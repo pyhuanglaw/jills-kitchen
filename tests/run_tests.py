@@ -139,9 +139,9 @@ window.__act = function(){
   for (const t of R.tables) { if (tableActionable(t) && !jillTargets(t.i)) tapTable(t); }
   for (const tk of R.tickets) for (const it of tk.items) if (it.st==='pending') startCook(tk,it,true);
   for (const s of R.slots) {
+    if (s.broken) { tapStation(R.slots.indexOf(s)); continue; }
     const j=s.job; if (!j || !j.step) continue; const k=j.step;
     if (chefFor(s.type)) continue;
-    if (s.broken) { tapStation(R.slots.indexOf(s)); continue; }
     if (k.t==='add') { const id = k.left[0]; if (id) actIng(s,id); }
     else if (k.t==='tap') actTap(s);
     else if (k.t==='zone') { if (k.p >= k.z.c) actZone(s); }
@@ -160,8 +160,42 @@ window.__bot = function(steps, dt){
   }
   return out;
 };
+// Evening mode: keep the world running after closing (Jill's sofa life, the TV, Dylan, the cats) without
+// rendering. Steps the same functions the main loop steps.
+window.__evening = function(seconds, dt, every, hook){
+  const out = {samples:[], bad:[]}; const n = Math.round(seconds/dt);
+  for (let i=0;i<n;i++){
+    if (R && phase==='service') update(dt);
+    updateCats(dt, 0); lifeUpd(dt);
+    if (hook) hook(i*dt);
+    const b = __lifeInvariants(); if (b.length && out.bad.length<8) out.bad.push({t:+(i*dt).toFixed(2), b});
+    if (every && i % every === 0) out.samples.push(__lifeSample(i*dt));
+  }
+  return out;
+};
+window.__lifeSample = t => { const L=LIFE.jill, D=LIFE.dylan, tv=LIFE.tv;
+  return {t:+t.toFixed(1), phase, plan:LIFE.plan, jill:{on:L.on,act:L.act,legs:+L.legs.toFixed(2),pos:L.pos,x:L.x|0,y:L.y|0,walking:L.walking},
+          tv:{at:tv.at,on:tv.on,x:tv.x|0,y:tv.y|0,mover:tv.mover}, dylan:D?{st:D.state,x:D.x|0,y:D.y|0,onSofa:D.onSofa,seated:D.seated,act:D.act}:null,
+          cats:CATS.map(c=>({id:c.def.id,st:c.st,pose:c.pose,x:c.x|0,y:c.y|0,slot:c.sofa?c.sofa.k:null,kind:c.sofa?c.sofa.kind:null,on:!!c.sofaOn}))}};
+window.__lifeInvariants = function(){ const bad=[]; const L=LIFE.jill, D=LIFE.dylan, tv=LIFE.tv; if (!CATS) return bad;
+  const on = CATS.filter(c=>c.sofa&&c.sofaOn);
+  const keys = on.map(c=>c.sofa.k); if (new Set(keys).size!==keys.length) bad.push('two cats in one sofa slot: '+keys.join(','));
+  if (on.filter(c=>c.sofa.kind==='lap').length>1) bad.push('two cats on the lap');
+  const ivs = []; if (L.on){ ivs.push(['jill',L.x-13,L.x+13]); const lg=jillLegs(); if (lg) ivs.push(['legs',lg[0],lg[1]]); }
+  if (D&&D.onSofa) ivs.push(['dylan',D.x-13,D.x+13]);
+  for (const c of on) if (c.sofa.kind==='seat') ivs.push([c.def.id,c.sofa.x-12,c.sofa.x+12]);
+  for (let i=0;i<ivs.length;i++) for (let j=i+1;j<ivs.length;j++){ const a=ivs[i],b=ivs[j]; if (a[0]==='jill'&&b[0]==='legs') continue; if (a[1]<b[2]-0.5 && b[1]<a[2]-0.5) bad.push('overlap on the seat: '+a[0]+' '+b[0]); }
+  for (const v of ivs) if (v[1]<SOFA.seatL-0.5||v[2]>SOFA.seatR+0.5) bad.push(v[0]+' hangs off the seat');
+  if (L.on && (L.x!==JPOS[L.pos].x || L.y!==SOFA.jy)) bad.push('Jill seated at a wrong place');
+  if (L.on && (L.act==='pushing'||L.walking)) bad.push('walking while seated');
+  if (tv.mover){ for (const c of CATS){ if (c.hidden||c.perch>=0||c.sofa) continue; if (Math.hypot(c.x-tv.x,c.y-6-tv.y)<14) bad.push('TV rolled into '+c.def.id); } }
+  for (const c of CATS){ if (!isFinite(c.x)||!isFinite(c.y)) bad.push(c.def.id+' NaN'); if (c.sofa&&c.sofaOn&&(c.x!==c.sofa.x||c.y!==c.sofa.y)) bad.push(c.def.id+' not at its slot'); }
+  if (L.on && CATS.some(c=>c.sofa&&c.sofa.kind==='lap'&&c.sofaOn) && !L.on) bad.push('got up with a cat on the lap');
+  return bad;
+};
 const __h = s => { let x=2166136261; for (let i=0;i<s.length;i++){ x^=s.charCodeAt(i); x=Math.imul(x,16777619);} return (x>>>0).toString(16); };
 const __px = cv => { if (!cv || !cv.width || !cv.height) return '-'; const d=cv.getContext('2d').getImageData(0,0,cv.width,cv.height).data; const u=new Uint32Array(d.buffer); let x=2166136261; for (let i=0;i<u.length;i++) x=Math.imul(x^u[i],16777619); return (x>>>0).toString(16); };
+window.__botUntil = function(cond, maxSteps, dt){ let n=0; for (; n<maxSteps; n++){ if (!(phase==='service'&&R) || eval(cond)) break; __act(); update(dt||1/30); updateCats(dt||1/30,0); } return n; };
 // Frame mode: run the real main loop frame by frame on virtual time (30 fps), sampling
 // scene pixels, DOM and cat state along the way.
 window.__play = function(frames, every, stop){
@@ -184,7 +218,7 @@ window.__digest = function(){
   const s = S.lastSummary ? {rev:S.lastSummary.rev,cost:S.lastSummary.cost,tips:S.lastSummary.tips,bonus:S.lastSummary.bonus,wages:S.lastSummary.wages,net:S.lastSummary.net,guests:S.lastSummary.guests,lost:S.lastSummary.lost,perfect:S.lastSummary.perfect,plated:S.lastSummary.plated,avg:S.lastSummary.avg,top:S.lastSummary.top,stars:S.lastSummary.stars} : null;
   return {day:S.day, money:S.money, lifetime:S.lifetime, level:S.level, stats:S.stats, xp:S.xp, stock:S.stock, reviews:S.reviews.length,
           reviewHash:__h(JSON.stringify(S.reviews.map(r=>[r.s,r.txt,r.name]))), regulars:S.regulars, summary:s, cats, catHash:__h(JSON.stringify(cats)),
-          mem:Object.keys(S.mem||{}).sort().map(k=>k+':'+S.mem[k].day+':'+__h(S.mem[k].img)), weights:__wtHash()};
+          mem:Object.keys(S.mem||{}).sort().map(k=>k+':'+S.mem[k].day+':'+__h(S.mem[k].img)), weights:__wtHash(), dylan:S.dylan, life:S.life};
 };
 """
 
@@ -200,6 +234,7 @@ INV = r"""(()=>{const bad=[];
   if(paused&&sub!=='pause'&&sub!=='guide'&&sub!=='settings')bad.push('paused without a menu open (sub='+sub+')');
   if(phase==='service'&&!paused&&!sub&&!screenEl.hidden)bad.push('menu screen covering the running service');
   if(!IDLE&&phase!=='service'&&phase!=='title')bad.push('no idle view outside service');
+  if(typeof __lifeInvariants==='function')bad.push(...__lifeInvariants());
   return bad})()"""
 
 def state_ok(g, where):
@@ -423,6 +458,7 @@ def old_saves_load(b, port, target):
         for k in ('eq', 'decor', 'stats', 'unlocked', 'menu', 'xp', 'regulars', 'achievements'):
             check(g.ev(f"JSON.stringify(S.{k})") == json.dumps({**g.ev(f"newState().{k}"), **orig[k]} if isinstance(orig.get(k), dict) and k in ('eq', 'decor', 'stats') else orig.get(k), ensure_ascii=False, separators=(',', ':')), f'{name}: S.{k} not preserved')
         check(g.ev("Array.isArray(S.crew)&&S.crewMig===1&&typeof S.mem==='object'&&typeof S.rstar==='object'"), f'{name}: missing fields not filled with defaults')
+        check(g.ev("S.dylan&&S.dylan.stage===0&&S.dylan.clues&&S.life&&S.life.sofa===0"), f'{name}: life/dylan defaults missing on an old save')
         if orig.get('staff', {}).get('bartender') and 'crew' not in orig:
             # KNOWN QUIRK (kept on purpose, see docs/REFACTOR_REPORT.md): load() fills crewMig from the
             # defaults before checking it, so a pre-crew save's bartender/busser are NOT turned into crew.
@@ -573,6 +609,198 @@ def touch_controls(b, port, target):
     fx, fy = g.ev("(()=>{const f=kitchenItems().find(i=>i.k==='fridge');return[f.x+f.w/2,f.y+f.h/2]})()")
     tap(fx, fy)
     check(g.ev("KPOP.fridge>0"), 'tapping the fridge did nothing')
+    check(not g.errors, g.errors)
+    g.close()
+
+# ---------------------------------------------------------------- life: sofa, TV, Jill, Dylan
+def run_evening(g, seconds=150, every=30, hook='null'):
+    """Plays the day fast, then lets the closing + after-hours world run (no rendering). Returns samples."""
+    start_day(g)
+    g.ev("__bot(40000,1/30)") if False else None
+    # play until the closing begins (the bot stops itself when closing starts)
+    steps = play_day(g, max_steps=40000)
+    check(g.ev("R&&R.closing!=null||phase!=='service'"), f'day did not reach the closing ({steps} steps)')
+    r = g.ev(f"__evening({seconds},1/20,{every},{hook})")
+    check(not r['bad'], f'life invariants broken: {r["bad"][:4]}')
+    check(g.ev("phase") == 'summary', 'evening did not end in the summary')
+    check(not g.errors, g.errors)
+    return r['samples']
+
+def next_day(g):
+    g.click('[data-act=toShop]'); g.click('[data-act=nextDay]')
+
+@test
+def sofa_geometry(b, port, target):
+    """Every seat/arm/back place the cats can choose, for every way Jill and Dylan can sit, is inside the
+    sofa and never overlaps a body. With Jill stretched out there is still room for several cats."""
+    g = Game(b, port, target, seed=16, manual=True)
+    install_bot(g)
+    r = g.ev(r"""(()=>{const bad=[];let minSlots=99;const L=LIFE.jill;updateCats(1/30,0);
+      for(const pos of['L','R','M'])for(const legs of[0,.75,1])for(const dy of[false,true]){
+        for(const c of CATS){c.sofa=null;c.sofaOn=false}
+        Object.assign(L,{on:true,pos,x:JPOS[pos].x,y:SOFA.jy,face:JPOS[pos].face,legs,legTarget:legs});
+        LIFE.dylan=null;if(dy){const x=dylanCanSofa();if(x==null)continue;LIFE.dylan={x,y:SOFA.jy,onSofa:true,seated:false,state:'sitSofa'}}
+        // fill the sofa greedily: each cat takes a slot, then re-check with the next cat
+        let n=0;for(const c of CATS){const sl=sofaSlots(c);if(!sl.length)break;const s=sl[Math.floor(Math.random()*sl.length)];c.sofa={k:s.k,x:s.x,y:s.y,kind:s.kind};c.sofaOn=true;c.x=s.x;c.y=s.y;n++}
+        if(legs===1&&!dy)minSlots=Math.min(minSlots,n);
+        bad.push(...__lifeInvariants().map(m=>pos+'/'+legs+'/'+(dy?'dylan':'-')+': '+m));
+        const lg=jillLegs();if(lg&&(lg[0]<SOFA.seatL||lg[1]>SOFA.seatR))bad.push(pos+' legs off the seat '+lg);}
+      for(const c of CATS){c.sofa=null;c.sofaOn=false}LIFE.dylan=null;Object.assign(L,{on:false,pos:null,legs:0,legTarget:0});
+      return{bad:bad.slice(0,6),minSlots}})()""")
+    check(not r['bad'], r['bad'])
+    check(r['minSlots'] >= 4, f'with Jill stretched out only {r["minSlots"]} cats fit on the sofa')
+    g.close()
+
+@test
+def jill_evening_life(b, port, target):
+    """Twelve seeded evenings: Jill finds her own way to the sofa most nights, stretches out when the seat is
+    free, reads / watches the rolling TV / does nothing, and never breaks a rule doing it."""
+    nights = []
+    for seed in range(40, 52):
+        g = Game(b, port, target, seed=seed, manual=True)
+        install_bot(g)
+        g.click('[data-act=open]')
+        samples = run_evening(g, seconds=150, every=10)
+        acts = set(x['jill']['act'] for x in samples if x['jill']['on'])
+        nights.append({'seed': seed, 'plan': samples[-1]['plan'], 'sat': any(x['jill']['on'] for x in samples),
+                       'legs': max(x['jill']['legs'] for x in samples), 'acts': acts,
+                       'tv': any(x['tv']['on'] for x in samples), 'tvmoved': any(x['tv']['at'] in ('use', 'moving') for x in samples),
+                       'endSeated': samples[-1]['jill']['on'] or samples[-1]['plan'] == 'table',
+                       'cats': max(sum(1 for c in x['cats'] if c['on']) for x in samples)})
+        g.close()
+    sat = [n for n in nights if n['sat']]
+    check(len(sat) >= 8, f'Jill used the sofa on only {len(sat)}/12 nights: {nights}')
+    check(sum(1 for n in sat if n['legs'] >= .95) >= len(sat) // 2, f'legs stretched on too few nights: {[n["legs"] for n in sat]}')
+    check(all(n['endSeated'] for n in nights), f'someone is stuck standing at the end of the evening: {[n for n in nights if not n["endSeated"]]}')
+    all_acts = set().union(*[n['acts'] for n in sat])
+    check({'read', 'idle'} <= all_acts, f'expected reading and doing nothing across nights, saw {all_acts}')
+    check(any(n['tv'] for n in nights), f'the TV was never watched in 12 nights: {[n["tvmoved"] for n in nights]}')
+    check(len(set(n['cats'] for n in nights)) >= 3, f'no variety in how many cats join her: {[n["cats"] for n in nights]}')
+
+@test
+def cats_use_sofa_by_personality(b, port, target):
+    """Over many evenings the five cats use the sofa the way their personalities say, without being told
+    where to sit: 包包 sleeps on the seat, 寶寶 takes the high pretty places, 樾樾 and 小齁 compete for the
+    places next to Jill (and neither always wins), 柔柔 keeps an eye on the others."""
+    slot_time = {k: {} for k in ['tora', 'ban', 'snow', 'mikan', 'mei']}
+    sleep_on_sofa = {k: 0 for k in slot_time}
+    closest = {'tora': 0, 'ban': 0}
+    zero_cat_checks = 0; checks = 0
+    for seed in range(60, 76):
+        g = Game(b, port, target, seed=seed, manual=True)
+        install_bot(g)
+        g.click('[data-act=open]')
+        samples = run_evening(g, seconds=140, every=8)
+        for x in samples:
+            if not x['jill']['on']:
+                continue
+            checks += 1
+            on = [c for c in x['cats'] if c['on']]
+            if not on: zero_cat_checks += 1
+            for c in on:
+                slot_time[c['id']][c['kind']] = slot_time[c['id']].get(c['kind'], 0) + 1
+                if c['st'] == 'sleep': sleep_on_sofa[c['id']] += 1
+            near = sorted([c for c in on if c['id'] in ('tora', 'ban')], key=lambda c: abs(c['x'] - x['jill']['x']) + (0 if c['kind'] in ('lap', 'arm', 'seat') else 40))
+            if near: closest[near[0]['id']] += 1
+        g.close()
+    tot = {k: sum(v.values()) for k, v in slot_time.items()}
+    check(all(tot[k] > 0 for k in tot), f'some cat never used the sofa: {tot}')
+    check(slot_time['snow'].get('seat', 0) >= tot['snow'] * .55, f'包包 should mostly lie on the seat: {slot_time["snow"]}')
+    check(sleep_on_sofa['snow'] >= tot['snow'] * .5, f'包包 should mostly sleep there: {sleep_on_sofa["snow"]}/{tot["snow"]}')
+    hi = slot_time['mei'].get('back', 0) + slot_time['mei'].get('arm', 0)
+    check(hi >= tot['mei'] * .55, f'寶寶 should prefer the backrest and the arms: {slot_time["mei"]}')
+    for k in ('tora', 'ban'):
+        nearJ = slot_time[k].get('lap', 0) + slot_time[k].get('arm', 0) + slot_time[k].get('seat', 0)
+        check(nearJ >= tot[k] * .6, f'{k} should sit close to Jill: {slot_time[k]}')
+    check(closest['tora'] > 0 and closest['ban'] > 0, f'the place closest to Jill should change hands: {closest}')
+    check(zero_cat_checks > 0, 'there was never a moment with Jill alone on the sofa')
+
+@test
+def dylan_stays_a_quiet_regular_early_on(b, port, target):
+    """Before anything is revealed Dylan is just an unusually patient guest who glances at Jill. He does not
+    stay after closing, nothing in the UI names the relationship, and no romance UI exists."""
+    g = Game(b, port, target, seed=77, manual=True)
+    install_bot(g)
+    g.ev("S.day=3;S.money=4000;S.level=2;S.tables=4")
+    g.click('[data-act=open]')
+    visits = 0; stayed = 0; looks = 0
+    for d in range(6):
+        start_day(g)
+        # bring him in early in the day so the visit completes before closing
+        g.ev("__botUntil('R.t>R.dur*.25',20000)")
+        g.ev("(()=>{for(const q of queued())if(q.state==='queue'){q.state='leave';q.tx=DOOR.x;q.ty=DOOR.y}spawn({type:'regular',reg:'dylan',size:1})})()")
+        g.ev("__bot(400,1/30)")
+        r = g.ev(r"""(()=>{const g=R.groups.find(x=>x.reg==='dylan');if(!g)return{lost:1};const t=freeTableFor(g);if(t&&g.table==null)seatGroup(g,t);
+          const o={type:'regular',reg:'chen',state:'wait',table:0,ticket:null};const other=drainRate(o);const mine=drainRate(Object.assign({},g,{state:'wait'}));return{lost:0,patient:mine<other*.7,table:g.table}})()""")
+        if not r.get('lost'):
+            visits += 1
+            check(r['patient'], 'Dylan should be much more patient than another regular')
+        looks = g.ev("S.dylan.clues.look||0")
+        stage0 = g.ev("S.dylan.stage") == 0
+        play_day(g)
+        if os.environ.get('JK_TRACE'): print('   day', d, 'phase', g.ev("phase"), 'R', g.ev("!!R"), 'visible', g.page.locator('[data-act=toShop]').count(), g.ev("screenEl.hidden"))
+        if stage0: stayed += 1 if g.ev("!!LIFE.dylan") else 0
+        if g.ev("(S.regulars.dylan||0)<3||S.day<6"): check(g.ev("S.dylan.stage") == 0, 'stage moved before the conditions were met')
+        next_day(g)
+    check(visits >= 3, f'Dylan should have been seated on most of these days: {visits}')
+    check(looks > 0, 'Dylan never glanced at Jill')
+    check(stayed == 0, 'Dylan must not stay after closing before the story moves on')
+    g.click('[data-act=book]'); g.click('[data-act=btab][data-k=regulars]')
+    html = g.page.inner_html('#screen')
+    check('Dylan' in html and '來店' in html, 'Dylan should be listed with the regulars once met')
+    for bad in ['Jill 的先生', 'husband', 'Husband', '好感', 'LOVE', 'Romance', '戀愛', '♥']:
+        check(bad not in html, f'romance UI text found early: {bad}')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
+def dylan_hidden_reveal(b, port, target):
+    """The relationship is only shown once several quiet things have happened, and only on an evening
+    where Jill is already settled on the sofa; it is one photo and one line in the book, and the game
+    just goes on. Afterwards he sometimes sits beside her and sometimes has to sit elsewhere."""
+    g = Game(b, port, target, seed=88, manual=True)
+    install_bot(g)
+    g.ev("S.day=13;S.money=9000;S.level=2;S.tables=4;S.regulars.dylan=6;S.dylan.stage=1;S.dylan.stay=2;S.dylan.clues={late:2,pet:1,look:9};S.life.sofa=4;dylanStays=()=>true")
+    g.click('[data-act=open]')
+    revealed_at = None; beside = 0; elsewhere = 0
+    for d in range(14):
+        if g.ev("S.dylan.stage") < 3:
+            g.click('[data-act=book]'); g.click('[data-act=btab][data-k=regulars]')
+            check('Jill 的先生' not in g.page.inner_html('#screen'), 'the book must not say it before the reveal')
+            g.click('[data-act=closeSub]')
+        start_day(g)
+        check(g.ev("S.dylan.stage") >= 2, 'stage 2 should be reached on the first day of this scenario')
+        g.ev("__botUntil('R.t>R.dur*.8',20000)")
+        g.ev("(()=>{for(const q of queued())if(q.state==='queue'){q.state='leave';q.tx=DOOR.x;q.ty=DOOR.y}spawn({type:'regular',reg:'dylan',size:1})})()")
+        g.ev("__botUntil('(()=>{const g=R.groups.find(x=>x.reg===\"dylan\");return !g||freeTableFor(g)})()',3000)")
+        g.ev("(()=>{const g=R.groups.find(x=>x.reg==='dylan');if(g&&g.table==null){const t=freeTableFor(g);if(t)seatGroup(g,t)}})()")
+        play_day(g)
+        # from the third evening on, the evening's dice are loaded so the test does not depend on luck; every other
+        # condition (his presence, Jill settled, a free place beside her) still has to come true by itself
+        force = 'if(%s&&S.dylan.stage===2&&LIFE.revealRoll===-1)LIFE.revealRoll=1;' % ('true' if d >= 2 else 'false')
+        hook = "t=>{%sif(S.dylan.stage===3&&!window.__rv){window.__rv={t,jillOn:LIFE.jill.on,dylanOn:!!(LIFE.dylan&&LIFE.dylan.onSofa),phase}}}" % force
+        samples = g.ev(f"__evening(120,1/20,10,{hook})")['samples']
+        rv = g.page.evaluate('window.__rv||null')
+        if rv and revealed_at is None:
+            revealed_at = d
+            check(rv['jillOn'] and rv['dylanOn'], f'the reveal happened away from the sofa: {rv}')
+            check(g.ev("S.dylan.reveal") == g.ev("S.day"), 'reveal day not recorded')
+        if g.ev("S.dylan.stage") == 3 and g.ev("!!LIFE.dylan"):
+            if any(x['dylan'] and x['dylan']['onSofa'] for x in samples): beside += 1
+            if any(x['dylan'] and x['dylan']['st'] == 'sitTable' for x in samples): elsewhere += 1
+        next_day(g)
+        if revealed_at is not None and d - revealed_at >= 4:
+            break
+    check(revealed_at is not None, 'the reveal never happened in 14 evenings')
+    check(g.ev("S.dylan.stage") == 3, 'stage 3 not set')
+    g.click('[data-act=book]'); g.click('[data-act=btab][data-k=regulars]')
+    html = g.page.inner_html('#screen')
+    check('Jill 的先生' in html, 'after the reveal the book should say who he is')
+    for bad in ['好感', 'LOVE', 'Romance', '戀愛', 'CONGRATULATIONS', '♥']:
+        check(bad not in html, f'romance UI text: {bad}')
+    g.click('[data-act=closeSub]')
+    check(beside >= 1, f'after the reveal he never sat beside her: beside={beside} elsewhere={elsewhere}')
+    check(g.ev("phase") == 'prep', 'the game should simply continue')
     check(not g.errors, g.errors)
     g.close()
 

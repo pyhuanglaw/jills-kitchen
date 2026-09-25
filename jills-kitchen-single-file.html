@@ -510,7 +510,7 @@ const COACH=[
 const KEY='jills-kitchen-save-v1';
 function newState(){return{v:1,day:1,phase:'prep',money:500,lifetime:0,level:1,
  eq:{stove:1,oven:0,bar:0,prep:0,fridge:1,pan:1},tables:2,
- decor:{plants:0,lights:0,art:0,chairs:0,rug:0,ware:0,bar:0,sofa:0},staff:{busser:false,bartender:false},mem:{},catFam:{},crew:[],crewMig:1,rstar:{},
+ decor:{plants:0,lights:0,art:0,chairs:0,rug:0,ware:0,bar:0,sofa:0},staff:{busser:false,bartender:false},mem:{},catFam:{},crew:[],crewMig:1,rstar:{},dylan:{stage:0,stay:0,reveal:0,last:0,clues:{}},life:{sofa:0,tv:0},
  unlocked:['friedrice'],menu:['friedrice'],price:{},stock:{},xp:{},reviews:[],achievements:{},regulars:{},returning:0,
  signature:null,catNames:{},buzz:1,buzzMsg:'',stats:{guests:0,perfect:0,days:0},tut:0,gate:1,news:[],today:null,todayCost:0,lastSummary:null,sfx:true,music:true}}
 let S;
@@ -661,6 +661,9 @@ function dishURL(id,q,want){const k='u'+id+(q||'G')+(want||0)+(id==='signature'&
 function drawPerson(c,x,y,L,o){o=o||{};const s=(o.s||1)*(o.pscale===undefined?PSC:o.pscale);c.save();c.translate(x,y);c.scale((o.flip?-1:1)*s,s);
  const seated=o.seated,bob=o.bob||0,step=o.step||0;const OL='rgba(60,34,22,.5)';c.lineJoin='round';
  if(!seated){c.fillStyle='rgba(40,25,15,.25)';el(c,0,.5,11,3.6);const LL=o.tall?15:10;const l1=-LL-Math.max(0,step)*1.6,l2=-LL-Math.max(0,-step)*1.6;c.fillStyle=L.pants||'#3B3542';c.strokeStyle=OL;c.lineWidth=.6;rr(c,-5.6,l1,4.8,LL,2.2);c.fill();c.stroke();rr(c,.8,l2,4.8,LL,2.2);c.fill();c.stroke();c.fillStyle='#2A2220';el(c,-3.2,l1+LL-.6,3.2,1.7);el(c,3.2,l2+LL-.6,3.2,1.7);c.fillStyle='rgba(255,255,255,.25)';el(c,-4,l1+LL-1.2,1.2,.5);el(c,2.4,l2+LL-1.2,1.2,.5)}
+ if(seated&&o.lounge){const lg=o.lounge;const pc=L.pants||'#3B3542';c.fillStyle=pc;c.strokeStyle=OL;c.lineWidth=.6;
+  if(lg.legs<.3){c.fillStyle=shade(pc,.12);rr(c,-7.2,-6,14.4,8.5,3.2);c.fill();c.stroke();c.fillStyle=pc;rr(c,-6.2,.5,4.8,8.5,2.2);c.fill();c.stroke();rr(c,1.4,.5,4.8,8.5,2.2);c.fill();c.stroke();c.fillStyle='rgba(255,255,255,.1)';rr(c,-6,-4.6,12,1.4,.7);c.fill();c.fillStyle='#2A2220';el(c,-3.8,9.4,3.3,1.8);el(c,3.8,9.4,3.3,1.8);c.fillStyle='rgba(255,255,255,.2)';el(c,-4.4,8.8,1.2,.5);el(c,3.2,8.8,1.2,.5)}
+  else{const len=lg.len;c.save();c.translate(3,-4.5);c.rotate(.07);c.fillStyle=shade(pc,.16);rr(c,0,-5.2,len,5,2.5);c.fill();c.stroke();c.fillStyle=shade(pc,.06);rr(c,-1,-1.4,len-1.5,5.2,2.6);c.fill();c.stroke();c.fillStyle='rgba(255,255,255,.14)';rr(c,2,-.6,len-6,1.2,.6);c.fill();c.fillStyle='#2A2220';c.save();c.translate(len+.6,-3.6);c.rotate(-.6);el(c,0,0,3,1.8);c.fillStyle='rgba(255,255,255,.2)';el(c,-.6,-.6,1.4,.6);c.restore();c.save();c.translate(len-.9,.3);c.rotate(-.6);c.fillStyle='#2A2220';el(c,0,0,3,1.8);c.fillStyle='rgba(255,255,255,.2)';el(c,-.6,-.6,1.4,.6);c.restore();c.restore()}}
  const base=seated?-4:(o.tall?-14:-9);const hy=base-25+bob;const top=o.jill?'#FFFFFF':L.top;const by=base-17+bob;
  if(L.acc==='backpack'){c.fillStyle='#4E6B8A';rr(c,-9.5,by,19,14,5);c.fill()}
  if(L.hs===1||L.hs===2){c.fillStyle=shade(L.hair,-.08);rr(c,-11,hy-9,22,L.hs===2?29:20,9);c.fill();c.strokeStyle=OL;c.lineWidth=.6;c.stroke()}
@@ -677,6 +680,8 @@ function drawPerson(c,x,y,L,o){o=o||{};const s=(o.s||1)*(o.pscale===undefined?PS
  if(L.acc==='backpack'){c.strokeStyle='#3C5470';c.lineWidth=2;c.beginPath();c.moveTo(-5,by+1);c.lineTo(-5,by+11);c.moveTo(5,by+1);c.lineTo(5,by+11);c.stroke()}
  if(L.acc==='shades'){c.strokeStyle='#E6C27A';c.lineWidth=1;c.beginPath();c.moveTo(-4,hy+9);c.quadraticCurveTo(0,hy+15,4,hy+9);c.stroke()}
  if(L.acc==='phone'){c.fillStyle='#222';rr(c,7,base-10+bob,4.5,7,1);c.fill();c.fillStyle='#8FD3F4';c.fillRect(7.8,base-9+bob,2.9,5)}
+ if(o.hold){const ph=o.hold==='phone';const hy2=by+9;c.save();c.translate(0,hy2);c.rotate(-.1);c.fillStyle=ph?'#2A2A2E':'#F2EFE8';rr(c,-4.6,-5,9.2,ph?6.6:8.6,1.2);c.fill();c.strokeStyle=OL;c.lineWidth=.5;c.stroke();c.fillStyle=ph?'#9FD8F5':'#FBFAF6';c.fillRect(-3.7,-4,7.4,ph?4.7:6.6);if(!ph){c.fillStyle='rgba(0,0,0,.2)';for(let k=0;k<4;k++)c.fillRect(-2.8,-2.7+k*1.5,5.6-(k===3?2.2:0),.6)}c.restore();
+  c.fillStyle=L.skin;const rh=o.flipPage?-2.4:0;rr(c,-9.4,hy2-1,5,3.4,1.7);c.fill();rr(c,4.4,hy2-1+rh,5,3.4,1.7);c.fill();circ(c,-5.4,hy2+1.4,2.2);circ(c,5.4,hy2+1.4+rh,2.2)}
  let hg=c.createRadialGradient(-3,hy-3,1,0,hy,11);hg.addColorStop(0,shade(L.skin,.12));hg.addColorStop(1,shade(L.skin,-.07));c.fillStyle=hg;circ(c,0,hy,9.6);c.strokeStyle=OL;c.lineWidth=.7;c.beginPath();c.arc(0,hy,9.6,0,7);c.stroke();
  c.fillStyle=shade(L.skin,-.06);circ(c,-9.3,hy+1.6,1.8);circ(c,9.3,hy+1.6,1.8);
  c.fillStyle=L.hair;
@@ -684,6 +689,7 @@ function drawPerson(c,x,y,L,o){o=o||{};const s=(o.s||1)*(o.pscale===undefined?PS
  else{c.beginPath();c.arc(0,hy-.5,10.3,Math.PI*.98,Math.PI*2.02);c.closePath();c.fill();c.beginPath();c.ellipse(-2.5,hy-5.2,8.3,3.9,-.15,0,7);c.fill();if(L.hs!==0){c.beginPath();c.ellipse(-8.7,hy+1,2.5,6.3,0,0,7);c.fill();c.beginPath();c.ellipse(8.7,hy+1,2.5,6.3,0,0,7);c.fill()}c.strokeStyle=shade(L.hair,.35);c.lineWidth=1.2;c.lineCap='round';c.beginPath();c.arc(-1,hy-3.2,7,Math.PI*1.15,Math.PI*1.45);c.stroke()}
  if(o.me){c.fillStyle=L.hair;c.beginPath();c.moveTo(-9.4,hy-2.6);c.quadraticCurveTo(-9.2,hy-9.6,0,hy-10);c.quadraticCurveTo(9.2,hy-9.6,9.4,hy-2.6);for(let i=4;i>=-4;i--)c.lineTo(i*2.15+(i>0?.4:-.4),hy-1.6-(Math.abs(i)%2?0:1.1));c.closePath();c.fill();c.strokeStyle=shade(L.hair,.35);c.lineWidth=.7;c.beginPath();c.moveTo(-3,hy-8);c.quadraticCurveTo(-2,hy-5,-2.6,hy-2.6);c.moveTo(2.6,hy-8);c.quadraticCurveTo(3.4,hy-5,3,hy-2.6);c.stroke()}
  if(L.hs===3){c.fillStyle=L.hair;circ(c,0,hy-11.5,5);c.strokeStyle=shade(L.hair,.3);c.lineWidth=1;c.beginPath();c.arc(-1,hy-12.5,3,Math.PI,Math.PI*1.5);c.stroke()}
+ const gz=o.gaze;if(gz){c.save();c.translate(clamp(gz.x||0,-1,1)*1.3,clamp(gz.y||0,-1,1)*.7)}
  const m=o.mood||'ok';c.fillStyle='#2A1C16';
  if(o.me&&m==='happy'&&!o.blink){c.strokeStyle='#2A1C16';c.lineWidth=1.2;c.lineCap='round';for(const ex of[-3.4,3.4]){c.beginPath();c.arc(ex,hy+2.4,1.8,Math.PI*1.12,Math.PI*1.88);c.stroke()}c.fillStyle='#2A1C16';c.fillRect(-5.4,hy+.1,.8,.6);c.fillRect(4.6,hy+.1,.8,.6)}else if(m==='angry'){c.fillRect(-4.8,hy+.8,3,1.2);c.fillRect(1.8,hy+.8,3,1.2)}else if(o.blink){c.fillRect(-4.6,hy+1.1,2.6,.9);c.fillRect(2,hy+1.1,2.6,.9)}else{el(c,-3.3,hy+1.3,1.35,1.55);el(c,3.3,hy+1.3,1.35,1.55);c.fillStyle='#fff';circ(c,-2.8,hy+.7,.45);circ(c,3.8,hy+.7,.45)}
  c.fillStyle=m==='angry'?'rgba(225,70,50,.55)':'rgba(235,120,110,.38)';el(c,-5.6,hy+4.2,2.1,1.3);el(c,5.6,hy+4.2,2.1,1.3);
@@ -691,10 +697,11 @@ function drawPerson(c,x,y,L,o){o=o||{};const s=(o.s||1)*(o.pscale===undefined?PS
  if(m==='happy'){c.arc(0,hy+4.3,2.3,.25,Math.PI-.25)}else if(m==='sad'){c.arc(0,hy+7.6,2,Math.PI+.45,-.45)}else if(m==='angry'){c.moveTo(-2,hy+6.2);c.lineTo(2,hy+5.4);c.moveTo(-5.2,hy-2.4);c.lineTo(-1.8,hy-.9);c.moveTo(5.2,hy-2.4);c.lineTo(1.8,hy-.9)}else if(m==='eat'){c.stroke();c.fillStyle='#8A3A2A';el(c,0,hy+5.4,1.5,o.chew?1.4:.6)}else{c.moveTo(-1.6,hy+5.5);c.lineTo(1.6,hy+5.5)}c.stroke();
  if(L.acc==='glasses'||L.acc==='hat'){c.strokeStyle='#3A2A22';c.lineWidth=.9;c.beginPath();c.arc(-3.4,hy+1.2,2.6,0,7);c.moveTo(-.8,hy+1.2);c.lineTo(.8,hy+1.2);c.arc(3.4,hy+1.2,2.6,Math.PI,Math.PI*3);c.stroke()}
  if(L.acc==='shades'){c.fillStyle='#161618';rr(c,-6.4,hy-.4,5.4,3.4,1.4);c.fill();rr(c,1,hy-.4,5.4,3.4,1.4);c.fill();c.fillRect(-1,hy+.4,2,.9);c.fillStyle='rgba(255,255,255,.3)';c.fillRect(-5.6,hy,1.4,.8)}
+ if(gz)c.restore();
  if(L.acc==='beret'){c.fillStyle='#7A2E3A';c.save();c.translate(-1,hy-8.5);c.rotate(-.2);el(c,0,0,10.5,4);c.restore();c.fillRect(-1.5,hy-14,2,3)}
  if(L.acc==='hat'){c.fillStyle='#34302D';el(c,0,hy-6.5,13,3.2);rr(c,-7,hy-15,14,9,3);c.fill();c.fillStyle='#8E6A3A';c.fillRect(-7,hy-8.6,14,2)}
  if(L.acc==='bow'){c.fillStyle='#E8798A';c.beginPath();c.moveTo(6,hy-8);c.lineTo(11,hy-11);c.lineTo(11,hy-5);c.closePath();c.fill();c.beginPath();c.moveTo(6,hy-8);c.lineTo(1,hy-11);c.lineTo(1,hy-5);c.closePath();c.fill();circ(c,6,hy-8,1.6)}
- if(o.jill){let tg=c.createLinearGradient(-8,0,8,0);tg.addColorStop(0,'#FFFFFF');tg.addColorStop(1,'#E6E0D6');c.fillStyle=tg;rr(c,-7.6,hy-22,15.2,12,2.5);c.fill();c.fillStyle='#FFFFFF';circ(c,-5.5,hy-22,5.4);circ(c,0,hy-25,6);circ(c,5.5,hy-22,5.4);c.strokeStyle='rgba(120,100,80,.35)';c.lineWidth=.6;c.beginPath();c.arc(-5.5,hy-22,5.4,Math.PI*.9,Math.PI*1.9);c.arc(0,hy-25,6,Math.PI*1.1,Math.PI*1.9);c.arc(5.5,hy-22,5.4,Math.PI*1.1,Math.PI*2.1);c.stroke();c.strokeStyle='rgba(0,0,0,.08)';for(let k=-4;k<=4;k+=4){c.beginPath();c.moveTo(k,hy-19);c.lineTo(k,hy-11);c.stroke()}c.fillStyle='#EDE7DC';c.fillRect(-7.6,hy-12.5,15.2,2.2)}
+ if(o.jill&&o.hat!==false){let tg=c.createLinearGradient(-8,0,8,0);tg.addColorStop(0,'#FFFFFF');tg.addColorStop(1,'#E6E0D6');c.fillStyle=tg;rr(c,-7.6,hy-22,15.2,12,2.5);c.fill();c.fillStyle='#FFFFFF';circ(c,-5.5,hy-22,5.4);circ(c,0,hy-25,6);circ(c,5.5,hy-22,5.4);c.strokeStyle='rgba(120,100,80,.35)';c.lineWidth=.6;c.beginPath();c.arc(-5.5,hy-22,5.4,Math.PI*.9,Math.PI*1.9);c.arc(0,hy-25,6,Math.PI*1.1,Math.PI*1.9);c.arc(5.5,hy-22,5.4,Math.PI*1.1,Math.PI*2.1);c.stroke();c.strokeStyle='rgba(0,0,0,.08)';for(let k=-4;k<=4;k+=4){c.beginPath();c.moveTo(k,hy-19);c.lineTo(k,hy-11);c.stroke()}c.fillStyle='#EDE7DC';c.fillRect(-7.6,hy-12.5,15.2,2.2)}
  c.restore()}
 
 const JILL_LOOK={skin:'#F5D2B8',hair:'#1C1816',hs:4,top:'#fff',pants:'#2E2A28'};
@@ -834,7 +841,7 @@ function buyStock(d,delta){const cur=S.stock[d]||0;if(delta>0){const room=fridge
 function autoStock(){const sug=suggestStock();for(const d in sug){const need=sug[d]-(S.stock[d]||0);if(need>0)buyStock(d,need)}}
 
 /* ================= service ================= */
-function startService(){
+function startService(){lifeReset();dylanStageCheck();
  if(S.money<150&&stockTotal()<5){S.money+=300;toast('Jill 翻出了抽屜裡的應急金 $300')}
  if(S.day<=2)autoStock();S.news=[];
  const T=S.today,dur=dayDur(S.day);
@@ -857,6 +864,7 @@ function buildSchedule(dur){const T=S.today,n=T.groups,out=[];
  if(ev==='blogger')out.push({t:rand(.3,.7)*dur,type:'blogger',size:1});
  if(S.day>=6&&Math.random()<.2)out.push({t:rand(.25,.8)*dur,type:'critic',size:1});
  for(const r of REGS)if(S.day>=r.day&&Math.random()<.42)out.push({t:rand(.1,.85)*dur,type:r.type,reg:r.id,size:r.size});
+ if(S.day>=3){const d=S.dylan;const p=d.last===S.day-1?.1:d.stage>=3?.42:.3;if(Math.random()<p){const late=Math.random()<(d.stage>=1?.6:.35);out.push({t:(late?rand(.62,.86):rand(.12,.5))*dur,type:'regular',reg:'dylan',size:1})}}
  return out.sort((a,b)=>a.t-b.t)}
 function rollGuest(){const D=S.day,ev=S.today.event,L=S.level;const w={office:30*(ev==='company'?3:1),student:D>=2?22:12,couple:D>=2?14*(ev==='valentine'?3:1):0,gourmet:D>=3?8+L*3:0,vip:D>=6?1.5+L*1.5:0};
  const type=wpick(Object.keys(w),k=>w[k]);let size=1;if(type==='couple'||type==='vip')size=2;else if(type==='student')size=Math.random()<.5?1:Math.random()<.65?2:3;else if(type==='office')size=Math.random()<.7?1:2;else size=Math.random()<.6?1:2;
@@ -869,22 +877,25 @@ function spawn(o){if(R.closed)return;const reg=o.reg?REG_BY[o.reg]:null;const si
   state:'arrive',table:null,pat:1,x:DOOR.x,y:DOOR.y,tx:DOOR.x,ty:DOOR.y+30,timer:0,ticket:null,seed:Math.random()*10,mood:'ok'};
  if(reg&&(S.regulars[reg.id]||0)>0)g.ret=true;
  if(queued().length>=queueMax()){R.st.lost+=size;toast(`${g.name} 看到客滿，失望地走了…`);return}
- R.groups.push(g);R.lastSpawn=R.t;requeue();sfx.door();
+ R.groups.push(g);R.lastSpawn=R.t;requeue();sfx.door();if(g.reg==='dylan'){S.dylan.last=S.day;if(!S.dylan.first)S.dylan.first=S.day}
  if(g.type==='vip')toast('VIP 貴賓到了！消費高，要求也高。');
  if(g.type==='blogger')toast('美食部落客走進來了，手機已經拿出來了。');
  if(g.forSig)quote(g,'我是專程為了 Jill 的招牌菜來的！');
  coach(0)}
-function drainRate(g){const T=TYPES[g.type];const base={queue:1/32,order:1/28,wait:1/80,check:1/26}[g.state]||0;let m=1/(T.pat*(g.reg?1.15:1));
+function drainRate(g){const T=TYPES[g.type];const base={queue:1/32,order:1/28,wait:1/80,check:1/26}[g.state]||0;let m=1/(T.pat*(g.reg?1.15:1));if(g.reg==='dylan')m*=.5;
  m*=1+Math.min(.35,S.day*.012);m*=1-Math.min(.25,ambience()*.02);m*=1-.08*S.decor.chairs;if(R.weather==='rain')m/=1.1;if(g.catT&&g.catT>R.t)m*=.6;if(!g.rowdy&&g.table!=null&&R.groups.some(o=>o.rowdy&&o.table!=null&&Math.hypot(R.tables[o.table].x-R.tables[g.table].x,R.tables[o.table].y-R.tables[g.table].y)<140))m*=1.7;if(S.day<=2)m*=.62;else if(S.day<=4)m*=.82;return base*m}
 function updGroup(g,dt){
  if(['arrive','queue','toTable','leave'].includes(g.state)){const dx=g.tx-g.x,dy=g.ty-g.y,d=Math.hypot(dx,dy),v=78*dt;if(d>v){g.x+=dx/d*v;g.y+=dy/d*v;g.walk=(g.walk||0)+dt*11;g.moving=true}else{g.x=g.tx;g.y=g.ty;g.moving=false;
   if(g.state==='arrive')g.state='queue';else if(g.state==='toTable'){g.state='reading';g.timer=rand(2.4,3.8)*(TYPES[g.type].read||1)*(S.day===1?.8:1)}else if(g.state==='leave'){g.gone=true;return}}}
  if(g.state==='queue'||g.state==='order'||g.state==='wait'||g.state==='check'||g.state==='arrive'){const dr=drainRate(g.state==='arrive'?{...g,state:'queue'}:g);g.pat-=dt*dr;if(g.pat<=0){g.pat=0;angryLeave(g);return}}
+ if(g.reg==='dylan'&&g.table!=null&&['reading','order','wait','eat','check'].includes(g.state))dylanGuestUpd(g,dt);
  if(g.state==='reading'){g.timer-=dt;if(g.timer<=0){g.state='order';sfx.bubble()}}
  if(g.state==='eat'){g.timer-=dt;if(g.timer<=0){g.state='check';sfx.bubble()}}}
 function seatGroup(g,t){t.group=g;t.dirty=false;g.table=t.i;g.state='toTable';g.tx=t.x;g.ty=t.y+8;g.pat=Math.min(1,g.pat+.1);requeue();sfx.tap();
  if(Math.random()<.16&&!g.reg)quote(g,pick(['聽說 Jill 主廚今天在店裡！','朋友說一定要來吃 Jill 的店。','好香喔，是 Jill 在煎東西嗎？','這間店好溫暖，Jill 很會佈置耶。']));coach(1)}
-function freeTableFor(g){return R.tables.filter(t=>!t.group&&!t.dirty&&t.seats>=g.size).sort((a,b)=>a.seats-b.seats)[0]}
+function freeTableFor(g){const ts=R.tables.filter(t=>!t.group&&!t.dirty&&t.seats>=g.size).sort((a,b)=>a.seats-b.seats);
+ if(g.reg==='dylan'&&ts.length){/* a seat that sees Jill at the pass but is not in her way: the free table farthest from the kitchen */return ts.slice().sort((a,b)=>(a.seats-b.seats)||(Math.hypot(b.x-PASS.x,b.y-PASS.y)-Math.hypot(a.x-PASS.x,a.y-PASS.y)))[0]}
+ return ts[0]}
 function leaveGroup(g,mood){const t=g.table!=null?R.tables[g.table]:null;if(t&&t.group===g)t.group=null;g.state='leave';g.mood=mood||'ok';g.tx=DOOR.x;g.ty=DOOR.y;
  if(g.ticket){const tk=g.ticket;for(const s of R.slots)if(s.job&&s.job.tk===tk)s.job=null;for(const it of tk.items)if(it.st==='pending')S.stock[it.d]=(S.stock[it.d]||0)+1;R.tickets=R.tickets.filter(x=>x!==tk);R.jill.carry=R.jill.carry.filter(c=>c.tk!==tk);R.tv++}}
 function angryLeave(g){if(g.state==='queue'||g.state==='arrive'){R.st.lost+=g.size;toast(`${g.name} 等太久，離開了`);g.state='leave';g.tx=DOOR.x;g.ty=DOOR.y;g.mood='sad';requeue();if(Math.random()<.35)addReview(g,2,pick(['在門口排到認識了隔壁的陌生人。','排隊排到腳痠，下次早點來。']));return}
@@ -897,6 +908,7 @@ function orderItems(g){const ms=menuList();const T=TYPES[g.type];const W=R.weath
  const items=[];const cap=g.size===1?3:g.size===2?4:5;const reg=g.reg?REG_BY[g.reg]:null;
  for(let k=0;k<g.size;k++){let d=null;
   if(k===0&&g.forSig&&ms.includes('signature'))d='signature';
+  else if(k===0&&reg&&g.reg==='dylan'){if(ms.includes('signature')&&Math.random()<.45)d='signature'}
   else if(k===0&&reg){d=reg.fav.find(f=>ms.includes(f)&&DISH(f).cat!=='drink'&&DISH(f).cat!=='dessert')||null;if(!d){const f=reg.fav.find(f=>ms.includes(f));if(f){items.push(f);continue}}}
   if(!d){const f=foods();if(f.length)d=wpick(f,wf)}
   if(d)items.push(d);
@@ -908,7 +920,7 @@ function createTicket(g){const items=orderItems(g);const t=R.tables[g.table];
  const tk={id:R.tkid++,no:t.i+1,g,items:items.map(d=>({d,st:'pending',q:null,want:d==='steak'?wpick([0,1,2,3],k=>[.2,.35,.3,.15][k]):0,picked:false})),t0:R.t};
  for(const it of tk.items)takeStock(it);if(tk.items.some(it=>it.st==='order')){toast(`食材不夠！Jill 緊急叫貨中（1.5 倍價），${g.name} 要多等一下`);g.pat=Math.min(1,g.pat+.1)}
  g.ticket=tk;g.state='wait';g.pat=Math.min(1,g.pat+.12);R.tickets.push(tk);R.tv++;sfx.ticket();
- if(g.reg){const v=S.regulars[g.reg]||0;const tier=v>=20?2:v>=5?1:0;quote(g,REG_BY[g.reg].l[tier])}else if(g.type==='vip')quote(g,'把你們最好的端上來吧。');else if(Math.random()<.12)quote(g,pick(['今天想吃點好的。','聽說這裡的東西都是 Jill 親手做的？','有推薦的嗎？算了，都點吧。']));
+ if(g.reg==='dylan'){}else if(g.reg){const v=S.regulars[g.reg]||0;const tier=v>=20?2:v>=5?1:0;quote(g,REG_BY[g.reg].l[tier])}else if(g.type==='vip')quote(g,'把你們最好的端上來吧。');else if(Math.random()<.12)quote(g,pick(['今天想吃點好的。','聽說這裡的東西都是 Jill 親手做的？','有推薦的嗎？算了，都點吧。']));
  coach(2)}
 function recipeOf(d){return DISH(d).steps}
 function uniq(a){return[...new Set(a)]}
@@ -986,7 +998,8 @@ function collect(g){const T=TYPES[g.type];const items=g.ticket.items.filter(i=>i
  if(g.reg){S.catFam=S.catFam||{};S.catFam[g.reg]=(S.catFam[g.reg]||0)+1;const before=S.regulars[g.reg]||0;S.regulars[g.reg]=before+1;if(before+1===5)toast(`${g.name} 成為了熟客！`);if(before+1===20){toast(`${g.name} 成為了 Jill 的老客人！`);ach('oldfriend')}}
  if(g.ret||(g.reg&&(S.regulars[g.reg]||0)>1)){S.returning+=g.size;if(S.returning>=100)ach('loves')}
  if(S.lifetime>=1e6)ach('million');
- leaveGroup(g,sat>=70?'happy':sat>=45?'ok':'sad');t.dirty=true;coach(6)}
+ leaveGroup(g,sat>=70?'happy':sat>=45?'ok':'sad');t.dirty=true;coach(6);
+ if(g.reg==='dylan'&&dylanStays())dylanLinger(g,t)}
 
 /* ---- Jill ---- */
 function jillTargets(i){const J=R.jill;return J.q.includes(i)||(J.cur&&J.cur.t===i)}
@@ -1032,7 +1045,9 @@ function update(dt){R.t+=dt;
  for(const k in S.stock)if(S.stock[k]<0)S.stock[k]=0;
  if(AU.ctx){const n=R.slots.filter(s=>s.job&&s.type==='stove').length;AU.siz.gain.setTargetAtTime(Math.min(.14,n*.05)*(.7+Math.random()*.6),AU.ctx.currentTime,.05);const seated=R.groups.filter(g=>['reading','order','wait','eat','check'].includes(g.state)).length;AU.chat.gain.setTargetAtTime(Math.min(.09,seated*.018),AU.ctx.currentTime,.3);if(Math.random()<.1)AU.chatBp.frequency.setTargetAtTime(380+Math.random()*500,AU.ctx.currentTime,.08)}
  if(R.closed&&R.groups.length===0&&R.closing==null)startClosing();if(R.closing!=null){R.closing+=dt;if(R.closing>18&&!R.ended)finishClosing()}}
-function startClosing(){R.closing=0;hideCombo();const J=R.jill;J.q=[];J.cur=null;J.carry=[];const t=R.tables[0];J.tx=t.x-25;J.ty=t.y+2;J.restTo=true;$('#closePill').hidden=false;if(CATS)for(const c of CATS){if(c.hidden||['jump','walk','race','dash','bed'].includes(c.st))continue;c.t=Math.min(c.t||0,c.def.id==='tora'?.4:c.def.id==='ban'?rand(1.5,3):rand(2,8))}}
+function startClosing(){R.closing=0;hideCombo();const J=R.jill;J.q=[];J.cur=null;J.carry=[];lifePlan();
+ if(LIFE.plan==='sofa'){J.tx=null;J.ty=null;J.restTo=false;J.moving=false;LIFE.jill.x=J.x;LIFE.jill.y=J.y;LIFE.jill.face=J.face;LIFE.jill.act='toSofa'}
+ else{const t=R.tables[0];J.tx=t.x-25;J.ty=t.y+2;J.restTo=true}$('#closePill').hidden=false;if(CATS)for(const c of CATS){if(c.hidden||['jump','walk','race','dash','bed'].includes(c.st))continue;c.t=Math.min(c.t||0,c.def.id==='tora'?.4:c.def.id==='ban'?rand(1.5,3):rand(2,8))}}
 function finishClosing(){if(!R||R.ended)return;R.ended=true;$('#closePill').hidden=true;endDay()}
 function endDay(){if(!R)return;const st=R.st,D=S.day;const wages=crewWages();let bonus=0;
  const tasks=S.today.tasks.map(t=>{const p=taskProg(t);const done=p>=t.n;if(done)bonus+=t.reward;return{...t,p,done}});
@@ -1084,7 +1099,9 @@ $('#taskPanel').addEventListener('click',()=>{$('#taskPanel').hidden=true});
 /* ================= layout ================= */
 function layoutAll(){DPR=Math.min(2.5,window.devicePixelRatio||1);const r=sc.getBoundingClientRect();if(!R&&r.width>0){const s0=r.width/336;const nd=clamp(Math.floor(r.height/s0-424-96),0,240);if(Math.abs(nd-DY)>2)applyDY(nd)}if(!IDLE)IDLE=makeIdle();sc.width=Math.round(r.width*DPR);sc.height=Math.round(r.height*DPR);SV.w=r.width;SV.h=r.height;SV.s=Math.min(r.width/336,r.height/LH);SV.ox=r.width/2-206*SV.s;SV.oy=Math.max(0,r.height-LH*SV.s);
  const W=Math.max(200,r.width-12);const kTop=SV.oy+FB*SV.s;{const pb=Math.max(18,r.height-kTop+10)+'px';$('#closePill').style.bottom=pb;$('#peekPill').style.bottom=pb}const WS=Math.round(clamp(r.height*.3,160,196));TL={n:0,chipW:0,CH:0,WS,pad:0,gap:0,x0:0,W};tc.style.height=WS+'px';tc.width=Math.round(W*DPR);tc.height=Math.round(WS*DPR);$('#trayWrap').style.top=Math.max(4,SV.oy+134*SV.s-WS)+'px';const tb=Math.max(8,r.height-kTop+8)+'px';$('#toasts').style.bottom=tb;$('#coach').style.bottom=tb;bg=null}
-function makeIdle(){const t=buildTables();return{tables:t,slots:buildSlots(),groups:[],tickets:[],jill:(['summary','shop'].includes(phase)&&t[0])?{x:t[0].x-25,y:t[0].y+2,sit:true,carry:[],q:[],cur:null,face:1,step:0}:{x:PASS.x,y:PASS.y,carry:[],q:[],cur:null,face:1,step:0},floats:[],parts:[],fire:0}}
+function makeIdle(){const t=buildTables();const ev=['summary','shop'].includes(phase);if(ev)lifeEnsureEvening();const L=LIFE.jill;
+ const jill=ev&&LIFE.plan==='sofa'?{x:L.x,y:L.y,sit:L.on,sofa:L.on?L.pos:null,carry:[],q:[],cur:null,face:L.face,step:0}:(ev&&t[0])?{x:t[0].x-25,y:t[0].y+2,sit:true,carry:[],q:[],cur:null,face:1,step:0}:{x:PASS.x,y:PASS.y,carry:[],q:[],cur:null,face:1,step:0};
+ return{tables:t,slots:buildSlots(),groups:[],tickets:[],jill,floats:[],parts:[],fire:0}}
 window.addEventListener('resize',()=>{layoutAll()});
 
 /* ================= scene render ================= */
@@ -1133,7 +1150,8 @@ function drawTableFull(c,t,now){const g=t.group;const seated=g&&['reading','orde
  if(four){c.fillStyle='#6A2632';rr(c,t.x-34,t.y-40,68,26,9);c.fill();c.fillStyle='#7E2E3C';rr(c,t.x-34,t.y-20,68,10,4);c.fill();c.strokeStyle='rgba(0,0,0,.15)';c.lineWidth=1;for(let k=-2;k<=2;k++){c.beginPath();c.moveTo(t.x+k*13,t.y-38);c.lineTo(t.x+k*13,t.y-22);c.stroke()}c.fillStyle='#C99A45';c.fillRect(t.x-34,t.y-41,68,2)}
  const order=seats.map((sp,k)=>({sp,k})).sort((a,b)=>a.sp.dy-b.sp.dy);
  for(const {sp,k} of order){const x=t.x+sp.dx,y=t.y+sp.dy;if(!four||sp.side!==0)drawChair(c,x,y,sp.side,false);
-  if(seated&&k<g.size){const L0=g.looks[k%g.looks.length];const mood=g.lookT&&R&&g.lookT>R.t?'happy':g.state==='eat'?'eat':g.pat>.6?'happy':g.pat>.3?'ok':'sad';drawPerson(c,x,y,L0,{seated:true,mood,flip:sp.side>0,bob:g.state==='eat'?Math.sin(now*6+k)*.6:0,chew:Math.sin(now*9+k)>0,blink:Math.sin(now*1.3+g.seed+k*2)>.97})}}
+  if(seated&&k<g.size){const L0=g.looks[k%g.looks.length];const mood=g.lookT&&R&&g.lookT>R.t?'happy':g.state==='eat'?'eat':g.pat>.6?'happy':g.pat>.3?'ok':'sad';let gaze=null;if(g.reg==='dylan'&&R&&g.gaze>R.t){const J=R.jill;gaze={x:(J.x>=x?1:-1)*(sp.side>0?-1:1),y:J.y>y?.5:-.3}}drawPerson(c,x,y,L0,{seated:true,mood,flip:sp.side>0,bob:g.state==='eat'?Math.sin(now*6+k)*.6:0,chew:Math.sin(now*9+k)>0,blink:Math.sin(now*1.3+g.seed+k*2)>.97,gaze})}
+  else if(LIFE.dylan&&LIFE.dylan.seated&&LIFE.dylan.table===t.i&&LIFE.dylan.seat===k){const D=LIFE.dylan;drawPerson(c,x,y,DYLAN.looks[0],{seated:true,mood:'happy',flip:sp.side>0,bob:Math.sin(now*1.5)*.3,blink:Math.sin(now*1.3+2)>.975,hold:D.phone?'phone':null,gaze:D.phone?{x:0,y:.6}:null})}}
  if(seated&&R&&g.lookT>R.t&&g.photo){const sp=seatPos(t)[0];const px=t.x+sp.dx+(sp.side<0?9:-9),py=t.y+sp.dy-44;c.fillStyle='#222';rr(c,px-2.6,py-4,5.2,8.4,1.2);c.fill();c.fillStyle='#8FD3F4';c.fillRect(px-1.8,py-3,3.6,5.8);if(R.t>=g.photoT0&&R.t-g.photoT0<.3){c.fillStyle='rgba(255,255,255,.9)';circ(c,px,py-2,7)}}
  const rx=four?34:22,ry=four?12:10.5;const top=L>=4?'#6E4128':L===3?'#8A5836':'#B07744';const edge=L>=4?'#4E2E1C':'#7A4E2C';
  c.fillStyle=edge;c.fillRect(t.x-2.5,t.y-4,5,12);c.fillStyle='#3A2A20';el(c,t.x,t.y+7,8,2.6);
@@ -1160,7 +1178,7 @@ function bubble(c,x,y,kind,pulse,extra){c.save();c.translate(x,y);const s=1+puls
 function patBar(c,x,y,p){c.fillStyle='rgba(20,15,10,.55)';rr(c,x-14,y,28,5,2.5);c.fill();c.fillStyle=p>.55?'#7BC06A':p>.28?'#F0B43A':'#E0543A';rr(c,x-13,y+1,26*p,3,1.5);c.fill()}
 function drawPlant(c,x,y,kind){c.fillStyle='rgba(40,25,15,.2)';el(c,x,y+2,12,4);c.fillStyle='#B8603A';c.beginPath();c.moveTo(x-10,y-14);c.lineTo(x+10,y-14);c.lineTo(x+7,y+1);c.lineTo(x-7,y+1);c.fill();c.fillStyle='#9A4E2E';c.fillRect(x-10.5,y-16,21,3);
  if(kind==='tall'){for(let i=0;i<9;i++)leaf(c,x+Math.sin(i*1.7)*9,y-26-i*5,20,8,-1.57+Math.sin(i*2.3)*.9,i%2?'#3F7F32':'#5E9E3D')}else{for(let i=0;i<8;i++)leaf(c,x+Math.cos(i*.8)*8,y-20-Math.sin(i)*4,14,6,i*.8,i%2?'#4E8A3A':'#6FAE45')}}
-function plantSpots(){const P=S.decor.plants;const a=[];if(P>=1)a.push({x:246,y:106,k:'tall'});if(P>=2)a.push({x:196,y:104,k:'tall'},{x:222,y:104,k:'bush'});if(P>=3)a.push({x:236,y:104,k:'bush'});return a}
+function plantSpots(){const P=S.decor.plants;const a=[];if(P>=1)a.push({x:250,y:106,k:'tall'});if(P>=2)a.push({x:264,y:102,k:'tall'},{x:240,y:104,k:'bush'});if(P>=3)a.push({x:278,y:100,k:'bush'});return a}
 function view(){if(R)return R;if(!IDLE)IDLE=makeIdle();return IDLE}
 function drawStringLights(c,now,dusk){if(S.level<2)return;const x0=-BGM,x1=LW+BGM;const yAt=x=>{const seg=(((x-x0)%130)+130)%130/130;return 4+Math.sin(seg*Math.PI)*12};c.strokeStyle='rgba(40,30,20,.75)';c.lineWidth=.7;c.beginPath();for(let x=x0;x<=x1;x+=4)c.lineTo(x,yAt(x));c.stroke();
  for(let x=x0+10;x<x1;x+=22){const y=yAt(x)+3;const tw=.75+Math.sin(now*2+x*.3)*.25;c.fillStyle=`rgba(255,${Math.round(205+tw*30)},${Math.round(130+tw*40)},${.65+dusk*.35})`;el(c,x,y,1.8,2.4);if(dusk>.15){let g=c.createRadialGradient(x,y,0,x,y,10);g.addColorStop(0,`rgba(255,200,120,${.4*dusk*tw})`);g.addColorStop(1,'rgba(255,200,120,0)');c.fillStyle=g;c.fillRect(x-10,y-10,20,20)}}}
@@ -1181,19 +1199,22 @@ function drawScene(now){const c=sctx;c.setTransform(1,0,0,1,0,0);c.fillStyle='#1
  const V=view();const J=V.jill;const list=[];
  for(const t of V.tables)list.push({y:t.y,f:()=>drawTableFull(c,t,now)});
  for(const p of plantSpots())list.push({y:p.y,f:()=>drawPlant(c,p.x,p.y,p.k)});
- list.push({y:352+DY,f:()=>drawCatTree(c,now)},{y:357+DY,f:()=>drawCatTree2(c,now)},{y:355+DY,f:()=>drawStairs(c)},{y:SPOT.scr2.y,f:()=>drawPost(c,now)});if(CATS)for(const k of CATS){if(k.hidden&&k.st==='hide2'&&k.peekT>0){list.push({y:k.y,f:()=>{c.save();c.translate(k.x,k.y);c.scale(CSC,CSC);catHead(c,k.def,0,-7,k.def.fluffy?6:5.4,{},false);c.restore()}});continue}if(!k.hidden&&(k.perch<0||k.st==='jump'||TREE.perches[k.perch].t===3))list.push({y:k.y+(k.st==='bed'||k.st==='scr'||k.st==='eat'?2:0),f:()=>drawCat(c,k,now)})}
+ list.push({y:352+DY,f:()=>drawCatTree(c,now)},{y:357+DY,f:()=>drawCatTree2(c,now)},{y:355+DY,f:()=>drawStairs(c)},{y:SPOT.scr2.y,f:()=>drawPost(c,now)},{y:SOFA.y,f:()=>drawSofaGroup(c,now)},{y:LIFE.tv.y,f:()=>drawTV(c,LIFE.tv,now)});
+ {const D=LIFE.dylan;if(D&&!D.seated&&!D.onSofa)list.push({y:D.y,f:()=>drawDylanFree(c,D,now)})}
+ if(CATS)for(const k of CATS){if(k.hidden&&k.st==='hide2'&&k.peekT>0){list.push({y:k.y,f:()=>{c.save();c.translate(k.x,k.y);c.scale(CSC,CSC);catHead(c,k.def,0,-7,k.def.fluffy?6:5.4,{},false);c.restore()}});continue}if(k.sofa&&k.sofaOn)continue;if(!k.hidden&&(k.perch<0||k.st==='jump'||TREE.perches[k.perch].t===3))list.push({y:(k.sofa||k.sofaLeaving)?SOFA.front+1:k.y+(k.st==='bed'||k.st==='scr'||k.st==='eat'?2:0),f:()=>drawCat(c,k,now)})}
  list.push({y:SPOT.scr.y,f:()=>drawScratcher(c,now)},{y:SPOT.cave.y,f:()=>drawCave(c,now)},{y:SPOT.bed.y,f:()=>drawBed(c,now)},{y:SPOT.bowl.y,f:()=>drawBowls(c,now)});
  for(const g of V.groups){if(['arrive','queue','toTable','leave'].includes(g.state)){list.push({y:g.y,f:()=>{const n=g.size;g.looks.forEach((L0,k)=>{const off=(k-(n-1)/2)*11;const stp=g.moving?Math.sin(g.walk+k):0;drawPerson(c,g.x+off+(g.state==='queue'||g.state==='arrive'?6:0),g.y+(k%2)*2,L0,{step:stp,bob:g.moving?Math.abs(stp)*-.8:0,mood:g.state==='leave'?(g.mood==='angry'?'angry':g.mood==='sad'?'sad':'happy'):(g.pat>.5?'happy':g.pat>.25?'ok':'sad'),flip:g.tx<g.x,blink:Math.sin(now*1.4+g.seed+k)>.97})})}})}}
- list.push({y:J.y,f:()=>{const moving=J.moving;const stp=moving?Math.sin(J.step):0;if(V.fire>0){let fg=c.createRadialGradient(J.x,J.y-20,2,J.x,J.y-20,30);fg.addColorStop(0,'rgba(255,150,50,.5)');fg.addColorStop(1,'rgba(255,90,20,0)');c.fillStyle=fg;el(c,J.x,J.y-20,30,34)}
+ if(!J.sofa)list.push({y:J.y,f:()=>{const moving=J.moving;const stp=moving?Math.sin(J.step):0;if(V.fire>0){let fg=c.createRadialGradient(J.x,J.y-20,2,J.x,J.y-20,30);fg.addColorStop(0,'rgba(255,150,50,.5)');fg.addColorStop(1,'rgba(255,90,20,0)');c.fillStyle=fg;el(c,J.x,J.y-20,30,34)}
   drawPerson(c,J.x,J.y,JILL_LOOK,{jill:true,me:true,tall:true,seated:!!J.sit,s:1.1,step:stp,bob:moving?Math.abs(stp)*-1:Math.sin(now*2)*.4,mood:'happy',flip:J.face<0,blink:Math.sin(now*1.7)>.985});
   J.carry.slice(0,3).forEach((cc,i)=>{const cv=dishCanvas(cc.it.d,cc.it.q,64,S.decor.ware>0,cc.it.want);c.drawImage(cv,J.x+(i%2?5:-21),J.y-50-Math.floor(i/2)*8,16,16)})}});
  crewDraw(c,now,list);incDraw(c,now,list);
- list.sort((a,b)=>a.y-b.y).forEach(i=>i.f());
+ list.sort((a,b)=>a.y-b.y).forEach(i=>i.f());drawSay(c);
  drawCounter(c,now,V);drawKitchen(c,now,V);
  c.save();c.globalCompositeOperation='multiply';c.fillStyle=mix('#FFF6EA','#6E6282',clamp(dusk,0,1)*.62);c.fillRect(X0,-TOP,XW,LH+TOP);c.restore();
  c.save();c.globalCompositeOperation='lighter';const lk=.12+clamp(dusk,0,1)*.2;for(const L0 of lightSpots()){let g=c.createRadialGradient(L0.x,L0.y,2,L0.x,L0.y+30,L0.r);g.addColorStop(0,`rgba(255,196,120,${lk*L0.k})`);g.addColorStop(1,'rgba(255,170,90,0)');c.fillStyle=g;c.fillRect(L0.x-L0.r,L0.y-L0.r,L0.r*2,L0.r*2.4)}
  for(const t of V.tables){if(S.level>=2){let g=c.createRadialGradient(t.x,t.y-15,1,t.x,t.y-15,26);g.addColorStop(0,`rgba(255,190,100,${.1+dusk*.12})`);g.addColorStop(1,'rgba(255,190,100,0)');c.fillStyle=g;c.fillRect(t.x-26,t.y-41,52,52)}}
- {let g=c.createRadialGradient(220,380+DY,10,220,380+DY,140);g.addColorStop(0,'rgba(255,170,80,.12)');g.addColorStop(1,'rgba(255,170,80,0)');c.fillStyle=g;c.fillRect(60,260,320,180)}c.restore();
+ {let g=c.createRadialGradient(220,380+DY,10,220,380+DY,140);g.addColorStop(0,'rgba(255,170,80,.12)');g.addColorStop(1,'rgba(255,170,80,0)');c.fillStyle=g;c.fillRect(60,260,320,180)}
+ if(LIFE.tv.on){const tv=LIFE.tv;let g=c.createRadialGradient(tv.x,tv.y-36,3,tv.x,tv.y-36,26);g.addColorStop(0,'rgba(170,200,255,.5)');g.addColorStop(.45,'rgba(170,200,255,.22)');g.addColorStop(1,'rgba(170,200,255,0)');c.fillStyle=g;c.fillRect(tv.x-28,tv.y-64,56,56)}c.restore();
  if(R){const pulse=(Math.sin(now*6)+1)/2;
   for(const t of R.tables){const g=t.group;const bx=t.x,by=t.y-(t.seats===4?74:68);
    if(g&&!['toTable','leave'].includes(g.state)){let kind=null,extra=null;if(g.state==='reading')kind='menu';else if(g.state==='order')kind='order';else if(g.state==='wait'){const it=g.ticket?g.ticket.items:[];if(it.some(i=>i.st==='ready'&&!i.picked))kind='ready';else kind='wait',extra=[it.filter(i=>i.st==='served').length,it.length]}else if(g.state==='check')kind='check';
@@ -1473,17 +1494,17 @@ WALL.forEach((w,i)=>TREE.perches.push({x:w.x,y:w.y-3,t:3,wi:i,ax:366,ay:114}));
 function applyDY(d){DY=d;FB=364+d;LH=424+d;ROWS=[162,240+d*.5,318+d];PASS.y=360+d;
  TREE.perches.forEach(p=>{if(p.by==null)p.by=p.y;p.y=p.by+(p.t===3?0:d)});
  SPOT.scr.y=358+d;SPOT.bowl.y=360+d;SPOT.toy.y=324+d;
- CATS=null;perchOcc.length=0;OCC.scr=OCC.scr2=OCC.cave=OCC.toy=null;OCC.bed=[];SIDE.R=SIDE.L=null;IDLE=null;bg=null}
+ CATS=null;perchOcc.length=0;OCC.scr=OCC.scr2=OCC.cave=OCC.toy=null;OCC.bed=[];SIDE.R=SIDE.L=null;IDLE=null;bg=null;if(typeof LIFE!=='undefined'&&LIFE.dylan&&LIFE.dylan.seated){LIFE.dylan.seated=false;LIFE.dylan.state='think';LIFE.dylan.t=1}}
 const SIDE={R:null,L:null};let RACE_CD=90,BAO_LAST=null;const MEMQ=[];let FLASH=null;
-const MEMS={sides:'Jill 左右各一隻',ambush:'埋伏成功',what:'妳到底在幹嘛',waited:'白等了',race:'突然開賽',sleepgod:'睡神',nearby:'今天也在附近',best:'最佳座位',nap3:'三貓午睡',everyone:'今天大家都在'};
+const MEMS={sofa:'今晚的沙發',sofafull:'沙發客滿',husband:'Dylan — Jill 的先生',sides:'Jill 左右各一隻',ambush:'埋伏成功',what:'妳到底在幹嘛',waited:'白等了',race:'突然開賽',sleepgod:'睡神',nearby:'今天也在附近',best:'最佳座位',nap3:'三貓午睡',everyone:'今天大家都在'};
 function catBy(id){return CATS?CATS.find(c=>c.def.id===id):null}
 function evening(){return(R&&R.closing!=null)||['summary','shop'].includes(phase)}
 function jillA(){const J=view().jill;const idle=!R||(!J.cur&&!(J.q&&J.q.length)&&!J.moving);if(R&&phase==='service'&&R.closing==null){const near=Math.hypot(J.x-PASS.x,J.y-PASS.y)<30;return{x:PASS.x,y:PASS.y,idle:idle&&near,sit:false}}return{x:J.x,y:J.y,idle,sit:!!J.sit}}
 function slotPos(s){const a=jillA();const y=Math.min(a.y+(a.sit?4:2),FB-6);return s==='R'?{x:a.x+22,y}:s==='L'?{x:a.x-22,y}:s==='R2'?{x:a.x+31,y:y+2}:s==='L2'?{x:a.x-31,y:y+2}:{x:a.x+rand(-10,10),y:y-16}}
 function tableClear(x,y){const V=view();for(const t of V.tables){const dx=(x-t.x)/(t.seats===4?50:42),dy=(y-t.y+10)/25;if(dx*dx+dy*dy<1)return false}return true}
-function randFloor(){for(let i=0;i<16;i++){const x=rand(96,316),y=rand(140,FB-14);if(tableClear(x,y))return{x,y}}return{x:rand(96,300),y:FB-12}}
+function randFloor(){for(let i=0;i<16;i++){const x=rand(96,316),y=rand(140,FB-14);if(tableClear(x,y)&&!(y<SOFA.front+6&&x<SOFA.x1+6))return{x,y}}return{x:rand(96,300),y:FB-12}}
 function guestPts(){const out=[];if(!R)return out;for(const g of R.groups){if(g.state==='leave')continue;if(g.table!=null&&!['arrive','queue','toTable'].includes(g.state)){const t=R.tables[g.table];out.push({x:t.x,y:t.y,g})}else out.push({x:g.x,y:g.y,g})}return out}
-function familiar(g){return g&&g.reg&&(S.catFam&&S.catFam[g.reg]||0)>=6}
+function familiar(g){return g&&g.reg&&(g.reg==='dylan'||(S.catFam&&S.catFam[g.reg]||0)>=6)}
 function scorePt(c,p){const id=c.def.id,a=jillA();let s=Math.random()*20;const dj=Math.hypot(p.x-a.x,p.y-a.y);const near=(o,w)=>{if(!o||o.hidden)return 0;return w*Math.max(0,120-Math.hypot(p.x-o.x,p.y-o.y))/120*20};
  if(id==='tora'){s+=Math.max(0,160-dj)/160*30;for(const q of guestPts())if(!familiar(q.g))s-=Math.max(0,90-Math.hypot(p.x-q.x,p.y-q.y))/90*25}
  if(id==='ban'){s+=Math.max(0,160-dj)/160*18+near(catBy('tora'),1)+near(catBy('mikan'),.8)+near(catBy('mei'),.5)}
@@ -1493,12 +1514,15 @@ function scorePt(c,p){const id=c.def.id,a=jillA();let s=Math.random()*20;const d
  return s}
 function pickFloor(c){let best=null,bs=-1e9;for(let i=0;i<7;i++){const p=randFloor();const sc=scorePt(c,p);if(sc>bs){bs=sc;best=p}}return best}
 function catJump(c,x1,y1,next){c.st='jump';c.jmp={x0:c.x,y0:c.y,x1,y1,t:0,d:c.race?.4:.55,next};c.face=x1>=c.x?1:-1}
-function catWalk(c,x,y,after,t){c.st='walk';c.tx=x;c.ty=y;c.after=after;c.afterT=t||rand(3,7);c.stareAt=null}
-function freeFloorCat(c){return c.perch<0&&['rest','walk','daze','side'].includes(c.st)&&!c.guest&&!c.hidden}
-const SPOT={bed:{x:262,y:124},scr:{x:126,y:358},scr2:{x:152,y:114},cave:{x:318,y:126},bowl:{x:164,y:360},toy:{x:100,y:324}};
+function catWalk(c,x,y,after,t){c.st='walk';c.tx=x;c.ty=y;c.after=after;c.afterT=t||rand(3,7);c.stareAt=null;
+ /* never walk through the sofa: go round its front */
+ const box={a:SOFA.x0-6,b:SOFA.x1+6,t:SOFA.back-8,d:SOFA.front+2};const inside=(px,py)=>px>box.a&&px<box.b&&py>box.t&&py<box.d;
+ c.via=(!inside(c.x,c.y)&&!inside(x,y)&&segHitsRect(c.x,c.y,x,y,box))?{x:clamp((c.x+x)/2,box.a,box.b),y:box.d+10}:null}
+function freeFloorCat(c){return c.perch<0&&!c.sofa&&['rest','walk','daze','side'].includes(c.st)&&!c.guest&&!c.hidden}
+const SPOT={bed:{x:262,y:124},scr:{x:126,y:358},scr2:{x:226,y:114},cave:{x:318,y:126},bowl:{x:164,y:360},toy:{x:100,y:324}};
 const OCC={scr:null,scr2:null,cave:null,toy:null,bed:[]};const TOY={amp:1};let FOOD=1;
 function spotFree(k){return k==='bed'?OCC.bed.length<2:!OCC[k]}
-function releaseSpots(c){for(const k of['scr','scr2','cave','toy'])if(OCC[k]===c)OCC[k]=null;OCC.bed=OCC.bed.filter(x=>x!==c);if(SIDE.R===c)SIDE.R=null;if(SIDE.L===c)SIDE.L=null;c.slot=null;c.hidden=false;c.peekT=0}
+function releaseSpots(c){for(const k of['scr','scr2','cave','toy'])if(OCC[k]===c)OCC[k]=null;OCC.bed=OCC.bed.filter(x=>x!==c);if(SIDE.R===c)SIDE.R=null;if(SIDE.L===c)SIDE.L=null;c.slot=null;c.hidden=false;c.peekT=0;c.sofa=null;c.sofaOn=false}
 function leavePerch(c,then){const p=TREE.perches[c.perch];perchOcc[c.perch]=null;c.perch=-1;if(p.t===3){c.chain=WALL.slice(0,p.wi).reverse().map(w=>({x:w.x,y:w.y-3})).concat([{x:p.ax,y:p.ay}]);c.chainEnd=then||'decide';const n=c.chain.shift();catJump(c,n.x,n.y,c.chain.length?'chain':c.chainEnd)}else catJump(c,p.x+(p.t===2?-1:1)*rand(24,40),rand(338,350)+DY,then||'decide')}
 function goPerch(c,i){perchOcc[i]=c;c.goPerch=i;const p=TREE.perches[i];catWalk(c,p.ax,p.ay||350+DY,'climb')}
 function catGo(c,what){const s=SPOT;releaseSpots(c);
@@ -1511,7 +1535,7 @@ function catGo(c,what){const s=SPOT;releaseSpots(c);
 function freePerches(){return TREE.perches.map((_,i)=>i).filter(i=>!perchOcc[i]&&perchVis(i))}
 function sleepHere(c,tmin,tmax){c.st='sleep';c.pose=pick(['curl','loaf','curl',c.def.id==='tora'?'belly':'loaf',c.def.id==='snow'?'belly':'curl']);c.t=rand(tmin||14,tmax||30);c.slept=0}
 /* ---- Jill-side seats (樾樾 × 小齁) ---- */
-function goJill(c){releaseSpots(c);const id=c.def.id;const rival=id==='tora'?catBy('ban'):id==='ban'?catBy('tora'):null;let slot=null;
+function goJill(c){releaseSpots(c);if(LIFE.plan==='sofa'&&evening()&&LIFE.jill.pos){goSofaJill(c);return}const id=c.def.id;const rival=id==='tora'?catBy('ban'):id==='ban'?catBy('tora'):null;let slot=null;
  if(!SIDE.R)slot='R';else if(SIDE.R===rival&&rival){const r=Math.random();
   if(r<.3)slot=SIDE.L?'B':'L';else if(r<.5)slot='R2';else if(r<.65)slot='B';else if(r<.8){const p=pickFloor(c);catWalk(c,p.x,p.y,'rest');return}
   else{slot='R';const o=rival;SIDE.R=null;o.slot=null;if(!SIDE.L){SIDE.L=o;o.slot='L';const q=slotPos('L');o.st='walk';o.tx=q.x;o.ty=q.y;o.after='side'}else{o.st='rest';o.pose='sit';o.t=rand(1,3)}}}
@@ -1519,6 +1543,7 @@ function goJill(c){releaseSpots(c);const id=c.def.id;const rival=id==='tora'?cat
  if(slot==='R'||slot==='L')SIDE[slot]=c;c.slot=slot;const q=slotPos(slot);c.lag=id==='tora'?rand(2,6):id==='ban'?rand(1,3):rand(1,4);c.lagT=0;catWalk(c,q.x,q.y,'side')}
 /* ---- decisions ---- */
 function catDecide(c){c.guest=null;c.moving=false;c.run=0;const id=c.def.id;const ev=evening();const a=jillA();
+ if(c.sofa){if(c.sofaOn){sofaDecide(c);return}c.sofa=null}
  if(c.perch>=0){const stay=id==='snow'?.8:id==='mei'?.65:.4;if(Math.random()<stay){if(id==='snow'||Math.random()<.3)sleepHere(c,18,45);else{c.st='rest';c.pose=pick(['sit','loaf','groom','sit','yawn']);c.t=rand(6,14)}return}leavePerch(c,'decide');return}
  releaseSpots(c);const fp=freePerches();const near=CATS.filter(o=>o!==c&&freeFloorCat(o)&&Math.hypot(o.x-c.x,o.y-c.y)<100);
  const W=[];const add=(k,w)=>{if(w>0)W.push([k,w])};
@@ -1528,18 +1553,21 @@ function catDecide(c){c.guest=null;c.moving=false;c.run=0;const id=c.def.id;cons
  add('perch',fp.length?(id==='mei'?4.5:id==='snow'?1.2:id==='mikan'?.9:1):0);
  add('scr',spotFree('scr')?(id==='tora'?1:.6):0);add('scr2',spotFree('scr2')?.5:0);add('cave',spotFree('cave')?(id==='tora'?.9:.5):0);add('bed',spotFree('bed')?(id==='snow'?3:.8):0);
  add('eat',id==='mikan'?1:.5);add('toy',spotFree('toy')?(id==='mikan'?1:.4):0);
+ add('sofa',sofaWeight(c));
+ if(R&&phase==='service'){const dg=R.groups.find(g=>g.reg==='dylan'&&g.table!=null&&['reading','wait','eat','check'].includes(g.state)&&!(g.catT>R.t)&&!CATS.some(o=>o.guest===g));if(dg)add('visitDylan',id==='tora'?.7:id==='mikan'?.5:id==='ban'?.3:0)}
+ {const D=LIFE.dylan;if(D&&!D.onSofa&&(D.seated||D.state==='stand'||D.state==='crouch'))add('nearDylan',id==='tora'?.9:id==='mikan'?.6:id==='ban'?.4:0)}
  if(id==='ban'){add('nearTora',1.3);add('nearRou',1.1);add('nearBao',.7)}
  if(id==='mikan'){add('nearHou',1.8);add('nearTora',1.4);add('watchBao',1);if(BAO_LAST&&ctime-BAO_LAST.t>6&&ctime-BAO_LAST.t<70)add('imitate',1.4);if(!c.ambCD||ctime>c.ambCD)add('ambush',.7);add('stare',.9)}
  if(id==='mei'){add('watch',2);if(CATS.some(o=>o.st==='hide2'))add('wander',1.5)}
- if(RACE_CD<=0){const o=catBy(id==='tora'?'snow':id==='snow'?'tora':'');const ok=o&&!o.hidden&&o.perch<0&&!['jump','race','dash','visit','hide'].includes(o.st)&&Math.hypot(o.x-c.x,o.y-c.y)<260;if(ok&&id==='tora')add('race',1.4);if(ok&&id==='snow'&&!['sleep','bed'].includes(o.st))add('race',.25)}
+ if(RACE_CD<=0){const o=catBy(id==='tora'?'snow':id==='snow'?'tora':'');const ok=o&&!o.hidden&&o.perch<0&&!o.sofa&&!['jump','race','dash','visit','hide'].includes(o.st)&&Math.hypot(o.x-c.x,o.y-c.y)<260;if(ok&&id==='tora')add('race',1.4);if(ok&&id==='snow'&&!['sleep','bed'].includes(o.st))add('race',.25)}
  if(near.length&&['ban','mikan'].includes(id))add('play',.5);
  const ch=wpick(W,o=>o[1])[0];
  switch(ch){
  case'jill':goJill(c);break;
  case'wander':{let p=pickFloor(c);if(id==='mei'){const h=CATS.find(o=>o.st==='hide2');if(h&&Math.random()<.4)p={x:clamp(h.x+rand(-30,30),96,316),y:clamp(h.y+rand(-16,16),140,FB-10)}}catWalk(c,p.x,p.y,'rest');if(id==='mikan'&&Math.random()<.35)c.stareAt=rand(20,60);break}
  case'rest':c.st='rest';c.pose=pick(id==='tora'?['groom','groom','sit','loaf']:['sit','groom','loaf','yawn']);c.t=rand(4,10);break;
- case'sleep':{if(id==='snow'){const spots=[];if(spotFree('bed'))spots.push('bed');const hi=[6,13,2].filter(i=>fp.includes(i));if(hi.length)spots.push('perch');if(Math.random()<.3||!spots.length){sleepHere(c,25,70);break}const s=pick(spots);if(s==='bed'){catGo(c,'bed')}else goPerch(c,pick(hi));c.wantSleep=1;break}
-  if(id==='tora'&&R){const fg=R.groups.find(g=>g.table!=null&&g.reg&&(S.catFam&&S.catFam[g.reg]||0)>=10&&['wait','eat','order'].includes(g.state));if(fg&&Math.random()<.3){const t=R.tables[fg.table];catWalk(c,clamp(t.x+pick([-32,32]),96,316),Math.min(FB-10,t.y+18),'sleep');break}}
+ case'sleep':{if(id==='snow'){const spots=[];if(spotFree('bed'))spots.push('bed');const hi=[6,13,2].filter(i=>fp.includes(i));if(hi.length)spots.push('perch');const ss=sofaSlots(c).some(x=>x.kind==='seat');if(ss)spots.push('sofa');if(Math.random()<.3||!spots.length){sleepHere(c,25,70);break}const s=pick(spots);if(s==='bed'){catGo(c,'bed')}else if(s==='sofa'){const sl=pickSofaSlot(c,false);if(sl){c.wantSleep=1;goSofaSlot(c,sl)}else sleepHere(c,25,70)}else goPerch(c,pick(hi));c.wantSleep=1;break}
+  if(id==='tora'&&R){const fg=R.groups.find(g=>g.table!=null&&g.reg&&(g.reg==='dylan'||(S.catFam&&S.catFam[g.reg]||0)>=10)&&['wait','eat','order'].includes(g.state));if(fg&&Math.random()<.3){const t=R.tables[fg.table];catWalk(c,clamp(t.x+pick([-32,32]),96,316),Math.min(FB-10,t.y+18),'sleep');break}}
   if(id==='tora'||id==='ban'){goJill(c);c.wantSleep=1;break}
   const p=pickFloor(c);catWalk(c,p.x,p.y,'sleep');break}
  case'perch':{let i;if(id==='mei'){const best=[6,13,12,2,11].filter(k=>fp.includes(k));i=best.length?best[0]:pick(fp)}else if(id==='tora'){const low=[3,0,1].filter(k=>fp.includes(k));i=low.length?pick(low):pick(fp)}else i=pick(fp);goPerch(c,i);break}
@@ -1549,10 +1577,14 @@ function catDecide(c){c.guest=null;c.moving=false;c.run=0;const id=c.def.id;cons
  case'watch':{const p=Math.random()<.5?{x:rand(104,140),y:rand(118,132)}:pickFloor(c);catWalk(c,p.x,p.y,'watch');break}
  case'stare':c.st='stare';c.t=rand(3,8);c.pose='sit';c.face=Math.random()<.5?1:-1;break;
  case'ambush':startAmbush(c);break;
+ case'sofa':{const sl=pickSofaSlot(c,false);if(sl)goSofaSlot(c,sl);else{const p=pickFloor(c);catWalk(c,p.x,p.y,'rest')}break}
+ case'visitDylan':{const g=R.groups.find(g=>g.reg==='dylan'&&g.table!=null);if(!g){const p=pickFloor(c);catWalk(c,p.x,p.y,'rest');break}releaseSpots(c);const t=R.tables[g.table];c.guest=g;catWalk(c,clamp(t.x+rand(-12,12),96,316),Math.min(FB-8,t.y+20),'visit');S.dylan.clues.pet=(S.dylan.clues.pet||0)+1;break}
+ case'nearDylan':{const D=LIFE.dylan;if(!D){const p=pickFloor(c);catWalk(c,p.x,p.y,'rest');break}const off=rand(18,34),ang=rand(0,6.28);catWalk(c,clamp(D.x+Math.cos(ang)*off,96,316),clamp(D.y+(D.seated?rand(14,26):Math.abs(Math.sin(ang))*off*.4+2),140,FB-10),'rest');c.lookAt=D;break}
  case'race':startRace(c);break;
  case'play':{const o=pick(near);releaseSpots(o);c.st='play';c.t=2.5;c.partner=o;o.st='play';o.t=2.5;o.partner=c;o.guest=null;c.face=o.x>=c.x?1:-1;o.face=-c.face;sfx.catPlay();break}
  default:catGo(c,ch)}}
 function catArrive(c){const a=c.after;const id=c.def.id;
+ if(a==='sofaUp'){const s=c.sofa;if(!s){catDecide(c);return}if(s.kind==='seat'||s.kind==='lap')catJump(c,s.x,s.y,'sofaLand');else{c.chain=[{x:s.x,y:s.y}];c.chainEnd='sofaLand';catJump(c,clamp(s.x,SOFA.seatL+8,SOFA.seatR-8),SOFA.catY,'chain')}return}
  if(a==='climb'){const i=c.goPerch;c.perch=i;const P0=TREE.perches[i];if(P0.t===3){c.chain=WALL.slice(0,P0.wi+1).map(w=>({x:w.x,y:w.y-3}));c.chainEnd='perch';const n=c.chain.shift();catJump(c,n.x,n.y,c.chain.length?'chain':'perch')}else catJump(c,P0.x,P0.y,'perch');return}
  if(a==='visit'){const g=c.guest;if(g&&R&&R.groups.includes(g)&&g.table!=null){c.st='visit';c.pose='sit';c.t=7;g.catT=R.t+7;if(catCheer(g,.08)>0){const tb=R.tables[g.table];if(tb)addFloat(tb.x,tb.y-54,'心情 UP','#F29AAE',0)}c.hearts.push({x:0,y:-26,t:0})}else catDecide(c);return}
  if(a==='side'){c.st='side';c.lagT=0;const J=jillA();c.face=J.x>=c.x?1:-1;c.pose=c.wantSleep?'loaf':pick(['sit','sit','loaf',J.idle?'rub':'sit']);c.t=rand(10,24);c.sleepy=!!c.wantSleep;c.wantSleep=0;return}
@@ -1568,7 +1600,7 @@ function catArrive(c){const a=c.after;const id=c.def.id;
  if(a==='raceNext'){raceStep(c);return}
  c.st='rest';c.pose=pick(['sit','groom','loaf','sit']);c.t=c.afterT||rand(3,7)}
 /* ---- 柔柔 ambush ---- */
-function hideSpots(){const out=[{x:74+14,y:FB-10},{x:318,y:FB-12},{x:SPOT.cave.x+22,y:SPOT.cave.y+2},{x:SPOT.scr2.x+14,y:SPOT.scr2.y+4}];for(const p of plantSpots())out.push({x:p.x+10,y:p.y+4});for(const t of view().tables)if(!t.group)out.push({x:t.x,y:t.y+4});return out}
+function hideSpots(){const out=[{x:74+14,y:FB-10},{x:318,y:FB-12},{x:SPOT.cave.x+22,y:SPOT.cave.y+2},{x:SPOT.scr2.x+14,y:SPOT.scr2.y+4},{x:LIFE.tv.x-15,y:LIFE.tv.y+3}];if(LIFE.tv.at!=='use')out.push({x:SOFA.x1+9,y:SOFA.front+2});for(const p of plantSpots())out.push({x:p.x+10,y:p.y+4});for(const t of view().tables)if(!t.group)out.push({x:t.x,y:t.y+4});return out}
 function startAmbush(c){c.ambCD=ctime+rand(70,140);const b=catBy('mei');const sp=hideSpots();let best=pick(sp);if(b){const ref=b.st==='walk'?{x:b.tx,y:b.ty}:b;best=sp.sort((p,q)=>Math.hypot(p.x-ref.x,p.y-ref.y)-Math.hypot(q.x-ref.x,q.y-ref.y))[Math.floor(Math.random()*2)]||best}c.amb=best;catWalk(c,best.x,best.y,'hide2')}
 function ambushTick(c,dt){c.t-=dt;if(c.peekT>0)c.peekT-=dt;
  for(const o of CATS){if(o===c||o.hidden||o.perch>=0)continue;if(!['walk','race','chase'].includes(o.st))continue;const d=Math.hypot(o.x-c.x,o.y-c.y);if(d>46)continue;const key=o.def.id+Math.floor(ctime/6);if(c.seen[key])continue;c.seen[key]=1;
@@ -1594,6 +1626,7 @@ function memChecks(){if(!CATS)return;const T=catBy('tora'),H=catBy('ban'),B=catB
  if(B&&B.perch>=0&&[6,13,12].includes(B.perch)&&B.st==='rest')memo('best',B.x,B.y+20);
  if(Bb&&(Bb.st==='sleep'||Bb.st==='bed')&&R&&(R.fire>0||R.insp||R.thief||R.groups.length>=6))memo('sleepgod',Bb.x,Bb.y);
  const sl=CATS.filter(c=>!c.hidden&&(c.st==='sleep'||c.st==='bed'||(c.st==='side'&&c.sleepy)));if(sl.length>=3){const cx=sl.reduce((a,c)=>a+c.x,0)/sl.length,cy=sl.reduce((a,c)=>a+c.y,0)/sl.length;if(sl.filter(c=>Math.hypot(c.x-cx,c.y-cy)<75).length>=3)memo('nap3',cx,cy)}
+ {const L=LIFE.jill;if(L.on&&evening()&&L.sinceSit>6){const on=sofaCats().length;if(on>=1)memo('sofa',(SOFA.x0+SOFA.x1)/2,120);if(on>=3)memo('sofafull',(SOFA.x0+SOFA.x1)/2,120)}}
  const vis=CATS.filter(c=>!c.hidden);if(vis.length===5){const cx=vis.reduce((a,c)=>a+c.x,0)/5,cy=vis.reduce((a,c)=>a+c.y,0)/5;if(vis.every(c=>Math.hypot(c.x-cx,c.y-cy)<100))memo('everyone',cx,cy)}}
 /* ---- update ---- */
 let ctime=0;
@@ -1602,10 +1635,12 @@ function initCats(){CATS=CAT_DEF.map(d=>({def:d,x:0,y:0,st:'rest',pose:'sit',per
  T.x=PASS.x-26;T.y=FB-8;T.pose='groom';H.perch=0;perchOcc[0]=H;H.x=TREE.perches[0].x;H.y=TREE.perches[0].y;B.perch=6;perchOcc[6]=B;B.x=TREE.perches[6].x;B.y=TREE.perches[6].y;Rr.x=140;Rr.y=FB-30;Rr.pose='sit';
  OCC.bed.push(Bb);Bb.x=SPOT.bed.x-5;Bb.y=SPOT.bed.y+1;Bb.st='bed';Bb.pose='curl';Bb.t=rand(20,40)}
 function updateCats(dt,now){if(!CATS)initCats();ctime+=dt;RACE_CD-=dt;TOY.amp=Math.max(1,TOY.amp-dt*.6);if(FLASH){FLASH.t+=dt;if(FLASH.t>.5)FLASH=null}
- for(const c of CATS){c.ph+=dt*(c.run?2.4:1);c.cd=Math.max(0,c.cd-dt);if(c.wcd>0)c.wcd-=dt;if(c.happy>0){c.happy-=dt;if(c.happy<=0&&c.st==='pet')catDecide(c)}for(const h of c.hearts)h.t+=dt;c.hearts=c.hearts.filter(h=>h.t<1.4);
+ for(const c of CATS){c.ph+=dt*(c.run?2.4:1);c.cd=Math.max(0,c.cd-dt);if(c.wcd>0)c.wcd-=dt;if(c.happy>0){c.happy-=dt;if(c.happy<=0){c.quiet=0;if(c.st==='pet')catDecide(c)}}for(const h of c.hearts)h.t+=dt;c.hearts=c.hearts.filter(h=>h.t<1.4);
   switch(c.st){
-  case'jump':{const j=c.jmp;j.t+=dt;const u=Math.min(1,j.t/j.d);c.x=lerp(j.x0,j.x1,u);c.y=lerp(j.y0,j.y1,u)-Math.sin(u*Math.PI)*(Math.abs(j.x1-j.x0)+Math.abs(j.y1-j.y0)<4?7:22);if(u>=1){c.x=j.x1;c.y=j.y1;if(j.next==='chain'){const n=c.chain.shift();catJump(c,n.x,n.y,c.chain.length?'chain':c.chainEnd)}else if(j.next==='glare'){c.st='glare';c.pose='glare';c.t=rand(1.8,2.8);c.moving=false}else if(j.next==='perch'){if(c.wantSleep||(c.def.id==='snow'&&Math.random()<.7)){c.wantSleep=0;sleepHere(c,25,60)}else{c.st='rest';c.pose=pick(['sit','loaf','groom']);c.t=c.def.id==='mei'?rand(14,26):rand(6,12)}if(c.def.id==='mei')BAO_LAST={perch:c.perch,x:c.x,y:c.y,t:ctime}}else catDecide(c)}break}
-  case'walk':{const spd=c.run?(c.st==='walk'&&c.after==='raceNext'?118:96):c.after==='visit'?60:c.after==='eat'?46:c.def.id==='snow'?28:34;const dx=c.tx-c.x,dy=c.ty-c.y,d=Math.hypot(dx,dy),v=spd*dt;
+  case'jump':{const j=c.jmp;j.t+=dt;const u=Math.min(1,j.t/j.d);c.x=lerp(j.x0,j.x1,u);c.y=lerp(j.y0,j.y1,u)-Math.sin(u*Math.PI)*(Math.abs(j.x1-j.x0)+Math.abs(j.y1-j.y0)<4?7:22);if(u>=1){c.x=j.x1;c.y=j.y1;c.sofaLeaving=false;if(j.next==='sofaLand'){c.sofaOn=true;sofaSettle(c,true)}else if(j.next==='chain'){const n=c.chain.shift();catJump(c,n.x,n.y,c.chain.length?'chain':c.chainEnd)}else if(j.next==='glare'){c.st='glare';c.pose='glare';c.t=rand(1.8,2.8);c.moving=false}else if(j.next==='perch'){if(c.wantSleep||(c.def.id==='snow'&&Math.random()<.7)){c.wantSleep=0;sleepHere(c,25,60)}else{c.st='rest';c.pose=pick(['sit','loaf','groom']);c.t=c.def.id==='mei'?rand(14,26):rand(6,12)}if(c.def.id==='mei')BAO_LAST={perch:c.perch,x:c.x,y:c.y,t:ctime}}else catDecide(c)}break}
+  case'walk':{const spd=c.run?(c.st==='walk'&&c.after==='raceNext'?118:96):c.after==='visit'?60:c.after==='eat'?46:c.def.id==='snow'?28:34;
+   if(c.via){const vx=c.via.x-c.x,vy=c.via.y-c.y,vd=Math.hypot(vx,vy),vv=spd*dt;if(vd>vv){c.x+=vx/vd*vv;c.y+=vy/vd*vv;c.face=vx>=0?1:-1;c.moving=true}else{c.x=c.via.x;c.y=c.via.y;c.via=null}break}
+   const dx=c.tx-c.x,dy=c.ty-c.y,d=Math.hypot(dx,dy),v=spd*dt;
    if(c.stareAt!=null&&d<c.stareAt){c.stareAt=null;c.resume={tx:c.tx,ty:c.ty,after:c.after};c.st='stare';c.t=rand(2.5,7);c.pose='sit';c.moving=false;break}
    if(d>v){c.x+=dx/d*v;c.y+=dy/d*v;c.face=dx>=0?1:-1;c.moving=true}else{c.x=c.tx;c.y=c.ty;c.moving=false;if(c.after==='circ'){const n=c.circ&&c.circ.shift();if(n){c.tx=n.x;c.ty=n.y;break}c.run=0}catArrive(c)}break}
   case'rest':c.moving=false;c.t-=dt;if(c.lookAt&&!c.lookAt.hidden)c.face=c.lookAt.x>=c.x?1:-1;if(c.t<=0){c.lookAt=null;catDecide(c)}break;
@@ -1631,15 +1666,15 @@ function updateCats(dt,now){if(!CATS)initCats();ctime+=dt;RACE_CD-=dt;TOY.amp=Ma
   case'play':c.t-=dt;c.moving=false;if(c.t<=0){c.partner=null;catDecide(c)}break;
   case'pet':c.moving=false;break}}
  /* 樾樾 is wary of strangers */
- const T=catBy('tora');if(T&&R&&phase==='service'&&!(T.wcd>0)&&T.perch<0&&!T.hidden&&['rest','walk','daze','stare'].includes(T.st)){for(const q of guestPts()){if(familiar(q.g))continue;if(Math.hypot(q.x-T.x,q.y-T.y)<72){releaseSpots(T);T.st='wary';T.t=rand(1.2,2.4);T.warnG=q;T.wcd=12;T.moving=false;const H=catBy('ban');if(H&&freeFloorCat(H)&&H.st!=='side'&&Math.random()<.35){releaseSpots(H);catWalk(H,clamp(T.x+rand(-40,40),96,316),clamp(T.y+rand(-10,14),140,FB-10),'rest')}break}}}
+ const T=catBy('tora');if(T&&R&&phase==='service'&&!(T.wcd>0)&&T.perch<0&&!T.sofa&&!T.hidden&&['rest','walk','daze','stare'].includes(T.st)){for(const q of guestPts()){if(familiar(q.g))continue;if(Math.hypot(q.x-T.x,q.y-T.y)<72){releaseSpots(T);T.st='wary';T.t=rand(1.2,2.4);T.warnG=q;T.wcd=12;T.moving=false;const H=catBy('ban');if(H&&freeFloorCat(H)&&H.st!=='side'&&Math.random()<.35){releaseSpots(H);catWalk(H,clamp(T.x+rand(-40,40),96,316),clamp(T.y+rand(-10,14),140,FB-10),'rest')}break}}}
  /* guests needing comfort: friendly cats only */
  if(R&&phase==='service'&&R.closing==null){R.catCheck=(R.catCheck||0)+dt;if(R.catCheck>3){R.catCheck=0;const needy=R.groups.filter(g=>['order','wait','check'].includes(g.state)&&g.pat<.5&&!CATS.some(c=>c.guest===g)).sort((a,b)=>a.pat-b.pat)[0];
-  if(needy){const pref={mikan:3,ban:2,snow:.3,mei:0,tora:familiar(needy)?1.5:0};const pool=CATS.filter(c=>pref[c.def.id]>0&&c.perch<0&&!c.hidden&&['rest','walk','daze','eat','toy'].includes(c.st)&&!c.guest);const c=wpick(pool,o=>pref[o.def.id]);if(c&&Math.random()<.7){releaseSpots(c);const t=R.tables[needy.table];c.guest=needy;catWalk(c,clamp(t.x+rand(-12,12),96,316),Math.min(FB-8,t.y+20),'visit')}}}
+  if(needy){const pref={mikan:3,ban:2,snow:.3,mei:0,tora:familiar(needy)?1.5:0};const pool=CATS.filter(c=>pref[c.def.id]>0&&c.perch<0&&!c.hidden&&!c.sofa&&['rest','walk','daze','eat','toy'].includes(c.st)&&!c.guest);const c=wpick(pool,o=>pref[o.def.id]);if(c&&Math.random()<.7){releaseSpots(c);const t=R.tables[needy.table];c.guest=needy;catWalk(c,clamp(t.x+rand(-12,12),96,316),Math.min(FB-8,t.y+20),'visit')}}}
   /* guests notice cats */
   R.noticeT=(R.noticeT??rand(4,8))-dt;if(R.noticeT<=0){R.noticeT=rand(5,10);const cands=[];for(const g of R.groups){if(g.table==null||!['reading','wait','eat'].includes(g.state))continue;const t=R.tables[g.table];for(const c of CATS){if(c.hidden)continue;const d=Math.hypot(t.x-c.x,t.y-c.y);if(d<120)cands.push({g,c,w:(c.def.id==='mei'?3:1)*(1-d/140)})}}const pk=wpick(cands,o=>o.w);if(pk){const star=pk.c.def.id==='mei'&&(pk.c.perch>=0||pk.c.st==='rest');const set=star?cands.filter(o=>o.c===pk.c).slice(0,3):[pk];for(const o of set){o.g.lookT=R.t+rand(2,3.5);o.g.photo=o.c.def.id==='mei'?Math.random()<.7:Math.random()<.3;o.g.photoT0=R.t+rand(0,.6)}}}}
  /* 寶寶 walks where 柔柔 might be hiding; nothing else to do */
  memChecks()}
-function freeCatNear(x,y){return CATS.filter(c=>c.perch<0&&!c.hidden&&!['jump','visit','bed','chase','race','dash','hide2'].includes(c.st)).sort((a,b)=>Math.hypot(a.x-x,a.y-y)-Math.hypot(b.x-x,b.y-y))[0]}
+function freeCatNear(x,y){return CATS.filter(c=>c.perch<0&&!c.hidden&&!c.sofa&&!['jump','visit','bed','chase','race','dash','hide2'].includes(c.st)).sort((a,b)=>Math.hypot(a.x-x,a.y-y)-Math.hypot(b.x-x,b.y-y))[0]}
 function hitSpot(p){if(p.x>=276&&p.x<=344&&p.y>=8&&p.y<=88)return'bags';const d=(s,r)=>Math.hypot(p.x-s.x,p.y-(s.y-8))<r;if(d(SPOT.bowl,16))return'bowl';if(Math.hypot(p.x-(SPOT.toy.x+Math.sin(performance.now()/1000*2.2)*3),p.y-SPOT.toy.y)<11)return'toy';if(d(SPOT.cave,20))return'cave';if(d(SPOT.bed,20))return'bed';if(d(SPOT.scr,18))return'scr';if(Math.hypot(p.x-SPOT.scr2.x,p.y-(SPOT.scr2.y-20))<16)return'scr2';return null}
 function tapSpot(k){audioInit();if(k==='bags'){BAG_T=performance.now()/1000;sfx.ding();toast(pick(['Jill 的包包收藏櫃，每一個都是自己努力賺來的','今天打烊後要背哪一個回家呢？','櫃子的燈一打，每個包都閃閃發亮']));return}
  if(k==='bowl'){sfx.kibble();for(const c of CATS.filter(c=>c.perch<0&&!c.hidden&&['rest','walk','daze','stare'].includes(c.st)&&c.def.id!=='snow').slice(0,2))catGo(c,'eat');return}
@@ -1667,8 +1702,8 @@ function hitCat(p){if(!CATS)return null;let best=null,bd=20;for(const c of CATS)
 function tapCat(c){audioInit();const id=c.def.id;
  if(id==='mei'&&Math.random()<.35&&!['sleep','bed'].includes(c.st)){c.face=-c.face;tone(420,0,.12,'sine',.05,300);return}
  if(id==='snow'&&(c.st==='sleep'||c.st==='bed')){c.hearts.push({x:0,y:-20,t:0});tone(200,0,.3,'sine',.05);return}
- sfx.meow();if(c.st==='sleep'){c.st='daze';c.pose='daze';c.t=2.5}if(['scr','toy','eat','stare','daze','wary','rest'].includes(c.st))releaseSpots(c);c.happy=1.8;c.hearts.push({x:0,y:-28,t:0},{x:5,y:-24,t:-.2});
- if(!['jump','visit','side','race','dash','chase','hide2','bed','hide','walk'].includes(c.st)&&c.perch<0){c.st='pet';c.pose='happy';c.moving=false}else if(c.perch>=0||c.st==='side'){c.pose='happy';c.t=Math.max(c.t,2.5)}
+ sfx.meow();if(c.st==='sleep'){c.st='daze';c.pose='daze';c.t=2.5}if(['scr','toy','eat','stare','daze','wary','rest'].includes(c.st)&&!c.sofa)releaseSpots(c);c.happy=1.8;c.hearts.push({x:0,y:-28,t:0},{x:5,y:-24,t:-.2});
+ if(!['jump','visit','side','race','dash','chase','hide2','bed','hide','walk'].includes(c.st)&&c.perch<0&&!c.sofa){c.st='pet';c.pose='happy';c.moving=false}else if(c.perch>=0||c.st==='side'||c.sofa){c.pose='happy';c.t=Math.max(c.t,2.5)}
  if(R&&phase==='service'&&c.cd<=0){c.cd=12;for(const g of R.groups){if(g.table==null||!['reading','order','wait','check'].includes(g.state))continue;const t=R.tables[g.table];if(Math.hypot(t.x-c.x,t.y-c.y)<90&&catCheer(g,.08)>0)addFloat(t.x,t.y-54,'心情 UP','#F29AAE',0)}}}
 /* ---- cat drawing ---- */
 function catStripesSide(c,C,bw,bh){if(!C.str)return;c.strokeStyle=C.str;c.lineCap='round';if(C.b==='amshort'){c.globalAlpha=.9;c.lineWidth=1.7;for(let i=-3;i<=3;i++){c.beginPath();c.moveTo(i*3.3,-10-bh-1);c.quadraticCurveTo(i*3.3+2,-11,i*3.3-.5,-10+bh*.2);c.stroke()}c.lineWidth=1.3;c.beginPath();c.arc(-1,-9.5,3,0,7);c.stroke()}else{c.globalAlpha=.8;c.lineWidth=1.3;for(let i=-3;i<=3;i++){c.beginPath();c.moveTo(i*3.4,-10-bh-1);c.quadraticCurveTo(i*3.4+1.8,-10.5,i*3.4,-10+bh*.1);c.stroke()}}c.globalAlpha=1}
@@ -1744,7 +1779,7 @@ function drawCat(c,cat,now){const C=cat.def;c.save();c.translate(cat.x,cat.y);c.
  else{c.scale(flip?-1:1,1);catSit(c,C,cat.ph,{groom:cat.pose==='groom'&&!happy,happy,blink})}
  c.restore();
  for(const h of cat.hearts){if(h.t<0)continue;const a=1-h.t/1.4;c.fillStyle=`rgba(232,110,130,${a})`;const hx=cat.x+h.x+Math.sin(h.t*6)*2,hy=cat.y+h.y*CSC-h.t*16;c.beginPath();c.moveTo(hx,hy+2.6);c.bezierCurveTo(hx-4,hy,hx-2,hy-3.4,hx,hy-1.3);c.bezierCurveTo(hx+2,hy-3.4,hx+4,hy,hx,hy+2.6);c.fill()}
- if(cat.happy>0){const nm=catName(C);c.font=`800 7px ${FONT}`;const w=c.measureText(nm).width+8;c.fillStyle='rgba(255,248,236,.95)';rr(c,cat.x-w/2,cat.y-50,w,11,5);c.fill();c.fillStyle='#2E2019';c.textAlign='center';c.textBaseline='middle';c.fillText(nm,cat.x,cat.y-44.3);c.textBaseline='alphabetic'}}
+ if(cat.happy>0&&!cat.quiet){const nm=catName(C);c.font=`800 7px ${FONT}`;const w=c.measureText(nm).width+8;c.fillStyle='rgba(255,248,236,.95)';rr(c,cat.x-w/2,cat.y-50,w,11,5);c.fill();c.fillStyle='#2E2019';c.textAlign='center';c.textBaseline='middle';c.fillText(nm,cat.x,cat.y-44.3);c.textBaseline='alphabetic'}}
 function drawCatTree(c,now){c.save();c.translate(30,DY);const X=40;const sisal=(x,y0,y1)=>{let g=c.createLinearGradient(x-4,0,x+4,0);g.addColorStop(0,'#B8986A');g.addColorStop(.5,'#E2C898');g.addColorStop(1,'#A88858');c.fillStyle=g;c.fillRect(x-4,y0,8,y1-y0);c.strokeStyle='rgba(110,80,40,.45)';c.lineWidth=.7;for(let y=y0+1;y<y1;y+=2.2){c.beginPath();c.moveTo(x-4,y);c.lineTo(x+4,y+1);c.stroke()}};
  const plat=(x,y,rx,col,top)=>{c.fillStyle='rgba(0,0,0,.18)';el(c,x+2,y+4,rx+1,rx*.34);c.fillStyle=col;el(c,x,y+2.5,rx,rx*.36);c.fillRect(x-rx,y-.5,rx*2,3);c.fillStyle=top;el(c,x,y-.5,rx,rx*.34);c.fillStyle='rgba(255,255,255,.12)';el(c,x-rx*.3,y-1.4,rx*.45,rx*.12)};
  c.fillStyle='rgba(0,0,0,.25)';el(c,X+8,358,34,7);c.fillStyle='#A88A66';rr(c,X-24,346,64,11,4);c.fill();c.fillStyle='#D8C09A';el(c,X+8,346,32,6.5);
@@ -1816,6 +1851,256 @@ function drawStation(c,s,r,now,i){const j=s.job;const foc=R&&R.panel&&R.focus===
 function tapStation(i){const s=R.slots[i];if(!s)return;audioInit();if(s.broken){s.fix=(s.fix||0)+1;s.shake=1;sfx.chop();trayFloat(s,'修理 '+s.fix+'/8','#FFD27A');if(s.fix>=8){s.broken=false;toast(`${ST_N[s.type]}修好了！`);sfx.ding()}return}if(s.job){R.focus=i;R.panel=true;sfx.tap();return}const n=nextPendingFor(s.type);if(n){R.focus=i;startCook(n.tk,n.it)}else toast(`${ST_N[s.type]}：目前沒有要做的料理`)}
 function hitStation(p){if(!R||p.y<FB-8||p.y>FB+48)return -1;const rs=kitchenRects(R.slots);for(let i=0;i<rs.length;i++){const r=rs[i];if(p.x>=r.x-2&&p.x<=r.x+r.w+2&&p.y>=r.y-10&&p.y<=r.y+r.h+8)return i}return -1}
 
+
+/* ================= life: the sofa, the rolling TV, Jill's evenings, Dylan ================= */
+/* Nothing in this section plays a scene. Jill, Dylan, the five cats and the TV each decide for
+   themselves from their own state, personality, what is free on the sofa, where the others are,
+   cooldowns and chance. Whatever happens on a given evening comes out of those rules. */
+const SOFA={x0:88,x1:208,y:100,back:86,seat:112,front:142,arm:12,jy:134,catY:132,backY:90,armY:100};
+SOFA.seatL=SOFA.x0+SOFA.arm;SOFA.seatR=SOFA.x1-SOFA.arm;
+const JPOS={L:{x:122,face:1},R:{x:174,face:-1},M:{x:148,face:1}};   /* where Jill can sit; L = legs to the right, towards the TV */
+const TV_PARK={x:352,y:118};
+function tvUsePos(){return LIFE.jill.pos==='R'?{x:SOFA.x0,y:146}:{x:SOFA.x1,y:146}}   /* in front of the arm at Jill's feet */
+const DYLAN={id:'dylan',n:'Dylan',type:'regular',size:1,fav:['signature'],looks:[{skin:'#EDC19C',hair:'#2A211C',hs:0,top:'#4E5A6B',acc:null,pants:'#3B3A44'}],
+ who:'一個人來，話不多。喜歡坐看得到廚房的位子。',who2:'Jill 的先生。打烊以後，有時候會留下來。'};
+REG_BY.dylan=DYLAN;
+const LIFE={day:0,plan:null,t:0,jill:null,tv:null,dylan:null,say:[],revealRoll:0};
+function lifeReset(){LIFE.day=0;LIFE.plan=null;LIFE.t=0;LIFE.revealRoll=0;LIFE.say=[];LIFE.dylan=null;
+ LIFE.jill={on:false,pos:null,x:PASS.x,y:PASS.y,face:1,step:0,legs:0,legTarget:0,act:null,last:null,t:0,flipT:0,flip:0,gazeT:0,gazeX:0,settleT:32,bobT:0,catNew:0,sinceSit:0,walking:false,tx:0,ty:0,via:null,after:null,sitT:0,petCat:null,counted:false};
+ LIFE.tv={x:TV_PARK.x,y:TV_PARK.y,at:'park',on:false,face:0,mover:null,path:null,wait:0,offT:0,tried:0,step:0}}
+lifeReset();
+function segHitsRect(x0,y0,x1,y1,r){for(let i=0;i<=10;i++){const u=i/10,px=x0+(x1-x0)*u,py=y0+(y1-y0)*u;if(px>r.a&&px<r.b&&py>r.t&&py<r.d)return true}return false}
+/* ---- who is where on the seat ---- */
+function jillLegs(){const J=LIFE.jill;if(!J.on||(J.legs<.05&&J.legTarget<.05))return null;const len=10+Math.max(J.legs,J.legTarget)*32;return J.face>0?[J.x+3,J.x+3+len]:[J.x-3-len,J.x-3]}
+function seatIvs(exclude){const out=[];const J=LIFE.jill,D=LIFE.dylan;if(J.on){out.push({a:J.x-13,b:J.x+13,who:'jill'});const lg=jillLegs();if(lg)out.push({a:lg[0],b:lg[1],who:'legs'})}else if(J.reserved&&J.pos)out.push({a:JPOS[J.pos].x-13,b:JPOS[J.pos].x+13,who:'jill'});
+ if(D&&(D.onSofa||D.state==='toSofa'||D.state==='waitSofa'))out.push({a:(D.onSofa?D.x:D.tx)-13,b:(D.onSofa?D.x:D.tx)+13,who:'dylan'});
+ if(CATS)for(const c of CATS){if(c===exclude||!c.sofa||c.sofa.kind!=='seat')continue;out.push({a:c.sofa.x-12,b:c.sofa.x+12,who:c})}return out}
+function ivFree(a,b,ivs){if(a<SOFA.seatL||b>SOFA.seatR)return false;for(const v of ivs)if(a<v.b+1&&b>v.a-1)return false;return true}
+function sofaCats(){return CATS?CATS.filter(c=>c.sofa&&c.sofaOn):[]}
+function sofaSlots(c){const J=LIFE.jill,D=LIFE.dylan;const ivs=seatIvs(c);const out=[];const taken=k=>CATS.some(o=>o!==c&&o.sofa&&o.sofa.k===k);
+ for(const x of[112,136,160,184])if(ivFree(x-12,x+12,ivs))out.push({k:'seat'+x,x,y:SOFA.catY,kind:'seat'});
+ if(J.on&&!taken('lap')){const lg=jillLegs();out.push({k:'lap',x:lg?(lg[0]+lg[1])/2:J.x+J.face*2,y:lg?SOFA.catY:SOFA.jy+4,kind:'lap'})}
+ for(const [k,x] of[['armL',SOFA.x0+6],['armR',SOFA.x1-6]])if(!taken(k)&&!(D&&D.onSofa&&Math.abs(D.x-x)<22))out.push({k,x,y:SOFA.armY,kind:'arm'});
+ for(const x of[114,140,166,192]){if(J.on&&Math.abs(x-J.x)<22)continue;if(D&&D.onSofa&&Math.abs(x-D.x)<22)continue;if(taken('back'+x))continue;if(CATS.some(o=>o!==c&&o.sofa&&o.sofa.kind==='back'&&Math.abs(o.sofa.x-x)<25))continue;out.push({k:'back'+x,x,y:SOFA.backY,kind:'back'})}
+ return out}
+/* ---- cats choosing a place on the sofa (personality × occupancy × who is already there) ---- */
+function pickSofaSlot(c,wantNear){const id=c.def.id;const sl=sofaSlots(c);if(!sl.length)return null;const J=LIFE.jill,D=LIFE.dylan;
+ const dJ=s=>J.on?Math.hypot(s.x-J.x,s.y-120):999;const dD=s=>D&&D.onSofa?Math.hypot(s.x-D.x,s.y-120):999;
+ const others=sofaCats().filter(o=>o!==c);const crowd=s=>others.reduce((a,o)=>a+Math.max(0,30-Math.hypot(o.sofa.x-s.x,o.sofa.y-s.y)),0);
+ const mate=(idl,w,s)=>{const o=catBy(idl);return o&&o.sofa?w*Math.max(0,60-Math.hypot(o.sofa.x-s.x,o.sofa.y-s.y))/60:0};
+ return wpick(sl,s=>{let w=1;
+  if(id==='snow'){w=s.kind==='seat'?3:s.kind==='lap'?1.2:s.kind==='arm'?.3:.2;if(s.kind==='seat'&&(s.x<=112||s.x>=184))w*=1.4;if(J.on)w*=1+Math.max(0,50-dJ(s))/50;w*=1+Math.max(0,40-dD(s))/40*.5}
+  else if(id==='mei'){w=s.kind==='back'?3:s.kind==='arm'?2.2:s.kind==='seat'?.8:.25;w*=1/(1+crowd(s)*.08)}
+  else if(id==='tora'||id==='ban'){w=wantNear&&J.on?Math.max(.2,80-dJ(s))/80*3:(s.kind==='seat'?1.2:s.kind==='lap'?(J.on?1.5:0):.7);if(id==='tora')w*=1+Math.max(0,50-dD(s))/50*.6;if(id==='ban')w*=1+mate('tora',.8,s)}
+  else{w=s.kind==='seat'?1:s.kind==='arm'?1.1:s.kind==='back'?.9:.6;w*=1+mate('ban',1.2,s)+mate('tora',.9,s)+mate('mei',1,s);if(J.on&&wantNear)w*=1+Math.max(0,80-dJ(s))/80}
+  return w})}
+function sofaWeight(c){const id=c.def.id;const J=LIFE.jill,D=LIFE.dylan;let w=id==='snow'?2.4:id==='mei'?2.2:id==='mikan'?.9:id==='tora'?.7:.6;
+ if(J.on)w*=(id==='tora'||id==='ban')?.5:1.3;
+ if(id==='mikan'&&CATS.some(o=>o!==c&&o.sofa&&o.def.id==='mei'))w+=1;
+ if(D&&D.onSofa){if(id==='tora')w+=.6;if(id==='snow')w+=.3}
+ if(evening())w*=1.3;if(c.sofaCD>ctime)w*=.2;const sl=sofaSlots(c);if(!sl.length)return 0;if(id==='snow'&&!sl.some(s=>s.kind==='seat'||s.kind==='lap'))w*=.25;return w}
+function goSofaSlot(c,s){releaseSpots(c);c.sofa={k:s.k,x:s.x,y:s.y,kind:s.kind};c.sofaOn=false;c.guest=null;catWalk(c,clamp(s.x,SOFA.x0-4,SOFA.x1+4),SOFA.front+10,'sofaUp')}
+function goSofaJill(c){const id=c.def.id;const J=LIFE.jill;const jx=J.on?J.x:JPOS[J.pos||'L'].x;const rival=id==='tora'?catBy('ban'):id==='ban'?catBy('tora'):null;const sl=sofaSlots(c);
+ const floor=()=>{const p={x:clamp(jx+rand(-22,22),96,316),y:SOFA.front+10};catWalk(c,p.x,p.y,'rest')};
+ if(!sl.length){floor();return}
+ const dJ=s=>Math.hypot(s.x-jx,s.y-120);const best=sl.slice().sort((a,b)=>dJ(a)-dJ(b))[0];
+ const rivalCloser=rival&&rival.sofa&&rival.sofa.kind!=='back'&&dJ(rival.sofa)<dJ(best);
+ if(rivalCloser){const r=Math.random();if(r<.2){floor();return}if(r<.32){const p=pickFloor(c);catWalk(c,p.x,p.y,'rest');return}}
+ const s=(id==='tora'||id==='ban')&&!(rivalCloser&&Math.random()<.5)?best:pickSofaSlot(c,true);if(!s){floor();return}goSofaSlot(c,s)}
+function sofaSettle(c,fresh){const id=c.def.id;const J=LIFE.jill;const s=c.sofa;c.moving=false;c.run=0;
+ const sleepy=(id==='snow'?.8:s.kind==='lap'?.5:.35)*(evening()?1.2:1);
+ if(Math.random()<sleepy){sleepHere(c,evening()?30:20,evening()?90:50);if(s.kind!=='seat')c.pose='loaf'}
+ else{c.st='rest';c.pose=s.kind==='lap'?pick(['loaf','curl','loaf']):pick(['sit','loaf','groom','loaf']);c.t=rand(8,24)}
+ c.face=J.on?(J.x>=c.x?1:-1):(Math.random()<.5?1:-1);
+ if(fresh&&J.on&&Math.abs(c.x-J.x)<46){LIFE.jill.gazeT=rand(1.2,2.2);LIFE.jill.gazeX=c.x;LIFE.jill.catNew++}
+ if(id==='mei')BAO_LAST={perch:null,x:c.x,y:c.y,t:ctime}}
+function moveSofaSlot(c,s){c.sofa={k:s.k,x:s.x,y:s.y,kind:s.kind};c.sofaOn=false;catJump(c,s.x,s.y,'sofaLand')}
+function leaveSofa(c,then){c.sofa=null;c.sofaOn=false;c.sofaLeaving=true;c.sofaCD=ctime+rand(20,60);catJump(c,clamp(c.x+rand(-14,14),SOFA.x0-6,SOFA.x1+6),SOFA.front+12,then||'decide')}
+function sofaDecide(c){const id=c.def.id;const J=LIFE.jill;
+ let stay=id==='snow'?.85:id==='mei'?.6:id==='tora'?(J.on?.78:.4):id==='ban'?(J.on?.72:.4):.45;if(evening())stay+=.08;
+ if(Math.random()<stay){
+  if(J.on&&(id==='tora'||id==='ban')&&Math.random()<.25){const sl=sofaSlots(c);const dJ=s=>Math.hypot(s.x-J.x,s.y-120);const cur=dJ(c.sofa);const better=sl.filter(s=>dJ(s)<cur-8).sort((a,b)=>dJ(a)-dJ(b))[0];if(better){moveSofaSlot(c,better);return}}
+  sofaSettle(c);return}
+ leaveSofa(c,'decide')}
+/* ---- Jill's evening ---- */
+function lifePlan(){if(LIFE.day===S.day&&LIFE.plan)return;LIFE.day=S.day;LIFE.t=0;LIFE.revealRoll=0;LIFE.say=[];
+ LIFE.plan=Math.random()<.85?'sofa':'table';const J=LIFE.jill;Object.assign(J,{on:false,reserved:false,pos:null,legs:0,legTarget:0,act:null,last:null,t:0,walking:false,via:null,after:null,sitT:0,catNew:0,sinceSit:0,counted:false})}
+function freeJillPos(){const ivs=seatIvs(null);const ok=p=>ivFree(JPOS[p].x-13,JPOS[p].x+13,ivs);const clearHead=p=>!sofaCats().some(o=>o.sofa.kind==='back'&&Math.abs(o.sofa.x-JPOS[p].x)<20);
+ const order=Math.random()<.7?['L','R','M']:['R','L','M'];return order.find(p=>ok(p)&&clearHead(p))||order.find(ok)||null}
+function jillWalk(L,x,y,after){L.tx=x;L.ty=y;L.after=after;L.walking=true;L.via=null;
+ if(L.y<148&&y>=148)L.via={x:L.x,y:152};else if(y<148&&L.y>=148)L.via={x,y:152}}
+function jillLife(J,L,dt){const tv=LIFE.tv;
+ if(L.walking){const tx=L.via?L.via.x:L.tx,ty=L.via?L.via.y:L.ty;const dx=tx-L.x,dy=ty-L.y,d=Math.hypot(dx,dy),v=140*dt;
+  if(d<=v){L.x=tx;L.y=ty;if(L.via){L.via=null}else{L.walking=false;const a=L.after;L.after=null;jillArrive(L,a)}}else{L.x+=dx/d*v;L.y+=dy/d*v;L.face=dx>=0?1:-1;L.step+=dt*12}}
+ else if(L.sitT>0){L.sitT-=dt;if(L.sitT<=0){L.on=true;L.reserved=false;L.y=SOFA.jy;L.act='settle';L.t=rand(1.5,4);L.sinceSit=0;
+   if(!L.counted){L.counted=true;S.life=S.life||{};S.life.sofa=(S.life.sofa||0)+1}
+   for(const c of CATS||[]){if(c.st==='side'){releaseSpots(c);c.st='rest';c.pose='sit';c.t=rand(.4,1.8)}else if(c.st==='walk'&&c.after==='side'){releaseSpots(c);c.after='rest';c.afterT=rand(.5,2)}}}}
+ else if(L.act==='toSofa'){const pos=L.reserved&&L.pos?L.pos:freeJillPos();if(!pos){lifeNoRoom();return}L.pos=pos;L.reserved=true;L.face=JPOS[pos].face;jillWalk(L,JPOS[pos].x,SOFA.front+10,'sit')}
+ else if(L.on){L.sinceSit+=dt;L.t-=dt;
+  /* legs: stretch out when the seat beside her is free, pull them in when someone needs the room */
+  const want=L.legTarget;const room=ivFree(L.face>0?L.x+3:L.x-3-42,L.face>0?L.x+3+42:L.x-3,seatIvs(null).filter(v=>v.who!=='jill'&&v.who!=='legs'));
+  if(L.legTarget===0&&room&&['read','idle','tv'].includes(L.act)&&Math.random()<dt*.04)L.legTarget=1;
+  const target=(L.act==='fetch'||L.act==='standing')?0:want;if(Math.abs(L.legs-target)>.01){const st=L.legs<target?1.6:2.2;L.legs=L.legs<target?Math.min(target,L.legs+dt*st):Math.max(target,L.legs-dt*st)}
+  if(L.gazeT>0)L.gazeT-=dt;if(L.flip>0)L.flip-=dt;if(L.bobT>0)L.bobT-=dt;
+  L.settleT-=dt;if(L.settleT<=0){L.settleT=rand(25,50);L.bobT=.5}
+  if(L.act==='read'){L.flipT-=dt;if(L.flipT<=0){L.flipT=rand(5,13);L.flip=.35}}
+  if(L.act==='settle'&&L.t<=0){L.legTarget=room&&Math.random()<.85?1:0;jillDecide(L)}
+  else if(L.act==='wantTV'){if(tv.mover){L.act='waitTV';L.t=30}else if(L.t<=0){if(!CATS.some(c=>c.sofa&&c.sofa.kind==='lap')&&tvUsable()&&tv.tried<2){L.act='fetch';L.fetch='legsIn';L.t=0}else{L.last='tv';L.act=null;jillDecide(L)}}}
+  else if(L.act==='waitTV'){if(tv.at==='use'&&!tv.mover){tv.on=true;L.act='tv';L.t=rand(30,90);S.life.tv=(S.life.tv||0)+1}else if(!tv.mover||L.t<=0){L.act=null;L.last='tv';jillDecide(L)}}
+  else if(L.act==='fetch'){if(L.fetch==='legsIn'&&L.legs<.05){L.fetch='stand';L.on=false;L.reserved=true;L.y=SOFA.front+10;L.act='standing';jillWalk(L,tv.x+18,tv.y+4,'grabTV')}}
+  else if(['read','idle','tv','pet'].includes(L.act)&&L.t<=0){if(L.act==='pet'&&L.petCat)L.petCat=null;jillDecide(L)}
+  if(L.act==='tv'&&!(tv.on&&tv.at==='use')){L.act=null;jillDecide(L)}
+  if(L.catNew>0&&L.act!=='pet'&&L.act!=='settle'&&Math.random()<dt*.25){const near=sofaCats().filter(c=>Math.abs(c.x-L.x)<46);if(near.length){L.petCat=pick(near);L.act='pet';L.t=rand(2,4);L.petCat.hearts.push({x:0,y:-24,t:0});if(Math.random()<.5)L.petCat.happy=Math.max(L.petCat.happy,1.5),L.petCat.quiet=1}L.catNew=0}}
+ else if(L.act==='standing'&&!L.walking){/* stood up but has nothing to do: sit back down */L.act='toSofa'}
+ /* mirror into the view's Jill so everything that reads view().jill sees her where she is */
+ J.x=L.x;J.y=L.y;J.face=L.face;J.moving=L.walking||L.act==='pushing';J.step=L.step;J.sit=L.on;J.sofa=L.on?L.pos:null}
+function jillArrive(L,a){const tv=LIFE.tv;
+ if(a==='sit'){L.sitT=.35;L.face=JPOS[L.pos].face;L.y=SOFA.front+10;L.act='sitting'}
+ else if(a==='grabTV'){if(tv.mover||tv.at==='use'){L.act='toSofa';return}tv.mover='jill';tv.path=[{x:tv.x,y:tvUsePos().y},{x:tvUsePos().x,y:tvUsePos().y}];tv.wait=0;L.act='pushing';L.face=-1}
+ else if(a==='back'){L.act='toSofa'}}
+function jillDecide(L){const tv=LIFE.tv,D=LIFE.dylan;const W=[];const add=(k,w)=>{if(w>0)W.push([k,w])};
+ add('read',L.last==='read'?2:4);add('idle',L.last==='idle'?1.2:2.4);
+ const tvOk=tvUsable();add('tv',tvOk?(L.last==='tv'?1.2:2.4)*(tv.at==='use'?1.3:1)*(D&&D.onSofa&&S.dylan.stage>=3?1.4:1):0);
+ const k=wpick(W,o=>o[1])[0];L.last=k;L.act=k;
+ if(k==='read'){L.t=rand(25,75);L.flipT=rand(4,10)}else if(k==='idle')L.t=rand(10,40);
+ else if(k==='tv'){if(tv.at==='use'&&!tv.mover){tv.on=true;L.t=rand(30,90);S.life.tv=(S.life.tv||0)+1;tvNoticed()}else{L.act='wantTV';L.t=rand(2,6)}}}
+/* ---- the rolling TV ---- */
+function tvUsable(){const tv=LIFE.tv;if(tv.at==='use')return Math.abs(tv.x-tvUsePos().x)<3;if(tv.mover)return false;return tv.tried<2&&tv.at==='park'}
+function tvNoticed(){for(const c of CATS||[]){if(c.hidden||c.st!=='rest'||Math.random()>.3)continue;const d=Math.hypot(c.x-LIFE.tv.x,c.y-LIFE.tv.y);if(d<130)c.lookAt={x:LIFE.tv.x,y:LIFE.tv.y-20,hidden:false}}}
+function tvBlocked(tv,dx,dy){const px=tv.x+dx*26,py=tv.y+dy*24;const who=tv.mover;const near=(x,y,r)=>Math.hypot(x-px,y-py)<r;
+ for(const c of CATS||[]){if(c.hidden||c.perch>=0||c.sofa)continue;if(near(c.x,c.y-6,22))return true}
+ if(who!=='jill'&&LIFE.jill.on===false&&near(LIFE.jill.x,LIFE.jill.y-10,22))return true;
+ if(who!=='dylan'&&LIFE.dylan&&!LIFE.dylan.onSofa&&!LIFE.dylan.seated&&near(LIFE.dylan.x,LIFE.dylan.y-10,22))return true;return false}
+function tvUpd(dt){const tv=LIFE.tv;
+ if(tv.mover){const n=tv.path[0];if(!n){tvDone(true);return}const dx=n.x-tv.x,dy=n.y-tv.y,d=Math.hypot(dx,dy);
+  if(d<1){tv.path.shift();if(!tv.path.length)tvDone(true);return}
+  if(tvBlocked(tv,dx/d,dy/d)){tv.wait+=dt;if(tv.wait>5)tvDone(false);return}
+  tv.wait=Math.max(0,tv.wait-dt);const v=Math.min(d,44*dt);tv.x+=dx/d*v;tv.y+=dy/d*v;tv.step+=dt*12;tv.at='moving';
+  const m=tv.mover==='jill'?LIFE.jill:LIFE.dylan;if(m){m.x=tv.x+18;m.y=tv.y+3;m.face=-1;m.step=tv.step;m.walking=false;m.moving=true}}
+ else if(tv.on){const w=(LIFE.jill.on&&LIFE.jill.act==='tv')||(LIFE.dylan&&LIFE.dylan.onSofa&&LIFE.dylan.act==='tv');tv.offT=w?0:tv.offT+dt;if(tv.offT>25){tv.on=false;tv.offT=0}}}
+function tvDone(ok){const tv=LIFE.tv;const who=tv.mover;tv.mover=null;tv.path=null;
+ if(ok&&Math.abs(tv.x-tvUsePos().x)<2&&Math.abs(tv.y-tvUsePos().y)<2){tv.at='use';tv.face=LIFE.jill.pos==='R'?1:-1;tv.on=true;tvNoticed();if(who==='dylan'){S.dylan.clues.tv=(S.dylan.clues.tv||0)+1}}
+ else{tv.at='stuck';tv.tried++}
+ if(who==='jill'){const L=LIFE.jill;L.moving=false;L.act='standing';jillWalk(L,JPOS[L.pos].x,SOFA.front+10,'back');if(ok)L.last='tv-fetched'}
+ else if(who==='dylan'&&LIFE.dylan){const D=LIFE.dylan;D.moving=false;D.state='think';D.t=rand(.5,1.5)}}
+/* ---- Dylan ---- */
+function dylanStays(){const d=S.dylan;if(!d||d.stage<1)return false;if(!R.closed&&R.t<R.dur*.8)return false;return Math.random()<(d.stage>=3?.65:.4)}
+function dylanLinger(g,t){g.gone=true;const sp=seatPos(t)[0];LIFE.dylan={x:t.x+sp.dx,y:t.y+sp.dy,face:sp.side>0?-1:1,state:'linger',table:t.i,seat:0,seated:true,onSofa:false,t:rand(3,8),phone:Math.random()<.7,walking:false,step:0,moving:false,carry:false,catCD:0,tidied:false,act:null,talkT:rand(30,70),since:0};
+ const d=S.dylan;d.stay=(d.stay||0)+1;d.clues.late=(d.clues.late||0)+1}
+function dylanStageCheck(){const d=S.dylan;if(!d)return;const v=S.regulars.dylan||0;const cl=Object.keys(d.clues||{}).filter(k=>d.clues[k]>0).length;
+ if(d.stage===0&&v>=3&&S.day>=6)d.stage=1;
+ if(d.stage===1&&S.day>=12&&v>=6&&(d.stay||0)>=2&&cl>=3&&(S.life&&S.life.sofa||0)>=3&&(d.clues.pet||0)>=1)d.stage=2}
+function dylanLine(){const st=S.dylan.stage;if(st>=3)return pick(['今天很累了吧。','不急，我等妳。','貓都在。']);return pick(['今天人很多。','貓咪們今天很乖。',R&&R.weather==='rain'?'外面開始下雨了。':'今天天氣很好。'])}
+function dylanGuestUpd(g,dt){const t=R.tables[g.table];const J=R.jill;g.glT=(g.glT??rand(5,12))-dt;
+ const jillLooking=Math.hypot(J.x-t.x,J.y-t.y)<80&&((J.face>0)===(t.x>=J.x));
+ if(g.gaze>R.t&&jillLooking)g.gaze=0;
+ if(g.glT<=0){g.glT=rand(8,20);if(!jillLooking&&Math.random()<.75){g.gaze=R.t+rand(1.2,2.8);S.dylan.clues.look=(S.dylan.clues.look||0)+1}}
+ if(!g.said&&['wait','eat'].includes(g.state)&&g.ticket&&R.t-g.ticket.t0>8&&jillA().idle&&Math.random()<dt*.06){g.said=1;quote(g,dylanLine())}}
+function dylanWalk(D,x,y,after){D.tx=x;D.ty=y;D.after=after;D.walking=true;D.seated=false;D.via=null;if(D.y<148&&y>=148)D.via={x:D.x,y:152};else if(y<148&&D.y>=148)D.via={x,y:152}}
+function dylanCanSofa(){const J=LIFE.jill;if(!(J.on||(J.reserved&&J.pos)))return null;const ivs=seatIvs(null);const face=J.on?J.face:JPOS[J.pos].face;
+ if(face>0&&ivFree(170,196,ivs))return 183;if(face<0&&ivFree(100,126,ivs))return 113;
+ if(S.dylan.stage>=3&&J.on&&J.legs<.3){for(const x of[149,160,136])if(ivFree(x-13,x+13,ivs))return x}return null}
+function dylanUpd(dt){const D=LIFE.dylan;if(!D)return;D.t-=dt;D.since+=dt;const st=S.dylan.stage;const J=LIFE.jill;
+ if(D.walking){const tx=D.via?D.via.x:D.tx,ty=D.via?D.via.y:D.ty;const dx=tx-D.x,dy=ty-D.y,d=Math.hypot(dx,dy),v=80*dt;
+  if(d<=v){D.x=tx;D.y=ty;if(D.via)D.via=null;else{D.walking=false;D.moving=false;dylanArrive(D)}}else{D.x+=dx/d*v;D.y+=dy/d*v;D.face=dx>=0?1:-1;D.step+=dt*11;D.moving=true}return}
+ switch(D.state){
+ case'linger':{if(!R||R.closing!=null){D.state='think';D.t=rand(.4,1.5);D.since=0;break}
+  const t=R&&R.tables[D.table];if(t&&t.group){/* his table is needed again: he gives it up and waits by the door */D.seated=false;dylanWalk(D,rand(66,84),rand(156,186),'stand');break}
+  if(D.t<=0){D.t=rand(4,9);if(st>=1&&!D.tidied&&t&&t.dirty&&!t.group&&!jillTargets(t.i)&&Math.random()<.45){D.tidied=true;dylanWalk(D,t.x,t.y+26,'bus')}}break}
+ case'think':if(D.t<=0)dylanDecide(D);break;
+ case'sitDown':{D.sitT-=dt;if(D.sitT<=0){D.onSofa=true;D.y=SOFA.jy;D.state='sitSofa';D.t=rand(30,90);D.act=(LIFE.tv.on&&LIFE.tv.at==='use'&&Math.random()<.6)?'tv':(Math.random()<.55?'phone':'idle');D.phone=D.act==='phone';
+   if(J.on&&J.legTarget>.75&&(J.face>0?D.x>J.x:D.x<J.x))J.legTarget=.75;if(Math.random()<.3){J.gazeT=1.4;J.gazeX=D.x}
+   if(D.reveal){D.revealT=2.5}}break}
+ case'sitSofa':{if(D.revealT!=null){D.revealT-=dt;if(D.revealT<=0){D.revealT=null;D.reveal=false;doReveal()}}
+  if(st>=3&&J.on&&D.onSofa){D.talkT-=dt;if(D.talkT<=0){D.talkT=rand(45,110);if(Math.random()<.5){say('d',D.x,SOFA.jy-52,pick(['今天很累了吧。','冷嗎？','明天我早點來。','貓都在。']));if(Math.random()<.55)say('j',J.x,SOFA.jy-52,pick(['嗯。','還好。','好。']),1.3)}}}
+  if(D.act==='tv'&&!(LIFE.tv.on&&LIFE.tv.at==='use'))D.act='idle';
+  if(D.t<=0)dylanDecide(D);break}
+ case'waitSofa':{if(J.on&&J.sinceSit>2.5){const x=dylanCanSofa();if(x!=null&&Math.abs(x-D.x)<=6){D.state='sitDown';D.sitT=.3;D.face=J.x>=D.x?1:-1;break}}if(D.t<=0||(J.on&&dylanCanSofa()==null)){D.state='think';D.t=1;D.reveal=false}break}
+ case'sitTable':case'stand':case'crouch':if(D.t<=0||(st>=3&&D.state!=='crouch'&&(J.on||J.reserved)&&dylanCanSofa()!=null&&Math.random()<dt*.08))dylanDecide(D);break;
+ case'pushing':break;
+ case'gone':LIFE.dylan=null;break}}
+function dylanArrive(D){const a=D.after;D.after=null;const J=LIFE.jill;
+ if(a==='bus'){const t=R&&R.tables[D.table];if(t&&t.dirty&&!t.group){t.dirty=false;t.plates=[];t.busT=0;D.carry=true;S.dylan.clues.tidy=(S.dylan.clues.tidy||0)+1;dylanWalk(D,PASS.x+18,PASS.y-2,'pass')}else{D.state='think';D.t=1}}
+ else if(a==='pass'){D.carry=false;sfx.clear();D.state='think';D.t=rand(1,3)}
+ else if(a==='sitTable'){D.seated=true;D.state='sitTable';D.t=S.dylan.stage>=3?rand(14,40):rand(25,70);D.phone=Math.random()<.65}
+ else if(a==='stand'){D.state='stand';D.t=rand(8,20);D.phone=Math.random()<.5}
+ else if(a==='cat'){const c=D.cat;D.state='crouch';D.t=rand(6,12);D.face=c&&c.x>=D.x?1:-1;D.catCD=LIFE.t+40;
+  if(c&&!c.hidden&&c.perch<0&&!c.sofa&&['rest','daze','stare'].includes(c.st)){const id=c.def.id;const p=id==='tora'?.7:id==='mikan'?.55:id==='ban'?.5:id==='mei'?.25:.1;if(Math.random()<p){releaseSpots(c);c.st='pet';c.pose='rub';c.happy=rand(2.5,4);c.quiet=1;c.face=D.x>=c.x?1:-1;c.hearts.push({x:0,y:-26,t:0});S.dylan.clues.pet=(S.dylan.clues.pet||0)+1}else if(c.st==='rest')c.face=D.x>=c.x?1:-1}}
+ else if(a==='grabTV'){const tv=LIFE.tv;if(tv.mover||tv.at==='use'){D.state='think';D.t=1;return}tv.mover='dylan';tv.path=[{x:tv.x,y:tvUsePos().y},{x:tvUsePos().x,y:tvUsePos().y}];tv.wait=0;D.state='pushing';D.face=-1}
+ else if(a==='sofa'){D.state='arrived';const x=dylanCanSofa();if(x==null||Math.abs(x-D.x)>6){D.state='think';D.t=1;return}
+  if(!(J.on&&J.sinceSit>2.5)){D.state='waitSofa';D.tx=D.x;D.t=14;return} /* she is still on her way or just sat down: he waits a moment beside the sofa */
+  D.state='sitDown';D.sitT=.3;D.face=J.x>=D.x?1:-1;D.seated=false}
+ else if(a==='door'){D.state='gone'}
+ else{D.state='think';D.t=1}}
+function dylanDecide(D){const st=S.dylan.stage;const J=LIFE.jill;const tv=LIFE.tv;const W=[];const add=(k,w)=>{if(w>0)W.push([k,w])};
+ const V=view();const near=CATS?CATS.filter(c=>!c.hidden&&c.perch<0&&!c.sofa&&!['jump','walk','race','dash','chase','hide2','visit','play'].includes(c.st)&&Math.hypot(c.x-D.x,c.y-D.y)<150):[];
+ const sofaX=dylanCanSofa();const wantsTV=J.on&&(J.act==='wantTV'||J.act==='waitTV')&&tv.at==='park'&&!tv.mover&&tv.tried<2;
+ if(st===2&&(J.on||J.reserved)&&!LIFE.revealRoll)LIFE.revealRoll=Math.random()<.4?1:-1;
+ const reveal=st===2&&LIFE.revealRoll===1&&sofaX!=null&&(J.reserved||J.on)&&(!J.on||['settle','read','idle','tv','pet','wantTV','waitTV'].includes(J.act));
+ add('sitTable',D.state==='sitTable'?.7:1);add('stand',.35);
+ if(near.length&&D.catCD<LIFE.t)add('cat',st>=3?.6:.7);
+ if(wantsTV)add('tv',1.3);
+ if(reveal)add('sofa',3);
+ if(st>=3&&sofaX!=null)add('sofa',D.state==='sitSofa'?2.2:(J.on&&J.sinceSit<20)||!J.on?2.6:1.6);
+ add('leave',(st>=3?.12:.3)+Math.max(0,(D.since-(st>=3?200:70))/60));
+ if(D.state==='sitSofa'&&st>=3&&Math.random()<.75){D.t=rand(25,80);D.act=(tv.on&&tv.at==='use'&&Math.random()<.5)?'tv':(Math.random()<.5?'phone':'idle');D.phone=D.act==='phone';return}
+ const k=wpick(W,o=>o[1])[0];
+ if(k==='sofa'&&D.onSofa){D.t=rand(25,80);return}
+ if(D.onSofa&&k!=='sofa'){D.onSofa=false;D.y=SOFA.front+10;D.seated=false}
+ switch(k){
+ case'sitTable':{if(D.state==='sitTable'){D.t=rand(20,50);D.phone=Math.random()<.65;return}const tb=V.tables.slice().sort((a,b)=>Math.hypot(a.x-148,a.y-130)-Math.hypot(b.x-148,b.y-130)).find(t=>!t.group);if(!tb){D.state='think';D.t=2;return}const sp=seatPos(tb);const k2=sp[0].dx<0&&tb.x>148?0:1;const s=sp[Math.min(k2,sp.length-1)];D.table=tb.i;D.seat=Math.min(k2,sp.length-1);dylanWalk(D,tb.x+s.dx,tb.y+s.dy,'sitTable');break}
+ case'stand':{const p={x:rand(66,84),y:rand(156,186)};dylanWalk(D,p.x,p.y,'stand');break}
+ case'cat':{const c=near.sort((a,b)=>Math.hypot(a.x-D.x,a.y-D.y)-Math.hypot(b.x-D.x,b.y-D.y))[0];D.cat=c;dylanWalk(D,clamp(c.x+(c.x<D.x?24:-24),60,340),clamp(c.y+3,150,FB-6),'cat');break}
+ case'tv':dylanWalk(D,tv.x+18,tv.y+4,'grabTV');break;
+ case'sofa':{if(reveal)D.reveal=true;D.state='toSofa';dylanWalk(D,sofaX,SOFA.front+10,'sofa');break}
+ case'leave':dylanWalk(D,DOOR.x,DOOR.y,'door');break;
+ default:D.state='think';D.t=2}}
+function doReveal(){const d=S.dylan;if(d.stage>=3)return;d.stage=3;d.reveal=S.day;save();memo('husband',(SOFA.x0+SOFA.x1)/2,120)}
+function say(who,x,y,txt,delay){LIFE.say.push({who,x,y,txt,t:-(delay||0),life:2.6})}
+function lifeEnsureEvening(){if(!evening())return;if(LIFE.day!==S.day||!LIFE.plan)lifePlan();const L=LIFE.jill;
+ if(LIFE.plan==='sofa'&&!L.on&&!L.act&&!L.walking){const pos=freeJillPos();if(!pos){lifeNoRoom();return}L.pos=pos;L.reserved=true;L.face=JPOS[pos].face;L.x=JPOS[pos].x;L.y=SOFA.front+10;L.sitT=.01}}
+function lifeNoRoom(){/* the cats have the whole sofa: Jill takes her old seat at the first table instead */LIFE.plan='table';const L=LIFE.jill;L.act=null;L.reserved=false;L.pos=null;
+ if(R&&R.jill){const J=R.jill,t=R.tables[0];J.tx=t.x-25;J.ty=t.y+2;J.restTo=true;J.sit=false;J.sofa=null}else IDLE=null}
+/* ---- per-frame ---- */
+function lifeUpd(dt){if(!evening())return;LIFE.t+=dt;lifeEnsureEvening();
+ const V=view();const J=V.jill;const L=LIFE.jill;
+ if(LIFE.plan==='sofa')jillLife(J,L,dt);
+ tvUpd(dt);dylanUpd(dt);for(const s of LIFE.say)s.t+=dt;LIFE.say=LIFE.say.filter(s=>s.t<s.life)}
+/* ---- drawing ---- */
+function drawSofaBody(c){const {x0,x1}=SOFA;const w=x1-x0;const y0=SOFA.back,ys=SOFA.seat,yf=SOFA.front,A=SOFA.arm;
+ c.fillStyle='rgba(40,25,15,.2)';el(c,(x0+x1)/2,yf+2,w/2+2,5);
+ let g=c.createLinearGradient(0,y0,0,ys);g.addColorStop(0,'#E4D5BA');g.addColorStop(1,'#CDBB9C');c.fillStyle=g;rr(c,x0+4,y0,w-8,ys-y0+6,9);c.fill();c.strokeStyle='rgba(90,70,45,.25)';c.lineWidth=.8;rr(c,x0+4.5,y0+.5,w-9,ys-y0+5,9);c.stroke();
+ for(const k of[0,1]){const cw=(w-2*A)/2-4,cx=x0+A+(w-2*A)*(k?.75:.25);let cg=c.createLinearGradient(0,y0,0,ys);cg.addColorStop(0,'#F1E5CC');cg.addColorStop(1,'#DACAAA');c.fillStyle=cg;rr(c,cx-cw/2,y0+2,cw,ys-y0,7);c.fill();c.strokeStyle='rgba(90,70,45,.2)';c.lineWidth=.7;c.stroke();c.fillStyle='rgba(255,255,255,.4)';rr(c,cx-cw/2+4,y0+4.5,cw-8,3.5,1.8);c.fill();c.fillStyle='rgba(90,70,45,.1)';rr(c,cx-cw/2+2,ys-7,cw-4,4,2);c.fill()}
+ c.fillStyle='#B9C7B3';c.beginPath();c.moveTo(x1-46,y0+1);c.lineTo(x1-20,y0+1);c.lineTo(x1-22,y0+16);c.lineTo(x1-44,y0+16);c.closePath();c.fill();c.strokeStyle='rgba(60,70,55,.3)';c.lineWidth=.6;for(let k=1;k<4;k++){c.beginPath();c.moveTo(x1-45,y0+1+k*4);c.lineTo(x1-21,y0+1+k*4);c.stroke()}
+ let sg=c.createLinearGradient(0,ys,0,yf);sg.addColorStop(0,'#EFE2C8');sg.addColorStop(.7,'#E2D2B4');sg.addColorStop(1,'#C9B694');c.fillStyle=sg;rr(c,x0+A-2,ys-2,w-2*A+4,yf-ys+2,5);c.fill();
+ c.fillStyle='rgba(90,70,45,.16)';c.fillRect(x0+A-2,ys-2,w-2*A+4,1.2);c.strokeStyle='rgba(90,70,45,.18)';c.lineWidth=.7;c.beginPath();c.moveTo((x0+x1)/2,ys);c.lineTo((x0+x1)/2,yf-3);c.stroke();
+ c.fillStyle='rgba(255,255,255,.25)';rr(c,x0+A+3,ys+1,w-2*A-6,3,1.5);c.fill();
+ c.fillStyle='#C4AF8C';rr(c,x0+A-2,yf-5,w-2*A+4,5,2);c.fill();
+ for(const ax of[x0,x1-A]){let ag=c.createLinearGradient(ax,0,ax+A,0);ag.addColorStop(0,'#D9C8A8');ag.addColorStop(.5,'#EADCC2');ag.addColorStop(1,'#CDBB9C');c.fillStyle=ag;rr(c,ax,SOFA.armY-6,A,yf-SOFA.armY+6,6);c.fill();c.strokeStyle='rgba(90,70,45,.25)';c.lineWidth=.8;c.stroke();c.fillStyle='rgba(255,255,255,.35)';el(c,ax+A/2,SOFA.armY-4,A/2-1.5,2)}
+ c.fillStyle='#6E4A2E';for(const fx of[x0+6,x1-9]){rr(c,fx,yf-1,3,4,1);c.fill()}}
+function drawSofaGroup(c,now){drawSofaBody(c);const L=LIFE.jill,D=LIFE.dylan;const on=sofaCats();const tv=LIFE.tv;
+ const byKind=k=>on.filter(o=>o.sofa.kind===k).sort((a,b)=>a.x-b.x);
+ for(const k of byKind('back'))drawCat(c,k,now);
+ if(L.on){const flip=L.face<0;const bob=L.bobT>0?Math.sin(L.bobT*6)*.8:Math.sin(now*1.6)*.35;const look=L.gazeT>0?L.gazeX:L.act==='tv'&&tv.on?tv.x:null;
+  const gaze=look!=null?{x:(look>=L.x?1:-1)*(flip?-1:1),y:.35}:L.act==='read'?{x:0,y:.6}:null;
+  drawPerson(c,L.x,SOFA.jy,JILL_LOOK,{jill:true,me:true,seated:true,s:1.1,bob,mood:'happy',flip,blink:Math.sin(now*1.7)>.985,hat:false,lounge:{legs:L.legs,len:(10+L.legs*32)/(1.1*PSC)},hold:L.act==='read'||(L.act==='wantTV'&&L.last==='read')?'reader':null,flipPage:L.flip>0,gaze})}
+ if(D&&D.onSofa){const flip=D.face<0;const look=D.act==='tv'&&tv.on?tv.x:(D.gazeT>0?L.x:null);drawPerson(c,D.x,SOFA.jy,DYLAN.looks[0],{seated:true,mood:'happy',flip,blink:Math.sin(now*1.3+2)>.975,lounge:{legs:0},hold:D.phone?'phone':null,gaze:look!=null?{x:(look>=D.x?1:-1)*(flip?-1:1),y:D.act==='phone'?.5:.2}:(D.act==='phone'?{x:0,y:.6}:null)})}
+ for(const k of byKind('lap'))drawCat(c,k,now);for(const k of byKind('seat'))drawCat(c,k,now);for(const k of byKind('arm'))drawCat(c,k,now);
+ if(L.on&&L.act==='pet'&&L.petCat&&L.petCat.sofa){const p=L.petCat;c.fillStyle=JILL_LOOK.skin;circ(c,p.x+(p.x<L.x?5:-5),p.y-9,2.6);c.fillStyle='rgba(60,34,22,.35)';c.beginPath();c.arc(p.x+(p.x<L.x?5:-5),p.y-9,2.6,0,7);c.stroke()}}
+function drawTV(c,tv,now){const {x,y}=tv;const dir=tv.face;const roll=tv.at==='moving'?Math.sin(tv.step)*.6:0;
+ c.fillStyle='rgba(0,0,0,.22)';el(c,x,y+1.5,12,3.2);
+ c.fillStyle='#2A2A2E';for(const wx of[-9,-3,3,9])el(c,x+wx,y+.5,2.2,1.6);c.fillStyle='#3C3C42';rr(c,x-11,y-4,22,4,1.5);c.fill();c.fillStyle='rgba(255,255,255,.15)';c.fillRect(x-10,y-3.6,20,.8);
+ c.fillStyle='#4A4A50';c.fillRect(x-1.4,y-24,2.8,20);c.fillStyle='#2E2E33';rr(c,x-2.5,y-26,5,3,1);c.fill();c.fillStyle='#6E6E76';rr(c,x-4,y-10,8,2.2,1);c.fill();
+ c.save();c.translate(x+roll,y-36);const sx=dir?.84:1;c.transform(sx,dir*.1,0,1,0,0);
+ c.fillStyle='#1E1E22';rr(c,-12,-9,24,17,2);c.fill();
+ if(tv.on){const ph=now*.3;const h1=(ph*40)%360,h2=(ph*40+70)%360;let g=c.createLinearGradient(-11,-8,11,7);g.addColorStop(0,`hsl(${h1},42%,${58+Math.sin(now*3)*4}%)`);g.addColorStop(1,`hsl(${h2},38%,42%)`);c.fillStyle=g;c.fillRect(-10.6,-7.6,21.2,14.2);c.fillStyle='rgba(255,255,255,.55)';c.fillRect(-9,4,10+Math.sin(now*.9)*3,1.4);c.fillStyle='rgba(255,255,255,.18)';c.beginPath();c.moveTo(-10.6,-7.6);c.lineTo(2,-7.6);c.lineTo(-10.6,4);c.fill()}
+ else{c.fillStyle='#2A2C33';c.fillRect(-10.6,-7.6,21.2,14.2);c.fillStyle='rgba(255,255,255,.08)';c.beginPath();c.moveTo(-10.6,-7.6);c.lineTo(0,-7.6);c.lineTo(-10.6,4);c.fill();c.fillStyle='#E24A5A';circ(c,9,5.5,.7)}
+ c.restore();
+ if(tv.on){c.save();c.globalCompositeOperation='lighter';let g=c.createRadialGradient(x+dir*22,y-14,4,x+dir*22,y-14,56);g.addColorStop(0,'rgba(150,190,255,.16)');g.addColorStop(1,'rgba(150,190,255,0)');c.fillStyle=g;c.fillRect(x-64,y-72,128,92);c.restore()}}
+function drawDylanFree(c,D,now){const stp=D.moving?Math.sin(D.step):0;const crouch=D.state==='crouch';
+ drawPerson(c,D.x,D.y,DYLAN.looks[0],{step:stp,bob:D.moving?Math.abs(stp)*-.8:Math.sin(now*1.5)*.3,mood:'happy',flip:D.face<0,seated:crouch,s:crouch?.95:1,hold:!D.moving&&D.phone&&D.state==='stand'?'phone':null,blink:Math.sin(now*1.3+2)>.975,lounge:crouch?{legs:0}:null});
+ if(D.carry){c.fillStyle='#fff';el(c,D.x+(D.face<0?-9:9),D.y-34,6.5,4.2);el(c,D.x+(D.face<0?-9:9),D.y-36.5,6.5,4.2)}}
+function drawSay(c){for(const s of LIFE.say){if(s.t<0)continue;const a=s.t<.2?s.t/.2:s.t>s.life-.4?(s.life-s.t)/.4:1;c.globalAlpha=Math.max(0,a);c.font=`700 6.5px ${FONT}`;const w=c.measureText(s.txt).width+10;c.fillStyle='#FFFDF7';rr(c,s.x-w/2,s.y-8,w,12,6);c.fill();c.beginPath();c.moveTo(s.x-2.5,s.y+4);c.lineTo(s.x+2.5,s.y+4);c.lineTo(s.x,s.y+7.5);c.fill();c.fillStyle='#2E2019';c.textAlign='center';c.textBaseline='middle';c.fillText(s.txt,s.x,s.y-1.6);c.textBaseline='alphabetic';c.globalAlpha=1}}
 
 /* ================= crew ================= */
 const ROLES={
@@ -1963,14 +2248,14 @@ function show(html,cls){screenEl.hidden=false;screenEl.className=cls||'';screenE
 function hideScreen(){screenEl.hidden=true;screenEl.innerHTML='';sub=null}
 function topIcons(){return`<button class="icon-btn" data-act="peek" aria-label="看店裡" style="font-weight:800;font-size:11px;width:auto;padding:0 9px">看店裡</button><button class="icon-btn" data-act="guide" aria-label="遊戲說明" style="font-weight:800;font-size:15px">?</button><button class="icon-btn" data-act="book" aria-label="餐廳手冊">${SVG.book}</button><button class="icon-btn" data-act="settings" aria-label="設定">${SVG.gear}</button>`}
 
-function showTitle(){phase='title';mainScreen='title';R=null;IDLE=null;hud(true);renderTickets();const has=hasSave()&&(S.day>1||S.stats.days>0);
+function showTitle(){phase='title';mainScreen='title';R=null;IDLE=null;lifeReset();hud(true);renderTickets();const has=hasSave()&&(S.day>1||S.stats.days>0);
  show(`<div class="title"><div class="sub-cn">Jill 主廚的餐廳</div><h1>JILL'S KITCHEN</h1><div class="by">A Restaurant by Chef Jill</div>
   <button class="btn primary open" data-act="open">OPEN FOR DINNER</button>
   <div class="cont">${has?`繼續：DAY ${S.day} · ${fmt(S.money)} · ${LV().n}`:'今天，是 Jill 的餐廳開幕的日子。'}</div>
   <div class="links"><button class="btn sm" data-act="guide">遊戲說明</button><button class="btn sm" data-act="book">餐廳手冊</button><button class="btn sm" data-act="settings">設定・存檔</button></div></div>`)}
 function goMain(){if(S.phase==='shop'&&S.lastSummary)showShop();else{applyGates();planToday();showPrep()}}
 
-function showPrep(){phase='prep';mainScreen='prep';R=null;IDLE=makeIdle();layoutAll();hud(true);renderTickets();planToday();const T=S.today,F=feat();const W=WEATHER[T.weather],E=EVENTS[T.event];
+function showPrep(){phase='prep';mainScreen='prep';R=null;lifeReset();IDLE=makeIdle();layoutAll();hud(true);renderTickets();planToday();const T=S.today,F=feat();const W=WEATHER[T.weather],E=EVENTS[T.event];
  const ms=menuList();const unlocked=[...S.unlocked];const sug=suggestStock();let restockCost=0;for(const d of ms){const need=Math.max(0,sug[d]-(S.stock[d]||0));restockCost+=need*costOf(d)}
  const cap=fridgeCap(),tot=stockTotal();const menuN=S.menu.filter(d=>S.unlocked.includes(d)).length;
  const rows=unlocked.map(d=>{const D=DISH(d);const on=S.menu.includes(d);const m=S.price[d]||1;const st=S.stock[d]||0;const lv=mLv(d);
@@ -2040,7 +2325,8 @@ function sigAutoName(d){return`Jill's ${SIG.sauce[d.sauce].n}${SIG.protein[d.pro
 let bookTab='reviews';
 function showBook(){sub='book';let body='';
  if(bookTab==='reviews'){const rv=S.reviews.slice().reverse();body=`<div class="bigrate"><b>${rating().toFixed(1)}</b><div><div class="sum-stars">${starsHTML(Math.round(rating()*2)/2)}</div><div class="muted" style="font-size:12px">${S.reviews.length} 則評論 · 最近 40 則計入評分</div></div></div><div class="card" style="margin-top:12px">${rv.length?rv.slice(0,30).map(r=>`<div class="review"><div class="rs">${starsHTML(r.s)}</div><p>「${r.txt}」</p><small>${r.critic?'神秘美食評論家':r.name} · DAY ${r.day}</small></div>`).join(''):'<p class="muted">還沒有評論。開店吧！</p>'}</div>`}
- if(bookTab==='regulars'){body=`<p class="muted" style="font-size:12.5px;margin:0 0 8px">來店 5 次成為熟客，20 次成為 Jill 的老客人。回頭客累計：${S.returning} / 100</p><div class="card">`+REGS.map(r=>{const v=S.regulars[r.id]||0;const tier=v>=20?2:v>=5?1:0;const met=v>0;return`<div class="reg ${met?'':'unknown'}"><img alt="" src="${portraitURL(r.looks,'reg'+r.id)}"><div><b>${met?r.n:'？？？'}</b> ${met?`<span class="tier t${tier}">${['陌生人','熟客','Jill 的老客人'][tier]}</span>`:''}</div><p>${met?`${r.who}<br>來店 ${v} 次・「${r.l[tier]}」`:`第 ${r.day} 天後可能會出現。`}</p></div>`}).join('')+'</div>'}
+ if(bookTab==='regulars'){body=`<p class="muted" style="font-size:12.5px;margin:0 0 8px">來店 5 次成為熟客，20 次成為 Jill 的老客人。回頭客累計：${S.returning} / 100</p><div class="card">`+REGS.map(r=>{const v=S.regulars[r.id]||0;const tier=v>=20?2:v>=5?1:0;const met=v>0;return`<div class="reg ${met?'':'unknown'}"><img alt="" src="${portraitURL(r.looks,'reg'+r.id)}"><div><b>${met?r.n:'？？？'}</b> ${met?`<span class="tier t${tier}">${['陌生人','熟客','Jill 的老客人'][tier]}</span>`:''}</div><p>${met?`${r.who}<br>來店 ${v} 次・「${r.l[tier]}」`:`第 ${r.day} 天後可能會出現。`}</p></div>`}).join('')
+  +(()=>{const v=S.regulars.dylan||0;if(!v)return'';const rv=S.dylan.stage>=3;const tier=v>=20?2:v>=5?1:0;return`<div class="reg"><img alt="" src="${portraitURL(DYLAN.looks,'regdylan')}"><div><b>Dylan</b> <span class="tier ${rv?'t2':'t'+tier}">${rv?'Jill 的先生':['陌生人','熟客','Jill 的老客人'][tier]}</span></div><p>${rv?DYLAN.who2:DYLAN.who}<br>來店 ${v} 次${rv?`・DAY ${S.dylan.reveal}`:''}</p></div>`})()+'</div>'}
  if(bookTab==='cats'){body=`<p class="muted" style="font-size:12.5px;margin:0 0 8px">住在店裡的五隻貓。名字可以直接改。</p><div class="card">`+CAT_DEF.map(C=>`<div class="reg"><img alt="" src="${catPortraitURL(C)}"><div><input class="txt" data-cat="${C.id}" maxlength="8" value="${catName(C).replace(/"/g,'&quot;')}" aria-label="貓咪名字" style="padding:6px 10px;width:auto;max-width:130px"> <span class="tier">${C.sex}</span></div><p>${C.who}</p></div>`).join('')+'</div>'}
  if(bookTab==='mem'){const ms=Object.keys(MEMS).filter(k=>S.mem&&S.mem[k]);body=`<p class="muted" style="font-size:12.5px;margin:0 0 10px">有些畫面，只有剛好看到才會留下來。</p>`+(ms.length?`<div class="memgrid">${ms.map(k=>`<figure><img alt="" src="${S.mem[k].img}"><figcaption><b>${MEMS[k]}</b><small>DAY ${S.mem[k].day}</small></figcaption></figure>`).join('')}</div>`:'<div class="card"><p class="muted" style="margin:0">還沒有留下任何畫面。</p></div>')}
  if(bookTab==='ach'){const n=Object.keys(S.achievements).length;body=`<p class="muted" style="font-size:12.5px;margin:0 0 8px">${n} / ${ACH.length} 已解鎖</p><div class="card">`+ACH.map(a=>{const got=S.achievements[a.id];return`<div class="ach ${got?'':'off'}"><img alt="" src="${iconURL(a.ic)}"><b>${a.n}</b><small>${a.d}${got?` · DAY ${got}`:''}</small></div>`}).join('')+'</div>'}
@@ -2113,9 +2399,9 @@ function keepScroll(fn){const sh=screenEl.querySelector('.sheet');const top=sh?s
 let last=performance.now(),tick=0;
 let lastEv=null;
 function frame(now){if(AU.ctx&&S.music){const ev=evening();if(ev!==lastEv){lastEv=ev;AU.music.gain.setTargetAtTime(ev?.09:.16,AU.ctx.currentTime,.8)}}const dt=Math.min(.05,(now-last)/1000);last=now;const t=now/1000;
- if(!(phase==='service'&&paused))updateCats(dt,t);
+ if(!(phase==='service'&&paused)){updateCats(dt,t);lifeUpd(dt)}
  if(phase==='service'&&R&&!paused){update(dt);tick+=dt;if(tick>.12){tick=0;renderTickets();updTicketBars();renderTasks();hud()}}
- else if(phase!=='service'&&IDLE){const J=IDLE.jill;J.x=PASS.x;}
+ else if(phase!=='service'&&IDLE){const J=IDLE.jill;if(!(evening()&&LIFE.plan==='sofa'))J.x=PASS.x;}
  if(sc.width>0){drawScene(t);flushMem()}{const tw=$('#trayWrap');const want=!!(R&&R.panel&&phase==='service'&&!paused);if(tw.hidden===want)tw.hidden=!want;if(want&&tc.width>0)drawTray(t)}requestAnimationFrame(frame)}
 
 /* ================= boot ================= */
