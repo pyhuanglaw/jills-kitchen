@@ -204,6 +204,12 @@ def check(cond, msg):
         raise AssertionError(msg)
 
 @test
+def single_file_in_sync(b, port, target):
+    import subprocess
+    r = subprocess.run([sys.executable, os.path.join(ROOT, 'tools', 'build_single.py'), '--check'], capture_output=True, text=True)
+    check(r.returncode == 0, r.stdout.strip() or r.stderr.strip())
+
+@test
 def new_game_starts(b, port, target):
     g = Game(b, port, target, seed=1, manual=True)
     check(g.page.is_visible('text=OPEN FOR DINNER'), 'title screen missing')
@@ -418,6 +424,27 @@ def ui_basics(b, port, target):
             g.click(f'[data-act=tab][data-k={k}]')
     g.click('[data-act=nextDay]')
     check(g.ev("phase") == 'prep' and g.ev("S.day") == 2, 'next day failed')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
+def long_play_is_stable(b, port, target):
+    """Ten days in a row: nothing piles up (listeners, reviews, per-day arrays, save size)."""
+    g = Game(b, port, target, seed=13, manual=True)
+    install_bot(g)
+    base = g.page.evaluate('window.__stats.listeners')
+    g.click('[data-act=open]')
+    sizes = []
+    for d in range(10):
+        start_day(g); play_day(g)
+        check(g.ev("phase") == 'summary', f'day {d+1} did not finish')
+        g.click('[data-act=toShop]'); g.click('[data-act=nextDay]')
+        sizes.append(g.ev("localStorage.getItem('jills-kitchen-save-v1').length"))
+        check(g.ev("CATS.every(c=>c.hearts.length<20)"), 'cat hearts piling up')
+    check(g.page.evaluate('window.__stats.listeners') == base, 'event listeners grew during long play')
+    # addReview() caps at 80; the rare health-inspector review is pushed without the cap (kept as is)
+    check(g.ev("S.reviews.length") <= 80 + g.ev("S.reviews.filter(r=>r.name==='衛生檢查員').length"), f'reviews not capped: {g.ev("S.reviews.length")}')
+    check(max(sizes) < 150000, f'save grew too large: {sizes}')
     check(not g.errors, g.errors)
     g.close()
 

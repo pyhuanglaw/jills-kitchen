@@ -1,9 +1,16 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Jill's Kitchen</title>
-<meta name="theme-color" content="#1E2B2F">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+/* Jill's Kitchen — styles */
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+img{max-width:100%}
 :root{
   --night:#1E2B2F; --night2:#27383D; --night3:#314449;
   --brass:#C99A45; --brass2:#E6C27A; --brass3:#8E6422;
@@ -266,7 +273,8 @@ input.txt{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(
 .setrow:first-child{border-top:0}
 @media (prefers-reduced-motion:reduce){.bn,.toast,#combo.bump,.tk.urgent{animation:none}.it.cooking::after{animation:none}}
 </style>
-
+</head>
+<body>
 <div id="app">
   <header id="hud">
     <div class="h-day"><small>DAY</small><b id="hDay">1</b></div>
@@ -291,8 +299,8 @@ input.txt{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(
   </div>
   <div id="screen" hidden></div>
 </div>
-
 <script>
+/* Jill's Kitchen — game logic, rendering, audio, save system */
 (()=>{
 'use strict';
 /* ================= utilities ================= */
@@ -2118,3 +2126,5 @@ function boot(){layoutAll();hud(true);renderTickets();showTitle();requestAnimati
 boot();
 })();
 </script>
+</body>
+</html>
