@@ -178,6 +178,20 @@ def install_bot(g):
     # evaluated through the hook so the helpers close over the game's internals
     g.ev(BOT)
 
+# Screen / run-state invariants that every screen change must keep (see docs/ARCHITECTURE.md).
+INV = r"""(()=>{const bad=[];
+  if(!['title','prep','service','summary','shop'].includes(phase))bad.push('unknown phase '+phase);
+  if(!!R!==(phase==='service'))bad.push('R should exist only during service (phase='+phase+', R='+!!R+')');
+  if(paused&&phase!=='service')bad.push('paused outside service');
+  if(paused&&sub!=='pause'&&sub!=='guide'&&sub!=='settings')bad.push('paused without a menu open (sub='+sub+')');
+  if(phase==='service'&&!paused&&!sub&&!screenEl.hidden)bad.push('menu screen covering the running service');
+  if(!IDLE&&phase!=='service'&&phase!=='title')bad.push('no idle view outside service');
+  return bad})()"""
+
+def state_ok(g, where):
+    bad = g.ev(INV)
+    check(not bad, f'state invariant broken at {where}: {bad}')
+
 def play_day(g, max_steps=40000, chunk=600, dt=1/30):
     steps = 0
     while steps < max_steps:
@@ -339,6 +353,12 @@ def cat_ai_keeps_running(b, port, target):
           if(!isFinite(c.x)||!isFinite(c.y))bad.push(c.def.id+' NaN');
           if(c.x<-BGM-5||c.x>LW+BGM+5||c.y>LH+5||c.y<wallTop()-40)bad.push(c.def.id+' out of bounds '+Math.round(c.x)+','+Math.round(c.y)+' '+c.st)}
         perchOcc.forEach((c,i)=>{if(c&&c.perch!==i&&c.goPerch!==i)bad.push('perchOcc mismatch '+i+' '+c.def.id)});
+        // spot bookkeeping: one spot per cat, no double booking, never booked while on a perch or beside Jill
+        const held=new Map();const own=(c,k)=>{if(c)held.set(c,(held.get(c)||[]).concat(k))};
+        for(const k of['scr','scr2','cave','toy'])own(OCC[k],k);OCC.bed.forEach(c=>own(c,'bed'));
+        if(OCC.bed.length>2||new Set(OCC.bed).size!==OCC.bed.length)bad.push('bed overbooked');
+        for(const [c,ks] of held){if(ks.length>1)bad.push(c.def.id+' holds '+ks);if(c.perch>=0)bad.push(c.def.id+' holds '+ks+' while on perch');if(SIDE.R===c||SIDE.L===c)bad.push(c.def.id+' holds '+ks+' while beside Jill')}
+        for(const c of CATS){if(c.perch>=0&&perchOcc[c.perch]!==c)bad.push(c.def.id+' on perch it does not own');if((SIDE.R===c||SIDE.L===c)&&c.perch>=0)bad.push(c.def.id+' beside Jill and on perch')}
         if(SIDE.R&&SIDE.R.slot!=='R')bad.push('SIDE.R mismatch');if(SIDE.L&&SIDE.L.slot!=='L')bad.push('SIDE.L mismatch');
         if(bad.length)break}
       return {changes,sleep,nearJ,bad:bad.slice(0,5)}})()""")
@@ -426,22 +446,24 @@ def unreadable_save_is_kept(b, port, target):
 @test
 def ui_basics(b, port, target):
     g = Game(b, port, target, seed=10, manual=True)
+    state_ok(g, 'title')
     g.click('.links [data-act=guide]'); check(g.page.is_visible('text=遊戲說明'), 'guide did not open'); g.click('.sh-top [data-act=closeSub]')
     g.click('.links [data-act=book]')
     for k in ['reviews', 'regulars', 'cats', 'mem', 'ach', 'mastery']:
         g.click(f'[data-act=btab][data-k={k}]')
-    g.click('[data-act=closeSub]')
-    g.click('[data-act=open]')
-    g.click('[data-act=peek]'); check(g.page.is_visible('#peekPill'), 'peek pill missing'); g.click('#peekPill')
-    start_day(g)
-    g.page.click('#hPause'); check(g.page.is_visible('[data-act=resume]'), 'pause menu missing'); g.click('[data-act=resume]')
+    g.click('[data-act=closeSub]'); state_ok(g, 'title after book')
+    g.click('[data-act=open]'); state_ok(g, 'prep')
+    g.click('[data-act=peek]'); check(g.page.is_visible('#peekPill'), 'peek pill missing'); g.click('#peekPill'); state_ok(g, 'prep after peek')
+    start_day(g); state_ok(g, 'service')
+    g.page.click('#hPause'); check(g.page.is_visible('[data-act=resume]'), 'pause menu missing'); state_ok(g, 'pause')
+    g.click('[data-act=resume]'); state_ok(g, 'resumed')
     check(g.ev("paused") is False, 'resume failed')
-    install_bot(g); play_day(g)
-    g.click('[data-act=toShop]')
+    install_bot(g); play_day(g); state_ok(g, 'summary')
+    g.click('[data-act=toShop]'); state_ok(g, 'shop')
     for k in ['tables', 'kitchen', 'menu', 'decor', 'staff', 'sig']:
         if g.page.locator(f'[data-act=tab][data-k={k}]:not([disabled])').count():
             g.click(f'[data-act=tab][data-k={k}]')
-    g.click('[data-act=nextDay]')
+    g.click('[data-act=nextDay]'); state_ok(g, 'next day prep')
     check(g.ev("phase") == 'prep' and g.ev("S.day") == 2, 'next day failed')
     check(not g.errors, g.errors)
     g.close()
@@ -512,9 +534,9 @@ def long_play_is_stable(b, port, target):
     g.click('[data-act=open]')
     sizes = []
     for d in range(10):
-        start_day(g); play_day(g)
-        check(g.ev("phase") == 'summary', f'day {d+1} did not finish')
-        g.click('[data-act=toShop]'); g.click('[data-act=nextDay]')
+        start_day(g); state_ok(g, f'day {d+1} service'); play_day(g)
+        check(g.ev("phase") == 'summary', f'day {d+1} did not finish'); state_ok(g, f'day {d+1} summary')
+        g.click('[data-act=toShop]'); state_ok(g, f'day {d+1} shop'); g.click('[data-act=nextDay]'); state_ok(g, f'day {d+2} prep')
         sizes.append(g.ev("localStorage.getItem('jills-kitchen-save-v1').length"))
         check(g.ev("CATS.every(c=>c.hearts.length<20)"), 'cat hearts piling up')
     check(g.page.evaluate('window.__stats.listeners') == base, 'event listeners grew during long play')
