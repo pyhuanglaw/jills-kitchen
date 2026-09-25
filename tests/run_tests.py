@@ -403,7 +403,24 @@ def old_saves_load(b, port, target):
         g.click('[data-act=open]')
         start_day(g)
         install_bot(g); play_day(g, max_steps=1500)
+        check(g.ev(f"localStorage.getItem('{SAVE_KEY}-unreadable')") is None, f'{name}: readable save was treated as unreadable')
         check(not g.errors, f'{name}: {g.errors}')
+        g.close()
+
+@test
+def unreadable_save_is_kept(b, port, target):
+    """A save this version can't read (broken, or written by a newer version) must not be destroyed."""
+    newer = json.loads(json.loads(open(os.path.join(FIXTURES, 'v13_with_photos.json'), encoding='utf-8').read())[SAVE_KEY])
+    newer['v'] = 99
+    for label, raw in [('broken JSON', '{"v":1,"day":7,"money":'), ('newer version', json.dumps(newer, ensure_ascii=False))]:
+        g = Game(b, port, target, seed=15, manual=True, storage={SAVE_KEY: raw})
+        check(g.ev("S.day") == 1 and g.ev("S.money") == 500, f'{label}: game did not start fresh')
+        g.click('[data-act=open]'); start_day(g)   # starting a day saves, overwriting the main key
+        check(g.ev(f"JSON.parse(localStorage.getItem('{SAVE_KEY}')).day") == 1, f'{label}: new progress not saved')
+        check(g.ev(f"localStorage.getItem('{SAVE_KEY}-unreadable')") == raw, f'{label}: unreadable save was not kept')
+        g.reload()
+        check(g.ev(f"localStorage.getItem('{SAVE_KEY}-unreadable')") == raw, f'{label}: kept copy lost after reload')
+        check(not [e for e in g.errors if 'could not read' not in e], f'{label}: {g.errors}')
         g.close()
 
 @test

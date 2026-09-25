@@ -212,8 +212,28 @@ function newState(){return{v:1,day:1,phase:'prep',money:500,lifetime:0,level:1,
  unlocked:['friedrice'],menu:['friedrice'],price:{},stock:{},xp:{},reviews:[],achievements:{},regulars:{},returning:0,
  signature:null,catNames:{},buzz:1,buzzMsg:'',stats:{guests:0,perfect:0,days:0},tut:0,gate:1,news:[],today:null,todayCost:0,lastSummary:null,sfx:true,music:true}}
 let S;
-function load(){try{const t=localStorage.getItem(KEY);if(!t)return null;const o=JSON.parse(t);if(!o||o.v!==1)return null;const base=newState();for(const k in base)if(!(k in o))o[k]=base[k];for(const k of['eq','decor','staff','stats'])o[k]=Object.assign({},base[k],o[k]);if(!o.crewMig){o.crewMig=1;o.crew=o.crew||[];if(o.staff&&o.staff.busser)o.crew.push({id:'c1',role:'cleaner',name:'秀琴阿姨',lv:1,duty:'clean'});if(o.staff&&o.staff.bartender)o.crew.push({id:'c2',role:'chef',name:'小茉',lv:1,duty:'bar'})}return o}catch(e){return null}}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S));return true}catch(e){return false}}
+/* How saves stay compatible (details: docs/ARCHITECTURE.md)
+   - NEW field: just add it to newState(). load() gives old saves every missing top-level field
+     from newState(), and merges eq/decor/staff/stats key by key.
+   - CHANGED data (rename a field, convert a format, rename an id): bump SAVE_V and add
+     MIGRATE[old version]=o=>{...}. Steps run in order, oldest first, before the defaults are filled.
+   - Never rename or delete ids that saves store (dish ids, cat ids, memory ids, crew roles).
+   - A save this code cannot read (broken JSON, unknown or newer version) is copied to RESCUE_KEY
+     before the game starts fresh, so the next save() can never destroy it. */
+const SAVE_V=1;
+const MIGRATE={};
+const RESCUE_KEY=KEY+'-unreadable';
+function rescue(t,why){try{if(!localStorage.getItem(RESCUE_KEY))localStorage.setItem(RESCUE_KEY,t);console.warn(`[save] could not read the save (${why}); a copy was kept in localStorage["${RESCUE_KEY}"]`)}catch(e){}}
+function fillDefaults(o){const base=newState();for(const k in base)if(!(k in o))o[k]=base[k];for(const k of['eq','decor','staff','stats'])o[k]=Object.assign({},base[k],o[k]);return o}
+// Old bartender/busser -> crew. NOTE: fillDefaults() runs first and already sets crewMig from newState(),
+// so this conversion never fires. Kept exactly as it was to preserve current behaviour (see docs/REFACTOR_REPORT.md).
+function legacyCrew(o){if(!o.crewMig){o.crewMig=1;o.crew=o.crew||[];if(o.staff&&o.staff.busser)o.crew.push({id:'c1',role:'cleaner',name:'秀琴阿姨',lv:1,duty:'clean'});if(o.staff&&o.staff.bartender)o.crew.push({id:'c2',role:'chef',name:'小茉',lv:1,duty:'bar'})}return o}
+function load(){let t=null;try{t=localStorage.getItem(KEY)}catch(e){return null}if(!t)return null;
+ try{const o=JSON.parse(t);if(!o||typeof o!=='object'||typeof o.v!=='number'||!(o.v>=1&&o.v<=SAVE_V)||o.v%1){rescue(t,'version '+(o&&o.v));return null}
+  for(let n=o.v;n<SAVE_V;n++){MIGRATE[n](o);o.v=n+1}
+  return legacyCrew(fillDefaults(o))}catch(e){rescue(t,e&&e.message||'error');return null}}
+let saveWarned=false;
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));return true}catch(e){if(!saveWarned){saveWarned=true;console.warn('[save] saving failed',e)}return false}}
 function hasSave(){try{return!!localStorage.getItem(KEY)}catch(e){return false}}
 S=load()||newState();
 
