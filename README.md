@@ -11,9 +11,17 @@ jills-kitchen-project/
 │   └── style.css                   所有介面樣式（HUD、訂單、選單、商店、說明書…）
 ├── js/
 │   └── game.js                     全部遊戲邏輯（見下方模組說明）
-├── jills-kitchen-single-file.html  同一個遊戲的單檔版本（樣式與程式都內嵌），直接開就能玩
+├── jills-kitchen-single-file.html  單檔版本（由建置腳本產生，直接開就能玩）
+├── docs/
+│   ├── ARCHITECTURE.md             程式結構、全域狀態、擴充守則、存檔 migration、測試流程
+│   └── REFACTOR_REPORT.md          安全網與重構報告（分析、風險、做了什麼、沒做什麼）
+├── tests/                          回歸測試、舊存檔樣本、畫面標準答案
+├── tools/                          單檔建置、靜態分析、lint
+├── backups/v13-before-refactor/    重構前的原始檔案（可直接換回去）
 └── README.md
 ```
+
+> 手動修改的只有 `index.html`、`css/style.css`、`js/game.js`。改完執行 `python3 tools/build_single.py` 更新單檔版。
 
 遊戲裡所有圖像（Jill、客人、五隻貓、料理、家具、廚房設備）都是用 Canvas 程式即時畫出來的，所以沒有圖片素材資料夾；音樂與音效也是用 Web Audio 即時合成。唯一的外部資源是 Google Fonts 字型（Young Serif、Figtree），離線時會自動改用系統字型。
 
@@ -38,6 +46,8 @@ jills-kitchen-project/
   - Claude 上的遊戲頁面、你本機打開的檔案、你自己架的網站，三者的存檔互相獨立。
   - 換手機、換瀏覽器、清除網站資料，存檔都不會跟著走。
 - 遊戲內「設定・存檔」可以手動 SAVE / LOAD / RESET（重置需要按兩次確認）。
+- 如果存檔讀不懂（檔案壞掉，或是用舊版程式打開新版存檔），遊戲會先把它原封不動複製到 `jills-kitchen-save-v1-unreadable`，再開始新遊戲，不會把它蓋掉。
+- 新增存檔欄位、改存檔格式的規則見 `docs/ARCHITECTURE.md` 第 4、5 節。
 
 ## game.js 模組導覽
 
@@ -47,7 +57,7 @@ jills-kitchen-project/
 |---|---|
 | utilities | 共用數學、繪圖小工具、亂數 |
 | game data | 料理與食譜步驟（`DISHES`）、食材（`ING`）、客人類型、熟客、擴建等級、裝潢、成就、評論 |
-| save / state | 存檔格式 `newState()`、讀檔與舊存檔相容、`save()` |
+| save / state | 存檔格式 `newState()`；`load()`＝版本檢查 → `MIGRATE` → `fillDefaults` → `legacyCrew`；讀不懂的存檔會被保留；`save()` |
 | derived / layout of the room | 售價、熟練度等計算值；桌位與座位配置 |
 | food art / people art / icons | 料理、人物、家具與圖示的 Canvas 繪製 |
 | audio | 背景音樂（bossa nova 風格即時合成）與所有音效 |
@@ -71,3 +81,22 @@ jills-kitchen-project/
 - **貓咪行為權重**：`function catDecide(c)`。
 - **一天營業長度**：`function dayDur(D)`。
 - **客人數量**：`function expected(weather,event)`。
+- **加東西之前**：先讀 `docs/ARCHITECTURE.md`，裡面有新增料理、貓咪行為、家具、存檔欄位的步驟與注意事項。
+
+## 測試
+
+```bash
+pip install playwright && playwright install chromium   # 第一次才需要
+python3 tests/run_tests.py                  # 測多檔版
+python3 tests/run_tests.py --target single  # 測單檔版
+python3 tests/run_tests.py --record         # 刻意改變遊戲內容後，重新錄製標準答案
+```
+
+17 項測試涵蓋：
+- 新遊戲、舊存檔、存讀檔、開店、打烊；
+- 客人完整流程、每道料理、經濟數值；
+- 五隻貓的初始化與個性 AI；
+- UI 與觸控操作、主迴圈只有一份、長時間遊玩不累積；
+- 逐像素比對畫面的黃金基準。
+
+詳細說明見 `docs/ARCHITECTURE.md` 第 6 節。
