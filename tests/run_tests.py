@@ -10,6 +10,7 @@ Usage:
   python3 tests/run_tests.py --target single # test jills-kitchen-single-file.html
   python3 tests/run_tests.py --record        # (re)record the golden baseline
   python3 tests/run_tests.py -k cats         # run tests whose name contains "cats"
+  JK_GAME_JS=/path/to/old/game.js python3 tests/run_tests.py   # run the suite against another game.js
 
 Requires: pip install playwright && playwright install chromium
 """
@@ -85,7 +86,8 @@ class Game:
         self.errors = []
         self.page.on('pageerror', lambda e: self.errors.append(str(e)))
         self.page.on('console', lambda m: self.errors.append('console.error: ' + m.text) if m.type == 'error' and 'fonts.g' not in m.text and 'ERR_' not in m.text else None)
-        self.page.route('**/js/game.js', lambda r: r.fulfill(status=200, content_type='application/javascript', body=inject(open(os.path.join(ROOT, 'js', 'game.js'), encoding='utf-8').read())))
+        game_js = os.environ.get('JK_GAME_JS') or os.path.join(ROOT, 'js', 'game.js')  # JK_GAME_JS: test another build, e.g. the baseline
+        self.page.route('**/js/game.js', lambda r: r.fulfill(status=200, content_type='application/javascript', body=inject(open(game_js, encoding='utf-8').read())))
         self.page.route('**/jills-kitchen-single-file.html', lambda r: r.fulfill(status=200, content_type='text/html', body=inject(open(os.path.join(ROOT, 'jills-kitchen-single-file.html'), encoding='utf-8').read())))
         self.page.route('https://fonts.googleapis.com/**', lambda r: r.abort())
         self.page.route('https://fonts.gstatic.com/**', lambda r: r.abort())
@@ -424,6 +426,63 @@ def ui_basics(b, port, target):
             g.click(f'[data-act=tab][data-k={k}]')
     g.click('[data-act=nextDay]')
     check(g.ev("phase") == 'prep' and g.ev("S.day") == 2, 'next day failed')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
+def touch_controls(b, port, target):
+    """Real pointer taps on the canvases: seat a guest, tap a table, open a station, press a
+    kitchen-panel ingredient, pet a cat, tap the fridge. Exercises the input layer end to end."""
+    g = Game(b, port, target, seed=14, manual=True)
+    install_bot(g)
+    def tap(x, y):  # scene coordinates -> screen pixels
+        p = g.ev(f"(()=>{{const r=sc.getBoundingClientRect();return[r.left+SV.ox+({x})*SV.s,r.top+SV.oy+({y})*SV.s]}})()")
+        g.page.mouse.click(p[0], p[1]); g.ev("__tick(1000/30)")
+    g.ev("__tick(100)")
+    g.click('[data-act=open]'); start_day(g)
+    # 1) a guest group arrives -> tap it -> it gets seated
+    g.ev("__tick(1000/30)")
+    for _ in range(40):
+        if g.ev("queued().some(x=>x.state==='queue')"): break
+        g.ev("for(let i=0;i<30;i++)__tick(1000/30)")
+    gid = g.ev("(()=>{const q=queued().find(x=>x.state==='queue');return q?q.id:null})()")
+    check(gid is not None, 'no guests arrived to seat')
+    gx, gy = g.ev(f"(()=>{{const q=R.groups.find(x=>x.id==={gid});return[q.x+6,q.y-22]}})()")
+    tap(gx, gy)
+    check(g.ev(f"R.groups.find(x=>x.id==={gid}).table!=null"), 'tapping the waiting guests did not seat them')
+    # 2) walk the service forward until a ticket exists, then tap the station to open the kitchen panel
+    for _ in range(60):
+        if g.ev("R.tickets.some(t=>t.items.some(i=>i.st==='pending'))"): break
+        g.ev("(()=>{for(const t of R.tables)if(tableActionable(t)&&!jillTargets(t.i))tapTable(t);for(let i=0;i<15;i++)__tick(1000/30)})()")
+    check(g.ev("R.tickets.length>0"), 'no order ticket appeared')
+    si = g.ev("R.slots.findIndex(s=>s.type==='stove')")
+    rx, ry = g.ev(f"(()=>{{const r=kitchenRects(R.slots)[{si}];return[r.x+r.w/2,r.y+r.h/2]}})()")
+    tap(rx, ry)
+    check(g.ev(f"!!R.slots[{si}].job && R.panel===true"), 'tapping the stove did not start cooking / open the panel')
+    g.ev("__tick(1000/30)")
+    check(g.ev("!$('#trayWrap').hidden"), 'kitchen panel not visible')
+    # 3) press the ingredient the recipe asks for, on the kitchen-panel canvas
+    before = g.ev(f"R.slots[{si}].job.adds.length")
+    want = g.ev(f"R.slots[{si}].job.step.t==='add'?R.slots[{si}].job.step.left[0]:null")
+    check(want is not None, 'first recipe step is not an ingredient step')
+    hx, hy = g.ev(f"(()=>{{const h=TRAYHIT.ctrls.find(h=>h.act==='ing'&&h.arg==={json.dumps(want)});const r=tc.getBoundingClientRect();return[r.left+h.x+h.w/2,r.top+h.y+h.h/2]}})()")
+    g.page.mouse.click(hx, hy); g.ev("__tick(1000/30)")
+    check(g.ev(f"R.slots[{si}].job.adds.length") == before + 1, 'tapping the ingredient did not add it')
+    # 4) close the panel with its X
+    hx, hy = g.ev("(()=>{const h=TRAYHIT.ctrls.find(h=>h.act==='close');const r=tc.getBoundingClientRect();return[r.left+h.x+h.w/2,r.top+h.y+h.h/2]})()")
+    g.page.mouse.click(hx, hy); g.ev("__tick(1000/30)")
+    check(g.ev("R.panel===false && $('#trayWrap').hidden"), 'panel did not close')
+    # 5) pet a cat that is sitting on the floor away from the counter
+    cid = g.ev("(()=>{const c=CATS.find(c=>!c.hidden&&c.def.id!=='mei'&&c.def.id!=='snow'&&c.y<FB-40&&c.perch<0&&!R.groups.some(q=>Math.hypot(q.x-c.x,q.y-c.y)<40)&&!R.tables.some(t=>Math.hypot(t.x-c.x,t.y-c.y)<50));return c?c.def.id:null})()")
+    check(cid, 'no cat free to pet')
+    if cid:
+        cx, cy = g.ev(f"(()=>{{const c=catBy('{cid}');return[c.x,c.y-12]}})()")
+        tap(cx, cy)
+        check(g.ev(f"catBy('{cid}').hearts.length>0"), f'petting {cid} did not show hearts')
+    # 6) tap the fridge
+    fx, fy = g.ev("(()=>{const f=kitchenItems().find(i=>i.k==='fridge');return[f.x+f.w/2,f.y+f.h/2]})()")
+    tap(fx, fy)
+    check(g.ev("KPOP.fridge>0"), 'tapping the fridge did nothing')
     check(not g.errors, g.errors)
     g.close()
 
