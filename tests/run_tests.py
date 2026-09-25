@@ -683,7 +683,7 @@ def cats_use_sofa_by_personality(b, port, target):
     where to sit: 包包 sleeps on the seat, 寶寶 takes the high pretty places, 樾樾 and 小齁 compete for the
     places next to Jill (and neither always wins), 柔柔 keeps an eye on the others."""
     slot_time = {k: {} for k in ['tora', 'ban', 'snow', 'mikan', 'mei']}
-    sleep_on_sofa = {k: 0 for k in slot_time}
+    sleep_on_sofa = {k: 0 for k in slot_time}; near_jill = {k: 0 for k in slot_time}
     closest = {'tora': 0, 'ban': 0}
     zero_cat_checks = 0; checks = 0
     for seed in range(60, 76):
@@ -700,6 +700,7 @@ def cats_use_sofa_by_personality(b, port, target):
             for c in on:
                 slot_time[c['id']][c['kind']] = slot_time[c['id']].get(c['kind'], 0) + 1
                 if c['st'] == 'sleep': sleep_on_sofa[c['id']] += 1
+                if abs(c['x'] - x['jill']['x']) < 50: near_jill[c['id']] += 1
             near = sorted([c for c in on if c['id'] in ('tora', 'ban')], key=lambda c: abs(c['x'] - x['jill']['x']) + (0 if c['kind'] in ('lap', 'arm', 'seat') else 40))
             if near: closest[near[0]['id']] += 1
         g.close()
@@ -710,8 +711,7 @@ def cats_use_sofa_by_personality(b, port, target):
     hi = slot_time['mei'].get('back', 0) + slot_time['mei'].get('arm', 0)
     check(hi >= tot['mei'] * .55, f'寶寶 should prefer the backrest and the arms: {slot_time["mei"]}')
     for k in ('tora', 'ban'):
-        nearJ = slot_time[k].get('lap', 0) + slot_time[k].get('arm', 0) + slot_time[k].get('seat', 0)
-        check(nearJ >= tot[k] * .6, f'{k} should sit close to Jill: {slot_time[k]}')
+        check(near_jill[k] >= tot[k] * .6, f'{k} should sit close to Jill: {near_jill[k]}/{tot[k]} {slot_time[k]}')
     check(closest['tora'] > 0 and closest['ban'] > 0, f'the place closest to Jill should change hands: {closest}')
     check(zero_cat_checks > 0, 'there was never a moment with Jill alone on the sofa')
 

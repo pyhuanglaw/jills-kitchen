@@ -14,6 +14,7 @@ jills-kitchen-project/
 ├── jills-kitchen-single-file.html  單檔版本（由建置腳本產生，直接開就能玩）
 ├── docs/
 │   ├── ARCHITECTURE.md             程式結構、全域狀態、擴充守則、存檔 migration、測試流程
+│   ├── LIFE_SYSTEM.md              打烊後的生活系統：沙發、閨蜜機、Jill、五隻貓、Dylan（含劇情，會爆雷）
 │   └── REFACTOR_REPORT.md          安全網與重構報告（分析、風險、做了什麼、沒做什麼）
 ├── tests/                          回歸測試、舊存檔樣本、畫面標準答案
 ├── tools/                          單檔建置、靜態分析、lint
@@ -68,6 +69,7 @@ jills-kitchen-project/
 | kitchen render | 料理台彈窗、開放式廚房檯面與設備 |
 | cats | 貓跳台、牆上貓爬架、貓咪外觀與動作繪製 |
 | five cats: personality AI | 五隻貓的個性、關係、Jill 身邊座位競爭、埋伏、賽跑、怕生、打烊後模式、回憶照片 |
+| life | 大沙發與位子計算、閨蜜機、Jill 打烊後的自主休息、Dylan（營業中的行為、留下來的晚上、隱藏進度） |
 | crew / incidents / emergency stock | 員工；突發事件；缺料時的緊急叫貨 |
 | stars & lab | 食譜星級、試做實驗室 |
 | Jill's bag cabinet / guide | 包包收藏櫃；遊戲說明內容 |
@@ -92,10 +94,11 @@ python3 tests/run_tests.py --target single  # 測單檔版
 python3 tests/run_tests.py --record         # 刻意改變遊戲內容後，重新錄製標準答案
 ```
 
-18 項測試涵蓋：
+23 項測試涵蓋：
 - 新遊戲、舊存檔、存讀檔、開店、打烊；
 - 客人完整流程、每道料理、經濟數值；
 - 五隻貓的初始化、個性 AI 與個性指紋；
+- 打烊後的生活：沙發位子幾何、Jill 的晚上、五隻貓怎麼用沙發、Dylan 的前期與揭露；
 - UI 與觸控操作、主迴圈只有一份、長時間遊玩不累積；
 - 逐像素比對畫面的黃金基準。
 

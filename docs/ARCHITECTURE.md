@@ -11,6 +11,7 @@
 | `tests/run_tests.py` | 回歸測試（見第 6 節） |
 | `tests/fixtures/*.json` | 舊存檔樣本，每次存檔格式改變都要新增一份 |
 | `tests/golden/` | 目前版本的「標準答案」：遊戲數值、每幀畫面雜湊、10 張截圖 |
+| `docs/LIFE_SYSTEM.md` | 沙發、閨蜜機、Jill 的晚上、五隻貓的沙發行為、Dylan 隱藏線的規則與測試 |
 | `tools/analyze.js`、`tools/lint.mjs` | 靜態分析（未使用的程式、共用變數、計時器、事件監聽） |
 
 `game.js` 是一個 IIFE，依區塊註解分段（搜尋 `/* ====`）。目前規模刻意**不拆檔**，原因寫在 `REFACTOR_REPORT.md`。
@@ -28,6 +29,8 @@
 | `CATS` | 五隻貓的即時狀態（不存檔；`applyDY` 會把它清成 `null`，下一幀重新產生） | 貓咪 AI |
 | `OCC` / `SIDE` / `perchOcc` | 貓咪「佔位表」：貓抓板、山洞、軟墊、玩具、Jill 左右、跳台各層 | `catGo`、`goJill`、跳台相關函式；**離開時一律透過 `releaseSpots(c)` / `leavePerch`** |
 | `bg` / `bgKey` | 背景快取，改等級、裝潢、菜單、尺寸時自動重畫；要強制重畫就設 `bg=null` |
+| `LIFE` | 當晚的生活狀態（Jill 在沙發上的位置與活動、閨蜜機、留下來的 Dylan、對話泡泡）。不存檔；每天開店與回到標題時 `lifeReset()`。只在 `evening()` 時更新 | `lifeUpd`（每幀）、`startClosing`、`dylanLinger` |
+| `c.sofa` / `c.sofaOn` | 貓在沙發上的位子（預約時就設定，跳上去後 `sofaOn=true`）；`releaseSpots(c)` 會一併清掉 | `goSofaSlot`、`leaveSofa` |
 
 測試會檢查的不變條件（`tests/run_tests.py` 的 `INV` 與 `cat_ai_keeps_running`）：
 
@@ -36,6 +39,7 @@
 - 營業中且沒暫停時，選單畫面是隱藏的
 - 一隻貓同時最多佔一個位置；佔位時不會同時在跳台上或 Jill 旁邊；軟墊最多兩隻、不重複
 - 貓的座標永遠是有限數字，也不會跑出房間
+- 沙發：一個位子一隻貓、Jill 腿上最多一隻、座墊上的區間（Jill 身體、她的腿、Dylan、每隻貓）互不重疊、閨蜜機移動時不會撞到貓（詳見 `docs/LIFE_SYSTEM.md`）
 
 新增畫面或新的貓咪行為時，這些條件必須繼續成立。
 
@@ -67,6 +71,12 @@
 4. 會佔用家具就走 `catGo` / `OCC`，並確保每條離開路徑都經過 `releaseSpots(c)`。
 5. 遵守貓咪世界規則：五隻都在，不寫離開、死亡、懷念類內容。
 6. 每多一次 `Math.random()` 都會讓之後所有隨機結果改變，所以 golden 測試**一定會**失敗，這是正常的。確認截圖差異是預期的，再重新錄製（第 6 節）。
+
+### 新增打烊後的行為
+- Jill：在 `jillDecide` 加一個權重和一個 `act`，在 `jillLife` 處理它的每幀更新與結束。不要加數值需求。
+- Dylan：在 `dylanDecide` 加權重與 `case`，在 `dylanArrive` / `dylanUpd` 處理。他的「階段」只能靠 `dylanStageCheck` 的條件推進，不要在 UI 顯示。
+- 貓在沙發上的新位子：加到 `sofaSlots`，並在 `pickSofaSlot` 給每隻貓一個權重。位子一定要能用區間表示，不變條件才管得到。
+- 新的線索：往 `S.dylan.clues.<名字>` 累加即可，`dylanStageCheck` 數的是「有幾種線索」。
 
 ### 新增可以點的家具
 - 貓咪相關：`SPOT` 加座標、`hitSpot` 加判斷、`tapSpot` 加反應，繪製放在 `drawScene` 對應的區塊。
