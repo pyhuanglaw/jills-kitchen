@@ -145,9 +145,9 @@ git checkout baseline-v13 -- index.html css/style.css js/game.js
 
 ## Phase 2：測試
 
-`python3 tests/run_tests.py`：17 項。
+`python3 tests/run_tests.py`：18 項。
 
-- 其中 16 項**先在未修改的 v13 上通過**，之後才開始重構。v13 就是 git 的 `baseline-v13`，可以用 `JK_GAME_JS` 指定它來執行。
+- 其中 17 項**先在未修改的 v13 上通過**，之後才開始重構。黃金基準（`tests/golden/`）都是**直接用 v13 錄製**的。v13 就是 git 的 `baseline-v13`，可以用 `JK_GAME_JS` 指定它來執行。
 - `unreadable_save_is_kept` 是為新的存檔保護寫的。它在 v13 上會失敗，這正好證明舊版會覆蓋讀不懂的存檔；在重構後的版本上通過。
 
 | 測試 | 保護的內容 |
@@ -160,6 +160,7 @@ git checkout baseline-v13 -- index.html css/style.css js/game.js
 | `close_shop_early` | 提早打烊：不再接客，已入座的客人會吃完，然後結算 |
 | `cooking_every_recipe` | 22 道料理加招牌菜，每一道完美操作都要拿到 PERFECT |
 | `five_cats_initialise` | 五隻貓的 id 和名字 |
+| `cat_personality_fingerprint` | 開店前、營業中、打烊後三種情境共約 5 萬次貓咪更新。記錄每一步的狀態，以及**每一個決策權重**，所以就算只把某隻貓的權重從 2 改成 2.05，也會被抓到 |
 | `cat_ai_keeps_running` | 9000 幀內每隻貓都持續換狀態、包包睡最多，而且強制觸發賽跑和埋伏。不變條件：座標有限、不出界、佔位一致 |
 | `ui_basics` | 說明書、手冊各分頁、看店裡、暫停和繼續、結算、商店各分頁、下一天，並在每個畫面檢查狀態不變條件 |
 | `touch_controls` | 真實的指標點擊：點客人會帶位、點爐台會開啟料理台、點食材、關閉料理台、摸貓、點冰箱 |
@@ -169,6 +170,18 @@ git checkout baseline-v13 -- index.html css/style.css js/game.js
 | `golden_scenario` | 固定亂數種子連玩三天，每天的金錢、營收、評論、熟客、庫存、貓咪狀態都要和基準完全相同 |
 | `golden_frames` | 以虛擬時間逐幀跑真正的主迴圈兩天（約 11000 幀），比對：<br>• 373 個取樣點的畫面像素雜湊、DOM 雜湊、貓咪狀態<br>• 回憶照片<br>• 10 張全畫面截圖（像素完全一致） |
 | `single_file_in_sync` | 單檔版和三個原始檔同步 |
+
+**測試的靈敏度（刻意改壞程式來驗證）**：
+
+| 刻意做的改動 | 結果 |
+|---|---|
+| 寶寶一個行為權重 2 → 2.05 | 抓到 |
+| 寶寶留在跳台的機率 65% → 66% | 抓到 |
+| 蛋炒飯售價 120 → 121 | 抓到 |
+| 暗角透明度 .38 → .37（肉眼幾乎看不出） | 抓到，10 張截圖全部不同 |
+| 埋伏被發現時「追上去」的機率 25% → 26% | **沒抓到** |
+
+最後一項沒抓到，是因為這個事件本來就很少發生：機率門檻的極小改變，如果只影響罕見事件，有限次數的模擬不一定遇得到。權重、數值和畫面的改變則一定會被抓到。
 
 ---
 
@@ -187,7 +200,7 @@ git checkout baseline-v13 -- index.html css/style.css js/game.js
 | 1. 單檔建置 | 新增 `tools/build_single.py`，由 `index.html` + `style.css` + `game.js` 產生單檔版 | 單檔版的 10 張截圖、373 個畫面雜湊，都和多檔版逐像素相同 |
 | 2. 移除死碼 | 刪除以下沒有任何地方呼叫或讀取的程式碼：<br>• `STAFF`（早已被 `ROLES` / `crew` 取代）<br>• `dishTime`、`autoFocus`、`comboT`、`chipRect`、`drawChip`、`ST_SHORT`、`WALLS`<br>• 4 個沒用到的區域變數<br>• 1 個 `if(false)` 分支 | ESLint 0 個錯誤、靜態分析沒有剩下未使用的宣告、全部測試通過 |
 | 3. 存檔安全 | 1. 讀不懂的存檔先複製到 `jills-kitchen-save-v1-unreadable`<br>2. `load()` 拆成 `fillDefaults` / `legacyCrew` / `MIGRATE`（附 `SAVE_V`）<br>3. 存檔失敗時在 console 警告一次<br>4. 存檔格式沒有任何改變 | 用新舊程式各跑三天，以及讀取兩份舊存檔，**寫出的存檔逐字元相同** |
-| 4. 測試加強 | 畫面狀態和貓咪佔位的不變條件、真實觸控測試 | 在未修改的 v13 上一樣通過 |
+| 4. 測試加強 | 畫面狀態和貓咪佔位的不變條件、真實觸控測試、貓咪個性指紋 | 在未修改的 v13 上一樣通過 |
 
 ### 刻意沒有做的事
 

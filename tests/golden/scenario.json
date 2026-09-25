@@ -81,7 +81,8 @@
    ]
   ],
   "catHash": "6a0e855f",
-  "mem": []
+  "mem": [],
+  "weights": "679:3b5ae106"
  },
  {
   "day": 2,
@@ -167,7 +168,8 @@
    ]
   ],
   "catHash": "c841dadc",
-  "mem": []
+  "mem": [],
+  "weights": "1323:9d37353f"
  },
  {
   "day": 3,
@@ -254,6 +256,7 @@
    ]
   ],
   "catHash": "f48ebe3b",
-  "mem": []
+  "mem": [],
+  "weights": "2209:3665ca0c"
  }
 ]

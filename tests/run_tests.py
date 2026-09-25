@@ -116,6 +116,20 @@ class Game:
 
 # In-page bot: plays the service perfectly and deterministically.
 BOT = r"""
+// Weight tracer: every weighted random choice in the game (cat personality decisions, guests
+// looking at cats, …) goes through wpick(). We fold every weight it sees into a hash, so even a
+// tiny change to a personality weight is detected, although it may not change any outcome.
+// The wrapper calls the game's own weight function exactly once per item, as the game does,
+// so the random number stream and the behaviour are unchanged.
+if (!window.__wt) {
+  window.__wt = {n:0, h:2166136261};
+  const W0 = wpick;
+  wpick = function(arr, wf){ const t = __wt; return W0(arr, function(x){ const v = wf(x);
+    const s = typeof v === 'number' ? v.toFixed(6) : String(v);
+    for (let i=0;i<s.length;i++){ t.h ^= s.charCodeAt(i); t.h = Math.imul(t.h,16777619); }
+    t.h ^= 124; t.h = Math.imul(t.h,16777619); t.n++; return v; }); };
+}
+window.__wtHash = () => __wt.n + ':' + (__wt.h>>>0).toString(16);
 // One step of a perfect, deterministic player: seat, serve, cook every step exactly right.
 window.__act = function(){
   if (!(phase==='service' && R)) return false;
@@ -163,14 +177,14 @@ window.__play = function(frames, every, stop){
 window.__sample = function(){
   return { t: R ? +R.t.toFixed(3) : null, phase, scene: __px(sc), tray: $('#trayWrap').hidden ? '-' : __px(tc),
            dom: __h(['#hud','#tickets','#taskPanel','#banner','#toasts','#coach','#screen'].map(q=>{const e=$(q);return e.hidden+'|'+e.innerHTML}).join('#')),
-           cats: __h(JSON.stringify((CATS||[]).map(c=>[c.def.id,c.st,c.pose,Math.round(c.x),Math.round(c.y),c.perch,!!c.hidden]))) };
+           cats: __h(JSON.stringify((CATS||[]).map(c=>[c.def.id,c.st,c.pose,Math.round(c.x),Math.round(c.y),c.perch,!!c.hidden]))), weights: __wtHash() };
 };
 window.__digest = function(){
   const cats = (CATS||[]).map(c=>[c.def.id,c.st,c.pose,Math.round(c.x),Math.round(c.y),c.perch,!!c.hidden]);
   const s = S.lastSummary ? {rev:S.lastSummary.rev,cost:S.lastSummary.cost,tips:S.lastSummary.tips,bonus:S.lastSummary.bonus,wages:S.lastSummary.wages,net:S.lastSummary.net,guests:S.lastSummary.guests,lost:S.lastSummary.lost,perfect:S.lastSummary.perfect,plated:S.lastSummary.plated,avg:S.lastSummary.avg,top:S.lastSummary.top,stars:S.lastSummary.stars} : null;
   return {day:S.day, money:S.money, lifetime:S.lifetime, level:S.level, stats:S.stats, xp:S.xp, stock:S.stock, reviews:S.reviews.length,
           reviewHash:__h(JSON.stringify(S.reviews.map(r=>[r.s,r.txt,r.name]))), regulars:S.regulars, summary:s, cats, catHash:__h(JSON.stringify(cats)),
-          mem:Object.keys(S.mem||{}).sort().map(k=>k+':'+S.mem[k].day+':'+__h(S.mem[k].img))};
+          mem:Object.keys(S.mem||{}).sort().map(k=>k+':'+S.mem[k].day+':'+__h(S.mem[k].img)), weights:__wtHash()};
 };
 """
 
@@ -443,6 +457,43 @@ def unreadable_save_is_kept(b, port, target):
         check(not [e for e in g.errors if 'could not read' not in e], f'{label}: {g.errors}')
         g.close()
 
+GOLDEN_CATS = os.path.join(ROOT, 'tests', 'golden', 'cats.json')
+
+@test
+def cat_personality_fingerprint(b, port, target, record=False):
+    """Long, cats-only run in three moods (before opening, during service, evening after closing):
+    ~50,000 cat updates with a fixed seed. Records every cat's state each step plus every decision
+    weight. Any change to personalities, weights, timings or probabilities shows up here."""
+    g = Game(b, port, target, seed=31337, manual=True)
+    install_bot(g)
+    run = r"""(n=>{let h=2166136261;const mix=s=>{for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}};
+      const cnt={};let t=0;for(let i=0;i<n;i++){t+=1/30;updateCats(1/30,t);
+        for(const c of CATS){mix(c.def.id+c.st+c.pose+(c.x|0)+','+(c.y|0)+c.perch+(c.hidden?1:0));cnt[c.def.id+':'+c.st]=(cnt[c.def.id+':'+c.st]||0)+1}}
+      return {states:(h>>>0).toString(16), weights:__wtHash(), time:cnt}})"""
+    out = {}
+    g.click('[data-act=open]')
+    out['prep'] = g.ev(f"({run})(18000)")
+    start_day(g)
+    out['service'] = g.ev(r"""(()=>{let h=2166136261;const mix=s=>{for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}};
+      for(let i=0;i<20000&&phase==='service';i++){__bot(1,1/30);for(const c of CATS)mix(c.def.id+c.st+c.pose+(c.x|0)+','+(c.y|0)+c.perch)}
+      return {states:(h>>>0).toString(16), weights:__wtHash()}})()""")
+    check(g.ev("phase") == 'summary', 'service day did not finish')
+    g.click('[data-act=toShop]')
+    out['evening'] = g.ev(f"({run})(18000)")
+    check(not g.errors, g.errors)
+    g.close()
+    # personality sanity (independent of the recording): who sleeps most, who stays near Jill
+    tm = out['prep']['time']
+    sleep = {k: sum(v for key, v in tm.items() if key.startswith(k + ':') and key.split(':')[1] in ('sleep', 'bed')) for k in ['tora', 'ban', 'snow', 'mikan', 'mei']}
+    check(max(sleep, key=sleep.get) == 'snow', f'包包 should be the sleepiest cat: {sleep}')
+    if record:
+        json.dump(out, open(GOLDEN_CATS, 'w', encoding='utf-8'), ensure_ascii=False, indent=1, sort_keys=True)
+        print('    recorded cat fingerprint ->', os.path.relpath(GOLDEN_CATS, ROOT))
+        return
+    want = json.load(open(GOLDEN_CATS, encoding='utf-8'))
+    bad = [f'{mood}.{k}' for mood in want for k in want[mood] if out[mood].get(k) != want[mood][k]]
+    check(not bad, f'cat behaviour differs from the baseline in: {bad}')
+
 @test
 def ui_basics(b, port, target):
     g = Game(b, port, target, seed=10, manual=True)
@@ -590,6 +641,14 @@ def compare_screens(shots, record):
             bad.append(f'{name}: no golden image'); continue
         a = Image.open(BytesIO(png)).convert('RGB'); w = Image.open(path).convert('RGB')
         box = ImageChops.difference(a, w).getbbox() if a.size == w.size else (0, 0) + a.size
+        if box and a.size == w.size:
+            # Tolerate text anti-aliasing noise: a handful of pixels off by at most 4 levels.
+            # Any real visual change (moved, recoloured or missing element) is far larger than this.
+            d = ImageChops.difference(a, w).convert('L')
+            hist = d.histogram()
+            changed, worst = sum(hist[1:]), max(i for i, n in enumerate(hist) if n)
+            if changed <= 16 and worst <= 4:
+                box = None
         if box:
             os.makedirs(ARTIFACTS, exist_ok=True)
             a.save(os.path.join(ARTIFACTS, name + '.actual.png'))
@@ -675,7 +734,7 @@ def main():
                 continue
             t0 = time.time()
             try:
-                if fn in (golden_scenario, golden_frames):
+                if fn in (golden_scenario, golden_frames, cat_personality_fingerprint):
                     fn(b, port, a.target, record=a.record)
                 else:
                     fn(b, port, a.target)

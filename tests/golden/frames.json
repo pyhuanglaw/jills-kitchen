@@ -7,7 +7,8 @@
 "scene": "50c30e3a",
 "tray": "-",
 "dom": "ed10058f",
-"cats": "5f8f452b"
+"cats": "5f8f452b",
+"weights": "35:40ca7d95"
 },
 {
 "t": 1.033,
@@ -15,7 +16,8 @@
 "scene": "d49e7fdf",
 "tray": "-",
 "dom": "759dfd4a",
-"cats": "5f8f452b"
+"cats": "5f8f452b",
+"weights": "35:40ca7d95"
 },
 {
 "t": 2.033,
@@ -23,7 +25,8 @@
 "scene": "a9167884",
 "tray": "-",
 "dom": "9a8e2cf7",
-"cats": "5f8f452b"
+"cats": "5f8f452b",
+"weights": "35:40ca7d95"
 },
 {
 "t": 3.033,
@@ -31,7 +34,8 @@
 "scene": "2340f0e2",
 "tray": "-",
 "dom": "387b21e1",
-"cats": "5f8f452b"
+"cats": "5f8f452b",
+"weights": "35:40ca7d95"
 },
 {
 "t": 4.033,
@@ -39,7 +43,8 @@
 "scene": "a1a6ff5e",
 "tray": "-",
 "dom": "61705503",
-"cats": "5f8f452b"
+"cats": "5f8f452b",
+"weights": "35:40ca7d95"
 },
 {
 "t": 5.033,
@@ -47,7 +52,8 @@
 "scene": "73dc15c8",
 "tray": "-",
 "dom": "45c72934",
-"cats": "88fd90a1"
+"cats": "88fd90a1",
+"weights": "52:d5a8e776"
 },
 {
 "t": 6.033,
@@ -55,7 +61,8 @@
 "scene": "2615370e",
 "tray": "-",
 "dom": "53c58007",
-"cats": "cf6c8cdc"
+"cats": "cf6c8cdc",
+"weights": "78:2a65c2b5"
 },
 {
 "t": 7.033,
@@ -63,7 +70,8 @@
 "scene": "9109cea3",
 "tray": "-",
 "dom": "9c4542a5",
-"cats": "326a395d"
+"cats": "326a395d",
+"weights": "78:2a65c2b5"
 },
 {
 "t": 8.033,
@@ -71,7 +79,8 @@
 "scene": "48ee415f",
 "tray": "-",
 "dom": "91ae37f3",
-"cats": "90c2d9a4"
+"cats": "90c2d9a4",
+"weights": "79:50e93be"
 },
 {
 "t": 9.033,
@@ -79,7 +88,8 @@
 "scene": "4a10e2ae",
 "tray": "-",
 "dom": "c1dc7784",
-"cats": "1c1abfbb"
+"cats": "1c1abfbb",
+"weights": "96:b655ac18"
 },
 {
 "t": 10.033,
@@ -87,7 +97,8 @@
 "scene": "22eed2e1",
 "tray": "-",
 "dom": "a056b23c",
-"cats": "64a75d42"
+"cats": "64a75d42",
+"weights": "96:b655ac18"
 },
 {
 "t": 11.033,
@@ -95,7 +106,8 @@
 "scene": "5120669d",
 "tray": "-",
 "dom": "549dd072",
-"cats": "6590b0dd"
+"cats": "6590b0dd",
+"weights": "96:b655ac18"
 },
 {
 "t": 12.033,
@@ -103,7 +115,8 @@
 "scene": "f55c9c42",
 "tray": "-",
 "dom": "c938be14",
-"cats": "3f2f2716"
+"cats": "3f2f2716",
+"weights": "96:b655ac18"
 },
 {
 "t": 13.033,
@@ -111,7 +124,8 @@
 "scene": "13d2f954",
 "tray": "-",
 "dom": "d776a54f",
-"cats": "b341063"
+"cats": "b341063",
+"weights": "111:870bdb9b"
 },
 {
 "t": 14.033,
@@ -119,7 +133,8 @@
 "scene": "c2d304a6",
 "tray": "-",
 "dom": "d05351ca",
-"cats": "764b40d7"
+"cats": "764b40d7",
+"weights": "112:a0224d96"
 },
 {
 "t": 15.033,
@@ -127,7 +142,8 @@
 "scene": "6b15da19",
 "tray": "-",
 "dom": "4900cdc0",
-"cats": "764b40d7"
+"cats": "764b40d7",
+"weights": "112:a0224d96"
 },
 {
 "t": 16.033,
@@ -135,7 +151,8 @@
 "scene": "a7470289",
 "tray": "-",
 "dom": "28b31f45",
-"cats": "764b40d7"
+"cats": "764b40d7",
+"weights": "112:a0224d96"
 },
 {
 "t": 17.033,
@@ -143,7 +160,8 @@
 "scene": "cfeb350e",
 "tray": "-",
 "dom": "f1f1307f",
-"cats": "b6135c69"
+"cats": "b6135c69",
+"weights": "123:bcced4ce"
 },
 {
 "t": 18.033,
@@ -151,7 +169,8 @@
 "scene": "84bf71b4",
 "tray": "-",
 "dom": "2efc83ba",
-"cats": "8d74a4df"
+"cats": "8d74a4df",
+"weights": "124:d13ca94d"
 },
 {
 "t": 19.033,
@@ -159,7 +178,8 @@
 "scene": "91858efb",
 "tray": "-",
 "dom": "9905282d",
-"cats": "a55c5cc5"
+"cats": "a55c5cc5",
+"weights": "139:9ef94444"
 },
 {
 "t": 20.067,
@@ -167,7 +187,8 @@
 "scene": "134e03e6",
 "tray": "-",
 "dom": "bdf2f9c1",
-"cats": "943fd66a"
+"cats": "943fd66a",
+"weights": "139:9ef94444"
 },
 {
 "t": 21.067,
@@ -175,7 +196,8 @@
 "scene": "276294e3",
 "tray": "-",
 "dom": "8c310bab",
-"cats": "d30af032"
+"cats": "d30af032",
+"weights": "155:cd61db49"
 },
 {
 "t": 22.067,
@@ -183,7 +205,8 @@
 "scene": "975b96c1",
 "tray": "-",
 "dom": "9ea0b360",
-"cats": "9fa6a208"
+"cats": "9fa6a208",
+"weights": "155:cd61db49"
 },
 {
 "t": 23.067,
@@ -191,7 +214,8 @@
 "scene": "d117ed2c",
 "tray": "-",
 "dom": "4ad261ea",
-"cats": "d66b29c9"
+"cats": "d66b29c9",
+"weights": "155:cd61db49"
 },
 {
 "t": 24.067,
@@ -199,7 +223,8 @@
 "scene": "adad67d6",
 "tray": "-",
 "dom": "728b8a7a",
-"cats": "89ea7906"
+"cats": "89ea7906",
+"weights": "158:5bacac3c"
 },
 {
 "t": 25.067,
@@ -207,7 +232,8 @@
 "scene": "f7ae1028",
 "tray": "-",
 "dom": "3cc4effb",
-"cats": "e2111796"
+"cats": "e2111796",
+"weights": "158:5bacac3c"
 },
 {
 "t": 26.067,
@@ -215,7 +241,8 @@
 "scene": "f58735c4",
 "tray": "-",
 "dom": "47f43dde",
-"cats": "2ccb24dc"
+"cats": "2ccb24dc",
+"weights": "158:5bacac3c"
 },
 {
 "t": 27.067,
@@ -223,7 +250,8 @@
 "scene": "cfa8053e",
 "tray": "-",
 "dom": "326928ed",
-"cats": "7e2ee3e9"
+"cats": "7e2ee3e9",
+"weights": "158:5bacac3c"
 },
 {
 "t": 27.4,
@@ -231,7 +259,8 @@
 "scene": "9e6ad3f1",
 "tray": "-",
 "dom": "d3b4a735",
-"cats": "7e2ee3e9"
+"cats": "7e2ee3e9",
+"weights": "160:b76a1b42"
 },
 {
 "t": 28.4,
@@ -239,7 +268,8 @@
 "scene": "3541a2b0",
 "tray": "-",
 "dom": "ca020dbc",
-"cats": "7e2ee3e9"
+"cats": "7e2ee3e9",
+"weights": "160:b76a1b42"
 },
 {
 "t": 29.4,
@@ -247,7 +277,8 @@
 "scene": "47b7bf3d",
 "tray": "-",
 "dom": "5aeedb1e",
-"cats": "72df7044"
+"cats": "72df7044",
+"weights": "160:b76a1b42"
 },
 {
 "t": 30.4,
@@ -255,7 +286,8 @@
 "scene": "3e5c8dd4",
 "tray": "-",
 "dom": "28e4cd8c",
-"cats": "72df7044"
+"cats": "72df7044",
+"weights": "160:b76a1b42"
 },
 {
 "t": 31.4,
@@ -263,7 +295,8 @@
 "scene": "1b1e0f37",
 "tray": "-",
 "dom": "d20409ad",
-"cats": "fa907491"
+"cats": "fa907491",
+"weights": "182:5d5aa626"
 },
 {
 "t": 32.4,
@@ -271,7 +304,8 @@
 "scene": "611ce172",
 "tray": "-",
 "dom": "d213f07a",
-"cats": "db974cf4"
+"cats": "db974cf4",
+"weights": "182:5d5aa626"
 },
 {
 "t": 33.4,
@@ -279,7 +313,8 @@
 "scene": "5ceef29e",
 "tray": "-",
 "dom": "75723aeb",
-"cats": "5dd371a8"
+"cats": "5dd371a8",
+"weights": "184:dacb391e"
 },
 {
 "t": 34.4,
@@ -287,7 +322,8 @@
 "scene": "8e582620",
 "tray": "-",
 "dom": "3fa38b91",
-"cats": "1d5c9274"
+"cats": "1d5c9274",
+"weights": "184:dacb391e"
 },
 {
 "t": 35.4,
@@ -295,7 +331,8 @@
 "scene": "e0139671",
 "tray": "-",
 "dom": "4b35ee42",
-"cats": "3453687d"
+"cats": "3453687d",
+"weights": "184:dacb391e"
 },
 {
 "t": 36.4,
@@ -303,7 +340,8 @@
 "scene": "df5da813",
 "tray": "-",
 "dom": "97b4c859",
-"cats": "11f8a070"
+"cats": "11f8a070",
+"weights": "185:127e0253"
 },
 {
 "t": 37.4,
@@ -311,7 +349,8 @@
 "scene": "ebb69f48",
 "tray": "-",
 "dom": "31500240",
-"cats": "931b9931"
+"cats": "931b9931",
+"weights": "185:127e0253"
 },
 {
 "t": 38.4,
@@ -319,7 +358,8 @@
 "scene": "f5884597",
 "tray": "-",
 "dom": "85693cc6",
-"cats": "e661409b"
+"cats": "e661409b",
+"weights": "185:127e0253"
 },
 {
 "t": 39.4,
@@ -327,7 +367,8 @@
 "scene": "817b28ca",
 "tray": "-",
 "dom": "eb28ccdd",
-"cats": "82642eb0"
+"cats": "82642eb0",
+"weights": "185:127e0253"
 },
 {
 "t": 40.4,
@@ -335,7 +376,8 @@
 "scene": "fdeab136",
 "tray": "-",
 "dom": "702cc3d6",
-"cats": "c71cd488"
+"cats": "c71cd488",
+"weights": "185:127e0253"
 },
 {
 "t": 41.4,
@@ -343,7 +385,8 @@
 "scene": "ccf9e47c",
 "tray": "-",
 "dom": "357f9fef",
-"cats": "73234a94"
+"cats": "73234a94",
+"weights": "185:127e0253"
 },
 {
 "t": 42.4,
@@ -351,7 +394,8 @@
 "scene": "93ffc24a",
 "tray": "-",
 "dom": "a9ad703c",
-"cats": "7678534d"
+"cats": "7678534d",
+"weights": "187:486a18df"
 },
 {
 "t": 43.4,
@@ -359,7 +403,8 @@
 "scene": "434b66c3",
 "tray": "-",
 "dom": "4e645951",
-"cats": "1f9d501f"
+"cats": "1f9d501f",
+"weights": "187:486a18df"
 },
 {
 "t": 44.4,
@@ -367,7 +412,8 @@
 "scene": "17523857",
 "tray": "-",
 "dom": "e2ce980",
-"cats": "9427df5f"
+"cats": "9427df5f",
+"weights": "188:febd5326"
 },
 {
 "t": 45.4,
@@ -375,7 +421,8 @@
 "scene": "d8b1443b",
 "tray": "-",
 "dom": "98bb77ab",
-"cats": "265f53d4"
+"cats": "265f53d4",
+"weights": "188:febd5326"
 },
 {
 "t": 46.4,
@@ -383,7 +430,8 @@
 "scene": "c759c46d",
 "tray": "-",
 "dom": "b3c42b94",
-"cats": "265f53d4"
+"cats": "265f53d4",
+"weights": "188:febd5326"
 },
 {
 "t": 47.4,
@@ -391,7 +439,8 @@
 "scene": "dea89d5b",
 "tray": "-",
 "dom": "4247f7b3",
-"cats": "5161f143"
+"cats": "5161f143",
+"weights": "188:febd5326"
 },
 {
 "t": 48.4,
@@ -399,7 +448,8 @@
 "scene": "fa0e1f34",
 "tray": "-",
 "dom": "b59802ca",
-"cats": "5161f143"
+"cats": "5161f143",
+"weights": "188:febd5326"
 },
 {
 "t": 49.4,
@@ -407,7 +457,8 @@
 "scene": "56864314",
 "tray": "-",
 "dom": "279c9306",
-"cats": "5161f143"
+"cats": "5161f143",
+"weights": "188:febd5326"
 },
 {
 "t": 50.4,
@@ -415,7 +466,8 @@
 "scene": "c0bdb3c3",
 "tray": "-",
 "dom": "139b382c",
-"cats": "f06eef84"
+"cats": "f06eef84",
+"weights": "188:febd5326"
 },
 {
 "t": 51.4,
@@ -423,7 +475,8 @@
 "scene": "e966517c",
 "tray": "-",
 "dom": "c5a624b3",
-"cats": "6cbd376f"
+"cats": "6cbd376f",
+"weights": "188:febd5326"
 },
 {
 "t": 52.4,
@@ -431,7 +484,8 @@
 "scene": "e75b1404",
 "tray": "-",
 "dom": "119a48f9",
-"cats": "fd19d724"
+"cats": "fd19d724",
+"weights": "211:d204c683"
 },
 {
 "t": 53.4,
@@ -439,7 +493,8 @@
 "scene": "6958fc3e",
 "tray": "-",
 "dom": "7ce77be1",
-"cats": "756992f8"
+"cats": "756992f8",
+"weights": "211:d204c683"
 },
 {
 "t": 54.4,
@@ -447,7 +502,8 @@
 "scene": "b5dbed61",
 "tray": "-",
 "dom": "b021748c",
-"cats": "efb02ce1"
+"cats": "efb02ce1",
+"weights": "212:85a541b2"
 },
 {
 "t": 55.4,
@@ -455,7 +511,8 @@
 "scene": "22a56ffc",
 "tray": "-",
 "dom": "3623c17f",
-"cats": "ef54fd1e"
+"cats": "ef54fd1e",
+"weights": "212:85a541b2"
 },
 {
 "t": 56.4,
@@ -463,7 +520,8 @@
 "scene": "84fd32c9",
 "tray": "-",
 "dom": "4f0cd6a1",
-"cats": "87b304f3"
+"cats": "87b304f3",
+"weights": "212:85a541b2"
 },
 {
 "t": 57.4,
@@ -471,7 +529,8 @@
 "scene": "1030950a",
 "tray": "-",
 "dom": "d1a6c004",
-"cats": "3beadf7f"
+"cats": "3beadf7f",
+"weights": "212:85a541b2"
 },
 {
 "t": 58.4,
@@ -479,7 +538,8 @@
 "scene": "9e20b5e8",
 "tray": "-",
 "dom": "60b11897",
-"cats": "95dba7b7"
+"cats": "95dba7b7",
+"weights": "230:354451dc"
 },
 {
 "t": 59.4,
@@ -487,7 +547,8 @@
 "scene": "270e16f0",
 "tray": "-",
 "dom": "3f3bffc3",
-"cats": "6f349a8"
+"cats": "6f349a8",
+"weights": "230:354451dc"
 },
 {
 "t": 60.4,
@@ -495,7 +556,8 @@
 "scene": "d58e1c46",
 "tray": "-",
 "dom": "8fb19c88",
-"cats": "9049c52a"
+"cats": "9049c52a",
+"weights": "230:354451dc"
 },
 {
 "t": 61.4,
@@ -503,7 +565,8 @@
 "scene": "d5833f79",
 "tray": "-",
 "dom": "39b43dcc",
-"cats": "b1741eac"
+"cats": "b1741eac",
+"weights": "230:354451dc"
 },
 {
 "t": 62.4,
@@ -511,7 +574,8 @@
 "scene": "8d793d27",
 "tray": "-",
 "dom": "3138c020",
-"cats": "70c7bc3b"
+"cats": "70c7bc3b",
+"weights": "230:354451dc"
 },
 {
 "t": 63.4,
@@ -519,7 +583,8 @@
 "scene": "3a551d27",
 "tray": "-",
 "dom": "a02555e3",
-"cats": "2a1fa8ab"
+"cats": "2a1fa8ab",
+"weights": "244:bde02c1a"
 },
 {
 "t": 64.4,
@@ -527,7 +592,8 @@
 "scene": "23de44d6",
 "tray": "-",
 "dom": "dbf3536f",
-"cats": "90ccefad"
+"cats": "90ccefad",
+"weights": "245:b17e001f"
 },
 {
 "t": 65.4,
@@ -535,7 +601,8 @@
 "scene": "633cb3f0",
 "tray": "-",
 "dom": "ebc688c",
-"cats": "6df7d985"
+"cats": "6df7d985",
+"weights": "245:b17e001f"
 },
 {
 "t": 66.4,
@@ -543,7 +610,8 @@
 "scene": "4e5ef2b8",
 "tray": "-",
 "dom": "9ca11c2e",
-"cats": "5e747f9b"
+"cats": "5e747f9b",
+"weights": "250:bfbda3af"
 },
 {
 "t": 67.4,
@@ -551,7 +619,8 @@
 "scene": "b8ab729d",
 "tray": "-",
 "dom": "5eb82f61",
-"cats": "5e747f9b"
+"cats": "5e747f9b",
+"weights": "250:bfbda3af"
 },
 {
 "t": 68.4,
@@ -559,7 +628,8 @@
 "scene": "7d0ef6e6",
 "tray": "-",
 "dom": "253cccbe",
-"cats": "66148dd"
+"cats": "66148dd",
+"weights": "263:c32085e8"
 },
 {
 "t": 69.4,
@@ -567,7 +637,8 @@
 "scene": "b66757c0",
 "tray": "-",
 "dom": "a6b343fc",
-"cats": "66148dd"
+"cats": "66148dd",
+"weights": "263:c32085e8"
 },
 {
 "t": 70.4,
@@ -575,7 +646,8 @@
 "scene": "279619e2",
 "tray": "-",
 "dom": "b20980fb",
-"cats": "66148dd"
+"cats": "66148dd",
+"weights": "263:c32085e8"
 },
 {
 "t": 71.4,
@@ -583,7 +655,8 @@
 "scene": "5f45872c",
 "tray": "-",
 "dom": "2ad98742",
-"cats": "66148dd"
+"cats": "66148dd",
+"weights": "263:c32085e8"
 },
 {
 "t": 72.4,
@@ -591,7 +664,8 @@
 "scene": "c105e2de",
 "tray": "-",
 "dom": "b0375a62",
-"cats": "66148dd"
+"cats": "66148dd",
+"weights": "265:88455a9a"
 },
 {
 "t": 73.4,
@@ -599,7 +673,8 @@
 "scene": "1e54be60",
 "tray": "-",
 "dom": "bc32dbbd",
-"cats": "66148dd"
+"cats": "66148dd",
+"weights": "265:88455a9a"
 },
 {
 "t": 74.4,
@@ -607,7 +682,8 @@
 "scene": "acf4eb36",
 "tray": "-",
 "dom": "cfcc455",
-"cats": "66148dd"
+"cats": "66148dd",
+"weights": "265:88455a9a"
 },
 {
 "t": 75.4,
@@ -615,7 +691,8 @@
 "scene": "a989bb3d",
 "tray": "-",
 "dom": "2d26dcc4",
-"cats": "e2dff0d9"
+"cats": "e2dff0d9",
+"weights": "283:17b61f8d"
 },
 {
 "t": 76.4,
@@ -623,7 +700,8 @@
 "scene": "22396d99",
 "tray": "-",
 "dom": "cc9d25ba",
-"cats": "a0d0b095"
+"cats": "a0d0b095",
+"weights": "295:84e7ee24"
 },
 {
 "t": 77.4,
@@ -631,7 +709,8 @@
 "scene": "b4052e48",
 "tray": "-",
 "dom": "6770c18c",
-"cats": "b9244346"
+"cats": "b9244346",
+"weights": "310:e76c913f"
 },
 {
 "t": 78.4,
@@ -639,7 +718,8 @@
 "scene": "9384f6b7",
 "tray": "-",
 "dom": "fa386bb4",
-"cats": "614ecfd2"
+"cats": "614ecfd2",
+"weights": "310:e76c913f"
 },
 {
 "t": 79.4,
@@ -647,7 +727,8 @@
 "scene": "14fe9c0d",
 "tray": "-",
 "dom": "ad285988",
-"cats": "6b56a834"
+"cats": "6b56a834",
+"weights": "310:e76c913f"
 },
 {
 "t": 80.4,
@@ -655,7 +736,8 @@
 "scene": "3d63a94e",
 "tray": "-",
 "dom": "7e7324c7",
-"cats": "1c0005c7"
+"cats": "1c0005c7",
+"weights": "310:e76c913f"
 },
 {
 "t": 81.4,
@@ -663,7 +745,8 @@
 "scene": "88af24b6",
 "tray": "-",
 "dom": "9eefc573",
-"cats": "33d84cff"
+"cats": "33d84cff",
+"weights": "327:deca64e5"
 },
 {
 "t": 82.4,
@@ -671,7 +754,8 @@
 "scene": "163ad6f9",
 "tray": "-",
 "dom": "b076c3d3",
-"cats": "fe43fe88"
+"cats": "fe43fe88",
+"weights": "327:deca64e5"
 },
 {
 "t": 83.4,
@@ -679,7 +763,8 @@
 "scene": "14d07ff3",
 "tray": "-",
 "dom": "40cd5fb9",
-"cats": "20bc5c84"
+"cats": "20bc5c84",
+"weights": "329:ff570bd7"
 },
 {
 "t": 84.4,
@@ -687,7 +772,8 @@
 "scene": "708ace5e",
 "tray": "-",
 "dom": "e3e70662",
-"cats": "73a88e34"
+"cats": "73a88e34",
+"weights": "334:c6eb7"
 },
 {
 "t": 85.4,
@@ -695,7 +781,8 @@
 "scene": "c27d74c1",
 "tray": "-",
 "dom": "174410e4",
-"cats": "f0ba4453"
+"cats": "f0ba4453",
+"weights": "334:c6eb7"
 },
 {
 "t": 86.4,
@@ -703,7 +790,8 @@
 "scene": "3fa00d7",
 "tray": "-",
 "dom": "145ba020",
-"cats": "42118c9c"
+"cats": "42118c9c",
+"weights": "334:c6eb7"
 },
 {
 "t": 87.4,
@@ -711,7 +799,8 @@
 "scene": "445ca255",
 "tray": "-",
 "dom": "9b9d69fe",
-"cats": "e08ec59d"
+"cats": "e08ec59d",
+"weights": "334:c6eb7"
 },
 {
 "t": 88.4,
@@ -719,7 +808,8 @@
 "scene": "f0017ccb",
 "tray": "-",
 "dom": "5a0661ce",
-"cats": "9b0223a"
+"cats": "9b0223a",
+"weights": "335:402097a1"
 },
 {
 "t": 89.4,
@@ -727,7 +817,8 @@
 "scene": "269b97c1",
 "tray": "-",
 "dom": "821ce80a",
-"cats": "9b0223a"
+"cats": "9b0223a",
+"weights": "335:402097a1"
 },
 {
 "t": 90.4,
@@ -735,7 +826,8 @@
 "scene": "a37db47f",
 "tray": "-",
 "dom": "b91ae063",
-"cats": "9b0223a"
+"cats": "9b0223a",
+"weights": "335:402097a1"
 },
 {
 "t": 91.4,
@@ -743,7 +835,8 @@
 "scene": "c03939e7",
 "tray": "-",
 "dom": "af76eddf",
-"cats": "9b0223a"
+"cats": "9b0223a",
+"weights": "337:10e04387"
 },
 {
 "t": 92.4,
@@ -751,7 +844,8 @@
 "scene": "342b5e94",
 "tray": "-",
 "dom": "688435fb",
-"cats": "9b0223a"
+"cats": "9b0223a",
+"weights": "337:10e04387"
 },
 {
 "t": 93.4,
@@ -759,7 +853,8 @@
 "scene": "9f3371a4",
 "tray": "-",
 "dom": "38197533",
-"cats": "9b0223a"
+"cats": "9b0223a",
+"weights": "342:bc873ec7"
 },
 {
 "t": 94.4,
@@ -767,7 +862,8 @@
 "scene": "12992845",
 "tray": "-",
 "dom": "643b0358",
-"cats": "9b0223a"
+"cats": "9b0223a",
+"weights": "342:bc873ec7"
 },
 {
 "t": 95.4,
@@ -775,7 +871,8 @@
 "scene": "c4029d68",
 "tray": "-",
 "dom": "8c6a2a51",
-"cats": "9b0223a"
+"cats": "9b0223a",
+"weights": "342:bc873ec7"
 },
 {
 "t": 96.4,
@@ -783,7 +880,8 @@
 "scene": "68d82050",
 "tray": "-",
 "dom": "18db2486",
-"cats": "9b0223a"
+"cats": "9b0223a",
+"weights": "344:970247bd"
 },
 {
 "t": 97.4,
@@ -791,7 +889,8 @@
 "scene": "cee62e99",
 "tray": "-",
 "dom": "ce5b76bc",
-"cats": "9b0223a"
+"cats": "9b0223a",
+"weights": "344:970247bd"
 },
 {
 "t": 98.4,
@@ -799,7 +898,8 @@
 "scene": "63508797",
 "tray": "-",
 "dom": "3ea8e412",
-"cats": "9b0223a"
+"cats": "9b0223a",
+"weights": "344:970247bd"
 },
 {
 "t": 99.4,
@@ -807,7 +907,8 @@
 "scene": "12cb5fa3",
 "tray": "-",
 "dom": "efb510a8",
-"cats": "9b0223a"
+"cats": "9b0223a",
+"weights": "345:7230db7a"
 },
 {
 "t": 100.4,
@@ -815,7 +916,8 @@
 "scene": "e75bfdcd",
 "tray": "-",
 "dom": "5feb95ab",
-"cats": "164a0847"
+"cats": "164a0847",
+"weights": "361:b09f75a1"
 },
 {
 "t": 101.4,
@@ -823,7 +925,8 @@
 "scene": "d6efcaed",
 "tray": "-",
 "dom": "e83bbeb7",
-"cats": "164a0847"
+"cats": "164a0847",
+"weights": "361:b09f75a1"
 },
 {
 "t": 102.4,
@@ -831,7 +934,8 @@
 "scene": "b7e18a41",
 "tray": "-",
 "dom": "ea4b2208",
-"cats": "164a0847"
+"cats": "164a0847",
+"weights": "364:79d2e985"
 },
 {
 "t": 103.4,
@@ -839,7 +943,8 @@
 "scene": "3e299748",
 "tray": "-",
 "dom": "4d59524d",
-"cats": "164a0847"
+"cats": "164a0847",
+"weights": "364:79d2e985"
 },
 {
 "t": 104.4,
@@ -847,7 +952,8 @@
 "scene": "cd039bf5",
 "tray": "-",
 "dom": "ec89de97",
-"cats": "164a0847"
+"cats": "164a0847",
+"weights": "364:79d2e985"
 },
 {
 "t": 105.4,
@@ -855,7 +961,8 @@
 "scene": "64df68d1",
 "tray": "-",
 "dom": "3973ebf0",
-"cats": "164a0847"
+"cats": "164a0847",
+"weights": "369:dba97ad5"
 },
 {
 "t": 106.4,
@@ -863,7 +970,8 @@
 "scene": "a451b310",
 "tray": "-",
 "dom": "1a4ba9e",
-"cats": "164a0847"
+"cats": "164a0847",
+"weights": "369:dba97ad5"
 },
 {
 "t": 107.4,
@@ -871,7 +979,8 @@
 "scene": "6c87b0b9",
 "tray": "-",
 "dom": "12718bf6",
-"cats": "46ec896b"
+"cats": "46ec896b",
+"weights": "385:34c46172"
 },
 {
 "t": 108.4,
@@ -879,7 +988,8 @@
 "scene": "d6d60914",
 "tray": "-",
 "dom": "26f479b9",
-"cats": "629c31bf"
+"cats": "629c31bf",
+"weights": "385:34c46172"
 },
 {
 "t": 109.4,
@@ -887,7 +997,8 @@
 "scene": "8e071180",
 "tray": "-",
 "dom": "8fbf1a90",
-"cats": "c8231dd8"
+"cats": "c8231dd8",
+"weights": "386:fc08e37d"
 },
 {
 "t": 110.4,
@@ -895,7 +1006,8 @@
 "scene": "f4d5d02c",
 "tray": "-",
 "dom": "b1a6b263",
-"cats": "783e69d1"
+"cats": "783e69d1",
+"weights": "401:15109e94"
 },
 {
 "t": 111.4,
@@ -903,7 +1015,8 @@
 "scene": "6d640fc1",
 "tray": "-",
 "dom": "839ee85e",
-"cats": "8650f2ee"
+"cats": "8650f2ee",
+"weights": "401:15109e94"
 },
 {
 "t": 112.4,
@@ -911,7 +1024,8 @@
 "scene": "fa67f16f",
 "tray": "-",
 "dom": "769fc68",
-"cats": "72ffecaa"
+"cats": "72ffecaa",
+"weights": "402:2f15837d"
 },
 {
 "t": 113.4,
@@ -919,7 +1033,8 @@
 "scene": "90f1c1f7",
 "tray": "-",
 "dom": "844afa43",
-"cats": "56dfbe20"
+"cats": "56dfbe20",
+"weights": "402:2f15837d"
 },
 {
 "t": 114.4,
@@ -927,7 +1042,8 @@
 "scene": "f1e19919",
 "tray": "-",
 "dom": "17420e07",
-"cats": "5d04019c"
+"cats": "5d04019c",
+"weights": "422:10b58474"
 },
 {
 "t": 115.4,
@@ -935,7 +1051,8 @@
 "scene": "65ea1ee3",
 "tray": "-",
 "dom": "63ba7ecc",
-"cats": "8b93dc53"
+"cats": "8b93dc53",
+"weights": "423:54d7e431"
 },
 {
 "t": 116.4,
@@ -943,7 +1060,8 @@
 "scene": "3308bae9",
 "tray": "-",
 "dom": "3fb964a2",
-"cats": "e7f0585c"
+"cats": "e7f0585c",
+"weights": "423:54d7e431"
 },
 {
 "t": 117.4,
@@ -951,7 +1069,8 @@
 "scene": "64016998",
 "tray": "-",
 "dom": "88d5c148",
-"cats": "e7f0585c"
+"cats": "e7f0585c",
+"weights": "423:54d7e431"
 },
 {
 "t": 118.4,
@@ -959,7 +1078,8 @@
 "scene": "400da3df",
 "tray": "-",
 "dom": "12860654",
-"cats": "47455df"
+"cats": "47455df",
+"weights": "440:b396ec87"
 },
 {
 "t": 119.4,
@@ -967,7 +1087,8 @@
 "scene": "f44768fd",
 "tray": "-",
 "dom": "6616b52a",
-"cats": "e2f528d1"
+"cats": "e2f528d1",
+"weights": "442:ba42e72d"
 },
 {
 "t": 120.4,
@@ -975,7 +1096,8 @@
 "scene": "66ad27d7",
 "tray": "-",
 "dom": "ad523eec",
-"cats": "9936159"
+"cats": "9936159",
+"weights": "457:67f9bb24"
 },
 {
 "t": 121.4,
@@ -983,7 +1105,8 @@
 "scene": "fdec29af",
 "tray": "-",
 "dom": "3800af5c",
-"cats": "a41c6869"
+"cats": "a41c6869",
+"weights": "457:67f9bb24"
 },
 {
 "t": 122.4,
@@ -991,7 +1114,8 @@
 "scene": "f5be8d4a",
 "tray": "-",
 "dom": "65b5cd40",
-"cats": "63bb39b5"
+"cats": "63bb39b5",
+"weights": "457:67f9bb24"
 },
 {
 "t": 123.4,
@@ -999,7 +1123,8 @@
 "scene": "61ee0085",
 "tray": "-",
 "dom": "f354b2fe",
-"cats": "2519759b"
+"cats": "2519759b",
+"weights": "474:d5d244a4"
 },
 {
 "t": 124.4,
@@ -1007,7 +1132,8 @@
 "scene": "5f20d6fc",
 "tray": "-",
 "dom": "11a2cada",
-"cats": "24895f15"
+"cats": "24895f15",
+"weights": "479:f1d81c36"
 },
 {
 "t": 125.4,
@@ -1015,7 +1141,8 @@
 "scene": "5cbc29e2",
 "tray": "-",
 "dom": "cc42e0ac",
-"cats": "dbf8b4cc"
+"cats": "dbf8b4cc",
+"weights": "479:f1d81c36"
 },
 {
 "t": 126.4,
@@ -1023,7 +1150,8 @@
 "scene": "72e93180",
 "tray": "-",
 "dom": "78d3dd0d",
-"cats": "a4708634"
+"cats": "a4708634",
+"weights": "479:f1d81c36"
 },
 {
 "t": 127.4,
@@ -1031,7 +1159,8 @@
 "scene": "73d1df60",
 "tray": "-",
 "dom": "89cf36d4",
-"cats": "a4708634"
+"cats": "a4708634",
+"weights": "479:f1d81c36"
 },
 {
 "t": 128.4,
@@ -1039,7 +1168,8 @@
 "scene": "39c26d5d",
 "tray": "-",
 "dom": "d81a124e",
-"cats": "f1a95b0b"
+"cats": "f1a95b0b",
+"weights": "490:51affab2"
 },
 {
 "t": 129.4,
@@ -1047,7 +1177,8 @@
 "scene": "baffd822",
 "tray": "-",
 "dom": "1b92b405",
-"cats": "f1a95b0b"
+"cats": "f1a95b0b",
+"weights": "491:ea8653e7"
 },
 {
 "t": 130.4,
@@ -1055,7 +1186,8 @@
 "scene": "7d2e2550",
 "tray": "-",
 "dom": "609a61dc",
-"cats": "f1a95b0b"
+"cats": "f1a95b0b",
+"weights": "491:ea8653e7"
 },
 {
 "t": 131.4,
@@ -1063,7 +1195,8 @@
 "scene": "b7e602a0",
 "tray": "-",
 "dom": "4e79dac0",
-"cats": "2be3e5e3"
+"cats": "2be3e5e3",
+"weights": "507:d807b9f6"
 },
 {
 "t": 132.4,
@@ -1071,7 +1204,8 @@
 "scene": "ea83973",
 "tray": "-",
 "dom": "7eb564e",
-"cats": "2aafc088"
+"cats": "2aafc088",
+"weights": "507:d807b9f6"
 },
 {
 "t": 133.4,
@@ -1079,7 +1213,8 @@
 "scene": "a291f341",
 "tray": "-",
 "dom": "943522b6",
-"cats": "fdd128da"
+"cats": "fdd128da",
+"weights": "523:84db6e2c"
 },
 {
 "t": 134.4,
@@ -1087,7 +1222,8 @@
 "scene": "38e41f61",
 "tray": "-",
 "dom": "6e9af303",
-"cats": "6d85f417"
+"cats": "6d85f417",
+"weights": "523:84db6e2c"
 },
 {
 "t": 135.4,
@@ -1095,7 +1231,8 @@
 "scene": "48ea990",
 "tray": "-",
 "dom": "47e0b9d",
-"cats": "a9401fb1"
+"cats": "a9401fb1",
+"weights": "523:84db6e2c"
 },
 {
 "t": 136.4,
@@ -1103,7 +1240,8 @@
 "scene": "ef88184",
 "tray": "-",
 "dom": "81d97e8b",
-"cats": "28701b5f"
+"cats": "28701b5f",
+"weights": "523:84db6e2c"
 },
 {
 "t": 137.4,
@@ -1111,7 +1249,8 @@
 "scene": "9e3395e5",
 "tray": "-",
 "dom": "6181a744",
-"cats": "2408e24"
+"cats": "2408e24",
+"weights": "523:84db6e2c"
 },
 {
 "t": 138.4,
@@ -1119,7 +1258,8 @@
 "scene": "54bef476",
 "tray": "-",
 "dom": "3af8707c",
-"cats": "4b45dd2d"
+"cats": "4b45dd2d",
+"weights": "536:db74ecb2"
 },
 {
 "t": 139.4,
@@ -1127,7 +1267,8 @@
 "scene": "b6979561",
 "tray": "-",
 "dom": "e5fd3f29",
-"cats": "e5c303a0"
+"cats": "e5c303a0",
+"weights": "536:db74ecb2"
 },
 {
 "t": 140.4,
@@ -1135,7 +1276,8 @@
 "scene": "48a6383d",
 "tray": "-",
 "dom": "f8113f3b",
-"cats": "579fa29e"
+"cats": "579fa29e",
+"weights": "536:db74ecb2"
 },
 {
 "t": 141.4,
@@ -1143,7 +1285,8 @@
 "scene": "1388649a",
 "tray": "-",
 "dom": "a70d6e89",
-"cats": "579fa29e"
+"cats": "579fa29e",
+"weights": "536:db74ecb2"
 },
 {
 "t": 142.4,
@@ -1151,7 +1294,8 @@
 "scene": "79e171b0",
 "tray": "-",
 "dom": "c6db55b7",
-"cats": "d71966d6"
+"cats": "d71966d6",
+"weights": "536:db74ecb2"
 },
 {
 "t": 143.4,
@@ -1159,7 +1303,8 @@
 "scene": "cf0f650",
 "tray": "-",
 "dom": "2803091e",
-"cats": "c4717561"
+"cats": "c4717561",
+"weights": "547:d70c85e0"
 },
 {
 "t": 144.4,
@@ -1167,7 +1312,8 @@
 "scene": "2d635da2",
 "tray": "-",
 "dom": "cd0e482f",
-"cats": "884bf88b"
+"cats": "884bf88b",
+"weights": "557:1509feaf"
 },
 {
 "t": 145.4,
@@ -1175,7 +1321,8 @@
 "scene": "4094cb2f",
 "tray": "-",
 "dom": "cf342c54",
-"cats": "9d60bb4e"
+"cats": "9d60bb4e",
+"weights": "557:1509feaf"
 },
 {
 "t": 146.4,
@@ -1183,7 +1330,8 @@
 "scene": "b91304f6",
 "tray": "-",
 "dom": "3568ef98",
-"cats": "6898014c"
+"cats": "6898014c",
+"weights": "571:43d1b975"
 },
 {
 "t": 147.4,
@@ -1191,7 +1339,8 @@
 "scene": "a3ef8b47",
 "tray": "-",
 "dom": "d850d2d0",
-"cats": "6898014c"
+"cats": "6898014c",
+"weights": "571:43d1b975"
 },
 {
 "t": 148.4,
@@ -1199,7 +1348,8 @@
 "scene": "56f3f5ff",
 "tray": "-",
 "dom": "1b304890",
-"cats": "6898014c"
+"cats": "6898014c",
+"weights": "571:43d1b975"
 },
 {
 "t": 149.4,
@@ -1207,7 +1357,8 @@
 "scene": "a91a5a23",
 "tray": "-",
 "dom": "4ccfc632",
-"cats": "a58d3f01"
+"cats": "a58d3f01",
+"weights": "571:43d1b975"
 },
 {
 "t": 150.4,
@@ -1215,7 +1366,8 @@
 "scene": "68eaa7a2",
 "tray": "-",
 "dom": "ffd83a6b",
-"cats": "a58d3f01"
+"cats": "a58d3f01",
+"weights": "571:43d1b975"
 },
 {
 "t": 151.4,
@@ -1223,7 +1375,8 @@
 "scene": "1e3862a5",
 "tray": "-",
 "dom": "896d128e",
-"cats": "c2cfdd2b"
+"cats": "c2cfdd2b",
+"weights": "582:9bd4704b"
 },
 {
 "t": 152.4,
@@ -1231,7 +1384,8 @@
 "scene": "838f0c4d",
 "tray": "-",
 "dom": "47566639",
-"cats": "8f901129"
+"cats": "8f901129",
+"weights": "594:366f8cd2"
 },
 {
 "t": 153.4,
@@ -1239,7 +1393,8 @@
 "scene": "b683f44",
 "tray": "-",
 "dom": "43d69f61",
-"cats": "3dc8a3ba"
+"cats": "3dc8a3ba",
+"weights": "594:366f8cd2"
 },
 {
 "t": 154.4,
@@ -1247,7 +1402,8 @@
 "scene": "880f4437",
 "tray": "-",
 "dom": "6708c9ff",
-"cats": "6208c583"
+"cats": "6208c583",
+"weights": "594:366f8cd2"
 },
 {
 "t": 155.4,
@@ -1255,7 +1411,8 @@
 "scene": "2bda74c7",
 "tray": "-",
 "dom": "3be62e5d",
-"cats": "2d3de10b"
+"cats": "2d3de10b",
+"weights": "594:366f8cd2"
 },
 {
 "t": 156.4,
@@ -1263,7 +1420,8 @@
 "scene": "73195aa8",
 "tray": "-",
 "dom": "e4d92c9c",
-"cats": "c33a08eb"
+"cats": "c33a08eb",
+"weights": "594:366f8cd2"
 },
 {
 "t": 157.4,
@@ -1271,7 +1429,8 @@
 "scene": "356f4d27",
 "tray": "-",
 "dom": "2f57e42",
-"cats": "3bb8476b"
+"cats": "3bb8476b",
+"weights": "608:9e657004"
 },
 {
 "t": 158.4,
@@ -1279,7 +1438,8 @@
 "scene": "83795f49",
 "tray": "-",
 "dom": "c26101d8",
-"cats": "fc953650"
+"cats": "fc953650",
+"weights": "608:9e657004"
 },
 {
 "t": 159.4,
@@ -1287,7 +1447,8 @@
 "scene": "4a311a58",
 "tray": "-",
 "dom": "c08c9fdd",
-"cats": "6a6bb6ec"
+"cats": "6a6bb6ec",
+"weights": "608:9e657004"
 },
 {
 "t": 160.267,
@@ -1295,7 +1456,8 @@
 "scene": "9851a4ab",
 "tray": "-",
 "dom": "a2a978e7",
-"cats": "6376fac"
+"cats": "6376fac",
+"weights": "608:9e657004"
 },
 {
 "t": 161.267,
@@ -1303,7 +1465,8 @@
 "scene": "977c9a22",
 "tray": "-",
 "dom": "560de61e",
-"cats": "40fb8c70"
+"cats": "40fb8c70",
+"weights": "608:9e657004"
 },
 {
 "t": 162.267,
@@ -1311,7 +1474,8 @@
 "scene": "f086fb4e",
 "tray": "-",
 "dom": "f9112e40",
-"cats": "aad00438"
+"cats": "aad00438",
+"weights": "620:6a6f6e8c"
 },
 {
 "t": 163.267,
@@ -1319,7 +1483,8 @@
 "scene": "bd327c90",
 "tray": "-",
 "dom": "673cf641",
-"cats": "de75aaab"
+"cats": "de75aaab",
+"weights": "620:6a6f6e8c"
 },
 {
 "t": 164.267,
@@ -1327,7 +1492,8 @@
 "scene": "f83523fd",
 "tray": "-",
 "dom": "e0aa5413",
-"cats": "cc81081d"
+"cats": "cc81081d",
+"weights": "620:6a6f6e8c"
 },
 {
 "t": 165.267,
@@ -1335,7 +1501,8 @@
 "scene": "9af5b351",
 "tray": "-",
 "dom": "5a83eef5",
-"cats": "6b3b4550"
+"cats": "6b3b4550",
+"weights": "620:6a6f6e8c"
 },
 {
 "t": 166.267,
@@ -1343,7 +1510,8 @@
 "scene": "472de64e",
 "tray": "-",
 "dom": "acdde687",
-"cats": "6b3b4550"
+"cats": "6b3b4550",
+"weights": "620:6a6f6e8c"
 },
 {
 "t": 167.267,
@@ -1351,7 +1519,8 @@
 "scene": "cdf9a4da",
 "tray": "-",
 "dom": "dc9c3df8",
-"cats": "c12edfb4"
+"cats": "c12edfb4",
+"weights": "648:2e1691d0"
 },
 {
 "t": 168.267,
@@ -1359,7 +1528,8 @@
 "scene": "8c347186",
 "tray": "-",
 "dom": "58efe66e",
-"cats": "b8847ff0"
+"cats": "b8847ff0",
+"weights": "660:3c8ecb2"
 },
 {
 "t": 169.267,
@@ -1367,7 +1537,8 @@
 "scene": "58f0ef09",
 "tray": "-",
 "dom": "99c0b83c",
-"cats": "2a0b0d60"
+"cats": "2a0b0d60",
+"weights": "660:3c8ecb2"
 },
 {
 "t": 170.267,
@@ -1375,7 +1546,8 @@
 "scene": "1a0b9855",
 "tray": "-",
 "dom": "19cfcf62",
-"cats": "ebdf0a7a"
+"cats": "ebdf0a7a",
+"weights": "660:3c8ecb2"
 },
 {
 "t": 171.267,
@@ -1383,7 +1555,8 @@
 "scene": "eb3fed4",
 "tray": "-",
 "dom": "5e18e350",
-"cats": "21d7a8ce"
+"cats": "21d7a8ce",
+"weights": "660:3c8ecb2"
 },
 {
 "t": 172.267,
@@ -1391,7 +1564,8 @@
 "scene": "6f5daba",
 "tray": "-",
 "dom": "99a34487",
-"cats": "a04c79d"
+"cats": "a04c79d",
+"weights": "660:3c8ecb2"
 }
 ],
 "frames": 4974,
@@ -1484,7 +1658,8 @@ false
 "nearby:1:fd9c753c",
 "sides:1:df64aee4",
 "sleepgod:1:4ce3490c"
-]
+],
+"weights": "660:3c8ecb2"
 }
 },
 "day2": {
@@ -1495,7 +1670,8 @@ false
 "scene": "a1e3c663",
 "tray": "-",
 "dom": "774977f0",
-"cats": "e4d85eed"
+"cats": "e4d85eed",
+"weights": "705:dc627a4a"
 },
 {
 "t": 1.033,
@@ -1503,7 +1679,8 @@ false
 "scene": "c63683e4",
 "tray": "-",
 "dom": "d4077ec2",
-"cats": "760d6a04"
+"cats": "760d6a04",
+"weights": "705:dc627a4a"
 },
 {
 "t": 2.033,
@@ -1511,7 +1688,8 @@ false
 "scene": "32fefe73",
 "tray": "-",
 "dom": "89a00848",
-"cats": "6e7fbe34"
+"cats": "6e7fbe34",
+"weights": "705:dc627a4a"
 },
 {
 "t": 3.033,
@@ -1519,7 +1697,8 @@ false
 "scene": "2f5ff2bb",
 "tray": "-",
 "dom": "f9595bae",
-"cats": "ba0da514"
+"cats": "ba0da514",
+"weights": "705:dc627a4a"
 },
 {
 "t": 4.033,
@@ -1527,7 +1706,8 @@ false
 "scene": "ed95ab14",
 "tray": "-",
 "dom": "14f31a0",
-"cats": "8b70396f"
+"cats": "8b70396f",
+"weights": "717:80d8e027"
 },
 {
 "t": 5.033,
@@ -1535,7 +1715,8 @@ false
 "scene": "2e3f4e04",
 "tray": "-",
 "dom": "b97b5ff5",
-"cats": "2d370ea6"
+"cats": "2d370ea6",
+"weights": "728:8273e14d"
 },
 {
 "t": 6.033,
@@ -1543,7 +1724,8 @@ false
 "scene": "702d31f0",
 "tray": "-",
 "dom": "63e5417",
-"cats": "70b2cae7"
+"cats": "70b2cae7",
+"weights": "728:8273e14d"
 },
 {
 "t": 7.033,
@@ -1551,7 +1733,8 @@ false
 "scene": "bbd50381",
 "tray": "-",
 "dom": "883a2d30",
-"cats": "10120b4e"
+"cats": "10120b4e",
+"weights": "728:8273e14d"
 },
 {
 "t": 8.033,
@@ -1559,7 +1742,8 @@ false
 "scene": "48a40bf9",
 "tray": "-",
 "dom": "bb054ffb",
-"cats": "b8690864"
+"cats": "b8690864",
+"weights": "731:9726a739"
 },
 {
 "t": 9.033,
@@ -1567,7 +1751,8 @@ false
 "scene": "7875c495",
 "tray": "-",
 "dom": "fdb4f229",
-"cats": "825546eb"
+"cats": "825546eb",
+"weights": "746:5adedef2"
 },
 {
 "t": 10.033,
@@ -1575,7 +1760,8 @@ false
 "scene": "11cdfe27",
 "tray": "-",
 "dom": "8eac52b4",
-"cats": "51a11056"
+"cats": "51a11056",
+"weights": "746:5adedef2"
 },
 {
 "t": 11.033,
@@ -1583,7 +1769,8 @@ false
 "scene": "1a08f337",
 "tray": "-",
 "dom": "26cdba3",
-"cats": "120a025e"
+"cats": "120a025e",
+"weights": "748:d479bba8"
 },
 {
 "t": 12.033,
@@ -1591,7 +1778,8 @@ false
 "scene": "3ef243e5",
 "tray": "-",
 "dom": "141cc24f",
-"cats": "9a10efae"
+"cats": "9a10efae",
+"weights": "748:d479bba8"
 },
 {
 "t": 13.033,
@@ -1599,7 +1787,8 @@ false
 "scene": "ace4a211",
 "tray": "-",
 "dom": "ce75fdc2",
-"cats": "6223cad"
+"cats": "6223cad",
+"weights": "748:d479bba8"
 },
 {
 "t": 14.033,
@@ -1607,7 +1796,8 @@ false
 "scene": "e665331f",
 "tray": "-",
 "dom": "5d38953d",
-"cats": "94e8f1e4"
+"cats": "94e8f1e4",
+"weights": "761:49421f25"
 },
 {
 "t": 15.033,
@@ -1615,7 +1805,8 @@ false
 "scene": "43c7a979",
 "tray": "-",
 "dom": "c9e04665",
-"cats": "cc3f03b6"
+"cats": "cc3f03b6",
+"weights": "761:49421f25"
 },
 {
 "t": 16.033,
@@ -1623,7 +1814,8 @@ false
 "scene": "f92eb9a0",
 "tray": "-",
 "dom": "f8a60b10",
-"cats": "6270305b"
+"cats": "6270305b",
+"weights": "762:81946402"
 },
 {
 "t": 17.033,
@@ -1631,7 +1823,8 @@ false
 "scene": "45f959ce",
 "tray": "-",
 "dom": "a4fb441a",
-"cats": "cf290d64"
+"cats": "cf290d64",
+"weights": "762:81946402"
 },
 {
 "t": 18.033,
@@ -1639,7 +1832,8 @@ false
 "scene": "c727559e",
 "tray": "-",
 "dom": "fb18e9b7",
-"cats": "ac39fa6c"
+"cats": "ac39fa6c",
+"weights": "774:96e383c3"
 },
 {
 "t": 19.033,
@@ -1647,7 +1841,8 @@ false
 "scene": "59a64431",
 "tray": "-",
 "dom": "86d6d2e7",
-"cats": "19703068"
+"cats": "19703068",
+"weights": "795:3bd629a3"
 },
 {
 "t": 20.033,
@@ -1655,7 +1850,8 @@ false
 "scene": "2f73d301",
 "tray": "-",
 "dom": "f3221914",
-"cats": "c39a5e7c"
+"cats": "c39a5e7c",
+"weights": "795:3bd629a3"
 },
 {
 "t": 21.033,
@@ -1663,7 +1859,8 @@ false
 "scene": "ab9d0345",
 "tray": "-",
 "dom": "f5f40f4c",
-"cats": "cb3f8172"
+"cats": "cb3f8172",
+"weights": "795:3bd629a3"
 },
 {
 "t": 22.033,
@@ -1671,7 +1868,8 @@ false
 "scene": "1a2ccf34",
 "tray": "-",
 "dom": "78ace73f",
-"cats": "f6cdb94b"
+"cats": "f6cdb94b",
+"weights": "805:a8c5ef84"
 },
 {
 "t": 23.033,
@@ -1679,7 +1877,8 @@ false
 "scene": "6fa67d59",
 "tray": "-",
 "dom": "efc6ca44",
-"cats": "3d4e2079"
+"cats": "3d4e2079",
+"weights": "805:a8c5ef84"
 },
 {
 "t": 24.033,
@@ -1687,7 +1886,8 @@ false
 "scene": "718e8b7e",
 "tray": "-",
 "dom": "ded1967a",
-"cats": "61d77a40"
+"cats": "61d77a40",
+"weights": "805:a8c5ef84"
 },
 {
 "t": 25.033,
@@ -1695,7 +1895,8 @@ false
 "scene": "88a8fd72",
 "tray": "-",
 "dom": "d0a75d64",
-"cats": "18c465ee"
+"cats": "18c465ee",
+"weights": "806:2a8ffd79"
 },
 {
 "t": 26.033,
@@ -1703,7 +1904,8 @@ false
 "scene": "6137ed26",
 "tray": "-",
 "dom": "e9908f29",
-"cats": "10d74e98"
+"cats": "10d74e98",
+"weights": "806:2a8ffd79"
 },
 {
 "t": 27.033,
@@ -1711,7 +1913,8 @@ false
 "scene": "d154e48e",
 "tray": "-",
 "dom": "9bb460ef",
-"cats": "469f777b"
+"cats": "469f777b",
+"weights": "806:2a8ffd79"
 },
 {
 "t": 28.033,
@@ -1719,7 +1922,8 @@ false
 "scene": "5c292ff3",
 "tray": "-",
 "dom": "c5a1229e",
-"cats": "a446611d"
+"cats": "a446611d",
+"weights": "806:2a8ffd79"
 },
 {
 "t": 29.033,
@@ -1727,7 +1931,8 @@ false
 "scene": "cd89822d",
 "tray": "-",
 "dom": "a1a8edcf",
-"cats": "e27280df"
+"cats": "e27280df",
+"weights": "806:2a8ffd79"
 },
 {
 "t": 30.033,
@@ -1735,7 +1940,8 @@ false
 "scene": "549392b4",
 "tray": "-",
 "dom": "a0d208fa",
-"cats": "a2191bea"
+"cats": "a2191bea",
+"weights": "806:2a8ffd79"
 },
 {
 "t": 31.033,
@@ -1743,7 +1949,8 @@ false
 "scene": "35fe3e38",
 "tray": "-",
 "dom": "b424e931",
-"cats": "255f63fe"
+"cats": "255f63fe",
+"weights": "807:e5cb1eaa"
 },
 {
 "t": 32.033,
@@ -1751,7 +1958,8 @@ false
 "scene": "c904e2b9",
 "tray": "-",
 "dom": "87340cd8",
-"cats": "cba34f05"
+"cats": "cba34f05",
+"weights": "817:b2e059"
 },
 {
 "t": 33.033,
@@ -1759,7 +1967,8 @@ false
 "scene": "e51dc52a",
 "tray": "-",
 "dom": "78daea42",
-"cats": "baccffe0"
+"cats": "baccffe0",
+"weights": "828:5218ab39"
 },
 {
 "t": 34.033,
@@ -1767,7 +1976,8 @@ false
 "scene": "ba055bf1",
 "tray": "-",
 "dom": "716ab822",
-"cats": "9aa45ad5"
+"cats": "9aa45ad5",
+"weights": "828:5218ab39"
 },
 {
 "t": 35.033,
@@ -1775,7 +1985,8 @@ false
 "scene": "9711e43e",
 "tray": "-",
 "dom": "6bed5836",
-"cats": "bc3bef43"
+"cats": "bc3bef43",
+"weights": "844:9515c7b5"
 },
 {
 "t": 36.033,
@@ -1783,7 +1994,8 @@ false
 "scene": "5f4ed632",
 "tray": "-",
 "dom": "56751669",
-"cats": "274fda6c"
+"cats": "274fda6c",
+"weights": "844:9515c7b5"
 },
 {
 "t": 37.033,
@@ -1791,7 +2003,8 @@ false
 "scene": "370473c3",
 "tray": "-",
 "dom": "502c92f5",
-"cats": "45cf72df"
+"cats": "45cf72df",
+"weights": "844:9515c7b5"
 },
 {
 "t": 38.033,
@@ -1799,7 +2012,8 @@ false
 "scene": "c75117d",
 "tray": "-",
 "dom": "9e132dff",
-"cats": "b8217d32"
+"cats": "b8217d32",
+"weights": "858:d33e8e8c"
 },
 {
 "t": 39.033,
@@ -1807,7 +2021,8 @@ false
 "scene": "6a088dcd",
 "tray": "-",
 "dom": "27a1692b",
-"cats": "187d032e"
+"cats": "187d032e",
+"weights": "858:d33e8e8c"
 },
 {
 "t": 40.033,
@@ -1815,7 +2030,8 @@ false
 "scene": "4812a21",
 "tray": "-",
 "dom": "827c15de",
-"cats": "94c8e88"
+"cats": "94c8e88",
+"weights": "860:5f312004"
 },
 {
 "t": 41.033,
@@ -1823,7 +2039,8 @@ false
 "scene": "87761a74",
 "tray": "-",
 "dom": "8606700a",
-"cats": "7c227639"
+"cats": "7c227639",
+"weights": "860:5f312004"
 },
 {
 "t": 42.033,
@@ -1831,7 +2048,8 @@ false
 "scene": "73ff72cf",
 "tray": "-",
 "dom": "4c993cda",
-"cats": "7e0dd8fd"
+"cats": "7e0dd8fd",
+"weights": "861:bcfdb6f1"
 },
 {
 "t": 43.033,
@@ -1839,7 +2057,8 @@ false
 "scene": "af6a5e04",
 "tray": "-",
 "dom": "c3187908",
-"cats": "6aaa7304"
+"cats": "6aaa7304",
+"weights": "861:bcfdb6f1"
 },
 {
 "t": 44.033,
@@ -1847,7 +2066,8 @@ false
 "scene": "1604d99d",
 "tray": "-",
 "dom": "3a05ebfd",
-"cats": "3f6a3667"
+"cats": "3f6a3667",
+"weights": "861:bcfdb6f1"
 },
 {
 "t": 45.033,
@@ -1855,7 +2075,8 @@ false
 "scene": "3af21ced",
 "tray": "-",
 "dom": "8e82f525",
-"cats": "1a22e361"
+"cats": "1a22e361",
+"weights": "874:97766f57"
 },
 {
 "t": 46.033,
@@ -1863,7 +2084,8 @@ false
 "scene": "81146677",
 "tray": "-",
 "dom": "bb808dc6",
-"cats": "9db94e2c"
+"cats": "9db94e2c",
+"weights": "874:97766f57"
 },
 {
 "t": 47.033,
@@ -1871,7 +2093,8 @@ false
 "scene": "d54c137f",
 "tray": "-",
 "dom": "347f194c",
-"cats": "bc401977"
+"cats": "bc401977",
+"weights": "874:97766f57"
 },
 {
 "t": 48.033,
@@ -1879,7 +2102,8 @@ false
 "scene": "93e23b98",
 "tray": "-",
 "dom": "8870c143",
-"cats": "ff88e490"
+"cats": "ff88e490",
+"weights": "874:97766f57"
 },
 {
 "t": 49.033,
@@ -1887,7 +2111,8 @@ false
 "scene": "45c3c7ec",
 "tray": "-",
 "dom": "b07a010f",
-"cats": "ff88e490"
+"cats": "ff88e490",
+"weights": "874:97766f57"
 },
 {
 "t": 50.033,
@@ -1895,7 +2120,8 @@ false
 "scene": "37017bb8",
 "tray": "-",
 "dom": "8855e070",
-"cats": "1a65761"
+"cats": "1a65761",
+"weights": "874:97766f57"
 },
 {
 "t": 51.033,
@@ -1903,7 +2129,8 @@ false
 "scene": "cd2b888d",
 "tray": "-",
 "dom": "5f213ce9",
-"cats": "1a65761"
+"cats": "1a65761",
+"weights": "877:1ed6430a"
 },
 {
 "t": 52.033,
@@ -1911,7 +2138,8 @@ false
 "scene": "48e0eba3",
 "tray": "-",
 "dom": "94412ba4",
-"cats": "c57eff20"
+"cats": "c57eff20",
+"weights": "894:9e43faa4"
 },
 {
 "t": 53.033,
@@ -1919,7 +2147,8 @@ false
 "scene": "d94bdacd",
 "tray": "-",
 "dom": "8b9ff1cf",
-"cats": "ce48ba2c"
+"cats": "ce48ba2c",
+"weights": "894:9e43faa4"
 },
 {
 "t": 54.033,
@@ -1927,7 +2156,8 @@ false
 "scene": "ae6e8bbd",
 "tray": "-",
 "dom": "e2450588",
-"cats": "6b9a8c51"
+"cats": "6b9a8c51",
+"weights": "894:9e43faa4"
 },
 {
 "t": 55.033,
@@ -1935,7 +2165,8 @@ false
 "scene": "69d47d93",
 "tray": "-",
 "dom": "52bce2cb",
-"cats": "48aaa798"
+"cats": "48aaa798",
+"weights": "906:9e5f3ec7"
 },
 {
 "t": 56.033,
@@ -1943,7 +2174,8 @@ false
 "scene": "67c19fd",
 "tray": "-",
 "dom": "6f08b65",
-"cats": "838a2f23"
+"cats": "838a2f23",
+"weights": "906:9e5f3ec7"
 },
 {
 "t": 57.033,
@@ -1951,7 +2183,8 @@ false
 "scene": "d70c006b",
 "tray": "-",
 "dom": "f01e34a7",
-"cats": "e2f55426"
+"cats": "e2f55426",
+"weights": "906:9e5f3ec7"
 },
 {
 "t": 58.033,
@@ -1959,7 +2192,8 @@ false
 "scene": "7ba2f0a3",
 "tray": "-",
 "dom": "9ae76988",
-"cats": "94a3ef78"
+"cats": "94a3ef78",
+"weights": "906:9e5f3ec7"
 },
 {
 "t": 59.033,
@@ -1967,7 +2201,8 @@ false
 "scene": "f03e19da",
 "tray": "-",
 "dom": "ff55ae68",
-"cats": "264b81a7"
+"cats": "264b81a7",
+"weights": "917:74046e29"
 },
 {
 "t": 60.033,
@@ -1975,7 +2210,8 @@ false
 "scene": "ad111870",
 "tray": "-",
 "dom": "a1d7ff8f",
-"cats": "b8148316"
+"cats": "b8148316",
+"weights": "929:fe4966b4"
 },
 {
 "t": 61.033,
@@ -1983,7 +2219,8 @@ false
 "scene": "10b1498f",
 "tray": "-",
 "dom": "e64e04a1",
-"cats": "cd480a44"
+"cats": "cd480a44",
+"weights": "929:fe4966b4"
 },
 {
 "t": 62.033,
@@ -1991,7 +2228,8 @@ false
 "scene": "21ce0ab7",
 "tray": "-",
 "dom": "8e5ffdc3",
-"cats": "19dd6462"
+"cats": "19dd6462",
+"weights": "931:b40dfd1c"
 },
 {
 "t": 63.033,
@@ -1999,7 +2237,8 @@ false
 "scene": "8bb9e78d",
 "tray": "-",
 "dom": "63161b7a",
-"cats": "407d31e"
+"cats": "407d31e",
+"weights": "932:6aac7af"
 },
 {
 "t": 64.033,
@@ -2007,7 +2246,8 @@ false
 "scene": "55654afc",
 "tray": "-",
 "dom": "958c10f7",
-"cats": "bca132f4"
+"cats": "bca132f4",
+"weights": "932:6aac7af"
 },
 {
 "t": 65.033,
@@ -2015,7 +2255,8 @@ false
 "scene": "be7f5130",
 "tray": "-",
 "dom": "8c5b91d1",
-"cats": "bfeb4d48"
+"cats": "bfeb4d48",
+"weights": "932:6aac7af"
 },
 {
 "t": 66.033,
@@ -2023,7 +2264,8 @@ false
 "scene": "6f0d02f6",
 "tray": "-",
 "dom": "4503f568",
-"cats": "a4c18396"
+"cats": "a4c18396",
+"weights": "932:6aac7af"
 },
 {
 "t": 67.033,
@@ -2031,7 +2273,8 @@ false
 "scene": "b8dc5aac",
 "tray": "-",
 "dom": "25fb8867",
-"cats": "79972582"
+"cats": "79972582",
+"weights": "932:6aac7af"
 },
 {
 "t": 68.033,
@@ -2039,7 +2282,8 @@ false
 "scene": "a886e78d",
 "tray": "-",
 "dom": "30e9fde1",
-"cats": "c10ec670"
+"cats": "c10ec670",
+"weights": "932:6aac7af"
 },
 {
 "t": 69.033,
@@ -2047,7 +2291,8 @@ false
 "scene": "7f168d39",
 "tray": "-",
 "dom": "7fb0bbb9",
-"cats": "c10ec670"
+"cats": "c10ec670",
+"weights": "934:3f983b83"
 },
 {
 "t": 70.033,
@@ -2055,7 +2300,8 @@ false
 "scene": "cd9ee506",
 "tray": "-",
 "dom": "96794348",
-"cats": "c10ec670"
+"cats": "c10ec670",
+"weights": "934:3f983b83"
 },
 {
 "t": 71.033,
@@ -2063,7 +2309,8 @@ false
 "scene": "ee704cb9",
 "tray": "-",
 "dom": "ec8da572",
-"cats": "b6bdaf3a"
+"cats": "b6bdaf3a",
+"weights": "950:2cc1d43a"
 },
 {
 "t": 72.033,
@@ -2071,7 +2318,8 @@ false
 "scene": "6dd83404",
 "tray": "-",
 "dom": "62d46a33",
-"cats": "276c6400"
+"cats": "276c6400",
+"weights": "950:2cc1d43a"
 },
 {
 "t": 73.033,
@@ -2079,7 +2327,8 @@ false
 "scene": "f68f84d0",
 "tray": "-",
 "dom": "7c43d424",
-"cats": "4bbcbe44"
+"cats": "4bbcbe44",
+"weights": "950:2cc1d43a"
 },
 {
 "t": 74.033,
@@ -2087,7 +2336,8 @@ false
 "scene": "452d9eca",
 "tray": "-",
 "dom": "dd709c60",
-"cats": "16711b61"
+"cats": "16711b61",
+"weights": "950:2cc1d43a"
 },
 {
 "t": 75.033,
@@ -2095,7 +2345,8 @@ false
 "scene": "68c92389",
 "tray": "-",
 "dom": "64fd2e6a",
-"cats": "d6d4922f"
+"cats": "d6d4922f",
+"weights": "950:2cc1d43a"
 },
 {
 "t": 76.033,
@@ -2103,7 +2354,8 @@ false
 "scene": "d1f55320",
 "tray": "-",
 "dom": "497d57dc",
-"cats": "d6d4922f"
+"cats": "d6d4922f",
+"weights": "950:2cc1d43a"
 },
 {
 "t": 77.033,
@@ -2111,7 +2363,8 @@ false
 "scene": "b239bb35",
 "tray": "-",
 "dom": "f32dbc9d",
-"cats": "efe740d8"
+"cats": "efe740d8",
+"weights": "962:402fce2b"
 },
 {
 "t": 78.033,
@@ -2119,7 +2372,8 @@ false
 "scene": "9d94e276",
 "tray": "-",
 "dom": "2de5b6da",
-"cats": "1709280"
+"cats": "1709280",
+"weights": "962:402fce2b"
 },
 {
 "t": 79.033,
@@ -2127,7 +2381,8 @@ false
 "scene": "89db3ac7",
 "tray": "-",
 "dom": "88403628",
-"cats": "9504d6bf"
+"cats": "9504d6bf",
+"weights": "966:dda41b2b"
 },
 {
 "t": 80.033,
@@ -2135,7 +2390,8 @@ false
 "scene": "251efeeb",
 "tray": "-",
 "dom": "a8bbf3bc",
-"cats": "d80c7e98"
+"cats": "d80c7e98",
+"weights": "966:dda41b2b"
 },
 {
 "t": 81.033,
@@ -2143,7 +2399,8 @@ false
 "scene": "27dd04c4",
 "tray": "-",
 "dom": "566d605f",
-"cats": "48c06db3"
+"cats": "48c06db3",
+"weights": "966:dda41b2b"
 },
 {
 "t": 82.033,
@@ -2151,7 +2408,8 @@ false
 "scene": "1f65c66a",
 "tray": "-",
 "dom": "8a741eec",
-"cats": "ae2ee999"
+"cats": "ae2ee999",
+"weights": "966:dda41b2b"
 },
 {
 "t": 83.033,
@@ -2159,7 +2417,8 @@ false
 "scene": "8b194169",
 "tray": "-",
 "dom": "7c771dcb",
-"cats": "256bf478"
+"cats": "256bf478",
+"weights": "981:d6d946be"
 },
 {
 "t": 84.033,
@@ -2167,7 +2426,8 @@ false
 "scene": "e016b6cf",
 "tray": "-",
 "dom": "c34ea435",
-"cats": "e04e75b6"
+"cats": "e04e75b6",
+"weights": "981:d6d946be"
 },
 {
 "t": 85.033,
@@ -2175,7 +2435,8 @@ false
 "scene": "8709bd3c",
 "tray": "-",
 "dom": "7132c6b5",
-"cats": "a41b819a"
+"cats": "a41b819a",
+"weights": "981:d6d946be"
 },
 {
 "t": 86.033,
@@ -2183,7 +2444,8 @@ false
 "scene": "2b9401a5",
 "tray": "-",
 "dom": "4012e66",
-"cats": "6e269aff"
+"cats": "6e269aff",
+"weights": "1007:a53878ad"
 },
 {
 "t": 87.033,
@@ -2191,7 +2453,8 @@ false
 "scene": "8e8c7452",
 "tray": "-",
 "dom": "7003b657",
-"cats": "e3d01e52"
+"cats": "e3d01e52",
+"weights": "1007:a53878ad"
 },
 {
 "t": 88.033,
@@ -2199,7 +2462,8 @@ false
 "scene": "5f6e2874",
 "tray": "-",
 "dom": "f8deddbf",
-"cats": "c6e77a"
+"cats": "c6e77a",
+"weights": "1007:a53878ad"
 },
 {
 "t": 89.033,
@@ -2207,7 +2471,8 @@ false
 "scene": "dedac133",
 "tray": "-",
 "dom": "72415968",
-"cats": "c6e77a"
+"cats": "c6e77a",
+"weights": "1009:e86f253"
 },
 {
 "t": 90.033,
@@ -2215,7 +2480,8 @@ false
 "scene": "28e02a05",
 "tray": "-",
 "dom": "55febc1c",
-"cats": "c6e77a"
+"cats": "c6e77a",
+"weights": "1009:e86f253"
 },
 {
 "t": 91.033,
@@ -2223,7 +2489,8 @@ false
 "scene": "6d76150a",
 "tray": "-",
 "dom": "37e943b",
-"cats": "c6e77a"
+"cats": "c6e77a",
+"weights": "1009:e86f253"
 },
 {
 "t": 92.033,
@@ -2231,7 +2498,8 @@ false
 "scene": "29f40a0d",
 "tray": "-",
 "dom": "e3f743a2",
-"cats": "c6e77a"
+"cats": "c6e77a",
+"weights": "1009:e86f253"
 },
 {
 "t": 93.033,
@@ -2239,7 +2507,8 @@ false
 "scene": "9711b13c",
 "tray": "-",
 "dom": "e39831f2",
-"cats": "c6e77a"
+"cats": "c6e77a",
+"weights": "1009:e86f253"
 },
 {
 "t": 94.033,
@@ -2247,7 +2516,8 @@ false
 "scene": "9b68469a",
 "tray": "-",
 "dom": "b0519afb",
-"cats": "7b04c643"
+"cats": "7b04c643",
+"weights": "1009:e86f253"
 },
 {
 "t": 95.033,
@@ -2255,7 +2525,8 @@ false
 "scene": "6b0b4227",
 "tray": "-",
 "dom": "34eb5f70",
-"cats": "7b04c643"
+"cats": "7b04c643",
+"weights": "1009:e86f253"
 },
 {
 "t": 96.033,
@@ -2263,7 +2534,8 @@ false
 "scene": "5ad7a94c",
 "tray": "-",
 "dom": "db243a29",
-"cats": "7b04c643"
+"cats": "7b04c643",
+"weights": "1009:e86f253"
 },
 {
 "t": 97.033,
@@ -2271,7 +2543,8 @@ false
 "scene": "c3b2b2b",
 "tray": "-",
 "dom": "935f5b85",
-"cats": "abb857be"
+"cats": "abb857be",
+"weights": "1009:e86f253"
 },
 {
 "t": 98.033,
@@ -2279,7 +2552,8 @@ false
 "scene": "15b24ab6",
 "tray": "-",
 "dom": "85de9134",
-"cats": "abb857be"
+"cats": "abb857be",
+"weights": "1009:e86f253"
 },
 {
 "t": 99.033,
@@ -2287,7 +2561,8 @@ false
 "scene": "d87127be",
 "tray": "-",
 "dom": "752f44e8",
-"cats": "1fb6d156"
+"cats": "1fb6d156",
+"weights": "1040:68463732"
 },
 {
 "t": 100.033,
@@ -2295,7 +2570,8 @@ false
 "scene": "7694b8e2",
 "tray": "-",
 "dom": "3b2382e9",
-"cats": "753734a7"
+"cats": "753734a7",
+"weights": "1045:586d158a"
 },
 {
 "t": 101.033,
@@ -2303,7 +2579,8 @@ false
 "scene": "a206455a",
 "tray": "-",
 "dom": "b6e84f95",
-"cats": "7cc5c85f"
+"cats": "7cc5c85f",
+"weights": "1045:586d158a"
 },
 {
 "t": 102.033,
@@ -2311,7 +2588,8 @@ false
 "scene": "f05c356c",
 "tray": "-",
 "dom": "1902ec50",
-"cats": "f9dbf673"
+"cats": "f9dbf673",
+"weights": "1045:586d158a"
 },
 {
 "t": 103.033,
@@ -2319,7 +2597,8 @@ false
 "scene": "57e9d50c",
 "tray": "-",
 "dom": "2adb8df6",
-"cats": "7086f2d4"
+"cats": "7086f2d4",
+"weights": "1045:586d158a"
 },
 {
 "t": 104.033,
@@ -2327,7 +2606,8 @@ false
 "scene": "e7d1da26",
 "tray": "-",
 "dom": "34213dd9",
-"cats": "97c44622"
+"cats": "97c44622",
+"weights": "1045:586d158a"
 },
 {
 "t": 105.033,
@@ -2335,7 +2615,8 @@ false
 "scene": "b17f2ea",
 "tray": "-",
 "dom": "cbac9958",
-"cats": "ae6b1ebb"
+"cats": "ae6b1ebb",
+"weights": "1045:586d158a"
 },
 {
 "t": 106.033,
@@ -2343,7 +2624,8 @@ false
 "scene": "f0ed3dde",
 "tray": "-",
 "dom": "939c93f9",
-"cats": "a908d434"
+"cats": "a908d434",
+"weights": "1045:586d158a"
 },
 {
 "t": 107.033,
@@ -2351,7 +2633,8 @@ false
 "scene": "d5b0a401",
 "tray": "-",
 "dom": "d630b67e",
-"cats": "51a36c46"
+"cats": "51a36c46",
+"weights": "1056:6fb90246"
 },
 {
 "t": 108.033,
@@ -2359,7 +2642,8 @@ false
 "scene": "8f5cd54f",
 "tray": "-",
 "dom": "f90ad49a",
-"cats": "3444484"
+"cats": "3444484",
+"weights": "1060:66092167"
 },
 {
 "t": 109.033,
@@ -2367,7 +2651,8 @@ false
 "scene": "2fcfed18",
 "tray": "-",
 "dom": "458c5f95",
-"cats": "db0fe1b4"
+"cats": "db0fe1b4",
+"weights": "1060:66092167"
 },
 {
 "t": 110.033,
@@ -2375,7 +2660,8 @@ false
 "scene": "7893ba71",
 "tray": "-",
 "dom": "afb367b1",
-"cats": "847e31b4"
+"cats": "847e31b4",
+"weights": "1060:66092167"
 },
 {
 "t": 111.033,
@@ -2383,7 +2669,8 @@ false
 "scene": "dee50e2b",
 "tray": "-",
 "dom": "75c15d2f",
-"cats": "1a52784a"
+"cats": "1a52784a",
+"weights": "1060:66092167"
 },
 {
 "t": 112.033,
@@ -2391,7 +2678,8 @@ false
 "scene": "19a1a69e",
 "tray": "-",
 "dom": "76b5a066",
-"cats": "1a52784a"
+"cats": "1a52784a",
+"weights": "1060:66092167"
 },
 {
 "t": 113.033,
@@ -2399,7 +2687,8 @@ false
 "scene": "5d9c76ab",
 "tray": "-",
 "dom": "1c3ae379",
-"cats": "1a52784a"
+"cats": "1a52784a",
+"weights": "1060:66092167"
 },
 {
 "t": 114.033,
@@ -2407,7 +2696,8 @@ false
 "scene": "dcfc9309",
 "tray": "-",
 "dom": "357d707e",
-"cats": "1a52784a"
+"cats": "1a52784a",
+"weights": "1060:66092167"
 },
 {
 "t": 115.033,
@@ -2415,7 +2705,8 @@ false
 "scene": "a3718632",
 "tray": "-",
 "dom": "8114b724",
-"cats": "1a52784a"
+"cats": "1a52784a",
+"weights": "1060:66092167"
 },
 {
 "t": 116.033,
@@ -2423,7 +2714,8 @@ false
 "scene": "a90f3589",
 "tray": "-",
 "dom": "2834576c",
-"cats": "6609a0c5"
+"cats": "6609a0c5",
+"weights": "1065:406c8c1f"
 },
 {
 "t": 117.033,
@@ -2431,7 +2723,8 @@ false
 "scene": "6406ac36",
 "tray": "-",
 "dom": "20cd1d19",
-"cats": "6609a0c5"
+"cats": "6609a0c5",
+"weights": "1065:406c8c1f"
 },
 {
 "t": 118.033,
@@ -2439,7 +2732,8 @@ false
 "scene": "d2e22b93",
 "tray": "-",
 "dom": "ff4e02c0",
-"cats": "6609a0c5"
+"cats": "6609a0c5",
+"weights": "1065:406c8c1f"
 },
 {
 "t": 119.033,
@@ -2447,7 +2741,8 @@ false
 "scene": "78f6bc70",
 "tray": "-",
 "dom": "8f0c965f",
-"cats": "6609a0c5"
+"cats": "6609a0c5",
+"weights": "1065:406c8c1f"
 },
 {
 "t": 120.033,
@@ -2455,7 +2750,8 @@ false
 "scene": "8e69d380",
 "tray": "-",
 "dom": "8376d169",
-"cats": "6609a0c5"
+"cats": "6609a0c5",
+"weights": "1065:406c8c1f"
 },
 {
 "t": 121.033,
@@ -2463,7 +2759,8 @@ false
 "scene": "bfa51624",
 "tray": "-",
 "dom": "7aa5c0fa",
-"cats": "6609a0c5"
+"cats": "6609a0c5",
+"weights": "1065:406c8c1f"
 },
 {
 "t": 122.033,
@@ -2471,7 +2768,8 @@ false
 "scene": "b9418f2f",
 "tray": "-",
 "dom": "472a7038",
-"cats": "6609a0c5"
+"cats": "6609a0c5",
+"weights": "1069:aab32437"
 },
 {
 "t": 123.033,
@@ -2479,7 +2777,8 @@ false
 "scene": "43f8f6d3",
 "tray": "-",
 "dom": "4981555f",
-"cats": "6609a0c5"
+"cats": "6609a0c5",
+"weights": "1069:aab32437"
 },
 {
 "t": 124.033,
@@ -2487,7 +2786,8 @@ false
 "scene": "b96e9206",
 "tray": "-",
 "dom": "19b77d8e",
-"cats": "3d3a16c8"
+"cats": "3d3a16c8",
+"weights": "1081:949d9618"
 },
 {
 "t": 125.033,
@@ -2495,7 +2795,8 @@ false
 "scene": "95b106dc",
 "tray": "-",
 "dom": "d8cd9d69",
-"cats": "3d3a16c8"
+"cats": "3d3a16c8",
+"weights": "1086:b03f3d8"
 },
 {
 "t": 126.033,
@@ -2503,7 +2804,8 @@ false
 "scene": "22ed314",
 "tray": "-",
 "dom": "301b1066",
-"cats": "3d3a16c8"
+"cats": "3d3a16c8",
+"weights": "1086:b03f3d8"
 },
 {
 "t": 127.033,
@@ -2511,7 +2813,8 @@ false
 "scene": "69ec797c",
 "tray": "-",
 "dom": "e8d91f51",
-"cats": "3d3a16c8"
+"cats": "3d3a16c8",
+"weights": "1086:b03f3d8"
 },
 {
 "t": 128.033,
@@ -2519,7 +2822,8 @@ false
 "scene": "2c0ac2eb",
 "tray": "-",
 "dom": "2a902069",
-"cats": "3d3a16c8"
+"cats": "3d3a16c8",
+"weights": "1086:b03f3d8"
 },
 {
 "t": 129.033,
@@ -2527,7 +2831,8 @@ false
 "scene": "6840578f",
 "tray": "-",
 "dom": "edcfbe2a",
-"cats": "3d3a16c8"
+"cats": "3d3a16c8",
+"weights": "1086:b03f3d8"
 },
 {
 "t": 130.033,
@@ -2535,7 +2840,8 @@ false
 "scene": "b99204a1",
 "tray": "-",
 "dom": "7b08153c",
-"cats": "3d3a16c8"
+"cats": "3d3a16c8",
+"weights": "1086:b03f3d8"
 },
 {
 "t": 131.033,
@@ -2543,7 +2849,8 @@ false
 "scene": "6eb2d057",
 "tray": "-",
 "dom": "ccd10bee",
-"cats": "3d3a16c8"
+"cats": "3d3a16c8",
+"weights": "1086:b03f3d8"
 },
 {
 "t": 132.033,
@@ -2551,7 +2858,8 @@ false
 "scene": "a224b40f",
 "tray": "-",
 "dom": "184c93aa",
-"cats": "6609a0c5"
+"cats": "6609a0c5",
+"weights": "1097:ba77552c"
 },
 {
 "t": 133.033,
@@ -2559,7 +2867,8 @@ false
 "scene": "affdd5a2",
 "tray": "-",
 "dom": "e604df33",
-"cats": "6609a0c5"
+"cats": "6609a0c5",
+"weights": "1098:29ab6e29"
 },
 {
 "t": 134.033,
@@ -2567,7 +2876,8 @@ false
 "scene": "690cfa5f",
 "tray": "-",
 "dom": "27040c77",
-"cats": "6609a0c5"
+"cats": "6609a0c5",
+"weights": "1098:29ab6e29"
 },
 {
 "t": 135.033,
@@ -2575,7 +2885,8 @@ false
 "scene": "99900d80",
 "tray": "-",
 "dom": "350c0b07",
-"cats": "6609a0c5"
+"cats": "6609a0c5",
+"weights": "1102:ab713509"
 },
 {
 "t": 136.033,
@@ -2583,7 +2894,8 @@ false
 "scene": "d2dfe1e9",
 "tray": "-",
 "dom": "fa1e4ac",
-"cats": "d6755428"
+"cats": "d6755428",
+"weights": "1102:ab713509"
 },
 {
 "t": 137.033,
@@ -2591,7 +2903,8 @@ false
 "scene": "6e3bc0ad",
 "tray": "-",
 "dom": "d037ee80",
-"cats": "12dc85eb"
+"cats": "12dc85eb",
+"weights": "1114:74c9a6a0"
 },
 {
 "t": 138.033,
@@ -2599,7 +2912,8 @@ false
 "scene": "e3864529",
 "tray": "-",
 "dom": "c2efddea",
-"cats": "30bed738"
+"cats": "30bed738",
+"weights": "1114:74c9a6a0"
 },
 {
 "t": 139.033,
@@ -2607,7 +2921,8 @@ false
 "scene": "605a1e72",
 "tray": "-",
 "dom": "d8377a",
-"cats": "83cd2919"
+"cats": "83cd2919",
+"weights": "1119:fa4a060"
 },
 {
 "t": 140.033,
@@ -2615,7 +2930,8 @@ false
 "scene": "9519a389",
 "tray": "-",
 "dom": "6ac8c02a",
-"cats": "83cd2919"
+"cats": "83cd2919",
+"weights": "1119:fa4a060"
 },
 {
 "t": 141.033,
@@ -2623,7 +2939,8 @@ false
 "scene": "62343838",
 "tray": "-",
 "dom": "ecf9ad43",
-"cats": "35ff311f"
+"cats": "35ff311f",
+"weights": "1134:7a8eb643"
 },
 {
 "t": 142.033,
@@ -2631,7 +2948,8 @@ false
 "scene": "bdb8e4be",
 "tray": "-",
 "dom": "3d3e06d4",
-"cats": "1c4eaea1"
+"cats": "1c4eaea1",
+"weights": "1134:7a8eb643"
 },
 {
 "t": 143.033,
@@ -2639,7 +2957,8 @@ false
 "scene": "bab2993e",
 "tray": "-",
 "dom": "71c50735",
-"cats": "29d30abb"
+"cats": "29d30abb",
+"weights": "1134:7a8eb643"
 },
 {
 "t": 144.033,
@@ -2647,7 +2966,8 @@ false
 "scene": "21e014a9",
 "tray": "-",
 "dom": "f04c83b8",
-"cats": "c87f9699"
+"cats": "c87f9699",
+"weights": "1162:f61cdfc5"
 },
 {
 "t": 145.033,
@@ -2655,7 +2975,8 @@ false
 "scene": "d7aee819",
 "tray": "-",
 "dom": "5c167ab9",
-"cats": "2d996107"
+"cats": "2d996107",
+"weights": "1162:f61cdfc5"
 },
 {
 "t": 146.033,
@@ -2663,7 +2984,8 @@ false
 "scene": "870e5bf6",
 "tray": "-",
 "dom": "d11a575a",
-"cats": "10a36636"
+"cats": "10a36636",
+"weights": "1164:54596fe0"
 },
 {
 "t": 147.033,
@@ -2671,7 +2993,8 @@ false
 "scene": "c1e50190",
 "tray": "-",
 "dom": "1ae24741",
-"cats": "70924c4c"
+"cats": "70924c4c",
+"weights": "1164:54596fe0"
 },
 {
 "t": 148.033,
@@ -2679,7 +3002,8 @@ false
 "scene": "2ce3003f",
 "tray": "-",
 "dom": "7ec4e78b",
-"cats": "e965ad12"
+"cats": "e965ad12",
+"weights": "1175:fb9e78a3"
 },
 {
 "t": 149.033,
@@ -2687,7 +3011,8 @@ false
 "scene": "eea8e82f",
 "tray": "-",
 "dom": "d5f81010",
-"cats": "c00c3b5"
+"cats": "c00c3b5",
+"weights": "1189:a6fbb3c0"
 },
 {
 "t": 150.033,
@@ -2695,7 +3020,8 @@ false
 "scene": "cce57697",
 "tray": "-",
 "dom": "6817eee3",
-"cats": "5f4c2c72"
+"cats": "5f4c2c72",
+"weights": "1189:a6fbb3c0"
 },
 {
 "t": 151.033,
@@ -2703,7 +3029,8 @@ false
 "scene": "d3b3e26d",
 "tray": "-",
 "dom": "ffbc9dbe",
-"cats": "ee9dce67"
+"cats": "ee9dce67",
+"weights": "1189:a6fbb3c0"
 },
 {
 "t": 152.033,
@@ -2711,7 +3038,8 @@ false
 "scene": "3947b2e",
 "tray": "-",
 "dom": "ac50165e",
-"cats": "31ff8bdb"
+"cats": "31ff8bdb",
+"weights": "1200:5143db03"
 },
 {
 "t": 153.033,
@@ -2719,7 +3047,8 @@ false
 "scene": "aa4488a0",
 "tray": "-",
 "dom": "f9cf1ece",
-"cats": "ca3d5bc1"
+"cats": "ca3d5bc1",
+"weights": "1205:fd493b60"
 },
 {
 "t": 154.033,
@@ -2727,7 +3056,8 @@ false
 "scene": "34913208",
 "tray": "-",
 "dom": "abac964d",
-"cats": "ccd8a2c5"
+"cats": "ccd8a2c5",
+"weights": "1205:fd493b60"
 },
 {
 "t": 155.033,
@@ -2735,7 +3065,8 @@ false
 "scene": "9c0b990d",
 "tray": "-",
 "dom": "e4abc4fb",
-"cats": "22e83e7f"
+"cats": "22e83e7f",
+"weights": "1205:fd493b60"
 },
 {
 "t": 156.033,
@@ -2743,7 +3074,8 @@ false
 "scene": "d0712cb5",
 "tray": "-",
 "dom": "1cdc8525",
-"cats": "e1775c3a"
+"cats": "e1775c3a",
+"weights": "1210:2c8d10a0"
 },
 {
 "t": 157.033,
@@ -2751,7 +3083,8 @@ false
 "scene": "e0189dde",
 "tray": "-",
 "dom": "90f09ed2",
-"cats": "663d7c50"
+"cats": "663d7c50",
+"weights": "1210:2c8d10a0"
 },
 {
 "t": 158.033,
@@ -2759,7 +3092,8 @@ false
 "scene": "308a216a",
 "tray": "-",
 "dom": "d6de9413",
-"cats": "2ff02e6"
+"cats": "2ff02e6",
+"weights": "1210:2c8d10a0"
 },
 {
 "t": 159.033,
@@ -2767,7 +3101,8 @@ false
 "scene": "a1ca6442",
 "tray": "-",
 "dom": "6cf43346",
-"cats": "2ff02e6"
+"cats": "2ff02e6",
+"weights": "1210:2c8d10a0"
 },
 {
 "t": 160.033,
@@ -2775,7 +3110,8 @@ false
 "scene": "3601e6e6",
 "tray": "-",
 "dom": "6eed7524",
-"cats": "2ff02e6"
+"cats": "2ff02e6",
+"weights": "1210:2c8d10a0"
 },
 {
 "t": 161.033,
@@ -2783,7 +3119,8 @@ false
 "scene": "43483e58",
 "tray": "-",
 "dom": "bb961a45",
-"cats": "2ff02e6"
+"cats": "2ff02e6",
+"weights": "1210:2c8d10a0"
 },
 {
 "t": 162.033,
@@ -2791,7 +3128,8 @@ false
 "scene": "417956b",
 "tray": "-",
 "dom": "9fbb632f",
-"cats": "2ff02e6"
+"cats": "2ff02e6",
+"weights": "1213:89924164"
 },
 {
 "t": 163.033,
@@ -2799,7 +3137,8 @@ false
 "scene": "94fdc825",
 "tray": "-",
 "dom": "98bbf00e",
-"cats": "48ac4818"
+"cats": "48ac4818",
+"weights": "1225:223587b1"
 },
 {
 "t": 164.033,
@@ -2807,7 +3146,8 @@ false
 "scene": "c52f5f7b",
 "tray": "-",
 "dom": "c23839f",
-"cats": "e3f2b24a"
+"cats": "e3f2b24a",
+"weights": "1225:223587b1"
 },
 {
 "t": 165.033,
@@ -2815,7 +3155,8 @@ false
 "scene": "baae3eb9",
 "tray": "-",
 "dom": "8d9fdf9f",
-"cats": "ef567e88"
+"cats": "ef567e88",
+"weights": "1225:223587b1"
 },
 {
 "t": 166.033,
@@ -2823,7 +3164,8 @@ false
 "scene": "cd7d92b",
 "tray": "-",
 "dom": "92a67b4f",
-"cats": "d43914ac"
+"cats": "d43914ac",
+"weights": "1225:223587b1"
 },
 {
 "t": 167.033,
@@ -2831,7 +3173,8 @@ false
 "scene": "1a4cf680",
 "tray": "-",
 "dom": "790c07d2",
-"cats": "b60fae3e"
+"cats": "b60fae3e",
+"weights": "1242:7525d860"
 },
 {
 "t": 168.033,
@@ -2839,7 +3182,8 @@ false
 "scene": "3570a913",
 "tray": "-",
 "dom": "3b399690",
-"cats": "6b2ea40e"
+"cats": "6b2ea40e",
+"weights": "1242:7525d860"
 },
 {
 "t": 169.033,
@@ -2847,7 +3191,8 @@ false
 "scene": "9f205792",
 "tray": "-",
 "dom": "ce0490aa",
-"cats": "347094cf"
+"cats": "347094cf",
+"weights": "1242:7525d860"
 },
 {
 "t": 170.033,
@@ -2855,7 +3200,8 @@ false
 "scene": "df71d77b",
 "tray": "-",
 "dom": "9d1c8566",
-"cats": "4ee31208"
+"cats": "4ee31208",
+"weights": "1242:7525d860"
 },
 {
 "t": 171.033,
@@ -2863,7 +3209,8 @@ false
 "scene": "ccf53539",
 "tray": "-",
 "dom": "966198a1",
-"cats": "6c495e62"
+"cats": "6c495e62",
+"weights": "1242:7525d860"
 },
 {
 "t": 172.033,
@@ -2871,7 +3218,8 @@ false
 "scene": "48f22fad",
 "tray": "-",
 "dom": "966dd929",
-"cats": "bbe528ef"
+"cats": "bbe528ef",
+"weights": "1243:458f525f"
 },
 {
 "t": 173.033,
@@ -2879,7 +3227,8 @@ false
 "scene": "c5d3dbd3",
 "tray": "-",
 "dom": "6557ac67",
-"cats": "bd6f30fb"
+"cats": "bd6f30fb",
+"weights": "1243:458f525f"
 },
 {
 "t": 174.033,
@@ -2887,7 +3236,8 @@ false
 "scene": "425b5087",
 "tray": "-",
 "dom": "18f4fdfd",
-"cats": "46a9ea98"
+"cats": "46a9ea98",
+"weights": "1257:140303a5"
 },
 {
 "t": 175.033,
@@ -2895,7 +3245,8 @@ false
 "scene": "4bc6db4c",
 "tray": "-",
 "dom": "6d716f21",
-"cats": "cd610059"
+"cats": "cd610059",
+"weights": "1274:11c1e6e4"
 },
 {
 "t": 176.033,
@@ -2903,7 +3254,8 @@ false
 "scene": "ddb2522",
 "tray": "-",
 "dom": "c34b4e32",
-"cats": "491de01b"
+"cats": "491de01b",
+"weights": "1274:11c1e6e4"
 },
 {
 "t": 177.033,
@@ -2911,7 +3263,8 @@ false
 "scene": "30eb625b",
 "tray": "-",
 "dom": "9001583e",
-"cats": "423bbe46"
+"cats": "423bbe46",
+"weights": "1274:11c1e6e4"
 },
 {
 "t": 178.033,
@@ -2919,7 +3272,8 @@ false
 "scene": "d6c0a9d0",
 "tray": "-",
 "dom": "dd5981b8",
-"cats": "f794a1cc"
+"cats": "f794a1cc",
+"weights": "1288:a62732b2"
 },
 {
 "t": 179.033,
@@ -2927,7 +3281,8 @@ false
 "scene": "94b2ae1b",
 "tray": "-",
 "dom": "87baf1b2",
-"cats": "d6ecd765"
+"cats": "d6ecd765",
+"weights": "1288:a62732b2"
 },
 {
 "t": 180.033,
@@ -2935,7 +3290,8 @@ false
 "scene": "7b5360ca",
 "tray": "-",
 "dom": "dfbab42b",
-"cats": "41977a0e"
+"cats": "41977a0e",
+"weights": "1298:14e0b248"
 },
 {
 "t": 181.033,
@@ -2943,7 +3299,8 @@ false
 "scene": "eb76f906",
 "tray": "-",
 "dom": "6d4a7d",
-"cats": "e64d4275"
+"cats": "e64d4275",
+"weights": "1298:14e0b248"
 },
 {
 "t": 182.033,
@@ -2951,7 +3308,8 @@ false
 "scene": "45a34d03",
 "tray": "-",
 "dom": "542c94df",
-"cats": "eb7c6697"
+"cats": "eb7c6697",
+"weights": "1298:14e0b248"
 },
 {
 "t": 183.033,
@@ -2959,7 +3317,8 @@ false
 "scene": "42d33f68",
 "tray": "-",
 "dom": "b8b24a49",
-"cats": "64b95464"
+"cats": "64b95464",
+"weights": "1298:14e0b248"
 },
 {
 "t": 184.033,
@@ -2967,7 +3326,8 @@ false
 "scene": "5c492d77",
 "tray": "-",
 "dom": "d063d667",
-"cats": "5ad3c39"
+"cats": "5ad3c39",
+"weights": "1298:14e0b248"
 },
 {
 "t": 185.033,
@@ -2975,7 +3335,8 @@ false
 "scene": "c0a0fc2d",
 "tray": "-",
 "dom": "5a0d05ce",
-"cats": "9084554d"
+"cats": "9084554d",
+"weights": "1298:14e0b248"
 },
 {
 "t": 185.333,
@@ -2983,7 +3344,8 @@ false
 "scene": "e5fa4e0c",
 "tray": "-",
 "dom": "5a1d046d",
-"cats": "6c2a3709"
+"cats": "6c2a3709",
+"weights": "1298:14e0b248"
 },
 {
 "t": 186.333,
@@ -2991,7 +3353,8 @@ false
 "scene": "c932ce52",
 "tray": "-",
 "dom": "6b3f089c",
-"cats": "551ddef5"
+"cats": "551ddef5",
+"weights": "1312:a53bc623"
 },
 {
 "t": 187.333,
@@ -2999,7 +3362,8 @@ false
 "scene": "e0b1decd",
 "tray": "-",
 "dom": "92f46a22",
-"cats": "57254e9a"
+"cats": "57254e9a",
+"weights": "1312:a53bc623"
 },
 {
 "t": 188.333,
@@ -3007,7 +3371,8 @@ false
 "scene": "891b2f10",
 "tray": "-",
 "dom": "69948410",
-"cats": "b101fc6f"
+"cats": "b101fc6f",
+"weights": "1312:a53bc623"
 },
 {
 "t": 189.333,
@@ -3015,7 +3380,8 @@ false
 "scene": "d4eae759",
 "tray": "-",
 "dom": "3803f203",
-"cats": "ea197dda"
+"cats": "ea197dda",
+"weights": "1312:a53bc623"
 },
 {
 "t": 190.333,
@@ -3023,7 +3389,8 @@ false
 "scene": "d9b3ee5a",
 "tray": "-",
 "dom": "27ff00f5",
-"cats": "1475d675"
+"cats": "1475d675",
+"weights": "1312:a53bc623"
 },
 {
 "t": 191.333,
@@ -3031,7 +3398,8 @@ false
 "scene": "8a6dd6f7",
 "tray": "-",
 "dom": "b484e404",
-"cats": "f9e15f2"
+"cats": "f9e15f2",
+"weights": "1312:a53bc623"
 },
 {
 "t": 192.333,
@@ -3039,7 +3407,8 @@ false
 "scene": "bcbf5a4b",
 "tray": "-",
 "dom": "a13f3396",
-"cats": "abf9818d"
+"cats": "abf9818d",
+"weights": "1312:a53bc623"
 },
 {
 "t": 193.333,
@@ -3047,7 +3416,8 @@ false
 "scene": "d5587d65",
 "tray": "-",
 "dom": "841c2c90",
-"cats": "c3bbbca7"
+"cats": "c3bbbca7",
+"weights": "1312:a53bc623"
 },
 {
 "t": 194.333,
@@ -3055,7 +3425,8 @@ false
 "scene": "9a5ebc7",
 "tray": "-",
 "dom": "4278f75b",
-"cats": "c3bbbca7"
+"cats": "c3bbbca7",
+"weights": "1312:a53bc623"
 },
 {
 "t": 195.333,
@@ -3063,7 +3434,8 @@ false
 "scene": "133eab1c",
 "tray": "-",
 "dom": "27290720",
-"cats": "2af9d7a0"
+"cats": "2af9d7a0",
+"weights": "1312:a53bc623"
 },
 {
 "t": 196.333,
@@ -3071,7 +3443,8 @@ false
 "scene": "c7392313",
 "tray": "-",
 "dom": "628042e1",
-"cats": "b996e1a1"
+"cats": "b996e1a1",
+"weights": "1312:a53bc623"
 },
 {
 "t": 197.333,
@@ -3079,7 +3452,8 @@ false
 "scene": "ca9c0496",
 "tray": "-",
 "dom": "9f6e0b5f",
-"cats": "2d55567e"
+"cats": "2d55567e",
+"weights": "1312:a53bc623"
 }
 ],
 "frames": 5949,
@@ -3176,7 +3550,8 @@ false
 "nearby:1:fd9c753c",
 "sides:1:df64aee4",
 "sleepgod:1:4ce3490c"
-]
+],
+"weights": "1312:a53bc623"
 }
 }
 }
