@@ -16,7 +16,8 @@ function circ(c,x,y,r){c.beginPath();c.arc(x,y,Math.max(.1,r),0,Math.PI*2);c.fil
 function rng(seed){let a=seed>>>0;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
 function mkCanvas(w,h){const c=document.createElement('canvas');c.width=w;c.height=h||w;return c}
-function hex2rgb(h){h=h.replace('#','');return[parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]}
+/* accepts '#rrggbb' and 'rgb(r,g,b)' (mix() returns the latter, and its result is sometimes mixed again) */
+function hex2rgb(h){if(h.charAt(0)!=='#'){const m=h.match(/[\d.]+/g)||[];return[+m[0]||0,+m[1]||0,+m[2]||0]}h=h.replace('#','');return[parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]}
 function mix(a,b,t){const A=hex2rgb(a),B=hex2rgb(b);return`rgb(${Math.round(lerp(A[0],B[0],t))},${Math.round(lerp(A[1],B[1],t))},${Math.round(lerp(A[2],B[2],t))})`}
 const FONT='Figtree,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif';
 const DFONT='"Young Serif",Georgia,serif';
@@ -790,7 +791,7 @@ function actZone(s){const j=s.job,k=j&&j.step;if(!k||k.t!=='zone')return;checkOv
  j.lastZone=k.p;if(k.p>=1.22){j.burnt=true;trayFloat(s,'焦掉了…','#E0654A');finishJob(s);return}
  const dd=Math.abs(k.p-k.z.c);const sc=k.p>=1?.5:dd<=k.z.w?1:dd<=k.z.g?.8:.5;if(k.verb==='翻面'){j.sear[j.side]=k.p;j.side=1-j.side;j.lastZone=0;s.flipT=.42;sfx.flip()}else sfx.tap();
  trayFloat(s,sc===1?'完美！':sc>=.8?'不錯':k.p<k.z.c?'有點生':'有點過',sc===1?'#FFE38A':sc>=.8?'#9ED08A':'#FFB27A');advance(s,sc)}
-function holdStart(s){const j=s.job,k=j&&j.step;if(!k||k.t!=='hold')return;checkOver(j);k.hold=true;R.holdSlot=s}
+function holdStart(s){const j=s.job,k=j&&j.step;if(!k||k.t!=='hold')return;checkOver(j);k.hold=true;k.holdT=0;R.holdSlot=s}
 function applyHold(j,k){const v=Math.min(1,k.level);switch(k.ing){case'beans':j.grind=v;break;case'milk':j.foam=v;break;case'soda':case'custard':case'cheesebatter':case'whites':j.fill=v;break;case'caramel':j.car=v;break;case'cream':j.cream=v;break;case'stock':j.stock=v;break;case'butter':j.butter=v;break;default:j.sauce=v;j.sauceC=(ING[k.ing]||{}).c||'#8A4A2A'}if(!j.adds.includes(k.ing))j.adds.push(k.ing)}
 function holdEnd(){const s=R&&R.holdSlot;if(!s)return;R.holdSlot=null;const j=s.job,k=j&&j.step;if(!k||k.t!=='hold'||!k.hold)return;k.hold=false;if(k.level<.04)return;let sc;
  if(k.level>=1){sc=.2;trayFloat(s,'溢出來了！','#E0654A')}else if(k.level>=k.a&&k.level<=k.b){sc=1;trayFloat(s,'剛剛好','#9ED08A')}else if(k.level>=k.a-.08&&k.level<=k.b+.08){sc=.75;trayFloat(s,k.level<k.a?'少了一點':'多了一點','#FFD27A')}else{sc=.45;trayFloat(s,k.level<k.a?'太少了':'太多了','#FFB27A')}
@@ -804,7 +805,7 @@ function updJob(s,dt){const j=s.job,k=j.step;if(!k)return;const sp=dishSpeed(j.d
  case'work':{k.p+=dt*sp/k.time;k.taps=Math.min(k.n,Math.floor(k.p*k.n));k.wt+=dt;if(k.wt>.18){k.wt=0;s.shake=.8;if(Math.random()<.45)(k.board?sfx.chop():sfx.stir())}if(!k.board)j.mix=Math.max(j.mix,Math.min(1,k.p));
   if(k.p>=1){j.cut=true;if(k.board&&CUTADD[j.d]&&!j.adds.includes(CUTADD[j.d]))j.adds.push(CUTADD[j.d]);advance(s,1)}break}
  case'tap':if(k.heat){if(R.t-k.last>.85)k.scorch+=dt*.3/(1+.12*(S.eq.pan-1))*(S.day<=2?.6:1);else k.scorch=Math.max(0,k.scorch-dt*.04);if(k.scorch>=1){j.burnt=true;trayFloat(s,'燒焦了','#E0654A');finishJob(s)}}break;
- case'hold':if(k.hold){k.level+=dt*k.rate;s.ht=(s.ht||0)+dt;if(s.ht>.13){s.ht=0;k.ing==='beans'?sfx.grind():k.ing==='milk'?sfx.steam():sfx.pour()}if(k.level>=1.04)holdEnd()}break}}
+ case'hold':if(k.hold){k.holdT=(k.holdT||0)+dt;if(k.holdT>1.3/k.rate+1.5){holdEnd();break}k.level+=dt*k.rate;s.ht=(s.ht||0)+dt;if(s.ht>.13){s.ht=0;k.ing==='beans'?sfx.grind():k.ing==='milk'?sfx.steam():sfx.pour()}if(k.level>=1.04)holdEnd()}break}}
 function charcoal(s){const j=s.job;s.job=null;if(R.holdSlot===s)R.holdSlot=null;const it=j.it;R.st.q.B++;R.streak=0;sfx.burnt();trayFloat(s,'焦成木炭了','#E0654A');
  it.st='pending';takeStock(it);toast(it.st==='order'?`${DISH(it.d).n} 焦掉了，食材用完，緊急叫貨中…`:`${DISH(it.d).n} 焦掉了，得重做一份`);R.tv++}
 function addXP(d,n){const before=mLv(d);S.xp[d]=(S.xp[d]||0)+n;const after=mLv(d);if(after>before){toast(`熟練度提升：${DISH(d).n} LV${after}`);if(d==='duck'&&after>=5)ach('duck')}}
@@ -2484,9 +2485,15 @@ sc.addEventListener('pointerdown',e=>{const p=scenePt(e);if(R&&!paused&&phase===
 function doCtrl(h){const s=h.s;switch(h.act){case'ing':actIng(s,h.arg);break;case'dose':actDose(s);break;case'doseDone':actDoseDone(s);break;case'tap':actTap(s);break;case'zone':actZone(s);break;case'hold':holdStart(s);break;case'close':R.panel=false;break;case'start':{const n=nextPendingFor(s.type);if(n)startCook(n.tk,n.it);break}}}
 tc.addEventListener('pointerdown',e=>{if(!R||paused||phase!=='service')return;e.preventDefault();audioInit();const r=tc.getBoundingClientRect();const x=e.clientX-r.left,y=e.clientY-r.top;
  for(const h of TRAYHIT.chips){if(inR(h,x,y)){const s=R.slots[h.i];R.focus=h.i;R.focusLock=R.t+1.6;if(!s.job){const n=nextPendingFor(s.type);if(n)startCook(n.tk,n.it)}else sfx.tap();return}}
- for(const h of TRAYHIT.ctrls){if(inR(h,x,y)){doCtrl(h);return}}
+ for(const h of TRAYHIT.ctrls){if(inR(h,x,y)){if(h.act==='hold'){R.holdPtr=e.pointerId;try{tc.setPointerCapture(e.pointerId)}catch(e2){}}doCtrl(h);return}}
  if(TRAYHIT.stage&&inR(TRAYHIT.stage,x,y)){const s=R.slots[R.focus];if(s&&s.job&&s.job.step&&s.job.step.t==='tap')actTap(s)}});
 window.addEventListener('pointerup',()=>{if(R)holdEnd()});window.addEventListener('pointercancel',()=>{if(R)holdEnd()});
+for(const ev of['pointerup','pointercancel','lostpointercapture'])tc.addEventListener(ev,()=>{if(R)holdEnd()});
+window.addEventListener('blur',()=>{if(R)holdEnd()});
+for(const ev of['touchend','touchcancel'])window.addEventListener(ev,()=>{if(R&&R.holdSlot)holdEnd()},{passive:true});
+/* iOS: the text-selection magnifier and the callout come from the touch, not the pointer event, so they are stopped here.
+   Only the two game canvases: buttons, sheets, inputs and the order strip keep their normal touch behaviour. */
+for(const el of[sc,tc]){el.addEventListener('touchstart',e=>{e.preventDefault()},{passive:false});el.addEventListener('touchmove',e=>{e.preventDefault()},{passive:false})}
 tc.addEventListener('contextmenu',e=>e.preventDefault());
 $('#closePill').addEventListener('click',()=>finishClosing());$('#peekPill').addEventListener('click',()=>{$('#peekPill').hidden=true;screenEl.hidden=false});
 $('#hPause').addEventListener('click',()=>{audioInit();if(phase==='service'){paused=true;showPause();checkpointSave('pause')}else if(phase!=='title'){openSub('settings')}});
@@ -2727,12 +2734,17 @@ function keepScroll(fn){const sh=screenEl.querySelector('.sheet');const top=sh?s
 let last=performance.now(),tick=0;
 let lastEv=null;
 let frameN=0,forceDraw=false;
-function frame(now){frameN++;const covered=phase!=='service'||paused||!!sub;/* the sims always get their time; the expensive part, drawing the room, runs at ~20 fps while a sheet covers it */
+let frameErrs=0,frameErrMsg='';
+/* One bad frame must not stop the game: the loop keeps its appointment with the next frame no matter what. The first
+   error of a kind is logged; after a burst of them the player is told once (the situation the soufflé bug produced —
+   a dead loop with a live Pause button — cannot happen again). */
+function frame(now){try{frameBody(now)}catch(e){frameErrs++;const m=e&&e.message||String(e);if(m!==frameErrMsg){frameErrMsg=m;console.error('[frame]',e)}if(frameErrs===40){try{toast('畫面出了點問題，已跳過（遊戲繼續）','warn')}catch(e2){}}}requestAnimationFrame(frame)}
+function frameBody(now){frameN++;const covered=phase!=='service'||paused||!!sub;/* the sims always get their time; the expensive part, drawing the room, runs at ~20 fps while a sheet covers it */
  if(AU.ctx&&S.music){const ev=evening();if(ev!==lastEv){lastEv=ev;AU.music.gain.setTargetAtTime(ev?.09:.16,AU.ctx.currentTime,.8)}}const dt=Math.min(.05,(now-last)/1000);last=now;const t=now/1000;
  if(!(phase==='service'&&paused)){updateCats(dt,t);lifeUpd(dt)}
  if(phase==='service'&&R&&!paused){update(dt);tick+=dt;if(tick>.12){tick=0;renderTickets();updTicketBars();renderTasks();hud()}}
  else if(phase!=='service'&&IDLE){const J=IDLE.jill;if(!(evening()&&LIFE.plan==='sofa'))J.x=PASS.x;}
- if(sc.width>0&&(!covered||frameN%3===0||forceDraw)){forceDraw=false;drawScene(t);flushMem()}{const tw=$('#trayWrap');const want=!!(R&&R.panel&&phase==='service'&&!paused);if(tw.hidden===want)tw.hidden=!want;if(want&&tc.width>0)drawTray(t)}requestAnimationFrame(frame)}
+ if(sc.width>0&&(!covered||frameN%3===0||forceDraw)){forceDraw=false;drawScene(t);flushMem()}{const tw=$('#trayWrap');const want=!!(R&&R.panel&&phase==='service'&&!paused);if(tw.hidden===want)tw.hidden=!want;if(want&&tc.width>0)drawTray(t)}}
 
 /* ================= boot ================= */
 function boot(){layoutAll();hud(true);renderTickets();showTitle();requestAnimationFrame(frame);photoOpen().then(()=>photoMigrate());

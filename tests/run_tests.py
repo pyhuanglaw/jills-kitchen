@@ -1490,6 +1490,80 @@ def album_store_and_viewer_v181(b, port, target):
     check(not g.errors, g.errors)
     g.close()
 
+# ---------------------------------------------------------------- version 18.2
+HOLD_DISHES = ['souffle','coffee','sparkling','soup','pudding','fruitsoda','basque','steak','risotto','tiramisu','salad','seafood','duck']
+MAKE_ORDER = r"""(()=>{const g0={id:R.gid++,name:'T',size:1,table:0,state:'wait',pat:1,type:'office',looks:makeLooks('office',1),seed:1,mood:'ok',x:200,y:300,tx:200,ty:300,timer:0,ticket:null,reg:null,forSig:false,ret:false};R.groups.push(g0);R.tables[0].group=g0;
+  const it={d:'%s',st:'pending',q:null,want:1,picked:false};const tk={id:R.tkid++,no:1,g:g0,items:[it],t0:R.t};g0.ticket=tk;R.tickets.push(tk);R.tv++;return startCook(tk,it)})()"""
+HOLD_BTN = r"""(()=>{const h=TRAYHIT.ctrls.find(h=>h.act==='hold');if(!h)return null;const r=tc.getBoundingClientRect();const sx=r.width/tc.width;return {x:r.left+(h.x+h.w/2)*sx,y:r.top+(h.y+h.h/2)*sx}})()"""
+
+def cook_by_hand(g, d, max_frames=900):
+    """Cooks dish d through the real frame loop (rendered, virtual time), pressing the tray's hold button with
+    real pointer events like a finger would. Returns (frames, final item state)."""
+    reopened = 0
+    for n in range(max_frames):
+        st = g.ev("(()=>{const s=R.slots[R.focus];const j=s&&s.job;if(!j)return {done:true};const k=j.step;return {t:k.t,p:+(k.p||0).toFixed(2),hold:!!k.hold,level:+(k.level||0).toFixed(2),cnt:k.cnt,min:k.min,a:k.a,b:k.b}})()")
+        if st.get('done'):
+            return n, g.ev("(()=>{const it=R.tickets[0]&&R.tickets[0].items[0];return it?{st:it.st,q:it.q}:null})()")
+        t = st['t']
+        if t == 'add': g.ev("(()=>{const s=R.slots[R.focus];actIng(s,s.job.step.left[0])})()")
+        elif t == 'dose': g.ev("(()=>{const s=R.slots[R.focus];const k=s.job.step;if(k.cnt<k.min)actDose(s);else actDoseDone(s)})()")
+        elif t == 'tap': g.ev("(()=>{actTap(R.slots[R.focus])})()")
+        elif t == 'zone':
+            if st['p'] >= 0.7: g.ev("(()=>{const s=R.slots[R.focus];if(s.job.step.p>=s.job.step.z.c)actZone(s)})()")
+        elif t == 'hold':
+            if not st['hold'] and st['level'] < 0.04:
+                hit = g.ev(HOLD_BTN)
+                if hit is None:   # the panel closed itself during a hands-off step: the player taps the station to bring it back
+                    reopened += 1; check(reopened <= 4, f'{d}: the hold control never appeared'); g.ev("tapStation(R.focus);__tick(1000/30)"); continue
+                g.page.mouse.move(hit['x'], hit['y']); g.page.mouse.down()
+            elif st['hold'] and st['level'] >= (st['a'] + st['b']) / 2:
+                g.page.mouse.up()
+        g.ev("__tick(1000/30)")
+    return max_frames, None
+
+@test
+def hold_recipes_never_lock_the_game(b, port, target):
+    """V18.2 regression (real iPhone, Day 25): starting the soufflé's hold threw inside the ramekin drawing
+    (mix() fed an rgb() string -> NaN colour) and the exception killed the frame loop: the hold stopped
+    responding, the restaurant froze, only DOM buttons like Pause still worked. Every hold-bearing recipe
+    now cooks to the end through the real, rendered frame loop with real pointer presses on the hold button;
+    the frame loop keeps going and the day's clock keeps moving."""
+    for d in HOLD_DISHES:
+        g = Game(b, port, target, seed=3, manual=True)
+        install_bot(g)
+        g.click('[data-act=open]')
+        g.ev("S.day=6;S.level=4;S.eq={stove:3,oven:3,bar:3,prep:2,fridge:3,pan:3};S.tables=6;S.money=99999;for(const k of Object.keys(DISHES))if(!S.unlocked.includes(k))S.unlocked.push(k);S.menu=['friedrice'];S.phase='prep';S.today=null;planToday();showPrep()")
+        g.ev("S.menu=['friedrice','%s'];S.stock['%s']=5;S.stock.friedrice=5;save();showPrep()" % (d, d))
+        start_day(g)
+        check(g.ev(MAKE_ORDER % d), f'{d}: could not start cooking')
+        raf0 = g.page.evaluate('window.__stats.raf'); t0 = g.ev("R.t")
+        frames, res = cook_by_hand(g, d)
+        check(res and res['st'] == 'ready', f'{d}: not plated after {frames} frames: {res}')
+        check(g.page.evaluate('window.__stats.raf') - raf0 >= frames - 2, f'{d}: the frame loop stopped')
+        check(g.ev("R.t") - t0 > 0.5, f'{d}: the day did not advance while cooking')
+        check(not g.errors, f'{d}: {g.errors[:2]}')
+        g.close()
+
+@test
+def frame_loop_survives_a_draw_error(b, port, target):
+    """Defensive path: an exception inside one frame is logged and the next frame still comes; the service
+    goes on and the player is not trapped."""
+    g = Game(b, port, target, seed=3, manual=True)
+    install_bot(g)
+    g.click('[data-act=open]')
+    start_day(g)
+    g.ev("(()=>{window.__drawScene0=drawScene;drawScene=function(){throw new Error('injected draw failure')}})()")
+    raf0 = g.page.evaluate('window.__stats.raf'); t0 = g.ev("R.t")
+    g.ev("for(let i=0;i<20;i++)__tick(1000/30)")
+    check(g.page.evaluate('window.__stats.raf') - raf0 >= 19, 'the frame loop died on an exception')
+    check(g.ev("R.t") - t0 > 0.5, 'the simulation stopped with the drawing')
+    check(any('injected draw failure' in e for e in g.errors), 'the failure was not logged')
+    g.errors.clear()
+    g.ev("drawScene=window.__drawScene0")
+    g.ev("for(let i=0;i<5;i++)__tick(1000/30)")
+    check(not g.errors, g.errors)
+    g.close()
+
 @test
 def save_backup_and_restore(b, port, target):
     """備份存檔 writes one JSON file; 讀取存檔 restores it (Dylan/life state included) after a confirmation;
@@ -1693,7 +1767,8 @@ def main():
                     traceback.print_exc()
         b.close()
     srv.shutdown()
-    print(f'\n{len([f for f in TESTS if a.k in f.__name__])-failed} passed, {failed} failed')
+    ran = [f for f in TESTS if not a.k or any(k and k in f.__name__ for k in a.k.split(','))]
+    print(f'\n{len(ran)-failed} passed, {failed} failed')
     sys.exit(1 if failed else 0)
 
 if __name__ == '__main__':
