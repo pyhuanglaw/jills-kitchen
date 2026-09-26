@@ -675,7 +675,7 @@ function startService(){lifeReset();dylanStageCheck();bg=null;lastEv=null;
   combo:0,maxCombo:0,streak:0,fire:0,fireCount:0,floats:[],parts:[],tv:1,gid:1,tkid:1,
   st:{rev:0,tips:0,guests:0,groups:0,perfect:0,q:{P:0,G:0,O:0,B:0},sats:[],dish:{},angry:0,lost:0,reviews:[],critic:null,blogger:null,treats:0},
   rush:feat().rush,rushT0:dur*120/270,rushT1:dur*180/270,rushShown:false,weather:T.weather,event:T.event,coach:(S.day===1&&!S.tut)?0:-1,taskDone:{},lastSpawn:0,idleT:0,focus:0,focusLock:0,holdSlot:null,inc:planIncidents(dur),cw:{},thief:null,insp:null,chaser:null};
- R.sched=buildSchedule(dur);R.log=[];logNew=0;phase='service';paused=false;hideScreen();layoutAll();renderTickets();renderTasks();hud(true);logChip();
+ R.sched=buildSchedule(dur);R.log=[];logNew=0;phase='service';paused=false;hideScreen();layoutAll();renderTickets();renderTasks();hud(true);logChip();stockChip();
  banner("OPEN FOR DINNER",LV().n+' 開始營業','');audioInit();sfx.door();
 }
 function buildSchedule(dur){const T=S.today,n=T.groups,out=[];
@@ -1219,10 +1219,30 @@ $('#tkMore').addEventListener('click',()=>{ticketsEl.scrollBy({left:ticketsEl.cl
 $('#tkBack').addEventListener('click',()=>{ticketsEl.scrollBy({left:-ticketsEl.clientWidth*.8,behavior:'smooth'});setTimeout(ticketsLayout,400)});
 ticketsEl.addEventListener('click',e=>{const b=e.target.closest('.it');if(!b||!R)return;const tk=R.tickets.find(t=>t.id===+b.dataset.tk);if(!tk)return;const it=tk.items[+b.dataset.i];if(!it)return;
  if(it.st==='pending')startCook(tk,it);else if(it.st==='ready'){const t=R.tables[tk.g.table];if(t)tapTable(t)}else if(it.st==='order'){toast(`食材運送中，還要 ${Math.max(1,Math.ceil(it.ordT-R.t))} 秒`)}else if(it.st==='cooking'){const i=R.slots.findIndex(x=>x.job&&x.job.it===it);if(i>=0){R.focus=i;R.panel=true;R.panelT=0}}});
-function renderTasks(){const chip=$('#taskChip');if(!S.today||phase!=='service'){chip.hidden=true;$('#taskPanel').hidden=true;const lp=$('#logPanel');if(lp)lp.hidden=true;logChip();return}chip.hidden=false;const ts=S.today.tasks;$('#taskDots').innerHTML=ts.map(t=>`<i class="${taskProg(t)>=t.n?'on':''}"></i>`).join('');
+function renderTasks(){const chip=$('#taskChip');if(!S.today||phase!=='service'){chip.hidden=true;$('#taskPanel').hidden=true;const lp=$('#logPanel');if(lp)lp.hidden=true;const sp=$('#stockPanel');if(sp)sp.hidden=true;logChip();stockChip();return}chip.hidden=false;const ts=S.today.tasks;$('#taskDots').innerHTML=ts.map(t=>`<i class="${taskProg(t)>=t.n?'on':''}"></i>`).join('');
  if(!$('#taskPanel').hidden)$('#taskPanel').innerHTML=`<h4>今日任務</h4>`+ts.map(t=>{const p=Math.min(t.n,taskProg(t));const done=p>=t.n;return`<div class="task ${done?'done':''}"><span>${t.txt}</span><small>+${fmt(t.reward)}</small><div class="bar"><i style="width:${t.k==='noangry'?(R&&R.st.angry?0:100):p/t.n*100}%"></i></div><small>${t.k==='noangry'?(R&&R.st.angry?'失敗':'維持中'):t.k==='revenue'?fmt(p)+' / '+fmt(t.n):p+' / '+t.n}</small></div>`}).join('')}
-$('#taskChip').addEventListener('click',()=>{const p=$('#taskPanel');p.hidden=!p.hidden;renderTasks()});
+$('#taskChip').addEventListener('click',()=>{const p=$('#taskPanel');p.hidden=!p.hidden;$('#logPanel').hidden=true;const sp=$('#stockPanel');if(sp)sp.hidden=true;renderTasks()});
 function logHTML(list,n){const L=list.slice(-(n||14)).reverse();if(!L.length)return'<p class="muted" style="margin:4px 0">還沒有人說話。</p>';return L.map(e=>`<div class="ll ${e.k}"><small>${e.c}</small>${e.w?`<b>${e.w}</b>`:''}<span>${e.k==='e'?e.t:'「'+e.t+'」'}</span></div>`).join('')}
+/* ---- 庫存: what is in the fridge right now, by dish, and emergency orders at 1.5× with real buttons ---- */
+let stockArm=null;
+function stockLevel(d){const n=S.stock[d]||0;return n<=0?'out':n<=2?'low':'ok'}
+function emergencyCost(d){return Math.round(costOf(d)*1.5)}
+function buyEmergency(d,n){const cst=emergencyCost(d);let k=0;while(k<n&&S.money>=cst&&stockTotal()<fridgeCap()){S.money-=cst;S.todayCost+=cst;S.stock[d]=(S.stock[d]||0)+1;k++}
+ if(k){R.st.bought=(R.st.bought||0)+k;R.tv++;sfx.buy();toast(`緊急叫貨：${dishName(d)} ×${k}　-${fmt(cst*k)}`);hud()}else toast(S.money<cst?'錢不夠':'冰箱滿了，放不下');return k}
+function stockChip(){const ch=$('#stockChip');if(!ch)return;const show=phase==='service'&&!!R;ch.hidden=!show;if(!show)return;const ms=menuList().filter(stationOk);const out=ms.filter(d=>stockLevel(d)==='out').length,low=ms.filter(d=>stockLevel(d)==='low').length;
+ ch.classList.toggle('out',out>0);ch.classList.toggle('low',!out&&low>0);$('#stockN').textContent=out?`缺 ${out}`:low?`低 ${low}`:`${stockTotal()}/${fridgeCap()}`}
+function openStock(on){const p=$('#stockPanel');if(!p)return;p.hidden=on===false?true:on===true?false:!p.hidden;if(!p.hidden){$('#logPanel').hidden=true;$('#taskPanel').hidden=true;renderStock()}}
+function renderStock(){const p=$('#stockPanel');if(!p||p.hidden||!R)return;const ms=menuList().filter(stationOk).slice().sort((a,b)=>(S.stock[a]||0)-(S.stock[b]||0));const tot=stockTotal(),cap=fridgeCap();
+ const lowAll=ms.filter(d=>(S.stock[d]||0)<=2);const fillCost=lowAll.reduce((a,d)=>a+emergencyCost(d)*Math.max(0,3-(S.stock[d]||0)),0);
+ p.innerHTML=`<div class="sp-h"><h4>冰箱 <span>${tot}/${cap}</span></h4><button class="sp-x" data-stock="close" aria-label="關閉">✕</button></div>
+  ${lowAll.length&&fillCost>0?`<button class="btn sm sp-fill" data-stock="fill">${stockArm==='fill'?`確定？低於 3 份的全部補到 3　${fmt(fillCost)}`:`低於 3 份的全部補到 3　${fmt(fillCost)}`}</button>`:''}
+  <div class="sp-list">${ms.map(d=>{const n=S.stock[d]||0;const lv=stockLevel(d);const c=emergencyCost(d);const c3=c*3;const arm=stockArm===d+'|3';return`<div class="sp-row ${lv}"><img alt="" src="${dishURL(d,'P')}"><div class="nm">${dishName(d)}<small>${lv==='out'?'賣完了':lv==='low'?'快沒了':'還夠'}・叫貨 ${fmt(c)}/份</small></div><b class="n">${n}</b><button data-stock="buy" data-d="${d}" data-n="1" ${S.money<c||tot>=cap?'disabled':''}>+1 <small>${fmt(c)}</small></button><button data-stock="buy" data-d="${d}" data-n="3" class="${arm?'arm':''}" ${S.money<c||tot>=cap?'disabled':''}>${arm?'確定？':'+3'} <small>${fmt(c3)}</small></button></div>`}).join('')}</div>
+  <p class="sp-note">臨時叫貨是平常進貨的 1.5 倍價，5 秒後到貨。餐點缺料時 Jill 也會自動叫貨。</p>`}
+{const sp=$('#stockPanel');if(sp){sp.addEventListener('click',e=>{const b=e.target.closest('[data-stock]');if(!b||b.disabled)return;const a=b.dataset.stock;audioInit();
+  if(a==='close'){sp.hidden=true;return}
+  if(a==='fill'){if(stockArm!=='fill'){stockArm='fill';renderStock();setTimeout(()=>{if(stockArm==='fill'){stockArm=null;renderStock()}},4000);return}stockArm=null;for(const d of menuList().filter(stationOk))if((S.stock[d]||0)<=2)buyEmergency(d,3-(S.stock[d]||0));renderStock();stockChip();return}
+  if(a==='buy'){const d=b.dataset.d,n=+b.dataset.n;const cost=emergencyCost(d)*n;if(cost>=600&&stockArm!==d+'|'+n){stockArm=d+'|'+n;renderStock();setTimeout(()=>{if(stockArm===d+'|'+n){stockArm=null;renderStock()}},4000);return}stockArm=null;buyEmergency(d,n);renderStock();stockChip()}});
+ $('#stockChip').addEventListener('click',()=>openStock())}}
 function renderLog(){const p=$('#logPanel');if(!p||p.hidden)return;p.innerHTML=`<h4>今天大家說了什麼</h4>${logHTML(dayLog(),14)}`}
 {const ch=$('#logChip');if(ch){ch.addEventListener('click',()=>{const p=$('#logPanel');p.hidden=!p.hidden;logNew=0;logChip();renderLog();$('#taskPanel').hidden=true;const sp=$('#stockPanel');if(sp)sp.hidden=true});$('#logPanel').addEventListener('click',()=>{$('#logPanel').hidden=true})}}
 $('#taskPanel').addEventListener('click',()=>{$('#taskPanel').hidden=true});
@@ -2112,9 +2132,7 @@ function hitKItem(p){for(const it of kitchenItems()){if(p.x>=it.x-3&&p.x<=it.x+i
 function tapKItem(k){audioInit();KPOP[k]=performance.now()/1000;const now=performance.now()/1000;
  if(k.startsWith('miss:')){toast(`${k.slice(5)}還沒買，打烊後可以在商店購買`);return}
  switch(k){
- case'fridge':{FRIDGE_T=now;sfx.fridge();const ms=menuList();const low=ms.filter(d=>(S.stock[d]||0)<=1);
-  if(R&&phase==='service'&&low.length){let bought=[],spent=0;for(const d of low){const cst=Math.round(costOf(d)*1.5);let n=0;while(n<3&&S.money>=cst&&stockTotal()<fridgeCap()){S.money-=cst;S.todayCost+=cst;spent+=cst;S.stock[d]=(S.stock[d]||0)+1;n++}if(n)bought.push(DISH(d).n+'×'+n)}if(bought.length){toast(`緊急叫貨（1.5 倍價）：${bought.join('、')}　-${fmt(spent)}`);R.tv++}else toast('錢不夠或冰箱滿了，沒辦法叫貨')}
-  break}
+ case'fridge':{FRIDGE_T=now;sfx.fridge();if(R&&phase==='service')openStock(true);break}
  case'sink':SINK_T=now;sfx.pour();setTimeout(()=>sfx.pour(),200);if(R&&phase==='service'){const t=R.tables.find(t=>t.dirty&&!t.group&&!jillTargets(t.i));if(t){R.jill.q.push(t.i);toast('Jill 去收盤子回來洗')}}break;
  case'knife':sfx.chop();setTimeout(()=>sfx.chop(),110);break;
  case'spice':sfx.shake();break;
@@ -2953,7 +2971,7 @@ function keepScroll(fn){const sh=screenEl.querySelector('.sheet');const top=sh?s
 let last=performance.now(),tick=0;
 let lastEv=null;
 let frameN=0,forceDraw=false;
-let frameErrs=0,frameErrMsg='';
+let frameErrs=0,frameErrMsg='',stockT=0;
 /* One bad frame must not stop the game: the loop keeps its appointment with the next frame no matter what. The first
    error of a kind is logged; after a burst of them the player is told once (the situation the soufflé bug produced —
    a dead loop with a live Pause button — cannot happen again). */
@@ -2961,7 +2979,7 @@ function frame(now){try{frameBody(now)}catch(e){frameErrs++;const m=e&&e.message
 function frameBody(now){frameN++;const covered=phase!=='service'||paused||!!sub;/* the sims always get their time; the expensive part, drawing the room, runs at ~20 fps while a sheet covers it */
  if(AU.ctx&&S.music){const ev=evening();if(ev!==lastEv){lastEv=ev;AU.music.gain.setTargetAtTime(ev?.09:.16,AU.ctx.currentTime,.8)}}const dt=Math.min(.05,(now-last)/1000);last=now;const t=now/1000;
  if(!(phase==='service'&&paused)){updateCats(dt,t);lifeUpd(dt)}
- if(phase==='service'&&R&&!paused){update(dt);tick+=dt;if(tick>.12){tick=0;renderTickets();updTicketBars();renderTasks();hud()}}
+ if(phase==='service'&&R&&!paused){update(dt);tick+=dt;if(tick>.12){tick=0;renderTickets();updTicketBars();renderTasks();hud();stockChip();stockT=(stockT||0)+1;if(stockT%8===0)renderStock()}}
  else if(phase!=='service'&&IDLE){const J=IDLE.jill;if(!(evening()&&LIFE.plan==='sofa'))J.x=PASS.x;}
  if(sc.width>0&&(!covered||frameN%3===0||forceDraw)){forceDraw=false;drawScene(t);flushMem()}{const tw=$('#trayWrap');const want=!!(R&&R.panel&&phase==='service'&&!paused);if(tw.hidden===want)tw.hidden=!want;if(want&&tc.width>0)drawTray(t)}}
 
