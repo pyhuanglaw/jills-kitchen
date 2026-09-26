@@ -444,7 +444,7 @@ def save_and_load_roundtrip(b, port, target):
 def legacy_saves():
     out = {}
     for name in sorted(os.listdir(FIXTURES)):
-        if name.endswith('.json'):
+        if name.endswith('.json') and not name.endswith('_file.json'):   # *_file.json are backup files, not localStorage dumps
             out[name] = open(os.path.join(FIXTURES, name), encoding='utf-8').read()
     return out
 
@@ -458,7 +458,10 @@ def old_saves_load(b, port, target):
         for k in ('eq', 'decor', 'stats', 'unlocked', 'menu', 'xp', 'regulars', 'achievements'):
             check(g.ev(f"JSON.stringify(S.{k})") == json.dumps({**g.ev(f"newState().{k}"), **orig[k]} if isinstance(orig.get(k), dict) and k in ('eq', 'decor', 'stats') else orig.get(k), ensure_ascii=False, separators=(',', ':')), f'{name}: S.{k} not preserved')
         check(g.ev("Array.isArray(S.crew)&&S.crewMig===1&&typeof S.mem==='object'&&typeof S.rstar==='object'"), f'{name}: missing fields not filled with defaults')
-        check(g.ev("S.dylan&&S.dylan.stage===0&&S.dylan.clues&&S.life&&S.life.sofa===0"), f'{name}: life/dylan defaults missing on an old save')
+        if 'dylan' not in orig:
+            check(g.ev("S.dylan&&S.dylan.stage===0&&S.dylan.clues&&S.life&&S.life.sofa===0"), f'{name}: life/dylan defaults missing on an old save')
+        else:
+            check(g.ev("JSON.stringify(S.dylan)") == json.dumps(orig['dylan'], ensure_ascii=False, separators=(',', ':')), f'{name}: dylan state not preserved')
         if orig.get('staff', {}).get('bartender') and 'crew' not in orig:
             # KNOWN QUIRK (kept on purpose, see docs/REFACTOR_REPORT.md): load() fills crewMig from the
             # defaults before checking it, so a pre-crew save's bartender/busser are NOT turned into crew.
@@ -1047,6 +1050,53 @@ def world_stays_visible_across_days(b, port, target):
     check(len(crew) >= 3 and any(c.startswith('c1:') for c in crew) and any(c.startswith('m1:') for c in crew), f'the staff (including the sign-bit ids) should have been drawn all along: {crew}')
     check(g.ev("S.level") >= 2 and g.ev("S.tables") >= 4, 'the test should have expanded the restaurant along the way')
     check(not g.errors, g.errors)
+    g.close()
+
+@test
+def v16_save_continues_in_v17(b, port, target):
+    """A real Version 16 save (10 days, staff with the game's own ids, Dylan met) opens in this build,
+    plays a rendered service day, exports, re-imports its own backup and plays on; a Version 16 backup
+    file imports directly too."""
+    fx = json.loads(open(os.path.join(FIXTURES, 'v16_day10_staff_dylan.json'), encoding='utf-8').read())
+    g = Game(b, port, target, seed=3, manual=True, storage=fx)
+    install_bot(g)
+    orig = json.loads(fx[SAVE_KEY])
+    check(g.ev("S.day") == orig['day'] and g.ev("S.money") == orig['money'] and g.ev("S.crew.length") == len(orig['crew']), 'V16 save did not load intact')
+    check(g.ev("JSON.stringify(S.dylan)") == json.dumps(orig['dylan'], ensure_ascii=False, separators=(',', ':')), 'V16 Dylan state changed on load')
+    g.click('[data-act=open]'); start_day(g)
+    g.ev("__play(240,0)")   # eight rendered seconds with the V16 staff on screen
+    check(not g.errors, f'errors playing a V16 save: {g.errors[:2]}')
+    check(g.ev("R.cw&&Object.keys(R.cw).length") == len(orig['crew']) - sum(1 for m in orig['crew'] if m['role'] == 'chef'), 'V16 staff not active')
+    g.ev("__bot(60000,1/30)"); g.ev("__evening(20,1/20,0,null)")
+    if g.ev("phase") == 'summary': g.click('[data-act=toShop]')
+    g.click('[data-act=nextDay]'); g.ev("__tick(60)")
+    day_after = g.ev("S.day"); check(day_after == orig['day'] + 1, 'day did not advance')
+    # export -> import own backup -> continue
+    g.click('.links [data-act=settings]') if g.page.is_visible('.links [data-act=settings]') else g.click('[data-act=settings]')
+    with g.page.expect_download() as dl:
+        g.click('[data-act=export]')
+    path = os.path.join(ARTIFACTS, 'v16_roundtrip.json'); os.makedirs(ARTIFACTS, exist_ok=True); dl.value.save_as(path)
+    with g.page.expect_file_chooser() as fc:
+        g.click('[data-act=import]')
+    fc.value.set_files(path); g.page.wait_for_timeout(150); g.ev("__tick(100)")
+    g.click('[data-act=importYes]'); g.ev("__tick(50)")
+    check(g.ev("S.day") == day_after and g.ev("S.crew.length") == len(orig['crew']), 'own backup did not restore')
+    g.click('[data-act=open]'); start_day(g); g.ev("__play(60,0)")
+    check(g.ev("phase") == 'service' and not g.errors, f'could not keep playing after the import: {g.errors[:2]}')
+    g.ev("__bot(60000,1/30)")
+    # a backup file written by Version 16 itself
+    g.ev("__evening(10,1/20,0,null)")
+    if g.ev("phase") == 'summary': g.click('[data-act=toShop]')
+    g.click('[data-act=nextDay]'); g.ev("__tick(60)")
+    g.click('.links [data-act=settings]') if g.page.is_visible('.links [data-act=settings]') else g.click('[data-act=settings]')
+    with g.page.expect_file_chooser() as fc:
+        g.click('[data-act=import]')
+    fc.value.set_files(os.path.join(FIXTURES, 'v16_backup_file.json')); g.page.wait_for_timeout(150); g.ev("__tick(100)")
+    check(g.ev("pendingImport&&pendingImport.day===10"), 'the Version 16 backup file was not accepted')
+    g.click('[data-act=importYes]'); g.ev("__tick(50)")
+    check(g.ev("S.day") == 10 and g.ev("S.regulars.dylan") == orig['regulars']['dylan'], 'V16 backup file not restored')
+    g.click('[data-act=open]'); start_day(g); g.ev("__play(60,0)")
+    check(g.ev("phase") == 'service' and not g.errors, f'could not play after importing the V16 backup: {g.errors[:2]}')
     g.close()
 
 @test
