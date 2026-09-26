@@ -255,7 +255,7 @@ const COACH=[
 const KEY='jills-kitchen-save-v1';
 function newState(){return{v:1,day:1,phase:'prep',money:500,lifetime:0,level:1,
  eq:{stove:1,oven:0,bar:0,prep:0,fridge:1,pan:1},tables:2,
- decor:{plants:0,lights:0,art:0,chairs:0,rug:0,ware:0,bar:0,sofa:0},staff:{busser:false,bartender:false},mem:{},catFam:{},crew:[],crewMig:1,rstar:{},dylan:{stage:0,stay:0,reveal:0,last:0,clues:{}},life:{sofa:0,tv:0},checkpoint:null,savedAt:0,savedLabel:'',rdProg:{},rdDone:{},labKnown:{},labTried:{},album:null,notes:[],taught:0,ops:{},theme:'classic',themes:{classic:1},rhist:[],records:{},salesHist:{},menuSince:{},regMem:{},props:{},regDay:null,gourmetBoost:0,dayLog:[],dayLogDay:0,
+ decor:{plants:0,lights:0,art:0,chairs:0,rug:0,ware:0,bar:0,sofa:0},staff:{busser:false,bartender:false},mem:{},catFam:{},crew:[],crewMig:1,rstar:{},dylan:{stage:0,stay:0,reveal:0,last:0,clues:{}},life:{sofa:0,tv:0},checkpoint:null,savedAt:0,savedLabel:'',rdProg:{},rdDone:{},labKnown:{},labTried:{},album:null,notes:[],taught:0,ops:{},theme:'classic',themes:{classic:1},sets:{},rhist:[],records:{},salesHist:{},menuSince:{},regMem:{},props:{},regDay:null,gourmetBoost:0,dayLog:[],dayLogDay:0,
  unlocked:['friedrice'],menu:['friedrice'],price:{},stock:{},xp:{},reviews:[],achievements:{},regulars:{},returning:0,
  signature:null,catNames:{},buzz:1,buzzMsg:'',stats:{guests:0,perfect:0,days:0},tut:0,gate:1,news:[],today:null,todayCost:0,lastSummary:null,sfx:true,music:true}}
 let S;
@@ -814,6 +814,11 @@ function demandW(d,T,ctx){const D=DISH(d);if(!D)return 0;let w=(D.pop||1)*((T.pr
  const m=S.price[d]||1;w*=Math.pow(1/m,1+T.sens*1.8);w*=Math.pow(D.price/220,(T.budget-1)*.9);if(T===TYPES.gourmet&&D.diff>=3)w*=1.7;
  if(d==='signature')w*=1.2;if(recoDish()===d)w*=2.2;w*=wxDemand(d)*evDemand(d);w*=1+.25*(starOf(d)-1);
  if(ctx&&ctx.stock!==false&&(S.stock[d]||0)<=0)w*=.6;return w}
+/* Set menus the player chooses to offer: a main with a drink, with a dessert, or both. The add-on is a little cheaper
+   and a lot more often ordered; à la carte stays. */
+const SETS={drink:{n:'主餐＋飲料',d:'點主餐的客人更常加一杯（飲料 −10%）',off:.9},dessert:{n:'主餐＋甜點',d:'點主餐的客人更常加甜點（甜點 −10%）',off:.9},full:{n:'主餐＋飲料＋甜點',d:'全套：飲料和甜點都更常被加點（各 −15%）',off:.85}};
+function setOn(k){return!!(S.sets&&S.sets[k])}
+function setFor(cat){if(cat==='drink'&&setOn('full'))return'full';if(cat==='drink'&&setOn('drink'))return'drink';if(cat==='dessert'&&setOn('full'))return'full';if(cat==='dessert'&&setOn('dessert'))return'dessert';return null}
 function recoDish(){const r=S.today&&S.today.reco;return r&&S.menu.includes(r)&&S.unlocked.includes(r)?r:(r==='signature'&&S.signature?r:null)}
 function orderItems(g){const ms=menuList().filter(stationOk);const T=TYPES[g.type];const W=R?R.weather:(S.today?S.today.weather:'sun');
  const wf=d=>demandW(d,T);const reco=recoDish();
@@ -833,8 +838,8 @@ function orderItems(g){const ms=menuList().filter(stationOk);const T=TYPES[g.typ
    else{d=reg.fav.find(f=>ms.includes(f)&&DISH(f).cat!=='drink'&&DISH(f).cat!=='dessert')||null;if(!d){const f=reg.fav.find(f=>ms.includes(f));if(f){items.push(f);continue}}}}
   if(!d){const f=foods();if(f.length)d=wpick(f,wf)}
   if(d)items.push(d);
-  const pd=(g.reg==='dylan'?.7:(T.pD||.35))*(W==='hot'?1.5:W==='rain'||W==='storm'?1.2:1)*(reco&&DISH(reco).cat==='drink'?1.25:1);const dr=drinks();if(dr.length&&(Math.random()<pd||!d))items.push(wpick(dr,wf));
-  const ds=des();if(ds.length&&Math.random()<(T.pS||.2)*(reco&&DISH(reco).cat==='dessert'?1.4:1)*(g.celebrate?2.2:1)*(g.broke||g.rushed||g.quick?.2:1))items.push(wpick(ds,wf))}
+  const hasMain=!!d&&DISH(d).cat==='main';const pd=(g.reg==='dylan'?.7:(T.pD||.35))*(W==='hot'?1.5:W==='rain'||W==='storm'?1.2:1)*(reco&&DISH(reco).cat==='drink'?1.25:1)*(hasMain&&setFor('drink')?1.6:1);const dr=drinks();if(dr.length&&(Math.random()<pd||!d))items.push(wpick(dr,wf));
+  const ds=des();if(ds.length&&Math.random()<(T.pS||.2)*(reco&&DISH(reco).cat==='dessert'?1.4:1)*(g.celebrate?2.2:1)*(g.broke||g.rushed||g.quick?.2:1)*(hasMain&&setFor('dessert')?1.7:1))items.push(wpick(ds,wf))}
  const out=items.filter(Boolean).slice(0,cap);if(g.share){/* one dessert, two forks */let seen=false;return out.filter(d=>{if(DISH(d).cat!=='dessert')return true;if(seen)return false;seen=true;return true})}return out}
 /* expected sales per dish for a day like today: the guest mix and the ordering rules themselves, sampled */
 function expectDemand(groups,n){const out={};const G=S.today?S.today.groups:groups||10;const N=n||60;
@@ -842,7 +847,7 @@ function expectDemand(groups,n){const out={};const G=S.today?S.today.groups:grou
  for(const d in out)out[d]=out[d]*G/N;return out}
 function createTicket(g){const items=orderItems(g);const t=R.tables[g.table];
  if(!items.length){leaveGroup(g,'ok');return}
- const tk={id:R.tkid++,no:t.i+1,g,items:items.map(d=>({d,st:'pending',q:null,want:d==='steak'?wpick([0,1,2,3],k=>[.2,.35,.3,.15][k]):0,picked:false})),t0:R.t};
+ const hasMain=items.some(d=>DISH(d).cat==='main');const tk={id:R.tkid++,no:t.i+1,g,items:items.map(d=>{const cat=DISH(d).cat;const set=hasMain&&(cat==='drink'||cat==='dessert')&&setFor(cat)||null;return{d,st:'pending',q:null,want:d==='steak'?wpick([0,1,2,3],k=>[.2,.35,.3,.15][k]):0,picked:false,set}}),t0:R.t};
  if(g.reg&&g.reg!=='dylan'){const m=regMem(g.reg);for(const it of tk.items)m.orders[it.d]=(m.orders[it.d]||0)+1;if(g.share&&tk.items.some(i=>DISH(i.d).cat==='dessert')&&Math.random()<.5)setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,'一份甜點，兩支叉子。')},800)}
  for(const it of tk.items)takeStock(it);if(tk.items.some(it=>it.st==='order')){toast(`食材不夠！Jill 緊急叫貨中（1.5 倍價），${g.name} 要多等一下`);g.pat=Math.min(1,g.pat+.1)}
  g.ticket=tk;g.state='wait';g.pat=Math.min(1,g.pat+.12);R.tickets.push(tk);R.tv++;sfx.ticket();
@@ -934,7 +939,7 @@ function addReview(g,stars,txt,ctx){const top=g.ticket?g.ticket.items.find(i=>i.
  const t=(txt||reviewText(g,stars,ctx)).replace('{d}',dn);const tags=[];const c=ctx||{};if(c.wait)tags.push('wait');if(c.left)tags.push('left');if(c.price)tags.push('price');if(c.q)tags.push('q');if(c.cat)tags.push('cat');if(c.sig)tags.push('sig');if(c.treat)tags.push('treat');
  const r={s:stars,txt:t,name:g.name,day:S.day,w:g.type==='critic'?3:1,critic:g.type==='critic',tags};S.reviews.push(r);if(S.reviews.length>80)S.reviews.shift();R.st.reviews.push(r);return r}
 function collect(g){const T=TYPES[g.type];const items=g.ticket.items.filter(i=>i.st==='served');let rev=0,qs=0,pen=0,bon=0;
- for(const it of items){const m=S.price[it.d]||1;rev+=priceOf(it.d);qs+=QV[it.q];pen+=Math.max(0,m-1);bon+=Math.max(0,1-m)}
+ for(const it of items){const m=S.price[it.d]||1;rev+=it.set?Math.round(priceOf(it.d)*SETS[it.set].off/5)*5:priceOf(it.d);if(it.set)R.st.sets=(R.st.sets||0)+1;qs+=QV[it.q];pen+=Math.max(0,m-1);bon+=Math.max(0,1-m)}
  const n=Math.max(1,items.length),qa=qs/n;let sat=qa*T.qw+g.pat*100*(1-T.qw);sat-=(pen/n)*80*T.sens;sat+=(bon/n)*30*T.sens;sat+=Math.min(12,ambience()*1.1);sat+=items.reduce((a,it)=>a+starOf(it.d)-1,0)/n*4;if(g.catJoy)sat+=5;if(g.reg)sat+=4;if(g.compl)sat+=g.compl;if(g.strict&&items.some(i=>i.q==='O'||i.q==='B'))sat-=12;if(g.forSig&&items.some(i=>i.d==='signature'))sat+=6;if(items.some(i=>i.d==='signature'&&i.byJill))sat+=3;sat=clamp(sat,0,100);
  let tip=rev*T.tip*Math.pow(sat/80,2)*(R.fire>0?1.5:1)*(1+.04*Math.min(R.combo,10))*(S.decor.ware?1.15:1)*(g.celebrate||g.anniv?1.8:1);if(sat<40)tip=0;if(g.reg==='dylan'&&sat>=40)tip*=1.35;rev=Math.round(rev);tip=Math.round(tip);
  if(g.type==='couple')R.st.couples=(R.st.couples||0)+1;
@@ -1225,7 +1230,7 @@ function endDay(){if(!R)return;clearCheckpoint();const st=R.st,D=S.day;const wag
  if(st.guests>=10)ach('rush');if(plated>=8&&st.q.B===0&&st.q.O===0&&st.angry===0)ach('perfectnight');if(rating()>=4.75&&S.reviews.length>=20)ach('chef');
  const r0=(S.rhist&&S.rhist.length)?S.rhist[S.rhist.length-1].r:3;const story=ratingStory(st,plated);S.rhist=S.rhist||[];S.rhist.push({d:D,r:Math.round(rating()*100)/100,n:st.reviews.length,rs:st.reviews.length?Math.round(st.reviews.reduce((a,r)=>a+r.s,0)/st.reviews.length*10)/10:null,why:story.slice(0,2).map(x=>x.t)});if(S.rhist.length>60)S.rhist.shift();
  const recs=updRecords(st,plated,D);achDay(st,plated);
- S.lastSummary={day:D,rev:st.rev,cost:S.todayCost,wages,tips:st.tips,bonus,net:st.rev+st.tips+bonus-S.todayCost-wages,guests:st.guests,lost:st.lost,angry:st.angry,perfect:st.perfect,plated,avg:Math.round(avg),top,stars:dayStars,reviews:st.reviews.slice(-3),tasks,maxCombo:R.maxCombo,reco:recoDish(),recoN:recoDish()?(st.dish[recoDish()]||0):0,photos:albumList().filter(p=>p.day===D).length,r0,r1:Math.round(rating()*100)/100,story,recs,weather:R.weather,event:R.event,treats:st.treats||0,crew:(S.crew||[]).map(m=>({name:m.name,role:m.role,lv:m.lv,wage:crewWage(m),n:(st.crew||{})[m.id]||{}})),short:Object.values(st.short||{}).reduce((a,b)=>a+b,0),
+ S.lastSummary={day:D,rev:st.rev,cost:S.todayCost,wages,tips:st.tips,bonus,net:st.rev+st.tips+bonus-S.todayCost-wages,guests:st.guests,lost:st.lost,angry:st.angry,perfect:st.perfect,plated,avg:Math.round(avg),top,stars:dayStars,reviews:st.reviews.slice(-3),tasks,maxCombo:R.maxCombo,reco:recoDish(),recoN:recoDish()?(st.dish[recoDish()]||0):0,photos:albumList().filter(p=>p.day===D).length,r0,r1:Math.round(rating()*100)/100,story,recs,weather:R.weather,event:R.event,treats:st.treats||0,sets:st.sets||0,crew:(S.crew||[]).map(m=>({name:m.name,role:m.role,lv:m.lv,wage:crewWage(m),n:(st.crew||{})[m.id]||{}})),short:Object.values(st.short||{}).reduce((a,b)=>a+b,0),
   sales:menuList().map(d=>({d,n:st.dish[d]||0,rev:(st.dish[d]||0)*priceOf(d),short:(st.short||{})[d]||0,left:S.stock[d]||0})).sort((a,b)=>b.n-a.n)};
  S.dayLog=(R.log||[]).slice(-90);S.dayLogDay=D;S.salesHist=S.salesHist||{};for(const d of menuList()){const v=(st.dish[d]||0)+((st.short||{})[d]||0);const h=S.salesHist[d];S.salesHist[d]=h==null?v:Math.round((h*.5+v*.5)*10)/10}S.phase='shop';S.tut=1;save();
  for(const k of[...ICACHE.keys()])if(k.startsWith('pg'))ICACHE.delete(k);
@@ -2839,6 +2844,7 @@ function showPrep(){phase='prep';mainScreen='prep';R=null;lifeReset();IDLE=makeI
   ${(()=>{const reco=recoDish();const dt=T.tasks.find(t=>t.k==='dish');const list=menuList().filter(stationOk);if(!list.length)return'';const exp=expectDemand(T.groups,60);
    return`<h3>⭐ 今日推薦</h3><div class="card reco"><p class="d">客人今天會比較容易點這道菜。想主推哪一道就選它，再多備一點料。</p><div class="opts">${list.map(d=>`<button class="${reco===d?'on':''}" data-act="reco" data-d="${d}">${reco===d?'⭐ ':''}${dishName(d)}</button>`).join('')}</div>
    <p class="small">${reco?`今日推薦：<b>${dishName(reco)}</b>，預估約 ${Math.max(1,Math.round(exp[reco]||0))} 份。`:'還沒選。'}${dt?` 今日任務要賣 ${dt.n} 份${dishName(dt.d)}${reco===dt.d?'，就是這道。':`（預估約 ${Math.max(1,Math.round(exp[dt.d]||0))} 份）——推薦它會比較容易。`}`:''}</p></div>`})()}
+  ${F.prices&&menuList().some(d=>DISH(d).cat==='drink'||DISH(d).cat==='dessert')?`<h3>套餐</h3><div class="card sets"><p class="d">要不要推套餐？點主餐的客人會更常加點；加點的那一份便宜一點。單點照常。</p>${Object.keys(SETS).map(k=>`<button class="setb ${setOn(k)?'on':''}" data-act="setT" data-k="${k}"><b>${setOn(k)?'✓ ':''}${SETS[k].n}</b><small>${SETS[k].d}</small></button>`).join('')}</div>`:''}
   <h3>今日菜單 <small>${menuN}/${menuCap()} 道${S.signature?' ＋ 招牌菜':''}</small></h3>
   ${sig}<div class="card">${rows||'<p class="muted">還沒有料理</p>'}</div>
   ${F.stock?`<div class="cap"><span>冰箱</span><div class="capbar"><i style="width:${tot/cap*100}%"></i></div><span>${tot}/${cap}</span></div><button class="btn sm" data-act="restock" ${restockCost>0?'':'disabled'} style="width:100%">一鍵補到建議量 ${restockCost>0?fmt(restockCost):'（已足夠）'}</button>${(()=>{const off=unlocked.filter(d=>!S.menu.includes(d)&&(S.stock[d]||0)>0);if(!off.length)return'';const n=off.reduce((a,d)=>a+S.stock[d],0);return`<button class="btn sm" data-act="${discardArmed?'discardAll':'discardAsk'}" style="width:100%;margin-top:6px">${discardArmed?`確定退掉這 ${n} 份？（再按一次）`:`退掉不在菜單上的庫存（${n} 份）`}</button>`})()}`:`<p class="muted" style="font-size:12.5px;margin:8px 2px 0">前兩天會自動備料。第 3 天開始可以自己進貨、調整售價。</p>`}
@@ -2849,7 +2855,7 @@ function showSummary(){phase='summary';mainScreen='summary';const s=S.lastSummar
  const topHTML=s.top?`<img alt="" src="${dishURL(s.top,'P')}" style="width:34px;height:34px;vertical-align:middle;margin-right:4px">${DISH(s.top)?DISH(s.top).n:''}`:'—';
  show(`<div class="sheet tall"><div class="sh-top"><div class="ttl"><div class="eyebrow">今日結算</div><h2>DAY ${s.day}</h2><div class="sum-stars">${starsHTML(s.stars)}</div></div><button class="icon-btn" data-act="peek" style="font-weight:800;font-size:11px;width:auto;padding:0 9px">看店裡</button></div>
   <div class="ledger"><div><span>營業額</span><span>${fmt(s.rev)}</span></div><div class="neg"><span>食材成本</span><span>-${fmt(s.cost)}</span></div>${s.wages?`<div class="neg"><span>薪資</span><span>-${fmt(s.wages)}</span></div>`:''}<div class="pos"><span>小費</span><span>+${fmt(s.tips)}</span></div>${s.bonus?`<div class="pos"><span>任務獎勵</span><span>+${fmt(s.bonus)}</span></div>`:''}<div class="net"><span>今日淨利</span><span style="color:${s.net>=0?'var(--sage)':'#A2412B'}">${s.net>=0?'+':''}${fmt(s.net)}</span></div></div>
-  ${(()=>{const W=WEATHER[s.weather]||WEATHER.sun,E=EVENTS[s.event];return`<div class="chips"><span>${W.n}</span>${s.event&&s.event!=='none'&&E?`<span>${E.n}</span>`:''}${s.treats?`<span>請客 ${s.treats} 次</span>`:''}${s.short?`<span class="warn">臨時叫貨 ${s.short} 次</span>`:''}</div>`})()}
+  ${(()=>{const W=WEATHER[s.weather]||WEATHER.sun,E=EVENTS[s.event];return`<div class="chips"><span>${W.n}</span>${s.event&&s.event!=='none'&&E?`<span>${E.n}</span>`:''}${s.treats?`<span>請客 ${s.treats} 次</span>`:''}${s.sets?`<span>套餐加點 ${s.sets} 份</span>`:''}${s.short?`<span class="warn">臨時叫貨 ${s.short} 次</span>`:''}</div>`})()}
   ${s.r1!=null?`<div class="card rating"><div class="rl"><span>餐廳評分</span><b>${(s.r0||3).toFixed(2)} → ${s.r1.toFixed(2)}</b><em class="${s.r1>s.r0+.004?'up':s.r1<s.r0-.004?'dn':''}">${s.r1>s.r0+.004?'↑':s.r1<s.r0-.004?'↓':'→'}</em></div>${s.story&&s.story.length?`<ul>${s.story.slice(0,3).map(x=>`<li class="${x.s>0?'up':'dn'}">${x.s>0?'＋':'－'} ${x.t}</li>`).join('')}</ul>`:'<p class="muted" style="margin:4px 0 0">今天沒有明顯影響評分的事。</p>'}${(()=>{const nl=LEVELS[S.level];if(!nl)return'';const ok=s.r1>=nl.rating;return`<small>${ok?`已達擴建到 ${nl.n} 的評分門檻（${nl.rating.toFixed(1)}）`:`擴建到 ${nl.n} 需要 ${nl.rating.toFixed(1)}，還差 ${(nl.rating-s.r1).toFixed(2)}`}</small>`})()}</div>`:''}
   ${s.recs&&s.recs.length?`<div class="news">🏆 今天創了紀錄：${s.recs.map(k=>REC_N[k]).join('、')}</div>`:''}
   <div class="statgrid"><div class="card"><small>客人數</small><b>${s.guests}</b>${s.lost?` <small style="display:inline">（${s.lost} 位沒等到）</small>`:''}</div><div class="card"><small>Perfect 料理</small><b>${s.perfect}</b> <small style="display:inline">/ ${s.plated}</small></div><div class="card"><small>平均滿意度</small><b>${s.avg}%</b></div><div class="card"><small>最受歡迎</small><b style="font-size:13px">${topHTML}</b></div></div>
@@ -2978,6 +2984,7 @@ screenEl.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(
  case'openFresh':sfx.door();clearCheckpoint();save();goMain();break;
  case'discardAsk':discardArmed=true;keepScroll(showPrep);setTimeout(()=>{discardArmed=false;if(phase==='prep'&&!sub)keepScroll(showPrep)},4000);break;
  case'discardAll':{discardArmed=false;for(const x of S.unlocked)if(!S.menu.includes(x)&&(S.stock[x]||0)>0)buyStock(x,-99);sfx.tap();toast('退掉了不在菜單上的庫存');save();keepScroll(showPrep);break}
+ case'setT':{S.sets=S.sets||{};S.sets[k]=!S.sets[k];if(k==='full'&&S.sets.full){S.sets.drink=false;S.sets.dessert=false}if((k==='drink'||k==='dessert')&&S.sets[k])S.sets.full=false;sfx.tap();save();keepScroll(showPrep);break}
  case'reco':{if(!S.today)break;S.today.reco=S.today.reco===d?null:d;sfx.tap();save();keepScroll(showPrep);break}
  case'toggle':{const on=S.menu.includes(d);if(on){const rest=S.menu.filter(x=>x!==d&&DISH(x).cat!=='drink'&&DISH(x).cat!=='dessert');if(!rest.length&&!S.signature&&DISH(d).cat!=='drink'&&DISH(d).cat!=='dessert'){toast('菜單至少要有一道主食');break}S.menu=S.menu.filter(x=>x!==d)}else{if(S.menu.filter(x=>S.unlocked.includes(x)).length>=menuCap()){toast(`菜單已滿（上限 ${menuCap()} 道）${LEVELS[S.level]?'，擴建後可以放更多':opsLv('board')?'':'；「大菜單板」可以多放 2 道'}`);break}S.menu.push(d);S.menuSince=S.menuSince||{};if(!S.menuSince[d])S.menuSince[d]=S.day;if(menuList().length>=8)ach('menu8')}sfx.tap();save();showPrep();break}
  case'price':{const steps=[.8,.9,1,1.1,1.2,1.3,1.5];let i=steps.indexOf(S.price[d]||1);if(i<0)i=2;i=clamp(i+(+b.dataset.v),0,steps.length-1);S.price[d]=steps[i];sfx.tap();save();keepScroll(showPrep);break}
