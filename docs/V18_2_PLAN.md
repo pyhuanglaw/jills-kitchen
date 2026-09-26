@@ -31,3 +31,16 @@ DEFER: outside brief; themes/set menus slip first
 
 ## Added by the player during V18.2
 - MUST: ticket identity (done wip-1); max-expansion dead-end audit + late-game operations upgrades (staff room +2, waiting area +2, 動線 tiers, booth tier 3); achievements 35–50 spread early/mid/mature with hidden; soufflé lock (done, V18.1.1).
+
+## 2.0 (autonomous, user asleep) — spatial growth
+Rooms: main / kitchen / side / front. Entities carry `.room`; only the viewed room is drawn; routing through doorways.
+Purchases: side room 60k (+6 tables via sideTables, +2 staff, +2 menu), kitchen ext 40k/70k (+slots, multi-chef, +2 staff), terrace 25k (+3 outdoor tables, weather-dependent), cooler 30k (+80 fridge), big pass 12k, exterior: awning/sign/planters/lights/bench/seasonal/cat nook.
+Status:
+- [ ] R1 room architecture (state, routing, draw dispatch, tabs+badges+swipe)
+- [ ] R2 kitchen room (layout, big stations, chefs, pass, fridge, Jill at pass)
+- [ ] R3 side room (layout, tables, doorway, purchase)
+- [ ] R4 front room (layout, street arrivals/departures, upgrades, outdoor tables)
+- [ ] R5 capacity model + multi-chef + staff cap + menu cap
+- [ ] R6 food: chef specials
+- [ ] R7 cats/album/achievements in new spaces
+- [ ] R8 migration + tests + smoke + docs + publish
