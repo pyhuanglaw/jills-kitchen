@@ -743,7 +743,7 @@ function spawn(o){if(R.closed)return;const reg=o.reg?REG_BY[o.reg]:null;const si
  if(g.forSig)quote(g,'我是專程為了 Jill 的招牌菜來的！');
  coach(0)}
 function drainRate(g){const T=TYPES[g.type];const base={queue:1/32,order:1/28,wait:1/80,check:1/26}[g.state]||0;let m=1/(T.pat*(g.reg?1.15:1));if(g.reg==='dylan')m*=.5;if(g.reg&&g.reg!=='dylan'){const tier=regTier(S.regulars[g.reg]||0);if(g.reg==='koba'&&!g.unhurried)m*=tier>=1?1.05:1.3;if(tier>=2)m*=.8;else if(tier>=1)m*=.9}if(g.quick)m*=1.15;if(g.state==='queue'&&g.spot&&g.spot.k==='seat')m*=.7;
- m*=1+Math.min(.35,S.day*.012);m*=1-Math.min(.25,ambience()*.02);m*=1-.08*S.decor.chairs;{const wp=WEATHER[R.weather]&&WEATHER[R.weather].pat;if(wp)m/=wp}if(g.catT&&g.catT>R.t)m*=.6;if(!g.rowdy&&g.table!=null&&R.groups.some(o=>o.rowdy&&o.table!=null&&Math.hypot(R.tables[o.table].x-R.tables[g.table].x,R.tables[o.table].y-R.tables[g.table].y)<140))m*=1.7;if(S.day<=2)m*=.62;else if(S.day<=4)m*=.82;return base*m}
+ m*=1+Math.min(.35,S.day*.012);m*=1-Math.min(.25,ambience()*.02);m*=1-.08*S.decor.chairs;{const wp=WEATHER[R.weather]&&WEATHER[R.weather].pat;if(wp)m/=wp}if(R.musicT>R.t&&(g.state==='queue'||g.state==='arrive'))m*=.7;if(g.catT&&g.catT>R.t)m*=.6;if(!g.rowdy&&g.table!=null&&R.groups.some(o=>o.rowdy&&o.table!=null&&Math.hypot(R.tables[o.table].x-R.tables[g.table].x,R.tables[o.table].y-R.tables[g.table].y)<140))m*=1.7;if(S.day<=2)m*=.62;else if(S.day<=4)m*=.82;return base*m}
 function updGroup(g,dt){
  if(['arrive','queue','toTable','leave'].includes(g.state)){const dx=g.tx-g.x,dy=g.ty-g.y,d=Math.hypot(dx,dy),v=78*dt;if(d>v){g.x+=dx/d*v;g.y+=dy/d*v;g.walk=(g.walk||0)+dt*11;g.moving=true}else{g.x=g.tx;g.y=g.ty;g.moving=false;
   if(g.state==='arrive'){g.landed=true;const t=!R.closed&&freeTableFor(g);if(t&&!t.claim){seatGroup(g,t);return}g.state='queue';requeue()}else if(g.state==='toTable'){g.state='reading';g.timer=rand(2.4,3.8)*(TYPES[g.type].read||1)*(S.day===1?.8:1)*(g.usual?.3:1)*(g.reg==='koba'&&!g.unhurried?.55:1)*(g.rushed?.6:1)}else if(g.state==='leave'){if(g.bus){g.bus=false;g.tx=DOOR.x;g.ty=DOOR.y;sfx.plop()}else{g.gone=true;return}}}}
@@ -846,10 +846,16 @@ function decoyFor(d,items){if(S.day<3||Math.random()<.4)return[];const st=DISH(d
 function enterStep(j,i){const st=recipeOf(j.d)[i];const m=mLv(j.d);const k=Object.assign({},st,{p:0,cnt:0,taps:0,mis:0,t0:R.t,scorch:0,last:R.t,hold:false,level:0,auto:0});
  if(st.t==='add'){k.left=st.items.slice();k.btns=shuffle(st.items.concat(decoyFor(j.d,st.items)))}
  if(st.t==='tap')k.n=Math.max(3,st.n-(m-1));
- if(st.t==='zone'){const c=st.c==='want'?[.52,.66,.8,.93][j.it.want]:st.c;let w=st.w*(1+.12*(m-1));if(DISH(j.d).pan)w*=1+.1*(S.eq.pan-1);if(st.c==='want')w=Math.min(w,.065);k.z={c,w,g:w+.12}}
- if(st.t==='hold'){const wd=.015*(m-1);k.a=Math.max(.05,st.a-wd);k.b=Math.min(.97,st.b+wd)}
+ const V=stepVar(j,i);
+ if(st.t==='zone'){const c=(st.c==='want'?[.52,.66,.8,.93][j.it.want]:st.c)+(st.c==='want'?0:V.shift*.6);let w=st.w*(1+.12*(m-1))*V.width;if(DISH(j.d).pan)w*=1+.1*(S.eq.pan-1);if(st.c==='want')w=Math.min(w,.065);k.z={c,w,g:w+.12}}
+ if(st.t==='hold'){const wd=.015*(m-1);const mid=(st.a+st.b)/2+V.shift,half=(st.b-st.a)/2*V.width;k.a=Math.max(.05,mid-half-wd);k.b=Math.min(.97,mid+half+wd);k.rate=st.rate*V.rate}
  if(st.t==='work'){k.n=8;k.taps=0;k.wt=0}
  j.si=i;j.step=k}
+/* The target of a hold or a flip moves a little: mostly by the day (today's beans grind coarser, today's cream is
+   thicker) and a touch per plate. The band on the tray shows the real target, so the hand learns the recipe and the
+   eyes do the last bit. Steak doneness is exact — a customer asked for it. */
+function stepVar(j,i){const hd=hash(S.day+'|'+j.d+'|'+i),hj=hash(j.seed+'|'+i);const u=(h,k)=>((h>>>(k*8))&255)/255;
+ const shift=(u(hd,0)-.5)*.09+(u(hj,0)-.5)*.03;const width=.85+u(hd,1)*.3;const rate=.9+u(hd,2)*.22;return{shift,width,rate}}
 function newJob(tk,it){const j={tk,it,d:it.d,si:0,step:null,scores:[],adds:[],burnt:false,t0:R.t,side:0,sear:[0,0],lastZone:0,mix:0,fill:0,wait:0,overStart:null,overLimit:0,overIdx:-1,overVerb:'',seed:(Math.random()*1e9)|0};enterStep(j,0);return j}
 function cookNow(j){return j.step&&j.step.t==='zone'?j.step.p:j.lastZone}
 function urgency(j){const k=j.step;if(!k)return 0;if(j.overStart!=null)return 4;if(k.t==='wait'||k.t==='work')return 0;if(k.t==='zone')return k.p>=k.z.c-k.z.g-.12?3:1;if(k.t==='tap'&&k.heat)return 3;return 2}
@@ -1071,6 +1077,7 @@ function tableActionable(t){const g=t.group;if(!g)return t.dirty;if(g.rowdy)retu
 function planAct(){const J=R.jill,t=R.tables[J.cur.t],g=t.group;const need=g&&g.ticket&&g.ticket.items.some(it=>it.st==='ready'&&!it.picked);
  if(need){J.cur.step='pickup';J.tx=PASS.x+(t.x<200?-14:14);J.ty=PASS.y}else{J.cur.step='table';J.tx=t.x;J.ty=t.y+26}}
 function arriveAct(){const J=R.jill;if(J.restTo){J.restTo=false;J.sit=true;J.face=1;return}
+ if(J.visit&&J.visit.phase==='go'&&J.visit.kind==='selfie'){const V=J.visit;V.phase='stand';V.t=rand(2,3);const t=V.t0,g=V.g;J.face=t.x>=J.x?1:-1;J.lookAt={x:t.x,y:t.y-8,t:V.t};if(R.groups.includes(g)){jillSay(pick(['好啊。','來。','貓也要一起嗎？']));g.pat=Math.min(1,g.pat+.1);memo('selfie',t.x,t.y-6,{g:g.name,subj:[{x:J.x,y:J.y}]})}return}
  if(J.visit&&J.visit.phase==='go'&&J.visit.kind==='treat'){const V=J.visit;V.phase='stand';V.t=rand(1.4,2.2);const t=V.t0;J.face=t.x>=J.x?1:-1;J.lookAt={x:t.x,y:t.y-8,t:V.t};treatArrive(V);return}
  if(J.visit&&J.visit.phase==='go'){const V=J.visit;V.phase='stand';V.t=rand(2.2,3.6);const t=V.t0,g=V.g;J.face=t.x>=J.x?1:-1;J.lookAt={x:t.x,y:t.y-8,t:V.t};
   if(R.groups.includes(g)){memo('pause',t.x,t.y,{subj:[{x:J.x,y:J.y}]});const st=S.dylan.stage;const r=Math.random();
@@ -1470,6 +1477,7 @@ function drawScene(now){const c=sctx;c.setTransform(1,0,0,1,0,0);c.globalAlpha=1
   for(const p of R.parts){const a=1-p.t/p.life;if(p.kind==='coin'){c.fillStyle=`rgba(244,196,78,${a})`;el(c,p.x,p.y,3,3.4);c.fillStyle=`rgba(142,100,34,${a})`;el(c,p.x,p.y,1.4,1.8)}else{c.fillStyle=`rgba(255,230,140,${a})`;c.save();c.translate(p.x,p.y);c.rotate(p.t*6);c.fillRect(-2.5,-.6,5,1.2);c.fillRect(-.6,-2.5,1.2,5);c.restore()}}
   for(const f of R.floats){const a=1-f.t/f.life;c.globalAlpha=Math.min(1,a*1.5);c.font=`800 ${f.big?12:9.5}px ${FONT}`;c.textAlign='center';c.textBaseline='middle';c.lineWidth=3;c.strokeStyle='rgba(30,20,15,.8)';c.strokeText(f.txt,f.x,f.y-f.t*22);c.fillStyle=f.col;c.fillText(f.txt,f.x,f.y-f.t*22);c.globalAlpha=1}
   if(R.fire>0){const a=.25+Math.sin(now*8)*.08;let g=c.createRadialGradient(200,220,150,200,220,320);g.addColorStop(0,'rgba(255,120,30,0)');g.addColorStop(1,`rgba(255,110,30,${a})`);c.fillStyle=g;c.fillRect(X0,-TOP,XW,LH+TOP)}}
+ if(R&&R.blackout>0){R.blackout-=1/60;const a=R.blackout>2.2?.75:R.blackout>.5?.85:(R.blackout/.5)*.85;c.fillStyle=`rgba(8,6,12,${a})`;c.fillRect(X0,-TOP,XW,LH+TOP)}
  if(FLASH){c.fillStyle=`rgba(255,255,255,${(1-FLASH.t/.5)*.55})`;c.fillRect(FLASH.x-78,FLASH.y-82,156,112)}
  let vg=c.createRadialGradient(206,290,210,206,290,400);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(15,8,4,.38)');c.fillStyle=vg;c.fillRect(X0,-TOP,XW,LH+TOP);
  c.restore()}
@@ -1744,10 +1752,10 @@ function applyDY(d){DY=d;FB=364+d;LH=424+d;ROWS=[162,240+d*.5,318+d];PASS.y=360+
 const SIDE={R:null,L:null};let RACE_CD=90,BAO_LAST=null;const MEMQ=[];let FLASH=null;
 const MEMS={sofa:'今晚的沙發',sofafull:'沙發客滿',husband:'Dylan — Jill 的先生',sides:'Jill 左右各一隻',ambush:'埋伏成功',what:'妳到底在幹嘛',waited:'白等了',race:'突然開賽',sleepgod:'睡神',nearby:'今天也在附近',best:'最佳座位',nap3:'三貓午睡',everyone:'今天大家都在',
  rest:'偷閒',lap:'膝上的重量',photo:'被拍了',pet:'摸一下',dylan:'留下來的人',
- play:'玩起來了',swat:'柔柔的小巴掌',pressed:'靠著柔柔',greeter:'不怕生',cushion:'一起擠軟墊',distracted:'走到一半忘了',guide:'小齁帶路',oldfriends:'又見面了',dylancat:'他們好像認識',quiet:'打烊後',oddspot:'怎麼睡在這',newroom:'新的店',reading:'各自安靜',pause:'經過的時候',company:'今天不是一個人',gift:'拿來的東西',anniversary:'紀念日',neighbors:'在店裡遇到',treat:'這個請你',bagcat:'比較喜歡袋子',rainday:'下雨天'};
+ play:'玩起來了',swat:'柔柔的小巴掌',pressed:'靠著柔柔',greeter:'不怕生',cushion:'一起擠軟墊',distracted:'走到一半忘了',guide:'小齁帶路',oldfriends:'又見面了',dylancat:'他們好像認識',quiet:'打烊後',oddspot:'怎麼睡在這',newroom:'新的店',reading:'各自安靜',pause:'經過的時候',company:'今天不是一個人',gift:'拿來的東西',anniversary:'紀念日',neighbors:'在店裡遇到',treat:'這個請你',bagcat:'比較喜歡袋子',rainday:'下雨天',selfie:'合照'};
 /* one line under each photo, written from what was actually in the frame */
 const MEM_TXT={sofa:i=>`${i.cats||'貓'}陪 Jill 坐了一會兒。`,sofafull:i=>`沙發上擠了 ${i.n||3} 隻貓，Jill 只好縮著坐。`,husband:()=>'原來一直都認識。',sides:i=>`${i.a}跟${i.b}一左一右。`,ambush:i=>`${i.a}從角落跳出來，${i.b}嚇了一跳。`,what:i=>`${i.a}看著${i.b}，看不懂。`,waited:i=>`${i.a}埋伏了半天，什麼都沒等到。`,race:i=>`${i.a}跟${i.b}突然繞著店裡跑起來。`,sleepgod:i=>`店裡再吵，${i.a}都照睡不誤。`,nearby:i=>`${i.a}坐在 Jill 腳邊。`,best:i=>`${i.a}找到了看得見全店的位子。`,nap3:()=>'三隻貓睡成一團。',everyone:()=>'五隻貓難得同時出現在一個畫面裡。',rest:i=>i.rush?'剛忙完一波，Jill 坐下來喘口氣。':'店裡沒事，Jill 在沙發上坐了一下。',lap:i=>`${i.a}跳上了 Jill 的膝蓋。`,photo:i=>`客人拿起手機，拍了${i.a}一張。`,pet:i=>`Jill 蹲下來摸了摸${i.a}。`,dylan:()=>'打烊後，Dylan 還在沙發上。',
- play:i=>`${i.a}跟${i.b}玩起來了。`,swat:i=>`${i.a}玩到一半，輕輕拍了${i.b}一下。`,pressed:i=>`${i.a}靠著${i.b}睡著了。`,greeter:i=>`${i.a}在陌生客人旁邊待得很自在。`,cushion:i=>`${i.a}跟${i.b}擠在同一塊軟墊上。`,distracted:i=>`${i.a}本來要去吃飯，走到一半就忘了。`,guide:i=>`${i.a}回頭等${i.b}，帶他去吃飯。`,oldfriends:i=>`${i.g}跟${i.a}又見面了。`,dylancat:i=>`${i.a}對 Dylan 的態度，不像對陌生人。`,quiet:()=>'店關了，燈還亮著。',oddspot:i=>`${i.a}睡在一個奇怪的地方。`,newroom:()=>'擴建之後的第一個晚上，大家都在。',reading:i=>`Jill 在看書，${i.cats}在旁邊各睡各的。`,pause:()=>'Jill 在 Dylan 的桌邊站了一下。',company:i=>`${i.g}今天帶了人來。`,gift:i=>`${i.g}帶了東西來給店裡。`,anniversary:()=>'王先生與王太太的紀念日，Jill 請了甜點。',neighbors:i=>`${i.a}跟${i.b}在店裡打了招呼，原來認識。`,treat:i=>`Jill 請了${i.g}一份${i.d}。`,bagcat:i=>`橘子沒興趣，${i.a}對袋子比較有興趣。`,rainday:i=>`外面在下雨，${i.a}睡得更沉了。`};
+ play:i=>`${i.a}跟${i.b}玩起來了。`,swat:i=>`${i.a}玩到一半，輕輕拍了${i.b}一下。`,pressed:i=>`${i.a}靠著${i.b}睡著了。`,greeter:i=>`${i.a}在陌生客人旁邊待得很自在。`,cushion:i=>`${i.a}跟${i.b}擠在同一塊軟墊上。`,distracted:i=>`${i.a}本來要去吃飯，走到一半就忘了。`,guide:i=>`${i.a}回頭等${i.b}，帶他去吃飯。`,oldfriends:i=>`${i.g}跟${i.a}又見面了。`,dylancat:i=>`${i.a}對 Dylan 的態度，不像對陌生人。`,quiet:()=>'店關了，燈還亮著。',oddspot:i=>`${i.a}睡在一個奇怪的地方。`,newroom:()=>'擴建之後的第一個晚上，大家都在。',reading:i=>`Jill 在看書，${i.cats}在旁邊各睡各的。`,pause:()=>'Jill 在 Dylan 的桌邊站了一下。',company:i=>`${i.g}今天帶了人來。`,gift:i=>`${i.g}帶了東西來給店裡。`,anniversary:()=>'王先生與王太太的紀念日，Jill 請了甜點。',neighbors:i=>`${i.a}跟${i.b}在店裡打了招呼，原來認識。`,treat:i=>`Jill 請了${i.g}一份${i.d}。`,bagcat:i=>`橘子沒興趣，${i.a}對袋子比較有興趣。`,rainday:i=>`外面在下雨，${i.a}睡得更沉了。`,selfie:i=>`${i.g}想跟 Jill 合照。`};
 /* Photos are the bulk of the restaurant's history, so they do not live in the save string any more: the save
    keeps the record (kind, day, clock, caption, 珍藏), the picture goes to IndexedDB under the record's id. A
    browser without IndexedDB (or one that refuses it) falls back to keeping the picture inline, with a lower
@@ -2203,7 +2211,7 @@ function hitStation(p){if(!R||p.y<FB-8||p.y>FB+48)return -1;const rs=kitchenRect
    checkpoint writes it into the save as plain data (references become indices), and restoreService()
    builds a new R from it. Anything that does not resolve throws, and the caller falls back to
    reopening at the same clock with today's numbers kept — and says so. */
-const CP_KEYS=['t','dur','si','closed','log','cds','treatT','combo','maxCombo','streak','fire','fireCount','tv','gid','tkid','st','rush','rushT0','rushT1','rushShown','weather','event','coach','taskDone','lastSpawn','idleT','focus','sched','inc','noticeT','catCheck','cpT'];
+const CP_KEYS=['t','dur','si','closed','log','cds','treatT','musicT','blackout','combo','maxCombo','streak','fire','fireCount','tv','gid','tkid','st','rush','rushT0','rushT1','rushShown','weather','event','coach','taskDone','lastSpawn','idleT','focus','sched','inc','noticeT','catCheck','cpT'];
 const G_STATES=['arrive','queue','toTable','reading','order','wait','eat','check','leave'];
 function snapshotService(){if(!R||phase!=='service'||R.closing!=null||R.ended)return null;
  const ti=t=>t?R.tickets.indexOf(t):-1;
@@ -2590,14 +2598,25 @@ function crewDraw(c,now,list){
   nameTag(c,w.x,w.y-64,m.name)}})}}
 function nameTag(c,x,y,n){c.font=`800 6.5px ${FONT}`;const w=c.measureText(n).width+8;c.fillStyle='rgba(42,42,42,.72)';rr(c,x-w/2,y-6,w,10,4);c.fill();c.fillStyle='#FFF8EC';c.textAlign='center';c.textBaseline='middle';c.fillText(n,x,y-1);c.textBaseline='alphabetic'}
 /* ================= incidents ================= */
-function planIncidents(dur){const D=S.day;if(D<3)return[];const n=D<6?1:D<10?2:3;const pool=shuffle(['rowdy','broken','thief','inspector','viprush']);const out=[];for(let i=0;i<n;i++)out.push({k:pool[i],t:dur*(.22+.6*(i+Math.random()*.6)/n),tries:0});return out}
+const INC_BAD=['rowdy','broken','thief','inspector'],INC_GOOD=['lucky','delivery','quiet','musician','selfie','power','rainstart','viprush','wave'];
+function planIncidents(dur){const D=S.day;if(D<3)return[];const n=D<6?1:D<12?2:3;const pool=[];let bad=0;const cand=shuffle(INC_BAD.concat(INC_GOOD,INC_GOOD));
+ for(const k of cand){if(pool.length>=n)break;if(pool.includes(k))continue;const isBad=INC_BAD.includes(k);if(isBad&&bad>=(D<8?1:2))continue;if(k==='rainstart'&&!(S.today.weather==='sun'||S.today.weather==='cloud'))continue;if(isBad)bad++;pool.push(k)}
+ return pool.map((k,i)=>({k,t:dur*(.2+.62*(i+Math.random()*.7)/n),tries:0}))}
 function fireIncident(k){switch(k){
  case'rowdy':{const cand=R.groups.filter(g=>['order','wait','eat'].includes(g.state)&&g.type!=='vip'&&!g.reg&&g.table!=null);if(!cand.length)return false;const g=pick(cand);g.rowdy=R.t+16;banner('奧客鬧事！',`T${g.table+1} 的客人在大吵大鬧`,'fire');toast('點那張桌子，讓 Jill 過去安撫');sfx.angry();return true}
  case'broken':{const cand=R.slots.filter(s=>!s.job&&!s.broken&&s.type!=='prep');if(!cand.length)return false;const s=pick(cand);s.broken=true;s.fix=0;banner('設備故障！',`${ST_N[s.type]}${s.no} 冒煙了`,'fire');toast('連點那台設備把它修好');sfx.burnt();return true}
  case'thief':{const ds=menuList().filter(d=>(S.stock[d]||0)>=2).sort((a,b)=>S.stock[b]-S.stock[a]);if(!ds.length)return false;const d=ds[0];const n=Math.min(4,S.stock[d]);S.stock[d]-=n;R.thief={x:130,y:FB-12,d,n,caught:false,look:{skin:'#E2AE88',hair:'#1E1E24',hs:0,top:'#2A2A30',acc:'shades',pants:'#1B1B20'}};banner('食材被偷了！','快點那個小偷！','fire');sfx.angry();
   const cat=CATS&&CATS.find(c=>c.perch<0&&!c.hidden&&!['jump','visit'].includes(c.st));if(cat){releaseSpots(cat);cat.guest=null;cat.run=1;catWalk(cat,R.thief.x,R.thief.y,'rest');R.chaser=cat}return true}
  case'inspector':{R.insp={t:0,dur:22,x:DOOR.x,y:DOOR.y+20,tx:224,ty:204,b0:R.st.q.B,out:false};banner('衛生檢查員突襲！','22 秒內把髒桌子收乾淨、別燒焦','fire');sfx.door();return true}
- case'viprush':{for(let i=0;i<3;i++)R.sched.splice(R.si,0,{t:R.t+i*2.5,type:i===1?'gourmet':'vip',size:2});R.sched.sort((a,b)=>a.t-b.t);banner('饕客尖峰時刻！','一群 VIP 饕客湧進來了','fire');return true}}return false}
+ case'viprush':{for(let i=0;i<3;i++)R.sched.splice(R.si,0,{t:R.t+i*2.5,type:i===1?'gourmet':'vip',size:2});R.sched.sort((a,b)=>a.t-b.t);banner('饕客尖峰時刻！','一群 VIP 饕客湧進來了','fire');return true}
+ case'wave':{for(let i=0;i<3;i++)R.sched.splice(R.si,0,Object.assign({t:R.t+i*3},rollGuest()));R.sched.sort((a,b)=>a.t-b.t);noteLine('外面一下子來了一群人');return true}
+ case'lucky':{const cand=R.groups.filter(g=>g.table!=null&&['eat','check'].includes(g.state)&&!g.reg);if(!cand.length)return false;const g=pick(cand);const t=R.tables[g.table];const tip=Math.round(80+Math.random()*120);S.money+=tip;S.lifetime+=tip;R.st.tips+=tip;quote(g,pick(['不用找了。','這個給你們，辛苦了。','多的當小費。']));addFloat(t.x,t.y-58,'小費 +'+fmt(tip),'#BFE3A8',1);sfx.cash();return true}
+ case'delivery':{const ms=menuList().filter(d=>stationOk(d)&&(S.stock[d]||0)<=6);if(!ms.length||stockTotal()+2>fridgeCap())return false;const d=pick(ms);S.stock[d]=(S.stock[d]||0)+2;noteLine(`供應商多送了 2 份${dishName(d)}的料，算他們請的`);sfx.ding();R.tv++;return true}
+ case'quiet':{let n=0;for(let i=R.si;i<R.sched.length;i++){const o=R.sched[i];if(o.t<R.t+35){o.t+=35;n++}}if(!n&&R.groups.length>2)return false;noteLine('店裡突然安靜下來了');return true}
+ case'musician':{R.musicT=R.t+45;noteLine('門口有人在唱歌，等位的客人不那麼急了');const q=queued();if(q.length)quote(q[0],pick(['外面有人在唱歌。','這首我會。']));return true}
+ case'selfie':{const cand=R.groups.filter(g=>g.table!=null&&g.state==='eat'&&g.pat>.6&&!g.reg);const J=R.jill;if(!cand.length||J.visit||J.rest||J.cur||J.q.length||jillWorkload()>1)return false;const g=pick(cand);const t=R.tables[g.table];quote(g,pick(['可以跟妳合照嗎？','老闆娘，一起拍一張？']));J.visit={g,t0:t,phase:'go',kind:'selfie'};J.tx=t.x+(t.x<200?30:-30);J.ty=t.y+20;J.idle=0;return true}
+ case'power':{R.blackout=2.6;noteLine('跳電了一下');sfx.burnt();if(CATS)for(const c of CATS){if(c.hidden||c.sofa||c.perch>=0||['jump','walk','race','dash','chase','hide2','bed','sleep'].includes(c.st))continue;releaseSpots(c);c.st='daze';c.pose='daze';c.t=rand(2,4);c.moving=false}return true}
+ case'rainstart':{if(R.weather!=='sun'&&R.weather!=='cloud')return false;R.weather='rain';S.today.weather='rain';S.wxPrev='rain';noteLine('外面突然下起雨了');const g=R.groups.find(g=>g.table!=null&&['reading','wait','eat'].includes(g.state));if(g)quote(g,pick(['下雨了。','還好進來了。','雨來得真快。']));bg=null;return true}}return false}
 function incUpd(dt){for(const e of R.inc||[]){if(!e.done&&R.t>=e.t&&!R.closed){if(fireIncident(e.k))e.done=true;else if(++e.tries>2)e.done=true;else e.t=R.t+8}}
  for(const g of R.groups){if(g.rowdy&&R.t>g.rowdy){g.rowdy=0;quote(g,'什麼爛店，我不吃了！');R.st.angry++;addReview(g,1,'隔壁桌鬧事鬧超久，店家都不管。');const t=R.tables[g.table];const served=g.ticket&&g.ticket.items.some(i=>i.st==='served');leaveGroup(g,'angry');if(t&&served)t.dirty=true;sfx.angry()}}
  const th=R.thief;if(th){const tx=DOOR.x,ty=DOOR.y+6,dx=tx-th.x,dy=ty-th.y,d=Math.hypot(dx,dy),v=(th.caught?95:38)*dt;th.step=(th.step||0)+dt*14;if(d>v){th.x+=dx/d*v;th.y+=dy/d*v;th.face=dx>=0?1:-1}else{if(!th.caught)toast(`小偷帶著 ${DISH(th.d).n}×${th.n} 跑掉了…`);R.thief=null}
