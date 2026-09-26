@@ -12,6 +12,7 @@
 | `tests/fixtures/*.json` | 舊存檔樣本，每次存檔格式改變都要新增一份 |
 | `tests/golden/` | 目前版本的「標準答案」：遊戲數值、每幀畫面雜湊、10 張截圖 |
 | `docs/V16_CHANGES.md` | V16（做菜流程、Dylan 的戲、等候長椅、備份存檔）改了什麼、為什麼 |
+| `docs/V17_CHANGES.md` | V17（Dylan 出場頻率、視覺打磨）改了什麼；第 5 天畫面消失的根因 |
 | `docs/LIFE_SYSTEM.md` | 沙發、閨蜜機、Jill 的晚上、五隻貓的沙發行為、Dylan 隱藏線的規則與測試 |
 | `tools/analyze.js`、`tools/lint.mjs` | 靜態分析（未使用的程式、共用變數、計時器、事件監聽） |
 
@@ -80,6 +81,12 @@
 - 等待時的小動作 `g.wact`：`idle`／`phone`／`look`／`cat`（附近 110px 內有貓就看牠）／`talk`（兩人以上）。純視覺，沒有數值。
 - 沒位子而且門口滿了：`spawn` 直接讓他們「看到客滿，失望地走了」（原本就有的 `queueMax()` 也還在）。
 - 幾何：長椅在 x 48–76、y 140–250，門口落地點在它上方，沙發從 x=88 開始，跳台最高層在 y=254+DY。測試 `waiting_bench` 檢查它不碰門口、桌子、沙發、跳台、閨蜜機、員工待命點。
+
+### 畫人、畫光、畫影子
+- 所有人（客人、員工、Dylan、Jill）都走 `drawPerson(c,x,y,L,o)`。`L`：`skin/hair/hs(0–8)/top/acc/pants`；`o`：`seated/lounge/step/bob/mood/blink/gaze/hold/expr…`。座標系是固定的（頭半徑 9.6、身體寬 17），改外觀不要動這些數字，否則點擊判定和位子會跑掉。Jill 專用的 `expr`（smile/focus/soft/tired/amused）由呼叫端依情境決定。
+- 從 `hash()`（無號 32 位元）取索引一律用 `>>>`，不要用 `>>`：有號位移會把一半的值變成負數索引，畫圖時取到 `undefined` 就會讓整個 rAF 迴圈死掉（V17 修過一次，見 `docs/V17_CHANGES.md`）。
+- 站在地上的東西用 `softShadow(c,x,y,rx,ry,a)` 畫接觸陰影；整體光線用 `tintFor(dusk)`（開店→傍晚→打烊三段），打烊後另有以沙發為中心的暗角。地板的織紋、暗角在 `makeBg` 快取裡。
+- 畫圖的函式裡**不能丟例外**：`drawScene` 跑在 `requestAnimationFrame` 裡，一個例外就是整個遊戲停住而 UI 還活著。`world_stays_visible_across_days` 會抓這種事，但新畫法請先在 `tests/artifacts/` 看截圖。
 
 ### 新增貓咪行為
 1. 在 `catDecide` 用 `add('新行為', 權重)` 加入候選；權重依個性（`id`）決定。
