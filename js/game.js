@@ -233,7 +233,7 @@ function legacyCrew(o){if(!o.crewMig){o.crewMig=1;o.crew=o.crew||[];if(o.staff&&
    touches S or localStorage. */
 const BACKUP_APP='jills-kitchen';
 function parseSave(t){let o;try{o=JSON.parse(t)}catch(e){return{err:'notjson'}}
- if(o&&typeof o==='object'&&o.app===BACKUP_APP&&o.save&&typeof o.save==='object')o=o.save;   /* a backup file wraps the save */
+ let photos=null;if(o&&typeof o==='object'&&o.app===BACKUP_APP&&o.save&&typeof o.save==='object'){if(o.photos&&typeof o.photos==='object')photos=o.photos;o=o.save}   /* a backup file wraps the save (and its pictures) */
  else if(o&&typeof o==='object'&&typeof o[KEY]==='string'){try{o=JSON.parse(o[KEY])}catch(e){return{err:'notjson'}}}   /* a raw localStorage dump */
  if(!o||typeof o!=='object'||Array.isArray(o))return{err:'notsave'};
  if(typeof o.v!=='number'||o.v%1)return{err:'notsave'};
@@ -241,29 +241,31 @@ function parseSave(t){let o;try{o=JSON.parse(t)}catch(e){return{err:'notjson'}}
  if(o.v<1)return{err:'notsave'};if(o.v>SAVE_V)return{err:'newer',v:o.v};
  try{for(let n=o.v;n<SAVE_V;n++){MIGRATE[n](o);o.v=n+1}o=legacyCrew(fillDefaults(o))}catch(e){return{err:'broken'}}
  if(!(o.day>=1&&isFinite(o.money)&&o.unlocked.every(d=>typeof d==='string')&&o.menu.every(d=>typeof d==='string')&&Array.isArray(o.crew)&&o.dylan&&typeof o.dylan==='object'))return{err:'broken'};
- o.day=Math.max(1,Math.floor(o.day));o.money=Math.round(o.money);return{o}}
+ o.day=Math.max(1,Math.floor(o.day));o.money=Math.round(o.money);return{o,photos}}
 function load(){let t=null;try{t=localStorage.getItem(KEY)}catch(e){return null}if(!t)return null;
  const r=parseSave(t);if(r.err){rescue(t,r.err+(r.v?' '+r.v:''));return null}return r.o}
 let saveWarned=false;
 function backupName(){const d=new Date(),p=n=>String(n).padStart(2,'0');return `JillsKitchen_Save_${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}_Day${S.day}.json`}
-function backupText(){return JSON.stringify({app:BACKUP_APP,kind:'save',v:S.v,exported:new Date().toISOString(),save:S},null,1)}
-function exportSave(){if(phase==='service'&&!paused){toast('先暫停再備份');return false}if(phase==='service'&&R&&R.closing==null)checkpointSave('backup');else save();const name=backupName(),text=backupText();
+function backupText(photos){return JSON.stringify({app:BACKUP_APP,kind:'save',v:S.v,exported:new Date().toISOString(),save:S,photos:photos||{}},null,1)}
+function exportSave(){if(phase==='service'&&!paused){toast('先暫停再備份');return false}if(phase==='service'&&R&&R.closing==null)checkpointSave('backup');else save();const name=backupName();photoAll().then(ph=>exportWith(name,backupText(ph)));return true}
+function exportWith(name,text){
  const direct=()=>{try{const blob=new Blob([text],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),4000);toast('已備份存檔：'+name);return true}catch(e){toast('這個瀏覽器無法下載檔案');return false}};
  /* inside the claude.ai viewer a page cannot download by itself; the host saves the file for us */
  const host=window.claude&&typeof window.claude.use==='function';if(!host)return direct();
  toast('準備備份檔…');window.claude.use('downloads').then(d=>{if(!d){direct();return}return d.save({filename:name,data:text}).then(()=>toast('已備份存檔：'+name),e=>{if(e&&e.code==='declined')return;direct()})}).catch(direct);return true}
-function copyBackup(){if(phase==='service'&&!paused){toast('先暫停再備份');return}if(phase==='service'&&R&&R.closing==null)checkpointSave('backup');else save();const text=backupText();
+function copyBackup(){if(phase==='service'&&!paused){toast('先暫停再備份');return}if(phase==='service'&&R&&R.closing==null)checkpointSave('backup');else save();photoAll().then(ph=>copyWith(backupText(ph)))}
+function copyWith(text){
  const done=()=>toast('備份文字已複製，貼到備忘錄或訊息裡留著；之後用「貼上備份文字恢復」讀回來');
  const fallback=()=>{try{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.focus();ta.select();const ok=document.execCommand&&document.execCommand('copy');ta.remove();if(ok)done();else toast('這個瀏覽器不讓網頁複製文字，請改用「備份到檔案」')}catch(e){toast('這個瀏覽器不讓網頁複製文字，請改用「備份到檔案」')}};
  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(text).then(done,fallback);else fallback()}
 const IMPORT_MSG={notjson:'這不是 Jill\'s Kitchen 的存檔檔案（無法讀取內容）',notsave:'這不是 Jill\'s Kitchen 的存檔檔案',newer:'這個存檔來自比較新的版本，目前的遊戲讀不了',broken:'這個存檔檔案已經損壞，無法讀取'};
-let pendingImport=null;
-function importSaveText(t){const r=parseSave(t);if(r.err){pendingImport=null;toast(IMPORT_MSG[r.err]+'。目前的進度沒有改變');if(sub==='settings'||sub==='pause')showSettings();return false}pendingImport=r.o;if(sub==='pause')sub='settings';showSettings();return true}
-function importConfirm(){const o=pendingImport;if(!o)return;pendingImport=null;if(phase==='service'&&!paused){toast('先暫停再讀取存檔');return}paused=false;
- S=o;save();R=null;ICACHE.clear();DCACHE.clear();IDLE=null;bg=null;lifeReset();setAudio();sub=null;resetStep=0;toast(`已讀取存檔：DAY ${S.day}`);showTitle()}
+let pendingImport=null,pendingPhotos=null;
+function importSaveText(t){const r=parseSave(t);if(r.err){pendingImport=null;toast(IMPORT_MSG[r.err]+'。目前的進度沒有改變');if(sub==='settings'||sub==='pause')showSettings();return false}pendingImport=r.o;pendingPhotos=r.photos;if(sub==='pause')sub='settings';showSettings();return true}
+function importConfirm(){const o=pendingImport;if(!o)return;const ph=pendingPhotos;pendingImport=null;pendingPhotos=null;if(phase==='service'&&!paused){toast('先暫停再讀取存檔');return}paused=false;
+ S=o;PHOTOS.clear();if(ph){for(const p of albumList())if(!p.img&&ph[p.id])p.img=ph[p.id]}photoMigrate();save();R=null;ICACHE.clear();DCACHE.clear();IDLE=null;bg=null;lifeReset();setAudio();sub=null;resetStep=0;toast(`已讀取存檔：DAY ${S.day}`);showTitle()}
 function pickImportFile(){if(phase==='service'&&!paused){toast('先暫停再讀取存檔');return}let inp=$('#importFile');
  if(!inp){inp=document.createElement('input');inp.type='file';inp.id='importFile';inp.accept='.json,application/json,text/plain';inp.hidden=true;document.body.appendChild(inp);
-  inp.addEventListener('change',()=>{const f=inp.files&&inp.files[0];inp.value='';if(!f)return;if(f.size>4e6){toast(IMPORT_MSG.notsave+'。目前的進度沒有改變');return}const fr=new FileReader();fr.onload=()=>importSaveText(String(fr.result||''));fr.onerror=()=>toast('讀取檔案失敗。目前的進度沒有改變');fr.readAsText(f)})}
+  inp.addEventListener('change',()=>{const f=inp.files&&inp.files[0];inp.value='';if(!f)return;if(f.size>40e6){toast(IMPORT_MSG.notsave+'。目前的進度沒有改變');return}const fr=new FileReader();fr.onload=()=>importSaveText(String(fr.result||''));fr.onerror=()=>toast('讀取檔案失敗。目前的進度沒有改變');fr.readAsText(f)})}
  inp.click()}
 function save(){try{S.savedAt=Date.now();S.savedLabel=`DAY ${S.day} · ${R&&phase==='service'?clockStr():(phase==='service'?'17:00':'打烊後')}`;localStorage.setItem(KEY,JSON.stringify(S));return true}catch(e){if(!saveWarned){saveWarned=true;console.warn('[save] saving failed',e)}return false}}
 function hasSave(){try{return!!localStorage.getItem(KEY)}catch(e){return false}}
@@ -864,14 +866,17 @@ function tableActionable(t){const g=t.group;if(!g)return t.dirty;if(g.rowdy)retu
 function planAct(){const J=R.jill,t=R.tables[J.cur.t],g=t.group;const need=g&&g.ticket&&g.ticket.items.some(it=>it.st==='ready'&&!it.picked);
  if(need){J.cur.step='pickup';J.tx=PASS.x+(t.x<200?-14:14);J.ty=PASS.y}else{J.cur.step='table';J.tx=t.x;J.ty=t.y+26}}
 function arriveAct(){const J=R.jill;if(J.restTo){J.restTo=false;J.sit=true;J.face=1;return}
- if(J.rest==='go'){const L=LIFE.jill;if(!L.reserved||!L.pos){J.rest=null;return}J.rest='sit';J.sofa=true;memo('rest',JPOS[L.pos].x,SOFA.jy);L.x=JPOS[L.pos].x;L.y=SOFA.jy;L.on=true;L.reserved=false;L.act='idle';L.t=rand(4,9);L.last=null;L.sinceSit=0;L.legs=0;L.legTarget=0;L.gazeT=0;L.flip=0;L.settleT=rand(20,40);L.bobT=.5;J.face=L.face;J.x=L.x;J.y=SOFA.front+10;return}
+ if(J.rest==='go'){const L=LIFE.jill;if(!L.reserved||!L.pos){J.rest=null;return}J.rest='sit';J.sofa=true;memo('rest',JPOS[L.pos].x,SOFA.jy,{subj:sofaCats()});L.x=JPOS[L.pos].x;L.y=SOFA.jy;L.on=true;L.reserved=false;L.act='idle';L.t=rand(4,9);L.last=null;L.sinceSit=0;L.legs=0;L.legTarget=0;L.gazeT=0;L.flip=0;L.settleT=rand(20,40);L.bobT=.5;J.face=L.face;J.x=L.x;J.y=SOFA.front+10;return}
  if(!J.cur)return;const t=R.tables[J.cur.t];
  if(J.cur.step==='pickup'){const g=t.group;if(g&&g.ticket){for(const it of g.ticket.items)if(it.st==='ready'&&!it.picked){it.picked=true;J.carry.push({tk:g.ticket,it})}}J.busy=.22;J.cur.step='table';J.cur.go=true;R.tv++;return}
- let busy=0;const g=t.group;if(g&&g.rowdy){g.rowdy=0;g.pat=Math.min(1,g.pat+.25);busy=1.1;quote(g,'好啦好啦…看在 Jill 的面子上。');addFloat(t.x,t.y-50,'安撫成功','#9ED08A',1);sfx.good()}
+ let busy=0;const g=t.group;/* what this trip is for is decided before anything changes: a checkout leaves the table dirty,
+   and clearing it is the next trip (tap again, or a cleaner) — the same rule whoever takes the money */
+ const clearing=!t.group&&t.dirty;
+ if(g&&g.rowdy){g.rowdy=0;g.pat=Math.min(1,g.pat+.25);busy=1.1;quote(g,'好啦好啦…看在 Jill 的面子上。');addFloat(t.x,t.y-50,'安撫成功','#9ED08A',1);sfx.good()}
  if(g&&g.state==='order'){createTicket(g);busy=.7}
  if(g&&g.ticket&&J.carry.length){const mine=J.carry.filter(c=>c.tk===g.ticket);if(mine.length){serveItems(g,mine);J.carry=J.carry.filter(c=>c.tk!==g.ticket);busy=Math.max(busy,.4)}}
  if(g&&g.state==='check'){jillFarewell(g);regularNote(g);collect(g);busy=Math.max(busy,.5)}
- if(!t.group&&t.dirty){t.dirty=false;t.plates=[];t.busT=0;busy=Math.max(busy,.55);sfx.clear();coach(7)}
+ if(clearing&&!t.group&&t.dirty){t.dirty=false;t.plates=[];t.busT=0;busy=Math.max(busy,.55);sfx.clear();coach(7)}
  J.carry=J.carry.filter(c=>R.tickets.includes(c.tk));J.busy=busy||.08;J.cur.done=true}
 /* What still needs Jill herself right now. Staff who cover a job take it off her plate, which is how
    hiring people turns into free time for her — no employee-count bonus anywhere. */
@@ -903,7 +908,7 @@ function jillUpd(dt){const J=R.jill;const fire=R.fire>0;
  if(J.tx!=null){const dx=J.tx-J.x,dy=J.ty-J.y,d=Math.hypot(dx,dy),v=165*(fire?1.5:1)*dt;if(d<=v){J.x=J.tx;J.y=J.ty;J.tx=null;J.moving=false;arriveAct()}else{J.x+=dx/d*v;J.y+=dy/d*v;J.face=dx>=0?1:-1;J.step+=dt*12;J.moving=true}return}
  if(J.pet){J.pet.t-=dt;if(J.pet.t<=0){J.pet=null;J.idle=0}else if(J.q.length||jillWorkload()>2)J.pet=null}
  if(!J.cur&&!J.pet&&R.closing==null&&J.idle>1.5&&(J.petCD||0)<R.t&&CATS&&Math.random()<dt*.5){/* a cat wandered close: look down, crouch, one pat */const near=CATS.find(c=>!c.hidden&&c.perch<0&&!c.sofa&&['rest','daze','stare','sleep','side'].includes(c.st)&&Math.hypot(c.x-J.x,c.y-J.y)<42);
-  if(near){const id=near.def.id;const p=id==='tora'?.9:id==='ban'?.85:id==='mikan'?.6:id==='mei'?.45:.35;J.petCD=R.t+rand(18,40);if(Math.random()<p){J.pet={cat:near,t:rand(1.6,3),crouch:near.st!=='side'};if(near.st!=='side')memo('pet',near.x,near.y-6,{a:catName(near.def)});J.face=near.x>=J.x?1:-1;if(near.st!=='sleep'){releaseSpots(near);near.st='pet';near.pose=near.st==='sleep'?near.pose:'rub';near.happy=rand(2,3.5);near.quiet=1;near.face=J.x>=near.x?1:-1}near.hearts.push({x:0,y:-26,t:0});if(id==='snow'&&near.st==='sleep')snowNudge(near)}else{J.lookAt={x:near.x,y:near.y,t:rand(1,2),down:true}}}}
+  if(near){const id=near.def.id;const p=id==='tora'?.9:id==='ban'?.85:id==='mikan'?.6:id==='mei'?.45:.35;J.petCD=R.t+rand(18,40);if(Math.random()<p){J.pet={cat:near,t:rand(1.6,3),crouch:near.st!=='side'};if(near.st!=='side')memo('pet',near.x,near.y-6,{a:catName(near.def),subj:[{x:J.x,y:J.y}]});J.face=near.x>=J.x?1:-1;if(near.st!=='sleep'){releaseSpots(near);near.st='pet';near.pose=near.st==='sleep'?near.pose:'rub';near.happy=rand(2,3.5);near.quiet=1;near.face=J.x>=near.x?1:-1}near.hearts.push({x:0,y:-26,t:0});if(id==='snow'&&near.st==='sleep')snowNudge(near)}else{J.lookAt={x:near.x,y:near.y,t:rand(1,2),down:true}}}}
  if(J.lookAt){J.lookAt.t-=dt;if(J.lookAt.t<=0)J.lookAt=null}if(J.nod>0)J.nod-=dt;
  if(!J.cur&&R.closing==null){J.idle+=dt;
   /* a quiet moment: nothing on the pass, nobody waiting on her -> she may sit down on the sofa for a bit */
@@ -990,6 +995,9 @@ function renderTickets(){if(!R){ticketsEl.innerHTML=`<div class="tk-empty">${pha
  tkRefs=[...ticketsEl.querySelectorAll('.tk')].map(el=>({el,tk:R.tickets.find(t=>t.id===+el.dataset.tk),w:el.querySelector('[data-w]'),p:el.querySelector('[data-p]')}));updTicketBars()}
 function updTicketBars(){if(!R)return;for(const r of tkRefs){if(!r.tk)continue;const e=Math.floor(R.t-r.tk.t0);r.w.textContent=`${Math.floor(e/60)}:${String(e%60).padStart(2,'0')}`;const p=r.tk.g.pat;r.p.style.width=(p*100)+'%';r.p.style.background=p>.55?'#5E8F4E':p>.28?'#E0A43A':'#D4553A';r.el.classList.toggle('urgent',p<.28)}}
 ticketsEl.addEventListener('scroll',()=>ticketsLayout(),{passive:true});
+{const lb=$('#lightbox');if(lb){lb.addEventListener('click',e=>{const b=e.target.closest('[data-lb]');if(!b)return;const a=b.dataset.lb;if(a==='close')closeLightbox();else if(a==='prev')lightboxStep(-1);else if(a==='next')lightboxStep(1);else if(a==='keep'){const p=albumList().find(x=>x.id===lightbox.ids[lightbox.i]);if(p){p.keep=!p.keep;save();lightboxRender();if(sub==='book')keepScroll(showBook)}}});
+ let sx=null,sy=null;lb.addEventListener('touchstart',e=>{const t=e.touches[0];sx=t.clientX;sy=t.clientY},{passive:true});lb.addEventListener('touchend',e=>{if(sx==null)return;const t=e.changedTouches[0];const dx=t.clientX-sx,dy=t.clientY-sy;sx=null;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5)lightboxStep(dx<0?1:-1)},{passive:true});
+ document.addEventListener('keydown',e=>{if(!lightbox)return;if(e.key==='Escape')closeLightbox();else if(e.key==='ArrowLeft')lightboxStep(-1);else if(e.key==='ArrowRight')lightboxStep(1)})}}
 $('#tkMore').addEventListener('click',()=>{ticketsEl.scrollBy({left:ticketsEl.clientWidth*.8,behavior:'smooth'});setTimeout(ticketsLayout,400)});
 $('#tkBack').addEventListener('click',()=>{ticketsEl.scrollBy({left:-ticketsEl.clientWidth*.8,behavior:'smooth'});setTimeout(ticketsLayout,400)});
 ticketsEl.addEventListener('click',e=>{const b=e.target.closest('.it');if(!b||!R)return;const tk=R.tickets.find(t=>t.id===+b.dataset.tk);if(!tk)return;const it=tk.items[+b.dataset.i];if(!it)return;
@@ -1446,12 +1454,33 @@ const MEMS={sofa:'今晚的沙發',sofafull:'沙發客滿',husband:'Dylan — Ji
  rest:'偷閒',lap:'膝上的重量',photo:'被拍了',pet:'摸一下',dylan:'留下來的人'};
 /* one line under each photo, written from what was actually in the frame */
 const MEM_TXT={sofa:i=>`${i.cats||'貓'}陪 Jill 坐了一會兒。`,sofafull:i=>`沙發上擠了 ${i.n||3} 隻貓，Jill 只好縮著坐。`,husband:()=>'原來一直都認識。',sides:i=>`${i.a}跟${i.b}一左一右。`,ambush:i=>`${i.a}從角落跳出來，${i.b}嚇了一跳。`,what:i=>`${i.a}看著${i.b}，看不懂。`,waited:i=>`${i.a}埋伏了半天，什麼都沒等到。`,race:i=>`${i.a}跟${i.b}突然繞著店裡跑起來。`,sleepgod:i=>`店裡再吵，${i.a}都照睡不誤。`,nearby:i=>`${i.a}坐在 Jill 腳邊。`,best:i=>`${i.a}找到了看得見全店的位子。`,nap3:()=>'三隻貓睡成一團。',everyone:()=>'五隻貓難得同時出現在一個畫面裡。',rest:()=>'店裡沒事，Jill 在沙發上坐了一下。',lap:i=>`${i.a}跳上了 Jill 的膝蓋。`,photo:i=>`客人拿起手機，拍了${i.a}一張。`,pet:i=>`Jill 蹲下來摸了摸${i.a}。`,dylan:()=>'打烊後，Dylan 還在沙發上。'};
-const ALBUM_CAP=30;   /* ordinary photos kept; the first photo of each kind is 珍藏 and never rotates out */
-function albumList(){if(!S.album){S.album=[];/* photos from before the album existed: all 珍藏, no clock */for(const k of Object.keys(S.mem||{}))if(S.mem[k]&&S.mem[k].img)S.album.push({kind:k,day:S.mem[k].day,clock:'',cap:MEMS[k]||k,txt:'',img:S.mem[k].img,keep:true});S.album.sort((a,b)=>a.day-b.day);for(const k in S.mem||{})if(S.mem[k])S.mem[k]={day:S.mem[k].day}/* the picture now lives in the album */}return S.album}
+/* Photos are the bulk of the restaurant's history, so they do not live in the save string any more: the save
+   keeps the record (kind, day, clock, caption, 珍藏), the picture goes to IndexedDB under the record's id. A
+   browser without IndexedDB (or one that refuses it) falls back to keeping the picture inline, with a lower
+   cap so localStorage stays safe. Backups always carry the pictures. */
+const PHOTOS=new Map();let photoDB=null,photoDBFail=false,photoQueue=Promise.resolve();
+function photoOpen(){return new Promise(res=>{if(photoDB)return res(photoDB);if(photoDBFail||!window.indexedDB)return res(null);try{const rq=indexedDB.open('jills-kitchen-photos',1);rq.onupgradeneeded=()=>{rq.result.createObjectStore('photos')};rq.onsuccess=()=>{photoDB=rq.result;photoDB.onclose=()=>{photoDB=null};photoDB.onversionchange=()=>{photoDB.close();photoDB=null};res(photoDB)};rq.onerror=()=>{photoDBFail=true;res(null)};rq.onblocked=()=>res(null)}catch(e){photoDBFail=true;res(null)}})}
+function photoPut(id,data){PHOTOS.set(id,data);return photoOpen().then(db=>new Promise(res=>{if(!db)return res(false);try{const tx=db.transaction('photos','readwrite');tx.objectStore('photos').put(data,id);tx.oncomplete=()=>res(true);tx.onerror=()=>res(false);tx.onabort=()=>res(false)}catch(e){res(false)}}))}
+function photoGet(id){if(!id)return Promise.resolve(null);if(PHOTOS.has(id))return Promise.resolve(PHOTOS.get(id));return photoOpen().then(db=>new Promise(res=>{if(!db)return res(null);try{const rq=db.transaction('photos').objectStore('photos').get(id);rq.onsuccess=()=>{if(rq.result)PHOTOS.set(id,rq.result);res(rq.result||null)};rq.onerror=()=>res(null)}catch(e){res(null)}}))}
+function photoDel(id){PHOTOS.delete(id);photoOpen().then(db=>{if(!db)return;try{db.transaction('photos','readwrite').objectStore('photos').delete(id)}catch(e){}})}
+function photoClear(){PHOTOS.clear();photoOpen().then(db=>{if(!db)return;try{db.transaction('photos','readwrite').objectStore('photos').clear()}catch(e){}})}
+/* every picture of the album, for a backup: {id: dataURL} */
+function photoAll(){const A=albumList();return Promise.all(A.map(p=>p.img?Promise.resolve([p.id,p.img]):photoGet(p.id).then(d=>[p.id,d]))).then(arr=>{const o={};for(const [id,d] of arr)if(id&&d)o[id]=d;return o})}
+const PHOTO_BLANK='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="360" height="270"><rect width="360" height="270" fill="#EFE3CF"/></svg>');
+let photoWake=0;
+/* what to put in an <img> right now: the picture if we have it, otherwise a blank while it loads (the album re-renders once) */
+function photoSrc(p){if(p.img)return p.img;if(PHOTOS.has(p.id))return PHOTOS.get(p.id);photoGet(p.id).then(d=>{if(d&&!photoWake){photoWake=1;Promise.resolve().then(()=>{photoWake=0;if(sub==='book')keepScroll(showBook);if(lightbox)lightboxRender()})}});return PHOTO_BLANK}
+/* pictures still inline in the save (older saves, or a failed IndexedDB write) move into the store when it works */
+function photoMigrate(){const A=albumList();const inline=A.filter(p=>p.img);if(!inline.length)return;photoQueue=photoQueue.then(()=>photoOpen()).then(db=>{if(!db)return;return Promise.all(inline.map(p=>photoPut(p.id,p.img).then(ok=>{if(ok)delete p.img}))).then(()=>save())})}
+function albumCap(){return photoDBFail?60:240}   /* ordinary photos kept; 珍藏 never rotate out */
+function albumList(){if(!S.album){S.album=[];/* photos from before the album existed: all 珍藏, no clock */for(const k of Object.keys(S.mem||{}))if(S.mem[k]&&S.mem[k].img)S.album.push({kind:k,day:S.mem[k].day,clock:'',cap:MEMS[k]||k,txt:'',img:S.mem[k].img,keep:true});S.album.sort((a,b)=>a.day-b.day);for(const k in S.mem||{})if(S.mem[k])S.mem[k]={day:S.mem[k].day}/* the picture now lives in the album */}
+ for(const p of S.album)if(!p.id)p.id='p'+p.day+'_'+p.kind+'_'+Math.random().toString(36).slice(2,8);return S.album}
 function albumAllows(kind){const A=albumList();const today=A.filter(p=>p.day===S.day);if(today.length>=4)return false;const same=A.filter(p=>p.kind===kind);if(!same.length)return true;const last=same[same.length-1];if(S.day-last.day<3)return false;return today.filter(p=>!p.keep).length<2}
 function eveningClock(){const m=Math.floor(21*60+30+Math.min(LIFE.t||0,180)*(75/180));const h=Math.floor(m/60),mm=m%60;return`${h}:${String(mm).padStart(2,'0')}`}
 function albumAdd(kind,img,info){const A=albumList();const keep=!A.some(p=>p.kind===kind);const clock=R&&R.closing==null?clockStr():evening()?eveningClock():'';let txt='';try{txt=(MEM_TXT[kind]||(()=>''))(info||{})}catch(e){}
- A.push({kind,day:S.day,clock,cap:MEMS[kind]||kind,txt,img,keep});const ord=A.filter(p=>!p.keep);if(ord.length>ALBUM_CAP){const old=ord[0];A.splice(A.indexOf(old),1)}}
+ const p={id:'p'+S.day+'_'+kind+'_'+Math.random().toString(36).slice(2,8),kind,day:S.day,clock,cap:MEMS[kind]||kind,txt,keep};A.push(p);
+ photoPut(p.id,img).then(ok=>{if(!ok){p.img=img;save()}});   /* no store: the picture stays in the save */
+ const ord=A.filter(p=>!p.keep);while(ord.length>albumCap()){const old=ord.shift();A.splice(A.indexOf(old),1);photoDel(old.id)}return p}
 function catBy(id){return CATS?CATS.find(c=>c.def.id===id):null}
 function evening(){return(R&&R.closing!=null)||['summary','shop'].includes(phase)}
 function jillA(){const J=view().jill;const idle=!R||(!J.cur&&!(J.q&&J.q.length)&&!J.moving);if(R&&phase==='service'&&R.closing==null&&J.rest){return{x:LIFE.jill.x,y:SOFA.front+10,idle:false,sit:true}}if(R&&phase==='service'&&R.closing==null){const near=Math.hypot(J.x-PASS.x,J.y-PASS.y)<30;return{x:PASS.x,y:PASS.y,idle:idle&&near,sit:false}}return{x:J.x,y:J.y,idle,sit:!!J.sit}}
@@ -1565,30 +1594,37 @@ function ambushTick(c,dt){c.t-=dt;if(c.peekT>0)c.peekT-=dt;
  for(const o of CATS){if(o===c||o.hidden||o.perch>=0)continue;if(!['walk','race','chase'].includes(o.st))continue;const d=Math.hypot(o.x-c.x,o.y-c.y);if(d>46)continue;const key=o.def.id+Math.floor(ctime/6);if(c.seen[key])continue;c.seen[key]=1;
   if(o.def.id==='mei'){if(Math.random()<.55){scare(c,o);return}}else{c.peekT=1.1}}
  if(c.t<=0){c.hidden=false;const r=Math.random();if(r<.45){c.st='daze';c.pose='daze';c.t=rand(2,4);memo('waited',c.x,c.y,{a:catName(c.def)})}else if(r<.75){c.st='rest';c.pose=pick(['sit','loaf']);c.t=rand(6,12)}else catDecide(c)}}
-function scare(c,b){c.hidden=false;c.st='dash';c.target=b;c.t=.45;c.run=1;b.stareAt=null;memo('ambush',b.x,b.y,{a:catName(c.def),b:catName(b.def)});if(R)for(const g of R.groups)if(g.table!=null&&Math.hypot(R.tables[g.table].x-b.x,R.tables[g.table].y-b.y)<90)g.scared=true;sfx.catPlay();
+function scare(c,b){c.hidden=false;c.st='dash';c.target=b;c.t=.45;c.run=1;b.stareAt=null;memo('ambush',b.x,b.y,{a:catName(c.def),b:catName(b.def),subj:[c]});if(R)for(const g of R.groups)if(g.table!=null&&Math.hypot(R.tables[g.table].x-b.x,R.tables[g.table].y-b.y)<90)g.scared=true;sfx.catPlay();
  const r=Math.random();b.react=r<.25?'chase':r<.6?'glare':r<.75?'freeze':'ignore'}
 function afterScare(c){const b=c.target;c.target=null;const r=b?b.react:'ignore';
- if(b){if(r==='chase'){releaseSpots(b);b.st='chase';b.target=c;b.t=2.2;b.run=1}else if(r==='glare'){releaseSpots(b);b.glareAt=c;catJump(b,b.x,b.y,'glare');b.jmp.d=.3;memo('what',b.x,b.y,{a:catName(b.def),b:catName(c.def)})}else if(r==='freeze'){releaseSpots(b);catJump(b,b.x,b.y,'decide');b.jmp.d=.35}}
+ if(b){if(r==='chase'){releaseSpots(b);b.st='chase';b.target=c;b.t=2.2;b.run=1}else if(r==='glare'){releaseSpots(b);b.glareAt=c;catJump(b,b.x,b.y,'glare');b.jmp.d=.3;memo('what',b.x,b.y,{a:catName(b.def),b:catName(c.def),subj:[c]})}else if(r==='freeze'){releaseSpots(b);catJump(b,b.x,b.y,'decide');b.jmp.d=.35}}
  const q=Math.random();if(q<.4){const p=randFloor();c.run=1;catWalk(c,p.x,p.y,'rest')}else if(q<.6){const p=randFloor();c.run=1;c.lookBack=1;catWalk(c,p.x,p.y,'flee')}else if(q<.8){catJump(c,c.x+rand(-6,6),c.y,'decide');c.jmp.d=.3}else{c.run=1;c.circ=[{x:c.x+30,y:c.y-12},{x:c.x+10,y:c.y-30},{x:c.x-20,y:c.y-10}].map(p=>({x:clamp(p.x,96,316),y:clamp(p.y,140,FB-10)}));const n=c.circ.shift();catWalk(c,n.x,n.y,'circ')}}
 /* ---- 樾樾 × 包包 race ---- */
 function startRace(c){const o=catBy(c.def.id==='tora'?'snow':'tora');if(!o)return catDecide(c);RACE_CD=rand(200,360);const wasAsleep=['sleep','bed'].includes(o.st);releaseSpots(o);o.guest=null;o.wd=wasAsleep?rand(.5,.9):.2;
  const path=[];let lx=Math.random()<.5;for(let i=0;i<4;i++){lx=!lx;path.push({x:lx?rand(96,150):rand(262,316),y:rand(150,FB-14)})}
- const lead=c,fol=o;lead.path=path;lead.run=1;lead.st='walk';lead.after='raceNext';raceStep(lead);fol.st='race';fol.target=lead;fol.t=16;fol.run=1;fol.moving=false;fol.pose='daze';memo('race',c.x,c.y,{a:catName(c.def),b:catName(o.def)})}
+ const lead=c,fol=o;lead.path=path;lead.run=1;lead.st='walk';lead.after='raceNext';raceStep(lead);fol.st='race';fol.target=lead;fol.t=16;fol.run=1;fol.moving=false;fol.pose='daze';memo('race',c.x,c.y,{a:catName(c.def),b:catName(o.def),subj:[o]})}
 function raceStep(c){const n=c.path&&c.path.shift();if(!n){c.run=0;c.path=null;const f=CATS.find(o=>o.st==='race'&&o.target===c);if(f){f.st='rest';f.run=0;f.target=null;finishRace(f)}finishRace(c);return}c.st='walk';c.tx=n.x;c.ty=n.y;c.after='raceNext';c.run=1}
 function finishRace(c){c.run=0;if(c.def.id==='snow'){if(spotFree('bed')&&Math.random()<.4)catGo(c,'bed');else sleepHere(c,30,60)}else{c.st='rest';c.pose='groom';c.t=rand(4,8)}}
 /* ---- memories ---- */
 function memo(id,x,y,info){if(!MEMS[id])return;if(MEMQ.some(m=>m.id===id)||!albumAllows(id))return;MEMQ.push({id,x,y,info})}
-function flushMem(){if(!MEMQ.length)return;for(const m of MEMQ.splice(0)){try{const w=150,h=110;let sx=(SV.ox+(m.x-w/2)*SV.s)*DPR,sy=(SV.oy+(m.y-h*.72)*SV.s)*DPR,sw=w*SV.s*DPR,sh=h*SV.s*DPR;sx=clamp(sx,0,Math.max(0,sc.width-sw));sy=clamp(sy,0,Math.max(0,sc.height-sh));const cv=mkCanvas(240,176),c=cv.getContext('2d');c.drawImage(sc,sx,sy,sw,sh,0,0,240,176);albumAdd(m.id,cv.toDataURL('image/jpeg',.66),m.info);S.mem=S.mem||{};if(!S.mem[m.id])S.mem[m.id]={day:S.day};FLASH={x:m.x,y:m.y,t:0};sfx.shutter();save()}catch(e){}}}
+/* The frame is built from the subjects of the moment (info.subj: the cats, Jill, the guest…), not from one
+   point: a close-up for one subject, wider when there are several, the whole room if that is what it takes.
+   Whatever the caption names is inside the picture. */
+function memFrame(m){const pts=[{x:m.x,y:m.y}].concat((m.info&&m.info.subj)||[]).filter(p=>p&&isFinite(p.x)&&isFinite(p.y));
+ let x0=Math.min(...pts.map(p=>p.x-18)),x1=Math.max(...pts.map(p=>p.x+18)),y0=Math.min(...pts.map(p=>p.y-34)),y1=Math.max(...pts.map(p=>p.y+10));
+ let w=Math.max(150,x1-x0),h=Math.max(112,y1-y0);if(w/h>4/3)h=w*3/4;else w=h*4/3;const cx=(x0+x1)/2,cy=(y0+y1)/2-2;
+ const W=SV.w/SV.s,H=SV.h/SV.s;w=Math.min(w,W);h=Math.min(h,H);let fx=cx-w/2,fy=cy-h/2;fx=clamp(fx,-SV.ox/SV.s,W-SV.ox/SV.s-w);fy=clamp(fy,-SV.oy/SV.s,H-SV.oy/SV.s-h);return{x:fx,y:fy,w,h}}
+function flushMem(){if(!MEMQ.length)return;for(const m of MEMQ.splice(0)){try{const f=memFrame(m);const sx=(SV.ox+f.x*SV.s)*DPR,sy=(SV.oy+f.y*SV.s)*DPR,sw=f.w*SV.s*DPR,sh=f.h*SV.s*DPR;const cv=mkCanvas(360,270),c=cv.getContext('2d');c.drawImage(sc,sx,sy,sw,sh,0,0,360,270);albumAdd(m.id,cv.toDataURL('image/jpeg',.68),m.info);S.mem=S.mem||{};if(!S.mem[m.id])S.mem[m.id]={day:S.day};FLASH={x:m.x,y:m.y,t:0};sfx.shutter();save()}catch(e){}}}
 function memChecks(){if(!CATS)return;const T=catBy('tora'),H=catBy('ban'),B=catBy('mei'),Bb=catBy('snow');
- const nm=c=>catName(c.def);const atSide=c=>c&&c.st==='side'&&!c.moving&&(c.slot==='L'||c.slot==='R');if(atSide(T)&&atSide(H)&&T.slot!==H.slot){const a=jillA();memo('sides',a.x,a.y,{a:nm(T),b:nm(H)})}
- if(T&&T.st==='side'&&T.sleepy&&!T.moving&&T.t<T.t0-4)memo('nearby',T.x,T.y,{a:nm(T)});
+ const nm=c=>catName(c.def);const atSide=c=>c&&c.st==='side'&&!c.moving&&(c.slot==='L'||c.slot==='R');if(atSide(T)&&atSide(H)&&T.slot!==H.slot){const a=jillA();memo('sides',a.x,a.y,{a:nm(T),b:nm(H),subj:[T,H]})}
+ if(T&&T.st==='side'&&T.sleepy&&!T.moving&&T.t<T.t0-4){const a=jillA();memo('nearby',T.x,T.y,{a:nm(T),subj:[{x:a.x,y:a.y}]})}
  if(B&&B.perch>=0&&[6,13,12].includes(B.perch)&&B.st==='rest')memo('best',B.x,B.y+20,{a:nm(B)});
- if(Bb&&(Bb.st==='sleep'||Bb.st==='bed')&&R&&(R.fire>0||R.insp||R.thief||R.groups.length>=6))memo('sleepgod',Bb.x,Bb.y,{a:nm(Bb)});
- const sl=CATS.filter(c=>!c.hidden&&(c.st==='sleep'||c.st==='bed'||(c.st==='side'&&c.sleepy)));if(sl.length>=3){const cx=sl.reduce((a,c)=>a+c.x,0)/sl.length,cy=sl.reduce((a,c)=>a+c.y,0)/sl.length;if(sl.filter(c=>Math.hypot(c.x-cx,c.y-cy)<75).length>=3)memo('nap3',cx,cy)}
- {const L=LIFE.jill;const on=sofaCats();if(L.on&&evening()&&L.sinceSit>6){if(on.length>=1)memo('sofa',(SOFA.x0+SOFA.x1)/2,120,{cats:on.map(nm).join('、')});if(on.length>=3)memo('sofafull',(SOFA.x0+SOFA.x1)/2,120,{n:on.length})}
-  const lap=on.find(c=>c.sofa.kind==='lap');if(L.on&&lap&&L.sinceSit>3)memo('lap',lap.x,lap.y,{a:nm(lap)});
-  const D=LIFE.dylan;if(D&&D.onSofa&&evening())memo('dylan',D.x,SOFA.jy)}
- const vis=CATS.filter(c=>!c.hidden);if(vis.length===5){const cx=vis.reduce((a,c)=>a+c.x,0)/5,cy=vis.reduce((a,c)=>a+c.y,0)/5;if(vis.every(c=>Math.hypot(c.x-cx,c.y-cy)<100))memo('everyone',cx,cy)}}
+ if(Bb&&(Bb.st==='sleep'||Bb.st==='bed')&&R&&(R.fire>0||R.insp||R.thief||R.groups.length>=6))memo('sleepgod',Bb.x,Bb.y,{a:nm(Bb),subj:R.groups.filter(g=>g.table!=null).slice(0,3).map(g=>R.tables[g.table])});
+ const sl=CATS.filter(c=>!c.hidden&&(c.st==='sleep'||c.st==='bed'||(c.st==='side'&&c.sleepy)));if(sl.length>=3){const cx=sl.reduce((a,c)=>a+c.x,0)/sl.length,cy=sl.reduce((a,c)=>a+c.y,0)/sl.length;const trio=sl.filter(c=>Math.hypot(c.x-cx,c.y-cy)<75);if(trio.length>=3)memo('nap3',cx,cy,{subj:trio})}
+ {const L=LIFE.jill;const on=sofaCats();if(L.on&&evening()&&L.sinceSit>6){if(on.length>=1)memo('sofa',(SOFA.x0+SOFA.x1)/2,120,{cats:on.map(nm).join('、'),subj:on.concat([{x:L.x,y:SOFA.jy}])});if(on.length>=3)memo('sofafull',(SOFA.x0+SOFA.x1)/2,120,{n:on.length,subj:on.concat([{x:L.x,y:SOFA.jy}])})}
+  const lap=on.find(c=>c.sofa.kind==='lap');if(L.on&&lap&&L.sinceSit>3)memo('lap',lap.x,lap.y,{a:nm(lap),subj:[{x:L.x,y:SOFA.jy}]});
+  const D=LIFE.dylan;if(D&&D.onSofa&&evening())memo('dylan',D.x,SOFA.jy,{subj:L.on?[{x:L.x,y:SOFA.jy}]:[]})}
+ const vis=CATS.filter(c=>!c.hidden);if(vis.length===5){const cx=vis.reduce((a,c)=>a+c.x,0)/5,cy=vis.reduce((a,c)=>a+c.y,0)/5;if(vis.every(c=>Math.hypot(c.x-cx,c.y-cy)<100))memo('everyone',cx,cy,{subj:vis})}}
 /* ---- update ---- */
 let ctime=0;
 function initCats(){CATS=CAT_DEF.map(d=>({def:d,x:0,y:0,st:'rest',pose:'sit',perch:-1,benchI:-1,t:rand(2,6),face:Math.random()<.5?1:-1,ph:Math.random()*10,cd:0,happy:0,hearts:[],after:null,tx:0,ty:0}));
@@ -1651,7 +1687,7 @@ function updateCats(dt,now){if(!CATS)initCats();ctime+=dt;RACE_CD-=dt;TOY.amp=Ma
     for(const o of set){const g=o.g,id=o.c.def.id;const dur=rand(2.2,3.8);g.lookT=R.t+dur;g.lookCat=o.c;if(g.wantShot==null)g.wantShot=Math.random()<(g.type==='blogger'?.95:.32);const pPhoto=(g.shot||!g.wantShot)?0:(id==='mei'?.8:id==='snow'?.6:.4);
      if(Math.random()<pPhoto){g.shot=true;g.photo=true;g.photoT0=R.t+.5+rand(.7,1.2);g.lookT=Math.max(g.lookT,g.photoT0+.9)}else g.photo=false}}}
   /* Jill notices someone photographing a cat: a glance over, if she is free */
-  for(const g of R.groups){if(g.photo&&g.photoT0&&R.t>=g.photoT0&&!g.shotSeen){g.shotSeen=true;if(g.lookCat&&!g.lookCat.hidden)memo('photo',g.lookCat.x,g.lookCat.y-4,{a:catName(g.lookCat.def)});const J=R.jill;if(!J.cur&&!J.q.length&&!J.rest&&!J.pet&&Math.random()<.65&&g.table!=null){const t=R.tables[g.table];J.lookAt={x:t.x,y:t.y,t:rand(1,1.8)};J.nod=.7}}}}
+  for(const g of R.groups){if(g.photo&&g.photoT0&&R.t>=g.photoT0&&!g.shotSeen){g.shotSeen=true;if(g.lookCat&&!g.lookCat.hidden&&g.table!=null){const t=R.tables[g.table];memo('photo',g.lookCat.x,g.lookCat.y-4,{a:catName(g.lookCat.def),subj:[{x:t.x,y:t.y-6}]})}const J=R.jill;if(!J.cur&&!J.q.length&&!J.rest&&!J.pet&&Math.random()<.65&&g.table!=null){const t=R.tables[g.table];J.lookAt={x:t.x,y:t.y,t:rand(1,1.8)};J.nod=.7}}}}
  /* 寶寶 walks where 柔柔 might be hiding; nothing else to do */
  memChecks()}
 function freeCatNear(x,y){return CATS.filter(c=>c.perch<0&&!c.hidden&&!c.sofa&&!['jump','visit','bed','chase','race','dash','hide2'].includes(c.st)).sort((a,b)=>Math.hypot(a.x-x,a.y-y)-Math.hypot(b.x-x,b.y-y))[0]}
@@ -2104,7 +2140,7 @@ function dylanDecide(D){const st=S.dylan.stage;const J=LIFE.jill;const tv=LIFE.t
  case'sofa':{if(reveal)D.reveal=true;D.state='toSofa';dylanWalk(D,sofaX,SOFA.front+10,'sofa');break}
  case'leave':dylanWalk(D,DOOR.x,DOOR.y,'door');break;
  default:D.state='think';D.t=2}}
-function doReveal(){const d=S.dylan;if(d.stage>=3)return;d.stage=3;d.reveal=S.day;save();const D=LIFE.dylan,J=LIFE.jill;if(D&&J){say('j',J.x,SOFA.jy-52,LIFE.tv.on?'老公，遙控器。':'老公。');say('d',D.x,SOFA.jy-52,LIFE.tv.on?'喔。':'嗯。',1.4)}memo('husband',(SOFA.x0+SOFA.x1)/2,120)}
+function doReveal(){const d=S.dylan;if(d.stage>=3)return;d.stage=3;d.reveal=S.day;save();const D=LIFE.dylan,J=LIFE.jill;if(D&&J){say('j',J.x,SOFA.jy-52,LIFE.tv.on?'老公，遙控器。':'老公。');say('d',D.x,SOFA.jy-52,LIFE.tv.on?'喔。':'嗯。',1.4)}memo('husband',(SOFA.x0+SOFA.x1)/2,120,{subj:[{x:LIFE.jill.x,y:SOFA.jy},{x:LIFE.dylan?LIFE.dylan.x:LIFE.jill.x,y:SOFA.jy}]})}
 function say(who,x,y,txt,delay){LIFE.say.push({who,x,y,txt,t:-(delay||0),life:2.6})}
 function lifeEnsureEvening(){if(!evening())return;if(LIFE.day!==S.day||!LIFE.plan)lifePlan();const L=LIFE.jill;
  if(LIFE.plan==='sofa'&&!L.on&&!L.act&&!L.walking){const pos=freeJillPos();if(!pos){lifeNoRoom();return}L.pos=pos;L.reserved=true;L.face=JPOS[pos].face;L.x=JPOS[pos].x;L.y=SOFA.front+10;L.sitT=.01}}
@@ -2496,7 +2532,15 @@ function sigAutoName(d){return`Jill's ${SIG.sauce[d.sauce].n}${SIG.protein[d.pro
 
 let bookTab='reviews';
 function notesFor(id,n){return(S.notes||[]).filter(x=>x.reg===id).slice(0,n||2)}
-function albumFigure(p,i){return`<figure class="polaroid ${p.keep?'keep':''}" style="--r:${((i%3)-1)*1.5}deg"><img alt="" src="${p.img}"><figcaption><span class="when">DAY ${p.day}${p.clock?' · '+p.clock:''}</span><b>「${p.cap}」</b>${p.txt?`<span class="txt">${p.txt}</span>`:''}</figcaption>${p.keep?'<span class="pin">珍藏</span>':''}</figure>`}
+let lightbox=null;   /* {ids:[...], i} while a photo is open */
+function openLightbox(id){const A=albumList().slice().reverse();const i=A.findIndex(p=>p.id===id);if(i<0)return;lightbox={ids:A.map(p=>p.id),i};$('#lightbox').hidden=false;lightboxRender();sfx.tap()}
+function closeLightbox(){lightbox=null;const el=$('#lightbox');if(el)el.hidden=true}
+function lightboxRender(){const el=$('#lightbox');if(!lightbox||!el)return;const p=albumList().find(x=>x.id===lightbox.ids[lightbox.i]);if(!p){closeLightbox();return}
+ el.innerHTML=`<div class="lb-bg" data-lb="close"></div><button class="lb-close" data-lb="close" aria-label="關閉">✕</button>
+  <figure class="lb-card ${p.keep?'keep':''}"><img alt="" src="${photoSrc(p)}"><figcaption><span class="when">DAY ${p.day}${p.clock?' · '+p.clock:''}</span><b>「${p.cap}」</b>${p.txt?`<span class="txt">${p.txt}</span>`:''}</figcaption>${p.keep?'<span class="pin">珍藏</span>':''}</figure>
+  <div class="lb-nav"><button data-lb="prev" ${lightbox.i<=0?'disabled':''} aria-label="上一張">‹</button><span class="lb-count">${lightbox.i+1} / ${lightbox.ids.length}</span><button class="lb-keep ${p.keep?'on':''}" data-lb="keep">${p.keep?'♥ 珍藏中':'♡ 珍藏'}</button><button data-lb="next" ${lightbox.i>=lightbox.ids.length-1?'disabled':''} aria-label="下一張">›</button></div>`}
+function lightboxStep(d){if(!lightbox)return;const n=lightbox.i+d;if(n<0||n>=lightbox.ids.length)return;lightbox.i=n;lightboxRender()}
+function albumFigure(p,i){return`<figure class="polaroid ${p.keep?'keep':''}" style="--r:${((i%3)-1)*1.5}deg" data-act="photo" data-k="${p.id}"><img alt="" src="${photoSrc(p)}"><figcaption><span class="when">DAY ${p.day}${p.clock?' · '+p.clock:''}</span><b>「${p.cap}」</b>${p.txt?`<span class="txt">${p.txt}</span>`:''}</figcaption>${p.keep?'<span class="pin">珍藏</span>':''}</figure>`}
 function showBook(){sub='book';let body='';
  if(bookTab==='front'){const rv=S.reviews.slice(-2).reverse();const notes=(S.notes||[]).slice(0,3);const A=albumList().slice(-2).reverse();const met=REGS.filter(r=>(S.regulars[r.id]||0)>0).length;const nAch=Object.keys(S.achievements).length;
   body=`<div class="jhead"><div class="bigrate"><b>${rating().toFixed(1)}</b><div><div class="sum-stars">${starsHTML(Math.round(rating()*2)/2)}</div><div class="muted" style="font-size:12px">${S.reviews.length} 則評價 · 開業 ${S.stats.days||0} 天 · ${S.stats.guests||0} 位客人</div></div></div></div>
@@ -2584,6 +2628,7 @@ screenEl.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(
  case'guide':showGuide();break;
  case'peek':screenEl.hidden=true;$('#peekPill').hidden=false;break;
  case'book':bookTab='front';showBook();break;
+ case'photo':openLightbox(k);break;
  case'btab':bookTab=k;showBook();break;
  case'settings':resetStep=0;showSettings();break;
  case'closeSub':closeSub();break;
@@ -2601,7 +2646,7 @@ screenEl.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(
  case'load':{if(phase==='service'){toast('營業中不能讀取存檔');break}const o=load();if(o){S=o;ICACHE.clear();DCACHE.clear();IDLE=null;bg=null;toast(`已讀取：DAY ${S.day}`);setAudio();sub=null;showTitle()}else toast('找不到存檔');break}
  case'reset1':resetStep=1;showSettings();break;
  case'resetNo':resetStep=0;showSettings();break;
- case'reset2':{S=newState();try{localStorage.removeItem(KEY)}catch(e){}save();R=null;phase='title';ICACHE.clear();DCACHE.clear();IDLE=null;bg=null;resetStep=0;sub=null;toast('已重置，一切重新開始');showTitle();break}
+ case'reset2':{S=newState();photoClear();try{localStorage.removeItem(KEY)}catch(e){}save();R=null;phase='title';ICACHE.clear();DCACHE.clear();IDLE=null;bg=null;resetStep=0;sub=null;toast('已重置，一切重新開始');showTitle();break}
  case'resume':paused=false;hideScreen();break;
  }});
 screenEl.addEventListener('input',e=>{if(e.target.dataset&&e.target.dataset.cat){S.catNames=S.catNames||{};S.catNames[e.target.dataset.cat]=e.target.value.trim().slice(0,8);save();return}if(e.target.id==='sigName'&&sigDraft)sigDraft.name=e.target.value});
@@ -2617,7 +2662,7 @@ function frame(now){if(AU.ctx&&S.music){const ev=evening();if(ev!==lastEv){lastE
  if(sc.width>0){drawScene(t);flushMem()}{const tw=$('#trayWrap');const want=!!(R&&R.panel&&phase==='service'&&!paused);if(tw.hidden===want)tw.hidden=!want;if(want&&tc.width>0)drawTray(t)}requestAnimationFrame(frame)}
 
 /* ================= boot ================= */
-function boot(){layoutAll();hud(true);renderTickets();showTitle();requestAnimationFrame(frame);
+function boot(){layoutAll();hud(true);renderTickets();showTitle();requestAnimationFrame(frame);photoOpen().then(()=>photoMigrate());
  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{bg=null;layoutAll()})}
 boot();
 })();

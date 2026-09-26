@@ -1326,6 +1326,51 @@ def album_notes_and_journal(b, port, target):
     g.close()
 
 @test
+def tables_need_clearing_after_checkout(b, port, target):
+    """One rule for dirty tables, whoever takes the money: a guest who was served food leaves a dirty table
+    (Jill's checkout used to clear it in the same trip while a waiter's did not — the 'sometimes tables need
+    clearing, sometimes not' bug); clearing is its own trip; Dylan busses his own table; a guest who leaves
+    before eating anything leaves a clean one."""
+    g = Game(b, port, target, seed=8, manual=True)
+    install_bot(g)
+    g.click('[data-act=open]'); g.ev("S.tables=4;S.day=5;save();showPrep()"); start_day(g)
+    SEAT = r"""((who)=>{const t=R.tables.find(t=>!t.group&&!t.dirty);const o=rollGuest();const g={id:R.gid++,type:'office',size:1,reg:who==='dylan'?'dylan':null,forSig:false,looks:makeLooks('office',1),name:who==='dylan'?'Dylan':'測試客',state:'toTable',table:null,pat:1,x:t.x,y:t.y+8,tx:t.x,ty:t.y+8,timer:0,ticket:null,seed:1,mood:'ok'};
+      R.groups.push(g);t.group=g;g.table=t.i;g.state='reading';return t.i})"""
+    def serve_and_check(ti):
+        g.ev(f"(()=>{{const t=R.tables[{ti}],g=t.group;createTicket(g);for(const it of g.ticket.items){{it.st='ready'}};serveItems(g,g.ticket.items.map(it=>({{it}})));g.state='check';R.tv++}})()")
+    # 1. Jill collects: the table is dirty afterwards, and needs a second trip
+    ti = g.ev(SEAT + "('office')"); serve_and_check(ti)
+    g.ev(f"tapTable(R.tables[{ti}])"); g.ev(f"__botUntil('R.tables[{ti}].group===null',600,1/30)")
+    st = g.ev(f"(()=>{{const t=R.tables[{ti}];return {{group:!!t.group,dirty:t.dirty,plates:t.plates.length}}}})()")
+    check(not st['group'] and st['dirty'] and st['plates'] > 0, f'after Jill takes the money the table must be dirty with plates on it: {st}')
+    g.ev("for(let i=0;i<40;i++){update(1/30);updateCats(1/30,0)}")
+    check(g.ev(f"R.tables[{ti}].dirty"), 'a dirty table stays dirty until someone clears it')
+    g.ev(f"tapTable(R.tables[{ti}])"); n = g.ev(f"__botUntil('!R.tables[{ti}].dirty',600,1/30)")
+    check(not g.ev(f"R.tables[{ti}].dirty") and g.ev(f"R.tables[{ti}].plates.length") == 0, 'tapping the dirty table sends Jill to clear it')
+    # 2. a LV3 waiter collects: same rule
+    g.ev("S.crew=[{id:'w1',role:'waiter',name:'小茉',lv:3,duty:'both'}];R.cw={}")
+    ti = g.ev(SEAT + "('office')"); serve_and_check(ti)
+    n = g.ev(f"(()=>{{let n=0;while(n<900&&R.tables[{ti}].group){{update(1/30);updateCats(1/30,0);n++}}return n}})()")
+    st = g.ev(f"(()=>{{const t=R.tables[{ti}];return {{group:!!t.group,dirty:t.dirty,jillQ:R.jill.q.length}}}})()")
+    check(not st['group'] and st['dirty'], f'after the waiter takes the money the table is dirty too ({n} frames): {st}')
+    g.ev("S.crew=[];R.cw={}")
+    # 3. Dylan busses his own table
+    g.ev("S.dylan.stage=0;S.day=5")
+    ti = g.ev(SEAT + "('dylan')"); serve_and_check(ti)
+    g.ev(f"tapTable(R.tables[{ti}])"); g.ev(f"__botUntil('R.tables[{ti}].group===null',600,1/30)")
+    st = g.ev(f"(()=>{{const t=R.tables[{ti}];const d=R.groups.find(x=>x.reg==='dylan');return {{dirty:t.dirty,bus:!!(d&&d.bus)||!!(LIFE.dylan&&LIFE.dylan.seated)}}}})()")
+    check(not st['dirty'] and st['bus'], f'Dylan clears his own table (or stays for the evening): {st}')
+    # 4. leaving before any food: no dirty table; leaving after food, angrily: dirty
+    ti = g.ev(SEAT + "('office')")
+    g.ev(f"(()=>{{const g=R.tables[{ti}].group;g.state='order';angryLeave(g)}})()")
+    check(not g.ev(f"R.tables[{ti}].dirty") and not g.ev(f"!!R.tables[{ti}].group"), 'a guest who leaves hungry leaves a clean table')
+    ti = g.ev(SEAT + "('office')"); serve_and_check(ti)
+    g.ev(f"(()=>{{const g=R.tables[{ti}].group;g.state='eat';angryLeave(g)}})()")
+    check(g.ev(f"R.tables[{ti}].dirty"), 'a served guest who storms out still leaves a dirty table')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
 def save_backup_and_restore(b, port, target):
     """備份存檔 writes one JSON file; 讀取存檔 restores it (Dylan/life state included) after a confirmation;
     junk, unrelated and newer-version files are refused with the current save untouched; an old save
