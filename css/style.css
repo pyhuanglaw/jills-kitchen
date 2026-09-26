@@ -11,7 +11,10 @@ img{max-width:100%}
   --ui:'Figtree','PingFang TC','Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif;
   color-scheme: dark;
 }
-html{height:100%;box-sizing:border-box;background:var(--night)}
+html{height:100%;box-sizing:border-box;background:var(--night);-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+/* text the player may want to copy: the backup paste box and inputs */
+textarea,input{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+#scene,#tray,#tickets,.hud,#hud,.tk,.it,.btn,button,canvas{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
 body{height:100%;margin:0;background:var(--night);color:var(--cream);font-family:var(--ui);font-size:14px;overflow:hidden;
@@ -368,3 +371,20 @@ input.txt{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(
 .lb-nav .lb-keep{font-size:13px;padding:10px 14px}
 .lb-nav .lb-keep.on{background:rgba(212,85,58,.75)}
 .lb-count{font-size:12.5px;font-weight:700;min-width:52px;text-align:center;font-variant-numeric:tabular-nums}
+
+/* the day's sales, one line per dish */
+.sales{padding:6px 12px}
+.sale{display:grid;grid-template-columns:28px 1fr auto auto;gap:2px 8px;align-items:center;padding:6px 0;border-top:1px solid var(--line);font-size:12.5px}
+.sale:first-child{border-top:0}
+.sale img{width:28px;height:28px;grid-row:span 2}
+.sale .nm{font-weight:700}
+.sale .n{font-weight:800;font-variant-numeric:tabular-nums}
+.sale .rev{color:var(--ink2);font-variant-numeric:tabular-nums;min-width:52px;text-align:right}
+.sale small{grid-column:2/-1;color:var(--ink3);font-size:11px}
+.sale.reco{background:#FFF6DC;margin:0 -12px;padding:6px 12px;border-radius:8px}
+
+/* who is this? a small card over the room */
+#regcard{position:absolute;left:10px;right:10px;bottom:120px;z-index:5;display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:14px;background:var(--paper);color:var(--ink);box-shadow:0 8px 24px rgba(0,0,0,.35)}
+#regcard img{width:46px;height:46px;border-radius:50%;background:#F3E7D2;flex:none}
+#regcard b{font-size:14px}
+#regcard p{margin:2px 0 0;font-size:12px;line-height:1.45;color:var(--ink2)}

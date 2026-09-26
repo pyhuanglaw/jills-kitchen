@@ -4,6 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Jill's Kitchen</title>
+<meta name="theme-color" content="#1E2B2F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Jill's Kitchen">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -29,6 +37,7 @@
     <div id="fire" hidden>JILL'S ON FIRE<div class="fb"><i id="fireBar"></i></div></div>
     <div id="banner"></div>
     <div id="coach" hidden></div>
+    <div id="regcard" hidden></div>
     <div id="toasts"></div>
     <button id="closePill" class="pill" hidden>結束今天・看結算 ›</button>
     <button id="peekPill" class="pill" hidden>回到選單 ›</button>
@@ -37,5 +46,9 @@
   <div id="screen" hidden></div>
 </div>
 <script src="js/game.js"></script>
+<script>
+/* installable app: the service worker only registers when the game is served over http(s) as files (not the single file / artifact) */
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!navigator.webdriver&&!document.querySelector('script[data-single]')){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})})}
+</script>
 </body>
 </html>

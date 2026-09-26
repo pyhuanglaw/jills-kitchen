@@ -27,7 +27,7 @@ def build():
     assert html.count(JS_TAG) == 1, 'index.html must load js/game.js exactly once'
     assert '</style' not in css.lower(), 'style.css contains </style>, cannot inline'
     assert '</script' not in js.lower(), 'game.js contains </script>, cannot inline'
-    return html.replace(CSS_TAG, '<style>\n' + css + '</style>').replace(JS_TAG, '<script>\n' + js + '</script>')
+    return html.replace(CSS_TAG, '<style>\n' + css + '</style>').replace(JS_TAG, '<script data-single>\n' + js + '</script>')
 
 
 def main():
