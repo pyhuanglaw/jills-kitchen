@@ -1,0 +1,79 @@
+[03:52:16] START target=single days=4
+[03:52:17] guide opened from title: cards=7
+[03:52:17] SMOKE START from a day-8 state: regulars met, signature, LV3 waiter + LV3 chef
+[03:52:18]   prep: recommendation=pasta; reco line: 今日推薦：番茄義大利麵，預估約 7 份。
+[03:52:18] DAY 1 opened. brightness=200.9 crew=waiter3,chef3 tables=5 money=3700
+[03:52:20]   1s: Jill crouched to pet a cat
+[03:52:43]   25s: regulars with floor name tags: ['mia', 'leo']
+[03:52:58]   40s: tapped leo on the floor -> card visible=True: Leo 陌生人 |  | 來店 1 次・附近大學的學生，錢包很薄但很捧場。
+[03:53:21]   63s: a guest is photographing a cat
+[03:55:26]   188s: tapped sleeping 包包 at (107,486) -> {'st': 'sleep', 'wake': True, 'flick': True, 'hearts': 1}
+[03:58:00]   CLOSING sequence (1 states): 0.2s None|False||-
+[03:58:00]   taught=0 dirtyTableTaps=19
+[03:58:00] DAY 1 done (341s real). phase=summary sits=0 sitTime=0% gotUpForWork=0 pets=6 looks=3 nods=0 chats=0 guestLooks=40 photos=3 errors=[]
+[03:58:00]   SUMMARY sales: pasta:10(short 1) coffee:9(short 6) signature:8(short 2) blacktea:6(short 3) friedrice:4 soup:3 salad:2 burger:1 | reco=pasta sold 10 | photos=4 | dish mission: []
+[03:58:01]   shop: 明日預估基本備料 約 $1,989 | 建議保留 約 $2,387
+[03:58:01]   after shopping: money=10972 crew=waiter3both,chef3stove level=2 toasts=
+[03:58:06]   -> DAY 9 prep. brightness behind prep=194.7
+[03:58:06] day 2 prep -> shop: header="DAY 9 · 開店前" budget="今天預估基本備料 約 $1,889 | 建議保留 約 $2,272" footer="回到開店準備 ›"
+[03:58:06]    back in prep: phase=prep day=9
+[03:58:06]   prep: recommendation=pasta; reco line: 今日推薦：番茄義大利麵，預估約 7 份。
+[03:58:06]   (阿德師傅 trained to LV5 between days)
+[03:58:07] DAY 2 opened. brightness=200 crew=waiter3,chef5 tables=5 money=9023
+[03:58:32]   25s: regulars with floor name tags: ['koba']
+[03:58:33]   26s: Jill is sitting on the sofa (act=idle)
+[03:58:45]   38s: a guest is photographing a cat
+[03:58:47]   40s: tapped koba on the floor -> card visible=True: 小林 有點眼熟 |  | 來店 3 次・業務員，吃飯永遠像在比賽。
+[03:59:07]   PAUSE menu: 暫停中 |  | DAY 9 · 18:10 · 目前營業額 $960 |  | 繼續營業 | ✓ 本機自動儲存 | 最後儲存：DAY 9 · 18:10 |  | 營業中每 20 秒、暫停時、切到別的 App 時都會存下目前的店內狀況（客人、訂單、爐上的菜、Jill 和員工）。下次開啟可以從這個時間點繼續。 |  | 儲存目前進度 | 備份與移轉 |  | 換手機、換瀏覽器、以防萬一：把進度存成
+[03:59:07]   pressed 儲存目前進度 -> label: DAY 9 · 18:10 checkpoint at 18:10
+[03:59:10]   background/foreground: audio running -> running music setting=True bgm scheduled=True
+[03:59:10]   backup download: JillsKitchen_Save_2026-09-27_0359_Day9.json
+[03:59:10]   resumed: paused=False phase=service
+[03:59:10]   60s: Jill said something: 已備份存檔：JillsKitchen_Save_2026-09-27_0359_Day9.json / Jill：「這道也交給你了。」
+[04:03:45]   CLOSING sequence (12 states): 0.2s wrap|False|mei|- → 4.8s toSofa|False|mei|- → 7.4s sitting|False|mei|- → 7.9s settle|True|mei|- → 10.6s idle|True|mei|- → 18.3s idle|True|tora,mei|- → 19.8s pet|True|tora,ban,mei|- → 21.9s read|True|tora,ban,mei|- → 25.9s read|True|tora,ban,mikan,mei|- → 31.1s pet|True|tora,ban,mikan,mei|- → 34.2s idle|True|tora,ban,mikan,mei|- → 58.9s read|True|tora,ban,mikan,mei|-
+[04:03:45]   taught=9 dirtyTableTaps=43
+[04:03:45] DAY 2 done (338s real). phase=summary sits=2 sitTime=1% gotUpForWork=1 pets=6 looks=8 nods=0 chats=0 guestLooks=40 photos=5 errors=[]
+[04:03:45]   SUMMARY sales: pasta:11(short 2) blacktea:11(short 8) salad:6(short 4) signature:5 friedrice:5 burger:5 coffee:5(short 1) soup:2 | reco=pasta sold 11 | photos=4 | dish mission: []
+[04:03:46]   shop: 明日預估基本備料 約 $2,068 | 建議保留 約 $2,478
+[04:03:46]   R&D try 1: soda+milk+lemon -> 有潛力的試作品 — 像是一道飲料（咖啡吧）的雛形。檸檬片、氣泡水是對的，還缺1種飲品配料。研究進度 ●○○
+[04:03:46]   R&D try 2: soda+lemon+milk -> 跟上次一樣 — 這個組合試過了，沒有新的發現。檸檬片、氣泡水留著，換一種飲品配料試試。
+[04:03:46]   R&D try 3: soda+lemon+milk -> 跟上次一樣 — 這個組合試過了，沒有新的發現。檸檬片、氣泡水留著，換一種飲品配料試試。
+[04:03:46]   R&D try 4: soda+lemon+milk -> 跟上次一樣 — 這個組合試過了，沒有新的發現。檸檬片、氣泡水留著，換一種飲品配料試試。
+[04:03:46]   after shopping: money=15332 crew=waiter3both,chef5stove level=2 toasts=觀葉植物 裝好了，看看店裡！
+[04:03:51]   -> DAY 10 prep. brightness behind prep=195
+[04:03:52] day 3 prep -> shop: header="DAY 10 · 開店前" budget="今天預估基本備料 約 $2,018 | 建議保留 約 $2,421" footer="回到開店準備 ›"
+[04:03:52]    back in prep: phase=prep day=10
+[04:03:52]   prep: recommendation=pasta; reco line: 今日推薦：番茄義大利麵，預估約 9 份。
+[04:03:53] DAY 3 opened. brightness=200.7 crew=waiter3,chef5 tables=5 money=13264
+[04:04:06]   14s: a guest is photographing a cat
+[04:04:23]   30s: tapped sleeping 包包 at (313,466) -> {'st': 'sleep', 'wake': True, 'flick': True, 'hearts': 1}
+[04:04:41]   48s: regulars with floor name tags: ['koba']
+[04:04:44]   51s: tapped koba on the floor -> card visible=True: 小林 熟客 |  | 來店 4 次・業務員，吃飯永遠像在比賽。 | 樾樾不躲他了。
+[04:05:33]   100s: Jill is sitting on the sofa (act=idle)
+[04:09:37]   CLOSING sequence (2 states): 0.0s None|False|tora,snow|- → 0.5s None|False|snow|-
+[04:09:37]   taught=9 dirtyTableTaps=66
+[04:09:37] DAY 3 done (343s real). phase=summary sits=3 sitTime=1% gotUpForWork=0 pets=3 looks=4 nods=0 chats=0 guestLooks=35 photos=1 errors=[]
+[04:09:37]   SUMMARY sales: pasta:15(short 6) coffee:11(short 7) blacktea:8(short 5) signature:7(short 1) burger:4 friedrice:3 salad:3(short 1) soup:2 | reco=pasta sold 15 | photos=5 | dish mission: []
+[04:09:37]   shop: 明日預估基本備料 約 $2,128 | 建議保留 約 $2,547
+[04:09:37]   after shopping: money=22096 crew=waiter3both,chef5stove level=2 toasts=新桌子搬進來了！
+[04:09:38]   JOURNAL front: JILL'S KITCHEN JOURNAL | 餐廳日誌 | 關閉 | 總覽 | 評價 | 熟客 | 相簿 | 店貓 | 成就 | 熟練度 | 3.3 | 41 則評價 · 開業 3 天 · 84 位客人 | 最近的評價 | 全部 › |  | 「Jill 很忙但出餐很穩，推。」 |  | 小宇 · DAY 10 |  | 「Jill 很忙但出餐很穩，推。」 |  | Kevin · DAY 10 | 熟客留言 | 熟客 › |  |
+[04:09:38]   album photos: 最佳座位@1; 最佳座位@8; 摸一下@8 17:02; 睡神@8 17:38; 被拍了@8 18:14; 偷閒@9 17:30; 玩起來了@9 18:17; 今天也在附近@9 20:08; Jill 左右各一隻@9 20:59; 突然開賽@10 17:52; 怎麼睡在這@10 18:09; 又見面了@10 18:37; 三貓午睡@10 20:45; 一起擠軟墊@10 20:45
+[04:09:38]   notes so far: 
+[04:09:43]   -> DAY 11 prep. brightness behind prep=194
+[04:09:43] day 4 prep -> shop: header="DAY 11 · 開店前" budget="今天預估基本備料 約 $2,260 | 建議保留 約 $2,699" footer="回到開店準備 ›"
+[04:09:43]    back in prep: phase=prep day=11
+[04:09:44]   prep: recommendation=pasta; reco line: 今日推薦：番茄義大利麵，預估約 13 份。
+[04:09:44] DAY 4 opened. brightness=199.2 crew=waiter3,chef5 tables=6 money=20120
+[04:09:56]   11s: Jill crouched to pet a cat
+[04:10:09]   25s: regulars with floor name tags: ['chen']
+[04:10:24]   40s: tapped chen on the floor -> card visible=True: 陳伯伯 熟客 |  | 來店 4 次・住在附近的退休老師，每天散步都會經過。 | 樾樾不躲他了。
+[04:10:38]   53s: a guest is photographing a cat
+[04:11:23]   98s: Jill is sitting on the sofa (act=idle)
+[04:15:38]   CLOSING sequence (17 states): 0.0s standing|False|snow|- → 0.5s wrap|False|snow|- → 1.8s wrap|False|tora,snow|- → 5.9s standing|False|tora,snow|- → 9.0s pushing|False|tora,snow|- → 13.1s standing|False|tora,snow|- → 13.6s settle|True|tora,snow|- → 16.3s tv|True|tora,snow|- → 22.5s tv|True|tora,snow,mei|- → 31.8s pet|True|tora,snow,mei|- → 34.9s read|True|tora,snow,mei|- → 37.5s read|True|tora,ban,snow,mei|-
+[04:15:38]   taught=9 dirtyTableTaps=91
+[04:15:38] DAY 4 done (353s real). phase=summary sits=1 sitTime=1% gotUpForWork=0 pets=6 looks=5 nods=1 chats=0 guestLooks=42 photos=6 errors=[]
+[04:15:38]   SUMMARY sales: signature:12(short 7) blacktea:12(short 9) coffee:11(short 8) burger:10(short 5) pasta:6(short 1) friedrice:5 soup:3 salad:1 | reco=pasta sold 6 | photos=4 | dish mission: []
+[04:15:38]   shop: 明日預估基本備料 約 $2,052 | 建議保留 約 $2,460
+[04:15:38]   after shopping: money=24780 crew=waiter4both,chef5stove level=2 toasts=小茉 升到 LV4！
+[04:15:43]   -> DAY 12 prep. brightness behind prep=193.7
+[04:15:44] END album=19 keep=16 notes=1 reviews=61 money=24780 rating=3.13 errors=[]
