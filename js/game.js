@@ -790,7 +790,7 @@ function freeTableFor(g){const ts=R.tables.filter(t=>!t.group&&!t.dirty&&t.seats
  if(g.reg==='dylan'&&ts.length){/* a seat that sees Jill at the pass but is not in her way: the free table farthest from the kitchen */return ts.slice().sort((a,b)=>(a.seats-b.seats)||(Math.hypot(b.x-PASS.x,b.y-PASS.y)-Math.hypot(a.x-PASS.x,a.y-PASS.y)))[0]}
  return ts[0]}
 function leaveGroup(g,mood){const t=g.table!=null?R.tables[g.table]:null;if(t&&t.group===g)t.group=null;g.state='leave';g.mood=mood||'ok';g.tx=DOOR.x;g.ty=DOOR.y;
- if(g.ticket){const tk=g.ticket;for(const s of R.slots)if(s.job&&s.job.tk===tk)s.job=null;for(const it of tk.items)if(it.st==='pending')S.stock[it.d]=(S.stock[it.d]||0)+1;R.tickets=R.tickets.filter(x=>x!==tk);R.jill.carry=R.jill.carry.filter(c=>c.tk!==tk);R.tv++}}
+ if(g.ticket){const tk=g.ticket;for(const s of R.slots)if(s.job&&s.job.tk===tk)s.job=null;for(const it of tk.items)if(it.st==='pending')S.stock[it.d]=(S.stock[it.d]||0)+1;R.tickets=R.tickets.filter(x=>x!==tk);R.jill.carry=R.jill.carry.filter(c=>c.tk!==tk);R.tv++;g.ticket=null}}
 function angryLeave(g){if(g.state==='queue'||g.state==='arrive'){R.st.lost+=g.size;toast(`${g.name} 等太久，離開了`);g.state='leave';g.tx=DOOR.x;g.ty=DOOR.y;g.mood='sad';requeue();if(Math.random()<.35)addReview(g,2,pick(['在門口的長椅上等到跟隔壁的陌生人變朋友。','等到腳痠，下次早點來。','客滿，沒等到位子。']),{wait:true,left:true});return}
  const t=R.tables[g.table];const served=g.ticket?g.ticket.items.some(i=>i.st==='served'):false;R.st.angry++;if(R.combo>=3)toast('COMBO 中斷');R.combo=0;R.streak=0;sfx.angry();
  addFloat(t.x,t.y-50,'生氣離開','#E0654A',1);toast(`${g.name} 生氣地離開了…`);addReview(g,1,null,{wait:true,left:true});leaveGroup(g,'angry');if(served){t.dirty=true}}

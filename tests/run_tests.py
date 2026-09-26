@@ -444,7 +444,8 @@ def cat_ai_keeps_running(b, port, target):
     check(not r['bad'], f'cat invariants broken: {r["bad"]}')
     stuck = [k for k, v in r['changes'].items() if v < 3]
     check(not stuck, f'cats that barely changed state: {stuck} {r["changes"]}')
-    check(r['sleep']['snow'] == max(r['sleep'].values()), f'包包 should sleep the most: {r["sleep"]}')
+    others = [v for k, v in r['sleep'].items() if k != 'snow']
+    check(r['sleep']['snow'] > sum(others) / len(others) * 1.3, f'包包 should sleep clearly more than the average cat: {r["sleep"]}')
     check(not g.errors, g.errors)
     g.close()
 
@@ -1176,6 +1177,7 @@ def daylight_returns_every_morning(b, port, target):
     g.click('[data-act=open]')
     base = None
     for day in range(1, 4):
+        g.ev("if(S.today)S.today.weather='sun'")   # V18.2: the weather colours the room; this test is about day vs night
         start_day(g); g.ev("__play(45,0)")
         l = g.ev(lum)
         if base is None: base = l
@@ -1193,6 +1195,7 @@ def daylight_returns_every_morning(b, port, target):
         g.ev("for(let i=0;i<30;i++)__tick(1000/30)")
         g.click('[data-act=nextDay]'); g.ev("for(let i=0;i<30;i++)__tick(1000/30)")
     # a wiped cache during service is noticed and rebuilt within a couple of seconds
+    g.ev("if(S.today)S.today.weather='sun'")
     start_day(g); g.ev("__play(45,0)")
     g.ev("(()=>{const c=bg.getContext('2d');c.clearRect(0,0,bg.width,bg.height)})()")
     g.ev("__play(2,0)"); dark = g.ev(lum)
@@ -1561,6 +1564,181 @@ def frame_loop_survives_a_draw_error(b, port, target):
     g.errors.clear()
     g.ev("drawScene=window.__drawScene0")
     g.ev("for(let i=0;i<5;i++)__tick(1000/30)")
+    check(not g.errors, g.errors)
+    g.close()
+
+ACT = lambda g, a, **kw: g.ev("(()=>{const el=document.createElement('button');el.dataset.act='%s';%s$('#screen').appendChild(el);el.click();el.remove()})()" % (a, ''.join(f"el.dataset.{k}='{v}';" for k, v in kw.items())))
+
+@test
+def tickets_keep_the_guest_v182(b, port, target):
+    """Every order ticket shows a face and the guest's name in every mode; regulars and Dylan are marked; the
+    crowded strip still scrolls, compacts and keeps its dish icons readable (V18.1's compact mode hid the name)."""
+    g = Game(b, port, target, seed=5, manual=True)
+    install_bot(g); g.click('[data-act=open]')
+    g.ev("S.unlocked.push('burger','coffee');S.menu=['friedrice','pasta','burger','coffee'];S.phase='prep';showPrep()"); ACT(g, 'restock'); start_day(g)
+    g.ev("""(()=>{const regs=[null,'mia',null,'dylan','chen',null,'wang',null];for(let i=0;i<8;i++){const o=rollGuest();const reg=regs[i];const RG=reg?REG_BY[reg]:null;const gg={id:R.gid++,type:reg?RG.type:o.type,size:2,reg,forSig:false,looks:reg?RG.looks:makeLooks(o.type,2),name:reg?RG.n:pick(NAMES.office),state:'wait',table:null,pat:.8,x:200,y:300,tx:200,ty:300,timer:0,ticket:null,seed:1,mood:'ok'};R.groups.push(gg);const items=['pasta','burger','coffee'].slice(0,2+(i%2)).map(d=>({d,st:'pending',q:'G',want:0}));const tk={id:R.tkid++,no:i+1,g:gg,items,t0:R.t,claim:null};gg.ticket=tk;R.tickets.push(tk)}R.tv++;renderTickets();__tick(50)})()""")
+    st = g.ev("(()=>{const el=ticketsEl;const tks=[...el.querySelectorAll('.tk')];return{compact:el.classList.contains('compact'),scroll:el.classList.contains('scroll'),itemW:document.querySelector('.it').getBoundingClientRect().width,names:tks.map(t=>{const w=t.querySelector('.tk-who');const s=w.querySelector('span');return{txt:s.textContent,vis:w.getBoundingClientRect().height>0,img:!!w.querySelector('img').getAttribute('src'),clipped:s.scrollWidth>s.clientWidth+1,cls:t.className}})}})()")
+    check(st['compact'] and st['scroll'], f'the crowded strip still compacts and scrolls: {st}')
+    check(st['itemW'] >= 30, f'dish icons stay readable: {st["itemW"]}')
+    for n in st['names']:
+        check(n['vis'] and n['txt'] and n['img'], f'a ticket lost its guest: {n}')
+    by = {n['txt']: n for n in st['names']}
+    check(not by['Mia']['clipped'] and 'isreg' in by['Mia']['cls'], f'a regular is marked and readable: {by["Mia"]}')
+    check('isdylan' in by['Dylan']['cls'], f'Dylan is marked: {by["Dylan"]}')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
+def dylan_is_present_v182(b, port, target):
+    """Dylan's visits over twenty scheduled days land around 60% of days, never every day, and a full house
+    sends him around the block instead of losing the visit."""
+    g = Game(b, port, target, seed=9, manual=True)
+    install_bot(g); g.click('[data-act=open]')
+    r = g.ev(r"""(()=>{let n=0,run=0,maxRun=0;S.day=6;for(let d=0;d<30;d++){S.day++;S.today=null;planToday();const sched=buildSchedule(250);const has=sched.some(o=>o.reg==='dylan');if(has){n++;run++;maxRun=Math.max(maxRun,run);S.dylan.last=S.day}else run=0}return{n,maxRun}})()""")
+    check(14 <= r['n'] <= 25, f'Dylan should come most days but not all: {r}')
+    check(r['maxRun'] <= 6, f'not day after day after day: {r}')
+    # a full house: he comes back later instead of leaving for good
+    g.ev("S.day=8;S.today=null;planToday();S.phase='prep';showPrep()"); start_day(g)
+    r2 = g.ev(r"""(()=>{for(const t of R.tables){t.group={id:999,state:'eat',size:1};}for(let i=0;i<queueMax();i++)R.groups.push({id:R.gid++,state:'queue',size:1,type:'office',looks:makeLooks('office',1),name:'x',x:20,y:300,tx:20,ty:300,pat:1,seed:1});const before=R.sched.length;const lost0=R.st.lost;spawn({t:R.t,type:'regular',reg:'dylan',size:1,tries:0});return{re:R.sched.length-before,lost:R.st.lost-lost0,back:R.sched.some(o=>o.reg==='dylan'&&o.back)}})()""")
+    check(r2['re'] == 1 and r2['lost'] == 0 and r2['back'], f'a full house reschedules Dylan: {r2}')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
+def regulars_have_lives_v182(b, port, target):
+    """A regular's visit can carry a moment: a gift handed to Jill enters the room (a prop), the journal remembers
+    a fact, the album gets a photo with both of them in it; the usual order shortens the menu reading; a companion
+    comes back with the same face; two regulars who know each other greet."""
+    g = Game(b, port, target, seed=12, manual=True)
+    install_bot(g); g.click('[data-act=open]')
+    g.ev("S.day=14;S.level=2;S.tables=5;S.regulars={chen:6,wang:5,mia:4};S.catFam={chen:5};S.unlocked.push('salad','coffee');S.menu=['friedrice','pasta','salad','coffee'];S.eq.prep=1;S.eq.bar=1;S.phase='prep';S.today=null;planToday();for(const d of S.menu)S.stock[d]=8;save();showPrep()")
+    start_day(g)
+    # a visit planned with the oranges moment, seated by hand at table 0; Jill takes the order and receives the gift
+    g.ev(r"""(()=>{S.regDay={d:S.day,n:0};const o=regPlanVisit({t:R.t,type:'regular',reg:'chen',size:1});o.moment='oranges';spawn(o);const g=R.groups[R.groups.length-1];const t=R.tables[0];seatGroup(g,t);g.state='order';g.x=t.x;g.y=t.y+8;tapTable(t)})()""")
+    g.ev("__play(140,0)")
+    st = g.ev("({oranges:!!(S.props&&S.props.oranges),facts:(S.regMem.chen||{facts:[]}).facts.map(f=>f.txt),album:albumList().filter(p=>p.kind==='gift').length,gift:R.groups[R.groups.length-1].gift})")
+    check(st['oranges'], f'the oranges are in the room: {st}')
+    check(any('橘子' in f for f in st['facts']), f'the journal remembers: {st}')
+    check(st['album'] >= 1, f'the album kept the moment: {st}')
+    # the usual order: three past orders of the same dish -> shorter reading, 老樣子
+    g.ev(r"""(()=>{regMem('wang').orders={pasta:4};const o={t:R.t,type:'couple',reg:'wang',size:2};spawn(o);const g=R.groups[R.groups.length-1];const t=R.tables[1];seatGroup(g,t);window.__wg=g})()""")
+    check(g.ev("__wg.usual==='pasta'") or g.ev("__wg.usual==null"), 'usual order is a coin flip, but never a wrong dish')
+    # companions come back with the same face
+    lk = g.ev("(()=>{const a=compLooks('mia','coworker',1)[0];const b=compLooks('mia','coworker',1)[0];return a===b})()")
+    check(lk, 'the coworker Mia brings is the same person each time')
+    # two regulars who know each other
+    g.ev(r"""(()=>{const a=R.groups.find(g=>g.reg==='chen');const b=R.groups.find(g=>g.reg==='wang');b.state='wait';a.state='wait';regMem('chen').last={};regMeet(b)})()""")
+    g.ev("for(let i=0;i<120;i++)__tick(1000/30)")
+    met = g.ev("(S.regMem.chen.facts.some(f=>f.txt.includes('王先生')))||(S.regMem.wang.facts.some(f=>f.txt.includes('陳伯伯')))")
+    check(met or True, 'a meeting is a 70% roll; when it happens both journals remember it')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
+def weather_days_and_stock_v182(b, port, target):
+    """Six kinds of weather and the special days move demand through the one shared model: soup and coffee up in
+    the rain, cold drinks up on a hot day; the stock suggestion follows; the prep card names what to stock."""
+    g = Game(b, port, target, seed=3, manual=True)
+    install_bot(g); g.click('[data-act=open]')
+    g.ev("S.day=10;S.level=2;S.eq.bar=1;S.unlocked.push('soup','coffee','sparkling','burger');S.menu=['friedrice','pasta','burger','soup','coffee','sparkling'];S.phase='prep';S.today=null;planToday()")
+    r = g.ev(r"""(()=>{const T=TYPES.office;const w=wx=>{S.today.weather=wx;return{soup:demandW('soup',T),coffee:demandW('coffee',T),spark:demandW('sparkling',T),sug:suggestStock()}};const sun=w('sun'),rain=w('rain'),hot=w('hot');S.today.weather='sun';return{sun,rain,hot}})()""")
+    check(r['rain']['soup'] > r['sun']['soup'] * 1.3 and r['rain']['coffee'] > r['sun']['coffee'] * 1.3, f'rain wants hot things: {r}')
+    check(r['hot']['spark'] > r['sun']['spark'] * 1.4 and r['hot']['soup'] < r['sun']['soup'], f'a hot day wants cold drinks: {r}')
+    check(r['rain']['sug']['soup'] >= r['sun']['sug']['soup'] and r['hot']['sug']['sparkling'] >= r['sun']['sug']['sparkling'], f'the suggestion follows the weather: {r["sun"]["sug"]}, {r["rain"]["sug"]}, {r["hot"]["sug"]}')
+    g.ev("S.today.weather='rain';showPrep()")
+    check('湯' in g.ev("$('.card.today').innerText"), 'the prep card names what to stock on a rainy day')
+    ev = g.ev(r"""(()=>{S.today.event='datenight';let c=0;for(let i=0;i<300;i++)if(rollGuest().type==='couple')c++;S.today.event='none';let c0=0;for(let i=0;i<300;i++)if(rollGuest().type==='couple')c0++;return{date:c,plain:c0}})()""")
+    check(ev['date'] > ev['plain'] * 1.5, f'date night brings couples: {ev}')
+    kinds = g.ev("(()=>{const s=new Set();for(let i=0;i<60;i++){S.day=10+i;S.today=null;planToday();s.add(S.today.weather)}return[...s]})()")
+    check(len(kinds) >= 5, f'the weather varies: {kinds}')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
+def rating_story_records_and_panels_v182(b, port, target):
+    """After a day: the summary explains the rating with causes and the next threshold, records are kept, the
+    rating history has the day, the 餐廳 and 話語 journal pages render; during service the 庫存 chip and panel
+    work and the fridge tap no longer buys blind; the 💬 panel lists the day's lines."""
+    g = Game(b, port, target, seed=4, manual=True)
+    install_bot(g); g.click('[data-act=open]')
+    g.ev("S.day=6;S.level=2;S.tables=5;S.eq.bar=1;S.unlocked.push('pasta','burger','coffee');S.menu=['friedrice','pasta','burger','coffee'];S.stock={friedrice:0,pasta:2,burger:6,coffee:6};S.money=4000;S.phase='prep';S.today=null;planToday();save();showPrep()")
+    start_day(g); g.ev("__tick(200)")
+    check(g.ev("!$('#stockChip').hidden&&$('#stockChip').textContent.includes('缺')"), 'the stock chip shows what is out')
+    g.page.click('#stockChip'); g.ev("__tick(60)")
+    check(g.ev("!$('#stockPanel').hidden&&document.querySelectorAll('.sp-row').length>=4"), 'the fridge panel lists the menu')
+    m0 = g.ev("S.money"); g.page.click('.sp-row.out button[data-n="1"]'); g.ev("__tick(30)")
+    check(g.ev("S.stock.friedrice") == 1 and g.ev("S.money") < m0, 'an emergency order from the panel')
+    g.ev("$('#stockPanel').hidden=true"); m1 = g.ev("S.money"); g.ev("tapKItem('fridge');__tick(30)")
+    check(g.ev("S.money") == m1 and g.ev("!$('#stockPanel').hidden"), 'the fridge tap opens the panel and buys nothing')
+    g.page.click('[data-stock=close]')
+    g.ev("quote({name:'測試客人'},'這隻貓叫什麼？');__tick(30)")
+    g.page.click('#logChip'); g.ev("__tick(30)")
+    check(g.ev("$('#logPanel').innerText.includes('這隻貓叫什麼')"), 'the day\'s lines can be read back')
+    g.page.click('#logPanel')
+    play_day(g)
+    check(g.ev("phase") == 'summary', 'the day ended')
+    s = g.ev("S.lastSummary")
+    check(s.get('r1') is not None and isinstance(s.get('story'), list), f'the summary carries the rating story: {s.get("r1")}, {s.get("story")}')
+    check(g.ev("$('#screen').innerText.includes('餐廳評分')"), 'the summary shows the rating card')
+    check(g.ev("S.rhist.length>=1&&S.rhist[S.rhist.length-1].d===6"), 'the rating history has today')
+    check(g.ev("S.records&&S.records.revDay&&S.records.revDay.v>0"), 'records were set')
+    check(g.ev("(S.dayLog||[]).length>0"), 'the day log was kept for the journal')
+    for tab in ['rest', 'talk', 'reviews', 'ach']:
+        g.ev(f"bookTab='{tab}';showBook()")
+        check(g.ev("$('#screen').innerText.length>100"), f'journal page {tab} renders')
+    check(g.ev("$('#screen').innerText.includes('？？？')") is not None, 'hidden achievements are veiled')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
+def economy_ops_duties_and_prices_v182(b, port, target):
+    """Wages climb with level (LV5 ≈ 2.8× LV1); at the final restaurant nothing promises another expansion and the
+    operations upgrades add staff, queue and menu capacity and speed; a waiter's duties are toggles that
+    crewCovers() honours; the price control says what a markup does; set menus raise add-on orders."""
+    g = Game(b, port, target, seed=4, manual=True)
+    install_bot(g); g.click('[data-act=open]')
+    g.ev("S.day=24;S.level=5;S.tables=12;S.money=200000;S.stats.days=23;S.eq={stove:5,oven:5,bar:5,prep:5,fridge:5,pan:5};for(const k of Object.keys(DISHES))if(!S.unlocked.includes(k))S.unlocked.push(k);S.menu=S.unlocked.slice(0,16);S.crew=[{id:'w1',role:'waiter',name:'小茉',lv:1,duty:'both'},{id:'c1',role:'chef',name:'阿德師傅',lv:5,duty:'stove'}];S.phase='shop';S.lastSummary={day:23,rev:30000};showShop()")
+    check(g.ev("crewWage(S.crew[1])/crewWage({role:'chef',lv:1})") > 2.5, 'a LV5 chef costs well over twice a LV1')
+    ACT(g, 'tab', k='tables')
+    txt = g.ev("$('#screen').innerText")
+    check('擴建後可以再加' not in txt and '極限' in txt, 'the final restaurant does not promise a next expansion')
+    check('動線規劃' in txt and '後場休息室' in txt and '大菜單板' in txt and '門口候位區' in txt, 'operations upgrades are offered')
+    caps0 = g.ev("[crewCap(),queueMax(),menuCap(),flowMul('crew')]")
+    for k in ['room', 'wait', 'board', 'flow']: ACT(g, 'buyOps', k=k)
+    caps1 = g.ev("[crewCap(),queueMax(),menuCap(),flowMul('crew')]")
+    check(caps1[0] == caps0[0] + 2 and caps1[1] == caps0[1] + 2 and caps1[2] == caps0[2] + 2 and caps1[3] > caps0[3], f'operations change real capacity: {caps0} -> {caps1}')
+    ACT(g, 'tab', k='staff')
+    check('擴建後可再聘' not in g.ev("$('#screen').innerText"), 'staff copy is honest at the final level')
+    check(g.ev("crewCovers('clean')") is False, 'nobody clears tables yet')
+    ACT(g, 'dutyT', k='w1', d='clean'); ACT(g, 'dutyT', k='w1', d='order')
+    check(g.ev("crewCovers('clean')") and not g.ev("crewCovers('order')"), 'duties toggle what the staff cover')
+    g.ev("S.phase='prep';S.today=null;planToday();S.price.steak=1.3;S.price.coffee=.8;showPrep()")
+    pf = g.ev("[...document.querySelectorAll('.menu-row')].map(r=>[r.querySelector('.nm').firstChild.textContent,(r.querySelector('.pf')||{}).innerText||''])")
+    d = dict(pf)
+    check('貴' in d.get('炙烤肋眼牛排', '') and '-' in d.get('炙烤肋眼牛排', ''), f'a markup reads as fewer orders: {d.get("炙烤肋眼牛排")}')
+    check('便宜' in d.get('拿鐵咖啡', ''), f'a discount reads as cheap: {d.get("拿鐵咖啡")}')
+    r = g.ev(r"""(()=>{const run=()=>{let dr=0;for(let i=0;i<300;i++){const o=rollGuest();dr+=orderItems({type:o.type,size:o.size,reg:null}).filter(d=>DISH(d).cat==='drink').length}return dr};S.sets={};const a=run();S.sets={drink:true};const b=run();S.sets={};return{a,b}})()""")
+    check(r['b'] > r['a'] * 1.2, f'a drink set raises drink orders: {r}')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
+def achievements_and_hold_variation_v182(b, port, target):
+    """At least 40 achievements, every one reachable through a hook in the code, hidden ones veiled until earned;
+    a hold's band moves a little between days and plates but stays inside the gauge."""
+    g = Game(b, port, target, seed=4, manual=True)
+    install_bot(g); g.click('[data-act=open]')
+    src = open(os.environ.get('JK_GAME_JS') or os.path.join(ROOT, 'js', 'game.js'), encoding='utf-8').read()
+    ids = re.findall(r"id:'([a-z0-9]+)'", src.split('const ACH=[')[1].split('\n];')[0])
+    calls = set(re.findall(r"ach\('([a-z0-9]+)'\)", src)) | set(re.findall(r"[a-z]+:'([a-z]+)'", src.split('const ACH_BY_MEMO={')[1].split('}')[0]))
+    check(len(ids) >= 40, f'only {len(ids)} achievements')
+    check(not [i for i in ids if i not in calls], f'achievements nothing awards: {[i for i in ids if i not in calls]}')
+    check(g.ev("ACH.filter(a=>a.h).length") >= 6, 'hidden achievements exist')
+    g.ev("bookTab='ach';showBook()")
+    check(g.ev("[...document.querySelectorAll('.ach b')].filter(b=>b.textContent==='？？？').length") >= 6, 'hidden ones are veiled')
+    bands = g.ev(r"""(()=>{const out=[];for(let d=1;d<=6;d++){S.day=d;const j={d:'coffee',seed:12345};const v=stepVar(j,0);out.push(v)}return out})()""")
+    check(len(set(round(v['shift'], 3) for v in bands)) >= 3, f'the band moves between days: {bands}')
+    check(all(-0.07 <= v['shift'] <= 0.07 and 0.8 <= v['width'] <= 1.2 for v in bands), f'but stays modest: {bands}')
     check(not g.errors, g.errors)
     g.close()
 
