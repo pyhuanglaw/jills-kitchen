@@ -16,6 +16,7 @@ jills-kitchen-project/
 │   ├── ARCHITECTURE.md             程式結構、全域狀態、擴充守則、存檔 migration、測試流程
 │   ├── V16_CHANGES.md              V16：做菜流程、Dylan 的戲、等候長椅、備份存檔
 │   ├── V17_CHANGES.md              V17：Dylan 出場頻率、視覺打磨、第 5 天畫面消失的 bug 與回歸測試
+│   ├── V18_CHANGES.md              V18：跨日變暗／音樂／存檔的 P0、Jill 營業中的休息與互動、料理研發重做、相簿與日誌、店主手冊
 │   ├── LIFE_SYSTEM.md              打烊後的生活系統：沙發、閨蜜機、Jill、五隻貓、Dylan（含劇情，會爆雷）
 │   └── REFACTOR_REPORT.md          安全網與重構報告（分析、風險、做了什麼、沒做什麼）
 ├── tests/                          回歸測試、舊存檔樣本、畫面標準答案
@@ -74,9 +75,9 @@ jills-kitchen-project/
 | five cats: personality AI | 五隻貓的個性、關係、Jill 身邊座位競爭、埋伏、賽跑、怕生、打烊後模式、回憶照片 |
 | life | 大沙發與位子計算、閨蜜機、Jill 打烊後的自主休息、Dylan（營業中的行為、留下來的晚上、隱藏進度） |
 | crew / incidents / emergency stock | 員工；突發事件；缺料時的緊急叫貨 |
-| stars & lab | 食譜星級、試做實驗室 |
+| stars & lab | 食譜星級、料理研發（食材卡片、相性、研究進度） |
 | Jill's bag cabinet / guide | 包包收藏櫃；遊戲說明內容 |
-| input / screens | 觸控操作；標題、開店前、結算、商店、餐廳手冊、設定 |
+| input / screens | 觸控操作；標題、開店前、結算、商店、餐廳日誌、店主手冊、設定 |
 | loop / boot | 主迴圈與啟動 |
 
 ## 常改的地方
@@ -97,13 +98,14 @@ python3 tests/run_tests.py --target single  # 測單檔版
 python3 tests/run_tests.py --record         # 刻意改變遊戲內容後，重新錄製標準答案
 ```
 
-31 項測試涵蓋：
+36 項測試涵蓋：
 - 新遊戲、舊存檔（含真的 V16 存檔與 V16 備份檔）、存讀檔、備份檔匯出／匯入（含壞檔案被拒絕）、開店、打烊；
 - 像真人一樣連玩 10 天（買東西、雇人、擴建）而且每一秒餐廳都真的畫在畫布上、主迴圈沒死、Canvas 狀態沒外漏；
 - 客人完整流程、每道料理（每道 2–5 次操作、五種料理家族的形狀、寬容度）、廚房員工的能力階梯、服務生送餐、門口長椅的等候流程、Dylan 的付款／收桌／不是員工、經濟數值；
 - 五隻貓的初始化、個性 AI 與個性指紋；
 - 打烊後的生活：沙發位子幾何、Jill 的晚上、五隻貓怎麼用沙發、Dylan 的前期與揭露；
 - UI 與觸控操作、主迴圈只有一份、長時間遊玩不累積；
+- 營業中的 checkpoint（暫停／重新載入後從同一分鐘繼續）、每天早上的亮度、Jill 依工作量休息與起身、只用看得到的資訊解完料理研發、相簿的珍藏／冷卻／容量規則與日誌；
 - 逐像素比對畫面的黃金基準。
 
 詳細說明見 `docs/ARCHITECTURE.md` 第 6 節。

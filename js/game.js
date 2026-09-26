@@ -208,7 +208,7 @@ const COACH=[
 const KEY='jills-kitchen-save-v1';
 function newState(){return{v:1,day:1,phase:'prep',money:500,lifetime:0,level:1,
  eq:{stove:1,oven:0,bar:0,prep:0,fridge:1,pan:1},tables:2,
- decor:{plants:0,lights:0,art:0,chairs:0,rug:0,ware:0,bar:0,sofa:0},staff:{busser:false,bartender:false},mem:{},catFam:{},crew:[],crewMig:1,rstar:{},dylan:{stage:0,stay:0,reveal:0,last:0,clues:{}},life:{sofa:0,tv:0},
+ decor:{plants:0,lights:0,art:0,chairs:0,rug:0,ware:0,bar:0,sofa:0},staff:{busser:false,bartender:false},mem:{},catFam:{},crew:[],crewMig:1,rstar:{},dylan:{stage:0,stay:0,reveal:0,last:0,clues:{}},life:{sofa:0,tv:0},checkpoint:null,savedAt:0,savedLabel:'',rdProg:{},rdDone:{},labKnown:{},album:null,notes:[],
  unlocked:['friedrice'],menu:['friedrice'],price:{},stock:{},xp:{},reviews:[],achievements:{},regulars:{},returning:0,
  signature:null,catNames:{},buzz:1,buzzMsg:'',stats:{guests:0,perfect:0,days:0},tut:0,gate:1,news:[],today:null,todayCost:0,lastSummary:null,sfx:true,music:true}}
 let S;
@@ -247,21 +247,25 @@ function load(){let t=null;try{t=localStorage.getItem(KEY)}catch(e){return null}
 let saveWarned=false;
 function backupName(){const d=new Date(),p=n=>String(n).padStart(2,'0');return `JillsKitchen_Save_${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}_Day${S.day}.json`}
 function backupText(){return JSON.stringify({app:BACKUP_APP,kind:'save',v:S.v,exported:new Date().toISOString(),save:S},null,1)}
-function exportSave(){if(phase==='service'){toast('營業中不能備份，打烊後再來');return false}save();const name=backupName(),text=backupText();
+function exportSave(){if(phase==='service'&&!paused){toast('先暫停再備份');return false}if(phase==='service'&&R&&R.closing==null)checkpointSave('backup');else save();const name=backupName(),text=backupText();
  const direct=()=>{try{const blob=new Blob([text],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),4000);toast('已備份存檔：'+name);return true}catch(e){toast('這個瀏覽器無法下載檔案');return false}};
  /* inside the claude.ai viewer a page cannot download by itself; the host saves the file for us */
  const host=window.claude&&typeof window.claude.use==='function';if(!host)return direct();
  toast('準備備份檔…');window.claude.use('downloads').then(d=>{if(!d){direct();return}return d.save({filename:name,data:text}).then(()=>toast('已備份存檔：'+name),e=>{if(e&&e.code==='declined')return;direct()})}).catch(direct);return true}
+function copyBackup(){if(phase==='service'&&!paused){toast('先暫停再備份');return}if(phase==='service'&&R&&R.closing==null)checkpointSave('backup');else save();const text=backupText();
+ const done=()=>toast('備份文字已複製，貼到備忘錄或訊息裡留著；之後用「貼上備份文字恢復」讀回來');
+ const fallback=()=>{try{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.focus();ta.select();const ok=document.execCommand&&document.execCommand('copy');ta.remove();if(ok)done();else toast('這個瀏覽器不讓網頁複製文字，請改用「備份到檔案」')}catch(e){toast('這個瀏覽器不讓網頁複製文字，請改用「備份到檔案」')}};
+ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(text).then(done,fallback);else fallback()}
 const IMPORT_MSG={notjson:'這不是 Jill\'s Kitchen 的存檔檔案（無法讀取內容）',notsave:'這不是 Jill\'s Kitchen 的存檔檔案',newer:'這個存檔來自比較新的版本，目前的遊戲讀不了',broken:'這個存檔檔案已經損壞，無法讀取'};
 let pendingImport=null;
-function importSaveText(t){const r=parseSave(t);if(r.err){pendingImport=null;toast(IMPORT_MSG[r.err]+'。目前的進度沒有改變');if(sub==='settings')showSettings();return false}pendingImport=r.o;if(sub==='settings')showSettings();return true}
-function importConfirm(){const o=pendingImport;if(!o)return;pendingImport=null;if(phase==='service'){toast('營業中不能讀取存檔');return}
+function importSaveText(t){const r=parseSave(t);if(r.err){pendingImport=null;toast(IMPORT_MSG[r.err]+'。目前的進度沒有改變');if(sub==='settings'||sub==='pause')showSettings();return false}pendingImport=r.o;if(sub==='pause')sub='settings';showSettings();return true}
+function importConfirm(){const o=pendingImport;if(!o)return;pendingImport=null;if(phase==='service'&&!paused){toast('先暫停再讀取存檔');return}paused=false;
  S=o;save();R=null;ICACHE.clear();DCACHE.clear();IDLE=null;bg=null;lifeReset();setAudio();sub=null;resetStep=0;toast(`已讀取存檔：DAY ${S.day}`);showTitle()}
-function pickImportFile(){if(phase==='service'){toast('營業中不能讀取存檔');return}let inp=$('#importFile');
+function pickImportFile(){if(phase==='service'&&!paused){toast('先暫停再讀取存檔');return}let inp=$('#importFile');
  if(!inp){inp=document.createElement('input');inp.type='file';inp.id='importFile';inp.accept='.json,application/json,text/plain';inp.hidden=true;document.body.appendChild(inp);
   inp.addEventListener('change',()=>{const f=inp.files&&inp.files[0];inp.value='';if(!f)return;if(f.size>4e6){toast(IMPORT_MSG.notsave+'。目前的進度沒有改變');return}const fr=new FileReader();fr.onload=()=>importSaveText(String(fr.result||''));fr.onerror=()=>toast('讀取檔案失敗。目前的進度沒有改變');fr.readAsText(f)})}
  inp.click()}
-function save(){try{S.savedAt=Date.now();localStorage.setItem(KEY,JSON.stringify(S));return true}catch(e){if(!saveWarned){saveWarned=true;console.warn('[save] saving failed',e)}return false}}
+function save(){try{S.savedAt=Date.now();S.savedLabel=`DAY ${S.day} · ${R&&phase==='service'?clockStr():(phase==='service'?'17:00':'打烊後')}`;localStorage.setItem(KEY,JSON.stringify(S));return true}catch(e){if(!saveWarned){saveWarned=true;console.warn('[save] saving failed',e)}return false}}
 function hasSave(){try{return!!localStorage.getItem(KEY)}catch(e){return false}}
 S=load()||newState();
 
@@ -436,7 +440,7 @@ function drawPerson(c,x,y,L,o){o=o||{};const s=(o.s||1)*(o.pscale===undefined?PS
  if(L.acc==='backpack'){c.strokeStyle='#3C5470';c.lineWidth=2;c.beginPath();c.moveTo(-5,by+1);c.lineTo(-5,by+11);c.moveTo(5,by+1);c.lineTo(5,by+11);c.stroke()}
  if(L.acc==='shades'){c.strokeStyle='#E6C27A';c.lineWidth=1;c.beginPath();c.moveTo(-4,hy+9);c.quadraticCurveTo(0,hy+15,4,hy+9);c.stroke()}
  if(L.acc==='phone'){c.fillStyle='#222';rr(c,7,base-10+bob,4.5,7,1);c.fill();c.fillStyle='#8FD3F4';c.fillRect(7.8,base-9+bob,2.9,5)}
- if(o.hold){const ph=o.hold==='phone';const hy2=by+9;c.save();c.translate(0,hy2);c.rotate(-.1);c.fillStyle=ph?'#2A2A2E':'#F2EFE8';rr(c,-4.6,-5,9.2,ph?6.6:8.6,1.2);c.fill();c.strokeStyle=OL;c.lineWidth=.5;c.stroke();c.fillStyle=ph?'#9FD8F5':'#FBFAF6';c.fillRect(-3.7,-4,7.4,ph?4.7:6.6);if(ph){c.fillStyle='rgba(255,255,255,.25)';c.fillRect(-3.7,-4,2.2,4.7)}else{c.fillStyle='rgba(0,0,0,.2)';for(let k=0;k<4;k++)c.fillRect(-2.8,-2.7+k*1.5,5.6-(k===3?2.2:0),.6)}c.restore();
+ if(o.hold&&o.hold!=='camera'){const ph=o.hold==='phone';const hy2=by+9;c.save();c.translate(0,hy2);c.rotate(-.1);c.fillStyle=ph?'#2A2A2E':'#F2EFE8';rr(c,-4.6,-5,9.2,ph?6.6:8.6,1.2);c.fill();c.strokeStyle=OL;c.lineWidth=.5;c.stroke();c.fillStyle=ph?'#9FD8F5':'#FBFAF6';c.fillRect(-3.7,-4,7.4,ph?4.7:6.6);if(ph){c.fillStyle='rgba(255,255,255,.25)';c.fillRect(-3.7,-4,2.2,4.7)}else{c.fillStyle='rgba(0,0,0,.2)';for(let k=0;k<4;k++)c.fillRect(-2.8,-2.7+k*1.5,5.6-(k===3?2.2:0),.6)}c.restore();
   c.fillStyle=skin;const rh=o.flipPage?-2.4:0;rr(c,-9.4,hy2-1,5,3.4,1.7);c.fill();rr(c,4.4,hy2-1+rh,5,3.4,1.7);c.fill();circ(c,-5.4,hy2+1.4,2.2);circ(c,5.4,hy2+1.4+rh,2.2)}
  /* head */
  c.fillStyle='rgba(0,0,0,.12)';el(c,0,hy+9.4,6.2,1.6);
@@ -490,6 +494,8 @@ function drawPerson(c,x,y,L,o){o=o||{};const s=(o.s||1)*(o.pscale===undefined?PS
  if(L.acc==='beret'){c.fillStyle='#7A2E3A';c.save();c.translate(-1,hy-8.5);c.rotate(-.2);el(c,0,0,10.5,4);c.fillStyle='rgba(255,255,255,.12)';el(c,-3,-1,5,1.4);c.restore();c.fillRect(-1.5,hy-14,2,3)}
  if(L.acc==='hat'){c.fillStyle='#34302D';el(c,0,hy-6.5,13,3.2);rr(c,-7,hy-15,14,9,3);c.fill();c.fillStyle='#8E6A3A';c.fillRect(-7,hy-8.6,14,2);c.fillStyle='rgba(255,255,255,.08)';rr(c,-6,hy-14,4,7,2);c.fill()}
  if(L.acc==='bow'){c.fillStyle='#E8798A';c.beginPath();c.moveTo(6,hy-8);c.lineTo(11,hy-11);c.lineTo(11,hy-5);c.closePath();c.fill();c.beginPath();c.moveTo(6,hy-8);c.lineTo(1,hy-11);c.lineTo(1,hy-5);c.closePath();c.fill();c.fillStyle='#C4506A';circ(c,6,hy-8,1.6)}
+ /* 'camera': the phone raised beside the face, turned sideways, pointed where the gaze goes; drawn over the head */
+ if(o.hold==='camera'){const dir=o.gaze?Math.sign(o.gaze.x)||1:1;const px=dir*9.5,py=hy+2;c.save();c.translate(px,py);c.rotate(dir*.25);c.fillStyle='#2A2A2E';rr(c,-2.6,-4.6,5.2,9.2,1.2);c.fill();c.strokeStyle=OL;c.lineWidth=.5;c.stroke();c.fillStyle='#9FD8F5';c.fillRect(-1.9,-3.8,3.8,7.2);c.fillStyle='rgba(255,255,255,.3)';c.fillRect(-1.9,-3.8,1.4,7.2);c.restore();c.fillStyle=skin;circ(c,px-dir*1.5,py+4.6,2.3);circ(c,px+dir*1.2,py-4.4,2)}
  if(o.jill&&o.hat!==false){let tg=c.createLinearGradient(-8,0,8,0);tg.addColorStop(0,'#FFFFFF');tg.addColorStop(1,'#E6E0D6');c.fillStyle=tg;rr(c,-7.6,hy-22,15.2,12,2.5);c.fill();c.fillStyle='#FFFFFF';circ(c,-5.5,hy-22,5.4);circ(c,0,hy-25,6);circ(c,5.5,hy-22,5.4);c.strokeStyle='rgba(120,100,80,.35)';c.lineWidth=.6;c.beginPath();c.arc(-5.5,hy-22,5.4,Math.PI*.9,Math.PI*1.9);c.arc(0,hy-25,6,Math.PI*1.1,Math.PI*1.9);c.arc(5.5,hy-22,5.4,Math.PI*1.1,Math.PI*2.1);c.stroke();c.strokeStyle='rgba(0,0,0,.08)';for(let k=-4;k<=4;k+=4){c.beginPath();c.moveTo(k,hy-19);c.lineTo(k,hy-11);c.stroke()}c.fillStyle='#EDE7DC';c.fillRect(-7.6,hy-12.5,15.2,2.2);c.fillStyle='rgba(0,0,0,.06)';c.fillRect(-7.6,hy-10.6,15.2,.8)}
  c.restore()}
 
@@ -535,7 +541,8 @@ function iconURL(kind,lv){const k='i'+kind+(lv||0);if(ICACHE.has(k))return ICACH
 
 /* ================= audio ================= */
 const AU={ctx:null};
-function audioInit(){if(AU.ctx){if(AU.ctx.state==='suspended')AU.ctx.resume();return}
+function audioResume(){const C=AU.ctx;if(!C||C.state==='running'||C.state==='closed')return;try{const p=C.resume();if(p&&p.catch)p.catch(()=>{})}catch(e){}}
+function audioInit(){if(AU.ctx){audioResume();return}
  try{const C=new(window.AudioContext||window.webkitAudioContext)();AU.ctx=C;
   AU.master=C.createGain();AU.master.gain.value=.9;AU.master.connect(C.destination);
   AU.music=C.createGain();AU.music.gain.value=S.music?.16:0;AU.music.connect(AU.master);
@@ -543,7 +550,7 @@ function audioInit(){if(AU.ctx){if(AU.ctx.state==='suspended')AU.ctx.resume();re
   const len=C.sampleRate*2,b=C.createBuffer(1,len,C.sampleRate),d=b.getChannelData(0);for(let i=0;i<len;i++)d[i]=Math.random()*2-1;AU.noise=b;
   const n=C.createBufferSource();n.buffer=b;n.loop=true;const hp=C.createBiquadFilter();hp.type='highpass';hp.frequency.value=2800;const g=C.createGain();g.gain.value=0;n.connect(hp);hp.connect(g);g.connect(AU.sfx);n.start();AU.siz=g;
   const n2=C.createBufferSource();n2.buffer=b;n2.loop=true;const bp=C.createBiquadFilter();bp.type='bandpass';bp.frequency.value=520;bp.Q.value=2.2;const g2=C.createGain();g2.gain.value=0;n2.connect(bp);bp.connect(g2);g2.connect(AU.sfx);n2.start(0,.7);AU.chat=g2;AU.chatBp=bp;
-  AU.next=C.currentTime+.1;AU.step=0;setInterval(musicTick,40)}catch(e){AU.ctx=null}}
+  AU.next=C.currentTime+.1;AU.step=0;setInterval(musicTick,40);try{C.onstatechange=()=>{if(!document.hidden&&C.state!=='running')setTimeout(audioResume,300)}}catch(e){}}catch(e){AU.ctx=null}}
 function setAudio(){if(!AU.ctx)return;AU.music.gain.setTargetAtTime(S.music?.16:0,AU.ctx.currentTime,.1);AU.sfx.gain.setTargetAtTime(S.sfx?.55:0,AU.ctx.currentTime,.05)}
 const mf=m=>440*Math.pow(2,(m-69)/12);
 function tone(f,dt,dur,type,vol,slide,dest){const C=AU.ctx;if(!C)return;const t=C.currentTime+(dt||0);const o=C.createOscillator();o.type=type||'sine';o.frequency.setValueAtTime(f,t);if(slide)o.frequency.exponentialRampToValueAtTime(slide,t+dur);const g=C.createGain();g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol||.2,t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g);g.connect(dest||AU.sfx);o.start(t);o.stop(t+dur+.05)}
@@ -626,11 +633,15 @@ function genTasks(ex){const D=S.day;const rw=60+D*25;const avgP=menuList().reduc
 function taskProg(t){if(!R)return 0;const st=R.st;switch(t.k){case'guests':return st.guests;case'perfect':return st.perfect;case'revenue':return st.rev;case'combo':return R.maxCombo;case'noangry':return st.angry===0?(R.closed?1:0):0;case'dish':return st.dish[t.d]||0}return 0}
 function suggestStock(){const ms=menuList();const T=S.today;const w={};let sw=0;for(const d of ms){const D=DISH(d);let v=(D.pop||1)*(D.cat==='drink'?.7:D.cat==='dessert'?.5:D.cat==='starter'?.6:1);if(d==='signature')v*=1.6;w[d]=v;sw+=v}
  const out={};const items=(T?T.items:10)*1.2;for(const d of ms)out[d]=Math.max(3,Math.ceil(items*w[d]/sw)+1);let tot=Object.values(out).reduce((a,b)=>a+b,0);const cap=fridgeCap();if(tot>cap){const f=cap/tot;for(const d in out)out[d]=Math.max(1,Math.floor(out[d]*f))}return out}
+/* what tomorrow's basic restock would cost right now (menu, stock and today's guest estimate) and how much to keep aside */
+function restockEstimate(){const sug=suggestStock();let c=0;for(const d of menuList())c+=Math.max(0,(sug[d]||0)-(S.stock[d]||0))*costOf(d);return Math.round(c)}
+function keepAside(){return Math.round(restockEstimate()*1.15+100)}
+function shopAfterBuy(){const keep=keepAside();if(S.money<keep)toast(`⚠ 現金 ${fmt(S.money)}，可能不足以完成${S.phase==='prep'?'今天':'明天'}的建議備料（約 ${fmt(restockEstimate())}）`,'warn')}
 function buyStock(d,delta){const cur=S.stock[d]||0;if(delta>0){const room=fridgeCap()-stockTotal();delta=Math.min(delta,room);const c=costOf(d);delta=Math.min(delta,Math.floor(S.money/c));if(delta<=0)return false;S.money-=delta*c;S.todayCost+=delta*c;S.stock[d]=cur+delta}else{delta=Math.max(delta,-cur);if(delta===0)return false;S.money+= -delta*costOf(d);S.todayCost-= -delta*costOf(d);S.stock[d]=cur+delta}return true}
 function autoStock(){const sug=suggestStock();for(const d in sug){const need=sug[d]-(S.stock[d]||0);if(need>0)buyStock(d,need)}}
 
 /* ================= service ================= */
-function startService(){lifeReset();dylanStageCheck();
+function startService(){lifeReset();dylanStageCheck();bg=null;lastEv=null;
  if(S.money<150&&stockTotal()<5){S.money+=300;toast('Jill 翻出了抽屜裡的應急金 $300')}
  if(S.day<=2)autoStock();S.news=[];
  const T=S.today,dur=dayDur(S.day);
@@ -685,7 +696,7 @@ function updGroup(g,dt){
  if(g.reg==='dylan'&&g.table!=null&&['reading','order','wait','eat','check'].includes(g.state))dylanGuestUpd(g,dt);
  if(g.state==='reading'){g.timer-=dt;if(g.timer<=0){g.state='order';sfx.bubble()}}
  if(g.state==='eat'){g.timer-=dt;if(g.timer<=0){g.state='check';sfx.bubble()}}}
-function seatGroup(g,t){t.group=g;t.dirty=false;g.table=t.i;g.state='toTable';g.tx=t.x;g.ty=t.y+8;g.pat=Math.min(1,g.pat+.1);requeue();sfx.tap();
+function seatGroup(g,t){t.group=g;t.dirty=false;g.table=t.i;g.state='toTable';g.tx=t.x;g.ty=t.y+8;g.pat=Math.min(1,g.pat+.1);requeue();sfx.tap();jillGreet(g,t);
  if(Math.random()<.16&&!g.reg)quote(g,pick(['聽說 Jill 主廚今天在店裡！','朋友說一定要來吃 Jill 的店。','好香喔，是 Jill 在煎東西嗎？','這間店好溫暖，Jill 很會佈置耶。']));coach(1)}
 function freeTableFor(g){const ts=R.tables.filter(t=>!t.group&&!t.dirty&&t.seats>=g.size).sort((a,b)=>a.seats-b.seats);
  if(g.reg==='dylan'&&ts.length){/* a seat that sees Jill at the pass but is not in her way: the free table farthest from the kitchen */return ts.slice().sort((a,b)=>(a.seats-b.seats)||(Math.hypot(b.x-PASS.x,b.y-PASS.y)-Math.hypot(a.x-PASS.x,a.y-PASS.y)))[0]}
@@ -696,7 +707,9 @@ function angryLeave(g){if(g.state==='queue'||g.state==='arrive'){R.st.lost+=g.si
  const t=R.tables[g.table];const served=g.ticket?g.ticket.items.some(i=>i.st==='served'):false;R.st.angry++;if(R.combo>=3)toast('COMBO 中斷');R.combo=0;R.streak=0;sfx.angry();
  addFloat(t.x,t.y-50,'生氣離開','#E0654A',1);toast(`${g.name} 生氣地離開了…`);addReview(g,1);leaveGroup(g,'angry');if(served){t.dirty=true}}
 function quote(g,txt){toast(`<b>${g.name}</b>：「${txt}」`,'q')}
-function orderItems(g){const ms=menuList();const T=TYPES[g.type];const W=R.weather;
+/* a dish needs its station in the kitchen before anyone can order it (a recipe found before the station exists waits) */
+function stationOk(d){const D=DISH(d);if(!D)return false;const st=D.st;return st==='stove'||!!(S.eq[st])}
+function orderItems(g){const ms=menuList().filter(stationOk);const T=TYPES[g.type];const W=R.weather;
  const wf=d=>{const D=DISH(d);let w=(D.pop||1)*((T.pref||{})[D.cat]||1);const m=S.price[d]||1;w*=Math.pow(1/m,1+T.sens*1.8);w*=Math.pow(D.price/220,(T.budget-1)*.9);if(g.type==='gourmet'&&D.diff>=3)w*=1.7;if(d==='signature')w*=2.2;if(R.event==='valentine'&&D.cat==='dessert')w*=2;w*=1+.25*(starOf(d)-1);if((S.stock[d]||0)<=0)w*=.6;return w};
  const foods=()=>ms.filter(d=>DISH(d).cat!=='drink'&&DISH(d).cat!=='dessert');const drinks=()=>ms.filter(d=>DISH(d).cat==='drink');const des=()=>ms.filter(d=>DISH(d).cat==='dessert');
  const items=[];const cap=g.size===1?3:g.size===2?4:5;const reg=g.reg?REG_BY[g.reg]:null;
@@ -799,29 +812,94 @@ function collect(g){const T=TYPES[g.type];const items=g.ticket.items.filter(i=>i
  if(g.reg==='dylan'){if(dylanStays())dylanLinger(g,t);else{/* he clears his own table: plate to the pass, then out. A habit, not a job. */t.dirty=false;t.plates=[];t.busT=0;g.bus=true;g.tx=PASS.x+18;g.ty=PASS.y-2;S.dylan.clues.tidy=(S.dylan.clues.tidy||0)+1}}}
 
 /* ---- Jill ---- */
+/* Lines for a familiar face. Tier 1 = 熟客 (5+ visits), tier 2 = 老客人 (20+). Short, and never every visit. */
+const REG_CHAT={
+ chen:[[['陳伯伯，今天散步走遠了嗎？','走到河邊又走回來，肚子餓了。'],['陳伯伯，今天還是老位子。','老位子看得到貓，好。']],[['陳伯伯，今天氣色很好。','有你的菜吃，氣色能不好嗎。'],['陳伯伯來啦。','嗯，來看看我的貓。']]],
+ mia:[[['Mia，今天又加班？','別問了，先給我咖啡。'],['Mia，今天早一點喔。','稿子交出去了，來犒賞自己。']],[['Mia，今天想吃什麼？','妳決定，我相信妳。'],['Mia，還撐得住嗎？','有這裡就撐得住。']]],
+ koba:[[['小林，今天不趕？','趕！但這裡不能不來。'],['小林，慢慢吃。','我盡量。']],[['小林，今天也很快？','今天…可以慢一點。'],['小林，坐。','老樣子，謝謝。']]],
+ leo:[[['Leo，考試還好嗎？','Jill 姊別提了，先吃飯。'],['Leo，今天吃飽一點。','一定！']],[['Leo，上班習慣了嗎？','習慣了，但還是最想念這裡。'],['Leo，今天想吃什麼？','跟以前一樣就好。']]],
+ sophie:[[['Sophie，今天想試什麼？','看你今天的手氣。'],['Sophie 來了。','來看看有沒有進步。']],[['Sophie，今天不寫稿？','今天只是想吃飯。'],['Sophie，老位子。','嗯，這裡最舒服。']]],
+ wang:[[['兩位，今天也約會？','每週一次，不能少。'],['靠窗的位子留給你們了。','謝謝 Jill。']],[['兩位，今天是第幾年了？','不告訴妳，反正還會再來。'],['王先生、王太太，慢用。','妳的店也要一直開下去喔。']]]};
+function jillSay(txt){toast(`<b>Jill</b>：「${txt}」`,'q')}
+function dishName(d){const D=DISH(d);return D?(d==='signature'&&S.signature?S.signature.name:D.n):''}
+/* Not every visit, and tied to the visit: the dish and how it came out, a cat that came by or got photographed,
+   a long wait, two words with Jill. Newest first in the journal; capped so the save stays small. */
+function regularNote(g){if(!R||!g.reg||g.reg==='dylan')return;const v=S.regulars[g.reg]||0;if(v<5||Math.random()>.32)return;S.notes=S.notes||[];if(S.notes.some(n=>n.reg===g.reg&&S.day-n.day<2))return;
+ const items=g.ticket?g.ticket.items.filter(i=>i.st==='served'):[];const it=items.length?pick(items):null;const dn=it?dishName(it.d):'';const q=it?it.q:null;const cat=g.lookCat?catName(g.lookCat.def):null;const pool=[];
+ if(dn&&(q==='P'||q==='G'))pool.push(`今天的${dn}還是很好吃。`,`${dn}，一如往常。`,`吃了${dn}，今天也算是過去了。`);
+ if(dn&&q==='O')pool.push(`${dn}好像跟上次不太一樣，但還是吃完了。`);
+ if(dn&&q==='B')pool.push(`今天的${dn}有點失常，下次再給它一次機會。`);
+ if(g.photo&&cat)pool.push(`拍到${cat}了，手機裡又多一張。`,`${cat}今天很上相。`);else if(cat&&g.lookCat&&g.lookCat.def.id==='tora')pool.push(`窗邊那隻貓今天終於看我了。`);else if(cat)pool.push(`看了${cat}一會兒，忘了自己在等菜。`);
+ if(g.catJoy)pool.push('貓來桌邊繞了一圈，心情好了一半。');if(g.scared)pool.push(`又被${catName(catBy('mikan').def)}嚇到一次。`);
+ if(g.pat<.45)pool.push('今天等了比較久，還是值得。');if(g.chat)pool.push('跟 Jill 聊了兩句，回家的路都輕了。');
+ if(!pool.length)pool.push('今天也來了。','老位子還在，就好。');
+ S.notes.unshift({day:S.day,reg:g.reg,txt:pick(pool)});if(S.notes.length>40)S.notes.length=40}
+function jillFarewell(g){if(!R||!g.reg||g.reg==='dylan'||g.chat||(R.chatT||0)>R.t)return;const v=S.regulars[g.reg]||0;const tier=v>=20?2:v>=5?1:0;if(!tier||Math.random()>(tier===2?.45:.3))return;
+ const items=g.ticket?g.ticket.items.filter(i=>i.st==='served'):[];const it=items.length?pick(items):null;const dn=it?dishName(it.d):'';const good=it&&(it.q==='P'||it.q==='G');
+ const gl=dn?(good?pick([`今天的${dn}還是很好吃。`,`${dn}，明天還想吃。`,`${dn}跟上次一樣好。`]):pick([`今天的${dn}，嗯，還可以。`,`${dn}下次再來試一次。`])):pick(['今天也謝謝妳。','明天見。']);
+ const jl=tier===2?pick(['慢走，明天見。','路上小心。','下次來，貓會記得你的。']):pick(['謝謝，慢走。','明天見！','謝謝光臨，路上小心。']);
+ g.chat=true;R.chatT=R.t+40;quote(g,gl);setTimeout(()=>{if(R&&phase==='service'&&!paused)jillSay(jl)},1400)}
+function jillGreet(g,t){if(!R||g.reg==='dylan')return;const J=R.jill;const free=!J.cur&&!J.q.length&&!J.rest&&!J.pet&&(J.calm||0)>.8;if(!free)return;
+ const v=g.reg?(S.regulars[g.reg]||0):0;const tier=v>=20?2:v>=5?1:0;
+ /* a look and a nod for everyone she has time for; a word for people she knows */
+ if(Math.random()<(g.reg?.9:.45)){J.lookAt={x:t.x,y:t.y,t:rand(1,1.6)};J.nod=.7}
+ if(g.reg&&tier>0&&!g.chat&&(R.chatT||0)<R.t&&Math.random()<(tier===2?.55:.4)){const L=REG_CHAT[g.reg];const pr=L&&L[tier-1]?pick(L[tier-1]):null;if(pr){g.chat=true;R.chatT=R.t+40;jillSay(pr[0]);setTimeout(()=>{if(R&&phase==='service'&&!paused&&R.groups.includes(g))quote(g,pr[1])},1500)}}}
 function jillTargets(i){const J=R.jill;return J.q.includes(i)||(J.cur&&J.cur.t===i)}
 function tableActionable(t){const g=t.group;if(!g)return t.dirty;if(g.rowdy)return true;if(g.state==='order'||g.state==='check')return true;if(g.state==='wait'&&g.ticket&&g.ticket.items.some(it=>it.st==='ready'))return true;return false}
 function planAct(){const J=R.jill,t=R.tables[J.cur.t],g=t.group;const need=g&&g.ticket&&g.ticket.items.some(it=>it.st==='ready'&&!it.picked);
  if(need){J.cur.step='pickup';J.tx=PASS.x+(t.x<200?-14:14);J.ty=PASS.y}else{J.cur.step='table';J.tx=t.x;J.ty=t.y+26}}
-function arriveAct(){const J=R.jill;if(J.restTo){J.restTo=false;J.sit=true;J.face=1;return}if(!J.cur)return;const t=R.tables[J.cur.t];
+function arriveAct(){const J=R.jill;if(J.restTo){J.restTo=false;J.sit=true;J.face=1;return}
+ if(J.rest==='go'){const L=LIFE.jill;if(!L.reserved||!L.pos){J.rest=null;return}J.rest='sit';J.sofa=true;memo('rest',JPOS[L.pos].x,SOFA.jy);L.x=JPOS[L.pos].x;L.y=SOFA.jy;L.on=true;L.reserved=false;L.act='idle';L.t=rand(4,9);L.last=null;L.sinceSit=0;L.legs=0;L.legTarget=0;L.gazeT=0;L.flip=0;L.settleT=rand(20,40);L.bobT=.5;J.face=L.face;J.x=L.x;J.y=SOFA.front+10;return}
+ if(!J.cur)return;const t=R.tables[J.cur.t];
  if(J.cur.step==='pickup'){const g=t.group;if(g&&g.ticket){for(const it of g.ticket.items)if(it.st==='ready'&&!it.picked){it.picked=true;J.carry.push({tk:g.ticket,it})}}J.busy=.22;J.cur.step='table';J.cur.go=true;R.tv++;return}
  let busy=0;const g=t.group;if(g&&g.rowdy){g.rowdy=0;g.pat=Math.min(1,g.pat+.25);busy=1.1;quote(g,'好啦好啦…看在 Jill 的面子上。');addFloat(t.x,t.y-50,'安撫成功','#9ED08A',1);sfx.good()}
  if(g&&g.state==='order'){createTicket(g);busy=.7}
  if(g&&g.ticket&&J.carry.length){const mine=J.carry.filter(c=>c.tk===g.ticket);if(mine.length){serveItems(g,mine);J.carry=J.carry.filter(c=>c.tk!==g.ticket);busy=Math.max(busy,.4)}}
- if(g&&g.state==='check'){collect(g);busy=Math.max(busy,.5)}
+ if(g&&g.state==='check'){jillFarewell(g);regularNote(g);collect(g);busy=Math.max(busy,.5)}
  if(!t.group&&t.dirty){t.dirty=false;t.plates=[];t.busT=0;busy=Math.max(busy,.55);sfx.clear();coach(7)}
  J.carry=J.carry.filter(c=>R.tickets.includes(c.tk));J.busy=busy||.08;J.cur.done=true}
+/* What still needs Jill herself right now. Staff who cover a job take it off her plate, which is how
+   hiring people turns into free time for her — no employee-count bonus anywhere. */
+function crewCovers(kind){for(const m of S.crew||[]){if(kind==='clean'&&m.role==='cleaner')return true;if(m.role!=='waiter')continue;if(kind==='seat'&&m.duty!=='order')return true;if(kind==='order'&&(m.duty==='both'||m.duty==='order'))return true;if(kind==='serve'&&m.duty==='both'&&m.lv>=2)return true;if(kind==='check'&&m.duty==='both'&&m.lv>=3)return true}return false}
+function chefCanAny(d){const D=DISH(d);if(!D)return false;const m=chefFor(D.st);return !!m&&chefCan(m,d)}
+function jillWorkload(){if(!R||R.closing!=null)return 9;const J=R.jill;let w=0;
+ if(J.cur||J.q.length||J.carry.length)w+=3;
+ for(const t of R.tables){const g=t.group;if(!g){if(t.dirty&&!crewCovers('clean'))w++;continue}if(g.rowdy)w+=3;if((g.state==='order'||g.state==='reading'||g.state==='toTable')&&!crewCovers('order'))w++;if(g.state==='check'&&!crewCovers('check'))w++;if(g.state==='wait'&&g.ticket&&g.ticket.items.some(i=>i.st==='ready'&&!i.picked)&&!crewCovers('serve'))w++}
+ for(const tk of R.tickets)for(const it of tk.items)if(it.st==='pending'&&!chefCanAny(it.d))w++;
+ for(const s0 of R.slots){if(s0.broken)w+=2;if(s0.job&&!chefHandles(s0))w++}
+ if(R.thief||R.insp)w+=3;return w}
+function startRest(pos){const J=R.jill,L=LIFE.jill;J.rest='go';J.restPos=pos;L.pos=pos;L.reserved=true;L.on=false;L.face=JPOS[pos].face;L.legs=0;L.legTarget=0;L.act=null;L.petCat=null;L.hat=true;J.tx=JPOS[pos].x;J.ty=SOFA.front+10;J.idle=0}
+function endRest(){const J=R.jill,L=LIFE.jill;if(!J.rest)return;const was=L.on;const x=L.x;J.rest=null;J.sofa=false;L.on=false;L.reserved=false;L.pos=null;L.act=null;L.petCat=null;L.hat=false;if(was){J.x=x;J.y=SOFA.front+12}J.tx=null;J.ty=null;J.moving=false;J.restCD=R.t+rand(25,45);J.idle=0;J.calm=0;
+ for(const c of CATS||[])if(c.sofa&&c.sofa.kind==='lap'&&c.sofaOn)leaveSofa(c)}
+function restTick(dt){const J=R.jill,L=LIFE.jill;L.sinceSit+=dt;L.t-=dt;if(L.gazeT>0)L.gazeT-=dt;if(L.flip>0)L.flip-=dt;if(L.bobT>0)L.bobT-=dt;
+ if(L.act==='read'){L.flipT-=dt;if(L.flipT<=0){L.flipT=rand(5,13);L.flip=.35}}
+ J.restChk=(J.restChk||0)+dt;if(J.restChk>.5){J.restChk=0;if(J.q.length||jillWorkload()>0){endRest();return}}
+ if(L.t<=0){const lap=(CATS||[]).find(c=>c.sofa&&c.sofa.kind==='lap'&&c.sofaOn);const near=sofaCats().filter(c=>Math.abs(c.x-L.x)<46);
+  const W=[['read',L.last==='read'?1.5:3],['idle',L.last==='idle'?1:2],['look',2]];if(near.length&&L.act!=='pet')W.push(['pet',lap?4:3]);
+  const k=wpick(W,o=>o[1])[0];L.last=L.act;L.act=k;
+  if(k==='read'){L.t=rand(10,25);L.flipT=rand(4,10)}else if(k==='idle')L.t=rand(5,12);
+  else if(k==='look'){L.t=rand(2.5,4);const g=R.groups.find(q=>q.table!=null&&['reading','wait','eat'].includes(q.state));L.gazeT=L.t;L.gazeX=g?R.tables[g.table].x:(L.face>0?L.x+80:L.x-80)}
+  else if(k==='pet'){L.petCat=pick(near);L.t=rand(2.5,4.5);L.petCat.hearts.push({x:0,y:-24,t:0});L.petCat.happy=Math.max(L.petCat.happy||0,1.5);L.petCat.quiet=1}}}
 function jillUpd(dt){const J=R.jill;const fire=R.fire>0;
+ J.calm=(J.calm||0)+dt;J.wlChk=(J.wlChk||0)+dt;if(J.wlChk>.5){J.wlChk=0;if(J.cur||J.q.length||jillWorkload()>0)J.calm=0}
+ if(J.rest==='sit'){restTick(dt);if(J.rest==='sit')return}
  if(J.busy>0){J.busy-=dt*(fire?1.5:1);if(J.busy>0)return;J.busy=0;if(J.cur){if(J.cur.go){J.cur.go=false;const t=R.tables[J.cur.t];J.tx=t.x;J.ty=t.y+26}else if(J.cur.done)J.cur=null}}
  if(!J.cur&&J.q.length){J.cur={t:J.q.shift()};planAct();J.idle=0}
  if(J.tx!=null){const dx=J.tx-J.x,dy=J.ty-J.y,d=Math.hypot(dx,dy),v=165*(fire?1.5:1)*dt;if(d<=v){J.x=J.tx;J.y=J.ty;J.tx=null;J.moving=false;arriveAct()}else{J.x+=dx/d*v;J.y+=dy/d*v;J.face=dx>=0?1:-1;J.step+=dt*12;J.moving=true}return}
- if(!J.cur&&R.closing==null){J.idle+=dt;if(J.idle>2.2&&Math.hypot(J.x-PASS.x,J.y-PASS.y)>3){J.tx=PASS.x;J.ty=PASS.y}}}
-function tapTable(t){const g=t.group;if(g&&g.rowdy){if(!jillTargets(t.i)){R.jill.q.push(t.i);sfx.tap()}return}
+ if(J.pet){J.pet.t-=dt;if(J.pet.t<=0){J.pet=null;J.idle=0}else if(J.q.length||jillWorkload()>2)J.pet=null}
+ if(!J.cur&&!J.pet&&R.closing==null&&J.idle>1.5&&(J.petCD||0)<R.t&&CATS&&Math.random()<dt*.5){/* a cat wandered close: look down, crouch, one pat */const near=CATS.find(c=>!c.hidden&&c.perch<0&&!c.sofa&&['rest','daze','stare','sleep','side'].includes(c.st)&&Math.hypot(c.x-J.x,c.y-J.y)<42);
+  if(near){const id=near.def.id;const p=id==='tora'?.9:id==='ban'?.85:id==='mikan'?.6:id==='mei'?.45:.35;J.petCD=R.t+rand(18,40);if(Math.random()<p){J.pet={cat:near,t:rand(1.6,3),crouch:near.st!=='side'};if(near.st!=='side')memo('pet',near.x,near.y-6,{a:catName(near.def)});J.face=near.x>=J.x?1:-1;if(near.st!=='sleep'){releaseSpots(near);near.st='pet';near.pose=near.st==='sleep'?near.pose:'rub';near.happy=rand(2,3.5);near.quiet=1;near.face=J.x>=near.x?1:-1}near.hearts.push({x:0,y:-26,t:0});if(id==='snow'&&near.st==='sleep')snowNudge(near)}else{J.lookAt={x:near.x,y:near.y,t:rand(1,2),down:true}}}}
+ if(J.lookAt){J.lookAt.t-=dt;if(J.lookAt.t<=0)J.lookAt=null}if(J.nod>0)J.nod-=dt;
+ if(!J.cur&&R.closing==null){J.idle+=dt;
+  /* a quiet moment: nothing on the pass, nobody waiting on her -> she may sit down on the sofa for a bit */
+  if(!J.rest&&!J.pet&&J.calm>5&&(J.restCD||0)<R.t&&R.t>10&&R.t<R.dur*.92&&Math.random()<dt*.3&&jillWorkload()===0){const pos=freeJillPos();if(pos){startRest(pos);return}J.restCD=R.t+15}
+  if(J.idle>2.2&&Math.hypot(J.x-PASS.x,J.y-PASS.y)>3){J.tx=PASS.x;J.ty=PASS.y}}}
+function tapTable(t){const g=t.group;if(g&&g.rowdy){if(!jillTargets(t.i)){R.jill.q.push(t.i);if(R.jill.rest)endRest();sfx.tap()}return}
  if(!g&&!t.dirty){const q=queued().filter(x=>x.state==='queue'||x.state==='arrive');const fit=q.find(x=>x.size<=t.seats);if(fit){seatGroup(fit,t);return}if(q.length)toast('這張桌子坐不下這組客人');return}
  if(g&&(g.state==='toTable'||g.state==='reading')){toast('客人還在看菜單');return}
  if(g&&g.state==='eat'){toast('客人正在享用中');return}
  if(g&&g.state==='wait'&&!tableActionable(t)){toast('料理還沒好，先去廚房做菜吧');return}
- if(jillTargets(t.i))return;R.jill.q.push(t.i);sfx.tap()}
+ if(jillTargets(t.i))return;R.jill.q.push(t.i);if(R.jill.rest)endRest();sfx.tap()}
 
 /* ---- staff ---- */
 function staffUpd(dt){crewUpd(dt);incUpd(dt);stockArrive()}
@@ -841,12 +919,14 @@ function update(dt){R.t+=dt;
  for(const p of R.parts){p.t+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=p.g*dt}R.parts=R.parts.filter(p=>p.t<p.life);
  for(const k in S.stock)if(S.stock[k]<0)S.stock[k]=0;
  if(AU.ctx){const n=R.slots.filter(s=>s.job&&s.type==='stove').length;AU.siz.gain.setTargetAtTime(Math.min(.14,n*.05)*(.7+Math.random()*.6),AU.ctx.currentTime,.05);const seated=R.groups.filter(g=>['reading','order','wait','eat','check'].includes(g.state)).length;AU.chat.gain.setTargetAtTime(Math.min(.09,seated*.018),AU.ctx.currentTime,.3);if(Math.random()<.1)AU.chatBp.frequency.setTargetAtTime(380+Math.random()*500,AU.ctx.currentTime,.08)}
- if(R.closed&&R.groups.length===0&&R.closing==null)startClosing();if(R.closing!=null){R.closing+=dt;if(R.closing>18&&!R.ended)finishClosing()}}
-function startClosing(){R.closing=0;hideCombo();const J=R.jill;J.q=[];J.cur=null;J.carry=[];lifePlan();
- if(LIFE.plan==='sofa'){J.tx=null;J.ty=null;J.restTo=false;J.moving=false;LIFE.jill.x=J.x;LIFE.jill.y=J.y;LIFE.jill.face=J.face;LIFE.jill.act='toSofa'}
+ if(R.closed&&R.groups.length===0&&R.closing==null)startClosing();if(R.closing!=null){R.closing+=dt;if(R.closing>75&&!R.ended){finishClosing();return}}
+ R.cpT=(R.cpT||0)+dt;if(R.cpT>20&&R.closing==null){R.cpT=0;checkpointSave('auto')}}
+function startClosing(){R.closing=0;hideCombo();const J=R.jill;J.q=[];J.cur=null;J.carry=[];const wasResting=J.rest==='sit';const keep=wasResting?Object.assign({},LIFE.jill):null;if(J.rest&&!wasResting)endRest();lifePlan();
+ if(wasResting){LIFE.plan='sofa';const L=LIFE.jill;Object.assign(L,{on:true,reserved:false,pos:keep.pos,x:keep.x,y:SOFA.jy,face:keep.face,legs:0,legTarget:0,act:'settle',t:rand(1,3),sinceSit:0,counted:false,hat:false});J.rest=null;J.sofa=true;J.tx=null;J.ty=null;J.moving=false;J.restTo=false}
+ else if(LIFE.plan==='sofa'){J.tx=null;J.ty=null;J.restTo=false;J.moving=false;const L=LIFE.jill;L.x=J.x;L.y=J.y;L.face=J.face;/* first the pass gets wiped down; then the sofa */L.wrapT=rand(4,6.5);if(Math.hypot(J.x-PASS.x,J.y-PASS.y)>4){L.act='standing';jillWalk(L,PASS.x,PASS.y,'wrap')}else L.act='wrap'}
  else{const t=R.tables[0];J.tx=t.x-25;J.ty=t.y+2;J.restTo=true}$('#closePill').hidden=false;if(CATS)for(const c of CATS){if(c.hidden||['jump','walk','race','dash','bed'].includes(c.st))continue;c.t=Math.min(c.t||0,c.def.id==='tora'?.4:c.def.id==='ban'?rand(1.5,3):rand(2,8))}}
 function finishClosing(){if(!R||R.ended)return;R.ended=true;$('#closePill').hidden=true;endDay()}
-function endDay(){if(!R)return;const st=R.st,D=S.day;const wages=crewWages();let bonus=0;
+function endDay(){if(!R)return;clearCheckpoint();const st=R.st,D=S.day;const wages=crewWages();let bonus=0;
  const tasks=S.today.tasks.map(t=>{const p=taskProg(t);const done=p>=t.n;if(done)bonus+=t.reward;return{...t,p,done}});
  S.money+=bonus-wages;const avg=st.sats.length?st.sats.reduce((a,b)=>a+b,0)/st.sats.length:0;
  let top=null,topN=0;for(const d in st.dish)if(st.dish[d]>topN){topN=st.dish[d];top=d}
@@ -905,9 +985,16 @@ window.addEventListener('resize',()=>{layoutAll()});
 /* Soft contact shadow: a wide faint ellipse under a tighter darker one. Everything that stands on the floor uses it. */
 function softShadow(c,x,y,rx,ry,a){a=a||.22;c.fillStyle=`rgba(40,25,15,${a*.45})`;el(c,x,y+ry*.15,rx*1.25,ry*1.35);c.fillStyle=`rgba(40,25,15,${a})`;el(c,x,y,rx,ry)}
 /* The room's light through the day: clear at opening, warm in the late afternoon, dim and cool by closing */
-function tintFor(d){d=clamp(d,0,1);return d<.5?mix('#FFF8EE','#FFE6C4',d/.5):mix('#FFE6C4','#A89CA8',(d-.5)/.5)}
+function tintFor(d){d=clamp(d,0,1);return d<.5?mix('#FFF8EE','#FFE6C4',d/.5):mix('#FFE6C4','#C2B4C0',(d-.5)/.5)}
 function duskF(){if(R)return clamp(R.t/R.dur,0,1.2);return phase==='title'?.55:phase==='prep'?.25:.95}
 const BGM=80;
+/* Mobile browsers (iOS in particular) may throw away an offscreen canvas's pixels when the page sits
+   in the background or memory is short. The cached floor/wall would then draw as nothing and the room
+   would look dark from that moment on — through the next day as well, because the cache key never
+   changes. So: probe a floor pixel of the cache every couple of seconds and after any return to the
+   foreground, and rebuild it when it has gone blank. */
+let bgProbeT=0;
+function bgCheck(now){if(!bg)return;if(now-bgProbeT<2)return;bgProbeT=now;try{const s=SV.s*DPR;const px=Math.floor((BGM+200)*s),py=Math.floor(250*s);const d=bg.getContext('2d').getImageData(px,py,1,1).data;if(d[3]<200)bg=null}catch(e){}}
 function makeBg(){const s=SV.s*DPR;const XW=LW+BGM*2,X0=-BGM;const cv=mkCanvas(Math.ceil(XW*s),Math.ceil(LH*s));const c=cv.getContext('2d');c.scale(s,s);c.translate(BGM,0);const L=S.level,rnd=rng(77);
  c.save();c.beginPath();c.rect(X0,90,XW,LH-90);c.clip();c.fillStyle='#E8E1D5';c.fillRect(X0,90,XW,LH);
  for(let i=0;i<40;i++){c.fillStyle=`rgba(${rnd()<.5?'255,255,255':'170,150,125'},.06)`;el(c,X0+rnd()*XW,95+rnd()*(LH-95),20+rnd()*50,6+rnd()*16)}
@@ -960,9 +1047,14 @@ function drawTableFull(c,t,now){const g=t.group;const seated=g&&['reading','orde
  if(four){c.fillStyle='#6A2632';rr(c,t.x-34,t.y-40,68,26,9);c.fill();c.fillStyle='#7E2E3C';rr(c,t.x-34,t.y-20,68,10,4);c.fill();c.strokeStyle='rgba(0,0,0,.15)';c.lineWidth=1;for(let k=-2;k<=2;k++){c.beginPath();c.moveTo(t.x+k*13,t.y-38);c.lineTo(t.x+k*13,t.y-22);c.stroke()}c.fillStyle='#C99A45';c.fillRect(t.x-34,t.y-41,68,2)}
  const order=seats.map((sp,k)=>({sp,k})).sort((a,b)=>a.sp.dy-b.sp.dy);
  for(const {sp,k} of order){const x=t.x+sp.dx,y=t.y+sp.dy;if(!four||sp.side!==0)drawChair(c,x,y,sp.side,false);
-  if(seated&&k<g.size){const L0=g.looks[k%g.looks.length];const mood=g.lookT&&R&&g.lookT>R.t?'happy':g.state==='eat'?'eat':g.pat>.6?'happy':g.pat>.3?'ok':'sad';let gaze=null;if(g.reg==='dylan'&&R&&g.gaze>R.t){const J=R.jill;gaze={x:(J.x>=x?1:-1)*(sp.side>0?-1:1),y:J.y>y?.5:-.3}}drawPerson(c,x,y,L0,{seated:true,mood,flip:sp.side>0,bob:g.state==='eat'?Math.sin(now*6+k)*.6:Math.sin(now*1.4+g.seed+k*1.7)*.3,chew:Math.sin(now*9+k)>0,blink:Math.sin(now*1.3+g.seed+k*2)>.97,gaze})}
+  if(seated&&k<g.size){const L0=g.looks[k%g.looks.length];const looking=!!(g.lookT&&R&&g.lookT>R.t&&g.lookCat&&!g.lookCat.hidden);const mood=looking?'happy':g.state==='eat'?'eat':g.pat>.6?'happy':g.pat>.3?'ok':'sad';let gaze=null,hold=null;
+   if(g.reg==='dylan'&&R&&g.gaze>R.t){const J=R.jill;gaze={x:(J.x>=x?1:-1)*(sp.side>0?-1:1),y:J.y>y?.5:-.3}}
+   else if(looking){const cc=g.lookCat;gaze={x:(cc.x>=x?1:-1)*(sp.side>0?-1:1),y:cc.y>y-14?.45:-.25};
+    /* the photographer: phone up half a second before the shot, still up for a moment after it */
+    if(k===0&&g.photo&&g.photoT0&&R.t>g.photoT0-.9&&R.t<g.photoT0+.7)hold='camera'}
+   drawPerson(c,x,y,L0,{seated:true,mood,flip:sp.side>0,bob:g.state==='eat'&&!looking?Math.sin(now*6+k)*.6:Math.sin(now*1.4+g.seed+k*1.7)*.3,chew:g.state==='eat'&&!looking&&Math.sin(now*9+k)>0,blink:Math.sin(now*1.3+g.seed+k*2)>.97,gaze,hold})}
   else if(LIFE.dylan&&LIFE.dylan.seated&&LIFE.dylan.table===t.i&&LIFE.dylan.seat===k){const D=LIFE.dylan;drawPerson(c,x,y,DYLAN.looks[0],{seated:true,mood:'happy',flip:sp.side>0,bob:Math.sin(now*1.5)*.3,blink:Math.sin(now*1.3+2)>.975,hold:D.phone?'phone':null,gaze:D.phone?{x:0,y:.6}:null})}}
- if(seated&&R&&g.lookT>R.t&&g.photo){const sp=seatPos(t)[0];const px=t.x+sp.dx+(sp.side<0?9:-9),py=t.y+sp.dy-44;c.fillStyle='#222';rr(c,px-2.6,py-4,5.2,8.4,1.2);c.fill();c.fillStyle='#8FD3F4';c.fillRect(px-1.8,py-3,3.6,5.8);if(R.t>=g.photoT0&&R.t-g.photoT0<.3){c.fillStyle='rgba(255,255,255,.9)';circ(c,px,py-2,7)}}
+ if(seated&&R&&g.photo&&g.photoT0&&R.t>=g.photoT0&&R.t-g.photoT0<.22){/* the flash: a small white burst at the phone */const sp=seatPos(t)[0];const px=t.x+sp.dx+(sp.side>0?-7:7),py=t.y+sp.dy-30;const a=1-(R.t-g.photoT0)/.22;c.fillStyle=`rgba(255,255,255,${.85*a})`;circ(c,px,py,6+4*(1-a));c.fillStyle=`rgba(255,255,255,${a})`;circ(c,px,py,2.5)}
  const rx=four?34:22,ry=four?12:10.5;const top=L>=4?'#6E4128':L===3?'#8A5836':'#B07744';const edge=L>=4?'#4E2E1C':'#7A4E2C';
  c.fillStyle=edge;c.fillRect(t.x-2.5,t.y-4,5,12);c.fillStyle='#3A2A20';el(c,t.x,t.y+7,8,2.6);
  c.fillStyle=edge;el(c,t.x,t.y-3,rx,ry);c.fillStyle=top;el(c,t.x,t.y-6,rx,ry);
@@ -992,7 +1084,8 @@ function plantSpots(){const P=S.decor.plants;const a=[];if(P>=1)a.push({x:250,y:
 function view(){if(R)return R;if(!IDLE)IDLE=makeIdle();return IDLE}
 function drawStringLights(c,now,dusk){if(S.level<2)return;const x0=-BGM,x1=LW+BGM;const yAt=x=>{const seg=(((x-x0)%130)+130)%130/130;return 4+Math.sin(seg*Math.PI)*12};c.strokeStyle='rgba(40,30,20,.75)';c.lineWidth=.7;c.beginPath();for(let x=x0;x<=x1;x+=4)c.lineTo(x,yAt(x));c.stroke();
  for(let x=x0+10;x<x1;x+=22){const y=yAt(x)+3;const tw=.75+Math.sin(now*2+x*.3)*.25;c.fillStyle=`rgba(255,${Math.round(205+tw*30)},${Math.round(130+tw*40)},${.65+dusk*.35})`;el(c,x,y,1.8,2.4);if(dusk>.15){let g=c.createRadialGradient(x,y,0,x,y,10);g.addColorStop(0,`rgba(255,200,120,${.4*dusk*tw})`);g.addColorStop(1,'rgba(255,200,120,0)');c.fillStyle=g;c.fillRect(x-10,y-10,20,20)}}}
-function drawScene(now){const c=sctx;c.setTransform(1,0,0,1,0,0);c.fillStyle='#1E1714';c.fillRect(0,0,sc.width,sc.height);const s=SV.s*DPR;c.setTransform(s,0,0,s,SV.ox*DPR,SV.oy*DPR);const X0=-BGM,XW=LW+BGM*2;
+function drawScene(now){const c=sctx;c.setTransform(1,0,0,1,0,0);c.globalAlpha=1;c.globalCompositeOperation='source-over';if(c.filter!==undefined&&c.filter!=='none')c.filter='none';c.fillStyle='#1E1714';c.fillRect(0,0,sc.width,sc.height);
+ bgCheck(now);const s=SV.s*DPR;c.setTransform(s,0,0,s,SV.ox*DPR,SV.oy*DPR);const X0=-BGM,XW=LW+BGM*2;
  const TOP=SV.oy/SV.s,WT=wallTop();
  if(TOP>1){c.fillStyle='#F1EEE8';c.fillRect(X0,-TOP,XW,TOP);
   if(WT<0){let wg=c.createLinearGradient(0,WT,0,0);wg.addColorStop(0,'#A9A8A3');wg.addColorStop(1,'#B6B5B0');c.fillStyle=wg;c.fillRect(X0,WT,XW,-WT);
@@ -1023,15 +1116,17 @@ function drawScene(now){const c=sctx;c.setTransform(1,0,0,1,0,0);c.fillStyle='#1
   const cooking=!moving&&R&&phase==='service'&&Math.hypot(J.x-PASS.x,J.y-PASS.y)<6&&R.slots.some(s=>s.job&&s.job.step&&!chefHandles(s)&&(s.job.step.t==='work'||(s.job.step.t==='wait'&&s.job.step.anim==='stir')));
   if(V.fire>0){let fg=c.createRadialGradient(J.x,J.y-20,2,J.x,J.y-20,30);fg.addColorStop(0,'rgba(255,150,50,.5)');fg.addColorStop(1,'rgba(255,90,20,0)');c.fillStyle=fg;el(c,J.x,J.y-20,30,34)}
   /* concentrating while she cooks or hurries somewhere with a job; her usual smile otherwise; tired once the closing starts */
-  const expr=(R&&R.closing!=null)?'tired':(cooking||(moving&&R&&R.jill.cur))?'focus':'smile';
-  drawPerson(c,J.x,J.y,JILL_LOOK,{jill:true,me:true,tall:true,seated:!!J.sit,s:1.1,step:stp,bob:moving?Math.abs(stp)*-1:cooking?Math.abs(Math.sin(now*9))*-1.2:Math.sin(now*2)*.4,mood:'happy',expr,flip:J.face<0,blink:Math.sin(now*1.7)>.985,hat:!(evening()&&LIFE.plan==='sofa')});
+  const expr=(R&&R.closing!=null)?'tired':(cooking||(moving&&R&&R.jill.cur))?'focus':'smile';const pet=R&&R.jill.pet;const crouch=!!(pet&&pet.crouch);const look=R&&R.jill.lookAt?R.jill.lookAt:(pet?{x:pet.cat.x,y:pet.cat.y}:null);const gaze=look?{x:((look.x>=J.x?1:-1)*(J.face<0?-1:1)),y:(pet||look.down)?.55:.15}:null;
+  const nod=R&&R.jill.nod>0?Math.sin(R.jill.nod*9)*1.4:0;drawPerson(c,J.x,J.y+(crouch?4:0),JILL_LOOK,{jill:true,me:true,tall:!crouch,seated:!!J.sit||crouch,s:crouch?1:1.1,step:stp,bob:(moving?Math.abs(stp)*-1:cooking?Math.abs(Math.sin(now*9))*-1.2:Math.sin(now*2)*.4)+nod,mood:'happy',expr,gaze,flip:J.face<0,blink:Math.sin(now*1.7)>.985,hat:!(evening()&&LIFE.plan==='sofa'&&LIFE.jill.act!=='wrap'&&LIFE.jill.after!=='wrap')});
+  if(R&&R.closing!=null&&LIFE.jill.act==='wrap'&&!moving){const wx=J.x+9+Math.sin(now*5.5)*6,wy=J.y-19;c.fillStyle='#BFD9EC';c.save();c.translate(wx,wy);c.rotate(Math.sin(now*5.5)*.3);rr(c,-4,-2.2,8,4.4,1.4);c.fill();c.restore();c.fillStyle=JILL_LOOK.skin;circ(c,wx-2,wy-1,2.3)}
+  if(pet&&pet.cat){const p=pet.cat;const hx=p.x+(p.x<J.x?6:-6),hy=p.y-(p.st==='sleep'?6:10);c.fillStyle=JILL_LOOK.skin;circ(c,hx,hy,2.6);c.fillStyle='rgba(60,34,22,.35)';c.beginPath();c.arc(hx,hy,2.6,0,7);c.stroke()}
   if(cooking){const f=J.face<0?-1:1;const a=Math.sin(now*9);c.save();c.translate(J.x+f*10,J.y-30+a*1.6);c.rotate(f*(-.55+a*.3));c.fillStyle='#D9D9DD';rr(c,-1.1,-8,2.4,9.5,1);c.fill();c.strokeStyle='rgba(60,34,22,.4)';c.lineWidth=.5;c.stroke();c.fillStyle='#4A3226';rr(c,-1.4,1.4,3,4.4,1.2);c.fill();c.restore()}
   J.carry.slice(0,3).forEach((cc,i)=>{const cv=dishCanvas(cc.it.d,cc.it.q,64,S.decor.ware>0,cc.it.want);c.drawImage(cv,J.x+(i%2?5:-21),J.y-50-Math.floor(i/2)*8,16,16)})}});
  crewDraw(c,now,list);incDraw(c,now,list);
  list.sort((a,b)=>a.y-b.y).forEach(i=>i.f());drawSay(c);
  drawCounter(c,now,V);drawKitchen(c,now,V);
  c.save();c.globalCompositeOperation='multiply';c.fillStyle=tintFor(dusk);c.fillRect(X0,-TOP,XW,LH+TOP);
- if(evening()&&!(R&&R.closing!=null&&R.closing<6)){/* after hours: the light gathers where someone is — the sofa when Jill is there, otherwise the room's middle */const L=LIFE.jill;const cx=L&&(L.on||L.reserved)?(SOFA.x0+SOFA.x1)/2:200,cy=L&&(L.on||L.reserved)?SOFA.seat:250;let eg=c.createRadialGradient(cx,cy,60,cx,cy,330);eg.addColorStop(0,'rgba(255,255,255,1)');eg.addColorStop(1,'rgba(168,155,176,1)');c.fillStyle=eg;c.fillRect(X0,-TOP,XW,LH+TOP)}c.restore();
+ if(evening()&&!(R&&R.closing!=null&&R.closing<6)){/* after hours: the light gathers where someone is — the sofa when Jill is there, otherwise the room's middle */const L=LIFE.jill;const cx=L&&(L.on||L.reserved)?(SOFA.x0+SOFA.x1)/2:200,cy=L&&(L.on||L.reserved)?SOFA.seat:250;let eg=c.createRadialGradient(cx,cy,60,cx,cy,330);eg.addColorStop(0,'rgba(255,255,255,1)');eg.addColorStop(1,'rgba(196,186,200,1)');c.fillStyle=eg;c.fillRect(X0,-TOP,XW,LH+TOP)}c.restore();
  c.save();c.globalCompositeOperation='lighter';const lk=.12+clamp(dusk,0,1)*.2;for(const L0 of lightSpots()){let g=c.createRadialGradient(L0.x,L0.y,2,L0.x,L0.y+30,L0.r);g.addColorStop(0,`rgba(255,196,120,${lk*L0.k})`);g.addColorStop(1,'rgba(255,170,90,0)');c.fillStyle=g;c.fillRect(L0.x-L0.r,L0.y-L0.r,L0.r*2,L0.r*2.4)}
  for(const t of V.tables){if(S.level>=2){let g=c.createRadialGradient(t.x,t.y-15,1,t.x,t.y-15,26);g.addColorStop(0,`rgba(255,190,100,${.1+dusk*.12})`);g.addColorStop(1,'rgba(255,190,100,0)');c.fillStyle=g;c.fillRect(t.x-26,t.y-41,52,52)}}
  {let g=c.createRadialGradient(220,380+DY,10,220,380+DY,140);g.addColorStop(0,'rgba(255,170,80,.12)');g.addColorStop(1,'rgba(255,170,80,0)');c.fillStyle=g;c.fillRect(60,260,320,180)}
@@ -1321,10 +1416,19 @@ function applyDY(d){DY=d;FB=364+d;LH=424+d;ROWS=[162,240+d*.5,318+d];PASS.y=360+
  SPOT.scr.y=358+d;SPOT.bowl.y=360+d;SPOT.toy.y=324+d;
  CATS=null;perchOcc.length=0;OCC.scr=OCC.scr2=OCC.cave=OCC.toy=null;OCC.bed=[];SIDE.R=SIDE.L=null;IDLE=null;bg=null;if(typeof LIFE!=='undefined'&&LIFE.dylan&&LIFE.dylan.seated){LIFE.dylan.seated=false;LIFE.dylan.state='think';LIFE.dylan.t=1}}
 const SIDE={R:null,L:null};let RACE_CD=90,BAO_LAST=null;const MEMQ=[];let FLASH=null;
-const MEMS={sofa:'今晚的沙發',sofafull:'沙發客滿',husband:'Dylan — Jill 的先生',sides:'Jill 左右各一隻',ambush:'埋伏成功',what:'妳到底在幹嘛',waited:'白等了',race:'突然開賽',sleepgod:'睡神',nearby:'今天也在附近',best:'最佳座位',nap3:'三貓午睡',everyone:'今天大家都在'};
+const MEMS={sofa:'今晚的沙發',sofafull:'沙發客滿',husband:'Dylan — Jill 的先生',sides:'Jill 左右各一隻',ambush:'埋伏成功',what:'妳到底在幹嘛',waited:'白等了',race:'突然開賽',sleepgod:'睡神',nearby:'今天也在附近',best:'最佳座位',nap3:'三貓午睡',everyone:'今天大家都在',
+ rest:'偷閒',lap:'膝上的重量',photo:'被拍了',pet:'摸一下',dylan:'留下來的人'};
+/* one line under each photo, written from what was actually in the frame */
+const MEM_TXT={sofa:i=>`${i.cats||'貓'}陪 Jill 坐了一會兒。`,sofafull:i=>`沙發上擠了 ${i.n||3} 隻貓，Jill 只好縮著坐。`,husband:()=>'原來一直都認識。',sides:i=>`${i.a}跟${i.b}一左一右。`,ambush:i=>`${i.a}從角落跳出來，${i.b}嚇了一跳。`,what:i=>`${i.a}看著${i.b}，看不懂。`,waited:i=>`${i.a}埋伏了半天，什麼都沒等到。`,race:i=>`${i.a}跟${i.b}突然繞著店裡跑起來。`,sleepgod:i=>`店裡再吵，${i.a}都照睡不誤。`,nearby:i=>`${i.a}坐在 Jill 腳邊。`,best:i=>`${i.a}找到了看得見全店的位子。`,nap3:()=>'三隻貓睡成一團。',everyone:()=>'五隻貓難得同時出現在一個畫面裡。',rest:()=>'店裡沒事，Jill 在沙發上坐了一下。',lap:i=>`${i.a}跳上了 Jill 的膝蓋。`,photo:i=>`客人拿起手機，拍了${i.a}一張。`,pet:i=>`Jill 蹲下來摸了摸${i.a}。`,dylan:()=>'打烊後，Dylan 還在沙發上。'};
+const ALBUM_CAP=30;   /* ordinary photos kept; the first photo of each kind is 珍藏 and never rotates out */
+function albumList(){if(!S.album){S.album=[];/* photos from before the album existed: all 珍藏, no clock */for(const k of Object.keys(S.mem||{}))if(S.mem[k]&&S.mem[k].img)S.album.push({kind:k,day:S.mem[k].day,clock:'',cap:MEMS[k]||k,txt:'',img:S.mem[k].img,keep:true});S.album.sort((a,b)=>a.day-b.day);for(const k in S.mem||{})if(S.mem[k])S.mem[k]={day:S.mem[k].day}/* the picture now lives in the album */}return S.album}
+function albumAllows(kind){const A=albumList();const today=A.filter(p=>p.day===S.day);if(today.length>=4)return false;const same=A.filter(p=>p.kind===kind);if(!same.length)return true;const last=same[same.length-1];if(S.day-last.day<3)return false;return today.filter(p=>!p.keep).length<2}
+function eveningClock(){const m=Math.floor(21*60+30+Math.min(LIFE.t||0,180)*(75/180));const h=Math.floor(m/60),mm=m%60;return`${h}:${String(mm).padStart(2,'0')}`}
+function albumAdd(kind,img,info){const A=albumList();const keep=!A.some(p=>p.kind===kind);const clock=R&&R.closing==null?clockStr():evening()?eveningClock():'';let txt='';try{txt=(MEM_TXT[kind]||(()=>''))(info||{})}catch(e){}
+ A.push({kind,day:S.day,clock,cap:MEMS[kind]||kind,txt,img,keep});const ord=A.filter(p=>!p.keep);if(ord.length>ALBUM_CAP){const old=ord[0];A.splice(A.indexOf(old),1)}}
 function catBy(id){return CATS?CATS.find(c=>c.def.id===id):null}
 function evening(){return(R&&R.closing!=null)||['summary','shop'].includes(phase)}
-function jillA(){const J=view().jill;const idle=!R||(!J.cur&&!(J.q&&J.q.length)&&!J.moving);if(R&&phase==='service'&&R.closing==null){const near=Math.hypot(J.x-PASS.x,J.y-PASS.y)<30;return{x:PASS.x,y:PASS.y,idle:idle&&near,sit:false}}return{x:J.x,y:J.y,idle,sit:!!J.sit}}
+function jillA(){const J=view().jill;const idle=!R||(!J.cur&&!(J.q&&J.q.length)&&!J.moving);if(R&&phase==='service'&&R.closing==null&&J.rest){return{x:LIFE.jill.x,y:SOFA.front+10,idle:false,sit:true}}if(R&&phase==='service'&&R.closing==null){const near=Math.hypot(J.x-PASS.x,J.y-PASS.y)<30;return{x:PASS.x,y:PASS.y,idle:idle&&near,sit:false}}return{x:J.x,y:J.y,idle,sit:!!J.sit}}
 function slotPos(s){const a=jillA();const y=Math.min(a.y+(a.sit?4:2),FB-6);return s==='R'?{x:a.x+22,y}:s==='L'?{x:a.x-22,y}:s==='R2'?{x:a.x+31,y:y+2}:s==='L2'?{x:a.x-31,y:y+2}:{x:a.x+rand(-10,10),y:y-16}}
 function tableClear(x,y){const V=view();for(const t of V.tables){const dx=(x-t.x)/(t.seats===4?50:42),dy=(y-t.y+10)/25;if(dx*dx+dy*dy<1)return false}return true}
 function randFloor(){for(let i=0;i<16;i++){const x=rand(96,316),y=rand(140,FB-14);if(tableClear(x,y)&&!(y<SOFA.front+6&&x<SOFA.x1+6))return{x,y}}return{x:rand(96,300),y:FB-12}}
@@ -1361,7 +1465,7 @@ function catGo(c,what){const s=SPOT;releaseSpots(c);
 function freePerches(){return TREE.perches.map((_,i)=>i).filter(i=>!perchOcc[i]&&perchVis(i))}
 function sleepHere(c,tmin,tmax){c.st='sleep';c.pose=pick(['curl','loaf','curl',c.def.id==='tora'?'belly':'loaf',c.def.id==='snow'?'belly':'curl']);c.t=rand(tmin||14,tmax||30);c.slept=0}
 /* ---- Jill-side seats (樾樾 × 小齁) ---- */
-function goJill(c){releaseSpots(c);if(LIFE.plan==='sofa'&&evening()&&LIFE.jill.pos){goSofaJill(c);return}const id=c.def.id;const rival=id==='tora'?catBy('ban'):id==='ban'?catBy('tora'):null;let slot=null;
+function goJill(c){releaseSpots(c);if(LIFE.jill.pos&&(evening()?LIFE.plan==='sofa':(LIFE.jill.on||LIFE.jill.reserved))){goSofaJill(c);return}const id=c.def.id;const rival=id==='tora'?catBy('ban'):id==='ban'?catBy('tora'):null;let slot=null;
  if(!SIDE.R)slot='R';else if(SIDE.R===rival&&rival){const r=Math.random();
   if(r<.3)slot=SIDE.L?'B':'L';else if(r<.5)slot='R2';else if(r<.65)slot='B';else if(r<.8){const p=pickFloor(c);catWalk(c,p.x,p.y,'rest');return}
   else{slot='R';const o=rival;SIDE.R=null;o.slot=null;if(!SIDE.L){SIDE.L=o;o.slot='L';const q=slotPos('L');o.st='walk';o.tx=q.x;o.ty=q.y;o.after='side'}else{o.st='rest';o.pose='sit';o.t=rand(1,3)}}}
@@ -1434,28 +1538,30 @@ function startAmbush(c){c.ambCD=ctime+rand(70,140);const b=catBy('mei');const sp
 function ambushTick(c,dt){c.t-=dt;if(c.peekT>0)c.peekT-=dt;
  for(const o of CATS){if(o===c||o.hidden||o.perch>=0)continue;if(!['walk','race','chase'].includes(o.st))continue;const d=Math.hypot(o.x-c.x,o.y-c.y);if(d>46)continue;const key=o.def.id+Math.floor(ctime/6);if(c.seen[key])continue;c.seen[key]=1;
   if(o.def.id==='mei'){if(Math.random()<.55){scare(c,o);return}}else{c.peekT=1.1}}
- if(c.t<=0){c.hidden=false;const r=Math.random();if(r<.45){c.st='daze';c.pose='daze';c.t=rand(2,4);memo('waited',c.x,c.y)}else if(r<.75){c.st='rest';c.pose=pick(['sit','loaf']);c.t=rand(6,12)}else catDecide(c)}}
-function scare(c,b){c.hidden=false;c.st='dash';c.target=b;c.t=.45;c.run=1;b.stareAt=null;memo('ambush',b.x,b.y);sfx.catPlay();
+ if(c.t<=0){c.hidden=false;const r=Math.random();if(r<.45){c.st='daze';c.pose='daze';c.t=rand(2,4);memo('waited',c.x,c.y,{a:catName(c.def)})}else if(r<.75){c.st='rest';c.pose=pick(['sit','loaf']);c.t=rand(6,12)}else catDecide(c)}}
+function scare(c,b){c.hidden=false;c.st='dash';c.target=b;c.t=.45;c.run=1;b.stareAt=null;memo('ambush',b.x,b.y,{a:catName(c.def),b:catName(b.def)});if(R)for(const g of R.groups)if(g.table!=null&&Math.hypot(R.tables[g.table].x-b.x,R.tables[g.table].y-b.y)<90)g.scared=true;sfx.catPlay();
  const r=Math.random();b.react=r<.25?'chase':r<.6?'glare':r<.75?'freeze':'ignore'}
 function afterScare(c){const b=c.target;c.target=null;const r=b?b.react:'ignore';
- if(b){if(r==='chase'){releaseSpots(b);b.st='chase';b.target=c;b.t=2.2;b.run=1}else if(r==='glare'){releaseSpots(b);b.glareAt=c;catJump(b,b.x,b.y,'glare');b.jmp.d=.3;memo('what',b.x,b.y)}else if(r==='freeze'){releaseSpots(b);catJump(b,b.x,b.y,'decide');b.jmp.d=.35}}
+ if(b){if(r==='chase'){releaseSpots(b);b.st='chase';b.target=c;b.t=2.2;b.run=1}else if(r==='glare'){releaseSpots(b);b.glareAt=c;catJump(b,b.x,b.y,'glare');b.jmp.d=.3;memo('what',b.x,b.y,{a:catName(b.def),b:catName(c.def)})}else if(r==='freeze'){releaseSpots(b);catJump(b,b.x,b.y,'decide');b.jmp.d=.35}}
  const q=Math.random();if(q<.4){const p=randFloor();c.run=1;catWalk(c,p.x,p.y,'rest')}else if(q<.6){const p=randFloor();c.run=1;c.lookBack=1;catWalk(c,p.x,p.y,'flee')}else if(q<.8){catJump(c,c.x+rand(-6,6),c.y,'decide');c.jmp.d=.3}else{c.run=1;c.circ=[{x:c.x+30,y:c.y-12},{x:c.x+10,y:c.y-30},{x:c.x-20,y:c.y-10}].map(p=>({x:clamp(p.x,96,316),y:clamp(p.y,140,FB-10)}));const n=c.circ.shift();catWalk(c,n.x,n.y,'circ')}}
 /* ---- 樾樾 × 包包 race ---- */
 function startRace(c){const o=catBy(c.def.id==='tora'?'snow':'tora');if(!o)return catDecide(c);RACE_CD=rand(200,360);const wasAsleep=['sleep','bed'].includes(o.st);releaseSpots(o);o.guest=null;o.wd=wasAsleep?rand(.5,.9):.2;
  const path=[];let lx=Math.random()<.5;for(let i=0;i<4;i++){lx=!lx;path.push({x:lx?rand(96,150):rand(262,316),y:rand(150,FB-14)})}
- const lead=c,fol=o;lead.path=path;lead.run=1;lead.st='walk';lead.after='raceNext';raceStep(lead);fol.st='race';fol.target=lead;fol.t=16;fol.run=1;fol.moving=false;fol.pose='daze';memo('race',c.x,c.y)}
+ const lead=c,fol=o;lead.path=path;lead.run=1;lead.st='walk';lead.after='raceNext';raceStep(lead);fol.st='race';fol.target=lead;fol.t=16;fol.run=1;fol.moving=false;fol.pose='daze';memo('race',c.x,c.y,{a:catName(c.def),b:catName(o.def)})}
 function raceStep(c){const n=c.path&&c.path.shift();if(!n){c.run=0;c.path=null;const f=CATS.find(o=>o.st==='race'&&o.target===c);if(f){f.st='rest';f.run=0;f.target=null;finishRace(f)}finishRace(c);return}c.st='walk';c.tx=n.x;c.ty=n.y;c.after='raceNext';c.run=1}
 function finishRace(c){c.run=0;if(c.def.id==='snow'){if(spotFree('bed')&&Math.random()<.4)catGo(c,'bed');else sleepHere(c,30,60)}else{c.st='rest';c.pose='groom';c.t=rand(4,8)}}
 /* ---- memories ---- */
-function memo(id,x,y){if(!MEMS[id])return;S.mem=S.mem||{};if(S.mem[id]||MEMQ.some(m=>m.id===id))return;MEMQ.push({id,x,y})}
-function flushMem(){if(!MEMQ.length)return;for(const m of MEMQ.splice(0)){try{const w=150,h=110;let sx=(SV.ox+(m.x-w/2)*SV.s)*DPR,sy=(SV.oy+(m.y-h*.72)*SV.s)*DPR,sw=w*SV.s*DPR,sh=h*SV.s*DPR;sx=clamp(sx,0,Math.max(0,sc.width-sw));sy=clamp(sy,0,Math.max(0,sc.height-sh));const cv=mkCanvas(240,176),c=cv.getContext('2d');c.drawImage(sc,sx,sy,sw,sh,0,0,240,176);S.mem[m.id]={day:S.day,img:cv.toDataURL('image/jpeg',.72)};FLASH={x:m.x,y:m.y,t:0};sfx.shutter();save()}catch(e){}}}
+function memo(id,x,y,info){if(!MEMS[id])return;if(MEMQ.some(m=>m.id===id)||!albumAllows(id))return;MEMQ.push({id,x,y,info})}
+function flushMem(){if(!MEMQ.length)return;for(const m of MEMQ.splice(0)){try{const w=150,h=110;let sx=(SV.ox+(m.x-w/2)*SV.s)*DPR,sy=(SV.oy+(m.y-h*.72)*SV.s)*DPR,sw=w*SV.s*DPR,sh=h*SV.s*DPR;sx=clamp(sx,0,Math.max(0,sc.width-sw));sy=clamp(sy,0,Math.max(0,sc.height-sh));const cv=mkCanvas(240,176),c=cv.getContext('2d');c.drawImage(sc,sx,sy,sw,sh,0,0,240,176);albumAdd(m.id,cv.toDataURL('image/jpeg',.66),m.info);S.mem=S.mem||{};if(!S.mem[m.id])S.mem[m.id]={day:S.day};FLASH={x:m.x,y:m.y,t:0};sfx.shutter();save()}catch(e){}}}
 function memChecks(){if(!CATS)return;const T=catBy('tora'),H=catBy('ban'),B=catBy('mei'),Bb=catBy('snow');
- const atSide=c=>c&&c.st==='side'&&!c.moving&&(c.slot==='L'||c.slot==='R');if(atSide(T)&&atSide(H)&&T.slot!==H.slot){const a=jillA();memo('sides',a.x,a.y)}
- if(T&&T.st==='side'&&T.sleepy&&!T.moving&&T.t<T.t0-4)memo('nearby',T.x,T.y);
- if(B&&B.perch>=0&&[6,13,12].includes(B.perch)&&B.st==='rest')memo('best',B.x,B.y+20);
- if(Bb&&(Bb.st==='sleep'||Bb.st==='bed')&&R&&(R.fire>0||R.insp||R.thief||R.groups.length>=6))memo('sleepgod',Bb.x,Bb.y);
+ const nm=c=>catName(c.def);const atSide=c=>c&&c.st==='side'&&!c.moving&&(c.slot==='L'||c.slot==='R');if(atSide(T)&&atSide(H)&&T.slot!==H.slot){const a=jillA();memo('sides',a.x,a.y,{a:nm(T),b:nm(H)})}
+ if(T&&T.st==='side'&&T.sleepy&&!T.moving&&T.t<T.t0-4)memo('nearby',T.x,T.y,{a:nm(T)});
+ if(B&&B.perch>=0&&[6,13,12].includes(B.perch)&&B.st==='rest')memo('best',B.x,B.y+20,{a:nm(B)});
+ if(Bb&&(Bb.st==='sleep'||Bb.st==='bed')&&R&&(R.fire>0||R.insp||R.thief||R.groups.length>=6))memo('sleepgod',Bb.x,Bb.y,{a:nm(Bb)});
  const sl=CATS.filter(c=>!c.hidden&&(c.st==='sleep'||c.st==='bed'||(c.st==='side'&&c.sleepy)));if(sl.length>=3){const cx=sl.reduce((a,c)=>a+c.x,0)/sl.length,cy=sl.reduce((a,c)=>a+c.y,0)/sl.length;if(sl.filter(c=>Math.hypot(c.x-cx,c.y-cy)<75).length>=3)memo('nap3',cx,cy)}
- {const L=LIFE.jill;if(L.on&&evening()&&L.sinceSit>6){const on=sofaCats().length;if(on>=1)memo('sofa',(SOFA.x0+SOFA.x1)/2,120);if(on>=3)memo('sofafull',(SOFA.x0+SOFA.x1)/2,120)}}
+ {const L=LIFE.jill;const on=sofaCats();if(L.on&&evening()&&L.sinceSit>6){if(on.length>=1)memo('sofa',(SOFA.x0+SOFA.x1)/2,120,{cats:on.map(nm).join('、')});if(on.length>=3)memo('sofafull',(SOFA.x0+SOFA.x1)/2,120,{n:on.length})}
+  const lap=on.find(c=>c.sofa.kind==='lap');if(L.on&&lap&&L.sinceSit>3)memo('lap',lap.x,lap.y,{a:nm(lap)});
+  const D=LIFE.dylan;if(D&&D.onSofa&&evening())memo('dylan',D.x,SOFA.jy)}
  const vis=CATS.filter(c=>!c.hidden);if(vis.length===5){const cx=vis.reduce((a,c)=>a+c.x,0)/5,cy=vis.reduce((a,c)=>a+c.y,0)/5;if(vis.every(c=>Math.hypot(c.x-cx,c.y-cy)<100))memo('everyone',cx,cy)}}
 /* ---- update ---- */
 let ctime=0;
@@ -1464,12 +1570,14 @@ function initCats(){CATS=CAT_DEF.map(d=>({def:d,x:0,y:0,st:'rest',pose:'sit',per
  T.x=PASS.x-26;T.y=FB-8;T.pose='groom';H.perch=0;perchOcc[0]=H;H.x=TREE.perches[0].x;H.y=TREE.perches[0].y;B.perch=6;perchOcc[6]=B;B.x=TREE.perches[6].x;B.y=TREE.perches[6].y;Rr.x=140;Rr.y=FB-30;Rr.pose='sit';
  OCC.bed.push(Bb);Bb.x=SPOT.bed.x-5;Bb.y=SPOT.bed.y+1;Bb.st='bed';Bb.pose='curl';Bb.t=rand(20,40)}
 function updateCats(dt,now){if(!CATS)initCats();ctime+=dt;RACE_CD-=dt;TOY.amp=Math.max(1,TOY.amp-dt*.6);if(FLASH){FLASH.t+=dt;if(FLASH.t>.5)FLASH=null}
- for(const c of CATS){c.ph+=dt*(c.run?2.4:1);c.cd=Math.max(0,c.cd-dt);if(c.wcd>0)c.wcd-=dt;if(c.happy>0){c.happy-=dt;if(c.happy<=0){c.quiet=0;if(c.st==='pet')catDecide(c)}}for(const h of c.hearts)h.t+=dt;c.hearts=c.hearts.filter(h=>h.t<1.4);
+ for(const c of CATS){c.ph+=dt*(c.run?2.4:1);c.cd=Math.max(0,c.cd-dt);if(c.wcd>0)c.wcd-=dt;if(c.wakeT>0)c.wakeT-=dt;if(c.flickT>0)c.flickT-=dt;if(c.happy>0){c.happy-=dt;if(c.happy<=0){c.quiet=0;if(c.st==='pet')catDecide(c)}}for(const h of c.hearts)h.t+=dt;c.hearts=c.hearts.filter(h=>h.t<1.4);
   switch(c.st){
   case'jump':{const j=c.jmp;j.t+=dt;const u=Math.min(1,j.t/j.d);c.x=lerp(j.x0,j.x1,u);c.y=lerp(j.y0,j.y1,u)-Math.sin(u*Math.PI)*(Math.abs(j.x1-j.x0)+Math.abs(j.y1-j.y0)<4?7:22);if(u>=1){c.x=j.x1;c.y=j.y1;c.sofaLeaving=false;if(j.next==='sofaLand'){c.sofaOn=true;sofaSettle(c,true)}else if(j.next==='benchLand'){c.st='bench';c.pose=pick(['loaf','sit','sit']);c.face=1;c.t=c.def.id==='mei'?rand(20,50):rand(12,40);c.moving=false}else if(j.next==='chain'){const n=c.chain.shift();catJump(c,n.x,n.y,c.chain.length?'chain':c.chainEnd)}else if(j.next==='glare'){c.st='glare';c.pose='glare';c.t=rand(1.8,2.8);c.moving=false}else if(j.next==='perch'){if(c.wantSleep||(c.def.id==='snow'&&Math.random()<.7)){c.wantSleep=0;sleepHere(c,25,60)}else{c.st='rest';c.pose=pick(['sit','loaf','groom']);c.t=c.def.id==='mei'?rand(14,26):rand(6,12)}if(c.def.id==='mei')BAO_LAST={perch:c.perch,x:c.x,y:c.y,t:ctime}}else catDecide(c)}break}
   case'walk':{const spd=c.run?(c.st==='walk'&&c.after==='raceNext'?118:96):c.after==='visit'?60:c.after==='eat'?46:c.def.id==='snow'?28:34;
    if(c.via){const vx=c.via.x-c.x,vy=c.via.y-c.y,vd=Math.hypot(vx,vy),vv=spd*dt;if(vd>vv){c.x+=vx/vd*vv;c.y+=vy/vd*vv;c.face=vx>=0?1:-1;c.moving=true}else{c.x=c.via.x;c.y=c.via.y;c.via=null}break}
    const dx=c.tx-c.x,dy=c.ty-c.y,d=Math.hypot(dx,dy),v=spd*dt;
+   /* a cat does not walk into the TV cabinet while someone is rolling it: wait a moment */
+   {const tv=LIFE.tv;if(tv&&tv.mover&&d>v){const nx=c.x+dx/d*v,ny=c.y+dy/d*v;if(Math.hypot(nx-tv.x,ny-6-tv.y)<18&&Math.hypot(c.x-tv.x,c.y-6-tv.y)>=Math.hypot(nx-tv.x,ny-6-tv.y)){c.moving=false;break}}}
    if(c.stareAt!=null&&d<c.stareAt){c.stareAt=null;c.resume={tx:c.tx,ty:c.ty,after:c.after};c.st='stare';c.t=rand(2.5,7);c.pose='sit';c.moving=false;break}
    if(d>v){c.x+=dx/d*v;c.y+=dy/d*v;c.face=dx>=0?1:-1;c.moving=true}else{c.x=c.tx;c.y=c.ty;c.moving=false;if(c.after==='circ'){const n=c.circ&&c.circ.shift();if(n){c.tx=n.x;c.ty=n.y;break}c.run=0}catArrive(c)}break}
   case'rest':c.moving=false;c.t-=dt;if(c.lookAt&&!c.lookAt.hidden)c.face=c.lookAt.x>=c.x?1:-1;if(c.t<=0){c.lookAt=null;catDecide(c)}break;
@@ -1501,7 +1609,23 @@ function updateCats(dt,now){if(!CATS)initCats();ctime+=dt;RACE_CD-=dt;TOY.amp=Ma
  if(R&&phase==='service'&&R.closing==null){R.catCheck=(R.catCheck||0)+dt;if(R.catCheck>3){R.catCheck=0;const needy=R.groups.filter(g=>['order','wait','check'].includes(g.state)&&g.pat<.5&&!CATS.some(c=>c.guest===g)).sort((a,b)=>a.pat-b.pat)[0];
   if(needy){const pref={mikan:3,ban:2,snow:.3,mei:0,tora:familiar(needy)?1.5:0};const pool=CATS.filter(c=>pref[c.def.id]>0&&c.perch<0&&!c.hidden&&!c.sofa&&['rest','walk','daze','eat','toy'].includes(c.st)&&!c.guest);const c=wpick(pool,o=>pref[o.def.id]);if(c&&Math.random()<.7){releaseSpots(c);const t=R.tables[needy.table];c.guest=needy;catWalk(c,clamp(t.x+rand(-12,12),96,316),Math.min(FB-8,t.y+20),'visit')}}}
   /* guests notice cats */
-  R.noticeT=(R.noticeT??rand(4,8))-dt;if(R.noticeT<=0){R.noticeT=rand(5,10);const cands=[];for(const g of R.groups){if(g.table==null||!['reading','wait','eat'].includes(g.state))continue;const t=R.tables[g.table];for(const c of CATS){if(c.hidden)continue;const d=Math.hypot(t.x-c.x,t.y-c.y);if(d<120)cands.push({g,c,w:(c.def.id==='mei'?3:1)*(1-d/140)})}}const pk=wpick(cands,o=>o.w);if(pk){const star=pk.c.def.id==='mei'&&(pk.c.perch>=0||pk.c.st==='rest');const set=star?cands.filter(o=>o.c===pk.c).slice(0,3):[pk];for(const o of set){o.g.lookT=R.t+rand(2,3.5);o.g.photo=o.c.def.id==='mei'?Math.random()<.7:Math.random()<.3;o.g.photoT0=R.t+rand(0,.6)}}}}
+  /* guests notice the cats. What draws the eye: 寶寶 sitting pretty (tree, sofa back, window bed), 包包 asleep in a
+     silly pose, 柔柔 doing something odd, two cats chasing each other. 樾樾 keeps away from strangers, so he is
+     rarely close enough. A look is common; a phone photo happens to some groups, once per visit. Dylan never
+     photographs them - he sees these cats every day. */
+  R.noticeT=(R.noticeT??rand(4,8))-dt;if(R.noticeT<=0){R.noticeT=rand(4,8);const cands=[];const busyCats=CATS.filter(c=>!c.hidden&&['race','chase','dash','play','wary'].includes(c.st));
+   for(const g of R.groups){if(g.table==null||!['reading','wait','eat'].includes(g.state)||g.reg==='dylan'||(g.lookT&&g.lookT>R.t))continue;const t=R.tables[g.table];
+    for(const c of CATS){if(c.hidden)continue;const d=Math.hypot(t.x-c.x,t.y-c.y);const lim=busyCats.includes(c)?170:120;if(d>=lim)continue;const id=c.def.id;let w=1;
+     if(id==='mei'){w=3;if(c.perch>=0||(c.sofa&&c.sofa.kind==='back')||c.st==='bed')w=4.5}
+     else if(id==='snow'){w=c.st==='sleep'&&c.pose==='belly'?2.6:c.st==='sleep'?1.2:.8}
+     else if(id==='mikan'){w=['stare','daze','hide','hide2','wary','glare'].includes(c.st)||c.pose==='glare'?2.4:1.2}
+     else if(id==='tora'){w=.5}
+     if(busyCats.includes(c))w+=2;cands.push({g,c,w:w*(1-d/(lim+30))})}}
+   const pk=wpick(cands,o=>o.w);if(pk){const star=pk.c.def.id==='mei'&&(pk.c.perch>=0||pk.c.st==='rest'||pk.c.sofa);const set=star?cands.filter(o=>o.c===pk.c).slice(0,3):busyCats.includes(pk.c)?cands.filter(o=>busyCats.includes(o.c)).slice(0,3):[pk];
+    for(const o of set){const g=o.g,id=o.c.def.id;const dur=rand(2.2,3.8);g.lookT=R.t+dur;g.lookCat=o.c;if(g.wantShot==null)g.wantShot=Math.random()<(g.type==='blogger'?.95:.32);const pPhoto=(g.shot||!g.wantShot)?0:(id==='mei'?.8:id==='snow'?.6:.4);
+     if(Math.random()<pPhoto){g.shot=true;g.photo=true;g.photoT0=R.t+.5+rand(.7,1.2);g.lookT=Math.max(g.lookT,g.photoT0+.9)}else g.photo=false}}}
+  /* Jill notices someone photographing a cat: a glance over, if she is free */
+  for(const g of R.groups){if(g.photo&&g.photoT0&&R.t>=g.photoT0&&!g.shotSeen){g.shotSeen=true;if(g.lookCat&&!g.lookCat.hidden)memo('photo',g.lookCat.x,g.lookCat.y-4,{a:catName(g.lookCat.def)});const J=R.jill;if(!J.cur&&!J.q.length&&!J.rest&&!J.pet&&Math.random()<.65&&g.table!=null){const t=R.tables[g.table];J.lookAt={x:t.x,y:t.y,t:rand(1,1.8)};J.nod=.7}}}}
  /* 寶寶 walks where 柔柔 might be hiding; nothing else to do */
  memChecks()}
 function freeCatNear(x,y){return CATS.filter(c=>c.perch<0&&!c.hidden&&!c.sofa&&!['jump','visit','bed','chase','race','dash','hide2'].includes(c.st)).sort((a,b)=>Math.hypot(a.x-x,a.y-y)-Math.hypot(b.x-x,b.y-y))[0]}
@@ -1523,16 +1647,18 @@ function drawBed(c,now){const {x,y}=SPOT.bed;c.fillStyle='rgba(0,0,0,.24)';el(c,
 function drawBowls(c,now){const {x,y}=SPOT.bowl;const bowl=(bx,col,fill,kib)=>{c.fillStyle='rgba(0,0,0,.2)';el(c,bx+1,y+1.5,8.5,2.6);c.fillStyle='#E4E8EA';c.beginPath();c.moveTo(bx-8,y-4);c.quadraticCurveTo(bx-7,y+1,bx,y+1);c.quadraticCurveTo(bx+7,y+1,bx+8,y-4);c.fill();c.fillStyle='#F6F8F9';el(c,bx,y-4,8,2.6);if(fill>0){c.fillStyle=col;el(c,bx,y-4,6.8*Math.max(.35,fill),2*Math.max(.35,fill));if(kib){c.fillStyle='#7A4A26';for(let i=0;i<Math.round(fill*9);i++)circ(c,bx-4+(i*3.1)%8,y-4.6+(i%3)*.7,.8)}}};bowl(x-6,'#B07A46',FOOD,1);bowl(x+9,'rgba(140,200,235,.9)',1,0);c.fillStyle='#C99A45';c.font=`800 4.5px ${FONT}`;c.textAlign='center';c.fillText('CAT',x-6,y+4.4)}
 function catShadow(c,w){c.fillStyle='rgba(30,20,10,.13)';el(c,0,.8,w+3,3.2);c.fillStyle='rgba(30,20,10,.2)';el(c,0,.5,w*.8,2.2)}
 function catBelly(c,C,ph,o){const W=C.white||{};catShadow(c,15);
- c.strokeStyle=shade(C.base,-.05);c.lineWidth=C.fluffy?5:3.2;c.lineCap='round';c.beginPath();c.moveTo(11,-3);c.quadraticCurveTo(18,-2,20+Math.sin(ph*2)*1.5,-6);c.stroke();
+ const fk=o.flick>0?Math.sin(o.flick*9)*3*Math.min(1,o.flick):0;c.strokeStyle=shade(C.base,-.05);c.lineWidth=C.fluffy?5:3.2;c.lineCap='round';c.beginPath();c.moveTo(11,-3);c.quadraticCurveTo(18,-2+fk*.5,20+Math.sin(ph*2)*1.5+Math.abs(fk)*.3,-6-fk);c.stroke();
  const legs=[[-5,-.5],[-1,.3],[6,-.2],[9,.6]];const wig=t=>Math.sin(ph*3+t)*1.2;
  for(const [lx,t] of legs){c.save();c.translate(lx,-8);c.rotate(-.35+t*.5+wig(t)*.05);c.fillStyle=C.base;rr(c,-1.4,-8,2.8,8.5,1.3);c.fill();c.fillStyle=W.paws?'#FFFFFF':C.belly;el(c,0,-8,1.9,1.3);c.restore()}
  c.fillStyle=C.base;c.save();c.beginPath();c.ellipse(1,-5,13,5.6,0,0,7);c.fill();c.clip();if(C.str){c.strokeStyle=C.str;c.globalAlpha=.7;c.lineWidth=1.2;for(let i=-3;i<=3;i++){c.beginPath();c.moveTo(i*3.4,1);c.lineTo(i*3.4+1,-3);c.stroke()}c.globalAlpha=1}c.fillStyle=W.belly||C.fluffy?'#FFFFFF':C.belly;el(c,1,-8.4,10,3.6);c.fillStyle='rgba(240,170,170,.35)';el(c,3,-8.4,4,1.8);c.restore();if(C.fluffy)fluff(c,C.base,1,-5,12,5,14,1.8);
- c.save();c.translate(-13,-6);c.rotate(-1.25);catHead(c,C,0,0,C.fluffy?6.2:5.6,{sleep:true},false);c.restore()}
+ c.save();c.translate(-13,-6);c.rotate(-1.25);catHead(c,C,0,0,C.fluffy?6.2:5.6,{sleep:!o.wake,twitch:o.twitch},false);c.restore()}
 
-function hitCat(p){if(!CATS)return null;let best=null,bd=20;for(const c of CATS){if(c.hidden)continue;const d=Math.hypot(p.x-c.x,p.y-(c.y-12));if(d<bd){bd=d;best=c}}return best}
+function hitCat(p){if(!CATS)return null;let best=null,bd=0;for(const c of CATS){if(c.hidden)continue;const lying=['sleep','bed','loaf','curl','belly'].includes(c.pose)||c.st==='sleep';const r=(c.def.fluffy?27:22)*(lying?1:1);const d=Math.hypot(p.x-c.x,(p.y-(c.y-(lying?8:12)))*(lying?1.4:1));if(d<r&&(best===null||d<bd)){bd=d;best=c}}return best}
+/* 包包 knows you are there; he just is not getting up. Eyes open a moment, an ear and the tail flick, a purr. */
+function snowNudge(c){c.wakeT=1.5;c.flickT=1.3;tone(190,0,.35,'sine',.045,140);setTimeout(()=>{if(AU.ctx)tone(205,0,.3,'sine',.04,150)},220)}
 function tapCat(c){audioInit();const id=c.def.id;
  if(id==='mei'&&Math.random()<.35&&!['sleep','bed'].includes(c.st)){c.face=-c.face;tone(420,0,.12,'sine',.05,300);return}
- if(id==='snow'&&(c.st==='sleep'||c.st==='bed')){c.hearts.push({x:0,y:-20,t:0});tone(200,0,.3,'sine',.05);return}
+ if(id==='snow'&&(c.st==='sleep'||c.st==='bed')){c.hearts.push({x:0,y:-20,t:0});snowNudge(c);return}
  sfx.meow();if(c.st==='sleep'){c.st='daze';c.pose='daze';c.t=2.5}if(['scr','toy','eat','stare','daze','wary','rest'].includes(c.st)&&!c.sofa)releaseSpots(c);c.happy=1.8;c.hearts.push({x:0,y:-28,t:0},{x:5,y:-24,t:-.2});
  if(!['jump','visit','side','race','dash','chase','hide2','bed','hide','walk'].includes(c.st)&&c.perch<0&&!c.sofa){c.st='pet';c.pose='happy';c.moving=false}else if(c.perch>=0||c.st==='side'||c.sofa){c.pose='happy';c.t=Math.max(c.t,2.5)}
  if(R&&phase==='service'&&c.cd<=0){c.cd=12;for(const g of R.groups){if(g.table==null||!['reading','order','wait','check'].includes(g.state))continue;const t=R.tables[g.table];if(Math.hypot(t.x-c.x,t.y-c.y)<90&&catCheer(g,.08)>0)addFloat(t.x,t.y-54,'心情 UP','#F29AAE',0)}}}
@@ -1542,7 +1668,7 @@ function fluff(c,col,cx,cy,rx,ry,n,r){c.fillStyle=col;c.beginPath();for(let i=0;
 const legCol=(C,far)=>far?shade(C.base,-.14):C.base;
 function catHead(c,C,hx,hy,r,o,side){const fl=C.fluffy,W=C.white||{};
  const ear=(ex,dir)=>{if(C.fold){c.fillStyle=C.base;c.beginPath();c.moveTo(ex-2.8,hy-r*.55);c.quadraticCurveTo(ex+dir*.4,hy-r-2.2,ex+2.8,hy-r*.5);c.quadraticCurveTo(ex+dir*1.2,hy-r*.35,ex-2.8,hy-r*.55);c.fill();c.fillStyle=shade(C.base,-.12);c.beginPath();c.moveTo(ex-1.6,hy-r*.62);c.quadraticCurveTo(ex+dir*.4,hy-r-.8,ex+1.6,hy-r*.58);c.fill();return}
-  c.fillStyle=C.base;c.beginPath();c.moveTo(ex-2.7,hy-r*.55);c.lineTo(ex+dir*.6,hy-r-(fl?2.8:4.4));c.lineTo(ex+2.7,hy-r*.45);c.closePath();c.fill();c.fillStyle=C.earIn;c.beginPath();c.moveTo(ex-1.3,hy-r*.6);c.lineTo(ex+dir*.5,hy-r-(fl?1.4:2.8));c.lineTo(ex+1.4,hy-r*.55);c.closePath();c.fill()};
+  const tw=(o.twitch&&dir>0)?o.twitch:0;c.fillStyle=C.base;c.beginPath();c.moveTo(ex-2.7,hy-r*.55);c.lineTo(ex+dir*.6+tw,hy-r-(fl?2.8:4.4)+Math.abs(tw)*.5);c.lineTo(ex+2.7,hy-r*.45);c.closePath();c.fill();c.fillStyle=C.earIn;c.beginPath();c.moveTo(ex-1.3,hy-r*.6);c.lineTo(ex+dir*.5+tw,hy-r-(fl?1.4:2.8)+Math.abs(tw)*.5);c.lineTo(ex+1.4,hy-r*.55);c.closePath();c.fill()};
  if(side){ear(hx-1.5,1);ear(hx+2.5,1)}else{ear(hx-r*.56,-1);ear(hx+r*.56,1)}
  let g=c.createRadialGradient(hx-2,hy-2,1,hx,hy,r+1);g.addColorStop(0,shade(C.base,.12));g.addColorStop(1,shade(C.base,-.08));c.fillStyle=g;circ(c,hx,hy,r);
  if(fl){fluff(c,C.base,hx,hy+1,r*.95,r*.8,11,1.9);if(C.shadeC){c.fillStyle=C.shadeC;el(c,hx,hy-r*.55,r*.5,r*.25)}}
@@ -1587,17 +1713,17 @@ function catLoaf(c,C,ph,o){const fl=C.fluffy,W=C.white||{};catShadow(c,12);
  const bw=fl?11.5:10.5,bh=fl?6.6:5.8;let g=c.createLinearGradient(0,-5-bh,0,0);g.addColorStop(0,shade(C.base,.1));g.addColorStop(1,shade(C.base,-.1));c.fillStyle=g;c.save();c.beginPath();c.ellipse(0,-5.5,bw,bh,0,0,7);c.fill();c.clip();
  if(C.str){c.strokeStyle=C.str;c.lineWidth=C.b==='amshort'?1.6:1.3;c.globalAlpha=.85;if(C.b==='amshort'){c.beginPath();c.arc(-3,-6,2.8,0,7);c.stroke()}for(let i=-3;i<=3;i++){c.beginPath();c.moveTo(i*3.2,-5.5-bh);c.quadraticCurveTo(i*3.2+1.5,-6,i*3.2,-3.5);c.stroke()}c.globalAlpha=1}
  if(C.tint){c.fillStyle=C.tint;c.globalAlpha=.3;el(c,3,-5,4,3);c.globalAlpha=1}if(W.belly){c.fillStyle='#FFFFFF';el(c,0,-.5,bw,2.6)}if(C.shadeC){c.fillStyle=C.shadeC;c.globalAlpha=.55;el(c,0,-5.5-bh+1.5,bw*.7,2);c.globalAlpha=1}c.restore();if(fl)fluff(c,C.base,0,-5.5,bw*.95,bh*.85,16,2);
- c.strokeStyle=shade(C.base,-.05);c.lineWidth=fl?4.8:3;c.lineCap='round';c.beginPath();c.moveTo(-bw+2,-1.5);c.quadraticCurveTo(-2,2,7,-.5);c.stroke();if(C.str){c.strokeStyle=C.str;c.globalAlpha=.7;c.lineWidth=3.2;c.setLineDash([1.6,2.4]);c.beginPath();c.moveTo(-bw+2,-1.5);c.quadraticCurveTo(-2,2,7,-.5);c.stroke();c.setLineDash([]);c.globalAlpha=1}
+ const fk=o.flick>0?Math.sin(o.flick*9)*3.2*Math.min(1,o.flick):0;const tail=()=>{c.beginPath();c.moveTo(-bw+2,-1.5);c.quadraticCurveTo(-2,2+fk*.6,7+Math.abs(fk)*.4,-.5-fk)};c.strokeStyle=shade(C.base,-.05);c.lineWidth=fl?4.8:3;c.lineCap='round';tail();c.stroke();if(C.str){c.strokeStyle=C.str;c.globalAlpha=.7;c.lineWidth=3.2;c.setLineDash([1.6,2.4]);tail();c.stroke();c.setLineDash([]);c.globalAlpha=1}
  if(W.paws||fl&&W.chest){c.fillStyle='#FFFFFF';el(c,-5,-.8,2.3,1.3);el(c,-1,-.8,2.3,1.3)}
- const breathe=Math.sin(ph*1.8)*.3;catHead(c,C,-bw*.35+2,-9.5+breathe,fl?6.5:C.eyeBig?6.1:5.6,{sleep:o.sleep,happy:o.happy,blink:o.blink},false);
- if(o.sleep){const t=(ph*.6)%1;c.globalAlpha=1-t;c.fillStyle='#FFF3DA';c.font=`800 ${5+t*3}px ${FONT}`;c.textAlign='center';c.fillText('z',6+t*6,-18-t*10);c.globalAlpha=1}}
+ const breathe=Math.sin(ph*1.8)*.3;catHead(c,C,-bw*.35+2,-9.5+breathe,fl?6.5:C.eyeBig?6.1:5.6,{sleep:o.sleep&&!o.wake,happy:o.happy&&!o.wake,blink:o.blink,twitch:o.twitch},false);
+ if(o.sleep&&!o.wake){const t=(ph*.6)%1;c.globalAlpha=1-t;c.fillStyle='#FFF3DA';c.font=`800 ${5+t*3}px ${FONT}`;c.textAlign='center';c.fillText('z',6+t*6,-18-t*10);c.globalAlpha=1}}
 function drawCat(c,cat,now){const C=cat.def;c.save();c.translate(cat.x,cat.y);c.scale(CSC,CSC);const flip=cat.face<0;const blink=Math.sin(now*1.1+cat.ph*.1+C.id.length)>.975;const happy=cat.happy>0||cat.pose==='happy'||cat.st==='visit'&&Math.sin(now*1.5)>.6;
  if(cat.st==='jump'){c.scale(flip?-1:1,1);c.rotate((cat.jmp.y1<cat.jmp.y0?-.35:.3));catSide(c,C,cat.ph,false,{leap:true,tailUp:true})}
  else if(cat.st==='play'){c.scale(flip?-1:1,1);const up=Math.max(0,Math.sin(now*9+C.id.length));c.translate(0,-up*3);c.rotate(-up*.35);catSide(c,C,cat.ph,true,{tailUp:true,happy:false})}
  else if(cat.moving||cat.pose==='walk'){c.scale(flip?-1:1,1);catSide(c,C,cat.ph,true,{tailUp:true,blink})}
  else if(cat.pose==='rub'){c.scale(flip?-1:1,1);c.rotate(Math.sin(now*3)*.06);catSide(c,C,cat.ph,false,{tailUp:true,happy:true})}
- else if(cat.pose==='belly'){c.scale(flip?-1:1,1);catBelly(c,C,cat.ph,{})}
- else if(cat.pose==='curl'){c.scale(flip?-1:1,1);catLoaf(c,C,cat.ph,{sleep:!happy,happy,blink})}
+ else if(cat.pose==='belly'){c.scale(flip?-1:1,1);catBelly(c,C,cat.ph,{wake:cat.wakeT>0,flick:cat.flickT,twitch:cat.wakeT>0?Math.sin(cat.ph*14)*1.3:0})}
+ else if(cat.pose==='curl'){c.scale(flip?-1:1,1);catLoaf(c,C,cat.ph,{sleep:!happy,happy,blink,wake:cat.wakeT>0,flick:cat.flickT,twitch:cat.wakeT>0?Math.sin(cat.ph*14)*1.3:0})}
  else if(cat.pose==='knead'){c.scale(flip?-1:1,1);catSit(c,C,cat.ph,{knead:true,happy:true})}
  else if(cat.pose==='yawn'){c.scale(flip?-1:1,1);const yv=Math.sin(cat.ph*.8)>.55;catSit(c,C,cat.ph,{yawn:yv,blink})}
  else if(cat.pose==='stretch'&&cat.st==='rest'){c.scale(flip?-1:1,1);c.translate(0,0);c.rotate(.2);catSide(c,C,cat.ph,false,{stretch:true,tailUp:true,happy:true})}
@@ -1606,7 +1732,7 @@ function drawCat(c,cat,now){const C=cat.def;c.save();c.translate(cat.x,cat.y);c.
  else if(cat.pose==='eat'){c.scale(flip?-1:1,1);catSide(c,C,cat.ph,false,{headDown:true,chew:true})}
  else if(cat.pose==='daze'){c.scale(flip?-1:1,1);catSit(c,C,cat.ph,{blink:true})}
  else if(cat.pose==='glare'){c.scale(flip?-1:1,1);c.rotate(-.05);catSit(c,C,cat.ph,{blink:true})}
- else if(cat.pose==='loaf'){c.scale(flip?-1:1,1);catLoaf(c,C,cat.ph,{sleep:!happy,happy,blink})}
+ else if(cat.pose==='loaf'){c.scale(flip?-1:1,1);catLoaf(c,C,cat.ph,{sleep:!happy,happy,blink,wake:cat.wakeT>0,flick:cat.flickT,twitch:cat.wakeT>0?Math.sin(cat.ph*14)*1.3:0})}
  else{c.scale(flip?-1:1,1);catSit(c,C,cat.ph,{groom:cat.pose==='groom'&&!happy,happy,blink})}
  c.restore();
  for(const h of cat.hearts){if(h.t<0)continue;const a=1-h.t/1.4;c.fillStyle=`rgba(232,110,130,${a})`;const hx=cat.x+h.x+Math.sin(h.t*6)*2,hy=cat.y+h.y*CSC-h.t*16;c.beginPath();c.moveTo(hx,hy+2.6);c.bezierCurveTo(hx-4,hy,hx-2,hy-3.4,hx,hy-1.3);c.bezierCurveTo(hx+2,hy-3.4,hx+4,hy,hx,hy+2.6);c.fill()}
@@ -1683,6 +1809,56 @@ function tapStation(i){const s=R.slots[i];if(!s)return;audioInit();if(s.broken){
 function hitStation(p){if(!R||p.y<FB-8||p.y>FB+48)return -1;const rs=kitchenRects(R.slots);for(let i=0;i<rs.length;i++){const r=rs[i];if(p.x>=r.x-2&&p.x<=r.x+r.w+2&&p.y>=r.y-10&&p.y<=r.y+r.h+8)return i}return -1}
 
 
+/* ================= today's checkpoint (continue a service day where it stopped) =================
+   R is the live day: guests, tickets, what is on every stove, where Jill and the staff are. The
+   checkpoint writes it into the save as plain data (references become indices), and restoreService()
+   builds a new R from it. Anything that does not resolve throws, and the caller falls back to
+   reopening at the same clock with today's numbers kept — and says so. */
+const CP_KEYS=['t','dur','si','closed','combo','maxCombo','streak','fire','fireCount','tv','gid','tkid','st','rush','rushT0','rushT1','rushShown','weather','event','coach','taskDone','lastSpawn','idleT','focus','sched','inc','noticeT','catCheck','cpT'];
+const G_STATES=['arrive','queue','toTable','reading','order','wait','eat','check','leave'];
+function snapshotService(){if(!R||phase!=='service'||R.closing!=null||R.ended)return null;
+ const ti=t=>t?R.tickets.indexOf(t):-1;
+ const ir=it=>{if(!it)return null;for(let a=0;a<R.tickets.length;a++){const k=R.tickets[a].items.indexOf(it);if(k>=0)return[a,k]}return null};
+ const groups=R.groups.filter(g=>!g.gone).map(g=>{const o={};for(const k in g)if(!['ticket','wcat','lookCat','claim','gone'].includes(k))o[k]=g[k];o.ticket=ti(g.ticket);o.claim=g.claim||null;return o});
+ const gi2=g=>g?groups.findIndex(o=>o.id===g.id):-1;
+ const tickets=R.tickets.map(tk=>{const o={};for(const k in tk)if(k!=='g'&&k!=='items')o[k]=tk[k];o.g=gi2(tk.g);o.items=tk.items.map(i=>Object.assign({},i));o.claim=tk.claim||null;return o});
+ const slots=R.slots.map(s0=>{const o={broken:!!s0.broken,fix:s0.fix||0,job:null};if(s0.job){const j=s0.job;const jo={};for(const k in j)if(k!=='tk'&&k!=='it')jo[k]=j[k];jo.tk=ti(j.tk);jo.it=ir(j.it);o.job=jo}return o});
+ const J=R.jill;const jill={};for(const k in J)if(!['carry','cur','pet','lookAt','rest','restPos','sofa'].includes(k))jill[k]=J[k];jill.carry=J.carry.map(c=>({tk:ti(c.tk),it:ir(c.it)}));jill.cur=J.cur?Object.assign({},J.cur):null;
+ const cw={};for(const id in R.cw||{}){const w=R.cw[id];const o={};for(const k in w)if(k!=='task'&&k!=='carry')o[k]=w[k];o.task=w.task?Object.assign({},w.task,{g:gi2(w.task.g),t:w.task.t?w.task.t.i:-1,tk:ti(w.task.tk)}):null;o.carry=w.carry?w.carry.map(ir):null;cw[id]=o}
+ const tables=R.tables.map(t=>({group:gi2(t.group),dirty:!!t.dirty,plates:(t.plates||[]).map(p=>Object.assign({},p)),busT:t.busT||0,claim:t.claim||null}));
+ const misc={};for(const k of CP_KEYS)if(k in R)misc[k]=R[k];
+ const snap={groups,tickets,slots,jill,cw,tables,misc,tablesN:R.tables.length,slotsN:R.slots.length};
+ return JSON.parse(JSON.stringify(snap))}   /* through JSON once: proves it is plain data, drops undefined */
+function checkpointSave(why){if(!R||phase!=='service')return false;try{const snap=snapshotService();if(!snap)return false;S.checkpoint={day:S.day,at:R.t,clock:clockStr(),why,snap};save();return true}catch(e){console.warn('[checkpoint] not saved:',e&&e.message);return false}}
+function clearCheckpoint(){if(S.checkpoint){S.checkpoint=null}}
+function restoreService(cp){const snap=cp.snap;if(!snap||cp.day!==S.day)throw new Error('checkpoint is for another day');
+ lifeReset();dylanStageCheck();bg=null;lastEv=null;const dur=snap.misc.dur||dayDur(S.day);
+ const N={t:0,dur,tables:buildTables(),slots:buildSlots(),groups:[],tickets:[],sched:[],si:0,closed:false,ended:false,
+  jill:{x:PASS.x,y:PASS.y,tx:null,ty:null,q:[],cur:null,busy:0,carry:[],idle:0,face:1,step:0},
+  combo:0,maxCombo:0,streak:0,fire:0,fireCount:0,floats:[],parts:[],tv:1,gid:1,tkid:1,
+  st:{rev:0,tips:0,guests:0,groups:0,perfect:0,q:{P:0,G:0,O:0,B:0},sats:[],dish:{},angry:0,lost:0,reviews:[],critic:null,blogger:null},
+  rush:feat().rush,rushT0:dur*120/270,rushT1:dur*180/270,rushShown:false,weather:S.today&&S.today.weather,event:S.today&&S.today.event,coach:-1,taskDone:{},lastSpawn:0,idleT:0,focus:0,focusLock:0,holdSlot:null,inc:[],cw:{},thief:null,insp:null,chaser:null};
+ if(N.tables.length!==snap.tablesN||N.slots.length!==snap.slotsN)throw new Error('room changed');
+ for(const k of CP_KEYS)if(k in snap.misc)N[k]=snap.misc[k];
+ N.groups=snap.groups.map(o=>Object.assign({},o,{wcat:null,gone:false}));
+ N.tickets=snap.tickets.map(o=>Object.assign({},o,{items:o.items.map(i=>Object.assign({},i))}));
+ N.tickets.forEach((tk,i)=>{tk.g=N.groups[snap.tickets[i].g];if(!tk.g)throw new Error('ticket without guests')});
+ N.groups.forEach((g,i)=>{const t=snap.groups[i].ticket;g.ticket=t>=0?N.tickets[t]:null;if(t>=0&&!g.ticket)throw new Error('guests without ticket');if(!G_STATES.includes(g.state)||!isFinite(g.x)||!isFinite(g.y)||!Array.isArray(g.looks))throw new Error('bad guest')});
+ snap.tables.forEach((o,i)=>{const t=N.tables[i];t.group=o.group>=0?N.groups[o.group]:null;if(o.group>=0&&!t.group)throw new Error('table without guests');t.dirty=o.dirty;t.plates=o.plates||[];t.busT=o.busT||0;t.claim=o.claim||null});
+ const item=ref=>{if(!ref)return null;const tk=N.tickets[ref[0]];return tk&&tk.items[ref[1]]||null};
+ snap.slots.forEach((o,i)=>{const s0=N.slots[i];s0.broken=!!o.broken;s0.fix=o.fix||0;if(o.job){const j=Object.assign({},o.job);j.tk=N.tickets[o.job.tk];j.it=item(o.job.it);if(!j.tk||!j.it||!DISH(j.d))throw new Error('job without ticket');if(j.step){j.step=Object.assign({},j.step);j.step.hold=false}s0.job=j}});
+ Object.assign(N.jill,snap.jill);N.jill.carry=snap.jill.carry.map(c=>({tk:N.tickets[c.tk],it:item(c.it)})).filter(c=>c.tk&&c.it);N.jill.cur=snap.jill.cur?Object.assign({},snap.jill.cur):null;N.jill.q=(snap.jill.q||[]).slice();if(!isFinite(N.jill.x)||!isFinite(N.jill.y))throw new Error('bad jill');N.jill.sofa=false;N.jill.rest=null;N.jill.pet=null;N.jill.lookAt=null;N.jill.nod=0;
+ for(const id in snap.cw){const o=snap.cw[id];const w=Object.assign({},o);if(o.task){w.task=Object.assign({},o.task);w.task.g=o.task.g>=0?N.groups[o.task.g]:null;w.task.t=o.task.t>=0?N.tables[o.task.t]:null;w.task.tk=o.task.tk>=0?N.tickets[o.task.tk]:null;if((o.task.g>=0&&!w.task.g)||(o.task.t>=0&&!w.task.t)||(o.task.tk>=0&&!w.task.tk))w.task=null}w.carry=o.carry?o.carry.map(item).filter(Boolean):null;if(w.carry&&!w.carry.length)w.carry=null;N.cw[id]=w}
+ N.holdSlot=null;N.panel=false;N.panelT=0;N.closing=null;
+ R=N;phase='service';paused=false;hideScreen();layoutAll();renderTickets();renderTasks();hud(true);audioInit();return true}
+function resumeCheckpoint(){const cp=S.checkpoint;if(!cp||cp.day!==S.day){goMain();return}
+ applyGates();if(!S.today)planToday();
+ try{restoreService(cp);banner('繼續營業',`DAY ${S.day} · ${cp.clock}`,'');toast(`從 ${cp.clock} 繼續今天的營業`)}
+ catch(e){console.warn('[checkpoint] could not restore fully:',e&&e.message);
+  /* the safe fallback: reopen at the same clock with today's numbers, the room starts empty */
+  startService();R.t=cp.at;if(cp.snap&&cp.snap.misc){if(cp.snap.misc.st)R.st=cp.snap.misc.st;if(cp.snap.misc.sched)R.sched=cp.snap.misc.sched;if(cp.snap.misc.si!=null)R.si=cp.snap.misc.si}
+  toast(`今天的店內狀況無法完整還原，從 ${cp.clock} 重新開店（今天的營收與客人數都保留，店裡的客人會重新入座）`)}
+ clearCheckpoint();save()}
 /* ================= life: the sofa, the rolling TV, Jill's evenings, Dylan ================= */
 /* Nothing in this section plays a scene. Jill, Dylan, the five cats and the TV each decide for
    themselves from their own state, personality, what is free on the sofa, where the others are,
@@ -1786,13 +1962,15 @@ function jillLife(J,L,dt){const tv=LIFE.tv;
   else if(['read','idle','tv','pet'].includes(L.act)&&L.t<=0){if(L.act==='pet'&&L.petCat)L.petCat=null;jillDecide(L)}
   if(L.act==='tv'&&!(tv.on&&tv.at==='use')){L.act=null;jillDecide(L)}
   if(L.catNew>0&&L.act!=='pet'&&L.act!=='settle'&&Math.random()<dt*.25){const near=sofaCats().filter(c=>Math.abs(c.x-L.x)<46);if(near.length){L.petCat=pick(near);L.act='pet';L.t=rand(2,4);L.petCat.hearts.push({x:0,y:-24,t:0});if(Math.random()<.5)L.petCat.happy=Math.max(L.petCat.happy,1.5),L.petCat.quiet=1}L.catNew=0}}
+ else if(L.act==='wrap'){L.face=1;L.wrapT=(L.wrapT||0)-dt;if(L.wrapT<=0)L.act='toSofa'}
  else if(L.act==='standing'&&!L.walking){/* stood up but has nothing to do: sit back down */L.act='toSofa'}
  /* mirror into the view's Jill so everything that reads view().jill sees her where she is */
  J.x=L.x;J.y=L.y;J.face=L.face;J.moving=L.walking||L.act==='pushing';J.step=L.step;J.sit=L.on;J.sofa=L.on?L.pos:null}
 function jillArrive(L,a){const tv=LIFE.tv;
  if(a==='sit'){L.sitT=.35;L.face=JPOS[L.pos].face;L.y=SOFA.front+10;L.act='sitting'}
  else if(a==='grabTV'){if(tv.mover||tv.at==='use'){L.act='toSofa';return}tv.mover='jill';tv.path=[{x:tv.x,y:tvUsePos().y},{x:tvUsePos().x,y:tvUsePos().y}];tv.wait=0;L.act='pushing';L.face=-1}
- else if(a==='back'){L.act='toSofa'}}
+ else if(a==='back'){L.act='toSofa'}
+ else if(a==='wrap'){L.act='wrap'}}
 function jillDecide(L){const tv=LIFE.tv,D=LIFE.dylan;const W=[];const add=(k,w)=>{if(w>0)W.push([k,w])};
  add('read',L.last==='read'?2:4);add('idle',L.last==='idle'?1.2:2.4);
  const lap=CATS.some(c=>c.sofa&&c.sofa.kind==='lap');const tvOk=tvUsable()&&!(tv.at!=='use'&&lap&&!(D&&!D.onSofa&&S.dylan.stage>=1));
@@ -1933,7 +2111,7 @@ function drawSofaGroup(c,now){drawSofaBody(c);const L=LIFE.jill,D=LIFE.dylan;con
   const gaze=look!=null?{x:(look>=L.x?1:-1)*(flip?-1:1),y:.35}:L.act==='read'?{x:0,y:.6}:null;
   /* her face after hours: amused when he is doing his act, warm when a cat or he has her attention, tired-but-content early in the evening, otherwise soft */
   const expr=LIFE.say.some(q=>q.who==='d'&&q.t>=0&&q.t<q.life)?'amused':(L.gazeT>0||L.act==='pet')?'smile':(LIFE.t<25&&L.sinceSit<25)?'tired':'soft';
-  drawPerson(c,L.x,SOFA.jy,JILL_LOOK,{jill:true,me:true,seated:true,s:1.1,bob,mood:'happy',expr,flip,blink:Math.sin(now*1.7)>.985,hat:false,lounge:{legs:L.legs,len:(10+L.legs*32)/(1.1*PSC)},hold:L.act==='read'||(L.act==='wantTV'&&L.last==='read')?'reader':null,flipPage:L.flip>0,gaze})}
+  drawPerson(c,L.x,SOFA.jy,JILL_LOOK,{jill:true,me:true,seated:true,s:1.1,bob,mood:'happy',expr,flip,blink:Math.sin(now*1.7)>.985,hat:!!L.hat,lounge:{legs:L.legs,len:(10+L.legs*32)/(1.1*PSC)},hold:L.act==='read'||(L.act==='wantTV'&&L.last==='read')?'reader':null,flipPage:L.flip>0,gaze})}
  if(D&&D.onSofa){const flip=D.face<0;const look=D.act==='tv'&&tv.on?tv.x:(D.gazeT>0?L.x:null);drawPerson(c,D.x,SOFA.jy,DYLAN.looks[0],{seated:true,mood:'happy',flip,blink:Math.sin(now*1.3+2)>.975,lounge:{legs:0},hold:D.phone?'phone':null,gaze:look!=null?{x:(look>=D.x?1:-1)*(flip?-1:1),y:D.act==='phone'?.5:.2}:(D.act==='phone'?{x:0,y:.6}:null)})}
  for(const k of byKind('lap'))drawCat(c,k,now);for(const k of byKind('seat'))drawCat(c,k,now);for(const k of byKind('arm'))drawCat(c,k,now);
  if(L.on&&L.act==='pet'&&L.petCat&&L.petCat.sofa){const p=L.petCat;c.fillStyle=JILL_LOOK.skin;circ(c,p.x+(p.x<L.x?5:-5),p.y-9,2.6);c.fillStyle='rgba(60,34,22,.35)';c.beginPath();c.arc(p.x+(p.x<L.x?5:-5),p.y-9,2.6,0,7);c.stroke()}}
@@ -1955,7 +2133,7 @@ function drawSay(c){for(const s of LIFE.say){if(s.t<0)continue;const a=s.t<.2?s.
 /* ================= crew ================= */
 const ROLES={
  chef:{n:'廚師',hire:1500,wage:200,up:1200,d:'負責一個工作站。LV1 只做簡單的菜，升級後能處理更多料理；LV3 起也會接手 Jill 做到一半的菜。招牌菜和每道新菜的第一份，永遠由 Jill 親自做。',duties:['stove','oven','prep','bar']},
- waiter:{n:'服務生',hire:1200,wage:160,up:1000,d:'幫忙帶位、點餐；LV2 起也會把做好的菜端給客人。等級越高動作越快。',duties:['both','seat','order']},
+ waiter:{n:'服務生',hire:1200,wage:160,up:1000,d:'幫忙帶位、點餐；LV2 起也會把做好的菜端給客人，LV3 起連結帳都包了。等級越高動作越快。',duties:['both','seat','order']},
  cleaner:{n:'清潔員',hire:900,wage:120,up:800,d:'客人離開後自動收拾桌面。等級越高越快。',duties:['clean']},
 };
 const DUTY_N={stove:'爐台',oven:'烤箱',prep:'冷盤台',bar:'咖啡吧',both:'帶位＋點餐',seat:'只帶位',order:'只點餐',clean:'收桌'};
@@ -1988,6 +2166,7 @@ function crewUpd(dt){R.cw=R.cw||{};for(const m of S.crew||[]){
   if(tk.k==='order')ok=tk.t.group===tk.g&&tk.g.state==='order';
   if(tk.k==='clean')ok=tk.t.dirty&&!tk.t.group;
   if(tk.k==='serve')ok=R.tickets.includes(tk.tk)&&tk.g.state==='wait'&&tk.t.group===tk.g&&(tk.phase==='table'||tk.tk.items.some(i=>i.st==='ready'&&!i.picked));
+  if(tk.k==='check')ok=tk.t.group===tk.g&&tk.g.state==='check'&&!jillTargets(tk.t.i);
   if(!ok){if(tk.g)tk.g.claim=null;if(tk.t)tk.t.claim=null;if(tk.tk)tk.tk.claim=null;if(w.carry){for(const c0 of w.carry)c0.picked=false;w.carry=null}w.task=null;w.cd=.3;continue}
   const dx=tk.x-w.x,dy=tk.y-w.y,d=Math.hypot(dx,dy),v=(115+15*m.lv)*dt;
   if(d>v){w.x+=dx/d*v;w.y+=dy/d*v;w.face=dx>=0?1:-1;w.step+=dt*12;w.moving=true}
@@ -1997,6 +2176,7 @@ function crewUpd(dt){R.cw=R.cw||{};for(const m of S.crew||[]){
    if(tk.k==='clean'){tk.t.dirty=false;tk.t.plates=[];tk.t.busT=0;sfx.clear()}
    if(tk.k==='serve'&&tk.phase==='pickup'){w.carry=tk.tk.items.filter(i=>i.st==='ready'&&!i.picked);for(const i of w.carry)i.picked=true;tk.phase='table';tk.x=tk.t.x+(tk.t.x<200?-26:26);tk.y=tk.t.y+22;w.busy=0;R.tv++;continue}
    if(tk.k==='serve'){serveItems(tk.g,w.carry.map(it=>({it})));w.carry=null;tk.tk.claim=null}
+   if(tk.k==='check'&&tk.g.state==='check'){regularNote(tk.g);collect(tk.g)}
    if(tk.g)tk.g.claim=null;if(tk.t)tk.t.claim=null;w.task=null;w.busy=0;w.cd=m.role==='waiter'?waiterDelay(m):.35}}
   continue}
  w.cd-=dt;if(w.cd>0){w.moving=false;continue}
@@ -2004,6 +2184,7 @@ function crewUpd(dt){R.cw=R.cw||{};for(const m of S.crew||[]){
   if(m.duty!=='order'){const g=queued().find(g=>g.state==='queue'&&!g.claim&&freeTableFor(g)&&!freeTableFor(g).claim);if(g){const t=freeTableFor(g);g.claim=m.id;t.claim=m.id;w.task={k:'seat',g,t,x:g.x+22,y:g.y+2,dur:.25};continue}}
   if(m.duty!=='seat'){const t=R.tables.find(t=>t.group&&t.group.state==='order'&&!t.claim&&!jillTargets(t.i));if(t){t.claim=m.id;w.task={k:'order',g:t.group,t,x:t.x+(t.x<200?-26:26),y:t.y+22,dur:.5};continue}}
   if(m.duty==='both'&&m.lv>=2){const tk=R.tickets.find(t=>t.g.table!=null&&t.g.state==='wait'&&!t.claim&&t.items.some(i=>i.st==='ready'&&!i.picked)&&!jillTargets(t.g.table)&&!R.jill.carry.some(c0=>c0.tk===t));if(tk){tk.claim=m.id;w.task={k:'serve',tk,g:tk.g,t:R.tables[tk.g.table],x:PASS.x+(tk.g.table%2?14:-14),y:PASS.y,dur:.25,phase:'pickup'};continue}}
+  if(m.duty==='both'&&m.lv>=3){const t=R.tables.find(t=>t.group&&t.group.state==='check'&&!t.claim&&!jillTargets(t.i));if(t){t.claim=m.id;w.task={k:'check',g:t.group,t,x:t.x+(t.x<200?-26:26),y:t.y+22,dur:.6};continue}}
   w.cd=.4;if(Math.hypot(w.x-84,w.y-150)>4){const v=(80)*dt,dx=84-w.x,dy=150-w.y,d=Math.hypot(dx,dy);w.x+=dx/d*Math.min(v,d);w.y+=dy/d*Math.min(v,d);w.moving=true;w.step+=dt*12;w.face=dx>=0?1:-1}}
  else{const t=R.tables.find(t=>t.dirty&&!t.group&&!t.claim&&!jillTargets(t.i));if(t){t.claim=m.id;w.task={k:'clean',t,x:t.x+(t.x<200?-24:24),y:t.y+22,dur:cleanDur(m)};continue}w.cd=.4}}}
 function crewDraw(c,now,list){
@@ -2040,8 +2221,62 @@ function starOf(d){return(S.rstar&&S.rstar[d])||1}
 function starUpCost(d){const D=DISH(d);return Math.round(D.price*(starOf(d)===1?8:16)/50)*50}
 const KEY_OVR={veg:['vegmix','oil']};
 function dishKeys(d){if(KEY_OVR[d])return KEY_OVR[d];const out=[];for(const st of DISHES[d].steps){const arr=st.t==='add'?st.items:(st.t==='hold'||st.t==='dose')?[st.ing]:[];for(const i of arr)if(!out.includes(i)&&!i.startsWith('s_'))out.push(i)}return out.slice(0,3)}
-function pantry(){const set=new Set(['egg','rice','milk','beans','cheese','tomato']);for(const d in DISHES)if(DISHES[d].rd>0)dishKeys(d).forEach(i=>set.add(i));return Object.keys(ING).filter(i=>set.has(i))}
+/* the pantry grows with the restaurant: ingredients of dishes up to one level above the current one */
+function pantry(){const set=new Set(['egg','rice','milk','beans','cheese','tomato']);for(const d in DISHES)if(DISHES[d].rd>0&&DISHES[d].lv<=S.level+1)dishKeys(d).forEach(i=>set.add(i));return Object.keys(ING).filter(i=>set.has(i))}
 let labSel=[];
+/* Every pantry ingredient wears its profile on the card: what role it plays (主體/配料/調味/醬汁/飲品/甜點),
+   how it tastes (清爽・濃郁・香氣・口感, 0-3), which world it belongs to (savory / drink / sweet) and a cost tier.
+   Everything the player needs to reason about a combination is visible before paying for a trial. */
+const LABI={
+ egg:{d:'base',t:[1,1,0,1],w:'s',c:1},rice:{d:'base',t:[1,0,0,2],w:'s',c:1},noodle:{d:'base',t:[1,0,0,2],w:'s',c:1},tomato:{d:'sauce',t:[2,1,1,0],w:'s',c:1},garlic:{d:'season',t:[0,1,3,0],w:'s',c:1},shrimp:{d:'side',t:[2,0,1,2],w:'s',c:2},
+ patty:{d:'base',t:[0,3,1,2],w:'s',c:2},bun:{d:'side',t:[0,1,0,2],w:'s',c:1},cheese:{d:'side',t:[0,3,1,1],w:'s',c:1},potato:{d:'base',t:[0,1,0,3],w:'s',c:1},salt:{d:'season',t:[0,0,2,0],w:'s',c:1},oil:{d:'season',t:[0,1,2,0],w:'s',c:1},
+ pumpkin:{d:'base',t:[1,2,0,1],w:'s',c:1},stock:{d:'sauce',t:[0,2,2,0],w:'s',c:1},cream:{d:'sauce',t:[0,3,0,1],w:'s',c:1},vegmix:{d:'base',t:[2,0,1,2],w:'s',c:1},herbs:{d:'season',t:[1,0,3,0],w:'s',c:1},butter:{d:'sauce',t:[0,3,1,0],w:'s',c:1},
+ duck:{d:'base',t:[0,3,1,2],w:'s',c:3},orange:{d:'sauce',t:[2,0,2,0],w:'s',c:2},chicken:{d:'base',t:[0,2,1,2],w:'s',c:2},steak:{d:'base',t:[0,3,1,3],w:'s',c:3},salmon:{d:'base',t:[1,2,1,2],w:'s',c:3},asparagus:{d:'side',t:[2,0,1,2],w:'s',c:2},
+ arborio:{d:'base',t:[0,1,0,3],w:'s',c:2},wine:{d:'sauce',t:[1,1,3,0],w:'s',c:2},prosciutto:{d:'base',t:[0,2,2,1],w:'s',c:3},fig:{d:'side',t:[1,1,2,1],w:'s',c:2},balsamic:{d:'sauce',t:[2,0,2,0],w:'s',c:2},
+ beans:{d:'drink',t:[0,2,3,0],w:'d',c:1},milk:{d:'mix',t:[1,1,0,1],w:'d',c:1},tea:{d:'drink',t:[2,0,2,0],w:'d',c:1},lemon:{d:'mix',t:[3,0,2,0],w:'d',c:1},ice:{d:'mix',t:[3,0,0,1],w:'d',c:1},soda:{d:'drink',t:[3,0,0,2],w:'d',c:1},fruit:{d:'mix',t:[2,0,2,1],w:'d',c:1},
+ custard:{d:'sweet',t:[0,2,1,2],w:'w',c:1},caramel:{d:'top',t:[0,2,2,0],w:'w',c:1},ladyfinger:{d:'sweet',t:[0,1,1,2],w:'w',c:1},mascarpone:{d:'top',t:[0,3,0,2],w:'w',c:2},cocoa:{d:'top',t:[0,1,3,0],w:'w',c:1},cheesebatter:{d:'sweet',t:[0,3,1,2],w:'w',c:2},berries:{d:'top',t:[2,0,2,1],w:'w',c:1},whites:{d:'sweet',t:[1,0,0,3],w:'w',c:1},sugar:{d:'top',t:[0,1,1,0],w:'w',c:1}};
+const DIR_N={base:'主體',side:'配料',season:'調味',sauce:'醬汁',drink:'飲品基底',mix:'飲品配料',sweet:'甜點基底',top:'甜點配料'};
+const DIR_GROUPS=[['base','主體'],['side','配料'],['season','調味與醬汁'],['sauce',null],['drink','飲品'],['mix',null],['sweet','甜點'],['top',null]];
+const TASTE_N=['清爽','濃郁','香氣','口感'];
+function labProfile(i){return LABI[i]||{d:'side',t:[1,1,1,1],w:'s',c:1}}
+function labDishesWith(i){return Object.keys(DISHES).filter(d=>dishKeys(d).includes(i))}
+function labRD(){return Object.keys(DISHES).filter(d=>DISHES[d].rd>0&&!S.unlocked.includes(d))}
+function tasteStr(t){return TASTE_N.map((n,k)=>t[k]>0?n+'↑'.repeat(Math.min(3,t[k])):null).filter(Boolean).join(' ')||'淡'}
+/* 很好 = the two are known to go together: they share a dish already on the menu, or a trial has shown it. Untried pairs are judged from the profiles only. */
+function labKnownPair(a,b){return !!((S.labKnown||{})[[a,b].sort().join('|')])}
+function labLearn(list){S.labKnown=S.labKnown||{};for(let a=0;a<list.length;a++)for(let b=a+1;b<list.length;b++)S.labKnown[[list[a],list[b]].sort().join('|')]=1}
+function labPair(a,b){if(labDishesWith(a).some(d=>S.unlocked.includes(d)&&dishKeys(d).includes(b))||labKnownPair(a,b))return 'great';const A=labProfile(a),B=labProfile(b);if(A.w!==B.w)return 'bad';
+ const heavy=['season','sauce'];if(A.d==='base'&&B.d==='base')return 'bad';if(heavy.includes(A.d)&&heavy.includes(B.d))return 'bad';if(A.d==='drink'&&B.d==='drink')return 'bad';if(A.d==='sweet'&&B.d==='sweet')return 'bad';return 'ok'}
+const PAIR_N={great:'很好',ok:'可以',bad:'不合'};
+function labStations(sel){const n={};for(const i of sel)for(const d of labDishesWith(i))n[DISHES[d].st]=(n[DISHES[d].st]||0)+1;const ks=Object.keys(n).sort((a,b)=>n[b]-n[a]);if(ks.length)return ks.slice(0,2);
+ const w=labProfile(sel[0]||'egg').w;return w==='d'?['bar']:w==='w'?['prep','oven']:['stove']}
+function labCat(sel){const n={};for(const i of sel)for(const d of labDishesWith(i))n[DISHES[d].cat]=(n[DISHES[d].cat]||0)+1;const ks=Object.keys(n).sort((a,b)=>n[b]-n[a]);return ks[0]||null}
+/* what a trial makes of a selection: a dish (exact, or with one ingredient too many), a promising prototype (research
+   progress on the dish it resembles), or an ordinary one with the reason spelled out */
+function labEval(sel){let best=null;for(const d of labRD()){const K=dishKeys(d);const m=K.filter(i=>sel.includes(i));const extra=sel.filter(i=>!K.includes(i));const sc=m.length/K.length+m.length*.01-extra.length*.001;if(!best||sc>best.sc)best={d,K,m,extra,sc}}
+ if(best&&best.m.length===best.K.length)return{kind:best.extra.length?'success':'exact',d:best.d,extra:best.extra};
+ if(best){const lead=best.m.find(i=>['base','drink','sweet'].includes(labProfile(i).d));const missing=best.K.filter(i=>!sel.includes(i));const rightKind=missing.some(k=>sel.some(i=>!best.K.includes(i)&&labProfile(i).d===labProfile(k).d));if(best.m.length>=2||(best.m.length===1&&best.K.length===2&&lead&&rightKind))return{kind:'potential',d:best.d,have:best.m,missing}}
+ const known=S.unlocked.find(d=>DISHES[d]&&dishKeys(d).every(i=>sel.includes(i)));if(known)return{kind:'known',d:known};
+ /* ordinary: say why */
+ const P=sel.map(labProfile);const worlds=new Set(P.map(p=>p.w));const bases=sel.filter(i=>['base','drink','sweet'].includes(labProfile(i).d));const heavy=sel.filter(i=>['season','sauce'].includes(labProfile(i).d));let why;
+ if(worlds.size>1)why=worlds.has('w')&&(worlds.has('s')||worlds.has('d'))?'甜的跟鹹的混在一起，味道很奇怪。':'飲料的材料跟料理的材料混在一起了。';
+ else if(!bases.length)why='缺少主體：沒有一樣能當主角的食材。';
+ else if(bases.length>=2)why=`兩種主體打架：${ING[bases[0]].n}跟${ING[bases[1]].n}都想當主角。`;
+ else if(heavy.length>=2)why='味道太重：調味太多，蓋過了食材本身。';
+ else why='可以吃，但還不像一道能上菜單的料理。';
+ let tip='';for(let a=0;a<sel.length;a++)for(let b=a+1;b<sel.length;b++)if(labPair(sel[a],sel[b])==='great')tip=`${ING[sel[a]].n}跟${ING[sel[b]].n}的相性很好，往這個方向再想想。`;
+ if(!tip&&bases.length===1){const st=labStations(sel)[0];tip=`${ING[bases[0]].n}比較適合${ST_N[st]}的料理，換一種配料或醬汁試試。`}
+ return{kind:'plain',why,tip}}
+function labLock(d){const D=DISHES[d];if(S.level<D.lv)return`要擴建到 ${LEVELS[D.lv-1].n} 才能上菜單`;if(!stationOk(d))return`要先買${ST_N[D.st]}才能上菜單`;return null}
+function rdFinish(d,how){const lock=labLock(d);const D=DISHES[d];if(lock){S.rdDone[d]=1;toast(`${how}「${D.n}」！${lock}，到時會自動加入。`);return}unlockDish(d);sfx.fire();banner(how,D.n);toast(`新料理：${D.n}${S.menu.includes(d)?'，已加入菜單':''}`)}
+function rdAutoUnlock(){for(const d in S.rdDone||{}){if(S.unlocked.includes(d)){delete S.rdDone[d];continue}if(!labLock(d)){delete S.rdDone[d];unlockDish(d);toast(`之前研發好的「${DISHES[d].n}」現在可以上菜單了！`)}}}
+function labPreviewHTML(){if(!labSel.length)return'<p class="small" style="margin:6px 0 0">點食材看它的特性；選 2–3 種再試做。主角＋配料或醬汁，是最常見的組合。</p>';
+ const rows=labSel.map(i=>{const p=labProfile(i);return`<div class="labrow"><img alt="" src="${ingURL(i)}"><b>${ING[i].n}</b><span class="tag">${DIR_N[p.d]}</span><span class="muted">${tasteStr(p.t)} · ${'$'.repeat(p.c)}</span></div>`}).join('');
+ let pairs='';for(let a=0;a<labSel.length;a++)for(let b=a+1;b<labSel.length;b++){const k=labPair(labSel[a],labSel[b]);pairs+=`<span class="pair ${k}">${ING[labSel[a]].n}×${ING[labSel[b]].n} ${PAIR_N[k]}</span>`}
+ const sum=[0,0,0,0];for(const i of labSel){const t=labProfile(i).t;for(let k=0;k<4;k++)sum[k]+=t[k]}const ts=TASTE_N.map((n,k)=>sum[k]>0?n+'↑'.repeat(Math.min(3,Math.round(sum[k]/Math.max(1,labSel.length-1))||1)):null).filter(Boolean).join(' ');
+ const st=labStations(labSel).map(k=>ST_N[k]).join('／');const cat=labCat(labSel);
+ return`<div class="labprev">${rows}${labSel.length>1?`<div class="labline">相性：${pairs}</div>`:''}<div class="labline">整體味道：${ts||'淡'}</div><div class="labline">可能適合：${st}${cat?' · '+CAT_N[cat]:''}</div></div>`}
+function labResultHTML(){const r=S.labLast;if(!r)return'';return`<div class="labres ${r.kind}"><b>${r.title}</b><div>${r.text}</div></div>`}
 function ingURL(id){const k='ing'+id;if(ICACHE.has(k))return ICACHE.get(k);const cv=mkCanvas(64),c=cv.getContext('2d');drawIng(c,id,32,34,24);const u=cv.toDataURL();ICACHE.set(k,u);return u}
 /* ================= Jill's bag cabinet ================= */
 let BAG_T=-9;
@@ -2060,19 +2295,52 @@ function drawBagCabinet(c){const x=280,y=12,w=60,h=72;c.fillStyle='rgba(0,0,0,.2
 function drawBagSparkle(c,now){const t=now-BAG_T;const base=.35+Math.sin(now*2)*.25;const pts=[[291,22],[318,40],[332,58],[300,70]];pts.forEach((p,i)=>{const a=t<1.6?(1-t/1.6):Math.max(0,Math.sin(now*1.3+i*1.7))*base;if(a<=.02)return;c.fillStyle=`rgba(255,244,200,${a})`;c.save();c.translate(p[0],p[1]);c.rotate(now*2+i);const s=t<1.6?3.5:2.2;c.fillRect(-s,-.5,s*2,1);c.fillRect(-.5,-s,1,s*2);c.restore()})}
 
 /* ================= guide ================= */
+/* 小小店主手冊：seven cards, short lines, the same tone as the rest of the game */
 const GUIDE=[
- ['這是什麼遊戲','你就是 Chef Jill，這間餐廳的主廚兼老闆。每天傍晚 17:00 開店，親手帶位、做菜、上菜、收錢；21:30 打烊後，用今天賺的錢升級餐廳、研發新菜、聘請員工。餐廳會從 4 張桌的小店，一路擴建成招牌只有「JILL」的高級餐廳。'],
- ['營業流程（點餐廳裡的東西）','<b>帶位</b>：有空桌時客人會自己入座；客滿時會在門口的長椅等，桌子一空就自己過去。想指定哪一組先坐，點那組客人或點一張空桌。<br><b>點餐</b>：桌上出現紅色「!」時點那張桌子，Jill 會走過去點餐。<br><b>做菜</b>：點最下面開放式廚房檯面上亮著「+」的設備開始做。<br><b>上菜</b>：桌上出現銀色餐蓋時點桌子，Jill 會去出菜口端菜。<br><b>收錢</b>：客人吃完出現金幣，點桌子收錢。<br><b>收桌</b>：客人走後桌上有髒盤子，點桌子收乾淨才能接下一組。<br>可以連點好幾張桌子，Jill 會照順序跑（桌邊會標 1、2、3）。'],
- ['做菜','點廚房設備後，上方會彈出料理台，照指示一步一步做。每道菜的步驟不同：<br>・<b>放食材</b>：點對的食材，有些要照順序。<br>・<b>Jill 自己來</b>：切菜、翻炒、打蛋白這些手工，開始後 Jill 會自己做完，你可以先去帶位、送餐或做另一道。<br>・<b>等一下</b>：煮麵、熬煮、冷藏要時間；時間到再回來處理，太久才會影響品質。<br>・<b>看準時機</b>：指針走到金色區塊時按（翻面、起鍋、出爐）。早一點、晚一點還是好菜，忘記太久才會焦。牛排要照客人點的熟度。<br>・<b>按住放開</b>：倒飲料、淋醬、蒸奶泡，在金色區間放開。<br>・<b>撒幾下</b>：撒鹽、淋醬油，數量對了再按完成。<br>把店開得順的秘訣：<b>這個在等，就先去做那個。</b><br>・<b>等待</b>：煮麵、冷藏、萃取。等的時候料理台會自己收起來，可以先去做別的；煮麵時間到要馬上處理。<br>每一步都會計分，決定出菜是 PERFECT、GOOD、OKAY 還是燒焦。連續好評出菜會累積 COMBO，連續 5 道 PERFECT 會進入「JILL\'S ON FIRE」，出菜更快、小費更多。'],
- ['廚房、冰箱與食材','開店前可以在「今日菜單」幫每道菜進貨、調整售價。營業中食材不夠也沒關係：客人照樣點，Jill 會自動<b>緊急叫貨</b>（1.5 倍價，約等 5 秒），訂單上會顯示「叫貨中」。<br><b>冰箱</b>：點它看庫存；冰箱上出現「!」代表有菜快沒了，點它會立刻補貨。<br><b>水槽</b>：點它叫 Jill 去收髒盤子。<br>砧板、刀架、香料、攪拌機、香草盆栽都可以點。虛線框的是還沒買的設備。'],
- ['客人與評價','每組客人頭上的綠色條是耐心，等太久會變紅，最後生氣離開。上班族趕時間、美食家重品質、情侶愛甜點、VIP 出手大方但要求高，偶爾還有神秘美食評論家。熟客來越多次，跟 Jill 的關係越好。客人的評論決定餐廳評分，評分越高客人越多。'],
- ['突發事件（第 3 天起）','<b>奧客鬧事</b>：那桌會冒出怒氣，還會讓附近客人不耐煩。點那張桌子讓 Jill 去安撫。<br><b>設備故障</b>：設備冒煙時連點它修理，修好才能用。<br><b>食材被偷</b>：小偷抱著食材往門口跑，快點他就能搶回來，貓咪也會幫忙追。<br><b>衛生檢查</b>：檢查員會倒數 22 秒，時間內桌子要收乾淨、料理不能燒焦。通過有獎金和好評，沒過要罰錢。<br><b>饕客尖峰</b>：一次湧進好幾組 VIP，抓緊時間。'],
- ['打烊後：升級餐廳','<b>桌椅與擴建</b>：加桌子、擴建店面（評分夠高才能擴建）。<br><b>廚房設備</b>：爐子、烤箱、咖啡機、冰箱、平底鍋，升級後更快、位子更多。<br><b>菜單研發</b>：在「試做實驗室」挑 2–3 種食材，組合對了就研發出新菜，比直接買食譜便宜。每道菜也能升到 3 星，售價更高、客人更愛點。<br><b>裝潢</b>：植物、燈、畫、椅子等，店裡會真的變漂亮，客人也更有耐心。<br><b>員工</b>：廚師負責一個工作站、服務生幫忙帶位點餐、清潔員自動收桌。可以換職責、花錢訓練升級。店越大可以聘越多人。<br><b>招牌菜</b>：自己組一道 Jill 的招牌菜，放在菜單最上方。'],
- ['貓咪','店裡住著樾樾、小齁、寶寶、柔柔、包包。牠們不需要照顧，每隻都有自己的個性和生活，會自己決定要去哪裡、跟誰待在一起、做什麼事。你可以點牠們，也可以點貓家具邀牠們過去，但牠們不一定會理你。客人等太久時，比較親人的貓有時會跑去陪，客人的心情會慢慢變好（同一組客人 20 秒內有上限）。偶爾剛好看到的特別畫面，會自己留在餐廳手冊的「回憶」裡。'],
- ['暫停、打烊與存檔','右上角的按鈕可以暫停，在暫停選單裡也能看這份說明、提早打烊（等店裡客人吃完）或馬上結束今天。遊戲每天打烊和每次購買都會自動存檔在這個瀏覽器；設定裡可以手動存檔、讀檔或重新開始。'],
-];
-function showGuide(){sub='guide';show(`<div class="sheet tall"><div class="sh-top"><div class="ttl"><div class="eyebrow">Jill's Kitchen</div><h2>遊戲說明</h2></div><button class="btn sm" data-act="closeSub">關閉</button></div>
- <div class="guide">${GUIDE.map(([h,t],i)=>`<h3>${h}</h3><p>${t}</p>`).join('')}</div>
+ {ic:'🍳',h:'開店與料理',sum:'每天 17:00 開店、21:30 打烊。你是 Chef Jill，點餐廳裡的東西就能指揮她。',pts:[
+  ['帶位','有空桌客人會自己坐；客滿時在門口長椅等。想指定順序，點那組客人或點空桌。'],
+  ['點餐','桌上出現紅色「!」→ 點桌子，Jill 過去點餐。'],
+  ['做菜','點廚房檯面上亮著「+」的設備，照料理台的指示一步一步做。'],
+  ['上菜','桌上出現銀色餐蓋 → 點桌子，Jill 去出菜口端菜。'],
+  ['收錢・收桌','出現金幣點桌子收錢；客人走後點桌子收乾淨才能接下一組。'],
+  ['料理台的幾種步驟','放食材（有些要照順序）／Jill 自己來（切、炒、打發，開始後她會做完）／等一下（時間到再回來）／看準時機（指針到金色區按）／按住放開（在金色區間放開）／撒幾下（數量對了按完成）。'],
+  ['把店開得順','這個在等，就先去做那個。連續好評出菜會累積 COMBO，連續 5 道 PERFECT 進入 JILL\'S ON FIRE。'],
+  ['食材不夠','客人照樣點，Jill 會自動緊急叫貨（1.5 倍價、等一下）。冰箱上的「!」點一下就補貨。'],
+  ['突發事件（第 3 天起）','奧客鬧事點桌子安撫；設備冒煙連點修理；小偷抱著食材跑，快點他；衛生檢查倒數時桌面要乾淨、料理不能燒焦。']]},
+ {ic:'👩🏻‍🍳',h:'Jill 與員工',sum:'Jill 一個人做得完的事有限。人請對了，她才有空坐下來。',pts:[
+  ['廚師','負責一個工作站。LV1 只做簡單的菜，LV3 起也會接手 Jill 做到一半的菜。招牌菜和每道新菜的第一份，永遠由 Jill 親自做。'],
+  ['服務生','帶位、點餐；LV2 起端菜，LV3 起連結帳都包了。'],
+  ['清潔員','客人走後自動收桌。'],
+  ['Jill 的空檔','沒有急著要做的菜、沒有客人等她的時候，她會去沙發坐一下、看看書、看看店裡、摸摸靠過來的貓。工作一來她馬上起身——你點桌子，她也會立刻過去。'],
+  ['她也會打招呼','客人入座時她會抬頭點個頭；熟客來了偶爾聊兩句；有人拍貓的時候她會看一眼。']]},
+ {ic:'🐈',h:'五隻店貓',sum:'樾樾、小齁、寶寶、柔柔、包包住在店裡。不用餵、不用照顧，牠們有自己的生活。',pts:[
+  ['個性','樾樾黏 Jill、怕生；小齁愛玩也黏人；寶寶天生明星，總坐在好看的位子；柔柔有點傻，愛埋伏寶寶；包包很會睡。'],
+  ['點牠們','可以摸，但牠們不一定理你。點睡著的包包，他會睜一下眼、動動耳朵尾巴——然後繼續睡。'],
+  ['客人也看貓','客人會轉頭看貓、微笑，有人會拿手機拍一張。等太久的客人，親人的貓有時會去陪一下。'],
+  ['名字','在餐廳日誌的「店貓」可以直接改名字。']]},
+ {ic:'🪑',h:'餐廳與升級',sum:'打烊後用今天賺的錢，把小店一路擴建成招牌只剩「JILL」的餐廳。',pts:[
+  ['桌椅與擴建','加桌子、擴建店面（評分夠高才能擴建）。擴建後菜單上限、等候組數都變多。'],
+  ['廚房設備','爐台、烤箱、咖啡吧、冷盤台、冰箱、平底鍋。升級後更快、位子更多。'],
+  ['裝潢','植物、燈、畫、椅子、地毯、餐具、卡座。店裡會真的變漂亮，客人也更有耐心。'],
+  ['先留一點錢','商店上方會顯示明天的基本備料大約要多少、建議保留多少。買太多不會擋你，但會提醒你。'],
+  ['開店前','可以幫每道菜進貨、調整售價；想再買東西，開店前也能回到商店。']]},
+ {ic:'🧪',h:'料理研發',sum:'每種食材都寫著它的角色和味道。用看得到的資訊推理，不是猜密碼。',pts:[
+  ['怎麼選','先選一個主角（主體／飲品基底／甜點基底），再配配料、調味或醬汁。選好會先看到相性、整體味道、可能適合哪個工作站。'],
+  ['試做的結果','大成功＝就是這道菜；成功料理＝多了一種食材也做出來了；有潛力＝方向對了，告訴你哪些是對的、還缺哪一種，累積三次研究進度就完成；普通試作品＝會說為什麼（缺少主體、味道太重、甜鹹混在一起…）。'],
+  ['相性','一起出現在菜單上的食材、或試做證明過的組合，會標「很好」。其他依角色判斷「可以」或「不合」。'],
+  ['急的話','每道菜也可以直接買食譜；做熟了還能升到 3 星。']]},
+ {ic:'📷',h:'生活相簿',sum:'店裡的日常剛好被看到的時候，會留下一張照片。',pts:[
+  ['什麼時候會拍','貓睡成一團、Jill 坐下來、有貓跳上膝蓋、客人拍貓、柔柔埋伏成功……同一種畫面隔幾天可能再出現。'],
+  ['珍藏','每種畫面的第一張會珍藏起來，不會被換掉；其他的會慢慢換新，最多留 30 張。不用整理。'],
+  ['在哪裡看','餐廳日誌 →「相簿」。日誌的總覽也會放最近的兩張。']]},
+ {ic:'💾',h:'存檔與備份',sum:'進度都在這台裝置的瀏覽器裡。換手機前，先備份成一個檔案。',pts:[
+  ['自動存檔','每天打烊、每次購買，還有營業中每 20 秒、暫停、切到別的 App 時，都會存下當下的店內狀況。下次打開可以從那個時間點繼續。'],
+  ['手動存檔','暫停選單和設定裡都有【儲存目前進度】，上面會寫最後儲存的時間。'],
+  ['備份到檔案','設定 → 備份到檔案，會下載一個 .json。從備份檔恢復時會先檢查檔案，確認沒問題才覆蓋現在的進度。也可以複製／貼上備份文字。'],
+  ['清除瀏覽器資料','會連存檔一起清掉。備份檔留著就不怕。']]}];
+function showGuide(){sub='guide';show(`<div class="sheet tall"><div class="sh-top"><div class="ttl"><div class="eyebrow">JILL'S KITCHEN</div><h2>小小店主手冊</h2></div><button class="btn sm" data-act="closeSub">關閉</button></div>
+ <p class="muted" style="font-size:12.5px;margin:0 0 10px">點一張卡片展開。</p>
+ <div class="guide2">${GUIDE.map((g,i)=>`<details class="gcard" ${i===0?'open':''}><summary><span class="gic">${g.ic}</span><span class="gh"><b>${g.h}</b><small>${g.sum}</small></span><span class="gchev">›</span></summary><div class="gbody">${g.pts.map(([k,t])=>`<div class="gpt"><b>${k}</b><span>${t}</span></div>`).join('')}</div></details>`).join('')}</div>
  <div class="footer"><button class="btn primary big" data-act="closeSub">知道了</button></div></div>`)}
 
 /* ================= input ================= */
@@ -2089,8 +2357,14 @@ tc.addEventListener('pointerdown',e=>{if(!R||paused||phase!=='service')return;e.
 window.addEventListener('pointerup',()=>{if(R)holdEnd()});window.addEventListener('pointercancel',()=>{if(R)holdEnd()});
 tc.addEventListener('contextmenu',e=>e.preventDefault());
 $('#closePill').addEventListener('click',()=>finishClosing());$('#peekPill').addEventListener('click',()=>{$('#peekPill').hidden=true;screenEl.hidden=false});
-$('#hPause').addEventListener('click',()=>{audioInit();if(phase==='service'){paused=true;showPause()}else if(phase!=='title'){openSub('settings')}});
-document.addEventListener('visibilitychange',()=>{if(document.hidden&&phase==='service'&&!paused){paused=true;showPause()}});
+$('#hPause').addEventListener('click',()=>{audioInit();if(phase==='service'){paused=true;showPause();checkpointSave('pause')}else if(phase!=='title'){openSub('settings')}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){if(phase==='service'&&!paused){paused=true;showPause()}if(phase==='service'&&R)checkpointSave('hidden')}else{bg=null;DCACHE.clear();audioResume()}});
+/* coming back from another app or from the page cache: caches may be blank, the audio context asleep */
+window.addEventListener('pageshow',()=>{bg=null;DCACHE.clear();audioResume()});
+window.addEventListener('focus',audioResume);
+/* iOS only lets audio resume from a user gesture: the very next tap does it */
+document.addEventListener('pointerdown',()=>{if(AU.ctx)audioResume()},{capture:true,passive:true});
+document.addEventListener('touchend',()=>{if(AU.ctx)audioResume()},{capture:true,passive:true});
 
 /* ================= screens ================= */
 const SVG={
@@ -2106,13 +2380,13 @@ const SVG={
 function starsHTML(v){let h='';for(let i=1;i<=5;i++)h+=v>=i?SVG.star(1):v>=i-.5?SVG.half():SVG.star(0);return h}
 function show(html,cls){screenEl.hidden=false;screenEl.className=cls||'';screenEl.innerHTML=html;$('#taskPanel').hidden=true;renderTasks()}
 function hideScreen(){screenEl.hidden=true;screenEl.innerHTML='';sub=null}
-function topIcons(){return`<button class="icon-btn" data-act="peek" aria-label="看店裡" style="font-weight:800;font-size:11px;width:auto;padding:0 9px">看店裡</button><button class="icon-btn" data-act="guide" aria-label="遊戲說明" style="font-weight:800;font-size:15px">?</button><button class="icon-btn" data-act="book" aria-label="餐廳手冊">${SVG.book}</button><button class="icon-btn" data-act="settings" aria-label="設定">${SVG.gear}</button>`}
+function topIcons(){return`<button class="icon-btn" data-act="peek" aria-label="看店裡" style="font-weight:800;font-size:11px;width:auto;padding:0 9px">看店裡</button><button class="icon-btn" data-act="guide" aria-label="店主手冊" style="font-weight:800;font-size:15px">?</button><button class="icon-btn" data-act="book" aria-label="餐廳日誌">${SVG.book}</button><button class="icon-btn" data-act="settings" aria-label="設定">${SVG.gear}</button>`}
 
 function showTitle(){phase='title';mainScreen='title';R=null;IDLE=null;lifeReset();hud(true);renderTickets();const has=hasSave()&&(S.day>1||S.stats.days>0);
  show(`<div class="title"><div class="sub-cn">Jill 主廚的餐廳</div><h1>JILL'S KITCHEN</h1><div class="by">A Restaurant by Chef Jill</div>
-  <button class="btn primary open" data-act="open">OPEN FOR DINNER</button>
-  <div class="cont">${has?`繼續：DAY ${S.day} · ${fmt(S.money)} · ${LV().n}`:'今天，是 Jill 的餐廳開幕的日子。'}</div>
-  <div class="links"><button class="btn sm" data-act="guide">遊戲說明</button><button class="btn sm" data-act="book">餐廳手冊</button><button class="btn sm" data-act="settings">設定・存檔</button></div></div>`)}
+  ${S.checkpoint&&S.checkpoint.day===S.day?`<button class="btn primary open" data-act="open">繼續營業 · ${S.checkpoint.clock}</button><div class="cont">DAY ${S.day} · ${fmt(S.money)} · 今天營業到一半存了進度</div><button class="btn sm" style="margin-top:6px" data-act="openFresh">不繼續，從開店前重來</button>`:`<button class="btn primary open" data-act="open">OPEN FOR DINNER</button>
+  <div class="cont">${has?`繼續：DAY ${S.day} · ${fmt(S.money)} · ${LV().n}`:'今天，是 Jill 的餐廳開幕的日子。'}</div>`}
+  <div class="links"><button class="btn sm" data-act="guide">店主手冊</button><button class="btn sm" data-act="book">餐廳日誌</button><button class="btn sm" data-act="settings">設定・存檔</button></div></div>`)}
 function goMain(){if(S.phase==='shop'&&S.lastSummary)showShop();else{applyGates();planToday();showPrep()}}
 
 function showPrep(){phase='prep';mainScreen='prep';R=null;lifeReset();IDLE=makeIdle();layoutAll();hud(true);renderTickets();planToday();const T=S.today,F=feat();const W=WEATHER[T.weather],E=EVENTS[T.event];
@@ -2120,7 +2394,7 @@ function showPrep(){phase='prep';mainScreen='prep';R=null;lifeReset();IDLE=makeI
  const cap=fridgeCap(),tot=stockTotal();const menuN=S.menu.filter(d=>S.unlocked.includes(d)).length;
  const rows=unlocked.map(d=>{const D=DISH(d);const on=S.menu.includes(d);const m=S.price[d]||1;const st=S.stock[d]||0;const lv=mLv(d);
   return`<div class="menu-row ${on?'':'off'}"><img alt="" src="${dishURL(d,'P')}"><div class="nm">${D.n}<span class="stars">${'★'.repeat(starOf(d))}</span><small>${CAT_N[D.cat]} · LV${lv}</small></div><button class="tog ${on?'on':''}" data-act="toggle" data-d="${d}" aria-label="${on?'從菜單移除':'加入菜單'}"></button>
-  <div class="meta">${fmt(priceOf(d))} · 成本 ${fmt(costOf(d))} · ${D.steps.length} 步驟・${mechN(d)}</div>
+  <div class="meta">${fmt(priceOf(d))} · 成本 ${fmt(costOf(d))} · ${D.steps.length} 步驟・${mechN(d)}${stationOk(d)?'':` · <b style="color:var(--tomato)">缺少${ST_N[D.st]}，客人不會點</b>`}</div>
   ${on&&(F.prices||F.stock)?`<div class="ctl">${F.prices?`<span class="step"><label>售價</label><button data-act="price" data-d="${d}" data-v="-1" aria-label="降價">−</button><span>${fmt(priceOf(d))}${m!==1?` <small>${m>1?'+':''}${Math.round((m-1)*100)}%</small>`:''}</span><button data-act="price" data-d="${d}" data-v="1" aria-label="漲價">＋</button></span>`:''}${F.stock?`<span class="step"><label>庫存</label><button data-act="stock" data-d="${d}" data-v="-2" aria-label="退貨">−</button><span>${st} 份</span><button data-act="stock" data-d="${d}" data-v="2" aria-label="進貨">＋</button></span>`:''}${m>1.15?'<span class="warnpill">客人會覺得貴</span>':''}${F.stock&&st===0?'<span class="warnpill">沒有備料</span>':''}</div>`:''}</div>`}).join('');
  const sig=S.signature?`<div class="sig"><img alt="" src="${dishURL('signature','P')}"><div><div class="st">★ CHEF JILL'S SIGNATURE ★</div><b>${S.signature.name}</b><small>${fmt(priceOf('signature'))} · 庫存 ${S.stock.signature||0} 份 · 永遠在菜單最上方</small>${F.stock?`<div style="margin-top:6px" class="step"><button data-act="stock" data-d="signature" data-v="-2" style="color:var(--cream)">−</button><span style="color:var(--cream)">${S.stock.signature||0} 份</span><button data-act="stock" data-d="signature" data-v="2" style="color:var(--cream)">＋</button></div>`:''}</div></div>`:'';
  show(`<div class="sheet tall"><div class="sh-top"><div class="ttl"><div class="eyebrow">DAY ${S.day} · 開店前</div><h2>${LV().n}</h2></div>${topIcons()}</div>
@@ -2132,6 +2406,7 @@ function showPrep(){phase='prep';mainScreen='prep';R=null;lifeReset();IDLE=makeI
   <h3>今日菜單 <small>${menuN}/${menuCap()} 道${S.signature?' ＋ 招牌菜':''}</small></h3>
   ${sig}<div class="card">${rows||'<p class="muted">還沒有料理</p>'}</div>
   ${F.stock?`<div class="cap"><span>冰箱</span><div class="capbar"><i style="width:${tot/cap*100}%"></i></div><span>${tot}/${cap}</span></div><button class="btn sm" data-act="restock" ${restockCost>0?'':'disabled'} style="width:100%">一鍵補到建議量 ${restockCost>0?fmt(restockCost):'（已足夠）'}</button>`:`<p class="muted" style="font-size:12.5px;margin:8px 2px 0">前兩天會自動備料。第 3 天開始可以自己進貨、調整售價。</p>`}
+  ${S.day>=2?`<button class="btn sm" data-act="backShop" style="width:100%;margin-top:10px">‹ 返回升級餐廳</button>`:''}
   <div class="footer"><div id="startWarn"></div><button class="btn primary big" data-act="start">開始營業</button></div></div>`)}
 
 function showSummary(){phase='summary';mainScreen='summary';const s=S.lastSummary;if(!s){showShop();return}
@@ -2146,18 +2421,20 @@ function showSummary(){phase='summary';mainScreen='summary';const s=S.lastSummar
 function nextDayNote(D){return{2:'解鎖 <b>拿鐵咖啡</b>',3:'第二口 <b>爐子</b> 到貨，還有 <b>番茄義大利麵</b>',4:'冷盤台與 <b>田園沙拉</b>，以及第一次 <b>Rush Hour</b>',5:'晚上可以開始 <b>裝潢與擴建</b> 了',6:'可以聘請 <b>員工</b>，評論家也可能出現',8:'可以研發 <b>Jill 的招牌菜</b>'}[D]||''}
 
 let shopTab='kitchen';
-function shopTabs(){const D=S.day;return[{k:'tables',n:'桌椅與擴建',on:true},{k:'kitchen',n:'廚房設備',on:D>=2},{k:'menu',n:'菜單研發',on:D>=2},{k:'decor',n:'裝潢',on:D>=4},{k:'staff',n:'員工',on:D>=4},{k:'sig',n:'招牌菜',on:D>=7}]}
-function showShop(){phase='shop';mainScreen='shop';R=null;IDLE=makeIdle();layoutAll();hud(true);renderTickets();const tabs=shopTabs();if(!tabs.find(t=>t.k===shopTab&&t.on))shopTab='tables';
+/* the shop belongs to the evening: opened again from the next morning's preparation, it still counts as that evening */
+function shopDay(){return S.phase==='prep'&&phase==='shop'?S.day-1:S.day}
+function shopTabs(){const D=shopDay();return[{k:'tables',n:'桌椅與擴建',on:true},{k:'kitchen',n:'廚房設備',on:D>=2},{k:'menu',n:'菜單研發',on:D>=2},{k:'decor',n:'裝潢',on:D>=4},{k:'staff',n:'員工',on:D>=4},{k:'sig',n:'招牌菜',on:D>=7}]}
+function showShop(){phase='shop';mainScreen='shop';R=null;rdAutoUnlock();IDLE=makeIdle();layoutAll();hud(true);renderTickets();const tabs=shopTabs();if(!tabs.find(t=>t.k===shopTab&&t.on))shopTab='tables';
  let body='';const money=S.money;const btn=(cost,act,extra,label)=>`<button class="btn sm ${money>=cost?'primary':''}" data-act="${act}" ${extra||''} ${money>=cost?'':'disabled'}>${label||'購買'} ${fmt(cost)}</button>`;
  if(shopTab==='tables'){const cap=tableCap();const next=S.tables<cap?TABLE_COST[S.tables]:null;
   body+=`<div class="item"><img alt="" src="${iconURL('table')}"><div class="nm">餐桌 <span class="muted" style="font-weight:600;font-size:12px">${S.tables} / ${cap} 張</span></div><div class="d">多一張桌子，同時就能多接待一組客人。${S.decor.sofa?`其中 ${S.decor.sofa*2} 張是四人卡座。`:''}</div><div class="act">${next!=null?btn(next,'buyTable','','加一張桌子'):`<span class="lock">這個規模最多 ${cap} 張，擴建後可以再加</span>`}</div></div>`;
-  const nl=LEVELS[S.level];if(nl){const ok=rating()>=nl.rating;body+=`<div class="item"><img alt="" src="${iconURL('expand',S.level+1)}"><div class="nm">擴建：${nl.n}</div><div class="d">桌位上限 ${nl.tables} 張、菜單上限 ${nl.menu} 道、門口最多等候 ${nl.q} 組。牆面、地板與招牌全部換新，也會吸引更講究的客人。</div><div class="act">${S.day<4&&S.level===1?'<span class="lock">第 4 天打烊後開放擴建</span>':ok?btn(nl.cost,'expand','','擴建'):`<span class="lock">需要餐廳評分 ${nl.rating.toFixed(1)}（目前 ${rating().toFixed(1)}）</span>`}</div></div>`}
+  const nl=LEVELS[S.level];if(nl){const ok=rating()>=nl.rating;body+=`<div class="item"><img alt="" src="${iconURL('expand',S.level+1)}"><div class="nm">擴建：${nl.n}</div><div class="d">桌位上限 ${nl.tables} 張、菜單上限 ${nl.menu} 道、門口最多等候 ${nl.q} 組。牆面、地板與招牌全部換新，也會吸引更講究的客人。</div><div class="act">${shopDay()<4&&S.level===1?'<span class="lock">第 4 天打烊後開放擴建</span>':ok?btn(nl.cost,'expand','','擴建'):`<span class="lock">需要餐廳評分 ${nl.rating.toFixed(1)}（目前 ${rating().toFixed(1)}）</span>`}</div></div>`}
   else body+=`<div class="item"><img alt="" src="${iconURL('expand',5)}"><div class="nm">JILL</div><div class="d">門口的招牌上，只剩下一個名字。這就是 Jill 的餐廳。</div></div>`}
- if(shopTab==='kitchen'){for(const E of EQUIP){const lv=S.eq[E.k]||0;const max=5;const cost=lv<max?E.cost[lv]:null;const locked=E.k==='oven'&&lv===0&&S.day<3;
+ if(shopTab==='kitchen'){for(const E of EQUIP){const lv=S.eq[E.k]||0;const max=5;const cost=lv<max?E.cost[lv]:null;const locked=E.k==='oven'&&lv===0&&shopDay()<3;
   body+=`<div class="item"><img alt="" src="${iconURL(E.k==='bar'?'bar':E.k,lv)}"><div class="nm">${E.n} ${lv?`LV${lv}`:'（未購買）'} <span class="pips">${[1,2,3,4,5].map(i=>`<i class="${i<=lv?'on':''}"></i>`).join('')}</span></div><div class="d">${E.d(Math.max(lv,E.k==='oven'&&!lv?0:1))}${lv<max&&lv?`<br><b>下一級：</b>${E.d(lv+1)}`:''}</div><div class="act">${locked?'<span class="lock">第 3 天後開放</span>':cost!=null?btn(cost,'buyEq',`data-k="${E.k}"`,lv?'升級':'購買'):'<span class="muted">已達最高等級</span>'}</div></div>`}}
- if(shopTab==='menu'){const pan=pantry();body+=`<div class="lab"><div class="nm" style="font-weight:800;font-size:15px">試做實驗室</div><p class="d" style="margin:2px 0 8px;font-size:12.5px;color:var(--ink2)">選 2–3 種食材試做，組合對了就能研發出新料理（比直接買食譜便宜很多）。每次試做 $150。</p><div class="opts">${pan.map(i=>`<button class="${labSel.includes(i)?'on':''}" data-act="labPick" data-k="${i}"><img alt="" src="${ingURL(i)}">${ING[i].n}</button>`).join('')}</div><div class="act" style="margin-top:8px">${btn(150,'labTry',labSel.length>=2?'':'disabled','試做')}<span class="muted" style="font-size:12px">已選：${labSel.length?labSel.map(i=>ING[i].n).join('＋'):'（還沒選）'}</span></div></div></div><div class="card" style="margin-top:10px"><div class="nm" style="font-weight:800;font-size:15px;margin-bottom:4px">食譜升級</div><p class="d" style="margin:0 0 4px;font-size:12.5px;color:var(--ink2)">每升一顆星：售價 +15%、客人更想點、滿意度更高。最高 3 星。</p>`+S.unlocked.concat(S.signature?['signature']:[]).map(d=>{const st=starOf(d);return`<div class="item"><img alt="" src="${dishURL(d,'P')}"><div class="nm">${DISH(d).n}<span class="stars">${'★'.repeat(st)}${'<span style="color:#E3D6C0">★</span>'.repeat(3-st)}</span></div><div class="d">目前售價 ${fmt(priceOf(d))}</div><div class="act">${st<3?btn(starUpCost(d),'starUp',`data-d="${d}"`,'升級'):'<span class="muted">已滿星</span>'}</div></div>`}).join('')+`</div><div class="card" style="margin-top:10px"><div class="nm" style="font-weight:800;font-size:15px;margin-bottom:4px">還沒研發的料理</div>`;
+ if(shopTab==='menu'){const pan=pantry();body+=`<div class="lab"><div class="nm" style="font-weight:800;font-size:15px">料理研發</div><p class="d" style="margin:2px 0 8px;font-size:12.5px;color:var(--ink2)">每種食材都標著它的角色和味道。選 2–3 種試做（每次 $150）：組合對了就是新料理；方向對了會累積研究進度，三次就能完成；不對也會告訴你為什麼。</p>${labResultHTML()}${DIR_GROUPS.map(([dk,title])=>{const items=pan.filter(i=>labProfile(i).d===dk);if(!items.length)return'';return`${title?`<div class="labgrp">${title}</div>`:''}<div class="opts">${items.map(i=>`<button class="${labSel.includes(i)?'on':''}" data-act="labPick" data-k="${i}"><img alt="" src="${ingURL(i)}">${ING[i].n}<small>${'$'.repeat(labProfile(i).c)}</small></button>`).join('')}</div>`}).join('')}${labPreviewHTML()}<div class="act" style="margin-top:8px">${btn(150,'labTry',labSel.length>=2?'':'disabled','試做')}<span class="muted" style="font-size:12px">${labSel.length?`已選 ${labSel.length}/3`:'還沒選'}</span></div></div></div><div class="card" style="margin-top:10px"><div class="nm" style="font-weight:800;font-size:15px;margin-bottom:4px">食譜升級</div><p class="d" style="margin:0 0 4px;font-size:12.5px;color:var(--ink2)">每升一顆星：售價 +15%、客人更想點、滿意度更高。最高 3 星。</p>`+S.unlocked.concat(S.signature?['signature']:[]).map(d=>{const st=starOf(d);return`<div class="item"><img alt="" src="${dishURL(d,'P')}"><div class="nm">${DISH(d).n}<span class="stars">${'★'.repeat(st)}${'<span style="color:#E3D6C0">★</span>'.repeat(3-st)}</span></div><div class="d">目前售價 ${fmt(priceOf(d))}</div><div class="act">${st<3?btn(starUpCost(d),'starUp',`data-d="${d}"`,'升級'):'<span class="muted">已滿星</span>'}</div></div>`}).join('')+`</div><div class="card" style="margin-top:10px"><div class="nm" style="font-weight:800;font-size:15px;margin-bottom:4px">還沒研發的料理</div>`;
   const list=Object.keys(DISHES).filter(d=>DISHES[d].rd>0&&!S.unlocked.includes(d)).sort((a,b)=>DISHES[a].lv-DISHES[b].lv||DISHES[a].rd-DISHES[b].rd);
-  body+=list.length?list.map(d=>{const D=DISHES[d];const lvOk=S.level>=D.lv;const ovenOk=D.st!=='oven'||S.eq.oven>0;return`<div class="item"><img alt="" src="${dishURL(d,'P')}"><div class="nm">${D.n} <span class="muted" style="font-size:11.5px;font-weight:600">${CAT_N[D.cat]}</span></div><div class="d">售價 ${fmt(D.price)} · 成本 ${fmt(D.cost)} · ${ST_N[D.st]} · 難度 ${'●'.repeat(D.diff)}<br>試做提示：${dishKeys(d).length} 種食材，其中一種是「${ING[dishKeys(d)[0]].n}」</div><div class="act">${!lvOk?`<span class="lock">需要擴建到 ${LEVELS[D.lv-1].n}</span>`:!ovenOk?'<span class="lock">需要先購買烤箱</span>':btn(D.rd,'rd',`data-d="${d}"`,'直接買食譜')}</div></div>`}).join(''):'<p class="muted">所有料理都研發完成了。</p>';
+  body+=list.length?list.map(d=>{const D=DISHES[d];const lvOk=S.level>=D.lv;const ovenOk=stationOk(d);return`<div class="item"><img alt="" src="${dishURL(d,'P')}"><div class="nm">${D.n} <span class="muted" style="font-size:11.5px;font-weight:600">${CAT_N[D.cat]}</span></div><div class="d">售價 ${fmt(D.price)} · 成本 ${fmt(D.cost)} · ${ST_N[D.st]} · 難度 ${'●'.repeat(D.diff)}<br>${(()=>{const pr=(S.rdProg||{})[d]||0;const K=dishKeys(d);const lead=K.find(i=>['base','drink','sweet'].includes(labProfile(i).d))||K[0];return`研究進度 <span class="dots">${'●'.repeat(pr)}${'○'.repeat(Math.max(0,3-pr))}</span> · ${K.length} 種食材，主角是「${ING[lead].n}」${pr>=2?`，另外要配${K.filter(i=>i!==lead).map(i=>DIR_N[labProfile(i).d]).join('和')}`:''}`})()}</div><div class="act">${!lvOk?`<span class="lock">需要擴建到 ${LEVELS[D.lv-1].n}</span>`:!ovenOk?`<span class="lock">需要先購買${ST_N[D.st]}</span>`:btn(D.rd,'rd',`data-d="${d}"`,'直接買食譜')}</div></div>`}).join(''):'<p class="muted">所有料理都研發完成了。</p>';
   body+=`<p class="muted" style="font-size:12px;margin-top:10px">研發後的料理可以在開店前加入菜單。菜單上限：${menuCap()} 道。</p>`}
  if(shopTab==='decor'){body+=DECOR.map(Dc=>{const t=S.decor[Dc.k]||0;const max=Dc.tiers.length;const cost=t<max?Dc.tiers[t]:null;const lvOk=S.level>=Dc.lv;return`<div class="item"><img alt="" src="${iconURL(Dc.k==='bar'?'barc':Dc.k,t)}"><div class="nm">${Dc.n} ${max>1?`<span class="pips">${Dc.tiers.map((_,i)=>`<i class="${i<t?'on':''}"></i>`).join('')}</span>`:t?'<span class="tier t1">已擁有</span>':''}</div><div class="d">${Dc.d} 氛圍 +${Dc.amb}</div><div class="act">${cost==null?'<span class="muted">已擁有全部</span>':!lvOk?`<span class="lock">需要擴建到 ${LEVELS[Dc.lv-1].n}</span>`:Dc.k==='sofa'&&S.tables<(t+1)*2?`<span class="lock">需要至少 ${(t+1)*2} 張桌子</span>`:btn(cost,'buyDecor',`data-k="${Dc.k}"`)}</div></div>`}).join('');body+=`<p class="muted" style="font-size:12px;margin-top:10px">目前氛圍 ${ambience()}：客人耐心與滿意度都會提升。買完上方就能看到店裡變化。</p>`}
  if(shopTab==='staff'){const crew=S.crew||[];const cap=crewCap();
@@ -2166,11 +2443,12 @@ function showShop(){phase='shop';mainScreen='shop';R=null;IDLE=makeIdle();layout
   body+=`<div class="nm" style="font-weight:800;font-size:15px;margin:14px 0 2px">招募</div>`+Object.keys(ROLES).map(r=>{const R0=ROLES[r];return`<div class="item"><img alt="" src="${iconURL(r)}"><div class="nm">${R0.n}</div><div class="d">${R0.d} 日薪 ${fmt(R0.wage)} 起。</div><div class="act">${crew.length>=cap?'<span class="lock">人數已滿，擴建後可再聘</span>':btn(R0.hire,'hire',`data-k="${r}"`,'聘請')}</div></div>`}).join('')}
  if(shopTab==='sig'){if(S.signature)body+=`<div class="sig"><img alt="" src="${dishURL('signature','P')}"><div><div class="st">★ CHEF JILL'S SIGNATURE ★</div><b>${S.signature.name}</b><small>${fmt(priceOf('signature'))} · ${Object.keys(SIG).map(k=>SIG[k][S.signature[k]].n).join('・')}</small></div></div><p class="muted" style="font-size:12.5px">招牌菜永遠在菜單最上方，有些客人會專程為它而來。可以花 $800 重新調整配方。</p>${btn(800,'sigOpen','','重新設計')}`;
   else body+=`<div class="item"><img alt="" src="${dishURL('signature','P')}"><div class="nm">Jill's Signature Dish</div><div class="d">從主食、蛋白質、醬汁、配菜組出一道只屬於 Jill 的料理。會出現在菜單最上方，客人也會專程為它而來（客流 +10%）。</div><div class="act">${S.level<2?'<span class="lock">需要擴建到 Jill\'s Bistro</span>':btn(3000,'sigOpen','','開始研發')}</div></div>`}
- show(`<div class="sheet tall"><div class="sh-top"><div class="ttl"><div class="eyebrow">DAY ${S.day} · 打烊後</div><h2>升級 Jill 的餐廳</h2></div>${topIcons()}</div>
-  <div class="row" style="margin-bottom:10px"><span class="muted" style="font-weight:700">可用資金</span><span class="moneytag">${fmt(S.money)}</span><span style="margin-left:auto" class="muted">評分 ${rating().toFixed(1)}</span></div>
+ show(`<div class="sheet tall"><div class="sh-top"><div class="ttl"><div class="eyebrow">${S.phase==='prep'?`DAY ${S.day} · 開店前`:`DAY ${S.day} · 打烊後`}</div><h2>升級 Jill 的餐廳</h2></div>${topIcons()}</div>
+  <div class="row" style="margin-bottom:6px"><span class="muted" style="font-weight:700">目前現金</span><span class="moneytag">${fmt(S.money)}</span><span style="margin-left:auto" class="muted">評分 ${rating().toFixed(1)}</span></div>
+  ${(()=>{const est=restockEstimate(),keep=keepAside();const low=S.money<keep;const when=S.phase==='prep'?'今天':'明日';return`<div class="budget ${low?'low':''}"><span>${when}預估基本備料 約 ${fmt(est)}</span><span>建議保留 約 ${fmt(keep)}</span>${low?`<span class="w">⚠ 現在的現金可能不夠完成建議備料，${when}可以少備一點或臨時叫貨</span>`:''}</div>`})()}
   <div class="tabs">${tabs.map(t=>`<button class="${t.k===shopTab?'on':''}" data-act="tab" data-k="${t.k}" ${t.on?'':'disabled'}>${t.n}</button>`).join('')}</div>
   <div class="card">${body}</div>
-  <div class="footer"><button class="btn primary big" data-act="nextDay">準備 DAY ${S.day+1}</button></div></div>`)}
+  <div class="footer">${S.phase==='prep'?`<button class="btn primary big" data-act="toPrep">回到開店準備 ›</button>`:`<button class="btn primary big" data-act="nextDay">準備 DAY ${S.day+1}</button>`}</div></div>`)}
 
 let sigDraft=null;
 function showSig(){sub='sig';const d=sigDraft;const old=S.signature;S.signature=d;const url=dishCanvas('signature','P',220,S.decor.ware>0);S.signature=old;const price=320+Object.keys(SIG).reduce((a,k)=>a+SIG[k][d[k]].p,0);
@@ -2183,75 +2461,103 @@ function showSig(){sub='sig';const d=sigDraft;const old=S.signature;S.signature=
 function sigAutoName(d){return`Jill's ${SIG.sauce[d.sauce].n}${SIG.protein[d.protein].n}`}
 
 let bookTab='reviews';
+function notesFor(id,n){return(S.notes||[]).filter(x=>x.reg===id).slice(0,n||2)}
+function albumFigure(p,i){return`<figure class="polaroid ${p.keep?'keep':''}" style="--r:${((i%3)-1)*1.5}deg"><img alt="" src="${p.img}"><figcaption><span class="when">DAY ${p.day}${p.clock?' · '+p.clock:''}</span><b>「${p.cap}」</b>${p.txt?`<span class="txt">${p.txt}</span>`:''}</figcaption>${p.keep?'<span class="pin">珍藏</span>':''}</figure>`}
 function showBook(){sub='book';let body='';
+ if(bookTab==='front'){const rv=S.reviews.slice(-2).reverse();const notes=(S.notes||[]).slice(0,3);const A=albumList().slice(-2).reverse();const met=REGS.filter(r=>(S.regulars[r.id]||0)>0).length;const nAch=Object.keys(S.achievements).length;
+  body=`<div class="jhead"><div class="bigrate"><b>${rating().toFixed(1)}</b><div><div class="sum-stars">${starsHTML(Math.round(rating()*2)/2)}</div><div class="muted" style="font-size:12px">${S.reviews.length} 則評價 · 開業 ${S.stats.days||0} 天 · ${S.stats.guests||0} 位客人</div></div></div></div>
+   <div class="jsec"><div class="jt">最近的評價 <button class="jmore" data-act="btab" data-k="reviews">全部 ›</button></div>${rv.length?rv.map(r=>`<div class="review"><div class="rs">${starsHTML(r.s)}</div><p>「${r.txt}」</p><small>${r.name||''}${r.day?` · DAY ${r.day}`:''}</small></div>`).join(''):'<p class="muted">還沒有評價。</p>'}</div>
+   <div class="jsec"><div class="jt">熟客留言 <button class="jmore" data-act="btab" data-k="regulars">熟客 ›</button></div>${notes.length?notes.map(n=>`<div class="note"><b>${REG_BY[n.reg]?REG_BY[n.reg].n:n.reg}</b><span>「${n.txt}」</span><small>DAY ${n.day}</small></div>`).join(''):`<p class="muted">${met?'熟客們還沒留下什麼話。':'來店 5 次的客人會成為熟客，偶爾留下幾句話。'}</p>`}</div>
+   <div class="jsec"><div class="jt">生活相簿 <button class="jmore" data-act="btab" data-k="mem">相簿 ›</button></div>${A.length?`<div class="album">${A.map(albumFigure).join('')}</div>`:'<p class="muted">店裡的日常會慢慢留下照片。</p>'}</div>
+   <div class="jsec"><div class="jt">五隻店貓 <button class="jmore" data-act="btab" data-k="cats">店貓 ›</button></div><div class="catrow">${CAT_DEF.map(C=>`<div><img alt="" src="${catPortraitURL(C)}"><span>${catName(C)}</span></div>`).join('')}</div></div>
+   <div class="jsec"><div class="jt">成就 ${nAch} / ${ACH.length} <button class="jmore" data-act="btab" data-k="ach">全部 ›</button></div><div class="achrow">${ACH.filter(a=>S.achievements[a.id]).slice(-4).map(a=>`<span><img alt="" src="${iconURL(a.ic)}">${a.n}</span>`).join('')||'<span class="muted">還沒有成就。</span>'}</div></div>`}
  if(bookTab==='reviews'){const rv=S.reviews.slice().reverse();body=`<div class="bigrate"><b>${rating().toFixed(1)}</b><div><div class="sum-stars">${starsHTML(Math.round(rating()*2)/2)}</div><div class="muted" style="font-size:12px">${S.reviews.length} 則評論 · 最近 40 則計入評分</div></div></div><div class="card" style="margin-top:12px">${rv.length?rv.slice(0,30).map(r=>`<div class="review"><div class="rs">${starsHTML(r.s)}</div><p>「${r.txt}」</p><small>${r.critic?'神秘美食評論家':r.name} · DAY ${r.day}</small></div>`).join(''):'<p class="muted">還沒有評論。開店吧！</p>'}</div>`}
- if(bookTab==='regulars'){body=`<p class="muted" style="font-size:12.5px;margin:0 0 8px">來店 5 次成為熟客，20 次成為 Jill 的老客人。回頭客累計：${S.returning} / 100</p><div class="card">`+REGS.map(r=>{const v=S.regulars[r.id]||0;const tier=v>=20?2:v>=5?1:0;const met=v>0;return`<div class="reg ${met?'':'unknown'}"><img alt="" src="${portraitURL(r.looks,'reg'+r.id)}"><div><b>${met?r.n:'？？？'}</b> ${met?`<span class="tier t${tier}">${['陌生人','熟客','Jill 的老客人'][tier]}</span>`:''}</div><p>${met?`${r.who}<br>來店 ${v} 次・「${r.l[tier]}」`:`第 ${r.day} 天後可能會出現。`}</p></div>`}).join('')
+ if(bookTab==='regulars'){body=`<p class="muted" style="font-size:12.5px;margin:0 0 8px">來店 5 次成為熟客，20 次成為 Jill 的老客人。回頭客累計：${S.returning} / 100</p><div class="card">`+REGS.map(r=>{const v=S.regulars[r.id]||0;const tier=v>=20?2:v>=5?1:0;const met=v>0;const nt=met?notesFor(r.id,2):[];return`<div class="reg ${met?'':'unknown'}"><img alt="" src="${portraitURL(r.looks,'reg'+r.id)}"><div><b>${met?r.n:'？？？'}</b> ${met?`<span class="tier t${tier}">${['陌生人','熟客','Jill 的老客人'][tier]}</span>`:''}</div><p>${met?`${r.who}<br>來店 ${v} 次・「${r.l[tier]}」`:`第 ${r.day} 天後可能會出現。`}</p>${nt.length?`<div class="notes">${nt.map(n=>`<div class="note"><span>「${n.txt}」</span><small>DAY ${n.day}</small></div>`).join('')}</div>`:''}</div>`}).join('')
   +(()=>{const v=S.regulars.dylan||0;if(!v)return'';const rv=S.dylan.stage>=3;const tier=v>=20?2:v>=5?1:0;return`<div class="reg"><img alt="" src="${portraitURL(DYLAN.looks,'regdylan')}"><div><b>Dylan</b> <span class="tier ${rv?'t2':'t'+tier}">${rv?'Jill 的先生':['陌生人','熟客','Jill 的老客人'][tier]}</span></div><p>${rv?DYLAN.who2:DYLAN.who}<br>來店 ${v} 次${rv?`・DAY ${S.dylan.reveal}`:''}</p></div>`})()+'</div>'}
  if(bookTab==='cats'){body=`<p class="muted" style="font-size:12.5px;margin:0 0 8px">住在店裡的五隻貓。名字可以直接改。</p><div class="card">`+CAT_DEF.map(C=>`<div class="reg"><img alt="" src="${catPortraitURL(C)}"><div><input class="txt" data-cat="${C.id}" maxlength="8" value="${catName(C).replace(/"/g,'&quot;')}" aria-label="貓咪名字" style="padding:6px 10px;width:auto;max-width:130px"> <span class="tier">${C.sex}</span></div><p>${C.who}</p></div>`).join('')+'</div>'}
- if(bookTab==='mem'){const ms=Object.keys(MEMS).filter(k=>S.mem&&S.mem[k]);body=`<p class="muted" style="font-size:12.5px;margin:0 0 10px">有些畫面，只有剛好看到才會留下來。</p>`+(ms.length?`<div class="memgrid">${ms.map(k=>`<figure><img alt="" src="${S.mem[k].img}"><figcaption><b>${MEMS[k]}</b><small>DAY ${S.mem[k].day}</small></figcaption></figure>`).join('')}</div>`:'<div class="card"><p class="muted" style="margin:0">還沒有留下任何畫面。</p></div>')}
+ if(bookTab==='mem'){const A=albumList().slice().reverse();body=`<p class="muted" style="font-size:12.5px;margin:0 0 10px">店裡的日常，剛好被看到的時候會留下一張。第一次的畫面會珍藏起來，其他的會慢慢換新。</p>`+(A.length?`<div class="album">${A.map(albumFigure).join('')}</div>`:'<div class="card"><p class="muted" style="margin:0">還沒有留下任何畫面。</p></div>')}
  if(bookTab==='ach'){const n=Object.keys(S.achievements).length;body=`<p class="muted" style="font-size:12.5px;margin:0 0 8px">${n} / ${ACH.length} 已解鎖</p><div class="card">`+ACH.map(a=>{const got=S.achievements[a.id];return`<div class="ach ${got?'':'off'}"><img alt="" src="${iconURL(a.ic)}"><b>${a.n}</b><small>${a.d}${got?` · DAY ${got}`:''}</small></div>`}).join('')+'</div>'}
  if(bookTab==='mastery'){body=`<p class="muted" style="font-size:12.5px;margin:0 0 8px">Jill 越常做一道菜，就做得越快，Perfect 判定也越寬。</p><div class="card">`+S.unlocked.concat(S.signature?['signature']:[]).map(d=>{const x=S.xp[d]||0,lv=mLv(d);const cur=XP_T[lv-1],nx=XP_T[lv]||cur;const pct=lv>=5?100:(x-cur)/(nx-cur)*100;return`<div class="mast"><img alt="" src="${dishURL(d,'P')}"><b style="font-size:13.5px">${DISH(d).n}</b><span class="tier ${lv>=5?'t2':lv>=3?'t1':''}">LV${lv}</span><div class="bar" style="grid-column:2"><i style="width:${pct}%"></i></div><small class="muted">${DISH(d).steps.length} 步驟</small></div>`}).join('')+'</div>'}
- show(`<div class="sheet tall"><div class="sh-top"><div class="ttl"><div class="eyebrow">Jill's Kitchen</div><h2>餐廳手冊</h2></div><button class="btn sm" data-act="closeSub">關閉</button></div>
-  <div class="tabs">${[['reviews','評價'],['regulars','熟客'],['cats','貓咪'],['mem','生活照'],['ach','成就'],['mastery','熟練度']].map(([k,n])=>`<button class="${bookTab===k?'on':''}" data-act="btab" data-k="${k}">${n}</button>`).join('')}</div>${body}</div>`)}
+ show(`<div class="sheet tall"><div class="sh-top"><div class="ttl"><div class="eyebrow">JILL'S KITCHEN JOURNAL</div><h2>餐廳日誌</h2></div><button class="btn sm" data-act="closeSub">關閉</button></div>
+  <div class="tabs">${[['front','總覽'],['reviews','評價'],['regulars','熟客'],['mem','相簿'],['cats','店貓'],['ach','成就'],['mastery','熟練度']].map(([k,n])=>`<button class="${bookTab===k?'on':''}" data-act="btab" data-k="${k}">${n}</button>`).join('')}</div>${body}</div>`)}
 let resetStep=0;
-function savedAtStr(){if(!S.savedAt)return '';const d=new Date(S.savedAt),p=n=>String(n).padStart(2,'0');return `${d.getMonth()+1}/${d.getDate()} ${p(d.getHours())}:${p(d.getMinutes())}`}
-function showSettings(){sub='settings';const at=savedAtStr();const pi=pendingImport;show(`<div class="modal"><h2>設定・存檔</h2>
+let pasteBox=false;
+function importConfirmHTML(){const pi=pendingImport;if(!pi)return '';const when=pi.savedAt?(()=>{const d=new Date(pi.savedAt),p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${p(d.getHours())}:${p(d.getMinutes())}`})():'';
+ return `<div class="inline-warn" style="margin-top:10px">讀取這個備份？<b>DAY ${pi.day} · ${fmt(pi.money)}</b>${when?`（${when} 存的）`:''}${pi.checkpoint&&pi.checkpoint.day===pi.day?`<br>裡面有營業到一半（${pi.checkpoint.clock}）的進度`:''}<br>目前的進度會被這個備份取代。</div><div class="row"><button class="btn" style="flex:1" data-act="importNo">取消</button><button class="btn primary" style="flex:1" data-act="importYes">讀取這個存檔</button></div>`}
+function pasteBoxHTML(){if(!pasteBox)return '';return `<div class="card" style="margin-top:10px"><p class="small" style="margin-top:0">把之前「複製備份文字」貼在這裡，再按恢復。</p><textarea id="pasteArea" class="txt" rows="4" style="width:100%;font-size:11px;font-weight:500;resize:vertical" placeholder="{&quot;app&quot;:&quot;jills-kitchen&quot;…}"></textarea><div class="row" style="margin-top:8px"><button class="btn" style="flex:1" data-act="pasteCancel">取消</button><button class="btn primary" style="flex:1" data-act="pasteGo">從貼上的文字恢復</button></div></div>`}
+function showSettings(){sub='settings';show(`<div class="modal"><h2>設定・存檔</h2>
  <div class="card"><div class="setrow"><span>背景音樂</span><button class="tog ${S.music?'on':''}" data-act="music" aria-label="背景音樂"></button></div><div class="setrow"><span>音效</span><button class="tog ${S.sfx?'on':''}" data-act="sfx" aria-label="音效"></button></div></div>
- <div class="card" style="margin-top:12px"><div class="setrow"><span><b>本機存檔</b> · 已自動儲存${at?`<span class="muted">（上次存檔 ${at}）</span>`:''}</span></div>
- <p class="small">遊戲進度會自動儲存在目前使用的瀏覽器中。清除網站資料、換瀏覽器或換裝置時，進度不會自動帶過去。每天打烊、購買升級後都會自動存檔；營業中重新整理的話，會回到當天開店前。</p>
- <p class="small">想換裝置或以防萬一，用「備份存檔」把進度存成一個檔案，之後用「讀取存檔」讀回來。</p></div>
- ${pi?`<div class="inline-warn">讀取這個備份？<b>DAY ${pi.day} · ${fmt(pi.money)}</b>${pi.savedAt?`（${(()=>{const d=new Date(pi.savedAt),p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${p(d.getHours())}:${p(d.getMinutes())}`})()} 存的）`:''}<br>目前的進度會被這個備份取代。</div><div class="row"><button class="btn" style="flex:1" data-act="importNo">取消</button><button class="btn primary" style="flex:1" data-act="importYes">讀取這個存檔</button></div>`:''}
- <div class="stack" style="margin-top:14px"><div class="row"><button class="btn" style="flex:1" data-act="save">存檔</button><button class="btn" style="flex:1" data-act="load">回到上次存檔</button></div>
- <div class="row"><button class="btn" style="flex:1" data-act="export">備份存檔</button><button class="btn" style="flex:1" data-act="import">讀取存檔</button></div>
+ ${saveCardHTML()}
+ <p class="small" style="margin:8px 2px 0">進度存在目前使用的瀏覽器裡：清除網站資料、換瀏覽器或換裝置時不會自動帶過去，要靠上面的備份。</p>
+ ${importConfirmHTML()}${pasteBoxHTML()}
+ <div class="stack" style="margin-top:14px">${phase!=='service'?'<button class="btn" data-act="load">回到上次存檔</button>':''}
  ${resetStep===0?'<button class="btn danger" data-act="reset1">重置遊戲</button>':`<div class="inline-warn">確定要重置嗎？Day、金錢、升級、熟客、成就都會消失，無法復原。</div><div class="row"><button class="btn" style="flex:1" data-act="resetNo">取消</button><button class="btn danger" style="flex:1" data-act="reset2">我確定，重置</button></div>`}
  <button class="btn dark" data-act="closeSub">關閉</button></div></div>`,'dim')}
+function saveCardHTML(){const cp=S.checkpoint&&S.checkpoint.day===S.day?S.checkpoint:null;return `<div class="card" style="margin-top:12px"><div class="setrow"><span>✓ 本機自動儲存</span><span class="muted" style="font-weight:600;font-size:12px">${S.savedLabel?`最後儲存：${S.savedLabel}`:'尚未存檔'}</span></div>
+ ${phase==='service'&&R&&R.closing==null?`<p class="small">營業中每 20 秒、暫停時、切到別的 App 時都會存下目前的店內狀況（客人、訂單、爐上的菜、Jill 和員工）。下次開啟可以從這個時間點繼續。</p><button class="btn" style="width:100%;margin-top:8px" data-act="save">儲存目前進度</button>`:`<p class="small">每天打烊、購買升級後都會自動存檔${cp?`；今天營業到一半的進度（${cp.clock}）也還在`:''}。</p><button class="btn" style="width:100%;margin-top:8px" data-act="save">存檔</button>`}</div>
+ <div class="card" style="margin-top:10px"><div class="setrow"><span><b>備份與移轉</b></span></div><p class="small">換手機、換瀏覽器、以防萬一：把進度存成一個檔案，之後再讀回來。</p>
+ <div class="row" style="margin-top:8px"><button class="btn" style="flex:1" data-act="export">備份到檔案</button><button class="btn" style="flex:1" data-act="import">從備份檔恢復</button></div>
+ <div class="row" style="margin-top:8px"><button class="btn sm" style="flex:1" data-act="copyBackup">複製備份文字</button><button class="btn sm" style="flex:1" data-act="pasteBackup">貼上備份文字恢復</button></div></div>`}
 function showPause(){sub='pause';show(`<div class="modal"><h2>暫停中</h2><p>DAY ${S.day} · ${clockStr()} · 目前營業額 ${fmt(R?R.st.rev:0)}</p>
- <div class="card"><div class="setrow"><span>背景音樂</span><button class="tog ${S.music?'on':''}" data-act="music" aria-label="背景音樂"></button></div><div class="setrow"><span>音效</span><button class="tog ${S.sfx?'on':''}" data-act="sfx" aria-label="音效"></button></div></div>
- <div class="stack" style="margin-top:14px"><button class="btn primary big" data-act="resume">繼續營業</button><button class="btn" data-act="guide">遊戲說明</button>${R&&!R.closed?'<button class="btn" data-act="closeEarly">提早打烊（等店裡客人吃完）</button><button class="btn danger" data-act="closeNow">馬上結束今天</button>':''}</div></div>`,'dim')}
+ <div class="stack"><button class="btn primary big" data-act="resume">繼續營業</button></div>
+ ${saveCardHTML()}
+ <div class="card" style="margin-top:10px"><div class="setrow"><span>背景音樂</span><button class="tog ${S.music?'on':''}" data-act="music" aria-label="背景音樂"></button></div><div class="setrow"><span>音效</span><button class="tog ${S.sfx?'on':''}" data-act="sfx" aria-label="音效"></button></div></div>
+ <div class="stack" style="margin-top:12px"><button class="btn" data-act="guide">小小店主手冊</button>${R&&!R.closed?'<button class="btn" data-act="closeEarly">提早打烊（等店裡客人吃完）</button><button class="btn danger" data-act="closeNow">馬上結束今天</button>':''}</div></div>`,'dim')}
 function openSub(k){if(k==='book')showBook();else if(k==='settings'){resetStep=0;showSettings()}}
 function closeSub(){sub=null;if(phase==='service'){if(paused){showPause();return}hideScreen();return}if(mainScreen==='title')showTitle();else if(mainScreen==='prep')showPrep();else if(mainScreen==='shop')showShop();else if(mainScreen==='summary')showSummary()}
 
 let startWarned=false;
 screenEl.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;const a=b.dataset.act,d=b.dataset.d,k=b.dataset.k;audioInit();
  switch(a){
- case'open':sfx.door();goMain();break;
+ case'open':sfx.door();if(S.checkpoint&&S.checkpoint.day===S.day)resumeCheckpoint();else goMain();break;
+ case'openFresh':sfx.door();clearCheckpoint();save();goMain();break;
  case'toggle':{const on=S.menu.includes(d);if(on){const rest=S.menu.filter(x=>x!==d&&DISH(x).cat!=='drink'&&DISH(x).cat!=='dessert');if(!rest.length&&!S.signature&&DISH(d).cat!=='drink'&&DISH(d).cat!=='dessert'){toast('菜單至少要有一道主食');break}S.menu=S.menu.filter(x=>x!==d)}else{if(S.menu.filter(x=>S.unlocked.includes(x)).length>=menuCap()){toast(`菜單已滿（上限 ${menuCap()} 道），擴建後可以放更多`);break}S.menu.push(d)}sfx.tap();save();showPrep();break}
  case'price':{const steps=[.8,.9,1,1.1,1.2,1.3,1.5];let i=steps.indexOf(S.price[d]||1);if(i<0)i=2;i=clamp(i+(+b.dataset.v),0,steps.length-1);S.price[d]=steps[i];sfx.tap();save();keepScroll(showPrep);break}
  case'stock':{const ok=buyStock(d,+b.dataset.v);if(!ok)toast(+b.dataset.v>0?(stockTotal()>=fridgeCap()?'冰箱滿了，升級冰箱可以放更多':'錢不夠了'):'沒有庫存可以退');else sfx.tap();save();keepScroll(showPrep);break}
  case'restock':{const sug=suggestStock();for(const x in sug){const need=sug[x]-(S.stock[x]||0);if(need>0)buyStock(x,need)}sfx.buy();save();keepScroll(showPrep);break}
- case'start':{const empty=menuList().filter(x=>(S.stock[x]||0)===0);if(feat().stock&&empty.length&&!startWarned){startWarned=true;$('#startWarn').innerHTML=`<div class="inline-warn">${empty.map(x=>DISH(x).n).join('、')} 沒有備料，客人點了要臨時叫貨（1.5 倍價、要等）。再按一次直接開店。</div>`;break}startWarned=false;save();startService();break}
+ case'start':{const empty=menuList().filter(x=>(S.stock[x]||0)===0);if(feat().stock&&empty.length&&!startWarned){startWarned=true;$('#startWarn').innerHTML=`<div class="inline-warn">${empty.map(x=>DISH(x).n).join('、')} 沒有備料，客人點了要臨時叫貨（1.5 倍價、要等）。再按一次直接開店。</div>`;break}startWarned=false;clearCheckpoint();save();startService();break}
  case'toShop':showShop();break;
+ case'backShop':showShop();break;
+ case'toPrep':showPrep();break;
  case'tab':shopTab=k;sfx.tap();showShop();break;
- case'buyTable':{const c=TABLE_COST[S.tables];if(S.money>=c&&S.tables<tableCap()){S.money-=c;S.tables++;sfx.buy();toast('新桌子搬進來了！');save();IDLE=null;showShop()}break}
- case'expand':{const nl=LEVELS[S.level];if(nl&&S.money>=nl.cost){S.money-=nl.cost;S.level++;sfx.buy();banner(LV().n,'擴建完成！');if(S.level===5)ach('jill');save();bg=null;showShop()}break}
- case'buyEq':{const lv=S.eq[k]||0;const E=EQUIP.find(x=>x.k===k);const c=E.cost[lv];if(lv<5&&S.money>=c){S.money-=c;S.eq[k]=lv+1;sfx.buy();toast(`${E.n} ${lv?'升級':'購買'}完成：LV${lv+1}`);save();IDLE=null;layoutAll();keepScroll(showShop)}break}
- case'rd':{const D=DISHES[d];if(S.money>=D.rd){S.money-=D.rd;unlockDish(d);sfx.buy();toast(`研發成功：${D.n}！${S.menu.includes(d)?'已加入菜單':'菜單已滿，記得在開店前調整'}`);save();keepScroll(showShop)}break}
- case'buyDecor':{const Dc=DECOR.find(x=>x.k===k);const t=S.decor[k]||0;const c=Dc.tiers[t];if(S.money>=c){S.money-=c;S.decor[k]=t+1;sfx.buy();toast(`${Dc.n} 裝好了，看看店裡！`);save();IDLE=null;bg=null;keepScroll(showShop)}break}
- case'hire':{const R0=ROLES[k];S.crew=S.crew||[];if(!R0||S.money<R0.hire||S.crew.length>=crewCap())break;S.money-=R0.hire;const used=S.crew.map(m=>m.name);const name=CREW_NAMES[k].find(n=>!used.includes(n))||R0.n;const duty=k==='chef'?(S.eq.bar&&!chefFor('bar')?'bar':'stove'):R0.duties[0];S.crew.push({id:'c'+Date.now().toString(36)+Math.floor(Math.random()*999),role:k,name,lv:1,duty});sfx.buy();toast(`${name} 加入了 Jill's Kitchen！`);save();keepScroll(showShop);break}
+ case'buyTable':{const c=TABLE_COST[S.tables];if(S.money>=c&&S.tables<tableCap()){S.money-=c;S.tables++;sfx.buy();toast('新桌子搬進來了！');save();IDLE=null;showShop();shopAfterBuy()}break}
+ case'expand':{const nl=LEVELS[S.level];if(nl&&S.money>=nl.cost){S.money-=nl.cost;S.level++;sfx.buy();banner(LV().n,'擴建完成！');if(S.level===5)ach('jill');save();bg=null;showShop();shopAfterBuy()}break}
+ case'buyEq':{const lv=S.eq[k]||0;const E=EQUIP.find(x=>x.k===k);const c=E.cost[lv];if(lv<5&&S.money>=c){S.money-=c;S.eq[k]=lv+1;sfx.buy();toast(`${E.n} ${lv?'升級':'購買'}完成：LV${lv+1}`);save();IDLE=null;layoutAll();keepScroll(showShop);shopAfterBuy()}break}
+ case'rd':{const D=DISHES[d];if(S.money>=D.rd){S.money-=D.rd;unlockDish(d);sfx.buy();toast(`研發成功：${D.n}！${S.menu.includes(d)?'已加入菜單':'菜單已滿，記得在開店前調整'}`);save();keepScroll(showShop);shopAfterBuy()}break}
+ case'buyDecor':{const Dc=DECOR.find(x=>x.k===k);const t=S.decor[k]||0;const c=Dc.tiers[t];if(S.money>=c){S.money-=c;S.decor[k]=t+1;sfx.buy();toast(`${Dc.n} 裝好了，看看店裡！`);save();IDLE=null;bg=null;keepScroll(showShop);shopAfterBuy()}break}
+ case'hire':{const R0=ROLES[k];S.crew=S.crew||[];if(!R0||S.money<R0.hire||S.crew.length>=crewCap())break;S.money-=R0.hire;const used=S.crew.map(m=>m.name);const name=CREW_NAMES[k].find(n=>!used.includes(n))||R0.n;const duty=k==='chef'?(S.eq.bar&&!chefFor('bar')?'bar':'stove'):R0.duties[0];S.crew.push({id:'c'+Date.now().toString(36)+Math.floor(Math.random()*999),role:k,name,lv:1,duty});sfx.buy();toast(`${name} 加入了 Jill's Kitchen！`);save();keepScroll(showShop);shopAfterBuy();break}
  case'crewFire':S.crew=(S.crew||[]).filter(m=>m.id!==k);save();keepScroll(showShop);break;
- case'crewUp':{const m=(S.crew||[]).find(m=>m.id===k);if(!m||m.lv>=5)break;const c=ROLES[m.role].up*m.lv;if(S.money<c)break;S.money-=c;m.lv++;sfx.buy();toast(`${m.name} 升到 LV${m.lv}！`);save();keepScroll(showShop);break}
+ case'crewUp':{const m=(S.crew||[]).find(m=>m.id===k);if(!m||m.lv>=5)break;const c=ROLES[m.role].up*m.lv;if(S.money<c)break;S.money-=c;m.lv++;sfx.buy();toast(`${m.name} 升到 LV${m.lv}！`);save();keepScroll(showShop);shopAfterBuy();break}
  case'duty':{const m=(S.crew||[]).find(m=>m.id===k);if(!m)break;let opts=ROLES[m.role].duties;if(m.role==='chef')opts=opts.filter(d=>d==='stove'||S.eq[d]);const i=opts.indexOf(m.duty);m.duty=opts[(i+1)%opts.length];sfx.tap();save();keepScroll(showShop);break}
  case'labPick':{const i=labSel.indexOf(k);if(i>=0)labSel.splice(i,1);else if(labSel.length<3)labSel.push(k);else toast('最多選 3 種食材');sfx.tap();keepScroll(showShop);break}
- case'labTry':{if(S.money<150||labSel.length<2)break;S.money-=150;const sel=labSel.slice().sort().join('|');const hit=Object.keys(DISHES).find(d=>DISHES[d].rd>0&&!S.unlocked.includes(d)&&dishKeys(d).slice().sort().join('|')===sel);
-  if(hit){const D=DISHES[hit];if(S.level<D.lv){toast(`這個組合能做出「${D.n}」！但要擴建到 ${LEVELS[D.lv-1].n} 才能上菜單`);S.money+=100}else if(D.st==='oven'&&!S.eq.oven){toast(`能做出「${D.n}」！但要先買烤箱`);S.money+=100}else{unlockDish(hit);sfx.fire();banner('研發成功！',D.n);toast(`新料理：${D.n}${S.menu.includes(hit)?'，已加入菜單':''}`)}}
-  else{const near=Object.keys(DISHES).some(d=>DISHES[d].rd>0&&!S.unlocked.includes(d)&&dishKeys(d).filter(i=>labSel.includes(i)).length>=2);toast(near?'味道很接近了…再換一種食材試試':'味道怪怪的，這個組合失敗了');sfx.okay()}
+ case'labTry':{if(S.money<150||labSel.length<2)break;S.money-=150;const sel=labSel.slice();const r=labEval(sel);S.rdProg=S.rdProg||{};S.rdDone=S.rdDone||{};
+  if(r.kind==='exact'||r.kind==='success'){const D=DISHES[r.d];S.labLast={kind:r.kind,title:r.kind==='exact'?'大成功！':'成功料理',text:r.kind==='exact'?`${sel.map(i=>ING[i].n).join('＋')}，就是「${D.n}」。`:`做出了「${D.n}」。${ING[r.extra[0]].n}其實用不到，下次可以省下來。`};labLearn(dishKeys(r.d));delete S.rdProg[r.d];rdFinish(r.d,r.kind==='exact'?'研發成功！':'研發成功')}
+  else if(r.kind==='potential'){const D=DISHES[r.d];const pr=Math.min(3,(S.rdProg[r.d]||0)+1);S.rdProg[r.d]=pr;labLearn(r.have);const miss=r.missing.map(i=>DIR_N[labProfile(i).d]);
+   const text=pr>=3?`第三次試作，終於成形了。`:`像是一道${CAT_N[D.cat]}（${ST_N[D.st]}）的雛形。${r.have.map(i=>ING[i].n).join('、')}是對的，還缺${miss.length}種${[...new Set(miss)].join('或')}。研究進度 ${'●'.repeat(pr)}${'○'.repeat(3-pr)}`;
+   S.labLast={kind:'potential',title:pr>=3?'研究完成！':'有潛力的試作品',text,have:r.have.slice(),missDirs:[...new Set(r.missing.map(i=>labProfile(i).d))]};if(pr>=3){delete S.rdProg[r.d];rdFinish(r.d,'研究完成！')}else sfx.good()}
+  else if(r.kind==='known'){S.labLast={kind:'plain',title:'這道已經會了',text:`這就是「${DISHES[r.d].n}」的做法，已經在菜單上了。`};sfx.okay()}
+  else{S.labLast={kind:'plain',title:'普通試作品',text:r.why+(r.tip?' '+r.tip:'')};sfx.okay()}
   labSel=[];save();keepScroll(showShop);break}
- case'starUp':{const c=starUpCost(d);if(S.money<c||starOf(d)>=3)break;S.money-=c;S.rstar=S.rstar||{};S.rstar[d]=starOf(d)+1;sfx.buy();toast(`${DISH(d).n} 升到 ${'★'.repeat(starOf(d))}`);save();keepScroll(showShop);break}
+ case'starUp':{const c=starUpCost(d);if(S.money<c||starOf(d)>=3)break;S.money-=c;S.rstar=S.rstar||{};S.rstar[d]=starOf(d)+1;sfx.buy();toast(`${DISH(d).n} 升到 ${'★'.repeat(starOf(d))}`);save();keepScroll(showShop);shopAfterBuy();break}
  case'closeEarly':paused=false;hideScreen();closeShop('Jill 提早打烊，等店裡客人吃完就結算');break;
- case'closeNow':paused=false;hideScreen();closeShop('今天到此為止，準備結算');for(const g of R.groups.slice()){if(g.state==='check')collect(g);else if(g.state!=='leave')leaveGroup(g,'ok')}for(const t of R.tables){t.dirty=false;t.plates=[]}break;
- case'nextDay':S.day++;S.today=null;S.todayCost=0;S.lastSummary=null;S.phase='prep';applyGates();planToday();save();showPrep();break;
+ case'closeNow':paused=false;hideScreen();clearCheckpoint();closeShop('今天到此為止，準備結算');for(const g of R.groups.slice()){if(g.state==='check')collect(g);else if(g.state!=='leave')leaveGroup(g,'ok')}for(const t of R.tables){t.dirty=false;t.plates=[]}break;
+ case'nextDay':clearCheckpoint();S.day++;S.today=null;S.todayCost=0;S.lastSummary=null;S.phase='prep';applyGates();planToday();save();showPrep();break;
  case'sigOpen':sigDraft=S.signature?{...S.signature}:{base:'mash',protein:'duck',sauce:'redwine',side:'asparagus',name:''};if(!sigDraft.name)sigDraft.name=sigAutoName(sigDraft);showSig();break;
  case'sigPick':{const auto=sigDraft.name===sigAutoName(sigDraft);const nm=$('#sigName');if(nm&&!auto)sigDraft.name=nm.value;sigDraft[b.dataset.c]=k;if(auto)sigDraft.name=sigAutoName(sigDraft);keepScroll(showSig);break}
  case'sigMake':{const cost=S.signature?800:3000;if(S.money<cost)break;const nm=($('#sigName').value||'').trim()||sigAutoName(sigDraft);S.money-=cost;const first=!S.signature;S.signature={...sigDraft,name:nm.slice(0,18)};if(first){S.xp.signature=0;S.stock.signature=S.stock.signature||0;ach('sig')}ICACHE.clear();DCACHE.clear();sfx.fire();banner("★ SIGNATURE ★",nm);save();sub=null;shopTab='sig';showShop();break}
  case'guide':showGuide();break;
  case'peek':screenEl.hidden=true;$('#peekPill').hidden=false;break;
- case'book':bookTab='reviews';showBook();break;
+ case'book':bookTab='front';showBook();break;
  case'btab':bookTab=k;showBook();break;
  case'settings':resetStep=0;showSettings();break;
  case'closeSub':closeSub();break;
  case'music':S.music=!S.music;setAudio();save();sub==='pause'?showPause():showSettings();break;
  case'sfx':S.sfx=!S.sfx;setAudio();save();sub==='pause'?showPause():showSettings();break;
- case'save':toast(save()?'已存檔':'這個瀏覽器不允許存檔');if(sub==='settings')showSettings();break;
+ case'save':{if(phase==='service'&&R&&R.closing==null){const ok=checkpointSave('manual');toast(ok?`已儲存目前進度（${S.savedLabel}）`:'這個瀏覽器不允許存檔')}else toast(save()?`已存檔（${S.savedLabel}）`:'這個瀏覽器不允許存檔');if(sub==='settings')showSettings();else if(sub==='pause')showPause();break}
+ case'copyBackup':copyBackup();break;
+ case'pasteBackup':pasteBox=true;if(sub==='pause'){sub='settings'}showSettings();setTimeout(()=>{const a=$('#pasteArea');if(a)a.focus()},50);break;
+ case'pasteCancel':pasteBox=false;showSettings();break;
+ case'pasteGo':{const a=$('#pasteArea');const t=a?a.value.trim():'';pasteBox=false;if(!t){toast('還沒有貼上任何內容');showSettings();break}importSaveText(t);break}
  case'export':exportSave();break;
  case'import':pickImportFile();break;
  case'importYes':importConfirm();break;

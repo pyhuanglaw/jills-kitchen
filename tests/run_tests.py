@@ -218,9 +218,39 @@ window.__digest = function(){
   const s = S.lastSummary ? {rev:S.lastSummary.rev,cost:S.lastSummary.cost,tips:S.lastSummary.tips,bonus:S.lastSummary.bonus,wages:S.lastSummary.wages,net:S.lastSummary.net,guests:S.lastSummary.guests,lost:S.lastSummary.lost,perfect:S.lastSummary.perfect,plated:S.lastSummary.plated,avg:S.lastSummary.avg,top:S.lastSummary.top,stars:S.lastSummary.stars} : null;
   return {day:S.day, money:S.money, lifetime:S.lifetime, level:S.level, stats:S.stats, xp:S.xp, stock:S.stock, reviews:S.reviews.length,
           reviewHash:__h(JSON.stringify(S.reviews.map(r=>[r.s,r.txt,r.name]))), regulars:S.regulars, summary:s, cats, catHash:__h(JSON.stringify(cats)),
-          mem:Object.keys(S.mem||{}).sort().map(k=>k+':'+S.mem[k].day+':'+__h(S.mem[k].img)), weights:__wtHash(), dylan:S.dylan, life:S.life};
+          mem:(S.album||[]).map(p=>p.kind+':'+p.day+':'+(p.keep?'K':'')+':'+__h(p.img||'')), weights:__wtHash(), dylan:S.dylan, life:S.life};
 };
 """
+
+# A player who lets the staff do their jobs: seats/orders/serves/cleans/collects only what nobody covers,
+# cooks only what no chef can cook. (The perfect bot above taps everything, which keeps Jill busy on purpose.)
+LAZY_ACTOR = r"""
+window.__actLazy=function(){if(!(phase==='service'&&R))return false;const cov=crewCovers;
+ if(!R.closed&&!cov('seat')){for(const g of queued()){if(g.state==='queue'){const t=freeTableFor(g);if(t)seatGroup(g,t)}}}
+ for(const t of R.tables){if(!tableActionable(t)||jillTargets(t.i))continue;const g=t.group;if(!g){if(!cov('clean'))tapTable(t);continue}if(g.rowdy){tapTable(t);continue}if(g.state==='order'&&!cov('order'))tapTable(t);else if(g.state==='check'&&!cov('check'))tapTable(t);else if(g.state==='wait'&&!cov('serve'))tapTable(t)}
+ for(const tk of R.tickets)for(const it of tk.items)if(it.st==='pending'&&!chefCanAny(it.d))startCook(tk,it,true);
+ for(const s of R.slots){if(s.broken){tapStation(R.slots.indexOf(s));continue}const j=s.job;if(!j||!j.step)continue;const k=j.step;if(chefHandles(s))continue;if(k.t==='add'){const id=k.left[0];if(id)actIng(s,id)}else if(k.t==='tap')actTap(s);else if(k.t==='zone'){if(k.p>=k.z.c)actZone(s)}else if(k.t==='hold'){k.hold=true;R.holdSlot=s;k.level=(k.a+k.b)/2;holdEnd()}else if(k.t==='dose'){if(k.cnt<k.min)actDose(s);else actDoseDone(s)}}return true};
+"""
+# A reasoning player in the lab. Reads only what the screen shows: each dish's 主角 and ingredient count,
+# ingredient roles/worlds, the pair affinity, the station hint, and the feedback of every trial (which
+# ingredients were right, what kind is missing). Never looks at dishKeys() of an undiscovered dish.
+LAB_SOLVER = r"""(()=>{
+ const log=[];let total=0;const act=a=>{const el=document.createElement('button');el.dataset.act=a;$('#screen').appendChild(el);el.click();el.remove()};
+ const pan=pantry();
+ const visible=d=>{const K=dishKeys(d);const lead=K.find(i=>['base','drink','sweet'].includes(labProfile(i).d))||K[0];return{n:K.length,lead,st:DISHES[d].st}};
+ const combos=(arr,k)=>{const out=[];const rec=(i,cur)=>{if(cur.length===k){out.push(cur.slice());return}for(let j=i;j<arr.length;j++){cur.push(arr[j]);rec(j+1,cur);cur.pop()}};rec(0,[]);return out};
+ for(const d of Object.keys(DISHES).filter(d=>DISHES[d].rd>0)){
+  if(S.unlocked.includes(d))continue;const v=visible(d);let known=[v.lead],missDirs=null,tries=0;const tried=new Set();
+  while(tries<40&&!S.unlocked.includes(d)){
+   const need=v.n-known.length;
+   let cands=pan.filter(i=>!known.includes(i)&&known.every(k=>labPair(k,i)!=='bad'));
+   if(missDirs&&missDirs.length)cands=cands.filter(i=>missDirs.includes(labProfile(i).d)).concat(cands.filter(i=>!missDirs.includes(labProfile(i).d)));
+   cands=cands.map(i=>({i,st:labStations([...known,i]).includes(v.st)?0:1,g:known.some(k=>labPair(k,i)==='great')?0:1})).sort((a,b)=>(a.g-b.g)||(a.st-b.st)).map(c=>c.i);
+   let sel=null;for(const c of combos(cands,need)){const key=[...known,...c].sort().join('|');if(!tried.has(key)){sel=[...known,...c];tried.add(key);break}}
+   if(!sel)break;labSel=sel.slice();act('labTry');tries++;total++;
+   const L=S.labLast;if(L&&L.kind==='potential'&&L.have){known=[...new Set([v.lead,...L.have])];missDirs=L.missDirs||null}}
+  log.push({d,n:v.n,tries,ok:S.unlocked.includes(d),last:S.labLast&&S.labLast.title})}
+ return {log,total}})()"""
 
 def install_bot(g):
     # evaluated through the hook so the helpers close over the game's internals
@@ -468,8 +498,9 @@ def old_saves_load(b, port, target):
             check(g.ev("S.crew.length") == 0, f'{name}: legacy staff migration behaviour changed')
         if orig.get('mem'):
             g.click('.links [data-act=book]'); g.click('[data-act=btab][data-k=mem]')
-            n = g.page.locator('.memgrid img').count()
+            n = g.page.locator('.polaroid img').count()
             check(n == len(orig['mem']), f'{name}: expected {len(orig["mem"])} photos in album, saw {n}')
+            check(g.page.locator('.polaroid .pin').count() == n, f'{name}: photos from before the album are all 珍藏')
             srcs = g.page.eval_on_selector_all('.memgrid img', 'els=>els.map(e=>e.src.slice(0,22))')
             check(all(s.startswith('data:image/') for s in srcs), f'{name}: photo images broken')
             g.click('[data-act=closeSub]')
@@ -537,7 +568,7 @@ def cat_personality_fingerprint(b, port, target, record=False):
 def ui_basics(b, port, target):
     g = Game(b, port, target, seed=10, manual=True)
     state_ok(g, 'title')
-    g.click('.links [data-act=guide]'); check(g.page.is_visible('text=遊戲說明'), 'guide did not open'); g.click('.sh-top [data-act=closeSub]')
+    g.click('.links [data-act=guide]'); check(g.page.is_visible('text=小小店主手冊'), 'guide did not open'); g.click('.sh-top [data-act=closeSub]')
     g.click('.links [data-act=book]')
     for k in ['reviews', 'regulars', 'cats', 'mem', 'ach', 'mastery']:
         g.click(f'[data-act=btab][data-k={k}]')
@@ -1100,6 +1131,201 @@ def v16_save_continues_in_v17(b, port, target):
     g.close()
 
 @test
+def service_checkpoint_resumes_the_day(b, port, target):
+    """Mid-service progress survives a reload: guests at their tables, tickets, food on the stoves, Jill
+    and the staff where they were, today's numbers, the clock. A broken checkpoint falls back to
+    reopening at the same clock with today's numbers, and says so. A finished day leaves no checkpoint."""
+    g = Game(b, port, target, seed=8, manual=True)
+    install_bot(g)
+    g.ev("S.day=6;S.level=2;S.tables=5;S.money=6000;S.eq.bar=1;S.eq.oven=1;for(const d of['coffee','pasta','salad','burger'])unlockDish(d);for(const d of S.unlocked)S.stock[d]=30;S.crew=[{id:'w1',role:'waiter',name:'小美',lv:2,duty:'both'},{id:'c1',role:'cleaner',name:'阿明',lv:1,duty:'clean'}];save()")
+    g.click('[data-act=open]'); start_day(g)
+    g.ev("__play(1500,0,'R.t>40&&R.groups.filter(q=>q.table!=null).length>=2&&R.slots.some(s=>s.job)')")
+    before = g.ev(r"""JSON.stringify({t:+R.t.toFixed(2),groups:R.groups.filter(q=>!q.gone).map(q=>[q.id,q.state,q.table,q.x|0,q.y|0,q.ticket?q.ticket.id:null]),tickets:R.tickets.map(k=>[k.id,k.g.id,k.items.map(i=>i.d+':'+i.st)]),jobs:R.slots.map(s=>s.job?[s.job.d,s.job.si,s.job.step&&s.job.step.t,s.job.tk.id]:null),jill:[R.jill.x|0,R.jill.y|0,R.jill.q.slice(),R.jill.carry.length],cw:Object.keys(R.cw).map(k=>[k,R.cw[k].x|0,R.cw[k].y|0,R.cw[k].task?R.cw[k].task.k:null]),st:R.st.rev+'/'+R.st.tips+'/'+R.st.guests,money:S.money,tables:R.tables.map(t=>[t.group?t.group.id:null,t.dirty])})""")
+    check(g.ev("checkpointSave('manual')"), 'checkpoint not written')
+    check(g.ev("S.checkpoint&&S.checkpoint.day===S.day&&typeof S.checkpoint.snap==='object'"), 'checkpoint missing from the save')
+    g.reload(); install_bot(g)
+    check(g.page.is_visible('text=繼續營業'), 'the title should offer to continue today')
+    g.click('[data-act=open]')
+    check(g.ev("phase") == 'service' and g.ev("!paused"), 'did not resume into service')
+    after = g.ev(r"""JSON.stringify({t:+R.t.toFixed(2),groups:R.groups.filter(q=>!q.gone).map(q=>[q.id,q.state,q.table,q.x|0,q.y|0,q.ticket?q.ticket.id:null]),tickets:R.tickets.map(k=>[k.id,k.g.id,k.items.map(i=>i.d+':'+i.st)]),jobs:R.slots.map(s=>s.job?[s.job.d,s.job.si,s.job.step&&s.job.step.t,s.job.tk.id]:null),jill:[R.jill.x|0,R.jill.y|0,R.jill.q.slice(),R.jill.carry.length],cw:Object.keys(R.cw).map(k=>[k,R.cw[k].x|0,R.cw[k].y|0,R.cw[k].task?R.cw[k].task.k:null]),st:R.st.rev+'/'+R.st.tips+'/'+R.st.guests,money:S.money,tables:R.tables.map(t=>[t.group?t.group.id:null,t.dirty])})""")
+    check(before == after, 'the restored day differs from the checkpoint:\n' + before + '\n' + after)
+    check(g.ev("S.checkpoint") is None, 'the checkpoint should be consumed on resume')
+    # the day goes on: render a few seconds, then finish it with the bot; no errors, a summary at the end
+    g.ev("__play(120,0)"); check(not g.errors, f'errors after the resume: {g.errors[:2]}')
+    play_day(g); check(g.ev("phase") == 'summary', 'the resumed day did not finish')
+    check(g.ev("S.checkpoint") is None and g.ev("S.stats.days") >= 1, 'a finished day must not leave a checkpoint')
+    # the safe fallback: a checkpoint that cannot be rebuilt reopens at its clock with today's numbers
+    g.click('[data-act=toShop]'); g.click('[data-act=nextDay]'); g.click('[data-act=start]')
+    if g.ev("phase") != 'service': g.click('[data-act=start]')
+    g.ev("__play(600,0,'R.t>20&&R.groups.length>0')")
+    g.ev("R.groups[0].state='teleporting';checkpointSave('manual')")   # (a reload also refreshes the checkpoint from the live day)
+    g.reload(); install_bot(g); g.click('[data-act=open]')
+    check(g.ev("phase") == 'service' and g.ev("R.t") > 19 and g.ev("R.groups.length") == 0, 'fallback should reopen at the checkpoint clock with an empty room')
+    check(g.page.locator('#toasts').inner_text().find('無法完整還原') >= 0, 'the fallback must tell the player')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
+def daylight_returns_every_morning(b, port, target):
+    """Evening darkness never leaks into the next day: through closing, summary, shop, an app switch and
+    a reload, the first frames of every service day are as bright as day 1's; the cached background
+    is rebuilt when its pixels vanish (mobile browsers drop offscreen canvases)."""
+    g = Game(b, port, target, seed=9, manual=True)
+    install_bot(g)
+    lum = r"""(()=>{const c=sc.getContext('2d');const w=sc.width,h=sc.height;const y0=Math.floor(h*.3),y1=Math.floor(h*.8);const d=c.getImageData(0,y0,w,y1-y0).data;let s=0,n=0;for(let i=0;i<d.length;i+=32){s+=d[i]*.3+d[i+1]*.59+d[i+2]*.11;n++}return +(s/n).toFixed(1)})()"""
+    g.click('[data-act=open]')
+    base = None
+    for day in range(1, 4):
+        start_day(g); g.ev("__play(45,0)")
+        l = g.ev(lum)
+        if base is None: base = l
+        check(abs(l - base) < 6, f'day {day} opens at brightness {l}, day 1 was {base}')
+        check(g.ev("sctx.globalAlpha===1&&sctx.globalCompositeOperation==='source-over'"), 'context state leaked')
+        g.ev("__bot(60000,1/30)"); g.ev("for(let i=0;i<300;i++)__tick(1000/30)")
+        night = g.ev(lum)
+        check(night < base - 20 and night > base * .55, f'the evening should be dimmer but still readable: {night} vs {base}')
+        if g.ev("phase") == 'summary': g.click('[data-act=toShop]')
+        # the app goes to the background and comes back; the cached background canvas has been wiped meanwhile
+        g.ev("Object.defineProperty(document,'hidden',{value:true,configurable:true});document.dispatchEvent(new Event('visibilitychange'))")
+        g.ev("__tick(5000)")
+        g.ev("(()=>{const c=bg&&bg.getContext('2d');if(c){c.clearRect(0,0,bg.width,bg.height)}})()")
+        g.ev("Object.defineProperty(document,'hidden',{value:false,configurable:true});document.dispatchEvent(new Event('visibilitychange'));window.dispatchEvent(new Event('pageshow'))")
+        g.ev("for(let i=0;i<30;i++)__tick(1000/30)")
+        g.click('[data-act=nextDay]'); g.ev("for(let i=0;i<30;i++)__tick(1000/30)")
+    # a wiped cache during service is noticed and rebuilt within a couple of seconds
+    start_day(g); g.ev("__play(45,0)")
+    g.ev("(()=>{const c=bg.getContext('2d');c.clearRect(0,0,bg.width,bg.height)})()")
+    g.ev("__play(2,0)"); dark = g.ev(lum)
+    g.ev("__play(90,0)"); back = g.ev(lum)
+    check(dark < base - 20 and abs(back - base) < 6, f'a wiped background cache should be rebuilt: wiped {dark}, after {back}, day {base}')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
+def jill_rests_when_staff_cover_the_floor(b, port, target):
+    """Jill's breaks come from her real workload, not from a staff count: on a day she runs alone she
+    never sits; with a full crew (and a player who lets them work) she sits on the sofa during service,
+    reads or looks around, and gets up the moment a table is tapped. Tapping sleeping 包包 gives visible
+    feedback (eyes, tail) without waking him."""
+    g = Game(b, port, target, seed=7, manual=True)
+    install_bot(g)
+    g.ev(LAZY_ACTOR)
+    g.click('[data-act=open]')
+    def run_day(actor):
+        start_day(g)
+        stats = g.ev("(()=>{window.__rs={sit:0,frames:0,acts:new Set(),pets:0};return 1})()")
+        for _ in range(1500):
+            r = g.ev("(()=>{for(let i=0;i<10;i++){if(!(phase==='service'&&R))return 0;if(i===0)%s();__tick(1000/30);const J=R.jill;__rs.frames++;if(J.rest==='sit'){__rs.sit++;__rs.acts.add(LIFE.jill.act)}if(J.pet)__rs.pets++;if(R.closing!=null&&R.closing>2&&!R.ended){finishClosing();return 0}}return 1})()" % actor)
+            if not r: break
+        return g.ev("({sit:__rs.sit,frames:__rs.frames,acts:[...__rs.acts],pets:__rs.pets})")
+    alone = run_day('__act')
+    check(alone['sit'] / max(1, alone['frames']) < .03, f'day 1 alone: Jill has no time to sit ({alone})')
+    check(alone['pets'] > 0, 'even on a busy day she pats a cat that comes by')
+    if g.ev("phase") == 'summary': g.click('[data-act=toShop]')
+    g.click('[data-act=nextDay]')
+    g.ev("(()=>{S.money=9000;S.level=4;S.eq.bar=1;S.eq.oven=1;S.eq.prep=1;for(const d in DISHES){unlockDish(d);S.xp[d]=8}S.crew=[{id:'w1',role:'waiter',name:'小美',lv:3,duty:'both'},{id:'k1',role:'cleaner',name:'阿宏',lv:2,duty:'clean'},{id:'c1',role:'chef',name:'阿德',lv:3,duty:'stove'},{id:'c2',role:'chef',name:'小玉',lv:3,duty:'bar'}];save();showPrep()})()")
+    g.ev("(()=>{const el=document.createElement('button');el.dataset.act='restock';$('#screen').appendChild(el);el.click();el.remove()})()")
+    staffed = run_day('__actLazy')
+    frac = staffed['sit'] / max(1, staffed['frames'])
+    check(.12 < frac < .6, f'with a full crew she should sit part of the day, not never and not always: {staffed}')
+    check('read' in staffed['acts'] or 'look' in staffed['acts'], f'on the sofa she reads or looks around: {staffed}')
+    # work arrives while she sits: she gets up at once
+    if g.ev("phase") == 'summary': g.click('[data-act=toShop]')
+    g.click('[data-act=nextDay]'); g.ev("(()=>{const el=document.createElement('button');el.dataset.act='restock';$('#screen').appendChild(el);el.click();el.remove()})()")
+    start_day(g)
+    n = g.ev("(()=>{let n=0;while(n<12000&&R&&R.jill.rest!=='sit'){if(n%10===0)__actLazy();__tick(1000/30);n++}return n})()")
+    check(g.ev("R&&R.jill.rest==='sit'"), f'she never sat down within {n} frames')
+    check(g.ev("(()=>{const L=LIFE.jill;return L.on&&L.hat===true&&R.jill.sofa===true})()"), 'seated state: on the sofa, hat on, standing sprite off')
+    g.ev("(()=>{const t=R.tables.find(t=>t.group)||R.tables[0];t.dirty=t.group?t.dirty:true;R.jill.q.push(t.i);endRest()})()")
+    check(g.ev("R.jill.rest===null&&!LIFE.jill.on&&R.jill.sofa===false"), 'a tapped table should get her up immediately')
+    g.ev("for(let i=0;i<60;i++)__tick(1000/30)")
+    check(g.ev("R.jill.moving||R.jill.cur!==null||R.jill.q.length===0"), 'after getting up she goes to the work')
+    # 包包 asleep: a tap is answered without waking him
+    g.ev("(()=>{const c=CATS.find(k=>k.def.id==='snow');releaseSpots(c);c.x=200;c.y=300;c.st='sleep';c.pose='loaf';c.t=30;c.perch=-1;c.sofa=null;c.hidden=false;return 1})()")
+    before = g.ev("(()=>{const c=CATS.find(k=>k.def.id==='snow');return [c.st,c.pose,c.hearts.length]})()")
+    g.ev("tapCat(CATS.find(k=>k.def.id==='snow'))")
+    after = g.ev("(()=>{const c=CATS.find(k=>k.def.id==='snow');return {st:c.st,pose:c.pose,wake:c.wakeT>0,flick:c.flickT>0,hearts:c.hearts.length}})()")
+    check(after['st'] == 'sleep' and after['wake'] and after['flick'] and after['hearts'] > before[2], f'包包 should react but keep sleeping: {before} -> {after}')
+    check(g.ev("hitCat({x:200+18,y:300-6})") is not None and g.ev("(()=>{const c=hitCat({x:200+18,y:300-6});return c&&c.def.id})()") == 'snow', 'a tap on his fluffy body must hit him')
+    g.ev("for(let i=0;i<70;i++)__tick(1000/30)")
+    check(g.ev("(()=>{const c=CATS.find(k=>k.def.id==='snow');return c.st==='sleep'&&!(c.wakeT>0)})()"), 'a couple of seconds later he is asleep again')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
+def research_is_solvable_from_visible_info(b, port, target):
+    """料理研發: every dish can be found by a player who reads only what the lab shows (the 主角 and
+    ingredient count of each dish, the ingredient roles, the pair affinity, the station hint, and the
+    feedback of each trial). Bad combinations explain themselves; a finished but locked dish unlocks itself
+    when the expansion or the oven arrives."""
+    g = Game(b, port, target, seed=3, manual=True)
+    g.click('[data-act=open]')
+    g.ev("S.money=1e6;S.level=5;S.eq.oven=1;S.eq.bar=1;S.eq.prep=1;phase='shop';showShop()")
+    r = g.ev(LAB_SOLVER)
+    bad = [e for e in r['log'] if not e['ok']]
+    check(not bad, f'dishes the reasoning player could not research: {bad}')
+    check(r['total'] <= 120, f'too many trials in total: {r["total"]} ({r["log"]})')
+    check(max(e['tries'] for e in r['log']) <= 25, f'one dish took too long: {r["log"]}')
+    kinds = g.ev("(()=>{const k=[];k.push(labEval(['egg','caramel']).kind,labEval(['patty','salt','oil']).kind,labEval(['patty','steak']).kind,labEval(['patty','cheese']).kind);return k})()")
+    check(kinds[0] == 'plain' and kinds[1] == 'plain' and kinds[2] == 'plain', f'bad combinations should be ordinary trials with a reason: {kinds}')
+    why = g.ev("[labEval(['egg','caramel']).why,labEval(['patty','salt','oil']).why,labEval(['patty','steak']).why]")
+    check('甜' in why[0] and '味道太重' in why[1] and '主體' in why[2], f'reasons should say why: {why}')
+    # a dish found before its expansion: parked, then unlocked by the expansion
+    g.ev("S.unlocked=['friedrice'];S.menu=['friedrice'];S.level=1;S.rdDone={};S.rdProg={};labSel=['arborio','wine','stock'];S.money=1000")
+    g.ev("(()=>{const el=document.createElement('button');el.dataset.act='labTry';$('#screen').appendChild(el);el.click();el.remove()})()")
+    check(g.ev("S.rdDone.risotto===1&&!S.unlocked.includes('risotto')"), 'a level-4 dish found at level 1 should wait for the expansion')
+    g.ev("S.level=4;S.day=5;showShop()")
+    check(g.ev("S.unlocked.includes('risotto')&&!S.rdDone.risotto"), 'the parked dish should unlock once the level allows it')
+    g.ev("(()=>{const el=document.createElement('button');el.dataset.act='tab';el.dataset.k='menu';$('#screen').appendChild(el);el.click();el.remove()})()")
+    check(g.page.is_visible('text=料理研發') and g.page.locator('.labgrp').count() >= 3 and g.page.locator('.labres').count() == 1, 'the lab shows ingredient groups and the last result')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
+def album_notes_and_journal(b, port, target):
+    """The life album keeps the first photo of every kind, lets a kind recur after a few days, caps ordinary
+    photos at 30 (oldest out first), never evicts 珍藏, migrates the old S.mem pictures, and the journal
+    shows photos, regular notes and the front page."""
+    g = Game(b, port, target, seed=5, manual=True)
+    install_bot(g)
+    g.click('[data-act=open]')
+    # an old save with S.mem pictures: they become 珍藏 photos
+    g.ev("S.mem={sofa:{day:2,img:'data:image/jpeg;base64,/9j/'},race:{day:3,img:'data:image/jpeg;base64,/9j/'}};S.album=null;albumList()")
+    check(g.ev("S.album.length===2&&S.album.every(p=>p.keep)&&!S.mem.sofa.img"), 'old pictures migrate as 珍藏 and are not stored twice')
+    # rules, driven directly
+    r = g.ev(r"""(()=>{const out={};S.day=10;out.firstNew=albumAllows('nap3');albumAdd('nap3','x',{});out.sameDay=albumAllows('nap3');S.day=12;out.twoDays=albumAllows('nap3');S.day=13;out.threeDays=albumAllows('nap3');
+      // ordinary photos rotate out at 30; 珍藏 never do
+      for(let i=0;i<45;i++){S.day=20+i*3;albumAdd('nap3','img'+i,{})}
+      const ord=S.album.filter(p=>!p.keep),keep=S.album.filter(p=>p.keep);out.ord=ord.length;out.keep=keep.length;out.oldestOrd=ord[0].img;out.keepKinds=keep.map(p=>p.kind).sort();
+      S.day=200;out.dailyCap=[albumAllows('best'),(albumAdd('best','a',{}),albumAllows('sides')),(albumAdd('sides','a',{}),albumAdd('rest','a',{}),albumAdd('pet','a',{}),albumAllows('lap'))];return out})()""")
+    check(r['firstNew'] and not r['sameDay'] and not r['twoDays'] and r['threeDays'], f'kind cooldown: {r}')
+    check(r['ord'] == 30 and r['keep'] == 3 and r['oldestOrd'] != 'img0' and r['keepKinds'] == ['nap3','race','sofa'], f'capacity: {r}')
+    check(r['dailyCap'] == [True, True, False], f'no more than four photos a day: {r["dailyCap"]}')
+    # in play: a few days with staff produce photos with captions, clocks and a note or two
+    g.ev("(()=>{S.album=[];S.mem={};S.notes=[];S.day=6;for(const r of REGS)S.regulars[r.id]=6;S.money=9000;S.level=2;S.eq.bar=1;S.crew=[{id:'w1',role:'waiter',name:'小美',lv:3,duty:'both'},{id:'k1',role:'cleaner',name:'阿宏',lv:2,duty:'clean'}];save();showPrep()})()")
+    g.ev(LAZY_ACTOR)
+    for day in range(3):
+        g.ev("(()=>{const el=document.createElement('button');el.dataset.act='restock';$('#screen').appendChild(el);el.click();el.remove()})()")
+        start_day(g)
+        for _ in range(1500):
+            if not g.ev("(()=>{for(let i=0;i<10;i++){if(!(phase==='service'&&R))return 0;if(i===0)__actLazy();__tick(1000/30);if(R.closing!=null&&R.closing>30&&!R.ended){finishClosing();return 0}}return 1})()"): break
+        g.ev("for(let i=0;i<900;i++)__tick(1000/30)")
+        if g.ev("phase") == 'summary': g.click('[data-act=toShop]')
+        g.click('[data-act=nextDay]')
+    a = g.ev("albumList().map(p=>({kind:p.kind,day:p.day,clock:p.clock,cap:p.cap,txt:p.txt,keep:p.keep,img:p.img.slice(0,22)}))")
+    check(len(a) >= 3, f'three staffed days should leave a few photos: {a}')
+    check(all(x['cap'] and x['img'].startswith('data:image/jpeg') and x['day'] >= 6 for x in a), f'photo records: {a}')
+    check(any(x['clock'] for x in a), f'photos taken during the day carry the clock: {a}')
+    check(all(x['keep'] for x in a[:1]), 'the first photo of a kind is 珍藏')
+    g.ev("(()=>{const el=document.createElement('button');el.dataset.act='book';$('#screen').appendChild(el);el.click();el.remove()})()")
+    check(g.page.is_visible('text=餐廳日誌') and g.page.is_visible('text=最近的評價') and g.page.is_visible('text=生活相簿'), 'journal front page')
+    g.ev("(()=>{const el=document.createElement('button');el.dataset.act='btab';el.dataset.k='mem';$('#screen').appendChild(el);el.click();el.remove()})()")
+    check(g.page.locator('.polaroid').count() == len(a) and g.page.locator('.polaroid .pin').count() >= 1, 'album tab shows every photo as a polaroid, 珍藏 pinned')
+    check(g.page.locator('text=COLLECTION').count() == 0, 'no collection counter')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
 def save_backup_and_restore(b, port, target):
     """備份存檔 writes one JSON file; 讀取存檔 restores it (Dylan/life state included) after a confirmation;
     junk, unrelated and newer-version files are refused with the current save untouched; an old save
@@ -1108,7 +1334,7 @@ def save_backup_and_restore(b, port, target):
     install_bot(g)
     g.ev("S.day=6;S.money=4321;S.dylan.stage=2;S.dylan.clues={late:2,tidy:1};S.life.sofa=3;S.life.tv=1;save()")
     g.click('.links [data-act=settings]')
-    check(g.page.is_visible('text=本機存檔') and g.page.is_visible('text=備份存檔') and g.page.is_visible('text=讀取存檔'), 'save UI labels missing')
+    check(g.page.is_visible('text=本機自動儲存') and g.page.is_visible('text=備份到檔案') and g.page.is_visible('text=從備份檔恢復'), 'save UI labels missing')
     with g.page.expect_download() as dl:
         g.click('[data-act=export]')
     d = dl.value

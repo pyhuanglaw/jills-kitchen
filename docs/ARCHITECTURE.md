@@ -12,6 +12,7 @@
 | `tests/fixtures/*.json` | 舊存檔樣本，每次存檔格式改變都要新增一份 |
 | `tests/golden/` | 目前版本的「標準答案」：遊戲數值、每幀畫面雜湊、10 張截圖 |
 | `docs/V16_CHANGES.md` | V16（做菜流程、Dylan 的戲、等候長椅、備份存檔）改了什麼、為什麼 |
+| `docs/V18_CHANGES.md` | V18（跨日變暗與音樂的根因、營業中 checkpoint、Jill 的休息與互動、料理研發、相簿／日誌）改了什麼、為什麼 |
 | `docs/V17_CHANGES.md` | V17（Dylan 出場頻率、視覺打磨）改了什麼；第 5 天畫面消失的根因 |
 | `docs/LIFE_SYSTEM.md` | 沙發、閨蜜機、Jill 的晚上、五隻貓的沙發行為、Dylan 隱藏線的規則與測試 |
 | `tools/analyze.js`、`tools/lint.mjs` | 靜態分析（未使用的程式、共用變數、計時器、事件監聽） |
@@ -31,7 +32,8 @@
 | `CATS` | 五隻貓的即時狀態（不存檔；`applyDY` 會把它清成 `null`，下一幀重新產生） | 貓咪 AI |
 | `OCC` / `SIDE` / `perchOcc` | 貓咪「佔位表」：貓抓板、山洞、軟墊、玩具、Jill 左右、跳台各層 | `catGo`、`goJill`、跳台相關函式；**離開時一律透過 `releaseSpots(c)` / `leavePerch`** |
 | `bg` / `bgKey` | 背景快取，改等級、裝潢、菜單、尺寸時自動重畫；要強制重畫就設 `bg=null` |
-| `LIFE` | 當晚的生活狀態（Jill 在沙發上的位置與活動、閨蜜機、留下來的 Dylan、對話泡泡）。不存檔；每天開店與回到標題時 `lifeReset()`。只在 `evening()` 時更新 | `lifeUpd`（每幀）、`startClosing`、`dylanLinger` |
+| `LIFE` | 當晚的生活狀態（Jill 在沙發上的位置與活動、閨蜜機、留下來的 Dylan、對話泡泡）。不存檔；每天開店與回到標題時 `lifeReset()`。晚上由 `lifeUpd` 更新；**營業中 Jill 休息時**（`R.jill.rest==='sit'`）`LIFE.jill` 也會 `on`，由 `restTick` 更新，`endRest()` 清掉 | `lifeUpd`（每幀）、`startClosing`、`dylanLinger`、`startRest`／`restTick`／`endRest` |
+| `S.checkpoint` | 營業中的快照（`snapshotService()` 的純資料），每 20 秒、暫停、切到背景時更新；`endDay`／`nextDay`／開店時清掉。標題畫面用它顯示「繼續營業 · 19:42」 | `checkpointSave`、`clearCheckpoint`、`resumeCheckpoint` |
 | `c.sofa` / `c.sofaOn` | 貓在沙發上的位子（預約時就設定，跳上去後 `sofaOn=true`）；`releaseSpots(c)` 會一併清掉 | `goSofaSlot`、`leaveSofa` |
 
 測試會檢查的不變條件（`tests/run_tests.py` 的 `INV` 與 `cat_ai_keeps_running`）：
@@ -135,7 +137,7 @@ const MIGRATE={
 - 讀不懂的存檔（壞掉、版本比程式新）會先複製到 `localStorage['jills-kitchen-save-v1-unreadable']`，再開始新遊戲，所以不會被下一次 `save()` 蓋掉。
 - 存檔失敗（例如容量滿）會在 console 印一次警告，遊戲畫面不變。
 
-照片（`S.mem`）目前每種回憶最多一張，共 10 張、每張約 5 KB。如果以後要讓照片數量無上限或提高解析度，先把照片搬到 IndexedDB 或獨立的 localStorage key，再用 migration 把舊照片搬過去。做法見 `REFACTOR_REPORT.md`。
+照片：`S.album`（V18 起）是一個陣列，每種畫面第一張 `keep:true`（珍藏），一般照片最多 `ALBUM_CAP`=30 張、最舊先出；每張 240×176 JPEG 約 6 KB，全滿約 300 KB。舊的 `S.mem` 在第一次 `albumList()` 時搬進相簿（圖片不再留在 `S.mem`）。要拍新種類的畫面：在 `MEMS` 加標題、`MEM_TXT` 加那句話、在條件成立處呼叫 `memo(id,x,y,info)`——冷卻、每日上限、容量都由 `albumAllows`／`albumAdd` 處理。如果以後要無上限，先搬到 IndexedDB。
 
 ## 6. 測試
 
