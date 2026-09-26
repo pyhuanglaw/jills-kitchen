@@ -1677,7 +1677,7 @@ def main():
     with sync_playwright() as p:
         b = p.chromium.launch()
         for fn in TESTS:
-            if a.k and a.k not in fn.__name__:
+            if a.k and not any(k and k in fn.__name__ for k in a.k.split(',')):
                 continue
             t0 = time.time()
             try:

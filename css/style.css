@@ -36,28 +36,36 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .icon-btn svg{width:16px;height:16px}
 
 /* tickets */
-#tickets{position:absolute;top:0;left:0;right:0;z-index:2;height:88px;display:flex;gap:7px;overflow-x:auto;overflow-y:hidden;padding:8px 10px;background:linear-gradient(rgba(12,18,20,.62),rgba(12,18,20,0));pointer-events:none;scrollbar-width:none}
+#tickets{position:absolute;top:0;left:0;right:0;z-index:2;height:88px;display:flex;gap:7px;overflow-x:auto;overflow-y:hidden;padding:4px 10px 0;align-items:flex-start;background:linear-gradient(rgba(12,18,20,.62),rgba(12,18,20,0));pointer-events:none;scrollbar-width:none}
 .tk{pointer-events:auto}
 #tickets::-webkit-scrollbar{display:none}
 /* many orders: the strip itself scrolls (drag anywhere on it), tickets go compact, the edge tells you there is more */
 #tickets.scroll{pointer-events:auto;touch-action:pan-x;scroll-snap-type:x proximity;padding-right:52px}
 #tickets.scroll .tk{scroll-snap-align:start}
-#tickets.compact .tk{min-width:0;padding:4px 5px 5px}
-#tickets.compact .tk-h span{display:none}
-#tickets.compact .it{width:34px;height:34px}
+#tickets.compact .tk{min-width:64px;padding:3px 5px 4px}
+#tickets.compact .it{width:32px;height:32px}
+#tickets.compact .tk-who{font-size:9.5px}
+#tickets.compact .tk-who img{width:13px;height:13px}
 .tk-nav{position:absolute;top:22px;right:8px;z-index:3;width:38px;height:44px;border:0;border-radius:10px;background:rgba(22,33,36,.88);color:var(--cream);font-size:22px;font-weight:800;line-height:1;box-shadow:0 0 0 1px rgba(230,194,122,.35),0 2px 6px rgba(0,0,0,.35);padding:0}
 .tk-nav small{display:block;font-size:9.5px;font-weight:800;margin-top:-2px}
 .tk-nav.back{right:auto;left:8px}
 .tk-empty{display:none;align-self:center;color:rgba(247,237,220,.45);font-size:12px;padding-left:4px}
-.tk{flex:0 0 auto;background:var(--paper);color:var(--ink);border-radius:4px 4px 9px 9px;padding:5px 6px 6px;display:flex;flex-direction:column;gap:4px;box-shadow:0 2px 0 rgba(0,0,0,.25);position:relative;min-width:74px}
+.tk{flex:0 0 auto;background:var(--paper);color:var(--ink);border-radius:4px 4px 9px 9px;padding:4px 6px 4px;display:flex;flex-direction:column;gap:2px;box-shadow:0 2px 0 rgba(0,0,0,.25);position:relative;min-width:74px;max-width:150px}
+/* who this order belongs to: a face and the name, on every ticket, in every mode. Regulars are marked; Dylan reads at a glance. */
+.tk-who{flex:none;display:flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;color:var(--ink);white-space:nowrap;line-height:13px;min-width:0}
+.tk-who img{width:15px;height:15px;border-radius:50%;background:#F3E7D2;flex:none;box-shadow:0 0 0 1px rgba(46,32,25,.15)}
+.tk-who span{overflow:hidden;text-overflow:ellipsis;min-width:0}
+.tk.isreg .tk-who span{color:#8A3A4A}.tk.isreg .tk-who::after{content:'♥';color:#E8798A;font-size:9px;flex:none;margin-left:1px}
+.tk.isdylan .tk-who img{box-shadow:0 0 0 1.5px #4E5A6B}.tk.isdylan .tk-who span{color:#2E3A4B;font-weight:800}.tk.isdylan .tk-who::after{content:'D';color:#fff;background:#4E5A6B;border-radius:4px;font-size:8px;padding:0 3px;flex:none;line-height:11px}
+.tk.isvip .tk-who span{color:#8E6422}
 .tk::before{content:"";position:absolute;left:50%;top:-3px;width:9px;height:9px;margin-left:-4.5px;border-radius:50%;background:var(--brass);box-shadow:inset 0 -2px 0 var(--brass3)}
 .tk.urgent{animation:tkPulse 1s ease-in-out infinite}
 @keyframes tkPulse{50%{box-shadow:0 0 0 2px var(--tomato),0 2px 0 rgba(0,0,0,.25)}}
-.tk-h{display:flex;gap:5px;align-items:baseline;font-size:10.5px;color:var(--ink2);white-space:nowrap}
-.tk-h b{font-family:var(--disp);font-size:14px;color:var(--ink);font-weight:400}
+.tk-h{flex:none;display:flex;gap:5px;align-items:baseline;font-size:10.5px;color:var(--ink2);white-space:nowrap;line-height:14px}
+.tk-h b{font-family:var(--disp);font-size:13.5px;color:var(--ink);font-weight:400}
 .tk-h em{font-style:normal;margin-left:auto;font-variant-numeric:tabular-nums;font-weight:700}
-.tk-items{display:flex;gap:4px}
-.it{width:38px;height:38px;border-radius:9px;border:1.5px dashed rgba(46,32,25,.4);background:#fff;padding:0;position:relative;display:block}
+.tk-items{flex:none;display:flex;gap:4px;margin-top:1px}
+.it{width:36px;height:36px;border-radius:9px;border:1.5px dashed rgba(46,32,25,.4);background:#fff;padding:0;position:relative;display:block}
 .it img{width:100%;height:100%;display:block;border-radius:7px}
 .it.cooking{border:2px solid var(--brass)}
 .it.cooking::after{content:"";position:absolute;inset:-5px;border-radius:12px;border:2px solid transparent;border-top-color:var(--brass);animation:spin 1s linear infinite}
@@ -88,7 +96,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .dots{color:var(--gold);letter-spacing:1px}
 .it .tag{position:absolute;bottom:-4px;right:-4px;font-size:8.5px;font-weight:800;background:var(--ink);color:#fff;border-radius:5px;padding:1px 3px;line-height:1.1}
 .it .ok{position:absolute;top:-5px;right:-5px;width:15px;height:15px;border-radius:50%;background:var(--sage);color:#fff;font-size:9px;display:grid;place-items:center;font-weight:800}
-.tk-pat{height:4px;background:rgba(46,32,25,.12);border-radius:2px;overflow:hidden}
+.tk-pat{flex:none;height:3px;margin-top:1px;background:rgba(46,32,25,.12);border-radius:2px;overflow:hidden}
 .tk-pat i{display:block;height:100%;background:var(--sage);transition:width .2s linear}
 
 /* scene */
@@ -98,6 +106,11 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .chip .dots{display:flex;gap:3px}
 .chip .dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.2)}
 .chip .dots i.on{background:var(--gold)}
+.chip.left{right:auto;left:8px;padding:5px 9px}.chip.left.two{top:124px}.chip .n{min-width:14px;text-align:center;font-size:11px;color:var(--gold)}
+#stockChip.low .n{color:#FF9A7A}#stockChip.out .n{color:#fff;background:#D4553A;border-radius:8px;padding:0 4px}
+.lpanel{position:absolute;top:158px;left:8px;right:8px;z-index:4;max-height:calc(100% - 200px);overflow:auto;background:var(--paper);color:var(--ink);border-radius:12px;padding:10px 12px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.lpanel h4{margin:0 0 6px;font-family:var(--disp);font-weight:400;font-size:15px}
+.ll{display:grid;grid-template-columns:auto auto 1fr;gap:0 6px;padding:4px 0;border-top:1px solid var(--line);font-size:12px;line-height:1.4;align-items:baseline}.ll:first-of-type{border-top:0}.ll small{color:var(--ink2);font-variant-numeric:tabular-nums;font-size:10.5px}.ll b{color:var(--tomato)}.ll.j b{color:#2E6B4A}.ll.d b{color:#2E3A4B}.ll.s b{color:#8E6422}.ll.e{grid-template-columns:auto 1fr;color:var(--ink2)}
 #taskPanel{position:absolute;top:126px;right:8px;z-index:4;width:min(250px,calc(100% - 16px));background:var(--paper);color:var(--ink);border-radius:12px;padding:10px 12px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
 #taskPanel h4{margin:0 0 6px;font-family:var(--disp);font-weight:400;font-size:15px}
 .task{display:grid;grid-template-columns:1fr auto;gap:2px 8px;padding:6px 0;border-top:1px solid var(--line);font-size:12.5px}
