@@ -208,7 +208,7 @@ const COACH=[
 const KEY='jills-kitchen-save-v1';
 function newState(){return{v:1,day:1,phase:'prep',money:500,lifetime:0,level:1,
  eq:{stove:1,oven:0,bar:0,prep:0,fridge:1,pan:1},tables:2,
- decor:{plants:0,lights:0,art:0,chairs:0,rug:0,ware:0,bar:0,sofa:0},staff:{busser:false,bartender:false},mem:{},catFam:{},crew:[],crewMig:1,rstar:{},dylan:{stage:0,stay:0,reveal:0,last:0,clues:{}},life:{sofa:0,tv:0},checkpoint:null,savedAt:0,savedLabel:'',rdProg:{},rdDone:{},labKnown:{},album:null,notes:[],
+ decor:{plants:0,lights:0,art:0,chairs:0,rug:0,ware:0,bar:0,sofa:0},staff:{busser:false,bartender:false},mem:{},catFam:{},crew:[],crewMig:1,rstar:{},dylan:{stage:0,stay:0,reveal:0,last:0,clues:{}},life:{sofa:0,tv:0},checkpoint:null,savedAt:0,savedLabel:'',rdProg:{},rdDone:{},labKnown:{},labTried:{},album:null,notes:[],
  unlocked:['friedrice'],menu:['friedrice'],price:{},stock:{},xp:{},reviews:[],achievements:{},regulars:{},returning:0,
  signature:null,catNames:{},buzz:1,buzzMsg:'',stats:{guests:0,perfect:0,days:0},tut:0,gate:1,news:[],today:null,todayCost:0,lastSummary:null,sfx:true,music:true}}
 let S;
@@ -2532,7 +2532,8 @@ screenEl.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(
  case'labPick':{const i=labSel.indexOf(k);if(i>=0)labSel.splice(i,1);else if(labSel.length<3)labSel.push(k);else toast('最多選 3 種食材');sfx.tap();keepScroll(showShop);break}
  case'labTry':{if(S.money<150||labSel.length<2)break;S.money-=150;const sel=labSel.slice();const r=labEval(sel);S.rdProg=S.rdProg||{};S.rdDone=S.rdDone||{};
   if(r.kind==='exact'||r.kind==='success'){const D=DISHES[r.d];S.labLast={kind:r.kind,title:r.kind==='exact'?'大成功！':'成功料理',text:r.kind==='exact'?`${sel.map(i=>ING[i].n).join('＋')}，就是「${D.n}」。`:`做出了「${D.n}」。${ING[r.extra[0]].n}其實用不到，下次可以省下來。`};labLearn(dishKeys(r.d));delete S.rdProg[r.d];rdFinish(r.d,r.kind==='exact'?'研發成功！':'研發成功')}
-  else if(r.kind==='potential'){const D=DISHES[r.d];const pr=Math.min(3,(S.rdProg[r.d]||0)+1);S.rdProg[r.d]=pr;labLearn(r.have);const miss=r.missing.map(i=>DIR_N[labProfile(i).d]);
+  else if(r.kind==='potential'&&(S.labTried=S.labTried||{})[sel.slice().sort().join('|')]){/* the same combination again: nothing new is learned */const miss=[...new Set(r.missing.map(i=>DIR_N[labProfile(i).d]))];S.labLast={kind:'plain',title:'跟上次一樣',text:`這個組合試過了，沒有新的發現。${r.have.map(i=>ING[i].n).join('、')}留著，換一種${miss.join('或')}試試。`};sfx.okay()}
+  else if(r.kind==='potential'){S.labTried[sel.slice().sort().join('|')]=1;const D=DISHES[r.d];const pr=Math.min(3,(S.rdProg[r.d]||0)+1);S.rdProg[r.d]=pr;labLearn(r.have);const miss=r.missing.map(i=>DIR_N[labProfile(i).d]);
    const text=pr>=3?`第三次試作，終於成形了。`:`像是一道${CAT_N[D.cat]}（${ST_N[D.st]}）的雛形。${r.have.map(i=>ING[i].n).join('、')}是對的，還缺${miss.length}種${[...new Set(miss)].join('或')}。研究進度 ${'●'.repeat(pr)}${'○'.repeat(3-pr)}`;
    S.labLast={kind:'potential',title:pr>=3?'研究完成！':'有潛力的試作品',text,have:r.have.slice(),missDirs:[...new Set(r.missing.map(i=>labProfile(i).d))]};if(pr>=3){delete S.rdProg[r.d];rdFinish(r.d,'研究完成！')}else sfx.good()}
   else if(r.kind==='known'){S.labLast={kind:'plain',title:'這道已經會了',text:`這就是「${DISHES[r.d].n}」的做法，已經在菜單上了。`};sfx.okay()}
