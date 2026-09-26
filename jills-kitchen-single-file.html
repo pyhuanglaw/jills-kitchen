@@ -901,7 +901,7 @@ function buildSchedule(dur){const T=S.today,n=T.groups,out=[];
  if(ev==='blogger')out.push({t:rand(.3,.7)*dur,type:'blogger',size:1});
  if(S.day>=6&&Math.random()<.2)out.push({t:rand(.25,.8)*dur,type:'critic',size:1});
  for(const r of REGS)if(S.day>=r.day&&Math.random()<.42)out.push({t:rand(.1,.85)*dur,type:r.type,reg:r.id,size:r.size});
- if(S.day>=3){const d=S.dylan;const p=d.last===S.day-1?.1:d.stage>=3?.42:.3;if(Math.random()<p){const late=Math.random()<(d.stage>=1?.6:.35);out.push({t:(late?rand(.62,.86):rand(.12,.5))*dur,type:'regular',reg:'dylan',size:1})}}
+ if(S.day>=3){const d=S.dylan;/* a recurring person in Jill's life, not a daily spawn: about every other day, less likely right after a visit */const p=d.last===S.day-1?.28:S.day<=5?.48:.56;if(Math.random()<p){const late=Math.random()<(d.stage>=2?.8:d.stage>=1?.7:.35);out.push({t:(late?rand(.62,.86):rand(.12,.5))*dur,type:'regular',reg:'dylan',size:1})}}
  return out.sort((a,b)=>a.t-b.t)}
 function rollGuest(){const D=S.day,ev=S.today.event,L=S.level;const w={office:30*(ev==='company'?3:1),student:D>=2?22:12,couple:D>=2?14*(ev==='valentine'?3:1):0,gourmet:D>=3?8+L*3:0,vip:D>=6?1.5+L*1.5:0};
  const type=wpick(Object.keys(w),k=>w[k]);let size=1;if(type==='couple'||type==='vip')size=2;else if(type==='student')size=Math.random()<.5?1:Math.random()<.65?2:3;else if(type==='office')size=Math.random()<.7?1:2;else size=Math.random()<.6?1:2;
@@ -1619,7 +1619,7 @@ function catDecide(c){c.guest=null;c.moving=false;c.run=0;const id=c.def.id;cons
  add('eat',id==='mikan'?1:.5);add('toy',spotFree('toy')?(id==='mikan'?1:.4):0);
  add('sofa',sofaWeight(c));
  {const fs=[0,1,2].filter(benchFree);const standing=R&&R.groups.some(g=>g.state==='queue'&&g.spot&&g.spot.k==='stand');if(fs.length>=2&&!standing&&![0,1,2].some(i=>OCC['bench'+i]))add('bench',id==='mei'?.5:id==='snow'?.15:.25)}
- if(R&&phase==='service'){const dg=R.groups.find(g=>g.reg==='dylan'&&g.table!=null&&['reading','wait','eat','check'].includes(g.state)&&!(g.catT>R.t)&&!CATS.some(o=>o.guest===g));if(dg)add('visitDylan',id==='tora'?.7:id==='mikan'?.5:id==='ban'?.3:0)}
+ if(R&&phase==='service'){const dg=R.groups.find(g=>g.reg==='dylan'&&g.table!=null&&['reading','wait','eat','check'].includes(g.state)&&!(g.catT>R.t)&&!CATS.some(o=>o.guest===g));if(dg)add('visitDylan',id==='tora'?2:id==='mikan'?1.4:id==='ban'?.9:id==='mei'?.5:.2)}
  {const D=LIFE.dylan;if(D&&!D.onSofa&&(D.seated||D.state==='stand'||D.state==='crouch'))add('nearDylan',id==='tora'?.9:id==='mikan'?.6:id==='ban'?.4:0)}
  if(id==='ban'){add('nearTora',1.3);add('nearRou',1.1);add('nearBao',.7)}
  if(id==='mikan'){add('nearHou',1.8);add('nearTora',1.4);add('watchBao',1);if(BAO_LAST&&ctime-BAO_LAST.t>6&&ctime-BAO_LAST.t<70)add('imitate',1.4);if(!c.ambCD||ctime>c.ambCD)add('ambush',.7);add('stare',.9)}
@@ -2057,7 +2057,7 @@ function tvDone(ok){const tv=LIFE.tv;const who=tv.mover;tv.mover=null;tv.path=nu
  if(who==='jill'){const L=LIFE.jill;L.moving=false;L.act='standing';jillWalk(L,JPOS[L.pos].x,SOFA.front+10,'back');if(ok)L.last='tv-fetched'}
  else if(who==='dylan'&&LIFE.dylan){const D=LIFE.dylan;D.moving=false;D.state='think';D.t=rand(.5,1.5)}}
 /* ---- Dylan ---- */
-function dylanStays(){const d=S.dylan;if(!d||d.stage<1)return false;if(!R.closed&&R.t<R.dur*.8)return false;return Math.random()<(d.stage>=3?.65:.4)}
+function dylanStays(){const d=S.dylan;if(!d||d.stage<1)return false;if(!R.closed&&R.t<R.dur*.72)return false;return Math.random()<(d.stage>=2?.8:.6)}
 function dylanLinger(g,t){g.gone=true;const sp=seatPos(t)[0];LIFE.dylan={x:t.x+sp.dx,y:t.y+sp.dy,face:sp.side>0?-1:1,state:'linger',table:t.i,seat:0,seated:true,onSofa:false,t:rand(3,8),phone:Math.random()<.7,walking:false,step:0,moving:false,carry:false,catCD:0,tidied:false,act:null,talkT:rand(30,70),since:0};
  const d=S.dylan;d.stay=(d.stay||0)+1;d.clues.late=(d.clues.late||0)+1}
 function dylanStageCheck(){const d=S.dylan;if(!d)return;const v=S.regulars.dylan||0;const cl=Object.keys(d.clues||{}).filter(k=>d.clues[k]>0).length;
@@ -2117,7 +2117,7 @@ function dylanArrive(D){const a=D.after;D.after=null;const J=LIFE.jill;
 function dylanDecide(D){const st=S.dylan.stage;const J=LIFE.jill;const tv=LIFE.tv;const W=[];const add=(k,w)=>{if(w>0)W.push([k,w])};
  const V=view();const near=CATS?CATS.filter(c=>!c.hidden&&c.perch<0&&!c.sofa&&!['jump','walk','race','dash','chase','hide2','visit','play'].includes(c.st)&&Math.hypot(c.x-D.x,c.y-D.y)<150):[];
  const sofaX=dylanCanSofa();const wantsTV=J.on&&(J.act==='wantTV'||J.act==='waitTV')&&tv.at==='park'&&!tv.mover&&tv.tried<2;
- if(st===2&&(J.on||J.reserved)&&!LIFE.revealRoll)LIFE.revealRoll=Math.random()<.4?1:-1;
+ if(st===2&&(J.on||J.reserved)&&!LIFE.revealRoll)LIFE.revealRoll=Math.random()<.75?1:-1;
  const reveal=st===2&&LIFE.revealRoll===1&&sofaX!=null&&(J.reserved||J.on)&&(!J.on||['settle','read','idle','tv','pet','wantTV','waitTV'].includes(J.act));
  add('sitTable',D.state==='sitTable'?.7:1);add('stand',.35);
  if(near.length&&D.catCD<LIFE.t)add('cat',st>=3?.6:.7);
@@ -2205,7 +2205,8 @@ function chefScore(m){return[.8,.86,.9,.95,1][m.lv-1]}
 function waiterDelay(m){return Math.max(.3,2.2-.4*(m.lv-1))}
 function cleanDur(m){return Math.max(.3,1.3-.22*(m.lv-1))}
 function crewStat(m){return m.role==='chef'?`每步 ${chefDelay(m).toFixed(1)} 秒・品質 ${Math.round(chefScore(m)*100)}`:m.role==='waiter'?`反應 ${waiterDelay(m).toFixed(1)} 秒`:`收桌 ${cleanDur(m).toFixed(1)} 秒`}
-function crewLook(m){const h=hash(m.id);return{skin:SKIN[h%SKIN.length],hair:HAIR[(h>>3)%HAIR.length],hs:(h>>6)%5,top:m.role==='waiter'?'#3F6B55':m.role==='cleaner'?'#8FA3B5':'#FFFFFF',acc:m.role==='waiter'?'tie':null,pants:'#2E2B33'}}
+/* hash() is unsigned 32-bit: shift with >>> — a signed >> turns half of all ids negative, HAIR[-2] is undefined and the first draw of that employee throws (and with it the whole frame loop) */
+function crewLook(m){const h=hash(m.id);return{skin:SKIN[h%SKIN.length],hair:HAIR[(h>>>3)%HAIR.length],hs:(h>>>6)%5,top:m.role==='waiter'?'#3F6B55':m.role==='cleaner'?'#8FA3B5':'#FFFFFF',acc:m.role==='waiter'?'tie':null,pants:'#2E2B33'}}
 function chefAuto(s,dt){const j=s.job,k=j.step;const ch=chefHandles(s);if(!ch||k.t==='wait'||k.t==='work')return false;const sp=dishSpeed(j.d,s.type);
  if(k.t==='zone'){const tgt=k.z.c-k.z.w*.35+(ch.lv<3?(hash(j.seed+''+j.si)%100/100-.5)*.08:0);if(k.p>=tgt){j.overStart=null;actZone(s)}else{k.p+=dt*sp/k.time;if(k.p>=1.5)charcoal(s)}return true}
  k.auto+=dt;if(k.auto<chefDelay(ch))return true;

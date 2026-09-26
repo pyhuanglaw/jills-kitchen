@@ -986,6 +986,70 @@ def dylan_pays_tidies_and_is_not_staff(b, port, target):
     g.close()
 
 @test
+def world_stays_visible_across_days(b, port, target):
+    """Ten consecutive real days played like a person would (buying tables, gear, decor, dishes, hiring
+    staff with the game's own random ids plus ids that hash into the sign bit), with real frames.
+    Every service day the restaurant world must actually be on the canvas, the frame loop must keep
+    running, nothing may throw, and the canvas state (save/restore depth, alpha, composite) must be
+    balanced after every frame. Guards against the Day-5 blank-world regression: an employee whose
+    id hashed negative made drawPerson throw on its first draw, which killed the frame loop for good
+    while the DOM HUD and station taps kept working."""
+    g = Game(b, port, target, seed=5, manual=True)
+    install_bot(g)
+    g.ev(r"""(()=>{window.__cv={depth:0,worst:0};const P=CanvasRenderingContext2D.prototype;const s0=P.save,r0=P.restore;
+      P.save=function(){if(this===sctx){__cv.depth++;__cv.worst=Math.max(__cv.worst,__cv.depth)}return s0.apply(this,arguments)};
+      P.restore=function(){if(this===sctx)__cv.depth--;return r0.apply(this,arguments)}})()""")
+    probe = r"""(()=>{const c=sc.getContext('2d');const w=sc.width,h=sc.height;const y0=Math.floor(h*.25),y1=Math.floor(h*.85);const d=c.getImageData(0,y0,w,y1-y0).data;
+      let dark=0,n=0;const cols=new Set();for(let i=0;i<d.length;i+=16){n++;if(Math.abs(d[i]-30)<6&&Math.abs(d[i+1]-23)<6&&Math.abs(d[i+2]-20)<6)dark++;if(cols.size<2000)cols.add((d[i]>>3)<<10|(d[i+1]>>3)<<5|(d[i+2]>>3))}
+      const tf=sctx.getTransform();return{dark:+(dark/n).toFixed(3),colors:cols.size,t:R?R.t:null,phase,depth:__cv.depth,alpha:sctx.globalAlpha,comp:sctx.globalCompositeOperation,finite:!R||(isFinite(R.jill.x)&&isFinite(R.jill.y)&&R.groups.every(q=>isFinite(q.x)&&isFinite(q.y))&&CATS.every(k=>isFinite(k.x)&&isFinite(k.y)))}})()"""
+    def act(a, **kv):
+        ds = ''.join(f"el.dataset.{k}='{v}';" for k, v in kv.items())
+        g.ev(f"(()=>{{const el=document.createElement('button');el.dataset.act='{a}';{ds}$('#screen').appendChild(el);el.click();el.remove()}})()")
+    plan = {1: [('rd', {'d': 'pasta'}), ('rd', {'d': 'salad'}), ('buyTable', {})],
+            2: [('buyEq', {'k': 'bar'}), ('rd', {'d': 'coffee'}), ('buyDecor', {'k': 'plants'}), ('buyTable', {})],
+            3: [('hire', {'k': 'waiter'}), ('rd', {'d': 'burger'}), ('buyDecor', {'k': 'lights'})],
+            4: [('buyEq', {'k': 'oven'}), ('rd', {'d': 'fries'}), ('expand', {}), ('hire', {'k': 'cleaner'})],
+            5: [('expand', {}), ('hire', {'k': 'chef'}), ('rd', {'d': 'soup'}), ('buyDecor', {'k': 'chairs'}), ('buyEq', {'k': 'stove'})],
+            6: [('buyEq', {'k': 'fridge'}), ('rd', {'d': 'blacktea'}), ('buyDecor', {'k': 'art'}), ('buyTable', {})],
+            7: [('rd', {'d': 'tiramisu'}), ('buyEq', {'k': 'pan'}), ('buyDecor', {'k': 'rug'})],
+            8: [('rd', {'d': 'chicken'}), ('buyDecor', {'k': 'ware'}), ('buyTable', {}), ('expand', {})],
+            9: [('rd', {'d': 'steak'}), ('buyEq', {'k': 'oven'}), ('hire', {'k': 'chef'})]}
+    g.click('[data-act=open]')
+    for day in range(1, 11):
+        act('restock'); g.ev("__tick(200)")
+        if day == 4:   # ids whose hash has the sign bit set: c1 (cleaner), m1 (chef) — the shape that used to crash
+            g.ev("S.crew.push({id:'c1',role:'cleaner',name:'阿明',lv:1,duty:'clean'},{id:'m1',role:'chef',name:'Hugo',lv:2,duty:'stove'})")
+        start_day(g)
+        t_prev = -1
+        for sec in range(8):
+            g.ev("__play(30,0)")
+            check(not g.errors, f'day {day}: page error during service: {g.errors[:2]}')
+            pr = g.ev(probe)
+            if pr['phase'] != 'service': break
+            check(pr['t'] > t_prev, f'day {day}: the clock stopped (frame loop dead?) at second {sec}: {pr}')
+            t_prev = pr['t']
+            check(pr['dark'] < .3 and pr['colors'] > 300, f'day {day}: the restaurant world is blank/dark at second {sec}: {pr}')
+            check(pr['depth'] == 0 and pr['alpha'] == 1 and pr['comp'] == 'source-over', f'day {day}: canvas state leaked after a frame: {pr}')
+            check(pr['finite'], f'day {day}: non-finite coordinates: {pr}')
+        # finish the day fast, then let the closing and a bit of the evening render
+        if g.ev("phase") == 'service': g.ev("__bot(60000,1/30)")
+        g.ev("for(let i=0;i<60;i++)__tick(1000/30)")
+        check(not g.errors, f'day {day}: page error at closing: {g.errors[:2]}')
+        if g.ev("phase") == 'summary': g.click('[data-act=toShop]')
+        for a, kv in plan.get(day, []):
+            act(a, **kv); g.ev("__tick(30)")
+        check(not g.errors, f'day {day}: page error in the shop: {g.errors[:2]}')
+        g.click('[data-act=nextDay]'); g.ev("__tick(100)")
+        check(g.ev("phase") == 'prep', f'day {day}: next day did not reach the prep screen')
+        pr = g.ev(probe)
+        check(pr['dark'] < .3 and pr['colors'] > 300, f'day {day + 1}: the room behind the prep screen is blank: {pr}')
+    crew = g.ev("S.crew.map(m=>m.id+':'+m.role)")
+    check(len(crew) >= 3 and any(c.startswith('c1:') for c in crew) and any(c.startswith('m1:') for c in crew), f'the staff (including the sign-bit ids) should have been drawn all along: {crew}')
+    check(g.ev("S.level") >= 2 and g.ev("S.tables") >= 4, 'the test should have expanded the restaurant along the way')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
 def save_backup_and_restore(b, port, target):
     """備份存檔 writes one JSON file; 讀取存檔 restores it (Dylan/life state included) after a confirmation;
     junk, unrelated and newer-version files are refused with the current save untouched; an old save
