@@ -247,9 +247,11 @@ function load(){let t=null;try{t=localStorage.getItem(KEY)}catch(e){return null}
 let saveWarned=false;
 function backupName(){const d=new Date(),p=n=>String(n).padStart(2,'0');return `JillsKitchen_Save_${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}_Day${S.day}.json`}
 function backupText(){return JSON.stringify({app:BACKUP_APP,kind:'save',v:S.v,exported:new Date().toISOString(),save:S},null,1)}
-function exportSave(){if(phase==='service'){toast('營業中不能備份，打烊後再來');return false}save();
- try{const blob=new Blob([backupText()],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=backupName();document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),4000);toast('已備份存檔：'+backupName());return true}
- catch(e){toast('這個瀏覽器無法下載檔案');return false}}
+function exportSave(){if(phase==='service'){toast('營業中不能備份，打烊後再來');return false}save();const name=backupName(),text=backupText();
+ const direct=()=>{try{const blob=new Blob([text],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),4000);toast('已備份存檔：'+name);return true}catch(e){toast('這個瀏覽器無法下載檔案');return false}};
+ /* inside the claude.ai viewer a page cannot download by itself; the host saves the file for us */
+ const host=window.claude&&typeof window.claude.use==='function';if(!host)return direct();
+ toast('準備備份檔…');window.claude.use('downloads').then(d=>{if(!d){direct();return}return d.save({filename:name,data:text}).then(()=>toast('已備份存檔：'+name),e=>{if(e&&e.code==='declined')return;direct()})}).catch(direct);return true}
 const IMPORT_MSG={notjson:'這不是 Jill\'s Kitchen 的存檔檔案（無法讀取內容）',notsave:'這不是 Jill\'s Kitchen 的存檔檔案',newer:'這個存檔來自比較新的版本，目前的遊戲讀不了',broken:'這個存檔檔案已經損壞，無法讀取'};
 let pendingImport=null;
 function importSaveText(t){const r=parseSave(t);if(r.err){pendingImport=null;toast(IMPORT_MSG[r.err]+'。目前的進度沒有改變');if(sub==='settings')showSettings();return false}pendingImport=r.o;if(sub==='settings')showSettings();return true}

@@ -1030,6 +1030,12 @@ def save_backup_and_restore(b, port, target):
     g.click('[data-act=importYes]'); g.ev("__tick(50)")
     orig = json.loads(json.load(open(fx, encoding='utf-8'))[SAVE_KEY])
     check(g.ev("S.day") == orig['day'] and g.ev("S.money") == orig['money'], 'old save file not restored')
+    # inside the claude.ai viewer the page cannot download by itself: the host's downloads capability saves the file
+    r = g.ev(r"""(()=>{window.__saved=null;window.claude={use:n=>Promise.resolve(n==='downloads'?{save:req=>{window.__saved=req;return Promise.resolve({status:'saved'})}}:null)};return exportSave()})()""")
+    g.page.wait_for_timeout(100)
+    saved = g.ev("__saved&&{filename:__saved.filename,app:JSON.parse(__saved.data).app,day:JSON.parse(__saved.data).save.day}")
+    check(r and saved and saved['app'] == 'jills-kitchen' and saved['day'] == orig['day'] and saved['filename'].endswith('.json'), f'host download path not used: {saved}')
+    g.ev("delete window.claude")
     check(not g.errors, g.errors)
     g.close()
 
