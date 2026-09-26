@@ -1295,11 +1295,11 @@ def album_notes_and_journal(b, port, target):
     # rules, driven directly
     r = g.ev(r"""(()=>{const out={};S.day=10;out.firstNew=albumAllows('nap3');albumAdd('nap3','x',{});out.sameDay=albumAllows('nap3');S.day=12;out.twoDays=albumAllows('nap3');S.day=13;out.threeDays=albumAllows('nap3');
       // ordinary photos rotate out at 30; 珍藏 never do
-      for(let i=0;i<45;i++){S.day=20+i*3;albumAdd('nap3','img'+i,{})}
-      const ord=S.album.filter(p=>!p.keep),keep=S.album.filter(p=>p.keep);out.ord=ord.length;out.keep=keep.length;out.oldestOrd=ord[0].img;out.keepKinds=keep.map(p=>p.kind).sort();
+      for(let i=0;i<albumCap()+20;i++){S.day=20+i*3;albumAdd('nap3','img'+i,{})}
+      const ord=S.album.filter(p=>!p.keep),keep=S.album.filter(p=>p.keep);out.ord=ord.length;out.keep=keep.length;out.oldestOrd=ord[0].id;out.keepKinds=keep.map(p=>p.kind).sort();
       S.day=200;out.dailyCap=[albumAllows('best'),(albumAdd('best','a',{}),albumAllows('sides')),(albumAdd('sides','a',{}),albumAdd('rest','a',{}),albumAdd('pet','a',{}),albumAllows('lap'))];return out})()""")
     check(r['firstNew'] and not r['sameDay'] and not r['twoDays'] and r['threeDays'], f'kind cooldown: {r}')
-    check(r['ord'] == 30 and r['keep'] == 3 and r['oldestOrd'] != 'img0' and r['keepKinds'] == ['nap3','race','sofa'], f'capacity: {r}')
+    check(r['ord'] == g.ev('albumCap()') and r['keep'] == 3 and r['keepKinds'] == ['nap3','race','sofa'], f'capacity: {r}')
     check(r['dailyCap'] == [True, True, False], f'no more than four photos a day: {r["dailyCap"]}')
     # in play: a few days with staff produce photos with captions, clocks and a note or two
     g.ev("(()=>{S.album=[];S.mem={};S.notes=[];S.day=6;for(const r of REGS)S.regulars[r.id]=6;S.money=9000;S.level=2;S.eq.bar=1;S.crew=[{id:'w1',role:'waiter',name:'小美',lv:3,duty:'both'},{id:'k1',role:'cleaner',name:'阿宏',lv:2,duty:'clean'}];save();showPrep()})()")
@@ -1312,7 +1312,8 @@ def album_notes_and_journal(b, port, target):
         g.ev("for(let i=0;i<900;i++)__tick(1000/30)")
         if g.ev("phase") == 'summary': g.click('[data-act=toShop]')
         g.click('[data-act=nextDay]')
-    a = g.ev("albumList().map(p=>({kind:p.kind,day:p.day,clock:p.clock,cap:p.cap,txt:p.txt,keep:p.keep,img:p.img.slice(0,22)}))")
+    g.page.wait_for_timeout(500)
+    a = g.ev("Promise.all(albumList().map(p=>photoGet(p.id).then(d=>({kind:p.kind,day:p.day,clock:p.clock,cap:p.cap,txt:p.txt,keep:p.keep,img:(d||'').slice(0,22)}))))")
     check(len(a) >= 3, f'three staffed days should leave a few photos: {a}')
     check(all(x['cap'] and x['img'].startswith('data:image/jpeg') and x['day'] >= 6 for x in a), f'photo records: {a}')
     check(any(x['clock'] for x in a), f'photos taken during the day carry the clock: {a}')
@@ -1367,6 +1368,125 @@ def tables_need_clearing_after_checkout(b, port, target):
     ti = g.ev(SEAT + "('office')"); serve_and_check(ti)
     g.ev(f"(()=>{{const g=R.tables[{ti}].group;g.state='eat';angryLeave(g)}})()")
     check(g.ev(f"R.tables[{ti}].dirty"), 'a served guest who storms out still leaves a dirty table')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
+def demand_recommendation_staff_v181(b, port, target):
+    """V18.1 loop: the recommendation raises a dish's expected demand and makes it the top main; the Signature
+    no longer swallows the service by itself; the dish mission asks for about 70% of expected sales; a LV5
+    chef cooks the Signature (LV3 cannot) and the hand-over line appears once; the staff list spells out
+    what each chef can cook; the order strip stays readable and reachable when overloaded."""
+    g = Game(b, port, target, seed=3, manual=True)
+    install_bot(g)
+    g.click('[data-act=open]')
+    g.ev("""(()=>{S.day=8;S.level=2;S.money=9000;S.tables=5;S.eq.bar=1;S.eq.oven=1;S.eq.prep=1;for(const d of ['pasta','salad','burger','soup','coffee','blacktea']){unlockDish(d);S.xp[d]=6}S.signature={name:"Jill's 香煎鴨胸",base:'mash',protein:'duck',sauce:'redwine',side:'asparagus'};S.xp.signature=3;S.today=null;planToday();for(const d of menuList())S.stock[d]=20;save()})()""")
+    base = g.ev("expectDemand(15,400)")
+    g.ev("S.today.reco='pasta'")
+    reco = g.ev("expectDemand(15,400)")
+    check(reco['pasta'] > base['pasta'] * 1.6, f'the recommendation should lift pasta clearly: {base["pasta"]} -> {reco["pasta"]}')
+    mains = {d: v for d, v in reco.items() if g.ev(f"DISH('{d}').cat") not in ('drink', 'dessert')}
+    check(max(mains, key=mains.get) == 'pasta', f'the recommended dish should be the most ordered main: {mains}')
+    g.ev("S.today.reco=null")
+    sig = g.ev("(()=>{const e=expectDemand(15,600);let m=0;for(const d in e)if(!['drink','dessert'].includes(DISH(d).cat))m+=e[d];return e.signature/m})()")
+    check(.12 < sig < .4, f'signature share of mains without a recommendation should be desirable, not dominant: {sig:.2f}')
+    for _ in range(6):
+        g.ev("S.today=null;planToday()")
+        t = g.ev("S.today.tasks.find(t=>t.k==='dish')")
+        if t:
+            check(t['n'] <= max(2, round(t['exp'] * .75) + 1), f'dish mission should ask for about 70% of expected sales: {t}')
+            check(g.ev(f"menuList().includes('{t['d']}')"), 'dish mission must be for a dish on the menu')
+    # chefs and the Signature
+    g.ev("S.crew=[{id:'c3',role:'chef',name:'阿德',lv:3,duty:'stove'}]")
+    check(not g.ev("chefCan(S.crew[0],'signature')") and g.ev("chefLock(S.crew[0],'signature')") == 'LV5 進階訓練', 'a LV3 chef must not cook the Signature')
+    g.ev("S.crew[0].lv=5")
+    check(g.ev("chefCan(S.crew[0],'signature')"), 'a LV5 chef cooks the Signature')
+    g.ev("S.taught=0;S.today.reco='signature';save();showPrep()")
+    g.ev("(()=>{const el=document.createElement('button');el.dataset.act='restock';$('#screen').appendChild(el);el.click();el.remove()})()")
+    start_day(g)
+    g.ev("(()=>{const t=R.tables[0];const o=rollGuest();const gg={id:R.gid++,type:'office',size:1,reg:null,forSig:true,looks:makeLooks('office',1),name:'測試客',state:'reading',table:0,pat:1,x:t.x,y:t.y+8,tx:t.x,ty:t.y+8,timer:0,ticket:null,seed:1,mood:'ok'};R.groups.push(gg);t.group=gg;createTicket(gg)})()")
+    check(g.ev("R.tickets[0].items.some(i=>i.d==='signature')"), 'a signature-seeking guest orders the Signature')
+    n = g.ev("(()=>{let n=0;while(n<600&&!R.slots.some(s=>s.job&&s.job.d==='signature'&&s.job.chef)){update(1/30);updateCats(1/30,0);n++}return n})()")
+    check(g.ev("R.slots.some(s=>s.job&&s.job.d==='signature'&&s.job.chef==='c3')"), f'the LV5 chef should pick up the Signature order ({n} frames)')
+    check(g.ev("S.taught") == 8 and '交給你了' in g.page.locator('#toasts').inner_text(), 'the hand-over moment fires once, on the first Signature the chef takes')
+    # staff list
+    g.ev("phase='shop';S.phase='shop';R=null;showShop()")
+    g.ev("(()=>{const el=document.createElement('button');el.dataset.act='tab';el.dataset.k='staff';$('#screen').appendChild(el);el.click();el.remove()})()")
+    caps = g.page.locator('.item .cap span').all_inner_texts()
+    check(any('✓' in c for c in caps) and any('🔒' in c for c in caps), f'capability list should show both ✓ and 🔒: {caps}')
+    # crowded order strip
+    g.ev("S.phase='prep';showPrep()"); g.ev("(()=>{const el=document.createElement('button');el.dataset.act='restock';$('#screen').appendChild(el);el.click();el.remove()})()"); start_day(g)
+    g.ev("""(()=>{for(let i=0;i<8;i++){const o=rollGuest();const gg={id:R.gid++,type:o.type,size:2,reg:null,forSig:false,looks:makeLooks(o.type,2),name:pick(NAMES.office),state:'wait',table:null,pat:.8,x:200,y:300,tx:200,ty:300,timer:0,ticket:null,seed:1,mood:'ok'};R.groups.push(gg);const items=['pasta','burger','coffee','signature'].slice(0,2+(i%3)).map(d=>({d,st:'pending',q:'G',want:0}));const tk={id:R.tkid++,no:i+1,g:gg,items,t0:R.t,claim:null};gg.ticket=tk;R.tickets.push(tk)}R.tv++;renderTickets();__tick(50)})()""")
+    st = g.ev("({scroll:ticketsEl.classList.contains('scroll'),compact:ticketsEl.classList.contains('compact'),more:!$('#tkMore').hidden,sw:ticketsEl.scrollWidth,cw:ticketsEl.clientWidth,itemW:document.querySelector('.it').getBoundingClientRect().width})")
+    check(st['scroll'] and st['compact'] and st['more'] and st['sw'] > st['cw'], f'an overloaded strip scrolls, compacts and shows the edge button: {st}')
+    check(st['itemW'] >= 30, f'compact tickets stay readable: item width {st["itemW"]}')
+    g.page.click('#tkMore'); g.page.wait_for_timeout(500)
+    check(g.ev("ticketsEl.scrollLeft") > 100, 'the edge button pages the strip')
+    reach = g.ev("(()=>{let ok=true;const el=ticketsEl;for(const t of el.querySelectorAll('.tk')){el.scrollLeft=t.offsetLeft-10;const r=t.getBoundingClientRect();if(r.left<0||r.right>innerWidth)ok=false}return ok})()")
+    check(reach, 'every ticket can be brought fully into view')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
+def album_store_and_viewer_v181(b, port, target):
+    """Photos live in IndexedDB (the save keeps records only), survive a reload, travel inside a backup file,
+    keep 240 ordinary photos plus every 珍藏, and open in the viewer; the frame of a moment contains all its
+    subjects; a real V18 save with inline pictures migrates without losing anything."""
+    g = Game(b, port, target, seed=21, manual=True)
+    install_bot(g)
+    g.click('[data-act=open]')
+    g.ev("(()=>{S.album=[];S.mem={};S.day=6;S.level=2;S.eq.bar=1;S.crew=[{id:'w1',role:'waiter',name:'小美',lv:3,duty:'both'},{id:'k1',role:'cleaner',name:'阿宏',lv:2,duty:'clean'}];save();showPrep()})()")
+    g.ev(LAZY_ACTOR)
+    g.ev("(()=>{const el=document.createElement('button');el.dataset.act='restock';$('#screen').appendChild(el);el.click();el.remove()})()")
+    start_day(g)
+    for _ in range(1500):
+        if not g.ev("(()=>{for(let i=0;i<10;i++){if(!(phase==='service'&&R))return 0;if(i===0)__actLazy();__tick(1000/30);if(R.closing!=null&&R.closing>30&&!R.ended){finishClosing();return 0}}return 1})()"): break
+    g.ev("for(let i=0;i<900;i++)__tick(1000/30)")
+    g.page.wait_for_timeout(400)
+    n = g.ev("albumList().length")
+    check(n >= 2, f'a staffed day should leave a couple of photos ({n})')
+    check(g.ev("albumList().every(p=>!p.img&&p.id)"), 'records carry no picture data')
+    check(g.ev("photoOpen().then(db=>new Promise(r=>{const rq=db.transaction('photos').objectStore('photos').count();rq.onsuccess=()=>r(rq.result)}))") == n, 'every record has its picture in the store')
+    check(g.ev("localStorage.getItem('jills-kitchen-save-v1').length") < 120000, 'the save stays small')
+    # framing: five subjects all inside the frame
+    fr = g.ev("(()=>{const pts=[{x:100,y:150},{x:300,y:150},{x:200,y:330},{x:120,y:300},{x:280,y:200}];const f=memFrame({x:200,y:240,info:{subj:pts}});return {f,inside:pts.every(p=>p.x>=f.x&&p.x<=f.x+f.w&&p.y-30>=f.y-4&&p.y<=f.y+f.h)}})()")
+    check(fr['inside'] and abs(fr['f']['w'] / fr['f']['h'] - 4 / 3) < .05, f'a five-subject frame contains all five at 4:3: {fr}')
+    one = g.ev("memFrame({x:200,y:240,info:{}})")
+    check(one['w'] <= 160, f'a single subject gets a close-up: {one}')
+    # reload, viewer
+    g.reload(); install_bot(g); g.click('[data-act=open]'); g.page.wait_for_timeout(300)
+    g.ev("(()=>{const el=document.createElement('button');el.dataset.act='book';$('#screen').appendChild(el);el.click();el.remove()})()")
+    g.ev("(()=>{const el=document.createElement('button');el.dataset.act='btab';el.dataset.k='mem';$('#screen').appendChild(el);el.click();el.remove()})()")
+    g.page.wait_for_timeout(600)
+    check(g.page.locator('.polaroid').count() == n and g.ev("[...document.querySelectorAll('.polaroid img')].every(i=>i.src.startsWith('data:image/jpeg'))"), 'after a reload every polaroid shows its picture')
+    g.page.locator('.polaroid').first.click(); g.page.wait_for_timeout(200)
+    check(not g.ev("$('#lightbox').hidden") and g.ev("$('.lb-card img').src.startsWith('data:image/jpeg')") and g.page.is_visible('.lb-card .when'), 'tapping a polaroid opens the viewer with the picture, day and caption')
+    if n > 1:
+        g.page.click('[data-lb=next]'); check(g.ev("lightbox.i") == 1, 'next moves to the next photo')
+    before = g.ev("albumList().slice().reverse()[lightbox.i].keep")
+    g.page.click('[data-lb=keep]'); check(g.ev("albumList().slice().reverse()[lightbox.i].keep") == (not before), '珍藏 can be toggled from the viewer')
+    g.page.click('.lb-close'); check(g.ev("$('#lightbox').hidden"), 'the viewer closes')
+    # backup carries pictures; the store survives a round trip
+    g.ev("(()=>{const el=document.createElement('button');el.dataset.act='closeSub';$('#screen').appendChild(el);el.click();el.remove()})()")
+    with g.page.expect_download() as dl:
+        g.ev("(()=>{const el=document.createElement('button');el.dataset.act='settings';$('#screen').appendChild(el);el.click();el.remove()})()"); g.ev("(()=>{const el=document.createElement('button');el.dataset.act='export';$('#screen').appendChild(el);el.click();el.remove()})()")
+    data = json.load(open(dl.value.path()))
+    check(len(data.get('photos', {})) == n and all(v.startswith('data:image/jpeg') for v in data['photos'].values()), 'the backup file carries every picture')
+    # capacity
+    r = g.ev(r"""(()=>{for(let i=0;i<260;i++){S.day=100+i;albumAdd('nap3','data:image/jpeg;base64,/9j/x'+i,{})}const ord=albumList().filter(p=>!p.keep);return {ord:ord.length,keep:albumList().filter(p=>p.keep).length}})()""")
+    check(r['ord'] == 240 and r['keep'] >= 1, f'240 ordinary photos are kept, 珍藏 never counted: {r}')
+    check(not g.errors, g.errors)
+    g.close()
+    # a real V18 save (inline pictures): loads, migrates, keeps everything
+    storage = json.loads(open(os.path.join(FIXTURES, 'v18_day4_album.json'), encoding='utf-8').read())
+    raw = storage[SAVE_KEY]; orig = json.loads(raw)
+    g = Game(b, port, target, seed=4, manual=True, storage=storage)
+    install_bot(g); g.page.wait_for_timeout(600)
+    check(g.ev("S.day") == orig['day'] and g.ev("S.money") == orig['money'] and g.ev("S.unlocked.length") == len(orig['unlocked']) and g.ev("S.regulars.chen") == orig['regulars']['chen'] and g.ev("S.crew.length") == 1, 'V18 save: progress preserved')
+    check(g.ev("albumList().length") == len(orig['album']) and g.ev("albumList().filter(p=>p.keep).length") == sum(1 for p in orig['album'] if p.get('keep')), 'V18 save: album records and 珍藏 preserved')
+    g.page.wait_for_timeout(800)
+    check(g.ev("albumList().filter(p=>p.img).length") == 0 and g.ev("PHOTOS.size") == len(orig['album']), 'V18 pictures moved into the store')
+    g.click('[data-act=open]'); start_day(g); g.ev("__play(30,0)")
     check(not g.errors, g.errors)
     g.close()
 
