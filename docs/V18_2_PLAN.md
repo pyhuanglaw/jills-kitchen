@@ -9,10 +9,10 @@ PROTOTYPE/DECIDE: 23/24 kitchen view
 DEFER: outside brief; themes/set menus slip first
 
 ## Status
-- [ ] 0 baseline measurement (economy, Dylan, regulars) — scratchpad/base182.py
-- [ ] 1 Dylan
-- [ ] 2/13 dialogue + log
-- [ ] 4/5/6 regulars
+- [x] 0 baseline measurement — docs/playtest-v18.2/base_s7.json, perfect_s7.json (wages 4–7% of revenue at maturity; stock suggestion 15–56 emergency orders/day; Dylan 8–10 visits by D25)
+- [x] 1 Dylan (wip-1) · [x] ticket identity (wip-1) · [x] soufflé hotfix → V18.1.1 published (wip-2)
+- [~] 2/13 log done (wip-1); ambient micro-interactions + line variety + review tags: patch C
+- [x] 4/5/6 regulars (wip-3) — moments/gifts/companions/pairs/treats/journal facts; lines fire via setTimeout so bot-mode probes under-report; verify in real-time smoke
 - [ ] 8/9 weather + days
 - [ ] 12/14 rating + reviews
 - [ ] 17/18 inventory + restock
@@ -28,3 +28,6 @@ DEFER: outside brief; themes/set menus slip first
 - Patches are applied with python scripts in the scratchpad (`patch_v182*.py`), each asserting exact match counts.
 - Tests: `python3 tests/run_tests.py` (39 in V18.1). Single-file: `python3 tools/build_single.py`. Lint: `node tools/lint.mjs`.
 - Artifact fragment: scratchpad `mkfrag.py` → /home/claude/jills-kitchen.html → publish to existing URL.
+
+## Added by the player during V18.2
+- MUST: ticket identity (done wip-1); max-expansion dead-end audit + late-game operations upgrades (staff room +2, waiting area +2, 動線 tiers, booth tier 3); achievements 35–50 spread early/mid/mature with hidden; soufflé lock (done, V18.1.1).
