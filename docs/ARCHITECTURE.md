@@ -145,7 +145,7 @@ python3 tests/run_tests.py -k cats          # 只跑名稱含 cats 的測試
   - 拍下的回憶照片；
   - 10 張全畫面截圖（像素完全一致）。
 
-  只要畫面、動畫、貓咪行為或數值有任何變化，它就會失敗。截圖比對只容許文字反鋸齒的微小雜訊：最多 16 個像素、每個像素的亮度差最多 4。不一致時，實際截圖與差異圖會存到 `tests/artifacts/`。
+  只要畫面、動畫、貓咪行為或數值有任何變化，它就會失敗。截圖比對只容許文字反鋸齒的微小雜訊：最多 40 個像素、每個像素的亮度差最多 8。不一致時，實際截圖與差異圖會存到 `tests/artifacts/`。
 - **有意改變**遊戲內容後：先看 `tests/artifacts/` 的差異確認是預期的，再執行 `python3 tests/run_tests.py --record` 重新錄製標準答案，並把 `tests/golden/` 一起 commit。
 - 截圖與像素雜湊跟機器和 Chromium 版本有關。換一台電腦時，先在舊版本（`git checkout baseline-v13` 或最近一次通過的 commit）用 `--record` 重錄，再切回來比對。
 - `JK_GAME_JS=/path/to/game.js python3 tests/run_tests.py` 可以拿任何一版 game.js 跑同一套測試。

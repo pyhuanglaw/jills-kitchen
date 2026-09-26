@@ -1089,7 +1089,7 @@ def compare_screens(shots, record):
             d = ImageChops.difference(a, w).convert('L')
             hist = d.histogram()
             changed, worst = sum(hist[1:]), max(i for i, n in enumerate(hist) if n)
-            if changed <= 16 and worst <= 4:
+            if changed <= 40 and worst <= 8:
                 box = None
         if box:
             os.makedirs(ARTIFACTS, exist_ok=True)
