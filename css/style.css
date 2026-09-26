@@ -262,3 +262,4 @@ input.txt{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(
 .setrow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--line);font-weight:700}
 .setrow:first-child{border-top:0}
 @media (prefers-reduced-motion:reduce){.bn,.toast,#combo.bump,.tk.urgent{animation:none}.it.cooking::after{animation:none}}
+.card p.small{margin:8px 0 0;font-size:12px;line-height:1.5;color:var(--ink2)}

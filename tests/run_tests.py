@@ -14,7 +14,7 @@ Usage:
 
 Requires: pip install playwright && playwright install chromium
 """
-import argparse, functools, http.server, json, os, socketserver, sys, threading, time, traceback
+import argparse, functools, http.server, json, os, re, socketserver, sys, threading, time, traceback
 
 from playwright.sync_api import sync_playwright
 
@@ -141,7 +141,7 @@ window.__act = function(){
   for (const s of R.slots) {
     if (s.broken) { tapStation(R.slots.indexOf(s)); continue; }
     const j=s.job; if (!j || !j.step) continue; const k=j.step;
-    if (chefFor(s.type)) continue;
+    if (chefHandles(s)) continue;
     if (k.t==='add') { const id = k.left[0]; if (id) actIng(s,id); }
     else if (k.t==='tap') actTap(s);
     else if (k.t==='zone') { if (k.p >= k.z.c) actZone(s); }
@@ -404,7 +404,7 @@ def cat_ai_keeps_running(b, port, target):
         perchOcc.forEach((c,i)=>{if(c&&c.perch!==i&&c.goPerch!==i)bad.push('perchOcc mismatch '+i+' '+c.def.id)});
         // spot bookkeeping: one spot per cat, no double booking, never booked while on a perch or beside Jill
         const held=new Map();const own=(c,k)=>{if(c)held.set(c,(held.get(c)||[]).concat(k))};
-        for(const k of['scr','scr2','cave','toy'])own(OCC[k],k);OCC.bed.forEach(c=>own(c,'bed'));
+        for(const k of['scr','scr2','cave','toy','bench0','bench1','bench2'])own(OCC[k],k);OCC.bed.forEach(c=>own(c,'bed'));
         if(OCC.bed.length>2||new Set(OCC.bed).size!==OCC.bed.length)bad.push('bed overbooked');
         for(const [c,ks] of held){if(ks.length>1)bad.push(c.def.id+' holds '+ks);if(c.perch>=0)bad.push(c.def.id+' holds '+ks+' while on perch');if(SIDE.R===c||SIDE.L===c)bad.push(c.def.id+' holds '+ks+' while beside Jill')}
         for(const c of CATS){if(c.perch>=0&&perchOcc[c.perch]!==c)bad.push(c.def.id+' on perch it does not own');if((SIDE.R===c||SIDE.L===c)&&c.perch>=0)bad.push(c.def.id+' beside Jill and on perch')}
@@ -566,16 +566,19 @@ def touch_controls(b, port, target):
         g.page.mouse.click(p[0], p[1]); g.ev("__tick(1000/30)")
     g.ev("__tick(100)")
     g.click('[data-act=open]'); start_day(g)
-    # 1) a guest group arrives -> tap it -> it gets seated
-    g.ev("__tick(1000/30)")
-    for _ in range(40):
-        if g.ev("queued().some(x=>x.state==='queue')"): break
+    # 1) the tables are all dirty, so a guest group waits on the bench -> free a table and tap the
+    #    group -> it gets seated at once (left alone it would get up by itself a few seconds later)
+    g.ev("for(const t of R.tables)t.dirty=true;__tick(1000/30)")
+    for _ in range(60):
+        if g.ev("queued().some(x=>x.state==='queue'&&!x.moving)"): break
         g.ev("for(let i=0;i<30;i++)__tick(1000/30)")
-    gid = g.ev("(()=>{const q=queued().find(x=>x.state==='queue');return q?q.id:null})()")
-    check(gid is not None, 'no guests arrived to seat')
-    gx, gy = g.ev(f"(()=>{{const q=R.groups.find(x=>x.id==={gid});return[q.x+6,q.y-22]}})()")
+    gid = g.ev("(()=>{const q=queued().find(x=>x.state==='queue'&&!x.moving);return q?q.id:null})()")
+    check(gid is not None, 'no guests arrived to wait')
+    check(g.ev(f"isSeated(R.groups.find(x=>x.id==={gid}))"), 'a small party should sit on the bench while waiting')
+    gx, gy = g.ev(f"(()=>{{R.tables[0].dirty=false;const q=R.groups.find(x=>x.id==={gid});return[q.x,q.y-22]}})()")
     tap(gx, gy)
     check(g.ev(f"R.groups.find(x=>x.id==={gid}).table!=null"), 'tapping the waiting guests did not seat them')
+    g.ev("for(const t of R.tables)if(!t.group)t.dirty=false")
     # 2) walk the service forward until a ticket exists, then tap the station to open the kitchen panel
     for _ in range(60):
         if g.ev("R.tickets.some(t=>t.items.some(i=>i.st==='pending'))"): break
@@ -599,7 +602,12 @@ def touch_controls(b, port, target):
     g.page.mouse.click(hx, hy); g.ev("__tick(1000/30)")
     check(g.ev("R.panel===false && $('#trayWrap').hidden"), 'panel did not close')
     # 5) pet a cat that is sitting on the floor away from the counter
-    cid = g.ev("(()=>{const c=CATS.find(c=>!c.hidden&&c.def.id!=='mei'&&c.def.id!=='snow'&&c.y<FB-40&&c.perch<0&&!R.groups.some(q=>Math.hypot(q.x-c.x,q.y-c.y)<40)&&!R.tables.some(t=>Math.hypot(t.x-c.x,t.y-c.y)<50));return c?c.def.id:null})()")
+    find_cat = "(()=>{const c=CATS.find(c=>!c.hidden&&c.def.id!=='mei'&&c.def.id!=='snow'&&c.y<FB-40&&c.perch<0&&!c.sofa&&c.benchI<0&&!R.groups.some(q=>Math.hypot(q.x-c.x,q.y-c.y)<40)&&!R.tables.some(t=>Math.hypot(t.x-c.x,t.y-c.y)<50));return c?c.def.id:null})()"
+    cid = None
+    for _ in range(40):
+        cid = g.ev(find_cat)
+        if cid: break
+        g.ev("for(let i=0;i<15;i++)__tick(1000/30)")
     check(cid, 'no cat free to pet')
     if cid:
         cx, cy = g.ev(f"(()=>{{const c=catBy('{cid}');return[c.x,c.y-12]}})()")
@@ -822,6 +830,206 @@ def long_play_is_stable(b, port, target):
     # addReview() caps at 80; the rare health-inspector review is pushed without the cap (kept as is)
     check(g.ev("S.reviews.length") <= 80 + g.ev("S.reviews.filter(r=>r.name==='衛生檢查員').length"), f'reviews not capped: {g.ev("S.reviews.length")}')
     check(max(sizes) < 150000, f'save grew too large: {sizes}')
+    check(not g.errors, g.errors)
+    g.close()
+
+# ---------------------------------------------------------------- version 16
+@test
+def cooking_flow_families(b, port, target):
+    """Every ordinary recipe takes 2–5 player interactions with perfect play, nothing is tap-repeated,
+    the recipe families have the shapes the design asks for, and a late pan flip is forgiven before
+    it burns."""
+    g = Game(b, port, target, seed=5, manual=True)
+    g.ev("S.level=5;S.eq.oven=3;S.eq.bar=3;S.eq.prep=1;S.eq.fridge=3;for(const d in DISHES)if(!S.unlocked.includes(d))S.unlocked.push(d);S.signature={base:'mash',protein:'duck',sauce:'redwine',side:'asparagus',name:'Test Sig'}")
+    g.click('[data-act=open]'); start_day(g)
+    res = g.ev(r"""(()=>{const out={};const ids=Object.keys(DISHES).concat(['signature']);
+      for(const d of ids){R.tickets=[];for(const s of R.slots)s.job=null;const g0={name:'T',size:1,table:0,state:'wait',pat:1,type:'office',looks:[]};
+        const it={d,st:'pending',q:null,want:d==='steak'?1:0,picked:false};const tk={id:999,no:1,g:g0,items:[it],t0:R.t};R.tickets.push(tk);
+        if(!startCook(tk,it,true)){out[d]={q:'NO_SLOT'};continue}
+        const s=R.slots.find(x=>x.job&&x.job.it===it);let guard=0,n=0;const kinds=new Set();let waitT=0;
+        while(it.st==='cooking'&&guard++<6000){const j=s.job;if(!j)break;const k=j.step;kinds.add(k.t);
+          if(k.t==='add'){actIng(s,k.left[0]);n++}else if(k.t==='tap'){actTap(s);n++}else if(k.t==='zone'){if(k.p>=k.z.c){actZone(s);n++}else updJob(s,1/30)}
+          else if(k.t==='hold'){k.hold=true;R.holdSlot=s;k.level=(k.a+k.b)/2;holdEnd();n++}else if(k.t==='dose'){if(k.cnt<k.min){actDose(s);n++}else{actDoseDone(s);n++}}else{updJob(s,1/30);waitT+=1/30}R.t+=1/30}
+        out[d]={q:it.st==='ready'?it.q:('STUCK:'+it.st),n,kinds:[...kinds],waitT:+waitT.toFixed(1),cat:DISH(d).cat,st:DISH(d).st}}
+      return out})()""")
+    bad = {k: v['q'] for k, v in res.items() if v['q'] != 'P'}
+    check(not bad, f'recipes not finishing PERFECT with perfect input: {bad}')
+    check(not any('tap' in v['kinds'] for v in res.values()), 'a recipe still uses tap-repeat steps')
+    counts = {k: v['n'] for k, v in res.items() if k != 'signature'}
+    check(all(2 <= n <= 5 for n in counts.values()), f'interactions outside 2–5: {counts}')
+    # families
+    fam = {k: v['kinds'] for k, v in res.items()}
+    check('zone' in fam['steak'] and 'zone' in fam['burger'] and 'zone' in fam['duck'], f'pan-seared dishes should be flip/remove timing: {fam}')
+    check('wait' in fam['soup'] and 'wait' in fam['risotto'] and res['soup']['waitT'] >= 4, f'stewed dishes should have a long passive wait: {fam}')
+    check(not ({'zone', 'wait'} & set(fam['salad'])) and not ({'zone', 'wait'} & set(fam['prosciutto'])), f'cold dishes should be quick: {fam}')
+    check('wait' in fam['tiramisu'] and 'zone' in fam['salmon'] and 'zone' in fam['chicken'], f'oven/chilled dishes should be prep then a long wait: {fam}')
+    check(all('hold' in fam[d] for d in ['coffee', 'sparkling', 'fruitsoda', 'blacktea'] if d in fam and res[d]['cat'] == 'drink') or 'hold' in fam['coffee'], 'the drink gauge (hold) must stay')
+    check('work' in fam['salad'] and 'work' in fam['souffle'] and 'work' in fam['duck'], f'handwork steps should be Jill\'s own (work): {fam}')
+    # forgiveness on a pan: late but not forgotten -> Okay, forgotten -> burnt
+    r = g.ev(r"""(()=>{const out={};for(const p of[1.1,1.3]){R.tickets=[];for(const s of R.slots)s.job=null;const g0={name:'T',size:1,table:0,state:'wait',pat:1,type:'office',looks:[]};
+      const it={d:'burger',st:'pending',q:null,want:0,picked:false};const tk={id:998,no:1,g:g0,items:[it],t0:R.t};R.tickets.push(tk);startCook(tk,it,true);const s=R.slots.find(x=>x.job&&x.job.it===it);
+      actIng(s,'patty');const k=s.job.step;k.p=p;actZone(s);out[p]={burnt:!s.job||!!s.job.burnt||it.q==='B',score:s.job?s.job.scores[s.job.scores.length-1]:null}}return out})()""")
+    check(not r['1.1']['burnt'] and r['1.1']['score'] < .9, f'a slightly late flip should be forgiven, not burnt: {r}')
+    check(r['1.3']['burnt'], f'a forgotten pan should burn: {r}')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
+def kitchen_staff_ladder(b, port, target):
+    """Chefs grow by capability: LV1 only simple dishes Jill has already cooked, LV2 ordinary ones, LV3+
+    also takes over a dish Jill started. The signature dish and the first serving of any dish stay Jill's."""
+    g = Game(b, port, target, seed=12, manual=True)
+    g.ev("S.level=5;S.eq.stove=3;S.eq.oven=3;S.eq.bar=3;for(const d in DISHES)if(!S.unlocked.includes(d))S.unlocked.push(d);S.signature={base:'mash',protein:'duck',sauce:'redwine',side:'asparagus',name:'Sig'};S.xp={friedrice:30,seafood:30,burger:30};S.crew=[{id:'c1',role:'chef',name:'阿德',lv:1,duty:'stove'}]")
+    r = g.ev("(()=>{const m=S.crew[0];const at=lv=>{m.lv=lv;return{fr:chefCan(m,'friedrice'),pasta:chefCan(m,'pasta'),seafood:chefCan(m,'seafood'),sig:chefCan(m,'signature')}};return{l1:at(1),l2:at(2),l3:at(3),l5:at(5)}})()")
+    check(r['l1'] == {'fr': True, 'pasta': False, 'seafood': False, 'sig': False}, f'LV1 chef scope wrong: {r}')
+    check(r['l3']['seafood'] and not r['l3']['sig'] and not r['l5']['sig'], f'LV3+/signature scope wrong: {r}')
+    check(not r['l2']['pasta'], 'a dish Jill has never cooked (xp 0) must stay hers')
+    g.click('[data-act=open]'); start_day(g)
+    r = g.ev(r"""(()=>{const g0={name:'T',size:1,table:0,state:'wait',pat:1,type:'office',looks:[]};const mk=d=>{const it={d,st:'pending',q:null,want:0,picked:false};const tk={id:900+Math.random()*99|0,no:1,g:g0,items:[it],t0:R.t};R.tickets.push(tk);startCook(tk,it,true);return R.slots.find(x=>x.job&&x.job.it===it)};
+      const m=S.crew[0];m.lv=1;const s1=mk('friedrice');const a=!!chefHandles(s1);m.lv=3;const b=!!chefHandles(s1);const s2=mk('seafood');const c=!!chefHandles(s2);m.lv=1;const d=!!chefHandles(s2);return{a,b,c,d}})()""")
+    check(r == {'a': False, 'b': True, 'c': True, 'd': False}, f'take-over rule (LV3+ continues what Jill started) wrong: {r}')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
+def waiter_serves_ready_food(b, port, target):
+    """A LV2 waiter on 帶位＋點餐 also carries finished plates from the pass to the table."""
+    g = Game(b, port, target, seed=5, manual=True)
+    install_bot(g)
+    g.ev(r"""window.__act=function(){if(!(phase==='service'&&R))return false;
+      for(const t of R.tables){if(tableActionable(t)&&!jillTargets(t.i)){const gg=t.group;const ready=gg&&gg.ticket&&gg.ticket.items.some(i=>i.st==='ready'&&!i.picked);if(!ready)tapTable(t)}}
+      for(const tk of R.tickets)for(const it of tk.items)if(it.st==='pending')startCook(tk,it,true);
+      for(const s of R.slots){if(s.broken){tapStation(R.slots.indexOf(s));continue}const j=s.job;if(!j||!j.step)continue;const k=j.step;if(chefHandles(s))continue;
+       if(k.t==='add'){const id=k.left[0];if(id)actIng(s,id)}else if(k.t==='zone'){if(k.p>=k.z.c)actZone(s)}else if(k.t==='hold'){k.hold=true;R.holdSlot=s;k.level=(k.a+k.b)/2;holdEnd()}else if(k.t==='dose'){if(k.cnt<k.min)actDose(s);else actDoseDone(s)}}
+      return true}""")
+    g.ev("window.__srv={waiter:0,jill:0};const s0=serveItems;serveItems=function(g,items){const byW=R.cw&&Object.values(R.cw).some(w=>w.carry&&w.carry.length&&items.every(x=>w.carry.includes(x.it)));if(byW)__srv.waiter++;else __srv.jill++;return s0.apply(this,arguments)}")
+    g.ev("S.day=6;S.level=2;S.tables=5;S.money=8000;S.crew=[{id:'w1',role:'waiter',name:'小美',lv:2,duty:'both'}];unlockDish('coffee');for(const d of S.unlocked)S.stock[d]=30")
+    g.click('[data-act=open]'); start_day(g)
+    for _ in range(300):
+        g.ev("__bot(60,1/30)")
+        if g.ev("phase") != 'service' or g.ev("__srv.waiter") >= 5: break
+    check(g.ev("__srv.waiter") >= 5, f'the waiter did not serve: {g.ev("__srv")}')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
+def waiting_bench(b, port, target):
+    """Full house: small parties sit on the bench by the door, a party of four stands beside it, the
+    first party that fits gets up and walks (no teleport) when a table frees, a cat on a place is
+    handled, Dylan waits like everyone else, and the bench keeps clear of the door, tables, sofa,
+    cat tree, TV and staff spots."""
+    g = Game(b, port, target, seed=7, manual=True)
+    install_bot(g)
+    # geometry: nothing the bench could block
+    geo = g.ev(r"""(()=>{const bx0=BENCH.x-BENCH.w/2-6,bx1=BENCH.x+BENCH.w/2,by0=BENCH.seats[0]-28,by1=BENCH.seats[2]+14;const hit=(x,y)=>x>=bx0&&x<=bx1&&y>=by0&&y<=by1;
+      const bad=[];if(hit(DOOR.x,DOOR.y+22)||hit(DOOR.x,DOOR.y))bad.push('door landing');
+      for(let i=0;i<12;i++){const sp=SPOT_ORDER[i];const r=Math.floor(sp/4),c=sp%4;const x=COLS[c]+RSH[r],y=ROWS[r];if(Math.abs(x-BENCH.x)<BENCH.w/2+30&&Math.abs(y-(by0+by1)/2)<(by1-by0)/2+22)bad.push('table '+sp)}
+      if(bx1>SOFA.x0)bad.push('sofa');if(hit(TV_PARK.x,TV_PARK.y))bad.push('tv');for(const p of TREE.perches)if(hit(p.x,p.y)||hit(p.ax,p.ay||350))bad.push('perch');
+      for(const sp of BENCH.stand)if(hit(sp.x,sp.y))bad.push('stand spot on bench');if(hit(84,150))bad.push('waiter spot');if(hit(PASS.x,PASS.y))bad.push('pass');
+      for(const k in SPOT)if(hit(SPOT[k].x,SPOT[k].y))bad.push('spot '+k);return bad})()""")
+    check(not geo, f'bench overlaps: {geo}')
+    g.ev("S.day=9;S.level=2;S.tables=5;S.decor.sofa=1;S.money=6000;S.dylan.stage=1;S.regulars.dylan=4")
+    g.click('[data-act=open]'); start_day(g)
+    g.ev("__botUntil('R.t>8',3000,1/30)")
+    # a cat takes the first place, then every table is dirty and three parties arrive
+    g.ev(r"""(()=>{for(const t of R.tables)t.dirty=true;window.__noClean=true;const A=window.__act;window.__act=function(){if(window.__noClean)for(const t of R.tables)if(!t.group)t.dirty=true;return A.apply(this,arguments)};
+      const c=CATS.find(c=>c.def.id==='mei');releaseSpots(c);if(c.perch>=0){perchOcc[c.perch]=null;c.perch=-1}OCC.bench0=c;c.benchI=0;c.st='bench';c.pose='loaf';c.face=1;c.t=200;c.x=BENCH.x+2;c.y=BENCH.seats[0]-3;
+      spawn({type:'office',size:2});spawn({type:'regular',reg:'dylan',size:1});spawn({type:'student',size:4})})()""")
+    for _ in range(40):
+        g.ev("__bot(15,1/30)")
+        if g.ev("queued().length===3&&queued().every(q=>q.state==='queue'&&!q.moving)"): break
+    q = g.ev("queued().map(q=>({n:q.name,size:q.size,spot:q.spot?q.spot.k+q.spot.i:null,sit:isSeated(q),x:q.x,y:q.y}))")
+    check(len(q) == 3 and all(x['spot'] for x in q), f'waiting parties have no place: {q}')
+    check([x['spot'] for x in q if x['size'] <= 2] == ['seat1', 'seat2'], f'small parties should take the free bench places (the cat has place 0): {q}')
+    check([x['spot'] for x in q if x['size'] == 4] == ['stand0'], f'a party of four should stand beside the bench: {q}')
+    check(all(x['sit'] for x in q if x['size'] <= 2) and not any(x['sit'] for x in q if x['size'] == 4), f'seated/standing wrong: {q}')
+    dy = [x for x in q if x['n'] == 'Dylan'][0]
+    check(dy['spot'] == 'seat2', f'Dylan must queue behind the party that came first: {q}')
+    # free the tables: the first party that fits gets up and walks over; nobody jumps
+    g.ev("window.__noClean=false;for(const t of R.tables)if(!t.group)t.dirty=false")
+    jumps = g.ev(r"""(()=>{const bad=[];let prev=new Map(R.groups.map(g=>[g.id,[g.x,g.y]]));let first=null;
+      for(let i=0;i<150;i++){update(1/30);updateCats(1/30,0);for(const g of R.groups){const p=prev.get(g.id);if(p){const d=Math.hypot(g.x-p[0],g.y-p[1]);if(d>78/30+1)bad.push([i,g.name,+d.toFixed(1)])}}prev=new Map(R.groups.map(g=>[g.id,[g.x,g.y]]));
+        if(!first){const s=R.groups.find(g=>g.state==='toTable');if(s)first=s.name}}
+      return{bad:bad.slice(0,5),first,states:R.groups.map(g=>[g.name,g.state,g.table])}})()""")
+    check(not jumps['bad'], f'a guest teleported: {jumps}')
+    check(jumps['first'] and jumps['first'] != 'Dylan', f'the party that arrived first should be seated first: {jumps}')
+    check(g.ev("CATS.find(c=>c.def.id==='mei').st") in ('bench', 'jump', 'walk', 'rest'), 'the cat on the bench got stuck')
+    # a full bench with a cat on it is never a deadlock: a party keeps a place or leaves through the normal patience rules
+    check(g.ev("queued().every(q=>q.spot)"), 'a waiting party lost its place')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
+def dylan_pays_tidies_and_is_not_staff(b, port, target):
+    """Dylan pays like anyone, tips a little more, carries his own plate to the pass and leaves the table
+    clean, and never appears anywhere in the staff system."""
+    g = Game(b, port, target, seed=21, manual=True)
+    install_bot(g)
+    g.ev("S.day=8;S.dylan.stage=1;S.regulars.dylan=3;S.level=2;S.tables=5;S.money=5000;dylanStays=()=>false")
+    g.click('[data-act=open]'); start_day(g)
+    r = g.ev(r"""(()=>{const mk=(reg)=>{const g={id:R.gid++,type:'regular',size:1,reg,ret:true,looks:[],name:reg||'X',state:'check',table:null,pat:1,x:0,y:0,tx:0,ty:0,timer:0,seed:1,mood:'ok',forSig:false};
+        const t=R.tables.find(t=>!t.group&&!t.used);t.used=1;t.group=g;g.table=t.i;g.ticket={id:1,no:1,g,items:[{d:'friedrice',st:'served',q:'P',want:0,picked:true}],t0:R.t};R.groups.push(g);return g};
+      const rnd=Math.random;Math.random=()=>.99; /* no review roll noise */
+      const a=mk('dylan');const t0=R.st.tips,r0=R.st.rev;collect(a);const dTip=R.st.tips-t0,dRev=R.st.rev-r0;const ta=R.tables[a.table];
+      const b=mk('wang');const t1=R.st.tips,r1=R.st.rev;collect(b);const oTip=R.st.tips-t1,oRev=R.st.rev-r1;const tb=R.tables[b.table];Math.random=rnd;
+      return{dTip,dRev,oTip,oRev,dBus:!!a.bus,dDirty:ta.dirty,oDirty:tb.dirty,dTarget:[a.tx,a.ty],dState:a.state}})()""")
+    check(r['dRev'] == r['oRev'] and r['dRev'] > 0, f'Dylan must pay the same price as anyone: {r}')
+    check(r['dTip'] > r['oTip'] and r['dTip'] <= r['oTip'] * 1.5 + 2, f'Dylan tips somewhat more, not absurdly more: {r}')
+    check(r['dBus'] and not r['dDirty'] and r['oDirty'], f'Dylan should clear his own table, the other guest not: {r}')
+    check(abs(r['dTarget'][0] - (g.ev("PASS.x") + 18)) < 1, f'he should walk to the pass first: {r}')
+    walk = g.ev(r"""(()=>{const a=R.groups.find(g=>g.reg==='dylan');let atPass=false,jumps=0;let px=a.x,py=a.y;for(let i=0;i<900&&!a.gone;i++){update(1/30);updateCats(1/30,0);if(Math.hypot(a.x-px,a.y-py)>78/30+1)jumps++;px=a.x;py=a.y;if(!a.bus&&!atPass)atPass=i}return{gone:a.gone,atPass,jumps,tidy:S.dylan.clues.tidy||0}})()""")
+    check(walk['gone'] and walk['atPass'] and walk['jumps'] == 0, f'Dylan should walk plate->pass->door: {walk}')
+    check(walk['tidy'] >= 1, 'clearing his table should count as a quiet clue')
+    # never staff
+    check(g.ev("!Object.values(ROLES).some(r=>/Dylan/.test(JSON.stringify(r)))&&!JSON.stringify(CREW_NAMES).includes('Dylan')&&!S.crew.some(m=>/Dylan/.test(m.name))"), 'Dylan must never be a staff member')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
+def save_backup_and_restore(b, port, target):
+    """備份存檔 writes one JSON file; 讀取存檔 restores it (Dylan/life state included) after a confirmation;
+    junk, unrelated and newer-version files are refused with the current save untouched; an old save
+    file goes through the same migrations as the browser copy."""
+    g = Game(b, port, target, seed=4, manual=True)
+    install_bot(g)
+    g.ev("S.day=6;S.money=4321;S.dylan.stage=2;S.dylan.clues={late:2,tidy:1};S.life.sofa=3;S.life.tv=1;save()")
+    g.click('.links [data-act=settings]')
+    check(g.page.is_visible('text=本機存檔') and g.page.is_visible('text=備份存檔') and g.page.is_visible('text=讀取存檔'), 'save UI labels missing')
+    with g.page.expect_download() as dl:
+        g.click('[data-act=export]')
+    d = dl.value
+    check(re.match(r'^JillsKitchen_Save_\d{4}-\d{2}-\d{2}_\d{4}_Day6\.json$', d.suggested_filename), f'backup file name: {d.suggested_filename}')
+    path = os.path.join(ARTIFACTS, 'backup_test.json'); os.makedirs(ARTIFACTS, exist_ok=True); d.save_as(path)
+    env = json.load(open(path, encoding='utf-8'))
+    check(env.get('app') == 'jills-kitchen' and env['save']['day'] == 6 and env['save']['dylan']['stage'] == 2, 'backup content wrong')
+    def feed(p):
+        if g.ev("sub") != 'settings': g.click('.links [data-act=settings]')
+        with g.page.expect_file_chooser() as fc:
+            g.click('[data-act=import]')
+        fc.value.set_files(p)
+        g.page.wait_for_timeout(150); g.ev("__tick(100)")
+    # wreck the state, restore from the file
+    g.ev("S.day=1;S.money=1;S.dylan.stage=0;save()")
+    feed(path)
+    check(g.ev("pendingImport&&pendingImport.day===6") and g.page.is_visible('[data-act=importYes]'), 'import should ask for confirmation first')
+    check(g.ev("S.day") == 1, 'nothing may change before the confirmation')
+    g.click('[data-act=importYes]'); g.ev("__tick(50)")
+    check(g.ev("[S.day,S.money,S.dylan.stage,S.dylan.clues.late,S.life.sofa,S.life.tv,phase].join()") == '6,4321,2,2,3,1,title', f'restore wrong: {g.ev("[S.day,S.money,S.dylan.stage,phase]")}')
+    check(json.loads(g.ev("localStorage.getItem(KEY)"))['day'] == 6, 'restored save not written to the browser')
+    # bad files
+    for name, content, msg in [('junk.json', '{not json', '不是 Jill'), ('other.json', json.dumps({'hello': 'world'}), '不是 Jill'), ('newer.json', json.dumps({'app': 'jills-kitchen', 'save': {'v': 99, 'day': 3, 'money': 1, 'unlocked': [], 'menu': []}}), '比較新的版本'), ('empty.json', '', '不是 Jill')]:
+        p = os.path.join(ARTIFACTS, name); open(p, 'w', encoding='utf-8').write(content)
+        feed(p)
+        check(g.page.locator('#toasts').inner_text().find(msg) >= 0, f'{name}: no clear zh-TW refusal ({g.page.locator("#toasts").inner_text()})')
+        check(g.ev("S.day") == 6 and not g.ev("!!pendingImport"), f'{name}: the current save must stay intact')
+        g.ev("__tick(6000)")
+    # an old save file is migrated like the browser copy
+    fx = os.path.join(ROOT, 'tests', 'fixtures', 'legacy_v1_staff.json')
+    feed(fx)
+    check(g.ev("pendingImport&&pendingImport.dylan&&pendingImport.dylan.stage===0&&Array.isArray(pendingImport.crew)"), 'old save file not migrated/filled')
+    g.click('[data-act=importYes]'); g.ev("__tick(50)")
+    orig = json.loads(json.load(open(fx, encoding='utf-8'))[SAVE_KEY])
+    check(g.ev("S.day") == orig['day'] and g.ev("S.money") == orig['money'], 'old save file not restored')
     check(not g.errors, g.errors)
     g.close()
 

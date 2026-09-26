@@ -11,6 +11,7 @@
 | `tests/run_tests.py` | 回歸測試（見第 6 節） |
 | `tests/fixtures/*.json` | 舊存檔樣本，每次存檔格式改變都要新增一份 |
 | `tests/golden/` | 目前版本的「標準答案」：遊戲數值、每幀畫面雜湊、10 張截圖 |
+| `docs/V16_CHANGES.md` | V16（做菜流程、Dylan 的戲、等候長椅、備份存檔）改了什麼、為什麼 |
 | `docs/LIFE_SYSTEM.md` | 沙發、閨蜜機、Jill 的晚上、五隻貓的沙發行為、Dylan 隱藏線的規則與測試 |
 | `tools/analyze.js`、`tools/lint.mjs` | 靜態分析（未使用的程式、共用變數、計時器、事件監聽） |
 
@@ -58,11 +59,27 @@
 ## 4. 常見擴充怎麼做
 
 ### 新增料理
-1. `DISHES` 加一筆：`{n, cat, st, v, price, cost, diff, pop, lv, rd, steps:[...]}`，步驟用 `sA`（加料）、`sT`（連點）、`sW`（等待）、`sZ`（抓時機）、`sH`（長按）、`sD`（份量）。
+1. `DISHES` 加一筆：`{n, cat, st, v, price, cost, diff, pop, lv, rd, steps:[...], fin:[...]}`，步驟用 `sA`（加料，玩家點）、`sK`（Jill 自己做的手工：切菜、打發，開始後不用管）、`sW`（等待；第 4 個參數 `'stir'` 會讓 Jill 在鍋邊翻炒）、`sZ`（抓時機：翻面、起鍋、出爐）、`sH`（長按量表，飲料）、`sD`（撒幾下）。`fin` 是上桌時自動擺上的配料（不是步驟）。V16 起**沒有連點步驟**（`sT` 已移除）。
+   - 一道普通菜控制在 2–5 次玩家操作，測試 `cooking_flow_families` 會數。
+   - 五種家族的形狀：煎（放料 → 等 → 翻面 → 等 → 起鍋）、燉煮（快速備料 → 長時間等 → 回來加一次 → 完成）、冷盤（幾秒手工 → 擺盤 → 淋醬）、快炒（照順序放料 → 短暫翻炒 → 一次調味）、烤箱（備料 → 長時間等 → 出爐）、飲料（量表，沒變）。
+   - 寬容度：`sZ` 的目標區 ±w 是 PERFECT、±(w+.12) 是 GOOD，1.0–1.22 之間「有點過」但只扣分，超過 1.22 才焦；`sW` 的 `over` 是超時秒數，超過才扣分，0 表示不扣。
 2. 用到新食材 → `ING` 加一筆。
 3. 成品圖 → `VESSEL` 與 `paintFood` 加分支；鍋中畫面 → `drawContents` / `drawTopLayers`。
 4. 執行測試。`cooking_every_recipe` 會自動把新料理從頭做到完，確認完美操作能拿到 PERFECT。
 5. **料理 id 一旦發佈就不要改名或刪除**：存檔的 `menu`、`unlocked`、`stock`、`xp`、`price`、`rstar` 都用 id 記錄。真的要改，寫 migration（第 5 節）。
+
+### 廚房員工能做什麼（`chefCan` / `chefHandles`）
+- 廚師只做 Jill 已經做過至少一次的菜（`S.xp[d]>0`），而且難度 ≤ min(3, 等級)：LV1 簡單菜、LV2 一般菜、LV3 起全部（招牌菜永遠除外）。
+- LV3 起也會接手 Jill 已經開始的菜（`chefHandles(s)` 對「他自己開始的」或「他有能力做的」都成立）。料理台面板會自動關掉，讓玩家去做別的。
+- 服務生 LV2（帶位＋點餐）會把出餐口做好的菜端到桌上（`crewUpd` 的 `serve` 任務；`w.carry` 畫在手上）。
+- 員工待命位置：服務生 (84,150) 門邊、清潔 (362,190) 右側，不要放在沙發上（V15 的 (110,136) 就是坐在沙發座墊上）。
+
+### 等候區（門口的長椅）
+- `BENCH`：三個座位（`seats`，y 座標）＋兩個站位（`stand`）。座位用「預約」而不是索引：客人 `g.spot={k:'seat'|'stand',i}`、貓 `OCC.bench0..2`。`benchFree(i)`／`standFree(i)`／`pickSpot(g)`／`requeue()` 是唯一的分配邏輯：1–2 人先坐、3 人以上站、沒位子就站；貓離開後站著的人自己坐過去。
+- 客人流程（`updGroup`）：進門 → 落地點 `(DOOR.x, DOOR.y+22)` → 有合適空桌就直接走過去（`seatGroup`）→ 沒有就去長椅 → 坐著等（2–4 秒看一次有沒有空桌，先來先坐，坐著時耐心消耗 ×0.7）→ 自己起身走過去。玩家點客人或點空桌可以馬上帶位；服務生的 `seat` 任務也還在。
+- 等待時的小動作 `g.wact`：`idle`／`phone`／`look`／`cat`（附近 110px 內有貓就看牠）／`talk`（兩人以上）。純視覺，沒有數值。
+- 沒位子而且門口滿了：`spawn` 直接讓他們「看到客滿，失望地走了」（原本就有的 `queueMax()` 也還在）。
+- 幾何：長椅在 x 48–76、y 140–250，門口落地點在它上方，沙發從 x=88 開始，跳台最高層在 y=254+DY。測試 `waiting_bench` 檢查它不碰門口、桌子、沙發、跳台、閨蜜機、員工待命點。
 
 ### 新增貓咪行為
 1. 在 `catDecide` 用 `add('新行為', 權重)` 加入候選；權重依個性（`id`）決定。
@@ -90,7 +107,12 @@
 
 ## 5. 存檔格式改變（migration）
 
-`load()` 的流程：讀取 → 解析 → 檢查版本 → 依序跑 `MIGRATE` → `fillDefaults` → `legacyCrew`。
+`parseSave(text)` 是唯一的解析管線：解析 → 是不是我們的存檔（頂層 `v`/`day`/`money`/`unlocked`/`menu`，或是備份檔的外殼 `{app:'jills-kitchen',save:{…}}`）→ 檢查版本 → 依序跑 `MIGRATE` → `fillDefaults` → `legacyCrew` → 基本合理性檢查。回傳 `{o}` 或 `{err}`，**不碰 `S`、不碰 localStorage**。`load()`（瀏覽器自己的那份）和「讀取存檔」（玩家選的檔案）都用它。
+
+備份／讀取（V16）：
+- 「備份存檔」`exportSave()`：先 `save()`，再把 `{app,kind,v,exported,save:S}` 存成 `JillsKitchen_Save_YYYY-MM-DD_HHMM_DayN.json` 下載。營業中不能備份。
+- 「讀取存檔」`pickImportFile()`：隱藏的 `<input type=file>`（只建一次）→ `FileReader` → `importSaveText()` → `parseSave` → 成功就放進 `pendingImport`，設定畫面顯示「讀取這個備份？DAY n · $m，目前的進度會被取代」→ 玩家按「讀取這個存檔」才 `importConfirm()`：換掉 `S`、`save()`、清快取、`lifeReset()`、回標題。失敗（不是 JSON、不是我們的存檔、版本太新、壞掉）只出一個 toast，`S` 完全不變。
+- `S.savedAt`：每次 `save()` 蓋上時間戳，設定畫面顯示「上次存檔」。舊存檔沒有這個欄位也沒關係。
 
 要改變既有資料時（改欄位名稱、改格式、改 id）：
 

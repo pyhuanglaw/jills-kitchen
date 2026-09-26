@@ -6,7 +6,7 @@ const {Linter}=tryReq('eslint');
 import fs from 'fs';
 const file=process.argv[2]||new URL('../js/game.js',import.meta.url).pathname;
 const code=fs.readFileSync(file,'utf8');
-const browser=['window','document','localStorage','performance','requestAnimationFrame','setTimeout','setInterval','clearTimeout','clearInterval','console','navigator','location','AudioContext','Math','JSON','Date','Object','Array','Set','Map','Number','String','Boolean','Error','Promise','Symbol','parseInt','parseFloat','isNaN','Infinity','NaN','undefined','Image','HTMLCanvasElement','CanvasRenderingContext2D','Intl','structuredClone','getComputedStyle','matchMedia','EventTarget'];
+const browser=['window','document','localStorage','performance','requestAnimationFrame','setTimeout','setInterval','clearTimeout','clearInterval','console','navigator','location','AudioContext','Math','JSON','Date','Object','Array','Set','Map','Number','String','Boolean','Error','Promise','Symbol','parseInt','parseFloat','isNaN','Infinity','NaN','undefined','Image','HTMLCanvasElement','CanvasRenderingContext2D','Intl','structuredClone','getComputedStyle','matchMedia','EventTarget','URL','Blob','FileReader','isFinite'];
 const globals=Object.fromEntries(browser.map(g=>[g,'readonly']));
 const linter=new Linter({configType:'flat'});
 const msgs=linter.verify(code,[{languageOptions:{ecmaVersion:'latest',sourceType:'script',globals},rules:{
