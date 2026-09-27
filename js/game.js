@@ -298,7 +298,7 @@ const ACH=[
  /* mature */
  {id:'guests60',n:'Full House',d:'一天接待 60 位客人',ic:'flame',p:2},{id:'calm7',n:'Calm Week',d:'連續七天沒有客人生氣離開',ic:'moon',p:2},{id:'storm',n:'Come Rain Or Shine',d:'大雨天還是接待了 15 位客人',ic:'moon',p:2},{id:'night0',n:'No One Waits',d:'一天 20 位客人以上、沒有人等到不耐煩',ic:'star',p:2},{id:'staff6',n:'Full Crew',d:'同時有 6 位員工',ic:'waiter',p:2},{id:'lv5all',n:'Veterans',d:'三位以上員工全部滿級',ic:'crown',p:2},{id:'ops3',n:'Well Oiled',d:'動線規劃升到最高',ic:'star',p:2},{id:'room',n:'Back Room',d:'蓋了後場休息室',ic:'crown',p:2},{id:'sig100',n:'A Hundred Plates',d:'招牌菜賣出 100 份',ic:'duck',p:2},{id:'keep10',n:'Curator',d:'珍藏 10 張照片',ic:'pen',p:2},
  /* 2.1: the plate */
- {id:'special',n:'The Finer Version',d:'研發第一道特製版',ic:'plate',p:2},{id:'specials4',n:'Chef\'s Table',d:'菜單上有四道特製版',ic:'crown',p:2},
+ {id:'special',n:'The Finer Version',d:'研發第一道特製版',ic:'plate',p:2},{id:'specials4',n:'Chef\'s Table',d:'菜單上有四道特製版',ic:'crown',p:2},{id:'walkin',n:'Passing By',d:'路人在門口看了一下就進來，累計 20 次',ic:'signlamp',p:1},
  /* 2.0: the place grows */
  {id:'project',n:'Under Construction',d:'完成第一個大工程',ic:'expand',p:2},{id:'allprojects',n:'The Whole Block',d:'露天座位、大出菜口、冷藏庫、廚房擴建、側廳——全部完工',ic:'crown',p:2},{id:'storefront',n:'Curb Appeal',d:'門口的每一樣東西都裝好了',ic:'lights',p:2},{id:'catgear',n:'Spoiled',d:'買齊了所有貓的東西',ic:'heart',p:2},{id:'newspot',n:'It Was Their Idea',d:'一隻貓第一次用了你買給牠的東西',ic:'heart',h:1},{id:'sideful',n:'Both Rooms',d:'側廳和用餐區同時坐滿',ic:'flame',p:2},{id:'terrace',n:'Al Fresco',d:'第一組客人坐在陽傘下吃完了一餐',ic:'star',p:2},
  /* hidden: things that happen on their own */
@@ -819,7 +819,7 @@ function buyStock(d,delta){const cur=S.stock[d]||0;if(delta>0){const room=fridge
 function autoStock(){const sug=suggestStock();for(const d in sug){const need=sug[d]-(S.stock[d]||0);if(need>0)buyStock(d,need)}}
 
 /* ================= service ================= */
-function startService(){lifeReset();dylanStageCheck();bg=null;lastEv=null;
+function startService(){lifeReset();streetReset();dylanStageCheck();bg=null;lastEv=null;
  if(S.money<150&&stockTotal()<5){S.money+=300;toast('Jill 翻出了抽屜裡的應急金 $300')}
  if(S.day<=2)autoStock();S.news=[];
  const T=S.today,dur=dayDur(S.day);
@@ -866,7 +866,7 @@ function spawn(o){if(R.closed)return;const reg=o.reg?REG_BY[o.reg]:null;const si
   state:'arrive',table:null,pat:1,room:'front',troom:'main',x:FR.enter.x,y:FR.enter.y,tx:DOOR.x,ty:DOOR.y+22,timer:0,ticket:null,seed:Math.random()*10,mood:'ok'};
  if(reg&&(S.regulars[reg.id]||0)>0)g.ret=true;
  if(queued().length>=queueMax()||(!freeTableFor(g)&&!pickSpot(g))){if(g.reg==='dylan'){if((o.tries||0)<2&&R.t<R.dur*.9){R.sched.splice(R.si+1,0,Object.assign({},o,{t:R.t+rand(24,42),tries:(o.tries||0)+1,back:true}));return}R.st.lost+=size;return}if(g.reg){S.regMiss=S.regMiss||{};S.regMiss[g.reg]=S.day}R.st.lost+=size;R.lostRun=(R.lostRun||0)+1;if(!R.lostToastT||R.t-R.lostToastT>40){const n=R.lostRun;R.lostRun=0;R.lostToastT=R.t;toast(n>1?`${g.name} 和另外 ${n-1} 組看到客滿，失望地走了…`:`${g.name} 看到客滿，失望地走了…`)}return}
- R.groups.push(g);R.lastSpawn=R.t;requeue();sfx.door();if(g.reg==='dylan'){S.dylan.last=S.day;if(!S.dylan.first)S.dylan.first=S.day;if(o.back)g.back=true}
+ if(o.fromStreet){g.x=o.fromStreet.x;g.y=o.fromStreet.y;g.walkIn=1}R.groups.push(g);R.lastSpawn=R.t;requeue();sfx.door();if(g.reg==='dylan'){S.dylan.last=S.day;if(!S.dylan.first)S.dylan.first=S.day;if(o.back)g.back=true}
  if(g.type==='vip')toast('VIP 貴賓到了！消費高，要求也高。');
  if(g.type==='blogger')toast('美食部落客走進來了，手機已經拿出來了。');
  if(g.forSig)quote(g,'我是專程為了 Jill 的招牌菜來的！');
@@ -1300,7 +1300,7 @@ function update(dt){R.t+=dt;
  if(R.rush&&!R.rushShown&&R.t>=R.rushT0){R.rushShown=true;banner('RUSH HOUR','晚餐尖峰時段開始！','fire')}
  if(R.t>=R.dur&&!R.closed)closeShop('21:30 打烊，不再接新客人');
  for(const g of R.groups)updGroup(g,dt);R.groups=R.groups.filter(g=>!g.gone);
- kitchenUpd(dt);
+ kitchenUpd(dt);streetUpd(dt);
  for(const s of R.slots){if(s.job)updJob(s,dt);if(s.pop)s.pop.t+=dt;if(s.fx){s.fx.t+=dt;if(s.fx.t>1)s.fx=null}if(s.flash>0)s.flash=Math.max(0,s.flash-dt*1.5);if(s.shake>0)s.shake=Math.max(0,s.shake-dt*8);if(s.flipT>0)s.flipT=Math.max(0,s.flipT-dt)}
  staffUpd(dt);ambientTick(dt);if(R.panel){const sl=R.slots[R.focus];const k=sl&&sl.job&&sl.job.step;const done=!sl||!sl.job||!!chefHandles(sl);if(done||(k&&(k.t==='wait'||k.t==='work')&&!R.holdSlot)){R.panelT=(R.panelT||0)+dt;if(R.panelT>(done?.7:.9)){R.panel=false;R.panelT=0}}else R.panelT=0}jillUpd(dt);
  for(const f of R.floats)f.t+=dt;R.floats=R.floats.filter(f=>f.t<f.life);
@@ -1350,12 +1350,12 @@ function endDay(){if(!R)return;clearCheckpoint();const st=R.st,D=S.day;const wag
  let top=null,topN=0;for(const d in st.dish)if(st.dish[d]>topN){topN=st.dish[d];top=d}
  const dayStars=st.sats.length?clamp(Math.round((avg/100)*5*2)/2,1,5):1;
  let nb=1,msg='';if(st.critic==='good'){nb+=.35;msg="Jill's Kitchen 昨晚突然爆紅！評論家的文章被瘋狂轉發。"}else if(st.critic==='bad'){nb-=.1;msg='評論家的文章不太留情面，今天客人少了一點。'}if(st.blogger==='good'){nb+=.25;msg=msg||'美食部落客的貼文爆了，大家都想來 Jill 的店！'}
- S.buzz=nb;S.buzzMsg=msg;S.stats.days++;S.stats.guests+=st.guests;S.stats.perfect+=st.perfect;
+ S.buzz=nb;S.buzzMsg=msg;S.stats.days++;S.stats.guests+=st.guests;S.stats.perfect+=st.perfect;S.stats.walkins=(S.stats.walkins||0)+(st.walkins||0);if(S.stats.walkins>=20)ach('walkin');
  const plated=st.q.P+st.q.G+st.q.O+st.q.B;
  if(st.guests>=10)ach('rush');if(plated>=8&&st.q.B===0&&st.q.O===0&&st.angry===0)ach('perfectnight');if(rating()>=4.75&&S.reviews.length>=20)ach('chef');
  const r0=(S.rhist&&S.rhist.length)?S.rhist[S.rhist.length-1].r:3;const story=ratingStory(st,plated);S.rhist=S.rhist||[];S.rhist.push({d:D,r:Math.round(rating()*100)/100,n:st.reviews.length,rs:st.reviews.length?Math.round(st.reviews.reduce((a,r)=>a+r.s,0)/st.reviews.length*10)/10:null,why:story.slice(0,2).map(x=>x.t)});if(S.rhist.length>60)S.rhist.shift();
  const recs=updRecords(st,plated,D);achDay(st,plated);
- S.lastSummary={day:D,rev:st.rev,cost:S.todayCost,wages,tips:st.tips,bonus,net:st.rev+st.tips+bonus-S.todayCost-wages,guests:st.guests,lost:st.lost,angry:st.angry,perfect:st.perfect,plated,avg:Math.round(avg),top,stars:dayStars,reviews:st.reviews.slice(-3),tasks,maxCombo:R.maxCombo,reco:recoDish(),recoN:recoDish()?(st.dish[recoDish()]||0):0,photos:albumList().filter(p=>p.day===D).length,r0,r1:Math.round(rating()*100)/100,story,recs,weather:R.weather,event:R.event,treats:st.treats||0,sets:st.sets||0,crew:(S.crew||[]).map(m=>({name:m.name,role:m.role,lv:m.lv,wage:crewWage(m),n:(st.crew||{})[m.id]||{}})),short:Object.values(st.short||{}).reduce((a,b)=>a+b,0),
+ S.lastSummary={day:D,rev:st.rev,cost:S.todayCost,wages,tips:st.tips,bonus,net:st.rev+st.tips+bonus-S.todayCost-wages,guests:st.guests,lost:st.lost,walkins:st.walkins||0,angry:st.angry,perfect:st.perfect,plated,avg:Math.round(avg),top,stars:dayStars,reviews:st.reviews.slice(-3),tasks,maxCombo:R.maxCombo,reco:recoDish(),recoN:recoDish()?(st.dish[recoDish()]||0):0,photos:albumList().filter(p=>p.day===D).length,r0,r1:Math.round(rating()*100)/100,story,recs,weather:R.weather,event:R.event,treats:st.treats||0,sets:st.sets||0,crew:(S.crew||[]).map(m=>({name:m.name,role:m.role,lv:m.lv,wage:crewWage(m),n:(st.crew||{})[m.id]||{}})),short:Object.values(st.short||{}).reduce((a,b)=>a+b,0),
   sales:menuList().map(d=>({d,n:st.dish[d]||0,rev:(st.dish[d]||0)*priceOf(d),short:(st.short||{})[d]||0,left:S.stock[d]||0})).sort((a,b)=>b.n-a.n)};
  S.dayLog=(R.log||[]).slice(-90);S.dayLogDay=D;S.salesHist=S.salesHist||{};for(const d of menuList()){const v=(st.dish[d]||0)+((st.short||{})[d]||0);const h=S.salesHist[d];S.salesHist[d]=h==null?v:Math.round((h*.5+v*.5)*10)/10}S.phase='shop';S.tut=1;save();
  for(const k of[...ICACHE.keys()])if(k.startsWith('pg'))ICACHE.delete(k);
@@ -1629,7 +1629,7 @@ function drawWalkers(c,g,now){const n=g.size;const sit=isSeated(g);const wact=g.
   g.looks.forEach((L0,k)=>{const off=(k-(n-1)/2)*11;const stp=g.moving?Math.sin(g.walk+k):0;let gaze=null,hold=null;
    if(wact==='phone'&&k===0){hold='phone';gaze={x:0,y:.6}}else if(wact==='cat'&&g.wcat&&!g.wcat.hidden){gaze={x:g.wcat.x>=g.x?1:-1,y:g.wcat.y>g.y-20?.5:-.2}}else if(wact==='look'){gaze={x:1,y:-.1}}else if(wact==='talk'&&n>1){gaze={x:k?1:-1,y:.1}}
    if(sit){drawPerson(c,g.x+(n>1?(k%2?6:-6):0),g.y+(n>1?(k%2?3:-3):0)+Math.floor(k/2)*14,L0,{seated:true,lounge:{legs:0},mood,flip:false,hold,gaze,bob:Math.sin(now*1.3+g.seed+k*1.7)*.3,blink:Math.sin(now*1.4+g.seed+k)>.97});return}
-   drawPerson(c,g.x+off,g.y+(k%2)*2,L0,{step:stp,bob:g.moving?Math.abs(stp)*-.8:0,mood,flip:g.tx<g.x,hold:g.moving?null:hold,gaze:g.moving?null:gaze,blink:Math.sin(now*1.4+g.seed+k)>.97});if(g.bus&&k===0){const fl=g.tx<g.x?-1:1;const px=g.x+off+fl*7,py=g.y-27;c.fillStyle='#FBFAF6';c.beginPath();c.ellipse(px,py,6.5,2.8,0,0,7);c.fill();c.strokeStyle='rgba(60,45,35,.55)';c.lineWidth=.7;c.stroke();c.fillStyle='rgba(120,90,70,.25)';c.beginPath();c.ellipse(px,py,3.2,1.2,0,0,7);c.fill()}})}
+   drawPerson(c,g.x+off,g.y+(k%2)*2,L0,{step:stp,bob:g.moving?Math.abs(stp)*-.8:0,mood,flip:g.tx<g.x,hold:g.moving?null:hold,gaze:g.moving?null:gaze,blink:Math.sin(now*1.4+g.seed+k)>.97});if(k===0&&(g.room||'main')==='front'&&streetWet())drawUmbrella(c,g.x+off+(g.tx<g.x?-3:3),g.y-30,UMB_COLS[Math.floor(g.seed*7)%UMB_COLS.length]);if(g.bus&&k===0){const fl=g.tx<g.x?-1:1;const px=g.x+off+fl*7,py=g.y-27;c.fillStyle='#FBFAF6';c.beginPath();c.ellipse(px,py,6.5,2.8,0,0,7);c.fill();c.strokeStyle='rgba(60,45,35,.55)';c.lineWidth=.7;c.stroke();c.fillStyle='rgba(120,90,70,.25)';c.beginPath();c.ellipse(px,py,3.2,1.2,0,0,7);c.fill()}})}
 function drawJillAt(c,J,V,now){const moving=J.moving;const stp=moving?Math.sin(J.step):0;
   /* handwork in progress (chopping, stirring) and she is at the pass: show her at it */
   const cooking=!moving&&R&&phase==='service'&&Math.hypot(J.x-PASS.x,J.y-PASS.y)<6&&R.slots.some(s=>s.job&&s.job.step&&!chefHandles(s)&&(s.job.step.t==='work'||(s.job.step.t==='wait'&&s.job.step.anim==='stir')));
@@ -1670,6 +1670,7 @@ function drawOtherRoom(c,now,dusk,V,X0,XW,TOP){const k=room;const J=V.jill;const
  crewDraw(c,now,list,k);
  if(CATS)for(const cat of CATS){if(cat.away!==k)continue;list.push({y:cat.ay,f:()=>{const sx=cat.x,sy=cat.y,sf=cat.face;cat.x=cat.ax;cat.y=cat.ay;cat.face=cat.aface||1;drawCat(c,cat,now);cat.x=sx;cat.y=sy;cat.face=sf}})}
  for(const G of CATGEAR)if(gearOn(G.k)&&G.room===k&&G.poses)list.push({y:G.y+(G.k==='perch'?-30:G.k==='tunnel'?-8:-6),f:()=>drawGear(c,G,now)});
+ if(k==='front'&&R){for(const w of STREET.ppl)list.push({y:w.y,f:()=>drawStreetWalker(c,w,now)});if(STREET.veh)list.push({y:STREET.veh.y,f:()=>drawVehicle(c,STREET.veh)})}
  list.sort((a,b)=>a.y-b.y).forEach(i=>i.f());
  /* the light of the hour, as in the dining room (the street bakes it into its sky) */
  if(k!=='front'){c.save();c.globalCompositeOperation='multiply';c.fillStyle=wxTint(tintFor(dusk));c.fillRect(X0,-TOP,XW,LH+TOP);c.restore();
@@ -1894,6 +1895,55 @@ function drawFrontRoom(c,now,dusk,V,X0,XW,TOP,list){const d=clamp(dusk,0,1);cons
  {const x=FR.door.x;c.fillStyle='#F6EEDF';rr(c,x-12,224,24,11,2);c.fill();c.fillStyle=R?'#2E6B4A':'#8A3A2A';c.font=`800 6px ${FONT}`;c.textAlign='center';c.fillText(R?'OPEN':'CLOSED',x,232)}
  if(E.lights){c.strokeStyle='rgba(40,30,20,.7)';c.lineWidth=.7;c.beginPath();for(let x=40;x<=360;x+=4)c.lineTo(x,128+Math.sin((x-40)/60*Math.PI)*8);c.stroke();for(let x=48;x<360;x+=16){const y=131+Math.sin((x-40)/60*Math.PI)*8;const tw=.75+Math.sin(now*2+x*.3)*.25;c.fillStyle=`rgba(255,${Math.round(205+tw*30)},${Math.round(130+tw*40)},${.55+d*.45})`;el(c,x,y,1.8,2.4);if(d>.2){let g=c.createRadialGradient(x,y,0,x,y,9);g.addColorStop(0,`rgba(255,200,120,${.35*d*tw})`);g.addColorStop(1,'rgba(255,200,120,0)');c.fillStyle=g;c.fillRect(x-9,y-9,18,18)}}}
  if(S.rooms&&S.rooms.terrace)for(const t of V.tables)if(t.room==='front'){list.push({y:t.y-58,f:()=>{c.fillStyle='#8A6A42';c.fillRect(t.x-1,t.y-62,2,44);c.fillStyle='#B8536A';c.beginPath();c.moveTo(t.x-40,t.y-58);c.quadraticCurveTo(t.x,t.y-88,t.x+40,t.y-58);c.closePath();c.fill();c.fillStyle='rgba(255,255,255,.25)';c.beginPath();c.moveTo(t.x-40,t.y-58);c.quadraticCurveTo(t.x-20,t.y-80,t.x,t.y-84);c.lineTo(t.x,t.y-58);c.closePath();c.fill();c.fillStyle='rgba(0,0,0,.1)';for(let k=-3;k<=3;k++)c.fillRect(t.x+k*13-.5,t.y-58,1,3)}})}}
+
+/* ================= 2.1: the street has a life of its own =================
+   While the restaurant is open, people walk the pavement: neighbours, students, a couple, someone with a dog; a scooter
+   or a bicycle passes on the road. Some stop at a window or the door and look in (the street pieces make that likelier,
+   and the lights in the evening). One who likes what they see becomes the next arrival on the schedule: the same person
+   turns and walks in from where they stood, so the guests visibly come from the street. Demand does not change — a
+   walk-in takes the place of the party that was about to arrive. */
+const STREET={ppl:[],next:0,veh:null,nextVeh:0};
+const STREET_TYPES=['office','student','couple','gourmet','office','student','couple'];
+const UMB_COLS=['#B8536A','#2E6B4A','#2E3A4B','#E0A43A','#5B6FB3','#F7EDDC'];
+function streetReset(){STREET.ppl=[];STREET.next=rand(2,6);STREET.veh=null;STREET.nextVeh=rand(8,26)}
+function streetWet(){const W=wxNow();return W==='rain'||W==='storm'}
+function streetStopP(){let p=.14;if(extOn('plants'))p+=.05;if(extOn('lights'))p+=.04;if(extOn('sign'))p+=.05;if(extOn('awning'))p+=.05;if(extOn('season'))p+=.03;if(projOn('terrace')&&(S.frontTables||0)>0)p+=.06;if(duskF()>.5&&(extOn('lights')||extOn('sign')))p+=.08;return Math.min(.55,p)}
+function streetSpawn(){const dir=Math.random()<.5?1:-1;const type=pick(STREET_TYPES);const n=type==='couple'?2:Math.random()<.22?2:1;const wet=streetWet();
+ const w={x:dir>0?-BGM-34:LW+BGM+34,y:rand(336,366),dir,v:rand(24,38)*(wet?1.3:1),looks:makeLooks(type,n),type,n,walk:Math.random()*6,st:'walk',t:0,dur:0,seed:Math.random()*10,dog:n===1&&!wet&&Math.random()<.2,dogCol:pick(['#C9A063','#5A4632','#F2EAD8','#2A2220','#B5652A']),umb:wet&&Math.random()<.9?pick(UMB_COLS):null,stopX:null,bub:0};
+ if(w.dog)w.v=Math.min(w.v,30);
+ if(!R.closed&&Math.random()<streetStopP()){const spots=[110,290,FR.door.x+(dir>0?-34:34)];if(projOn('terrace')&&(S.frontTables||0)>0)spots.push(FR.cols[0]+(dir>0?-46:46));w.stopX=pick(spots)}
+ STREET.ppl.push(w)}
+function streetJoin(w){if(R.closed||R.t>R.dur*.9||R.si>=R.sched.length)return false;const o=R.sched[R.si];if(o.reg||o.t-R.t>45||o.forSig)return false;if(queued().length>=queueMax()-1)return false;if(Math.random()>.6)return false;
+ const spec=Object.assign({},o,{t:R.t,looks:o.size===w.n?w.looks:null,fromStreet:{x:w.x,y:w.y}});R.si++;spawn(spec);return true}
+function streetUpd(dt){if(!R)return;const wet=streetWet();STREET.next-=dt;
+ if(STREET.next<=0&&STREET.ppl.length<(wet?3:5)){streetSpawn();STREET.next=rand(5,13)*(wet?1.5:1)*(R.rush?.75:1)*(R.closed?1.6:1)}
+ for(const w of STREET.ppl){w.t+=dt;
+  if(w.st==='walk'){w.x+=w.dir*w.v*dt;w.walk+=dt*7.5;if(w.stopX!=null&&(w.dir>0?w.x>=w.stopX:w.x<=w.stopX)){w.st='look';w.t=0;w.dur=rand(1.8,3.6);w.stopX=null}
+   if(w.dir>0?w.x>LW+BGM+44:w.x<-BGM-44)w.gone=true}
+  else if(w.st==='look'&&w.t>=w.dur){if(streetJoin(w)){w.gone=true;R.st.walkins=(R.st.walkins||0)+1;if(!R.walkinNoted&&room!=='front'){R.walkinNoted=1;noteLine('有人在門口看了一下，走進來了。')}}else{w.st='walk';w.t=0;if(Math.random()<.25)w.dir=-w.dir}}}
+ STREET.ppl=STREET.ppl.filter(w=>!w.gone);
+ STREET.nextVeh-=dt;if(!STREET.veh&&STREET.nextVeh<=0){const dir=Math.random()<.5?1:-1;const scoot=Math.random()<.72;STREET.veh={x:dir>0?-BGM-70:LW+BGM+70,dir,v:scoot?rand(150,215):rand(70,100),kind:scoot?'scooter':'bike',y:rand(390,404),col:pick(['#C9413A','#2E6B4A','#F2EAD8','#3E4E66','#E0A43A']),helm:pick(['#F2EAD8','#2A2A2E','#C9413A','#5B6FB3']),box:scoot&&Math.random()<.5,boxCol:pick(['#2E9E6B','#E86A3A','#F4C44E']),look:makeLooks('office',1)[0],ph:Math.random()*6};STREET.nextVeh=rand(12,40)}
+ if(STREET.veh){const v=STREET.veh;v.x+=v.dir*v.v*dt;v.ph+=dt*9;if(v.dir>0?v.x>LW+BGM+80:v.x<-BGM-80)STREET.veh=null}}
+function drawUmbrella(c,x,y,col){c.save();c.translate(x,y);c.strokeStyle='#3A2E28';c.lineWidth=1.1;c.beginPath();c.moveTo(0,0);c.lineTo(0,-16);c.stroke();c.fillStyle=col;c.beginPath();c.moveTo(-17,-16);c.quadraticCurveTo(0,-34,17,-16);for(let k=17;k>-17;k-=6.8)c.quadraticCurveTo(k-3.4,-13,k-6.8,-16);c.closePath();c.fill();c.strokeStyle='rgba(60,34,22,.4)';c.lineWidth=.6;c.stroke();c.fillStyle='rgba(255,255,255,.2)';c.beginPath();c.moveTo(-13,-17);c.quadraticCurveTo(-9,-28,0,-31);c.quadraticCurveTo(-7,-26,-8,-17);c.fill();c.fillStyle='#3A2E28';circ(c,0,-33,1.2);c.restore()}
+function drawDog(c,x,y,flip,ph,col){c.save();c.translate(x,y);c.scale(flip?-1:1,1);c.fillStyle='rgba(40,25,15,.16)';el(c,1,1,9,2.6);const OL='rgba(60,34,22,.5)';c.strokeStyle=OL;c.lineWidth=.6;
+ c.fillStyle=shade(col,-.12);for(const [lx,k] of[[-5.5,0],[-2.5,3.1],[2.5,1.6],[5.5,4.7]]){const lift=Math.max(0,Math.sin(ph+k))*2;rr(c,lx-1.3,-7-lift*.2,2.6,7-lift,1.1);c.fill();c.stroke()}
+ c.fillStyle=col;el(c,0,-9,8.6,4.8);c.stroke();circ(c,8.5,-12.5,4.2);c.fillStyle=shade(col,.14);el(c,11.6,-11.4,2.8,1.9);c.fillStyle='#2A2220';circ(c,13.4,-11.8,.9);circ(c,9.6,-13.6,.75);c.fillStyle=shade(col,-.2);c.save();c.translate(6,-15.5);c.rotate(-.5);el(c,0,0,1.9,3.2);c.restore();
+ c.strokeStyle=col;c.lineWidth=2.2;c.lineCap='round';c.beginPath();c.moveTo(-8,-10);c.quadraticCurveTo(-12,-15+Math.sin(ph*1.7)*2,-10,-18);c.stroke();c.strokeStyle='#C9413A';c.lineWidth=1.2;c.beginPath();c.moveTo(4.6,-10.2);c.lineTo(5.4,-14.6);c.stroke();c.restore()}
+function drawStreetWalker(c,w,now){const f=w.dir;const look=w.st==='look';
+ w.looks.forEach((L0,k)=>{const off=(k-(w.n-1)/2)*12*f;drawPerson(c,w.x+off,w.y+(k%2)*2,L0,{step:look?0:Math.sin(w.walk+k),bob:look?0:Math.abs(Math.sin(w.walk+k))*-.8,mood:look?'happy':'ok',flip:f<0,gaze:look?{x:0,y:-.45}:null,blink:Math.sin(now*1.4+w.seed+k)>.97});
+  if(w.umb&&k===0)drawUmbrella(c,w.x+off+f*3,w.y-30,w.umb)});
+ if(w.dog){const dx=w.x-f*20;c.strokeStyle='rgba(60,45,35,.7)';c.lineWidth=.8;c.beginPath();c.moveTo(w.x-f*7,w.y-24);c.quadraticCurveTo(w.x-f*12,w.y-14,dx+f*4,w.y-13);c.stroke();drawDog(c,dx,w.y+2,f<0,look?0:w.walk*1.1,w.dogCol)}
+ if(look){/* a little thought while they read the window */const t=w.t;if(t>.5){c.fillStyle='rgba(255,250,240,.95)';const bx=w.x+f*9,by=w.y-56;circ(c,bx,by,5.6);circ(c,bx-f*4,by+6,1.8);circ(c,bx-f*6.5,by+9.5,1.1);c.fillStyle='#2E2019';if(t>w.dur-.9){c.font=`800 8px ${FONT}`;c.textAlign='center';c.textBaseline='middle';c.fillText('!',bx,by+.5);c.textBaseline='alphabetic'}else{for(let i=-1;i<=1;i++)circ(c,bx+i*2.2,by+.3,.75)}}}}
+function drawVehicle(c,v){const f=v.dir;c.save();c.translate(v.x,v.y);c.scale(f,1);c.fillStyle='rgba(20,15,10,.22)';el(c,0,2,22,4);
+ if(v.kind==='scooter'){for(const wx of[-14,14]){c.fillStyle='#2A2A2E';circ(c,wx,-4.5,5.4);c.fillStyle='#8A8A90';circ(c,wx,-4.5,2.6);c.fillStyle='#2A2A2E';circ(c,wx,-4.5,1)}
+  c.fillStyle=shade(v.col,-.2);c.fillRect(-14,-8,28,3);c.fillStyle=v.col;c.beginPath();c.moveTo(-17,-9);c.quadraticCurveTo(-19,-17,-8,-18);c.lineTo(3,-18);c.lineTo(6,-10);c.lineTo(15,-10);c.lineTo(16,-6);c.lineTo(-15,-6);c.closePath();c.fill();c.fillStyle='rgba(255,255,255,.22)';c.fillRect(-14,-16,12,1.6);
+  c.fillStyle=v.col;c.beginPath();c.moveTo(11,-10);c.quadraticCurveTo(17,-20,15,-31);c.lineTo(18,-31);c.quadraticCurveTo(21,-18,14,-9);c.closePath();c.fill();c.strokeStyle='#2A2A2E';c.lineWidth=1.6;c.lineCap='round';c.beginPath();c.moveTo(16,-32);c.lineTo(8,-33);c.stroke();c.fillStyle='#F4E2B0';circ(c,19,-26,2.2);c.fillStyle='#C9413A';circ(c,-18,-12,1.4);
+  c.fillStyle='#2A2220';rr(c,-13,-22,15,4.5,2);c.fill();if(v.box){c.fillStyle=v.boxCol;rr(c,-27,-33,15,14,2);c.fill();c.fillStyle='rgba(0,0,0,.12)';c.fillRect(-27,-22,15,3);c.fillStyle='rgba(255,255,255,.4)';c.fillRect(-25,-29,11,1.6)}}
+ else{for(const wx of[-13,13]){c.strokeStyle='#2E2B33';c.lineWidth=1.6;c.beginPath();c.arc(wx,-6,7.5,0,7);c.stroke();c.beginPath();c.arc(wx,-6,1.6,0,7);c.stroke();for(let k=0;k<6;k++){c.beginPath();c.moveTo(wx,-6);c.lineTo(wx+Math.cos(k+v.ph*.3)*7,-6+Math.sin(k+v.ph*.3)*7);c.stroke()}}
+  c.strokeStyle=v.col;c.lineWidth=2;c.beginPath();c.moveTo(-13,-6);c.lineTo(-3,-19);c.lineTo(11,-19);c.lineTo(13,-6);c.moveTo(-3,-19);c.lineTo(4,-8);c.lineTo(13,-6);c.moveTo(4,-8);c.lineTo(11,-19);c.stroke();c.fillStyle='#2A2220';rr(c,-7,-22,7,2.6,1);c.fill();c.strokeStyle='#2A2A2E';c.lineWidth=1.4;c.beginPath();c.moveTo(11,-19);c.lineTo(12,-26);c.lineTo(16,-27);c.stroke()}
+ c.restore();
+ const rx=v.x-f*(v.kind==='scooter'?4:2),ry=v.y-(v.kind==='scooter'?17:19);drawPerson(c,rx,ry,v.look,{seated:true,lounge:{legs:0},s:.8,flip:f<0,arms:[.75,.75],mood:'ok'});
+ if(v.kind==='scooter'){c.save();c.translate(rx,ry-29*.8*PSC);c.fillStyle=v.helm;c.beginPath();c.arc(0,-.5,10.8,Math.PI,0);c.lineTo(10.8,3);c.lineTo(-10.8,3);c.closePath();c.fill();c.strokeStyle='rgba(60,34,22,.5)';c.lineWidth=.6;c.stroke();c.fillStyle='rgba(255,255,255,.28)';el(c,-4,-6,3.2,1.6);c.fillStyle='rgba(0,0,0,.2)';c.fillRect(-10.8,1.5,21.6,1.5);c.restore()}}
 /* ================= kitchen render ================= */
 const TRAYHIT={chips:[],ctrls:[],stage:null};
 const inR=(h,x,y)=>x>=h.x&&x<=h.x+h.w&&y>=h.y&&y<=h.y+h.h;
@@ -2675,7 +2725,7 @@ function snapshotService(){if(!R||phase!=='service'||R.closing!=null||R.ended)re
 function checkpointSave(why){if(!R||phase!=='service')return false;try{const snap=snapshotService();if(!snap)return false;S.checkpoint={day:S.day,at:R.t,clock:clockStr(),why,snap};save();return true}catch(e){console.warn('[checkpoint] not saved:',e&&e.message);return false}}
 function clearCheckpoint(){if(S.checkpoint){S.checkpoint=null}}
 function restoreService(cp){const snap=cp.snap;if(!snap||cp.day!==S.day)throw new Error('checkpoint is for another day');
- lifeReset();dylanStageCheck();bg=null;lastEv=null;const dur=snap.misc.dur||dayDur(S.day);
+ lifeReset();streetReset();dylanStageCheck();bg=null;lastEv=null;const dur=snap.misc.dur||dayDur(S.day);
  const N={t:0,dur,tables:buildTables(),slots:buildSlots(),groups:[],tickets:[],sched:[],si:0,closed:false,ended:false,
   jill:{x:PASS.x,y:PASS.y,tx:null,ty:null,q:[],cur:null,busy:0,carry:[],idle:0,face:1,step:0,room:'main',troom:'main'},
   combo:0,maxCombo:0,streak:0,fire:0,fireCount:0,floats:[],parts:[],tv:1,gid:1,tkid:1,
@@ -3314,7 +3364,7 @@ function showSummary(){phase='summary';mainScreen='summary';const s=S.lastSummar
   ${(()=>{const W=WEATHER[s.weather]||WEATHER.sun,E=EVENTS[s.event];return`<div class="chips"><span>${W.n}</span>${s.event&&s.event!=='none'&&E?`<span>${E.n}</span>`:''}${s.treats?`<span>請客 ${s.treats} 次</span>`:''}${s.sets?`<span>套餐加點 ${s.sets} 份</span>`:''}${s.short?`<span class="warn">臨時叫貨 ${s.short} 次</span>`:''}</div>`})()}
   ${s.r1!=null?`<div class="card rating"><div class="rl"><span>餐廳評分</span><b>${(s.r0||3).toFixed(2)} → ${s.r1.toFixed(2)}</b><em class="${s.r1>s.r0+.004?'up':s.r1<s.r0-.004?'dn':''}">${s.r1>s.r0+.004?'↑':s.r1<s.r0-.004?'↓':'→'}</em></div>${s.story&&s.story.length?`<ul>${s.story.slice(0,3).map(x=>`<li class="${x.s>0?'up':'dn'}">${x.s>0?'＋':'－'} ${x.t}</li>`).join('')}</ul>`:'<p class="muted" style="margin:4px 0 0">今天沒有明顯影響評分的事。</p>'}${(()=>{const nl=LEVELS[S.level];if(!nl)return'';const ok=s.r1>=nl.rating;return`<small>${ok?`已達擴建到 ${nl.n} 的評分門檻（${nl.rating.toFixed(1)}）`:`擴建到 ${nl.n} 需要 ${nl.rating.toFixed(1)}，還差 ${(nl.rating-s.r1).toFixed(2)}`}</small>`})()}</div>`:''}
   ${s.recs&&s.recs.length?`<div class="news">🏆 今天創了紀錄：${s.recs.map(k=>REC_N[k]).join('、')}</div>`:''}
-  <div class="statgrid"><div class="card"><small>客人數</small><b>${s.guests}</b>${s.lost?` <small style="display:inline">（${s.lost} 位沒等到）</small>`:''}</div><div class="card"><small>Perfect 料理</small><b>${s.perfect}</b> <small style="display:inline">/ ${s.plated}</small></div><div class="card"><small>平均滿意度</small><b>${s.avg}%</b></div><div class="card"><small>最受歡迎</small><b style="font-size:13px">${topHTML}</b></div></div>
+  <div class="statgrid"><div class="card"><small>客人數</small><b>${s.guests}</b>${s.lost?` <small style="display:inline">（${s.lost} 位沒等到）</small>`:''}${s.walkins?` <small style="display:inline">（${s.walkins} 組路過進來）</small>`:''}</div><div class="card"><small>Perfect 料理</small><b>${s.perfect}</b> <small style="display:inline">/ ${s.plated}</small></div><div class="card"><small>平均滿意度</small><b>${s.avg}%</b></div><div class="card"><small>最受歡迎</small><b style="font-size:13px">${topHTML}</b></div></div>
   ${s.sales&&s.sales.length?`<h3>今天賣了什麼</h3><div class="card sales">${s.sales.map(x=>`<div class="sale ${x.d===s.reco?'reco':''}"><img alt="" src="${dishURL(x.d,'P')}"><span class="nm">${x.d===s.reco?'⭐ ':''}${dishName(x.d)}</span><span class="n">${x.n} 份</span><span class="rev">${fmt(x.rev)}</span><small>${x.short?`臨時叫貨 ${x.short}`:x.left?`剩 ${x.left}`:'賣完'}</small></div>`).join('')}</div>`:''}
   ${s.crew&&s.crew.length?`<h3>員工今天做了什麼</h3><div class="card staffday">${s.crew.map(m=>{const n=m.n||{};const parts=m.role==='chef'?[n.cook?`做了 ${n.cook} 道`:'沒有接到菜']:m.role==='waiter'?[n.seat?`帶位 ${n.seat}`:'',n.order?`點餐 ${n.order}`:'',n.serve?`上菜 ${n.serve}`:'',n.check?`結帳 ${n.check}`:'',n.clean?`收桌 ${n.clean}`:''].filter(Boolean):[n.clean?`收了 ${n.clean} 桌`:'沒有桌子要收'];return`<div class="srow"><b>${m.name}</b><span>${parts.join('・')||'—'}</span><small>日薪 ${fmt(m.wage)}</small></div>`}).join('')}<div class="srow tot"><b>薪資合計</b><span>${fmt(s.wages)}${s.rev?`（營業額的 ${Math.round(s.wages/s.rev*100)}%）`:''}</span></div></div>`:''}
   ${s.photos?`<div class="news">📷 今天留下了 ${s.photos} 張照片 <button class="jmore" data-act="album">看相簿 ›</button></div>`:''}

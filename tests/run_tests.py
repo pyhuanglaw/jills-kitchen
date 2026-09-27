@@ -2107,6 +2107,34 @@ def specials_are_a_finer_version_of_a_mastered_dish(b, port, target):
     check(not g.errors, g.errors)
     g.close()
 
+@test
+def the_street_has_passers_by_and_some_walk_in(b, port, target):
+    """People walk the pavement while the restaurant is open, some stop to look, a scooter or a bicycle passes; a looker
+    who walks in takes the place of the next scheduled party (demand unchanged) and starts from where they stood."""
+    g = Game(b, port, target, seed=37, manual=True)
+    mature(g); g.click('[data-act=open]')
+    g.ev("S.ext={plants:1,lights:1,sign:1,awning:1};S.today.weather='sun';save()")
+    start_day(g); install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;")
+    check(g.ev("typeof STREET==='object' && STREET.ppl.length===0"), 'the street should start empty at opening')
+    seen = {'walk': 0, 'look': 0, 'veh': 0}
+    for i in range(90):
+        g.page.evaluate('()=>window.__play(20,0)')
+        if g.ev("phase") != 'service': break
+        st = json.loads(g.ev("JSON.stringify({n:STREET.ppl.length,look:STREET.ppl.filter(w=>w.st==='look').length,veh:!!STREET.veh,walkins:R.st.walkins||0})"))
+        seen['walk'] += st['n']; seen['look'] += st['look']; seen['veh'] += 1 if st['veh'] else 0
+        if st['walkins'] >= 1 and seen['veh'] and seen['look']: break
+    check(seen['walk'] > 0 and seen['look'] > 0 and seen['veh'] > 0, f'the street stayed empty: {seen}')
+    # a walk-in: force one from a looker and check the bookkeeping
+    r = g.ev(r"""(()=>{const si=R.si;const o=R.sched[si];if(!o)return{no:1};o.reg=null;o.forSig=false;o.t=R.t+5;R.groups=R.groups.filter(q=>q.state!=='arrive'&&q.state!=='queue');
+      STREET.ppl=[];streetSpawn();const w=STREET.ppl[0];w.x=110;w.y=350;w.st='look';w.t=99;w.dur=1;let ok=false;for(let k=0;k<12&&!ok;k++){Math.random=(()=>{let n=0;return()=>[.1,.1,.1,.1][n++%4]})();ok=streetJoin(w)}
+      const g=R.groups[R.groups.length-1];return{no:0,ok,si:R.si-si,walkIn:g&&g.walkIn,x:g&&Math.round(g.x),y:g&&Math.round(g.y),room:g&&g.room,st:g&&g.state}})()""")
+    check(r.get('no') == 0 and r['ok'] and r['si'] == 1 and r['walkIn'] == 1 and r['x'] == 110 and r['y'] == 350 and r['room'] == 'front' and r['st'] == 'arrive', f'the walk-in should replace the next scheduled party and start on the pavement: {r}')
+    g.page.evaluate('()=>window.__play(200,0)')
+    check(g.ev("R.groups.some(q=>q.walkIn&&(q.table!=null||q.state==='queue'))||R.st.guests>0"), 'the walk-in never got in')
+    check(g.ev("STREET.ppl.every(w=>w.y>=336&&w.y<=366)&&(!STREET.veh||STREET.veh.y>=388)"), 'walkers keep to the pavement and vehicles to the road')
+    check(not g.errors, g.errors)
+    g.close()
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--target', choices=['index', 'single'], default='index')
