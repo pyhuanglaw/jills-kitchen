@@ -2151,7 +2151,7 @@ function drawPassStrip(c,now,V){const y=FB+22;const n=V.slots.length;if(!n)retur
  const chefs=(S.crew||[]).filter(m=>m.role==='chef').length;if(chefs){c.fillStyle='rgba(60,56,50,.55)';c.font=`700 6px ${FONT}`;c.fillText(`${chefs} 位廚師在裡面`,200,y+25)}}
 /* ================= 2.0: the kitchen, the side room and the street ================= */
 const BGC={};   /* cached backgrounds of the other rooms, by room */
-function roomBg(k,key,TOP,draw){const T2=Math.round(TOP);const kk=key+'|'+T2+'|'+SV.s+'|'+DPR+'|'+FB+'|'+DY;const hit=BGC[k];if(hit&&hit.key===kk)return hit.cv;
+function roomBg(k,key,TOP,draw){const T2=Math.round(TOP);const kk=key+'|'+T2+'|'+SV.s+'|'+DPR+'|'+FB+'|'+DY;const hit=BGC[k];if(hit&&hit.key===kk)return hit.cv;for(const o in BGC)if(o!==k)delete BGC[o];   /* one room's background at a time: a phone's memory is finite */
  const sc0=SV.s*DPR;const XW=LW+BGM*2;const cv=mkCanvas(Math.ceil(XW*sc0),Math.ceil((LH+T2)*sc0));const c=cv.getContext('2d');c.scale(sc0,sc0);c.translate(BGM,T2);draw(c,-BGM,XW,T2);BGC[k]={key:kk,cv};return cv}
 function blitBg(c,cv,X0,XW,TOP){const T2=Math.round(TOP);c.drawImage(cv,X0,-T2,XW,LH+T2)}
 /* an open doorway in a back wall: dark inside, warm light, a wooden frame and a sign */

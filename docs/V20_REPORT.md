@@ -33,7 +33,8 @@
 - **Grown-restaurant pacing**: demand is capped at what the tables can turn over (grown restaurants only), the rating is judged
   over more visits in a bigger place, full-house departures are toasted once per 40 s with a count, the prep screen warns when
   tables outnumber what the waiters can cover. Guests remark on the new rooms; a one-time 2.0 news item on the prep screen.
-- 7 new achievements (67 total), 4 new album moments, new shop icons.
+- 7 new achievements (67 total), 4 new album moments, new shop icons; an A-frame chalkboard by the counter with today's
+  recommendation; the saving goal as one line on the prep screen; the 2.0 news item once.
 
 ## 3. What changes for a Day-25 player
 - Loads unchanged (money, level, dishes, staff, regulars, photos, achievements). Three tabs appear (店門口 / 用餐區 / 廚房); the
@@ -61,7 +62,8 @@
   used the day after buying; cats used box/perch/lounge; kitchen looks showed cooks in add/plate/hold/watch beats and plates
   at the pass. It also found the pacing problem (64 lost guests on the day after the terrace) that led to the cap, the rating
   window and the staffing warning; re-measured with the cap: 87 guests / 0 lost / rating 3→4.54 on the first expanded day with
-  a full crew.
+  a full crew. A second 2-day smoke on the final build (Day-25 save, terrace then side room): 82 and 76 guests, 0 lost,
+  rating 3→4.58→4.87, no errors.
 - Performance (headless Chromium 390×800, mature save, rain): ms JS per frame — dining room 12.6 (V18.1.1 baseline 13.8),
   kitchen 4.3, side room 3.1, street 2.5; first frame in a room after a change 100–240 ms (cached background).
 
