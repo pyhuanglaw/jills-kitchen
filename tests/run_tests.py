@@ -1928,7 +1928,7 @@ def golden_frames(b, port, target, record=False):
 MATURE_181 = r"""(()=>{S.level=5;S.tables=12;S.money=236000;S.day=25;S.stats={guests:1200,perfect:900,days:24};
  S.eq={stove:5,oven:5,bar:5,prep:1,fridge:5,pan:5};S.decor={plants:3,lights:3,art:2,chairs:2,rug:1,ware:1,bar:1,sofa:3};
  S.crew=[{id:'c1',role:'chef',name:'阿德師傅',lv:5,duty:'stove'},{id:'c2',role:'chef',name:'Marco',lv:5,duty:'oven'},{id:'c6',role:'chef',name:'阿珠姐',lv:4,duty:'bar'},{id:'c3',role:'waiter',name:'小茉',lv:5,duty:'both'},{id:'c4',role:'waiter',name:'Kai',lv:4,duty:'both'},{id:'c5',role:'cleaner',name:'秀琴阿姨',lv:3,duty:'clean'}];
- for(const d of Object.keys(DISHES))if(!DISHES[d].special&&!S.unlocked.includes(d))S.unlocked.push(d);for(const d of S.unlocked){S.stock[d]=30;S.xp[d]=400}S.menu=S.unlocked.slice(0,16);
+ for(const d of Object.keys(DISHES))if(!(DISHES[d]||{}).special&&!S.unlocked.includes(d))S.unlocked.push(d);for(const d of S.unlocked){S.stock[d]=30;S.xp[d]=400}S.menu=S.unlocked.slice(0,16);
  S.regulars={wang:12,koba:9,dylan:14,writer:6};S.dylan.stage=3;S.dylan.reveal=18;S.achievements={first:1,rush:2,fire:3,bistro:4,jill:20,husband:18};
  S.album=[{id:'p1',kind:'sofa',day:9,img:null,info:{}},{id:'p2',kind:'husband',day:18,img:null,info:{}}];S.reviews=Array.from({length:40},(_,i)=>({s:5,txt:'好吃',name:'客人'+i}));
  delete S.rooms;delete S.ext;delete S.gear;delete S.gearUse;delete S.newRooms;delete S.sideTables;delete S.frontTables;   /* a save from before 2.0 has none of these */
@@ -2081,7 +2081,7 @@ def specials_are_a_finer_version_of_a_mastered_dish(b, port, target):
     g = Game(b, port, target, seed=31, manual=True)
     mature(g); g.click('[data-act=open]')
     check(g.ev("Object.keys(SPECIALS).every(b=>DISHES[SPECIALS[b].id]&&DISHES[SPECIALS[b].id].special===b&&DISHES[SPECIALS[b].id].steps===DISHES[b].steps)"), 'every special should share its base recipe')
-    check(g.ev("S.unlocked.every(d=>!DISHES[d].special)"), 'a pre-2.1 save should not own any special')
+    check(g.ev("S.unlocked.every(d=>!(DISHES[d]||{}).special)"), 'a pre-2.1 save should not own any special')
     # the icons differ from the base (the finish) and never throw
     diff = g.ev(r"""(()=>{let n=0;for(const b in SPECIALS){const A=dishCanvas(b,'P',64).getContext('2d').getImageData(0,0,64,64).data,B=dishCanvas(SPECIALS[b].id,'P',64).getContext('2d').getImageData(0,0,64,64).data;let d=0;for(let i=0;i<A.length;i+=4)if(A[i]!==B[i]||A[i+1]!==B[i+1]||A[i+2]!==B[i+2])d++;if(d>60)n++}return n})()""")
     check(diff == len(json.loads(g.ev("JSON.stringify(Object.keys(SPECIALS))"))), f'only {diff} specials look different from their base')
@@ -2098,10 +2098,10 @@ def specials_are_a_finer_version_of_a_mastered_dish(b, port, target):
     for i in range(50):
         g.page.evaluate('()=>window.__play(40,0)')
         if g.ev("phase") != 'service': break
-        for d in json.loads(g.ev("JSON.stringify(R.slots.filter(s=>s.job&&DISHES[s.job.d].special&&s.job.chef).map(s=>s.job.d))")): seen.add(d)
-        if len(seen) >= 3 and g.ev("Object.keys(R.st.dish).filter(d=>DISHES[d].special).length>=3"): break
+        for d in json.loads(g.ev("JSON.stringify(R.slots.filter(s=>s.job&&(DISHES[s.job.d]||{}).special&&s.job.chef).map(s=>s.job.d))")): seen.add(d)
+        if len(seen) >= 3 and g.ev("Object.keys(R.st.dish).filter(d=>(DISHES[d]||{}).special).length>=3"): break
     check(len(seen) >= 3, f'the cooks should cook the specials on the line: {seen}')
-    served = json.loads(g.ev("JSON.stringify(Object.fromEntries(Object.entries(R.st.dish).filter(([d])=>DISHES[d].special)))"))
+    served = json.loads(g.ev("JSON.stringify(Object.fromEntries(Object.entries(R.st.dish).filter(([d])=>(DISHES[d]||{}).special)))"))
     check(len(served) >= 3, f'three different specials should have been served: {served}')
     check(g.ev("R.tickets.every(tk=>tk.items.every(it=>dishName(it.d)))") and g.ev("dishName('pasta_x')") == '布拉塔番茄麵', 'tickets should name the special')
     check(not g.errors, g.errors)

@@ -3,7 +3,7 @@
    the cache only when the network fails or stalls (so the home-screen app still opens offline). Everything that
    is not part of the shell is passed through. Saves live in localStorage/IndexedDB and are never touched here.
    Bump CACHE when shipping a new build; old caches are deleted on activate. */
-const CACHE='jills-kitchen-v2.0';
+const CACHE='jills-kitchen-v2.1';
 const SHELL=['./','./index.html','./css/style.css','./js/game.js','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png'];
 const NET_TIMEOUT=4000;
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting()))});
