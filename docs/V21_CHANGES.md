@@ -34,7 +34,11 @@ player see, feel or experience it during normal play?
   stand apart.
 - **Families** (`TYPES.family`): two grown-ups and a child, drawn small (`L.kid`), take a four-top from Day 4 (double on
   weekend evenings); the child watches the cats (「小朋友與貓」 in the album); a word at the table; achievement `families`.
-- **Table talk**: a party of two or more passes a little bubble between them while they wait.
+- **Table talk**: a party of two or more passes a little bubble between them while they wait. On a hot day someone at
+  the table fans themselves. The child sits in a high chair.
+- **The dog waits**: when a passer-by with a dog walks in, the dog waits by the planter on a leash and leaves with them.
+- **員工餐**: before opening (看店裡 on the prep screen) the staff eat together at the big table — a pot in the middle,
+  bowls and chopsticks, whoever does not fit stands with a bowl (`staffMealList`).
 - Dylan: two scenes about the specials and one about the new plating.
 - A one-time 2.1 news line on the prep screen.
 
@@ -50,6 +54,12 @@ player see, feel or experience it during normal play?
   scheduled party and starts on the pavement; walkers keep to the pavement, vehicles to the road).
 - Goldens (scenario / frames / cat fingerprint) re-recorded for 2.1: the street draws from the same random stream.
 
-## 5. Real-speed smoke (`playtest21.py`)
+## 5. Performance
+- Headless Chromium 390×800, mature save, rain, measured back to back on the same machine: dining room 15.4–15.8 ms of
+  JS per frame vs the 2.0 baseline's 15.9–16.1 (the 12.6 in the 2.0 report was a quieter machine); kitchen 5.3–5.8 (5.1–5.7);
+  side 3.1–3.8 (4.1–4.3); street with five walkers and a scooter in the rain 3.2 (3.1). Nothing 2.1 adds is per-frame
+  heavy: the street is a handful of persons, the toppings are painted once into the dish cache.
+
+## 6. Real-speed smoke (`playtest21.py`)
 - A grown 2.0 restaurant (every project, 18 tables, 10 staff), three days at real speed with the person-like actor:
   researching specials on the evenings, looking at the street, the kitchen and the side room. See the report.

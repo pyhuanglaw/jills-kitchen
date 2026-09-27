@@ -2,9 +2,10 @@
 
 ## 1. Artifact / release version
 - Artifact https://claude.ai/artifact/2vhURujrtCpQ1P5jnSsjps — **Version 29**, label "2.1 Food & Life" (Version 28 = 2.0 final).
-- Repo tag **v2.1** on `master`, on top of `v2.0` (`6a757c2`, also `baseline-v2.0`). Zip `jills-kitchen-v2.1.zip` (sent).
+- Repo tag **v2.1** on `master`, on top of `v2.0` (`6a757c2`, also `baseline-v2.0`); Version 30 = "2.1 (b)" adds the dog that
+  waits, the fan, the high chair and the staff meal. Zip `jills-kitchen-v2.1.zip` (sent; re-sent for (b)).
 - Nothing from 2.0 was restarted, redesigned or replaced: the rooms, the kitchen line, the money ladder, the cats' things and
-  the Dylan arc are as shipped. 2.1 is nine commits of content on top.
+  the Dylan arc are as shipped. 2.1 is twelve commits of content on top.
 - The brief arrived truncated after "0. PRODUCT DIRECTION — Jill's Kitchen is being developed toward a future"; this build
   is the reading of the title (food & life), the stated central question, and the two systems 2.0 had deferred (chef
   specials / signature evolution). If the rest of the brief names things not here, they are the next pass.
@@ -17,9 +18,11 @@
   mushroom sauce, truffle, marrow bone, cherries, uni, matcha). Idle cooks wipe, sip, taste, read the rail, chat. The
   pickup side is furnished (shelving, work table with the dish rack, mop) on phone-tall screens.
 - **用餐區**: bigger plates; the meal visibly goes down; empty plates until the bill; a party's talk bubble; families with a
-  small child; a guest photographing a special; the signature's second/third plating.
+  small child in a high chair; a paper fan on a hot day; a guest photographing a special; the signature's second/third plating.
 - **店門口**: passers-by (some with a dog, umbrellas in the rain), lookers at the window and the door with a thought bubble,
-  a scooter or bicycle on the road, and the ones who walk in — from where they stood. The summary counts them.
+  a scooter or bicycle on the road, and the ones who walk in — from where they stood; their dog waits by the planter and
+  leaves with them. The summary counts them.
+- **看店裡 before opening**: the staff eat together at the big table (員工餐).
 - **Summary / prep**: 路過進來 n 組; the 2.1 news line once; the signature upgrade news the morning after.
 
 ## 3. Save compatibility (result)
@@ -43,7 +46,12 @@
   passive Jill turns over), not a 2.1 regression; walk-ins and families do not add to them. The real-speed run above,
   with a person acting, stayed at 2–17 lost.
 
-## 5. Normal-play observations
+## 5. Performance
+- Measured back to back on the same machine (headless Chromium 390×800, mature save, rain): 2.1 dining room 15.4–15.8 ms of
+  JS per frame vs 2.0's 15.9–16.1; kitchen 5.3–5.8 vs 5.1–5.7; side 3.1–3.8 vs 4.1–4.3; the street with five walkers and a
+  scooter 3.2 vs 3.1. No regression; the 12.6 in the 2.0 report was a quieter machine.
+
+## 5b. Normal-play observations
 - The street is the biggest change to the feel: the restaurant is on a road with people on it, and arrivals now come out of
   that flow. Lookers convert often enough to notice (4–7 a day on a grown restaurant) without changing demand.
 - The specials read at the pass and in the ticket strip; at table size (20 px) they read by colour (pink, white, dark).
