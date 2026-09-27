@@ -512,10 +512,10 @@ const DCACHE=new Map();
 function dishCanvas(id,q,size,gold,want){const key=id+'|'+q+'|'+size+'|'+(gold?1:0)+'|'+(want||0)+(id==='signature'&&S.signature?'|'+S.signature.base+S.signature.protein+S.signature.sauce+S.signature.side:'');if(DCACHE.has(key))return DCACHE.get(key);
  const cv=mkCanvas(size),c=cv.getContext('2d');c.translate(size/2,size/2);c.scale(size/100,size/100);const v=VESSEL[id]||'plate';
  if(v==='plate'&&id!=='tiramisu')drawPlate(c,gold);else if(id==='tiramisu')drawPlate(c,gold);else if(v==='bowl')drawBowl(c,gold);else if(v==='cup')drawPlate(c,gold,.92);
- const fl=mkCanvas(size),f=fl.getContext('2d');f.translate(size/2,size/2);f.scale(size/100,size/100);paintFood(f,id,want);
+ const fl=mkCanvas(size),f=fl.getContext('2d');f.translate(size/2,size/2);const fs=(v==='cup'||v==='glass')?1:1.12;/* 2.1: the food fills more of the plate */f.scale(size/100*fs,size/100*fs);paintFood(f,id,want);
  f.setTransform(1,0,0,1,0,0);f.globalCompositeOperation='source-atop';
  if(q==='B'){f.fillStyle='rgba(38,20,10,.66)';f.fillRect(0,0,size,size)}else if(q==='O'){f.fillStyle='rgba(130,110,90,.2)';f.fillRect(0,0,size,size)}else if(q==='P'){const g=f.createRadialGradient(size*.38,size*.34,1,size*.38,size*.34,size*.45);g.addColorStop(0,'rgba(255,255,255,.3)');g.addColorStop(1,'rgba(255,255,255,0)');f.fillStyle=g;f.fillRect(0,0,size,size)}
- c.setTransform(1,0,0,1,0,0);c.drawImage(fl,0,0);
+ c.setTransform(1,0,0,1,0,0);if(v!=='cup'&&v!=='glass'){/* the food sits on the plate: a soft shadow under it */c.save();c.shadowColor='rgba(60,30,10,.32)';c.shadowBlur=size*.05;c.shadowOffsetY=size*.025;c.drawImage(fl,0,0);c.restore()}else c.drawImage(fl,0,0);
  if(q==='B'){c.fillStyle='rgba(60,60,60,.35)';for(let k=0;k<3;k++){c.beginPath();c.arc(size*(.4+k*.1),size*(.3-k*.06),size*.08,0,7);c.fill()}}
  if(DCACHE.size>600)DCACHE.clear();DCACHE.set(key,cv);return cv}
 const ICACHE=new Map();
