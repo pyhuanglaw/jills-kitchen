@@ -3494,7 +3494,7 @@ function chefFor(type){let b=null;for(const m of S.crew||[])if(m.role==='chef'&&
    taught it. (Jill still makes the first portion of every new dish herself.) */
 function chefCan(m,d){const D=DISH(d);if(!D)return false;if(D.sig||d==='signature')return m.lv>=5&&(S.xp.signature||0)>0;if((S.xp[d]||0)<=0)return false;return D.diff<=Math.min(3,m.lv)}
 function chefLock(m,d){const D=DISH(d);if(!D)return'';if(D.sig||d==='signature')return m.lv>=5?((S.xp.signature||0)>0?'':'Jill 先做過一次'):'LV5 進階訓練';if((S.xp[d]||0)<=0)return'Jill 先做過一次';return D.diff>Math.min(3,m.lv)?`LV${D.diff}`:''}
-function chefHandles(s){const j=s.job;if(!j)return null;const ch=chefFor(s.type);if(!ch)return null;if(j.chef===ch.id)return ch;return ch.lv>=3&&chefCan(ch,j.d)?ch:null}
+function chefHandles(s){const j=s.job;if(!j)return null;if(j.chef){/* 2.0: the cook who started it keeps it — a second cook of the same duty is a real second pair of hands */const own=(S.crew||[]).find(m=>m.id===j.chef&&m.role==='chef');if(own)return own}const ch=chefFor(s.type);if(!ch)return null;return ch.lv>=3&&chefCan(ch,j.d)?ch:null}
 function chefDelay(m){return Math.max(.45,1.5-.22*(m.lv-1))}
 function chefScore(m){return[.8,.86,.9,.95,1][m.lv-1]}
 function waiterDelay(m){return Math.max(.3,2.2-.4*(m.lv-1))*(projOn('pass')?.85:1)}
@@ -3508,7 +3508,7 @@ function chefAuto(s,dt){const j=s.job,k=j.step;const ch=chefHandles(s);if(!ch||k
  switch(k.t){case'add':k.left.forEach(i=>j.adds.push(i));k.left=[];s.pop={id:k.items[k.items.length-1],t:0};break;case'hold':k.level=(k.a+k.b)/2;applyHold(j,k);break;case'dose':for(let i=0;i<k.min;i++)j.adds.push(k.ing);k.cnt=k.min;break;case'tap':if(k.heat)j.mix=1;else{j.cut=true;if(CUTADD[j.d])j.adds.push(CUTADD[j.d])}break}
  j.overStart=null;advance(s,chefScore(ch));return true}
 function crewUpd(dt){R.cw=R.cw||{};for(const m of S.crew||[]){
- if(m.role==='chef'){for(const s of R.slots)if(s.type===m.duty&&!s.job&&!s.broken){let n=null;for(const tk of R.tickets){for(const it of tk.items)if(it.st==='pending'&&DISH(it.d).st===s.type&&chefCan(m,it.d)){n={tk,it};break}if(n)break}if(n&&startCook(n.tk,n.it,true)&&s.job){s.job.chef=m.id;crewCount(m,'cook');if(n.it.d==='signature'&&!S.taught){S.taught=S.day;jillSay('這道也交給你了。');setTimeout(()=>{if(R&&phase==='service')staffSay(m,'交給我。')},1400);ach('taught')}}}continue}
+ if(m.role==='chef'){const peers=(S.crew||[]).filter(q=>q.role==='chef'&&q.duty===m.duty).length;const share=Math.ceil(R.slots.filter(q=>q.type===m.duty).length/Math.max(1,peers));for(const s of R.slots)if(s.type===m.duty&&!s.job&&!s.broken){if(R.slots.filter(q=>q.job&&q.job.chef===m.id).length>=share)break;let n=null;for(const tk of R.tickets){for(const it of tk.items)if(it.st==='pending'&&DISH(it.d).st===s.type&&chefCan(m,it.d)){n={tk,it};break}if(n)break}if(n&&startCook(n.tk,n.it,true)&&s.job){s.job.chef=m.id;crewCount(m,'cook');if(n.it.d==='signature'&&!S.taught){S.taught=S.day;jillSay('這道也交給你了。');setTimeout(()=>{if(R&&phase==='service')staffSay(m,'交給我。')},1400);ach('taught')}}}continue}
  let w=R.cw[m.id];if(!w)w=R.cw[m.id]={x:m.role==='waiter'?84:362,y:m.role==='waiter'?150:190,task:null,cd:1,face:1,step:0,busy:0,room:'main',troom:'main'};if(!w.room)w.room='main';
  if(w.task){const tk=w.task;let ok=true;
   if(tk.k==='seat')ok=R.groups.includes(tk.g)&&tk.g.state==='queue'&&!tk.t.group&&!tk.t.dirty;
