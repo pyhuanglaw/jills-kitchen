@@ -457,3 +457,4 @@ input.txt{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(
 #reveal .unl{margin:10px 0 4px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;align-items:center}#reveal .unl b{width:100%;font-size:11px;color:var(--ink2);letter-spacing:.08em}#reveal .unl span{background:rgba(201,154,69,.18);border:1px solid rgba(201,154,69,.5);border-radius:999px;padding:3px 9px;font-size:12px;font-weight:700}
 #reveal .btns{display:flex;gap:8px;justify-content:center;margin-top:12px}
 @media (prefers-reduced-motion:reduce){#reveal .dust i,#roomTabs button.new b.nw{animation:none}}
+.goalline{display:flex;align-items:baseline;gap:8px;margin:8px 0 2px;padding:7px 10px;border-radius:10px;background:rgba(201,154,69,.14);border:1px solid rgba(201,154,69,.35);font-size:12.5px}.goalline span{color:var(--ink2);font-weight:700;font-size:11px;letter-spacing:.06em}.goalline b{font-weight:800}.goalline small{margin-left:auto;color:var(--ink2);font-size:11.5px}
