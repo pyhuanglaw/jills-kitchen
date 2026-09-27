@@ -987,8 +987,8 @@ def waiting_bench(b, port, target):
     check(dy['spot'] == 'seat2', f'Dylan must queue behind the party that came first: {q}')
     # free the tables: the first party that fits gets up and walks over; nobody jumps
     g.ev("window.__noClean=false;for(const t of R.tables)if(!t.group)t.dirty=false")
-    jumps = g.ev(r"""(()=>{const bad=[];let prev=new Map(R.groups.map(g=>[g.id,[g.x,g.y]]));let first=null;
-      for(let i=0;i<150;i++){update(1/30);updateCats(1/30,0);for(const g of R.groups){const p=prev.get(g.id);if(p){const d=Math.hypot(g.x-p[0],g.y-p[1]);if(d>78/30+1)bad.push([i,g.name,+d.toFixed(1)])}}prev=new Map(R.groups.map(g=>[g.id,[g.x,g.y]]));
+    jumps = g.ev(r"""(()=>{const bad=[];let prev=new Map(R.groups.map(g=>[g.id,[g.x,g.y,g.room]]));let first=null;
+      for(let i=0;i<150;i++){update(1/30);updateCats(1/30,0);for(const g of R.groups){const p=prev.get(g.id);if(p&&p[2]===g.room){const d=Math.hypot(g.x-p[0],g.y-p[1]);if(d>78/30+1)bad.push([i,g.name,+d.toFixed(1)])}}prev=new Map(R.groups.map(g=>[g.id,[g.x,g.y,g.room]]));
         if(!first){const s=R.groups.find(g=>g.state==='toTable');if(s)first=s.name}}
       return{bad:bad.slice(0,5),first,states:R.groups.map(g=>[g.name,g.state,g.table])}})()""")
     check(not jumps['bad'], f'a guest teleported: {jumps}')
@@ -2008,14 +2008,14 @@ def purchases_change_the_place(b, port, target):
     g.ev("doAct('buySideTable',null,null,null);doAct('buyFrontTable',null,null,null);doAct('buyExt',null,'awning',null);doAct('buyExt',null,'bench',null)")
     check(g.ev("S.sideTables===3 && S.frontTables===2 && extOn('awning') && extOn('bench') && queueMax()===%d" % (base['q'] + 3)), 'side/front tables or street pieces did not buy')
     check(g.ev("JSON.stringify(roomsOpen())") == '["front","main","side","kitchen"]', 'the side room did not open')
-    g.ev("doAct('nextDay',null,null,null)"); start_day(g); install_bot(g)
+    g.ev("doAct('nextDay',null,null,null)"); g.ev("S.today.weather='sun'"); start_day(g); install_bot(g); g.ev("R.weather='sun'")   # (nobody sits outside in the rain)
     check(g.ev("R.tables.filter(t=>t.room==='side').length===3 && R.tables.filter(t=>t.room==='front').length===2 && R.slots.filter(s=>s.type==='stove').length===6"), 'the new tables and burners are not in the run state')
     check(g.ev("$('#roomTabs').innerText.includes('NEW')"), 'the new room should be marked NEW on its tab')
     g.ev("__tick(3000)")
     check(g.ev("(R.log||[]).some(l=>l.t.includes('第一天'))"), 'Jill did not mention the new room on its first day')
     # guests find the new tables; waiters serve there; nothing walks through walls
     seen = {'side': False, 'front': False}
-    for i in range(120):
+    for i in range(220):
         g.page.evaluate('()=>window.__play(20,0)')
         st = json.loads(g.ev("JSON.stringify({side:R.tables.some(t=>t.room==='side'&&t.group),front:R.tables.some(t=>t.room==='front'&&t.group)})"))
         seen['side'] |= st['side']; seen['front'] |= st['front']

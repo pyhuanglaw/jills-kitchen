@@ -776,7 +776,7 @@ function applyGates(){while(S.gate<S.day){S.gate++;const D=S.gate;
  if(D===8&&!S.signature)S.news.push('Jill 想做一道只屬於自己的料理。晚上可以在商店研發<b>招牌菜</b>（需要擴建到 Bistro）。')
 }}
 function unlockDish(d){if(!S.unlocked.includes(d))S.unlocked.push(d);if(!S.menu.includes(d)&&S.menu.length<menuCap()){S.menu.push(d);S.menuSince=S.menuSince||{};S.menuSince[d]=S.day}if(!(d in S.xp))S.xp[d]=0}
-function expected(weather,event){const D=S.day;const NT=tablesTotal();let g=(3+NT*2.2)*Math.min(1.35,.85+D*.04);g*=.7+(rating()-3)*.18+.3;g*=WEATHER[weather].m*(EVENTS[event].m||1)*(S.buzz||1)*(S.signature?1.1:1)*extAttract();g=Math.min(g,NT*dayDur(D)/75);   /* a table turns over three or four times in a service at best: more people than that only queue and leave */g=Math.max(D===1?7:5,Math.round(g));
+function expected(weather,event){const D=S.day;const NT=tablesTotal();let g=(3+NT*2.2)*Math.min(1.35,.85+D*.04);g*=.7+(rating()-3)*.18+.3;g*=WEATHER[weather].m*(EVENTS[event].m||1)*(S.buzz||1)*(S.signature?1.1:1)*extAttract();if(NT>=8)g=Math.min(g,NT*dayDur(D)/75);   /* a grown restaurant: a table turns over three or four times in a service at best, more people than that only queue and leave (the small early days keep their own pace) */g=Math.max(D===1?7:5,Math.round(g));
  const people=Math.round(g*1.45);const items=Math.round(people*(D<=1?1:D<=3?1.4:1.7));return{groups:g,people,items}}
 function planToday(){if(S.today&&S.today.day===S.day)return;const F=feat();let weather='sun',event='none';
  if(F.events){const prev=S.wxPrev||'sun';const ww={sun:4,cloud:3,rain:2,storm:.9,hot:1.5,cool:1.6};if(prev==='rain'||prev==='storm'){ww.rain*=1.8;ww.storm*=1.5}if(prev==='hot')ww.hot*=1.8;weather=wpick(Object.keys(ww),k=>ww[k]);S.wxPrev=weather;const evs=Object.keys(EVENTS).filter(k=>!EVENTS[k].need||EVENTS[k].need());const cel=(S.stats.days+1)%10===0&&S.stats.days>0;event=cel?'celebrate':Math.random()<.38?'none':pick(evs.filter(k=>k!=='none'&&k!=='celebrate'&&(k!=='vip'||S.day>=5)))||'none'}
@@ -1669,7 +1669,7 @@ function drawOtherRoom(c,now,dusk,V,X0,XW,TOP){const k=room;const J=V.jill;const
    tray's own vessel renderer draws the food on the counter, so what is on the fire is the dish that was ordered. */
 const KX_BASE={sink:{x:50,w:26},prep:{x:80,w:64},range:{x:148,w:128},oven:{x:280,w:44},bar:{x:328,w:34}},KX_BIG={sink:{x:36,w:22},prep:{x:62,w:60},range:{x:126,w:160},oven:{x:290,w:44},bar:{x:338,w:34}};
 const KX={get sink(){return(projOn('kext')?KX_BIG:KX_BASE).sink},get prep(){return(projOn('kext')?KX_BIG:KX_BASE).prep},get range(){return(projOn('kext')?KX_BIG:KX_BASE).range},get oven(){return(projOn('kext')?KX_BIG:KX_BASE).oven},get bar(){return(projOn('kext')?KX_BIG:KX_BASE).bar}};   /* the six-burner range of the expansion takes the line's middle */
-const KY={top:130,h:70,face:20,feet:152,passTop:276,passH:40,passFace:12,passFeet:272,front:362,rail:236};
+const KY={top:130,h:70,face:20,feet:146,passTop:276,passH:40,passFace:12,passFeet:272,front:362,rail:236};
 /* where a slot's vessel normally sits and where its cook stands */
 function slotHome(s){const i=s.no-1;switch(s.type){
  case'stove':{const cols=projOn('kext')?3:2;const col=i%cols;const x=KX.range.x+(cols===3?[30,80,130][col]:[32,96][col]);return{x,y:i<cols?186:160,sc:.62,cx:x,place:'range'}}
@@ -1801,7 +1801,7 @@ function drawHandSpoon(c,x,y,f,now){const a=now*6;c.save();c.translate(x+f*4+Mat
 function drawCook(c,m,a,now){const b=a.beat||{kind:'idle'};const k=b.s&&b.s.job&&b.s.job.step;const moving=a.moving;const stp=moving?Math.sin(a.step):0;
  const busy=!moving&&(b.kind!=='idle'&&b.kind!=='watch');const chop=busy&&k&&k.t==='work'&&k.board;const stir=busy&&((k&&k.t==='tap'&&k.heat)||b.kind==='stir'||(k&&k.t==='work'&&!k.board));const plating=b.kind==='plate'&&!moving;
  const wiping=b.kind==='idle'&&!moving&&Math.sin(now*.35+a.x*.1)>.72;const bob=moving?Math.abs(stp)*-1:chop?Math.abs(Math.sin(now*9))*-1.2:plating?Math.abs(Math.sin(now*7))*-.9:busy?Math.abs(Math.sin(now*5))*-.6:wiping?Math.abs(Math.sin(now*8))*-.5:Math.sin(now*2+a.x)*.4;
- const arms=moving?null:(chop||stir)?[.35,.95+Math.sin(now*(chop?9:6))*.25]:busy&&k&&(k.t==='hold'||k.t==='dose')?[.3,1.1]:plating?[1.1,1.1]:b.kind==='watch'?[.9,.9]:null;
+ const arms=moving?null:(chop||stir)?[.35,.95+Math.sin(now*(chop?9:6))*.25]:busy&&k&&(k.t==='hold'||k.t==='dose')?[.3,1.1]:plating?[.65+Math.sin(now*7)*.1,.65-Math.sin(now*7)*.1]:b.kind==='watch'?[1.05,1.05]:null;
  drawPerson(c,a.x,a.y,crewLook(m),{s:1.1,mood:'happy',expr:busy||b.kind==='watch'?'focus':'smile',bob,step:stp,flip:a.face<0,blink:Math.sin(now*1.5+a.x)>.97,arms});
  const wipe=b.kind==='idle'&&!moving&&Math.sin(now*.35+a.x*.1)>.72;if(wipe){const f=a.face<0?-1:1;c.fillStyle='#F4F1EA';el(c,a.x+f*12+Math.sin(now*8)*5,a.y-24,5,3)}
  if(chop)drawHandKnife(c,a.x,a.y,a.face<0?-1:1,now);else if(stir)drawHandSpoon(c,a.x,a.y,a.face<0?-1:1,now);
