@@ -1713,7 +1713,7 @@ function platingSpot(){const used=R.slots.filter(s=>s.job&&s.job.plating&&s.job.
 function jobChef(s){return s.job?chefHandles(s):null}
 /* handwork waits for the cook to be at that spot (the fire does not) */
 function cookPresent(s){const id=s.cook;if(!id)return true;const a=R.ck&&R.ck[id];if(!a)return true;const b=a.beat;return !!b&&b.s===s&&!a.moving}
-function homeSpot(m,i){const z=m.duty==='oven'?KX.oven:m.duty==='bar'?KX.bar:m.duty==='prep'?KX.prep:KX.range;return{x:z.x+z.w/2+(i%2?14:-14),y:KY.feet}}
+function homeSpot(m,i){const z=m.duty==='oven'?KX.oven:m.duty==='bar'?KX.bar:m.duty==='prep'?KX.prep:KX.range;const off=m.duty==='oven'?-8:m.duty==='bar'?10:0;return{x:z.x+z.w/2+off+(i%2?14:-14),y:KY.feet}}
 function chefBeat(m,a,i){const mine=R.slots.filter(s=>s.job&&s.cook===m.id);
  let s=mine.find(s=>s.job.plating);if(s)return{kind:'plate',s,x:s.job.plating.x||200,y:KY.passFeet};
  const hands=mine.filter(s=>{const k=s.job.step;return k&&['add','hold','dose','tap','work'].includes(k.t)}).sort((p,q)=>p.job.t0-q.job.t0);
@@ -1727,8 +1727,37 @@ function kitchenUpd(dt){if(!R)return;R.ck=R.ck||{};
  for(const s of R.slots){const m=jobChef(s);s.cook=m?m.id:null;if(s.job&&s.job.plating&&!s.job.plating.x)s.job.plating.x=platingSpot()}
  let i=0;for(const m of S.crew||[]){if(m.role!=='chef')continue;let a=R.ck[m.id];if(!a){const h=homeSpot(m,i);a=R.ck[m.id]={x:h.x,y:h.y,face:1,step:0,moving:false}}
   const b=a.beat=chefBeat(m,a,i);i++;const v=(200+16*m.lv)*flowMul('crew')*dt;const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy);
-  if(d>v){a.x+=dx/d*v;a.y+=dy/d*v;a.moving=true;a.step+=dt*13;if(Math.abs(dx)>.5)a.face=dx>0?1:-1}else{a.x=b.x;a.y=b.y;a.moving=false;a.face=1}
+  if(d>v){a.x+=dx/d*v;a.y+=dy/d*v;a.moving=true;a.step+=dt*13;if(Math.abs(dx)>.5)a.face=dx>0?1:-1;a.idle=null}else{a.x=b.x;a.y=b.y;a.moving=false;a.face=a.idle==='chat'&&a.chatFace?a.chatFace:1}
+  cookIdleTick(m,a,b,dt);
   if(b.kind==='plate'&&!a.moving){const j=b.s.job;j.plating.t+=dt;if(j.plating.t>=j.plating.dur)finishJob(b.s)}}}
+/* 2.1: what a cook does with a quiet minute — wipes the counter, drinks some water, tastes the sauce, reads the rail,
+   or turns to the cook next to him for a word. Nothing to manage; it is there when you look. */
+function cookIdleTick(m,a,b,dt){if(b.kind!=='idle'||a.moving){a.idle=null;a.idleLeft=0;return}
+ if(a.idle){a.idleLeft-=dt;if(a.idleLeft<=0){if(a.idle==='chat'&&a.chatWith){const o=R.ck[a.chatWith];if(o&&o.idle==='chat')o.idle=null}a.idle=null;a.chatWith=null}return}
+ a.idleNext=(a.idleNext==null?rand(2,6):a.idleNext)-dt;if(a.idleNext>0)return;a.idleNext=rand(6,14);
+ const others=Object.keys(R.ck).filter(id=>id!==m.id&&R.ck[id].beat&&R.ck[id].beat.kind==='idle'&&!R.ck[id].moving&&!R.ck[id].idle&&Math.abs(R.ck[id].x-a.x)<110&&Math.abs(R.ck[id].y-a.y)<30);
+ const k=pick(others.length?['wipe','sip','taste','rail','chat','chat']:['wipe','wipe','sip','taste','rail']);a.idle=k;a.idleLeft=k==='chat'?rand(3,5):k==='wipe'?rand(2.5,4):rand(1.6,2.6);
+ if(k==='chat'){const oid=pick(others),o=R.ck[oid];a.chatWith=oid;o.idle='chat';o.idleLeft=a.idleLeft;o.chatWith=m.id;a.chatFace=o.x>a.x?1:-1;o.chatFace=-a.chatFace;a.face=a.chatFace;o.face=o.chatFace;a.talker=1;o.talker=0}}
+/* 2.1: the pickup side is furnished when the screen is tall enough to leave floor there — wire shelving with the plates,
+   the jars and the dry goods on the left, a work table with the dish rack and the glasses by the fridge, the mop and
+   bucket by the door. Cached with the room. */
+function drawKitchenFill(b,LHk){
+ {const top=KY.passTop+124,bot=LHk-70;if(bot-top>=60){const x=16,w=62,h=Math.min(124,bot-top),y=bot-h;b.fillStyle='rgba(0,0,0,.14)';el(b,x+w/2,y+h+2,w*.55,5);
+  const tiers=h>=104?3:2,th=h/tiers;b.fillStyle='#7C838A';for(const px of[x,x+w-3])b.fillRect(px,y-4,3,h+6);
+  for(let t=0;t<=tiers;t++){const ty=y+t*th;b.fillStyle='#9AA0A6';b.fillRect(x,ty,w,3);b.fillStyle='rgba(255,255,255,.35)';b.fillRect(x,ty,w,1)}
+  const stack=(sx,sy,n,rw,col)=>{for(let i=0;i<n;i++){b.fillStyle=col||'#F6F1E6';el(b,sx,sy-i*2.2,rw,2.6);b.fillStyle='rgba(0,0,0,.08)';el(b,sx,sy-i*2.2+.6,rw*.8,1.2)}};
+  stack(x+14,y+th-5,6,9);stack(x+34,y+th-5,4,7);stack(x+50,y+th-5,5,5,'#E8E2D6');
+  const jy=y+th*(tiers-1);for(const [jx,col] of[[x+10,'#D9A45A'],[x+22,'#8A3A2A'],[x+34,'#5E9E3D']]){b.fillStyle='rgba(255,255,255,.6)';rr(b,jx-5,jy-16,10,14,2);b.fill();b.fillStyle=col;rr(b,jx-4,jy-11,8,8,1.5);b.fill();b.fillStyle='#3A2A22';rr(b,jx-5,jy-18,10,3,1);b.fill()}
+  b.fillStyle='#C9A063';rr(b,x+42,jy-15,18,13,1.5);b.fill();b.fillStyle='rgba(0,0,0,.15)';b.fillRect(x+42,jy-9,18,1.2);
+  b.fillStyle='#EBE1CC';rr(b,x+6,y+h-21,22,18,5);b.fill();b.fillStyle='#8A6A42';b.fillRect(x+9,y+h-19,16,2);b.fillStyle='#B8536A';b.font=`800 6px ${FONT}`;b.textAlign='center';b.fillText('米',x+17,y+h-8);
+  b.fillStyle='#C9A063';rr(b,x+34,y+h-18,24,15,1.5);b.fill();b.fillStyle='rgba(0,0,0,.15)';b.fillRect(x+34,y+h-11,24,1.2);b.fillStyle='#2E2019';b.font=`800 4.5px ${FONT}`;b.fillText('FRAGILE',x+46,y+h-6)}}
+ {const x=254,w=58,y=LHk-150;if(y>=KY.passTop+118){b.fillStyle='rgba(0,0,0,.14)';el(b,x+w/2,y+40,w*.55,5);b.fillStyle='#7C838A';b.fillRect(x+3,y+10,3,28);b.fillRect(x+w-6,y+10,3,28);b.fillStyle='#9AA0A6';b.fillRect(x+3,y+24,w-6,2);
+  let g=b.createLinearGradient(0,y,0,y+12);g.addColorStop(0,'#D5DADE');g.addColorStop(1,'#A9B0B6');b.fillStyle=g;rr(b,x,y,w,12,2);b.fill();b.fillStyle='rgba(255,255,255,.5)';b.fillRect(x+2,y+1,w-4,1.2);
+  b.fillStyle='#8A9096';b.fillRect(x+6,y-11,30,2);for(let i=0;i<6;i++){b.fillStyle='#F6F1E6';rr(b,x+8+i*4.6,y-20,2.6,11,1.2);b.fill();b.fillStyle='rgba(0,0,0,.06)';b.fillRect(x+9.6+i*4.6,y-18,.8,8)}b.fillStyle='#8A9096';b.fillRect(x+6,y-1,30,1.5);
+  for(let i=0;i<3;i++){b.fillStyle='rgba(200,220,235,.75)';rr(b,x+39+i*5.8,y-10,4.2,10,1);b.fill();b.fillStyle='rgba(255,255,255,.7)';b.fillRect(x+40+i*5.8,y-9,1,8)}
+  b.fillStyle='#B8536A';rr(b,x+w-15,y+7,9,13,1.5);b.fill();b.fillStyle='rgba(255,255,255,.25)';b.fillRect(x+w-15,y+11,9,1.2);b.fillRect(x+w-15,y+15,9,1.2)}}
+ {const x=118,y=LHk-12;if(LHk>=520){b.fillStyle='rgba(0,0,0,.14)';el(b,x,y+2,12,3.5);b.fillStyle='#E0A43A';b.beginPath();b.moveTo(x-9,y-15);b.lineTo(x+9,y-15);b.lineTo(x+7,y);b.lineTo(x-7,y);b.closePath();b.fill();b.fillStyle='rgba(0,0,0,.14)';b.fillRect(x-9,y-15,18,2.2);b.fillStyle='rgba(255,255,255,.2)';b.fillRect(x-6,y-11,2,9);
+  b.strokeStyle='#8A6A42';b.lineWidth=2.2;b.lineCap='round';b.beginPath();b.moveTo(x+3,y-12);b.lineTo(x+11,y-54);b.stroke();b.fillStyle='#D5DADE';for(let i=0;i<6;i++){b.fillRect(x-3+i*2.2,y-18,1.3,9)}b.fillStyle='#2E2019';b.fillRect(x-4,y-19,14,2)}}}
 function hitStation(p){if(!R||room!=='kitchen')return -1;let best=-1,bd=1e9;
  for(let i=0;i<R.slots.length;i++){const s=R.slots[i];const spots=[slotHome(s)];if(s.job)spots.push(stepSpot(s));
   for(const sp of spots){if(sp.place==='pass')continue;const d=Math.hypot(p.x-sp.x,(p.y-(sp.y-8))*1.4);if(d<26&&d<bd){bd=d;best=i}}
@@ -1749,6 +1778,7 @@ function drawKitchenRoom(c,now,dusk,V,X0,XW,TOP,list){const E=S.eq;const LHk=LH;
   /* the pickup side: a rubber mat in front of the pass, crates, a bin, the way to the dining room */b.fillStyle='rgba(40,30,25,.18)';rr(b,84,KY.passTop+KY.passH+KY.passFace+8,232,26,3);b.fill();
   for(const [cx,cy] of[[70,KY.passTop+70],[70,KY.passTop+100]]){b.fillStyle='rgba(0,0,0,.14)';el(b,cx,cy+14,26,5);b.fillStyle='#B8905E';rr(b,cx-22,cy-8,44,22,2);b.fill();b.fillStyle='#8A6A42';b.fillRect(cx-22,cy-1,44,2);b.fillRect(cx-22,cy+7,44,2);b.fillStyle=cy<KY.passTop+90?'#F0932B':'#5E9E3D';for(let k=0;k<6;k++)circ(b,cx-15+k*6,cy-10+(k%2),3.4)}
   b.fillStyle='rgba(0,0,0,.14)';el(b,332,KY.passTop+108,13,4);b.fillStyle='#4A4A4E';rr(b,320,KY.passTop+72,24,34,3);b.fill();b.fillStyle='#5A5A60';rr(b,318,KY.passTop+68,28,6,2);b.fill();
+  drawKitchenFill(b,LHk);
   /* the door to the dining room, bottom centre */{const dx=200,dy=LHk-2;b.fillStyle='#3A2A22';b.fillRect(dx-38,dy-62,76,62);for(const sx of[dx-34,dx+2]){b.fillStyle='#8A6A42';b.fillRect(sx,dy-58,32,58);b.fillStyle='rgba(255,230,180,.5)';circ(b,sx+16,dy-40,7);b.fillStyle='#C9CDD0';b.fillRect(sx+(sx<dx?24:4),dy-26,4,10)}b.fillStyle='rgba(255,214,150,.18)';b.fillRect(dx-38,dy-62,76,62);
    b.fillStyle='#F6EEDF';rr(b,dx-26,dy-14,52,11,2);b.fill();b.fillStyle='#2E2019';b.font=`800 6.5px ${FONT}`;b.textAlign='center';b.textBaseline='middle';b.fillText('‹ 用餐區',dx,dy-8.4);b.textBaseline='alphabetic'}});
  blitBg(c,bg,X0,XW,TOP);
@@ -1823,10 +1853,12 @@ function drawHandSpoon(c,x,y,f,now){const a=now*6;c.save();c.translate(x+f*4+Mat
 /* a cook: walking the aisle, or at work with the tool of the step; a plate in hand on the way to the pass */
 function drawCook(c,m,a,now){const b=a.beat||{kind:'idle'};const k=b.s&&b.s.job&&b.s.job.step;const moving=a.moving;const stp=moving?Math.sin(a.step):0;
  const busy=!moving&&(b.kind!=='idle'&&b.kind!=='watch');const chop=busy&&k&&k.t==='work'&&k.board;const stir=busy&&((k&&k.t==='tap'&&k.heat)||b.kind==='stir'||(k&&k.t==='work'&&!k.board));const plating=b.kind==='plate'&&!moving;
- const wiping=b.kind==='idle'&&!moving&&Math.sin(now*.35+a.x*.1)>.72;const bob=moving?Math.abs(stp)*-1:chop?Math.abs(Math.sin(now*9))*-1.2:plating?Math.abs(Math.sin(now*7))*-.9:busy?Math.abs(Math.sin(now*5))*-.6:wiping?Math.abs(Math.sin(now*8))*-.5:Math.sin(now*2+a.x)*.4;
- const arms=moving?null:(chop||stir)?[.35,.95+Math.sin(now*(chop?9:6))*.25]:busy&&k&&(k.t==='hold'||k.t==='dose')?[.3,1.1]:plating?[.65+Math.sin(now*7)*.1,.65-Math.sin(now*7)*.1]:b.kind==='watch'?[1.05,1.05]:null;
- drawPerson(c,a.x,a.y,crewLook(m),{s:1.1,mood:'happy',expr:busy||b.kind==='watch'?'focus':'smile',bob,step:stp,flip:a.face<0,blink:Math.sin(now*1.5+a.x)>.97,arms});
- const wipe=b.kind==='idle'&&!moving&&Math.sin(now*.35+a.x*.1)>.72;if(wipe){const f=a.face<0?-1:1;c.fillStyle='#F4F1EA';el(c,a.x+f*12+Math.sin(now*8)*5,a.y-24,5,3)}
+ const idle=b.kind==='idle'&&!moving?a.idle:null;const wiping=idle==='wipe';const bob=moving?Math.abs(stp)*-1:chop?Math.abs(Math.sin(now*9))*-1.2:plating?Math.abs(Math.sin(now*7))*-.9:busy?Math.abs(Math.sin(now*5))*-.6:wiping?Math.abs(Math.sin(now*8))*-.5:Math.sin(now*2+a.x)*.4;
+ const sipping=idle==='sip'||idle==='taste';const arms=moving?null:(chop||stir)?[.35,.95+Math.sin(now*(chop?9:6))*.25]:busy&&k&&(k.t==='hold'||k.t==='dose')?[.3,1.1]:plating?[.65+Math.sin(now*7)*.1,.65-Math.sin(now*7)*.1]:b.kind==='watch'||idle==='rail'?[1.05,1.05]:sipping?[.3,1.25]:idle==='chat'?[.4+Math.sin(now*3)*.15,.35]:null;
+ drawPerson(c,a.x,a.y,crewLook(m),{s:1.1,mood:'happy',expr:busy||b.kind==='watch'?'focus':'smile',bob,step:stp,flip:a.face<0,blink:Math.sin(now*1.5+a.x)>.97,arms,gaze:idle==='rail'?{x:0,y:.5}:idle==='chat'?{x:1,y:.1}:null});
+ if(wiping){const f=a.face<0?-1:1;c.fillStyle='#F4F1EA';el(c,a.x+f*12+Math.sin(now*8)*5,a.y-24,5,3)}
+ else if(sipping){const f=a.face<0?-1:1;c.save();c.translate(a.x+f*5,a.y-38);c.rotate(f*.35);if(idle==='sip'){c.fillStyle='#F6F1E6';rr(c,-3.2,-3,6.4,7.5,1.4);c.fill();c.fillStyle='rgba(120,90,60,.35)';el(c,0,-2.6,2.6,.9)}else{c.fillStyle='#C9CDD2';c.fillRect(-.8,-1,1.6,9);el(c,0,-2.4,2.8,1.8);c.fillStyle='#D9A45A';el(c,0,-2.4,1.8,1)}c.restore()}
+ else if(idle==='chat'&&a.talker&&Math.sin(now*1.6)>-.2){const f=a.face<0?-1:1;c.fillStyle='rgba(255,250,240,.95)';const bx=a.x+f*14,by=a.y-66;rr(c,bx-7,by-5,14,10,4);c.fill();c.fillStyle='#2E2019';for(let i=-1;i<=1;i++)circ(c,bx+i*3,by+.4,.9)}
  if(chop)drawHandKnife(c,a.x,a.y,a.face<0?-1:1,now);else if(stir)drawHandSpoon(c,a.x,a.y,a.face<0?-1:1,now);
  else if(busy&&k&&(k.t==='hold'||k.t==='dose')){/* a bottle or a shaker, tipped over the vessel */const col=k.ing==='beans'?'#6B3A1A':(ING[k.ing]||{}).c||'#ccc';const f=a.face<0?-1:1;c.save();c.translate(a.x+f*6,a.y-31);c.rotate(f*.9);c.fillStyle=col==='#FFFFFF'?'#F2EEE6':col;rr(c,-2.4,-7,4.8,11,1.6);c.fill();c.fillStyle='#2A2A2A';c.fillRect(-1.4,-9.5,2.8,3);c.restore();if(k.t==='dose'){for(let i=0;i<4;i++){const ph=(now*2+i*.25)%1;c.globalAlpha=1-ph;c.fillStyle=col;circ(c,a.x+f*14+(i-1.5)*2,a.y-26+ph*10,.9);c.globalAlpha=1}}}
  if(b.kind==='plate'&&moving){c.drawImage(dishCanvas(b.s.job.d,'G',64,S.decor.ware>0,b.s.job.it.want),a.x-10,a.y-44,20,20)}
