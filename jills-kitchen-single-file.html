@@ -1280,7 +1280,8 @@ let DPR=1,SV={w:0,h:0,s:1,ox:0,oy:0},TL={cols:1,rows:1,w:100,h:84,pad:8,gap:6,x0
 let R=null,IDLE=null,phase='title',paused=false,mainScreen='title',sub=null;
 
 /* ================= planning a day ================= */
-function applyGates(){while(S.gate<S.day){S.gate++;const D=S.gate;
+function applyGates(){if(!S.news20&&S.day>=3){S.news20=S.day;S.news.push('<b>2.0：店可以變大了。</b>用餐區上方可以切到<b>店門口</b>和<b>廚房</b>（廚師真的在裡面煮）。打烊後商店裡多了<b>工程</b>（露天座位、大出菜口、冷藏庫、廚房擴建、側廳）和<b>貓的東西</b>；結算會告訴你下一個存錢的目標。')}
+ while(S.gate<S.day){S.gate++;const D=S.gate;
  if(D===2){unlockDish('coffee');S.eq.bar=Math.max(1,S.eq.bar);S.news.push('<b>新料理解鎖：拿鐵咖啡</b>。咖啡吧開張了，客人會加點飲料。')}
  if(D===3){if(S.eq.stove<2){S.eq.stove=2}unlockDish('pasta');S.news.push('<b>第二口爐子到貨！</b>同時可以做兩道熱菜。<br><b>新料理：番茄義大利麵</b>（先煮麵，再加醬）。<br>從今天開始可以自己<b>備料</b>與<b>調整售價</b>。')}
  if(D===4){S.eq.prep=1;unlockDish('salad');S.news.push('<b>冷盤台啟用：田園沙拉</b>（Jill 切菜的時候，可以先去忙別的）。<br>今晚 19:00 會有第一次 <b>Rush Hour</b>，做好準備！')}
@@ -1382,10 +1383,10 @@ function seatGroup(g,t){t.group=g;t.dirty=false;g.table=t.i;g.state='toTable';g.
  if(g.reg&&g.reg!=='dylan'){const m=regMem(g.reg);m.seats[t.i]=(m.seats[t.i]||0)+1;const v=S.regulars[g.reg]||0;if(usualTable(g.reg)===t.i&&v>=4&&Math.random()<.25&&canChat('seat'+g.reg,300,3))setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,pick(['老位子。','還是這裡好。','這個位子看得到貓。']))},500);
   const ud=usualDish(g.reg);if(ud&&v>=4&&!g.moment&&Math.random()<.5)g.usual=ud;regSeatMoment(g,t);regMeet(g)}
  if(!g.reg)seatLine(g);coach(1)}
-const SEAT_LINES={any:['聽說 Jill 主廚今天在店裡！','朋友說一定要來吃 Jill 的店。','好香喔，是 Jill 在煎東西嗎？','這間店好溫暖，Jill 很會佈置耶。','終於有位子了。','這裡的貓是不是很有名？','上次路過就想進來了。','同事說這裡的炒飯不錯。'],
+const SEAT_LINES={side:['這邊是新的？','以前這裡是牆吧。','窗邊的位子不錯。','這一間比較安靜。','側廳耶，第一次坐。'],front:['坐外面好舒服。','外面也可以吃了。','今天天氣好，坐外面。','路過的人都在看我們吃什麼。'],grew:['店變大了。','上次來還沒有這間。','這裡越來越像一間真正的餐廳了。'],any:['聽說 Jill 主廚今天在店裡！','朋友說一定要來吃 Jill 的店。','好香喔，是 Jill 在煎東西嗎？','這間店好溫暖，Jill 很會佈置耶。','終於有位子了。','這裡的貓是不是很有名？','上次路過就想進來了。','同事說這裡的炒飯不錯。'],
  rain:['外面雨好大。','傘都濕透了。','下雨天就想喝點熱的。'],storm:['雨大到不想回家。','外面跟颱風一樣。','等雨小一點再走。'],hot:['熱死了，先來杯冰的。','外面像烤箱。','有冷氣真好。'],cool:['今天天氣真舒服。','終於涼了。'],
  ret:['又來了。','上次那道還有嗎？','這次換點別的。'],decor:['這裡換了燈？','店裡不太一樣了。','牆上那幅是新的？'],crowd:['好多人。','聽說很難等到位子。','早知道早點來。']};
-function seatLine(g){const W=R.weather;const pools=[];if(g.ret)pools.push(['ret',.5]);if(SEAT_LINES[W])pools.push([W,.45]);if(S.newDecor&&S.day-S.newDecor<=2)pools.push(['decor',.5]);if(queued().length>=3)pools.push(['crowd',.3]);pools.push(['any',.35]);
+function seatLine(g){const W=R.weather;const pools=[];const t=g.table!=null?R.tables[g.table]:null;if(t&&t.room==='side')pools.push(['side',(S.newRooms&&S.day-(S.newRooms.side||0)<=3)?.9:.35]);if(t&&t.room==='front')pools.push(['front',.6]);if(g.ret&&S.newRooms&&Object.values(S.newRooms).some(d=>d&&S.day-d<=2))pools.push(['grew',.7]);if(g.ret)pools.push(['ret',.5]);if(SEAT_LINES[W])pools.push([W,.45]);if(S.newDecor&&S.day-S.newDecor<=2)pools.push(['decor',.5]);if(queued().length>=3)pools.push(['crowd',.3]);pools.push(['any',.35]);
  const k=wpick(pools,p=>p[1])[0];const p=k==='ret'?.4:k==='any'?.14:.3;if(Math.random()<p&&canChat('seat',18,4))quote(g,pick(SEAT_LINES[k]));
  else if(g.ret&&!g.reg&&Math.random()<.3&&canChat('jillret',60,4)){const J=R.jill;if(!J.cur&&!J.q.length&&!J.rest)jillSay(pick(['又來了，歡迎。','歡迎回來。','今天想吃什麼？']))}}
 /* now and then someone in the room says something that fits: about the food at the next table, a new dish, a cat,
