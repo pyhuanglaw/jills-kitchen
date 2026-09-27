@@ -1923,6 +1923,156 @@ def golden_frames(b, port, target, record=False):
             problems.append(f'{day}: end-of-day digest differs: ' + ', '.join(k for k in w['digest'] if a['digest'].get(k) != w['digest'][k]))
     check(not problems, '\n      '.join(problems))
 
+# ---------------------------------------------------------------- 2.0: rooms, the kitchen line, the money ladder, the cats' things
+# A mature restaurant the way a V18.1.1 player would have it on Day 25: JILL, 12 tables, LV5 staff, every dish, money in the bank.
+MATURE_181 = r"""(()=>{S.level=5;S.tables=12;S.money=236000;S.day=25;S.stats={guests:1200,perfect:900,days:24};
+ S.eq={stove:5,oven:5,bar:5,prep:1,fridge:5,pan:5};S.decor={plants:3,lights:3,art:2,chairs:2,rug:1,ware:1,bar:1,sofa:3};
+ S.crew=[{id:'c1',role:'chef',name:'阿德師傅',lv:5,duty:'stove'},{id:'c2',role:'chef',name:'Marco',lv:5,duty:'oven'},{id:'c6',role:'chef',name:'阿珠姐',lv:4,duty:'bar'},{id:'c3',role:'waiter',name:'小茉',lv:5,duty:'both'},{id:'c4',role:'waiter',name:'Kai',lv:4,duty:'both'},{id:'c5',role:'cleaner',name:'秀琴阿姨',lv:3,duty:'clean'}];
+ for(const d of Object.keys(DISHES))if(!S.unlocked.includes(d))S.unlocked.push(d);for(const d of S.unlocked){S.stock[d]=30;S.xp[d]=400}S.menu=S.unlocked.slice(0,16);
+ S.regulars={wang:12,koba:9,dylan:14,writer:6};S.dylan.stage=3;S.dylan.reveal=18;S.achievements={first:1,rush:2,fire:3,bistro:4,jill:20,husband:18};
+ S.album=[{id:'p1',kind:'sofa',day:9,img:null,info:{}},{id:'p2',kind:'husband',day:18,img:null,info:{}}];S.reviews=Array.from({length:40},(_,i)=>({s:5,txt:'好吃',name:'客人'+i}));
+ delete S.rooms;delete S.ext;delete S.gear;delete S.gearUse;delete S.newRooms;delete S.sideTables;delete S.frontTables;   /* a save from before 2.0 has none of these */
+ save();return JSON.stringify({money:S.money,level:S.level,dishes:S.unlocked.length,crew:S.crew.length,regs:Object.keys(S.regulars).length,ach:Object.keys(S.achievements).length,album:S.album.length})})()"""
+
+def mature(g):
+    """seed the mature restaurant from the title screen and return the digest string"""
+    g.click('[data-act=open]')
+    d = g.ev(MATURE_181)
+    g.reload()
+    return d
+
+@test
+def mature_save_loads_into_2_0(b, port, target):
+    """A Day-25 save from before 2.0 keeps everything it had, gets the new fields, opens three rooms (the side room is a
+    purchase) and plays a whole day with the staff cooking on the line, in every room, without an error."""
+    g = Game(b, port, target, seed=25, manual=True)
+    before = json.loads(mature(g))
+    after = json.loads(g.ev("JSON.stringify({money:S.money,level:S.level,dishes:S.unlocked.length,crew:S.crew.length,regs:Object.keys(S.regulars).length,ach:Object.keys(S.achievements).length,album:(S.album||[]).length})"))
+    check(before == after, f'the mature save lost something: {before} -> {after}')
+    check(g.ev("!!S.rooms && !!S.ext && !!S.gear && !!S.gearUse && S.sideTables===0 && S.frontTables===0"), 'the 2.0 fields were not filled in')
+    check(g.ev("JSON.stringify(roomsOpen())") == '["front","main","kitchen"]', 'a pre-2.0 save should open the street, the dining room and the kitchen')
+    check(g.ev("S.dylan.stage===3 && DYLAN.who2.includes('結婚')"), 'the Dylan reveal and the journal line were lost')
+    g.click('[data-act=open]'); start_day(g); install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;")
+    check(g.ev("R.tables.length===12 && R.slots.filter(s=>s.type==='stove').length===4"), 'the mature kitchen should have the four-burner range and 12 tables')
+    # a day at speed, looking into each room in turn
+    for i in range(40):
+        g.page.evaluate('()=>window.__play(45,0)')
+        if g.ev("phase") != 'service': break
+        g.ev("(()=>{const l=roomsOpen();setRoom(l[(l.indexOf(room)+1)%l.length])})()")
+    g.ev("setRoom('main')"); play_day(g)   # the rest of the day at speed
+    guests = g.ev("S.lastSummary?S.lastSummary.guests:(R?R.st.guests:0)")
+    check(guests >= 20, f'the mature day did not serve guests: {guests}')
+    check(g.ev("S.lastSummary?(S.lastSummary.q?S.lastSummary.q.B:0)<=3:true"), 'the cooks burnt too much on the line')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
+def kitchen_cooks_walk_the_line_and_plate(b, port, target):
+    """Chefs are actors: a job's handwork waits for its cook to be at the counter, a chef carries the finished dish to
+    the pass and plates it there, and the whole day's orders still get cooked (no deadlock between presence and steps)."""
+    g = Game(b, port, target, seed=26, manual=True)
+    mature(g); g.click('[data-act=open]'); start_day(g); install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;")
+    g.ev("setRoom('kitchen')")
+    moved, plated, gated = set(), 0, 0
+    for i in range(160):
+        g.page.evaluate('()=>window.__play(10,0)')
+        st = json.loads(g.ev("JSON.stringify({ck:Object.entries(R.ck||{}).map(([k,a])=>[k,Math.round(a.x),Math.round(a.y),a.beat&&a.beat.kind]),pl:R.slots.filter(s=>s.job&&s.job.plating).length,gate:R.slots.filter(s=>s.job&&s.cook&&s.job.step&&['add','hold','dose','tap'].includes(s.job.step.t)&&!cookPresent(s)).length})"))
+        for k, x, y, kind in st['ck']: moved.add((k, x // 40, y // 40))
+        plated += st['pl']; gated += st['gate']
+        if g.ev("phase") != 'service': break
+    check(len(moved) >= 6, f'the cooks barely moved: {sorted(moved)[:8]}')
+    check(plated > 0, 'no chef ever plated at the pass')
+    check(gated > 0, 'handwork never waited for a cook to arrive')
+    plated_n = g.ev("R?(R.st.q.P+R.st.q.G+R.st.q.O):S.lastSummary.plated")
+    check(plated_n >= 10, f'too few dishes came out: {plated_n}')
+    check(g.ev("R?R.tickets.every(t=>t.items.every(i=>i.st!=='cooking'||R.slots.some(s=>s.job&&s.job.it===i))):true"), 'a cooking item has no job')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
+def purchases_change_the_place(b, port, target):
+    """Every project has real effects, the reveal is an event, and the next day the new room is marked and Jill says so;
+    the side room and the terrace add tables in their rooms; the tables count is honest everywhere."""
+    g = Game(b, port, target, seed=27, manual=True)
+    mature(g); g.click('[data-act=open]'); g.ev("S.phase='shop';save();showShop();shopTab='projects';showShop()")
+    base = json.loads(g.ev("JSON.stringify({crew:crewCap(),menu:menuCap(),fridge:fridgeCap(),q:queueMax(),burners:stoveSlots(S.eq.stove),tables:tablesTotal()})"))
+    for k in ['terrace', 'pass', 'cooler', 'kext', 'side']:
+        g.ev(f"doAct('buyProject',null,'{k}',null)"); g.ev("__tick(1800)")
+        check(g.ev("!$('#reveal').hidden && $('#reveal').className==='done'"), f'no reveal card after buying {k}')
+        g.ev("doAct('revealClose',null,null,null)")
+        check(g.ev(f"projOn('{k}')"), f'{k} was not bought')
+    after = json.loads(g.ev("JSON.stringify({crew:crewCap(),menu:menuCap(),fridge:fridgeCap(),q:queueMax(),burners:stoveSlots(S.eq.stove),tables:tablesTotal()})"))
+    check(after['crew'] == base['crew'] + 4 and after['menu'] == base['menu'] + 2 and after['fridge'] == base['fridge'] + 80 and after['q'] == base['q'] + 1 and after['burners'] == base['burners'] + 2, f'project effects wrong: {base} -> {after}')
+    check(after['tables'] == base['tables'] + 3, f'the side room (2 booths) and the terrace (1 table) should add 3 tables: {base} -> {after}')
+    g.ev("shopTab='projects';showShop()")
+    g.ev("doAct('buySideTable',null,null,null);doAct('buyFrontTable',null,null,null);doAct('buyExt',null,'awning',null);doAct('buyExt',null,'bench',null)")
+    check(g.ev("S.sideTables===3 && S.frontTables===2 && extOn('awning') && extOn('bench') && queueMax()===%d" % (base['q'] + 3)), 'side/front tables or street pieces did not buy')
+    check(g.ev("JSON.stringify(roomsOpen())") == '["front","main","side","kitchen"]', 'the side room did not open')
+    g.ev("doAct('nextDay',null,null,null)"); start_day(g); install_bot(g)
+    check(g.ev("R.tables.filter(t=>t.room==='side').length===3 && R.tables.filter(t=>t.room==='front').length===2 && R.slots.filter(s=>s.type==='stove').length===6"), 'the new tables and burners are not in the run state')
+    check(g.ev("$('#roomTabs').innerText.includes('NEW')"), 'the new room should be marked NEW on its tab')
+    g.ev("__tick(3000)")
+    check(g.ev("(R.log||[]).some(l=>l.t.includes('第一天'))"), 'Jill did not mention the new room on its first day')
+    # guests find the new tables; waiters serve there; nothing walks through walls
+    seen = {'side': False, 'front': False}
+    for i in range(120):
+        g.page.evaluate('()=>window.__play(20,0)')
+        st = json.loads(g.ev("JSON.stringify({side:R.tables.some(t=>t.room==='side'&&t.group),front:R.tables.some(t=>t.room==='front'&&t.group)})"))
+        seen['side'] |= st['side']; seen['front'] |= st['front']
+        if all(seen.values()): break
+    check(all(seen.values()), f'guests never sat in the new rooms: {seen}')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
+def cats_use_their_things_and_stay_inside(b, port, target):
+    """Bought pieces are used by the cats (by personality), side-room pieces through a trip, the first use is a moment;
+    the five cats never set foot outside."""
+    g = Game(b, port, target, seed=28, manual=True)
+    mature(g); g.click('[data-act=open]')
+    g.ev("S.rooms.side=1;S.sideTables=4;S.rooms.terrace=1;S.frontTables=2;for(const G of CATGEAR)S.gear[G.k]=S.day-2;save();showPrep()")
+    start_day(g); install_bot(g)
+    used, outside = set(), 0
+    for i in range(220):
+        g.page.evaluate('()=>window.__play(30,0)')
+        st = json.loads(g.ev("JSON.stringify(CATS.map(c=>[c.def.id,c.st,c.gear||'',c.away||'',c.room||'main',c.perch]))"))
+        for cid, stt, gear, away, rm, perch in st:
+            if stt == 'gear': used.add(gear)
+            if perch is not None and perch >= 14: used.add('deluxe')
+            if rm == 'front' or away == 'front': outside += 1
+        if g.ev("phase") != 'service': break
+    check(len(used) >= 2, f'the cats used too few of their things: {sorted(used)}')
+    check(outside == 0, 'a cat went outside')
+    gu = g.ev("JSON.stringify(S.gearUse)")
+    check(g.ev("Object.keys(S.gearUse).length>=2 && !!S.achievements.newspot"), f'first uses were not recorded: {gu}')
+    check(g.ev("(R.log||[]).some(l=>l.t.includes('第一次用了'))"), 'no log line for a first use')
+    # the away cats draw in the side room without an error, and come back
+    g.ev("setRoom('side')"); g.page.evaluate('()=>window.__play(30,0)'); g.ev("setRoom('main')")
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
+def goal_ladder_and_dylan_scenes(b, port, target):
+    """The summary offers three things to save for; Dylan's milestone scenes play once each and land in the log."""
+    g = Game(b, port, target, seed=29, manual=True)
+    mature(g); g.click('[data-act=open]')
+    g.ev("S.money=9000;S.rooms.side=1;S.sideTables=2;S.lastSummary={day:24,rev:9000,cost:3000,tips:800,bonus:0,wages:2000,net:4800,guests:40,lost:1,perfect:20,plated:50,avg:80,top:'pasta',stars:4,tasks:[],reviews:[],sales:[],crew:[],weather:'sun',event:'none'};S.phase='shop';save();showSummary()")
+    check(g.ev("document.querySelectorAll('.goals .goal').length") == 3, 'the summary should show three goals')
+    check(g.ev("[...document.querySelectorAll('.goals .goal .gm')].some(e=>e.textContent.includes('還差'))"), 'a goal should say how much is still missing')
+    g.ev("doAct('nextDay',null,null,null)"); start_day(g); install_bot(g)
+    g.ev("spawn({type:'regular',reg:'dylan',size:1})")
+    for i in range(60):
+        g.page.evaluate('()=>window.__play(15,0)')
+        if g.ev("R.groups.some(q=>q.reg==='dylan'&&q.table!=null)"): break
+    check(g.ev("R.groups.some(q=>q.reg==='dylan'&&q.table!=null)"), 'Dylan did not get a table')
+    played = g.ev("(()=>{const q=R.groups.find(x=>x.reg==='dylan');return dylanScene(q)&&JSON.stringify(S.dylan.seen)})()")
+    check(played and played != '{}', f'no Dylan scene was available with the side room open: {played}')
+    check(g.ev("(()=>{const q=R.groups.find(x=>x.reg==='dylan');return dylanScene(q)===true&&Object.keys(S.dylan.seen).length===2})()"), 'a second, different scene should follow')
+    g.ev("__tick(6000)")
+    check(g.ev("(R.log||[]).some(l=>l.w==='dylan')"), 'the scene did not reach the log')
+    check(not g.errors, g.errors)
+    g.close()
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--target', choices=['index', 'single'], default='index')

@@ -882,7 +882,7 @@ function ambientTick(dt){if(!R||R.closing!=null)return;R.ambT=(R.ambT||0)+dt;if(
  if(!c.length)return;const pk=wpick(c,o=>o.w);const gap={nexttable:70,newdish:90,askcat:80,check:50,chentora:400,kobaban:400}[pk.k]||60;if(canChat(pk.k,gap,7))pk.f()}
 function freeTableFor(g){const ts=R.tables.filter(t=>!t.group&&!t.dirty&&t.seats>=g.size).sort((a,b)=>a.seats-b.seats);
  if(g.reg&&g.reg!=='dylan'&&ts.length){const u=usualTable(g.reg);const ut=u!=null&&ts.find(t=>t.i===u);if(ut&&(S.regulars[g.reg]||0)>=2)return ut;if(g.reg==='wang'&&u==null){/* by the window, as they always ask */return ts.slice().sort((a,b)=>(a.seats-b.seats)||(a.x-b.x)||(a.y-b.y))[0]}}
- if(g.reg==='dylan'&&ts.length){/* a seat that sees Jill at the pass but is not in her way: the free dining-room table farthest from the kitchen */const m=ts.filter(t=>t.room==='main');return (m.length?m:ts).slice().sort((a,b)=>(a.seats-b.seats)||(Math.hypot(b.x-PASS.x,b.y-PASS.y)-Math.hypot(a.x-PASS.x,a.y-PASS.y)))[0]}
+ if(g.reg==='dylan'&&ts.length){/* a seat that sees Jill at the pass but is not in her way: the free dining-room table farthest from the kitchen; now and then the side room, once there is one */const sd=ts.filter(t=>t.room==='side');if(sd.length&&(g.wantSide||(g.wantSide==null&&(g.wantSide=Math.random()<.35))))return sd[0];const m=ts.filter(t=>t.room==='main');return (m.length?m:ts).slice().sort((a,b)=>(a.seats-b.seats)||(Math.hypot(b.x-PASS.x,b.y-PASS.y)-Math.hypot(a.x-PASS.x,a.y-PASS.y)))[0]}
  if(ts.length){/* the dining room fills first; outdoor tables only in fair weather */const wx=R.weather;const ok=ts.filter(t=>!t.out||(wx!=='rain'&&wx!=='storm'));const pool=ok.length?ok:ts.filter(t=>!t.out);if(!pool.length)return null;const m=pool.filter(t=>t.room==='main');if(m.length&&Math.random()<.7)return m[0];return pool[0]}
  return ts[0]}
 function leaveGroup(g,mood){const t=g.table!=null?R.tables[g.table]:null;if(t&&t.group===g)t.group=null;g.state='leave';g.mood=mood||'ok';sendOut(g);
@@ -2449,7 +2449,7 @@ function hitRegular(p){if(!R)return null;for(const g of R.groups){if(!g.reg||g.t
 /* a small card, not a dialogue: name, how well the place knows them, what has been noticed */
 let regCardT=0;
 function showRegCard(g){const el=$('#regcard');if(!el)return;const v=S.regulars[g.reg]||0;const isD=g.reg==='dylan';const tier=regTier(v);const rv=isD&&S.dylan.stage>=3;
- let who=isD?(rv?DYLAN.who2:DYLAN.who):REG_BY[g.reg].who;const notes=[];if(isD&&!rv){if(S.dylan.stage>=1)notes.push('打烊後偶爾會留下來。');if((S.dylan.clues.pet||0)>=1)notes.push('貓對他好像不太怕生。');if((S.dylan.clues.tidy||0)>=1)notes.push('走之前會自己收盤子。');if((S.dylan.clues.pause||0)>=2)notes.push('Jill 經過他那桌的時候，會停一下。')}
+ let who=isD?(rv?DYLAN.who2:DYLAN.who):REG_BY[g.reg].who;const notes=[];if(isD&&!rv){if(S.dylan.stage>=1)notes.push('打烊後偶爾會留下來。');if(S.dylan.clues.knows)notes.push('好像知道東西放在哪。');if(S.dylan.seen&&S.dylan.seen.wang)notes.push('王太太也注意到他了。');if((S.dylan.clues.pet||0)>=1)notes.push('貓對他好像不太怕生。');if((S.dylan.clues.tidy||0)>=1)notes.push('走之前會自己收盤子。');if((S.dylan.clues.pause||0)>=2)notes.push('Jill 經過他那桌的時候，會停一下。')}
  else if(!isD){const cf=(S.catFam&&S.catFam[g.reg])||0;if(cf>=4)notes.push('樾樾不躲他了。');const m=regMem(g.reg);if(m.facts.length)notes.push(m.facts[0].txt);else{const nt=notesFor(g.reg,1);if(nt.length)notes.push(`「${nt[0].txt}」`)}}
  el.innerHTML=`<img alt="" src="${isD?portraitURL(DYLAN.looks,'regdylan'):portraitURL(REG_BY[g.reg].looks,'reg'+g.reg)}"><div><b>${isD?'Dylan':g.name}</b> <span class="tier t${Math.floor(tier)}">${rv?'Jill 的先生':TIER_N[tier]}</span><p>${v?`來店 ${v} 次・`:''}${who}${notes.length?'<br>'+notes.join(' '):''}</p></div>`;
  el.hidden=false;sfx.tap();clearTimeout(regCardT);regCardT=setTimeout(()=>{el.hidden=true},4200)}
@@ -2658,7 +2658,7 @@ const JPOS={L:{x:122,face:1},R:{x:174,face:-1},M:{x:148,face:1}};   /* where Jil
 const TV_PARK={x:352,y:118};
 function tvUsePos(){return LIFE.jill.pos==='R'?{x:SOFA.x0,y:146}:{x:SOFA.x1,y:146}}   /* in front of the arm at Jill's feet */
 const DYLAN={id:'dylan',n:'Dylan',type:'regular',size:1,fav:['signature'],looks:[{skin:'#EDC19C',hair:'#2A211C',hs:6,top:'#4E5A6B',acc:null,pants:'#3B3A44'}],
- who:'一個人來，話不多。喜歡坐看得到廚房的位子。',who2:'Jill 的先生。打烊以後，有時候會留下來。'};
+ who:'一個人來，話不多。喜歡坐看得到廚房的位子。',who2:'Jill 的先生。結婚 11 年。打烊以後，有時候會留下來——然後隔天再來追一次。'};
 REG_BY.dylan=DYLAN;
 const LIFE={day:0,plan:null,t:0,jill:null,tv:null,dylan:null,say:[],revealRoll:0};
 function lifeReset(){LIFE.day=0;LIFE.plan=null;LIFE.t=0;LIFE.revealRoll=0;LIFE.say=[];LIFE.dylan=null;
@@ -2798,8 +2798,26 @@ function dylanLine(){const st=S.dylan.stage;if(st>=3)return pick(['今天很累�
    trying his luck; after it, the same act keeps going — now it's an old joke between the two of
    them. Each entry: what he says, what she answers (null = she doesn't dignify it), what he adds. */
 const DYLAN_ACT={
- before:[['老闆娘，今天有空嗎？','沒有。'],['老闆娘，妳有男朋友嗎？','先吃飯。'],['今天的菜好吃到想每天來。','你本來就每天來。'],['老闆娘，可以留個電話嗎？','不行。'],['老闆娘，妳綁馬尾很好看。',null],['我下次帶花來。','帶錢來就好。']],
- after:[['老闆娘，明天有空嗎？','不行，我老公會生氣。','那確實滿麻煩的。'],['老闆娘，可以留個電話嗎？','你不是有嗎？','再要一次也不行喔？'],['老闆娘，妳一個人住嗎？','跟五隻貓，還有一個很煩的人。','聽起來滿熱鬧的。'],['老闆娘，這道菜是為我做的吧？','是為 {T} 號桌做的。',null],['老闆娘，晚上一起吃飯？','回家吃。','好。']]};
+ before:[['老闆娘，今天有空嗎？','沒有。'],['老闆娘，妳有男朋友嗎？','先吃飯。'],['今天的菜好吃到想每天來。','你本來就每天來。'],['老闆娘，可以留個電話嗎？','不行。'],['老闆娘，妳綁馬尾很好看。',null],['我下次帶花來。','帶錢來就好。'],
+  ['主廚，請問今日推薦是什麼？','你可以正常講話。','我只是尊重主廚。'],['這道菜，跟昨天一樣好。','你昨天不是才吃過？','昨天跟今天是不同的約會。'],['老闆娘，妳今天有笑。','我每天都有。','沒有，今天比較多。'],['我可以坐這裡看妳做菜嗎？','你已經坐下了。',null],['老闆娘，這隻貓好像認識我。','牠誰都認識。','牠剛剛只來我這桌。'],['老闆娘，打烊後要去哪？','回家。','一個人？','跟貓。']],
+ after:[['老闆娘，明天有空嗎？','不行，我老公會生氣。','那確實滿麻煩的。'],['老闆娘，可以留個電話嗎？','你不是有嗎？','再要一次也不行喔？'],['老闆娘，妳一個人住嗎？','跟五隻貓，還有一個很煩的人。','聽起來滿熱鬧的。'],['老闆娘，這道菜是為我做的吧？','是為 {T} 號桌做的。',null],['老闆娘，晚上一起吃飯？','回家吃。','好。'],
+  ['老闆娘，今天早點打烊？','看貓答不答應。','牠們一向答應。'],['主廚，今天的菜有進步。','你昨天也這樣講。','昨天也是真的。'],['老闆娘，我可以追妳嗎？','追到了再說。','那就是可以。'],['老闆娘，紀念日想吃什麼？','你記得日期？','我只是問問。','……那天店裡吃。'],['這位子有人坐嗎？','有，一個很煩的人。','那我坐旁邊。'],['老闆娘，我今天可以幫忙嗎？','不用，你是客人。','客人可以每天來嗎？','你不是已經每天來了。']]};
+/* Scenes that belong to a moment: the place grew, a cat took something first, a regular noticed. Each plays once. */
+const DYLAN_SCENES=[
+ {k:'side',when:()=>projOn('side'),lines:[['側廳有位子嗎？','你坐哪都一樣。','不一樣，那邊看得到妳。'],['妳把牆打掉了。','嗯。','以前那面牆我還滿喜歡的。','……你要不要吃飯。']]},
+ {k:'kext',when:()=>projOn('kext'),lines:[['廚房變大了。','嗯。','妳更忙了。','你話變多了。']]},
+ {k:'terrace',when:()=>projOn('terrace'),lines:[['外面也有位子了。','下次坐外面。','下雨我就進來。']]},
+ {k:'pass',when:()=>projOn('pass'),lines:[['出菜口變寬了。','你連這個都注意。','我什麼都注意。']]},
+ {k:'cooler',when:()=>projOn('cooler'),lines:[['冷藏庫。','嗯。','好，那我不問了。']]},
+ {k:'jill5',when:()=>S.level>=5,lines:[['招牌上只剩一個名字了。','還缺一個嗎？','……不缺。']]},
+ {k:'gear',when:()=>CATGEAR.some(G=>gearOn(G.k)&&S.day-(S.gear[G.k]||0)<=3&&(S.gearUse[G.k]&&Object.keys(S.gearUse[G.k]).length)),lines:[['牠已經在上面了。','牠比你快。','牠比誰都快。']]},
+ {k:'menu',when:()=>S.dylan.stage>=2&&!(S.dylan.clues.knows),clue:'knows',lines:[['菜單我自己拿了。','你知道放哪？','我……猜的。']]},
+ {k:'water',when:()=>S.dylan.stage>=2&&(S.dylan.clues.knows||0)>=1&&!(S.dylan.clues.knows2),clue:'knows2',lines:[['水我自己倒了。','杯子呢？','左邊第二個櫃子。','……嗯。']]},
+ {k:'wang',when:()=>S.dylan.stage>=1&&(S.regulars.wang||0)>=3&&R.groups.some(q=>q.reg==='wang'&&q.table!=null),note:true,lines:[['王太太：「那位先生每天都來耶。」','嗯。','王太太：「妳不覺得他……」','他吃完就會走了。']]},
+];
+function dylanScene(g){const seen=S.dylan.seen=S.dylan.seen||{};for(const sc of DYLAN_SCENES){if(seen[sc.k])continue;let ok=false;try{ok=sc.when()}catch(e){ok=false}if(!ok)continue;seen[sc.k]=S.day;if(sc.clue)S.dylan.clues[sc.clue]=(S.dylan.clues[sc.clue]||0)+1;
+ const L=pick(sc.lines);const say=(i,txt)=>setTimeout(()=>{if(!R||phase!=='service')return;if(sc.note&&txt.startsWith('王太太：'))noteLine(txt);else if(i%2===0){if(R.groups.includes(g))quote(g,txt)}else jillSay(txt)},600+i*1500);
+ L.forEach((txt,i)=>{if(txt)say(i,txt)});logLine('dylan',L.filter(Boolean).join(' / '),'reg');return true}return false}
 function dylanAct(g){const st=S.dylan.stage;const pool=st>=3?DYLAN_ACT.after:DYLAN_ACT.before;const line=pick(pool).map(x=>x&&x.replace('{T}',g.table+1));quote(g,line[0]);
  if(line[1])setTimeout(()=>{if(R&&phase==='service')jillSay(line[1])},1500);else setTimeout(()=>{if(R&&phase==='service')noteLine('Jill 看了他一眼，沒有回答。')},1500);
  if(line[2])setTimeout(()=>{if(R&&phase==='service')quote(g,line[2])},3100)}
@@ -2807,7 +2825,7 @@ function dylanGuestUpd(g,dt){const t=R.tables[g.table];const J=R.jill;g.glT=(g.g
  const jillLooking=Math.hypot(J.x-t.x,J.y-t.y)<80&&((J.face>0)===(t.x>=J.x));
  if(g.gaze>R.t&&jillLooking)g.gaze=0;
  if(g.glT<=0){g.glT=rand(8,20);if(!jillLooking&&Math.random()<.75){g.gaze=R.t+rand(1.2,2.8);S.dylan.clues.look=(S.dylan.clues.look||0)+1}}
- if(!g.said&&['wait','eat'].includes(g.state)&&g.ticket&&R.t-g.ticket.t0>8&&!J.cur&&!J.q.length&&!J.moving&&Math.random()<dt*.08){g.said=1;if(Math.random()<(S.dylan.stage>=3?.4:.5))dylanAct(g);else quote(g,dylanLine())}}
+ if(!g.said&&['wait','eat'].includes(g.state)&&g.ticket&&R.t-g.ticket.t0>8&&!J.cur&&!J.q.length&&!J.moving&&Math.random()<dt*.08){g.said=1;if(dylanScene(g))return;if(Math.random()<(S.dylan.stage>=3?.4:.5))dylanAct(g);else quote(g,dylanLine())}}
 function dylanWalk(D,x,y,after){D.tx=x;D.ty=y;D.after=after;D.walking=true;D.seated=false;D.via=null;if(D.y<148&&y>=148)D.via={x:D.x,y:152};else if(y<148&&D.y>=148)D.via={x,y:152}}
 function dylanCanSofa(){const J=LIFE.jill;if(!(J.on||(J.reserved&&J.pos)))return null;const ivs=seatIvs(null);const face=J.on?J.face:JPOS[J.pos].face;
  if(face>0&&ivFree(170,196,ivs))return 183;if(face<0&&ivFree(100,126,ivs))return 113;
