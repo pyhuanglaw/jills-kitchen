@@ -140,6 +140,7 @@ const LEVELS=[
 const TABLE_COST=[0,0,500,800,1400,2000,2800,3800,5000,6500,8000,10000];
 /* Operations: what a restaurant that cannot grow any bigger can still get better at. Each one is a real capacity or
    throughput change, bought once (or in tiers), and none of them needs a next expansion. */
+/* the pieces that were bought with the room in mind now live in the projects page too */
 const OPS=[
  {k:'flow',n:'動線規劃',tiers:[9000,16000,26000],lv:3,d:t=>`重新安排出菜口與桌子之間的走法：Jill 走路 +${6*t}%，員工 +${8*t}%。`},
  {k:'wait',n:'門口候位區',tiers:[12000],lv:4,d:()=>'門口多一排椅子：客滿時多等 2 組客人，少一點失望離開的人。'},
@@ -147,6 +148,54 @@ const OPS=[
  {k:'board',n:'大菜單板',tiers:[15000],lv:5,d:()=>'門口換一塊大菜單板：菜單上限 +2 道。'},
 ];
 function opsLv(k){return(S.ops&&S.ops[k])||0}
+/* ---- 2.0: the money ladder. Big projects change the place; street pieces change the front; the cats' things change
+   what the cats do. Every entry is data: the shop, the effects and the reveal read it. ---- */
+const PROJECTS=[
+ {k:'terrace',n:'露天座位',cost:25000,lv:2,ic:'terrace',room:'front',d:'門口人行道上撐起陽傘，最多再放 3 張雙人桌（桌子另外買）。路過的人看得到有人在外面吃飯：客流 +5%。',done:'門口的陽傘撐起來了。',jill:'外面也可以坐了。',unlock:['露天桌位（這一頁）'],react:'小茉：「外面的桌子我來顧。」'},
+ {k:'pass',n:'大出菜口',cost:15000,lv:3,ic:'pass',room:'kitchen',d:'出菜口加寬、加保溫燈：可以同時放更多盤，服務生取餐更快（反應 −15%）。',done:'出菜口變寬了，保溫燈亮著。',jill:'好，出菜。',unlock:[],react:'秀琴阿姨：「這樣端菜順多了。」'},
+ {k:'cooler',n:'冷藏庫',cost:30000,lv:3,ic:'cooler',room:'kitchen',d:'後場隔出一間冷藏庫：食材容量 +80 份，備料可以一次買夠。',done:'冷藏庫裝好了，門一開一陣白霧。',jill:'終於。',unlock:[],react:'包包在冷藏庫門口坐了很久。'},
+ {k:'kext',n:'廚房擴建',cost:45000,lv:3,ic:'kext',room:'kitchen',d:'爐灶換成六口的大爐（第 5、6 口爐可以在「廚房設備」加購），廚房可以再站 2 個人。',done:'新的六口爐灶進來了。',jill:'六口爐。',unlock:['爐灶第 5、6 口（廚房設備）','再聘 2 位員工'],react:'阿德師傅：「這下真的能同時做了。」'},
+ {k:'side',n:'側廳',cost:60000,lv:3,ic:'side',room:'side',d:'把隔壁打通：一間有整面大窗的側廳，最多 6 張桌（前 2 張是四人卡座）；可以再聘 2 位員工、菜單上限 +2。酒櫃會搬進去。',done:'牆打通了。側廳有一整面窗，下午的光會照進來。',jill:'……店真的變大了。',unlock:['側廳桌位（這一頁）','窗邊貓架、側廳貓窩（貓的東西）'],react:'柔柔第一個走進去看了一圈。'},
+];
+const EXTERIOR=[
+ {k:'season',n:'季節布置',cost:2000,lv:1,ic:'season',d:'燈籠、三角旗、花環，隨著日子換。'},
+ {k:'bench',n:'門口長椅',cost:3000,lv:1,ic:'bench',d:'等位的客人有地方坐：門口最多再等 2 組。'},
+ {k:'plants',n:'門口花箱',cost:4000,lv:1,ic:'planter',d:'兩個花箱，門口有了顏色。客流 +2%。'},
+ {k:'lights',n:'門口串燈',cost:5000,lv:2,ic:'lights',d:'沿著屋簷掛一排小燈，天黑以後整條街最溫暖的一段。客流 +2%。'},
+ {k:'sign',n:'招牌燈',cost:6000,lv:2,ic:'signlamp',d:'招牌上裝一盞燈，天黑以後整條街都看得到。客流 +3%。'},
+ {k:'awning',n:'遮雨棚',cost:8000,lv:2,ic:'awning',d:'紅白條紋的遮雨棚。下雨天門口的人比較願意等；客流 +3%。買過之後可以換顏色。',styles:['紅白','綠白','深藍白']},
+];
+const CATGEAR=[
+ {k:'box',n:'紙箱',cost:800,ic:'box',room:'main',x:300,y:204,poses:['sit'],d:'就是一個紙箱，放在桌子之間的走道上。柔柔會躲在裡面，等別的貓經過。',w:{mikan:4,ban:2,mei:.8,tora:.5,snow:.2}},
+ {k:'cushion',n:'大睡墊',cost:1200,ic:'cushion',room:'side',need:'side',x:352,y:300,poses:['sleep','loaf','curl'],d:'一塊很厚的睡墊，放在側廳靠窗那一側。包包大概會把它當成正職。',w:{snow:4,tora:1,mikan:1.2,ban:.4,mei:.6}},
+ {k:'basket',n:'藤籃',cost:1800,ic:'basket',room:'side',need:'side',x:60,y:418,poses:['curl','loaf'],d:'剛好塞得下一隻貓的藤籃，放在側廳門邊。樾樾的尺寸。',w:{tora:3,mei:1,mikan:1,snow:.6,ban:.5}},
+ {k:'tunnel',n:'貓隧道',cost:2500,ic:'tunnel',room:'side',need:'side',x:150,y:420,poses:['loaf'],d:'一條會沙沙響的隧道，放在側廳。小齁會衝進去，再從另一頭衝出來。',w:{ban:4,mikan:1.5,mei:1,tora:.3,snow:.1}},
+ {k:'perch',n:'窗邊貓架',cost:3500,ic:'perch',room:'side',need:'side',x:128,y:84,poses:['sit','loaf'],d:'側廳大窗前的一層貓架，看得到整條街。寶寶會在那裡看很久。',w:{mei:4,mikan:2,snow:1,tora:.8,ban:1}},
+ {k:'lounge',n:'側廳貓窩',cost:4500,ic:'lounge',room:'side',need:'side',x:352,y:410,poses:['sleep','curl','belly'],d:'側廳角落一張圓圓的軟窩，下午有太陽。',w:{snow:3,tora:2,mikan:1.5,mei:1,ban:.6}},
+ {k:'deluxe',n:'三層大跳台',cost:12000,ic:'deluxe',room:'main',lv:4,d:'右邊的貓跳台換成三層的大跳台：高處多 2 個位子，寶寶和包包不用再搶。',w:{}},
+];
+function gearOn(k){return!!(S.gear&&S.gear[k])}
+function projOn(k){return!!(S.rooms&&S.rooms[k])}
+function extOn(k){return!!(S.ext&&S.ext[k])}
+function tablesTotal(){return S.tables+(projOn('side')?(S.sideTables||0):0)+(projOn('terrace')?(S.frontTables||0):0)}
+/* the street's pull on passers-by */
+function extAttract(){let m=1;if(extOn('awning'))m+=.03;if(extOn('sign'))m+=.03;if(extOn('lights'))m+=.02;if(extOn('plants'))m+=.02;if(projOn('terrace'))m+=.05;if(EXTERIOR.every(e=>extOn(e.k)))m+=.03;return m}
+const SIDE_TABLE_COST=[1500,2200,3000,4000,5200,6500],FRONT_TABLE_COST=[1200,1800,2600];
+/* what to save for next: one thing within reach, one a few days away, one to dream about */
+function goalLadder(){const out=[];const money=S.money;const add=(n,cost,where)=>{if(cost==null)return;out.push({n,cost,where,left:Math.max(0,cost-money)})};
+ for(const P of PROJECTS)if(!projOn(P.k)&&S.level>=P.lv)add(P.n,P.cost,'工程');
+ for(const E of EXTERIOR)if(!extOn(E.k)&&S.level>=E.lv)add(E.n,E.cost,'工程');
+ for(const G of CATGEAR)if(!gearOn(G.k)&&(!G.need||projOn(G.need))&&S.level>=(G.lv||1))add(G.n,G.cost,'貓的東西');
+ const nl=LEVELS[S.level];if(nl)add('擴建：'+nl.n,nl.cost,'桌椅與擴建');
+ if(S.tables<tableCap())add('餐桌',TABLE_COST[S.tables],'桌椅與擴建');
+ if(projOn('side')&&(S.sideTables||0)<6)add('側廳桌',SIDE_TABLE_COST[S.sideTables||0],'工程');
+ for(const E of EQUIP){const lv=S.eq[E.k]||0;if(lv<5)add(E.n+(lv?' LV'+(lv+1):''),E.cost[lv],'廚房設備')}
+ for(const o of OPS){const t=opsLv(o.k);if(o.tiers[t]!=null&&S.level>=o.lv)add(o.n,o.tiers[t],'桌椅與擴建')}
+ for(const Dc of DECOR){const t=S.decor[Dc.k]||0;if(Dc.tiers[t]!=null&&S.level>=(Dc.tierLv?Dc.tierLv[t]:Dc.lv))add(Dc.n,Dc.tiers[t],'裝潢')}
+ out.sort((a,b)=>a.cost-b.cost);const near=out.find(g=>g.left===0)||out[0];const mid=out.find(g=>g.left>0&&g.left<=Math.max(3000,money*.6))||out.find(g=>g.left>0);const far=out.slice().reverse().find(g=>g.left>0&&g!==mid)||null;
+ const G=[near,mid,far].filter((g,i,a)=>g&&a.indexOf(g)===i);for(const g of out.slice().reverse()){if(G.length>=3)break;if(!G.includes(g))G.push(g)}return G}
+function goalLadderHTML(){const G=goalLadder();if(!G.length)return'';const avg=S.lastSummary?Math.max(1,S.lastSummary.net):1000;
+ return`<h3>存錢的目標</h3><div class="card goals">${G.map(g=>{const pct=Math.min(100,Math.round(S.money/g.cost*100));const days=g.left>0?Math.max(1,Math.ceil(g.left/avg)):0;return`<div class="goal"><div class="gt"><span>${g.n}</span><small>${g.where}</small></div><div class="gb"><i style="width:${pct}%"></i></div><div class="gm">${g.left>0?`還差 ${fmt(g.left)}${days<=30?` · 照今天的收入約 ${days} 天`:''}`:'現在就買得起'}</div></div>`}).join('')}</div>`}
 function flowMul(who){const t=opsLv('flow');return 1+(who==='jill'?.06:.08)*t}
 /* Interior styles: floor, walls, baseboard and counter. Bought once, switched any time, never forced by an expansion
    (the level's own flourishes — the brass trim, the sign — stay as they are). */
@@ -158,11 +207,11 @@ const THEMES={classic:{n:'原本的樣子',d:'米色地板、灰牆，開幕那�
  modern:{n:'簡單的灰',d:'水泥色的牆、淺灰地板，什麼都不多。',cost:3000,floor:'#D8D8D6',wall0:'#9EA3A8',wall1:'#8E9398',base:'#EDEDEB',c0:'#F4F4F2',c1:'#C9CBCC',front:'#3A3A3C'}};
 function TH(){return THEMES[S.theme]||THEMES.classic}
 const EQUIP=[
- {k:'stove',n:'爐子',cost:[0,900,2600,6000,13000],d:lv=>`${stoveSlots(lv)} 口爐・加熱速度 ×${SPD[lv-1].toFixed(2)}`},
+ {k:'stove',n:'爐灶',cost:[0,900,2600,6000,13000],d:lv=>`${stoveSlots(lv)} 口爐・加熱速度 ×${SPD[lv-1].toFixed(2)}${projOn('kext')&&lv>=4?'（擴建後的大爐）':''}`},
  {k:'pan',n:'平底鍋',cost:[0,600,1600,4000,9000],d:lv=>`煎類料理速度 +${(lv-1)*8}%・Perfect 範圍 +${(lv-1)*10}%・炒飯不易焦`},
- {k:'oven',n:'烤箱',cost:[1200,1500,3500,8000,16000],d:lv=>lv?`${lv>=3?2:1} 個烤位・速度 ×${SPD[lv-1].toFixed(2)}`:'解鎖烤類料理：松露薯條、烤雞、鮭魚…'},
- {k:'bar',n:'咖啡機',cost:[0,700,2000,5000,11000],d:lv=>`${lv>=3?2:1} 個出杯位・速度 ×${SPD[lv-1].toFixed(2)}`},
- {k:'fridge',n:'冰箱',cost:[0,800,2200,5000,12000],d:lv=>`食材容量 ${FRIDGE[lv-1]} 份・冷盤台 ${lv>=3?2:1} 位・冷藏速度 ×${SPD[lv-1].toFixed(2)}`},
+ {k:'oven',n:'烤箱',cost:[1200,1500,3500,8000,16000],d:lv=>lv?`${lv>=3?'雙門烤箱，2':'1'} 個烤位・速度 ×${SPD[lv-1].toFixed(2)}`:'爐台旁裝一台烤箱，解鎖烤類料理：松露薯條、烤雞、鮭魚…'},
+ {k:'bar',n:'咖啡機',cost:[0,700,2000,5000,11000],d:lv=>lv?`${lv>=3?'雙沖煮頭，2':'1'} 個出杯位・速度 ×${SPD[lv-1].toFixed(2)}`:'工作台尾端裝一台咖啡機，解鎖飲料。'},
+ {k:'fridge',n:'冰箱',cost:[0,800,2200,5000,12000],d:lv=>`食材容量 ${FRIDGE[lv-1]+(projOn('cooler')?80:0)} 份・冷盤台 ${lv>=3?2:1} 塊砧板・冷藏速度 ×${SPD[lv-1].toFixed(2)}`},
 ];
 const SPD=[1,1.12,1.25,1.4,1.55];
 const FRIDGE=[40,60,90,130,180];
@@ -234,6 +283,8 @@ const ACH=[
  {id:'taught',n:'Passed On',d:'把招牌菜交給一位 LV5 廚師',ic:'plate',p:1},{id:'usual',n:'The Usual',d:'Jill 記得一位熟客的老樣子',ic:'heart',p:1},{id:'gift',n:'Something From Home',d:'熟客帶了東西來給店裡',ic:'heart',p:1},{id:'company',n:'Not Alone Today',d:'熟客第一次帶人來',ic:'heart',p:1},{id:'treat',n:'On The House',d:'Jill 請了客人一份',ic:'plate',p:1},{id:'dylan5',n:'Him Again',d:'Dylan 第五次來店',ic:'heart',p:1},{id:'jillrest',n:'A Moment',d:'營業中 Jill 在沙發上坐了一下',ic:'moon',p:1},{id:'everyone',n:'All Five',d:'五隻貓同時出現在一張照片裡',ic:'heart',p:1},{id:'lap',n:'Lap Cat',d:'有貓跳上 Jill 的膝蓋',ic:'heart',p:1},{id:'play',n:'Playtime',d:'小齁跟柔柔玩起來了',ic:'heart',p:1},{id:'photos50',n:'Fifty Photos',d:'相簿累積 50 張照片',ic:'pen',p:1},{id:'rain',n:'Rainy Day Soup',d:'下雨天賣出 6 碗以上的湯',ic:'moon',p:1},{id:'hot',n:'Ice Cold',d:'炎熱的一天賣出 12 杯以上的冰飲',ic:'flame',p:1},{id:'celebrate',n:'Ten Days',d:'過了第一次店慶',ic:'crown',p:1},{id:'datenight',n:'Date Night',d:'約會之夜接待 5 對情侶',ic:'heart',p:1},{id:'rev20k',n:'Twenty Thousand',d:'單日營業額達到 $20,000',ic:'coin',p:1},{id:'noshort',n:'Nothing Missing',d:'一天 30 位客人以上、一次都沒有臨時叫貨',ic:'star',p:1},{id:'rating45',n:'Four and a Half',d:'評分達到 4.5（至少 20 則評論）',ic:'star',p:1},
  /* mature */
  {id:'guests60',n:'Full House',d:'一天接待 60 位客人',ic:'flame',p:2},{id:'calm7',n:'Calm Week',d:'連續七天沒有客人生氣離開',ic:'moon',p:2},{id:'storm',n:'Come Rain Or Shine',d:'大雨天還是接待了 15 位客人',ic:'moon',p:2},{id:'night0',n:'No One Waits',d:'一天 20 位客人以上、沒有人等到不耐煩',ic:'star',p:2},{id:'staff6',n:'Full Crew',d:'同時有 6 位員工',ic:'waiter',p:2},{id:'lv5all',n:'Veterans',d:'三位以上員工全部滿級',ic:'crown',p:2},{id:'ops3',n:'Well Oiled',d:'動線規劃升到最高',ic:'star',p:2},{id:'room',n:'Back Room',d:'蓋了後場休息室',ic:'crown',p:2},{id:'sig100',n:'A Hundred Plates',d:'招牌菜賣出 100 份',ic:'duck',p:2},{id:'keep10',n:'Curator',d:'珍藏 10 張照片',ic:'pen',p:2},
+ /* 2.0: the place grows */
+ {id:'project',n:'Under Construction',d:'完成第一個大工程',ic:'expand',p:2},{id:'allprojects',n:'The Whole Block',d:'露天座位、大出菜口、冷藏庫、廚房擴建、側廳——全部完工',ic:'crown',p:2},{id:'storefront',n:'Curb Appeal',d:'門口的每一樣東西都裝好了',ic:'lights',p:2},{id:'catgear',n:'Spoiled',d:'買齊了所有貓的東西',ic:'heart',p:2},{id:'newspot',n:'It Was Their Idea',d:'一隻貓第一次用了你買給牠的東西',ic:'heart',h:1},{id:'sideful',n:'Both Rooms',d:'側廳和用餐區同時坐滿',ic:'flame',p:2},{id:'terrace',n:'Al Fresco',d:'第一組客人坐在陽傘下吃完了一餐',ic:'star',p:2},
  /* hidden: things that happen on their own */
  {id:'anniv',n:'Anniversary',d:'王先生與王太太在店裡過了紀念日',ic:'heart',h:1},{id:'pause',n:'Passing By',d:'Jill 在 Dylan 的桌邊停了一下',ic:'heart',h:1},{id:'husband',n:'All Along',d:'原來一直都認識',ic:'heart',h:1},{id:'dylancat',n:'The Cats Know',d:'貓對 Dylan 的態度不像對陌生人',ic:'heart',h:1},{id:'bagcat',n:'The Bag',d:'包包對袋子比橘子有興趣',ic:'heart',h:1},{id:'neighbors',n:'Small World',d:'兩位熟客在店裡認出了彼此',ic:'heart',h:1},{id:'writer',n:'In Print',d:'寫專欄的朋友給了好評',ic:'pen',h:1},{id:'oddspot',n:'Why There',d:'有貓睡在一個奇怪的地方',ic:'moon',h:1},{id:'sleepgod',n:'Sleeps Through Anything',d:'店裡再吵，包包照睡',ic:'moon',h:1},
 ];
@@ -255,7 +306,7 @@ const COACH=[
 const KEY='jills-kitchen-save-v1';
 function newState(){return{v:1,day:1,phase:'prep',money:500,lifetime:0,level:1,
  eq:{stove:1,oven:0,bar:0,prep:0,fridge:1,pan:1},tables:2,
- decor:{plants:0,lights:0,art:0,chairs:0,rug:0,ware:0,bar:0,sofa:0},staff:{busser:false,bartender:false},mem:{},catFam:{},crew:[],crewMig:1,rstar:{},dylan:{stage:0,stay:0,reveal:0,last:0,clues:{}},life:{sofa:0,tv:0},checkpoint:null,savedAt:0,savedLabel:'',rdProg:{},rdDone:{},labKnown:{},labTried:{},album:null,notes:[],taught:0,ops:{},theme:'classic',themes:{classic:1},sets:{},rooms:{side:0,terrace:0,kext:0,cooler:0,pass:0},sideTables:0,frontTables:0,ext:{awning:0,sign:0,plants:0,lights:0,bench:0,season:0,nook:0},rhist:[],records:{},salesHist:{},menuSince:{},regMem:{},props:{},regDay:null,gourmetBoost:0,dayLog:[],dayLogDay:0,
+ decor:{plants:0,lights:0,art:0,chairs:0,rug:0,ware:0,bar:0,sofa:0},staff:{busser:false,bartender:false},mem:{},catFam:{},crew:[],crewMig:1,rstar:{},dylan:{stage:0,stay:0,reveal:0,last:0,clues:{}},life:{sofa:0,tv:0},checkpoint:null,savedAt:0,savedLabel:'',rdProg:{},rdDone:{},labKnown:{},labTried:{},album:null,notes:[],taught:0,ops:{},theme:'classic',themes:{classic:1},sets:{},rooms:{side:0,terrace:0,kext:0,cooler:0,pass:0},sideTables:0,frontTables:0,ext:{awning:0,sign:0,plants:0,lights:0,bench:0,season:0},gear:{},gearUse:{},newRooms:{},reveal:null,rhist:[],records:{},salesHist:{},menuSince:{},regMem:{},props:{},regDay:null,gourmetBoost:0,dayLog:[],dayLogDay:0,
  unlocked:['friedrice'],menu:['friedrice'],price:{},stock:{},xp:{},reviews:[],achievements:{},regulars:{},returning:0,
  signature:null,catNames:{},buzz:1,buzzMsg:'',stats:{guests:0,perfect:0,days:0},tut:0,gate:1,news:[],today:null,todayCost:0,lastSummary:null,sfx:true,music:true}}
 let S;
@@ -271,7 +322,7 @@ const SAVE_V=1;
 const MIGRATE={};
 const RESCUE_KEY=KEY+'-unreadable';
 function rescue(t,why){try{if(!localStorage.getItem(RESCUE_KEY))localStorage.setItem(RESCUE_KEY,t);console.warn(`[save] could not read the save (${why}); a copy was kept in localStorage["${RESCUE_KEY}"]`)}catch(e){}}
-function fillDefaults(o){const base=newState();for(const k in base)if(!(k in o))o[k]=base[k];for(const k of['eq','decor','staff','stats','ops','rooms','ext'])o[k]=Object.assign({},base[k],o[k]);return o}
+function fillDefaults(o){const base=newState();for(const k in base)if(!(k in o))o[k]=base[k];for(const k of['eq','decor','staff','stats','ops','rooms','ext','gear','gearUse','newRooms'])o[k]=Object.assign({},base[k],o[k]);return o}
 // Old bartender/busser -> crew. NOTE: fillDefaults() runs first and already sets crewMig from newState(),
 // so this conversion never fires. Kept exactly as it was to preserve current behaviour (see docs/REFACTOR_REPORT.md).
 function legacyCrew(o){if(!o.crewMig){o.crewMig=1;o.crew=o.crew||[];if(o.staff&&o.staff.busser)o.crew.push({id:'c1',role:'cleaner',name:'秀琴阿姨',lv:1,duty:'clean'});if(o.staff&&o.staff.bartender)o.crew.push({id:'c2',role:'chef',name:'小茉',lv:1,duty:'bar'})}return o}
@@ -319,11 +370,11 @@ function hasSave(){try{return!!localStorage.getItem(KEY)}catch(e){return false}}
 S=load()||newState();
 
 /* ================= derived ================= */
-const stoveSlots=lv=>[1,2,3,3,4][lv-1];
+const stoveSlots=lv=>[1,2,3,3,4][lv-1]+(projOn('kext')?Math.min(2,Math.max(0,lv-3)):0);   /* the six-burner range of the kitchen expansion: LV4 → 5, LV5 → 6 */
 const LV=()=>LEVELS[S.level-1];
 const tableCap=()=>LV().tables;
-const menuCap=()=>LV().menu+2*opsLv('board');
-const fridgeCap=()=>FRIDGE[S.eq.fridge-1];
+const menuCap=()=>LV().menu+2*opsLv('board')+(projOn('side')?2:0);
+const fridgeCap=()=>FRIDGE[S.eq.fridge-1]+(projOn('cooler')?80:0);
 function ambience(){let a=0;for(const d of DECOR)a+=(S.decor[d.k]||0)*d.amb;return a+(S.level-1)}
 function rating(){const r=S.reviews.slice(-40);let s=3*4,n=4;for(const v of r){const w=v.w||1;s+=v.s*w;n+=w}return s/n}
 function xpLv(x){return x>=55?5:x>=28?4:x>=12?3:x>=4?2:1}
@@ -602,6 +653,24 @@ function iconURL(kind,lv){const k='i'+kind+(lv||0);if(ICACHE.has(k))return ICACH
  case 'rug':c.save();c.scale(1,.55);c.fillStyle='#8A3A2E';rr(c,-40,-34,80,68,6);c.fill();c.strokeStyle='#E6C27A';c.lineWidth=3;rr(c,-34,-28,68,56,4);c.stroke();c.fillStyle='#2E4A5A';rr(c,-22,-16,44,32,3);c.fill();c.fillStyle='#E6C27A';circ(c,0,0,6);c.restore();break;
  case 'ware':drawPlate(c,true,.5);c.strokeStyle='#C99A45';c.lineWidth=2.4;c.lineCap='round';c.beginPath();c.moveTo(-36,-16);c.lineTo(-36,20);c.moveTo(36,-16);c.lineTo(36,20);c.stroke();break;
  case 'barc':c.fillStyle='#5A3920';c.fillRect(-38,-4,76,30);c.fillStyle='#C99A45';c.fillRect(-40,-8,80,5);c.fillStyle='#3A2A20';c.fillRect(-36,-40,72,26);const bc=['#2E6B4A','#8A2A2A','#C99A45','#3A5A8A','#6B3A5A'];for(let i=0;i<7;i++){c.fillStyle=bc[i%5];rr(c,-32+i*10,-38,6,20,2);c.fill()}break;
+ /* 2.0: the projects, the street, the cats' things */
+ case 'side':c.fillStyle='#8A6A42';rr(c,-30,-34,60,60,6);c.fill();c.fillStyle='#2A1C16';rr(c,-24,-28,48,52,5);c.fill();let sg=c.createLinearGradient(0,-28,0,24);sg.addColorStop(0,'rgba(255,214,150,.1)');sg.addColorStop(1,'rgba(255,214,150,.6)');c.fillStyle=sg;rr(c,-24,-28,48,52,5);c.fill();c.fillStyle='#9FC1D8';c.fillRect(-14,-20,28,16);c.fillStyle='#F3F1EC';c.fillRect(-1,-20,2,16);c.fillRect(-14,-13,28,2);break;
+ case 'terrace':c.fillStyle='#8A6A42';c.fillRect(-1.5,-6,3,34);c.fillStyle='#B8536A';c.beginPath();c.moveTo(-34,-4);c.quadraticCurveTo(0,-38,34,-4);c.closePath();c.fill();c.fillStyle='rgba(255,255,255,.3)';c.beginPath();c.moveTo(-34,-4);c.quadraticCurveTo(-16,-28,0,-34);c.lineTo(0,-4);c.closePath();c.fill();c.fillStyle='#F4F1EA';el(c,0,24,22,7);c.fillStyle='#8A6A42';c.fillRect(-8,26,3,10);c.fillRect(5,26,3,10);break;
+ case 'kext':c.fillStyle='#9AA3A6';rr(c,-40,-14,80,40,5);c.fill();c.fillStyle='#2E3134';rr(c,-38,-12,76,30,4);c.fill();for(const [px,py] of[[-24,-4],[0,-4],[24,-4],[-24,10],[0,10],[24,10]]){c.fillStyle='#1B1B1D';el(c,px,py,9,4);c.strokeStyle='#4A7BD8';c.lineWidth=1.6;c.beginPath();c.ellipse(px,py,6,2.4,0,0,7);c.stroke()}c.fillStyle='#C99A45';for(let i=0;i<6;i++)circ(c,-30+i*12,22,2);break;
+ case 'cooler':c.fillStyle='#8FA0A8';rr(c,-26,-34,52,66,4);c.fill();c.fillStyle='#E4E6E7';rr(c,-22,-30,44,58,3);c.fill();c.fillStyle='#8FA0A8';rr(c,12,-6,5,18,2);c.fill();c.fillStyle='rgba(140,200,230,.45)';rr(c,-16,-24,26,12,2);c.fill();c.fillStyle='#F4F9FC';for(const [x,y] of[[-30,-40],[30,-36],[-34,20]])circ(c,x,y,3);break;
+ case 'pass':c.fillStyle='#2A2A2A';c.fillRect(-36,-30,72,3);for(const x of[-22,0,22]){c.fillRect(x-.8,-27,1.6,8);c.fillStyle='#B8536A';c.beginPath();c.moveTo(x-9,-8);c.lineTo(x+9,-8);c.lineTo(x+5,-19);c.lineTo(x-5,-19);c.closePath();c.fill();c.fillStyle='#FFE6A8';el(c,x,-7.5,6,1.6);c.fillStyle='#2A2A2A'}let pg=c.createLinearGradient(0,0,0,26);pg.addColorStop(0,'#D3D7D9');pg.addColorStop(1,'#AEB5B8');c.fillStyle=pg;rr(c,-40,8,80,18,4);c.fill();c.fillStyle='#F4F1EA';for(const x of[-22,0,22])el(c,x,8,9,4);break;
+ case 'season':c.fillStyle='#8A3A2A';c.fillRect(-1,-30,2,10);c.fillStyle='#D8392A';el(c,0,-6,16,20);c.fillStyle='#F4C44E';c.fillRect(-7,-26,14,4);c.fillRect(-7,12,14,4);for(let i=0;i<3;i++){c.fillStyle=['#E8798A','#7FB3C8','#5E9E3D'][i];c.beginPath();c.moveTo(-34+i*12,-34);c.lineTo(-24+i*12,-34);c.lineTo(-29+i*12,-22);c.closePath();c.fill()}break;
+ case 'bench':c.fillStyle='#6B4428';rr(c,-36,-14,72,8,3);c.fill();rr(c,-36,2,72,8,3);c.fill();c.fillRect(-33,10,5,18);c.fillRect(28,10,5,18);c.fillStyle='#8A6A42';c.fillRect(-36,-14,72,2);break;
+ case 'planter':c.fillStyle='#8A3A2A';rr(c,-28,2,56,26,4);c.fill();c.fillStyle='#A64A36';c.fillRect(-28,2,56,4);for(let k=0;k<8;k++)leaf(c,-24+k*7,-4-Math.abs(k-3.5)*4,16,7,-1.6+(k-3.5)*.35,k%2?'#3F7F32':'#5E9E3D');c.fillStyle='#E8798A';circ(c,-10,-12,3.5);c.fillStyle='#F4C44E';circ(c,10,-14,3.5);break;
+ case 'signlamp':c.fillStyle='#2C2C2B';rr(c,-36,-6,72,26,4);c.fill();c.strokeStyle='#E0B863';c.lineWidth=1.5;rr(c,-33,-3,66,20,3);c.stroke();c.fillStyle='#E6C27A';c.font=`400 12px ${DFONT}`;c.textAlign='center';c.textBaseline='middle';c.fillText('JILL',0,7.5);c.textBaseline='alphabetic';c.fillStyle='#8E6422';c.fillRect(-2,-18,4,12);c.fillStyle='#F4C44E';el(c,0,-19,9,3);let lg2=c.createRadialGradient(0,-4,2,0,-4,40);lg2.addColorStop(0,'rgba(255,214,120,.5)');lg2.addColorStop(1,'rgba(255,214,120,0)');c.fillStyle=lg2;c.fillRect(-44,-44,88,60);break;
+ case 'awning':c.fillStyle='rgba(0,0,0,.15)';c.fillRect(-40,14,80,6);for(let i=0;i<8;i++){c.fillStyle=i%2?'#F7EDDC':'#B8536A';c.beginPath();c.moveTo(-40+i*10,-14);c.lineTo(-30+i*10,-14);c.lineTo(-26+i*10,12);c.lineTo(-36+i*10,12);c.closePath();c.fill()}c.fillStyle='#B8536A';for(let i=0;i<8;i++){c.beginPath();c.arc(-35+i*10,13,5,0,Math.PI);c.fill()}break;
+ case 'box':c.fillStyle='#B8905E';c.beginPath();c.moveTo(-30,-10);c.lineTo(30,-10);c.lineTo(30,26);c.lineTo(-30,26);c.closePath();c.fill();c.fillStyle='#8A6A42';c.fillRect(-30,-10,60,4);c.fillStyle='#C9A26E';c.beginPath();c.moveTo(-30,-10);c.lineTo(-40,-24);c.lineTo(-10,-24);c.lineTo(0,-10);c.closePath();c.fill();c.fillStyle='#2A2A2A';el(c,-8,4,3,3);el(c,8,4,3,3);c.fillStyle='#E6A465';circ(c,0,8,12);c.fillStyle='#F7F3EA';el(c,-5,6,2.4,3);el(c,5,6,2.4,3);c.fillStyle='#2A2A2A';el(c,-5,6.5,1,2);el(c,5,6.5,1,2);break;
+ case 'cushion':c.fillStyle='rgba(0,0,0,.14)';el(c,0,20,34,9);c.fillStyle='#B8536A';el(c,0,10,34,16);c.fillStyle='#C9687C';el(c,0,6,30,12);c.fillStyle='rgba(255,255,255,.25)';el(c,-8,2,10,4);c.fillStyle='#F7F6F2';el(c,2,-2,18,11);c.fillStyle='#DEDBD6';el(c,-10,-4,5,4);break;
+ case 'basket':c.fillStyle='#B08B5E';c.beginPath();c.moveTo(-32,-6);c.quadraticCurveTo(-30,26,0,26);c.quadraticCurveTo(30,26,32,-6);c.closePath();c.fill();c.strokeStyle='rgba(120,80,40,.4)';c.lineWidth=1.2;for(let y=0;y<22;y+=5){c.beginPath();c.moveTo(-30+y*.6,y);c.lineTo(30-y*.6,y);c.stroke()}c.fillStyle='#D8C4A4';el(c,0,-6,32,8);c.fillStyle='#9A8166';el(c,0,-4,18,9);c.fillStyle='#3B2C20';el(c,-8,-6,3,3);el(c,8,-6,3,3);break;
+ case 'tunnel':c.fillStyle='#5E8FA8';rr(c,-40,-14,80,30,14);c.fill();c.fillStyle='#2A3A44';el(c,-36,1,8,14);el(c,36,1,8,14);c.fillStyle='rgba(255,255,255,.15)';c.fillRect(-32,-11,64,4);c.fillStyle='#8C7B66';circ(c,34,-2,8);c.fillStyle='#FFFFFF';el(c,34,2,6,4);c.fillStyle='#352A20';el(c,31,-4,2,2.6);el(c,37,-4,2,2.6);break;
+ case 'perch':c.fillStyle='#F3F1EC';c.fillRect(-36,-34,72,44);c.fillStyle='#9FC1D8';c.fillRect(-32,-30,64,36);c.fillStyle='#F3F1EC';c.fillRect(-1,-30,2,36);c.fillStyle='#8A6A42';rr(c,-40,10,80,8,2);c.fill();c.fillRect(-34,18,6,12);c.fillRect(28,18,6,12);c.fillStyle='#DCDDDC';el(c,0,4,16,9);c.fillStyle='#222425';for(let k=0;k<3;k++)c.fillRect(-10+k*8,-2,3,10);break;
+ case 'lounge':c.fillStyle='rgba(0,0,0,.14)';el(c,0,20,36,10);c.fillStyle='#8FA893';el(c,0,10,36,18);c.fillStyle='#A9BFAC';el(c,0,8,28,12);c.fillStyle='#F7F6F2';el(c,0,4,16,9);c.fillStyle='#DEDBD6';el(c,-9,1,5,4);c.fillStyle='#F4C44E';for(const [x,y] of[[-30,-24],[32,-20],[26,-30]])circ(c,x,y,2.4);break;
+ case 'deluxe':c.fillStyle='#8A6A42';c.fillRect(-3,-34,6,60);c.fillStyle='#B8905E';for(const [y,w] of[[-32,30],[-12,40],[8,50]]){rr(c,-w/2,y,w,7,3);c.fill()}c.fillStyle='#F7F6F2';el(c,-6,-38,12,7);c.fillStyle='#DCDDDC';el(c,12,-18,10,6);c.fillStyle='#E6A465';el(c,-12,2,10,6);break;
  case 'sofa':c.fillStyle='#7A2E3A';rr(c,-38,-28,76,30,10);c.fill();c.fillStyle='#8E3A48';rr(c,-40,-4,80,22,8);c.fill();c.fillStyle='#C99A45';c.fillRect(-34,18,4,10);c.fillRect(30,18,4,10);break;
  case 'busser':case 'bartender':case 'cleaner':case 'waiter':drawPerson(c,0,34,kind==='waiter'||kind==='bartender'?{skin:'#F6D3B5',hair:'#4A2E1F',hs:3,top:'#3F6B55',acc:'tie',pants:'#2E2B33'}:{skin:'#E2AE88',hair:'#2B1D16',hs:0,top:'#8FA3B5',pants:'#2E2B33'},{pscale:1,s:1.9,mood:'happy'});break;
  case 'chef':drawPerson(c,0,40,{skin:'#E2AE88',hair:'#2B1D16',hs:0,top:'#FFFFFF',pants:'#2E2B33'},{pscale:1,s:1.7,mood:'happy',jill:true});break;
@@ -700,7 +769,7 @@ function applyGates(){while(S.gate<S.day){S.gate++;const D=S.gate;
  if(D===8&&!S.signature)S.news.push('Jill 想做一道只屬於自己的料理。晚上可以在商店研發<b>招牌菜</b>（需要擴建到 Bistro）。')
 }}
 function unlockDish(d){if(!S.unlocked.includes(d))S.unlocked.push(d);if(!S.menu.includes(d)&&S.menu.length<menuCap()){S.menu.push(d);S.menuSince=S.menuSince||{};S.menuSince[d]=S.day}if(!(d in S.xp))S.xp[d]=0}
-function expected(weather,event){const D=S.day;let g=(3+S.tables*2.2)*Math.min(1.35,.85+D*.04);g*=.7+(rating()-3)*.18+.3;g*=WEATHER[weather].m*(EVENTS[event].m||1)*(S.buzz||1)*(S.signature?1.1:1);g=Math.min(g,S.tables*dayDur(D)/30);g=Math.max(D===1?7:5,Math.round(g));
+function expected(weather,event){const D=S.day;const NT=tablesTotal();let g=(3+NT*2.2)*Math.min(1.35,.85+D*.04);g*=.7+(rating()-3)*.18+.3;g*=WEATHER[weather].m*(EVENTS[event].m||1)*(S.buzz||1)*(S.signature?1.1:1)*extAttract();g=Math.min(g,NT*dayDur(D)/30);g=Math.max(D===1?7:5,Math.round(g));
  const people=Math.round(g*1.45);const items=Math.round(people*(D<=1?1:D<=3?1.4:1.7));return{groups:g,people,items}}
 function planToday(){if(S.today&&S.today.day===S.day)return;const F=feat();let weather='sun',event='none';
  if(F.events){const prev=S.wxPrev||'sun';const ww={sun:4,cloud:3,rain:2,storm:.9,hot:1.5,cool:1.6};if(prev==='rain'||prev==='storm'){ww.rain*=1.8;ww.storm*=1.5}if(prev==='hot')ww.hot*=1.8;weather=wpick(Object.keys(ww),k=>ww[k]);S.wxPrev=weather;const evs=Object.keys(EVENTS).filter(k=>!EVENTS[k].need||EVENTS[k].need());const cel=(S.stats.days+1)%10===0&&S.stats.days>0;event=cel?'celebrate':Math.random()<.38?'none':pick(evs.filter(k=>k!=='none'&&k!=='celebrate'&&(k!=='vip'||S.day>=5)))||'none'}
@@ -735,6 +804,7 @@ function startService(){lifeReset();dylanStageCheck();bg=null;lastEv=null;
   st:{rev:0,tips:0,guests:0,groups:0,perfect:0,q:{P:0,G:0,O:0,B:0},sats:[],dish:{},angry:0,lost:0,reviews:[],critic:null,blogger:null,treats:0},
   rush:feat().rush,rushT0:dur*120/270,rushT1:dur*180/270,rushShown:false,weather:T.weather,event:T.event,coach:(S.day===1&&!S.tut)?0:-1,taskDone:{},lastSpawn:0,idleT:0,focus:0,focusLock:0,holdSlot:null,inc:planIncidents(dur),cw:{},thief:null,insp:null,chaser:null};
  R.sched=buildSchedule(dur);R.log=[];logNew=0;phase='service';paused=false;room='main';hideScreen();layoutAll();renderTickets();renderTasks();hud(true);logChip();stockChip();renderRoomTabs(true);
+ if(S.reveal&&S.reveal.day<S.day){const P=PROJECTS.find(x=>x.k===S.reveal.k);S.reveal=null;if(P){setTimeout(()=>{if(R&&phase==='service'){jillSay(P.k==='side'?'今天側廳也開放了。':P.k==='terrace'?'外面的桌子也可以坐。':P.k==='kext'?'廚房變大了，今天可以多做一點。':P.k==='cooler'?'冷藏庫今天開始用。':'出菜口變寬了。');logLine('jill',P.n+'：第一天。')}},2500)}}
  banner("OPEN FOR DINNER",LV().n+' 開始營業','');audioInit();sfx.door();
 }
 function buildSchedule(dur){const T=S.today,n=T.groups,out=[];
@@ -761,7 +831,7 @@ function priceFeelHTML(d){const f=priceFeel(d);if(f.m===1)return`<small class="p
 function rollGuest(){const D=S.day;const w=guestWeights();
  const type=wpick(Object.keys(w),k=>w[k]);let size=1;if(type==='couple'||type==='vip')size=2;else if(type==='student')size=Math.random()<.5?1:Math.random()<.65?2:3;else if(type==='office')size=Math.random()<.7?1:2;else size=Math.random()<.6?1:2;
  return{type,size,forSig:!!S.signature&&Math.random()<(recoDish()==='signature'?.12:.05),ret:D>=3&&Math.random()<clamp(.06+(rating()-3)*.1,.03,.3)}}
-function queueMax(){return LV().q+2*opsLv('wait')}
+function queueMax(){return LV().q+2*opsLv('wait')+(extOn('bench')?2:0)+(projOn('terrace')?1:0)}
 function queued(){return R.groups.filter(g=>g.state==='arrive'||g.state==='queue').sort((a,b)=>a.id-b.id)}
 function requeue(){for(const g of queued()){if(g.state==='arrive'&&!g.landed)continue;
  if(g.spot){const ok=g.spot.k==='seat'?!OCC['bench'+g.spot.i]:true;const upgrade=g.spot.k==='stand'&&g.size<=2&&[0,1,2].some(benchFree);if(ok&&!upgrade)continue;g.spot=null}
@@ -1345,8 +1415,9 @@ function roomAlerts(){const A={};for(const k of ROOM_ORDER)A[k]={n:0,u:0};if(!R|
  for(const tk of R.tickets)for(const it of tk.items)if(it.st==='pending'&&!chefCanAny(it.d)){A.kitchen.n++;break}
  const q=queued().length;if(q){A.main.n+=q}return A}
 let tabsHTML='';
+function roomIsNew(k){const nr=S.newRooms||{};const d=k==='side'?nr.side:k==='kitchen'?Math.max(nr.kext||0,nr.cooler||0,nr.pass||0):k==='front'?Math.max(nr.terrace||0,...EXTERIOR.map(e=>S.ext&&S.ext[e.k]?0:0)):0;return!!d&&S.day-d<=1}
 function renderRoomTabs(force){const el=$('#roomTabs');if(!el)return;const show=phase==='service'&&!!R;el.hidden=!show;if(!show)return;const A=roomAlerts();
- const h=roomsOpen().map(k=>`<button data-room="${k}" class="${k===room?'on':''}${A[k].u?' urgent':''}"><span>${ROOMS[k].n}</span>${A[k].n?`<b>${A[k].n}</b>`:''}</button>`).join('');
+ const h=roomsOpen().map(k=>`<button data-room="${k}" class="${k===room?'on':''}${A[k].u?' urgent':''}${roomIsNew(k)&&k!==room?' new':''}"><span>${ROOMS[k].n}</span>${A[k].n?`<b>${A[k].n}</b>`:roomIsNew(k)&&k!==room?'<b class="nw">NEW</b>':''}</button>`).join('');
  if(force||h!==tabsHTML){tabsHTML=h;el.innerHTML=h}}
 {const rt=$('#roomTabs');if(rt)rt.addEventListener('click',e=>{const b=e.target.closest('[data-room]');if(b)setRoom(b.dataset.room)})}
 document.addEventListener('keydown',e=>{if(phase!=='service'||!R||sub)return;const i=['1','2','3','4'].indexOf(e.key);if(i>=0){const list=roomsOpen();if(list[i])setRoom(list[i])}else if(e.key==='ArrowLeft'||e.key==='ArrowRight'){const list=roomsOpen();const i2=list.indexOf(room)+(e.key==='ArrowRight'?1:-1);if(list[i2])setRoom(list[i2])}});
@@ -1497,6 +1568,7 @@ function drawScene(now){const c=sctx;c.setTransform(1,0,0,1,0,0);c.globalAlpha=1
  const V=view();const J=V.jill;const list=[];
  for(const t of V.tables)if((t.room||'main')==='main')list.push({y:t.y,f:()=>drawTableFull(c,t,now)});
  for(const p of plantSpots())list.push({y:p.y,f:()=>drawPlant(c,p.x,p.y,p.k)});
+ for(const G of CATGEAR)if(gearOn(G.k)&&G.room==='main'&&G.poses)list.push({y:G.y-6,f:()=>drawGear(c,G,now)});if(gearOn('box')){const bc=CATS&&CATS.find(k=>k.gear==='box'&&k.st==='gear'&&!k.away);if(bc)list.push({y:CATGEAR[0].y+12,f:()=>drawGear(c,CATGEAR[0],now,true)})}
  list.push({y:352+FY,f:()=>drawCatTree(c,now)},{y:357+FY,f:()=>drawCatTree2(c,now)},{y:355+FY,f:()=>drawStairs(c)},{y:SPOT.scr2.y,f:()=>drawPost(c,now)},{y:BENCH.seats[0]-20,f:()=>drawBench(c)},{y:SOFA.y,f:()=>drawSofaGroup(c,now)},{y:LIFE.tv.y,f:()=>drawTV(c,LIFE.tv,now)});
  {const D=LIFE.dylan;if(D&&!D.seated&&!D.onSofa)list.push({y:D.y,f:()=>drawDylanFree(c,D,now)})}
  if(CATS)for(const k of CATS){if(k.hidden&&k.st==='hide2'&&k.peekT>0){list.push({y:k.y,f:()=>{c.save();c.translate(k.x,k.y);c.scale(CSC,CSC);catHead(c,k.def,0,-7,k.def.fluffy?6:5.4,{},false);c.restore()}});continue}if(k.sofa&&k.sofaOn)continue;if(!k.hidden&&(k.perch<0||k.st==='jump'||TREE.perches[k.perch].t===3))list.push({y:(k.sofa||k.sofaLeaving)?SOFA.front+1:k.y+(k.st==='bed'||k.st==='scr'||k.st==='eat'?2:0),f:()=>drawCat(c,k,now)})}
@@ -1567,7 +1639,8 @@ function drawOtherRoom(c,now,dusk,V,X0,XW,TOP){const k=room;const J=V.jill;const
  for(const g of V.groups)if(WALK_ST.includes(g.state)&&(g.room||'main')===k)list.push({y:g.y,f:()=>drawWalkers(c,g,now)});
  if(!J.sofa&&(J.room||'main')===k)list.push({y:J.y,f:()=>drawJillAt(c,J,V,now)});
  crewDraw(c,now,list,k);
- if(CATS)for(const cat of CATS){if(cat.hidden||(cat.room||'main')!==k)continue;list.push({y:cat.y,f:()=>drawCat(c,cat,now)})}
+ if(CATS)for(const cat of CATS){if(cat.away!==k)continue;list.push({y:cat.ay,f:()=>{const sx=cat.x,sy=cat.y,sf=cat.face;cat.x=cat.ax;cat.y=cat.ay;cat.face=cat.aface||1;drawCat(c,cat,now);cat.x=sx;cat.y=sy;cat.face=sf}})}
+ for(const G of CATGEAR)if(gearOn(G.k)&&G.room===k&&G.poses)list.push({y:G.y+(G.k==='perch'?-30:G.k==='tunnel'?-8:-6),f:()=>drawGear(c,G,now)});
  list.sort((a,b)=>a.y-b.y).forEach(i=>i.f());
  /* the light of the hour, as in the dining room (the street bakes it into its sky) */
  if(k!=='front'){c.save();c.globalCompositeOperation='multiply';c.fillStyle=wxTint(tintFor(dusk));c.fillRect(X0,-TOP,XW,LH+TOP);c.restore()}
@@ -1583,11 +1656,12 @@ function drawOtherRoom(c,now,dusk,V,X0,XW,TOP){const k=room;const J=V.jill;const
    of house takes them from the other side. Below the pass is the pickup side with the door to the dining room. Every cook
    is an actor who walks the aisle between the line and the pass; the recipe decides where each step happens and the
    tray's own vessel renderer draws the food on the counter, so what is on the fire is the dish that was ordered. */
-const KX={sink:{x:50,w:26},prep:{x:80,w:64},range:{x:148,w:128},oven:{x:280,w:44},bar:{x:328,w:34}};
+const KX_BASE={sink:{x:50,w:26},prep:{x:80,w:64},range:{x:148,w:128},oven:{x:280,w:44},bar:{x:328,w:34}},KX_BIG={sink:{x:36,w:22},prep:{x:62,w:60},range:{x:126,w:160},oven:{x:290,w:44},bar:{x:338,w:34}};
+const KX={get sink(){return(projOn('kext')?KX_BIG:KX_BASE).sink},get prep(){return(projOn('kext')?KX_BIG:KX_BASE).prep},get range(){return(projOn('kext')?KX_BIG:KX_BASE).range},get oven(){return(projOn('kext')?KX_BIG:KX_BASE).oven},get bar(){return(projOn('kext')?KX_BIG:KX_BASE).bar}};   /* the six-burner range of the expansion takes the line's middle */
 const KY={top:130,h:70,face:20,feet:152,passTop:276,passH:40,passFace:12,passFeet:272,front:362,rail:236};
 /* where a slot's vessel normally sits and where its cook stands */
 function slotHome(s){const i=s.no-1;switch(s.type){
- case'stove':{const x=KX.range.x+(i%2?96:32);return{x,y:i<2?186:160,sc:.62,cx:x,place:'range'}}
+ case'stove':{const cols=projOn('kext')?3:2;const col=i%cols;const x=KX.range.x+(cols===3?[30,80,130][col]:[32,96][col]);return{x,y:i<cols?186:160,sc:.62,cx:x,place:'range'}}
  case'oven':return{x:KX.oven.x+22,y:170,sc:.36,cx:KX.oven.x+22,place:'oven'};
  case'bar':return{x:KX.bar.x+(i?25:9),y:192,sc:.32,cx:KX.bar.x+17,place:'bar'};
  default:{const x=KX.prep.x+(i?50:20);return{x,y:172,sc:.36,cx:x,place:'prep'}}}}
@@ -1674,7 +1748,7 @@ function drawLine(c,now,V){const E=S.eq;const x0=KX.sink.x-4,x1=KX.bar.x+KX.bar.
   c.save();c.translate(x+32,y+14);c.rotate(-.3);let kg=c.createLinearGradient(0,-3,0,3);kg.addColorStop(0,'#F4F6F7');kg.addColorStop(1,'#9AA4A8');c.fillStyle=kg;c.beginPath();c.moveTo(-9,2);c.lineTo(8,2);c.lineTo(8,-1.5);c.quadraticCurveTo(-3,-5,-9,2);c.fill();c.fillStyle='#3A2A20';rr(c,8,-1.6,8,3.4,1.5);c.fill();c.restore();
   /* the lowboy fridge in the face */c.fillStyle='#C9CDD0';rr(c,x+2,y+h+2,KX.prep.w-4,f-6,1.5);c.fill();c.fillStyle='#9AA3A6';c.fillRect(x+KX.prep.w/2-1,y+h+3,2,f-8);c.fillRect(x+8,y+h+f/2-1,8,1.6);c.fillRect(x+KX.prep.w-16,y+h+f/2-1,8,1.6)}
  /* the range: steel frame, black top, knobs on the face, burners lit while something is on them */{const x=KX.range.x,w=KX.range.w;c.fillStyle='#9AA3A6';rr(c,x-2,y,w+4,h,3);c.fill();c.fillStyle='#2E3134';rr(c,x,y+2,w,h-4,3);c.fill();c.fillStyle='#3A3E41';rr(c,x+2,y+4,w-4,h-8,2);c.fill();c.fillStyle='rgba(255,255,255,.08)';c.fillRect(x+4,y+6,w-8,2);let rg=c.createLinearGradient(0,y,0,y+h);rg.addColorStop(0,'rgba(255,230,170,.16)');rg.addColorStop(1,'rgba(255,230,170,0)');c.fillStyle=rg;rr(c,x+2,y+4,w-4,h-8,2);c.fill();
-  c.fillStyle='#2A2C2E';rr(c,x,y+h,w,f-2,1.5);c.fill();for(let k=0;k<4;k++){c.fillStyle='#8A9498';circ(c,x+22+k*28,y+h+f/2,3.2);c.fillStyle='#2A2C2E';c.fillRect(x+21.4+k*28,y+h+f/2-3,1.2,3)}c.fillStyle='#8A9498';c.fillRect(x+w-14,y+h+3,8,f-8);
+  c.fillStyle='#2A2C2E';rr(c,x,y+h,w,f-2,1.5);c.fill();const nk=projOn('kext')?6:4;for(let k=0;k<nk;k++){c.fillStyle='#8A9498';circ(c,x+22+k*(nk===6?22:28),y+h+f/2,3.2);c.fillStyle='#2A2C2E';c.fillRect(x+21.4+k*(nk===6?22:28),y+h+f/2-3,1.2,3)}c.fillStyle='#8A9498';c.fillRect(x+w-14,y+h+3,8,f-8);
   const n=stoveSlots(E.stove);for(let i=0;i<n;i++){const s0=V.slots.find(q=>q.type==='stove'&&q.no===i+1);const hm=slotHome(s0||{type:'stove',no:i+1});const lit=!!(s0&&s0.job&&stepSpot(s0).place==='range');drawBurner(c,hm.x,hm.y+8,.62,lit,now)}}
  /* the oven under the counter: door(s) with a window, warm when something bakes; a fruit bowl on the counter until there is one */{const x=KX.oven.x;if(E.oven){const doors=E.oven>=3?2:1;for(let i=0;i<doors;i++){const dx=x+2+i*22;const s0=V.slots.find(q=>q.type==='oven'&&q.no===i+1);const on=!!(s0&&s0.job&&stepSpot(s0).inOven);c.fillStyle='#34302D';rr(c,dx,y+h+1,20,f-4,2);c.fill();let og=c.createLinearGradient(0,y+h,0,y+h+f);og.addColorStop(0,on?'#5A2E18':'#262220');og.addColorStop(1,on?'#8A4418':'#1E1A18');c.fillStyle=og;rr(c,dx+2.5,y+h+4,15,f-9,1.5);c.fill();if(on){c.fillStyle=`rgba(255,${Math.round(150+Math.sin(now*4)*30)},60,.35)`;rr(c,dx+2.5,y+h+4,15,f-9,1.5);c.fill()}c.fillStyle='#9AA3A6';c.fillRect(dx+3,y+h+2,14,1.6)}
    if(doors===1){c.fillStyle='#2A2C2E';rr(c,x+24,y+h+1,18,f-4,2);c.fill();c.fillStyle='#8A9498';c.fillRect(x+28,y+h+f/2-1,10,1.6)}
@@ -1692,11 +1766,11 @@ function drawBurner(c,cx,gy,sc,active,now){c.fillStyle='#17191A';el(c,cx,gy,22*s
  if(active){for(let i=0;i<16;i++){const a=i/16*6.283+now*2.5;const fl=(4+Math.sin(now*22+i*1.7)*1.8)*sc;const px=cx+Math.cos(a)*16*sc,py=gy+Math.sin(a)*4*sc;c.fillStyle=i%3?'rgba(90,140,255,.9)':'rgba(255,180,80,.8)';el(c,px,py-fl*.6,1.7*sc,fl)}let hg=c.createRadialGradient(cx,gy,2,cx,gy,56*sc);hg.addColorStop(0,'rgba(255,140,60,.28)');hg.addColorStop(1,'rgba(255,140,60,0)');c.fillStyle=hg;c.fillRect(cx-56*sc,gy-30*sc,112*sc,60*sc)}}
 function drawEspresso(c,x,y,w,h,now){let b2=c.createLinearGradient(x,0,x+w,0);b2.addColorStop(0,'#9E7026');b2.addColorStop(.5,'#EFCB80');b2.addColorStop(1,'#95691F');c.fillStyle='rgba(0,0,0,.16)';rr(c,x+2,y+3,w,h,4);c.fill();c.fillStyle=b2;rr(c,x,y,w,h*.62,5);c.fill();c.fillStyle='#2A2A2A';rr(c,x+3,y+h*.62,w-6,6,2);c.fill();c.fillStyle='#8FD3F4';circ(c,x+8,y+9,2);circ(c,x+w/2,y+9,2);circ(c,x+w-8,y+9,2);c.fillStyle='#555';c.fillRect(x+9,y+h*.62+6,4,6);if(h>36)c.fillRect(x+w-13,y+h*.62+6,4,6);c.fillStyle='#3A3F42';rr(c,x+2,y+h-6,w-4,6,2);c.fill();c.strokeStyle='#C9D0D3';c.lineWidth=1.6;c.beginPath();c.moveTo(x+w-3,y+h*.5);c.lineTo(x+w+4,y+h*.75);c.stroke();
  const on=R&&R.slots.some(s0=>s0.type==='bar'&&s0.job);if(on){c.fillStyle=`rgba(120,255,140,${.6+Math.sin(now*8)*.3})`;circ(c,x+w/2,y+9,2)}}
-function drawHeatLamps(c,now){const y=KY.rail;c.fillStyle='#2A2A2A';c.fillRect(92,y,216,2.6);for(const x of[92,308]){c.fillRect(x-1.2,y-20,2.4,20)}
- for(const x of[132,200,268]){c.fillStyle='#2A2A2A';c.fillRect(x-.8,y+2,1.6,8);c.fillStyle='#B8536A';c.beginPath();c.moveTo(x-11,y+22);c.lineTo(x+11,y+22);c.lineTo(x+6,y+10);c.lineTo(x-6,y+10);c.closePath();c.fill();c.fillStyle='#8A3A4A';c.fillRect(x-11,y+21,22,1.5);c.fillStyle=`rgba(255,214,120,${.8+Math.sin(now*3+x)*.1})`;el(c,x,y+22.5,7,1.8);
+function drawHeatLamps(c,now){const y=KY.rail;const big=projOn('pass');const x0=big?76:92,x1=big?324:308;c.fillStyle='#2A2A2A';c.fillRect(x0,y,x1-x0,2.6);for(const x of[x0,x1]){c.fillRect(x-1.2,y-20,2.4,20)}
+ for(const x of big?[110,170,230,290]:[132,200,268]){c.fillStyle='#2A2A2A';c.fillRect(x-.8,y+2,1.6,8);c.fillStyle='#B8536A';c.beginPath();c.moveTo(x-11,y+22);c.lineTo(x+11,y+22);c.lineTo(x+6,y+10);c.lineTo(x-6,y+10);c.closePath();c.fill();c.fillStyle='#8A3A4A';c.fillRect(x-11,y+21,22,1.5);c.fillStyle=`rgba(255,214,120,${.8+Math.sin(now*3+x)*.1})`;el(c,x,y+22.5,7,1.8);
   let g=c.createLinearGradient(0,y+24,0,KY.passTop+30);g.addColorStop(0,'rgba(255,200,110,.22)');g.addColorStop(1,'rgba(255,200,110,0)');c.fillStyle=g;c.beginPath();c.moveTo(x-9,y+24);c.lineTo(x+9,y+24);c.lineTo(x+30,KY.passTop+30);c.lineTo(x-30,KY.passTop+30);c.closePath();c.fill()}}
 /* the pass: steel top, the tickets on the rail along its back edge, the plates being finished and the ones waiting */
-function drawPass(c,now,V){const T=TH();const x0=80,x1=320,y=KY.passTop,h=KY.passH,f=KY.passFace;
+function drawPass(c,now,V){const T=TH();const big=projOn('pass');const x0=big?64:80,x1=big?336:320,y=KY.passTop,h=KY.passH,f=KY.passFace;
  c.fillStyle='rgba(0,0,0,.18)';rr(c,x0+2,y+5,x1-x0,h+f+6,4);c.fill();let g=c.createLinearGradient(0,y,0,y+h);g.addColorStop(0,'#D3D7D9');g.addColorStop(1,'#AEB5B8');c.fillStyle=g;rr(c,x0,y,x1-x0,h,4);c.fill();c.fillStyle='rgba(255,255,255,.5)';rr(c,x0+2,y+1.5,x1-x0-4,2.5,1.2);c.fill();
  let fg=c.createLinearGradient(0,y+h,0,y+h+f);fg.addColorStop(0,T.c0);fg.addColorStop(1,T.c1);c.fillStyle=fg;rr(c,x0,y+h-2,x1-x0,f+2,2);c.fill();c.fillStyle='rgba(0,0,0,.2)';c.fillRect(x0,y+h+f-2,x1-x0,3);
  /* the rail with the open tickets */c.fillStyle='#3A3A3A';c.fillRect(x0+8,y-2,x1-x0-16,2);if(V.tickets){const open=V.tickets.filter(tk=>tk.items.some(it=>it.st==='pending'||it.st==='cooking'));
@@ -1705,7 +1779,7 @@ function drawPass(c,now,V){const T=TH();const x0=80,x1=320,y=KY.passTop,h=KY.pas
   if(u>.55){/* the garnish going on */const fin=DISH(j.d).fin;if(fin&&fin.length){const t=(u-.55)/.45;c.globalAlpha=1-t;drawIng(c,fin[0],px+8,py-16-t*10,9);c.globalAlpha=1}}
   for(let k=0;k<3;k++){const ph=(now*1.2+k*.33)%1;c.globalAlpha=(1-ph)*.5;c.fillStyle='#fff';circ(c,px-8+k*8,py-16-ph*14,2+ph*3);c.globalAlpha=1}}
  /* plates waiting under the lamps, ticket number on each */if(V.tickets){const ready=[];for(const tk of V.tickets)for(const it of tk.items)if(it.st==='ready'&&!it.picked)ready.push({tk,it});
-  ready.slice(0,9).forEach((r0,i)=>{const x=x0+18+i*26,py=y+22;c.fillStyle='rgba(0,0,0,.12)';el(c,x,py+14,15,3.5);c.drawImage(dishCanvas(r0.it.d,r0.it.q,64,S.decor.ware>0,r0.it.want),x-17,py-17,34,34);c.fillStyle='#FFF8EC';rr(c,x+6,py-22,14,8,2);c.fill();c.fillStyle='#2E2019';c.font=`800 5.5px ${FONT}`;c.textAlign='center';c.textBaseline='middle';c.fillText('T'+r0.tk.no,x+13,py-18);c.textBaseline='alphabetic';
+  ready.slice(0,big?11:9).forEach((r0,i)=>{const x=x0+18+i*26,py=y+22;c.fillStyle='rgba(0,0,0,.12)';el(c,x,py+14,15,3.5);c.drawImage(dishCanvas(r0.it.d,r0.it.q,64,S.decor.ware>0,r0.it.want),x-17,py-17,34,34);c.fillStyle='#FFF8EC';rr(c,x+6,py-22,14,8,2);c.fill();c.fillStyle='#2E2019';c.font=`800 5.5px ${FONT}`;c.textAlign='center';c.textBaseline='middle';c.fillText('T'+r0.tk.no,x+13,py-18);c.textBaseline='alphabetic';
    c.strokeStyle='rgba(255,255,255,.45)';c.lineWidth=1;for(let k=0;k<2;k++){const ph=(now*.8+i*.37+k*.5)%1;c.globalAlpha=(1-ph)*.6;c.beginPath();c.moveTo(x-4+k*8,py-12-ph*10);c.quadraticCurveTo(x-1+k*8,py-16-ph*10,x-4+k*8,py-20-ph*10);c.stroke();c.globalAlpha=1}})}}
 function drawKFridge(c,now,x,y,w,h){const open=(now-FRIDGE_T)<1.8;c.fillStyle='rgba(0,0,0,.16)';rr(c,x+2,y+3,w,h,3);c.fill();c.fillStyle=S.level>=4?'#4A4A4E':'#C9CDD0';rr(c,x,y,w,h,3);c.fill();let fg=c.createLinearGradient(x,0,x+w,0);fg.addColorStop(0,'#E4E6E7');fg.addColorStop(.5,'#F7F8F8');fg.addColorStop(1,'#CDD1D3');c.fillStyle=fg;rr(c,x+2,y+(open?6:2),w-4,h-6,2);c.fill();c.fillStyle='#9AA3A6';rr(c,x+w-14,y+h*.45,8,3,1);c.fill();c.fillStyle='#2A2F33';rr(c,x+w-16,y+8,10,6,1);c.fill();c.fillStyle='#8FD3F4';c.font=`800 4px ${FONT}`;c.textAlign='center';c.fillText('3°C',x+w-11,y+12.4);c.fillStyle='rgba(60,56,50,.75)';c.font=`800 6.5px ${FONT}`;c.fillText('冰箱 · 庫存',x+w/2,y+h+9);
  if(R&&menuList().some(d=>(S.stock[d]||0)<=1)){const p=(Math.sin(now*6)+1)/2;c.fillStyle='#E0543A';circ(c,x+6,y-4-p*1.5,5.5);c.fillStyle='#fff';c.font=`800 7.5px ${FONT}`;c.textAlign='center';c.textBaseline='middle';c.fillText('!',x+6,y-3.6-p*1.5);c.textBaseline='alphabetic'}}
@@ -1725,7 +1799,7 @@ function drawCook(c,m,a,now){const b=a.beat||{kind:'idle'};const k=b.s&&b.s.job&
 /* ---- the side room: the lounge. An arch back to the dining room on the left of the back wall, a big window with curtains,
    a sideboard with a lamp, the wine bar (once bought), its own tables, a rug ---- */
 function drawSideRoom(c,now,dusk,V,X0,XW,TOP,list){const T=TH();const d=clamp(dusk,0,1);
- const bg=roomBg('side',S.level+'|'+(S.theme||'')+'|'+(S.decor.bar?1:0)+'|'+(S.ext&&S.ext.nook?1:0),TOP,(b,X0,XW,T2)=>{const r=rng(53);
+ const bg=roomBg('side',S.level+'|'+(S.theme||'')+'|'+(S.decor.bar?1:0)+'|'+(gearOn('lounge')?1:0)+'|'+(gearOn('perch')?1:0),TOP,(b,X0,XW,T2)=>{const r=rng(53);
   b.fillStyle=T.base;b.fillRect(X0,-T2,XW,T2+92);let wg=b.createLinearGradient(0,-T2,0,92);wg.addColorStop(0,T.wall0);wg.addColorStop(1,T.wall1);b.fillStyle=wg;b.fillRect(X0,-T2,XW,T2+92);
   for(let i=0;i<300;i++){b.fillStyle=`rgba(${r()<.5?'255,255,255':'70,70,66'},${.03+r()*.05})`;el(b,X0+r()*XW,-T2+r()*(T2+88),4+r()*16,2+r()*8)}
   b.strokeStyle='rgba(70,70,66,.3)';b.lineWidth=.7;for(let x=X0+10;x<LW+BGM;x+=92){b.beginPath();b.moveTo(x,-T2);b.lineTo(x,86);b.stroke()}for(let y=44;y>-T2;y-=44){b.beginPath();b.moveTo(X0,y);b.lineTo(LW+BGM,y);b.stroke()}
@@ -1744,7 +1818,7 @@ function drawSideRoom(c,now,dusk,V,X0,XW,TOP,list){const T=TH();const d=clamp(du
    b.fillStyle='#2A2A2A';b.fillRect(sx+74,sy-13,16,13);b.fillStyle='#F3F0EA';b.fillRect(sx+75.5,sy-11.5,13,10);b.fillStyle='#C08A6A';circ(b,sx+82,sy-6.5,3)}
   /* the wine bar moved in here with the side room */if(S.decor.bar){b.fillStyle='#2A2A28';b.fillRect(318,26,60,22);const bc=['#2E6B4A','#8A2A2A','#C99A45','#3A5A8A','#6B3A5A','#D9C27A'];for(let i=0;i<9;i++){b.fillStyle=bc[i%6];rr(b,321+i*6.4,28-(i%3)*2,4.2,17+(i%3)*2,1.5);b.fill()}b.fillStyle='#8C8A84';b.fillRect(306,86,94,18);b.fillStyle='#A7A59F';b.fillRect(306,90,94,14);b.fillStyle='#ECE9E3';b.fillRect(304,84,96,3);for(const x of[322,352]){b.fillStyle='#2A2A2A';b.fillRect(x-.8,108,1.6,10);b.fillStyle='#D9D5CD';el(b,x,107,7,3)}}
   else{/* a bookshelf instead */b.fillStyle='#8A6A42';b.fillRect(330,20,52,72);b.fillStyle='#6E4E2E';b.fillRect(333,23,46,66);const cols=['#B8536A','#5E8FA8','#E6C27A','#2E6B4A','#C08A6A','#F3F0EA'];for(let sh=0;sh<3;sh++){b.fillStyle='#8A6A42';b.fillRect(333,44+sh*22,46,2);let x=335;for(let k=0;k<7&&x<376;k++){const w=4+(k*7)%4;b.fillStyle=cols[(k+sh)%6];b.fillRect(x,26+sh*22-(k%2?2:0),w,18+(k%2?2:0));x+=w+1}}}
-  /* the cat cushion in the corner, once the nook is bought */if(S.ext&&S.ext.nook){b.fillStyle='rgba(0,0,0,.14)';el(b,352,414,20,8);b.fillStyle='#8FA893';el(b,352,410,20,9);b.fillStyle='#A9BFAC';el(b,352,408,15,6)}
+  /* the cat lounge in the corner, once bought */if(gearOn('lounge')){b.fillStyle='rgba(0,0,0,.14)';el(b,352,414,20,8);b.fillStyle='#8FA893';el(b,352,410,20,9);b.fillStyle='#A9BFAC';el(b,352,408,15,6)}
   });
  blitBg(c,bg,X0,XW,TOP);
  /* the window glass: sky by the hour and the weather */{const {x,y,w,h}=SIDE_L.window;const W=wxNow();const wet=W==='rain'||W==='storm';let g=c.createLinearGradient(0,y,0,y+h);const top=wet?(W==='storm'?'#8A93A0':'#B9C2CC'):W==='hot'?'#FFEFC8':W==='cool'?'#EAF4F8':'#FFF4DE',bot=wet?(W==='storm'?'#6E7683':'#9AA4B0'):'#FCE4BE';g.addColorStop(0,mix(top,'#3A3E5E',d));g.addColorStop(1,mix(bot,'#4E4666',d));c.fillStyle=g;c.fillRect(x,y,w,h);
@@ -2019,8 +2093,8 @@ const CAT_DEF=[
 const TREE={x:54,perches:[{x:57,y:320,t:1,ax:83},{x:85,y:288,t:1,ax:111},{x:63,y:254,t:1,ax:89},{x:88,y:350,t:1,ax:114},{x:336,y:320,t:2,ax:308},{x:356,y:288,t:2,ax:326},{x:338,y:252,t:2,ax:312}]};
 const WALL=[{x:362,y:66},{x:360,y:32},{x:344,y:-2},{x:316,y:-24},{x:276,y:-40},{x:232,y:-50},{x:190,y:-46}];
 function wallTop(){const top=SV.oy/SV.s;return top>40?-Math.min(110,top-26):0}
-function perchVis(i){const p=TREE.perches[i];return p.t!==3||p.y>wallTop()+14}
-let CATS=null;const perchOcc=[null,null,null,null,null,null,null];
+function perchVis(i){const p=TREE.perches[i];if(p.need&&!gearOn(p.need))return false;return p.t!==3||p.y>wallTop()+14}
+let CATS=null;const perchOcc=[];
 function drawWallRun(c,now){const WT=wallTop();const vis=y=>y>WT+10;
  const bracket=(x,y)=>{c.fillStyle='#6E6E6A';c.fillRect(x-1,y+2,2,6);c.fillRect(x-4,y+7,8,1.4)};
  const step=(x,y,w)=>{c.fillStyle='rgba(0,0,0,.14)';rr(c,x-w/2+1,y+3,w,6,2);c.fill();bracket(x-w/3,y);bracket(x+w/3,y);c.fillStyle='#B08B5E';rr(c,x-w/2,y,w,5,1.5);c.fill();c.fillStyle='#D9B98A';rr(c,x-w/2,y-1.5,w,3,1.5);c.fill();c.fillStyle='#8E8B85';rr(c,x-w/2+2,y-2.4,w-4,2,1);c.fill()};
@@ -2030,12 +2104,21 @@ function drawWallRun(c,now){const WT=wallTop();const vis=y=>y>WT+10;
   else step(w.x,w.y,i===0?22:26)});
  if(vis(-60)){c.fillStyle='rgba(0,0,0,.14)';c.fillRect(154,-72,28,26);c.fillStyle='#D9C9AE';rr(c,150,-76,28,26,3);c.fill();c.fillStyle='#3A322C';el(c,164,-62,6.5,6.5);c.fillStyle='#C4B294';c.fillRect(150,-52,28,2)}
  if(S.decor.art>=1&&vis(-42)){const ax=100,ay=-44;c.fillStyle='rgba(0,0,0,.18)';c.fillRect(ax+3,ay+3,26,32);c.fillStyle='#F4F2EE';c.fillRect(ax,ay,26,32);c.fillStyle='#FBFAF7';c.fillRect(ax+2.5,ay+2.5,21,27);c.fillStyle='#D9B27A';circ(c,ax+16,ay+10,3);c.fillStyle='#8FA38A';c.beginPath();c.moveTo(ax+2.5,ay+29.5);c.lineTo(ax+10,ay+17);c.lineTo(ax+16,ay+24);c.lineTo(ax+20,ay+20);c.lineTo(ax+23.5,ay+29.5);c.fill()}}
+function drawGear(c,G,now,front){const {x,y}=G;
+ switch(G.k){
+ case'box':{if(front){c.fillStyle='#B8905E';c.fillRect(x-14,y-8,28,16);c.fillStyle='#8A6A42';c.fillRect(x-14,y-8,28,2);c.fillStyle='rgba(0,0,0,.12)';c.fillRect(x-14,y+6,28,2);return}c.fillStyle='rgba(0,0,0,.16)';el(c,x,y+9,17,4);c.fillStyle='#A47B54';c.fillRect(x-14,y-22,28,30);c.fillStyle='#8A6A42';c.fillRect(x-14,y-22,28,2);c.fillStyle='#C9A26E';c.beginPath();c.moveTo(x-14,y-22);c.lineTo(x-20,y-30);c.lineTo(x-2,y-30);c.lineTo(x+2,y-22);c.closePath();c.fill();c.fillStyle='#4A3226';c.font=`800 5px ${FONT}`;c.textAlign='center';c.fillText('FRAGILE',x,y-12);break}
+ case'cushion':{c.fillStyle='rgba(0,0,0,.14)';el(c,x,y+6,22,7);c.fillStyle='#B8536A';el(c,x,y,22,10);c.fillStyle='#C9687C';el(c,x,y-2,19,7.5);c.fillStyle='rgba(255,255,255,.22)';el(c,x-5,y-4,7,2.5);break}
+ case'basket':{c.fillStyle='rgba(0,0,0,.14)';el(c,x,y+5,20,6);c.fillStyle='#B08B5E';c.beginPath();c.moveTo(x-19,y-8);c.quadraticCurveTo(x-18,y+8,x,y+8);c.quadraticCurveTo(x+18,y+8,x+19,y-8);c.closePath();c.fill();c.strokeStyle='rgba(120,80,40,.4)';c.lineWidth=.8;for(let yy=y-5;yy<y+6;yy+=3){c.beginPath();c.moveTo(x-17+(yy-y)*.4,yy);c.lineTo(x+17-(yy-y)*.4,yy);c.stroke()}c.fillStyle='#D8C4A4';el(c,x,y-8,19,5);c.fillStyle='#A88858';el(c,x,y-7.5,15,3.5);break}
+ case'tunnel':{c.fillStyle='rgba(0,0,0,.14)';el(c,x,y+7,36,5);c.fillStyle='#5E8FA8';rr(c,x-36,y-10,72,20,10);c.fill();c.fillStyle='#2A3A44';el(c,x-34,y,6,9);el(c,x+34,y,6,9);c.fillStyle='rgba(255,255,255,.15)';c.fillRect(x-30,y-8,60,3);c.strokeStyle='rgba(0,0,0,.12)';c.lineWidth=1;for(let k=-2;k<=2;k++){c.beginPath();c.moveTo(x+k*12,y-10);c.lineTo(x+k*12,y+10);c.stroke()}break}
+ case'perch':{c.fillStyle='rgba(0,0,0,.14)';c.fillRect(x-20,y+3,40,3);c.fillStyle='#8A6A42';rr(c,x-20,y-2,40,5,2);c.fill();c.fillStyle='#A98559';c.fillRect(x-20,y-2,40,1.5);c.fillStyle='#8A6A42';c.fillRect(x-17,y+3,3,14);c.fillRect(x+14,y+3,3,14);c.fillStyle='#EDE6D8';rr(c,x-17,y-6,34,4,2);c.fill();break}
+ case'lounge':{c.fillStyle='rgba(0,0,0,.14)';el(c,x,y+4,20,8);c.fillStyle='#8FA893';el(c,x,y,20,9);c.fillStyle='#A9BFAC';el(c,x,y-2,15,6);break}}}
 function drawCatTree2(c,now){c.save();c.translate(-26,DY);const sisal=(x,y0,y1)=>{let g=c.createLinearGradient(x-4,0,x+4,0);g.addColorStop(0,'#B8986A');g.addColorStop(.5,'#E2C898');g.addColorStop(1,'#A88858');c.fillStyle=g;c.fillRect(x-4,y0,8,y1-y0);c.strokeStyle='rgba(110,80,40,.45)';c.lineWidth=.7;for(let y=y0+1;y<y1;y+=2.2){c.beginPath();c.moveTo(x-4,y);c.lineTo(x+4,y+1);c.stroke()}};
  const plat=(x,y,rx,col,top)=>{c.fillStyle='rgba(0,0,0,.18)';el(c,x+2,y+4,rx+1,rx*.34);c.fillStyle=col;el(c,x,y+2.5,rx,rx*.36);c.fillRect(x-rx,y-.5,rx*2,3);c.fillStyle=top;el(c,x,y-.5,rx,rx*.34)};
  c.fillStyle='rgba(0,0,0,.22)';el(c,372,358,30,6.5);c.fillStyle='#8C8F94';rr(c,344,346,58,11,4);c.fill();c.fillStyle='#C9CCD0';el(c,373,346,29,6);
  sisal(362,322,348);sisal(382,290,348);sisal(364,258,320);
  c.fillStyle='#A7AAB0';rr(c,346,300,20,20,4);c.fill();c.fillStyle='#2A2A2C';el(c,356,312,6,6);c.fillStyle='#C9CCD0';rr(c,346,298,20,4,2);c.fill();
  plat(362,320,17,'#8C8F94','#D5D8DC');plat(382,288,15,'#8C8F94','#D5D8DC');
+ if(gearOn('deluxe')){sisal(364,200,252);sisal(346,222,258);plat(346,222,15,'#8C8F94','#D5D8DC');plat(372,196,16,'#8C8F94','#D5D8DC');c.fillStyle='#A7AAB0';rr(c,352,168,24,26,5);c.fill();c.fillStyle='#2A2A2C';el(c,364,182,7,7);c.fillStyle='#C9CCD0';rr(c,352,166,24,4,2);c.fill()}
  c.strokeStyle='#8C8F94';c.lineWidth=1.2;c.beginPath();c.moveTo(348,244);c.lineTo(348,256);c.moveTo(380,244);c.lineTo(380,256);c.stroke();c.fillStyle='#E9E3DA';c.beginPath();c.moveTo(346,246);c.quadraticCurveTo(364,262,382,246);c.lineTo(382,250);c.quadraticCurveTo(364,266,346,250);c.closePath();c.fill();fluff(c,'#F2ECE4',364,251,16,3,10,1.6);
  c.restore();const onTree=CATS?CATS.filter(k=>k.perch>=0&&TREE.perches[k.perch].t===2&&k.st!=='jump').sort((a,b)=>a.y-b.y):[];for(const k of onTree)drawCat(c,k,now)}
 function drawStairs(c){const x=300,y=356+FY;c.fillStyle='rgba(0,0,0,.2)';el(c,x+2,y+2,16,4);c.fillStyle='#4A4A4C';rr(c,x-15,y-10,30,10,2);c.fill();c.fillStyle='#5E5E61';rr(c,x-15,y-12,30,3,1.5);c.fill();c.fillStyle='#434346';rr(c,x-5,y-21,20,11,2);c.fill();c.fillStyle='#5A5A5D';rr(c,x-5,y-23,20,3,1.5);c.fill();c.fillStyle='rgba(255,255,255,.06)';for(let i=0;i<30;i++)c.fillRect(x-14+(i*7)%28,y-9+(i*3)%8,.8,.8)}
@@ -2043,6 +2126,8 @@ function drawPost(c,now){const {x,y}=SPOT.scr2;c.fillStyle='rgba(0,0,0,.22)';el(
 function catCheer(g,amt){if(!R||!g)return 0;if(R.t-(g.cwin??-99)>20){g.cwin=R.t;g.cgain=0}const a=Math.max(0,Math.min(amt,.3-g.cgain));if(a>0){g.pat=Math.min(1,g.pat+a);g.cgain+=a;g.catJoy=true}return a}
 function catName(C){return(S.catNames&&S.catNames[C.id])||C.n}
 WALL.forEach((w,i)=>TREE.perches.push({x:w.x,y:w.y-3,t:3,wi:i,ax:366,ay:114}));
+/* 2.0: the two high places of the three-tier tree (only there once it is bought) */
+TREE.perches.push({x:320,y:222,t:2,ax:312,need:'deluxe'},{x:346,y:196,t:2,ax:326,need:'deluxe'});
 /* ================= five cats: personality AI ================= */
 function applyDY(d){DY=d;KB=clamp(Math.round(d*.25),0,30);FY=d-KB;FB=364+d-KB;LH=424+d;ROWS=[162,240+(d-KB)*.5,318+d-KB];PASS.y=360+d-KB;
  TREE.perches.forEach(p=>{if(p.by==null)p.by=p.y;p.y=p.by+(p.t===3?0:d-KB)});
@@ -2051,9 +2136,9 @@ function applyDY(d){DY=d;KB=clamp(Math.round(d*.25),0,30);FY=d-KB;FB=364+d-KB;LH
 const SIDE={R:null,L:null};let RACE_CD=90,BAO_LAST=null;const MEMQ=[];let FLASH=null;
 const MEMS={sofa:'今晚的沙發',sofafull:'沙發客滿',husband:'Dylan — Jill 的先生',sides:'Jill 左右各一隻',ambush:'埋伏成功',what:'妳到底在幹嘛',waited:'白等了',race:'突然開賽',sleepgod:'睡神',nearby:'今天也在附近',best:'最佳座位',nap3:'三貓午睡',everyone:'今天大家都在',
  rest:'偷閒',lap:'膝上的重量',photo:'被拍了',pet:'摸一下',dylan:'留下來的人',
- play:'玩起來了',swat:'柔柔的小巴掌',pressed:'靠著柔柔',greeter:'不怕生',cushion:'一起擠軟墊',distracted:'走到一半忘了',guide:'小齁帶路',oldfriends:'又見面了',dylancat:'他們好像認識',quiet:'打烊後',oddspot:'怎麼睡在這',newroom:'新的店',reading:'各自安靜',pause:'經過的時候',company:'今天不是一個人',gift:'拿來的東西',anniversary:'紀念日',neighbors:'在店裡遇到',treat:'這個請你',bagcat:'比較喜歡袋子',rainday:'下雨天',selfie:'合照'};
+ play:'玩起來了',swat:'柔柔的小巴掌',pressed:'靠著柔柔',greeter:'不怕生',cushion:'一起擠軟墊',distracted:'走到一半忘了',guide:'小齁帶路',oldfriends:'又見面了',dylancat:'他們好像認識',quiet:'打烊後',oddspot:'怎麼睡在這',newroom:'新的店',newspot:'牠自己找到的',boxcat:'紙箱裡有東西',window:'窗邊',tunnel:'隧道的另一頭',reading:'各自安靜',pause:'經過的時候',company:'今天不是一個人',gift:'拿來的東西',anniversary:'紀念日',neighbors:'在店裡遇到',treat:'這個請你',bagcat:'比較喜歡袋子',rainday:'下雨天',selfie:'合照'};
 /* one line under each photo, written from what was actually in the frame */
-const MEM_TXT={sofa:i=>`${i.cats||'貓'}陪 Jill 坐了一會兒。`,sofafull:i=>`沙發上擠了 ${i.n||3} 隻貓，Jill 只好縮著坐。`,husband:()=>'原來一直都認識。',sides:i=>`${i.a}跟${i.b}一左一右。`,ambush:i=>`${i.a}從角落跳出來，${i.b}嚇了一跳。`,what:i=>`${i.a}看著${i.b}，看不懂。`,waited:i=>`${i.a}埋伏了半天，什麼都沒等到。`,race:i=>`${i.a}跟${i.b}突然繞著店裡跑起來。`,sleepgod:i=>`店裡再吵，${i.a}都照睡不誤。`,nearby:i=>`${i.a}坐在 Jill 腳邊。`,best:i=>`${i.a}找到了看得見全店的位子。`,nap3:()=>'三隻貓睡成一團。',everyone:()=>'五隻貓難得同時出現在一個畫面裡。',rest:i=>i.rush?'剛忙完一波，Jill 坐下來喘口氣。':'店裡沒事，Jill 在沙發上坐了一下。',lap:i=>`${i.a}跳上了 Jill 的膝蓋。`,photo:i=>`客人拿起手機，拍了${i.a}一張。`,pet:i=>`Jill 蹲下來摸了摸${i.a}。`,dylan:()=>'打烊後，Dylan 還在沙發上。',
+const MEM_TXT={newspot:i=>`${i.a}第一次用了${i.g}。`,boxcat:i=>`${i.a}在紙箱裡，只露出頭。`,window:i=>`${i.a}在窗邊看了很久的街。`,tunnel:i=>`${i.a}從隧道另一頭衝出來。`,sofa:i=>`${i.cats||'貓'}陪 Jill 坐了一會兒。`,sofafull:i=>`沙發上擠了 ${i.n||3} 隻貓，Jill 只好縮著坐。`,husband:()=>'原來一直都認識。',sides:i=>`${i.a}跟${i.b}一左一右。`,ambush:i=>`${i.a}從角落跳出來，${i.b}嚇了一跳。`,what:i=>`${i.a}看著${i.b}，看不懂。`,waited:i=>`${i.a}埋伏了半天，什麼都沒等到。`,race:i=>`${i.a}跟${i.b}突然繞著店裡跑起來。`,sleepgod:i=>`店裡再吵，${i.a}都照睡不誤。`,nearby:i=>`${i.a}坐在 Jill 腳邊。`,best:i=>`${i.a}找到了看得見全店的位子。`,nap3:()=>'三隻貓睡成一團。',everyone:()=>'五隻貓難得同時出現在一個畫面裡。',rest:i=>i.rush?'剛忙完一波，Jill 坐下來喘口氣。':'店裡沒事，Jill 在沙發上坐了一下。',lap:i=>`${i.a}跳上了 Jill 的膝蓋。`,photo:i=>`客人拿起手機，拍了${i.a}一張。`,pet:i=>`Jill 蹲下來摸了摸${i.a}。`,dylan:()=>'打烊後，Dylan 還在沙發上。',
  play:i=>`${i.a}跟${i.b}玩起來了。`,swat:i=>`${i.a}玩到一半，輕輕拍了${i.b}一下。`,pressed:i=>`${i.a}靠著${i.b}睡著了。`,greeter:i=>`${i.a}在陌生客人旁邊待得很自在。`,cushion:i=>`${i.a}跟${i.b}擠在同一塊軟墊上。`,distracted:i=>`${i.a}本來要去吃飯，走到一半就忘了。`,guide:i=>`${i.a}回頭等${i.b}，帶他去吃飯。`,oldfriends:i=>`${i.g}跟${i.a}又見面了。`,dylancat:i=>`${i.a}對 Dylan 的態度，不像對陌生人。`,quiet:()=>'店關了，燈還亮著。',oddspot:i=>`${i.a}睡在一個奇怪的地方。`,newroom:()=>'擴建之後的第一個晚上，大家都在。',reading:i=>`Jill 在看書，${i.cats}在旁邊各睡各的。`,pause:()=>'Jill 在 Dylan 的桌邊站了一下。',company:i=>`${i.g}今天帶了人來。`,gift:i=>`${i.g}帶了東西來給店裡。`,anniversary:()=>'王先生與王太太的紀念日，Jill 請了甜點。',neighbors:i=>`${i.a}跟${i.b}在店裡打了招呼，原來認識。`,treat:i=>`Jill 請了${i.g}一份${i.d}。`,bagcat:i=>`橘子沒興趣，${i.a}對袋子比較有興趣。`,rainday:i=>`外面在下雨，${i.a}睡得更沉了。`,selfie:i=>`${i.g}想跟 Jill 合照。`};
 /* Photos are the bulk of the restaurant's history, so they do not live in the save string any more: the save
    keeps the record (kind, day, clock, caption, 珍藏), the picture goes to IndexedDB under the record's id. A
@@ -2103,11 +2188,12 @@ function catWalk(c,x,y,after,t){c.st='walk';c.tx=x;c.ty=y;c.after=after;c.afterT
  /* never walk through the sofa: go round its front */
  const box={a:SOFA.x0-6,b:SOFA.x1+6,t:SOFA.back-8,d:SOFA.front+2};const inside=(px,py)=>px>box.a&&px<box.b&&py>box.t&&py<box.d;
  c.via=(!inside(c.x,c.y)&&!inside(x,y)&&segHitsRect(c.x,c.y,x,y,box))?{x:clamp((c.x+x)/2,box.a,box.b),y:box.d+10}:null}
-function freeFloorCat(c){return c.perch<0&&!c.sofa&&['rest','walk','daze','side'].includes(c.st)&&!c.guest&&!c.hidden}
+function freeFloorCat(c){return !c.away&&c.perch<0&&!c.sofa&&['rest','walk','daze','side'].includes(c.st)&&!c.guest&&!c.hidden}
 const SPOT={bed:{x:262,y:124},scr:{x:126,y:358},scr2:{x:226,y:114},cave:{x:318,y:126},bowl:{x:164,y:360},toy:{x:100,y:324}};
 const OCC={scr:null,scr2:null,cave:null,toy:null,bench0:null,bench1:null,bench2:null,bed:[]};const TOY={amp:1};let FOOD=1;
 function spotFree(k){return k==='bed'?OCC.bed.length<2:!OCC[k]}
-function releaseSpots(c){for(const k of['scr','scr2','cave','toy','bench0','bench1','bench2'])if(OCC[k]===c)OCC[k]=null;c.benchI=-1;OCC.bed=OCC.bed.filter(x=>x!==c);if(SIDE.R===c)SIDE.R=null;if(SIDE.L===c)SIDE.L=null;c.slot=null;c.hidden=false;c.peekT=0;c.sofa=null;c.sofaOn=false;
+const GEAR_OCC={};
+function releaseSpots(c){for(const k in GEAR_OCC)if(GEAR_OCC[k]===c)GEAR_OCC[k]=null;if(c.st!=='gear'&&!c.away)c.gear=null;for(const k of['scr','scr2','cave','toy','bench0','bench1','bench2'])if(OCC[k]===c)OCC[k]=null;c.benchI=-1;OCC.bed=OCC.bed.filter(x=>x!==c);if(SIDE.R===c)SIDE.R=null;if(SIDE.L===c)SIDE.L=null;c.slot=null;c.hidden=false;c.peekT=0;c.sofa=null;c.sofaOn=false;
  /* a perch reserved for a climb that never happened would stay booked forever */if(c.goPerch>=0&&c.perch!==c.goPerch&&perchOcc[c.goPerch]===c){perchOcc[c.goPerch]=null;c.goPerch=-1}}
 function leavePerch(c,then){const p=TREE.perches[c.perch];perchOcc[c.perch]=null;c.perch=-1;if(p.t===3){c.chain=WALL.slice(0,p.wi).reverse().map(w=>({x:w.x,y:w.y-3})).concat([{x:p.ax,y:p.ay}]);c.chainEnd=then||'decide';const n=c.chain.shift();catJump(c,n.x,n.y,c.chain.length?'chain':c.chainEnd)}else catJump(c,p.x+(p.t===2?-1:1)*rand(24,40),rand(338,350)+DY,then||'decide')}
 function goPerch(c,i){perchOcc[i]=c;c.goPerch=i;const p=TREE.perches[i];catWalk(c,p.ax,p.ay||350+FY,'climb')}
@@ -2128,7 +2214,20 @@ function goJill(c){releaseSpots(c);if(LIFE.jill.pos&&(evening()?LIFE.plan==='sof
  else slot=SIDE.L?(Math.random()<.5?'L2':'B'):'L';
  if(slot==='R'||slot==='L')SIDE[slot]=c;c.slot=slot;const q=slotPos(slot);c.lag=id==='tora'?rand(2,6):id==='ban'?rand(1,3):rand(1,4);c.lagT=0;catWalk(c,q.x,q.y,'side')}
 /* ---- decisions ---- */
-function catDecide(c){c.guest=null;c.moving=false;c.run=0;const id=c.def.id;const ev=evening();const a=jillA();
+/* ---- 2.0: the things bought for the cats. A piece is a spot with poses and a personality weight; the side room's
+   pieces are reached by a trip through the arch (the cat is off the dining-room floor while it is there). ---- */
+function catGoGear(c,G){if(!G)return;releaseSpots(c);GEAR_OCC[G.k]=c;c.gear=G.k;
+ if(G.room==='side'){catWalk(c,SIDE_ARCH.x+SIDE_ARCH.w/2,108,'gearAway');return}
+ catWalk(c,G.x+(G.k==='box'?0:0),G.y+(G.k==='box'?2:0),'gear')}
+function gearUsed(c,G){S.gearUse=S.gearUse||{};const U=S.gearUse[G.k]=S.gearUse[G.k]||{};const first=!U[c.def.id];U[c.def.id]=S.day;const nm=catName(c.def);
+ if(first){ach('newspot');logLine('cat',`${nm}第一次用了${G.n}。`,'cat');if(G.room==='main')memo('newspot',c.x,c.y,{a:nm,g:G.n,subj:[c]});else memo('newspot',G.x,G.y,{a:nm,g:G.n,room:'side',subj:[{x:G.x,y:G.y}]})}
+ if(G.k==='box')memo('boxcat',c.x,c.y,{a:nm,subj:[c]});if(G.k==='perch')memo('window',G.x,G.y,{a:nm,room:'side',subj:[{x:G.x,y:G.y}]})}
+function gearArrive(c){const G=CATGEAR.find(x=>x.k===c.gear);if(!G||!gearOn(G.k)){c.gear=null;catDecide(c);return}c.st='gear';c.pose=pick(G.poses);c.face=Math.random()<.5?1:-1;c.t=G.k==='box'?rand(20,45):rand(25,60);c.boxSeen={};gearUsed(c,G)}
+function gearTick(c,dt){const G=CATGEAR.find(x=>x.k===c.gear);c.moving=false;c.t-=dt;
+ if(G&&G.k==='box'&&!c.away){/* the ambush: a cat passing the box gets pounced on, both run */for(const o of CATS){if(o===c||o.hidden||o.perch>=0||o.sofa||!['walk','race','chase'].includes(o.st))continue;const d=Math.hypot(o.x-c.x,o.y-c.y);if(d>44)continue;const key=o.def.id+Math.floor((R?R.t:0)/8);if(c.boxSeen[key])continue;c.boxSeen[key]=1;if(Math.random()<.6){memo('ambush',c.x,c.y,{a:catName(c.def),b:catName(o.def),subj:[c,o]});logLine('cat',`${catName(c.def)}從紙箱裡跳出來，${catName(o.def)}嚇了一跳。`,'cat');GEAR_OCC[G.k]=null;c.gear=null;c.gearCD=60;const p=pickFloor(c);c.run=1;catWalk(c,p.x,p.y,'rest');const q=pickFloor(o);o.run=1;catWalk(o,q.x,q.y,'rest');return}}}
+ if(G&&G.k==='tunnel'&&c.away&&c.t<20&&!c.dashed){/* the dash through the tunnel: out the other end */c.dashed=1;c.ax=G.x+(c.aface>0?34:-34);c.aface=c.aface>0?1:-1;c.pose='sit';memo('tunnel',c.ax,c.ay,{a:catName(c.def),room:'side',subj:[{x:c.ax,y:c.ay}]})}
+ if(c.t<=0){if(c.away){c.away=null;c.hidden=false;c.x=SIDE_ARCH.x+SIDE_ARCH.w/2;c.y=110;c.face=-1;c.dashed=0}GEAR_OCC[c.gear]=null;c.gear=null;c.gearCD=rand(40,120);c.st='rest';c.pose='stretch';c.t=1.4}}
+function catDecide(c){c.guest=null;c.moving=false;c.run=0;const id=c.def.id;const ev=evening();const a=jillA();if(c.gearCD>0)c.gearCD=Math.max(0,c.gearCD-1);
  if(id==='snow'&&c.forgot==='eat'){c.forgot=null;c.distractedOnce=1;if(Math.random()<.4){catWalk(c,SPOT.bowl.x+8,SPOT.bowl.y-2,'eat');return}}
  if(c.sofa){if(c.sofaOn){sofaDecide(c);return}c.sofa=null}
  if(c.perch>=0){const stay=id==='snow'?.8:id==='mei'?.65:.4;if(Math.random()<stay){if(id==='snow'||Math.random()<.3)sleepHere(c,18,45);else{c.st='rest';c.pose=pick(['sit','loaf','groom','sit','yawn']);c.t=rand(6,14)}return}leavePerch(c,'decide');return}
@@ -2141,6 +2240,7 @@ function catDecide(c){c.guest=null;c.moving=false;c.run=0;const id=c.def.id;cons
  add('scr',spotFree('scr')?(id==='tora'?1:.6):0);add('scr2',spotFree('scr2')?.5:0);add('cave',spotFree('cave')?(id==='tora'?.9:.5):0);add('bed',spotFree('bed')?(id==='snow'?3:id==='ban'&&OCC.bed.some(o=>o.def.id==='mei')?2.4:.8):0);
  add('eat',id==='mikan'?1:.5);add('toy',spotFree('toy')?(id==='mikan'?1:.4)*(wxNow()==='cool'?1.4:wxNow()==='hot'?.6:1):0);
  add('sofa',sofaWeight(c));
+ for(const G of CATGEAR){if(!gearOn(G.k)||!G.poses||(G.need&&!projOn(G.need)))continue;if(GEAR_OCC[G.k]&&GEAR_OCC[G.k]!==c)continue;const w=(G.w[id]||.3)*(G.room==='side'?(ev?.35:.7):1)*(c.gearCD>0?0:1)*(S.day-(S.gear[G.k]||0)<=1?1.8:1);add('gear:'+G.k,w)}
  {const fs=[0,1,2].filter(benchFree);const standing=R&&R.groups.some(g=>g.state==='queue'&&g.spot&&g.spot.k==='stand');if(fs.length>=2&&!standing&&![0,1,2].some(i=>OCC['bench'+i]))add('bench',id==='mei'?.5:id==='snow'?.15:.25)}
  if(R&&phase==='service'){const dg=R.groups.find(g=>g.reg==='dylan'&&g.table!=null&&['reading','wait','eat','check'].includes(g.state)&&!(g.catT>R.t)&&!CATS.some(o=>o.guest===g));if(dg)add('visitDylan',id==='tora'?2:id==='mikan'?1.4:id==='ban'?.9:id==='mei'?.5:.2)}
  {const D=LIFE.dylan;if(D&&!D.onSofa&&(D.seated||D.state==='stand'||D.state==='crouch'))add('nearDylan',id==='tora'?.9:id==='mikan'?.6:id==='ban'?.4:0)}
@@ -2179,7 +2279,7 @@ function catDecide(c){c.guest=null;c.moving=false;c.run=0;const id=c.def.id;cons
  case'play':{const o=pick(near);startPlay(c,o);break}
  case'seekPlay':{const m=catBy('mikan');c.playCD=ctime+rand(50,110);c.target=m;catWalk(c,clamp(m.x+(c.x<m.x?-22:22),96,316),clamp(m.y+4,140,FB-10),'playWith');break}
  case'guideBao':{const b=catBy('snow');catWalk(c,clamp(b.x+(c.x<b.x?-20:20),96,316),clamp(b.y+2,140,FB-10),'guide');break}
- default:catGo(c,ch)}}
+ default:if(ch.startsWith('gear:'))catGoGear(c,CATGEAR.find(G=>G.k===ch.slice(5)));else catGo(c,ch)}}
 /* a play bout between two cats; 柔柔 may end it with a mischievous little swat (play, not a fight) */
 function startPlay(c,o){releaseSpots(o);releaseSpots(c);const t=rand(2.5,4);c.st='play';c.t=t;c.partner=o;o.st='play';o.t=t;o.partner=c;o.guest=null;c.face=o.x>=c.x?1:-1;o.face=-c.face;sfx.catPlay();
  const rou=c.def.id==='mikan'?c:o.def.id==='mikan'?o:null,hou=c.def.id==='ban'?c:o.def.id==='ban'?o:null;memo('play',(c.x+o.x)/2,(c.y+o.y)/2,{a:catName(c.def),b:catName(o.def),subj:[c,o]});
@@ -2200,6 +2300,8 @@ function catArrive(c){const a=c.after;const id=c.def.id;
  if(a==='toy'){c.st='toy';c.pose='toy';c.face=1;c.t=rand(4,6);TOY.amp=2.5;return}
  if(a==='benchUp'){const i=c.benchI;if(i<0||OCC['bench'+i]!==c){catDecide(c);return}catJump(c,BENCH.x+2,BENCH.seats[i]-3,'benchLand');return}
  if(a==='hide2'){c.st='hide2';c.hidden=true;c.t=rand(15,40);c.seen={};return}
+ if(a==='gear'){gearArrive(c);return}
+ if(a==='gearAway'){const G=CATGEAR.find(x=>x.k===c.gear);if(!G||!gearOn(G.k)){c.gear=null;catDecide(c);return}c.away='side';c.hidden=true;c.ax=G.x;c.ay=G.y;c.aface=G.k==='perch'?1:(Math.random()<.5?1:-1);c.st='gear';c.pose=pick(G.poses);c.t=rand(28,70);gearUsed(c,G);return}
  if(a==='flee'){c.run=0;if(c.lookBack){c.lookBack=0;c.st='stare';c.t=1.6;c.face=c.x<(catBy('mei')||c).x?1:-1;return}}
  if(a==='raceNext'){raceStep(c);return}
  c.st='rest';c.pose=pick(['sit','groom','loaf','sit']);c.t=c.afterT||rand(3,7)}
@@ -2222,7 +2324,7 @@ function startRace(c){const o=catBy(c.def.id==='tora'?'snow':'tora');if(!o)retur
 function raceStep(c){const n=c.path&&c.path.shift();if(!n){c.run=0;c.path=null;const f=CATS.find(o=>o.st==='race'&&o.target===c);if(f){f.st='rest';f.run=0;f.target=null;finishRace(f)}finishRace(c);return}c.st='walk';c.tx=n.x;c.ty=n.y;c.after='raceNext';c.run=1}
 function finishRace(c){c.run=0;if(c.def.id==='snow'){if(spotFree('bed')&&Math.random()<.4)catGo(c,'bed');else sleepHere(c,30,60)}else{c.st='rest';c.pose='groom';c.t=rand(4,8)}}
 /* ---- memories ---- */
-function memo(id,x,y,info){if(!MEMS[id])return;if(MEMQ.some(m=>m.id===id)||!albumAllows(id))return;MEMQ.push({id,x,y,info})}
+function memo(id,x,y,info){if(!MEMS[id])return;if(MEMQ.some(m=>m.id===id)||!albumAllows(id))return;MEMQ.push({id,x,y,info,room:(info&&info.room)||'main'})}
 /* The frame is built from the subjects of the moment (info.subj: the cats, Jill, the guest…), not from one
    point: a close-up for one subject, wider when there are several, the whole room if that is what it takes.
    Whatever the caption names is inside the picture. */
@@ -2230,7 +2332,7 @@ function memFrame(m){const pts=[{x:m.x,y:m.y}].concat((m.info&&m.info.subj)||[])
  let x0=Math.min(...pts.map(p=>p.x-18)),x1=Math.max(...pts.map(p=>p.x+18)),y0=Math.min(...pts.map(p=>p.y-34)),y1=Math.max(...pts.map(p=>p.y+10));
  let w=Math.max(150,x1-x0),h=Math.max(112,y1-y0);if(w/h>4/3)h=w*3/4;else w=h*4/3;const cx=(x0+x1)/2,cy=(y0+y1)/2-2;
  const W=SV.w/SV.s,H=SV.h/SV.s;w=Math.min(w,W);h=Math.min(h,H);let fx=cx-w/2,fy=cy-h/2;fx=clamp(fx,-SV.ox/SV.s,W-SV.ox/SV.s-w);fy=clamp(fy,-SV.oy/SV.s,H-SV.oy/SV.s-h);return{x:fx,y:fy,w,h}}
-function flushMem(){if(!MEMQ.length)return;for(const m of MEMQ.splice(0)){try{const f=memFrame(m);const sx=(SV.ox+f.x*SV.s)*DPR,sy=(SV.oy+f.y*SV.s)*DPR,sw=f.w*SV.s*DPR,sh=f.h*SV.s*DPR;const cv=mkCanvas(360,270),c=cv.getContext('2d');c.drawImage(sc,sx,sy,sw,sh,0,0,360,270);albumAdd(m.id,cv.toDataURL('image/jpeg',.68),m.info);S.mem=S.mem||{};if(!S.mem[m.id])S.mem[m.id]={day:S.day};FLASH={x:m.x,y:m.y,t:0};sfx.shutter();save()}catch(e){}}}
+function flushMem(){if(!MEMQ.length)return;for(const m of MEMQ.splice(0)){if(m.room!==room)continue;/* the camera only sees the room on screen */try{const f=memFrame(m);const sx=(SV.ox+f.x*SV.s)*DPR,sy=(SV.oy+f.y*SV.s)*DPR,sw=f.w*SV.s*DPR,sh=f.h*SV.s*DPR;const cv=mkCanvas(360,270),c=cv.getContext('2d');c.drawImage(sc,sx,sy,sw,sh,0,0,360,270);albumAdd(m.id,cv.toDataURL('image/jpeg',.68),m.info);S.mem=S.mem||{};if(!S.mem[m.id])S.mem[m.id]={day:S.day};FLASH={x:m.x,y:m.y,t:0};sfx.shutter();save()}catch(e){}}}
 function memChecks(){if(!CATS)return;const T=catBy('tora'),H=catBy('ban'),B=catBy('mei'),Bb=catBy('snow');
  const nm=c=>catName(c.def);const atSide=c=>c&&c.st==='side'&&!c.moving&&(c.slot==='L'||c.slot==='R');if(atSide(T)&&atSide(H)&&T.slot!==H.slot){const a=jillA();memo('sides',a.x,a.y,{a:nm(T),b:nm(H),subj:[T,H]})}
  if(T&&T.st==='side'&&T.sleepy&&!T.moving&&T.t<T.t0-4){const a=jillA();memo('nearby',T.x,T.y,{a:nm(T),subj:[{x:a.x,y:a.y}]})}
@@ -2280,6 +2382,7 @@ function updateCats(dt,now){if(!CATS)initCats();ctime+=dt;RACE_CD-=dt;TOY.amp=Ma
    if(c.t<=0){c.t0=null;if(c.sleepy||Math.random()<.35){c.t=rand(10,22);c.sleepy=c.def.id==='tora'&&Math.random()<.5}else{releaseSpots(c);catDecide(c)}}break}
   case'wary':c.moving=false;c.t-=dt;if(c.warnG)c.face=c.warnG.x>=c.x?1:-1;if(c.t<=0){const r=Math.random();const fp=freePerches();if(r<.5)goJill(c);else if(r<.75&&[2,1,0,6].some(k=>fp.includes(k))){goPerch(c,[2,1,0,6].find(k=>fp.includes(k)))}else{let best=null,bs=-1;for(let i=0;i<6;i++){const p=randFloor();const s=Math.min(...guestPts().map(q=>Math.hypot(p.x-q.x,p.y-q.y)),999);if(s>bs){bs=s;best=p}}catWalk(c,best.x,best.y,'watch')}}break;
   case'hide2':ambushTick(c,dt);break;
+  case'gear':gearTick(c,dt);break;
   case'dash':{c.t-=dt;const b=c.target;if(b){const dx=b.x-c.x,dy=b.y-c.y,d=Math.hypot(dx,dy);if(d>10){const v=150*dt;c.x+=dx/d*Math.min(v,d);c.y+=dy/d*Math.min(v,d);c.face=dx>=0?1:-1;c.moving=true}}if(c.t<=0){c.moving=false;afterScare(c)}break}
   case'race':{c.t-=dt;if(c.wd>0){c.wd-=dt;c.moving=false;c.pose='daze';if(c.target)c.face=c.target.x>=c.x?1:-1;break}const L=c.target;if(!L||c.t<=0||!L.path){c.st='rest';c.run=0;finishRace(c);break}const tx=L.x-L.face*14,ty=L.y+4;const dx=tx-c.x,dy=ty-c.y,d=Math.hypot(dx,dy);if(d>3){const v=122*dt;c.x+=dx/d*Math.min(v,d);c.y+=dy/d*Math.min(v,d);c.face=dx>=0?1:-1;c.moving=true}break}
   case'scr':c.t-=dt;c.sT=(c.sT||0)+dt;if(c.sT>.35){c.sT=0;if(Math.random()<.5)sfx.scratch()}if(c.t<=0){c.x-=4;catDecide(c)}break;
@@ -2825,7 +2928,7 @@ const ROLES={
 const DUTY_N={stove:'爐台',oven:'烤箱',prep:'冷盤台',bar:'咖啡吧',both:'帶位＋點餐',seat:'只帶位',order:'只點餐',clean:'收桌'};
 const CREW_NAMES={chef:['阿德師傅','Marco','小林師傅','阿珠姐','Hugo'],waiter:['小茉','Kai','Nina','阿哲','Momo'],cleaner:['秀琴阿姨','小彤','阿明','Yuki']};
 function crewCount(m,k){if(!R)return;R.st.crew=R.st.crew||{};const c=R.st.crew[m.id]=R.st.crew[m.id]||{};c[k]=(c[k]||0)+1}
-function crewCap(){return[1,2,3,4,6][S.level-1]+(opsLv('room')?2:0)}
+function crewCap(){return[1,2,3,4,6][S.level-1]+(opsLv('room')?2:0)+(projOn('side')?2:0)+(projOn('kext')?2:0)}
 /* a senior employee costs more than a new one by a good margin: LV5 ≈ 2.8× LV1 (chef 240→672, waiter 200→560, cleaner 150→420) */
 function crewWage(m){return Math.round(ROLES[m.role].wage*(1+.45*(m.lv-1)))}
 function crewWages(){return(S.crew||[]).reduce((a,m)=>a+crewWage(m),0)}
@@ -2840,7 +2943,7 @@ function chefLock(m,d){const D=DISH(d);if(!D)return'';if(D.sig||d==='signature')
 function chefHandles(s){const j=s.job;if(!j)return null;const ch=chefFor(s.type);if(!ch)return null;if(j.chef===ch.id)return ch;return ch.lv>=3&&chefCan(ch,j.d)?ch:null}
 function chefDelay(m){return Math.max(.45,1.5-.22*(m.lv-1))}
 function chefScore(m){return[.8,.86,.9,.95,1][m.lv-1]}
-function waiterDelay(m){return Math.max(.3,2.2-.4*(m.lv-1))}
+function waiterDelay(m){return Math.max(.3,2.2-.4*(m.lv-1))*(projOn('pass')?.85:1)}
 function cleanDur(m){return Math.max(.3,1.3-.22*(m.lv-1))}
 function crewStat(m){return m.role==='chef'?`每步 ${chefDelay(m).toFixed(1)} 秒・品質 ${Math.round(chefScore(m)*100)}`:m.role==='waiter'?`反應 ${waiterDelay(m).toFixed(1)} 秒`:`收桌 ${cleanDur(m).toFixed(1)} 秒`}
 /* hash() is unsigned 32-bit: shift with >>> — a signed >> turns half of all ids negative, HAIR[-2] is undefined and the first draw of that employee throws (and with it the whole frame loop) */
@@ -3069,7 +3172,7 @@ for(const ev of['touchend','touchcancel'])window.addEventListener(ev,()=>{if(R&&
    Only the two game canvases: buttons, sheets, inputs and the order strip keep their normal touch behaviour. */
 for(const el of[sc,tc]){el.addEventListener('touchstart',e=>{e.preventDefault()},{passive:false});el.addEventListener('touchmove',e=>{e.preventDefault()},{passive:false})}
 tc.addEventListener('contextmenu',e=>e.preventDefault());
-$('#closePill').addEventListener('click',()=>finishClosing());$('#peekPill').addEventListener('click',()=>{$('#peekPill').hidden=true;screenEl.hidden=false});
+$('#closePill').addEventListener('click',()=>finishClosing());$('#peekPill').addEventListener('click',()=>{$('#peekPill').hidden=true;screenEl.hidden=false;if(phase!=='service'){room='main';forceDraw=true}});
 $('#hPause').addEventListener('click',()=>{audioInit();if(phase==='service'){paused=true;showPause();checkpointSave('pause')}else if(phase!=='title'){openSub('settings')}});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){if(phase==='service'&&!paused){paused=true;showPause()}if(phase==='service'&&R)checkpointSave('hidden')}else{bg=null;DCACHE.clear();audioResume()}});
 /* coming back from another app or from the page cache: caches may be blank, the audio context asleep */
@@ -3142,6 +3245,7 @@ function showSummary(){phase='summary';mainScreen='summary';const s=S.lastSummar
   ${s.photos?`<div class="news">📷 今天留下了 ${s.photos} 張照片 <button class="jmore" data-act="album">看相簿 ›</button></div>`:''}
   <h3>今日任務</h3><div class="card">${s.tasks.map(t=>`<div class="task ${t.done?'done':''}"><span>${t.done?'✓ ':''}${t.txt}</span><small>${t.done?'+'+fmt(t.reward):'未完成'}</small></div>`).join('')}</div>
   ${s.reviews.length?`<h3>今晚的評論</h3><div class="card">${s.reviews.map(r=>`<div class="review"><div class="rs">${starsHTML(r.s)}</div><p>「${r.txt}」</p><small>${r.critic?'神秘美食評論家':r.name}</small></div>`).join('')}</div>`:''}
+  ${goalLadderHTML()}
   ${nextDayNote(s.day+1)?`<div class="news" style="margin-top:14px">明天：${nextDayNote(s.day+1)}</div>`:''}
   <div class="footer"><button class="btn primary big" data-act="toShop">晚上升級餐廳</button></div></div>`);if(s.net>0)sfx.cash()}
 function nextDayNote(D){return{2:'解鎖 <b>拿鐵咖啡</b>',3:'第二口 <b>爐子</b> 到貨，還有 <b>番茄義大利麵</b>',4:'冷盤台與 <b>田園沙拉</b>，以及第一次 <b>Rush Hour</b>',5:'晚上可以開始 <b>裝潢與擴建</b> 了',6:'可以聘請 <b>員工</b>，評論家也可能出現',8:'可以研發 <b>Jill 的招牌菜</b>'}[D]||''}
@@ -3149,7 +3253,7 @@ function nextDayNote(D){return{2:'解鎖 <b>拿鐵咖啡</b>',3:'第二口 <b>�
 let shopTab='kitchen';
 /* the shop belongs to the evening: opened again from the next morning's preparation, it still counts as that evening */
 function shopDay(){return S.phase==='prep'&&phase==='shop'?S.day-1:S.day}
-function shopTabs(){const D=shopDay();return[{k:'tables',n:'桌椅與擴建',on:true},{k:'kitchen',n:'廚房設備',on:D>=2},{k:'menu',n:'菜單研發',on:D>=2},{k:'decor',n:'裝潢',on:D>=4},{k:'staff',n:'員工',on:D>=4},{k:'sig',n:'招牌菜',on:D>=7}]}
+function shopTabs(){const D=shopDay();return[{k:'tables',n:'桌椅與擴建',on:true},{k:'kitchen',n:'廚房設備',on:D>=2},{k:'menu',n:'菜單研發',on:D>=2},{k:'decor',n:'裝潢',on:D>=4},{k:'projects',n:'工程',on:D>=3},{k:'cats',n:'貓的東西',on:D>=4},{k:'staff',n:'員工',on:D>=4},{k:'sig',n:'招牌菜',on:D>=7}]}
 function showShop(){phase='shop';mainScreen='shop';R=null;rdAutoUnlock();IDLE=makeIdle();layoutAll();hud(true);renderTickets();const tabs=shopTabs();if(!tabs.find(t=>t.k===shopTab&&t.on))shopTab='tables';
  let body='';const money=S.money;const btn=(cost,act,extra,label)=>`<button class="btn sm ${money>=cost?'primary':''}" data-act="${act}" ${extra||''} ${money>=cost?'':'disabled'}>${label||'購買'} ${fmt(cost)}</button>`;
  if(shopTab==='tables'){const cap=tableCap();const next=S.tables<cap?TABLE_COST[S.tables]:null;
@@ -3164,8 +3268,18 @@ function showShop(){phase='shop';mainScreen='shop';R=null;rdAutoUnlock();IDLE=ma
   body+=list.length?list.map(d=>{const D=DISHES[d];const lvOk=S.level>=D.lv;const ovenOk=stationOk(d);return`<div class="item"><img alt="" src="${dishURL(d,'P')}"><div class="nm">${D.n} <span class="muted" style="font-size:11.5px;font-weight:600">${CAT_N[D.cat]}</span></div><div class="d">售價 ${fmt(D.price)} · 成本 ${fmt(D.cost)} · ${ST_N[D.st]} · 難度 ${'●'.repeat(D.diff)}<br>${(()=>{const pr=(S.rdProg||{})[d]||0;const K=dishKeys(d);const lead=K.find(i=>['base','drink','sweet'].includes(labProfile(i).d))||K[0];return`研究進度 <span class="dots">${'●'.repeat(pr)}${'○'.repeat(Math.max(0,3-pr))}</span> · ${K.length} 種食材，主角是「${ING[lead].n}」${pr>=2?`，另外要配${K.filter(i=>i!==lead).map(i=>DIR_N[labProfile(i).d]).join('和')}`:''}`})()}</div><div class="act">${!lvOk?`<span class="lock">需要擴建到 ${LEVELS[D.lv-1].n}</span>`:!ovenOk?`<span class="lock">需要先購買${ST_N[D.st]}</span>`:btn(D.rd,'rd',`data-d="${d}"`,'直接買食譜')}</div></div>`}).join(''):'<p class="muted">所有料理都研發完成了。</p>';
   body+=`<p class="muted" style="font-size:12px;margin-top:10px">研發後的料理可以在開店前加入菜單。菜單上限：${menuCap()} 道。</p>`}
  if(shopTab==='decor'){body+=`<div class="nm" style="font-weight:800;font-size:15px;margin:0 0 2px">店裡的樣子</div><p class="muted" style="font-size:12px;margin:0 0 6px">地板、牆和吧台的顏色。買過的隨時可以換回來；擴建不會改變它。</p><div class="themes">${Object.keys(THEMES).map(k=>{const t=THEMES[k];const own=!!(S.themes&&S.themes[k])||k==='classic';const on=(S.theme||'classic')===k;const lvOk=S.level>=2||k==='classic';return`<button class="theme ${on?'on':''}" data-act="theme" data-k="${k}" ${!lvOk?'disabled':''}><i style="background:linear-gradient(${t.wall0} 0 42%,${t.base} 42% 50%,${t.floor} 50% 100%)"><b style="background:${t.c0}"></b></i><span>${t.n}</span><small>${on?'現在':own?'已擁有':!lvOk?'Bistro 起':fmt(t.cost)}</small></button>`}).join('')}</div><div class="nm" style="font-weight:800;font-size:15px;margin:14px 0 2px">裝潢</div>`+DECOR.map(Dc=>{const t=S.decor[Dc.k]||0;const max=Dc.tiers.length;const cost=t<max?Dc.tiers[t]:null;const needLv=Dc.tierLv?Dc.tierLv[Math.min(t,max-1)]:Dc.lv;const lvOk=S.level>=needLv;return`<div class="item"><img alt="" src="${iconURL(Dc.k==='bar'?'barc':Dc.k,t)}"><div class="nm">${Dc.n} ${max>1?`<span class="pips">${Dc.tiers.map((_,i)=>`<i class="${i<t?'on':''}"></i>`).join('')}</span>`:t?'<span class="tier t1">已擁有</span>':''}</div><div class="d">${Dc.d} 氛圍 +${Dc.amb}</div><div class="act">${cost==null?'<span class="muted">已擁有全部</span>':!lvOk?`<span class="lock">需要擴建到 ${LEVELS[needLv-1].n}</span>`:Dc.k==='sofa'&&S.tables<(t+1)*2?`<span class="lock">需要至少 ${(t+1)*2} 張桌子</span>`:btn(cost,'buyDecor',`data-k="${Dc.k}"`)}</div></div>`}).join('');body+=`<p class="muted" style="font-size:12px;margin-top:10px">目前氛圍 ${ambience()}：客人耐心與滿意度都會提升。買完上方就能看到店裡變化。</p>`}
+ if(shopTab==='projects'){body+=`<div class="nm" style="font-weight:800;font-size:15px;margin:0 0 2px">大工程</div><p class="muted" style="font-size:12px;margin:0 0 6px">會把店變成另一個樣子的東西。買了以後，第二天開店就看得到。</p>`;
+  for(const P of PROJECTS){const on=projOn(P.k);const ok=S.level>=P.lv;const pct=Math.min(100,Math.round(S.money/P.cost*100));
+   body+=`<div class="item ${on?'done':''}"><img alt="" src="${iconURL(P.ic)}"><div class="nm">${P.n} ${on?'<span class="tier t1">已完工</span>':''}</div><div class="d">${on?P.done:P.d}</div>${on?'':`<div class="act">${ok?btn(P.cost,'buyProject',`data-k="${P.k}"`,'開工'):`<span class="muted">需要擴建到 ${LEVELS[P.lv-1].n}</span>`}${!on&&ok&&S.money<P.cost?`<span class="muted" style="font-size:11.5px">還差 ${fmt(P.cost-S.money)}</span>`:''}</div>${!on&&ok&&S.money<P.cost?`<div class="gb"><i style="width:${pct}%"></i></div>`:''}`}</div>`}
+  if(projOn('side')){const n=S.sideTables||0;const c=n<6?SIDE_TABLE_COST[n]:null;body+=`<div class="item"><img alt="" src="${iconURL('table')}"><div class="nm">側廳的桌子 <span class="muted" style="font-weight:600;font-size:12px">${n} / 6 張</span></div><div class="d">側廳可以放 6 張桌，前 2 張是四人卡座。</div><div class="act">${c!=null?btn(c,'buySideTable','','加一張'):'<span class="muted">側廳已經滿了</span>'}</div></div>`}
+  if(projOn('terrace')){const n=S.frontTables||0;const c=n<3?FRONT_TABLE_COST[n]:null;body+=`<div class="item"><img alt="" src="${iconURL('terrace')}"><div class="nm">露天桌 <span class="muted" style="font-weight:600;font-size:12px">${n} / 3 張</span></div><div class="d">陽傘下的雙人桌。下雨的日子沒有人想坐外面。</div><div class="act">${c!=null?btn(c,'buyFrontTable','','加一張'):'<span class="muted">人行道放不下更多了</span>'}</div></div>`}
+  body+=`<div class="nm" style="font-weight:800;font-size:15px;margin:14px 0 2px">店門口</div><p class="muted" style="font-size:12px;margin:0 0 6px">從街上看過來的樣子。到「店門口」那一格就看得到。</p>`;
+  for(const E of EXTERIOR){const on=extOn(E.k);const ok=S.level>=E.lv;body+=`<div class="item ${on?'done':''}"><img alt="" src="${iconURL(E.ic)}"><div class="nm">${E.n}${on&&E.styles?` <span class="muted" style="font-weight:600;font-size:12px">${E.styles[(S.ext[E.k]||1)-1]}</span>`:''}</div><div class="d">${E.d}</div><div class="act">${on?(E.styles?`<button class="btn sm" data-act="extStyle" data-k="${E.k}">換顏色</button>`:'<span class="tier t1">裝好了</span>'):ok?btn(E.cost,'buyExt',`data-k="${E.k}"`):`<span class="muted">需要擴建到 ${LEVELS[E.lv-1].n}</span>`}</div></div>`}}
+ if(shopTab==='cats'){body+=`<div class="nm" style="font-weight:800;font-size:15px;margin:0 0 2px">貓的東西</div><p class="muted" style="font-size:12px;margin:0 0 6px">買給牠們的。誰會用、怎麼用，牠們自己決定。</p>`;
+  for(const G of CATGEAR){const on=gearOn(G.k);const okRoom=!G.need||projOn(G.need);const ok=okRoom&&S.level>=(G.lv||1);const used=Object.keys((S.gearUse||{})[G.k]||{});
+   body+=`<div class="item ${on?'done':''}"><img alt="" src="${iconURL(G.ic)}"><div class="nm">${G.n} ${on?'<span class="tier t1">已擺好</span>':''}${G.room==='side'?' <span class="muted" style="font-weight:600;font-size:12px">側廳</span>':''}</div><div class="d">${G.d}${on&&used.length?`<br><b>用過的：</b>${used.map(id=>catName(CAT_DEF.find(x=>x.id===id))).join('、')}`:''}</div>${on?'':`<div class="act">${ok?btn(G.cost,'buyGear',`data-k="${G.k}"`):okRoom?`<span class="muted">需要擴建到 ${LEVELS[(G.lv||1)-1].n}</span>`:'<span class="muted">要先有側廳</span>'}</div>`}</div>`}}
  if(shopTab==='staff'){const crew=S.crew||[];const cap=crewCap();
-  body+=`<p class="muted" style="font-size:12.5px;margin:0 0 6px">員工 ${crew.length}/${cap} 人・每日薪資 ${fmt(crewWages())}。${LEVELS[S.level]?'擴建餐廳可以聘更多人。':opsLv('room')?'這是最多的人數了。':'「後場休息室」（桌椅與擴建）可以再多 2 位。'}</p>`;
+  body+=`<p class="muted" style="font-size:12.5px;margin:0 0 6px">員工 ${crew.length}/${cap} 人・每日薪資 ${fmt(crewWages())}。${LEVELS[S.level]?'擴建餐廳可以聘更多人。':[!opsLv('room')?'「後場休息室」（桌椅與擴建）':'',!projOn('side')?'「側廳」（工程）':'',!projOn('kext')?'「廚房擴建」（工程）':''].filter(Boolean).length?[!opsLv('room')?'「後場休息室」（桌椅與擴建）':'',!projOn('side')?'「側廳」（工程）':'',!projOn('kext')?'「廚房擴建」（工程）':''].filter(Boolean).join('、')+' 各可以再多 2 位。':'這是最多的人數了。'}</p>`;
   body+=crew.map(m=>{const R0=ROLES[m.role];const up=m.lv<5?R0.up*m.lv:null;return`<div class="item"><img alt="" src="${iconURL(m.role)}"><div class="nm">${m.name} <span class="tier t1">${R0.n}</span> <span class="pips">${[1,2,3,4,5].map(i=>`<i class="${i<=m.lv?'on':''}"></i>`).join('')}</span></div><div class="d">職責：<b>${m.role==='waiter'?dutyLabel(m):DUTY_N[m.duty]}</b>・日薪 ${fmt(crewWage(m))}・${crewStat(m)}</div>${m.role==='chef'?`<div class="cap">${(()=>{const list=S.unlocked.filter(d=>DISH(d).st===m.duty).concat(S.signature&&m.duty==='stove'?['signature']:[]);if(!list.length)return`<span class="muted">${ST_N[m.duty]}目前沒有料理</span>`;return list.map(d=>{const lock=chefLock(m,d);return`<span class="${lock?'no':'ok'}">${lock?'🔒':'✓'} ${dishName(d)}${lock?` <small>${lock}</small>`:''}</span>`}).join('')})()}</div>`:m.role==='waiter'?`<div class="cap duties">${[['seat','帶位',1],['order','點餐',1],['serve','上菜',2],['check','結帳',3],['clean','收桌',1]].map(([k,n,lv])=>{const d=waiterDuties(m);const locked=m.lv<lv;return`<button class="dt ${locked?'no':d[k]?'on':''}" data-act="dutyT" data-k="${m.id}" data-d="${k}" ${locked?'disabled':''}>${locked?'🔒':d[k]?'✓':'○'} ${n}${locked?` <small>LV${lv}</small>`:''}</button>`}).join('')}</div>`:`<div class="cap"><span class="ok">✓ 客人走後收桌</span></div>`}<div class="act">${m.role==='chef'&&R0.duties.length>1?`<button class="btn sm" data-act="duty" data-k="${m.id}">換工作站</button>`:''}${up!=null?btn(up,'crewUp',`data-k="${m.id}"`,'訓練升級'):'<span class="muted">已滿級</span>'}<button class="btn sm danger" data-act="crewFire" data-k="${m.id}">解雇</button></div></div>`}).join('');
   body+=`<div class="nm" style="font-weight:800;font-size:15px;margin:14px 0 2px">招募</div>`+Object.keys(ROLES).map(r=>{const R0=ROLES[r];return`<div class="item"><img alt="" src="${iconURL(r)}"><div class="nm">${R0.n}</div><div class="d">${R0.d} 日薪 ${fmt(R0.wage)} 起，LV5 ${fmt(Math.round(R0.wage*2.8))}。</div><div class="act">${crew.length>=cap?`<span class="lock">${LEVELS[S.level]?'人數已滿，擴建後可再聘':opsLv('room')?'人數已滿':'人數已滿，後場休息室可以再多 2 位'}</span>`:btn(R0.hire,'hire',`data-k="${r}"`,'聘請')}</div></div>`}).join('')}
  if(shopTab==='sig'){if(S.signature)body+=`<div class="sig"><img alt="" src="${dishURL('signature','P')}"><div><div class="st">★ CHEF JILL'S SIGNATURE ★</div><b>${S.signature.name}</b><small>${fmt(priceOf('signature'))} · ${Object.keys(SIG).map(k=>SIG[k][S.signature[k]].n).join('・')}</small></div></div><p class="muted" style="font-size:12.5px">招牌菜永遠在菜單最上方，有些客人會專程為它而來。可以花 $800 重新調整配方。</p>${btn(800,'sigOpen','','重新設計')}`;
@@ -3256,7 +3370,8 @@ function openSub(k){if(k==='book')showBook();else if(k==='settings'){resetStep=0
 function closeSub(){sub=null;if(phase==='service'){if(paused){showPause();return}hideScreen();return}if(mainScreen==='title')showTitle();else if(mainScreen==='prep')showPrep();else if(mainScreen==='shop')showShop();else if(mainScreen==='summary')showSummary()}
 
 let startWarned=false,discardArmed=false;
-screenEl.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;const a=b.dataset.act,d=b.dataset.d,k=b.dataset.k;audioInit();
+screenEl.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;audioInit();doAct(b.dataset.act,b.dataset.d,b.dataset.k,b)});
+function doAct(a,d,k,b){
  switch(a){
  case'open':sfx.door();if(S.checkpoint&&S.checkpoint.day===S.day)resumeCheckpoint();else goMain();break;
  case'openFresh':sfx.door();clearCheckpoint();save();goMain();break;
@@ -3274,6 +3389,14 @@ screenEl.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(
  case'toPrep':showPrep();break;
  case'tab':shopTab=k;sfx.tap();showShop();break;
  case'buyTable':{const c=TABLE_COST[S.tables];if(S.money>=c&&S.tables<tableCap()){S.money-=c;S.tables++;sfx.buy();toast('新桌子搬進來了！');save();IDLE=null;showShop();shopAfterBuy()}break}
+ case'buySideTable':{const n=S.sideTables||0;const c=SIDE_TABLE_COST[n];if(projOn('side')&&c!=null&&S.money>=c){S.money-=c;S.sideTables=n+1;sfx.buy();toast('側廳多了一張桌子');save();IDLE=null;keepScroll(showShop);shopAfterBuy()}break}
+ case'buyFrontTable':{const n=S.frontTables||0;const c=FRONT_TABLE_COST[n];if(projOn('terrace')&&c!=null&&S.money>=c){S.money-=c;S.frontTables=n+1;sfx.buy();toast('陽傘下多了一張桌子');save();IDLE=null;keepScroll(showShop);shopAfterBuy()}break}
+ case'buyProject':{const P=PROJECTS.find(x=>x.k===k);if(!P||projOn(P.k)||S.money<P.cost||S.level<P.lv)break;S.money-=P.cost;S.rooms[P.k]=1;S.newRooms[P.k]=S.day;S.reveal={k:P.k,day:S.day};if(P.k==='side')S.sideTables=Math.max(S.sideTables||0,2);if(P.k==='terrace')S.frontTables=Math.max(S.frontTables||0,1);ach('project');if(PROJECTS.every(x=>projOn(x.k)))ach('allprojects');save();IDLE=null;bg=null;for(const kk in BGC)delete BGC[kk];projectReveal(P);break}
+ case'buyExt':{const E=EXTERIOR.find(x=>x.k===k);if(!E||extOn(E.k)||S.money<E.cost||S.level<E.lv)break;S.money-=E.cost;S.ext[E.k]=1;sfx.buy();toast(`${E.n}：裝好了，到「店門口」看看`);if(EXTERIOR.every(x=>extOn(x.k)))ach('storefront');save();for(const kk in BGC)delete BGC[kk];keepScroll(showShop);shopAfterBuy();break}
+ case'extStyle':{const E=EXTERIOR.find(x=>x.k===k);if(!E||!E.styles||!extOn(E.k))break;S.ext[E.k]=(S.ext[E.k]%E.styles.length)+1;sfx.tap();save();for(const kk in BGC)delete BGC[kk];keepScroll(showShop);break}
+ case'buyGear':{const G=CATGEAR.find(x=>x.k===k);if(!G||gearOn(G.k)||S.money<G.cost||(G.need&&!projOn(G.need))||S.level<(G.lv||1))break;S.money-=G.cost;S.gear[G.k]=S.day;sfx.buy();toast(`${G.n}：擺好了。看牠們什麼時候發現。`);if(CATGEAR.every(x=>gearOn(x.k)))ach('catgear');save();IDLE=null;bg=null;for(const kk in BGC)delete BGC[kk];keepScroll(showShop);shopAfterBuy();break}
+ case'revealPeek':{const P=PROJECTS.find(x=>x.k===k);hideReveal();if(P){room=P.room;forceDraw=true;screenEl.hidden=true;$('#peekPill').hidden=false;banner(P.n,P.done,'gold')}break}
+ case'revealClose':hideReveal();showShop();shopAfterBuy();break;
  case'expand':{const nl=LEVELS[S.level];if(nl&&S.money>=nl.cost){S.money-=nl.cost;S.level++;if(S.level===2)ach('bistro');sfx.buy();banner(LV().n,'擴建完成！');if(S.level===5)ach('jill');S.newRoom=S.day;save();bg=null;showShop();shopAfterBuy()}break}
  case'buyEq':{const lv=S.eq[k]||0;const E=EQUIP.find(x=>x.k===k);const c=E.cost[lv];if(lv<5&&S.money>=c){S.money-=c;S.eq[k]=lv+1;sfx.buy();toast(`${E.n} ${lv?'升級':'購買'}完成：LV${lv+1}`);save();IDLE=null;layoutAll();keepScroll(showShop);shopAfterBuy()}break}
  case'rd':{const D=DISHES[d];if(S.money>=D.rd){S.money-=D.rd;unlockDish(d);sfx.buy();toast(`研發成功：${D.n}！${S.menu.includes(d)?'已加入菜單':'菜單已滿，記得在開店前調整'}`);save();keepScroll(showShop);shopAfterBuy()}break}
@@ -3326,8 +3449,15 @@ screenEl.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(
  case'resetNo':resetStep=0;showSettings();break;
  case'reset2':{S=newState();photoClear();try{localStorage.removeItem(KEY)}catch(e){}save();R=null;phase='title';ICACHE.clear();DCACHE.clear();IDLE=null;bg=null;resetStep=0;sub=null;toast('已重置，一切重新開始');showTitle();break}
  case'resume':paused=false;hideScreen();break;
- }});
+ }}
 screenEl.addEventListener('input',e=>{if(e.target.dataset&&e.target.dataset.cat){S.catNames=S.catNames||{};S.catNames[e.target.dataset.cat]=e.target.value.trim().slice(0,8);save();return}if(e.target.id==='sigName'&&sigDraft)sigDraft.name=e.target.value});
+/* a big purchase is an event: the dust of the work, then the reveal — what changed, what it opens up, who said what */
+function projectReveal(P){let el=$('#reveal');if(!el){el=document.createElement('div');el.id='reveal';screenEl.parentNode.appendChild(el)}
+ el.hidden=false;el.className='work';el.innerHTML=`<div class="rv"><div class="dust">${Array.from({length:14},(_,i)=>`<i style="left:${8+i*6.5}%;animation-delay:${(i*137%700)/1000}s"></i>`).join('')}</div><b>施工中…</b><span>${P.n}</span></div>`;sfx.buy();
+ const T=setTimeout(()=>{if(!$('#reveal')||el.hidden)return;el.className='done';sfx.ding();
+  el.innerHTML=`<div class="rv card"><div class="eyebrow">完工</div><h2>${P.n}</h2><p class="done">${P.done}</p><p class="say">Jill：「${P.jill}」</p>${P.react?`<p class="react">${P.react}</p>`:''}${P.unlock&&P.unlock.length?`<div class="unl"><b>現在可以</b>${P.unlock.map(u=>`<span>${u}</span>`).join('')}</div>`:''}<div class="btns"><button class="btn primary" data-act="revealPeek" data-k="${P.k}">去看看 ›</button><button class="btn" data-act="revealClose">繼續買東西</button></div></div>`},1500);
+ el.onclick=e=>{const b=e.target.closest('[data-act]');if(!b)return;clearTimeout(T);doAct(b.dataset.act,b.dataset.d,b.dataset.k,b)}}
+function hideReveal(){const el=$('#reveal');if(el){el.hidden=true;el.innerHTML=''}}
 function keepScroll(fn){const sh=screenEl.querySelector('.sheet');const top=sh?sh.scrollTop:0;fn();const s2=screenEl.querySelector('.sheet');if(s2)s2.scrollTop=top}
 
 /* ================= loop ================= */

@@ -441,3 +441,19 @@ input.txt{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(
 #regcard img{width:46px;height:46px;border-radius:50%;background:#F3E7D2;flex:none}
 #regcard b{font-size:14px}
 #regcard p{margin:2px 0 0;font-size:12px;line-height:1.45;color:var(--ink2)}
+
+/* 2.0: the money ladder */
+#roomTabs button.new b.nw{background:#5E8F4E;color:#fff;font-size:8px;letter-spacing:.04em;padding:0 4px;animation:tabpulse 1.4s ease-in-out infinite}
+.item.done{opacity:.85}.item .gb{grid-column:2/-1;height:5px;border-radius:3px;background:rgba(0,0,0,.08);margin-top:4px;overflow:hidden}.item .gb i{display:block;height:100%;background:linear-gradient(90deg,#C99A45,#E6C27A)}
+.goals .goal{padding:7px 0;border-bottom:1px solid rgba(0,0,0,.06)}.goals .goal:last-child{border-bottom:0}.goals .gt{display:flex;justify-content:space-between;align-items:baseline;font-weight:800}.goals .gt small{color:var(--ink2);font-weight:600;font-size:11px}
+.goals .gb{height:6px;border-radius:3px;background:rgba(0,0,0,.08);margin:5px 0 3px;overflow:hidden}.goals .gb i{display:block;height:100%;background:linear-gradient(90deg,#C99A45,#E6C27A)}.goals .gm{font-size:11.5px;color:var(--ink2)}
+#reveal{position:absolute;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;background:rgba(12,10,8,.72);padding:16px}
+#reveal .rv{position:relative;text-align:center;color:var(--cream)}#reveal.work .rv b{display:block;font-family:var(--disp);font-weight:400;font-size:26px;letter-spacing:.08em}#reveal.work .rv span{display:block;margin-top:6px;font-size:13px;opacity:.8}
+#reveal .dust{position:absolute;left:-40px;right:-40px;top:-90px;height:80px;pointer-events:none}#reveal .dust i{position:absolute;bottom:0;width:10px;height:10px;border-radius:50%;background:rgba(230,210,180,.5);animation:dust 1.3s ease-out infinite}
+@keyframes dust{0%{transform:translateY(20px) scale(.4);opacity:0}30%{opacity:.9}100%{transform:translateY(-70px) scale(1.6);opacity:0}}
+#reveal .rv.card{background:var(--paper);color:var(--ink);border-radius:16px;padding:18px 18px 14px;max-width:340px;width:100%;box-shadow:0 16px 40px rgba(0,0,0,.45);animation:pop .35s ease}
+@keyframes pop{0%{transform:scale(.85);opacity:0}100%{transform:scale(1);opacity:1}}
+#reveal .rv.card h2{margin:2px 0 8px;font-family:var(--disp);font-weight:400;font-size:24px}#reveal .rv.card p{margin:4px 0;font-size:13.5px;line-height:1.45}#reveal .rv.card p.say{color:#8E6422;font-weight:700}#reveal .rv.card p.react{color:var(--ink2);font-size:12.5px}
+#reveal .unl{margin:10px 0 4px;display:flex;flex-wrap:wrap;gap:6px;justify-content:center;align-items:center}#reveal .unl b{width:100%;font-size:11px;color:var(--ink2);letter-spacing:.08em}#reveal .unl span{background:rgba(201,154,69,.18);border:1px solid rgba(201,154,69,.5);border-radius:999px;padding:3px 9px;font-size:12px;font-weight:700}
+#reveal .btns{display:flex;gap:8px;justify-content:center;margin-top:12px}
+@media (prefers-reduced-motion:reduce){#reveal .dust i,#roomTabs button.new b.nw{animation:none}}

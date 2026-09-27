@@ -620,11 +620,14 @@ def touch_controls(b, port, target):
         g.ev("(()=>{for(const t of R.tables)if(tableActionable(t)&&!jillTargets(t.i))tapTable(t);for(let i=0;i<15;i++)__tick(1000/30)})()")
     check(g.ev("R.tickets.length>0"), 'no order ticket appeared')
     si = g.ev("R.slots.findIndex(s=>s.type==='stove')")
-    rx, ry = g.ev(f"(()=>{{const r=kitchenRects(R.slots)[{si}];return[r.x+r.w/2,r.y+r.h/2]}})()")
+    # 2.0: the stations live in the kitchen room; a tap on the burner starts the cooking there
+    g.ev("setRoom('kitchen')"); g.ev("__tick(1000/30)")
+    rx, ry = g.ev(f"(()=>{{const h=slotHome(R.slots[{si}]);return[h.x,h.y-8]}})()")
     tap(rx, ry)
     check(g.ev(f"!!R.slots[{si}].job && R.panel===true"), 'tapping the stove did not start cooking / open the panel')
     g.ev("__tick(1000/30)")
     check(g.ev("!$('#trayWrap').hidden"), 'kitchen panel not visible')
+    g.ev("setRoom('main')"); g.ev("__tick(1000/30)")
     # 3) press the ingredient the recipe asks for, on the kitchen-panel canvas
     before = g.ev(f"R.slots[{si}].job.adds.length")
     want = g.ev(f"R.slots[{si}].job.step.t==='add'?R.slots[{si}].job.step.left[0]:null")
@@ -967,6 +970,8 @@ def waiting_bench(b, port, target):
     g.click('[data-act=open]'); start_day(g)
     g.ev("__botUntil('R.t>8',3000,1/30)")
     # a cat takes the first place, then every table is dirty and three parties arrive
+    # 2.0: guests walk in from the street, so a party still on its way would join the queue — take it out of the picture
+    g.ev("R.groups=R.groups.filter(g=>g.state!=='arrive')")
     g.ev(r"""(()=>{for(const t of R.tables)t.dirty=true;window.__noClean=true;const A=window.__act;window.__act=function(){if(window.__noClean)for(const t of R.tables)if(!t.group)t.dirty=true;return A.apply(this,arguments)};
       const c=CATS.find(c=>c.def.id==='mei');releaseSpots(c);if(c.perch>=0){perchOcc[c.perch]=null;c.perch=-1}OCC.bench0=c;c.benchI=0;c.st='bench';c.pose='loaf';c.face=1;c.t=200;c.x=BENCH.x+2;c.y=BENCH.seats[0]-3;
       spawn({type:'office',size:2});spawn({type:'regular',reg:'dylan',size:1});spawn({type:'student',size:4})})()""")
@@ -990,7 +995,7 @@ def waiting_bench(b, port, target):
     check(jumps['first'] and jumps['first'] != 'Dylan', f'the party that arrived first should be seated first: {jumps}')
     check(g.ev("CATS.find(c=>c.def.id==='mei').st") in ('bench', 'jump', 'walk', 'rest'), 'the cat on the bench got stuck')
     # a full bench with a cat on it is never a deadlock: a party keeps a place or leaves through the normal patience rules
-    check(g.ev("queued().every(q=>q.spot)"), 'a waiting party lost its place')
+    check(g.ev("queued().filter(q=>q.state==='queue').every(q=>q.spot)"), 'a waiting party lost its place')   # (a party still walking in from the street has no place yet)
     check(not g.errors, g.errors)
     g.close()
 
@@ -1012,7 +1017,7 @@ def dylan_pays_tidies_and_is_not_staff(b, port, target):
     check(r['dTip'] > r['oTip'] and r['dTip'] <= r['oTip'] * 1.5 + 2, f'Dylan tips somewhat more, not absurdly more: {r}')
     check(r['dBus'] and not r['dDirty'] and r['oDirty'], f'Dylan should clear his own table, the other guest not: {r}')
     check(abs(r['dTarget'][0] - (g.ev("PASS.x") + 18)) < 1, f'he should walk to the pass first: {r}')
-    walk = g.ev(r"""(()=>{const a=R.groups.find(g=>g.reg==='dylan');let atPass=false,jumps=0;let px=a.x,py=a.y;for(let i=0;i<900&&!a.gone;i++){update(1/30);updateCats(1/30,0);if(Math.hypot(a.x-px,a.y-py)>78/30+1)jumps++;px=a.x;py=a.y;if(!a.bus&&!atPass)atPass=i}return{gone:a.gone,atPass,jumps,tidy:S.dylan.clues.tidy||0}})()""")
+    walk = g.ev(r"""(()=>{const a=R.groups.find(g=>g.reg==='dylan');let atPass=false,jumps=0;let px=a.x,py=a.y,pr=a.room;for(let i=0;i<900&&!a.gone;i++){update(1/30);updateCats(1/30,0);if(a.room===pr&&Math.hypot(a.x-px,a.y-py)>78/30+1)jumps++;px=a.x;py=a.y;pr=a.room;if(!a.bus&&!atPass)atPass=i}return{gone:a.gone,atPass,jumps,tidy:S.dylan.clues.tidy||0}})()""")
     check(walk['gone'] and walk['atPass'] and walk['jumps'] == 0, f'Dylan should walk plate->pass->door: {walk}')
     check(walk['tidy'] >= 1, 'clearing his table should count as a quiet clue')
     # never staff
