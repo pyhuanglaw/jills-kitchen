@@ -2252,6 +2252,7 @@ function drawKitchenRoom(c,now,dusk,V,X0,XW,TOP,list){const E=S.eq;const LHk=LH;
  list.push({y:KY.passTop+KY.passH+KY.passFace+1,f:()=>drawPass(c,now,V)});
  {const {x,y,w,h}=KR.fridge;list.push({y:y+h,f:()=>drawKFridge(c,now,x,y,w,h)});if(S.rooms&&S.rooms.cooler){const k=KR.cooler;list.push({y:k.y+k.h,f:()=>drawCooler(c,now,k)})}}
  if(R&&R.ck)for(const m of S.crew||[]){if(m.role!=='chef')continue;const a=R.ck[m.id];if(!a)continue;list.push({y:a.y,f:()=>drawCook(c,m,a,now)})}
+ else{/* before and after service the cooks are at their places, wiping down */let i=0;for(const m of S.crew||[]){if(m.role!=='chef')continue;const h=homeSpot(m,i++);const a={x:h.x,y:h.y,face:1,step:0,moving:false,beat:{kind:'idle',x:h.x,y:h.y}};list.push({y:a.y,f:()=>drawCook(c,m,a,now)})}}
  const J=V.jill;if(R&&(J.room||'main')==='main'&&Math.hypot(J.x-PASS.x,J.y-PASS.y)<30){
   const ms=R.slots.find(s0=>s0.job&&!s0.cook&&s0.job.step&&s0.job.step.t!=='wait');
   if(ms){const sp=stepSpot(ms);const k=ms.job.step;list.push({y:sp.cy,f:()=>{const bob=Math.abs(Math.sin(now*9))*-1.2;drawPerson(c,sp.cx,sp.cy,JILL_LOOK,{jill:true,me:true,tall:true,s:1.1,mood:'happy',expr:'focus',bob,blink:Math.sin(now*1.7)>.985,hat:true});if(k.t==='work'&&k.board)drawHandKnife(c,sp.cx,sp.cy,1,now);nameTag(c,sp.cx,sp.cy-68,'Jill')}})}
