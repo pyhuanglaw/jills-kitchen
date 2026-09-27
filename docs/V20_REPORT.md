@@ -33,6 +33,8 @@
 - **Grown-restaurant pacing**: demand is capped at what the tables can turn over (grown restaurants only), the rating is judged
   over more visits in a bigger place, full-house departures are toasted once per 40 s with a count, the prep screen warns when
   tables outnumber what the waiters can cover. Guests remark on the new rooms; a one-time 2.0 news item on the prep screen.
+- A second cook of the same duty is a real second pair of hands: the cook who starts a dish keeps it (his own speed and
+  quality), and free burners are shared between cooks of one duty (the kitchen expansion's +2 crew makes this the natural hire).
 - 7 new achievements (67 total), 4 new album moments, new shop icons; an A-frame chalkboard by the counter with today's
   recommendation; the saving goal as one line on the prep screen; the 2.0 news item once.
 
@@ -90,7 +92,6 @@
 
 ## 8. Deferred (honest list)
 - Chef specials / signature evolution (food progression beyond the existing 22 dishes + signature) — not built.
-- A second cook of the same duty only helps through the expansion's extra burners (the older shared-line behaviour).
 - Cats do not visit the kitchen; the dining room holds one cat piece (the box) and the big tree, the rest live in the side room.
 - The dining room's arch to the side room sits at the right end of the back wall (mostly off-screen on phones).
 - Desktop is still the phone column (540px); a landscape layout for Steam is future work.

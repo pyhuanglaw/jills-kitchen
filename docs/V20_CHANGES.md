@@ -35,6 +35,8 @@ Checkpoints on `master`: `v20-wip-1` (rooms + the kitchen line), `v20-wip-2` (mo
 - Taps: a burner/board/door with a job opens its tray; an idle one only answers on release (a swipe from it still works);
   the fridge/cold room open the stock panel; the door returns to the dining room.
 - Tools in hand: knife at the board, spoon at the pot, bottle/shaker for pours and doses, the plate carried to the pass.
+- Two cooks of one duty: `chefHandles` keeps a dish with the cook who started it; `crewUpd` gives each cook of a duty an
+  equal share of the free burners, so a second stove chef works in parallel instead of watching the first.
 
 ## 3. The money ladder (data-driven: `PROJECTS`, `EXTERIOR`, `CATGEAR`, `SIDE_TABLE_COST`, `FRONT_TABLE_COST`)
 - Large: 露天座位 25k (3 tables, +5% pull, +1 queue), 大出菜口 15k (waiters −15% reaction, wider pass, 11 plates),
@@ -90,7 +92,6 @@ Checkpoints on `master`: `v20-wip-1` (rooms + the kitchen line), `v20-wip-2` (mo
   frame of a room after a change rebuilds its cached background (100–240 ms once).
 
 ## 10. Known limits / deferred
-- Chefs of the same duty share the line's jobs (the older behaviour); a second stove chef helps only through the extra
-  burners of the expansion. Cats do not visit the kitchen. The side-room arch in the dining room sits at the right end
+- Cats do not visit the kitchen. The side-room arch in the dining room sits at the right end
   of the back wall, mostly off-screen on phones (the tab strip is the primary navigation). No real-device (iPhone)
   verification in this session — see the report.
