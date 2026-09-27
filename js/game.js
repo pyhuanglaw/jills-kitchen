@@ -107,6 +107,7 @@ const TYPES={
  critic:{n:'神秘客',pat:1.1,eat:1.2,tip:.1,sens:.4,qw:.85,budget:1.5,read:1.3,pref:{},pD:.4,pS:.4},
  blogger:{n:'部落客',pat:1,eat:1.2,tip:.1,sens:.6,qw:.6,budget:1.2,read:1.2,pref:{dessert:1.6},pD:.6,pS:.5},
  regular:{n:'熟客',pat:1.3,eat:1,tip:.12,sens:.6,qw:.5,budget:1,read:.8,pref:{},pD:.4,pS:.25},
+ family:{n:'一家人',pat:.9,eat:1.15,tip:.1,sens:.9,qw:.45,budget:1.05,read:1,pref:{main:1.2,starter:.8,drink:1.1,dessert:1.7},pD:.6,pS:.3},   /* 2.1: two grown-ups and a child; they take a four-top, the child watches the cats */
 };
 const SKIN=['#F6D3B5','#EDC19C','#E2AE88','#C98E63','#9C6644'];
 const HAIR=['#2B1D16','#4A2E1F','#6B4428','#A5652F','#D8B27A','#1E1E24','#7E3B2A'];
@@ -116,6 +117,7 @@ const LOOKS={
  gourmet:{top:['#6B3E57','#5A4632','#34495E'],acc:['beret','glasses'],pants:'#3A3030'},
  couple:{top:['#B84A5A','#4A6FA5','#E7A6A1','#6F8F5E','#D6A04A'],acc:['bow',null,null],pants:'#3B3542'},
  vip:{top:['#1F1F24','#5E1E2E','#2E2A4A'],acc:['shades'],pants:'#1B1B20'},
+ family:{top:['#E0A43A','#4F8A6B','#B84A5A','#5B6FB3','#C75B39','#6F8F5E'],acc:[null,null,'scarf','glasses'],pants:'#3B3542'},
  critic:{top:['#4A4440'],acc:['hat'],pants:'#2A2826'},
  blogger:{top:['#E58FA5','#F2B84B'],acc:['phone'],pants:'#3B3542'},
  regular:{top:['#7B8B6F'],acc:[null],pants:'#3B3542'},
@@ -126,6 +128,7 @@ const NAMES={
  gourmet:['老饕李先生','Chloe','Emma','Monsieur 杜','品酒師 Ken'],
  couple:['Ryan 與 Ivy','阿傑與小雯','Ben 與 Lily','Sam 與 Nina','小周與阿晴'],
  vip:['周董','Madame Lin','Mr. Hart'],
+ family:['王家三口','李家','張媽媽一家','陳家','小周一家','林家三口','Lin family'],
  critic:['戴帽子的客人'],
  blogger:['吃貨小琪','美食部落客 Momo'],
 };
@@ -264,7 +267,7 @@ const EVENTS={
  concert:{n:'附近演唱會散場',d:'20:30 左右會湧進一波客人。',m:1.08},
  students:{n:'一群學生要來',d:'某個時段會一口氣來很多學生。'},
  vip:{n:'VIP 預約',d:'19:00 有 VIP 貴賓到訪，消費高、要求也高。'},
- weekend:{n:'週末晚餐',d:'出門吃飯的人多，情侶和家庭也多；甜點會比平常好賣。',m:1.15,mix:{couple:1.5},dem:{dessert:1.25}},
+ weekend:{n:'週末晚餐',d:'出門吃飯的人多，情侶和家庭也多；甜點會比平常好賣。',m:1.15,mix:{couple:1.5,family:2},dem:{dessert:1.25}},
  datenight:{n:'約會之夜',d:'今晚情侶特別多、來得比較晚，甜點和飲料一起點的機率高。',m:1.05,mix:{couple:2.2},dem:{dessert:1.5,drink:1.2},late:true},
  market:{n:'附近的市集',d:'街上有市集，早一點就會有人進來；學生和上班族都多。',m:1.12,mix:{student:1.5,office:1.3},early:true},
  fresh:{n:'漁獲新鮮',d:'今天海鮮進貨便宜又新鮮：海鮮類料理成本 ×0.7，客人也更想點。',costMul:{seafood:.7,salmon:.7},dem:{seafood:1.4,salmon:1.4},need:()=>S.unlocked.includes('seafood')||S.unlocked.includes('salmon')},
@@ -298,7 +301,7 @@ const ACH=[
  /* mature */
  {id:'guests60',n:'Full House',d:'一天接待 60 位客人',ic:'flame',p:2},{id:'calm7',n:'Calm Week',d:'連續七天沒有客人生氣離開',ic:'moon',p:2},{id:'storm',n:'Come Rain Or Shine',d:'大雨天還是接待了 15 位客人',ic:'moon',p:2},{id:'night0',n:'No One Waits',d:'一天 20 位客人以上、沒有人等到不耐煩',ic:'star',p:2},{id:'staff6',n:'Full Crew',d:'同時有 6 位員工',ic:'waiter',p:2},{id:'lv5all',n:'Veterans',d:'三位以上員工全部滿級',ic:'crown',p:2},{id:'ops3',n:'Well Oiled',d:'動線規劃升到最高',ic:'star',p:2},{id:'room',n:'Back Room',d:'蓋了後場休息室',ic:'crown',p:2},{id:'sig100',n:'A Hundred Plates',d:'招牌菜賣出 100 份',ic:'duck',p:2},{id:'keep10',n:'Curator',d:'珍藏 10 張照片',ic:'pen',p:2},
  /* 2.1: the plate */
- {id:'special',n:'The Finer Version',d:'研發第一道特製版',ic:'plate',p:2},{id:'specials4',n:'Chef\'s Table',d:'菜單上有四道特製版',ic:'crown',p:2},{id:'walkin',n:'Passing By',d:'路人在門口看了一下就進來，累計 20 次',ic:'signlamp',p:1},
+ {id:'special',n:'The Finer Version',d:'研發第一道特製版',ic:'plate',p:2},{id:'specials4',n:'Chef\'s Table',d:'菜單上有四道特製版',ic:'crown',p:2},{id:'walkin',n:'Passing By',d:'路人在門口看了一下就進來，累計 20 次',ic:'signlamp',p:1},{id:'families',n:'Family Table',d:'招待了 10 組帶小孩來的家庭',ic:'heart',p:1},
  /* 2.0: the place grows */
  {id:'project',n:'Under Construction',d:'完成第一個大工程',ic:'expand',p:2},{id:'allprojects',n:'The Whole Block',d:'露天座位、大出菜口、冷藏庫、廚房擴建、側廳——全部完工',ic:'crown',p:2},{id:'storefront',n:'Curb Appeal',d:'門口的每一樣東西都裝好了',ic:'lights',p:2},{id:'catgear',n:'Spoiled',d:'買齊了所有貓的東西',ic:'heart',p:2},{id:'newspot',n:'It Was Their Idea',d:'一隻貓第一次用了你買給牠的東西',ic:'heart',h:1},{id:'sideful',n:'Both Rooms',d:'側廳和用餐區同時坐滿',ic:'flame',p:2},{id:'terrace',n:'Al Fresco',d:'第一組客人坐在陽傘下吃完了一餐',ic:'star',p:2},
  /* hidden: things that happen on their own */
@@ -544,7 +547,7 @@ function dishURL(id,q,want){const k='u'+id+(q||'G')+(want||0)+(id==='signature'&
    seated, lounge{legs,len}, bob, step, tall, jill, me, hat, hold ('reader'|'phone'), flipPage,
    gaze{x,y} (local, -1..1), mood (happy|ok|sad|angry|eat) + chew, blink, expr (Jill only: smile|focus|
    soft|amused|tired). Look L: skin, hair, hs 0..8, top, acc, pants. */
-function drawPerson(c,x,y,L,o){o=o||{};const s=(o.s||1)*(o.pscale===undefined?PSC:o.pscale);c.save();c.translate(x,y);c.scale((o.flip?-1:1)*s,s);
+function drawPerson(c,x,y,L,o){o=o||{};const s=(o.s||1)*(o.pscale===undefined?PSC:o.pscale)*(L.kid?.74:1);c.save();c.translate(x,y);c.scale((o.flip?-1:1)*s,s);
  const seated=o.seated,bob=o.bob||0,step=o.step||0;const OL='rgba(60,34,22,.5)';c.lineJoin='round';c.lineCap='round';
  const pc=L.pants||'#3B3542';const skin=L.skin,hair=L.hair;const hairDk=shade(hair,-.28),hairLt=shade(hair,.3);
  if(!seated){c.fillStyle='rgba(40,25,15,.16)';el(c,0,1,13,4.4);c.fillStyle='rgba(40,25,15,.2)';el(c,0,.6,9,2.8);const LL=o.tall?15:10;const l1=-LL-Math.max(0,step)*1.6,l2=-LL-Math.max(0,-step)*1.6;
@@ -649,7 +652,7 @@ function drawPerson(c,x,y,L,o){o=o||{};const s=(o.s||1)*(o.pscale===undefined?PS
  c.restore()}
 
 const JILL_LOOK={skin:'#F5D2B8',hair:'#1C1816',hs:4,top:'#fff',pants:'#2E2A28'};
-function makeLooks(type,size){const P=LOOKS[type]||LOOKS.office;const out=[];for(let k=0;k<size;k++){const L={skin:pick(SKIN),hair:pick(HAIR),hs:pick([0,0,1,2,3,4,6,6,7,8]),top:pick(P.top),acc:pick(P.acc),pants:P.pants};const pr=Math.random();if(pr<.16)L.pat='stripes';else if(pr<.26)L.pat='dots';else if(pr<.42){L.pat='cardi';L.top2=pick(P.top)}if(type==='couple'&&k===1){L.acc='bow';L.hs=pick([1,2,4,7,8])}if(type==='couple'&&k===0)L.acc=null;if(type==='student'&&k>0)L.acc=pick(['backpack',null]);out.push(L)}return out}
+function makeLooks(type,size){const P=LOOKS[type]||LOOKS.office;const out=[];for(let k=0;k<size;k++){const L={skin:pick(SKIN),hair:pick(HAIR),hs:pick([0,0,1,2,3,4,6,6,7,8]),top:pick(P.top),acc:pick(P.acc),pants:P.pants};const pr=Math.random();if(pr<.16)L.pat='stripes';else if(pr<.26)L.pat='dots';else if(pr<.42){L.pat='cardi';L.top2=pick(P.top)}if(type==='couple'&&k===1){L.acc='bow';L.hs=pick([1,2,4,7,8])}if(type==='couple'&&k===0)L.acc=null;if(type==='student'&&k>0)L.acc=pick(['backpack',null]);if(type==='family'&&k===size-1&&size>=3){L.kid=true;L.acc=null;L.hs=pick([0,3,4,6,6]);L.top=pick(['#F4C44E','#E8798A','#7FB3C8','#5E9E3D','#F0932B']);L.pat=Math.random()<.5?'stripes':null;L.top2=null;L.hair=pick(HAIR.slice(0,3))}out.push(L)}return out}
 /* the face on a ticket: regulars and Dylan have their own, other guests get one for the day (cleared each night) */
 function guestPortrait(g){if(g.reg==='dylan')return portraitURL(DYLAN.looks,'regdylan');if(g.reg&&REG_BY[g.reg])return portraitURL(REG_BY[g.reg].looks,'reg'+g.reg);return portraitURL(g.looks,'g'+S.day+'_'+g.id)}
 function portraitURL(looks,key,jill){const k='p'+key;if(ICACHE.has(k))return ICACHE.get(k);const cv=mkCanvas(112),c=cv.getContext('2d');c.fillStyle='#F3E7D2';c.fillRect(0,0,112,112);c.scale(3.2,3.2);
@@ -845,7 +848,8 @@ function buildSchedule(dur){const T=S.today,n=T.groups,out=[];
  for(const r of REGS)if(S.day>=r.day){const met=(S.regulars[r.id]||0)>0;const retry=S.regMiss&&S.regMiss[r.id]===S.day-1;if(Math.random()<(E.regs?.95:retry?.8:met?.55:.45))out.push(regPlanVisit({t:rand(.1,.85)*dur,type:r.type,reg:r.id,size:r.size}))}
  if(S.day>=3){const d=S.dylan;/* a recurring person in Jill's life, not a daily spawn: about every other day, less likely right after a visit */const gap=S.day-(d.last||0);const p=S.day<=5?.5:gap<=1?.4:gap>=3?.92:.68;if(Math.random()<p){const late=Math.random()<(d.stage>=2?.75:d.stage>=1?.6:.35);out.push({t:(late?rand(.6,.86):rand(.1,.55))*dur,type:'regular',reg:'dylan',size:1,tries:0})}}
  return out.sort((a,b)=>a.t-b.t)}
-function guestWeights(){const D=S.day,ev=S.today?S.today.event:'none',L=S.level;const w={office:30*(ev==='company'?3:1),student:D>=2?22:12,couple:D>=2?14*(ev==='valentine'?3:1):0,gourmet:(D>=3?8+L*3:0)*(S.gourmetBoost===D?1.8:1),vip:D>=6?1.5+L*1.5:0};const mixE=EVENTS[ev]&&EVENTS[ev].mix;if(mixE)for(const k in mixE)if(w[k])w[k]*=mixE[k];return w}
+function R_hasFour(){const ts=R?R.tables:buildTables();return ts.some(t=>t.seats>=3)}
+function guestWeights(){const D=S.day,ev=S.today?S.today.event:'none',L=S.level;const w={office:30*(ev==='company'?3:1),student:D>=2?22:12,couple:D>=2?14*(ev==='valentine'?3:1):0,gourmet:(D>=3?8+L*3:0)*(S.gourmetBoost===D?1.8:1),vip:D>=6?1.5+L*1.5:0,family:D>=4&&R_hasFour()?6+L*2:0};const mixE=EVENTS[ev]&&EVENTS[ev].mix;if(mixE)for(const k in mixE)if(w[k])w[k]*=mixE[k];return w}
 /* what a markup does, for today's mix of guests: fewer orders (each type by its price sensitivity) and a satisfaction
    penalty at checkout; a discount brings a few more orders and a small bonus. Read straight from the demand model. */
 function priceFeel(d){const m=S.price[d]||1;const w=guestWeights();const D=DISH(d);const peers=menuList().filter(x=>stationOk(x)&&DISH(x).cat===D.cat);let sw=0,dem=0,sat=0;
@@ -854,7 +858,7 @@ function priceFeel(d){const m=S.price[d]||1;const w=guestWeights();const D=DISH(
  for(const k in w){const T=TYPES[k];if(!T||!w[k])continue;sw+=w[k];sat+=w[k]*(m>1?-(m-1)*80*T.sens:(1-m)*30*T.sens)}sat=sw?sat/sw:0;const lbl=m<=.85?'便宜':m<.99?'略低':m<=1.01?'合理':m<=1.15?'偏高':m<=1.3?'貴':'昂貴';const cls=m<=.85?'cheap':m<.99?'cheap':m<=1.01?'fair':m<=1.15?'high':'steep';return{m,lbl,cls,dem:Math.round((dem-1)*100),sat:Math.round(sat)}}
 function priceFeelHTML(d){const f=priceFeel(d);if(f.m===1)return`<small class="pf fair">合理・客人照常點</small>`;return`<small class="pf ${f.cls}">${f.lbl}・點的人約 ${f.dem>0?'+':''}${f.dem}%${f.sat?`、滿意度 ${f.sat>0?'+':''}${f.sat}`:''}${f.m<1?'、小費略少':''}</small>`}
 function rollGuest(){const D=S.day;const w=guestWeights();
- const type=wpick(Object.keys(w),k=>w[k]);let size=1;if(type==='couple'||type==='vip')size=2;else if(type==='student')size=Math.random()<.5?1:Math.random()<.65?2:3;else if(type==='office')size=Math.random()<.7?1:2;else size=Math.random()<.6?1:2;
+ const type=wpick(Object.keys(w),k=>w[k]);let size=1;if(type==='couple'||type==='vip')size=2;else if(type==='student')size=Math.random()<.5?1:Math.random()<.65?2:3;else if(type==='office')size=Math.random()<.7?1:2;else if(type==='family')size=3;else size=Math.random()<.6?1:2;
  return{type,size,forSig:!!S.signature&&Math.random()<(recoDish()==='signature'?.12:.05),ret:D>=3&&Math.random()<clamp(.06+(rating()-3)*.1,.03,.3)}}
 function queueMax(){return LV().q+2*opsLv('wait')+(extOn('bench')?2:0)+(projOn('terrace')?1:0)}
 function queued(){return R.groups.filter(g=>g.state==='arrive'||g.state==='queue').sort((a,b)=>a.id-b.id)}
@@ -867,7 +871,7 @@ function spawn(o){if(R.closed)return;const reg=o.reg?REG_BY[o.reg]:null;const si
  if(reg&&(S.regulars[reg.id]||0)>0)g.ret=true;
  if(queued().length>=queueMax()||(!freeTableFor(g)&&!pickSpot(g))){if(g.reg==='dylan'){if((o.tries||0)<2&&R.t<R.dur*.9){R.sched.splice(R.si+1,0,Object.assign({},o,{t:R.t+rand(24,42),tries:(o.tries||0)+1,back:true}));return}R.st.lost+=size;return}if(g.reg){S.regMiss=S.regMiss||{};S.regMiss[g.reg]=S.day}R.st.lost+=size;R.lostRun=(R.lostRun||0)+1;if(!R.lostToastT||R.t-R.lostToastT>40){const n=R.lostRun;R.lostRun=0;R.lostToastT=R.t;toast(n>1?`${g.name} 和另外 ${n-1} 組看到客滿，失望地走了…`:`${g.name} 看到客滿，失望地走了…`)}return}
  if(o.fromStreet){g.x=o.fromStreet.x;g.y=o.fromStreet.y;g.walkIn=1}R.groups.push(g);R.lastSpawn=R.t;requeue();sfx.door();if(g.reg==='dylan'){S.dylan.last=S.day;if(!S.dylan.first)S.dylan.first=S.day;if(o.back)g.back=true}
- if(g.type==='vip')toast('VIP 貴賓到了！消費高，要求也高。');
+ if(g.type==='vip')toast('VIP 貴賓到了！消費高，要求也高。');if(g.type==='family')R.st.families=(R.st.families||0)+1;
  if(g.type==='blogger')toast('美食部落客走進來了，手機已經拿出來了。');
  if(g.forSig)quote(g,'我是專程為了 Jill 的招牌菜來的！');
  coach(0)}
@@ -1046,6 +1050,7 @@ function serveItems(g,list){const t=R.tables[g.table];let best=null;
  sfx.serve();if(best==='P')burst('scene',{x:t.x,y:t.y-14,room:t.room},'#FFE38A');
  if(list.some(c0=>c0.it.d==='signature')&&Math.random()<.25&&canChat('sig',120,4))quote(g,pick(['這就是招牌菜？','招牌菜長這樣。','終於吃到了。','專程來吃這道的。']));
  else if(list.some(c0=>DISH(c0.it.d)&&DISH(c0.it.d).special)&&Math.random()<.3&&canChat('special',60,4)){const sd=list.find(c0=>DISH(c0.it.d)&&DISH(c0.it.d).special).it.d;const sp=SPECIALS[DISHES[sd].special];quote(g,pick([`${sp.n}，就是這個。`,'特製版長這樣。','這個要拍一下。','比照片還好看。','上面那個是'+ING[sp.top].n+'？','跟一般版差在哪？我看看。']));if(!g.photo&&!g.shot&&Math.random()<.5){g.photo=true;g.shot=true;g.photoT0=R.t+1.2;g.dishShot=sp.n}}
+ else if(g.type==='family'&&Math.random()<.3&&canChat('family',60,4))quote(g,pick(['小朋友：「我要那個！」','媽媽：「先吃飯，貓等一下再看。」','小朋友把薯條先搶走了。','爸爸：「這家的貓不怕人。」','小朋友：「牠在看我。」']));
  else if(Math.random()<.12&&canChat('served',25,4))quote(g,pick(['這是 Jill 親手做的嗎？','哇，Jill 主廚的擺盤好美。','聞起來好香…','先拍照，等我一下！','來了來了。','看起來好好吃。','份量剛好。']));
  checkAllServed(g);R.tv++;coach(5)}
 /* extra lines a review can draw on when the visit had that in it */
@@ -1350,7 +1355,7 @@ function endDay(){if(!R)return;clearCheckpoint();const st=R.st,D=S.day;const wag
  let top=null,topN=0;for(const d in st.dish)if(st.dish[d]>topN){topN=st.dish[d];top=d}
  const dayStars=st.sats.length?clamp(Math.round((avg/100)*5*2)/2,1,5):1;
  let nb=1,msg='';if(st.critic==='good'){nb+=.35;msg="Jill's Kitchen 昨晚突然爆紅！評論家的文章被瘋狂轉發。"}else if(st.critic==='bad'){nb-=.1;msg='評論家的文章不太留情面，今天客人少了一點。'}if(st.blogger==='good'){nb+=.25;msg=msg||'美食部落客的貼文爆了，大家都想來 Jill 的店！'}
- S.buzz=nb;S.buzzMsg=msg;S.stats.days++;S.stats.guests+=st.guests;S.stats.perfect+=st.perfect;S.stats.walkins=(S.stats.walkins||0)+(st.walkins||0);if(S.stats.walkins>=20)ach('walkin');
+ S.buzz=nb;S.buzzMsg=msg;S.stats.days++;S.stats.guests+=st.guests;S.stats.perfect+=st.perfect;S.stats.walkins=(S.stats.walkins||0)+(st.walkins||0);if(S.stats.walkins>=20)ach('walkin');S.stats.families=(S.stats.families||0)+(st.families||0);if(S.stats.families>=10)ach('families');
  const plated=st.q.P+st.q.G+st.q.O+st.q.B;
  if(st.guests>=10)ach('rush');if(plated>=8&&st.q.B===0&&st.q.O===0&&st.angry===0)ach('perfectnight');if(rating()>=4.75&&S.reviews.length>=20)ach('chef');
  const r0=(S.rhist&&S.rhist.length)?S.rhist[S.rhist.length-1].r:3;const story=ratingStory(st,plated);S.rhist=S.rhist||[];S.rhist.push({d:D,r:Math.round(rating()*100)/100,n:st.reviews.length,rs:st.reviews.length?Math.round(st.reviews.reduce((a,r)=>a+r.s,0)/st.reviews.length*10)/10:null,why:story.slice(0,2).map(x=>x.t)});if(S.rhist.length>60)S.rhist.shift();
@@ -2548,7 +2553,7 @@ function updateCats(dt,now){if(!CATS)initCats();ctime+=dt;RACE_CD-=dt;TOY.amp=Ma
      else if(id==='snow'){w=c.st==='sleep'&&c.pose==='belly'?2.6:c.st==='sleep'?1.2:.8}
      else if(id==='mikan'){w=['stare','daze','hide','hide2','wary','glare'].includes(c.st)||c.pose==='glare'?2.4:1.2}
      else if(id==='tora'){w=.5}
-     if(busyCats.includes(c))w+=2;cands.push({g,c,w:w*(1-d/(lim+30))})}}
+     if(busyCats.includes(c))w+=2;if(g.type==='family')w*=1.8;cands.push({g,c,w:w*(1-d/(lim+30))})}}
    const pk=wpick(cands,o=>o.w);if(pk){const star=pk.c.def.id==='mei'&&(pk.c.perch>=0||pk.c.st==='rest'||pk.c.sofa);const set=star?cands.filter(o=>o.c===pk.c).slice(0,3):busyCats.includes(pk.c)?cands.filter(o=>busyCats.includes(o.c)).slice(0,3):[pk];
     for(const o of set){const g=o.g,id=o.c.def.id;const dur=rand(2.2,3.8);g.lookT=R.t+dur;g.lookCat=o.c;if(g.wantShot==null)g.wantShot=Math.random()<(g.type==='blogger'?.95:.32);const pPhoto=(g.shot||!g.wantShot)?0:(id==='mei'?.8:id==='snow'?.6:.4);
      if(Math.random()<pPhoto){g.shot=true;g.photo=true;g.photoT0=R.t+.5+rand(.7,1.2);g.lookT=Math.max(g.lookT,g.photoT0+.9)}else g.photo=false}}}
