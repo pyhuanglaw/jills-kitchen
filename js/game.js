@@ -37,10 +37,14 @@ const sZ=(verb,time,c,w)=>({t:'zone',verb,time,c,w});
 const sH=(verb,ing,a,b,rate,unit)=>({t:'hold',verb,ing,a,b,rate,unit});
 const sD=(verb,ing,min,max)=>({t:'dose',verb,ing,min,max})
 const sK=(verb,time,board)=>({t:'work',verb,time,board:!!board})   /* routine handwork: one decision starts it, Jill does the rest */;
+/* 2.1: a step can move the dish to another vessel (the pasta from the pot to the pan, the sliced duck onto the plate) or
+   flag what it does to the food; `v` is where the step is drawn, `slice` marks the rest-and-slice board work */
+const sV=(step,o)=>Object.assign(step,o);
+function stepVessel(j){const k=j&&j.step;return(k&&k.v)||DISH(j.d).v}
 const DISHES={
  friedrice:{n:'黃金蛋炒飯',cat:'main',st:'stove',v:'wok',price:120,cost:35,diff:1,pop:1,lv:1,rd:0,steps:[sA(['egg','rice'],1,'依序下鍋：先雞蛋、再白飯'),sW('翻炒',4.5,5,'stir'),sD('淋醬油','soy',2,3)],fin:['scallion']},
  coffee:{n:'拿鐵咖啡',cat:'drink',st:'bar',v:'cup',price:90,cost:18,diff:1,pop:1,lv:1,rd:0,steps:[sH('磨豆','beans',.6,.8,.55,'研磨度'),sW('萃取濃縮',3.5),sH('蒸奶泡','milk',.7,.85,.5,'溫度')]},
- pasta:{n:'番茄義大利麵',cat:'main',st:'stove',v:'pot',price:160,cost:45,diff:2,pop:1,lv:1,rd:0,steps:[sA(['noodle'],0,'麵條下鍋'),sW('煮麵',6,4.5),sA(['tomato'],0,'瀝乾，加入番茄醬汁'),sK('拌炒',2.4)],fin:['basil','parmesan']},
+ pasta:{n:'番茄義大利麵',cat:'main',st:'stove',v:'pot',price:160,cost:45,diff:2,pop:1,lv:1,rd:0,steps:[sA(['noodle'],0,'麵條下鍋'),sW('煮麵',6,4.5),sA(['s_drain'],0,'瀝乾'),sV(sA(['tomato'],0,'倒進平底鍋，加番茄醬汁'),{v:'pan'}),sV(sK('拌炒',2.4),{v:'pan',anim:'toss'})],fin:['basil','parmesan']},
  salad:{n:'田園沙拉',cat:'starter',st:'prep',v:'bowl',price:110,cost:28,diff:1,pop:.85,lv:1,rd:0,steps:[sK('切菜',2.4,1),sA(['greens','ctomato'],0,'放入生菜、小番茄'),sD('淋油醋醬','dressing',1,2)],fin:['cucumber']},
  burger:{n:'經典牛肉漢堡',cat:'main',st:'stove',v:'griddle',pan:1,price:190,cost:62,diff:2,pop:1.1,lv:1,rd:600,steps:[sA(['patty'],0,'牛肉排下鍋'),sZ('翻面',4.5,.72,.15),sZ('起鍋',4,.78,.14),sA(['cheese','bun'],1,'組裝：起司 → 麵包')],fin:['lettuce']},
  blacktea:{n:'錫蘭檸檬紅茶',cat:'drink',st:'bar',v:'cup',price:70,cost:10,diff:1,pop:.8,lv:1,rd:300,steps:[sA(['tea'],0,'放入紅茶葉'),sW('浸泡',4,4),sA(['lemon'],0,'撈出茶葉，放上檸檬片')]},
@@ -52,12 +56,12 @@ const DISHES={
  veg:{n:'香料烤蔬菜',cat:'starter',st:'oven',v:'tray',price:140,cost:32,diff:1,pop:.75,lv:2,rd:900,steps:[sK('切蔬菜',2.4,1),sD('淋橄欖油','oil',1,2),sZ('出爐',7,.8,.14)]},
  tiramisu:{n:'提拉米蘇',cat:'dessert',st:'prep',v:'mold',price:170,cost:45,diff:2,pop:1,lv:2,rd:1400,steps:[sA(['ladyfinger','mascarpone'],1,'依序：手指餅乾 → 馬斯卡彭'),sW('冷藏',6),sD('撒可可粉','cocoa',1,2)],fin:['espresso']},
  chicken:{n:'香草烤雞',cat:'main',st:'oven',v:'tray',price:360,cost:110,diff:2,pop:1,lv:2,rd:2200,steps:[sA(['chicken'],0,'雞腿放上烤盤'),sD('抹香草鹽','herbs',1,2),sZ('出爐',10,.8,.13)],fin:['lemon']},
- steak:{n:'炙烤肋眼牛排',cat:'main',st:'stove',v:'pan',pan:1,price:520,cost:190,diff:3,pop:1.1,lv:2,rd:3200,steps:[sA(['steak'],0,'肋眼下鍋'),sZ('翻面',5,.7,.13),sH('澆淋奶油','butter',.5,.78,.6,'份量'),sZ('起鍋',5,'want',.09)],fin:['salt']},
+ steak:{n:'炙烤肋眼牛排',cat:'main',st:'stove',v:'pan',pan:1,price:520,cost:190,diff:3,pop:1.1,lv:2,rd:3200,steps:[sA(['steak'],0,'肋眼下鍋'),sZ('翻面',5,.7,.13),sH('澆淋奶油','butter',.5,.78,.6,'份量'),sZ('起鍋',5,'want',.09),sV(sK('靜置切片',2.2,1),{slice:true,v:'plate'})],fin:['salt']},
  basque:{n:'巴斯克乳酪蛋糕',cat:'dessert',st:'prep',v:'mold',price:170,cost:42,diff:2,pop:1,lv:3,rd:2000,steps:[sH('倒入乳酪糊','cheesebatter',.72,.9,.5,'份量'),sW('烘烤定型',5),sA(['berries'],0,'放上莓果')]},
  prosciutto:{n:'生火腿沙拉',cat:'starter',st:'prep',v:'plate',price:220,cost:78,diff:2,pop:.9,lv:3,rd:2400,steps:[sA(['prosciutto','fig'],0,'擺上生火腿與無花果'),sD('淋巴薩米克醋','balsamic',1,2)],fin:['greens','parmesan']},
  salmon:{n:'香烤鮭魚',cat:'main',st:'oven',v:'tray',price:420,cost:140,diff:3,pop:1,lv:3,rd:3600,steps:[sA(['salmon','asparagus'],1,'先放鮭魚，再放蘆筍'),sZ('出爐',9,.8,.12)],fin:['lemon','salt']},
- seafood:{n:'海鮮義大利麵',cat:'main',st:'stove',v:'pot',price:380,cost:130,diff:3,pop:1,lv:3,rd:3800,steps:[sA(['noodle'],0,'麵條下鍋'),sW('煮麵',5,4.5),sA(['garlic','shrimp','mussel'],1,'依序：蒜片 → 鮮蝦 → 淡菜'),sK('拌炒',2.6)],fin:['parsley']},
- duck:{n:'香煎鴨胸',cat:'main',st:'stove',v:'pan',pan:1,price:480,cost:160,diff:3,pop:1.1,lv:3,rd:4500,steps:[sK('鴨皮劃刀',2,1),sA(['duck'],0,'鴨皮朝下下鍋'),sZ('翻面',6,.72,.12),sZ('起鍋',5,.8,.11),sH('淋橙醬','orange',.45,.7,.55,'份量')]},
+ seafood:{n:'海鮮義大利麵',cat:'main',st:'stove',v:'pot',price:380,cost:130,diff:3,pop:1,lv:3,rd:3800,steps:[sA(['noodle'],0,'麵條下鍋'),sW('煮麵',5,4.5),sA(['s_drain'],0,'瀝乾'),sV(sA(['garlic','shrimp','mussel'],1,'平底鍋依序：蒜片 → 鮮蝦 → 淡菜'),{v:'pan'}),sV(sK('拌炒',2.6),{v:'pan',anim:'toss'})],fin:['parsley']},
+ duck:{n:'香煎鴨胸',cat:'main',st:'stove',v:'pan',pan:1,price:480,cost:160,diff:3,pop:1.1,lv:3,rd:4500,steps:[sK('鴨皮劃刀',2,1),sA(['duck'],0,'鴨皮朝下下鍋'),sZ('翻面',6,.72,.12),sZ('起鍋',5,.8,.11),sV(sK('靜置切片',2.2,1),{slice:true}),sV(sH('淋橙醬','orange',.45,.7,.55,'份量'),{v:'plate'})]},
  risotto:{n:'松露燉飯',cat:'main',st:'stove',v:'pan',truffle:1,price:440,cost:150,diff:3,pop:1,lv:4,rd:5500,steps:[sA(['arborio','wine'],1,'先燉飯米，再倒白酒'),sW('燉煮',7,4,'stir'),sH('加高湯','stock',.55,.78,.5,'份量'),sW('收汁',4,0,'stir')],fin:['truffle','parmesan']},
  souffle:{n:'舒芙蕾',cat:'dessert',st:'oven',v:'ramekin',price:240,cost:60,diff:3,pop:1,lv:4,rd:5000,steps:[sK('打發蛋白',3,1),sH('倒入模具','whites',.7,.86,.55,'份量'),sZ('出爐',7,.8,.1),sD('撒糖粉','sugar',1,2)]},
 };
@@ -83,7 +87,7 @@ const ING={egg:{n:'雞蛋',k:'egg'},rice:{n:'白飯',k:'bowl',c:'#FBF6E6'},scall
  patty:{n:'牛肉排',k:'patty'},bun:{n:'漢堡麵包',k:'bun'},cheese:{n:'起司片',k:'slice',c:'#F7C548'},lettuce:{n:'生菜',k:'leaf',c:'#7CBF4A'},
  greens:{n:'綜合生菜',k:'leaf',c:'#6FAE45'},ctomato:{n:'小番茄',k:'tomato'},cucumber:{n:'小黃瓜',k:'cuke'},dressing:{n:'油醋醬',k:'bottle',c:'#E2BE5E'},
  beans:{n:'咖啡豆',k:'beans'},milk:{n:'牛奶',k:'carton',c:'#FFFFFF'},tea:{n:'紅茶葉',k:'bits',c:'#5A3218'},lemon:{n:'檸檬片',k:'lemon'},ice:{n:'冰塊',k:'ice'},soda:{n:'氣泡水',k:'bottle',c:'#BFE3F0'},syrup:{n:'莓果糖漿',k:'bottle',c:'#E2566E'},fruit:{n:'水果片',k:'fruit'},
- potato:{n:'薯條',k:'fries'},salt:{n:'鹽與胡椒',k:'shaker',c:'#FFFFFF'},truffle:{n:'黑松露',k:'truffle'},crab:{n:'蟹肉',k:'bits',c:'#F2C6B4'},burrata:{n:'布拉塔起司',k:'bowl',c:'#FFFFFF'},porcini:{n:'松露蘑菇醬',k:'bottle',c:'#4A3A2E'},marrow:{n:'烤骨髓',k:'bits',c:'#E8D7B8'},cherry:{n:'櫻桃紅酒醬',k:'bottle',c:'#7A1C2E'},uni:{n:'海膽',k:'bits',c:'#F0932B'},matcha:{n:'抹茶粉',k:'shaker',c:'#6FA84E'},oil:{n:'橄欖油',k:'bottle',c:'#C9B23A'},
+ potato:{n:'薯條',k:'fries'},salt:{n:'鹽與胡椒',k:'shaker',c:'#FFFFFF'},truffle:{n:'黑松露',k:'truffle'},s_drain:{n:'瀝乾',k:'colander'},crab:{n:'蟹肉',k:'bits',c:'#F2C6B4'},burrata:{n:'布拉塔起司',k:'bowl',c:'#FFFFFF'},porcini:{n:'松露蘑菇醬',k:'bottle',c:'#4A3A2E'},marrow:{n:'烤骨髓',k:'bits',c:'#E8D7B8'},cherry:{n:'櫻桃紅酒醬',k:'bottle',c:'#7A1C2E'},uni:{n:'海膽',k:'bits',c:'#F0932B'},matcha:{n:'抹茶粉',k:'shaker',c:'#6FA84E'},oil:{n:'橄欖油',k:'bottle',c:'#C9B23A'},
  pumpkin:{n:'南瓜塊',k:'chunk'},stock:{n:'高湯',k:'bottle',c:'#E6C88C'},cream:{n:'鮮奶油',k:'carton',c:'#FFF8E8'},seeds:{n:'南瓜籽',k:'bits',c:'#4F7A35'},
  vegmix:{n:'時蔬',k:'veg'},herbs:{n:'香草鹽',k:'shaker',c:'#8DB05A'},butter:{n:'奶油',k:'slice',c:'#F8E08E'},
  duck:{n:'鴨胸',k:'duck'},orange:{n:'橙醬',k:'bottle',c:'#E8862E'},chicken:{n:'雞腿',k:'chicken'},steak:{n:'肋眼',k:'steak'},salmon:{n:'鮭魚',k:'salmon'},asparagus:{n:'蘆筍',k:'aspar'},
@@ -1021,7 +1025,7 @@ function createTicket(g){const items=orderItems(g);const t=R.tables[g.table];
 function recipeOf(d){return DISH(d).steps}
 function uniq(a){return[...new Set(a)]}
 function zoneQ(p,z){if(p>=1.22)return'B';if(p>=1)return'O';const d=Math.abs(p-z.c);return d<=z.w?'P':d<=z.g?'G':'O'}
-function decoyFor(d,items){if(S.day<3||Math.random()<.4)return[];const st=DISH(d).st;const pool=new Set();for(const x of S.unlocked.concat(S.signature?['signature']:[])){const D=DISH(x);if(!D||D.st!==st)continue;for(const s2 of D.steps)if(s2.t==='add')s2.items.forEach(i=>pool.add(i))}items.forEach(i=>pool.delete(i));const arr=[...pool];return arr.length?[pick(arr)]:[]}
+function decoyFor(d,items){if(S.day<3||Math.random()<.4||items.some(i=>i.startsWith('s_')))return[];const st=DISH(d).st;const pool=new Set();for(const x of S.unlocked.concat(S.signature?['signature']:[])){const D=DISH(x);if(!D||D.st!==st)continue;for(const s2 of D.steps)if(s2.t==='add')s2.items.forEach(i=>{if(!i.startsWith('s_'))pool.add(i)})}items.forEach(i=>pool.delete(i));const arr=[...pool];return arr.length?[pick(arr)]:[]}
 function enterStep(j,i){const st=recipeOf(j.d)[i];const m=mLv(j.d);const k=Object.assign({},st,{p:0,cnt:0,taps:0,mis:0,t0:R.t,scorch:0,last:R.t,hold:false,level:0,auto:0});
  if(st.t==='add'){k.left=st.items.slice();k.btns=shuffle(st.items.concat(decoyFor(j.d,st.items)))}
  if(st.t==='tap')k.n=Math.max(3,st.n-(m-1));
@@ -1071,7 +1075,7 @@ function updJob(s,dt){const j=s.job,k=j.step;if(!k)return;const sp=dishSpeed(j.d
  case'wait':k.p+=dt*sp/k.time;j.wait=Math.min(1,k.p);if(k.anim==='stir'){j.mix=Math.max(j.mix,Math.min(1,k.p));k.wt=(k.wt||0)+dt;if(k.wt>.3){k.wt=0;s.shake=.5}}if(k.p>=1){sfx.ding();if(k.over){j.overStart=R.t;j.overLimit=k.over;j.overIdx=j.scores.length;j.overVerb=k.verb}advance(s,1)}break;
  case'zone':k.p+=hdt*sp/k.time;if(k.p>=1.5)charcoal(s);break;
  case'work':{if(chefHandles(s)&&!cookPresent(s))break;k.p+=dt*sp/k.time;k.taps=Math.min(k.n,Math.floor(k.p*k.n));k.wt+=dt;if(k.wt>.18){k.wt=0;s.shake=.8;if(Math.random()<.45)(k.board?sfx.chop():sfx.stir())}if(!k.board)j.mix=Math.max(j.mix,Math.min(1,k.p));
-  if(k.p>=1){j.cut=true;if(k.board&&CUTADD[j.d]&&!j.adds.includes(CUTADD[j.d]))j.adds.push(CUTADD[j.d]);advance(s,1)}break}
+  if(k.p>=1){j.cut=true;if(k.slice)j.sliced=true;if(k.board&&CUTADD[j.d]&&!j.adds.includes(CUTADD[j.d]))j.adds.push(CUTADD[j.d]);advance(s,1)}break}
  case'tap':if(k.heat){if(R.t-k.last>.85)k.scorch+=hdt*.3/(1+.12*(S.eq.pan-1))*(S.day<=2?.6:1);else k.scorch=Math.max(0,k.scorch-hdt*.04);if(k.scorch>=1){j.burnt=true;trayFloat(s,'燒焦了','#E0654A');finishJob(s)}}break;
  case'hold':if(k.hold){k.holdT=(k.holdT||0)+hdt;if(k.holdT>1.3/k.rate+1.5){holdEnd();break}k.level+=hdt*k.rate;s.ht=(s.ht||0)+dt;if(s.ht>.13){s.ht=0;k.ing==='beans'?sfx.grind():k.ing==='milk'?sfx.steam():sfx.pour()}if(k.level>=1.04)holdEnd()}break}}
 function charcoal(s){const j=s.job;s.job=null;if(R.holdSlot===s)R.holdSlot=null;const it=j.it;R.st.q.B++;R.streak=0;sfx.burnt();trayFloat(s,'焦成木炭了','#E0654A');
@@ -1807,14 +1811,15 @@ function slotHome(s){const i=s.no-1;switch(s.type){
    the pass once an oven dish is out (and for the plating of every chef's dish) */
 function stepSpot(s){const j=s.job;const h=slotHome(s);const out=Object.assign({cy:KY.feet},h);if(!j)return out;
  if(j.plating){const x=j.plating.x||200;return Object.assign(out,{place:'pass',cx:x,cy:KY.passFeet,x,y:KY.passTop+22,sc:.5})}
- const k=j.step;if(!k)return out;const v=k.verb||'';
+ const k=j.step;if(!k)return out;const v=k.verb||k.txt||'';
  if(k.t==='work'&&k.board){const x=s.type==='prep'?h.x:KX.prep.x+35;return Object.assign(out,{place:'prep',x,y:172,cx:x,sc:.4,board:true})}
  if(k.t==='add'&&/瀝乾/.test(v)){const x=KX.sink.x+13;return Object.assign(out,{place:'sink',x,y:158,cx:x,sc:.5})}
+ if(k.v==='plate')return Object.assign(out,{place:'pass',cx:200,cy:KY.passFeet,x:200,y:KY.passTop+22,sc:.5});
  if(s.type==='oven'){const steps=recipeOf(j.d);const zi=steps.findIndex(q=>q.t==='zone');
   if(k.t==='zone')return Object.assign(out,{inOven:true,x:KX.oven.x+(s.no>1?34:12),y:KY.top+KY.h+10,sc:.17,cx:KX.oven.x+22});
   if(zi>=0&&j.si>zi)return Object.assign(out,{place:'pass',cx:200,cy:KY.passFeet,x:200,y:KY.passTop+22,sc:.5})}
  return out}
-function platingSpot(){const used=R.slots.filter(s=>s.job&&s.job.plating&&s.job.plating.x).map(s=>s.job.plating.x);return[200,148,252,174,226,122,278].find(x=>!used.includes(x))||200}
+function platingSpot(){const used=R.slots.filter(s=>s.job&&s.job.plating&&s.job.plating.x).map(s=>s.job.plating.x);if(R.slots.some(s=>s.job&&!s.job.plating&&stepSpot(s).place==='pass'))used.push(200);return[200,148,252,174,226,122,278].find(x=>!used.includes(x))||200}
 function jobChef(s){return s.job?chefHandles(s):null}
 /* handwork waits for the cook to be at that spot (the fire does not) */
 function cookPresent(s){const id=s.cook;if(!id)return true;const a=R.ck&&R.ck[id];if(!a)return true;const b=a.beat;return !!b&&b.s===s&&!a.moving}
@@ -1926,7 +1931,7 @@ function drawLine(c,now,V){const E=S.eq;const x0=KX.sink.x-4,x1=KX.bar.x+KX.bar.
  /* the coffee machine, or a kettle and mugs until there is one */{const x=KX.bar.x;if(E.bar)drawEspresso(c,x+1,y+10,32,E.bar>=3?44:40,now);else{c.fillStyle='rgba(0,0,0,.12)';el(c,x+12,y+46,10,3);c.fillStyle='#B8536A';rr(c,x+4,y+30,16,16,4);c.fill();c.fillStyle='#8A3A4A';c.fillRect(x+4,y+30,16,2.5);c.strokeStyle='#B8536A';c.lineWidth=2;c.beginPath();c.arc(x+22,y+37,4,-1.3,1.3);c.stroke();c.fillStyle='#2A2A2A';c.fillRect(x+10,y+27,4,3);for(const [mx,col] of[[x+27,'#5E8FA8'],[x+30,'#E6C27A']]){c.fillStyle=col;rr(c,mx,y+38,6,8,1.5);c.fill()}}}
  /* what is cooking: every job's vessel where its step happens (a pan left on the fire stays there, empty) */
  const vs=[];for(const s0 of V.slots){if(!s0.job||s0.job.plating)continue;const sp=stepSpot(s0);if(sp.place==='pass')continue;vs.push({s:s0,sp});if(s0.type==='stove'&&sp.place!=='range'){const hm=slotHome(s0);vs.push({s:s0,sp:hm,empty:true})}}
- vs.sort((a,b)=>a.sp.y-b.sp.y);for(const v of vs){if(v.empty){c.save();c.translate(v.sp.x,v.sp.y);c.scale(v.sp.sc,v.sp.sc);drawVesselBack(c,DISH(v.s.job.d).v);drawVesselFront(c,DISH(v.s.job.d).v);c.restore();continue}
+ vs.sort((a,b)=>a.sp.y-b.sp.y);for(const v of vs){if(v.empty){c.save();c.translate(v.sp.x,v.sp.y);c.scale(v.sp.sc,v.sp.sc);drawVesselBack(c,stepVessel(v.s.job));drawVesselFront(c,stepVessel(v.s.job));c.restore();continue}
   if(v.sp.inOven){c.save();c.translate(v.sp.x,v.sp.y);c.scale(v.sp.sc,v.sp.sc);c.globalAlpha=.9;drawVesselBack(c,DISH(v.s.job.d).v);drawContents(c,v.s.job,DISH(v.s.job.d).v,now);c.restore();continue}
   drawStageFood(c,v.s,v.s.job,v.sp.x,v.sp.y,v.sp.sc,now);
   const k=v.s.job.step;if(k&&k.t==='wait'&&/冷藏/.test(k.verb||'')){c.fillStyle='#F4F9FC';circ(c,v.sp.x+14,v.sp.y-18,6);c.fillStyle='#5E8FA8';c.font=`800 7px ${FONT}`;c.textAlign='center';c.textBaseline='middle';c.fillText('❄',v.sp.x+14,v.sp.y-17.6);c.textBaseline='alphabetic'}
@@ -1944,6 +1949,7 @@ function drawPass(c,now,V){const T=TH();const big=projOn('pass');const x0=big?64
  let fg=c.createLinearGradient(0,y+h,0,y+h+f);fg.addColorStop(0,T.c0);fg.addColorStop(1,T.c1);c.fillStyle=fg;rr(c,x0,y+h-2,x1-x0,f+2,2);c.fill();c.fillStyle='rgba(0,0,0,.2)';c.fillRect(x0,y+h+f-2,x1-x0,3);
  /* the rail with the open tickets */c.fillStyle='#3A3A3A';c.fillRect(x0+8,y-2,x1-x0-16,2);if(V.tickets){const open=V.tickets.filter(tk=>tk.items.some(it=>it.st==='pending'||it.st==='cooking'));
   open.slice(0,9).forEach((tk,i)=>{const x=x0+14+i*22,ty=y-16;c.fillStyle='rgba(0,0,0,.15)';c.fillRect(x+1,ty+1,18,15);c.fillStyle='#FFFDF5';c.fillRect(x,ty,18,15);c.fillStyle='#8A9498';c.fillRect(x+7,ty-2,4,3);c.fillStyle='#2E2019';c.font=`800 6px ${FONT}`;c.textAlign='center';c.textBaseline='middle';c.fillText('T'+tk.no,x+9,ty+5);tk.items.slice(0,4).forEach((it,k)=>{c.fillStyle=it.st==='cooking'?'#E6B04A':it.st==='pending'?'#E0543A':'#8FB07A';circ(c,x+4+k*3.6,ty+11.5,1.3)})});c.textBaseline='alphabetic'}
+ /* 2.1: a step that happens on the pass itself — the sauce over the sliced duck, the baked dish out of the oven */for(const s0 of V.slots){const j=s0.job;if(!j||j.plating)continue;const sp=stepSpot(s0);if(sp.place!=='pass')continue;drawStageFood(c,s0,j,sp.x,y+16,.5,now)}
  /* plates being finished at the pass */for(const s0 of V.slots){const j=s0.job;if(!j||!j.plating)continue;const px=j.plating.x||200,py=y+14;const u=clamp(j.plating.t/j.plating.dur,0,1);const sz=24+u*10;c.globalAlpha=.55+u*.45;c.drawImage(dishCanvas(j.d,'G',64,S.decor.ware>0,j.it.want),px-sz/2,py-sz/2,sz,sz);c.globalAlpha=1;
   if(u>.55){/* the garnish going on */const fin=DISH(j.d).fin;if(fin&&fin.length){const t=(u-.55)/.45;c.globalAlpha=1-t;drawIng(c,fin[0],px+8,py-16-t*10,9);c.globalAlpha=1}}
   for(let k=0;k<3;k++){const ph=(now*1.2+k*.33)%1;c.globalAlpha=(1-ph)*.5;c.fillStyle='#fff';circ(c,px-8+k*8,py-16-ph*14,2+ph*3);c.globalAlpha=1}}
@@ -2154,18 +2160,19 @@ function drawStage(c,s,j,x,y,w,h,now){const D=j?DISH(j.d):null;const k=j?j.step:
  const vy=s.type==='bar'?y+h-16-24*sc:cy;const vs=s.type==='oven'?sc*.92:D.v==='glass'?sc*.9:sc;drawStageFood(c,s,j,cx,vy,vs,now)}
 /* the vessel with whatever is in it right now, at (cx,vy) and scale vs: the board while chopping, the pour of a hold,
    the spit of a sear, the steam, the ingredient that just went in. Used by the tray and by the kitchen. */
-function drawStageFood(c,s,j,cx,vy,vs,now){const D=DISH(j.d);const k=j.step;const board=k&&((k.t==='tap'&&!k.heat)||(k.t==='work'&&k.board));
+function drawStageFood(c,s,j,cx,vy,vs,now){const D=DISH(j.d);const k=j.step;const board=k&&((k.t==='tap'&&!k.heat)||(k.t==='work'&&k.board));const V=stepVessel(j);
  c.save();c.translate(cx,vy);c.scale(vs,vs);if(s.shake)c.translate(Math.sin(now*70)*s.shake*2,0);
- if(board)drawBoard(c,j,k,now,s);else{drawVesselBack(c,D.v);if(s.flipT>0){/* the flip: contents hop and turn over */const u=1-s.flipT/.42;c.save();c.translate(0,-Math.sin(u*Math.PI)*14);c.scale(1,Math.max(.12,Math.abs(Math.cos(u*Math.PI))));drawContents(c,j,D.v,now);c.restore()}else drawContents(c,j,D.v,now);drawVesselFront(c,D.v);
+ if(board)drawBoard(c,j,k,now,s);else{drawVesselBack(c,V);const toss=k&&k.t==='work'&&k.anim==='toss'&&(!chefHandles(s)||cookPresent(s))?Math.max(0,Math.sin(now*5.5)):0;if(s.flipT>0){/* the flip: contents hop and turn over */const u=1-s.flipT/.42;c.save();c.translate(0,-Math.sin(u*Math.PI)*14);c.scale(1,Math.max(.12,Math.abs(Math.cos(u*Math.PI))));drawContents(c,j,V,now);c.restore()}else if(toss>0){/* the toss: the contents hop out of the pan and land */c.save();c.translate(0,-toss*12);c.scale(1+toss*.06,1-toss*.12);drawContents(c,j,V,now);c.restore()}else drawContents(c,j,V,now);drawVesselFront(c,V);
   if(k&&k.t==='zone'&&D.pan&&k.p>.3){/* fat spitting while it sears */for(let i=0;i<5;i++){const ph=(now*1.5+i*.21)%1;c.globalAlpha=(1-ph)*.85;c.fillStyle=i%2?'#FFF1B0':'#FFD27A';circ(c,-26+i*13+Math.sin(now*9+i*2)*3,-12-ph*24,1.6-ph)}c.globalAlpha=1}}
- if(k&&k.t==='hold'&&k.hold){let col=k.ing==='beans'?'#6B3A1A':(ING[k.ing]||{}).c||'#ccc';if(col==='#FFFFFF')col='#F2EEE6';const bot=D.v==='glass'?29-76*Math.min(1,k.level):D.v==='cup'?-9:D.v==='mold'?17-32*Math.min(1,k.level):D.v==='ramekin'?-10:D.v==='pot'?-16:-2;c.globalAlpha=.9;c.fillStyle=col;const wob=Math.sin(now*30)*.6;rr(c,-2.6+wob,-95,5.2,bot+95,2.6);c.fill();c.globalAlpha=1;if(k.ing==='milk'){for(let i=0;i<3;i++){const ph=(now*1.4+i*.33)%1;c.globalAlpha=(1-ph)*.5;c.fillStyle='#fff';circ(c,-10+i*10,-20-ph*30,4+ph*6)}c.globalAlpha=1}}
- const smoky=(k&&k.t==='tap'&&k.heat&&k.scorch>.45)||(k&&k.t==='zone'&&k.p>1);const steamy=smoky||(s.type==='stove'&&!board)||(k&&k.t==='wait'&&(D.v==='cup'||D.v==='pot'));
+ if(k&&k.t==='hold'&&k.hold){let col=k.ing==='beans'?'#6B3A1A':(ING[k.ing]||{}).c||'#ccc';if(col==='#FFFFFF')col='#F2EEE6';const bot=V==='glass'?29-76*Math.min(1,k.level):V==='cup'?-9:V==='mold'?17-32*Math.min(1,k.level):V==='ramekin'?-10:V==='pot'?-16:-2;c.globalAlpha=.9;c.fillStyle=col;const wob=Math.sin(now*30)*.6;rr(c,-2.6+wob,-95,5.2,bot+95,2.6);c.fill();c.globalAlpha=1;if(k.ing==='milk'){for(let i=0;i<3;i++){const ph=(now*1.4+i*.33)%1;c.globalAlpha=(1-ph)*.5;c.fillStyle='#fff';circ(c,-10+i*10,-20-ph*30,4+ph*6)}c.globalAlpha=1}}
+ const smoky=(k&&k.t==='tap'&&k.heat&&k.scorch>.45)||(k&&k.t==='zone'&&k.p>1);const steamy=smoky||(s.type==='stove'&&!board&&V!=='plate')||(k&&k.t==='wait'&&(V==='cup'||V==='pot'));
  if(steamy){for(let i=0;i<4;i++){const ph=(now*.7+i*.25)%1;c.globalAlpha=(1-ph)*(smoky?.55:.3);c.fillStyle=smoky?'#555':'#fff';circ(c,-18+i*12+Math.sin(now*2+i)*4,-26-ph*40,5+ph*8)}c.globalAlpha=1}
  if(s.pop&&s.pop.t<.5){const t=s.pop.t/.5;c.globalAlpha=1-t;drawIng(c,s.pop.id,0,-50+t*36,12);c.globalAlpha=1}
  c.restore()}
 function drawBoard(c,j,k,now,s){c.fillStyle='rgba(0,0,0,.28)';el(c,2,18,54,12);c.fillStyle='#9A6534';rr(c,-52,-8,104,26,7);c.fill();c.fillStyle='#C8965E';rr(c,-52,-14,104,26,7);c.fill();c.strokeStyle='rgba(120,70,30,.25)';c.lineWidth=.8;for(let i=0;i<4;i++){c.beginPath();c.moveTo(-46,-9+i*6);c.quadraticCurveTo(0,-7+i*6,46,-10+i*6);c.stroke()}
  const p=k.taps/k.n;const R0=rng(j.seed);
- const jd=baseOf(j.d);if(jd==='duck'){c.fillStyle='#E39292';el(c,-6,-1,30,12);c.fillStyle='#F3DCC0';el(c,-6,-3,28,9.5);c.strokeStyle='rgba(150,90,60,.85)';c.lineWidth=1.2;for(let i=0;i<k.taps;i++){const off=-20+i*(36/Math.max(1,k.n-1));c.beginPath();c.moveTo(off-5,-11);c.lineTo(off+5,4);c.stroke();c.beginPath();c.moveTo(off+5,-11);c.lineTo(off-5,4);c.stroke()}}
+ const jd=baseOf(j.d);if(k.slice){/* rested: the seared piece, the slices fanning off it as the knife goes */const n=Math.floor(p*6);c.fillStyle='rgba(0,0,0,.2)';el(c,-4,4,32,9);if(jd==='duck'){c.fillStyle='#C9782E';el(c,-14+n*2,-2,16-n*2,9);c.fillStyle='#F3DCC0';el(c,-14+n*2,-4,15-n*2,4);for(let i=0;i<n;i++){c.save();c.translate(2+i*6.5,-1);c.rotate(-.15);c.fillStyle='#E39292';el(c,0,0,4.6,8);c.fillStyle='#F6C9B0';el(c,0,-6.5,4.2,1.8);c.fillStyle='#C9782E';el(c,0,-7.5,4.4,1.2);c.restore()}}else{c.fillStyle='#7A3E22';el(c,-14+n*2,-2,16-n*2,9.5);c.fillStyle='#8A4A2A';el(c,-14+n*2,-5,14-n*2,3);for(let i=0;i<n;i++){c.save();c.translate(2+i*6.5,-1);c.rotate(-.15);c.fillStyle='#C43A4C';el(c,0,0,4.6,8.5);c.fillStyle='#E8788A';el(c,-.5,0,2.6,6);c.fillStyle='#5A2E1C';el(c,0,-8,4.4,1.3);c.restore()}}c.fillStyle='rgba(120,40,30,.35)';for(let i=0;i<4;i++)circ(c,-24+R0()*40,6+R0()*5,1.2)}
+ else if(jd==='duck'){c.fillStyle='#E39292';el(c,-6,-1,30,12);c.fillStyle='#F3DCC0';el(c,-6,-3,28,9.5);c.strokeStyle='rgba(150,90,60,.85)';c.lineWidth=1.2;for(let i=0;i<k.taps;i++){const off=-20+i*(36/Math.max(1,k.n-1));c.beginPath();c.moveTo(off-5,-11);c.lineTo(off+5,4);c.stroke();c.beginPath();c.moveTo(off+5,-11);c.lineTo(off-5,4);c.stroke()}}
  else if(jd==='souffle'){c.fillStyle='#F4F0EA';c.beginPath();c.moveTo(-26,-10);c.quadraticCurveTo(-24,14,0,14);c.quadraticCurveTo(24,14,26,-10);c.fill();c.fillStyle='#E4DCCF';el(c,0,-10,26,7);c.fillStyle='#FFFFFF';const f=4+p*10;for(let i=0;i<7;i++)circ(c,-16+i*5.4,-11-Math.sin(i*1.3)*f*.35,3.5+f*.3);const a=Math.sin(now*20)*(s.shake||0)*.6;c.save();c.translate(12,-14);c.rotate(-.6+a);c.strokeStyle='#C9CED0';c.lineWidth=1.2;for(let i=-2;i<=2;i++){c.beginPath();c.ellipse(i*1.5,-8,3,9,0,0,7);c.stroke()}c.fillStyle='#8A5A30';c.fillRect(-1.5,-30,3,14);c.restore()}
  else{const cols=jd==='salad'?['#7CBF4A','#D8392A','#9AC66A']:['#4E7F2E','#D6392E','#F2BE2E'];const whole=Math.max(0,3-Math.floor(p*3));for(let i=0;i<whole;i++){c.fillStyle=cols[i];el(c,-36+i*11,-3,7.5,5.5);gloss(c,-38+i*11,-5,2.5,1.2,.4)}const pieces=Math.floor(p*16);for(let i=0;i<pieces;i++){c.fillStyle=cols[i%3];c.save();c.translate(2+R0()*40,-11+R0()*15);c.rotate(R0()*3);c.fillRect(-2.6,-1.8,5.2,3.6);c.restore()}}
  if(jd!=='souffle'){const lift=(s.shake||0)*10;c.save();c.translate(-8,-18-lift);c.rotate(-.12);let kg=c.createLinearGradient(0,-8,0,6);kg.addColorStop(0,'#F4F6F7');kg.addColorStop(1,'#9AA4A8');c.fillStyle=kg;c.beginPath();c.moveTo(-20,4);c.lineTo(18,4);c.lineTo(18,-4);c.quadraticCurveTo(-6,-11,-20,4);c.fill();c.fillStyle='#3A2A20';rr(c,18,-3,17,7,3);c.fill();c.fillStyle='#C99A45';circ(c,23,.5,1);circ(c,30,.5,1);c.restore()}}
@@ -2190,7 +2197,8 @@ function drawContents(c,j,v,now){const R0=rng(j.seed);
  if(v==='wok'||v==='pan'||v==='griddle'||v==='tray'||v==='plate'||v==='bowl'){c.save();if(v==='tray'){c.beginPath();c.rect(-45,-15,90,30);c.clip();c.scale(1,.62)}else{const rx=v==='bowl'?38:v==='plate'?40:42,ry=v==='bowl'?11:v==='plate'?16:18,oy=v==='bowl'?-7:0;c.beginPath();c.ellipse(0,oy,rx,ry,0,0,7);c.clip();c.translate(0,oy);c.scale(1,ry/rx)}drawTopLayers(c,j,R0,now,v);c.restore()}
  else if(v==='pot')drawPot(c,j,R0,now);else if(v==='cup')drawCupC(c,j,R0,now);else if(v==='glass')drawGlassC(c,j,R0,now);else if(v==='mold')drawMoldC(c,j,R0,now);else if(v==='ramekin')drawRamekinC(c,j,R0,now)}
 function drawTopLayers(c,j,R0,now,v){const d=baseOf(j.d);const cnt=id=>j.adds.filter(x=>x===id).length;const k=j.step;
- const mixA=d==='friedrice'||d==='risotto'?j.mix:d==='salad'?Math.min(1,cnt('dressing')*.34):0;
+ if(v==='plate'&&j.sliced){/* rested and sliced, on the plate: the sauce pools under the slices as it is poured */const holding=k&&k.t==='hold';const lv=holding?k.level:(j.sauce||0);if(lv>0){c.fillStyle=holding?((ING[k.ing]||{}).c||'#8A3A1A'):(j.sauceC||'#8A3A1A');c.globalAlpha=.85;el(c,2,6,10+lv*22,5+lv*10);c.globalAlpha=1}if(d==='duck')duckSlices(c,0,-3,1.15);else steakSlices(c,0,-2,1.05,j.it&&j.it.want||1);if(d==='steak'){c.fillStyle='#F8E08E';rr(c,-24,-18,10,8,2);c.fill()}return}
+ const mixA=d==='friedrice'||d==='risotto'?j.mix:d==='salad'?Math.min(1,cnt('dressing')*.34):(d==='pasta'||d==='seafood')&&v==='pan'?j.mix:0;
  const P=(n,r,fn)=>{for(let i=0;i<n;i++){const a=R0()*6.283,dd=Math.sqrt(R0())*r;fn(Math.cos(a)*dd,Math.sin(a)*dd,i)}};
  if(v==='wok'||v==='pan'||v==='griddle'){let g=c.createRadialGradient(-10,-8,2,0,0,32);g.addColorStop(0,'rgba(255,220,140,.2)');g.addColorStop(1,'rgba(255,220,140,0)');c.fillStyle=g;circ(c,0,0,32)}
  c.globalAlpha=1-mixA*.9;const side=d==='signature';const ck=clamp(cookNow(j),0,1.3);
@@ -2224,7 +2232,12 @@ function drawTopLayers(c,j,R0,now,v){const d=baseOf(j.d);const cnt=id=>j.adds.fi
   case'parmesan':P(18,24,(x,y)=>{c.fillStyle='#FFF4D8';circ(c,x,y,1.1)});break;
   case'mash':mash(c,-18,10,1);break;
   case'bread':bread(c,-18,10,1);break;
-  case'noodle':noodleNest(c,R0,-18,10,12,['#F4CB72','#E8B04F','#F7D98E']);break;
+  case'noodle':if(v==='pan'){noodleNest(c,R0,0,0,27,['#F4CB72','#E8B04F','#F7D98E'])}else noodleNest(c,R0,-18,10,12,['#F4CB72','#E8B04F','#F7D98E']);break;
+  case'tomato':tomatoSauce(c,R0,0,-2,cnt('tomato')?17:0);break;
+  case'garlic':{c.fillStyle='#EDE0C0';P(8,26,(x,y)=>el(c,x,y,3.2,2.2));break}
+  case'shrimp':shrimp(c,-12,-6,1.2,.4);shrimp(c,12,-8,1.2,2.2);shrimp(c,2,12,1.2,-1);break;
+  case'mussel':mussel(c,-16,10,1.3,.5);mussel(c,18,8,1.3,-.7);break;
+  case's_drain':break;
   case'potatoSide':break;
  }}
  const holding=k&&k.t==='hold'&&!['butter','stock','milk','soda','beans','cream','custard','caramel','cheesebatter','whites'].includes(k.ing);
@@ -2247,7 +2260,7 @@ function drawPot(c,j,R0,now){const has=id=>j.adds.includes(id);const k=j.step;co
  if(d==='soup'){c.fillStyle=has('stock')?mix('#E6C88C','#EA922E',clamp(j.wait||0,0,1)):'#C9D9DD';circ(c,0,0,34);if(has('pumpkin')&&(j.wait||0)<.9){c.globalAlpha=1-(j.wait||0);for(let i=0;i<8;i++){c.fillStyle=i%2?'#F2A33A':'#E88C2A';c.save();c.translate((R0()-.5)*44,(R0()-.5)*44);c.rotate(R0()*3);c.fillRect(-5,-5,10,10);c.restore()}c.globalAlpha=1}
   const cr=k&&k.t==='hold'&&k.ing==='cream'?k.level:(j.cream||0);if(cr>0){c.strokeStyle=`rgba(255,250,240,${Math.min(1,cr*1.5)})`;c.lineWidth=3;c.beginPath();for(let t=0;t<12;t+=.25){const q=t*1.6*Math.min(1.2,cr*1.6);c.lineTo(Math.cos(t)*q,Math.sin(t)*q)}c.stroke()}
   if(has('seeds')){c.fillStyle='#4F7A35';for(let i=0;i<7;i++){c.save();c.translate((R0()-.5)*36,(R0()-.5)*36);c.rotate(R0()*3);el(c,0,0,3.4,1.8);c.restore()}}}
- else{const drained=has('tomato')||has('garlic');c.fillStyle=drained?'#6E777B':'#BFD6DC';circ(c,0,0,34);
+ else{const drained=has('tomato')||has('garlic')||has('s_drain');c.fillStyle=drained?'#6E777B':'#BFD6DC';circ(c,0,0,34);if(drained&&!has('tomato')&&!has('garlic')){c.fillStyle='#B9C1C4';circ(c,0,0,31);c.fillStyle='rgba(0,0,0,.2)';for(let q=-24;q<=24;q+=8)for(let r=-24;r<=24;r+=8)if(q*q+r*r<700)circ(c,q,r,1.6)}
   if(has('noodle')){const w=j.wait||0;if(!drained){if(w<.45){c.lineCap='round';for(let i=0;i<16;i++){const a=i/16*6.283;c.strokeStyle=i%2?'#EFD28A':'#E3C272';c.lineWidth=2.4;c.beginPath();c.moveTo(Math.cos(a)*3,Math.sin(a)*3);c.lineTo(Math.cos(a)*(18+w*30),Math.sin(a)*(18+w*30));c.stroke()}}else noodleNest(c,R0,0,0,26,['#F7E0A0','#EFD08A','#F9E8B8'])}else noodleNest(c,R0,0,0,28,['#F4CB72','#E8B04F','#F7D98E'])}
   if(has('tomato'))tomatoSauce(c,R0,0,0,20);if(has('garlic')){c.fillStyle='#EDE0C0';for(let i=0;i<8;i++)el(c,(R0()-.5)*40,(R0()-.5)*40,3,2.2)}if(has('shrimp')){shrimp(c,-12,-6,1.2,.4);shrimp(c,12,-8,1.2,2.2);shrimp(c,2,12,1.2,-1)}if(has('mussel')){mussel(c,-16,10,1.3,.5);mussel(c,18,8,1.3,-.7)}
   if(j.mix>0){c.globalAlpha=j.mix;c.drawImage(foodCanvas(d,160),-40,-40,80,80);c.globalAlpha=1}
@@ -2288,6 +2301,7 @@ function paintTopping(c,top,R){c.save();c.scale(1,.8);
  c.restore()}
 function drawIng(c,id,x,y,r){const I=ING[id]||{k:'bits',c:'#ccc'};c.save();c.translate(x,y);const s=r/16;c.scale(s,s);const sh=()=>{c.fillStyle='rgba(0,0,0,.18)';el(c,1,13,13,3)};
  switch(I.k){
+ case'colander':sh();c.fillStyle='#B9C1C4';c.beginPath();c.moveTo(-13,-6);c.lineTo(13,-6);c.lineTo(9,9);c.lineTo(-9,9);c.closePath();c.fill();c.fillStyle='#8A9498';c.fillRect(-16,-8,32,3);c.fillStyle='rgba(0,0,0,.25)';for(let q=-6;q<=6;q+=4)for(let r=-2;r<=6;r+=4)circ(c,q,r,1);c.fillStyle='#F4CB72';for(let q=0;q<5;q++){c.beginPath();c.moveTo(-8+q*4,-7);c.quadraticCurveTo(-6+q*4,-14,-4+q*4,-8);c.strokeStyle='#E8B04F';c.lineWidth=1.6;c.stroke()}break;
  case'egg':sh();c.fillStyle='#F2E1C8';el(c,0,0,10.5,13.5);c.fillStyle='rgba(160,110,60,.12)';el(c,3,4,6,8);c.fillStyle='#FFF6E8';el(c,-3.5,-5,3.5,4.5);break;
  case'bowl':case'bits':sh();c.fillStyle='#F4F0EA';c.beginPath();c.moveTo(-15,-2);c.quadraticCurveTo(-13,14,0,14);c.quadraticCurveTo(13,14,15,-2);c.fill();c.fillStyle=I.k==='bowl'?I.c:'#E9E1D4';el(c,0,-2,14,5);if(I.k==='bits'){const R0=rng(hash(id));c.fillStyle=I.c;for(let i=0;i<12;i++)el(c,(R0()-.5)*20,-2+(R0()-.5)*6,1.8,1.2)}else{c.fillStyle='rgba(255,255,255,.35)';el(c,-4,-3.5,5,1.4)}c.strokeStyle='rgba(0,0,0,.14)';c.lineWidth=1;c.beginPath();c.ellipse(0,-2,15,5.5,0,0,7);c.stroke();break;
  case'bottle':{sh();const light=['#BFE3F0','#E9DF9A','#E6C88C','#EFCF73'].includes(I.c);const glass='rgba(230,242,246,.92)';c.fillStyle=light?glass:I.c;rr(c,-7,-3,14,17,4);c.fill();if(light){c.fillStyle=I.c;rr(c,-6,2,12,11,3);c.fill()}c.fillStyle=light?glass:I.c;c.fillRect(-3,-11,6,9);c.fillStyle='#2A2A2A';rr(c,-3.6,-15,7.2,4.5,1.2);c.fill();c.fillStyle='#F6EEDF';c.fillRect(-7,3,14,5.5);c.fillStyle='rgba(255,255,255,.4)';c.fillRect(-5,-1,2.2,13);c.strokeStyle='rgba(0,0,0,.15)';c.lineWidth=.8;rr(c,-7,-3,14,17,4);c.stroke();break}
