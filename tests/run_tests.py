@@ -3293,6 +3293,58 @@ def restaurant_records_are_readable_in_the_journal(b, port, target):
         check(contrast(r['c'], r['bg']) > contrast(r['d'], r['bg']), f'the DAY stays secondary: {r}')
     g.close()
 
+@test
+def workstation_assignment_is_explicit_with_capacities_and_swaps(b, port, target):
+    """v2.2.1 #3 (real device: 換工作站 cycled blindly). The chooser lists every bought station as n/cap (cap = its
+    cooking slots), the chef moves to the chosen one, a full station offers a swap that names both people and where
+    each ends up, the kitchen header counts update at once, and the prep screen warns when a station with dishes on
+    today's menu has nobody at it."""
+    g = Game(b, port, target, seed=9, manual=True)
+    player30(g)
+    g.ev("shopTab='staff';phase='shop';mainScreen='shop';showShop()"); g.page.wait_for_timeout(80)
+    chefs = json.loads(g.ev("JSON.stringify(S.crew.filter(m=>m.role==='chef').map(m=>({id:m.id,name:m.name,duty:m.duty})))"))
+    check(len(chefs) >= 3, f'the Day 30 save has chefs: {chefs}')
+    caps = json.loads(g.ev("JSON.stringify({stove:stationCap('stove'),oven:stationCap('oven'),prep:stationCap('prep'),bar:stationCap('bar')})"))
+    check(caps['stove'] == g.ev("stoveSlots(S.eq.stove)") and caps['oven'] == g.ev("buildSlots().filter(s=>s.type==='oven').length"), f'capacity is the slot count: {caps}')
+    m = chefs[0]
+    g.click(f"[data-act=duty][data-k='{m['id']}']"); g.page.wait_for_timeout(80)
+    rows = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('.stpick .strow')].map(r=>({st:r.querySelector('b').textContent,n:r.querySelector('.stn').textContent,cur:r.classList.contains('cur'),full:r.classList.contains('full'),move:!!r.querySelector('[data-act=dutyTo]'),swap:!!r.querySelector('[data-act=dutySwapAsk]')})))"))
+    check(len(rows) == sum(1 for k, v in caps.items() if v > 0), f'one row per bought station: {rows}')
+    for r in rows: check('/' in r['n'], f'n/cap shown: {r}')
+    check(sum(1 for r in rows if r['cur']) == 1, 'the current station is marked')
+    # move to a station with room
+    free = next((r for r in rows if r['move']), None)
+    check(free is not None, f'a station with room offers 移到這裡: {rows}')
+    st = {'爐台': 'stove', '烤箱': 'oven', '冷盤台': 'prep', '咖啡吧': 'bar'}[free['st']]
+    g.click(f"[data-act=dutyTo][data-k='{m['id']}'][data-d='{st}']"); g.page.wait_for_timeout(80)
+    check(g.ev(f"S.crew.find(x=>x.id==='{m['id']}').duty") == st, 'the chef moved where the player chose')
+    hdr = g.ev("document.querySelector('.crewgrp .cg-h').textContent")
+    nat = g.ev("chefsAt('%s').length" % st)
+    check(f"{DUTY[st]} {nat}/{caps[st]}" in hdr, f'the kitchen header counts update at once: {hdr}')
+    # fill a station, then the chooser offers a swap naming both people
+    g.ev("(()=>{const cs=S.crew.filter(m=>m.role==='chef');const cap=stationCap('oven');cs.forEach((m,i)=>m.duty=i<cap?'oven':'stove');return 1})()")
+    other = g.ev("S.crew.find(m=>m.role==='chef'&&m.duty==='stove').id")
+    victim = g.ev("S.crew.find(m=>m.role==='chef'&&m.duty==='oven').id")
+    g.ev("showShop()"); g.click(f"[data-act=duty][data-k='{other}']"); g.page.wait_for_timeout(60)
+    check(g.ev("!document.querySelector('.stpick [data-act=dutyTo][data-d=oven]')") and g.ev("!!document.querySelector('.stpick [data-act=dutySwapAsk][data-d=oven]')"), 'a full station cannot be moved into, only swapped')
+    g.click(f"[data-act=dutySwapAsk][data-k='{other}'][data-d='oven']"); g.page.wait_for_timeout(60)
+    txt = g.ev("[...document.querySelectorAll('.stpick [data-act=dutySwap]')].map(b=>b.textContent).join('|')")
+    on, vn = g.ev(f"S.crew.find(m=>m.id==='{other}').name"), g.ev(f"S.crew.find(m=>m.id==='{victim}').name")
+    check(f'{on} → 烤箱' in txt and f'{vn} → 爐台' in txt, f'the swap names both people and both destinations: {txt}')
+    g.click(f"[data-act=dutySwap][data-k='{other}'][data-o='{victim}']"); g.page.wait_for_timeout(60)
+    check(g.ev(f"S.crew.find(m=>m.id==='{other}').duty") == 'oven' and g.ev(f"S.crew.find(m=>m.id==='{victim}').duty") == 'stove', 'the swap happened as stated')
+    # the prep warning: nobody at a station today's menu needs
+    g.ev("S.crew.filter(m=>m.role==='chef').forEach(m=>m.duty='stove');phase='prep';mainScreen='prep';S.phase='prep';showPrep()"); g.page.wait_for_timeout(80)
+    warns = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('.stwarn')].map(w=>w.textContent))"))
+    need = json.loads(g.ev("JSON.stringify(['oven','prep','bar'].filter(st=>stationCap(st)>0&&menuList().some(d=>DISH(d).st===st&&stationOk(d))))"))
+    check(len(warns) == len(need) and all('目前無人' in w for w in warns), f'one warning per empty station the menu needs: {warns} / {need}')
+    check(g.ev("!!document.querySelector('.stwarn [data-act=staffTab]')"), 'the warning has 安排員工')
+    g.click('.stwarn [data-act=staffTab]'); g.page.wait_for_timeout(80)
+    check(g.ev("shopTab") == 'staff' and g.ev("phase") == 'shop', 'it opens the staff tab')
+    g.close()
+
+DUTY = {'stove': '爐台', 'oven': '烤箱', 'prep': '冷盤台', 'bar': '咖啡吧'}
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--target', choices=['index', 'single'], default='index')
