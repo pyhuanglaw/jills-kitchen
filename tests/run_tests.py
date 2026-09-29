@@ -2454,7 +2454,7 @@ def e_rating_card_is_structured_and_records_are_chips(b, port, target):
     check(['客滿離開', '19 位', '其中 3 則留下兩顆星'] in card['rows'] and any(r[0] == '料理品質' and 'Perfect' in r[1] for r in card['rows']), f'the factors should be rows: {card["rows"]}')
     check(not any('（' in r[0] or '（' in r[1] for r in card['rows']), 'no parentheses in the factor prose')
     check('4.45' in card['head'] and '4.54' in card['head'], 'the head shows the move')
-    recs = g.ev("[...document.querySelectorAll('.recs .rec')].map(e=>e.textContent)")
+    recs = g.ev("[...document.querySelectorAll('.recs .recchip')].map(e=>e.textContent)")
     check(len(recs) == 4 and '單日最高營業額' in recs, f'records should be chips: {recs}')
     check(not g.errors, g.errors)
     g.close()
@@ -3232,6 +3232,66 @@ def portrait_crops_isolate_each_figure(b, port, target):
     check(seen >= 12, f'the separators are in place ({seen})')
     cols = {pid: box[0] for entry in mod.CROPS for (sheet, pid, box) in [entry[:3]] if sheet.startswith('sheet_regulars')}
     check(cols['sophie'] < cols['leo'] < cols['xiaolin'], f'Sophie is the third figure and 小林 the fifth: {cols}')
+
+@test
+def restock_during_service_is_one_tap_with_immediate_feedback(b, port, target):
+    """v2.2.1 #2 (real device: the same 補滿 +12 sometimes bought at once, sometimes wanted a second tap). The hidden
+    rule (orders ≥ $600 asked "確定？" for 4 s, keyed by a quantity the panel's redraw changed) is gone: every button in
+    the stock panel buys on the first tap, for the price printed on it, and the money on the HUD changes at once."""
+    g = Game(b, port, target, seed=23, manual=True)
+    player30(g); install_bot(g); fill_fridge(g); start_day(g); g.ev("window.__act=()=>{}")
+    g.ev("for(const d of menuList())S.stock[d]=0;S.money=50000;openStock(true)")
+    rows = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('#stockPanel .sp-row')].map(r=>({d:r.querySelector('[data-stock=buy]').dataset.d,btn:[...r.querySelectorAll('[data-stock=buy]')].map(b=>({n:+b.dataset.n,txt:b.textContent.trim(),dis:b.disabled}))})))"))
+    check(rows and all(len(r['btn']) == 2 for r in rows), f'each dish has +1 and 補滿: {rows[:2]}')
+    check(not any('確定' in b['txt'] for r in rows for b in r['btn']), 'no confirm state anywhere')
+    # the most expensive 補滿 (well over the old $600 threshold): one tap buys it
+    exp = max(rows, key=lambda r: r['btn'][1]['n'] * g.ev(f"emergencyCost('{r['d']}')"))
+    d, n = exp['d'], exp['btn'][1]['n']
+    cost = g.ev(f"emergencyCost('{d}')") * n
+    check(cost >= 600, f'the fixture should exercise a big order, got {cost}')
+    m0 = g.ev("S.money"); s0 = g.ev(f"S.stock['{d}']||0")
+    g.click(f"#stockPanel [data-stock=buy][data-d='{d}'][data-n='{n}']")
+    s1 = g.ev(f"S.stock['{d}']"); m1 = g.ev("S.money")
+    check(s1 == s0 + n and m1 == m0 - cost, f'one tap buys {n} for {cost}: stock {s1}, money {m1}')
+    check(hud_money(g).replace(',', '').endswith(str(m0 - cost)), f'the HUD shows the money at once: {hud_money(g)}')
+    check('緊急叫貨' in g.ev("$('#toasts')?$('#toasts').textContent:document.body.textContent"), 'the feedback names the order')
+    # the same button again, a few seconds later (the panel redrew in between): still one tap
+    g.ev("(()=>{for(let i=0;i<40;i++)__tick(100)})();renderStock()")
+    d2 = rows[0]['d'] if rows[0]['d'] != d else rows[1]['d']
+    n2 = g.ev(f"+document.querySelector(\"#stockPanel [data-stock=buy][data-d='{d2}']:last-of-type\").dataset.n")
+    m2 = g.ev("S.money"); g.click(f"#stockPanel [data-stock=buy][data-d='{d2}'][data-n='{n2}']")
+    check(g.ev("S.money") == m2 - g.ev(f"emergencyCost('{d2}')") * n2, 'the second big order is one tap too')
+    # the fill-all button: one tap, or disabled when it cannot be paid
+    g.ev("for(const d of menuList())S.stock[d]=1;S.money=99999;renderStock()")
+    check(g.ev("!!document.querySelector('[data-stock=fill]')") and not g.ev("document.querySelector('[data-stock=fill]').disabled"), 'fill-all is offered')
+    g.click('[data-stock=fill]')
+    check(all(v >= 3 for v in json.loads(g.ev("JSON.stringify(menuList().filter(stationOk).map(d=>S.stock[d]||0))"))), 'one tap fills every low dish to 3')
+    g.ev("for(const d of menuList())S.stock[d]=1;S.money=10;renderStock()")
+    check(g.ev("document.querySelector('[data-stock=fill]').disabled"), 'fill-all is disabled, not a trap, when the money is short')
+    g.close()
+
+@test
+def restaurant_records_are_readable_in_the_journal(b, port, target):
+    """v2.2.1 #12 (real device: the 餐廳紀錄 chips were cream on cream). The journal's records are dark ink on the paper
+    card with the value emphasised; the DAY stays secondary. Contrast is measured from the computed colours."""
+    g = Game(b, port, target, seed=5, manual=True, viewport={'width': 390, 'height': 844})
+    player30(g)
+    g.ev("bookTab='rest';showBook()"); g.page.wait_for_timeout(100)
+    rows = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('.reclist .recrow')].map(r=>{const cs=getComputedStyle(r.querySelector('span')),cb=getComputedStyle(r.querySelector('b')),cd=getComputedStyle(r.querySelector('small'));const bg=getComputedStyle(r.closest('.card')).backgroundColor;return {label:r.querySelector('span').textContent,c:cs.color,v:cb.color,d:cd.color,bg}}))"))
+    check(len(rows) >= 5, f'the Day 30 save has records: {rows}')
+    def lum(css):
+        import re
+        m = [float(x) for x in re.findall(r'[\d.]+', css)]
+        r, gg, bb = [c / 255 for c in m[:3]]
+        f = lambda c: c / 12.92 if c <= .03928 else ((c + .055) / 1.055) ** 2.4
+        return .2126 * f(r) + .7152 * f(gg) + .0722 * f(bb)
+    def contrast(a, b2):
+        la, lb = lum(a), lum(b2); hi, lo = max(la, lb), min(la, lb); return (hi + .05) / (lo + .05)
+    for r in rows:
+        check(contrast(r['c'], r['bg']) >= 7, f'the label reads: {r}')
+        check(contrast(r['v'], r['bg']) >= 4.5, f'the value reads: {r}')
+        check(contrast(r['c'], r['bg']) > contrast(r['d'], r['bg']), f'the DAY stays secondary: {r}')
+    g.close()
 
 def main():
     ap = argparse.ArgumentParser()
