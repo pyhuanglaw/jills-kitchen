@@ -9,6 +9,8 @@ Jill’s Kitchen v2.3 — Stories of Jill’s Kitchen
 - 《LOUNGE STORYLINES & RELATIONSHIP CONTENT》（第三份，同日稍後）→ 第三部（S1–S22）；Sophie × Mia 的角色設定圖
   → docs/v23/sophie_mia_concept.png，文字轉錄在 S6a。與既有章節重疊的人（Sophie、Mia、Dylan、王家、Ken × 杜）只加交叉
   引用，不改既有內容。
+- 第二張角色設定卡（沈晴／阿拓／Ken／Monsieur 杜，含年齡、職業、性格、興趣、喜好、色票、表情）→ docs/v23/qing_tuo_ken_du_concept.png，
+  文字轉錄在 L12b；Ken 的職業與遊戲內「品酒師」標籤的關係列為待你決定的事項（L12b）。
 被 addendum 明確取代的部分，只在文件層面調整字句：第 20 節（Stage 3「酒水企劃」→ Lounge 企劃）、第 21 節（酒水基礎設施
 不再是主廳裡的酒櫃，而是 Lounge 的吧台／酒藏；First Tasting Night = 起源線 Beat 4 的一次性實驗）、第 52 節（Ken-triggered
 wine service → Ken → wine → Lounge 起源線）、第 53 節（Phase E「Wine」→ Phase E–I 的 Lounge 分期）、「開始方式」的稽核清單
@@ -2459,6 +2461,43 @@ Evan 林奕文 32 — 首席 Bartender
 場景句：「主廳還要十五分鐘，要不要先坐吧台？」／「他還沒來。」「我又沒問。」「你每次都問。」
 場景圖（下方）：「Jill’s Kitchen Lounge」霓虹字、弧形吧台與高腳椅、小圓桌與沙發、植栽、暖琥珀光、一隻貓在沙發上；
 標語 “Same people. New stories. A bigger table.” — 這就是 L3 視覺方向的參照：still Jill’s restaurant, simply later.
+
+L12b. 角色設定卡（第二張）：沈晴／阿拓／Ken／Monsieur 杜
+圖：docs/v23/qing_tuo_ken_du_concept.png（2026-09-30 收到）。四人各有色票與六格表情；Ken 與 Monsieur 杜在 v2.2.1 已有遊戲內肖像
+（ken.webp、monsieur_du.webp，H2 依角色 ID 對應），這張是 v2.3 的表情／外觀參照，整合時同樣依 ID 對應，不得按順序。
+沈晴 27 — Bartender（Qing）
+「酒可以認真，但日子一定要好玩。」
+性格：開朗、直率、聰明、行動力強。
+興趣：調酒、旅行、拍照、新奇的食材組合。
+喜好：琴酒、氣泡酒、好笑的客人。
+相關：與阿拓工作默契逐漸升溫；也是 Lounge 氣氛的靈魂之一。
+外觀：深髮鬆盤髮、黑細肩上衣＋深色圍裙、長耳環、項鍊；手邊搖酒器；色票 近黑／深棕／棕／砂色。
+阿拓 29 — Bar Food Specialist（Tuo；後期可選雇）
+「食物要有靈魂，炸的也一樣。」
+性格：認真、專注、嘴硬、溫柔、對食物極度講究。
+興趣：研究食材、深夜食堂、電影、機車、貓。
+喜好：炸物、燻燒、啤酒、簡單的好味道。
+相關：與沈晴從工作默契開始，可能發展為戀情（可選）。
+外觀：深色微捲中長髮、黑襯衫＋棕色皮圍裙、拿夾子在油鍋前；色票 棕／米／橄欖灰／灰。
+Ken 36 — Regular Customer
+「好吃的東西，值得搭一杯更好的酒。」
+職業：金融／投資相關。
+性格：聰明、幽默、健談、熱愛美食、對酒有熱情。
+興趣：葡萄酒、旅行、餐酒搭配、收藏。
+喜好：紅酒、單一麥芽、和杜的爭論。
+相關：酒吧概念的起源者之一；與杜是多年好友（非戀愛）。
+外觀：深色捲髮、深色西裝外套＋深襯衫、腕錶、紅酒杯；色票 藍黑／灰米／灰棕／褐。
+Monsieur 杜 50 — Regular Customer
+「酒不是為了討好，是為了說真話。」
+職業：藝術收藏／顧問。
+性格：優雅、沉穩、挑剔、幽默、有原則。
+興趣：葡萄酒、藝術、音樂、閱讀。
+喜好：老年份、單一產區、經典料理。
+相關：與 Ken 是多年好友，常爭論但互相尊重（非戀愛）。
+外觀：灰白捲髮、眼鏡、花呢外套＋領巾、紅酒杯；色票 灰棕／米白／酒紅／橄欖。
+待決定：遊戲內 Ken 的名字是「品酒師 Ken」（v2.2.1 的 NAMED 表與肖像），這張卡把他的職業寫成金融／投資。兩者可以並存（「品酒師」
+是店裡的稱呼，不是他的職業；第 20 節 Beat 1 的「你是來吃飯還是來找工作？」也是這個意思），但要不要改遊戲內顯示名，請你在 v2.3
+audit 前決定；本文件不自行改。
 
 L14. EXISTING STAFF MUST NOT BECOME OBSOLETE
 Opening the Lounge must NOT make existing staff useless.
