@@ -3197,6 +3197,42 @@ def speech_log_logs_each_spoken_line_once(b, port, target):
     check(w[0] > w[1] * .55, f'the text column takes the row, not a sliver: {w}')
     g.close()
 
+@test
+def portrait_crops_isolate_each_figure(b, port, target):
+    """v2.2.1 #11 (two real-device screenshots: a stranger's hair down the left of Jill's portrait). The sheets' figures
+    overlap, so every crop that touches a neighbour carries a separator polyline in tools/portraits.py; the produced
+    PNG must be fully transparent on the neighbour's side of that line, and the four Jill crops must keep their own
+    figure (opaque pixels on the kept side). The 小林/Sophie swap the author confirmed is checked by the sheet columns."""
+    import importlib.util, numpy as np
+    from PIL import Image
+    spec = importlib.util.spec_from_file_location('portraits', os.path.join(ROOT, 'tools', 'portraits.py'))
+    mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod)
+    seen = 0
+    for entry in mod.CROPS:
+        if len(entry) < 4: continue
+        sheet, pid, box, seps = entry
+        im = Image.open(os.path.join(ROOT, 'assets', 'portraits', pid + '.png')).convert('RGBA')
+        sh = Image.open(os.path.join(mod.SRC, sheet)).convert('RGBA')
+        # the saved crop is trimmed: recover its offset inside the box from the untrimmed cut
+        raw = mod.solid_inside(sh.crop(box)); raw = mod.separate(raw, box, seps); bb = raw.getchannel('A').getbbox()
+        a = np.asarray(im.getchannel('A')); h, w = a.shape
+        ox, oy = box[0] + bb[0], box[1] + bb[1]
+        ys = np.arange(h) + oy; xs = np.arange(w) + ox
+        for side, pts in seps.items():
+            if side == 'top':
+                pts = sorted(pts, key=lambda q: q[0]); py = np.interp(xs, [q[0] for q in pts], [q[1] for q in pts])
+                bad = a[(ys[:, None] < py[None, :] - 3)]
+            else:
+                pts = sorted(pts, key=lambda q: q[1]); px = np.interp(ys, [q[1] for q in pts], [q[0] for q in pts])
+                m = (xs[None, :] < px[:, None] - 3) if side == 'left' else (xs[None, :] > px[:, None] + 3)
+                bad = a[m]
+            check(bad.size == 0 or bad.max() == 0, f'{pid}: the neighbour side of the {side} separator must be transparent (max alpha {bad.max() if bad.size else 0})')
+            seen += 1
+        check((a > 200).mean() > .25, f'{pid}: the figure itself is kept')
+    check(seen >= 12, f'the separators are in place ({seen})')
+    cols = {pid: box[0] for entry in mod.CROPS for (sheet, pid, box) in [entry[:3]] if sheet.startswith('sheet_regulars')}
+    check(cols['sophie'] < cols['leo'] < cols['xiaolin'], f'Sophie is the third figure and 小林 the fifth: {cols}')
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--target', choices=['index', 'single'], default='index')
