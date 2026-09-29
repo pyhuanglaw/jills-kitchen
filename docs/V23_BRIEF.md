@@ -6,6 +6,9 @@ Jill’s Kitchen v2.3 — Stories of Jill’s Kitchen
 - 《LOUNGE EXPANSION + STAFF GROWTH + RELATIONSHIP SPACE》→ 第二部（L1–L45）。
 - 《LOUNGE ORIGIN ARC — 餐廳是不是少了什麼？》→ 第 20 節（Ken × Monsieur 杜 現在是 Lounge 的敘事起源）。
 - 四位新員工的核心概念圖（approved concept direction）→ docs/v23/lounge_cast_concept.png，文字轉錄在 L12a。
+- 《LOUNGE STORYLINES & RELATIONSHIP CONTENT》（第三份，同日稍後）→ 第三部（S1–S22）；Sophie × Mia 的角色設定圖
+  → docs/v23/sophie_mia_concept.png，文字轉錄在 S6a。與既有章節重疊的人（Sophie、Mia、Dylan、王家、Ken × 杜）只加交叉
+  引用，不改既有內容。
 被 addendum 明確取代的部分，只在文件層面調整字句：第 20 節（Stage 3「酒水企劃」→ Lounge 企劃）、第 21 節（酒水基礎設施
 不再是主廳裡的酒櫃，而是 Lounge 的吧台／酒藏；First Tasting Night = 起源線 Beat 4 的一次性實驗）、第 52 節（Ken-triggered
 wine service → Ken → wine → Lounge 起源線）、第 53 節（Phase E「Wine」→ Phase E–I 的 Lounge 分期）、「開始方式」的稽核清單
@@ -258,6 +261,7 @@ Sophie ❤️ BaoBao +10
 
 最後她送的貓用品真的永久放在店裡。
 8. STORY ARC 01：Sophie × 寶寶
+【2026-09-30】這條線在 Lounge 之後仍獨立繼續（S7）；Sophie × Mia（S6）是另一條線，可以自然交會，不取代這條。
 《我沒有特別喜歡貓》
 這是 v2.3 的代表故事之一，請優先做好。
 Stage 1：保持距離
@@ -570,6 +574,7 @@ Jill：
 - Mrs. Wang solo。
 他們是兩個人，不是 Couple NPC object。
 15. STORY ARC 08：王先生／王太太 × Dylan／Jill
+【2026-09-30】「十一年了」指的只有 Jill 與 Dylan 自己的關係（S11）；Dylan 不是「觀察別人的戀情十一年」，也不會對新關係全知。
 《還在追喔？》
 Dylan reveal 前：
 王太太：
@@ -604,6 +609,7 @@ Album：
 打烊以後
 
 16. STORY ARC 09：Mia
+【2026-09-30】Mia 也是 Sophie × Mia（S6，primary slow-burn）的一半；這裡的聚餐線與那條線各自獨立，Mia 永遠是獨立 NPC。
 《我以前來的時候》
 只有真的在早期餐廳來過的 Mia 才能說：
 「我以前來的時候這邊還沒有側廳。」
@@ -822,6 +828,8 @@ After Lounge opens: Ken does NOT become staff. Monsieur 杜 does NOT become staf
 gradually become Lounge regulars. Evan / 晴 may later learn their habits through REAL service history. This creates a new
 relationship chain: Ken ↔ Monsieur 杜, Ken ↔ Evan, Monsieur 杜 ↔ Evan, Ken ↔ 晴, Jill ↔ Lounge history. The origin event
 therefore continues generating story instead of ending after unlock.
+Late callback（S4）：much later, after Evan has naturally learned the history of the Lounge —
+Evan：「聽說這裡是你害的。」 Ken：「誰跟你講的？」 Jill（從別處）：「我。」 Only if Evan has reasonably learned the origin story.
 
 TRIGGER ARCHITECTURE / DEADLOCK SAFETY
 Do NOT implement this as Day 35 → Ken line / Day 38 → 杜 line / Day 40 → tasting / Day 42 → Lounge, and do NOT implement
@@ -1251,6 +1259,8 @@ Album 不拍帳目。
 好像真的開起來了
 
 41. Dylan HARD RULES
+【2026-09-30】S11：Jill × Dylan 是關係生態裡的「長期的愛」對照組；reveal 後他可以偶爾注意到別人的關係（「她們是不是——」／「不要管人家。」），
+但不全知、不介入、不替別人的關係當旁白。
 Dylan 從 Day 1 就是 Jill 的丈夫。
 不是陌生人。
 不是 dating candidate。
@@ -1653,6 +1663,9 @@ Write stories that become part of Jill’s Kitchen.
     recommended implementation boundaries；
 13. 提出 station familiarity / wine familiarity 的最小表示與 UI 命名（L15–L17），以及 event lanes / overdue bonus 的
     arbiter 參數位置（L20–L22）。
+14. （S21）說明現有系統如何安全支撐：persistent Relationship Facts、familiarity、authored romantic eligibility、staff
+    employment dependencies、event weighting、overdue catch-up、room transitions、story event budget、special Life Album
+    illustration unlocks、save migration、mature-save compatibility。不建 generic romance engine／dating simulator／N×N romance matrix。
 
 第二部：Lounge 擴建、員工成長與關係空間（Addendum 2026-09-30，原文 docs/v23/addendum_2026-09-30_lounge_expansion.txt）
 本部是 docs/V23_BRIEF.md 的 DESIGN / ARCHITECTURE ADDENDUM。DO NOT IMPLEMENT THIS NOW；v2.3 仍以 architecture audit 開始（Phase 0），
@@ -2875,6 +2888,8 @@ Lounge presence ≠ friendship.
 Repeated actual history is still required.
 
 L25. AUTHORED LOUNGE RELATIONSHIP EXAMPLES
+【2026-09-30】第三部把其中幾組寫深：Sophie × Mia（S6，八個 phase）、Ken × 杜（S5，deep friendship，不是戀愛）、Evan（S4）、
+晴 × 阿拓（S9，新的 optional 員工線）、Jill × Dylan 與王家作為對照（S11、S12）。
 These are tone/content targets.
 Do not hard-code every scene into a linear quest chain.
 
@@ -3040,6 +3055,8 @@ wordless or near-wordless kitchen coordination.
 Their relationship is created through work, not generic friendship dialogue.
 
 L26. FRIENDSHIP AND ROMANCE
+【2026-09-30】whitelist 見 S13：PRIMARY Sophie × Mia；SECONDARY / OPTIONAL 晴 × 阿拓；Ken × Monsieur 杜 永遠是友情。
+eligibility 架構見 S14–S15；milestone 插圖見 S8、S10、S16–S17。
 The Lounge may support friendship and a SMALL number of romantic developments.
 
 HARD RULE:
@@ -3225,6 +3242,8 @@ It cannot invent:
 that did not occur.
 
 L31. LIFE ALBUM
+【2026-09-30】新增：authored relationship milestone illustrations（S8、S10、S16、S17）— 真正發生後才解鎖的專屬插圖，
+不是隨機截圖；Album 不能變成 CG 收集館。
 Lounge stories may become some of the strongest Life Album material.
 
 Examples:
@@ -3755,6 +3774,1098 @@ The player simply realizes:
 “These people know each other now.”
 
 That is v2.3.
+
+
+第三部：Lounge 故事線與關係內容（Addendum 2026-09-30 #2，原文 docs/v23/addendum_2026-09-30_lounge_storylines.txt）
+STORY / CONTENT specification for the future v2.3 Lounge — future scope；DO NOT IMPLEMENT before v2.2.1 Version 33 is completely
+released and the v2.3 architecture audit has been reviewed（S22）。與第 20 節（起源線）、第二部 L18–L28、L31 一起讀。
+
+The Lounge is not valuable merely because it sells wine.
+
+Its real narrative purpose is:
+
+People who previously came to Jill’s Kitchen separately begin spending enough time in the same place to recognize one another.
+
+Some become friends.
+Some become part of each other’s routines.
+A very small number may slowly become romantic.
+Staff become part of customers’ histories.
+Customers become part of staff members’ working lives.
+
+The player should gradually realize:
+
+「這些人以前根本不認識。」
+
+
+S1. STORY PHILOSOPHY
+The Lounge must NOT become a quest hub.
+
+Never show:
+
+Sophie Romance 3/5
+Friendship +10
+Relationship Level Up
+❤️ 78%
+Dating unlocked
+Talk to Mia (!)
+
+The player observes relationships through behavior.
+
+Important relationship development should be expressed through things such as:
+
+- choosing to sit near someone
+- greeting someone without introduction
+- knowing their name
+- sharing food
+- remembering their drink
+- waiting for someone
+- noticing someone is absent
+- leaving together
+- arriving together
+- staff preparing something before being asked
+- moving a bag off the adjacent chair
+- keeping a seat available without formally reserving it
+- changing one's normal behavior because another person is present
+
+The central rule is:
+
+RELATIONSHIPS ARE OBSERVED THROUGH CHANGED BEHAVIOR.
+
+Not through meters.
+
+S2. THE LOUNGE MUST HAVE AN ORIGIN STORY
+The Lounge does NOT appear merely because the player reached a revenue threshold.
+
+Ken is the narrative origin.
+
+The structural arc is:
+
+KEN NOTICES THE RESTAURANT DOES NOT SELL WINE
+→ repeated real food/pairing conversations
+→ Monsieur 杜 may join and disagree
+→ small experimental tasting evening
+→ Jill realizes she does not merely want a wine cabinet
+→ Jill wants somewhere guests can remain after dinner
+→ Lounge project becomes available
+→ player may build now or defer
+→ Lounge I construction
+→ first real Lounge service
+
+Ken remains a CUSTOMER.
+
+Monsieur 杜 remains a CUSTOMER.
+
+Neither becomes free staff.
+
+--------------------------------------------------
+KEN — FIRST QUESTION
+--------------------------------------------------
+
+Only after Ken has genuine visit history and has eaten suitable food.
+
+Ken:
+「妳真的完全不賣酒？」
+
+Jill:
+「目前沒有。」
+
+Ken:
+「有幾道菜，我每次吃到一半，都覺得旁邊少了一個東西。」
+
+Jill:
+「你是來吃飯還是來找工作？」
+
+Ken:
+「吃飯。」
+
+Do not immediately unlock Lounge construction.
+
+The idea must first become part of restaurant history.
+
+--------------------------------------------------
+MONSIEUR 杜
+--------------------------------------------------
+
+Preferred later event if Ken and 杜 are genuinely co-present:
+
+Ken:
+「這一道如果配——」
+
+杜:
+「不要。」
+
+Ken:
+「我還沒講。」
+
+杜:
+「我知道你要講什麼。」
+
+Their disagreement becomes a recurring relationship motif.
+
+IMPORTANT:
+
+Monsieur 杜 participation is CHARACTER ENRICHMENT.
+
+It must NOT become a hard blocker for Lounge structural progression.
+
+If RNG repeatedly prevents natural co-presence, Ken's structural arc continues.
+
+杜 can join later.
+
+--------------------------------------------------
+EXPERIMENTAL TASTING
+--------------------------------------------------
+
+Eventually Jill tries ONE small tasting evening.
+
+This is not permanent wine service.
+
+No permanent bottle inventory.
+No wine micromanagement.
+No giant tutorial.
+
+It exists to prove:
+
+“Wine actually belongs here.”
+
+It may create:
+- real Reviews
+- Social discussion
+- Life Album photo
+- character memories
+- Ken/杜 disagreement
+
+After sufficient real history:
+
+Jill:
+「如果真的要做，我不想只是放一個酒櫃。」
+
+Ken:
+「那妳想怎樣？」
+
+Jill:
+「讓人吃完飯以後，還有地方可以坐。」
+
+NEW PROJECT:
+Jill’s Kitchen — Lounge
+
+Player may choose:
+
+[開始規劃]
+[之後再說]
+
+Deferring NEVER permanently loses the Lounge.
+
+S3. AFTER THE LOUNGE OPENS
+Do NOT treat the opening as the end of the story.
+
+It is the beginning of a new social environment.
+
+The first nights should primarily use EXISTING characters.
+
+The player should see familiar people behaving differently because there is now somewhere to stay.
+
+Possible behaviors:
+
+Dinner → Lounge
+
+Lounge → Dinner
+
+Wait for dining table in Lounge
+
+Come specifically for Lounge
+
+Stay after another regular leaves
+
+Wait for another person
+
+Join someone already seated
+
+Move from bar counter to shared table
+
+Share Bar Food
+
+Talk to bartender
+
+Leave together
+
+The SAME customer identity must persist through room transitions.
+
+S4. EVAN — THE PERSON WHO STARTS REMEMBERING EVERYONE
+Evan begins with no magical knowledge of restaurant history.
+
+He learns through actual employment.
+
+Early:
+
+Ken:
+「杜來了嗎？」
+
+Evan:
+「還沒看到。」
+
+Later, after enough real history:
+
+Ken walks in.
+
+Evan places one coaster down.
+
+Then pauses.
+
+Places a second coaster nearby.
+
+Ken:
+「他今天沒來。」
+
+Evan:
+「我沒問。」
+
+Evan gradually learns:
+- regular drinks
+- preferred seating
+- who tends to wait for whom
+- who argues about what
+- who comes alone
+- who increasingly arrives together
+
+But he NEVER exposes private information simply because he knows it.
+
+His personality is:
+
+「記得很多，但不會因為知道很多就一直講。」
+
+--------------------------------------------------
+LATE CALLBACK TO LOUNGE ORIGIN
+--------------------------------------------------
+
+Much later, after Evan has naturally learned the history of the Lounge:
+
+Evan:
+「聽說這裡是你害的。」
+
+Ken:
+「誰跟你講的？」
+
+Jill, from elsewhere:
+「我。」
+
+This should only occur if Evan has reasonably learned the origin story.
+
+S5. KEN × MONSIEUR 杜 DEEP FRIENDSHIP — NOT ROMANCE
+This relationship is intentionally capable of fooling the player.
+
+They may:
+
+- argue constantly
+- know each other's wine preferences
+- sit together
+- save an adjacent seat
+- notice absence
+- wait for one another
+- order food together
+- arrive independently but spend the evening together
+
+BUT:
+
+They are NOT a romantic pair.
+
+This is important.
+
+The relationship system must establish:
+
+INTIMACY ≠ ROMANCE.
+
+Example:
+
+晴:
+「你今天不等杜先生？」
+
+Ken:
+「我為什麼要等他？」
+
+pause
+
+Ken:
+「他有說幾點嗎？」
+
+Do not turn this into a romantic reveal later.
+
+Their friendship itself is valuable.
+
+S6. SOPHIE × MIA PRIMARY SLOW-BURN ROMANTIC ARC
+This is the strongest candidate for the major new romantic relationship.
+
+It must take a LONG time.
+
+The first half of their development should be indistinguishable from ordinary friendship.
+
+Do NOT internally begin with:
+
+SophieLikesMia = true
+
+Use ordinary Relationship Facts first.
+
+Possible facts:
+
+recognizes
+knowsName
+repeatedCoPresence
+sharedTable
+sharedFood
+choosesNearbySeat
+waitedFor
+noticedAbsence
+leftTogether
+arrivedTogether
+
+Only an explicitly authored whitelist may later interpret enough qualitative history as:
+
+romanticEligible
+
+Even then:
+
+romanticEligible ≠ dating.
+
+--------------------------------------------------
+PHASE A — RECOGNITION
+--------------------------------------------------
+
+They repeatedly encounter one another naturally.
+
+Mia:
+「妳也常來？」
+
+Sophie:
+「……妳不是也一樣。」
+
+Nothing romantic.
+
+--------------------------------------------------
+PHASE B — FIRST SHARED SPACE
+--------------------------------------------------
+
+A crowded restaurant or Lounge may naturally cause them to share seating.
+
+But shared seating must NOT be a hard progression requirement.
+
+If crowding never happens, an equivalent meaningful conversation can occur naturally.
+
+Story meaning fixed.
+Presentation may fallback.
+
+--------------------------------------------------
+PHASE C — ACTIVE CHOICE
+--------------------------------------------------
+
+This is more important than repeated co-presence.
+
+Mia is already in Lounge.
+
+Sophie enters.
+
+Other seats exist.
+
+Sophie chooses to sit nearby.
+
+Later:
+
+Mia:
+「妳今天不是坐那邊？」
+
+Sophie:
+「這邊也可以。」
+
+This is the first moment where an observant player may suspect something.
+
+--------------------------------------------------
+PHASE D — MAKING SPACE
+--------------------------------------------------
+
+Sophie arrives first.
+
+Her bag is on the adjacent chair.
+
+Mia enters.
+
+Sophie notices her.
+
+Without dialogue:
+
+Sophie moves the bag.
+
+This should count as more meaningful relationship evidence than another generic conversation.
+
+--------------------------------------------------
+PHASE E — SHARED FOOD
+--------------------------------------------------
+
+Mia:
+「要不要吃這個？」
+
+Sophie:
+「不要。」
+
+Later Sophie is eating it.
+
+No relationship popup.
+
+--------------------------------------------------
+PHASE F — WAITING
+--------------------------------------------------
+
+Sophie has finished.
+
+Normally she would leave.
+
+Evan:
+「還要什麼嗎？」
+
+Sophie:
+「不用。」
+
+She stays.
+
+Later Mia arrives.
+
+Evan notices.
+
+He says nothing.
+
+This may create a qualitative fact:
+
+waitedFor(Mia)
+
+Waiting should matter more than simple co-presence.
+
+--------------------------------------------------
+PHASE G — LEAVING TOGETHER
+--------------------------------------------------
+
+Near closing:
+
+Mia:
+「走嗎？」
+
+Sophie:
+「嗯。」
+
+They leave together.
+
+Potential Life Album title:
+
+《今天一起走》
+
+NOT:
+
+《第一次約會》
+
+The player interprets the moment.
+
+--------------------------------------------------
+PHASE H — ARRIVING TOGETHER
+--------------------------------------------------
+
+Much later, after sufficient real history:
+
+They enter Jill’s Kitchen together.
+
+Jill:
+「今天一起？」
+
+Mia:
+「嗯。」
+
+Sophie:
+「……怎樣？」
+
+Jill:
+「沒有啊。」
+
+From this point:
+
+arrivesTogether becomes occasionally eligible.
+
+They still remain two independent NPCs.
+
+Never merge them into a Couple entity.
+
+They may still:
+- visit separately
+- have separate preferences
+- have separate stories
+- interact with different people
+- arrive alone
+
+A relationship must ADD identity, not erase it.
+
+S6a. Sophie × Mia 角色設定（canonical appearances）
+圖：docs/v23/sophie_mia_concept.png（2026-09-30 收到）。這是 S8 milestone 插圖與任何新表情藝術的外觀依據；v2.2.1 遊戲內既有的
+sophie / mia 肖像（assets/portraits/web/sophie.webp、mia.webp）仍是目前的 canon，整合新藝術時依角色 ID 對應（L13），不得按順序。
+Sophie：色票 近黑／暖棕／灰米／砂色。深色長捲髮（另有盤髮變化），黑西裝外套＋黑上衣、灰寬褲、黑色托特包、腕錶、小耳環，手邊常有
+一杯紅酒；表情：沉思、側看、托腮、微笑、戴眼鏡看書。氣質安靜、內斂、有距離感。
+Mia：色票 深棕／駝色／乾燥玫瑰／米白。高馬尾＋瀏海，米白襯衫（圖中配深色圍裙）、耳環，手邊是加薄荷的飲料；表情：大笑、托腮、
+瞇眼笑、驚訝、吃東西、趴桌笑。氣質明亮、外放、活潑。
+兩人的對比（安靜 × 明亮）就是 S6 八個 phase 要靠「行為改變」讓玩家自己看出來的東西；插圖要低調（S8：一起坐、一起走、分食、自然
+靠近），不要婚禮、誇張親吻、大愛心、告白畫面或畫面內文字。
+
+S7. SOPHIE × 寶寶 CONTINUES
+Sophie’s relationship with 寶寶 must continue independently.
+
+Romance does NOT replace earlier character stories.
+
+Instead, story threads may cross naturally.
+
+Example:
+
+寶寶 approaches Sophie.
+
+Sophie pets her naturally.
+
+Mia watches.
+
+Sophie:
+「幹嘛？」
+
+Mia:
+「沒有。」
+
+Sophie:
+「妳有。」
+
+Mia:
+「我真的沒有。」
+
+If Mia eventually learns about the item Sophie brought for 寶寶, she may reference it.
+
+But only after she has actually witnessed or learned that fact.
+
+No omniscience.
+
+S8. SOPHIE × MIA ROMANTIC MILESTONE IMAGE
+IMPORTANT NEW REQUIREMENT:
+
+When an authored relationship genuinely crosses the confirmed romantic milestone, generate/unlock ONE dedicated relationship illustration for Life Album.
+
+This is NOT merely a random screenshot.
+
+It is a special authored milestone image.
+
+However:
+
+The image may unlock ONLY after the underlying relationship event actually occurred.
+
+Do not fabricate relationship history merely to unlock artwork.
+
+For Sophie × Mia:
+
+after their relationship has genuinely become romantic through real history,
+unlock a dedicated Sophie × Mia illustration.
+
+The illustration should use their canonical character appearances.
+
+It may depict an understated moment such as:
+- sitting together in Lounge
+- leaving together
+- quiet shared food/drink
+- one leaning naturally toward the other
+
+Avoid:
+- wedding imagery
+- exaggerated kissing
+- giant hearts
+- visual-novel confession framing
+- text saying “COUPLE UNLOCKED”
+
+Life Album title should remain understated.
+
+Examples:
+
+《今天一起來》
+《留到很晚》
+《她的位置》
+《兩個人的晚上》
+
+This artwork becomes a permanent piece of restaurant history.
+
+S9. 晴 × 阿拓 OPTIONAL STAFF SLOW-BURN
+This is a SECONDARY authored romantic possibility.
+
+It begins as professional chemistry.
+
+Do NOT start romantically.
+
+Early:
+
+晴:
+「炸雞好了沒？」
+
+阿拓:
+「沒有。」
+
+晴:
+「看起來好了。」
+
+阿拓:
+「妳跟 Hugo 講一樣的話。」
+
+晴:
+「那代表我們兩個都正常。」
+
+Their first relationship is WORK.
+
+Over time they learn each other's timing.
+
+Eventually 晴 can recognize when food is nearly ready without asking.
+
+阿拓 learns which Lounge tables actually need speed.
+
+--------------------------------------------------
+SMALL PERSONAL CHANGE
+--------------------------------------------------
+
+After closing:
+
+晴 is still working at the bar.
+
+阿拓 places a small plate beside her.
+
+晴:
+「什麼？」
+
+阿拓:
+「多的。」
+
+She tastes it.
+
+晴:
+「你明明就是特別做的。」
+
+阿拓:
+「多的。」
+
+Do not label this romantic.
+
+Repeat variations rarely.
+
+--------------------------------------------------
+ABSENCE
+--------------------------------------------------
+
+One day 阿拓 is not working.
+
+晴:
+「今天炸物怎麼怪怪的？」
+
+Hugo:
+「一樣的做法。」
+
+晴:
+「喔。」
+
+pause
+
+晴:
+「阿拓今天沒來？」
+
+Hugo:
+「妳不是在問炸物？」
+
+This is where the player may begin suspecting something.
+
+--------------------------------------------------
+EMPLOYMENT SAFETY
+--------------------------------------------------
+
+This arc MUST tolerate firing / staff absence.
+
+If 晴 or 阿拓 is no longer employed:
+
+Do not teleport them back.
+
+Do not freeze unrelated systems.
+
+Do not punish the player.
+
+Do not leave a permanent broken StoryStage waiting for them.
+
+The romantic arc simply becomes inactive unless the game later has a legitimate former-employee return mechanism.
+
+This is an OPTIONAL character arc.
+
+It must never block restaurant progression.
+
+S10. 晴 × 阿拓 MILESTONE IMAGE
+If and only if their authored romantic relationship genuinely develops far enough:
+
+unlock a dedicated relationship illustration.
+
+Possible understated image:
+
+After closing,
+Lounge mostly empty,
+晴 sitting at bar,
+阿拓 beside her with the small plate he claims was “extra.”
+
+Again:
+
+No giant romance UI.
+No hearts.
+No confession screen.
+
+The player should recognize the history represented by the image.
+
+S11. JILL × DYLAN LONG-TERM LOVE AS CONTRAST
+Jill and Dylan are already married and have been together for approximately eleven years.
+
+Dylan is NOT “observing a romance for eleven years.”
+
+The eleven years refers ONLY to Jill and Dylan’s own long-term relationship.
+
+Their role in the relationship ecosystem is different:
+
+Sophie × Mia:
+a relationship beginning.
+
+晴 × 阿拓:
+work familiarity becoming personal.
+
+Jill × Dylan:
+a long-established marriage where Dylan still enjoys acting like he is pursuing his wife.
+
+王先生 × 王太太:
+an established married couple with ordinary independent lives.
+
+Ken × Monsieur 杜:
+deep friendship without romance.
+
+This contrast is important.
+
+--------------------------------------------------
+JILL / DYLAN OBSERVING NEW RELATIONSHIPS
+--------------------------------------------------
+
+After Dylan’s marriage reveal, he may occasionally notice other relationships developing.
+
+But do NOT make him omniscient.
+
+Example:
+
+Dylan:
+「她們是不是——」
+
+Jill:
+「不要管人家。」
+
+Dylan:
+「我只是觀察。」
+
+Jill:
+「你很閒是不是？」
+
+This is enough.
+
+Do NOT say he has been observing them for eleven years.
+
+--------------------------------------------------
+JILL / DYLAN THEMATIC CALLBACK
+--------------------------------------------------
+
+A new relationship may occasionally remind the player that Jill/Dylan have their own long history.
+
+For example:
+
+Dylan watches two people awkwardly choose seats near each other.
+
+Dylan:
+「以前我也——」
+
+Jill:
+「你現在也一樣。」
+
+Dylan:
+「也是。」
+
+This preserves Dylan’s core joke:
+
+He never stopped pursuing Jill.
+
+S12. 王先生 × 王太太 ESTABLISHED COUPLE
+They should demonstrate that being married does not mean functioning as one NPC.
+
+Sometimes:
+- arrive together
+- arrive separately
+- one waits
+- one leaves earlier
+- one sits with another regular
+- they tease each other
+- they know one another’s habits
+
+Their relationship should feel comfortable and ordinary.
+
+This provides another contrast to new romance.
+
+S13. RELATIONSHIP NETWORK — NOT PAIRING TABLE
+Do NOT turn all characters into romantic candidates.
+
+Most relationships should remain:
+
+friendship
+professional familiarity
+regular/staff familiarity
+shared-interest relationship
+friendly rivalry
+customer/restaurant history
+
+Romance is rare.
+
+Currently approved romantic authored candidates:
+
+PRIMARY:
+Sophie × Mia
+
+SECONDARY / OPTIONAL:
+晴 × 阿拓
+
+Do NOT spontaneously create additional romantic pairs without approval.
+
+Especially:
+
+Ken × Monsieur 杜 remains friendship.
+
+Do not automatically pair opposite-sex NPCs.
+
+Do not assume repeated co-presence means attraction.
+
+S14. ROMANTIC ELIGIBILITY ARCHITECTURE
+Do NOT use:
+
+coPresenceCount >= 10
+→ romance
+
+Romantic progression requires qualitative facts.
+
+Examples:
+
+choosesNearbySeat
+waitedFor
+changedDepartureBehavior
+sharedFoodVoluntarily
+noticedAbsence
+arrivedTogether
+leftTogether
+repeatedActiveChoice
+
+The authored pair must first develop through normal relationship architecture.
+
+Conceptually:
+
+FACTS
+→ FAMILIARITY
+→ COMFORT
+→ QUALITATIVE RELATIONSHIP HISTORY
+→ romanticEligible
+→ authored romantic beats
+→ confirmed relationship state
+
+The player sees NONE of these technical states.
+
+S15. DO NOT DEADLOCK ROMANCE
+Do not require one exact physical event.
+
+Example:
+
+Sophie/Mia romance should not permanently fail because:
+
+“they never happened to share Table 4.”
+
+Use meaningful equivalent presentation.
+
+But do NOT fake core facts.
+
+If Mia never actually arrived:
+Sophie cannot wait for Mia and then somehow record waitedFor(Mia).
+
+If Sophie left before Mia arrived:
+do not claim they left together.
+
+Presentation can fallback.
+
+History cannot lie.
+
+S16. RELATIONSHIP ART ARCHITECTURE
+Dedicated relationship illustrations are authored rewards for genuine long-term history.
+
+They are NOT random screenshots.
+
+They should be treated similarly to special Life Album assets.
+
+Requirements:
+
+- canonical faces
+- stable character mapping
+- correct outfits/era where relevant
+- correct relationship
+- no unrelated character accidentally appearing
+- no portrait identity swap
+- no impossible cat
+- no event depicted before it occurred
+
+If an illustration includes a cat:
+that inclusion must be appropriate to the actual authored milestone.
+
+Do not use generated text inside the artwork if avoidable.
+
+Use game UI for title/caption.
+
+This avoids typography artifacts and keeps localization safe.
+
+S17. OTHER RELATIONSHIP MILESTONE IMAGES
+Romance is NOT the only relationship worthy of special artwork.
+
+Potentially, extremely important non-romantic history may also earn one.
+
+Examples:
+
+Ken × Monsieur 杜:
+their established Lounge friendship / argument
+
+Dylan × Jill:
+rare post-reveal long-term-marriage moment
+
+Staff ensemble:
+late-night staff meal
+
+But keep these rare.
+
+Life Album should not become a collectible CG gallery.
+
+Special illustrations should feel exceptional.
+
+S18. EVENT DENSITY
+Do not turn Lounge into nonstop scripted dialogue.
+
+Normal night:
+mostly restaurant simulation.
+
+Typical:
+0–1 major authored story beat
+0–2 minor callbacks
+ambient interactions as appropriate
+
+Some nights:
+nothing important happens.
+
+That silence is necessary.
+
+Without ordinary nights, special nights do not feel special.
+
+S19. CROSSOVER EXAMPLES
+As history grows, relationships may cross.
+
+Examples:
+
+Mia knows Sophie likes 寶寶.
+
+Evan knows Ken waits for 杜.
+
+晴 knows 周董’s “隨便” is not actually random.
+
+安安 recognizes who is waiting for whom.
+
+王太太 notices Sophie/Mia before they formally arrive together.
+
+Dylan suspects something but Jill tells him not to interfere.
+
+Hugo notices 晴 asking about 阿拓.
+
+These are BONUS callbacks.
+
+They must NEVER become mandatory prerequisites for the underlying relationship.
+
+S20. LONG-TERM TARGET
+By Day80–100 in a sufficiently mature save, a player might witness something like:
+
+Ken and Monsieur 杜 are already arguing at their usual part of the bar.
+
+Evan barely needs to ask what they want.
+
+Sophie arrives first.
+
+She sits down.
+
+Her bag is on the next chair.
+
+Mia enters later.
+
+Sophie removes the bag without saying anything.
+
+Nearby, 晴 asks Kitchen whether 阿拓 is working tonight, then immediately pretends the question was about food.
+
+Dylan notices Sophie and Mia.
+
+He looks toward Jill.
+
+Jill sees his face before he says anything.
+
+Jill:
+「不要。」
+
+Dylan:
+「我還沒講。」
+
+One of the cats is asleep nearby.
+
+Nothing announces:
+
+RELATIONSHIP EVENT COMPLETE.
+
+The player understands all of it because they remember what these people used to be like.
+
+That is the target.
+
+S21. IMPLEMENTATION GUARDRAIL
+Before coding any of these stories:
+
+architecture audit must explain how current systems safely support:
+
+- persistent Relationship Facts
+- familiarity
+- authored romantic eligibility
+- staff employment dependencies
+- event weighting
+- overdue catch-up
+- room transitions
+- story event budget
+- special Life Album illustration unlocks
+- save migration
+- mature-save compatibility
+
+Do NOT build a generic romance engine.
+
+Do NOT build a dating simulator.
+
+Do NOT create an N×N romance matrix.
+
+Do NOT create romance AI.
+
+Implement only the small number of authored relationships we actually need.
+
+The system should be generic enough for relationship facts,
+but ROMANCE itself remains authored.
+
+S22. CURRENT EXECUTION STATUS
+DOCUMENTATION ONLY FOR NOW.
+
+Do not implement this before v2.2.1 Version33 is complete.
+
+When eventually authorized for v2.3:
+
+implement relationship infrastructure first,
+prove it with a small vertical slice,
+then add Lounge relationship content gradually.
+
+Do not attempt every storyline in one commit.
 
 完成這份 architecture report 後再開始 Phase A。
 不要重新設計已穩定的 v2.2.1 系統，不要為了 v2.3 建立不必要的大型 framework，也不要把 presentation 問題升級成 infrastructure project。
