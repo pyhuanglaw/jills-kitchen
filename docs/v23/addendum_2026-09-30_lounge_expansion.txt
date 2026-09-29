@@ -1,0 +1,2251 @@
+Jill’s Kitchen v2.3 ADDENDUM
+LOUNGE EXPANSION + STAFF GROWTH + RELATIONSHIP SPACE
+
+IMPORTANT EXECUTION INSTRUCTION
+
+This is a DESIGN / ARCHITECTURE ADDENDUM to docs/V23_BRIEF.md.
+
+DO NOT IMPLEMENT THIS NOW.
+
+First:
+1. Append/integrate this addendum into docs/V23_BRIEF.md.
+2. Commit the documentation change only.
+3. Continue and complete v2.2.1 exactly as already planned:
+   - finish full QA
+   - fix only real release blockers
+   - rebuild single-file artifact
+   - Day35 real-save smoke
+   - publish Version33
+   - create v2.2.1 tag
+   - write V221_REPORT
+4. Do not spend current quota prototyping Lounge systems.
+5. After v2.2.1 is fully released, v2.3 still begins with the previously requested architecture audit/report BEFORE implementation.
+
+The Lounge is now a major v2.3 direction, but it must be integrated into the existing Jill’s Kitchen simulation rather than becoming a second independent game.
+
+==================================================
+1. PRODUCT VISION
+==================================================
+
+Jill’s Kitchen eventually grows beyond a restaurant with additional dining rooms.
+
+It develops a connected evening Lounge / wine bar.
+
+The conceptual distinction is:
+
+Main Hall:
+“吃飯”
+high service density / primary dining / turnover
+
+Side Hall:
+“聚餐”
+groups / comfort / longer meals
+
+Lounge:
+“留下來”
+lower turnover / higher average spend / higher social density / relationship development
+
+The Lounge should feel like Jill’s Kitchen growing another layer of life at night.
+
+It is NOT:
+- a nightclub
+- a sports bar
+- a separate business
+- a second restaurant simulation
+- a cocktail minigame
+- a wine inventory simulator
+- a dating simulator
+- a new F2P management layer
+- an excuse to replace existing characters with new characters
+
+Core fantasy:
+
+During dinner, Jill runs a restaurant.
+
+Later in the evening, some people do not immediately leave.
+
+They move to the Lounge.
+They sit longer.
+People who used to merely recognize one another begin talking.
+Staff begin remembering customers.
+Customers begin remembering staff.
+Separate regulars slowly become part of one another’s lives.
+
+The Lounge is a physical place where the existing v2.3 relationship-memory system becomes visible.
+
+Core line:
+
+「主廳是吃飯，側廳是聚餐，酒吧是留下來。」
+
+And:
+
+「這些人本來不是一群朋友，是這間餐廳讓他們慢慢認識。」
+
+==================================================
+2. HARD ARCHITECTURAL RULE:
+ONE RESTAURANT, NOT TWO GAMES
+==================================================
+
+The Lounge MUST remain inside the existing Jill’s Kitchen restaurant simulation.
+
+Do NOT create:
+- a second game loop
+- a separate save
+- a separate customer universe
+- a duplicate staff system
+- a duplicate relationship system
+- a duplicate review system
+- a duplicate event scheduler
+- a duplicate economy
+- a duplicate inventory system
+- a duplicate clock
+- a duplicate customer AI framework
+
+Reuse the existing systems whenever safe:
+
+- restaurant clock
+- customer identity
+- regular history
+- World Memory
+- Relationship Facts
+- staff roster
+- staff assignment board
+- kitchen
+- tickets
+- economy
+- Reviews 2.0
+- Social
+- Marketing
+- Life Album
+- Restaurant Records
+- Story Event Arbiter
+
+The Lounge is primarily:
+
+NEW SPACE
++ NEW SERVICE TYPE
++ NEW STAFF SPECIALTY
++ NEW MENU CATEGORY
++ NEW SEATING BEHAVIOR
++ NEW SOCIAL/RELATIONSHIP OPPORTUNITIES
+
+It is NOT a parallel simulation.
+
+Conceptually a guest may have:
+
+location = MAIN / SIDE / LOUNGE / WAITING / LEAVING
+
+and can transition safely between spaces.
+
+Do not implement this exact enum if current architecture suggests a safer representation.
+Audit first.
+
+==================================================
+3. VISUAL DIRECTION
+==================================================
+
+Working identity:
+
+Jill’s Kitchen — Lounge
+
+The Lounge must visually belong to the same restaurant.
+
+It should NOT suddenly become:
+- black nightclub walls
+- neon purple LEDs
+- loud nightclub design
+- generic American pub
+- sports-bar TVs
+- overly masculine whiskey den
+- wall-to-wall alcohol bottles
+- casino-like luxury
+- another copy of Main Hall
+
+Visual direction:
+
+warm contemporary Taipei hospitality
++
+quiet wine lounge
++
+residential warmth
+
+Palette should extend the mature Jill’s Kitchen palette:
+
+- ivory
+- cream
+- oatmeal
+- beige
+- greige
+- taupe
+- natural warm wood
+- warm stone
+- restrained charcoal
+- small brass details
+- plant green
+- warm amber lighting
+
+Lighting:
+lower and warmer than Main Hall,
+but NEVER so dark that NPC faces, food, cats, or social interactions become hard to read on phone.
+
+The player must still be able to visually understand:
+- who is sitting with whom
+- who is waiting for someone
+- which staff member is serving
+- where Jill is
+- where Dylan is
+- which cat entered the Lounge
+- what social event is occurring
+
+Do not sacrifice gameplay readability for mood.
+
+The Lounge should communicate:
+
+“It is still Jill’s restaurant. It is simply later now.”
+
+==================================================
+4. EXPANDABLE LOUNGE
+==================================================
+
+Do not give the player the final Lounge immediately.
+
+It should physically grow with the restaurant.
+
+Exact prices and capacities must be balance-audited before implementation.
+The following numbers are design targets, not immutable constants.
+
+------------------------------
+LOUNGE I — SMALL BAR
+------------------------------
+
+A mature restaurant story unlock introduces the possibility.
+
+Approximate spatial identity:
+- real bar counter
+- ~6 bar seats
+- ~2–3 small lounge tables
+- compact wine storage
+- basic glassware
+- warm lighting
+- small Bar Food menu
+
+This should feel like Jill has opened a small new evening space.
+
+Minimum viable staffing:
+- 1 trained bartender
+- 1 FOH support person
+- shared Main Kitchen
+
+No second kitchen.
+
+------------------------------
+LOUNGE II — BAR LOUNGE
+------------------------------
+
+Physical expansion:
+- longer bar
+- more seating
+- ~5–6 table/lounge groups depending on actual layout
+- improved wine display/storage
+- better lighting
+- some sofa/lounge seating
+- stronger evening identity
+- increased social event eligibility
+
+Staffing naturally grows:
+- 1–2 bartenders
+- 1–2 Lounge-capable FOH
+- Main Kitchen still shared
+
+This is where the Lounge begins to feel like a real second social environment inside the same restaurant.
+
+------------------------------
+LOUNGE III — MATURE LOUNGE
+------------------------------
+
+Late-game money sink and spatial transformation.
+
+Possible physical elements:
+- mature bar counter
+- richer wine display
+- premium seating
+- sofa grouping
+- quiet conversation corner
+- better glassware/service equipment
+- atmospheric lighting
+- optional Bar Pantry / Fry Station
+
+IMPORTANT:
+
+Lounge III must not simply increase table count.
+
+Different seating areas should support different social behavior.
+
+BAR COUNTER:
+strangers / regulars / bartender conversations
+
+SMALL TABLE:
+friends / couples / quiet conversations
+
+SOFA / GROUP AREA:
+small social clusters
+
+QUIET CORNER:
+low-frequency intimate or reflective story moments
+
+Space itself should help tell stories.
+
+==================================================
+5. THE LOUNGE IS ALSO A WAITING SPACE
+==================================================
+
+One practical gameplay benefit:
+
+When Main Hall / Side Hall is full, some eligible guests may choose:
+
+“先到 Lounge 等桌”
+
+instead of standing in a normal queue.
+
+They may:
+- sit at the bar
+- order a drink
+- wait naturally
+- move to Main/Side when their table becomes available
+
+This must NOT create duplicate customers or duplicate tickets.
+
+The SAME guest entity transitions spaces.
+
+Potential flow:
+
+ARRIVE
+→ WAITING
+→ LOUNGE
+→ MAIN/SIDE
+→ optional LOUNGE after dinner
+→ LEAVE
+
+But do not force every guest through this.
+
+Some guests:
+- do not drink
+- do not want to wait
+- prefer direct dining
+- may leave normally
+
+The Lounge should improve restaurant flow without becoming mandatory.
+
+==================================================
+6. EVENING FLOW
+==================================================
+
+The Lounge should create a visible change in restaurant rhythm.
+
+Approximate conceptual flow:
+
+early dinner:
+Main/Side dominant
+
+later dinner:
+Lounge becomes increasingly active
+
+late evening:
+Main Hall gradually empties
+while a smaller number of guests remain in Lounge
+
+Do NOT hard-code rigid time behavior without auditing the current service clock.
+
+The desired player feeling is:
+
+“The restaurant has a second half of the night.”
+
+This allows relationship scenes that would feel unnatural during peak table turnover.
+
+==================================================
+7. BAR FOOD
+==================================================
+
+The Lounge gets a SHORT dedicated Bar Food menu.
+
+Do NOT copy the full restaurant menu.
+
+Possible categories:
+
+- truffle fries
+- fried chicken / seasoned chicken bites
+- fried seafood
+- croquette
+- mushrooms / warm small plate
+- cheese / charcuterie-style small plate
+- simple dessert
+- one Jill’s Kitchen Signature Bar Bite
+
+Exact dishes should fit existing ingredient/art architecture.
+
+Bar Food is primarily:
+- shareable
+- quick
+- suited to drinks
+- visually distinct from full dinner plates
+
+==================================================
+8. HARD RULE: SHARED KITCHEN FIRST
+==================================================
+
+Bar I and Bar II MUST use the existing Main Kitchen.
+
+Example Lounge ticket:
+
+LOUNGE TABLE 3
+Sparkling ×2
+Truffle Fries ×1
+Fried Chicken ×1
+
+Drinks:
+→ Bartender workflow
+
+Food:
+→ existing Main Kitchen ticket workflow
+
+Completed food:
+→ Lounge Server / Runner delivers to Lounge
+
+Do NOT create a second full kitchen.
+
+Do NOT create a second ingredient inventory.
+
+Do NOT create a second prep system.
+
+Do NOT create a second refrigerator economy.
+
+Reuse existing ingredients whenever sensible.
+
+The interesting consequence is:
+
+A successful Lounge increases Main Kitchen demand.
+
+This creates a real management tradeoff.
+
+The player may respond by:
+1. assigning more existing kitchen staff
+2. improving staff familiarity with Bar Food
+3. later hiring a specialist
+4. eventually purchasing a small Bar Pantry/Fry Station
+
+==================================================
+9. OPTIONAL LATE-GAME BAR PANTRY
+==================================================
+
+Only after Lounge demand becomes substantial should the player be offered:
+
+Bar Pantry / Fry Station
+
+This is NOT a second kitchen.
+
+It can finish only limited Bar Food such as:
+- fries
+- fried chicken
+- croquette
+- cold plates
+- simple dessert finishing
+
+It cannot produce:
+- full restaurant entrées
+- Signature main dishes
+- complex Main Kitchen recipes
+
+Purpose:
+- reduce Main Kitchen pressure
+- provide visible late-game infrastructure
+- create a meaningful money sink
+- make a Bar Food specialist valuable
+
+It should be optional.
+
+The player should first FEEL the operational reason before being asked to buy it.
+
+==================================================
+10. WINE / DRINK ARCHITECTURE
+==================================================
+
+Do not turn wine into a 25-SKU inventory simulator.
+
+Initial conceptual wine styles:
+
+- sparkling
+- crisp white
+- fuller white
+- light red
+- full red
+
+Individual fictional wine names may be used for presentation.
+
+Underlying gameplay should rely on a small stable style vocabulary.
+
+Do NOT require the player to restock every bottle manually in v2.3.
+
+Drink cost can be represented operationally through cost-of-goods rather than another daily inventory burden.
+
+The Lounge should increase:
+- average spend
+- pairing possibilities
+- evening identity
+- character interactions
+- story possibilities
+
+It should NOT increase repetitive clicking.
+
+==================================================
+11. NO PER-TABLE WINE MICROMANAGEMENT
+==================================================
+
+Never require:
+
+guest orders dish
+→ popup asks player to choose wine
+→ repeat 50 times
+
+Normal wine service should be largely automated through staff and guest preference.
+
+Player decisions should occur at higher-value moments:
+
+- which wines/styles to offer
+- Lounge investment
+- special tasting night
+- authored pairing story choices
+- menu/pairing strategy
+- staff assignment
+
+80% flow.
+20% hand-feel.
+
+==================================================
+12. CORE NEW STAFF
+==================================================
+
+New staff exist only because the restaurant has developed new professional needs.
+
+Do NOT generate a large new roster.
+
+Existing staff remain important.
+
+Approved new core characters:
+
+--------------------------------
+EVAN 林奕文 — 32
+HEAD BARTENDER
+--------------------------------
+
+Role:
+Lounge’s first major bartender / eventual Head Bartender.
+
+Personality:
+- quiet
+- stable
+- observant
+- dry humor
+- professionally mature
+- remembers people extremely well
+- does not expose people merely because he understands them
+
+Core character principle:
+
+「記得很多，但不會因為知道很多就一直講。」
+
+Background:
+Previously worked in a more formal hotel/bar environment.
+
+He became interested in Jill’s Kitchen because it is a place where:
+- customers know Jill
+- customers know the cats
+- regulars recognize one another
+- people have history
+
+He prefers this human continuity to treating customers like anonymous table numbers.
+
+Possible interview:
+
+Jill:
+「我們現在其實還沒有很多酒。」
+
+Evan:
+「我有看到。」
+
+Jill:
+「那你還來？」
+
+Evan:
+「所以才有工作。」
+
+Long-term role:
+He gradually becomes one of the witnesses to the Lounge’s social history.
+
+He may know:
+- Ken and Monsieur Du’s habits
+- Zhou’s fake “隨便”
+- Sophie’s preferred quiet seating
+- Dylan’s tendency to wait for Jill
+- which regulars used to arrive separately but now sit together
+
+HARD MEMORY RULE:
+Evan does NOT know events from before he was hired unless he later learns them through a valid event.
+
+No omniscience.
+
+Visual:
+Use the approved concept direction.
+He must be visually very distinct from 阿拓.
+Do not let male NPC procedural art converge into the same face.
+
+--------------------------------
+沈晴 — 27
+BARTENDER
+--------------------------------
+
+Role:
+Second bartender, primarily needed as Lounge expands.
+
+Personality:
+- professional
+- quick
+- perceptive
+- verbally fast
+- playful but not childish
+- good at handling customers who do not know what they want
+
+Contrast:
+
+Evan:
+understands and often says nothing.
+
+晴:
+understands and may say one sentence too much.
+
+Possible interaction:
+
+周董:
+「隨便。」
+
+晴:
+「不行。」
+
+周董:
+「？」
+
+晴:
+「你看起來就不是可以隨便的人。」
+
+She should develop relationships with:
+- 小琪
+- Momo
+- Mia
+- Zhou
+- existing staff
+- eventually other Lounge regulars
+
+Do NOT write her as:
+- ditzy
+- loud
+- gossip machine
+- generic cute bartender
+
+She is competent.
+
+Visual:
+Use approved concept direction.
+She must be immediately distinguishable from 安安.
+
+--------------------------------
+阿拓 — 29
+BAR FOOD / KITCHEN SPECIALIST
+--------------------------------
+
+IMPORTANT:
+He is NOT required when Lounge first opens.
+
+He becomes an optional hire when Lounge food demand becomes high enough that Main Kitchen pressure is noticeable.
+
+Character concept:
+
+He takes “food that people think is only a snack” extremely seriously.
+
+Possible Jill exchange:
+
+Jill:
+「就薯條啊。」
+
+阿拓:
+「妳再說一次。」
+
+Jill:
+「……松露薯條。」
+
+阿拓:
+「好多了。」
+
+Strengths:
+- frying
+- Bar Food
+- timing
+- small plates
+- consistency
+
+He is not a separate “Bar Chef class” requiring a new kitchen system.
+
+Initially he works through the same kitchen architecture.
+
+Potential relationship:
+阿拓 × Hugo / existing kitchen staff
+
+Early:
+Hugo:
+「看起來好了。」
+
+阿拓:
+「看起來跟好了是兩回事。」
+
+Much later:
+Hugo:
+「再二十秒？」
+
+阿拓:
+「十八。」
+
+Their work history should visibly develop.
+
+Potential regular relationship:
+老饕李先生
+
+老饕:
+「這個炸雞誰做的？」
+
+Jill:
+「阿拓。」
+
+老饕:
+「叫他不要改。」
+
+Later:
+
+阿拓:
+「今天炸雞有。」
+
+老饕:
+「我又沒問。」
+
+--------------------------------
+安安 — 26
+LOUNGE SERVER / HOST
+--------------------------------
+
+Role:
+Dedicated Lounge floor specialist as Lounge grows.
+
+She is NOT a wine expert.
+
+Her strength is spatial/social awareness.
+
+She becomes good at remembering:
+- seating
+- who is waiting
+- who prefers which area
+- which table will transfer to Main Hall
+- which guests tend to sit together
+- who is probably waiting for someone
+
+Early:
+
+Ken:
+「杜來了嗎？」
+
+安安:
+「杜先生？」
+
+Ken:
+「……算了。」
+
+Much later:
+
+Ken enters.
+
+安安:
+「他還沒來。」
+
+Ken:
+「我又沒問。」
+
+安安:
+「你每次都問。」
+
+Gameplay role:
+- Lounge seating
+- table transition
+- waiting guests
+- bar-food delivery
+- regular familiarity
+
+Visual:
+Use approved concept direction.
+She must remain visually distinct from 晴.
+
+==================================================
+13. CHARACTER ART RULE
+==================================================
+
+The approved concept direction intentionally makes the four new characters visually distinct.
+
+Do NOT regress toward procedural lookalikes.
+
+Particularly:
+
+EVAN and 阿拓 must not share the same facial structure/hair silhouette.
+
+晴 and 安安 must not look like sisters or palette-swapped versions of the same portrait.
+
+Preserve:
+- different silhouettes
+- different face shapes
+- different hair
+- different body language
+- different expression language
+- different work posture
+
+When integrating actual assets, use deterministic mapping by character ID.
+
+Never assign portraits by array order if that could reproduce the previous Sophie/小林 mapping bug.
+
+Named character → stable explicit portrait mapping.
+
+==================================================
+14. EXISTING STAFF MUST NOT BECOME OBSOLETE
+==================================================
+
+Opening the Lounge must NOT make existing staff useless.
+
+Existing employees should be able to SUPPORT the Lounge where their existing skills logically transfer.
+
+Examples:
+
+existing FOH:
+- can deliver food
+- clear tables
+- serve Lounge tables
+- assist waiting/table transitions
+- gradually learn basic wine service
+
+existing kitchen:
+- makes Bar Food
+- gradually becomes familiar with Bar Food
+- can be assigned additional capacity when Lounge demand is high
+
+existing runner:
+- can move food between Kitchen and Lounge
+
+existing dishwasher infrastructure:
+- remains shared where architecturally appropriate
+
+BUT:
+
+A general FOH employee should not instantly become a full bartender.
+
+Bartending remains a meaningful specialty.
+
+==================================================
+15. STAFF GROWTH / STATION FAMILIARITY
+==================================================
+
+Do NOT build a giant RPG skill tree.
+
+Add only a lightweight concept of:
+
+STATION FAMILIARITY
+
+Conceptual examples:
+
+MAIN
+SIDE
+LOUNGE
+KITCHEN
+
+Possible hidden/simple levels:
+
+NEW
+FAMILIAR
+EXPERIENCED
+
+Exact naming/UI should be proposed during architecture audit.
+
+Important principle:
+
+Existing general competence TRANSFERS.
+
+An experienced Main Hall server entering Lounge for the first time does NOT become incompetent.
+
+They already know:
+- carrying
+- service
+- guest interaction
+- clearing
+- restaurant rhythm
+
+They initially lack:
+- Lounge layout knowledge
+- wine location
+- Lounge table numbers
+- bar workflow
+- regular drink habits
+- Lounge-specific transitions
+
+Therefore:
+
+first Lounge shifts:
+slightly slower / needs occasional help
+
+after repeated real shifts:
+becomes comfortable
+
+later:
+can train/help newer staff
+
+Example:
+
+First Lounge shift:
+
+阿哲:
+「這杯是哪桌？」
+
+Evan:
+「三號。」
+
+阿哲 walks away, returns.
+
+「三號是哪邊？」
+
+Much later:
+
+new employee:
+「三號在哪？」
+
+阿哲:
+「靠牆第二桌。」
+
+This is the desired feeling.
+
+==================================================
+16. WINE FAMILIARITY
+==================================================
+
+A similarly lightweight transferable competency may exist:
+
+NONE
+BASIC
+COMFORTABLE
+
+Do NOT expose it as an RPG XP grind unless necessary.
+
+Basic:
+- correctly delivers drinks
+- understands basic wine styles
+- fewer simple service mistakes
+
+Comfortable:
+- can answer simple guest questions
+- remembers familiar customers’ usual drinks
+- can handle basic wine-table service without bartender intervention
+
+BUT:
+
+FOH staff should never completely replace a trained bartender.
+
+Bartender specialty remains valuable.
+
+Likewise:
+
+Bartenders may gradually learn Main/Side Hall service if assigned there.
+
+People can learn.
+
+They are not immutable job cards.
+
+==================================================
+17. LONG-TERM STAFF VALUE
+==================================================
+
+The desired late-game feeling:
+
+A staff member who joined early may eventually be useful in several spaces.
+
+The player should naturally think:
+
+「這個人哪裡都能頂。」
+
+That creates attachment to veteran employees.
+
+Do NOT reduce this to:
+
+STR +7
+DEX +4
+
+Represent it through:
+- reliable behavior
+- station familiarity
+- remembered customers
+- contextual dialogue
+- service autonomy
+- veteran/new employee interactions
+
+Possible staff card history:
+
+阿哲
+在店 47 天
+熟悉：主廳、側廳
+正在熟悉：Lounge
+
+Nina
+在店 62 天
+熟悉：主廳、Lounge
+remembers Momo’s presentation habits
+
+Hugo
+在店 80 天
+Kitchen veteran
+Bar Food: experienced
+
+Do not implement these exact labels without UI audit.
+The concept matters more than literal text.
+
+==================================================
+18. RELATIONSHIP ARCHITECTURE IN THE LOUNGE
+==================================================
+
+The Lounge MUST use the same Relationship Facts architecture described elsewhere in v2.3.
+
+Do NOT create:
+
+LoungeRelationshipManager
+
+Do NOT create a second friendship graph.
+
+Use shared facts such as:
+
+met
+recognizes
+knowsName
+repeatedCoPresence
+hasSpoken
+sharedTable
+sharedDrink
+sharedFood
+sharedEvent
+recognizesHabit
+comfortableSittingTogether
+noticesAbsence
+knowsStaffRole
+remembersPastService
+usualSeat
+usualDrink
+
+Facts must come from REAL events.
+
+No omniscience.
+
+No progression solely because the calendar advanced.
+
+==================================================
+19. RELATIONSHIP PROGRESSION MUST NOT DEADLOCK
+==================================================
+
+CRITICAL ARCHITECTURAL RULE.
+
+Do NOT build long prerequisite chains such as:
+
+met 4 times
+→ greeting
+→ shared table
+→ event X
+→ event Y
+→ only then relationship progresses
+
+This is highly vulnerable to deadlock.
+
+Instead:
+
+FACTS
+→ coarse familiarity state
+→ unlock broader behavior pools
+→ authored story beats become eligible
+
+Conceptual hidden familiarity:
+
+0 stranger
+1 recognize
+2 familiar
+3 comfortable
+
+Do NOT show a relationship meter to the player.
+
+Facts may promote familiarity.
+
+Example:
+
+repeated co-presence
+→ recognize
+
+meaningful interaction
+→ familiar
+
+shared table / repeated shared events
+→ comfortable
+
+Familiarity should generally unlock BEHAVIOR, not a single mandatory “next chapter.”
+
+Example:
+
+Sophie × Mia at recognize:
+- glance
+- greeting
+- acknowledge departure
+
+familiar:
+- short conversation
+- knows name
+- comments on usual order
+- accepts shared seating
+
+comfortable:
+- voluntarily sits nearby/together
+- notices absence
+- introduces to another person
+- participates in multi-character story beats
+
+No single behavior should become a mandatory progression key unless absolutely narratively required.
+
+==================================================
+20. ELIGIBILITY WEIGHTS, NOT GIANT PREREQUISITE CHAINS
+==================================================
+
+Use HARD requirements only for things that must logically be true.
+
+Examples:
+- required characters are actually present
+- required staff still employed
+- required cat is actually in a reasonable location
+- post-reveal Dylan dialogue only after reveal
+- a character cannot remember an event they never witnessed
+
+Other conditions should generally influence event WEIGHT.
+
+Conceptual example:
+
+Sophie × Mia Lounge conversation
+
+base weight
++ repeated co-presence
++ knows name
++ shared seating history
++ long time since last interaction
++ same room
+- heavy rush
+- another major event
+
+Do not copy these literal numbers.
+Use the architecture audit to propose safe implementation.
+
+==================================================
+21. SOFT CATCH-UP / OVERDUE BONUS
+==================================================
+
+Important authored relationships must not remain frozen forever because RNG was unlucky.
+
+If an event has been valid repeatedly but not selected, gradually increase its priority/weight.
+
+Conceptually:
+
+eligible 1–2 times:
+normal
+
+eligible repeatedly:
+increasing weight
+
+long-overdue important beat:
+high priority when a natural window exists
+
+This must NOT force absurd scenes.
+
+It simply prevents:
+
+Day100 and Ken/Monsieur Du still behave like strangers despite 20 genuine co-presences.
+
+Critical arcs may use stronger catch-up windows.
+
+Emergent moments do NOT need guaranteed catch-up.
+
+==================================================
+22. THREE EVENT LANES
+==================================================
+
+Do not let every tiny greeting compete with a major story beat.
+
+Use the SAME Story Event Arbiter but distinguish conceptual event weight/budget:
+
+MAJOR
+0–1/day normally
+
+Examples:
+- major Lounge opening
+- Signature story beat
+- tasting night
+- meaningful relationship turning point
+- major reviewer/social event
+
+MINOR
+limited small number/day
+
+Examples:
+- notices absence
+- first meaningful conversation
+- bartender/customer callback
+- shared food interaction
+
+AMBIENT
+lightweight behavior
+
+Examples:
+- greeting
+- glance
+- sitting nearby
+- bartender places usual glass
+- customer moves bag to free a familiar seat
+- staff recognizes usual order
+
+Ambient behavior must not block a major story.
+
+Do not create:
+
+“Sophie said hello, therefore Dylan reveal was postponed.”
+
+==================================================
+23. PRESENTATION FALLBACKS
+==================================================
+
+Story meaning should not depend on one fragile physical condition.
+
+Example:
+
+A relationship needs a meaningful interaction.
+
+Ideal presentation:
+restaurant crowded → Jill asks two regulars to share a table.
+
+But if the player runs a spacious restaurant and crowding never occurs, their relationship must not freeze forever.
+
+Alternative presentation:
+one character stops at the other’s table for a conversation.
+
+Same meaningful relationship fact.
+Different presentation.
+
+Rule:
+
+STORY MEANING MAY BE STABLE.
+PRESENTATION MAY HAVE SAFE FALLBACKS.
+
+Do not fake character presence.
+
+Do not teleport characters merely to satisfy a story.
+
+Delay when required.
+Fallback when equivalent.
+Skip optional crossover when neither is natural.
+
+==================================================
+24. THE LOUNGE ACCELERATES SOCIAL OPPORTUNITY
+IT DOES NOT GENERATE FRIENDSHIP AUTOMATICALLY
+==================================================
+
+Being in the Lounge may increase probability of:
+- longer conversation
+- shared seating
+- sharing Bar Food
+- bartender interaction
+- noticing familiar people
+- remaining after dinner
+
+But:
+
+Lounge presence ≠ friendship.
+
+Repeated actual history is still required.
+
+==================================================
+25. AUTHORED LOUNGE RELATIONSHIP EXAMPLES
+==================================================
+
+These are tone/content targets.
+Do not hard-code every scene into a linear quest chain.
+
+--------------------------------
+SOPHIE × MIA
+--------------------------------
+
+Their familiarity may begin in the restaurant.
+
+Later both independently use Lounge.
+
+Mia:
+「這裡有人嗎？」
+
+Sophie:
+「現在有了。」
+
+Early:
+they merely sit near one another.
+
+Later:
+they share fries or another small plate.
+
+Much later:
+
+Sophie arrives first.
+Her bag is on the adjacent chair.
+
+Mia enters.
+
+Without dialogue, Sophie removes the bag.
+
+This action is more valuable than a Friendship Level popup.
+
+--------------------------------
+KEN × MONSIEUR 杜
+--------------------------------
+
+They naturally become strong Lounge regulars.
+
+They continue disagreeing about wine.
+
+Over time they may develop preferred seats.
+
+One night only Ken arrives.
+
+Evan casually prepares two coasters.
+
+Ken:
+「他今天沒來。」
+
+Evan:
+「我沒問。」
+
+Their relationship becomes meaningful when absence is noticed.
+
+--------------------------------
+老饕李先生 × 小琪
+--------------------------------
+
+小琪 orders fried chicken.
+
+老饕:
+「妳來這裡還吃這個？」
+
+小琪:
+「炸雞怎麼了？」
+
+老饕:
+「沒怎麼。」
+
+Later he takes one.
+
+小琪:
+「你不是嫌？」
+
+老饕:
+「我沒有嫌。」
+
+This can connect to their existing social/food-history relationship.
+
+--------------------------------
+DYLAN × EVAN
+--------------------------------
+
+Pre-reveal:
+
+Dylan:
+「Jill 今天有喝什麼嗎？」
+
+Evan:
+「你可以直接問她。」
+
+Dylan:
+「這樣就沒有參考價值了。」
+
+Evan may gradually realize something is unusual.
+
+Do NOT let Evan reveal the marriage.
+
+After Dylan reveal, Evan does not necessarily need a huge shocked reaction.
+
+A funny possibility is that the player realizes Evan had already suspected something.
+
+--------------------------------
+晴 × 周董
+--------------------------------
+
+周董:
+「隨便。」
+
+晴:
+「不行。」
+
+周董:
+「？」
+
+晴:
+「你看起來就不是可以隨便的人。」
+
+Later she learns what his “隨便” actually means.
+
+--------------------------------
+安安 × KEN
+--------------------------------
+
+Early:
+
+Ken:
+「杜來了嗎？」
+
+安安:
+「杜先生？」
+
+Ken:
+「……算了。」
+
+Later:
+
+Ken enters.
+
+安安:
+「他還沒來。」
+
+Ken:
+「我又沒問。」
+
+安安:
+「你每次都問。」
+
+This demonstrates staff growth through remembered human behavior.
+
+--------------------------------
+阿拓 × HUGO
+--------------------------------
+
+Early:
+professional disagreement about Bar Food timing.
+
+Later:
+wordless or near-wordless kitchen coordination.
+
+Their relationship is created through work, not generic friendship dialogue.
+
+==================================================
+26. FRIENDSHIP AND ROMANCE
+==================================================
+
+The Lounge may support friendship and a SMALL number of romantic developments.
+
+HARD RULE:
+
+GENERIC RELATIONSHIP SYSTEM MUST NEVER GENERATE ROMANCE AUTOMATICALLY.
+
+No:
+
+affinity > 80
+→ dating
+
+No generic matchmaking.
+
+No automatic pairing of male/female characters.
+
+No visible:
+- heart meters
+- dating meters
+- confession quests
+- matchmaking UI
+
+Generic relationship architecture may produce:
+- recognition
+- familiarity
+- friendship
+- comfort
+- shared habits
+- shared seating
+- noticing absence
+
+Romance is allowed ONLY for explicitly authored/whitelisted adult character pairs.
+
+Even an eligible pair does not need to become romantic in every save unless specifically authored that way.
+
+Possible progression should remain subtle:
+
+independent visits
+→ repeated encounters
+→ longer conversations
+→ voluntarily sitting together
+→ one waits for the other
+→ occasionally arriving together
+
+No giant:
+
+“THEY ARE NOW DATING ❤️”
+
+popup.
+
+The player should often notice before the UI says anything.
+
+Example:
+
+One person arrives first.
+
+Bartender:
+「今天一個人？」
+
+Character:
+「……先一個。」
+
+Much later they enter together.
+
+The player should think:
+
+「幹？？？你們兩個？？？」
+
+That is the desired emotional response.
+
+Friendship must remain equally valuable.
+
+Some relationships that LOOK romantic may simply become close friendships.
+
+Do not make every meaningful relationship romantic.
+
+==================================================
+27. CUSTOMER × STAFF RELATIONSHIPS
+==================================================
+
+The Lounge naturally increases customer/staff familiarity.
+
+This should be used heavily.
+
+Examples:
+
+bartender remembers usual drink
+
+server knows preferred seat
+
+customer notices a staff member’s day off
+
+staff member knows a regular is waiting for someone
+
+customer remembers a server from their first week
+
+veteran staff recognizes an old habit
+
+But customer/staff romance should be extremely rare and authored only if ever used.
+
+Do NOT create workplace matchmaking mechanics.
+
+==================================================
+28. SEATS CAN HAVE HISTORY
+==================================================
+
+Lounge seating should not only represent capacity.
+
+Certain recurring characters may gradually develop soft preferences.
+
+Examples:
+- Ken often chooses a particular bar seat
+- Sophie prefers a quieter area
+- Dylan may choose a position where Jill is visible
+- a pair that became familiar may begin choosing adjacent seats
+
+Do not reserve seats permanently.
+
+Normal guests may occupy them.
+
+That itself can create natural variation.
+
+Example:
+
+Ken’s usual seat is occupied.
+
+He sits beside Monsieur Du instead.
+
+No one is displaced.
+
+This may create a different interaction.
+
+Seat preference is a WEIGHT, not ownership.
+
+==================================================
+29. CATS IN THE LOUNGE
+==================================================
+
+All existing cat canon remains.
+
+HARD:
+cats NEVER go outside the restaurant.
+
+The Lounge is indoors, therefore cats may autonomously visit if physically/pathing appropriate.
+
+Do NOT turn cats into Lounge attractions or management tasks.
+
+Possible natural behavior:
+- 包包 sleeps near a Lounge chair
+- 寶寶 chooses a visible elegant spot
+- 樾樾 cautiously approaches a familiar person
+- 柔柔 creates odd little moments
+- 小齁 follows Jill or competes for proximity
+
+Their presence may create real relationship callbacks.
+
+Example:
+周董 delays leaving because 包包 is sleeping nearby.
+
+Do not teleport a cat to create an event.
+
+The cat must actually be there.
+
+==================================================
+30. REVIEWS / SOCIAL / LOUNGE
+==================================================
+
+The Lounge must integrate with the previously specified shared topic vocabulary.
+
+Possible topics:
+- wine
+- atmosphere
+- late-night
+- Bar Food
+- staff
+- comfort
+- social
+- Signature
+- waiting experience
+
+Real Lounge events may generate:
+- reviews
+- social posts
+- Album photos
+- Records entries
+
+Social must amplify REAL events.
+
+It cannot invent:
+- a relationship
+- a dish
+- a cat interaction
+- a party
+- a crowded night
+
+that did not occur.
+
+==================================================
+31. LIFE ALBUM
+==================================================
+
+Lounge stories may become some of the strongest Life Album material.
+
+Examples:
+
+「只是再坐一下」
+「他今天沒來」
+「打烊以後」
+「第一次坐在一起」
+「Ken 自己開的頭」
+「他們還是沒有同意」
+「今天晚一點」
+
+But all Album images must match reality.
+
+No fake staged photos.
+
+If title implies two characters:
+both must actually be present.
+
+If a cat is referenced:
+that cat must actually be in the captured scene.
+
+Do not reproduce the old “五隻同框 but only three cats visible” problem.
+
+==================================================
+32. OPERATING CONSEQUENCES
+==================================================
+
+The Lounge should create interesting management consequences without punitive busywork.
+
+Possible consequences:
+
++ higher evening revenue
++ higher average spend
++ additional waiting capacity
++ more relationship opportunities
++ more late-game money sinks
++ more staff specialization
++ more use of existing kitchen
+
+Tradeoffs:
+
+- more kitchen load
+- more FOH staffing demand
+- bartender specialization needed
+- longer-staying customers occupy Lounge seats
+
+Do NOT add:
+- taxes
+- arbitrary maintenance punishment
+- alcohol spoilage micromanagement
+- daily bottle ordering
+- mandatory manual pouring
+- constant glasswashing clicks
+
+==================================================
+33. STAFF ASSIGNMENT INTEGRATION
+==================================================
+
+Reuse the new v2.2.1 “工作分配” architecture.
+
+Do NOT recreate the old unclear “換工作站” cycling behavior.
+
+Lounge should appear naturally as another assignment destination once unlocked.
+
+Player should be able to understand:
+
+WHO
+is assigned to
+WHAT AREA / ROLE
+
+without cycling random employees.
+
+Potential conceptual assignments:
+
+Main Hall
+Side Hall
+Lounge
+Kitchen
+Bartender
+
+Exact representation depends on architecture audit.
+
+Do not assume every staff member is eligible for every assignment.
+
+==================================================
+34. STAFFING GROWTH TARGET
+==================================================
+
+Current mature saves already have substantial staff.
+
+A mature restaurant with full Lounge may naturally reach approximately 13–15 total employees, but this is NOT a required fixed number.
+
+Do not require all staff to work simultaneously.
+
+The player should gradually feel:
+
+“今晚 Lounge 比較忙，我要多放一個人過去。”
+
+or:
+
+“今天 Side Hall 有聚餐，我把強的 FOH 留那邊。”
+
+This is the desired staffing decision.
+
+Not:
+
+“15 people require constant micromanagement.”
+
+==================================================
+35. NO NEW NPC EXPLOSION
+==================================================
+
+Do NOT create many new customers simply because Lounge exists.
+
+The PRIMARY Lounge cast should be existing Jill’s Kitchen characters:
+
+- 陳伯伯
+- Mia
+- 小林
+- Leo
+- Sophie
+- 王先生
+- 王太太
+- Dylan
+- 周董
+- Madame Lin
+- Mr. Hart
+- 老饕李先生
+- Monsieur 杜
+- 品酒師 Ken
+- 神秘美食評論家
+- 小琪
+- Momo
+- existing staff
+- existing cats
+
+The point is to deepen the existing social world.
+
+New permanent NPCs should be added only when they provide a role the existing cast cannot naturally provide.
+
+Currently approved core new staff are:
+
+- Evan 林奕文
+- 沈晴
+- 阿拓
+- 安安
+
+Do NOT spontaneously generate 10 more named Lounge regulars.
+
+==================================================
+36. STORY SYSTEM PRIORITIES
+==================================================
+
+The Lounge is not a quest hub.
+
+No:
+- exclamation marks
+- “Sophie Story 3/5”
+- friendship progress bars
+- collect reward buttons
+- romance meters
+
+Story should emerge through:
+
+- arrivals
+- seating
+- food/drink orders
+- shared food
+- conversation
+- remembered habits
+- staff familiarity
+- absence
+- waiting
+- moving between rooms
+- after-dinner lingering
+- after-close moments
+- Reviews
+- Social
+- Album
+- Records
+
+The player should feel like they noticed something happening.
+
+Not like they completed a quest.
+
+==================================================
+37. SAVE / MIGRATION SAFETY
+==================================================
+
+This is P0.
+
+v2.2.1 mature saves MUST load safely into v2.3.
+
+Do not repeat the Day35 migration regression.
+
+Before implementation:
+audit current save schema and migration order.
+
+Requirements:
+
+- old saves without Lounge fields load safely
+- Lounge defaults locked/unbuilt
+- existing staff retain current roles/levels/history
+- new station familiarity initializes safely
+- no existing employee loses competence
+- no regular history resets
+- no Dylan progression resets
+- no Album/Reviews/Records loss
+- no existing Signature unlock relocks
+- no new character mapping collision
+- no duplicate customer IDs
+- no duplicate staff IDs
+
+Migration must be:
+idempotent
+version-aware
+tested on real mature saves
+
+Use at least:
+- fresh/new save
+- Day30 fixture
+- current Day35+ real mature save
+
+Reload migrated saves more than once to prove idempotence.
+
+==================================================
+38. EVENT / SIMULATION SAFETY
+==================================================
+
+Avoid adding per-frame relationship scans.
+
+Relationship/story evaluation should happen at meaningful boundaries such as:
+
+- character arrival
+- seating
+- order creation
+- food/drink delivery
+- room transition
+- another named character arrival
+- service completion
+- closing
+- specific event resolution
+
+Do NOT compute all NPC × NPC relationships every frame.
+
+Do NOT build a full N×N matrix unless architecture audit proves a compelling reason.
+
+Create/update relationship facts only for relevant entities that genuinely interacted or shared meaningful context.
+
+==================================================
+39. TICKET SAFETY
+==================================================
+
+A guest moving:
+
+Lounge → Main Hall
+
+or:
+
+Main Hall → Lounge
+
+must remain the SAME guest.
+
+Do not:
+- duplicate their ticket
+- duplicate payment
+- duplicate review eligibility
+- duplicate visit count
+- duplicate relationship co-presence
+- duplicate Album eligibility
+
+A single visit may have multiple phases.
+
+Audit ticket identity before implementation.
+
+==================================================
+40. STORY IMPORTANCE CLASSES
+==================================================
+
+Not every story needs guaranteed completion.
+
+Class A — CRITICAL / STRUCTURAL
+Should reliably occur when conditions mature.
+
+Examples:
+- Lounge unlock
+- wine-service origin
+- important restaurant milestone
+- Dylan core progression
+- second Signature progression
+
+Use strong catch-up windows.
+
+Class B — CHARACTER ARC
+Expected to occur reasonably often but can vary.
+
+Examples:
+- Sophie × 寶寶
+- Ken × Monsieur Du
+- customer/staff familiarity
+- 王先生 × 王太太
+
+Use soft catch-up.
+
+Class C — EMERGENT MOMENT
+Never guaranteed.
+
+Examples:
+Sophie + Mia + Momo + Nina + 寶寶 happen to combine into one beautiful evening scene.
+
+These should remain rare and special.
+
+Do NOT force them merely to “show content.”
+
+==================================================
+41. V2.3 IMPLEMENTATION PHASING — UPDATE
+==================================================
+
+Do NOT implement all of this at once.
+
+After v2.2.1 release:
+
+PHASE 0
+ARCHITECTURE AUDIT ONLY
+
+Report:
+- current room model
+- customer location/state model
+- ticket identity model
+- staff assignment model
+- kitchen/ticket routing
+- event scheduler
+- Regular History / World Memory
+- save schema/migration
+- Album capture architecture
+- review/social architecture
+- how Lounge can be added with minimum duplication
+- likely regression risks
+- recommended implementation boundaries
+
+NO CODE until audit is reviewed.
+
+Then proposed staged implementation:
+
+PHASE A
+Story/Relationship foundation already specified in main v2.3 brief
++ Sophie/BaoBao vertical slice
++ generic familiarity behavior
+
+PHASE B
+Reviews 2.0 / shared topic vocabulary
+
+PHASE C
+Social layer
+
+PHASE D
+Marketing layer
+
+PHASE E
+Lounge foundation:
+- room shell
+- room transition
+- staffing destination
+- bartender role
+- shared kitchen Bar Food routing
+- minimal drinks
+- save migration
+- NO giant story pack yet
+
+PHASE F
+Lounge I playable vertical slice:
+- Evan
+- one existing FOH supporting
+- small Lounge
+- waiting transition
+- small Bar Food menu
+- Ken/Monsieur Du interaction
+- Dylan/Evan small interaction
+- staff familiarity
+- real-save smoke
+
+PHASE G
+Lounge expansion / staff:
+- 晴
+- 安安
+- Lounge II
+- broader existing-staff familiarity
+- relationship events
+
+PHASE H
+Optional Bar Food specialization:
+- 阿拓
+- kitchen load consequences
+- optional Bar Pantry/Fry Station
+- Lounge III if justified
+
+PHASE I
+Crossovers / romance-authorized arcs / long-delay callbacks / polish
+
+This exact ordering may be adjusted after architecture audit if current code suggests a safer dependency order.
+
+But do NOT jump directly from brief to “build complete Lounge.”
+
+==================================================
+42. TESTING PHILOSOPHY
+==================================================
+
+Test SYSTEM TRUTHS, not every dialogue line.
+
+Important invariants:
+
+- no duplicate guest after room transition
+- no duplicate ticket
+- no duplicate payment
+- no duplicate visit count
+- no impossible omniscient memory
+- no relationship progression without real co-presence/interaction where required
+- dismissed staff never appear in staff story beats
+- cats are never teleported outside
+- Lounge food routes to valid kitchen
+- bartender-only actions respect staff eligibility
+- old saves migrate safely
+- station familiarity persists
+- veteran staff do not lose old competence
+- event budgets work
+- ambient events do not block major stories
+- overdue bonus cannot bypass hard requirements
+- no portrait ID collisions
+- no Album title/content mismatch
+
+Use deterministic seeded tests where useful.
+
+Avoid building another enormous brittle golden-test laboratory.
+
+Visual golden tests only where they protect real layout regressions.
+
+Real mature-save smoke remains mandatory.
+
+==================================================
+43. I / T / O DISCIPLINE
+==================================================
+
+Continue current definitions:
+
+I = Implemented
+T = Targeted / automated test
+O = Observed in normal play
+
+Never promote T to O.
+
+For Lounge especially:
+
+Automated test proving:
+“Sophie and Mia can share seating”
+
+is T.
+
+It becomes O only when normal play actually produces a coherent scene and it looks/feels correct.
+
+Phone-scale real play remains the final authority for:
+- room readability
+- seating density
+- staff visibility
+- story perceptibility
+- whether Lounge feels alive
+- whether kitchen load is annoying
+- whether staffing is understandable
+- whether interactions are noticeable during actual service
+
+==================================================
+44. PERFORMANCE / SCOPE GUARDRAIL
+==================================================
+
+Do not turn this into a simulation research project.
+
+Before creating any new subsystem ask:
+
+Can existing:
+- customer state
+- staff assignment
+- event arbiter
+- World Memory
+- relationship facts
+- kitchen routing
+- save system
+
+represent this safely?
+
+Prefer extension over replacement.
+
+Do not rewrite stable systems merely because a cleaner theoretical architecture exists.
+
+Do not build:
+- full social graph simulator
+- generic dating AI
+- bartender physics
+- realistic alcohol chemistry
+- bottle-by-bottle cellar simulation
+- second pathfinding engine
+- second kitchen
+- separate Lounge economy
+
+The goal is:
+
+MORE LIFE VISIBLE TO THE PLAYER.
+
+Not:
+
+MORE ARCHITECTURE INVISIBLE TO THE PLAYER.
+
+==================================================
+45. FINAL ACCEPTANCE TARGET
+==================================================
+
+By mature play (roughly Day50–100 depending on save history), the player should be able to notice:
+
+- Jill’s Kitchen physically grew a real evening Lounge
+- the Lounge looks related to the restaurant but has its own identity
+- Main Hall, Side Hall and Lounge feel functionally different
+- existing staff learned new spaces instead of becoming obsolete
+- veteran employees feel valuable
+- bartender is a real specialty
+- Bar Food uses the restaurant kitchen naturally
+- Lounge success creates manageable kitchen/staffing consequences
+- the player has meaningful late-game investments
+- some customers wait in Lounge instead of queueing mechanically
+- some dinner guests move to Lounge afterward
+- existing regulars recognize one another
+- some independently arriving people now sit together
+- staff know customer habits
+- customers notice staff
+- someone occasionally notices another person’s absence
+- some friendships have clearly grown over time
+- a very small number of authored relationships may hint at or develop romance
+- the player notices relationship changes without meters or quest UI
+- cats remain autonomous indoor family members
+- Album / Reviews / Social / Records preserve actual history
+- the restaurant feels different because things happened there before
+
+The ultimate target scene is NOT a scripted cutscene.
+
+It is something like:
+
+Main Hall is winding down.
+
+Ken and Monsieur Du are still arguing at the bar.
+
+Evan already knows where their glasses go.
+
+Sophie arrives and sees Mia in the Lounge.
+She quietly moves her bag off the adjacent chair.
+
+Momo notices BaoBao nearby but remembers not to photograph Sophie.
+
+Nina brings food and already knows how Momo likes the plate positioned.
+
+Dylan sits where he can still see Jill finishing work.
+
+A veteran employee helps a newer Lounge server without being asked.
+
+One of the cats falls asleep under a chair.
+
+Nothing announces:
+
+STORY EVENT COMPLETE.
+
+The player simply realizes:
+
+“These people know each other now.”
+
+That is v2.3.
+
+==================================================
+46. CURRENT ACTION
+==================================================
+
+For NOW:
+
+1. Integrate this addendum into docs/V23_BRIEF.md cleanly.
+2. Do not duplicate contradictory sections; reconcile wording at documentation level only.
+3. Preserve all previously approved v2.3 story / relationship / Reviews / Social / Marketing / Wine requirements unless explicitly superseded here.
+4. This addendum supersedes the earlier concept of wine being merely a small restaurant-side wine-service feature:
+   wine service now develops primarily through the expandable Lounge.
+5. Preserve the second Signature Dessert story.
+6. Preserve Ken × Monsieur Du as the narrative origin of wine/Lounge discussion.
+7. Preserve all existing cat canon.
+8. Preserve all Dylan canon.
+9. Preserve existing named regulars.
+10. Commit docs only.
+11. Report exactly what sections were added/reconciled.
+12. Then return immediately to v2.2.1 release work.
+
+DO NOT IMPLEMENT THE LOUNGE YET.
+DO NOT START PROTOTYPING IT.
+DO NOT GENERATE EXTRA NPCs.
+DO NOT REWRITE CURRENT SYSTEMS.
+
+Finish Version33 first.
