@@ -269,6 +269,8 @@ INV = r"""(()=>{const bad=[];
   if(phase==='service'&&!paused&&!sub&&!screenEl.hidden)bad.push('menu screen covering the running service');
   if(!IDLE&&phase!=='service'&&phase!=='title')bad.push('no idle view outside service');
   if(typeof __lifeInvariants==='function')bad.push(...__lifeInvariants());
+  if(typeof stockTotal==='function'&&stockTotal()>fridgeCap())bad.push('stock above the fridge capacity: '+stockTotal()+'/'+fridgeCap());
+  for(const k in S.stock)if(!(S.stock[k]>=0))bad.push('negative or invalid stock for '+k+': '+S.stock[k]);
   return bad})()"""
 
 def state_ok(g, where):
@@ -285,6 +287,12 @@ def play_day(g, max_steps=40000, chunk=600, dt=1/30):
         if r['ticks'] < chunk:
             break
     return steps
+
+# A stocked fridge for a fixture, within the capacity: the game never lets the stock exceed fridgeCap() (every purchase,
+# gift and return checks the room), so a fixture must not either — 621/180 on a screenshot would be a fixture lie.
+FILL_FRIDGE = "(()=>{const ms=menuList();const cap=fridgeCap();const per=Math.max(1,Math.floor(cap/Math.max(1,ms.length)));for(const k in S.stock)if(!ms.includes(k))S.stock[k]=0;for(const d of ms)S.stock[d]=per;return per})()"
+def fill_fridge(g):
+    return g.ev(FILL_FRIDGE)
 
 def start_day(g):
     g.click('[data-act=start]')
@@ -775,7 +783,7 @@ def dylan_stays_a_quiet_regular_early_on(b, port, target):
     g.click('[data-act=open]')
     visits = 0; stayed = 0; looks = 0
     for d in range(6):
-        g.ev("for(const d of menuList())S.stock[d]=40")   # v2.2: from Day 3 nothing sells from an empty fridge (A2), and a visit has to end with the bill
+        fill_fridge(g)   # v2.2: from Day 3 nothing sells from an empty fridge (A2), and a visit has to end with the bill
         start_day(g)
         # bring him in early in the day so the visit completes before closing
         g.ev("__botUntil('R.t>R.dur*.25',20000)")
@@ -817,10 +825,10 @@ def dylan_reveal_scenario(g, evenings=14, checks=True):
     """the reveal scenario: Day 13, stage-1 Dylan with clues, Jill settled on the sofa in the evenings; from the third
     evening the dice are loaded, everything else has to happen by itself. Returns (revealed_at, beside, elsewhere)."""
     install_bot(g)
-    g.ev("S.day=13;S.money=9000;S.level=2;S.tables=4;S.regulars.dylan=6;S.dylan.stage=1;S.dylan.stay=2;S.dylan.clues={late:2,pet:1,look:9};S.life.sofa=4;dylanStays=()=>true")
+    g.ev("S.day=13;S.money=9000;S.level=2;S.tables=4;S.eq.fridge=5;S.regulars.dylan=6;S.dylan.stage=1;S.dylan.stay=2;S.dylan.clues={late:2,pet:1,look:9};S.life.sofa=4;dylanStays=()=>true")   # a big fridge so the day's food is there within the capacity
     g.click('[data-act=open]')
     revealed_at = None; beside = 0; elsewhere = 0
-    stock = "for(const d of menuList())S.stock[d]=60;"   # v2.2: from Day 3 a sold-out dish cannot be ordered, so the scenario's fridge must be stocked each day
+    stock = FILL_FRIDGE + ";"   # v2.2: from Day 3 a sold-out dish cannot be ordered, so the scenario's fridge must be stocked each day (within its capacity)
     for d in range(evenings):
         if checks and g.ev("S.dylan.stage") < 3:
             g.click('[data-act=book]'); g.click('[data-act=btab][data-k=regulars]')
@@ -1366,7 +1374,7 @@ def tables_need_clearing_after_checkout(b, port, target):
     before eating anything leaves a clean one."""
     g = Game(b, port, target, seed=8, manual=True)
     install_bot(g)
-    g.click('[data-act=open]'); g.ev("S.tables=4;S.day=5;for(const d of menuList())S.stock[d]=40;save();showPrep()"); start_day(g)   # v2.2: a Day-5 fridge must hold what the test orders
+    g.click('[data-act=open]'); g.ev("S.tables=4;S.day=5;"+FILL_FRIDGE+";save();showPrep()"); start_day(g)   # v2.2: a Day-5 fridge must hold what the test orders
     SEAT = r"""((who)=>{const t=R.tables.find(t=>!t.group&&!t.dirty);const o=rollGuest();const g={id:R.gid++,type:'office',size:1,reg:who==='dylan'?'dylan':null,forSig:false,looks:makeLooks('office',1),name:who==='dylan'?'Dylan':'測試客',state:'toTable',table:null,pat:1,x:t.x,y:t.y+8,tx:t.x,ty:t.y+8,timer:0,ticket:null,seed:1,mood:'ok'};
       R.groups.push(g);t.group=g;g.table=t.i;g.state='reading';return t.i})"""
     def serve_and_check(ti):
@@ -1746,7 +1754,7 @@ def economy_ops_duties_and_prices_v182(b, port, target):
     d = dict(pf)
     check('貴' in d.get('炙烤肋眼牛排', '') and '-' in d.get('炙烤肋眼牛排', ''), f'a markup reads as fewer orders: {d.get("炙烤肋眼牛排")}')
     check('便宜' in d.get('拿鐵咖啡', ''), f'a discount reads as cheap: {d.get("拿鐵咖啡")}')
-    g.ev("for(const d of menuList())S.stock[d]=60")   # v2.2: a sold-out dish is not on offer, so the sampling needs a stocked fridge
+    fill_fridge(g)   # v2.2: a sold-out dish is not on offer, so the sampling needs a stocked fridge
     r = g.ev(r"""(()=>{const run=()=>{let dr=0;for(let i=0;i<300;i++){const o=rollGuest();dr+=orderItems({type:o.type,size:o.size,reg:null}).filter(d=>DISH(d).cat==='drink').length}return dr};S.sets={};const a=run();S.sets={drink:true};const b=run();S.sets={};return{a,b}})()""")
     check(r['b'] > r['a'] * 1.2, f'a drink set raises drink orders: {r}')
     check(not g.errors, g.errors)
@@ -1959,7 +1967,7 @@ def golden_frames(b, port, target, record=False):
 MATURE_181 = r"""(()=>{S.level=5;S.tables=12;S.money=236000;S.day=25;S.stats={guests:1200,perfect:900,days:24};
  S.eq={stove:5,oven:5,bar:5,prep:1,fridge:5,pan:5};S.decor={plants:3,lights:3,art:2,chairs:2,rug:1,ware:1,bar:1,sofa:3};
  S.crew=[{id:'c1',role:'chef',name:'阿德師傅',lv:5,duty:'stove'},{id:'c2',role:'chef',name:'Marco',lv:5,duty:'oven'},{id:'c6',role:'chef',name:'阿珠姐',lv:4,duty:'bar'},{id:'c3',role:'waiter',name:'小茉',lv:5,duty:'both'},{id:'c4',role:'waiter',name:'Kai',lv:4,duty:'both'},{id:'c5',role:'cleaner',name:'秀琴阿姨',lv:3,duty:'clean'}];
- for(const d of Object.keys(DISHES))if(!(DISHES[d]||{}).special&&!S.unlocked.includes(d))S.unlocked.push(d);for(const d of S.unlocked){S.stock[d]=30;S.xp[d]=400}S.menu=S.unlocked.slice(0,16);
+ for(const d of Object.keys(DISHES))if(!(DISHES[d]||{}).special&&!S.unlocked.includes(d))S.unlocked.push(d);for(const d of S.unlocked){S.stock[d]=0;S.xp[d]=400}S.menu=S.unlocked.slice(0,16);{/* a full fridge, within its capacity */const per=Math.floor(fridgeCap()/S.menu.length);for(const d of S.menu)S.stock[d]=per}
  S.regulars={wang:12,koba:9,dylan:14,writer:6};S.dylan.stage=3;S.dylan.reveal=18;S.achievements={first:1,rush:2,fire:3,bistro:4,jill:20,husband:18};
  S.album=[{id:'p1',kind:'sofa',day:9,img:null,info:{}},{id:'p2',kind:'husband',day:18,img:null,info:{}}];S.reviews=Array.from({length:40},(_,i)=>({s:5,txt:'好吃',name:'客人'+i}));
  delete S.rooms;delete S.ext;delete S.gear;delete S.gearUse;delete S.newRooms;delete S.sideTables;delete S.frontTables;   /* a save from before 2.0 has none of these */
@@ -2330,7 +2338,7 @@ def a5_money_is_one_number_everywhere_after_the_side_hall(b, port, target):
     # (found by the v2.2 smoke: the HUD kept the pre-wage figure until 去商店)
     g.click('[data-act=open]'); g.page.wait_for_timeout(100)
     if g.ev("!!document.querySelector('[data-act=nextDay]')"): g.click('[data-act=nextDay]')
-    g.page.wait_for_timeout(100); g.ev("for(const d of menuList())S.stock[d]=30")
+    g.page.wait_for_timeout(100); fill_fridge(g)
     start_day(g); install_bot(g); g.ev("closeShop('x');for(const q of R.groups.slice())leaveGroup(q,'ok')"); g.page.evaluate('()=>window.__play(200,0)')
     if g.ev("phase") == 'service': g.ev("finishClosing()")
     g.page.wait_for_timeout(100)
@@ -2596,14 +2604,14 @@ def dylan_is_a_presence_not_a_story_trigger(b, port, target):
     def sched_rate(gap, n=40):
         hits = 0
         for i in range(n):
-            g.ev(f"S.dylan.last=S.day-{gap};for(const d of menuList())S.stock[d]=40;startService()")
+            g.ev(f"S.dylan.last=S.day-{gap};"+FILL_FRIDGE+";startService()")
             hits += 1 if g.ev("R.sched.some(o=>o.reg==='dylan')") else 0
             g.ev("R=null;phase='prep';showPrep()")
         return hits / n
     r1, r2, r3 = sched_rate(1), sched_rate(2), sched_rate(3)
     check(r1 >= .4 and r2 >= .7 and r3 >= .9, f'he should come by most days: gap1 {r1}, gap2 {r2}, gap3 {r3}')
     # a full house: he comes back later the same day, no seat is taken, and after enough tries the player sees him at the door
-    g.ev("for(const d of menuList())S.stock[d]=40"); start_day(g); g.ev("window.__act=()=>{}")
+    fill_fridge(g); start_day(g); g.ev("window.__act=()=>{}")
     g.ev(r"""(()=>{R.groups=[];for(const t of R.tables){const q={id:R.gid++,type:'office',size:2,looks:makeLooks('office',2),name:'佔位',state:'eat',table:t.i,pat:1,room:t.room||'main',troom:t.room||'main',x:t.x,y:t.y,tx:t.x,ty:t.y,timer:900,ticket:null,seed:1,mood:'ok'};t.group=q;t.dirty=false;R.groups.push(q)}
       for(let i=0;i<queueMax();i++){const q={id:R.gid++,type:'office',size:2,looks:makeLooks('office',2),name:'排隊',state:'queue',table:null,pat:1,room:'main',troom:'main',x:DOOR.x,y:DOOR.y,tx:DOOR.x,ty:DOOR.y,timer:0,ticket:null,seed:1,mood:'ok'};R.groups.push(q)}requeue();R.sched=[];R.si=0;R.sched.push({t:R.t,type:'regular',reg:'dylan',size:1,tries:0});return 1})()""")
     check(g.ev("queued().length>=queueMax()"), 'the fixture must have a full queue')
@@ -2649,6 +2657,70 @@ def dylan_is_a_presence_not_a_story_trigger(b, port, target):
     g.ev("S.dylan.stay=2;S.life.sofa=2;dylanStageCheck()"); check(g.ev("S.dylan.stage") == 1, 'two sofa evenings short: no Stage 2')
     g.ev("S.life.sofa=38;dylanStageCheck()"); check(g.ev("S.dylan.stage") == 2, 'with the old conditions met, Stage 2')
     check(g.ev("S.dylan.stage") < 3, 'no forced reveal')
+    check(not g.errors, g.errors)
+    g.close()
+
+# ---------------------------------------------------------------- v2.2 H–K, T: the shop, the decoration, the pass, the dreams
+@test
+def h_i_k_t_shop_rooms_decoration_pass_and_dreams(b, port, target):
+    """H: the shop has 家具與佈置 / 店舖工程 / 貓咪生活 (+ kitchen, research, staff, signature); nothing that was for sale
+    is gone; the old tab keys still land on the right page. I: every decoration draws something in the dining room
+    (the room's pixels change per item). K: the pass has no sink, knife block or spice rack left; the stock board and
+    the bus tub answer taps. T: three dream projects at 100k/180k/300k in three horizons; the ceiling takes the hot-day
+    patience penalty away; the catwalk gives the cats three places two metres up and 柔柔 gets there and back."""
+    g = Game(b, port, target, seed=51, manual=True)
+    player30(g); g.ev("S.phase='shop';showShop()")
+    tabs = json.loads(g.ev("JSON.stringify(shopTabs().filter(t=>t.on).map(t=>[t.k,t.n]))"))
+    check([t[1] for t in tabs][:3] == ['家具與佈置', '店舖工程', '貓咪生活'], f'the three big rooms of the shop come first: {tabs}')
+    # every purchasable thing is reachable from some tab (on a level-5 restaurant that still has everything to buy)
+    g.ev("S.tables=4;S.decor={plants:0,lights:0,art:0,chairs:0,rug:0,ware:0,bar:0,sofa:0};S.ext={};S.gear={};S.ops={};S.rooms={side:1};S.sideTables=2;S.eq={stove:1,oven:1,bar:1,prep:1,fridge:1,pan:1};S.unlocked=S.unlocked.filter(d=>!(DISHES[d]||{}).special&&!['duck','steak'].includes(d));S.menu=S.menu.filter(d=>S.unlocked.includes(d));S.themes={};S.money=50000;S.crew=[];for(const d of ['friedrice','pasta','soup'])S.xp[d]=400")
+    seen = set()
+    for k, n in tabs:
+        g.ev(f"shopTab='{k}';showShop()")
+        seen |= set(json.loads(g.ev("JSON.stringify([...document.querySelectorAll('#screen [data-act]')].map(e=>e.dataset.act+':'+(e.dataset.k||e.dataset.d||'')))")))
+    for act in ['buyTable', 'buyDecor:plants', 'buyDecor:lights', 'buyProject:glass', 'buyProject:ceiling', 'buyProject:catwalk', 'buyProject:terrace', 'buyGear:deluxe', 'buyOps:flow', 'theme:classic', 'buyExt:awning', 'buySideTable', 'hire:', 'buyEq:', 'rd:', 'rdSpecial:']:
+        base = act.split(':')[0]
+        check(any(x.startswith(act) if ':' in act and act[-1] != ':' else x.startswith(base + ':') for x in seen), f'{act} is not reachable in the shop: {sorted(seen)[:40]}')
+    for old, new in [('tables', 'home'), ('decor', 'home'), ('projects', 'works'), ('cats', 'catlife')]:
+        g.ev(f"shopTab='{old}';showShop()"); check(g.ev("shopTab") == new, f'old key {old} should open {new}')
+    # I: each decoration changes the room
+    def room_px():
+        g.ev("showPrep();hideScreen();bg=null;layoutAll();for(let i=0;i<3;i++)__tick(1000/30)")
+        return g.ev("(()=>{const d=sctx.getImageData(0,0,sc.width,sc.height).data;let h=0;for(let i=0;i<d.length;i+=97)h=(h*31+d[i])>>>0;return h})()")
+    g.ev("S.decor={plants:0,lights:0,art:0,chairs:0,rug:0,ware:0,bar:0,sofa:0}")
+    h0 = room_px()
+    for k, v in [('plants', 1), ('plants', 3), ('lights', 1), ('lights', 2), ('art', 1), ('art', 2), ('rug', 1)]:
+        g.ev(f"S.decor.{k}={v}"); h1 = room_px()
+        check(h1 != h0, f'decor {k}={v} draws nothing new'); h0 = h1
+    # K: the pass
+    items = json.loads(g.ev("JSON.stringify(kitchenItems().map(i=>i.k))"))
+    check('knife' not in items and 'spice' not in items and 'sink' in items and 'fridge' in items and 'bell' in items, f'the pass keeps the tub, the bell and the stock board only: {items}')
+    g.ev("tapKItem('fridge')"); check(g.ev("KPOP.fridge>0"), 'the stock board answers a tap')
+    # T: the dreams
+    g.ev("S.money=400000;S.level=5;shopTab='works';showShop()")
+    dreams = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('#screen [data-act=buyProject]')].map(e=>e.dataset.k))"))
+    check([d for d in dreams if d in ('glass', 'ceiling', 'catwalk')] == ['glass', 'ceiling', 'catwalk'], f'three dreams on the works page: {dreams}')
+    check(json.loads(g.ev("JSON.stringify(DREAMS.map(d=>[d.cost,d.horizon]))")) == [[100000, '近'], [180000, '中'], [300000, '遠']], 'three horizons at 100k / 180k / 300k')
+    amb0 = g.ev("ambience()")
+    g.click('[data-act=buyProject][data-k=ceiling]'); g.page.wait_for_timeout(100); g.ev("hideReveal()")
+    check(g.ev("projOn('ceiling')") and g.ev("S.money") == 400000 - 180000 and g.ev("ambience()") == amb0 + 3, 'the ceiling is bought, paid and felt')
+    g.ev("S.money=400000;showShop()"); g.click('[data-act=buyProject][data-k=catwalk]'); g.page.wait_for_timeout(100); g.ev("hideReveal()")
+    check(g.ev("projOn('catwalk')"), 'the catwalk is bought')
+    # the hot day: patience drains slower with the ceiling than without it
+    g.ev("showShop()"); g.click('[data-act=nextDay]'); g.page.wait_for_timeout(100); fill_fridge(g); start_day(g); install_bot(g); g.ev("window.__act=()=>{}")
+    g.ev("R.weather='hot';window.__tg={type:'office',state:'wait',table:0,ticket:null,pat:1}")
+    with_c = g.ev("drainRate(__tg)"); g.ev("S.rooms.ceiling=0"); without = g.ev("drainRate(__tg)"); g.ev("S.rooms.ceiling=1")
+    check(with_c < without, f'on a hot day the fans should keep the guests patient: {with_c} vs {without}')
+    # the catwalk: 柔柔 goes up, sits there two metres up, and comes back down the same way
+    idx = json.loads(g.ev("JSON.stringify(TREE.perches.map((p,i)=>p.t===4?i:-1).filter(i=>i>=0))"))
+    check(len(idx) == 3 and all(i in json.loads(g.ev("JSON.stringify(freePerches())")) for i in idx), 'three free places on the catwalk')
+    g.ev(f"(()=>{{const c=catBy('mikan');releaseSpots(c);c.hidden=false;c.perch=-1;c.x=200;c.y=300;goPerch(c,{idx[1]})}})()")
+    up = g.ev(f"(()=>{{const c=catBy('mikan');for(let i=0;i<1800;i++){{__tick(1000/30);if(c.perch==={idx[1]}&&c.st!=='jump'&&c.y<40)return i}}return -1}})()")
+    check(up >= 0, '柔柔 never reached the catwalk')
+    check(g.ev("catBy('mikan').y") < 40 and g.ev(f"Math.abs(catBy('mikan').x-TREE.perches[{idx[1]}].x)<2"), 'she should be sitting on the plank')
+    g.ev("leavePerch(catBy('mikan'))")
+    down = g.ev("(()=>{const c=catBy('mikan');for(let i=0;i<1800;i++){__tick(1000/30);if(c.perch<0&&c.st!=='jump'&&c.y>100)return i}return -1})()")
+    check(down >= 0 and g.ev("catBy('mikan').y") > 100, 'she should come back down to the floor')
     check(not g.errors, g.errors)
     g.close()
 

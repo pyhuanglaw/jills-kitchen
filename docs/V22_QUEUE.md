@@ -13,6 +13,17 @@ starting state. Nothing in v2.2 is keyed to Day 30 or to that save: every fix wo
 day, and the only day gates in the changed code are the game's existing ones (the tutorial's auto-provisioning on
 days 1–2 in `startService` → `autoStock()`, which `orderItems`/`takeStock` respect; Dylan and the news from Day 3).
 
+## Working rules added during v2.2
+
+- **Visual checkpoints** (user, 2026-09-29): during long autonomous stretches, capture and inspect the relevant game
+  screen whenever a player-visible change is done, when moving to a different UI/room/feature/art pass, and roughly
+  every 10–15 minutes otherwise — realistic state (the Day 30 save where it fits), the affected area cropped/zoomed,
+  phone + desktop for responsive work, characters at gameplay scale. A suspicious state on a screenshot is
+  investigated, never cropped away (the `庫存 621/180` on a probe screenshot was a fixture that wrote the stock past
+  the fridge capacity; the harness now checks `stockTotal() <= fridgeCap()` as an invariant and fixtures fill within
+  the capacity). No screenshots for their own sake, no re-captures of unchanged screens, no interrupting long runs.
+- **Day 30 is only a fixture**: nothing is keyed to that save or day.
+
 ## Order
 
 1. A1–A5 (test-first) → 2. B–E → 3. A–E tests + nearby regression + Day 30 loads + normal-speed smoke → 4. tag
