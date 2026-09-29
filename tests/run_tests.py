@@ -1276,7 +1276,7 @@ def jill_rests_when_staff_cover_the_floor(b, port, target):
     start_day(g)
     n = g.ev("(()=>{let n=0;while(n<12000&&R&&R.jill.rest!=='sit'){if(n%10===0)__actLazy();__tick(1000/30);n++}return n})()")
     check(g.ev("R&&R.jill.rest==='sit'"), f'she never sat down within {n} frames')
-    check(g.ev("(()=>{const L=LIFE.jill;return L.on&&L.hat===true&&R.jill.sofa===true})()"), 'seated state: on the sofa, hat on, standing sprite off')
+    check(g.ev("(()=>{const L=LIFE.jill;return L.on&&L.hat===false&&R.jill.sofa===true})()"), 'seated state: on the sofa, standing sprite off (v2.2: no toque — her hair is her silhouette, at work and at rest)')
     g.ev("(()=>{const t=R.tables.find(t=>t.group)||R.tables[0];t.dirty=t.group?t.dirty:true;R.jill.q.push(t.i);endRest()})()")
     check(g.ev("R.jill.rest===null&&!LIFE.jill.on&&R.jill.sofa===false"), 'a tapped table should get her up immediately')
     g.ev("for(let i=0;i<60;i++)__tick(1000/30)")
@@ -1504,8 +1504,8 @@ def album_store_and_viewer_v181(b, port, target):
     check(not g.ev("$('#lightbox').hidden") and g.ev("$('.lb-card img').src.startsWith('data:image/jpeg')") and g.page.is_visible('.lb-card .when'), 'tapping a polaroid opens the viewer with the picture, day and caption')
     if n > 1:
         g.page.click('[data-lb=next]'); check(g.ev("lightbox.i") == 1, 'next moves to the next photo')
-    before = g.ev("albumList().slice().reverse()[lightbox.i].keep")
-    g.page.click('[data-lb=keep]'); check(g.ev("albumList().slice().reverse()[lightbox.i].keep") == (not before), '珍藏 can be toggled from the viewer')
+    before = g.ev("albumList().find(p=>p.id===lightbox.ids[lightbox.i]).keep")
+    g.page.click('[data-lb=keep]'); check(g.ev("albumList().find(p=>p.id===lightbox.ids[lightbox.i]).keep") == (not before), '珍藏 can be toggled from the viewer')
     g.page.click('.lb-close'); check(g.ev("$('#lightbox').hidden"), 'the viewer closes')
     # backup carries pictures; the store survives a round trip
     g.ev("(()=>{const el=document.createElement('button');el.dataset.act='closeSub';$('#screen').appendChild(el);el.click();el.remove()})()")
@@ -2873,6 +2873,161 @@ def q_plus_world_sprites_keep_jill_and_dylan_their_own(b, port, target):
     px = g.ev("(()=>{const cv=document.createElement('canvas');cv.width=80;cv.height=100;const c=cv.getContext('2d');drawPerson(c,40,90,JILL_LOOK,{jill:true,me:true,tall:true});const a=c.getImageData(0,0,80,100).data;let n=0;for(let i=3;i<a.length;i+=4)if(a[i]>0)n++;c.clearRect(0,0,80,100);drawPerson(c,40,90,JILL_LOOK,{jill:true,me:true,tall:true,hat:true});const b=c.getImageData(0,0,80,100).data;let m=0;for(let i=3;i<b.length;i+=4)if(b[i]>0)m++;return [n,m]})()")
     check(px[0] > 500 and px[1] > px[0], f'Jill draws (no hat by default; the hat adds pixels when asked): {px}')
     check(not g.errors, g.errors)
+    g.close()
+
+@test
+def u_v_world_memory_and_regulars_speak_with_their_faces(b, port, target):
+    """U + V. What happened in the restaurant comes back later in the words of the regulars: a regular sitting down
+    a week after the side room opened says so, once, days after the fact, at most one memory a day; it is read from
+    the days the save already keeps (rooms, projects, records, the first special, the reveal) and nothing else is
+    recorded for it. A regular's own line shows their supplied face beside the words (a portrait card, not a toast);
+    a guest without a portrait stays a toast; the book's regulars page shows the faces once they are known."""
+    g = Game(b, port, target, seed=44, manual=True)
+    player30(g); fill_fridge(g)
+    g.ev("S.regulars.chen=Math.max(S.regulars.chen||0,6);S.regulars.leo=Math.max(S.regulars.leo||0,6);S.regulars.wang=Math.max(S.regulars.wang||0,6);S.worldMem={};S.worldMemDay=0;S.newRooms.side=S.day-7;S.newRooms.terrace=0;S.newRooms.kext=0;S.newRooms.glass=0;S.newRooms.ceiling=0;S.newRooms.catwalk=0;S.grewDay=0;S.firstSpecial=0;S.records.rain=null;S.records.guestsDay=null;save()")
+    start_day(g); install_bot(g); g.ev("window.__act=()=>{}"); g.page.evaluate('()=>window.__play(5,0)')
+    SEAT = r"""(()=>{const t=R.tables[%d];if(t.group){R.groups=R.groups.filter(q=>q!==t.group)}t.group=null;t.dirty=false;const q={id:R.gid++,type:'regular',reg:'%s',size:1,looks:REG_BY['%s'].looks,name:REG_BY['%s'].n,state:'queue',table:null,pat:1,room:'main',troom:'main',x:DOOR.x,y:DOOR.y,tx:DOOR.x,ty:DOOR.y,timer:0,ticket:null,seed:1,mood:'ok'};R.groups.push(q);window.__rq=q;return q})()"""
+    # the candidates are read from the save: only the side room is in its window (7 days ago, window 3–14)
+    g.ev(SEAT % (0, 'chen', 'chen', 'chen'))
+    cands = json.loads(g.ev("JSON.stringify(worldMemCands(__rq).map(M=>M.k))"))
+    check(cands == ['side'], f'the side room a week ago is the one memory in its window, got {cands}')
+    g.ev("S.newRooms.side=S.day-1"); check(json.loads(g.ev("JSON.stringify(worldMemCands(__rq).map(M=>M.k))")) == [], 'yesterday is too soon to be a memory')
+    g.ev("S.newRooms.side=S.day-20"); check(json.loads(g.ev("JSON.stringify(worldMemCands(__rq).map(M=>M.k))")) == [], 'three weeks ago is forgotten')
+    g.ev("S.newRooms.side=S.day-7;S.records.rain={v:1000,d:S.day-4}")
+    check(sorted(json.loads(g.ev("JSON.stringify(worldMemCands(__rq).map(M=>M.k))"))) == ['side', 'storm'], 'a record rainy day four days back is a second memory for 陳伯伯')
+    # a new face is not asked to remember: fewer than two visits → nothing
+    g.ev("S.regulars.chen=1"); check(not g.ev("worldMemoryLine(__rq,true)"), 'a first-time regular remembers nothing')
+    g.ev("S.regulars.chen=6;$('#plines').innerHTML='';$('#toasts').innerHTML='';R.log=[]")
+    check(g.ev("worldMemoryLine(__rq,true)"), 'the memory fires (forced past the chance)')
+    k = json.loads(g.ev("JSON.stringify(Object.keys(S.worldMem))"))
+    check(len(k) == 1 and k[0] in ('side', 'storm') and g.ev("S.worldMem['%s']" % k[0]) == g.ev("S.day") and g.ev("S.worldMemDay") == g.ev("S.day"), f'one memory, marked with the day: {k}')
+    g.ev("__tick(1500)"); g.page.wait_for_timeout(1600)
+    check(g.ev("$('#plines').querySelectorAll('.pline.right img').length") >= 1 and g.ev("$('#plines').textContent.includes('陳伯伯')"), 'the line is a portrait card with his face')
+    check(not g.ev("$('#toasts').textContent.includes('陳伯伯')"), 'not a toast')
+    line = g.ev("(R.log.find(l=>l.w==='陳伯伯')||{}).t")
+    check(bool(line) and g.ev("regMem('chen').facts.some(f=>f.txt==='「'+%s+'」')" % json.dumps(line)), f'the line is in the log and in his facts, as his words: {line!r}')
+    # once: the same memory never comes back, and there is one memory a day at most
+    check(not g.ev("worldMemoryLine(__rq,true)"), 'one memory a day')
+    g.ev("S.worldMemDay=0"); rest = json.loads(g.ev("JSON.stringify(worldMemCands(__rq).map(M=>M.k))"))
+    check(k[0] not in rest and len(rest) == 1, f'the memory that was said is spent, the other remains: {rest}')
+    # the Wang couple: a line meant for 王太太 shows her face; one meant for both shows 王先生
+    g.ev("S.worldMem={};S.worldMemDay=0;S.records.rain=null;S.newRooms.side=0;S.newRooms.ceiling=S.day-5;$('#plines').innerHTML=''")
+    g.ev(SEAT % (1, 'wang', 'wang', 'wang'))
+    check(json.loads(g.ev("JSON.stringify(worldMemCands(__rq).map(M=>M.k))")) == ['ceiling'], 'the couple remember the ceiling')
+    check(g.ev("worldMemoryLine(__rq,true)"), 'the couple remember'); g.ev("__tick(1500)"); g.page.wait_for_timeout(1600)
+    check(g.ev("$('#plines').textContent.includes('王先生')") or g.ev("$('#plines').textContent.includes('王太太')"), 'one of the two faces speaks')
+    g.ev("S.worldMem={};S.worldMemDay=0;S.newRooms.ceiling=0;S.newRooms.glass=S.day-5;$('#plines').innerHTML=''")
+    check(g.ev("worldMemoryLine(__rq,true)"), 'the glass memory fires'); g.ev("__tick(1500)"); g.page.wait_for_timeout(1600)
+    check(g.ev("$('#plines').textContent.includes('王太太')"), 'the glass front line is hers (王太太)')
+    # the seat moment of a regular goes through the same card; a plain guest is still a toast
+    g.ev("$('#plines').innerHTML='';$('#toasts').innerHTML='';quote(__rq,'今天也來了。');quote({name:'客人',type:'office'},'好吃。')")
+    check(g.ev("$('#plines').querySelectorAll('.pline').length") == 1 and g.ev("$('#toasts').textContent.includes('客人')"), 'regular → card, guest → toast')
+    # V: the regulars page shows the supplied faces once known; the unknown keep the silhouette
+    g.ev("S.regulars.sophie=0;bookTab='regulars';showBook()"); g.page.wait_for_timeout(50)
+    faces = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('.reg')].map(r=>({n:r.querySelector('b').textContent,face:!!r.querySelector('img.face'),unknown:r.classList.contains('unknown')})))"))
+    known = [f for f in faces if not f['unknown']]
+    check(all(f['face'] for f in known) and any(f['n'] == '陳伯伯' for f in known), f'known regulars show their supplied faces: {known}')
+    check(all(not f['face'] for f in faces if f['unknown']), 'an unknown regular keeps the silhouette')
+    check(any(f['n'] == 'Dylan' and f['face'] for f in faces), 'Dylan has his face in the book')
+    # nothing keyed to the day: the memory works from any compatible save day
+    g.ev("hideScreen()"); check(g.ev("S.day") >= 30, 'the fixture is the mature save')
+    check(not g.errors, g.errors[:2])
+    g.close()
+
+@test
+def w_the_album_is_a_living_history(b, port, target):
+    """W. The album reads forward as the restaurant's story: weeks, and inside each week what happened to the place
+    (read only from days written when the thing happened — rooms/projects, the expansion, the first special, the
+    record days, the reveal, the regulars' facts; never the achievements' days, which a migrated save carries wrong)
+    and that week's photos; the last week is this one and the page ends with today, still going. No memorial framing
+    anywhere. The lightbox walks the same order. A fresh game shows the empty state and today."""
+    g = Game(b, port, target, seed=45, manual=True)
+    player30(g)
+    ev = json.loads(g.ev("JSON.stringify(storyEvents())"))
+    days = [e['day'] for e in ev]
+    check(days == sorted(days) and ev[0]['day'] == 1 and '開店' in ev[0]['t'], f'the story starts with the opening and reads forward: {ev[:2]}')
+    side = g.ev("S.newRooms.side")
+    check(any(e['day'] == side and '側廳' in e['t'] for e in ev), 'the side room is dated the day it was built')
+    check(any('最多客人' in e['t'] and e['day'] == g.ev("S.records.guestsDay.d") for e in ev), 'the record day is in the story')
+    check(any('特製版' in e['t'] and e['day'] == g.ev("S.firstSpecial") for e in ev), 'the first special is in the story')
+    ach_days = json.loads(g.ev("JSON.stringify(Object.values(S.achievements))"))
+    check(not any('聘請' in e['t'] or '連續營業' in e['t'] for e in ev), 'achievement lines are not used as dated events (a migrated save dates them the day they were granted)')
+    check(all(e['day'] <= g.ev("S.day") for e in ev), 'nothing dated after today')
+    # a regular's fact is one event, named once; the regular's own words (「…」) are not events
+    g.ev("regMem('chen').facts.unshift({day:S.day-2,txt:'拿了一袋橘子來。'});regMem('wang').facts.unshift({day:S.day-2,txt:'王先生一個人來過。'});regMem('mia').facts.unshift({day:S.day-1,txt:'「那天雨那麼大，你們還開著。」'})")
+    ev = json.loads(g.ev("JSON.stringify(storyEvents())"))
+    check(any(e['t'] == '陳伯伯拿了一袋橘子來。' for e in ev) and any(e['t'] == '王先生一個人來過。' for e in ev), f'facts are named once: {[e["t"] for e in ev if e.get("reg")]}')
+    check(not any('那天雨那麼大' in e['t'] for e in ev), 'what a regular said is not an event')
+    # the page
+    g.ev("bookTab='mem';showBook()"); g.page.wait_for_timeout(100)
+    weeks = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('.story-week')].map(w=>({h:w.querySelector('.story-h').textContent,days:[...w.querySelectorAll('.polaroid .when')].map(x=>+x.textContent.match(/DAY (\\d+)/)[1]),ev:[...w.querySelectorAll('.story-ev .when')].map(x=>+x.textContent.match(/DAY (\\d+)/)[1])})))"))
+    check(len(weeks) >= 3 and '第 1 週' in weeks[0]['h'] and '這一週' in weeks[-1]['h'], f'weeks in order, the last is this week: {[w["h"] for w in weeks]}')
+    for i, w in enumerate(weeks):
+        m = re.search(r'第 (\d+) 週', w['h']); n = int(m.group(1)); lo, hi = (n-1)*7+1, n*7
+        check(all(lo <= d <= hi for d in w['days'] + w['ev']), f'week {n} holds only DAY {lo}–{hi}: photos {w["days"]} events {w["ev"]}')
+    check(sum(len(w['days']) for w in weeks) == g.ev("albumList().length"), 'every photo is on the page, once')
+    txt = g.ev("$('#screen').textContent")
+    check('還在繼續' in txt and txt.rstrip().endswith('還在繼續。') or txt.index('還在繼續') > txt.rindex('第 '), 'the page ends with today, still going')
+    check(not re.search('紀念|追思|懷念|過世|離開了我們|安息|最後一', txt), 'no memorial framing')
+    now = g.ev("$('.story-now').textContent")
+    check(f"DAY {g.ev('S.day')}" in now and '貓都在' in now, f'today\'s block: {now}')
+    # the lightbox walks the same order
+    first = g.ev("albumList().slice().sort((a,b)=>a.day-b.day)[0].id")
+    g.ev("openLightbox(%s)" % json.dumps(first)); check(g.ev("lightbox.i") == 0 and g.ev("(()=>{const A=albumList();const d=lightbox.ids.map(id=>A.find(p=>p.id===id).day);return d.every((x,i)=>i===0||x>=d[i-1])})()"), 'the lightbox starts at the first photo and moves forward in time')
+    g.ev("$('#lightbox').hidden=true;lightbox=null;hideScreen()")
+    check(not g.errors, g.errors[:2])
+    g.close()
+    # a fresh game: the empty state and today
+    g = Game(b, port, target, seed=46, manual=True)
+    g.ev("bookTab='mem';showBook()"); g.page.wait_for_timeout(50)
+    check(g.ev("!!$('.story-now')") and '還沒有留下任何畫面' in g.ev("$('#screen').textContent"), 'a new restaurant: nothing yet, and today')
+    check(not g.errors, g.errors[:2])
+    g.close()
+
+@test
+def x_a_desktop_window_is_used_and_the_mouse_and_keyboard_work(b, port, target):
+    """X. On a desktop window the game is not a 540 px column: the column is as wide as the room at that height (no
+    dark bands, the HUD/tickets/sheets span it), the sheets stay a readable width, a resize mid-service re-lays
+    everything out, the phone layout below 900 px is untouched. With a mouse the cursor says what can be tapped.
+    Keyboard: Space pauses/resumes, Escape closes what is open, Enter steps a dialogue line."""
+    g = Game(b, port, target, seed=47, manual=True, viewport={'width': 1440, 'height': 900})
+    player30(g); fill_fridge(g)
+    appw = g.ev("$('#app').getBoundingClientRect().width"); hud = g.ev("$('#hud').offsetHeight")
+    want = (900 - hud) / 424 * (400 + 160)
+    check(abs(appw - want) < 6 and appw > 1000, f'the column is as wide as the room at this height: {appw} vs {want:.0f}')
+    check(g.ev("document.documentElement.classList.contains('desk')") and g.ev("SV.oy") == 0 and abs(g.ev("SV.w") - appw) < 1, 'desktop mode: the scene fills the column')
+    # no dark band: the canvas is painted to both edges (the clear colour is #1E1714)
+    px = json.loads(g.ev("(()=>{const c=sc.getContext('2d');const m=Math.round(sc.height*.5);const l=c.getImageData(2,m,1,1).data,r=c.getImageData(sc.width-3,m,1,1).data;return JSON.stringify([[...l].slice(0,3),[...r].slice(0,3)])})()"))
+    check(all(p != [30, 23, 20] for p in px), f'the room is painted to both edges: {px}')
+    sw = g.ev("(()=>{const r=$('.sheet').getBoundingClientRect();return [r.width,r.left]})()")
+    check(sw[0] <= 722 and sw[1] > 150, f'a sheet stays readable and centred on a wide window: {sw}')
+    start_day(g); install_bot(g); g.ev("window.__act=()=>{}"); g.page.evaluate('()=>window.__play(3,0)')
+    check(g.ev("(()=>{const r=$('#roomTabs').getBoundingClientRect(),w=$('#sceneWrap').getBoundingClientRect();return r.top-w.top})()") > 120, 'the room tabs sit under the sign at desktop scale (76 logical px × the scale)')
+    # the mouse: a table → pointer; empty wall → default
+    t = json.loads(g.ev("(()=>{const t=R.tables[0];const r=sc.getBoundingClientRect();let cold=null;for(const p of [[200,20],[300,20],[120,20],[60,150],[340,150],[200,120]])if(!sceneHot({x:p[0],y:p[1]})){cold=p;break}return JSON.stringify([r.left+SV.ox+t.x*SV.s,r.top+SV.oy+(t.y-16)*SV.s,r.left+SV.ox+cold[0]*SV.s,r.top+SV.oy+cold[1]*SV.s])})()"))
+    g.page.mouse.move(t[0], t[1]); g.page.wait_for_timeout(80); g.page.mouse.move(t[0] + 1, t[1]); g.page.wait_for_timeout(80)
+    check(g.ev("sc.style.cursor") == 'pointer', f'over a table the cursor is a pointer ({g.ev("sc.style.cursor")!r})')
+    g.page.mouse.move(t[2], t[3]); g.page.wait_for_timeout(80); g.page.mouse.move(t[2] + 1, t[3]); g.page.wait_for_timeout(80)
+    check(g.ev("sc.style.cursor") == '', f'over the wall it is not ({g.ev("sc.style.cursor")!r})')
+    # keyboard
+    g.page.keyboard.press('Space'); g.page.wait_for_timeout(60)
+    check(g.ev("paused") and g.ev("sub") == 'pause', 'Space pauses')
+    g.page.keyboard.press('Space'); g.page.wait_for_timeout(60)
+    check(not g.ev("paused") and g.ev("sub") is None and g.ev("phase") == 'service', 'Space resumes')
+    g.page.keyboard.press('Escape'); g.page.wait_for_timeout(60); check(g.ev("paused") and g.ev("sub") == 'pause', 'Escape pauses when nothing is open')
+    g.page.keyboard.press('Escape'); g.page.wait_for_timeout(60); check(not g.ev("paused"), 'Escape on the pause menu resumes')
+    g.ev("window.__noScenes=false;scene([{who:'jill',text:'一'},{who:'jill',text:'二'}])"); g.page.wait_for_timeout(50)
+    g.page.keyboard.press('Enter'); g.page.wait_for_timeout(50); check(g.ev("$('#dlg .dlg-text').textContent") == '二', 'Enter steps a dialogue')
+    g.page.keyboard.press('Escape'); g.page.wait_for_timeout(50); check(g.ev("$('#dlg').hidden"), 'Escape closes it')
+    g.ev("window.__noScenes=true")
+    # a resize mid-service re-lays everything out; the phone layout is untouched below 900 px
+    g.page.set_viewport_size({'width': 1000, 'height': 700}); g.page.wait_for_timeout(150)
+    appw2 = g.ev("$('#app').getBoundingClientRect().width"); want2 = (700 - hud) / 424 * 560
+    check(abs(appw2 - want2) < 6 and abs(g.ev("SV.w") - appw2) < 1 and g.ev("sc.width") == round(appw2 * g.ev("DPR")), f'after a resize the column and the canvas follow: {appw2} vs {want2:.0f}')
+    g.ev("__tick(200)"); g.page.set_viewport_size({'width': 390, 'height': 844}); g.page.wait_for_timeout(150); g.ev("__tick(200)")
+    check(not g.ev("document.documentElement.classList.contains('desk')") and g.ev("$('#app').style.maxWidth") == '' and g.ev("$('#app').getBoundingClientRect().width") == 390, 'a phone-sized window is the phone layout')
+    check(g.ev("(()=>{const r=$('#roomTabs').getBoundingClientRect();return Math.abs(r.top-(SV.oy+76*SV.s+$('#sceneWrap').getBoundingClientRect().top))<2})()"), 'the tabs follow the scene scale on the phone too')
+    check(not g.errors, g.errors[:2])
     g.close()
 
 def main():
