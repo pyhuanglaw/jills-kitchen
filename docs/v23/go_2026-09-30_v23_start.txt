@@ -1,0 +1,316 @@
+GO AHEAD — START JILL’S KITCHEN v2.3 NOW.
+
+v2.2.1 is complete and frozen:
+- Version 33
+- tag v2.2.1
+- release report complete
+- 95/95 suite
+- rollback points preserved
+
+Do not modify or reopen v2.2.1 except if a genuine migration/regression blocker is discovered while developing v2.3.
+
+You are now explicitly authorized to begin v2.3.
+
+IMPORTANT:
+The architecture audit is the FIRST STEP OF IMPLEMENTATION, not another approval gate.
+
+Do not stop after producing the audit and wait for me again.
+
+Workflow:
+
+1. Perform the concise v2.3 architecture audit required by docs/V23_BRIEF.md and all filed addenda.
+2. Reconcile the proposed systems with the actual current code.
+3. If there is no genuine architectural blocker, immediately proceed into implementation.
+4. Work in small, rollback-safe commits.
+5. Continue through the first meaningful playable vertical slice before stopping for a report.
+
+Do not spend hours writing an enormous architecture document.
+The audit exists to prevent bad implementation, not to become the product.
+
+==================================================
+PHASE 0 — ARCHITECTURE AUDIT
+==================================================
+
+Inspect the actual current implementation and answer, from code rather than assumptions:
+
+A. How the Lounge can join the existing restaurant simulation without becoming a second game/simulation.
+
+B. How the same customer entity can transition between:
+WAITING
+→ Lounge
+→ Main Hall / Side Hall
+→ Lounge after dinner
+→ departure
+
+without duplicate:
+- customers
+- tickets
+- payments
+- reviews
+- visit counts
+- story facts
+
+C. How persistent Story Facts / Relationship Facts fit into the existing save structure.
+
+D. How familiarity and behavior unlocks can remain lightweight:
+FACTS
+→ familiarity
+→ behavior eligibility
+→ authored story beats
+
+Do NOT build an N×N relationship simulation.
+
+E. How the Story Event Arbiter should reuse existing event/history systems.
+
+Evaluation must happen at meaningful event boundaries, not every frame.
+
+F. How event lanes work:
+
+MAJOR STORY:
+normally 0–1/day
+
+MINOR CALLBACK:
+normally 0–2/day
+
+AMBIENT:
+low-cost interactions that do not consume or block the major-story slot
+
+G. How weighted eligibility + overdue/catch-up prevents important arcs from silently never occurring.
+
+H. How presentation fallback prevents physical layout/RNG from deadlocking story progression.
+
+Story meaning may remain fixed while presentation changes.
+
+History must never lie.
+
+I. How the Ken → wine discussion → tasting → Lounge project origin arc works on:
+- fresh saves
+- Day30 mature saves
+- Day35+ mature saves
+
+Never fabricate events that did not happen.
+
+J. How Lounge staffing extends the existing 工作分配 system rather than creating another staff manager.
+
+K. How station familiarity / wine familiarity can remain coarse and lightweight.
+
+L. How staff-dependent stories survive:
+- days off
+- reassignment
+- firing
+- missing staff
+
+Optional character stories may become inactive.
+They must never block restaurant progression.
+
+M. How Bar Food routes through the existing Main Kitchen.
+
+Lounge I / II must NOT create a second full kitchen.
+
+N. How Story Photos integrate with Life Album.
+
+There are TWO photo concepts:
+
+1. Ordinary Life Album photos
+   = emergent captures of real play
+
+2. Story Photos
+   = rare canonical authored illustrations unlocked only after the corresponding real story milestone occurred
+
+Story Photo unlock must be an idempotent Story Event consequence.
+
+Confirmed requirements include:
+- Sophie × Mia relationship Story Photo
+- 晴 × 阿拓 Story Photo if their optional relationship genuinely develops
+- Ken × Monsieur 杜 REQUIRED friendship Story Photo, never romantic
+- selected Jill × Dylan milestones
+- selected 王先生 × 王太太 milestones
+- important staff/group story milestones where appropriate
+
+Never unlock a Story Photo for history that did not occur.
+
+O. Save migration:
+- version-aware
+- idempotent
+- safe on repeated reload
+- fresh save
+- Day30
+- Day33
+- Day35+
+
+Specifically guard against another migration failure like the MAIN_MAX TDZ incident.
+
+P. Performance:
+No per-frame relationship graph scans.
+No giant generic RPG framework.
+No unnecessary golden-test laboratory.
+
+==================================================
+AFTER THE AUDIT — DO NOT STOP
+==================================================
+
+If the audit finds no genuine blocker, immediately implement the v2.3 STORY / RELATIONSHIP FOUNDATION.
+
+Build the smallest architecture capable of supporting the actual game.
+
+Required foundation:
+
+- persistent Story Facts
+- persistent Relationship Facts
+- coarse familiarity where useful
+- behavior unlock eligibility
+- Story Event Arbiter
+- major/minor/ambient event budgeting
+- weighted eligibility
+- cooldowns
+- overdue/catch-up weighting
+- idempotent consequences
+- presentation fallback
+- Story Photo unlock state
+- safe save migration
+
+Do NOT build:
+
+- quest UI
+- friendship meters
+- romance meters
+- generic dating system
+- N×N relationship matrix
+- second simulation
+- second save universe
+- second restaurant economy
+- second staff system
+- giant dialogue framework
+- full wine inventory simulator
+
+==================================================
+FIRST PLAYABLE VERTICAL SLICE
+==================================================
+
+After the foundation exists, prove it with REAL CONTENT.
+
+Use existing characters first.
+
+The first slice should demonstrate:
+
+1. Sophie × 寶寶 continuing relationship/history
+2. at least one relationship fact between existing human characters
+3. one ambient callback
+4. one minor story callback
+5. one authored major beat
+6. persistence across save/reload
+7. no duplicated event after reload
+8. event history visible through existing appropriate surfaces
+9. one Story Photo unlock path proven end-to-end using a development/test condition
+
+IMPORTANT:
+
+The Story Photo test may force prerequisites in a test fixture.
+
+Normal gameplay must NEVER fake the underlying milestone.
+
+Do not yet dump every v2.3 story into the game.
+
+Prove the system first.
+
+==================================================
+THEN BEGIN THE LOUNGE FOUNDATION
+==================================================
+
+Once the story/relationship foundation and vertical slice are stable, proceed into the Lounge foundation according to the filed v2.3 brief.
+
+The Lounge must remain part of the SAME restaurant.
+
+Start with structural integration:
+
+- new Lounge space
+- room navigation
+- same guest identity
+- waiting → Lounge transition
+- dinner → Lounge transition
+- Lounge → dinner transition
+- Lounge seating
+- existing staff assignment integration
+- existing kitchen routing
+- save/load
+- mature-save compatibility
+
+Do not begin by adding dozens of drinks or decorations.
+
+Prove the simulation first.
+
+Then begin the Ken-origin vertical slice:
+
+Ken’s real visit history
+→ first wine question
+→ later pairing discussion
+→ optional Monsieur 杜 enrichment
+→ small tasting experiment
+→ Jill’s after-close realization
+→ Lounge project becomes available
+
+Monsieur 杜 must enrich the story but must NOT hard-block structural progression.
+
+The Lounge project must feel like something that happened because of restaurant history, not because revenue >= X.
+
+==================================================
+QUALITY / SCOPE RULE
+==================================================
+
+Use the intelligence for implementation, not ceremony.
+
+Do enough testing to protect:
+- save compatibility
+- identity
+- ticket/payment integrity
+- story idempotence
+- migration
+- event scheduling
+
+Do NOT create another NASA-scale test center for tiny visual differences.
+
+Player-visible progress matters.
+
+Prefer:
+one working story
+one working relationship
+one working transition
+one working Lounge
+
+over:
+twenty pages describing how they might someday work.
+
+==================================================
+COMMITS
+==================================================
+
+Keep checkpoints small and reversible.
+
+Suggested boundaries:
+
+v2.3 Phase 0 — architecture audit/docs
+v2.3 Phase 1 — story/relationship foundation
+v2.3 Phase 2 — first playable story vertical slice
+v2.3 Phase 3 — Lounge structural foundation
+v2.3 Phase 4 — Ken origin vertical slice
+
+Do not rewrite stable v2.2.1 systems unnecessarily.
+
+==================================================
+WHEN TO STOP
+==================================================
+
+Do NOT stop merely because the architecture audit is complete.
+
+Continue automatically unless:
+
+- you discover a genuine architectural contradiction requiring a product decision;
+- safe migration cannot be designed without choosing between incompatible behaviors;
+- implementation would require rewriting a stable core system far beyond the brief;
+- or remaining context/resources make continuing unsafe.
+
+Otherwise:
+
+AUDIT → IMPLEMENT → TEST → PLAYABLE VERTICAL SLICE.
+
+Start now.
