@@ -48,10 +48,10 @@ report with this checklist reconciled.
 | step | status |
 |---|---|
 | A–E tests pass | DONE |
-| nearby regression (full suite) | see the final report's suite line |
+| nearby regression (full suite) | DONE — 64/66 on the first full run (`docs/evidence/v22_suite_gate.log`); the two failures were a stochastic bound (`jill_rests…`, 0.646 vs < 0.6) and raster noise inside album photos (`golden_frames` book_mem, ≤ 12 levels) — both verified against the v2.1 baseline first (`docs/evidence/v22_rng_invariants.md`), then the tests adjusted; 66/66 after |
 | Day 30 save loads, opens on prep, checkpoint resumable | DONE (`day30_load.py`, `a4b_…`) |
-| short normal-speed smoke on Day 30 (real time, touch, phone viewport) | see `docs/evidence/v22_smoke_gate.log` |
-| commit + tag `v2.2-ux-stable`, `v2.1` preserved | see bottom |
+| short normal-speed smoke on Day 30 (real time, touch, phone viewport) | DONE — 2 days, speeds 0.75/1/1.5/2× cycled, pause menu on screen, no errors (`docs/evidence/v22_smoke_gate.log`); found and fixed: the summary screen's HUD kept the pre-wage money until 去商店 (now `hud(true)` in `showSummary`, asserted in the A5 test) |
+| commit + tag `v2.2-ux-stable`, `v2.1` preserved | DONE — `511f237` |
 
 ## F–Z (priorities 5–12)
 
@@ -76,7 +76,7 @@ report with this checklist reconciled.
 | V+ Dylan presence (user clarification, 2026-09-29) — presence frequency, narrative progression frequency and reveal timing are three separate knobs; the reveal may stay low-frequency, Dylan himself must not | NOT STARTED | inspect how visit eligibility, full-house rejection, Jill-idle requirements and RNG gates compound (the Day 30 save is still stage 1); add small lived moments (he visits without advancing anything, Jill knows his order, shorthand talk, knows where things are, clears his own plate as established, stays out of the way when she is busy, cats treat him as family from Day 1, near closing, regulars notice he comes often, Jill teases his charm attempts, notices a change on a later visit, plain non-clue dialogue). Not staff, no routine help, no quests / meters / dating; not every appearance advances the story; no forced reveal at Day 30; the pursuit joke continues after the reveal |
 | W Album living history | NOT STARTED | no death / memorial framing |
 | X responsive desktop | NOT STARTED | no 540 px column; mouse / keyboard / resize; no Steamworks |
-| Y save compatibility with the Day 30 save | PARTIAL | loads and plays on v2.2 (A tests, smoke); every later section must keep it — re-checked before the final tag |
+| Y save compatibility with the Day 30 save | PARTIAL | loads and plays on v2.2 (A tests, smoke: two full days at normal speed, $70,588 → $207,375); every later section must keep it — re-checked before the final tag |
 | Z autonomous bug fixing, no silent rebalancing | ONGOING | balance observations collected in the report, none changed |
 
 ## Required regression coverage (24 items)
@@ -92,4 +92,4 @@ contexts in the harness; `touch_controls`) · desktop resize (pending X) · albu
 ## Tags
 
 - `v2.1` / `stable-v2.1` = `da79864` (preserved)
-- `v2.2-ux-stable` = (filled in when tagged)
+- `v2.2-ux-stable` = `511f237` (2026-09-29)
