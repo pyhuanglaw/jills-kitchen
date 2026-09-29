@@ -64,6 +64,7 @@ def init_script(seed=None, manual=False, audio=False):
       // Manual mode = virtual time. Nothing moves unless the test calls __tick(ms):
       // performance.now(), setTimeout and requestAnimationFrame all follow the virtual clock,
       // so frames, toasts, banners and coach bubbles are fully deterministic.
+      window.__noScenes=true;   // v2.2: portrait scenes (a full-screen tap-to-continue panel) stay off unless a test turns them on
       window.__rafQ=[];
       if(MANUAL){
         let now=1000,seq=0;const timers=[];
@@ -2802,6 +2803,54 @@ def l_m_n_hospitality_set_sales_and_the_weather_suggestion(b, port, target):
     check(g.ev("!!document.querySelector('.sale.set')"), 'the set row is on the summary')
     check(not g.errors, g.errors)
     g.close()
+
+# ---------------------------------------------------------------- v2.2 Q: dialogue portraits
+@test
+def q_portraits_are_one_system_with_a_fallback_and_fit_a_phone(b, port, target):
+    """Q. One portrait architecture: characterId → asset(s), side, fallback. Jill has her variants, Dylan his, each
+    regular one, six named staff by role and hiring order; anyone else gets no portrait (never Jill's). The scene panel
+    shows the speaker with the name and the text, both faces in a Jill/Dylan exchange with the speaker lit, tap to
+    continue; a Dylan line during service is a card with his face, a generic guest stays a toast. On 375×553 the face
+    is inside the screen and not under the text box. Without assets the plain presentation remains."""
+    for (vw, vh) in [(375, 553), (390, 664)]:
+        g = Game(b, port, target, seed=62, manual=True, touch=True, viewport={'width': vw, 'height': vh})
+        player30(g)
+        check(g.ev("portraitOf('jill','teasing').src.startsWith('data:image/webp')") and g.ev("portraitOf('jill').side") == 'left', 'Jill has portraits from the supplied assets')
+        check(g.ev("portraitOf('dylan','playful').side") == 'right' and g.ev("portraitOf('dylan','playful').src!==portraitOf('dylan').src"), 'Dylan has variants on the right')
+        for rid in ['chen', 'mia', 'koba', 'leo', 'sophie', 'wang', 'wangwife']:
+            check(g.ev(f"!!portraitOf('{rid}')"), f'regular {rid} has a portrait')
+        check(g.ev("portraitOf('staff:阿德師傅').src!==portraitOf('staff:小茉').src") and g.ev("portraitOf('staff:Hugo')") is None and g.ev("portraitOf('office')") is None, 'named staff by role and hiring order; nobody else')
+        srcs = json.loads(g.ev("JSON.stringify([portraitOf('jill').src,portraitOf('dylan').src,portraitOf('chen').src,portraitOf('staff:阿德師傅').src])"))
+        check(len(set(srcs)) == 4, 'no two characters share a face')
+        # the morning remark, once
+        g.ev("window.__noScenes=false;S.morningSaid=0;showPrep()"); g.page.wait_for_timeout(100)
+        check(g.ev("!$('#dlg').hidden") and g.ev("$('#dlg .dlg-name').textContent") == 'Jill' and g.ev("$('#dlg .dlg-text').textContent.length>3"), 'the morning remark shows Jill')
+        face = json.loads(g.ev("(()=>{const r=$('#dlg .dlg-p.left img').getBoundingClientRect();return JSON.stringify([r.left,r.top,r.right,r.top+r.height*.45])})()"))
+        box = json.loads(g.ev("(()=>{const r=$('#dlg .dlg-box').getBoundingClientRect();return JSON.stringify([r.left,r.top,r.right,r.bottom])})()"))
+        check(face[0] >= 0 and face[1] >= 0 and face[2] <= vw and box[3] <= vh + 1 and box[1] >= 0, f'portrait and box inside {vw}x{vh}: face {face} box {box}')
+        check(face[3] <= box[1] + 1, f'the face (top 45% of the portrait) is above the text box: face bottom {face[3]} box top {box[1]}')
+        check(g.ev("getComputedStyle($('#dlg .dlg-next')).display") != 'none', 'the tap target is there')
+        g.ev("dlgNext()"); check(g.ev("$('#dlg').hidden"), 'a single line closes on the tap')
+        g.ev("showPrep()"); check(g.ev("$('#dlg').hidden"), 'the remark is once a day')
+        # a Jill/Dylan scene: both faces, the speaker lit
+        g.ev("scene([{who:'jill',tone:'teasing',text:'你本來就每天來。'},{who:'dylan',tone:'playful',text:'昨天跟今天是不同的約會。'}])")
+        check(g.ev("!$('#dlg .dlg-p.left').hidden&&!$('#dlg .dlg-p.right').hidden"), 'both portraits in a Jill/Dylan scene')
+        check(g.ev("!$('#dlg .dlg-p.left').classList.contains('dim')&&$('#dlg .dlg-p.right').classList.contains('dim')"), 'Jill lit, Dylan dimmed while she speaks')
+        g.ev("dlgNext()"); check(g.ev("$('#dlg .dlg-name').textContent") == 'Dylan' and g.ev("$('#dlg .dlg-p.left').classList.contains('dim')"), 'then Dylan lit')
+        g.ev("dlgNext()"); check(g.ev("$('#dlg').hidden"), 'closed after the last line')
+        check(g.ev("(S.dayLog||[]).filter(l=>l.k==='d'||l.k==='j').length") >= 2, 'the lines are in the log')
+        # the fallback: no assets → the plain presentation, no placeholder
+        g.ev("window.__pd=window.PORTRAIT_DATA;window.PORTRAIT_DATA=null")
+        check(g.ev("portraitOf('jill')") is None and not g.ev("scene([{who:'jill',text:'x'}])") and g.ev("$('#dlg').hidden"), 'without assets nothing is shown')
+        g.ev("window.PORTRAIT_DATA=window.__pd")
+        # during service: Dylan's line is a card with his face, Jill's answer with hers; a guest stays a toast
+        fill_fridge(g); start_day(g); install_bot(g); g.ev("window.__act=()=>{}"); g.page.evaluate('()=>window.__play(30,0)')
+        g.ev("$('#toasts').innerHTML='';quote({name:'Dylan',reg:'dylan'},'老闆娘，今天有空嗎？');jillSay('沒有。',{with:'dylan'});quote({name:'客人',type:'office'},'好吃。')")
+        check(g.ev("$('#plines').querySelectorAll('.pline.right img').length") >= 1 and g.ev("$('#plines').querySelectorAll('.pline.left').length") == 1, 'the exchange is two portrait cards')
+        check(g.ev("$('#toasts').textContent.includes('客人')") and not g.ev("$('#toasts').textContent.includes('Dylan')"), 'the guest is a toast, Dylan is not')
+        check(g.ev("!$('#dlg')||$('#dlg').hidden"), 'no modal during service')
+        check(not g.errors, g.errors)
+        g.close()
 
 def main():
     ap = argparse.ArgumentParser()

@@ -167,7 +167,9 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .bn{display:inline-block;animation:bnPop 1.6s cubic-bezier(.2,1.4,.4,1) forwards}
 .bn b{display:block;font-family:var(--disp);font-weight:400;font-size:34px;color:#FFF3D0;text-shadow:0 3px 0 #8E6422,0 0 18px rgba(255,190,80,.8);letter-spacing:.02em}
 .bn span{display:inline-block;margin-top:4px;padding:3px 10px;border-radius:8px;background:rgba(22,33,36,.8);font-size:12px;font-weight:700;color:var(--brass2)}
-.bn.perfect b{font-size:38px;color:#FFF6C8;text-shadow:0 3px 0 #B07A1A,0 0 24px rgba(255,210,90,.95)}
+/* v2.2 S: PERFECT is a nod, not a billboard — smaller, higher, gone sooner (the combo chip keeps the count) */
+.bn.perfect{animation-duration:1s}.bn.perfect b{font-size:22px;color:#FFF6C8;text-shadow:0 2px 0 #B07A1A,0 0 14px rgba(255,210,90,.9)}
+#banner:has(.bn.perfect){top:22%}
 .bn.fire b{color:#FFE0A0;text-shadow:0 3px 0 #9A3212,0 0 26px rgba(255,120,40,.95)}
 @keyframes bnPop{0%{transform:scale(.4);opacity:0}15%{transform:scale(1.08);opacity:1}25%{transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:translateY(-14px)}}
 #coach{position:absolute;left:8px;right:8px;z-index:5;display:flex;gap:8px;align-items:center;padding:6px 10px 6px 6px;border-radius:12px;font-size:12px;line-height:1.4;background:var(--paper);color:var(--ink);box-shadow:0 6px 20px rgba(0,0,0,.35);font-size:13px;line-height:1.45;font-weight:600}
@@ -488,3 +490,31 @@ input.txt{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(
 .wxadd{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 2px}
 .wxadd .mini{height:28px;padding:0 10px;border-radius:14px;border:1px solid var(--line);background:var(--paper);font-size:12px;font-weight:700}
 .wxadd .mini:disabled{opacity:.45}
+/* ===== v2.2 Q: dialogue portraits ===== */
+#dlg{position:absolute;left:0;right:0;bottom:0;top:0;z-index:30;background:linear-gradient(rgba(12,18,20,.35) 0%,rgba(12,18,20,.62) 40%,rgba(12,18,20,.82));cursor:pointer;-webkit-tap-highlight-color:transparent}
+#dlg .dlg-p{position:absolute;bottom:calc(96px + env(safe-area-inset-bottom));width:46%;max-width:300px;height:min(38vh,320px);display:flex;align-items:flex-end;pointer-events:none;transition:opacity .2s,transform .2s}
+#dlg .dlg-p.left{left:2%;justify-content:flex-start}#dlg .dlg-p.right{right:2%;justify-content:flex-end}
+#dlg .dlg-p img{max-height:100%;max-width:100%;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,.35))}
+#dlg .dlg-p.dim{transform:scale(.9)}#dlg .dlg-p.dim img{filter:drop-shadow(0 4px 8px rgba(0,0,0,.25)) brightness(.55) saturate(.7)}
+#dlg .dlg-box{position:absolute;left:10px;right:10px;bottom:calc(14px + env(safe-area-inset-bottom));background:var(--paper);color:var(--ink);border-radius:14px;padding:12px 14px 10px;box-shadow:0 6px 18px rgba(0,0,0,.35);border:1px solid rgba(201,154,69,.5);min-height:88px}
+#dlg .dlg-name{display:inline-block;font-size:12.5px;font-weight:800;color:#7A5A22;letter-spacing:.04em;margin-bottom:3px}
+#dlg .dlg-text{margin:0;font-size:15px;line-height:1.55;font-weight:600}
+#dlg .dlg-next{display:block;text-align:right;margin-top:6px;font-size:11px;color:var(--muted);font-weight:700}
+#dlg.side-right .dlg-name{color:#3E5A7A}
+#sceneWrap{container-type:inline-size}
+/* a wide stage (desktop, section X): more room, not a blown-up phone box */
+@container (min-width:720px){#dlg .dlg-p{height:min(56vh,480px);max-width:440px;bottom:calc(112px + env(safe-area-inset-bottom))}#dlg .dlg-p.left{left:6%}#dlg .dlg-p.right{right:6%}#dlg .dlg-box{left:50%;right:auto;transform:translateX(-50%);width:min(720px,70%);padding:16px 22px 12px;bottom:28px}#dlg .dlg-text{font-size:17px}}
+/* the line card during service */
+#plines{position:absolute;left:8px;right:8px;bottom:calc(72px + env(safe-area-inset-bottom));z-index:5;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.pline{pointer-events:auto;display:flex;align-items:flex-end;gap:8px;max-width:330px;animation:tIn .25s ease}
+.pline.right{align-self:flex-end;flex-direction:row}
+.pline img{width:64px;height:76px;object-fit:cover;object-position:top;border-radius:10px;border:1.5px solid rgba(230,194,122,.7);background:rgba(22,33,36,.6);flex:none}
+.pline img.dim{width:44px;height:52px;opacity:.7}
+.pline .pl-t{background:rgba(22,33,36,.92);border:1px solid rgba(230,194,122,.35);color:var(--cream);border-radius:12px;padding:7px 11px;font-size:13px;line-height:1.45}
+.pline .pl-t b{display:block;font-size:11px;color:var(--brass2);letter-spacing:.04em;margin-bottom:1px}
+.pline.out{opacity:0;transition:opacity .25s}
+@container (min-width:720px){.pline{max-width:440px}.pline img{width:80px;height:96px}.pline .pl-t{font-size:14px}}
+/* the construction card with Jill's portrait beside her line */
+#reveal .say-row{display:flex;align-items:flex-end;gap:10px;margin:6px 0 2px}
+#reveal .rv-jill{width:84px;height:100px;object-fit:cover;object-position:top;border-radius:12px;flex:none;filter:drop-shadow(0 3px 6px rgba(0,0,0,.25))}
+#reveal .say-row .say{margin:0 0 8px}

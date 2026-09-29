@@ -969,7 +969,7 @@ function logLine(who,txt,kind){const L=dayLog();L.push({c:R?clockStr():'打烊�
 function logChip(){const ch=$('#logChip');if(!ch)return;const show=phase==='service'&&!!R;ch.hidden=!show;if(show)$('#logN').textContent=logNew>99?'99+':String(logNew)}
 /* a global pace for ambient talk: one line at a time, and each kind of remark keeps its own distance */
 function canChat(key,gap,min){if(!R)return false;R.cds=R.cds||{};const now=R.t;if(now-(R.cds._any||-99)<(min==null?7:min))return false;if(now-(R.cds[key]||-999)<gap)return false;R.cds[key]=now;R.cds._any=now;return true}
-function quote(g,txt){logLine(g.name,txt,g.reg==='dylan'?'d':'g');toast(`<b>${g.name}</b>：「${txt}」`,'q')}
+function quote(g,txt){logLine(g.name,txt,g.reg==='dylan'?'d':'g');if(g.reg==='dylan'&&portraitLine('dylan',txt,{tone:dylanTone(txt),with:'jill',withTone:'default'}))return;toast(`<b>${g.name}</b>：「${txt}」`,'q')}
 function staffSay(m,txt){logLine(m.name,txt,'s');toast(`<b>${m.name}</b>：「${txt}」`,'q')}
 function noteLine(txt){logLine('',txt,'e');toast(txt)}
 /* a dish needs its station in the kitchen before anyone can order it (a recipe found before the station exists waits) */
@@ -1275,7 +1275,7 @@ function treatOfferable(g){return!!(R&&g&&g.table!=null&&['wait','eat'].includes
 function playerTreat(g){if(!treatOfferable(g)){toast((R.st.treats||0)>=2?'今天已經請過兩桌了':'現在請不了');return}g.treat='drink';g.byPlayer=true;R.tv++;sfx.tap();toast(`Jill 有空就會拿一杯過去給 ${g.name}`)}
 function treatTick(){if(!R||R.closing!=null)return;const J=R.jill;if(J.visit||J.pet||J.cur||J.q.length||jillWorkload()>1)return;for(const g of R.groups){if(g.table==null||!['wait','eat'].includes(g.state))continue;const k=treatWanted(g);if(!k)continue;/* v2.2 L: an occasion (the card, the player's 招待) gets her up from the sofa like a tapped table would; the patience treat still waits for a quiet moment */if(J.rest){if(g.treat){endRest();J.idle=1}return}if(J.idle<.8)return;if(treatGo(g,k))return}}
 const TIER_N={0:'陌生人',.5:'有點眼熟',1:'熟客',2:'Jill 的老客人'};
-function jillSay(txt){logLine('Jill',txt,'j');toast(`<b>Jill</b>：「${txt}」`,'q')}
+function jillSay(txt,o){logLine('Jill',txt,'j');/* v2.2 Q: an authored moment (with someone who has a portrait) shows her face; an operational word stays a toast */if(o&&o.with&&portraitLine('jill',txt,{tone:jillTone(txt,o),with:o.with,withTone:o.withTone}))return;toast(`<b>Jill</b>：「${txt}」`,'q')}
 function dishName(d){const D=DISH(d);return D?(d==='signature'&&S.signature?S.signature.name:D.n):''}
 /* Not every visit, and tied to the visit: the dish and how it came out, a cat that came by or got photographed,
    a long wait, two words with Jill. Newest first in the journal; capped so the save stays small. */
@@ -1462,7 +1462,7 @@ function burst(where,s,col){if(!R)return;if(where==='tray'){s.burst={t:0,col};re
 function trayFloat(s,txt,col){s.fx={txt,col,t:0}}
 function showCombo(){const el=$('#combo');el.hidden=false;el.textContent='COMBO ×'+R.combo;el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump')}
 function hideCombo(){$('#combo').hidden=true}
-function banner(title,subt,kind){const b=$('#banner');const d=document.createElement('div');d.className='bn '+(kind||'');d.innerHTML=`<b>${title}</b>${subt?`<span>${subt}</span>`:''}`;b.innerHTML='';b.appendChild(d);setTimeout(()=>{if(d.parentNode)d.remove()},1700)}
+function banner(title,subt,kind){const b=$('#banner');const d=document.createElement('div');d.className='bn '+(kind||'');d.innerHTML=`<b>${title}</b>${subt?`<span>${subt}</span>`:''}`;b.innerHTML='';b.appendChild(d);setTimeout(()=>{if(d.parentNode)d.remove()},kind==='perfect'?1050:1700)}
 function toast(html,kind){const box=$('#toasts');const lastT=box.lastElementChild;if(lastT&&lastT.innerHTML===html&&lastT.style.opacity!=='0')return;const d=document.createElement('div');d.className='toast '+(kind||'');d.innerHTML=html;box.appendChild(d);while(box.children.length>2)box.firstChild.remove();setTimeout(()=>{d.style.transition='opacity .4s';d.style.opacity='0';setTimeout(()=>d.remove(),400)},kind==='q'?3600:2800)}
 function ach(id){if(S.achievements[id])return;S.achievements[id]=S.day;const a=ACH.find(x=>x.id===id);if(a){setTimeout(()=>banner(a.n,'成就解鎖'),600);sfx.buy()}}
 function coach(k){if(!R||R.coach<0)return;if(k===R.coach){showCoach(COACH[k]);R.coach++;if(R.coach>=COACH.length){R.coach=-1;setTimeout(hideCoach,4500)}}}
@@ -3083,7 +3083,7 @@ function dylanUsual(){const o=S.dylan&&S.dylan.orders;if(!o)return null;let best
 /* his order is remembered; now and then Jill already knows it — a shorthand between two people, said across the
    room, a small familiarity the player can notice (counted once a day as its own kind of clue) */
 function dylanOrdered(g,tk){const d=S.dylan;d.orders=d.orders||{};const main=tk.items.find(i=>DISH(i.d).cat==='main')||tk.items[0];if(!main)return;const u=dylanUsual();d.orders[main.d]=(d.orders[main.d]||0)+1;
- if(u&&(S.regulars.dylan||0)>=2&&Math.random()<.45&&canChat('dusual',150,3)){const same=main.d===u;if(same){d.clues.usual=(d.clues.usual||0)+1}setTimeout(()=>{if(!R||phase!=='service'||!R.groups.includes(g))return;jillSay(same?pickT(['老樣子？','一樣的？','還是那個？']):pickT(['今天不一樣？','換口味了？']));setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,same?pickT(['老樣子。','嗯。','妳知道的。']):pickT(['換個口味。','今天想吃這個。']))},1300)},700)}}
+ if(u&&(S.regulars.dylan||0)>=2&&Math.random()<.45&&canChat('dusual',150,3)){const same=main.d===u;if(same){d.clues.usual=(d.clues.usual||0)+1}setTimeout(()=>{if(!R||phase!=='service'||!R.groups.includes(g))return;jillSay(same?pickT(['老樣子？','一樣的？','還是那個？']):pickT(['今天不一樣？','換口味了？']),{with:'dylan'});setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,same?pickT(['老樣子。','嗯。','妳知道的。']):pickT(['換個口味。','今天想吃這個。']))},1300)},700)}}
 /* a regular who has been coming for a while notices that he has too — once in a while, one line, no follow-up */
 function regularsNoticeDylan(g){if(!R||!g.reg||g.reg==='dylan'||g.reg==='wang')return;const dg=R.groups.find(q=>q.reg==='dylan'&&q.table!=null);if(!dg||(S.regulars[g.reg]||0)<4||(S.regulars.dylan||0)<3)return;const d=S.dylan;if((d.noticedDay||-9)>S.day-4||Math.random()>.35)return;d.noticedDay=S.day;d.clues.noticed=(d.clues.noticed||0)+1;
  setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g)&&R.groups.includes(dg))quote(g,pickT(['那位先生又來了。','他好像每次都在。','那個人跟老闆娘很熟的樣子。','他上次也坐那裡。']))},1200)}
@@ -3112,10 +3112,10 @@ const DYLAN_SCENES=[
  {k:'wang',when:()=>S.dylan.stage>=1&&(S.regulars.wang||0)>=3&&R.groups.some(q=>q.reg==='wang'&&q.table!=null),note:true,lines:[['王太太：「那位先生每天都來耶。」','嗯。','王太太：「妳不覺得他……」','他吃完就會走了。']]},
 ];
 function dylanScene(g){const seen=S.dylan.seen=S.dylan.seen||{};for(const sc of DYLAN_SCENES){if(seen[sc.k])continue;let ok=false;try{ok=sc.when()}catch(e){ok=false}if(!ok)continue;seen[sc.k]=S.day;if(sc.clue)S.dylan.clues[sc.clue]=(S.dylan.clues[sc.clue]||0)+1;
- const L=pick(sc.lines);const say=(i,txt)=>setTimeout(()=>{if(!R||phase!=='service')return;if(sc.note&&txt.startsWith('王太太：'))noteLine(txt);else if(i%2===0){if(R.groups.includes(g))quote(g,txt)}else jillSay(txt)},600+i*1500);
+ const L=pick(sc.lines);const say=(i,txt)=>setTimeout(()=>{if(!R||phase!=='service')return;if(sc.note&&txt.startsWith('王太太：'))noteLine(txt);else if(i%2===0){if(R.groups.includes(g))quote(g,txt)}else jillSay(txt,{with:'dylan'})},600+i*1500);
  L.forEach((txt,i)=>{if(txt)say(i,txt)});logLine('dylan',L.filter(Boolean).join(' / '),'reg');return true}return false}
 function dylanAct(g){const st=S.dylan.stage;const pool=st>=3?DYLAN_ACT.after:DYLAN_ACT.before;const line=pick(pool).map(x=>x&&x.replace('{T}',g.table+1));quote(g,line[0]);
- if(line[1])setTimeout(()=>{if(R&&phase==='service')jillSay(line[1])},1500);else setTimeout(()=>{if(R&&phase==='service')noteLine('Jill 看了他一眼，沒有回答。')},1500);
+ if(line[1])setTimeout(()=>{if(R&&phase==='service')jillSay(line[1],{with:'dylan'})},1500);else setTimeout(()=>{if(R&&phase==='service')noteLine('Jill 看了他一眼，沒有回答。')},1500);
  if(line[2])setTimeout(()=>{if(R&&phase==='service')quote(g,line[2])},3100)}
 function dylanGuestUpd(g,dt){const t=R.tables[g.table];const J=R.jill;g.glT=(g.glT??rand(5,12))-dt;
  const jillLooking=Math.hypot(J.x-t.x,J.y-t.y)<80&&((J.face>0)===(t.x>=J.x));
@@ -3181,7 +3181,7 @@ function dylanDecide(D){const st=S.dylan.stage;const J=LIFE.jill;const tv=LIFE.t
  case'sofa':{if(reveal)D.reveal=true;D.state='toSofa';dylanWalk(D,sofaX,SOFA.front+10,'sofa');break}
  case'leave':dylanWalk(D,DOOR.x,DOOR.y,'door');break;
  default:D.state='think';D.t=2}}
-function doReveal(){const d=S.dylan;if(d.stage>=3)return;d.stage=3;d.reveal=S.day;ach('husband');save();const D=LIFE.dylan,J=LIFE.jill;if(D&&J){say('j',J.x,SOFA.jy-52,LIFE.tv.on?'老公，遙控器。':'老公。');say('d',D.x,SOFA.jy-52,LIFE.tv.on?'喔。':'嗯。',1.4)}memo('husband',(SOFA.x0+SOFA.x1)/2,120,{subj:[{x:LIFE.jill.x,y:SOFA.jy},{x:LIFE.dylan?LIFE.dylan.x:LIFE.jill.x,y:SOFA.jy}]})}
+function doReveal(){const d=S.dylan;if(d.stage>=3)return;d.stage=3;d.reveal=S.day;ach('husband');save();const D=LIFE.dylan,J=LIFE.jill;if(D&&J){say('j',J.x,SOFA.jy-52,LIFE.tv.on?'老公，遙控器。':'老公。');say('d',D.x,SOFA.jy-52,LIFE.tv.on?'喔。':'嗯。',1.4)}setTimeout(()=>{if(S.dylan.stage>=3)scene([{who:'jill',tone:'gentle',text:'老公，走了。'},{who:'dylan',tone:'gentle',text:'好。'}])},3200);memo('husband',(SOFA.x0+SOFA.x1)/2,120,{subj:[{x:LIFE.jill.x,y:SOFA.jy},{x:LIFE.dylan?LIFE.dylan.x:LIFE.jill.x,y:SOFA.jy}]})}
 function say(who,x,y,txt,delay){LIFE.say.push({who,x,y,txt,t:-(delay||0),life:2.6});logLine(who==='j'?'Jill':'Dylan',txt,who==='j'?'j':'d')}
 function lifeEnsureEvening(){if(!evening())return;if(LIFE.day!==S.day||!LIFE.plan)lifePlan();const L=LIFE.jill;
  if(LIFE.plan==='sofa'&&!L.on&&!L.act&&!L.walking){const pos=freeJillPos();if(!pos){lifeNoRoom();return}L.pos=pos;L.reserved=true;L.face=JPOS[pos].face;L.x=JPOS[pos].x;L.y=SOFA.front+10;L.sitT=.01}}
@@ -3520,6 +3520,40 @@ const SVG={
 };
 function starsHTML(v){let h='';for(let i=1;i<=5;i++)h+=v>=i?SVG.star(1):v>=i-.5?SVG.half():SVG.star(0);return h}
 function show(html,cls){screenEl.hidden=false;screenEl.className=cls||'';screenEl.innerHTML=html;$('#taskPanel').hidden=true;renderTasks()}
+/* ================= v2.2 Q: dialogue portraits =================
+   One reusable system: a character id → its portrait asset(s), the side it enters from, and a fallback. The assets
+   are the supplied illustrations (assets/portraits, cut by tools/portraits.py; the display versions ride in
+   js/portraits.js as data URIs so the single file and the artifact carry them). Jill's world sprite stays the small
+   animated one; the portrait appears only for authored character moments — never for toasts, stock or money
+   warnings, PERFECT/COMBO, duty assignment or generic customers, who keep their procedural look.
+   A character with no supplied portrait keeps the existing presentation (no placeholder, never Jill's face). */
+const PORTRAITS={
+ jill:{name:'Jill',side:'left',v:{default:'jill_default',warm:'jill_warm',relaxed:'jill_relaxed',cheerful:'jill_cheerful',teasing:'jill_teasing',gentle:'jill_gentle'}},
+ dylan:{name:'Dylan',side:'right',v:{default:'dylan_default',friendly:'dylan_friendly',playful:'dylan_playful',gentle:'dylan_gentle'}},
+ chen:{name:'陳伯伯',side:'right',v:{default:'chen'}},mia:{name:'Mia',side:'right',v:{default:'mia'}},koba:{name:'小林',side:'right',v:{default:'xiaolin'}},leo:{name:'Leo',side:'right',v:{default:'leo'}},sophie:{name:'Sophie',side:'right',v:{default:'sophie'}},wang:{name:'王先生',side:'right',v:{default:'mr_wang'}},wangwife:{name:'王太太',side:'right',v:{default:'mrs_wang'}}};
+/* the six staff designs → the game's own staff records, by role and hiring order (CREW_NAMES); the data stays authoritative */
+const STAFF_PORTRAITS={'阿德師傅':'staff_1','Marco':'staff_2','小林師傅':'staff_3','小茉':'staff_4','Kai':'staff_5','秀琴阿姨':'staff_6'};
+function portraitData(key){const D=window.PORTRAIT_DATA;return D&&key&&D[key]?D[key]:null}
+/* who: 'jill' | 'dylan' | a regular id | 'staff:<name>'. Returns {src,name,side} or null (= keep the plain presentation). */
+function portraitOf(who,tone){if(!who)return null;if(who.startsWith&&who.startsWith('staff:')){const nm=who.slice(6);const src=portraitData(STAFF_PORTRAITS[nm]);return src?{src,name:nm,side:'right'}:null}const P=PORTRAITS[who];if(!P)return null;const src=portraitData(P.v[tone]||P.v.default);return src?{src,name:P.name,side:P.side}:null}
+/* the tone of a line, from what it says: teasing when she brushes him off, cheerful with an exclamation, gentle at night */
+function jillTone(txt,ctx){if(ctx&&ctx.tone)return ctx.tone;if(/沒有|不行|不用|你本來|你已經|你不是|帶錢|先吃|回家吃|正常講話|追到了|不缺|看貓/.test(txt))return'teasing';if(/[！!]|好吃|新|好，/.test(txt))return'cheerful';if(evening&&evening())return'gentle';return'default'}
+function dylanTone(txt,ctx){if(ctx&&ctx.tone)return ctx.tone;if(/老闆娘|可以|有空|留個|馬尾|帶花|約會|追妳|坐旁邊|紀念日|幫忙/.test(txt))return'playful';if(/謝謝|辛苦|累了|不急|慢慢來|妳先忙|我等/.test(txt))return'gentle';if(/[！!]|好吃|真的/.test(txt))return'friendly';return'default'}
+/* ---- the scene: a bottom panel, the portrait on its side, the text beside it, tap to continue. Blocking, for
+   moments outside service (or a paused service). Jill/Dylan scenes show both, the speaker lit. ---- */
+let DLG=null;
+function scene(lines,onDone){const el=$('#dlg');if(!el||!lines||!lines.length){if(onDone)onDone();return false}const ok=lines.some(l=>portraitOf(l.who,l.tone))&&!window.__noScenes;if(!ok){/* nobody in this scene has a portrait: the plain presentation */for(const l of lines){const P=PORTRAITS[l.who];if(P)logLine(P.name,l.text,l.who==='jill'?'j':l.who==='dylan'?'d':'g')}if(onDone)onDone();return false}
+ DLG={lines,i:0,onDone};el.hidden=false;el.className='';dlgShow();return true}
+function dlgShow(){const el=$('#dlg');const L=DLG.lines[DLG.i];const p=portraitOf(L.who,L.tone);const other=DLG.lines.find(x=>x.who!==L.who&&portraitOf(x.who,x.tone));const po=other?portraitOf(other.who,other.tone):null;
+ const left=el.querySelector('.dlg-p.left'),right=el.querySelector('.dlg-p.right');for(const [box,side] of[[left,'left'],[right,'right']]){const who=p&&p.side===side?p:po&&po.side===side?po:null;box.hidden=!who;if(who){box.querySelector('img').src=who.src;box.classList.toggle('dim',who!==p)}}
+ el.querySelector('.dlg-name').textContent=p?p.name:(PORTRAITS[L.who]||{}).name||'';el.querySelector('.dlg-text').textContent=L.text;el.querySelector('.dlg-next').textContent=DLG.i<DLG.lines.length-1?'點一下繼續 ›':'點一下關閉';el.classList.toggle('side-right',!!(p&&p.side==='right'));
+ const P=PORTRAITS[L.who];logLine(p?p.name:(P?P.name:L.who),L.text,L.who==='jill'?'j':L.who==='dylan'?'d':'g')}
+function dlgNext(){if(!DLG)return;DLG.i++;if(DLG.i>=DLG.lines.length){const d=DLG;DLG=null;$('#dlg').hidden=true;if(d.onDone)d.onDone();return}dlgShow()}
+/* ---- the line: during service, a small card with the portrait beside the words, gone by itself; not a modal.
+   Jill/Dylan exchanges show both faces, the speaker lit. ---- */
+function portraitLine(who,txt,o){o=o||{};const p=portraitOf(who,o.tone);if(!p)return false;const box=$('#plines');if(!box)return false;const w=o.with?portraitOf(o.with,o.withTone):null;
+ const d=document.createElement('div');d.className='pline '+(p.side==='right'?'right':'left');d.innerHTML=`${w&&w.side==='left'?`<img class="dim" alt="" src="${w.src}">`:''}${p.side==='left'?`<img alt="" src="${p.src}">`:''}<div class="pl-t"><b>${p.name}</b><span>${txt}</span></div>${p.side==='right'?`<img alt="" src="${p.src}">`:''}${w&&w.side==='right'?`<img class="dim" alt="" src="${w.src}">`:''}`;
+ box.appendChild(d);while(box.children.length>2)box.firstChild.remove();const T=setTimeout(()=>{d.classList.add('out');setTimeout(()=>d.remove(),260)},o.ms||3400);d.onclick=()=>{clearTimeout(T);d.remove()};return true}
 function hideScreen(){screenEl.hidden=true;screenEl.innerHTML='';sub=null}
 function topIcons(){return`<button class="icon-btn" data-act="peek" aria-label="看店裡" style="font-weight:800;font-size:11px;width:auto;padding:0 9px">看店裡</button><button class="icon-btn" data-act="guide" aria-label="店主手冊" style="font-weight:800;font-size:15px">?</button><button class="icon-btn" data-act="book" aria-label="餐廳日誌">${SVG.book}</button><button class="icon-btn" data-act="settings" aria-label="設定">${SVG.gear}</button>`}
 
@@ -3530,6 +3564,11 @@ function showTitle(){phase='title';mainScreen='title';R=null;IDLE=null;lifeReset
   <div class="links"><button class="btn sm" data-act="guide">店主手冊</button><button class="btn sm" data-act="book">餐廳日誌</button><button class="btn sm" data-act="settings">設定・存檔</button></div></div>`)}
 function goMain(){if(S.phase==='shop'&&S.lastSummary)showShop();else{applyGates();planToday();showPrep()}}
 
+/* v2.2 Q: the morning — one line from Jill when the day's prep screen first opens, from the weather and the day */
+function morningLine(){const W=S.today?S.today.weather:'sun';const ev=S.today&&S.today.event;const pool={sun:['天氣好。今天會忙一點，先把料備夠。','太陽很大，冰的先備。','晴天。客人會多，桌子先擦一遍。'],cloud:['多雲，不冷不熱，普通的一天。','今天沒什麼特別的，那就把每一道做好。'],rain:['下雨了。湯要多備一點，傘架先拿出來。','雨天客人少，但來的人會待久一點。今天慢慢做。'],storm:['雨很大。今天來的都是真的想來的人。','大雨。熱的東西先備，門口的地會濕，小心。'],hot:['好熱。冰飲和冰甜點會賣得特別快。','今天熱到不想開爐。但還是要開。'],cool:['涼涼的，適合走路過來吃飯的天氣。','今天空氣很好，門開著就好。']}[W]||['今天也開店。'];
+ const extra=[];const cn=CATS&&CATS.filter(c=>!c.hidden&&['sleep','bed'].includes(c.st));if(cn&&cn.length)extra.push(`${catName(cn[0].def)}還在睡，先不吵牠。`);if(S.day>=3&&S.regulars&&Object.keys(S.regulars).length>=3)extra.push('熟客差不多這個時間會來。');if(ev&&ev!=='none'&&EVENTS[ev])extra.push(`今天${EVENTS[ev].n}。`);if(S.reveal&&S.reveal.day===S.day-1)extra.push('昨天的工程，今天客人就看得到了。');
+ return pickT(pool)+(extra.length&&Math.random()<.7?pickT(extra):'')}
+function morningRemark(){if(!S.today||S.morningSaid===S.day||phase!=='prep')return;S.morningSaid=S.day;const W=S.today.weather;scene([{who:'jill',tone:W==='rain'||W==='storm'?'gentle':W==='sun'||W==='cool'?'cheerful':'default',text:morningLine()}])}
 function showPrep(){phase='prep';mainScreen='prep';R=null;room='main';lifeReset();IDLE=makeIdle();layoutAll();hud(true);renderTickets();planToday();const T=S.today,F=feat();const W=WEATHER[T.weather],E=EVENTS[T.event];
  const ms=menuList();const unlocked=[...S.unlocked];const sug=suggestStock();let restockCost=0;for(const d of ms){const need=Math.max(0,sug[d]-(S.stock[d]||0));restockCost+=need*costOf(d)}
  const cap=fridgeCap(),tot=stockTotal();const menuN=S.menu.filter(d=>S.unlocked.includes(d)).length;
@@ -3554,7 +3593,7 @@ function showPrep(){phase='prep';mainScreen='prep';R=null;room='main';lifeReset(
   ${sig}<div class="card">${rows||'<p class="muted">還沒有料理</p>'}</div>
   ${F.stock?`<div class="cap"><span>冰箱</span><div class="capbar"><i style="width:${tot/cap*100}%"></i></div><span>${tot}/${cap}</span></div><button class="btn sm" data-act="restock" ${restockCost>0?'':'disabled'} style="width:100%">一鍵補到建議量 ${restockCost>0?fmt(restockCost):'（已足夠）'}</button>${(()=>{const off=unlocked.filter(d=>!S.menu.includes(d)&&(S.stock[d]||0)>0);if(!off.length)return'';const n=off.reduce((a,d)=>a+S.stock[d],0);return`<button class="btn sm" data-act="${discardArmed?'discardAll':'discardAsk'}" style="width:100%;margin-top:6px">${discardArmed?`確定退掉這 ${n} 份？（再按一次）`:`退掉不在菜單上的庫存（${n} 份）`}</button>`})()}`:`<p class="muted" style="font-size:12.5px;margin:8px 2px 0">前兩天會自動備料。第 3 天開始可以自己進貨、調整售價。</p>`}
   ${S.day>=2?`<button class="btn sm" data-act="backShop" style="width:100%;margin-top:10px">‹ 返回升級餐廳</button>`:''}
-  <div class="footer"><div id="startWarn"></div><button class="btn primary big" data-act="start">開始營業</button></div></div>`)}
+  <div class="footer"><div id="startWarn"></div><button class="btn primary big" data-act="start">開始營業</button></div></div>`);morningRemark()}
 
 function showSummary(){phase='summary';mainScreen='summary';const s=S.lastSummary;if(!s){showShop();return}hud(true);/* v2.2 A5: the wages just left the till — the HUD must say so on this screen, not on the next */
  const topHTML=s.top?`<img alt="" src="${dishURL(s.top,'P')}" style="width:34px;height:34px;vertical-align:middle;margin-right:4px">${DISH(s.top)?DISH(s.top).n:''}`:'—';
@@ -3731,6 +3770,7 @@ function closeSub(){sub=null;if(phase==='service'){if(paused){showPause();return
 
 let startWarned=false,discardArmed=false;
 screenEl.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;audioInit();doAct(b.dataset.act,b.dataset.d,b.dataset.k,b)});
+{const dl=$('#dlg');if(dl)dl.addEventListener('click',e=>{e.preventDefault();audioInit();sfx.tap();dlgNext()})}
 function doAct(a,d,k,b){const money0=S.money;try{doAct0(a,d,k,b)}finally{if(S.money!==money0)hud(true)}}
 function doAct0(a,d,k,b){
  switch(a){
@@ -3760,7 +3800,7 @@ function doAct0(a,d,k,b){
  case'buyGear':{const G=CATGEAR.find(x=>x.k===k);if(!G||gearOn(G.k)||S.money<G.cost||(G.need&&!projOn(G.need))||S.level<(G.lv||1))break;S.money-=G.cost;S.gear[G.k]=S.day;sfx.buy();toast(`${G.n}：擺好了。看牠們什麼時候發現。`);if(CATGEAR.every(x=>gearOn(x.k)))ach('catgear');save();IDLE=null;bg=null;for(const kk in BGC)delete BGC[kk];keepScroll(showShop);shopAfterBuy();break}
  case'revealPeek':{const P=ALL_PROJECTS().find(x=>x.k===k);hideReveal();if(P){room=P.room;forceDraw=true;screenEl.hidden=true;$('#peekPill').hidden=false;banner(P.n,P.done,'gold')}break}
  case'revealClose':hideReveal();showShop();shopAfterBuy();break;
- case'expand':{const nl=LEVELS[S.level];if(nl&&S.money>=nl.cost){S.money-=nl.cost;S.level++;if(S.level===2)ach('bistro');sfx.buy();banner(LV().n,'擴建完成！');if(S.level===5)ach('jill');S.newRoom=S.day;save();bg=null;showShop();shopAfterBuy()}break}
+ case'expand':{const nl=LEVELS[S.level];if(nl&&S.money>=nl.cost){S.money-=nl.cost;S.level++;if(S.level===2)ach('bistro');sfx.buy();banner(LV().n,'擴建完成！');if(S.level===5)ach('jill');S.newRoom=S.day;save();bg=null;showShop();shopAfterBuy();scene([{who:'jill',tone:'cheerful',text:S.level===5?'招牌上只剩一個名字了。就這樣，不會再大了——但可以更好。':S.level===2?'店變大了一點。多兩張桌子，多幾道菜。':S.level===3?'牆換了、地板換了。客人會更講究一點，我也是。':'這下真的像一間餐廳了。'}])}break}
  case'buyEq':{const lv=S.eq[k]||0;const E=EQUIP.find(x=>x.k===k);const c=E.cost[lv];if(lv<5&&S.money>=c){S.money-=c;S.eq[k]=lv+1;sfx.buy();toast(`${E.n} ${lv?'升級':'購買'}完成：LV${lv+1}`);save();IDLE=null;layoutAll();keepScroll(showShop);shopAfterBuy()}break}
  case'rdSpecial':{const sp=SPECIALS[d];if(!sp||S.unlocked.includes(sp.id)||mLv(d)<3||S.money<sp.rd)break;S.money-=sp.rd;unlockDish(sp.id);S.stock[sp.id]=S.stock[sp.id]||0;sfx.buy();toast(`研發成功：${sp.n}！${S.menu.includes(sp.id)?'已加入菜單':'菜單已滿，記得在開店前調整'}`);ach('special');if(Object.keys(SPECIALS).filter(b=>S.unlocked.includes(SPECIALS[b].id)).length>=4)ach('specials4');save();keepScroll(showShop);shopAfterBuy();break}
  case'rd':{const D=DISHES[d];if(S.money>=D.rd){S.money-=D.rd;unlockDish(d);sfx.buy();toast(`研發成功：${D.n}！${S.menu.includes(d)?'已加入菜單':'菜單已滿，記得在開店前調整'}`);save();keepScroll(showShop);shopAfterBuy()}break}
@@ -3820,7 +3860,7 @@ screenEl.addEventListener('input',e=>{if(e.target.dataset&&e.target.dataset.cat)
 function projectReveal(P){let el=$('#reveal');if(!el){el=document.createElement('div');el.id='reveal';screenEl.parentNode.appendChild(el)}
  el.hidden=false;el.className='work';el.innerHTML=`<div class="rv"><div class="dust">${Array.from({length:14},(_,i)=>`<i style="left:${8+i*6.5}%;animation-delay:${(i*137%700)/1000}s"></i>`).join('')}</div><b>施工中…</b><span>${P.n}</span></div>`;sfx.buy();
  const T=setTimeout(()=>{if(!$('#reveal')||el.hidden)return;el.className='done';sfx.ding();
-  el.innerHTML=`<div class="rv card"><div class="eyebrow">完工</div><h2>${P.n}</h2><p class="done">${P.done}</p><p class="say">Jill：「${P.jill}」</p>${P.react?`<p class="react">${P.react}</p>`:''}${P.unlock&&P.unlock.length?`<div class="unl"><b>現在可以</b>${P.unlock.map(u=>`<span>${u}</span>`).join('')}</div>`:''}<div class="btns"><button class="btn primary" data-act="revealPeek" data-k="${P.k}">去看看 ›</button><button class="btn" data-act="revealClose">繼續買東西</button></div></div>`},1500);
+  const pj=portraitOf('jill','cheerful');el.innerHTML=`<div class="rv card ${pj?'with-jill':''}"><div class="eyebrow">完工</div><h2>${P.n}</h2><p class="done">${P.done}</p>${pj?`<div class="say-row"><img class="rv-jill" alt="" src="${pj.src}"><p class="say">Jill：「${P.jill}」</p></div>`:`<p class="say">Jill：「${P.jill}」</p>`}${P.react?`<p class="react">${P.react}</p>`:''}${P.unlock&&P.unlock.length?`<div class="unl"><b>現在可以</b>${P.unlock.map(u=>`<span>${u}</span>`).join('')}</div>`:''}<div class="btns"><button class="btn primary" data-act="revealPeek" data-k="${P.k}">去看看 ›</button><button class="btn" data-act="revealClose">繼續買東西</button></div></div>`},1500);
  el.onclick=e=>{const b=e.target.closest('[data-act]');if(!b)return;clearTimeout(T);doAct(b.dataset.act,b.dataset.d,b.dataset.k,b)}}
 function hideReveal(){const el=$('#reveal');if(el){el.hidden=true;el.innerHTML=''}}
 function keepScroll(fn,anchor){const sh=screenEl.querySelector('.sheet');const top=sh?sh.scrollTop:0;const a0=anchor&&sh?screenEl.querySelector(anchor):null;const y0=a0?a0.getBoundingClientRect().top:null;fn();const s2=screenEl.querySelector('.sheet');if(!s2)return;s2.scrollTop=top;
