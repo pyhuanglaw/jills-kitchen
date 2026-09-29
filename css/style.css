@@ -473,6 +473,7 @@ input.txt{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(
 /* who is this? a small card over the room */
 #regcard{position:absolute;left:10px;right:10px;bottom:120px;z-index:5;display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:14px;background:var(--paper);color:var(--ink);box-shadow:0 8px 24px rgba(0,0,0,.35)}
 #regcard img{width:46px;height:46px;border-radius:50%;background:#F3E7D2;flex:none}
+#regcard img.face{width:52px;height:60px;border-radius:12px;object-fit:cover;object-position:top;background:linear-gradient(#EFE5D3,#D9C9AE)}
 #regcard b{font-size:14px}
 #regcard p{margin:2px 0 0;font-size:12px;line-height:1.45;color:var(--ink2)}
 

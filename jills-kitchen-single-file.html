@@ -276,8 +276,19 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .polaroid .when{display:block;font-size:10px;font-weight:800;letter-spacing:.06em;color:var(--ink3)}
 .polaroid b{display:block;font-size:12.5px;margin-top:1px;line-height:1.3}
 .polaroid .txt{display:block;font-size:11px;color:var(--ink2);line-height:1.4;margin-top:2px}
-.polaroid .pin{position:absolute;top:-7px;right:8px;font-size:9.5px;font-weight:800;letter-spacing:.08em;background:var(--tomato);color:#fff;border-radius:6px;padding:2px 6px;box-shadow:0 1px 3px rgba(0,0,0,.2)}
-.polaroid.keep{box-shadow:0 3px 10px rgba(0,0,0,.16),0 0 0 2px rgba(212,85,58,.18)}
+.polaroid .pin{position:absolute;top:-7px;right:8px;font-size:9.5px;font-weight:800;letter-spacing:.08em;background:#8C6A3D;color:#FFF6E6;border-radius:6px;padding:2px 6px;box-shadow:0 1px 3px rgba(0,0,0,.2)}/* v2.2: brass, not red — a quiet tag */
+.polaroid.keep{box-shadow:0 3px 10px rgba(0,0,0,.16),0 0 0 2px rgba(140,106,61,.22)}
+/* v2.2 W: the album as a living history — weeks, what happened, the photos, and today at the end */
+.story-week{margin-top:14px;padding-top:10px;border-top:1px dashed var(--line)}
+.story-week:first-of-type{margin-top:0;padding-top:0;border-top:0}
+.story-h .muted{font-weight:600;font-size:12px}
+.story-ev{display:flex;flex-direction:column;gap:4px;margin:0 0 10px;padding:6px 10px;background:var(--paper2);border-radius:10px;border-left:2px solid var(--brass2)}
+.story-ev div{display:flex;align-items:center;gap:8px;font-size:12.5px;line-height:1.4;color:var(--ink)}
+.story-ev img{width:18px;height:18px;flex:none}
+.story-ev .when{font-size:10px;font-weight:800;letter-spacing:.06em;color:var(--ink3);flex:none;min-width:44px}
+.story-now{margin-top:16px;padding:10px 12px;border-radius:12px;background:linear-gradient(180deg,#F7F0E3,#EFE4D0);border:1px solid var(--line);font-size:12.5px;line-height:1.5;color:var(--ink2)}
+.story-now .when{display:block;font-size:10px;font-weight:800;letter-spacing:.06em;color:var(--ink3)}
+.story-now b{display:block;font-size:13.5px;color:var(--ink);margin:1px 0 2px}
 .memgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
 .memgrid figure{margin:0;background:#fff;padding:6px 6px 9px;border-radius:5px;box-shadow:0 3px 10px rgba(0,0,0,.14);transform:rotate(-1.2deg)}
 .memgrid figure:nth-child(2n){transform:rotate(1.4deg)}
@@ -410,6 +421,7 @@ input.txt{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(
 .reg:first-child{border-top:0}
 .reg img{width:56px;height:56px;border-radius:50%;background:#F3E7D2;grid-row:span 2}
 .reg.unknown img{filter:brightness(0) opacity(.25)}
+.reg img.face{object-fit:cover;object-position:top;border-radius:14px;background:linear-gradient(#EFE5D3,#D9C9AE)}
 .reg p{margin:0;font-size:12.5px;color:var(--ink2);line-height:1.45}
 .tier{font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:6px;background:#EFE3CF;color:var(--ink2)}
 .tier.t1{background:#E4EEDC;color:#3F6B33}
@@ -536,6 +548,17 @@ input.txt{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(
 #reveal .say-row{display:flex;align-items:flex-end;gap:10px;margin:6px 0 2px}
 #reveal .rv-jill{width:84px;height:100px;object-fit:cover;object-position:top;border-radius:12px;flex:none;filter:drop-shadow(0 3px 6px rgba(0,0,0,.25))}
 #reveal .say-row .say{margin:0 0 8px}
+
+/* ================= v2.2 X: a desktop window ================= */
+html.desk #app{max-width:none}   /* the width is set by layoutAll (as wide as the room at this height) */
+html.desk .sheet{max-width:720px;width:100%;margin:0 auto;border-radius:20px 20px 0 0}
+html.desk .modal{max-width:520px;width:calc(100% - 32px);margin-left:auto;margin-right:auto}
+html.desk #hud{padding:8px 18px}
+html.desk #tickets{padding:4px 14px 0}
+html.desk #toasts,html.desk #plines{left:14px;right:14px}
+html.desk #trayWrap{left:12px;right:12px;max-width:820px;margin:0 auto}
+html.desk .icon-btn,html.desk #roomTabs button{cursor:pointer}
+html.desk button,html.desk [data-act],html.desk .polaroid{cursor:pointer}
 </style>
 </head>
 <body>
@@ -1191,14 +1214,17 @@ function drawPerson(c,x,y,L,o){o=o||{};const s=(o.s||1)*(o.pscale===undefined?PS
  /* neck and collar */
  c.fillStyle=skin;c.fillRect(-2.3,hy+7,4.6,4.2);c.fillStyle='rgba(0,0,0,.14)';c.fillRect(-2.3,hy+8.6,4.6,2.6);
  if(!o.jill){c.fillStyle=shade(top,.26);c.beginPath();c.moveTo(-4.8,by+.4);c.lineTo(0,by+4.8);c.lineTo(4.8,by+.4);c.closePath();c.fill();c.fillStyle='rgba(0,0,0,.12)';c.beginPath();c.moveTo(-3.2,by+.6);c.lineTo(0,by+3.4);c.lineTo(3.2,by+.6);c.closePath();c.fill()}
- if(o.jill){c.fillStyle='#C99A45';for(let k=0;k<3;k++){circ(c,-3,by+5+k*4,.95);circ(c,3,by+5+k*4,.95)}c.strokeStyle='rgba(0,0,0,.1)';c.lineWidth=.6;c.beginPath();c.moveTo(0,by+2);c.lineTo(0,by+17);c.stroke();c.fillStyle='rgba(0,0,0,.05)';rr(c,-8.6,by+9,17.2,8.5,4);c.fill();
-  c.fillStyle='#D4553A';c.beginPath();c.moveTo(-5.2,hy+8.3);c.lineTo(5.2,hy+8.3);c.lineTo(0,hy+14);c.fill();c.fillStyle='#B8432C';c.beginPath();c.moveTo(0,hy+14);c.lineTo(-1.5,hy+17);c.lineTo(1.5,hy+17);c.fill();c.fillStyle='rgba(255,255,255,.35)';c.beginPath();c.moveTo(-4.4,hy+8.8);c.lineTo(-1,hy+9.2);c.lineTo(-2.4,hy+11);c.fill();
-  c.fillStyle='#F1ECE3';rr(c,-7,base-2+bob,14,5,2);c.fill();c.fillStyle='rgba(0,0,0,.07)';rr(c,-7,base+1+bob,14,2,1);c.fill();c.fillStyle='#C99A45';c.fillRect(-6,by+3,3,1.6)}
+ if(o.jill){/* v2.2 Q+: the world Jill matches her portrait — white double-breasted jacket, two rows of brass buttons, a dark
+    brown bib apron on leather straps with the little cat patch; no scarf, no hat */c.fillStyle='#C99A45';for(let k=0;k<2;k++){circ(c,-3.2,by+3.5+k*3.6,.9);circ(c,3.2,by+3.5+k*3.6,.9)}c.strokeStyle='rgba(0,0,0,.08)';c.lineWidth=.6;c.beginPath();c.moveTo(0,by+1.5);c.lineTo(0,by+8);c.stroke();
+  const ap='#3A2E28';c.fillStyle='#6B4A36';c.lineWidth=1.3;c.strokeStyle='#6B4A36';c.beginPath();c.moveTo(-5.6,by+8.6);c.lineTo(-7.2,hy+9);c.moveTo(5.6,by+8.6);c.lineTo(7.2,hy+9);c.stroke();c.fillStyle=ap;c.strokeStyle=OL;c.lineWidth=.5;c.beginPath();c.moveTo(-6,by+8);c.lineTo(6,by+8);c.lineTo(8.4,by+11);c.lineTo(8.4,by+(seated?15:20));c.lineTo(-8.4,by+(seated?15:20));c.lineTo(-8.4,by+11);c.closePath();c.fill();c.stroke();c.fillStyle='rgba(255,255,255,.07)';c.fillRect(-7.4,by+11.5,14.8,1.2);c.fillStyle='#C9A26E';circ(c,-6,by+9.2,.8);circ(c,6,by+9.2,.8);
+  c.fillStyle='#E8C9A2';circ(c,3.6,by+14.6,1.7);c.fillStyle='#3A2E28';circ(c,3.1,by+13.6,.45);circ(c,4.1,by+13.6,.45);c.fillStyle='#E8C9A2';c.beginPath();c.moveTo(2.2,by+13.6);c.lineTo(2.6,by+12.4);c.lineTo(3.3,by+13.3);c.fill();c.beginPath();c.moveTo(5,by+13.6);c.lineTo(4.6,by+12.4);c.lineTo(3.9,by+13.3);c.fill();
+  c.fillStyle='#F1ECE3';rr(c,-7,base-2+bob,14,5,2);c.fill();c.fillStyle='rgba(0,0,0,.07)';rr(c,-7,base+1+bob,14,2,1);c.fill()}
  if(L.acc==='tie'){c.fillStyle='#fff';c.beginPath();c.moveTo(-3.8,hy+8.6);c.lineTo(0,hy+12.5);c.lineTo(3.8,hy+8.6);c.fill();c.fillStyle='#A8323A';c.beginPath();c.moveTo(-1.3,hy+11);c.lineTo(1.3,hy+11);c.lineTo(1.8,hy+20);c.lineTo(0,hy+22);c.lineTo(-1.8,hy+20);c.fill();c.fillStyle='rgba(255,255,255,.25)';c.fillRect(-.9,hy+12,.9,7)}
  if(L.acc==='scarf'){c.fillStyle='#E2B04A';rr(c,-6.5,hy+8,13,4.5,2);c.fill();c.fillRect(2,hy+11,3,7);c.fillStyle='rgba(0,0,0,.12)';c.fillRect(2,hy+16,3,2);c.fillStyle='rgba(255,255,255,.2)';rr(c,-5.5,hy+8.8,6,1.2,.6);c.fill()}
  if(L.acc==='backpack'){c.strokeStyle='#3C5470';c.lineWidth=2;c.beginPath();c.moveTo(-5,by+1);c.lineTo(-5,by+11);c.moveTo(5,by+1);c.lineTo(5,by+11);c.stroke()}
  if(L.acc==='shades'){c.strokeStyle='#E6C27A';c.lineWidth=1;c.beginPath();c.moveTo(-4,hy+9);c.quadraticCurveTo(0,hy+15,4,hy+9);c.stroke()}
  if(L.acc==='phone'){c.fillStyle='#222';rr(c,7,base-10+bob,4.5,7,1);c.fill();c.fillStyle='#8FD3F4';c.fillRect(7.8,base-9+bob,2.9,5)}
+ if(L.acc==='watch'){/* a wristwatch on the left wrist */c.fillStyle='#2A2A2C';rr(c,-11.6,by+12.2,4.4,2.4,1);c.fill();c.fillStyle='#E8E4DC';circ(c,-9.4,by+13.4,1.1)}
  if(o.hold==='fan'){/* 2.1: a paper fan, waved on a hot day */const t=performance.now()/1000;const dir=o.flip?-1:1;c.save();c.translate(dir*8,hy+2);c.rotate(dir*(-.5+Math.sin(t*9+x)*.35));c.fillStyle='#8A6A42';rr(c,-.8,0,1.6,7,.8);c.fill();c.fillStyle='#F4DFA9';c.beginPath();c.moveTo(0,0);c.arc(0,0,7.5,Math.PI*1.15,Math.PI*1.85);c.closePath();c.fill();c.strokeStyle='rgba(120,90,50,.45)';c.lineWidth=.5;for(let k=0;k<5;k++){const a=Math.PI*1.15+k*Math.PI*.175;c.beginPath();c.moveTo(0,0);c.lineTo(Math.cos(a)*7.5,Math.sin(a)*7.5);c.stroke()}c.fillStyle='#D4553A';circ(c,-1.5,-5,1.2);c.restore()}
  else if(o.hold&&o.hold!=='camera'){const ph=o.hold==='phone';const hy2=by+9;c.save();c.translate(0,hy2);c.rotate(-.1);c.fillStyle=ph?'#2A2A2E':'#F2EFE8';rr(c,-4.6,-5,9.2,ph?6.6:8.6,1.2);c.fill();c.strokeStyle=OL;c.lineWidth=.5;c.stroke();c.fillStyle=ph?'#9FD8F5':'#FBFAF6';c.fillRect(-3.7,-4,7.4,ph?4.7:6.6);if(ph){c.fillStyle='rgba(255,255,255,.25)';c.fillRect(-3.7,-4,2.2,4.7)}else{c.fillStyle='rgba(0,0,0,.2)';for(let k=0;k<4;k++)c.fillRect(-2.8,-2.7+k*1.5,5.6-(k===3?2.2:0),.6)}c.restore();
   c.fillStyle=skin;const rh=o.flipPage?-2.4:0;rr(c,-9.4,hy2-1,5,3.4,1.7);c.fill();rr(c,4.4,hy2-1+rh,5,3.4,1.7);c.fill();circ(c,-5.4,hy2+1.4,2.2);circ(c,5.4,hy2+1.4+rh,2.2)}
@@ -1212,9 +1238,10 @@ function drawPerson(c,x,y,L,o){o=o||{};const s=(o.s||1)*(o.pscale===undefined?PS
  else{c.beginPath();c.arc(0,hy-.5,10.3,Math.PI*.98,Math.PI*2.02);c.closePath();c.fill();
   if(L.hs===6){for(const [bx,br] of[[-6.2,3.8],[-1,4.6],[4.6,4]]){c.beginPath();c.arc(bx,hy-7.2,br,0,7);c.fill()}c.beginPath();c.moveTo(-9.6,hy-2);c.quadraticCurveTo(-4,hy-1,-1.5,hy+.5);c.quadraticCurveTo(-3,hy-3.6,-7,hy-5);c.fill()}
   else if(L.hs===7){for(const bx of[-8,-3.5,1.5,6.5]){c.beginPath();c.arc(bx,hy-6.4,4.1,0,7);c.fill()}c.beginPath();c.ellipse(-2.5,hy-5.2,8.3,3.9,-.15,0,7);c.fill()}
+  else if(L.hs===9){/* short and thick, a straight fringe cut just above the brows, a soft tousled crown */c.beginPath();c.ellipse(0,hy-5,10.6,7,0,0,7);c.fill();c.beginPath();c.moveTo(-9.8,hy-1.5);c.lineTo(9.8,hy-1.5);c.lineTo(9.6,hy+1.8);for(let i=4;i>=-4;i--)c.lineTo(i*2.2,hy+1.8+(Math.abs(i)%2?0:.9));c.lineTo(-9.6,hy+1.8);c.closePath();c.fill();c.strokeStyle=hairLt;c.lineWidth=.8;c.beginPath();c.moveTo(-5,hy-10);c.quadraticCurveTo(-3,hy-8,-4,hy-5);c.moveTo(2,hy-11);c.quadraticCurveTo(3.5,hy-8.5,2.5,hy-5.5);c.stroke()}
   else{c.beginPath();c.ellipse(-2.5,hy-5.2,8.3,3.9,-.15,0,7);c.fill()}
   if(L.hs===8){c.beginPath();c.moveTo(-10,hy-1);c.quadraticCurveTo(-2,hy-2,8.5,hy+2.5);c.lineTo(9.8,hy-3);c.quadraticCurveTo(2,hy-7,-9.6,hy-3.5);c.closePath();c.fill()}
-  if(L.hs!==0&&L.hs!==6&&L.hs!==8){c.beginPath();c.ellipse(-8.7,hy+1,2.5,6.3,0,0,7);c.fill();c.beginPath();c.ellipse(8.7,hy+1,2.5,6.3,0,0,7);c.fill()}
+  if(L.hs!==0&&L.hs!==6&&L.hs!==8&&L.hs!==9){c.beginPath();c.ellipse(-8.7,hy+1,2.5,6.3,0,0,7);c.fill();c.beginPath();c.ellipse(8.7,hy+1,2.5,6.3,0,0,7);c.fill()}
   /* volume: a darker edge under the fringe, a highlight on top */
   c.strokeStyle=shade(hair,-.22);c.lineWidth=1;c.beginPath();c.arc(0,hy-.5,9.4,Math.PI*1.12,Math.PI*1.88);c.stroke();
   c.strokeStyle=hairLt;c.lineWidth=1.2;c.beginPath();c.arc(-1,hy-3.2,7,Math.PI*1.15,Math.PI*1.45);c.stroke()}
@@ -1256,7 +1283,7 @@ function drawPerson(c,x,y,L,o){o=o||{};const s=(o.s||1)*(o.pscale===undefined?PS
  if(L.acc==='bow'){c.fillStyle='#E8798A';c.beginPath();c.moveTo(6,hy-8);c.lineTo(11,hy-11);c.lineTo(11,hy-5);c.closePath();c.fill();c.beginPath();c.moveTo(6,hy-8);c.lineTo(1,hy-11);c.lineTo(1,hy-5);c.closePath();c.fill();c.fillStyle='#C4506A';circ(c,6,hy-8,1.6)}
  /* 'camera': the phone raised beside the face, turned sideways, pointed where the gaze goes; drawn over the head */
  if(o.hold==='camera'){const dir=o.gaze?Math.sign(o.gaze.x)||1:1;const px=dir*9.5,py=hy+2;c.save();c.translate(px,py);c.rotate(dir*.25);c.fillStyle='#2A2A2E';rr(c,-2.6,-4.6,5.2,9.2,1.2);c.fill();c.strokeStyle=OL;c.lineWidth=.5;c.stroke();c.fillStyle='#9FD8F5';c.fillRect(-1.9,-3.8,3.8,7.2);c.fillStyle='rgba(255,255,255,.3)';c.fillRect(-1.9,-3.8,1.4,7.2);c.restore();c.fillStyle=skin;circ(c,px-dir*1.5,py+4.6,2.3);circ(c,px+dir*1.2,py-4.4,2)}
- if(o.jill&&o.hat!==false){let tg=c.createLinearGradient(-8,0,8,0);tg.addColorStop(0,'#FFFFFF');tg.addColorStop(1,'#E6E0D6');c.fillStyle=tg;rr(c,-7.6,hy-22,15.2,12,2.5);c.fill();c.fillStyle='#FFFFFF';circ(c,-5.5,hy-22,5.4);circ(c,0,hy-25,6);circ(c,5.5,hy-22,5.4);c.strokeStyle='rgba(120,100,80,.35)';c.lineWidth=.6;c.beginPath();c.arc(-5.5,hy-22,5.4,Math.PI*.9,Math.PI*1.9);c.arc(0,hy-25,6,Math.PI*1.1,Math.PI*1.9);c.arc(5.5,hy-22,5.4,Math.PI*1.1,Math.PI*2.1);c.stroke();c.strokeStyle='rgba(0,0,0,.08)';for(let k=-4;k<=4;k+=4){c.beginPath();c.moveTo(k,hy-19);c.lineTo(k,hy-11);c.stroke()}c.fillStyle='#EDE7DC';c.fillRect(-7.6,hy-12.5,15.2,2.2);c.fillStyle='rgba(0,0,0,.06)';c.fillRect(-7.6,hy-10.6,15.2,.8)}
+ if(o.jill&&o.hat===true){let tg=c.createLinearGradient(-8,0,8,0);tg.addColorStop(0,'#FFFFFF');tg.addColorStop(1,'#E6E0D6');c.fillStyle=tg;rr(c,-7.6,hy-22,15.2,12,2.5);c.fill();c.fillStyle='#FFFFFF';circ(c,-5.5,hy-22,5.4);circ(c,0,hy-25,6);circ(c,5.5,hy-22,5.4);c.strokeStyle='rgba(120,100,80,.35)';c.lineWidth=.6;c.beginPath();c.arc(-5.5,hy-22,5.4,Math.PI*.9,Math.PI*1.9);c.arc(0,hy-25,6,Math.PI*1.1,Math.PI*1.9);c.arc(5.5,hy-22,5.4,Math.PI*1.1,Math.PI*2.1);c.stroke();c.strokeStyle='rgba(0,0,0,.08)';for(let k=-4;k<=4;k+=4){c.beginPath();c.moveTo(k,hy-19);c.lineTo(k,hy-11);c.stroke()}c.fillStyle='#EDE7DC';c.fillRect(-7.6,hy-12.5,15.2,2.2);c.fillStyle='rgba(0,0,0,.06)';c.fillRect(-7.6,hy-10.6,15.2,.8)}
  c.restore()}
 
 const JILL_LOOK={skin:'#F5D2B8',hair:'#1C1816',hs:4,top:'#fff',pants:'#2E2A28'};
@@ -1549,7 +1576,10 @@ function logLine(who,txt,kind){const L=dayLog();L.push({c:R?clockStr():'打烊�
 function logChip(){const ch=$('#logChip');if(!ch)return;const show=phase==='service'&&!!R;ch.hidden=!show;if(show)$('#logN').textContent=logNew>99?'99+':String(logNew)}
 /* a global pace for ambient talk: one line at a time, and each kind of remark keeps its own distance */
 function canChat(key,gap,min){if(!R)return false;R.cds=R.cds||{};const now=R.t;if(now-(R.cds._any||-99)<(min==null?7:min))return false;if(now-(R.cds[key]||-999)<gap)return false;R.cds[key]=now;R.cds._any=now;return true}
-function quote(g,txt){logLine(g.name,txt,g.reg==='dylan'?'d':'g');if(g.reg==='dylan'&&portraitLine('dylan',txt,{tone:dylanTone(txt),with:'jill',withTone:'default'}))return;toast(`<b>${g.name}</b>：「${txt}」`,'q')}
+/* v2.2 Q/V: Dylan and the regulars speak with their faces (a portrait card) when the assets are there; o.face picks
+   another face for a group that has two (the Wangs), o.with puts the person they are answering beside them, dimmed.
+   Everyone else stays a toast. */
+function quote(g,txt,o){o=o||{};logLine(g.name,txt,g.reg==='dylan'?'d':'g');if(g.reg==='dylan'&&portraitLine('dylan',txt,{tone:dylanTone(txt),with:'jill',withTone:'default'}))return;if(g.reg&&g.reg!=='dylan'&&portraitLine(o.face||g.reg,txt,{with:o.with}))return;toast(`<b>${g.name}</b>：「${txt}」`,'q')}
 function staffSay(m,txt){logLine(m.name,txt,'s');toast(`<b>${m.name}</b>：「${txt}」`,'q')}
 function noteLine(txt){logLine('',txt,'e');toast(txt)}
 /* a dish needs its station in the kitchen before anyone can order it (a recipe found before the station exists waits) */
@@ -1761,6 +1791,31 @@ function regTier(v){return v>=12?2:v>=4?1:v>=2?.5:0}
 /* ---- what the place has learned about a regular: where they sit, what they order, what happened. No meters: this is
    memory, and the game reads it back as habits (a usual table, a usual order) and as a few lines in the journal. ---- */
 function regMem(id){S.regMem=S.regMem||{};return S.regMem[id]=S.regMem[id]||{seats:{},orders:{},facts:[],flags:{},last:{}}}
+/* ================= v2.2 U: world memory =================
+   What happened in the restaurant is remembered by the people in it and comes up again later — days after, once,
+   not every visit: a regular who sits down in the side room a week after the wall came down; someone who remembers
+   the day it stormed; the first special; the record day. Each memory has a source (a day already in the save), a
+   window (how many days later it may surface), a low chance per visit, and who says it. Nothing new is recorded for
+   it: it reads the days the game already keeps. */
+const WORLD_MEM=[
+ {k:'side',src:()=>S.newRooms&&S.newRooms.side,min:3,max:14,who:['chen','mia','koba','leo','sophie','wang','wangwife'],line:()=>pickT(['側廳是新的？上次來還沒有。','以前這裡是一面牆吧。','打通了以後亮很多。'])},
+ {k:'terrace',src:()=>S.newRooms&&S.newRooms.terrace,min:3,max:14,who:['leo','mia','koba'],line:()=>pickT(['外面的位子是什麼時候有的？','上次來還沒有陽傘。'])},
+ {k:'kext',src:()=>S.newRooms&&S.newRooms.kext,min:4,max:16,who:['chen','sophie','wang'],line:()=>pickT(['廚房變大了？出菜比以前快。','聽說廚房整修過。'])},
+ {k:'glass',src:()=>S.newRooms&&S.newRooms.glass,min:2,max:12,who:['mia','sophie','wangwife','leo'],line:()=>pickT(['從街上看進來整間都亮亮的。','玻璃換了以後，路過就想進來。'])},
+ {k:'ceiling',src:()=>S.newRooms&&S.newRooms.ceiling,min:2,max:12,who:['chen','wang','wangwife'],line:()=>pickT(['吊扇是新的？','天花板換木頭了，抬頭看了一下。'])},
+ {k:'catwalk',src:()=>S.newRooms&&S.newRooms.catwalk,min:2,max:12,who:['leo','mia','koba','sophie'],line:()=>pickT(['貓在牆上走！','上面那條是給貓走的？'])},
+ {k:'expand',src:()=>S.grewDay,min:3,max:14,who:['chen','wang','wangwife','koba'],line:()=>pickT(['店變大了，桌子比以前多。','我記得剛開的時候只有幾張桌子。','招牌換新的了。'])},
+ {k:'firstspecial',src:()=>S.firstSpecial,min:3,max:20,who:['sophie','mia','koba'],line:()=>pickT(['上次那道特製版，我回去還在想。','特製版現在還有嗎？'])},
+ {k:'storm',src:()=>S.records&&S.records.rain&&S.records.rain.d,min:2,max:10,who:['chen','wangwife','mia'],line:()=>pickT(['那天雨那麼大，你們還開著。','上次大雨那天我也在，記得嗎。'])},
+ {k:'guestsDay',src:()=>S.records&&S.records.guestsDay&&S.records.guestsDay.d,min:2,max:10,who:['koba','leo','wang'],line:()=>pickT(['前幾天那天好像很滿。','上次來要等，今天剛好有位。'])},
+ {k:'husband',src:()=>S.dylan&&S.dylan.stage>=3?S.dylan.reveal:null,min:2,max:20,who:['wangwife','chen','mia'],line:()=>pickT(['原來那位常來的先生是妳先生。','我就說他每天都來。'])},
+];
+function worldMemCands(g){const ids=g.reg==='wang'?['wang','wangwife']:[g.reg];return WORLD_MEM.filter(M=>{if(S.worldMem[M.k])return false;const d0=M.src();if(!d0)return false;const gap=S.day-d0;return gap>=M.min&&gap<=M.max&&M.who.some(w=>ids.includes(w))})}
+function worldMemoryLine(g,force){if(!R||!g.reg||g.reg==='dylan')return false;S.worldMem=S.worldMem||{};const v=S.regulars[g.reg]||0;if(v<2)return false;if((S.worldMemDay||0)===S.day)return false;/* one a day at most */
+ const cands=worldMemCands(g);if(!cands.length)return false;if(!force&&Math.random()>.35)return false;
+ const M=pick(cands);S.worldMem[M.k]=S.day;S.worldMemDay=S.day;const txt=M.line();const face=g.reg==='wang'&&!M.who.includes('wang')?'wangwife':null;setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g)){quote(g,txt,{face});regFact(g.reg,`「${txt}」`)}},1400);return true}
+/* v2.2 V: a regular's row in the book shows the supplied face once they are known; the sprite render stays the fallback */
+function regFaceHTML(id,met,fallback){const p=met?portraitOf(id):null;return p?`<img class="face" alt="" src="${p.src}">`:`<img alt="" src="${fallback}">`}
 function regFact(id,txt){const m=regMem(id);if(m.facts.some(f=>f.txt===txt))return;m.facts.unshift({day:S.day,txt});if(m.facts.length>6)m.facts.length=6}
 function usualTable(id){const m=regMem(id);let best=null,bn=1;for(const k in m.seats)if(m.seats[k]>bn){bn=m.seats[k];best=+k}return best}
 function usualDish(id){const m=regMem(id);let best=null,bn=2;for(const k in m.orders)if(m.orders[k]>bn&&menuList().includes(k)&&(S.stock[k]||0)>0){bn=m.orders[k];best=k}return best}
@@ -1794,7 +1849,7 @@ function regPlanVisit(o){const id=o.reg;if(!id||id==='dylan')return o;const r=RE
  case'deadline':o.t=Math.max(o.t,R?R.dur*rand(.55,.8):o.t);break}
  return o}
 /* the first words of a visit, when they sit down */
-function regSeatMoment(g,t){const id=g.reg;if(!id||id==='dylan')return;const k=g.moment;const m=regMem(id);const say=(txt,d)=>setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,txt)},d||600);
+function regSeatMoment(g,t){const id=g.reg;if(!id||id==='dylan')return;const k=g.moment;const m=regMem(id);const say=(txt,d)=>setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,txt)},d||600);worldMemoryLine(g);
  if(g.comp==='friend'){say(pick(['今天帶老朋友來。','以前教書的同事，退休了才有空。']));regFact(id,'帶了一位老朋友來。');g.memoAt='seat'}
  if(g.comp==='coworker'){say(pick(['同事一直問我都吃哪裡，帶她來了。','今天有伴，不用一個人吃。']));regFact(id,'帶了同事來。');g.memoAt='seat'}
  if(g.comp==='classmates'){say(pick(['同學說想來看貓。','跟同學一起，今天可以點多一點。']));regFact(id,'帶了同學來看貓。');g.memoAt='seat';for(let i=0;i<g.size;i++)g.wantShot=true}
@@ -1878,7 +1933,7 @@ function jillGreet(g,t){if(!R)return;const J=R.jill;if(g.reg==='dylan'){if(!J.cu
  const v=g.reg?(S.regulars[g.reg]||0):0;const tier=Math.floor(regTier(v));
  /* a look and a nod for everyone she has time for; a word for people she knows */
  if(Math.random()<(g.reg?.9:.45)){J.lookAt={x:t.x,y:t.y,t:rand(1,1.6)};J.nod=.7}
- if(g.reg&&tier>0&&!g.chat&&(R.chatT||0)<R.t&&Math.random()<(tier===2?.55:.4)){const L=REG_CHAT[g.reg];const pr=L&&L[tier-1]?pick(L[tier-1]):null;if(pr){g.chat=true;R.chatT=R.t+40;jillSay(pr[0]);setTimeout(()=>{if(R&&phase==='service'&&!paused&&R.groups.includes(g))quote(g,pr[1])},1500)}}}
+ if(g.reg&&tier>0&&!g.chat&&(R.chatT||0)<R.t&&Math.random()<(tier===2?.55:.4)){const L=REG_CHAT[g.reg];const pr=L&&L[tier-1]?pick(L[tier-1]):null;if(pr){g.chat=true;R.chatT=R.t+40;jillSay(pr[0],{with:g.reg});setTimeout(()=>{if(R&&phase==='service'&&!paused&&R.groups.includes(g))quote(g,pr[1],{with:'jill'})},1500)}}}
 function jillTargets(i){const J=R.jill;return J.q.includes(i)||(J.cur&&J.cur.t===i)}
 function tableActionable(t){const g=t.group;if(!g)return t.dirty;if(g.rowdy)return true;if(g.state==='order'||g.state==='check')return true;if(g.state==='wait'&&g.ticket&&g.ticket.items.some(it=>it.st==='ready'))return true;return false}
 function planAct(){const J=R.jill,t=R.tables[J.cur.t],g=t.group;const need=g&&g.ticket&&g.ticket.items.some(it=>it.st==='ready'&&!it.picked);
@@ -1921,7 +1976,7 @@ function jillWorkload(){if(!R||R.closing!=null)return 9;const J=R.jill;let w=0;
  for(const tk of R.tickets)for(const it of tk.items)if(it.st==='pending'&&!chefCanAny(it.d))w++;
  for(const s0 of R.slots){if(s0.broken)w+=2;if(s0.job&&!chefHandles(s0))w++}
  if(R.thief||R.insp)w+=3;return w}
-function startRest(pos){const J=R.jill,L=LIFE.jill;J.rest='go';J.restPos=pos;L.pos=pos;L.reserved=true;L.on=false;L.face=JPOS[pos].face;L.legs=0;L.legTarget=0;L.act=null;L.petCat=null;L.hat=true;J.troom='main';J.tx=JPOS[pos].x;J.ty=SOFA.front+10;J.idle=0}
+function startRest(pos){const J=R.jill,L=LIFE.jill;J.rest='go';J.restPos=pos;L.pos=pos;L.reserved=true;L.on=false;L.face=JPOS[pos].face;L.legs=0;L.legTarget=0;L.act=null;L.petCat=null;L.hat=false;J.troom='main';J.tx=JPOS[pos].x;J.ty=SOFA.front+10;J.idle=0}
 function endRest(){const J=R.jill,L=LIFE.jill;if(!J.rest)return;const was=L.on;const x=L.x;J.rest=null;J.sofa=false;L.on=false;L.reserved=false;L.pos=null;L.act=null;L.petCat=null;L.hat=false;if(was){J.x=x;J.y=SOFA.front+12}J.tx=null;J.ty=null;J.moving=false;J.restCD=R.t+rand(25,45);J.idle=0;J.calm=0;
  for(const c of CATS||[])if(c.sofa&&c.sofa.kind==='lap'&&c.sofaOn)leaveSofa(c)}
 function restTick(dt){const J=R.jill,L=LIFE.jill;L.sinceSit+=dt;L.t-=dt;if(L.gazeT>0)L.gazeT-=dt;if(L.flip>0)L.flip-=dt;if(L.bobT>0)L.bobT-=dt;
@@ -2121,6 +2176,11 @@ function renderRoomTabs(force){const el=$('#roomTabs');if(!el)return;const show=
  const h=roomsOpen().map(k=>`<button data-room="${k}" class="${k===room?'on':''}${A[k].u?' urgent':''}${roomIsNew(k)&&k!==room?' new':''}"><span>${ROOMS[k].n}</span>${A[k].n?`<b>${A[k].n}</b>`:roomIsNew(k)&&k!==room?'<b class="nw">NEW</b>':''}</button>`).join('');
  if(force||h!==tabsHTML){tabsHTML=h;el.innerHTML=h}}
 {const rt=$('#roomTabs');if(rt)rt.addEventListener('click',e=>{const b=e.target.closest('[data-room]');if(b)setRoom(b.dataset.room)})}
+/* v2.2 X: keyboard — Space pauses and resumes a service, Escape closes what is open (a dialogue line, the lightbox, a
+   sheet, the pause menu), Enter/Space steps a dialogue. Only when nothing is being typed. */
+document.addEventListener('keydown',e=>{if(e.target&&/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))return;if(e.key==='Enter'||e.key===' '){if($('#dlg')&&!$('#dlg').hidden){e.preventDefault();dlgNext();return}}
+ if(e.key==='Escape'){if($('#dlg')&&!$('#dlg').hidden){dlgNext();return}if(lightbox){closeLightbox();return}if(sub){if(sub==='pause'&&phase==='service'){paused=false;hideScreen()}else closeSub();return}if(phase==='service'&&R&&!paused){paused=true;showPause();checkpointSave('pause')}return}
+ if(e.key===' '&&phase==='service'&&R&&!e.repeat){if(!sub){e.preventDefault();paused=true;showPause();checkpointSave('pause')}else if(sub==='pause'){e.preventDefault();paused=false;hideScreen()}}});
 document.addEventListener('keydown',e=>{if(phase!=='service'||!R||sub)return;const i=['1','2','3','4'].indexOf(e.key);if(i>=0){const list=roomsOpen();if(list[i])setRoom(list[i])}else if(e.key==='ArrowLeft'||e.key==='ArrowRight'){const list=roomsOpen();const i2=list.indexOf(room)+(e.key==='ArrowRight'?1:-1);if(list[i2])setRoom(list[i2])}});
 let SW=null;
 function swipeEnd(e){if(!SW||!R)return;const dx=e.clientX-SW.x,dy=e.clientY-SW.y,dt=performance.now()-SW.t;const hit=SW.hit,idle=SW.idle;SW=null;const swiped=!R.holdSlot&&dt<=700&&Math.abs(dx)>=70&&Math.abs(dy)<=Math.abs(dx)*.6;if(idle!=null&&!swiped&&Math.hypot(dx,dy)<12){if(!paused&&room==='kitchen')tapStation(idle);return}if(hit||!swiped)return;const list=roomsOpen();const i=list.indexOf(room)+(dx<0?1:-1);if(list[i])setRoom(list[i])}
@@ -2130,8 +2190,12 @@ function renderLog(){const p=$('#logPanel');if(!p||p.hidden)return;p.innerHTML=`
 $('#taskPanel').addEventListener('click',()=>{$('#taskPanel').hidden=true});
 
 /* ================= layout ================= */
-function layoutAll(){DPR=Math.min(2,window.devicePixelRatio||1);const r=sc.getBoundingClientRect();if(!R&&r.width>0){const s0=r.width/336;const nd=clamp(Math.floor(r.height/s0-424-96),0,240);if(Math.abs(nd-DY)>2)applyDY(nd)}if(!IDLE)IDLE=makeIdle();sc.width=Math.round(r.width*DPR);sc.height=Math.round(r.height*DPR);SV.w=r.width;SV.h=r.height;SV.s=Math.min(r.width/336,r.height/LH);SV.ox=r.width/2-206*SV.s;SV.oy=Math.max(0,r.height-LH*SV.s);
- const W=Math.max(200,r.width-12);const kTop=SV.oy+FB*SV.s;{const pb=Math.max(18,r.height-kTop+10)+'px';$('#closePill').style.bottom=pb;$('#peekPill').style.bottom=pb}const WS=Math.round(clamp(r.height*.3,160,196));TL={n:0,chipW:0,CH:0,WS,pad:0,gap:0,x0:0,W};tc.style.height=WS+'px';tc.width=Math.round(W*DPR);tc.height=Math.round(WS*DPR);$('#trayWrap').style.top=Math.max(4,SV.oy+134*SV.s-WS)+'px';const tb=Math.max(8,r.height-kTop+8)+'px';$('#toasts').style.bottom=tb;$('#coach').style.bottom=tb;bg=null;forceDraw=true;if(typeof ticketsLayout==='function')ticketsLayout()}
+/* v2.2 X: on a desktop window the column is not 540 px — it is as wide as the scene wants at this height (the whole
+   painted room, LW + the margins, at the height-limited scale), so there are no dark bands and the sheets, the HUD
+   and the tickets span the same width as the room. Below 900 px it is the phone layout, untouched. */
+function desktopWidth(){const W=window.innerWidth,H=window.innerHeight;if(!(W>=900&&H>=560))return 0;const hudH=($('#hud')&&$('#hud').offsetHeight)||44;const want=Math.round((H-hudH)/424*(LW+BGM*2));return clamp(want,540,W)}
+function layoutAll(){DPR=Math.min(2,window.devicePixelRatio||1);{const dw=desktopWidth();const app=$('#app');if(dw){app.style.maxWidth=dw+'px';document.documentElement.classList.add('desk')}else{app.style.maxWidth='';document.documentElement.classList.remove('desk')}}const r=sc.getBoundingClientRect();if(!R&&r.width>0){const s0=r.width/336;const nd=clamp(Math.floor(r.height/s0-424-96),0,240);if(Math.abs(nd-DY)>2)applyDY(nd)}if(!IDLE)IDLE=makeIdle();sc.width=Math.round(r.width*DPR);sc.height=Math.round(r.height*DPR);SV.w=r.width;SV.h=r.height;SV.s=Math.min(r.width/336,r.height/LH);SV.ox=r.width/2-206*SV.s;SV.oy=Math.max(0,r.height-LH*SV.s);
+ const W=Math.max(200,r.width-12);const kTop=SV.oy+FB*SV.s;{const pb=Math.max(18,r.height-kTop+10)+'px';$('#closePill').style.bottom=pb;$('#peekPill').style.bottom=pb}const WS=Math.round(clamp(r.height*.3,160,196));TL={n:0,chipW:0,CH:0,WS,pad:0,gap:0,x0:0,W};tc.style.height=WS+'px';tc.width=Math.round(W*DPR);tc.height=Math.round(WS*DPR);$('#trayWrap').style.top=Math.max(4,SV.oy+134*SV.s-WS)+'px';{const rt=$('#roomTabs');if(rt)rt.style.top=Math.round(SV.oy+76*SV.s)+'px'}/* v2.2 X: the room tabs sit under the sign at every scale */const tb=Math.max(8,r.height-kTop+8)+'px';$('#toasts').style.bottom=tb;$('#coach').style.bottom=tb;bg=null;forceDraw=true;if(typeof ticketsLayout==='function')ticketsLayout()}
 function makeIdle(){const t=buildTables();const ev=['summary','shop'].includes(phase);if(ev)lifeEnsureEvening();const L=LIFE.jill;
  const jill=ev&&LIFE.plan==='sofa'?{x:L.x,y:L.y,sit:L.on,sofa:L.on?L.pos:null,carry:[],q:[],cur:null,face:L.face,step:0}:(ev&&t[0])?{x:t[0].x-25,y:t[0].y+2,sit:true,carry:[],q:[],cur:null,face:1,step:0}:{x:PASS.x,y:PASS.y,carry:[],q:[],cur:null,face:1,step:0};
  return{tables:t,slots:buildSlots(),groups:[],tickets:[],jill,floats:[],parts:[],fire:0}}
@@ -2326,7 +2390,7 @@ function drawJillAt(c,J,V,now){const moving=J.moving;const stp=moving?Math.sin(J
   if(V.fire>0){let fg=c.createRadialGradient(J.x,J.y-20,2,J.x,J.y-20,30);fg.addColorStop(0,'rgba(255,150,50,.5)');fg.addColorStop(1,'rgba(255,90,20,0)');c.fillStyle=fg;el(c,J.x,J.y-20,30,34)}
   /* concentrating while she cooks or hurries somewhere with a job; her usual smile otherwise; tired once the closing starts */
   const expr=(R&&R.closing!=null)?'tired':(cooking||(moving&&R&&R.jill.cur))?'focus':'smile';const pet=R&&R.jill.pet;const crouch=!!(pet&&pet.crouch);const look=R&&R.jill.lookAt?R.jill.lookAt:(pet?{x:pet.cat.x,y:pet.cat.y}:null);const gaze=look?{x:((look.x>=J.x?1:-1)*(J.face<0?-1:1)),y:(pet||look.down)?.55:.15}:null;
-  const nod=R&&R.jill.nod>0?Math.sin(R.jill.nod*9)*1.4:0;const carrying=!!(J.carry&&J.carry.length);drawPerson(c,J.x,J.y+(crouch?4:0),JILL_LOOK,{jill:true,me:true,tall:!crouch,seated:!!J.sit||crouch,s:crouch?1:1.1,step:stp,carry:carrying,arms:cooking?[.35,1.0+Math.sin(now*9)*.2]:null,bob:(moving?Math.abs(stp)*-1:cooking?Math.abs(Math.sin(now*9))*-1.2:Math.sin(now*2)*.4)+nod,mood:'happy',expr,gaze,flip:J.face<0,blink:Math.sin(now*1.7)>.985,hat:!(evening()&&LIFE.plan==='sofa'&&LIFE.jill.act!=='wrap'&&LIFE.jill.after!=='wrap')});
+  const nod=R&&R.jill.nod>0?Math.sin(R.jill.nod*9)*1.4:0;const carrying=!!(J.carry&&J.carry.length);drawPerson(c,J.x,J.y+(crouch?4:0),JILL_LOOK,{jill:true,me:true,tall:!crouch,seated:!!J.sit||crouch,s:crouch?1:1.1,step:stp,carry:carrying,arms:cooking?[.35,1.0+Math.sin(now*9)*.2]:null,bob:(moving?Math.abs(stp)*-1:cooking?Math.abs(Math.sin(now*9))*-1.2:Math.sin(now*2)*.4)+nod,mood:'happy',expr,gaze,flip:J.face<0,blink:Math.sin(now*1.7)>.985,hat:false/* v2.2 Q+: her hair is her silhouette; the toque stays an option in drawPerson */});
   if(R&&R.closing!=null&&LIFE.jill.act==='wrap'&&!moving){const wx=J.x+9+Math.sin(now*5.5)*6,wy=J.y-19;c.fillStyle='#BFD9EC';c.save();c.translate(wx,wy);c.rotate(Math.sin(now*5.5)*.3);rr(c,-4,-2.2,8,4.4,1.4);c.fill();c.restore();c.fillStyle=JILL_LOOK.skin;circ(c,wx-2,wy-1,2.3)}
   if(pet&&pet.cat){const p=pet.cat;const hx=p.x+(p.x<J.x?6:-6),hy=p.y-(p.st==='sleep'?6:10);c.fillStyle=JILL_LOOK.skin;circ(c,hx,hy,2.6);c.fillStyle='rgba(60,34,22,.35)';c.beginPath();c.arc(hx,hy,2.6,0,7);c.stroke()}
   if(cooking){const f=J.face<0?-1:1;const a=Math.sin(now*9);c.save();c.translate(J.x+f*4,J.y-29+a*1.6);c.rotate(f*(-.55+a*.3));c.fillStyle='#D9D9DD';rr(c,-1.1,-8,2.4,9.5,1);c.fill();c.strokeStyle='rgba(60,34,22,.4)';c.lineWidth=.5;c.stroke();c.fillStyle='#4A3226';rr(c,-1.4,1.4,3,4.4,1.2);c.fill();c.restore()}
@@ -2481,8 +2545,8 @@ function drawKitchenRoom(c,now,dusk,V,X0,XW,TOP,list){const E=S.eq;const LHk=LH;
  else{/* before and after service the cooks are at their places, wiping down */let i=0;for(const m of S.crew||[]){if(m.role!=='chef')continue;const h=homeSpot(m,i++);const a={x:h.x,y:h.y,face:1,step:0,moving:false,beat:{kind:'idle',x:h.x,y:h.y}};list.push({y:a.y,f:()=>drawCook(c,m,a,now)})}}
  const J=V.jill;if(R&&(J.room||'main')==='main'&&Math.hypot(J.x-PASS.x,J.y-PASS.y)<30){
   const ms=R.slots.find(s0=>s0.job&&!s0.cook&&s0.job.step&&s0.job.step.t!=='wait');
-  if(ms){const sp=stepSpot(ms);const k=ms.job.step;list.push({y:sp.cy,f:()=>{const bob=Math.abs(Math.sin(now*9))*-1.2;drawPerson(c,sp.cx,sp.cy,JILL_LOOK,{jill:true,me:true,tall:true,s:1.1,mood:'happy',expr:'focus',bob,blink:Math.sin(now*1.7)>.985,hat:true});if(k.t==='work'&&k.board)drawHandKnife(c,sp.cx,sp.cy,1,now);nameTag(c,sp.cx,sp.cy-68,'Jill')}})}
-  else list.push({y:KY.front,f:()=>{drawPerson(c,200,KY.front,JILL_LOOK,{jill:true,me:true,tall:true,s:1.1,mood:'happy',expr:'smile',bob:Math.sin(now*2)*.4,blink:Math.sin(now*1.7)>.985,hat:true});nameTag(c,200,KY.front-68,'Jill')}})}
+  if(ms){const sp=stepSpot(ms);const k=ms.job.step;list.push({y:sp.cy,f:()=>{const bob=Math.abs(Math.sin(now*9))*-1.2;drawPerson(c,sp.cx,sp.cy,JILL_LOOK,{jill:true,me:true,tall:true,s:1.1,mood:'happy',expr:'focus',bob,blink:Math.sin(now*1.7)>.985});if(k.t==='work'&&k.board)drawHandKnife(c,sp.cx,sp.cy,1,now);nameTag(c,sp.cx,sp.cy-68,'Jill')}})}
+  else list.push({y:KY.front,f:()=>{drawPerson(c,200,KY.front,JILL_LOOK,{jill:true,me:true,tall:true,s:1.1,mood:'happy',expr:'smile',bob:Math.sin(now*2)*.4,blink:Math.sin(now*1.7)>.985});nameTag(c,200,KY.front-68,'Jill')}})}
  if(R&&R.cw)for(const m of S.crew||[]){if(m.role==='chef')continue;const w=R.cw[m.id];if(!w||(w.room||'main')!=='main'||Math.hypot(w.x-PASS.x,w.y-PASS.y)>40)continue;const x=clamp(w.x,120,280);
   list.push({y:KY.front+4,f:()=>{drawPerson(c,x,KY.front+4,crewLook(m),{s:1,mood:'happy',expr:'smile',bob:Math.sin(now*2+x)*.4,blink:Math.sin(now*1.5+x)>.97});if(w.carry)w.carry.slice(0,3).forEach((it,i)=>{c.drawImage(dishCanvas(it.d,it.q,64,S.decor.ware>0,it.want),x+(i%2?4:-20),KY.front-46-Math.floor(i/2)*8,16,16)});nameTag(c,x,KY.front-52,m.name)}})}
  if(S.decor.plants)list.push({y:112,f:()=>drawPlant(c,KX.bar.x+KX.bar.w+10,110,'bush')})}
@@ -2589,20 +2653,31 @@ function drawSideRoom(c,now,dusk,V,X0,XW,TOP,list){const T=TH();const d=clamp(du
 /* ---- the street: the sky by the hour and the weather, the neighbours, the façade with the sign, the door (OPEN while the
    service runs), the pavement with whatever was bought for it, the tables under umbrellas ---- */
 function drawFrontRoom(c,now,dusk,V,X0,XW,TOP,list){const d=clamp(dusk,0,1);const W=wxNow();const wet=W==='rain'||W==='storm';const E=S.ext||{};const dq=Math.round(d*16)/16;
- const bg=roomBg('front',S.level+'|'+W+'|'+dq+'|'+JSON.stringify(E)+'|'+Math.floor(S.day/10)+'|'+(S.rooms&&S.rooms.terrace?S.frontTables:0),TOP,(b,X0,XW,T2)=>{const d=dq;
+ const glass=projOn('glass');const bg=roomBg('front',S.level+'|'+W+'|'+dq+'|'+JSON.stringify(E)+'|'+Math.floor(S.day/10)+'|'+(S.rooms&&S.rooms.terrace?S.frontTables:0)+'|'+(glass?1:0),TOP,(b,X0,XW,T2)=>{const d=dq;
   /* sky */{let g=b.createLinearGradient(0,-T2,0,130);const top=wet?'#8E97A2':W==='hot'?'#9FC8EC':W==='cool'?'#C9DDEA':'#A9D3F0',bot=wet?'#B7BFC8':'#F2DEC0';g.addColorStop(0,mix(top,'#1E2438',d));g.addColorStop(1,mix(bot,'#5E4666',d));b.fillStyle=g;b.fillRect(X0,-T2,XW,130+T2);
    if(!wet){b.fillStyle=`rgba(255,240,200,${.9-d*.6})`;circ(b,340-d*60,Math.max(-T2+14,20-T2*.4)+d*40,10);if(d>.6){b.fillStyle=`rgba(255,255,255,${(d-.6)*2})`;for(let k=0;k<26;k++)circ(b,X0+((k*67)%XW),-T2+((k*41)%(90+T2)),.9)}}
    b.fillStyle=`rgba(255,255,255,${.35-d*.3})`;for(const [cx,cy,r0] of[[80,-T2+30,14],[104,-T2+26,18],[128,-T2+32,12]])circ(b,cx,cy,r0);
    /* the neighbours: two quiet buildings */b.fillStyle=mix('#D9CFC2','#2A2A38',d);b.fillRect(X0,56,BGM+34,74);b.fillStyle=mix('#CFC2B4','#2A2A38',d);b.fillRect(366,48,XW,82);b.fillStyle=mix('#B8A898','#1E1E2A',d);b.fillRect(X0,56,BGM+34,5);b.fillRect(366,48,XW,5);for(const [x,y] of[[-36,70],[-36,98],[6,70],[6,98],[376,64],[376,94],[406,64],[406,94]]){b.fillStyle=d>.5?'rgba(255,220,150,.8)':'rgba(120,130,150,.6)';b.fillRect(x,y,11,14)}}
-  /* the façade */const wall='#EADFC8',trim='#B8536A';b.fillStyle=wall;b.fillRect(X0+34,120,XW-68,170);b.fillStyle='rgba(0,0,0,.08)';for(let y=126;y<286;y+=16)b.fillRect(X0+34,y,XW-68,1);b.fillStyle=trim;b.fillRect(X0+34,120,XW-68,6);b.fillStyle='rgba(0,0,0,.12)';b.fillRect(X0+34,126,XW-68,3);
-  /* windows: the dining room, faintly, behind the glass */for(const wx of[78,258]){b.fillStyle='#3A2A22';b.fillRect(wx-3,188,70,62);let g=b.createLinearGradient(0,190,0,248);g.addColorStop(0,d>.45?'#FFE2A8':'#F6EFE0');g.addColorStop(1,d>.45?'#E8B865':'#E4DCCB');b.fillStyle=g;b.fillRect(wx,191,64,56);b.fillStyle='rgba(60,40,30,.22)';el(b,wx+18,236,9,4);el(b,wx+46,236,9,4);b.fillRect(wx+14,224,8,12);b.fillRect(wx+42,224,8,12);b.fillStyle='rgba(255,255,255,.3)';b.fillRect(wx+4,195,14,48);b.fillStyle='#3A2A22';b.fillRect(wx+31,191,2,56);b.fillStyle='#F6EEDF';b.fillRect(wx-6,250,76,3)}
+  /* v2.2 R: the façade — warm plaster with a little grain above, a band of warm stone at waist height, a brass line
+     between; the cornice is taupe, not red */const wall=mix('#EADFC8','#3A3446',d*.55),trim=mix('#8C7B68','#2A2630',d*.5);b.fillStyle=wall;b.fillRect(X0+34,120,XW-68,170);{const R0=rng(7);b.fillStyle='rgba(120,100,80,.07)';for(let i=0;i<700;i++)b.fillRect(X0+34+R0()*(XW-68),120+R0()*170,1.2,1.2);b.fillStyle='rgba(255,255,255,.12)';for(let i=0;i<260;i++)b.fillRect(X0+34+R0()*(XW-68),120+R0()*170,1.2,1.2)}
+   b.fillStyle=mix('#C9BBA6','#2E2A34',d*.55);b.fillRect(X0+34,250,XW-68,40);b.fillStyle='rgba(0,0,0,.08)';for(let x=X0+34;x<LW+BGM;x+=38)b.fillRect(x,250,1,40);b.fillRect(X0+34,270,XW-68,1);b.fillStyle='#C99A45';b.fillRect(X0+34,248,XW-68,1.6);b.fillStyle=trim;b.fillRect(X0+34,120,XW-68,6);b.fillStyle='rgba(0,0,0,.12)';b.fillRect(X0+34,126,XW-68,3);
+  /* the windows: the dining room behind the glass — warm light, a pendant lamp, a table, a cat on the sill inside
+     (never outside); with the glass front, one wide window and the whole room showing */
+  const pane=(x0,w0,y0,h0)=>{let g=b.createLinearGradient(0,y0,0,y0+h0);g.addColorStop(0,d>.45?'#FFE2A8':'#F6EFE0');g.addColorStop(1,d>.45?'#E8B865':'#E4DCCB');b.fillStyle=g;b.fillRect(x0,y0,w0,h0);
+   /* inside: the far wall, a lamp, tables */b.fillStyle=d>.45?'rgba(120,80,50,.22)':'rgba(120,100,80,.12)';b.fillRect(x0,y0,w0,h0*.45);for(let tx=x0+18;tx<x0+w0-10;tx+=32){b.fillStyle='rgba(60,40,30,.22)';el(b,tx,y0+h0-12,9,4);b.fillRect(tx-4,y0+h0-24,8,12);b.fillStyle='rgba(255,255,255,.55)';el(b,tx,y0+h0-13,6,2.2)}for(let lx=x0+16;lx<x0+w0-8;lx+=48){b.fillStyle='rgba(60,40,30,.35)';b.fillRect(lx-.5,y0,1,10);b.fillStyle=d>.45?'#FFF1C4':'#E6C27A';b.beginPath();b.moveTo(lx-5,y0+10);b.lineTo(lx+5,y0+10);b.lineTo(lx+3,y0+4);b.lineTo(lx-3,y0+4);b.closePath();b.fill()}
+   b.fillStyle='rgba(255,255,255,.28)';b.beginPath();b.moveTo(x0+4,y0);b.lineTo(x0+18,y0);b.lineTo(x0+8,y0+h0);b.lineTo(x0+4,y0+h0);b.fill()};
+  const catSil=(cx,cy)=>{b.fillStyle=d>.45?'rgba(40,28,22,.85)':'rgba(70,55,45,.55)';el(b,cx,cy,7,4.2);circ(b,cx+5,cy-5,3.6);b.beginPath();b.moveTo(cx+2.5,cy-7);b.lineTo(cx+3.2,cy-10.5);b.lineTo(cx+5,cy-8);b.fill();b.beginPath();b.moveTo(cx+7.5,cy-7);b.lineTo(cx+7,cy-10.5);b.lineTo(cx+5.4,cy-8);b.fill();b.strokeStyle=b.fillStyle;b.lineWidth=1.6;b.beginPath();b.moveTo(cx-6,cy);b.quadraticCurveTo(cx-12,cy-2,cx-11,cy-8);b.stroke()};
+  if(glass){b.fillStyle='#2E2A26';b.fillRect(40,184,320,68);pane(43,314,187,62);b.fillStyle='#2E2A26';for(const mx of[120,176,224,280])b.fillRect(mx-1,187,2,62);b.fillRect(43,214,314,1.5);catSil(300,244);b.fillStyle='#EDE6D8';b.fillRect(38,250,324,3)}
+  else for(const wx of[78,258]){b.fillStyle='#3A2A22';b.fillRect(wx-3,188,70,62);pane(wx,64,191,56);b.fillStyle='#3A2A22';b.fillRect(wx+31,191,2,56);if(wx===258)catSil(wx+48,244);b.fillStyle='#EDE6D8';b.fillRect(wx-6,250,76,3);b.fillStyle='rgba(0,0,0,.12)';b.fillRect(wx-6,253,76,1.5)}
   /* the door */{const x=FR.door.x;b.fillStyle='#3A2A22';b.fillRect(x-24,180,48,82);b.fillStyle='#6B4428';b.fillRect(x-20,184,40,78);b.fillStyle='#C99A45';b.fillRect(x-20,184,40,2);b.fillStyle='rgba(255,230,180,.35)';b.fillRect(x-14,190,28,28);b.fillStyle='#E6C27A';circ(b,x+12,228,2);
-   b.fillStyle='#CFC6B8';b.fillRect(x-30,262,60,8);b.fillStyle='rgba(0,0,0,.15)';b.fillRect(x-30,269,60,2)}
+   b.fillStyle='#CFC6B8';b.fillRect(x-30,262,60,8);b.fillStyle='rgba(0,0,0,.15)';b.fillRect(x-30,269,60,2);/* v2.2 R: the doormat, and the room's light in the door glass at dusk */b.fillStyle='#8A6A42';rr(b,x-16,284,32,7,1.5);b.fill();b.strokeStyle='rgba(255,240,210,.45)';b.lineWidth=.7;for(let k=0;k<3;k++){b.beginPath();b.moveTo(x-13,286+k*2);b.lineTo(x+13,286+k*2);b.stroke()}if(d>.45){b.fillStyle=`rgba(255,220,150,${.35*d})`;b.fillRect(x-14,190,28,28)}}
   /* the sign */{const L=S.level;const signW=L===5?120:136;b.fillStyle='rgba(0,0,0,.18)';rr(b,200-signW/2+2,143,signW,30,4);b.fill();b.fillStyle=L===5?'#14161F':'#2C2C2B';rr(b,200-signW/2,140,signW,30,4);b.fill();b.strokeStyle=L>=4?'#E0B863':'rgba(230,194,122,.7)';b.lineWidth=1.1;rr(b,200-signW/2+2.5,142.5,signW-5,25,3);b.stroke();
    b.fillStyle='#E6C27A';b.textAlign='center';b.textBaseline='middle';if(L===5){b.font=`400 20px ${DFONT}`;b.fillText('J I L L',200,156)}else{b.font=`400 ${L===1?11:12.5}px ${DFONT}`;b.fillText(LV().n,200,155.5)}b.textBaseline='alphabetic';
-   if(E.sign){b.fillStyle='#8E6422';b.fillRect(198,132,4,8);b.fillStyle='#F4C44E';el(b,200,132,7,2.5);if(d>.3){let g=b.createRadialGradient(200,150,4,200,150,70);g.addColorStop(0,`rgba(255,214,120,${.35*d})`);g.addColorStop(1,'rgba(255,214,120,0)');b.fillStyle=g;b.fillRect(120,110,160,80)}}}
+   if(E.sign){b.fillStyle='#8E6422';b.fillRect(198,132,4,8);b.fillStyle='#F4C44E';el(b,200,132,7,2.5);if(d>.3){let g=b.createRadialGradient(200,150,4,200,150,70);g.addColorStop(0,`rgba(255,214,120,${.35*d})`);g.addColorStop(1,'rgba(255,214,120,0)');b.fillStyle=g;b.fillRect(120,110,160,80)}}
+   /* the windows throw light onto the pavement at dusk */if(d>.4){for(const wx of(glass?[100,200,300]:[110,290])){let g=b.createLinearGradient(0,252,0,330);g.addColorStop(0,`rgba(255,214,140,${.22*d})`);g.addColorStop(1,'rgba(255,214,140,0)');b.fillStyle=g;b.beginPath();b.moveTo(wx-34,252);b.lineTo(wx+34,252);b.lineTo(wx+52,330);b.lineTo(wx-52,330);b.closePath();b.fill()}}}
   /* the awning */if(E.awning){const cols=E.awning===2?['#2E6B4A','#F7EDDC']:E.awning===3?['#2E3A4B','#F7EDDC']:['#B8536A','#F7EDDC'];b.fillStyle='rgba(0,0,0,.15)';b.fillRect(126,196,148,6);for(let i=0;i<12;i++){b.fillStyle=cols[i%2];b.beginPath();b.moveTo(126+i*12.3,176);b.lineTo(126+(i+1)*12.3,176);b.lineTo(126+(i+1)*12.3+4,196);b.lineTo(126+i*12.3+4,196);b.closePath();b.fill()}b.fillStyle=cols[0];for(let i=0;i<12;i++){b.beginPath();b.arc(132+i*12.3,197,5,0,Math.PI);b.fill()}}
-  /* the pavement and the street */b.fillStyle='#CFC9BE';b.fillRect(X0,284,XW,90);b.fillStyle='rgba(0,0,0,.07)';for(let x=X0;x<LW+BGM;x+=40)b.fillRect(x,284,1,90);b.fillRect(X0,328,XW,1);b.fillStyle='#B8B2A6';b.fillRect(X0,372,XW,5);b.fillStyle='#4A4A4E';b.fillRect(X0,377,XW,LH-377);b.fillStyle='rgba(255,255,255,.5)';for(let x=X0;x<LW+BGM;x+=40)b.fillRect(x,400,22,2);
+  /* the pavement and the street: warm stone flags; wet, they go dark and hold puddles with the sky in them */b.fillStyle=mix(wet?'#9A9890':'#CFC9BE','#2A2A34',d*.5);b.fillRect(X0,284,XW,90);b.fillStyle='rgba(0,0,0,.07)';for(let x=X0;x<LW+BGM;x+=40)b.fillRect(x,284,1,90);b.fillRect(X0,328,XW,1);{const R1=rng(13);b.fillStyle='rgba(255,255,255,.08)';for(let i=0;i<160;i++)b.fillRect(X0+R1()*XW,284+R1()*88,1.5,1);if(wet){for(const [px,py,rx,ry] of[[92,318,26,5],[212,352,34,6],[318,306,20,4],[150,362,18,3.5]]){b.fillStyle=mix('#B7BFC8','#5E4666',d);el(b,px,py,rx,ry);b.fillStyle='rgba(255,255,255,.18)';el(b,px-rx*.3,py-1,rx*.4,1.2)}}}
+   b.fillStyle=mix('#B8B2A6','#26262E',d*.5);b.fillRect(X0,372,XW,5);b.fillStyle=mix(wet?'#3A3A40':'#4A4A4E','#1E1E24',d*.4);b.fillRect(X0,377,XW,LH-377);b.fillStyle='rgba(255,255,255,.5)';for(let x=X0;x<LW+BGM;x+=40)b.fillRect(x,400,22,2);
   /* planters, the bench, seasonal things */if(E.plants){for(const px of[150,250]){b.fillStyle='#8A3A2A';rr(b,px-12,266,24,16,2);b.fill();for(let k=0;k<7;k++)leaf(b,px-8+k*2.6,262-Math.abs(k-3)*2,9,3.6,-1.6+(k-3)*.4,k%2?'#3F7F32':'#5E9E3D');b.fillStyle='#E8798A';circ(b,px-4,258,1.6);b.fillStyle='#F4C44E';circ(b,px+3,256,1.6)}}
   if(E.bench){const {x,y}=FR.bench;b.fillStyle='#6B4428';b.fillRect(x-24,y-12,48,5);b.fillRect(x-24,y-2,48,5);b.fillRect(x-22,y+3,3,12);b.fillRect(x+19,y+3,3,12);b.fillStyle='#8A6A42';b.fillRect(x-24,y-12,48,1.5)}
   if(E.season){const k=Math.floor(S.day/10)%3;if(k===0){for(const lx of[60,340]){b.fillStyle='#8A3A2A';b.fillRect(lx-1,160,2,12);b.fillStyle='#D8392A';el(b,lx,182,7,10);b.fillStyle='#F4C44E';b.fillRect(lx-3,171,6,2);b.fillRect(lx-3,192,6,2)}}else if(k===1){for(let i=0;i<8;i++){b.fillStyle=['#E8798A','#F4C44E','#7FB3C8','#5E9E3D'][i%4];b.beginPath();b.moveTo(60+i*40,132);b.lineTo(72+i*40,132);b.lineTo(66+i*40,146);b.closePath();b.fill()}}else{b.fillStyle='#F4C44E';for(const lx of[70,330])for(let i=0;i<5;i++)el(b,lx+Math.cos(i*1.26)*7,178+Math.sin(i*1.26)*7,3,3)}}
@@ -2614,7 +2689,8 @@ function drawFrontRoom(c,now,dusk,V,X0,XW,TOP,list){const d=clamp(dusk,0,1);cons
  /* live: rain, the door plate, the string lights, the umbrellas; the lamp and the windows on the wet pavement */
  if(d>.25){c.save();c.globalCompositeOperation='lighter';let g=c.createRadialGradient(356,146,3,356,146,80);g.addColorStop(0,`rgba(255,226,150,${.38*d})`);g.addColorStop(1,'rgba(255,226,150,0)');c.fillStyle=g;c.fillRect(276,66,160,180);c.restore()}
  if(wet){c.save();c.globalCompositeOperation='lighter';for(const wx of[110,290,200]){let g=c.createLinearGradient(0,286,0,360);g.addColorStop(0,`rgba(255,214,140,${.18+d*.14})`);g.addColorStop(1,'rgba(255,214,140,0)');c.fillStyle=g;c.fillRect(wx-30,286,60,74)}c.restore()}
- if(wet){for(let k=0;k<(W==='storm'?40:18);k++){const ph=((now*(W==='storm'?.9:.5))+k*.37)%1;const rx=X0+((k*53)%XW);c.strokeStyle='rgba(230,240,250,.45)';c.lineWidth=.8;c.beginPath();c.moveTo(rx,-TOP+ph*(130+TOP));c.lineTo(rx-1,-TOP+ph*(130+TOP)+9);c.stroke()}}
+ if(wet){const n=W==='storm'?46:22;for(let k=0;k<n;k++){const ph=((now*(W==='storm'?.95:.55))+k*.37)%1;const rx=X0+((k*53)%XW);const yy=-TOP+ph*(LH+TOP);c.strokeStyle=`rgba(230,240,250,${W==='storm'?.5:.4})`;c.lineWidth=.8;c.beginPath();c.moveTo(rx,yy);c.lineTo(rx-1.5,yy+(W==='storm'?13:9));c.stroke()}
+  /* splashes where the drops land on the wet stone */for(let k=0;k<(W==='storm'?14:7);k++){const ph=(now*1.6+k*.61)%1;const sx=X0+((k*97+31)%XW),sy=290+((k*43)%80);c.strokeStyle=`rgba(235,242,250,${(1-ph)*.55})`;c.lineWidth=.7;c.beginPath();c.ellipse(sx,sy,2+ph*5,.7+ph*1.6,0,0,7);c.stroke()}}
  {const x=FR.door.x;c.fillStyle='#F6EEDF';rr(c,x-12,224,24,11,2);c.fill();c.fillStyle=R?'#2E6B4A':'#8A3A2A';c.font=`800 6px ${FONT}`;c.textAlign='center';c.fillText(R?'OPEN':'CLOSED',x,232)}
  if(E.lights){c.strokeStyle='rgba(40,30,20,.7)';c.lineWidth=.7;c.beginPath();for(let x=40;x<=360;x+=4)c.lineTo(x,128+Math.sin((x-40)/60*Math.PI)*8);c.stroke();for(let x=48;x<360;x+=16){const y=131+Math.sin((x-40)/60*Math.PI)*8;const tw=.75+Math.sin(now*2+x*.3)*.25;c.fillStyle=`rgba(255,${Math.round(205+tw*30)},${Math.round(130+tw*40)},${.55+d*.45})`;el(c,x,y,1.8,2.4);if(d>.2){let g=c.createRadialGradient(x,y,0,x,y,9);g.addColorStop(0,`rgba(255,200,120,${.35*d*tw})`);g.addColorStop(1,'rgba(255,200,120,0)');c.fillStyle=g;c.fillRect(x-9,y-9,18,18)}}}
  if(S.rooms&&S.rooms.terrace)for(const t of V.tables)if(t.room==='front'){list.push({y:t.y-58,f:()=>{c.fillStyle='#8A6A42';c.fillRect(t.x-1,t.y-62,2,44);c.fillStyle='#B8536A';c.beginPath();c.moveTo(t.x-40,t.y-58);c.quadraticCurveTo(t.x,t.y-88,t.x+40,t.y-58);c.closePath();c.fill();c.fillStyle='rgba(255,255,255,.25)';c.beginPath();c.moveTo(t.x-40,t.y-58);c.quadraticCurveTo(t.x-20,t.y-80,t.x,t.y-84);c.lineTo(t.x,t.y-58);c.closePath();c.fill();c.fillStyle='rgba(0,0,0,.1)';for(let k=-3;k<=3;k++)c.fillRect(t.x+k*13-.5,t.y-58,1,3)}})}}
@@ -3520,7 +3596,7 @@ SOFA.seatL=SOFA.x0+SOFA.arm;SOFA.seatR=SOFA.x1-SOFA.arm;
 const JPOS={L:{x:122,face:1},R:{x:174,face:-1},M:{x:148,face:1}};   /* where Jill can sit; L = legs to the right, towards the TV */
 const TV_PARK={x:352,y:118};
 function tvUsePos(){return LIFE.jill.pos==='R'?{x:SOFA.x0,y:146}:{x:SOFA.x1,y:146}}   /* in front of the arm at Jill's feet */
-const DYLAN={id:'dylan',n:'Dylan',type:'regular',size:1,fav:['signature'],looks:[{skin:'#EDC19C',hair:'#2A211C',hs:6,top:'#4E5A6B',acc:null,pants:'#3B3A44'}],
+const DYLAN={id:'dylan',n:'Dylan',type:'regular',size:1,fav:['signature'],looks:[{skin:'#EDC19C',hair:'#1A1614',hs:9,top:'#F6F3EC',pat:'cardi',top2:'#2F3B5C',acc:'watch',pants:'#3B3A44'}],/* v2.2 Q+: the portrait's look — short dark hair with a straight fringe (style 9 is his alone), navy cardigan over a white tee, a watch */
  who:'一個人來，話不多。喜歡坐看得到廚房的位子。',who2:'Jill 的先生。結婚 11 年。打烊以後，有時候會留下來——然後隔天再來追一次。'};
 REG_BY.dylan=DYLAN;
 const LIFE={day:0,plan:null,t:0,jill:null,tv:null,dylan:null,say:[],revealRoll:0};
@@ -4053,6 +4129,13 @@ function showGuide(){sub='guide';show(`<div class="sheet tall"><div class="sh-to
 
 /* ================= input ================= */
 function scenePt(e){const r=sc.getBoundingClientRect();return{x:(e.clientX-r.left-SV.ox)/SV.s,y:(e.clientY-r.top-SV.oy)/SV.s}}
+/* v2.2 X: with a mouse, the cursor says what can be tapped — the same targets as the tap below, nothing else */
+function roomHot(p){if(room==='kitchen'){if(R&&!paused&&phase==='service'&&hitStation(p)>=0)return true;const f=KR.fridge;if(p.x>=f.x-4&&p.x<=f.x+f.w+4&&p.y>=f.y-8&&p.y<=f.y+f.h+12)return true;if(S.rooms&&S.rooms.cooler){const k=KR.cooler;if(p.x>=k.x-4&&p.x<=k.x+k.w+4&&p.y>=k.y-8&&p.y<=k.y+k.h+12)return true}if(p.y>LH-70&&Math.abs(p.x-200)<60)return true;return false}
+ if(room==='side'){const a=SIDE_L.arch;if(p.x>=a.x-8&&p.x<=a.x+a.w+8&&p.y>=a.y-6&&p.y<=a.y+112)return true}if(room==='front'&&Math.abs(p.x-FR.door.x)<30&&p.y>176&&p.y<276)return true;if(hitRegular(p)&&!paused)return true;if(!R||paused||phase!=='service')return false;
+ for(const t of R.tables){if((t.room||'main')!==room)continue;if(Math.hypot((p.x-t.x)*.85,p.y-(t.y-16))<(t.seats===4?46:40))return true}return false}
+function sceneHot(p){if(room!=='main')return roomHot(p);if(S.rooms&&S.rooms.side&&p.x>=SIDE_ARCH.x-6&&p.x<=SIDE_ARCH.x+SIDE_ARCH.w+6&&p.y>=SIDE_ARCH.y-4&&p.y<=SIDE_ARCH.y+112)return true;if(paused)return false;if(hitCat(p)||hitRegular(p)||hitSpot(p))return true;if(p.y>FB-16&&hitKItem(p))return true;if(R&&phase==='service'&&p.y>FB)return true;if(!R||phase!=='service')return false;
+ for(const g of queued()){if(g.state!=='queue'&&g.state!=='arrive')continue;if(Math.hypot(p.x-g.x,p.y-(g.y-22))<26)return true}for(const t of R.tables){if((t.room||'main')!==room)continue;if(Math.hypot((p.x-t.x)*.85,p.y-(t.y-16))<(t.seats===4?46:40))return true}return false}
+sc.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse')return;let hot=false;try{hot=sceneHot(scenePt(e))}catch(e2){hot=false}const want=hot?'pointer':'';if(sc.style.cursor!==want)sc.style.cursor=want});sc.addEventListener('pointerleave',()=>{sc.style.cursor=''});
 sc.addEventListener('pointerdown',e=>{const p=scenePt(e);SW={x:e.clientX,y:e.clientY,t:performance.now(),hit:false};
  if(room!=='main'){if(roomTap(p,e))SW.hit=true;return}
  if(S.rooms&&S.rooms.side&&p.x>=SIDE_ARCH.x-6&&p.x<=SIDE_ARCH.x+SIDE_ARCH.w+6&&p.y>=SIDE_ARCH.y-4&&p.y<=SIDE_ARCH.y+112&&!hitCat(p)){e.preventDefault();SW.hit=true;setRoom('side');return}
@@ -4288,13 +4371,32 @@ function reviewDigestHTML(){const d=reviewDigest(25);if(d.n<5)return'';const par
  return`<div class="digest"><b>最近 ${d.n} 則在說什麼</b><span>${parts.join('・')}</span>${d.good>=d.n*.8?'<small>大多是好評，繼續保持。</small>':worst&&worst[1]>=3?`<small>${worst[2]}</small>`:''}</div>`}
 function notesFor(id,n){return(S.notes||[]).filter(x=>x.reg===id).slice(0,n||2)}
 let lightbox=null;   /* {ids:[...], i} while a photo is open */
-function openLightbox(id){const A=albumList().slice().reverse();const i=A.findIndex(p=>p.id===id);if(i<0)return;lightbox={ids:A.map(p=>p.id),i};$('#lightbox').hidden=false;lightboxRender();sfx.tap()}
+function openLightbox(id){const A=albumList().slice().sort((a,b)=>a.day-b.day);/* v2.2 W: the album reads forward */const i=A.findIndex(p=>p.id===id);if(i<0)return;lightbox={ids:A.map(p=>p.id),i};$('#lightbox').hidden=false;lightboxRender();sfx.tap()}
 function closeLightbox(){lightbox=null;const el=$('#lightbox');if(el)el.hidden=true}
 function lightboxRender(){const el=$('#lightbox');if(!lightbox||!el)return;const p=albumList().find(x=>x.id===lightbox.ids[lightbox.i]);if(!p){closeLightbox();return}
  el.innerHTML=`<div class="lb-bg" data-lb="close"></div><button class="lb-close" data-lb="close" aria-label="關閉">✕</button>
   <figure class="lb-card ${p.keep?'keep':''}"><img alt="" data-pid="${p.id}" src="${photoSrc(p)}"><figcaption><span class="when">DAY ${p.day}${p.clock?' · '+p.clock:''}</span><b>「${p.cap}」</b>${p.txt?`<span class="txt">${p.txt}</span>`:''}</figcaption>${p.keep?'<span class="pin">珍藏</span>':''}</figure>
   <div class="lb-nav"><button data-lb="prev" ${lightbox.i<=0?'disabled':''} aria-label="上一張">‹</button><span class="lb-count">${lightbox.i+1} / ${lightbox.ids.length}</span><button class="lb-keep ${p.keep?'on':''}" data-lb="keep">${p.keep?'♥ 珍藏中':'♡ 珍藏'}</button><button data-lb="next" ${lightbox.i>=lightbox.ids.length-1?'disabled':''} aria-label="下一張">›</button></div>`}
 function lightboxStep(d){if(!lightbox)return;const n=lightbox.i+d;if(n<0||n>=lightbox.ids.length)return;lightbox.i=n;lightboxRender()}
+/* ================= v2.2 W: the album is the restaurant's living history =================
+   The photos are read in the order they happened, grouped by week, and between them the things that happened to the
+   place that week — from days the save already keeps (the rooms and projects, the achievements' days, the record
+   day, the first special, the regulars' facts). Nothing new is recorded, and only days written when the thing
+   happened are read: the achievements' days are not used, because a save that came through a version update carries
+   the newer achievements dated the day they were granted, not the day they were earned. The last group is this week
+   and it ends with today: the story is still going — there is no last page, no memorial, nothing is ever "gone". */
+function storyEvents(){const ev=[{day:1,t:'開店。第一天。',ic:'signlamp'}];const nr=S.newRooms||{};for(const P of ALL_PROJECTS())if(nr[P.k])ev.push({day:nr[P.k],t:`${P.n}完工。`,ic:P.ic});
+ if(S.grewDay)ev.push({day:S.grewDay,t:`擴建成${LV().n}。`,ic:'crown'});if(S.firstSpecial)ev.push({day:S.firstSpecial,t:'第一道特製版從出菜口出去了。',ic:'plate'});
+ const Rc=S.records||{};if(Rc.guestsDay&&Rc.guestsDay.v>=20)ev.push({day:Rc.guestsDay.d,t:`最多客人的一天：${Rc.guestsDay.v} 位。`,ic:'flame'});if(Rc.rain&&Rc.rain.v>0)ev.push({day:Rc.rain.d,t:'下雨天，店裡還是滿的。',ic:'moon'});
+ if(S.dylan&&S.dylan.stage>=3&&S.dylan.reveal)ev.push({day:S.dylan.reveal,t:'原來一直都認識。',ic:'heart'});
+ for(const id in S.regMem||{}){const r=REG_BY[id];if(!r)continue;const first=r.n.split('與')[0];for(const f of (S.regMem[id].facts||[]))if(f.day&&!/^「/.test(f.txt))ev.push({day:f.day,t:(f.txt.startsWith(first)||/^(王先生|王太太|Jill)/.test(f.txt))?f.txt:`${r.n}${f.txt}`,ic:'heart',reg:id})}
+ const seen=new Set();return ev.filter(e=>e.day>0&&e.day<=S.day&&!seen.has(e.day+e.t)&&seen.add(e.day+e.t)).sort((a,b)=>a.day-b.day)}
+function weekOf(day){return Math.floor((day-1)/7)+1}
+function albumStoryHTML(){const A=albumList().slice().sort((a,b)=>a.day-b.day);const ev=storyEvents();const wk=weekOf(S.day);const weeks=[];for(let w=1;w<=wk;w++){const ph=A.filter(p=>weekOf(p.day)===w),ee=ev.filter(e=>weekOf(e.day)===w);if(ph.length||ee.length||w===wk)weeks.push({w,ph,ee})}
+ const cats=CATS?CATS.filter(c=>!c.hidden).length:CAT_DEF.length;const today=`<div class="story-now"><span class="when">DAY ${S.day}${S.today&&S.today.day===S.day&&WEATHER[S.today.weather]?' · '+WEATHER[S.today.weather].n:''}</span><b>今天。</b><span>營業了 ${S.stats.days||0} 天，店還開著。${cats} 隻貓都在，${S.crew.length?`${S.crew.length} 位員工，`:''}熟客 ${REGS.filter(r=>(S.regulars[r.id]||0)>=4).length} 位。還在繼續。</span></div>`;
+ if(!A.length&&ev.length<=1)return `<div class="card"><p class="muted" style="margin:0">還沒有留下任何畫面。</p></div>`+today;
+ let i=0;return weeks.map(({w,ph,ee})=>{const d0=(w-1)*7+1,d1=Math.min(S.day,w*7);const evH=ee.length?`<div class="story-ev">${ee.map(e=>`<div><img alt="" src="${iconURL(e.ic||'star')}"><span class="when">DAY ${e.day}</span><span>${e.t}</span></div>`).join('')}</div>`:'';
+  return`<div class="story-week"><div class="jt story-h">第 ${w} 週 <span class="muted">DAY ${d0}–${d1}${w===wk?' · 這一週':''}</span></div>${evH}${ph.length?`<div class="album">${ph.map(p=>albumFigure(p,i++)).join('')}</div>`:''}</div>`}).join('')+today}
 function albumFigure(p,i){return`<figure class="polaroid ${p.keep?'keep':''}" style="--r:${((i%3)-1)*1.5}deg" data-act="photo" data-k="${p.id}"><img alt="" data-pid="${p.id}" src="${photoSrc(p)}"><figcaption><span class="when">DAY ${p.day}${p.clock?' · '+p.clock:''}</span><b>「${p.cap}」</b>${p.txt?`<span class="txt">${p.txt}</span>`:''}</figcaption>${p.keep?'<span class="pin">珍藏</span>':''}</figure>`}
 function showBook(){sub='book';let body='';
  if(bookTab==='front'){const rv=S.reviews.slice(-2).reverse();const notes=(S.notes||[]).slice(0,3);const A=albumList().slice(-2).reverse();const met=REGS.filter(r=>(S.regulars[r.id]||0)>0).length;const nAch=Object.keys(S.achievements).length;
@@ -4306,8 +4408,8 @@ function showBook(){sub='book';let body='';
    <div class="jsec"><div class="jt">成就 ${nAch} / ${ACH.length} <button class="jmore" data-act="btab" data-k="ach">全部 ›</button></div><div class="achrow">${ACH.filter(a=>S.achievements[a.id]).slice(-4).map(a=>`<span><img alt="" src="${iconURL(a.ic)}">${a.n}</span>`).join('')||'<span class="muted">還沒有成就。</span>'}</div></div>`}
  if(bookTab==='reviews'){const rv=S.reviews.slice().reverse();body=`<div class="bigrate"><b>${rating().toFixed(1)}</b><div><div class="sum-stars">${starsHTML(Math.round(rating()*2)/2)}</div><div class="muted" style="font-size:12px">${S.reviews.length} 則評論 · 最近 40 則計入評分</div></div></div>${reviewDigestHTML()}<div class="card" style="margin-top:12px">${rv.length?rv.slice(0,30).map(r=>`<div class="review"><div class="rs">${starsHTML(r.s)}</div><p>「${r.txt}」</p><small>${r.critic?'神秘美食評論家':r.name} · DAY ${r.day}</small></div>`).join(''):'<p class="muted">還沒有評論。開店吧！</p>'}</div>`}
  if(bookTab==='regulars'){body=`<p class="muted" style="font-size:12.5px;margin:0 0 8px">來過兩次會開始眼熟，4 次成為熟客，12 次成為 Jill 的老客人。回頭客累計：${S.returning} / 100</p><div class="card">`+REGS.map(r=>{const v=S.regulars[r.id]||0;const tier=regTier(v);const met=v>0;const nt=met?notesFor(r.id,2):[];const m=met?regMem(r.id):null;const ut=met?usualTable(r.id):null;const ud=met?(()=>{let b=null,bn=2;for(const k in m.orders)if(m.orders[k]>bn){bn=m.orders[k];b=k}return b})():null;const habits=met?[ut!=null?`老位子 T${ut+1}`:'',ud?`常點${dishName(ud)}`:''].filter(Boolean):[];const card=met?`<span class="jcard" title="Jill's Card：每來五次請一次">${Array.from({length:5},(_,i)=>`<i class="${i<(v%5||(v?5:0))?'on':''}"></i>`).join('')}</span>`:'';
-   return`<div class="reg ${met?'':'unknown'}"><img alt="" src="${portraitURL(r.looks,'reg'+r.id)}"><div><b>${met?r.n:'？？？'}</b> ${met?`<span class="tier t${Math.floor(tier)}">${TIER_N[tier]}</span>`:''}</div><p>${met?`${r.who}<br>來店 ${v} 次 ${card}${habits.length?'・'+habits.join('・'):''}・「${r.l[Math.floor(tier)]}」`:`第 ${r.day} 天後可能會出現。`}</p>${met&&m.facts.length?`<div class="facts">${m.facts.slice(0,4).map(f=>`<div class="note"><span>${f.txt}</span><small>DAY ${f.day}</small></div>`).join('')}</div>`:''}${nt.length?`<div class="notes">${nt.map(n=>`<div class="note"><span>「${n.txt}」</span><small>DAY ${n.day}</small></div>`).join('')}</div>`:''}</div>`}).join('')
-  +(()=>{const v=S.regulars.dylan||0;if(!v)return'';const rv=S.dylan.stage>=3;const tier=regTier(v);return`<div class="reg"><img alt="" src="${portraitURL(DYLAN.looks,'regdylan')}"><div><b>Dylan</b> <span class="tier ${rv?'t2':'t'+Math.floor(tier)}">${rv?'Jill 的先生':TIER_N[tier]}</span></div><p>${rv?DYLAN.who2:DYLAN.who}<br>來店 ${v} 次${rv?`・DAY ${S.dylan.reveal}`:''}</p></div>`})()+'</div>'}
+   return`<div class="reg ${met?'':'unknown'}">${regFaceHTML(r.id,met,portraitURL(r.looks,'reg'+r.id))}<div><b>${met?r.n:'？？？'}</b> ${met?`<span class="tier t${Math.floor(tier)}">${TIER_N[tier]}</span>`:''}</div><p>${met?`${r.who}<br>來店 ${v} 次 ${card}${habits.length?'・'+habits.join('・'):''}・「${r.l[Math.floor(tier)]}」`:`第 ${r.day} 天後可能會出現。`}</p>${met&&m.facts.length?`<div class="facts">${m.facts.slice(0,4).map(f=>`<div class="note"><span>${f.txt}</span><small>DAY ${f.day}</small></div>`).join('')}</div>`:''}${nt.length?`<div class="notes">${nt.map(n=>`<div class="note"><span>「${n.txt}」</span><small>DAY ${n.day}</small></div>`).join('')}</div>`:''}</div>`}).join('')
+  +(()=>{const v=S.regulars.dylan||0;if(!v)return'';const rv=S.dylan.stage>=3;const tier=regTier(v);return`<div class="reg">${regFaceHTML('dylan',true,portraitURL(DYLAN.looks,'regdylan'))}<div><b>Dylan</b> <span class="tier ${rv?'t2':'t'+Math.floor(tier)}">${rv?'Jill 的先生':TIER_N[tier]}</span></div><p>${rv?DYLAN.who2:DYLAN.who}<br>來店 ${v} 次${rv?`・DAY ${S.dylan.reveal}`:''}</p></div>`})()+'</div>'}
  if(bookTab==='rest'){const nl=LEVELS[S.level];const wages=crewWages();const last=S.lastSummary;
   body=`<div class="jsec" style="margin-top:0;padding-top:0;border-top:0"><div class="jt">評分走勢 <span class="muted" style="font-weight:600;font-size:12px">最近 14 天</span></div>${ratingHistHTML()}
    <p class="muted" style="font-size:12px;margin:8px 0 0">評分＝最近 40 則評論的平均（評論家 ×3、檢查員 ×2）。客人給幾顆星看四件事：料理品質、等了多久、價格合不合理、店裡的氛圍；生氣離開一律一顆星，客滿沒等到的人有時留兩顆星。${nl?`擴建到 ${nl.n} 需要 ${nl.rating.toFixed(1)}。`:'這已經是最大的規模。'}</p></div>
@@ -4316,7 +4418,7 @@ function showBook(){sub='book';let body='';
    <div class="card" style="margin-top:8px"><div class="srow"><b>開業</b><span>${S.stats.days||0} 天・${S.stats.guests||0} 位客人</span></div><div class="srow"><b>累積收入</b><span>${fmt(S.lifetime||0)}</span></div>${last?`<div class="srow"><b>昨天</b><span>營業額 ${fmt(last.rev)}・食材 ${fmt(last.cost)}・薪資 ${fmt(last.wages)}・淨利 ${fmt(last.net)}</span></div>`:''}</div></div>`}
  if(bookTab==='talk'){const L=(S.dayLog||[]);body=`<p class="muted" style="font-size:12.5px;margin:0 0 8px">${S.dayLogDay?`DAY ${S.dayLogDay} 店裡說過的話`:'今天店裡說過的話'}（最近 ${Math.min(90,L.length)} 句）。營業中按左上角的 💬 也看得到。</p><div class="card">${logHTML(L,90)}</div>`}
  if(bookTab==='cats'){body=`<p class="muted" style="font-size:12.5px;margin:0 0 8px">住在店裡的五隻貓。名字可以直接改。</p><div class="card">`+CAT_DEF.map(C=>`<div class="reg"><img alt="" src="${catPortraitURL(C)}"><div><input class="txt" data-cat="${C.id}" maxlength="8" value="${catName(C).replace(/"/g,'&quot;')}" aria-label="貓咪名字" style="padding:6px 10px;width:auto;max-width:130px"> <span class="tier">${C.sex}</span></div><p>${C.who}</p></div>`).join('')+'</div>'}
- if(bookTab==='mem'){const A=albumList().slice().reverse();body=`<p class="muted" style="font-size:12.5px;margin:0 0 10px">店裡的日常，剛好被看到的時候會留下一張。第一次的畫面會珍藏起來，其他的會慢慢換新。</p>`+(A.length?`<div class="album">${A.map(albumFigure).join('')}</div>`:'<div class="card"><p class="muted" style="margin:0">還沒有留下任何畫面。</p></div>')}
+ if(bookTab==='mem'){body=`<p class="muted" style="font-size:12.5px;margin:0 0 10px">店裡的日常，剛好被看到的時候會留下一張。第一次的畫面會珍藏起來，其他的會慢慢換新。</p>`+albumStoryHTML()}
  if(bookTab==='ach'){const n=ACH.filter(a=>S.achievements[a.id]).length;const groups=[['早期',a=>!a.h&&(a.p||0)===0],['中期',a=>!a.h&&a.p===1],['成熟的餐廳',a=>!a.h&&a.p===2],['自己發生的事',a=>a.h]];
   body=`<p class="muted" style="font-size:12.5px;margin:0 0 8px">${n} / ${ACH.length} 已解鎖。有些成就不會先告訴你是什麼。</p>`+groups.map(([title,f])=>{const list=ACH.filter(f);if(!list.length)return'';const got=list.filter(a=>S.achievements[a.id]).length;return`<div class="jt" style="margin-top:12px">${title} <span class="muted" style="font-weight:600;font-size:12px">${got}/${list.length}</span></div><div class="card">`+list.map(a=>{const g0=S.achievements[a.id];const veil=a.h&&!g0;return`<div class="ach ${g0?'':'off'}"><img alt="" src="${iconURL(veil?'moon':a.ic)}"><b>${veil?'？？？':a.n}</b><small>${veil?'……':a.d}${g0?` · DAY ${g0}`:''}</small></div>`}).join('')+'</div>'}).join('')}
  if(bookTab==='mastery'){body=`<p class="muted" style="font-size:12.5px;margin:0 0 8px">Jill 越常做一道菜，就做得越快，Perfect 判定也越寬。</p><div class="card">`+S.unlocked.concat(S.signature?['signature']:[]).map(d=>{const x=S.xp[d]||0,lv=mLv(d);const cur=XP_T[lv-1],nx=XP_T[lv]||cur;const pct=lv>=5?100:(x-cur)/(nx-cur)*100;return`<div class="mast"><img alt="" src="${dishURL(d,'P')}"><b style="font-size:13.5px">${DISH(d).n}</b><span class="tier ${lv>=5?'t2':lv>=3?'t1':''}">LV${lv}</span><div class="bar" style="grid-column:2"><i style="width:${pct}%"></i></div><small class="muted">${DISH(d).steps.length} 步驟</small></div>`}).join('')+'</div>'}
@@ -4380,7 +4482,7 @@ function doAct0(a,d,k,b){
  case'buyGear':{const G=CATGEAR.find(x=>x.k===k);if(!G||gearOn(G.k)||S.money<G.cost||(G.need&&!projOn(G.need))||S.level<(G.lv||1))break;S.money-=G.cost;S.gear[G.k]=S.day;sfx.buy();toast(`${G.n}：擺好了。看牠們什麼時候發現。`);if(CATGEAR.every(x=>gearOn(x.k)))ach('catgear');save();IDLE=null;bg=null;for(const kk in BGC)delete BGC[kk];keepScroll(showShop);shopAfterBuy();break}
  case'revealPeek':{const P=ALL_PROJECTS().find(x=>x.k===k);hideReveal();if(P){room=P.room;forceDraw=true;screenEl.hidden=true;$('#peekPill').hidden=false;banner(P.n,P.done,'gold')}break}
  case'revealClose':hideReveal();showShop();shopAfterBuy();break;
- case'expand':{const nl=LEVELS[S.level];if(nl&&S.money>=nl.cost){S.money-=nl.cost;S.level++;if(S.level===2)ach('bistro');sfx.buy();banner(LV().n,'擴建完成！');if(S.level===5)ach('jill');S.newRoom=S.day;save();bg=null;showShop();shopAfterBuy();scene([{who:'jill',tone:'cheerful',text:S.level===5?'招牌上只剩一個名字了。就這樣，不會再大了——但可以更好。':S.level===2?'店變大了一點。多兩張桌子，多幾道菜。':S.level===3?'牆換了、地板換了。客人會更講究一點，我也是。':'這下真的像一間餐廳了。'}])}break}
+ case'expand':{const nl=LEVELS[S.level];if(nl&&S.money>=nl.cost){S.money-=nl.cost;S.level++;if(S.level===2)ach('bistro');sfx.buy();banner(LV().n,'擴建完成！');if(S.level===5)ach('jill');S.newRoom=S.day;S.grewDay=S.day;save();bg=null;showShop();shopAfterBuy();scene([{who:'jill',tone:'cheerful',text:S.level===5?'招牌上只剩一個名字了。就這樣，不會再大了——但可以更好。':S.level===2?'店變大了一點。多兩張桌子，多幾道菜。':S.level===3?'牆換了、地板換了。客人會更講究一點，我也是。':'這下真的像一間餐廳了。'}])}break}
  case'buyEq':{const lv=S.eq[k]||0;const E=EQUIP.find(x=>x.k===k);const c=E.cost[lv];if(lv<5&&S.money>=c){S.money-=c;S.eq[k]=lv+1;sfx.buy();toast(`${E.n} ${lv?'升級':'購買'}完成：LV${lv+1}`);save();IDLE=null;layoutAll();keepScroll(showShop);shopAfterBuy()}break}
  case'rdSpecial':{const sp=SPECIALS[d];if(!sp||S.unlocked.includes(sp.id)||mLv(d)<3||S.money<sp.rd)break;S.money-=sp.rd;unlockDish(sp.id);S.stock[sp.id]=S.stock[sp.id]||0;sfx.buy();toast(`研發成功：${sp.n}！${S.menu.includes(sp.id)?'已加入菜單':'菜單已滿，記得在開店前調整'}`);ach('special');if(Object.keys(SPECIALS).filter(b=>S.unlocked.includes(SPECIALS[b].id)).length>=4)ach('specials4');save();keepScroll(showShop);shopAfterBuy();break}
  case'rd':{const D=DISHES[d];if(S.money>=D.rd){S.money-=D.rd;unlockDish(d);sfx.buy();toast(`研發成功：${D.n}！${S.menu.includes(d)?'已加入菜單':'菜單已滿，記得在開店前調整'}`);save();keepScroll(showShop);shopAfterBuy()}break}

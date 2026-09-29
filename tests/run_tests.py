@@ -1659,7 +1659,7 @@ def regulars_have_lives_v182(b, port, target):
     check(any('橘子' in f for f in st['facts']), f'the journal remembers: {st}')
     check(st['album'] >= 1, f'the album kept the moment: {st}')
     # the usual order: three past orders of the same dish -> shorter reading, 老樣子
-    g.ev(r"""(()=>{regMem('wang').orders={pasta:4};const o={t:R.t,type:'couple',reg:'wang',size:2};spawn(o);const g=R.groups[R.groups.length-1];const t=R.tables[1];seatGroup(g,t);window.__wg=g})()""")
+    g.ev(r"""(()=>{regMem('wang').orders={pasta:4};const o=regPlanVisit({t:R.t,type:'couple',reg:'wang',size:1});o.moment=null;o.regs=['wang','wangwife'];o.size=2;o.looks=REG_BY.wang.looks.concat(REG_BY.wangwife.looks);o.name=pairName(o.regs);spawn(o);const g=R.groups[R.groups.length-1];const t=R.tables[1];seatGroup(g,t);window.__wg=g})()""")
     check(g.ev("__wg.usual==='pasta'") or g.ev("__wg.usual==null"), 'usual order is a coin flip, but never a wrong dish')
     # companions come back with the same face
     lk = g.ev("(()=>{const a=compLooks('mia','coworker',1)[0];const b=compLooks('mia','coworker',1)[0];return a===b})()")
@@ -1988,7 +1988,8 @@ def mature_save_loads_into_2_0(b, port, target):
     g = Game(b, port, target, seed=25, manual=True)
     before = json.loads(mature(g))
     after = json.loads(g.ev("JSON.stringify({money:S.money,level:S.level,dishes:S.unlocked.length,crew:S.crew.length,regs:Object.keys(S.regulars).length,ach:Object.keys(S.achievements).length,album:(S.album||[]).length})"))
-    check(before == after, f'the mature save lost something: {before} -> {after}')
+    exp = dict(before); exp['regs'] = before['regs'] + 1   # v2.2: the old couple record 'wang' becomes 王先生 and 王太太
+    check(exp == after and g.ev("S.regulars.wangwife===S.regulars.wang"), f'the mature save lost something: {before} -> {after}')
     check(g.ev("!!S.rooms && !!S.ext && !!S.gear && !!S.gearUse && S.sideTables===0 && S.frontTables===0"), 'the 2.0 fields were not filled in')
     check(g.ev("JSON.stringify(roomsOpen())") == '["front","main","kitchen"]', 'a pre-2.0 save should open the street, the dining room and the kitchen')
     check(g.ev("S.dylan.stage===3 && DYLAN.who2.includes('結婚')"), 'the Dylan reveal and the journal line were lost')
@@ -2910,15 +2911,22 @@ def u_v_world_memory_and_regulars_speak_with_their_faces(b, port, target):
     check(not g.ev("worldMemoryLine(__rq,true)"), 'one memory a day')
     g.ev("S.worldMemDay=0"); rest = json.loads(g.ev("JSON.stringify(worldMemCands(__rq).map(M=>M.k))"))
     check(k[0] not in rest and len(rest) == 1, f'the memory that was said is spent, the other remains: {rest}')
-    # the Wang couple: a line meant for 王太太 shows her face; one meant for both shows 王先生
-    g.ev("S.worldMem={};S.worldMemDay=0;S.records.rain=null;S.newRooms.side=0;S.newRooms.ceiling=S.day-5;$('#plines').innerHTML=''")
-    g.ev(SEAT % (1, 'wang', 'wang', 'wang'))
+    # 王先生 and 王太太 at one table: two people, two records; a memory only she has is said by her, with him beside her
+    g.ev("S.regulars.wangwife=Math.max(S.regulars.wangwife||0,6);S.worldMem={};S.worldMemDay=0;S.records.rain=null;S.newRooms.side=0;S.newRooms.ceiling=S.day-5;$('#plines').innerHTML=''")
+    g.ev(r"""(()=>{const t=R.tables[1];if(t.group){R.groups=R.groups.filter(q=>q!==t.group)}t.group=null;t.dirty=false;const q={id:R.gid++,type:'couple',reg:'wang',regs:['wang','wangwife'],size:2,looks:REG_BY.wang.looks.concat(REG_BY.wangwife.looks),name:pairName(['wang','wangwife']),state:'queue',table:null,pat:1,room:'main',troom:'main',x:DOOR.x,y:DOOR.y,tx:DOOR.x,ty:DOOR.y,timer:0,ticket:null,seed:1,mood:'ok'};R.groups.push(q);window.__rq=q;return q})()""")
+    check(g.ev("__rq.name") == '王先生與王太太' and json.loads(g.ev("JSON.stringify(regsOf(__rq))")) == ['wang', 'wangwife'], 'the table holds two regulars')
     check(json.loads(g.ev("JSON.stringify(worldMemCands(__rq).map(M=>M.k))")) == ['ceiling'], 'the couple remember the ceiling')
     check(g.ev("worldMemoryLine(__rq,true)"), 'the couple remember'); g.ev("__tick(1500)"); g.page.wait_for_timeout(1600)
-    check(g.ev("$('#plines').textContent.includes('王先生')") or g.ev("$('#plines').textContent.includes('王太太')"), 'one of the two faces speaks')
+    check(g.ev("$('#plines').textContent.includes('王先生')") or g.ev("$('#plines').textContent.includes('王太太')"), 'one of the two speaks')
+    check(g.ev("$('#plines .pline:last-child img').length>0") or g.ev("$('#plines .pline:last-child').querySelectorAll('img').length") == 2, 'both faces on the card (the speaker lit, the other dimmed)')
     g.ev("S.worldMem={};S.worldMemDay=0;S.newRooms.ceiling=0;S.newRooms.glass=S.day-5;$('#plines').innerHTML=''")
     check(g.ev("worldMemoryLine(__rq,true)"), 'the glass memory fires'); g.ev("__tick(1500)"); g.page.wait_for_timeout(1600)
-    check(g.ev("$('#plines').textContent.includes('王太太')"), 'the glass front line is hers (王太太)')
+    check(g.ev("$('#plines .pline:last-child .pl-t b').textContent") == '王太太' and g.ev("regMem('wangwife').facts[0].txt.startsWith('「')") and not g.ev("regMem('wang').facts.some(f=>/玻璃|亮亮/.test(f.txt))"), 'the glass front line is hers, in her own history only')
+    # a line she does not have goes to him only when she is not there
+    g.ev("S.worldMem={};S.worldMemDay=0;S.newRooms.glass=0;S.records.guestsDay={v:80,d:S.day-4};__rq.regs=['wang'];__rq.size=1;$('#plines').innerHTML=''")
+    check(g.ev("worldMemoryLine(__rq,true)"), 'his memory'); g.ev("__tick(1500)"); g.page.wait_for_timeout(1600)
+    check(g.ev("$('#plines .pline:last-child .pl-t b').textContent") == '王先生' and g.ev("$('#plines .pline:last-child').querySelectorAll('img').length") == 1, 'alone: his face only')
+    g.ev("__rq.regs=['wang','wangwife'];__rq.size=2")
     # the seat moment of a regular goes through the same card; a plain guest is still a toast
     g.ev("$('#plines').innerHTML='';$('#toasts').innerHTML='';quote(__rq,'今天也來了。');quote({name:'客人',type:'office'},'好吃。')")
     check(g.ev("$('#plines').querySelectorAll('.pline').length") == 1 and g.ev("$('#toasts').textContent.includes('客人')"), 'regular → card, guest → toast')
@@ -2927,6 +2935,7 @@ def u_v_world_memory_and_regulars_speak_with_their_faces(b, port, target):
     faces = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('.reg')].map(r=>({n:r.querySelector('b').textContent,face:!!r.querySelector('img.face'),unknown:r.classList.contains('unknown')})))"))
     known = [f for f in faces if not f['unknown']]
     check(all(f['face'] for f in known) and any(f['n'] == '陳伯伯' for f in known), f'known regulars show their supplied faces: {known}')
+    check(any(f['n'] == '王先生' for f in known) and any(f['n'] == '王太太' for f in known) and not any('與' in f['n'] for f in faces), f'王先生 and 王太太 are two rows, never one couple row: {[f["n"] for f in faces]}')
     check(all(not f['face'] for f in faces if f['unknown']), 'an unknown regular keeps the silhouette')
     check(any(f['n'] == 'Dylan' and f['face'] for f in faces), 'Dylan has his face in the book')
     # nothing keyed to the day: the memory works from any compatible save day
@@ -3027,6 +3036,111 @@ def x_a_desktop_window_is_used_and_the_mouse_and_keyboard_work(b, port, target):
     g.ev("__tick(200)"); g.page.set_viewport_size({'width': 390, 'height': 844}); g.page.wait_for_timeout(150); g.ev("__tick(200)")
     check(not g.ev("document.documentElement.classList.contains('desk')") and g.ev("$('#app').style.maxWidth") == '' and g.ev("$('#app').getBoundingClientRect().width") == 390, 'a phone-sized window is the phone layout')
     check(g.ev("(()=>{const r=$('#roomTabs').getBoundingClientRect();return Math.abs(r.top-(SV.oy+76*SV.s+$('#sceneWrap').getBoundingClientRect().top))<2})()"), 'the tabs follow the scene scale on the phone too')
+    check(not g.errors, g.errors[:2])
+    g.close()
+
+@test
+def z_regression_rooms_kitchen_construction_and_staff_assignment(b, port, target):
+    """Z. The remaining items of the required regression list, on the mature save: room navigation (tabs, keys, taps on
+    the arch/door, the kitchen band; every room draws; the tab state is one place); kitchen service (staff cook a
+    ticket to the pass and it reaches the table without the player); construction ownership (a project is paid once,
+    owned once, cannot be bought twice, survives a reload, and its room opens); staff assignment (a waiter's duties
+    toggled in the shop are what he does in service, and survive a reload)."""
+    g = Game(b, port, target, seed=48, manual=True)
+    player30(g); fill_fridge(g)
+    # construction ownership
+    g.ev("S.rooms.side=0;S.newRooms.side=0;S.sideTables=0;S.money=200000;save();showShop();shopTab='works';showShop()")
+    m0 = g.ev("S.money"); cost = g.ev("PROJECTS.find(p=>p.k==='side').cost")
+    check(g.ev("!!document.querySelector('[data-act=buyProject][data-k=side]')"), 'the side room is offered in 店舖工程')
+    g.ev("doAct('buyProject',null,'side',null)"); g.ev("__tick(1800)"); g.ev("doAct('revealClose',null,null,null)")
+    check(g.ev("S.money") == m0 - cost and g.ev("S.rooms.side") == 1 and g.ev("S.newRooms.side") == g.ev("S.day"), 'paid once, owned, dated today')
+    g.ev("doAct('buyProject',null,'side',null)"); check(g.ev("S.money") == m0 - cost, 'it cannot be bought twice')
+    g.reload(); check(g.ev("S.rooms.side") == 1 and g.ev("S.money") == m0 - cost and g.ev("roomOpen('side')"), 'ownership survives a reload and the room is open')
+    # staff assignment: the first waiter only seats
+    g.ev("S.crew=S.crew.filter(m=>m.role!=='waiter');S.crew.push({id:'w1',role:'waiter',name:'小茉',lv:3,duty:'both'},{id:'w2',role:'waiter',name:'Kai',lv:3,duty:'both'});save();shopTab='staff';showShop()")
+    check(g.ev("!!document.querySelector('[data-act=dutyT][data-k=w1][data-d=order]')"), 'the duty toggles are on the card')
+    for d in ['order', 'serve', 'check']:
+        g.page.click(f'[data-act=dutyT][data-k=w1][data-d={d}]'); g.page.wait_for_timeout(60)
+    d = json.loads(g.ev("JSON.stringify(waiterDuties(S.crew.find(m=>m.id==='w1')))"))
+    check(d['seat'] and not d['order'] and not d['serve'] and not d['check'], f'小茉 now only seats: {d}')
+    g.reload(); d2 = json.loads(g.ev("JSON.stringify(waiterDuties(S.crew.find(m=>m.id==='w1')))")); check(d2 == d, 'the assignment survives a reload')
+    # service: rooms + kitchen + the assignment in action (no player at all)
+    g.ev("showPrep()"); fill_fridge(g); start_day(g); install_bot(g); g.ev("window.__act=()=>{}")
+    check(json.loads(g.ev("JSON.stringify(roomsOpen())")) == ['front', 'main', 'side', 'kitchen'], 'four rooms open')
+    for k in ['side', 'kitchen', 'front', 'main']:
+        g.ev(f"setRoom('{k}')"); g.ev("__tick(120)")
+        check(g.ev("room") == k and g.ev("$('#roomTabs button.on').dataset.room||$('#roomTabs button.on').textContent.length>0"), f'room {k} is current and its tab is lit')
+        px = json.loads(g.ev("(()=>{const c=sc.getContext('2d');const p=c.getImageData(Math.round(sc.width/2),Math.round(sc.height*.5),1,1).data;return JSON.stringify([...p].slice(0,3))})()"))
+        check(px != [30, 23, 20], f'room {k} draws something at its centre: {px}')
+    g.page.keyboard.press('ArrowRight'); g.page.wait_for_timeout(30); check(g.ev("room") == 'side', '→ goes to the next room')
+    g.page.keyboard.press('1'); g.page.wait_for_timeout(30); check(g.ev("room") == 'front', '1 is the first room')
+    g.ev("setRoom('main')")
+    # a tap on the side arch enters the side room; a tap on the kitchen band enters the kitchen
+    arch = json.loads(g.ev("(()=>{const r=sc.getBoundingClientRect();const p={x:SIDE_ARCH.x+SIDE_ARCH.w/2,y:SIDE_ARCH.y+40};return JSON.stringify([r.left+SV.ox+p.x*SV.s,r.top+SV.oy+p.y*SV.s,r.left+SV.ox+200*SV.s,r.top+SV.oy+(FB+12)*SV.s])})()"))
+    g.page.mouse.click(arch[0], arch[1]); g.page.wait_for_timeout(50); check(g.ev("room") == 'side', 'a tap on the arch goes to the side room')
+    g.ev("setRoom('main')"); g.page.mouse.click(arch[2], arch[3]); g.page.wait_for_timeout(50); check(g.ev("room") == 'kitchen', 'a tap on the kitchen band goes to the kitchen')
+    g.ev("setRoom('main')")
+    # the staff run the day: 小茉 seats, Kai orders/serves/checks, the chefs cook to the pass, food reaches tables
+    r = json.loads(g.ev(r"""(()=>{let bad=0;for(let i=0;i<9000&&phase==='service';i++){__tick(1000/30);if(i%10===0){const w=R.cw&&R.cw.w1;if(w&&w.task&&['order','serve','check'].includes(w.task.k))bad++}}const c=R?R.st.crew||{}:{};const q=R?R.st.q:{};return JSON.stringify({bad,crew:c,plates:q.P+q.G+q.O+q.B,guests:R?R.st.guests:-1,rev:R?R.st.rev:-1,phase})})()"""))
+    check(r['phase'] == 'service' and r['guests'] > 0 and r['plates'] > 0 and r['rev'] > 0, f'the kitchen and the floor ran without the player: {r}')
+    check(r['crew'].get('w1', {}).get('seat', 0) > 0, f'小茉 seats: {r["crew"]}')
+    check(r['bad'] == 0 and not any(k in r['crew'].get('w1', {}) for k in ['order', 'serve', 'check']) and any(k in r['crew'].get('w2', {}) for k in ['order', 'serve', 'check']), f'小茉 never takes an order, a plate or a bill; Kai does: {r["crew"]}')
+    check(g.ev("(R.log||[]).length") >= 0 and not g.errors, g.errors[:2])
+    g.close()
+
+@test
+def wangs_are_two_people_who_usually_come_together(b, port, target):
+    """王先生 and 王太太 are two characters — two records, two faces, two histories, two speakers, two sprites — who
+    usually come together to one table (one bill) and sometimes come alone. Never one combined couple NPC: the
+    visit counts, memories, notes, name tags, the tap card and the book rows are per person; a couple line shows
+    both faces with the speaker lit; an old save's single 'wang' record becomes the two of them once."""
+    g = Game(b, port, target, seed=49, manual=True)
+    # the records
+    check(g.ev("REG_BY.wang.n") == '王先生' and g.ev("REG_BY.wangwife.n") == '王太太' and g.ev("REG_BY.wang.pair") == 'wangwife' and g.ev("REG_BY.wangwife.pair") == 'wang', 'two records, paired')
+    check(g.ev("REG_BY.wang.looks.length") == 1 and g.ev("REG_BY.wangwife.looks.length") == 1 and g.ev("JSON.stringify(REG_BY.wang.looks[0])") != g.ev("JSON.stringify(REG_BY.wangwife.looks[0])"), 'two sprites')
+    check(g.ev("portraitOf('wang').src") != g.ev("portraitOf('wangwife').src") and g.ev("portraitOf('wang').name") == '王先生' and g.ev("portraitOf('wangwife').name") == '王太太', 'two faces')
+    # an old save: one couple record → the two of them, once
+    g.ev("S.day=20;S.regulars={wang:7,chen:3};S.regMem={wang:{seats:{2:5},orders:{steak:4},facts:[{day:12,txt:'王先生一個人來過。'},{day:14,txt:'結婚紀念日是在這裡過的。'},{day:15,txt:'王太太一個人來過。'}],flags:{anniv:1},last:{}}};S.catFam={wang:5};delete S.wangMig;save()")
+    g.reload()
+    check(g.ev("S.regulars.wangwife") == 7 and g.ev("S.regulars.wang") == 7 and g.ev("S.wangMig") == 1, 'she gets the shared history once')
+    check(json.loads(g.ev("JSON.stringify(S.regMem.wangwife.facts.map(f=>f.txt))")) == ['結婚紀念日是在這裡過的。', '王太太一個人來過。'] and json.loads(g.ev("JSON.stringify(S.regMem.wang.facts.map(f=>f.txt))")) == ['王先生一個人來過。', '結婚紀念日是在這裡過的。'], 'the solo visits stay with the right person')
+    g.ev("S.regulars.wangwife=9;save()"); g.reload(); check(g.ev("S.regulars.wangwife") == 9, 'the migration runs once, never again')
+    g.ev("S.day=30;S.regulars={wang:7,wangwife:7};S.regMem={};S.notes=[];S.money=50000;S.phase='prep';save();showPrep()"); fill_fridge(g); start_day(g); install_bot(g); g.ev("window.__act=()=>{}"); g.page.evaluate('()=>window.__play(3,0)')
+    # planning: she comes with him, never scheduled on her own; sometimes one of them alone
+    r = json.loads(g.ev(r"""(()=>{const day=S.day;let both=0,alone={wang:0,wangwife:0},wifeSched=0,names=new Set();for(let d=0;d<240;d++){S.day=20+d;S.regDay=null;regMem('wang').last={};const o=regPlanVisit({t:100,type:'couple',reg:'wang',size:1});names.add(o.name);if(o.regs.length===2&&o.regs[0]==='wang'&&o.regs[1]==='wangwife'&&o.size===2&&o.looks.length===2)both++;else if(o.regs.length===1&&o.size===1&&o.looks.length===1){alone[o.regs[0]]++;if(o.reg!==o.regs[0]||o.name!==REG_BY[o.regs[0]].n)alone.bad=1}else alone.bad=1}
+      for(let d=0;d<40;d++){S.day=20+d;S.regDay=null;const sc=buildSchedule(600);if(sc.some(x=>x.reg==='wangwife'))wifeSched++}S.day=day;S.regDay=null;S.regMem={};return JSON.stringify({both,alone,wifeSched,names:[...names]})})()"""))
+    check(r['both'] > 150 and r['alone']['wang'] > 0 and r['alone']['wangwife'] > 0 and not r['alone'].get('bad'), f'together most days, each alone sometimes: {r}')
+    check(r['wifeSched'] == 0 and set(r['names']) <= {'王先生與王太太', '王先生', '王太太'}, f'she is never scheduled on her own; the names are people: {r}')
+    # a visit together: one table, two people counted, each their own memory, two name tags, two speakers
+    g.ev(r"""(()=>{for(const q of R.groups.slice())leaveGroup(q,'ok');const o=regPlanVisit({t:R.t,type:'couple',reg:'wang',size:1});o.moment=null;o.regs=['wang','wangwife'];o.size=2;o.looks=REG_BY.wang.looks.concat(REG_BY.wangwife.looks);o.name=pairName(o.regs);spawn(o);const q=R.groups[R.groups.length-1];const t=R.tables[0];t.group=null;t.dirty=false;seatGroup(q,t);q.state='order';q.x=t.x;q.y=t.y+8;window.__wq=q;$('#plines').innerHTML='';R.log=[]})()""")
+    check(g.ev("__wq.size") == 2 and g.ev("regMem('wang').seats[0]") == 1 and g.ev("regMem('wangwife').seats[0]") == 1, 'both remember the table')
+    g.ev("createTicket(__wq)"); g.ev("__tick(100)")
+    items = json.loads(g.ev("JSON.stringify(__wq.ticket.items.map(i=>i.d))"))
+    om = json.loads(g.ev("JSON.stringify([Object.keys(regMem('wang').orders),Object.keys(regMem('wangwife').orders)])"))
+    check(len(om[0]) >= 1 and len(om[1]) >= 1, f'each person remembers their own order: {om} from {items}')
+    tags = json.loads(g.ev("JSON.stringify([floorTag(__wq,0),floorTag(__wq,1),floorTag(__wq,2)])"))
+    check(tags == ['王先生', '王太太', None], f'two name tags on the floor, one per person: {tags}')
+    g.ev("S.regulars.dylan=Math.max(S.regulars.dylan||0,3);spawn({type:'regular',reg:'dylan',size:1});window.__dq=R.groups[R.groups.length-1]")
+    check(g.ev("floorTag(__dq,0)") is None, 'Dylan has no permanent name label')
+    g.ev("quote(__dq,'今天人很多。')"); check(g.ev("floorTag(__dq,0)") == 'Dylan', 'his name shows for a moment when he speaks')
+    g.ev("__dq.tagT=0;leaveGroup(__dq,'ok')")
+    # speakers: a line by her shows her face with him beside; the log names her
+    g.ev("quote(__wq,'甜點我來點。',{who:'wangwife'})")
+    check(g.ev("$('#plines .pline:last-child .pl-t b').textContent") == '王太太' and g.ev("$('#plines .pline:last-child').querySelectorAll('img').length") == 2 and g.ev("R.log[R.log.length-1].w") == '王太太', 'she speaks with her face, he is beside her')
+    g.ev("quote(__wq,'她點的。',{who:'wang'})"); check(g.ev("R.log[R.log.length-1].w") == '王先生', 'he speaks as himself')
+    # the tap card: the person tapped
+    hit = json.loads(g.ev("(()=>{const t=R.tables[0];const sps=seatPos(t);const a=hitRegular({x:t.x+sps[0].dx,y:t.y+sps[0].dy-20});const ka=a&&a.hitWho;const b=hitRegular({x:t.x+sps[1].dx,y:t.y+sps[1].dy-20});return JSON.stringify([ka,b&&b.hitWho])})()"))
+    check(hit == [0, 1], f'a tap lands on the person, not the couple: {hit}')
+    g.ev("__wq.hitWho=1;showRegCard(__wq)"); check(g.ev("$('#regcard b').textContent") == '王太太', 'the card is hers')
+    g.ev("__wq.hitWho=0;showRegCard(__wq)"); check(g.ev("$('#regcard b').textContent") == '王先生', 'the card is his')
+    # the bill: both counted; the note has one author
+    g.ev("__wq.state='check';__wq.pat=1;for(const it of __wq.ticket.items)it.st='served';collect(__wq)")
+    check(g.ev("S.regulars.wang") == 8 and g.ev("S.regulars.wangwife") == 8, 'one bill, two visits counted')
+    g.ev("Math.random=()=>0.1;regularNote(__wq)"); note = g.ev("S.notes.length?S.notes[0].reg:null")
+    check(note in ('wang', 'wangwife'), f'a note is written by one of them: {note}')
+    # the book: two rows, two faces, no couple row
+    g.ev("bookTab='regulars';showBook()"); rows = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('.reg b')].map(b=>b.textContent))"))
+    check('王先生' in rows and '王太太' in rows and not any('與' in r for r in rows), f'two rows: {rows}')
     check(not g.errors, g.errors[:2])
     g.close()
 
