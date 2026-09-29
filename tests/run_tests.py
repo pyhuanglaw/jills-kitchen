@@ -3345,6 +3345,54 @@ def workstation_assignment_is_explicit_with_capacities_and_swaps(b, port, target
 
 DUTY = {'stove': '爐台', 'oven': '烤箱', 'prep': '冷盤台', 'bar': '咖啡吧'}
 
+@test
+def album_has_two_entries_history_from_the_start_and_todays_photos_from_the_summary(b, port, target):
+    """v2.2.1 #4 (real device: 看最新相片 opened at Day 1 and needed a scroll through the whole album). The journal's
+    相簿 tab reads from the beginning; the summary's button lands on the newest photo, in view, on a phone."""
+    g = Game(b, port, target, seed=3, manual=True, viewport={'width': 390, 'height': 844})
+    player30(g)
+    n = g.ev("albumList().length"); check(n >= 30, f'the Day 30 save has a full album ({n})')
+    # normal entry: the top
+    g.ev("bookTab='mem';showBook()"); g.page.wait_for_timeout(80)
+    check(g.ev("document.querySelector('.sheet').scrollTop") == 0, 'the journal entry starts at the beginning')
+    first = g.ev("document.querySelector('.story-week .jt').textContent")
+    check(first.startswith('第 1 週'), f'the first week is first: {first}')
+    # the summary's button: the newest photo in view
+    g.ev("closeSub();doAct('album')"); g.page.wait_for_timeout(120)
+    r = json.loads(g.ev("JSON.stringify((()=>{const A=albumList();const last=A.reduce((a,p)=>p.day>a.day?p:a,A[0]);const el=document.querySelector(`.polaroid[data-k=\"${last.id}\"]`);const b=el.getBoundingClientRect();return {day:last.day,top:b.top,bottom:b.bottom,h:innerHeight,scroll:document.querySelector('.sheet').scrollTop}})())"))
+    check(r['scroll'] > 200, f'the sheet scrolled to the latest photos: {r}')
+    check(0 <= r['top'] and r['bottom'] <= r['h'], f'the newest photo (DAY {r["day"]}) is on screen: {r}')
+    g.close()
+
+@test
+def weather_dish_replaces_a_chosen_dish_when_the_menu_is_full(b, port, target):
+    """v2.2.1 #5 (real device: a full menu sent the player to scroll, remove, come back). Tapping a weather dish on a
+    full menu opens a chooser of the current dishes (least expected sales first); picking one swaps it out in one flow;
+    the cap holds, no duplicate, nothing replaced without the player's pick, cancel leaves the menu as it was."""
+    g = Game(b, port, target, seed=8, manual=True, viewport={'width': 390, 'height': 844})
+    player30(g)
+    # a weather with an off-menu suggestion, and a full menu
+    g.ev("S.today.weather='cool';S.today.sugKey=null;S.menu=S.menu.filter(d=>d!=='soup');(()=>{const cap=menuCap();for(const d of S.unlocked){if(S.menu.filter(x=>S.unlocked.includes(x)).length>=cap)break;if(!S.menu.includes(d)&&d!=='soup')S.menu.push(d)}})();showPrep()"); g.page.wait_for_timeout(80)
+    off = json.loads(g.ev("JSON.stringify(wxOffMenu())"))
+    check('soup' in off, f'the cool day suggests the soup, off the menu: {off}')
+    n0 = g.ev("S.menu.filter(x=>S.unlocked.includes(x)).length"); cap = g.ev("menuCap()")
+    check(n0 >= cap, f'the fixture menu is full: {n0}/{cap}')
+    check(not g.ev("document.querySelector('.wxadd [data-act=menuAdd][data-d=soup]').disabled"), 'the weather button is not disabled on a full menu')
+    g.click('.wxadd [data-act=menuAdd][data-d=soup]'); g.page.wait_for_timeout(80)
+    rows = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('.mswap .ms-row')].map(r=>({d:r.dataset.d,txt:r.textContent})))"))
+    check(len(rows) == n0 and all('預估' in r['txt'] for r in rows), f'the chooser lists every current dish with its expected sales: {len(rows)}')
+    check(g.ev("S.menu.includes('soup')") is False, 'nothing replaced before the player picks')
+    g.click('[data-act=menuSwapNo]'); g.page.wait_for_timeout(60)
+    check(g.ev("!document.querySelector('.mswap')") and g.ev("S.menu.length") == n0, 'cancel leaves the menu as it was')
+    g.click('.wxadd [data-act=menuAdd][data-d=soup]'); g.page.wait_for_timeout(60)
+    out = rows[0]['d']
+    g.click(f".mswap [data-act=menuSwapDo][data-d='{out}']"); g.page.wait_for_timeout(80)
+    menu = json.loads(g.ev("JSON.stringify(S.menu)"))
+    check('soup' in menu and out not in menu, f'the pick swapped {out} for the soup: {menu}')
+    check(len(set(menu)) == len(menu) and g.ev("S.menu.filter(x=>S.unlocked.includes(x)).length") == n0, 'no duplicate, the cap holds')
+    check(g.ev("!document.querySelector('.mswap')") and g.ev("!!document.querySelector('.menu-row [data-act=toggle][data-d=soup]')"), 'the chooser closed and the soup is on the menu list')
+    g.close()
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--target', choices=['index', 'single'], default='index')
