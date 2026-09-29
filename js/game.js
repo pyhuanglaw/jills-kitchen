@@ -902,7 +902,7 @@ function startService(){lifeReset();streetReset();dylanStageCheck();bg=null;last
   st:{rev:0,tips:0,guests:0,groups:0,perfect:0,q:{P:0,G:0,O:0,B:0},sats:[],dish:{},angry:0,lost:0,reviews:[],critic:null,blogger:null,treats:0},
   rush:feat().rush,rushT0:dur*120/270,rushT1:dur*180/270,rushShown:false,weather:T.weather,event:T.event,coach:(S.day===1&&!S.tut)?0:-1,taskDone:{},lastSpawn:0,idleT:0,focus:0,focusLock:0,holdSlot:null,inc:planIncidents(dur),cw:{},thief:null,insp:null,chaser:null};
  R.sched=buildSchedule(dur);R.log=[];logNew=0;phase='service';paused=false;room='main';hideScreen();layoutAll();renderTickets();renderTasks();hud(true);logChip();stockChip();renderRoomTabs(true);
- if(S.reveal&&S.reveal.day<S.day){const P=PROJECTS.find(x=>x.k===S.reveal.k);S.reveal=null;if(P){setTimeout(()=>{if(R&&phase==='service'){jillSay(P.k==='side'?'今天側廳也開放了。':P.k==='terrace'?'外面的桌子也可以坐。':P.k==='kext'?'廚房變大了，今天可以多做一點。':P.k==='cooler'?'冷藏庫今天開始用。':'出菜口變寬了。');logLine('jill',P.n+'：第一天。')}},2500)}}
+ if(S.reveal&&S.reveal.day<S.day){const P=PROJECTS.find(x=>x.k===S.reveal.k);S.reveal=null;if(P){setTimeout(()=>{if(R&&phase==='service'){jillSay(P.k==='side'?'今天側廳也開放了。':P.k==='terrace'?'外面的桌子也可以坐。':P.k==='kext'?'廚房變大了，今天可以多做一點。':P.k==='cooler'?'冷藏庫今天開始用。':'出菜口變寬了。');logLine('',P.n+'：第一天。','e')}},2500)}}
  banner("OPEN FOR DINNER",LV().n+' 開始營業','');audioInit();sfx.door();
 }
 function buildSchedule(dur){const T=S.today,n=T.groups,out=[];
@@ -3203,7 +3203,7 @@ const DYLAN_SCENES=[
 ];
 function dylanScene(g){const seen=S.dylan.seen=S.dylan.seen||{};for(const sc of DYLAN_SCENES){if(seen[sc.k])continue;let ok=false;try{ok=sc.when()}catch(e){ok=false}if(!ok)continue;seen[sc.k]=S.day;if(sc.clue)S.dylan.clues[sc.clue]=(S.dylan.clues[sc.clue]||0)+1;
  const L=pick(sc.lines);const say=(i,txt)=>setTimeout(()=>{if(!R||phase!=='service')return;if(sc.note&&txt.startsWith('王太太：')){const wg=R.groups.find(q=>regsOf(q).includes('wangwife')&&q.table!=null);if(wg)quote(wg,txt.slice(4).replace(/^「|」$/g,''),{who:'wangwife',with:'jill'});else noteLine(txt)}else if(i%2===0){if(R.groups.includes(g))quote(g,txt)}else jillSay(txt,{with:'dylan'})},600+i*1500);
- L.forEach((txt,i)=>{if(txt)say(i,txt)});logLine('dylan',L.filter(Boolean).join(' / '),'reg');return true}return false}
+ L.forEach((txt,i)=>{if(txt)say(i,txt)});/* v2.2.1: each line is logged when it is spoken (quote / jillSay / noteLine) — the script itself is not a log entry */return true}return false}
 function dylanAct(g){const st=S.dylan.stage;const pool=st>=3?DYLAN_ACT.after:DYLAN_ACT.before;const line=pick(pool).map(x=>x&&x.replace('{T}',g.table+1));quote(g,line[0]);
  if(line[1])setTimeout(()=>{if(R&&phase==='service')jillSay(line[1],{with:'dylan'})},1500);else setTimeout(()=>{if(R&&phase==='service')noteLine('Jill 看了他一眼，沒有回答。')},1500);
  if(line[2])setTimeout(()=>{if(R&&phase==='service')quote(g,line[2])},3100)}

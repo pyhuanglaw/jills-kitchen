@@ -3159,6 +3159,44 @@ def wangs_are_two_people_who_usually_come_together(b, port, target):
     check(not g.errors, g.errors[:2])
     g.close()
 
+@test
+def speech_log_logs_each_spoken_line_once(b, port, target):
+    """v2.2.1 #20 (Day 33 real-device log): a scripted Dylan/Jill exchange used to be written twice — once per spoken
+    line as it was said, and once more as the whole script joined with ' / ' under the internal id 'dylan' and the
+    kind 'reg' (no CSS → a near-vertical column). Now the log has only the spoken lines, in spoken order, with the
+    player-facing names; no entry carries a raw ' / ' delimiter or an internal id. The first day of a construction
+    project is an event line, not a line said by 'jill'."""
+    g = Game(b, port, target, seed=61, manual=True)
+    player30(g); install_bot(g)
+    g.ev("S.reveal={k:'kext',day:S.day-1};S.rooms.kext=1;S.newRooms.kext=S.day-1")
+    fill_fridge(g); start_day(g); g.ev("window.__act=()=>{}")
+    # seat Dylan at a table, waiting on a ticket, and play the 側廳 scene (the one from the Day 33 log)
+    g.ev(r"""(()=>{for(const t of R.tables){if(t.group){t.group=null}t.dirty=false}R.groups=[];const t=R.tables.find(t=>(t.room||'main')==='main');
+      const q={id:R.gid++,type:'regular',reg:'dylan',regs:['dylan'],size:1,looks:DYLAN.looks.slice(),name:'Dylan',state:'wait',table:t.i,pat:1,room:'main',troom:'main',x:t.x,y:t.y,tx:t.x,ty:t.y,timer:0,ticket:null,seed:1,mood:'ok'};t.group=q;R.groups.push(q);
+      S.dylan.seen={};S.rooms.side=1;S.sideTables=S.sideTables||2;R.log=[];window.__q=q;return 1})()""")
+    ok = g.ev("(()=>{const sc=DYLAN_SCENES.find(s=>s.k==='side');S.dylan.seen={};for(const s of DYLAN_SCENES)if(s.k!=='side')S.dylan.seen[s.k]=1;return dylanScene(window.__q)})()")
+    check(ok, 'the side-hall scene should play')
+    g.ev("(()=>{for(let i=0;i<40;i++)__tick(150)})()")   # the lines are said 1.5 s apart (virtual time)
+    log = json.loads(g.ev("JSON.stringify(R.log)"))
+    check(len(log) >= 3, f'the exchange should be in the log: {log}')
+    for e in log:
+        check(' / ' not in e['t'], f'no raw script delimiter in the log: {e}')
+        check(e['w'] not in ('dylan', 'jill') and e['k'] != 'reg', f'no internal id or kind in the log: {e}')
+    said = [(e['w'], e['t']) for e in log if e['k'] in ('d', 'j')]
+    names = [w for w, _ in said]
+    check(names[0] == 'Dylan' and 'Jill' in names, f'the speakers keep their player-facing names in spoken order: {said}')
+    texts = [t for _, t in said]
+    check(len(texts) == len(set(texts)), f'each line once: {texts}')
+    # the construction first-day note is an event line
+    g.ev("(()=>{for(let i=0;i<20;i++)__tick(150)})()")
+    first = [e for e in log + json.loads(g.ev("JSON.stringify(R.log)")) if '第一天' in e['t']]
+    check(first and all(e['k'] == 'e' and e['w'] == '' for e in first), f'the first-day note is an event, not a line by "jill": {first}')
+    # the row layout: a long line wraps inside a full-width row, never a narrow column
+    g.ev("R.log.push({c:'20:25',w:'Dylan',t:'側廳有位子嗎？你坐哪都一樣。不一樣，那邊看得到妳。側廳有位子嗎？你坐哪都一樣。',k:'d'});$('#logPanel').hidden=false;renderLog()")
+    w = g.ev("(()=>{const r=[...document.querySelectorAll('#logPanel .ll')].find(x=>x.textContent.includes('側廳有位子嗎？你坐哪'));const s=r.querySelector('span').getBoundingClientRect();return [s.width, r.getBoundingClientRect().width]})()")
+    check(w[0] > w[1] * .55, f'the text column takes the row, not a sliver: {w}')
+    g.close()
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--target', choices=['index', 'single'], default='index')
