@@ -496,6 +496,13 @@ input.txt{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(
 /* v2.2 L: the player's 招待 chip on a ticket, and Jill's Card stamps in the regulars' book */
 .tk-treat{position:absolute;right:4px;top:19px;height:16px;padding:0 6px;border:1px solid #C99A45;border-radius:8px;background:rgba(255,250,240,.9);color:#7A5A22;font-size:9.5px;font-weight:800;line-height:14px}
 .tk-treat:active{transform:translateY(1px)}
+/* v2.2.1 I-13: the chip always says where the table stands — offerable (with the uses left), something already on its way,
+   already treated, the day's two used up, nothing in the fridge to give */
+.tk-treat i{display:inline-block;min-width:11px;height:11px;margin-left:3px;border-radius:6px;background:#C99A45;color:#fff;font-size:8px;line-height:11px;text-align:center;font-style:normal;vertical-align:1px}
+span.tk-treat{pointer-events:none;font-weight:700}
+.tk-treat.pending{background:#E6C27A;border-color:#B8862E;color:#2E2019}
+.tk-treat.done{border-color:#CFC3B2;color:#8A7A5A;background:rgba(255,250,240,.6)}
+.tk-treat.spent,.tk-treat.nostock{border-style:dashed;border-color:#CFC3B2;color:#8A7A5A;background:rgba(255,250,240,.5)}
 .jcard{display:inline-flex;gap:2px;vertical-align:middle;margin:0 2px}
 .jcard i{width:7px;height:7px;border-radius:50%;border:1px solid #C99A45;background:transparent}
 .jcard i.on{background:#E6C27A}
