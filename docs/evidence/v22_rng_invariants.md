@@ -63,3 +63,25 @@ log across the day) and `…_after_12d.log` (12 days, the same code): entered 12
 **every** visit he said 2–3 things and Jill answered once or twice; new clue kinds appeared (usual, noticed, knows,
 knows2 — the scenes now play because his line no longer waits for Jill to be idle). Stage stayed 2 throughout: the
 reveal conditions were not touched.
+
+## Final build (after F–X, the two Wangs and Q++), before the goldens were re-recorded a second time
+
+`rng22.py all` on the v2.1 baseline game.js vs the final v2.2 game.js (`scratchpad/rng_final.log`):
+
+- **Cats, prep** (4 seeds × 12,000 updates; v2.1 | v2.2): 樾樾 side .53|.62, rest .14|.11, walk .15|.16; 小齁 side .48|.37,
+  rest .18|.16, sleep .05|.16, walk .18|.18; 包包 sleep .48|.55, bed .29|.22; 柔柔 side .30|.25, rest .23|.21, sleep .18|.17;
+  寶寶 rest .39|.46, sleep .26|.25. Sleepiest: 包包 in both (.77 | .77).
+- **Cats, evening**: 樾樾 side .54|.61; 小齁 side .63|.67; 包包 sleep .84|.75 (bed .06|.06); 柔柔 side .50|.35, sleep .14|.21;
+  寶寶 rest .31|.28, sleep .27|.32. Sleepiest: 包包 in both (.90 | .81). Three cells moved more than .08 (小齁 prep side/sleep,
+  柔柔 evening side) — all within the seed-to-seed spread of a 4-seed mean and the canon holds (包包 sleepiest, 樾樾 at
+  Jill's side most, 寶寶 resting high); the cat AI itself was not touched in v2.2 (the grass pot and the catwalk add
+  places, `gearTick` branches, no weights changed).
+- **Dylan, the 14-evening scenario** (6 seeds): v2.1 revealed 5/6 (evenings 1, —, 1, 6, 0, 2; seed 5 reached stage 2
+  only); v2.2 revealed 6/6 (0, 1, 2, 4, 1, 0). Presence is more regular by design (V+); the reveal gate itself is the
+  same code and the evenings are in the same range.
+- **A cat free to pet** (first 240 fast frames, 3 seeds): v2.1 0–2, v2.2 0–2.
+
+→ `golden_scenario`, `golden_frames` and `cat_personality_fingerprint` re-recorded once on the final build (they are
+digests of a seeded Day 1 and the sequence moved with every feature that draws from it); reviewed: Day 1 guests 17 →
+17, revenue 2040 → 2040, net 2092 → 1997 (tips 464 → 369: the composed reviews and a different treat roll), lost 0 → 0,
+5★ both.

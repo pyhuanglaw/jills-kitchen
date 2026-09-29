@@ -92,20 +92,21 @@ report with this checklist reconciled.
 | Q++ character translation (user feedback, 2026-09-30 00:26 and 00:50) — Jill and Dylan recognizable at phone scale from masses, not detail; Jill the owner-host, not staff | DONE (`sprites_q2_*.png`: the real Day 30 room at 390 wide before/after, 2× strips beside the cleaner and the chefs; test `q_plus_…` updated) | Jill: her own cream linen shirt with the sleeves rolled to the elbow (forearms show — hands-on), khaki trousers, a natural-linen half apron with the cat patch tied with a tan band, the long dark ponytail over her shoulder, the straight fringe, earrings, a bright resting face — the light warm figure in a room of darker clothes; no uniform white, no bib, no black trousers, no toque, no name label anywhere (the kitchen view's 'Jill' tag removed). Dylan: a thick tousled crop with real volume (style 9), strong brows, a long dark-navy cardigan with a collar over a white tee, a watch, a cat mug when seated; his floor name only after a tap or a line. Reserved from guests and crew: style 4 (her tail), style 9, white tops, a white tee under a cardigan, her shirt and trousers. Verified in the Day 30 room with 13 parties and staff on the floor and at the pass beside four chefs |
 | W Album living history | DONE (test `w_the_album_is_a_living_history`) | the 相簿 reads forward: weeks, and inside each the things that happened to the place that week (only from days written when they happened — rooms/projects `S.newRooms`, the expansion `S.grewDay`, the first special `S.firstSpecial`, the record days, the reveal at stage ≥ 3, the regulars' facts; **the achievements' days are deliberately not used** — a save that came through a version update carries the newer achievements dated the day they were granted, e.g. the Day 30 save has 聘請第一位員工 = DAY 27), then that week's photos; the last week is this one and the page ends with 今天 … 還在繼續; the lightbox walks the same order; no memorial framing (asserted); 珍藏 tag brass, not red |
 | X responsive desktop | DONE (test `x_a_desktop_window_is_used_and_the_mouse_and_keyboard_work`; before/after 1440×900 sent) | ≥ 900×560: the column is as wide as the room at that height (`desktopWidth()` = (H − HUD)/424 × (LW + 2·BGM), `html.desk`), so no dark bands and the HUD/tickets/sheets span the room; sheets ≤ 720 px centred, modals ≤ 520; room tabs positioned by scene scale (76 logical px, all sizes); mouse: pointer cursor only over tappable targets (`sceneHot`/`roomHot`, the same targets as the tap); keyboard: Space pause/resume, Escape closes dialogue → lightbox → sheet/pause (or pauses), Enter/Space steps a dialogue, plus the existing 1–4/←→ rooms and [ ] speed; resize mid-service re-lays out (tested 1440 → 1000 → 390); below 900 px the phone layout is untouched; no Steamworks |
-| Y save compatibility with the Day 30 save | PARTIAL | loads and plays on v2.2 (A tests, smoke: two full days at normal speed, $70,588 → $207,375); every later section must keep it — re-checked before the final tag |
-| Z autonomous bug fixing, no silent rebalancing | ONGOING | balance observations collected in the report, none changed |
+| Y save compatibility with the Day 30 save | DONE | loads and plays on the final build: two full days at normal speed on a touch phone (`docs/evidence/v22_smoke_final.log`: $70,588 → $137,304 → $202,841, 1480 money checks / 0 mismatches, no errors, no off-screen modal), checkpoint round trip (`a4b_`), every save fixture (v1.6/1.7/1.8/pre-2.0/Day 30) in the suite; the one migration (`legacyWang`) runs once |
+| Z autonomous bug fixing, no silent rebalancing | DONE | full suite 79/79 on the final build (`v22_suite_final.log`); goldens re-recorded once after the invariants were re-checked on the final build (`v22_rng_invariants.md`, `v22_rng_final.log`); performance before/after (`v22_perf.md`); balance observations in the report §7, none changed |
 
 ## Required regression coverage (24 items)
 
 restock suggestion stability ✔ · atomic restock ✔ · no auto-buy ✔ · money never negative ✔ · service → menu on short
 phone ✔ · journal → album ✔ · money display across screens ✔ · staff grouping ✔ · speed coherence ✔ · rating card ✔ ·
-scroll preservation ✔ · checkpoint round trip ✔ · Day 30 migration (PARTIAL: loads; final re-check pending) · weather
-reco add (pending N) · staff assignment (pending) · set sales (pending M) · review duplicate suppression (pending G) ·
-cat-context review (pending F) · room navigation (pending) · kitchen service (pending) · mobile touch ✔ (touch
-contexts in the harness; `touch_controls`) · desktop resize (pending X) · album persistence ✔ · construction ownership
-(pending).
+scroll preservation ✔ · checkpoint round trip ✔ · Day 30 migration ✔ (loads, plays, checkpoint; the final smoke) ·
+weather reco add ✔ (N) · staff assignment ✔ (z) · set sales ✔ (M) · review duplicate suppression ✔ (G) · cat-context
+review ✔ (F) · room navigation ✔ (z) · kitchen service ✔ (z + the 2.0 kitchen tests) · mobile touch ✔ (touch contexts
+in the harness; `touch_controls`) · desktop resize ✔ (X) · album persistence ✔ · construction ownership ✔ (z). All 24
+covered.
 
 ## Tags
 
 - `v2.1` / `stable-v2.1` = `da79864` (preserved)
 - `v2.2-ux-stable` = `511f237` (2026-09-29)
+- `v2.2` = the final commit (2026-09-30) — see `git tag -l` / the report

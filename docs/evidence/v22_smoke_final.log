@@ -1,0 +1,21 @@
+[23:45:07] START v2.2 smoke — the player's Day 30 save, money=70588 stock=131/180 crew=10 tables=14 speed=1
+[23:45:07]   補滿 for coffee is disabled after 補到建議 (fridge 180/180) — as designed
+[23:45:07] day 1 prep: restock 70588->66811 hud=$66,811 stock=180/180 sug=259B weather=hot event=celebrate expected=68
+[23:45:28]   20s: speed -> 0.75× (hud chip: "17:22 0.75×", R.speed=0.75)
+[23:45:48]   pause menu open: buttons=繼續營業 | 0.75× | 1× | 1.5× | 2× | 設定・存檔・備份 | 小小店主手冊 | 提早打烊（等店裡客人吃完） | 馬上結束今天 offscreen=[]
+[23:45:49]   resumed: paused=False phase=service
+[23:46:23]   61s: speed -> 1× (hud chip: "18:06", R.speed=1)
+[23:47:38]   136s: speed -> 1.5× (hud chip: "19:27 1.5×", R.speed=1.5)
+[23:48:58]   256s: speed -> 1× (hud chip: "21:36", R.speed=1)
+[23:49:36] DAY 1 done (268s real, game clock closed): short=0 soldOutLeft=0 tickets=0 money=137304 hud=$137,304 errors=[]
+[23:49:36]   SUMMARY rev=51440 net=52606 guests=87 lost=5 rating 4.83→4.76 story=[('料理品質', '160 道 Perfect'), ('上菜速度', '客人很少等'), ('店裡氛圍', '+21'), ('請客', '2 次'), ('貓在店裡過日子', '3 桌客人遇到了牠們')] recs=[]
+[23:49:38] day 2 prep: restock 137304->125599 hud=$125,599 stock=180/180 sug=258B weather=rain event=valentine expected=68
+[23:49:59]   20s: speed -> 0.75× (hud chip: "17:22 0.75×", R.speed=0.75)
+[23:50:19]   pause menu open: buttons=繼續營業 | 0.75× | 1× | 1.5× | 2× | 設定・存檔・備份 | 小小店主手冊 | 提早打烊（等店裡客人吃完） | 馬上結束今天 offscreen=[]
+[23:50:19]   resumed: paused=False phase=service
+[23:50:54]   61s: speed -> 1× (hud chip: "18:06", R.speed=1)
+[23:52:09]   136s: speed -> 1.5× (hud chip: "19:27 1.5×", R.speed=1.5)
+[23:53:29]   256s: speed -> 1× (hud chip: "21:36", R.speed=1)
+[23:54:10] DAY 2 done (271s real, game clock closed): short=0 soldOutLeft=4 tickets=0 money=202841 hud=$202,841 errors=[]
+[23:54:10]   SUMMARY rev=55800 net=65537 guests=99 lost=2 rating 4.76→4.78 story=[('料理品質', '182 道 Perfect'), ('上菜速度', '客人很少等'), ('店裡氛圍', '+21')] recs=['guestsDay', 'perfectDay', 'combo']
+[23:54:12] END day=32 money=202841 hud=$202,841 money checks=1480 mismatches=0 stock notices=['巴斯克乳酪蛋糕賣完了。', '拿鐵咖啡賣完了。', '提拉米蘇賣完了。', '松露燉飯賣完了。', '檸檬氣泡水賣完了。', '海鮮義大利麵賣完了。'] offscreen=[] wageOwed=0 errors=[]

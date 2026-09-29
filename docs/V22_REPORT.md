@@ -27,10 +27,17 @@
   their own horizons and effects in the room.
 - **Dining room**: quiet luxury — oatmeal booths on walnut with one brass line, a greige rug, charcoal-and-oatmeal tier-2
   chairs, muted clay pots; art under the sign, plants and lamps inside the phone's view; the old kitchen strip reduced to
-  the bus tub, the bell and the stock board under the heat-lamp rail. Cats on the catwalk and at the grass pot. Jill's
-  sprite corresponds to her portrait (dark straight hair, fringe, ponytail, white double-breasted jacket, brown bib
-  apron; no toque); Dylan's to his (short thick dark hair — a reserved style, navy cardigan over a white tee, a watch).
-  王先生 (glasses, brown jacket over light blue) and 王太太 (brown bob, pink cardigan) are two people at one table.
+  the bus tub, the bell and the stock board under the heat-lamp rail. Cats on the catwalk and at the grass pot.
+- **Jill and Dylan in the world (Q+/Q++)**: a character translation of the portraits into the game's cute language —
+  masses that survive at phone scale. Jill is the owner who cooks and serves, not staff: her own cream linen shirt with
+  the sleeves rolled to the elbow, khaki trousers, a natural-linen half apron with the cat patch, the long dark ponytail
+  over her shoulder, the straight fringe, earrings, a bright face — the light warm figure in a room of darker clothes;
+  no uniform white, no bib, no black trousers, no toque, no name label anywhere. Dylan: a thick tousled crop (a style
+  that is his alone), strong brows, a long dark-navy cardigan over a white tee, a watch, a cat mug when he sits; his
+  floor name shows only for a moment after a tap or a line. Guests and crew never get her tail, his crop, a white top,
+  a white tee under a cardigan, her shirt or her trousers. Verified in the Day 30 room with 13 parties and staff on the
+  floor and at the pass beside four chefs (`docs/evidence/v22_art/sprites_q2_*.png`). 王先生 (glasses, brown jacket
+  over light blue) and 王太太 (brown bob, pink cardigan) are two people at one table.
 - **Storefront**: warm plaster and stone with a brass line, the dining room visible through the windows (a cat on the sill
   inside), stone flags that hold puddles in the rain, light on the pavement at dusk; the glass front is one wide window.
 - **Faces**: the supplied portraits appear at the morning remark, the expansion, the construction card, the quiet
@@ -72,7 +79,7 @@
 
 ## 4. Testing
 - Lint: `npm run lint` — 0 errors.
-- Full suite `python3 tests/run_tests.py` (index.html): __SUITE__.
+- Full suite `python3 tests/run_tests.py` (index.html): **79 passed, 0 failed** on the final build (`docs/evidence/v22_suite_final.log`; 66 at the checkpoint gate, 13 v2.2 tests added after it).
 - New v2.2 tests (in the suite): a1–a5 (+a4b), b, c, d, e, o, f, g, `dylan_is_a_presence_not_a_story_trigger`,
   h_i_k_t, j, l_m_n, q, q_plus, u_v, w, x, `wangs_are_two_people_who_usually_come_together`,
   `z_regression_rooms_kitchen_construction_and_staff_assignment`.
@@ -115,7 +122,7 @@ was measured.
 | J cat tiers + grass | ✔ | j | grass pot, catwalk perches at phone scale |
 | L/M/N hospitality, set sales, weather add | ✔ | l_m_n | 招待 chip, Jill's Card row in the book |
 | P cooking choreography | ✔ | cooking tests | kitchen view |
-| Q portraits / Q+ sprites | ✔ | q, q_plus | scenes, cards, lineup before/after |
+| Q portraits / Q+ Q++ sprites | ✔ | q, q_plus | scenes, cards; the Day 30 room at phone scale before/after (`sprites_q2_room_before_after.png`), beside the cleaner and the chefs |
 | R storefront | ✔ | (street test) | `storefront_before/after.png` |
 | S UI hierarchy | ✔ | (visual) | PERFECT banner |
 | U world memory / V faces | ✔ | u_v | `regulars_faces_and_book.png` |
@@ -142,7 +149,8 @@ say, for a design decision:
   by the evening scenario (`dylan_hidden_reveal`: 6/6 seeds within 14 evenings, evenings 1–11).
 
 ## 8. Deferred / partial / blocked
-- DEFERRED: a permanent Dylan name label (by instruction: his silhouette is his label; a temporary one on tap/line).
+- DEFERRED: a permanent name label for Jill or Dylan (by instruction: the silhouette is the label; Dylan's shows for a
+  moment on a tap or a line; the kitchen view's 'Jill' tag was removed).
 - DEFERRED: achievement days in the album's story (a migrated save dates them the day they were granted — the Day 30
   save has 聘請第一位員工 = DAY 27); the story uses only days written when the thing happened.
 - PARTIAL: the seat-moment lines of the Wangs' shared moments (anniversary, flowers, share) are spoken by the lead
@@ -169,7 +177,8 @@ say, for a design decision:
   **Open question for the author**: the 13-sheet's third figure (mapped to 小林 by the given order) reads as a young
   woman and the fifth (Sophie) as a man in a suit; if the given order was meant differently, swapping two entries in
   `CROPS`/`PORTRAITS` is a one-line change — nothing was inferred from appearance.
-- Jill's world sprite and Dylan's were redesigned to correspond to their portraits (Q+); the Wangs' sprites to theirs (V++).
+- Jill's world sprite and Dylan's were redesigned twice: Q+ (the portrait's clothes, literally — which read as staff
+  at phone scale) and Q++ (the character translation above, per the acceptance feedback); the Wangs' sprites to theirs (V++).
 
 ## 10. Not verified on a real device
 Nothing in this session ran on a phone or a desktop browser with a GPU: the frame costs above are headless software
