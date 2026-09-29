@@ -2419,7 +2419,7 @@ def e_rating_card_is_structured_and_records_are_chips(b, port, target):
     prose — grouped into 加分 / 扣分; several records show as chips, not one sentence."""
     g = Game(b, port, target, seed=38, manual=True)
     player30(g)
-    g.ev("S.lastSummary=Object.assign({},S.lastSummary||{},{day:30,r0:4.45,r1:4.54,rev:9000,cost:3000,tips:800,bonus:0,wages:2000,net:4800,guests:40,lost:19,perfect:20,plated:50,avg:80,top:'pasta',stars:4,tasks:[],reviews:[],sales:[],crew:[],weather:'sun',event:'none',story:ratingStory({q:{P:153},pats:[.9,.9,.8,.9],lost:19,reviews:[{s:2,tags:{left:true}},{s:2,tags:{left:true}},{s:2,tags:{left:true}}],angry:0,short:{},catJoy:0},153),recs:['revDay','guestsDay','perfectDay','combo']});S.phase='shop';showSummary()")
+    g.ev("S.lastSummary=Object.assign({},S.lastSummary||{},{day:30,r0:4.45,r1:4.54,rev:9000,cost:3000,tips:800,bonus:0,wages:2000,net:4800,guests:40,lost:19,perfect:20,plated:50,avg:80,top:'pasta',stars:4,tasks:[],reviews:[],sales:[],crew:[],weather:'sun',event:'none',story:ratingStory({q:{P:153},pats:[.9,.9,.8,.9],lost:19,reviews:[{s:2,tags:['left']},{s:2,tags:['left']},{s:2,tags:['left']}],angry:0,short:{},catJoy:0},153),recs:['revDay','guestsDay','perfectDay','combo']});S.phase='shop';showSummary()")
     g.page.wait_for_timeout(150)
     card = g.ev("(()=>{const c=document.querySelector('.card.rating');return {groups:[...c.querySelectorAll('.rfg')].map(x=>x.querySelector('.rfg-h').textContent),rows:[...c.querySelectorAll('.rf')].map(r=>[r.querySelector('.rf-k').textContent,r.querySelector('.rf-v').textContent,(r.querySelector('.rf-s')||{}).textContent||'']),head:c.querySelector('.rl').textContent,ul:c.querySelectorAll('ul').length}})()")
     check(card['groups'] == ['扣分', '加分'] and card['ul'] == 0, f'the card should have the two groups and no bullet list: {card}')
@@ -2493,6 +2493,83 @@ def a4b_a_mid_service_checkpoint_is_consistent_and_the_day_finishes_after_it(b, 
     check(saved['money'] == m1 and saved.get('checkpoint') is None and saved['lastSummary']['day'] == 30, 'the finished day must be on disk with no checkpoint left')
     g.reload(); g.page.wait_for_timeout(200)
     check(g.ev("S.money") == m1 and g.ev("S.lastSummary.day") == 30 and g.ev("S.phase") in ('summary', 'shop'), 'the reload after the day must return the settled state')
+    check(not g.errors, g.errors)
+    g.close()
+
+# ---------------------------------------------------------------- v2.2 F–G: grounded reviews, no repeats
+FIX_GROUP = r"""(()=>{R.groups=R.groups.filter(q=>q.table!==0);R.tables[0].group=null;const g0={id:R.gid++,type:'%s',size:2,looks:makeLooks('%s',2),name:'測試客',state:'eat',table:0,pat:.9,room:'main',troom:'main',x:200,y:200,tx:200,ty:200,timer:0,ticket:null,seed:1,mood:'ok'};R.groups.push(g0);R.tables[0].group=g0;const tk={id:R.tkid++,no:1,g:g0,items:[{d:'pasta',st:'served',q:'P',want:0}],t0:R.t};g0.ticket=tk;R.tickets.push(tk);window.__g=g0;return 1})()"""
+
+@test
+def f_reviews_name_only_the_cats_the_table_actually_met(b, port, target):
+    """F. A review mentions a cat only when that table met one, names that cat, and says what it was actually doing
+    (asleep, on a perch, walking past, sitting by the table, photographed, a child watching it). A table that met no
+    cat never gets a cat line. Cats are never described as serving or accompanying anyone."""
+    g = Game(b, port, target, seed=41, manual=True)
+    player30(g); start_day(g); install_bot(g); g.ev("window.__act=()=>{}")
+    g.page.evaluate('()=>window.__play(30,0)')
+    names = json.loads(g.ev("JSON.stringify(CAT_DEF.map(C=>catName(C)))"))
+    def reviews(cats, n=40, stars=5):
+        g.ev(FIX_GROUP % ('office', 'office')); g.ev("S.reviews=[]"); g.ev(f"__g.cats={json.dumps(cats)}")
+        return [g.ev(f"(()=>{{const r=addReview(__g,{stars},null,{{}});return JSON.stringify([r.txt,r.tags,r.cat||null])}})()") for _ in range(n)]
+    # no cat met: no cat in the review
+    for r in reviews([]):
+        t, tags, cid = json.loads(r)
+        check(not any(nm in t for nm in names) and '貓' not in t and 'cat' not in tags and cid is None, f'a table that met no cat got a cat line: {t}')
+    # 樾樾 sat by the table: only 樾樾 is named, and only in a sitting-by-the-table way
+    tora = json.loads(g.ev("JSON.stringify(catName(CAT_DEF.find(C=>C.id==='tora')))"))
+    got = [json.loads(r) for r in reviews([{'k': 'visit', 'id': 'tora', 'st': 'visit', 'perch': False, 'sofa': False}])]
+    catty = [x for x in got if 'cat' in x[1]]
+    check(len(catty) >= 20, f'with a cat at the table most reviews should mention it ({len(catty)}/40)')
+    for t, tags, cid in got:
+        others = [nm for nm in names if nm != tora and nm in t]
+        check(not others, f'a cat that was not there is named: {t}')
+        if 'cat' in tags:
+            check(tora in t and cid == 'tora', f'the cat line must name the cat that came: {t}')
+            check('坐' in t, f'a visit line should say it sat by the table: {t}')
+        check(not re.search('陪|招呼|服務', t), f'cats never serve or accompany anyone: {t}')
+    # 包包 asleep, only looked at: the line says it was asleep
+    snow = json.loads(g.ev("JSON.stringify(catName(CAT_DEF.find(C=>C.id==='snow')))"))
+    got = [json.loads(r) for r in reviews([{'k': 'look', 'id': 'snow', 'st': 'sleep', 'perch': False, 'sofa': False}], 30)]
+    for t, tags, cid in got:
+        if 'cat' in tags: check(snow in t and '睡' in t, f'a sleeping cat that was looked at must be described asleep: {t}')
+    # a family's child watched 寶寶 on the perch
+    mei = json.loads(g.ev("JSON.stringify(catName(CAT_DEF.find(C=>C.id==='mei')))"))
+    g.ev(FIX_GROUP % ('family', 'family')); g.ev("S.reviews=[];__g.cats=[{k:'look',id:'mei',st:'rest',perch:true,sofa:false},{k:'kid',id:'mei',st:'rest',perch:true,sofa:false}]")
+    kid = [json.loads(g.ev("(()=>{const r=addReview(__g,4,null,{});return JSON.stringify([r.txt,r.tags,r.cat||null])})()")) for _ in range(30)]
+    check(any('小' in t and mei in t for t, tags, cid in kid), 'the child watching the cat should be what the family remembers')
+    # the low-star tone exists too, still naming the right cat
+    got = [json.loads(r) for r in reviews([{'k': 'photo', 'id': 'mikan', 'st': 'walk', 'perch': False, 'sofa': False}], 20, 2)]
+    mik = json.loads(g.ev("JSON.stringify(catName(CAT_DEF.find(C=>C.id==='mikan')))"))
+    check(all(mik in t for t, tags, cid in got if 'cat' in tags) and any('cat' in tags for t, tags, cid in got), 'two-star reviews name the photographed cat too')
+    # the digest counts only reviews that really mention a cat
+    g.ev("S.reviews=[]"); reviews([]); d0 = g.ev("reviewDigest(25).cat"); reviews([{'k': 'visit', 'id': 'ban', 'st': 'visit', 'perch': False, 'sofa': False}]); d1 = g.ev("reviewDigest(25).cat")
+    check(d0 == 0 and d1 > 0, f'提到貓 must count real mentions: {d0} then {d1}')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
+def g_lines_and_reviews_do_not_repeat_themselves(b, port, target):
+    """G. A pool of lines is cycled, not sampled: four lines come out in four calls without a repeat, and the fifth is the
+    one said longest ago; the ring survives a save. Thirty composed reviews for the same kind of visit are (almost) all
+    different, and a review already in the book is not written again while the parts allow it."""
+    g = Game(b, port, target, seed=42, manual=True)
+    player30(g); start_day(g); install_bot(g); g.ev("window.__act=()=>{}")
+    g.page.evaluate('()=>window.__play(30,0)')
+    g.ev("SAID.q=[];S.said=[]")
+    out = [g.ev("pickT(['甲','乙','丙','丁'])") for _ in range(8)]
+    check(sorted(out[:4]) == sorted(['甲', '乙', '丙', '丁']), f'the first four picks must be the four lines: {out}')
+    check(out[4] == out[0] and out[5] == out[1], f'when every line was said, the oldest comes back first: {out}')
+    check(json.loads(g.ev("JSON.stringify(S.said.slice(-4))")) == out[4:], 'the said lines are kept in the save')
+    g.ev("save()"); saved = json.loads(g.ev("localStorage.getItem(KEY)"))
+    check(saved.get('said') and saved['said'][-1] == out[-1], 'the ring is on disk')
+    # reviews: the same kind of visit thirty times
+    g.ev(FIX_GROUP % ('office', 'office')); g.ev("S.reviews=[];__g.cats=[]")
+    txts = [g.ev("addReview(__g,4,null,{wait:true,weather:'rain'}).txt") for _ in range(30)]
+    check(len(set(txts)) >= 26, f'thirty reviews of the same visit should read differently: {len(set(txts))} distinct')
+    # a table that talks: twenty-five served lines, no immediate repeats
+    g.ev("SAID.q=[];S.said=[]")
+    lines = [g.ev("pickT(['這是 Jill 親手做的嗎？','哇，Jill 主廚的擺盤好美。','聞起來好香…','先拍照，等我一下！','來了來了。','看起來好好吃。','份量剛好。'])") for _ in range(14)]
+    check(len(set(lines[:7])) == 7 and len(set(lines[7:])) == 7, f'a seven-line pool cycles without repeats: {lines}')
     check(not g.errors, g.errors)
     g.close()
 
