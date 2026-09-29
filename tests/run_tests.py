@@ -2379,11 +2379,10 @@ def b_staff_are_grouped_by_job(b, port, target):
     names = sum((x['names'] for x in grp), [])
     check(sorted(names) == sorted(json.loads(g.ev("JSON.stringify(S.crew.map(m=>m.name))"))), 'every staff member appears exactly once')
     chef = g.ev("S.crew.find(m=>m.role==='chef'&&m.duty==='stove').id")
-    d0 = g.ev(f"S.crew.find(m=>m.id==='{chef}').duty"); g.click(f'[data-act=duty][data-k="{chef}"]'); g.page.wait_for_timeout(100)
-    # v2.2.1 #3: the button opens the station chooser inside the group; a station row moves the chef
-    check(g.ev("!!document.querySelector('.crewgrp .stpick')"), 'the station chooser opens inside the group')
-    g.click(f'.stpick [data-act=dutyTo][data-k="{chef}"]:not([disabled])'); g.page.wait_for_timeout(100)
-    check(g.ev(f"S.crew.find(m=>m.id==='{chef}').duty") != d0, 'the station switch must still work inside the group')
+    # v2.2.1 (real device): assignment lives on the 工作分配 board above the groups, not inside them — × on his chip takes him off the stove
+    check(g.ev("!document.querySelector('.crewgrp [data-act=duty], .crewgrp [data-act^=bd]')") and g.ev("!!document.querySelector('.board .brow[data-st=stove] .bchip .x[data-k=\"%s\"]')" % chef), 'the group has no assignment controls; the board has his chip')
+    g.click(f'.board .brow[data-st=stove] .bchip .x[data-k="{chef}"]'); g.page.wait_for_timeout(100)
+    check(g.ev(f"S.crew.find(m=>m.id==='{chef}').duty") is None, 'the station switch works from the board')
     check(not g.errors, g.errors)
     g.close()
 
@@ -2713,8 +2712,8 @@ def h_i_k_t_shop_rooms_decoration_pass_and_dreams(b, port, target):
         check(h1 != h0, f'decor {k}={v} draws nothing new'); h0 = h1
     # K: the pass
     items = json.loads(g.ev("JSON.stringify(kitchenItems().map(i=>i.k))"))
-    check(items == ['bell'], f'v2.2.1 F: the pass hatch keeps only the bell; the tub and the stock board left with the counter band: {items}')
-    check(g.ev("typeof HATCH==='object'&&HATCH.x0<HATCH.x1&&typeof drawPassStrip==='undefined'&&typeof drawStairs==='undefined'"), 'the counter band (dots strip, stairs) is gone; the hatch is the kitchen edge')
+    check(items == [], f'v2.2.1 F (real device): nothing of the kitchen is in the main hall — the tub, the stock board, the bell and the hatch all went with the counter band: {items}')
+    check(g.ev("typeof HATCH==='undefined'&&typeof drawPassStrip==='undefined'&&typeof drawStairs==='undefined'&&FB===LH-16&&ROWS[2]===FB-40"), 'the counter band is gone; the floor runs to the skirting and the bottom row sits above it')
     # T: the dreams
     g.ev("S.money=400000;S.level=5;shopTab='works';showShop()")
     dreams = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('#screen [data-act=buyProject]')].map(e=>e.dataset.k))"))
@@ -3099,10 +3098,10 @@ def z_regression_rooms_kitchen_construction_and_staff_assignment(b, port, target
     g.page.keyboard.press('ArrowRight'); g.page.wait_for_timeout(30); check(g.ev("room") == 'side', '→ goes to the next room')
     g.page.keyboard.press('1'); g.page.wait_for_timeout(30); check(g.ev("room") == 'front', '1 is the first room')
     g.ev("setRoom('main')")
-    # a tap on the side arch enters the side room; a tap on the kitchen band enters the kitchen
-    arch = json.loads(g.ev("(()=>{const r=sc.getBoundingClientRect();const p={x:SIDE_ARCH.x+SIDE_ARCH.w/2,y:SIDE_ARCH.y+40};return JSON.stringify([r.left+SV.ox+p.x*SV.s,r.top+SV.oy+p.y*SV.s,r.left+SV.ox+200*SV.s,r.top+SV.oy+(FB+12)*SV.s])})()"))
+    # a tap on the side arch enters the side room; the kitchen band is gone (v2.2.1 F, real device) — a tap at the bottom edge stays in the main hall, the tab and the keys are the way to the kitchen
+    arch = json.loads(g.ev("(()=>{const r=sc.getBoundingClientRect();const p={x:SIDE_ARCH.x+SIDE_ARCH.w/2,y:SIDE_ARCH.y+40};return JSON.stringify([r.left+SV.ox+p.x*SV.s,r.top+SV.oy+p.y*SV.s,r.left+SV.ox+200*SV.s,r.top+SV.oy+(FB+6)*SV.s])})()"))
     g.page.mouse.click(arch[0], arch[1]); g.page.wait_for_timeout(50); check(g.ev("room") == 'side', 'a tap on the arch goes to the side room')
-    g.ev("setRoom('main')"); g.page.mouse.click(arch[2], arch[3]); g.page.wait_for_timeout(50); check(g.ev("room") == 'kitchen', 'a tap on the kitchen band goes to the kitchen')
+    g.ev("setRoom('main')"); g.page.mouse.click(arch[2], arch[3]); g.page.wait_for_timeout(50); check(g.ev("room") == 'main' and g.ev("kitchenItems().length===0&&FB>=LH-16"), 'the bottom edge of the main hall is floor, not a kitchen band')
     g.ev("setRoom('main')")
     # the staff run the day: 小茉 seats, Kai orders/serves/checks, the chefs cook to the pass, food reaches tables
     r = json.loads(g.ev(r"""(()=>{let bad=0;for(let i=0;i<9000&&phase==='service';i++){__tick(1000/30);if(i%10===0){const w=R.cw&&R.cw.w1;if(w&&w.task&&['order','serve','check'].includes(w.task.k))bad++}}const c=R?R.st.crew||{}:{};const q=R?R.st.q:{};return JSON.stringify({bad,crew:c,plates:q.P+q.G+q.O+q.B,guests:R?R.st.guests:-1,rev:R?R.st.rev:-1,phase})})()"""))
@@ -3304,10 +3303,12 @@ def restaurant_records_are_readable_in_the_journal(b, port, target):
 
 @test
 def workstation_assignment_is_explicit_with_capacities_and_swaps(b, port, target):
-    """v2.2.1 #3 (real device: 換工作站 cycled blindly). The chooser lists every bought station as n/cap (cap = its
-    cooking slots), the chef moves to the chosen one, a full station offers a swap that names both people and where
-    each ends up, the kitchen header counts update at once, and the prep screen warns when a station with dishes on
-    today's menu has nobody at it."""
+    """v2.2.1 #3 (real device: 換工作站 cycled blindly; then: "show each area with who is on it, add or remove with one
+    tap, and keep training separate from assignment"). The staff tab is two lists: 工作分配 — one row per bought station
+    (n/cap, cap = its cooking slots, today's dish count) and per floor job, the people on it as chips, × takes someone
+    off (a chef goes to 待命), ＋ lists who can be added with where they come from and one tap adds them, a full station
+    says 已滿 — then 員工 (level, wage, training, firing; no assignment controls) and 招募. The prep screen warns when a
+    station with dishes on today's menu has nobody at it. Older saves' waiter duties still load."""
     g = Game(b, port, target, seed=9, manual=True)
     player30(g)
     g.ev("shopTab='staff';phase='shop';mainScreen='shop';showShop()"); g.page.wait_for_timeout(80)
@@ -3315,33 +3316,56 @@ def workstation_assignment_is_explicit_with_capacities_and_swaps(b, port, target
     check(len(chefs) >= 3, f'the Day 30 save has chefs: {chefs}')
     caps = json.loads(g.ev("JSON.stringify({stove:stationCap('stove'),oven:stationCap('oven'),prep:stationCap('prep'),bar:stationCap('bar')})"))
     check(caps['stove'] == g.ev("stoveSlots(S.eq.stove)") and caps['oven'] == g.ev("buildSlots().filter(s=>s.type==='oven').length"), f'capacity is the slot count: {caps}')
-    m = chefs[0]
-    g.click(f"[data-act=duty][data-k='{m['id']}']"); g.page.wait_for_timeout(80)
-    rows = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('.stpick .strow')].map(r=>({st:r.querySelector('b').textContent,n:r.querySelector('.stn').textContent,cur:r.classList.contains('cur'),full:r.classList.contains('full'),move:!!r.querySelector('[data-act=dutyTo]'),swap:!!r.querySelector('[data-act=dutySwapAsk]')})))"))
+    # the board comes first, the people after it, and the people have no assignment controls
+    order = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('.board, .crewgrp')].map(e=>e.className.split(' ')[0]))"))
+    check(order and order[0] == 'board' and 'crewgrp' in order, f'工作分配 first, then 員工: {order}')
+    check(g.ev("!document.querySelector('.crewgrp [data-act^=bd], .crewgrp [data-act=duty], .crewgrp [data-act=dutyT]')") and g.ev("!!document.querySelector('.crewgrp [data-act=crewUp], .crewgrp .muted')"), 'the people list is training and firing only')
+    rows = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('.board .brow[data-st]')].map(r=>({st:r.dataset.st,n:r.querySelector('.bnm span').textContent,chips:[...r.querySelectorAll('.bchip')].map(c=>c.textContent),add:!!r.querySelector('[data-act=bdOpen]'),full:!!r.querySelector('.bfull')})))"))
     check(len(rows) == sum(1 for k, v in caps.items() if v > 0), f'one row per bought station: {rows}')
-    for r in rows: check('/' in r['n'], f'n/cap shown: {r}')
-    check(sum(1 for r in rows if r['cur']) == 1, 'the current station is marked')
-    # move to a station with room
-    free = next((r for r in rows if r['move']), None)
-    check(free is not None, f'a station with room offers 移到這裡: {rows}')
-    st = {'爐台': 'stove', '烤箱': 'oven', '冷盤台': 'prep', '咖啡吧': 'bar'}[free['st']]
-    g.click(f"[data-act=dutyTo][data-k='{m['id']}'][data-d='{st}']"); g.page.wait_for_timeout(80)
-    check(g.ev(f"S.crew.find(x=>x.id==='{m['id']}').duty") == st, 'the chef moved where the player chose')
-    hdr = g.ev("document.querySelector('.crewgrp .cg-h').textContent")
-    nat = g.ev("chefsAt('%s').length" % st)
-    check(f"{DUTY[st]} {nat}/{caps[st]}" in hdr, f'the kitchen header counts update at once: {hdr}')
-    # fill a station, then the chooser offers a swap naming both people
+    for r in rows:
+        check(r['n'].startswith(f"{g.ev('chefsAt(%r).length' % r['st'])}/{caps[r['st']]}"), f'n/cap shown: {r}')
+        check(len(r['chips']) == g.ev('chefsAt(%r).length' % r['st']), f'every chef at the station is a chip: {r}')
+        check(r['add'] != r['full'], f'either ＋ or 已滿: {r}')
+    # × takes a chef off: he is on standby, the row count drops, the people list says so
+    m = chefs[0]; st0 = m['duty']
+    n0 = g.ev("chefsAt(%r).length" % st0)
+    g.click(f".brow[data-st='{st0}'] .bchip .x[data-k='{m['id']}']"); g.page.wait_for_timeout(80)
+    check(g.ev(f"S.crew.find(x=>x.id==='{m['id']}').duty") is None and g.ev("chefsAt(%r).length" % st0) == n0 - 1, 'the chef left the station')
+    check(g.ev("!!document.querySelector('.brow.standby .bchip')") and g.ev("document.querySelector('.brow.standby').textContent").find(m['name']) >= 0, 'he is listed under 待命')
+    check(g.ev("document.querySelector('.crewgrp').textContent").find('待命') >= 0, 'the people list shows 待命 for him')
+    # ＋ on a station with room lists who can come, with where from; one tap adds
+    free = next((r for r in rows if r['add'] and r['st'] != st0), None) or next((r for r in rows if r['add']), None)
+    check(free is not None, f'a station with room offers ＋: {rows}')
+    st = free['st']
+    g.click(f".brow[data-st='{st}'] [data-act=bdOpen]"); g.page.wait_for_timeout(80)
+    lst = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('.brow[data-st=%s] .blist [data-act=bdAdd]')].map(b=>({k:b.dataset.k,txt:b.textContent})))" % st))
+    check(len(lst) == g.ev("S.crew.filter(x=>x.role==='chef'&&x.duty!==%r).length" % st) and any(m['id'] == x['k'] and '待命' in x['txt'] for x in lst), f'the list has every other chef, the standby one marked: {lst}')
+    check(all(('移過來' in x['txt']) or ('待命' in x['txt']) for x in lst), f'each says where he comes from: {lst}')
+    g.click(f".brow[data-st='{st}'] .blist [data-act=bdAdd][data-k='{m['id']}']"); g.page.wait_for_timeout(80)
+    check(g.ev(f"S.crew.find(x=>x.id==='{m['id']}').duty") == st and g.ev("!document.querySelector('.brow.standby')"), 'one tap put him on the station; nobody is on standby')
+    check(g.ev("document.querySelector('.brow[data-st=%s] .bnm span').textContent" % st).startswith(f"{g.ev('chefsAt(%r).length' % st)}/{caps[st]}"), 'the row count updated at once')
+    # a full station says 已滿 and cannot be added to
     g.ev("(()=>{const cs=S.crew.filter(m=>m.role==='chef');const cap=stationCap('oven');cs.forEach((m,i)=>m.duty=i<cap?'oven':'stove');return 1})()")
+    g.ev("showShop()"); g.page.wait_for_timeout(60)
+    check(g.ev("!!document.querySelector('.brow[data-st=oven] .bfull')") and g.ev("!document.querySelector('.brow[data-st=oven] [data-act=bdOpen]')"), 'a full station says 已滿, no ＋')
     other = g.ev("S.crew.find(m=>m.role==='chef'&&m.duty==='stove').id")
-    victim = g.ev("S.crew.find(m=>m.role==='chef'&&m.duty==='oven').id")
-    g.ev("showShop()"); g.click(f"[data-act=duty][data-k='{other}']"); g.page.wait_for_timeout(60)
-    check(g.ev("!document.querySelector('.stpick [data-act=dutyTo][data-d=oven]')") and g.ev("!!document.querySelector('.stpick [data-act=dutySwapAsk][data-d=oven]')"), 'a full station cannot be moved into, only swapped')
-    g.click(f"[data-act=dutySwapAsk][data-k='{other}'][data-d='oven']"); g.page.wait_for_timeout(60)
-    txt = g.ev("[...document.querySelectorAll('.stpick [data-act=dutySwap]')].map(b=>b.textContent).join('|')")
-    on, vn = g.ev(f"S.crew.find(m=>m.id==='{other}').name"), g.ev(f"S.crew.find(m=>m.id==='{victim}').name")
-    check(f'{on} → 烤箱' in txt and f'{vn} → 爐台' in txt, f'the swap names both people and both destinations: {txt}')
-    g.click(f"[data-act=dutySwap][data-k='{other}'][data-o='{victim}']"); g.page.wait_for_timeout(60)
-    check(g.ev(f"S.crew.find(m=>m.id==='{other}').duty") == 'oven' and g.ev(f"S.crew.find(m=>m.id==='{victim}').duty") == 'stove', 'the swap happened as stated')
+    m0 = g.ev("S.money"); g.ev("doAct('bdAdd',null,'%s',{dataset:{st:'oven'}})" % other)
+    check(g.ev(f"S.crew.find(m=>m.id==='{other}').duty") == 'stove' and g.ev("S.money") == m0, 'nothing squeezes into a full station')
+    # the floor: a waiter's job rows, add and remove with one tap; a LV1 waiter cannot be put on 結帳
+    w = json.loads(g.ev("JSON.stringify(S.crew.filter(m=>m.role==='waiter').map(m=>({id:m.id,name:m.name,lv:m.lv,d:waiterDuties(m)})))"))
+    check(w, 'the Day 30 save has waiters')
+    wid = w[0]['id']; had = w[0]['d']['seat']
+    g.ev("showShop()"); g.page.wait_for_timeout(60)
+    if had:
+        g.click(f".brow[data-d='seat'] .bchip .x[data-k='{wid}']"); g.page.wait_for_timeout(60)
+        check(g.ev(f"waiterDuties(S.crew.find(m=>m.id==='{wid}')).seat") is False, '× took the waiter off 帶位')
+    g.click(".brow[data-d='seat'] [data-act=bdOpen]"); g.page.wait_for_timeout(60)
+    g.click(f".brow[data-d='seat'] .blist [data-act=bdAddD][data-k='{wid}']"); g.page.wait_for_timeout(60)
+    check(g.ev(f"waiterDuties(S.crew.find(m=>m.id==='{wid}')).seat") is True, '＋ put the waiter back on 帶位')
+    g.ev("(()=>{const w=S.crew.find(m=>m.id==='%s');w.lv=1;const d=waiterDuties(w);d.check=false;return 1})()" % wid); g.ev("showShop()"); g.page.wait_for_timeout(60)
+    g.click(".brow[data-d='check'] [data-act=bdOpen]"); g.page.wait_for_timeout(60)
+    check(g.ev("!!document.querySelector('.brow[data-d=check] .blist [data-act=bdAddD][data-k=\"%s\"][disabled]')" % wid), 'a LV1 waiter is listed for 結帳 but cannot be added (LV3 起)')
+    g.reload(); check(g.ev(f"waiterDuties(S.crew.find(m=>m.id==='{wid}')).seat") is True, 'the assignment survives a reload')
     # the prep warning: nobody at a station today's menu needs
     g.ev("S.crew.filter(m=>m.role==='chef').forEach(m=>m.duty='stove');phase='prep';mainScreen='prep';S.phase='prep';showPrep()"); g.page.wait_for_timeout(80)
     warns = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('.stwarn')].map(w=>w.textContent))"))
@@ -3349,7 +3373,11 @@ def workstation_assignment_is_explicit_with_capacities_and_swaps(b, port, target
     check(len(warns) == len(need) and all('目前無人' in w for w in warns), f'one warning per empty station the menu needs: {warns} / {need}')
     check(g.ev("!!document.querySelector('.stwarn [data-act=staffTab]')"), 'the warning has 安排員工')
     g.click('.stwarn [data-act=staffTab]'); g.page.wait_for_timeout(80)
-    check(g.ev("shopTab") == 'staff' and g.ev("phase") == 'shop', 'it opens the staff tab')
+    check(g.ev("shopTab") == 'staff' and g.ev("phase") == 'shop' and g.ev("!!document.querySelector('.board')"), 'it opens the staff tab on the board')
+    # a chef on standby during a service does nothing and breaks nothing
+    g.ev("S.crew.find(m=>m.role==='chef').duty=null;save();showPrep()"); fill_fridge(g); start_day(g); install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;")
+    g.page.evaluate('()=>window.__bot(900,1/30)')
+    check(g.ev("phase") == 'service' and not g.errors, f'a standby chef is harmless: {g.errors[:2]}')
     g.close()
 
 DUTY = {'stove': '爐台', 'oven': '烤箱', 'prep': '冷盤台', 'bar': '咖啡吧'}
@@ -3422,7 +3450,9 @@ def main_and_side_hall_are_one_layout_system(b, port, target):
     # the layout: three rows of three in both halls; every main table above the pass hatch; side row 0 = four-tops
     lay = json.loads(g.ev("(()=>{const V=buildTables();return JSON.stringify({main:V.filter(t=>t.room==='main').map(t=>[t.x,t.y,t.seats]),side:V.filter(t=>t.room==='side').map(t=>[t.x,t.y,t.seats]),FB,LH,DY})})()"))
     check(len(lay['main']) == 9 and len(set(x for x, y, s in lay['main'])) == 3 and len(set(y for x, y, s in lay['main'])) == 3, f'the main hall is three rows of three: {lay["main"]}')
-    check(all(y + 24 < lay['FB'] for x, y, s in lay['main']), f'no main table sits on the pass hatch: {lay["main"]} FB={lay["FB"]}')
+    check(all(y + 24 < lay['FB'] for x, y, s in lay['main']) and lay['FB'] == lay['LH'] - 16, f'every main table stands on the floor above the skirting; there is no kitchen band: {lay["main"]} FB={lay["FB"]} LH={lay["LH"]}')
+    ys = sorted(set(y for x, y, s in lay['main'])); gaps = [round(ys[1] - ys[0]), round(ys[2] - ys[1])]
+    check(abs(gaps[0] - gaps[1]) <= 1 and gaps[0] >= 100, f'the three rows share the whole height evenly: {ys}')
     check(len(lay['side']) == 5 and all(s == 4 for x, y, s in lay['side'][:3]) and all(s == 2 for x, y, s in lay['side'][3:]), f'the side hall: a back row of four-tops, then two-tops: {lay["side"]}')
     check(all(y + 30 < lay['LH'] for x, y, s in lay['side']), 'every side table is on the floor')
     booths = [s for x, y, s in lay['main'] if s == 4]
@@ -3556,6 +3586,29 @@ def hospitality_stays_with_a_guest_from_stranger_to_regular(b, port, target):
     check(g.ev("R.st.ptreats") == 1 and g.ev("S.stock['%s']" % d) == n0 + 1 and g.ev("R.groups.find(q=>q.id===%d).treat==='drink'" % r2['id']), 'cancelled: the use and the drink are back, the table still waits for it')
     check(not g.errors, g.errors[:2])
     g.close()
+
+@test
+def the_players_saves_load_through_a_real_reload(b, port, target):
+    """v2.2.1: every real save the player sent (Day 30, 33, 35) is written to localStorage and the page is reloaded, the way
+    the game itself starts — load() runs with the file's own declaration order, so a migration that touches a constant
+    declared below load() throws inside parseSave's try and the save silently comes up as Day 1 (it happened twice while
+    building v2.2.1). Day, money and the crew must come through, nothing may be rescued as unreadable, and the shop's
+    staff board and the prep screen must render for each."""
+    for name in ['player_day30.json', 'player_day33.json', 'player_day35.json']:
+        raw = json.load(open(os.path.join(ROOT, 'tests', 'saves', name), encoding='utf-8'))['save']
+        g = Game(b, port, target, seed=11, manual=True, viewport={'width': 390, 'height': 844})
+        g.ev("phase='title';R=null;localStorage.setItem(KEY,JSON.stringify(%s))" % json.dumps(raw, ensure_ascii=False)); g.reload(); g.page.wait_for_timeout(150)
+        check(g.ev("S.day") == raw['day'], f'{name}: came up as Day {g.ev("S.day")}, not Day {raw["day"]} — a migration threw while the save was read')
+        exp_money = raw['money'] if raw.get('hallMig') or raw['tables'] <= 9 or (raw.get('rooms') or {}).get('side') else None
+        if exp_money is not None: check(g.ev("S.money") == exp_money, f'{name}: money {g.ev("S.money")} != {exp_money}')
+        check(g.ev("S.crew.length") == len(raw['crew']) and g.ev("S.crew.every(m=>m.name!==ROLES[m.role].n)"), f'{name}: the crew came through with real names: {g.ev("JSON.stringify(S.crew.map(m=>m.name))")}')
+        check(g.ev(f"localStorage.getItem('{SAVE_KEY}-unreadable')") is None, f'{name}: treated as unreadable')
+        check(g.ev("S.tables<=MAIN_MAX&&(S.sideTables||0)<=SIDE_MAX"), f'{name}: the halls are within their caps')
+        g.click('[data-act=openFresh]'); g.page.wait_for_timeout(150); check(g.ev("phase") == 'prep', f'{name}: the prep screen opens')
+        g.ev("showShop();shopTab='staff';showShop()"); g.page.wait_for_timeout(80)
+        check(g.ev("!!document.querySelector('.board .brow')"), f'{name}: the staff board renders')
+        check(not g.errors, f'{name}: {g.errors[:2]}')
+        g.close()
 
 def main():
     ap = argparse.ArgumentParser()
