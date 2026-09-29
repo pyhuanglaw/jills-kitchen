@@ -28,7 +28,18 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .h-day{display:flex;flex-direction:column;line-height:1}
 .h-day small{font-size:9px;letter-spacing:.16em;color:var(--brass2);font-weight:700}
 .h-day b{font-family:var(--disp);font-size:20px;font-weight:400}
-.h-clock{font-weight:800;font-size:15px;padding:4px 8px;border-radius:8px;background:rgba(255,255,255,.07);letter-spacing:.03em}
+.h-clock{font-weight:800;font-size:15px;padding:4px 8px;border-radius:8px;background:rgba(255,255,255,.07);letter-spacing:.03em;cursor:pointer}
+.h-clock i{font-style:normal;font-size:11px;font-weight:800;color:var(--gold);margin-left:3px}
+.h-clock.sp{box-shadow:inset 0 0 0 1px rgba(230,194,122,.55)}
+/* v2.2: segmented choice (the service speed in the pause menu) */
+.seg{display:inline-flex;border-radius:9px;overflow:hidden;box-shadow:inset 0 0 0 1px var(--line)}
+.seg button{border:0;background:var(--paper2);color:var(--ink);font-weight:800;font-size:12.5px;padding:7px 10px;min-width:44px}
+.seg button.on{background:var(--ink);color:var(--cream)}
+/* v2.2: staff grouped by job */
+.crewgrp{margin-top:14px}.crewgrp .cg-h{display:flex;align-items:baseline;gap:10px;font-size:15px;margin:0 0 6px}.crewgrp .cg-h .muted{font-size:11.5px;font-weight:700}
+.cg-cmp{display:grid;grid-template-columns:auto auto 1fr auto;column-gap:10px;row-gap:3px;align-items:center;padding:8px 10px;border-radius:12px;background:var(--paper2);box-shadow:inset 0 0 0 1px var(--line);margin-bottom:6px;font-size:12px}
+.cg-cmp .cg-row{display:contents}.cg-cmp .cg-n{font-weight:800}.cg-cmp .cg-d{color:var(--ink2);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cg-cmp .cg-s{color:var(--ink3);font-size:11px;white-space:nowrap}
+
 .h-stat{display:flex;align-items:center;gap:4px;font-weight:800;font-size:15px}
 .h-stat svg{width:17px;height:17px}
 .h-money{margin-left:auto}
@@ -221,8 +232,12 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .card.today .hint{margin:4px 0 0;font-size:12.5px;color:var(--ink)}
 /* summary: the day's chips, the rating story, staff work; journal: the rating trend, records */
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 0}.chips span{padding:3px 9px;border-radius:999px;background:var(--paper2);font-size:12px;font-weight:700;color:var(--ink2)}.chips span.warn{background:#FFE9DD;color:#8A3A2A}
-.card.rating{margin-top:10px}.card.rating .rl{display:flex;align-items:baseline;gap:8px}.card.rating .rl span{font-size:12px;font-weight:700;color:var(--ink2)}.card.rating .rl b{font-family:var(--disp);font-weight:400;font-size:22px}.card.rating em{font-style:normal;font-weight:800;font-size:18px;color:var(--ink3)}.card.rating em.up,.rrow em.up{color:var(--sage)}.card.rating em.dn,.rrow em.dn{color:#A2412B}
-.card.rating ul{margin:6px 0 0;padding:0;list-style:none;font-size:13px}.card.rating li{padding:3px 0}.card.rating li.up{color:#3E6B32}.card.rating li.dn{color:#8A3A2A}.card.rating small{display:block;margin-top:6px;color:var(--ink2);font-size:12px}
+/* v2.2: the rating card — result first, then the factors as rows with a label, the number that matters and one supporting line */
+.card.rating{margin-top:10px}.card.rating .rl{display:flex;align-items:baseline;gap:8px}.card.rating .rl span{font-size:12px;font-weight:800;color:var(--ink2);letter-spacing:.04em}.card.rating .rl b{font-family:var(--disp);font-weight:400;font-size:24px;letter-spacing:.01em}.card.rating .rl b i{font-style:normal;color:var(--ink3);font-size:18px;margin:0 2px}.card.rating .rl em{font-style:normal;font-weight:800;font-size:16px;color:var(--ink3)}.card.rating .rl em.up{color:#3E6B32}.card.rating .rl em.dn{color:#8A3A2A}
+.rfs{display:grid;gap:10px;margin-top:10px}.rfg{padding:8px 10px;border-radius:12px;background:var(--paper2);box-shadow:inset 0 0 0 1px var(--line)}.rfg-h{font-size:10.5px;font-weight:800;letter-spacing:.08em;color:var(--ink3);margin-bottom:4px}.rfg.up .rfg-h{color:#3E6B32}.rfg.dn .rfg-h{color:#8A3A2A}
+.rf{display:grid;grid-template-columns:1fr auto;column-gap:10px;align-items:baseline;padding:4px 0;border-top:1px solid var(--line)}.rf:first-of-type{border-top:0}.rf-k{font-weight:800;font-size:13px}.rf-v{font-weight:800;font-size:13px;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}.rf-s{grid-column:1/-1;font-size:11px;color:var(--ink3);margin-top:-1px}
+.card.rating small{display:block;margin-top:8px;font-size:11.5px;color:var(--ink3)}
+.recs{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--night2);color:var(--cream);display:flex;flex-wrap:wrap;gap:6px;align-items:center}.recs-h{font-size:12px;font-weight:800;color:var(--gold);margin-right:2px}.rec{font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;background:rgba(255,248,236,.12);box-shadow:inset 0 0 0 1px rgba(230,194,122,.35)}
 .srow{display:grid;grid-template-columns:auto 1fr auto;gap:2px 8px;align-items:baseline;padding:6px 0;border-top:1px solid var(--line);font-size:13px}.srow:first-child{border-top:0}.srow small{color:var(--ink2);font-variant-numeric:tabular-nums}.srow span{color:var(--ink2);font-size:12.5px}.srow.tot{border-top:1px solid rgba(46,32,25,.3)}.srow.tot span{color:var(--ink);font-weight:700}
 .spark{display:block;width:100%;height:76px;margin:2px 0 6px}
 .rrow{display:grid;grid-template-columns:auto auto auto 1fr;gap:2px 8px;align-items:baseline;padding:5px 0;border-top:1px solid var(--line);font-size:12.5px}.rrow:first-child{border-top:0}.rrow b{font-variant-numeric:tabular-nums}.rrow em{font-style:normal;font-weight:800;font-size:12px;color:var(--ink3)}.rrow small{color:var(--ink2);font-size:11.5px;grid-column:1/-1}

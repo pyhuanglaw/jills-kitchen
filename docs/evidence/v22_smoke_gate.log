@@ -1,0 +1,43 @@
+[18:38:46] START v2.2 smoke — the player's Day 30 save, money=70588 stock=131/180 crew=10 tables=14 speed=1
+[18:38:46]   補滿 for coffee is disabled after 補到建議 (fridge 180/180) — as designed
+[18:38:46] day 1 prep: restock 70588->66811 hud=$66,811 stock=180/180 sug=259B weather=hot event=celebrate expected=68
+[18:39:07]   20s: speed -> 0.75× (hud chip: "17:22 0.75×", R.speed=0.75)
+[18:39:27]   pause menu open: buttons=繼續營業 | 0.75× | 1× | 1.5× | 2× | 設定・存檔・備份 | 小小店主手冊 | 提早打烊（等店裡客人吃完） | 馬上結束今天 offscreen=[]
+[18:39:28]   resumed: paused=False phase=service
+[18:40:02]   61s: speed -> 1× (hud chip: "18:06", R.speed=1)
+[18:41:04]   MONEY MISMATCH hud=$88,633 S.money=91139
+[18:41:16]   MONEY MISMATCH hud=$94,424 S.money=95599
+[18:41:17]   136s: speed -> 1.5× (hud chip: "19:27 1.5×", R.speed=1.5)
+[18:41:22]   MONEY MISMATCH hud=$95,939 S.money=96368
+[18:41:31]   MONEY MISMATCH hud=$101,271 S.money=102019
+[18:41:39]   MONEY MISMATCH hud=$104,915 S.money=106100
+[18:41:43]   MONEY MISMATCH hud=$107,574 S.money=108924
+[18:41:47]   MONEY MISMATCH hud=$111,479 S.money=112319
+[18:41:58]   MONEY MISMATCH hud=$115,800 S.money=117500
+[18:42:02]   MONEY MISMATCH hud=$117,500 S.money=117975
+[18:42:27]   MONEY MISMATCH hud=$129,490 S.money=132049
+[18:42:37]   255s: speed -> 1× (hud chip: "21:36", R.speed=1)
+[18:43:14] DAY 1 done (266s real, game clock closed): short=0 soldOutLeft=0 tickets=0 money=143990 hud=$146,986 errors=[]
+[18:43:14]   SUMMARY rev=56970 net=58992 guests=98 lost=0 rating 4.83→4.84 story=[('料理品質', '174 道 Perfect'), ('上菜速度', '客人很少等'), ('貓在店裡過日子', '4 桌客人遇到了牠們'), ('店裡氛圍', '+21')] recs=['guestsDay', 'ratingMax', 'perfectDay', 'combo']
+[18:43:16] day 2 prep: restock 143990->131121 hud=$131,121 stock=180/180 sug=259B weather=sun event=blogger expected=68
+[18:43:37]   20s: speed -> 0.75× (hud chip: "17:22 0.75×", R.speed=0.75)
+[18:43:57]   pause menu open: buttons=繼續營業 | 0.75× | 1× | 1.5× | 2× | 設定・存檔・備份 | 小小店主手冊 | 提早打烊（等店裡客人吃完） | 馬上結束今天 offscreen=[]
+[18:43:57]   resumed: paused=False phase=service
+[18:44:32]   62s: speed -> 1× (hud chip: "18:06", R.speed=1)
+[18:45:12]   MONEY MISMATCH hud=$150,107 S.money=151505
+[18:45:35]   MONEY MISMATCH hud=$154,987 S.money=157817
+[18:45:39]   MONEY MISMATCH hud=$157,817 S.money=158444
+[18:45:41]   MONEY MISMATCH hud=$158,444 S.money=159119
+[18:45:47]   136s: speed -> 1.5× (hud chip: "19:27 1.5×", R.speed=1.5)
+[18:46:09]   MONEY MISMATCH hud=$172,357 S.money=173054
+[18:46:12]   MONEY MISMATCH hud=$173,054 S.money=174197
+[18:46:18]   MONEY MISMATCH hud=$179,271 S.money=180767
+[18:46:28]   MONEY MISMATCH hud=$181,026 S.money=183106
+[18:46:39]   MONEY MISMATCH hud=$188,472 S.money=188882
+[18:46:44]   MONEY MISMATCH hud=$190,103 S.money=191974
+[18:46:54]   MONEY MISMATCH hud=$198,499 S.money=199408
+[18:47:07]   255s: speed -> 1× (hud chip: "21:35", R.speed=1)
+[18:47:21]   MONEY MISMATCH hud=$208,056 S.money=208775
+[18:47:35] DAY 2 done (258s real, game clock closed): short=0 soldOutLeft=0 tickets=0 money=207375 hud=$210,296 errors=[]
+[18:47:35]   SUMMARY rev=55905 net=63385 guests=100 lost=4 rating 4.84→4.85 story=[('料理品質', '177 道 Perfect'), ('上菜速度', '客人很少等'), ('店裡氛圍', '+21')] recs=['guestsDay', 'ratingMax', 'perfectDay', 'combo']
+[18:47:36] END day=32 money=207375 hud=$207,375 money checks=1317 mismatches=22 stock notices=["Jill's 檸檬奶油干貝賣完了。", '巴斯克乳酪蛋糕賣完了。', '拿鐵咖啡賣完了。', '提拉米蘇賣完了。', '檸檬氣泡水賣完了。', '海鮮義大利麵賣完了。'] offscreen=[] wageOwed=0 errors=[]

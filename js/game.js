@@ -960,7 +960,8 @@ const SETS={drink:{n:'主餐＋飲料',d:'點主餐的客人更常加一杯（�
 function setOn(k){return!!(S.sets&&S.sets[k])}
 function setFor(cat){if(cat==='drink'&&setOn('full'))return'full';if(cat==='drink'&&setOn('drink'))return'drink';if(cat==='dessert'&&setOn('full'))return'full';if(cat==='dessert'&&setOn('dessert'))return'dessert';return null}
 function recoDish(){const r=S.today&&S.today.reco;return r&&S.menu.includes(r)&&S.unlocked.includes(r)?r:(r==='signature'&&S.signature?r:null)}
-function orderItems(g,est){/* v2.2: a sold-out dish is not on offer (est = the demand estimate, which ignores the fridge) */const ms0=menuList().filter(stationOk);const ms=est?ms0:ms0.filter(d=>(S.stock[d]||0)>0);const T=TYPES[g.type];const W=R?R.weather:(S.today?S.today.weather:'sun');
+function orderItems(g,est){/* v2.2: a sold-out dish is not on offer (est = the demand estimate, which ignores the fridge; on the two
+   auto-provisioning days the tutorial still lets Jill order a missing unit herself, so nothing is filtered there) */const ms0=menuList().filter(stationOk);const ms=est||S.day<=2?ms0:ms0.filter(d=>(S.stock[d]||0)>0);const T=TYPES[g.type];const W=R?R.weather:(S.today?S.today.weather:'sun');
  const wf=d=>demandW(d,T);const reco=recoDish();
  const foods=()=>ms.filter(d=>DISH(d).cat!=='drink'&&DISH(d).cat!=='dessert');const drinks=()=>ms.filter(d=>DISH(d).cat==='drink');const des=()=>ms.filter(d=>DISH(d).cat==='dessert');
  const items=[];const cap=g.size===1?3:g.size===2?4:5;const reg=g.reg?REG_BY[g.reg]:null;
@@ -980,7 +981,7 @@ function orderItems(g,est){/* v2.2: a sold-out dish is not on offer (est = the d
   if(d)items.push(d);
   const hasMain=!!d&&DISH(d).cat==='main';const pd=(g.reg==='dylan'?.7:(T.pD||.35))*(W==='hot'?1.5:W==='rain'||W==='storm'?1.2:1)*(reco&&DISH(reco).cat==='drink'?1.25:1)*(hasMain&&setFor('drink')?1.6:1);const dr=drinks();if(dr.length&&(Math.random()<pd||!d))items.push(wpick(dr,wf));
   const ds=des();if(ds.length&&Math.random()<(T.pS||.2)*(reco&&DISH(reco).cat==='dessert'?1.4:1)*(g.celebrate?2.2:1)*(g.broke||g.rushed||g.quick?.2:1)*(hasMain&&setFor('dessert')?1.7:1))items.push(wpick(ds,wf))}
- let out=items.filter(Boolean).slice(0,cap);if(!est){const used={};out=out.filter(d=>{used[d]=(used[d]||0)+1;return used[d]<=(S.stock[d]||0)})}if(g.share){/* one dessert, two forks */let seen=false;return out.filter(d=>{if(DISH(d).cat!=='dessert')return true;if(seen)return false;seen=true;return true})}return out}
+ let out=items.filter(Boolean).slice(0,cap);if(!est&&S.day>2){const used={};out=out.filter(d=>{used[d]=(used[d]||0)+1;return used[d]<=(S.stock[d]||0)})}if(g.share){/* one dessert, two forks */let seen=false;return out.filter(d=>{if(DISH(d).cat!=='dessert')return true;if(seen)return false;seen=true;return true})}return out}
 /* expected sales per dish for a day like today: the guest mix and the ordering rules themselves, sampled */
 function expectDemand(groups,n,est){const out={};const G=S.today?S.today.groups:groups||10;const N=n||60;
  for(let i=0;i<N;i++){const o=rollGuest();const g={type:o.type,size:o.size,reg:null,forSig:o.forSig};for(const d of orderItems(g,true))out[d]=(out[d]||0)+1}
@@ -989,7 +990,7 @@ function createTicket(g){const items=orderItems(g);const t=R.tables[g.table];
  if(!items.length){/* nothing they wanted is left in the fridge */R.st.soldOutLeft=(R.st.soldOutLeft||0)+g.size;if(canChat('soldout',30,3))quote(g,pick(['想吃的都賣完了。','沒東西可以點了？','下次早點來。']));noteLine(`${g.name} 想點的都賣完了，走了。`);leaveGroup(g,'sad');return}
  const hasMain=items.some(d=>DISH(d).cat==='main');const tk={id:R.tkid++,no:t.i+1,g,items:items.map(d=>{const cat=DISH(d).cat;const set=hasMain&&(cat==='drink'||cat==='dessert')&&setFor(cat)||null;return{d,st:'pending',q:null,want:d==='steak'?wpick([0,1,2,3],k=>[.2,.35,.3,.15][k]):0,picked:false,set}}),t0:R.t};
  if(g.reg&&g.reg!=='dylan'){const m=regMem(g.reg);for(const it of tk.items)m.orders[it.d]=(m.orders[it.d]||0)+1;if(g.share&&tk.items.some(i=>DISH(i.d).cat==='dessert')&&Math.random()<.5)setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,'一份甜點，兩支叉子。')},800)}
- for(const it of tk.items)takeStock(it);tk.items=tk.items.filter(it=>it.st!=='cancel');stockWatch();
+ for(const it of tk.items)takeStock(it);tk.items=tk.items.filter(it=>it.st!=='cancel');if(tk.items.some(it=>it.st==='order')){toast(`食材不夠！Jill 緊急叫貨中（1.5 倍價），${g.name} 要多等一下`);g.pat=Math.min(1,g.pat+.1)}stockWatch();
  g.ticket=tk;g.state='wait';g.pat=Math.min(1,g.pat+.12);R.tickets.push(tk);R.tv++;sfx.ticket();
  if(g.reg==='dylan'){}else if(g.reg){const v=S.regulars[g.reg]||0;const tier=Math.floor(regTier(v));/* not every visit: a line when they are still new, then only now and then */if(tier===0?Math.random()<.5:Math.random()<.35)quote(g,REG_BY[g.reg].l[tier])}else if(g.type==='vip')quote(g,'把你們最好的端上來吧。');else if(Math.random()<.12)quote(g,pick(['今天想吃點好的。','聽說這裡的東西都是 Jill 親手做的？','有推薦的嗎？算了，都點吧。']));
  coach(2)}
@@ -1040,14 +1041,15 @@ function holdEnd(){const s=R&&R.holdSlot;if(!s)return;R.holdSlot=null;const j=s.
  applyHold(j,k);advance(s,sc)}
 function updJob(s,dt){const j=s.job,k=j.step;if(!k)return;const sp=dishSpeed(j.d,s.type);
  if(chefAuto(s,dt))return;
+ const hdt=(R.speed||1)>1.5?dt*1.5/R.speed:dt;   /* the hand-timing clock (see SPEEDS) */
 
  switch(k.t){
  case'wait':k.p+=dt*sp/k.time;j.wait=Math.min(1,k.p);if(k.anim==='stir'){j.mix=Math.max(j.mix,Math.min(1,k.p));k.wt=(k.wt||0)+dt;if(k.wt>.3){k.wt=0;s.shake=.5}}if(k.p>=1){sfx.ding();if(k.over){j.overStart=R.t;j.overLimit=k.over;j.overIdx=j.scores.length;j.overVerb=k.verb}advance(s,1)}break;
- case'zone':k.p+=dt*sp/k.time;if(k.p>=1.5)charcoal(s);break;
+ case'zone':k.p+=hdt*sp/k.time;if(k.p>=1.5)charcoal(s);break;
  case'work':{if(chefHandles(s)&&!cookPresent(s))break;k.p+=dt*sp/k.time;k.taps=Math.min(k.n,Math.floor(k.p*k.n));k.wt+=dt;if(k.wt>.18){k.wt=0;s.shake=.8;if(Math.random()<.45)(k.board?sfx.chop():sfx.stir())}if(!k.board)j.mix=Math.max(j.mix,Math.min(1,k.p));
   if(k.p>=1){j.cut=true;if(k.board&&CUTADD[j.d]&&!j.adds.includes(CUTADD[j.d]))j.adds.push(CUTADD[j.d]);advance(s,1)}break}
- case'tap':if(k.heat){if(R.t-k.last>.85)k.scorch+=dt*.3/(1+.12*(S.eq.pan-1))*(S.day<=2?.6:1);else k.scorch=Math.max(0,k.scorch-dt*.04);if(k.scorch>=1){j.burnt=true;trayFloat(s,'燒焦了','#E0654A');finishJob(s)}}break;
- case'hold':if(k.hold){k.holdT=(k.holdT||0)+dt;if(k.holdT>1.3/k.rate+1.5){holdEnd();break}k.level+=dt*k.rate;s.ht=(s.ht||0)+dt;if(s.ht>.13){s.ht=0;k.ing==='beans'?sfx.grind():k.ing==='milk'?sfx.steam():sfx.pour()}if(k.level>=1.04)holdEnd()}break}}
+ case'tap':if(k.heat){if(R.t-k.last>.85)k.scorch+=hdt*.3/(1+.12*(S.eq.pan-1))*(S.day<=2?.6:1);else k.scorch=Math.max(0,k.scorch-hdt*.04);if(k.scorch>=1){j.burnt=true;trayFloat(s,'燒焦了','#E0654A');finishJob(s)}}break;
+ case'hold':if(k.hold){k.holdT=(k.holdT||0)+hdt;if(k.holdT>1.3/k.rate+1.5){holdEnd();break}k.level+=hdt*k.rate;s.ht=(s.ht||0)+dt;if(s.ht>.13){s.ht=0;k.ing==='beans'?sfx.grind():k.ing==='milk'?sfx.steam():sfx.pour()}if(k.level>=1.04)holdEnd()}break}}
 function charcoal(s){const j=s.job;s.job=null;if(R.holdSlot===s)R.holdSlot=null;const it=j.it;R.st.q.B++;R.streak=0;sfx.burnt();trayFloat(s,'焦成木炭了','#E0654A');
  it.st='pending';if(takeStock(it)){toast(`${DISH(it.d).n} 焦掉了，得重做一份`)}else{toast(`${DISH(it.d).n} 焦掉了，而且沒有備料了——這道只好取消`,'warn');const tk=R.tickets.find(t=>t.items.includes(it));if(tk){tk.items=tk.items.filter(x=>x!==it);const g=tk.g;g.pat=Math.max(0,g.pat-.25);if(!tk.items.length){tk.items=[];}}}stockWatch();R.tv++}
 function addXP(d,n){const before=mLv(d);S.xp[d]=(S.xp[d]||0)+n;const after=mLv(d);if(after>before){toast(`熟練度提升：${DISH(d).n} LV${after}`);if(d==='duck'&&after>=5)ach('duck')}}
@@ -1336,15 +1338,17 @@ function startClosing(){R.closing=0;hideCombo();const J=R.jill;J.q=[];J.cur=null
 function finishClosing(){if(!R||R.ended)return;R.ended=true;$('#closePill').hidden=true;endDay()}
 /* Why the stars went where they went today, in the player's words. Each cause carries a sign and a weight so the
    summary can show the ones that mattered. Computed from what happened, not from the formula's decimals. */
-function ratingStory(st,plated){const out=[];const add=(t,s,w)=>out.push({t,s,w});
- const q=st.q||{};const good=(q.P||0)+(q.G||0),bad=(q.O||0)+(q.B||0);if(plated>=4){if(good/plated>=.8)add(`料理品質高（Perfect ${q.P||0}・Good ${q.G||0}）`,1,good/plated);if(bad/plated>=.25)add(`料理失常 ${bad} 道（Okay／燒焦）`,-1,bad/plated*1.5)}
- const pats=st.pats||[];if(pats.length>=4){const p=pats.reduce((a,b)=>a+b,0)/pats.length;if(p<.5)add(`客人等太久（結帳時平均耐心 ${Math.round(p*100)}%）`,-1,(.6-p)*2.5);else if(p>=.78)add('上菜快，客人很少等',1,(p-.6)*1.5)}
- if(st.angry)add(`${st.angry} 組客人生氣離開（每組一顆星）`,-1,st.angry*.5);
- if(st.lost>=6)add(`${st.lost} 位客滿沒等到位子（有些留下兩顆星）`,-1,st.lost*.06);
- if((st.pricey||0)>=3)add(`${st.pricey} 組覺得價格偏高`,-1,st.pricey*.15);
- const short=Object.values(st.short||{}).reduce((a,b)=>a+b,0);if(short>=6)add(`缺貨臨時叫貨 ${short} 次，客人多等`,-1,short*.05);
- if(ambience()>=6)add(`店裡氛圍 +${ambience()}`,1,.3);if((st.catJoy||0)>=3)add(`貓陪了 ${st.catJoy} 桌客人`,1,st.catJoy*.08);if(st.treats)add(`請客 ${st.treats} 次`,1,.25);
- if(st.critic==='good')add('評論家給了好評（權重 ×3）',1,2);if(st.critic==='bad')add('評論家的評價不好（權重 ×3）',-1,2);
+/* v2.2: the rating's story as structured factors — a label, the number that matters, one supporting line — so the
+   summary can lay them out like a card instead of a sentence with a parenthesis. `t` is kept for older saves. */
+function ratingStory(st,plated){const out=[];const add=(k,label,value,sub,s,w)=>out.push({k,label,value,sub:sub||'',s,w,t:`${label} ${value}${sub?'（'+sub+'）':''}`});
+ const q=st.q||{};const good=(q.P||0)+(q.G||0),bad=(q.O||0)+(q.B||0);if(plated>=4){if(good/plated>=.8)add('quality','料理品質',`${q.P||0} 道 Perfect${q.G?` · ${q.G} 道 Good`:''}`,`${plated} 道裡的 ${Math.round(good/plated*100)}%`,1,good/plated);if(bad/plated>=.25)add('quality-','料理失常',`${bad} 道`,'Okay 或燒焦',-1,bad/plated*1.5)}
+ const pats=st.pats||[];if(pats.length>=4){const p=pats.reduce((a,b)=>a+b,0)/pats.length;if(p<.5)add('wait-','等太久',`平均耐心剩 ${Math.round(p*100)}%`,'結帳時',-1,(.6-p)*2.5);else if(p>=.78)add('wait','上菜速度','客人很少等',`平均耐心 ${Math.round(p*100)}%`,1,(p-.6)*1.5)}
+ if(st.angry)add('angry','生氣離開',`${st.angry} 組`,'每組扣一顆星',-1,st.angry*.5);
+ if(st.lost>=6){const low=(st.reviews||[]).filter(r=>r.tags&&r.tags.left).length;add('lost','客滿離開',`${st.lost} 位`,low?`其中 ${low} 則留下兩顆星`:'沒等到位子',-1,st.lost*.06)}
+ if((st.pricey||0)>=3)add('pricey','價格偏高',`${st.pricey} 組這麼覺得`,'',-1,st.pricey*.15);
+ const short=Object.values(st.short||{}).reduce((a,b)=>a+b,0);if(short>=6)add('short','賣完了',`${short} 次點不到`,'客人改點別的或離開',-1,short*.05);
+ if(ambience()>=6)add('amb','店裡氛圍',`+${ambience()}`,'裝潢與燈光',1,.3);if((st.catJoy||0)>=3)add('cats','貓在店裡過日子',`${st.catJoy} 桌客人遇到了牠們`,'牠們沒有在招呼誰，客人自己開心',1,st.catJoy*.08);if(st.treats)add('treat','請客',`${st.treats} 次`,'',1,.25);
+ if(st.critic==='good')add('critic','評論家好評','權重 ×3','',1,2);if(st.critic==='bad')add('critic-','評論家差評','權重 ×3','',-1,2);
  return out.sort((a,b)=>b.w-a.w)}
 /* the restaurant's records: fun, legible, with the day they were set */
 const REC_N={revDay:'單日最高營業額',guestsDay:'單日最多客人',ratingMax:'最高評分',dishDay:'單日一道菜賣最多',tipsDay:'單日最多小費',perfectDay:'單日最多 Perfect',combo:'最長 COMBO',photosDay:'單日最多照片',calm:'連續沒有客人生氣離開',rain:'下雨天營業額最高',treats:'請客的次數',sig:'招牌菜賣出的份數',regs:'來過最多次的熟客'};
@@ -1398,8 +1402,8 @@ function hideCoach(){$('#coach').hidden=true}
 /* ================= HUD & tickets ================= */
 let hudCache={};
 function clockStr(){if(!R)return phase==='service'?'17:00':'打烊';const m=Math.floor(17*60+Math.min(R.t/R.dur,1.35)*270);const h=Math.floor(m/60),mm=m%60;return`${h}:${String(mm).padStart(2,'0')}`}
-function hud(force){const vals={d:S.day,c:R?clockStr():(phase==='prep'?'開店前':phase==='title'?'17:00':'打烊後'),r:rating().toFixed(1),m:fmt(S.money)};
- if(force||vals.d!==hudCache.d)$('#hDay').textContent=vals.d;if(force||vals.c!==hudCache.c)$('#hClock').textContent=vals.c;if(force||vals.r!==hudCache.r)$('#hRate').textContent=vals.r;if(force||vals.m!==hudCache.m)$('#hMoney').textContent=vals.m;hudCache=vals;
+function hud(force){const spv=simSpeed();const vals={d:S.day,c:(R?clockStr():(phase==='prep'?'開店前':phase==='title'?'17:00':'打烊後'))+(phase==='service'&&R&&spv!==1?` <i>${spv}×</i>`:''),r:rating().toFixed(1),m:fmt(S.money)};
+ if(force||vals.d!==hudCache.d)$('#hDay').textContent=vals.d;if(force||vals.c!==hudCache.c){$('#hClock').innerHTML=vals.c;$('#hClock').classList.toggle('sp',!!(phase==='service'&&R&&spv!==1))}if(force||vals.r!==hudCache.r)$('#hRate').textContent=vals.r;if(force||vals.m!==hudCache.m)$('#hMoney').textContent=vals.m;hudCache=vals;
  if(R&&R.fire>0){$('#fire').hidden=false;$('#fireBar').style.width=(R.fire/15*100)+'%'}else $('#fire').hidden=true}
 let tkVer=-1,tkRefs=[];
 /* The order strip on a phone: when the tickets do not fit, the strip scrolls (drag anywhere on it, or tap the
@@ -1423,7 +1427,7 @@ document.addEventListener('contextmenu',noSelect);document.addEventListener('sel
 ticketsEl.addEventListener('scroll',()=>ticketsLayout(),{passive:true});
 {const rc=$('#regcard');if(rc)rc.addEventListener('click',()=>{rc.hidden=true});const lb=$('#lightbox');if(lb){lb.addEventListener('click',e=>{const b=e.target.closest('[data-lb]');if(!b)return;const a=b.dataset.lb;if(a==='close')closeLightbox();else if(a==='prev')lightboxStep(-1);else if(a==='next')lightboxStep(1);else if(a==='keep'){const p=albumList().find(x=>x.id===lightbox.ids[lightbox.i]);if(p){p.keep=!p.keep;if(albumList().filter(x=>x.keep&&!MEMS_FIRST(x)).length>=10)ach('keep10');save();lightboxRender();if(sub==='book')keepScroll(showBook)}}});
  let sx=null,sy=null;lb.addEventListener('touchstart',e=>{const t=e.touches[0];sx=t.clientX;sy=t.clientY},{passive:true});lb.addEventListener('touchend',e=>{if(sx==null)return;const t=e.changedTouches[0];const dx=t.clientX-sx,dy=t.clientY-sy;sx=null;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5)lightboxStep(dx<0?1:-1)},{passive:true});
- document.addEventListener('keydown',e=>{if(!lightbox)return;if(e.key==='Escape')closeLightbox();else if(e.key==='ArrowLeft')lightboxStep(-1);else if(e.key==='ArrowRight')lightboxStep(1)})}}
+ document.addEventListener('keydown',e=>{if(phase==='service'&&R&&!paused&&!sub&&(e.key==='['||e.key===']')){const i=SPEEDS.indexOf(simSpeed());setSpeed(SPEEDS[clamp(i+(e.key===']'?1:-1),0,SPEEDS.length-1)]);return}if(!lightbox)return;if(e.key==='Escape')closeLightbox();else if(e.key==='ArrowLeft')lightboxStep(-1);else if(e.key==='ArrowRight')lightboxStep(1)})}}
 $('#tkMore').addEventListener('click',()=>{ticketsEl.scrollBy({left:ticketsEl.clientWidth*.8,behavior:'smooth'});setTimeout(ticketsLayout,400)});
 $('#tkBack').addEventListener('click',()=>{ticketsEl.scrollBy({left:-ticketsEl.clientWidth*.8,behavior:'smooth'});setTimeout(ticketsLayout,400)});
 ticketsEl.addEventListener('click',e=>{const b=e.target.closest('.it');if(!b||!R)return;const tk=R.tickets.find(t=>t.id===+b.dataset.tk);if(!tk)return;const it=tk.items[+b.dataset.i];if(!it)return;
@@ -3221,7 +3225,9 @@ function incDraw(c,now,list){const th=R&&R.thief;if(th)list.push({y:th.y,f:()=>{
 /* v2.2: a unit leaves the fridge when it is ordered. There is no automatic emergency order any more: the game never spends
    the player's money on its own, so money cannot go negative here. If the fridge is empty after all (a re-make after a
    burnt plate), the item is cancelled and the guest is told. */
-function takeStock(it){if((S.stock[it.d]||0)>0){S.stock[it.d]--;return true}it.st='cancel';R.st.short=R.st.short||{};R.st.short[it.d]=(R.st.short[it.d]||0)+1;return false}
+function takeStock(it){if((S.stock[it.d]||0)>0){S.stock[it.d]--;return true}
+ if(S.day<=2){/* the two opening days: the game provisions for the player (it says so on the prep screen) — an emergency unit at 1.5×, only if the till can pay it */const c=Math.round(costOf(it.d)*1.5);if(S.money>=c){S.money-=c;S.todayCost+=c;it.st='order';it.ordT=R.t+5;R.st.short=R.st.short||{};R.st.short[it.d]=(R.st.short[it.d]||0)+1;return true}}
+ it.st='cancel';R.st.short=R.st.short||{};R.st.short[it.d]=(R.st.short[it.d]||0)+1;return false}
 /* low-stock and sold-out notices, once each per dish per day, with a shortcut to the fridge */
 function stockWatch(){if(!R||!feat().stock)return;R.stockNote=R.stockNote||{};for(const d of menuList().filter(stationOk)){const n=S.stock[d]||0;const k=R.stockNote[d]||0;if(n<=0&&k<2){R.stockNote[d]=2;toast(`<b>${dishName(d)}</b> 賣完了，菜單上先標示售完（冰箱可以臨時叫貨）`,'warn');logLine('',`${dishName(d)}賣完了。`,'e')}else if(n<=2&&k<1){R.stockNote[d]=1;if(R.t-(R.lowToastT||-99)>25){R.lowToastT=R.t;toast(`${dishName(d)} 只剩 ${n} 份`)}}}stockChip()}
 function stockArrive(){let n=0;for(const tk of R.tickets)for(const it of tk.items)if(it.st==='order'&&R.t>=it.ordT){it.st='pending';n++}if(n){R.tv++;toast('叫的食材送到了！可以開始做了');sfx.ding()}}
@@ -3376,6 +3382,7 @@ for(const ev of['touchend','touchcancel'])window.addEventListener(ev,()=>{if(R&&
 for(const el of[sc,tc]){el.addEventListener('touchstart',e=>{e.preventDefault()},{passive:false});el.addEventListener('touchmove',e=>{e.preventDefault()},{passive:false})}
 tc.addEventListener('contextmenu',e=>e.preventDefault());
 $('#closePill').addEventListener('click',()=>finishClosing());$('#peekPill').addEventListener('click',()=>{$('#peekPill').hidden=true;screenEl.hidden=false;if(phase!=='service'){room='main';forceDraw=true;if(mainScreen==='shop')keepScroll(showShop);else if(mainScreen==='prep')keepScroll(showPrep);else hud(true)}});
+$('#hClock').addEventListener('click',()=>{if(phase==='service'&&R&&!paused){audioInit();cycleSpeed()}});
 $('#hPause').addEventListener('click',()=>{audioInit();if(phase==='service'){paused=true;showPause();checkpointSave('pause')}else if(phase!=='title'){openSub('settings')}});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){if(phase==='service'&&!paused){paused=true;showPause()}if(phase==='service'&&R)checkpointSave('hidden');else if(phase!=='title')save()}else{bg=null;DCACHE.clear();audioResume()}});
 window.addEventListener('pagehide',()=>{if(phase==='service'&&R)checkpointSave('pagehide');else if(phase!=='title')save()});
@@ -3437,13 +3444,17 @@ function showPrep(){phase='prep';mainScreen='prep';R=null;room='main';lifeReset(
   ${S.day>=2?`<button class="btn sm" data-act="backShop" style="width:100%;margin-top:10px">‹ 返回升級餐廳</button>`:''}
   <div class="footer"><div id="startWarn"></div><button class="btn primary big" data-act="start">開始營業</button></div></div>`)}
 
-function showSummary(){phase='summary';mainScreen='summary';const s=S.lastSummary;if(!s){showShop();return}
+function showSummary(){phase='summary';mainScreen='summary';const s=S.lastSummary;if(!s){showShop();return}hud(true);/* v2.2 A5: the wages just left the till — the HUD must say so on this screen, not on the next */
  const topHTML=s.top?`<img alt="" src="${dishURL(s.top,'P')}" style="width:34px;height:34px;vertical-align:middle;margin-right:4px">${DISH(s.top)?DISH(s.top).n:''}`:'—';
  show(`<div class="sheet tall"><div class="sh-top"><div class="ttl"><div class="eyebrow">今日結算</div><h2>DAY ${s.day}</h2><div class="sum-stars">${starsHTML(s.stars)}</div></div><button class="icon-btn" data-act="peek" style="font-weight:800;font-size:11px;width:auto;padding:0 9px">看店裡</button></div>
   <div class="ledger"><div><span>營業額</span><span>${fmt(s.rev)}</span></div><div class="neg"><span>食材成本</span><span>-${fmt(s.cost)}</span></div>${s.wages?`<div class="neg"><span>薪資</span><span>-${fmt(s.wages)}</span></div>`:''}<div class="pos"><span>小費</span><span>+${fmt(s.tips)}</span></div>${s.bonus?`<div class="pos"><span>任務獎勵</span><span>+${fmt(s.bonus)}</span></div>`:''}<div class="net"><span>今日淨利</span><span style="color:${s.net>=0?'var(--sage)':'#A2412B'}">${s.net>=0?'+':''}${fmt(s.net)}</span></div></div>
   ${(()=>{const W=WEATHER[s.weather]||WEATHER.sun,E=EVENTS[s.event];return`<div class="chips"><span>${W.n}</span>${s.event&&s.event!=='none'&&E?`<span>${E.n}</span>`:''}${s.treats?`<span>請客 ${s.treats} 次</span>`:''}${s.sets?`<span>套餐加點 ${s.sets} 份</span>`:''}${s.short?`<span class="warn">臨時叫貨 ${s.short} 次</span>`:''}</div>`})()}
-  ${s.r1!=null?`<div class="card rating"><div class="rl"><span>餐廳評分</span><b>${(s.r0||3).toFixed(2)} → ${s.r1.toFixed(2)}</b><em class="${s.r1>s.r0+.004?'up':s.r1<s.r0-.004?'dn':''}">${s.r1>s.r0+.004?'↑':s.r1<s.r0-.004?'↓':'→'}</em></div>${s.story&&s.story.length?`<ul>${s.story.slice(0,3).map(x=>`<li class="${x.s>0?'up':'dn'}">${x.s>0?'＋':'－'} ${x.t}</li>`).join('')}</ul>`:'<p class="muted" style="margin:4px 0 0">今天沒有明顯影響評分的事。</p>'}${(()=>{const nl=LEVELS[S.level];if(!nl)return'';const ok=s.r1>=nl.rating;return`<small>${ok?`已達擴建到 ${nl.n} 的評分門檻（${nl.rating.toFixed(1)}）`:`擴建到 ${nl.n} 需要 ${nl.rating.toFixed(1)}，還差 ${(nl.rating-s.r1).toFixed(2)}`}</small>`})()}</div>`:''}
-  ${s.recs&&s.recs.length?`<div class="news">🏆 今天創了紀錄：${s.recs.map(k=>REC_N[k]).join('、')}</div>`:''}
+  ${s.r1!=null?(()=>{const up=s.r1>s.r0+.004,dn=s.r1<s.r0-.004;const F=(s.story||[]).map(x=>x.label?x:{label:x.t,value:'',sub:'',s:x.s});const pos=F.filter(x=>x.s>0).slice(0,3),neg=F.filter(x=>x.s<0).slice(0,3);
+   const row=x=>`<div class="rf"><span class="rf-k">${x.label}</span><span class="rf-v">${x.value}</span>${x.sub?`<small class="rf-s">${x.sub}</small>`:''}</div>`;
+   const nl=LEVELS[S.level];const gate=nl?(s.r1>=nl.rating?`已達擴建到 ${nl.n} 的門檻 ${nl.rating.toFixed(1)}`:`擴建到 ${nl.n} 需要 ${nl.rating.toFixed(1)}，還差 ${(nl.rating-s.r1).toFixed(2)}`):'';
+   return`<div class="card rating"><div class="rl"><span>餐廳評分</span><b>${(s.r0||3).toFixed(2)} <i>→</i> ${s.r1.toFixed(2)}</b><em class="${up?'up':dn?'dn':''}">${up?'↑':dn?'↓':'→'}</em></div>
+    ${pos.length||neg.length?`<div class="rfs">${neg.length?`<div class="rfg dn"><div class="rfg-h">扣分</div>${neg.map(row).join('')}</div>`:''}${pos.length?`<div class="rfg up"><div class="rfg-h">加分</div>${pos.map(row).join('')}</div>`:''}</div>`:'<p class="muted" style="margin:4px 0 0">今天沒有明顯影響評分的事。</p>'}${gate?`<small>${gate}</small>`:''}</div>`})():''}
+  ${s.recs&&s.recs.length?`<div class="recs"><span class="recs-h">🏆 今天創了紀錄</span>${s.recs.map(k=>`<span class="rec">${REC_N[k]}</span>`).join('')}</div>`:''}
   <div class="statgrid"><div class="card"><small>客人數</small><b>${s.guests}</b>${s.lost?` <small style="display:inline">（${s.lost} 位沒等到）</small>`:''}${s.walkins?` <small style="display:inline">（${s.walkins} 組路過進來）</small>`:''}</div><div class="card"><small>Perfect 料理</small><b>${s.perfect}</b> <small style="display:inline">/ ${s.plated}</small></div><div class="card"><small>平均滿意度</small><b>${s.avg}%</b></div><div class="card"><small>最受歡迎</small><b style="font-size:13px">${topHTML}</b></div></div>
   ${s.sales&&s.sales.length?`<h3>今天賣了什麼</h3><div class="card sales">${s.sales.map(x=>`<div class="sale ${x.d===s.reco?'reco':''}"><img alt="" src="${dishURL(x.d,'P')}"><span class="nm">${x.d===s.reco?'⭐ ':''}${dishName(x.d)}</span><span class="n">${x.n} 份</span><span class="rev">${fmt(x.rev)}</span><small>${x.short?`臨時叫貨 ${x.short}`:x.left?`剩 ${x.left}`:'賣完'}</small></div>`).join('')}</div>`:''}
   ${s.crew&&s.crew.length?`<h3>員工今天做了什麼</h3><div class="card staffday">${s.crew.map(m=>{const n=m.n||{};const parts=m.role==='chef'?[n.cook?`做了 ${n.cook} 道`:'沒有接到菜']:m.role==='waiter'?[n.seat?`帶位 ${n.seat}`:'',n.order?`點餐 ${n.order}`:'',n.serve?`上菜 ${n.serve}`:'',n.check?`結帳 ${n.check}`:'',n.clean?`收桌 ${n.clean}`:''].filter(Boolean):[n.clean?`收了 ${n.clean} 桌`:'沒有桌子要收'];return`<div class="srow"><b>${m.name}</b><span>${parts.join('・')||'—'}</span><small>日薪 ${fmt(m.wage)}</small></div>`}).join('')}<div class="srow tot"><b>薪資合計</b><span>${fmt(s.wages)}${s.rev?`（營業額的 ${Math.round(s.wages/s.rev*100)}%）`:''}</span></div></div>`:''}
@@ -3487,7 +3498,12 @@ function showShop(){phase='shop';mainScreen='shop';R=null;rdAutoUnlock();IDLE=ma
    body+=`<div class="item ${on?'done':''}"><img alt="" src="${iconURL(G.ic)}"><div class="nm">${G.n} ${on?'<span class="tier t1">已擺好</span>':''}${G.room==='side'?' <span class="muted" style="font-weight:600;font-size:12px">側廳</span>':''}</div><div class="d">${G.d}${on&&used.length?`<br><b>用過的：</b>${used.map(id=>catName(CAT_DEF.find(x=>x.id===id))).join('、')}`:''}</div>${on?'':`<div class="act">${ok?btn(G.cost,'buyGear',`data-k="${G.k}"`):okRoom?`<span class="muted">需要擴建到 ${LEVELS[(G.lv||1)-1].n}</span>`:'<span class="muted">要先有側廳</span>'}</div>`}</div>`}}
  if(shopTab==='staff'){const crew=S.crew||[];const cap=crewCap();
   body+=`<p class="muted" style="font-size:12.5px;margin:0 0 6px">員工 ${crew.length}/${cap} 人・每日薪資 ${fmt(crewWages())}。${LEVELS[S.level]?'擴建餐廳可以聘更多人。':[!opsLv('room')?'「後場休息室」（桌椅與擴建）':'',!projOn('side')?'「側廳」（工程）':'',!projOn('kext')?'「廚房擴建」（工程）':''].filter(Boolean).length?[!opsLv('room')?'「後場休息室」（桌椅與擴建）':'',!projOn('side')?'「側廳」（工程）':'',!projOn('kext')?'「廚房擴建」（工程）':''].filter(Boolean).join('、')+' 各可以再多 2 位。':'這是最多的人數了。'}</p>`;
-  body+=crew.map(m=>{const R0=ROLES[m.role];const up=m.lv<5?R0.up*m.lv:null;return`<div class="item"><img alt="" src="${iconURL(m.role)}"><div class="nm">${m.name} <span class="tier t1">${R0.n}</span> <span class="pips">${[1,2,3,4,5].map(i=>`<i class="${i<=m.lv?'on':''}"></i>`).join('')}</span></div><div class="d">職責：<b>${m.role==='waiter'?dutyLabel(m):DUTY_N[m.duty]}</b>・日薪 ${fmt(crewWage(m))}・${crewStat(m)}</div>${m.role==='chef'?`<div class="cap">${(()=>{const list=S.unlocked.filter(d=>DISH(d).st===m.duty).concat(S.signature&&m.duty==='stove'?['signature']:[]);if(!list.length)return`<span class="muted">${ST_N[m.duty]}目前沒有料理</span>`;return list.map(d=>{const lock=chefLock(m,d);return`<span class="${lock?'no':'ok'}">${lock?'🔒':'✓'} ${dishName(d)}${lock?` <small>${lock}</small>`:''}</span>`}).join('')})()}</div>`:m.role==='waiter'?`<div class="cap duties">${[['seat','帶位',1],['order','點餐',1],['serve','上菜',2],['check','結帳',3],['clean','收桌',1]].map(([k,n,lv])=>{const d=waiterDuties(m);const locked=m.lv<lv;return`<button class="dt ${locked?'no':d[k]?'on':''}" data-act="dutyT" data-k="${m.id}" data-d="${k}" ${locked?'disabled':''}>${locked?'🔒':d[k]?'✓':'○'} ${n}${locked?` <small>LV${lv}</small>`:''}</button>`}).join('')}</div>`:`<div class="cap"><span class="ok">✓ 客人走後收桌</span></div>`}<div class="act">${m.role==='chef'&&R0.duties.length>1?`<button class="btn sm" data-act="duty" data-k="${m.id}">換工作站</button>`:''}${up!=null?btn(up,'crewUp',`data-k="${m.id}"`,'訓練升級'):'<span class="muted">已滿級</span>'}<button class="btn sm danger" data-act="crewFire" data-k="${m.id}">解雇</button></div></div>`}).join('');
+  const crewCard=m=>{const R0=ROLES[m.role];const up=m.lv<5?R0.up*m.lv:null;return`<div class="item"><img alt="" src="${iconURL(m.role)}"><div class="nm">${m.name} <span class="tier t1">${R0.n}</span> <span class="pips">${[1,2,3,4,5].map(i=>`<i class="${i<=m.lv?'on':''}"></i>`).join('')}</span></div><div class="d">職責：<b>${m.role==='waiter'?dutyLabel(m):DUTY_N[m.duty]}</b>・日薪 ${fmt(crewWage(m))}・${crewStat(m)}</div>${m.role==='chef'?`<div class="cap">${(()=>{const list=S.unlocked.filter(d=>DISH(d).st===m.duty).concat(S.signature&&m.duty==='stove'?['signature']:[]);if(!list.length)return`<span class="muted">${ST_N[m.duty]}目前沒有料理</span>`;return list.map(d=>{const lock=chefLock(m,d);return`<span class="${lock?'no':'ok'}">${lock?'🔒':'✓'} ${dishName(d)}${lock?` <small>${lock}</small>`:''}</span>`}).join('')})()}</div>`:m.role==='waiter'?`<div class="cap duties">${[['seat','帶位',1],['order','點餐',1],['serve','上菜',2],['check','結帳',3],['clean','收桌',1]].map(([k,n,lv])=>{const d=waiterDuties(m);const locked=m.lv<lv;return`<button class="dt ${locked?'no':d[k]?'on':''}" data-act="dutyT" data-k="${m.id}" data-d="${k}" ${locked?'disabled':''}>${locked?'🔒':d[k]?'✓':'○'} ${n}${locked?` <small>LV${lv}</small>`:''}</button>`}).join('')}</div>`:`<div class="cap"><span class="ok">✓ 客人走後收桌</span></div>`}<div class="act">${m.role==='chef'&&R0.duties.length>1?`<button class="btn sm" data-act="duty" data-k="${m.id}">換工作站</button>`:''}${up!=null?btn(up,'crewUp',`data-k="${m.id}"`,'訓練升級'):'<span class="muted">已滿級</span>'}<button class="btn sm danger" data-act="crewFire" data-k="${m.id}">解雇</button></div></div>`};
+  /* v2.2: the same jobs together — chefs by station, then the floor, then cleaning — so 「誰來做這個」 is one glance */
+  const GROUPS=[['chef','廚房',m=>DUTY_N[m.duty]||''],['waiter','外場',m=>dutyLabel(m)],['cleaner','清潔',()=>'收桌']];
+  for(const [role,title,duty] of GROUPS){const ms=crew.filter(m=>m.role===role).sort((a,b)=>(a.duty||'').localeCompare(b.duty||'')||b.lv-a.lv);if(!ms.length)continue;
+   body+=`<div class="crewgrp"><div class="cg-h"><b>${title}</b><span class="muted">${ms.length} 人</span>${role==='chef'?`<span class="muted">${['stove','oven','prep','bar'].filter(st=>S.eq[st]||st==='stove').map(st=>`${DUTY_N[st]} ${ms.filter(m=>m.duty===st).length||'—'}`).join(' · ')}</span>`:''}</div>
+    <div class="cg-cmp">${ms.map(m=>`<div class="cg-row"><span class="cg-n">${m.name}</span><span class="pips">${[1,2,3,4,5].map(i=>`<i class="${i<=m.lv?'on':''}"></i>`).join('')}</span><span class="cg-d">${duty(m)}</span><span class="cg-s">${crewStat(m)}</span></div>`).join('')}</div>${ms.map(crewCard).join('')}</div>`}
   body+=`<div class="nm" style="font-weight:800;font-size:15px;margin:14px 0 2px">招募</div>`+Object.keys(ROLES).map(r=>{const R0=ROLES[r];return`<div class="item"><img alt="" src="${iconURL(r)}"><div class="nm">${R0.n}</div><div class="d">${R0.d} 日薪 ${fmt(R0.wage)} 起，LV5 ${fmt(Math.round(R0.wage*2.8))}。</div><div class="act">${crew.length>=cap?`<span class="lock">${LEVELS[S.level]?'人數已滿，擴建後可再聘':opsLv('room')?'人數已滿':'人數已滿，後場休息室可以再多 2 位'}</span>`:btn(R0.hire,'hire',`data-k="${r}"`,'聘請')}</div></div>`}).join('')}
  if(shopTab==='sig'){if(S.signature)body+=`<div class="sig"><img alt="" src="${dishURL('signature','P')}"><div><div class="st">★ CHEF JILL'S SIGNATURE ★</div><b>${S.signature.name}</b><small>${fmt(priceOf('signature'))} · ${Object.keys(SIG).map(k=>SIG[k][S.signature[k]].n).join('・')}</small><small style="display:block;margin-top:3px">${sigLv()>=3?'第三版 · 食用花與金箔':sigLv()===2?`第二版 · 醬汁畫盤與嫩葉 · 賣到 ${SIG_EVO[2]} 份升第三版（目前 ${sigSold()}）`:`第一版 · 賣到 ${SIG_EVO[1]} 份升第二版（目前 ${sigSold()}）`}</small></div></div><p class="muted" style="font-size:12.5px">招牌菜永遠在菜單最上方，有些客人會專程為它而來。賣得夠多，Jill 會把盤子做得更講究、價格也高一點。可以花 $800 重新調整配方。</p>${btn(800,'sigOpen','','重新設計')}`;
   else body+=`<div class="item"><img alt="" src="${dishURL('signature','P')}"><div class="nm">Jill's Signature Dish</div><div class="d">從主食、蛋白質、醬汁、配菜組出一道只屬於 Jill 的料理。會出現在菜單最上方，客人也會專程為它而來（客流 +10%）。</div><div class="act">${S.level<2?'<span class="lock">需要擴建到 Jill\'s Bistro</span>':btn(3000,'sigOpen','','開始研發')}</div></div>`}
@@ -3570,6 +3586,7 @@ function saveCardHTML(){const cp=S.checkpoint&&S.checkpoint.day===S.day?S.checkp
  <div class="row" style="margin-top:8px"><button class="btn sm" style="flex:1" data-act="copyBackup">複製備份文字</button><button class="btn sm" style="flex:1" data-act="pasteBackup">貼上備份文字恢復</button></div></div>`}
 function showPause(){sub='pause';show(`<div class="modal"><h2>暫停中</h2><p>DAY ${S.day} · ${clockStr()} · 目前營業額 ${fmt(R?R.st.rev:0)}</p>
  <div class="stack"><button class="btn primary big" data-act="resume">繼續營業</button></div>
+ <div class="card" style="margin-top:10px"><div class="setrow"><span>營業速度</span><span class="seg">${SPEEDS.map(v=>`<button class="${simSpeed()===v?'on':''}" data-act="speed" data-k="${v}">${v}×</button>`).join('')}</span></div><p class="small" style="margin:6px 0 0">慢一點可以好好看菜和店裡的動靜；快一點是等菜的時候用。點上方的時間也可以切換。</p></div>
  <p class="small" style="margin:10px 2px 0">${S.savedLabel?`最後儲存：${S.savedLabel}`:'尚未存檔'} · 營業中每 20 秒、暫停時、切到別的 App 時都會存下店裡的狀況。</p>
  <div class="stack" style="margin-top:12px"><button class="btn" data-act="settings">設定・存檔・備份</button><button class="btn" data-act="guide">小小店主手冊</button>${R&&!R.closed?'<button class="btn" data-act="closeEarly">提早打烊（等店裡客人吃完）</button><button class="btn danger" data-act="closeNow">馬上結束今天</button>':''}</div></div>`,'dim')}
 function openSub(k){if(k==='book')showBook();else if(k==='settings'){resetStep=0;showSettings()}}
@@ -3586,10 +3603,10 @@ function doAct0(a,d,k,b){
  case'discardAll':{discardArmed=false;for(const x of S.unlocked)if(!S.menu.includes(x)&&(S.stock[x]||0)>0)buyStock(x,-99);sfx.tap();toast('退掉了不在菜單上的庫存');save();keepScroll(showPrep);break}
  case'setT':{S.sets=S.sets||{};S.sets[k]=!S.sets[k];if(k==='full'&&S.sets.full){S.sets.drink=false;S.sets.dessert=false}if((k==='drink'||k==='dessert')&&S.sets[k])S.sets.full=false;sfx.tap();save();keepScroll(showPrep);break}
  case'reco':{if(!S.today)break;S.today.reco=S.today.reco===d?null:d;sfx.tap();save();keepScroll(showPrep);break}
- case'toggle':{const on=S.menu.includes(d);if(on){const rest=S.menu.filter(x=>x!==d&&DISH(x).cat!=='drink'&&DISH(x).cat!=='dessert');if(!rest.length&&!S.signature&&DISH(d).cat!=='drink'&&DISH(d).cat!=='dessert'){toast('菜單至少要有一道主食');break}S.menu=S.menu.filter(x=>x!==d)}else{if(S.menu.filter(x=>S.unlocked.includes(x)).length>=menuCap()){toast(`菜單已滿（上限 ${menuCap()} 道）${LEVELS[S.level]?'，擴建後可以放更多':opsLv('board')?'':'；「大菜單板」可以多放 2 道'}`);break}S.menu.push(d);S.menuSince=S.menuSince||{};if(!S.menuSince[d])S.menuSince[d]=S.day;if(menuList().length>=8)ach('menu8')}sfx.tap();save();keepScroll(showPrep);break}
- case'price':{const steps=[.8,.9,1,1.1,1.2,1.3,1.5];let i=steps.indexOf(S.price[d]||1);if(i<0)i=2;i=clamp(i+(+b.dataset.v),0,steps.length-1);S.price[d]=steps[i];sfx.tap();save();keepScroll(showPrep);break}
- case'stock':{const want=+b.dataset.v;const ok=buyStock(d,want);const q=buyStock.last||{};if(!ok)toast(stockFailText(d,q),'warn');else{sfx.tap();if(want>0&&q.n<want)toast(`只進了 ${q.n} 份：${q.why==='cap'?'冰箱空間不足':'錢不夠再多'}`)}save();keepScroll(showPrep);break}
- case'stockTo':{/* v2.2: to the suggested amount, or 補滿 (as many as the fridge and the money allow) */const mode=b.dataset.k;const cur=S.stock[d]||0;const want=mode==='max'?999:Math.max(0,(suggestStock()[d]||0)-cur);if(want<=0){toast(mode==='max'?'冰箱已經放不下了':'已經達到建議量');break}const ok=buyStock(d,want);const q=buyStock.last||{};if(!ok)toast(stockFailText(d,q),'warn');else{sfx.buy();if(mode!=='max'&&q.n<want)toast(`只進了 ${q.n} 份：${q.why==='cap'?'冰箱空間不足':'錢不夠再多'}`)}save();keepScroll(showPrep);break}
+ case'toggle':{const on=S.menu.includes(d);if(on){const rest=S.menu.filter(x=>x!==d&&DISH(x).cat!=='drink'&&DISH(x).cat!=='dessert');if(!rest.length&&!S.signature&&DISH(d).cat!=='drink'&&DISH(d).cat!=='dessert'){toast('菜單至少要有一道主食');break}S.menu=S.menu.filter(x=>x!==d)}else{if(S.menu.filter(x=>S.unlocked.includes(x)).length>=menuCap()){toast(`菜單已滿（上限 ${menuCap()} 道）${LEVELS[S.level]?'，擴建後可以放更多':opsLv('board')?'':'；「大菜單板」可以多放 2 道'}`);break}S.menu.push(d);S.menuSince=S.menuSince||{};if(!S.menuSince[d])S.menuSince[d]=S.day;if(menuList().length>=8)ach('menu8')}sfx.tap();save();keepScroll(showPrep,`.menu-row [data-act=toggle][data-d="${d}"]`);break}
+ case'price':{const steps=[.8,.9,1,1.1,1.2,1.3,1.5];let i=steps.indexOf(S.price[d]||1);if(i<0)i=2;i=clamp(i+(+b.dataset.v),0,steps.length-1);S.price[d]=steps[i];sfx.tap();save();keepScroll(showPrep,`.menu-row [data-act=toggle][data-d="${d}"]`);break}
+ case'stock':{const want=+b.dataset.v;const ok=buyStock(d,want);const q=buyStock.last||{};if(!ok)toast(stockFailText(d,q),'warn');else{sfx.tap();if(want>0&&q.n<want)toast(`只進了 ${q.n} 份：${q.why==='cap'?'冰箱空間不足':'錢不夠再多'}`)}save();keepScroll(showPrep,`.menu-row [data-act=toggle][data-d="${d}"]`);break}
+ case'stockTo':{/* v2.2: to the suggested amount, or 補滿 (as many as the fridge and the money allow) */const mode=b.dataset.k;const cur=S.stock[d]||0;const want=mode==='max'?999:Math.max(0,(suggestStock()[d]||0)-cur);if(want<=0){toast(mode==='max'?'冰箱已經放不下了':'已經達到建議量');break}const ok=buyStock(d,want);const q=buyStock.last||{};if(!ok)toast(stockFailText(d,q),'warn');else{sfx.buy();if(mode!=='max'&&q.n<want)toast(`只進了 ${q.n} 份：${q.why==='cap'?'冰箱空間不足':'錢不夠再多'}`)}save();keepScroll(showPrep,`.menu-row [data-act=toggle][data-d="${d}"]`);break}
  case'restock':{const sug=suggestStock();for(const x in sug){const need=sug[x]-(S.stock[x]||0);if(need>0)buyStock(x,need)}sfx.buy();save();keepScroll(showPrep);break}
  case'start':{const empty=menuList().filter(x=>(S.stock[x]||0)===0);if(feat().stock&&empty.length&&!startWarned){startWarned=true;$('#startWarn').innerHTML=`<div class="inline-warn">${empty.map(x=>DISH(x).n).join('、')} 沒有備料，客人點了要臨時叫貨（1.5 倍價、要等）。再按一次直接開店。</div>`;break}startWarned=false;clearCheckpoint();save();startService();break}
  case'toShop':showShop();break;
@@ -3658,6 +3675,7 @@ function doAct0(a,d,k,b){
  case'resetNo':resetStep=0;showSettings();break;
  case'reset2':{S=newState();photoClear();try{localStorage.removeItem(KEY)}catch(e){}save();R=null;phase='title';ICACHE.clear();DCACHE.clear();IDLE=null;bg=null;resetStep=0;sub=null;toast('已重置，一切重新開始');showTitle();break}
  case'resume':paused=false;hideScreen();break;
+ case'speed':setSpeed(+k);if(sub==='pause')showPause();break;
  }}
 screenEl.addEventListener('input',e=>{if(e.target.dataset&&e.target.dataset.cat){S.catNames=S.catNames||{};S.catNames[e.target.dataset.cat]=e.target.value.trim().slice(0,8);save();return}if(e.target.id==='sigName'&&sigDraft)sigDraft.name=e.target.value});
 /* a big purchase is an event: the dust of the work, then the reveal — what changed, what it opens up, who said what */
@@ -3667,7 +3685,8 @@ function projectReveal(P){let el=$('#reveal');if(!el){el=document.createElement(
   el.innerHTML=`<div class="rv card"><div class="eyebrow">完工</div><h2>${P.n}</h2><p class="done">${P.done}</p><p class="say">Jill：「${P.jill}」</p>${P.react?`<p class="react">${P.react}</p>`:''}${P.unlock&&P.unlock.length?`<div class="unl"><b>現在可以</b>${P.unlock.map(u=>`<span>${u}</span>`).join('')}</div>`:''}<div class="btns"><button class="btn primary" data-act="revealPeek" data-k="${P.k}">去看看 ›</button><button class="btn" data-act="revealClose">繼續買東西</button></div></div>`},1500);
  el.onclick=e=>{const b=e.target.closest('[data-act]');if(!b)return;clearTimeout(T);doAct(b.dataset.act,b.dataset.d,b.dataset.k,b)}}
 function hideReveal(){const el=$('#reveal');if(el){el.hidden=true;el.innerHTML=''}}
-function keepScroll(fn){const sh=screenEl.querySelector('.sheet');const top=sh?sh.scrollTop:0;fn();const s2=screenEl.querySelector('.sheet');if(s2)s2.scrollTop=top}
+function keepScroll(fn,anchor){const sh=screenEl.querySelector('.sheet');const top=sh?sh.scrollTop:0;const a0=anchor&&sh?screenEl.querySelector(anchor):null;const y0=a0?a0.getBoundingClientRect().top:null;fn();const s2=screenEl.querySelector('.sheet');if(!s2)return;s2.scrollTop=top;
+ /* v2.2: with an anchor (the row that was just edited) the row stays where the finger was, even when what is above it changed height */const a1=y0!=null?screenEl.querySelector(anchor):null;if(a1){const y1=a1.getBoundingClientRect().top;if(Math.abs(y1-y0)>1)s2.scrollTop+=y1-y0}}
 
 /* ================= loop ================= */
 let last=performance.now(),tick=0;
@@ -3678,10 +3697,20 @@ let frameErrs=0,frameErrMsg='',stockT=0;
    error of a kind is logged; after a burst of them the player is told once (the situation the soufflé bug produced —
    a dead loop with a live Pause button — cannot happen again). */
 function frame(now){try{frameBody(now)}catch(e){frameErrs++;const m=e&&e.message||String(e);if(m!==frameErrMsg){frameErrMsg=m;console.error('[frame]',e)}if(frameErrs===40){try{toast('畫面出了點問題，已跳過（遊戲繼續）','warn')}catch(e2){}}}requestAnimationFrame(frame)}
+/* v2.2: the service can run at 0.75×, 1×, 1.5× or 2× — the player's choice, kept in the save. Everything in the
+   simulation takes the same scaled time (guests, cooks, cats, timers, patience), so nothing drifts apart. The only
+   exception is the hand-timing of Jill's own tray at 2×: the gauge of a 翻面／起鍋 zone and a pour are capped at 1.5×
+   real time, because a 0.3 s window is not a fair tap on a phone; everything else on that job (boiling, searing)
+   follows the chosen speed. */
+const SPEEDS=[.75,1,1.5,2];
+function simSpeed(){const v=+(S.speed||1);return SPEEDS.includes(v)?v:1}
+function setSpeed(v){S.speed=SPEEDS.includes(v)?v:1;save();hud(true);toast(S.speed===1?'速度：正常':`速度：${S.speed}×`)}
+function cycleSpeed(){const i=SPEEDS.indexOf(simSpeed());setSpeed(SPEEDS[(i+1)%SPEEDS.length])}
 function frameBody(now){frameN++;const covered=phase!=='service'||paused||!!sub;/* the sims always get their time; the expensive part, drawing the room, runs at ~20 fps while a sheet covers it */
  if(AU.ctx&&S.music){const ev=evening();if(ev!==lastEv){lastEv=ev;AU.music.gain.setTargetAtTime(ev?.09:.16,AU.ctx.currentTime,.8)}}const dt=Math.min(.05,(now-last)/1000);last=now;const t=now/1000;
- if(!(phase==='service'&&paused)){updateCats(dt,t);lifeUpd(dt)}
- if(phase==='service'&&R&&!paused){update(dt);tick+=dt;if(tick>.12){tick=0;renderTickets();updTicketBars();renderTasks();hud();stockChip();renderRoomTabs();stockT=(stockT||0)+1;if(stockT%8===0)renderStock()}}
+ const sp=phase==='service'&&R&&!paused?simSpeed():1;const sdt=dt*sp;if(R)R.speed=sp;
+ if(!(phase==='service'&&paused)){updateCats(sdt,t);lifeUpd(sdt)}
+ if(phase==='service'&&R&&!paused){update(sdt);tick+=dt;if(tick>.12){tick=0;renderTickets();updTicketBars();renderTasks();hud();stockChip();renderRoomTabs();stockT=(stockT||0)+1;if(stockT%8===0)renderStock()}}
  else if(phase!=='service'&&IDLE){const J=IDLE.jill;if(!(evening()&&LIFE.plan==='sofa'))J.x=PASS.x;}
  if(sc.width>0&&(!covered||frameN%3===0||forceDraw)){forceDraw=false;drawScene(t);flushMem()}{const tw=$('#trayWrap');const want=!!(R&&R.panel&&phase==='service'&&!paused);if(tw.hidden===want)tw.hidden=!want;if(want&&tc.width>0)drawTray(t)}}
 

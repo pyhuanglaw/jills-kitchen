@@ -1,0 +1,6 @@
+v2.1 {'seed': 7, 'frac': 0.34, 'frames': 5208, 'stock0': 36, 'money0': 7842, 'summary': {'guests': 13, 'lost': 0, 'rev': 2680, 'items': None, 'short': 2}}
+v2.1 {'seed': 8, 'frac': 0.407, 'frames': 6003, 'stock0': 35, 'money0': 7903, 'summary': {'guests': 14, 'lost': 0, 'rev': 3450, 'items': None, 'short': 7}}
+v2.1 {'seed': 9, 'frac': 0.264, 'frames': 5917, 'stock0': 35, 'money0': 7861, 'summary': {'guests': 14, 'lost': 0, 'rev': 2980, 'items': None, 'short': 3}}
+v2.2 {'seed': 7, 'frac': 0.646, 'frames': 5860, 'stock0': 35, 'money0': 7861, 'summary': {'guests': 12, 'lost': 0, 'rev': 2590, 'items': None, 'short': 4}}
+v2.2 {'seed': 8, 'frac': 0.165, 'frames': 6109, 'stock0': 34, 'money0': 7871, 'summary': {'guests': 14, 'lost': 0, 'rev': 2810, 'items': None, 'short': 4}}
+v2.2 {'seed': 9, 'frac': 0.301, 'frames': 5577, 'stock0': 36, 'money0': 7811, 'summary': {'guests': 14, 'lost': 0, 'rev': 2940, 'items': None, 'short': 2}}
