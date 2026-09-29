@@ -2836,7 +2836,7 @@ def q_portraits_are_one_system_with_a_fallback_and_fit_a_phone(b, port, target):
         check(g.ev("portraitOf('dylan','playful').side") == 'right' and g.ev("portraitOf('dylan','playful').src!==portraitOf('dylan').src"), 'Dylan has variants on the right')
         for rid in ['chen', 'mia', 'koba', 'leo', 'sophie', 'wang', 'wangwife']:
             check(g.ev(f"!!portraitOf('{rid}')"), f'regular {rid} has a portrait')
-        check(g.ev("portraitOf('staff:阿德師傅').src!==portraitOf('staff:小茉').src") and g.ev("portraitOf('staff:Hugo')") is None and g.ev("portraitOf('office')") is None, 'named staff by role and hiring order; nobody else')
+        check(g.ev("portraitOf('staff:阿德師傅').src!==portraitOf('staff:小茉').src") and g.ev("portraitOf('staff:Hugo')") is not None and g.ev("portraitOf('staff:阿勇')") is None and g.ev("portraitOf('office')") is None, 'named staff by name (v2.2.1 H2: fourteen); nobody else')
         srcs = json.loads(g.ev("JSON.stringify([portraitOf('jill').src,portraitOf('dylan').src,portraitOf('chen').src,portraitOf('staff:阿德師傅').src])"))
         check(len(set(srcs)) == 4, 'no two characters share a face')
         # the morning remark, once
@@ -3081,9 +3081,9 @@ def z_regression_rooms_kitchen_construction_and_staff_assignment(b, port, target
     g.reload(); check(g.ev("S.rooms.side") == 1 and g.ev("S.money") == m0 - cost and g.ev("roomOpen('side')"), 'ownership survives a reload and the room is open')
     # staff assignment: the first waiter only seats
     g.ev("S.crew=S.crew.filter(m=>m.role!=='waiter');S.crew.push({id:'w1',role:'waiter',name:'小茉',lv:3,duty:'both'},{id:'w2',role:'waiter',name:'Kai',lv:3,duty:'both'});save();shopTab='staff';showShop()")
-    check(g.ev("!!document.querySelector('[data-act=dutyT][data-k=w1][data-d=order]')"), 'the duty toggles are on the card')
+    check(g.ev("!!document.querySelector('.board .brow[data-d=order] .bchip .x[data-k=w1]')"), 'v2.2.1: the waiter is a chip on the board\'s job rows')
     for d in ['order', 'serve', 'check']:
-        g.page.click(f'[data-act=dutyT][data-k=w1][data-d={d}]'); g.page.wait_for_timeout(60)
+        g.page.click(f'.board .brow[data-d={d}] .bchip .x[data-k=w1]'); g.page.wait_for_timeout(60)
     d = json.loads(g.ev("JSON.stringify(waiterDuties(S.crew.find(m=>m.id==='w1')))"))
     check(d['seat'] and not d['order'] and not d['serve'] and not d['check'], f'小茉 now only seats: {d}')
     g.reload(); d2 = json.loads(g.ev("JSON.stringify(waiterDuties(S.crew.find(m=>m.id==='w1')))")); check(d2 == d, 'the assignment survives a reload')
@@ -3577,7 +3577,7 @@ def hospitality_stays_with_a_guest_from_stranger_to_regular(b, port, target):
     check(chip and 'spent' in chip and '0/2' in chip, f'the chip on the ticket: {chip}')
     check(g.ev("(()=>{const q=R.groups.find(q=>q.id===%d);q.pat=.1;q.state='eat';R.treatT=0;const mr=Math.random;Math.random=()=>0;try{return treatWanted(q)}finally{Math.random=mr}})()" % r2['id']) == 'drink', "Jill's own patience treat is a separate budget: still available after the player's two")
     check(g.ev("(()=>{R.st.jtreats=2;const q=R.groups.find(q=>q.id===%d);q.pat=.1;q.state='eat';R.treatT=0;const mr=Math.random;Math.random=()=>0;try{return treatWanted(q)}finally{Math.random=mr}})()" % r2['id']) is None, "Jill's patience treats stop at two")
-    check(g.ev("treatWanted(R.groups.find(q=>q.id===%d))" % c5['id']) == 'dessert', 'the card treat is still coming with both budgets spent: an occasion is never capped')
+    check(g.ev("(()=>{const q=R.groups.find(q=>q.id===%d);q.treated=false;q.treat='dessert';q.card=true;q.state='eat';return treatWanted(q)})()" % c5['id']) == 'dessert', 'the card treat is still coming with both budgets spent: an occasion is never capped')
     # an interrupted walk gives the use back
     g.ev("R.st.ptreats=1;R.st.treats=1;R.st.jtreats=0;(()=>{const q=R.groups.find(q=>q.id===%d);q.treated=false;q.byPlayer=true;q.treat='drink';q.card=false;q.state='eat';q.pat=.9;R.jill.visit=null;R.jill.rest=null;treatGo(q,'drink')})()" % r2['id'])
     check(g.ev("R.st.ptreats") == 2 and g.ev("R.jill.visit&&R.jill.visit.of==='player'"), 'the walk started and took the use')
