@@ -500,7 +500,10 @@ def old_saves_load(b, port, target):
         orig = json.loads(storage[SAVE_KEY])
         check(g.ev("S.day") == orig['day'] and g.ev("S.money") == orig['money'], f'{name}: day/money not preserved')
         for k in ('eq', 'decor', 'stats', 'unlocked', 'menu', 'xp', 'regulars', 'achievements'):
-            check(g.ev(f"JSON.stringify(S.{k})") == json.dumps({**g.ev(f"newState().{k}"), **orig[k]} if isinstance(orig.get(k), dict) and k in ('eq', 'decor', 'stats') else orig.get(k), ensure_ascii=False, separators=(',', ':')), f'{name}: S.{k} not preserved')
+            exp = {**g.ev(f"newState().{k}"), **orig[k]} if isinstance(orig.get(k), dict) and k in ('eq', 'decor', 'stats') else orig.get(k)
+            if k == 'regulars' and isinstance(exp, dict) and exp.get('wang') and 'wangwife' not in exp:
+                exp = {**exp, 'wangwife': exp['wang']}   # v2.2: the old couple record becomes 王先生 and 王太太, once
+            check(g.ev(f"JSON.stringify(S.{k})") == json.dumps(exp, ensure_ascii=False, separators=(',', ':')), f'{name}: S.{k} not preserved')
         check(g.ev("Array.isArray(S.crew)&&S.crewMig===1&&typeof S.mem==='object'&&typeof S.rstar==='object'"), f'{name}: missing fields not filled with defaults')
         if 'dylan' not in orig:
             check(g.ev("S.dylan&&S.dylan.stage===0&&S.dylan.clues&&S.life&&S.life.sofa===0"), f'{name}: life/dylan defaults missing on an old save')
@@ -1682,7 +1685,10 @@ def weather_days_and_stock_v182(b, port, target):
     r = g.ev(r"""(()=>{const T=TYPES.office;const w=wx=>{S.today.weather=wx;return{soup:demandW('soup',T),coffee:demandW('coffee',T),spark:demandW('sparkling',T),sug:suggestStock()}};const sun=w('sun'),rain=w('rain'),hot=w('hot');S.today.weather='sun';return{sun,rain,hot}})()""")
     check(r['rain']['soup'] > r['sun']['soup'] * 1.3 and r['rain']['coffee'] > r['sun']['coffee'] * 1.3, f'rain wants hot things: {r}')
     check(r['hot']['spark'] > r['sun']['spark'] * 1.4 and r['hot']['soup'] < r['sun']['soup'], f'a hot day wants cold drinks: {r}')
-    check(r['rain']['sug']['soup'] >= r['sun']['sug']['soup'] and r['hot']['sug']['sparkling'] >= r['sun']['sug']['sparkling'], f'the suggestion follows the weather: {r["sun"]["sug"]}, {r["rain"]["sug"]}, {r["hot"]["sug"]}')
+    # the suggestion is one seeded sample of 80 guests per (day, weather) — v2.2 A1 — so it follows the weather on
+    # average over days, not necessarily on one day: 20 days, the mean per weather
+    m = json.loads(g.ev(r"""(()=>{const acc={sun:{soup:0,sparkling:0},rain:{soup:0,sparkling:0},hot:{soup:0,sparkling:0}};const day=S.day;for(let d=10;d<30;d++){S.day=d;for(const wx of ['sun','rain','hot']){S.today.weather=wx;S.today.sugKey=null;const sg=suggestStock();acc[wx].soup+=sg.soup;acc[wx].sparkling+=sg.sparkling}}S.day=day;S.today.weather='sun';S.today.sugKey=null;return JSON.stringify(acc)})()"""))
+    check(m['rain']['soup'] > m['sun']['soup'] and m['hot']['sparkling'] > m['sun']['sparkling'], f'the suggestion follows the weather on average: {m}')
     g.ev("S.today.weather='rain';showPrep()")
     check('湯' in g.ev("$('.card.today').innerText"), 'the prep card names what to stock on a rainy day')
     ev = g.ev(r"""(()=>{S.today.event='datenight';let c=0;for(let i=0;i<300;i++)if(rollGuest().type==='couple')c++;S.today.event='none';let c0=0;for(let i=0;i<300;i++)if(rollGuest().type==='couple')c0++;return{date:c,plain:c0}})()""")
@@ -1740,6 +1746,8 @@ def economy_ops_duties_and_prices_v182(b, port, target):
     ACT(g, 'tab', k='tables')
     txt = g.ev("$('#screen').innerText")
     check('擴建後可以再加' not in txt and '極限' in txt, 'the final restaurant does not promise a next expansion')
+    ACT(g, 'tab', k='works')   # v2.2 H: expansion, projects and the operations upgrades live under 店舖工程
+    txt = g.ev("$('#screen').innerText")
     check('動線規劃' in txt and '後場休息室' in txt and '大菜單板' in txt and '門口候位區' in txt, 'operations upgrades are offered')
     caps0 = g.ev("[crewCap(),queueMax(),menuCap(),flowMul('crew')]")
     for k in ['room', 'wait', 'board', 'flow']: ACT(g, 'buyOps', k=k)
@@ -2855,13 +2863,19 @@ def q_portraits_are_one_system_with_a_fallback_and_fit_a_phone(b, port, target):
 
 @test
 def q_plus_world_sprites_keep_jill_and_dylan_their_own(b, port, target):
-    """Q+. The world sprites correspond to the portraits and stay theirs: Jill — dark hair with the fringe and the
-    ponytail, white double-breasted jacket, dark bib apron, no hat; Dylan — the short straight-fringe hair (style 9),
-    a navy cardigan over a white tee, a watch. Procedural guests never get style 9, a white top, or a white tee under a
-    cardigan, so the two of them keep their silhouette in a crowd."""
+    """Q+ / Q++. The world sprites are a translation of the portraits into the game's own cute language — masses that
+    survive at phone scale, not detail: Jill — dark hair with the straight fringe and a long ponytail over her shoulder
+    (style 4 is hers alone), her own cream shirt with the sleeves rolled and khaki trousers (the light warm figure in
+    the room — never the staff's white jacket, black trousers or dark bib), a linen half apron with the cat patch;
+    Dylan — the thick tousled crop (style 9, his alone), a long navy cardigan over a white tee, a watch. Procedural
+    guests and the crew never get style 4 or 9, a white top, or a white tee under a cardigan, so the two of them keep
+    their silhouette in a crowd."""
     g = Game(b, port, target, seed=64, manual=True)
     install_bot(g); g.click('[data-act=open]')
-    check(g.ev("JILL_LOOK.hs") == 4 and g.ev("JILL_LOOK.top").lower() in ('#fff', '#ffffff') and g.ev("JILL_LOOK.hair") == '#1C1816', 'Jill: ponytail, white jacket, dark hair')
+    check(g.ev("JILL_LOOK.hs") == 4 and g.ev("JILL_LOOK.top") == '#F3E9D6' and g.ev("JILL_LOOK.pants") == '#7A7052' and g.ev("JILL_LOOK.hair") == '#221712', 'Jill: the tail, her own cream shirt and khaki trousers, dark hair')
+    check(g.ev("JILL_LOOK.top").lower() not in ('#fff', '#ffffff') and g.ev("JILL_LOOK.pants") not in ('#2E2B33', '#2E2A28'), 'not the staff white, not the staff black trousers')
+    crew = json.loads(g.ev("JSON.stringify(['chef','waiter','cleaner'].flatMap(role=>Array.from({length:40},(_,i)=>crewLook({id:'c'+role+i,role,name:'x',lv:1})).map(L=>[L.hs,L.top,L.pants])))"))
+    check(all(hs not in (4, 9) for hs, *_ in crew) and all(top != '#F3E9D6' and pants != '#7A7052' for hs, top, pants in crew), 'the crew never share her tail, his crop, her shirt or her trousers')
     check(g.ev("DYLAN.looks[0].hs") == 9 and g.ev("DYLAN.looks[0].pat") == 'cardi' and g.ev("DYLAN.looks[0].top") == '#F6F3EC' and g.ev("DYLAN.looks[0].acc") == 'watch', 'Dylan: the reserved hair, the cardigan over white, the watch')
     looks = json.loads(g.ev("JSON.stringify((()=>{const out=[];for(const t of ['office','student','couple','family','gourmet','vip','blogger','regular','critic'])for(let i=0;i<40;i++)for(const L of makeLooks(t,2))out.push([L.hs,L.top,L.top2||null,L.pat||null]);return out})())"))
     def light(c):
@@ -2869,6 +2883,7 @@ def q_plus_world_sprites_keep_jill_and_dylan_their_own(b, port, target):
         c = c.lstrip('#'); r, gg, bb = int(c[0:2], 16), int(c[2:4], 16), int(c[4:6], 16)
         return (r + gg + bb) / 3 > 225
     check(all(hs != 9 for hs, *_ in looks), 'style 9 is Dylan\'s alone')
+    check(all(hs != 4 for hs, *_ in looks), 'style 4 (the tail) is Jill\'s alone — no adult guest, no couple (a small child may wear a little one)')
     check(not any(light(top) or (pat == 'cardi' and light(t2)) for hs, top, t2, pat in looks), 'no guest in a white jacket or a white tee under a cardigan')
     # the sprite renders without the hat by default and with it when asked (both paths draw)
     px = g.ev("(()=>{const cv=document.createElement('canvas');cv.width=80;cv.height=100;const c=cv.getContext('2d');drawPerson(c,40,90,JILL_LOOK,{jill:true,me:true,tall:true});const a=c.getImageData(0,0,80,100).data;let n=0;for(let i=3;i<a.length;i+=4)if(a[i]>0)n++;c.clearRect(0,0,80,100);drawPerson(c,40,90,JILL_LOOK,{jill:true,me:true,tall:true,hat:true});const b=c.getImageData(0,0,80,100).data;let m=0;for(let i=3;i<b.length;i+=4)if(b[i]>0)m++;return [n,m]})()")
