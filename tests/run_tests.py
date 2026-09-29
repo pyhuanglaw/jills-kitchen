@@ -3700,6 +3700,58 @@ def dylan_leaves_a_trace_and_never_vanishes_at_a_closed_door(b, port, target):
     check(not g.errors, g.errors[:2])
     g.close()
 
+@test
+def stock_suggestion_follows_each_dish_and_counts_the_demand_it_missed(b, port, target):
+    """v2.2.1 B1 (#1, real device: the suggestion ran out on some dishes while others were left over). The suggestion is
+    per dish — its mean blends the seeded demand estimate with the sales history, its buffer grows with the square root of
+    the mean (a bigger seller gets a bigger buffer, a smaller relative one), never below 2. When the fridge cannot hold the
+    day, the buffers give first (every dish keeps its mean when the means fit), the rounding's leftovers are handed out so
+    the fridge is used to the last portion, and the prep screen says so. The demand that met an empty shelf is counted
+    (R.st.unmet), shown in the summary and blended into the history, so a dish that sold out is not recommended lower
+    tomorrow — the vicious circle of v2.2."""
+    g = Game(b, port, target, seed=27, manual=True)
+    player30(g)
+    # the shape: the same estimate as the game's, then mean + 1.2·sqrt(mean) + 1, ceil, ≥ 2 — with a fridge big enough to hold it
+    g.ev("S.menu=S.menu.slice(0,6);S.eq.fridge=5;S.rooms.cooler=1;S.today.sugKey=null;S.today.sug=null")
+    shape = json.loads(g.ev(r"""(()=>{const ms=menuList().filter(stationOk);const T=S.today;const key=S.day+'|'+ms.join(',')+'|'+(T?T.weather+'/'+T.event+'/'+T.groups:'');const mr=Math.random;Math.random=rng(hash(key));let exp;try{exp=expectDemand(T.groups,120,true)}finally{Math.random=mr}
+     const hist=S.salesHist||{};const want={};for(const d of ms){const e=exp[d]||0;const h=hist[d];const m=h!=null?Math.max(e*.85,h*.55+e*.45):e;want[d]=Math.max(2,Math.ceil(m+1.2*Math.sqrt(m)+1))}
+     T.sugKey=null;T.sug=null;const sug=suggestStock();return JSON.stringify({want,sug,cap:fridgeCap(),capped:T.sugCapped||0,tot:Object.values(sug).reduce((a,b)=>a+b,0)})})()"""))
+    check(shape['tot'] <= shape['cap'] and shape['capped'] == 0, f'six dishes fit the biggest fridge: {shape}')
+    check(shape['sug'] == shape['want'], f'each dish is its mean plus a square-root buffer: {shape}')
+    check(all(v >= 2 for v in shape['sug'].values()), 'never below two portions')
+    # the buffer is bigger for a bigger seller, but smaller relative to it
+    g.ev("S.salesHist={};for(const d of menuList())S.salesHist[d]=8;S.salesHist[menuList()[0]]=60;S.today.sugKey=null;S.today.sug=null")
+    big, small = g.ev("menuList()[0]"), g.ev("menuList()[1]")
+    r = json.loads(g.ev("(()=>{const sug=suggestStock();const h=S.salesHist;return JSON.stringify({b:sug['%s'],s:sug['%s'],hb:h['%s'],hs:h['%s']})})()" % (big, small, big, small)))
+    check(r['b'] > r['s'] and (r['b'] - r['hb'] * .55) > (r['s'] - r['hs'] * .55) and (r['b'] / r['hb']) < (r['s'] / r['hs']), f'a big seller gets a bigger buffer, a smaller relative one: {r}')
+    # the cap: the Day 33 player's 18-dish menu does not fit the fridge — every dish keeps at least its mean, the buffers give, the fridge is filled to the last portion, the screen says so
+    raw33 = json.load(open(os.path.join(ROOT, 'tests', 'saves', 'player_day33.json'), encoding='utf-8'))['save']
+    g.ev("phase='title';R=null;localStorage.setItem(KEY,JSON.stringify(%s))" % json.dumps(raw33, ensure_ascii=False)); g.reload(); g.click('[data-act=openFresh]'); g.page.wait_for_timeout(120)
+    g.ev("S.today.sugKey=null;S.today.sug=null")
+    capd = json.loads(g.ev(r"""(()=>{const ms=menuList().filter(stationOk);const T=S.today;const key=S.day+'|'+ms.join(',')+'|'+(T?T.weather+'/'+T.event+'/'+T.groups:'');const mr=Math.random;Math.random=rng(hash(key));let exp;try{exp=expectDemand(T.groups,120,true)}finally{Math.random=mr}
+     const hist=S.salesHist||{};const mean={};for(const d of ms){const e=exp[d]||0;const h=hist[d];mean[d]=h!=null?Math.max(e*.85,h*.55+e*.45):e}const sug=suggestStock();const tot=Object.values(sug).reduce((a,b)=>a+b,0);const mt=Object.values(mean).reduce((a,b)=>a+b,0);
+     return JSON.stringify({cap:fridgeCap(),tot,capped:T.sugCapped||0,meansFit:mt<=fridgeCap(),keep:ms.every(d=>sug[d]>=Math.floor(mean[d])),n:ms.length})})()"""))
+    check(capd['n'] >= 15 and capd['capped'] > capd['cap'] and capd['tot'] == capd['cap'], f'the Day 33 menu is capped and the fridge is used to the last portion: {capd}')
+    check((not capd['meansFit']) or capd['keep'], f'when the means fit, every dish keeps its mean: {capd}')
+    g.ev("showPrep()"); g.page.wait_for_timeout(60)
+    check('冰箱裝不下' in g.ev("$('#screen').innerText"), 'the prep screen says the fridge cannot hold the day')
+    # the demand that met an empty shelf is counted, shown, and blended into the history
+    fill_fridge(g); start_day(g); install_bot(g); g.ev("window.__act=()=>{}")
+    d = g.ev("(()=>{const ds=menuList().filter(d=>stationOk(d)&&DISH(d).cat==='main');const d=ds[0];S.stock[d]=0;return d})()")
+    got = False
+    for i in range(80):
+        g.ev("(()=>{for(const q of R.groups)if(q.table!=null&&q.state==='order')createTicket(q);for(let i=0;i<20;i++)__tick(1000/30)})()")
+        if g.ev("(R.st.unmet&&R.st.unmet['%s'])||0" % d) > 0: got = True; break
+    check(got, f'a table that would have ordered the sold-out {d} is counted as unmet demand')
+    g.ev("R.st.dish['%s']=10;R.st.unmet['%s']=6;delete (R.st.short||{})['%s'];S.salesHist['%s']=10" % (d, d, d, d))
+    g.ev("closeShop('x');for(const q of R.groups.slice())leaveGroup(q,'ok')"); g.page.evaluate('()=>window.__bot(400,1/30)')
+    if g.ev("phase") == 'service': g.ev("finishClosing()")
+    g.page.wait_for_timeout(100)
+    check(g.ev("S.salesHist['%s']" % d) == 13, f'the history blends sales + unmet (10 → (10·.5 + 16·.5) = 13), not sales alone: {g.ev("S.salesHist[%r]" % d)}')
+    check(g.ev("S.lastSummary.sales.find(x=>x.d==='%s').unmet" % d) == 6 and '估計少賣' in g.ev("$('#screen').innerText"), 'the summary says how much a sold-out dish is estimated to have missed')
+    check(not g.errors, g.errors[:2])
+    g.close()
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--target', choices=['index', 'single'], default='index')
