@@ -80,8 +80,8 @@ def init_script(seed=None, manual=False, audio=False):
 
 # ---------------------------------------------------------------- page helpers
 class Game:
-    def __init__(self, browser, port, target, seed=None, manual=False, audio=False, storage=None):
-        self.ctx = browser.new_context(viewport=VIEW, device_scale_factor=1)
+    def __init__(self, browser, port, target, seed=None, manual=False, audio=False, storage=None, touch=False, viewport=None):
+        self.ctx = browser.new_context(viewport=viewport or VIEW, device_scale_factor=1, has_touch=touch, is_mobile=touch)
         self.page = self.ctx.new_page()
         self.errors = []
         self.page.on('pageerror', lambda e: self.errors.append(str(e)))
@@ -106,6 +106,10 @@ class Game:
 
     def click(self, sel):
         self.page.click(sel)
+
+    def tap(self, sel):
+        """a finger, not a mouse (the context must have been made with touch=True)"""
+        self.page.tap(sel)
 
     def reload(self):
         self.page.reload()
@@ -2132,6 +2136,169 @@ def the_street_has_passers_by_and_some_walk_in(b, port, target):
     g.page.evaluate('()=>window.__play(200,0)')
     check(g.ev("R.groups.some(q=>q.walkIn&&(q.table!=null||q.state==='queue'))||R.st.guests>0"), 'the walk-in never got in')
     check(g.ev("STREET.ppl.every(w=>w.y>=336&&w.y<=366)&&(!STREET.veh||STREET.veh.y>=388)"), 'walkers keep to the pavement and vehicles to the road')
+    check(not g.errors, g.errors)
+    g.close()
+
+# ---------------------------------------------------------------- v2.2: the player's own bugs (A1–A5), reproduced on the v2.1 baseline first
+PLAYER30 = os.path.join(ROOT, 'tests', 'saves', 'player_day30.json')   # the real Day 30 backup the player sent (money, rooms, staff, 74 photos, 93 reviews)
+
+def player30_raw():
+    return json.load(open(PLAYER30, encoding='utf-8'))['save']
+
+def player30(g, prep=True):
+    """put the player's save in the browser and open it the way they would; prep=True starts from 開店前 (not the mid-service checkpoint)"""
+    g.ev("localStorage.setItem(KEY,JSON.stringify(%s))" % json.dumps(player30_raw(), ensure_ascii=False))
+    g.reload()
+    if prep:
+        if g.ev("!!document.querySelector('[data-act=openFresh]')"): g.click('[data-act=openFresh]')
+        else: g.click('[data-act=open]')
+        g.page.wait_for_timeout(150)
+        check(g.ev("phase") == 'prep', f'the player save should open on the prep screen, got {g.ev("phase")}')
+
+def hud_money(g):
+    return g.ev("document.querySelector('#hMoney').textContent")
+
+@test
+def a1_failed_restock_changes_nothing_and_the_suggestion_holds_still(b, port, target):
+    """A1. Before opening, with room in the fridge but not enough money, pressing + must leave money, stock AND the suggested
+    restock exactly as they were, and say why. On v2.1 the suggestion was re-sampled from random guests on every redraw,
+    so each failed press showed a different 建議 number."""
+    g = Game(b, port, target, seed=30, manual=True, touch=True)
+    player30(g)
+    d = g.ev("menuList().find(x=>x!=='signature'&&(S.stock[x]||0)<10)") or 'coffee'
+    g.ev(f"S.money=Math.max(1,costOf('{d}')-1);save();showPrep()")
+    check(g.ev("stockTotal()<fridgeCap()"), 'the fixture should have room in the fridge')
+    sug = [g.ev("JSON.stringify(suggestStock())") for _ in range(3)]
+    check(sug[0] == sug[1] == sug[2], 'the suggested restock must be a stable number for the day (it re-rolled on every call)')
+    label = lambda: g.ev("(document.querySelector('[data-act=restock]')||{}).textContent||''")
+    m0, st0, l0 = g.ev("S.money"), g.ev(f"S.stock['{d}']||0"), label()
+    plus = f"[data-act=stock][data-d={d}]:not([data-v^='-'])"
+    for i in range(4):
+        if g.ev(f"(()=>{{const b=document.querySelector(\"{plus}\");return !!b&&!b.disabled}})()"): g.tap(plus)
+        else: g.ev(f"doAct('stock','{d}',null,Object.assign(document.createElement('button'),{{dataset:{{v:'1'}}}}))") if False else g.ev(f"(()=>{{const b=document.createElement('button');b.dataset.v='1';doAct('stock','{d}',null,b)}})()")
+        g.page.wait_for_timeout(120)
+        check(g.ev("S.money") == m0 and g.ev(f"S.stock['{d}']||0") == st0, f'press {i+1}: money or stock moved on a purchase that cannot be afforded')
+        check(label() == l0, f'press {i+1}: the suggested-restock label changed after a failed press ({l0!r} -> {label()!r})')
+    check(re.search('錢|金額', g.page.locator('#toasts').inner_text() or ''), 'a failed purchase must say that the money is short')
+    # with exactly one affordable, + buys one and both numbers move together
+    g.ev(f"S.money=costOf('{d}');save();showPrep()")
+    g.ev(f"(()=>{{const b=document.createElement('button');b.dataset.v='1';doAct('stock','{d}',null,b)}})()"); g.page.wait_for_timeout(100)
+    check(g.ev(f"S.stock['{d}']") == st0 + 1 and g.ev("S.money") == 0, 'an affordable +1 should buy exactly one and spend exactly its cost')
+    check(json.loads(g.ev("localStorage.getItem(KEY)"))['money'] == 0, 'the purchase must be saved at once')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
+def a2_the_game_never_buys_stock_for_the_player_and_money_never_goes_negative(b, port, target):
+    """A2. With an empty fridge and no cash, a service must not order ingredients behind the player's back: v2.1 charged
+    1.5× cost for an 'emergency order' the moment a guest ordered a sold-out dish, and the till went negative."""
+    g = Game(b, port, target, seed=31, manual=True)
+    player30(g)
+    g.ev("for(const d of Object.keys(S.stock))S.stock[d]=0;S.money=0;S.today.weather='sun';save();showPrep()")
+    m0 = g.ev("S.money")
+    start_day(g); install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;")
+    check(g.ev("S.money") >= m0, 'opening the doors must not spend anything on a mature day')
+    worst = 0
+    for i in range(40):
+        g.page.evaluate('()=>window.__play(20,0)')
+        worst = min(worst, g.ev("S.money"))
+        if g.ev("phase") != 'service': break
+    check(worst >= 0, f'money went negative during service (min {worst}) — stock was bought without the player')
+    check(g.ev("!R||R.tickets.every(tk=>tk.items.every(it=>it.st!=='order'))"), 'no ticket may be waiting on an automatic order')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
+def a3_the_pause_menu_is_reachable_on_a_short_phone_and_every_way_out_works(b, port, target):
+    """A3. On an iPhone-sized viewport the pause menu must fit or scroll: on v2.1 the modal was ~810px tall inside a
+    non-scrolling overlay, so on a 375×553 screen (an iPhone with Safari's bars) 繼續營業 sat above the top edge — a grey
+    translucent screen with no way back. Every action in the menu must also leave a way back to the service."""
+    for W, H in [(375, 553), (390, 664)]:
+        g = Game(b, port, target, seed=32, manual=True, touch=True, viewport={'width': W, 'height': H})
+        player30(g)
+        start_day(g); install_bot(g); g.ev("window.__act=()=>{}"); g.page.evaluate('()=>window.__play(30,0)')
+        g.tap('#hPause') if g.ev("!!document.querySelector('#hPause')") else g.ev("paused=true;showPause()")
+        g.page.wait_for_timeout(120)
+        check(g.ev("paused&&sub==='pause'"), f'{W}x{H}: the pause menu should be open')
+        r = g.ev(r"""(()=>{const b=document.querySelector('#screen [data-act=resume]');if(!b)return 'no resume button';const sc=document.querySelector('#screen');const q=b.getBoundingClientRect();if(q.top<0||q.bottom>innerHeight){sc.scrollTop=0;const q2=b.getBoundingClientRect();if(q2.top<0||q2.bottom>innerHeight)return 'resume off-screen ('+Math.round(q2.top)+'..'+Math.round(q2.bottom)+' of '+innerHeight+')'}const e=document.elementFromPoint(q.left+q.width/2,q.top+q.height/2);return e===b||b.contains(e)?'ok':'covered by '+(e?e.tagName+'.'+e.className:'nothing')})()""")
+        check(r == 'ok', f'{W}x{H}: 繼續營業 must be tappable: {r}')
+        acts = g.ev("[...document.querySelectorAll('#screen [data-act]')].map(b=>b.dataset.act)")
+        for a in acts:
+            if a in ('resume', 'closeNow', 'closeEarly', 'export', 'import', 'copyBackup'): continue
+            g.ev("paused=true;showPause()"); g.page.wait_for_timeout(60)
+            g.ev(f"(()=>{{const b=document.querySelector('#screen [data-act={a}]');b&&b.click()}})()"); g.page.wait_for_timeout(150); g.ev("__tick(60)")
+            for step in range(4):
+                if g.ev("phase==='service'&&!paused&&document.querySelector('#screen').hidden"): break
+                got = g.ev("(()=>{for(const k of['closeSub','resume','importNo']){const b=document.querySelector('#screen [data-act='+k+']');if(b){b.click();return k}}return null})()")
+                g.page.wait_for_timeout(120); g.ev("__tick(60)")
+                if not got: break
+            check(g.ev("phase==='service'&&!paused&&document.querySelector('#screen').hidden"), f'{W}x{H}: after {a} there was no way back to the service (phase={g.ev("phase")} paused={g.ev("paused")} sub={g.ev("sub")})')
+            state_ok(g, f'after pause action {a}')
+        g.tap('#scene') if False else None
+        check(not g.errors, g.errors)
+        g.close()
+
+@test
+def a4_the_album_opens_without_a_render_storm_and_progress_survives_a_kill(b, port, target):
+    """A4. With the player's 74 photos, opening the 相簿 tab on v2.1 re-rendered the whole journal ~2,600 times (once per
+    photo arriving, each redraw re-requesting the rest) — a multi-second freeze on a phone that reads as a softlock.
+    The tab must render a handful of times at most, every tab and the close must stay tappable, and durable progress
+    (a purchase) must survive the page being killed and reopened."""
+    g = Game(b, port, target, seed=33, manual=True, touch=True)
+    g.click('.links [data-act=settings]')
+    with g.page.expect_file_chooser() as fc: g.click('[data-act=import]')
+    fc.value.set_files(PLAYER30); g.page.wait_for_timeout(300); g.ev("__tick(100)"); g.click('[data-act=importYes]'); g.page.wait_for_timeout(1200)
+    g.reload(); g.page.wait_for_timeout(400)   # cold photo cache, like reopening the app
+    g.ev("window.__renders=0;const sb=showBook;showBook=function(){window.__renders++;return sb.apply(this,arguments)}")
+    g.tap('.links [data-act=book]'); g.page.wait_for_timeout(120); g.ev("window.__renders=0")
+    g.tap('#screen [data-act=btab][data-k=mem]'); g.page.wait_for_timeout(2500)
+    n = g.ev("window.__renders")
+    check(n <= 6, f'opening the album re-rendered the journal {n} times')
+    check(g.ev("[...document.querySelectorAll('#screen img')].filter(i=>i.src.startsWith('data:image/jpeg')).length") >= 60, 'the photos should be on screen')
+    for k in ['cats', 'mem', 'log', 'mem']:
+        if g.ev(f"!!document.querySelector('#screen [data-act=btab][data-k={k}]')"):
+            g.tap(f'#screen [data-act=btab][data-k={k}]'); g.page.wait_for_timeout(200)
+            check(g.ev("bookTab") == k, f'the {k} tab did not respond to a tap')
+    # a photo, the lightbox, its close, by finger
+    g.ev("(()=>{const e=document.querySelector('#screen .album img, #screen [data-act=photo]');e&&e.click()})()"); g.page.wait_for_timeout(200)
+    if g.ev("!!lightbox"):
+        g.tap('#lightbox button.lb-close'); g.page.wait_for_timeout(150)
+        check(g.ev("!lightbox&&document.querySelector('#lightbox').hidden"), 'the lightbox must close by finger')
+    g.tap('#screen [data-act=closeSub]'); g.page.wait_for_timeout(150)
+    check(g.ev("sub===null&&phase==='title'"), 'the journal must close back to the title')
+    r = g.ev("(()=>{const b=document.querySelector('#screen [data-act=open],#screen [data-act=openFresh]');const q=b.getBoundingClientRect();const e=document.elementFromPoint(q.left+q.width/2,q.top+q.height/2);return e===b||b.contains(e)?'ok':'blocked by '+(e?e.tagName+'#'+e.id:'nothing')})()")
+    check(r == 'ok', f'after the album the title button is {r}')
+    # durable progress: a purchase, then the page is killed before anything else
+    g.click('[data-act=openFresh]'); g.page.wait_for_timeout(150); g.ev("S.money=50000;save();showShop()"); g.page.wait_for_timeout(100)
+    m0 = g.ev("S.money"); g.ev("doAct('buyGear',null,'cushion',null)"); bought = g.ev("!!gearOn('cushion')"); m1 = g.ev("S.money")
+    check(bought and m1 < m0, 'the fixture purchase did not happen')
+    g.reload(); g.page.wait_for_timeout(300)
+    check(g.ev("!!gearOn('cushion')") and g.ev("S.money") == m1, 'the purchase must survive the app being killed right after it')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
+def a5_money_is_one_number_everywhere_after_the_side_hall(b, port, target):
+    """A5. Buy the side hall → construction → 去看看 → back: the HUD, the shop's buttons and the save must all show the
+    money after the purchase. On v2.1 the HUD only refreshed on the next screen change, so the top bar kept the old
+    balance while the buttons already knew the truth."""
+    g = Game(b, port, target, seed=34, manual=True)
+    player30(g)
+    g.ev("S.rooms.side=0;S.sideTables=0;S.money=100000;S.lastSummary={day:29,rev:9000,cost:3000,tips:800,bonus:0,wages:2000,net:4800,guests:40,lost:1,perfect:20,plated:50,avg:80,top:'pasta',stars:4,tasks:[],reviews:[],sales:[],crew:[],weather:'sun',event:'none'};S.phase='shop';save();showShop();shopTab='projects';showShop()")
+    m0 = g.ev("S.money")
+    g.click('[data-act=buyProject][data-k=side]'); g.page.wait_for_timeout(200)
+    check(g.ev("S.money") == m0 - 60000 and g.ev("!!projOn('side')"), 'the purchase must deduct 60k and own the room')
+    check(hud_money(g) == g.ev("fmt(S.money)"), f'the HUD shows {hud_money(g)} while the money is {g.ev("fmt(S.money)")} (during construction)')
+    g.page.evaluate('()=>window.__tick(1700)'); g.page.wait_for_timeout(150)
+    g.click('[data-act=revealPeek]'); g.page.wait_for_timeout(150); g.page.evaluate('()=>{for(let i=0;i<10;i++)window.__tick(33)}')
+    check(hud_money(g) == g.ev("fmt(S.money)"), f'the HUD shows {hud_money(g)} while the money is {g.ev("fmt(S.money)")} (looking at the new room)')
+    g.click('#peekPill'); g.page.wait_for_timeout(200)
+    check(hud_money(g) == g.ev("fmt(S.money)"), f'the HUD shows {hud_money(g)} while the money is {g.ev("fmt(S.money)")} (back in the shop)')
+    # the shop's own buttons agree: a 45k project is affordable at 40k only if the display and the state agree
+    check(g.ev("(()=>{const b=document.querySelector('[data-act=buyProject][data-k=kext]');return !!b&&b.disabled})()") == (g.ev("S.money") < 45000), 'the shop buttons must reflect the post-purchase money')
+    g.ev("save()"); g.reload(); g.page.wait_for_timeout(300)
+    check(g.ev("S.money") == m0 - 60000 and g.ev("!!projOn('side')") and g.ev("S.sideTables") >= 2, 'the reload must return the same money and ownership')
+    check(hud_money(g) == g.ev("fmt(S.money)"), 'the HUD after reload must match')
     check(not g.errors, g.errors)
     g.close()
 

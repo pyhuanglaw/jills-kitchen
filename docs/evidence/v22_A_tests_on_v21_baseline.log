@@ -1,0 +1,12 @@
+FAIL  a1_failed_restock_changes_nothing_and_the_suggestion_holds_still  (0.9s)
+      the suggested restock must be a stable number for the day (it re-rolled on every call)
+FAIL  a2_the_game_never_buys_stock_for_the_player_and_money_never_goes_negative  (0.9s)
+      opening the doors must not spend anything on a mature day
+FAIL  a3_the_pause_menu_is_reachable_on_a_short_phone_and_every_way_out_works  (1.6s)
+      375x553: 繼續營業 must be tappable: resume off-screen (-42..9 of 553)
+FAIL  a4_the_album_opens_without_a_render_storm_and_progress_survives_a_kill  (114.4s)
+      opening the album re-rendered the journal 2509 times
+FAIL  a5_money_is_one_number_everywhere_after_the_side_hall  (1.3s)
+      the HUD shows $100,000 while the money is $40,000 (during construction)
+
+0 passed, 5 failed

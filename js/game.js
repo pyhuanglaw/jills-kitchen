@@ -818,14 +818,22 @@ function taskProg(t){if(!R)return 0;const st=R.st;switch(t.k){case'guests':retur
 /* Advice, not a rule: what today's guests are likely to order (the ordering model itself, sampled — weather, occasion,
    recommendation and prices included), blended with what actually sold on recent days (sales plus emergency orders,
    so a sold-out day counts as the demand it really had), with a buffer for luck. */
-function suggestStock(){const ms=menuList().filter(stationOk);const T=S.today;const exp=expectDemand(T?T.groups:10,80);const hist=S.salesHist||{};const out={};
+/* v2.2: the suggested restock is a stable number for the day. It used to be re-sampled from random guests on every
+   redraw of the prep screen, so pressing + (even when the purchase failed) showed a different 建議 each time. Now the
+   sample is seeded by the day and the menu, and cached on S.today until either changes. */
+function suggestStock(){const ms=menuList().filter(stationOk);const T=S.today;const key=S.day+'|'+ms.join(',')+'|'+(T?T.weather+'/'+T.event+'/'+T.groups:'');if(T&&T.sugKey===key&&T.sug)return Object.assign({},T.sug);
+ const mr=Math.random;const R0=rng(hash(key));Math.random=R0;let exp;try{exp=expectDemand(T?T.groups:10,80,true)}finally{Math.random=mr}const hist=S.salesHist||{};const out={};
  for(const d of ms){const e=exp[d]||0;const h=hist[d];const base=h!=null?Math.max(e*.85,h*.55+e*.45):e;out[d]=Math.max(2,Math.ceil(base*1.15+1))}
- let tot=Object.values(out).reduce((a,b)=>a+b,0);const cap=fridgeCap();if(tot>cap){const f=cap/tot;for(const d in out)out[d]=Math.max(1,Math.floor(out[d]*f))}return out}
+ let tot=Object.values(out).reduce((a,b)=>a+b,0);const cap=fridgeCap();if(tot>cap){const f=cap/tot;for(const d in out)out[d]=Math.max(1,Math.floor(out[d]*f))}if(T){T.sugKey=key;T.sug=Object.assign({},out)}return out}
 /* what tomorrow's basic restock would cost right now (menu, stock and today's guest estimate) and how much to keep aside */
 function restockEstimate(){const sug=suggestStock();let c=0;for(const d of menuList())c+=Math.max(0,(sug[d]||0)-(S.stock[d]||0))*costOf(d);return Math.round(c)}
 function keepAside(){return Math.round(restockEstimate()*1.15+100)}
 function shopAfterBuy(){const keep=keepAside();if(S.money<keep)toast(`⚠ 現金 ${fmt(S.money)}，可能不足以完成${S.phase==='prep'?'今天':'明天'}的建議備料（約 ${fmt(restockEstimate())}）`,'warn')}
-function buyStock(d,delta){const cur=S.stock[d]||0;if(delta>0){const room=fridgeCap()-stockTotal();delta=Math.min(delta,room);const c=costOf(d);delta=Math.min(delta,Math.floor(S.money/c));if(delta<=0)return false;S.money-=delta*c;S.todayCost+=delta*c;S.stock[d]=cur+delta}else{delta=Math.max(delta,-cur);if(delta===0)return false;S.money+= -delta*costOf(d);S.todayCost-= -delta*costOf(d);S.stock[d]=cur+delta}return true}
+/* v2.2: one atomic purchase path. Validate money and room, then commit; the caller gets what happened and why, so the
+   screen can say 「錢不夠」 or 「冰箱空間不足」 instead of quietly doing something else. Never spends below zero. */
+function stockQuote(d,want){const room=Math.max(0,fridgeCap()-stockTotal());const c=costOf(d);const byMoney=Math.floor(Math.max(0,S.money)/c);const n=Math.max(0,Math.min(want,room,byMoney));return{n,c,room,byMoney,why:n>=want?'':room<=0?'cap':byMoney<=0?'money':room<want&&byMoney>=room?'cap':'money'}}
+function buyStock(d,delta){const cur=S.stock[d]||0;if(delta>0){const q=stockQuote(d,delta);if(q.n<=0){buyStock.last=q;return false}S.money-=q.n*q.c;S.todayCost+=q.n*q.c;S.stock[d]=cur+q.n;buyStock.last=q;return true}else{delta=Math.max(delta,-cur);if(delta===0){buyStock.last={n:0,why:'none'};return false}S.money+= -delta*costOf(d);S.todayCost-= -delta*costOf(d);S.stock[d]=cur+delta;buyStock.last={n:delta,why:''};return true}}
+function stockFailText(d,q){return q.why==='cap'?`冰箱空間不足（還能放 ${q.room} 份，升級冰箱可以放更多）`:q.why==='money'?`錢不夠：${dishName(d)} 一份 ${fmt(q.c)}，現金 ${fmt(S.money)}`:'沒有庫存可以退'}
 function autoStock(){const sug=suggestStock();for(const d in sug){const need=sug[d]-(S.stock[d]||0);if(need>0)buyStock(d,need)}}
 
 /* ================= service ================= */
@@ -952,7 +960,7 @@ const SETS={drink:{n:'主餐＋飲料',d:'點主餐的客人更常加一杯（�
 function setOn(k){return!!(S.sets&&S.sets[k])}
 function setFor(cat){if(cat==='drink'&&setOn('full'))return'full';if(cat==='drink'&&setOn('drink'))return'drink';if(cat==='dessert'&&setOn('full'))return'full';if(cat==='dessert'&&setOn('dessert'))return'dessert';return null}
 function recoDish(){const r=S.today&&S.today.reco;return r&&S.menu.includes(r)&&S.unlocked.includes(r)?r:(r==='signature'&&S.signature?r:null)}
-function orderItems(g){const ms=menuList().filter(stationOk);const T=TYPES[g.type];const W=R?R.weather:(S.today?S.today.weather:'sun');
+function orderItems(g,est){/* v2.2: a sold-out dish is not on offer (est = the demand estimate, which ignores the fridge) */const ms0=menuList().filter(stationOk);const ms=est?ms0:ms0.filter(d=>(S.stock[d]||0)>0);const T=TYPES[g.type];const W=R?R.weather:(S.today?S.today.weather:'sun');
  const wf=d=>demandW(d,T);const reco=recoDish();
  const foods=()=>ms.filter(d=>DISH(d).cat!=='drink'&&DISH(d).cat!=='dessert');const drinks=()=>ms.filter(d=>DISH(d).cat==='drink');const des=()=>ms.filter(d=>DISH(d).cat==='dessert');
  const items=[];const cap=g.size===1?3:g.size===2?4:5;const reg=g.reg?REG_BY[g.reg]:null;
@@ -972,16 +980,16 @@ function orderItems(g){const ms=menuList().filter(stationOk);const T=TYPES[g.typ
   if(d)items.push(d);
   const hasMain=!!d&&DISH(d).cat==='main';const pd=(g.reg==='dylan'?.7:(T.pD||.35))*(W==='hot'?1.5:W==='rain'||W==='storm'?1.2:1)*(reco&&DISH(reco).cat==='drink'?1.25:1)*(hasMain&&setFor('drink')?1.6:1);const dr=drinks();if(dr.length&&(Math.random()<pd||!d))items.push(wpick(dr,wf));
   const ds=des();if(ds.length&&Math.random()<(T.pS||.2)*(reco&&DISH(reco).cat==='dessert'?1.4:1)*(g.celebrate?2.2:1)*(g.broke||g.rushed||g.quick?.2:1)*(hasMain&&setFor('dessert')?1.7:1))items.push(wpick(ds,wf))}
- const out=items.filter(Boolean).slice(0,cap);if(g.share){/* one dessert, two forks */let seen=false;return out.filter(d=>{if(DISH(d).cat!=='dessert')return true;if(seen)return false;seen=true;return true})}return out}
+ let out=items.filter(Boolean).slice(0,cap);if(!est){const used={};out=out.filter(d=>{used[d]=(used[d]||0)+1;return used[d]<=(S.stock[d]||0)})}if(g.share){/* one dessert, two forks */let seen=false;return out.filter(d=>{if(DISH(d).cat!=='dessert')return true;if(seen)return false;seen=true;return true})}return out}
 /* expected sales per dish for a day like today: the guest mix and the ordering rules themselves, sampled */
-function expectDemand(groups,n){const out={};const G=S.today?S.today.groups:groups||10;const N=n||60;
- for(let i=0;i<N;i++){const o=rollGuest();const g={type:o.type,size:o.size,reg:null,forSig:o.forSig};for(const d of orderItems(g))out[d]=(out[d]||0)+1}
+function expectDemand(groups,n,est){const out={};const G=S.today?S.today.groups:groups||10;const N=n||60;
+ for(let i=0;i<N;i++){const o=rollGuest();const g={type:o.type,size:o.size,reg:null,forSig:o.forSig};for(const d of orderItems(g,true))out[d]=(out[d]||0)+1}
  for(const d in out)out[d]=out[d]*G/N;return out}
 function createTicket(g){const items=orderItems(g);const t=R.tables[g.table];
- if(!items.length){leaveGroup(g,'ok');return}
+ if(!items.length){/* nothing they wanted is left in the fridge */R.st.soldOutLeft=(R.st.soldOutLeft||0)+g.size;if(canChat('soldout',30,3))quote(g,pick(['想吃的都賣完了。','沒東西可以點了？','下次早點來。']));noteLine(`${g.name} 想點的都賣完了，走了。`);leaveGroup(g,'sad');return}
  const hasMain=items.some(d=>DISH(d).cat==='main');const tk={id:R.tkid++,no:t.i+1,g,items:items.map(d=>{const cat=DISH(d).cat;const set=hasMain&&(cat==='drink'||cat==='dessert')&&setFor(cat)||null;return{d,st:'pending',q:null,want:d==='steak'?wpick([0,1,2,3],k=>[.2,.35,.3,.15][k]):0,picked:false,set}}),t0:R.t};
  if(g.reg&&g.reg!=='dylan'){const m=regMem(g.reg);for(const it of tk.items)m.orders[it.d]=(m.orders[it.d]||0)+1;if(g.share&&tk.items.some(i=>DISH(i.d).cat==='dessert')&&Math.random()<.5)setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,'一份甜點，兩支叉子。')},800)}
- for(const it of tk.items)takeStock(it);if(tk.items.some(it=>it.st==='order')){toast(`食材不夠！Jill 緊急叫貨中（1.5 倍價），${g.name} 要多等一下`);g.pat=Math.min(1,g.pat+.1)}
+ for(const it of tk.items)takeStock(it);tk.items=tk.items.filter(it=>it.st!=='cancel');stockWatch();
  g.ticket=tk;g.state='wait';g.pat=Math.min(1,g.pat+.12);R.tickets.push(tk);R.tv++;sfx.ticket();
  if(g.reg==='dylan'){}else if(g.reg){const v=S.regulars[g.reg]||0;const tier=Math.floor(regTier(v));/* not every visit: a line when they are still new, then only now and then */if(tier===0?Math.random()<.5:Math.random()<.35)quote(g,REG_BY[g.reg].l[tier])}else if(g.type==='vip')quote(g,'把你們最好的端上來吧。');else if(Math.random()<.12)quote(g,pick(['今天想吃點好的。','聽說這裡的東西都是 Jill 親手做的？','有推薦的嗎？算了，都點吧。']));
  coach(2)}
@@ -1041,7 +1049,7 @@ function updJob(s,dt){const j=s.job,k=j.step;if(!k)return;const sp=dishSpeed(j.d
  case'tap':if(k.heat){if(R.t-k.last>.85)k.scorch+=dt*.3/(1+.12*(S.eq.pan-1))*(S.day<=2?.6:1);else k.scorch=Math.max(0,k.scorch-dt*.04);if(k.scorch>=1){j.burnt=true;trayFloat(s,'燒焦了','#E0654A');finishJob(s)}}break;
  case'hold':if(k.hold){k.holdT=(k.holdT||0)+dt;if(k.holdT>1.3/k.rate+1.5){holdEnd();break}k.level+=dt*k.rate;s.ht=(s.ht||0)+dt;if(s.ht>.13){s.ht=0;k.ing==='beans'?sfx.grind():k.ing==='milk'?sfx.steam():sfx.pour()}if(k.level>=1.04)holdEnd()}break}}
 function charcoal(s){const j=s.job;s.job=null;if(R.holdSlot===s)R.holdSlot=null;const it=j.it;R.st.q.B++;R.streak=0;sfx.burnt();trayFloat(s,'焦成木炭了','#E0654A');
- it.st='pending';takeStock(it);toast(it.st==='order'?`${DISH(it.d).n} 焦掉了，食材用完，緊急叫貨中…`:`${DISH(it.d).n} 焦掉了，得重做一份`);R.tv++}
+ it.st='pending';if(takeStock(it)){toast(`${DISH(it.d).n} 焦掉了，得重做一份`)}else{toast(`${DISH(it.d).n} 焦掉了，而且沒有備料了——這道只好取消`,'warn');const tk=R.tickets.find(t=>t.items.includes(it));if(tk){tk.items=tk.items.filter(x=>x!==it);const g=tk.g;g.pat=Math.max(0,g.pat-.25);if(!tk.items.length){tk.items=[];}}}stockWatch();R.tv++}
 function addXP(d,n){const before=mLv(d);S.xp[d]=(S.xp[d]||0)+n;const after=mLv(d);if(after>before){toast(`熟練度提升：${DISH(d).n} LV${after}`);if(d==='duck'&&after>=5)ach('duck')}}
 function plate(s,q){const j=s.job;s.job=null;const it=j.it;if(!R.tickets.includes(j.tk))return;it.st='ready';it.q=q;it.byJill=!j.chef;R.tv++;if(DISH(j.d).special&&!S.firstSpecial){S.firstSpecial=S.day;const px=j.plating&&j.plating.x||200;memo('firstspecial',px,KY.passTop+6,{d:dishName(j.d),room:'kitchen'});logLine('',`第一盤${dishName(j.d)}從出菜口出去了。`,'e')}
  addXP(it.d,q==='P'?2:q==='B'?0:1);R.st.q[q]++;trayFloat(s,QN[q],q==='P'?'#FFD95A':q==='G'?'#9ED08A':q==='O'?'#E6D3B0':'#E0654A');
@@ -1358,7 +1366,7 @@ function achDay(st,plated){if(S.stats.days+1>=7)ach('week');if(st.rev>=20000)ach
  if(rating()>=4.5&&S.reviews.length>=20)ach('rating45');if(Rc.sig&&Rc.sig.v>=100)ach('sig100');const crew=S.crew||[];if(crew.length>=6)ach('staff6');if(crew.length>=3&&crew.every(m=>m.lv>=5))ach('lv5all');if(opsLv('flow')>=3)ach('ops3');if(albumList().length>=50)ach('photos50')}
 function endDay(){if(!R)return;clearCheckpoint();const st=R.st,D=S.day;const wages=crewWages();let bonus=0;
  const tasks=S.today.tasks.map(t=>{const p=taskProg(t);const done=p>=t.n;if(done)bonus+=t.reward;return{...t,p,done}});
- S.money+=bonus-wages;const avg=st.sats.length?st.sats.reduce((a,b)=>a+b,0)/st.sats.length:0;
+ S.money+=bonus;let wagesPaid=wages;if(S.money-wages<0){/* v2.2: the till never goes negative — what cannot be paid tonight is noted, not borrowed */wagesPaid=Math.max(0,S.money);S.wageOwed=(S.wageOwed||0)+(wages-wagesPaid)}S.money-=wagesPaid;const avg=st.sats.length?st.sats.reduce((a,b)=>a+b,0)/st.sats.length:0;
  let top=null,topN=0;for(const d in st.dish)if(st.dish[d]>topN){topN=st.dish[d];top=d}
  const dayStars=st.sats.length?clamp(Math.round((avg/100)*5*2)/2,1,5):1;
  let nb=1,msg='';if(st.critic==='good'){nb+=.35;msg="Jill's Kitchen 昨晚突然爆紅！評論家的文章被瘋狂轉發。"}else if(st.critic==='bad'){nb-=.1;msg='評論家的文章不太留情面，今天客人少了一點。'}if(st.blogger==='good'){nb+=.25;msg=msg||'美食部落客的貼文爆了，大家都想來 Jill 的店！'}
@@ -1437,8 +1445,8 @@ function renderStock(){const p=$('#stockPanel');if(!p||p.hidden||!R)return;const
  const lowAll=ms.filter(d=>(S.stock[d]||0)<=2);const fillCost=lowAll.reduce((a,d)=>a+emergencyCost(d)*Math.max(0,3-(S.stock[d]||0)),0);
  p.innerHTML=`<div class="sp-h"><h4>冰箱 <span>${tot}/${cap}</span></h4><button class="sp-x" data-stock="close" aria-label="關閉">✕</button></div>
   ${lowAll.length&&fillCost>0?`<button class="btn sm sp-fill" data-stock="fill">${stockArm==='fill'?`確定？低於 3 份的全部補到 3　${fmt(fillCost)}`:`低於 3 份的全部補到 3　${fmt(fillCost)}`}</button>`:''}
-  <div class="sp-list">${ms.map(d=>{const n=S.stock[d]||0;const lv=stockLevel(d);const c=emergencyCost(d);const c3=c*3;const arm=stockArm===d+'|3';return`<div class="sp-row ${lv}"><img alt="" src="${dishURL(d,'P')}"><div class="nm">${dishName(d)}<small>${lv==='out'?'賣完了':lv==='low'?'快沒了':'還夠'}・叫貨 ${fmt(c)}/份</small></div><b class="n">${n}</b><button data-stock="buy" data-d="${d}" data-n="1" ${S.money<c||tot>=cap?'disabled':''}>+1 <small>${fmt(c)}</small></button><button data-stock="buy" data-d="${d}" data-n="3" class="${arm?'arm':''}" ${S.money<c||tot>=cap?'disabled':''}>${arm?'確定？':'+3'} <small>${fmt(c3)}</small></button></div>`}).join('')}</div>
-  <p class="sp-note">臨時叫貨是平常進貨的 1.5 倍價，5 秒後到貨。餐點缺料時 Jill 也會自動叫貨。</p>`}
+  <div class="sp-list">${ms.map(d=>{const n=S.stock[d]||0;const lv=stockLevel(d);const c=emergencyCost(d);return`<div class="sp-row ${lv}"><img alt="" src="${dishURL(d,'P')}"><div class="nm">${dishName(d)}<small>${lv==='out'?'賣完了':lv==='low'?'快沒了':'還夠'}・叫貨 ${fmt(c)}/份</small></div><b class="n">${n}</b><button data-stock="buy" data-d="${d}" data-n="1" ${S.money<c||tot>=cap?'disabled':''}>+1 <small>${fmt(c)}</small></button>${(()=>{const mx=Math.max(0,Math.min(cap-tot,Math.floor(S.money/c),12));const arm=stockArm===d+'|'+mx;return`<button data-stock="buy" data-d="${d}" data-n="${mx}" class="${arm?'arm':''}" ${mx<=1?'disabled':''}>${arm?'確定？':'補滿 +'+mx} <small>${fmt(c*mx)}</small></button>`})()}</div>`}).join('')}</div>
+  <p class="sp-note">臨時叫貨是平常進貨的 1.5 倍價，馬上到。賣完的菜客人點不到；店不會自己花錢叫貨。</p>`}
 {const sp=$('#stockPanel');if(sp){sp.addEventListener('click',e=>{const b=e.target.closest('[data-stock]');if(!b||b.disabled)return;const a=b.dataset.stock;audioInit();
   if(a==='close'){sp.hidden=true;return}
   if(a==='fill'){if(stockArm!=='fill'){stockArm='fill';renderStock();setTimeout(()=>{if(stockArm==='fill'){stockArm=null;renderStock()}},4000);return}stockArm=null;for(const d of menuList().filter(stationOk))if((S.stock[d]||0)<=2)buyEmergency(d,3-(S.stock[d]||0));renderStock();stockChip();return}
@@ -2319,9 +2327,12 @@ function photoClear(){PHOTOS.clear();photoOpen().then(db=>{if(!db)return;try{db.
 /* every picture of the album, for a backup: {id: dataURL} */
 function photoAll(){const A=albumList();return Promise.all(A.map(p=>p.img?Promise.resolve([p.id,p.img]):photoGet(p.id).then(d=>[p.id,d]))).then(arr=>{const o={};for(const [id,d] of arr)if(id&&d)o[id]=d;return o})}
 const PHOTO_BLANK='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="360" height="270"><rect width="360" height="270" fill="#EFE3CF"/></svg>');
-let photoWake=0;
 /* what to put in an <img> right now: the picture if we have it, otherwise a blank while it loads (the album re-renders once) */
-function photoSrc(p){if(p.img)return p.img;if(PHOTOS.has(p.id))return PHOTOS.get(p.id);photoGet(p.id).then(d=>{if(d&&!photoWake){photoWake=1;Promise.resolve().then(()=>{photoWake=0;if(sub==='book')keepScroll(showBook);if(lightbox)lightboxRender()})}});return PHOTO_BLANK}
+/* v2.2: a photo that is not in memory yet is fetched once; when it arrives it is written into the <img> elements that
+   show it (data-pid) — the journal is not redrawn. v2.1 redrew the whole journal on every arrival, and each redraw
+   re-requested the rest: with 74 photos that was ~2,500 redraws of a 1.5 MB page, a freeze that read as a softlock. */
+const photoWant=new Set();
+function photoSrc(p){if(p.img)return p.img;if(PHOTOS.has(p.id))return PHOTOS.get(p.id);if(!photoWant.has(p.id)){photoWant.add(p.id);photoGet(p.id).then(d=>{photoWant.delete(p.id);if(!d)return;for(const im of document.querySelectorAll(`img[data-pid="${p.id}"]`))if(im.src!==d)im.src=d})}return PHOTO_BLANK}
 /* pictures still inline in the save (older saves, or a failed IndexedDB write) move into the store when it works */
 function photoMigrate(){const A=albumList();const inline=A.filter(p=>p.img);if(!inline.length)return;photoQueue=photoQueue.then(()=>photoOpen()).then(db=>{if(!db)return;return Promise.all(inline.map(p=>photoPut(p.id,p.img).then(ok=>{if(ok)delete p.img}))).then(()=>save())})}
 function albumCap(){return photoDBFail?60:240}   /* ordinary photos kept; 珍藏 never rotate out */
@@ -3207,7 +3218,12 @@ function incDraw(c,now,list){const th=R&&R.thief;if(th)list.push({y:th.y,f:()=>{
  const I=R&&R.insp;if(I)list.push({y:I.y,f:()=>{const stp=I.moving?Math.sin(I.step):0;drawPerson(c,I.x,I.y,{skin:'#F0C8A8',hair:'#4A4A4A',hs:0,top:'#3A4A5A',acc:'glasses',pants:'#2A2A30'},{step:stp,mood:'ok',flip:(I.face||1)<0});c.fillStyle='#8A6A42';rr(c,I.x+8,I.y-30,8,10,1);c.fill();c.fillStyle='#fff';c.fillRect(I.x+9,I.y-28,6,7);
   if(!I.out){const f=1-I.t/I.dur;c.lineWidth=3;c.strokeStyle='rgba(0,0,0,.25)';c.beginPath();c.arc(I.x,I.y-72,9,0,7);c.stroke();c.strokeStyle=f>.3?'#E6B04A':'#E0543A';c.beginPath();c.arc(I.x,I.y-72,9,-Math.PI/2,-Math.PI/2+f*6.283);c.stroke();c.fillStyle='#2E2019';c.font=`800 7px ${FONT}`;c.textAlign='center';c.textBaseline='middle';c.fillText(Math.ceil(I.dur-I.t),I.x,I.y-71.5);c.textBaseline='alphabetic';const dirty=R.tables.filter(t=>t.dirty).length;if(dirty)nameTag(c,I.x,I.y-88,`髒桌 ${dirty}`)}}})}
 /* ================= emergency stock ================= */
-function takeStock(it){if((S.stock[it.d]||0)>0){S.stock[it.d]--;return}it.st='order';it.ordT=R.t+5;const c=Math.round(costOf(it.d)*1.5);S.money-=c;S.todayCost+=c;R.st.short=R.st.short||{};R.st.short[it.d]=(R.st.short[it.d]||0)+1}
+/* v2.2: a unit leaves the fridge when it is ordered. There is no automatic emergency order any more: the game never spends
+   the player's money on its own, so money cannot go negative here. If the fridge is empty after all (a re-make after a
+   burnt plate), the item is cancelled and the guest is told. */
+function takeStock(it){if((S.stock[it.d]||0)>0){S.stock[it.d]--;return true}it.st='cancel';R.st.short=R.st.short||{};R.st.short[it.d]=(R.st.short[it.d]||0)+1;return false}
+/* low-stock and sold-out notices, once each per dish per day, with a shortcut to the fridge */
+function stockWatch(){if(!R||!feat().stock)return;R.stockNote=R.stockNote||{};for(const d of menuList().filter(stationOk)){const n=S.stock[d]||0;const k=R.stockNote[d]||0;if(n<=0&&k<2){R.stockNote[d]=2;toast(`<b>${dishName(d)}</b> 賣完了，菜單上先標示售完（冰箱可以臨時叫貨）`,'warn');logLine('',`${dishName(d)}賣完了。`,'e')}else if(n<=2&&k<1){R.stockNote[d]=1;if(R.t-(R.lowToastT||-99)>25){R.lowToastT=R.t;toast(`${dishName(d)} 只剩 ${n} 份`)}}}stockChip()}
 function stockArrive(){let n=0;for(const tk of R.tickets)for(const it of tk.items)if(it.st==='order'&&R.t>=it.ordT){it.st='pending';n++}if(n){R.tv++;toast('叫的食材送到了！可以開始做了');sfx.ding()}}
 function closeShop(msg){if(!R||R.closed)return;R.closed=true;toast(msg);for(const g of R.groups)if(g.state==='arrive'||g.state==='queue'){g.state='leave';sendOut(g)}}
 /* ================= stars & lab ================= */
@@ -3359,9 +3375,10 @@ for(const ev of['touchend','touchcancel'])window.addEventListener(ev,()=>{if(R&&
    Only the two game canvases: buttons, sheets, inputs and the order strip keep their normal touch behaviour. */
 for(const el of[sc,tc]){el.addEventListener('touchstart',e=>{e.preventDefault()},{passive:false});el.addEventListener('touchmove',e=>{e.preventDefault()},{passive:false})}
 tc.addEventListener('contextmenu',e=>e.preventDefault());
-$('#closePill').addEventListener('click',()=>finishClosing());$('#peekPill').addEventListener('click',()=>{$('#peekPill').hidden=true;screenEl.hidden=false;if(phase!=='service'){room='main';forceDraw=true}});
+$('#closePill').addEventListener('click',()=>finishClosing());$('#peekPill').addEventListener('click',()=>{$('#peekPill').hidden=true;screenEl.hidden=false;if(phase!=='service'){room='main';forceDraw=true;if(mainScreen==='shop')keepScroll(showShop);else if(mainScreen==='prep')keepScroll(showPrep);else hud(true)}});
 $('#hPause').addEventListener('click',()=>{audioInit();if(phase==='service'){paused=true;showPause();checkpointSave('pause')}else if(phase!=='title'){openSub('settings')}});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){if(phase==='service'&&!paused){paused=true;showPause()}if(phase==='service'&&R)checkpointSave('hidden')}else{bg=null;DCACHE.clear();audioResume()}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){if(phase==='service'&&!paused){paused=true;showPause()}if(phase==='service'&&R)checkpointSave('hidden');else if(phase!=='title')save()}else{bg=null;DCACHE.clear();audioResume()}});
+window.addEventListener('pagehide',()=>{if(phase==='service'&&R)checkpointSave('pagehide');else if(phase!=='title')save()});
 /* coming back from another app or from the page cache: caches may be blank, the audio context asleep */
 window.addEventListener('pageshow',()=>{bg=null;DCACHE.clear();audioResume()});
 window.addEventListener('focus',audioResume);
@@ -3401,7 +3418,7 @@ function showPrep(){phase='prep';mainScreen='prep';R=null;room='main';lifeReset(
   return`<div class="menu-row ${on?'':'off'}"><img alt="" src="${dishURL(d,'P')}"><div class="nm">${D.n}<span class="stars">${'★'.repeat(starOf(d))}</span><small>${CAT_N[D.cat]} · LV${lv}</small></div><button class="tog ${on?'on':''}" data-act="toggle" data-d="${d}" aria-label="${on?'從菜單移除':'加入菜單'}"></button>
   <div class="meta">${fmt(priceOf(d))} · 成本 ${fmt(costOf(d))} · ${D.steps.length} 步驟・${mechN(d)}${stationOk(d)?'':` · <b style="color:var(--tomato)">缺少${ST_N[D.st]}，客人不會點</b>`}</div>
   ${!on&&F.stock&&st>0?`<div class="ctl offstock"><span>冰箱裡還有 ${st} 份，佔著位子</span><button class="btn sm" data-act="stock" data-d="${d}" data-v="-99">退掉（退 ${fmt(st*costOf(d))}）</button></div>`:''}
-  ${on&&(F.prices||F.stock)?`<div class="ctl">${F.prices?`<span class="step"><label>售價</label><button data-act="price" data-d="${d}" data-v="-1" aria-label="降價">−</button><span>${fmt(priceOf(d))}${m!==1?` <small>${m>1?'+':''}${Math.round((m-1)*100)}%</small>`:''}</span><button data-act="price" data-d="${d}" data-v="1" aria-label="漲價">＋</button></span>`:''}${F.stock?`<span class="step"><label>庫存</label><button data-act="stock" data-d="${d}" data-v="-2" aria-label="退貨">−</button><span>${st} 份</span><button data-act="stock" data-d="${d}" data-v="2" aria-label="進貨">＋</button></span>`:''}${F.prices?priceFeelHTML(d):''}${F.stock&&st===0?'<span class="warnpill">沒有備料</span>':''}</div>`:''}</div>`}).join('');
+  ${on&&(F.prices||F.stock)?`<div class="ctl">${F.prices?`<span class="step"><label>售價</label><button data-act="price" data-d="${d}" data-v="-1" aria-label="降價">−</button><span>${fmt(priceOf(d))}${m!==1?` <small>${m>1?'+':''}${Math.round((m-1)*100)}%</small>`:''}</span><button data-act="price" data-d="${d}" data-v="1" aria-label="漲價">＋</button></span>`:''}${F.stock?(()=>{const sg=sug[d]||0;const q1=stockQuote(d,1);return`<span class="step stk"><label>庫存</label><button data-act="stock" data-d="${d}" data-v="-1" aria-label="退一份" ${st>0?'':'disabled'}>−</button><span>${st} 份</span><button data-act="stock" data-d="${d}" data-v="1" aria-label="進一份" ${q1.n>0?'':'disabled'}>＋</button></span><span class="stkq"><button class="mini" data-act="stockTo" data-d="${d}" data-k="sug" ${st<sg&&q1.n>0?'':'disabled'}>補到建議 ${sg}</button><button class="mini" data-act="stockTo" data-d="${d}" data-k="max" ${q1.n>0?'':'disabled'}>補滿</button></span>`})():''}${F.prices?priceFeelHTML(d):''}${F.stock&&st===0?'<span class="warnpill">沒有備料</span>':''}</div>`:''}</div>`}).join('');
  const sig=S.signature?`<div class="sig"><img alt="" src="${dishURL('signature','P')}"><div><div class="st">★ CHEF JILL'S SIGNATURE ★</div><b>${S.signature.name}</b><small>${fmt(priceOf('signature'))} · 庫存 ${S.stock.signature||0} 份 · 永遠在菜單最上方</small>${F.stock?`<div style="margin-top:6px" class="step"><button data-act="stock" data-d="signature" data-v="-2" style="color:var(--cream)">−</button><span style="color:var(--cream)">${S.stock.signature||0} 份</span><button data-act="stock" data-d="signature" data-v="2" style="color:var(--cream)">＋</button></div>`:''}</div></div>`:'';
  show(`<div class="sheet tall"><div class="sh-top"><div class="ttl"><div class="eyebrow">DAY ${S.day} · 開店前</div><h2>${LV().n}</h2></div>${topIcons()}</div>
   <div class="card today"><div class="wx">${SVG[W.ic||T.weather]||SVG.sun}</div><div><b>${W.n} · 預計約 ${T.people} 位客人</b><p>${W.d}${S.buzz>1?' 店裡最近很紅，人潮會多一些。':''}${(()=>{const w=(S.crew||[]).filter(m=>m.role==='waiter').length;const NT=tablesTotal();return NT>w*6+8?`<br><b style="color:#B8432C">⚠ ${NT} 張桌、${w} 位服務生：桌數比服務生顧得來的多，客人會等太久。</b>`:''})()}</p>${(()=>{const h=wxHints();return h.length?`<p class="hint">今天可能要多準備：<b>${h.map(dishName).join('、')}</b></p>`:''})()}</div></div>
@@ -3503,10 +3520,10 @@ function openLightbox(id){const A=albumList().slice().reverse();const i=A.findIn
 function closeLightbox(){lightbox=null;const el=$('#lightbox');if(el)el.hidden=true}
 function lightboxRender(){const el=$('#lightbox');if(!lightbox||!el)return;const p=albumList().find(x=>x.id===lightbox.ids[lightbox.i]);if(!p){closeLightbox();return}
  el.innerHTML=`<div class="lb-bg" data-lb="close"></div><button class="lb-close" data-lb="close" aria-label="關閉">✕</button>
-  <figure class="lb-card ${p.keep?'keep':''}"><img alt="" src="${photoSrc(p)}"><figcaption><span class="when">DAY ${p.day}${p.clock?' · '+p.clock:''}</span><b>「${p.cap}」</b>${p.txt?`<span class="txt">${p.txt}</span>`:''}</figcaption>${p.keep?'<span class="pin">珍藏</span>':''}</figure>
+  <figure class="lb-card ${p.keep?'keep':''}"><img alt="" data-pid="${p.id}" src="${photoSrc(p)}"><figcaption><span class="when">DAY ${p.day}${p.clock?' · '+p.clock:''}</span><b>「${p.cap}」</b>${p.txt?`<span class="txt">${p.txt}</span>`:''}</figcaption>${p.keep?'<span class="pin">珍藏</span>':''}</figure>
   <div class="lb-nav"><button data-lb="prev" ${lightbox.i<=0?'disabled':''} aria-label="上一張">‹</button><span class="lb-count">${lightbox.i+1} / ${lightbox.ids.length}</span><button class="lb-keep ${p.keep?'on':''}" data-lb="keep">${p.keep?'♥ 珍藏中':'♡ 珍藏'}</button><button data-lb="next" ${lightbox.i>=lightbox.ids.length-1?'disabled':''} aria-label="下一張">›</button></div>`}
 function lightboxStep(d){if(!lightbox)return;const n=lightbox.i+d;if(n<0||n>=lightbox.ids.length)return;lightbox.i=n;lightboxRender()}
-function albumFigure(p,i){return`<figure class="polaroid ${p.keep?'keep':''}" style="--r:${((i%3)-1)*1.5}deg" data-act="photo" data-k="${p.id}"><img alt="" src="${photoSrc(p)}"><figcaption><span class="when">DAY ${p.day}${p.clock?' · '+p.clock:''}</span><b>「${p.cap}」</b>${p.txt?`<span class="txt">${p.txt}</span>`:''}</figcaption>${p.keep?'<span class="pin">珍藏</span>':''}</figure>`}
+function albumFigure(p,i){return`<figure class="polaroid ${p.keep?'keep':''}" style="--r:${((i%3)-1)*1.5}deg" data-act="photo" data-k="${p.id}"><img alt="" data-pid="${p.id}" src="${photoSrc(p)}"><figcaption><span class="when">DAY ${p.day}${p.clock?' · '+p.clock:''}</span><b>「${p.cap}」</b>${p.txt?`<span class="txt">${p.txt}</span>`:''}</figcaption>${p.keep?'<span class="pin">珍藏</span>':''}</figure>`}
 function showBook(){sub='book';let body='';
  if(bookTab==='front'){const rv=S.reviews.slice(-2).reverse();const notes=(S.notes||[]).slice(0,3);const A=albumList().slice(-2).reverse();const met=REGS.filter(r=>(S.regulars[r.id]||0)>0).length;const nAch=Object.keys(S.achievements).length;
   body=`<div class="jhead"><div class="bigrate"><b>${rating().toFixed(1)}</b><div><div class="sum-stars">${starsHTML(Math.round(rating()*2)/2)}</div><div class="muted" style="font-size:12px">${S.reviews.length} 則評價 · 開業 ${S.stats.days||0} 天 · ${S.stats.guests||0} 位客人</div></div></div></div>
@@ -3553,15 +3570,15 @@ function saveCardHTML(){const cp=S.checkpoint&&S.checkpoint.day===S.day?S.checkp
  <div class="row" style="margin-top:8px"><button class="btn sm" style="flex:1" data-act="copyBackup">複製備份文字</button><button class="btn sm" style="flex:1" data-act="pasteBackup">貼上備份文字恢復</button></div></div>`}
 function showPause(){sub='pause';show(`<div class="modal"><h2>暫停中</h2><p>DAY ${S.day} · ${clockStr()} · 目前營業額 ${fmt(R?R.st.rev:0)}</p>
  <div class="stack"><button class="btn primary big" data-act="resume">繼續營業</button></div>
- ${saveCardHTML()}
- <div class="card" style="margin-top:10px"><div class="setrow"><span>背景音樂</span><button class="tog ${S.music?'on':''}" data-act="music" aria-label="背景音樂"></button></div><div class="setrow"><span>音效</span><button class="tog ${S.sfx?'on':''}" data-act="sfx" aria-label="音效"></button></div></div>
- <div class="stack" style="margin-top:12px"><button class="btn" data-act="guide">小小店主手冊</button>${R&&!R.closed?'<button class="btn" data-act="closeEarly">提早打烊（等店裡客人吃完）</button><button class="btn danger" data-act="closeNow">馬上結束今天</button>':''}</div></div>`,'dim')}
+ <p class="small" style="margin:10px 2px 0">${S.savedLabel?`最後儲存：${S.savedLabel}`:'尚未存檔'} · 營業中每 20 秒、暫停時、切到別的 App 時都會存下店裡的狀況。</p>
+ <div class="stack" style="margin-top:12px"><button class="btn" data-act="settings">設定・存檔・備份</button><button class="btn" data-act="guide">小小店主手冊</button>${R&&!R.closed?'<button class="btn" data-act="closeEarly">提早打烊（等店裡客人吃完）</button><button class="btn danger" data-act="closeNow">馬上結束今天</button>':''}</div></div>`,'dim')}
 function openSub(k){if(k==='book')showBook();else if(k==='settings'){resetStep=0;showSettings()}}
 function closeSub(){sub=null;if(phase==='service'){if(paused){showPause();return}hideScreen();return}if(mainScreen==='title')showTitle();else if(mainScreen==='prep')showPrep();else if(mainScreen==='shop')showShop();else if(mainScreen==='summary')showSummary()}
 
 let startWarned=false,discardArmed=false;
 screenEl.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;audioInit();doAct(b.dataset.act,b.dataset.d,b.dataset.k,b)});
-function doAct(a,d,k,b){
+function doAct(a,d,k,b){const money0=S.money;try{doAct0(a,d,k,b)}finally{if(S.money!==money0)hud(true)}}
+function doAct0(a,d,k,b){
  switch(a){
  case'open':sfx.door();if(S.checkpoint&&S.checkpoint.day===S.day)resumeCheckpoint();else goMain();break;
  case'openFresh':sfx.door();clearCheckpoint();save();goMain();break;
@@ -3569,9 +3586,10 @@ function doAct(a,d,k,b){
  case'discardAll':{discardArmed=false;for(const x of S.unlocked)if(!S.menu.includes(x)&&(S.stock[x]||0)>0)buyStock(x,-99);sfx.tap();toast('退掉了不在菜單上的庫存');save();keepScroll(showPrep);break}
  case'setT':{S.sets=S.sets||{};S.sets[k]=!S.sets[k];if(k==='full'&&S.sets.full){S.sets.drink=false;S.sets.dessert=false}if((k==='drink'||k==='dessert')&&S.sets[k])S.sets.full=false;sfx.tap();save();keepScroll(showPrep);break}
  case'reco':{if(!S.today)break;S.today.reco=S.today.reco===d?null:d;sfx.tap();save();keepScroll(showPrep);break}
- case'toggle':{const on=S.menu.includes(d);if(on){const rest=S.menu.filter(x=>x!==d&&DISH(x).cat!=='drink'&&DISH(x).cat!=='dessert');if(!rest.length&&!S.signature&&DISH(d).cat!=='drink'&&DISH(d).cat!=='dessert'){toast('菜單至少要有一道主食');break}S.menu=S.menu.filter(x=>x!==d)}else{if(S.menu.filter(x=>S.unlocked.includes(x)).length>=menuCap()){toast(`菜單已滿（上限 ${menuCap()} 道）${LEVELS[S.level]?'，擴建後可以放更多':opsLv('board')?'':'；「大菜單板」可以多放 2 道'}`);break}S.menu.push(d);S.menuSince=S.menuSince||{};if(!S.menuSince[d])S.menuSince[d]=S.day;if(menuList().length>=8)ach('menu8')}sfx.tap();save();showPrep();break}
+ case'toggle':{const on=S.menu.includes(d);if(on){const rest=S.menu.filter(x=>x!==d&&DISH(x).cat!=='drink'&&DISH(x).cat!=='dessert');if(!rest.length&&!S.signature&&DISH(d).cat!=='drink'&&DISH(d).cat!=='dessert'){toast('菜單至少要有一道主食');break}S.menu=S.menu.filter(x=>x!==d)}else{if(S.menu.filter(x=>S.unlocked.includes(x)).length>=menuCap()){toast(`菜單已滿（上限 ${menuCap()} 道）${LEVELS[S.level]?'，擴建後可以放更多':opsLv('board')?'':'；「大菜單板」可以多放 2 道'}`);break}S.menu.push(d);S.menuSince=S.menuSince||{};if(!S.menuSince[d])S.menuSince[d]=S.day;if(menuList().length>=8)ach('menu8')}sfx.tap();save();keepScroll(showPrep);break}
  case'price':{const steps=[.8,.9,1,1.1,1.2,1.3,1.5];let i=steps.indexOf(S.price[d]||1);if(i<0)i=2;i=clamp(i+(+b.dataset.v),0,steps.length-1);S.price[d]=steps[i];sfx.tap();save();keepScroll(showPrep);break}
- case'stock':{const ok=buyStock(d,+b.dataset.v);if(!ok)toast(+b.dataset.v>0?(stockTotal()>=fridgeCap()?'冰箱滿了，升級冰箱可以放更多':'錢不夠了'):'沒有庫存可以退');else sfx.tap();save();keepScroll(showPrep);break}
+ case'stock':{const want=+b.dataset.v;const ok=buyStock(d,want);const q=buyStock.last||{};if(!ok)toast(stockFailText(d,q),'warn');else{sfx.tap();if(want>0&&q.n<want)toast(`只進了 ${q.n} 份：${q.why==='cap'?'冰箱空間不足':'錢不夠再多'}`)}save();keepScroll(showPrep);break}
+ case'stockTo':{/* v2.2: to the suggested amount, or 補滿 (as many as the fridge and the money allow) */const mode=b.dataset.k;const cur=S.stock[d]||0;const want=mode==='max'?999:Math.max(0,(suggestStock()[d]||0)-cur);if(want<=0){toast(mode==='max'?'冰箱已經放不下了':'已經達到建議量');break}const ok=buyStock(d,want);const q=buyStock.last||{};if(!ok)toast(stockFailText(d,q),'warn');else{sfx.buy();if(mode!=='max'&&q.n<want)toast(`只進了 ${q.n} 份：${q.why==='cap'?'冰箱空間不足':'錢不夠再多'}`)}save();keepScroll(showPrep);break}
  case'restock':{const sug=suggestStock();for(const x in sug){const need=sug[x]-(S.stock[x]||0);if(need>0)buyStock(x,need)}sfx.buy();save();keepScroll(showPrep);break}
  case'start':{const empty=menuList().filter(x=>(S.stock[x]||0)===0);if(feat().stock&&empty.length&&!startWarned){startWarned=true;$('#startWarn').innerHTML=`<div class="inline-warn">${empty.map(x=>DISH(x).n).join('、')} 沒有備料，客人點了要臨時叫貨（1.5 倍價、要等）。再按一次直接開店。</div>`;break}startWarned=false;clearCheckpoint();save();startService();break}
  case'toShop':showShop();break;
