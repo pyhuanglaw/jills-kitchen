@@ -359,7 +359,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .review .rs{display:flex;gap:2px}
 .review .rs svg{width:13px;height:13px}
 .review p{margin:4px 0 2px;font-size:13.5px;line-height:1.5}
-.review small{color:var(--ink3);font-size:11px}
+.review small{color:var(--ink3);font-size:11px;display:flex;align-items:center;gap:5px}.review small .rface{width:18px;height:18px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 1px rgba(46,32,25,.15)}   /* v2.2.1 H2: a named reviewer's face */
 
 /* shop */
 .tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin:0 -16px 6px;padding-left:16px;padding-right:16px;scrollbar-width:none}

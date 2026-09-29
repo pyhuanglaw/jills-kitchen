@@ -3803,6 +3803,40 @@ def a_second_signature_the_dessert_with_its_own_progression(b, port, target):
     check(not g.errors, g.errors[:2])
     g.close()
 
+@test
+def named_guests_keep_one_face_and_the_staff_have_theirs(b, port, target):
+    """v2.2.1 H2 (Day 35 #4/#5). The recurring named guests — 周董, Madame Lin, Mr. Hart, 老饕李先生, Monsieur 杜, 品酒師 Ken,
+    the mystery critic, 吃貨小琪, 美食部落客 Momo and the inspector — keep one look across visits (a fixed sprite instead of a
+    roll of the dice) and one face: the card portrait on the ticket, in their lines, on their reviews. Generic guests still
+    get a face for the day. The eight staff from the card sheet are mapped by name (老周師傅 and 阿勇 wait for cleaner assets);
+    Jill's and Dylan's portraits are untouched."""
+    g = Game(b, port, target, seed=57, manual=True)
+    player30(g); fill_fridge(g); start_day(g); install_bot(g); g.ev("window.__act=()=>{}")
+    names = json.loads(g.ev("JSON.stringify(Object.keys(NAMED))"))
+    check(len(names) == 10 and all(g.ev("!!portraitData(NAMED[%r].p)" % n) for n in names), f'ten named guests, each with a portrait in the data: {names}')
+    check(g.ev("Object.keys(NAMED).every(n=>n==='衛生檢查員'||Object.values(NAMES).some(l=>l.includes(n)))"), 'every named guest is a name the game actually deals out')
+    # the same look twice, and a face that is the card
+    r = json.loads(g.ev("(()=>{const out={};for(const n of ['周董','Mr. Hart','美食部落客 Momo','戴帽子的客人']){const t=n==='戴帽子的客人'?'critic':n==='美食部落客 Momo'?'blogger':'vip';spawn({t:R.t,type:t,size:1,name:n});const a=R.groups[R.groups.length-1];spawn({t:R.t,type:t,size:1,name:n});const b2=R.groups[R.groups.length-1];out[n]={same:JSON.stringify(a.looks)===JSON.stringify(b2.looks),card:guestPortrait(a)===portraitData(NAMED[n].p),notJill:a.looks[0].hs!==4&&a.looks[0].hs!==9}}return JSON.stringify(out)})()"))
+    check(all(v['same'] and v['card'] and v['notJill'] for v in r.values()), f'one look, one face, never Jill\'s or Dylan\'s hair: {r}')
+    check(g.ev("(()=>{spawn({t:R.t,type:'office',size:1,name:'張經理'});const a=R.groups[R.groups.length-1];return guestPortrait(a).startsWith('data:image/png')&&!Object.values(NAMED).some(N=>portraitData(N.p)===guestPortrait(a))})()"), 'a generic guest gets a face for the day, not a card')
+    # a line shows the face
+    g.ev("(()=>{const q=R.groups.find(q=>q.name==='周董');const t=R.tables.find(t=>!t.group&&!t.dirty);if(t)seatGroup(q,t);quote(q,'把你們最好的端上來吧。')})()"); g.ev("__tick(100)"); g.page.wait_for_timeout(60)
+    check(g.ev("!!document.querySelector('#plines img') && document.querySelector('#plines').textContent.includes('周董')"), 'a named guest speaks with their face')
+    check(g.ev("(R.log||[]).some(l=>l.w==='周董'&&l.t==='把你們最好的端上來吧。')"), 'and the line is logged under the name')
+    # the inspector wears her own look and says one line with her face
+    g.ev("document.querySelectorAll('#plines>*').forEach(e=>e.remove());fireIncident('inspector')"); g.ev("__tick(100)"); g.page.wait_for_timeout(60)
+    check(g.ev("!!R.insp") and g.ev("!!document.querySelector('#plines img')") and g.ev("(R.log||[]).some(l=>l.w==='衛生檢查員')"), 'the inspector arrives with her face and a line')
+    # the staff
+    st = json.loads(g.ev("JSON.stringify(Object.keys(STAFF_PORTRAITS).map(n=>[n,!!portraitOf('staff:'+n)]))"))
+    check(len(st) == 14 and all(ok for n, ok in st), f'fourteen staff names have a portrait: {st}')
+    check(g.ev("CREW_NAMES.chef.concat(CREW_NAMES.waiter,CREW_NAMES.cleaner).filter(n=>!STAFF_PORTRAITS[n]).join(',')") == '阿勇,老周師傅,小魏,小威,阿芳,阿桂', 'the six later names wait for assets, as reported')
+    check(g.ev("portraitOf('jill').src===portraitData('jill_default')&&portraitOf('dylan').src===portraitData('dylan_default')"), "Jill's and Dylan's portraits are untouched")
+    # a named reviewer's face in the journal
+    g.ev("(()=>{const q=R.groups.find(q=>q.name==='Mr. Hart');addReview(q,5,'牛排熟度剛好。',{})})();bookTab='reviews';showBook()"); g.page.wait_for_timeout(80)
+    check(g.ev("!!document.querySelector('.review small .rface')"), 'the review carries his face')
+    check(not g.errors, g.errors[:2])
+    g.close()
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--target', choices=['index', 'single'], default='index')
