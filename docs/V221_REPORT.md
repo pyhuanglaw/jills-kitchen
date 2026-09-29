@@ -3,12 +3,13 @@
 ## 1. Versions
 - Artifact https://claude.ai/artifact/2vhURujrtCpQ1P5jnSsjps — **Version 33**, label "2.2.1". Single file
   `jills-kitchen-single-file.html` (1,866 KB; the 41 portraits inlined as WebP, ~1,023 KB).
-- Repo: **`v2.2.1` (annotated tag) = the QA commit listed in §14** (code, goldens, single file, this report). Rollback
+- Repo: **`v2.2.1` (annotated tag) = `7dbcaff`**, the QA commit (code, goldens, single file, this report; §14). Rollback
   points preserved and untouched: `v2.2` = `962b494` (Version 32), `v2.2-ux-stable` = `511f237`, `v2.1` /
   `stable-v2.1` = `da79864`.
 - Commits after `v2.2`, in order: A `e43da98`, H `17e462b`, B2+I-12 `407cc48`, H2 assets `fc12c2d`, C `8d0cc07`, D+E
   `46ea177`, F+G+I-13 `9a65fec`, F'+C' `a8401ba`, J+K+M `049d1eb`, B1 `dbe4a3c`, #16 `641dbc0`, H2 `d19a768`, #18
-  `d3adc10`, docs `0805810`, QA (goldens, single file, this report) = the tag.
+  `d3adc10`, docs `0805810`, QA (goldens, single file, this report) `7dbcaff` = the tag; this SHA pin is a docs-only
+  commit after the tag.
 - Not started, filed for after this release as instructed: `docs/V23_BRIEF.md` (the v2.3 development brief) and
   `docs/V23_STORIES_BRIEF.md` (the stories design).
 
@@ -225,8 +226,9 @@ Day 35 smoke: one whole lazy day on the real save — 72 guests, the summary, th
 (Day 35 kept), no errors. Sims kept in `tools/sims/`.
 
 ## 14. QA commit
-The `v2.2.1` tag points at the commit that adds the re-recorded goldens, the single file and this report; its SHA is
-in the tag message and in `git describe`. Everything else in this report refers to the commits in §1.
+The `v2.2.1` tag points at `7dbcaff`, the commit that adds the re-recorded goldens, the single file and this report
+(the tag message repeats the SHA; `git describe` on it prints `v2.2.1`). Everything else in this report refers to the
+commits in §1; the only commit after the tag is this SHA pin (docs only).
 
 ## 15. Deferred (not done, on purpose)
 - A second cold room / a bigger fridge for 18-dish menus (§7): capacity is economy; listed, not added.
