@@ -2724,6 +2724,35 @@ def h_i_k_t_shop_rooms_decoration_pass_and_dreams(b, port, target):
     check(not g.errors, g.errors)
     g.close()
 
+@test
+def j_cat_furniture_comes_in_tiers_and_the_grass_pot_is_used(b, port, target):
+    """J. 貓咪生活 lists the cats' things in three tiers (基本 / 舒適 / 豪華) plus the catwalk dream; nothing is a chore.
+    The new grass pot: a cat walks over, sits beside it facing it, nibbles, rolls on its back beside it, and the moment
+    goes into the album with the cat's name. Cats never leave the building for it."""
+    g = Game(b, port, target, seed=53, manual=True)
+    player30(g); g.ev("S.phase='shop';showShop();shopTab='catlife';showShop()")
+    heads = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('#screen .nm')].map(e=>e.textContent.trim()))"))
+    for t in ['基本', '舒適', '豪華']: check(any(h.startswith(t) for h in heads), f'tier {t} missing: {heads}')
+    check(json.loads(g.ev("JSON.stringify(CATGEAR.map(G=>G.tier||0))")).count(0) == 0, 'every piece has a tier')
+    check(not any(w in g.page.inner_html('#screen') for w in ['清理', '餵食', '飼料量', '髒了']), 'no chores on the cats\' page')
+    g.ev("S.money=50000;showShop()"); g.click('[data-act=buyGear][data-k=grass]'); g.page.wait_for_timeout(100)
+    check(g.ev("gearOn('grass')") and g.ev("S.money") == 44000, 'the pot is bought and paid')
+    g.click('[data-act=nextDay]'); fill_fridge(g); start_day(g); install_bot(g); g.ev("window.__act=()=>{}"); g.page.evaluate('()=>window.__play(5,0)')
+    g.ev("(()=>{const c=catBy('ban');releaseSpots(c);c.hidden=false;c.perch=-1;c.x=200;c.y=300;catGoGear(c,CATGEAR.find(G=>G.k==='grass'))})()")
+    seen = set(); rooms = set()
+    for i in range(50):
+        g.page.evaluate('()=>window.__play(12,0)')
+        st = json.loads(g.ev("JSON.stringify((()=>{const c=catBy('ban');return [c.st,c.pose,!!c.nibble,c.room||'main',Math.round(c.x)]})())"))
+        seen.add((st[0], st[1], st[2])); rooms.add(st[3])
+    check(('gear', 'sit', True) in seen, f'she should nibble at the grass: {seen}')
+    check(('gear', 'belly', False) in seen, f'then roll on her back beside it: {seen}')
+    check(rooms == {'main'}, f'cats never go outside for it: {rooms}')
+    alb = json.loads(g.ev("JSON.stringify(albumList().filter(p=>p.kind==='grass').map(p=>p.txt))"))
+    check(alb and g.ev("catName(CAT_DEF.find(x=>x.id==='ban'))") in alb[0] and '草' in alb[0], f'the album should hold the moment with her name: {alb}')
+    check(g.ev("MEMS.grass") and '草' in g.ev("MEM_TXT.grass({a:'小齁'})"), 'the album knows how to title and caption it')
+    check(not g.errors, g.errors)
+    g.close()
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--target', choices=['index', 'single'], default='index')
