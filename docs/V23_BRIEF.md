@@ -11,6 +11,8 @@ Jill’s Kitchen v2.3 — Stories of Jill’s Kitchen
   引用，不改既有內容。
 - 第二張角色設定卡（沈晴／阿拓／Ken／Monsieur 杜，含年齡、職業、性格、興趣、喜好、色票、表情）→ docs/v23/qing_tuo_ken_du_concept.png，
   文字轉錄在 L12b；Ken 的職業與遊戲內「品酒師」標籤的關係列為待你決定的事項（L12b）。
+- Story Photo 最終規則（S1–S22 之後確立）→ S17a；S17 的「potentially／keep these rare」被取代，Ken × Monsieur 杜的友情
+  Story Photo 改為確定要求；S5、S8、S10、S16、L31、第 32 節加交叉引用。
 被 addendum 明確取代的部分，只在文件層面調整字句：第 20 節（Stage 3「酒水企劃」→ Lounge 企劃）、第 21 節（酒水基礎設施
 不再是主廳裡的酒櫃，而是 Lounge 的吧台／酒藏；First Tasting Night = 起源線 Beat 4 的一次性實驗）、第 52 節（Ken-triggered
 wine service → Ken → wine → Lounge 起源線）、第 53 節（Phase E「Wine」→ Phase E–I 的 Lounge 分期）、「開始方式」的稽核清單
@@ -1107,6 +1109,7 @@ Social media cannot invent history.
 放大世界裡真的發生的事情。
 
 32. Life Album / Reviews / Social / Records 的角色分工
+【2026-09-30】Life Album 多一類：Story Photo（S17a）— 由真實故事里程碑解鎖的 authored 插圖，與平常的 emergent 照片並存。
 不要四套都顯示同樣內容。
 Life Album
 私人記憶。
@@ -3281,8 +3284,8 @@ It cannot invent:
 that did not occur.
 
 L31. LIFE ALBUM
-【2026-09-30】新增：authored relationship milestone illustrations（S8、S10、S16、S17）— 真正發生後才解鎖的專屬插圖，
-不是隨機截圖；Album 不能變成 CG 收集館。
+【2026-09-30】新增：Story Photos（S17a 最終規則；實例 S8、S10；架構 S16）— 重要故事線在真正發生的里程碑「必須」留下一張
+authored 插圖，不限戀愛（Ken × 杜的友情照是確定要求）；不是隨機截圖；Album 不能變成 CG 收集館。
 Lounge stories may become some of the strongest Life Album material.
 
 Examples:
@@ -4091,6 +4094,7 @@ Jill, from elsewhere:
 This should only occur if Evan has reasonably learned the origin story.
 
 S5. KEN × MONSIEUR 杜 DEEP FRIENDSHIP — NOT ROMANCE
+【2026-09-30】S17a：這條線「必須」有一張友情 Story Photo（里程碑真的發生後解鎖），而且永遠不能暗示戀愛。
 This relationship is intentionally capable of fooling the player.
 
 They may:
@@ -4381,6 +4385,7 @@ But only after she has actually witnessed or learned that fact.
 No omniscience.
 
 S8. SOPHIE × MIA ROMANTIC MILESTONE IMAGE
+【2026-09-30】本節是 S17a（Story Photo 最終規則）的一個實例／架構要求；規則本身不限戀愛。
 IMPORTANT NEW REQUIREMENT:
 
 When an authored relationship genuinely crosses the confirmed romantic milestone, generate/unlock ONE dedicated relationship illustration for Life Album.
@@ -4534,6 +4539,7 @@ This is an OPTIONAL character arc.
 It must never block restaurant progression.
 
 S10. 晴 × 阿拓 MILESTONE IMAGE
+【2026-09-30】本節是 S17a（Story Photo 最終規則）的一個實例／架構要求；規則本身不限戀愛。
 If and only if their authored romantic relationship genuinely develops far enough:
 
 unlock a dedicated relationship illustration.
@@ -4733,6 +4739,7 @@ Presentation can fallback.
 History cannot lie.
 
 S16. RELATIONSHIP ART ARCHITECTURE
+【2026-09-30】本節是 S17a（Story Photo 最終規則）的一個實例／架構要求；規則本身不限戀愛。
 Dedicated relationship illustrations are authored rewards for genuine long-term history.
 
 They are NOT random screenshots.
@@ -4760,6 +4767,9 @@ Use game UI for title/caption.
 This avoids typography artifacts and keeps localization safe.
 
 S17. OTHER RELATIONSHIP MILESTONE IMAGES
+【2026-09-30 superseded by S17a】本節的「potentially… may also earn one」與「keep these rare」由 S17a 的最終規則取代：
+重要故事線在有意義的里程碑「必須」留下 Story Photo，不限戀愛；Ken × Monsieur 杜的友情 Story Photo 是確定的要求，不是可能。
+下面保留原文以供對照。
 Romance is NOT the only relationship worthy of special artwork.
 
 Potentially, extremely important non-romantic history may also earn one.
@@ -4780,6 +4790,49 @@ But keep these rare.
 Life Album should not become a collectible CG gallery.
 
 Special illustrations should feel exceptional.
+
+S17a. STORY PHOTOS — 最終規則（2026-09-30，S1–S22 之後確立；取代 S17 的「potentially／keep these rare」）
+IMPORTANT STORY ARCS MUST LEAVE A STORY PHOTO / RELATIONSHIP PHOTO AT A MEANINGFUL MILESTONE.
+
+This is NOT limited to romance.
+
+The rule is:
+
+real shared history
+→ meaningful authored milestone actually occurs
+→ unlock the corresponding canonical Story Photo / relationship illustration
+→ preserve it permanently in Life Album.
+
+Confirmed examples:
+
+- Sophie × Mia — romantic relationship milestone photo(s)（S8）
+- 晴 × 阿拓 — relationship photo if their optional arc genuinely develops（S10）
+- Ken × Monsieur 杜 — MUST have a friendship milestone photo; this is not optional and must never imply romance（S5）
+- Jill × Dylan — selected long-term-marriage story milestone(s), when appropriate（S11；第 15、41 節）
+- 王先生 × 王太太 — selected established-couple milestone(s), when appropriate（S12；第 14 節）
+- important staff ensemble / multi-character authored arcs — a group photo when the arc reaches a genuinely meaningful
+  shared milestone（第 33–36 節的員工線、L25 的多人線）
+
+The principle is:
+
+A Story Photo records shared history.
+It is not a romance reward.
+
+Do not give every minor interaction a CG.
+Only meaningful authored story milestones qualify.
+
+The underlying event must really have happened in that save.
+Never unlock a photo for history that did not occur.
+
+Use canonical character IDs and appearances（L13、L12a、L12b、S6a）.
+A Story Photo must never change who a character is, swap identities, invent attendance, teleport a cat/person into an
+event, or contradict actual story facts.
+
+Ordinary Life Album photos remain emergent captures of normal play.
+Story Photos are rare authored illustrations unlocked by genuine story history.
+
+（架構面：S16 的 relationship art architecture 與 L31 的 Album 規則照舊適用；Story Photo 的解鎖條件是 Story Event Arbiter
+記錄的真實里程碑，屬於第 2 節 CONSEQUENCE 層，並要在 audit 的第 14 項「special Life Album illustration unlocks」裡說明。）
 
 S18. EVENT DENSITY
 Do not turn Lounge into nonstop scripted dialogue.
