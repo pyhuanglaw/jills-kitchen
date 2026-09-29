@@ -2852,6 +2852,29 @@ def q_portraits_are_one_system_with_a_fallback_and_fit_a_phone(b, port, target):
         check(not g.errors, g.errors)
         g.close()
 
+@test
+def q_plus_world_sprites_keep_jill_and_dylan_their_own(b, port, target):
+    """Q+. The world sprites correspond to the portraits and stay theirs: Jill — dark hair with the fringe and the
+    ponytail, white double-breasted jacket, dark bib apron, no hat; Dylan — the short straight-fringe hair (style 9),
+    a navy cardigan over a white tee, a watch. Procedural guests never get style 9, a white top, or a white tee under a
+    cardigan, so the two of them keep their silhouette in a crowd."""
+    g = Game(b, port, target, seed=64, manual=True)
+    install_bot(g); g.click('[data-act=open]')
+    check(g.ev("JILL_LOOK.hs") == 4 and g.ev("JILL_LOOK.top").lower() in ('#fff', '#ffffff') and g.ev("JILL_LOOK.hair") == '#1C1816', 'Jill: ponytail, white jacket, dark hair')
+    check(g.ev("DYLAN.looks[0].hs") == 9 and g.ev("DYLAN.looks[0].pat") == 'cardi' and g.ev("DYLAN.looks[0].top") == '#F6F3EC' and g.ev("DYLAN.looks[0].acc") == 'watch', 'Dylan: the reserved hair, the cardigan over white, the watch')
+    looks = json.loads(g.ev("JSON.stringify((()=>{const out=[];for(const t of ['office','student','couple','family','gourmet','vip','blogger','regular','critic'])for(let i=0;i<40;i++)for(const L of makeLooks(t,2))out.push([L.hs,L.top,L.top2||null,L.pat||null]);return out})())"))
+    def light(c):
+        if not c: return False
+        c = c.lstrip('#'); r, gg, bb = int(c[0:2], 16), int(c[2:4], 16), int(c[4:6], 16)
+        return (r + gg + bb) / 3 > 225
+    check(all(hs != 9 for hs, *_ in looks), 'style 9 is Dylan\'s alone')
+    check(not any(light(top) or (pat == 'cardi' and light(t2)) for hs, top, t2, pat in looks), 'no guest in a white jacket or a white tee under a cardigan')
+    # the sprite renders without the hat by default and with it when asked (both paths draw)
+    px = g.ev("(()=>{const cv=document.createElement('canvas');cv.width=80;cv.height=100;const c=cv.getContext('2d');drawPerson(c,40,90,JILL_LOOK,{jill:true,me:true,tall:true});const a=c.getImageData(0,0,80,100).data;let n=0;for(let i=3;i<a.length;i+=4)if(a[i]>0)n++;c.clearRect(0,0,80,100);drawPerson(c,40,90,JILL_LOOK,{jill:true,me:true,tall:true,hat:true});const b=c.getImageData(0,0,80,100).data;let m=0;for(let i=3;i<b.length;i+=4)if(b[i]>0)m++;return [n,m]})()")
+    check(px[0] > 500 and px[1] > px[0], f'Jill draws (no hat by default; the hat adds pixels when asked): {px}')
+    check(not g.errors, g.errors)
+    g.close()
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--target', choices=['index', 'single'], default='index')
