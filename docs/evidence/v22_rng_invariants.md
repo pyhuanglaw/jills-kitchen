@@ -54,3 +54,12 @@ JPEG canvas snapshot); the DOM, the scene digest and the other nine screens matc
 deterministic (virtual clock, seeded RNG); what moved is Chromium's raster filter for a scaled image under CPU load
 (the suite and a probe were running together). `compare_screens` now also passes when no pixel differs by more than
 16 levels and fewer than 1,500 do — a moved, missing or recoloured element always differs by more somewhere.
+
+## Dylan presence audit (Day 30 save, lazy player, fast days)
+
+`v22_dylan_audit_before.log` (checkpoint + F/G code, 12 days): scheduled 6/12, entered 6, paid visits 6, days he
+said anything **0**, lingered after closing 4. `v22_dylan_audit_after.log` (8 days, counting fixed to accumulate the
+log across the day) and `…_after_12d.log` (12 days, the same code): entered 12/20 days over the two runs, and on
+**every** visit he said 2–3 things and Jill answered once or twice; new clue kinds appeared (usual, noticed, knows,
+knows2 — the scenes now play because his line no longer waits for Jill to be idle). Stage stayed 2 throughout: the
+reveal conditions were not touched.
