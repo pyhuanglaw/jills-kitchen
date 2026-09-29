@@ -1761,7 +1761,7 @@ def economy_ops_duties_and_prices_v182(b, port, target):
     ACT(g, 'tab', k='staff')
     check('擴建後可再聘' not in g.ev("$('#screen').innerText"), 'staff copy is honest at the final level')
     check(g.ev("crewCovers('clean')") is False, 'nobody clears tables yet')
-    ACT(g, 'dutyT', k='w1', d='clean'); ACT(g, 'dutyT', k='w1', d='order')
+    ACT(g, 'bdAddD', k='w1', d='clean'); ACT(g, 'bdRmD', k='w1', d='order')   # v2.2.1: the 工作分配 board's add/remove
     check(g.ev("crewCovers('clean')") and not g.ev("crewCovers('order')"), 'duties toggle what the staff cover')
     g.ev("S.phase='prep';S.today=null;planToday();S.price.steak=1.3;S.price.coffee=.8;showPrep()")
     pf = g.ev("[...document.querySelectorAll('.menu-row')].map(r=>[r.querySelector('.nm').firstChild.textContent,(r.querySelector('.pf')||{}).innerText||''])")
@@ -2718,7 +2718,7 @@ def h_i_k_t_shop_rooms_decoration_pass_and_dreams(b, port, target):
     g.ev("S.money=400000;S.level=5;shopTab='works';showShop()")
     dreams = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('#screen [data-act=buyProject]')].map(e=>e.dataset.k))"))
     check([d for d in dreams if d in ('glass', 'ceiling', 'catwalk')] == ['glass', 'ceiling', 'catwalk'], f'three dreams on the works page: {dreams}')
-    check(json.loads(g.ev("JSON.stringify(DREAMS.map(d=>[d.cost,d.horizon]))")) == [[100000, '近'], [180000, '中'], [300000, '遠']], 'three horizons at 100k / 180k / 300k')
+    check(json.loads(g.ev("JSON.stringify(DREAMS.map(d=>[d.cost,d.horizon]))")) == [[100000, '近'], [120000, '中'], [180000, '中'], [300000, '遠']], 'four dreams at 100k / 120k / 180k / 300k (v2.2.1 J added the main light)')
     amb0 = g.ev("ambience()")
     g.click('[data-act=buyProject][data-k=ceiling]'); g.page.wait_for_timeout(100); g.ev("hideReveal()")
     check(g.ev("projOn('ceiling')") and g.ev("S.money") == 400000 - 180000 and g.ev("ambience()") == amb0 + 3, 'the ceiling is bought, paid and felt')
@@ -3609,6 +3609,96 @@ def the_players_saves_load_through_a_real_reload(b, port, target):
         check(g.ev("!!document.querySelector('.board .brow')"), f'{name}: the staff board renders')
         check(not g.errors, f'{name}: {g.errors[:2]}')
         g.close()
+
+@test
+def infrastructure_you_can_see_and_a_calmer_incident_calendar(b, port, target):
+    """v2.2.1 J (#14, #15, Day 35 #2/#3). Three infrastructure lines under 營運升級 — 空調 (wall unit → quiet commercial unit
+    → zoned system), 電力設施 (配電盤升級 → 商用電力增容＋備用電源), 商用洗碗機 — and a 主廳主燈 among the dreams. Each tier is
+    bought in order and is a thing on a wall; the effects are light: a hot day costs less patience (×.6, ×.3, none), the
+    quiet unit and the zoned system add ambience, power cuts thin out and then stop and breakdowns thin with them, the
+    same incident never comes two days running, clearing a table is quicker with the dishwasher, and guests praise the
+    cooling only once there is some. The Day 35 player has these left to buy."""
+    g = Game(b, port, target, seed=44, manual=True)
+    raw = json.load(open(os.path.join(ROOT, 'tests', 'saves', 'player_day35.json'), encoding='utf-8'))['save']
+    g.ev("phase='title';R=null;localStorage.setItem(KEY,JSON.stringify(%s))" % json.dumps(raw, ensure_ascii=False)); g.reload(); g.click('[data-act=openFresh]'); g.page.wait_for_timeout(120)
+    ops = json.loads(g.ev("JSON.stringify(OPS.filter(o=>['ac','power','dish'].includes(o.k)).map(o=>({k:o.k,tiers:o.tiers,lv:o.lv})))"))
+    check([o['k'] for o in ops] == ['ac', 'power', 'dish'] and len(ops[0]['tiers']) == 3 and len(ops[1]['tiers']) == 2 and len(ops[2]['tiers']) == 1, f'the three lines with their tiers: {ops}')
+    check(g.ev("DREAMS.some(p=>p.k==='chandelier'&&p.cost===120000&&p.lv===5)"), 'the main light is a dream at 120k')
+    left = json.loads(g.ev("JSON.stringify(goalLadder().map(x=>x.n).concat(OPS.filter(o=>o.tiers[opsLv(o.k)]!=null).map(o=>o.n)))"))
+    check(all(n in left for n in ['空調', '電力設施', '商用洗碗機']), f'the Day 35 player has the new lines left to buy: {left}')
+    # bought in order; each tier costs what it says; the shop shows pips
+    g.ev("S.money=400000;showShop();shopTab='works';showShop()"); g.page.wait_for_timeout(60)
+    check(g.ev("!!document.querySelector('[data-act=buyOps][data-k=ac]') && !!document.querySelector('[data-act=buyOps][data-k=power]') && !!document.querySelector('[data-act=buyOps][data-k=dish]')"), 'the three lines are for sale')
+    for k, tiers in [('ac', [14000, 38000, 95000]), ('power', [18000, 48000]), ('dish', [32000])]:
+        for i, cost in enumerate(tiers):
+            m0 = g.ev("S.money"); g.ev("doAct('buyOps',null,'%s',null)" % k)
+            check(g.ev("opsLv('%s')" % k) == i + 1 and g.ev("S.money") == m0 - cost, f'{k} tier {i+1} for {cost}')
+        m0 = g.ev("S.money"); g.ev("doAct('buyOps',null,'%s',null)" % k); check(g.ev("S.money") == m0, f'{k} has no tier past the last')
+    check(g.ev("hotFactor()") == 0 and g.ev("ambience()") == g.ev("(()=>{S.ops.ac=0;const a=ambience();S.ops.ac=3;return a})()") + 3, 'the zoned system takes the whole hot-day cost and adds 3 ambience in all')
+    check(g.ev("(()=>{S.ops.ac=1;const a=hotFactor();S.ops.ac=2;const b2=hotFactor();S.ops.ac=0;const c0=hotFactor();S.ops.ac=3;return JSON.stringify([c0,a,b2])})()") == '[1,0.6,0.3]', 'the wall unit halves it, the quiet unit takes most')
+    # a hot day drains patience like a sunny one with the zoned system; without any cooling it drains faster
+    g.ev("showPrep()"); fill_fridge(g); start_day(g); install_bot(g); g.ev("window.__act=()=>{}")
+    r = json.loads(g.ev("(()=>{const q={type:'office',size:1,state:'wait',reg:null,table:0,seed:1};R.weather='sun';const a=drainRate(q);R.weather='hot';const h3=drainRate(q);S.ops.ac=0;const h0=drainRate(q);S.ops.ac=3;R.weather='sun';return JSON.stringify({sun:a,hot3:h3,hot0:h0})})()"))
+    check(abs(r['hot3'] - r['sun']) < 1e-9 and r['hot0'] > r['sun'] * 1.05, f'a hot day is a sunny day with the zoned system: {r}')
+    # the dishwasher
+    check(g.ev("(()=>{const m={lv:3};S.ops.dish=0;const a=cleanDur(m);S.ops.dish=1;const b2=cleanDur(m);return Math.abs(b2-a*.7)<1e-9})()"), 'clearing is 30% quicker with the dishwasher')
+    # incidents: power cuts thin then stop, breakdowns thin, nothing repeats the day after
+    stats = json.loads(g.ev(r"""(()=>{const mr=Math.random;const rng0=(seed)=>{let a=seed;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}};
+     const count=(pw,last)=>{S.ops.power=pw;S.incLast=last||{};Math.random=rng0(7);const c={power:0,broken:0,rowdy:0,n:0};for(let i=0;i<600;i++){for(const e of planIncidents(250)){c[e.k]=(c[e.k]||0)+1}c.n++}return c};
+     try{const p0=count(0),p1=count(1),p2=count(2),cd=count(0,{rowdy:S.day-1,power:S.day-1});return JSON.stringify({p0,p1,p2,cd})}finally{Math.random=mr;S.ops.power=2;S.incLast={}}})()"""))
+    p0, p1, p2, cd = stats['p0'], stats['p1'], stats['p2'], stats['cd']
+    check(p0['power'] > 60 and .3 <= p1['power'] / p0['power'] <= .7 and p2['power'] == 0, f'power cuts: {p0["power"]} → {p1["power"]} → {p2["power"]} over {p0["n"]} days')
+    check(p1['broken'] < p0['broken'] * .9 and p2['broken'] < p0['broken'] * .65, f'breakdowns thin with the electrical work: {p0["broken"]} → {p1["broken"]} → {p2["broken"]}')
+    check(cd['rowdy'] == 0 and cd['power'] == 0 and cd['broken'] > 0, f'what happened yesterday is not planned today: {cd}')
+    check(g.ev("(()=>{R.inc=[{k:'quiet',t:0,tries:0}];R.closed=false;incUpd(0);return S.incLast&&S.incLast.quiet===S.day})()"), 'a fired incident is remembered for tomorrow')
+    # the words follow the cooling
+    lines = json.loads(g.ev("(()=>{const out={};for(const a of[0,1,2,3]){S.ops.ac=a;out[a]={seat:SEAT_LINES.hot.slice(),rev5:wxLines('hot',5),rev3:wxLines('hot',3)}}S.ops.ac=3;return JSON.stringify(out)})()"))
+    check(not any('冷氣' in t for t in lines['0']['seat']) and any('悶' in t for t in lines['0']['seat']) and not any('冷氣' in t for t in lines['0']['rev5']), f'no cooling, no praise for it: {lines["0"]}')
+    check(any('冷氣' in t for t in lines['1']['seat']) and any('安靜' in t for t in lines['2']['seat']) and any('側廳' in t for t in lines['3']['seat']) and any('安靜' in t for t in lines['2']['rev5']), f'the better the cooling, the more they say: {lines}')
+    check(not g.errors, g.errors[:2])
+    g.close()
+
+@test
+def dylan_leaves_a_trace_and_never_vanishes_at_a_closed_door(b, port, target):
+    """v2.2.1 K (#17). Presence ≠ clues ≠ reveal: the schedule (p by the gap since his last visit), the arrival window and
+    the full-house retry are unchanged; what changed is that a retry which would land after closing is not scheduled —
+    it used to reach a closed door and vanish with no note — and that every day leaves a trace in the save (planned, when,
+    came, which room, a door look, lines spoken), which his card shows after the reveal as the last days' dots, and his
+    arrival is a quiet line in the log once the player knows who he is."""
+    g = Game(b, port, target, seed=61, manual=True)
+    player30(g); fill_fridge(g); start_day(g); install_bot(g); g.ev("window.__act=()=>{}")
+    tr = json.loads(g.ev("JSON.stringify(S.dylan.trace||[])"))
+    check(tr and tr[-1]['d'] == g.ev("S.day") and tr[-1]['s'] in (0, 1) and 'p' in tr[-1], f'the day is traced at the schedule: {tr[-1:]}')
+    # a full house near closing: the retry would land after closing, so he looks in at the door now, with a note
+    g.ev("R.sched=R.sched.filter(o=>o.reg!=='dylan');R.si=Math.min(R.si,R.sched.length);for(const q of R.groups.slice())leaveGroup(q,'ok');R.t=R.dur*.9;for(const t of R.tables){t.dirty=true;t.group=null}")
+    n0 = g.ev("(R.log||[]).length")
+    g.ev("(()=>{const qm=queueMax();for(let i=0;i<qm;i++)spawn({t:R.t,type:'office',size:2});spawn({t:R.t,type:'regular',reg:'dylan',size:1,tries:0})})()")
+    check(g.ev("!R.groups.some(q=>q.reg==='dylan')") and g.ev("!R.sched.some(o=>o.reg==='dylan'&&o.back)"), 'no retry is scheduled past closing')
+    check(g.ev("R.dylanDoor===1") and g.ev("(R.log||[]).slice(%d).some(l=>l.t.includes('在門口看了一眼'))" % n0), 'he looked in at the door, and the log says so')
+    check(g.ev("S.dylan.trace[S.dylan.trace.length-1].door") == 1, f'the trace has the door look: {g.ev("JSON.stringify(S.dylan.trace.slice(-1))")}')
+    # earlier in the day the same full house gets a retry within the day
+    g.ev("R.dylanDoor=0;R.t=R.dur*.5;S.dylan.trace[S.dylan.trace.length-1].door=0")
+    g.ev("spawn({t:R.t,type:'regular',reg:'dylan',size:1,tries:0})")
+    check(g.ev("R.sched.some(o=>o.reg==='dylan'&&o.back&&o.t<R.dur*.92)"), 'earlier, a retry is scheduled inside the day')
+    # he comes in: the trace and the log
+    g.ev("R.sched=R.sched.filter(o=>o.reg!=='dylan');for(const q of R.groups.slice())leaveGroup(q,'ok');for(const t of R.tables){t.dirty=false;t.group=null}")
+    n1 = g.ev("(R.log||[]).length"); g.ev("spawn({t:R.t,type:'regular',reg:'dylan',size:1,tries:0})")
+    check(g.ev("R.groups.some(q=>q.reg==='dylan')") and g.ev("S.dylan.stage") < 3 and g.ev("!(R.log||[]).slice(%d).some(l=>l.t==='Dylan 來了。')" % n1), 'before the reveal (the Day 30 save is at stage 2) he comes in without a word in the log')
+    g.ev("(()=>{const q=R.groups.find(q=>q.reg==='dylan');leaveGroup(q,'ok');S.dylan.stage=3})()"); n1 = g.ev("(R.log||[]).length"); g.ev("spawn({t:R.t,type:'regular',reg:'dylan',size:1,tries:0})")
+    check(g.ev("R.groups.some(q=>q.reg==='dylan')"), 'he came in')
+    check(g.ev("(R.log||[]).slice(%d).some(l=>l.k==='e'&&l.t==='Dylan 來了。')" % n1), 'after the reveal his arrival is a quiet line in the log')
+    for i in range(40):
+        g.ev("for(let i=0;i<15;i++)__tick(1000/30)")
+        if g.ev("R.groups.some(q=>q.reg==='dylan'&&q.table!=null)"): break
+    e = json.loads(g.ev("JSON.stringify(S.dylan.trace[S.dylan.trace.length-1])"))
+    check(e.get('c') == 1 and e.get('r') in ('main', 'side') and 'at' in e, f'the trace has the arrival and the room: {e}')
+    check(g.ev("(S.dylan.trace||[]).length") <= 12, 'the trace is capped')
+    # the card shows the last days after the reveal
+    g.ev("(()=>{const q=R.groups.find(q=>q.reg==='dylan');S.dylan.trace.unshift({d:S.day-1,p:55,s:0});showRegCard(q)})()"); g.page.wait_for_timeout(60)
+    txt = g.ev("$('#regcard').textContent")
+    check('這幾天' in txt and '●' in txt and '○' in txt, f'the card shows came/not for the last days: {txt}')
+    check(not g.errors, g.errors[:2])
+    g.close()
 
 def main():
     ap = argparse.ArgumentParser()
