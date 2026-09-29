@@ -224,6 +224,10 @@ Goldens re-recorded for the layout (scenario, frames, the cat fingerprint) with 
 guests served, lost ≤ guests, net = rev + tips + bonus − cost − wages on every golden day; the frames inspected).
 Day 35 smoke: one whole lazy day on the real save — 72 guests, the summary, the shop and the board, a save, a reload
 (Day 35 kept), no errors. Sims kept in `tools/sims/`.
+Release check on the **published** page: Version 33's live HTML was read back from the artifact service (it carries the
+tagged `js/game.js` byte for byte), loaded at 390×844 with the Day 35 save, played into the evening with the lazy bot,
+saved and reloaded (Day 35 kept, no page errors); the screenshots of that run — title, prep, the four rooms, after the
+reload — are `docs/evidence/v221_release/` (T: a Chromium touch viewport, not a phone).
 
 ## 14. QA commit
 The `v2.2.1` tag points at `7dbcaff`, the commit that adds the re-recorded goldens, the single file and this report
