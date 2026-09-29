@@ -775,6 +775,7 @@ def dylan_stays_a_quiet_regular_early_on(b, port, target):
     g.click('[data-act=open]')
     visits = 0; stayed = 0; looks = 0
     for d in range(6):
+        g.ev("for(const d of menuList())S.stock[d]=40")   # v2.2: from Day 3 nothing sells from an empty fridge (A2), and a visit has to end with the bill
         start_day(g)
         # bring him in early in the day so the visit completes before closing
         g.ev("__botUntil('R.t>R.dur*.25',20000)")
@@ -793,6 +794,15 @@ def dylan_stays_a_quiet_regular_early_on(b, port, target):
         if g.ev("(S.regulars.dylan||0)<3||S.day<6"): check(g.ev("S.dylan.stage") == 0, 'stage moved before the conditions were met')
         next_day(g)
     check(visits >= 3, f'Dylan should have been seated on most of these days: {visits}')
+    # the glance: under the bot a visit is over in ~10 s, shorter than his first glance timer (5–12 s), so it is checked
+    # on a held visit — seated, waiting for food nobody cooks, fifteen seconds
+    if looks == 0:
+        start_day(g); g.ev("window.__act=()=>{}")
+        g.ev("(()=>{for(const q of R.groups.slice())leaveGroup(q,'ok');spawn({type:'regular',reg:'dylan',size:1});const q=R.groups.find(x=>x.reg==='dylan');const t=freeTableFor(q);seatGroup(q,t);q.state='wait';q.x=t.x;q.y=t.y;q.ticket={id:R.tkid++,no:1,g:q,items:[{d:'coffee',st:'pending',q:null,want:0}],t0:R.t};R.tickets.push(q.ticket);for(let i=0;i<450;i++)__tick(1000/30)})()")
+        looks = g.ev("S.dylan.clues.look||0")
+        if g.ev("phase") == 'service': g.ev("closeShop('x');for(const q of R.groups.slice())leaveGroup(q,'ok');finishClosing()")
+        if g.ev("phase") == 'summary': g.click('[data-act=toShop]')
+        if g.ev("phase") == 'shop': g.click('[data-act=nextDay]')
     check(looks > 0, 'Dylan never glanced at Jill')
     check(stayed == 0, 'Dylan must not stay after closing before the story moves on')
     g.click('[data-act=book]'); g.click('[data-act=btab][data-k=regulars]')
@@ -2570,6 +2580,75 @@ def g_lines_and_reviews_do_not_repeat_themselves(b, port, target):
     g.ev("SAID.q=[];S.said=[]")
     lines = [g.ev("pickT(['這是 Jill 親手做的嗎？','哇，Jill 主廚的擺盤好美。','聞起來好香…','先拍照，等我一下！','來了來了。','看起來好好吃。','份量剛好。'])") for _ in range(14)]
     check(len(set(lines[:7])) == 7 and len(set(lines[7:])) == 7, f'a seven-line pool cycles without repeats: {lines}')
+    check(not g.errors, g.errors)
+    g.close()
+
+@test
+def dylan_is_a_presence_not_a_story_trigger(b, port, target):
+    """Dylan clarification. Presence, clues and the reveal are three knobs. Presence: most days he comes by; a full
+    house sends him away for half an hour, not for the day (never a seat taken from anyone); he speaks once per visit
+    without waiting for Jill to be idle — a word when she is busy, a line when she is not; he orders what he usually
+    has and Jill sometimes says it first; a regular notices he comes often. Clues: one glance clue per visit, new kinds
+    (usual, noticed). Reveal: the Stage 2 conditions are exactly the old ones and Day 30 is not a deadline."""
+    g = Game(b, port, target, seed=47, manual=True)
+    player30(g); install_bot(g)
+    # presence: the day after a visit is not a day off, and two days after one he is almost certain
+    def sched_rate(gap, n=40):
+        hits = 0
+        for i in range(n):
+            g.ev(f"S.dylan.last=S.day-{gap};for(const d of menuList())S.stock[d]=40;startService()")
+            hits += 1 if g.ev("R.sched.some(o=>o.reg==='dylan')") else 0
+            g.ev("R=null;phase='prep';showPrep()")
+        return hits / n
+    r1, r2, r3 = sched_rate(1), sched_rate(2), sched_rate(3)
+    check(r1 >= .4 and r2 >= .7 and r3 >= .9, f'he should come by most days: gap1 {r1}, gap2 {r2}, gap3 {r3}')
+    # a full house: he comes back later the same day, no seat is taken, and after enough tries the player sees him at the door
+    g.ev("for(const d of menuList())S.stock[d]=40"); start_day(g); g.ev("window.__act=()=>{}")
+    g.ev(r"""(()=>{R.groups=[];for(const t of R.tables){const q={id:R.gid++,type:'office',size:2,looks:makeLooks('office',2),name:'佔位',state:'eat',table:t.i,pat:1,room:t.room||'main',troom:t.room||'main',x:t.x,y:t.y,tx:t.x,ty:t.y,timer:900,ticket:null,seed:1,mood:'ok'};t.group=q;t.dirty=false;R.groups.push(q)}
+      for(let i=0;i<queueMax();i++){const q={id:R.gid++,type:'office',size:2,looks:makeLooks('office',2),name:'排隊',state:'queue',table:null,pat:1,room:'main',troom:'main',x:DOOR.x,y:DOOR.y,tx:DOOR.x,ty:DOOR.y,timer:0,ticket:null,seed:1,mood:'ok'};R.groups.push(q)}requeue();R.sched=[];R.si=0;R.sched.push({t:R.t,type:'regular',reg:'dylan',size:1,tries:0});return 1})()""")
+    check(g.ev("queued().length>=queueMax()"), 'the fixture must have a full queue')
+    tries = []
+    for i in range(6):
+        g.ev("(()=>{for(let i=0;i<8;i++)__tick(1000/30)})()")
+        o = g.ev("JSON.stringify(R.sched.slice(R.si).filter(o=>o.reg==='dylan').map(o=>({tries:o.tries,dt:+(o.t-R.t).toFixed(1),back:!!o.back})))")
+        tries.append(json.loads(o))
+        check(not g.ev("R.groups.some(q=>q.reg==='dylan')"), 'he must not enter a full room')
+        for e in json.loads(o): check(28 <= e['dt'] <= 56, f'the retry should be half an hour of service later, got {e}')
+        g.ev("R.sched.slice(R.si).forEach(o=>{if(o.reg==='dylan')o.t=R.t})")   # fast-forward to his next try
+    check(tries[0] and tries[0][0]['tries'] == 1 and tries[0][0]['back'], f'the first rejection reschedules: {tries[0]}')
+    check(g.ev("!R.sched.slice(R.si).some(o=>o.reg==='dylan')"), 'after four tries he stops for the day')
+    check(g.ev("(R.log||[]).some(l=>l.t.includes('Dylan 在門口'))"), 'the player should see him look in from the door')
+    # speaking: seated and waiting, Jill busy → within a minute he has said a word or a line; Jill idle → a line
+    def held_visit(busy):
+        g.ev(r"""(()=>{R.groups=R.groups.filter(q=>q.reg!=='dylan');const t=R.tables[0];t.group=null;const q={id:R.gid++,type:'regular',reg:'dylan',size:1,looks:DYLAN.looks,name:'Dylan',state:'wait',table:0,pat:1,room:'main',troom:'main',x:t.x,y:t.y,tx:t.x,ty:t.y,timer:0,ticket:null,seed:1,mood:'ok'};t.group=q;R.groups.push(q);q.ticket={id:R.tkid++,no:1,g:q,items:[{d:'coffee',st:'pending',q:null,want:0}],t0:R.t-10};R.tickets.push(q.ticket);R.log=[];window.__dq=q;return 1})()""")
+        g.ev("R.jill.cur=%s;R.jill.moving=%s;R.jill.q=[];" % (('{step:"table",t:0}' if busy else 'null'), 'true' if busy else 'false'))
+        g.ev("(()=>{for(let i=0;i<1800;i++){if(R.jill.moving)R.jill.moving=true;dylanGuestUpd(__dq,1/30)}__tick(5000)})()")
+        return g.ev("JSON.stringify({said:!!__dq.said,quiet:!!__dq.quiet,lines:(R.log||[]).filter(l=>l.k==='d'||l.k==='reg').map(l=>l.t)})")
+    busy = json.loads(held_visit(True)); idle = json.loads(held_visit(False))
+    check(busy['said'] or busy['quiet'], f'with Jill busy he still says something within a minute: {busy}')
+    check(idle['said'] and idle['lines'], f'with Jill free he has his line: {idle}')
+    # one glance clue per visit
+    g.ev("S.dylan.clues.look=0;__dq.lookClue=0;__dq.glT=0;(()=>{for(let i=0;i<3000;i++)dylanGuestUpd(__dq,1/30)})()")
+    check(g.ev("S.dylan.clues.look") == 1, 'the glance is one clue per visit, not one per glance')
+    # his usual: ordered often, and Jill sometimes names it first
+    g.ev("S.dylan.orders={pasta:6};S.stock.pasta=40;if(!S.menu.includes('pasta'))S.menu.push('pasta');S.regulars.dylan=10")
+    n = sum(1 for _ in range(40) if g.ev("orderItems(__dq).includes('pasta')"))
+    check(n >= 14, f'he should order his usual often: {n}/40')
+    g.ev("S.dylan.clues.usual=0;R.log=[]")
+    for i in range(12):
+        g.ev("R.cds={};dylanOrdered(__dq,{items:[{d:'pasta',st:'pending'}]});__tick(3000)")
+    check(g.ev("S.dylan.clues.usual") >= 1 and g.ev("(R.log||[]).some(l=>l.w==='Jill'&&/老樣子|一樣的|還是那個/.test(l.t))"), 'Jill should sometimes say his order before he does')
+    # a regular notices him
+    g.ev(r"""(()=>{const t=R.tables[1];t.group=null;const q={id:R.gid++,type:'regular',reg:'chen',size:1,looks:REG_BY.chen.looks,name:'陳伯伯',state:'wait',table:1,pat:1,room:'main',troom:'main',x:t.x,y:t.y,tx:t.x,ty:t.y,timer:0,ticket:null,seed:1,mood:'ok'};t.group=q;R.groups.push(q);window.__cq=q;S.regulars.chen=10;S.dylan.clues.noticed=0;R.log=[];return 1})()""")
+    for i in range(30):
+        g.ev("S.dylan.noticedDay=0;regularsNoticeDylan(__cq);__tick(2000)")
+    check(g.ev("S.dylan.clues.noticed") >= 1 and g.ev("(R.log||[]).some(l=>l.w==='陳伯伯')"), 'a regular should notice that he comes often')
+    # the reveal knob is untouched: Stage 2 needs exactly what it needed, and Day 30 is not a deadline
+    check(g.ev("S.dylan.stage") == 2, 'the Day 30 save reaches Stage 2 on its own (all its conditions were already met)')
+    g.ev("S.dylan.stage=1;S.dylan.stay=1;dylanStageCheck()"); check(g.ev("S.dylan.stage") == 1, 'one stay short: no Stage 2')
+    g.ev("S.dylan.stay=2;S.life.sofa=2;dylanStageCheck()"); check(g.ev("S.dylan.stage") == 1, 'two sofa evenings short: no Stage 2')
+    g.ev("S.life.sofa=38;dylanStageCheck()"); check(g.ev("S.dylan.stage") == 2, 'with the old conditions met, Stage 2')
+    check(g.ev("S.dylan.stage") < 3, 'no forced reveal')
     check(not g.errors, g.errors)
     g.close()
 
