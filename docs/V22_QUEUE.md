@@ -72,6 +72,7 @@ report with this checklist reconciled.
 | G dialogue/review composable variation + duplicate suppression | NOT STARTED | no runtime LLM |
 | H shop taxonomy 家具與佈置 / 店舖工程 / 貓咪生活 | NOT STARTED | no tiny categories |
 | I decoration much more visible | NOT STARTED | |
+| I+ dining-room art direction — quieter, refined luxury (user clarification, 2026-09-29) | NOT STARTED | reduce large red/burgundy surfaces (sofa booths, banquettes, rugs, repeated upholstery) to a restrained palette (ivory, cream, oatmeal, greige, taupe, natural wood, warm stone, muted brown, a little charcoal/black metal, restrained brass, plants); keep the concrete walls, the warm beige/cream floor and carpet, the warm light, the architecture and the cosy feel; hierarchy space → food & people → cats & details → furniture → small decoration; unify upholstery families, fewer competing silhouettes, breathing room; mature = richer materials + composition, not more objects; before/after at phone scale from the Day 30 room, checkpoints during the pass; no gameplay/balance changes |
 | J cat furniture tiers with behaviours, Album | NOT STARTED | no chores, cats never outside |
 | K dining-room cleanup of the old kitchen strip | NOT STARTED | keep the pass / clipped tickets |
 | L lightweight hospitality (常客 / Jill's Card, 招待) | NOT STARTED | defer with reasons if it does not fit |

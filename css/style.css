@@ -478,3 +478,13 @@ input.txt{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(
 #reveal .btns{display:flex;gap:8px;justify-content:center;margin-top:12px}
 @media (prefers-reduced-motion:reduce){#reveal .dust i,#roomTabs button.new b.nw{animation:none}}
 .goalline{display:flex;align-items:baseline;gap:8px;margin:8px 0 2px;padding:7px 10px;border-radius:10px;background:rgba(201,154,69,.14);border:1px solid rgba(201,154,69,.35);font-size:12.5px}.goalline span{color:var(--ink2);font-weight:700;font-size:11px;letter-spacing:.06em}.goalline b{font-weight:800}.goalline small{margin-left:auto;color:var(--ink2);font-size:11.5px}
+/* v2.2 L: the player's 招待 chip on a ticket, and Jill's Card stamps in the regulars' book */
+.tk-treat{position:absolute;right:4px;top:19px;height:16px;padding:0 6px;border:0;border-radius:8px;background:#F4C44E;color:#2A1B10;font-size:9.5px;font-weight:800;line-height:16px;box-shadow:0 1px 0 rgba(0,0,0,.2)}
+.tk-treat:active{transform:translateY(1px)}
+.jcard{display:inline-flex;gap:2px;vertical-align:middle;margin:0 2px}
+.jcard i{width:7px;height:7px;border-radius:50%;border:1px solid #C99A45;background:transparent}
+.jcard i.on{background:#E6C27A}
+/* v2.2 N: the weather's off-menu suggestions */
+.wxadd{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 2px}
+.wxadd .mini{height:28px;padding:0 10px;border-radius:14px;border:1px solid var(--line);background:var(--paper);font-size:12px;font-weight:700}
+.wxadd .mini:disabled{opacity:.45}

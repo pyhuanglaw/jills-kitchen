@@ -2753,6 +2753,56 @@ def j_cat_furniture_comes_in_tiers_and_the_grass_pot_is_used(b, port, target):
     check(not g.errors, g.errors)
     g.close()
 
+@test
+def l_m_n_hospitality_set_sales_and_the_weather_suggestion(b, port, target):
+    """L: Jill's Card — a regular's fifth visit gets a dessert on the house, said and remembered; the player can offer a
+    table a drink from the ticket (same two-a-day limit, costs the item). M: a set sold is a product of its own on the
+    summary and in the lifetime tally. N: a dish the weather favours but that is off today's menu is one tap away —
+    into a free slot only; a full menu says so and removes nothing."""
+    g = Game(b, port, target, seed=55, manual=True)
+    player30(g)
+    # N — on the prep screen, a wet day
+    g.ev("S.today.weather='rain';S.menu=S.menu.filter(d=>!['soup','blacktea'].includes(d));save();showPrep()")
+    off = json.loads(g.ev("JSON.stringify(wxOffMenu())"))
+    check('soup' in off, f'the hot soup should be suggested on a rainy day when it is off the menu: {off}')
+    n0 = g.ev("S.menu.length"); g.click('[data-act=menuAdd][data-d=soup]'); g.page.wait_for_timeout(100)
+    check(g.ev("S.menu.includes('soup')") and g.ev("S.menu.length") == n0 + 1, 'one tap puts it on the menu')
+    g.ev("while(S.menu.filter(x=>S.unlocked.includes(x)).length<menuCap()){const d=S.unlocked.find(x=>!S.menu.includes(x));if(!d)break;S.menu.push(d)}save();showPrep()")
+    menu_full = json.loads(g.ev("JSON.stringify(S.menu)"))
+    if g.ev("wxOffMenu().length"):
+        check(g.ev("[...document.querySelectorAll('[data-act=menuAdd]')].every(b=>b.disabled)"), 'with a full menu the suggestion buttons are disabled')
+        g.ev("doAct('menuAdd',wxOffMenu()[0],null,null)")
+        check(json.loads(g.ev("JSON.stringify(S.menu)")) == menu_full, 'a full menu must not lose or gain a dish silently')
+    g.ev("S.menu=%s;S.stock.soup=20;save();showPrep()" % json.dumps(menu_full[:14]))
+    # L + M during a day
+    fill_fridge(g); g.ev("S.sets={drink:1};S.regulars.chen=4;S.stock.pudding=Math.max(S.stock.pudding||0,3)"); start_day(g); install_bot(g); g.ev("window.__act=()=>{}")
+    g.page.evaluate('()=>window.__play(5,0)')
+    # the fifth visit of 陳伯伯: seated, he is owed a dessert
+    g.ev(r"""(()=>{R.groups=R.groups.filter(q=>q.table!==0);const t=R.tables[0];t.group=null;t.dirty=false;const q={id:R.gid++,type:'regular',reg:'chen',size:1,looks:REG_BY.chen.looks,name:'陳伯伯',state:'queue',table:null,pat:1,room:'main',troom:'main',x:DOOR.x,y:DOOR.y,tx:DOOR.x,ty:DOOR.y,timer:0,ticket:null,seed:1,mood:'ok'};R.groups.push(q);seatGroup(q,t);window.__cq=q})()""")
+    check(g.ev("__cq.treat") == 'dessert' and g.ev("!!__cq.card"), 'the fifth visit is a Jill\'s Card visit')
+    g.ev("__cq.state='eat';__cq.timer=90;__cq.eatDur=90;__cq.x=R.tables[0].x;__cq.y=R.tables[0].y;__cq.ticket={id:R.tkid++,no:1,g:__cq,items:[{d:'pasta',st:'served',q:'P',want:0,set:'drink'},{d:'coffee',st:'served',q:'P',want:0,set:'drink'}],t0:R.t};R.tickets.push(__cq.ticket);R.jill.cur=null;R.jill.q=[];R.jill.idle=5;R.jill.calm=5;R.log=[]")
+    ok = g.ev("(()=>{for(let i=0;i<900;i++){__tick(1000/30);if(__cq.treated&&R.tables[0].plates.some(p=>p.treat))return i}return -1})()")
+    check(ok >= 0, 'Jill should bring the dessert of the card')
+    g.ev("__tick(2000)")
+    check(g.ev("(R.log||[]).some(l=>l.w==='Jill'&&/第五次|集點卡|這麼多次/.test(l.t))"), 'she says it is the card')
+    check(g.ev("!!S.achievements.card"), 'the card achievement')
+    # the player's own 招待 on another table
+    g.ev(r"""(()=>{const t=R.tables[1];t.group=null;t.dirty=false;const q={id:R.gid++,type:'office',size:2,looks:makeLooks('office',2),name:'測試桌',state:'eat',table:1,pat:.5,room:'main',troom:'main',x:t.x,y:t.y,tx:t.x,ty:t.y,timer:90,eatDur:90,ticket:null,seed:2,mood:'ok'};t.group=q;R.groups.push(q);q.ticket={id:R.tkid++,no:2,g:q,items:[{d:'pasta',st:'served',q:'G',want:0}],t0:R.t};R.tickets.push(q.ticket);R.tv++;renderTickets();window.__pq=q})()""")
+    check(g.ev("!!document.querySelector('[data-treat]')"), 'the ticket offers 招待')
+    st0 = g.ev("stockTotal()"); g.page.click('[data-treat]'); g.page.wait_for_timeout(100)
+    check(g.ev("__pq.treat") == 'drink' and g.ev("!!__pq.byPlayer"), 'the tap asks Jill for a drink on the house')
+    ok2 = g.ev("(()=>{R.jill.cur=null;R.jill.q=[];R.jill.idle=5;R.jill.calm=5;for(let i=0;i<900;i++){__tick(1000/30);if(__pq.treated&&R.tables[1].plates.some(p=>p.treat))return i}return -1})()")
+    check(ok2 >= 0 and g.ev("stockTotal()") == st0 - 1 and g.ev("R.st.treats") == 2, 'the treat is brought, costs one from the fridge, and counts')
+    g.ev("renderTickets()"); check(not g.ev("!!document.querySelector('[data-treat]')"), 'two a day: the chip is gone')
+    # M — the bill: the set is a product
+    g.ev("__cq.state='check';__cq.pat=1;collect(__cq)")
+    check(g.ev("(R.st.setN||{}).drink") == 2 and g.ev("(R.st.setRev||{}).drink") > 0, 'both items of the set are counted under it')
+    g.ev("closeShop('x');for(const q of R.groups.slice())leaveGroup(q,'ok');finishClosing()"); g.page.wait_for_timeout(100)
+    check(g.ev("S.lastSummary.setSales.some(x=>x.k==='drink'&&x.n===2)") and g.ev("S.setHist.drink.n") == 2, 'the summary and the lifetime tally know the set')
+    check(g.ev("!!document.querySelector('.sale.set')"), 'the set row is on the summary')
+    check(not g.errors, g.errors)
+    g.close()
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--target', choices=['index', 'single'], default='index')
