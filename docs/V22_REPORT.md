@@ -1,14 +1,16 @@
-# Jill's Kitchen 2.2 — UX, presence and faces: release report (2026-09-29)
+# Jill's Kitchen 2.2 — UX, presence and faces: release report (2026-09-30)
 
 ## 1. Versions
 - Artifact https://claude.ai/artifact/2vhURujrtCpQ1P5jnSsjps — **Version 32**, label "2.2" (Version 31 = "2.2 UX
   checkpoint" = `511f237`; Version 30 = 2.1). Single file `jills-kitchen-single-file.html` (1,587 KB — the portraits
   are inlined as WebP data URIs, 802 KB).
 - Repo: `v2.1` / `stable-v2.1` = `da79864` (preserved). `v2.2-ux-stable` = `511f237` (A–E + O, the checkpoint gate).
-  **`v2.2` = the final commit on `master`** (see the tag). Commits after the checkpoint, in order: F+G `9fec026`,
-  Dylan presence + H `c5dcb11`, I/K/T + fridge invariant `78b6195`, J `4498e37`, L/M/N `53f3e1c`, I+ art direction
-  `75aeb75`, Dylan audit evidence `566c2a1`, P `ffc8591`, Q portraits `e17b79a`, Q+ sprites `c43ed2a`, R storefront
-  `2fbf683`, U+V+W+X `f0aca88`, V++ two Wangs `87a1a15`, then the QA commit (goldens, docs, single file).
+  **`v2.2` (annotated tag) = `962b494`**, the QA commit: goldens, docs, single file — the code published as Version 32.
+  Commits after the checkpoint, in order: F+G `9fec026`, Dylan presence + H `c5dcb11`, I/K/T + fridge invariant
+  `78b6195`, J `4498e37`, L/M/N `53f3e1c`, I+ art direction `75aeb75`, Dylan audit evidence `566c2a1`, P `ffc8591`,
+  Q portraits `e17b79a`, Q+ sprites `c43ed2a`, R storefront `2fbf683`, U+V+W+X `f0aca88`, V++ two Wangs `87a1a15`,
+  Q++ Jill/Dylan as character translations `de74ba6`, QA `962b494`. A docs-only commit after the tag pins these
+  numbers (no code change; the published page and the single file are `962b494`).
 - The reconciliation checklist is `docs/V22_QUEUE.md` (every item of the brief and of every later message with
   DONE / PARTIAL / DEFERRED / BLOCKED / NOT STARTED). This report copies its conclusions; the queue file is the source.
 

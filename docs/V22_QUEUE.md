@@ -109,4 +109,4 @@ covered.
 
 - `v2.1` / `stable-v2.1` = `da79864` (preserved)
 - `v2.2-ux-stable` = `511f237` (2026-09-29)
-- `v2.2` = the final commit (2026-09-30) — see `git tag -l` / the report
+- `v2.2` = `962b494` (2026-09-30, annotated) — published as artifact Version 32 (label "2.2"); a docs-only commit follows the tag
