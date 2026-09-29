@@ -1550,7 +1550,7 @@ def cook_by_hand(g, d, max_frames=900):
     real pointer events like a finger would. Returns (frames, final item state)."""
     reopened = 0
     for n in range(max_frames):
-        st = g.ev("(()=>{const s=R.slots[R.focus];const j=s&&s.job;if(!j)return {done:true};const k=j.step;return {t:k.t,p:+(k.p||0).toFixed(2),hold:!!k.hold,level:+(k.level||0).toFixed(2),cnt:k.cnt,min:k.min,a:k.a,b:k.b}})()")
+        st = g.ev("(()=>{const s=R.slots[R.focus];const j=s&&s.job;if(!j)return {done:true};const k=j.step;if(!k)return {t:null};return {t:k.t,p:+(k.p||0).toFixed(2),hold:!!k.hold,level:+(k.level||0).toFixed(2),cnt:k.cnt,min:k.min,a:k.a,b:k.b}})()")
         if st.get('done'):
             return n, g.ev("(()=>{const it=R.tickets[0]&&R.tickets[0].items[0];return it?{st:it.st,q:it.q}:null})()")
         t = st['t']
@@ -3749,6 +3749,57 @@ def stock_suggestion_follows_each_dish_and_counts_the_demand_it_missed(b, port, 
     g.page.wait_for_timeout(100)
     check(g.ev("S.salesHist['%s']" % d) == 13, f'the history blends sales + unmet (10 → (10·.5 + 16·.5) = 13), not sales alone: {g.ev("S.salesHist[%r]" % d)}')
     check(g.ev("S.lastSummary.sales.find(x=>x.d==='%s').unmet" % d) == 6 and '估計少賣' in g.ev("$('#screen').innerText"), 'the summary says how much a sold-out dish is estimated to have missed')
+    check(not g.errors, g.errors[:2])
+    g.close()
+
+@test
+def a_second_signature_the_dessert_with_its_own_progression(b, port, target):
+    """v2.2.1 #16. Jill's second signature is a dessert of her own: a base, a cream, a fruit and a finish from their own
+    tables, plated cold at the 冷盤台 (its own station and recipe), second on the menu under the main signature, taken for
+    dessert by most of the guests who came for the signature. It has its own counter and versions (30 and 80 sold), its own
+    news line, its own designer (4,000 to create, 800 to redesign), needs the main signature, Jill's Kitchen and a 冷盤台,
+    and cooks to the end through the real tray with real presses. Old saves without it are untouched."""
+    g = Game(b, port, target, seed=16, manual=True)
+    raw = json.load(open(os.path.join(ROOT, 'tests', 'saves', 'player_day35.json'), encoding='utf-8'))['save']
+    g.ev("phase='title';R=null;localStorage.setItem(KEY,JSON.stringify(%s))" % json.dumps(raw, ensure_ascii=False)); g.reload(); g.click('[data-act=openFresh]'); g.page.wait_for_timeout(120)
+    check(g.ev("S.sigDessert==null && !menuList().includes('sigdessert') && DISH('sigdessert')==null"), 'a save without the dessert has none of it')
+    g.ev("S.money=90000;showShop();shopTab='sig';showShop()"); g.page.wait_for_timeout(60)
+    check(g.ev("!!document.querySelector('[data-act=sigdOpen]') && document.body.textContent.includes(\"Jill's Signature Dessert\")"), 'the sig tab offers the dessert to a Day 35 player')
+    # the gates: needs the main signature, level 3 and a 冷盤台
+    check(g.ev("(()=>{const keep=S.signature;S.signature=null;showShop();const a=!document.querySelector('[data-act=sigdOpen]')&&document.body.textContent.includes('先研發招牌菜');S.signature=keep;const eq=S.eq.prep;S.eq.prep=0;showShop();const b2=!document.querySelector('[data-act=sigdOpen]')&&document.body.textContent.includes('冷盤台');S.eq.prep=eq;showShop();return a&&b2})()"), 'without the main signature or a 冷盤台 the dessert is not for sale, and the card says why')
+    # the designer
+    g.click('[data-act=sigdOpen]'); g.page.wait_for_timeout(100)
+    check(g.ev("sub") == 'sig' and g.ev("document.body.textContent.includes('設計招牌甜點')") and g.ev("[...document.querySelectorAll('.opts')].length") == 4, 'the dessert designer opens with its four slots')
+    g.click('[data-act=sigPick][data-c=fruit][data-k=fig]'); g.page.wait_for_timeout(60); g.click('[data-act=sigPick][data-c=cream][data-k=ganache]'); g.page.wait_for_timeout(60)
+    check(g.ev("sigDraft.fruit==='fig'&&sigDraft.cream==='ganache'&&sigDraft.name==='Jill\\'s 無花果奶酪'"), f'the picks and the auto name: {g.ev("JSON.stringify(sigDraft)")}')
+    m0 = g.ev("S.money"); g.click('[data-act=sigMake]'); g.page.wait_for_timeout(200)
+    check(g.ev("S.money") == m0 - 4000 and g.ev("!!S.sigDessert&&S.sigDessert.fruit==='fig'") and g.ev("!!S.achievements.sigd"), 'created for 4,000; the achievement')
+    D = json.loads(g.ev("JSON.stringify(DISH('sigdessert'))"))
+    check(D['cat'] == 'dessert' and D['st'] == 'prep' and len(D['steps']) == 4 and D['price'] == 150 + 40 + 60 + 50 + 30 and D['sigd'] == 1, f'a dessert at the 冷盤台 with four steps and its own price: {D}')
+    check(g.ev("JSON.stringify(menuList().slice(0,2))") == '["signature","sigdessert"]' and g.ev("dishName('sigdessert')") == "Jill's 無花果奶酪", 'second on the menu, by its name')
+    # its own versions and news
+    check(g.ev("sigDLv()") == 1 and g.ev("(()=>{S.records.sigd={v:30,d:S.day};const a=sigDLv();S.records.sigd={v:80,d:S.day};const b2=sigDLv();S.records.sigd={v:0,d:S.day};return a*10+b2})()") == 23, 'versions at 30 and 80 sold')
+    arts = json.loads(g.ev("(()=>{const out=[];for(const v of[0,30,80]){S.records.sigd={v,d:S.day};DCACHE.clear();ICACHE.clear();out.push(dishURL('sigdessert','P').length+'|'+hash(dishURL('sigdessert','P')))}S.records.sigd={v:0,d:S.day};DCACHE.clear();ICACHE.clear();return JSON.stringify(out)})()"))
+    check(len(set(arts)) == 3, f'each version is a different plate: {arts}')
+    check(g.ev("(()=>{S.sigdEvoNews=2;const n=S.news.length;applyGates();return S.news.length===n+1&&S.news[n].includes('招牌甜點升級了')})()"), 'the news line for the second version')
+    # guests who came for the signature take it for dessert most of the time
+    r = json.loads(g.ev("(()=>{let n=0,d=0;for(let i=0;i<200;i++){const it=orderItems({type:'gourmet',size:1,reg:null,forSig:true,seed:i},true);if(it.some(x=>DISH(x).cat==='dessert'))n++;if(it.includes('sigdessert'))d++}return JSON.stringify({n,d})})()"))
+    check(r['n'] > 0 and r['d'] / r['n'] >= .5, f'of the signature guests who take a dessert, most take the signature dessert: {r}')
+    # chefs: LV5 and after Jill's first plate, like the main
+    check(g.ev("(()=>{const m={lv:5,role:'chef',duty:'prep'};S.xp.sigdessert=0;const a=chefCan(m,'sigdessert');S.xp.sigdessert=1;const b2=chefCan(m,'sigdessert');const c0=chefCan({lv:4,role:'chef',duty:'prep'},'sigdessert');return !a&&b2&&!c0})()"), 'a LV5 chef takes it over once Jill has made one; LV4 cannot')
+    # the redesign costs 800
+    g.ev("showShop();shopTab='sig';showShop()"); g.page.wait_for_timeout(60); g.click('[data-act=sigdOpen]'); g.page.wait_for_timeout(60)
+    check(g.ev("$('[data-act=sigMake]').textContent").startswith('更新配方 $800'), 'redesign for 800')
+    g.click('[data-act=closeSub]'); g.page.wait_for_timeout(60)
+    # it cooks to the end through the real tray
+    g.ev("S.menu=S.menu.slice(0,4);S.stock.sigdessert=5;for(const d of menuList())S.stock[d]=Math.max(S.stock[d]||0,3);showPrep()"); start_day(g); install_bot(g); g.ev("window.__act=()=>{}")
+    check(g.ev(MAKE_ORDER % 'sigdessert'), 'could not start the dessert')
+    frames, res = cook_by_hand(g, 'sigdessert')
+    check(res and res['st'] == 'ready', f'the dessert is not plated after {frames} frames: {res}')
+    check(g.ev("S.xp.sigdessert") >= 1, "Jill's first plate is counted")
+    # the counter moves when it is paid for
+    g.ev("(()=>{const q=R.groups.find(q=>q.ticket&&q.ticket.items.some(i=>i.d==='sigdessert'));q.ticket.items[0].st='served';q.state='check';R.tables[q.table].plates=[{d:'sigdessert',q:'P',want:0}];collect(q)})()")
+    check(g.ev("R.st.sigd") == 1 and g.ev("R.st.sig||0") == 0, 'its own counter, separate from the main signature')
     check(not g.errors, g.errors[:2])
     g.close()
 

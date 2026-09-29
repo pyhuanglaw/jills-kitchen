@@ -95,6 +95,7 @@ const ING={egg:{n:'雞蛋',k:'egg'},rice:{n:'白飯',k:'bowl',c:'#FBF6E6'},scall
  custard:{n:'布丁液',k:'carton',c:'#F6D77E'},caramel:{n:'焦糖',k:'bottle',c:'#B8661F'},ladyfinger:{n:'手指餅乾',k:'finger'},espresso:{n:'濃縮咖啡',k:'cup'},mascarpone:{n:'馬斯卡彭',k:'bowl',c:'#F7EEDC'},cocoa:{n:'可可粉',k:'shaker',c:'#6E4226'},
  cheesebatter:{n:'乳酪糊',k:'carton',c:'#F4DFA9'},berries:{n:'莓果',k:'berry'},whites:{n:'蛋白霜',k:'carton',c:'#FFFFFF'},sugar:{n:'糖粉',k:'shaker',c:'#FFFFFF'},
  mash:{n:'奶油薯泥',k:'bowl',c:'#F3E2B6'},bread:{n:'酸種麵包',k:'bread'},scallop:{n:'干貝',k:'scallop'},
+ pannacotta:{n:'奶酪',k:'bowl',c:'#FFF6EA'},sponge:{n:'海綿蛋糕',k:'slice',c:'#F3D98A'},tart:{n:'塔皮',k:'slice',c:'#D9A86A'},crepe:{n:'可麗餅',k:'slice',c:'#EFD6A2'},chantilly:{n:'香緹鮮奶油',k:'carton',c:'#FFFFFF'},ganache:{n:'巧克力甘納許',k:'bowl',c:'#4A2A1A'},matchacream:{n:'抹茶奶霜',k:'bowl',c:'#A9C77A'},mango:{n:'芒果',k:'fruit'},citrus:{n:'柑橘',k:'lemon'},honey:{n:'蜂蜜堅果',k:'bottle',c:'#E5A83A'},   /* v2.2.1 #16: the signature dessert's parts */
  s_redwine:{n:'紅酒醬',k:'bottle',c:'#6E1F2A'},s_lemon:{n:'檸檬奶油醬',k:'bottle',c:'#EFCF73'},s_truffle:{n:'松露醬',k:'bottle',c:'#4A3A2E'},s_yuzu:{n:'柚子胡椒醬',k:'bottle',c:'#D2BA3A'},s_pesto:{n:'青醬',k:'bottle',c:'#4F8A3A'}};
 function stepShort(st){return st.t==='add'?st.items.map(i=>ING[i].n).join('、'):st.verb}
 function mechN(d){return DISH(d).steps.map(stepShort).join(' → ')}
@@ -109,7 +110,22 @@ const SIG_CAT_N={base:'主食',protein:'蛋白質',sauce:'醬汁',side:'配菜'}
 const SIG_EVO=[0,40,110];function sigSold(){return S.records&&S.records.sig?S.records.sig.v:0}function sigLv(){const v=sigSold();return v>=SIG_EVO[2]?3:v>=SIG_EVO[1]?2:1}
 function sigDef(){const s=S.signature;if(!s)return null;const add=SIG.base[s.base].p+SIG.protein[s.protein].p+SIG.sauce[s.sauce].p+SIG.side[s.side].p;const price=320+add+(sigLv()-1)*30;const BASE={rice:'rice',mash:'mash',pasta:'noodle',bread:'bread'},PROT={duck:'duck',beef:'steak',salmon:'salmon',chicken:'chicken',scallop:'scallop'},SIDE={asparagus:'asparagus',veg:'vegmix',salad:'greens',fries:'potato'};
  return{n:s.name,cat:'main',st:'stove',v:'pan',pan:1,price,cost:Math.round(price*.32),diff:3,pop:1,lv:2,truffle:s.sauce==='truffle'?1:0,sig:1,steps:[sA([PROT[s.protein]],0,SIG.protein[s.protein].n+'下鍋'),sZ('翻面',5,.72,.12),sZ('起鍋',4.5,.8,.11),sA([BASE[s.base],SIDE[s.side]],0,'擺上'+SIG.base[s.base].n+'與'+SIG.side[s.side].n),sH('淋'+SIG.sauce[s.sauce].n,'s_'+s.sauce,.45,.7,.55,'份量')]}}
-function DISH(d){return d==='signature'?sigDef():DISHES[d]}
+/* v2.2.1 #16: a second, distinct signature — Jill's dessert. Its own parts (a base, a cream, a fruit, a finish), its own
+   station (the 冷盤台, plated cold), its own counter and versions (30 and 80 sold: a coulis stroke and mint, then a spun-sugar
+   cage and gold), its own designer. Guests who come for the signature take it for dessert more often than not. */
+const SIGD={
+ base:{pannacotta:{n:'奶酪',p:40},sponge:{n:'海綿蛋糕',p:50},tart:{n:'塔皮',p:60},crepe:{n:'可麗餅',p:45}},
+ cream:{mascarpone:{n:'馬斯卡彭',p:50,c:'#F7EEDC'},custard:{n:'卡士達',p:40,c:'#F6D77E'},chantilly:{n:'香緹鮮奶油',p:40,c:'#FFFFFF'},ganache:{n:'巧克力甘納許',p:60,c:'#4A2A1A'},matchacream:{n:'抹茶奶霜',p:55,c:'#A9C77A'}},
+ fruit:{berries:{n:'莓果',p:40},fig:{n:'無花果',p:50},mango:{n:'芒果',p:45},citrus:{n:'柑橘',p:35}},
+ finish:{caramel:{n:'焦糖',p:30},cocoa:{n:'可可粉',p:20},honey:{n:'蜂蜜堅果',p:40},sugar:{n:'糖粉',p:15}},
+};
+const SIGD_CAT_N={base:'底',cream:'奶餡',fruit:'水果',finish:'點綴'};
+const SIGD_EVO=[0,30,80];function sigDSold(){return S.records&&S.records.sigd?S.records.sigd.v:0}function sigDLv(){const v=sigDSold();return v>=SIGD_EVO[2]?3:v>=SIGD_EVO[1]?2:1}
+function isSig(d){return d==='signature'||d==='sigdessert'}
+function sigDessertDef(){const s=S.sigDessert;if(!s)return null;const add=SIGD.base[s.base].p+SIGD.cream[s.cream].p+SIGD.fruit[s.fruit].p+SIGD.finish[s.finish].p;const price=150+add+(sigDLv()-1)*20;
+ const fin=s.finish==='caramel'?sH('淋焦糖','caramel',.35,.6,.6,'份量'):s.finish==='cocoa'?sD('撒可可粉','cocoa',1,2):s.finish==='sugar'?sD('撒糖粉','sugar',1,2):sA(['honey'],0,'淋蜂蜜與堅果');
+ return{n:s.name,cat:'dessert',st:'prep',v:'plate',price,cost:Math.round(price*.32),diff:3,pop:1,lv:3,sig:1,sigd:1,steps:[sA([s.base],0,'放上'+SIGD.base[s.base].n),sH('抹上'+SIGD.cream[s.cream].n,s.cream,.5,.78,.5,'份量'),sA([s.fruit],0,'放上'+SIGD.fruit[s.fruit].n),fin]}}
+function DISH(d){return d==='signature'?sigDef():d==='sigdessert'?sigDessertDef():DISHES[d]}
 
 const TYPES={
  office:{n:'上班族',pat:.8,eat:.7,tip:.1,sens:.7,qw:.35,budget:1,read:.7,pref:{main:1.2,starter:.6,drink:1.4,dessert:.5},pD:.55,pS:.12},
@@ -331,7 +347,7 @@ const ACH=[
  {id:'fire',n:"Jill's On Fire",d:'第一次進入 Rush Mode',ic:'flame'},
  {id:'perfectnight',n:'Perfect Night',d:'整晚沒有料理失敗（至少 8 道、無人生氣離開）',ic:'moon',p:1},
  {id:'combo10',n:'Ten in a Row',d:'達成 COMBO ×10',ic:'star',p:1},
- {id:'sig',n:'Signature Born',d:'研發出 Jill 的招牌菜',ic:'plate',p:1},
+ {id:'sig',n:'Signature Born',d:'研發出 Jill 的招牌菜',ic:'plate',p:1},{id:'sigd',n:'Sweet Signature',d:'研發出 Jill 的招牌甜點',ic:'plate',p:1},
  {id:'duck',n:"Jill's Signature",d:'香煎鴨胸熟練度滿級',ic:'duck',p:2},
  {id:'oldfriend',n:'Old Friend',d:'有熟客成為 Jill 的老客人',ic:'heart',p:2},
  {id:'loves',n:'Everybody Loves Jill',d:'服務 100 位回頭客',ic:'heart',p:2},
@@ -460,7 +476,7 @@ function costOf(d){const D=DISH(d);let c=D.cost;if(S.today&&S.today.event==='tru
 function stockTotal(){let t=0;for(const k in S.stock)t+=S.stock[k]||0;return t}
 function stSpeed(type){const lv=type==='stove'?S.eq.stove:type==='oven'?Math.max(1,S.eq.oven):type==='bar'?Math.max(1,S.eq.bar):S.eq.fridge;let v=SPD[clamp(lv,1,5)-1];if(type==='bar'&&S.decor.bar)v*=1.15;if(R&&R.fire>0)v*=1.4;return v}
 function dishSpeed(d,type){const D=DISH(d);let v=stSpeed(type);if(D.pan)v*=1+.08*(S.eq.pan-1);return v/(1-.07*(mLv(d)-1))}
-function menuList(){const m=S.menu.filter(d=>S.unlocked.includes(d));if(S.signature&&!m.includes('signature'))m.unshift('signature');return m}
+function menuList(){const m=S.menu.filter(d=>S.unlocked.includes(d));if(S.sigDessert&&!m.includes('sigdessert'))m.unshift('sigdessert');if(S.signature&&!m.includes('signature'))m.unshift('signature');return m}
 function maxSeats(tables){return(tables||buildTables()).reduce((a,t)=>Math.max(a,t.seats),2)}
 function dayDur(D){return D===1?150:D===2?170:D===3?190:D<=5?210:D<=9?230:250}
 function feat(){const D=S.day;return{prices:D>=2,stock:true,events:D>=3,rush:D>=4}}
@@ -559,7 +575,7 @@ function bread(c,x,y,s){c.save();c.translate(x,y);c.rotate(-.3);c.fillStyle='#9A
 
 const VESSEL={coffee:'cup',blacktea:'cup',sparkling:'glass',fruitsoda:'glass',soup:'bowl',salad:'bowl',soup_x:'bowl'};
 function paintFood(c,id,want){const SP=DISHES[id]&&DISHES[id].special?SPECIALS[DISHES[id].special]:null;if(SP){paintFood(c,DISHES[id].special,want);paintTopping(c,SP.top,rng(hash(id)));return}
- const R=rng(hash(id+'|'+(want||0)+(id==='signature'&&S.signature?JSON.stringify(S.signature):'')));
+ const R=rng(hash(id+'|'+(want||0)+(id==='signature'&&S.signature?JSON.stringify(S.signature):'')+(id==='sigdessert'&&S.sigDessert?JSON.stringify(S.sigDessert):'')));
  const flat=fn=>{c.save();c.scale(1,.8);fn();c.restore()};
  switch(id){
  case 'friedrice':flat(()=>{riceMound(c,R,0,0,28)});break;
@@ -590,9 +606,25 @@ function paintFood(c,id,want){const SP=DISHES[id]&&DISHES[id].special?SPECIALS[D
   c.fillStyle='#E9C46A';for(let k=0;k<6;k++)c.fillRect(-10+R()*30,-16+R()*16,1.6,1.6);herbs(c,R,10,-14,5,4,'#6FA84E');
   const lv=sigLv();if(lv>=2){/* the second version: a swoosh of the sauce and a tuft of microgreens */c.strokeStyle=shade(SIG.sauce[s.sauce].c,-.25);c.lineWidth=3.2;c.lineCap='round';c.beginPath();c.moveTo(-26,16);c.quadraticCurveTo(-8,26,20,20);c.stroke();c.lineWidth=1.2;c.strokeStyle='rgba(255,255,255,.25)';c.beginPath();c.moveTo(-24,15);c.quadraticCurveTo(-8,23,16,19);c.stroke();for(let k=0;k<7;k++){c.save();c.translate(22+(R()-.5)*8,-12+(R()-.5)*8);c.rotate(R()*3);leaf(c,0,0,5,2.2,0,k%2?'#4E9E44':'#7CBF4A');c.restore()}}
   if(lv>=3){/* the third: an edible flower and a few flakes of gold leaf */c.save();c.translate(-20,-14);for(let k=0;k<6;k++){c.save();c.rotate(k*1.047);c.fillStyle=k%2?'#F4B6C2':'#F7D06B';el(c,3.2,0,3,1.6);c.restore()}c.fillStyle='#F0932B';circ(c,0,0,1.5);c.restore();c.fillStyle='#F1C64B';for(let k=0;k<5;k++){c.save();c.translate(-4+R()*24,-8+R()*18);c.rotate(R()*3);c.fillRect(-1.4,-.9,2.8,1.8);c.restore()}c.fillStyle='rgba(255,255,255,.5)';for(let k=0;k<3;k++)circ(c,-2+R()*20,-6+R()*14,.5)}});break}
+ case 'sigdessert':{const s=S.sigDessert||{base:'pannacotta',cream:'mascarpone',fruit:'berries',finish:'caramel'};const lv=sigDLv();const CR=SIGD.cream[s.cream].c;flat(()=>{
+  /* the base */if(s.base==='pannacotta'){c.fillStyle='rgba(90,50,25,.16)';el(c,1,12,20,7);c.fillStyle='#FFF6EA';el(c,0,4,18,12);el(c,0,-4,18,9);c.fillStyle='#F7ECDB';el(c,0,-5,18,8);gloss(c,-6,-8,5,1.6,.5)}
+  else if(s.base==='sponge'){c.fillStyle='rgba(90,50,25,.16)';el(c,1,12,22,7);c.fillStyle='#E9C878';c.fillRect(-18,-4,36,14);c.fillStyle='#F3D98A';c.fillRect(-18,-8,36,6);c.fillStyle='rgba(120,80,30,.25)';for(let k=0;k<12;k++)circ(c,-15+R()*30,-2+R()*10,.7)}
+  else if(s.base==='tart'){c.fillStyle='rgba(90,50,25,.16)';el(c,1,12,22,7);c.fillStyle='#C9944E';el(c,0,4,22,10);c.fillStyle='#D9A86A';el(c,0,1,22,10);c.fillStyle='#C9944E';for(let k=0;k<14;k++){const a=k/14*6.283;el(c,Math.cos(a)*20,Math.sin(a)*8.5+1,2.2,1.5)}c.fillStyle='#EBC98A';el(c,0,0,16,6.5)}
+  else{c.fillStyle='rgba(90,50,25,.16)';el(c,1,12,22,7);c.fillStyle='#EFD6A2';c.beginPath();c.moveTo(-22,4);c.quadraticCurveTo(-10,-10,10,-8);c.quadraticCurveTo(24,-4,20,8);c.quadraticCurveTo(0,12,-22,4);c.fill();c.fillStyle='rgba(160,100,40,.3)';for(let k=0;k<8;k++)el(c,-14+R()*30,-4+R()*10,2,1.2)}
+  /* the cream: a quenelle */c.fillStyle=shade(CR,-.12);el(c,-2,-6,11,6);c.fillStyle=CR;c.beginPath();c.moveTo(-12,-6);c.quadraticCurveTo(-4,-16,10,-10);c.quadraticCurveTo(12,-4,0,-1);c.quadraticCurveTo(-12,-1,-12,-6);c.fill();gloss(c,-4,-11,3,1.2,.45);
+  /* the fruit */if(s.fruit==='berries'){c.fillStyle='#3A2E6A';circ(c,9,-2,3.2);circ(c,14,2,2.8);c.fillStyle='#D23A4A';circ(c,6,4,3);c.fillStyle='#B2283A';circ(c,13,-6,2.4);gloss(c,8,-3,1.1,.7,.6)}
+  else if(s.fruit==='fig'){c.fillStyle='#6E2E4A';el(c,10,0,6,5);c.fillStyle='#D9556E';el(c,10,0,4.4,3.4);c.fillStyle='#F2C4B8';for(let k=0;k<8;k++)circ(c,8+R()*4,-1.5+R()*3,.5);c.fillStyle='#6E2E4A';el(c,3,5,4.5,3.5);c.fillStyle='#D9556E';el(c,3,5,3.2,2.4)}
+  else if(s.fruit==='mango'){c.fillStyle='#F2A93B';for(const [x,y,a] of[[8,-2,.3],[12,3,-.2],[4,5,.5]]){c.save();c.translate(x,y);c.rotate(a);el(c,0,0,5,2.6);c.restore()}gloss(c,9,-3,2,.8,.5)}
+  else{c.fillStyle='#F4A32B';for(const [x,y] of[[8,-2],[13,3],[4,5]]){el(c,x,y,4.2,3.2);c.fillStyle='#FFD27A';el(c,x,y,3,2.2);c.fillStyle='#F4A32B'}c.strokeStyle='rgba(255,255,255,.6)';c.lineWidth=.6;for(const [x,y] of[[8,-2],[13,3],[4,5]]){c.beginPath();c.moveTo(x-3,y);c.lineTo(x+3,y);c.stroke()}}
+  /* the finish */if(s.finish==='caramel'){c.strokeStyle='#B8661F';c.lineWidth=1.6;c.lineCap='round';c.beginPath();c.moveTo(-16,-12);c.quadraticCurveTo(0,-2,16,-8);c.stroke();c.fillStyle='#B8661F';for(let k=0;k<4;k++)circ(c,-12+k*9,-2+(k%2)*6,1)}
+  else if(s.finish==='cocoa'){c.fillStyle='rgba(60,30,15,.55)';for(let k=0;k<26;k++)circ(c,-14+R()*30,-14+R()*10,.6)}
+  else if(s.finish==='sugar'){c.fillStyle='rgba(255,255,255,.85)';for(let k=0;k<26;k++)circ(c,-14+R()*30,-14+R()*10,.55)}
+  else{c.fillStyle='#E5A83A';el(c,-6,6,7,2.2);c.fillStyle='#C98B3A';for(let k=0;k<5;k++)circ(c,-12+k*5,5+(k%2),1.1);c.fillStyle='#F3D28A';for(let k=0;k<5;k++)circ(c,-12+k*5,4.6+(k%2),.5)}
+  if(lv>=2){/* the second version: a stroke of coulis and a mint tip */const cc=s.fruit==='mango'?'#F2A93B':s.fruit==='citrus'?'#F4A32B':s.fruit==='fig'?'#B2283A':'#C8324A';c.strokeStyle=cc;c.lineWidth=3;c.lineCap='round';c.beginPath();c.moveTo(-26,14);c.quadraticCurveTo(-10,22,18,18);c.stroke();c.strokeStyle='rgba(255,255,255,.25)';c.lineWidth=1;c.beginPath();c.moveTo(-24,13);c.quadraticCurveTo(-10,20,14,17);c.stroke();leaf(c,-8,-14,6,2.6,-.6,'#4E9E44');leaf(c,-4,-15,5,2.2,.3,'#7CBF4A')}
+  if(lv>=3){/* the third: a spun-sugar cage and gold */c.strokeStyle='rgba(240,200,120,.85)';c.lineWidth=.7;for(let k=0;k<7;k++){c.beginPath();c.arc(-2+(k-3)*2,-6,13+k*.8,3.3+k*.15,6.1-k*.12);c.stroke()}c.fillStyle='#F1C64B';for(let k=0;k<5;k++){c.save();c.translate(-8+R()*18,-10+R()*12);c.rotate(R()*3);c.fillRect(-1.3,-.9,2.6,1.8);c.restore()}c.fillStyle='rgba(255,255,255,.5)';for(let k=0;k<3;k++)circ(c,-4+R()*14,-8+R()*10,.5)}});break}
  }}
 const DCACHE=new Map();
-function dishCanvas(id,q,size,gold,want){const key=id+'|'+q+'|'+size+'|'+(gold?1:0)+'|'+(want||0)+(id==='signature'&&S.signature?'|'+S.signature.base+S.signature.protein+S.signature.sauce+S.signature.side+sigLv():'');if(DCACHE.has(key))return DCACHE.get(key);
+function dishCanvas(id,q,size,gold,want){const key=id+'|'+q+'|'+size+'|'+(gold?1:0)+'|'+(want||0)+(id==='signature'&&S.signature?'|'+S.signature.base+S.signature.protein+S.signature.sauce+S.signature.side+sigLv():'')+(id==='sigdessert'&&S.sigDessert?'|'+S.sigDessert.base+S.sigDessert.cream+S.sigDessert.fruit+S.sigDessert.finish+sigDLv():'');if(DCACHE.has(key))return DCACHE.get(key);
  const cv=mkCanvas(size),c=cv.getContext('2d');c.translate(size/2,size/2);c.scale(size/100,size/100);const v=VESSEL[id]||'plate';
  if(v==='plate'&&id!=='tiramisu')drawPlate(c,gold);else if(id==='tiramisu')drawPlate(c,gold);else if(v==='bowl')drawBowl(c,gold);else if(v==='cup')drawPlate(c,gold,.92);
  const fl=mkCanvas(size),f=fl.getContext('2d');f.translate(size/2,size/2);const fs=(v==='cup'||v==='glass')?1:1.12;/* 2.1: the food fills more of the plate */f.scale(size/100*fs,size/100*fs);paintFood(f,id,want);
@@ -602,7 +634,7 @@ function dishCanvas(id,q,size,gold,want){const key=id+'|'+q+'|'+size+'|'+(gold?1
  if(q==='B'){c.fillStyle='rgba(60,60,60,.35)';for(let k=0;k<3;k++){c.beginPath();c.arc(size*(.4+k*.1),size*(.3-k*.06),size*.08,0,7);c.fill()}}
  if(DCACHE.size>600)DCACHE.clear();DCACHE.set(key,cv);return cv}
 const ICACHE=new Map();
-function dishURL(id,q,want){const k='u'+id+(q||'G')+(want||0)+(id==='signature'&&S.signature?S.signature.base+S.signature.protein+S.signature.sauce+S.signature.side+sigLv():'')+(S.decor.ware?1:0);if(ICACHE.has(k))return ICACHE.get(k);const u=dishCanvas(id,q||'G',112,S.decor.ware>0,want).toDataURL();ICACHE.set(k,u);return u}
+function dishURL(id,q,want){const k='u'+id+(q||'G')+(want||0)+(id==='signature'&&S.signature?S.signature.base+S.signature.protein+S.signature.sauce+S.signature.side+sigLv():'')+(id==='sigdessert'&&S.sigDessert?'|'+S.sigDessert.base+S.sigDessert.cream+S.sigDessert.fruit+S.sigDessert.finish+sigDLv():'')+(S.decor.ware?1:0);if(ICACHE.has(k))return ICACHE.get(k);const u=dishCanvas(id,q||'G',112,S.decor.ware>0,want).toDataURL();ICACHE.set(k,u);return u}
 
 /* ================= people art ================= */
 /* People. One renderer for guests, staff, Dylan and Jill. Units are the same as before (head r≈9.6,
@@ -880,7 +912,7 @@ let DPR=1,SV={w:0,h:0,s:1,ox:0,oy:0},TL={cols:1,rows:1,w:100,h:84,pad:8,gap:6,x0
 let R=null,IDLE=null,phase='title',paused=false,mainScreen='title',sub=null;
 
 /* ================= planning a day ================= */
-function applyGates(){if(S.sigEvoNews&&S.signature){const lv=S.sigEvoNews;S.sigEvoNews=0;S.news.push(`<b>招牌菜升級了。</b>${S.signature.name}賣到 ${lv===3?SIG_EVO[2]:SIG_EVO[1]} 份，Jill 把盤子重新做過：${lv===3?'食用花與金箔':'醬汁畫盤與一撮嫩葉'}，價格高 $${(lv-1)*30}。`)}
+function applyGates(){if(S.sigdEvoNews&&S.sigDessert){const lv=S.sigdEvoNews;S.sigdEvoNews=0;S.news.push(`<b>招牌甜點升級了。</b>${S.sigDessert.name}賣到 ${lv===3?SIGD_EVO[2]:SIGD_EVO[1]} 份，${lv===3?'Jill 在上面拉了一層糖絲，點了金箔。':'Jill 在盤邊畫了一道果泥，放了一片薄荷。'}`)}if(S.sigEvoNews&&S.signature){const lv=S.sigEvoNews;S.sigEvoNews=0;S.news.push(`<b>招牌菜升級了。</b>${S.signature.name}賣到 ${lv===3?SIG_EVO[2]:SIG_EVO[1]} 份，Jill 把盤子重新做過：${lv===3?'食用花與金箔':'醬汁畫盤與一撮嫩葉'}，價格高 $${(lv-1)*30}。`)}
  if(!S.news21&&S.day>=3){S.news21=S.day;S.news.push('<b>2.1：食物與日常。</b>做熟的菜（熟練度 LV3）可以在<b>菜單研發</b>研發成<b>特製版</b>；招牌菜賣得多會換盤；街上有人經過、有人在門口看菜單就進來；帶小孩的家庭、雨天的傘、廚房裡的空檔。')}
  if(!S.news20&&S.day>=3){S.news20=S.day;S.news.push('<b>2.0：店可以變大了。</b>主廳上方可以切到<b>店門口</b>和<b>廚房</b>（廚師真的在裡面煮）。打烊後商店裡多了<b>工程</b>（戶外區、大出菜口、冷藏庫、廚房擴建、側廳）和<b>貓的東西</b>；結算會告訴你下一個存錢的目標。')}
  while(S.gate<S.day){S.gate++;const D=S.gate;
@@ -1055,14 +1087,14 @@ function stationOk(d){const D=DISH(d);if(!D)return false;const st=D.st;return st
    service by itself; 今日推薦 is the player's lever (×2.4); stars, price and the guest's budget do the rest. */
 function demandW(d,T,ctx){const D=DISH(d);if(!D)return 0;let w=(D.pop||1)*((T.pref||{})[D.cat]||1);
  const m=S.price[d]||1;w*=Math.pow(1/m,1+T.sens*1.8);w*=Math.pow(D.price/220,(T.budget-1)*.9);if(T===TYPES.gourmet&&D.diff>=3)w*=1.7;
- if(d==='signature')w*=1.2;if(recoDish()===d)w*=2.2;w*=wxDemand(d)*evDemand(d);w*=1+.25*(starOf(d)-1);
+ if(isSig(d))w*=1.2;if(recoDish()===d)w*=2.2;w*=wxDemand(d)*evDemand(d);w*=1+.25*(starOf(d)-1);
  if(ctx&&ctx.stock!==false&&(S.stock[d]||0)<=0)w*=.6;return w}
 /* Set menus the player chooses to offer: a main with a drink, with a dessert, or both. The add-on is a little cheaper
    and a lot more often ordered; à la carte stays. */
 const SETS={drink:{n:'主餐＋飲料',d:'點主餐的客人更常加一杯（飲料 −10%）',off:.9},dessert:{n:'主餐＋甜點',d:'點主餐的客人更常加甜點（甜點 −10%）',off:.9},full:{n:'主餐＋飲料＋甜點',d:'全套：飲料和甜點都更常被加點（各 −15%）',off:.85}};
 function setOn(k){return!!(S.sets&&S.sets[k])}
 function setFor(cat){if(cat==='drink'&&setOn('full'))return'full';if(cat==='drink'&&setOn('drink'))return'drink';if(cat==='dessert'&&setOn('full'))return'full';if(cat==='dessert'&&setOn('dessert'))return'dessert';return null}
-function recoDish(){const r=S.today&&S.today.reco;return r&&S.menu.includes(r)&&S.unlocked.includes(r)?r:(r==='signature'&&S.signature?r:null)}
+function recoDish(){const r=S.today&&S.today.reco;return r&&S.menu.includes(r)&&S.unlocked.includes(r)?r:(r==='signature'&&S.signature)||(r==='sigdessert'&&S.sigDessert)?r:null}
 function orderItems(g,est){/* v2.2: a sold-out dish is not on offer (est = the demand estimate, which ignores the fridge; on the two
    auto-provisioning days the tutorial still lets Jill order a missing unit herself, so nothing is filtered there) */const ms0=menuList().filter(stationOk);const ms=est||S.day<=2?ms0:ms0.filter(d=>(S.stock[d]||0)>0);const T=TYPES[g.type];const W=R?R.weather:(S.today?S.today.weather:'sun');
  const wf=d=>demandW(d,T);const reco=recoDish();
@@ -1084,7 +1116,7 @@ function orderItems(g,est){/* v2.2: a sold-out dish is not on offer (est = the d
   if(!d){const f=foods();if(f.length)d=wpick(f,wf)}
   if(d)items.push(d);
   const hasMain=!!d&&DISH(d).cat==='main';const pd=(g.reg==='dylan'?.7:(T.pD||.35))*(W==='hot'?1.5:W==='rain'||W==='storm'?1.2:1)*(reco&&DISH(reco).cat==='drink'?1.25:1)*(hasMain&&setFor('drink')?1.6:1);const dr=drinks();if(dr.length&&(Math.random()<pd||!d))items.push(wpick(dr,wf));
-  const ds=des();if(ds.length&&Math.random()<(T.pS||.2)*(reco&&DISH(reco).cat==='dessert'?1.4:1)*(g.celebrate?2.2:1)*(g.broke||g.rushed||g.quick?.2:1)*(hasMain&&setFor('dessert')?1.7:1))items.push(wpick(ds,wf))}
+  const ds=des();if(ds.length&&Math.random()<(T.pS||.2)*(reco&&DISH(reco).cat==='dessert'?1.4:1)*(g.celebrate?2.2:1)*(g.broke||g.rushed||g.quick?.2:1)*(hasMain&&setFor('dessert')?1.7:1))items.push((g.forSig||g.wantSig)&&ds.includes('sigdessert')&&Math.random()<.7?'sigdessert':wpick(ds,wf))}
  let out=items.filter(Boolean).slice(0,cap);if(!est&&S.day>2){const used={};out=out.filter(d=>{used[d]=(used[d]||0)+1;return used[d]<=(S.stock[d]||0)})}if(g.share){/* one dessert, two forks */let seen=false;return out.filter(d=>{if(DISH(d).cat!=='dessert')return true;if(seen)return false;seen=true;return true})}return out}
 /* expected sales per dish for a day like today: the guest mix and the ordering rules themselves, sampled */
 function expectDemand(groups,n,est){const out={};const G=S.today?S.today.groups:groups||10;const N=n||60;
@@ -1102,7 +1134,7 @@ function createTicket(g){const items=orderItems(g);const t=R.tables[g.table];
 function recipeOf(d){return DISH(d).steps}
 function uniq(a){return[...new Set(a)]}
 function zoneQ(p,z){if(p>=1.22)return'B';if(p>=1)return'O';const d=Math.abs(p-z.c);return d<=z.w?'P':d<=z.g?'G':'O'}
-function decoyFor(d,items){if(S.day<3||Math.random()<.4||items.some(i=>i.startsWith('s_')))return[];const st=DISH(d).st;const pool=new Set();for(const x of S.unlocked.concat(S.signature?['signature']:[])){const D=DISH(x);if(!D||D.st!==st)continue;for(const s2 of D.steps)if(s2.t==='add')s2.items.forEach(i=>{if(!i.startsWith('s_'))pool.add(i)})}items.forEach(i=>pool.delete(i));const arr=[...pool];return arr.length?[pick(arr)]:[]}
+function decoyFor(d,items){if(S.day<3||Math.random()<.4||items.some(i=>i.startsWith('s_')))return[];const st=DISH(d).st;const pool=new Set();for(const x of S.unlocked.concat(S.signature?['signature']:[],S.sigDessert?['sigdessert']:[])){const D=DISH(x);if(!D||D.st!==st)continue;for(const s2 of D.steps)if(s2.t==='add')s2.items.forEach(i=>{if(!i.startsWith('s_'))pool.add(i)})}items.forEach(i=>pool.delete(i));const arr=[...pool];return arr.length?[pick(arr)]:[]}
 function enterStep(j,i){const st=recipeOf(j.d)[i];const m=mLv(j.d);const k=Object.assign({},st,{p:0,cnt:0,taps:0,mis:0,t0:R.t,scorch:0,last:R.t,hold:false,level:0,auto:0});
  if(st.t==='add'){k.left=st.items.slice();k.btns=shuffle(st.items.concat(decoyFor(j.d,st.items)))}
  if(st.t==='tap')k.n=Math.max(3,st.n-(m-1));
@@ -1170,7 +1202,7 @@ function serveItems(g,list){const t=R.tables[g.table];let best=null;
   if(it.q==='P'||it.q==='G'){R.combo++;R.maxCombo=Math.max(R.maxCombo,R.combo);if(R.combo>=2){showCombo();sfx.combo(R.combo)}if(R.combo>=10)ach('combo10')}else{if(R.combo>=3)toast('COMBO 中斷');R.combo=0;hideCombo()}
   R.st.dish[it.d]=(R.st.dish[it.d]||0)+1;if(it.q==='P')best='P'}
  sfx.serve();if(best==='P')burst('scene',{x:t.x,y:t.y-14,room:t.room},'#FFE38A');
- if(list.some(c0=>c0.it.d==='signature')&&Math.random()<.25&&canChat('sig',120,4))quote(g,pickT(['這就是招牌菜？','招牌菜長這樣。','終於吃到了。','專程來吃這道的。']));
+ if(list.some(c0=>c0.it.d==='signature')&&Math.random()<.25&&canChat('sig',120,4))quote(g,pickT(['這就是招牌菜？','招牌菜長這樣。','終於吃到了。','專程來吃這道的。']));else if(list.some(c0=>c0.it.d==='sigdessert')&&Math.random()<.25&&canChat('sigd',120,4))quote(g,pickT(['招牌甜點。','這個是 Jill 自己想的？','留了肚子給它。','拍一張再吃。']));
  else if(list.some(c0=>DISH(c0.it.d)&&DISH(c0.it.d).special)&&Math.random()<.3&&canChat('special',60,4)){const sd=list.find(c0=>DISH(c0.it.d)&&DISH(c0.it.d).special).it.d;const sp=SPECIALS[DISHES[sd].special];quote(g,pickT([`${sp.n}，就是這個。`,'特製版長這樣。','這個要拍一下。','比照片還好看。','上面那個是'+ING[sp.top].n+'？','跟一般版差在哪？我看看。']));if(!g.photo&&!g.shot&&Math.random()<.5){g.photo=true;g.shot=true;g.photoT0=R.t+1.2;g.dishShot=sp.n}}
  else if(g.type==='family'&&Math.random()<.3&&canChat('family',60,4))quote(g,pickT(['小朋友：「我要那個！」','媽媽：「先吃飯，貓等一下再看。」','小朋友把薯條先搶走了。','爸爸：「這家的貓不怕人。」','小朋友：「牠在看我。」']));
  else if(Math.random()<.12&&canChat('served',25,4)){const it0=list[0]&&list[0].it;const dn=it0?dishName(it0.d):'';const byJ=it0&&it0.byJill;quote(g,pickT(['這是 Jill 親手做的嗎？','哇，Jill 主廚的擺盤好美。','聞起來好香…','先拍照，等我一下！','來了來了。','看起來好好吃。','份量剛好。'].concat(dn?[`${dn}來了。`,`${dn}長這樣啊。`,`我的${dn}！`]:[],byJ?['剛剛是 Jill 自己端過來的。']:[],it0&&it0.q==='P'?['這盤擺得也太好看。']:[])))}
@@ -1231,14 +1263,14 @@ function collect(g){const T=TYPES[g.type];const items=g.ticket.items.filter(i=>i
  const n=Math.max(1,items.length),qa=qs/n;let sat=qa*T.qw+g.pat*100*(1-T.qw);sat-=(pen/n)*80*T.sens;sat+=(bon/n)*30*T.sens;sat+=Math.min(12,ambience()*1.1);sat+=items.reduce((a,it)=>a+starOf(it.d)-1,0)/n*4;if(g.catJoy)sat+=5;if(g.reg)sat+=4;if(g.compl)sat+=g.compl;if(g.strict&&items.some(i=>i.q==='O'||i.q==='B'))sat-=12;if(g.forSig&&items.some(i=>i.d==='signature'))sat+=6;if(items.some(i=>i.d==='signature'&&i.byJill))sat+=3;sat=clamp(sat,0,100);
  let tip=rev*T.tip*Math.pow(sat/80,2)*(R.fire>0?1.5:1)*(1+.04*Math.min(R.combo,10))*(S.decor.ware?1.15:1)*(g.celebrate||g.anniv?1.8:1);if(sat<40)tip=0;if(g.reg==='dylan'&&sat>=40)tip*=1.35;rev=Math.round(rev);tip=Math.round(tip);
  if(g.type==='couple')R.st.couples=(R.st.couples||0)+1;
- S.money+=rev+tip;S.lifetime+=rev+tip;R.st.rev+=rev;R.st.tips+=tip;R.st.guests+=g.size;R.st.groups++;R.st.sats.push(sat);R.st.pats=R.st.pats||[];R.st.pats.push(g.pat);if(pen>0)R.st.pricey=(R.st.pricey||0)+1;if(g.catJoy)R.st.catJoy=(R.st.catJoy||0)+1;if(items.some(i=>i.d==='signature'))R.st.sig=(R.st.sig||0)+items.filter(i=>i.d==='signature').length;
+ S.money+=rev+tip;S.lifetime+=rev+tip;R.st.rev+=rev;R.st.tips+=tip;R.st.guests+=g.size;R.st.groups++;R.st.sats.push(sat);R.st.pats=R.st.pats||[];R.st.pats.push(g.pat);if(pen>0)R.st.pricey=(R.st.pricey||0)+1;if(g.catJoy)R.st.catJoy=(R.st.catJoy||0)+1;if(items.some(i=>i.d==='signature'))R.st.sig=(R.st.sig||0)+items.filter(i=>i.d==='signature').length;if(items.some(i=>i.d==='sigdessert'))R.st.sigd=(R.st.sigd||0)+items.filter(i=>i.d==='sigdessert').length;
  const t=R.tables[g.table];addFloat(t.x,t.y-42,'+'+fmt(rev),'#FFE38A',1,t.room);if(tip>0)addFloat(t.x+6,t.y-58,'小費 +'+fmt(tip),'#BFE3A8',0,t.room);sfx.cash();burst('coins',{x:t.x,y:t.y-20,room:t.room},'#F4C44E');
  const stars=sat>=86?5:sat>=70?4:sat>=54?3:sat>=36?2:1;
  if(g.type==='critic'){toast('其實剛才那位，是<b>神秘美食評論家</b>！');R.st.critic=sat>=84?'good':sat<55?'bad':'ok';addReview(g,stars,stars>=5?"Jill's Kitchen 是今年最令人驚喜的餐廳。":stars>=4?'Jill 主廚的手藝紮實，值得專程一訪。':'有潛力，但還需要打磨。');if(stars>=5)ach('critic')}
  else if(g.type==='blogger'){R.st.blogger=sat>=78?'good':'ok';addReview(g,stars)}
  else if(g.writer){const r=addReview(g,stars,stars>=5?'朋友帶我來的小店。主廚的菜有自己的個性，會再來。':stars>=4?'朋友推薦的店，水準穩定。':'朋友推薦的店，這次普通。');if(r)r.w=2;if(stars>=4){ach('writer');S.gourmetBoost=S.day+1;S.buzzMsg=S.buzzMsg||'Sophie 的朋友寫了這裡，今天美食家會多一些。'}}
  else if(g.reg==='sophie'&&items.some(i=>i.q==='P')&&(g.wantSig||Math.random()<.3)){const r=addReview(g,Math.max(4,stars),g.wantSig?'招牌菜的醬汁對了。這道可以寫進專欄。':'這家店的水準，是可以寫的。');if(r)r.w=2;quote(g,g.wantSig?'今天的醬汁對了。':'不錯。')}
- else if(g.type==='vip'||(g.reg!=='dylan'&&Math.random()<.55))addReview(g,stars,null,{cat:!!g.catJoy,wait:g.pat<.4,price:pen>0,q:items.some(i=>i.q==='O'||i.q==='B'),sig:items.some(i=>i.d==='signature'),treat:!!g.treated,decor:ambience()>=6,weather:R.weather});
+ else if(g.type==='vip'||(g.reg!=='dylan'&&Math.random()<.55))addReview(g,stars,null,{cat:!!g.catJoy,wait:g.pat<.4,price:pen>0,q:items.some(i=>i.q==='O'||i.q==='B'),sig:items.some(i=>isSig(i.d)),treat:!!g.treated,decor:ambience()>=6,weather:R.weather});
  if(g.reg){S.catFam=S.catFam||{};for(const id of regsOf(g)){S.catFam[id]=(S.catFam[id]||0)+1;const before=S.regulars[id]||0;S.regulars[id]=before+1;const nm=id==='dylan'?'Dylan':REG_BY[id]?REG_BY[id].n:g.name;if(before+1===4){toast(`${nm} 成為了熟客！`);ach('regular4')}if(id==='dylan'&&before+1>=5)ach('dylan5');if(before+1===12){toast(`${nm} 成為了 Jill 的老客人！`);ach('oldfriend')}}}
  if(g.ret||(g.reg&&(S.regulars[g.reg]||0)>1)){S.returning+=g.size;if(S.returning>=100)ach('loves')}
  if(S.lifetime>=1e6)ach('million');
@@ -1409,7 +1441,7 @@ function playerTreat(g){const st=treatState(g);if(st.k!=='offer'){toast(st.k==='
 function treatTick(){if(!R||R.closing!=null)return;const J=R.jill;if(J.visit||J.pet||J.cur||J.q.length||jillWorkload()>1)return;for(const g of R.groups){if(g.table==null||!['wait','eat'].includes(g.state))continue;const k=treatWanted(g);if(!k)continue;/* v2.2 L: an occasion (the card, the player's 招待) gets her up from the sofa like a tapped table would; the patience treat still waits for a quiet moment */if(J.rest){if(g.treat){endRest();J.idle=1}return}if(J.idle<.8)return;if(treatGo(g,k))return}}
 const TIER_N={0:'陌生人',.5:'有點眼熟',1:'熟客',2:'Jill 的老客人'};
 function jillSay(txt,o){logLine('Jill',txt,'j');/* v2.2 Q: an authored moment (with someone who has a portrait) shows her face; an operational word stays a toast */if(o&&o.with&&portraitLine('jill',txt,{tone:jillTone(txt,o),with:o.with,withTone:o.withTone}))return;toast(`<b>Jill</b>：「${txt}」`,'q')}
-function dishName(d){const D=DISH(d);return D?(d==='signature'&&S.signature?S.signature.name:D.n):''}
+function dishName(d){const D=DISH(d);return D?(d==='signature'&&S.signature?S.signature.name:d==='sigdessert'&&S.sigDessert?S.sigDessert.name:D.n):''}
 /* Not every visit, and tied to the visit: the dish and how it came out, a cat that came by or got photographed,
    a long wait, two words with Jill. Newest first in the journal; capped so the save stays small. */
 function regularNote(g){if(!R||!g.reg||g.reg==='dylan')return;const who=speakerOf(g);const v=S.regulars[who]||0;if(v<4||Math.random()>.32)return;S.notes=S.notes||[];if(S.notes.some(n=>regsOf(g).includes(n.reg)&&S.day-n.day<2))return;
@@ -1556,7 +1588,7 @@ const REC_N={revDay:'單日最高營業額',guestsDay:'單日最多客人',ratin
 function updRecords(st,plated,D){S.records=S.records||{};const Rc=S.records;const set=(k,v,extra)=>{if(v==null)return;if(!Rc[k]||v>Rc[k].v)Rc[k]=Object.assign({v,d:D},extra||{})};
  set('revDay',st.rev);set('guestsDay',st.guests);set('ratingMax',Math.round(rating()*100)/100);let td=null,tn=0;for(const d in st.dish)if(st.dish[d]>tn){tn=st.dish[d];td=d}if(td)set('dishDay',tn,{dish:td});set('tipsDay',st.tips);set('perfectDay',st.perfect);set('combo',R.maxCombo);set('photosDay',albumList().filter(p=>p.day===D).length);
  Rc.calmRun=st.angry?0:(Rc.calmRun||0)+1;set('calm',Rc.calmRun);if(R.weather==='rain'||R.weather==='storm')set('rain',st.rev);
- Rc.treats={v:(Rc.treats?Rc.treats.v:0)+(st.treats||0),d:D};const sigBefore=sigLv();Rc.sig={v:(Rc.sig?Rc.sig.v:0)+(st.sig||0),d:D};if(S.signature&&sigLv()>sigBefore){S.sigEvoNews=sigLv();DCACHE.clear();ICACHE.clear();if(sigLv()>=2)ach('sig2');if(sigLv()>=3)ach('sig3')}
+ Rc.treats={v:(Rc.treats?Rc.treats.v:0)+(st.treats||0),d:D};const sigBefore=sigLv();Rc.sig={v:(Rc.sig?Rc.sig.v:0)+(st.sig||0),d:D};if(S.signature&&sigLv()>sigBefore){S.sigEvoNews=sigLv();DCACHE.clear();ICACHE.clear();if(sigLv()>=2)ach('sig2');if(sigLv()>=3)ach('sig3')}const sigdBefore=sigDLv();Rc.sigd={v:(Rc.sigd?Rc.sigd.v:0)+(st.sigd||0),d:D};if(S.sigDessert&&sigDLv()>sigdBefore){S.sigdEvoNews=sigDLv();DCACHE.clear();ICACHE.clear()}
  let br=null,bn=0;for(const k in S.regulars)if(S.regulars[k]>bn){bn=S.regulars[k];br=k}if(br)Rc.regs={v:bn,d:D,who:br==='dylan'?'Dylan':(REG_BY[br]||{}).n||br};
  return Object.keys(Rc).filter(k=>Rc[k]&&Rc[k].d===D&&['revDay','guestsDay','ratingMax','dishDay','tipsDay','perfectDay','combo','photosDay'].includes(k)&&(D>3))}
 function recordsHTML(){const Rc=S.records||{};const rows=Object.keys(REC_N).filter(k=>Rc[k]&&Rc[k].v).map(k=>{const r=Rc[k];const v=k==='revDay'||k==='tipsDay'||k==='rain'?fmt(r.v):k==='ratingMax'?r.v.toFixed(2):k==='dishDay'?`${dishName(r.dish)} × ${r.v}`:k==='regs'?`${r.who} · ${r.v} 次`:k==='calm'?`${r.v} 天`:k==='combo'?`×${r.v}`:String(r.v);return`<div class="recrow"><span>${REC_N[k]}</span><b>${v}</b><small>DAY ${r.d}</small></div>`});
@@ -2399,6 +2431,13 @@ function drawTopLayers(c,j,R0,now,v){const d=baseOf(j.d);const cnt=id=>j.adds.fi
   case'mussel':mussel(c,-16,10,1.3,.5);mussel(c,18,8,1.3,-.7);break;
   case's_drain':break;
   case'potatoSide':break;
+  /* v2.2.1 #16: the signature dessert's parts on the plate while it is being built */
+  case'pannacotta':case'sponge':case'tart':case'crepe':{c.fillStyle='rgba(90,50,25,.14)';el(c,1,8,18,7);c.fillStyle=(ING[id]||{}).c||'#F3D98A';el(c,0,3,17,10);c.fillStyle='rgba(255,255,255,.3)';el(c,-4,0,7,3);break}
+  case'mascarpone':case'custard':case'chantilly':case'ganache':case'matchacream':{c.fillStyle=(ING[id]||{}).c||'#F7EEDC';c.beginPath();c.moveTo(-11,-2);c.quadraticCurveTo(-3,-12,10,-6);c.quadraticCurveTo(12,0,0,3);c.quadraticCurveTo(-11,3,-11,-2);c.fill();gloss(c,-3,-7,3,1.2,.4);break}
+  case'berries':{c.fillStyle='#3A2E6A';circ(c,8,-1,3);circ(c,13,3,2.6);c.fillStyle='#D23A4A';circ(c,5,5,2.8);break}
+  case'mango':{c.fillStyle='#F2A93B';el(c,8,-1,5,2.6);el(c,12,4,5,2.6);el(c,4,5,4,2.2);break}
+  case'citrus':{c.fillStyle='#F4A32B';for(const [x,y] of[[8,-2],[13,3],[4,5]]){el(c,x,y,4,3);c.fillStyle='#FFD27A';el(c,x,y,2.8,2);c.fillStyle='#F4A32B'}break}
+  case'honey':{c.fillStyle='#E5A83A';el(c,-6,5,7,2.2);c.fillStyle='#C98B3A';for(let k=0;k<5;k++)circ(c,-12+k*5,4+(k%2),1.1);break}
  }}
  const holding=k&&k.t==='hold'&&!['butter','stock','milk','soda','beans','cream','custard','caramel','cheesebatter','whites'].includes(k.ing);
  if(j.sauce||holding){const lv=holding?k.level:j.sauce;const col=holding?(ING[k.ing]||{}).c:j.sauceC;c.fillStyle=col;c.globalAlpha=.88*(1-mixA*.9);for(let i=0;i<5;i++)el(c,Math.cos(i*1.3)*12,Math.sin(i*1.3)*8+2,3+lv*9,2+lv*5)}
@@ -2446,7 +2485,7 @@ function drawMoldC(c,j,R0,now){const has=id=>j.adds.includes(id);const k=j.step;
  else{const lv=k&&k.t==='hold'?Math.min(1.05,k.level):(j.fill||0);if(lv>0){const top=bot-H*lv;c.fillStyle='#F4DFA9';c.fillRect(-29,top,58,bot-top);const w=j.wait||0;if(w>0){let g=c.createLinearGradient(0,top,0,top+9);g.addColorStop(0,mix('#F4DFA9','#4A2A12',w));g.addColorStop(1,'#F4DFA9');c.fillStyle=g;c.fillRect(-29,top,58,9)}}}
  c.restore();if(has('berries')){c.fillStyle='#3A2E6A';circ(c,-8,-17,4);c.fillStyle='#D23A4A';circ(c,2,-18,4.2);c.fillStyle='#3A2E6A';circ(c,10,-16,3.6)}}
 function drawRamekinC(c,j,R0,now){const k=j.step;const lv=k&&k.t==='hold'?Math.min(1.05,k.level):(j.fill||0);if(lv<=0)return;const cook=cookNow(j);const rise=4+lv*6+Math.min(1,cook)*12;const col=cook>1?mix('#C98A33','#3A2010',Math.min(1,(cook-1)*3)):mix('#FFFFFF','#D9A04A',clamp(cook,0,1));let g=c.createRadialGradient(-5,-10-rise,2,0,-10,26);g.addColorStop(0,mix(col,'#FFFFFF',.25));g.addColorStop(1,col);c.fillStyle=g;c.beginPath();c.moveTo(-21,-10);c.bezierCurveTo(-24,-10-rise*1.6,24,-10-rise*1.6,21,-10);c.closePath();c.fill();const sug=j.adds.filter(x=>x==='sugar').length;c.fillStyle='rgba(255,255,255,.95)';for(let i=0;i<sug*10;i++)circ(c,(R0()-.5)*30,-12-R0()*rise,.8)}
-function foodCanvas(id,size,want){const key='f'+id+size+(want||0)+(id==='signature'&&S.signature?S.signature.base+S.signature.protein+S.signature.sauce+S.signature.side:'');if(DCACHE.has(key))return DCACHE.get(key);const cv=mkCanvas(size),f=cv.getContext('2d');f.translate(size/2,size/2);f.scale(size/100,size/100);paintFood(f,id,want);DCACHE.set(key,cv);return cv}
+function foodCanvas(id,size,want){const key='f'+id+size+(want||0)+(id==='signature'&&S.signature?S.signature.base+S.signature.protein+S.signature.sauce+S.signature.side:'')+(id==='sigdessert'&&S.sigDessert?'|'+S.sigDessert.base+S.sigDessert.cream+S.sigDessert.fruit+S.sigDessert.finish+sigDLv():'');if(DCACHE.has(key))return DCACHE.get(key);const cv=mkCanvas(size),f=cv.getContext('2d');f.translate(size/2,size/2);f.scale(size/100,size/100);paintFood(f,id,want);DCACHE.set(key,cv);return cv}
 /* the finish that makes a 特製版 recognisable on the pass */
 function paintTopping(c,top,R){c.save();c.scale(1,.8);
  switch(top){
@@ -3433,8 +3472,8 @@ function chefFor(type){let b=null;for(const m of S.crew||[])if(m.role==='chef'&&
 /* What a chef can cook: dishes up to their level's difficulty (LV3 handles everything ordinary), and only
    dishes Jill has made at least once. The Signature is Jill's own until a chef reaches LV5 — then she has
    taught it. (Jill still makes the first portion of every new dish herself.) */
-function chefCan(m,d){const D=DISH(d);if(!D)return false;if(D.sig||d==='signature')return m.lv>=5&&(S.xp.signature||0)>0;if((S.xp[d]||0)<=0)return false;return D.diff<=Math.min(3,m.lv)}
-function chefLock(m,d){const D=DISH(d);if(!D)return'';if(D.sig||d==='signature')return m.lv>=5?((S.xp.signature||0)>0?'':'Jill 先做過一次'):'LV5 進階訓練';if((S.xp[d]||0)<=0)return'Jill 先做過一次';return D.diff>Math.min(3,m.lv)?`LV${D.diff}`:''}
+function chefCan(m,d){const D=DISH(d);if(!D)return false;if(D.sig||isSig(d))return m.lv>=5&&(S.xp[d]||0)>0;if((S.xp[d]||0)<=0)return false;return D.diff<=Math.min(3,m.lv)}
+function chefLock(m,d){const D=DISH(d);if(!D)return'';if(D.sig||isSig(d))return m.lv>=5?((S.xp[d]||0)>0?'':'Jill 先做過一次'):'LV5 進階訓練';if((S.xp[d]||0)<=0)return'Jill 先做過一次';return D.diff>Math.min(3,m.lv)?`LV${D.diff}`:''}
 function chefHandles(s){const j=s.job;if(!j)return null;if(j.chef){/* 2.0: the cook who started it keeps it — a second cook of the same duty is a real second pair of hands */const own=(S.crew||[]).find(m=>m.id===j.chef&&m.role==='chef');if(own)return own}const ch=chefFor(s.type);if(!ch)return null;return ch.lv>=3&&chefCan(ch,j.d)?ch:null}
 function chefDelay(m){return Math.max(.45,1.5-.22*(m.lv-1))}
 function chefScore(m){return[.8,.86,.9,.95,1][m.lv-1]}
@@ -3769,7 +3808,7 @@ function showPrep(){phase='prep';mainScreen='prep';R=null;room='main';lifeReset(
   <div class="meta">${fmt(priceOf(d))} · 成本 ${fmt(costOf(d))} · ${D.steps.length} 步驟・${mechN(d)}${stationOk(d)?'':` · <b style="color:var(--tomato)">缺少${ST_N[D.st]}，客人不會點</b>`}</div>
   ${!on&&F.stock&&st>0?`<div class="ctl offstock"><span>冰箱裡還有 ${st} 份，佔著位子</span><button class="btn sm" data-act="stock" data-d="${d}" data-v="-99">退掉（退 ${fmt(st*costOf(d))}）</button></div>`:''}
   ${on&&(F.prices||F.stock)?`<div class="ctl">${F.prices?`<span class="step"><label>售價</label><button data-act="price" data-d="${d}" data-v="-1" aria-label="降價">−</button><span>${fmt(priceOf(d))}${m!==1?` <small>${m>1?'+':''}${Math.round((m-1)*100)}%</small>`:''}</span><button data-act="price" data-d="${d}" data-v="1" aria-label="漲價">＋</button></span>`:''}${F.stock?(()=>{const sg=sug[d]||0;const q1=stockQuote(d,1);return`<span class="step stk"><label>庫存</label><button data-act="stock" data-d="${d}" data-v="-1" aria-label="退一份" ${st>0?'':'disabled'}>−</button><span>${st} 份</span><button data-act="stock" data-d="${d}" data-v="1" aria-label="進一份" ${q1.n>0?'':'disabled'}>＋</button></span><span class="stkq"><button class="mini" data-act="stockTo" data-d="${d}" data-k="sug" ${st<sg&&q1.n>0?'':'disabled'}>補到建議 ${sg}</button><button class="mini" data-act="stockTo" data-d="${d}" data-k="max" ${q1.n>0?'':'disabled'}>補滿</button></span>`})():''}${F.prices?priceFeelHTML(d):''}${F.stock&&st===0?'<span class="warnpill">沒有備料</span>':''}</div>`:''}</div>`}).join('');
- const sig=S.signature?`<div class="sig"><img alt="" src="${dishURL('signature','P')}"><div><div class="st">★ CHEF JILL'S SIGNATURE ★</div><b>${S.signature.name}</b><small>${fmt(priceOf('signature'))} · 庫存 ${S.stock.signature||0} 份 · 永遠在菜單最上方</small>${F.stock?`<div style="margin-top:6px" class="step"><button data-act="stock" data-d="signature" data-v="-2" style="color:var(--cream)">−</button><span style="color:var(--cream)">${S.stock.signature||0} 份</span><button data-act="stock" data-d="signature" data-v="2" style="color:var(--cream)">＋</button></div>`:''}</div></div>`:'';
+ const sig=S.signature?`<div class="sig"><img alt="" src="${dishURL('signature','P')}"><div><div class="st">★ CHEF JILL'S SIGNATURE ★</div><b>${S.signature.name}</b><small>${fmt(priceOf('signature'))} · 庫存 ${S.stock.signature||0} 份 · 永遠在菜單最上方</small>${F.stock?`<div style="margin-top:6px" class="step"><button data-act="stock" data-d="signature" data-v="-2" style="color:var(--cream)">−</button><span style="color:var(--cream)">${S.stock.signature||0} 份</span><button data-act="stock" data-d="signature" data-v="2" style="color:var(--cream)">＋</button></div>`:''}</div></div>${S.sigDessert?`<div class="sig sigd"><img alt="" src="${dishURL('sigdessert','P')}"><div><div class="st">★ JILL'S SIGNATURE DESSERT ★</div><b>${S.sigDessert.name}</b><small>${fmt(priceOf('sigdessert'))} · 庫存 ${S.stock.sigdessert||0} 份 · 排在招牌菜下面</small>${F.stock?`<div style="margin-top:6px" class="step"><button data-act="stock" data-d="sigdessert" data-v="-2" style="color:var(--cream)">−</button><span style="color:var(--cream)">${S.stock.sigdessert||0} 份</span><button data-act="stock" data-d="sigdessert" data-v="2" style="color:var(--cream)">＋</button></div>`:''}</div></div>`:''}`:'';
  show(`<div class="sheet tall"><div class="sh-top"><div class="ttl"><div class="eyebrow">DAY ${S.day} · 開店前</div><h2>${LV().n}</h2></div>${topIcons()}</div>
   <div class="card today"><div class="wx">${SVG[W.ic||T.weather]||SVG.sun}</div><div><b>${W.n} · 預計約 ${T.people} 位客人</b><p>${W.d}${S.buzz>1?' 店裡最近很紅，人潮會多一些。':''}${(()=>{const w=(S.crew||[]).filter(m=>m.role==='waiter').length;const NT=tablesTotal();return NT>w*6+8?`<br><b style="color:#B8432C">⚠ ${NT} 張桌、${w} 位服務生：桌數比服務生顧得來的多，客人會等太久。</b>`:''})()}</p>${(()=>{const h=wxHints();return h.length?`<p class="hint">今天可能要多準備：<b>${h.map(dishName).join('、')}</b></p>`:''})()}${(()=>{const off=wxOffMenu();if(!off.length)return'';const full=S.menu.filter(x=>S.unlocked.includes(x)).length>=menuCap();return`<p class="hint">今天的天氣也適合，但不在今天的菜單上：</p><div class="wxadd">${off.map(d=>`<button class="mini ${menuSwap===d?'on':''}" data-act="menuAdd" data-d="${d}">＋ ${dishName(d)}</button>`).join('')}</div>${full&&!menuSwap?`<p class="small muted">菜單已滿（${menuCap()} 道）——點一道，選要換掉哪一道。</p>`:''}${menuSwapHTML()}`})()}</div></div>
   ${stationWarnings().map(w=>`<div class="stwarn">⚠ <b>${DUTY_N[w.st]}目前無人</b><span>今日有 ${w.n} 道料理需要${ST_N[w.st]}，沒有廚師的話全部由 Jill 自己做。</span><button class="btn sm" data-act="staffTab">安排員工</button></div>`).join('')}
@@ -3782,7 +3821,7 @@ function showPrep(){phase='prep';mainScreen='prep';R=null;room='main';lifeReset(
    return`<h3>⭐ 今日推薦</h3><div class="card reco"><p class="d">客人今天會比較容易點這道菜。想主推哪一道就選它，再多備一點料。</p><div class="opts">${list.map(d=>`<button class="${reco===d?'on':''}" data-act="reco" data-d="${d}">${reco===d?'⭐ ':''}${dishName(d)}</button>`).join('')}</div>
    <p class="small">${reco?`今日推薦：<b>${dishName(reco)}</b>，預估約 ${Math.max(1,Math.round(exp[reco]||0))} 份。`:'還沒選。'}${dt?` 今日任務要賣 ${dt.n} 份${dishName(dt.d)}${reco===dt.d?'，就是這道。':`（預估約 ${Math.max(1,Math.round(exp[dt.d]||0))} 份）——推薦它會比較容易。`}`:''}</p></div>`})()}
   ${F.prices&&menuList().some(d=>DISH(d).cat==='drink'||DISH(d).cat==='dessert')?`<h3>套餐</h3><div class="card sets"><p class="d">要不要推套餐？點主餐的客人會更常加點；加點的那一份便宜一點。單點照常。</p>${Object.keys(SETS).map(k=>`<button class="setb ${setOn(k)?'on':''}" data-act="setT" data-k="${k}"><b>${setOn(k)?'✓ ':''}${SETS[k].n}</b><small>${SETS[k].d}${(S.setHist&&S.setHist[k]&&S.setHist[k].n)?`<br>累計賣出 ${S.setHist[k].n} 份・${fmt(S.setHist[k].rev)}`:''}</small></button>`).join('')}</div>`:''}
-  <h3>今日菜單 <small>${menuN}/${menuCap()} 道${S.signature?' ＋ 招牌菜':''}</small></h3>
+  <h3>今日菜單 <small>${menuN}/${menuCap()} 道${S.signature?' ＋ 招牌菜':''}${S.sigDessert?' ＋ 招牌甜點':''}</small></h3>
   ${sig}<div class="card">${rows||'<p class="muted">還沒有料理</p>'}</div>
   ${F.stock?`<div class="cap"><span>冰箱</span><div class="capbar"><i style="width:${tot/cap*100}%"></i></div><span>${tot}/${cap}</span></div>${S.today&&S.today.sugCapped?`<p class="small" style="margin:4px 2px 6px">冰箱裝不下今天的預估需求（約 ${S.today.sugCapped} 份，容量 ${cap}），建議量已按容量縮減，熱門菜可能提早賣完；升級冰箱或冷藏庫可以多放。</p>`:''}<button class="btn sm" data-act="restock" ${restockCost>0?'':'disabled'} style="width:100%">一鍵補到建議量 ${restockCost>0?fmt(restockCost):'（已足夠）'}</button>${(()=>{const off=unlocked.filter(d=>!S.menu.includes(d)&&(S.stock[d]||0)>0);if(!off.length)return'';const n=off.reduce((a,d)=>a+S.stock[d],0);return`<button class="btn sm" data-act="${discardArmed?'discardAll':'discardAsk'}" style="width:100%;margin-top:6px">${discardArmed?`確定退掉這 ${n} 份？（再按一次）`:`退掉不在菜單上的庫存（${n} 份）`}</button>`})()}`:`<p class="muted" style="font-size:12.5px;margin:8px 2px 0">前兩天會自動備料。第 3 天開始可以自己進貨、調整售價。</p>`}
   ${S.day>=2?`<button class="btn sm" data-act="backShop" style="width:100%;margin-top:10px">‹ 返回升級餐廳</button>`:''}
@@ -3877,7 +3916,10 @@ function showShop(){phase='shop';mainScreen='shop';R=null;rdAutoUnlock();IDLE=ma
     <div class="cg-cmp">${ms.map(m=>`<div class="cg-row"><span class="cg-n">${m.name}</span><span class="pips">${[1,2,3,4,5].map(i=>`<i class="${i<=m.lv?'on':''}"></i>`).join('')}</span><span class="cg-d">${role==='chef'?(DUTY_N[m.duty]||'待命'):role==='waiter'?dutyLabel(m):'收桌'}</span><span class="cg-s">${crewStat(m)}</span></div>`).join('')}</div>${ms.map(crewCard).join('')}</div>`}
   body+=`<div class="nm" style="font-weight:800;font-size:15px;margin:14px 0 2px">招募</div>`+Object.keys(ROLES).map(r=>{const R0=ROLES[r];return`<div class="item"><img alt="" src="${iconURL(r)}"><div class="nm">${R0.n}</div><div class="d">${R0.d} 日薪 ${fmt(R0.wage)} 起，LV5 ${fmt(Math.round(R0.wage*2.8))}。</div><div class="act">${crew.length>=cap?`<span class="lock">${LEVELS[S.level]?'人數已滿，擴建後可再聘':opsLv('room')?'人數已滿':'人數已滿，後場休息室可以再多 2 位'}</span>`:btn(R0.hire,'hire',`data-k="${r}"`,'聘請')}</div></div>`}).join('')}
  if(shopTab==='sig'){if(S.signature)body+=`<div class="sig"><img alt="" src="${dishURL('signature','P')}"><div><div class="st">★ CHEF JILL'S SIGNATURE ★</div><b>${S.signature.name}</b><small>${fmt(priceOf('signature'))} · ${Object.keys(SIG).map(k=>SIG[k][S.signature[k]].n).join('・')}</small><small style="display:block;margin-top:3px">${sigLv()>=3?'第三版 · 食用花與金箔':sigLv()===2?`第二版 · 醬汁畫盤與嫩葉 · 賣到 ${SIG_EVO[2]} 份升第三版（目前 ${sigSold()}）`:`第一版 · 賣到 ${SIG_EVO[1]} 份升第二版（目前 ${sigSold()}）`}</small></div></div><p class="muted" style="font-size:12.5px">招牌菜永遠在菜單最上方，有些客人會專程為它而來。賣得夠多，Jill 會把盤子做得更講究、價格也高一點。可以花 $800 重新調整配方。</p>${btn(800,'sigOpen','','重新設計')}`;
-  else body+=`<div class="item"><img alt="" src="${dishURL('signature','P')}"><div class="nm">Jill's Signature Dish</div><div class="d">從主食、蛋白質、醬汁、配菜組出一道只屬於 Jill 的料理。會出現在菜單最上方，客人也會專程為它而來（客流 +10%）。</div><div class="act">${S.level<2?'<span class="lock">需要擴建到 Jill\'s Bistro</span>':btn(3000,'sigOpen','','開始研發')}</div></div>`}
+  else body+=`<div class="item"><img alt="" src="${dishURL('signature','P')}"><div class="nm">Jill's Signature Dish</div><div class="d">從主食、蛋白質、醬汁、配菜組出一道只屬於 Jill 的料理。會出現在菜單最上方，客人也會專程為它而來（客流 +10%）。</div><div class="act">${S.level<2?'<span class="lock">需要擴建到 Jill\'s Bistro</span>':btn(3000,'sigOpen','','開始研發')}</div></div>`;
+  /* v2.2.1 #16: the second signature — a dessert of Jill's own, plated at the 冷盤台, with its own versions */
+  if(S.sigDessert)body+=`<div class="sig sigd"><img alt="" src="${dishURL('sigdessert','P')}"><div><div class="st">★ JILL'S SIGNATURE DESSERT ★</div><b>${S.sigDessert.name}</b><small>${fmt(priceOf('sigdessert'))} · ${Object.keys(SIGD).map(k=>SIGD[k][S.sigDessert[k]].n).join('・')}</small><small style="display:block;margin-top:3px">${sigDLv()>=3?'第三版 · 糖絲與金箔':sigDLv()===2?`第二版 · 果泥畫盤與薄荷 · 賣到 ${SIGD_EVO[2]} 份升第三版（目前 ${sigDSold()}）`:`第一版 · 賣到 ${SIGD_EVO[1]} 份升第二版（目前 ${sigDSold()}）`}</small></div></div><p class="muted" style="font-size:12.5px">招牌甜點排在招牌菜下面，為招牌菜來的客人多半會把它一起點了；在冷盤台冷作擺盤。賣得夠多，盤子會越做越講究。可以花 $800 重新調整配方。</p>${btn(800,'sigdOpen','','重新設計')}`;
+  else body+=`<div class="item"><img alt="" src="${dishURL('sigdessert','P')}"><div class="nm">Jill's Signature Dessert</div><div class="d">從底、奶餡、水果、點綴組出一道 Jill 自己的甜點：在冷盤台冷作擺盤，排在招牌菜下面，為招牌菜來的客人多半會一起點。有自己的版本進程。</div><div class="act">${!S.signature?'<span class="lock">先研發招牌菜</span>':S.level<3?'<span class="lock">需要擴建到 Jill\'s Kitchen</span>':stationCap('prep')<=0?'<span class="lock">需要冷盤台（廚房設備）</span>':btn(4000,'sigdOpen','','開始研發')}</div></div>`}
  show(`<div class="sheet tall"><div class="sh-top"><div class="ttl"><div class="eyebrow">${S.phase==='prep'?`DAY ${S.day} · 開店前`:`DAY ${S.day} · 打烊後`}</div><h2>升級 Jill 的餐廳</h2></div>${topIcons()}</div>
   <div class="row" style="margin-bottom:6px"><span class="muted" style="font-weight:700">目前現金</span><span class="moneytag">${fmt(S.money)}</span><span style="margin-left:auto" class="muted">評分 ${rating().toFixed(1)}</span></div>
   ${(()=>{const est=restockEstimate(),keep=keepAside();const low=S.money<keep;const when=S.phase==='prep'?'今天':'明日';return`<div class="budget ${low?'low':''}"><span>${when}預估基本備料 約 ${fmt(est)}</span><span>建議保留 約 ${fmt(keep)}</span>${low?`<span class="w">⚠ 現在的現金可能不夠完成建議備料，${when}可以少備一點或臨時叫貨</span>`:''}</div>`})()}
@@ -3885,15 +3927,16 @@ function showShop(){phase='shop';mainScreen='shop';R=null;rdAutoUnlock();IDLE=ma
   <div class="card">${body}</div>
   <div class="footer">${S.phase==='prep'?`<button class="btn primary big" data-act="toPrep">回到開店準備 ›</button>`:`<button class="btn primary big" data-act="nextDay">準備 DAY ${S.day+1}</button>`}</div></div>`)}
 
-let sigDraft=null;
-function showSig(){sub='sig';const d=sigDraft;const old=S.signature;S.signature=d;const url=dishCanvas('signature','P',220,S.decor.ware>0);S.signature=old;const price=320+Object.keys(SIG).reduce((a,k)=>a+SIG[k][d[k]].p,0);
- show(`<div class="sheet tall"><div class="sh-top"><div class="ttl"><div class="eyebrow">Jill's Signature Dish</div><h2>設計招牌菜</h2></div><button class="btn sm" data-act="closeSub">取消</button></div>
-  <div class="sigprev"><canvas id="sigCv" width="220" height="220"></canvas><div><div class="eyebrow">★ CHEF JILL'S SIGNATURE ★</div><div style="font-family:var(--disp);font-size:19px;margin:4px 0">${d.name}</div><div class="muted" style="font-size:12.5px">售價 ${fmt(price)} · 在爐台用平底鍋煎，看準時機起鍋</div></div></div>
-  ${Object.keys(SIG).map(cat=>`<h3>${SIG_CAT_N[cat]}</h3><div class="opts">${Object.keys(SIG[cat]).map(k=>`<button class="${d[cat]===k?'on':''}" data-act="sigPick" data-c="${cat}" data-k="${k}">${SIG[cat][k].n}<small>+${SIG[cat][k].p}</small></button>`).join('')}</div>`).join('')}
-  <h3>菜名</h3><input class="txt" id="sigName" maxlength="18" value="${d.name.replace(/"/g,'&quot;')}">
-  <div class="footer"><button class="btn primary big" data-act="sigMake" ${S.money>=(S.signature?800:3000)?'':'disabled'}>${S.signature?'更新配方 $800':'研發招牌菜 $3,000'}</button></div></div>`);
+let sigDraft=null,sigKind='m';   /* 'm' the main signature, 'd' the dessert (v2.2.1 #16) — one designer, two tables */
+function sigT(){return sigKind==='d'?{T:SIGD,N:SIGD_CAT_N,id:'sigdessert',key:'sigDessert',base:150,eyebrow:"Jill's Signature Dessert",title:'設計招牌甜點',st:"★ JILL'S SIGNATURE DESSERT ★",how:'在冷盤台冷作擺盤：底、奶餡、水果、點綴',make:4000,mk:'研發招牌甜點 $4,000'}:{T:SIG,N:SIG_CAT_N,id:'signature',key:'signature',base:320,eyebrow:"Jill's Signature Dish",title:'設計招牌菜',st:"★ CHEF JILL'S SIGNATURE ★",how:'在爐台用平底鍋煎，看準時機起鍋',make:3000,mk:'研發招牌菜 $3,000'}}
+function showSig(){sub='sig';const d=sigDraft;const K=sigT();const old=S[K.key];S[K.key]=d;DCACHE.clear();const url=dishCanvas(K.id,'P',220,S.decor.ware>0);S[K.key]=old;DCACHE.clear();const price=K.base+Object.keys(K.T).reduce((a,k)=>a+K.T[k][d[k]].p,0);const has=!!S[K.key];
+ show(`<div class="sheet tall"><div class="sh-top"><div class="ttl"><div class="eyebrow">${K.eyebrow}</div><h2>${K.title}</h2></div><button class="btn sm" data-act="closeSub">取消</button></div>
+  <div class="sigprev"><canvas id="sigCv" width="220" height="220"></canvas><div><div class="eyebrow">${K.st}</div><div style="font-family:var(--disp);font-size:19px;margin:4px 0">${d.name}</div><div class="muted" style="font-size:12.5px">售價 ${fmt(price)} · ${K.how}</div></div></div>
+  ${Object.keys(K.T).map(cat=>`<h3>${K.N[cat]}</h3><div class="opts">${Object.keys(K.T[cat]).map(k=>`<button class="${d[cat]===k?'on':''}" data-act="sigPick" data-c="${cat}" data-k="${k}">${K.T[cat][k].n}<small>+${K.T[cat][k].p}</small></button>`).join('')}</div>`).join('')}
+  <h3>${sigKind==='d'?'甜點名':'菜名'}</h3><input class="txt" id="sigName" maxlength="18" value="${d.name.replace(/"/g,'&quot;')}">
+  <div class="footer"><button class="btn primary big" data-act="sigMake" ${S.money>=(has?800:K.make)?'':'disabled'}>${has?'更新配方 $800':K.mk}</button></div></div>`);
  const cv=$('#sigCv');cv.getContext('2d').drawImage(url,0,0)}
-function sigAutoName(d){return`Jill's ${SIG.sauce[d.sauce].n}${SIG.protein[d.protein].n}`}
+function sigAutoName(d){return sigKind==='d'?`Jill's ${SIGD.fruit[d.fruit].n}${SIGD.base[d.base].n}`:`Jill's ${SIG.sauce[d.sauce].n}${SIG.protein[d.protein].n}`}
 
 let bookTab='reviews';
 /* what the last reviews keep saying, in one line the player can act on */
@@ -3956,7 +3999,7 @@ function showBook(){sub='book';let body='';
  if(bookTab==='mem'){body=`<p class="muted" style="font-size:12.5px;margin:0 0 10px">店裡的日常，剛好被看到的時候會留下一張。第一次的畫面會珍藏起來，其他的會慢慢換新。</p>`+albumStoryHTML()}
  if(bookTab==='ach'){const n=ACH.filter(a=>S.achievements[a.id]).length;const groups=[['早期',a=>!a.h&&(a.p||0)===0],['中期',a=>!a.h&&a.p===1],['成熟的餐廳',a=>!a.h&&a.p===2],['自己發生的事',a=>a.h]];
   body=`<p class="muted" style="font-size:12.5px;margin:0 0 8px">${n} / ${ACH.length} 已解鎖。有些成就不會先告訴你是什麼。</p>`+groups.map(([title,f])=>{const list=ACH.filter(f);if(!list.length)return'';const got=list.filter(a=>S.achievements[a.id]).length;return`<div class="jt" style="margin-top:12px">${title} <span class="muted" style="font-weight:600;font-size:12px">${got}/${list.length}</span></div><div class="card">`+list.map(a=>{const g0=S.achievements[a.id];const veil=a.h&&!g0;return`<div class="ach ${g0?'':'off'}"><img alt="" src="${iconURL(veil?'moon':a.ic)}"><b>${veil?'？？？':a.n}</b><small>${veil?'……':a.d}${g0?` · DAY ${g0}`:''}</small></div>`}).join('')+'</div>'}).join('')}
- if(bookTab==='mastery'){body=`<p class="muted" style="font-size:12.5px;margin:0 0 8px">Jill 越常做一道菜，就做得越快，Perfect 判定也越寬。</p><div class="card">`+S.unlocked.concat(S.signature?['signature']:[]).map(d=>{const x=S.xp[d]||0,lv=mLv(d);const cur=XP_T[lv-1],nx=XP_T[lv]||cur;const pct=lv>=5?100:(x-cur)/(nx-cur)*100;return`<div class="mast"><img alt="" src="${dishURL(d,'P')}"><b style="font-size:13.5px">${DISH(d).n}</b><span class="tier ${lv>=5?'t2':lv>=3?'t1':''}">LV${lv}</span><div class="bar" style="grid-column:2"><i style="width:${pct}%"></i></div><small class="muted">${DISH(d).steps.length} 步驟</small></div>`}).join('')+'</div>'}
+ if(bookTab==='mastery'){body=`<p class="muted" style="font-size:12.5px;margin:0 0 8px">Jill 越常做一道菜，就做得越快，Perfect 判定也越寬。</p><div class="card">`+S.unlocked.concat(S.signature?['signature']:[],S.sigDessert?['sigdessert']:[]).map(d=>{const x=S.xp[d]||0,lv=mLv(d);const cur=XP_T[lv-1],nx=XP_T[lv]||cur;const pct=lv>=5?100:(x-cur)/(nx-cur)*100;return`<div class="mast"><img alt="" src="${dishURL(d,'P')}"><b style="font-size:13.5px">${DISH(d).n}</b><span class="tier ${lv>=5?'t2':lv>=3?'t1':''}">LV${lv}</span><div class="bar" style="grid-column:2"><i style="width:${pct}%"></i></div><small class="muted">${DISH(d).steps.length} 步驟</small></div>`}).join('')+'</div>'}
  show(`<div class="sheet tall"><div class="sh-top"><div class="ttl"><div class="eyebrow">JILL'S KITCHEN JOURNAL</div><h2>餐廳日誌</h2></div><button class="btn sm" data-act="closeSub">關閉</button></div>
   <div class="tabs">${[['front','總覽'],['rest','餐廳'],['reviews','評價'],['regulars','熟客'],['talk','話語'],['mem','相簿'],['cats','店貓'],['ach','成就'],['mastery','熟練度']].map(([k,n])=>`<button class="${bookTab===k?'on':''}" data-act="btab" data-k="${k}">${n}</button>`).join('')}</div>${body}</div>`)}
 let resetStep=0;
@@ -4048,9 +4091,10 @@ function doAct0(a,d,k,b){
  case'closeEarly':paused=false;hideScreen();closeShop('Jill 提早打烊，等店裡客人吃完就結算');break;
  case'closeNow':paused=false;hideScreen();clearCheckpoint();closeShop('今天到此為止，準備結算');for(const g of R.groups.slice()){if(g.state==='check')collect(g);else if(g.state!=='leave')leaveGroup(g,'ok')}for(const t of R.tables){t.dirty=false;t.plates=[]}break;
  case'nextDay':clearCheckpoint();S.day++;S.today=null;S.todayCost=0;S.lastSummary=null;S.phase='prep';applyGates();planToday();save();showPrep();break;
- case'sigOpen':sigDraft=S.signature?{...S.signature}:{base:'mash',protein:'duck',sauce:'redwine',side:'asparagus',name:''};if(!sigDraft.name)sigDraft.name=sigAutoName(sigDraft);showSig();break;
+ case'sigOpen':sigKind='m';sigDraft=S.signature?{...S.signature}:{base:'mash',protein:'duck',sauce:'redwine',side:'asparagus',name:''};if(!sigDraft.name)sigDraft.name=sigAutoName(sigDraft);showSig();break;
+ case'sigdOpen':{if(!S.sigDessert&&(!S.signature||S.level<3||stationCap('prep')<=0))break;sigKind='d';sigDraft=S.sigDessert?{...S.sigDessert}:{base:'pannacotta',cream:'mascarpone',fruit:'berries',finish:'caramel',name:''};if(!sigDraft.name)sigDraft.name=sigAutoName(sigDraft);showSig();break}
  case'sigPick':{const auto=sigDraft.name===sigAutoName(sigDraft);const nm=$('#sigName');if(nm&&!auto)sigDraft.name=nm.value;sigDraft[b.dataset.c]=k;if(auto)sigDraft.name=sigAutoName(sigDraft);keepScroll(showSig);break}
- case'sigMake':{const cost=S.signature?800:3000;if(S.money<cost)break;const nm=($('#sigName').value||'').trim()||sigAutoName(sigDraft);S.money-=cost;const first=!S.signature;S.signature={...sigDraft,name:nm.slice(0,18)};if(first){S.xp.signature=0;S.stock.signature=S.stock.signature||0;ach('sig')}ICACHE.clear();DCACHE.clear();sfx.fire();banner("★ SIGNATURE ★",nm);save();sub=null;shopTab='sig';showShop();break}
+ case'sigMake':{const K=sigT();const cost=S[K.key]?800:K.make;if(S.money<cost)break;const nm=($('#sigName').value||'').trim()||sigAutoName(sigDraft);S.money-=cost;const first=!S[K.key];S[K.key]={...sigDraft,name:nm.slice(0,18)};if(first){S.xp[K.id]=0;S.stock[K.id]=S.stock[K.id]||0;ach(sigKind==='d'?'sigd':'sig')}ICACHE.clear();DCACHE.clear();sfx.fire();banner(sigKind==='d'?"★ SIGNATURE DESSERT ★":"★ SIGNATURE ★",nm);save();sub=null;shopTab='sig';showShop();break}
  case'guide':showGuide();break;
  case'peek':screenEl.hidden=true;$('#peekPill').hidden=false;renderRoomTabs(true);break;
  case'book':bookTab='front';showBook();break;
