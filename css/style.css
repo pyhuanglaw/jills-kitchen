@@ -608,6 +608,7 @@ html.desk button,html.desk [data-act],html.desk .polaroid{cursor:pointer}
 .sl-h .faces{display:flex}.sl-h .faces img,.sl-h .faces i{width:38px;height:38px;border-radius:50%;object-fit:cover;object-position:top;background:#EFE5D3;border:2px solid #fff;display:block}.sl-h .faces>*+*{margin-left:-10px}
 .sl-t{font-size:13px;color:var(--ink2)}.sl-more{margin:6px 0 0;font-size:12.5px;color:var(--ink2);font-style:italic}
 .sline.ghost{opacity:.7}.sline.ghost .faces i{background:#DCD3C2}
+.goalline.linkline{width:100%;border:0;font:inherit;text-align:left;cursor:pointer;margin-top:8px}
 /* v2.3 follow-up: the ticket of a guest who came because of a campaign; a story beat's record */
 .tk-who .via{font-style:normal;font-size:10px;margin-left:2px;line-height:1}
 .sline .sb{font-size:12.5px;line-height:1.55;border-top:1px dashed rgba(0,0,0,.08);padding:3px 0}.sline .sb:first-child{border-top:0}

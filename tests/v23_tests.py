@@ -662,7 +662,7 @@ def followup_story_progress_is_visible_retrievable_and_honest(b, port, target):
     load_fixture(g, 'player_day48.json'); g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(1200)
     check(g.ev("document.querySelector('#storyNote').hidden"), 'loading an old save announces nothing')
     g.ev("bookTab='story';showBook()"); g.page.wait_for_timeout(80); txt = g.ev("document.body.innerText")
-    check('人物故事' in txt and '開始記得彼此' not in txt and '餐廳故事' not in txt, 'no v2.3 beat that never happened, and no restaurant chapters')
+    check('人物故事' in txt and '開始記得彼此' not in txt and '餐廳故事' in txt, 'no v2.3 beat that never happened; the restaurant story (restored) is there')
     for w in ['madeSpace', 'choseNear', 'sharedFood', 'waitedFor', 'copresent']:
         check(w not in txt, f'no internal name on the page: {w}')
     dy = json.loads(g.ev("JSON.stringify((()=>{const L=STORY_LINES.find(x=>x.k==='dylan');return{open:L.open(),who:L.who(),title:L.title(),faces:L.faces(),done:lineProgress(L).done.map(x=>x.t),stage:S.dylan.stage}})())"))
@@ -802,4 +802,41 @@ def followup_the_manual_describes_the_current_game(b, port, target):
         check(stale not in txt, f'stale line removed: {stale}')
     g.ev("showGuide()"); g.page.wait_for_timeout(50)
     check('故事' in g.ev("document.querySelector('#screen').innerText") and '社群與宣傳' in g.ev("document.querySelector('#screen').innerText"), 'the manual screen shows the new sections')
+    check(not g.errors, g.errors[:3]); g.close()
+
+@test
+def qa_merged_room_tabs_cushion_light_and_social_entrances(b, port, target):
+    """v2.3 QA items merged from wip/qa-normal-play (READY), on the player's own Day 52 save at phone size: the room
+    tabs sit under the ticket rail (never over the top row); two cats on the one cushion stay side by side — also when
+    one leaves and another comes; the chandelier's light reaches the floor; 社群與宣傳 is reachable from the prep
+    screen, the shop (right after 店舖工程) and the journal, where during service it is read-only."""
+    g = Game(b, port, target, seed=105, manual=True, viewport={'width': 390, 'height': 844})
+    load_fixture(g, 'player_day52.json'); g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(300)
+    order = g.ev("[...document.querySelectorAll('#screen [data-act=tab]')].map(b=>b.innerText.trim())")
+    check('社群與宣傳' in order and order.index('社群與宣傳') == order.index('店舖工程') + 1, f'the shop (this save was left in it after closing) lists 社群與宣傳 right after 店舖工程: {order}')
+    g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(400)
+    # the prep screen's link line opens the journal on 社群
+    check(g.ev("!!document.querySelector('#screen [data-act=bookSocial]')"), 'the prep screen has a 社群與宣傳 line')
+    g.click('#screen [data-act=bookSocial]'); g.page.wait_for_timeout(100)
+    txt = g.ev("document.querySelector('#screen').innerText")
+    check(g.ev("sub==='book'&&bookTab==='social'") and 'Jill 今天要發什麼' in txt and '宣傳' in txt, 'it opens the journal on 社群')
+    check(g.ev("!!document.querySelector('#screen [data-act=campaign]')"), 'before opening, a campaign can be started from there')
+    g.ev("closeSub()")
+    # the chandelier (bought on DAY 44 in this save): a soft second light low in the room
+    L = json.loads(g.ev("JSON.stringify({on:projOn('chandelier'),spots:lightSpots(),LH})"))
+    soft = [x for x in L['spots'] if x.get('soft')]
+    check(L['on'] and soft and soft[0]['y'] + soft[0]['r'] >= L['LH'] * .95, f"the main light reaches the floor: {soft} / LH {L['LH']}")
+    # service: the room tabs under the ticket rail
+    start_day(g); g.ev(P7_HELPERS); g.ev("__tick(60)")
+    g.ev("for(const w of ['sophie','mia','koba']){__p7.seat(w)}for(const q of R.groups)if(q.table!=null&&!q.ticket){q.state='reading';createTicket(q)}tkVer=-1;renderTickets()"); g.page.wait_for_timeout(120)
+    r = json.loads(g.ev("JSON.stringify({rt:document.querySelector('#roomTabs').getBoundingClientRect(),tk:document.querySelector('#tickets').getBoundingClientRect(),hid:document.querySelector('#roomTabs').hidden,n:R.tickets.length})"))
+    check(not r['hid'] and r['n'] >= 1 and r['rt']['top'] >= r['tk']['bottom'] - 1, f"the room tabs sit under the ticket rail: {r}")
+    # the cushion: two side by side; one leaves, the next takes the free half
+    cu = json.loads(g.ev("JSON.stringify((()=>{const a=catBy('mei'),b=catBy('ban'),c=catBy('mikan');for(const x of CATS)releaseSpots(x);OCC.bed=[];catGo(a,'bed');catGo(b,'bed');const d1=Math.abs(a.tx-b.tx);releaseSpots(a);catGo(c,'bed');const d2=Math.abs(c.tx-b.tx);return{d1,d2,n:OCC.bed.length}})())"))
+    check(cu['d1'] >= 14 and cu['d2'] >= 14 and cu['n'] == 2, f'two cats on one cushion never on top of each other: {cu}')
+    # the journal's 社群 during service: look, do not buy
+    g.ev("paused=true;bookTab='social';showBook()"); g.page.wait_for_timeout(80)
+    txt = g.ev("document.querySelector('#screen').innerText")
+    check(not g.ev("!!document.querySelector('#screen [data-act=jillPost],#screen [data-act=campaign]')") and '營業中先看就好' in txt, 'during service the 社群 page is read-only')
+    g.ev("closeSub()"); check(g.ev("phase==='service'&&(sub===null||sub==='pause')"), 'closing goes back to the paused service: ' + str(g.ev("[phase,sub]")))
     check(not g.errors, g.errors[:3]); g.close()
