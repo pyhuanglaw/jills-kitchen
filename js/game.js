@@ -186,21 +186,21 @@ const NAMES={
 };
 const REGS=[
  {id:'chen',n:'陳伯伯',day:2,type:'regular',size:1,fav:['friedrice','risotto'],looks:[{skin:'#EDC19C',hair:'#C9C3BA',hs:5,top:'#7B8B6F',acc:'glasses',pants:'#5A5048'}],
-  l:['一份炒飯，謝謝。','Jill，今天還是老樣子。','我記得你這裡剛開幕的時候只有四張桌子。'],who:'住在附近的退休老師，每天散步都會經過。'},
+  l:['一份炒飯，謝謝。','Jill，今天還是老樣子。'],cb:[{k:'fourTables',t:'我記得你這裡剛開幕的時候只有四張桌子。',once:1,need:()=>S.level>=2}],who:'住在附近的退休老師，每天散步都會經過。'},
  {id:'mia',n:'Mia',day:3,type:'office',size:1,fav:['coffee','tiramisu'],looks:[{skin:'#F6D3B5',hair:'#2B1D16',hs:1,top:'#3E5A7A',acc:'scarf',pants:'#2E2B33'}],
   l:['一杯咖啡，謝謝。今天好長。','Jill 主廚，今天也拜託你的咖啡續命。','每次加班完來這裡，才覺得今天有被好好對待。'],who:'樓上設計公司的設計師，永遠在趕稿。'},
  {id:'koba',n:'小林',day:4,type:'office',size:1,fav:['burger','pasta'],looks:[{skin:'#E2AE88',hair:'#1E1E24',hs:0,top:'#2F3B4C',acc:'tie',pants:'#2E2B33'}],
-  l:['哪個最快？我十分鐘後要回公司。','Jill，老樣子，快快快。','我升職那天也是來這裡慶祝的，你還記得嗎？'],who:'業務員，吃飯永遠像在比賽。'},
+  l:['哪個最快？我十分鐘後要回公司。','Jill，老樣子，快快快。'],cb:[{k:'promoMemory',t:'我升職那天也是來這裡慶祝的，你還記得嗎？',once:1,need:m=>m.flags.promo>1&&S.day-m.flags.promo>=10}],who:'業務員，吃飯永遠像在比賽。'},
  {id:'leo',n:'Leo',day:5,type:'student',size:1,fav:['pasta','friedrice','burger'],looks:[{skin:'#F6D3B5',hair:'#A5652F',hs:3,top:'#C75B39',acc:'backpack',pants:'#3E4F6E'}],
-  l:['請問學生有優惠嗎？沒有也沒關係。','Jill 姊，我期末考考完了！','我畢業了，第一份薪水就是想來這裡吃一頓。'],who:'附近大學的學生，錢包很薄但很捧場。'},
+  l:['請問學生有優惠嗎？沒有也沒關係。'],who:'附近大學的學生，錢包很薄但很捧場。'},
  {id:'sophie',n:'Sophie',day:7,type:'gourmet',size:1,fav:['duck','salmon','risotto','chicken'],looks:[{skin:'#EDC19C',hair:'#6B4428',hs:2,top:'#6B3E57',acc:'beret',pants:'#3A3030'}],
-  l:['讓我看看這家店有什麼本事。','Jill，今天的醬汁我想再試一次。','我寫過很多餐廳，但只有這裡，我會想一直回來。'],who:'味覺很挑剔的美食家，嘴上嚴格，心很軟。'},
+  l:['讓我看看這家店有什麼本事。','Jill，今天的醬汁我想再試一次。'],cb:[{k:'onlyHere',t:'我寫過很多餐廳，但只有這裡，我會想一直回來。',cd:30,need:()=>(S.regulars.sophie||0)>=12}],who:'味覺很挑剔的美食家，嘴上嚴格，心很軟。'},
  /* 王先生 and 王太太 are two people: two records, two faces, two histories. They usually come together (one table,
     one bill — the visit is planned for him with her along, see regPlanVisit), sometimes one of them alone. */
  {id:'wang',n:'王先生',day:9,type:'couple',size:1,pair:'wangwife',lead:true,fav:['steak','tiramisu','basque'],looks:[{skin:'#E2AE88',hair:'#2A1F1A',hs:0,top:'#6B5140',pat:'cardi',top2:'#C9DBEA',acc:'glasses',pants:'#2E2B33'}],
-  l:['靠窗的位子可以嗎？','Jill，我們又來約會了。','結婚紀念日每年都在這裡過，這是第幾年了？'],who:'結婚多年，每週帶太太來約會一次；報紙看到一半就會被叫去點餐。'},
+  l:['靠窗的位子可以嗎？','Jill，我們又來約會了。'],cb:[{k:'annivMemory',t:'結婚紀念日每年都在這裡過，這是第幾年了？',cd:40,share:'wang',need:()=>regAnnivDay()!=null&&S.day-regAnnivDay()>=7}],who:'結婚多年，每週帶太太來約會一次；報紙看到一半就會被叫去點餐。'},
  {id:'wangwife',n:'王太太',day:9,type:'couple',size:1,pair:'wang',fav:['tiramisu','basque','steak'],looks:[{skin:'#F6D3B5',hair:'#5C3B2A',hs:7,top:'#E7B7BE',pat:'cardi',top2:'#F6E9DC',acc:null,pants:'#3B3542'}],
-  l:['甜點先看一下菜單，好嗎？','Jill，今天他又說要提早走，妳別理他。','每年紀念日都在這裡，妳的店不能關喔。'],who:'跟先生每週約會一次；甜點永遠是她點的，他負責付錢。'},
+  l:['甜點先看一下菜單，好嗎？','Jill，今天他又說要提早走，妳別理他。'],cb:[{k:'annivMemory',t:'每年紀念日都在這裡，妳的店不能關喔。',cd:40,share:'wang',need:()=>regAnnivDay()!=null&&S.day-regAnnivDay()>=7}],who:'跟先生每週約會一次；甜點永遠是她點的，他負責付錢。'},
 ];
 const REG_BY=Object.fromEntries(REGS.map(r=>[r.id,r]));
 const LEVELS=[
@@ -449,6 +449,14 @@ function legacyCrew(o){if(!o.crewMig){o.crewMig=1;o.crew=o.crew||[];if(o.staff&&
    parse -> is it one of ours -> version -> migrations -> defaults -> sanity checks. Nothing here
    touches S or localStorage. */
 const BACKUP_APP='jills-kitchen';
+/* v2.3 dialogue audit: a save from before it. A regular who had reached the third tier said their "third" line —
+   now a callback — every few visits; the player has heard it. A once-callback is marked said, a rare one starts its gap
+   today. A moving / former-students moment that already happened (their own record says so) is not a new event again. */
+function dlgAuditMig(o){if(o.dlgAudit)return o;o.dlgAudit=1;o.regMem=o.regMem||{};const M=id=>o.regMem[id]=o.regMem[id]||{seats:{},orders:{},facts:[],flags:{},last:{}};
+ const heard=[['chen','fourTables','chen'],['koba','promoMemory','koba'],['sophie','onlyHere','sophie'],['wang','annivMemory','wang'],['wangwife','annivMemory','wang']];
+ for(const [id,k,share] of heard){if(((o.regulars||{})[id]||0)<12)continue;const st=M(share);st.flags=st.flags||{};st.cb=st.cb||{};if(!st.cb[k])st.cb[k]=o.day}
+ for(const [id,flag,txt] of [['mia','moved','搬家了，還是會來。'],['chen','students','以前的學生來看他，都當爸爸了。']]){const m=M(id);m.flags=m.flags||{};const f=(m.facts||[]).find(x=>x.txt===txt);if(f&&!m.flags[flag])m.flags[flag]=Math.max(2,f.day)}
+ return o}
 function parseSave(t){let o;try{o=JSON.parse(t)}catch(e){return{err:'notjson'}}
  let photos=null;if(o&&typeof o==='object'&&o.app===BACKUP_APP&&o.save&&typeof o.save==='object'){if(o.photos&&typeof o.photos==='object')photos=o.photos;o=o.save}   /* a backup file wraps the save (and its pictures) */
  else if(o&&typeof o==='object'&&typeof o[KEY]==='string'){try{o=JSON.parse(o[KEY])}catch(e){return{err:'notjson'}}}   /* a raw localStorage dump */
@@ -456,7 +464,7 @@ function parseSave(t){let o;try{o=JSON.parse(t)}catch(e){return{err:'notjson'}}
  if(typeof o.v!=='number'||o.v%1)return{err:'notsave'};
  if(!(typeof o.day==='number'&&typeof o.money==='number'&&Array.isArray(o.unlocked)&&Array.isArray(o.menu)))return{err:'notsave'};
  if(o.v<1)return{err:'notsave'};if(o.v>SAVE_V)return{err:'newer',v:o.v};
- try{for(let n=o.v;n<SAVE_V;n++){MIGRATE[n](o);o.v=n+1}o=crewNameFix(mainHallMig(legacyWang(legacyCrew(fillDefaults(o)))))}catch(e){return{err:'broken'}}
+ try{for(let n=o.v;n<SAVE_V;n++){MIGRATE[n](o);o.v=n+1}o=dlgAuditMig(crewNameFix(mainHallMig(legacyWang(legacyCrew(fillDefaults(o))))))}catch(e){return{err:'broken'}}
  if(!(o.day>=1&&isFinite(o.money)&&o.unlocked.every(d=>typeof d==='string')&&o.menu.every(d=>typeof d==='string')&&Array.isArray(o.crew)&&o.dylan&&typeof o.dylan==='object'))return{err:'broken'};
  o.day=Math.max(1,Math.floor(o.day));o.money=Math.round(o.money);return{o,photos}}
 function load(){let t=null;try{t=localStorage.getItem(KEY)}catch(e){return null}if(!t)return null;
@@ -1180,7 +1188,7 @@ function createTicket(g){const t=R.tables[g.table];if(t&&t.lounge){/* v2.3: a Lo
  if(g.reg&&g.reg!=='dylan'){const ids=regsOf(g);tk.items.forEach((it,i)=>{const m=regMem(ids[Math.min(i,ids.length-1)]||g.reg);m.orders[it.d]=(m.orders[it.d]||0)+1});if(g.share&&tk.items.some(i=>DISH(i.d).cat==='dessert')&&Math.random()<.5)setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,'一份甜點，兩支叉子。')},800)}
  for(const it of tk.items)if(!it.lbar&&!takeStock(it))g.short=true;tk.items=tk.items.filter(it=>it.st!=='cancel');if(tk.items.some(it=>it.st==='order')){toast(`食材不夠！Jill 緊急叫貨中（1.5 倍價），${g.name} 要多等一下`);g.pat=Math.min(1,g.pat+.1)}stockWatch();
  g.ticket=tk;g.state='wait';g.pat=Math.min(1,g.pat+.12);R.tickets.push(tk);R.tv++;sfx.ticket();campaignOrder(tk);try{campaignOrderLine(g,tk)}catch(e){}{const tp=socialTopic();if(tp&&tp.k==='food'&&tp.dish&&tk.items.some(i=>i.d===tp.dish)&&Math.random()<.3&&canChat('topic',90,4))quote(g,pickT(['是不是那一道？','就是那個，我看到有人發。','聽說這個很好吃。']))}/* v2.3 */
- if(g.reg==='dylan'){dylanOrdered(g,tk)}else if(g.reg){const who=speakerOf(g);const v=S.regulars[who]||0;const tier=Math.floor(regTier(v));/* not every visit: a line when they are still new, then only now and then */if(tier===0?Math.random()<.5:Math.random()<.35)quote(g,REG_BY[who].l[tier],{who})}else if(g.type==='vip')quote(g,'把你們最好的端上來吧。');else if(Math.random()<.12)quote(g,pickT(['今天想吃點好的。','聽說這裡的東西都是 Jill 親手做的？','有推薦的嗎？算了，都點吧。']));
+ if(g.reg==='dylan'){dylanOrdered(g,tk)}else if(g.reg){const who=speakerOf(g);const v=S.regulars[who]||0;const tier=Math.floor(regTier(v));/* not every visit: a line when they are still new, then only now and then */if(tier===0?Math.random()<.5:Math.random()<.35){const t=regTalk(who,tier);if(t)quote(g,t,{who})}}else if(g.type==='vip')quote(g,'把你們最好的端上來吧。');else if(Math.random()<.12)quote(g,pickT(['今天想吃點好的。','聽說這裡的東西都是 Jill 親手做的？','有推薦的嗎？算了，都點吧。']));
  storyTick('order',{g,tk});   /* v2.3 */
  coach(2)}
 function recipeOf(d){return DISH(d).steps}
@@ -1403,12 +1411,14 @@ function compLooks(id,kind,n){const m=regMem(id);m.comp=m.comp||{};if(!m.comp[ki
 function regPlanVisit(o){const id=o.reg;if(!id||id==='dylan')return o;const r=REG_BY[id];const v=S.regulars[id]||0;const tier=regTier(v);const m=regMem(id);o.size=r.size;o.looks=r.looks;o.regs=[id];if(r.pair&&r.lead){/* the two of them, one table */o.regs=[id,r.pair];o.size=2;o.looks=r.looks.concat(REG_BY[r.pair].looks);o.name=pairName(o.regs)}o.name=o.name||r.n;
  if(v<1||momentsLeft()<=0||Math.random()<.3)return o;   /* many visits are just visits */
  const W=[];const add=(k,w)=>{if(w>0)W.push([k,w])};
- if(id==='chen'){add('walk',1);if(tier>=1&&S.day>=8&&!propOn('oranges'))add('oranges',1.2);if(tier>=1&&S.unlocked.includes('salad'))add('veg',.8);if(tier>=1&&S.day>=10)add('friend',1);if(tier>=2)add('students',.8)}
- if(id==='mia'){add('deadline',1.2);if(tier>=.5)add('delivered',1);if(tier>=1&&S.day>=9)add('coworker',1);if(tier>=1&&!m.flags.drawing)add('drawing',.9);if(tier>=2)add('moved',.6)}
+ /* v2.3 dialogue audit: habit (comes back) / occasional (`since`: a long gap since the last time) / once in a life (a flag holding the day) */
+ const since=k=>S.day-(m.flags[k]||-999);const PR=S.props||{};const student=!m.flags.grad;
+ if(id==='chen'){add('walk',1);if(tier>=1&&S.day>=8&&!propOn('oranges')&&S.day-(PR.oranges||-999)>=30)add('oranges',1.2);if(tier>=1&&S.unlocked.includes('salad')&&since('vegDay')>=21)add('veg',.8);if(tier>=1&&S.day>=10&&since('friendDay')>=14)add('friend',1);if(tier>=2&&!m.flags.students)add('students',.8)}
+ if(id==='mia'){add('deadline',1.2);if(tier>=.5)add('delivered',1);if(tier>=1&&S.day>=9&&since('coworkerDay')>=14)add('coworker',1);if(tier>=1&&!m.flags.drawing)add('drawing',.9);if(tier>=2&&!m.flags.moved)add('moved',.6)}
  if(id==='koba'){if(tier>=.5)add('late',1);if(tier>=1&&S.day>=12&&!m.flags.promo)add('promo',1.4);if(tier>=2&&!m.flags.newjob)add('newjob',.6)}
- if(id==='leo'){if(tier<1)add('broke',1);if(tier>=.5)add('payday',1);if(tier>=1&&S.day>=8)add('classmates',1.1);add('exam',.7);if(tier>=1&&S.day>=12&&!m.flags.plant)add('plant',.9);if(tier>=2&&!m.flags.jobhunt)add('jobhunt',.6)}
- if(id==='sophie'){if(tier>=.5&&S.signature)add('signature',1);if(tier>=1&&S.day>=10)add('writer',.9);add('strict',.6)}
- if(id==='wang'){add('share',1);if(tier>=.5)add('alone',.7);if(tier>=1&&S.day>=10&&!m.flags.anniv)add('anniv',1.3);if(tier>=1&&!propOn('flowers'))add('flowers',.9)}
+ if(id==='leo'){if(tier<1)add('broke',1);if(tier>=.5&&student&&since('paydayDay')>=25)add('payday',1);if(tier>=1&&S.day>=8&&since('classDay')>=14)add('classmates',1.1);if(student&&since('examDay')>=25)add('exam',.7);if(tier>=1&&student&&since('finalsDay')>=60&&since('examDay')>=3)add('finals',.6);if(tier>=1&&S.day>=12&&!m.flags.plant)add('plant',.9);if(tier>=2&&!m.flags.jobhunt)add('jobhunt',.6);if(tier>=2&&m.flags.jobhunt&&!m.flags.grad&&since('jobhunt')>=10)add('grad',1.2)}
+ if(id==='sophie'){if(tier>=.5&&S.signature)add('signature',1);if(tier>=1&&S.day>=10&&since('writerDay')>=30)add('writer',.9);add('strict',.6)}
+ if(id==='wang'){add('share',1);if(tier>=.5)add('alone',.7);if(tier>=1&&S.day>=10&&!m.flags.anniv)add('anniv',1.3);if(tier>=1&&!propOn('flowers')&&S.day-(PR.flowers||-999)>=30)add('flowers',.9)}
  if(!W.length)return o;const k=wpick(W,x=>x[1])[0];if(!regGate(id,'moment',2))return o;momentUsed();o.moment=k;
  switch(k){
  case'friend':o.size=2;o.looks=r.looks.concat(compLooks(id,'friend',1));o.comp='friend';break;
@@ -1419,29 +1429,44 @@ function regPlanVisit(o){const id=o.reg;if(!id||id==='dylan')return o;const r=RE
  case'late':o.t=Math.max(o.t,R?R.dur*.72:o.t);break;
  case'deadline':o.t=Math.max(o.t,R?R.dur*rand(.55,.8):o.t);break}
  return o}
+/* ================= v2.3 dialogue audit (2026-10-01): a regular remembers their life, they do not replay it =================
+   What a regular says when ordering is their HABIT (`l`: the first visits, then the everyday — safe to recur). A
+   CALLBACK to their own history (`cb`) is said only if that history really happened in this save, rarely (a long gap,
+   `cd` days) or once (`once`), and never as if it just happened again. One-time life events (a promotion, moving,
+   graduating) are moments that happen once and become a fact (regPlanVisit / regSeatMoment), not lines in a pool. */
+function regTalk(id,tier){const r=REG_BY[id];const c=regCallback(id);if(c)return c;const L=tier===0?r.l.slice(0,1):r.l.slice(1,tier+1);return L.length?pick(L):null}
+function regCallback(id){const r=REG_BY[id];if(!r||!r.cb)return null;const m=regMem(id);
+ const due=r.cb.filter(c=>{const st=regMem(c.share||id);st.cb=st.cb||{};const last=st.cb[c.k];if(c.once?last:(last&&S.day-last<c.cd))return false;try{return!!c.need(m)}catch(e){return false}});
+ if(!due.length||Math.random()>.3)return null;const c=pick(due);regMem(c.share||id).cb[c.k]=S.day;return c.t}
+/* the Wangs' anniversary in this save: the day it was spent here (v2.3 keeps the day; older saves, their own record) */
+function regAnnivDay(){const m=regMem('wang');const v=m.flags.anniv;if(!v)return null;if(v>1)return v;const f=(m.facts||[]).concat(regMem('wangwife').facts||[]).find(x=>x.txt==='結婚紀念日是在這裡過的。');return f?f.day:0}
+/* a once-only moment's day: the flag holds it (v2.3), else the regular's own record of it, else 0 (更早以前) */
+function regOnceDay(id,flag,txt){const m=regMem(id);const v=m.flags[flag];if(!v)return null;if(v>1)return v;const f=(m.facts||[]).find(x=>x.txt===txt);return f?f.day:0}
 /* the first words of a visit, when they sit down */
 function regSeatMoment(g,t){const id=g.reg;if(!id||id==='dylan')return;const k=g.moment;const m=regMem(id);const say=(txt,d)=>setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,txt)},d||600);worldMemoryLine(g);
- if(g.comp==='friend'){say(pick(['今天帶老朋友來。','以前教書的同事，退休了才有空。']));regFact(id,'帶了一位老朋友來。');g.memoAt='seat'}
- if(g.comp==='coworker'){say(pick(['同事一直問我都吃哪裡，帶她來了。','今天有伴，不用一個人吃。']));regFact(id,'帶了同事來。');g.memoAt='seat'}
- if(g.comp==='classmates'){say(pick(['同學說想來看貓。','跟同學一起，今天可以點多一點。']));regFact(id,'帶了同學來看貓。');g.memoAt='seat';for(let i=0;i<g.size;i++)g.wantShot=true}
- if(g.comp==='writer'){say('我帶了一位朋友，她在寫餐廳專欄。');regFact(id,'帶了寫專欄的朋友來。');g.memoAt='seat';g.writer=true;g.treat='drink'}
+ if(g.comp==='friend'){say(pick(['今天帶老朋友來。','以前教書的同事，退休了才有空。']));m.flags.friendDay=S.day;regFact(id,'帶了一位老朋友來。');g.memoAt='seat'}
+ if(g.comp==='coworker'){say(m.flags.coworkerDay?'今天有伴，不用一個人吃。':pick(['同事一直問我都吃哪裡，帶她來了。','今天有伴，不用一個人吃。']));/* the first time she brings someone is the first time */m.flags.coworkerDay=S.day;regFact(id,'帶了同事來。');g.memoAt='seat'}
+ if(g.comp==='classmates'){say(pick(['同學說想來看貓。','跟同學一起，今天可以點多一點。']));m.flags.classDay=S.day;regFact(id,'帶了同學來看貓。');g.memoAt='seat';for(let i=0;i<g.size;i++)g.wantShot=true}
+ if(g.comp==='writer'){say('我帶了一位朋友，她在寫餐廳專欄。');m.flags.writerDay=S.day;regFact(id,'帶了寫專欄的朋友來。');g.memoAt='seat';g.writer=true;g.treat='drink'}
  if(k==='alone'){const wife=g.reg==='wangwife';say(wife?pick(['先生今天出差，我一個人來。','一個人也想來。']):pick(['太太今天加班，我一個人。','她說替她點一份甜點帶回去。']));regFact(id,wife?'王太太一個人來過。':'王先生一個人來過。')}
  if(k==='walk')say(pick(['今天走到河邊，回來剛好餓了。','散步繞遠了一點。','走一走就到了。']));
- if(k==='students'){say('以前的學生昨天來看我，都當爸爸了。');regFact(id,'以前的學生來看他，都當爸爸了。')}
+ if(k==='students'){say('以前的學生昨天來看我，都當爸爸了。');m.flags.students=S.day;regFact(id,'以前的學生來看他，都當爸爸了。')}
  if(k==='deadline'){say(pick(['先給我咖啡，稿子還沒交。','今天不能待太久。']));g.rushed=true}
  if(k==='delivered'){say(pick(['稿子交了！今天要吃好一點。','終於交出去了。']));g.celebrate=true;regFact(id,'趕完稿那天，說要吃好一點。')}
- if(k==='moved'){say('搬家了，但還是會繞過來。');regFact(id,'搬家了，還是會來。')}
+ if(k==='moved'){say('搬家了，但還是會繞過來。');m.flags.moved=S.day;regFact(id,'搬家了，還是會來。')}
  if(k==='late'){say(pick(['今天加班，還好還開著。','趕上了。']))}
- if(k==='promo'){say('升職了，今天不趕。');g.celebrate=true;g.unhurried=true;m.flags.promo=1;regFact(id,'升職那天，難得吃了一頓慢的。')}
- if(k==='newjob'){say('換工作了，離這裡遠一點，還是會來。');m.flags.newjob=1;regFact(id,'換了工作，離得遠了。')}
+ if(k==='promo'){say('升職了，今天不趕。');g.celebrate=true;g.unhurried=true;m.flags.promo=S.day;regFact(id,'升職那天，難得吃了一頓慢的。')}
+ if(k==='newjob'){say('換工作了，離這裡遠一點，還是會來。');m.flags.newjob=S.day;regFact(id,'換了工作，離得遠了。')}
  if(k==='broke'){say(pick(['今天只能點這個。','月底了。']));g.broke=true}
- if(k==='payday'){say('打工薪水下來了！');g.celebrate=true}
- if(k==='exam'){say(pick(['期中考週，吃完就回去唸書。','考完再來好好吃。']));g.quick=true}
- if(k==='jobhunt'){say('快畢業了，開始找工作。');m.flags.jobhunt=1;regFact(id,'快畢業了，在找工作。')}
+ if(k==='payday'){say('打工薪水下來了！');m.flags.paydayDay=S.day;g.celebrate=true}
+ if(k==='exam'){say(pick(['期中考週，吃完就回去唸書。','考完再來好好吃。']));m.flags.examDay=S.day;g.quick=true}
+ if(k==='finals'){say('Jill 姊，我期末考考完了！');m.flags.finalsDay=S.day}
+ if(k==='jobhunt'){say('快畢業了，開始找工作。');m.flags.jobhunt=S.day;regFact(id,'快畢業了，在找工作。')}
+ if(k==='grad'){say('我畢業了，第一份薪水就是想來這裡吃一頓。');g.celebrate=true;m.flags.grad=S.day;regFact(id,'畢業了，第一份薪水來這裡吃了一頓。')}
  if(k==='signature'){say(pick(['今天想看看招牌菜。','招牌菜，我來評分。']));g.wantSig=true}
  if(k==='strict'){g.strict=true}
  if(k==='share'){g.share=true}
- if(k==='anniv'){say('今天是我們的結婚紀念日。');g.anniv=true;g.treat='dessert';m.flags.anniv=1;regFactG(g,'結婚紀念日是在這裡過的。')}
+ if(k==='anniv'){say('今天是我們的結婚紀念日。');g.anniv=true;g.treat='dessert';m.flags.anniv=S.day;regFactG(g,'結婚紀念日是在這裡過的。')}
  if(['oranges','veg','drawing','plant','flowers'].includes(k))g.gift=k;
  if(g.memoAt==='seat')setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g)&&g.table!=null){const tb=R.tables[g.table];memo('company',tb.x,tb.y-6,{g:g.name,subj:[{x:tb.x-24,y:tb.y},{x:tb.x+24,y:tb.y}]})}},2500)}
 /* the gift is handed over when Jill comes to the table (a waiter taking the order leaves it for the checkout) */
@@ -1449,19 +1474,20 @@ function regGift(g,t){const k=g.gift;if(!k)return;g.gift=null;const id=g.reg;con
  const lines={oranges:['鄰居送太多橘子，我一個人吃不完，拿一些來。','橘子，朋友種的，太多了。'],veg:['朋友田裡的菜，太多了，分妳一些。','菜園今年收太好，拿來給店裡。'],drawing:['幫店裡畫了個小東西，貼在牆上好嗎？','畫了一張，放店裡吧。'],plant:['宿舍的多肉長太多，分店裡一盆。','這盆放窗邊剛好。'],flowers:['太太種的花，開太多了。','花園裡剪的，放店裡好看。']};
  quote(g,pickT(lines[k]));setTimeout(()=>{if(R&&phase==='service')jillSay(pickT(['謝謝，我放這裡。','太好了，謝謝你。','這怎麼好意思。']))},1500);
  if(k==='oranges'){propSet('oranges');regFact(id,'拿了一袋橘子來。')}
- if(k==='veg'){if(S.unlocked.includes('salad')&&stockTotal()+2<=fridgeCap()){S.stock.salad=(S.stock.salad||0)+2;noteLine('田園沙拉的料多了 2 份')}regFact(id,'帶了自己種的菜來。')}
- if(k==='drawing'){propSet('drawing');m.flags.drawing=1;regFact(id,'畫了一張小圖，貼在牆上。')}
- if(k==='plant'){propSet('plant');m.flags.plant=1;regFact(id,'送了一盆多肉，放在窗邊。')}
+ if(k==='veg'){m.flags.vegDay=S.day;if(S.unlocked.includes('salad')&&stockTotal()+2<=fridgeCap()){S.stock.salad=(S.stock.salad||0)+2;noteLine('田園沙拉的料多了 2 份')}regFact(id,'帶了自己種的菜來。')}
+ if(k==='drawing'){propSet('drawing');m.flags.drawing=S.day;regFact(id,'畫了一張小圖，貼在牆上。')}
+ if(k==='plant'){propSet('plant');m.flags.plant=S.day;regFact(id,'送了一盆多肉，放在窗邊。')}
  if(k==='flowers'){propSet('flowers');regFactG(g,'帶了自己種的花來。')}
  memo('gift',t.x,t.y-6,{g:g.name,subj:[{x:R.jill.x,y:R.jill.y}]});ach('gift')}
 /* two regulars in the room at once, who happen to know each other. Sparingly: once in a while, one pair at a time. */
-const REG_PAIRS=[['chen','wang',['王先生，好久不見。','陳老師！']],['mia','koba',['你也在這棟上班？','三樓。你是樓上那間？']],['sophie','leo',['學生，點那道，不會錯。','好、好，那道。']]];
-function regMeet(g){if(!g.reg||g.reg==='dylan')return;const mine=regsOf(g);for(const [a,b,lines] of REG_PAIRS){if(!mine.includes(a)&&!mine.includes(b))continue;const want=mine.includes(a)?b:a;const other=R.groups.find(o=>o!==g&&regsOf(o).includes(want)&&o.table!=null&&['reading','order','wait','eat'].includes(o.state));if(!other)continue;
+const REG_PAIRS=[['chen','wang',['王先生，好久不見。','陳老師！'],1],['mia','koba',['你也在這棟上班？','三樓。你是樓上那間？'],1],['sophie','leo',['學生，點那道，不會錯。','好、好，那道。']]];   /* 1 = a discovery (they find out they know each other): once; the last is a habit */
+function regMeet(g){if(!g.reg||g.reg==='dylan')return;const mine=regsOf(g);for(const [a,b,lines,once] of REG_PAIRS){if(!mine.includes(a)&&!mine.includes(b))continue;if(once&&regPairMet(a,b))continue;const want=mine.includes(a)?b:a;const other=R.groups.find(o=>o!==g&&regsOf(o).includes(want)&&o.table!=null&&['reading','order','wait','eat'].includes(o.state));if(!other)continue;
   const va=S.regulars[a]||0,vb=S.regulars[b]||0;if(regTier(va)<.5||regTier(vb)<.5)continue;if(!regGate(a,'meet_'+b,5))continue;if(Math.random()>.7)continue;
   const A=mine.includes(a)?g:other,B=mine.includes(a)?other:g;setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(A))quote(A,lines[0],{who:a})},900);setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(B))quote(B,lines[1],{who:b})},2400);
   if(a==='sophie'&&B.state==='reading')B.wantDish=REG_BY.sophie.fav.find(f=>menuList().includes(f))||null;
   const ta=R.tables[A.table],tb=R.tables[B.table];setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(A)&&R.groups.includes(B))memo('neighbors',(ta.x+tb.x)/2,(ta.y+tb.y)/2-6,{a:A.name,b:B.name,subj:[ta,tb]})},1200);
-  regFact(a,`在店裡遇到${REG_BY[b].n}，原來認識。`);regFact(b,`在店裡遇到${REG_BY[a].n}，原來認識。`);relSet(a,b,'spoke');/* v2.3 */return}}
+  regFact(a,`在店裡遇到${REG_BY[b].n}，原來認識。`);regFact(b,`在店裡遇到${REG_BY[a].n}，原來認識。`);relSet(a,b,'spoke');/* v2.3 */relSet(a,b,'metHere');return}}
+function regPairMet(a,b){return!!(relN(a,b,'metHere')||relN(a,b,'spoke')||(regMem(a).facts||[]).some(f=>f.txt===`在店裡遇到${REG_BY[b].n}，原來認識。`)||(regMem(b).facts||[]).some(f=>f.txt===`在店裡遇到${REG_BY[a].n}，原來認識。`))}
 /* ================= v2.3: the story foundation =================
    One record of what really happened (S.story), read back as behaviour. Facts are idempotent by key and dated;
    relationship facts are kept per pair; familiarity is computed from a pair's facts, never stored, never shown.

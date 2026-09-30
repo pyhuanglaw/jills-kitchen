@@ -862,3 +862,41 @@ def dylan_dialogue_revisions_2026_10_01(b, port, target):
     log = json.loads(g.ev("JSON.stringify((R.log||[]).slice(-8).map(l=>l.w+'：'+l.t))"))
     check(any(l.endswith('誰？') and l.startswith('Dylan') for l in log) and any(l.startswith('Jill') and l.endswith('你。') for l in log), f'the four-line exchange is said to the end: {log}')
     check(not g.errors, g.errors[:3]); g.close()
+
+@test
+def regulars_remember_their_life_not_replay_it(b, port, target):
+    """v2.3 dialogue audit (2026-10-01): a regular's ordering lines are habits; a promotion, a graduation, finals, an
+    anniversary, "only here" are callbacks said only if they really happened, rarely or once — never every few visits;
+    one-time life events (moving, graduating, a former student's news) happen once; two regulars discover they know
+    each other once. On the player's own Day 52 save the lines they have already heard many times are not brought back."""
+    g = Game(b, port, target, seed=107, manual=True)
+    load_fixture(g, 'player_day52.json'); g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(200)
+    pools = g.ev("JSON.stringify(REGS.map(r=>r.l))")
+    for w in ['升職', '畢業', '期末考', '四張桌子', '紀念日', '只有這裡']:
+        check(w not in pools, f'no one-time event or callback in an ordinary pool: {w}')
+    mig = json.loads(g.ev("JSON.stringify({a:S.dlgAudit,koba:regMem('koba').cb,chen:regMem('chen').cb,sophie:regMem('sophie').cb,wang:regMem('wang').cb,day:S.day})"))
+    check(mig['a'] == 1 and mig['koba'].get('promoMemory') and mig['chen'].get('fourTables') and mig['sophie'].get('onlyHere') == mig['day'] and mig['wang'].get('annivMemory') == mig['day'], f'the lines this save has already heard are marked: {mig}')
+    g.ev("window.__talk=(id,tier,n)=>{const c={};for(let i=0;i<n;i++){const t=regTalk(id,tier);if(t)c[t]=(c[t]||0)+1}return c}")
+    k = json.loads(g.ev("JSON.stringify(__talk('koba',2,400))"))
+    check(k and not any('升職' in t for t in k) and any('老樣子' in t for t in k), f'小林 orders like himself, and does not relive the promotion: {k}')
+    l = json.loads(g.ev("JSON.stringify(__talk('leo',2,400))"))
+    check(not any(('畢業' in t or '期末考' in t) for t in l), f'Leo does not graduate or finish finals when he orders: {l}')
+    # a callback that is due: once, or once in its gap — never as a habit
+    k2 = json.loads(g.ev("JSON.stringify((()=>{const m=regMem('koba');m.flags.promo=S.day-12;delete m.cb.promoMemory;return __talk('koba',2,400)})())"))
+    check(sum(n for t, n in k2.items() if '升職' in t) == 1, f'a promotion that really happened here is remembered once: {k2}')
+    s2 = json.loads(g.ev("JSON.stringify((()=>{const d0=S.day;S.day+=31;const a=__talk('sophie',2,400);S.day=d0;return a})())"))
+    check(sum(n for t, n in s2.items() if '只有這裡' in t) == 1, f'「只有這裡」 now and then, not every visit: {s2}')
+    # moments: a life happens once
+    g.ev("window.__mom=(id,n)=>{const c={};for(let i=0;i<n;i++){S.regDay={d:S.day,n:0};regMem(id).last.moment=-99;const o=regPlanVisit({t:0,type:REG_BY[id].type,reg:id,size:1});if(o.moment)c[o.moment]=(c[o.moment]||0)+1}return c}")
+    m0 = json.loads(g.ev("JSON.stringify((()=>{const m=regMem('leo');m.flags={};return __mom('leo',500)})())"))
+    check('grad' not in m0, f'no graduation before the job hunt: {m0}')
+    m1 = json.loads(g.ev("JSON.stringify((()=>{const m=regMem('leo');m.flags={plant:5,jobhunt:S.day-12};return __mom('leo',500)})())"))
+    check(m1.get('grad', 0) > 0, f'after the job hunt, graduation can come: {m1}')
+    m2 = json.loads(g.ev("JSON.stringify((()=>{const m=regMem('leo');m.flags={plant:5,jobhunt:S.day-20,grad:S.day-2};return __mom('leo',500)})())"))
+    check(not any(x in m2 for x in ['grad', 'exam', 'finals', 'payday']), f'after graduating: no student moments, no second graduation: {m2}')
+    m3 = json.loads(g.ev("JSON.stringify((()=>{const m=regMem('mia');m.flags={drawing:9,moved:S.day-40};return __mom('mia',500)})())"))
+    check('moved' not in m3, f'Mia moves once: {m3}')
+    m4 = json.loads(g.ev("JSON.stringify((()=>{const m=regMem('chen');m.flags={students:S.day-30,vegDay:S.day-3,friendDay:S.day-3};S.props=S.props||{};S.props.oranges=S.day-10;return __mom('chen',500)})())"))
+    check(not any(x in m4 for x in ['students', 'veg', 'friend', 'oranges']), f'陳伯伯: the former student once; the oranges, the vegetables, the old friend only after a long gap: {m4}')
+    check(g.ev("regPairMet('chen','wang')"), '陳伯伯 and 王先生 found out they know each other already (DAY 44) — not again')
+    check(not g.errors, g.errors[:3]); g.close()
