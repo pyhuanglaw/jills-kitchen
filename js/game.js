@@ -403,7 +403,7 @@ function newState(){return{v:1,day:1,phase:'prep',money:500,lifetime:0,level:1,
  eq:{stove:1,oven:0,bar:0,prep:0,fridge:1,pan:1},tables:2,
  decor:{plants:0,lights:0,art:0,chairs:0,rug:0,ware:0,bar:0,sofa:0},staff:{busser:false,bartender:false},mem:{},catFam:{},crew:[],crewMig:1,rstar:{},dylan:{stage:0,stay:0,reveal:0,last:0,clues:{}},life:{sofa:0,tv:0},checkpoint:null,savedAt:0,savedLabel:'',rdProg:{},rdDone:{},labKnown:{},labTried:{},album:null,notes:[],taught:0,ops:{},theme:'classic',themes:{classic:1},sets:{},rooms:{side:0,terrace:0,kext:0,cooler:0,pass:0},sideTables:0,frontTables:0,ext:{awning:0,sign:0,plants:0,lights:0,bench:0,season:0},gear:{},gearUse:{},newRooms:{},reveal:null,rhist:[],records:{},salesHist:{},menuSince:{},regMem:{},props:{},regDay:null,gourmetBoost:0,dayLog:[],dayLogDay:0,
  unlocked:['friedrice'],menu:['friedrice'],price:{},stock:{},xp:{},reviews:[],achievements:{},regulars:{},returning:0,
- signature:null,catNames:{},buzz:1,buzzMsg:'',stats:{guests:0,perfect:0,days:0},tut:0,gate:1,news:[],today:null,todayCost:0,lastSummary:null,sfx:true,music:true}}
+ signature:null,story:null/* v2.3: what really happened — see story() */,catNames:{},buzz:1,buzzMsg:'',stats:{guests:0,perfect:0,days:0},tut:0,gate:1,news:[],today:null,todayCost:0,lastSummary:null,sfx:true,music:true}}
 let S;
 /* How saves stay compatible (details: docs/ARCHITECTURE.md)
    - NEW field: just add it to newState(). load() gives old saves every missing top-level field
@@ -989,7 +989,7 @@ function startService(){lifeReset();streetReset();dylanStageCheck();bg=null;last
   combo:0,maxCombo:0,streak:0,fire:0,fireCount:0,floats:[],parts:[],tv:1,gid:1,tkid:1,
   st:{rev:0,tips:0,guests:0,groups:0,perfect:0,q:{P:0,G:0,O:0,B:0},sats:[],dish:{},angry:0,lost:0,reviews:[],critic:null,blogger:null,treats:0,jtreats:0,ptreats:0},
   rush:feat().rush,rushT0:dur*120/270,rushT1:dur*180/270,rushShown:false,weather:T.weather,event:T.event,coach:(S.day===1&&!S.tut)?0:-1,taskDone:{},lastSpawn:0,idleT:0,focus:0,focusLock:0,holdSlot:null,inc:planIncidents(dur),cw:{},thief:null,insp:null,chaser:null};
- R.sched=buildSchedule(dur);R.log=[];logNew=0;phase='service';paused=false;room='main';hideScreen();layoutAll();renderTickets();renderTasks();hud(true);logChip();stockChip();renderRoomTabs(true);
+ R.sched=buildSchedule(dur);R.log=[];logNew=0;phase='service';storyTick('daystart',{});/* v2.3 */paused=false;room='main';hideScreen();layoutAll();renderTickets();renderTasks();hud(true);logChip();stockChip();renderRoomTabs(true);
  if(S.reveal&&S.reveal.day<S.day){const P=PROJECTS.find(x=>x.k===S.reveal.k);S.reveal=null;if(P){setTimeout(()=>{if(R&&phase==='service'){jillSay(P.k==='side'?'今天側廳也開放了。':P.k==='terrace'?'外面的桌子也可以坐。':P.k==='kext'?'廚房變大了，今天可以多做一點。':P.k==='cooler'?'冷藏庫今天開始用。':'出菜口變寬了。');logLine('',P.n+'：第一天。','e')}},2500)}}
  banner("OPEN FOR DINNER",LV().n+' 開始營業','');audioInit();sfx.door();
 }
@@ -1027,7 +1027,7 @@ function requeue(){for(const g of queued()){if(g.state==='arrive'&&!g.landed)con
  if(g.spot){const ok=g.spot.k==='seat'?!OCC['bench'+g.spot.i]:true;const upgrade=g.spot.k==='stand'&&g.size<=2&&[0,1,2].some(benchFree);if(ok&&!upgrade)continue;g.spot=null}
  const sp=pickSpot(g);g.spot=sp;const p=sp?spotPos(sp):{x:DOOR.x,y:DOOR.y+22};g.troom='main';g.tx=p.x;g.ty=p.y}}
 function spawn(o){if(R.closed)return;const reg=o.reg?REG_BY[o.reg]:null;const size=Math.min(o.size,maxSeats(R.tables));if(o.looks&&o.looks.length>size)o.looks=o.looks.slice(0,size);
- const nm0=o.name||(reg?reg.n:pick(NAMES[o.type]||NAMES.office));const g={id:R.gid++,type:o.type,size,reg:o.reg||null,regs:(o.regs||(o.reg?[o.reg]:[])).slice(0,size),forSig:!!o.forSig,ret:!!o.ret,looks:o.looks||(reg?reg.looks:(size===1&&NAMED[nm0]?[Object.assign({},NAMED[nm0].looks)]:makeLooks(o.type,size))),name:nm0,moment:o.moment||null,comp:o.comp||null,
+ let nm0=o.name||(reg?reg.n:pick(NAMES[o.type]||NAMES.office));if(!o.reg&&NAMED[nm0]&&R.groups.some(q=>q.name===nm0&&!q.gone)){const alt=(NAMES[o.type]||NAMES.office).filter(n=>!NAMED[n]);if(alt.length)nm0=pick(alt)}/* v2.3: a named guest is one person — never two Kens in one evening */const g={id:R.gid++,type:o.type,size,reg:o.reg||null,regs:(o.regs||(o.reg?[o.reg]:[])).slice(0,size),forSig:!!o.forSig,ret:!!o.ret,looks:o.looks||(reg?reg.looks:(size===1&&NAMED[nm0]?[Object.assign({},NAMED[nm0].looks)]:makeLooks(o.type,size))),name:nm0,moment:o.moment||null,comp:o.comp||null,
   state:'arrive',table:null,pat:1,room:'front',troom:'main',x:FR.enter.x,y:FR.enter.y,tx:DOOR.x,ty:DOOR.y+22,timer:0,ticket:null,seed:Math.random()*10,mood:'ok'};
  if(reg&&(S.regulars[reg.id]||0)>0)g.ret=true;
  if(queued().length>=queueMax()||(!freeTableFor(g)&&!pickSpot(g))){if(g.reg==='dylan'){/* v2.2: the room is full — he has time, he comes back later (no queue jumping, no seat taken from anyone); after that, a look in from the door */const dl=rand(28,55);if((o.tries||0)<4&&R.t+dl<R.dur*.92){/* v2.2.1 K: a retry that would land after closing is not scheduled — it used to vanish at the door of a closed shop with no note */R.sched.splice(R.si+1,0,Object.assign({},o,{t:R.t+dl,tries:(o.tries||0)+1,back:true}));return}R.st.lost+=size;dylanTrace({door:1,tries:(o.tries||0)});if((S.regulars.dylan||0)>=3&&!R.dylanDoor){R.dylanDoor=1;noteLine('Dylan 在門口看了一眼，人太多，先走了。');S.dylan.doorDays=(S.dylan.doorDays||0)+1}return}if(g.reg){S.regMiss=S.regMiss||{};S.regMiss[g.reg]=S.day}R.st.lost+=size;R.lostRun=(R.lostRun||0)+1;if(!R.lostToastT||R.t-R.lostToastT>40){const n=R.lostRun;R.lostRun=0;R.lostToastT=R.t;toast(n>1?`${g.name} 和另外 ${n-1} 組看到客滿，失望地走了…`:`${g.name} 看到客滿，失望地走了…`)}return}
@@ -1051,6 +1051,7 @@ function updGroup(g,dt){
 function seatGroup(g,t){t.group=g;t.dirty=false;g.table=t.i;if(g.reg==='dylan')dylanTrace({r:t.room||'main'});g.state='toTable';g.troom=t.room||'main';g.tx=t.x;g.ty=t.y+8;g.pat=Math.min(1,g.pat+.1);requeue();sfx.tap();jillGreet(g,t);if(projOn('side')&&R.tables.some(q=>q.room==='side')&&R.tables.every(q=>q.room==='front'||q.group))ach('sideful');
  if(g.reg&&g.reg!=='dylan'){for(const id of regsOf(g)){const m=regMem(id);m.seats[t.i]=(m.seats[t.i]||0)+1}const v=S.regulars[g.reg]||0;/* v2.2 L: Jill's Card — every fifth visit, something on the house; visits are the only stamp */if((v+1)%5===0&&v>0&&!g.treat){g.treat='dessert';g.card=true}if(usualTable(g.reg)===t.i&&v>=4&&Math.random()<.25&&canChat('seat'+g.reg,300,3))setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,pickT(['老位子。','還是這裡好。','這個位子看得到貓。']))},500);
   const ud=usualDish(g.reg);if(ud&&v>=4&&!g.moment&&Math.random()<.5)g.usual=ud;regSeatMoment(g,t);regMeet(g);regularsNoticeDylan(g)}
+ storyCopresence(g);storyTick('seat',{g,t});   /* v2.3 */
  if(!g.reg)seatLine(g);coach(1)}
 const SEAT_LINES={side:['這邊是新的？','以前這裡是牆吧。','窗邊的位子不錯。','這一間比較安靜。','側廳耶，第一次坐。'],front:['坐外面好舒服。','外面也可以吃了。','今天天氣好，坐外面。','路過的人都在看我們吃什麼。'],grew:['店變大了。','上次來還沒有這間。','這裡越來越像一間真正的餐廳了。'],any:['聽說 Jill 主廚今天在店裡！','朋友說一定要來吃 Jill 的店。','好香喔，是 Jill 在煎東西嗎？','這間店好溫暖，Jill 很會佈置耶。','終於有位子了。','這裡的貓是不是很有名？','上次路過就想進來了。','同事說這裡的炒飯不錯。'],
  rain:['外面雨好大。','傘都濕透了。','下雨天就想喝點熱的。'],storm:['雨大到不想回家。','外面跟颱風一樣。','等雨小一點再走。'],get hot(){const ac=opsLv('ac');return['熱死了，先來杯冰的。','外面像烤箱。'].concat(ac>=1?['有冷氣真好。']:['裡面也好悶。'],ac>=2?['這裡的冷氣好安靜。']:[],ac>=3?['側廳也一樣涼。']:[])},   /* v2.2.1 J: they praise the cooling only once there is some */cool:['今天天氣真舒服。','終於涼了。'],
@@ -1145,6 +1146,7 @@ function createTicket(g){const items=orderItems(g);const t=R.tables[g.table];
  for(const it of tk.items)if(!takeStock(it))g.short=true;tk.items=tk.items.filter(it=>it.st!=='cancel');if(tk.items.some(it=>it.st==='order')){toast(`食材不夠！Jill 緊急叫貨中（1.5 倍價），${g.name} 要多等一下`);g.pat=Math.min(1,g.pat+.1)}stockWatch();
  g.ticket=tk;g.state='wait';g.pat=Math.min(1,g.pat+.12);R.tickets.push(tk);R.tv++;sfx.ticket();
  if(g.reg==='dylan'){dylanOrdered(g,tk)}else if(g.reg){const who=speakerOf(g);const v=S.regulars[who]||0;const tier=Math.floor(regTier(v));/* not every visit: a line when they are still new, then only now and then */if(tier===0?Math.random()<.5:Math.random()<.35)quote(g,REG_BY[who].l[tier],{who})}else if(g.type==='vip')quote(g,'把你們最好的端上來吧。');else if(Math.random()<.12)quote(g,pickT(['今天想吃點好的。','聽說這裡的東西都是 Jill 親手做的？','有推薦的嗎？算了，都點吧。']));
+ storyTick('order',{g,tk});   /* v2.3 */
  coach(2)}
 function recipeOf(d){return DISH(d).steps}
 function uniq(a){return[...new Set(a)]}
@@ -1286,10 +1288,12 @@ function collect(g){const T=TYPES[g.type];const items=g.ticket.items.filter(i=>i
  else if(g.writer){const r=addReview(g,stars,stars>=5?'朋友帶我來的小店。主廚的菜有自己的個性，會再來。':stars>=4?'朋友推薦的店，水準穩定。':'朋友推薦的店，這次普通。');if(r)r.w=2;if(stars>=4){ach('writer');S.gourmetBoost=S.day+1;S.buzzMsg=S.buzzMsg||'Sophie 的朋友寫了這裡，今天美食家會多一些。'}}
  else if(g.reg==='sophie'&&items.some(i=>i.q==='P')&&(g.wantSig||Math.random()<.3)){const r=addReview(g,Math.max(4,stars),g.wantSig?'招牌菜的醬汁對了。這道可以寫進專欄。':'這家店的水準，是可以寫的。');if(r)r.w=2;quote(g,g.wantSig?'今天的醬汁對了。':'不錯。')}
  else if(g.type==='vip'||(g.reg!=='dylan'&&Math.random()<.55))addReview(g,stars,null,{cat:!!g.catJoy,wait:g.pat<.4,price:pen>0,q:items.some(i=>i.q==='O'||i.q==='B'),sig:items.some(i=>isSig(i.d)),treat:!!g.treated,decor:ambience()>=6,weather:R.weather});
- if(g.reg){S.catFam=S.catFam||{};for(const id of regsOf(g)){S.catFam[id]=(S.catFam[id]||0)+1;const before=S.regulars[id]||0;S.regulars[id]=before+1;const nm=id==='dylan'?'Dylan':REG_BY[id]?REG_BY[id].n:g.name;if(before+1===4){toast(`${nm} 成為了熟客！`);ach('regular4')}if(id==='dylan'&&before+1>=5)ach('dylan5');if(before+1===12){toast(`${nm} 成為了 Jill 的老客人！`);ach('oldfriend')}}}
+ if(!g.counted){g.counted=1;/* v2.3: a visit is counted once, whatever rooms it passes through */const nn=namedId(g);if(nn){const h=namedHist(nn);h.v++;h.last=S.day;for(const it of items)h.dishes[it.d]=(h.dishes[it.d]||0)+1}
+ if(g.reg){S.catFam=S.catFam||{};for(const id of regsOf(g)){S.catFam[id]=(S.catFam[id]||0)+1;const before=S.regulars[id]||0;S.regulars[id]=before+1;const nm=id==='dylan'?'Dylan':REG_BY[id]?REG_BY[id].n:g.name;if(before+1===4){toast(`${nm} 成為了熟客！`);ach('regular4')}if(id==='dylan'&&before+1>=5)ach('dylan5');if(before+1===12){toast(`${nm} 成為了 Jill 的老客人！`);ach('oldfriend')}}}}
  if(g.ret||(g.reg&&(S.regulars[g.reg]||0)>1)){S.returning+=g.size;if(S.returning>=100)ach('loves')}
  if(S.lifetime>=1e6)ach('million');
  if(g.reg!=='dylan'){if(sat>=86&&Math.random()<.22&&canChat('thanks',35,4)){const top=items[0];const dn=top?dishName(top.d):'';const cev=(g.cats||[])[0];const cnm=cev&&catBy(cev.id)?catName(catBy(cev.id).def):null;quote(g,pickT(['很好吃，謝謝。','下次帶朋友來。','老闆娘手藝真好。','會再來。','謝謝招待。'].concat(dn?[`${dn}很好吃，謝謝。`,`下次還要點${dn}。`]:[],cnm?[`${cnm}好可愛。`,`跟${cnm}說再見。`]:[],g.treated?['謝謝招待，下次一定再來。']:[])))}else if(g.pat<.35&&sat>=70&&Math.random()<.3&&canChat('waitok',70,4))quote(g,pickT(['等有點久，不過值得。','人真的很多，還好有等。']));else if(sat<45&&Math.random()<.25&&canChat('meh',70,4))quote(g,pickT(['等太久了。','有點貴。','普通。','下次再看看。']))}
+ storyTick('collect',{g,t,sat,items,stars});   /* v2.3 */
  leaveGroup(g,sat>=70?'happy':sat>=45?'ok':'sad');t.dirty=true;coach(6);
  if(g.reg==='dylan'){if(dylanStays())dylanLinger(g,t);else{/* he clears his own table: plate to the pass, then out. A habit, not a job. */t.dirty=false;t.plates=[];t.busT=0;g.bus=true;g.troom='main';g.tx=PASS.x+18;g.ty=PASS.y-2;S.dylan.clues.tidy=(S.dylan.clues.tidy||0)+1}}}
 
@@ -1418,6 +1422,59 @@ function regMeet(g){if(!g.reg||g.reg==='dylan')return;const mine=regsOf(g);for(c
   if(a==='sophie'&&B.state==='reading')B.wantDish=REG_BY.sophie.fav.find(f=>menuList().includes(f))||null;
   const ta=R.tables[A.table],tb=R.tables[B.table];setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(A)&&R.groups.includes(B))memo('neighbors',(ta.x+tb.x)/2,(ta.y+tb.y)/2-6,{a:A.name,b:B.name,subj:[ta,tb]})},1200);
   regFact(a,`在店裡遇到${REG_BY[b].n}，原來認識。`);regFact(b,`在店裡遇到${REG_BY[a].n}，原來認識。`);return}}
+/* ================= v2.3: the story foundation =================
+   One record of what really happened (S.story), read back as behaviour. Facts are idempotent by key and dated;
+   relationship facts are kept per pair; familiarity is computed from a pair's facts, never stored, never shown.
+   Story events are data (STORY_EV): a lane (major 0–1 a day, minor 0–2, ambient with cooldowns only), hard
+   requirements in when(), a weight in w(), presentation variants in present[] (the first that can run today), and a
+   run() that writes consequences through the idempotent helpers. storyTick(at, ctx) runs at boundaries only (a
+   seating, an order, a payment, the closing, the evening, the day's start and end) — never per frame. An eligible
+   event that is not chosen counts a miss, and misses raise its weight (overdue); a Class A event with enough misses
+   goes first when it can. Story Photos are album entries with an authored picture, unlocked once, only by a run().
+   Old saves have no S.story: it starts empty — nothing is inferred from the past; the next visit begins the story. */
+function story(){let st=S.story;if(!st||typeof st!=='object')st=S.story={v:1};st.facts=st.facts||{};st.rel=st.rel||{};st.ev=st.ev||{};st.photos=st.photos||{};st.named=st.named||{};st.trace=st.trace||[];return st}
+/* a world/character fact: the first day it happened, how many times, the last day. Returns true the first time. */
+function factSet(key,perDay){const F=story().facts;const f=F[key];if(f){if(perDay&&f.l===S.day)return false;f.n++;f.l=S.day;return false}F[key]={d:S.day,n:1,l:S.day};return true}
+function fact(key){return story().facts[key]||null}
+function factN(key){const f=fact(key);return f?f.n:0}
+function pairKey(a,b){return a<b?a+'|'+b:b+'|'+a}
+/* a fact between two people (regular ids, 'dylan', 'n:<named guest>', 's:<crew id>', a cat id, 'jill') */
+function relSet(a,b,key,perDay){const R0=story().rel;const k=pairKey(a,b);const p=R0[k]=R0[k]||{f:{}};const f=p.f[key];if(f){if(perDay&&f.l===S.day)return false;f.n++;f.l=S.day;return false}p.f[key]={d:S.day,n:1,l:S.day};return true}
+function rel(a,b){const p=story().rel[pairKey(a,b)];return p?p.f:{}}
+function relN(a,b,key){const f=rel(a,b)[key];return f?f.n:0}
+/* familiarity, computed: 0 stranger, 1 recognize (repeated co-presence), 2 familiar (a real interaction), 3 comfortable
+   (shared things, more than once). Never stored, never shown as a number. */
+function famOf(a,b){const f=rel(a,b);const n=k=>f[k]?f[k].n:0;const co=n('copresent'),talk=n('spoke')+n('greeted'),shared=n('sharedTable')+n('sharedFood')+n('waitedFor')+n('leftTogether')+n('arrivedTogether')+n('sharedEvent');
+ if(shared>=2||(talk>=3&&co>=6))return 3;if(talk>=1||shared>=1||co>=8)return 2;if(co>=3)return 1;return 0}
+/* the day's lane budget */
+function storyDay(){const st=story();if(!st.day||st.day.d!==S.day)st.day={d:S.day,major:0,minor:0,seen:{}};return st.day}
+function evState(k){const E=story().ev;return E[k]=E[k]||{n:0,miss:0}}
+function evDone(k){const s=evState(k);return s.n>0}
+function storyTrace(o){const st=story();st.trace.push(Object.assign({d:S.day},o));if(st.trace.length>40)st.trace.splice(0,st.trace.length-40)}
+const STORY_EV=[];   /* filled by the content sections below: {k,lane,cls,at:[...],when,w,cd,once,floor,present:[{can,run}],run,note} */
+const LANE_CAP={major:1,minor:2,ambient:99};
+function storyMiss(E,day){if(day.seen[E.k])return;day.seen[E.k]=1;evState(E.k).miss++}
+function storyEligible(E,ctx){const s=evState(E.k);if(E.once&&s.n)return null;const cd=E.cd==null?1:E.cd;if(s.last!=null&&S.day-s.last<cd)return null;let ok=false;try{ok=!!E.when(ctx)}catch(e){ok=false}if(!ok)return null;
+ const list=E.present||[{run:E.run}];for(const p of list){let can=true;try{can=!p.can||!!p.can(ctx)}catch(e){can=false}if(can)return p}return false}   /* false: eligible but no way to present it today */
+function storyTick(at,ctx){if(!S||phase==='title')return null;ctx=ctx||{};ctx.at=at;const day=storyDay();let fired=null;
+ for(const lane of['major','minor','ambient']){if(day[lane]>=LANE_CAP[lane])continue;const cands=[];
+  for(const E of STORY_EV){if(E.lane!==lane||!(E.at||[]).includes(at))continue;const pv=storyEligible(E,ctx);if(pv===null)continue;if(pv===false){storyMiss(E,day);continue}const s=evState(E.k);let w=1;try{w=E.w?E.w(ctx):1}catch(e){w=0}if(!(w>0))continue;w*=1+.6*s.miss;if(E.cls==='A'&&s.miss>=(E.floor==null?3:E.floor))w+=1e6;cands.push({E,pv,w})}
+  if(!cands.length)continue;const c=wpick(cands,x=>x.w);if(!c)continue;for(const o of cands)if(o!==c)storyMiss(o.E,day);
+  const s=evState(c.E.k);s.n++;s.last=S.day;if(!s.d)s.d=S.day;s.miss=0;day.seen[c.E.k]=1;if(lane!=='ambient')day[lane]++;storyTrace({at,k:c.E.k,lane});try{c.pv.run(ctx)}catch(e){console.warn('[story]',c.E.k,e)}fired=fired||c.E.k}
+ return fired}
+/* what a story event leaves in the journal's week timeline (read by storyEvents) */
+function storyNotes(){const out=[];const E=story().ev;for(const S0 of STORY_EV)if(S0.note&&E[S0.k]&&E[S0.k].n){const t=typeof S0.note==='function'?S0.note(E[S0.k]):S0.note;if(t)out.push({day:E[S0.k].d,t,ic:S0.ic||'heart'})}return out}
+/* ---- Story Photos: an authored picture in the album, unlocked once, by a story consequence only ---- */
+const STORY_PHOTOS={};   /* key -> {cap, txt, art (a key of window.STORY_ART) or stage (a function drawing a 360x270 canvas), who:[ids]} */
+function storyArtSrc(key){const A=window.STORY_ART;return A&&A[key]||null}
+function storyPhoto(key,info){const st=story();if(st.photos[key])return false;const P=STORY_PHOTOS[key];if(!P)return false;let img=P.art?storyArtSrc(P.art):null;if(!img&&P.stage){try{const cv=mkCanvas(360,270);P.stage(cv.getContext('2d'),info||{});img=cv.toDataURL('image/jpeg',.8)}catch(e){img=null}}if(!img)return false;
+ st.photos[key]=S.day;const p=albumAdd('story:'+key,img,Object.assign({cap:P.cap,txt:typeof P.txt==='function'?P.txt(info||{}):P.txt},info||{}));p.story=1;p.keep=true;FLASH=null;sfx.shutter();noteLine(`相簿多了一張：「${P.cap}」`);save();return true}
+/* ---- named guests (Ken, Monsieur 杜, 周董 …) have a history from now on: visits, the last day, what they ate ---- */
+function namedId(g){return g&&!g.reg&&g.size===1&&NAMED[g.name]?g.name:null}
+function namedHist(name){const N=story().named;return N[name]=N[name]||{v:0,last:0,dishes:{}}}
+function storyIdsOf(g){if(!g)return[];const ids=regsOf(g).slice();const n=namedId(g);if(n)ids.push('n:'+n);return ids}
+/* co-presence: everyone seated who has an identity, once a day per pair — written at a seating, so at most the few people in the room */
+function storyCopresence(g){const mine=storyIdsOf(g);if(!mine.length||!R)return;for(const o of R.groups){if(o===g||o.table==null||o.state==='leave'||o.gone)continue;for(const a of mine)for(const b of storyIdsOf(o))if(a!==b)relSet(a,b,'copresent',true)}}
 /* ---- hospitality: something on the house. Three separate things that used to share one counter (v2.2.1 I-13 / Day 35 #1):
    (1) an OCCASION — Jill's Card (every fifth visit of a regular), an anniversary, the columnist's friend: g.treat is set when
        the table is seated and Jill brings it as soon as she has a moment; never capped, it is a promise;
@@ -1579,7 +1636,7 @@ function update(dt){R.t+=dt;
  if(AU.ctx){const n=R.slots.filter(s=>s.job&&s.type==='stove').length;AU.siz.gain.setTargetAtTime(Math.min(.14,n*.05)*(.7+Math.random()*.6),AU.ctx.currentTime,.05);const seated=R.groups.filter(g=>['reading','order','wait','eat','check'].includes(g.state)).length;AU.chat.gain.setTargetAtTime(Math.min(.09,seated*.018),AU.ctx.currentTime,.3);if(Math.random()<.1)AU.chatBp.frequency.setTargetAtTime(380+Math.random()*500,AU.ctx.currentTime,.08)}
  if(R.closed&&R.groups.length===0&&R.closing==null)startClosing();if(R.closing!=null){R.closing+=dt;if(R.closing>75&&!R.ended){finishClosing();return}}
  R.cpT=(R.cpT||0)+dt;if(R.cpT>20&&R.closing==null){R.cpT=0;checkpointSave('auto')}}
-function startClosing(){R.closing=0;hideCombo();const J=R.jill;J.q=[];J.cur=null;J.carry=[];const wasResting=J.rest==='sit';const keep=wasResting?Object.assign({},LIFE.jill):null;if(J.rest&&!wasResting)endRest();lifePlan();
+function startClosing(){R.closing=0;hideCombo();storyTick('close',{});/* v2.3 */const J=R.jill;J.q=[];J.cur=null;J.carry=[];const wasResting=J.rest==='sit';const keep=wasResting?Object.assign({},LIFE.jill):null;if(J.rest&&!wasResting)endRest();lifePlan();
  if(wasResting){LIFE.plan='sofa';const L=LIFE.jill;Object.assign(L,{on:true,reserved:false,pos:keep.pos,x:keep.x,y:SOFA.jy,face:keep.face,legs:0,legTarget:0,act:'settle',t:rand(1,3),sinceSit:0,counted:false,hat:false});J.rest=null;J.sofa=true;J.tx=null;J.ty=null;J.moving=false;J.restTo=false}
  else if(LIFE.plan==='sofa'){J.tx=null;J.ty=null;J.restTo=false;J.moving=false;const L=LIFE.jill;L.x=J.x;L.y=J.y;L.face=J.face;/* first the pass gets wiped down; then the sofa */L.wrapT=rand(4,6.5);if(Math.hypot(J.x-PASS.x,J.y-PASS.y)>4){L.act='standing';jillWalk(L,PASS.x,PASS.y,'wrap')}else L.act='wrap'}
  else{const t=R.tables[0];J.troom='main';J.tx=t.x-25;J.ty=t.y+2;J.restTo=true}$('#closePill').hidden=false;if(CATS)for(const c of CATS){if(c.hidden||['jump','walk','race','dash','bed'].includes(c.st))continue;c.t=Math.min(c.t||0,c.def.id==='tora'?.4:c.def.id==='ban'?rand(1.5,3):rand(2,8))}}
@@ -1617,7 +1674,7 @@ function achDay(st,plated){if(S.stats.days+1>=7)ach('week');if(st.rev>=20000)ach
  const Rc=S.records||{};if((Rc.calmRun||0)>=7)ach('calm7');const W=R.weather;if((W==='rain'||W==='storm')&&(st.dish.soup||0)>=6)ach('rain');if(W==='storm'&&st.guests>=15)ach('storm');if(W==='hot'&&WX_COLD.filter(d=>DISH(d).cat==='drink').reduce((a,d)=>a+(st.dish[d]||0),0)>=12)ach('hot');
  if(R.event==='celebrate')ach('celebrate');if(R.event==='datenight'&&(st.couples||0)>=5)ach('datenight');const pats=st.pats||[];if(st.guests>=20&&pats.length>=8&&pats.every(p=>p>=.5))ach('night0');
  if(rating()>=4.5&&S.reviews.length>=20)ach('rating45');if(Rc.sig&&Rc.sig.v>=100)ach('sig100');const crew=S.crew||[];if(crew.length>=6)ach('staff6');if(crew.length>=3&&crew.every(m=>m.lv>=5))ach('lv5all');if(opsLv('flow')>=3)ach('ops3');if(albumList().length>=50)ach('photos50')}
-function endDay(){if(!R)return;clearCheckpoint();const st=R.st,D=S.day;const wages=crewWages();let bonus=0;
+function endDay(){if(!R)return;clearCheckpoint();const st=R.st,D=S.day;storyTick('dayend',{st});/* v2.3 */const wages=crewWages();let bonus=0;
  const tasks=S.today.tasks.map(t=>{const p=taskProg(t);const done=p>=t.n;if(done)bonus+=t.reward;return{...t,p,done}});
  S.money+=bonus;let wagesPaid=wages;if(S.money-wages<0){/* v2.2: the till never goes negative — what cannot be paid tonight is noted, not borrowed */wagesPaid=Math.max(0,S.money);S.wageOwed=(S.wageOwed||0)+(wages-wagesPaid)}S.money-=wagesPaid;const avg=st.sats.length?st.sats.reduce((a,b)=>a+b,0)/st.sats.length:0;
  let top=null,topN=0;for(const d in st.dish)if(st.dish[d]>topN){topN=st.dish[d];top=d}
@@ -2619,7 +2676,7 @@ function drawCatTree2(c,now){c.save();c.translate(-26,FY);const sisal=(x,y0,y1)=
 function drawPost(c,now){const {x,y}=SPOT.scr2;c.fillStyle='rgba(0,0,0,.22)';el(c,x+1,y+1.5,12,3.5);c.fillStyle='#D5D0C8';rr(c,x-12,y-5,24,6,2);c.fill();let g=c.createLinearGradient(x-4,0,x+4,0);g.addColorStop(0,'#B8986A');g.addColorStop(.5,'#E2C898');g.addColorStop(1,'#A88858');c.fillStyle=g;c.fillRect(x-4,y-38,8,34);c.strokeStyle='rgba(110,80,40,.45)';c.lineWidth=.7;for(let yy=y-37;yy<y-4;yy+=2.2){c.beginPath();c.moveTo(x-4,yy);c.lineTo(x+4,yy+1);c.stroke()}c.fillStyle='#D5D0C8';el(c,x,y-38,7,2.4);const sw=Math.sin(now*2)*1.5;c.strokeStyle='rgba(60,40,30,.6)';c.lineWidth=.5;c.beginPath();c.moveTo(x,y-40);c.lineTo(x+sw,y-48);c.stroke();c.fillStyle='#8FB6D9';circ(c,x+sw,y-49,2.4)}
 /* v2.2 F: what a table actually saw of the cats, by name and doing what — a review or a regular's note draws only on
    these. The cats are never doing it for anyone: a guest happened to be there. */
-function catEv(g,k,c){if(!g||!c||!c.def)return;g.cats=g.cats||[];if(g.cats.some(e=>e.k===k&&e.id===c.def.id))return;g.cats.push({k,id:c.def.id,st:c.st,perch:c.perch>=0,sofa:!!c.sofa});if(g.cats.length>6)g.cats.shift()}
+function catEv(g,k,c){if(!g||!c||!c.def)return;g.cats=g.cats||[];if(g.cats.some(e=>e.k===k&&e.id===c.def.id))return;g.cats.push({k,id:c.def.id,st:c.st,perch:c.perch>=0,sofa:!!c.sofa});if(g.cats.length>6)g.cats.shift();for(const id of storyIdsOf(g))relSet(id,c.def.id,'cat_'+k,true);storyTick('cat',{g,c,k})/* v2.3 */}
 function catCheer(g,amt){if(!R||!g)return 0;if(R.t-(g.cwin??-99)>20){g.cwin=R.t;g.cgain=0}const a=Math.max(0,Math.min(amt,.3-g.cgain));if(a>0){g.pat=Math.min(1,g.pat+a);g.cgain+=a;g.catJoy=true}return a}
 function catName(C){return(S.catNames&&S.catNames[C.id])||C.n}
 WALL.forEach((w,i)=>TREE.perches.push({x:w.x,y:w.y-3,t:3,wi:i,ax:366,ay:114}));
@@ -2669,7 +2726,7 @@ function albumList(){if(!S.album){S.album=[];/* photos from before the album exi
 function albumAllows(kind){const A=albumList();const today=A.filter(p=>p.day===S.day);if(today.length>=4)return false;const same=A.filter(p=>p.kind===kind);if(!same.length)return true;const last=same[same.length-1];if(S.day-last.day<3)return false;return today.filter(p=>!p.keep).length<2}
 function eveningClock(){const m=Math.floor(21*60+30+Math.min(LIFE.t||0,180)*(75/180));const h=Math.floor(m/60),mm=m%60;return`${h}:${String(mm).padStart(2,'0')}`}
 function albumAdd(kind,img,info){const A=albumList();if(ACH_BY_MEMO[kind])ach(ACH_BY_MEMO[kind]);if(A.length+1>=50)ach('photos50');const keep=!A.some(p=>p.kind===kind);const clock=R&&R.closing==null?clockStr():evening()?eveningClock():'';let txt='';try{txt=(MEM_TXT[kind]||(()=>''))(info||{})}catch(e){}
- const p={id:'p'+S.day+'_'+kind+'_'+Math.random().toString(36).slice(2,8),kind,day:S.day,clock,cap:MEMS[kind]||kind,txt,keep};A.push(p);
+ const p={id:'p'+S.day+'_'+kind+'_'+Math.random().toString(36).slice(2,8),kind,day:S.day,clock,cap:(info&&info.cap)||MEMS[kind]||kind,txt:(info&&info.txt)||txt,keep};A.push(p);
  photoPut(p.id,img).then(ok=>{if(!ok){p.img=img;save()}});   /* no store: the picture stays in the save */
  const ord=A.filter(p=>!p.keep);while(ord.length>albumCap()){const old=ord.shift();A.splice(A.indexOf(old),1);photoDel(old.id)}return p}
 function catBy(id){return CATS?CATS.find(c=>c.def.id===id):null}
@@ -3403,7 +3460,7 @@ function dylanDecide(D){const st=S.dylan.stage;const J=LIFE.jill;const tv=LIFE.t
  default:D.state='think';D.t=2}}
 function doReveal(){const d=S.dylan;if(d.stage>=3)return;d.stage=3;d.reveal=S.day;ach('husband');save();const D=LIFE.dylan,J=LIFE.jill;if(D&&J){say('j',J.x,SOFA.jy-52,LIFE.tv.on?'老公，遙控器。':'老公。');say('d',D.x,SOFA.jy-52,LIFE.tv.on?'喔。':'嗯。',1.4)}setTimeout(()=>{if(S.dylan.stage>=3)scene([{who:'jill',tone:'gentle',text:'老公，走了。'},{who:'dylan',tone:'gentle',text:'好。'}])},3200);memo('husband',(SOFA.x0+SOFA.x1)/2,120,{subj:[{x:LIFE.jill.x,y:SOFA.jy},{x:LIFE.dylan?LIFE.dylan.x:LIFE.jill.x,y:SOFA.jy}]})}
 function say(who,x,y,txt,delay){LIFE.say.push({who,x,y,txt,t:-(delay||0),life:2.6});logLine(who==='j'?'Jill':'Dylan',txt,who==='j'?'j':'d')}
-function lifeEnsureEvening(){if(!evening())return;if(LIFE.day!==S.day||!LIFE.plan)lifePlan();const L=LIFE.jill;
+function lifeEnsureEvening(){if(!evening())return;if(LIFE.day!==S.day||!LIFE.plan)lifePlan();{const d=storyDay();if(!d.eve){d.eve=1;storyTick('evening',{})}}/* v2.3: once, when the evening begins */const L=LIFE.jill;
  if(LIFE.plan==='sofa'&&!L.on&&!L.act&&!L.walking){const pos=freeJillPos();if(!pos){lifeNoRoom();return}L.pos=pos;L.reserved=true;L.face=JPOS[pos].face;L.x=JPOS[pos].x;L.y=SOFA.front+10;L.sitT=.01}}
 function lifeNoRoom(){/* the cats have the whole sofa: Jill takes her old seat at the first table instead */LIFE.plan='table';const L=LIFE.jill;L.act=null;L.reserved=false;L.pos=null;
  if(R&&R.jill){const J=R.jill,t=R.tables[0];J.troom='main';J.tx=t.x-25;J.ty=t.y+2;J.restTo=true;J.sit=false;J.sofa=null}else IDLE=null}
@@ -3994,7 +4051,7 @@ function openLightbox(id){const A=albumList().slice().sort((a,b)=>a.day-b.day);/
 function closeLightbox(){lightbox=null;const el=$('#lightbox');if(el)el.hidden=true}
 function lightboxRender(){const el=$('#lightbox');if(!lightbox||!el)return;const p=albumList().find(x=>x.id===lightbox.ids[lightbox.i]);if(!p){closeLightbox();return}
  el.innerHTML=`<div class="lb-bg" data-lb="close"></div><button class="lb-close" data-lb="close" aria-label="關閉">✕</button>
-  <figure class="lb-card ${p.keep?'keep':''}"><img alt="" data-pid="${p.id}" src="${photoSrc(p)}"><figcaption><span class="when">DAY ${p.day}${p.clock?' · '+p.clock:''}</span><b>「${p.cap}」</b>${p.txt?`<span class="txt">${p.txt}</span>`:''}</figcaption>${p.keep?'<span class="pin">珍藏</span>':''}</figure>
+  <figure class="lb-card ${p.keep?'keep':''}"><img alt="" data-pid="${p.id}" src="${photoSrc(p)}"><figcaption><span class="when">DAY ${p.day}${p.clock?' · '+p.clock:''}</span><b>「${p.cap}」</b>${p.txt?`<span class="txt">${p.txt}</span>`:''}</figcaption>${p.story?'<span class="pin story">故事</span>':p.keep?'<span class="pin">珍藏</span>':''}</figure>
   <div class="lb-nav"><button data-lb="prev" ${lightbox.i<=0?'disabled':''} aria-label="上一張">‹</button><span class="lb-count">${lightbox.i+1} / ${lightbox.ids.length}</span><button class="lb-keep ${p.keep?'on':''}" data-lb="keep">${p.keep?'♥ 珍藏中':'♡ 珍藏'}</button><button data-lb="next" ${lightbox.i>=lightbox.ids.length-1?'disabled':''} aria-label="下一張">›</button></div>`}
 function lightboxStep(d){if(!lightbox)return;const n=lightbox.i+d;if(n<0||n>=lightbox.ids.length)return;lightbox.i=n;lightboxRender()}
 /* ================= v2.2 W: the album is the restaurant's living history =================
@@ -4008,6 +4065,7 @@ function storyEvents(){const ev=[{day:1,t:'開店。第一天。',ic:'signlamp'}
  if(S.grewDay)ev.push({day:S.grewDay,t:`擴建成${LV().n}。`,ic:'crown'});if(S.firstSpecial)ev.push({day:S.firstSpecial,t:'第一道特製版從出菜口出去了。',ic:'plate'});
  const Rc=S.records||{};if(Rc.guestsDay&&Rc.guestsDay.v>=20)ev.push({day:Rc.guestsDay.d,t:`最多客人的一天：${Rc.guestsDay.v} 位。`,ic:'flame'});if(Rc.rain&&Rc.rain.v>0)ev.push({day:Rc.rain.d,t:'下雨天，店裡還是滿的。',ic:'moon'});
  if(S.dylan&&S.dylan.stage>=3&&S.dylan.reveal)ev.push({day:S.dylan.reveal,t:'原來一直都認識。',ic:'heart'});
+ for(const e of storyNotes())ev.push(e);   /* v2.3: what the stories left */
  for(const id in S.regMem||{}){const r=REG_BY[id];if(!r)continue;const first=r.n.split('與')[0];for(const f of (S.regMem[id].facts||[]))if(f.day&&!/^「/.test(f.txt))ev.push({day:f.day,t:(f.txt.startsWith(first)||/^(王先生|王太太|Jill)/.test(f.txt))?f.txt:`${r.n}${f.txt}`,ic:'heart',reg:id})}
  const seen=new Set();return ev.filter(e=>e.day>0&&e.day<=S.day&&!seen.has(e.day+e.t)&&seen.add(e.day+e.t)).sort((a,b)=>a.day-b.day)}
 function weekOf(day){return Math.floor((day-1)/7)+1}
@@ -4019,7 +4077,7 @@ function albumStoryHTML(){const A=albumList().slice().sort((a,b)=>a.day-b.day);c
 /* v2.2.1 #4: two ways into the album. The journal's tab reads from the beginning (the restaurant's history); the
    settlement's 看最新相片 lands on today's photos — the newest polaroid in view, no scrolling from Day 1. */
 function albumScrollLatest(){const sh=screenEl.querySelector('.sheet');if(!sh)return;const A=albumList();const last=A.length?A.reduce((a,p)=>p.day>a.day?p:a,A[0]):null;const el=(last&&screenEl.querySelector(`.polaroid[data-k="${last.id}"]`))||screenEl.querySelector('#story-thisweek')||screenEl.querySelector('.story-now');if(!el)return;const top=el.getBoundingClientRect().top-sh.getBoundingClientRect().top+sh.scrollTop;sh.scrollTop=Math.max(0,top-72)}
-function albumFigure(p,i){return`<figure class="polaroid ${p.keep?'keep':''}" style="--r:${((i%3)-1)*1.5}deg" data-act="photo" data-k="${p.id}"><img alt="" data-pid="${p.id}" src="${photoSrc(p)}"><figcaption><span class="when">DAY ${p.day}${p.clock?' · '+p.clock:''}</span><b>「${p.cap}」</b>${p.txt?`<span class="txt">${p.txt}</span>`:''}</figcaption>${p.keep?'<span class="pin">珍藏</span>':''}</figure>`}
+function albumFigure(p,i){return`<figure class="polaroid ${p.keep?'keep':''}" style="--r:${((i%3)-1)*1.5}deg" data-act="photo" data-k="${p.id}"><img alt="" data-pid="${p.id}" src="${photoSrc(p)}"><figcaption><span class="when">DAY ${p.day}${p.clock?' · '+p.clock:''}</span><b>「${p.cap}」</b>${p.txt?`<span class="txt">${p.txt}</span>`:''}</figcaption>${p.story?'<span class="pin story">故事</span>':p.keep?'<span class="pin">珍藏</span>':''}</figure>`}
 function showBook(){sub='book';let body='';
  if(bookTab==='front'){const rv=S.reviews.slice(-2).reverse();const notes=(S.notes||[]).slice(0,3);const A=albumList().slice(-2).reverse();const met=REGS.filter(r=>(S.regulars[r.id]||0)>0).length;const nAch=Object.keys(S.achievements).length;
   body=`<div class="jhead"><div class="bigrate"><b>${rating().toFixed(1)}</b><div><div class="sum-stars">${starsHTML(Math.round(rating()*2)/2)}</div><div class="muted" style="font-size:12px">${S.reviews.length} 則評價 · 開業 ${S.stats.days||0} 天 · ${S.stats.guests||0} 位客人</div></div></div></div>

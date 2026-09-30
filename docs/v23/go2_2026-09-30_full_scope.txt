@@ -1,0 +1,461 @@
+==================================================
+EXECUTION MODE — COMPLETE v2.3 IN THIS RUN
+==================================================
+
+Change of instruction:
+
+Do NOT stop after the first playable vertical slice.
+Do NOT stop after the Lounge foundation.
+Do NOT stop after the Ken origin slice.
+Do NOT return after each phase asking for authorization.
+
+You are authorized to implement the FULL currently approved Jill’s Kitchen v2.3 scope in docs/V23_BRIEF.md and all incorporated addenda.
+
+The phases are INTERNAL CHECKPOINTS, not approval gates.
+
+For each phase:
+
+IMPLEMENT
+→ TEST
+→ inspect the actual result
+→ commit a rollback-safe checkpoint
+→ continue automatically to the next phase
+
+Only stop early if you discover a genuine product decision that cannot safely be inferred from the approved brief, or a technical blocker that makes continuing unsafe.
+
+Otherwise, continue until the complete approved v2.3 is integrated, tested, built, and ready for my real-device playtest.
+
+==================================================
+FULL TARGET
+==================================================
+
+Complete the approved v2.3 experience, including the systems and content already specified in the brief:
+
+1. Story / Relationship architecture
+- Story Facts
+- Relationship Facts
+- lightweight familiarity
+- behavior unlocks
+- Story Event Arbiter
+- Major / Minor / Ambient lanes
+- weighted eligibility
+- cooldowns
+- overdue/catch-up
+- presentation fallbacks
+- idempotent consequences
+- save migration
+- mature-save compatibility
+
+2. Lounge origin
+- Ken’s wine question
+- later pairing conversations
+- optional Monsieur 杜 enrichment
+- tasting experiment
+- Jill’s after-close realization
+- Lounge project reveal
+- player may build now or defer
+- no fabricated mature-save history
+
+3. Full Lounge progression
+- Lounge I
+- Lounge II
+- Lounge III
+- visible spatial progression
+- bar counter
+- wine storage/backbar
+- seating progression
+- sofa / quiet conversation areas where specified
+- waiting-space function
+- dinner ↔ Lounge transitions
+- post-dinner lingering
+- same customer identity throughout
+
+4. Wine / drink service
+- permanent wine service begins with Lounge I
+- Lounge remains the narrative/operational home of wine
+- pairing behavior
+- no per-table micromanagement
+- no giant bottle-inventory simulator
+
+5. Bar Food
+- distinct short Lounge food menu
+- shared Main Kitchen routing
+- sharing-friendly items
+- Signature Bar Bite where specified
+- no second full kitchen
+- optional later Bar Pantry / Fry Station only at the appropriate mature Lounge stage
+
+6. Lounge staff
+- Evan 林奕文
+- 沈晴
+- 安安
+- 阿拓 黃柘
+
+Use their approved character definitions and canonical art mapping.
+
+Integrate them into the EXISTING staff / 工作分配 architecture.
+
+7. Staff growth
+- existing employees remain useful
+- coarse Station Familiarity
+- coarse Wine Familiarity where appropriate
+- cross-training
+- veteran employees become more valuable, not obsolete
+- no RPG skill tree
+
+8. Sophie × 寶寶
+- continue the approved cross-day relationship arc
+- preserve Sophie’s independent identity
+- no omniscience
+
+9. Sophie × Mia
+Implement the approved slow-burn authored relationship:
+
+recognition
+→ repeated natural encounters
+→ active choice to sit nearby
+→ making space
+→ shared food
+→ waiting
+→ leaving together
+→ eventually arriving together
+
+Do not use a visible romance meter.
+Do not convert them into one Couple entity.
+They remain independent NPCs.
+
+10. 晴 × 阿拓
+Implement the approved optional staff slow-burn:
+
+work friction
+→ work synchrony
+→ small personal gestures
+→ absence noticed
+→ optional relationship development
+
+Must tolerate reassignment, absence and firing.
+Must never block restaurant progression.
+
+11. Ken × Monsieur 杜
+Implement their complete authored friendship arc:
+
+- wine arguments
+- repeated shared Lounge history
+- remembering preferences
+- usual seating
+- noticing absence
+- waiting / asking about each other
+- recurring disagreement
+
+They remain FRIENDS.
+
+Never convert this into romance.
+
+Their closeness is intentionally part of the game’s proof that intimacy ≠ romance.
+
+12. Existing-character story arcs
+Implement the approved v2.3 arcs and callbacks for existing characters, including the ones already specified in the brief:
+
+- 老饕李先生
+- Sophie
+- Mia
+- Momo
+- 小琪
+- 周董
+- Madame Lin
+- 神秘美食評論家
+- 衛生檢查員
+- 王先生
+- 王太太
+- 小林
+- Leo
+- Dylan
+- Jill
+- existing staff
+- cats
+
+Reuse existing NPCs rather than creating unnecessary new named characters.
+
+13. NPC ↔ NPC social development
+Implement lightweight persistent social familiarity and the approved authored/crossover relationships.
+
+People who repeatedly meet at Jill’s Kitchen should gradually behave as if they know each other.
+
+Do NOT turn the restaurant into a matchmaking simulator.
+
+14. NPC ↔ staff familiarity
+Regulars may learn who staff are.
+Staff may remember regular habits.
+Long-tenured staff should visibly accumulate restaurant history.
+
+No omniscience.
+
+15. NPC ↔ cat familiarity
+Characters may gradually recognize individual cats and develop preferences/familiarity where appropriate.
+
+Cats remain autonomous.
+No cat-management burden.
+
+16. Jill × Dylan
+Preserve the existing marriage/pursuer dynamic.
+
+Dylan remains Jill’s husband from the beginning.
+The reveal changes player understanding, not their actual relationship.
+
+Post-reveal Dylan still enjoys pursuing/flirting with his wife.
+
+Their approximately eleven-year history refers ONLY to Jill and Dylan’s relationship.
+
+Do not accidentally apply “eleven years” to observing other NPC relationships.
+
+17. 王先生 × 王太太
+Preserve them as two independent people in an established marriage.
+
+They may arrive together or separately and have independent relationships with other regulars.
+
+18. Story Photos
+Implement S17a fully.
+
+Important authored story arcs leave canonical Story Photos at meaningful milestones.
+
+Story Photo =
+real shared history
+→ real authored milestone occurs
+→ canonical illustration unlocks
+→ permanently preserved in Life Album
+
+Required:
+- Sophie × Mia
+- Ken × Monsieur 杜 friendship
+- 晴 × 阿拓 if their optional relationship genuinely develops
+
+Selected appropriate milestones:
+- Jill × Dylan
+- 王先生 × 王太太
+- staff ensemble / important multi-character arcs
+
+Story Photos are NOT romance rewards.
+
+Ordinary Life Album photos remain emergent captures.
+
+Never unlock a Story Photo for history that did not occur.
+
+19. Reviews 2.0
+Reviews should reflect actual customer experiences and remembered restaurant history where specified.
+
+Reviews must not claim events that did not happen.
+
+20. Social
+Implement the lightweight Social layer from the brief.
+
+Social posts must derive from real restaurant events/photos/history.
+
+Jill may choose among a small number of legitimate recent candidates where specified.
+
+Do not generate fake restaurant history merely for Social content.
+
+21. Marketing
+Implement the approved lightweight marketing loop:
+
+real restaurant topic
+→ optional promotion
+→ affected guest composition / demand
+→ service consequence
+→ reviews / returns / story opportunities
+
+Do not turn this into generic “spend money for +20% customers.”
+
+22. Crossovers
+Implement enough approved cross-character callbacks that by a mature Day50–100 restaurant the player can see a genuine social web.
+
+Characters should:
+- recognize people
+- remember habits
+- notice absence
+- occasionally sit together
+- refer to real shared history
+- form small social clusters
+
+Crossovers are bonus consequences of history.
+
+They must not become hard prerequisites for unrelated arcs.
+
+23. Long-term restaurant memory
+By mature play, the restaurant should visibly remember:
+
+- relationships
+- staff tenure
+- regular habits
+- story events
+- important meals
+- Lounge origin
+- upgrades witnessed
+- cat familiarity
+- Story Photos
+- Reviews / Social history
+
+The restaurant should feel as if it has been open for 50 / 80 / 100 days, not as if every morning rerolls the world.
+
+==================================================
+ART RULE
+==================================================
+
+Use the approved canonical character art and stable character IDs.
+
+Never map portraits by array order.
+
+Do not silently regenerate or substitute a character’s identity.
+
+The approved Sophie / Mia concept must remain visually distinct.
+
+Story Photos must use the canonical identities established for their characters.
+
+If an approved Story Photo asset is not yet available, implement the correct stable asset slot / unlock path and explicitly list the missing art asset in the final report rather than generating a wrong substitute.
+
+Do not block unrelated gameplay because an art asset is missing.
+
+==================================================
+PHASE DISCIPLINE
+==================================================
+
+You may and should divide the work internally.
+
+Suggested sequence:
+
+Phase 0
+Architecture audit
+
+Phase 1
+Story / Relationship foundation
+
+Phase 2
+Existing-character vertical slices
+
+Phase 3
+Lounge structural integration
+
+Phase 4
+Ken → Wine → Lounge origin
+
+Phase 5
+Lounge I + staff + wine + Bar Food
+
+Phase 6
+Lounge II / III + staff growth + optional Bar Pantry
+
+Phase 7
+Sophie × Mia / Ken × 杜 / 晴 × 阿拓 and remaining authored arcs
+
+Phase 8
+Reviews 2.0 + Social + Marketing
+
+Phase 9
+Crossovers + Story Photos + long-term memory
+
+Phase 10
+Balance / migration / mature-save / full regression / release candidate
+
+These are NOT approval gates.
+
+Continue automatically.
+
+==================================================
+TESTING
+==================================================
+
+Protect system truths:
+
+- same customer remains same customer across rooms
+- no duplicate ticket
+- no duplicate payment
+- no duplicate visit
+- no duplicate Review
+- no duplicate Story Fact
+- Story Events are idempotent
+- Story Photos unlock once
+- NPC knowledge has provenance
+- romance never emerges outside the authored whitelist
+- Ken × 杜 never becomes romantic
+- fired staff do not deadlock stories
+- Lounge does not create a second simulation
+- Bar Food does not create a second full kitchen
+- mature saves remain valid
+- migrations survive repeated reload
+- event density stays restrained
+- story evaluation does not become a per-frame performance cost
+
+Use targeted tests and seeded simulations where they provide real confidence.
+
+Do not build a huge test framework for cosmetic minutiae.
+
+==================================================
+PLAYER EXPERIENCE ACCEPTANCE
+==================================================
+
+Do not judge completion only by tests.
+
+Inspect/play representative mature runs.
+
+The target is that the player can eventually say things like:
+
+“Ken 跟杜現在每次都坐那裡吵酒。”
+
+“Sophie 本來跟 Mia 根本不熟。”
+
+“Evan 已經知道誰會等誰了。”
+
+“晴嘴上問炸物，其實是在問阿拓今天有沒有來。”
+
+“這個 Lounge 是 Ken 當初嫌 Jill 沒有酒，後來才真的蓋出來的。”
+
+“這些人以前根本不認識。”
+
+If the systems technically exist but this cannot be perceived in normal play, the feature is not finished.
+
+==================================================
+FINAL DELIVERY
+==================================================
+
+Do not publish over v2.2.1.
+
+When the full approved v2.3 scope is complete:
+
+- run the full regression suite
+- test fresh save
+- test the real mature save fixtures
+- test repeated save/reload
+- perform representative long-run seeded simulations
+- inspect the actual playable UI
+- build the single-file artifact
+- prepare the v2.3 release candidate
+- write docs/V23_REPORT.md
+
+Clearly separate I / T / O.
+
+Do NOT claim phone observation unless I actually perform it.
+
+Do not mark something complete merely because a test forced it.
+
+At the end, report:
+
+1. what was implemented
+2. architecture actually used
+3. story arcs implemented
+4. Lounge I / II / III behavior
+5. staff integration
+6. relationship behavior
+7. Story Photos and any missing final art assets
+8. Reviews / Social / Marketing
+9. save migration
+10. tests and simulations
+11. balance findings
+12. deferred items, if any
+13. what specifically needs my iPhone / normal-play verification
+
+Proceed through the full v2.3 implementation now.
+
+Do not stop after Phase 0.
+Do not stop after a vertical slice.
+Do not ask for routine phase approval.
+
+Finish the approved scope unless a genuine blocker requires my decision.

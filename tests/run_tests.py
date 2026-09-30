@@ -3837,6 +3837,9 @@ def named_guests_keep_one_face_and_the_staff_have_theirs(b, port, target):
     check(not g.errors, g.errors[:2])
     g.close()
 
+# v2.3: the story / Lounge tests live in tests/v23_tests.py (same harness, same TESTS list)
+import v23_tests  # noqa: E402,F401
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--target', choices=['index', 'single'], default='index')

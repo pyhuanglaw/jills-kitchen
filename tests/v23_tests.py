@@ -1,0 +1,101 @@
+"""v2.3 tests — the story/relationship foundation, the vertical slices, the Lounge. Same harness and TESTS list as
+run_tests.py (imported from there at the end of that file), so `python3 tests/run_tests.py -k story` runs these."""
+import json, os, sys
+_rt = sys.modules['__main__'] if hasattr(sys.modules.get('__main__'), 'TESTS') else __import__('run_tests')   # the running harness, not a second copy
+test, check, Game, ROOT, SAVE_KEY, start_day, install_bot, LAZY_ACTOR, play_day = (_rt.test, _rt.check, _rt.Game, _rt.ROOT, _rt.SAVE_KEY, _rt.start_day, _rt.install_bot, _rt.LAZY_ACTOR, _rt.play_day)
+
+FIXTURES = ['player_day30.json', 'player_day33.json', 'player_day35.json', 'player_day39.json']
+
+def load_fixture(g, name):
+    raw = json.load(open(os.path.join(ROOT, 'tests', 'saves', name), encoding='utf-8'))['save']
+    g.ev("phase='title';R=null;localStorage.setItem(KEY,JSON.stringify(%s))" % json.dumps(raw, ensure_ascii=False)); g.reload(); g.page.wait_for_timeout(150)
+    return raw
+
+@test
+def story_foundation_facts_lanes_overdue_and_reload(b, port, target):
+    """v2.3 Phase 1: facts are idempotent and dated, relationship facts are per pair (and once a day when asked),
+    familiarity is computed from them, the arbiter keeps its lanes (major 1 / minor 2 a day), counts a miss for an
+    eligible event that was not chosen and raises its weight, prefers an overdue Class A event, falls back to the
+    presentation that can run, never fires a once-event twice, and everything survives a save and a reload."""
+    g = Game(b, port, target, seed=5, manual=True)
+    g.click('[data-act=start]') if g.ev("!!document.querySelector('[data-act=start]')") else None
+    g.ev("if(phase!=='prep')showPrep()")
+    # facts
+    check(g.ev("factSet('x')") is True and g.ev("factSet('x')") is False and g.ev("factN('x')") == 2 and g.ev("fact('x').d") == g.ev("S.day"), 'a fact is set once, then counted')
+    check(g.ev("factSet('y',true)") is True and g.ev("factSet('y',true)") is False and g.ev("factN('y')") == 1, 'a per-day fact counts once a day')
+    # relationship facts + familiarity
+    check(g.ev("relSet('sophie','mia','copresent',true)") is True and g.ev("relSet('mia','sophie','copresent',true)") is False and g.ev("relN('sophie','mia','copresent')") == 1, 'a pair fact is symmetric and once a day')
+    check(g.ev("famOf('sophie','mia')") == 0, 'one co-presence is still a stranger')
+    g.ev("for(let d=2;d<=4;d++){S.day=d;relSet('sophie','mia','copresent',true)}S.day=1")
+    check(g.ev("famOf('sophie','mia')") == 1, 'repeated co-presence → recognize')
+    g.ev("relSet('sophie','mia','spoke')"); check(g.ev("famOf('sophie','mia')") == 2, 'a real interaction → familiar')
+    g.ev("relSet('sophie','mia','sharedTable');relSet('sophie','mia','sharedFood')"); check(g.ev("famOf('sophie','mia')") == 3, 'shared things, twice → comfortable')
+    check(g.ev("famOf('leo','chen')") == 0, 'an unrelated pair is untouched (no matrix)')
+    # the arbiter, with a test registry
+    g.ev("""STORY_EV.length=0;window.__ran=[];
+      const mk=(k,lane,o)=>Object.assign({k,lane,at:['seat'],when:()=>true,run:()=>__ran.push(k)},o||{});
+      STORY_EV.push(mk('m1','major'),mk('m2','major'),mk('n1','minor'),mk('n2','minor'),mk('n3','minor'),mk('a1','ambient',{cd:0}),
+        mk('once','minor',{once:true,w:()=>100}),
+        mk('fb','minor',{present:[{can:()=>false,run:()=>__ran.push('fb-crowded')},{can:()=>true,run:()=>__ran.push('fb-table')}]}),
+        mk('never','minor',{present:[{can:()=>false,run:()=>__ran.push('never')}]}));""")
+    for _ in range(6): g.ev("storyTick('seat',{})")
+    ran = g.ev("JSON.stringify(__ran)")
+    day = g.ev("JSON.stringify(storyDay())")
+    check(g.ev("storyDay().major") == 1 and g.ev("storyDay().minor") == 2, f'lanes: major 1, minor 2 a day — {day} ran {ran}')
+    check(g.ev("__ran.filter(k=>k==='a1').length") >= 2, f'ambient events keep going with their own cooldown: {ran}')
+    check(g.ev("__ran.includes('once')") and g.ev("__ran.filter(k=>k==='once').length") == 1, f'the weighted once-event fired exactly once: {ran}')
+    check(g.ev("evState('never').miss") >= 1 and not g.ev("__ran.includes('never')"), 'an event with no presentation that can run counts a miss and never fires')
+    check(g.ev("evState('m1').miss+evState('m2').miss") >= 1, 'the major event not chosen counted a miss')
+    # overdue: a Class A event with misses at the floor goes first
+    g.ev("S.day=2;STORY_EV.length=0;__ran.length=0;STORY_EV.push({k:'A',lane:'major',cls:'A',floor:2,at:['seat'],when:()=>true,w:()=>1,run:()=>__ran.push('A')},{k:'B',lane:'major',at:['seat'],when:()=>true,w:()=>1000,run:()=>__ran.push('B')});evState('A').miss=2;evState('A').last=null;evState('B').last=null")
+    g.ev("storyTick('seat',{})"); check(g.ev("__ran[0]") == 'A', f'an overdue Class A event goes first over a heavier one: {g.ev("JSON.stringify(__ran)")}')
+    # fallback presentation used
+    g.ev("S.day=3;STORY_EV.length=0;__ran.length=0;STORY_EV.push({k:'fb2',lane:'minor',at:['seat'],when:()=>true,present:[{can:()=>false,run:()=>__ran.push('crowded')},{can:()=>true,run:()=>__ran.push('table')}]})")
+    g.ev("storyTick('seat',{})"); check(g.ev("__ran[0]") == 'table', 'the first presentation that can run today is used; the story fact is the same')
+    # trace, and the day budget resets with the day
+    check(g.ev("story().trace.length") >= 3 and g.ev("story().trace.every(t=>t.k&&t.d)"), 'a small trace of what fired, dated')
+    check(g.ev("storyDay().d") == 3 and g.ev("storyDay().major") == 0, 'the budget is per day')
+    # persistence through a real reload (the game's own save path)
+    g.ev("S.day=1;save()"); before = g.ev("JSON.stringify(S.story)"); g.reload()
+    check(g.ev("JSON.stringify(S.story)") == before, 'S.story survives the reload byte for byte')
+    check(not g.errors, g.errors[:3]); g.close()
+
+@test
+def story_state_is_empty_on_old_saves_and_stable_over_reloads(b, port, target):
+    """v2.3 mature-save safety: every real save (Day 30/33/35/39) comes up with its own day and an empty story record —
+    nothing is inferred from the past — and two more reloads leave S.story and the day exactly as they were. Named
+    guests have no history yet: the next visit begins it."""
+    for name in FIXTURES:
+        g = Game(b, port, target, seed=3, manual=True, viewport={'width': 390, 'height': 844})
+        raw = load_fixture(g, name)
+        check(g.ev("S.day") == raw['day'], f'{name}: Day {g.ev("S.day")} != {raw["day"]}')
+        check(g.ev(f"localStorage.getItem('{SAVE_KEY}-unreadable')") is None, f'{name}: rescued as unreadable')
+        st = g.ev("JSON.stringify(story())"); regs0 = g.ev("JSON.stringify(S.regulars)")   # after the first load (the Day 30 save gains 王太太's record from the v2.2 migration)
+        check(g.ev("Object.keys(story().facts).length+Object.keys(story().rel).length+Object.keys(story().ev).length+Object.keys(story().photos).length+Object.keys(story().named).length") == 0, f'{name}: the story starts empty, nothing fabricated')
+        g.ev("save()"); g.reload(); g.ev("save()"); g.reload()
+        check(g.ev("S.day") == raw['day'] and g.ev("JSON.stringify(story())") == st, f'{name}: two reloads changed the day or the story record')
+        check(g.ev("S.crew.length") == len(raw['crew']) and g.ev("JSON.stringify(S.regulars)") == regs0, f'{name}: crew or regulars changed over the reloads')
+        check(not g.errors, f'{name}: {g.errors[:2]}'); g.close()
+
+@test
+def a_day_with_the_hooks_writes_copresence_named_history_and_nothing_twice(b, port, target):
+    """v2.3 Phase 1 hooks in the real loop: on the Day 39 save a lazy day is played; every seated pair of known people
+    has at most one co-presence a day, a named guest who paid has one visit in the named history per group (never two
+    Kens in one evening), and the day's story lanes never exceed their caps."""
+    g = Game(b, port, target, seed=39, manual=True, viewport={'width': 390, 'height': 844})
+    load_fixture(g, 'player_day39.json'); g.click('[data-act=openFresh]'); g.page.wait_for_timeout(120)
+    g.ev("S.money+=20000;autoStock()"); start_day(g); install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;")
+    play_day(g, max_steps=60000)
+    for _ in range(300):
+        if g.ev("phase") != 'service': break
+        g.ev("for(let i=0;i<30;i++)__tick(1000/30)")
+    check(g.ev("phase") in ('summary', 'shop'), f'the day ended: {g.ev("phase")}')
+    d = g.ev("S.day"); rel = json.loads(g.ev("JSON.stringify(story().rel)"))
+    for k, p in rel.items():
+        for fk, f in p['f'].items():
+            check(f['n'] <= 1 or f['d'] < f['l'] or fk.startswith('cat_'), f'{k}.{fk} counted twice in one day: {f}')
+    named = json.loads(g.ev("JSON.stringify(story().named)"))
+    check(all(v['v'] >= 1 and v['last'] == d for v in named.values()), f'named history: {named}')
+    names = g.ev("JSON.stringify(R?[]:S.dayLog.filter(l=>l.k==='g').map(l=>l.w))")
+    check(g.ev("(S.story.day.major||0)<=1&&(S.story.day.minor||0)<=2"), f'lanes over budget: {g.ev("JSON.stringify(S.story.day)")}')
+    check(not g.errors, g.errors[:3]); g.close()

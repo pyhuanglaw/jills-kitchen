@@ -260,6 +260,8 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .polaroid .txt{display:block;font-size:11px;color:var(--ink2);line-height:1.4;margin-top:2px}
 .polaroid .pin{position:absolute;top:-7px;right:8px;font-size:9.5px;font-weight:800;letter-spacing:.08em;background:#8C6A3D;color:#FFF6E6;border-radius:6px;padding:2px 6px;box-shadow:0 1px 3px rgba(0,0,0,.2)}/* v2.2: brass, not red — a quiet tag */
 .polaroid.keep{box-shadow:0 3px 10px rgba(0,0,0,.16),0 0 0 2px rgba(140,106,61,.22)}
+/* v2.3: a Story Photo — an authored picture the restaurant's history unlocked; a darker tag than 珍藏 */
+.polaroid .pin.story,.lb-card .pin.story{background:#3A2C24;color:#F4E3C8}
 /* v2.2 W: the album as a living history — weeks, what happened, the photos, and today at the end */
 .story-week{margin-top:14px;padding-top:10px;border-top:1px dashed var(--line)}
 .story-week:first-of-type{margin-top:0;padding-top:0;border-top:0}
