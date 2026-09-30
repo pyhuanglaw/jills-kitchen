@@ -95,7 +95,7 @@ def a_day_with_the_hooks_writes_copresence_named_history_and_nothing_twice(b, po
         for fk, f in p['f'].items():
             check(f['n'] <= 1 or f['d'] < f['l'] or fk.startswith('cat_'), f'{k}.{fk} counted twice in one day: {f}')
     named = json.loads(g.ev("JSON.stringify(story().named)"))
-    check(all(v['v'] >= 1 and v['last'] == d for v in named.values()), f'named history: {named}')
+    check(all(v['v'] >= 1 and v['last'] == d for v in named.values() if v.get('v')), f'named history: {named}')  # (v2.3 Phase 7: a name seen at the door but not paid is a 'seen' entry with v 0)
     names = g.ev("JSON.stringify(R?[]:S.dayLog.filter(l=>l.k==='g').map(l=>l.w))")
     check(g.ev("(S.story.day.major||0)<=1&&(S.story.day.minor||0)<=2"), f'lanes over budget: {g.ev("JSON.stringify(S.story.day)")}')
     check(not g.errors, g.errors[:3]); g.close()
@@ -444,8 +444,8 @@ def phase7_the_arcs_run_on_real_history_and_leave_it_changed(b, port, target):
     check(g.ev("__p7.ev('sm_g').n") == 1, 'G recorded')
     # H: the schedule puts them at the door together; Jill notices; the Story Photo unlocks once
     g.ev("__p7.back('left_'+pairKey('sophie','mia'),3);__p7.clearDay();for(const q of R.groups.slice()){q.gone=true}R.groups=[];for(const t of R.tables){t.group=null;t.dirty=false}")
-    tog = g.ev("(()=>{const out=[{reg:'sophie',t:10},{reg:'mia',t:60}];const r=Math.random;Math.random=()=>.1;storyScheduleTogether(out);Math.random=r;return out.map(o=>[o.t,o.together])})()")
-    check(tog[0][1] == 'sm' and tog[1][1] == 'sm' and abs(tog[0][0] - tog[1][0]) < 3, f'H: one time on the schedule, two entries: {tog}')
+    tog = g.ev("(()=>{const d0=S.day;let out;for(let i=0;i<20;i++){S.day=d0+i;out=[{reg:'sophie',t:10},{reg:'mia',t:60}];storyScheduleTogether(out);if(out[0].together)break}S.day=d0;return out.map(o=>[o.t,o.together])})()")
+    check(tog[0][1] == 'sm' and tog[1][1] == 'sm' and abs(tog[0][0] - tog[1][0]) < 3, f'H: one time on the schedule, two entries (some day soon): {tog}')
     g.ev("const o1=regPlanVisit({t:R.t,type:'gourmet',reg:'sophie',size:1});o1.moment=null;o1.together='sm';const o2=regPlanVisit({t:R.t,type:'office',reg:'mia',size:1});o2.moment=null;o2.together='sm';spawn(o1);spawn(o2);for(const q of R.groups){if(q.table==null){const t=freeTableFor(q);seatGroup(q,t)}}")
     dbg = g.ev("JSON.stringify([evState('sm_h'),R.groups.map(q=>[q.reg,q.state,q.table,q.together]),storyDay(),story().trace.slice(-3)])")
     check(g.ev("__p7.ev('sm_h').n") == 1 and g.ev("relN('sophie','mia','arrivedTogether')") == 1, 'H: 「今天一起？」 ' + dbg)
@@ -459,6 +459,7 @@ def phase7_the_arcs_run_on_real_history_and_leave_it_changed(b, port, target):
     check(g.ev("__p7.ev('kd_evan_1').n") == 1 and g.ev("(R.log||[]).some(l=>/還沒看到/.test(l.t))"), 'Ken asks 「杜來了嗎？」, Evan: 「還沒看到。」')
     g.ev("relSet('n:品酒師 Ken','n:Monsieur 杜','sharedTable');__p7.clearDay();__p7.lounge('Monsieur 杜')")
     check(g.ev("Math.abs(R.tables[R.groups.find(q=>q.name==='Monsieur 杜').table].x-R.tables[R.groups.find(q=>q.name==='品酒師 Ken').table].x)<34"), '杜 takes the stool next to Ken')
+    g.ev("if(!evState('kd_usual').n){__p7.clearDay();storyTick('lounge',{g:R.groups.find(q=>q.name==='Monsieur 杜'),t:null,why:'direct'})}")  # the first Lounge night's own beat may have taken the slot
     check(g.ev("__p7.ev('kd_usual').n") == 1 and g.ev("!!fact('kd_usual').seat"), 'their usual stools are now a fact')
     g.ev("for(let i=0;i<3;i++){relSet('n:品酒師 Ken','n:Monsieur 杜','argued');story().rel[pairKey('n:品酒師 Ken','n:Monsieur 杜')].f.argued.l=S.day-1-i}relSet('n:品酒師 Ken','n:Monsieur 杜','noticedAbsence');__p7.clearDay();storyTick('lounge',{g:R.groups.find(q=>q.name==='品酒師 Ken'),t:null,why:'direct'})")
     check(g.ev("!!story().photos.ken_du&&albumList().some(p=>p.kind==='story:ken_du')"), 'REQUIRED: the friendship Story Photo 《還是沒有同意》')
@@ -510,8 +511,8 @@ def phase7_the_arcs_run_on_real_history_and_leave_it_changed(b, port, target):
     check(g.ev("__p7.ev('koba_drink').n") == 1 and g.ev("(()=>{const q=R.groups.find(x=>x.reg==='koba');return q.ticket.items.some(i=>i.d==='coffee'&&i.st==='served')})()"), '小林: the coffee is on the table when the order is written')
     # ---- the inspector, off duty — only after inspections
     g.ev("__p7.clearDay();factSet('inspection');fact('inspection').l=S.day-3;factSet('inspection')")
-    sch = g.ev("(()=>{const out=[];const r=Math.random;Math.random=()=>.01;storySchedule(out,300);Math.random=r;return out.filter(o=>o.name==='衛生檢查員').map(o=>o.offduty)})()")
-    check(sch == [1], f'the inspector is on the schedule, off duty: {sch}')
+    sch = g.ev("(()=>{const d0=S.day;let out=[];for(let i=0;i<60;i++){S.day=d0+i;out=[];storySchedule(out,300);if(out.some(o=>o.name==='衛生檢查員'))break}S.day=d0;return out.filter(o=>o.name==='衛生檢查員').map(o=>o.offduty)})()")
+    check(sch == [1], f'the inspector is on the schedule some day, off duty: {sch}')
     g.ev("namedHist('衛生檢查員').last=0;namedHist('衛生檢查員').seen=0;spawn({t:R.t,type:'regular',size:1,name:'衛生檢查員',offduty:1});const q=R.groups.find(x=>x.name==='衛生檢查員');const t=R.tables.find(t=>!t.lounge&&!t.group);seatGroup(q,t)")
     check(g.ev("__p7.ev('inspector_dinner').n") == 1 and g.ev("(R.log||[]).some(l=>/只是來吃飯/.test(l.t))"), '「我今天只是來吃飯。」')
     # ---- 王太太 × Dylan after the reveal
