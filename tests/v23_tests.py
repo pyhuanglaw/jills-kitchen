@@ -517,7 +517,7 @@ def phase7_the_arcs_run_on_real_history_and_leave_it_changed(b, port, target):
     check(g.ev("__p7.ev('inspector_dinner').n") == 1 and g.ev("(R.log||[]).some(l=>/只是來吃飯/.test(l.t))"), '「我今天只是來吃飯。」')
     # ---- 王太太 × Dylan after the reveal
     g.ev("__p7.clearDay();S.dylan.stage=3;for(const q of R.groups.slice()){q.gone=true}R.groups=[];for(const t of R.tables){t.group=null;t.dirty=false};spawn({t:R.t,type:'regular',reg:'dylan',size:1});const d=R.groups.find(x=>x.reg==='dylan');seatGroup(d,R.tables.find(t=>!t.lounge&&!t.group));d.state='wait';const o=regPlanVisit({t:R.t,type:'couple',reg:'wang',size:1});o.moment=null;spawn(o);const w=R.groups.find(x=>x.reg==='wang');seatGroup(w,R.tables.find(t=>!t.lounge&&!t.group&&t.seats>=2))")
-    check(g.ev("__p7.ev('wang_dylan_2').n") == 1 and g.ev("(R.log||[]).some(l=>/十一年了/.test(l.t))"), '「追到了沒？」「還在努力。」「十一年了。」')
+    check(g.ev("__p7.ev('wang_dylan_2').n") == 1 and g.ev("(R.log||[]).some(l=>/不要理他/.test(l.t))"), '「追到了沒？」「還在努力。」「不要理他。」')
     # ---- a guest who knows a cat
     g.ev("__p7.clearDay();for(let i=0;i<5;i++){relSet('chen','tora','cat_near');story().rel[pairKey('chen','tora')].f.cat_near.l=S.day-5+i}const r=Math.random;Math.random=()=>.1;__p7.seat('chen');Math.random=r")
     check(g.ev("relN('chen','tora','named')") == 1, '陳伯伯 calls 小虎 by name (or asks where it is)')
@@ -839,4 +839,26 @@ def qa_merged_room_tabs_cushion_light_and_social_entrances(b, port, target):
     txt = g.ev("document.querySelector('#screen').innerText")
     check(not g.ev("!!document.querySelector('#screen [data-act=jillPost],#screen [data-act=campaign]')") and '營業中先看就好' in txt, 'during service the 社群 page is read-only')
     g.ev("closeSub()"); check(g.ev("phase==='service'&&(sub===null||sub==='pause')"), 'closing goes back to the paused service: ' + str(g.ev("[phase,sub]")))
+    check(not g.errors, g.errors[:3]); g.close()
+
+@test
+def dylan_dialogue_revisions_2026_10_01(b, port, target):
+    """The 2026-10-01 Dylan × Jill revision: the cooler scene is gone (no replacement); after the reveal 王太太's
+    「追到了沒？」 gets 「不要理他。」; 「你不是在追？」「那我繼續。」; 「誰？」「你。」; the anniversary is
+    「你決定。」「我每次決定妳都說不要。」「所以你先想三個。」; a four-line exchange is said to the end."""
+    g = Game(b, port, target, seed=106, manual=True)
+    load_fixture(g, 'player_day46.json'); g.click('[data-act=openFresh]'); g.page.wait_for_timeout(150)
+    check(not g.ev("DYLAN_SCENES.some(s=>s.k==='cooler'||s.lines.flat().some(l=>/冷藏庫|不問了/.test(l)))"), 'the cooler scene is removed')
+    act = g.ev("JSON.stringify(DYLAN_ACT)")
+    for gone in ['追到了再說', '那就是可以', '聽起來滿熱鬧的', '你記得日期', '我只是問問', '那天店裡吃']:
+        check(gone not in act, f'old line gone: {gone}')
+    for need in ['你不是在追？', '那我繼續。', '誰？', '你。', '紀念日想吃什麼？', '你決定。', '我每次決定妳都說不要。', '所以你先想三個。']:
+        check(need in act, f'new line in: {need}')
+    check('十一年' not in g.ev("JSON.stringify(STORY_EV.find(e=>e.k==='wang_dylan_2').note)"), 'the 王太太 note no longer says 十一年了')
+    start_day(g); g.ev(P7_HELPERS)
+    g.ev("S.dylan.stage=3;for(const q of R.groups.slice()){q.gone=true}R.groups=[];for(const t of R.tables){t.group=null;t.dirty=false}spawn({t:R.t,type:'regular',reg:'dylan',size:1});const d=R.groups.find(x=>x.reg==='dylan');seatGroup(d,R.tables.find(t=>!t.lounge&&!t.group));__p7.fed(d,['pasta']);d.state='eat';d.timer=0;d.eatDur=90;window.__dg=d")
+    g.ev("const r=Math.random;const i=DYLAN_ACT.after.findIndex(x=>x[2]==='誰？');Math.random=()=>(i+.5)/DYLAN_ACT.after.length;dylanAct(__dg);Math.random=r")
+    g.ev("for(let i=0;i<60;i++)__tick(100)")   # the virtual clock (ms): the exchange's later lines are timed
+    log = json.loads(g.ev("JSON.stringify((R.log||[]).slice(-8).map(l=>l.w+'：'+l.t))"))
+    check(any(l.endswith('誰？') and l.startswith('Dylan') for l in log) and any(l.startswith('Jill') and l.endswith('你。') for l in log), f'the four-line exchange is said to the end: {log}')
     check(not g.errors, g.errors[:3]); g.close()

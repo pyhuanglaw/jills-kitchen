@@ -1961,9 +1961,9 @@ STORY_EV.push(
  {k:'wang_dylan_1',lane:'minor',cls:'B',at:['seat'],once:true,note:'王太太問 Dylan：「還在追喔？」Dylan：「很難追。」',
   when:ctx=>ctx.g&&regsOf(ctx.g).includes('wangwife')&&S.dylan&&S.dylan.stage<3&&(S.regulars.wangwife||0)>=3&&!!R.groups.find(o=>o.reg==='dylan'&&o.table!=null&&SEATED_ST.includes(o.state)),
   run:ctx=>{const g=ctx.g,d=R.groups.find(o=>o.reg==='dylan');sayG(g,'還在追喔？',900,{who:'wangwife'});sayG(d,'很難追。',2500);JILL_SAY('你可以放棄。',4000,{with:'dylan'});sayG(d,'不行。',5400);relSet('wangwife','dylan','spoke');factSet('wang_dylan_1');S.dylan.clues.wang=(S.dylan.clues.wang||0)+1}},
- {k:'wang_dylan_2',lane:'minor',cls:'B',at:['seat'],once:true,note:'王太太：「追到了沒？」Dylan：「還在努力。」Jill：「十一年了。」',
+ {k:'wang_dylan_2',lane:'minor',cls:'B',at:['seat'],once:true,note:'王太太：「追到了沒？」Dylan：「還在努力。」Jill：「不要理他。」',
   when:ctx=>ctx.g&&regsOf(ctx.g).includes('wangwife')&&S.dylan&&S.dylan.stage>=3&&!!R.groups.find(o=>o.reg==='dylan'&&o.table!=null&&SEATED_ST.includes(o.state)),
-  run:ctx=>{const g=ctx.g,d=R.groups.find(o=>o.reg==='dylan');sayG(g,'追到了沒？',900,{who:'wangwife'});sayG(d,'還在努力。',2500);JILL_SAY('十一年了。',4000,{with:'dylan'});relSet('wangwife','dylan','spoke');factSet('wang_dylan_2');regFact('wangwife','問 Dylan 追到了沒。Jill 說十一年了。')}},
+  run:ctx=>{const g=ctx.g,d=R.groups.find(o=>o.reg==='dylan');sayG(g,'追到了沒？',900,{who:'wangwife'});sayG(d,'還在努力。',2500);JILL_SAY('不要理他。',4000,{with:'dylan'});relSet('wangwife','dylan','spoke');factSet('wang_dylan_2');regFact('wangwife','問 Dylan 追到了沒。Jill 說不要理他。')}},
  /* ===== Mia — only the Mia who was really here early ===== */
  {k:'mia_early',lane:'ambient',cd:1,at:['seat'],when:ctx=>ctx.g&&ctx.g.reg==='mia'&&!fact('mia_early')&&fact('first_mia')&&projOn('side')&&(S.newRooms&&S.newRooms.side)>fact('first_mia').d&&ctx.t&&(ctx.t.room||'main')==='side',
   run:ctx=>{sayG(ctx.g,'我以前來的時候這邊還沒有側廳。',900);factSet('mia_early');regFact('mia','記得側廳還沒蓋的時候。')}},
@@ -4199,15 +4199,14 @@ function regularsNoticeDylan(g){if(!R||!g.reg||g.reg==='dylan'||(REG_BY[g.reg]&&
 const DYLAN_ACT={
  before:[['老闆娘，今天有空嗎？','沒有。'],['老闆娘，妳有男朋友嗎？','先吃飯。'],['今天的菜好吃到想每天來。','你本來就每天來。'],['老闆娘，可以留個電話嗎？','不行。'],['老闆娘，妳綁馬尾很好看。',null],['我下次帶花來。','帶錢來就好。'],
   ['主廚，請問今日推薦是什麼？','你可以正常講話。','我只是尊重主廚。'],['這道菜，跟昨天一樣好。','你昨天不是才吃過？','昨天跟今天是不同的約會。'],['老闆娘，妳今天有笑。','我每天都有。','沒有，今天比較多。'],['我可以坐這裡看妳做菜嗎？','你已經坐下了。',null],['老闆娘，這隻貓好像認識我。','牠誰都認識。','牠剛剛只來我這桌。'],['老闆娘，打烊後要去哪？','回家。','一個人？','跟貓。']],
- after:[['老闆娘，明天有空嗎？','不行，我老公會生氣。','那確實滿麻煩的。'],['老闆娘，可以留個電話嗎？','你不是有嗎？','再要一次也不行喔？'],['老闆娘，妳一個人住嗎？','跟五隻貓，還有一個很煩的人。','聽起來滿熱鬧的。'],['老闆娘，這道菜是為我做的吧？','是為 {T} 號桌做的。',null],['老闆娘，晚上一起吃飯？','回家吃。','好。'],
-  ['老闆娘，今天早點打烊？','看貓答不答應。','牠們一向答應。'],['主廚，今天的菜有進步。','你昨天也這樣講。','昨天也是真的。'],['老闆娘，我可以追妳嗎？','追到了再說。','那就是可以。'],['老闆娘，紀念日想吃什麼？','你記得日期？','我只是問問。','……那天店裡吃。'],['這位子有人坐嗎？','有，一個很煩的人。','那我坐旁邊。'],['老闆娘，我今天可以幫忙嗎？','不用，你是客人。','客人可以每天來嗎？','你不是已經每天來了。']]};
+ after:[['老闆娘，明天有空嗎？','不行，我老公會生氣。','那確實滿麻煩的。'],['老闆娘，可以留個電話嗎？','你不是有嗎？','再要一次也不行喔？'],['老闆娘，妳一個人住嗎？','跟五隻貓，還有一個很煩的人。','誰？','你。'],['老闆娘，這道菜是為我做的吧？','是為 {T} 號桌做的。',null],['老闆娘，晚上一起吃飯？','回家吃。','好。'],
+  ['老闆娘，今天早點打烊？','看貓答不答應。','牠們一向答應。'],['主廚，今天的菜有進步。','你昨天也這樣講。','昨天也是真的。'],['老闆娘，我可以追妳嗎？','你不是在追？','那我繼續。'],['紀念日想吃什麼？','你決定。','我每次決定妳都說不要。','所以你先想三個。'],['這位子有人坐嗎？','有，一個很煩的人。','那我坐旁邊。'],['老闆娘，我今天可以幫忙嗎？','不用，你是客人。','客人可以每天來嗎？','你不是已經每天來了。']]};
 /* Scenes that belong to a moment: the place grew, a cat took something first, a regular noticed. Each plays once. */
 const DYLAN_SCENES=[
  {k:'side',when:()=>projOn('side'),lines:[['側廳有位子嗎？','你坐哪都一樣。','不一樣，那邊看得到妳。'],['妳把牆打掉了。','嗯。','以前那面牆我還滿喜歡的。','……你要不要吃飯。']]},
  {k:'kext',when:()=>projOn('kext'),lines:[['廚房變大了。','嗯。','妳更忙了。','你話變多了。']]},
  {k:'terrace',when:()=>projOn('terrace'),lines:[['外面也有位子了。','下次坐外面。','下雨我就進來。']]},
  {k:'pass',when:()=>projOn('pass'),lines:[['出菜口變寬了。','你連這個都注意。','我什麼都注意。']]},
- {k:'cooler',when:()=>projOn('cooler'),lines:[['冷藏庫。','嗯。','好，那我不問了。']]},
  {k:'jill5',when:()=>S.level>=5,lines:[['招牌上只剩一個名字了。','還缺一個嗎？','……不缺。']]},
  {k:'special',when:()=>S.menu.some(d=>DISHES[d]&&DISHES[d].special),lines:[['特製版跟一般的差在哪？','差一百塊。','那我要特製版。'],['我要特製版。','你每次都點最貴的。','我尊重主廚的研發。']]},
  {k:'special4',when:()=>S.menu.filter(d=>DISHES[d]&&DISHES[d].special).length>=4,lines:[['菜單上有四道特製版了。','嗯。','妳以前一道都不肯做。','以前沒有人一直點。']]},
@@ -4222,7 +4221,8 @@ function dylanScene(g){const seen=S.dylan.seen=S.dylan.seen||{};for(const sc of 
  L.forEach((txt,i)=>{if(txt)say(i,txt)});/* v2.2.1: each line is logged when it is spoken (quote / jillSay / noteLine) — the script itself is not a log entry */return true}return false}
 function dylanAct(g){const st=S.dylan.stage;const pool=st>=3?DYLAN_ACT.after:DYLAN_ACT.before;const line=pick(pool).map(x=>x&&x.replace('{T}',g.table+1));quote(g,line[0]);
  if(line[1])setTimeout(()=>{if(R&&phase==='service')jillSay(line[1],{with:'dylan'})},1500);else setTimeout(()=>{if(R&&phase==='service')noteLine('Jill 看了他一眼，沒有回答。')},1500);
- if(line[2])setTimeout(()=>{if(R&&phase==='service')quote(g,line[2])},3100)}
+ if(line[2])setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,line[2])},3100);
+ if(line[3])setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))jillSay(line[3],{with:'dylan'})},4700)}/* v2.3: a four-line exchange ends with Jill (before, the fourth line was never said) */
 function dylanGuestUpd(g,dt){const t=R.tables[g.table];const J=R.jill;g.glT=(g.glT??rand(5,12))-dt;
  const jillLooking=Math.hypot(J.x-t.x,J.y-t.y)<80&&((J.face>0)===(t.x>=J.x));
  if(g.gaze>R.t&&jillLooking)g.gaze=0;
