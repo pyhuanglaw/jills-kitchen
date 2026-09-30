@@ -294,3 +294,36 @@ def the_lounge_has_an_origin_ken_wine_a_tasting_and_a_project_that_never_disappe
     # a save with no Ken history: nothing of this can fire on day one
     g = Game(b, port, target, seed=3, manual=True); load_fixture(g, 'player_day39.json'); g.click('[data-act=openFresh]'); g.page.wait_for_timeout(100)
     check(not g.ev("!!fact('ken_wine_q')") and g.ev("kenHist().v") == 0, 'no fabricated history'); g.close()
+
+@test
+def lounge_i_content_bar_food_in_the_kitchen_wine_at_dinner_the_cast_by_name(b, port, target):
+    """v2.3 Phase 5: Lounge I bought on the Day 46 save unlocks the bar bites in the same kitchen (no menu slot, same
+    fridge); a hired bartender is Evan with his own portrait and look, the second is 沈晴; over a lazy day Lounge tickets
+    carry bites cooked by chefs at the stove/prep, dining tables order a glass now and then (poured at the bar, carried
+    from the pass), the summary shows the Lounge line, and the manual has its card."""
+    g = Game(b, port, target, seed=51, manual=True, viewport={'width': 390, 'height': 844})
+    load_fixture(g, 'player_day46.json'); g.click('[data-act=openFresh]'); g.page.wait_for_timeout(120)
+    g.ev("S.money+=400000;factSet('lounge_project');buyLounge(1);hideReveal&&hideReveal()")
+    check(g.ev("loungeLv()") == 1 and g.ev("S.unlocked.includes('bites')&&S.menu.includes('bites')&&S.unlocked.includes('cheeseplate')") and not g.ev("S.unlocked.includes('mushroom')"), 'Lounge I unlocked the bites (II keeps the mushrooms)')
+    n0 = g.ev("menuCount()"); check(g.ev("menuCount()") <= g.ev("menuCap()") and g.ev("S.menu.filter(d=>DISHES[d]&&DISHES[d].bar).length") == 3, 'bar dishes take no menu slot')
+    g.ev("(()=>{const b=document.createElement('button');b.dataset.act='hire';b.dataset.k='bartender';doAct('hire',b,'bartender')})()") if g.ev("typeof doAct==='function'") else None
+    if g.ev("!S.crew.some(m=>m.role==='bartender')"):
+        g.ev("S.crew.push({id:'cb1',role:'bartender',name:CREW_NAMES.bartender[0],lv:1,duty:'lbar'})")
+    ev = g.ev("S.crew.find(m=>m.role==='bartender')")
+    check(ev['name'] == 'Evan' and g.ev("!!portraitOf('staff:Evan')") and g.ev("crewLook(S.crew.find(m=>m.role==='bartender')).apron") == '#5A3E28', f'Evan, with his portrait and his look: {ev}')
+    g.ev("S.crew.push({id:'cb2',role:'bartender',name:CREW_NAMES.bartender.find(n=>!S.crew.some(m=>m.name===n)),lv:1,duty:null})")
+    check(g.ev("S.crew.find(m=>m.id==='cb2').name") == '沈晴' and g.ev("!!portraitOf('staff:沈晴')"), 'the second bartender is 沈晴')
+    g.ev("showPrep();autoStock();S.stock.bites=Math.max(S.stock.bites||0,12);S.stock.croquette=Math.max(S.stock.croquette||0,10);S.stock.cheeseplate=Math.max(S.stock.cheeseplate||0,8)")
+    start_day(g); install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;")
+    g.ev("window.__lg={bites:0,wineDine:0,cooked:0};const ct0=createTicket;createTicket=function(q){const r=ct0.apply(this,arguments);const tk=q.ticket;if(!tk)return r;if(tk.lounge){if(tk.items.some(i=>DISHES[i.d]&&DISHES[i.d].bar))__lg.bites++}else if(tk.items.some(i=>i.lbar))__lg.wineDine++;return r};const pl0=plate;plate=function(sl,q){const j=sl.job;if(j&&DISHES[j.d]&&DISHES[j.d].bar)__lg.cooked++;return pl0.apply(this,arguments)}")
+    play_day(g, max_steps=60000)
+    for _ in range(400):
+        if g.ev("phase") != 'service': break
+        g.ev("for(let i=0;i<30;i++)__tick(1000/30)")
+    lg = json.loads(g.ev("JSON.stringify(__lg)")); s = json.loads(g.ev("JSON.stringify(S.lastSummary.lg)"))
+    check(lg['bites'] >= 1 and lg['cooked'] >= 1, f'bar bites were ordered in the Lounge and cooked by the kitchen: {lg}')
+    check(lg['wineDine'] >= 1, f'a glass at a dining table: {lg}')
+    check(s and s['open'] and s['tabs'] >= 2, f'the summary carries the Lounge line: {s}')
+    check('Lounge' in g.ev("document.body.innerText"), 'the summary shows it')
+    check(g.ev("GUIDE.some(c=>/Lounge/.test(c.h))"), 'the manual has the Lounge card')
+    check(not g.errors, g.errors[:3]); g.close()

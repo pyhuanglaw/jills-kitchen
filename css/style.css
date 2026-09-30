@@ -372,6 +372,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .item{display:grid;grid-template-columns:56px 1fr;gap:4px 12px;padding:12px 0;border-top:1px solid var(--line)}
 .item:first-child{border-top:0}
 .item img{width:56px;height:56px;grid-row:span 3;border-radius:12px;background:#F6EEDF}
+.item img.face{object-fit:cover;object-position:top;background:linear-gradient(#EFE5D3,#D9C9AE)}   /* v2.3: a staff member's own portrait on the card */
 .item .nm{font-weight:800;font-size:14.5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .item .d{font-size:12.5px;color:var(--ink2);line-height:1.45}
 .item .act{grid-column:2}

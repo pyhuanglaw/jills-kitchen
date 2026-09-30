@@ -3828,7 +3828,7 @@ def named_guests_keep_one_face_and_the_staff_have_theirs(b, port, target):
     check(g.ev("!!R.insp") and g.ev("!!document.querySelector('#plines img')") and g.ev("(R.log||[]).some(l=>l.w==='衛生檢查員')"), 'the inspector arrives with her face and a line')
     # the staff
     st = json.loads(g.ev("JSON.stringify(Object.keys(STAFF_PORTRAITS).map(n=>[n,!!portraitOf('staff:'+n)]))"))
-    check(len(st) == 14 and all(ok for n, ok in st), f'fourteen staff names have a portrait: {st}')
+    check(len(st) == 18 and all(ok for n, ok in st) and all(n in dict(st) for n in ['Evan', '沈晴', '阿拓', '安安']), f'eighteen staff names have a portrait (v2.3: the four of the Lounge, by name): {st}')
     check(g.ev("CREW_NAMES.chef.concat(CREW_NAMES.waiter,CREW_NAMES.cleaner).filter(n=>!STAFF_PORTRAITS[n]).join(',')") == '阿勇,老周師傅,小魏,小威,阿芳,阿桂', 'the six later names wait for assets, as reported')
     check(g.ev("portraitOf('jill').src===portraitData('jill_default')&&portraitOf('dylan').src===portraitData('dylan_default')"), "Jill's and Dylan's portraits are untouched")
     # a named reviewer's face in the journal
