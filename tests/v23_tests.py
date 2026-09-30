@@ -606,16 +606,18 @@ def phase9_the_restaurant_remembers_milestones_slots_and_small_crossovers(b, por
     g.ev("S.money+=900000;showPrep();autoStock()")
     start_day(g); g.ev(P7_HELPERS)
     # a slot without art
+    g.ev("window.__wa=window.STORY_ART.wang_anniv;delete window.STORY_ART.wang_anniv")   # as before the art arrived (2026-10-01)
     check(g.ev("storyPhoto('wang_anniv',{n:1})") is False and g.ev("!!storyPhotoPending().wang_anniv&&storyPhotoPending().wang_anniv.day===S.day&&!story().photos.wang_anniv"), 'no art: the milestone waits in its slot')
     g.ev("S.day+=2;window.STORY_ART.wang_anniv=window.STORY_ART.ken_du;storyPhotoFlush();S.day-=2")
     check(g.ev("!!story().photos.wang_anniv&&!storyPhotoPending().wang_anniv&&albumList().some(p=>p.kind==='story:wang_anniv'&&p.day===S.day)"), 'when the art arrives the photo joins the album on the day it happened')
-    g.ev("delete window.STORY_ART.wang_anniv")
+    g.ev("window.STORY_ART.wang_anniv=__wa")
     # the blackout, remembered
     g.ev("__p7.seat('chen');fireIncident('power')")
     check(g.ev("!!fact('saw_power_chen')"), '陳伯伯 sat through the blackout')
     g.ev("S.ops=S.ops||{};S.ops.power=Math.max(1,S.ops.power||0);__p7.clearDay();__p7.seat('chen')")
     check(g.ev("relN('chen','jill','powerJoke')") == 1 and g.ev("(R.log||[]).some(l=>/沒再停電/.test(l.t))"), '「最近沒再停電了吧？」「不要講。」— once')
-    # Valentine's
+    # Valentine's (first as a save from before the art arrived: the slot waits, no substitute picture)
+    g.ev("window.__valArt=window.STORY_ART.jill_dylan_valentine;delete window.STORY_ART.jill_dylan_valentine")
     g.ev("S.dylan.stage=1;R.event='valentine';S.props=S.props||{};delete S.props.flowers;__p7.clearDay();spawn({t:R.t,type:'regular',reg:'dylan',size:1});const d=R.groups.find(x=>x.reg==='dylan');if(d.table==null)seatGroup(d,freeTableFor(d))")
     check(g.ev("__p7.ev('dylan_valentine').n") == 1 and g.ev("propOn('flowers')&&S.propFrom.flowers==='dylan'") and g.ev("R.groups.find(x=>x.reg==='dylan').stayLate") == 1 and g.ev("dylanStays(R.groups.find(x=>x.reg==='dylan'))"), 'flowers on the counter, and he stays late')
     v1 = g.ev("(R.log||[]).filter(l=>l.w==='Dylan').slice(-2).map(l=>l.t).join('|')")
@@ -623,6 +625,10 @@ def phase9_the_restaurant_remembers_milestones_slots_and_small_crossovers(b, por
     v2 = g.ev("(R.log||[]).filter(l=>l.w==='Dylan').slice(-2).map(l=>l.t).join('|')")
     check(g.ev("__p7.ev('dylan_valentine').n") == 2 and v1 != v2 and g.ev("!!storyPhotoPending().jill_dylan_valentine"), f'the next year is different, and after the reveal the photo slot is set: {v1} / {v2}')
     check(not g.ev("!!story().photos.jill_dylan_valentine"), 'no substitute picture for missing art')
+    # the art arrives (2026-10-01): the waiting slot joins the album, dated to the day it happened
+    d0 = g.ev("storyPhotoPending().jill_dylan_valentine.day")
+    g.ev("window.STORY_ART.jill_dylan_valentine=__valArt;storyPhotoFlush()")
+    check(g.ev("!!story().photos.jill_dylan_valentine") and not g.ev("!!storyPhotoPending().jill_dylan_valentine") and g.ev("(albumList().find(p=>p.kind==='story:jill_dylan_valentine')||{}).day") == d0, 'with the art, the Valentine photo joins the album on the day it happened')
     g.ev("S.day--;R.event='none'")
     # the milestone
     g.ev("story().base=S.lifetime;S.lifetime=MILESTONES.find(v=>v>story().base)+1;const v=milestoneDue();window.__v=v")
@@ -662,7 +668,7 @@ def followup_story_progress_is_visible_retrievable_and_honest(b, port, target):
     load_fixture(g, 'player_day48.json'); g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(1200)
     check(g.ev("document.querySelector('#storyNote').hidden"), 'loading an old save announces nothing')
     g.ev("bookTab='story';showBook()"); g.page.wait_for_timeout(80); txt = g.ev("document.body.innerText")
-    check('人物故事' in txt and '開始記得彼此' not in txt and '餐廳故事' in txt, 'no v2.3 beat that never happened; the restaurant story (restored) is there')
+    check('人物／關係支線' in txt and '開始記得彼此' not in txt and '餐廳故事' in txt, 'no v2.3 beat that never happened; the restaurant story (restored) is there')
     for w in ['madeSpace', 'choseNear', 'sharedFood', 'waitedFor', 'copresent']:
         check(w not in txt, f'no internal name on the page: {w}')
     dy = json.loads(g.ev("JSON.stringify((()=>{const L=STORY_LINES.find(x=>x.k==='dylan');return{open:L.open(),who:L.who(),title:L.title(),faces:L.faces(),done:lineProgress(L).done.map(x=>x.t),stage:S.dylan.stage}})())"))
@@ -689,7 +695,7 @@ def followup_story_progress_is_visible_retrievable_and_honest(b, port, target):
     g.ev("storyNoteShow({k:'sm',who:'Sophie & Mia',t:'開始記得彼此',n:1,total:8})"); g.page.click('#storyNote'); g.page.wait_for_timeout(150)
     check(g.ev("sub==='book'&&bookTab==='story'&&paused") and g.ev("!!document.querySelector('#sl-sm.focus')"), 'tapping the note opens that story, focused')
     ptxt = g.ev("document.querySelector('#sl-sm').innerText")
-    check('1 / 8 個故事片段' in ptxt and '下一段：？？？' in ptxt and '她們的故事還在繼續' in ptxt, f'progress, the next beat unknown: {ptxt[:200]}')
+    check('1 / 8 個故事片段' in ptxt and '2.？？？' in ptxt and '8.？？？' in ptxt and '9.' not in ptxt and '她們的故事還在繼續' in ptxt, f'progress: every stage numbered, the ones not seen yet 「？？？」: {ptxt[:260]}')
     g.ev("document.querySelector('#sl-sm details.sb').open=true"); ptxt = g.ev("document.querySelector('#sl-sm').innerText")
     check('妳也常來' in ptxt, 'the beat opens to what was said')
     g.ev("closeSub()"); check(g.ev("sub===null&&!paused&&phase==='service'"), 'closing returns to service, running')
@@ -701,7 +707,7 @@ def followup_story_progress_is_visible_retrievable_and_honest(b, port, target):
     pre = g.ev("lineProgress(STORY_LINES.find(x=>x.k==='dylan')).total")
     g.ev("S.dylan.stage=3;S.dylan.reveal=S.day;factSet('dylan_valentine')")
     post = json.loads(g.ev("JSON.stringify((()=>{const L=STORY_LINES.find(x=>x.k==='dylan');const P=lineProgress(L);return{title:L.title(),who:L.who(),faces:L.faces(),total:P.total,done:P.done.map(x=>x.t),more:L.more()}})())"))
-    check(post['title'] == '結婚十一年，還在追' and post['who'] == 'Jill & Dylan' and 'jill' in post['faces'] and post['total'] > pre and '情人節' in post['done'] and '還在繼續' in post['more'], f'after the reveal: {post}')
+    check(post['title'] == '結婚十一年，還在追' and post['who'] == 'Jill & Dylan' and 'jill' in post['faces'] and post['total'] > len(post['done']) and '「老公，走了。」' in post['done'] and '情人節' in post['done'] and '還在繼續' in post['more'], f'after the reveal the same history goes on, with more to come: {post} (before: {pre})')
     # reload keeps records and the seen-counts
     before = g.ev("JSON.stringify([story().lineSeen,story().beatLines])"); g.ev("save()"); g.reload(); g.page.wait_for_timeout(200); g.click('[data-act=openFresh]'); g.page.wait_for_timeout(1200)
     check(g.ev("JSON.stringify([story().lineSeen,story().beatLines])") == before and g.ev("document.querySelector('#storyNote').hidden"), 'records survive a reload; nothing is announced again')
@@ -899,4 +905,47 @@ def regulars_remember_their_life_not_replay_it(b, port, target):
     m4 = json.loads(g.ev("JSON.stringify((()=>{const m=regMem('chen');m.flags={students:S.day-30,vegDay:S.day-3,friendDay:S.day-3};S.props=S.props||{};S.props.oranges=S.day-10;return __mom('chen',500)})())"))
     check(not any(x in m4 for x in ['students', 'veg', 'friend', 'oranges']), f'陳伯伯: the former student once; the oranges, the vegetables, the old friend only after a long gap: {m4}')
     check(g.ev("regPairMet('chen','wang')"), '陳伯伯 and 王先生 found out they know each other already (DAY 44) — not again')
+    check(not g.errors, g.errors[:3]); g.close()
+
+@test
+def story_page_counts_only_real_beats_numbered_with_unseen_stages(b, port, target):
+    """v2.3 story audit (2026-10-01), on the player's Day 52 save at phone size: the 故事 page shows 餐廳故事 (restored)
+    and 人物／關係支線; each line numbers every stage, the unseen ones 「？？？」; only one-time authored beats count (the
+    deleted cooler scene, a visit count, recurring behaviour, ambient lines and repeats do not); dates come from the
+    game's own records, 更早以前 when they are not known (a batch of achievements an update caught up on is not a date);
+    a story with no beat yet is one of the 「還沒開始」; a beat is announced the day it happens, never a past one;
+    everything survives a reload."""
+    g = Game(b, port, target, seed=108, manual=True, viewport={'width': 390, 'height': 844})
+    load_fixture(g, 'player_day52.json'); g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(1300)
+    check(g.ev("document.querySelector('#storyNote').hidden"), 'loading announces nothing')
+    L = json.loads(g.ev("JSON.stringify(Object.fromEntries(STORY_LINES.map(L=>{const P=lineProgress(L);return[L.k,{open:(()=>{try{return L.open()}catch(e){return false}})(),n:P.done.length,total:P.total,done:histOrder(P.done,x=>x.d).map(x=>[x.d,x.t])}]})))"))
+    dy = L['dylan']
+    check(dy['n'] == 12 and dy['total'] == 17 and [d for d, t in dy['done']] == [0, 28, 33, 34, 38, 41, 43, 45, 47, 48, 50, 52], f"Dylan: his real one-time scenes, dated: {dy}")
+    check(not any('冷藏庫' in t or '又來了' in t or '熟悉他' in t or '收盤子' in t for d, t in dy['done']), 'no deleted scene, no visit count, no recurring behaviour')
+    check(L['koba']['n'] == 2 and [d for d, t in L['koba']['done']] == [28, 40] and L['koba']['total'] == 3, f"小林: promotion (DAY 28) and the new job (DAY 40) from his own record; 「今天不要那個。」 is a habit: {L['koba']}")
+    check(L['wang']['total'] == 2 and L['wang']['done'] == [[38, '結婚紀念日在這裡過']], f"the Wangs: one anniversary, one stage (its photo is the same day): {L['wang']}")
+    check(L['li']['total'] == 1, f"老饕李先生: the first two beats cannot happen any more in this save (the second signature came first): {L['li']}")
+    beats = g.ev("JSON.stringify(STORY_LINES.map(L=>L.beats.map(b=>b[1])))")
+    for w in ['又看出來了', '又來了', '「隨便」是什麼', '今天不要那個', '今年也在這裡']:
+        check(w not in beats, f'not a stage: {w}')
+    g.ev("bookTab='story';showBook()"); g.page.wait_for_timeout(120); txt = g.ev("document.querySelector('#screen').innerText")
+    check('餐廳故事' in txt and '人物／關係支線' in txt, 'both sections')
+    for w in ['madeSpace', 'choseNear', 'sharedFood', 'waitedFor', 'copresent', 'dy_', 'koba_promo', 'meal_box']:
+        check(w not in txt, f'no internal name on the page: {w}')
+    dtxt = g.ev("document.querySelector('#sl-dylan').innerText")
+    check('12 / 17 個故事片段' in dtxt and '13.？？？' in dtxt and '17.？？？' in dtxt and '結婚' not in dtxt, f'Dylan numbered, the rest 「？？？」, the secret kept: {dtxt[:300]}')
+    check(not g.ev("!!document.querySelector('#sl-zhou')") and '還有' in txt, '周董 has no beat yet: one of the 「還沒開始」')
+    ch = g.ev("document.querySelector('.schap').innerText")
+    check('1.DAY 1開店' in ch and '更早以前第一位員工' in ch and 'DAY 27' not in ch, f'the first hire is not claimed for DAY 27 (the crew was here before tenure was kept): {ch[:220]}')
+    g.ev("closeSub()")
+    # a beat today is news (and a line's number); a beat added to the record for an earlier day is not
+    g.ev("storyProgressCheck();document.querySelector('#storyNote').hidden=true;/* (the first look at a save takes in what is already there, silently) */S.dylan.seen.gear=S.day;storyProgressCheck()")
+    note = g.ev("document.querySelector('#storyNote').hidden?null:document.querySelector('#storyNote').innerText")
+    check(note and 'Dylan' in note and '13 / 17' in note and '牠已經在上面了' in note, f"today's beat is announced: {note}")
+    g.ev("document.querySelector('#storyNote').hidden=true;regMem('leo').flags.plant=S.day-9;storyProgressCheck()")
+    check(g.ev("document.querySelector('#storyNote').hidden"), 'a beat from nine days ago is not news')
+    before = g.ev("JSON.stringify(story().lineSeen)")
+    g.ev("save()"); g.reload(); g.page.wait_for_timeout(200); g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(1300)
+    check(g.ev("JSON.stringify(story().lineSeen)") == before and g.ev("document.querySelector('#storyNote').hidden"), 'what the player has been told survives a reload; nothing is announced again')
+    check(sorted(json.loads(g.ev("JSON.stringify(lineProgress(STORY_LINES.find(x=>x.k==='dylan')).done.map(x=>x.d))"))) == [0, 28, 33, 34, 38, 41, 43, 45, 47, 48, 50, 52, 52], 'and no beat is lost or invented by the reload')
     check(not g.errors, g.errors[:3]); g.close()

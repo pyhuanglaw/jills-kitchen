@@ -1455,22 +1455,22 @@ function regSeatMoment(g,t){const id=g.reg;if(!id||id==='dylan')return;const k=g
  if(k==='delivered'){say(pick(['稿子交了！今天要吃好一點。','終於交出去了。']));g.celebrate=true;regFact(id,'趕完稿那天，說要吃好一點。')}
  if(k==='moved'){say('搬家了，但還是會繞過來。');m.flags.moved=S.day;regFact(id,'搬家了，還是會來。')}
  if(k==='late'){say(pick(['今天加班，還好還開著。','趕上了。']))}
- if(k==='promo'){say('升職了，今天不趕。');g.celebrate=true;g.unhurried=true;m.flags.promo=S.day;regFact(id,'升職那天，難得吃了一頓慢的。')}
- if(k==='newjob'){say('換工作了，離這裡遠一點，還是會來。');m.flags.newjob=S.day;regFact(id,'換了工作，離得遠了。')}
+ if(k==='promo'){storyCapStart('koba_promo');say('升職了，今天不趕。');g.celebrate=true;g.unhurried=true;m.flags.promo=S.day;regFact(id,'升職那天，難得吃了一頓慢的。')}
+ if(k==='newjob'){storyCapStart('koba_newjob');say('換工作了，離這裡遠一點，還是會來。');m.flags.newjob=S.day;regFact(id,'換了工作，離得遠了。')}
  if(k==='broke'){say(pick(['今天只能點這個。','月底了。']));g.broke=true}
  if(k==='payday'){say('打工薪水下來了！');m.flags.paydayDay=S.day;g.celebrate=true}
  if(k==='exam'){say(pick(['期中考週，吃完就回去唸書。','考完再來好好吃。']));m.flags.examDay=S.day;g.quick=true}
  if(k==='finals'){say('Jill 姊，我期末考考完了！');m.flags.finalsDay=S.day}
- if(k==='jobhunt'){say('快畢業了，開始找工作。');m.flags.jobhunt=S.day;regFact(id,'快畢業了，在找工作。')}
- if(k==='grad'){say('我畢業了，第一份薪水就是想來這裡吃一頓。');g.celebrate=true;m.flags.grad=S.day;regFact(id,'畢業了，第一份薪水來這裡吃了一頓。')}
+ if(k==='jobhunt'){storyCapStart('leo_jobhunt');say('快畢業了，開始找工作。');m.flags.jobhunt=S.day;regFact(id,'快畢業了，在找工作。')}
+ if(k==='grad'){storyCapStart('leo_grad');say('我畢業了，第一份薪水就是想來這裡吃一頓。');g.celebrate=true;m.flags.grad=S.day;regFact(id,'畢業了，第一份薪水來這裡吃了一頓。')}
  if(k==='signature'){say(pick(['今天想看看招牌菜。','招牌菜，我來評分。']));g.wantSig=true}
  if(k==='strict'){g.strict=true}
  if(k==='share'){g.share=true}
- if(k==='anniv'){say('今天是我們的結婚紀念日。');g.anniv=true;g.treat='dessert';m.flags.anniv=S.day;regFactG(g,'結婚紀念日是在這裡過的。')}
+ if(k==='anniv'){storyCapStart('wang_anniv');say('今天是我們的結婚紀念日。');g.anniv=true;g.treat='dessert';m.flags.anniv=S.day;regFactG(g,'結婚紀念日是在這裡過的。')}
  if(['oranges','veg','drawing','plant','flowers'].includes(k))g.gift=k;
  if(g.memoAt==='seat')setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g)&&g.table!=null){const tb=R.tables[g.table];memo('company',tb.x,tb.y-6,{g:g.name,subj:[{x:tb.x-24,y:tb.y},{x:tb.x+24,y:tb.y}]})}},2500)}
 /* the gift is handed over when Jill comes to the table (a waiter taking the order leaves it for the checkout) */
-function regGift(g,t){const k=g.gift;if(!k)return;g.gift=null;const id=g.reg;const m=regMem(id);
+function regGift(g,t){const k=g.gift;if(!k)return;g.gift=null;const id=g.reg;const m=regMem(id);if(k==='plant'&&!m.flags.plant)storyCapStart('leo_plant');
  const lines={oranges:['鄰居送太多橘子，我一個人吃不完，拿一些來。','橘子，朋友種的，太多了。'],veg:['朋友田裡的菜，太多了，分妳一些。','菜園今年收太好，拿來給店裡。'],drawing:['幫店裡畫了個小東西，貼在牆上好嗎？','畫了一張，放店裡吧。'],plant:['宿舍的多肉長太多，分店裡一盆。','這盆放窗邊剛好。'],flowers:['太太種的花，開太多了。','花園裡剪的，放店裡好看。']};
  quote(g,pickT(lines[k]));setTimeout(()=>{if(R&&phase==='service')jillSay(pickT(['謝謝，我放這裡。','太好了，謝謝你。','這怎麼好意思。']))},1500);
  if(k==='oranges'){propSet('oranges');regFact(id,'拿了一袋橘子來。')}
@@ -2133,7 +2133,7 @@ function secSocial(money,btn,live){const s=social();const cands=socialCands();co
 function storyPhotoPending(){const st=story();return st.photosPending=st.photosPending||{}}
 function storyPhotoFlush(){const P=storyPhotoPending();for(const k in P){if(story().photos[k]){delete P[k];continue}const D=STORY_PHOTOS[k];if(D&&D.art&&storyArtSrc(D.art)){const info=P[k].info||{};const day0=P[k].day;delete P[k];const ok=storyPhoto(k,info);if(ok){const p=albumList().find(x=>x.kind==='story:'+k);if(p&&day0)p.day=day0}}}}
 STORY_PHOTOS.jill_dylan_valentine={cap:'情人節，還在追',txt:()=>'十一年了，他還是每年帶花來。',art:'jill_dylan_valentine',who:['jill','dylan']};
-STORY_PHOTOS.wang_anniv={cap:'今年也在這裡',txt:i=>`王先生和王太太的結婚紀念日，${i.n?`第 ${i.n} 次`:''}在這裡過。`,art:'wang_anniv',who:['wang','wangwife']};
+STORY_PHOTOS.wang_anniv={cap:'今年也在這裡',txt:()=>'王先生和王太太的結婚紀念日，在這裡過。',art:'wang_anniv',who:['wang','wangwife']};   /* the anniversary happens once in a save (a count here always said 「第 1 次」, against 「今年也在這裡」) */
 STORY_PHOTOS.staff_meal={cap:'開店前',txt:i=>`${i.names||'大家'}——這些人現在是一家店了。`,art:'staff_meal',who:['staff']};
 STORY_PHOTOS.opened_up={cap:'好像真的開起來了',txt:i=>`打烊後還亮著燈的餐廳。${i.who?`${i.who}看了帳，說：「妳以前第一天賺多少？」`:''}`,who:['jill'],
  stage:(c,info)=>{/* the storefront after closing, from the street: the room still lit, Jill inside — no cats placed, nobody invented */
@@ -2163,8 +2163,8 @@ function namedGuestsHTML(){const N=story().named;const keys=Object.keys(N).filte
 /* ---- the staff meal before opening: fragments between people who have worked here a while ---- */
 function staffMealStory(){const crew=(S.crew||[]).filter(m=>(m.days||0)>=3);if(crew.length<2||!R&&phase!=='prep')return;const st=story();if(st.mealDay===S.day)return;st.mealDay=S.day;
  const W=crew.filter(m=>m.role==='waiter'),C=crew.filter(m=>m.role==='chef');if(!W.length||!C.length)return;const w=W[hash('meal|'+S.day+'|w')%W.length],c=C[hash('meal|'+S.day+'|c')%C.length];const k=pairKey('s:'+w.id,'s:'+c.id);
- if(!fact('meal_box_'+k)){if(Object.keys(st.facts).some(x=>x.startsWith('meal_box_'))||hash('meal|'+S.day)%100>=12)return;/* one running joke per restaurant */factSet('meal_box_'+k);const lines=[[w,'你今天是不是把我的甜點吃掉了？'],[c,'沒有。'],[w,'盒子上寫'+w.name+'。'],[c,'我以為是口味。']];lines.forEach(([m,t],i)=>later(()=>{if(phase==='prep')staffSay(m,t)},600+i*1500));relSet('s:'+w.id,'s:'+c.id,'mealJoke');return}
- const f=fact('meal_box_'+k);if(f&&S.day-f.d>=6&&!fact('meal_two_'+k)&&(S.crew||[]).includes(w)&&(S.crew||[]).includes(c)){factSet('meal_two_'+k);later(()=>{if(phase==='prep')noteLine(`員工餐的桌上多了一份甜點，盒子上寫${w.name}。沒有人解釋。`)},900);relSet('s:'+w.id,'s:'+c.id,'gesture')}}
+ if(!fact('meal_box_'+k)){if(Object.keys(st.facts).some(x=>x.startsWith('meal_box_'))||hash('meal|'+S.day)%100>=12)return;/* one running joke per restaurant */factSet('meal_box_'+k);{const F=story().facts['meal_box_'+k];F.w=w.name;F.c=c.name}storyCapStart('meal_box');const lines=[[w,'你今天是不是把我的甜點吃掉了？'],[c,'沒有。'],[w,'盒子上寫'+w.name+'。'],[c,'我以為是口味。']];lines.forEach(([m,t],i)=>later(()=>{if(phase==='prep')staffSay(m,t)},600+i*1500));relSet('s:'+w.id,'s:'+c.id,'mealJoke');return}
+ const f=fact('meal_box_'+k);if(f&&S.day-f.d>=6&&!fact('meal_two_'+k)&&(S.crew||[]).includes(w)&&(S.crew||[]).includes(c)){factSet('meal_two_'+k);storyCapStart('meal_two');later(()=>{if(phase==='prep')noteLine(`員工餐的桌上多了一份甜點，盒子上寫${w.name}。沒有人解釋。`)},900);relSet('s:'+w.id,'s:'+c.id,'gesture')}}
 /* the ensemble: a team that has really been one for a while */
 function staffEnsembleCheck(){const crew=S.crew||[];const vets=crew.filter(m=>(m.days||0)>=20);if(crew.length>=6&&vets.length>=4&&!story().photos.staff_meal&&!storyPhotoPending().staff_meal){factSet('staff_ensemble');storyPhoto('staff_meal',{names:vets.slice(0,5).map(m=>m.name).join('、')})}}
 STORY_EV.push(
@@ -2203,45 +2203,76 @@ STORY_EV.push(
    stored except, per line, how many beats the player has already been told about (so an update is announced once). */
 const BF=k=>{const f=fact(k);if(f)return f.d;const e=story().ev[k];return e&&e.n?e.d||e.last||S.day:null};   /* the day a beat happened */
 const BOLD=v=>v?0:null;   /* a real v2.2 record with no date: "更早以前" */
+/* ---- helpers for records the game already keeps ---- */
+function achAt(id){const v=S.achievements&&S.achievements[id];return v?(typeof v==='number'?v:0):null}   /* the day an achievement was unlocked (0 = unknown) */
+/* ...as the day the thing itself happened: not when it arrived with a batch (four or more unlocked the same day — an
+   update catching up on what had already happened; the real day is unknown, 更早以前) */
+function achReal(id){const d=achAt(id);if(!d)return d;const A=S.achievements||{};let n=0;for(const k in A)if(A[k]===d)n++;return n>=4?0:d}
+/* the first person hired: unknown when someone on the crew was already here before tenure was kept */
+function firstHireDay(){const crew=S.crew||[];const a=achReal('hire');if(!crew.length)return a;if(crew.some(m=>m.sinceLegacy||!m.since))return 0;const m=Math.min(...crew.map(m=>m.since));return a?Math.min(a,m):m}
+function minD(...v){const d=v.filter(x=>x!=null);return d.length?Math.min(...d):null}
+function dyScene(k){return(S.dylan&&S.dylan.seen&&S.dylan.seen[k])||null}
+/* a Dylan scene with one version: what was said (the order is Dylan / Jill, or 王太太 when the line says so) */
+function dySceneNote(k){const sc=typeof DYLAN_SCENES!=='undefined'&&DYLAN_SCENES.find(x=>x.k===k);if(!sc||sc.lines.length!==1)return'';return sc.lines[0].map((t,i)=>!t?'':/^王太太：/.test(t)?t:(i%2===0?`Dylan：「${t}」`:`Jill：「${t}」`)).filter(Boolean).join(' ')}
+const DY_SCENE_T={pass:'「出菜口變寬了。」',side:'側廳',kext:'「廚房變大了。」',terrace:'「外面也有位子了。」',jill5:'「招牌上只剩一個名字了。」',special:'特製版',special4:'「菜單上有四道特製版了。」',sigevo:'「招牌菜換盤了？」',gear:'「牠已經在上面了。」',menu:'「菜單我自己拿了。」',water:'「水我自己倒了。」',wang:'「那位先生每天都來耶。」'};
+/* the staff meal's running joke (one per restaurant): who, when, and whether the second half can still happen */
+function mealPair(){const F=story().facts;const k=Object.keys(F).find(x=>x.startsWith('meal_box_'));if(!k)return null;const f=F[k];const pk=k.slice(9);const crew=S.crew||[];const ms=pk.split('|').map(x=>crew.find(m=>'s:'+m.id===x));
+ let w=f.w,c=f.c;if(!w||!c){const W=ms.find(m=>m&&m.role==='waiter'),C=ms.find(m=>m&&m.role==='chef');w=w||(W&&W.name);c=c||(C&&C.name)}
+ const two=F['meal_two_'+pk];return{w:w||'一位外場',c:c||'一位廚師',d1:f.d,d2:two?two.d:null,both:ms.every(Boolean)}}
+function firstCriticDay(){const r=S.reviews.find(r=>r.critic);const a=achReal('critic');if(a===0)return 0;return minD(r?r.day:null,a)}
+/* Each line is a genuine authored arc; each beat [source, title, opts] is a one-time moment (a once-only event, a
+   flag, a dated record) or the FIRST time of an authored story event — never an ambient or repeated line (see
+   docs/v23/story_audit_2026-10-01.md). opts: post (only after Dylan's reveal) · hide (counted only once it happened)
+   · can (counted while it can still happen) · key (for a function source: its id) · note (what happened, from the
+   game's own record). */
 const STORY_LINES=[
  {k:'sm',who:'Sophie & Mia',names:['Sophie','Mia','Jill','Evan','沈晴','安安'],faces:['sophie','mia'],title:()=>'慢慢變得不一樣',open:()=>!!BF('sm_a'),more:'她們的故事還在繼續。',photos:['sophie_mia_arrive','sophie_mia_leave'],
   beats:[['sm_a','開始記得彼此'],['sm_b','同一個晚上'],['sm_c','今天坐得近了一點'],['sm_d','留了一個位置'],['sm_e','分一口'],['sm_f','等一個人'],['sm_g','今天一起走'],['sm_h','今天一起來']]},
  {k:'sophiemei',who:'Sophie & 寶寶',names:['Sophie','Jill'],faces:['sophie','cat:mei'],title:()=>'我沒有特別喜歡貓',open:()=>!!BF('sophie_mei_1'),more:'寶寶好像記得她。',photos:['sophie_mei'],
   beats:[['sophie_mei_1','「可以不要讓牠靠我的包嗎？」'],['sophie_mei_2','「今天那隻呢？」'],['sophie_mei_3','低頭看了一下'],['sophie_mei_4','「給你們店裡的。」']]},
  {k:'kd',who:'Ken & Monsieur 杜',names:['品酒師 Ken','Monsieur 杜','Evan','沈晴','安安','Jill'],faces:['named:品酒師 Ken','named:Monsieur 杜'],title:()=>'總是談不攏的兩個人',tag:'友情故事',open:()=>!!(BF('ken_du_argue')||BF('kd_usual')),more:'他們還在吵。',photos:['ken_du','ken_du_seat'],
-  beats:[['ken_du_argue','第一次吵起來'],['lounge_first_night','Lounge 的第一個晚上'],['kd_usual','固定的位子'],['kd_evan_1','「杜來了嗎？」'],['kd_qing','「他有說幾點嗎？」'],[['kd_absence','kd_absence_du'],'那個人今天沒來'],['kd_coaster','第二個杯墊'],['kd_photo','還是沒有同意']]},
+  beats:[['ken_du_argue','第一次吵起來'],['lounge_first_night','Lounge 的第一個晚上'],['kd_usual','固定的位子'],['kd_evan_1','「杜來了嗎？」'],['kd_qing','「他有說幾點嗎？」'],[['kd_absence','kd_absence_du'],'那個人今天沒來'],['kd_coaster','第二個杯墊'],['kd_photo','還是沒有同意'],['kd_photo2','固定的位置']]},
  {k:'qt',who:'晴 & 阿拓',names:['沈晴','阿拓','Jill'],kinds:['s'],faces:['staff:沈晴','staff:阿拓'],title:()=>'多的',open:()=>!!BF('qt_1'),more:'（只要他們還在這裡工作。）',photos:['qing_tuo','qing_tuo_late'],
-  beats:[['qt_1','「炸雞好了沒？」'],['qt_2','不用問了'],['qt_3','「多的。」'],['qt_absence','「今天炸物怎麼怪怪的？」'],['qt_photo','從工作開始']]},
- {k:'dylan',who:()=>dylanOut()?'Jill & Dylan':'Dylan',names:['Dylan','Jill','王太太','王先生'],faces:()=>dylanOut()?['dylan','jill']:['dylan'],title:()=>dylanOut()?'結婚十一年，還在追':'那位常來的客人',open:()=>(S.regulars.dylan||0)>=1,more:()=>dylanOut()?'他們的故事還在繼續。':'好像有什麼……',photos:['jill_dylan_valentine','opened_up'],
-  beats:[[()=>(S.regulars.dylan||0)>=3?BOLD(1):null,'又來了'],[()=>(S.dylan.clues.knows||0)>=1?BOLD(1):null,'他好像知道東西放在哪'],[()=>(S.dylan.clues.pet||0)>=1?BOLD(1):null,'五隻貓好像很熟悉他'],[()=>(S.dylan.clues.tidy||0)>=1?BOLD(1):null,'走之前會自己收盤子'],[()=>S.dylan.stage>=1?BOLD(1):null,'打烊後還在'],['wang_dylan_1','「還在追喔？」'],
-   [()=>S.dylan.stage>=3?(S.dylan.reveal||0):null,'「老公，走了。」',{hide:1}],['dylan_valentine','情人節',{post:1}],['wang_dylan_2','「十一年了。」',{post:1}],['dylan_notices','「不要管人家。」',{post:1}]]},
+  beats:[['qt_1','「炸雞好了沒？」'],['qt_2','不用問了'],['qt_3','「多的。」'],['qt_absence','「今天炸物怎麼怪怪的？」'],['qt_photo','從工作開始'],['qt_photo2','有你在的晚班']]},
+ {k:'dylan',who:()=>dylanOut()?'Jill & Dylan':'Dylan',names:['Dylan','Jill','王太太','王先生'],faces:()=>dylanOut()?['dylan','jill']:['dylan'],title:()=>dylanOut()?'結婚十一年，還在追':'那位常來的客人',open:()=>(S.regulars.dylan||0)>=1,more:()=>dylanOut()?'他們的故事還在繼續。':'好像有什麼……',photos:['jill_dylan_valentine'],
+  beats:[[()=>S.dylan.stage>=1?(S.dylan.st1||0):null,'打烊後還在',{key:'dy_stay'}],
+   ...Object.keys(DY_SCENE_T).map(k=>[()=>dyScene(k),DY_SCENE_T[k],{key:'dy_'+k,note:()=>dySceneNote(k),can:k==='gear'?()=>CATGEAR.some(G=>!gearOn(G.k)||S.day-(S.gear[G.k]||0)<=3):null}]),
+   ['wang_dylan_1','「還在追喔？」',{can:()=>S.dylan.stage<3}],['dylan_valentine','情人節'],['dylan_notices','「不要管人家。」'],
+   [()=>S.dylan.stage>=3?(S.dylan.reveal||0):null,'「老公，走了。」',{hide:1,key:'dy_reveal'}],['wang_dylan_2','「不要理他。」',{post:1}]]},
  {k:'wang',who:'王先生 & 王太太',names:['王先生','王太太','Dylan','Jill'],faces:['wang','wangwife'],title:()=>'兩個人，不是一組',open:()=>(S.regulars.wang||0)>=4,more:'他們的日子還很長。',photos:['wang_anniv'],
-  beats:[[()=>regMem('wang').flags.anniv?BOLD(1):null,'結婚紀念日在這裡過'],[()=>(regMem('wang').flags.soloSeen||0)>=1||(regMem('wangwife').flags.soloSeen||0)>=1?BOLD(1):null,'今天只有一個人'],['wang_solo','「我也是經過。」'],['wang_anniv','今年也在這裡']]},
+  beats:[[()=>regAnnivDay(),'結婚紀念日在這裡過',{key:'wang_anniv',note:()=>'結婚紀念日是在這裡過的。Jill 請了甜點。'}],['wang_solo','「我也是經過。」']]},
+ {k:'koba',who:'小林',names:['小林','Jill'],faces:['koba'],title:()=>'我還沒點',open:()=>regOnceDay('koba','promo','升職那天，難得吃了一頓慢的。')!=null||!!BF('koba_drink'),more:'',
+  beats:[[()=>regOnceDay('koba','promo','升職那天，難得吃了一頓慢的。'),'「升職了，今天不趕。」',{key:'koba_promo',note:()=>'升職那天，難得吃了一頓慢的。'}],['koba_drink','「你哪次不是這個？」'],[()=>regOnceDay('koba','newjob','換了工作，離得遠了。'),'換了工作',{key:'koba_newjob',note:()=>'小林：「換工作了，離這裡遠一點，還是會來。」'}]]},
+ {k:'leo',who:'Leo',names:['Leo','Jill'],faces:['leo'],title:()=>'考完再來好好吃',open:()=>regOnceDay('leo','plant','送了一盆多肉，放在窗邊。')!=null||!!BF('leo_cats')||regOnceDay('leo','jobhunt','快畢業了，在找工作。')!=null,more:'',
+  beats:[[()=>regOnceDay('leo','plant','送了一盆多肉，放在窗邊。'),'一盆多肉',{key:'leo_plant',note:()=>'送了一盆多肉，放在窗邊。'}],['leo_cats','五隻都在'],[()=>regOnceDay('leo','jobhunt','快畢業了，在找工作。'),'「快畢業了，開始找工作。」',{key:'leo_jobhunt'}],[()=>regOnceDay('leo','grad','畢業了，第一份薪水來這裡吃了一頓。'),'第一份薪水',{key:'leo_grad',note:()=>'畢業了，第一份薪水來這裡吃了一頓。'}]]},
+ {k:'meal',who:()=>{const p=mealPair();return p?`${p.w} & ${p.c}`:'員工'},names:[],kinds:['s','e'],faces:()=>{const p=mealPair();return p?['staff:'+p.w,'staff:'+p.c]:[]},title:()=>'我以為是口味',open:()=>!!mealPair(),more:'',
+  beats:[[()=>{const p=mealPair();return p?p.d1:null},'「你今天是不是把我的甜點吃掉了？」',{key:'meal_box',note:()=>{const p=mealPair();return p?`員工餐。${p.w}：「你今天是不是把我的甜點吃掉了？」${p.c}：「沒有。」${p.w}：「盒子上寫${p.w}。」${p.c}：「我以為是口味。」`:''}}],
+   [()=>{const p=mealPair();return p?p.d2:null},'多了一份甜點',{key:'meal_two',note:()=>{const p=mealPair();return p?`員工餐的桌上多了一份甜點，盒子上寫${p.w}。沒有人解釋。`:''},can:()=>{const p=mealPair();return!!(p&&p.both)}}]]},
  {k:'zhou',who:'周董',names:['周董','Jill'],kinds:['s'],faces:['named:周董'],title:()=>'都可以',open:()=>(namedHist('周董').v||0)>=3,more:'',
-  beats:[['zhou_seat','第一次坐到側廳'],['zhou_random','「隨便」是什麼'],['zhou_dessert','「那明天再來。」'],[()=>relN('n:周董','snow','stayedFor')?(rel('n:周董','snow').stayedFor.d):null,'「牠在睡。」']]},
+  beats:[['zhou_seat','第一次坐到側廳'],['zhou_dessert','「那明天再來。」'],[()=>relN('n:周董','snow','stayedFor')?(rel('n:周董','snow').stayedFor.d):null,'「牠在睡。」',{key:'zhou_snow'}]]},
  {k:'lin',who:'Madame Lin',names:['Madame Lin','Jill'],faces:['named:Madame Lin'],title:()=>'她什麼都看得到',open:()=>!!BF('lin_saw'),more:'',
-  beats:[['lin_saw','一坐下就看出來了'],[()=>factN('lin_saw')>=3?fact('lin_saw').l:null,'又看出來了'],['lin_gift','「那個角落空很久了。」']]},
+  beats:[['lin_saw','一坐下就看出來了'],['lin_gift','「那個角落空很久了。」']]},
  {k:'li',who:'老饕李先生',names:['老饕李先生','Jill','Sophie'],faces:['named:老饕李先生'],title:()=>'兩道走天下',open:()=>!!(BF('li_1')||BF('li_2')),more:'',
-  beats:[['li_1','「靠這一道走天下？」'],['li_sophie','「甜點還沒有。」'],['li_2','「現在可以了。」']]},
- {k:'critic',who:'戴帽子的客人',names:['戴帽子的客人','Jill'],faces:['named:戴帽子的客人'],title:()=>'比較安靜',open:()=>S.reviews.some(r=>r.critic),more:'',
-  beats:[[()=>{const r=S.reviews.find(r=>r.critic);return r?r.day:null},'有人寫了 Jill\'s Kitchen'],['critic_back','「今天還戴帽子？」']]},
- {k:'insp',who:'衛生檢查員',names:['衛生檢查員','Jill'],kinds:['s'],faces:['named:衛生檢查員'],title:()=>'今天不是來檢查',open:()=>!!BF('inspection'),more:'',
-  beats:[['inspection','例行檢查'],[()=>factN('inspection')>=2?fact('inspection').l:null,'又來了'],['inspector_dinner','「我今天只是來吃飯。」']]},
- {k:'koba',who:'小林',names:['小林','Jill'],faces:['koba'],title:()=>'我還沒點',open:()=>!!BF('koba_drink'),more:'',
-  beats:[['koba_drink','「你哪次不是這個？」'],['koba_not_today','「今天不要那個。」']]},
+  beats:[['li_1','「靠這一道走天下？」',{can:()=>!S.sigDessert}],['li_sophie','「甜點還沒有。」',{can:()=>!S.sigDessert}],['li_2','「現在可以了。」']]},
+ {k:'critic',who:'戴帽子的客人',names:['戴帽子的客人','Jill'],faces:['named:戴帽子的客人'],title:()=>'比較安靜',open:()=>firstCriticDay()!=null,more:'',
+  beats:[[()=>firstCriticDay(),'有人寫了 Jill\'s Kitchen',{key:'critic_first'}],['critic_back','「今天還戴帽子？」']]},
+ {k:'insp',who:'衛生檢查員',names:['衛生檢查員','Jill'],kinds:['s'],faces:['named:衛生檢查員'],title:()=>'今天不是來檢查',open:()=>minD(BF('inspection'),achAt('inspect'))!=null,more:'',
+  beats:[[()=>{const a=achReal('inspect');return a===0?0:minD(BF('inspection'),a)},'例行檢查',{key:'inspection'}],['inspector_dinner','「我今天只是來吃飯。」']]},
 ];
 function dylanOut(){return S.dylan&&S.dylan.stage>=3}
 /* a beat's day: a fact / event key, several keys (first that happened), or a function returning a day (0 = before v2.3) or null */
 function beatDay(b){const src=b[0];if(typeof src==='function'){try{return src()}catch(e){return null}}if(Array.isArray(src)){const ds=src.map(BF).filter(d=>d!=null);return ds.length?Math.min(...ds):null}return BF(src)}
-function lineBeats(L){return L.beats.filter(b=>!(b[2]&&b[2].post)||dylanOut()).filter(b=>!(b[2]&&b[2].hide)||beatDay(b)!=null)}
-function beatKey(b){const s0=b[0];if(typeof s0==='string')return s0;if(Array.isArray(s0))return s0.filter(k=>BF(k)!=null).sort((a,c)=>BF(a)-BF(c))[0]||null;return null}
-function lineProgress(L){const bs=lineBeats(L);const done=bs.map(b=>({t:b[1],d:beatDay(b),k:beatKey(b)})).filter(x=>x.d!=null);return{done,total:bs.length+(L.k==='dylan'&&!dylanOut()?1:0)}}
+function lineBeats(L){return L.beats.filter(b=>{const o=b[2]||{};if(o.post&&!dylanOut())return false;const d=beatDay(b);if(o.hide&&d==null)return false;if(o.can&&d==null){try{if(!o.can())return false}catch(e){return false}}return true})}
+function beatKey(b){const s0=b[0];if(typeof s0==='string')return s0;if(Array.isArray(s0))return s0.filter(k=>BF(k)!=null).sort((a,c)=>BF(a)-BF(c))[0]||null;return(b[2]&&b[2].key)||null}
+function beatId(b){const s0=b[0];return typeof s0==='string'?s0:Array.isArray(s0)?s0.join('+'):(b[2]&&b[2].key)||b[1]}
+function lineProgress(L){const bs=lineBeats(L);const done=bs.map(b=>({t:b[1],d:beatDay(b),k:beatKey(b),id:beatId(b),note:b[2]&&b[2].note})).filter(x=>x.d!=null);return{done,total:bs.length+(L.k==='dylan'&&!dylanOut()?1:0)}}
+function lineWho(L){return typeof L.who==='function'?L.who():L.who}
 /* the restaurant's own story: chapters read from what the restaurant really became */
-function restChapters(){const achD=id=>S.achievements&&S.achievements[id]?(typeof S.achievements[id]==='number'?S.achievements[id]:0):null;
+function restChapters(){const achD=achReal;/* v2.3 follow-up: a beat's day from the game's own records where it kept one (achievements, the side hall's day, the first expansion when it was the only one); otherwise 更早以前 */
  const has=(ok,d)=>ok?(d==null?0:d):null;
  const C=[
-  {t:'小小的餐廳',beats:[['開店',has(true,1)],['第一位員工',has((S.crew||[]).length>0||achD('hire')!=null,achD('hire'))],['第一次擴建',has(S.level>=2,null)],['有了熟客',has(REGS.some(r=>(S.regulars[r.id]||0)>=4),null)]]},
-  {t:'店開始有自己的樣子',beats:[['招牌菜',has(!!S.signature,null)],['側廳',has(projOn('side'),S.newRooms&&S.newRooms.side)],['第二道招牌',has(!!S.sigDessert,null)],["Jill's Kitchen — JILL",has(S.level>=5,null)]]},
+  {t:'小小的餐廳',beats:[['開店',has(true,1)],['第一位員工',has((S.crew||[]).length>0||achD('hire')!=null,firstHireDay())],['第一次擴建',has(S.level>=2,S.level===2&&S.grewDay?S.grewDay:null)],['有了熟客',has(REGS.some(r=>(S.regulars[r.id]||0)>=4),achD('regular4'))]]},
+  {t:'店開始有自己的樣子',beats:[['招牌菜',has(!!S.signature,achD('sig'))],['側廳',has(projOn('side'),S.newRooms&&S.newRooms.side)],['第二道招牌',has(!!S.sigDessert,achD('sigd'))],["Jill's Kitchen — JILL",has(S.level>=5,achD('jill'))]]},
   {t:'晚餐之後',hidden:()=>!fact('ken_wine_q'),tease:'店裡好像還少了什麼。',showIf:()=>S.level>=4,beats:[['「妳真的完全不賣酒？」',BF('ken_wine_q')],['這道要配什麼',BF('ken_pairing')],['有人吃完了還不想走',BF('lounge_idea')],['試酒的晚上',BF('tasting_night')],['「讓人吃完飯以後，還有地方可以坐。」',BF('lounge_project')],['Lounge 開了',BF('lounge_built_1')]]},
   {t:"Jill's Kitchen — The Lounge",hidden:()=>!fact('lounge_project'),tease:'？？？？？',showIf:()=>!!fact('ken_wine_q'),beats:[['第一個晚上',BF('lounge_first_night')],['酒吧沙發廳',BF('lounge_built_2')],['安靜的角落',BF('lounge_built_3')],['「聽說這裡是你害的。」',BF('evan_origin')],['好像真的開起來了',(()=>{const k=Object.keys(story().facts).find(x=>x.startsWith('milestone_'));return k?fact(k).d:null})()]]},
  ];return C}
@@ -2251,28 +2282,40 @@ function storyFace(id){try{if(id.startsWith('cat:')){const C=CAT_DEF.find(x=>x.i
 function dotsHTML(n,t){let s='';for(let i=0;i<t;i++)s+=`<i class="${i<n?'on':''}"></i>`;return`<span class="sdots">${s}</span>`}
 function storyPageHTML(){let h=`<p class="muted" style="font-size:12.5px;margin:0 0 8px">店裡真的發生過的事，一段一段記下來。沒有任務，也不用做什麼——下一段什麼時候發生，要看他們自己。點一段可以看那天的經過。</p>`;
  h+=`<div class="nm" style="font-weight:800;font-size:15px;margin:6px 0 6px">餐廳故事</div><div class="card schap">`;
- for(const [i,C] of restChapters().entries()){if(C.showIf&&!C.showIf())continue;const hid=C.hidden&&C.hidden();const n=C.beats.filter(b=>b[1]!=null).length;const all=n===C.beats.length;
+ for(const [i,C] of restChapters().entries()){if(C.showIf&&!C.showIf())continue;const hid=C.hidden&&C.hidden();const done=C.beats.filter(b=>b[1]!=null);const n=done.length;const all=n===C.beats.length;
   h+=`<div class="chap ${all?'done':''}"><div class="ch-h"><small>CHAPTER ${i+1}</small><b>${hid?(C.tease==='？？？？？'?'？？？？？':'？？？'):C.t}</b>${all?'<span class="ok">✓</span>':''}</div>`;
   if(hid){h+=`<p class="muted" style="margin:2px 0 0;font-size:12.5px">${C.tease}</p>`}
-  else{h+=dotsHTML(n,C.beats.length)+`<div class="ch-b">${C.beats.map(b=>b[1]!=null?`<div><span class="d">${b[1]>0?'DAY '+b[1]:'早期'}</span>${b[0]}</div>`:'').join('')}${all?'':'<div class="muted">？？？</div>'}</div>`}
+  else{h+=dotsHTML(n,C.beats.length)+`<div class="ch-b">${histOrder(done,b=>b[1]).map((b,j)=>`<div class="sb"><span class="no">${j+1}.</span><span class="d">${b[1]>0?'DAY '+b[1]:'更早以前'}</span>${b[0]}</div>`).join('')}${unseenRowsHTML(n,C.beats.length)}</div>`}
   h+=`</div>`}
- h+=`</div><div class="nm" style="font-weight:800;font-size:15px;margin:14px 0 6px">人物故事</div>`;
- const open=STORY_LINES.filter(L=>{try{return L.open()}catch(e){return false}});const closed=STORY_LINES.length-open.length;
- for(const L of open){const P=lineProgress(L);const who=typeof L.who==='function'?L.who():L.who;const more=typeof L.more==='function'?L.more():L.more;const ph=(L.photos||[]).filter(k=>story().photos[k]);
+ h+=`</div><div class="nm" style="font-weight:800;font-size:15px;margin:14px 0 6px">人物／關係支線</div>`;
+ const open=STORY_LINES.filter(L=>{try{return L.open()&&lineProgress(L).done.length>0}catch(e){return false}});const closed=STORY_LINES.length-open.length;   /* a story is on the page from its first beat; before that it is one of the 「還沒開始」 */
+ for(const L of open){const P=lineProgress(L);const who=lineWho(L);const more=typeof L.more==='function'?L.more():L.more;const ph=(L.photos||[]).filter(k=>story().photos[k]);const seen=histOrder(P.done,x=>x.d);
   h+=`<div class="card sline ${storyFocus===L.k?'focus':''}" id="sl-${L.k}"><div class="sl-h"><span class="faces">${(typeof L.faces==='function'?L.faces():L.faces).map(f=>`<img alt="" src="${storyFace(f)}">`).join('')}</span><div><b>${who}</b>${L.tag?` <span class="tier t1">${L.tag}</span>`:''}<div class="sl-t">「${L.title()}」</div></div></div>
-   ${dotsHTML(P.done.length,P.total)}<div class="muted" style="font-size:12px;margin:2px 0 6px">${P.done.length} / ${P.total} 個故事片段</div>
-   <div class="sl-b">${P.done.slice().sort((a,b)=>a.d-b.d).map(x=>beatRowHTML(x)).join('')}${P.done.length<P.total?'<div class="next">下一段：？？？</div>':''}</div>
+   ${dotsHTML(seen.length,P.total)}<div class="muted" style="font-size:12px;margin:2px 0 6px">${seen.length} / ${P.total} 個故事片段</div>
+   <div class="sl-b">${seen.map((x,i)=>beatRowHTML(x,i+1)).join('')}${unseenRowsHTML(seen.length,P.total)}</div>
    ${ph.length?`<div class="muted" style="font-size:12px;margin-top:4px">相簿裡有 ${ph.length} 張他們的故事照片。</div>`:''}${more?`<p class="sl-more">${more}</p>`:''}</div>`}
  if(closed>0)h+=`<div class="card sline ghost"><div class="sl-h"><span class="faces"><i></i><i></i></span><div><b>？？？</b><div class="sl-t">還有 ${closed} 段故事還沒開始。</div></div></div></div>`;
  return h}
-/* one beat: its day and name; tap to see what happened and what was said (kept from the moment itself) */
-function beatRowHTML(x){const note=x.k?beatNote(x.k):'';const lines=(x.k&&story().beatLines&&story().beatLines[x.k])||[];const head=`<span class="d">${x.d>0?'DAY '+x.d:'更早以前'}</span>「${x.t.replace(/^「|」$/g,'')}」`;if(!note&&!lines.length)return`<div class="sb">${head}</div>`;
+/* the order things happened: by day; a beat whose day is not known (更早以前) keeps its place in the story, right after
+   the beat before it */
+function histOrder(done,dayOf){let last=0;const k=done.map((x,i)=>{const d=dayOf(x);if(d>0)last=d;return{x,i,key:d>0?d:last}});return k.sort((a,b)=>a.key-b.key||a.i-b.i).map(o=>o.x)}
+/* the stages not seen yet: only their number */
+function unseenRowsHTML(n,total){let h='';for(let i=n+1;i<=total;i++)h+=`<div class="sb un"><span class="no">${i}.</span>？？？</div>`;return h}
+/* one beat: its number, day and name; tap to see what happened and what was said (kept from the moment itself) */
+function beatRowHTML(x,i){const note=x.note?(()=>{try{return x.note()||''}catch(e){return''}})():x.k?beatNote(x.k):'';const lines=(x.k&&story().beatLines&&story().beatLines[x.k])||[];const head=`<span class="no">${i}.</span><span class="d">${x.d>0?'DAY '+x.d:'更早以前'}</span>「${x.t.replace(/^「|」$/g,'')}」`;if(!note&&!lines.length)return`<div class="sb">${head}</div>`;
  return`<details class="sb"><summary>${head}</summary>${note?`<p class="sn">${note}</p>`:''}${lines.length?`<div class="sq">${lines.map(l=>l.w?`<div><b>${l.w}</b>「${l.t}」</div>`:`<div class="e">${l.t}</div>`).join('')}</div>`:''}</details>`}
 /* ---- story updates: once per new beat, never for ambient repeats ---- */
-function storyLineSeen(){const st=story();if(!st.lineSeen){st.lineSeen={};for(const L of STORY_LINES){try{st.lineSeen[L.k]=L.open()?lineProgress(L).done.length:0}catch(e){st.lineSeen[L.k]=0}}st.lineSeen._rest=restChapters().reduce((a,C)=>a+C.beats.filter(b=>b[1]!=null).length,0)}return st.lineSeen}
-function storyProgressCheck(){if(!S||!S.story)return;const seen=storyLineSeen();let note=null;
- for(const L of STORY_LINES){let ok=false;try{ok=L.open()}catch(e){}if(!ok)continue;const P=lineProgress(L);const n=P.done.length;if(n>(seen[L.k]||0)){seen[L.k]=n;const last=P.done.slice().sort((a,b)=>b.d-a.d)[0];note=note||{k:L.k,who:typeof L.who==='function'?L.who():L.who,t:last?last.t:'',n,total:P.total}}}
- {const n=restChapters().reduce((a,C)=>a+C.beats.filter(b=>b[1]!=null).length,0);if(n>(seen._rest||0)){seen._rest=n;note=note||{k:'_rest',who:'餐廳故事',t:'',n:0,total:0}}}
+function storyLineSeen(){const st=story();st.lineSeen=st.lineSeen||{};return st.lineSeen}
+function restDone(){const out=[];restChapters().forEach((C,ci)=>{if((C.showIf&&!C.showIf())||(C.hidden&&C.hidden()))return;for(const b of C.beats)if(b[1]!=null)out.push({id:ci+':'+b[0],t:b[0],d:b[1],C})});return out}
+/* what the player has been told is kept per line as the beats' ids. A line seen for the first time (or an older save's
+   count) is taken in silently; a beat is announced only the day it happens — a change in what counts never
+   announces the past. */
+function storyProgressCheck(){if(!S||!S.story)return;const seen=storyLineSeen();let note=null;const fresh=d=>d!=null&&d>0&&d>=S.day-1;
+ for(const L of STORY_LINES){let ok=false;try{ok=L.open()}catch(e){}const was=seen[L.k];if(!ok){if(!Array.isArray(was))seen[L.k]=[];/* not started: its first beat will be news */continue}const P=lineProgress(L);const ids=P.done.map(x=>x.id);
+  if(!Array.isArray(was)){seen[L.k]=ids;continue}const nw=P.done.filter(x=>!was.includes(x.id));if(!nw.length)continue;seen[L.k]=was.concat(nw.map(x=>x.id));
+  const last=nw.filter(x=>fresh(x.d)).sort((a,b)=>b.d-a.d)[0];if(last&&!note)note={k:L.k,who:lineWho(L),t:last.t,n:P.done.length,total:P.total}}
+ {const D=restDone();const was=seen._rest;if(!Array.isArray(was))seen._rest=D.map(x=>x.id);else{const nw=D.filter(x=>!was.includes(x.id));if(nw.length){seen._rest=was.concat(nw.map(x=>x.id));const last=nw.filter(x=>fresh(x.d)).sort((a,b)=>b.d-a.d)[0];
+  if(last&&!note)note={k:'_rest',who:'餐廳故事',t:last.t,n:last.C.beats.filter(b=>b[1]!=null).length,total:last.C.beats.length}}}}
  if(note)storyNoteShow(note)}
 function storyNoteShow(n){const el=$('#storyNote');if(!el)return;el.innerHTML=`<small>故事更新</small><b>${n.who}</b>${n.t?`<span>「${n.t.replace(/^「|」$/g,'')}」</span>`:''}${n.total?`<em>${n.n} / ${n.total}</em>`:''}`;el.dataset.k=n.k;{/* under the room tabs (they sit under the ticket rail) — never over them */const rt=$('#roomTabs'),ref=phase==='service'?(rt&&!rt.hidden?rt:ticketsEl):null;el.style.top=ref?Math.round(ref.getBoundingClientRect().bottom+6)+'px':''}el.hidden=false;el.classList.remove('go');void el.offsetWidth;el.classList.add('go');clearTimeout(storyNoteShow.t);storyNoteShow.t=setTimeout(()=>{el.hidden=true},7000)}
 let bookFromNote=false;
@@ -2296,7 +2339,7 @@ function campaignSeat(g,t){const c=campVia(g);if(!c||!t)return;const room=t.room
  else if(c.k==='wine'&&t.lounge){if(Math.random()<.6)campSay(g,['聽說你們晚上有酒？','酒單呢？','是這裡吧？看到說吃完可以坐一下。'],900)}}
 /* ordering: the dish they came for, or the dish they came for and cannot have; a glass because of the wine post */
 function campaignOrderLine(g,tk){const c=campVia(g);const day=campDay();if(day&&c&&c.dish&&tk.items.some(i=>i.d===c.dish))day.dish++;
- if(!c)return;if(c.k==='dish'){if(g.wantMissed){if(!g.campSaid&&campCan(6)){g.campSaid=1;sayG(g,pickT([`不是說有${dishName(c.dish)}嗎？`,`${dishName(c.dish)}賣完了喔……`,'就是為了那一道來的耶。']),700);JILL_SAY('今天賣完了，抱歉。',2200)}}
+ if(!c)return;if(c.k==='dish'){if(g.wantMissed){if(!g.campSaid&&campCan(6)){g.campSaid=1;sayG(g,pickT([`不是說有${dishName(c.dish)}嗎？`,`${dishName(c.dish)}賣完了喔……`,'就是為了那一道來的耶。']),700);if((R.campMissJ||0)<2&&canChat('campMissJ',90,0)){R.campMissJ=(R.campMissJ||0)+1;JILL_SAY(pickT(['今天賣完了，抱歉。','那道今天沒有了。','今天的份已經沒了。']),2200)}}}
   else if(tk.items.some(i=>i.d===c.dish)&&Math.random()<.5)campSay(g,['是不是網路上那一道？','我就是看到這個才來的。',`${dishName(c.dish)}，就是這個。`],700)}
  else if(c.k==='wine'&&tk.items.some(i=>i.lbar)&&Math.random()<.45)campSay(g,['今天有什麼酒？','配這道的那一杯。','看到說晚上有酒，就來了。'],700)}
 /* the ones who came for the cats look for them; when they cannot find one they ask, and Jill answers with where the cats really are */
@@ -2322,7 +2365,7 @@ function storyCapLine(who,txt,kind){const C=STORY_CAP;if(!C)return;const now=per
  const names=C.L.names||[];const ok=names.includes(who)||(kind==='e'&&names.some(n=>n&&txt.includes(n.replace(/^品酒師 |^Monsieur /,''))))||(C.L.kinds||[]).includes(kind);if(!ok)return;
  const arr=story().beatLines&&story().beatLines[C.k];if(!arr||arr.length>=8)return;arr.push(who?{w:who,t:txt}:{t:txt});C.until=now+6000}
 function beatNote(k){const E=STORY_EV.find(x=>x.k===k);if(!E||!E.note)return'';try{return typeof E.note==='function'?E.note(evState(k))||'':E.note}catch(e){return''}}
-for(const L of STORY_LINES)for(const b of L.beats){const s0=b[0];for(const k of Array.isArray(s0)?s0:typeof s0==='string'?[s0]:[])BEAT_LINE[k]=L}
+for(const L of STORY_LINES)for(const b of L.beats){const s0=b[0];const ks=Array.isArray(s0)?s0.slice():typeof s0==='string'?[s0]:[];if(b[2]&&b[2].key)ks.push(b[2].key);for(const k of ks)BEAT_LINE[k]=L}
 /* ---- hospitality: something on the house. Three separate things that used to share one counter (v2.2.1 I-13 / Day 35 #1):
    (1) an OCCASION — Jill's Card (every fifth visit of a regular), an anniversary, the columnist's friend: g.treat is set when
        the table is seated and Jill brings it as soon as she has a moment; never capped, it is a promise;
@@ -4206,7 +4249,7 @@ function dylanStays(g){if(g&&g.stayLate)return true;/* v2.3 */const d=S.dylan;if
 function dylanLinger(g,t){g.gone=true;const sp=seatPos(t)[0];LIFE.dylan={x:t.x+sp.dx,y:t.y+sp.dy,face:sp.side>0?-1:1,state:'linger',table:t.i,seat:0,seated:true,onSofa:false,t:rand(3,8),phone:Math.random()<.7,walking:false,step:0,moving:false,carry:false,catCD:0,tidied:false,act:null,talkT:rand(30,70),since:0};
  const d=S.dylan;d.stay=(d.stay||0)+1;d.clues.late=(d.clues.late||0)+1}
 function dylanStageCheck(){const d=S.dylan;if(!d)return;const v=S.regulars.dylan||0;const cl=Object.keys(d.clues||{}).filter(k=>d.clues[k]>0).length;
- if(d.stage===0&&v>=3&&S.day>=6)d.stage=1;
+ if(d.stage===0&&v>=3&&S.day>=6){d.stage=1;d.st1=S.day}/* v2.3: the day he started staying after closing */
  if(d.stage===1&&S.day>=12&&v>=6&&(d.stay||0)>=2&&cl>=3&&(S.life&&S.life.sofa||0)>=3&&((d.clues.pet||0)>=1||(d.clues.tidy||0)>=3||(d.clues.pause||0)>=2))d.stage=2}
 function dylanLine(){const st=S.dylan.stage;const W=R?R.weather:'sun';const wx=W==='rain'?'外面開始下雨了。':W==='storm'?'雨真的很大。':W==='hot'?'外面熱死了。':W==='cool'?'外面涼涼的。':'今天天氣很好。';const q=R?queued().length:0;
  const pool=st>=3?['今天很累了吧。','不急，我等妳。','貓都在。','我吃完等妳。',wx]:['今天人很多。','貓咪們今天很乖。',wx,'不急，妳先忙。','我坐這裡就好。','今天也很好吃。'];if(q>=3)pool.push('外面排好長。');if(R&&R.st.perfect>=10)pool.push('今天出菜很順。');const cn=CATS&&CATS.find(c=>!c.hidden&&['sleep','bed'].includes(c.st));if(cn)pool.push(`${catName(cn.def)}睡得真沉。`);return pickT(pool)}
@@ -4242,7 +4285,7 @@ const DYLAN_SCENES=[
  {k:'water',when:()=>S.dylan.stage>=2&&(S.dylan.clues.knows||0)>=1&&!(S.dylan.clues.knows2),clue:'knows2',lines:[['水我自己倒了。','杯子呢？','左邊第二個櫃子。','……嗯。']]},
  {k:'wang',when:()=>S.dylan.stage>=1&&(S.regulars.wangwife||0)>=3&&R.groups.some(q=>regsOf(q).includes('wangwife')&&q.table!=null),note:true,lines:[['王太太：「那位先生每天都來耶。」','嗯。','王太太：「妳不覺得他……」','他吃完就會走了。']]},
 ];
-function dylanScene(g){const seen=S.dylan.seen=S.dylan.seen||{};for(const sc of DYLAN_SCENES){if(seen[sc.k])continue;let ok=false;try{ok=sc.when()}catch(e){ok=false}if(!ok)continue;seen[sc.k]=S.day;if(sc.clue)S.dylan.clues[sc.clue]=(S.dylan.clues[sc.clue]||0)+1;
+function dylanScene(g){const seen=S.dylan.seen=S.dylan.seen||{};for(const sc of DYLAN_SCENES){if(seen[sc.k])continue;let ok=false;try{ok=sc.when()}catch(e){ok=false}if(!ok)continue;seen[sc.k]=S.day;storyCapStart('dy_'+sc.k);if(sc.clue)S.dylan.clues[sc.clue]=(S.dylan.clues[sc.clue]||0)+1;
  const L=pick(sc.lines);const say=(i,txt)=>setTimeout(()=>{if(!R||phase!=='service')return;if(sc.note&&txt.startsWith('王太太：')){const wg=R.groups.find(q=>regsOf(q).includes('wangwife')&&q.table!=null);if(wg)quote(wg,txt.slice(4).replace(/^「|」$/g,''),{who:'wangwife',with:'jill'});else noteLine(txt)}else if(i%2===0){if(R.groups.includes(g))quote(g,txt)}else jillSay(txt,{with:'dylan'})},600+i*1500);
  L.forEach((txt,i)=>{if(txt)say(i,txt)});/* v2.2.1: each line is logged when it is spoken (quote / jillSay / noteLine) — the script itself is not a log entry */return true}return false}
 function dylanAct(g){const st=S.dylan.stage;const pool=st>=3?DYLAN_ACT.after:DYLAN_ACT.before;const line=pick(pool).map(x=>x&&x.replace('{T}',g.table+1));quote(g,line[0]);

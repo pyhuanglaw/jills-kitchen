@@ -616,3 +616,4 @@ html.desk button,html.desk [data-act],html.desk .polaroid{cursor:pointer}
 .sline details.sb summary::after{content:'›';float:right;color:var(--ink2);transition:transform .15s}.sline details.sb[open] summary::after{transform:rotate(90deg)}
 .sline .sn{margin:4px 0 2px 62px;font-size:12px;color:var(--ink2)}.sline .sq{margin:2px 0 4px 62px;font-size:12px}.sline .sq b{margin-right:4px;color:#8A4E2A}.sline .sq .e{color:var(--ink2);font-style:italic}
 .sline .next{font-size:12.5px;color:var(--ink2);margin-top:3px}
+.sb .no,.chap .no{display:inline-block;min-width:22px;color:var(--ink2);font-size:11px;font-weight:800}.sb.un{color:var(--ink2);letter-spacing:.08em}
