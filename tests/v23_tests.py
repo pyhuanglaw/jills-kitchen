@@ -4,7 +4,7 @@ import json, os, sys
 _rt = sys.modules['__main__'] if hasattr(sys.modules.get('__main__'), 'TESTS') else __import__('run_tests')   # the running harness, not a second copy
 test, check, Game, ROOT, SAVE_KEY, start_day, install_bot, LAZY_ACTOR, play_day = (_rt.test, _rt.check, _rt.Game, _rt.ROOT, _rt.SAVE_KEY, _rt.start_day, _rt.install_bot, _rt.LAZY_ACTOR, _rt.play_day)
 
-FIXTURES = ['player_day30.json', 'player_day33.json', 'player_day35.json', 'player_day39.json']
+FIXTURES = ['player_day30.json', 'player_day33.json', 'player_day35.json', 'player_day39.json', 'player_day46.json']
 
 def load_fixture(g, name):
     raw = json.load(open(os.path.join(ROOT, 'tests', 'saves', name), encoding='utf-8'))['save']
@@ -98,4 +98,53 @@ def a_day_with_the_hooks_writes_copresence_named_history_and_nothing_twice(b, po
     check(all(v['v'] >= 1 and v['last'] == d for v in named.values()), f'named history: {named}')
     names = g.ev("JSON.stringify(R?[]:S.dayLog.filter(l=>l.k==='g').map(l=>l.w))")
     check(g.ev("(S.story.day.major||0)<=1&&(S.story.day.minor||0)<=2"), f'lanes over budget: {g.ev("JSON.stringify(S.story.day)")}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+SEAT_SOPHIE = r"""(()=>{for(const q of R.groups.slice())if(q.reg==='sophie')leaveGroup(q,'ok');const o=regPlanVisit({t:R.t,type:'gourmet',reg:'sophie',size:1});o.moment=null;spawn(o);const q=R.groups.find(x=>x.reg==='sophie'&&!x.gone);if(!q)return null;
+ if(q.table==null){const t=freeTableFor(q)||R.tables.find(t=>(t.room||'main')==='main'&&!t.group);if(t.group)leaveGroup(t.group,'ok');t.dirty=false;seatGroup(q,t)}q.state='wait';q.x=R.tables[q.table].x;q.y=R.tables[q.table].y;return q.table})()"""
+
+@test
+def sophie_and_baobao_the_arc_runs_on_real_conditions_and_leaves_a_pad_a_fact_and_a_story_photo(b, port, target):
+    """v2.3 Phase 2 vertical slice (the test forces the prerequisites — visits and where the cat is — never the beats):
+    beat 1 needs 寶寶 actually near Sophie's table; beat 2 needs three more visits and the cat away; beat 3 the cat near
+    again after two more; beat 4 (major, Class A) two visits later at her checkout — the pad appears in the main hall
+    for good and not in the shop's price list, her card gets the fact, the album gets the Story Photo once (a second
+    unlock is refused), the journal's timeline lists the beats, and all of it survives a reload."""
+    g = Game(b, port, target, seed=39, manual=True, viewport={'width': 390, 'height': 844})
+    load_fixture(g, 'player_day39.json'); g.click('[data-act=openFresh]'); g.page.wait_for_timeout(120)
+    g.ev("S.money+=20000;autoStock()"); start_day(g); g.ev("for(let i=0;i<3;i++)__tick(1000/30)")   # a few frames: the cats exist
+    def day_with_sophie(cat_near):
+        g.ev("R.groups.slice().forEach(q=>leaveGroup(q,'ok'));R.groups.length=0;for(const t of R.tables){t.group=null;t.dirty=false}")
+        ti = g.ev(SEAT_SOPHIE); check(ti is not None, 'Sophie seated')
+        g.ev("(()=>{const c=catBy('mei');const t=R.tables[%d];c.hidden=false;c.perch=-1;c.sofa=null;c.st='rest';c.x=%s;c.y=%s})()" % (ti, 't.x+30' if cat_near else '40', 't.y+14' if cat_near else 'FB-12'))
+        return ti
+    # beat 1: the cat is near her and she looks at it (the game's own event)
+    day_with_sophie(True); g.ev("catEv(R.groups.find(q=>q.reg==='sophie'),'look',catBy('mei'))"); g.ev("__tick(2500)")
+    check(g.ev("evDone('sophie_mei_1')"), 'beat 1 fired when 寶寶 was really near her')
+    check(g.ev("S.dayLog.concat(R.log||[]).some(l=>/不要讓牠靠我的包/.test(l.t))") or g.ev("(R.log||[]).some(l=>/不要讓牠靠我的包/.test(l.t))"), 'she said it')
+    # not again the same visit, and beat 2 not yet (visits)
+    g.ev("catEv(R.groups.find(q=>q.reg==='sophie'),'pet',catBy('mei'))"); check(g.ev("evState('sophie_mei_1').n") == 1, 'once')
+    g.ev("S.day++;storyDay()"); day_with_sophie(False); check(not g.ev("evDone('sophie_mei_2')"), 'beat 2 waits for three more visits')
+    # three visits later, the cat away: beat 2
+    g.ev("S.regulars.sophie+=3;S.day++"); day_with_sophie(False); g.ev("__tick(4000)")
+    check(g.ev("evDone('sophie_mei_2')"), 'beat 2 fired on a visit without the cat')
+    g.ev("S.day++"); day_with_sophie(True); g.ev("catEv(R.groups.find(q=>q.reg==='sophie'),'look',catBy('mei'))"); check(not g.ev("evDone('sophie_mei_3')"), 'beat 3 waits for two more visits')
+    # the cat's own choice is weighted toward her table while beat 3 is pending
+    g.ev("S.regulars.sophie+=2"); check(g.ev("!!storyCatPull(catBy('mei'))"), 'storyCatPull points 寶寶 at her table (a weight, not a move)')
+    g.ev("S.day++"); day_with_sophie(True); g.ev("catEv(R.groups.find(q=>q.reg==='sophie'),'look',catBy('mei'))"); g.ev("__tick(1500)")
+    check(g.ev("evDone('sophie_mei_3')") and g.ev("relN('sophie','mei','sat_near')") == 1, 'beat 3 fired with the cat near again')
+    # beat 4 at her checkout, two visits later: the pad, the fact, the photo
+    n0 = g.ev("albumList().length"); g.ev("S.regulars.sophie+=2;S.day++"); ti = day_with_sophie(False)
+    g.ev("(()=>{const q=R.groups.find(x=>x.reg==='sophie');q.ticket={id:R.tkid++,no:1,g:q,items:[{d:'friedrice',st:'served',q:'P',want:0,picked:true}],t0:R.t};q.state='check';R.tickets.push(q.ticket);collect(q)})()"); g.page.wait_for_timeout(200)
+    check(g.ev("evDone('sophie_mei_4')") and g.ev("gearOn('sophiepad')") and g.ev("S.gearFrom.sophiepad") == 'sophie', 'beat 4: the pad is in the room, from Sophie')
+    check(g.ev("regMem('sophie').facts.some(f=>/小貓墊/.test(f.txt))"), 'her card carries the fact')
+    check(g.ev("albumList().length") == n0 + 1 and g.ev("albumList().slice(-1)[0].kind") == 'story:sophie_mei' and g.ev("albumList().slice(-1)[0].story") == 1 and g.ev("albumList().slice(-1)[0].keep") is True, 'one Story Photo, kept')
+    check(g.ev("storyPhoto('sophie_mei')") is False and g.ev("albumList().length") == n0 + 1, 'a second unlock is refused')
+    check(g.ev("storyEvents().filter(e=>/寶寶|小貓墊/.test(e.t)).length") >= 3, 'the journal timeline lists the beats')
+    check(g.ev("goalLadder().every(x=>!/小貓墊/.test(x.n))"), 'the pad is not a purchase goal')
+    g.ev("save()"); g.reload()
+    check(g.ev("gearOn('sophiepad')") and g.ev("S.story.photos.sophie_mei>0") and g.ev("albumList().some(p=>p.kind==='story:sophie_mei')") and g.ev("evDone('sophie_mei_4')"), 'the pad, the photo and the beats survive a reload')
+    g.ev("showShop();shopTab='cats';showShop()"); g.page.wait_for_timeout(80)
+    html = g.ev("document.body.innerHTML")
+    check('小貓墊' in html and '已擺好' in html and 'data-k="sophiepad"' not in html, 'the shop shows the pad as placed, with no buy button')
     check(not g.errors, g.errors[:3]); g.close()

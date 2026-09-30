@@ -254,6 +254,8 @@ const CATGEAR=[   /* v2.2.1 F: the side hall's cat things sit in two zones — t
  {k:'lounge',n:'側廳貓窩',cost:4500,tier:2,ic:'lounge',room:'side',need:'side',x:352,get y(){return 402+DY*.8},poses:['sleep','curl','belly'],d:'側廳角落一張圓圓的軟窩，下午有太陽。',w:{snow:3,tora:2,mikan:1.5,mei:1,ban:.6}},
  {k:'grass',n:'貓草盆',cost:6000,tier:3,ic:'grass',room:'main',lv:3,x:64,y:198,poses:['sit'],d:'一盆貓草，放在左邊牆邊、沙發下面一點。牠們會去啃兩口，然後在旁邊翻肚子打滾。小齁最常去。',w:{ban:3,tora:2,mikan:1.5,mei:.8,snow:.5}},
  {k:'deluxe',n:'三層大跳台',cost:12000,tier:3,ic:'deluxe',room:'main',lv:4,d:'右邊的貓跳台換成三層的大跳台：高處多 2 個位子，寶寶和包包不用再搶。',w:{}},
+ /* v2.3 STORY ARC 01: not for sale — Sophie brought it (see the Sophie × 寶寶 events). It appears in the shop only once it is here. */
+ {k:'sophiepad',n:'小貓墊',cost:0,tier:1,ic:'cushion',room:'main',story:1,x:246,get y(){return FB-30},poses:['curl','loaf','sit'],d:'一塊小小的圓貓墊，灰米色、邊上一圈深一點的線。Sophie 帶來的，說是給店裡的。寶寶最常用。',w:{mei:5,snow:1.2,tora:.8,mikan:.7,ban:.5}},
 ];
 const GEAR_TIERS=[[1,'基本','一個角落就夠了的東西。'],[2,'舒適','側廳的東西：窗、隧道、軟窩。'],[3,'豪華','大件的。用得最兇的通常不是你以為的那隻。']];
 /* v2.2 T: three dreams beyond the last expansion — one within reach, one a few weeks away, one to save for. Each
@@ -276,7 +278,7 @@ const SIDE_TABLE_COST=[1500,2200,3000,4000,5200,6500,8000,9500,11000],FRONT_TABL
 function goalLadder(){const out=[];const money=S.money;const add=(n,cost,where)=>{if(cost==null)return;out.push({n,cost,where,left:Math.max(0,cost-money)})};
  for(const P of ALL_PROJECTS())if(!projOn(P.k)&&S.level>=P.lv)add(P.n,P.cost,'店舖工程');
  for(const E of EXTERIOR)if(!extOn(E.k)&&S.level>=E.lv)add(E.n,E.cost,'家具與佈置');
- for(const G of CATGEAR)if(!gearOn(G.k)&&(!G.need||projOn(G.need))&&S.level>=(G.lv||1))add(G.n,G.cost,'貓咪生活');
+ for(const G of CATGEAR)if(!gearOn(G.k)&&!G.story&&(!G.need||projOn(G.need))&&S.level>=(G.lv||1))add(G.n,G.cost,'貓咪生活');
  const nl=LEVELS[S.level];if(nl)add('擴建：'+nl.n,nl.cost,'店舖工程');
  if(S.tables<tableCap())add('餐桌',TABLE_COST[S.tables],'家具與佈置');
  if(projOn('side')&&(S.sideTables||0)<SIDE_MAX)add('側廳桌',SIDE_TABLE_COST[S.sideTables||0],'家具與佈置');
@@ -1421,7 +1423,7 @@ function regMeet(g){if(!g.reg||g.reg==='dylan')return;const mine=regsOf(g);for(c
   const A=mine.includes(a)?g:other,B=mine.includes(a)?other:g;setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(A))quote(A,lines[0],{who:a})},900);setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(B))quote(B,lines[1],{who:b})},2400);
   if(a==='sophie'&&B.state==='reading')B.wantDish=REG_BY.sophie.fav.find(f=>menuList().includes(f))||null;
   const ta=R.tables[A.table],tb=R.tables[B.table];setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(A)&&R.groups.includes(B))memo('neighbors',(ta.x+tb.x)/2,(ta.y+tb.y)/2-6,{a:A.name,b:B.name,subj:[ta,tb]})},1200);
-  regFact(a,`在店裡遇到${REG_BY[b].n}，原來認識。`);regFact(b,`在店裡遇到${REG_BY[a].n}，原來認識。`);return}}
+  regFact(a,`在店裡遇到${REG_BY[b].n}，原來認識。`);regFact(b,`在店裡遇到${REG_BY[a].n}，原來認識。`);relSet(a,b,'spoke');/* v2.3 */return}}
 /* ================= v2.3: the story foundation =================
    One record of what really happened (S.story), read back as behaviour. Facts are idempotent by key and dated;
    relationship facts are kept per pair; familiarity is computed from a pair's facts, never stored, never shown.
@@ -1475,6 +1477,58 @@ function namedHist(name){const N=story().named;return N[name]=N[name]||{v:0,last
 function storyIdsOf(g){if(!g)return[];const ids=regsOf(g).slice();const n=namedId(g);if(n)ids.push('n:'+n);return ids}
 /* co-presence: everyone seated who has an identity, once a day per pair — written at a seating, so at most the few people in the room */
 function storyCopresence(g){const mine=storyIdsOf(g);if(!mine.length||!R)return;for(const o of R.groups){if(o===g||o.table==null||o.state==='leave'||o.gone)continue;for(const a of mine)for(const b of storyIdsOf(o))if(a!==b)relSet(a,b,'copresent',true)}}
+/* ================= v2.3 Phase 2: STORY ARC 01 — Sophie × 寶寶《我沒有特別喜歡貓》 =================
+   Four beats over many visits, each needing the real thing: 寶寶 (mei) actually near her table, or actually not; her
+   visits counted by the game; the gift only after the rest. Consequence: a small cat pad that stays in the room for
+   good (CATGEAR 'sophiepad', not for sale), a fact on her card, a Story Photo. 寶寶 is never moved: beat 3 only makes
+   Sophie's table a heavier option in the cat's own choice (storyCatPull). */
+function sophieAt(){return R&&R.groups.find(g=>g.reg==='sophie'&&g.table!=null&&!g.gone&&['reading','order','wait','eat','check'].includes(g.state))||null}
+function meiNearTable(g,d){const c=catBy('mei');if(!c||c.hidden||!g||g.table==null)return false;const t=R.tables[g.table];if((t.room||'main')!=='main')return false;return Math.hypot(c.x-t.x,c.y-t.y)<(d||120)}
+function sophieVisitsSince(k){const s=evState(k);return s.n?(S.regulars.sophie||0)-(s.v||0):-1}
+function storyCatPull(c){if(!R||phase!=='service'||c.def.id!=='mei')return null;const g=sophieAt();if(!g)return null;const t=R.tables[g.table];if((t.room||'main')!=='main')return null;
+ /* beat 3 pending: she has said 「今天那隻呢？」 and has been back since — 寶寶 finds her table worth a look */
+ if(evDone('sophie_mei_2')&&!evDone('sophie_mei_3')&&sophieVisitsSince('sophie_mei_2')>=2)return{g,w:2.6};
+ /* after the pad: a small pull now and then, so the later glances happen at all */
+ if(gearOn('sophiepad')&&Math.random()<.5)return{g,w:.9};return null}
+const SOPHIE_SAY=(g,txt,ms)=>setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,txt)},ms||500);
+const JILL_SAY=(txt,ms,o)=>setTimeout(()=>{if(R&&phase==='service')jillSay(txt,o||{})},ms||1600);
+STORY_EV.push(
+ {k:'sophie_mei_1',lane:'minor',cls:'B',at:['cat'],once:true,note:'Sophie 第一次來，叫寶寶不要靠她的包。',
+  when:ctx=>ctx.g&&ctx.g.reg==='sophie'&&ctx.c&&ctx.c.def.id==='mei'&&ctx.g.table!=null&&(S.regulars.sophie||0)>=1,
+  run:ctx=>{const g=ctx.g;evState('sophie_mei_1').v=S.regulars.sophie||0;SOPHIE_SAY(g,'可以不要讓牠靠我的包嗎？',300);JILL_SAY('寶寶，過來。',1700);relSet('sophie','mei','told_off');regFact('sophie','第一次就叫寶寶不要靠她的包。')}},
+ {k:'sophie_mei_2',lane:'minor',cls:'B',at:['seat'],once:true,note:'Sophie 問了一句「今天那隻呢？」',
+  when:ctx=>ctx.g&&ctx.g.reg==='sophie'&&evDone('sophie_mei_1')&&sophieVisitsSince('sophie_mei_1')>=3&&!meiNearTable(ctx.g,150),
+  run:ctx=>{const g=ctx.g;evState('sophie_mei_2').v=S.regulars.sophie||0;SOPHIE_SAY(g,'今天那隻呢？',900);JILL_SAY('哪隻？',2200);SOPHIE_SAY(g,'……算了。',3600);relSet('sophie','mei','asked_after');regFact('sophie','問了一句「今天那隻呢？」')}},
+ {k:'sophie_mei_3',lane:'minor',cls:'B',at:['cat'],once:true,note:'寶寶自己坐到 Sophie 桌邊；她低頭看了一下。',
+  when:ctx=>ctx.g&&ctx.g.reg==='sophie'&&ctx.c&&ctx.c.def.id==='mei'&&evDone('sophie_mei_2')&&sophieVisitsSince('sophie_mei_2')>=2&&meiNearTable(ctx.g,120),
+  run:ctx=>{const g=ctx.g,c=ctx.c;evState('sophie_mei_3').v=S.regulars.sophie||0;g.lookT=R.t+3;g.lookCat=c;relSet('sophie','mei','sat_near');noteLine('Sophie 低頭看了寶寶一下，沒說話。');const t=R.tables[g.table];memo('sophiecat',c.x,c.y-4,{a:catName(c.def),subj:[{x:t.x,y:t.y-6}]})}},
+ {k:'sophie_mei_4',lane:'major',cls:'A',floor:2,at:['collect'],once:true,ic:'heart',note:'Sophie 帶來一塊小貓墊，說是給店裡的。',
+  when:ctx=>ctx.g&&ctx.g.reg==='sophie'&&evDone('sophie_mei_3')&&sophieVisitsSince('sophie_mei_3')>=2&&(ctx.items||[]).length>0,
+  run:ctx=>{const g=ctx.g;const lines=[{who:'jill',text:'這什麼？'},{who:'sophie',text:'看到就買了。'},{who:'jill',tone:'warm',text:'給寶寶的？'},{who:'sophie',text:'給你們店裡的。'},{who:'jill',tone:'teasing',text:'妳不是不喜歡貓？'},{who:'sophie',text:'我沒有說不喜歡。'},{who:'jill',text:'妳第一次來叫她不要靠妳的包。'},{who:'sophie',text:'那是兩件事。'}];
+   const done=()=>{S.gear=S.gear||{};if(!S.gear.sophiepad){S.gear.sophiepad=S.day;S.gearFrom=S.gearFrom||{};S.gearFrom.sophiepad='sophie';bg=null}factSet('sophie_gift');relSet('sophie','mei','gift');relSet('sophie','jill','gift');regFact('sophie','帶了一塊小貓墊來，說是給店裡的。');noteLine('Sophie 帶來的小貓墊放在走道邊。');storyPhoto('sophie_mei',{g:g.name});ach('gift')};
+   if(!scene(lines,done))done()}},
+ /* afterwards: when 寶寶 is on the pad and Sophie is in — a glance, nothing said (ambient, rare) */
+ {k:'sophie_mei_glance',lane:'ambient',cd:3,at:['seat','cat'],when:ctx=>gearOn('sophiepad')&&ctx.g&&ctx.g.reg==='sophie'&&(()=>{const c=catBy('mei');return c&&!c.hidden&&c.gear==='sophiepad'&&c.st==='gear'})(),
+  run:ctx=>{const g=ctx.g;g.lookT=R.t+2.5;g.lookCat=catBy('mei');noteLine(pickT(['Sophie 看了一眼墊子上的寶寶。','Sophie 停了一下，看向那塊墊子。']));relSet('sophie','mei','glance')}}
+);
+STORY_PHOTOS.sophie_mei={cap:'她說只是剛好看到',txt:i=>'Sophie 帶來的小貓墊，寶寶已經在上面了。',who:['sophie','mei','jill'],
+ stage:(c,info)=>{/* the actual sprites at the actual place: her table, Jill with the bag, 寶寶 on the pad */
+  c.fillStyle='#E9DCC6';c.fillRect(0,0,360,270);let g=c.createLinearGradient(0,0,0,270);g.addColorStop(0,'rgba(255,240,210,.35)');g.addColorStop(1,'rgba(90,60,40,.18)');c.fillStyle=g;c.fillRect(0,0,360,270);
+  c.fillStyle='#CDBBA0';c.fillRect(0,196,360,74);c.fillStyle='rgba(90,60,40,.12)';for(let x=0;x<360;x+=30)c.fillRect(x,196,1.5,74);c.fillStyle='rgba(0,0,0,.08)';c.fillRect(0,196,360,2);
+  c.save();c.scale(1.5,1.5);const t={x:96,y:118,seats:2,room:'main',i:0,group:null};
+  try{drawTableFull(c,t,0);const sp=seatPos(t)[0];drawPerson(c,t.x+sp.dx,t.y+sp.dy,REG_BY.sophie.looks[0],{seated:true,mood:'ok',flip:sp.side>0})}catch(e){drawPerson(c,96,132,REG_BY.sophie.looks[0],{seated:true})}
+  try{drawPerson(c,168,142,JILL_LOOK,{mood:'happy',s:1.02});c.fillStyle='#D9C7A6';rr(c,178,120,14,16,2);c.fill();c.strokeStyle='#8A6A42';c.lineWidth=1;c.strokeRect(178,120,14,16)}catch(e){}
+  try{const G=CATGEAR.find(x=>x.k==='sophiepad');drawGear(c,{k:'sophiepad',x:212,y:150},0);const C=CAT_DEF.find(x=>x.id==='mei');c.save();c.translate(212,150);c.scale(CSC,CSC);catLoaf(c,C,0,{});c.restore()}catch(e){}
+  c.restore()}};
+/* ---- v2.3: people who keep meeting here start to act like it (generic, from the pair facts; no matchmaking) ---- */
+function seatedKnown(){return R?R.groups.filter(g=>g.table!=null&&!g.gone&&['reading','order','wait','eat','check'].includes(g.state)&&storyIdsOf(g).length):[]}
+const RECOG_LINES={1:['點了個頭。','看了一眼，好像見過。'],2:['「又碰到了。」','「你也常來？」','「今天也來啦。」'],3:['「坐這邊？」','「等你很久了。」','「今天怎麼這麼晚。」']};
+STORY_EV.push({k:'recognize',lane:'ambient',cd:1,at:['seat'],
+ when:ctx=>{const g=ctx.g;if(!g||!storyIdsOf(g).length)return false;return seatedKnown().some(o=>o!==g&&storyIdsOf(o).some(b=>storyIdsOf(g).some(a=>a!==b&&famOf(a,b)>=1&&!(REG_BY[a]&&REG_BY[a].pair===b))))},
+ w:()=>.6,
+ run:ctx=>{const g=ctx.g;let best=null;for(const o of seatedKnown()){if(o===g)continue;for(const a of storyIdsOf(g))for(const b of storyIdsOf(o)){const f=famOf(a,b);if(a!==b&&f>=1&&!(REG_BY[a]&&REG_BY[a].pair===b)&&(!best||f>best.f))best={a,b,f,o}}}if(!best)return;
+  const nm=id=>id.startsWith('n:')?id.slice(2):REG_BY[id]?REG_BY[id].n:id;const line=pickT(RECOG_LINES[best.f]||RECOG_LINES[1]);
+  if(line.startsWith('「')){setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,line.replace(/^「|」$/g,''),{who:REG_BY[best.a]?best.a:undefined})},700);relSet(best.a,best.b,'greeted',true)}else{noteLine(`${nm(best.a)}朝${nm(best.b)}${line}`);relSet(best.a,best.b,'noticed',true)}}});
 /* ---- hospitality: something on the house. Three separate things that used to share one counter (v2.2.1 I-13 / Day 35 #1):
    (1) an OCCASION — Jill's Card (every fifth visit of a regular), an anniversary, the columnist's friend: g.treat is set when
        the table is seated and Jill brings it as soon as she has a moment; never capped, it is a promise;
@@ -2638,7 +2692,8 @@ function drawGear(c,G,now,front){const {x,y}=G;
  case'tunnel':{c.fillStyle='rgba(0,0,0,.14)';el(c,x,y+7,36,5);c.fillStyle='#5E8FA8';rr(c,x-36,y-10,72,20,10);c.fill();c.fillStyle='#2A3A44';el(c,x-34,y,6,9);el(c,x+34,y,6,9);c.fillStyle='rgba(255,255,255,.15)';c.fillRect(x-30,y-8,60,3);c.strokeStyle='rgba(0,0,0,.12)';c.lineWidth=1;for(let k=-2;k<=2;k++){c.beginPath();c.moveTo(x+k*12,y-10);c.lineTo(x+k*12,y+10);c.stroke()}break}
  case'perch':{c.fillStyle='rgba(0,0,0,.14)';c.fillRect(x-20,y+3,40,3);c.fillStyle='#8A6A42';rr(c,x-20,y-2,40,5,2);c.fill();c.fillStyle='#A98559';c.fillRect(x-20,y-2,40,1.5);c.fillStyle='#8A6A42';c.fillRect(x-17,y+3,3,14);c.fillRect(x+14,y+3,3,14);c.fillStyle='#EDE6D8';rr(c,x-17,y-6,34,4,2);c.fill();break}
  case'grass':{c.fillStyle='rgba(0,0,0,.16)';el(c,x,y+2,11,4);c.fillStyle='#C9825C';c.beginPath();c.moveTo(x-10,y-10);c.lineTo(x+10,y-10);c.lineTo(x+8,y+1);c.lineTo(x-8,y+1);c.closePath();c.fill();c.fillStyle='#A8623F';c.fillRect(x-10.5,y-12,21,3);const bit=CATS&&CATS.some(k=>k.gear==='grass'&&k.st==='gear'&&k.grassT>0&&k.grassT<6);for(let i=-4;i<=4;i++){const h=(i%2?15:11)-(bit&&Math.abs(i)<2?4:0);c.strokeStyle=i%2?'#5E9E3D':'#3F7F32';c.lineWidth=1.4;c.beginPath();c.moveTo(x+i*2,y-11);c.quadraticCurveTo(x+i*2+i*.6,y-11-h*.6,x+i*2.6,y-11-h);c.stroke()}break}
- case'lounge':{c.fillStyle='rgba(0,0,0,.14)';el(c,x,y+4,20,8);c.fillStyle='#8FA893';el(c,x,y,20,9);c.fillStyle='#A9BFAC';el(c,x,y-2,15,6);break}}}
+ case'lounge':{c.fillStyle='rgba(0,0,0,.14)';el(c,x,y+4,20,8);c.fillStyle='#8FA893';el(c,x,y,20,9);c.fillStyle='#A9BFAC';el(c,x,y-2,15,6);break}
+ case'sophiepad':{/* v2.3: a small round pad in greige with a darker piped rim and a tiny stitched paw — the restaurant's own palette, not the pink side-hall cushion */c.fillStyle='rgba(0,0,0,.14)';el(c,x,y+5,18,6);c.fillStyle='#B8A88F';el(c,x,y,18,8.5);c.fillStyle='#D9CFC0';el(c,x,y-1,15.5,6.5);c.fillStyle='rgba(255,255,255,.28)';el(c,x-4,y-3,6,2);c.fillStyle='#B8A88F';circ(c,x+7,y-1,1.6);circ(c,x+5,y-3,.8);circ(c,x+7,y-3.6,.8);circ(c,x+9,y-3,.8);break}}}
 /* the A-frame chalkboard by the counter: today's recommendation, or a word from the kitchen */
 /* 2.1: 員工餐 — before opening, the staff eat together at the big table in the dining room (the prep screen's view of
    the room). Bowls, chopsticks, a pot in the middle; whoever does not fit at the table stands with a bowl. Nothing to
@@ -2695,10 +2750,10 @@ function applyDY(d){DY=d;LH=424+d;FB=LH-16;FY=FB-364;ROWS=[168,268+d*.5,368+d];P
 const SIDE={R:null,L:null};let RACE_CD=90,BAO_LAST=null;const MEMQ=[];let FLASH=null;
 const MEMS={sofa:'今晚的沙發',sofafull:'沙發客滿',husband:'Dylan — Jill 的先生',sides:'Jill 左右各一隻',ambush:'埋伏成功',what:'妳到底在幹嘛',waited:'白等了',race:'突然開賽',sleepgod:'睡神',nearby:'今天也在附近',best:'最佳座位',nap3:'三貓午睡',everyone:'今天大家都在',
  rest:'偷閒',lap:'膝上的重量',photo:'被拍了',pet:'摸一下',dylan:'留下來的人',
- play:'玩起來了',swat:'柔柔的小巴掌',pressed:'靠著柔柔',greeter:'不怕生',cushion:'一起擠軟墊',distracted:'走到一半忘了',guide:'小齁帶路',oldfriends:'又見面了',dylancat:'他們好像認識',quiet:'打烊後',oddspot:'怎麼睡在這',newroom:'新的店',newspot:'牠自己找到的',boxcat:'紙箱裡有東西',window:'窗邊',tunnel:'隧道的另一頭',reading:'各自安靜',pause:'經過的時候',company:'今天不是一個人',gift:'拿來的東西',anniversary:'紀念日',neighbors:'在店裡遇到',treat:'這個請你',bagcat:'比較喜歡袋子',rainday:'下雨天',selfie:'合照',dishphoto:'先拍再吃',firstspecial:'第一道特製版',kidcat:'小朋友與貓',grass:'啃草的時間'};
+ play:'玩起來了',swat:'柔柔的小巴掌',pressed:'靠著柔柔',greeter:'不怕生',cushion:'一起擠軟墊',distracted:'走到一半忘了',guide:'小齁帶路',oldfriends:'又見面了',dylancat:'他們好像認識',quiet:'打烊後',oddspot:'怎麼睡在這',newroom:'新的店',newspot:'牠自己找到的',boxcat:'紙箱裡有東西',window:'窗邊',tunnel:'隧道的另一頭',reading:'各自安靜',pause:'經過的時候',company:'今天不是一個人',gift:'拿來的東西',anniversary:'紀念日',neighbors:'在店裡遇到',treat:'這個請你',bagcat:'比較喜歡袋子',rainday:'下雨天',selfie:'合照',dishphoto:'先拍再吃',firstspecial:'第一道特製版',kidcat:'小朋友與貓',grass:'啃草的時間',sophiecat:'只是坐一下'/* v2.3 */};
 /* one line under each photo, written from what was actually in the frame */
 const MEM_TXT={newspot:i=>`${i.a}第一次用了${i.g}。`,boxcat:i=>`${i.a}在紙箱裡，只露出頭。`,window:i=>`${i.a}在窗邊看了很久的街。`,tunnel:i=>`${i.a}從隧道另一頭衝出來。`,grass:i=>`${i.a}啃了兩口貓草，然後在旁邊翻肚子。`,sofa:i=>`${i.cats||'貓'}陪 Jill 坐了一會兒。`,sofafull:i=>`沙發上擠了 ${i.n||3} 隻貓，Jill 只好縮著坐。`,husband:()=>'原來一直都認識。',sides:i=>`${i.a}跟${i.b}一左一右。`,ambush:i=>`${i.a}從角落跳出來，${i.b}嚇了一跳。`,what:i=>`${i.a}看著${i.b}，看不懂。`,waited:i=>`${i.a}埋伏了半天，什麼都沒等到。`,race:i=>`${i.a}跟${i.b}突然繞著店裡跑起來。`,sleepgod:i=>`店裡再吵，${i.a}都照睡不誤。`,nearby:i=>`${i.a}坐在 Jill 腳邊。`,best:i=>`${i.a}找到了看得見全店的位子。`,nap3:()=>'三隻貓睡成一團。',everyone:()=>'五隻貓難得同時出現在一個畫面裡。',rest:i=>i.rush?'剛忙完一波，Jill 坐下來喘口氣。':'店裡沒事，Jill 在沙發上坐了一下。',lap:i=>`${i.a}跳上了 Jill 的膝蓋。`,photo:i=>`客人拿起手機，拍了${i.a}一張。`,pet:i=>`Jill 蹲下來摸了摸${i.a}。`,dylan:()=>'打烊後，Dylan 還在沙發上。',
- play:i=>`${i.a}跟${i.b}玩起來了。`,swat:i=>`${i.a}玩到一半，輕輕拍了${i.b}一下。`,pressed:i=>`${i.a}靠著${i.b}睡著了。`,greeter:i=>`${i.a}在陌生客人旁邊待得很自在。`,cushion:i=>`${i.a}跟${i.b}擠在同一塊軟墊上。`,distracted:i=>`${i.a}本來要去吃飯，走到一半就忘了。`,guide:i=>`${i.a}回頭等${i.b}，帶他去吃飯。`,oldfriends:i=>`${i.g}跟${i.a}又見面了。`,dylancat:i=>`${i.a}對 Dylan 的態度，不像對陌生人。`,quiet:()=>'店關了，燈還亮著。',oddspot:i=>`${i.a}睡在一個奇怪的地方。`,newroom:()=>'擴建之後的第一個晚上，大家都在。',reading:i=>`Jill 在看書，${i.cats}在旁邊各睡各的。`,pause:()=>'Jill 在 Dylan 的桌邊站了一下。',company:i=>`${i.g}今天帶了人來。`,gift:i=>`${i.g}帶了東西來給店裡。`,anniversary:()=>'王先生與王太太的紀念日，Jill 請了甜點。',neighbors:i=>`${i.a}跟${i.b}在店裡打了招呼，原來認識。`,treat:i=>`Jill 請了${i.g}一份${i.d}。`,bagcat:i=>`橘子沒興趣，${i.a}對袋子比較有興趣。`,rainday:i=>`外面在下雨，${i.a}睡得更沉了。`,selfie:i=>`${i.g}想跟 Jill 合照。`,dishphoto:i=>`${i.d}上桌，客人先拍了一張。`,firstspecial:i=>`第一盤${i.d}從出菜口出去了。`,kidcat:i=>`小朋友盯著${i.a}看了很久，飯都忘了吃。`};
+ play:i=>`${i.a}跟${i.b}玩起來了。`,swat:i=>`${i.a}玩到一半，輕輕拍了${i.b}一下。`,pressed:i=>`${i.a}靠著${i.b}睡著了。`,greeter:i=>`${i.a}在陌生客人旁邊待得很自在。`,cushion:i=>`${i.a}跟${i.b}擠在同一塊軟墊上。`,distracted:i=>`${i.a}本來要去吃飯，走到一半就忘了。`,guide:i=>`${i.a}回頭等${i.b}，帶他去吃飯。`,oldfriends:i=>`${i.g}跟${i.a}又見面了。`,dylancat:i=>`${i.a}對 Dylan 的態度，不像對陌生人。`,quiet:()=>'店關了，燈還亮著。',oddspot:i=>`${i.a}睡在一個奇怪的地方。`,newroom:()=>'擴建之後的第一個晚上，大家都在。',reading:i=>`Jill 在看書，${i.cats}在旁邊各睡各的。`,pause:()=>'Jill 在 Dylan 的桌邊站了一下。',company:i=>`${i.g}今天帶了人來。`,gift:i=>`${i.g}帶了東西來給店裡。`,anniversary:()=>'王先生與王太太的紀念日，Jill 請了甜點。',neighbors:i=>`${i.a}跟${i.b}在店裡打了招呼，原來認識。`,treat:i=>`Jill 請了${i.g}一份${i.d}。`,bagcat:i=>`橘子沒興趣，${i.a}對袋子比較有興趣。`,rainday:i=>`外面在下雨，${i.a}睡得更沉了。`,selfie:i=>`${i.g}想跟 Jill 合照。`,dishphoto:i=>`${i.d}上桌，客人先拍了一張。`,firstspecial:i=>`第一盤${i.d}從出菜口出去了。`,kidcat:i=>`小朋友盯著${i.a}看了很久，飯都忘了吃。`,sophiecat:i=>`${i.a}自己坐到 Sophie 桌邊；她低頭看了一下。`};
 /* Photos are the bulk of the restaurant's history, so they do not live in the save string any more: the save
    keeps the record (kind, day, clock, caption, 珍藏), the picture goes to IndexedDB under the record's id. A
    browser without IndexedDB (or one that refuses it) falls back to keeping the picture inline, with a lower
@@ -2810,6 +2865,7 @@ function catDecide(c){c.guest=null;c.moving=false;c.run=0;const id=c.def.id;cons
  if(id==='ban'){add('nearTora',1.3);add('nearRou',1.1);add('nearBao',.7)}
  if(id==='mikan'){add('nearHou',1.8);add('nearTora',1.4);add('watchBao',1);if(BAO_LAST&&ctime-BAO_LAST.t>6&&ctime-BAO_LAST.t<70)add('imitate',1.4);if(!c.ambCD||ctime>c.ambCD)add('ambush',.7);add('stare',.9)}
  if(id==='mei'){add('watch',2);if(CATS.some(o=>o.st==='hide2'))add('wander',1.5)}
+ {const pull=storyCatPull(c);if(pull)add('story',pull.w)}   /* v2.3: a story may make a table more interesting to a cat — a weight in its own choice, never a teleport */
  if(RACE_CD<=0){const o=catBy(id==='tora'?'snow':id==='snow'?'tora':'');const ok=o&&!o.hidden&&o.perch<0&&!o.sofa&&!['jump','race','dash','visit','hide'].includes(o.st)&&Math.hypot(o.x-c.x,o.y-c.y)<260;if(ok&&id==='tora')add('race',1.4);if(ok&&id==='snow'&&!['sleep','bed'].includes(o.st))add('race',.25)}
  if(near.length&&['ban','mikan'].includes(id))add('play',.5);
  if(id==='ban'){const m=catBy('mikan');if(m&&freeFloorCat(m)&&['rest','daze','stare'].includes(m.st)&&Math.hypot(m.x-c.x,m.y-c.y)<230&&!(c.playCD>ctime))add('seekPlay',1.3)}
@@ -2820,6 +2876,7 @@ function catDecide(c){c.guest=null;c.moving=false;c.run=0;const id=c.def.id;cons
  const ch=wpick(W,o=>o[1])[0];
  switch(ch){
  case'jill':goJill(c);break;
+ case'story':{const pull=storyCatPull(c);const g=pull&&pull.g;if(!g||g.table==null){const p=pickFloor(c);catWalk(c,p.x,p.y,'rest');break}releaseSpots(c);const t=R.tables[g.table];catWalk(c,clamp(t.x+pick([-34,34]),96,316),Math.min(FB-10,t.y+16),'rest');c.lookAt=null;break}
  case'bag':c.bagDone=1;catWalk(c,46,FB-14,'sleep');break;
  case'wander':{let p=pickFloor(c);if(id==='mei'){const h=CATS.find(o=>o.st==='hide2');if(h&&Math.random()<.4)p={x:clamp(h.x+rand(-30,30),96,316),y:clamp(h.y+rand(-16,16),140,FB-10)}}catWalk(c,p.x,p.y,'rest');if(id==='mikan'&&Math.random()<.35)c.stareAt=rand(20,60);break}
  case'rest':c.st='rest';c.pose=pick(id==='tora'?['groom','groom','sit','loaf']:['sit','groom','loaf','yawn']);c.t=rand(4,10);break;
@@ -3984,7 +4041,7 @@ function secExterior(money,btn){let body='';
  return body}
 function secCats(money,btn){let body='';body+=`<div class="nm" style="font-weight:800;font-size:15px;margin:0 0 2px">貓咪生活</div><p class="muted" style="font-size:12px;margin:0 0 6px">買給牠們的。誰會用、怎麼用，牠們自己決定。用過的會記在相簿裡。</p>`;
  for(const [tier,tn,td] of GEAR_TIERS){const items=CATGEAR.filter(G=>(G.tier||1)===tier);if(!items.length)continue;body+=`<div class="nm" style="font-weight:800;font-size:13.5px;margin:12px 0 2px">${tn}<span class="muted" style="font-weight:600;font-size:12px;margin-left:8px">${td}</span></div>`;
-  for(const G of items){const on=gearOn(G.k);const okRoom=!G.need||projOn(G.need);const ok=okRoom&&S.level>=(G.lv||1);const used=Object.keys((S.gearUse||{})[G.k]||{});
+  for(const G of items){const on=gearOn(G.k);if(G.story&&!on)continue;/* v2.3: a thing someone brought is not for sale */const okRoom=!G.need||projOn(G.need);const ok=okRoom&&S.level>=(G.lv||1);const used=Object.keys((S.gearUse||{})[G.k]||{});
    body+=`<div class="item ${on?'done':''}"><img alt="" src="${iconURL(G.ic)}"><div class="nm">${G.n} ${on?'<span class="tier t1">已擺好</span>':''}${G.room==='side'?' <span class="muted" style="font-weight:600;font-size:12px">側廳</span>':''}</div><div class="d">${G.d}${on&&used.length?`<br><b>用過的：</b>${used.map(id=>catName(CAT_DEF.find(x=>x.id===id))).join('、')}`:''}</div>${on?'':`<div class="act">${ok?btn(G.cost,'buyGear',`data-k="${G.k}"`):okRoom?`<span class="muted">需要擴建到 ${LEVELS[(G.lv||1)-1].n}</span>`:'<span class="muted">要先有側廳</span>'}</div>`}</div>`}}
  if(S.level>=4){const on=projOn('catwalk');body+=`<div class="nm" style="font-weight:800;font-size:13.5px;margin:12px 0 2px">夢想<span class="muted" style="font-weight:600;font-size:12px;margin-left:8px">在店舖工程那一頁。</span></div><div class="item ${on?'done':''}"><img alt="" src="${iconURL('catwalk')}"><div class="nm">貓的空中走道 ${on?'<span class="tier t1">已完工</span>':''}</div><div class="d">${on?DREAMS[2].done:DREAMS[2].d}</div>${on?'':`<div class="act"><button class="btn sm" data-act="tab" data-k="works">去店舖工程 ›</button></div>`}</div>`}
  return body}
@@ -4161,7 +4218,7 @@ function doAct0(a,d,k,b){
  case'buyProject':{const P=ALL_PROJECTS().find(x=>x.k===k);if(!P||projOn(P.k)||S.money<P.cost||S.level<P.lv)break;S.money-=P.cost;S.rooms[P.k]=1;S.newRooms[P.k]=S.day;S.reveal={k:P.k,day:S.day};if(P.k==='side')S.sideTables=Math.max(S.sideTables||0,2);if(P.k==='terrace')S.frontTables=Math.max(S.frontTables||0,1);ach('project');if(PROJECTS.every(x=>projOn(x.k)))ach('allprojects');save();IDLE=null;bg=null;for(const kk in BGC)delete BGC[kk];projectReveal(P);break}
  case'buyExt':{const E=EXTERIOR.find(x=>x.k===k);if(!E||extOn(E.k)||S.money<E.cost||S.level<E.lv)break;S.money-=E.cost;S.ext[E.k]=1;sfx.buy();toast(`${E.n}：裝好了，到「店門口」看看`);if(EXTERIOR.every(x=>extOn(x.k)))ach('storefront');save();for(const kk in BGC)delete BGC[kk];keepScroll(showShop);shopAfterBuy();break}
  case'extStyle':{const E=EXTERIOR.find(x=>x.k===k);if(!E||!E.styles||!extOn(E.k))break;S.ext[E.k]=(S.ext[E.k]%E.styles.length)+1;sfx.tap();save();for(const kk in BGC)delete BGC[kk];keepScroll(showShop);break}
- case'buyGear':{const G=CATGEAR.find(x=>x.k===k);if(!G||gearOn(G.k)||S.money<G.cost||(G.need&&!projOn(G.need))||S.level<(G.lv||1))break;S.money-=G.cost;S.gear[G.k]=S.day;sfx.buy();toast(`${G.n}：擺好了。看牠們什麼時候發現。`);if(CATGEAR.every(x=>gearOn(x.k)))ach('catgear');save();IDLE=null;bg=null;for(const kk in BGC)delete BGC[kk];keepScroll(showShop);shopAfterBuy();break}
+ case'buyGear':{const G=CATGEAR.find(x=>x.k===k);if(!G||G.story||gearOn(G.k)||S.money<G.cost||(G.need&&!projOn(G.need))||S.level<(G.lv||1))break;S.money-=G.cost;S.gear[G.k]=S.day;sfx.buy();toast(`${G.n}：擺好了。看牠們什麼時候發現。`);if(CATGEAR.every(x=>gearOn(x.k)))ach('catgear');save();IDLE=null;bg=null;for(const kk in BGC)delete BGC[kk];keepScroll(showShop);shopAfterBuy();break}
  case'revealPeek':{const P=ALL_PROJECTS().find(x=>x.k===k);hideReveal();if(P){room=P.room;forceDraw=true;screenEl.hidden=true;$('#peekPill').hidden=false;renderRoomTabs(true);banner(P.n,P.done,'gold')}break}
  case'revealClose':hideReveal();showShop();shopAfterBuy();break;
  case'expand':{const nl=LEVELS[S.level];if(nl&&S.money>=nl.cost){S.money-=nl.cost;S.level++;if(S.level===2)ach('bistro');sfx.buy();banner(LV().n,'擴建完成！');if(S.level===5)ach('jill');S.newRoom=S.day;S.grewDay=S.day;save();bg=null;showShop();shopAfterBuy();scene([{who:'jill',tone:'cheerful',text:S.level===5?'招牌上只剩一個名字了。就這樣，不會再大了——但可以更好。':S.level===2?'店變大了一點。多兩張桌子，多幾道菜。':S.level===3?'牆換了、地板換了。客人會更講究一點，我也是。':'這下真的像一間餐廳了。'}])}break}
