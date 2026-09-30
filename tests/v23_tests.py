@@ -578,10 +578,11 @@ def phase8_reviews_say_what_happened_posts_amplify_it_and_a_campaign_is_counted(
     check(post['who'] == 'Jill' and post['topic'] == 'food' and post['dish'] == g.ev("__nd") and g.ev("socialTopic().who") == 'Jill', f'Jill posted it; the topic is hers now: {post}')
     check(not any(c == 'dish:' + g.ev("__nd") for c in json.loads(g.ev("JSON.stringify(socialCands().map(c=>c.k))"))), 'a thing posted is not offered again')
     # campaign: money, marked guests, real counting, a result
-    m0 = g.ev("S.money"); check(g.ev("startCampaign('dish',__nd)") and g.ev("S.money") == m0 - 9000 and g.ev("!!campaign()"), 'a dish campaign starts, for money')
+    m0 = g.ev("S.money"); check(g.ev("startCampaign('dish',__nd)") and g.ev("S.money") == m0 - 9000 and g.ev("!!campaignRec()&&!campaign()&&campaignRec().start===S.day+1"), 'a dish campaign bought during the day starts tomorrow, for money')
+    g.ev("S.day=campaignRec().start"); check(g.ev("!!campaign()"), 'it runs from its first day')
     check(not g.ev("startCampaign('local')"), 'one at a time')
     sch = json.loads(g.ev("JSON.stringify((()=>{const out=[];campaignGuests(out,300);return out})())"))
-    check(3 <= len(sch) <= 5 and all(o['via'] == 'camp' and o['wantDish'] == g.ev("__nd") for o in sch), f'the schedule gets guests who came for the dish: {len(sch)}')
+    check(4 <= len(sch) <= 6 and all(o['via'] == 'camp' and o['wantDish'] == g.ev("__nd") for o in sch), f'the schedule gets guests who came for the dish: {len(sch)}')
     g.ev("for(const q of R.groups.slice()){q.gone=true}R.groups=[];for(const t of R.tables){t.group=null;t.dirty=false};S.stock[__nd]=5;spawn({t:R.t,type:'office',size:1,via:'camp',wantDish:__nd});const q=R.groups[0];if(q.table==null)seatGroup(q,freeTableFor(q));q.state='reading';createTicket(q)")
     st = json.loads(g.ev("JSON.stringify(campaign().stats)"))
     check(st['via'] == 1 and st['first'] == 1 and st['dish'] == 1 and g.ev("R.groups[0].ticket.items.some(i=>i.d===__nd)"), f'a campaign guest is counted once, and the dish they ordered: {st}')
@@ -647,4 +648,158 @@ def phase9_the_restaurant_remembers_milestones_slots_and_small_crossovers(b, por
     check('店裡的人' in g.ev("document.body.innerText") and '周董' in g.ev("document.body.innerText"), 'the regulars page lists the named guests')
     g.ev("S.gearN={box:{snow:7,tora:1}};bookTab='cats';showBook()"); g.page.wait_for_timeout(80)
     check('最常待的地方' in g.ev("document.body.innerText"), 'a cat has a favourite spot, from real use')
+    check(not g.errors, g.errors[:3]); g.close()
+
+@test
+def followup_story_progress_is_visible_retrievable_and_honest(b, port, target):
+    """v2.3 follow-up (2026-10-01): the journal's 故事 page shows each started story line with its real beats (dates,
+    ●━○ progress, 「下一段：？？？」), never internal fact names; an old v2.2.1 save shows only what its own records
+    hold; a new beat raises one non-blocking note (not on load, not for ambient repeats, not twice) that opens the
+    beat's line; the words said around a beat are kept with it; Dylan's line keeps the secret until the reveal and
+    goes on after it; Ken × 杜 is marked a friendship."""
+    g = Game(b, port, target, seed=101, manual=True, viewport={'width': 390, 'height': 844})
+    # an old save: records only, nothing announced on load
+    load_fixture(g, 'player_day48.json'); g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(1200)
+    check(g.ev("document.querySelector('#storyNote').hidden"), 'loading an old save announces nothing')
+    g.ev("bookTab='story';showBook()"); g.page.wait_for_timeout(80); txt = g.ev("document.body.innerText")
+    check('人物故事' in txt and '開始記得彼此' not in txt and '餐廳故事' not in txt, 'no v2.3 beat that never happened, and no restaurant chapters')
+    for w in ['madeSpace', 'choseNear', 'sharedFood', 'waitedFor', 'copresent']:
+        check(w not in txt, f'no internal name on the page: {w}')
+    dy = json.loads(g.ev("JSON.stringify((()=>{const L=STORY_LINES.find(x=>x.k==='dylan');return{open:L.open(),who:L.who(),title:L.title(),faces:L.faces(),done:lineProgress(L).done.map(x=>x.t),stage:S.dylan.stage}})())"))
+    if dy['stage'] < 3:
+        dtxt = g.ev("document.querySelector('#sl-dylan').innerText")
+        check(dy['title'] == '那位常來的客人' and dy['faces'] == ['dylan'] and '結婚' not in dtxt and 'Jill' not in dtxt, f'before the reveal his line keeps the secret: {dy} / {dtxt[:120]}')
+    g.ev("closeSub()")
+    # a v2.3 save in service: drive Sophie × Mia through its first real beat
+    load_fixture(g, 'player_day46.json'); g.click('[data-act=openFresh]'); g.page.wait_for_timeout(1200)
+    start_day(g); g.ev(P7_HELPERS)
+    n0 = g.ev("lineProgress(STORY_LINES.find(x=>x.k==='sm')).done.length")
+    g.ev("document.querySelector('#storyNote').hidden=true;for(let i=0;i<3;i++){relSet('sophie','mia','copresent');story().rel[pairKey('sophie','mia')].f.copresent.l=S.day-1-i}__p7.seat('mia');__p7.seat('sophie')")
+    note = g.ev("(()=>{const n=document.querySelector('#storyNote');return n.hidden?null:{k:n.dataset.k,t:n.innerText}})()")
+    check(note and note['k'] == 'sm' and 'Sophie & Mia' in note['t'] and '1 / 8' in note['t'] and '開始記得彼此' in note['t'], f'a story update, with the line and how far it has gone: {note} (before: {n0})')
+    check(g.ev("!paused&&phase==='service'"), 'the note does not pause service')
+    lines = json.loads(g.ev("JSON.stringify(story().beatLines.sm_a||[])"))
+    check(any(l.get('w') == 'Mia' and '妳也常來' in l['t'] for l in lines) and any(l.get('w') == 'Sophie' for l in lines), f'the words of that moment are kept with the beat: {lines}')
+    g.ev("document.querySelector('#storyNote').hidden=true;storyProgressCheck()")
+    check(g.ev("document.querySelector('#storyNote').hidden"), 'the same beat is not announced twice')
+    g.ev("__p7.clearDay();factSet('sm_h');const h=relN('sophie','mia','spoke');storyProgressCheck();window.__cnt=lineProgress(STORY_LINES.find(x=>x.k==='sm')).done.length;delete story().facts.sm_h;story().lineSeen.sm=1")
+    g.ev("document.querySelector('#storyNote').hidden=true;evState('sm_after').n=5;relSet('sophie','mia','spoke');storyProgressCheck()")
+    check(g.ev("document.querySelector('#storyNote').hidden") and g.ev("lineProgress(STORY_LINES.find(x=>x.k==='sm')).done.length") == 1, 'ambient repeats never count as a beat')
+    # tap: the line opens in the journal (paused while reading), closing goes straight back to service
+    g.ev("storyNoteShow({k:'sm',who:'Sophie & Mia',t:'開始記得彼此',n:1,total:8})"); g.page.click('#storyNote'); g.page.wait_for_timeout(150)
+    check(g.ev("sub==='book'&&bookTab==='story'&&paused") and g.ev("!!document.querySelector('#sl-sm.focus')"), 'tapping the note opens that story, focused')
+    ptxt = g.ev("document.querySelector('#sl-sm').innerText")
+    check('1 / 8 個故事片段' in ptxt and '下一段：？？？' in ptxt and '她們的故事還在繼續' in ptxt, f'progress, the next beat unknown: {ptxt[:200]}')
+    g.ev("document.querySelector('#sl-sm details.sb').open=true"); ptxt = g.ev("document.querySelector('#sl-sm').innerText")
+    check('妳也常來' in ptxt, 'the beat opens to what was said')
+    g.ev("closeSub()"); check(g.ev("sub===null&&!paused&&phase==='service'"), 'closing returns to service, running')
+    # Ken × 杜: friendship, said so
+    g.ev("factSet('ken_du_argue')"); g.ev("bookTab='story';showBook()"); g.page.wait_for_timeout(60)
+    check('友情故事' in g.ev("document.querySelector('#sl-kd').innerText") and not g.ev("romanticEligible('n:品酒師 Ken','n:Monsieur 杜')"), 'Ken × 杜 is a friendship story')
+    g.ev("closeSub()")
+    # Dylan after the reveal: the title changes, the story goes on
+    pre = g.ev("lineProgress(STORY_LINES.find(x=>x.k==='dylan')).total")
+    g.ev("S.dylan.stage=3;S.dylan.reveal=S.day;factSet('dylan_valentine')")
+    post = json.loads(g.ev("JSON.stringify((()=>{const L=STORY_LINES.find(x=>x.k==='dylan');const P=lineProgress(L);return{title:L.title(),who:L.who(),faces:L.faces(),total:P.total,done:P.done.map(x=>x.t),more:L.more()}})())"))
+    check(post['title'] == '結婚十一年，還在追' and post['who'] == 'Jill & Dylan' and 'jill' in post['faces'] and post['total'] > pre and '情人節' in post['done'] and '還在繼續' in post['more'], f'after the reveal: {post}')
+    # reload keeps records and the seen-counts
+    before = g.ev("JSON.stringify([story().lineSeen,story().beatLines])"); g.ev("save()"); g.reload(); g.page.wait_for_timeout(200); g.click('[data-act=openFresh]'); g.page.wait_for_timeout(1200)
+    check(g.ev("JSON.stringify([story().lineSeen,story().beatLines])") == before and g.ev("document.querySelector('#storyNote').hidden"), 'records survive a reload; nothing is announced again')
+    check(not g.errors, g.errors[:3]); g.close()
+
+@test
+def followup_a_busy_service_keeps_every_line_and_the_journal_is_reachable(b, port, target):
+    """v2.3 follow-up: the 💬 panel keeps the whole day (a heavy service is hundreds of lines), scrolls, closes only with
+    its ×; the pause menu and the day's summary open the journal."""
+    g = Game(b, port, target, seed=102, manual=True, viewport={'width': 390, 'height': 844})
+    load_fixture(g, 'player_day46.json'); g.click('[data-act=openFresh]'); g.page.wait_for_timeout(150)
+    start_day(g); g.ev(P7_HELPERS)
+    n0 = g.ev("dayLog().length")
+    g.ev("for(let i=0;i<520;i++)logLine(i%7?'客人'+(i%13):'Sophie','第'+i+'句',i%5?'g':'e');logLine('客人12','第519句','g');/* the same line twice is kept once */")
+    check(g.ev("dayLog().length") == n0 + 520, 'a heavy service: every line kept (and an immediate repeat merged)')
+    g.page.click('#logChip'); g.page.wait_for_timeout(80)
+    check(g.ev("document.querySelectorAll('#logPanel .ll').length") == n0 + 520 and f'{n0 + 520} 句' in g.ev("document.querySelector('#logPanel .lhead').innerText"), 'the panel shows them all')
+    check(g.ev("(()=>{const b=document.querySelector('#logPanel .lbody');return b.scrollHeight>b.clientHeight&&getComputedStyle(b).overflowY==='auto'})()"), 'and it scrolls')
+    g.page.click('#logPanel .lbody .ll:nth-child(3)'); g.page.wait_for_timeout(50)
+    check(not g.ev("document.querySelector('#logPanel').hidden"), 'a tap inside (while scrolling) does not close it')
+    r = json.loads(g.ev("JSON.stringify(document.querySelector('#logPanel .lclose').getBoundingClientRect())"))
+    check(r['width'] >= 40 and r['height'] >= 40, f'the × is a real target: {r}')
+    g.page.click('#logPanel .lclose'); g.page.wait_for_timeout(50)
+    check(g.ev("document.querySelector('#logPanel').hidden"), 'the × closes it')
+    # the journal from the pause menu, and back to the pause menu
+    g.ev("paused=true;showPause()"); g.page.wait_for_timeout(50)
+    g.click('#screen [data-act=book]'); g.page.wait_for_timeout(80)
+    check(g.ev("sub==='book'") and '故事' in g.ev("document.querySelector('#screen .tabs').innerText"), 'the pause menu opens the journal, which has 故事')
+    g.ev("closeSub()"); check(g.ev("sub==='pause'"), 'closing goes back to the pause menu')
+    g.ev("paused=false;hideScreen();R.si=R.sched.length;closeShop('');for(const q of R.groups.slice()){q.gone=true}R.groups=[];__tick(50);if(R&&R.closing==null)startClosing();if(R)R.closing=999;__tick(50)")
+    g.page.wait_for_timeout(100)
+    check(g.ev("phase") == 'summary' and g.ev("!!document.querySelector('#screen .sh-top [data-act=book]')"), 'the summary has the journal too')
+    check(g.ev("(S.dayLog||[]).length") >= n0 + 520, "the day's lines are kept for the journal's 話語 page")
+    check(not g.errors, g.errors[:3]); g.close()
+
+@test
+def followup_a_campaign_is_felt_in_the_room(b, port, target):
+    """v2.3 follow-up: the guests a campaign brought act like it — the cat people look for cats, name the one they
+    really see, ask when they cannot find one (and Jill says where the cats really are), write about it; the dish
+    people order the dish and say so, and react when it has run out; local first-timers say they have walked past for
+    years; the Side Hall group mentions the room it really sits in; the wine post means more glasses at dinner and more
+    people staying for the Lounge. A ticket shows 📱; the day's summary confirms the count. Not every table says it."""
+    g = Game(b, port, target, seed=103, manual=True, viewport={'width': 390, 'height': 844})
+    load_fixture(g, 'player_day46.json'); g.click('[data-act=openFresh]'); g.page.wait_for_timeout(150)
+    g.ev("S.money+=900000;factSet('lounge_project');buyLounge(1);hideReveal();S.crew.push({id:'cb1',role:'bartender',name:'Evan',lv:2,duty:'lbar'});showPrep();autoStock()")
+    check(g.ev("startCampaign('cats')") and g.ev("campaign()&&campaign().start===S.day"), 'bought before opening: it runs today')
+    start_day(g); g.ev(P7_HELPERS); g.ev("__tick(40)")
+    spawn_camp = "(o=>{window.__scn=(window.__scn||0)+1;o.name='測試客'+__scn;o.t=R.t;o.via='camp';const want=o.wantSide?'side':'main';let t=R.tables.find(t=>!t.lounge&&(t.room||'main')===want&&!t.group&&!t.dirty&&t.seats>=o.size)||R.tables.find(t=>!t.lounge&&(t.room||'main')===want&&t.seats>=o.size);if(t&&t.group){t.group.gone=true;leaveGroup(t.group,'ok')}if(t){t.dirty=false;t.claim=null}R.groups=R.groups.filter(q=>!q.gone);spawn(o);const q=R.groups.find(x=>x.name===o.name);if(!q)return null;if(q.table==null){const tt=freeTableFor(q)||t;seatGroup(q,tt)}q.state='wait';q.moving=false;return q})"
+    g.ev("window.__sc=" + spawn_camp)
+    # a cat person who really sees a cat names it
+    said = json.loads(g.ev("JSON.stringify((()=>{const q=__sc({type:'student',size:1,catfan:1});const c=CATS.find(x=>!x.hidden);R.cds={};R.campT=null;R.campN=0;campaignCatSeen(q,c);return{name:catName(c.def),log:(R.log||[]).slice(-2).map(l=>l.t),via:q.via}})())"))
+    check(any(said['name'] in t for t in said['log']) and said['via'] == 'camp', f'the cat they see, by its name: {said}')
+    # one who sees none asks; Jill says where the cats really are
+    ask = json.loads(g.ev("JSON.stringify((()=>{R.cds={};R.campT=null;R.campN=0;const q=__sc({type:'couple',size:2,catfan:1});q.cats=[];q.state='eat';for(const c of CATS){c.hidden=false}const s=CATS[0];s.st='sleep';R.cds={};R.campT=null;R.campN=0;campaignCatLook(q);return{log:(R.log||[]).slice(-3).map(l=>l.w+'：'+l.t),sleeper:catName(s.def)}})())"))
+    check(any('照片裡那隻' in t or '貓呢' in t or '在哪' in t or '沒看到貓' in t for t in ask['log']) and any(t.startswith('Jill：') and ask['sleeper'] in t for t in ask['log']), f'asked, and answered with a real cat: {ask}')
+    rv = json.loads(g.ev("JSON.stringify((()=>{const out=[];for(let i=0;i<24;i++){const q=__sc({type:'office',size:1,catfan:1});q.cats=[];__p7.fed(q,['pasta']);out.push(addReview(q,4,null,{}).txt)}return out})())"))
+    nocat = sum(1 for t in rv if any(l in t for l in sum([list(v) for v in g.ev("Object.values(RV_DET.nocat)")], [])))
+    check(nocat >= 3, f'their reviews say they did not meet a cat (and never claim one): {nocat}/24')
+    tk = g.ev("(()=>{const q=__sc({type:'office',size:1,catfan:1});q.state='reading';q.ticket=null;createTicket(q);R.tv++;tkVer=-1;renderTickets();return ticketsEl.innerHTML.includes('📱')})()")
+    check(tk, 'their ticket carries 📱')
+    # the dish campaign
+    g.ev("S.social.camp=null;const d=menuList().find(x=>!(DISHES[x]&&DISHES[x].bar)&&x!=='signature'&&x!=='sigdessert'&&stationOk(x));window.__cd=d;S.stock[d]=20;S.money+=9000;phase='prep';startCampaign('dish',d);phase='service'")
+    got = json.loads(g.ev("JSON.stringify((()=>{let said=0,has=0;for(let i=0;i<8;i++){R.cds={};R.campT=null;R.campN=0;const q=__sc({type:'gourmet',size:1,wantDish:__cd});q.state='reading';q.ticket=null;R.cds={};R.campT=null;R.campN=0;/* the order comes a few seconds after the greeting */createTicket(q);if(q.ticket&&q.ticket.items.some(i=>i.d===__cd))has++;if(q.campSaid)said++}return{has,said}})())"))
+    check(got['has'] == 8 and 2 <= got['said'] <= 7, f'the dish is on their tickets; some of them say why they came: {got}')
+    miss = json.loads(g.ev("JSON.stringify((()=>{const q=__sc({type:'gourmet',size:1,wantDish:__cd});S.stock[__cd]=0;/* (after the seat: a table cleared for the test may return an unserved plate to the fridge) */q.state='reading';q.ticket=null;R.cds={};R.campT=null;R.campN=0;createTicket(q);__p7.fed(q,['pasta']);const r=addReview(q,3,null,{});return{missed:q.wantMissed||0,log:(R.log||[]).slice(-3).map(l=>l.w+'：'+l.t),tags:r.tags}})())"))
+    check(miss['missed'] == 1 and any('賣完' in t or '不是說有' in t or '為了那一道' in t for t in miss['log']) and 'short' in miss['tags'], f'sold out: they say so, and the review remembers: {miss}')
+    # local first-timers
+    g.ev("S.social.camp=null;S.money+=6000;phase='prep';startCampaign('local');phase='service'")
+    loc = g.ev("(()=>{let n=0;for(let i=0;i<10;i++){R.cds={};R.campT=null;R.campN=0;const q=__sc({type:'regular',size:1});q.ret=false;if(q.campSaid)n++}return n})()")
+    check(3 <= loc <= 9, f'some local first-timers say it (not all): {loc}/10')
+    check(g.ev("campaignStreetBoost()") > 0 and g.ev("streetStopP()") > g.ev("(()=>{const c=S.social.camp;S.social.camp=null;const v=streetStopP();S.social.camp=c;return v})()"), 'more people stop at the window')
+    # the Side Hall group
+    g.ev("S.social.camp=null;S.money+=9000;phase='prep';startCampaign('side');phase='service'")
+    side = json.loads(g.ev("JSON.stringify((()=>{let inSide=0,said=0;for(let i=0;i<6;i++){R.cds={};R.campT=null;R.campN=0;for(const t of R.tables)if((t.room||'main')==='side'&&t.group){t.group.gone=true;t.group=null}R.groups=R.groups.filter(q=>!q.gone);const q=__sc({type:'family',size:3,wantSide:1});if((R.tables[q.table].room||'main')==='side')inSide++;if(q.campSaid)said++}return{inSide,said}})())"))
+    check(side['inSide'] == 6 and side['said'] >= 2, f'they sit in the Side Hall and talk about it: {side}')
+    # the wine post
+    g.ev("S.social.camp=null;S.money+=12000;phase='prep';startCampaign('wine');phase='service'")
+    wine = json.loads(g.ev("JSON.stringify((()=>{const q={type:'couple',size:2,name:'x',reg:null,regs:[]};R.t=R.dur*.6;const on=loungeAfterP(q);const c=S.social.camp;S.social.camp=null;const off=loungeAfterP(q);S.social.camp=c;let a=0,b2=0;const r=Math.random;let seed=1;Math.random=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};for(let i=0;i<400;i++){if(orderItems({type:'couple',size:2,reg:null,regs:[]}).some(d=>DISH(d).wine))a++}S.social.camp=null;seed=1;for(let i=0;i<400;i++){if(orderItems({type:'couple',size:2,reg:null,regs:[]}).some(d=>DISH(d).wine))b2++}S.social.camp=c;Math.random=r;return{on,off,a,b2}})())"))
+    check(abs(wine['on'] - min(.9, wine['off'] * 1.5)) < 1e-9 and wine['a'] > wine['b2'] * 1.3, f'more glasses at dinner, more people staying for the Lounge: {wine}')
+    # the day's summary confirms it
+    g.ev("R.st.camp=R.st.camp||{k:'wine',via:0,first:0,dish:0};R.st.camp.via=4;R.st.camp.first=3")
+    g.ev("R.si=R.sched.length;closeShop('');for(const q of R.groups.slice()){q.gone=true}R.groups=[];__tick(50);if(R&&R.closing==null)startClosing();if(R)R.closing=999;__tick(50)")
+    g.page.wait_for_timeout(100)
+    dbg = g.ev("JSON.stringify({phase,camp:S.lastSummary&&S.lastSummary.camp,closing:R&&R.closing,groups:R&&R.groups.length})")
+    check(g.ev("phase") == 'summary' and f"看到宣傳來的 {json.loads(dbg)['camp']['via']} 組" in g.ev("document.body.innerText") and json.loads(dbg)['camp']['via'] >= 4, 'the summary confirms what the day showed ' + dbg)
+    check(not g.errors, g.errors[:3]); g.close()
+
+@test
+def followup_the_manual_describes_the_current_game(b, port, target):
+    """v2.3 follow-up: the manual audit — the manual explains the 故事 page and story updates, 社群與宣傳 and how a
+    campaign shows itself, the Lounge staff jobs as they now work, the journal's places, the whole-day dialogue log;
+    stale lines are gone."""
+    g = Game(b, port, target, seed=104, manual=True)
+    txt = g.ev("GUIDE.map(s=>s.h+' '+s.sum+' '+s.pts.map(p=>p.join(' ')).join(' ')).join('\\n')")
+    for need in ['故事更新', '下一段', '社群與宣傳', '📱', 'Lounge 外場', 'Lounge 吧台', '調酒師', '暫停選單的「餐廳日誌」', '一整天的都在', '店裡的人', '存錢目標', 'Bar 小廚']:
+        check(need in txt, f'the manual mentions {need}')
+    for stale in ['暫停選單和設定裡都有【儲存目前進度】', '把杯子交給吧台的客人；桌位由有']:
+        check(stale not in txt, f'stale line removed: {stale}')
+    g.ev("showGuide()"); g.page.wait_for_timeout(50)
+    check('故事' in g.ev("document.querySelector('#screen').innerText") and '社群與宣傳' in g.ev("document.querySelector('#screen').innerText"), 'the manual screen shows the new sections')
     check(not g.errors, g.errors[:3]); g.close()

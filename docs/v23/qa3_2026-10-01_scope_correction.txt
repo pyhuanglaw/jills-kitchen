@@ -1,0 +1,294 @@
+IMPORTANT CORRECTION TO MY PREVIOUS SCOPE INSTRUCTIONS
+
+I need to correct two misunderstandings caused by my previous wording.
+
+Please adjust the current release plan BEFORE continuing.
+
+==================================================
+1. DO NOT REMOVE THE EXISTING 「餐廳故事」
+==================================================
+
+When I said:
+
+“Do not implement the Main Story yet”
+
+I did NOT mean:
+
+“Remove the existing 餐廳故事 content.”
+
+The existing 「餐廳故事」 MUST be preserved.
+
+What I meant was:
+
+Do not invent or lock in a NEW overarching Main Quest structure,
+new restaurant chapters, endgame, or final main-story progression
+before we finish designing that larger structure.
+
+So:
+
+KEEP existing restaurant-story content that already exists and is valid.
+
+DO NOT delete already-authored restaurant history/story beats merely because
+the future overarching main story is not yet finalized.
+
+The distinction is:
+
+EXISTING RESTAURANT STORY / HISTORY
+→ KEEP.
+
+NEW OVERARCHING MAIN QUEST / CHAPTER STRUCTURE / ENDGAME
+→ DO NOT DESIGN YET.
+
+If you already removed existing 「餐廳故事」 content in the current working
+branch, restore it from the appropriate previous work/commit rather than
+re-creating it from memory.
+
+==================================================
+2. THE STORY PAGE SHOULD SHOW BOTH RESTAURANT STORY AND SIDE STORIES
+==================================================
+
+The purpose of the new Story UI is to let the player SEE that stories exist,
+SEE that they are progressing, and revisit what already happened.
+
+The Story area should therefore clearly organize:
+
+A. 餐廳故事
+B. 人物／關係支線
+
+Do not turn either category into RPG quests.
+
+--------------------------------------------------
+CHARACTER / NPC SIDE STORIES
+--------------------------------------------------
+
+For every genuine authored persistent NPC or relationship story,
+the player should be able to understand:
+
+- whose story this is;
+- how many meaningful authored stages/beats exist;
+- how many have already occurred;
+- which stages have been seen;
+- that additional stages remain;
+- the date/history of completed beats;
+- the actual important dialogue/context from completed beats.
+
+Example:
+
+Sophie × Mia
+3 / 8 個故事片段
+
+●━━●━━●━━○━━○━━○━━○━━○
+
+1. DAY 43 — [seen beat]
+2. DAY 47 — [seen beat]
+3. DAY 51 — [seen beat]
+4. ???
+5. ???
+6. ???
+7. ???
+8. ???
+
+The player SHOULD know:
+“There are 8 meaningful stages and I have seen 3.”
+
+The player SHOULD NOT know:
+“Seat Sophie beside Mia twice to trigger stage 4.”
+
+Do not expose internal conditions, flags, weights, cooldowns,
+relationship facts, RNG, or trigger logic.
+
+So the rule is:
+
+SHOW THE EXISTENCE AND PROGRESS OF THE STORY.
+HIDE THE MECHANICAL SOLUTION FOR FORCING THE NEXT EVENT.
+
+--------------------------------------------------
+THIS APPLIES TO EXISTING AUTHORED STORIES
+--------------------------------------------------
+
+Audit the current game and include all genuine authored persistent arcs,
+not merely the examples in the prompt.
+
+Examples include, where they genuinely exist:
+
+- Sophie × Mia
+- Ken × Monsieur 杜 — FRIENDSHIP, never romance
+- 晴 × 阿拓
+- Sophie × 寶寶
+- Jill × Dylan
+- 王先生 × 王太太
+- individual regular/customer arcs
+- other authored NPC/customer/staff/cat relationship stories already in code
+
+Do not invent filler stages merely to make a progress bar longer.
+
+The denominator must represent REAL meaningful authored beats.
+
+--------------------------------------------------
+DYLAN
+--------------------------------------------------
+
+Before the reveal, preserve the mystery.
+
+Do not spoil that Dylan is Jill's husband.
+
+The visible story can remain something such as:
+
+「那位常來的客人」
+
+After the reveal, the story identity can update appropriately and the same
+history continues.
+
+The reveal is NOT the end of Dylan's story.
+
+==================================================
+3. RESTAURANT STORY IS NOT THE SAME THING AS THE FUTURE MAIN QUEST
+==================================================
+
+Existing restaurant milestones/history can appear under 「餐廳故事」.
+
+For example, if the game already contains genuine authored restaurant
+milestones, they should remain visible and retrievable.
+
+However:
+
+Do NOT yet invent a complete new sequence such as:
+
+Chapter 1 → Chapter 2 → Lounge → Final Chapter → Ending
+
+unless that sequence already genuinely existed and was previously approved.
+
+We are still discussing the future overarching main progression.
+
+Preserve what exists.
+Do not prematurely define what does not exist yet.
+
+==================================================
+4. RESTORE COMPLETED QA WORK INTO THIS RELEASE
+==================================================
+
+My previous scope-control instruction was also too strict regarding the
+normal-play QA fixes.
+
+If a previously requested QA improvement has ALREADY BEEN IMPLEMENTED
+successfully in `wip/qa-normal-play`, do NOT exclude it from this release
+merely because it originated from an earlier task.
+
+Examples include work already done for:
+
+- room-tab / top-row ticket overlap;
+- shared-cushion cat overlap;
+- Main Hall lighting;
+- dog / dog-house improvements;
+- dialogue/UI fixes;
+- Journal access;
+- other previously requested normal-play fixes.
+
+If those changes are already implemented, coherent, and testable:
+
+MERGE THEM INTO THIS RELEASE.
+
+Do not make the player wait for another release just because the work happened
+under a different branch.
+
+IMPORTANT:
+Do not blindly merge unfinished or broken experiments.
+
+For each item currently in `wip/qa-normal-play`, classify it as:
+
+READY
+- implementation complete;
+- compatible with current build;
+- migration/save safe where relevant;
+- passes appropriate regression/phone-layout checks.
+
+→ MERGE INTO THIS RELEASE.
+
+NOT READY
+- incomplete;
+- known regression;
+- conflicts with current implementation;
+- requires substantial unfinished work.
+
+→ Do not rush it in merely to satisfy this instruction.
+List exactly what remains and why.
+
+Nothing previously requested should silently disappear.
+
+==================================================
+5. RELEASE CONTENT AUDIT
+==================================================
+
+Before final release, give me a concise table/list:
+
+FEATURE / FIX
+STATUS
+SOURCE BRANCH
+IN THIS RELEASE?
+WHY / WHY NOT
+
+I specifically want visibility into previously completed work so that
+implemented features are not accidentally stranded on old branches.
+
+==================================================
+6. MANUAL AUDIT STILL APPLIES
+==================================================
+
+Because this release may now include previously completed QA changes,
+re-run the 「小小店主手冊」 audit AFTER the final merge.
+
+Do not audit the manual before the final feature set is known and assume it
+remains correct.
+
+For every merged change, check whether:
+- controls changed;
+- access paths changed;
+- mechanics changed;
+- unlocks changed;
+- player-facing explanation changed;
+- a new feature needs explanation.
+
+Update the manual in the same release where necessary.
+
+==================================================
+7. RELEASE / DEPLOYMENT
+==================================================
+
+After merging the READY work:
+
+- run the full regression suite;
+- validate mature saves including the player's current save;
+- perform mobile-size screenshot QA;
+- verify story progress/history survives save/reload;
+- verify existing completed story beats are not fabricated or lost;
+- build and tag the release;
+- publish to the SAME established live URL the player already uses.
+
+Do not create another situation where the new build exists but the player's
+normal URL remains on the previous version.
+
+==================================================
+BOTTOM LINE
+==================================================
+
+Please correct the current plan as follows:
+
+KEEP the existing 餐廳故事.
+
+KEEP and finish the new visible NPC/relationship side-story progression.
+
+Do NOT invent the future overarching Main Quest yet.
+
+MERGE previously completed normal-play QA fixes into this release when they
+are already READY.
+
+Do not strand completed dog/cat/UI/lighting/etc. work on a WIP branch merely
+for scope purity.
+
+After the merge, re-run tests, mobile QA, save migration checks, and the
+mandatory manual audit.
+
+Before proceeding, briefly report:
+1. what 餐廳故事 content you are restoring;
+2. which `wip/qa-normal-play` changes are READY to merge;
+3. which, if any, are genuinely NOT READY and why.

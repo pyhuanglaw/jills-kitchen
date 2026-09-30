@@ -585,3 +585,31 @@ html.desk button,html.desk [data-act],html.desk .polaroid{cursor:pointer}
 .tchips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0 4px}
 .tchip{display:inline-block;background:#F1E7D6;color:#3A2C24;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700}
 .sel{font:inherit;font-size:12.5px;padding:5px 8px;border-radius:9px;border:1px solid #D9CBB6;background:#FFFDF8;color:#3A2C24;margin-right:6px}
+/* v2.3 QA: the dialogue panel keeps the whole day, scrolls, and has its own close button */
+.lpanel{display:flex;flex-direction:column;padding:0;overflow:hidden;max-height:calc(100% - 150px)}
+.lpanel .lhead{display:flex;align-items:center;justify-content:space-between;padding:8px 6px 6px 12px;border-bottom:1px solid rgba(0,0,0,.08);flex:none}
+.lpanel .lhead h4{margin:0}.lpanel .lhead h4 small{font-family:var(--ui,inherit);font-size:11px;color:var(--ink2);margin-left:6px}
+.lpanel .lclose{width:44px;height:44px;border:0;border-radius:12px;background:rgba(0,0,0,.06);font-size:24px;line-height:1;color:var(--ink);flex:none}
+.lpanel .lbody{overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:6px 12px 12px;flex:1 1 auto;min-height:0}
+.ll.named b{color:#8A4E2A}
+/* v2.3 QA: story updates — small, non-blocking, tappable */
+#storyNote{position:fixed;top:calc(env(safe-area-inset-top,0px) + 122px);left:50%;transform:translateX(-50%);z-index:80;max-width:230px;display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 14px 8px;border-radius:14px;border:1px solid rgba(230,194,122,.55);background:rgba(34,26,22,.92);color:#F7EDDC;box-shadow:0 6px 18px rgba(0,0,0,.3);text-align:center;font:inherit;line-height:1.3}
+#storyNote small{font-size:10px;letter-spacing:.12em;color:#E6C27A;font-weight:800}
+#storyNote b{font-size:13px}#storyNote span{font-size:12.5px}#storyNote em{font-style:normal;font-size:10.5px;color:rgba(247,237,220,.7)}
+#storyNote.go{animation:snIn .45s ease-out}@keyframes snIn{from{opacity:0;transform:translate(-50%,-8px)}to{opacity:1;transform:translate(-50%,0)}}
+@media (prefers-reduced-motion:reduce){#storyNote.go{animation:none}}
+/* the 故事 page */
+.sdots{display:flex;gap:4px;align-items:center;margin:8px 0 2px}.sdots i{width:10px;height:10px;border-radius:50%;border:1.5px solid #C99A45;background:transparent}.sdots i.on{background:#C99A45}
+.sdots i+i{position:relative}.sdots i+i::before{content:'';position:absolute;right:11px;top:3px;width:4px;height:1.5px;background:#D9C7A6}
+.sline .sl-b div{font-size:12.5px;line-height:1.55}.sline .d{display:inline-block;min-width:62px;color:var(--ink2);font-size:11px;font-weight:700}
+.sline{margin-top:10px}.sline.focus{box-shadow:0 0 0 2px #C99A45}.sl-h{display:flex;gap:10px;align-items:center}
+.sl-h .faces{display:flex}.sl-h .faces img,.sl-h .faces i{width:38px;height:38px;border-radius:50%;object-fit:cover;object-position:top;background:#EFE5D3;border:2px solid #fff;display:block}.sl-h .faces>*+*{margin-left:-10px}
+.sl-t{font-size:13px;color:var(--ink2)}.sl-more{margin:6px 0 0;font-size:12.5px;color:var(--ink2);font-style:italic}
+.sline.ghost{opacity:.7}.sline.ghost .faces i{background:#DCD3C2}
+/* v2.3 follow-up: the ticket of a guest who came because of a campaign; a story beat's record */
+.tk-who .via{font-style:normal;font-size:10px;margin-left:2px;line-height:1}
+.sline .sb{font-size:12.5px;line-height:1.55;border-top:1px dashed rgba(0,0,0,.08);padding:3px 0}.sline .sb:first-child{border-top:0}
+.sline details.sb summary{list-style:none;cursor:pointer}.sline details.sb summary::-webkit-details-marker{display:none}
+.sline details.sb summary::after{content:'›';float:right;color:var(--ink2);transition:transform .15s}.sline details.sb[open] summary::after{transform:rotate(90deg)}
+.sline .sn{margin:4px 0 2px 62px;font-size:12px;color:var(--ink2)}.sline .sq{margin:2px 0 4px 62px;font-size:12px}.sline .sq b{margin-right:4px;color:#8A4E2A}.sline .sq .e{color:var(--ink2);font-style:italic}
+.sline .next{font-size:12.5px;color:var(--ink2);margin-top:3px}
