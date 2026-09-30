@@ -944,7 +944,8 @@ function goalLadder(){const out=[];const money=S.money;const add=(n,cost,where)=
  if(S.tables<tableCap())add('餐桌',TABLE_COST[S.tables],'家具與佈置');
  if(projOn('side')&&(S.sideTables||0)<SIDE_MAX)add('側廳桌',SIDE_TABLE_COST[S.sideTables||0],'家具與佈置');
  for(const E of EQUIP){const lv=S.eq[E.k]||0;if(lv<5)add(E.n+(lv?' LV'+(lv+1):''),E.cost[lv],'廚房設備')}
- for(const o of OPS){const t=opsLv(o.k);if(o.tiers[t]!=null&&S.level>=o.lv)add(o.n,o.tiers[t],'店舖工程')}
+ for(const o of OPS){const t=opsLv(o.k);if(o.tiers[t]!=null&&S.level>=o.lv&&(!o.need||o.need()))add(o.n,o.tiers[t],'店舖工程')}/* v2.3: only what can really be bought now (the Bar 小廚 waits for Lounge III) */
+ {const Q=typeof loungeNext==='function'&&(fact('lounge_project')||loungeLv())?loungeNext():null;if(Q&&S.level>=Q.need)add(Q.n,Q.cost,'店舖工程')}
  for(const Dc of DECOR){const t=S.decor[Dc.k]||0;if(Dc.tiers[t]!=null&&S.level>=(Dc.tierLv?Dc.tierLv[t]:Dc.lv))add(Dc.n,Dc.tiers[t],'家具與佈置')}
  out.sort((a,b)=>a.cost-b.cost);const near=out.find(g=>g.left===0)||out[0];const mid=out.find(g=>g.left>0&&g.left<=Math.max(3000,money*.6))||out.find(g=>g.left>0);const far=out.slice().reverse().find(g=>g.left>0&&g!==mid)||null;
  const G=[near,mid,far].filter((g,i,a)=>g&&a.indexOf(g)===i);for(const g of out.slice().reverse()){if(G.length>=3)break;if(!G.includes(g))G.push(g)}return G}
