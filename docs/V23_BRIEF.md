@@ -4961,3 +4961,11 @@ Do not attempt every storyline in one commit.
 
 完成這份 architecture report 後再開始 Phase A。
 不要重新設計已穩定的 v2.2.1 系統，不要為了 v2.3 建立不必要的大型 framework，也不要把 presentation 問題升級成 infrastructure project。
+【2026-09-30 VISUAL CORRECTION — LOUNGE】（原文與四張參考圖：docs/v23/refs/）The Lounge is materially DARKER and more intimate
+than the Main Hall: floor = dark warm-grey / charcoal / deep greige stone or microcement with subtle texture (wood only as an
+accent — the bar counter, cabinetry, table tops); lighting = localized warm pools (bar/backbar glow, small table lamps,
+restrained brass, indirect wall light, wine-fridge illumination), never the whole room evenly lit; palette = charcoal, deep warm
+greige, dark stone, muted warm brown, restrained brass, cream only as small highlights, dark green plants. NOT sports bar /
+nightclub / neon / black-and-gold / rustic pub / izakaya / another beige dining room. Mood: quiet contemporary wine lounge,
+restrained Taipei/Tokyo hospitality, warm but dim, adult but not pretentious — somewhere guests naturally stay after dinner.
+Simulation architecture unchanged; applied during v2.3 (L3 supersedes where it said "residential warmth / natural warm wood").
