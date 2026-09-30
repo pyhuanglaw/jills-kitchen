@@ -327,3 +327,41 @@ def lounge_i_content_bar_food_in_the_kitchen_wine_at_dinner_the_cast_by_name(b, 
     check('Lounge' in g.ev("document.body.innerText"), 'the summary shows it')
     check(g.ev("GUIDE.some(c=>/Lounge/.test(c.h))"), 'the manual has the Lounge card')
     check(not g.errors, g.errors[:3]); g.close()
+
+@test
+def staff_learn_places_coarsely_and_veterans_stay_useful(b, port, target):
+    """v2.3 Phase 6: a day's end counts a day of familiarity for every area a person worked (chefs the kitchen, waiters the
+    halls and — with the job — the Lounge, bartenders the Lounge); the labels are coarse (新/熟悉/熟練); an experienced
+    server's first Lounge shifts are a little slower and she asks where table three is once (a veteran answers); the
+    card shows tenure and familiarity; 阿拓 comes as the next chef from Lounge II and is quicker on bar food; the pantry
+    needs Lounge III and adds a burner; old crew carry no invented history (tenure counts from v2.3)."""
+    g = Game(b, port, target, seed=61, manual=True, viewport={'width': 390, 'height': 844})
+    load_fixture(g, 'player_day46.json'); g.click('[data-act=openFresh]'); g.page.wait_for_timeout(120)
+    g.ev("S.money+=900000;factSet('lounge_project');buyLounge(1);hideReveal();S.crew.push({id:'cb1',role:'bartender',name:'Evan',lv:2,duty:'lbar'});const w=S.crew.find(m=>m.role==='waiter');waiterDuties(w).lounge=true;window.__w=w.id;showPrep();autoStock()")
+    check(g.ev("S.crew.every(m=>!m.since)"), 'no invented tenure before a day is played')
+    check(g.ev("loungeShiftMul(S.crew.find(m=>m.id===__w))") == 1.25, 'a first Lounge shift is slower')
+    start_day(g); install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;")
+    play_day(g, max_steps=60000)
+    for _ in range(400):
+        if g.ev("phase") != 'service': break
+        g.ev("for(let i=0;i<30;i++)__tick(1000/30)")
+    check(g.ev("phase") != 'service', 'the day ends: with a bartender and a server who only carries plates in the Lounge, nobody is left waiting for an order or a glass (the bartender covers what she does not)')
+    w = json.loads(g.ev("JSON.stringify(S.crew.find(m=>m.id===__w))")); ev = json.loads(g.ev("JSON.stringify(S.crew.find(m=>m.id==='cb1'))")); ch = json.loads(g.ev("JSON.stringify(S.crew.find(m=>m.role==='chef'))"))
+    check(w['fam'].get('main') == 1 and w['fam'].get('side') == 1 and w['fam'].get('lounge') == 1 and w['sinceLegacy'] == 1, f'the server learned a day of every area she works: {w.get("fam")}')
+    check(ev['fam'].get('lounge') == 1 and ch['fam'].get('kitchen') == 1 and not ch['fam'].get('lounge'), 'the bartender the Lounge, the chef the kitchen')
+    check(g.ev("(S.dayLog||[]).some(l=>/哪桌|三號/.test(l.t))"), 'she asked where table three is')
+    g.ev("showShop();shopTab='staff';showShop()"); g.page.wait_for_timeout(80); txt = g.ev("document.body.innerText")
+    check('在店' in txt and '正在熟悉：Lounge' in txt and '從 v2.3 起算' in txt, 'the card says tenure and what she is learning')
+    g.ev("S.crew.find(m=>m.id===__w).fam.lounge=12"); check(g.ev("famLabel(12)") == '熟練' and g.ev("loungeShiftMul(S.crew.find(m=>m.id===__w))") < 1, 'a veteran of the Lounge is a little quicker there')
+    # 阿拓 from Lounge II; the pantry only at III
+    g.ev("buyLounge(2);hideReveal();S.crew=S.crew.filter(m=>m.role!=='chef'||S.crew.filter(q=>q.role==='chef').indexOf(m)<2)")
+    g.ev("(()=>{const b=document.createElement('button');b.dataset.k='chef';doAct('hire',null,'chef',b)})()")
+    check(g.ev("S.crew.some(m=>m.name==='阿拓'&&m.role==='chef')"), '阿拓 is the next chef once there is a Lounge II')
+    check(g.ev("barCookMul(S.crew.find(m=>m.name==='阿拓'),'bites')") < 1 and g.ev("barCookMul(S.crew.find(m=>m.name==='阿拓'),'steak')") == 1, 'quicker on bar food only')
+    check(g.ev("OPS.find(o=>o.k==='pantry').need()") is False, 'the pantry waits for Lounge III')
+    g.ev("buyLounge(3);hideReveal()"); n0 = g.ev("stoveSlots(S.eq.stove)")
+    check(g.ev("OPS.find(o=>o.k==='pantry').need()") is True, 'at III it is offered')
+    g.ev("(()=>{const b=document.createElement('button');b.dataset.k='pantry';doAct('buyOps',null,'pantry',b)})()")
+    check(g.ev("opsLv('pantry')") == 1 and g.ev("stoveSlots(S.eq.stove)") == n0 + 1, 'the pantry adds a burner')
+    check(g.ev("loungeSeatDefs().some(d=>d.kind==='quiet')&&loungeSeatDefs().some(d=>d.kind==='sofa')&&loungeSeatDefs().filter(d=>d.kind==='bar').length===8"), 'Lounge III: eight stools, a sofa, the quiet corner')
+    check(not g.errors, g.errors[:3]); g.close()
