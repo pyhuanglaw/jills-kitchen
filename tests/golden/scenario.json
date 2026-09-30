@@ -241,20 +241,20 @@
   "cats": [
    [
     "tora",
-    "side",
-    "sit",
-    222,
-    529,
+    "walk",
+    "yawn",
+    93,
+    468,
     -1,
     false
    ],
    [
     "ban",
-    "side",
-    "sit",
-    178,
-    529,
-    -1,
+    "rest",
+    "groom",
+    88,
+    521,
+    3,
     false
    ],
    [
@@ -268,26 +268,26 @@
    ],
    [
     "mikan",
-    "bed",
-    "curl",
-    257,
-    125,
+    "sleep",
+    "loaf",
+    140,
+    90,
     -1,
     false
    ],
    [
     "mei",
-    "sleep",
-    "loaf",
-    114,
-    90,
-    -1,
+    "rest",
+    "sit",
+    338,
+    423,
+    6,
     false
    ]
   ],
-  "catHash": "81a373e1",
+  "catHash": "e06e3401",
   "mem": [],
-  "weights": "7026:f0fc78a0",
+  "weights": "6971:e75c074c",
   "dylan": {
    "stage": 0,
    "stay": 0,

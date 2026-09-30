@@ -365,3 +365,285 @@ def staff_learn_places_coarsely_and_veterans_stay_useful(b, port, target):
     check(g.ev("opsLv('pantry')") == 1 and g.ev("stoveSlots(S.eq.stove)") == n0 + 1, 'the pantry adds a burner')
     check(g.ev("loungeSeatDefs().some(d=>d.kind==='quiet')&&loungeSeatDefs().some(d=>d.kind==='sofa')&&loungeSeatDefs().filter(d=>d.kind==='bar').length===8"), 'Lounge III: eight stools, a sofa, the quiet corner')
     check(not g.errors, g.errors[:3]); g.close()
+
+P7_HELPERS = r"""
+window.__p7={
+ // a regular or a named guest, spawned and seated at a given table (or the first free dining table)
+ seat:(who,ti)=>{for(const q of R.groups.slice())if((q.reg&&q.reg===who)||(!q.reg&&q.name===who)){leaveGroup(q,'ok');q.gone=true}R.groups=R.groups.filter(q=>!q.gone);if(NAMED[who]){namedHist(who).last=0;namedHist(who).seen=0}/* the test stands in for days: a person visits once a day */
+  const o=REG_BY[who]?regPlanVisit({t:R.t,type:REG_BY[who].type,reg:who,size:1}):{t:R.t,type:NAMED[who]?'gourmet':'office',size:1,name:who};if(o.moment)o.moment=null;spawn(o);const q=R.groups.find(x=>!x.gone&&((x.reg&&x.reg===who)||(!x.reg&&x.name===who)));if(!q)return null;
+  if(q.table==null){const t=ti!=null?R.tables[ti]:(freeTableFor(q)||R.tables.find(t=>!t.lounge&&!t.group));if(t.group)leaveGroup(t.group,'ok');t.dirty=false;seatGroup(q,t)}q.state='wait';q.x=R.tables[q.table].x;q.y=R.tables[q.table].y;q.moving=false;return q},
+ // straight into the Lounge (a stool or a table the seat chooser picks)
+ lounge:(who,why)=>{for(const q of R.groups.slice())if((q.reg&&q.reg===who)||(!q.reg&&q.name===who)){leaveGroup(q,'ok');q.gone=true}R.groups=R.groups.filter(q=>!q.gone);if(NAMED[who]){namedHist(who).last=0;namedHist(who).seen=0}
+  const o=REG_BY[who]?regPlanVisit({t:R.t,type:REG_BY[who].type,reg:who,size:1}):{t:R.t,type:'gourmet',size:1,name:who};if(o.moment)o.moment=null;o.lounge=1;spawn(o);const q=R.groups.find(x=>!x.gone&&((x.reg&&x.reg===who)||(!x.reg&&x.name===who)));if(!q)return null;
+  if(q.table==null){const ls=loungeSeatFor(q);if(!ls)return null;loungeSeat(q,ls,why||'direct')}q.state='wait';q.x=R.tables[q.table].x;q.y=R.tables[q.table].y;q.moving=false;return q},
+ // a served ticket, so a checkout has items
+ fed:(q,dishes)=>{const t=R.tables[q.table];const tk={id:R.tkid++,no:t.i+1,g:q,lounge:t.lounge?1:0,items:dishes.map(d=>({d,st:'served',q:'G',want:0,picked:true,set:null,lbar:DISH(d).wine?1:undefined})),t0:R.t};for(const it of tk.items)t.plates.push({d:it.d,q:'G',want:0});q.ticket=tk;R.tickets.push(tk);q.state='check';q.ate=1;return tk},
+ clearDay:()=>{const d=storyDay();d.major=0;d.minor=0;d.seen={}},
+ ev:k=>JSON.parse(JSON.stringify(evState(k))),
+ rel:(a,b)=>JSON.parse(JSON.stringify(rel(a,b))),
+ back:(k,n)=>{const f=fact(k);if(f){f.d-=n;f.l-=n}},
+};
+window.__noScenes=true;window.__fastSay=1;
+"""
+
+@test
+def phase7_the_arcs_run_on_real_history_and_leave_it_changed(b, port, target):
+    """v2.3 Phase 7: on the Day 46 save with Lounge I and the Lounge cast, each authored arc is driven through its real
+    conditions (facts are forced only where the test stands in for days of play; nothing is faked at the moment of the
+    beat): Sophie × Mia A→H with the seat choice, the held stool, the shared plate, the wait, leaving together and
+    arriving together (a Story Photo, once); romance is only ever read for the whitelisted pair; Ken × 杜's usual stools,
+    Evan's 「還沒看到」, the arguments, the REQUIRED friendship photo; 晴 × 阿拓 through friction, synchrony, 「多的」, the
+    photo, and the absence beat after 阿拓 is fired (no deadlock); 周董's fixed 「隨便」 and the side hall; Madame Lin sees
+    only what changed since she looked; 老饕 and the two Signatures; 小林's drink before he asks; the inspector off duty;
+    王太太 and Dylan after the reveal; a guest who knows a cat; save/reload keeps it all and re-fires nothing."""
+    g = Game(b, port, target, seed=77, manual=True, viewport={'width': 390, 'height': 844})
+    load_fixture(g, 'player_day46.json'); g.click('[data-act=openFresh]'); g.page.wait_for_timeout(120)
+    g.ev("S.money+=900000;factSet('lounge_project');buyLounge(1);hideReveal();S.crew.push({id:'cb1',role:'bartender',name:'Evan',lv:2,duty:'lbar',days:9,since:S.day-9},{id:'cb2',role:'bartender',name:'沈晴',lv:2,duty:'lbar',days:3,since:S.day-3},{id:'ct1',role:'chef',name:'阿拓',lv:2,duty:'stove',days:3,since:S.day-3});const w=S.crew.find(m=>m.role==='waiter');waiterDuties(w).lounge=true;showPrep();autoStock()")
+    start_day(g); g.ev(P7_HELPERS)
+    money0 = g.ev("S.money")
+    # ---- Sophie × Mia
+    g.ev("for(let i=0;i<3;i++){relSet('sophie','mia','copresent');story().rel[pairKey('sophie','mia')].f.copresent.l=S.day-1-i}")
+    check(g.ev("famOf('sophie','mia')") == 1 and not g.ev("romanticEligible('sophie','mia')"), 'three evenings in the same room: they recognise each other, nothing more')
+    g.ev("__p7.seat('mia');__p7.seat('sophie')")
+    dbg = g.ev("JSON.stringify([evState('sm_a'),rel('sophie','mia')])")
+    check(g.ev("__p7.ev('sm_a').n") == 1 and g.ev("relN('sophie','mia','spoke')") == 1, 'A: 「妳也常來？」 when both are seated and familiar ' + dbg)
+    g.ev("__p7.back('sm_a',1);__p7.clearDay();(()=>{const m=R.groups.find(q=>q.reg==='mia');const mt=R.tables[m.table];const t=R.tables.find(t=>!t.lounge&&!t.group&&t.i!==mt.i&&(t.room||'main')===(mt.room||'main'));__p7.seat('sophie',t.i)})()")
+    check(g.ev("__p7.ev('sm_b').n") == 1 and g.ev("relN('sophie','mia','sharedSpace')") == 1, 'B: a shared evening, a day later')
+    # C: Sophie's table choice — other tables are free, hers is the one next to Mia's
+    g.ev("__p7.back('sm_b',1);__p7.clearDay();for(const q of R.groups.slice())if(q.reg==='sophie'){leaveGroup(q,'ok');q.gone=true}R.groups=R.groups.filter(q=>!q.gone);for(const t of R.tables)if(t.group&&t.group.reg!=='mia'){leaveGroup(t.group,'ok')}for(const t of R.tables)if(!t.group)t.dirty=false")
+    g.ev("const o=regPlanVisit({t:R.t,type:'gourmet',reg:'sophie',size:1});o.moment=null;spawn(o)")
+    g.ev("for(let i=0;i<40;i++)__tick(50)")
+    near = g.ev("(()=>{const s=R.groups.find(q=>q.reg==='sophie'),m=R.groups.find(q=>q.reg==='mia');if(!s||s.table==null)return null;const ts=R.tables.filter(t=>!t.lounge&&t.seats>=1&&t.i!==m.table&&(t.room||'main')===(R.tables[m.table].room||'main'));const mt=R.tables[m.table];const d=t=>Math.hypot(t.x-mt.x,t.y-mt.y);return{mine:d(R.tables[s.table]),min:Math.min(...ts.map(d)),pick:!!s.nearPick}})()")
+    check(near and abs(near['mine'] - near['min']) < 1 and near['pick'], f'C: with the room empty she took the table nearest Mia: {near}')
+    check(g.ev("__p7.ev('sm_c').n") == 1 and g.ev("relN('sophie','mia','choseNear')") == 1, 'C: 「妳今天不是坐那邊？」「這邊也可以。」')
+    # D: her bag on the next stool, moved when Mia comes in
+    g.ev("__p7.back('sm_c',1);__p7.clearDay();for(const q of R.groups.slice()){leaveGroup(q,'ok');q.gone=true}R.groups=[];for(const t of R.tables){t.dirty=false;t.hold=null}")
+    g.ev("__p7.lounge('sophie')")
+    held = g.ev("JSON.stringify(loungeTables().filter(t=>t.hold).map(t=>[t.i,t.hold,t.holdBy]))")
+    check(json.loads(held) and json.loads(held)[0][1] == 'mia' and json.loads(held)[0][2] == 'sophie', f'D: the stool beside her is held, for Mia: {held}')
+    check(g.ev("(()=>{const o={t:R.t,type:'office',size:1,name:'Kevin'};spawn(o);const q=R.groups.find(x=>x.name==='Kevin');const ls=loungeSeatFor(q);const ok=!ls||!ls.hold;leaveGroup(q,'ok');q.gone=true;R.groups=R.groups.filter(x=>!x.gone);return ok})()"), 'nobody else gets the held stool')
+    g.ev("__p7.lounge('mia')")
+    check(g.ev("__p7.ev('sm_d').n") == 1 and g.ev("relN('sophie','mia','madeSpace')") == 1 and not g.ev("loungeTables().some(t=>t.hold)"), 'D: Mia took the held stool; the bag came off it; madeSpace')
+    check(g.ev("Math.abs(R.tables[R.groups.find(q=>q.reg==='mia').table].x-R.tables[R.groups.find(q=>q.reg==='sophie').table].x)<34"), 'they are side by side')
+    # E: a plate shared — at a checkout with real items, both nearby
+    g.ev("__p7.back('sm_d',1);__p7.clearDay();const m=R.groups.find(q=>q.reg==='mia'),s=R.groups.find(q=>q.reg==='sophie');__p7.fed(m,['bites','w_white']);__p7.fed(s,['w_lred']);collect(s,{tab:true});s.state='wait'")
+    check(g.ev("__p7.ev('sm_e').n") == 1 and g.ev("relN('sophie','mia','sharedFood')") == 1, 'E: 「要不要吃這個？」「不要。」— and later a bite')
+    check(not g.ev("romanticEligible('sophie','mia')"), 'still not romantic-eligible: nobody has waited for anyone')
+    # F: she has finished; Mia is on the schedule; she stays — and only because Mia really comes
+    g.ev("__p7.back('sm_e',1);__p7.clearDay();for(const q of R.groups.slice()){leaveGroup(q,'ok');q.gone=true}R.groups=[];for(const t of R.tables){t.dirty=false;t.hold=null};const s=__p7.seat('sophie');s.state='eat';s.timer=.01;s.eatDur=30;R.sched.splice(R.si,0,{t:R.t+30,type:'office',reg:'mia',size:1});__tick(50)")
+    st = g.ev("(()=>{const s=R.groups.find(q=>q.reg==='sophie');return{state:s.state,lingered:s.lingered,for:s.lingerFor,timer:Math.round(s.timer)}})()")
+    check(st['state'] == 'eat' and st['lingered'] == 1 and st['for'] == 'mia' and 40 <= st['timer'] <= 60, f'F: she stays (once) for as long as Mia is away: {st}')
+    g.ev("__p7.seat('mia')")
+    dbg = g.ev("JSON.stringify([relN('sophie','mia','waitedFor'),evState('sm_f'),(R.log||[]).slice(-4).map(l=>l.t),R.groups.map(q=>[q.reg,q.state,q.table,q.lingerFor])])")
+    check(g.ev("relN('sophie','mia','waitedFor')") == 1 and g.ev("__p7.ev('sm_f').n") == 1 and g.ev("(R.log||[]).some(l=>/等的人來了|看了一眼/.test(l.t))"), 'F: Mia sat down — waitedFor, said by nobody in particular ' + dbg)
+    check(g.ev("romanticEligible('sophie','mia')") and not g.ev("romanticEligible('mia','sophie')") == False, 'now the authored pair is eligible')
+    # G: leaving together, one payment each
+    g.ev("__p7.back('sm_f',1);__p7.clearDay();const m=R.groups.find(q=>q.reg==='mia'),s=R.groups.find(q=>q.reg==='sophie');__p7.fed(m,['pasta']);__p7.fed(s,['duck']);window.__m0=S.money;window.__v0=[S.regulars.sophie,S.regulars.mia];collect(s,{})")
+    g2 = g.ev("(()=>{const m=R.groups.find(q=>q.reg==='mia'),s=R.groups.find(q=>q.reg==='sophie');return{ms:m.state,ss:s.state,mc:m.counted,sc:s.counted,left:relN('sophie','mia','leftTogether'),paid:S.money-__m0,v:[S.regulars.sophie-__v0[0],S.regulars.mia-__v0[1]],memo:MEMQ.some(x=>x.id==='together')}})()")
+    check(g2['ms'] == 'leave' and g2['ss'] == 'leave' and g2['left'] == 1 and g2['v'] == [1, 1] and g2['mc'] == 1 and g2['sc'] == 1 and g2['memo'], f'G: both left, each counted once, 《今天一起走》 queued: {g2}')
+    check(g.ev("__p7.ev('sm_g').n") == 1, 'G recorded')
+    # H: the schedule puts them at the door together; Jill notices; the Story Photo unlocks once
+    g.ev("__p7.back('left_'+pairKey('sophie','mia'),3);__p7.clearDay();for(const q of R.groups.slice()){q.gone=true}R.groups=[];for(const t of R.tables){t.group=null;t.dirty=false}")
+    tog = g.ev("(()=>{const out=[{reg:'sophie',t:10},{reg:'mia',t:60}];const r=Math.random;Math.random=()=>.1;storyScheduleTogether(out);Math.random=r;return out.map(o=>[o.t,o.together])})()")
+    check(tog[0][1] == 'sm' and tog[1][1] == 'sm' and abs(tog[0][0] - tog[1][0]) < 3, f'H: one time on the schedule, two entries: {tog}')
+    g.ev("const o1=regPlanVisit({t:R.t,type:'gourmet',reg:'sophie',size:1});o1.moment=null;o1.together='sm';const o2=regPlanVisit({t:R.t,type:'office',reg:'mia',size:1});o2.moment=null;o2.together='sm';spawn(o1);spawn(o2);for(const q of R.groups){if(q.table==null){const t=freeTableFor(q);seatGroup(q,t)}}")
+    dbg = g.ev("JSON.stringify([evState('sm_h'),R.groups.map(q=>[q.reg,q.state,q.table,q.together]),storyDay(),story().trace.slice(-3)])")
+    check(g.ev("__p7.ev('sm_h').n") == 1 and g.ev("relN('sophie','mia','arrivedTogether')") == 1, 'H: 「今天一起？」 ' + dbg)
+    check(g.ev("!!story().photos.sophie_mia_arrive&&albumList().some(p=>p.kind==='story:sophie_mia_arrive'&&p.story)"), 'the Story Photo 《今天一起來》 is in the album, from the supplied art')
+    check(g.ev("storyPhoto('sophie_mia_arrive',{})") is False and g.ev("albumList().filter(p=>p.kind==='story:sophie_mia_arrive').length") == 1, 'it unlocks once')
+    # ---- Ken × 杜: usual stools, Evan, arguments, the required friendship photo — never romance
+    g.ev("__p7.clearDay();for(const q of R.groups.slice()){q.gone=true}R.groups=[];for(const t of R.tables){t.group=null;t.dirty=false;t.hold=null}")
+    g.ev("__p7.lounge('品酒師 Ken')")
+    check(g.ev("__p7.ev('kd_evan_1').n") == 0, 'Evan has nothing to say before they have shared an evening')
+    g.ev("relSet('n:品酒師 Ken','n:Monsieur 杜','sharedTable');story().rel[pairKey('n:品酒師 Ken','n:Monsieur 杜')].f.sharedTable.l=S.day-2;__p7.clearDay();__p7.lounge('品酒師 Ken')")
+    check(g.ev("__p7.ev('kd_evan_1').n") == 1 and g.ev("(R.log||[]).some(l=>/還沒看到/.test(l.t))"), 'Ken asks 「杜來了嗎？」, Evan: 「還沒看到。」')
+    g.ev("relSet('n:品酒師 Ken','n:Monsieur 杜','sharedTable');__p7.clearDay();__p7.lounge('Monsieur 杜')")
+    check(g.ev("Math.abs(R.tables[R.groups.find(q=>q.name==='Monsieur 杜').table].x-R.tables[R.groups.find(q=>q.name==='品酒師 Ken').table].x)<34"), '杜 takes the stool next to Ken')
+    check(g.ev("__p7.ev('kd_usual').n") == 1 and g.ev("!!fact('kd_usual').seat"), 'their usual stools are now a fact')
+    g.ev("for(let i=0;i<3;i++){relSet('n:品酒師 Ken','n:Monsieur 杜','argued');story().rel[pairKey('n:品酒師 Ken','n:Monsieur 杜')].f.argued.l=S.day-1-i}relSet('n:品酒師 Ken','n:Monsieur 杜','noticedAbsence');__p7.clearDay();storyTick('lounge',{g:R.groups.find(q=>q.name==='品酒師 Ken'),t:null,why:'direct'})")
+    check(g.ev("!!story().photos.ken_du&&albumList().some(p=>p.kind==='story:ken_du')"), 'REQUIRED: the friendship Story Photo 《還是沒有同意》')
+    check(not g.ev("romanticEligible('n:品酒師 Ken','n:Monsieur 杜')") and g.ev("famOf('n:品酒師 Ken','n:Monsieur 杜')") == 3, 'comfortable, never romantic: not on the whitelist')
+    check(not any(w in g.ev("albumList().find(p=>p.kind==='story:ken_du').cap+albumList().find(p=>p.kind==='story:ken_du').txt") for w in ['約會', '愛', '戀']), 'the caption is about the argument')
+    g.ev("for(const q of R.groups.slice()){q.gone=true}R.groups=[];for(const t of R.tables){t.group=null;t.dirty=false}__p7.lounge('品酒師 Ken')")
+    check(g.ev("R.tables[R.groups.find(q=>q.name==='品酒師 Ken').table].i===fact('kd_usual').seat[0]"), 'alone, Ken takes his own stool')
+    # ---- 晴 × 阿拓
+    g.ev("__p7.clearDay();const q=__p7.lounge('陳先生');q.state='reading';createTicket(q)")
+    g.ev("(()=>{const q=R.groups.find(x=>x.name==='陳先生');if(!q.ticket||!q.ticket.items.some(i=>!i.lbar)){q.ticket=null;q.state='reading';const tk={id:R.tkid++,no:1,g:q,lounge:1,items:[{d:'bites',st:'pending',q:null,want:0,picked:false,set:null}],t0:R.t};q.ticket=tk;R.tickets.push(tk);q.state='wait';storyTick('order',{g:q,tk})}})()")
+    check(g.ev("__p7.ev('qt_1').n") == 1 and g.ev("(R.log||[]).some(l=>/都正常/.test(l.t))"), '晴 × 阿拓 begin with the fryer argument')
+    g.ev("for(let i=0;i<6;i++){factSet('qt_days');fact('qt_days').l=S.day-6+i}__p7.clearDay();storyTick('order',{g:R.groups.find(x=>x.name==='陳先生'),tk:R.tickets[R.tickets.length-1]})")
+    check(g.ev("__p7.ev('qt_2').n") == 1, 'after six shifts together she knows when it is ready')
+    g.ev("__p7.back('qt_2',3);__p7.clearDay();storyTick('close',{})")
+    check(g.ev("__p7.ev('qt_3').n") == 1 and g.ev("relN('s:cb2','s:ct1','gesture')") == 1, '「多的。」 after closing')
+    g.ev("factSet('qt_extra');factSet('qt_extra');factSet('qt_extra');fact('qt_extra').l=S.day-1;__p7.clearDay();storyTick('close',{})")
+    check(g.ev("!!story().photos.qing_tuo"), 'their Story Photo 《多的》 only after it has happened more than once')
+    g.ev("S.crew=S.crew.filter(m=>m.id!=='ct1');__p7.clearDay();storyTick('order',{g:R.groups.find(x=>x.name==='陳先生'),tk:R.tickets[R.tickets.length-1]})")
+    check(g.ev("__p7.ev('qt_absence').n") == 1 and g.ev("(R.log||[]).some(l=>/妳不是在問炸物/.test(l.t))"), '阿拓 fired: the absence beat, and nothing waits for him')
+    check(g.ev("STORY_EV.filter(E=>E.k.startsWith('qt_')).every(E=>{try{return !E.when({tk:{lounge:1,items:[{d:'bites'}]}})||E.k==='qt_absence'}catch(e){return false}})"), 'with him gone every other 晴 × 阿拓 event is simply ineligible (no deadlock, no error)')
+    # ---- 周董: 「隨便」 is steak and the dessert; his table; the side hall; the sold-out dessert
+    zm = g.ev("(()=>{const ms=menuList().filter(d=>stationOk(d));const main=ms.find(d=>DISH(d).cat==='main'&&d!=='signature'),des=ms.find(d=>DISH(d).cat==='dessert'&&d!=='sigdessert'),drink=ms.find(d=>DISH(d).cat==='drink');window.__zm={main,des,drink};__p7.clearDay();const h=namedHist('周董');h.v=4;h.dishes={};h.dishes[main]=3;h.dishes[des]=3;h.dishes[drink]=2;h.seats={0:3};S.stock[main]=5;S.stock[des]=5;S.stock[drink]=5;return __zm})()")
+    order = g.ev("JSON.stringify(orderItems({type:'vip',size:1,name:'周董',reg:null,regs:[]}))")
+    check(set(json.loads(order)) == {zm['main'], zm['des'], zm['drink']}, f'「隨便」 is always the same: {order} vs {zm}')
+    g.ev("for(const q of R.groups.slice()){q.gone=true}R.groups=[];for(const t of R.tables){t.group=null;t.dirty=false}__p7.seat('陳先生',0)")
+    z = g.ev("(()=>{const q=__p7.seat('周董');return{room:R.tables[q.table].room||'main',ev:evState('zhou_seat').n}})()")
+    check(z['room'] == 'side' and z['ev'] == 1, f'his table taken: the side hall, and the line: {z}')
+    g.ev("S.stock[__zm.des]=0;__p7.clearDay();const q=R.groups.find(x=>x.name==='周董');q.state='reading';createTicket(q)")
+    check(g.ev("__p7.ev('zhou_dessert').n") == 1 and g.ev("!!fact('zhou_tomorrow')"), '「布丁還有嗎？」…「那明天再來。」')
+    # ---- Madame Lin sees what changed since she last looked — not before
+    g.ev("__p7.clearDay();__p7.seat('Madame Lin')")
+    check(g.ev("__p7.ev('lin_sees').n") == 0 and g.ev("!!namedHist('Madame Lin').saw"), 'her first look records the room and says nothing')
+    g.ev("S.ops=S.ops||{};S.ops.ac=(S.ops.ac||0)+1;__p7.clearDay();__p7.seat('Madame Lin')")
+    dbg = g.ev("JSON.stringify([evState('lin_sees'),namedHist('Madame Lin').saw,linSnap(),storyDay(),story().trace.slice(-3),(R.log||[]).slice(-3).map(l=>l.w+l.t)])")
+    check(g.ev("__p7.ev('lin_sees').n") == 1 and g.ev("(R.log||[]).some(l=>/冷氣換過了/.test(l.t))"), '「冷氣換過了？」 ' + dbg)
+    g.ev("__p7.clearDay();__p7.seat('Madame Lin')")
+    check(g.ev("__p7.ev('lin_sees').n") == 1, 'not twice for the same change')
+    g.ev("S.decor.chairs=(S.decor.chairs||0)+1;__p7.clearDay();__p7.seat('Madame Lin');S.decor.plants=(S.decor.plants||0)+1;__p7.clearDay();__p7.seat('Madame Lin')")
+    check(g.ev("factN('lin_saw')") == 3, 'three changes seen')
+    g.ev("__p7.clearDay();const q=R.groups.find(x=>x.name==='Madame Lin');__p7.fed(q,['steak']);collect(q,{})")
+    check(g.ev("propOn('linplant')") and g.ev("__p7.ev('lin_gift').n") == 1, 'the plant is in the corner for good')
+    # ---- 老饕: the second Signature
+    g.ev("__p7.clearDay();window.__sd=S.sigDessert;S.sigDessert=null;const q=__p7.seat('老饕李先生');__p7.fed(q,['signature']);collect(q,{})")
+    check(g.ev("__p7.ev('li_1').n") == 1, '「所以妳就打算靠這一道走天下？」 while there is one Signature')
+    g.ev("S.sigDessert=__sd||{base:'pannacotta',cream:'mascarpone',fruit:'berries',finish:'caramel',name:'試作'};__p7.clearDay();const q=__p7.seat('老饕李先生');__p7.fed(q,['sigdessert']);collect(q,{})")
+    check(g.ev("__p7.ev('li_2').n") == 1 and g.ev("(namedHist('老饕李先生').facts||[]).some(f=>/兩道走天下/.test(f.txt))"), '「兩道走天下。」 on his card')
+    # ---- 小林: the drink before he asks
+    g.ev("__p7.clearDay();regMem('koba').orders={coffee:4,burger:3};S.regulars.koba=Math.max(S.regulars.koba||0,5);const q=__p7.seat('koba');q.state='reading';const tk={id:R.tkid++,no:1,g:q,items:[{d:'burger',st:'pending',q:null,want:0,picked:false,set:null},{d:'coffee',st:'pending',q:null,want:0,picked:false,set:null}],t0:R.t};q.ticket=tk;R.tickets.push(tk);q.state='wait';storyTick('order',{g:q,tk})")
+    check(g.ev("__p7.ev('koba_drink').n") == 1 and g.ev("(()=>{const q=R.groups.find(x=>x.reg==='koba');return q.ticket.items.some(i=>i.d==='coffee'&&i.st==='served')})()"), '小林: the coffee is on the table when the order is written')
+    # ---- the inspector, off duty — only after inspections
+    g.ev("__p7.clearDay();factSet('inspection');fact('inspection').l=S.day-3;factSet('inspection')")
+    sch = g.ev("(()=>{const out=[];const r=Math.random;Math.random=()=>.01;storySchedule(out,300);Math.random=r;return out.filter(o=>o.name==='衛生檢查員').map(o=>o.offduty)})()")
+    check(sch == [1], f'the inspector is on the schedule, off duty: {sch}')
+    g.ev("namedHist('衛生檢查員').last=0;namedHist('衛生檢查員').seen=0;spawn({t:R.t,type:'regular',size:1,name:'衛生檢查員',offduty:1});const q=R.groups.find(x=>x.name==='衛生檢查員');const t=R.tables.find(t=>!t.lounge&&!t.group);seatGroup(q,t)")
+    check(g.ev("__p7.ev('inspector_dinner').n") == 1 and g.ev("(R.log||[]).some(l=>/只是來吃飯/.test(l.t))"), '「我今天只是來吃飯。」')
+    # ---- 王太太 × Dylan after the reveal
+    g.ev("__p7.clearDay();S.dylan.stage=3;for(const q of R.groups.slice()){q.gone=true}R.groups=[];for(const t of R.tables){t.group=null;t.dirty=false};spawn({t:R.t,type:'regular',reg:'dylan',size:1});const d=R.groups.find(x=>x.reg==='dylan');seatGroup(d,R.tables.find(t=>!t.lounge&&!t.group));d.state='wait';const o=regPlanVisit({t:R.t,type:'couple',reg:'wang',size:1});o.moment=null;spawn(o);const w=R.groups.find(x=>x.reg==='wang');seatGroup(w,R.tables.find(t=>!t.lounge&&!t.group&&t.seats>=2))")
+    check(g.ev("__p7.ev('wang_dylan_2').n") == 1 and g.ev("(R.log||[]).some(l=>/十一年了/.test(l.t))"), '「追到了沒？」「還在努力。」「十一年了。」')
+    # ---- a guest who knows a cat
+    g.ev("__p7.clearDay();for(let i=0;i<5;i++){relSet('chen','tora','cat_near');story().rel[pairKey('chen','tora')].f.cat_near.l=S.day-5+i}const r=Math.random;Math.random=()=>.1;__p7.seat('chen');Math.random=r")
+    check(g.ev("relN('chen','tora','named')") == 1, '陳伯伯 calls 小虎 by name (or asks where it is)')
+    # ---- named guests have a card now
+    g.ev("const q=__p7.seat('周董');showRegCard(q)")
+    check('周董' in g.ev("document.querySelector('#regcard').innerText") and '明天再來' in g.ev("document.querySelector('#regcard').innerText"), 'a named guest card with his real history')
+    # ---- save/reload: everything kept; nothing fires again
+    before = json.loads(g.ev("JSON.stringify({ev:story().ev,ph:story().photos,rel:Object.keys(story().rel).length,f:Object.keys(story().facts).length})"))
+    g.ev("save()"); g.reload(); g.page.wait_for_timeout(200); g.click('[data-act=openFresh]'); g.page.wait_for_timeout(120)
+    after = json.loads(g.ev("JSON.stringify({ev:story().ev,ph:story().photos,rel:Object.keys(story().rel).length,f:Object.keys(story().facts).length})"))
+    check(before == after, 'the story survives the reload unchanged')
+    check(g.ev("STORY_EV.filter(E=>E.once&&evState(E.k).n).every(E=>storyEligible(E,{})===null)"), 'every once-only beat that ran is ineligible afterwards')
+    check(g.ev("albumList().filter(p=>p.story).length") == 3, 'three Story Photos, one each')
+    check(not g.errors, g.errors[:3]); g.close()
+
+@test
+def phase8_reviews_say_what_happened_posts_amplify_it_and_a_campaign_is_counted(b, port, target):
+    """v2.3 Phase 8: a review's topics are the things its text is really about (a glass, the Lounge, a sell-out); a named
+    guest who complained about a sell-out and comes back to a good evening writes the recovery line; Momo posts about the
+    cat she really saw (or the room she really sat in), 小琪 about the dish she really ate — and that dish is wanted more for
+    three days; Jill's candidates come only from things that happened (a dish added these days, a photo, a new room) and
+    a post is offered once; a campaign costs money, brings guests marked as such, counts them from the simulation and
+    reports real numbers when it ends; the page renders."""
+    g = Game(b, port, target, seed=88, manual=True, viewport={'width': 390, 'height': 844})
+    load_fixture(g, 'player_day46.json'); g.click('[data-act=openFresh]'); g.page.wait_for_timeout(120)
+    g.ev("S.money+=900000;factSet('lounge_project');buyLounge(1);hideReveal();S.crew.push({id:'cb1',role:'bartender',name:'Evan',lv:2,duty:'lbar'});showPrep();autoStock()")
+    start_day(g); g.ev(P7_HELPERS)
+    # reviews: topics consistent with the text
+    res = json.loads(g.ev("JSON.stringify((()=>{const out=[];for(let i=0;i<24;i++){const q=__p7.lounge('Emma');__p7.fed(q,['w_white','bites']);q.lg={why:'after'};const r=addReview(q,5,null,{});out.push({t:r.txt,tp:r.topics,tags:r.tags})}return out})())"))
+    wine = [r for r in res if 'wine' in r['tp']]; lounge = [r for r in res if 'lounge' in r['tp']]
+    check(wine and lounge, f'a glass and the Lounge appear in reviews: wine {len(wine)} lounge {len(lounge)}')
+    check(all(any(r['t'].endswith(l) or l in r['t'] for l in sum([list(v) for v in g.ev("Object.values(RV_DET.wine)")], [])) for r in wine), 'a review tagged wine really says something about the glass')
+    check(all(any(l in r['t'] for l in sum([list(v) for v in g.ev("Object.values(RV_DET.lounge)")], [])) for r in lounge), 'a review tagged Lounge really says something about the Lounge')
+    # recovery: the same named guest, a bad evening then a good one
+    g.ev("const q=__p7.seat('老饕李先生');__p7.fed(q,['pasta']);q.short=true;addReview(q,3,null,{short:true})")
+    check(g.ev("!!fact('badrv_n:老饕李先生')&&fact('badrv_n:老饕李先生').k==='short'"), 'the sell-out is remembered against his name')
+    g.ev("S.day++;const q=__p7.seat('老饕李先生');__p7.fed(q,['pasta']);q.short=false;window.__r=addReview(q,5,null,{})")
+    dbg = g.ev("JSON.stringify([__r,fact('badrv_n:老饕李先生'),S.day,R.groups.map(q=>[q.name,q.named,q.size])])")
+    check(g.ev("__r.tags.includes('recovery')&&/賣完|吃到了/.test(__r.txt)&&!/等/.test(__r.txt)&&__r.topics.includes('service')") and not g.ev("!!fact('badrv_n:老饕李先生')"), 'the second visit writes the recovery line about the sell-out, not the wait, once ' + dbg)
+    g.ev("S.day--")
+    # social: Momo posts about the cat she saw; 小琪 about the dish she ate; the topic moves demand
+    g.ev("const q=__p7.seat('美食部落客 Momo');__p7.fed(q,['pasta']);q.cats=[{k:'near',id:'tora'}];addReview(q,5,null,{})")
+    post = json.loads(g.ev("JSON.stringify(social().posts.slice(-1)[0])"))
+    check(post['who'] == '美食部落客 Momo' and post['topic'] == 'cats' and post['cat'] == 'tora' and g.ev("catName(CAT_DEF.find(c=>c.id==='tora'))") in post['txt'], f'Momo posted about the cat she really saw, by the name this save gave it: {post}')
+    g.ev("const q=__p7.seat('吃貨小琪');__p7.fed(q,['pasta']);addReview(q,5,null,{})")
+    post = json.loads(g.ev("JSON.stringify(social().posts.slice(-1)[0])"))
+    check(post['who'] == '吃貨小琪' and post['topic'] == 'food' and post['dish'] == 'pasta' and g.ev("socialTopic().dish") == 'pasta' and abs(g.ev("topicDemandMul('pasta')") - 1.6) < 1e-9 and g.ev("topicDemandMul('burger')") == 1, f'小琪 posted the dish she ate; it is wanted more for three days: {post}')
+    check(g.ev("demandW('pasta',TYPES.office)") > g.ev("(()=>{const t=S.social.topic;S.social.topic=null;const v=demandW('pasta',TYPES.office);S.social.topic=t;return v})()"), 'the demand model reads the topic')
+    check(g.ev("guestWeights().gourmet") > g.ev("(()=>{const t=S.social.topic;S.social.topic=null;const v=guestWeights().gourmet;S.social.topic=t;return v})()"), 'and so does the mix of guests')
+    # Jill's candidates: only what happened
+    g.ev("S.social.cands=null;S.social.candDay=0;S.menuSince=S.menuSince||{};const d=menuList().find(x=>!(DISHES[x]&&DISHES[x].bar)&&x!=='signature'&&x!=='sigdessert');S.menuSince[d]=S.day")
+    cands = json.loads(g.ev("JSON.stringify(socialCands().map(c=>c.k))"))
+    check(any(c.startswith('dish:') for c in cands) and len(cands) <= 3 and all(g.ev("S.day-(S.menuSince[%s]||0)<=3" % json.dumps(c[5:])) for c in cands if c.startswith('dish:')), f'a dish added to the menu these days is a candidate, at most three: {cands}')
+    g.ev("window.__nd=%s" % json.dumps([c for c in cands if c.startswith('dish:')][0][5:]))
+    check(not any(c == 'side' for c in cands), 'the side hall, built long ago, is not offered as news')
+    g.ev("jillPost('dish:'+__nd)")
+    post = json.loads(g.ev("JSON.stringify(social().posts.slice(-1)[0])"))
+    check(post['who'] == 'Jill' and post['topic'] == 'food' and post['dish'] == g.ev("__nd") and g.ev("socialTopic().who") == 'Jill', f'Jill posted it; the topic is hers now: {post}')
+    check(not any(c == 'dish:' + g.ev("__nd") for c in json.loads(g.ev("JSON.stringify(socialCands().map(c=>c.k))"))), 'a thing posted is not offered again')
+    # campaign: money, marked guests, real counting, a result
+    m0 = g.ev("S.money"); check(g.ev("startCampaign('dish',__nd)") and g.ev("S.money") == m0 - 9000 and g.ev("!!campaign()"), 'a dish campaign starts, for money')
+    check(not g.ev("startCampaign('local')"), 'one at a time')
+    sch = json.loads(g.ev("JSON.stringify((()=>{const out=[];campaignGuests(out,300);return out})())"))
+    check(3 <= len(sch) <= 5 and all(o['via'] == 'camp' and o['wantDish'] == g.ev("__nd") for o in sch), f'the schedule gets guests who came for the dish: {len(sch)}')
+    g.ev("for(const q of R.groups.slice()){q.gone=true}R.groups=[];for(const t of R.tables){t.group=null;t.dirty=false};S.stock[__nd]=5;spawn({t:R.t,type:'office',size:1,via:'camp',wantDish:__nd});const q=R.groups[0];if(q.table==null)seatGroup(q,freeTableFor(q));q.state='reading';createTicket(q)")
+    st = json.loads(g.ev("JSON.stringify(campaign().stats)"))
+    check(st['via'] == 1 and st['first'] == 1 and st['dish'] == 1 and g.ev("R.groups[0].ticket.items.some(i=>i.d===__nd)"), f'a campaign guest is counted once, and the dish they ordered: {st}')
+    g.ev("S.day=campaign().until+1;campaignEnd()")
+    check(g.ev("!campaign()&&S.social.campLog.length===1&&S.social.campLog[0].stats.via===1&&(S.news||[]).some(n=>/宣傳結束|結束了/.test(n)&&/1 位客人第一次來/.test(n))"), 'when it ends the result is the real count')
+    # the page
+    g.ev("showShop();shopTab='social';showShop()"); g.page.wait_for_timeout(80); txt = g.ev("document.body.innerText")
+    check('社群' in txt and '宣傳' in txt and '之前的宣傳' in txt and 'Jill 今天要發什麼' in txt, 'the page renders with the log')
+    check(not g.errors, g.errors[:3]); g.close()
+
+@test
+def phase9_the_restaurant_remembers_milestones_slots_and_small_crossovers(b, port, target):
+    """v2.3 Phase 9: a Story Photo whose art is missing keeps its milestone in a slot and joins the album, dated, when the
+    art arrives; a regular who sat through the blackout jokes about it after the power is fixed; on Valentine's Dylan
+    comes, brings flowers, stays late and says something different each year (the post-reveal one earns the photo slot);
+    the first books milestone after v2.3 began happens after closing with whoever is really there and leaves a staged
+    photo; a new hire asks where things are and a veteran answers; the staff meal fragment and its quiet follow-up; 周董
+    stays because 包包 is asleep beside him; the regulars page lists the named guests; a cat's favourite spot is counted."""
+    g = Game(b, port, target, seed=99, manual=True, viewport={'width': 390, 'height': 844})
+    load_fixture(g, 'player_day46.json'); g.click('[data-act=openFresh]'); g.page.wait_for_timeout(120)
+    g.ev("S.money+=900000;showPrep();autoStock()")
+    start_day(g); g.ev(P7_HELPERS)
+    # a slot without art
+    check(g.ev("storyPhoto('wang_anniv',{n:1})") is False and g.ev("!!storyPhotoPending().wang_anniv&&storyPhotoPending().wang_anniv.day===S.day&&!story().photos.wang_anniv"), 'no art: the milestone waits in its slot')
+    g.ev("S.day+=2;window.STORY_ART.wang_anniv=window.STORY_ART.ken_du;storyPhotoFlush();S.day-=2")
+    check(g.ev("!!story().photos.wang_anniv&&!storyPhotoPending().wang_anniv&&albumList().some(p=>p.kind==='story:wang_anniv'&&p.day===S.day)"), 'when the art arrives the photo joins the album on the day it happened')
+    g.ev("delete window.STORY_ART.wang_anniv")
+    # the blackout, remembered
+    g.ev("__p7.seat('chen');fireIncident('power')")
+    check(g.ev("!!fact('saw_power_chen')"), '陳伯伯 sat through the blackout')
+    g.ev("S.ops=S.ops||{};S.ops.power=Math.max(1,S.ops.power||0);__p7.clearDay();__p7.seat('chen')")
+    check(g.ev("relN('chen','jill','powerJoke')") == 1 and g.ev("(R.log||[]).some(l=>/沒再停電/.test(l.t))"), '「最近沒再停電了吧？」「不要講。」— once')
+    # Valentine's
+    g.ev("S.dylan.stage=1;R.event='valentine';S.props=S.props||{};delete S.props.flowers;__p7.clearDay();spawn({t:R.t,type:'regular',reg:'dylan',size:1});const d=R.groups.find(x=>x.reg==='dylan');if(d.table==null)seatGroup(d,freeTableFor(d))")
+    check(g.ev("__p7.ev('dylan_valentine').n") == 1 and g.ev("propOn('flowers')&&S.propFrom.flowers==='dylan'") and g.ev("R.groups.find(x=>x.reg==='dylan').stayLate") == 1 and g.ev("dylanStays(R.groups.find(x=>x.reg==='dylan'))"), 'flowers on the counter, and he stays late')
+    v1 = g.ev("(R.log||[]).filter(l=>l.w==='Dylan').slice(-2).map(l=>l.t).join('|')")
+    g.ev("S.day++;S.dylan.stage=3;__p7.clearDay();for(const q of R.groups.slice()){q.gone=true}R.groups=[];for(const t of R.tables){t.group=null;t.dirty=false};spawn({t:R.t,type:'regular',reg:'dylan',size:1});const d=R.groups.find(x=>x.reg==='dylan');if(d.table==null)seatGroup(d,freeTableFor(d))")
+    v2 = g.ev("(R.log||[]).filter(l=>l.w==='Dylan').slice(-2).map(l=>l.t).join('|')")
+    check(g.ev("__p7.ev('dylan_valentine').n") == 2 and v1 != v2 and g.ev("!!storyPhotoPending().jill_dylan_valentine"), f'the next year is different, and after the reveal the photo slot is set: {v1} / {v2}')
+    check(not g.ev("!!story().photos.jill_dylan_valentine"), 'no substitute picture for missing art')
+    g.ev("S.day--;R.event='none'")
+    # the milestone
+    g.ev("story().base=S.lifetime;S.lifetime=MILESTONES.find(v=>v>story().base)+1;const v=milestoneDue();window.__v=v")
+    check(g.ev("__v") is not None, 'a milestone the save had not crossed before v2.3 is due')
+    g.ev("__p7.clearDay();storyTick('close',{})")
+    check(g.ev("!!fact('milestone_'+__v)&&!!story().photos.opened_up&&albumList().some(p=>p.kind==='story:opened_up')") and not g.ev("!!milestoneDue()"), '《好像真的開起來了》, once')
+    check(g.ev("(()=>{story().base=S.lifetime;return !milestoneDue()})()"), 'an old save that crossed a million long ago is not congratulated for it')
+    # the new hire
+    g.ev("S.crew.push({id:'cwn',role:'waiter',name:'小新',lv:1,duty:'both',days:0});const vet=S.crew.find(m=>m.role==='waiter'&&m.id!=='cwn');vet.days=12;__p7.clearDay();storyTick('order',{g:R.groups[0],tk:{items:[]}})")
+    dbg = g.ev("JSON.stringify([evState('first_shift'),S.crew.map(m=>[m.name,m.role,m.days,m.askedFirst]),story().trace.slice(-3),(R.log||[]).slice(-3).map(l=>l.w+l.t)])")
+    check(g.ev("S.crew.find(m=>m.id==='cwn').askedFirst===1&&relN('s:cwn','s:'+S.crew.find(m=>m.role==='waiter'&&m.days===12).id,'helpedBy')===1"), 'the new hire asks, the veteran answers ' + dbg)
+    # the staff meal
+    g.ev("phase='prep';for(const m of S.crew)m.days=Math.max(m.days||0,3);window.__d0=S.day;let n=0;while(n<60&&!Object.keys(story().facts).some(k=>k.startsWith('meal_box_'))){S.day++;story().mealDay=0;staffMealStory();n++}")
+    check(g.ev("Object.keys(story().facts).some(k=>k.startsWith('meal_box_'))"), 'the dessert box joke happens, some morning')
+    g.ev("const k=Object.keys(story().facts).find(k=>k.startsWith('meal_box_'));fact(k).d=S.day-6;story().mealDay=0;staffMealStory()")
+    check(g.ev("Object.keys(story().facts).some(k=>k.startsWith('meal_two_'))"), 'days later there are two boxes on the table')
+    g.ev("S.day=__d0;phase='service'")
+    # 周董 × 包包
+    g.ev("__tick(40)"); g.ev("const q=__p7.seat('周董');const t=R.tables[q.table];const c=catBy('snow');c.hidden=false;c.st='sleep';c.x=t.x+40;c.y=t.y+10;q.state='eat';q.timer=.01;q.eatDur=20;__tick(50)")
+    check(g.ev("(()=>{const q=R.groups.find(x=>x.name==='周董');return q.zhouStay===1&&q.state==='eat'&&q.timer>20})()") and g.ev("relN('n:周董','snow','stayedFor')") == 1, '「你不是有事？」「牠在睡。」— he stays')
+    # the surfaces
+    g.ev("namedHist('周董').v=5;paused=true;bookTab='regulars';showBook()"); g.page.wait_for_timeout(80)
+    check('店裡的人' in g.ev("document.body.innerText") and '周董' in g.ev("document.body.innerText"), 'the regulars page lists the named guests')
+    g.ev("S.gearN={box:{snow:7,tora:1}};bookTab='cats';showBook()"); g.page.wait_for_timeout(80)
+    check('最常待的地方' in g.ev("document.body.innerText"), 'a cat has a favourite spot, from real use')
+    check(not g.errors, g.errors[:3]); g.close()

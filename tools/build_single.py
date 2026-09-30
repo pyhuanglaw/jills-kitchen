@@ -15,6 +15,7 @@ OUT = os.path.join(ROOT, 'jills-kitchen-single-file.html')
 CSS_TAG = '<link rel="stylesheet" href="css/style.css">'
 JS_TAG = '<script src="js/game.js"></script>'
 PJS_TAG = '<script src="js/portraits.js"></script>'
+AJS_TAG = '<script src="js/story_art.js"></script>'
 
 
 def read(rel):
@@ -24,13 +25,16 @@ def read(rel):
 
 def build():
     html, css, js, pjs = read('index.html'), read('css/style.css'), read('js/game.js'), read('js/portraits.js')
+    ajs = read('js/story_art.js')
     assert html.count(CSS_TAG) == 1, 'index.html must link css/style.css exactly once'
     assert html.count(JS_TAG) == 1, 'index.html must load js/game.js exactly once'
     assert html.count(PJS_TAG) == 1, 'index.html must load js/portraits.js exactly once'
+    assert html.count(AJS_TAG) == 1, 'index.html must load js/story_art.js exactly once'
+    assert '</script' not in ajs.lower(), 'story_art.js contains </script>, cannot inline'
     assert '</style' not in css.lower(), 'style.css contains </style>, cannot inline'
     assert '</script' not in js.lower(), 'game.js contains </script>, cannot inline'
     assert '</script' not in pjs.lower(), 'portraits.js contains </script>, cannot inline'
-    return html.replace(CSS_TAG, '<style>\n' + css + '</style>').replace(PJS_TAG, '<script>\n' + pjs + '</script>').replace(JS_TAG, '<script data-single>\n' + js + '</script>')
+    return html.replace(CSS_TAG, '<style>\n' + css + '</style>').replace(PJS_TAG, '<script>\n' + pjs + '</script>').replace(AJS_TAG, '<script>\n' + ajs + '</script>').replace(JS_TAG, '<script data-single>\n' + js + '</script>')
 
 
 def main():

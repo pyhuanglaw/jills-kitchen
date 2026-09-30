@@ -1,0 +1,501 @@
+PHASE 7 — CONTENT DIRECTION RECAP
+
+Continue the current v2.3 execution. Do NOT stop for approval.
+
+Before implementing Phase 7, use the following as the intended character/story direction. These are not requests for a new narrative framework. Use the Story Facts / Relationship Facts / Story Event Arbiter already implemented in Phases 1–6.
+
+The purpose of Phase 7 is not “more dialogue.”
+
+The purpose is:
+
+The restaurant has been open long enough that people begin to know the cats, Jill, the staff, and each other.
+
+The player should gradually feel:
+
+「表面上經營 Jill 的餐廳，
+實際上是在偷看 Jill、五隻貓和一群熟客慢慢過日子。」
+
+CORE STORY RULE
+
+A good story unit is:
+
+real history
+→ recognition / callback
+→ visible behavior or event
+→ something is slightly different afterward
+
+Whenever possible:
+
+「因為這件事發生過，所以以後有一點不一樣。」
+
+Do not turn the game into an RPG:
+- no quest list
+- no relationship meters
+- no “Sophie story 3/8”
+- no exclamation marks
+- no claim rewards
+- no visible friendship XP
+
+Facts and familiarity remain invisible.
+
+Most days should still feel like normal restaurant life.
+
+Target rhythm:
+- usually 0–1 major authored beat per day
+- 0–2 minor callbacks
+- ambient familiarity can happen naturally
+- some days should have no story beat at all
+
+Normal restaurant life remains ~80%.
+Memorable authored life is ~20%.
+
+==================================================
+1. SOPHIE × MIA — MAIN SLOW ROMANCE
+==================================================
+
+This is the primary developing romance.
+
+IMPORTANT:
+The first half should be almost indistinguishable from friendship.
+
+Do NOT make repeated co-presence alone equal romance.
+
+Meaningful progression comes from ACTIVE CHOICES.
+
+Intended progression:
+
+A. They repeatedly recognize each other.
+「妳也常來？」
+
+B. They become comfortable sharing space.
+
+C. Sophie chooses a seat near Mia even when other seats exist.
+
+D. Mia arrives and Sophie quietly moves her bag off the adjacent chair.
+
+E. They share food.
+
+F. Sophie has already finished eating but stays because Mia has not arrived yet.
+
+Evan may notice this and say nothing.
+
+G. Eventually they leave together.
+
+This may create an understated Album moment:
+《今天一起走》
+
+H. Much later, they arrive together.
+
+Jill:
+「今天一起？」
+
+Mia:
+「嗯。」
+
+Sophie:
+「……怎樣？」
+
+Jill:
+「沒有啊。」
+
+Do NOT create a dramatic confession requirement.
+
+The relationship becomes clear because their behavior changes repeatedly.
+
+They always remain two independent customers:
+- separate identities
+- separate visit histories
+- separate preferences
+- separate story histories
+
+Never merge them into a generic “couple” guest.
+
+Sophie × 寶寶 continues independently.
+Mia only knows about Sophie × 寶寶 history if she legitimately witnessed or learned it.
+
+Romance must only emerge from authored romantic-eligible facts.
+The generic relationship system must NEVER generate romance.
+
+A genuine later milestone qualifies for a canonical Story Photo, but only after that history actually happened.
+
+==================================================
+2. KEN × MONSIEUR 杜 — DEEP FRIENDSHIP, NOT ROMANCE
+==================================================
+
+This relationship is intentionally a contrast to Sophie × Mia.
+
+Ken and Monsieur 杜 can become extremely familiar:
+
+- argue about wine
+- know each other's preferences
+- sit together
+- save an adjacent seat
+- notice when the other is absent
+- wait for each other
+- order together
+- arrive separately but spend the evening together
+
+Example tone:
+
+晴:
+「你今天不等杜先生？」
+
+Ken:
+「我為什麼要等他？」
+
+pause
+
+Ken:
+「他有說幾點嗎？」
+
+This must NEVER later become a romance reveal.
+
+The point is:
+
+親密 ≠ 戀愛。
+
+Ken × 杜 require a FRIENDSHIP Story Photo after genuine shared history.
+
+Possible understated concept/title:
+《還是沒有同意》
+
+They are at their familiar Lounge spot, different wine glasses, shared snack, still disagreeing about something.
+
+The image and writing must never imply romance.
+
+==================================================
+3. 晴 × 阿拓 — OPTIONAL WORKPLACE ROMANCE
+==================================================
+
+This begins as work friction and professional familiarity.
+
+Not instant flirting.
+
+Example early dynamic:
+
+晴:
+「炸雞好了沒？」
+
+阿拓:
+「沒有。」
+
+晴:
+「看起來好了。」
+
+阿拓:
+「妳跟 Hugo 講一樣的話。」
+
+晴:
+「那代表我們兩個都正常。」
+
+Over time, work synchrony becomes personal familiarity.
+
+Possible later after-close beat:
+
+阿拓 gives her a plate.
+
+晴:
+「什麼？」
+
+阿拓:
+「多的。」
+
+晴:
+「你明明就是特別做的。」
+
+阿拓:
+「多的。」
+
+Absence can eventually matter:
+
+晴 notices the food/timing feels different and asks whether 阿拓 is working today.
+
+This arc is OPTIONAL.
+
+If 阿拓 was never hired, was legitimately fired, or the required history never happened, do not teleport him back or block unrelated progression.
+
+If the relationship genuinely develops, it can eventually earn a relationship Story Photo.
+
+==================================================
+4. LOUNGE STAFF MUST NOTICE PEOPLE DIFFERENTLY
+==================================================
+
+Do not make Evan a Relationship Database API.
+
+Evan:
+quiet, observant, remembers a lot, rarely comments.
+He often notices something and chooses NOT to say it.
+
+安安:
+strong spatial/social memory.
+She gradually remembers:
+- who usually sits where
+- who usually comes with whom
+- who seems to be waiting for whom
+
+晴:
+more willing to directly tease or point something out.
+
+This distinction should make the Lounge staff feel like different people.
+
+They only know history they could reasonably know after joining.
+
+No staff omniscience.
+
+==================================================
+5. EXISTING CHARACTER ARCS
+==================================================
+
+Prefer existing characters over adding more NPCs.
+
+老饕李先生:
+Use his genuine food history.
+He can participate in the second Signature story and recognize changes in Jill's cooking/menu.
+
+Madame Lin:
+She notices REAL upgrades that happened.
+Later she may leave/bring a restrained plant or decor object.
+Do not let her comment on upgrades she never saw.
+
+周董:
+His “隨便” gradually becomes recognizable as a very specific habit.
+Staff may eventually know what “隨便” actually means for him.
+He may have a preferred seat / ordinary dessert / routine.
+
+神秘美食評論家:
+First visit should not announce that he is a critic.
+Any later article/reputation consequence must reflect his actual service experience.
+He can later return as a real customer.
+
+衛生檢查員:
+After legitimate inspection history, the inspector may eventually return casually as a customer.
+That change should feel quietly funny rather than like a quest reward.
+
+王先生 × 王太太:
+Established everyday marriage.
+They may visit separately sometimes.
+Staff/regulars gradually understand their habits.
+They can tease each other and later create callbacks.
+
+They are a contrast to a NEW romance:
+they already have a shared life.
+
+Mia:
+She may say 「我以前來的時候……」 only if she genuinely has early visit history.
+
+小林:
+Jill/staff can eventually anticipate the usual order.
+A rare change in order should therefore become noticeable.
+
+Leo:
+Any five-cat photo/event requires all five cats to ACTUALLY be present.
+Never teleport cats for a screenshot.
+
+==================================================
+6. NPC ↔ CAT FAMILIARITY
+==================================================
+
+Cats are part of the restaurant's social history.
+
+Named guests can gradually develop familiarity with specific cats.
+
+Examples:
+- recognizes a cat
+- knows where it tends to sit
+- asks where it is
+- chooses a seat partly because of it
+- cat becomes comfortable approaching that person
+
+But cats remain autonomous.
+
+No cat friendship meter.
+No cat chores.
+No teleporting cats to satisfy story conditions.
+
+The already implemented Sophie × 寶寶 arc is the reference quality bar:
+history → behavior → permanent consequence.
+
+==================================================
+7. CROSS-CHARACTER MEMORY
+==================================================
+
+The strongest v2.3 moments should sometimes involve characters whose stories were originally separate.
+
+Examples:
+- Jill notices a developing relationship
+- Dylan notices it too
+- staff recognize regular habits
+- one regular recognizes another's usual seat/order
+- people begin asking whether someone else has arrived
+- cats become part of how regulars recognize the restaurant
+
+But knowledge must propagate plausibly.
+
+NPCs only remember:
+- things they witnessed
+- things directly told to them
+- public restaurant events they could reasonably know
+
+No omniscient callbacks.
+
+Crossovers are bonuses, NEVER prerequisites that can deadlock another storyline.
+
+==================================================
+8. JILL × DYLAN
+==================================================
+
+Remember the fundamental Dylan rule:
+
+Dylan is Jill's husband from the beginning.
+
+He genuinely loves her.
+
+The only thing he “pretends” is that he still has not successfully won her over.
+
+Before the reveal, his behavior should make the player increasingly think:
+“This regular customer is obviously pursuing Jill.”
+
+After the reveal, the SAME behavior becomes funnier and warmer because the player now knows:
+he has been married to her for years.
+
+The reveal must NOT make Dylan less romantic.
+
+Do not turn him into generic Husband NPC afterward.
+
+He should continue:
+- visiting
+- pursuing Jill playfully
+- knowing the cats as family
+- interacting naturally with regulars
+- occasionally staying after closing
+- behaving like someone with deep established familiarity
+
+Safe crossover tone:
+
+Dylan:
+「她們是不是——」
+
+Jill:
+「不要管人家。」
+
+Dylan:
+「我只是觀察。」
+
+Jill:
+「你很閒是不是？」
+
+Do NOT use “十一年” as a joke about observing another couple.
+Their ~11 years refers only to Jill and Dylan's own relationship.
+
+VALENTINE'S DAY:
+Dylan must visibly do something.
+
+Before reveal, it can look like further evidence that he is pursuing Jill.
+
+After reveal, the exact same kind of behavior reads as established-marriage affection.
+
+Possible behaviors:
+- flowers or a thoughtful small item
+- chooses a seat with a view of Jill when possible
+- stays later if service allows
+- understated teasing
+- gift/flowers remain visibly present for that day
+
+Do not use:
+- affection points
+- relationship rewards
+- generic romance meter
+
+Do not repeat the identical Valentine's event every year.
+Later Valentine's Days should draw from a small persistent-history-aware pool.
+
+==================================================
+9. STORY PHOTOS
+==================================================
+
+Story Photos are NOT achievement CG rewards.
+
+Rule:
+
+real shared history
+→ meaningful authored milestone actually occurs
+→ unlock canonical Story Photo
+→ preserve permanently in Life Album
+
+Ordinary Life Album photos = emergent captures.
+
+Story Photos = rare authored illustrations representing history that actually happened.
+
+Confirmed eligible relationships include:
+
+- Sophie × Mia — romance milestone
+- 晴 × 阿拓 — only if their optional relationship genuinely develops
+- Ken × Monsieur 杜 — REQUIRED friendship photo, explicitly non-romantic
+- Jill × Dylan — selected long-marriage milestones
+- 王先生 × 王太太 — selected established-couple milestones
+- meaningful staff ensemble / multi-character moments
+
+Never unlock a Story Photo for history that did not happen.
+
+No:
+- invented attendance
+- teleported cats
+- swapped identities
+- fake shared history
+- staging events solely to obtain a screenshot
+
+==================================================
+10. PRESENTATION FALLBACK
+==================================================
+
+Story meaning is fixed.
+Presentation may fallback.
+
+A story must not permanently stall because:
+- preferred seat unavailable
+- exact room unavailable
+- Jill busy
+- one optional staff member absent
+- a dish is not currently on the menu
+- a cat happens to be elsewhere
+
+Use reasonable presentation alternatives when meaning remains intact.
+
+But never fake required CHARACTER presence.
+
+If a character-specific beat genuinely requires that character, delay the beat.
+
+Critical long-term arcs may use the already implemented overdue/catch-up weighting.
+
+Do NOT solve this with hardcoded Day X story schedules.
+
+==================================================
+11. MOST IMPORTANT ACCEPTANCE TEST
+==================================================
+
+Do not judge Phase 7 primarily by:
+“how many events were implemented.”
+
+Judge it by whether normal play gradually produces recognizable human history.
+
+By Day 50 / 80 / 100, a player should naturally be able to say things like:
+
+“Sophie以前明明很嫌寶寶，現在還會找牠。”
+
+“Ken跟杜每次都在吵酒，但其中一個沒來另一個反而會問。”
+
+“Sophie跟Mia好像不知道什麼時候開始就總是坐在一起。”
+
+“晴跟阿拓一開始明明一直互嗆。”
+
+“周董嘴巴說隨便，其實根本超固定。”
+
+“那個以前來檢查衛生的人現在居然自己跑來吃飯。”
+
+These should be memories created by PLAY, not encyclopedia text.
+
+Continue implementing Phase 7 now.
+
+Use the architecture already built.
+Do not expand scope into another narrative engine.
+Implement → targeted test → inspect → rollback-safe commit → continue to Phase 8 without waiting for approval.
