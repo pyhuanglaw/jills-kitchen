@@ -601,7 +601,9 @@ html.desk button,html.desk [data-act],html.desk .polaroid{cursor:pointer}
 /* the 故事 page */
 .sdots{display:flex;gap:4px;align-items:center;margin:8px 0 2px}.sdots i{width:10px;height:10px;border-radius:50%;border:1.5px solid #C99A45;background:transparent}.sdots i.on{background:#C99A45}
 .sdots i+i{position:relative}.sdots i+i::before{content:'';position:absolute;right:11px;top:3px;width:4px;height:1.5px;background:#D9C7A6}
-.sline .sl-b div{font-size:12.5px;line-height:1.55}.sline .d{display:inline-block;min-width:62px;color:var(--ink2);font-size:11px;font-weight:700}
+.schap .chap{padding:8px 0;border-top:1px solid var(--line)}.schap .chap:first-child{border-top:0}
+.chap .ch-h{display:flex;align-items:baseline;gap:8px}.chap .ch-h small{font-size:10px;letter-spacing:.1em;color:var(--ink2);font-weight:800}.chap .ch-h b{font-size:14px}.chap .ok{color:#5E8F4E;font-weight:800}
+.chap .ch-b div,.sline .sl-b div{font-size:12.5px;line-height:1.55}.chap .d,.sline .d{display:inline-block;min-width:62px;color:var(--ink2);font-size:11px;font-weight:700}
 .sline{margin-top:10px}.sline.focus{box-shadow:0 0 0 2px #C99A45}.sl-h{display:flex;gap:10px;align-items:center}
 .sl-h .faces{display:flex}.sl-h .faces img,.sl-h .faces i{width:38px;height:38px;border-radius:50%;object-fit:cover;object-position:top;background:#EFE5D3;border:2px solid #fff;display:block}.sl-h .faces>*+*{margin-left:-10px}
 .sl-t{font-size:13px;color:var(--ink2)}.sl-more{margin:6px 0 0;font-size:12.5px;color:var(--ink2);font-style:italic}

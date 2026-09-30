@@ -2210,12 +2210,27 @@ function beatDay(b){const src=b[0];if(typeof src==='function'){try{return src()}
 function lineBeats(L){return L.beats.filter(b=>!(b[2]&&b[2].post)||dylanOut()).filter(b=>!(b[2]&&b[2].hide)||beatDay(b)!=null)}
 function beatKey(b){const s0=b[0];if(typeof s0==='string')return s0;if(Array.isArray(s0))return s0.filter(k=>BF(k)!=null).sort((a,c)=>BF(a)-BF(c))[0]||null;return null}
 function lineProgress(L){const bs=lineBeats(L);const done=bs.map(b=>({t:b[1],d:beatDay(b),k:beatKey(b)})).filter(x=>x.d!=null);return{done,total:bs.length+(L.k==='dylan'&&!dylanOut()?1:0)}}
+/* the restaurant's own story: chapters read from what the restaurant really became */
+function restChapters(){const achD=id=>S.achievements&&S.achievements[id]?(typeof S.achievements[id]==='number'?S.achievements[id]:0):null;
+ const has=(ok,d)=>ok?(d==null?0:d):null;
+ const C=[
+  {t:'小小的餐廳',beats:[['開店',has(true,1)],['第一位員工',has((S.crew||[]).length>0||achD('hire')!=null,achD('hire'))],['第一次擴建',has(S.level>=2,null)],['有了熟客',has(REGS.some(r=>(S.regulars[r.id]||0)>=4),null)]]},
+  {t:'店開始有自己的樣子',beats:[['招牌菜',has(!!S.signature,null)],['側廳',has(projOn('side'),S.newRooms&&S.newRooms.side)],['第二道招牌',has(!!S.sigDessert,null)],["Jill's Kitchen — JILL",has(S.level>=5,null)]]},
+  {t:'晚餐之後',hidden:()=>!fact('ken_wine_q'),tease:'店裡好像還少了什麼。',showIf:()=>S.level>=4,beats:[['「妳真的完全不賣酒？」',BF('ken_wine_q')],['這道要配什麼',BF('ken_pairing')],['有人吃完了還不想走',BF('lounge_idea')],['試酒的晚上',BF('tasting_night')],['「讓人吃完飯以後，還有地方可以坐。」',BF('lounge_project')],['Lounge 開了',BF('lounge_built_1')]]},
+  {t:"Jill's Kitchen — The Lounge",hidden:()=>!fact('lounge_project'),tease:'？？？？？',showIf:()=>!!fact('ken_wine_q'),beats:[['第一個晚上',BF('lounge_first_night')],['酒吧沙發廳',BF('lounge_built_2')],['安靜的角落',BF('lounge_built_3')],['「聽說這裡是你害的。」',BF('evan_origin')],['好像真的開起來了',(()=>{const k=Object.keys(story().facts).find(x=>x.startsWith('milestone_'));return k?fact(k).d:null})()]]},
+ ];return C}
 /* ---- the page ---- */
 let storyFocus=null;
 function storyFace(id){try{if(id.startsWith('cat:')){const C=CAT_DEF.find(x=>x.id===id.slice(4));return C?catPortraitURL(C):''}const p=portraitOf(id);if(p)return p.src;if(REG_BY[id])return portraitURL(REG_BY[id].looks,'reg'+id);if(id==='dylan')return portraitURL(DYLAN.looks,'regdylan')}catch(e){}return''}
 function dotsHTML(n,t){let s='';for(let i=0;i<t;i++)s+=`<i class="${i<n?'on':''}"></i>`;return`<span class="sdots">${s}</span>`}
 function storyPageHTML(){let h=`<p class="muted" style="font-size:12.5px;margin:0 0 8px">店裡真的發生過的事，一段一段記下來。沒有任務，也不用做什麼——下一段什麼時候發生，要看他們自己。點一段可以看那天的經過。</p>`;
- h+=`<div class="nm" style="font-weight:800;font-size:15px;margin:6px 0 6px">人物故事</div>`;
+ h+=`<div class="nm" style="font-weight:800;font-size:15px;margin:6px 0 6px">餐廳故事</div><div class="card schap">`;
+ for(const [i,C] of restChapters().entries()){if(C.showIf&&!C.showIf())continue;const hid=C.hidden&&C.hidden();const n=C.beats.filter(b=>b[1]!=null).length;const all=n===C.beats.length;
+  h+=`<div class="chap ${all?'done':''}"><div class="ch-h"><small>CHAPTER ${i+1}</small><b>${hid?(C.tease==='？？？？？'?'？？？？？':'？？？'):C.t}</b>${all?'<span class="ok">✓</span>':''}</div>`;
+  if(hid){h+=`<p class="muted" style="margin:2px 0 0;font-size:12.5px">${C.tease}</p>`}
+  else{h+=dotsHTML(n,C.beats.length)+`<div class="ch-b">${C.beats.map(b=>b[1]!=null?`<div><span class="d">${b[1]>0?'DAY '+b[1]:'早期'}</span>${b[0]}</div>`:'').join('')}${all?'':'<div class="muted">？？？</div>'}</div>`}
+  h+=`</div>`}
+ h+=`</div><div class="nm" style="font-weight:800;font-size:15px;margin:14px 0 6px">人物故事</div>`;
  const open=STORY_LINES.filter(L=>{try{return L.open()}catch(e){return false}});const closed=STORY_LINES.length-open.length;
  for(const L of open){const P=lineProgress(L);const who=typeof L.who==='function'?L.who():L.who;const more=typeof L.more==='function'?L.more():L.more;const ph=(L.photos||[]).filter(k=>story().photos[k]);
   h+=`<div class="card sline ${storyFocus===L.k?'focus':''}" id="sl-${L.k}"><div class="sl-h"><span class="faces">${(typeof L.faces==='function'?L.faces():L.faces).map(f=>`<img alt="" src="${storyFace(f)}">`).join('')}</span><div><b>${who}</b>${L.tag?` <span class="tier t1">${L.tag}</span>`:''}<div class="sl-t">「${L.title()}」</div></div></div>
@@ -2228,13 +2243,14 @@ function storyPageHTML(){let h=`<p class="muted" style="font-size:12.5px;margin:
 function beatRowHTML(x){const note=x.k?beatNote(x.k):'';const lines=(x.k&&story().beatLines&&story().beatLines[x.k])||[];const head=`<span class="d">${x.d>0?'DAY '+x.d:'更早以前'}</span>「${x.t.replace(/^「|」$/g,'')}」`;if(!note&&!lines.length)return`<div class="sb">${head}</div>`;
  return`<details class="sb"><summary>${head}</summary>${note?`<p class="sn">${note}</p>`:''}${lines.length?`<div class="sq">${lines.map(l=>l.w?`<div><b>${l.w}</b>「${l.t}」</div>`:`<div class="e">${l.t}</div>`).join('')}</div>`:''}</details>`}
 /* ---- story updates: once per new beat, never for ambient repeats ---- */
-function storyLineSeen(){const st=story();if(!st.lineSeen){st.lineSeen={};for(const L of STORY_LINES){try{st.lineSeen[L.k]=L.open()?lineProgress(L).done.length:0}catch(e){st.lineSeen[L.k]=0}}}return st.lineSeen}
+function storyLineSeen(){const st=story();if(!st.lineSeen){st.lineSeen={};for(const L of STORY_LINES){try{st.lineSeen[L.k]=L.open()?lineProgress(L).done.length:0}catch(e){st.lineSeen[L.k]=0}}st.lineSeen._rest=restChapters().reduce((a,C)=>a+C.beats.filter(b=>b[1]!=null).length,0)}return st.lineSeen}
 function storyProgressCheck(){if(!S||!S.story)return;const seen=storyLineSeen();let note=null;
  for(const L of STORY_LINES){let ok=false;try{ok=L.open()}catch(e){}if(!ok)continue;const P=lineProgress(L);const n=P.done.length;if(n>(seen[L.k]||0)){seen[L.k]=n;const last=P.done.slice().sort((a,b)=>b.d-a.d)[0];note=note||{k:L.k,who:typeof L.who==='function'?L.who():L.who,t:last?last.t:'',n,total:P.total}}}
+ {const n=restChapters().reduce((a,C)=>a+C.beats.filter(b=>b[1]!=null).length,0);if(n>(seen._rest||0)){seen._rest=n;note=note||{k:'_rest',who:'餐廳故事',t:'',n:0,total:0}}}
  if(note)storyNoteShow(note)}
 function storyNoteShow(n){const el=$('#storyNote');if(!el)return;el.innerHTML=`<small>故事更新</small><b>${n.who}</b>${n.t?`<span>「${n.t.replace(/^「|」$/g,'')}」</span>`:''}${n.total?`<em>${n.n} / ${n.total}</em>`:''}`;el.dataset.k=n.k;el.hidden=false;el.classList.remove('go');void el.offsetWidth;el.classList.add('go');clearTimeout(storyNoteShow.t);storyNoteShow.t=setTimeout(()=>{el.hidden=true},7000)}
 let bookFromNote=false;
-function openStory(k){storyFocus=k||null;bookTab='story';const el=$('#storyNote');if(el)el.hidden=true;if(phase==='service'&&R){paused=true;bookFromNote=true}showBook();setTimeout(()=>{const t=storyFocus&&document.getElementById('sl-'+storyFocus);if(t)t.scrollIntoView({block:'center'})},60)}
+function openStory(k){storyFocus=k&&k!=='_rest'?k:null;bookTab='story';const el=$('#storyNote');if(el)el.hidden=true;if(phase==='service'&&R){paused=true;bookFromNote=true}showBook();setTimeout(()=>{const t=storyFocus&&document.getElementById('sl-'+storyFocus);if(t)t.scrollIntoView({block:'center'})},60)}
 /* ================= v2.3 follow-up: a campaign you can feel =================
    The campaign already changed who comes and what they want (campaignGuests / topicWeightMul / topicDemandMul);
    here the people it brought behave like it. Everything below reads what really happens: a cat line names a cat
