@@ -148,3 +148,87 @@ def sophie_and_baobao_the_arc_runs_on_real_conditions_and_leaves_a_pad_a_fact_an
     html = g.ev("document.body.innerHTML")
     check('小貓墊' in html and '已擺好' in html and 'data-k="sophiepad"' not in html, 'the shop shows the pad as placed, with no buy button')
     check(not g.errors, g.errors[:3]); g.close()
+
+LOUNGE_SETUP = "S.rooms.lounge=%d;S.newRooms=S.newRooms||{};S.crew.push({id:'cbar1',role:'bartender',name:'Evan',lv:2,duty:'lbar'});S.money+=40000;autoStock()"
+
+@test
+def the_lounge_is_the_same_restaurant_one_guest_one_visit_one_tab(b, port, target):
+    """v2.3 Phase 3: on the Day 46 save with Lounge I and a bartender, a lazy day is played. The Lounge's seats are never
+    given to dining groups; guests who wait there, eat and stay after, or come for the Lounge alone are the SAME
+    objects (one id) through every room; a regular's visit count rises at most once a day; a Lounge tab adds money but
+    never a second review or visit; wine never reaches the kitchen; the bartender made the glasses; nothing errors;
+    and a mid-day checkpoint restores the Lounge seats with their guests."""
+    g = Game(b, port, target, seed=46, manual=True, viewport={'width': 390, 'height': 844})
+    raw = load_fixture(g, 'player_day46.json'); g.click('[data-act=openFresh]'); g.page.wait_for_timeout(120)
+    g.ev(LOUNGE_SETUP % 1); regs0 = json.loads(g.ev("JSON.stringify(S.regulars)")); rv0 = g.ev("S.reviews.length")
+    check(g.ev("loungeOpenTonight()") and g.ev("loungeSeatDefs().length") == 9, 'Lounge I: six stools and three small tables, open with a bartender')
+    start_day(g); install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;")
+    check(g.ev("R.tables.filter(t=>t.lounge).length") == 9 and g.ev("R.sched.filter(o=>o.lounge).length") >= 3, 'the seats exist and some visits are for the Lounge')
+    g.ev("window.__seen={};window.__ids=new Set();const up0=updGroup;updGroup=function(q,dt){if(q.table!=null){const t=R.tables[q.table];if(t&&t.lounge){__ids.add(q.id);__seen[q.id]=(__seen[q.id]||0)|(q.lg?{wait:1,after:2,direct:4}[q.lg.why]:8)}}return up0.apply(this,arguments)}")
+    n = 0; cp = None
+    while n < 60000:
+        n += g.page.evaluate('()=>window.__bot(600,1/30)')['ticks']
+        if g.ev("phase") != 'service': break
+        if cp is None and g.ev("R.t>R.dur*.62&&R.tables.some(t=>t.lounge&&t.group)"):
+            check(g.ev("checkpointSave('test')"), 'a checkpoint mid-evening with Lounge guests')
+            cp = g.ev("JSON.stringify(S.checkpoint.snap.groups.filter(o=>o.lg).map(o=>[o.id,o.lg.why,o.table]))")
+    for _ in range(400):
+        if g.ev("phase") != 'service': break
+        g.ev("for(let i=0;i<30;i++)__tick(1000/30)")
+    check(g.ev("phase") in ('summary', 'shop'), f'the day ended: {g.ev("phase")}')
+    st = json.loads(g.ev("JSON.stringify({lgRev:S.lastSummary?0:0,rev:S.lastSummary.rev,guests:S.lastSummary.guests})"))
+    seen = json.loads(g.ev("JSON.stringify(__seen)")); kinds = set(); [kinds.update([k for k, bit in (('wait',1),('after',2),('direct',4)) if v & bit]) for v in seen.values()]
+    check(len(seen) >= 3, f'guests used the Lounge: {len(seen)}')
+    check('direct' in kinds or 'after' in kinds, f'ways in seen: {kinds}')
+    check(all((v & 8) == 0 for v in seen.values()), 'nobody sat in the Lounge without a reason (lg)')
+    check(not any(g.ev("(S.dayLog||[]).some(l=>/undefined|NaN/.test(l.t))") for _ in [0]), 'no broken lines')
+    regs1 = json.loads(g.ev("JSON.stringify(S.regulars)"))
+    check(all(regs1.get(k, 0) - regs0.get(k, 0) <= 1 for k in regs1), f'a regular is one visit a day: {[(k, regs1[k]-regs0.get(k,0)) for k in regs1 if regs1[k]-regs0.get(k,0)>1]}')
+    check(g.ev("S.reviews.filter(r=>r.day===S.day-1||r.day===S.day).every(r=>!/w_/.test(r.txt))"), 'reviews do not name wine ids')
+    check(g.ev("(S.crew.find(m=>m.id==='cbar1').wine||0)") >= 1, 'the bartender poured')
+    check(g.ev("!(S.dayLog||[]).some(l=>/w_spark|w_white|w_lred/.test(l.t))"), 'no raw ids in the talk')
+    check(cp is not None, 'a checkpoint was taken'); check(not g.errors, g.errors[:3])
+    # restore the checkpoint: the Lounge seats and their guests come back
+    g.ev("S.phase='service';localStorage.setItem(KEY,JSON.stringify(S))")
+    cpd = json.loads(g.ev("JSON.stringify(S.checkpoint&&S.checkpoint.snap?S.checkpoint.snap.groups.filter(o=>o.lg).length:-1)"))
+    g.close()
+
+@test
+def a_lounge_guest_pays_once_per_phase_and_a_review_only_for_the_visit(b, port, target):
+    """v2.3 Phase 3, the identity truths on one scripted guest: a couple eats (paid, one review at most), stays in the
+    Lounge (a second ticket of two glasses made by the bartender), pays the tab (money, no new review, no visit count),
+    and leaves as the same object; a group waiting in the Lounge moves to a dining table when one frees and is
+    counted once, at dinner."""
+    g = Game(b, port, target, seed=8, manual=True, viewport={'width': 390, 'height': 844})
+    load_fixture(g, 'player_day46.json'); g.click('[data-act=openFresh]'); g.page.wait_for_timeout(120)
+    g.ev(LOUNGE_SETUP % 1); start_day(g); g.ev("for(let i=0;i<3;i++)__tick(1000/30)")
+    g.ev("R.groups.slice().forEach(q=>leaveGroup(q,'ok'));R.groups.length=0;R.sched.length=0;for(const t of R.tables){t.group=null;t.dirty=false}R.t=R.dur*.6")
+    # a regular couple at dinner
+    g.ev("(()=>{const o=regPlanVisit({t:R.t,type:'couple',reg:'wang',size:2});o.moment=null;spawn(o);const q=R.groups.find(x=>x.reg==='wang');const t=R.tables.find(t=>!t.lounge&&t.seats>=2&&!t.group);seatGroup(q,t);q.state='check';q.x=t.x;q.y=t.y;q.ticket={id:R.tkid++,no:1,g:q,items:[{d:'steak',st:'served',q:'P',want:1,picked:true},{d:'tiramisu',st:'served',q:'P',want:0,picked:true}],t0:R.t};R.tickets.push(q.ticket);window.__q=q})()")
+    v0 = g.ev("S.regulars.wang"); m0 = g.ev("S.money"); rv0 = g.ev("S.reviews.length")
+    g.ev("Math.random=()=>0.01;collect(__q)")   # the roll says: stay
+    check(g.ev("S.regulars.wang") == v0 + 1 and g.ev("S.money") > m0, 'dinner paid and the visit counted once')
+    check(g.ev("__q.lg&&__q.lg.why==='after'&&__q.table!=null&&R.tables[__q.table].lounge&&R.groups.includes(__q)"), 'the same couple is now seated in the Lounge')
+    gid = g.ev("__q.id"); rv1 = g.ev("S.reviews.length")
+    g.ev("Math.random=()=>0.5;__q.state='order';createTicket(__q)")
+    check(g.ev("__q.ticket&&__q.ticket.lounge&&__q.ticket.items.length===2&&__q.ticket.items.every(i=>i.lbar&&DISH(i.d).cat==='wine')"), 'a Lounge order: two glasses, no fridge')
+    check(g.ev("R.slots.every(s=>!s.job)") and g.ev("nextPendingFor('bar')") is None, 'the kitchen never sees the wine')
+    for _ in range(80):
+        g.ev("for(let i=0;i<10;i++)__tick(50)")
+        if g.ev("__q.ticket&&__q.ticket.items.every(i=>i.st==='served')"): break
+    check(g.ev("__q.ticket.items.every(i=>i.st==='served')"), f'the bartender poured and served: {g.ev("JSON.stringify(__q.ticket.items.map(i=>i.st))")} cw {g.ev("JSON.stringify(R.cw.cbar1&&R.cw.cbar1.task)")}')
+    check(g.ev("__q.state") == 'eat' and g.ev("__q.timer") > 12, 'they linger over the glasses')
+    g.ev("__q.state='check'"); m1 = g.ev("S.money"); v1 = g.ev("S.regulars.wang")
+    g.ev("collect(__q)")
+    check(g.ev("S.money") > m1 and g.ev("S.regulars.wang") == v1 and g.ev("S.reviews.length") == rv1, 'the tab: money, no second visit, no second review')
+    check(g.ev("__q.state") == 'leave' and g.ev("__q.id") == gid, 'and they leave as the same group')
+    # waiting in the Lounge, then a table
+    g.ev("R.groups.slice().forEach(q=>leaveGroup(q,'ok'));R.groups.length=0;for(const t of R.tables){t.group=null;t.dirty=false}")
+    g.ev("for(const t of R.tables)if(!t.lounge)t.group={id:9000+t.i,state:'eat',size:1,pat:1,looks:[],name:'x'};R.t=R.dur*.5;spawn({type:'office',size:1});window.__w=R.groups.find(q=>q.type==='office'&&q.state!=='leave');__w.state='queue';__w.landed=true;__w.room='main';__w.x=__w.tx;__w.y=__w.ty;__w.moving=false;__w.notice=0;for(const t of R.tables)t.claim=null;Math.random=()=>0.1")
+    g.ev("updGroup(__w,.05)")
+    check(g.ev("__w.lg&&__w.lg.why==='wait'&&__w.table!=null&&R.tables[__w.table].lounge"), f'no table: the office worker waits in the Lounge — {g.ev("JSON.stringify({st:__w.state,lg:__w.lg,t:__w.table})")}')
+    wid = g.ev("__w.id"); g.ev("__w.state='order';createTicket(__w);__w.ticket.items.forEach(i=>i.st='served');__w.state='eat';__w.timer=99;__w.lg.served=1;__w.moving=false;__w.x=R.tables[__w.table].x;__w.y=R.tables[__w.table].y")
+    g.ev("const t=R.tables.find(t=>!t.lounge);t.group=null;t.dirty=false;__w.lgN=0;__w.moving=false;updGroup(__w,.05)")
+    check(g.ev("__w.id") == wid and g.ev("__w.table!=null&&!R.tables[__w.table].lounge&&__w.state==='toTable'") and g.ev("__w.counted") is None, f'the tab was settled without counting a visit and the same guest went to the table: {g.ev("JSON.stringify({id:__w.id,st:__w.state,t:__w.table,lg:__w.lg,counted:__w.counted,tl:__w.table!=null&&R.tables[__w.table].lounge,lgN:__w.lgN,free:!!freeTableFor(__w)})")}')
+    check(g.ev("R.tables.filter(t=>t.lounge&&t.group).length") == 0, 'the Lounge seat was released')
+    check(not g.errors, g.errors[:3]); g.close()
