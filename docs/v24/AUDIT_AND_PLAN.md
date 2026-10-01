@@ -416,3 +416,75 @@ Dining Room; Phase I the main cost of each; II and III less.
 
 **Tests (AS–AU)**, the saves, the pacing sims (the Day 52 and Day 61 saves with the floor and the rooms bought as soon
 as they are offered; reservation frequency per phase), phone screenshots, the full suite.
+
+### 8.1 Economy — what was measured and what was set (2026-10-02)
+
+**The late-game day** (the player's Day 61 save played by the lazy bot, two 60-day runs, seeds 8100 and 9300): about
+75 guests, takings about $51–55k, net about $55–57k a day with everything bought along the way (the floor, both rooms,
+all their phases). Money goes from about $120k to about $2.6M over the sixty days.
+
+**Prices** (unchanged from the plan; checked against that day):
+
+| | Phase I | Phase II | Phase III | All three |
+|---|---|---|---|---|
+| Staff Room | $160,000 (≈ 3 days of net) | $70,000 | $90,000 | $320,000 |
+| Private Dining Room | $240,000 (≈ 4½ days) | $120,000 | $160,000 | $520,000 |
+
+The Staff Room is the cheaper room; each room's first phase is its main cost (walls, door, the real works); II and III
+are improvements. A mature save can pay for each when it is offered, and it is felt (a few days of takings), but nobody
+grinds for weeks after the story.
+
+**Minimum spend** (T, U, V, W). The first formula (party × the restaurant's average check per guest × 1.05–1.15) was
+wrong in practice: that average includes the Lounge and the small tables' drinks, and a big party ordered at most eight
+plates, so every booked party ate about 55–65% of its minimum and every bill was the minimum — a surcharge, not a
+floor. Now:
+- a party of five or more orders as people do — a dish each, a drink or a dessert here and there — up to twelve on its
+  ticket (three and four order as before);
+- the minimum is what a party of that size and kind orders at that day's menu and prices (the ordering rules
+  themselves, sampled with a seeded draw so the day's dice are not touched), times 0.88 / 0.92 / 0.94 by phase,
+  rounded to $100, never below $400; fixed in the booking.
+
+Measured (two runs, before the last small change of the factors from 0.90/0.95/1.0): every booking came and paid;
+Phase I minimum ≈ $2,300–2,600 against ≈ $2,100–3,000 eaten; Phase II ≈ $2,900–3,300 against ≈ $3,300–3,700; Phase
+III ≈ $3,800–4,000 against ≈ $3,700–3,800, the floor reached by 10–13 of 17–18 parties — which is why III's factor
+came down from 1.0 to 0.94. The final runs are in the release report.
+
+**Bookings by phase** (same runs): Phase I about 29% of evenings, Phase II 44–56%, Phase III about 68%; the longest run
+of evenings without one is 2–3; the first comes by the second evening (guaranteed). Walk-in parties use the room on
+some free evenings (1 / 3–4 / 7 over the phases' evenings).
+
+**What the rooms add.** The Staff Room adds no takings and no places (K). The Private Dining Room's bookings add
+roughly a party of 4–10 on most evenings by Phase III — about $3–4k an evening, under a tenth of the day — and two
+places on the restaurant's list (AG). Neither changes the shape of the late-game economy.
+
+### 8.2 The player's corrections of 04:06–04:26 (they replace the parts of §8 above that differ)
+
+Filed: `rc6_spec_spaces_0406`, `second_floor_architecture_0408`, `impact_report_request_0409`,
+`second_floor_overview_visual_0417`, `private_dining_artdeco_0425` (+ the photo `refs/private_dining_artdeco_mood_0425`).
+
+- **The floor and its rooms are three scenes.** 二樓 is the floor's own view: where the rooms are — their outer walls, their
+  doors, the space they take — never what is inside. Each room is its own full view, entered by its door. (The rooms
+  were already their own views; what changes is the floor: the cut walls and the small copies of the rooms' insides on
+  it are gone.)
+- **From the floor the rooms are closed rooms**: the wall that faces you (the Private Dining Room's in its own language —
+  deep green panels, brass, an arched frosted window; the Staff Room's in the floor's plaster with a frosted window),
+  the end wall seen a little from the side as the column is, the walls' tops, a real door (trim, panels, frosted glass,
+  lever, threshold, a mat) with its sign. The state shows only from outside: light in the frosted glass and under the
+  door when someone is in there; the Private Dining Room's card on the door (已預約 / 用餐中); over its door, the same
+  bubble a table shows when the table in there needs you.
+- **The floor recomposed**: the Staff Room is a wall's height in front of the Private Dining Room (a passage between
+  them), so the Private Dining Room's whole front shows; the open middle, the right window, the column, the stairs;
+  the corner left of the stairs undecided — side-window light on the boards and a plant, no use given to it. At closing
+  one of the floor stays out by the big window; the cats keep their cushion and window.
+- **Navigation: Restaurant → 二樓 → a room.** The 二樓 tab is the floor, from anywhere (it no longer goes round three
+  rooms); inside a room it reads 「‹ 二樓」 and takes you back; the room's door does the same; the arrow keys go over
+  the top-level rooms.
+- **The Private Dining Room, redone** (the brief overrides the wooden room of `refs/private_dining_room_reference`):
+  contemporary Art Deco with Jill's Kitchen's warmth, from Phase I — stone floor in large slabs, an ivory stone table
+  running from the door (the near end, the bottom of the view) to the window wall (its long axis the phone's height),
+  deep green panelling with brass, upholstered oatmeal chairs on brass feet, a brass pendant, a walnut sideboard under
+  the window, a service console, plants in brass pots. Phase II, the same room more complete: the table longer (8),
+  sconces, fluting, velvet drapes, a framed print, a console with its lamp, a coat stand, glasses and flowers. Phase
+  III: the table at 10, the coffered ceiling, the tiered chandelier, a wine cabinet, an arched mirror, the sideboard's
+  stone top and lamp, chargers, wine glasses, candles. The places are down both sides (the game never shows a back);
+  the party comes to the table's near end; the crew serve from there.

@@ -24,7 +24,7 @@ SAVE = sys.argv[4] if len(sys.argv) > 4 else os.path.join(ROOT, 'tests/saves/pla
 BUY = os.environ.get('JK_ROOMS_BUY', '1') != '0'
 raw = json.load(open(SAVE)); raw = raw.get('save', raw)
 SEED = "Math.random=(function(){let a=%d;return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}})()"
-KEYS = ['sp_wait', 'sr_story', 'sr_build', 'sr_first', 'sr_plug', 'sr_plug2', 'sr_food', 'sr_fridge', 'sr_nina',
+KEYS = ['wall_settle', 'up_hint', 'up_inspect', 'up_cats', 'up_ask', 'up_lease', 'up_use', 'sp_wait', 'sr_story', 'sr_build', 'sr_first', 'sr_plug', 'sr_plug2', 'sr_food', 'sr_fridge', 'sr_nina',
         'pd_yj', 'pd_other', 'pd_story', 'pd_build', 'pd_back']
 
 
@@ -48,6 +48,7 @@ def floor_taken(g, lease_back):
 
 SIM_DAY = r"""window.__simDay=function(steps,dt){let n=0;for(;n<steps;n++){if(!(phase==='service'&&R))break;
  if(sub==='roomoffer'){const b=document.querySelector('#screen [data-act=roomGo]');const k=b?b.dataset.k.split('|')[0]:'?';__rm.offers.push(k);if(b)roomGo(k+'|plan');else{hideScreen();paused=false}}
+ if(sub==='upproj'){__rm.offers.push('up');upGo('plan')}if(sub==='loungeproj'){__rm.offers.push('lounge');loungeGo('plan')}
  if(typeof DLG!=='undefined'&&DLG)dlgNext();
  __act();update(dt);updateCats(dt,0);if(!R)break;
  const m=srPeople().length;if(m>__rm.most)__rm.most=m;__rm.brk=R.srBreaks||0;__rm.cat=R.srCat?1:0;__rm.early=R.srEarly?1:0;
@@ -69,13 +70,16 @@ def main():
         g = rt.Game(b, port, 'index', seed=SEEDBASE, manual=True, viewport={'width': 390, 'height': 844})
         g.ev("phase='title';R=null;localStorage.setItem(KEY,JSON.stringify(%s))" % json.dumps(raw, ensure_ascii=False)); g.reload(); g.page.wait_for_timeout(150)
         g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(150)
-        floor_taken(g, LEASE_BACK)
+        if LEASE_BACK >= 0: floor_taken(g, LEASE_BACK)
         g.ev("window.__fastSay=1")
         rows = []; buys = []
         for d in range(DAYS):
             bought = []
             if g.ev("phase") == 'summary':
                 g.click('[data-act=toShop]'); g.page.wait_for_timeout(80)
+            if BUY and g.ev("phase") == 'shop' and g.ev("!!fact('up_ask')&&!upTaken()&&S.money>=UP_PROJ.cost"):
+                if g.ev("buyUp()"):
+                    g.ev("hideReveal&&hideReveal()"); bought.append('up'); buys.append((g.ev('S.day'), 'up'))
             if BUY and g.ev("phase") == 'shop':
                 for kind, L in (('sr', 'SR_PROJ'), ('pd', 'PD_PROJ')):
                     n = g.ev(f"{kind}Next()")
@@ -108,7 +112,7 @@ def main():
         lease = g.ev("upS().lease")
         print(f'\nthe floor leased on Day {lease}; first day of each beat (days after the lease):')
         for k in KEYS:
-            print(f'  {k:10s} {final[k]}' + (f'  (+{final[k]-lease})' if final[k] is not None else ''))
+            print(f'  {k:10s} {final[k]}' + (f'  (+{final[k]-lease})' if final[k] is not None and lease is not None else ''))
         print('bought:', buys)
         # the bookings by phase
         by = {}
