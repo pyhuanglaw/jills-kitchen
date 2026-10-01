@@ -1,0 +1,8 @@
+{"variant": "t1", "day": 0, "samples": 296, "win_avg": 0.12, "winline_max": 0, "clash_samples": 0, "main_avg": 4.49, "side_avg": 0.45, "spot_share": {"perch": 0.12}, "hops": 0, "memos": {"window": 1}}
+{"variant": "t1", "day": 1, "samples": 304, "win_avg": 0.0, "winline_max": 0, "clash_samples": 0, "main_avg": 5.0, "side_avg": 0.0, "spot_share": {}, "hops": 0, "memos": {"newspot": 1}}
+{"variant": "t1", "day": 2, "samples": 293, "win_avg": 0.0, "winline_max": 0, "clash_samples": 0, "main_avg": 4.98, "side_avg": 0.0, "spot_share": {}, "hops": 0, "memos": {}}
+errors t1 []
+{"variant": "t5", "day": 0, "samples": 300, "win_avg": 0.76, "winline_max": 1, "clash_samples": 0, "main_avg": 3.89, "side_avg": 1.11, "spot_share": {"winSeat1": 0.3, "winHammock": 0.26, "perch": 0.2}, "hops": 0, "memos": {"newspot": 3, "window": 1, "windowcats": 1}}
+{"variant": "t5", "day": 1, "samples": 287, "win_avg": 0.51, "winline_max": 1, "clash_samples": 0, "main_avg": 4.46, "side_avg": 0.51, "spot_share": {"winHammock": 0.34, "winStep1": 0.17}, "hops": 0, "memos": {"hammock": 1, "newspot": 1}}
+{"variant": "t5", "day": 2, "samples": 288, "win_avg": 0.62, "winline_max": 1, "clash_samples": 0, "main_avg": 4.35, "side_avg": 0.62, "spot_share": {"winHammock": 0.39, "winStep1": 0.14, "winStep2": 0.1}, "hops": 0, "memos": {"hammock": 1, "newspot": 1}}
+errors t5 []

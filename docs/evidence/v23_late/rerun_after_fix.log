@@ -1,0 +1,8 @@
+PASS  single_file_in_sync  (0.1s)
+PASS  cat_personality_fingerprint  (1.1s)
+PASS  golden_scenario  (1.5s)
+PASS  golden_frames  (124.0s)
+PASS  j_cat_furniture_comes_in_tiers_and_the_grass_pot_is_used  (10.6s)
+PASS  window_line_cats_stay_inside_and_in_sight  (7.4s)
+
+6 passed, 0 failed
