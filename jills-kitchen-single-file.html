@@ -966,13 +966,13 @@ const CATGEAR=[   /* v2.2.1 F: the side hall's cat things sit in two zones — t
     edge and the stock and task chips its two upper corners (375×667 to 430×932), and a cat is 30–40 units tall — so
     the high places sit in the middle of the glass, the low ones on the sill. Places that would overlap on screen are
     not used at the same time (winClash). */
- {k:'winSeat1',n:'軟墊窗台',line:'win',wt:2,room:'side',need:'side',x:256,y:71,face:1,poses:['loaf','curl','sit'],w:{snow:1.4,mikan:1.1,mei:.9,tora:.7,ban:.4}},
- {k:'winSeat2',n:'軟墊窗台',line:'win',wt:2,room:'side',need:'side',x:284,y:71,face:-1,poses:['curl','loaf'],w:{mikan:1.2,snow:1.1,tora:.7,mei:.7,ban:.4}},
- {k:'winStep1',n:'窗邊步道',line:'win',wt:3,room:'side',need:'side',x:146,y:64,face:1,poses:['sit','loaf'],w:{ban:1.1,mei:.8,tora:.6,mikan:.4,snow:.15}},
- {k:'winStep2',n:'窗邊步道',line:'win',wt:3,room:'side',need:'side',x:176,y:49,face:1,poses:['loaf','curl'],w:{mei:1.4,ban:1.1,tora:.7,mikan:.35,snow:.15}},
- {k:'winHammock',n:'窗邊吊床',line:'win',wt:4,room:'side',need:'side',x:239,y:46,face:1,poses:['curl','belly','loaf'],w:{snow:1.8,mikan:1.5,tora:.8,mei:.7,ban:.5}},
- {k:'winBed',n:'觀景圓窩',line:'win',wt:5,room:'side',need:'side',x:207,y:49,face:1,poses:['curl','loaf'],w:{tora:1.6,snow:1,mei:.8,mikan:.7,ban:.4}},
- {k:'winTop',n:'觀景平台',line:'win',wt:5,room:'side',need:'side',x:266,y:47,face:-1,poses:['loaf','curl'],w:{mei:1.6,ban:1.1,tora:.7,mikan:.3,snow:.2}},
+ {k:'winSeat1',n:'軟墊窗台',line:'win',tier:3,wt:2,room:'side',need:'side',x:256,y:71,face:1,poses:['loaf','curl','sit'],w:{snow:1.4,mikan:1.1,mei:.9,tora:.7,ban:.4}},
+ {k:'winSeat2',n:'軟墊窗台',line:'win',tier:3,wt:2,room:'side',need:'side',x:284,y:71,face:-1,poses:['curl','loaf'],w:{mikan:1.2,snow:1.1,tora:.7,mei:.7,ban:.4}},
+ {k:'winStep1',n:'窗邊步道',line:'win',tier:3,wt:3,room:'side',need:'side',x:146,y:64,face:1,poses:['sit','loaf'],w:{ban:1.1,mei:.8,tora:.6,mikan:.4,snow:.15}},
+ {k:'winStep2',n:'窗邊步道',line:'win',tier:3,wt:3,room:'side',need:'side',x:176,y:49,face:1,poses:['loaf','curl'],w:{mei:1.4,ban:1.1,tora:.7,mikan:.35,snow:.15}},
+ {k:'winHammock',n:'窗邊吊床',line:'win',tier:3,wt:4,room:'side',need:'side',x:239,y:46,face:1,poses:['curl','belly','loaf'],w:{snow:1.8,mikan:1.5,tora:.8,mei:.7,ban:.5}},
+ {k:'winBed',n:'觀景圓窩',line:'win',tier:3,wt:5,room:'side',need:'side',x:207,y:49,face:1,poses:['curl','loaf'],w:{tora:1.6,snow:1,mei:.8,mikan:.7,ban:.4}},
+ {k:'winTop',n:'觀景平台',line:'win',tier:3,wt:5,room:'side',need:'side',x:266,y:47,face:-1,poses:['loaf','curl'],w:{mei:1.6,ban:1.1,tora:.7,mikan:.3,snow:.2}},
  /* v2.3 STORY ARC 01: not for sale — Sophie brought it (see the Sophie × 寶寶 events). It appears in the shop only once it is here. */
  {k:'sophiepad',n:'小貓墊',cost:0,tier:1,ic:'cushion',room:'main',story:1,x:246,get y(){return FB-30},poses:['curl','loaf','sit'],d:'一塊小小的圓貓墊，灰米色、邊上一圈深一點的線。Sophie 帶來的，說是給店裡的。寶寶最常用。',w:{mei:5,snow:1.2,tora:.8,mikan:.7,ban:.5}},
 ];
