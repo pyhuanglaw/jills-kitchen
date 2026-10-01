@@ -119,3 +119,24 @@ On the player's Day 52 save, 小林 will not bring up the promotion again.
 Leo, who has not looked for a job yet in that save, will graduate once, later, after his job hunt.
 
 Test: `regulars_remember_their_life_not_replay_it` (the player's Day 52 save).
+
+## Addendum — another reader of `l` (found later the same day)
+
+The journal's 熟客 page also quoted a regular's line, as `l[tier]`.
+
+- After this audit, `l` holds habits only, and only Mia still has a third habit.
+- So on the page, every other tier-2 regular showed 「undefined」.
+- Found in the phone screenshots of the new Sophie / Mia portraits (commit f12b94f).
+
+The fix:
+
+- The page quotes the newest habit line the tier has unlocked: `regHabitLine`, the same pool `regTalk` draws from.
+- Leo's tier has no habit line any more (his student lines are moments), so he gets no quote.
+- `l` has no other reader: checked with a search for `.l[`.
+
+Test: `journal_pages_never_show_undefined` (every journal page on the Day 30, 46 and 52 saves).
+
+Seen on the same page, not part of this audit, and left for the next release: guest-book notes from V18.
+
+- 「吃了拿鐵咖啡」 uses 吃 for a drink.
+- 「香煎鴨胸，一如往常。」 can be written for a dish that is not the regular's usual.
