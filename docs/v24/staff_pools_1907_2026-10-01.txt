@@ -1,0 +1,173 @@
+(Filed verbatim. 2026-10-01 19:07, the player, during rc5 (the Second Floor). For rc5. Read with the Lounge staff of
+v2.3 Phase 5 and the 18:32 report (evan_and_sig_line_2026-10-01.txt).)
+
+【IMPORTANT — STAFF POOL ARCHITECTURE】
+
+請注意：這次不是單純替 crewCap() 增加幾個「限定職種 slot」。
+
+Jill’s Kitchen 的 Restaurant Staff 與 Lounge Bar Staff 必須視為兩個獨立的聘僱 pool / capacity domain。
+
+請不要把兩者最後仍然合併成同一個 generic crewCap。
+
+概念上必須區分：
+
+employmentPool:
+- restaurant
+- lounge
+
+以及：
+
+role:
+- chef
+- waiter
+- cleaner
+- bartender
+- etc.
+
+employmentPool 與 role 是兩個不同維度。
+
+例如：
+
+秀琴：
+employmentPool = restaurant
+role = cleaner
+
+Nina：
+employmentPool = restaurant
+role = waiter
+
+Evan：
+employmentPool = lounge
+role = bartender
+
+沈晴：
+employmentPool = lounge
+role = bartender
+
+阿拓：
+employmentPool = lounge
+role = bartender
+
+安安：
+employmentPool = lounge
+role = waiter
+
+許葳：
+employmentPool = lounge
+role = cleaner
+
+因此「waiter」本身不能用來判斷此人屬於 Restaurant 還是 Lounge；
+「cleaner」也不能用來判斷。
+
+────────────────────
+CAPACITY ISOLATION
+────────────────────
+
+Restaurant capacity 與 Lounge capacity 必須完全隔離。
+
+未來任何其他 Restaurant 空間、設備或升級增加員工容量，例如：
+
+- Kitchen expansion
+- Second Floor
+- Staff Room
+- 其他未來 Restaurant upgrade
+
+如果增加的是 Restaurant staff capacity，只能增加 restaurant employment pool 的可聘人數。
+
+不得因此增加 Lounge 可聘人數。
+
+反過來：
+
+Lounge I / Lounge II 所增加的 staff capacity，只能增加 lounge employment pool。
+
+不得增加 Restaurant chef / waiter / cleaner 的可聘人數。
+
+請特別避免這種實作：
+
+crewCap = baseRestaurantCap + loungeBonus + secondFloorBonus + otherBonus
+
+然後所有職種共用這個總數。
+
+這會造成不同空間的人力容量互相污染，是本次要避免的核心問題。
+
+────────────────────
+LOUNGE FIXED ROSTER
+────────────────────
+
+Lounge employment pool 是固定 named roster，不是 random recruitment pool。
+
+Lounge I：
+Bartender ×2
+- Evan 林奕文
+- 沈晴
+
+Lounge II 額外：
+Bartender ×1
+- 阿拓 黃柘
+
+Waiter ×1
+- 安安
+
+Cleaner ×1
+- 許葳，33歲
+
+因此目前完整 Lounge roster 上限就是 5 人。
+
+如果這五人全部已聘：
+
+Lounge recruitment = FULL
+
+不得再生成第六位 random bartender / waiter / cleaner。
+
+未來若要增加 Lounge staff，必須由未來明確的 Lounge expansion/design 新增 roster slot，而不是因 Restaurant capacity 上升自動增加。
+
+────────────────────
+WORK ASSIGNMENT ≠ EMPLOYMENT POOL
+────────────────────
+
+員工「在哪裡工作」與「從哪個聘僱 pool 加入」必須分開。
+
+Restaurant waiter / cleaner 可以依既有 duty system 支援 Lounge。
+
+例如：
+Restaurant cleaner 秀琴可以去 Lounge 清潔。
+Restaurant waiter Nina 可以在允許的情況下支援 Lounge 外場。
+
+這不會把她們變成 Lounge employees，也不會占用 Lounge-specific hiring slots。
+
+同樣地，不要為了做到跨區支援而重新把兩個 capacity pool 合併。
+
+Cross-zone work assignment is allowed.
+Cross-pool capacity sharing is NOT allowed.
+
+────────────────────
+LEGACY / FUTURE-PROOFING
+────────────────────
+
+請 audit 現有 crewCap() 與所有 upgrade bonus。
+
+我要避免的不只是目前 Lounge bug，而是未來新增 Second Floor、Staff Room 或其他空間後，再次發生 capacity 混用。
+
+如果現有架構只有單一 crew array，可以保留單一 crew collection，只要每位員工有可靠的 employmentPool / equivalent source-of-employment metadata，且 capacity validation 分開即可。
+
+不要為了這件事過度重構整個員工系統。
+
+目標是：
+最小、安全、可 migration、未來不會把不同空間的員工容量混在一起。
+
+────────────────────
+(19:11, the player, answering which job 阿拓 has — v2.3's card says Bar Food 料理員, the 19:07 list says Bartender:)
+
+可是我找不到新增員工有這個名稱的職務
+
+總之就是因為酒吧擴建的人只能讓我找到這幾個人 就直接把他們放在酒吧的員工名單不管你要叫什麼只會找到他們
+
+(The same minute: 許葳's character sheet — "Jill's Kitchen Lounge — Staff Profile: Xu Wei (許葳), 33歲, Taiwan Female,
+Fixed Cleaner": dark hair in a low ponytail, a dark grey work shirt with the sleeves rolled, a black waist apron, black
+trousers, 166 cm; faces: Neutral/Working, Small Smile, Mildly Amused, Deadpan/Already Done ("yes, it's already taken
+care of"); "Neutral, focused, 敏銳 (keenly observative)"; behaviour: pushing back a slightly askew chair without looking
+as she passes an empty table; quietly clearing empty glasses and coasters from a Lounge table. Kept as
+assets/portraits/src/sheet_xuwei_v24.jpg.)
+
+Reading taken: the Lounge's recruitment shows only its five named people. 阿拓 is one of them (Lounge II) and keeps
+v2.3's job, Bar Food in the kitchen, so the stories built on it stand.

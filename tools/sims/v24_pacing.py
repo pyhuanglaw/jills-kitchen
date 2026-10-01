@@ -6,6 +6,7 @@ the day each 怡君 / 秀琴阿姨 × Sophie-Mia / 《那面牆》 beat happened
   《那面牆》 begins               ~Day 62–66
   《那面牆》 settled               ~Day 75–82
   Second Floor era opens          ~Day 78–86   (two days after the settlement)
+  v2.4 P2 (AUDIT_AND_PLAN §7): era ~81–83 → U1 82–84 → U3 85–87 → U4 88–91 → U6 94–98
 
   python3 tools/sims/v24_pacing.py [days=36] [seedbase=7000] [save=tests/saves/player_day52.json]
 """
@@ -21,7 +22,11 @@ raw = json.load(open(SAVE)); raw = raw.get('save', raw)
 SEED = "Math.random=(function(){let a=%d;return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}})()"
 KEYS = ['yj_meet', 'yj_look', 'yj_three', 'yj_chose', 'yj_move', 'yj_key', 'yj_key_seen', 'xq_oh',
         'wall_worry', 'wall_call', 'wall_photos', 'wall_jill', 'wall_visit', 'wall_wang', 'wall_setback', 'wall_report', 'wall_fee', 'wall_prep',
-        'wall_mediation', 'wall_settle', 'wall_paid', 'wall_article', 'wall_paper', 'wall_fixed']
+        'wall_mediation', 'wall_settle', 'wall_paid', 'wall_article', 'wall_paper', 'wall_fixed',
+        # v2.4 P2: the Second Floor
+        'up_hint', 'up_staff', 'up_inspect', 'up_door', 'up_cats', 'sp_seat', 'sp_box', 'sp_stuff', 'up_busy', 'up_full', 'up_small', 'up_quiet',
+        'up_remind', 'up_ask', 'up_leak', 'up_lease', 'up_use', 'up_late']
+BUY_UP = os.environ.get('JK_BUY_UP') == '1'   # buy 二樓（整層） in the shop the first evening it is offered and affordable
 
 def main():
     t0 = time.time()
@@ -33,6 +38,8 @@ def main():
         g.ev("window.__fastSay=1")
         rows = []
         for d in range(DAYS):
+            if BUY_UP and g.ev("phase") in ('shop', 'summary') and g.ev("!!fact('up_ask')&&!upTaken()&&S.money>=UP_PROJ.cost"):
+                g.ev("buyUp();hideReveal&&hideReveal()"); print('  (bought the second floor)', flush=True)
             if g.ev("phase") == 'shop':
                 g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(120)
             if g.ev("phase") == 'summary':

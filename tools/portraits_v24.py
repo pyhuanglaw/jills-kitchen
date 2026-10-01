@@ -15,6 +15,8 @@ own background kept, nothing redrawn, stretched or recoloured) and packed by too
 - 秀琴阿姨's three expressions, supplied by the player at 14:27 (assets/portraits/src/sheet_xiuqin_tones_v24.jpg, the
   labels under each figure are left out): 心神不寧 (worried), 講電話 (phone), 「喔～～」 (oh). Her everyday portrait stays
   st23_xiuqin.
+- 許葳 (the Lounge's cleaner, a new person), supplied by the player at 19:11 (sheet_xuwei_v24.jpg): the large face is her
+  portrait; the four expressions are 工作中, 淺笑, 覺得好笑, 已經處理好了 (the labels are left out).
 
   python3 tools/portraits_v24.py && python3 tools/portraits.py
 """
@@ -33,6 +35,7 @@ YT = os.path.join(ROOT, 'assets', 'portraits', 'src', 'sheet_yijun_tones_v24.jpg
 WT = os.path.join(ROOT, 'assets', 'portraits', 'src', 'sheet_wang_tones_v24.jpg')     # 2026-10-01 14:35, the player: 王先生 等一下 / 淡淡的笑
 MT = os.path.join(ROOT, 'assets', 'portraits', 'src', 'sheet_mia_tone_v24.jpg')       # 2026-10-01 14:43, the player: Mia 認真看 (the photo of the wall on her phone)
 LT = os.path.join(ROOT, 'assets', 'portraits', 'src', 'sheet_landlord_v24.jpg')       # 2026-10-01 14:50, the player: 房東 (for the Second Floor) — 房東 / 平常 / 整層？
+XW = os.path.join(ROOT, 'assets', 'portraits', 'src', 'sheet_xuwei_v24.jpg')          # 2026-10-01 19:11, the player: 許葳, the Lounge's cleaner — the large face, and four expressions
 # (id, sheet, box, who / tone) — boxes in sheet px, found by the sheets' separators / the figures' ink
 CARDS = [
     ('v24_yj', YJ, (0, 0, 436, 572), '怡君'),
@@ -49,6 +52,11 @@ CARDS = [
     ('v24_landlord', LT, (133, 110, 900, 1150), '房東'),
     ('v24_landlord_talk', LT, (1018, 110, 1784, 1150), '房東 平常'),
     ('v24_landlord_surprised', LT, (1914, 107, 2680, 1150), '房東 整層？'),
+    ('v24_xuwei', XW, (420, 108, 690, 548), '許葳 (Neutral, focused, 敏銳)'),
+    ('v24_xuwei_work', XW, (708, 36, 966, 324), '許葳 Neutral/Working'),
+    ('v24_xuwei_smile', XW, (984, 36, 1244, 324), '許葳 Small Smile'),
+    ('v24_xuwei_amused', XW, (708, 352, 966, 640), '許葳 Mildly Amused'),
+    ('v24_xuwei_done', XW, (984, 352, 1244, 640), '許葳 Deadpan/Already Done'),
 ]
 
 

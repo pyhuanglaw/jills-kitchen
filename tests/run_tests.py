@@ -1754,9 +1754,9 @@ def economy_ops_duties_and_prices_v182(b, port, target):
     ACT(g, 'tab', k='works')   # v2.2 H: expansion, projects and the operations upgrades live under 店舖工程
     txt = g.ev("$('#screen').innerText")
     check('動線規劃' in txt and '後場整理區' in txt and '大菜單板' in txt and '門口候位區' in txt, 'operations upgrades are offered')   # v2.4 A1: 後場休息室 → 後場整理區
-    caps0 = g.ev("[crewCap(),queueMax(),menuCap(),flowMul('crew')]")
+    caps0 = g.ev("[restaurantCap(),queueMax(),menuCap(),flowMul('crew')]")
     for k in ['room', 'wait', 'board', 'flow']: ACT(g, 'buyOps', k=k)
-    caps1 = g.ev("[crewCap(),queueMax(),menuCap(),flowMul('crew')]")
+    caps1 = g.ev("[restaurantCap(),queueMax(),menuCap(),flowMul('crew')]")
     check(caps1[0] == caps0[0] + 2 and caps1[1] == caps0[1] + 2 and caps1[2] == caps0[2] + 2 and caps1[3] > caps0[3], f'operations change real capacity: {caps0} -> {caps1}')
     ACT(g, 'tab', k='staff')
     check('擴建後可再聘' not in g.ev("$('#screen').innerText"), 'staff copy is honest at the final level')
@@ -2050,13 +2050,13 @@ def purchases_change_the_place(b, port, target):
     the side room and the terrace add tables in their rooms; the tables count is honest everywhere."""
     g = Game(b, port, target, seed=27, manual=True)
     mature(g); g.click('[data-act=open]'); g.ev("S.phase='shop';save();showShop();shopTab='projects';showShop()")
-    base = json.loads(g.ev("JSON.stringify({crew:crewCap(),menu:menuCap(),fridge:fridgeCap(),q:queueMax(),burners:stoveSlots(S.eq.stove),tables:tablesTotal()})"))
+    base = json.loads(g.ev("JSON.stringify({crew:restaurantCap(),menu:menuCap(),fridge:fridgeCap(),q:queueMax(),burners:stoveSlots(S.eq.stove),tables:tablesTotal()})"))
     for k in ['terrace', 'pass', 'cooler', 'kext', 'side']:
         g.ev(f"doAct('buyProject',null,'{k}',null)"); g.ev("__tick(1800)")
         check(g.ev("!$('#reveal').hidden && $('#reveal').className==='done'"), f'no reveal card after buying {k}')
         g.ev("doAct('revealClose',null,null,null)")
         check(g.ev(f"projOn('{k}')"), f'{k} was not bought')
-    after = json.loads(g.ev("JSON.stringify({crew:crewCap(),menu:menuCap(),fridge:fridgeCap(),q:queueMax(),burners:stoveSlots(S.eq.stove),tables:tablesTotal()})"))
+    after = json.loads(g.ev("JSON.stringify({crew:restaurantCap(),menu:menuCap(),fridge:fridgeCap(),q:queueMax(),burners:stoveSlots(S.eq.stove),tables:tablesTotal()})"))
     check(after['crew'] == base['crew'] + 4 and after['menu'] == base['menu'] + 2 and after['fridge'] == base['fridge'] + 80 and after['q'] == base['q'] + 1 and after['burners'] == base['burners'] + 2, f'project effects wrong: {base} -> {after}')
     check(after['tables'] == base['tables'] + 3, f'the side room (2 booths) and the terrace (1 table) should add 3 tables: {base} -> {after}')
     g.ev("shopTab='projects';showShop()")

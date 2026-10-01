@@ -30,7 +30,7 @@ def v24_back_of_house_is_a_work_area_and_keeps_its_two(b, port, target):
     g = Game(b, port, target, seed=241, manual=True, viewport={'width': 390, 'height': 844})
     raw = load_save(g, 'player_day52.json')
     check(g.ev("opsLv('room')") == 1 and g.ev("OPS.find(o=>o.k==='room').n") == '後場整理區', 'the purchase is kept, under its new name')
-    check(g.ev("crewCap()") == 12 and g.ev("S.crew.length") == 12, 'the +2 is kept: the crew of twelve still fits')
+    check(g.ev("restaurantCap()") == 12 and g.ev("S.crew.length") == 12, 'the +2 is kept: the crew of twelve still fits')
     check(g.ev("S.money") == raw['money'], 'nothing refunded or charged')
     d = g.ev("OPS.find(o=>o.k==='room').d(1)")
     check('休息' not in d and '整理區' in d and '2 位員工' in d, f'work storage, +2: {d}')
@@ -574,4 +574,102 @@ def v24_the_day_is_held_for_the_beat_its_people_came_for(b, port, target):
     # grouped story visits keep their hour; the first of a group finds a room with a table for each
     out = json.loads(g.ev("JSON.stringify((()=>{const out=[];v24Visits(out,R.dur,()=>true);return out})())"))
     check(all(o.get('hold') for o in out if o.get('v24grp')), f'grouped visits are held at their hour: {out}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+def _hire(g, act, k):
+    g.ev("(()=>{const b=document.createElement('button');b.dataset.act='%s';b.dataset.k='%s';doAct('%s',null,'%s',b)})()" % (act, k, act, k))
+
+
+@test
+def v24_restaurant_and_lounge_staff_are_two_pools_that_never_share_places(b, port, target):
+    """rc5 (the player, 19:07–19:16; docs/v24/staff_pools_1907_2026-10-01.txt), on the player's Day 61 save (Lounge II,
+    twelve restaurant people, Evan and 沈晴): every employee has a pool; the restaurant's capacity comes from the
+    restaurant (level, 後場整理區, 側廳, 廚房擴建, 廚房二期) and the Lounge's from its roster (I: Evan, 沈晴; II: 阿拓,
+    安安, 許葳); one never adds to the other; the Lounge hires its five by name and nobody else; who works where stays
+    the duty board's (a restaurant server on the Lounge floor is still restaurant staff); it all survives a reload."""
+    g = Game(b, port, target, seed=271, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day61.json')
+    pools = json.loads(g.ev("JSON.stringify(Object.fromEntries(S.crew.map(m=>[m.name,m.pool])))"))
+    check(pools['Evan'] == 'lounge' and pools['沈晴'] == 'lounge' and all(v == 'restaurant' for k, v in pools.items() if k not in ('Evan', '沈晴')), f'migrated: {pools}')
+    check(g.ev("restaurantCap()") == 12 and g.ev("poolCrew('restaurant').length") == 12, 'the restaurant: level 5 (6) + 後場整理區 + 側廳 + 廚房擴建 (2 each) = 12, all taken')
+    check(g.ev("loungeCap()") == 5 and g.ev("poolCrew('lounge').length") == 2, 'the Lounge: its roster at II is five; two hired')
+    g.ev("S.money+=500000")
+    n = g.ev("S.crew.length"); _hire(g, 'hire', 'waiter')
+    check(g.ev("S.crew.length") == n, 'the restaurant is full: no waiter, though the Lounge has three open places')
+    _hire(g, 'hire', 'bartender')
+    check(g.ev("S.crew.length") == n, 'nobody is hired as a generic bartender')
+    for nm in ['阿拓', '安安', '許葳']:
+        _hire(g, 'hireLounge', nm)
+    got = json.loads(g.ev("JSON.stringify(poolCrew('lounge').map(m=>[m.name,m.role]))"))
+    check(sorted(got) == sorted([['Evan', 'bartender'], ['沈晴', 'bartender'], ['阿拓', 'chef'], ['安安', 'waiter'], ['許葳', 'cleaner']]), f'the five, by name: {got}')
+    check(g.ev("poolCrew('restaurant').length") == 12 and g.ev("restaurantCap()") == 12, 'hiring the Lounge took no restaurant place')
+    n = g.ev("S.crew.length"); _hire(g, 'hireLounge', '阿拓'); _hire(g, 'hire', 'chef')
+    check(g.ev("S.crew.length") == n, 'full on both sides: no sixth Lounge person, no thirteenth restaurant one')
+    # the restaurant's works add restaurant places only, the Lounge's works Lounge places only
+    l0, r0 = g.ev("loungeCap()"), g.ev("restaurantCap()")
+    g.ev("S.rooms.kitchen2=1")
+    check(g.ev("restaurantCap()") == r0 + 2 and g.ev("loungeCap()") == l0, '廚房二期: +2 for the restaurant, nothing for the Lounge')
+    g.ev("S.rooms.up=1;S.rooms.lounge=3")
+    check(g.ev("restaurantCap()") == r0 + 2 and g.ev("loungeCap()") == l0, 'the second floor and Lounge III add no places at all (nothing mechanical; no new names)')
+    g.ev("S.rooms.lounge=1")
+    check(g.ev("loungeCap()") == 2 and g.ev("restaurantCap()") == r0 + 2, 'Lounge I alone: two Lounge places; the restaurant unchanged')
+    g.ev("S.rooms.lounge=2;delete S.rooms.up;delete S.rooms.kitchen2")
+    # where they work is the board's: a restaurant server on the Lounge floor stays restaurant staff; 安安 works both
+    g.ev("(()=>{const m=S.crew.find(m=>m.name==='Nina');m.duties=Object.assign({},waiterDuties(m),{lounge:true})})()")
+    check(g.ev("crewPool(S.crew.find(m=>m.name==='Nina'))") == 'restaurant' and g.ev("waiterDuties(S.crew.find(m=>m.name==='Nina')).lounge") is True, 'Nina works the Lounge floor and is still restaurant staff')
+    check(g.ev("(()=>{const m=S.crew.find(m=>m.name==='安安');const d=waiterDuties(m);return d.lounge&&d.seat&&d.order})()") is True, '安安: the Lounge floor, and seating and orders anywhere')
+    # the shop says it, the manual says it
+    g.ev("showShop();shopTab='staff';showShop()"); g.page.wait_for_timeout(80); txt = g.ev("document.querySelector('#screen').innerText")
+    check('餐廳員工 12/12' in txt and 'Lounge 員工 5/5' in txt and 'Lounge 名單' in txt and 'Lounge 的人都到齊了' in txt, 'the staff page shows two pools')
+    check('阿拓 黃柘' in txt and 'Bar Food 料理員' in txt and '許葳' in txt, 'the roster by name and job')
+    check(g.ev("GUIDE.some(s=>s.pts.some(e=>e[0]==='員工'&&/Lounge 名單/.test(e[1])&&/互不佔用/.test(e[1])))") is True, 'the manual explains the two lists')
+    # 許葳: her portrait, her faces, her look (not Jill's tail)
+    check(g.ev("!!portraitOf('staff:許葳')&&!!portraitOf('staff:許葳','done')&&!!portraitOf('staff:許葳','smile')") is True, '許葳 has her portrait and expressions')
+    L = json.loads(g.ev("JSON.stringify(crewLook(S.crew.find(m=>m.name==='許葳')))"))
+    check(L['hs'] != 4 and L['top'] == '#4A4845', f'her look, from the sheet: {L}')
+    # it all survives a reload
+    g.ev("save()"); g.reload(); g.page.wait_for_timeout(150)
+    g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(150)
+    check(g.ev("poolCrew('lounge').length") == 5 and g.ev("poolCrew('restaurant').length") == 12, 'kept across a reload')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_an_old_shared_cap_save_keeps_everyone_and_waits(b, port, target):
+    """rc5 migration: before the split, the Lounge's +2 and +2 were added to one shared cap, so a save can hold more
+    restaurant people than the restaurant's own places, and 安安 / 阿拓 were hired as a plain waiter / chef. Nobody is
+    fired: 安安 and 阿拓 are the Lounge's by name; the restaurant shows over its number and hires again only below it."""
+    g = Game(b, port, target, seed=272, manual=True, viewport={'width': 390, 'height': 844})
+    raw = json.load(open(os.path.join(ROOT, 'tests', 'saves', 'player_day61.json'), encoding='utf-8')); raw = raw.get('save', raw)
+    raw['crew'] = raw['crew'] + [{'id': 'old1', 'role': 'chef', 'name': '老周師傅', 'lv': 2, 'duty': 'stove'}, {'id': 'old2', 'role': 'waiter', 'name': '安安', 'lv': 3, 'duty': 'both', 'duties': {'seat': True, 'order': True, 'lounge': True}}, {'id': 'old3', 'role': 'chef', 'name': '阿拓', 'lv': 2, 'duty': 'bar'}]
+    g.ev("phase='title';R=null;localStorage.setItem(KEY,JSON.stringify(%s))" % json.dumps(raw, ensure_ascii=False)); g.reload(); g.page.wait_for_timeout(150)
+    g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(150)
+    check(g.ev("S.crew.length") == 17, 'nobody was fired')
+    check(g.ev("crewPool(S.crew.find(m=>m.name==='安安'))") == 'lounge' and g.ev("crewPool(S.crew.find(m=>m.name==='阿拓'))") == 'lounge', '安安 and 阿拓 are the Lounge\'s')
+    check(g.ev("poolCrew('restaurant').length") == 13 and g.ev("restaurantCap()") == 12, 'the restaurant: 13 of 12')
+    g.ev("S.money+=500000"); n = g.ev("S.crew.length"); _hire(g, 'hire', 'cleaner')
+    check(g.ev("S.crew.length") == n, 'over its number, the restaurant does not hire')
+    g.ev("showShop();shopTab='staff';showShop()"); g.page.wait_for_timeout(80); txt = g.ev("document.querySelector('#screen').innerText")
+    check('餐廳員工 13/12' in txt and '比上限多' in txt and '大家都留著' in txt, 'the page says why')
+    _hire(g, 'hireLounge', '許葳')
+    check(g.ev("poolCrew('lounge').length") == 5, 'the Lounge still hires its own')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_a_guest_who_came_for_the_signature_says_so_rarely_and_in_different_words(b, port, target):
+    """rc5 (the player, 18:32: 「一堆npc一直重複是為了Jill招牌菜來的」): of the guests who come for the signature, one
+    every few minutes at most says it, in different words with the dish's name, never the same sentence twice running,
+    never a named guest (周董 is himself); and the evening's dice are where they were (the line is picked by a hash)."""
+    g = Game(b, port, target, seed=273, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day61.json')
+    to_service(g)
+    g.ev("window.__fs=[];const q0=quote;quote=function(gr,txt){if(gr&&gr.forSig&&(forSigLines().includes(txt)||/專程為了/.test(txt)))__fs.push({t:txt,named:!!namedId(gr)});return q0.apply(this,arguments)}")   # the line at the door (the 25% line when the dish arrives is its own, already rate-limited)
+    g.ev("for(let i=0;i<14;i++){spawn({t:R.t,type:['office','couple','gourmet','vip'][i%4],size:1,forSig:true});R.t+=12;for(let k=0;k<40;k++)__tick(1000/30)}")
+    fs = json.loads(g.ev("JSON.stringify(__fs)"))
+    check(1 <= len(fs) <= 3, f'one in a while, not every one of fourteen: {fs}')
+    check(not any(x['named'] for x in fs), f'never a named guest: {fs}')
+    check(all('『' in x['t'] for x in fs) and all('我是專程為了' not in x['t'] for x in fs), f'the dish by its name, not the old sentence: {fs}')
+    check(all(fs[i]['t'] != fs[i + 1]['t'] for i in range(len(fs) - 1)), f'not the same twice running: {fs}')
     check(not g.errors, g.errors[:3]); g.close()
