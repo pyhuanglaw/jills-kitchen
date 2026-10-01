@@ -40,4 +40,5 @@ due); the day itself is played by the bot and photographed as it happens.
   (both tests not yet in step with the new data: twenty-five staff portraits now; the player's Day 61 save already
   has v2.4 story facts).
 - `rerun_after_fix.log` — those two and the manual test after the update: 3 passed.
-- `full_run_final.log` — the whole suite on the release code.
+- `full_run_2.log` — the whole suite after those updates: 151 passed, 0 failed.
+- `full_run_final.log` — the whole suite on the release commit (92751b0): 151 passed, 0 failed.

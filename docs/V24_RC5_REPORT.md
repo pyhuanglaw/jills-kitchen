@@ -224,8 +224,14 @@ gate holding, not the day a person would get there.
 ## 11. Tests and regression
 
 - New in rc5 (all in `tests/v24_tests.py`): the pools (two), the signature line, the steppers, the Second Floor (four).
-- `docs/evidence/v24_rc5/full_run.log` — the whole suite on the release code: RESULT_PLACEHOLDER
-- Goldens: GOLDEN_PLACEHOLDER
+- `docs/evidence/v24_rc5/full_run.log` — the whole suite during the evidence pass: 149 passed, 2 failed — both tests
+  behind the new data (twenty-five staff portraits now, not twenty-four; the player's Day 61 save already has v2.4 story
+  facts, which the load test took for fabricated). Updated: the portrait count, and the load test now checks that a
+  save's v2.4 facts come back exactly as saved (none for a save from before v2.4). `rerun_after_fix.log`: 3 passed.
+- `full_run_2.log` — the whole suite after those updates: 151 passed, 0 failed.
+- `full_run_final.log` — the whole suite on the release commit (92751b0): **151 passed, 0 failed**.
+- Goldens: not re-recorded. `golden_scenario` and `golden_frames` pass unchanged — their two fresh days have no
+  employee whose look changed (秀琴阿姨's was already hers) and never reach the second floor or the Lounge.
 
 ## 12. For the player to look at (O)
 
