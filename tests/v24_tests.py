@@ -1137,3 +1137,99 @@ def v24_rc6_one_tab_for_the_floor_and_old_saves_get_nothing(b, port, target):
     check(seen == ['staff', 'pdr', 'up'], f'round the floor\'s rooms: {seen}')
     check(g.ev("document.querySelector('#roomTabs [data-room=upgrp] span').textContent") == '二樓', 'labelled with where you are')
     check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc6_cats_visit_the_rooms_and_leave(b, port, target):
+    """rc6 H, AD, AT (cats, low frequency, no pathing trouble): a cat that follows the crew into the Staff Room sleeps on
+    the sofa a while and comes back down; the Private Dining Room, empty, is one of the rare places up there — never on
+    an evening it is kept, never with a table in it; a cat inside walks out by the door when a party comes; both come
+    home; the open floor is still where the cats mostly are."""
+    g = Game(b, port, target, seed=298, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day61.json')
+    _floor(g, 50); g.ev(PD_OPEN)
+    g.ev("(()=>{const p=pdW();p.ever=3;p.res={id:'r'+S.day,d:S.day,size:5,min:3800,kind:'x',type:'family',name:'x',t:.9,status:'missed',phase:1}})()")
+    _quiet(g); to_service(g)
+    g.ev("__botUntil('R.t>=R.dur*.1',90000,1/30)")
+    g.ev("window.__pdT=pdTableFor;pdTableFor=()=>false")   # nobody else at the table while she is tested
+    check(g.ev("pdFreeForCat()") is True, 'the room is empty and nobody booked it')
+    picks = g.ev("(()=>{const c=CATS[0];let n=0;for(let i=0;i<600;i++)if(upCatSpot(c).room==='pdr')n++;return n})()")
+    check(10 <= picks <= 120, f'a rare place, not the usual one: {picks}/600')
+    cid = g.ev("(()=>{const c=CATS.find(o=>freeFloorCat(o));upCatForce(c);upCatUp(c,{room:'pdr',x:220,y:118,face:1,pose:'sit',t:12});return c.def.id})()")
+    W = lambda cond, n=2500: g.ev(f"(()=>{{const c=catBy('{cid}');for(let i=0;i<{n};i++){{if({cond})return i;__tick(100)}}return -1}})()")
+    check(W("c.away==='pdr'&&!c.upTo") >= 0, 'in the Private Dining Room, by the window')
+    g.ev("setRoom('pdr');forceDraw=true;__tick(1000/30)")
+    check(W("c.away!=='pdr'") >= 0 and W("!upCatBusy(c)") >= 0, 'out by the door and down the stairs, by herself')
+    g.ev(f"(()=>{{const c=catBy('{cid}');upCatForce(c);upCatUp(c,{{room:'pdr',x:240,y:118,face:-1,pose:'loaf',t:600}})}})()")
+    check(W("c.away==='pdr'&&!c.upTo") >= 0, 'in again, for a long nap')
+    g.ev("pdSeated({size:5,pdWalk:1},pdTable())")
+    check(W("c.away!=='pdr'", 400) >= 0, 'a party comes: she walks out (no vanishing)')
+    check(W("!upCatBusy(c)") >= 0, 'and comes home')
+    g.ev("pdTableFor=window.__pdT;pdW().res.status='booked';pdW().res.t=.99")
+    check(g.ev("pdFreeForCat()") is False and g.ev("(()=>{const c=CATS[0];let n=0;for(let i=0;i<300;i++)if(upCatSpot(c).room==='pdr')n++;return n})()") == 0, 'a kept evening: never')
+    # the Staff Room: after the crew, a nap on the sofa
+    g.ev("(()=>{const s=srW();s.bought=S.day-30;s.done=S.day-29})()")
+    sid = g.ev("(()=>{const c=CATS.find(o=>freeFloorCat(o));const c0=R.closing;R.closing=40;R.srCatId=c.def.id;const sp=upCatSpot(c);R.closing=c0;upCatForce(c);upCatUp(c,Object.assign(sp,{t:8}));return sp.room+'|'+c.def.id})()")
+    check(sid.startswith('staff|'), f'the Staff Room spot after the crew: {sid}')
+    cid = sid.split('|')[1]
+    W2 = lambda cond, n=2500: g.ev(f"(()=>{{const c=catBy('{cid}');for(let i=0;i<{n};i++){{if({cond})return i;__tick(100)}}return -1}})()")
+    check(W2("c.away==='staff'&&!c.upTo") >= 0, 'on the sofa')
+    g.ev("setRoom('staff');forceDraw=true;__tick(1000/30)")
+    check(W2("!upCatBusy(c)") >= 0, 'and back down')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc6_the_open_floor_keeps_its_ways(b, port, target):
+    """rc6 B, AT (circulation): with both rooms the open floor keeps the stairs, the middle, the column, the right window
+    and the corner nobody has decided; the people walk from the stairs to each door and back round the column, never
+    through a wall; the floor's view still draws its furniture and the cut walls."""
+    g = Game(b, port, target, seed=299, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day61.json')
+    _floor(g, 50); g.ev(PD_OPEN)
+    g.ev("(()=>{const p=pdW();p.ever=3;p.res={id:'r'+S.day,d:S.day,size:5,min:3800,kind:'x',type:'family',name:'x',t:.9,status:'missed',phase:1}})()")
+    z = json.loads(g.ev("JSON.stringify((()=>{const P=UPR.pd,Q=UPR.sr,in_=(r,x,y)=>x>=r.x0&&x<=r.x1&&y>=r.y0&&y<=r.y1;const s=UP_L.stair,col=UP_L.col,win=UP_L.win[1],e=UP_L.entry;return{stairs:!in_(P,s.x,s.y)&&!in_(Q,s.x,s.y)&&!in_(P,s.x+s.w,s.y+s.h),col:!in_(P,col.x,col.base)&&!in_(Q,col.x,col.base),win:win.x>P.x1,entry:!in_(P,e.x,e.y)&&!in_(Q,e.x,e.y),corner:!in_(Q,UP_ZONES.undecided.x+UP_ZONES.undecided.w,UP_ZONES.undecided.y+UP_ZONES.undecided.h-1)||Q.y1<UP_ZONES.undecided.y+UP_ZONES.undecided.h}})())"))
+    check(all(z.values()), f'the open floor keeps its parts: {z}')
+    _quiet(g); to_service(g)
+    g.ev("__botUntil('R.t>=R.dur*.1',90000,1/30)")
+    # a walker from the stairs to each door and back: every step outside the rooms' boxes while on the floor
+    for dest in ('staff', 'pdr'):
+        r = json.loads(g.ev(f"""JSON.stringify((()=>{{const P=UPR.pd,Q=UPR.sr,inn=(r,x,y)=>x>r.x0+2&&x<r.x1-2&&y>r.y0+2&&y<r.y1-2;const w={{room:'up',x:UP_L.entry.x,y:UP_L.entry.y-4,troom:'{dest}',tx:200,ty:{'srY(.5)' if dest=='staff' else 'pdY(.25)'},step:0,moving:false}};let bad=0,n=0;
+          for(;n<3000;n++){{if(stepTo(w,105/30))break;if(w.room==='up'&&(inn(P,w.x,w.y)||inn(Q,w.x,w.y)))bad++}}const there=w.room==='{dest}';w.troom='up';w.tx=UP_L.entry.x;w.ty=UP_L.entry.y-4;let m=0;for(;m<3000;m++){{if(stepTo(w,105/30))break;if(w.room==='up'&&(inn(P,w.x,w.y)||inn(Q,w.x,w.y)))bad++}}return{{there,back:w.room==='up',bad,n,m}}}})())"""))
+        check(r['there'] and r['back'] and r['bad'] == 0 and r['n'] < 3000 and r['m'] < 3000, f'stairs → {dest} → stairs, never through a wall: {r}')
+    check(g.ev("setRoom('up');forceDraw=true;__tick(1000/30);room") == 'up', 'the floor draws')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc6_a_booked_party_comes_eats_and_pays(b, port, target):
+    """rc6 R–W, Z, AR (played for real, lazily): the booking on the prep screen in the day's news, the party arriving at
+    its time, seated at the long table upstairs, ordering as people do, eating, paying — the bill never below the
+    minimum — and the day's summary saying so."""
+    g = Game(b, port, target, seed=300, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day61.json')
+    _floor(g, 50); g.ev(PD_OPEN)
+    g.ev("(()=>{const p=pdW();p.ever=0;p.dry=0;delete p.res})()")
+    if g.ev("phase") == 'shop':
+        g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(200)
+    else:
+        g.ev("IDLE=null;showPrep()"); g.page.wait_for_timeout(150)
+    r = json.loads(g.ev("JSON.stringify(pdRes())"))
+    check(r and r['status'] == 'booked' and 4 <= r['size'] <= 6, f'the second evening: booked ({r})')
+    news = g.ev("(document.querySelector('#screen .event.pdres')||{}).textContent||''")
+    check('今晚｜私人包廂｜已預約' in news and f"{r['size']} 位" in news and '最低消費' in news, f'in the day\'s news: {news}')
+    box = g.ev("(()=>{const e=document.querySelector('#screen .event.pdres');if(!e)return null;const a=e.getBoundingClientRect(),s=e.querySelector('span').getBoundingClientRect();return[a.right<=390,s.right<=a.right+0.5,e.scrollWidth<=e.clientWidth+1]})()")
+    check(box == [True, True, True], f'readable at 390 wide, nothing clipped: {box}')
+    _quiet(g); to_service(g)
+    g.ev(f"__botUntil(\"pdRes().status==='done'||R.closing!=null&&R.closing>60\",400000,1/30)")
+    st = json.loads(g.ev("JSON.stringify(pdRes())"))
+    check(st['status'] == 'done' and st['min'] == r['min'] and st['actual'] > 0, f'came, ate, paid: {st}')
+    g.ev("__botUntil('phase!==\"service\"',400000,1/30)")
+    for _ in range(40):
+        if g.ev("phase") == 'summary': break
+        g.ev("while(typeof DLG!=='undefined'&&DLG)dlgNext()"); g.ev("__tick(1000)")
+    s = json.loads(g.ev("JSON.stringify(S.lastSummary&&S.lastSummary.pd)"))
+    check(s and s['n'] >= 1 and s['res'] == 1 and s['top'] == max(0, r['min'] - st['actual']), f'the summary: {s} (min {r["min"]}, ate {st["actual"]})')
+    chips = g.ev("[...document.querySelectorAll('#screen .chips span')].map(e=>e.textContent).join('|')")
+    check('包廂' in chips, f'and the chip on the summary: {chips}')
+    check(not g.errors, g.errors[:3]); g.close()
