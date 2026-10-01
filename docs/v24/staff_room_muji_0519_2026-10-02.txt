@@ -1,0 +1,380 @@
+(Filed verbatim. 2026-10-02 05:19, the player, with three pictures: docs/v24/refs/staff_room_muji_ref1_0519_2026-10-02.jpg (REFERENCE 1), staff_room_muji_ref2_0519_2026-10-02.jpg (REFERENCE 2), staff_room_muji_ref3_0519_2026-10-02.png (REFERENCE 3). This replaces refs/staff_room_stages_reference for the Staff Room's look; the room's story, phases, use and state stay.)
+
+請直接修改目前的 Staff Room（員工休息室）實作與視覺，不要只做分析或提出方案。完成後自行做 mobile screenshot QA、必要修正與 regression。
+
+這次有兩個核心要求：
+1. 員工休息室必須在玩家感知上是「獨立房間 / 獨立 scene」。
+2. Staff Room 的室內設計全面改成我附上的三張 reference 所共同呈現的明亮、溫暖、淺色 MUJI-inspired 方向。
+
+━━━━━━━━━━━━━━━━━━
+A. Staff Room 必須是獨立房間
+━━━━━━━━━━━━━━━━━━
+
+目前即使程式架構上 Staff Room 已經是獨立 room，玩家進入後仍然看到上方 Restaurant 的主區域 navigation，而且「二樓」仍呈 active/highlight 狀態。
+
+這會讓玩家感覺：
+「我仍然站在二樓，只是切換到二樓的一個顯示區域。」
+
+這不是我要的體驗。
+
+我要的世界關係是：
+
+Restaurant
+→ Second Floor Commons
+→ 點擊 Staff Room 的實體門
+→ 進入 Staff Room 獨立 full-screen scene
+→ 返回時才回到 Second Floor Commons
+
+因此，進入 Staff Room 後：
+
+- 不要繼續把「二樓」顯示成目前所在 tab。
+- Staff Room 自己就是目前 location。
+- 玩家應明確知道自己已經「進入一個房間」，不是仍在二樓 overview。
+- Staff Room 畫面標籤直接顯示：
+  「員工休息室」
+- 可以有「‹ 二樓」作為返回入口 / back navigation。
+- 如果 Restaurant 主 navigation 在這個 scene 沒有必要，可以直接隱藏，不必硬保留「店門口／主廳／側廳／二樓／Lounge／廚房」整排 tabs。
+- 不要為了保留既有 navigation architecture 而犧牲房間感。
+- 返回 Second Floor 後，才重新顯示二樓的正常 navigation。
+
+同樣維持既有 architecture：
+Second Floor overview 只負責表示 Staff Room 位於二樓的哪裡，以及它的門／入口。
+Staff Room 裡面的家具、員工、活動全部只在 Staff Room full-screen scene 中呈現。
+不要把 Staff Room interior 再縮小畫回 Second Floor overview。
+
+一句話：
+
+「二樓」是 Staff Room 的所在樓層，不是 Staff Room 畫面的 location label。
+進門之後，玩家所在的位置就是「員工休息室」。
+
+━━━━━━━━━━━━━━━━━━
+B. 三張 reference 的使用方式
+━━━━━━━━━━━━━━━━━━
+
+我附上的三張圖片共同構成 Staff Room 的正式 visual specification。
+
+它們不是「大概參考一下的 mood board」。
+
+請從三張 reference 中整合：
+- sofa / lounge zone
+- material palette
+- furniture language
+- lighting
+- wood tone
+- rug
+- storage integration
+- communal table / eating area
+- spatial layering
+
+不需要一比一複製任何一張，但最終房間必須明顯屬於同一個 design language。
+
+其中：
+
+REFERENCE 1：
+主要參考完整空間配置與「休息區 + 其他功能區」共存的方式。
+Staff Room 不能只有沙發，也必須是真正能讓員工吃東西、喝咖啡、放私人物品、短暫休息的地方。
+
+REFERENCE 2：
+主要參考 communal table、窗邊座位、built-in storage / kitchenette 的整合方式。
+功能設備不要像現在一樣一件一件孤立沿牆排放。
+
+REFERENCE 3：
+是 sofa / lounge zone 最重要的 reference。
+尤其保留：
+- low-profile sofa
+- oatmeal / light greige upholstery
+- pale natural wood frame
+- pale wood coffee table
+- off-white textured rug
+- light wood architectural details
+- soft warm light
+- calm residential comfort
+
+這個 sofa zone 必須讓人第一眼覺得：
+「員工下班或休息時真的會想坐在這裡。」
+
+不是 corporate break room。
+不是辦公室休息區。
+不是員工更衣室。
+也不是廉價公共空間。
+
+━━━━━━━━━━━━━━━━━━
+C. COLOR / MATERIAL — HARD RULE
+━━━━━━━━━━━━━━━━━━
+
+Staff Room 整體 palette 嚴格限制為：
+
+- warm white
+- off-white
+- ivory
+- oatmeal
+- very light greige
+- very light warm gray
+- pale natural oak
+- pale ash wood
+
+木材必須是：
+very light, low-saturation natural oak / ash。
+
+不要黃橘。
+不要紅。
+不要深咖啡。
+
+以下大型視覺元素禁止：
+
+- dark sofa
+- dark green sofa
+- dark gray sofa
+- black sofa
+- green carpet
+- dark carpet
+- dark wood floor
+- reddish/orange wood floor
+- walnut furniture
+- dark brown furniture
+- black large cabinet
+- large dark visual blocks
+
+植物可以保留自然綠色。
+小型電器、把手、五金可以有少量灰色／深色細節，但不能形成主要視覺色塊。
+
+我不要「深色家具 + 木頭」的 cozy。
+我要的是：
+
+LIGHT + SOFT + WARM + NATURAL。
+
+━━━━━━━━━━━━━━━━━━
+D. FLOOR / RUG
+━━━━━━━━━━━━━━━━━━
+
+目前偏橘／紅棕的木地板不要保留。
+
+改成：
+very pale natural oak / ash flooring，
+低黃度、低飽和、明亮。
+
+Sofa zone 可以使用 rug，但必須是：
+
+- ivory
+- oatmeal
+- light greige
+- subtle woven / textured fabric
+
+絕對不要綠色地毯。
+
+地毯不要像遊戲中的 rectangular zone marker。
+它應該自然地把 sofa + coffee table + lounge chairs 組成一個舒服的小區域。
+
+━━━━━━━━━━━━━━━━━━
+E. FURNITURE / SPACE LAYOUT
+━━━━━━━━━━━━━━━━━━
+
+不要再做成「一大塊地毯中央站 NPC，家具全部貼牆」的配置。
+
+Staff Room 應該自然形成至少三種使用方式，但不要在 UI 上標示分區：
+
+1. SOFA / LOUNGE ZONE
+
+這是整個 Staff Room 的視覺核心。
+
+配置：
+- 一張寬、低、舒服的 oatmeal / light greige fabric sofa
+- 1–2 張 pale wood + light fabric lounge chairs
+- 大而低的 pale wood coffee table
+- ivory / oatmeal textured rug
+- floor lamp / wall light / soft indirect light
+- 少量植物
+- 可以有靠墊，但保持白、米、淺灰系
+
+這裡要可以自然容納：
+- 兩三個員工聊天
+- 一個員工自己休息
+- 有人喝東西
+- 貓低頻進來睡沙發／待在附近
+
+不要讓 sofa zone 看起來像展示家具。
+
+2. COMMUNAL TABLE / STAFF MEAL ZONE
+
+另外設置一張 4–6 人尺度的 pale wood table。
+
+用途：
+- 員工餐
+- 喝咖啡
+- Nina / Hugo / 其他員工聊天
+- 一個人坐著吃東西
+- Staff Lives 未來 ambient scene
+
+椅子同樣維持 pale wood / light neutral upholstery。
+
+不要做成會議室。
+不要做成辦公桌。
+它就是員工可以坐下來吃飯、喝東西、聊天的一張舒服桌子。
+
+3. STORAGE / LOCKER / KITCHENETTE ZONE
+
+置物櫃一定要保留。
+
+但不要使用：
+- 灰色辦公室鐵櫃
+- industrial locker
+- school locker aesthetic
+- gym changing-room aesthetic
+
+改成 built-in pale wood employee lockers。
+
+最好靠近入口／其中一側牆面，整合成完整 cabinetry。
+
+可以包含：
+- 個人 locker
+- open cubbies
+- coat hooks
+- bag storage
+- small shelf
+
+每個 locker 可以有非常低調的小把手／姓名標示，但不要像學校置物櫃。
+
+另一側整合 kitchenette / storage wall：
+
+- small refrigerator
+- water
+- coffee machine
+- cups
+- shelves
+- basic storage
+
+設備應嵌入／整合在 pale wood + warm-white cabinetry 中。
+
+不要把：
+locker / fridge / coffee machine / cabinet / water
+全部像遊戲 props 一樣各自孤立地排在牆邊。
+
+它們必須看起來像室內設計的一部分。
+
+━━━━━━━━━━━━━━━━━━
+F. ARCHITECTURAL DETAILS
+━━━━━━━━━━━━━━━━━━
+
+不要只換家具。
+
+Reference 中「房間本身」也有設計。
+
+可以使用：
+
+- pale wood slats / screens
+- pale wood window framing
+- warm-white walls
+- light wood built-ins
+- soft curtains / sheer curtains
+- restrained ceiling wood details
+- soft wall lights
+- warm indirect lighting
+- large window / natural-light feeling where existing architecture permits
+
+整體要有：
+soft daylight + warm practical lighting。
+
+不要整間黃橘色。
+不要做成日本旅館。
+不要做成和室。
+不要榻榻米。
+不要日式主題裝飾。
+
+這是 contemporary warm minimal / MUJI-inspired staff lounge，
+不是「Japanese-themed room」。
+
+━━━━━━━━━━━━━━━━━━
+G. STAFF ROOM 必須仍然像有人工作生活過
+━━━━━━━━━━━━━━━━━━
+
+不要因為追求 MUJI aesthetic，把它做成沒有人碰過的 showroom。
+
+Staff Room 仍然需要：
+- lockers
+- bags / coats（依既有 phase / state）
+- cups
+- fridge
+- coffee / water
+- small everyday objects
+- employee belongings
+- Staff Lives 已合法解鎖的 persistent objects
+
+但這些東西必須融入整體設計。
+
+Phase I 就必須是漂亮、完整、舒服的房間。
+
+Phase II / III 是同一個房間逐漸變得：
+- 更完整
+- 更 lived-in
+- 更有員工自己的物品
+- 更舒服
+- 更多 shared history
+
+不是：
+Phase I 醜 → Phase II 普通 → Phase III 才漂亮。
+
+不要改變核心 material language。
+三個 phase 都維持：
+warm white + oatmeal + light gray + pale oak/ash。
+
+━━━━━━━━━━━━━━━━━━
+H. 不要改壞既有功能
+━━━━━━━━━━━━━━━━━━
+
+這次主要是：
+1. Staff Room scene identity / navigation correction
+2. Staff Room visual redesign
+3. furniture layout / spatial composition correction
+
+保留既有：
+- Staff Room independent scene architecture
+- staff ambient usage
+- staff entry / exit
+- Restaurant / Lounge employmentPool separation
+- cats low-frequency access
+- Staff Lives hooks
+- phase progression
+- save compatibility
+- existing legitimate story state
+
+不要因為美術修改重寫不必要的 systems。
+
+━━━━━━━━━━━━━━━━━━
+I. MOBILE QA
+━━━━━━━━━━━━━━━━━━
+
+完成後請用 mobile viewport 實際 screenshot 檢查，而不是只看 code。
+
+我要確認：
+
+1. 一進房間就明確知道目前位置是「員工休息室」。
+2. 不會因為「二樓」tab highlight 而誤認仍在 Second Floor overview。
+3. Sofa zone 是第一眼最舒服、最有吸引力的區域。
+4. 沒有任何大型深色家具。
+5. 沒有綠色地毯。
+6. 沒有橘紅木地板。
+7. Locker 清楚存在，但不像辦公室／學校／健身房。
+8. Fridge / coffee / storage 是整合式，而非 props 排隊。
+9. 4–6 人桌與 sofa zone 都能在手機上清楚辨識。
+10. NPC 在不同活動區使用空間，而不是全部站在一大塊地毯中央。
+11. 房間看起來 warm / bright / comfortable / lived-in。
+12. Phase I 本身就已經漂亮；Phase II / III 是成熟，而不是救醜。
+
+如果 screenshot 與上述 reference direction 明顯不符，請直接自行修正後再回報，不要把第一版當成完成品交回。
+
+最終回報請提供：
+- 修改內容
+- Staff Room navigation / scene identity 如何處理
+- Phase I / II / III 的視覺差異
+- mobile screenshots
+- regression 結果
+- I / T / O 分開報告
+
+最重要的視覺判準：
+
+「這是一間 Jill’s Kitchen 願意認真替員工做的、明亮舒服、讓人真的想留下來休息的房間。」
+
+不是：
+「我們需要員工休息室，所以放了沙發、locker、冰箱。」
+
+請直接實作。

@@ -520,7 +520,7 @@ def v24_manual_tutorial_and_news_cover_the_new_content(b, port, target):
         check(need in txt, f'the manual mentions {need}')
     for stale in ['後場休息室', '吧台我擦']:
         check(stale not in txt, f'not in the manual: {stale}')
-    check('— last: v2.4 rc5' in open(os.path.join(ROOT, 'js', 'game.js'), encoding='utf-8').read(), 'the audit stamp on GUIDE')
+    check('— last: v2.4 rc6' in open(os.path.join(ROOT, 'js', 'game.js'), encoding='utf-8').read(), 'the audit stamp on GUIDE')
     g.click('[data-act=open]'); g.page.wait_for_timeout(100)
     check('2.4' not in g.ev("S.news.join(' ')") and g.ev("S.news24") == -1, 'a new game: no update note')
     g.close()
@@ -861,14 +861,14 @@ def v24_jill_calls_the_landlord_and_the_whole_floor_is_hers(b, port, target):
     g.ev("S.money=Math.max(S.money,400000)")
     check(g.ev("buyUp()") is True, 'bought')
     g.ev("hideReveal()")
-    st = json.loads(g.ev("JSON.stringify({up:S.rooms.up,open:roomOpen('up'),lease:S.up.lease,furn:S.up.furn,caps:[restaurantCap(),loungeCap(),tablesTotal()],fact:!!fact('up_lease')})"))
-    check(st['up'] == 1 and st['open'] and st['fact'] and st['caps'] == caps0, f'the floor is a room; no seat, no staff place: {st}')
+    st = json.loads(g.ev("JSON.stringify({up:S.rooms.up,everyday:roomOpen('up'),look:(()=>{upLookOpen();const o=roomOpen('up')&&room==='up';upViewClose();$('#peekPill').hidden=true;screenEl.hidden=false;return o})(),shop:secUp(1e9,()=>'').includes('data-act=\"upLook\"'),lease:S.up.lease,furn:S.up.furn,caps:[restaurantCap(),loungeCap(),tablesTotal()],fact:!!fact('up_lease')})"))
+    check(st['up'] == 1 and not st['everyday'] and st['look'] and st['shop'] and st['fact'] and st['caps'] == caps0, f'the floor is Jill\'s — not an everyday tab (05:23), shown from 店舖工程; no seat, no staff place: {st}')
     L = st['lease']
     check(st['furn']['table'] == L + 1 and st['furn']['scratch'] == L + 5, f'the furniture comes over the next days: {st["furn"]}')
     check(g.ev("upHas('table')") is False, 'the same evening: empty')
     g.ev("save()"); g.reload(); g.page.wait_for_timeout(150)
     g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(150)
-    check(g.ev("!!S.rooms.up&&roomOpen('up')&&S.up.lease") is not None, 'kept across a reload')
+    check(g.ev("!!S.rooms.up&&!roomOpen('up')&&!!S.up.lease") is True, 'kept across a reload (and still not an everyday tab)')
     g.ev("S.day+=6;IDLE=null")
     check(g.ev("upHas('table')&&upHas('cushion')&&upHas('scratch')&&upTrace('cup')") is True, 'a week later: the table, the cats\' things, a cup')
     check(not g.errors, g.errors[:3]); g.close()
@@ -931,7 +931,7 @@ def v24_rc6_the_staff_room_comes_from_a_need_and_grows_in_place(b, port, target)
     g.ev("S.day+=1;IDLE=null")
     check(g.ev("srBuilt()&&roomOpen('staff')&&srStage()===1&&!upWorks()") is True, 'the next day: the room')
     check(g.ev("srTrace('cup')||srTrace('seat')||srTrace('yj')") is False, 'no one\'s things before their story')
-    check(g.ev("String(drawSrShelf).includes(\"srTrace('cup')\")&&String(drawSrChair).includes(\"srTrace('seat')\")") is True, 'the drawings ask for the trace first')
+    check(g.ev("String(drawSrKitchenette).includes(\"srTrace('cup')\")&&String(drawSrArmchair).includes(\"srTrace('seat')\")&&String(drawSrTable).includes(\"srTrace('yj')\")") is True, 'the drawings ask for the trace first')
     check(g.ev("buyRoomPhase('sr',2)") is False and g.ev("srWhyNot(2)").startswith('先讓大家用一陣子'), 'Phase II waits a few days')
     g.ev("S.day+=5")
     check(g.ev("buyRoomPhase('sr',2)") is True, 'Phase II')
@@ -971,8 +971,10 @@ def v24_rc6_the_staff_room_is_used_and_the_pools_stay_apart(b, port, target):
     check(g.ev("['sr_plug','sr_food','sr_fridge','sr_nina','sr_plug2'].filter(k=>fact(k)).length") == 0, 'nothing else that evening')
     check(g.ev("story().trace.filter(t=>t.d===S.day&&t.lane==='major'&&String(t.k).startsWith('sr')).length") == 0, 'no major beat for using the room')
     check(g.ev("JSON.stringify((S.crew||[]).map(m=>[m.name,crewPool(m)]))") == pools0 and g.ev("[restaurantCap(),loungeCap()]") == caps0, 'the lists and their numbers are as they were')
-    check(g.ev("setRoom('up');forceDraw=true;__tick(1000/30);room") == 'up', 'the floor draws with them in it')
+    check(g.ev("setRoom('up');room") != 'up', 'the floor is not an everyday tab (05:23)')
+    check(g.ev("R.upView=1;setRoom('up');forceDraw=true;__tick(1000/30);const r=room;R.upView=0;setRoom('main');r") == 'up', 'as a story shows it, the floor draws with them in the room (closed)')
     check(g.ev("setRoom('staff');forceDraw=true;__tick(1000/30);room") == 'staff', 'the room draws')
+    check(g.ev("document.querySelector('#roomTabs .on span').textContent") == '員工休息室', 'and its tab reads 員工休息室')
     check(not g.errors, g.errors[:3]); g.close()
 
 
@@ -1116,36 +1118,116 @@ def v24_rc6_private_dining_story_needs_two_tables_and_a_lived_in_staff_room(b, p
 
 
 @test
-def v24_rc6_one_tab_for_the_floor_and_old_saves_get_nothing(b, port, target):
-    """rc6 navigation and AP: with rooms on the floor the tabs keep one 二樓 (its label the room you are in; tapping it
-    goes round the floor's rooms); every fixture save loads with no room, no booking, no story fact of these."""
+def v24_rc6_the_rooms_are_tabs_and_the_floor_is_not_everyday(b, port, target):
+    """rc6 navigation (the player's 05:19 and 05:23) and AP: 「二樓」 is not an everyday tab — not on the open floor, not
+    once it has rooms; the Staff Room and the Private Dining Room are tabs of their own, one tap from anywhere, and the
+    tab you are in reads the room's whole name (員工休息室, 私人包廂), never 二樓; each room's door goes down the stairs to
+    the side room; the keys go over the same tabs; the floor is shown while a story happens up there (and is a tab only
+    then); every fixture save loads with no room, no booking, no story fact of these."""
     g = Game(b, port, target, seed=297, manual=True, viewport={'width': 390, 'height': 844})
     for f in sorted(os.listdir(os.path.join(ROOT, 'tests', 'saves'))):
         if not f.endswith('.json'): continue
         load_save(g, f)
-        st = json.loads(g.ev("JSON.stringify({sr:!!(S.up&&S.up.sr),pd:!!(S.up&&S.up.pd),f:['sr_story','pd_yj','pd_story','sp_wait'].filter(k=>fact(k)),open:roomOpen('staff')||roomOpen('pdr')})"))
+        st = json.loads(g.ev("JSON.stringify({sr:!!(S.up&&S.up.sr),pd:!!(S.up&&S.up.pd),f:['sr_story','pd_yj','pd_story','sp_wait'].filter(k=>fact(k)),open:roomOpen('staff')||roomOpen('pdr')||roomOpen('up')})"))
         check(not st['sr'] and not st['pd'] and not st['f'] and not st['open'], f'{f}: nothing of rc6 ({st})')
     load_save(g, 'player_day61.json')
-    _floor(g, 50); g.ev(PD_OPEN)
+    _floor(g, 50)
+    check(g.ev("upTaken()&&!roomOpen('up')&&!roomsOpen().includes('up')") is True, 'the open floor is Jill\'s, and not an everyday tab')
+    g.ev(PD_OPEN)
     _quiet(g); to_service(g); _quiet(g)
     tabs = g.ev("[...document.querySelectorAll('#roomTabs button')].map(b=>b.dataset.room).join(',')")
-    check('upgrp' in tabs and 'staff' not in tabs and 'pdr' not in tabs, f'one tab for the floor: {tabs}')
-    # the player's 04:17 correction: Restaurant → 二樓 → a room; the tab is the floor, the rooms are behind their doors
-    g.ev("setRoom('main')"); g.click('#roomTabs [data-room=upgrp]'); g.page.wait_for_timeout(40)
-    check(g.ev("room") == 'up', 'the tab opens the floor')
-    g.click('#roomTabs [data-room=upgrp]'); g.page.wait_for_timeout(40)
-    check(g.ev("room") == 'up', 'and stays on the floor (no going round three rooms)')
-    lab = lambda: g.ev("document.querySelector('#roomTabs [data-room=upgrp] span').textContent")
-    check(lab() == '二樓', f'labelled 二樓 on the floor: {lab()}')
+    check(tabs == 'front,main,side,staff,pdr,lounge,kitchen', f'the rooms are tabs, 二樓 is not: {tabs}')
+    lab = lambda: g.ev("[...document.querySelectorAll('#roomTabs button')].map(b=>b.textContent+(b.classList.contains('on')?'*':'')).join(',')")
+    check('二樓' not in lab(), f'no 二樓 among the tabs: {lab()}')
+    g.ev("setRoom('main')"); g.click('#roomTabs [data-room=staff]'); g.page.wait_for_timeout(40)
+    check(g.ev("room") == 'staff' and '員工休息室*' in lab(), f'one tap from the dining room into the Staff Room, which is what the tab says: {lab()}')
+    g.click('#roomTabs [data-room=pdr]'); g.page.wait_for_timeout(40)
+    check(g.ev("room") == 'pdr' and '私人包廂*' in lab() and ',休息室,' in ','+lab()+',', f'and into the Private Dining Room: {lab()}')
     tap = lambda x, y: g.ev(f"(()=>{{roomTap({{x:{x},y:{y}}},{{preventDefault(){{}}}});return room}})()")
+    check(tap("PDL.door.x", "LH-30") == 'side', 'its door at the near end: down the stairs to the side room')
+    g.ev("setRoom('staff')")
+    check(tap("SRL.door.x", "LH-20") == 'side', 'the Staff Room\'s door: the same')
+    check(g.ev("(()=>{setRoom('side');document.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowRight'}));return room})()") == 'staff', 'the arrow keys go over the same tabs')
+    check(g.ev("(()=>{document.dispatchEvent(new KeyboardEvent('keydown',{key:'5'}));return room})()") == 'pdr', 'and the number keys')
+    # a story up there (as the night of the missing cats): then the floor is a tab, lit, and its doors open the rooms
+    g.ev("R.upView=1;renderRoomTabs(true);setRoom('up')")
+    check(g.ev("room") == 'up' and '二樓*' in lab(), f'while a story shows the floor it is a tab: {lab()}')
     check(tap("UPR.pd.x0+60", "UPR.pd.y1-30") == 'pdr', 'the Private Dining Room\'s wall or door on the floor: in')
-    check(lab() == '‹ 二樓', f'inside, the tab reads ‹ 二樓: {lab()}')
-    check(tap("PDL.door.x", "LH-30") == 'up', 'its door at the near end: back to the floor')
-    check(tap("UPR.srDoor.x", "UPR.sr.y1-30") == 'staff', 'the Staff Room\'s door: in')
-    g.click('#roomTabs [data-room=upgrp]'); g.page.wait_for_timeout(40)
-    check(g.ev("room") == 'up', 'the tab from inside a room: back to the floor')
-    check(g.ev("(()=>{room='up';const k=new KeyboardEvent('keydown',{key:'ArrowRight'});document.dispatchEvent(k);return room})()") not in ('staff', 'pdr'), 'the arrow keys go over the top-level rooms only')
+    g.ev("R.upView=0;setRoom('main');renderRoomTabs(true)")
+    check(g.ev("roomsOpen().includes('up')") is False and '二樓' not in lab(), 'and then it is gone again')
     check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc6_the_floor_is_shown_when_it_changes(b, port, target):
+    """the player's 05:23 (B–F, K, L): 店舖工程 shows the whole floor — the rooms closed (walls, doors, signs; nothing of the
+    inside, no people), the works, and a restrained 「？」 on the corner nobody has decided about (only once the floor
+    has started to be divided); the morning a room is finished, before the opening, the floor is shown once: last
+    night's works, then the walls come up, the door, the sign (員工休息室 / 私人包廂) — then the room's own view the first
+    time, and back to the day; never again, not after a reload, never during a service."""
+    g = Game(b, port, target, seed=301, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day61.json')
+    _floor(g, 30); _upf(g, 'sr_story', 3)
+    spy = "(()=>{window.__spy={q:0,sr:0,pd:0};const q=upQuestionDraw,s=drawStaffRoom,p=drawPdrRoom;upQuestionDraw=function(){__spy.q++;return q.apply(this,arguments)};drawStaffRoom=function(){__spy.sr++;return s.apply(this,arguments)};drawPdrRoom=function(){__spy.pd++;return p.apply(this,arguments)}})()"
+    g.ev(spy)
+    # the open floor in 店舖工程: the whole floor, no 「？」 yet (nothing has been divided)
+    g.ev("S.money=Math.max(S.money,600000);showShop();shopTab='works';showShop()"); g.page.wait_for_timeout(60)
+    check(g.page.query_selector('[data-act=upLook]') is not None, '店舖工程 has the floor\'s look')
+    g.click('[data-act=upLook]'); g.ev("for(let i=0;i<4;i++)__tick(1000/30)")
+    st = json.loads(g.ev("JSON.stringify({room,UPV,pill:$('#peekPill').textContent,tabs:[...document.querySelectorAll('#roomTabs button')].map(b=>b.textContent),q:__spy.q})"))
+    check(st['room'] == 'up' and st['UPV'] == 'look' and st['pill'].startswith('回到店舖工程') and st['tabs'] == ['二樓'] and st['q'] == 0, f'the open floor, shown from 店舖工程; no 「？」 before any room: {st}')
+    g.click('#peekPill'); g.ev("__tick(1000/30)")
+    check(g.ev("UPV===null&&room!=='up'&&!screenEl.hidden") is True, 'back to 店舖工程')
+    # the Staff Room bought: built tonight; tomorrow morning, the reveal
+    check(g.ev("buyRoomPhase('sr',1)") is True, 'bought'); g.ev("hideReveal()")
+    g.ev("S.day+=1;S.today=null;IDLE=null;showPrep()"); g.ev("__tick(500)")
+    st = json.loads(g.ev("JSON.stringify({UPV,room,k:UPRV&&UPRV.k,p:upRevealP(),sign:upSignOn('sr'),tabs:[...document.querySelectorAll('#roomTabs button')].map(b=>b.textContent+(b.classList.contains('on')?'*':'')),card:!$('#upRv').hidden,screen:screenEl.hidden,rv:srOf().rv})"))
+    check(st['UPV'] == 'reveal' and st['room'] == 'up' and st['k'] == 'sr' and st['p'] == 0 and not st['sign'] and st['tabs'] == ['二樓*'] and not st['card'] and st['screen'] and st['rv'] == g.ev("S.day"), f'the morning it is finished: the floor, last night\'s works first: {st}')
+    g.ev("__spy.q=0;__spy.sr=0;for(let i=0;i<40;i++)__tick(1000/30)")
+    mid = g.ev("upRevealP()")
+    check(0 < mid < 1, f'the walls coming up: {mid}')
+    g.ev("for(let i=0;i<70;i++)__tick(1000/30)")
+    st = json.loads(g.ev("JSON.stringify({p:upRevealP(),sign:upSignOn('sr'),card:!$('#upRv').hidden,txt:$('#upRv').innerText,q:__spy.q,sr:__spy.sr})"))
+    check(st['p'] == 1 and st['sign'] and st['card'] and '員工休息室' in st['txt'] and '進去看看' in st['txt'], f'then the room, its sign, and a card: {st}')
+    check(st['q'] > 0 and st['sr'] == 0, f'the 「？」 on the undecided corner; nothing of the room\'s inside drawn on the floor: {st}')
+    g.click('#upRv [data-uprv=in]'); g.ev("for(let i=0;i<4;i++)__tick(1000/30)")
+    st = json.loads(g.ev("JSON.stringify({room,UPV,pill:$('#peekPill').textContent,on:(document.querySelector('#roomTabs .on span')||{}).textContent,sr:__spy.sr})"))
+    check(st['room'] == 'staff' and st['pill'].startswith('回到開店準備') and st['on'] == '員工休息室' and st['sr'] > 0, f'into the room\'s own view, the first time: {st}')
+    g.click('#peekPill'); g.ev("__tick(1000/30)")
+    check(g.ev("phase==='prep'&&UPV===null&&!screenEl.hidden&&$('#upRv').hidden") is True, 'and back to the day')
+    _reload(g); g.ev("__tick(900)")
+    check(g.ev("UPV") is None and g.ev("upRevealDue()") is None, 'not again after a reload')
+    # the Private Dining Room finished on a morning: the same; but a service never starts one
+    g.ev("(()=>{const p=pdW();p.bought=S.day-1;p.done=S.day})()")
+    check(g.ev("upRevealDue()") == 'pd', 'the Private Dining Room is due')
+    g.ev("showPrep()")   # its reveal is due 0.45 s after the prep screen; the day is opened before that
+    to_service(g)
+    g.ev("for(let i=0;i<30;i++)__tick(1000/30)")
+    check(g.ev("UPV") is None and g.ev("room") != 'up' and g.ev("phase") == 'service', 'a service never starts one')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc6_the_staff_room_has_a_way_to_every_seat(b, port, target):
+    """the player's 05:19 room (E, H, I-10): the sofa and its armchairs, the long table with its banquette and end chairs,
+    the stool at the counter, the bench at the lockers — from the door at the near end there is a way to every place
+    and back, round the furniture (never through it: at most a step or two brushing a corner), on a phone and on a
+    short desktop screen; people sit where there are seats and stand (at the fridge, the coffee, the lockers, the
+    window) only when they are standing places."""
+    for vw, vh in [(390, 844), (1280, 800)]:
+        g = Game(b, port, target, seed=303, manual=True, viewport={'width': vw, 'height': vh})
+        load_save(g, 'player_day61.json')
+        _floor(g, 60); g.ev("(()=>{const s=srW();s.bought=S.day-50;s.done=S.day-49;s.rv=S.day-49;s.st2=S.day-30;s.st3=S.day-10})()")
+        r = json.loads(g.ev(r"""JSON.stringify((()=>{const out=[];const obs=srObs();const inside=(o,x,y)=>x>o.bx0+3&&x<o.bx1-3&&y>o.by0+3&&y<o.by1-3;
+          for(const sp of srSpots()){const own=obs.filter(o=>sp.x>=o.bx0&&sp.x<=o.bx1&&sp.y>=o.by0&&sp.y<=o.by1);
+           const go=(x,y,tx,ty)=>{const w={room:'staff',x,y,troom:'staff',tx,ty,step:0,moving:false};let bad=0,n=0;for(;n<4000;n++){if(stepTo(w,105/30))break;if(obs.some(o=>!own.includes(o)&&inside(o,w.x,w.y)))bad++}return[n,bad]};
+           const a=go(SRL.door.x,SRL.door.y,sp.x,sp.y),z=go(sp.x,sp.y,SRL.door.x,SRL.door.y);out.push({k:sp.k,stand:!!sp.stand,n:a[0],bad:a[1],m:z[0],bad2:z[1]})}return out})())"""))
+        far = [x for x in r if x['n'] >= 4000 or x['m'] >= 4000 or x['bad'] > 5 or x['bad2'] > 5]
+        check(not far, f'{vw}x{vh}: a way to every place and back, round the furniture: {far}')
+        st = {x['k']: x['stand'] for x in r}
+        check(all(st[k] for k in ['fridge', 'coffee', 'locker', 'hooks', 'window']) and not any(st[k] for k in ['sofa0', 'lc0', 'b0', 'c0', 'stool', 'bench0']), f'standing places are marked, seats are not: {st}')
+        check(g.ev("(()=>{R={cw:{},srw:[],tables:[],tickets:[]};const k=srFreeSpot(null).stand;R=null;return !!k})()") is False, 'the first free place is a seat')
+        check(not g.errors, g.errors[:3]); g.close()
 
 
 @test
@@ -1206,7 +1288,7 @@ def v24_rc6_the_open_floor_keeps_its_ways(b, port, target):
         r = json.loads(g.ev(f"""JSON.stringify((()=>{{const P=UPR.pd,Q=UPR.sr,inn=(r,x,y)=>x>r.x0+2&&x<r.x1-2&&y>r.y0+2&&y<r.y1-2;const w={{room:'up',x:UP_L.entry.x,y:UP_L.entry.y-4,troom:'{dest}',tx:{'200' if dest=='staff' else '300'},ty:{'srY(.5)' if dest=='staff' else 'pdY(.25)'},step:0,moving:false}};let bad=0,n=0;
           for(;n<3000;n++){{if(stepTo(w,105/30))break;if(w.room==='up'&&(inn(P,w.x,w.y)||inn(Q,w.x,w.y)))bad++}}const there=w.room==='{dest}';w.troom='up';w.tx=UP_L.entry.x;w.ty=UP_L.entry.y-4;let m=0;for(;m<3000;m++){{if(stepTo(w,105/30))break;if(w.room==='up'&&(inn(P,w.x,w.y)||inn(Q,w.x,w.y)))bad++}}return{{there,back:w.room==='up',bad,n,m}}}})())"""))
         check(r['there'] and r['back'] and r['bad'] == 0 and r['n'] < 3000 and r['m'] < 3000, f'stairs → {dest} → stairs, never through a wall: {r}')
-    check(g.ev("setRoom('up');forceDraw=true;__tick(1000/30);room") == 'up', 'the floor draws')
+    check(g.ev("R.upView=1;setRoom('up');forceDraw=true;__tick(1000/30);const r=room;R.upView=0;r") == 'up', 'the floor draws (as a story shows it)')
     check(not g.errors, g.errors[:3]); g.close()
 
 

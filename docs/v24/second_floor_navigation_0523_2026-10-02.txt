@@ -1,0 +1,442 @@
+(Filed verbatim. 2026-10-02 05:23, the player. The second floor's overview is no longer an everyday tab: it is for the floor's story, the expansion view, the works and the reveal when a room is finished; the two rooms are reached directly and are named 員工休息室 / 私人包廂 inside. Supersedes the "‹ 二樓" back entry allowed in staff_room_muji_0519.)
+
+我要調整 Second Floor（二樓）的產品定位與 navigation。
+
+這不是要刪除 Second Floor scene，也不是要重寫目前已經獨立存在的 Staff Room / Private Dining Room。
+
+核心決定如下：
+
+「二樓」不再是一個玩家日常營運時需要反覆切換進入的 gameplay tab。
+
+Second Floor 的主要功能改成：
+
+1. 二樓故事發生的舞台
+2. 二樓空間擴增 / construction progression 的視覺介面
+3. 讓玩家理解各個二樓房間彼此位置關係的 spatial overview
+4. 新空間施工完成時的 reveal / payoff scene
+
+平常營業 gameplay 不需要看到或經過 Second Floor overview。
+
+━━━━━━━━━━━━━━━━━━
+A. 移除日常 navigation 中的「二樓」tab
+━━━━━━━━━━━━━━━━━━
+
+目前主 navigation 類似：
+
+店門口｜主廳｜側廳｜二樓｜Lounge｜廚房
+
+請不要再讓「二樓」作為一般日常 gameplay tab 長期存在。
+
+正常營業／日常遊玩時：
+
+- 不顯示「二樓」作為普通 location tab。
+- 玩家不需要先進入二樓 overview，再進 Staff Room / Private Dining。
+- 不要把 Second Floor 當作 navigation hub。
+- 不要增加沒有必要的中間點擊。
+
+Staff Room 與 Private Dining Room 已經是獨立 full-screen scenes，維持這個 architecture。
+
+玩家進 Staff Room：
+current location = 員工休息室
+
+玩家進 Private Dining：
+current location = 私人包廂
+
+不要再顯示「二樓」為 active location。
+
+━━━━━━━━━━━━━━━━━━
+B. Second Floor overview 的新定位
+━━━━━━━━━━━━━━━━━━
+
+Second Floor overview 保留。
+
+但它不是 everyday gameplay page。
+
+它只在以下情況出現：
+
+1. Second Floor story arc
+2. 第一次探索二樓
+3. 柔柔 / 小齁探索二樓等既有故事場景
+4. 玩家查看二樓空間擴增 / construction
+5. 玩家決定建立新的二樓空間
+6. construction in progress 的必要呈現
+7. construction completion / room reveal
+8. 未來真正與 Second Floor 空間本身有關的 authored story beat
+
+換句話說：
+
+SECOND FLOOR OVERVIEW =
+STORY + EXPANSION + CONSTRUCTION + SPATIAL PROGRESSION
+
+不是 everyday navigation。
+
+━━━━━━━━━━━━━━━━━━
+C. 二樓擴增頁面
+━━━━━━━━━━━━━━━━━━
+
+當玩家進入「擴增 / Expansion」相關介面查看二樓時，可以看到完整 Second Floor spatial overview。
+
+這個 overview 要清楚呈現目前已經存在的空間，例如：
+
+[ 員工休息室 ]
+[ 私人包廂 ]
+[ 尚未開發區域 ]
+
+已完成的房間只顯示：
+
+- 房間位置
+- 牆
+- 門
+- 建築輪廓
+- restrained room label / sign
+
+不要顯示房間內部。
+
+不要顯示：
+- sofa
+- locker
+- fridge
+- Private Dining table
+- guests
+- staff
+- miniature NPC
+- miniature room interior
+
+這不是 dollhouse / cutaway view。
+
+它是 architectural spatial overview。
+
+━━━━━━━━━━━━━━━━━━
+D. 尚未開發區域 / FUTURE SPACE
+━━━━━━━━━━━━━━━━━━
+
+目前 Second Floor 還有尚未使用的空間。
+
+這一區必須保留。
+
+現階段不要替它自行發明用途。
+
+在 Expansion view 中可以顯示：
+
+「？」
+
+或其他非常 restrained 的 unknown / future expansion presentation。
+
+目的不是告訴玩家下一個功能是什麼。
+
+而是讓玩家知道：
+
+「二樓還有空間，未來可能會發生事情。」
+
+不要顯示：
+Coming Soon
+Future Room
+Locked Room
+Dylan’s Study
+Residence
+Bedroom
+任何未正式進入遊戲 progression 的名稱。
+
+不要提前劇透未來用途。
+
+只需要讓玩家看到：
+這裡仍然有一塊尚未發展的空間。
+
+「？」即可。
+
+這個問號應該產生 anticipation，而不是像 disabled feature / unfinished content。
+
+━━━━━━━━━━━━━━━━━━
+E. CONSTRUCTION FLOW
+━━━━━━━━━━━━━━━━━━
+
+未來每一次二樓新增空間，請遵循：
+
+STORY / NEED
+↓
+玩家知道某種空間需求存在
+↓
+Expansion interface 出現新的可擴增項目
+↓
+玩家選擇 / 支付 construction
+↓
+construction
+↓
+Second Floor overview 作為施工完成 reveal
+↓
+玩家第一次看到新的牆、門、空間位置
+↓
+進入該房間自己的 independent full-screen scene
+↓
+之後回到正常日常 gameplay
+
+重要：
+
+「施工完成」是 Second Floor overview 最值得出現的時刻之一。
+
+例如 Staff Room 完工：
+
+原本：
+[ ??? / undeveloped area ]
+
+施工後：
+Second Floor overview 顯示新的牆面與門
+→ room sign / label：
+「員工休息室」
+
+然後玩家第一次進入：
+
+[ 員工休息室 full-screen scene ]
+
+Private Dining 同理。
+
+這樣玩家會感受到：
+
+「二樓真的被改造了。」
+
+而不是：
+「menu 裡突然多了一個新 tab。」
+
+━━━━━━━━━━━━━━━━━━
+F. CONSTRUCTION COMPLETION PRESENTATION
+━━━━━━━━━━━━━━━━━━
+
+每次重要二樓 construction 完成時，可以短暫把玩家帶回 Second Floor overview。
+
+這不是普通 navigation。
+
+這是一個 spatial payoff / reveal。
+
+例如：
+
+昨天：
+Staff Room 已存在
+Private Dining construction area
+???
+↓
+
+今天：
+Second Floor overview
+新的牆、門、入口完成
+「私人包廂」
+
+玩家看到空間真的改變。
+
+之後才第一次進入完整 Private Dining scene。
+
+不需要做複雜 construction simulation。
+
+不需要讓玩家每天查看施工進度。
+
+重點是 BEFORE → AFTER 的空間變化可以被玩家看見。
+
+━━━━━━━━━━━━━━━━━━
+G. SECOND FLOOR STORY SCENES
+━━━━━━━━━━━━━━━━━━
+
+Second Floor overview 仍然可以作為真正的 authored story stage。
+
+例如既有：
+
+- 第一次正式上樓
+- 空樓層 reveal
+- 柔柔先探索
+- 小齁跟上去
+- Jill / staff 發現貓
+- Jill 開始意識到整層空間的可能性
+- landlord / rental progression 中需要呈現空間的部分
+- Open-Floor Period
+- 與 construction / spatial growth 有直接關係的故事
+
+這些時候玩家看到完整二樓是合理且有意義的。
+
+所以不要刪除 Second Floor renderer / scene。
+
+只是不要讓它變成日常 navigation tab。
+
+━━━━━━━━━━━━━━━━━━
+H. STAFF ROOM / PRIVATE DINING 的獨立性
+━━━━━━━━━━━━━━━━━━
+
+再次確認：
+
+Staff Room 與 Private Dining Room 都是獨立 full-screen scenes。
+
+Second Floor overview 只顯示它們「存在於哪裡」。
+
+它不負責顯示或操作房間內活動。
+
+STAFF ROOM：
+
+進入後畫面 location label：
+「員工休息室」
+
+不要：
+「二樓」active tab + Staff Room interior
+
+PRIVATE DINING：
+
+進入後畫面 location label：
+「私人包廂」
+
+不要：
+「二樓」active tab + Private Dining interior
+
+玩家心理模型應該是：
+
+「我現在在員工休息室。」
+
+而不是：
+
+「我現在在二樓的員工休息室 mode。」
+
+━━━━━━━━━━━━━━━━━━
+I. NORMAL PLAY
+━━━━━━━━━━━━━━━━━━
+
+日常遊戲時，玩家不需要反覆看到 Second Floor overview。
+
+正常流程應該保持快速：
+
+Main Hall
+Side Hall
+Lounge
+Kitchen
+etc.
+
+需要查看 / 進入 Staff Room 或 Private Dining 時，使用既有合理入口 / room navigation。
+
+不要強迫：
+
+Second Floor
+→ door
+→ Staff Room
+
+每一次都多走一層。
+
+Second Floor overview 的價值來自「少而有意義」。
+
+玩家看到它時，通常代表：
+
+- 故事正在發生
+- 空間正在改變
+- 新東西即將出現
+- 某個 construction 完成
+- 二樓 progression 又往前一步
+
+因此它本身會有 anticipation。
+
+━━━━━━━━━━━━━━━━━━
+J. FUTURE-PROOFING
+━━━━━━━━━━━━━━━━━━
+
+Second Floor remaining undeveloped space 必須保留。
+
+目前只呈現「？」。
+
+不要在這次 RC6：
+- 決定用途
+- 建新房
+- 寫新故事
+- 加住宅
+- 加 Dylan room
+- 加任何新 gameplay system
+
+只要確保 architecture 支援：
+
+未來某一天：
+???
+→ story
+→ expansion unlocked
+→ construction
+→ Second Floor reveal
+→ new independent room/space
+
+即可。
+
+不要 over-engineer generic room framework。
+
+━━━━━━━━━━━━━━━━━━
+K. 本次修改範圍
+━━━━━━━━━━━━━━━━━━
+
+這次請優先做最小安全修改：
+
+1. 日常 main navigation 移除「二樓」tab。
+2. Staff Room current location 正確顯示「員工休息室」。
+3. Private Dining current location 正確顯示「私人包廂」。
+4. Second Floor overview 保留給 story / expansion / construction / completion reveal。
+5. Expansion view 可以看到：
+   - 已完成 Staff Room
+   - 已完成 Private Dining
+   - 剩餘 undeveloped space「？」
+6. overview 不顯示房間 miniature interior。
+7. 不破壞既有 Second Floor story。
+8. 不破壞 Staff Room / Private Dining existing independent scenes。
+9. 不改 employment pools、reservation、minimum spend、staff behavior 等無關 systems。
+10. save / legacy migration 必須保持安全。
+
+━━━━━━━━━━━━━━━━━━
+L. QA
+━━━━━━━━━━━━━━━━━━
+
+請實際驗證：
+
+NORMAL PLAY：
+- 主 navigation 不再出現「二樓」。
+- 玩家不會為了進房間被迫經過 overview。
+- Staff Room 顯示自己是「員工休息室」。
+- PDR 顯示自己是「私人包廂」。
+
+EXPANSION：
+- 可以看到完整 Second Floor spatial overview。
+- 已完成房間位置清楚。
+- 尚未開發區域顯示 restrained「？」。
+- 不出現 miniature interiors。
+
+STORY：
+- 既有 Second Floor authored scenes 仍能正常呼叫 overview。
+- 柔柔 / 小齁等既有 Second Floor story 不受破壞。
+
+CONSTRUCTION：
+- 新 room construction completion 可以呼叫 Second Floor overview。
+- before / after spatial state 可正確呈現。
+- 完工後可以進入新 room 的 independent scene。
+
+MOBILE：
+- overview 在手機上仍然讀得出空間關係。
+- 「？」不是巨大的 UI button，也不像 debug placeholder。
+- room labels 不遮擋建築。
+- Staff Room / PDR 的 location identity 清楚。
+
+最後請用 I / T / O 分開回報。
+
+━━━━━━━━━━━━━━━━━━
+核心產品原則
+━━━━━━━━━━━━━━━━━━
+
+Second Floor 不應該是一個每天都要看的 menu page。
+
+它應該是一個：
+
+「只有當這一層樓正在發生變化時，玩家才會重新看到的地方。」
+
+玩家第一次看到它，是一整層空的。
+
+後來再看到：
+多了一間 Staff Room。
+
+再後來：
+Private Dining 完工了。
+
+旁邊仍然有一塊：
+
+「？」
+
+因此玩家自然會想：
+
+「那裡以後會變成什麼？」
+
+這就是 Second Floor overview 存在的理由。
+
+請依此直接修改，不要刪除 Second Floor scene，也不要把它繼續當 everyday navigation tab。

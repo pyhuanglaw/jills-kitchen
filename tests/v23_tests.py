@@ -811,12 +811,16 @@ def followup_the_manual_describes_the_current_game(b, port, target):
                  '餐廳員工', 'Lounge 名單', '許葳', '互不佔用', '二樓', '樓梯門', '上樓待一會兒',
                  # v2.4 rc6: the two rooms upstairs, the bookings, the two places
                  '二樓：休息室與包廂', '員工休息室', '私人包廂', '二樓的房間', '今晚｜私人包廂｜已預約', '最低消費', '4–6 位', '4–8 位', '4–10 位',
-                 '一個晚上最多一組', '客人不會為了湊低消多點', '私人包廂 I 和 III 也各多一位', '休息室不加名額', '‹ 二樓', '包廂 幾組']:
+                 '一個晚上最多一組', '客人不會為了湊低消多點', '私人包廂 I 和 III 也各多一位', '休息室不加名額', '包廂 幾組',
+                 # v2.4 rc6 (the player's 05:19 and 05:23): the rooms are tabs; the floor is shown only when it changes
+                 '寫著那一間的全名', '整層二樓只在幾個時候出現', '看看整層', '「？」', '開店前會先帶你上二樓看一眼', '淺色橡木', '燕麥色沙發', '淺木置物櫃']:
         check(need in txt, f'the manual mentions {need}')
     for stale in ['暫停選單和設定裡都有【儲存目前進度】', '把杯子交給吧台的客人；桌位由有', '上方的分頁', '畫面上方會跳一個小通知', '打烊後或開店前，商店的「社群與宣傳」分頁（第 6 天起）。', '下一段寫著', '窗邊（貓架、睡墊）', '牠會在門邊趴著等主人',
                   '人數上限跟擴建、後場整理區、側廳、廚房擴建、廚房二期、Lounge 有關', '有 Lounge 以後才能招募', '第二位調酒師',
                   # v2.4 rc6: the rc5 line that said the staff list's number came only from the ground floor
-                  '側廳、廚房擴建、廚房二期有關；', '輪流切']:
+                  '側廳、廚房擴建、廚房二期有關；', '輪流切',
+                  # v2.4 rc6 (05:23): the floor is no longer an everyday tab, and the Staff Room is no longer green
+                  '‹ 二樓', '還是一個「二樓」分頁', '置物櫃、小冰箱、咖啡機、多一排插座']:
         check(stale not in txt, f'stale line removed: {stale}')
     g.ev("showGuide()"); g.page.wait_for_timeout(50)
     check('故事' in g.ev("document.querySelector('#screen').innerText") and '社群與宣傳' in g.ev("document.querySelector('#screen').innerText"), 'the manual screen shows the new sections')

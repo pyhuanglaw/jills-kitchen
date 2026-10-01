@@ -1,0 +1,93 @@
+(Filed verbatim. 2026-10-02 05:32, the player: finish and release v2.4-rc6 first — including 05:19 and 05:23 — in the order A–M; nothing of P5 / rc7 in it; P5 starts only after the release, its URL and zips are confirmed.)
+
+先不要開始 P5 / rc7。
+
+請先把目前 RC6 完整收尾，並正式發布一個可玩的 v2.4-rc6，讓我先在 iPhone 實機驗收。
+
+RC6 本次 release 必須包含目前已經決定的所有 RC6 修改，尤其包括剛剛新增的兩項：
+
+1. 05:19 員工休息室全面重畫
+- 使用我提供的三張 reference。
+- 整體改成明亮、溫暖、MUJI-inspired：
+  warm white / off-white / oatmeal / light gray / pale natural oak or ash。
+- 不要深色沙發、深色大型家具、深綠、深灰、黑色大色塊、胡桃木、橘紅木。
+- 不要綠色地毯。
+- 保留並重新整合員工置物櫃、冰箱、咖啡／飲水、收納。
+- Locker 要做成淺木 built-in storage，不要辦公室／學校／健身房鐵櫃感。
+- Sofa zone、communal table、storage/kitchenette 要形成自然且完整的空間配置。
+- Phase I 本身就必須漂亮完整；Phase II / III 是同一空間逐漸成熟、lived-in，不是從醜升級成漂亮。
+- 完成後必須用 mobile screenshot 實際檢查，不符合 reference 就自行修正。
+
+2. 05:23 Second Floor navigation / expansion 定位修改
+- 「二樓」不再作為日常 gameplay 的普通 navigation tab。
+- 正常遊玩時不要讓玩家反覆切進 Second Floor overview。
+- Staff Room 是獨立 full-screen scene，current location 顯示「員工休息室」。
+- Private Dining 是獨立 full-screen scene，current location 顯示「私人包廂」。
+- 不要在這兩個房間內把「二樓」顯示成 active location。
+- Second Floor overview 保留，但用途限定為：
+  a. Second Floor authored story
+  b. 二樓 expansion / construction
+  c. construction completion reveal
+  d. spatial progression
+- Expansion view 中可以看到二樓目前的建築配置：
+  已完成的員工休息室、私人包廂，以及剩餘未開發空間。
+- 已完成房間只顯示牆、門、位置與 restrained label，不顯示 miniature interior / NPC / furniture。
+- 尚未開發區域只顯示 restrained「？」。
+- 不要替「？」自行決定用途，也不要提前加入任何未正式實作的未來內容。
+- 每次未來二樓空間完工時，可以用 Second Floor overview 做 BEFORE → AFTER 的施工完成 reveal。
+- 不要刪掉既有 Second Floor story renderer，也不要破壞柔柔／小齁等既有二樓故事。
+
+除此之外，把目前 RC6 已經完成或正在收尾的內容全部一起完成，包括：
+- Staff Room 全部功能、故事、phase、ambient usage
+- Private Dining Art Deco redesign
+- 直向石材長桌、石材地板與既定 PDR visual rules
+- PDR reservation
+- minimum spend
+- walk-in / reservation rules
+- authored occupancy
+- Restaurant / Lounge employment pool separation
+- Restaurant capacity +2
+- Lounge fixed roster isolation
+- cats / staff room behavior
+- 已發現的未結帳、休息未發生、打烊人數重複計算等 bug
+- save/load / legacy migration
+- mobile UI
+- 所有 RC6 tests / simulation / regression
+- documentation
+
+完成順序：
+
+A. 完成目前所有 RC6 implementation
+B. 跑 RC6 targeted tests
+C. 跑完整 regression
+D. 修到全部通過
+E. 做 mobile screenshot QA
+F. 如果 screenshot 視覺不符合已確認 reference / spec，直接自行修正並重測，不要把明顯不合格的第一版交給我
+G. 更新文件
+H. 最終建立乾淨 RC6 commit
+I. 建立正式 tag：v2.4-rc6
+J. 發布到目前給我玩的網址
+K. 實際讀回 deployed version，確認不是舊 cache / 舊 build
+L. 產出並檢查可下載壓縮檔
+M. 最後提供完整 I / T / O 報告與 release evidence
+
+這次請把 RC6 當成一個獨立 release checkpoint。
+
+不要把任何 P5 / rc7 內容混進 v2.4-rc6。
+
+P5 包含的國雄、宇翔、珊珊、老林、Kevin、小彤＋爸媽、Kai、交叉人物線、怡君男友、員工家人訂包廂等內容，全部留到 rc7。
+
+我要先拿到一個：
+「RC6 功能完整、視覺完成、測試通過、可在 iPhone 正常玩的正式版本。」
+
+RC6 發布成功、網址與壓縮檔都確認可用後，再開始 P5 / rc7。
+
+不需要在 RC6 中途停下來等我逐項確認；請自行完成、測試、修正、發布。
+
+只有遇到以下情況才需要停下來問我：
+- 已確認 canon 彼此直接衝突，無法同時成立
+- 存檔有不可逆資料損失且無法安全 migration
+
+除此之外請自行判斷並繼續。
+
+現在先完成並發布 v2.4-rc6。
