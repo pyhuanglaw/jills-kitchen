@@ -1,0 +1,713 @@
+(Filed verbatim. 2026-10-01 13:09, the player: a long cross-character arc for the Staff Lives round, 《那面牆》 —
+阿珠姐 × Sophie × Mia × 王先生. It begins only after 怡君's own arc 《三個選項》 (second_floor_and_long_arcs_2026-10-01.txt,
+section 29) is complete and she has lived in her home for a while.
+Canon check against js/game.js the same day: Sophie 「味覺很挑剔的美食家，嘴上嚴格，心很軟。」 and Jill asks her
+「Sophie，今天不寫稿？」 — she writes, so magazine / editorial work fits; Mia 「樓上設計公司的設計師，永遠在趕稿。」 — a
+design firm in the building (小林 works on 3F and asks Mia 「你是樓上那間？」, so the firm is above the third floor; the
+vacant second floor is untouched) — interior / spatial design fits; 王先生 「結婚多年，每週帶太太來約會一次；報紙看到一半
+就會被叫去點餐。」 has no occupation in the code yet — lawyer does not contradict anything.)
+
+JILL'S KITCHEN — NEW LONG-FORM CROSS-CHARACTER STORY ARC
+阿珠姐 × Sophie × Mia × 王先生
+Working title: 《那面牆》
+
+IMPORTANT:
+This is a genuine long-form story arc, NOT a collection of ambient callbacks or relationship flavor events.
+
+It should unfold across many in-game days, with:
+- setup
+- discovery
+- uncertainty
+- investigation
+- professional involvement
+- setbacks / incomplete evidence
+- formal legal handling
+- mediation
+- compensation
+- aftermath
+
+The player should genuinely want to know:
+「怡君買的房子到底怎麼了？」
+and later:
+「這件事情最後能不能處理掉？」
+
+Do NOT compress this into 3–4 events.
+
+==================================================
+0. STRICT CONTINUITY / PREREQUISITES
+==================================================
+
+This story happens ONLY AFTER 怡君 has already:
+
+1. appeared naturally as 阿珠姐's adult daughter;
+2. completed her earlier housing story 《三個選項》;
+3. chosen and purchased a home;
+4. moved into that home;
+5. lived there for some time.
+
+Do NOT reveal the leak during the home-selection arc.
+
+The earlier arc should feel COMPLETE first.
+
+The emotional effect should be:
+
+玩家原本已經看著怡君選好房子、搬進去，
+以為這件人生小事已經告一段落。
+
+過了一段時間，生活又發生新的事情。
+
+Do not retroactively turn 《三個選項》 into obvious foreshadowing for a defective house.
+
+The home choice was reasonable based on what 怡君 knew at the time.
+
+This new story should begin only after enough time has passed that 怡君 genuinely feels she has moved in.
+
+==================================================
+1. CHARACTER / OCCUPATION CANON FOR THIS ARC
+==================================================
+
+阿珠姐
+- Senior Jill's Kitchen kitchen employee.
+- 怡君's mother.
+- Practical, experienced, not sentimental or theatrical.
+- She worries about her daughter but initially does NOT want to turn her daughter's problem into restaurant gossip.
+
+Sophie
+- Establish her occupation as media / magazine / editorial work.
+- She understands how to reconstruct a timeline, preserve source material, ask precise questions, and eventually recognize when a private incident may point to a broader public-interest / consumer-life topic.
+- She is NOT a tabloid exposé machine.
+- She should understand that publishing accusations before facts are established can create problems.
+
+Mia
+- Establish her occupation as interior / spatial design or a closely related built-environment profession.
+- She can recognize suspicious repair / repainting / moisture-related physical signs.
+- She is NOT a building inspector and must never magically diagnose a leak from one photograph.
+- Her professional judgment creates useful hypotheses that still require evidence / inspection.
+
+王先生
+- Existing regular customer.
+- Lawyer.
+- He is a real practicing professional, not a free legal-advice NPC.
+- Once formally retained, he charges a real legal fee.
+- He ultimately assists 怡君 through formal handling / mediation and helps obtain compensation.
+
+Do NOT change these professions merely to fit another system.
+
+==================================================
+2. EXISTING SOPHIE / MIA / 阿珠姐 RELATIONSHIP
+==================================================
+
+Before this arc begins, establish / preserve that 阿珠姐 has already noticed Sophie and Mia are together.
+
+阿珠姐 has a subtle 「姨母笑」 reaction to them.
+
+She does NOT loudly announce:
+「我早就知道妳們在交往！」
+
+Instead, over ordinary visits, she has clearly figured it out.
+
+Example tone:
+
+阿珠姐：「今天怎麼只有妳？」
+Sophie：「她加班。」
+阿珠姐：「喔～～」
+Sophie：「妳那個喔是什麼意思？」
+阿珠姐：「沒有啊。」
+
+They occasionally chat.
+
+This matters because Sophie and Mia later care about 阿珠姐's problem for a believable reason.
+
+They are not strangers suddenly performing a side quest for an employee.
+
+==================================================
+3. OPENING — SOMETHING IS WRONG
+==================================================
+
+After 怡君 has been moved in for some time:
+
+Sophie and Mia notice 阿珠姐 seems distracted / worried during several visits.
+
+They ask.
+
+阿珠姐 initially refuses to explain.
+
+Example:
+
+Sophie：「阿珠姐，妳最近怎麼了？」
+阿珠姐：「沒怎樣。」
+Sophie：「妳明明就有。」
+阿珠姐：「吃妳的飯啦。」
+
+Do not reveal everything immediately.
+
+On a later day, Sophie and Mia happen to hear part of a phone call between 阿珠姐 and 怡君.
+
+Only fragments at first:
+
+阿珠姐：
+「妳先拍起來。」
+「不是擦掉就好了啦。」
+「上次不是才叫人來？」
+「……好啦，妳先不要弄。」
+
+Afterward, they learn the basic situation:
+
+怡君 has discovered a significant water-leak problem AFTER moving into the home she purchased.
+
+The leak may appear / worsen during rain.
+
+The other side has not simply accepted responsibility.
+
+There is uncertainty about:
+- whether the defect existed before sale;
+- whether it had previously been repaired;
+- what the seller knew;
+- what was disclosed;
+- where the water is actually coming from.
+
+Do NOT immediately establish:
+「seller knowingly committed fraud。」
+
+That must remain uncertain.
+
+==================================================
+4. MIA BECOMES INVOLVED FIRST THROUGH HER PROFESSION
+==================================================
+
+Mia asks to see photographs.
+
+She notices signs that make her suspicious that this area may have been repaired before:
+- localized repainting;
+- patching;
+- finish differences;
+- moisture / repair patterns;
+or another technically plausible visual clue.
+
+But she must explicitly remain cautious.
+
+Example:
+
+Mia：「這裡以前可能處理過。」
+Sophie：「所以他們本來就知道？」
+Mia：「不是。這只能說可能處理過。」
+Sophie：「差在哪？」
+Mia：「差很多。」
+
+IMPORTANT:
+Mia does NOT prove legal knowledge.
+Mia does NOT replace a professional inspection.
+Mia does NOT magically solve the source of the leak.
+
+Her role is to notice:
+「這件事情可能沒有表面上那麼簡單。」
+
+==================================================
+5. SOPHIE'S PROFESSIONAL ROLE
+==================================================
+
+Sophie begins helping reconstruct what actually happened.
+
+She asks whether 怡君 still has:
+- original listing material;
+- viewing photographs;
+- messages;
+- disclosure documents;
+- repair conversations;
+- dates;
+- handover records;
+etc.
+
+She helps turn a confused family complaint into a chronological record.
+
+This should feel like an editor / media professional instinctively organizing facts.
+
+Sophie may initially think:
+
+「如果真的早就知道還不講，這件事其實可以寫。」
+
+But she does NOT immediately publish anything.
+
+Her eventual article comes much later.
+
+==================================================
+6. 王先生 OVERHEARS
+==================================================
+
+王先生 should NOT be summoned as a quest NPC.
+
+He is already a regular customer.
+
+On one ordinary visit, he happens to overhear enough of their conversation to recognize that this may be a real property-sale dispute.
+
+Example:
+
+Sophie：
+「所以看屋的時候那面牆才剛漆過？」
+
+Mia：
+「如果照片日期沒錯的話。」
+
+阿珠姐：
+「可是對方就說不知道啊。」
+
+王先生 pauses.
+
+王先生：
+「等一下。」
+
+They look at him.
+
+王先生：
+「妳女兒買的是中古屋？」
+
+This is his natural entrance into the arc.
+
+He begins asking lawyer-type questions:
+- purchase / handover timing
+- contract
+- disclosure / current-condition documents
+- when the leak first appeared
+- what was said in writing
+- photographs
+- repair history
+- what exactly the seller has admitted or denied
+
+He should immediately distinguish suspicion from proof.
+
+For example:
+
+Sophie：「如果交屋前就補過，還能說不知道嗎？」
+
+王先生：
+「先不要跳那麼快。」
+
+Mia：
+「可是那面牆一定處理過。」
+
+王先生：
+「處理過，跟知道現在這個漏水問題，是兩件事。」
+
+Mia：
+「我知道。」
+
+王先生：
+「那就先證明第一件。」
+
+==================================================
+7. IMPORTANT — 王先生 DOES NOT WORK FOR FREE
+==================================================
+
+At first, 王先生 can casually point out what information should be preserved and warn them not to make unnecessary statements.
+
+But once the matter requires actual legal work, make the boundary explicit.
+
+He should effectively say:
+
+「如果要我處理，就正式委任我。」
+
+怡君 is the client / actual party.
+
+There should be a real lawyer-client relationship and a real fee.
+
+王先生:
+- reviews the documents;
+- helps determine the legal position;
+- communicates / negotiates where appropriate;
+- prepares for mediation;
+- participates in the mediation process.
+
+DO NOT make him a magical pro bono lawyer simply because he is a regular at Jill's Kitchen.
+
+==================================================
+8. THE FEE IS DISCOUNTED — BUT 王先生 NEVER ANNOUNCES IT
+==================================================
+
+This is important characterization.
+
+王先生 gives 怡君 a genuinely favorable / discounted fee.
+
+But he NEVER says:
+
+「我算妳友情價。」
+「我有打折喔。」
+「因為阿珠姐所以算便宜。」
+
+Do not make him seek credit for generosity.
+
+The characters infer it themselves.
+
+For example, 怡君 has already consulted / asked about fees elsewhere.
+
+When she sees 王先生's formal fee:
+
+怡君：
+「……這比我之前問的低很多欸。」
+
+阿珠姐：
+「真的？」
+
+怡君：
+「嗯。」
+
+阿珠姐 looks at 王先生.
+
+阿珠姐：
+「你是不是算太少？」
+
+王先生：
+「沒有。」
+
+阿珠姐：
+「真的？」
+
+王先生：
+「妳女兒有付錢就好。」
+
+Stop there.
+
+Do not explain the emotion.
+
+The player should understand the discount without 王先生 saying it.
+
+IMPORTANT:
+The fee must still feel like a REAL professional fee.
+Not a symbolic NT$1 / NT$3,000 joke.
+怡君 genuinely pays for legal representation.
+
+==================================================
+9. INVESTIGATION / SETBACKS
+==================================================
+
+Do not make every clue support 怡君.
+
+The story needs uncertainty.
+
+Possible structure:
+
+A viewing photograph initially seems extremely favorable.
+
+Sophie thinks:
+「這不是就有了？」
+
+Mia looks closer and realizes it does NOT establish what they hoped.
+
+Or:
+
+A repair mark exists, but the repair may not initially be proven to concern the same water source.
+
+Or:
+
+The first assumed source of the leak turns out to be wrong after inspection.
+
+The player should experience at least one moment where:
+
+「喔，原來沒有這麼簡單。」
+
+王先生 should repeatedly separate:
+- what they suspect;
+- what they know;
+- what they can prove.
+
+This is part of his professional characterization.
+
+==================================================
+10. MEDIATION IS THE CLIMAX
+==================================================
+
+The legal storyline should NOT end with:
+「王先生幫忙處理，後來成功了。」
+
+Actually depict the mediation as an authored story beat.
+
+王先生 is visibly different in professional mode.
+
+He does not need to shout or deliver a courtroom speech.
+
+His strength is:
+- organized facts;
+- knowing which evidence matters;
+- identifying weak points;
+- controlling the discussion;
+- negotiating realistically.
+
+A good 王先生 line:
+
+「那我們一項一項談。」
+
+The evidence assembled through the arc matters here.
+
+Mia's observations helped identify what needed examination.
+Sophie helped reconstruct and preserve the chronology / source material.
+怡君 provided the actual documents and evidence.
+王先生 converts the usable material into a legal strategy.
+
+The mediation ultimately reaches a settlement.
+
+怡君 receives REAL COMPENSATION.
+
+The compensation should be meaningful relative to the repair problem.
+
+Do not necessarily make it 100% of everything she originally wanted.
+A negotiated result can feel more credible.
+
+The important result is:
+
+怡君 can actually repair / address the home without personally absorbing the entire unexpected loss.
+
+==================================================
+11. SOPHIE'S ARTICLE COMES AFTER THE LEGAL MATTER IS SAFE
+==================================================
+
+Do NOT use:
+Sophie writes exposé → seller panics → pays.
+
+That cheapens both Sophie and 王先生.
+
+After mediation / settlement has progressed or concluded, Sophie returns to the broader issue.
+
+She realizes 怡君's experience points toward a useful consumer / housing story.
+
+She asks before using anything connected to 怡君.
+
+Example:
+
+Sophie：
+「我想寫這個。」
+
+怡君：
+「寫我的？」
+
+Sophie：
+「不一定寫妳。是寫這件事。」
+
+Her eventual piece should be broader:
+- buying a used home;
+- hidden water leaks;
+- disclosure;
+- documenting conditions;
+- preserving evidence;
+- what buyers often fail to photograph / retain;
+etc.
+
+It should feel like a real piece of her professional work that grew from something she encountered through Jill's Kitchen.
+
+Do not make it revenge journalism.
+
+==================================================
+12. AFTERMATH — DO NOT OVERWRITE THE EMOTION
+==================================================
+
+After compensation / repair:
+
+Do not have characters say:
+「大家互相幫忙真的很溫暖。」
+「Jill's Kitchen 就像一個大家庭。」
+「幸好有你們。」
+「這就是熟客的意義。」
+
+Never explain the theme.
+
+Instead use behavior.
+
+王先生 later comes in for an ordinary meal.
+
+阿珠姐 gives him a noticeably generous portion.
+
+王先生：
+「今天是不是比較多？」
+
+阿珠姐：
+「有嗎？」
+
+王先生：
+「有吧。」
+
+阿珠姐：
+「快吃啦。」
+
+End.
+
+No speech.
+
+==================================================
+13. LONG-TERM CALLBACK — SECOND FLOOR
+==================================================
+
+Much later, if / when Jill's Kitchen begins serious Second Floor renovation planning:
+
+Mia looks at the space.
+
+Mia：
+「先看漏水。」
+
+Sophie laughs.
+
+阿珠姐：
+「真的，先看。」
+
+If 王先生 happens to be present:
+
+王先生：
+「……這次跟我沒關係。」
+
+This callback should ONLY occur after 《那面牆》 has actually completed.
+
+Do not make it required for Second Floor progression.
+
+The Second Floor story remains independent.
+
+This is shared history, not a dependency.
+
+==================================================
+14. STORY STRUCTURE / PACING
+==================================================
+
+Target this as a long arc across many in-game days.
+
+Conceptually:
+
+Phase 1 — 阿珠姐 / Sophie / Mia existing familiarity
+Phase 2 — 阿珠姐 visibly worried
+Phase 3 — overheard phone fragments
+Phase 4 — leak revealed
+Phase 5 — Mia notices possible prior repair
+Phase 6 — Sophie reconstructs information
+Phase 7 — 王先生 overhears and asks questions
+Phase 8 — evidence gathering
+Phase 9 — apparent strong clue weakens / technical uncertainty
+Phase 10 — clearer evidence / professional inspection
+Phase 11 — formal retention of 王先生
+Phase 12 — player learns fee is quietly discounted
+Phase 13 — negotiation / preparation
+Phase 14 — mediation
+Phase 15 — compensation
+Phase 16 — repair / life continues
+Phase 17 — Sophie's broader article
+Phase 18 — restaurant aftermath / quiet callbacks
+
+Do not fire these events on consecutive days.
+
+Allow ordinary restaurant life between them.
+
+The player should occasionally wonder:
+「怡君那個漏水後來怎麼樣了？」
+
+==================================================
+15. JOURNAL / SYSTEM RULES
+==================================================
+
+This is a meaningful authored character / relationship story arc.
+
+Use the existing story / Journal architecture.
+
+Do NOT:
+- create a quest checklist;
+- show evidence 3/7;
+- show legal progress meters;
+- create a leak minigame;
+- make the player collect documents manually;
+- make the player choose legal strategy;
+- add lawyer affection;
+- add relationship points.
+
+The player witnesses / follows the story.
+
+The characters handle their own adult lives.
+
+The player's reward is:
+- knowing these people better;
+- seeing their lives continue;
+- seeing relationships between restaurant staff and regular customers become real history;
+- later recognizing callbacks.
+
+==================================================
+16. CHARACTER WRITING RULE
+==================================================
+
+This arc is specifically meant to solve a current Jill's Kitchen weakness:
+
+Employees and regular customers must NOT feel like two separate NPC databases.
+
+This story should create genuine shared history between:
+
+阿珠姐
+Sophie
+Mia
+王先生
+
+But do NOT force them into a permanent friend group afterward.
+
+After the story:
+- Sophie and Mia remain customers;
+- 阿珠姐 remains an employee;
+- 王先生 remains a regular;
+- they simply know each other differently because something real happened between them.
+
+That distinction matters.
+
+Do not make everyone best friends.
+
+==================================================
+17. DO NOT OVERWRITE 怡君
+==================================================
+
+怡君 is the actual homeowner and legal client.
+
+She must retain agency.
+
+阿珠姐 must NOT make legal decisions for her.
+Sophie must NOT publish her story without permission.
+Mia must NOT decide what repairs she should accept.
+王先生 must NOT decide settlement terms without her.
+
+The others help because they care / have relevant expertise.
+
+怡君 decides:
+- whether to retain 王先生;
+- whether to mediate;
+- whether to accept the settlement;
+- what Sophie may use / disclose.
+
+She is not a helpless daughter being rescued by her mother's friends.
+
+==================================================
+18. PRODUCT INTENT
+==================================================
+
+The player should feel:
+
+「我以前只是看 Sophie 跟 Mia 來吃飯。」
+↓
+「阿珠姐好像很喜歡看她們兩個。」
+↓
+「等等，阿珠姐最近怎麼怪怪的？」
+↓
+「靠，怡君的新家漏水？」
+↓
+「Mia 看出那面牆以前可能動過。」
+↓
+「Sophie 開始把資料整理起來。」
+↓
+「王先生居然在旁邊聽到了。」
+↓
+「原來王先生真的會進入律師模式。」
+↓
+「事情沒有想像中那麼容易證明。」
+↓
+「他真的正式接了怡君的案子。」
+↓
+「欸，這律師費是不是有算便宜？」
+↓
+「調解真的談成了。」
+↓
+「怡君拿到賠償了。」
+↓
+「Sophie 後來居然真的把這件事變成自己的工作題目。」
+↓
+Many days later:
+「哈哈靠，Mia 還記得漏水。」
+
+That is the target.
+
+This should feel like four existing Jill's Kitchen lives unexpectedly intersected because one employee's adult daughter encountered a real problem — not because the game decided to assemble a quest party.
