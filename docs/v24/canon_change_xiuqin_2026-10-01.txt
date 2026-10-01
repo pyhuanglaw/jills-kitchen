@@ -1,0 +1,392 @@
+(Filed verbatim. 2026-10-01 13:37, the player: CHARACTER CANON CHANGE — 秀琴阿姨 (cleaner, late 50s, 國雄's wife) is
+怡君's mother and takes every family / Sophie-Mia familiarity / 《那面牆》 role earlier written for 阿珠姐; 阿珠姐 stays a
+senior kitchen veteran; the 王先生 food-portion aftermath is replaced with a gesture a cleaner can make. Supersedes the
+earlier docs/v24 files where they differ.)
+
+IMPORTANT CHARACTER CANON CHANGE — REPLACE 阿珠姐 WITH 秀琴阿姨 IN ALL PREVIOUSLY DESIGNED FAMILY / CROSS-CHARACTER STORY CONTENT
+
+Before implementing the relevant story content, make this global narrative correction:
+
+All previously designed stories in which 阿珠姐 was:
+- 怡君's mother;
+- the employee who first becomes familiar with Sophie and Mia;
+- the employee with subtle 「姨母笑」 energy toward Sophie × Mia;
+- the worried mother in 《那面牆》;
+- the employee whose family problem connects Sophie, Mia and 王先生;
+
+must now use 秀琴阿姨 instead.
+
+This is intentional and should be treated as the new canon.
+
+REASON:
+阿珠姐 is a kitchen employee / chef-side veteran. Repeatedly placing her in customer-facing scenes creates spatial and simulation problems because she should normally be working in the kitchen.
+
+秀琴阿姨 is a cleaner and can naturally move through Main Hall / Side Hall / customer-facing restaurant space, notice regular customers over time, exchange occasional conversation with them, and plausibly become familiar with Sophie and Mia without violating her work role.
+
+Do NOT solve this by making 阿珠姐 repeatedly leave the kitchen.
+
+Change the character canon instead.
+
+==================================================
+NEW FAMILY CANON
+==================================================
+
+秀琴阿姨:
+- existing Jill's Kitchen cleaner;
+- approximately late-50s;
+- married to 國雄;
+- mother of 怡君.
+
+國雄:
+- 秀琴阿姨's husband;
+- approximately 60;
+- 怡君's father;
+- preserve the previously designed retirement-life storyline for 國雄 × 秀琴.
+
+怡君:
+- approximately 27;
+- adult daughter of 秀琴阿姨 and 國雄;
+- preserve her personality and all previously designed agency;
+- no tragic romantic backstory;
+- her housing arc remains unchanged except for parent identity.
+
+Therefore the family is now:
+
+秀琴阿姨 × 國雄
+　　　　│
+　　　怡君
+
+This should be consistent everywhere:
+- story facts;
+- dialogue;
+- Journal;
+- character relationships;
+- knowledge state;
+- callbacks;
+- future story eligibility;
+- any portrait / story metadata;
+- tests.
+
+==================================================
+怡君 INTRODUCTION
+==================================================
+
+Replace the previous 阿珠姐 version.
+
+怡君's first natural restaurant appearance can now involve 秀琴阿姨.
+
+Example tone:
+
+秀琴阿姨：
+「妳怎麼來了？」
+
+怡君：
+「吃飯啊。」
+
+秀琴阿姨：
+「附近那麼多間。」
+
+怡君：
+「不能吃妳工作的喔？」
+
+Preserve the ordinary, practical mother-daughter relationship.
+
+國雄 does NOT need to be present at every 怡君 event.
+
+Do not turn them into a constantly appearing family unit.
+
+==================================================
+《三個選項》
+==================================================
+
+All previously designed 怡君 housing-story beats now belong to:
+
+秀琴阿姨 ↔ 怡君
+
+not:
+
+阿珠姐 ↔ 怡君.
+
+怡君 still:
+- considers three housing options;
+- makes her own decision;
+- purchases the home;
+- moves in;
+- eventually gives her mother a spare key.
+
+The home choice remains reasonable based on information available at purchase.
+
+The leak defect already physically exists before purchase / handover but is not reasonably apparent to 怡君.
+
+怡君 discovers the manifestation only after moving in, plausibly after rain.
+
+==================================================
+SOPHIE × MIA FAMILIARITY
+==================================================
+
+The employee who gradually notices Sophie and Mia are together is now 秀琴阿姨.
+
+This should arise naturally because her cleaner role allows her to repeatedly encounter them in customer-facing spaces.
+
+She has subtle 「姨母笑」 energy.
+
+Do not make her intrusive.
+
+Example tone:
+
+秀琴阿姨：
+「今天怎麼只有妳？」
+
+Sophie：
+「她加班。」
+
+秀琴阿姨：
+「喔～～」
+
+Sophie：
+「妳那個喔是什麼意思？」
+
+秀琴阿姨：
+「沒有啊。」
+
+Over time they occasionally chat.
+
+This pre-existing familiarity is why Sophie and Mia later notice when 秀琴阿姨 seems worried.
+
+==================================================
+《那面牆》 — CAST UPDATE
+==================================================
+
+The central cross-character arc is now:
+
+秀琴阿姨 × Sophie × Mia × 王先生
+
+with 怡君 as the actual homeowner / legal client.
+
+NOT:
+
+阿珠姐 × Sophie × Mia × 王先生.
+
+All story logic remains:
+
+秀琴阿姨 seems worried
+→ initially refuses to explain
+→ Sophie / Mia later overhear fragments of her call with 怡君
+→ discover 怡君's recently purchased home has a pre-existing leak defect that only became apparent after move-in
+→ Mia notices possible prior repair / concealment clues but does not overclaim
+→ Sophie reconstructs timeline / documents
+→ 王先生 naturally overhears the discussion while dining
+→ distinguishes suspicion from provable facts
+→ evidence contains at least one setback / ambiguity
+→ 怡君 formally retains 王先生
+→ real legal fee
+→ genuinely discounted fee that 王先生 NEVER announces
+→ formal mediation
+→ compensation
+→ later Sophie develops the broader housing / consumer article
+→ quiet long-term callbacks.
+
+Preserve 怡君's agency throughout.
+
+==================================================
+王先生 FEE AFTERMATH — CHANGE THE OLD FOOD JOKE
+==================================================
+
+IMPORTANT:
+
+Delete / revise the previously proposed aftermath where 阿珠姐 personally gives 王先生 an unusually large food portion.
+
+That worked when the mother was a kitchen employee.
+
+秀琴阿姨 is a cleaner and should NOT control kitchen portions.
+
+Do NOT make her enter the kitchen and secretly add food merely to preserve the joke.
+
+Find a role-consistent understated gesture instead.
+
+Possible direction:
+- she notices 王先生's usual table and quietly prepares / straightens it before he sits;
+- remembers a small ordinary preference already established through restaurant life;
+- brings / places something she can legitimately handle in her role;
+- or simply has a short understated exchange showing that their relationship is now different.
+
+Do not force a gratitude prop if none is natural.
+
+The important emotional rule remains:
+
+王先生 never asks for recognition for the discounted fee.
+秀琴阿姨 understands what he did.
+Neither of them gives a speech about it.
+
+==================================================
+國雄 STORY REMAINS
+==================================================
+
+Preserve the existing 秀琴阿姨 × 國雄 storyline.
+
+This change actually makes 怡君 part of the same established family.
+
+國雄's retirement-life arc remains conceptually:
+
+《今天不回去吃》
+
+- recently retired / semi-retired;
+- initially often comes to pick up 秀琴;
+- 秀琴 likes continuing to work;
+- 國雄 gradually develops his own routine / friends;
+- he stops appearing solely as 「來等老婆的人」;
+- eventually may come to Jill's Kitchen independently to eat.
+
+Example later exchange may remain:
+
+秀琴：
+「你不是跟朋友出去？」
+
+國雄：
+「回來了。」
+
+秀琴：
+「那你來幹嘛？」
+
+國雄：
+「吃飯。」
+
+秀琴：
+「家裡不能吃？」
+
+國雄：
+「今天不想煮。」
+
+Do not make 國雄's story dependent on 《那面牆》.
+
+However, because he is now canonically 怡君's father, he must not behave as though he has never heard of 怡君 or the housing problem.
+
+Use story knowledge appropriately.
+
+He does NOT need to become a fifth protagonist of 《那面牆》.
+
+==================================================
+阿珠姐 — NEW / RESTORED ROLE
+==================================================
+
+阿珠姐 remains an established senior kitchen employee.
+
+Remove the newly invented:
+- daughter 怡君 relationship;
+- Sophie / Mia姨母笑 role;
+- 《三個選項》 mother role;
+- 《那面牆》 family role.
+
+Preserve her value as a kitchen veteran.
+
+Existing source-aligned material such as:
+
+《第二層左邊》
+
+and veteran behavior should remain associated with her where appropriate.
+
+She can still have future Staff Lives content, but do NOT immediately invent a replacement family biography merely because 怡君 moved to 秀琴阿姨.
+
+It is okay for 阿珠姐's deeper personal story to be designed later.
+
+==================================================
+STAFF ROOM / SECOND FLOOR CONSEQUENCES
+==================================================
+
+Update any future Staff Room story examples accordingly.
+
+Because 秀琴阿姨 is now the employee with:
+- 國雄;
+- 怡君;
+- Sophie / Mia familiarity;
+- 《那面牆》 shared history;
+
+she may naturally contribute to Staff Room evidence involving:
+- 國雄 waiting for her;
+- 怡君 visiting / waiting;
+- outside life entering the restaurant.
+
+But do NOT make Staff Room “秀琴阿姨's room.”
+
+It remains a shared employee space.
+
+阿珠姐 remains valid for:
+- veteran kitchen behavior;
+- staff-space observations;
+- long-tenure moments;
+- Staff Room use as an employee.
+
+==================================================
+MIGRATION / IMPLEMENTATION
+==================================================
+
+If any of the previous 阿珠姐-family story material has already been coded during this current implementation run:
+
+Do NOT preserve it merely because code already exists.
+
+Migrate / replace it now before release.
+
+This is a canon correction.
+
+Search for all relevant references to:
+- 阿珠姐 + 怡君
+- 阿珠姐 + Sophie
+- 阿珠姐 + Mia
+- 阿珠姐 + 王先生 in 《那面牆》
+- mother / daughter relationship metadata
+- housing arc ownership
+- story eligibility
+- Journal text
+- dialogue
+- tests
+- story illustration hooks
+
+and update them consistently to 秀琴阿姨.
+
+Do NOT blindly replace every occurrence of 阿珠姐 globally:
+her legitimate kitchen / veteran content must remain hers.
+
+Only replace the family / 怡君 / Sophie-Mia familiarity / 《那面牆》 story role described above.
+
+==================================================
+CANON SUMMARY
+==================================================
+
+FINAL:
+
+秀琴阿姨
+= cleaner
+= 國雄's wife
+= 怡君's mother
+= naturally knows Sophie / Mia from customer-facing work
+= notices Sophie × Mia early with subtle 姨母笑
+= mother at center of 怡君 housing concern
+= employee connection that brings 《那面牆》 into Jill's Kitchen
+
+國雄
+= 秀琴's husband
+= 怡君's father
+= retains retirement-life arc
+
+怡君
+= their 27-year-old adult daughter
+= 《三個選項》
+= buys / moves into home
+= later discovers pre-existing leak
+= actual legal client in 《那面牆》
+
+Sophie
+= media / editorial professional
+
+Mia
+= interior / spatial-design-related professional
+
+王先生
+= lawyer / regular customer
+
+阿珠姐
+= senior kitchen veteran
+= NOT 怡君's mother
+= NOT required to leave the kitchen for customer-facing story beats
+
+This canon supersedes the earlier version.

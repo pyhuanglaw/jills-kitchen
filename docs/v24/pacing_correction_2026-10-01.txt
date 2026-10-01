@@ -1,0 +1,95 @@
+(Filed verbatim. 2026-10-01 13:30, the player: PACING CORRECTION. Compresses the chronology in AUDIT_AND_PLAN.md §3–§4:
+怡君 ~7–10 days, 2–4 settled days, 《那面牆》 ~12–18 days in 8–10 beats, 2–4 days before Second Floor awareness;
+no global multi-day separation between beats; at most one major authored beat per in-game day; no event dump.
+Supersedes the pacing in the earlier docs/v24 files where they differ.)
+
+PACING CORRECTION — COMPRESS MUCH MORE
+
+The current proposed pacing is still far too slow for actual play.
+
+This is a restaurant-management game with many parallel systems, not a real-time daily-life simulator. A mature Day 52 player should NOT need another 50–80 in-game days before the Second Floor storyline even begins.
+
+Revise the chronology to approximately:
+
+1. 怡君 introduction → 《三個選項》 → purchase / move-in / spare-key payoff:
+   TARGET ~7–10 in-game days total.
+
+2. After move-in:
+   allow ~2–4 ordinary restaurant days so the move feels completed and settled.
+
+3. 《那面牆》:
+   TARGET ~12–18 in-game days total.
+
+Do NOT force the previously conceptual 18 phases into 18 separate authored events.
+
+Consolidate them into approximately 8–10 meaningful player-facing beats.
+
+For example:
+
+Beat 1 — 阿珠姐 seems worried / phone fragments / leak becomes known
+Beat 2 — Mia examines available visual evidence; Sophie begins reconstructing the timeline
+Beat 3 — early evidence / seller response creates the first working theory
+Beat 4 — 王先生 naturally overhears and identifies the legal issue
+Beat 5 — an apparently useful clue becomes weaker / more ambiguous than expected
+Beat 6 — stronger evidence / professional findings emerge; 怡君 formally retains 王先生
+Beat 7 — preparation / negotiation develops
+Beat 8 — mediation
+Beat 9 — settlement / compensation
+Beat 10 — Sophie article + quiet aftermath, which may itself be split or partially ambient if appropriate
+
+Some beats may naturally occur on nearby days.
+
+Do NOT insert artificial 2–4 day waits between every beat merely to make the arc “long-form.”
+
+Long-form means:
+the story develops, changes direction, and has remembered history.
+
+It does NOT mean:
+the game makes the player wait unnecessarily.
+
+Keep:
+- at most one major authored story beat per in-game day;
+- no event dump;
+- ordinary gameplay between major beats where it feels natural.
+
+But remove any global rule requiring every important beat to be separated by multiple days.
+
+4. After 《那面牆》 resolves:
+   only ~2–4 ordinary days are needed before early Second Floor awareness can begin.
+
+IMPORTANT:
+“Second Floor storyline begins” does NOT mean immediate acquisition.
+
+The Second Floor storyline already contains its own pacing:
+awareness
+→ Jill inspection
+→ later Missing Cats
+→ continued space pressure
+→ Jill asks landlord
+→ acquisition
+→ open-floor life
+→ much later Staff Room
+→ still later Private Dining.
+
+Therefore DO NOT use 怡君 / 《那面牆》 as an artificial pacing wall for Second Floor content.
+
+For the user's current mature Day 52 save, a reasonable target is approximately:
+
+Day 59–62:
+怡君 has moved in.
+
+Day 62–66:
+《那面牆》 begins.
+
+Day 75–82:
+《那面牆》 reaches resolution / aftermath.
+
+Approximately Day 78–86:
+early Second Floor story beats may begin surfacing.
+
+These are pacing targets, NOT hard-coded absolute day gates.
+
+Actual progression must depend on experienced story state.
+
+Most important:
+If playtesting feels like the player is waiting for the next story rather than naturally encountering it, the pacing is too slow.

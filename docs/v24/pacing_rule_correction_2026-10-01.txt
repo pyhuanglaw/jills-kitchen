@@ -1,0 +1,54 @@
+(Filed verbatim. 2026-10-01 13:32, the player: ONE MORE PACING RULE CORRECTION, after pacing_correction_2026-10-01.txt.
+Keeps at most one major authored beat per in-game day; removes every global separation or cooldown between beats or
+stories; event-specific minimum delays only where the fiction needs time. NARRATIVE TIME > GLOBAL COOLDOWN.)
+
+ONE MORE PACING RULE CORRECTION
+
+Keep this rule:
+- At most ONE major authored story beat may fire on the same in-game day.
+
+But REMOVE any global rule such as:
+- different stories must be separated by at least 2 days;
+- every major beat needs a multi-day cooldown;
+- a story cannot continue on the following day.
+
+That kind of global cooldown is too mechanical and can make natural story continuity feel artificially delayed.
+
+Pacing should be determined by narrative causality, not a fixed cooldown.
+
+For example:
+
+Day X:
+阿珠姐's phone conversation reveals that 怡君's new home has a leak.
+
+Day X+1:
+If Sophie and Mia naturally visit and the required characters are actually present, it is perfectly valid for them to ask about it / see the photos / begin helping.
+
+Do NOT force an empty day merely because a generic “2-day story gap” rule says so.
+
+Likewise, some events SHOULD require longer gaps when the fiction requires time:
+- waiting for another rainfall;
+- professional inspection;
+- collecting documents;
+- arranging formal legal representation;
+- scheduling mediation;
+- completing repairs;
+- allowing a move-in to feel settled.
+
+So the intended rule is:
+
+NARRATIVE TIME > GLOBAL COOLDOWN.
+
+Use:
+- same-day maximum: 1 major authored beat;
+- story prerequisites;
+- actual character presence;
+- event-specific minimum delays only where the fiction requires them.
+
+Do NOT use:
+- universal 2-day separation between different stories;
+- universal multi-day cooldown between beats.
+
+The purpose of pacing is to make events feel like they happened over time, NOT to make the player wait for the story system.
+
+Also, unrelated ambient life may continue normally between or alongside authored beats.

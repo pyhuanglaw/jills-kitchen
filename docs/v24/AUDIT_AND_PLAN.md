@@ -3,6 +3,15 @@
 Written 2026-10-01 against v2.3-rc3 (tag `v2.3-rc3`, published as version 37). The canonical brief is
 `docs/v24/implementation_pass_2026-10-01.txt` (section letters below refer to it).
 
+**Revised the same day (13:30–13:37) for three corrections from the player, which win where they differ:**
+- `pacing_correction_2026-10-01.txt`: much shorter arcs. 怡君 ~7–10 days, 2–4 settled days, 《那面牆》 ~12–18 days in
+  8–10 beats, 2–4 days before the Second Floor's first hints.
+- `pacing_rule_correction_2026-10-01.txt`: no global gaps or cooldowns between beats or stories. At most one major
+  beat a day; waits only where the fiction needs time.
+- `canon_change_xiuqin_2026-10-01.txt`: **秀琴阿姨** (cleaner, late 50s, 國雄's wife) is 怡君's mother, the one who
+  knows Sophie and Mia, and the family at the centre of 《那面牆》. 阿珠姐 stays a senior kitchen veteran and never has
+  to leave the kitchen for these stories. §2–§5 below are written to the corrected canon.
+
 Read with it:
 - the visual addendum (`visual_addendum_yijun_wall_2026-10-01.txt`);
 - the Second Floor visual reference (`second_floor_visual_reference_2026-10-01.txt`, the two pictures in `refs/`);
@@ -60,12 +69,12 @@ Read with it:
 | Conflict | Decision |
 |---|---|
 | A1 — 營運升級 「後場休息室」 (bought around Day 27 in the player's save; +2 staff; nothing drawn) | Renamed **後場整理區** with new text: shelves, a rack, a place to change and drop things. The +2 staff and the achievement stay; no refund, no rebuy. Drawn small in the kitchen (shelves, a few hooks), never with a seat or a door. It does not answer the Staff Room's need — it is part of the evidence |
-| A2 — tenure since v2.3 only | `tenure(m)` gives a coarse class, never a date. **Legacy staff** (hired before v2.3, `sinceLegacy`): 「熟手」 by default; where the player's canon says more, that wins — 阿珠姐, 秀琴阿姨 and 阿德師傅 are 「資深」 (veteran cook; legacy staff who watched the restaurant grow; quiet stable routines), 小彤 is 「較新」 (early in her working life). **Hired after v2.3**: their counted days (新 under 10, 熟手 from 10, 資深 from 60). Story gates read the class; the staff card keeps showing the counted days ("從 v2.3 起算"). New hires stay new (《第一天》 unchanged) |
+| A2 — tenure since v2.3 only | `tenure(m)` gives a coarse class, never a date. **Legacy staff** (hired before v2.3, `sinceLegacy`): 「熟手」 by default; where the player's canon says more, that wins — 阿珠姐, 秀琴阿姨 and 阿德師傅 are 「資深」 (veteran cook; legacy staff who watched the restaurant grow; quiet stable routines), 小彤 is 「較新」 (early in her working life; 「熟手」 after 45 counted days). **Hired after v2.3**: their counted days (新 under 10, 熟手 from 10, 資深 from 60). Story gates read the class; the staff card keeps showing the counted days ("從 v2.3 起算"). New hires stay new (《第一天》 unchanged). 《第二層左邊》 (`veteran_knows`) goes to 阿珠姐 when she is in, else the most senior cook by class |
 | A3 — no schedules | `crewHere(m)`, story-only presence: here / 晚點到 / 今天沒來 / 已經下班. Only an authored beat sets it, for that one day. A staff member who is not here does no work that day; nothing else changes. No rota, no UI, no chores |
 | The random office guest 「Kevin」 | Renamed in the random pool, so Kevin is only ever Marco's old colleague (later pass) |
 | 小彤 is a cleaner; 《第一天》 only fires for waiters and chefs | Her arc is later (P5); her first-day line will get a cleaner's version then |
 | Crew cap 12/12 on Day 52 | 「下面第二格」 needs a new hire; it stays in P5, after the second floor raises the cap |
-| A chef never leaves the kitchen on screen, but 阿珠姐 must meet 怡君, Sophie and Mia at a table | A **table visit**: a staff member walks out of the kitchen to a table, stands there for the exchange, walks back. Real presence, a few seconds, no other effect |
+| ~~A chef never leaves the kitchen on screen, but 阿珠姐 must meet 怡君, Sophie and Mia at a table~~ | Resolved by the canon change: the mother is **秀琴阿姨**, a cleaner, already a walking sprite in the dining rooms. A beat that needs her at a table gives her a **walk-over** task (she walks to that table, stands for the exchange, goes back to work) — the same movement as clearing a table. No cook ever leaves the kitchen for these stories |
 | Where the stairs to 2F are | The internal staircase comes down in the **side room** (the unit next door that was opened up): a door in the side room's near wall, bottom edge, beside the cats' bowls. That is how the cats get up without ever leaving the building. The second floor's own reference puts the stair opening at its lower right, above that corner |
 | The building's other floors | 3F and above are offices (小林, Mia's firm). 2F is the landlord's, vacant. The street view gets the 2F facade above the sign: dark windows, which light up after the lease |
 
@@ -78,20 +87,33 @@ Read with it:
      - the people really present, through a `present` check.
    - A run writes its fact.
    - The arc's Journal line is a `STORY_LINES` entry listing only the meaningful stages; ambient steps write facts but are not in the denominator.
-2. **Pacing.**
-   - `v24Pace()`: at most one meaningful v2.4 beat a day.
-   - At least 2 days between meaningful beats of different arcs.
-   - Each arc's own gaps are 2–7 days.
-   - Ambient hints at most one a day.
-   - The first v2.4 beat can come no earlier than the second day the new version is played (no load-time dump).
-3. **Chronology without brittle coupling** (brief B). Each era opens when the previous one has ended plus breathing room, or after a fallback if the previous one cannot happen in this save:
+2. **Pacing** (revised by the two pacing corrections: narrative time, not cooldowns).
+   - **At most one major beat a day**, across every story. The arbiter already does this (`LANE_CAP.major` 1 a day,
+     shared with the v2.3 stories); v2.4's major beats go through it, including the away-from-the-restaurant
+     vignettes.
+   - **No global gaps.** Nothing like "2 days between stories" or "a cooldown after every beat". A beat may come the
+     day after the one before it when the people it needs are really there.
+   - **Waits only where the fiction needs time.** Each stage has its own minimum `gap` in days after the stage before
+     it — 1 for most (the next day is fine), longer only for viewings, a handover, settling in after the move, rain, a
+     professional inspection, collecting documents, a formal retainer, scheduling the mediation, repairs.
+   - **Presence.** A beat needs the people it shows. When a beat is due, the visit schedule brings those regulars that
+     day with a high chance (the schedule's own hash coins, so the day's random stream is untouched). The arc does not
+     stall waiting for a lucky visit.
+   - **No load-time dump.** The first v2.4 beat cannot come before the second day the new version is played.
+   - Ambient life (cats, regulars, staff chatter, v2.3 stories) carries on as before, beside and between beats.
+3. **Chronology without brittle coupling** (brief B). Eras in order, each with its own entry condition:
    - 怡君 era;
-   - 《那面牆》 era;
-   - Second Floor era;
+   - 《那面牆》 era: opens 2 days after the spare key (the move has settled), and its first beat needs rain;
+   - Second Floor era: opens 2 days after the settlement. It is not walled behind the aftermath, and its own stages
+     carry its own pacing (awareness → inspection → later the missing cats → pressure → asking → the lease → the open
+     floor);
    - Staff Room;
    - Private Dining.
 
-   For example, the Second Floor opens when 《那面牆》 is done plus 6 days. If 阿珠姐 has not worked here for 20 days, 怡君's arcs are skipped (dormant, not completed) and the floor opens anyway.
+   **Fallback (dormancy).** An era whose people cannot be there in this save (怡君's needs 秀琴阿姨 on the crew) does
+   not hold the next era forever. Once the next era could start and has waited 5 days, the blocked era becomes
+   *dormant*: skipped, not completed, never shown as done. A dormant era does not wake up after a later era has had
+   its first beat, so the chronology is never reversed.
 4. **Knowledge.**
    - An outside character is "introduced" by a fact when the first beat really happens.
    - Lines that name someone check that the speaker was present then (`relSet(…,'introduced')`) or that the fact exists.
@@ -116,27 +138,66 @@ Read with it:
    - At closing, the present staff and Jill notice. Short search lines, rooms shown one after another. 「這個怎麼開著？」 Up the stairs: the first full view of 2F, the two cats where they went. 「妳們兩個。」
    - Then down, and the door locked. At most about an hour of game time missing.
 
-## 4. The chronology and what a Day 52 player meets (rough, depends on who comes in)
+## 4. The chronology and what a Day 52 player meets
 
-| Era | Stages (meaningful ones in bold) | Rough length |
+Revised for the pacing corrections and the canon change. "Gap" is the stage's own minimum wait in days after the stage
+before it, and only where the fiction needs time; 1 means the next day is fine. Major beats also share the one-a-day
+cap with every other story. Days are what a Day 52 player should roughly see, not gates.
+
+**怡君 (target ~7–10 days; Day 52 save: from Day 53, moved in by ~Day 61)**
+
+| # | Beat | Lane | Who has to be there | Gap |
+|---|---|---|---|---|
+| Y1 | 《吃飯啊》 — 怡君 eats here; 秀琴阿姨 walks over: 「妳怎麼來了？」「吃飯啊。」 Illustration `yj_intro` | major | 怡君, 秀琴阿姨 | era open (the second day played) |
+| Y2 | listings: 怡君 scrolling flats at her table; 秀琴阿姨 glances over | minor | 怡君, 秀琴阿姨 | 1 |
+| Y3 | 「找到？」「找到三個。」 — three ordinary options and their tradeoffs | major | 怡君, 秀琴阿姨 | 2 (viewings) |
+| Y4 | 「她決定了。」 — the smaller one, closer, fits her life; a reasonable choice with what she could see | minor | 秀琴阿姨 (tells Jill) | 1 |
+| Y5 | 《搬家》 — 秀琴阿姨 晚點到 (she helped with the move); one line when she comes in | minor | 秀琴阿姨, late | 2 (the handover) |
+| Y6 | 備用鑰匙 — morning vignette at 怡君's new home; the wall is in the room and looks normal. Illustration `yj_key`. In service Jill notices the new key on 秀琴阿姨's ring | major | (away scene) | 2 (settling in) |
+
+**Sophie × Mia × 秀琴阿姨 (before the wall)**
+- Ambient, while she clears or wipes near their table: two or three short exchanges. They build the pair's familiarity
+  (`spoke`). 《那面牆》's first beat needs `famOf` ≥ 2 with both of them.
+- 「今天怎麼只有妳？」「她加班。」「喔～～」 (minor): once Sophie and Mia come together (`sm_h`) and Sophie comes alone.
+  It happens whenever that is true, before or during the wall.
+
+**《那面牆》 (target ~12–18 days, ten beats; Day 52 save: begins ~Day 63–65, settled ~Day 78–80)**
+
+| # | Beat | Lane | Who | Gap |
+|---|---|---|---|---|
+| W1 | 秀琴阿姨不太對 — wipes the same table twice; Sophie and Mia ask; 「沒事。」 Later, her phone call by the side door: 「妳先拍起來。」「不是擦掉就好了啦。」「上次不是才叫人來？」「……好啦，妳先不要弄。」 | major | Sophie, Mia, 秀琴阿姨 | era open + rain in the last 3 days (after 5 days without, a night rain the game did not show) |
+| W2 | They learn what it is: 怡君's flat leaks when it rains. Photos on 秀琴阿姨's phone; Mia: 「這裡以前可能處理過。」「所以他們本來就知道？」「不是。這只能說可能處理過。」「差在哪？」「差很多。」 Sophie starts asking for the listing, the viewing photos, the messages, the disclosure, the dates | major | Sophie, Mia, 秀琴阿姨 | 1 |
+| W3 | First working theory: the seller's side says they never had a leak; the disclosure form says 無滲漏水; the listing photo shows that wall freshly painted. "Water comes in at the window and they painted over it." | minor | 怡君 (with her folder) or 秀琴阿姨 + Sophie | 2 (documents) |
+| W4 | 王先生 at the next table: 「等一下。」「妳女兒買的是中古屋？」 He separates the three questions: (1) was the defect there before the handover, (2) was that spot repaired or covered before, (3) did the seller know of this leak and not disclose it. Suspicion, physical evidence, legal relevance, what can be proven. Casual advice: keep this, do not say that, find these | major | 王先生, Sophie, Mia, 秀琴阿姨 | 1 |
+| W5 | Setback: a water test on the window frame — nothing comes in. The window was not it. And the "fresh paint" listing photo has no reliable date. 「喔，原來沒這麼簡單。」 | minor | 秀琴阿姨 + Sophie or Mia | 2 (the test) |
+| W6 | The leak-detection report: water through a crack in the outer wall behind the patch; old water damage and an old repair under the paint. (1) and (2) now have evidence; (3) does not yet. 「如果要我處理，就正式委任我。」 怡君 retains him. The fee: 「……這比我之前問的低很多欸。」「你是不是算太少？」「沒有。」「真的？」「妳女兒有付錢就好。」 | major | 怡君, 王先生, 秀琴阿姨 | 3 (the inspection) |
+| W7 | Preparation: his letter; the seller's lawyer: "never knew"; then the building's repair record shows a worker for that wall before the sale. Mediation is applied for | minor | 王先生 or 秀琴阿姨 | 2 (documents) |
+| W8 | 調解 — away scene in the mediation room: 「那我們一項一項談。」 The evidence item by item; the other side concedes the old repair and disputes the knowledge; a proposal; 怡君 decides to accept a negotiated amount | major | (away scene) | 3 (scheduling) |
+| W9 | 和解 — compensation recorded as a fact; repairs to start. Illustration `wall_settled` | minor | 怡君 or 秀琴阿姨 | 1 |
+| W10 | Sophie: 「我想寫這個。」「寫我的？」「不一定寫妳。是寫這件事。」 怡君 keeps control of her part | minor | Sophie, 怡君 | 3 (only once the matter is closed) |
+| — | Aftermath (ambient): before 王先生 sits, 秀琴阿姨 has wiped his table and put the day's paper there; two lines. Later 「牆弄好了。」 | ambient | 王先生, 秀琴阿姨 | 2 / 5 |
+
+**After that**
+
+| Era | Stages | Day 52 save |
 |---|---|---|
-| 怡君 | **《吃飯啊》** → (她在看房子) → **「三個。」** → 「她決定了。」 → 《搬家》 (阿珠姐 晚點到) → **備用鑰匙** | ~20–30 days |
-| breathing room | ordinary days; 怡君 sometimes eats here | ≥ 8 days |
-| Sophie × Mia × 阿珠姐 | needs Sophie and Mia to have left together (`sm_g`): **「喔～～」** | when it happens |
-| 《那面牆》 | 阿珠姐不太對 → 電話 → **漏水** (a rainy day) → **Mia 看照片** → Sophie 排時間 → **王先生「等一下。」** → 問題 → 照片沒那麼有用 → 水不是從那裡來 → **抓漏的報告** → **「就正式委任我。」** → **律師費** → 準備 → **調解** → **和解** → 修 → **Sophie「我想寫這個。」** → **「今天是不是比較多？」** | ~50–70 days |
-| breathing room | | ≥ 6 days |
-| 二樓 | 「樓上也是你們的？」 → staff mention → Jill 看過樓上 → (days) → **柔柔和小齁不見了** → pressure (staff and customers) → 「樓上不是還空著？」 → **「整層？」「整層。」** → the whole floor | ~25–40 days |
-| open floor | people start using it; the cats visit; 柔柔's window | ≥ 10 days |
-| 休息室 | 《箱子》《又在找位置》《東西放哪》 (may start earlier) → **《大家待的地方》** → walls and a door → I / II / III | later |
+| 二樓 | opens 2 days after W9 → 「樓上也是你們的？」 → staff mention → Jill 看過樓上 → (days) → **柔柔和小齁不見了** → pressure (staff and customers) → 「樓上不是還空著？」 → **「整層？」「整層。」** → the whole floor | first hints ~Day 80–86 |
+| open floor | people start using it; the cats visit; 柔柔's window | a real stretch, not one day |
+| 休息室 | 《箱子》《又在找位置》《東西放哪》 (may start earlier) → **《大家待的地方》** → walls and a door → I / II / III. 秀琴阿姨 may add evidence (國雄 waiting for her, 怡君 waiting) but it is everyone's room | later |
 | 包廂 | its own evidence → **《關上門以後》** → walls and a door | later still |
+
+國雄's own arc 《今天不回去吃》 (P5) does not depend on the wall, but he is 怡君's father: nothing he says may sound as if
+he had never heard of her flat.
 
 ## 5. Illustrations needed from the player
 
-Hooks exist from the start, each with an in-game fallback:
+Hooks exist from the start, each with an in-game fallback (asked for on 2026-10-01, corrected for the canon change):
 
-1. `yj_intro`: 怡君 at Jill's Kitchen, 阿珠姐 out of the kitchen at her table.
-2. `yj_key`: 怡君's new home, 阿珠姐 visiting, the spare key.
-3. `wall_leak` (**required**): the affected wall or ceiling in 怡君's home. Mia examining the repaired patch, Sophie with photos / the timeline, 阿珠姐 there.
+1. `yj_intro`: 怡君 at Jill's Kitchen; 秀琴阿姨 in her cleaner's clothes at her table.
+2. `yj_key`: 怡君's new home, 秀琴阿姨 visiting, the spare key. The wall is in view and looks normal; any old repair
+   is barely visible.
+3. `wall_leak` (**required**): the same room and wall after the rain. Mia at the repaired patch, Sophie with photos and
+   the timeline, 秀琴阿姨 there, 怡君 possibly.
 4. `wall_settled`: after the mediation — 怡君 and 王先生, restrained.
 
 Later, for the floor:
@@ -146,11 +207,11 @@ Later, for the floor:
 ## 6. Releases
 
 - **rc4: P0 + P1.**
-  - Foundations: A1–A3, pacing, illustrations, table visits.
+  - Foundations: A1–A3, pacing, illustrations, the walk-over.
   - 怡君 and 《三個選項》.
-  - The Sophie / Mia / 阿珠姐 familiarity.
+  - The Sophie / Mia / 秀琴阿姨 familiarity.
   - 《那面牆》 complete.
-  - The Day 52 player starts meeting 怡君 within days and has weeks of story before the floor.
+  - The Day 52 player meets 怡君 the day after updating and sees the wall settled around Day 80.
 - **rc5: P2.**
   - The 2F room from the reference, its facade, the stairs.
   - The floor's arc with the missing cats, the lease, the open floor.
@@ -160,6 +221,6 @@ Later, for the floor:
 Each release gets:
 - its own tests;
 - migration on every player save;
-- a multi-day pacing simulation on Day 52 / Day 46;
+- a multi-day pacing simulation on Day 52 / Day 46, checked against the targets above;
 - phone screenshots;
 - a full regression.
