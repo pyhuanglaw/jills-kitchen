@@ -1,0 +1,26 @@
+v2.4 rc4 — why golden_frames was re-recorded, and the proof that nothing else moved (2026-10-01, 16:10)
+
+What changed: 秀琴阿姨 from Day 1 (docs/v24/xiuqin_from_day1_2026-10-01.txt). In a new game she walks in at ~92% of
+Day 1's service, tidies beside an empty, already clear table, says three lines, and the coach names her once; Day 2's
+prep screen has one news line about her. golden_frames plays exactly that: Day 1 and Day 2 of a new game, plus the
+evening screen.
+
+1. Before re-recording, against the P0 baselines (tests/golden/frames.json, screens/evening.png):
+   FAIL golden_frames
+     evening: pixels differ in box (39, 224, 82, 581)   <- her sprite and name tag at the left table
+     day1: first differing sample #140 (t=140.1): scene <- she walks in (0.92 x 150 s = 138 s, plus the walk)
+     day2: first differing sample #0 (t=0.033): dom     <- the prep screen's news line, kept in #screen's markup
+   golden_scenario and cat_personality_fingerprint: PASS (unchanged).
+
+2. The same code with the helper switched off (window.__noXQH=1 prepended to js/game.js, run via JK_GAME_JS):
+   PASS cat_personality_fingerprint, PASS golden_scenario, PASS golden_frames — the P0 baselines exactly.
+   So every difference in (1) is hers, and nothing else in rc4 moves a golden.
+
+3. What the re-recorded frames.json differs in (old vs new):
+   day1: 104 of 244 samples differ, from t=140.1 on — scene pixels in 54 samples, DOM in 97 (her lines, the coach);
+         'frames' and 'digest' identical: money, revenue, tips, guests, reviews, stats, stock and the cats' state are
+         the same with her as without her.
+   day2: 268 of 268 samples differ in 'dom' only (the news line); scene pixels identical; 'digest' identical.
+   screens/evening.png: her at the left table during the closing (Jill at the right one).
+
+4. After re-recording: PASS golden_frames.

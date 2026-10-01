@@ -1,0 +1,12 @@
+day1_helper_arrives.png: Day 1 of a new game, about 21:15: 秀琴阿姨 has walked in and tidies beside a table nobody is at; her first lines
+day1_coach.png: a few seconds later, after her three lines: the coach names her, once
+day1_closing_helper.png: Day 1, after 21:30: she wipes down by the pickup point while the closing runs; about twenty seconds in she goes home
+day2_news.png: Day 2 of a new game: the morning news says who came to help last night
+day4_staff_tab.png: Day 4, the staff tab opens: the recruit list says the first cleaner is 秀琴阿姨
+hire_her_line.png: hiring the first cleaner is hiring her: her one line over the shop, 「那以後就天天來了。」
+hire_her_card.png: her card: 清潔員, 「今天起正式上班」 — she was in most evenings before
+yj_meet_helper_scene.png: a new game, Day 8, no cleaner hired: 怡君 came late to eat; her mother, in to help close up, walked over — 「妳怎麼來了？」 with the player's yj_intro picture
+yj_meet_helper_scene_line4.png: the same scene, the last line 「不能吃妳工作的喔？」 (怡君, laughing)
+day52_update_note.png: the player's Day 52 save, next prep screen: one 2.4 note — staff arriving late, the illustrations, 後場整理區 (systems only)
+manual_staff.png: the manual, Jill 與員工: 清潔員, 秀琴阿姨 (before and after the first cleaner), 晚點到
+manual_story.png: the manual, 故事: 插圖 and 店外的生活

@@ -12,6 +12,15 @@ Written 2026-10-01 against v2.3-rc3 (tag `v2.3-rc3`, published as version 37). T
   knows Sophie and Mia, and the family at the centre of 《那面牆》. 阿珠姐 stays a senior kitchen veteran and never has
   to leave the kitchen for these stories. §2–§5 below are written to the corrected canon.
 
+**Revised again (15:07–15:11) for the fresh-game premise and two standing requirements:**
+- `xiuqin_from_day1_2026-10-01.txt`: 秀琴阿姨 is part of the restaurant from Day 1 / the first days, without giving a
+  free full-strength cleaner. 怡君 is not gated on a late day or on Sophie × Mia. Two progressions — A: 秀琴 → 怡君 →
+  《三個選項》 → the move; B: Sophie / Mia's long-term visits → familiarity with 秀琴 — meet in 《那面牆》. Validate on
+  the Day 52 save and on a fresh save. Not more beats; not more rc4 scope. (§3.9, §4.)
+- 15:08: no Simplified Chinese anywhere in the game; names may be English.
+- 15:11: 「因為這次新增很多東西 說明書和一開始的教學都要到位」 — the manual and the opening tutorial must cover the new
+  content (§6).
+
 Read with it:
 - the visual addendum (`visual_addendum_yijun_wall_2026-10-01.txt`);
 - the Second Floor visual reference (`second_floor_visual_reference_2026-10-01.txt`, the two pictures in `refs/`);
@@ -137,12 +146,45 @@ Read with it:
    - From late in the evening 柔柔, then 小齁, are `away='up'`: really not in any room you can see.
    - At closing, the present staff and Jill notice. Short search lines, rooms shown one after another. 「這個怎麼開著？」 Up the stairs: the first full view of 2F, the two cats where they went. 「妳們兩個。」
    - Then down, and the door locked. At most about an hour of game time missing.
+9. **秀琴阿姨 before she is on the crew** (the fresh-game premise; the smallest safe way, no second staff system).
+   - *Helper mode* while no cleaner is on the crew (and she was never let go): she is `XQ_HELPER` (`id 'xq'`), a sprite
+     of her own (`R.xqh`) that is not in `S.crew`, draws no wage and claims nothing. Most evenings (always the first,
+     and the evenings 怡君 is coming) she walks in at ~92% of the service, tidies beside tables nobody is at that are
+     already clear (never a dirty one: clearing is the game's), says a few words with Jill, and goes home about twenty
+     seconds into the closing. No random draw anywhere in it, so a day with her and without her is the same day.
+   - `xqm()` is "秀琴阿姨, whichever way she is here": the crew member, else the helper. The P1 beats use it. The
+     helper's walk-in fires the arbiter's `xqin` context, so 怡君's steps can play when her mother comes in.
+   - *Hiring the first cleaner is hiring her* (the pool already puts her first): the new crew member keeps `id 'xq'`,
+     so who she has talked to and what she knows carry over; one line over the shop, 「那以後就天天來了。」; her card
+     says 「今天起正式上班」. Let go, she does not come back to help in the evenings (`xq_gone`).
+   - *A — 怡君*: the era opens on the first v2.4 day, but its first beat waits for its people (`V24_ERAS.can`):
+     秀琴阿姨 known for about a week (`xqKnown`: legacy crew always; otherwise 6+ days since she was first around and
+     4+ evenings or working days). In helper mode 怡君 comes late (90%, `hold`: a quiet evening does not pull her
+     visit earlier) and waits for her mother if she has finished eating; when the fridge is empty Jill orders in one
+     portion for her (the opening days' emergency order, 1.5×) rather than sending her away hungry. On moving day the
+     helper is helping with the move instead (「晚上不會來幫忙收店」), and Jill asks the next evening.
+   - *B — Sophie / Mia*: 《那面牆》's first beat needs the familiarity exchanges (`smFamiliar`) **and** a long
+     acquaintance (`smLongTime`): Sophie and Mia have each been in 8+ times, and 秀琴阿姨 has worked the floor 6+ days
+     (legacy crew always). The wall needs her on the crew: a helper is only in at closing.
+10. **The day's one major, held for the people who came for it** (pacing, measured on the Day 52 save). When the
+    schedule brings someone for a due v2.4 major beat (`V24_WANTS … k`), that beat keeps the day's single major slot
+    until it plays or until 85% of the service; other stories' major moments that come up meanwhile are counted as
+    missed (their priority rises) and come another day. Grouped story visits keep their hour (`hold`), and the first of
+    a group sits in a room with a free table for each of them, so they really are in the same room.
 
 ## 4. The chronology and what a Day 52 player meets
 
 Revised for the pacing corrections and the canon change. "Gap" is the stage's own minimum wait in days after the stage
 before it, and only where the fiction needs time; 1 means the next day is fine. Major beats also share the one-a-day
 cap with every other story. Days are what a Day 52 player should roughly see, not gates.
+
+**Measured** (`tools/sims/v24_pacing.py`, the Day 52 save, lazy bot, 40 days, seeds 7000 / 9100 / 4242 / 5555 /
+8080 — after the 15:07 premise): spare key Day 61 in all five (target 59–62); the wall begins Day 63–65 (62–66);
+mediation Day 79–81 (75–82); the Second Floor era opens Day 81–83 (78–86); never two major beats in a day; nothing on
+the first day's start. **A new game** (`tools/sims/v24_fresh.py`, the perfect bot, three shop plans): 秀琴阿姨 from Day
+1; 怡君 first comes Day 8, the spare key Day 16 (with or without a cleaner hired); the wall begins Day 21–27 (it needs her
+on the crew and Sophie / Mia's long acquaintance) and settles about two and a half weeks later; Days 1–7 played with
+and without her end with the same money, guests, stars, reviews and stock.
 
 **怡君 (target ~7–10 days; Day 52 save: from Day 53, moved in by ~Day 61)**
 
@@ -216,6 +258,11 @@ Later, for the floor:
   - 怡君 and 《三個選項》.
   - The Sophie / Mia / 秀琴阿姨 familiarity.
   - 《那面牆》 complete.
+  - 秀琴阿姨 from Day 1 in a new game (the evening helper, §3.9); the first cleaner is her.
+  - The manual (員工: 秀琴阿姨, 晚點到; 故事: 插圖, 店外的生活), the opening tutorial (Day 1: she walks in and says who
+    she is to the place, then the coach names her once; Day 2's news; the staff tab's recruit note) and one 2.4 note
+    for a save that was already going (systems only: late arrivals, illustrations, 後場整理區; who comes in the
+    evenings if there is no cleaner yet) — the player's 15:11 request.
   - The Day 52 player meets 怡君 the day after updating and sees the wall settled around Day 80.
 - **rc5: P2.**
   - The 2F room from the reference, its facade, the stairs.
