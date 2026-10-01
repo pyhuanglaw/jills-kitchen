@@ -4,7 +4,6 @@ the album carries the title. 720x540 WebP (the album shows 360x270)."""
 import base64, io, os, sys
 from PIL import Image
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SM = os.path.join(ROOT, 'docs/v23/story_photos_sophie_mia_concept.png')
 VAL = os.path.join(ROOT, 'docs/v23/story_photo_jill_dylan_valentine.png')   # 2026-10-01, supplied by the player: Dylan × Jill, Valentine's
 WANG = os.path.join(ROOT, 'docs/v23/story_photo_wang_anniv.jpg')             # 2026-10-01, supplied by the player: 王先生 × 王太太, the anniversary
 MEAL = os.path.join(ROOT, 'docs/v23/story_photo_staff_meal.png')             # 2026-10-01, supplied by the player (second version, made to the spec): the staff meal
@@ -13,10 +12,11 @@ QTL = os.path.join(ROOT, 'docs/v23/story_photo_qing_tuo_late.png')           # 2
 SML = os.path.join(ROOT, 'docs/v23/story_photo_sophie_mia_leave.png')       # 2026-10-01, supplied by the player: Sophie × Mia 「一起回家」 as a full picture (was a small panel of the concept sheet)
 KDS = os.path.join(ROOT, 'docs/v23/story_photo_ken_du_seat.png')            # 2026-10-01, supplied by the player: Ken × 杜 「固定的位置」 as a full picture (was a small panel of the concept sheet)
 KDA = os.path.join(ROOT, 'docs/v23/story_photo_ken_du.png')                 # 2026-10-01, supplied by the player: Ken × 杜 「還是沒有同意」 as a full picture (was a small panel of the concept sheet)
+SMA = os.path.join(ROOT, 'docs/v23/story_photo_sophie_mia_arrive.png')      # 2026-10-01, supplied by the player: Sophie × Mia 「今天一起來」, illustrated like 「一起回家」 (was the concept sheet's top banner)
 # key -> (sheet, box). Boxes chosen by eye on the sheets; 4:3 is enforced by a centered crop of the box.
 ART = {
     'sophie_mia_leave':  (SML, (15, 0, 1380, 1024)),    # 《一起回家》 — Sophie and Mia arm in arm on the way out, the cat on the counter behind them (the player's full picture, 2026-10-01)
-    'sophie_mia_arrive': (SM, (430, 0, 1010, 412)),      # the top banner's two faces, right of the title text
+    'sophie_mia_arrive': (SMA, (171, 0, 1536, 1024)),   # 《今天一起來》 — Sophie and Mia coming in together, a server and the cat on the counter behind them (the player's picture, 2026-10-01)
     'ken_du':            (KDA, (120, 0, 1485, 1024)),   # 《還是沒有同意》 — Ken making his case with his hands, 杜 unconvinced, chin in hand (the player's full picture, 2026-10-01)
     'ken_du_seat':       (KDS, (120, 0, 1485, 1024)),   # 《固定的位置》 — Ken and 杜 side by side at the bar, wine and small plates (the player's full picture, 2026-10-01)
     'qing_tuo':          (QT, (60, 0, 1425, 1024)),     # 《多的》 — 阿拓 sets the small plate down beside 晴 (the player's full picture, 2026-10-01)
