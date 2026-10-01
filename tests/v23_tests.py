@@ -1121,3 +1121,41 @@ def kitchen_works_walk_in_and_a_second_coffee_machine(b, port, target):
     g.ev("S.rooms.kext=1;S.eq.bar=0;showShop()"); g.page.wait_for_timeout(60)
     check('要先有咖啡機' in g.ev("document.querySelector('#screen').innerText"), 'kitchen II needs a coffee machine to stand beside')
     check(not g.errors, g.errors[:3]); g.close()
+
+@test
+def dogs_five_kinds_and_the_house_by_the_door(b, port, target):
+    """2026-10-01 (brief O, the player's references docs/v23/refs/dog_*): five kinds of dog told apart by their shape —
+    博美, 臘腸, 米克斯, 垂耳, 黃金獵犬 — each drawable walking, standing, sitting, lying and drinking; a walker's dog is
+    one of them, chosen from the walker's own seed (no new random draw). The waiting dog's house is inside the phone
+    view, the dog faces the door, lies on the cushion, sits up now and then, drinks; without the house it sits by
+    the door. Dogs stay outside; nothing to manage."""
+    g = Game(b, port, target, seed=123, manual=True, viewport={'width': 390, 'height': 844})
+    load_fixture(g, 'player_day52.json')
+    g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(200)
+    kinds = g.ev("DOG_KEYS.join(',')")
+    check(kinds == 'pom,dachs,mutt,floppy,retriever', kinds)
+    shapes = json.loads(g.ev("JSON.stringify(DOG_KEYS.map(k=>{const T=DOG_T[k];return[T.L,T.H,T.leg,T.ear,T.tail]}))"))
+    check(len({(s[0], s[2]) for s in shapes}) == 5 and len({s[4] for s in shapes}) == 5, f'five different builds and five different tails: {shapes}')
+    check(g.ev("(()=>{const cv=mkCanvas(60,40),c=cv.getContext('2d');for(const k of DOG_KEYS)for(const p of['walk','stand','sit','lie','drink']){c.save();c.translate(30,30);drawDogT(c,0,0,false,1,k,p);drawDogT(c,0,0,true,2,k,p);c.restore()}return true})()"), 'every kind draws in every pose, both ways')
+    seen = g.ev("[...new Set(Array.from({length:40},(_,i)=>dogTypeOf(i*0.25)))].length")
+    check(seen == 5, f'walkers bring all five kinds: {seen}')
+    check(g.ev("dogTypeOf(3.7)===dogTypeOf(3.7)"), 'the same walker, the same dog')
+    nk = json.loads(g.ev("JSON.stringify(FR.nook)"))
+    check(46 <= nk['x'] - 40 and nk['x'] + 38 <= 366, f'the house fits the phone view with a margin (world x 38–374): {nk}')
+    # a dog comes with a walk-in and waits at the house
+    if g.ev("phase") == 'shop': g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(300)
+    g.ev("autoStock()"); start_day(g); install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;window.__noScenes=true")
+    d = None
+    for i in range(240):
+        g.page.evaluate('()=>window.__bot(30,1/30)')
+        if not g.ev("!!R.dogOut"):
+            g.ev("(()=>{const w=STREET.ppl.find(w=>w.dog&&w.st==='walk');if(w){w.stopX=w.x;w.st='look';w.t=99;w.dur=0}else{STREET.next=0;STREET.ppl.forEach(w=>{w.dog=true;w.n=1})}})()")
+        else:
+            d = json.loads(g.ev("JSON.stringify(R.dogOut)"))
+            if not d['moving'] and d.get('rest', 0) > 1.5: break
+    check(d is not None and d.get('nook') and d.get('type') in kinds.split(','), f'a dog of one of the five kinds waits at the house: {d}')
+    check(d and d['face'] == 1, 'it faces the door')
+    poses = g.ev("(()=>{const d=R.dogOut,out=new Set();const r0=d.rest,k0=d.drink;for(let t=1.3;t<40;t+=.5){d.rest=t;d.drink=0;out.add(dogOutPose(d))}d.drink=1;out.add(dogOutPose(d));d.rest=r0;d.drink=k0;return[...out].sort().join(',')})()")
+    check(poses == 'drink,lie,sit', f'it lies, sits up now and then, drinks: {poses}')
+    check(g.ev("CATS.every(c=>!(c.room==='front'))"), 'the cats stay inside')
+    check(not g.errors, g.errors[:3]); g.close()

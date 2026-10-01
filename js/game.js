@@ -263,7 +263,7 @@ const EXTERIOR=[
  {k:'lights',n:'門口串燈',cost:5000,lv:2,ic:'lights',d:'沿著屋簷掛一排小燈，天黑以後整條街最溫暖的一段。客流 +2%。'},
  {k:'sign',n:'招牌燈',cost:6000,lv:2,ic:'signlamp',d:'招牌上裝一盞燈，天黑以後整條街都看得到。客流 +3%。'},
  {k:'awning',n:'遮雨棚',cost:8000,lv:2,ic:'awning',d:'紅白條紋的遮雨棚。下雨天門口的人比較願意等；客流 +3%。買過之後可以換顏色。',styles:['紅白','綠白','深藍白']},
- {k:'dognook',n:'門口狗狗休息角',cost:3500,lv:2,ic:'dognook',d:'門邊一小塊有遮蔭的角落：一張軟墊、一碗水。帶狗來的客人可以放心進來吃，狗在外面趴著等，等得很舒服。帶狗的路人比較願意走進來。'},   /* v2.2.1 #10: the dog stays outside; nothing to manage */
+ {k:'dognook',n:'門口狗狗休息角',cost:3500,lv:2,ic:'dognook',d:'門邊一間小木屋：屋頂長著綠葉，裡面一張軟墊，前面一碗水，旁邊一根拴牽繩的木柱。帶狗來的客人可以放心進來吃，狗在外面趴著等，等得很舒服。帶狗的路人比較願意走進來。'},   /* v2.2.1 #10: the dog stays outside; nothing to manage */
 ];
 const CATGEAR=[   /* v2.2.1 F: the side hall's cat things sit in two zones — the window (perch, cushion) and the far wall (tunnel, basket, lounge); the far-wall row moves with DY like the third row of tables */
  {k:'box',n:'紙箱',cost:800,tier:1,ic:'box',room:'main',x:300,y:204,poses:['sit'],d:'就是一個紙箱，放在桌子之間的走道上。柔柔會躲在裡面，等別的貓經過。',w:{mikan:4,ban:2,mei:.8,tora:.5,snow:.2}},
@@ -545,7 +545,7 @@ const ROOMS={main:{n:'主廳'},kitchen:{n:'廚房'},side:{n:'側廳'},front:{n:'
 let room='main';
 const SIDE_L={door:{x:70,y:100},arch:{x:48,y:8,w:44},cols:[104,200,296],rows:[180,268,356],window:{x:118,y:10,w:180,h:64},cat:{x:352,y:120}};   /* the side dining room: its door is an arch on the back wall, left */
 const SIDE_ARCH={x:344,y:12,w:40};   /* the arch to the side room, on the dining room's back wall, right */
-const FR={door:{x:200,y:262},walk:300,enter:{x:-24,y:300},exit:{x:424,y:300},cols:[96,304,200],row:352,bench:{x:350,y:262},sun:{x:48,y:266},nook:{x:50,y:258}};   /* nook: the dog's corner by the door (v2.2.1 #10) */   /* the street outside */
+const FR={door:{x:200,y:262},walk:300,enter:{x:-24,y:300},exit:{x:424,y:300},cols:[96,304,200],row:352,bench:{x:350,y:262},sun:{x:48,y:266},nook:{x:88,y:250}};   /* nook: the dog's house by the door (v2.2.1 #10; v2.3 moved in from x 50, where a phone cut it off: it now spans x 48–126, between the left edge and the flower box, and sits 8 px higher so the terrace's first parasol does not cover the cushion) */   /* the street outside */
 const KD={x:64,y:0};   /* the kitchen door in the dining room: at the left end of the counter (y filled from FB) */
 const KR={get door(){return{x:200,y:LH-30}},get fridge(){return{x:318,y:LH-112,w:52,h:80}},get cooler(){return projOn('walkin')?{x:43,y:LH-138,w:57,h:106}:{x:44,y:LH-112,w:48,h:80}}};   /* the walk-in: wider and taller, same corner */   /* the kitchen: the fridge and the cold room stand on the pickup side, the door to the dining room between them */
 function roomOpen(k){return k==='main'||k==='kitchen'||k==='front'||(k==='side'&&!!(S.rooms&&S.rooms.side))||(k==='lounge'&&!!(S.rooms&&S.rooms.lounge))}
@@ -876,7 +876,7 @@ function iconURL(kind,lv){const k='i'+kind+(lv||0);if(ICACHE.has(k))return ICACH
  case 'planter':c.fillStyle='#8A3A2A';rr(c,-28,2,56,26,4);c.fill();c.fillStyle='#A64A36';c.fillRect(-28,2,56,4);for(let k=0;k<8;k++)leaf(c,-24+k*7,-4-Math.abs(k-3.5)*4,16,7,-1.6+(k-3.5)*.35,k%2?'#3F7F32':'#5E9E3D');c.fillStyle='#E8798A';circ(c,-10,-12,3.5);c.fillStyle='#F4C44E';circ(c,10,-14,3.5);break;
  case 'signlamp':c.fillStyle='#2C2C2B';rr(c,-36,-6,72,26,4);c.fill();c.strokeStyle='#E0B863';c.lineWidth=1.5;rr(c,-33,-3,66,20,3);c.stroke();c.fillStyle='#E6C27A';c.font=`400 12px ${DFONT}`;c.textAlign='center';c.textBaseline='middle';c.fillText('JILL',0,7.5);c.textBaseline='alphabetic';c.fillStyle='#8E6422';c.fillRect(-2,-18,4,12);c.fillStyle='#F4C44E';el(c,0,-19,9,3);let lg2=c.createRadialGradient(0,-4,2,0,-4,40);lg2.addColorStop(0,'rgba(255,214,120,.5)');lg2.addColorStop(1,'rgba(255,214,120,0)');c.fillStyle=lg2;c.fillRect(-44,-44,88,60);break;
  case 'awning':c.fillStyle='rgba(0,0,0,.15)';c.fillRect(-40,14,80,6);for(let i=0;i<8;i++){c.fillStyle=i%2?'#F7EDDC':'#B8536A';c.beginPath();c.moveTo(-40+i*10,-14);c.lineTo(-30+i*10,-14);c.lineTo(-26+i*10,12);c.lineTo(-36+i*10,12);c.closePath();c.fill()}c.fillStyle='#B8536A';for(let i=0;i<8;i++){c.beginPath();c.arc(-35+i*10,13,5,0,Math.PI);c.fill()}break;
- case 'dognook':c.fillStyle='rgba(0,0,0,.14)';el(c,0,26,34,6);c.fillStyle='#6B4428';c.fillRect(-30,-16,4,44);c.fillRect(26,-16,4,44);c.fillStyle='#8C7B68';c.beginPath();c.moveTo(-36,-16);c.lineTo(36,-16);c.lineTo(30,-28);c.lineTo(-30,-28);c.closePath();c.fill();c.fillStyle='rgba(255,255,255,.18)';c.fillRect(-32,-17,64,2);c.fillStyle='#B9A88F';rr(c,-22,12,44,16,8);c.fill();c.fillStyle='#CDBFA9';rr(c,-19,13,38,11,6);c.fill();c.fillStyle='#4E6E8A';el(c,32,24,10,4.5);c.fillStyle='#8FC2E0';el(c,32,22.5,7,2.6);c.save();c.translate(-2,20);c.scale(1.7,1.7);drawDog(c,0,0,false,0,'#C8A070',true,'lie');c.restore();break;
+ case 'dognook':{c.save();c.scale(1.12,1.12);c.translate(-2,-6);drawDogHouse(c,0,0);drawDogT(c,2,22,false,0,'pom','lie');c.restore();break}
  case 'box':c.fillStyle='#B8905E';c.beginPath();c.moveTo(-30,-10);c.lineTo(30,-10);c.lineTo(30,26);c.lineTo(-30,26);c.closePath();c.fill();c.fillStyle='#8A6A42';c.fillRect(-30,-10,60,4);c.fillStyle='#C9A26E';c.beginPath();c.moveTo(-30,-10);c.lineTo(-40,-24);c.lineTo(-10,-24);c.lineTo(0,-10);c.closePath();c.fill();c.fillStyle='#2A2A2A';el(c,-8,4,3,3);el(c,8,4,3,3);c.fillStyle='#E6A465';circ(c,0,8,12);c.fillStyle='#F7F3EA';el(c,-5,6,2.4,3);el(c,5,6,2.4,3);c.fillStyle='#2A2A2A';el(c,-5,6.5,1,2);el(c,5,6.5,1,2);break;
  case 'cushion':c.fillStyle='rgba(0,0,0,.14)';el(c,0,20,34,9);c.fillStyle='#B8536A';el(c,0,10,34,16);c.fillStyle='#C9687C';el(c,0,6,30,12);c.fillStyle='rgba(255,255,255,.25)';el(c,-8,2,10,4);c.fillStyle='#F7F6F2';el(c,2,-2,18,11);c.fillStyle='#DEDBD6';el(c,-10,-4,5,4);break;
  case 'basket':c.fillStyle='#B08B5E';c.beginPath();c.moveTo(-32,-6);c.quadraticCurveTo(-30,26,0,26);c.quadraticCurveTo(30,26,32,-6);c.closePath();c.fill();c.strokeStyle='rgba(120,80,40,.4)';c.lineWidth=1.2;for(let y=0;y<22;y+=5){c.beginPath();c.moveTo(-30+y*.6,y);c.lineTo(30-y*.6,y);c.stroke()}c.fillStyle='#D8C4A4';el(c,0,-6,32,8);c.fillStyle='#9A8166';el(c,0,-4,18,9);c.fillStyle='#3B2C20';el(c,-8,-6,3,3);el(c,8,-6,3,3);break;
@@ -2944,7 +2944,7 @@ function drawOtherRoom(c,now,dusk,V,X0,XW,TOP){const k=room;const J=V.jill;const
  crewDraw(c,now,list,k);
  if(CATS)for(const cat of CATS){if(cat.away!==k)continue;list.push({y:cat.ay,f:()=>{const sx=cat.x,sy=cat.y,sf=cat.face;cat.x=cat.ax;cat.y=cat.ay;cat.face=cat.aface||1;drawCat(c,cat,now);cat.x=sx;cat.y=sy;cat.face=sf}})}
  for(const G of CATGEAR)if(gearOn(G.k)&&G.room===k&&G.poses)list.push({y:G.y+(G.k==='perch'?-30:G.k==='tunnel'?-8:-6),f:()=>drawGear(c,G,now)});
- if(k==='front'&&R){for(const w of STREET.ppl)list.push({y:w.y,f:()=>drawStreetWalker(c,w,now)});if(STREET.veh)list.push({y:STREET.veh.y,f:()=>drawVehicle(c,STREET.veh)});if(R.dogOut){const d=R.dogOut;list.push({y:d.y,f:()=>{drawDog(c,d.x,d.y+2,d.face<0,d.ph,d.col,!d.moving,d.nook&&!d.moving&&d.rest>1.2?(d.drink>0?'drink':'lie'):null);if(!d.moving&&!d.nook){c.strokeStyle='rgba(60,45,35,.7)';c.lineWidth=.8;c.beginPath();c.moveTo(d.x+d.face*4,d.y-10);c.quadraticCurveTo(d.x+d.face*14,d.y-14,d.x+d.face*20,d.y-24);c.stroke()}}})}}
+ if(k==='front'&&R){for(const w of STREET.ppl)list.push({y:w.y,f:()=>drawStreetWalker(c,w,now)});if(STREET.veh)list.push({y:STREET.veh.y,f:()=>drawVehicle(c,STREET.veh)});if(R.dogOut){const d=R.dogOut;list.push({y:d.y,f:()=>{const ty=d.type||dogTypeOf(d.gid);const pose=dogOutPose(d);drawDogT(c,d.x,d.y+2,d.face<0,d.ph,ty,pose);if(!d.moving){const nk=dogNeck(ty,pose);const cx=d.x+d.face*nk.x,cy=d.y+2+nk.y;c.strokeStyle='rgba(60,45,35,.7)';c.lineWidth=.8;c.beginPath();c.moveTo(cx,cy);if(d.nook){/* tied to the post by the house */const px=FR.nook.x+34,py=FR.nook.y+9;c.quadraticCurveTo((cx+px)/2,Math.max(cy,py)+5,px,py)}else{c.quadraticCurveTo(d.x+d.face*14,d.y-14,d.x+d.face*20,d.y-24)}c.stroke()}}})}}
  list.sort((a,b)=>a.y-b.y).forEach(i=>i.f());
  /* the light of the hour, as in the dining room (the street bakes it into its sky) */
  if(k!=='front'){c.save();c.globalCompositeOperation='multiply';c.fillStyle=k==='lounge'?mix(wxTint(tintFor(dusk)),'#5A4E48',.55):wxTint(tintFor(dusk));c.fillRect(X0,-TOP,XW,LH+TOP);/* v2.3: the Lounge is dimmer, whatever the hour */c.restore();
@@ -3221,7 +3221,7 @@ function drawFrontRoom(c,now,dusk,V,X0,XW,TOP,list){const d=clamp(dusk,0,1);cons
    b.fillStyle=mix('#B8B2A6','#26262E',d*.5);b.fillRect(X0,372,XW,5);b.fillStyle=mix(wet?'#3A3A40':'#4A4A4E','#1E1E24',d*.4);b.fillRect(X0,377,XW,LH-377);b.fillStyle='rgba(255,255,255,.5)';for(let x=X0;x<LW+BGM;x+=40)b.fillRect(x,400,22,2);
   /* planters, the bench, seasonal things */if(E.plants){for(const px of[150,250]){b.fillStyle='#8A3A2A';rr(b,px-12,266,24,16,2);b.fill();for(let k=0;k<7;k++)leaf(b,px-8+k*2.6,262-Math.abs(k-3)*2,9,3.6,-1.6+(k-3)*.4,k%2?'#3F7F32':'#5E9E3D');b.fillStyle='#E8798A';circ(b,px-4,258,1.6);b.fillStyle='#F4C44E';circ(b,px+3,256,1.6)}}
   if(E.bench){const {x,y}=FR.bench;b.fillStyle='#6B4428';b.fillRect(x-24,y-12,48,5);b.fillRect(x-24,y-2,48,5);b.fillRect(x-22,y+3,3,12);b.fillRect(x+19,y+3,3,12);b.fillStyle='#8A6A42';b.fillRect(x-24,y-12,48,1.5)}
-  if(E.dognook){/* v2.2.1 #10: a low shade on two posts, a cushion under it, a water bowl beside — the dog's corner */const {x,y}=FR.nook;b.fillStyle='rgba(0,0,0,.14)';el(b,x+4,y+26,26,5);b.fillStyle='#6B4428';b.fillRect(x-18,y-14,2.4,36);b.fillRect(x+16,y-14,2.4,36);b.fillStyle='#8C7B68';b.beginPath();b.moveTo(x-22,y-14);b.lineTo(x+22,y-14);b.lineTo(x+18,y-22);b.lineTo(x-18,y-22);b.closePath();b.fill();b.fillStyle='rgba(255,255,255,.18)';b.fillRect(x-20,y-15,40,1.5);b.fillStyle='#B9A88F';rr(b,x-13,y+14,28,11,5);b.fill();b.fillStyle='#CDBFA9';rr(b,x-11,y+15,24,7,4);b.fill();b.fillStyle='#4E6E8A';el(b,x-4,y+31,6.5,3);b.fillStyle='#8FC2E0';el(b,x-4,y+30,4.6,1.8);b.fillStyle='rgba(60,56,50,.5)';circ(b,x,y-17.5,1.6);for(const [px,py] of[[-3,-20.5],[0,-21.5],[3,-20.5]])circ(b,x+px,y+py,.8)}
+  if(E.dognook){/* v2.3 late game: the dog's house (v2.2.1 #10's corner, redrawn) */drawDogHouse(b,FR.nook.x,FR.nook.y)}
   if(E.season){const k=Math.floor(S.day/10)%3;if(k===0){for(const lx of[60,340]){b.fillStyle='#8A3A2A';b.fillRect(lx-1,160,2,12);b.fillStyle='#D8392A';el(b,lx,182,7,10);b.fillStyle='#F4C44E';b.fillRect(lx-3,171,6,2);b.fillRect(lx-3,192,6,2)}}else if(k===1){for(let i=0;i<8;i++){b.fillStyle=['#E8798A','#F4C44E','#7FB3C8','#5E9E3D'][i%4];b.beginPath();b.moveTo(60+i*40,132);b.lineTo(72+i*40,132);b.lineTo(66+i*40,146);b.closePath();b.fill()}}else{b.fillStyle='#F4C44E';for(const lx of[70,330])for(let i=0;i<5;i++)el(b,lx+Math.cos(i*1.26)*7,178+Math.sin(i*1.26)*7,3,3)}}
   if(wet){b.fillStyle='rgba(120,140,170,.18)';b.fillRect(X0,284,XW,LH-284)}
   /* the street lamp on the corner, a bicycle against the wall */b.fillStyle='#2A2A2E';b.fillRect(366,150,3,134);b.fillStyle='#3A3A3E';rr(b,360,282,15,5,2);b.fill();b.beginPath();b.moveTo(367.5,150);b.quadraticCurveTo(367.5,138,356,138);b.lineTo(356,141);b.quadraticCurveTo(364.5,141,364.5,150);b.closePath();b.fill();b.fillStyle='#F4E2B0';rr(b,349,138,14,9,2);b.fill();b.fillStyle='#2A2A2E';b.fillRect(348,136,16,2.5);
@@ -3256,7 +3256,7 @@ function streetSpawn(){const dir=Math.random()<.5?1:-1;const type=pick(STREET_TY
  STREET.ppl.push(w)}
 function streetJoin(w){if(R.closed||R.t>R.dur*.9||R.si>=R.sched.length)return false;const o=R.sched[R.si];if(o.reg||o.t-R.t>45||o.forSig)return false;if(queued().length>=queueMax()-1)return false;if(Math.random()>(w.dog&&extOn('dognook')?.75:.6))return false;
  const spec=Object.assign({},o,{t:R.t,looks:o.size===w.n?w.looks:null,fromStreet:{x:w.x,y:w.y}});R.si++;spawn(spec);
- if(w.dog&&!R.dogOut){const g=R.groups[R.groups.length-1];if(g&&g.walkIn){const nook=extOn('dognook');R.dogOut={gid:g.id,col:w.dogCol,x:w.x,y:w.y,tx:nook?FR.nook.x+2:FR.door.x+(w.x<FR.door.x?-48:48),ty:nook?FR.nook.y+20:296,ph:0,face:1,nook,rest:0,drink:0};if(nook&&!R.dogNookNoted){R.dogNookNoted=1;noteLine('有隻狗在門口的休息角趴下來了。')}}}
+ if(w.dog&&!R.dogOut){const g=R.groups[R.groups.length-1];if(g&&g.walkIn){const nook=extOn('dognook');R.dogOut={gid:g.id,col:w.dogCol,type:w.dogT||dogTypeOf(w.seed),x:w.x,y:w.y,tx:nook?FR.nook.x+2:FR.door.x+(w.x<FR.door.x?-48:48),ty:nook?FR.nook.y+20:296,ph:0,face:1,nook,rest:0,drink:0};if(nook&&!R.dogNookNoted){R.dogNookNoted=1;noteLine('有隻狗在門口的休息角趴下來了。')}}}
  return true}
 function streetUpd(dt){if(!R)return;const wet=streetWet();STREET.next-=dt;
  if(STREET.next<=0&&STREET.ppl.length<(wet?3:5)){streetSpawn();STREET.next=rand(5,13)*(wet?1.5:1)*(R.rush?.75:1)*(R.closed?1.6:1)}
@@ -3268,17 +3268,96 @@ function streetUpd(dt){if(!R)return;const wet=streetWet();STREET.next-=dt;
  STREET.nextVeh-=dt;if(!STREET.veh&&STREET.nextVeh<=0){const dir=Math.random()<.5?1:-1;const scoot=Math.random()<.72;STREET.veh={x:dir>0?-BGM-70:LW+BGM+70,dir,v:scoot?rand(150,215):rand(70,100),kind:scoot?'scooter':'bike',y:rand(390,404),col:pick(['#C9413A','#2E6B4A','#F2EAD8','#3E4E66','#E0A43A']),helm:pick(['#F2EAD8','#2A2A2E','#C9413A','#5B6FB3']),box:scoot&&Math.random()<.5,boxCol:pick(['#2E9E6B','#E86A3A','#F4C44E']),look:makeLooks('office',1)[0],ph:Math.random()*6};STREET.nextVeh=rand(12,40)}
  if(STREET.veh){const v=STREET.veh;v.x+=v.dir*v.v*dt;v.ph+=dt*9;if(v.dir>0?v.x>LW+BGM+80:v.x<-BGM-80)STREET.veh=null}
  if(R.dogOut){const d=R.dogOut;const g=R.groups.find(q=>q.id===d.gid);if(!g){R.dogOut=null}else{if(g.state==='leave'&&(g.room||'main')==='front'){d.tx=g.x-(g.tx<g.x?-18:18);d.ty=g.y+3}const dx=d.tx-d.x,dy=d.ty-d.y,dd=Math.hypot(dx,dy),v=70*dt;if(dd>v){d.x+=dx/dd*v;d.y+=dy/dd*v;d.ph+=dt*9;d.moving=true;d.rest=0;if(Math.abs(dx)>.5)d.face=dx>0?1:-1}else{d.x=d.tx;d.y=d.ty;d.moving=false;d.ph+=dt*1.5;
-   /* v2.2.1 #10: at the nook the dog lies down on the cushion and drinks now and then; by the door it just waits */if(d.nook&&g.state!=='leave'){d.rest+=dt;d.face=-1;if(d.drink>0)d.drink-=dt;else if(d.rest>4&&Math.random()<dt*.05)d.drink=2.2}}}}}
+   /* v2.2.1 #10: at the nook the dog lies down on the cushion and drinks now and then; by the door it just waits. v2.3: it faces the door either way, and sits up now and then (dogOutPose) */if(g.state!=='leave'){d.face=FR.door.x>d.x?1:-1;if(!d.nook)d.rest=(d.rest||0)+dt}if(d.nook&&g.state!=='leave'){d.rest+=dt;if(d.drink>0)d.drink-=dt;else if(d.rest>4&&Math.random()<dt*.05)d.drink=2.2}}}}}
+/* v2.3 late game: the dog's house by the door, after the player's reference (docs/v23/refs/dog_nook_reference_2026-10-01.png):
+   a small wooden shelter under a dark shingle roof with greenery on it, a cushion inside, a woven mat, a steel water
+   bowl, a post with a ring for the leash, and a little sign with a sitting dog. (x, y) = FR.nook; the cushion is at
+   (x + 2, y + 20), where the dog lies facing the door, the bowl in front of it. Spans x - 33 … x + 38: inside the
+   phone view (world x 38–374) with room. */
+function drawDogHouse(b,x,y){b.fillStyle='rgba(0,0,0,.15)';el(b,x+2,y+31,36,4.2);
+ /* the back wall: planks */b.fillStyle='#9C6B42';b.fillRect(x-24,y-13,48,38);b.strokeStyle='rgba(70,42,24,.45)';b.lineWidth=.7;for(let px=x-18;px<x+24;px+=6){b.beginPath();b.moveTo(px,y-13);b.lineTo(px,y+25);b.stroke()}
+ b.fillStyle='rgba(0,0,0,.2)';b.fillRect(x-24,y-13,48,7);
+ /* greenery growing through the back */for(let k=0;k<6;k++)leaf(b,x-18+k*7.4,y-3+(k%2)*2,7,2.8,-.3+(k%3)*.35,k%2?'#4F8A3A':'#6BA34A');
+ /* the side posts */b.fillStyle='#6B4428';b.fillRect(x-27,y-17,4.2,44);b.fillRect(x+23,y-17,4.2,44);b.fillStyle='rgba(255,255,255,.14)';b.fillRect(x-27,y-17,1.2,44);b.fillRect(x+23,y-17,1.2,44);
+ /* the roof: dark shingles, a beam under it */b.fillStyle='#7A5232';b.fillRect(x-30,y-18,60,3.4);b.fillStyle='#46423E';b.beginPath();b.moveTo(x-33,y-17);b.lineTo(x+33,y-17);b.lineTo(x+29,y-29);b.lineTo(x-29,y-29);b.closePath();b.fill();
+ b.fillStyle='#5A5550';for(let row=0;row<3;row++){const ry=y-28+row*4;for(let k=0;k<11;k++){const sx=x-29+row*-1.2+k*5.6+(row%2)*2.8;b.fillRect(sx,ry,4.6,2.6)}}b.fillStyle='rgba(255,255,255,.16)';b.fillRect(x-29,y-29,58,1.2);
+ /* plants on the roof, a trail down the right corner */for(let k=0;k<10;k++)leaf(b,x-26+k*5.8,y-30-(k%3)*1.6,7.5,3,-1.2+(k%4)*.6,['#5E9E3D','#3F7F32','#7DB04E'][k%3]);for(let k=0;k<4;k++)leaf(b,x+27+(k%2)*1.5,y-22+k*5,5.5,2.2,1.3+(k%2)*.4,k%2?'#3F7F32':'#5E9E3D');
+ /* the cushion */b.fillStyle='#A9A39A';rr(b,x-18,y+11,40,13,6);b.fill();b.fillStyle='#E2DCD2';rr(b,x-15,y+12,34,9,5);b.fill();b.fillStyle='rgba(255,255,255,.35)';rr(b,x-12,y+13,24,2.4,1.2);b.fill();
+ /* the woven mat */b.fillStyle='#8A6A42';rr(b,x-24,y+25,50,7,2);b.fill();b.strokeStyle='rgba(60,40,24,.45)';b.lineWidth=.6;for(let mx=x-21;mx<x+24;mx+=3){b.beginPath();b.moveTo(mx,y+26);b.lineTo(mx,y+31);b.stroke()}b.fillStyle='#5A4430';b.fillRect(x-24,y+25,50,1);
+ /* the water bowl, at the front corner the dog faces (it drinks without getting up) */b.fillStyle='#8E979B';el(b,x+22,y+30.6,6,2.4);b.fillStyle='#C9D0D3';el(b,x+22,y+29.4,5.6,2.2);b.fillStyle='#8FC2E0';el(b,x+22,y+29,4.1,1.4);b.fillStyle='rgba(255,255,255,.6)';el(b,x+20.6,y+28.6,1.3,.5);
+ /* the post with a ring */b.fillStyle='#6B4428';b.fillRect(x+32,y-1,4.4,32);b.fillStyle='#8A6A42';b.fillRect(x+32,y-1,4.4,2);b.fillStyle='#9AA3A8';b.fillRect(x+32.6,y+6,3.2,4.6);b.strokeStyle='#7C858A';b.lineWidth=1;b.beginPath();b.arc(x+34.2,y+12,2,0,7);b.stroke();
+ /* the sign: a bracket from the right post, a board with a sitting dog */b.fillStyle='#3A2E28';b.fillRect(x+24,y-11,14,1.4);b.strokeStyle='#3A2E28';b.lineWidth=.6;b.beginPath();b.moveTo(x+29,y-10);b.lineTo(x+29,y-7);b.moveTo(x+36,y-10);b.lineTo(x+36,y-7);b.stroke();
+ b.fillStyle='#4A3A30';rr(b,x+27,y-7,11,10,1.5);b.fill();b.strokeStyle='#8A6A42';b.lineWidth=.6;rr(b,x+27,y-7,11,10,1.5);b.stroke();b.fillStyle='#E8D7B8';el(b,x+32,y+.6,2.4,1.9);circ(b,x+33.4,y-2.6,1.5);b.beginPath();b.moveTo(x+32.4,y-3.4);b.lineTo(x+31.8,y-5.2);b.lineTo(x+33.2,y-3.8);b.fill();b.fillRect(x+33.6,y-.6,.9,2.4)}
+function dogOutPose(d){if(d.moving)return'walk';if((d.rest||0)<1.2)return'stand';if(!d.nook)return'sit';if(d.drink>0)return'drink';return((d.rest+((d.gid||0)%7)*2.3)%18)<3.2?'sit':'lie'}
 function drawUmbrella(c,x,y,col){c.save();c.translate(x,y);c.strokeStyle='#3A2E28';c.lineWidth=1.1;c.beginPath();c.moveTo(0,0);c.lineTo(0,-16);c.stroke();c.fillStyle=col;c.beginPath();c.moveTo(-17,-16);c.quadraticCurveTo(0,-34,17,-16);for(let k=17;k>-17;k-=6.8)c.quadraticCurveTo(k-3.4,-13,k-6.8,-16);c.closePath();c.fill();c.strokeStyle='rgba(60,34,22,.4)';c.lineWidth=.6;c.stroke();c.fillStyle='rgba(255,255,255,.2)';c.beginPath();c.moveTo(-13,-17);c.quadraticCurveTo(-9,-28,0,-31);c.quadraticCurveTo(-7,-26,-8,-17);c.fill();c.fillStyle='#3A2E28';circ(c,0,-33,1.2);c.restore()}
-function drawDog(c,x,y,flip,ph,col,still,pose){c.save();c.translate(x,y);c.scale(flip?-1:1,1);c.fillStyle='rgba(40,25,15,.16)';el(c,1,1,9,2.6);const OL='rgba(60,34,22,.5)';c.strokeStyle=OL;c.lineWidth=.6;
- if(pose==='lie'||pose==='drink'){/* v2.2.1 #10: lying down — the body low, the front paws out, the head up (or down in the bowl) */c.fillStyle=shade(col,-.12);rr(c,-8,-3.5,6,3,1.2);c.fill();c.stroke();rr(c,3,-3.5,6,3,1.2);c.fill();c.stroke();c.fillStyle=col;el(c,0,-5.5,9.4,4);c.stroke();const hy=pose==='drink'?-3.5:-9.5,hx=pose==='drink'?11.5:9;circ(c,hx,hy,4.2);c.fillStyle=shade(col,.14);el(c,hx+3.1,hy+1.1,2.8,1.9);c.fillStyle='#2A2220';circ(c,hx+4.9,hy+.7,.9);circ(c,hx+1.1,hy-1.1,.75);c.fillStyle=shade(col,-.2);c.save();c.translate(hx-2.5,hy-3);c.rotate(-.5);el(c,0,0,1.9,3.2);c.restore();c.strokeStyle=col;c.lineWidth=2.2;c.lineCap='round';c.beginPath();c.moveTo(-9,-5);c.quadraticCurveTo(-13,-6+Math.sin(ph*1.7)*1.5,-14,-3);c.stroke();c.strokeStyle='#C9413A';c.lineWidth=1.2;c.beginPath();c.moveTo(hx-4,hy+3.6);c.lineTo(hx-3.4,hy+.4);c.stroke();c.restore();return}
- c.fillStyle=shade(col,-.12);for(const [lx,k] of[[-5.5,0],[-2.5,3.1],[2.5,1.6],[5.5,4.7]]){const lift=still?0:Math.max(0,Math.sin(ph+k))*2;rr(c,lx-1.3,-7-lift*.2,2.6,7-lift,1.1);c.fill();c.stroke()}
- c.fillStyle=col;el(c,0,-9,8.6,4.8);c.stroke();circ(c,8.5,-12.5,4.2);c.fillStyle=shade(col,.14);el(c,11.6,-11.4,2.8,1.9);c.fillStyle='#2A2220';circ(c,13.4,-11.8,.9);circ(c,9.6,-13.6,.75);c.fillStyle=shade(col,-.2);c.save();c.translate(6,-15.5);c.rotate(-.5);el(c,0,0,1.9,3.2);c.restore();
- c.strokeStyle=col;c.lineWidth=2.2;c.lineCap='round';c.beginPath();c.moveTo(-8,-10);c.quadraticCurveTo(-12,-15+Math.sin(ph*1.7)*2,-10,-18);c.stroke();c.strokeStyle='#C9413A';c.lineWidth=1.2;c.beginPath();c.moveTo(4.6,-10.2);c.lineTo(5.4,-14.6);c.stroke();c.restore()}
+/* ================= dogs: five kinds, told apart by their shape, not their colour =================
+   v2.3 late game (2026-10-01), from the player's reference sheet (docs/v23/refs/dog_types_reference_2026-10-01.png):
+   a small fluffy one (博美型), a long low one (臘腸型), an everyday mixed one (米克斯), a floppy-eared one (垂耳),
+   and a big retriever. Each has its own body, legs, head, ears, tail and coat; five poses: walk, stand, sit, lie,
+   drink. Drawn facing right; flip for left. (x, y) is the ground under the dog's middle. */
+const DOG_T={
+ pom:{n:'博美',L:5,H:4.3,leg:2.3,hr:3.7,sn:1.3,ear:'prick',earH:2.2,tail:'plume',coat:'fluff',col:'#E2A55A',col2:'#F8E6C6',legC:'#EDBE7E',nose:'#2A2220'},
+ dachs:{n:'臘腸',L:9.4,H:2.9,leg:1.9,hr:2.8,sn:3.4,ear:'long',tail:'thin',coat:'smooth',col:'#5C3420',col2:'#B97A43',points:1,nose:'#1E1814'},
+ mutt:{n:'米克斯',L:7,H:3.5,leg:5.4,hr:3.2,sn:2.6,ear:'prick',earH:3.4,tail:'curl',coat:'smooth',col:'#C9965C',col2:'#F3DFBC',saddle:'#6E5238',nose:'#2A2220'},
+ floppy:{n:'垂耳',L:7.2,H:3.9,leg:4.6,hr:3.4,sn:2.3,ear:'drop',tail:'flag',coat:'smooth',col:'#F5EFE5',col2:'#F5EFE5',head:'#B8743C',saddle:'#3B312B',nose:'#2A2220'},
+ retriever:{n:'黃金獵犬',L:9.8,H:4.7,leg:7,hr:4,sn:3,ear:'drop',tail:'feather',coat:'feather',col:'#D8A458',col2:'#F1CF90',nose:'#2A2220'},
+};
+const DOG_KEYS=Object.keys(DOG_T);
+/* the kind of a dog from a number it already has (a walker's seed, a group's id): no new random draw */
+function dogTypeOf(n){const v=Math.abs(Math.floor((+n||0)*97+.5));return DOG_KEYS[v%DOG_KEYS.length]}
+/* where the collar is (for a leash), in the dog's own frame (facing right) */
+function dogNeck(type,pose){const T=DOG_T[type]||DOG_T.mutt;const g=dogGeo(T,pose||'stand');return{x:g.nx,y:g.ny}}
+function dogGeo(T,pose){const lie=pose==='lie'||pose==='drink',sit=pose==='sit';
+ const by=lie?-T.H*.95:sit?-(T.leg*.55+T.H*1.15):-(T.leg+T.H*.85);
+ const hx=sit?T.L*.42+T.hr*.55:T.L*.82+T.hr*.55,hy=pose==='drink'?-T.hr*.9:sit?by-T.H*1.55-T.hr*.55:by-T.H*.95-T.hr*.35;
+ return{by,hx,hy,nx:hx-T.hr*.65,ny:hy+T.hr*.75,lie,sit}}
+function drawDogT(c,x,y,flip,ph,type,pose,o){const T=DOG_T[type]||DOG_T.mutt;pose=pose||'stand';o=o||{};const G=dogGeo(T,pose);const {by,hx,hy,lie,sit}=G;
+ const col=T.col,dk=shade(col,-.18),lt=T.col2,OL='rgba(60,34,22,.42)';
+ c.save();c.translate(x,y);if(flip)c.scale(-1,1);c.lineWidth=.55;c.strokeStyle=OL;c.lineCap='round';c.lineJoin='round';
+ c.fillStyle='rgba(40,25,15,.16)';el(c,lie?1:0,.6,T.L+2.2,1.7);
+ const walk=pose==='walk',wagA=o.wag!=null?o.wag:(walk?1.2:sit||pose==='stand'?2.2:.9),wag=Math.sin(ph*(walk?1.6:3.2))*wagA;
+ /* the tail, behind everything */
+ {const tx=sit?-T.L*.55:-T.L*.92,ty=sit?-T.H*.5:by-T.H*.25;c.strokeStyle=T.tail==='flag'?T.saddle||dk:col;
+  if(T.tail==='plume'){c.fillStyle=col;el(c,tx+1.2,ty-T.H*.85+wag*.2,3.6,2.6);c.stroke();el(c,tx+1.2,ty-T.H*.85+wag*.2,3.6,2.6);c.fillStyle=lt;el(c,tx+.4,ty-T.H*.95+wag*.2,2.2,1.4)}
+  else if(T.tail==='thin'){c.lineWidth=1.2;c.beginPath();c.moveTo(tx+1,ty);c.quadraticCurveTo(tx-3,ty-1.5+wag*.4,tx-5.5,ty-3.6+wag*.7);c.stroke()}
+  else if(T.tail==='curl'){c.lineWidth=2;c.beginPath();c.moveTo(tx+.8,ty);c.quadraticCurveTo(tx-2.8,ty-3+wag*.3,tx-1.2,ty-5.6);c.quadraticCurveTo(tx+.8,ty-6.8,tx+1.6,ty-4.6);c.stroke();c.strokeStyle=lt;c.lineWidth=.8;c.beginPath();c.moveTo(tx-1.6,ty-4.4);c.quadraticCurveTo(tx-.2,ty-6,tx+1,ty-4.8);c.stroke()}
+  else if(T.tail==='flag'){c.lineWidth=1.5;c.beginPath();c.moveTo(tx+.8,ty);c.quadraticCurveTo(tx-2.2,ty-2.6,tx-2.2+wag*.5,ty-5.6);c.stroke();c.fillStyle='#FFFFFF';circ(c,tx-2.2+wag*.5,ty-5.8,.9)}
+  else{/* feather: long and full, hanging, swinging */c.fillStyle=col;c.beginPath();c.moveTo(tx+1.5,ty-1.6);c.quadraticCurveTo(tx-6,ty-2.6+wag*.6,tx-9.5,ty+2.4+wag);c.quadraticCurveTo(tx-6,ty+2.6+wag*.4,tx+1.5,ty+1.6);c.closePath();c.fill();c.stroke();c.fillStyle=lt;c.beginPath();c.moveTo(tx-2,ty+.6);c.quadraticCurveTo(tx-6,ty+1.4+wag*.5,tx-8.6,ty+2.6+wag);c.quadraticCurveTo(tx-5.5,ty+2.2+wag*.4,tx-2,ty+1.6);c.fill()}
+  c.strokeStyle=OL;c.lineWidth=.55}
+ /* legs: far pair first, darker */
+ const legC=T.legC||(T.points?T.col2:col),legD=shade(legC,-.16);   /* colours stay hex: shade() reads hex */
+ const leg=(lx,len,far,lift,w0)=>{c.fillStyle=far?legD:legC;rr(c,lx-(w0||1.25),-len-lift,(w0||1.25)*2,len,1);c.fill();c.stroke();c.fillStyle=shade(legC,-.05);el(c,lx+.5,-lift-.3,(w0||1.25)+.4,.7)};
+ if(lie){/* two front paws out in front of the chest */const pl=Math.max(2.4,T.L*.42);c.fillStyle=legD;rr(c,T.L*.5,-2.3,pl,1.7,.85);c.fill();c.stroke();c.fillStyle=legC;rr(c,T.L*.42,-1.75,pl+.4,1.75,.85);c.fill();c.stroke()}
+ else if(sit){const fl=T.leg+T.H*.35;leg(T.L*.42+.8,fl,true,0);leg(T.L*.42-.9,fl,false,0)}
+ else{const sw=k=>walk?Math.sin(ph+k*Math.PI)*1.6:0,lf=k=>walk?Math.max(0,Math.sin(ph+k*Math.PI))*1.1:0;
+  leg(-T.L*.5,T.leg,true,lf(1));leg(T.L*.6,T.leg,true,lf(0));leg(-T.L*.62+sw(0)*.4,T.leg,false,lf(0));leg(T.L*.5+sw(1)*.4,T.leg,false,lf(1))}
+ /* the body */
+ c.fillStyle=col;if(sit){c.save();c.translate(-T.L*.15,by+T.H*.55);c.rotate(-.62);el(c,0,0,T.L*.62,T.H*1.02);c.stroke();el(c,0,0,T.L*.62,T.H*1.02);c.restore();/* the haunch */c.fillStyle=shade(col,-.05);el(c,-T.L*.42,-T.H*.62,T.H*.95,T.H*.62);c.stroke();el(c,-T.L*.42,-T.H*.62,T.H*.95,T.H*.62);c.fillStyle=legC;el(c,-T.L*.12,-.65,T.H*.5,.75)}
+ else{el(c,0,by,T.L,T.H);c.stroke();el(c,0,by,T.L,T.H)}
+ if(T.saddle&&!sit){c.fillStyle=T.saddle;c.beginPath();c.ellipse(-T.L*.12,by-T.H*.42,T.L*.68,T.H*.55,0,Math.PI,Math.PI*2);c.fill()}
+ if(T.saddle&&sit){c.fillStyle=T.saddle;c.save();c.translate(-T.L*.3,by+T.H*.3);c.rotate(-.62);c.beginPath();c.ellipse(0,0,T.L*.5,T.H*.7,0,Math.PI*1.05,Math.PI*1.95);c.fill();c.restore()}
+ /* the chest and belly, lighter */c.fillStyle=lt;if(sit)el(c,T.L*.3,by-T.H*.2,T.H*.6,T.H*.95);else el(c,T.L*.55,by+T.H*.25,T.L*.36,T.H*.55);
+ if(T.coat==='fluff'){/* the ruff: a soft ring of fur around the neck and chest */c.fillStyle=lt;for(let k=0;k<6;k++){const a=-1.1+k*.45;circ(c,hx-T.hr*.55+Math.cos(a)*T.hr*.9,hy+T.hr*.7+Math.sin(a)*T.hr*.75,1.55)}c.fillStyle=col;for(let k=0;k<5;k++)circ(c,-T.L*.7+k*T.L*.32,by-T.H*.88,1.25)}
+ if(T.coat==='feather'&&!lie){/* feathering under the belly and behind the legs */c.fillStyle=lt;for(let k=0;k<5;k++){c.beginPath();const fx=-T.L*.45+k*T.L*.22;c.moveTo(fx-1.4,by+T.H*.62);c.lineTo(fx,by+T.H*1.15+(k%2)*.6);c.lineTo(fx+1.4,by+T.H*.62);c.fill()}}
+ /* the neck */c.fillStyle=T.head||col;c.beginPath();c.moveTo(G.nx-T.hr*.55,G.ny+1);c.quadraticCurveTo(hx-T.hr*.2,hy+T.hr*.2,hx+T.hr*.3,hy+T.hr*.55);c.lineTo((sit?T.L*.35:T.L*.62),by+T.H*.2);c.lineTo((sit?T.L*.05:T.L*.38),by-T.H*.55);c.closePath();c.fill();
+ /* ears behind the head (the drop ears fall in front of it, below) */const hc=T.head||col,earC=T.ear==='drop'||T.ear==='long'?shade(hc,-.2):hc;
+ if(T.ear==='prick'){c.fillStyle=hc;for(const [ex,lean] of[[-.62,-.15],[-.08,.12]]){c.beginPath();c.moveTo(hx+ex*T.hr-T.hr*.32,hy-T.hr*.55);c.lineTo(hx+ex*T.hr+lean*T.hr,hy-T.hr*.55-T.earH);c.lineTo(hx+ex*T.hr+T.hr*.36,hy-T.hr*.62);c.closePath();c.fill();c.stroke()}c.fillStyle='#E9B4A8';c.beginPath();c.moveTo(hx-.08*T.hr-T.hr*.12,hy-T.hr*.62);c.lineTo(hx+.04*T.hr,hy-T.hr*.55-T.earH*.62);c.lineTo(hx+.2*T.hr,hy-T.hr*.64);c.closePath();c.fill()}
+ /* the head: skull, muzzle, nose, eye */
+ c.fillStyle=hc;el(c,hx,hy,T.hr*1.02,T.hr*.92);c.stroke();el(c,hx,hy,T.hr*1.02,T.hr*.92);
+ const mz=T.points?T.col2:(T.head?'#F5EFE5':lt);c.fillStyle=mz;el(c,hx+T.hr*.62+T.sn*.45,hy+T.hr*.32,T.sn*.72+.6,T.hr*.42);c.stroke();el(c,hx+T.hr*.62+T.sn*.45,hy+T.hr*.32,T.sn*.72+.6,T.hr*.42);
+ if(T.head){/* the beagle's white blaze */c.fillStyle='#F5EFE5';el(c,hx+T.hr*.25,hy-T.hr*.18,T.hr*.22,T.hr*.62)}
+ c.fillStyle=T.nose;circ(c,hx+T.hr*.62+T.sn*1.05+.35,hy+T.hr*.12,.85);
+ c.fillStyle='#2A2220';circ(c,hx+T.hr*.22,hy-T.hr*.22,.62);c.fillStyle='rgba(255,255,255,.75)';circ(c,hx+T.hr*.28,hy-T.hr*.3,.22);
+ if(T.points){c.fillStyle=T.col2;circ(c,hx+T.hr*.18,hy-T.hr*.48,.55)}
+ if(pose!=='drink'&&!walk){/* panting a little: the tongue */c.fillStyle='#D9605A';el(c,hx+T.hr*.62+T.sn*.5,hy+T.hr*.78,.75,1.05)}
+ if(pose==='drink'){c.fillStyle='#D9605A';el(c,hx+T.hr*.62+T.sn*.9,hy+T.hr*.72,.6,.9)}
+ if(T.ear==='drop'||T.ear==='long'){const len=T.ear==='long'?T.hr*1.45:T.hr*1.1,ew=T.ear==='long'?T.hr*.42:T.hr*.48;c.fillStyle=earC;c.save();c.translate(hx-T.hr*.32,hy-T.hr*.42);c.rotate(.2+(walk?Math.sin(ph)*.12:0));c.beginPath();c.ellipse(0,len*.5,ew,len*.58,0,0,Math.PI*2);c.fill();c.stroke();c.restore()}
+ if(T.coat==='fluff'){c.fillStyle=col;for(let k=0;k<4;k++)circ(c,hx-T.hr*.85+k*.4,hy-T.hr*.2+k*.75,1.05)}
+ c.restore()}
 function drawStreetWalker(c,w,now){const f=w.dir;const look=w.st==='look';
  w.looks.forEach((L0,k)=>{const off=(k-(w.n-1)/2)*12*f;drawPerson(c,w.x+off,w.y+(k%2)*2,L0,{step:look?0:Math.sin(w.walk+k),bob:look?0:Math.abs(Math.sin(w.walk+k))*-.8,mood:look?'happy':'ok',flip:f<0,gaze:look?{x:0,y:-.45}:null,blink:Math.sin(now*1.4+w.seed+k)>.97});
   if(w.umb&&k===0)drawUmbrella(c,w.x+off+f*3,w.y-30,w.umb)});
- if(w.dog){const dx=w.x-f*20;c.strokeStyle='rgba(60,45,35,.7)';c.lineWidth=.8;c.beginPath();c.moveTo(w.x-f*7,w.y-24);c.quadraticCurveTo(w.x-f*12,w.y-14,dx+f*4,w.y-13);c.stroke();drawDog(c,dx,w.y+2,f<0,look?0:w.walk*1.1,w.dogCol)}
+ if(w.dog){const ty=w.dogT||(w.dogT=dogTypeOf(w.seed));const pose=look?'sit':'walk';const dx=w.x-f*(DOG_T[ty].L+11);const nk=dogNeck(ty,pose);c.strokeStyle='rgba(60,45,35,.7)';c.lineWidth=.8;c.beginPath();c.moveTo(w.x-f*7,w.y-24);c.quadraticCurveTo(w.x-f*12,w.y-14,dx+f*nk.x,w.y+2+nk.y);c.stroke();drawDogT(c,dx,w.y+2,f<0,look?w.t*2:w.walk*1.1,ty,pose)}
  if(look){/* a little thought while they read the window */const t=w.t;if(t>.5){c.fillStyle='rgba(255,250,240,.95)';const bx=w.x+f*9,by=w.y-56;circ(c,bx,by,5.6);circ(c,bx-f*4,by+6,1.8);circ(c,bx-f*6.5,by+9.5,1.1);c.fillStyle='#2E2019';if(t>w.dur-.9){c.font=`800 8px ${FONT}`;c.textAlign='center';c.textBaseline='middle';c.fillText('!',bx,by+.5);c.textBaseline='alphabetic'}else{for(let i=-1;i<=1;i++)circ(c,bx+i*2.2,by+.3,.75)}}}}
 function drawVehicle(c,v){const f=v.dir;c.save();c.translate(v.x,v.y);c.scale(f,1);c.fillStyle='rgba(20,15,10,.22)';el(c,0,2,22,4);
  if(v.kind==='scooter'){for(const wx of[-14,14]){c.fillStyle='#2A2A2E';circ(c,wx,-4.5,5.4);c.fillStyle='#8A8A90';circ(c,wx,-4.5,2.6);c.fillStyle='#2A2A2E';circ(c,wx,-4.5,1)}
