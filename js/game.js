@@ -2660,7 +2660,7 @@ function endDay(){if(!R)return;clearCheckpoint();const st=R.st,D=S.day;storyTick
 function addFloat(x,y,txt,col,big,rm){if(!R)return;R.floats.push({x,y,txt,col,big,t:0,life:1.4,room:rm||'main'})}
 function burst(where,s,col){if(!R)return;if(where==='tray'){s.burst={t:0,col};return}const n=where==='coins'?10:14;for(let i=0;i<n;i++){const a=rand(-Math.PI,0),v=rand(40,110);R.parts.push({x:s.x,y:s.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,g:where==='coins'?260:120,t:0,life:rand(.6,1),col,kind:where==='coins'?'coin':'spark',room:s.room||'main'})}}
 function trayFloat(s,txt,col){s.fx={txt,col,t:0}}
-function showCombo(){const el=$('#combo');el.hidden=false;el.textContent='COMBO ×'+R.combo;el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump')}
+function showCombo(){const el=$('#combo');el.hidden=false;el.innerHTML='COMBO<b>×'+(R.combo|0)+'</b>';el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump')}
 function hideCombo(){$('#combo').hidden=true}
 function banner(title,subt,kind){const b=$('#banner');const d=document.createElement('div');d.className='bn '+(kind||'');d.innerHTML=`<b>${title}</b>${subt?`<span>${subt}</span>`:''}`;b.innerHTML='';b.appendChild(d);setTimeout(()=>{if(d.parentNode)d.remove()},kind==='perfect'?1050:1700)}
 function toast(html,kind){const box=$('#toasts');const lastT=box.lastElementChild;if(lastT&&lastT.innerHTML===html&&lastT.style.opacity!=='0')return;const d=document.createElement('div');d.className='toast '+(kind||'');d.innerHTML=html;box.appendChild(d);while(box.children.length>2)box.firstChild.remove();setTimeout(()=>{d.style.transition='opacity .4s';d.style.opacity='0';setTimeout(()=>d.remove(),400)},kind==='q'?3600:2800)}

@@ -157,7 +157,9 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .task .bar i{display:block;height:100%;background:var(--brass)}
 .task.done .bar i{background:var(--sage)}
 .task small{color:var(--ink2);font-variant-numeric:tabular-nums}
-#combo{position:absolute;top:168px;right:8px;z-index:3;padding:4px 10px;border-radius:9px;background:linear-gradient(#E6C27A,#C99A45);color:#2A1B10;font-weight:800;font-size:13px;letter-spacing:.05em;box-shadow:0 2px 0 var(--brass3)}
+/* v2.3 late game: two short lines instead of one long one — the long pill covered the side room's window seat on a phone */
+#combo{position:absolute;top:168px;right:8px;z-index:3;padding:3px 8px 4px;border-radius:9px;background:linear-gradient(#E6C27A,#C99A45);color:#2A1B10;font-weight:800;font-size:11px;line-height:1.1;text-align:center;letter-spacing:.04em;box-shadow:0 2px 0 var(--brass3)}
+#combo b{display:block;font-size:13px;letter-spacing:.02em}
 #combo.bump{animation:bump .35s ease}
 @keyframes bump{40%{transform:scale(1.25)}}
 #fire{position:absolute;top:200px;right:8px;z-index:3;width:120px;padding:4px 8px 6px;border-radius:9px;background:rgba(120,30,10,.85);border:1px solid #F4A04E;color:#FFE3B0;font-weight:800;font-size:11px;letter-spacing:.06em}

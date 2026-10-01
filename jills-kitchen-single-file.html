@@ -175,7 +175,9 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .task .bar i{display:block;height:100%;background:var(--brass)}
 .task.done .bar i{background:var(--sage)}
 .task small{color:var(--ink2);font-variant-numeric:tabular-nums}
-#combo{position:absolute;top:168px;right:8px;z-index:3;padding:4px 10px;border-radius:9px;background:linear-gradient(#E6C27A,#C99A45);color:#2A1B10;font-weight:800;font-size:13px;letter-spacing:.05em;box-shadow:0 2px 0 var(--brass3)}
+/* v2.3 late game: two short lines instead of one long one — the long pill covered the side room's window seat on a phone */
+#combo{position:absolute;top:168px;right:8px;z-index:3;padding:3px 8px 4px;border-radius:9px;background:linear-gradient(#E6C27A,#C99A45);color:#2A1B10;font-weight:800;font-size:11px;line-height:1.1;text-align:center;letter-spacing:.04em;box-shadow:0 2px 0 var(--brass3)}
+#combo b{display:block;font-size:13px;letter-spacing:.02em}
 #combo.bump{animation:bump .35s ease}
 @keyframes bump{40%{transform:scale(1.25)}}
 #fire{position:absolute;top:200px;right:8px;z-index:3;width:120px;padding:4px 8px 6px;border-radius:9px;background:rgba(120,30,10,.85);border:1px solid #F4A04E;color:#FFE3B0;font-weight:800;font-size:11px;letter-spacing:.06em}
@@ -3344,7 +3346,7 @@ function endDay(){if(!R)return;clearCheckpoint();const st=R.st,D=S.day;storyTick
 function addFloat(x,y,txt,col,big,rm){if(!R)return;R.floats.push({x,y,txt,col,big,t:0,life:1.4,room:rm||'main'})}
 function burst(where,s,col){if(!R)return;if(where==='tray'){s.burst={t:0,col};return}const n=where==='coins'?10:14;for(let i=0;i<n;i++){const a=rand(-Math.PI,0),v=rand(40,110);R.parts.push({x:s.x,y:s.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,g:where==='coins'?260:120,t:0,life:rand(.6,1),col,kind:where==='coins'?'coin':'spark',room:s.room||'main'})}}
 function trayFloat(s,txt,col){s.fx={txt,col,t:0}}
-function showCombo(){const el=$('#combo');el.hidden=false;el.textContent='COMBO ×'+R.combo;el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump')}
+function showCombo(){const el=$('#combo');el.hidden=false;el.innerHTML='COMBO<b>×'+(R.combo|0)+'</b>';el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump')}
 function hideCombo(){$('#combo').hidden=true}
 function banner(title,subt,kind){const b=$('#banner');const d=document.createElement('div');d.className='bn '+(kind||'');d.innerHTML=`<b>${title}</b>${subt?`<span>${subt}</span>`:''}`;b.innerHTML='';b.appendChild(d);setTimeout(()=>{if(d.parentNode)d.remove()},kind==='perfect'?1050:1700)}
 function toast(html,kind){const box=$('#toasts');const lastT=box.lastElementChild;if(lastT&&lastT.innerHTML===html&&lastT.style.opacity!=='0')return;const d=document.createElement('div');d.className='toast '+(kind||'');d.innerHTML=html;box.appendChild(d);while(box.children.length>2)box.firstChild.remove();setTimeout(()=>{d.style.transition='opacity .4s';d.style.opacity='0';setTimeout(()=>d.remove(),400)},kind==='q'?3600:2800)}

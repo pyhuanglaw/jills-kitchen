@@ -1212,7 +1212,7 @@ def window_line_cats_stay_inside_and_in_sight(b, port, target):
     """2026-10-01 (brief, the player's reference docs/v23/refs/window_cat_furniture_reference_2026-10-01.png): the side
     room's window, five steps (the 窗邊貓架 the shop already sold is the first). Indoor furniture: cats go up from the
     side room's floor, never outside. Every place is where a phone shows it — not under the room tabs, the stock chip or
-    the task chip (measured at 375×667, 390×844, 430×932) — never more than three cats on the window places, never two
+    the task chip, the COMBO pill (measured at 375×667, 390×844, 430×932) — never more than three cats on the window places, never two
     on places that overlap on screen. A save with the 窗邊貓架 is at step 1; nothing on the window without the side room."""
     g = Game(b, port, target, seed=133, manual=True, viewport={'width': 390, 'height': 844})
     load_fixture(g, 'player_day52.json')
@@ -1225,7 +1225,8 @@ def window_line_cats_stay_inside_and_in_sight(b, port, target):
         if g.ev("phase") == 'shop' and vw == 375:
             g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(300); g.ev("autoStock()"); start_day(g)
         g.ev("setRoom('side');forceDraw=true;__tick(40)"); g.page.wait_for_timeout(60)
-        bad = g.ev("""JSON.stringify((()=>{const cv=document.querySelector('canvas').getBoundingClientRect();const R2=[];for(const id of['roomTabs','stockChip','taskChip','logChip']){const e=document.getElementById(id);if(e&&!e.hidden){const r=e.getBoundingClientRect();if(r.width)R2.push([id,r])}}
+        bad = g.ev("""JSON.stringify((()=>{const cb=document.getElementById('combo');cb.hidden=false;cb.innerHTML='COMBO<b>×106</b>';/* a long evening's combo: the pill as wide as it gets */
+          const cv=document.querySelector('canvas').getBoundingClientRect();const R2=[];for(const id of['roomTabs','stockChip','taskChip','logChip','combo']){const e=document.getElementById(id);if(e&&!e.hidden){const r=e.getBoundingClientRect();if(r.width)R2.push([id,r])}}
           /* the cat's head and back (drawn sizes at CSC: a sitting cat is 39 tall, a loaf 30; the tail curls low, by the feet) */
           const H={sit:39,loaf:30,curl:30,belly:22};const out=[];for(const G of CATGEAR.filter(x=>x.line==='win'||x.k==='perch')){const h=Math.max(...G.poses.map(p=>H[p]||39));
            const x0=cv.left+SV.ox+(G.x-11)*SV.s,x1=cv.left+SV.ox+(G.x+11)*SV.s,y0=cv.top+SV.oy+(G.y-h+4)*SV.s,y1=cv.top+SV.oy+(G.y-8)*SV.s;
