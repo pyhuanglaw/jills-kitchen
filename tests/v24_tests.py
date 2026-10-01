@@ -519,7 +519,7 @@ def v24_manual_tutorial_and_news_cover_the_new_content(b, port, target):
         check(need in txt, f'the manual mentions {need}')
     for stale in ['後場休息室', '吧台我擦']:
         check(stale not in txt, f'not in the manual: {stale}')
-    check('— last: v2.4 rc4' in open(os.path.join(ROOT, 'js', 'game.js'), encoding='utf-8').read(), 'the audit stamp on GUIDE')
+    check('— last: v2.4 rc5' in open(os.path.join(ROOT, 'js', 'game.js'), encoding='utf-8').read(), 'the audit stamp on GUIDE')
     g.click('[data-act=open]'); g.page.wait_for_timeout(100)
     check('2.4' not in g.ev("S.news.join(' ')") and g.ev("S.news24") == -1, 'a new game: no update note')
     g.close()
@@ -672,4 +672,202 @@ def v24_a_guest_who_came_for_the_signature_says_so_rarely_and_in_different_words
     check(not any(x['named'] for x in fs), f'never a named guest: {fs}')
     check(all('『' in x['t'] for x in fs) and all('我是專程為了' not in x['t'] for x in fs), f'the dish by its name, not the old sentence: {fs}')
     check(all(fs[i]['t'] != fs[i + 1]['t'] for i in range(len(fs) - 1)), f'not the same twice running: {fs}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_the_signature_steppers_stay_on_their_own_line(b, port, target):
+    """rc5 (the player, 17:48, docs/v24/next/dessert_stepper_jumps_2026-10-01.txt): on the prep screen the −/＋ of both
+    signature cards sits under the info line, and does not move while the count changes width (9 → 16 → 100 份)."""
+    g = Game(b, port, target, seed=274, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day61.json')
+    if g.ev("phase") != 'prep': g.ev("showPrep()")
+    g.page.wait_for_timeout(100)
+    pos = []
+    for n in (9, 16, 100):
+        g.ev(f"S.stock.signature={n};S.stock.sigdessert={n};showPrep()"); g.page.wait_for_timeout(60)
+        r = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('#screen .sig')].map(c=>{const s=c.querySelector('small').getBoundingClientRect(),t=c.querySelector('.step').getBoundingClientRect(),i=c.getBoundingClientRect();return[Math.round(t.top-i.top),Math.round(s.bottom-i.top),Math.round(t.left-i.left)]}))"))
+        check(len(r) == 2 and all(st >= sb - 1 for st, sb, _ in r), f'{n} 份: each stepper is under its info line: {r}')
+        pos.append(r)
+    check(pos[0] == pos[1] == pos[2], f'and stays put while the count changes: {pos}')
+    # the cause, structurally: an inline-flex stepper sits beside a line short enough for it (the player's phone font is
+    # narrower than this browser's, so the jump showed there and not here) — it must be a block of its own
+    disp = g.ev("[...document.querySelectorAll('#screen .sig .step')].map(e=>getComputedStyle(e).display)")
+    check(disp and all(d in ('flex', 'block', 'grid') for d in disp), f'a line of its own, whatever the font: {disp}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+UP_DONE_BEFORE = r"""(()=>{const set=(k,b)=>{const d=S.day-b;story().facts[k]={d,n:1,l:d}};
+ ['yj_meet','yj_look','yj_three','yj_chose','yj_move','yj_key','yj_key_seen','xq_oh'].forEach((k,i)=>set(k,34-i*2));
+ ['wall_worry','wall_call','wall_photos','wall_jill','wall_visit','wall_wang','wall_setback','wall_report','wall_fee','wall_prep','wall_mediation','wall_settle','wall_paid','wall_article','wall_paper','wall_fixed'].forEach((k,i)=>set(k,Math.max(1,18-i)))})()"""
+
+
+def _upf(g, k, back):
+    g.ev(f"(()=>{{const d=S.day-{back};story().facts['{k}']={{d,n:1,l:d}}}})()")
+
+
+def _up_day(g, key, seed, tries=4):
+    """start days until `key` fires at the start of one (the day's one major can go to another story first)"""
+    for i in range(tries):
+        if g.ev("phase") == 'summary':
+            g.click('[data-act=toShop]'); g.page.wait_for_timeout(80)
+        if g.ev("phase") == 'shop':
+            g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(150)
+        g.ev(f"Math.random=(function(){{let a={seed + i};return function(){{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}}})()")
+        to_service(g)
+        if g.ev(f"!!fact('{key}')&&fact('{key}').d===S.day"): return True
+        g.ev("closeShop('x');for(const q of R.groups.slice())leaveGroup(q,'ok')"); g.page.evaluate('()=>window.__bot(600,1/30)')
+        if g.ev("phase") == 'service': g.ev("finishClosing()")
+        g.ev("for(let i=0;i<10;i++)__tick(1000/30)")
+    return False
+
+
+@test
+def v24_the_second_floor_is_a_story_before_it_is_a_room(b, port, target):
+    """P2 (second_floor_and_long_arcs §3–§16, implementation pass I): the era opens only after the wall, with the side
+    room and a grown restaurant; a regular's question first (no journal), the crew, the landlord's afternoon (Jill goes
+    up once; words only, no room), and only days after that the night of the missing cats. Nothing unlocks."""
+    g = Game(b, port, target, seed=281, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day52.json')
+    check(g.ev("eraOpen('up')") is False and g.ev("due('up_hint',null,0,'up')") is False, 'not before 怡君 and the wall')
+    g.ev(UP_DONE_BEFORE)
+    check(g.ev("eraOpen('up')") is True and g.ev("upCan()") is True, 'two days after the wall settled, with the side room and a crew of twelve')
+    g.ev("const s0=S.rooms.side;S.rooms.side=0;window.__c=upCan();S.rooms.side=s0")
+    check(g.ev("__c") is False, 'no side room, no stairs, no story')
+    check(g.ev("due('up_inspect','up_staff',2,'up')") is False and g.ev("due('up_door','up_inspect',3,'up')") is False, 'each step waits for the one before it')
+    _upf(g, 'up_hint', 3); _upf(g, 'up_staff', 2)
+    check(g.ev("due('up_inspect','up_staff',2,'up')") is True and g.ev("due('up_door','up_inspect',3,'up')") is False, 'the landlord comes when the crew have wondered; the door waits for him')
+    _upf(g, 'up_inspect', 2)
+    check(g.ev("due('up_door','up_inspect',3,'up')") is False, 'not two days after he locked it')
+    _upf(g, 'up_inspect', 3)
+    check(g.ev("due('up_door','up_inspect',3,'up')") is True, 'several days later')
+    check(g.ev("!!STORY_EV.find(E=>E.k==='up_hint').note") is False and g.ev("!!STORY_EV.find(E=>E.k==='up_hint').ic") is False, 'the first question leaves nothing in the journal')
+    check(g.ev("restChapters().find(C=>C.t==='樓上').showIf()") is False, 'and the story page has no 樓上 before the night')
+    check(g.ev("!S.rooms.up&&!roomOpen('up')&&secUp(1e9,()=>'')===''") is True, 'nothing to buy, no room')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_the_night_of_the_missing_cats(b, port, target):
+    """P2 U4 on the Day 52 save, played: the day's major is taken at the start (the landlord and the air conditioner);
+    late in the evening the stair door gives, 柔柔 goes, 小齁 after her — up at the window and by the boxes, an hour at
+    most; at closing the closing waits and the crew who are really here search (someone off today never appears);
+    the other cats are where they are; the door is found, they go up, the floor is seen, the cats come down, the door is
+    latched; the closing goes on and the day ends. No unlock; the journal has 樓上 now."""
+    g = Game(b, port, target, seed=282, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day52.json')
+    to_service(g); play_day(g, max_steps=60000)
+    for _ in range(200):
+        if g.ev("phase") != 'service': break
+        g.ev("for(let i=0;i<30;i++)__tick(1000/30)")
+    g.ev(UP_DONE_BEFORE); _upf(g, 'up_hint', 6); _upf(g, 'up_staff', 5); _upf(g, 'up_inspect', 3)
+    check(_up_day(g, 'up_door', 9102), 'the night\'s day starts')
+    nina = g.ev("S.crew.find(m=>m.name==='Nina').id"); g.ev(f"setCrewAway(S.crew.find(m=>m.id==='{nina}'),'off')")
+    check(g.ev("upNight()") is True and not g.ev("R.upDoor"), 'the door looks shut for most of the evening')
+    g.ev("__botUntil('R.t>=R.dur*.83',90000,1/30)")
+    check(g.ev("R.upDoor") == 1, 'late in the evening it has given a little')
+    g.ev("__botUntil('R.closing!=null',90000,1/30)")
+    cats = json.loads(g.ev("JSON.stringify(['mikan','ban'].map(id=>{const c=catBy(id);return[c.st,c.away,c.hidden]}))"))
+    check(all(c[0] in ('up', 'upgo') and c[2] for c in cats), f'柔柔 and 小齁 are not in any room downstairs: {cats}')
+    others = g.ev("['snow','tora','mei'].every(id=>!upCatBusy(catBy(id)))")
+    check(others is True, 'the other three are where they were')
+    g.ev("for(let i=0;i<3;i++)__tick(1000/30)")
+    check(g.ev("!!R.upSearch&&!R.upSearch.end") is True and g.ev("$('#closePill').hidden") is True, 'the closing became a search: no 「結束今天」 while they look')
+    party = g.ev("R.upSearch.F")
+    check(nina not in party and len(party) >= 1, f'only the people who are here search: {party}')
+    c0 = g.ev("R.closing")
+    seen = {'side': False, 'up': False, 'tab': False}
+    for _ in range(300):   # about a minute and a half of the evening, ten frames at a time
+        g.ev("for(let i=0;i<10;i++)__tick(1000/30)")
+        if g.ev("!R||!R.upSearch||R.upSearch.end"): break
+        if g.ev("room==='side'"): seen['side'] = True
+        if g.ev("room==='up'"): seen['up'] = True
+        if g.ev("roomsOpen().includes('up')"): seen['tab'] = True
+    check(g.ev("!!(R&&R.upSearch&&R.upSearch.end)") is True, 'the search ends')
+    check(seen['side'] and seen['up'] and seen['tab'], f'the door in the side room, then the floor upstairs: {seen}')
+    check(g.ev("R.closing") <= c0 + 1, 'the closing waited for them')
+    check(g.ev("fact('up_cats')&&fact('up_cats').d===S.day") is True, 'the cats were found today')
+    after = json.loads(g.ev("JSON.stringify({cats:['mikan','ban'].map(id=>{const c=catBy(id);return[c.st,!!c.away,c.hidden]}),door:R.upDoor,tab:roomsOpen().includes('up'),pill:$('#closePill').hidden,up:!!S.rooms.up})"))
+    check(all(not c[1] and not c[2] for c in after['cats']) and not after['door'] and not after['tab'] and not after['pill'] and not after['up'], f'downstairs, the door latched, the tab gone, the closing on — and nothing unlocked: {after}')
+    for _ in range(200):
+        if g.ev("phase") != 'service': break
+        g.ev("for(let i=0;i<30;i++)__tick(1000/30)")
+    check(g.ev("phase") in ('summary', 'shop'), 'the day ends')
+    check(g.ev("restChapters().find(C=>C.t==='樓上').showIf()") is True and g.ev("restChapters().find(C=>C.t==='樓上').beats.filter(b=>b[1]!=null).length") == 2, 'the journal: 樓上, two beats (the landlord\'s floor, the night)')
+    check(g.ev("secUp(1e9,()=>'')") == '', 'still no project')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_the_night_cut_short_is_not_counted_and_comes_again(b, port, target):
+    """If the day ends in the middle of it (the closing cut short), the cats are home and the night is not counted —
+    it can still happen on another day; and a checkpoint reload in the evening plays it as if nothing happened."""
+    g = Game(b, port, target, seed=283, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day52.json')
+    to_service(g); play_day(g, max_steps=60000)
+    for _ in range(200):
+        if g.ev("phase") != 'service': break
+        g.ev("for(let i=0;i<30;i++)__tick(1000/30)")
+    g.ev(UP_DONE_BEFORE); _upf(g, 'up_hint', 6); _upf(g, 'up_staff', 5); _upf(g, 'up_inspect', 3)
+    check(_up_day(g, 'up_door', 9202), 'the night\'s day starts')
+    g.ev("__botUntil('R.closing!=null',90000,1/30)"); g.ev("for(let i=0;i<40;i++)__tick(1000/30)")
+    check(g.ev("!!R.upSearch") is True, 'searching')
+    g.ev("finishClosing()"); g.ev("for(let i=0;i<10;i++)__tick(1000/30)")
+    st = json.loads(g.ev("JSON.stringify({cats:['mikan','ban'].map(id=>{const c=catBy(id);return[c.st,!!c.away,c.hidden]}),door:fact('up_door'),cats_f:fact('up_cats')})"))
+    check(all(not c[1] and not c[2] for c in st['cats']) and st['door'] is None and st['cats_f'] is None, f'home, and not counted: {st}')
+    check(g.ev("due('up_door','up_inspect',3,'up')") is True, 'it can come again')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_jill_calls_the_landlord_and_the_whole_floor_is_hers(b, port, target):
+    """P2 U5–U7: the reminder needs the night two days back, two kinds of crew pressure and two kinds of customer
+    pressure; the call needs the reminder two days back and a restaurant that can afford to think of it; at closing she
+    stands at the stair door and calls; the project is offered (開始規劃 / 之後再說) and only then is in 店舖工程; bought,
+    the whole floor is a room (furniture over the next days, traces later), the street's windows warm, no seat and no
+    staff place added; kept across reloads before and after."""
+    g = Game(b, port, target, seed=284, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day52.json')
+    g.ev(UP_DONE_BEFORE)
+    for k, back in [('up_hint', 16), ('up_staff', 15), ('up_inspect', 13), ('up_door', 10), ('up_cats', 10)]:
+        _upf(g, k, back)
+    check(g.ev("due('up_remind','up_cats',2,'up')&&upKinds(UP_STAFF)>=2&&upKinds(UP_CUST)>=2") is False, 'no reminder without the pressure')
+    for k, back in [('sp_seat', 12), ('sp_box', 9), ('up_busy', 7), ('up_small', 5)]:
+        _upf(g, k, back)
+    check(g.ev("due('up_remind','up_cats',2,'up')&&upKinds(UP_STAFF)>=2&&upKinds(UP_CUST)>=2") is True, 'two of each: someone may say it')
+    _upf(g, 'up_remind', 1)
+    check(g.ev("due('up_ask','up_remind',2,'up')") is False, 'not the next day')
+    _upf(g, 'up_remind', 2); g.ev("S.money=50000")
+    check(g.ev("upAskReady()") is False, 'not with an empty till')
+    g.ev("S.money=420000")
+    check(g.ev("due('up_ask','up_remind',2,'up')&&upAskReady()") is True, 'ready')
+    to_service(g)
+    g.ev("__botUntil('R.closing!=null',90000,1/30)")
+    for _ in range(600):
+        g.ev("__tick(1000/30)")
+        if g.ev("sub==='upproj'"): break
+    check(g.ev("fact('up_ask')&&fact('up_ask').d===S.day") is True and g.ev("sub") == 'upproj', 'the call, and the project offered')
+    check(g.ev("R.jill.room") == 'main', 'Jill is back in the dining room')
+    g.click('[data-act=upGo][data-k=plan]'); g.page.wait_for_timeout(80)
+    check(g.ev("S.upProj&&S.upProj.state") == 'planned', 'planned')
+    for _ in range(300):
+        if g.ev("phase") != 'service': break
+        g.ev("for(let i=0;i<30;i++)__tick(1000/30)")
+    g.ev("save()"); g.reload(); g.page.wait_for_timeout(150)
+    g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(150)
+    check(g.ev("!!fact('up_ask')&&!S.rooms.up&&secUp(1e9,()=>'X').includes('二樓（整層）')") is True, 'kept across a reload, and in 店舖工程')
+    caps0 = g.ev("[restaurantCap(),loungeCap(),tablesTotal()]")
+    g.ev("S.money=Math.max(S.money,400000)")
+    check(g.ev("buyUp()") is True, 'bought')
+    g.ev("hideReveal()")
+    st = json.loads(g.ev("JSON.stringify({up:S.rooms.up,open:roomOpen('up'),lease:S.up.lease,furn:S.up.furn,caps:[restaurantCap(),loungeCap(),tablesTotal()],fact:!!fact('up_lease')})"))
+    check(st['up'] == 1 and st['open'] and st['fact'] and st['caps'] == caps0, f'the floor is a room; no seat, no staff place: {st}')
+    L = st['lease']
+    check(st['furn']['table'] == L + 1 and st['furn']['scratch'] == L + 5, f'the furniture comes over the next days: {st["furn"]}')
+    check(g.ev("upHas('table')") is False, 'the same evening: empty')
+    g.ev("save()"); g.reload(); g.page.wait_for_timeout(150)
+    g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(150)
+    check(g.ev("!!S.rooms.up&&roomOpen('up')&&S.up.lease") is not None, 'kept across a reload')
+    g.ev("S.day+=6;IDLE=null")
+    check(g.ev("upHas('table')&&upHas('cushion')&&upHas('scratch')&&upTrace('cup')") is True, 'a week later: the table, the cats\' things, a cup')
     check(not g.errors, g.errors[:3]); g.close()

@@ -1050,6 +1050,7 @@ function applyGates(){if(S.sigdEvoNews&&S.sigDessert){const lv=S.sigdEvoNews;S.s
  if(!S.news21&&S.day>=3){S.news21=S.day;S.news.push('<b>2.1：食物與日常。</b>做熟的菜（熟練度 LV3）可以在<b>菜單研發</b>研發成<b>特製版</b>；招牌菜賣得多會換盤；街上有人經過、有人在門口看菜單就進來；帶小孩的家庭、雨天的傘、廚房裡的空檔。')}
  if(!S.news20&&S.day>=3){S.news20=S.day;S.news.push('<b>2.0：店可以變大了。</b>主廳上方可以切到<b>店門口</b>和<b>廚房</b>（廚師真的在裡面煮）。打烊後商店裡多了<b>工程</b>（戶外區、大出菜口、冷藏庫、廚房擴建、側廳）和<b>貓的東西</b>；結算會告訴你下一個存錢的目標。')}
  if(S.news24==null){if(S.day<=1)S.news24=-1;else{S.news24=S.day;S.news.push(`<b>2.4：店裡的人，店外的生活。</b>員工有時候會因為自己的事晚點到（當天開店時會說）。幾段故事有一張插圖，看過以後在日誌「故事」的那一段可以再打開。${opsLv('room')?'營運升級的「後場休息室」現在叫<b>後場整理區</b>：廚房門邊的層架和掛鉤，員工上限一樣多 2 位。':''}${xqHelperMode()?'Jill 認識很久的<b>秀琴阿姨</b>，很多晚上會在快打烊時順路來幫忙收一收；請第一位清潔員，就是請她。':''}`)}}   /* v2.4: for a save that was already going — the systems only; nobody's story is told in advance */
+ if(S.news24b==null){if(S.day<=1||!(S.crew||[]).length)S.news24b=-1;else{S.news24b=S.day;const lc=(S.crew||[]).filter(m=>crewPool(m)==='lounge').length;S.news.push(`<b>員工分成兩個名單。</b>餐廳員工（廚師、服務生、清潔員）和 Lounge 名單的名額各算各的，互不佔用。${loungeLv()?`Lounge 名單是固定的幾個人：${loungeLv()>=2?'Evan、沈晴、阿拓、安安、許葳':'Evan 和沈晴（Lounge II 再加三位）'}，在「員工 › Lounge 名單」；現在 ${lc}/${loungeCap()}。`:'Lounge 蓋好以後，它有自己的名單。'}在哪裡上班照「工作分配」：服務生兩邊共用，廚房只有一個，調酒師只顧吧台。`)}}   /* v2.4 rc5: the two staff pools, told once to a save that was already going */
  while(S.gate<S.day){S.gate++;const D=S.gate;
  if(D===2){unlockDish('coffee');S.eq.bar=Math.max(1,S.eq.bar);S.news.push('<b>新料理解鎖：拿鐵咖啡</b>。咖啡吧開張了，客人會加點飲料。');if(fact('xq_helper')&&xqHelperMode())S.news.push('昨晚快打烊時來幫忙收店的是<b>秀琴阿姨</b>，Jill 認識很久的阿姨。她不是員工，很多晚上會順路來；之後請清潔員，第一位就是她。')}
  if(D===3){if(S.eq.stove<2){S.eq.stove=2}unlockDish('pasta');S.news.push('<b>第二口爐子到貨！</b>同時可以做兩道熱菜。<br><b>新料理：番茄義大利麵</b>（先煮麵，再加醬）。<br>從今天開始可以自己<b>備料</b>與<b>調整售價</b>。')}
@@ -3085,6 +3086,9 @@ function restChapters(){const achD=achReal;/* v2.3 follow-up: a beat's day from 
   {t:'店開始有自己的樣子',beats:[['招牌菜',has(!!S.signature,achD('sig'))],['側廳',has(projOn('side'),S.newRooms&&S.newRooms.side)],['第二道招牌',has(!!S.sigDessert,achD('sigd'))],["Jill's Kitchen — JILL",has(S.level>=5,achD('jill'))]]},
   {t:'晚餐之後',hidden:()=>!fact('ken_wine_q'),tease:'店裡好像還少了什麼。',showIf:()=>S.level>=4,beats:[['「妳真的完全不賣酒？」',BF('ken_wine_q')],['這道要配什麼',BF('ken_pairing')],['有人吃完了還不想走',BF('lounge_idea')],['試酒的晚上',BF('tasting_night')],['「讓人吃完飯以後，還有地方可以坐。」',BF('lounge_project')],['Lounge 開了',BF('lounge_built_1')]]},
   {t:"Jill's Kitchen — The Lounge",hidden:()=>!fact('lounge_project'),tease:'？？？？？',showIf:()=>!!fact('ken_wine_q'),beats:[['第一個晚上',BF('lounge_first_night')],['酒吧沙發廳',BF('lounge_built_2')],['安靜的角落',BF('lounge_built_3')],['「聽說這裡是你害的。」',BF('evan_origin')],['好像真的開起來了',(()=>{const k=Object.keys(story().facts).find(x=>x.startsWith('milestone_'));return k?fact(k).d:null})()]]},
+  /* v2.4 P2: the Second Floor (second_floor_and_long_arcs §39: the major beats only — no line for the first question,
+     none for the crew's moments; nothing that says what the floor will be) */
+  {t:'樓上',showIf:()=>!!fact('up_cats'),beats:[['房東的二樓',BF('up_inspect')],[`${upCatN('mikan')}和${upCatN('ban')}不見的那一晚`,BF('up_cats')],['「……樓上現在還空著嗎？」',BF('up_ask')],['「整層。」',BF('up_lease')]]},
  ];return C}
 /* ---- the page ---- */
 let storyFocus=null;
@@ -5687,9 +5691,9 @@ function drawBagSparkle(c,now){const t=now-BAG_T;const base=.35+Math.sin(now*2)*
 
 /* ================= guide ================= */
 /* 小小店主手冊：seven cards, short lines, the same tone as the rest of the game */
-const GUIDE=[   /* the manual describes the game as it is. Audited every release (docs/RELEASE_CHECKLIST.md) — last: v2.4 rc4 (秀琴阿姨 from Day 1, story presence, illustrations), 2026-10-01 */
+const GUIDE=[   /* the manual describes the game as it is. Audited every release (docs/RELEASE_CHECKLIST.md) — last: v2.4 rc5 (the second floor, the two staff lists, 許葳), 2026-10-01 */
  {ic:'🍳',h:'開店與料理',sum:'每天 17:00 開店、21:30 打烊。你是 Chef Jill，點餐廳裡的東西就能指揮她。',pts:[
-  ['房間','票券列下面的分頁：店門口・主廳・側廳・Lounge（蓋好以後）・廚房（也可以用 ←→ 或數字鍵）。主廳的後牆有側廳的拱門，Lounge 蓋好以後旁邊多一道，都可以直接點。主廳底部沒有廚房——廚房是自己的一間，出菜口在那裡；Jill 和服務生會走到主廳最下面去拿菜。'],
+  ['房間','票券列下面的分頁：店門口・主廳・側廳・二樓（是店裡的以後）・Lounge（蓋好以後）・廚房（也可以用 ←→ 或數字鍵）。上二樓的樓梯門在側廳靠近你的那一邊。主廳的後牆有側廳的拱門，Lounge 蓋好以後旁邊多一道，都可以直接點。主廳底部沒有廚房——廚房是自己的一間，出菜口在那裡；Jill 和服務生會走到主廳最下面去拿菜。'],
   ['帶位','有空桌客人會自己坐；客滿時在門口長椅等。想指定順序，點那組客人或點空桌。'],
   ['點餐','桌上出現紅色「!」→ 點桌子，Jill 過去點餐。'],
   ['做菜','切到廚房，點亮著「+」的設備，照料理台的指示一步一步做。有廚師的工作站他們會自己接。'],
@@ -5727,7 +5731,7 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
   ['Dylan','常常在打烊前才來的那位。他不是員工，也不用你招待。你認識他以後，他來的時候日誌會記一行，他的卡片會顯示最近幾天來了沒（●來了・◐門口看了一眼・○沒來）。客滿時他會晚點再來，打烊前來不及就只在門口看一眼。']]},
  {ic:'🪑',h:'商店：家具、工程、營運',sum:'打烊後（開店前也可以）用今天賺的錢把店變成你要的樣子。錢買得到的都看得到。',pts:[
   ['家具與佈置','主廳最多 9 張桌（三排三張，卡座在後排）；側廳最多 9 張（靠窗那排是四人卡座；「側廳卡座」把中間、前面兩排也換成一樣的卡座，一次一整排，那一排要先擺滿）；露天桌 1–3 張（戶外區完工後）。店裡的樣子、植物、燈、畫、椅子、地毯、餐具、卡座；門口的布置（長椅、花箱、串燈、招牌燈、遮雨棚、狗狗休息角）。'],
-  ['店舖工程','擴建店面（評分夠高才能擴建）。大工程：戶外區（陽傘與地面，附第一張桌）、大出菜口、冷藏庫、廚房擴建、側廳；後期還有走入式冷藏庫和廚房二期（也在「廚房設備」最下面）。Lounge 的企劃出現以後也在這裡（I → II → III）。'],
+  ['店舖工程','擴建店面（評分夠高才能擴建）。大工程：戶外區（陽傘與地面，附第一張桌）、大出菜口、冷藏庫、廚房擴建、側廳；後期還有走入式冷藏庫和廚房二期（也在「廚房設備」最下面）。Lounge 的企劃出現以後也在這裡（I → II → III）。二樓是房東的；故事走到那裡，這裡會多一項「二樓（整層）」——租下整層、做基本工程，先是一整層空間：不是用餐區，不加座位，也不加員工名額。'],
   ['營運升級','動線規劃、門口候位區、後場整理區（廚房門邊的層架和掛鉤，換班的東西有地方放）、大菜單板；空調三級（牆上冷氣→靜音商用機→主廳側廳分區恆溫：熱天客人的耐心少扣一半、幾乎不扣、完全不扣，氛圍也加）；電力設施兩級（配電盤→商用增容＋備用電源：跳電變少→不再跳電，設備故障也少）；商用洗碗機（收桌快三成）；Lounge III 以後的 Bar 小廚／油炸站（爐台多一個位子、小食快一點）。每一級都畫在牆上。'],
   ['夢想工程','整面玻璃店面、主廳主燈、木樑天花板與吊扇、貓的空中走道——存錢的目標，結算下面會告訴你還差多少。'],
   ['貓咪生活','紙箱、睡墊、藤籃、隧道、貓窩、貓草、大跳台。側廳的東西分兩區：窗邊和最裡面那面牆（隧道、藤籃、貓窩）。'],

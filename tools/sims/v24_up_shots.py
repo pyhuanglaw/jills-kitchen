@@ -210,6 +210,29 @@ with sync_playwright() as p:
         g.ev("__botUntil('R.t>=R.dur*.97',90000,1/30)"); flush(g); g.ev("setRoom('up')"); frames(g, 20); clear_toasts(g)
         shot(g, 'up_open_floor_night.png', 'the same floor at the end of the evening, the lamps on')
         g.close()
+    if PART in ('all', 'staff'):
+        # the player's Day 61 save (Lounge II): two pools on the staff page, the Lounge roster, the new people at work
+        g = rt.Game(b, port, 'index', seed=504, manual=True, viewport={'width': 390, 'height': 844})
+        raw61 = json.load(open(os.path.join(ROOT, 'tests/saves/player_day61.json'))); raw61 = raw61.get('save', raw61)
+        g.ev("phase='title';R=null;localStorage.setItem(KEY,JSON.stringify(%s))" % json.dumps(raw61, ensure_ascii=False)); g.reload(); g.page.wait_for_timeout(150)
+        g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(150)
+        g.ev("S.money+=400000")
+        g.ev("showShop();shopTab='staff';showShop()"); g.page.wait_for_timeout(100)
+        g.ev("(()=>{const e=[...document.querySelectorAll('#screen .nm')].find(x=>x.textContent.trim()==='Lounge 名單');if(e)e.scrollIntoView({block:'start'})})()"); g.page.wait_for_timeout(60)
+        shot(g, 'staff_lounge_roster.png', 'the player\'s Day 61 save, the staff page: the Lounge list — Evan and 沈晴 in the shop, 阿拓 (Bar Food), 安安, 許葳 to hire; two numbers, never added together')
+        for nm in ['阿拓', '安安', '許葳']:
+            g.ev("(()=>{const b=document.createElement('button');b.dataset.act='hireLounge';b.dataset.k='%s';doAct('hireLounge',null,'%s',b)})()" % (nm, nm))
+        g.page.wait_for_timeout(60)
+        g.ev("(()=>{const e=[...document.querySelectorAll('#screen .nm')].find(x=>x.textContent.trim()==='Lounge 名單');if(e)e.scrollIntoView({block:'start'})})()"); g.page.wait_for_timeout(60)
+        shot(g, 'staff_lounge_full.png', 'all five hired: 「Lounge 的人都到齊了。」 — no sixth; the restaurant still 12/12')
+        g.ev("window.scrollTo(0,0);document.querySelector('#screen').scrollTop=0"); g.page.wait_for_timeout(40)
+        shot(g, 'staff_two_pools_top.png', 'the top of the staff page: 餐廳員工 12/12・Lounge 員工 5/5')
+        if g.page.query_selector('#screen [data-act=toPrep]'): g.click('#screen [data-act=toPrep]'); g.page.wait_for_timeout(120)   # the shop was opened from the prep screen
+        begin(g, 9501, scenes=False)
+        g.ev("__botUntil('R.t>=R.dur*.62',90000,1/30)"); flush(g)
+        g.ev("setRoom('lounge')"); frames(g, 30); clear_toasts(g)
+        shot(g, 'staff_lounge_at_work.png', 'the Lounge at 20:00: Evan (his portrait\'s dark waves now) and 沈晴 at the bar, 安安 on the floor, 許葳 clearing the Lounge first')
+        g.close()
     with open(os.path.join(OUT, 'shots_up.txt'), 'w', encoding='utf-8') as f:
         f.write('\n'.join(notes) + '\n')
     b.close()
