@@ -1,0 +1,661 @@
+(Filed verbatim. 2026-10-02 06:36, the player, after the 06:2x screenshots: keep the daily Second Floor (it reverses 05:23's "no everyday 二樓 tab"); the floor's three uses — STORY (the first full reveal), DAILY (go up, enter the rooms), EXPANSION (a large readable floor plan in 工程 › 二樓, permanent, growing with the building, 「？」 on what is undeveloped); the Staff Room's wood: furniture a little more natural oak than the quieter floor. Not a redesign.)
+
+RC6 Second Floor + Staff Room 最終 UX / Visual Polish 指示
+
+我看過你目前最新的 RC6 screenshots。
+
+先講結論：
+
+【我很滿意你現在做出的整體方向。】
+
+尤其是你沒有再把 Staff Room / Private Dining Room 的 miniature interiors 塞進巨大二樓 overview，而是：
+
+- 保留「二樓」作為真實存在的樓層
+- 玩家可以上二樓
+- 再進入獨立的 Staff Room / Private Dining Room
+- Staff Room / PDR 本身都是完整獨立場景
+- 二樓仍然保有剩餘空間與「？」的未知感
+
+我原本曾要求把「二樓」完全退出日常 navigation，
+但看到你現在的實際成果後，我改變這個決定。
+
+【目前這個 daily Second Floor 的設計請保留。】
+
+不要因為舊 spec 又把它拆掉。
+不要重新大改 Second Floor architecture。
+不要重新做 Staff Room layout。
+不要重新做 PDR。
+
+這次主要是：
+
+1. 確認 Second Floor 的三種 presentation / use case
+2. 把完整二樓平面圖正式放進「工程／擴建」
+3. 修 Staff Room 木質家具與地板全部混成一片的問題
+4. 保留目前已經成功的 RC6 設計
+
+━━━━━━━━━━━━━━━━━━
+PART 1｜Second Floor 的三種用途要明確分開
+━━━━━━━━━━━━━━━━━━
+
+同一個 Second Floor 有三種不同用途：
+
+A. STORY
+= 玩家第一次認識完整二樓
+
+B. DAILY
+= 玩家平常真的上二樓、進入房間
+
+C. EXPANSION / 工程
+= 玩家查看並理解「整個二樓目前被怎麼使用，以及還能往哪裡擴建」
+
+三者屬於同一個實體樓層，
+但不需要使用完全相同的 UI / camera / presentation。
+
+這個區分是目前最終方向。
+
+━━━━━━━━━━━━━━━━━━
+PART 2｜STORY：第一次完整二樓 Architectural Reveal
+━━━━━━━━━━━━━━━━━━
+
+請確認原本 Second Floor story 中的完整空間 reveal 仍然存在。
+
+故事概念仍然是：
+
+柔柔先探索二樓
+→ 小齁跟上去
+→ Jill / 當時在場的人發現貓不見
+→ 上樓尋找
+→ 玩家第一次真正看到完整二樓
+→ 柔柔在大窗附近
+→ 小齁也在附近
+
+這一次非常重要。
+
+玩家第一次必須真正理解：
+
+- 原來樓上是一整層
+- 整層有多大
+- 樓梯在哪裡
+- 大窗在哪裡
+- 柱子／主要固定結構在哪裡
+- 還存在大量尚未定義用途的空間
+
+這一幕的功能不是 navigation。
+
+它的功能是：
+
+【SPATIAL REVEAL】
+
+也就是第一次把「Jill’s Kitchen 有完整二樓」這件事建立在玩家腦中。
+
+如果目前這段已經存在且正常：
+不要重做，只要保留。
+
+如果因 RC6 修改而消失：
+請以最小修改恢復。
+
+不要因此重構整個 Second Floor system。
+
+━━━━━━━━━━━━━━━━━━
+PART 3｜DAILY：保留你現在做出的簡化二樓
+━━━━━━━━━━━━━━━━━━
+
+我現在喜歡你目前的 daily Second Floor。
+
+正常遊玩時：
+
+玩家選擇／上到二樓
+→ 看到目前簡潔的二樓空間
+→ 再選擇進入「員工休息室」或「私人包廂」
+→ Staff Room / PDR 各自進入完整獨立場景
+
+這個流程可以保留。
+
+我現在不要求把「二樓」完全移出日常 navigation。
+
+同時：
+
+【不要把完整巨大平面圖重新放回每天的正常遊玩。】
+
+玩家不需要每次想去 Staff Room，
+都先看一次整層 architectural overview。
+
+也不要恢復以前那種：
+
+- giant empty overview
+- miniature Staff Room
+- miniature PDR
+- dollhouse rooms
+- 在 overview 裡直接操作房間
+
+現在的 daily navigation 已經比那個好。
+
+請保留。
+
+━━━━━━━━━━━━━━━━━━
+PART 4｜EXPANSION / 工程：完整二樓平面圖必須永久存在
+━━━━━━━━━━━━━━━━━━
+
+這是這次最重要的新確認。
+
+【完整 Second Floor floor plan / architectural overview 必須永久存在於「工程／餐廳擴建」系統裡。】
+
+不論：
+
+- 二樓剛租下來
+- 尚未擴建
+- Staff Room 完成
+- PDR 完成
+- 部分擴建
+- 未來新增其他房間
+- 甚至未來整個二樓全部開發完成
+
+玩家進入：
+
+「工程／餐廳擴建 → 二樓」
+
+都應該能查看完整二樓平面圖。
+
+這張圖不是只為了「購買下一個 upgrade」。
+
+它同時是玩家對自己餐廳建築的：
+
+【architectural record / spatial progression view】
+
+玩家應該永遠可以回來看：
+
+「我的二樓現在到底長什麼樣子？」
+
+━━━━━━━━━━━━━━━━━━
+PART 5｜完整平面圖不能只是一小塊 thumbnail
+━━━━━━━━━━━━━━━━━━
+
+這點非常重要：
+
+【不要把完整二樓平面圖做成工程頁裡一小塊看不清楚的縮圖。】
+
+我不要：
+
+- tiny thumbnail
+- 小卡片裡塞完整二樓
+- 只能勉強看出幾個色塊
+- room label 小到手機看不清楚
+- 玩家根本無法理解房間大小與相對位置
+- 只是「有放 floor plan」但實際沒有資訊價值
+
+在 mobile 上尤其要避免。
+
+當玩家進入「工程 → 二樓」時，
+Second Floor plan 應該是這個頁面的主要視覺資訊之一。
+
+它必須大到可以清楚理解：
+
+- 整層外框
+- 房間大小
+- 房間相對位置
+- 樓梯位置
+- 主要固定結構
+- 已完成空間
+- 尚未開發空間
+- 門的位置
+- 未來還有多少空間
+
+如果工程頁現有 layout 無法讓 floor plan 足夠大，
+可以使用：
+
+- large dedicated plan area
+- tap to enlarge
+- full-screen plan view
+- 或其他簡單且 mobile-friendly 的方式
+
+但不要為此建立複雜的新 UI framework。
+
+核心標準只有一個：
+
+【玩家在手機上真的看得懂完整二樓現在是怎麼被切分的。】
+
+不是 technically visible。
+是 actually readable。
+
+━━━━━━━━━━━━━━━━━━
+PART 6｜平面圖顯示的是 Architecture，不是 miniature gameplay
+━━━━━━━━━━━━━━━━━━
+
+完整 floor plan 要顯示：
+
+- entire Second Floor boundary
+- stairs
+- major fixed structural elements
+- walls
+- doors
+- room footprints
+- restrained room labels
+- undeveloped areas
+
+已完成的 Staff Room 可以標示：
+
+「員工休息室」
+
+已完成的 Private Dining Room 可以標示：
+
+「私人包廂」
+
+但：
+
+【不要在平面圖裡重新畫房間完整 interior。】
+
+不要顯示：
+
+- miniature sofa
+- miniature staff
+- miniature dining table
+- NPC
+- cats
+- detailed furniture simulation
+- dollhouse gameplay
+
+這是一張 architectural overview。
+
+不是把兩個獨立場景縮小貼回去。
+
+玩家需要知道：
+
+「房間在哪裡、占多少空間。」
+
+不是：
+
+「房間裡沙發現在在哪裡。」
+
+━━━━━━━━━━━━━━━━━━
+PART 7｜平面圖必須跟著實際擴建永久演化
+━━━━━━━━━━━━━━━━━━
+
+這張 floor plan 不能是固定背景圖。
+
+它必須反映玩家目前真正完成的 Second Floor state。
+
+例如：
+
+【剛取得二樓】
+
+玩家看到完整 floor plate，
+大部分仍是 open / undeveloped。
+
+↓
+
+【Staff Room 完工】
+
+同一張平面圖上出現：
+
+- Staff Room walls
+- Staff Room door
+- Staff Room footprint
+- restrained label
+
+玩家清楚看到：
+原本空白的一塊現在變成房間。
+
+↓
+
+【Private Dining Room 完工】
+
+同一張圖再出現：
+
+- PDR walls
+- PDR door
+- PDR footprint
+- restrained label
+
+↓
+
+【未來其他擴建】
+
+原本未開發的區域再逐步改變。
+
+也就是：
+
+BEFORE
+→ construction
+→ AFTER
+
+玩家應該能從同一張 floor plan 直接感受到：
+
+【我的餐廳二樓真的被我一塊一塊蓋起來了。】
+
+這本身就是 spatial progression。
+
+━━━━━━━━━━━━━━━━━━
+PART 8｜未開發區域只顯示「？」
+━━━━━━━━━━━━━━━━━━
+
+目前尚未開發的二樓區域：
+
+只顯示 restrained：
+
+？
+
+不要顯示：
+
+- Coming Soon
+- Future Room
+- Future Expansion
+- Residence
+- Dylan Study
+- Bedroom
+- Living Room
+- 任何尚未正式進入遊戲的用途
+
+也不要用 developer/debug placeholder 的視覺。
+
+「？」要讓玩家感覺：
+
+【這裡以後可能還會發生什麼。】
+
+而不是：
+
+【這裡還沒做完。】
+
+玩家應該知道這裡還有空間，
+但不知道未來會變成什麼。
+
+請保留 anticipation。
+
+━━━━━━━━━━━━━━━━━━
+PART 9｜即使全部擴建完成，完整平面圖仍然保留
+━━━━━━━━━━━━━━━━━━
+
+這點請不要誤解。
+
+未來如果 Second Floor 所有區域都已經完成：
+
+完整 floor plan 仍然存在於：
+
+「工程／餐廳擴建 → 二樓」
+
+它不應該因為：
+
+「已經沒有 upgrade 可以買」
+
+就消失。
+
+因為這張圖不只是 shop UI。
+
+它也是玩家已完成空間的紀錄。
+
+所以即使未來沒有「？」了，
+玩家仍然可以打開完整二樓平面圖，
+看到自己最後把整層變成了什麼。
+
+━━━━━━━━━━━━━━━━━━
+PART 10｜Construction Completion 的 Spatial Payoff
+━━━━━━━━━━━━━━━━━━
+
+每次二樓有重大空間 construction 完成時，
+
+希望玩家能感受到：
+
+「平面真的變了。」
+
+不需要做複雜 construction simulation。
+
+但可以沿用現有系統做簡單的：
+
+BEFORE
+→ construction completed
+→ updated floor plan
+→ new walls / door / room label 出現
+→ 玩家第一次進入新的獨立完整場景
+
+這樣 expansion 才不是：
+
+付錢 → button 變成 purchased。
+
+而是：
+
+付錢 → Jill’s Kitchen 的建築真的永久改變。
+
+━━━━━━━━━━━━━━━━━━
+PART 11｜Staff Room：目前整體設計我很滿意
+━━━━━━━━━━━━━━━━━━
+
+目前新版 Staff Room 我很滿意。
+
+請保留現在的：
+
+- overall layout
+- bright warm atmosphere
+- MUJI-inspired direction
+- cream / off-white / pale neutral palette
+- sofa zone
+- rug
+- lounge chairs
+- coffee table
+- communal staff table
+- lockers
+- kitchenette
+- plants
+- lighting
+- spatial composition
+
+它現在已經是一個：
+
+「品質很好、舒服、員工真的會想待著的休息室。」
+
+雖然比一般員工休息室高級，
+但以現在 Jill’s Kitchen 的發展程度，我覺得成立。
+
+【不要重新設計 Staff Room。】
+
+這次只做 material / color separation polish。
+
+━━━━━━━━━━━━━━━━━━
+PART 12｜Staff Room 現在唯一主要視覺問題
+━━━━━━━━━━━━━━━━━━
+
+目前的問題是：
+
+【地板、locker、桌子、部分木製家具顏色太接近。】
+
+尤其 mobile screenshot 縮小後：
+
+- floor
+- employee lockers
+- communal table
+- coffee table
+- cabinetry
+
+容易全部融成同一片非常淡的米黃色。
+
+所以不是空間設計有問題。
+
+是：
+
+【WOOD MATERIAL HIERARCHY 不夠。】
+
+我要保留整體非常明亮的 palette，
+但讓家具和地板可以被清楚分辨。
+
+━━━━━━━━━━━━━━━━━━
+PART 13｜Staff Room 木材調整方向
+━━━━━━━━━━━━━━━━━━
+
+請把：
+
+- employee lockers
+- communal dining table
+- coffee table / appropriate wood furniture
+- integrated wood cabinetry where appropriate
+
+調整成更明確的：
+
+PALE NATURAL OAK
+/
+LIGHT NATURAL OAK
+
+我要的是：
+
+- 仍然是淺色
+- natural oak / ash 的感覺
+- 比目前地板稍微暖一點
+- 比地板稍微有更明確的木材存在感
+- 木紋可以略微清楚
+- furniture edge / silhouette 更容易辨識
+- 保持低飽和
+- 保持自然
+- 保持 MUJI-inspired
+- 保持整間房明亮
+
+地板則可以維持更淡、更安靜的 pale wood，
+讓兩者產生層次。
+
+簡單說：
+
+FLOOR
+= 更淡、更安靜、作為 background plane
+
+FURNITURE / LOCKERS
+= 稍微更有 natural oak character
+
+SOFA / RUG
+= cream / oatmeal / very light greige
+
+這樣玩家在手機上會清楚看到不同材質層次。
+
+━━━━━━━━━━━━━━━━━━
+PART 14｜Staff Room 木色 HARD BAN
+━━━━━━━━━━━━━━━━━━
+
+不要因為我說「橡木」就變成：
+
+- dark oak
+- walnut
+- dark brown
+- reddish wood
+- orange wood
+- honey-orange saturated wood
+- 深色櫃體
+- 深色桌子
+
+也不要重新加入：
+
+- dark sofa
+- dark green rug
+- gray-green dominant furniture
+- black large furniture
+
+我要的是：
+
+【淺自然橡木家具】
+vs
+【更淡的木地板】
+
+不是：
+
+【淺色房間 + 深色家具】
+
+整體仍然必須維持現在成功的明亮 MUJI direction。
+
+━━━━━━━━━━━━━━━━━━
+PART 15｜Mobile 是最終視覺判斷標準
+━━━━━━━━━━━━━━━━━━
+
+請用實際 mobile viewport screenshot 判斷。
+
+Staff Room 在手機正常遊玩尺寸下，
+應該可以一眼分辨：
+
+- floor
+- lockers
+- communal table
+- sofa
+- rug
+- kitchenette
+
+不是靠放大 screenshot 才看得出差異。
+
+Second Floor Expansion floor plan 也一樣：
+
+玩家在手機上必須真的能看懂：
+
+- 完整樓層
+- 房間配置
+- 已開發區域
+- 未開發區域
+- room labels
+- stairs
+- doors
+
+不要把 desktop technically readable 當成 mobile readable。
+
+━━━━━━━━━━━━━━━━━━
+PART 16｜不要因這次 polish 擴大 RC6 scope
+━━━━━━━━━━━━━━━━━━
+
+這次不是要求重新設計 RC6。
+
+請不要：
+
+- 重構 Second Floor architecture
+- 重做 Staff Room
+- 重做 PDR
+- 建立新的 generic room framework
+- 建立大型 floor-plan framework
+- 建立 construction simulator
+- 重寫 navigation
+- 修改已經正常的 reservation system
+- 修改已經正常的 employment pool
+- 順便加入未來 Residence / Dylan Study
+- 順便開始新的大功能
+
+優先 reuse：
+
+- current Second Floor renderer
+- current room states
+- current construction / expansion state
+- current Staff Room
+- current PDR
+- existing story state
+
+只完成這次必要的 UX / presentation polish。
+
+━━━━━━━━━━━━━━━━━━
+PART 17｜完成後請明確回報
+━━━━━━━━━━━━━━━━━━
+
+請完成／確認後告訴我：
+
+1. Second Floor 初次 story architectural reveal 是否仍存在
+2. 柔柔／小齁第一次上二樓時，玩家實際看到什麼
+3. 現在 daily Second Floor → Staff Room / PDR 的 navigation 流程
+4. 「工程／餐廳擴建 → 二樓」完整 floor plan 如何呈現
+5. floor plan 在未擴建 / Staff Room 完成 / PDR 完成後如何變化
+6. 未開發「？」如何呈現
+7. 完整二樓平面圖在 mobile 上的 screenshot
+8. Staff Room 調整後的 mobile screenshot
+9. Staff Room lockers / tables 與 floor 的 material separation 前後差異
+10. 是否有任何這次修改影響到既有 save / migration / navigation
+
+如果以上原本就已有部分功能，
+不要重做。
+
+先 inspect current implementation，
+保留已經正確的部分，
+只補缺少的部分。
+
+最後再次確認：
+
+【我很滿意目前 RC6 的二樓與 Staff Room 整體方向。】
+
+這不是 redesign request。
+
+我要的是：
+
+保留目前成功的 daily Second Floor
++
+保留 story 中第一次完整二樓 reveal
++
+讓「工程／擴建」永久擁有一張大而清楚、真正可閱讀、會隨擴建演化的完整二樓平面圖
++
+只微調 Staff Room 淺橡木家具與地板的材質／色階分離。
+
+不要把已經做對的東西重新做壞。

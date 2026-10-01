@@ -1,0 +1,569 @@
+(Filed verbatim. 2026-10-02 06:43, the player: the Staff Room gets a restrained recreation layer — a pool table in pale oak and mushroom felt, one massage chair in light stone greige, a few books / games — used now and then by the crew as ambient life (no minigame, no stats); the Private Dining Room's side table goes against the wall as a narrow Art Deco console (the album removed, the lamp kept) and the window sideboard becomes warm ivory with a light stone top and aged brass. Not a redesign; RC6 scope.)
+
+RC6｜Staff Room Recreation + Private Dining Room Final Visual Polish
+
+我看過目前最新版 screenshots。
+
+先確認：
+
+【Staff Room 與 Private Dining Room 現在的整體方向我都很滿意。】
+
+這次不是 redesign。
+
+不要推翻目前：
+- Staff Room 的 MUJI-inspired 明亮設計
+- Staff Room 現有 layout / sofa zone / communal table / kitchenette / lockers
+- PDR 的 deep olive Art Deco architecture
+- PDR stone floor
+- PDR vertical stone dining table
+- PDR 現有 reservation / minimum spend / capacity 系統
+
+這次只做兩件事：
+
+A. Staff Room 增加真正的「休閒／放鬆」功能與 ambient usage
+B. PDR 修正兩個目前不合理的家具／材質細節
+
+請先 inspect 現有 implementation，
+盡量沿用現有 room state / NPC ambient behavior / furniture rendering，
+不要為此建立大型新系統。
+
+━━━━━━━━━━━━━━━━━━
+A｜STAFF ROOM：現在漂亮了，但還缺「真的拿來放鬆」的東西
+━━━━━━━━━━━━━━━━━━
+
+目前新版 Staff Room 已經很好看：
+
+- 明亮
+- 溫暖
+- MUJI-inspired
+- sofa lounge
+- communal table
+- lockers
+- kitchenette
+- plants
+- pale neutral palette
+
+這些全部保留。
+
+但目前 Staff Room 的主要活動仍然集中在：
+
+坐著
+聊天
+吃東西
+喝東西
+
+所以它現在比較像高品質 employee lounge，
+還不完全像員工真的會在休息時間／下班後留下來放鬆的 Staff Room。
+
+我希望增加一個 restrained recreation layer。
+
+核心新增：
+
+1. 小型／中型 pool table（撞球台）
+2. 一張高品質 massage chair（按摩椅）
+3. 如果空間適合，可以有少量 books / magazines / board games / cards 等生活物件
+
+但不要把 Staff Room 變成：
+
+- arcade
+- sports bar
+- Google office
+- game center
+- KTV
+- entertainment room
+
+不要塞滿娛樂設備。
+
+核心仍然是舒服、安靜、成熟的 Staff Room。
+
+━━━━━━━━━━━━━━━━━━
+A1｜POOL TABLE
+━━━━━━━━━━━━━━━━━━
+
+撞球台是主要 recreation feature。
+
+希望它看起來像：
+
+「高品質住宅 lounge / boutique staff lounge 裡的 pool table」
+
+而不是撞球館。
+
+材質方向：
+
+BODY / FRAME
+= pale natural oak / light natural oak
+
+FELT
+= warm greige / mushroom / oatmeal-gray
+
+DETAILS
+= restrained taupe / muted metal / very少量 brushed or aged brass if appropriate
+
+HARD BAN：
+
+- traditional bright green felt
+- dark green felt dominating the room
+- red felt
+- black pool table
+- dark walnut body
+- orange/reddish wood
+- sports-bar styling
+- neon
+- arcade styling
+
+不要把我們剛剛移除的「大面積綠色」又透過撞球台帶回來。
+
+撞球台需要與目前 Staff Room 的：
+
+warm white
++ cream
++ oatmeal
++ pale oak
++ light greige
+
+自然融合。
+
+━━━━━━━━━━━━━━━━━━
+A2｜POOL TABLE 不只是裝飾
+━━━━━━━━━━━━━━━━━━
+
+如果加入撞球台，希望員工真的會低頻使用。
+
+不需要做 playable billiards minigame。
+
+不要做球體物理遊戲。
+
+只需要作為 Staff Room ambient behavior：
+
+例如：
+- 兩名 off-duty / resting staff 打一局
+- 一人準備擊球、一人在旁邊等
+- 第三人偶爾站在旁邊看
+- 簡短自然對話
+- 打完後各自離開
+- 有時完全沒有人使用
+
+目的是讓玩家偶爾進 Staff Room 時看到：
+
+「喔，他們真的會在這裡玩。」
+
+不是每次進來都一定有人打球。
+
+不要讓 recreation behavior 搶走 major authored story slot。
+
+━━━━━━━━━━━━━━━━━━
+A3｜MASSAGE CHAIR
+━━━━━━━━━━━━━━━━━━
+
+增加一張按摩椅即可。
+
+不要放很多張。
+
+造型必須簡潔、現代、融入 Staff Room。
+
+Palette：
+
+MAIN SHELL
+= warm light gray / very light stone greige
+
+INNER CUSHION
+= slightly deeper warm greige / taupe-gray
+
+CONTROL DETAIL
+= small restrained charcoal detail only if necessary
+
+HARD BAN：
+
+- giant black massage chair
+- glossy black plastic
+- gaming-chair appearance
+- futuristic spaceship chair
+- oversized commercial massage-chair showroom feeling
+
+它應該像室內設計的一部分。
+
+可以有低頻 ambient use，例如：
+
+- 某個員工坐著休息
+- 有人坐到睡著
+- 另一個員工經過講一句話
+- 使用完離開
+
+同樣：
+
+不要建立 fatigue / morale / stamina / massage buff。
+
+這只是生活行為，不是新的 management system。
+
+━━━━━━━━━━━━━━━━━━
+A4｜其他小型 Recreation Props
+━━━━━━━━━━━━━━━━━━
+
+如果現有空間適合，可以非常克制地加入：
+
+- books
+- magazines
+- small board-game storage
+- playing cards
+- small shelf / basket
+
+這些可以主要作為 ambient props。
+
+不需要全部可互動。
+
+不要加入：
+
+- huge TV
+- console gaming station
+- arcade machine
+- foosball table
+- dart machine
+- karaoke
+- vending-machine wall
+
+不要把房間塞滿。
+
+━━━━━━━━━━━━━━━━━━
+A5｜STAFF ROOM ZONING
+━━━━━━━━━━━━━━━━━━
+
+請保留目前成功的 sofa / rug lounge zone。
+
+不要把撞球台直接塞在現在漂亮的大地毯中央。
+
+理想上讓 Staff Room 形成幾個自然區域：
+
+1. LOCKER / ARRIVAL
+置物櫃、包包、外套
+
+2. COMMUNAL
+員工餐、咖啡、聊天的大桌
+
+3. LOUNGE
+現有 sofa + armchairs + coffee table + rug
+
+4. RECREATION
+pool table
+
+5. QUIET REST
+massage chair
+
+不需要用 UI label 標示這些 zone。
+
+只是空間配置上自然成立。
+
+如果現有 room dimensions 需要稍微調整 furniture placement 才放得下，
+可以合理調整，
+但不要因此重新設計整間 Staff Room。
+
+━━━━━━━━━━━━━━━━━━
+A6｜STAFF ROOM WOOD / COLOR HIERARCHY
+━━━━━━━━━━━━━━━━━━
+
+同時延續前面已確認的 Staff Room 材質修正：
+
+目前 floor / lockers / communal table / coffee table / cabinetry 太接近，
+mobile view 下容易融成同一片淡米色。
+
+請維持：
+
+FLOOR
+= very pale natural oak / ash
+= 最淡、最安靜的 background plane
+
+WOOD FURNITURE
+= pale natural oak / light natural oak
+= 比 floor 稍微暖一點
+= 木紋稍微更清楚
+= 有足夠 material separation
+
+SOFA / RUG
+= cream / oatmeal / very light greige
+
+POOL TABLE FELT
+= warm greige / mushroom
+
+MASSAGE CHAIR
+= light stone greige
+
+PLANTS / SMALL OBJECTS
+= 可以提供少量自然 accent color
+
+整體仍然必須非常明亮。
+
+不要使用：
+- walnut
+- dark oak
+- dark brown
+- reddish/orange wood
+- large dark furniture
+- large green rug
+- dark sofa
+
+━━━━━━━━━━━━━━━━━━
+B｜PRIVATE DINING ROOM：整體不要動，只修兩個家具問題
+━━━━━━━━━━━━━━━━━━
+
+目前新版 PDR 的主要方向是正確的：
+
+- vertical long stone table
+- stone flooring
+- deep olive Art Deco wall language
+- warm lighting
+- formal private dining feeling
+
+這些全部保留。
+
+不要重新設計 PDR。
+
+只修以下兩點。
+
+━━━━━━━━━━━━━━━━━━
+B1｜左側小桌不要擋在走道上
+━━━━━━━━━━━━━━━━━━
+
+目前 PDR 左側有一張：
+
+small table / side table
++ lamp
++ photo / album / framed object
+
+現在的位置看起來像家具放在 circulation path 上。
+
+在狹長的 PDR 裡，
+中央 vertical dining table 已經是主視覺，
+兩側 circulation 應該保持乾淨。
+
+請把這張家具：
+
+移到牆邊。
+
+最好可以整理成：
+
+a narrow Art Deco console / side table
+
+要求：
+
+- 靠牆
+- 不侵入主要 walkway
+- 不阻礙服務動線
+- 不與中央 stone dining table 搶視覺
+- 保持空間縱深
+
+lamp 可以保留。
+
+因為一盞小型 warm table lamp 很適合 PDR 的 ambient lighting。
+
+但目前上面的 photo album / album / frame：
+
+如果沒有明確 gameplay / story / character meaning，
+請直接移除。
+
+不要為了「看起來有生活感」而放一個沒有意義的神秘相簿。
+
+如果需要 decoration，
+可以改成非常 restrained 的：
+
+- small vase
+- small artwork
+- lamp only
+
+即可。
+
+━━━━━━━━━━━━━━━━━━
+B2｜窗邊深色木櫃改成淺色石材語言
+━━━━━━━━━━━━━━━━━━
+
+目前窗邊的 dark brown wooden sideboard / cabinet
+視覺重量太重。
+
+它會把已經成功建立的：
+
+STONE
++ DEEP OLIVE
++ ART DECO
+
+重新拉回大量深色木頭。
+
+我不希望這樣。
+
+請把窗邊 sideboard 改成較明亮、較高級，
+並與中央 stone dining table 呼應的材質。
+
+建議：
+
+COUNTERTOP
+= warm ivory / creamy white marble
+或
+= light warm-gray stone
+
+CABINET BODY
+= warm ivory / very pale greige
+
+DETAILS / HANDLES
+= restrained aged brass
+
+可以有非常 subtle stone veining。
+
+不要：
+
+- dark walnut
+- dark brown wood
+- reddish wood
+- orange wood
+- black cabinet
+- large dark wood mass
+
+━━━━━━━━━━━━━━━━━━
+B3｜PDR MATERIAL HIERARCHY
+━━━━━━━━━━━━━━━━━━
+
+請把目前 PDR 的 material hierarchy 理解成：
+
+ARCHITECTURE / FRAME
+= deep olive / forest muted green walls
++ warm gray / charcoal stone floor
+
+MAIN FURNITURE
+= warm ivory / creamy light stone
+
+ACCENTS
+= aged brass
++ warm lighting
++ restrained plants / artwork
+
+簡單說：
+
+【深色主要留給 architecture，家具保持較明亮。】
+
+這樣 PDR 才有層次，
+但不會重新變成沉重的深木色房間。
+
+中央 vertical stone table 仍然是 room hero。
+
+不要改它的 orientation。
+
+━━━━━━━━━━━━━━━━━━
+C｜這次不要擴大 SCOPE
+━━━━━━━━━━━━━━━━━━
+
+這次只是：
+
+Staff Room recreation / lived-in polish
++
+PDR furniture / material polish
+
+不要因此：
+
+- 重做 Staff Room architecture
+- 重做 Staff Room sofa zone
+- 重做 Staff Room kitchenette
+- 重做 PDR
+- 修改 PDR reservation logic
+- 修改 minimum spend
+- 修改 room capacity
+- 建立 billiards minigame
+- 建立 fatigue system
+- 建立 morale system
+- 建立 recreation stats
+- 建立 employee happiness meter
+- 建立新的 generic interaction framework
+- 建立大型 furniture system
+
+如果現有 ambient behavior architecture 可以簡單支援，
+就沿用。
+
+這些新增的 recreation interactions 目的只有：
+
+【讓 Staff Room 看起來真的有人在使用、有人在休息、有人下班後願意待一下。】
+
+不是增加 management burden。
+
+━━━━━━━━━━━━━━━━━━
+D｜PHASE PROGRESSION
+━━━━━━━━━━━━━━━━━━
+
+如果 Staff Room 現有 Phase I / II / III 可以自然容納 recreation progression，
+可以使用：
+
+Phase I
+= Staff Room 本身已經完整、漂亮、舒服
+= lockers / kitchenette / communal table / sofa lounge
+
+Phase II
+= recreation layer 開始成熟
+= pool table
+= small books / games / lived-in details
+
+Phase III
+= quiet-rest layer 更完整
+= massage chair
+= richer but restrained persistent lived-in details
+
+但：
+
+不要把 Phase I 故意做差。
+
+不要把現在已經漂亮的 Staff Room 拆掉，
+再要求玩家升級才恢復。
+
+Phase progression 應該是：
+
+完整
+→ 更有人使用
+→ 更有生活
+
+不是：
+
+差
+→ 普通
+→ 漂亮。
+
+如果目前 phase architecture 不適合這樣分，
+不要為了硬套 phase 而重構；
+可以選擇最小、安全、符合現有 progression 的 implementation。
+
+━━━━━━━━━━━━━━━━━━
+E｜完成後 QA / 回報
+━━━━━━━━━━━━━━━━━━
+
+完成後請提供 mobile screenshots，至少確認：
+
+STAFF ROOM：
+1. 整體 room screenshot
+2. pool table 與 surrounding circulation
+3. massage chair placement
+4. sofa zone 沒有被破壞
+5. floor / lockers / tables / pool table 在 mobile size 下仍能清楚分辨
+6. 至少一個 NPC recreation ambient usage 的 evidence
+
+PDR：
+7. 左側 console 已靠牆、不擋 walkway
+8. window sideboard 已改成 light stone / warm ivory direction
+9. central vertical stone table 仍然是主視覺
+10. 整體 PDR 沒有因這次修改重新變成 wood-heavy
+
+最後請明確回報：
+
+- 這次改了哪些 furniture / material
+- recreation behaviors 如何觸發
+- 是否使用現有 ambient behavior system
+- 是否影響 save schema / migration
+- 是否影響 Staff Room Phase state
+- targeted tests 結果
+
+如果不涉及 shared system / save architecture，
+這輪 visual + ambient polish 不需要因每個小修改反覆跑完整 full regression。
+
+等 RC6 最終 release gate 再跑完整 regression。
+
+最重要：
+
+【目前 Staff Room 和 PDR 的大方向已經成功。】
+
+這次是在成功版本上增加：
+「Staff Room 更像真的有人休息生活」
+以及
+「PDR 家具位置與材質更合理」。
+
+不要重新發明這兩個房間。

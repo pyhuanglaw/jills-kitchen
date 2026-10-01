@@ -1,0 +1,723 @@
+GLOBAL NPC WARDROBE ART DIRECTION
+全遊戲 Generic NPC 穿搭系統整理
+
+我看過目前 Private Dining Room 的實機畫面後，發現一個需要做成全遊戲 visual direction 的問題。
+
+目前 generic customers / background NPC 的衣服很像：
+
+shirtColor = random(red / orange / yellow / green / blue / purple)
+
+單獨看一個角色可能還可以，
+但多人同桌時會變成：
+
+紅、橙、黃、綠、藍、紫
+
+一整排高飽和純色色塊。
+
+這不是我要的「colorful」。
+
+我完全不反對：
+
+- colorful clothing
+- patterned clothing
+- floral
+- geometric pattern
+- stripes
+- checks
+- tweed-like texture
+- embroidery-like detail
+- layered clothing
+- statement pieces
+- vivid colors
+
+【花可以非常漂亮，而且高級時裝本來就可以非常 colorful / elaborate。】
+
+真正要避免的是：
+
+【沒有服裝設計，只是替同一件衣服隨機換一個高飽和 RGB 顏色。】
+
+所以請建立一套 lightweight GLOBAL NPC WARDROBE ART DIRECTION。
+
+這不是 fashion management system。
+不是 dress-code simulator。
+不是要求重做所有 character architecture。
+
+目的是讓 Jill’s Kitchen 裡的 generic customers 看起來：
+
+【像每個人真的有自己的衣櫃，而不是不同顏色的遊戲棋子。】
+
+━━━━━━━━━━━━━━━━━━
+0｜先確認現有 renderer 到底做得到什麼
+━━━━━━━━━━━━━━━━━━
+
+請先 inspect 現有：
+
+- generic NPC rendering
+- clothing variants
+- sprite / SVG / CSS / canvas architecture
+- pattern capability
+- layering capability
+- accessories
+- existing outfit assets
+- color generation
+- group generation
+
+先確認：
+
+目前系統是否能以合理成本做出真正「有設計感」的服裝 variation。
+
+這裡有兩條 implementation path：
+
+PATH A
+= renderer 足以支援有品質的 fashion variation
+
+PATH B
+= renderer 不足以支援，就使用 restrained solid-color wardrobe
+
+【不要為了硬做 PATH A，建立大型 fashion rendering framework。】
+
+如果 PATH A 做出來會很廉價，
+寧可使用 PATH B。
+
+簡單但好看 > 複雜但廉價。
+
+━━━━━━━━━━━━━━━━━━
+1｜PATH A：如果做得到，允許真正漂亮的 COLORFUL FASHION
+━━━━━━━━━━━━━━━━━━
+
+如果現有 rendering architecture 能夠以合理成本支援：
+
+- patterns
+- texture cues
+- trims
+- collars
+- layering
+- jackets
+- cardigans
+- dresses
+- scarves
+- accessories
+- visually coherent multi-color garments
+
+那我希望 generic NPC wardrobe 可以有真正的 fashion variation。
+
+參考的是：
+
+【high-end fashion / refined ready-to-wear / couture-level color sensibility】
+
+不是要求複製任何品牌商品。
+
+不要直接複製：
+
+- Hermès trademark
+- Chanel logo
+- recognizable branded monogram
+- exact copyrighted print
+- exact runway garment
+
+我要的是設計原理，不是品牌仿製。
+
+━━━━━━━━━━━━━━━━━━
+2｜COLORFUL ≠ RANDOM COLORS
+━━━━━━━━━━━━━━━━━━
+
+一件衣服可以同時有很多顏色。
+
+例如可以有：
+
+- sophisticated floral print
+- geometric silk-print feeling
+- tasteful stripes
+- refined checks
+- multicolor tweed-like texture
+- patterned blouse
+- patterned dress
+- scarf-inspired print
+- embroidered-looking detail
+- contrasting trim
+- layered jacket + inner top
+- statement cardigan
+
+甚至可以有：
+
+red
+orange
+yellow
+green
+blue
+purple
+
+其中很多顏色同時存在。
+
+只要：
+
+【它們共同組成一件 coherent garment。】
+
+真正禁止的是：
+
+NPC A = pure red shirt
+NPC B = pure orange shirt
+NPC C = pure yellow shirt
+NPC D = pure green shirt
+NPC E = pure blue shirt
+NPC F = pure purple shirt
+
+然後全部使用幾乎同一個 clothing silhouette。
+
+那看起來不是 fashion。
+
+那看起來像：
+
+DEBUG COLOR PALETTE。
+
+━━━━━━━━━━━━━━━━━━
+3｜服裝需要有三種視覺層級
+━━━━━━━━━━━━━━━━━━
+
+如果 PATH A 可行，可以建立簡單的三層 wardrobe variation：
+
+A. QUIET / SIMPLE
+
+例如：
+
+- cream knit
+- navy shirt
+- charcoal cardigan
+- pale blue blouse
+- camel sweater
+- white shirt
+- olive knit
+- black / ivory simple dress
+
+這些角色負責讓整體畫面有 breathing room。
+
+B. REFINED PATTERN
+
+例如：
+
+- subtle stripe
+- small check
+- refined floral
+- geometric pattern
+- tweed-like texture
+- contrasting collar / trim
+- layered cardigan / jacket
+
+有設計感，但不搶畫面。
+
+C. STATEMENT FASHION
+
+低頻出現。
+
+可以：
+
+- colorful
+- patterned
+- elaborate
+- visually rich
+- jewel-toned
+- multi-color
+- stronger silhouette / trim
+
+但必須看起來像：
+
+「這個人今天真的穿了一件漂亮的衣服。」
+
+而不是：
+
+「遊戲隨機抽到很多顏色。」
+
+Statement outfit 不需要大量出現。
+
+它的存在反而可以讓餐廳偶爾出現很有記憶點的客人。
+
+━━━━━━━━━━━━━━━━━━
+4｜不要讓整桌客人穿成同一個 palette
+━━━━━━━━━━━━━━━━━━
+
+另一個重要原則：
+
+【不要把同一 party 配成制服。】
+
+現實中的 8 個朋友來吃飯，
+不會事先決定：
+
+「今晚大家只能穿 beige + sage + navy。」
+
+所以不要過度做 group palette coordination。
+
+同桌的人應該有個人差異。
+
+可以有人：
+
+- 穿白襯衫
+- 穿 navy knit
+- 穿漂亮 floral blouse
+- 穿 tweed-like jacket
+- 穿 burgundy dress
+- 穿 camel cardigan
+- 穿 colorful statement piece
+
+這樣是好的。
+
+我們要避免的是：
+
+【random rainbow color blocks】
+
+而不是：
+
+【color diversity】。
+
+━━━━━━━━━━━━━━━━━━
+5｜同桌的視覺節奏
+━━━━━━━━━━━━━━━━━━
+
+多人 group 可以用「視覺節奏」而不是「統一 palette」。
+
+例如一桌 8 人：
+
+3–4 人
+= quiet / simple outfits
+
+2–3 人
+= refined color / texture / pattern
+
+0–2 人
+= stronger statement fashion
+
+這只是一個 weighting concept，
+不是硬性數學 quota。
+
+目的只是避免：
+
+每一個 NPC 都在搶 attention。
+
+如果每個人都是 statement outfit，
+畫面還是會亂。
+
+如果每個人都是 beige，
+畫面又會死。
+
+希望最後是：
+
+【有人安靜，有人有趣，偶爾有人真的穿得很好看。】
+
+━━━━━━━━━━━━━━━━━━
+6｜PRIVATE DINING ROOM 的客人可以稍微更會穿
+━━━━━━━━━━━━━━━━━━
+
+Private Dining Room 不需要 dress code。
+
+不要讓所有人突然穿西裝、晚禮服。
+
+但因為這裡是：
+
+- reservation
+- whole-table minimum spend
+- 4–10 person private dining
+- 較成熟的 dining environment
+
+可以讓 PDR generic customer generation 稍微提高：
+
+- smart casual
+- jacket
+- blouse
+- knitwear
+- dress
+- cardigan
+- patterned garment
+- refined statement piece
+
+的 weighting。
+
+降低：
+
+- generic bright T-shirt
+- childish color blocking
+- completely random saturated solid shirts
+
+目標不是：
+
+「有錢人都穿灰色。」
+
+而是：
+
+【這群人看起來有稍微打理過自己。】
+
+━━━━━━━━━━━━━━━━━━
+7｜不同空間可以有不同 weighting，但不是制服
+━━━━━━━━━━━━━━━━━━
+
+MAIN HALL
+
+最 casual。
+
+可以：
+- T-shirt
+- shirt
+- knit
+- casual dress
+- denim-like cues
+- more everyday color
+
+仍然不要 rainbow debug palette。
+
+
+SIDE HALL
+
+family / friends / groups。
+
+可以非常多樣，
+重點是自然。
+
+
+LOUNGE
+
+稍微提高：
+- stylish
+- evening
+- darker sophisticated colors
+- interesting jacket / blouse / knit
+- occasional statement fashion
+
+
+PRIVATE DINING
+
+稍微提高：
+- smart casual
+- refined patterns
+- better layering
+- sophisticated statement clothing
+
+但四個空間仍然是同一個 Jill’s Kitchen 世界。
+
+不要做成四套制服。
+
+━━━━━━━━━━━━━━━━━━
+8｜PATH B：如果高級 fashion variation 做不到
+━━━━━━━━━━━━━━━━━━
+
+這點非常重要。
+
+如果現有 renderer 做不到：
+
+- 好看的 pattern
+- convincing texture
+- layering
+- garment detail
+
+或者實際 screenshot 看起來：
+
+- cheap
+- noisy
+- pixel clutter
+- childish
+- fake luxury
+- random floral texture
+- visually broken
+
+那就不要硬做。
+
+直接退回：
+
+【SIMPLE SOLID-COLOR WARDROBE】
+
+而且這完全可以接受。
+
+寧可簡單、乾淨、成熟，
+也不要假裝 couture。
+
+━━━━━━━━━━━━━━━━━━
+9｜PATH B 的 SOLID COLOR PALETTE
+━━━━━━━━━━━━━━━━━━
+
+如果只能做素色，
+
+請主要使用：
+
+NEUTRAL
+
+- ivory
+- cream
+- oatmeal
+- beige
+- camel
+- taupe
+- greige
+- warm gray
+- charcoal
+- soft black
+- white
+
+BLUE
+
+- pale blue
+- dusty blue
+- slate blue
+- navy
+
+GREEN
+
+- sage
+- muted olive
+- moss
+- forest green
+
+RED / WARM
+
+- burgundy
+- wine
+- brick
+- rust
+- terracotta
+- dusty rose
+
+OTHER
+
+- mauve
+- muted lavender
+- muted teal
+
+可以偶爾有比較亮的：
+
+- red
+- cobalt-ish blue
+- emerald-ish green
+- warm yellow
+
+但必須低頻，
+不要同桌大量同時出現。
+
+━━━━━━━━━━━━━━━━━━
+10｜PATH B 也不要所有人穿一樣
+━━━━━━━━━━━━━━━━━━
+
+使用 restrained palette 不代表：
+
+全餐廳 beige。
+
+也不要：
+
+一桌全部 navy。
+
+也不要：
+
+所有女性 dusty rose，
+所有男性 navy。
+
+需要 variation。
+
+例如一桌可以自然出現：
+
+cream
+navy
+burgundy
+camel
+dusty blue
+olive
+charcoal
+pale blue
+
+這樣即使全部都是 solid color，
+也已經會比目前：
+
+red / orange / yellow / green / blue / purple
+
+漂亮很多。
+
+━━━━━━━━━━━━━━━━━━
+11｜即使只能做素色，也可以用 SILHOUETTE 增加差異
+━━━━━━━━━━━━━━━━━━
+
+如果 pattern capability 不好，
+
+可以優先利用現有 renderer 能安全支援的：
+
+- shirt
+- blouse
+- knit
+- cardigan
+- jacket
+- dress
+- polo
+- different neckline
+- sleeve length
+- collar
+- simple layering
+
+讓 NPC 不只是：
+
+「同一件 T-shirt 換顏色」。
+
+如果這些現有 architecture 已經支援，就使用。
+
+如果不支援，
+不要為此建立大型 clothing engine。
+
+━━━━━━━━━━━━━━━━━━
+12｜NAMED CHARACTERS 保留自己的身份
+━━━━━━━━━━━━━━━━━━
+
+這次主要處理：
+
+- generic customers
+- random groups
+- background NPC
+- non-canonical minor customers
+
+不要把：
+
+- Jill
+- staff
+- regulars
+- story characters
+- special guests
+- 已經有 canonical portrait / outfit 的角色
+
+全部洗成 generic wardrobe。
+
+Named characters 的 signature outfit / color / identity 優先。
+
+━━━━━━━━━━━━━━━━━━
+13｜不要做「假高級」
+━━━━━━━━━━━━━━━━━━
+
+請特別避免 AI 很容易做出的這些錯誤：
+
+- 全部 beige = luxury
+- 全部 black = luxury
+- black + gold = luxury
+- 每個人穿 suit = expensive
+- floral everywhere = fashion
+- random pattern everywhere = couture
+- 每個人戴 scarf = Hermès feeling
+- 每個人 tweed = Chanel feeling
+- logo / monogram = expensive
+- 一堆 jewelry = wealthy
+
+都不要。
+
+高級感應該來自：
+
+- coherent garment design
+- proportion
+- silhouette
+- restrained detail
+- material / texture cue
+- color relationship
+- variation
+- visual rhythm
+
+不是符號堆砌。
+
+━━━━━━━━━━━━━━━━━━
+14｜實作策略：先做小 SAMPLE，不要一口氣全遊戲重畫
+━━━━━━━━━━━━━━━━━━
+
+請不要先大規模修改所有 generic NPC。
+
+先做一個 small visual prototype。
+
+最好直接用：
+
+Private Dining Room
+8–10 person party
+
+因為這是目前最容易暴露問題的場景。
+
+先產生至少兩個 comparison samples：
+
+SAMPLE A
+= 目前 renderer 能做到的 best-effort refined fashion version
+
+SAMPLE B
+= safe solid-color fallback version
+
+如果 A 真正看起來：
+
+- refined
+- coherent
+- varied
+- believable
+- 不廉價
+
+就採用 A 的方向。
+
+如果 A 看起來只是：
+
+「更多 pattern + 更多顏色」
+
+而沒有真的更好，
+
+就不要硬做。
+
+直接採用 B。
+
+【不要為了證明技術上做得到，而犧牲 art direction。】
+
+━━━━━━━━━━━━━━━━━━
+15｜驗收標準
+━━━━━━━━━━━━━━━━━━
+
+最後請用 mobile screenshot 判斷，不只看 code。
+
+尤其看 8–10 人同桌時：
+
+PASS：
+
+- 每個人有個體差異
+- 不像制服
+- 不像 rainbow debug palette
+- 有些人簡單
+- 有些人比較會穿
+- 如果有花衣服，它本身看起來是一件完整設計
+- statement outfit 不會全部同時搶畫面
+- PDR 整體仍然比 Main Hall 稍微 polished
+- NPC 不會破壞目前 PDR 已經建立的成熟空間感
+
+FAIL：
+
+- 紅橙黃綠藍紫一字排開
+- 同 silhouette 只換純色
+- 全部 beige
+- 全部 navy
+- 所有人像穿制服
+- 每個人都穿花
+- random floral / pattern noise
+- fake luxury
+- logo-heavy
+- black-and-gold cliché
+- 為了 fashion 建立巨大新 system
+
+━━━━━━━━━━━━━━━━━━
+16｜最重要的 fallback rule
+━━━━━━━━━━━━━━━━━━
+
+請把這條當作最高原則：
+
+【如果你能把「花」做得真的漂亮，就讓它花。】
+
+【如果做不到，就不要硬做；回到簡單、成熟、有變化的素色。】
+
+Colorful 本身不是問題。
+
+Pattern 本身不是問題。
+
+High saturation 甚至也不是絕對禁止。
+
+真正的問題是：
+
+【沒有設計意圖的隨機色塊。】
+
+我希望最後玩家看到一桌人時會覺得：
+
+「這些人各自穿了自己的衣服來吃飯。」
+
+而不是：
+
+「系統替八個 NPC 各抽了一個顏色。」
+
+請先 inspect architecture → 做 small PDR sample → screenshot review → 再決定 A 或 B。
+
+這次不要為 wardrobe 建立大型新 framework。
+優先使用現有 architecture 可以漂亮做到的最高品質方案。

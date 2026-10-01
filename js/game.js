@@ -596,15 +596,15 @@ const SPOT_ORDER=[4,3,5,7,6,8,1,0,2];   /* the middle row first, then the front,
    thing carries .room, and a target in another room is reached through a doorway (all doorways lead to the dining room). ---- */
 const ROOMS={main:{n:'主廳'},kitchen:{n:'廚房'},side:{n:'側廳'},front:{n:'店門口'},lounge:{n:'Lounge'}};   /* v2.3: the Lounge */   /* v2.2.1 #6: 主廳 — with a side hall both rooms are dining rooms */
 let room='main';
-/* v2.4 rc6 (the player's 05:23): the second floor's view is not an everyday room. Outside the stories that happen up there
-   (R.upView), it is shown only as 店舖工程's view of the floor ('look') or as a finished room's reveal ('reveal') */
+/* v2.4 rc6: the second floor's view outside a service — 店舖工程's look after a purchase ('look') and a finished room's
+   reveal on the morning it opens ('reveal'); in a service it is a room like the others (the player's 06:36) */
 let UPV=null,UPRV=null;
 const SIDE_L={door:{x:70,y:100},arch:{x:48,y:8,w:44},cols:[104,200,296],rows:[180,268,356],window:{x:118,y:10,w:180,h:64},cat:{x:352,y:120}};   /* the side dining room: its door is an arch on the back wall, left */
 const SIDE_ARCH={x:344,y:12,w:40};   /* the arch to the side room, on the dining room's back wall, right */
 const FR={door:{x:200,y:262},walk:300,enter:{x:-24,y:300},exit:{x:424,y:300},cols:[96,304,200],row:352,bench:{x:350,y:262},sun:{x:48,y:266},nook:{x:88,y:250}};   /* nook: the dog's house by the door (v2.2.1 #10; v2.3 moved in from x 50, where a phone cut it off: it now spans x 48–126, between the left edge and the flower box, and sits 8 px higher so the terrace's first parasol does not cover the cushion) */   /* the street outside */
 const KD={x:64,y:0};   /* the kitchen door in the dining room: at the left end of the counter (y filled from FB) */
 const KR={get door(){return{x:200,y:LH-30}},get fridge(){return{x:318,y:LH-112,w:52,h:80}},get cooler(){return projOn('walkin')?{x:43,y:LH-138,w:57,h:106}:{x:44,y:LH-112,w:48,h:80}}};   /* the walk-in: wider and taller, same corner */   /* the kitchen: the fridge and the cold room stand on the pickup side, the door to the dining room between them */
-function roomOpen(k){return k==='main'||k==='kitchen'||k==='front'||(k==='side'&&!!(S.rooms&&S.rooms.side))||(k==='lounge'&&!!(S.rooms&&S.rooms.lounge))||(k==='up'&&(!!(R&&R.upView)||!!UPV))||(k==='staff'&&srBuilt())||(k==='pdr'&&pdBuilt())}   /* v2.4 P2: the second floor — the nights someone has to go up; rc6 (05:23): never an everyday tab, its two rooms are */
+function roomOpen(k){return k==='main'||k==='kitchen'||k==='front'||(k==='side'&&!!(S.rooms&&S.rooms.side))||(k==='lounge'&&!!(S.rooms&&S.rooms.lounge))||(k==='up'&&(upTaken()||!!(R&&R.upView)||!!UPV))||(k==='staff'&&srBuilt())||(k==='pdr'&&pdBuilt())}   /* v2.4 P2: the second floor — once it is Jill's (and the nights someone has to go up); rc6: its two rooms are tabs of their own too */
 function doorway(a,b){const kd={x:KD.x,y:FB-8};
  if(a==='main'){if(b==='lounge')return[[LOUNGE_ARCH.x+LOUNGE_ARCH.w/2,100],[LG.door.x,LG.door.y]];if(b==='side')return[[SIDE_ARCH.x+SIDE_ARCH.w/2,100],[SIDE_L.door.x,SIDE_L.door.y]];if(b==='front')return[[DOOR.x,DOOR.y+4],[FR.door.x,FR.door.y]];if(b==='kitchen')return[[kd.x,kd.y],[KR.door.x,KR.door.y]]}
  if(b==='main'){if(a==='lounge')return[[LG.door.x,LG.door.y],[LOUNGE_ARCH.x+LOUNGE_ARCH.w/2,100]];if(a==='side')return[[SIDE_L.door.x,SIDE_L.door.y],[SIDE_ARCH.x+SIDE_ARCH.w/2,100]];if(a==='front')return[[FR.door.x,FR.door.y],[DOOR.x,DOOR.y+4]];if(a==='kitchen')return[[KR.door.x,KR.door.y],[kd.x,kd.y]]}
@@ -615,7 +615,7 @@ function nextHop(a,b){if(a===b)return b;const pb=roomPath(b);const i=pb.indexOf(
 /* one movement step for anything with x,y,room and a target tx,ty,troom; through doorways when needed. Returns true on arrival. */
 function stepTo(e,v){const tr=e.troom||e.room||'main';if(!e.room)e.room='main';let tx=e.tx,ty=e.ty;let hop=null;
  if(tr!==e.room){hop=nextHop(e.room,tr);const dw=doorway(e.room,hop);if(!dw){e.room=tr;return false}tx=dw[0][0];ty=dw[0][1]}
- if(e.room==='up'||e.room==='pdr'||e.room==='staff'){/* v2.4 rc6: round the column, round the long table, round the Staff Room's furniture */const w0=obsVia(e.room,e.x,e.y,tx,ty);if(w0&&Math.hypot(w0.x-e.x,w0.y-e.y)>1){const dx=w0.x-e.x,dy=w0.y-e.y,dd=Math.hypot(dx,dy);if(dd<=v){e.x=w0.x;e.y=w0.y}else{e.x+=dx/dd*v;e.y+=dy/dd*v;if(Math.abs(dx)>.5)e.face=dx>=0?1:-1}return false}}
+ if(e.room==='up'||e.room==='pdr'||e.room==='staff'){/* v2.4 rc6: round the column, round the long table, round the Staff Room's furniture */const w0=obsNext(e,e.room,tx,ty);if(w0&&Math.hypot(w0.x-e.x,w0.y-e.y)>1){const dx=w0.x-e.x,dy=w0.y-e.y,dd=Math.hypot(dx,dy);if(dd<=v){e.x=w0.x;e.y=w0.y}else{e.x+=dx/dd*v;e.y+=dy/dd*v;if(Math.abs(dx)>.5)e.face=dx>=0?1:-1}return false}}
  const dx=tx-e.x,dy=ty-e.y,d=Math.hypot(dx,dy);
  if(d<=v){e.x=tx;e.y=ty;if(hop){const dw=doorway(e.room,hop);e.room=hop;e.x=dw[1][0];e.y=dw[1][1];return false}return true}
  e.x+=dx/d*v;e.y+=dy/d*v;if(Math.abs(dx)>.5)e.face=dx>=0?1:-1;return false}
@@ -2922,12 +2922,12 @@ function upAskUpd(dt){const A=R.upAsk;A.t+=dt;const J=R.jill;
 
 /* ---- the project (U7): the whole floor — basic works only (J): cleaning, floor and walls, power, light, air, the stair
    rail. Not a dining room: no seats, nothing mechanical; it is the floor. ---- */
-const UP_PROJ={k:'up',n:'二樓（整層）',cost:350000,room:'up',d:'把房東那邊空著的二樓整層租下來，做基本工程：打掃、地板和牆面整理、電力、燈、冷氣、樓梯扶手。不隔間——先是一整層空間。不是用餐區，不會多座位。',done:'整層打掃乾淨了。地板整理過，牆補過、漆過；燈和冷氣都接好了，樓梯加了扶手。一整層，還空著。',jill:'先這樣。',unlock:['二樓（房間分頁）','樓梯門在側廳']};
+const UP_PROJ={k:'up',n:'二樓（整層）',cost:350000,room:'up',d:'把房東那邊空著的二樓整層租下來，做基本工程：打掃、地板和牆面整理、電力、燈、冷氣、樓梯扶手。不隔間——先是一整層空間。不是用餐區，不會多座位。',done:'整層打掃乾淨了。地板整理過，牆補過、漆過；燈和冷氣都接好了，樓梯加了扶手。一整層，還空著。',jill:'先這樣。',unlock:['二樓（自己的分頁；店舖工程裡有整層的平面圖）','樓梯門在側廳']};
 function upProjectReveal(){S.upProj=S.upProj||{revealed:S.day};paused=!!R;sub='upproj';
  show(`<div class="modal"><div class="eyebrow">新企劃</div><h2>二樓（整層）</h2><p>房東說可以，整層。打掃、地板、牆、電、燈、冷氣、樓梯扶手——基本工程做完，先是一整層空間；要拿來做什麼，之後再說。也不急。</p><div class="stack"><button class="btn primary" data-act="upGo" data-k="plan">開始規劃 <small>會出現在「店鋪工程」，存夠了就租下來</small></button><button class="btn" data-act="upGo" data-k="later">之後再說 <small>不會不見——工程頁隨時找得到</small></button></div></div>`,'dim')}
 function upGo(k){S.upProj=S.upProj||{revealed:S.day};S.upProj.state=k==='plan'?'planned':'deferred';S.upProj.at=S.day;hideScreen();sub=null;if(R)paused=false;noteLine(k==='plan'?'二樓列進了店鋪工程。':'二樓先放著。工程頁裡隨時找得到。');save()}
 function secUp(money,btn){const on=upTaken();if(!fact('up_ask')&&!on)return'';const Q=UP_PROJ;const pct=Math.min(100,Math.round(money/Q.cost*100));
- return`<div class="nm" style="font-weight:800;font-size:15px;margin:14px 0 2px">二樓</div><p class="muted" style="font-size:12px;margin:0 0 6px">${on?'整層都是店裡的了。':S.upProj&&S.upProj.state==='deferred'?'之後再說過的那件事——還在這裡。':'房東說：「整層？」Jill 說：「整層。」'}</p>${on?`<button class="goalline linkline" data-act="upLook" style="margin:0 0 8px"><span>二樓</span><b>${srOn()||pdOn()?'看看整層現在的樣子':'看看整層'}</b><small>›</small></button>`:''}<div class="item ${on?'done':''}"><img alt="" src="${iconURL('upfloor')}"><div class="nm">${Q.n} ${on?'<span class="tier t1">已完工</span>':''}</div><div class="d">${on?Q.done:Q.d}</div>${on?'':`<div class="act">${btn(Q.cost,'buyUp','','租下來')}${money<Q.cost?`<span class="muted" style="font-size:11.5px">還差 ${fmt(Q.cost-money)}</span>`:''}</div>${money<Q.cost?`<div class="gb"><i style="width:${pct}%"></i></div>`:''}`}</div>`}
+ return`<div class="nm" style="font-weight:800;font-size:15px;margin:14px 0 2px">二樓</div><p class="muted" style="font-size:12px;margin:0 0 6px">${on?'整層都是店裡的了。':S.upProj&&S.upProj.state==='deferred'?'之後再說過的那件事——還在這裡。':'房東說：「整層？」Jill 說：「整層。」'}</p>${on?upPlanCard()+`<button class="goalline linkline" data-act="upLook" style="margin:0 0 8px"><span>二樓</span><b>${srOn()||pdOn()?'看看整層現在的樣子':'看看整層'}</b><small>›</small></button>`:''}<div class="item ${on?'done':''}"><img alt="" src="${iconURL('upfloor')}"><div class="nm">${Q.n} ${on?'<span class="tier t1">已完工</span>':''}</div><div class="d">${on?Q.done:Q.d}</div>${on?'':`<div class="act">${btn(Q.cost,'buyUp','','租下來')}${money<Q.cost?`<span class="muted" style="font-size:11.5px">還差 ${fmt(Q.cost-money)}</span>`:''}</div>${money<Q.cost?`<div class="gb"><i style="width:${pct}%"></i></div>`:''}`}</div>`}
 /* the furniture comes up over the first week, in the order it would (the table first, the cats' things last); the
    crew's traces once they have started going up */
 function buyUp(){if(upTaken()||!fact('up_ask')||S.money<UP_PROJ.cost)return false;S.money-=UP_PROJ.cost;S.rooms.up=1;S.newRooms=S.newRooms||{};S.newRooms.up=S.day;const u=upS(),L=S.day;u.lease=L;
@@ -3504,13 +3504,12 @@ function roomAlerts(){const A={};for(const k of ROOM_ORDER)A[k]={n:0,u:0};if(!R|
 let tabsHTML='';
 function roomIsNew(k){const nr=S.newRooms||{};const d=k==='side'?nr.side:k==='up'?nr.up:k==='staff'?nr.staff:k==='pdr'?nr.pdr:k==='lounge'?nr.lounge:k==='kitchen'?Math.max(nr.kext||0,nr.cooler||0,nr.pass||0):k==='front'?Math.max(nr.terrace||0,...EXTERIOR.map(e=>S.ext&&S.ext[e.k]?0:0)):0;return!!d&&S.day-d<=1}
 function peeking(){const p=$('#peekPill');return!!p&&!p.hidden}   /* v2.2.1 #8: 看店裡 from the shop or the prep screen */
-/* v2.4 rc6 (the player's 05:19 and 05:23): every room is its own tab — the Staff Room and the Private Dining Room too,
-   reached in one tap like the rest; the tab you are in reads the room's whole name (員工休息室, 私人包廂), so inside a
-   room it is that room, never 「二樓」. 二樓 is a tab only while the floor itself is being shown — a story up there, the
-   floor in 店舖工程, a finished room's reveal — and then it is the one lit. */
+/* v2.4 rc6 (the player's 05:19, 05:23, 06:36): every room is its own tab — the floor (二樓) and, once they are built,
+   the Staff Room and the Private Dining Room, each one tap from anywhere (nobody has to cross the floor to reach them);
+   the tab you are in reads the room's whole name (員工休息室, 私人包廂), so inside a room it is that room, never 二樓. */
 function roomTabName(k){const r=ROOMS[k];return k===room&&r.full?r.full:r.n}
 function renderRoomTabs(force){const el=$('#roomTabs');if(!el)return;const rv=phase!=='service'&&UPV==='reveal';const show=(phase==='service'&&!!R)||rv||(phase!=='service'&&peeking()&&roomsOpen().length>1);el.hidden=!show;if(!show)return;const A=roomAlerts();
- const list=rv?['up']:UPV==='look'&&phase!=='service'?['up','staff','pdr'].filter(roomOpen):roomsOpen();el.classList.toggle('many',list.length>=7);   /* the floor's look (店舖工程, a reveal): the floor and its rooms only */
+ const list=rv?['up']:UPV==='look'&&phase!=='service'?['up','staff','pdr'].filter(roomOpen):roomsOpen();el.classList.toggle('many',list.length>=7);el.classList.toggle('many8',list.length>=8);   /* the floor's look (店舖工程, a reveal): the floor and its rooms only */
  const h=list.map(k=>`<button data-room="${k}" class="${k===room?'on':''}${A[k].u?' urgent':''}${roomIsNew(k)&&k!==room?' new':''}"><span>${roomTabName(k)}</span>${A[k].n?`<b>${A[k].n}</b>`:roomIsNew(k)&&k!==room?'<b class="nw">NEW</b>':''}</button>`).join('');
  if(force||h!==tabsHTML){tabsHTML=h;el.innerHTML=h}}
 {const rt=$('#roomTabs');if(rt)rt.addEventListener('click',e=>{const b=e.target.closest('[data-room]');if(!b||UPV==='reveal')return;setRoom(b.dataset.room)})}
@@ -4158,6 +4157,22 @@ function obsVia(rm,x0,y0,x1,y1){const O=roomObs(rm);if(!O)return null;const L=Ar
  const pen=(ax,ay,bx,by)=>(segRect(ax,ay,bx,by,bx0,by0,bx1,by1)?1e6:0)+(others.some(o=>segRect(ax,ay,bx,by,o.bx0,o.by0,o.bx1,o.by1))?1e5:0);
  const P=[{x:bx0-6,y:by1+10},{x:bx1+6,y:by1+10},{x:bx1+6,y:by0-10},{x:bx0-6,y:by0-10}];let bp=P[0],bc=1e18;
  for(const p of P){const v=pen(x0,y0,p.x,p.y)+(segRect(p.x,p.y,x1,y1,bx0,by0,bx1,by1)?1e6:0)+(others.some(o=>has(o,p.x,p.y))?1e5:0)+Math.hypot(p.x-x0,p.y-y0)+Math.hypot(x1-p.x,y1-p.y);if(v<bc){bc=v;bp=p}}return bp}
+/* v2.4 rc6 (06:43, the Staff Room's pool table and massage chair): round the furniture by the shortest way that touches
+   nothing — a few corners, each a little out from the thing it rounds (one you start inside or are going into is left
+   out, as before). The way is kept on the walker and worked out again only when the target changes or the next corner
+   is no longer in clear sight; a clear line goes straight. */
+function obsNext(e,rm,tx,ty){const O=roomObs(rm);if(!O)return null;const L=Array.isArray(O)?O:[O];
+ const has=(o,x,y)=>x>=o.bx0&&x<=o.bx1&&y>=o.by0&&y<=o.by1;const live=L.filter(o=>!has(o,tx,ty)&&!has(o,e.x,e.y));
+ const clear=(ax,ay,bx,by)=>!live.some(o=>segRect(ax,ay,bx,by,o.bx0,o.by0,o.bx1,o.by1));
+ if(clear(e.x,e.y,tx,ty)){e.__op=null;return null}
+ const key=rm+'|'+Math.round(tx)+'|'+Math.round(ty)+'|'+live.length;const C=e.__op;
+ if(C&&C.key===key){while(C.pts.length&&Math.hypot(C.pts[0].x-e.x,C.pts[0].y-e.y)<1.5)C.pts.shift();if(C.pts.length&&clear(e.x,e.y,C.pts[0].x,C.pts[0].y))return C.pts[0]}
+ const N=[{x:e.x,y:e.y}];for(const o of live)for(const q of[{x:o.bx0-6,y:o.by1+10},{x:o.bx1+6,y:o.by1+10},{x:o.bx1+6,y:o.by0-10},{x:o.bx0-6,y:o.by0-10}])if(!L.some(b=>has(b,q.x,q.y)))N.push(q);N.push({x:tx,y:ty});
+ const n=N.length,D=new Array(n).fill(1e18),pr=new Array(n).fill(-1),dn=new Array(n).fill(false);D[0]=0;
+ for(let it=0;it<n;it++){let u=-1;for(let i=0;i<n;i++)if(!dn[i]&&(u<0||D[i]<D[u]))u=i;if(u<0||D[u]>=1e18)break;dn[u]=true;if(u===n-1)break;
+  for(let v=1;v<n;v++){if(dn[v])continue;const d=D[u]+Math.hypot(N[v].x-N[u].x,N[v].y-N[u].y);if(d<D[v]&&clear(N[u].x,N[u].y,N[v].x,N[v].y)){D[v]=d;pr[v]=u}}}
+ if(pr[n-1]<0){e.__op=null;return obsVia(rm,e.x,e.y,tx,ty)}   /* no clear way at all (it should not happen): the old rounding */
+ const pts=[];for(let v=pr[n-1];v>0;v=pr[v])pts.unshift(N[v]);e.__op={key,pts};return pts[0]||null}
 /* where a segment first enters a box (0..1), or null */
 function segT(x0,y0,x1,y1,rx0,ry0,rx1,ry1){let t0=0,t1=1;const dx=x1-x0,dy=y1-y0;const P=[-dx,dx,-dy,dy],Q=[x0-rx0,rx1-x0,y0-ry0,ry1-y0];
  for(let i=0;i<4;i++){if(P[i]===0){if(Q[i]<0)return null}else{const t=Q[i]/P[i];if(P[i]<0){if(t>t1)return null;if(t>t0)t0=t}else{if(t<t0)return null;if(t<t1)t1=t}}}return t0}
@@ -4316,13 +4331,24 @@ function upWorksDraw(c,B,now,k){const r=rng(k==='sr'?77:78);c.fillStyle='rgba(90
    appears only after that story happened (E: life before history). ---- */
 function srW0(){return LH<520?110:168}   /* where the far wall meets the floor */
 function srY(f){const W=srW0();return W+Math.round((LH-W)*f)}
-const SRC={wall:'#F6F1E9',wall2:'#EFE8DC',oak:'#DFCBA8',oakHi:'#EADCC2',oakMid:'#D2BB95',oakLo:'#C3A97F',edge:'rgba(112,86,56,.34)',grain:'rgba(140,108,70,.13)',
- cab:'#F4EFE6',floor:'#E4D3B7',ivory:'#F6F0E6',oat:'#D7C7AC',oatHi:'#E4D8C3',oatLo:'#C2B092',oatDk:'#B09C7C',greige:'#D8D2C6'};
+/* the palette (05:19; the material hierarchy of 06:36 and 06:43): the floor the palest, quietest wood — the plane everything
+   stands on; the furniture and the built-ins a light natural oak, a little warmer, the grain and the edges clearer; the
+   architecture's trim (window frame, skirting, ceiling beams) a pale ash; fabric oatmeal, cream, light greige; the pool
+   table's felt mushroom; the massage chair light stone */
+const SRC={wall:'#F6F1E9',wall2:'#EFE8DC',oak:'#D6BD95',oakHi:'#E4D1AF',oakMid:'#C9AD84',oakLo:'#B89B70',edge:'rgba(98,72,42,.45)',grain:'rgba(120,88,52,.22)',
+ ash:'#EEE5D5',ashHi:'#F4EDE1',ashMid:'#E3D7C2',cab:'#F4EFE6',floor:'#ECE2D1',ivory:'#F6F0E6',oat:'#D7C7AC',oatHi:'#E4D8C3',oatLo:'#C2B092',oatDk:'#B09C7C',greige:'#D8D2C6',
+ felt:'#B7AA96',feltLo:'#A69984',stone:'#DCD6CC',stoneLo:'#C9C0B3'};
 /* where things stand: the sofa's front edge on the floor, the coffee table's, the two armchairs, the rug; the long
    table under the window (its front legs' line); the window; the door at the near end */
-const SRG={get sofa(){return{x0:96,x1:312,y:srY(LH<520?.47:.52)}},get ct(){return{x0:146,x1:266,y:srY(LH<520?.75:.70)}},
- get lc(){const y=srY(LH<520?.72:.67);return[{x:70,y,f:1},{x:342,y,f:-1}]},get rug(){return{x0:40,x1:372,y0:srY(LH<520?.36:.40),y1:srY(LH<520?.93:.88)}},
- get tb(){return{x0:180,x1:260,y:srW0()+50}},get win(){const W=srW0();return{x0:174,x1:266,y0:W-84,y1:W-12}}};
+/* by phase (06:43): Phase I exactly as drawn on 05:19; from Phase II the sofa group sits a little nearer you, so the pool
+   table has a place of its own between it and the long table — not on the rug (srLay: tall I, tall II, short I, short II) */
+function srLay(a1,a2,b1,b2){const p2=srStage()>=2;return LH<520?(p2?b2:b1):(p2?a2:a1)}
+const SRG={get sofa(){return{x0:96,x1:312,y:srY(srLay(.52,.555,.47,.60))}},get ct(){return{x0:146,x1:266,y:srY(srLay(.70,.735,.75,.82))}},
+ get lc(){const y=srY(srLay(.67,.705,.72,.79));return[{x:70,y,f:1},{x:342,y,f:-1}]},get rug(){return{x0:40,x1:372,y0:srY(srLay(.40,.435,.36,.49)),y1:srY(srLay(.88,.915,.93,.99))}},
+ get tb(){return{x0:180,x1:260,y:srW0()+50}},get win(){const W=srW0();return{x0:174,x1:266,y0:W-84,y1:W-12}},
+ get pool(){return{x0:124,x1:276,y:srY(LH<520?.357:.32)}},   /* the pool table's front legs on the boards (Phase II on) */
+ get mass(){return LH<520?{x:Math.round(clamp(srVisR()-28,352,420)),y:LH-12}:{x:344,y:LH-18}}};   /* the massage chair in the quiet corner by the door (Phase III); a short wide screen (a desktop) shows more of the room to the right, so it stands clear of the armchair there */
+function srVisR(){return typeof SV!=='undefined'&&SV&&SV.s&&SV.w?(SV.w-SV.ox)/SV.s:400}   /* the right edge of what the screen shows, in the room's coordinates */
 const SRL={get door(){return{x:88,y:LH-24}},get floorY(){return srW0()}};
 function srDoorHit(p){return Math.abs(p.x-SRL.door.x)<36&&p.y>LH-44}
 const SR_SEATS={get sofa(){const S0=SRG.sofa;return[0,1,2,3].map(i=>({k:'sofa'+i,x:S0.x0+30+i*50,y:S0.y-15,sofa:1,face:i<2?1:-1}))},
@@ -4331,14 +4357,19 @@ const SR_SEATS={get sofa(){const S0=SRG.sofa;return[0,1,2,3].map(i=>({k:'sofa'+i
   {k:'c0',x:T.x0-16,y:T.y-12,face:1},{k:'c1',x:T.x1+16,y:T.y-12,face:-1},{k:'stool',x:284,y:W-2,face:1},{k:'bench0',x:84,y:W+8,face:1},{k:'bench1',x:120,y:W+8,face:1}];
   if(st>=3){const C=SRG.ct;a.push({k:'pouf',x:(C.x0+C.x1)/2,y:C.y+25,face:1})}return a},
  get stand(){const W=srW0(),T=SRG.tb;return[{k:'fridge',x:356,y:W+8,face:1,stand:1},{k:'coffee',x:306,y:W+8,face:1,stand:1},{k:'locker',x:100,y:W+4,face:-1,stand:1},{k:'hooks',x:156,y:W+6,face:1,stand:1},{k:'window',x:T.x0-8,y:T.y+16,face:1,stand:1}]}};   /* standing places (until rc6's redraw they were not marked, so people stood "seated" at the fridge) */
-function srSpots(){return SR_SEATS.sofa.concat(SR_SEATS.chairs,SR_SEATS.stand)}
+/* the pool table's two ends and a place behind it to watch (Phase II), the massage chair (Phase III): never handed out
+   at random — only to the people an evening picks for them (srRecPlan) or a break that wants the chair */
+function srRecSpots(){const st=srStage();const out=[];if(st>=2){const P=SRG.pool;out.push({k:'pool0',x:P.x0-14,y:P.y-15,face:1,stand:1,rec:1},{k:'pool1',x:P.x1+14,y:P.y-15,face:-1,stand:1,rec:1},{k:'poolw',x:P.x0+40,y:P.y-36,face:1,stand:1,rec:1})}
+ if(st>=3){const M=SRG.mass;out.push({k:'mass',x:M.x,y:M.y-17,face:-1,sofa:1,rec:1})}return out}
+function srSpots(){return SR_SEATS.sofa.concat(SR_SEATS.chairs,SR_SEATS.stand,srRecSpots())}
+function srSpotK(k){return srSpots().find(s=>s.k===k)||null}
 /* the cat's place: the sofa's right end, by the arm */
 function srCatSpot(){const S0=SRG.sofa;return{room:'staff',x:S0.x1-12,y:S0.y-10,oy:8,face:-1,pose:'loaf'}}
 /* round the long table, the sofa, the coffee table and the armchairs (a seat inside one is reached straight) */
-function srObs(){const T=SRG.tb,S0=SRG.sofa,C=SRG.ct,L=SRG.lc;return[{bx0:T.x0-4,bx1:T.x1+4,by0:T.y-44,by1:T.y+3},{bx0:C.x0-4,bx1:C.x1+4,by0:C.y-30,by1:C.y+4},{bx0:S0.x0-8,bx1:S0.x1+8,by0:S0.y-36,by1:S0.y-2},{bx0:L[0].x-27,bx1:L[0].x+27,by0:L[0].y-30,by1:L[0].y+3},{bx0:L[1].x-27,bx1:L[1].x+27,by0:L[1].y-30,by1:L[1].y+3}]}
+function srObs(){const T=SRG.tb,S0=SRG.sofa,C=SRG.ct,L=SRG.lc;const st=srStage();const P=SRG.pool,M=SRG.mass;return[{bx0:T.x0-4,bx1:T.x1+4,by0:T.y-44,by1:T.y+3},{bx0:C.x0-4,bx1:C.x1+4,by0:C.y-30,by1:C.y+4},{bx0:S0.x0-8,bx1:S0.x1+8,by0:S0.y-36,by1:S0.y-2},{bx0:L[0].x-27,bx1:L[0].x+27,by0:L[0].y-30,by1:L[0].y+3},{bx0:L[1].x-27,bx1:L[1].x+27,by0:L[1].y-30,by1:L[1].y+3}].concat(st>=2?[{bx0:P.x0-4,bx1:P.x1+4,by0:P.y-34,by1:P.y+3}]:[],st>=3?[{bx0:M.x-24,bx1:M.x+24,by0:M.y-32,by1:M.y+3}]:[])}
 /* the people in the room right now, for drawing here and on the floor (the crew's own sprites and the kitchen's walkers) */
-function srPeople(){const out=[];if(!R)return out;for(const m of S.crew||[]){const w=R.cw&&R.cw[m.id];if(!w||w.room!=='staff'||srWalker(m.id))continue;const sp=w.srSpot;const there=!!(sp&&w.task&&w.task.fired&&Math.hypot(w.x-sp.x,w.y-sp.y)<2);out.push({m,x:w.x,y:w.y,look:crewLook(m),seated:there&&!sp.stand,sofa:there&&sp.sofa,face:there&&sp.face?sp.face:w.face,moving:w.moving,step:w.step,hold:there?w.srHold:null})}
- for(const w of R.srw||[]){if(w.room!=='staff')continue;const sp=w.spot;const there=!!(sp&&Math.hypot(w.x-sp.x,w.y-sp.y)<2);out.push({m:w.m,x:w.x,y:w.y,look:crewLook(w.m),seated:there&&!sp.stand,sofa:there&&sp.sofa,face:there&&sp.face?sp.face:w.face,moving:w.moving,step:w.step,hold:there?w.hold:null})}return out}
+function srPeople(){const out=[];if(!R)return out;for(const m of S.crew||[]){const w=R.cw&&R.cw[m.id];if(!w||w.room!=='staff'||srWalker(m.id))continue;const sp=w.srSpot;const there=!!(sp&&w.task&&w.task.fired&&Math.hypot(w.x-sp.x,w.y-sp.y)<2);out.push({m,x:w.x,y:w.y,look:crewLook(m),seated:there&&!sp.stand,sofa:there&&sp.sofa,face:there&&sp.face?sp.face:w.face,moving:w.moving,step:w.step,hold:there?w.srHold:null,spotK:there?sp.k:null,doze:there&&sp.k==='mass'&&((R.srMassAt||{})[m.id]||0)>4})}
+ for(const w of R.srw||[]){if(w.room!=='staff')continue;const sp=w.spot;const there=!!(sp&&Math.hypot(w.x-sp.x,w.y-sp.y)<2);out.push({m:w.m,x:w.x,y:w.y,look:crewLook(w.m),seated:there&&!sp.stand,sofa:there&&sp.sofa,face:there&&sp.face?sp.face:w.face,moving:w.moving,step:w.step,hold:there?w.hold:null,spotK:there?sp.k:null,doze:there&&sp.k==='mass'&&((R.srMassAt||{})[w.m.id]||0)>4})}return out}
 function srWalker(id){return R&&(R.srw||[]).find(w=>w.m.id===id)||null}
 function srTrace(k){const t=S.up&&S.up.sr&&S.up.sr.tr;return !!(t&&t[k]!=null&&S.day>=t[k])}
 function srTraceSet(k,d){const s=srW();s.tr=s.tr||{};if(s.tr[k]==null)s.tr[k]=d==null?S.day:d}
@@ -4350,17 +4381,17 @@ function drawStaffRoom(c,now,dusk,V,X0,XW,TOP,list){const d=clamp(dusk,0,1);cons
  const bg=roomBg('staff',st+'|'+LH,TOP,(b,X0,XW,T2)=>{const r=rng(61);const XR=LW+BGM;const CE=W-104;
   /* the ceiling: warm white between pale oak beams, closer and wider apart as they come towards you; small downlights */
   b.fillStyle='#F0EAE0';b.fillRect(X0,-T2,XW,T2+CE);
-  {let y=CE-2,gap=12,th=3;while(y>-T2-8){b.fillStyle=SRC.oakMid;b.fillRect(X0,y-th,XW,th);b.fillStyle='rgba(255,250,240,.45)';b.fillRect(X0,y-th,XW,.8);b.fillStyle='rgba(112,86,56,.16)';b.fillRect(X0,y,XW,1.2);
+  {let y=CE-2,gap=12,th=3;while(y>-T2-8){b.fillStyle=SRC.ashMid;b.fillRect(X0,y-th,XW,th);b.fillStyle='rgba(255,250,240,.45)';b.fillRect(X0,y-th,XW,.8);b.fillStyle='rgba(112,86,56,.16)';b.fillRect(X0,y,XW,1.2);
    if(gap>20)for(let x=60;x<400;x+=140){b.fillStyle='#FBF6EC';el(b,x,y-th-gap/2,4,1.6);b.fillStyle='rgba(200,180,150,.5)';el(b,x,y-th-gap/2+.8,4,.6)}
    y-=gap+th;gap*=1.45;th=Math.min(8,th*1.3)}}
   /* the walls: warm white plaster, barely any texture */let wg=b.createLinearGradient(0,CE,0,W);wg.addColorStop(0,SRC.wall);wg.addColorStop(1,SRC.wall2);b.fillStyle=wg;b.fillRect(X0,CE,XW,W-CE);b.fillStyle='rgba(112,86,56,.08)';b.fillRect(X0,CE,XW,2);
   for(let i=0;i<220;i++){b.fillStyle=`rgba(${r()<.5?'255,255,255':'150,130,100'},${.012+r()*.018})`;el(b,X0+r()*XW,CE+2+r()*(W-CE-4),3+r()*8,2+r()*4)}
   /* the floor: very pale oak, long boards running into the room, joints staggered; low yellow, low saturation */
   b.fillStyle=SRC.floor;b.fillRect(X0,W,XW,LH-W);
-  {const pw=15;let k=0;for(let x=X0;x<XR;x+=pw,k++){const t=(r()-.5)*.08;b.fillStyle=t>0?`rgba(255,252,244,${t*1.7})`:`rgba(140,108,72,${-t})`;b.fillRect(x,W,pw,LH-W);b.fillStyle='rgba(130,100,66,.17)';b.fillRect(x,W,.8,LH-W);for(let y=W+((k*41)%110);y<LH;y+=96+((k*17)%60)){b.fillStyle='rgba(130,100,66,.14)';b.fillRect(x,y,pw,.8)}
-    for(let i=0;i<6;i++){b.fillStyle='rgba(150,118,80,.07)';b.fillRect(x+2+r()*(pw-4),W+r()*(LH-W),.6,10+r()*30)}}}
+  {const pw=15;let k=0;for(let x=X0;x<XR;x+=pw,k++){const t=(r()-.5)*.06;b.fillStyle=t>0?`rgba(255,253,248,${t*1.7})`:`rgba(150,122,88,${-t*.8})`;b.fillRect(x,W,pw,LH-W);b.fillStyle='rgba(140,112,78,.11)';b.fillRect(x,W,.7,LH-W);for(let y=W+((k*41)%110);y<LH;y+=96+((k*17)%60)){b.fillStyle='rgba(140,112,78,.09)';b.fillRect(x,y,pw,.7)}
+    for(let i=0;i<5;i++){b.fillStyle='rgba(160,130,92,.05)';b.fillRect(x+2+r()*(pw-4),W+r()*(LH-W),.6,10+r()*30)}}}
   let fg=b.createLinearGradient(0,W,0,LH);fg.addColorStop(0,'rgba(100,76,48,.12)');fg.addColorStop(.07,'rgba(100,76,48,0)');fg.addColorStop(1,'rgba(100,76,48,.08)');b.fillStyle=fg;b.fillRect(X0,W,XW,LH-W);
-  /* the skirting, pale oak */srOak(b,X0,W-5,XW,5,SRC.oakHi);
+  /* the skirting, pale ash */srOak(b,X0,W-5,XW,5,SRC.ashHi);
   /* the rug: ivory wool, a soft woven texture and a few quiet arcs; a woven edge; it gathers the sofa, the table and
      the chairs into one place — not a zone painted on the floor */
   {const R0=SRG.rug;const w=R0.x1-R0.x0,h=R0.y1-R0.y0;b.fillStyle='rgba(100,76,48,.12)';rr(b,R0.x0+2,R0.y0+4,w,h,34);b.fill();
@@ -4381,6 +4412,8 @@ function drawStaffRoom(c,now,dusk,V,X0,XW,TOP,list){const d=clamp(dusk,0,1);cons
    const bx=x0+1+n*dw;b.fillStyle='#E7DCC9';b.fillRect(bx,top+26,x1-bx,64);b.fillStyle='rgba(112,86,56,.22)';b.fillRect(bx,top+26,1,64);
    srOak(b,bx,top+62,x1-bx,2.5,SRC.oakMid);srOak(b,bx,top+75,x1-bx,2.5,SRC.oakMid);b.fillStyle='rgba(112,86,56,.18)';b.fillRect(bx+(x1-bx)/2,top+64,1,26);
    b.fillStyle='#BFA47C';for(const px of[bx+6,bx+(x1-bx)-6]){b.fillRect(px-.8,top+30,1.6,5);circ(b,px,top+35,1.4)}
+   if(st>=2){/* the lower cubbies: a few board games, a box of cards (06:43) */const hw=(x1-bx)/2;for(const [k,col] of[[0,'#B9C4B0'],[1,'#E6DCCB'],[2,'#AFBAC6']]){b.fillStyle=col;b.fillRect(bx+1.5,top+87.5-k*3.3,hw-3,3.1);b.fillStyle='rgba(112,86,56,.25)';b.fillRect(bx+1.5,top+90.4-k*3.3,hw-3,.4)}b.fillStyle='#F2ECE2';b.fillRect(bx+hw+2,top+86,4,4);b.fillStyle='#9AA9B5';b.fillRect(bx+hw+2.6,top+86.8,2.8,1)}
+   if(st>=3){/* the upper cubbies: books (06:43) */for(let k=0;k<5;k++){b.fillStyle=['#D7C9AE','#A9B7BF','#E4DACA','#C4B39A','#B8C2B0'][k];const bh=9-(k%2)*1.6;b.fillRect(bx+1.6+k*3.3,top+75-bh,2.8,bh)}}
    /* the storage band: linen boxes */for(let i=0;i<4;i++){b.fillStyle=i%2?'#E6DCCB':'#DCD0BC';rr(b,x0+4+i*26.5,top+6,22,14,1.5);b.fill();b.fillStyle='rgba(112,90,66,.16)';b.fillRect(x0+4+i*26.5,top+8,22,.6);b.fillStyle='#C4B49A';b.fillRect(x0+12+i*26.5,top+11,6,1.6)}
    b.strokeStyle=SRC.edge;b.lineWidth=.7;b.strokeRect(x0-1.5,top-1.5,x1-x0+3,97)}
   /* the kitchenette, built in along the right of the wall: warm white doors under a pale oak top, a tiled splash, two
@@ -4395,7 +4428,7 @@ function drawStaffRoom(c,now,dusk,V,X0,XW,TOP,list){const d=clamp(dusk,0,1);cons
    /* the tall unit: a cabinet above, the fridge below (a long slim pull), the joint between */srOak(b,x1,W-104,32,104,SRC.oak);b.fillStyle='rgba(112,86,56,.26)';b.fillRect(x1,W-104,1,104);b.fillRect(x1,W-66,32,1);b.fillStyle='rgba(112,86,56,.18)';b.fillRect(x1+31,W-104,1,104);
    b.fillStyle='#9E978C';b.fillRect(x1+4,W-58,1.6,28);b.fillRect(x1+4,W-82,1.6,10);b.fillStyle='rgba(255,255,255,.5)';b.fillRect(x1+4,W-58,.5,28);b.strokeStyle=SRC.edge;b.lineWidth=.6;b.strokeRect(x1+.3,W-104,31.4,104)}
   /* the window: pale ash frame, three lights; the glass and the sheer linen are drawn live (the hour); a deep oak sill */
-  {const W0=SRG.win;b.fillStyle='rgba(112,86,56,.1)';b.fillRect(W0.x0-1,W0.y0+2,W0.x1-W0.x0+4,W0.y1-W0.y0+2);srOak(b,W0.x0-5,W0.y0-5,W0.x1-W0.x0+10,W0.y1-W0.y0+9,SRC.oakHi,1);srOak(b,W0.x0-7,W0.y1+2,W0.x1-W0.x0+14,4,SRC.oak,1)}
+  {const W0=SRG.win;b.fillStyle='rgba(112,86,56,.1)';b.fillRect(W0.x0-1,W0.y0+2,W0.x1-W0.x0+4,W0.y1-W0.y0+2);srOak(b,W0.x0-5,W0.y0-5,W0.x1-W0.x0+10,W0.y1-W0.y0+9,SRC.ashHi,1);srOak(b,W0.x0-7,W0.y1+2,W0.x1-W0.x0+14,4,SRC.ash,1)}
   /* the outlets: two on the splash by the counter (Phase II: a row of them along the banquette) */b.fillStyle='#F9F6F0';rr(b,326,W-48,8,6,1);b.fill();b.strokeStyle=SRC.edge;b.lineWidth=.4;b.stroke();b.fillStyle='#A39B90';b.fillRect(328,W-46,1.2,1.6);b.fillRect(331.4,W-46,1.2,1.6);
  });
  blitBg(c,bg,X0,XW,TOP);
@@ -4405,7 +4438,7 @@ function drawStaffRoom(c,now,dusk,V,X0,XW,TOP,list){const d=clamp(dusk,0,1);cons
   let g=c.createLinearGradient(0,y,0,y+h);g.addColorStop(0,mix(wet?'#AEB8C2':'#C9DEEC','#26304A',d));g.addColorStop(1,mix(wet?'#C6CDD3':'#F2E8D6','#3A3A55',d));c.fillStyle=g;c.fillRect(x,y,w,h);
   c.fillStyle=mix('#93B47F','#24352C',d);for(let k=0;k<7;k++)el(c,x+8+k*17,y+h-8-(k%2)*5,11,8);c.fillStyle=mix('#CCC5BC','#30324A',d);for(let k=0;k<4;k++)c.fillRect(x+12+k*27,y+16+(k%2)*8,14,h-24);if(d>.45){c.fillStyle='rgba(255,220,150,.8)';for(let k=0;k<9;k++)c.fillRect(x+14+((k*23)%(w-20)),y+20+((k*13)%(h-30)),2,2)}
   if(wet){c.strokeStyle='rgba(235,242,250,.4)';c.lineWidth=.7;for(let k=0;k<9;k++){const ph=((now*.5)+k*.37)%1;const rx=x+4+((k*29)%(w-8));c.beginPath();c.moveTo(rx,y+ph*h);c.lineTo(rx-1,y+ph*h+5);c.stroke()}}
-  c.fillStyle=SRC.oakHi;c.fillRect(x+w/3-1.5,y,3,h);c.fillRect(x+2*w/3-1.5,y,3,h);c.fillStyle='rgba(112,86,56,.2)';c.fillRect(x+w/3+1.5,y,.6,h);c.fillRect(x+2*w/3+1.5,y,.6,h);
+  c.fillStyle=SRC.ashHi;c.fillRect(x+w/3-1.5,y,3,h);c.fillRect(x+2*w/3-1.5,y,3,h);c.fillStyle='rgba(112,86,56,.2)';c.fillRect(x+w/3+1.5,y,.6,h);c.fillRect(x+2*w/3+1.5,y,.6,h);
   /* the sheers: a rod, the gathered panels at the sides, a thin veil across */c.fillStyle='#BFA884';c.fillRect(x-10,y-8,w+20,1.8);
   c.fillStyle=`rgba(252,249,243,${.30+d*.25})`;c.fillRect(x,y-6,w,h+8);
   for(const px of[x-8,x+w-18]){c.fillStyle='rgba(250,247,240,.9)';c.fillRect(px,y-7,26,h+10);c.fillStyle='rgba(190,172,144,.32)';for(let k=0;k<5;k++)c.fillRect(px+3+k*5,y-6,1.4,h+8);c.fillStyle='rgba(255,255,255,.55)';for(let k=0;k<5;k++)c.fillRect(px+5+k*5,y-6,1,h+8);c.strokeStyle='rgba(176,156,124,.35)';c.lineWidth=.5;c.strokeRect(px+.25,y-7,25.5,h+10)}
@@ -4415,7 +4448,7 @@ function drawStaffRoom(c,now,dusk,V,X0,XW,TOP,list){const d=clamp(dusk,0,1);cons
  /* the pendant over the long table: a white linen drum on a long cord */{const lx=220,ly=W-58;c.fillStyle='#BDB2A2';c.fillRect(lx-.5,-TOP,1,TOP+ly);c.fillStyle='#F7F2E9';rr(c,lx-14,ly,28,12,2);c.fill();c.strokeStyle=SRC.edge;c.lineWidth=.6;c.stroke();c.fillStyle='rgba(190,172,144,.4)';c.fillRect(lx-14,ly+8,28,1.2);c.fillStyle=d>.25||srPeople().length?'rgba(255,236,196,.95)':'rgba(240,232,218,.9)';el(c,lx,ly+12.5,12,1.8)}
  for(const it of srItems(c,now,d))list.push(it)}
 /* the room's own warm light at night: the pendant, the floor lamp, the two wall lights, the kitchenette's shelf light */
-function srLampSpots(){const S0=SRG.sofa,W=srW0();return[{x:220,y:W-40,r:120,k:.95,col:'255,214,160'},{x:S0.x0-16,y:S0.y-74,r:118,k:1.05,col:'255,206,148'},{x:306,y:W-64,r:62,k:.75,col:'255,214,160'},{x:110,y:W-40,r:70,k:.45,col:'255,222,178'}]}
+function srLampSpots(){const S0=SRG.sofa,W=srW0();return[{x:220,y:W-40,r:120,k:.95,col:'255,214,160'},{x:S0.x0-16,y:S0.y-74,r:118,k:1.05,col:'255,206,148'},{x:306,y:W-64,r:62,k:.75,col:'255,214,160'},{x:110,y:W-40,r:70,k:.45,col:'255,222,178'}].concat(srStage()>=2?[{x:200,y:SRG.pool.y-74,r:100,k:.5,col:'255,218,170'}]:[])}
 /* the furniture and things, y-sorted, in this view's coordinates */
 function srItems(c,now,d){const st=srStage();const out=[];const P=(y,f)=>out.push({y,f:()=>f(c)});
  const W=srW0(),S0=SRG.sofa,C=SRG.ct,L=SRG.lc,T=SRG.tb;
@@ -4442,11 +4475,16 @@ function srItems(c,now,d){const st=srStage();const out=[];const P=(y,f)=>out.pus
  if(st>=2)P(S0.y+3,c=>drawSrBasket(c,S0.x1+24,S0.y+3,st));
  if(st>=2)P(L[1].y-44,c=>drawSrPotPlant(c,362,L[1].y-44));
  if(st>=3)P(C.y+22,c=>drawSrPouf(c,(C.x0+C.x1)/2,C.y+34));
- /* the near end: the door's mat (out, down the stairs); a coat stand by it, coats by phase; a plant in the corner;
+ /* the pool table, between the long table and the sofa (Phase II on) */
+ if(st>=2)P(SRG.pool.y,c=>drawSrPool(c,st,now));
+ /* the quiet corner by the door: the massage chair and a small table with a few books (Phase III; the corner's plant
+    gives it the place) */
+ if(st>=3){const M=SRG.mass;P(M.y-20,c=>drawSrMassage(c,M.x,M.y,-1));P(M.y-7,c=>drawSrSideTable(c,M.x-(LH<520?44:42),M.y-7))}
+ /* the near end: the door's mat (out onto the floor); a coat stand by it, coats by phase; a plant in the corner;
     slippers in III */
- {const sh=LH<520;P(LH-30,c=>drawSrCoatStand(c,sh?26:142,LH-30,st));P(LH-26,c=>drawSrTallPlant(c,sh?384:350,LH-26,1))}   /* a short screen (a desktop) keeps them clear of the armchairs */
+ {const sh=LH<520;P(LH-30,c=>drawSrCoatStand(c,sh?26:142,LH-30,st));if(st<3)P(LH-26,c=>drawSrTallPlant(c,sh?384:350,LH-26,1))}   /* a short screen (a desktop) keeps them clear of the armchairs */
  P(LH-20,c=>{const x=SRL.door.x,y=LH-8;srShadow(c,x,y+1,30,3,.12);c.fillStyle='#D8C7AA';rr(c,x-29,y-13,58,14,3);c.fill();c.strokeStyle='rgba(150,128,96,.4)';c.lineWidth=.6;for(let k=0;k<7;k++){c.beginPath();c.moveTo(x-25+k*8,y-12);c.lineTo(x-25+k*8,y);c.stroke()}c.strokeStyle=SRC.edge;c.lineWidth=.6;rr(c,x-29,y-13,58,14,3);c.stroke();
-  c.font=`800 6.8px ${FONT}`;const lb='‹ 側廳';const w=c.measureText(lb).width+12;c.fillStyle='rgba(74,67,60,.84)';rr(c,x-w/2,y-11,w,10,3);c.fill();c.fillStyle='#F7F1E6';c.textAlign='center';c.textBaseline='middle';c.fillText(lb,x,y-5.6);c.textBaseline='alphabetic';
+  c.font=`800 6.8px ${FONT}`;const lb='‹ 二樓';const w=c.measureText(lb).width+12;c.fillStyle='rgba(74,67,60,.84)';rr(c,x-w/2,y-11,w,10,3);c.fill();c.fillStyle='#F7F1E6';c.textAlign='center';c.textBaseline='middle';c.fillText(lb,x,y-5.6);c.textBaseline='alphabetic';
   if(st>=3){for(const sx of[x+38,x+50]){c.fillStyle='#EFE8DC';rr(c,sx-4,y-10,8,5,2.4);c.fill();c.strokeStyle=SRC.edge;c.lineWidth=.4;c.stroke();c.fillStyle='#D6C9B4';rr(c,sx-4,y-10,8,2.2,1.2);c.fill()}}});
  return out}
 /* the kitchenette's live part */
@@ -4529,6 +4567,7 @@ function drawSrCoffeeTable(c,C,st){const x0=C.x0,x1=C.x1,y=C.y;const Wd=x1-x0;sr
  /* a white bowl with a plant; II magazines and a mug; III a second mug, a plate of something */
  {const px=x0+Wd*.62,py=y-18;c.fillStyle='#F8F4EE';c.beginPath();c.ellipse(px,py,11,4.4,0,0,Math.PI);c.fill();c.strokeStyle=SRC.edge;c.lineWidth=.5;c.stroke();c.fillStyle='#ECE4D7';el(c,px,py,11,2.6);c.fillStyle='#78A066';for(const [ox,oy,w] of[[-6,-4,4],[-2,-7,4.4],[3,-6,4],[6,-3,3.4],[0,-3,4],[-4,-8,3]])el(c,px+ox,py+oy,w,2.4);c.fillStyle='#628C52';for(const [ox,oy] of[[-3,-5],[2,-8],[5,-5]])el(c,px+ox,py+oy,2.4,1.6)}
  if(st>=2){c.fillStyle='#F5F1EA';c.save();c.translate(x0+24,y-19);c.rotate(-.12);c.fillRect(-11,-5,22,14);c.strokeStyle=SRC.edge;c.lineWidth=.4;c.strokeRect(-11,-5,22,14);c.fillStyle='#D3DADF';c.fillRect(-10,-4,10,6);c.fillStyle='rgba(120,110,100,.32)';c.fillRect(1,-3,7,.6);c.fillRect(1,-1,6,.6);c.restore();c.fillStyle='#FBF8F2';rr(c,x0+44,y-26,6,7,1.3);c.fill();c.strokeStyle='rgba(130,108,80,.45)';c.lineWidth=.5;c.stroke();c.strokeStyle='#D6CBB9';c.lineWidth=.9;c.beginPath();c.arc(x0+50.6,y-22.5,1.6,-Math.PI/2,Math.PI/2);c.stroke()}
+ if(st>=2){/* a pack of cards and two of them (06:43) */const kx=x1-10,ky=y-14;c.save();c.translate(kx,ky);c.rotate(.15);c.fillStyle='#F7F3EC';c.fillRect(-3,-2,6,4);c.strokeStyle='rgba(120,100,80,.45)';c.lineWidth=.4;c.strokeRect(-3,-2,6,4);c.fillStyle='#9AA9B5';c.fillRect(-2,-1.2,4,1.2);c.restore();c.save();c.translate(kx-7,ky+1.5);c.rotate(-.3);c.fillStyle='#FBF8F2';c.fillRect(-2.4,-1.6,4.8,3.2);c.strokeStyle='rgba(120,100,80,.45)';c.lineWidth=.4;c.strokeRect(-2.4,-1.6,4.8,3.2);c.fillStyle='#B5705C';c.fillRect(-1.4,-.9,1,1);c.restore()}
  if(st>=3){c.fillStyle='#E7D5BC';rr(c,x1-20,y-27,6,7,1.3);c.fill();c.strokeStyle='rgba(130,108,80,.45)';c.lineWidth=.5;c.stroke();c.fillStyle='#F8F4EE';el(c,x1-34,y-15,8,2.6);c.fillStyle='#D2AE76';for(const ox of[-3,0,3])el(c,x1-34+ox,y-16.6,2,1.3)}}
 function drawSrFloorLamp(c,x,y,d){srShadow(c,x,y+1,8,2.2,.12);c.strokeStyle=SRC.oakLo;c.lineWidth=1.5;c.beginPath();c.moveTo(x-8,y);c.lineTo(x,y-62);c.lineTo(x+8,y);c.moveTo(x,y-62);c.lineTo(x,y);c.stroke();
  const on=d>.25;c.fillStyle=on?'#FFF1D6':'#F6F0E5';c.beginPath();c.moveTo(x-12,y-62);c.lineTo(x+12,y-62);c.lineTo(x+9,y-81);c.lineTo(x-9,y-81);c.closePath();c.fill();c.strokeStyle=SRC.edge;c.lineWidth=.6;c.stroke();c.fillStyle='rgba(170,150,120,.28)';c.fillRect(x-12,y-63,24,1);
@@ -4543,10 +4582,69 @@ function drawSrPouf(c,x,y){srShadow(c,x,y+1,13,3.4,.15);c.fillStyle='#D8C8AB';rr
 function drawSrCoatStand(c,x,y,st){srShadow(c,x,y+1,10,2.6,.13);c.strokeStyle=SRC.oakLo;c.lineWidth=1.8;c.beginPath();c.moveTo(x,y-70);c.lineTo(x,y);c.moveTo(x-9,y);c.lineTo(x,y-10);c.lineTo(x+9,y);c.stroke();c.fillStyle=SRC.oakMid;for(const a of[-1,1]){c.fillRect(x+a*3-(a<0?3:0),y-66,3,1.6)}
  const coats=st>=3?['#D8D0C2','#B9C3C8','#E6DCC8']:st>=2?['#D8D0C2','#B9C3C8']:['#E2D9C9'];coats.forEach((col,i)=>{const cx=x+(i===1?5:i===2?-6:-2);c.fillStyle=col;c.beginPath();c.moveTo(cx-4,y-66);c.lineTo(cx+4,y-66);c.lineTo(cx+7,y-34+i*3);c.lineTo(cx-7,y-34+i*3);c.closePath();c.fill();c.strokeStyle='rgba(112,86,56,.3)';c.lineWidth=.5;c.stroke()});
  if(st>=2){c.fillStyle='#CDBB9C';rr(c,x+4,y-46,9,11,2);c.fill();c.strokeStyle=SRC.edge;c.lineWidth=.4;c.stroke()}}
+/* the pool table (Phase II on; the player's 06:43): a boutique lounge's table, not a pool hall's — a pale oak rail and
+   apron with their grain, legs of the same oak, mushroom felt, taupe pockets with a thin line of aged brass on the
+   corners; the balls racked and the cues on the table while nobody plays, where the last shot left them during a frame */
+function srPoolFelt(){const P=SRG.pool;return{x0:P.x0+8,x1:P.x1-8,y0:P.y-53,y1:P.y-33}}
+function srPoolRack(){const B=[{u:.25,v:.5,c:'#F6F1E7'}];const cols=['#C9A24E','#6F86A0','#B5705C','#4F4A45','#8C7896','#6F9A8C'];let i=0;for(let k=0;k<3;k++)for(let j=0;j<=k;j++)B.push({u:.68+k*.027,v:.5+(j-k/2)*.24,c:cols[i++]});return B}
+function srBallAt(F,b,f,e){const u=f.u+(b.u-f.u)*e,v=f.v+(b.v-f.v)*e;return{x:F.x0+3+u*(F.x1-F.x0-6),y:F.y0+3+v*(F.y1-F.y0-6)}}
+function drawSrPool(c,st,now){const P=SRG.pool;const x0=P.x0,x1=P.x1,y=P.y,w=x1-x0;const top=y-58,fr=y-28;const F=srPoolFelt();
+ srShadow(c,(x0+x1)/2,y-13,w/2+2,12,.14);
+ /* the two front legs (the back two are behind the apron): square, the same pale oak */for(const lx of[x0+7,x1-16])srOak(c,lx,y-19,9,19,SRC.oakMid,1);
+ /* the apron */srOak(c,x0+2,fr,w-4,10,SRC.oak,1);c.fillStyle='rgba(112,86,56,.22)';c.fillRect(x0+3,fr+1,w-6,.8);
+ /* the top: the oak rail all round, the felt inside it */c.fillStyle=SRC.oakHi;rr(c,x0,top,w,fr-top+1,2.5);c.fill();c.fillStyle=SRC.grain;for(let gx=x0+4;gx<x1-3;gx+=7){c.fillRect(gx,top+1,.6,3.4);c.fillRect(gx+2,fr-3.4,.6,3.4)}
+ c.strokeStyle=SRC.edge;c.lineWidth=.7;rr(c,x0,top,w,fr-top+1,2.5);c.stroke();
+ const cx=(F.x0+F.x1)/2,cy=(F.y0+F.y1)/2;let g=c.createRadialGradient(cx,cy,4,cx,cy,(F.x1-F.x0)*.62);g.addColorStop(0,'#BFB3A2');g.addColorStop(1,SRC.felt);c.fillStyle=g;c.fillRect(F.x0,F.y0,F.x1-F.x0,F.y1-F.y0);
+ /* the cushions: darker felt along the rails */c.fillStyle=SRC.feltLo;c.fillRect(F.x0,F.y0,F.x1-F.x0,1.6);c.fillRect(F.x0,F.y0,1.5,F.y1-F.y0);c.fillRect(F.x1-1.5,F.y0,1.5,F.y1-F.y0);c.fillStyle='rgba(255,250,240,.2)';c.fillRect(F.x0,F.y1-1,F.x1-F.x0,1);
+ /* the sights in the rails */c.fillStyle='rgba(250,246,238,.85)';for(const k of[1,3]){const sx=x0+w*k/4;el(c,sx,top+2.4,.9,.6);el(c,sx,fr-1.8,.9,.6)}
+ /* the six pockets */for(const [px,py,cn] of[[F.x0,F.y0,1],[F.x1,F.y0,1],[F.x0,F.y1,1],[F.x1,F.y1,1],[cx,F.y0-.6,0],[cx,F.y1+.4,0]]){c.fillStyle='#6E645A';el(c,px,py,3.1,2.1);c.fillStyle='rgba(40,32,24,.35)';el(c,px,py+.4,2.2,1.2);if(cn){c.strokeStyle='rgba(176,148,96,.75)';c.lineWidth=.7;c.beginPath();c.ellipse(px,py,3.6,2.5,0,0,Math.PI*2);c.stroke()}}
+ const Q=R&&R.srPool&&R.srPool.balls?R.srPool:null;
+ /* the cues along the far cushion and the chalk on the rail, while nobody plays */
+ if(!Q){c.lineCap='round';for(const [ya,yb] of[[F.y0+3.2,F.y0+4.2],[F.y0+5.4,F.y0+6.2]]){c.strokeStyle=SRC.oakMid;c.lineWidth=1.6;c.beginPath();c.moveTo(F.x0+8,ya);c.lineTo(F.x0+46,ya+(yb-ya)*.35);c.stroke();c.strokeStyle=SRC.ashMid;c.lineWidth=1;c.beginPath();c.moveTo(F.x0+46,ya+(yb-ya)*.35);c.lineTo(F.x1-30,yb);c.stroke()}c.lineCap='butt'}
+ c.fillStyle='#8DA0B0';c.fillRect(x1-15,fr-4.2,3.2,2.4);
+ /* the balls (left where the frame ended, until tomorrow) */const B=Q?Q.balls:(R&&R.srPoolLeft)||srPoolRack();const e=Q&&Q.lerp<1?1-Math.pow(1-Q.lerp,2):1;
+ for(let i=0;i<B.length;i++){const b=B[i];if(b.gone&&e>=1)continue;const f=Q&&Q.from&&Q.from[i]?Q.from[i]:b;const q=srBallAt(F,b,f,e);c.fillStyle='rgba(60,48,36,.22)';el(c,q.x+.5,q.y+1.4,2,.9);c.fillStyle=b.c;circ(c,q.x,q.y,1.9);c.fillStyle='rgba(255,255,255,.55)';circ(c,q.x-.6,q.y-.7,.55)}}
+/* the cue held upright at the side away from the table, its foot on the floor, while it is not your shot */
+function srCueUp(c,p){const f=p.face||1;const bx=p.x-f*12,by=p.y,tx=p.x-f*9,ty=p.y-76;const mx=bx+(tx-bx)*.42,my=by+(ty-by)*.42;c.lineCap='round';c.strokeStyle=SRC.oakLo;c.lineWidth=2;c.beginPath();c.moveTo(bx,by);c.lineTo(mx,my);c.stroke();c.strokeStyle=SRC.ashMid;c.lineWidth=1.2;c.beginPath();c.moveTo(mx,my);c.lineTo(tx,ty);c.stroke();c.strokeStyle='#8C8276';c.lineWidth=1.4;c.beginPath();c.moveTo(tx,ty+2);c.lineTo(tx,ty);c.stroke();c.lineCap='butt'}
+/* the shot: the cue from behind the hands to the cue ball, two slow strokes and then through it */
+function srCueShot(c,p,Q){const F=srPoolFelt();const f=p.face||1;const e=Q.lerp<1?1-Math.pow(1-Q.lerp,2):1;const b0=srBallAt(F,Q.balls[0],Q.from&&Q.from[0]?Q.from[0]:Q.balls[0],e);
+ const s=1-Math.max(0,Q.stroke)/1.3;const back=s<.82?(1-Math.cos(s/.82*Math.PI*4))*2.2:-(s-.82)/.18*2;
+ const hx=p.x+f*6,hy=p.y-26;let dx=b0.x-hx,dy=b0.y-hy;const L=Math.hypot(dx,dy)||1;dx/=L;dy/=L;
+ const tx=b0.x-dx*(3+back),ty=b0.y-dy*(3+back);const bx=hx-dx*30,by=hy-dy*30;const mx=bx+(tx-bx)*.4,my=by+(ty-by)*.4;
+ c.lineCap='round';c.strokeStyle=SRC.oakLo;c.lineWidth=2.1;c.beginPath();c.moveTo(bx,by);c.lineTo(mx,my);c.stroke();c.strokeStyle=SRC.ashMid;c.lineWidth=1.2;c.beginPath();c.moveTo(mx,my);c.lineTo(tx,ty);c.stroke();c.strokeStyle='#8C8276';c.lineWidth=1.5;c.beginPath();c.moveTo(tx-dx*1.8,ty-dy*1.8);c.lineTo(tx,ty);c.stroke();c.lineCap='butt';
+ c.fillStyle=p.look.skin;circ(c,hx,hy,2.1);circ(c,hx-dx*16,hy-dy*16,2.1)}
+/* the massage chair (Phase III; 06:43): part of the room, not a showroom's — a light stone greige shell round the back
+   and the arms, a deeper warm greige cushion, the leg rest down to the floor, one small charcoal control on the arm;
+   turned a little towards the room, like the armchairs */
+function drawSrMassage(c,x,y,f){c.save();c.translate(x,y);c.scale(f,1);srShadow(c,-2,2,27,4.6,.17);c.transform(1,0,-.12,1,0,0);
+ const SH=SRC.stone,SL=SRC.stoneLo,CU='#BCB2A5',CL='#ADA396';
+ /* the foot rest, out in front on the floor: a soft pod with the two foot wells */c.fillStyle=SH;rr(c,-13,-9,26,10,4);c.fill();c.strokeStyle=SRC.edge;c.lineWidth=.7;c.stroke();c.fillStyle=CL;rr(c,-10,-7.5,9,5,2.2);c.fill();rr(c,1,-7.5,9,5,2.2);c.fill();
+ /* the calf rest, from the seat down to it */c.fillStyle=CL;c.beginPath();c.moveTo(-11,-19);c.lineTo(11,-19);c.lineTo(10,-8);c.lineTo(-10,-8);c.closePath();c.fill();c.strokeStyle=SRC.edge;c.lineWidth=.6;c.stroke();c.fillStyle='rgba(90,80,70,.14)';c.fillRect(-9,-14,18,.8);
+ /* the shell: a cocoon round the back and the head, its inside in shadow */c.fillStyle=SH;c.beginPath();c.moveTo(-21,-20);c.lineTo(-21,-52);c.quadraticCurveTo(-22,-74,0,-75);c.quadraticCurveTo(22,-74,21,-52);c.lineTo(21,-20);c.closePath();c.fill();c.strokeStyle=SRC.edge;c.lineWidth=.8;c.stroke();
+ c.fillStyle='#CFC7BA';c.beginPath();c.moveTo(-16,-24);c.lineTo(-16,-52);c.quadraticCurveTo(-16,-69,0,-69.5);c.quadraticCurveTo(16,-69,16,-52);c.lineTo(16,-24);c.closePath();c.fill();
+ c.fillStyle='rgba(255,255,255,.45)';c.beginPath();c.moveTo(-19,-50);c.quadraticCurveTo(-19,-71,-2,-72.5);c.lineTo(-2,-71);c.quadraticCurveTo(-17,-69,-17.5,-50);c.closePath();c.fill();
+ /* the back cushion, quilted */c.fillStyle=CU;rr(c,-13,-62,26,39,8);c.fill();c.strokeStyle='rgba(120,108,94,.45)';c.lineWidth=.6;c.stroke();c.fillStyle='rgba(110,98,86,.2)';for(const sy of[-50,-39])c.fillRect(-11,sy,22,1);c.fillStyle='rgba(255,255,255,.18)';c.fillRect(-9,-60,18,1.2);
+ /* the seat */c.fillStyle=CU;rr(c,-15,-28,30,11,4);c.fill();c.strokeStyle='rgba(120,108,94,.45)';c.lineWidth=.6;c.stroke();c.fillStyle='rgba(255,255,255,.2)';c.fillRect(-12,-27,24,1);
+ /* the sides: the shell comes round as two deep arms */for(const ax of[-26,15]){c.fillStyle=SH;rr(c,ax,-38,11,31,5);c.fill();c.strokeStyle=SRC.edge;c.lineWidth=.8;c.stroke();c.fillStyle='rgba(255,255,255,.34)';rr(c,ax+1.5,-37,8,2.4,1.2);c.fill();c.fillStyle=SL;c.fillRect(ax+1,-11,9,3)}
+ /* the one control */c.fillStyle='#4C4945';rr(c,17,-35,6,3.2,1.2);c.fill();c.fillStyle='rgba(255,255,255,.25)';c.fillRect(18,-34.6,2,.6);
+ c.restore()}
+/* a small round side table by the massage chair: three books, a glass of water */
+function drawSrSideTable(c,x,y){srShadow(c,x,y+1,10,2.6,.13);c.fillStyle=SRC.oakMid;c.fillRect(x-1.2,y-19,2.4,18);c.fillStyle=SRC.oak;el(c,x,y-1,7,2);c.fillStyle=SRC.oak;c.fillRect(x-11,y-20,22,1.8);c.fillStyle=SRC.oakHi;el(c,x,y-20.5,11,3.6);c.strokeStyle=SRC.edge;c.lineWidth=.6;c.beginPath();c.ellipse(x,y-20.5,11,3.6,0,0,Math.PI*2);c.stroke();
+ for(const [k,col,w] of[[0,'#C8B99E',15],[1,'#9FB0B8',13],[2,'#E2D7C4',14]]){c.fillStyle=col;rr(c,x-8+k*.6,y-24-k*2.7,w,2.6,.6);c.fill();c.strokeStyle='rgba(110,90,66,.35)';c.lineWidth=.4;c.stroke();c.fillStyle='rgba(255,255,255,.45)';c.fillRect(x-7+k*.6,y-23.5-k*2.7,w-3,.5)}
+ c.fillStyle='rgba(214,230,232,.85)';rr(c,x+5.5,y-30,4,6.5,1);c.fill();c.fillStyle='rgba(180,208,218,.6)';c.fillRect(x+5.5,y-27,4,3)}
+/* asleep: a few small z's drifting up */
+function srZzz(c,p,now){c.textAlign='center';c.textBaseline='alphabetic';for(let k=0;k<3;k++){const ph=((now*.42)+k/3)%1;c.font=`800 ${6+ph*2.4}px ${FONT}`;c.fillStyle=`rgba(96,88,80,${Math.min(1,(1-ph)*1.6)*.8})`;c.fillText('z',p.x-(p.face||1)*(10+ph*8),p.y-50-ph*15)}}
+/* a word said in the room, over the speaker's head, only here (the pool table's few lines; whoever finds someone asleep) */
+function srSay(m,txt,delay){if(!R||!m)return;(R.srSay=R.srSay||[]).push({id:m.id,txt,t:-(delay||0),life:2.8})}
+function srSayDraw(c){const P=srPeople();for(const s of R.srSay||[]){if(s.t<0)continue;const p=P.find(o=>o.m.id===s.id);if(!p)continue;const a=s.t<.2?s.t/.2:s.t>s.life-.4?(s.life-s.t)/.4:1;c.globalAlpha=Math.max(0,Math.min(1,a));c.font=`700 6.5px ${FONT}`;const w=c.measureText(s.txt).width+10;const x=p.x,y=p.y-(p.seated?70:81);
+  c.fillStyle='#FFFDF7';rr(c,x-w/2,y-8,w,12,6);c.fill();c.strokeStyle='rgba(120,100,80,.28)';c.lineWidth=.5;c.stroke();c.beginPath();c.moveTo(x-2.5,y+4);c.lineTo(x+2.5,y+4);c.lineTo(x,y+7.5);c.fill();c.fillStyle='#2E2019';c.textAlign='center';c.textBaseline='middle';c.fillText(s.txt,x,y-1.6);c.textBaseline='alphabetic';c.globalAlpha=1}}
 /* the crew in the room: seated where there is a seat, on the sofa with their feet down, a cup or a phone sometimes;
    the kitchen's and the bar's walkers on their way up through the other rooms */
 function srDrawPeople(c,now,list,rm){if(!R)return;
- if(rm==='staff'){for(const p of srPeople())list.push({y:p.y,f:()=>{const stp=p.moving?Math.sin(p.step||0):0;drawPerson(c,p.x,p.y,p.look,{seated:p.seated,lounge:p.sofa?{legs:0}:null,step:stp,bob:p.moving?Math.abs(stp)*-.8:Math.sin(now*1.2+p.x)*.3,mood:'happy',flip:p.face<0,hold:p.hold||null,blink:Math.sin(now*1.3+p.x*.1)>.97});nameTag(c,p.x,p.y-(p.seated?54:64),p.m.name)}});return}
+ if(rm==='staff'){const Q=R.srPool;for(const p of srPeople()){const pk=p.spotK;const atPool=pk==='pool0'||pk==='pool1';const shoot=atPool&&!!Q&&Q.st===1&&Q.stroke>0&&(Q.turn===0?pk==='pool0':pk==='pool1');
+  list.push({y:p.y,f:()=>{const stp=p.moving?Math.sin(p.step||0):0;drawPerson(c,p.x,p.y,p.look,{seated:p.seated,lounge:p.sofa?{legs:0}:null,step:stp,bob:p.moving?Math.abs(stp)*-.8:p.doze?Math.sin(now*.8+p.x)*.45:Math.sin(now*1.2+p.x)*.3,mood:'happy',flip:p.face<0,hold:atPool||p.doze?null:(p.hold||null),carry:shoot,blink:p.doze||Math.sin(now*1.3+p.x*.1)>.97});if(atPool&&!shoot)srCueUp(c,p);nameTag(c,p.x,p.y-(p.seated?54:64),p.m.name);if(p.doze)srZzz(c,p,now)}});
+  if(shoot)list.push({y:SRG.pool.y+.5,f:()=>srCueShot(c,p,Q)})}
+ if(R.srSay&&R.srSay.length)list.push({y:1e6,f:()=>srSayDraw(c)});return}
  for(const w of R.srw||[]){if(w.room!==rm||(R.closing!=null&&R.closing<w.at))continue;list.push({y:w.y,f:()=>{const stp=w.moving?Math.sin(w.step):0;drawPerson(c,w.x,w.y,crewLook(w.m),{step:stp,bob:w.moving?Math.abs(stp)*-.8:0,mood:'happy',flip:w.face<0});nameTag(c,w.x,w.y-64,w.m.name)}})}}
 /* ---- 包廂, its own view. The player's 04:25 brief (docs/v24/private_dining_artdeco_0425_2026-10-02.txt): contemporary
    Art Deco, Jill's Kitchen's warmth — deep green panelled walls, brass, a stone floor in large slabs, an ivory stone
@@ -4619,24 +4717,20 @@ function drawPdrRoom(c,now,dusk,V,X0,XW,TOP,list){const d=clamp(dusk,0,1);const 
  /* art on the far wall: a framed print (II), and an Art Deco mirror (III) */
  if(st>=2)list.push({y:PDW-58,f:()=>{const x=34,y=18,w=58,h=44;c.fillStyle=PDC.brass;c.fillRect(x-3,y-3,w+6,h+6);c.fillStyle='#EDE5D3';c.fillRect(x,y,w,h);let g=c.createLinearGradient(0,y,0,y+h);g.addColorStop(0,'#D9C7A2');g.addColorStop(1,'#B9A57E');c.fillStyle=g;c.fillRect(x+5,y+5,w-10,h-10);c.fillStyle='#3E5233';c.beginPath();c.moveTo(x+5,y+h-5);c.lineTo(x+w/2,y+12);c.lineTo(x+w-5,y+h-5);c.closePath();c.fill();c.fillStyle='#C99A45';c.beginPath();c.arc(x+w/2,y+h-5,10,Math.PI,0);c.fill();c.strokeStyle='#EDE5D3';c.lineWidth=.8;for(let k=-2;k<=2;k++){c.beginPath();c.moveTo(x+w/2,y+h-5);c.lineTo(x+w/2+k*7,y+h-17);c.stroke()}}});
  if(st>=3)list.push({y:PDW-58,f:()=>{const x=338,y=14,w=34,h=52;c.fillStyle=PDC.brass;c.beginPath();c.moveTo(x-3,y+h+3);c.lineTo(x-3,y+12);c.quadraticCurveTo(x+w/2,y-10,x+w+3,y+12);c.lineTo(x+w+3,y+h+3);c.closePath();c.fill();let g=c.createLinearGradient(x,y,x+w,y+h);g.addColorStop(0,'#E8E4DA');g.addColorStop(.5,'#B9C0BE');g.addColorStop(1,'#DCD6C8');c.fillStyle=g;c.beginPath();c.moveTo(x,y+h);c.lineTo(x,y+13);c.quadraticCurveTo(x+w/2,y-5,x+w,y+13);c.lineTo(x+w,y+h);c.closePath();c.fill();c.fillStyle='rgba(255,255,255,.35)';c.fillRect(x+6,y+12,3,h-16)}});
- /* the sideboard under the window: walnut, fluted doors, brass pulls; an ivory stone top from Phase III; what is on it grows */
- list.push({y:PDW+6,f:()=>{const x0=146,w=108,y=PDW+6;softShadow(c,x0+w/2,y,w*.5,5,.22);c.fillStyle=PDC.walnut;c.fillRect(x0,y-32,w,32);c.fillStyle='#4E3626';c.fillRect(x0+3,y-28,w-6,24);for(let k=0;k<4;k++){const px=x0+5+k*((w-10)/4);for(let fx=px+3;fx<px+(w-10)/4-3;fx+=3){c.fillStyle='rgba(0,0,0,.25)';c.fillRect(fx,y-26,1,20)}c.fillStyle=PDC.brass;c.fillRect(px+(w-10)/8-2,y-17,4,1.6)}
-   c.fillStyle=st>=3?PDC.ivory:'#5A3E2C';c.fillRect(x0-3,y-36,w+6,5);c.fillStyle=st>=3?'rgba(170,160,145,.4)':'rgba(255,255,255,.1)';c.fillRect(x0-3,y-36,w+6,1);c.fillStyle=PDC.brassLo;c.fillRect(x0+2,y-2,3,4);c.fillRect(x0+w-5,y-2,3,4);
+ /* the sideboard under the window (the player's 06:43): warm ivory lacquer with fine fluting, a creamy marble top with a
+    little veining, aged brass pulls and feet — the furniture light, the dark kept for the architecture; what is on it grows */
+ list.push({y:PDW+6,f:()=>{const x0=146,w=108,y=PDW+6;softShadow(c,x0+w/2,y,w*.5,5,.22);c.fillStyle='#E7DDCB';c.fillRect(x0,y-32,w,32);c.fillStyle='#F0E8DA';c.fillRect(x0+3,y-28,w-6,24);for(let k=0;k<4;k++){const px=x0+5+k*((w-10)/4);for(let fx=px+3;fx<px+(w-10)/4-3;fx+=3){c.fillStyle='rgba(150,128,96,.24)';c.fillRect(fx,y-26,.8,20)}c.fillStyle='rgba(120,98,66,.3)';c.fillRect(px+(w-10)/4-1,y-28,1,24);c.fillStyle=PDC.brass;c.fillRect(px+(w-10)/8-2,y-17,4,1.6)}c.strokeStyle='rgba(100,82,56,.4)';c.lineWidth=.7;c.strokeRect(x0+.4,y-32,w-.8,32);
+   /* the marble top */c.fillStyle='#F5EFE4';c.fillRect(x0-3,y-36,w+6,5);c.strokeStyle='rgba(170,152,126,.55)';c.lineWidth=.5;c.beginPath();c.moveTo(x0+6,y-35);c.bezierCurveTo(x0+26,y-33,x0+40,y-36,x0+62,y-33);c.moveTo(x0+70,y-34.5);c.bezierCurveTo(x0+84,y-32.5,x0+96,y-35.5,x0+w,y-33);c.stroke();c.fillStyle='rgba(110,90,60,.32)';c.fillRect(x0-3,y-31.4,w+6,.8);c.fillStyle=PDC.brassLo;c.fillRect(x0+2,y-2,3,4);c.fillRect(x0+w-5,y-2,3,4);
    /* on it: a stack of plates and a carafe (I); a decanter and glasses, a low arrangement (II); a small lamp (III) */c.fillStyle='#F7F3EA';for(let k=0;k<3;k++)el(c,x0+16,y-38-k*1.6,8,2.3);c.fillStyle='rgba(220,232,236,.8)';rr(c,x0+34,y-50,7,13,2);c.fill();
    if(st>=2){c.fillStyle='rgba(120,40,40,.75)';rr(c,x0+52,y-49,8,12,3);c.fill();c.fillStyle='rgba(230,236,238,.7)';for(let k=0;k<3;k++){c.fillRect(x0+64+k*6,y-46,3,8)}c.fillStyle='#3E6A3A';el(c,x0+92,y-42,8,4);for(const [ox,col] of[[-3,'#E8A0A0'],[2,'#F3E3C0'],[5,'#E37A6A']]){c.fillStyle=col;circ(c,x0+92+ox,y-45,2.2)}}
    if(st>=3){c.fillStyle=PDC.brass;c.fillRect(x0+w-14,y-58,1.6,20);c.fillStyle=d>.2?'#FCE6B8':'#EDE3D0';c.beginPath();c.moveTo(x0+w-21,y-56);c.lineTo(x0+w-5,y-56);c.lineTo(x0+w-9,y-66);c.lineTo(x0+w-17,y-66);c.closePath();c.fill()}}});
  /* plants in brass pots: one by the window (I), a pair (II) */
  const pot=(x,y,big)=>list.push({y,f:()=>{softShadow(c,x,y+1,10,3,.2);c.fillStyle=PDC.brass;c.beginPath();c.moveTo(x-8,y-14);c.lineTo(x+8,y-14);c.lineTo(x+6,y);c.lineTo(x-6,y);c.closePath();c.fill();c.fillStyle=PDC.brassHi;c.fillRect(x-8,y-14,16,1.4);for(let k=0;k<(big?9:6);k++){const a=-1.4+k*(2.8/(big?8:5));c.fillStyle=k%2?'#3F6B3A':'#4F7F45';c.save();c.translate(x,y-14);c.rotate(a);el(c,0,-(big?16:11),big?5.5:4.5,big?11:8);c.restore()}}});
  pot(116,PDW+4,true);if(st>=2)pot(284,PDW+4,true);
- /* a coat stand by the door (II); a wine cabinet against the right wall and a service console (III) */
- if(st>=2)list.push({y:LH-40,f:()=>{const x=72,y=LH-40;softShadow(c,x,y,9,3,.2);c.fillStyle=PDC.walnut;c.fillRect(x-1.5,y-74,3,74);c.fillRect(x-10,y-2,20,3);c.fillStyle=PDC.brass;c.fillRect(x-9,y-72,18,2);circ(c,x,y-75,2.2);c.fillStyle='#4A4A52';rr(c,x+2,y-70,9,26,3);c.fill();c.fillStyle='#8A6A4A';rr(c,x-11,y-68,8,20,3);c.fill()}});
- if(st>=3)list.push({y:PDW+70,f:()=>{const x0=336,y=PDW+70,w=34;softShadow(c,x0+w/2,y,w*.6,5,.2);c.fillStyle=PDC.walnut;c.fillRect(x0,y-96,w,96);c.fillStyle='#2A2018';c.fillRect(x0+3,y-92,w-6,64);for(let k=0;k<5;k++){c.fillStyle='#4A3A2C';c.fillRect(x0+3,y-90+k*12.6,w-6,1.4);for(let j=0;j<3;j++){c.fillStyle=['#5A1E22','#2E3A22','#6A4A1A'][(j+k)%3];circ(c,x0+8+j*9,y-84+k*12.6,2.6)}}c.fillStyle='rgba(200,220,230,.12)';c.fillRect(x0+3,y-92,w-6,64);c.fillStyle=PDC.brass;c.fillRect(x0,y-96,w,1.6);c.fillRect(x0+w/2-.6,y-92,1.2,64);c.fillStyle='#4E3626';c.fillRect(x0+3,y-24,w-6,20);c.fillStyle=PDC.brass;c.fillRect(x0+w/2-3,y-15,6,1.4)}});
- if(st>=1)list.push({y:LH-128,f:()=>{const x0=292,y=LH-128,w=44;softShadow(c,x0+w/2,y,w*.5,4,.2);c.fillStyle=PDC.walnut;c.fillRect(x0,y-26,w,26);c.fillStyle=PDC.ivory;c.fillRect(x0-2,y-29,w+4,4);c.fillStyle='#F7F3EA';for(let k=0;k<3;k++)el(c,x0+12,y-31-k*1.4,7,2);c.fillStyle='rgba(230,236,238,.75)';for(let k=0;k<3;k++)c.fillRect(x0+24+k*5,y-37,3,7)}});
- /* a slim console against the left wall with a lamp and a small framed picture (II on) */
- if(st>=2)list.push({y:LH-170,f:()=>{const x0=60,y=LH-170,w=40;softShadow(c,x0+w/2,y,w*.5,4,.2);c.fillStyle=PDC.walnut;c.fillRect(x0,y-22,w,3);c.fillRect(x0+2,y-19,2.4,19);c.fillRect(x0+w-4.4,y-19,2.4,19);c.fillStyle=PDC.brass;c.fillRect(x0,y-22,w,1);c.fillRect(x0+2,y-2,2.4,2);c.fillRect(x0+w-4.4,y-2,2.4,2);
-  c.fillStyle=PDC.brass;c.fillRect(x0+8,y-34,1.6,12);c.fillStyle=d>.2?'#FCE6B8':'#EDE3D0';c.beginPath();c.moveTo(x0+2,y-32);c.lineTo(x0+16,y-32);c.lineTo(x0+12,y-41);c.lineTo(x0+6,y-41);c.closePath();c.fill();
-  c.fillStyle=PDC.brass;c.fillRect(x0+22,y-40,15,18);c.fillStyle='#EDE5D3';c.fillRect(x0+24,y-38,11,14);c.fillStyle='#3E5233';c.beginPath();c.moveTo(x0+24,y-24);c.lineTo(x0+29.5,y-35);c.lineTo(x0+35,y-24);c.closePath();c.fill();
-  if(d>.2){c.save();c.globalCompositeOperation='lighter';let g=c.createRadialGradient(x0+9,y-36,2,x0+9,y-36,46);g.addColorStop(0,'rgba(255,214,150,.35)');g.addColorStop(1,'rgba(255,214,150,0)');c.fillStyle=g;c.fillRect(x0-40,y-80,100,100);c.restore()}}});
+ /* nothing stands along the side walls (the player's 06:57): the table is the room's one big thing and the two
+    walkways beside it stay wide and empty — the sideboard under the window is the service furniture; the walls carry the
+    rest (panelling, brass, sconces, the print, the mirror). The wine cabinet, the two consoles and the coat stand are gone,
+    and nothing was put in their place. */
  /* the pendant over the table: a stepped brass frame with frosted glass (I–II); a tiered linear chandelier (III) */
  {const cx=200,cy=G.y0-8;const lit=d>.15||pdOccupied()||(R&&pdHeld());c.fillStyle=PDC.brassLo;c.fillRect(cx-.7,-TOP,1.4,TOP+cy-14);
   if(st<3){c.save();c.translate(cx,cy);c.scale(1.5,1.5);c.fillStyle=PDC.brass;c.beginPath();c.moveTo(-14,6);c.lineTo(14,6);c.lineTo(9,-6);c.lineTo(-9,-6);c.closePath();c.fill();c.fillStyle=lit?'#FCE7BC':'#E4DACA';c.beginPath();c.moveTo(-12,5);c.lineTo(12,5);c.lineTo(8,-4);c.lineTo(-8,-4);c.closePath();c.fill();c.fillStyle=PDC.brass;c.fillRect(-5,-12,10,6);c.fillRect(-16,6,32,1.6);for(const dx of[-6,0,6])c.fillRect(dx-.4,-4,.8,9);c.restore()}
@@ -4644,7 +4738,7 @@ function drawPdrRoom(c,now,dusk,V,X0,XW,TOP,list){const d=clamp(dusk,0,1);const 
   if(lit){c.save();c.globalCompositeOperation='lighter';let g=c.createRadialGradient(cx,cy+4,3,cx,cy+4,40);g.addColorStop(0,'rgba(255,220,160,.45)');g.addColorStop(1,'rgba(255,220,160,0)');c.fillStyle=g;c.fillRect(cx-40,cy-36,80,80);const ty=(G.y0+G.y1)/2;g=c.createRadialGradient(cx,ty,8,cx,ty,(G.y1-G.y0)*.75);g.addColorStop(0,'rgba(255,206,140,.26)');g.addColorStop(1,'rgba(255,206,140,0)');c.fillStyle=g;c.fillRect(cx-150,G.y0-60,300,G.y1-G.y0+120);c.restore()}}
  /* the door at the near end, standing open: two leaves of bronze and frosted glass either side of the way out */
  list.push({y:LH+2,f:()=>{for(const [x,dir] of[[164,-1],[236,1]]){const w=12,y0=LH-86;c.fillStyle='rgba(0,0,0,.25)';c.fillRect(x+(dir<0?-w-2:2),LH-6,w,6);c.fillStyle='#6E5434';c.fillRect(dir<0?x-w:x,y0,w,86);c.fillStyle='#8A6A3E';c.fillRect(dir<0?x-w:x,y0,w,2);c.fillStyle='rgba(222,214,198,.85)';c.fillRect((dir<0?x-w:x)+2.5,y0+8,w-5,50);c.fillStyle='rgba(255,255,255,.35)';c.fillRect((dir<0?x-w:x)+3,y0+10,1.4,44);c.fillStyle=PDC.brassHi;c.fillRect((dir<0?x-w:x)+(dir<0?w-4:2),y0+64,2,8)}
-  /* the way out, as on the arches' mats: down the stairs to the side room (05:23 — not to the floor's view) */c.font=`800 6.8px ${FONT}`;const lb='‹ 側廳';const w=c.measureText(lb).width+12;c.fillStyle='#2E2620';rr(c,200-w/2,LH-24,w,11,3);c.fill();c.fillStyle=PDC.brass;c.fillRect(200-w/2+2,LH-23,w-4,.7);c.fillStyle='#F3E6CC';c.textAlign='center';c.textBaseline='middle';c.fillText(lb,200,LH-18.2);c.textBaseline='alphabetic'}});
+  /* the way out, as on the arches' mats: onto the floor */c.font=`800 6.8px ${FONT}`;const lb='‹ 二樓';const w=c.measureText(lb).width+12;c.fillStyle='#2E2620';rr(c,200-w/2,LH-24,w,11,3);c.fill();c.fillStyle=PDC.brass;c.fillRect(200-w/2+2,LH-23,w-4,.7);c.fillStyle='#F3E6CC';c.textAlign='center';c.textBaseline='middle';c.fillText(lb,200,LH-18.2);c.textBaseline='alphabetic'}});
  /* the table itself is in the day's tables (buildTables), drawn by drawTableFull → drawPdrTable */}
 /* the long table, down the middle: ivory stone on walnut, upholstered chairs down both sides; the people face each
    other across it (the game never shows a back); the setting by phase; the plates where the people are */
@@ -4682,12 +4776,12 @@ function drawPdrTable(c,t,now){const st=Math.max(1,pdStage());const G=pdGeo();co
    room's first phase the main cost. ---- */
 const SR_PROJ=[null,
  {n:'員工休息室',sub:'有地方坐了',cost:160000,d:'二樓左邊、樓梯上來的內側，隔出一間有門的房間：米白的牆、淺色橡木地板，一張低低的燕麥色沙發和兩張單椅、象牙白地毯；窗下一張長桌和靠窗的長椅；一整面淺木置物櫃，和做進牆裡的小廚房——小冰箱、咖啡機、飲水、杯子。今晚施工，明天開門前完工。',done:'二樓左邊多了一面牆、一扇淺色的門，門上一塊小牌子：員工休息室。',jill:'先這樣。',unlock:['員工休息室（自己的分頁）']},
- {n:'員工休息室',sub:'開始像他們的地方',cost:70000,d:'同一間房，開始有他們的樣子：置物櫃寫上名字、每個人自己的杯子、沙發上的毯子和靠墊、冰箱門上的便條、長椅下多一排插座、一籃毯子和一盆植物。明天就在。',done:'置物櫃寫上了名字，杯子一個一個不一樣了，長椅下多了一排插座。',jill:'嗯。'},
- {n:'員工休息室',sub:'真的有人生活過',cost:90000,d:'用久了的樣子：桌上的花和桌巾、冰箱上的照片、長大的植物、沙發背上的毯子、一個坐墩、層架上的小喇叭、門邊的拖鞋。不是變豪華，是有人在這裡生活過。明天就在。',done:'桌上多了花，冰箱上多了照片，門邊有人放了拖鞋。',jill:'這樣可以。'}];
+ {n:'員工休息室',sub:'開始像他們的地方',cost:70000,d:'同一間房，開始有他們的樣子：中間多一張淺橡木的撞球台（菇色的檯呢；沙發那一區往門口挪一點，讓它有自己的位置）、置物櫃寫上名字、每個人自己的杯子、沙發上的毯子和靠墊、冰箱門上的便條、長椅下多一排插座、一籃毯子和一盆植物、櫃子格子裡幾盒桌遊和一副牌。明天就在。',done:'置物櫃寫上了名字，杯子一個一個不一樣了，中間多了一張撞球台。',jill:'嗯。'},
+ {n:'員工休息室',sub:'真的有人生活過',cost:90000,d:'用久了的樣子：靠門的角落一張淺石灰色的按摩椅、旁邊一張放書的小圓桌，桌上的花和桌巾、冰箱上的照片、長大的植物、沙發背上的毯子、一個坐墩、層架上的小喇叭、門邊的拖鞋。不是變豪華，是有人在這裡生活過。明天就在。',done:'角落多了一張按摩椅，冰箱上多了照片，門邊有人放了拖鞋。',jill:'這樣可以。'}];
 const PD_PROJ=[null,
- {n:'私人包廂',sub:'一桌人的地方',cost:240000,d:'二樓窗邊那一區隔出一間包廂：牆、可以關上的門；石材地板、一張從門口往窗邊延伸的石材長桌（6 位）、深綠牆板和黃銅線條、包覆的餐椅、一盞黃銅吊燈、邊櫃和一張服務台。4–6 位的訂位會自己進來，每組有整桌最低消費；沒有訂位的晚上，4 位以上的客人也可以直接坐。餐廳員工名額 +1。今晚施工，明天開門前完工。',done:'窗邊那一區有了深綠的牆和一扇門。裡面一張石材長桌，一盞黃銅吊燈。',jill:'好。',unlock:['私人包廂（自己的分頁）','4–6 位的包廂訂位','餐廳員工名額 +1']},
- {n:'私人包廂',sub:'慢慢吃',cost:120000,d:'同一間房更完整：長桌接長到 8 位、窗邊兩盞壁燈、牆板加上直紋、絲絨窗簾、牆上的畫、靠牆的小桌和燈、衣帽架、桌上的花和水杯。4–8 位都能訂，訂位也會多一些。明天就在。',done:'桌子長了一截，窗邊多了兩盞壁燈和深綠的窗簾。',jill:'嗯。',unlock:['4–8 位的包廂訂位']},
- {n:'私人包廂',sub:'熟悉的位置',cost:160000,d:'包廂做到最完整：最多坐 10 位、天花的格子、層疊的吊燈、酒櫃、拱形的鏡子、邊櫃換上石材檯面和一盞小燈、每天擺好的全套餐具和酒杯、蠟燭。4–10 位都能訂，成了固定會有人訂的房間。餐廳員工名額再 +1。明天就在。',done:'包廂可以坐到十個人了，桌上的餐具每天擺好，晚上點著蠟燭。',jill:'好。',unlock:['4–10 位的包廂訂位','餐廳員工名額 +1']}];
+ {n:'私人包廂',sub:'一桌人的地方',cost:240000,d:'二樓窗邊那一區隔出一間包廂：牆、可以關上的門；石材地板、一張從門口往窗邊延伸的石材長桌（6 位）、深綠牆板和黃銅線條、包覆的餐椅、一盞黃銅吊燈、窗下一座象牙白大理石檯面的邊櫃。4–6 位的訂位會自己進來，每組有整桌最低消費；沒有訂位的晚上，4 位以上的客人也可以直接坐。餐廳員工名額 +1。今晚施工，明天開門前完工。',done:'窗邊那一區有了深綠的牆和一扇門。裡面一張石材長桌，一盞黃銅吊燈。',jill:'好。',unlock:['私人包廂（自己的分頁）','4–6 位的包廂訂位','餐廳員工名額 +1']},
+ {n:'私人包廂',sub:'慢慢吃',cost:120000,d:'同一間房更完整：長桌接長到 8 位、窗邊兩盞壁燈、牆板加上直紋、絲絨窗簾、牆上的畫、桌上的花和水杯。4–8 位都能訂，訂位也會多一些。明天就在。',done:'桌子長了一截，窗邊多了兩盞壁燈和深綠的窗簾。',jill:'嗯。',unlock:['4–8 位的包廂訂位']},
+ {n:'私人包廂',sub:'熟悉的位置',cost:160000,d:'包廂做到最完整：最多坐 10 位、天花的格子、層疊的吊燈、拱形的鏡子、邊櫃上一盞小燈、每天擺好的全套餐具和酒杯、蠟燭。4–10 位都能訂，成了固定會有人訂的房間。餐廳員工名額再 +1。明天就在。',done:'包廂可以坐到十個人了，桌上的餐具每天擺好，晚上點著蠟燭。',jill:'好。',unlock:['4–10 位的包廂訂位','餐廳員工名額 +1']}];
 const SR_WAIT=[0,0,5,7],PD_WAIT=[0,0,6,8],PD_USES=[0,0,3,9];
 /* what is open to buy now, or why not yet */
 function srNext(){const s=srOf();if(!srOn())return fact('sr_story')?1:0;const st=srStage();if(st===0)return 0;return st<3?st+1:0}
@@ -4709,6 +4803,63 @@ function secUpRooms(money,btn){if(!upTaken())return'';let out='';
  if(sr){out+=`<p class="muted" style="font-size:12px;margin:8px 0 4px">員工休息室——《大家待的地方》之後的事。</p>`;for(let n=1;n<=3;n++){if(n>1&&srStage()<n-1&&srNext()!==n)continue;out+=roomPhaseCard('sr',n,money,btn)}}
  if(pd){out+=`<p class="muted" style="font-size:12px;margin:8px 0 4px">私人包廂——《關上門以後》之後的事。${pdBuilt()?`現在可訂 4–${pdMax()} 位。`:''}</p>`;for(let n=1;n<=3;n++){if(n>1&&pdStage()<n-1&&pdNext()!==n)continue;out+=roomPhaseCard('pd',n,money,btn)}}
  return`<div class="nm" style="font-weight:800;font-size:15px;margin:14px 0 2px">二樓的房間</div>`+out}
+/* ---- the floor plan (the player's 06:36): in 店舖工程 › 二樓, from the day the floor is leased and for good — a large
+   architectural plan of the whole floor as it is now: the floor plate and its walls, the street windows and the side
+   windows, the column, the stairs, each room's walls, door and name once it is built (hatched while it is being built),
+   and a quiet 「？」 on what nobody has decided about. Architecture only: no furniture, no people, no cats. It changes
+   with the building and stays when there is nothing left to build — the record of what the floor became. Its
+   geometry is the floor's own (UPR, UP_L, UP_ZONES), read at the phone's depth so the plan is the same on any screen.
+   Tap it: full screen. ---- */
+const UPP={W:400,H:532,dy:-62};   /* the plan's canvas: the floor's x as is, its depth y moved up by 62 */
+function upPlanGeo(){const L0=LH,F0=FB;LH=588;FB=LH-16;try{const c0=UP_L.col;return{plate:{x0:22,x1:378,y0:92,y1:FB},win:UP_L.win.map(w=>({x0:w.x,x1:w.x+w.w})),pil:{x0:UP_L.pil.x,x1:UP_L.pil.x+UP_L.pil.w},col:{x0:c0.x-11,x1:c0.x+11,y0:c0.base-22,y1:c0.base},stair:Object.assign({},UP_L.stair),entry:Object.assign({},UP_L.entry),pd:Object.assign({},UPR.pd),sr:Object.assign({},UPR.sr),pdDoor:Object.assign({},UPR.pdDoor),srDoor:Object.assign({},UPR.srDoor),und:Object.assign({},UP_ZONES.undecided)}}finally{LH=L0;FB=F0}}
+function upPlanState(){const st=k=>{const o=k==='sr'?srOf():pdOf();if(!o||o.done==null)return null;return S.day>=o.done?'built':'works'};return{sr:st('sr'),pd:st('pd')}}
+function upPlanCaption(){const u=S.up||{};const out=[];if(u.lease!=null)out.push(`第 ${u.lease} 天 租下整層`);
+ for(const [k,n] of[['sr','員工休息室'],['pd','私人包廂']]){const o=k==='sr'?srOf():pdOf();if(!o||o.done==null)continue;out.push(S.day>=o.done?`第 ${o.done} 天 ${n}`:`${n} 施工中（第 ${o.done} 天完工）`)}return out.join('　·　')}
+function upPlanCard(){return`<button class="upplan" data-act="upPlanBig" aria-label="二樓平面圖，點一下放大"><span class="upplan-h"><b>二樓平面圖</b><small>點一下放大</small></span><canvas id="upPlanCv" width="400" height="532"></canvas><span class="upplan-cap">${upPlanCaption()}</span></button>`}
+function upPlanPaint(){const cv=document.getElementById('upPlanCv');if(cv)upPlanFit(cv,Math.min(440,cv.parentElement?cv.parentElement.clientWidth-16:340),9999)}   /* the whole width on a phone; on a desktop no taller than the screen (full screen is a tap away) */
+function upPlanFit(cv,maxW,maxH){const k=Math.max(.3,Math.min(maxW/UPP.W,maxH/UPP.H));const w=Math.round(UPP.W*k),h=Math.round(UPP.H*k);const dpr=Math.min(3,window.devicePixelRatio||1);cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);cv.style.width=w+'px';cv.style.height=h+'px';const c=cv.getContext('2d');c.setTransform(k*dpr,0,0,k*dpr,0,0);drawUpPlan(c)}
+function upPlanBig(){let el=document.getElementById('upPlanBig');if(!el){el=document.createElement('div');el.id='upPlanBig';document.body.appendChild(el);el.addEventListener('click',()=>{el.hidden=true;el.innerHTML=''})}
+ el.innerHTML=`<div class="upplan-bh"><b>二樓平面圖</b><span>${upPlanCaption()}</span></div><canvas></canvas><button class="btn sm">關閉</button>`;el.hidden=false;const cv=el.querySelector('canvas');upPlanFit(cv,window.innerWidth-20,window.innerHeight-130)}
+function drawUpPlan(c){const g=upPlanGeo();const P=g.plate,st=upPlanState();const Y=y=>y+UPP.dy;
+ const WALL='#4A3F36',IN='#5C5047',INK='#3E342C',SOFT='#9C8E80',GLASS='#7E98A8';
+ /* the paper */c.fillStyle='#F8F3EA';c.fillRect(0,0,UPP.W,UPP.H);c.strokeStyle='rgba(150,130,100,.07)';c.lineWidth=1;for(let x=10;x<UPP.W;x+=20){c.beginPath();c.moveTo(x,0);c.lineTo(x,UPP.H);c.stroke()}for(let y=10;y<UPP.H;y+=20){c.beginPath();c.moveTo(0,y);c.lineTo(UPP.W,y);c.stroke()}
+ /* the floor: boards running into the room, very faint */c.fillStyle='#F1E8D8';c.fillRect(P.x0,Y(P.y0),P.x1-P.x0,P.y1-P.y0);c.strokeStyle='rgba(150,120,80,.07)';c.lineWidth=.8;for(let x=P.x0+12;x<P.x1;x+=12){c.beginPath();c.moveTo(x,Y(P.y0));c.lineTo(x,Y(P.y1));c.stroke()}
+ /* the rooms: their footprints, tinted (the Staff Room pale oak, the Private Dining Room its green); hatched while they are being built */
+ const room=(B,tint,k)=>{if(!st[k])return;const x=B.x0,y=Y(B.y0),w=B.x1-B.x0,h=B.y1-B.y0;if(st[k]==='built'){c.fillStyle=tint;c.fillRect(x,y,w,h)}else{c.fillStyle='rgba(201,169,122,.14)';c.fillRect(x,y,w,h);c.save();c.beginPath();c.rect(x,y,w,h);c.clip();c.strokeStyle='rgba(176,140,90,.42)';c.lineWidth=1;for(let q=-h;q<w;q+=9){c.beginPath();c.moveTo(x+q,y+h);c.lineTo(x+q+h,y);c.stroke()}c.restore()}};
+ room(g.pd,'#E1E6D8','pd');room(g.sr,'#F0E2CB','sr');
+ /* what nobody has decided about yet: a quiet 「？」 — no outline, no name */
+ const q=(x,y,sz)=>{c.font=`700 ${sz}px ${DFONT}`;c.textAlign='center';c.textBaseline='middle';c.fillStyle='rgba(140,124,106,.62)';c.fillText('？',x,y)};
+ if(!st.sr&&!st.pd)q((P.x0+228)/2,Y((g.pd.y0+g.und.y+g.und.h)/2),46);
+ else{if(!st.pd)q((g.pd.x0+g.pd.x1)/2,Y((g.pd.y0+g.pd.y1)/2),34);if(!st.sr)q((g.sr.x0+g.sr.x1)/2,Y((g.sr.y0+g.sr.y1)/2),34);q(g.und.x+g.und.w/2,Y(g.und.y+g.und.h/2),40)}
+ /* the stairs: the well, the treads (the near end is the way in, the far end the deep end), the wall on the right, the
+    railing round the opening, the way down */
+ {const s=g.stair;const x0=s.x,x1=s.x+s.w,y0=Y(s.y),y1=Y(s.y+s.h);c.fillStyle='#E9E0D0';c.fillRect(x0,y0,x1-x0,y1-y0);c.strokeStyle=SOFT;c.lineWidth=1;for(let i=0;i<=9;i++){const yy=y0+8+i*15;c.beginPath();c.moveTo(x0+8,yy);c.lineTo(x1-22,yy);c.stroke()}
+  c.fillStyle=IN;c.fillRect(x1-22,y0,22,y1-y0);c.strokeStyle=IN;c.lineWidth=1.4;c.strokeRect(x0+.7,y0+.7,x1-x0-1.4,y1-y0-1.4);
+  c.strokeStyle=WALL;c.lineWidth=2.4;c.beginPath();c.moveTo(x1-22,y0-1);c.lineTo(x0-1,y0-1);c.lineTo(x0-1,y0+88);c.stroke();
+  const ax=(x0+x1-22)/2;c.strokeStyle='#7A6D60';c.lineWidth=1.6;c.beginPath();c.moveTo(ax,y1-8);c.lineTo(ax,y0+18);c.stroke();c.fillStyle='#7A6D60';c.beginPath();c.moveTo(ax,y0+11);c.lineTo(ax-5,y0+20);c.lineTo(ax+5,y0+20);c.closePath();c.fill();
+  c.fillStyle='#F8F3EA';rr(c,ax-19,(y0+y1)/2-9,38,18,4);c.fill();c.font=`800 12px ${FONT}`;c.textAlign='center';c.textBaseline='middle';c.fillStyle=INK;c.fillText('樓梯',ax,(y0+y1)/2+.5)}
+ /* the column */c.fillStyle=IN;c.fillRect(g.col.x0,Y(g.col.y0),g.col.x1-g.col.x0,g.col.y1-g.col.y0);c.fillStyle='rgba(255,255,255,.18)';c.fillRect(g.col.x0+2,Y(g.col.y0)+2,g.col.x1-g.col.x0-4,2);
+ /* the walls round the floor: the street wall with its two big windows and the pilaster between them, the side wall
+    with its two windows by the open corner, the far side and the near side solid */
+ const T=7;c.fillStyle=WALL;
+ const top=Y(P.y0)-T;let xs=P.x0-T;for(const w of g.win){c.fillRect(xs,top,w.x0-xs,T);xs=w.x1}c.fillRect(xs,top,P.x1+T-xs,T);
+ for(const w of g.win){c.fillStyle='#E4EDF1';c.fillRect(w.x0,top,w.x1-w.x0,T);c.strokeStyle=GLASS;c.lineWidth=1.3;for(const yy of[top+1.6,top+T-1.6]){c.beginPath();c.moveTo(w.x0,yy);c.lineTo(w.x1,yy);c.stroke()}c.lineWidth=.9;c.beginPath();c.moveTo(w.x0,top+T/2);c.lineTo(w.x1,top+T/2);c.stroke();c.fillStyle=WALL;for(let k=1;k<5;k++){const xx=w.x0+k*(w.x1-w.x0)/5;c.fillRect(xx-.6,top,1.2,T)}}
+ c.fillStyle=WALL;c.fillRect(g.pil.x0,Y(P.y0),g.pil.x1-g.pil.x0,6);
+ const sw=[[Y(g.und.y)+14,Y(g.und.y)+62],[Y(g.und.y)+80,Y(g.und.y)+128]];let ys=top;for(const [a,b] of sw){c.fillRect(P.x0-T,ys,T,a-ys);ys=b}c.fillRect(P.x0-T,ys,T,Y(P.y1)+T-ys);
+ for(const [a,b] of sw){c.fillStyle='#E4EDF1';c.fillRect(P.x0-T,a,T,b-a);c.strokeStyle=GLASS;c.lineWidth=1.3;for(const xx of[P.x0-T+1.6,P.x0-1.6]){c.beginPath();c.moveTo(xx,a);c.lineTo(xx,b);c.stroke()}c.lineWidth=.9;c.beginPath();c.moveTo(P.x0-T/2,a);c.lineTo(P.x0-T/2,b);c.stroke()}
+ c.fillStyle=WALL;c.fillRect(P.x1,top,T,Y(P.y1)+T-top);c.fillRect(P.x0-T,Y(P.y1),P.x1-P.x0+2*T,T);
+ /* each room's own walls, its door (the gap, the leaf, the swing) and its name */
+ const door=(x,y,w)=>{c.strokeStyle=IN;c.lineWidth=1.3;c.beginPath();c.moveTo(x,y);c.lineTo(x,y-w);c.stroke();c.strokeStyle='rgba(92,80,71,.55)';c.lineWidth=.9;c.setLineDash([3,2]);c.beginPath();c.arc(x,y,w,-Math.PI/2,0);c.stroke();c.setLineDash([])};
+ const walls=(B,D,k)=>{if(!st[k])return;const built=st[k]==='built';const x0=B.x0,x1=B.x1,y0=Y(B.y0),y1=Y(B.y1),dw=24,dx0=D.x-dw/2;c.strokeStyle=IN;c.lineWidth=4;if(!built){c.setLineDash([6,4]);c.lineWidth=2.4}
+  c.beginPath();if(k==='sr'){c.moveTo(x0,y0);c.lineTo(x1,y0)}c.moveTo(x1,y0);c.lineTo(x1,y1);c.stroke();
+  c.beginPath();c.moveTo(x0,y1);c.lineTo(built?dx0:x1,y1);if(built){c.moveTo(dx0+dw,y1);c.lineTo(x1+2,y1)}c.stroke();c.setLineDash([]);if(built)door(dx0,y1,dw)};
+ walls(g.pd,g.pdDoor,'pd');walls(g.sr,g.srDoor,'sr');
+ const label=(B,n,k)=>{if(!st[k])return;const o=k==='sr'?srOf():pdOf();const cx=(B.x0+B.x1)/2,cy=Y((B.y0+B.y1)/2);c.textAlign='center';c.textBaseline='middle';
+  if(st[k]==='works'){c.font=`800 13px ${FONT}`;c.fillStyle='rgba(62,52,44,.75)';c.fillText(n,cx,cy-9);c.font=`800 11px ${FONT}`;const tw=c.measureText('施工中').width+12;c.fillStyle='#C99A45';rr(c,cx-tw/2,cy+2,tw,15,3);c.fill();c.fillStyle='#2A1C10';c.fillText('施工中',cx,cy+10);return}
+  c.font=`800 15px ${FONT}`;c.fillStyle=INK;c.fillText(n,cx,cy-(o&&o.done===S.day?6:0));if(o&&o.done===S.day){c.font=`800 10px ${FONT}`;const tw=c.measureText('今天完工').width+10;c.fillStyle='rgba(201,154,69,.9)';rr(c,cx-tw/2,cy+5,tw,13,3);c.fill();c.fillStyle='#2A1C10';c.fillText('今天完工',cx,cy+12)}};
+ label(g.pd,'私人包廂','pd');label(g.sr,'員工休息室','sr');
+ /* which side is the street */c.font=`700 10.5px ${FONT}`;c.textAlign='center';c.textBaseline='middle';c.fillStyle='rgba(92,80,71,.7)';c.fillText('臨街的窗',(g.win[0].x0+g.win[1].x1)/2,Y(P.y0)-T-9);
+ c.textBaseline='alphabetic';c.textAlign='left'}
 /* the offer after the story beat, like the floor's: plan it, or later — it stays in 店舖工程 either way */
 function roomOffer(kind){paused=!!R;sub='roomoffer';const sr=kind==='sr';
  show(`<div class="modal"><div class="eyebrow">新企劃</div><h2>${sr?'員工休息室':'私人包廂'}</h2><p>${sr?'二樓左邊、樓梯上來的內側那一塊，隔一間有門的房間，給每天在這裡工作的人。':'二樓窗邊那一區，隔一間可以關上門的包廂：一張長桌，給一桌人自己的地方。'}</p><div class="stack"><button class="btn primary" data-act="roomGo" data-k="${kind}|plan">開始規劃 <small>會出現在「店舖工程」</small></button><button class="btn" data-act="roomGo" data-k="${kind}|later">之後再說 <small>不會不見——工程頁隨時找得到</small></button></div></div>`,'dim')}
@@ -4799,7 +4950,7 @@ function pdStoryDay(){if(!pdBuilt()||fact('pd_back')||!fact('pd_yj'))return;cons
 const SR_LINE_GAP=2;   /* days between the room's small first-time moments */
 function srHere(m){return !!m&&crewHere(m)&&(S.crew||[]).includes(m)}
 function srFreeSpot(pref){const used=new Set(srPeople().map(p=>p.spotK).filter(Boolean));for(const w of R.srw||[])if(w.spot)used.add(w.spot.k);for(const id in R.cw||{}){const w=R.cw[id];if(w.srSpot&&w.task&&w.task.sr)used.add(w.srSpot.k)}
- const all=srSpots();if(pref){const p=all.find(s=>s.k===pref&&!used.has(s.k));if(p)return p}const seats=all.filter(s=>!s.stand&&!used.has(s.k));const pool=seats.length?seats:all.filter(s=>!used.has(s.k));if(!pool.length)return null;return pool[hash('srsp|'+S.day+'|'+used.size)%pool.length]}
+ const all=srSpots();if(pref){const p=all.find(s=>s.k===pref&&!used.has(s.k));if(p)return p}const seats=all.filter(s=>!s.stand&&!s.rec&&!used.has(s.k));const pool=seats.length?seats:all.filter(s=>!s.rec&&!used.has(s.k));if(!pool.length)return null;return pool[hash('srsp|'+S.day+'|'+used.size)%pool.length]}
 function srPrefOf(m){if(m.name==='阿德師傅'&&srStage()>=2)return'lc0';if(m.name==='Hugo'&&srStage()>=2)return'fridge';if(m.name==='小彤'&&srTrace('cup'))return'stool';return null}
 function srCount(m){const s=srW();s.cnt=s.cnt||{};s.cnt[m.name]=(s.cnt[m.name]||0)+1;return s.cnt[m.name]}
 /* a floor crew member up to the room for a while: the walk-over's task, to a spot in another room */
@@ -4811,6 +4962,8 @@ function srWalk(m,from,spot,at){(R.srw=R.srw||[]).push({m,room:from.room,x:from.
 function srArrive(m){/* first-time moments and quiet habits, once each */const st=srStage();const n=srCount(m);const w=R.cw&&R.cw[m.id];const sw=srWalker(m.id);
  if(m.name==='小彤'&&st>=2&&n>=4&&!srTrace('cup'))srTraceSet('cup');if(m.name==='阿德師傅'&&st>=2&&n>=3&&!srTrace('seat'))srTraceSet('seat');
  const hold=m.name==='小彤'&&srTrace('cup')?'mug':(hash('srh|'+S.day+'|'+m.id)%3===0?'phone':null);if(w)w.srHold=hold;if(sw)sw.hold=hold;
+ /* someone asleep in the massage chair: whoever comes in may say so, once an evening (06:43) */
+ if(R&&!R.srMassSaid&&R.srMassAt){const z=Object.keys(R.srMassAt).find(id=>id!==m.id&&R.srMassAt[id]>4);if(z&&hash('srms|'+S.day)%100<60){R.srMassSaid=1;srSay(m,hash('srms2|'+S.day)%2?'睡著了？':'真的睡著了。',.9)}}
  const f0=fact('sr_first');if(!f0||f0.d===S.day||R.srSaid===S.day)return;const lastLine=(srOf().line||-99);if(S.day-lastLine<SR_LINE_GAP)return;
  const said=k=>{factSet(k);srW().line=S.day;R.srSaid=S.day};const inRoom=n0=>srPeople().find(p=>p.m.name===n0);
  if(m.name==='阿珠姐'&&st===1&&!fact('sr_plug')){said('sr_plug');srTraceSet('plug');sayS(m,'插座不夠。',800);return}
@@ -4832,9 +4985,13 @@ function srLifeUpd(dt){if(!R||phase!=='service'||!srBuilt())return;
   const F=(S.crew||[]).filter(m=>(m.role==='waiter'||m.role==='cleaner')&&srHere(m)&&R.cw[m.id]&&!R.cw[m.id].task&&!R.cw[m.id].next&&!R.cw[m.id].arriving&&!R.cw[m.id].leaving);   /* nothing in hand (the idle wait between looks is not work) */
   const quiet=queued().length===0&&R.tables.filter(t=>t.group&&(t.group.state==='order'||t.group.state==='check'||t.group.pat<.35)).length<=1;
   if(quiet&&F.length>=3&&(R.srBreaks||0)<2&&R.t>R.dur*.12&&R.t<R.dur*.85&&!Object.values(R.cw||{}).some(w=>w.task&&w.task.sr)){
-   if(hash('srbr|'+S.day+'|'+Math.floor(R.t/8))%100<30){const m=F[hash('srbm|'+S.day+'|'+Math.floor(R.t))%F.length];if(srSend(m,10+hash('srbd|'+S.day)%5)){R.srBreaks=(R.srBreaks||0)+1;R.srT=60}}}}
+   if(hash('srbr|'+S.day+'|'+Math.floor(R.t/8))%100<30){const m=F[hash('srbm|'+S.day+'|'+Math.floor(R.t))%F.length];const ms=srStage()>=3&&hash('srbm2|'+S.day+'|'+Math.floor(R.t))%3===0?srMassFree():null;if(srSend(m,10+hash('srbd|'+S.day)%5,ms||undefined)){R.srBreaks=(R.srBreaks||0)+1;R.srT=60}}}}
+ /* the pool table's frame at closing, the massage chair's sleepers, the words said up here (06:43) */
+ if(R.srPool&&R.closing!=null)srPoolUpd(dt);
+ {const MA=R.srMassAt=R.srMassAt||{};const seen={};for(const p of srPeople())if(p.spotK==='mass'){MA[p.m.id]=(MA[p.m.id]||0)+dt;seen[p.m.id]=1}for(const id in MA)if(!seen[id])delete MA[id]}
+ if(R.srSay&&R.srSay.length){for(const s0 of R.srSay)s0.t+=dt;R.srSay=R.srSay.filter(s0=>s0.t<s0.life)}
  /* the walkers: up from the kitchen or the bar, to a spot, and sit */
- for(const w of R.srw||[]){if(R.closing==null||R.closing<w.at)continue;if(!w.arr){if(stepTo(w,105*dt)){w.arr=1;w.moving=false;w.face=w.spot.face||1;srArrive(w.m);if(w.m.name==='Hugo'&&srStage()>=2&&w.spot.k==='fridge')w.fr={t:0}}else{w.moving=true;w.step+=dt*11}}
+ for(const w of R.srw||[]){if(R.closing==null||R.closing<w.at)continue;if(!w.arr){if(stepTo(w,105*dt)){w.arr=1;w.moving=false;w.face=w.spot.face||1;if(!w.re)srArrive(w.m);if(w.m.name==='Hugo'&&srStage()>=2&&w.spot.k==='fridge')w.fr={t:0}}else{w.moving=true;w.step+=dt*11}}
   else if(w.fr){w.fr.t+=dt;const t=w.fr.t;if(t>2&&t<2.6){w.x=w.spot.x-10;w.face=-1}else if(t>=2.6&&t<3.4){w.x=w.spot.x;w.face=1}if(t>6){w.fr=null;const sp=srFreeSpot(null);if(sp&&!sp.stand){w.spot=sp;w.tx=sp.x;w.ty=sp.y;w.arr=0}}}}
  for(const id in R.cw||{}){const w=R.cw[id];if(w.room==='staff'&&w.task&&w.task.sr&&w.task.fired&&w.srSpot&&w.srSpot.k==='fridge'&&srStage()>=2){if(!w.fr)w.fr={t:0};w.fr.t+=dt}}
  /* the first evening: Jill goes up to see it; the newest of them is standing, not sure she may sit */
@@ -4848,13 +5005,42 @@ function srClosingPlan(){if(!srBuilt()||!R||upNight()||(R.upAsk&&!R.upAsk.end))r
  const wantN=k=>['阿珠姐','阿德師傅','Hugo','小彤','秀琴阿姨','Nina'].includes(k);
  const cookN=Math.min(cooks.length,2+(st>=2?1:0)),floorN=Math.min(floor.length,2+(st>=3?1:0));
  const C=pick(cooks.filter(m=>wantN(m.name)),cookN).concat(pick(cooks.filter(m=>!wantN(m.name)),cookN)).slice(0,cookN);const F=pick(floor.filter(m=>wantN(m.name)),floorN).concat(pick(floor.filter(m=>!wantN(m.name)),floorN)).slice(0,floorN);const B=pick(bars,hash('srbar|'+S.day)%2);
- let at=4;for(const m of C){const sp=srFreeSpotPlanned(srPrefOf(m));if(!sp)break;srWalk(m,{room:'kitchen',x:KR.door.x+(hash(m.id)%30)-15,y:KR.door.y-10},sp,at);at+=3+hash('srat|'+m.id)%5}
- for(const m of B){const sp=srFreeSpotPlanned(null);if(!sp)break;srWalk(m,{room:'lounge',x:LG.door.x,y:LG.door.y},sp,at);at+=4}
- R.srPlan=F.map((m,i)=>({m,at:6+i*5}));
+ const recK=srRecPlan(C.concat(B,F),st);const recSp=m=>recK[m.id]?srSpotK(recK[m.id]):null;
+ let at=4;for(const m of C){const sp=recSp(m)||srFreeSpotPlanned(srPrefOf(m));if(!sp)break;srWalk(m,{room:'kitchen',x:KR.door.x+(hash(m.id)%30)-15,y:KR.door.y-10},sp,at);at+=3+hash('srat|'+m.id)%5}
+ for(const m of B){const sp=recSp(m)||srFreeSpotPlanned(null);if(!sp)break;srWalk(m,{room:'lounge',x:LG.door.x,y:LG.door.y},sp,at);at+=4}
+ R.srPlan=F.map((m,i)=>({m,at:6+i*5,spot:recSp(m)}));
  /* AO: not everyone goes in — one of the floor stays out by the big window a while, the open floor still lived on */
  {const rest=floor.filter(m=>!F.includes(m));const m=rest.length?rest[hash('upwin|'+S.day)%rest.length]:null;if(m&&upHas('table'))R.srPlan.push({m,at:9,out:1})}}
-function srFreeSpotPlanned(pref){const used=new Set((R.srw||[]).map(w=>w.spot.k));const all=srSpots();if(pref){const p=all.find(s=>s.k===pref&&!used.has(s.k));if(p)return p}const seats=all.filter(s=>!s.stand&&!used.has(s.k));return seats.length?seats[hash('srp|'+S.day+'|'+used.size)%seats.length]:null}
-function srClosingUpd(dt){if(!R||!R.srPlan||R.closing==null)return;for(const p of R.srPlan){if(p.done||R.closing<p.at)continue;p.done=1;if(R.srFirst&&R.srFirst.who===p.m.id)continue;if(p.out){upWindowSend(p.m);continue}srSend(p.m,1e9)}
+function srFreeSpotPlanned(pref){const used=new Set((R.srw||[]).map(w=>w.spot.k));const all=srSpots();if(pref){const p=all.find(s=>s.k===pref&&!used.has(s.k));if(p)return p}const seats=all.filter(s=>!s.stand&&!s.rec&&!used.has(s.k));return seats.length?seats[hash('srp|'+S.day+'|'+used.size)%seats.length]:null}
+/* ---- the pool table and the massage chair in use (06:43): now and then, never a game to play and never a number. At
+   closing on about a third of the evenings (Phase II on), two of the people going up play a frame — a shot every few
+   seconds, the other waiting with the cue, sometimes a third watching from behind the table; a word or two; then they
+   sit down like everyone else. From Phase III someone often takes the massage chair at closing (now and then on a
+   break too) and falls asleep in it; whoever comes in may say something. Runtime only: nothing here is saved. ---- */
+function srRecPlan(all,st){const out={};R.srPool=null;R.srMassAt={};R.srMassSaid=0;R.srSay=[];if(st<2||all.length<2)return out;
+ const ord=all.slice().sort((a,b)=>(hash('srrec|'+S.day+'|'+a.id)%997)-(hash('srrec|'+S.day+'|'+b.id)%997));
+ if(hash('srpool|'+S.day)%100<36){const w=ord.length>=4&&hash('srpw|'+S.day)%100<40?ord[2]:null;out[ord[0].id]='pool0';out[ord[1].id]='pool1';if(w)out[w.id]='poolw';
+  R.srPool={a:ord[0].id,b:ord[1].id,w:w?w.id:null,st:0,t:0,shot:0,n:4+hash('srpn|'+S.day)%3,turn:0,stroke:0,wait:0,lerp:1,balls:null,from:null}}
+ if(st>=3&&hash('srmass|'+S.day)%100<45){const m=ord.find(x=>!out[x.id]);if(m)out[m.id]='mass'}
+ return out}
+function srMassFree(){const sp=srSpotK('mass');if(!sp||!R)return null;if(srPeople().some(p=>p.spotK==='mass'))return null;for(const id in R.cw||{}){const w=R.cw[id];if(w.srSpot&&w.srSpot.k==='mass'&&w.task&&w.task.sr)return null}for(const w of R.srw||[])if(w.spot&&w.spot.k==='mass')return null;return sp}
+function srReseat(m,sp){if(!sp||!R||!m)return false;const sw=srWalker(m.id);if(sw){sw.spot=sp;sw.tx=sp.x;sw.ty=sp.y;sw.arr=0;sw.re=1;return true}
+ const w=R.cw&&R.cw[m.id];if(w&&w.task&&w.task.sr){w.srSpot=sp;Object.assign(w.task,{x:sp.x,y:sp.y,t:{x:sp.x+(sp.face||1)*10,y:sp.y-22,room:'staff'},fired:0,then:null});return true}return false}
+function srPoolUpd(dt){const Q=R.srPool;if(!Q||Q.st===2)return;Q.t+=dt;if(Q.lerp<1)Q.lerp=Math.min(1,Q.lerp+dt/.8);
+ const P=srPeople();const A=P.find(o=>o.m.id===Q.a&&o.spotK==='pool0'),B=P.find(o=>o.m.id===Q.b&&o.spotK==='pool1');
+ if(Q.st===0){if(A&&B){Q.st=1;Q.t=0;Q.wait=2.4;Q.balls=srPoolRack();Q.from=null;Q.lerp=1;if(hash('srpl|'+S.day)%3!==2){srSay(A.m,'打一局？',.2);srSay(B.m,'來。',1.5)}}else if(Q.t>50)srPoolStop(Q);return}
+ if(!A||!B){srPoolStop(Q);return}
+ if(Q.stroke>0){Q.stroke-=dt;if(Q.stroke<=0)srPoolShot(Q);return}
+ Q.wait-=dt;if(Q.wait>0)return;
+ if(Q.shot>=Q.n){Q.st=2;const L=hash('srpe|'+S.day)%3;if(L===0){srSay(A.m,'再一局？',.1);srSay(B.m,'明天吧。',1.4)}else if(L===1)srSay(Q.turn===0?B.m:A.m,'好球。',.2);later(()=>{if(R&&R.srPool===Q)srPoolStop(Q)},2800);return}
+ Q.stroke=1.3}
+function srPoolShot(Q){Q.shot++;const r=rng(hash('srps|'+S.day+'|'+Q.shot));Q.from=Q.balls.map(b=>({u:b.u,v:b.v}));const live=Q.balls.filter((b,i)=>i>0&&!b.gone);
+ const tgt=live.length?live[Math.floor(r()*live.length)]:null;let pot=false;
+ if(tgt){pot=r()<.45;if(pot){const pk=[[0,0],[.5,0],[1,0],[0,1],[.5,1],[1,1]][Math.floor(r()*6)];tgt.u=pk[0];tgt.v=pk[1];tgt.gone=1}else{tgt.u=.08+r()*.84;tgt.v=.1+r()*.8}
+  if(r()<.5){const o=live.filter(b=>b!==tgt&&!b.gone);if(o.length){const b=o[Math.floor(r()*o.length)];b.u=clamp(b.u+(r()-.5)*.3,.06,.94);b.v=clamp(b.v+(r()-.5)*.5,.08,.92)}}}
+ if(!pot)Q.turn=1-Q.turn;const cb=Q.balls[0];cb.u=Q.turn===0?.12+r()*.28:.6+r()*.28;cb.v=.15+r()*.7;Q.lerp=0;Q.wait=3+r()*2.4}
+function srPoolStop(Q){Q.st=2;if(Q.balls)R.srPoolLeft=Q.balls.filter(b=>!b.gone).map(b=>({u:b.u,v:b.v,c:b.c}));for(const id of[Q.a,Q.b,Q.w]){if(!id)continue;const m=(S.crew||[]).find(x=>x.id===id);const p=m&&srPeople().find(o=>o.m.id===id);if(p&&p.spotK&&p.spotK.indexOf('pool')===0)srReseat(m,srFreeSpot(null))}if(R.srPool===Q)R.srPool=null}
+function srClosingUpd(dt){if(!R||!R.srPlan||R.closing==null)return;for(const p of R.srPlan){if(p.done||R.closing<p.at)continue;p.done=1;if(R.srFirst&&R.srFirst.who===p.m.id)continue;if(p.out){upWindowSend(p.m);continue}srSend(p.m,1e9,p.spot||undefined)}
  if(!fact('sr_first')&&!R.srFirst&&R.closing>8&&!DLG)srFirstStart()}
 /* 「坐啊。」「喔，好。」 — the first evening the room is there */
 function srFirstStart(){const F=(S.crew||[]).filter(m=>(m.role==='waiter'||m.role==='cleaner')&&srHere(m)&&R.cw&&R.cw[m.id]);const who=F.find(m=>m.name==='小彤')||F.slice().sort((a,b)=>TENURE_RANK[tenure(a)]-TENURE_RANK[tenure(b)]||((a.days||0)-(b.days||0)))[0];
@@ -5938,9 +6124,8 @@ function roomTap(p,e){e.preventDefault();audioInit();
   if(p.y>LH-70&&Math.abs(p.x-200)<60){setRoom('main');return true}return false}
  if(room==='side'){const a=SIDE_L.arch;if(p.x>=a.x-8&&p.x<=a.x+a.w+8&&p.y>=a.y-6&&p.y<=a.y+112){setRoom('main');return true}}
  if(room==='front'){if(Math.abs(p.x-FR.door.x)<30&&p.y>176&&p.y<276){setRoom('main');return true}}
- /* v2.4 rc6: when the floor is shown (a story, 店舖工程, a reveal) its doors open the rooms; inside a room the door goes
-    down the stairs to the side room, like the kitchen's door to the dining room — never to the floor's view (05:23) */if(room==='up'){const inB=(B,m)=>p.x>=B.x0-m&&p.x<=B.x1+UPRW.sd+m&&p.y>=B.y0-UPRW.h-m&&p.y<=B.y1+m;if(UPV==='reveal'){upRevealSkip();return true}if(srBuilt()&&inB(UPR.sr,4)){setRoom('staff');return true}if(pdBuilt()&&inB(UPR.pd,4)){setRoom('pdr');return true}}
- if((room==='staff'&&srDoorHit(p))||(room==='pdr'&&Math.abs(p.x-PDL.door.x)<46&&p.y>LH-56)){setRoom('side');return true}
+ /* v2.4 rc6: on the floor its doors open the rooms; inside a room its door goes back out onto the floor (06:36) */if(room==='up'){const inB=(B,m)=>p.x>=B.x0-m&&p.x<=B.x1+UPRW.sd+m&&p.y>=B.y0-UPRW.h-m&&p.y<=B.y1+m;if(UPV==='reveal'){upRevealSkip();return true}if(srBuilt()&&inB(UPR.sr,4)){setRoom('staff');return true}if(pdBuilt()&&inB(UPR.pd,4)){setRoom('pdr');return true}}
+ if((room==='staff'&&srDoorHit(p))||(room==='pdr'&&Math.abs(p.x-PDL.door.x)<46&&p.y>LH-56)){setRoom('up');return true}
  const rg=hitRegular(p);if(rg&&!paused){showRegCard(rg);return true}
  if(!R||paused||phase!=='service')return false;let best=null,bd=1e9;for(const t of R.tables){if((t.room||'main')!==room)continue;const d=t.pdr?(pdHit(p)?0:1e9):Math.hypot((p.x-t.x)*.85,p.y-(t.y-16));const lim=t.pdr?60:t.seats===4?46:40;if(d<lim&&d<bd){bd=d;best=t}}
  if(best){tapTable(best);return true}return false}
@@ -5964,12 +6149,12 @@ const G_STATES=['arrive','queue','toTable','reading','order','wait','eat','check
 function snapshotService(){if(!R||phase!=='service'||R.closing!=null||R.ended)return null;
  const ti=t=>t?R.tickets.indexOf(t):-1;
  const ir=it=>{if(!it)return null;for(let a=0;a<R.tickets.length;a++){const k=R.tickets[a].items.indexOf(it);if(k>=0)return[a,k]}return null};
- const groups=R.groups.filter(g=>!g.gone).map(g=>{const o={};for(const k in g)if(!['ticket','wcat','lookCat','claim','gone'].includes(k))o[k]=g[k];o.ticket=ti(g.ticket);o.claim=g.claim||null;return o});
+ const groups=R.groups.filter(g=>!g.gone).map(g=>{const o={};for(const k in g)if(!['ticket','wcat','lookCat','claim','gone','__op'].includes(k))o[k]=g[k];o.ticket=ti(g.ticket);o.claim=g.claim||null;return o});
  const gi2=g=>g?groups.findIndex(o=>o.id===g.id):-1;
  const tickets=R.tickets.map(tk=>{const o={};for(const k in tk)if(k!=='g'&&k!=='items')o[k]=tk[k];o.g=gi2(tk.g);o.items=tk.items.map(i=>Object.assign({},i));o.claim=tk.claim||null;return o});
  const slots=R.slots.map(s0=>{const o={broken:!!s0.broken,fix:s0.fix||0,job:null};if(s0.job){const j=s0.job;const jo={};for(const k in j)if(k!=='tk'&&k!=='it')jo[k]=j[k];jo.tk=ti(j.tk);jo.it=ir(j.it);o.job=jo}return o});
- const J=R.jill;const jill={};for(const k in J)if(!['carry','cur','pet','lookAt','rest','restPos','sofa','visit'].includes(k))jill[k]=J[k];jill.carry=J.carry.map(c=>({tk:ti(c.tk),it:ir(c.it)}));jill.cur=J.cur?Object.assign({},J.cur):null;
- const cw={};for(const id in R.cw||{}){const w=R.cw[id];const o={};for(const k in w)if(k!=='task'&&k!=='carry')o[k]=w[k];o.task=w.task?Object.assign({},w.task,{g:gi2(w.task.g),t:w.task.t?w.task.t.i:-1,tk:ti(w.task.tk)}):null;o.carry=w.carry?w.carry.map(ir):null;cw[id]=o}
+ const J=R.jill;const jill={};for(const k in J)if(!['carry','cur','pet','lookAt','rest','restPos','sofa','visit','__op'].includes(k))jill[k]=J[k];jill.carry=J.carry.map(c=>({tk:ti(c.tk),it:ir(c.it)}));jill.cur=J.cur?Object.assign({},J.cur):null;
+ const cw={};for(const id in R.cw||{}){const w=R.cw[id];const o={};for(const k in w)if(k!=='task'&&k!=='carry'&&k!=='__op')o[k]=w[k];   /* a walker's worked-out way round the furniture (__op) is not kept */o.task=w.task?Object.assign({},w.task,{g:gi2(w.task.g),t:w.task.t?w.task.t.i:-1,tk:ti(w.task.tk)}):null;o.carry=w.carry?w.carry.map(ir):null;cw[id]=o}
  const tables=R.tables.map(t=>({group:gi2(t.group),dirty:!!t.dirty,plates:(t.plates||[]).map(p=>Object.assign({},p)),busT:t.busT||0,claim:t.claim||null}));
  const misc={};for(const k of CP_KEYS)if(k in R)misc[k]=R[k];
  const snap={groups,tickets,slots,jill,cw,tables,misc,tablesN:R.tables.length,slotsN:R.slots.length};
@@ -6547,7 +6732,7 @@ function drawBagSparkle(c,now){const t=now-BAG_T;const base=.35+Math.sin(now*2)*
 /* 小小店主手冊：seven cards, short lines, the same tone as the rest of the game */
 const GUIDE=[   /* the manual describes the game as it is. Audited every release (docs/RELEASE_CHECKLIST.md) — last: v2.4 rc6 (the Staff Room, the Private Dining Room and its bookings, two more places on the restaurant's list), 2026-10-02 */
  {ic:'🍳',h:'開店與料理',sum:'每天 17:00 開店、21:30 打烊。你是 Chef Jill，點餐廳裡的東西就能指揮她。',pts:[
-  ['房間','票券列下面的分頁：店門口・主廳・側廳・休息室・包廂（蓋好以後）・Lounge（蓋好以後）・廚房（也可以用 ←→ 或數字鍵）。你在哪一間，那個分頁就亮著，寫著那一間的全名——在休息室裡是「員工休息室」，在包廂裡是「私人包廂」。二樓本身不是每天要看的分頁，它是這兩間房所在的樓層：上二樓的樓梯門在側廳靠近你的那一邊，房間裡的門通往樓梯，點它回到側廳。整層二樓只在幾個時候出現：二樓的故事發生的時候、在「店舖工程」的二樓那一欄點「看看整層」的時候、還有新的房間蓋好的那天早上。包廂的分頁上有跟桌子一樣的提示。主廳的後牆有側廳的拱門，Lounge 蓋好以後旁邊多一道，都可以直接點。主廳底部沒有廚房——廚房是自己的一間，出菜口在那裡；Jill 和服務生會走到主廳最下面去拿菜。'],
+  ['房間','票券列下面的分頁：店門口・主廳・側廳・二樓（租下以後）・休息室・包廂（蓋好以後）・Lounge（蓋好以後）・廚房（也可以用 ←→ 或數字鍵）。你在哪一間，那個分頁就亮著，寫著那一間的全名——在休息室裡是「員工休息室」，在包廂裡是「私人包廂」。二樓是整層樓本身：上面的房間關著門，點門就進去，房間裡靠近你的那扇門回到二樓；上二樓的樓梯門在側廳靠近你的那一邊。新的房間蓋好的那天早上，開店前會先帶你上二樓看一眼；整層的平面圖在「店舖工程」的二樓那一欄。包廂的分頁上有跟桌子一樣的提示。主廳的後牆有側廳的拱門，Lounge 蓋好以後旁邊多一道，都可以直接點。主廳底部沒有廚房——廚房是自己的一間，出菜口在那裡；Jill 和服務生會走到主廳最下面去拿菜。'],
   ['帶位','有空桌客人會自己坐；客滿時在門口長椅等。想指定順序，點那組客人或點空桌。'],
   ['點餐','桌上出現紅色「!」→ 點桌子，Jill 過去點餐。'],
   ['做菜','切到廚房，點亮著「+」的設備，照料理台的指示一步一步做。有廚師的工作站他們會自己接。'],
@@ -6585,7 +6770,7 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
   ['Dylan','常常在打烊前才來的那位。他不是員工，也不用你招待。你認識他以後，他來的時候日誌會記一行，他的卡片會顯示最近幾天來了沒（●來了・◐門口看了一眼・○沒來）。客滿時他會晚點再來，打烊前來不及就只在門口看一眼。']]},
  {ic:'🪑',h:'商店：家具、工程、營運',sum:'打烊後（開店前也可以）用今天賺的錢把店變成你要的樣子。錢買得到的都看得到。',pts:[
   ['家具與佈置','主廳最多 9 張桌（三排三張，卡座在後排）；側廳最多 9 張（靠窗那排是四人卡座；「側廳卡座」把中間、前面兩排也換成一樣的卡座，一次一整排，那一排要先擺滿）；露天桌 1–3 張（戶外區完工後）。店裡的樣子、植物、燈、畫、椅子、地毯、餐具、卡座；門口的布置（長椅、花箱、串燈、招牌燈、遮雨棚、狗狗休息角）。'],
-  ['店舖工程','擴建店面（評分夠高才能擴建）。大工程：戶外區（陽傘與地面，附第一張桌）、大出菜口、冷藏庫、廚房擴建、側廳；後期還有走入式冷藏庫和廚房二期（也在「廚房設備」最下面）。Lounge 的企劃出現以後也在這裡（I → II → III）。二樓是房東的；故事走到那裡，這裡會多一項「二樓（整層）」——租下整層、做基本工程，先是一整層空間：不是用餐區，不加座位，也不加員工名額。之後二樓的事走到那裡，這裡會多「二樓的房間」：員工休息室和私人包廂，各三個階段（見「二樓：休息室與包廂」）。租下二樓以後，二樓那一欄有「看看整層」：整層現在的樣子——蓋好的房間只看得到牆、門和門牌，看不到裡面；還沒決定用途的那一角，地上用粉筆畫著一個「？」。'],
+  ['店舖工程','擴建店面（評分夠高才能擴建）。大工程：戶外區（陽傘與地面，附第一張桌）、大出菜口、冷藏庫、廚房擴建、側廳；後期還有走入式冷藏庫和廚房二期（也在「廚房設備」最下面）。Lounge 的企劃出現以後也在這裡（I → II → III）。二樓是房東的；故事走到那裡，這裡會多一項「二樓（整層）」——租下整層、做基本工程，先是一整層空間：不是用餐區，不加座位，也不加員工名額。之後二樓的事走到那裡，這裡會多「二樓的房間」：員工休息室和私人包廂，各三個階段（見「二樓：休息室與包廂」）。租下二樓以後，二樓那一欄有一張「二樓平面圖」：整層的外牆、臨街的窗、柱子、樓梯，每一間蓋好的房間的牆、門和名字（施工中的畫著斜線），還沒決定用途的地方只寫一個「？」。蓋了什麼它就跟著變，全部蓋完也一直在；點一下放大。下面的「看看整層」是整層現在的樣子——蓋好的房間只看得到牆、門和門牌，看不到裡面；還沒決定用途的那一角，地上用粉筆畫著一個「？」。'],
   ['營運升級','動線規劃、門口候位區、後場整理區（廚房門邊的層架和掛鉤，換班的東西有地方放）、大菜單板；空調三級（牆上冷氣→靜音商用機→主廳側廳分區恆溫：熱天客人的耐心少扣一半、幾乎不扣、完全不扣，氛圍也加）；電力設施兩級（配電盤→商用增容＋備用電源：跳電變少→不再跳電，設備故障也少）；商用洗碗機（收桌快三成）；Lounge III 以後的 Bar 小廚／油炸站（爐台多一個位子、小食快一點）。每一級都畫在牆上。'],
   ['夢想工程','整面玻璃店面、主廳主燈、木樑天花板與吊扇、貓的空中走道——存錢的目標，結算下面會告訴你還差多少。'],
   ['貓咪生活','紙箱、睡墊、藤籃、隧道、貓窩、貓草、大跳台。側廳的東西分兩區：窗邊和最裡面那面牆（隧道、藤籃、貓窩）。'],
@@ -6608,7 +6793,7 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
   ['帳','結算的晚上會寫「Lounge 幾桌・多少錢・吃完留下幾組」。']]},
  {ic:'🚪',h:'二樓：休息室與包廂',sum:'二樓租下來以後，有兩間房會從店裡的日子裡長出來：先是給每天在這裡工作的人的，再是給一桌人的。',pts:[
   ['怎麼來的','都不是升級選單裡冒出來的。二樓開放一陣子以後，換班的東西、等人、找地方坐一下，大家都在二樓找位置；看得夠多了，打烊後 Jill 會自己看見（《大家待的地方》）。休息室用了一段時間、店裡也夠滿以後，會有客人問有沒有比較安靜、不被打擾的位子；之後又是一個打烊後的晚上（《關上門以後》）。企劃都在「店舖工程 › 二樓的房間」，選「之後再說」也不會不見。房間蓋好的那天早上，開店前會先帶你上二樓看一眼：昨晚還是工地，今天多了牆、門和門牌；可以直接進去看看，之後就從分頁進去。'],
-  ['員工休息室','二樓左邊、樓梯上來的內側，一間有門的房間：米白的牆、淺色橡木地板，一張低低的燕麥色沙發和兩張單椅圍著淺木矮桌，底下一塊象牙白的地毯；窗下一張可以坐四到六個人吃飯的長桌和靠窗的長椅；左邊一整面淺木置物櫃（每格一張小名牌）和掛外套的地方，右邊是做進牆裡的小廚房——小冰箱藏在淺木門後面，咖啡機、飲水、掛著的杯子和開放層架。I 就已經是完整的房間；II：置物櫃寫上了名字、每個人自己的杯子、沙發上的毯子、冰箱上的便條、長椅下多一排插座；III：照片、長大的植物、桌上的花、門邊的拖鞋——是用久了的樣子，不是變豪華。I 今晚施工、明天開門前好；II、III 都是隔天就在，要上一階用過幾天才能訂。二樓一次只做一件工程。它不是用餐區，不加座位，也不加員工名額。'],
+  ['員工休息室','二樓左邊、樓梯上來的內側，一間有門的房間：米白的牆、淺色橡木地板，一張低低的燕麥色沙發和兩張單椅圍著淺木矮桌，底下一塊象牙白的地毯；窗下一張可以坐四到六個人吃飯的長桌和靠窗的長椅；左邊一整面淺木置物櫃（每格一張小名牌）和掛外套的地方，右邊是做進牆裡的小廚房——小冰箱藏在淺木門後面，咖啡機、飲水、掛著的杯子和開放層架。I 就已經是完整的房間；II：中間多一張淺橡木的撞球台（菇色的檯呢），置物櫃寫上了名字、每個人自己的杯子、沙發上的毯子、冰箱上的便條、長椅下多一排插座、格子裡幾盒桌遊；III：靠門的角落一張按摩椅和一小疊書，照片、長大的植物、桌上的花、門邊的拖鞋——是用久了的樣子，不是變豪華。有些晚上打烊以後，會有兩個人打一局撞球、有人站在後面看；III 以後常有人在按摩椅上睡著。這些都只是他們的日子：沒有分數，也不用管。I 今晚施工、明天開門前好；II、III 都是隔天就在，要上一階用過幾天才能訂。二樓一次只做一件工程。它不是用餐區，不加座位，也不加員工名額。'],
   ['誰會上去','店裡的人：早到的先上去坐一下；店裡不忙的時候，外場偶爾有人上去喘口氣，一下子就下來（一晚最多兩次；店裡一忙就不會有人上去）；打烊以後，幾個人——廚房的、外場的，有 Lounge 的話吧台的也會——上去坐一下才回家。Lounge 的人用休息室，還是在 Lounge 名單上。客人不會進去。不用你安排，也沒有要照顧的數值。'],
   ['私人包廂','二樓窗邊那一區，一扇可以關上的門；深綠牆板、石材地板、一張從門口往窗邊延伸的石材長桌。I：4–6 位；II：桌子加長，4–8 位；III：4–10 位、餐具每天擺好。最少都是 4 位。II 要上一階完工 6 天、包廂用過 3 次；III 要 8 天、用過 9 次。餐廳員工名額 I 和 III 各 +1，Lounge 名單不變。'],
   ['預約','訂位會自己進來，一個晚上最多一組，不用接電話也不用排。開店前的新聞會寫「今晚｜私人包廂｜已預約」、幾位、哪一種聚餐、最低消費。剛蓋好的頭一兩個晚上就會有人訂；之後不會每晚都有，II、III 會越來越常。有預約的晚上，包廂留給他們，就算還沒到也不會讓別人坐。'],
@@ -6926,7 +7111,7 @@ function showShop(){phase='shop';mainScreen='shop';R=null;rdAutoUnlock();IDLE=ma
   ${(()=>{const est=restockEstimate(),keep=keepAside();const low=S.money<keep;const when=S.phase==='prep'?'今天':'明日';return`<div class="budget ${low?'low':''}"><span>${when}預估基本備料 約 ${fmt(est)}</span><span>建議保留 約 ${fmt(keep)}</span>${low?`<span class="w">⚠ 現在的現金可能不夠完成建議備料，${when}可以少備一點或臨時叫貨</span>`:''}</div>`})()}
   <div class="tabs">${tabs.map(t=>`<button class="${t.k===shopTab?'on':''}" data-act="tab" data-k="${t.k}" ${t.on?'':'disabled'}>${t.n}</button>`).join('')}</div>
   <div class="card">${body}</div>
-  <div class="footer">${S.phase==='prep'?`<button class="btn primary big" data-act="toPrep">回到開店準備 ›</button>`:`<button class="btn primary big" data-act="nextDay">準備 DAY ${S.day+1}</button>`}</div></div>`)}
+  <div class="footer">${S.phase==='prep'?`<button class="btn primary big" data-act="toPrep">回到開店準備 ›</button>`:`<button class="btn primary big" data-act="nextDay">準備 DAY ${S.day+1}</button>`}</div></div>`);try{upPlanPaint()}catch(e){console.warn('[plan]',e)}}
 
 let sigDraft=null,sigKind='m';   /* 'm' the main signature, 'd' the dessert (v2.2.1 #16) — one designer, two tables */
 function sigT(){return sigKind==='d'?{T:SIGD,N:SIGD_CAT_N,id:'sigdessert',key:'sigDessert',base:150,eyebrow:"Jill's Signature Dessert",title:'設計招牌甜點',st:"★ JILL'S SIGNATURE DESSERT ★",how:'在冷盤台冷作擺盤：底、奶餡、水果、點綴',make:4000,mk:'研發招牌甜點 $4,000'}:{T:SIG,N:SIG_CAT_N,id:'signature',key:'signature',base:320,eyebrow:"Jill's Signature Dish",title:'設計招牌菜',st:"★ CHEF JILL'S SIGNATURE ★",how:'在爐台用平底鍋煎，看準時機起鍋',make:3000,mk:'研發招牌菜 $3,000'}}
@@ -7118,7 +7303,8 @@ function doAct0(a,d,k,b){
  case'sigMake':{const K=sigT();const cost=S[K.key]?800:K.make;if(S.money<cost)break;const nm=($('#sigName').value||'').trim()||sigAutoName(sigDraft);S.money-=cost;const first=!S[K.key];S[K.key]={...sigDraft,name:nm.slice(0,18)};if(first){S.xp[K.id]=0;S.stock[K.id]=S.stock[K.id]||0;if(sigKind==='d')ach('sigd');else ach('sig')}ICACHE.clear();DCACHE.clear();sfx.fire();banner(sigKind==='d'?"★ SIGNATURE DESSERT ★":"★ SIGNATURE ★",nm);save();sub=null;shopTab='sig';showShop();break}
  case'guide':showGuide();break;
  case'peek':screenEl.hidden=true;$('#peekPill').hidden=false;renderRoomTabs(true);break;
- case'upLook':upLookOpen();break;   /* v2.4 rc6 (05:23): the floor in 店舖工程 */
+ case'upLook':upLookOpen();break;
+  case'upPlanBig':upPlanBig();break;   /* v2.4 rc6 (06:36): the floor plan, full screen */   /* v2.4 rc6 (05:23): the floor in 店舖工程 */
  case'book':bookTab='front';showBook();break;
  case'photo':openLightbox(k);break;
  case'album':bookTab='mem';showBook();albumScrollLatest();break;

@@ -119,8 +119,9 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 #roomTabs button.urgent b{background:#D4553A;color:#fff;animation:tabpulse 1.1s ease-in-out infinite}
 @keyframes tabpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
 @media (min-width:700px){#roomTabs button{height:34px;min-width:60px;font-size:13px}}
-#roomTabs.many{gap:1px}#roomTabs.many button{padding:0 7.5px;min-width:36px}   /* v2.4 rc6: seven rooms (the Staff Room and the Private Dining Room are tabs) still fit a phone */
-@media (min-width:700px){#roomTabs.many button{padding:0 11px;min-width:52px}}
+#roomTabs.many{gap:1px}#roomTabs.many button{padding:0 7.5px;min-width:36px}   /* v2.4 rc6: seven or eight rooms (二樓, the Staff Room and the Private Dining Room are tabs) still fit a phone */
+#roomTabs.many8 button{padding:0 6px;min-width:33px;font-size:11.5px;letter-spacing:0}
+@media (min-width:700px){#roomTabs.many button,#roomTabs.many8 button{padding:0 11px;min-width:52px;font-size:13px}}
 
 /* scene */
 #sceneWrap{flex:1 1 auto;min-height:0;position:relative;background:#2A1F1A;overflow:hidden}
@@ -644,3 +645,16 @@ html.desk button,html.desk [data-act],html.desk .polaroid{cursor:pointer}
 #upRv .btns{display:flex;flex-direction:column;gap:6px}#upRv .btns .btn{width:100%}
 @keyframes uprvIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){#upRv{animation:none}}
+/* v2.4 rc6 (06:36): the second floor's plan in 店舖工程 › 二樓 — large, readable, tap for full screen */
+.upplan{display:block;width:100%;margin:2px 0 10px;padding:8px 8px 9px;border:1px solid rgba(120,96,64,.28);border-radius:12px;background:#F8F3EA;text-align:left;cursor:zoom-in;font:inherit;color:inherit;box-shadow:0 1px 0 rgba(255,255,255,.6) inset}
+.upplan canvas{display:block;margin:4px auto 0;border-radius:6px}
+.upplan-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:0 2px}
+.upplan-h b{font-size:13.5px;font-weight:800;color:#3E342C}
+.upplan-h small{font-size:11px;color:#8A7A68;font-weight:700}
+.upplan-cap{display:block;margin:6px 2px 0;font-size:11.5px;line-height:1.5;color:#6A5A4A}
+#upPlanBig{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:10px;background:rgba(36,28,20,.82);cursor:zoom-out}
+#upPlanBig[hidden]{display:none}
+#upPlanBig canvas{border-radius:8px;box-shadow:0 8px 30px rgba(0,0,0,.35)}
+#upPlanBig .upplan-bh{display:flex;flex-direction:column;align-items:center;gap:2px;color:#F6EEDF;text-align:center}
+#upPlanBig .upplan-bh b{font-size:16px;font-weight:800}
+#upPlanBig .upplan-bh span{font-size:11.5px;opacity:.85;max-width:92vw}
