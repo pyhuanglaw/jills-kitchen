@@ -1033,3 +1033,20 @@ def story_photos_show_the_current_art_not_an_old_copy(b, port, target):
     check(g.ev("document.querySelector('#lightbox img').getAttribute('src')===window.STORY_ART.sophie_mia_leave"), 'the lightbox shows the new 「一起回家」')
     g.ev("closeLightbox()")
     check(not g.errors, g.errors[:3]); g.close()
+
+@test
+def regular_card_says_her_for_sophie_and_mia(b, port, target):
+    """Found in the 2026-10-01 phone screenshots of the new Sophie / Mia portraits: the card's cat line said
+    「樾樾不躲他了。」 for Sophie and Mia. Only 王太太 had 她. Now Sophie, Mia and 王太太 get 她; the men keep 他."""
+    g = Game(b, port, target, seed=117, manual=True, viewport={'width': 390, 'height': 844})
+    load_fixture(g, 'player_day52.json')
+    g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(200)
+    if g.ev("phase") == 'shop':
+        g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(300)
+    g.ev("autoStock()"); start_day(g)
+    g.ev("S.catFam=S.catFam||{};for(const id of ['sophie','mia','chen','koba'])S.catFam[id]=6")
+    for reg, want in (('sophie', '樾樾不躲她了。'), ('mia', '樾樾不躲她了。'), ('chen', '樾樾不躲他了。'), ('koba', '樾樾不躲他了。')):
+        g.ev(f"spawn({{t:R.t,type:'regular',reg:'{reg}',size:1}});const q=R.groups.find(x=>x.reg==='{reg}');if(q&&q.table==null){{const t=freeTableFor(q);if(t!=null)seatGroup(q,t)}}")
+        txt = g.ev(f"(()=>{{const q=R.groups.find(x=>x.reg==='{reg}');if(!q)return null;showRegCard(q);return document.querySelector('#regcard').innerText}})()")
+        check(txt is not None and want in txt, f'{reg}: {want} ({txt})')
+    check(not g.errors, g.errors[:3]); g.close()
