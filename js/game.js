@@ -3613,7 +3613,11 @@ const PHOTO_BLANK='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://w
    show it (data-pid) — the journal is not redrawn. v2.1 redrew the whole journal on every arrival, and each redraw
    re-requested the rest: with 74 photos that was ~2,500 redraws of a 1.5 MB page, a freeze that read as a softlock. */
 const photoWant=new Set();
-function photoSrc(p){if(p.img)return p.img;if(PHOTOS.has(p.id))return PHOTOS.get(p.id);if(!photoWant.has(p.id)){photoWant.add(p.id);photoGet(p.id).then(d=>{photoWant.delete(p.id);if(!d)return;for(const im of document.querySelectorAll(`img[data-pid="${p.id}"]`))if(im.src!==d)im.src=d})}return PHOTO_BLANK}
+/* 2026-10-01: a Story Photo that has art shows the current art. Its album entry still keeps the copy it was taken with
+   (export, no art), but a save that earned 「多的」, 「有你在的晚班」 or 「一起回家」 when they were small panels of a concept
+   sheet now sees the player's full picture. A staged (drawn) photo keeps the picture it was taken with. */
+function photoArt(p){if(!p||!p.story||typeof p.kind!=='string'||!p.kind.startsWith('story:'))return null;const D=STORY_PHOTOS[p.kind.slice(6)];return D&&D.art?storyArtSrc(D.art):null}
+function photoSrc(p){const a=photoArt(p);if(a)return a;if(p.img)return p.img;if(PHOTOS.has(p.id))return PHOTOS.get(p.id);if(!photoWant.has(p.id)){photoWant.add(p.id);photoGet(p.id).then(d=>{photoWant.delete(p.id);if(!d)return;for(const im of document.querySelectorAll(`img[data-pid="${p.id}"]`))if(im.src!==d)im.src=d})}return PHOTO_BLANK}
 /* pictures still inline in the save (older saves, or a failed IndexedDB write) move into the store when it works */
 function photoMigrate(){const A=albumList();const inline=A.filter(p=>p.img);if(!inline.length)return;photoQueue=photoQueue.then(()=>photoOpen()).then(db=>{if(!db)return;return Promise.all(inline.map(p=>photoPut(p.id,p.img).then(ok=>{if(ok)delete p.img}))).then(()=>save())})}
 function albumCap(){return photoDBFail?60:240}   /* ordinary photos kept; 珍藏 never rotate out */

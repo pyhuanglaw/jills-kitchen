@@ -1006,3 +1006,30 @@ def journal_social_page_opens_the_same_day_as_the_shops(b, port, target):
     g.ev("bookTab='social';showBook()"); g.page.wait_for_timeout(60)
     check('社群' in g.ev("document.querySelector('#screen .tabs').innerText") and g.ev("bookTab") == 'social', 'day 6: the journal has 社群, as the shop does')
     check(not g.errors, g.errors[:3]); g.close()
+
+@test
+def story_photos_show_the_current_art_not_an_old_copy(b, port, target):
+    """2026-10-01: the player supplied full pictures for three Story Photos that were small panels of a concept sheet
+    (晴 × 阿拓 「多的」「有你在的晚班」, Sophie × Mia 「一起回家」). A save that earned one earlier holds a copy of the old
+    picture; the album, the lightbox and the social page show the current art. A staged (drawn) photo keeps the picture
+    it was taken with; the stored copy is still there for export."""
+    g = Game(b, port, target, seed=113, manual=True, viewport={'width': 390, 'height': 844})
+    load_fixture(g, 'player_day52.json')
+    g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(200)
+    old = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg=='
+    g.ev(f"for(const k of ['qing_tuo','qing_tuo_late','sophie_mia_leave']){{const P=STORY_PHOTOS[k];const p=albumAdd('story:'+k,'{old}',{{cap:P.cap,txt:P.txt()}});p.story=1;p.keep=true;story().photos[k]=S.day}}")
+    g.page.wait_for_timeout(150)
+    for k in ('qing_tuo', 'qing_tuo_late', 'sophie_mia_leave'):
+        check(g.ev(f"(()=>{{const p=albumList().find(x=>x.kind==='story:{k}');return photoSrc(p)===window.STORY_ART.{k}&&photoSrc(p)!=='{old}'}})()"), f'{k}: the album shows the current art')
+    check(g.ev("photoAll().then(o=>{const p=albumList().find(x=>x.kind==='story:qing_tuo');window.__exp=o[p.id]||null});1") == 1, 'export read')
+    g.page.wait_for_timeout(150)
+    check(g.ev("window.__exp") == old, 'the stored copy is still the one it was taken with (export)')
+    staged = g.ev("(()=>{const p=albumList().find(x=>x.kind==='story:opened_up');return p?photoSrc(p).slice(0,22):null})()")
+    check(staged is None or (staged.startswith('data:image/') and not g.ev("!!STORY_PHOTOS.opened_up.art")), f'a staged photo keeps its own picture: {staged}')
+    g.ev("paused=true;bookTab='mem';showBook()"); g.page.wait_for_timeout(200)
+    srcs = g.ev("[...document.querySelectorAll('#screen .polaroid img')].map(im=>im.getAttribute('src')).filter(s=>s===window.STORY_ART.qing_tuo||s===window.STORY_ART.qing_tuo_late||s===window.STORY_ART.sophie_mia_leave).length")
+    check(srcs == 3, f'the journal album shows the three pictures ({srcs})')
+    g.ev("openLightbox(albumList().find(x=>x.kind==='story:sophie_mia_leave').id)"); g.page.wait_for_timeout(100)
+    check(g.ev("document.querySelector('#lightbox img').getAttribute('src')===window.STORY_ART.sophie_mia_leave"), 'the lightbox shows the new 「一起回家」')
+    g.ev("closeLightbox()")
+    check(not g.errors, g.errors[:3]); g.close()
