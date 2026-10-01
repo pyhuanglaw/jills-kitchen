@@ -8,7 +8,8 @@
 
 **Branch and builds**
 - Branch: `master`. Tag: `v2.4-rc5`.
-- Published to the player's usual URL, https://claude.ai/artifact/2vhURujrtCpQ1P5jnSsjps (saves live there).
+- Published to the player's usual URL, https://claude.ai/artifact/2vhURujrtCpQ1P5jnSsjps (saves live there), as
+  Version 39. §14 is the check of the published page.
 
 **What the player asked for in this round (filed verbatim, `docs/v24/`)**
 - 17:57 「繼續吧」: P2, the Second Floor (the plan: `docs/v24/AUDIT_AND_PLAN.md` §7).
@@ -248,3 +249,41 @@ gate holding, not the day a person would get there.
 Screenshots (390×844, real play from the Day 52 and Day 61 saves; T, not O), listed with one line each in
 `shots_up.txt`: the landlord's afternoon (`u3_*`), the night (`u4_*`), the call and the project (`u6_*`, `u7_*`), the open
 floor (`up_*`), the staff lists and the Lounge at work (`staff_*`). Sims in `sims/`. The full run in `full_run.log`.
+
+## 14. The published page (after the tag)
+
+- Published to the player's URL as **Version 39** (version id `1790862876-a1d4`). This is the page that
+  `tools/build_artifact.py` builds from the tag.
+- Read back from the artifact service and checked with `tools/sims/live_check.py` (new). The page built from `v2.4-rc5`
+  sits inside the live HTML byte for byte:
+  - built page: 4,440,695 bytes, sha256 `03e5b8c92854`;
+  - `js/game.js` appears once;
+  - the host adds 552 bytes, its document skeleton.
+- Played at 390×844 with touch, using the player's Day 61 save:
+  1. the title (DAY 61), then OPEN;
+  2. the prep screen, with the one-time note about the two staff lists;
+  3. a whole day with the lazy bot, the five rooms photographed through their tabs;
+  4. the summary;
+  5. the staff page, showing 「餐廳員工 12/12 人・Lounge 員工 2/5 人」;
+  6. Day 62;
+  7. the page reloaded, and the title keeps DAY 62.
+
+  No page errors. The screenshots are in `docs/evidence/v24_rc5_release/`. This is T: Chromium on this machine, not a
+  phone, and not the claude.ai frame.
+- The summary's 4.13 → 3.30 comes from the lazy bot's evening, not from rc5. The same save and seeds on rc4's
+  `js/game.js` give the same walk-outs. Over five seeds:
+
+  | Build | Groups that left angry |
+  |---|---|
+  | rc4 | 19 / 18 / 25 / 26 / 25 |
+  | rc5 | 20 / 21 / 26 / 21 / 20 |
+
+- The zips are built from the tag with `tools/make_release_zips.py v2.4-rc5 v24-rc5 docs/evidence/v24_rc5`:
+  - source: 15.4 MiB;
+  - art: 4 parts;
+  - portrait cards: 2 parts;
+  - evidence: 7.2 MiB;
+  - saves: 2 parts.
+
+  Built from the unzipped source, the single file and the page come out identical (`03e5b8c92854`). This check's
+  screenshots were taken after the tag, so the zips do not include them.

@@ -1,0 +1,14 @@
+v2.4-rc5: the page built from the tag (4440695 bytes, sha256 03e5b8c92854) is inside the live HTML (4441247 bytes) byte for byte, js/game.js once; the host adds 552 bytes (its document skeleton)
+01_title.png: the title with the save: DAY 61 | {"phase":"title","day":61,"t":null,"room":"main"}
+02_prep.png: OPEN: the prep screen | {"phase":"prep","day":61,"t":null,"room":"main"}
+03_main.png: the dining room, early evening | {"phase":"service","day":61,"t":"31%","room":"main"}
+04_side.png: the side room (the stair door at the near edge) | {"phase":"service","day":61,"t":"43%","room":"side"}
+05_front.png: the street | {"phase":"service","day":61,"t":"56%","room":"front"}
+06_lounge.png: the Lounge | {"phase":"service","day":61,"t":"67%","room":"lounge"}
+07_kitchen.png: the kitchen | {"phase":"service","day":61,"t":"75%","room":"kitchen"}
+08_summary.png: the day's summary | {"phase":"summary","day":61,"t":null,"room":"kitchen"}
+the staff page: 餐廳員工 12/12 人・Lounge 員工 2/5 人・每日薪資 $8,904。餐廳的人數到頂了。 Lounge 的人是固定的名單，名額跟餐廳分開算。
+09_staff.png: the shop, the staff page: two numbers | {"phase":"shop","day":61,"t":null,"room":"kitchen"}
+10_prep_next_day.png: the next day's prep (Day 62) | {"phase":"prep","day":62,"t":null,"room":"main"}
+11_after_reload.png: the page reloaded: the title keeps DAY 62 | {"phase":"title","day":62,"t":null,"room":"main"}
+page errors: none (0)

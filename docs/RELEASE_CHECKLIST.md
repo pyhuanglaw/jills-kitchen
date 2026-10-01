@@ -79,6 +79,12 @@ Never promote T to O.
 - [ ] Publish to the **same live URL** the player uses: https://claude.ai/artifact/2vhURujrtCpQ1P5jnSsjps.
   - Saves are kept per URL.
   - Never leave the new build on a different URL while the player's normal one stays old.
+- [ ] Check the published page (from v2.4 rc5).
+  - Read it back with Artifact's read action, which saves the live HTML.
+  - Run `python3 tools/sims/live_check.py LIVE.html <tag> tests/saves/<the player's latest>.json docs/evidence/<release>_release`.
+  - Pass: the page built from the tag sits inside the live HTML byte for byte.
+  - Pass: one day plays from the player's save, and the page survives a reload with no page errors.
+  - Record the published version in the release report.
 - [ ] Package the release as zips, made from the tag (`git archive <tag>`), and send them to the player with the release reply.
   - `python3 tools/make_release_zips.py <tag> <name> <this release's evidence folder>` does all of the below and runs the source check.
   - **source**: everything but the large art, the evidence and the saves. Check it: `tools/build_single.py` and `tools/build_artifact.py` run from the unzipped copy must give files identical to the committed single file and to the published page.
