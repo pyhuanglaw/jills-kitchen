@@ -30,4 +30,7 @@ Made by `tools/sims/v24_shots.py`; the list with one line each is `shots.txt`.
 
 ## Regression
 
-- `full_run.log` — `python3 tests/run_tests.py`, the whole suite on the release commit.
+- `full_run.log` — `python3 tests/run_tests.py` on 2682820: 137 passed, 5 failed (each traced in the report, §5).
+- `rerun_after_fix.log` — those five after the fixes: 5 passed.
+- `full_run_final.log` — the whole suite on the release code (80ca03e): 143 passed, 0 failed.
+- `sims/window_places_p0_vs_rc4.log`, `sims/*_nohold.log` — the measurements behind two of the fixes and the hold.

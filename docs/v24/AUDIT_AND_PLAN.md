@@ -173,6 +173,8 @@ Read with it:
     Valentine's), which is never held back. Grouped story visits keep their hour (`hold`), and the first of a group
     sits in a room with a free table for each of them, so they really are in the same room. The cost is measured in
     `docs/V24_RC4_REPORT.md` §4: the v2.3 majors that share those days (Sophie × Mia's) come some days later.
+    **Kept by the player's decision** (17:34, `decision_priority_1734_2026-10-01.txt`): this default stays, date-exclusive
+    beats keep their protection, and the Sophie × Mia delay is an rc4 normal-play observation item.
 
 ## 4. The chronology and what a Day 52 player meets
 

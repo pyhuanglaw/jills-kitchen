@@ -44,6 +44,7 @@
 | P2 the Second Floor (room, facade, stairs, the missing cats, the lease) | NOT STARTED | — | No | rc5. The landlord's portraits are in; the era opens in the code (`up`) with nothing in it yet |
 | P3 / P4 the Staff Room, the Private Dining Room | NOT STARTED | — | No | rc6 |
 | P5 the other Staff Lives arcs and the outside cast (#42) | NOT STARTED | — | No | Later; nothing in rc4 contradicts them (國雄 has no lines yet) |
+| The signature dessert's −/＋ stepper jumps up beside the info line while you add stock | FOUND by the player (17:48) | — | No | The player: 下一個版本再改. Filed with the cause in `docs/v24/next/dessert_stepper_jumps_2026-10-01.txt` |
 
 ## 3. What was planned, what the game showed, what changed
 
@@ -72,7 +73,8 @@
 | 5555 | 53 | 61 | 63 | 79 | 81 | never | 0 |
 | 8080 | 53 | 61 | 63 | 79 | 81 | never | 0 |
 
-Nothing fires at the start of Day 53 (the first day played); the first v2.4 beat is 怡君's visit that evening. One
+Nothing fires at the start of Day 53 (the first day played); the first v2.4 beat is 怡君's visit that evening (the next
+evening in seed 7000). One
 spare key is a day outside the window, because a beat that has only that day (Dylan on Valentine's) is never held
 back. (A first version of the hold, without that exception, put 怡君's key on Day 61 in this seed — and Dylan's Valentine
 never happened.)
@@ -102,9 +104,10 @@ come. If Sophie × Mia should go first on shared days, it is a one-line change (
 | a waiter first, the cleaner Day 14 (300) | Day 1 | Day 14 | Day 8 | Day 16 | Day 27 | the letters (W8) |
 | never a cleaner (512, 30 days) | Day 1 | — | Day 8 | Day 16 | — (it needs her on the crew) | — |
 
-怡君 never waits on Sophie × Mia: in the third run the pair's own story had not moved at all. The wall waits for B
+怡君 never waits on Sophie × Mia: none of her beats looks at their story, and in the third run no cleaner was ever
+hired — her mother stayed the evening helper throughout. The wall waits for B
 (Sophie and Mia in 8+ times each, her on the floor 6+ days) and settles about two and a half weeks after it begins
-(in earlier runs of the same plans the wall began Day 21–27 and the mediation came on Day 38).
+(in earlier runs of the same plans the wall began Day 21–27, and with the late plan the mediation came on Day 38).
 
 **Not free labour.** The same new game with and without her (`--noxqh`), Days 1–7 (before 怡君 can come): money,
 revenue, tips, guests, stars and reviews identical every day, including the four days she came in. In the tests:
@@ -138,6 +141,9 @@ None of the five was a broken feature; each was traced:
   evening found two. The test now watches a second evening when the first found fewer than three.
 All five pass after that (`docs/evidence/v24_rc4/rerun_after_fix.log`), and every other test passed in the full run.
 
+**The full regression again, on the release code** (80ca03e; after it only documents changed): **143 passed, 0 failed**
+(`docs/evidence/v24_rc4/full_run_final.log`).
+
 Goldens: `golden_frames` re-recorded (her evening on Day 1, Day 2's news line); with her switched off the code
 reproduced the P0 baselines exactly; `golden_scenario` and `cat_personality_fingerprint` unchanged.
 
@@ -154,7 +160,7 @@ reproduced the P0 baselines exactly; `golden_scenario` and `cat_personality_fing
 
 ## 7. Manual audit (小小店主手冊)
 
-Sections checked: all ten. Changed:
+Sections checked: all thirteen. Changed:
 - **Jill 與員工**: 清潔員 (the first one is 秀琴阿姨); new 秀琴阿姨 (before the first cleaner: some evenings near
   closing, helps tidy, no tables, no guests, the game's work is still yours; the first cleaner is her, then an
   ordinary cleaner); new 晚點到 (staff late for their own reasons, said that morning; their jobs undone meanwhile;
@@ -188,18 +194,27 @@ hire, 怡君's first visit in a new game with the player's picture, the Day 52 n
 1. Your Day 52 save: the 2.4 note on the next prep screen; 怡君 on Day 53 or so, eating, and 秀琴阿姨 walking over.
 2. Over the next week: 《三個選項》, 「她決定了」, the move (she is in late), the spare key.
 3. Two to three days after the key: 《那面牆》 — the wiping, the phone call, the photos, the flat, 王先生.
-4. A new game (another browser or a backup first): Day 1, near 21:15 — does she read as someone the restaurant
-   already knows? Is anything she does mistaken for work you no longer have to do?
+4. A new game — **back up first** (設定 → 備份到檔案), or use another browser or a private window: the URL keeps one
+   save, and 重新開始 replaces it. Day 1, near 21:15: does she read as someone the restaurant already knows? Is
+   anything she does mistaken for work you no longer have to do?
+5. **Observation item (your decision, §12):** in normal play, do Sophie × Mia's own beats (「這邊也可以」, the bag on
+   the stool) feel late while the wall is running? The simulations show some of them 9–11 days later in two of five
+   seeds.
 
 ## 11. Not in this release
 
 The Second Floor (rc5), the Staff Room and the Private Dining Room (rc6), the other Staff Lives arcs (P5).
 
-## 12. A decision for the player
+For the next version, by the player's word: the signature dessert's stepper that jumps beside its info line when the
+count changes width (`docs/v24/next/dessert_stepper_jumps_2026-10-01.txt`, with the player's screenshot).
+
+## 12. Which story goes first — decided
 
 On a day when someone comes in for a due v2.4 major beat, that beat holds the day's one major slot (until it plays,
 or 85% of the service). It keeps 怡君 and the wall on your windows; it can delay a Sophie × Mia beat by about a week
-when both stories need the same evening (§4). The alternative is to let a story whose own people are seated go first —
-the wall then lands a few days later (mediation up to Day 84 in these seeds). Say which you prefer; the default in rc4
-is the hold.
+when both stories need the same evening (§4).
+
+**The player's decision (17:34, filed verbatim in `docs/v24/decision_priority_1734_2026-10-01.txt`):** keep this
+default — Sophie × Mia do not go first; date-exclusive beats (Valentine's and the like, floor 0) keep their protection;
+the 9–11-day delay is an rc4 normal-play observation item (§10.5), and the release does not wait for it.
 

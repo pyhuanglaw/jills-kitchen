@@ -1,0 +1,12 @@
+(Filed verbatim. 2026-10-01 17:48, the player, with a phone screenshot: dessert_stepper_jumps_2026-10-01.jpg.
+For the next version — not rc4.)
+
+莓果增加庫存 加減的地方會跳到上面 下一個版本再改
+
+What the screenshot shows: the prep screen's 今日菜單, the two signature cards. The signature dish's −/＋ stepper sits
+under its info line; the signature dessert's sits to the right of it, on the same line.
+
+Where it comes from (read, not changed): both cards put the stepper (`.step`, margin-top 6px) right after the info
+line `<small>` — `$價格 · 庫存 N 份 · …`. The dessert's line is short, so the stepper fits beside it; when the count
+changes width (庫存 9 份 → 16 份) the stepper wraps to the next line or comes back up. The dish's line is longer, so
+its stepper is always below. Next version: the stepper on its own line in both cards, so it never moves while you tap it.
