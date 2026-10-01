@@ -53,7 +53,7 @@ five or more (`upCan`). Nothing in it fires on the first day a save plays this v
 | U1 | 「樓上也是你們的？」「不是，房東的。」「一直空著？」「好像是。」 | v24 | 陳伯伯 (a regular who walks past every day; else 小林, Leo) | the era | none (§4: building information) |
 | U2 | 「樓上真的一直都空著喔？」「嗯。」「上面多大？」「不知道。」「妳沒上去過？」「沒有啊。」 (one person: 「房東還沒租出去？」「好像還沒。」) | v24, at closing | two of the crew who are here (Nina first; a cook from the kitchen) | U1 + 1 day | none |
 | U3 | The landlord's afternoon: the fire inspection is coming, he goes up; 「我可以一起上去嗎？」; 「地板是好的，窗戶也是好的。」; he locks the door on the way out. Words only — the floor is not shown | major, start of the day | Jill, the landlord | U2 + 2 days | week timeline; 樓上 (once it exists) |
-| U4 | The missing cats (§4 below) | major (claimed at the start of the day) | the cats, Jill, the crew who are really here | U3 + 3 days ("several days") | 樓上 |
+| U4 | The missing cats (§4 below) | major (claimed at the start of the day) | the cats, Jill, the crew who are really here | U3 + 3 days ("several days") | week timeline (written once they are found); 樓上 |
 | — | Customer pressure, one a day, different people and different needs: 「妳們現在人這麼多，沒想過樓上？」「樓上又不是我的。」「租啊。」「你講得很簡單。」 (小林, a busy night) / 「今天又滿了？」「嗯。」「樓上還空著？」「還在。」 (Leo, seated after a wait) / 「妳這間越來越不像以前那麼小了。」「有嗎？」「有啊。」 (王太太) / a family wanting somewhere quieter when the side room is full too | v24 / ambient | different regulars | U4 + 2 (the night is given room) | none |
 | — | Crew pressure, one every other day: 《又在找位置》 at the staff meal, said by someone eating standing up (「我們是不是每次都在找地方坐？」「嗯。」); 《箱子》 (「你幹嘛坐那裡？」「這裡可以坐。」「……那是箱子。」); 《東西放哪》 (「這裡早晚會找不到東西。」) | ambient | the people in them | the era | none |
 | U5 | 「妳不是看過樓上？」「看過。」「很小？」「……不小。」 (a veteran cook who was not upstairs that night) or 「樓上不是還空著？」「那是房東的。」「我知道啊。」 | v24, closing | one of the crew | U4 + 2, two kinds of crew pressure, two kinds of customer pressure | none |
@@ -167,6 +167,23 @@ gate holding, not the day a person would get there.
 - **The steppers (I, T).** The −/＋ of both signature cards is a block of its own under the info line. The test checks
   the position at 9, 16 and 100 份 and the layout itself (it fails on rc4's CSS: on the player's phone font the
   dessert's line was short enough for the stepper to sit beside it).
+
+## 8a. Manual audit (docs/RELEASE_CHECKLIST.md §2)
+
+- **Checked:** every section (開店與料理, 開店前, Jill 與員工, 招待與熟客, 商店, 招牌菜與招牌甜點, Lounge, 五隻店貓, 料理研發,
+  餐廳日誌) against the final feature set.
+- **Changed:** 開店與料理 › 房間 (二樓 once it is the restaurant's; the stair door in the side room); Jill 與員工 (the summary:
+  the Lounge list at the bottom of the page) › 員工 (two lists, places counted apart; the Lounge's five by name; servers
+  shared, one kitchen, bartenders at the bar) › 調酒師 (Evan and 沈晴, from the Lounge list); 商店 › 店舖工程 (二樓（整層）
+  when the story gets there: not a dining room, no seats, no staff places); Lounge › Lounge I／II／III (II adds 阿拓, 安安,
+  許葳 to the list, instead of 「第二位調酒師」); 五隻店貓 › 牠們不出門 (once the floor is the restaurant's, one goes up now
+  and then and comes down by herself).
+- **Obsolete wording removed:** 「人數上限跟擴建、後場整理區、側廳、廚房擴建、廚房二期、Lounge 有關」, 「有 Lounge 以後才能招募」,
+  「第二位調酒師」 — `followup_the_manual_describes_the_current_game` now checks they are gone and that the new phrases are
+  there.
+- **No change required (verified):** 招牌菜 (「客人會專程為它來」 is still how it works; only the arrival line changed); 餐廳日誌
+  (the 故事 page's chapters are described generically; 樓上 appears there like the others).
+- Audit stamp: `last: v2.4 rc5`.
 
 ## 9. The brief's completion report (second_floor_and_long_arcs §48)
 
