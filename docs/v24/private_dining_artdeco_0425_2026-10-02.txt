@@ -1,0 +1,544 @@
+(Filed verbatim. 2026-10-02 04:25, the player, with the photo docs/v24/refs/private_dining_artdeco_mood_0425_2026-10-02.jpg — the mood / material / Art Deco language for the Private Dining Room; two attachments, then 04:26 「私人桌子要是直的！手機螢幕是直的 ！你浪費超多空間！」. This supersedes the wooden room of docs/v24/refs/private_dining_room_reference_2026-10-01.png for the room's look; the room's story, phases, bookings and staffing stay.)
+
+=== attachment 1 (a48d6d1e) ===
+【非常重要：Phase I / II / III 必須是同一間漂亮的房間逐步成熟】
+
+不要把 Private Dining 的三個 Phase 理解成：
+
+Phase I = 便宜、陽春、醜
+Phase II = 普通
+Phase III = 突然整間變成高級 Art Deco
+
+這是錯的。
+
+Private Dining 從 Phase I 正式建成的第一天，
+就已經是一間經過設計、值得 Jill’s Kitchen 收取私人包廂最低消費的空間。
+
+三個 Phase 必須共享同一套 architectural DNA。
+
+━━━━━━━━━━━━━━━━━━
+三階段從 Phase I 就固定不變的核心
+━━━━━━━━━━━━━━━━━━
+
+從 Phase I 開始就必須有：
+
+- 石材地板
+- NO WOOD FLOOR
+- 縱向長桌
+- 石材桌面
+- NO WOOD TABLETOP
+- 深綠／墨綠 Art Deco 牆面語言
+- 完整牆體與真正的門
+- 合理的高品質餐椅
+- 暖色餐廳照明
+- 黃銅／深色金屬細節
+- Contemporary Art Deco 的基本空間骨架
+- 明確高於 Main Hall / Side Hall 的 Private Dining 質感
+
+這些不是 Phase III 才取得的 upgrade。
+
+尤其：
+
+STONE FLOOR
+STONE TABLETOP
+VERTICAL LONG TABLE
+ART DECO ARCHITECTURAL LANGUAGE
+
+全部從 Phase I 就存在。
+
+━━━━━━━━━━━━━━━━━━
+Phase I｜漂亮，但剛完成
+━━━━━━━━━━━━━━━━━━
+
+Phase I 是：
+
+「這間包廂剛正式完工。」
+
+不是：
+
+「先弄一間很醜的，以後有錢再救。」
+
+它已經必須是一間完整、漂亮、有設計感的 Private Dining Room。
+
+使用：
+
+- 高品質暖灰／深灰褐天然石材地板
+- 一張縱向 4–6 人石材長桌
+- 深綠 Art Deco wall paneling 的基礎版本
+- 好看的 upholstered dining chairs
+- 基本但精緻的 Art Deco pendant
+- 少量 aged brass
+- 基本 sideboard / service console
+- 克制的桌面餐具
+- 完整暖光
+
+整體比較乾淨、克制、剛完工。
+
+「少」不等於「廉價」。
+
+Phase I 就應該讓玩家覺得：
+
+這 $240,000 確實蓋出了一間漂亮的私人包廂。
+
+━━━━━━━━━━━━━━━━━━
+Phase II｜同一間房變得更完整、更有人使用
+━━━━━━━━━━━━━━━━━━
+
+不要換地板。
+不要換桌子的材質。
+不要把房間重新裝潢成另一種風格。
+
+保留 Phase I：
+
+- 同一套石材地板
+- 同一張石材長桌的設計語言
+- 同一套深綠 Art Deco architecture
+- 同一個空間 layout
+
+Phase II 升級的是成熟度：
+
+- 長桌可自然延伸／配置到 4–8 人
+- 更完整的 upholstered chairs
+- 增加精緻 Art Deco wall sconces
+- 更完整的 wall molding / fluting
+- 更好的窗簾
+- sideboard 更完整
+- 花藝
+- coat rack
+- 更好的 table setting
+- 少量藝術品
+- 更成熟的間接照明
+
+看起來是：
+
+「原本就漂亮的房間，現在更完整了。」
+
+━━━━━━━━━━━━━━━━━━
+Phase III｜成熟完成態
+━━━━━━━━━━━━━━━━━━
+
+仍然是同一間房。
+
+不是砍掉 Phase II 重裝。
+
+保留原本的：
+- stone floor
+- stone table
+- green walls
+- room geometry
+- door
+- main layout
+
+Phase III 加入最高完成度：
+
+- 更完整、精緻的 Art Deco ceiling treatment
+- 更漂亮但克制的主吊燈
+- wine cabinet / display cabinet
+- 更成熟的 aged brass details
+- 完整 table setting
+- 更好的 glassware
+- candles / low table lighting
+- 更精緻但低矮的花藝
+- artwork
+- 少量 lived-in details
+- 更完整的 service furniture
+
+長桌可以自然服務 4–10 人。
+
+這時候玩家應該感覺：
+
+「這間包廂已經經營成熟了。」
+
+而不是：
+
+「原本那間房被拆掉，換成另一間比較漂亮的房。」
+
+━━━━━━━━━━━━━━━━━━
+三階段的差異原則
+━━━━━━━━━━━━━━━━━━
+
+Phase progression 應該是：
+
+Phase I
+漂亮、完整、克制、剛完工
+
+↓
+
+Phase II
+更豐富、更舒適、更成熟
+
+↓
+
+Phase III
+細節完整、氣氛成熟、真正高級
+
+而不是：
+
+醜
+↓
+普通
+↓
+漂亮
+
+請確保三張 reference 放在一起時，
+任何人都能一眼看出：
+
+「這是同一間 Private Dining Room 在不同成熟階段。」
+
+而且三個 Phase 單獨拿出來看，
+每一張都必須是我願意讓它出現在正式遊戲裡的漂亮空間。
+
+Phase I 絕對不能故意做醜來製造升級感。
+
+升級感來自「完成度增加」，
+不是「美感從沒有變成有」。
+=== attachment 2 (3184f71d) ===
+請以我提供的照片作為主要「室內設計 mood / material / Art Deco language」參考，
+重新設計《Jill’s Kitchen》的 Private Dining Room（私人包廂）。
+
+這不是要複製照片，而是吸收它的：
+- Art Deco 氣質
+- 深綠牆面
+- 石材
+- 黃銅細節
+- 幾何線條
+- 對稱感
+- 精緻天花
+- 私人餐廳的高級感
+
+最後必須是一個全新的 Jill’s Kitchen 私人包廂設計。
+
+━━━━━━━━━━━━━━━━━━
+【核心定位】
+━━━━━━━━━━━━━━━━━━
+
+這是一間成熟、精緻、有明顯高級感的 restaurant private dining room。
+
+關鍵字：
+
+Elegant Art Deco
+Contemporary Art Deco
+Intimate private dining
+Sophisticated
+Warm
+Refined
+Understated luxury
+High-end restaurant
+
+它應該讓人一看就明白：
+
+「這不是普通大桌區，而是一間需要預約、具有最低消費的私人包廂。」
+
+但不要做成：
+- 飯店宴會廳
+- KTV 包廂
+- 會議室
+- 商務招待所
+- 土豪 VIP 房
+- 黑金夜店
+- 過度奢華宮殿
+- 老派中式宴會包廂
+
+高級感來自：
+比例、材質、燈光、細節與空間設計，
+不是堆金色裝飾。
+
+━━━━━━━━━━━━━━━━━━
+【最重要：桌子方向】
+━━━━━━━━━━━━━━━━━━
+
+餐桌必須是「縱向長桌」。
+
+從畫面前方／入口往房間深處延伸。
+
+LONG AXIS OF TABLE = DEPTH AXIS OF ROOM.
+
+絕對不要把桌子橫放。
+
+構圖應該有明顯的視覺深度：
+
+入口
+↓
+長桌近端
+↓
+整張縱向長桌
+↓
+座位與餐具
+↓
+房間後方端景
+
+桌子是整個畫面的視覺中軸。
+
+適合約 6–10 人使用，
+空間仍要舒適，不要把椅子塞得很擠。
+
+━━━━━━━━━━━━━━━━━━
+【地板：必須是石材】
+━━━━━━━━━━━━━━━━━━
+
+NO WOOD FLOOR.
+
+完全不要木地板。
+
+地板改成高級天然石材／大理石感的大板地坪。
+
+偏好：
+
+- warm charcoal stone
+- deep taupe marble
+- warm grey marble
+- dark brown-grey natural stone
+- subtle natural veining
+- large-format stone slabs
+
+可以參考照片裡深色石材地面的高級感，
+但不要做成過度鏡面的黑色大理石。
+
+希望是：
+
+霧面到低度柔光，
+有天然石紋，
+昂貴、沉穩，
+但人物、家具、食物仍然容易辨識。
+
+不要：
+- 木紋地板
+- 廉價磁磚
+- 黑白棋盤格
+- 強烈花紋拼花
+- 高反射鏡面地板
+
+━━━━━━━━━━━━━━━━━━
+【餐桌：桌面也必須是石材】
+━━━━━━━━━━━━━━━━━━
+
+NO WOOD TABLETOP.
+
+餐桌桌面必須明顯是天然石材。
+
+建議：
+
+warm ivory stone / creamy marble / warm light-grey stone
+
+有非常細緻、克制的天然石紋。
+
+桌面可以比地板稍微亮一些，
+讓長桌自然成為畫面中心。
+
+桌體／桌腳可以使用：
+- 深胡桃木
+- aged brass
+- dark bronze
+
+但「桌面本身」必須讀得出來是 stone。
+
+不要做成木桌。
+
+━━━━━━━━━━━━━━━━━━
+【牆面】
+━━━━━━━━━━━━━━━━━━
+
+主要牆面使用：
+
+deep olive green / forest green / dark muted green
+
+搭配精緻 Art Deco wall paneling。
+
+可以有：
+- vertical fluting
+- geometric molding
+- restrained panel divisions
+- thin aged-brass trims
+
+不要整面都是木頭。
+
+木材只作為少量 accent。
+
+深綠＋石材＋黃銅
+才是主要 material hierarchy。
+
+可以有一面較有特色的端景牆，
+例如：
+- Art Deco 幾何構圖
+- 精緻藝術品
+- 對稱壁燈
+- 小型展示／餐具櫃
+
+但不要塞滿裝飾。
+
+━━━━━━━━━━━━━━━━━━
+【天花板】
+━━━━━━━━━━━━━━━━━━
+
+天花板必須有設計。
+
+不要普通平面天花板＋一盞燈。
+
+參考照片的高級感，
+使用簡化、現代化的 Art Deco ceiling：
+
+- shallow coffered ceiling
+- stepped geometric ceiling
+- elegant recessed border
+- subtle Art Deco geometry
+
+中央沿著縱向長桌配置一盞精緻的 Art Deco pendant / chandelier。
+
+材質可以是：
+aged brass + warm frosted glass
+
+燈具要精緻、有辨識度，
+但不要巨大水晶吊燈。
+
+━━━━━━━━━━━━━━━━━━
+【椅子】
+━━━━━━━━━━━━━━━━━━
+
+高品質 upholstered dining chairs。
+
+顏色可以：
+
+deep muted green
+或
+warm taupe / oatmeal
+
+椅子要：
+- 舒服
+- 成人比例
+- 有包覆感
+- 細緻
+- 適合高級餐廳
+
+可以有細黃銅／深木腳。
+
+不要：
+- 王座
+- 厚重大班椅
+- 普通咖啡廳椅
+- 塑膠椅
+- 全木餐椅
+
+━━━━━━━━━━━━━━━━━━
+【照明】
+━━━━━━━━━━━━━━━━━━
+
+整體是 warm intimate evening lighting。
+
+使用：
+- central Art Deco pendant
+- warm wall sconces
+- subtle indirect ceiling lighting
+- restrained accent lighting
+
+色溫溫暖，
+但不要整張變成橘黃色。
+
+石材仍需保留自然灰／米灰色，
+深綠牆也必須清楚辨識。
+
+━━━━━━━━━━━━━━━━━━
+【其他家具與細節】
+━━━━━━━━━━━━━━━━━━
+
+可以加入少量：
+
+- elegant sideboard
+- compact wine cabinet
+- discreet service console
+- framed artwork
+- one or two restrained plants
+- subtle curtains
+- Art Deco mirror
+- table setting
+
+餐桌可以有：
+- 精緻餐具
+- 水杯／酒杯
+- 小型花藝
+- 蠟燭或低矮桌燈
+
+但桌面不要塞滿。
+
+這是一間仍然真的會提供餐飲服務的包廂，
+不是室內設計展示間。
+
+━━━━━━━━━━━━━━━━━━
+【Jill’s Kitchen 世界觀一致性】
+━━━━━━━━━━━━━━━━━━
+
+雖然 Private Dining 比 Main Hall 明顯高級，
+它仍然必須感覺屬於 Jill’s Kitchen。
+
+不是突然進入另一家五星飯店。
+
+保留 Jill’s Kitchen 的：
+
+- warm human scale
+- welcoming atmosphere
+- natural materials
+- lived-in warmth
+- intimate restaurant feeling
+
+只是這個房間在材質與設計完成度上提升一級。
+
+可以理解成：
+
+Jill’s Kitchen
+×
+Contemporary Art Deco
+×
+Private Dining
+×
+Understated luxury
+
+━━━━━━━━━━━━━━━━━━
+【遊戲畫面需求】
+━━━━━━━━━━━━━━━━━━
+
+這是遊戲中的完整獨立 playable room，
+不是概念建築攝影而已。
+
+請讓空間配置適合遊戲角色實際活動：
+
+- 桌子周圍留合理走道
+- 服務生可以繞桌服務
+- 客人可以入座
+- 門口有合理 circulation
+- 不要讓家具貼牆或互相卡住
+- 不要讓椅子數量看起來無法實際使用
+
+視角請適合 Jill’s Kitchen 現有遊戲的 room reference：
+能清楚看見完整空間配置、家具位置與主要材質。
+
+不要做極端廣角攝影。
+不要讓近景家具遮住大部分房間。
+
+━━━━━━━━━━━━━━━━━━
+【最終畫面重點】
+━━━━━━━━━━━━━━━━━━
+
+第一眼：
+高級、有氣氛的 Art Deco 私人包廂。
+
+第二眼：
+深綠牆板、石材地板、石材縱向長桌、黃銅與精緻燈光。
+
+第三眼：
+仍然是一個溫暖、真的有人會在這裡吃飯的 Jill’s Kitchen 空間。
+
+必須明顯比 Main Hall / Side Hall 高一個空間等級，
+但不要炫富。
+
+ABSOLUTE REQUIREMENTS：
+
+1. 石材地板，NO WOOD FLOOR。
+2. 石材桌面，NO WOOD TABLETOP。
+3. 桌子縱向朝房間深處延伸，NO HORIZONTAL TABLE。
+4. Contemporary Art Deco。
+5. 深綠＋石材＋黃銅為主要語言。
+6. 精緻 Art Deco 天花與燈具。
+7. 6–10 人長桌。
+8. 高級但溫暖，不做土豪 VIP room。
+9. 不做 KTV、飯店宴會廳、會議室。
+10. 必須是一個完整、可實際遊玩的 Private Dining Room。
+04:26 私人桌子要是直的！手機螢幕是直的 ！你浪費超多空間！

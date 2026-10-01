@@ -1130,12 +1130,21 @@ def v24_rc6_one_tab_for_the_floor_and_old_saves_get_nothing(b, port, target):
     _quiet(g); to_service(g); _quiet(g)
     tabs = g.ev("[...document.querySelectorAll('#roomTabs button')].map(b=>b.dataset.room).join(',')")
     check('upgrp' in tabs and 'staff' not in tabs and 'pdr' not in tabs, f'one tab for the floor: {tabs}')
-    seen = []
-    g.ev("setRoom('up')")
-    for _ in range(3):
-        g.click('#roomTabs [data-room=upgrp]'); g.page.wait_for_timeout(40); seen.append(g.ev("room"))
-    check(seen == ['staff', 'pdr', 'up'], f'round the floor\'s rooms: {seen}')
-    check(g.ev("document.querySelector('#roomTabs [data-room=upgrp] span').textContent") == '二樓', 'labelled with where you are')
+    # the player's 04:17 correction: Restaurant → 二樓 → a room; the tab is the floor, the rooms are behind their doors
+    g.ev("setRoom('main')"); g.click('#roomTabs [data-room=upgrp]'); g.page.wait_for_timeout(40)
+    check(g.ev("room") == 'up', 'the tab opens the floor')
+    g.click('#roomTabs [data-room=upgrp]'); g.page.wait_for_timeout(40)
+    check(g.ev("room") == 'up', 'and stays on the floor (no going round three rooms)')
+    lab = lambda: g.ev("document.querySelector('#roomTabs [data-room=upgrp] span').textContent")
+    check(lab() == '二樓', f'labelled 二樓 on the floor: {lab()}')
+    tap = lambda x, y: g.ev(f"(()=>{{roomTap({{x:{x},y:{y}}},{{preventDefault(){{}}}});return room}})()")
+    check(tap("UPR.pd.x0+60", "UPR.pd.y1-30") == 'pdr', 'the Private Dining Room\'s wall or door on the floor: in')
+    check(lab() == '‹ 二樓', f'inside, the tab reads ‹ 二樓: {lab()}')
+    check(tap("PDL.door.x", "LH-30") == 'up', 'its door at the near end: back to the floor')
+    check(tap("UPR.srDoor.x", "UPR.sr.y1-30") == 'staff', 'the Staff Room\'s door: in')
+    g.click('#roomTabs [data-room=upgrp]'); g.page.wait_for_timeout(40)
+    check(g.ev("room") == 'up', 'the tab from inside a room: back to the floor')
+    check(g.ev("(()=>{room='up';const k=new KeyboardEvent('keydown',{key:'ArrowRight'});document.dispatchEvent(k);return room})()") not in ('staff', 'pdr'), 'the arrow keys go over the top-level rooms only')
     check(not g.errors, g.errors[:3]); g.close()
 
 
@@ -1155,12 +1164,12 @@ def v24_rc6_cats_visit_the_rooms_and_leave(b, port, target):
     check(g.ev("pdFreeForCat()") is True, 'the room is empty and nobody booked it')
     picks = g.ev("(()=>{const c=CATS[0];let n=0;for(let i=0;i<600;i++)if(upCatSpot(c).room==='pdr')n++;return n})()")
     check(10 <= picks <= 120, f'a rare place, not the usual one: {picks}/600')
-    cid = g.ev("(()=>{const c=CATS.find(o=>freeFloorCat(o));upCatForce(c);upCatUp(c,{room:'pdr',x:220,y:118,face:1,pose:'sit',t:12});return c.def.id})()")
+    cid = g.ev("(()=>{const c=CATS.find(o=>freeFloorCat(o));upCatForce(c);upCatUp(c,{room:'pdr',x:290,y:PDW+22,face:1,pose:'sit',t:12});return c.def.id})()")
     W = lambda cond, n=2500: g.ev(f"(()=>{{const c=catBy('{cid}');for(let i=0;i<{n};i++){{if({cond})return i;__tick(100)}}return -1}})()")
     check(W("c.away==='pdr'&&!c.upTo") >= 0, 'in the Private Dining Room, by the window')
     g.ev("setRoom('pdr');forceDraw=true;__tick(1000/30)")
     check(W("c.away!=='pdr'") >= 0 and W("!upCatBusy(c)") >= 0, 'out by the door and down the stairs, by herself')
-    g.ev(f"(()=>{{const c=catBy('{cid}');upCatForce(c);upCatUp(c,{{room:'pdr',x:240,y:118,face:-1,pose:'loaf',t:600}})}})()")
+    g.ev(f"(()=>{{const c=catBy('{cid}');upCatForce(c);upCatUp(c,{{room:'pdr',x:300,y:PDW+22,face:-1,pose:'loaf',t:600}})}})()")
     check(W("c.away==='pdr'&&!c.upTo") >= 0, 'in again, for a long nap')
     g.ev("pdSeated({size:5,pdWalk:1},pdTable())")
     check(W("c.away!=='pdr'", 400) >= 0, 'a party comes: she walks out (no vanishing)')
@@ -1194,7 +1203,7 @@ def v24_rc6_the_open_floor_keeps_its_ways(b, port, target):
     g.ev("__botUntil('R.t>=R.dur*.1',90000,1/30)")
     # a walker from the stairs to each door and back: every step outside the rooms' boxes while on the floor
     for dest in ('staff', 'pdr'):
-        r = json.loads(g.ev(f"""JSON.stringify((()=>{{const P=UPR.pd,Q=UPR.sr,inn=(r,x,y)=>x>r.x0+2&&x<r.x1-2&&y>r.y0+2&&y<r.y1-2;const w={{room:'up',x:UP_L.entry.x,y:UP_L.entry.y-4,troom:'{dest}',tx:200,ty:{'srY(.5)' if dest=='staff' else 'pdY(.25)'},step:0,moving:false}};let bad=0,n=0;
+        r = json.loads(g.ev(f"""JSON.stringify((()=>{{const P=UPR.pd,Q=UPR.sr,inn=(r,x,y)=>x>r.x0+2&&x<r.x1-2&&y>r.y0+2&&y<r.y1-2;const w={{room:'up',x:UP_L.entry.x,y:UP_L.entry.y-4,troom:'{dest}',tx:{'200' if dest=='staff' else '300'},ty:{'srY(.5)' if dest=='staff' else 'pdY(.25)'},step:0,moving:false}};let bad=0,n=0;
           for(;n<3000;n++){{if(stepTo(w,105/30))break;if(w.room==='up'&&(inn(P,w.x,w.y)||inn(Q,w.x,w.y)))bad++}}const there=w.room==='{dest}';w.troom='up';w.tx=UP_L.entry.x;w.ty=UP_L.entry.y-4;let m=0;for(;m<3000;m++){{if(stepTo(w,105/30))break;if(w.room==='up'&&(inn(P,w.x,w.y)||inn(Q,w.x,w.y)))bad++}}return{{there,back:w.room==='up',bad,n,m}}}})())"""))
         check(r['there'] and r['back'] and r['bad'] == 0 and r['n'] < 3000 and r['m'] < 3000, f'stairs → {dest} → stairs, never through a wall: {r}')
     check(g.ev("setRoom('up');forceDraw=true;__tick(1000/30);room") == 'up', 'the floor draws')

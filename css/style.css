@@ -632,3 +632,5 @@ html.desk button,html.desk [data-act],html.desk .polaroid{cursor:pointer}
 .tk.big{max-width:290px}.tk.big .it{width:28px;height:28px;border-radius:8px}.tk.big .tk-items{gap:3px}
 /* v2.4 rc6: tonight's Private Dining Room on the prep screen — one line, the minimum never cut */
 .event.pdres{display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline;background:#F3E9DA;border-style:solid;border-color:rgba(142,100,34,.35)}.event.pdres b{white-space:nowrap}.event.pdres span{font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}.event.pdres.quiet{background:var(--paper2);border-color:var(--line)}.event.pdres.quiet span{font-weight:600;color:var(--ink2);font-size:12px}
+/* v2.4 rc6: a ticket for the long table upstairs (nine to twelve plates): one row, smaller plates */
+.tk.huge{max-width:300px}#tickets .tk.huge .it{width:22px;height:22px;border-radius:6px}.tk.huge .tk-items{gap:2px}

@@ -1182,7 +1182,7 @@ function updGroup(g,dt){
  if(g.reg==='dylan'&&g.table!=null&&['reading','order','wait','eat','check'].includes(g.state))dylanGuestUpd(g,dt);
  if(g.state==='reading'){g.timer-=dt;if(g.timer<=0){g.state='order';sfx.bubble()}}
  if(g.state==='eat'){g.timer-=dt;if(g.timer<=0&&!storyLinger(g)){g.state='check';g.ate=1;sfx.bubble()}}}
-function seatGroup(g,t){t.group=g;t.dirty=false;g.table=t.i;if(t.pdr)pdSeated(g,t);if(g.reg==='dylan')dylanTrace({r:t.room||'main'});g.state='toTable';g.troom=t.room||'main';g.tx=t.pdr?t.x-pdHalf()-18:t.x;g.ty=t.y+8;   /* v2.4 rc6: the long table — they come round its end */g.pat=Math.min(1,g.pat+.1);requeue();sfx.tap();jillGreet(g,t);if(projOn('side')&&R.tables.some(q=>q.room==='side')&&R.tables.every(q=>q.room==='front'||q.group))ach('sideful');
+function seatGroup(g,t){t.group=g;t.dirty=false;g.table=t.i;if(t.pdr)pdSeated(g,t);if(g.reg==='dylan')dylanTrace({r:t.room||'main'});g.state='toTable';g.troom=t.room||'main';g.tx=t.x;g.ty=t.y+8;   /* v2.4 rc6: the long table — they come to its near end */g.pat=Math.min(1,g.pat+.1);requeue();sfx.tap();jillGreet(g,t);if(projOn('side')&&R.tables.some(q=>q.room==='side')&&R.tables.every(q=>q.room==='front'||q.group))ach('sideful');
  if(g.reg&&g.reg!=='dylan'){for(const id of regsOf(g)){const m=regMem(id);m.seats[t.i]=(m.seats[t.i]||0)+1}const v=S.regulars[g.reg]||0;/* v2.2 L: Jill's Card — every fifth visit, something on the house; visits are the only stamp */if((v+1)%5===0&&v>0&&!g.treat){g.treat='dessert';g.card=true}if(usualTable(g.reg)===t.i&&v>=4&&Math.random()<.25&&canChat('seat'+g.reg,300,3))setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,pickT(['老位子。','還是這裡好。','這個位子看得到貓。']))},500);
   const ud=usualDish(g.reg);if(ud&&v>=4&&!g.moment&&Math.random()<.5)g.usual=ud;regSeatMoment(g,t);regMeet(g);regularsNoticeDylan(g)}
  storySeatHook(g,t);storyCopresence(g);storyTick('seat',{g,t});   /* v2.3 */
@@ -1251,7 +1251,7 @@ function orderItems(g,est){/* v2.2: a sold-out dish is not on offer (est = the d
    auto-provisioning days the tutorial still lets Jill order a missing unit herself, so nothing is filtered there) */const ms0=menuList().filter(d=>stationOk(d)&&!(DISHES[d]&&DISHES[d].bar));const ms=est||S.day<=2?ms0:ms0.filter(d=>(S.stock[d]||0)>0);const T=TYPES[g.type];const W=R?R.weather:(S.today?S.today.weather:'sun');
  const wf=d=>demandW(d,T);const reco=recoDish();
  const foods=()=>ms.filter(d=>DISH(d).cat!=='drink'&&DISH(d).cat!=='dessert');const drinks=()=>ms.filter(d=>DISH(d).cat==='drink');const des=()=>ms.filter(d=>DISH(d).cat==='dessert');
- const items=[];const cap=g.size===1?3:g.size===2?4:g.size>=4?Math.min(8,g.size+2):5;   /* v2.4 rc6: a party of four to ten shares, up to eight plates */const reg=g.reg?REG_BY[g.reg]:null;
+ const items=[];const cap=g.size===1?3:g.size===2?4:g.size>=5?Math.min(12,g.size+2):5;   /* v2.4 rc6: a party of five to ten (the Private Dining Room) orders as people do — a dish each, a drink or a dessert here and there — up to twelve on one ticket */const reg=g.reg?REG_BY[g.reg]:null;
  if(!est&&g.wantDish&&g.via==='camp'&&!ms.includes(g.wantDish))g.wantMissed=1;/* v2.3: came for it, it ran out */
  if(namedId(g)==='周董'&&!est){const z=zhouOrder(ms);if(z){g.zhouUsual=1;return z}}/* v2.3: 「隨便」 */
  for(let k=0;k<g.size;k++){let d=null;
@@ -2784,8 +2784,8 @@ function upCatsHome(){if(CATS)for(const c of CATS)if(upCatBusy(c))upCatHome(c)}
 /* v2.4 rc6 AD: the Private Dining Room, empty, now and then: in by its door (left of the column, never through it), a while
    by the window, out the same way; never while the room is kept or a table is in it — a party coming sends her out */
 function pdFreeForCat(){if(!pdBuilt()||!R||phase!=='service'||pdHeld())return false;const t=pdTable();if(t&&(t.group||t.dirty))return false;return !(CATS&&CATS.some(o=>o.away==='pdr'))}
-function upCatPdrIn(sp,fin){const D=UPR.pdDoor,col=UP_L.col;return{x:176,y:col.base+22,v:38,then:o=>{o.upTo={x:D.x-6,y:D.y+12,v:38,then:o2=>{if(!pdFreeForCat()){o2.upT=null;o2.upTo={x:176,y:col.base+22,v:40,then:o3=>{o3.upTo={x:UP_L.entry.x,y:UP_L.entry.y-2,v:40,then:upCatDown}}};return}o2.away='pdr';o2.ax=PDL.door.x+6;o2.ay=PDL.door.y+8;o2.upTo={x:PDL.door.x+26,y:132,v:34,then:o3=>{o3.upTo={x:sp.x,y:sp.y,v:34,then:fin}}}}}}}}
-function upCatLeavePdr(c){if(!c||c.away!=='pdr')return;const D=UPR.pdDoor,col=UP_L.col;c.upT=null;c.upTo={x:PDL.door.x+26,y:132,v:44,then:o=>{o.upTo={x:PDL.door.x+6,y:PDL.door.y+8,v:44,then:o2=>{o2.away='up';o2.ax=D.x-6;o2.ay=D.y+12;o2.upTo={x:176,y:col.base+22,v:42,then:o3=>{o3.upTo={x:UP_L.entry.x,y:UP_L.entry.y-2,v:42,then:upCatDown}}}}}}}}
+function upCatPdrIn(sp,fin){const D=UPR.pdDoor,col=UP_L.col;return{x:176,y:col.base+22,v:38,then:o=>{o.upTo={x:D.x-6,y:D.y+12,v:38,then:o2=>{if(!pdFreeForCat()){o2.upT=null;o2.upTo={x:176,y:col.base+22,v:40,then:o3=>{o3.upTo={x:UP_L.entry.x,y:UP_L.entry.y-2,v:40,then:upCatDown}}};return}o2.away='pdr';o2.ax=PDL.door.x;o2.ay=PDL.door.y-4;o2.upTo={x:300,y:LH-56,v:34,then:o3=>{o3.upTo={x:300,y:PDW+34,v:34,then:o4=>{o4.upTo={x:sp.x,y:sp.y,v:30,then:fin}}}}}}}}}}
+function upCatLeavePdr(c){if(!c||c.away!=='pdr')return;const D=UPR.pdDoor,col=UP_L.col;c.upT=null;c.upTo={x:300,y:PDW+34,v:44,then:o0=>{o0.upTo={x:300,y:LH-56,v:44,then:o=>{o.upTo={x:PDL.door.x,y:PDL.door.y-4,v:44,then:o2=>{o2.away='up';o2.ax=D.x-6;o2.ay=D.y+12;o2.upTo={x:176,y:col.base+22,v:42,then:o3=>{o3.upTo={x:UP_L.entry.x,y:UP_L.entry.y-2,v:42,then:upCatDown}}}}}}}}}}
 function upCatToStairs(c,v){c.upTo={x:238,y:392,v:v||44,then:o=>{o.upTo={x:UP_L.entry.x,y:UP_L.entry.y-2,v:v||44,then:upCatDown}}}}
 function upCatTick(c,dt){if(c.upTo){const T=c.upTo;const dx=T.x-c.ax,dy=T.y-c.ay,d=Math.hypot(dx,dy),v=(T.v||36)*dt;
   if(d<=v){c.ax=T.x;c.ay=T.y;c.moving=false;c.upTo=null;if(T.then)T.then(c)}else{c.ax+=dx/d*v;c.ay+=dy/d*v;if(Math.abs(dx)>.5)c.aface=dx>=0?1:-1;c.moving=true;c.aoy=0}return}
@@ -2800,7 +2800,7 @@ function upCatSpot(c){const id=c.def.id;
  if(upHas('stool'))S0.push({x:UP_L.sill.x+40,y:115,oy:16,face:-1,pose:'sit',w:2});
  if(upHas('scratch'))S0.push({x:342,y:Math.round(92+(LH-92)*.42)+1,face:1,pose:'scr',w:1,t:rand(6,10)});
  if(upHas('table'))S0.push(srOn()?{x:296,y:upTableY()+12,face:1,pose:'loaf',w:1.5}:{x:122,y:Math.round(92+(LH-92)*.36)+12,face:1,pose:'loaf',w:1.5});
- if(pdFreeForCat())S0.push({room:'pdr',x:150+hash(id+'|pd|'+S.day)%110,y:118,face:hash(S.day+'|pd|'+id)%2?1:-1,pose:hash(id+'|pdp|'+S.day)%3?'sit':'loaf',w:.9,t:rand(25,45)});   /* v2.4 rc6 AD: an empty room, now and then */
+ if(pdFreeForCat())S0.push({room:'pdr',x:268+hash(id+'|pd|'+S.day)%50,y:PDW+22,face:hash(S.day+'|pd|'+id)%2?1:-1,pose:hash(id+'|pdp|'+S.day)%3?'sit':'loaf',w:.9,t:rand(25,45)});   /* v2.4 rc6 AD: an empty room, now and then */
  S0.push({x:150+hash(id+'|'+S.day)%90,y:210+hash(S.day+'|'+id)%80,face:1,pose:'sit',w:1});
  const s=wpick(S0,o=>o.w)||S0[S0.length-1];return Object.assign({t:rand(40,100)},s)}
 /* the open floor's cats (K, restrained): now and then one goes up for a while, one at a time; 柔柔 most of all, and 小齁
@@ -3447,7 +3447,7 @@ function ticketsLayout(){const el=ticketsEl;const more=$('#tkMore'),back=$('#tkB
 function renderTickets(){if(!R){ticketsEl.innerHTML=`<div class="tk-empty">${phase==='service'?'':'訂單會出現在這裡。'}</div>`;tkVer=-1;tkRefs=[];ticketsEl.classList.remove('scroll','compact');const m=$('#tkMore');if(m){m.hidden=true;$('#tkBack').hidden=true}return}
  if(R.tv===tkVer)return;tkVer=R.tv;
  if(!R.tickets.length){ticketsEl.innerHTML='<div class="tk-empty">還沒有訂單。點有「!」的桌子幫客人點餐。</div>';tkRefs=[];ticketsLayout();return}
- ticketsEl.innerHTML=R.tickets.map(tk=>{const g=tk.g;return`<div class="tk${tk.items.length>5?' big':''} ${g.reg?(g.reg==='dylan'?'isdylan':'isreg'):g.type==='vip'?'isvip':''}" data-tk="${tk.id}"><div class="tk-h"><b>T${tk.no}</b><em data-w>0:00</em></div><div class="tk-who"><img alt="" src="${guestPortrait(g)}"><span>${g.reg==='dylan'?'Dylan':g.name}</span>${g.via==='camp'?'<i class="via" title="看到宣傳來的">📱</i>':''}</div><div class="tk-items">${tk.items.map((it,i)=>`<button class="it ${it.st}" data-tk="${tk.id}" data-i="${i}" aria-label="${DISH(it.d).n}"><img alt="" src="${dishURL(it.d,it.st==='ready'||it.st==='served'?it.q:'G',it.want)}">${it.d==='steak'?`<span class="tag">${STEAK_S[it.want]}</span>`:''}${it.st==='ready'?'<span class="ok">✓</span>':''}${it.st==='order'?'<span class="dl">叫貨中</span>':''}</button>`).join('')}</div><div class="tk-pat"><i data-p></i></div>${(()=>{const st=treatState(g);if(!st.k)return'';if(st.k==='offer')return`<button class="tk-treat" data-treat="${tk.id}" aria-label="招待，今天還可以 ${st.left} 桌">招待<i>${st.left}</i></button>`;return`<span class="tk-treat ${st.k}" title="${st.n}">${st.n}</span>`})()}</div>`}).join('');ticketsLayout();
+ ticketsEl.innerHTML=R.tickets.map(tk=>{const g=tk.g;return`<div class="tk${tk.items.length>8?' big huge':tk.items.length>5?' big':''} ${g.reg?(g.reg==='dylan'?'isdylan':'isreg'):g.type==='vip'?'isvip':''}" data-tk="${tk.id}"><div class="tk-h"><b>T${tk.no}</b><em data-w>0:00</em></div><div class="tk-who"><img alt="" src="${guestPortrait(g)}"><span>${g.reg==='dylan'?'Dylan':g.name}</span>${g.via==='camp'?'<i class="via" title="看到宣傳來的">📱</i>':''}</div><div class="tk-items">${tk.items.map((it,i)=>`<button class="it ${it.st}" data-tk="${tk.id}" data-i="${i}" aria-label="${DISH(it.d).n}"><img alt="" src="${dishURL(it.d,it.st==='ready'||it.st==='served'?it.q:'G',it.want)}">${it.d==='steak'?`<span class="tag">${STEAK_S[it.want]}</span>`:''}${it.st==='ready'?'<span class="ok">✓</span>':''}${it.st==='order'?'<span class="dl">叫貨中</span>':''}</button>`).join('')}</div><div class="tk-pat"><i data-p></i></div>${(()=>{const st=treatState(g);if(!st.k)return'';if(st.k==='offer')return`<button class="tk-treat" data-treat="${tk.id}" aria-label="招待，今天還可以 ${st.left} 桌">招待<i>${st.left}</i></button>`;return`<span class="tk-treat ${st.k}" title="${st.n}">${st.n}</span>`})()}</div>`}).join('');ticketsLayout();
  tkRefs=[...ticketsEl.querySelectorAll('.tk')].map(el=>({el,tk:R.tickets.find(t=>t.id===+el.dataset.tk),w:el.querySelector('[data-w]'),p:el.querySelector('[data-p]')}));updTicketBars()}
 function updTicketBars(){if(!R)return;for(const r of tkRefs){if(!r.tk)continue;const e=Math.floor(R.t-r.tk.t0);r.w.textContent=`${Math.floor(e/60)}:${String(e%60).padStart(2,'0')}`;const p=r.tk.g.pat;r.p.style.width=(p*100)+'%';r.p.style.background=p>.55?'#5E8F4E':p>.28?'#E0A43A':'#D4553A';r.el.classList.toggle('urgent',p<.28)}}
 /* a long press on a game control (hold-and-release cooking, buttons, the room) must never become a text
@@ -3492,7 +3492,9 @@ function renderStock(){const p=$('#stockPanel');if(!p||p.hidden||!R)return;const
 /* ---- room navigation: tabs with badges (what needs you where), swipe on the scene, keys 1–4 on a keyboard ---- */
 const ROOM_ORDER=['front','main','side','up','staff','pdr','lounge','kitchen'];   /* v2.4 rc6: the two rooms on the floor */
 function roomsOpen(){return ROOM_ORDER.filter(roomOpen)}
-function setRoom(k){if(!roomOpen(k)||k===room)return;room=k;if(UP_ROOMS.includes(k))upLastRoom=k;forceDraw=true;sfx.tap();renderRoomTabs(true)}
+function setRoom(k){if(!roomOpen(k)||k===room)return;room=k;forceDraw=true;sfx.tap();renderRoomTabs(true)}
+/* the rooms you can go to from the tabs: the floor's rooms are inside the floor (Restaurant → 二樓 → a room) */
+function roomsTop(){return roomsOpen().filter(k=>k!=='staff'&&k!=='pdr')}
 function roomAlerts(){const A={};for(const k of ROOM_ORDER)A[k]={n:0,u:0};if(!R||phase!=='service')return A;
  for(const t of R.tables){const k=t.room||'main';const g=t.group;if(!g){if(t.dirty)A[k].n++;continue}if(g.rowdy){A[k].n++;A[k].u++;continue}if(g.state==='order'||g.state==='check'||(g.state==='wait'&&g.ticket&&g.ticket.items.some(i=>i.st==='ready'&&!i.picked))){A[k].n++;if(g.pat<.3)A[k].u++}}
  for(const s0 of R.slots){if(s0.broken){A.kitchen.n++;A.kitchen.u++;continue}const j=s0.job;if(j&&!chefHandles(s0)){const u=urgency(j);if(u>=2){A.kitchen.n++;if(u>=3)A.kitchen.u++}}}
@@ -3502,18 +3504,18 @@ let tabsHTML='';
 function roomIsNew(k){const nr=S.newRooms||{};const d=k==='side'?nr.side:k==='up'?nr.up:k==='staff'?nr.staff:k==='pdr'?nr.pdr:k==='lounge'?nr.lounge:k==='kitchen'?Math.max(nr.kext||0,nr.cooler||0,nr.pass||0):k==='front'?Math.max(nr.terrace||0,...EXTERIOR.map(e=>S.ext&&S.ext[e.k]?0:0)):0;return!!d&&S.day-d<=1}
 function peeking(){const p=$('#peekPill');return!!p&&!p.hidden}   /* v2.2.1 #8: 看店裡 from the shop or the prep screen */
 function renderRoomTabs(force){const el=$('#roomTabs');if(!el)return;const show=(phase==='service'&&!!R)||(phase!=='service'&&peeking()&&roomsOpen().length>1);el.hidden=!show;if(!show)return;const A=roomAlerts();
- const open0=roomsOpen();const grp=UP_ROOMS.filter(k=>open0.includes(k));const inUp=UP_ROOMS.includes(room);const h=open0.filter(k=>grp.length<2||!UP_ROOMS.includes(k)||k==='up').map(k=>k==='up'&&grp.length>1?(()=>{/* v2.4 rc6: one tab for the floor and its rooms */const n=grp.reduce((a,q)=>a+A[q].n,0),u=grp.some(q=>A[q].u),nw=grp.some(q=>roomIsNew(q))&&!inUp;return`<button data-room="upgrp" class="${inUp?'on':''}${u?' urgent':''}${nw?' new':''}"><span>${ROOMS[inUp?room:'up'].n}</span>${n?`<b>${n}</b>`:nw?'<b class="nw">NEW</b>':''}</button>`})():`<button data-room="${k}" class="${k===room?'on':''}${A[k].u?' urgent':''}${roomIsNew(k)&&k!==room?' new':''}"><span>${ROOMS[k].n}</span>${A[k].n?`<b>${A[k].n}</b>`:roomIsNew(k)&&k!==room?'<b class="nw">NEW</b>':''}</button>`).join('');
+ const open0=roomsOpen();const grp=UP_ROOMS.filter(k=>open0.includes(k));const inUp=UP_ROOMS.includes(room);const h=open0.filter(k=>grp.length<2||!UP_ROOMS.includes(k)||k==='up').map(k=>k==='up'&&grp.length>1?(()=>{/* v2.4 rc6: one tab for the floor and its rooms */const n=grp.reduce((a,q)=>a+A[q].n,0),u=grp.some(q=>A[q].u),nw=grp.some(q=>roomIsNew(q))&&!inUp;return`<button data-room="upgrp" class="${inUp?'on':''}${u?' urgent':''}${nw?' new':''}"><span>${inUp&&room!=='up'?'‹ 二樓':'二樓'}</span>${n?`<b>${n}</b>`:nw?'<b class="nw">NEW</b>':''}</button>`})():`<button data-room="${k}" class="${k===room?'on':''}${A[k].u?' urgent':''}${roomIsNew(k)&&k!==room?' new':''}"><span>${ROOMS[k].n}</span>${A[k].n?`<b>${A[k].n}</b>`:roomIsNew(k)&&k!==room?'<b class="nw">NEW</b>':''}</button>`).join('');
  if(force||h!==tabsHTML){tabsHTML=h;el.innerHTML=h}}
 {const rt=$('#roomTabs');if(rt)rt.addEventListener('click',e=>{const b=e.target.closest('[data-room]');if(!b)return;if(b.dataset.room==='upgrp')upTabTap();else setRoom(b.dataset.room)})}
-/* v2.4 rc6: the floor's tab — on the floor it goes round its rooms; from elsewhere, to the one that needs you (else the last one you were in) */
-function upTabTap(){const open=roomsOpen();const grp=UP_ROOMS.filter(k=>open.includes(k));if(UP_ROOMS.includes(room)){const i=grp.indexOf(room);setRoom(grp[(i+1)%grp.length]);return}const A=roomAlerts();const need=grp.find(k=>A[k].u)||grp.find(k=>A[k].n);setRoom(need||(grp.includes(upLastRoom)?upLastRoom:'up'))}
-let upLastRoom='up';
+/* v2.4 rc6 (the player's 04:17 correction): the floor's tab is the floor — from anywhere, and from inside one of its rooms
+   (then it reads ‹ 二樓): Restaurant → 二樓 → a room, and back the same way; the rooms are entered by their doors */
+function upTabTap(){setRoom('up')}
 /* v2.2 X: keyboard — Space pauses and resumes a service, Escape closes what is open (a dialogue line, the lightbox, a
    sheet, the pause menu), Enter/Space steps a dialogue. Only when nothing is being typed. */
 document.addEventListener('keydown',e=>{if(e.target&&/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))return;if(e.key==='Enter'||e.key===' '){if($('#dlg')&&!$('#dlg').hidden){e.preventDefault();dlgNext();return}}
  if(e.key==='Escape'){if($('#dlg')&&!$('#dlg').hidden){dlgNext();return}if(lightbox){closeLightbox();return}if(sub){if(sub==='pause'&&phase==='service'){paused=false;hideScreen()}else closeSub();return}if(phase==='service'&&R&&!paused){paused=true;showPause();checkpointSave('pause')}return}
  if(e.key===' '&&phase==='service'&&R&&!e.repeat){if(!sub){e.preventDefault();paused=true;showPause();checkpointSave('pause')}else if(sub==='pause'){e.preventDefault();paused=false;hideScreen()}}});
-document.addEventListener('keydown',e=>{if(phase!=='service'||!R||sub)return;const i=['1','2','3','4'].indexOf(e.key);if(i>=0){const list=roomsOpen();if(list[i])setRoom(list[i])}else if(e.key==='ArrowLeft'||e.key==='ArrowRight'){const list=roomsOpen();const i2=list.indexOf(room)+(e.key==='ArrowRight'?1:-1);if(list[i2])setRoom(list[i2])}});
+document.addEventListener('keydown',e=>{if(phase!=='service'||!R||sub)return;const i=['1','2','3','4'].indexOf(e.key);if(i>=0){const list=roomsTop();if(list[i])setRoom(list[i])}else if(e.key==='ArrowLeft'||e.key==='ArrowRight'){const list=roomsTop();const here=(room==='staff'||room==='pdr')?'up':room;const i2=list.indexOf(here)+(e.key==='ArrowRight'?1:-1);if(list[i2])setRoom(list[i2])}});
 let SW=null;
 function swipeEnd(e){if(!SW||!R)return;const dx=e.clientX-SW.x,dy=e.clientY-SW.y,dt=performance.now()-SW.t;const hit=SW.hit,idle=SW.idle;SW=null;const swiped=!R.holdSlot&&dt<=700&&Math.abs(dx)>=70&&Math.abs(dy)<=Math.abs(dx)*.6;if(idle!=null&&!swiped&&Math.hypot(dx,dy)<12){if(!paused&&room==='kitchen')tapStation(idle);return}if(hit||!swiped)return;const list=roomsOpen();const i=list.indexOf(room)+(dx<0?1:-1);if(list[i])setRoom(list[i])}
 window.addEventListener('pointerup',swipeEnd);
@@ -3732,13 +3734,13 @@ function drawJillAt(c,J,V,now){const moving=J.moving;const stp=moving?Math.sin(J
   if(pet&&pet.cat){const p=pet.cat;const hx=p.x+(p.x<J.x?6:-6),hy=p.y-(p.st==='sleep'?6:10);c.fillStyle=JILL_LOOK.skin;circ(c,hx,hy,2.6);c.fillStyle='rgba(60,34,22,.35)';c.beginPath();c.arc(hx,hy,2.6,0,7);c.stroke()}
   if(cooking){const f=J.face<0?-1:1;const a=Math.sin(now*9);c.save();c.translate(J.x+f*4,J.y-29+a*1.6);c.rotate(f*(-.55+a*.3));c.fillStyle='#D9D9DD';rr(c,-1.1,-8,2.4,9.5,1);c.fill();c.strokeStyle='rgba(60,34,22,.4)';c.lineWidth=.5;c.stroke();c.fillStyle='#4A3226';rr(c,-1.4,1.4,3,4.4,1.2);c.fill();c.restore()}
   J.carry.slice(0,3).forEach((cc,i)=>{const cv=dishCanvas(cc.it.d,cc.it.q,64,S.decor.ware>0,cc.it.want);c.drawImage(cv,J.x+(i%2?5:-21),J.y-50-Math.floor(i/2)*8,16,16)})}
-function drawTableOverlay(c,t,now,pulse){const g=t.group;const bx=t.x,by=t.y-(t.seats===4?74:68);
+function drawTableOverlay(c,t,now,pulse){const g=t.group;const bx=t.x,by=t.pdr?t.y+40:t.y-(t.seats===4?74:68);const ring=(col,w,dash)=>{if(t.pdr){const G=pdGeo();c.strokeStyle=col;c.lineWidth=w;if(dash)c.setLineDash(dash);rr(c,G.x-G.hw-30,G.y0-18,(G.hw+30)*2,G.y1-G.y0+30,14);c.stroke();c.setLineDash([]);return true}return false};
    if(g&&!['toTable','leave'].includes(g.state)){let kind=null,extra=null;if(g.state==='reading')kind='menu';else if(g.state==='order')kind='order';else if(g.state==='wait'){const it=g.ticket?g.ticket.items:[];if(it.some(i=>i.st==='ready'&&!i.picked))kind='ready';else kind='wait',extra=[it.filter(i=>i.st==='served').length,it.length]}else if(g.state==='check')kind='check';
-    const act=kind==='order'||kind==='ready'||kind==='check';if(act){c.strokeStyle=`rgba(255,215,110,${.35+pulse*.45})`;c.lineWidth=2;c.beginPath();c.ellipse(t.x,t.y-4,(t.seats===4?42:34)+pulse*3,15+pulse*1.5,0,0,7);c.stroke()}
+    const act=kind==='order'||kind==='ready'||kind==='check';if(act&&!ring(`rgba(255,215,110,${.35+pulse*.45})`,2)){c.strokeStyle=`rgba(255,215,110,${.35+pulse*.45})`;c.lineWidth=2;c.beginPath();c.ellipse(t.x,t.y-4,(t.seats===4?42:34)+pulse*3,15+pulse*1.5,0,0,7);c.stroke()}
     if(g.rowdy){kind='angry';c.save();c.translate(Math.sin(now*40)*1.2,0)}if(kind)bubble(c,bx,by,kind,g.rowdy?pulse:act?pulse:0,extra);if(g.rowdy)c.restore();if(['order','wait','check'].includes(g.state))patBar(c,bx,by+13,g.pat);if(g.ret||g.reg){c.fillStyle='#E8798A';c.beginPath();const hx=bx+15,hy=by-8;c.moveTo(hx,hy+4);c.bezierCurveTo(hx-6,hy,hx-3,hy-5,hx,hy-2);c.bezierCurveTo(hx+3,hy-5,hx+6,hy,hx,hy+4);c.fill()}
     if(g.type==='vip'){c.fillStyle='#E0B863';c.font=`800 7px ${FONT}`;c.textAlign='center';c.fillText('VIP',bx-17,by-6)}}
-   else if(!g&&t.dirty){bubble(c,bx,by+8,'dirty',pulse);c.strokeStyle=`rgba(160,210,235,${.3+pulse*.4})`;c.lineWidth=2;c.beginPath();c.ellipse(t.x,t.y-4,34+pulse*3,15,0,0,7);c.stroke()}
-   else if(!g&&!t.dirty&&queued().some(q=>q.size<=t.seats)){c.strokeStyle=`rgba(140,200,120,${.25+pulse*.35})`;c.lineWidth=1.6;c.setLineDash([4,4]);c.beginPath();c.ellipse(t.x,t.y-4,t.seats===4?42:32,14,0,0,7);c.stroke();c.setLineDash([])}}
+   else if(!g&&t.dirty){bubble(c,bx,by+8,'dirty',pulse);if(!ring(`rgba(160,210,235,${.3+pulse*.4})`,2)){c.strokeStyle=`rgba(160,210,235,${.3+pulse*.4})`;c.lineWidth=2;c.beginPath();c.ellipse(t.x,t.y-4,34+pulse*3,15,0,0,7);c.stroke()}}
+   else if(!g&&!t.dirty&&queued().some(q=>q.size<=t.seats&&(!t.pdr||pdTableFor(q)))){if(!ring(`rgba(140,200,120,${.25+pulse*.35})`,1.6,[4,4])){c.strokeStyle=`rgba(140,200,120,${.25+pulse*.35})`;c.lineWidth=1.6;c.setLineDash([4,4]);c.beginPath();c.ellipse(t.x,t.y-4,t.seats===4?42:32,14,0,0,7);c.stroke();c.setLineDash([])}}}
 /* the pass, seen from the dining room: the counter with today's ready plates (drawCounter) plus one status dot per
    station and the way to the kitchen. Tapping the counter goes to the kitchen. */
 /* ================= 2.0: the kitchen, the side room and the street ================= */
@@ -3761,7 +3763,7 @@ function drawOtherRoom(c,now,dusk,V,X0,XW,TOP){const k=room;const J=V.jill;const
  list.sort((a,b)=>a.y-b.y).forEach(i=>i.f());
  /* the light of the hour, as in the dining room (the street bakes it into its sky) */
  if(k!=='front'){c.save();c.globalCompositeOperation='multiply';c.fillStyle=k==='lounge'?mix(wxTint(tintFor(dusk)),'#5A4E48',.55):wxTint(tintFor(dusk));c.fillRect(X0,-TOP,XW,LH+TOP);/* v2.3: the Lounge is dimmer, whatever the hour */c.restore();
-  /* the room's own lamps come up with the evening */c.save();c.globalCompositeOperation='lighter';const lk=.1+clamp(dusk,0,1)*.22;const spots=k==='side'?[{x:104,y:40,r:90,k:1},{x:296,y:40,r:90,k:1},{x:200,y:150,r:130,k:.8}]:k==='lounge'?[{x:242,y:150,r:96,k:1.5,col:'255,190,110'},{x:322,y:150,r:96,k:1.5,col:'255,190,110'},{x:296,y:70,r:120,k:1.1,col:'255,200,130'}].concat(V.tables.filter(t=>t.room==='lounge'&&t.kind!=='bar').map(t=>({x:t.x-34,y:t.y-30,r:74,k:1.35,col:'255,196,120'}))):k==='up'?upLampSpots():k==='staff'?[{x:200,y:30,r:150,k:.9},{x:360,y:60,r:70,k:.7}]:k==='pdr'?[{x:200,y:PDL_TABLE().y-90,r:160,k:1.1,col:'255,200,130'},{x:340,y:70,r:70,k:.6}]:[{x:KX.range.x+KX.range.w/2,y:60,r:120,k:.9,col:'255,236,190'},{x:132,y:KY.rail+20,r:70,k:.9},{x:200,y:KY.rail+20,r:70,k:.9},{x:268,y:KY.rail+20,r:70,k:.9},{x:200,y:LH-60,r:90,k:.5}];
+  /* the room's own lamps come up with the evening */c.save();c.globalCompositeOperation='lighter';const lk=.1+clamp(dusk,0,1)*.22;const spots=k==='side'?[{x:104,y:40,r:90,k:1},{x:296,y:40,r:90,k:1},{x:200,y:150,r:130,k:.8}]:k==='lounge'?[{x:242,y:150,r:96,k:1.5,col:'255,190,110'},{x:322,y:150,r:96,k:1.5,col:'255,190,110'},{x:296,y:70,r:120,k:1.1,col:'255,200,130'}].concat(V.tables.filter(t=>t.room==='lounge'&&t.kind!=='bar').map(t=>({x:t.x-34,y:t.y-30,r:74,k:1.35,col:'255,196,120'}))):k==='up'?upLampSpots():k==='staff'?[{x:200,y:30,r:150,k:.9},{x:360,y:60,r:70,k:.7}]:k==='pdr'?(()=>{const G=pdGeo();return[{x:200,y:(G.y0+G.y1)/2-40,r:Math.max(160,(G.y1-G.y0)*.8),k:.9,col:'255,206,140'},{x:200,y:PDW-40,r:120,k:.5,col:'255,214,160'}]})():[{x:KX.range.x+KX.range.w/2,y:60,r:120,k:.9,col:'255,236,190'},{x:132,y:KY.rail+20,r:70,k:.9},{x:200,y:KY.rail+20,r:70,k:.9},{x:268,y:KY.rail+20,r:70,k:.9},{x:200,y:LH-60,r:90,k:.5}];
   for(const L0 of spots){let g=c.createRadialGradient(L0.x,L0.y,2,L0.x,L0.y+30,L0.r);g.addColorStop(0,`rgba(${L0.col||'255,196,120'},${lk*L0.k})`);g.addColorStop(1,'rgba(255,170,90,0)');c.fillStyle=g;c.fillRect(L0.x-L0.r,L0.y-L0.r,L0.r*2,L0.r*2.4)}
   if(k==='side'||k==='lounge')for(const t of V.tables){if(t.room!==k)continue;let g=c.createRadialGradient(t.x,t.y-15,1,t.x,t.y-15,26);g.addColorStop(0,`rgba(255,190,100,${.1+dusk*.12})`);g.addColorStop(1,'rgba(255,190,100,0)');c.fillStyle=g;c.fillRect(t.x-26,t.y-41,52,52)}c.restore()}
  if(R){const pulse=(Math.sin(now*6)+1)/2;for(const t of R.tables)if((t.room||'main')===k)drawTableOverlay(c,t,now,pulse);
@@ -4017,7 +4019,7 @@ const UP_L={win:[{x:36,y:4,w:150,h:76},{x:214,y:4,w:150,h:76}],pil:{x:189,w:22},
  get stair(){return{x:262,y:FB-170,w:114,h:162}},
  get entry(){return{x:246,y:FB-24}},
  get sill(){return{x:300,y:98}}};
-const UP_ZONES={get staff(){return{x:22,y:150,w:128,h:Math.round((LH-92)*.48)}},get pdr(){return{x:22,y:94,w:356,h:62}},get stairs(){const s=UP_L.stair;return{x:s.x-16,y:s.y-6,w:s.w+22,h:s.h+14}},get undecided(){return{x:22,y:FB-150,w:206,h:142}},get middle(){return{x:150,y:160,w:110,h:Math.round((LH-92)*.5)}}};
+const UP_ZONES={get staff(){const B=UPR.sr;return{x:B.x0,y:B.y0,w:B.x1-B.x0,h:B.y1-B.y0}},get pdr(){const B=UPR.pd;return{x:B.x0,y:B.y0,w:B.x1-B.x0,h:B.y1-B.y0}},get stairs(){const s=UP_L.stair;return{x:s.x-16,y:s.y-6,w:s.w+22,h:s.h+14}},get undecided(){return{x:22,y:FB-150,w:206,h:142}},get middle(){return{x:150,y:160,w:110,h:Math.round((LH-92)*.5)}}};
 const UPDOOR={x:204,get y(){return FB-8}};   /* the stair door, at the side room's near edge */
 function upTaken(){return !!(S.rooms&&S.rooms.up)}
 function upHas(k){const f=S.up&&S.up.furn;return !!(f&&f[k]!=null&&S.day>=f[k])}
@@ -4044,9 +4046,9 @@ function drawUpRoom(c,now,dusk,V,X0,XW,TOP,list){const d=clamp(dusk,0,1);const t
   /* the trees and the buildings across the street */c.fillStyle=mix('#7FA86A','#22302A',d);for(let k=0;k<6;k++)el(c,w.x+10+k*27,w.y+w.h-8-(k%2)*6,16,10);c.fillStyle=mix('#B8B0A8','#2A2C3C',d);for(let k=0;k<4;k++)c.fillRect(w.x+18+k*36,w.y+22+(k%2)*8,18,w.h-30);if(d>.45){c.fillStyle='rgba(255,214,140,.75)';for(let k=0;k<10;k++)c.fillRect(w.x+21+((k*29+i*13)%(w.w-28)),w.y+26+((k*17)%(w.h-36)),2.5,2.5)}
   if(wet){c.strokeStyle='rgba(235,242,250,.4)';c.lineWidth=.8;for(let k=0;k<10;k++){const ph=((now*.5)+k*.37)%1;const rx=w.x+4+((k*31)%(w.w-8));c.beginPath();c.moveTo(rx,w.y+ph*w.h);c.lineTo(rx-1,w.y+ph*w.h+6);c.stroke()}}
   c.fillStyle='#2F2A26';for(let k=1;k<5;k++)c.fillRect(w.x+k*w.w/5-1,w.y,2,w.h);c.fillRect(w.x,w.y+w.h*.42,w.w,2);if(!taken){c.fillStyle='rgba(200,190,170,.18)';c.fillRect(w.x,w.y,w.w,w.h)}}
- /* daylight through the windows onto the floor; the lamps' pools once they are on */if(d<.55){c.save();c.globalCompositeOperation='lighter';for(const w of UP_L.win){const a=(.55-d)*.35*(taken?1:.75);c.fillStyle=`rgba(255,214,150,${a})`;c.beginPath();c.moveTo(w.x+6,92);c.lineTo(w.x+w.w-6,92);c.lineTo(w.x+w.w+24,212);c.lineTo(w.x+30,212);c.closePath();c.fill()}c.restore()}
- if(lamps){c.save();c.globalCompositeOperation='lighter';for(const lx of[110,290]){let g=c.createRadialGradient(lx,150,6,lx,150,120);g.addColorStop(0,`rgba(255,206,130,${taken?.26:.22})`);g.addColorStop(1,'rgba(255,206,130,0)');c.fillStyle=g;c.fillRect(lx-120,30,240,240)}c.restore()}
- /* the pendant lamps, hanging in front of the windows */for(const lx of[110,290]){c.fillStyle='#2A2420';c.fillRect(lx-.6,-TOP,1.2,TOP+32);c.fillStyle='#2F2A26';c.beginPath();c.moveTo(lx-9,42);c.lineTo(lx+9,42);c.lineTo(lx+4,32);c.lineTo(lx-4,32);c.closePath();c.fill();if(lamps){c.fillStyle='#FFE7B0';el(c,lx,42.5,7,2.2)}}
+ /* daylight through the windows onto the floor; the lamps' pools once they are on */if(d<.55){c.save();c.globalCompositeOperation='lighter';for(const w of UP_L.win){if(w===UP_L.win[0]&&pdBuilt())continue;/* v2.4 rc6: that window is in the Private Dining Room now */const a=(.55-d)*.35*(taken?1:.75);c.fillStyle=`rgba(255,214,150,${a})`;c.beginPath();c.moveTo(w.x+6,92);c.lineTo(w.x+w.w-6,92);c.lineTo(w.x+w.w+24,212);c.lineTo(w.x+30,212);c.closePath();c.fill()}c.restore()}
+ if(lamps){c.save();c.globalCompositeOperation='lighter';for(const lx of(pdBuilt()?[290]:[110,290])){let g=c.createRadialGradient(lx,150,6,lx,150,120);g.addColorStop(0,`rgba(255,206,130,${taken?.26:.22})`);g.addColorStop(1,'rgba(255,206,130,0)');c.fillStyle=g;c.fillRect(lx-120,30,240,240)}c.restore()}
+ /* the pendant lamps, hanging in front of the windows (the left one is inside the Private Dining Room once it is built) */for(const lx of(pdBuilt()?[290]:[110,290])){c.fillStyle='#2A2420';c.fillRect(lx-.6,-TOP,1.2,TOP+32);c.fillStyle='#2F2A26';c.beginPath();c.moveTo(lx-9,42);c.lineTo(lx+9,42);c.lineTo(lx+4,32);c.lineTo(lx-4,32);c.closePath();c.fill();if(lamps){c.fillStyle='#FFE7B0';el(c,lx,42.5,7,2.2)}}
  /* the column in the middle of the floor: a square concrete post, plaster in front, the shaded side, a dark base and capital */list.push({y:col.base,f:()=>{const w=26,sd=8,x0=col.x-w/2;c.fillStyle='rgba(0,0,0,.18)';el(c,col.x+6,col.base+2,w*.75,5);c.fillStyle=taken?'#DCCDB4':'#C9BBA4';c.fillRect(x0,col.top,w,col.base-col.top);c.fillStyle=taken?'#BFAE93':'#AE9F88';c.beginPath();c.moveTo(x0+w,col.top);c.lineTo(x0+w+sd,col.top-4);c.lineTo(x0+w+sd,col.base-4);c.lineTo(x0+w,col.base);c.closePath();c.fill();c.fillStyle='rgba(0,0,0,.06)';c.fillRect(x0,col.top,3,col.base-col.top);c.fillStyle=taken?'#6B4E34':'#5E4A38';c.fillRect(x0-2,col.base-9,w+4,9);c.beginPath();c.moveTo(x0+w+2,col.base-9);c.lineTo(x0+w+sd+2,col.base-13);c.lineTo(x0+w+sd+2,col.base-4);c.lineTo(x0+w+2,col.base);c.closePath();c.fill();c.fillRect(x0-2,col.top-2,w+4,6);c.beginPath();c.moveTo(x0+w+2,col.top-2);c.lineTo(x0+w+sd+2,col.top-6);c.lineTo(x0+w+sd+2,col.top);c.lineTo(x0+w+2,col.top+4);c.closePath();c.fill()}});
  /* the railing: along the opening's back edge, and down its left side to the way in */list.push({y:s.y,f:()=>{c.fillStyle='#3A2A1E';c.fillRect(s.x-3,s.y-26,s.w+3,4);for(let x=s.x;x<=s.x+s.w;x+=9)c.fillRect(x,s.y-24,2,24);c.fillStyle='rgba(0,0,0,.18)';c.fillRect(s.x,s.y,s.w,2)}});
  for(let y=s.y;y<=s.y+86;y+=9){const yy=y;list.push({y:yy,f:()=>{c.fillStyle='#3A2A1E';c.fillRect(s.x-1,yy-24,2,24);if(yy+9<=s.y+86)c.fillRect(s.x-3,yy-26,4,9.5)}})}
@@ -4054,6 +4056,10 @@ function drawUpRoom(c,now,dusk,V,X0,XW,TOP,list){const d=clamp(dusk,0,1);const t
  /* the landlord's things: a plant in one corner, boxes and a step ladder in the other, a folding table and two chairs
     by the left wall. Once the floor is Jill's: two boxes left from the works, and what has been carried up since */
  if(!pdOn())list.push({y:118,f:()=>drawPlant(c,58,118,'tall')});   /* v2.4 rc6: it went into the Private Dining Room */
+ /* v2.4 rc6: with the rooms built, the open part left of the stairs — not decided, not empty: the light from the side
+    windows lies on the boards (sun by day, the street at night), a big plant in the corner, the boards running on */
+ if(srOn()||pdOn()){const y0=UPR.sr.y1+18,y1=FB-14;if(y1-y0>40){c.save();c.globalCompositeOperation='lighter';const day=d<.55;for(let k=0;k<3;k++){const yy=y0+k*(y1-y0)/3+6;c.fillStyle=day?`rgba(255,226,170,${(.55-d)*.28})`:`rgba(170,190,230,${.05+d*.05})`;c.beginPath();c.moveTo(14,yy);c.lineTo(14,yy+26);c.lineTo(120,yy+40);c.lineTo(120,yy+14);c.closePath();c.fill()}c.restore()}
+  list.push({y:FB-18,f:()=>drawPlant(c,40,FB-18,'tall')})}
  const box=(x,y,w,h)=>list.push({y,f:()=>{c.fillStyle='rgba(0,0,0,.14)';el(c,x+w/2,y+1,w*.6,3);c.fillStyle='#B98E5E';c.fillRect(x,y-h,w,h);c.fillStyle='#A47A4C';c.fillRect(x,y-h,w,4);c.fillStyle='rgba(255,255,255,.25)';c.fillRect(x+w/2-1,y-h,2,h)}});
  box(320,122,22,18);box(343,127,20,14);if(!taken){box(328,104,18,14);box(50,240,22,16);box(54,222,16,12);box(300,118,16,10)}
  if(!taken){/* the step ladder */list.push({y:124,f:()=>{c.strokeStyle='#8A8E92';c.lineWidth=1.8;c.beginPath();c.moveTo(352,126);c.lineTo(359,90);c.lineTo(366,126);c.stroke();for(let k=0;k<3;k++){c.beginPath();c.moveTo(353+k*1.8,119-k*10);c.lineTo(365-k*1.8,119-k*10);c.stroke()}}});
@@ -4102,10 +4108,10 @@ const UP_ROOMS=['up','staff','pdr'];
 /* where they stand on the floor (B): the Private Dining Room in the left window bay — the floor's left window is its
    window; the Staff Room inside, below it, no window. Logical coordinates of the 二樓 view; the depth follows LH. */
 const UPR={
- get pd(){const H=LH-92;return{x0:22,x1:186,y0:92,y1:92+Math.round(clamp(H*.24,104,170))}},
- get sr(){const H=LH-92;const y0=UPR.pd.y1;return{x0:22,x1:150,y0,y1:y0+Math.round(clamp(H*.36,120,270))}},
- get pdDoor(){return{x:168,y:UPR.pd.y1}},
- get srDoor(){return{x:120,y:UPR.sr.y1}}};
+ get pd(){const H=LH-92;return{x0:22,x1:186,y0:92,y1:92+Math.round(clamp(H*.2,96,140))}},
+ get sr(){const H=LH-92;const y0=UPR.pd.y1+UPRW.h;return{x0:22,x1:130,y0,y1:y0+Math.round(clamp(H*.21,96,170))}},   /* a passage between the two, a wall's height deep: the Private Dining Room's whole front shows over it */
+ get pdDoor(){return{x:158,y:UPR.pd.y1}},
+ get srDoor(){return{x:98,y:UPR.sr.y1}}};
 /* state: S.up.sr = {offer, bought, done, st2, st3} (the Staff Room's phases: done the day it is ready; st2 / st3 the
    day each improvement shows); S.up.pd = {offer, bought, done, st2, st3, res, book, pity, n} (the Private Dining Room) */
 function srOf(){return S.up&&S.up.sr||null}
@@ -4135,23 +4141,91 @@ const ROOM_PARENT={side:'main',front:'main',kitchen:'main',lounge:'main',up:'sid
 function roomPath(k){const p=[k];let x=k;while(ROOM_PARENT[x]){x=ROOM_PARENT[x];p.unshift(x)}return p}
 /* the doors inside the two rooms (their own views) */
 const SRL={door:{x:252,y:104},get floorY(){return 92}};
-const PDL={door:{x:44,y:106}};
+const PDL={door:{x:200,get y(){return LH-14}}};   /* v2.4 rc6 (04:25): the door is at the table's near end, the bottom of the view */
 function upRoomDoor(k){return k==='staff'?UPR.srDoor:UPR.pdDoor}
 /* the column in the middle of the floor: a path through its foot goes round it, in front (B: circulation) */
 function segRect(x0,y0,x1,y1,rx0,ry0,rx1,ry1){let t0=0,t1=1;const dx=x1-x0,dy=y1-y0;const P=[-dx,dx,-dy,dy],Q=[x0-rx0,rx1-x0,y0-ry0,ry1-y0];
  for(let i=0;i<4;i++){if(P[i]===0){if(Q[i]<0)return false}else{const t=Q[i]/P[i];if(P[i]<0){if(t>t1)return false;if(t>t0)t0=t}else{if(t<t0)return false;if(t<t1)t1=t}}}return true}
-function roomObs(rm){if(rm==='up'){const col=UP_L.col;return{bx0:col.x-24,bx1:col.x+30,by0:col.base-16,by1:col.base+8}}if(rm==='pdr'&&pdBuilt()){const T=PDL_TABLE(),h=pdHalf();return{bx0:T.x-h-14,bx1:T.x+h+14,by0:T.y-26,by1:T.y+12}}return null}
-function obsVia(rm,x0,y0,x1,y1){const o=roomObs(rm);if(!o)return null;const {bx0,bx1,by0,by1}=o;if(x1>=bx0&&x1<=bx1&&y1>=by0&&y1<=by1)return null;/* a target inside it is reached straight */
+function roomObs(rm){if(rm==='up'){const col=UP_L.col;const L=[{bx0:col.x-24,bx1:col.x+30,by0:col.base-16,by1:col.base+8}];if(srBuilt()||srBuilding()){const B=UPR.sr;L.push({bx0:B.x0-4,bx1:B.x1+UPRW.sd+4,by0:B.y0-4,by1:B.y1+3})}if(pdBuilt()||pdBuilding()){const B=UPR.pd;L.push({bx0:B.x0-4,bx1:B.x1+UPRW.sd+4,by0:B.y0,by1:B.y1+3})}return L}if(rm==='pdr'&&pdBuilt()){const G=pdGeo();return{bx0:G.x-G.hw-34,bx1:G.x+G.hw+34,by0:G.y0-16,by1:G.y1+6}}return null}
+function obsVia(rm,x0,y0,x1,y1){const O=roomObs(rm);if(!O)return null;for(const o of(Array.isArray(O)?O:[O])){const w=obsVia1(o,x0,y0,x1,y1);if(w)return w}return null}
+function obsVia1(o,x0,y0,x1,y1){const {bx0,bx1,by0,by1}=o;if(x1>=bx0&&x1<=bx1&&y1>=by0&&y1<=by1)return null;/* a target inside it is reached straight */
  if(!segRect(x0,y0,x1,y1,bx0,by0,bx1,by1))return null;
  const cost=p=>(segRect(x0,y0,p.x,p.y,bx0,by0,bx1,by1)?1e6:0)+(segRect(p.x,p.y,x1,y1,bx0,by0,bx1,by1)?1e6:0)+Math.hypot(p.x-x0,p.y-y0)+Math.hypot(x1-p.x,y1-p.y);
- const A={x:bx0-6,y:by1+10},B={x:bx1+6,y:by1+10};return cost(A)<=cost(B)?A:B}
-/* ---- the two rooms in the 二樓 view: the player's floor picture is a cutaway, so the new walls are too — cut low with
-   a dark cap, the doors standing full height with a narrow glass strip and a name plate; what is inside shows over
-   them. While a room is being built: studs, boards, a work lamp. ---- */
-const UPW={h:30,face:'#E7D9C2',side:'#DCCCB2',cap:'#4A3A2E'};
-function upWallFace(c,x0,x1,y,gaps){const h=UPW.h;const segs=[];let a=x0;for(const g of(gaps||[]).slice().sort((p,q)=>p[0]-q[0])){if(g[0]>a)segs.push([a,g[0]]);a=Math.max(a,g[1])}if(a<x1)segs.push([a,x1]);
- for(const [s0,s1] of segs){c.fillStyle='rgba(0,0,0,.13)';c.fillRect(s0,y,s1-s0,3);c.fillStyle=UPW.face;c.fillRect(s0,y-h,s1-s0,h);c.fillStyle='rgba(90,70,50,.08)';c.fillRect(s0,y-h*.32,s1-s0,h*.32);c.fillStyle='#CDBEA5';c.fillRect(s0,y-3,s1-s0,3);c.fillStyle=UPW.cap;c.fillRect(s0-1,y-h-4,s1-s0+2,4);c.fillStyle='rgba(255,255,255,.12)';c.fillRect(s0,y-h-4,s1-s0,1)}}
-function upWallSide(c,x,y0,y1){const h=UPW.h;c.fillStyle='rgba(0,0,0,.1)';c.fillRect(x+3,y0-h,3,y1-y0+h);c.fillStyle=UPW.cap;c.fillRect(x-2,y0-h-4,5,y1-y0);c.fillStyle=UPW.side;c.fillRect(x-2,y1-h-4,5,h+4);c.fillStyle='rgba(0,0,0,.12)';c.fillRect(x-2,y1-1,5,2)}
+ const P=[{x:bx0-6,y:by1+10},{x:bx1+6,y:by1+10},{x:bx1+6,y:by0-10},{x:bx0-6,y:by0-10}];let best=P[0],bc=1e18;for(const p of P){const v=cost(p);if(v<bc){bc=v;best=p}}return best}
+/* ---- the two rooms in the 二樓 view. The player's correction (docs/v24/second_floor_architecture_0408_2026-10-02.txt):
+   the floor is the floor's view — where the rooms are, their outer walls, their doors, the space they take — and what
+   happens inside a room is seen only in that room's own full view. So from the floor they are closed rooms: a wall
+   facing you with the door and its sign, the top of the walls over the space they take, the end wall in the same
+   light as the column; the state on the door (light behind the glass and under it when someone is in there, the
+   Private Dining Room's card: 已預約 / 用餐中, a badge when something there needs you). While one is being built:
+   studs, boards, a work lamp, open to see. ---- */
+const UPW={h:30,face:'#E7D9C2',side:'#DCCCB2',cap:'#4A3A2E'};   /* the works' studs */
+const UPRW={h:78,sd:9,cap:6};   /* a closed room's walls: their height (most of the loft's), the end wall's depth (as the column's side), their thickness */
+/* the top of a room built inside the loft, from the floor's view: the walls' thickness all round and what is over the
+   room, dark and quiet — as the building's own walls are drawn in the player's floor picture — so the eye goes to the
+   walls that face you, the doors and the light behind them */
+function upRoomRoof(c,B){const h=UPRW.h,t=UPRW.cap,y0=B.y0-h,y1=B.y1-h,w=B.x1-B.x0;
+ c.fillStyle='rgba(40,28,18,.22)';c.fillRect(B.x0+4,y0+4,w,y1-y0);
+ c.fillStyle='#5C4838';c.fillRect(B.x0,y0,w,y1-y0);
+ let g=c.createLinearGradient(0,y0,0,y1);g.addColorStop(0,'#3E3128');g.addColorStop(1,'#4A3A2F');c.fillStyle=g;c.fillRect(B.x0+t,y0+t,w-2*t,y1-y0-2*t);
+ for(let y=y0+t+9;y<y1-t-2;y+=9){c.fillStyle='rgba(255,236,206,.045)';c.fillRect(B.x0+t,y,w-2*t,1);c.fillStyle='rgba(10,6,4,.12)';c.fillRect(B.x0+t,y+1,w-2*t,1)}   /* the boards over the room, quiet */
+ c.fillStyle='rgba(20,14,10,.35)';c.fillRect(B.x0+t,y0+t,w-2*t,2);c.fillRect(B.x0+t,y0+t,2,y1-y0-2*t);
+ c.fillStyle='rgba(255,236,206,.22)';c.fillRect(B.x0,y0,w,1);c.fillRect(B.x0,y0,1,y1-y0);c.fillStyle='rgba(255,236,206,.12)';c.fillRect(B.x0+t,y1-t,w-2*t,1);c.fillStyle='#2E241C';c.fillRect(B.x0,y1-2,w,2)}
+/* the end wall, seen a little from the side, as the column is: plaster, the lower band, the skirting, its top */
+function upRoomEnd(c,B){const h=UPRW.h,sd=UPRW.sd,x=B.x1;
+ let g=c.createLinearGradient(x+sd+10,0,x+sd,0);g.addColorStop(0,'rgba(60,45,30,0)');g.addColorStop(1,'rgba(60,45,30,.14)');c.fillStyle=g;c.fillRect(x+sd,B.y0-4,10,B.y1-B.y0+4);
+ c.fillStyle='#CFBEA2';c.beginPath();c.moveTo(x,B.y0-h);c.lineTo(x+sd,B.y0-h-4);c.lineTo(x+sd,B.y1-4);c.lineTo(x,B.y1);c.closePath();c.fill();
+ c.fillStyle='#C2AE8E';c.beginPath();c.moveTo(x,B.y1-h*.34);c.lineTo(x+sd,B.y1-h*.34-4);c.lineTo(x+sd,B.y1-4);c.lineTo(x,B.y1);c.closePath();c.fill();
+ c.fillStyle='#9C7E5A';c.beginPath();c.moveTo(x,B.y1-4);c.lineTo(x+sd,B.y1-8);c.lineTo(x+sd,B.y1-4);c.lineTo(x,B.y1);c.closePath();c.fill();
+ c.fillStyle='#4A3A2E';c.beginPath();c.moveTo(x-1,B.y0-h);c.lineTo(x+sd,B.y0-h-4);c.lineTo(x+sd,B.y1-h-4+1);c.lineTo(x-1,B.y1-h+1);c.closePath();c.fill();
+ c.fillStyle='rgba(0,0,0,.18)';c.fillRect(x-1,B.y1-h,1.2,h)}   /* the corner */
+/* the wall that faces you: the floor's plaster, its lower band as on the window wall, a rail, the skirting, the corner
+   trims, the top of the wall above it */
+function upRoomFace(c,x0,x1,y){const h=UPRW.h;
+ c.fillStyle='rgba(40,28,18,.2)';c.fillRect(x0,y,x1-x0+UPRW.sd,3);c.fillStyle='rgba(40,28,18,.08)';c.fillRect(x0,y+3,x1-x0+UPRW.sd,4);
+ let g=c.createLinearGradient(0,y-h,0,y);g.addColorStop(0,'#EFE5D3');g.addColorStop(1,'#E6D8C1');c.fillStyle=g;c.fillRect(x0,y-h,x1-x0,h);
+ const r=rng(Math.round(x0*7+y));for(let i=0;i<(x1-x0)/3;i++){c.fillStyle=`rgba(${r()<.5?'255,255,255':'90,80,66'},${.03+r()*.04})`;el(c,x0+r()*(x1-x0),y-h+r()*h,1.5+r()*4,1+r()*2)}
+ c.fillStyle='#D9C8AE';c.fillRect(x0,y-h*.34,x1-x0,h*.34);c.fillStyle='#8E6A48';c.fillRect(x0,y-h*.34-1.6,x1-x0,1.6);c.fillStyle='rgba(255,255,255,.22)';c.fillRect(x0,y-h*.34,x1-x0,1);
+ c.fillStyle='#9C7E5A';c.fillRect(x0,y-5,x1-x0,5);c.fillStyle='rgba(255,255,255,.18)';c.fillRect(x0,y-5,x1-x0,1);
+ c.fillStyle='rgba(0,0,0,.1)';c.fillRect(x0,y-h,2,h);c.fillStyle='rgba(255,255,255,.14)';c.fillRect(x1-3,y-h,1,h);
+ c.fillStyle='rgba(60,45,30,.16)';c.fillRect(x0,y-h,x1-x0,3)}
+/* a real door: the trim, the frame, a panelled leaf with a narrow frosted light, the lever, the threshold, a mat; the
+   room's sign above it. Light behind the glass and under the door when someone is in there; open while someone passes */
+function upRoomDoorDraw(c,x,y,label,open,lit,deco){const W=15,H=50;
+ c.fillStyle='rgba(0,0,0,.12)';rr(c,x-15,y+2,30,9,2);c.fill();c.fillStyle='#8A6A42';rr(c,x-14,y+1,28,8,2);c.fill();c.fillStyle='#A5845A';rr(c,x-12,y+2.5,24,5,1.5);c.fill();   /* the mat */
+ c.fillStyle='#B58C5E';c.fillRect(x-W-3,y-H-3,(W+3)*2,H+3);c.fillStyle='rgba(255,255,255,.2)';c.fillRect(x-W-3,y-H-3,(W+3)*2,1);c.fillStyle='rgba(0,0,0,.12)';c.fillRect(x+W,y-H,3,H);
+ c.fillStyle='#3A2A1E';c.fillRect(x-W,y-H,W*2,H);
+ if(open){c.fillStyle=lit?'#7A5A3A':'#2A2018';c.fillRect(x-W+2,y-H+2,W*2-4,H-2);if(lit){let g=c.createLinearGradient(0,y-H,0,y);g.addColorStop(0,'rgba(255,214,150,.25)');g.addColorStop(1,'rgba(255,214,150,.6)');c.fillStyle=g;c.fillRect(x-W+2,y-H+2,W*2-4,H-2)}
+  c.fillStyle='#7A5232';c.beginPath();c.moveTo(x-W+2,y-H+2);c.lineTo(x-W+9,y-H-2);c.lineTo(x-W+9,y+3);c.lineTo(x-W+2,y);c.closePath();c.fill();c.fillStyle='rgba(0,0,0,.2)';c.fillRect(x-W+8,y-H-1,1,H+3)}
+ else if(deco){c.fillStyle='#3A271B';c.fillRect(x-W+2,y-H+2,W*2-4,H-2);c.fillStyle='#B8924E';c.fillRect(x-W+2,y-H+2,W*2-4,1.4);c.fillStyle=lit?'#F8DDA6':'#D3D8D4';c.fillRect(x-6,y-H+8,12,28);c.fillStyle='rgba(255,255,255,.3)';c.fillRect(x-5,y-H+9,2,26);c.strokeStyle='#B8924E';c.lineWidth=1;c.strokeRect(x-6.5,y-H+7.5,13,29);c.fillStyle='#E2C47E';c.fillRect(x+7,y-H+24,2,12);c.fillStyle='#B8924E';c.fillRect(x-W+2,y-9,W*2-4,1)}
+ else{c.fillStyle='#7E5434';c.fillRect(x-W+2,y-H+2,W*2-4,H-2);c.fillStyle='#8E6440';c.fillRect(x-W+2,y-H+2,W*2-4,2);
+  for(const [py,ph] of[[y-H+7,18],[y-H+30,15]]){c.fillStyle='#6E4A2E';c.fillRect(x-W+6,py,W*2-12-8,ph);c.fillStyle='rgba(255,255,255,.12)';c.fillRect(x-W+6,py+ph-1,W*2-12-8,1);c.fillStyle='rgba(0,0,0,.18)';c.fillRect(x-W+6,py,W*2-12-8,1)}
+  c.fillStyle=lit?'#F6DDA6':'#D3DEE2';c.fillRect(x+W-8,y-H+7,4,26);c.fillStyle=lit?'rgba(255,240,200,.6)':'rgba(255,255,255,.45)';c.fillRect(x+W-8,y-H+7,1.2,26);c.fillStyle='rgba(0,0,0,.2)';c.fillRect(x+W-4.5,y-H+7,.8,26);   /* the frosted light */
+  c.fillStyle='#D9B56A';c.fillRect(x-W+5,y-H+29,5,1.8);circ(c,x-W+5.5,y-H+30,1.4);c.fillStyle='rgba(0,0,0,.25)';c.fillRect(x-W+6,y-H+31,4,.8)}   /* the lever */
+ c.fillStyle='#C9A469';c.fillRect(x-W-2,y-1.5,(W+2)*2,2);   /* the threshold */
+ if(lit&&!open){c.save();c.globalCompositeOperation='lighter';c.fillStyle='rgba(255,214,150,.45)';c.fillRect(x-W+3,y-1,W*2-6,2);let g=c.createRadialGradient(x,y+3,1,x,y+3,22);g.addColorStop(0,'rgba(255,206,140,.22)');g.addColorStop(1,'rgba(255,206,140,0)');c.fillStyle=g;c.fillRect(x-22,y-2,44,26);c.restore()}
+ if(label){c.font=`800 6.4px ${FONT}`;const w=c.measureText(label).width+10;const ly=y-H-12;c.fillStyle='rgba(0,0,0,.2)';rr(c,x-w/2+.8,ly+.8,w,8.5,1.5);c.fill();c.fillStyle='#3A2C22';rr(c,x-w/2,ly,w,8.5,1.5);c.fill();c.fillStyle='#C99A45';c.fillRect(x-w/2+1.5,ly+1,w-3,.6);c.fillStyle='#F3E6CC';c.textAlign='center';c.textBaseline='middle';c.fillText(label,x,ly+4.6);c.textBaseline='alphabetic'}}
+/* the Private Dining Room's front, seen from the floor: its own language on the outside — deep green panels, a brass
+   line, a frosted window in a brass frame — so you know which door is which before you read the sign */
+function upPdrFace(c,x0,x1,y,lit,d){const h=UPRW.h;
+ c.fillStyle='rgba(30,22,16,.22)';c.fillRect(x0,y,x1-x0+UPRW.sd,3);c.fillStyle='rgba(30,22,16,.08)';c.fillRect(x0,y+3,x1-x0+UPRW.sd,4);
+ c.fillStyle='#2E3B29';c.fillRect(x0,y-h,x1-x0,h);
+ for(let px=x0+4;px<x1-6;px+=34){const w=Math.min(30,x1-4-px);if(w<12)break;c.fillStyle='#3A4A34';c.fillRect(px,y-h+8,w,h*.5-6);c.fillRect(px,y-h*.42+2,w,h*.42-10);c.strokeStyle='rgba(226,196,126,.5)';c.lineWidth=.7;c.strokeRect(px+2.5,y-h+10.5,w-5,h*.5-11);c.strokeRect(px+2.5,y-h*.42+4.5,w-5,h*.42-15)}
+ c.fillStyle='#B8924E';c.fillRect(x0,y-h*.42-1.6,x1-x0,1.6);c.fillStyle='#1F281A';c.fillRect(x0,y-5,x1-x0,5);c.fillStyle='#B8924E';c.fillRect(x0,y-5,x1-x0,1);
+ c.fillStyle='#E2C47E';c.fillRect(x0,y-h,x1-x0,1.4);c.fillStyle='rgba(0,0,0,.2)';c.fillRect(x0,y-h,2,h);
+ /* the frosted window, brass-framed, an arch at its head */const wx=x0+22,ww=58,wy=y-h+12,wh=40;c.fillStyle='#8A6A34';c.beginPath();c.moveTo(wx-3,wy+wh+3);c.lineTo(wx-3,wy+10);c.quadraticCurveTo(wx+ww/2,wy-8,wx+ww+3,wy+10);c.lineTo(wx+ww+3,wy+wh+3);c.closePath();c.fill();
+ let g=c.createLinearGradient(0,wy,0,wy+wh);if(lit){g.addColorStop(0,'#FBE3B0');g.addColorStop(1,'#EDBE76')}else{g.addColorStop(0,mix('#D9E0DE','#5E6870',d));g.addColorStop(1,mix('#C6CFCC','#4E5862',d))}c.fillStyle=g;c.beginPath();c.moveTo(wx,wy+wh);c.lineTo(wx,wy+11);c.quadraticCurveTo(wx+ww/2,wy-5,wx+ww,wy+11);c.lineTo(wx+ww,wy+wh);c.closePath();c.fill();
+ c.fillStyle='rgba(255,255,255,.2)';for(let k=0;k<4;k++)c.fillRect(wx+5+k*14,wy+8,5,wh-10);c.fillStyle='#8A6A34';c.fillRect(wx+ww/2-.8,wy+2,1.6,wh-2);c.fillRect(wx,wy+wh*.55,ww,1.4);
+ if(lit){c.save();c.globalCompositeOperation='lighter';let lg=c.createRadialGradient(wx+ww/2,wy+wh/2,4,wx+ww/2,wy+wh/2,ww);lg.addColorStop(0,'rgba(255,206,140,.3)');lg.addColorStop(1,'rgba(255,206,140,0)');c.fillStyle=lg;c.fillRect(wx-ww/2,wy-ww/2,ww*2,wh+ww);c.restore()}}
+/* a frosted window in a room's wall: you see that the light is on in there, not what is in there */
+function upRoomWindow(c,x,y,w,lit,d){const h=UPRW.h,y0=y-h+14,wh=34;c.fillStyle='#B58C5E';c.fillRect(x-2,y0-2,w+4,wh+4);c.fillStyle='#3A2A1E';c.fillRect(x,y0,w,wh);
+ let g=c.createLinearGradient(0,y0,0,y0+wh);if(lit){g.addColorStop(0,'#FBE6B8');g.addColorStop(1,'#EFC780')}else{g.addColorStop(0,mix('#DCE4E6','#6A7480',d));g.addColorStop(1,mix('#C9D3D6','#55606C',d))}c.fillStyle=g;c.fillRect(x+2,y0+2,w-4,wh-4);
+ c.fillStyle='rgba(255,255,255,.22)';for(let k=0;k<5;k++)c.fillRect(x+4+k*(w-8)/5,y0+3,(w-8)/10,wh-6);c.fillStyle='#3A2A1E';c.fillRect(x+w/2-1,y0,2,wh);c.fillRect(x,y0+wh/2-1,w,2);
+ c.fillStyle='#C9B08A';c.fillRect(x-4,y0+wh+2,w+8,3);c.fillStyle='rgba(0,0,0,.15)';c.fillRect(x-4,y0+wh+5,w+8,1);
+ if(lit){c.save();c.globalCompositeOperation='lighter';let lg=c.createRadialGradient(x+w/2,y0+wh/2,4,x+w/2,y0+wh/2,w);lg.addColorStop(0,'rgba(255,210,140,.25)');lg.addColorStop(1,'rgba(255,210,140,0)');c.fillStyle=lg;c.fillRect(x-w/2,y0-w/2,w*2,wh+w);c.restore()}}
+/* the Private Dining Room's card, hanging from the lever: paper, a string (已預約 / 用餐中) */
+function upRoomCard(c,x,y,label){const lx=x-15+5.5,ly=y-50+30;c.font=`700 5.4px ${FONT}`;const w=c.measureText(label).width+6;c.strokeStyle='rgba(60,40,25,.7)';c.lineWidth=.6;c.beginPath();c.moveTo(lx,ly+1);c.lineTo(lx-2,ly+5);c.moveTo(lx,ly+1);c.lineTo(lx+2,ly+5);c.stroke();
+ c.save();c.translate(lx,ly+5);c.rotate(-.05);c.fillStyle='rgba(0,0,0,.18)';rr(c,-w/2+.8,.8,w,9,1.2);c.fill();c.fillStyle='#F4ECDA';rr(c,-w/2,0,w,9,1.2);c.fill();c.fillStyle='#8E6422';c.fillRect(-w/2,0,w,1.2);c.fillStyle='#4A3424';c.textAlign='center';c.textBaseline='middle';c.fillText(label,0,5);c.textBaseline='alphabetic';c.restore()}
 /* a door in a wall that faces you: the frame, the leaf (open while someone goes through), the plate beside it */
 function upDoor(c,x,y,label,open,lit,plateLeft){c.fillStyle='rgba(0,0,0,.16)';c.fillRect(x-14,y-1,28,3);c.fillStyle='#3A2A1E';c.fillRect(x-14,y-48,28,48);c.fillStyle='#4E3A2A';c.fillRect(x-14,y-48,28,3);
  if(open){c.fillStyle=lit?'#6A5034':'#2A2018';c.fillRect(x-11,y-45,22,45);if(lit){let g=c.createLinearGradient(0,y-45,0,y);g.addColorStop(0,'rgba(255,214,150,.2)');g.addColorStop(1,'rgba(255,214,150,.5)');c.fillStyle=g;c.fillRect(x-11,y-45,22,45)}c.fillStyle='#7A5232';c.beginPath();c.moveTo(x-11,y-45);c.lineTo(x-4,y-49);c.lineTo(x-4,y+2);c.lineTo(x-11,y);c.closePath();c.fill()}
@@ -4162,19 +4236,20 @@ function upDoor(c,x,y,label,open,lit,plateLeft){c.fillStyle='rgba(0,0,0,.16)';c.
 function upDoorBusy(k){if(!R)return false;const D=upRoomDoor(k);const near=e=>e&&(e.room==='up'||e.room===k)&&Math.hypot(e.x-(e.room==='up'?D.x:(k==='staff'?SRL.door.x:PDL.door.x)),e.y-(e.room==='up'?D.y+6:(k==='staff'?SRL.door.y:PDL.door.y)))<16;
  if(near(R.jill))return true;for(const id in R.cw||{})if(near(R.cw[id]))return true;for(const w of R.srw||[])if(near(w))return true;for(const g of R.groups)if(!g.gone&&near(g))return true;return false}
 function upRoomsDraw(c,list,now,d){const P=UPR.pd,Sr=UPR.sr;const sOn=srOn(),pOn=pdOn();if(!sOn&&!pOn)return;
- /* the floors inside: a rug each, and what is in them (scaled, seen over the cut walls) */
- if(srBuilt())list.push({y:Sr.y0+1,f:()=>srMini(c,now,d)});
- if(pdBuilt())list.push({y:P.y0+2,f:()=>pdMini(c,now,d)});
  if(srBuilding())list.push({y:Sr.y0+2,f:()=>upWorksDraw(c,Sr,now,'sr')});
  if(pdBuilding())list.push({y:P.y0+2,f:()=>upWorksDraw(c,P,now,'pd')});
- /* the walls: the line between the two rooms (the Staff Room's back, the Private Dining Room's front), the Staff
-    Room's side and front, the Private Dining Room's side */
- const sb=srBuilt(),pb=pdBuilt();
- if(sb||pb){const gaps=pb?[[UPR.pdDoor.x-14,UPR.pdDoor.x+14]]:[];list.push({y:P.y1,f:()=>upWallFace(c,P.x0,pb?P.x1:Sr.x1,P.y1,gaps)})}
- if(pb)list.push({y:P.y1-1,f:()=>upWallSide(c,P.x1,P.y0+2,P.y1)});
- if(sb){list.push({y:Sr.y1-1,f:()=>upWallSide(c,Sr.x1,Sr.y0,Sr.y1)});list.push({y:Sr.y1,f:()=>upWallFace(c,Sr.x0,Sr.x1,Sr.y1,[[UPR.srDoor.x-14,UPR.srDoor.x+14]])})}
- if(sb){const D=UPR.srDoor;list.push({y:D.y+.5,f:()=>upDoor(c,D.x,D.y,'休息室',upDoorBusy('staff'),d>.3||srPeople().length>0,true)})}
- if(pb){const D=UPR.pdDoor;const occ=pdOccupied();list.push({y:D.y+.5,f:()=>{upDoor(c,D.x,D.y,'包廂',upDoorBusy('pdr'),occ||d>.3,true);if(R&&pdHeld()&&!occ){/* reserved tonight: a small card on the plate's line */c.font=`800 5.6px ${FONT}`;c.fillStyle='#8E6422';rr(c,D.x+15,D.y-30,24,9,2);c.fill();c.fillStyle='#FFF4DC';c.textAlign='center';c.textBaseline='middle';c.fillText('已預約',D.x+27,D.y-25.4);c.textBaseline='alphabetic'}}})}}
+ const sb=srBuilt(),pb=pdBuilt();const pulse=(Math.sin(now*4)+1)/2;
+ /* the Private Dining Room, against the left window: its wall faces the floor beside the Staff Room, the door there */
+ if(pb){const D=UPR.pdDoor;const occ=pdOccupied();const held=!!R&&pdHeld();
+  list.push({y:P.y1-1,f:()=>{upRoomRoof(c,P);upRoomEnd(c,P)}});
+  list.push({y:P.y1,f:()=>upPdrFace(c,P.x0,P.x1,P.y1,occ||(held&&d>.3)||(d>.6&&!!R),d)});
+  list.push({y:D.y+.5,f:()=>{upRoomDoorDraw(c,D.x,D.y,'包廂',upDoorBusy('pdr'),occ||(held&&d>.3),true);if(occ)upRoomCard(c,D.x,D.y,'用餐中');else if(held)upRoomCard(c,D.x,D.y,'已預約');
+   /* what the table in there needs, as over any table: the same bubble, over its door */const t=pdTable();const g=t&&t.group;let kind=null;if(g&&!g.gone){if(g.state==='order')kind='order';else if(g.state==='check')kind='check';else if(g.state==='wait'&&g.ticket&&g.ticket.items.some(i=>i.st==='ready'&&!i.picked))kind='ready'}else if(t&&t.dirty)kind='dirty';if(kind&&R&&phase==='service')bubble(c,D.x+20,D.y-62,kind,pulse)}})}
+ /* the Staff Room, below it on the inner side from the stairs: its wall faces the floor, the door towards the middle */
+ if(sb){const D=UPR.srDoor;const inside=srPeople().length>0;
+  list.push({y:Sr.y1-1,f:()=>{upRoomRoof(c,Sr);upRoomEnd(c,Sr)}});
+  list.push({y:Sr.y1,f:()=>{upRoomFace(c,Sr.x0,Sr.x1,Sr.y1);upRoomWindow(c,Sr.x0+16,Sr.y1,46,inside,d)}});
+  list.push({y:D.y+.5,f:()=>upRoomDoorDraw(c,D.x,D.y,'休息室',upDoorBusy('staff'),inside)})}}
 /* the works: studs on the new lines, boards leaning, a work lamp, a ladder; the day after, a room */
 function upWorksDraw(c,B,now,k){const r=rng(k==='sr'?77:78);c.fillStyle='rgba(90,80,70,.08)';c.fillRect(B.x0,B.y0,B.x1-B.x0,B.y1-B.y0);
  c.fillStyle='rgba(235,232,224,.55)';rr(c,B.x0+8,B.y0+10,B.x1-B.x0-16,B.y1-B.y0-20,3);c.fill();   /* the dust sheet */
@@ -4186,24 +4261,6 @@ function upWorksDraw(c,B,now,k){const r=rng(k==='sr'?77:78);c.fillStyle='rgba(90
  const wx=B.x1-22,wy=B.y0+30;c.fillStyle='#3A3A3E';c.fillRect(wx-1,wy-18,2,18);c.fillStyle='#E8C24A';rr(c,wx-6,wy-24,12,7,2);c.fill();c.save();c.globalCompositeOperation='lighter';let g=c.createRadialGradient(wx,wy-20,2,wx,wy-20,40);g.addColorStop(0,'rgba(255,230,160,.4)');g.addColorStop(1,'rgba(255,230,160,0)');c.fillStyle=g;c.fillRect(wx-40,wy-60,80,80);c.restore();
  for(let i=0;i<5;i++){c.fillStyle='rgba(190,160,120,.7)';c.fillRect(B.x0+14+r()*(B.x1-B.x0-28),B.y0+16+r()*(B.y1-B.y0-30),4+r()*8,1.6)}
  c.font=`800 6.5px ${FONT}`;c.fillStyle='#C99A45';rr(c,B.x0+10,B.y0+8,34,11,2);c.fill();c.fillStyle='#2A1C10';c.textAlign='center';c.textBaseline='middle';c.fillText('施工中',B.x0+27,B.y0+13.6);c.textBaseline='alphabetic'}
-/* what the floor shows inside each room: the room's own view, small (the same things, the same people) */
-function miniMap(B,x,y){const H=LH-92;return{x:B.x0+8+(x/400)*(B.x1-B.x0-16),y:B.y0+UPW.h*.4+6+((y-92)/H)*(B.y1-B.y0-UPW.h*.4-12)}}
-function srMini(c,now,d){const B=UPR.sr;const st=srStage();
- c.fillStyle=st>=2?'#C99470':'#CC9C70';c.fillRect(B.x0,B.y0,B.x1-B.x0,B.y1-B.y0);c.fillStyle='rgba(255,255,255,.05)';for(let y=B.y0+6;y<B.y1;y+=10)c.fillRect(B.x0,y,B.x1-B.x0,1);
- const r0=miniMap(B,56,srY(.32)),r1=miniMap(B,336,srY(.76));c.fillStyle=st>=3?'#7E8C76':'#70826A';rr(c,r0.x,r0.y,r1.x-r0.x,r1.y-r0.y,3);c.fill();
- const sx=(B.x1-B.x0-16)/400,sy=(B.y1-B.y0-UPW.h*.4-12)/(LH-92);c.save();c.beginPath();c.rect(B.x0,B.y0-UPW.h,B.x1-B.x0,B.y1-B.y0+UPW.h);c.clip();c.translate(B.x0+8,B.y0+UPW.h*.4+6);c.scale(sx,sy);c.translate(0,-92);for(const it of srItems(c,now,d).sort((a,b)=>a.y-b.y))it.f();c.restore();
- for(const p of srPeople()){const q=miniMap(B,p.x,p.y);c.save();c.translate(q.x,q.y);c.scale(.52,.52);drawPerson(c,0,0,p.look,{seated:p.seated,flip:p.face<0,mood:'happy',step:p.moving?Math.sin(p.step||0):0});c.restore()}
- if(d>.3||srPeople().length){c.save();c.globalCompositeOperation='lighter';const L0=miniMap(B,200,92+(LH-92)*.3);let g=c.createRadialGradient(L0.x,L0.y,3,L0.x,L0.y,70);g.addColorStop(0,'rgba(255,206,140,.22)');g.addColorStop(1,'rgba(255,206,140,0)');c.fillStyle=g;c.fillRect(B.x0,B.y0,B.x1-B.x0,B.y1-B.y0);c.restore()}}
-function pdMini(c,now,d){const B=UPR.pd;const st=pdStage();
- c.fillStyle='#B98A5C';c.fillRect(B.x0,B.y0,B.x1-B.x0,B.y1-B.y0);c.fillStyle='rgba(60,35,15,.12)';for(let x=B.x0;x<B.x1;x+=9)c.fillRect(x,B.y0,.8,B.y1-B.y0);
- const T=miniMap(B,200,PDL_TABLE().y);const half=st>=3?50:st>=2?42:34;c.fillStyle='#6E7A62';rr(c,T.x-half-10,T.y-20,(half+10)*2,30,3);c.fill();
- const g=pdTable()&&pdTable().group;const seated=g&&SEATED_ST.includes(g.state);
- /* the table and its chairs, the people at it */c.fillStyle='rgba(0,0,0,.18)';el(c,T.x,T.y+4,half+4,6);c.fillStyle='#6B4628';rr(c,T.x-half,T.y-12,half*2,12,2);c.fill();c.fillStyle='#8A5E3A';rr(c,T.x-half,T.y-12,half*2,4,2);c.fill();
- const n=pdMax()||6;const per=Math.ceil((n-2)/2);for(let i=0;i<per;i++){const x=T.x-half+((i+.5)/per)*half*2;c.fillStyle='#3E5A48';rr(c,x-4,T.y-20,8,7,1.5);c.fill();rr(c,x-4,T.y+1,8,6,1.5);c.fill()}c.fillRect(T.x-half-9,T.y-10,6,8);c.fillRect(T.x+half+3,T.y-10,6,8);
- if(seated){const S0=pdSeats();for(let k=0;k<g.size&&k<S0.length;k++){const q=miniMap(B,200+S0[k].dx,PDL_TABLE().y+S0[k].dy);c.save();c.translate(q.x,q.y);c.scale(.5,.5);drawPerson(c,0,0,g.looks[k%g.looks.length],{seated:true,flip:S0[k].side>0,mood:g.state==='eat'?'eat':'happy'});c.restore()}}
- else if(pdHeld()){/* set for the guests who booked it */for(let i=0;i<per;i++){const x=T.x-half+((i+.5)/per)*half*2;c.fillStyle='#FFFFFF';el(c,x,T.y-8,2.6,1.4)}}
- if(st>=1){c.fillStyle='#5E3E24';rr(c,B.x1-22,B.y0+8,14,26,2);c.fill();c.fillStyle='#7A5232';c.fillRect(B.x1-22,B.y0+8,14,3)}   /* the sideboard along its side wall */
- if(d>.3||seated){c.save();c.globalCompositeOperation='lighter';let lg=c.createRadialGradient(T.x,T.y-10,3,T.x,T.y-10,64);lg.addColorStop(0,'rgba(255,200,130,.3)');lg.addColorStop(1,'rgba(255,200,130,0)');c.fillStyle=lg;c.fillRect(B.x0,B.y0,B.x1-B.x0,B.y1-B.y0);c.restore()}}
 /* ---- 休息室, its own view: the player's three-stage picture (refs/staff_room_stages_reference). The back wall with the
    corkboard, the coat hooks, the window, the door back to the floor; terracotta tiles, a green rug. Phase I: a green
    sofa, a low table, mismatched chairs (one of them came in from the open floor, with the cabinet, the floor lamp and
@@ -4311,68 +4368,134 @@ function drawSrFood(c,x,y){c.fillStyle='#B8463A';rr(c,x-7,y-7,14,8,2);c.fill();c
 function srDrawPeople(c,now,list,rm){if(!R)return;
  if(rm==='staff'){for(const p of srPeople())list.push({y:p.y,f:()=>{const stp=p.moving?Math.sin(p.step||0):0;drawPerson(c,p.x,p.y,p.look,{seated:p.seated,lounge:p.sofa?{legs:0}:null,step:stp,bob:p.moving?Math.abs(stp)*-.8:Math.sin(now*1.2+p.x)*.3,mood:'happy',flip:p.face<0,hold:p.hold||null,blink:Math.sin(now*1.3+p.x*.1)>.97});nameTag(c,p.x,p.y-(p.seated?54:64),p.m.name)}});return}
  for(const w of R.srw||[]){if(w.room!==rm||(R.closing!=null&&R.closing<w.at))continue;list.push({y:w.y,f:()=>{const stp=w.moving?Math.sin(w.step):0;drawPerson(c,w.x,w.y,crewLook(w.m),{step:stp,bob:w.moving?Math.abs(stp)*-.8:0,mood:'happy',flip:w.face<0});nameTag(c,w.x,w.y-64,w.m.name)}})}}
-/* ---- 包廂, its own view: the player's picture (refs/private_dining_room_reference) — the big window with the city in
-   it (the floor's left window), the pendant lamp low over one long table, chairs with dark green seats, the sideboard,
-   a plant, the door with its narrow glass strip on the left. Phase II: the table longer, curtains, a runner and
-   flowers, a wall lamp, a painting, the coat stand. Phase III: the table set, candles, the shelf, more green. Clean
-   and quiet: it is reset after every meal (二十：the Staff Room keeps things; this room keeps nothing). ---- */
-function pdY(f){return 92+Math.round((LH-92)*f)}
-function PDL_TABLE(){return{x:200,y:pdY(.46)}}
-/* the seats by phase: people sit along the far side and at the ends (the game never shows a back) */
-function pdSeats(){const st=Math.max(1,pdStage());const S6=[{dx:-54,dy:-16,side:0},{dx:-18,dy:-16,side:0},{dx:18,dy:-16,side:0},{dx:54,dy:-16,side:0},{dx:-96,dy:0,side:-1},{dx:96,dy:0,side:1}];
- if(st===1)return S6;const back=[-90,-54,-18,18,54,90].map(dx=>({dx,dy:-16,side:0}));if(st===2)return back.concat([{dx:-128,dy:0,side:-1},{dx:128,dy:0,side:1}]);
- return back.concat([{dx:-126,dy:-6,side:-1},{dx:126,dy:-6,side:1},{dx:-132,dy:10,side:-1},{dx:132,dy:10,side:1}])}
-function pdHalf(){const st=Math.max(1,pdStage());return st===1?82:st===2?114:118}
+/* ---- 包廂, its own view. The player's 04:25 brief (docs/v24/private_dining_artdeco_0425_2026-10-02.txt): contemporary
+   Art Deco, Jill's Kitchen's warmth — deep green panelled walls, brass, a stone floor in large slabs, an ivory stone
+   table running from the door into the room (its long axis is the room's depth, and the phone's), upholstered chairs,
+   a designed ceiling and an Art Deco pendant over the table. All of it from Phase I, which is already finished and
+   beautiful; II and III are the same room, more complete (sconces, fluting, drapes, flowers, a coat stand, art; then
+   the ceiling's coffers, the tiered chandelier, the wine cabinet, the full setting, candles). The door is at the near
+   end (the bottom of the view); the far wall is the window wall — the floor's left window. ---- */
+const PDW=150,PD_SIDE=66;   /* where the far wall meets the stone; how far in the side walls come at the near end */
+function pdY(f){return PDW+Math.round((LH-PDW)*f)}
+/* the table by phase: 3, 4, 5 places down each side (6 / 8 / 10); the same table, longer */
+function pdGeo(){const st=Math.max(1,pdStage());const n=[0,3,4,5][st];const y0=PDW+50;const room=LH-78-y0;const pitch=Math.max(38,Math.min(56,(room-22)/n));return{x:200,hw:34,y0,y1:Math.round(y0+n*pitch+22),n,pitch}}
+function PDL_TABLE(){const G=pdGeo();return{x:G.x,y:G.y1}}   /* its near end: where a party comes to it and the service stands */
+function pdSeats(){const G=pdGeo();const out=[];for(let i=0;i<G.n;i++){const y=Math.round(G.y0+11+G.pitch*(i+.5));out.push({dx:-(G.hw+20),dy:y-G.y1,side:-1,row:i});out.push({dx:G.hw+20,dy:y-G.y1,side:1,row:i})}return out}
 function pdTable(){return R?R.tables.find(t=>t.pdr)||null:null}
+/* the crew see to the room upstairs first: nobody passes it on the way, and a table that booked cannot wait for a quiet moment */
+function pdFirst(pred){if(!R)return null;return R.tables.find(t=>t.pdr&&pred(t))||R.tables.find(pred)}
+function pdHit(p){const G=pdGeo();return Math.abs(p.x-G.x)<G.hw+34&&p.y>G.y0-30&&p.y<G.y1+26}   /* a tap on the long table or its chairs */
 function pdOccupied(){const t=pdTable();return !!(t&&t.group&&!t.group.gone)}
-function drawPdrRoom(c,now,dusk,V,X0,XW,TOP,list){const d=clamp(dusk,0,1);const st=Math.max(1,pdStage());const T=PDL_TABLE();
- const bg=roomBg('pdr',st+'|'+S.level,TOP,(b,X0,XW,T2)=>{const r=rng(67);
-  let wg=b.createLinearGradient(0,-T2,0,92);wg.addColorStop(0,'#EFE6D4');wg.addColorStop(1,'#E6D9C2');b.fillStyle=wg;b.fillRect(X0,-T2,XW,T2+92);for(let i=0;i<220;i++){b.fillStyle=`rgba(${r()<.5?'255,255,255':'100,80,60'},${.015+r()*.02})`;el(b,X0+r()*XW,-T2+r()*(T2+86),3+r()*9,2+r()*5)}
-  /* dark wood: the ceiling trim, the corner posts, the skirting */b.fillStyle='#5A3E28';b.fillRect(X0,-T2,XW,Math.min(9,T2));b.fillRect(X0,84,XW,8);b.fillStyle='#6E4E34';b.fillRect(X0,84,XW,2);b.fillStyle='#5A3E28';b.fillRect(2,-T2,8,T2+92);b.fillRect(390,-T2,8,T2+92);
-  /* the air conditioner over the window */b.fillStyle='#ECEAE4';rr(b,174,-14,52,13,2);b.fill();b.fillStyle='#C9C6BF';b.fillRect(178,-5,44,1.2);b.fillRect(178,-3,44,1.2);
-  /* the big window: the floor's left window, from inside */const wx=104,wy=6,ww=192,wh=74;b.fillStyle='rgba(0,0,0,.14)';b.fillRect(wx-3,wy-1,ww+8,wh+8);b.fillStyle='#2F2A26';b.fillRect(wx-5,wy-5,ww+10,wh+10);b.fillStyle='#E9DCC4';b.fillRect(wx-10,wy+wh+4,ww+20,4);
-  if(st>=2){/* linen curtains */b.fillStyle='#6B4628';b.fillRect(wx-26,wy-10,ww+52,3);for(const cx of[wx-22,wx+ww+6]){let cg=b.createLinearGradient(cx,0,cx+16,0);cg.addColorStop(0,'#CBBBA4');cg.addColorStop(.5,'#DED0BC');cg.addColorStop(1,'#CBBBA4');b.fillStyle=cg;b.beginPath();b.moveTo(cx,wy-7);b.lineTo(cx+16,wy-7);b.lineTo(cx+14,wy+wh+6);b.lineTo(cx+2,wy+wh+6);b.closePath();b.fill()}}
-  /* the door to the floor, on the left: wood, a narrow glass strip, a lever */const dx=PDL.door.x;b.fillStyle='#4A3424';b.fillRect(dx-22,2,44,90);b.fillStyle='#6E4A30';b.fillRect(dx-19,5,38,87);b.fillStyle='#7E5638';b.fillRect(dx-19,5,38,3);b.fillStyle='#CFDCE0';b.fillRect(dx+6,16,6,36);b.fillStyle='rgba(0,0,0,.2)';b.fillRect(dx+6,16,1,36);b.fillStyle='#C8C2B8';b.fillRect(dx-15,52,8,2);circ(b,dx-14,53,1.6);
-  if(st>=2){/* a painting on the right, a wall lamp */b.fillStyle='#8A6A3A';b.fillRect(318,16,50,38);b.fillStyle='#E9E2CC';b.fillRect(321,19,44,32);let pg=b.createLinearGradient(0,19,0,51);pg.addColorStop(0,'#C9D6D8');pg.addColorStop(.55,'#A9B88E');pg.addColorStop(1,'#7E8E5E');b.fillStyle=pg;b.fillRect(323,21,40,28);b.fillStyle='rgba(60,70,40,.5)';el(b,333,40,10,4);el(b,352,43,12,4);b.fillStyle='#8E6422';b.fillRect(336,10,14,2)}
-  if(st>=3){/* a wall shelf with books and a plant */b.fillStyle='#6B4628';b.fillRect(330,60,46,3);const bc=['#8A3A2A','#2E4A3A','#C9A24A','#4A5A7A'];for(let k=0;k<4;k++){b.fillStyle=bc[k];b.fillRect(332+k*5,49+(k%2),4,11-(k%2))}}
-  /* the floor: dark warm planks */b.fillStyle='#9A6A44';b.fillRect(X0,92,XW,LH-92);{const pw=11;let k=0;for(let x=X0;x<LW+BGM;x+=pw,k++){const t=(r()-.5)*.1;b.fillStyle=t>0?`rgba(255,230,200,${t})`:`rgba(50,30,15,${-t})`;b.fillRect(x,92,pw,LH-92);b.fillStyle='rgba(50,30,15,.2)';b.fillRect(x,92,.8,LH-92);for(let y=92+((k*41)%80);y<LH;y+=64+((k*17)%40)){b.fillStyle='rgba(50,30,15,.16)';b.fillRect(x,y,pw,.8)}}}
-  let g=b.createLinearGradient(0,92,0,LH);g.addColorStop(0,'rgba(40,25,15,.26)');g.addColorStop(.12,'rgba(40,25,15,0)');g.addColorStop(1,'rgba(40,25,15,.2)');b.fillStyle=g;b.fillRect(X0,92,XW,LH-92);
-  /* the rug under the table */const half=pdHalf();const ry=PDL_TABLE().y;b.fillStyle='rgba(0,0,0,.1)';rr(b,200-half-46,ry-44,(half+46)*2,74,5);b.fill();b.fillStyle='#6E745A';rr(b,200-half-48,ry-46,(half+48)*2,74,5);b.fill();b.strokeStyle='#A39A6E';b.lineWidth=1.4;rr(b,200-half-42,ry-40,(half+42)*2,62,3);b.stroke();
+const PDC={wall:'#34432F',wallHi:'#46583F',wallLo:'#27331F',brass:'#B8924E',brassHi:'#E2C47E',brassLo:'#8A6A34',stone:'#74695E',ivory:'#EEE7DA',walnut:'#3E2A1E',fabric:'#CDBFA9',fabricLo:'#B3A48C'};
+/* a run of Art Deco panelling: a frame with stepped corners and a thin brass line inside */
+function pdPanel(b,x,y,w,h,fl){b.fillStyle=PDC.wallLo;b.fillRect(x,y,w,h);b.fillStyle=PDC.wall;b.fillRect(x+2,y+2,w-4,h-4);
+ b.fillStyle='rgba(255,255,255,.06)';b.fillRect(x+2,y+2,w-4,1.2);b.fillStyle='rgba(0,0,0,.18)';b.fillRect(x+2,y+h-3,w-4,1.2);
+ const k=5;b.strokeStyle='rgba(226,196,126,.55)';b.lineWidth=.8;b.beginPath();b.moveTo(x+k+4,y+4);b.lineTo(x+w-k-4,y+4);b.lineTo(x+w-4,y+k+4);b.lineTo(x+w-4,y+h-k-4);b.lineTo(x+w-k-4,y+h-4);b.lineTo(x+k+4,y+h-4);b.lineTo(x+4,y+h-k-4);b.lineTo(x+4,y+k+4);b.closePath();b.stroke();
+ if(fl){/* fluting */for(let fx=x+8;fx<x+w-7;fx+=4){b.fillStyle='rgba(0,0,0,.16)';b.fillRect(fx,y+8,1.4,h-16);b.fillStyle='rgba(255,255,255,.06)';b.fillRect(fx+1.4,y+8,.8,h-16)}}}
+function drawPdrRoom(c,now,dusk,V,X0,XW,TOP,list){const d=clamp(dusk,0,1);const st=Math.max(1,pdStage());const G=pdGeo();
+ const bg=roomBg('pdr',st+'|'+S.level+'|'+LH,TOP,(b,X0,XW,T2)=>{const r=rng(67);
+  /* the ceiling's edge over the far wall: a stepped cornice (III: the coffers above it) */
+  b.fillStyle='#2A3626';b.fillRect(X0,-T2,XW,T2+PDW);
+  if(T2>0){if(st>=3){for(let x=X0+6;x<LW+BGM;x+=46){b.fillStyle='#E9E1D0';b.fillRect(x,-T2,42,Math.max(0,T2-14));b.fillStyle='#D8CDB6';b.fillRect(x+4,-T2,34,Math.max(0,T2-18));b.fillStyle='rgba(184,146,78,.6)';b.fillRect(x,-T2,42,1)}}else{b.fillStyle='#E4DCCB';b.fillRect(X0,-T2,XW,Math.max(0,T2-10))}}
+  b.fillStyle='#E9E1D0';b.fillRect(X0,-10,XW,8);b.fillStyle='#D3C7B0';b.fillRect(X0,-3,XW,3);b.fillStyle=PDC.brass;b.fillRect(X0,0,XW,1.6);b.fillStyle=PDC.wallLo;b.fillRect(X0,1.6,XW,3);
+  /* the far wall: green panels, a dado with a brass rail, the skirting */
+  const dado=PDW-48;
+  for(const [x,w] of[[X0,16+(-X0)],[16,98],[286,98],[384,XW+X0-384]]){if(w<=0)continue;pdPanel(b,x+2,8,w-4,dado-14,st>=2);pdPanel(b,x+2,dado+4,w-4,PDW-dado-12,false)}
+  b.fillStyle=PDC.brassLo;b.fillRect(X0,dado-3,XW,4);b.fillStyle=PDC.brass;b.fillRect(X0,dado-3,XW,1.6);b.fillStyle='rgba(255,255,255,.2)';b.fillRect(X0,dado-3,XW,.6);
+  b.fillStyle='#1F281A';b.fillRect(X0,PDW-7,XW,7);b.fillStyle=PDC.brass;b.fillRect(X0,PDW-7,XW,1);
+  /* the window (the floor's left window, from in here): bronze, tall, the panelling around it */
+  const wx=124,ww=152,wy=12,wh=PDW-62;b.fillStyle=PDC.wallLo;b.fillRect(wx-12,6,ww+24,PDW-14);b.fillStyle='#2B2620';b.fillRect(wx-5,wy-5,ww+10,wh+10);b.fillStyle=PDC.brassLo;b.fillRect(wx-6,wy+wh+4,ww+12,4);b.fillStyle=PDC.brass;b.fillRect(wx-6,wy+wh+4,ww+12,1.2);
+  /* the stone: warm charcoal slabs, large, matte, a few soft veins; a darker field down the middle, under the table */
+  b.fillStyle=PDC.stone;b.fillRect(14,PDW,372,LH-PDW);
+  const sw=62,sh=46;for(let y=PDW,ry=0;y<LH;y+=sh,ry++){for(let x=14-((ry%2)?sw/2:0),k=0;x<386;x+=sw,k++){const v=(r()-.5)*.08;const inMid=x+sw/2>=124&&x+sw/2<=276;b.fillStyle=inMid?(v>0?`rgba(70,58,46,${.16+v})`:`rgba(40,32,26,${.2-v})`):(v>0?`rgba(255,246,230,${v*.9})`:`rgba(40,32,26,${-v})`);b.fillRect(Math.max(14,x),y,Math.min(sw,386-Math.max(14,x)),sh);
+    b.strokeStyle='rgba(240,232,214,.13)';b.lineWidth=.7;b.beginPath();const vx=x+r()*sw,vy=y+r()*sh;b.moveTo(vx,vy);b.bezierCurveTo(vx+10+r()*14,vy+6,vx+18,vy-4+r()*10,vx+28+r()*12,vy+6+r()*8);b.stroke();
+    b.fillStyle='rgba(30,24,20,.35)';b.fillRect(Math.max(14,x),y,Math.min(sw,386-Math.max(14,x)),.8);b.fillRect(Math.max(14,x),y,.8,sh)}}
+  b.strokeStyle='rgba(184,146,78,.35)';b.lineWidth=1;b.strokeRect(118.5,PDW+18.5,163,LH-PDW-40);
+  let fg=b.createLinearGradient(0,PDW,0,LH);fg.addColorStop(0,'rgba(20,16,12,.32)');fg.addColorStop(.12,'rgba(20,16,12,0)');fg.addColorStop(.85,'rgba(20,16,12,0)');fg.addColorStop(1,'rgba(20,16,12,.25)');b.fillStyle=fg;b.fillRect(14,PDW,372,LH-PDW);
+  /* the side walls: green panelled faces opening out towards you, stiles and brass — the room's length, its depth */
+  for(const dir of[-1,1]){const xf=dir<0?18:382,xn=dir<0?PD_SIDE:400-PD_SIDE,xo=dir<0?X0:LW+BGM;const face=()=>{b.beginPath();b.moveTo(xo,-T2);b.lineTo(xf,-T2);b.lineTo(xf,PDW);b.lineTo(xn,LH+2);b.lineTo(xo,LH+2);b.closePath()};
+   b.fillStyle='#33422E';face();b.fill();
+   b.save();face();b.clip();
+   for(let k=0;k<7;k++){const f0=Math.pow(k/7,1.5),f1=Math.pow((k+1)/7,1.5);const x0=xf+(xn-xf)*f0,x1=xf+(xn-xf)*f1,y0=PDW+(LH-PDW)*f0,y1=PDW+(LH-PDW)*f1;
+    /* each panel: a lighter field inside a darker frame, a brass line round it */const ins=1.5+f0*3;b.fillStyle='#3B4B35';b.beginPath();b.moveTo(x0+dir*-ins,-T2);b.lineTo(x1-dir*-ins*0+dir*-ins,-T2);b.lineTo(x1+dir*-ins,y1-6-f1*10);b.lineTo(x0+dir*-ins,y0-6-f0*10);b.closePath();b.fill();
+    b.strokeStyle='rgba(226,196,126,.42)';b.lineWidth=.7+f0*.6;b.beginPath();b.moveTo(x0+dir*-(ins+2),-T2);b.lineTo(x0+dir*-(ins+2),y0-8-f0*10);b.stroke();
+    b.fillStyle='rgba(16,22,12,.45)';b.fillRect(Math.min(x0,x0+dir*2.5),-T2,2.5,y0+T2)}
+   let sg=b.createLinearGradient(xn,0,xo,0);sg.addColorStop(0,'rgba(255,240,210,.1)');sg.addColorStop(.5,'rgba(0,0,0,0)');sg.addColorStop(1,'rgba(0,0,0,.28)');b.fillStyle=sg;b.fillRect(Math.min(xo,xn)-2,-T2,Math.abs(xo-xn)+4,T2+LH+2);
+   b.restore();
+   b.strokeStyle=PDC.brass;b.lineWidth=1.6;b.beginPath();b.moveTo(xf,PDW);b.lineTo(xn,LH+2);b.stroke();b.strokeStyle='rgba(20,16,12,.45)';b.lineWidth=3;b.beginPath();b.moveTo(xf-dir*2,PDW+1);b.lineTo(xn-dir*3,LH+2);b.stroke()}
+  /* the door you came in by, at the near end: the threshold, its brass, the mat with the way back */
+  b.fillStyle='#4A3E32';b.fillRect(166,LH-12,68,12);b.fillStyle=PDC.brass;b.fillRect(166,LH-12,68,1.4);
  });
  blitBg(c,bg,X0,XW,TOP);
- /* the window glass: the street's trees by day, the city's lit windows at night */{const wx=104,wy=6,ww=192,wh=74;const W=wxNow();const wet=W==='rain'||W==='storm';let gg=c.createLinearGradient(0,wy,0,wy+wh);gg.addColorStop(0,mix(wet?'#9AA4AE':'#BFDDF2','#1C2238',d));gg.addColorStop(1,mix(wet?'#B9C1C8':'#F3E6CC','#3A3150',d));c.fillStyle=gg;c.fillRect(wx,wy,ww,wh);
-  c.fillStyle=mix('#B8B0A8','#262838',d);for(let k=0;k<6;k++)c.fillRect(wx+10+k*31,wy+20+(k%3)*7,20,wh-26);if(d>.4){c.fillStyle='rgba(255,212,140,.8)';for(let k=0;k<18;k++)c.fillRect(wx+13+((k*29)%(ww-20)),wy+24+((k*17)%(wh-32)),2.4,2.4)}c.fillStyle=mix('#6F9E5E','#1E2E26',d);for(let k=0;k<7;k++)el(c,wx+12+k*28,wy+wh-8-(k%2)*6,15,10);
-  if(wet){c.strokeStyle='rgba(235,242,250,.4)';c.lineWidth=.8;for(let k=0;k<12;k++){const ph=((now*.5)+k*.37)%1;const rx=wx+4+((k*31)%(ww-8));c.beginPath();c.moveTo(rx,wy+ph*wh);c.lineTo(rx-1,wy+ph*wh+6);c.stroke()}}
-  c.fillStyle='#2F2A26';for(let k=1;k<4;k++)c.fillRect(wx+k*ww/4-1,wy,2,wh);c.fillRect(wx,wy+wh*.45,ww,2)}
- /* the sideboard (I), a plant, the coat stand (II), the candles (III) */
- list.push({y:106,f:()=>{const x0=300,y=106;softShadow(c,x0+40,y,42,4,.18);c.fillStyle='#5E3E24';c.fillRect(x0,y-30,80,30);c.fillStyle='#7A5232';c.fillRect(x0,y-30,80,4);c.fillStyle='#4A3020';for(let k=0;k<3;k++)c.fillRect(x0+4+k*26,y-22,23,18);c.fillStyle='#C99A45';for(let k=0;k<3;k++)c.fillRect(x0+13+k*26,y-14,5,1.4);
-  c.fillStyle='#F4F1EA';for(let k=0;k<4;k++)el(c,x0+18,y-33-k*1.6,8,2.4);c.fillStyle='#3A2E26';c.fillRect(x0+60,y-44,1.6,12);c.fillStyle=d>.25?'#FFE4A8':'#EFE2C8';c.beginPath();c.moveTo(x0+54,y-44);c.lineTo(x0+68,y-44);c.lineTo(x0+65,y-52);c.lineTo(x0+57,y-52);c.closePath();c.fill();if(st>=3){c.fillStyle='#4A2E24';for(let k=0;k<3;k++)rr(c,x0+34+k*5,y-46,3.5,14,1.2),c.fill()}}});
- list.push({y:108,f:()=>drawPlant(c,82,108,'tall')});if(st>=2)list.push({y:pdY(.70),f:()=>drawPlant(c,368,pdY(.70),'bush')});
- if(st>=2)list.push({y:112,f:()=>{const x=88,y=112;c.fillStyle='rgba(0,0,0,.14)';el(c,x,y+1,9,3);c.fillStyle='#6B4628';c.fillRect(x-1.5,y-64,3,64);c.fillRect(x-9,y-2,18,3);c.fillRect(x-8,y-62,16,2.2)}});
- list.push({y:pdY(.86),f:()=>drawPlant(c,36,pdY(.86),'tall')});list.push({y:pdY(.84),f:()=>{const x0=318,y=pdY(.84);softShadow(c,x0+30,y,30,4,.16);c.fillStyle='#5E3E24';c.fillRect(x0,y-26,60,26);c.fillStyle='#7A5232';c.fillRect(x0,y-26,60,3);c.fillStyle='#4A3020';c.fillRect(x0+4,y-20,52,1.4);c.fillStyle='#F4F1EA';for(let k=0;k<3;k++)el(c,x0+16,y-28-k*1.6,7,2.2);c.fillStyle='#E9E2CF';rr(c,x0+38,y-36,10,9,2);c.fill();c.fillStyle='#3E6A3A';el(c,x0+43,y-38,5,3)}});
- if(st>=3)list.push({y:pdY(.74),f:()=>drawPlant(c,34,pdY(.66),'bush')});
- /* the pendant lamp, low over the table */{const lx=T.x;const ly=Math.max(30,T.y-118);c.fillStyle='#2A2420';c.fillRect(lx-.6,-TOP,1.2,TOP+ly);c.fillStyle='#2A2622';c.beginPath();c.moveTo(lx-16,ly+12);c.lineTo(lx+16,ly+12);c.quadraticCurveTo(lx+10,ly-2,lx,ly-2);c.quadraticCurveTo(lx-10,ly-2,lx-16,ly+12);c.fill();c.fillStyle=d>.2||pdOccupied()?'#FFE3A6':'#D8CFC0';el(c,lx,ly+12.5,12,2.6);
-  if(d>.2||pdOccupied()){c.save();c.globalCompositeOperation='lighter';let g=c.createRadialGradient(lx,T.y-10,6,lx,T.y-10,150);g.addColorStop(0,'rgba(255,206,130,.32)');g.addColorStop(1,'rgba(255,206,130,0)');c.fillStyle=g;c.fillRect(lx-160,T.y-140,320,220);c.restore()}}
+ /* the window glass: the street by the hour; the city lit at night; drapes from Phase II */{const wx=124,ww=152,wy=12,wh=PDW-62;const W=wxNow();const wet=W==='rain'||W==='storm';let gg=c.createLinearGradient(0,wy,0,wy+wh);gg.addColorStop(0,mix(wet?'#9AA4AE':'#BFDDF2','#1A2034',d));gg.addColorStop(1,mix(wet?'#B9C1C8':'#F1E3C8','#3A3050',d));c.fillStyle=gg;c.fillRect(wx,wy,ww,wh);
+  c.fillStyle=mix('#B8B0A8','#252736',d);for(let k=0;k<5;k++)c.fillRect(wx+10+k*30,wy+22+(k%3)*8,20,wh-30);if(d>.4){c.fillStyle='rgba(255,212,140,.8)';for(let k=0;k<16;k++)c.fillRect(wx+13+((k*29)%(ww-20)),wy+26+((k*17)%(wh-36)),2.2,2.2)}c.fillStyle=mix('#6F9E5E','#1C2C24',d);for(let k=0;k<6;k++)el(c,wx+12+k*26,wy+wh-8-(k%2)*6,14,9);
+  if(wet){c.strokeStyle='rgba(235,242,250,.4)';c.lineWidth=.8;for(let k=0;k<10;k++){const ph=((now*.5)+k*.37)%1;const rx=wx+4+((k*31)%(ww-8));c.beginPath();c.moveTo(rx,wy+ph*wh);c.lineTo(rx-1,wy+ph*wh+6);c.stroke()}}
+  c.fillStyle='#2B2620';for(let k=1;k<4;k++)c.fillRect(wx+k*ww/4-1,wy,2,wh);c.fillRect(wx,wy+wh*.42,ww,2);c.fillStyle='rgba(184,146,78,.5)';c.fillRect(wx,wy+wh*.42-1,ww,.8);
+  /* sheers always; velvet drapes and a brass rod from Phase II */c.fillStyle='rgba(244,238,226,.34)';c.fillRect(wx+2,wy,24,wh);c.fillRect(wx+ww-26,wy,24,wh);
+  if(st>=2){c.fillStyle=PDC.brass;c.fillRect(wx-22,wy-8,ww+44,2.4);circ(c,wx-22,wy-7,2.2);circ(c,wx+ww+22,wy-7,2.2);for(const cx of[wx-22,wx+ww+6]){let cg=c.createLinearGradient(cx,0,cx+16,0);cg.addColorStop(0,'#26331F');cg.addColorStop(.5,'#3E5233');cg.addColorStop(1,'#26331F');c.fillStyle=cg;c.beginPath();c.moveTo(cx,wy-6);c.lineTo(cx+16,wy-6);c.lineTo(cx+17,wy+wh+4);c.lineTo(cx-1,wy+wh+4);c.closePath();c.fill();c.fillStyle='rgba(226,196,126,.5)';c.fillRect(cx+(cx<wx?4:9),wy+wh*.55,4,1.4)}}}
+ /* the sconces either side of the window (Phase II on): brass fans with frosted glass */
+ if(st>=2)for(const sx of[106,294])list.push({y:PDW-40,f:()=>{const sy=96;c.fillStyle=PDC.brassLo;c.fillRect(sx-1.5,sy,3,10);c.fillStyle=PDC.brass;c.beginPath();c.moveTo(sx-9,sy);c.lineTo(sx+9,sy);c.lineTo(sx+4,sy-14);c.lineTo(sx-4,sy-14);c.closePath();c.fill();c.fillStyle=d>.2?'#FCE6B8':'#E7DED0';c.beginPath();c.moveTo(sx-7,sy-1);c.lineTo(sx+7,sy-1);c.lineTo(sx+3,sy-12);c.lineTo(sx-3,sy-12);c.closePath();c.fill();c.strokeStyle=PDC.brass;c.lineWidth=.7;for(const dx of[-2.5,0,2.5]){c.beginPath();c.moveTo(sx+dx*.6,sy-12);c.lineTo(sx+dx*1.6,sy-1);c.stroke()}
+   if(d>.2){c.save();c.globalCompositeOperation='lighter';let g=c.createRadialGradient(sx,sy-6,2,sx,sy-6,40);g.addColorStop(0,'rgba(255,214,150,.4)');g.addColorStop(1,'rgba(255,214,150,0)');c.fillStyle=g;c.fillRect(sx-40,sy-46,80,90);c.restore()}}});
+ /* art on the far wall: a framed print (II), and an Art Deco mirror (III) */
+ if(st>=2)list.push({y:PDW-58,f:()=>{const x=34,y=18,w=58,h=44;c.fillStyle=PDC.brass;c.fillRect(x-3,y-3,w+6,h+6);c.fillStyle='#EDE5D3';c.fillRect(x,y,w,h);let g=c.createLinearGradient(0,y,0,y+h);g.addColorStop(0,'#D9C7A2');g.addColorStop(1,'#B9A57E');c.fillStyle=g;c.fillRect(x+5,y+5,w-10,h-10);c.fillStyle='#3E5233';c.beginPath();c.moveTo(x+5,y+h-5);c.lineTo(x+w/2,y+12);c.lineTo(x+w-5,y+h-5);c.closePath();c.fill();c.fillStyle='#C99A45';c.beginPath();c.arc(x+w/2,y+h-5,10,Math.PI,0);c.fill();c.strokeStyle='#EDE5D3';c.lineWidth=.8;for(let k=-2;k<=2;k++){c.beginPath();c.moveTo(x+w/2,y+h-5);c.lineTo(x+w/2+k*7,y+h-17);c.stroke()}}});
+ if(st>=3)list.push({y:PDW-58,f:()=>{const x=338,y=14,w=34,h=52;c.fillStyle=PDC.brass;c.beginPath();c.moveTo(x-3,y+h+3);c.lineTo(x-3,y+12);c.quadraticCurveTo(x+w/2,y-10,x+w+3,y+12);c.lineTo(x+w+3,y+h+3);c.closePath();c.fill();let g=c.createLinearGradient(x,y,x+w,y+h);g.addColorStop(0,'#E8E4DA');g.addColorStop(.5,'#B9C0BE');g.addColorStop(1,'#DCD6C8');c.fillStyle=g;c.beginPath();c.moveTo(x,y+h);c.lineTo(x,y+13);c.quadraticCurveTo(x+w/2,y-5,x+w,y+13);c.lineTo(x+w,y+h);c.closePath();c.fill();c.fillStyle='rgba(255,255,255,.35)';c.fillRect(x+6,y+12,3,h-16)}});
+ /* the sideboard under the window: walnut, fluted doors, brass pulls; an ivory stone top from Phase III; what is on it grows */
+ list.push({y:PDW+6,f:()=>{const x0=146,w=108,y=PDW+6;softShadow(c,x0+w/2,y,w*.5,5,.22);c.fillStyle=PDC.walnut;c.fillRect(x0,y-32,w,32);c.fillStyle='#4E3626';c.fillRect(x0+3,y-28,w-6,24);for(let k=0;k<4;k++){const px=x0+5+k*((w-10)/4);for(let fx=px+3;fx<px+(w-10)/4-3;fx+=3){c.fillStyle='rgba(0,0,0,.25)';c.fillRect(fx,y-26,1,20)}c.fillStyle=PDC.brass;c.fillRect(px+(w-10)/8-2,y-17,4,1.6)}
+   c.fillStyle=st>=3?PDC.ivory:'#5A3E2C';c.fillRect(x0-3,y-36,w+6,5);c.fillStyle=st>=3?'rgba(170,160,145,.4)':'rgba(255,255,255,.1)';c.fillRect(x0-3,y-36,w+6,1);c.fillStyle=PDC.brassLo;c.fillRect(x0+2,y-2,3,4);c.fillRect(x0+w-5,y-2,3,4);
+   /* on it: a stack of plates and a carafe (I); a decanter and glasses, a low arrangement (II); a small lamp (III) */c.fillStyle='#F7F3EA';for(let k=0;k<3;k++)el(c,x0+16,y-38-k*1.6,8,2.3);c.fillStyle='rgba(220,232,236,.8)';rr(c,x0+34,y-50,7,13,2);c.fill();
+   if(st>=2){c.fillStyle='rgba(120,40,40,.75)';rr(c,x0+52,y-49,8,12,3);c.fill();c.fillStyle='rgba(230,236,238,.7)';for(let k=0;k<3;k++){c.fillRect(x0+64+k*6,y-46,3,8)}c.fillStyle='#3E6A3A';el(c,x0+92,y-42,8,4);for(const [ox,col] of[[-3,'#E8A0A0'],[2,'#F3E3C0'],[5,'#E37A6A']]){c.fillStyle=col;circ(c,x0+92+ox,y-45,2.2)}}
+   if(st>=3){c.fillStyle=PDC.brass;c.fillRect(x0+w-14,y-58,1.6,20);c.fillStyle=d>.2?'#FCE6B8':'#EDE3D0';c.beginPath();c.moveTo(x0+w-21,y-56);c.lineTo(x0+w-5,y-56);c.lineTo(x0+w-9,y-66);c.lineTo(x0+w-17,y-66);c.closePath();c.fill()}}});
+ /* plants in brass pots: one by the window (I), a pair (II) */
+ const pot=(x,y,big)=>list.push({y,f:()=>{softShadow(c,x,y+1,10,3,.2);c.fillStyle=PDC.brass;c.beginPath();c.moveTo(x-8,y-14);c.lineTo(x+8,y-14);c.lineTo(x+6,y);c.lineTo(x-6,y);c.closePath();c.fill();c.fillStyle=PDC.brassHi;c.fillRect(x-8,y-14,16,1.4);for(let k=0;k<(big?9:6);k++){const a=-1.4+k*(2.8/(big?8:5));c.fillStyle=k%2?'#3F6B3A':'#4F7F45';c.save();c.translate(x,y-14);c.rotate(a);el(c,0,-(big?16:11),big?5.5:4.5,big?11:8);c.restore()}}});
+ pot(116,PDW+4,true);if(st>=2)pot(284,PDW+4,true);
+ /* a coat stand by the door (II); a wine cabinet against the right wall and a service console (III) */
+ if(st>=2)list.push({y:LH-40,f:()=>{const x=72,y=LH-40;softShadow(c,x,y,9,3,.2);c.fillStyle=PDC.walnut;c.fillRect(x-1.5,y-74,3,74);c.fillRect(x-10,y-2,20,3);c.fillStyle=PDC.brass;c.fillRect(x-9,y-72,18,2);circ(c,x,y-75,2.2);c.fillStyle='#4A4A52';rr(c,x+2,y-70,9,26,3);c.fill();c.fillStyle='#8A6A4A';rr(c,x-11,y-68,8,20,3);c.fill()}});
+ if(st>=3)list.push({y:PDW+70,f:()=>{const x0=336,y=PDW+70,w=34;softShadow(c,x0+w/2,y,w*.6,5,.2);c.fillStyle=PDC.walnut;c.fillRect(x0,y-96,w,96);c.fillStyle='#2A2018';c.fillRect(x0+3,y-92,w-6,64);for(let k=0;k<5;k++){c.fillStyle='#4A3A2C';c.fillRect(x0+3,y-90+k*12.6,w-6,1.4);for(let j=0;j<3;j++){c.fillStyle=['#5A1E22','#2E3A22','#6A4A1A'][(j+k)%3];circ(c,x0+8+j*9,y-84+k*12.6,2.6)}}c.fillStyle='rgba(200,220,230,.12)';c.fillRect(x0+3,y-92,w-6,64);c.fillStyle=PDC.brass;c.fillRect(x0,y-96,w,1.6);c.fillRect(x0+w/2-.6,y-92,1.2,64);c.fillStyle='#4E3626';c.fillRect(x0+3,y-24,w-6,20);c.fillStyle=PDC.brass;c.fillRect(x0+w/2-3,y-15,6,1.4)}});
+ if(st>=1)list.push({y:LH-128,f:()=>{const x0=292,y=LH-128,w=44;softShadow(c,x0+w/2,y,w*.5,4,.2);c.fillStyle=PDC.walnut;c.fillRect(x0,y-26,w,26);c.fillStyle=PDC.ivory;c.fillRect(x0-2,y-29,w+4,4);c.fillStyle='#F7F3EA';for(let k=0;k<3;k++)el(c,x0+12,y-31-k*1.4,7,2);c.fillStyle='rgba(230,236,238,.75)';for(let k=0;k<3;k++)c.fillRect(x0+24+k*5,y-37,3,7)}});
+ /* a slim console against the left wall with a lamp and a small framed picture (II on) */
+ if(st>=2)list.push({y:LH-170,f:()=>{const x0=60,y=LH-170,w=40;softShadow(c,x0+w/2,y,w*.5,4,.2);c.fillStyle=PDC.walnut;c.fillRect(x0,y-22,w,3);c.fillRect(x0+2,y-19,2.4,19);c.fillRect(x0+w-4.4,y-19,2.4,19);c.fillStyle=PDC.brass;c.fillRect(x0,y-22,w,1);c.fillRect(x0+2,y-2,2.4,2);c.fillRect(x0+w-4.4,y-2,2.4,2);
+  c.fillStyle=PDC.brass;c.fillRect(x0+8,y-34,1.6,12);c.fillStyle=d>.2?'#FCE6B8':'#EDE3D0';c.beginPath();c.moveTo(x0+2,y-32);c.lineTo(x0+16,y-32);c.lineTo(x0+12,y-41);c.lineTo(x0+6,y-41);c.closePath();c.fill();
+  c.fillStyle=PDC.brass;c.fillRect(x0+22,y-40,15,18);c.fillStyle='#EDE5D3';c.fillRect(x0+24,y-38,11,14);c.fillStyle='#3E5233';c.beginPath();c.moveTo(x0+24,y-24);c.lineTo(x0+29.5,y-35);c.lineTo(x0+35,y-24);c.closePath();c.fill();
+  if(d>.2){c.save();c.globalCompositeOperation='lighter';let g=c.createRadialGradient(x0+9,y-36,2,x0+9,y-36,46);g.addColorStop(0,'rgba(255,214,150,.35)');g.addColorStop(1,'rgba(255,214,150,0)');c.fillStyle=g;c.fillRect(x0-40,y-80,100,100);c.restore()}}});
+ /* the pendant over the table: a stepped brass frame with frosted glass (I–II); a tiered linear chandelier (III) */
+ {const cx=200,cy=G.y0-8;const lit=d>.15||pdOccupied()||(R&&pdHeld());c.fillStyle=PDC.brassLo;c.fillRect(cx-.7,-TOP,1.4,TOP+cy-14);
+  if(st<3){c.save();c.translate(cx,cy);c.scale(1.5,1.5);c.fillStyle=PDC.brass;c.beginPath();c.moveTo(-14,6);c.lineTo(14,6);c.lineTo(9,-6);c.lineTo(-9,-6);c.closePath();c.fill();c.fillStyle=lit?'#FCE7BC':'#E4DACA';c.beginPath();c.moveTo(-12,5);c.lineTo(12,5);c.lineTo(8,-4);c.lineTo(-8,-4);c.closePath();c.fill();c.fillStyle=PDC.brass;c.fillRect(-5,-12,10,6);c.fillRect(-16,6,32,1.6);for(const dx of[-6,0,6])c.fillRect(dx-.4,-4,.8,9);c.restore()}
+  else{for(const [w,y] of[[52,cy-14],[42,cy],[32,cy+14]]){c.fillStyle=PDC.brass;c.fillRect(cx-w/2,y-4,w,1.6);c.fillRect(cx-w/2,y+3,w,1.6);c.fillStyle=lit?'#FCE7BC':'#E4DACA';for(let x=cx-w/2+2;x<cx+w/2-1;x+=4)c.fillRect(x,y-2.4,2.4,5.2)}c.fillStyle=PDC.brass;c.fillRect(cx-.8,cy-18,1.6,30);c.fillRect(cx-6,cy-18,12,3)}
+  if(lit){c.save();c.globalCompositeOperation='lighter';let g=c.createRadialGradient(cx,cy+4,3,cx,cy+4,40);g.addColorStop(0,'rgba(255,220,160,.45)');g.addColorStop(1,'rgba(255,220,160,0)');c.fillStyle=g;c.fillRect(cx-40,cy-36,80,80);const ty=(G.y0+G.y1)/2;g=c.createRadialGradient(cx,ty,8,cx,ty,(G.y1-G.y0)*.75);g.addColorStop(0,'rgba(255,206,140,.26)');g.addColorStop(1,'rgba(255,206,140,0)');c.fillStyle=g;c.fillRect(cx-150,G.y0-60,300,G.y1-G.y0+120);c.restore()}}
+ /* the door at the near end, standing open: two leaves of bronze and frosted glass either side of the way out */
+ list.push({y:LH+2,f:()=>{for(const [x,dir] of[[164,-1],[236,1]]){const w=12,y0=LH-86;c.fillStyle='rgba(0,0,0,.25)';c.fillRect(x+(dir<0?-w-2:2),LH-6,w,6);c.fillStyle='#6E5434';c.fillRect(dir<0?x-w:x,y0,w,86);c.fillStyle='#8A6A3E';c.fillRect(dir<0?x-w:x,y0,w,2);c.fillStyle='rgba(222,214,198,.85)';c.fillRect((dir<0?x-w:x)+2.5,y0+8,w-5,50);c.fillStyle='rgba(255,255,255,.35)';c.fillRect((dir<0?x-w:x)+3,y0+10,1.4,44);c.fillStyle=PDC.brassHi;c.fillRect((dir<0?x-w:x)+(dir<0?w-4:2),y0+64,2,8)}
+  /* the way back, as on the arches' mats */c.font=`800 6.8px ${FONT}`;const lb='‹ 二樓';const w=c.measureText(lb).width+12;c.fillStyle='#2E2620';rr(c,200-w/2,LH-24,w,11,3);c.fill();c.fillStyle=PDC.brass;c.fillRect(200-w/2+2,LH-23,w-4,.7);c.fillStyle='#F3E6CC';c.textAlign='center';c.textBaseline='middle';c.fillText(lb,200,LH-18.2);c.textBaseline='alphabetic'}});
  /* the table itself is in the day's tables (buildTables), drawn by drawTableFull → drawPdrTable */}
-/* the long table: chairs with dark green seats, the people along the far side and at the ends, plates by phase */
-function drawPdrTable(c,t,now){const st=Math.max(1,pdStage());const half=pdHalf();const g=t.group;const seated=g&&SEATED_ST.includes(g.state);const seats=pdSeats();const held=!g&&pdHeld();
- softShadow(c,t.x,t.y+8,half+6,12,.24);
- const chair=(x,y,side)=>{c.save();c.translate(x,y);c.scale(side>0?-1:1,1);c.fillStyle='#5E3E24';c.fillRect(-7,-9,14,3);c.fillRect(-7,-6,2,7);c.fillRect(5,-6,2,7);c.fillStyle='#3E5A48';rr(c,-7,-12,14,4,1.5);c.fill();if(side!==0){c.fillStyle='#5E3E24';c.fillRect(-9,-28,3,22);c.fillStyle='#3E5A48';rr(c,-9,-26,4,13,1.5);c.fill()}else{c.fillStyle='#5E3E24';c.fillRect(-7,-30,14,3);c.fillRect(-7,-30,2,22);c.fillRect(5,-30,2,22);c.fillStyle='#3E5A48';rr(c,-6,-28,12,9,2);c.fill()}c.restore()};
- const order=seats.map((sp,k)=>({sp,k})).sort((a,b)=>a.sp.dy-b.sp.dy);
- for(const {sp,k} of order){const x=t.x+sp.dx,y=t.y+sp.dy;chair(x,y,sp.side);
-  if(seated&&k<g.size){const L0=g.looks[k%g.looks.length];const mood=g.state==='eat'?'eat':g.pat>.6?'happy':g.pat>.3?'ok':'sad';drawPerson(c,x,y,L0,{seated:true,mood,flip:sp.side>0,bob:g.state==='eat'?Math.sin(now*6+k)*.6:Math.sin(now*1.4+g.seed+k*1.7)*.3,chew:g.state==='eat'&&Math.sin(now*9+k)>0,blink:Math.sin(now*1.3+g.seed+k*2)>.97});
-   if(g.size>=2&&['reading','wait','order','eat'].includes(g.state)){const ph=now*.6+g.seed;const who=Math.floor(ph/6.28)%g.size;if(k===who&&Math.sin(ph)>.4){const f=sp.side>0?-1:1;c.fillStyle='rgba(255,250,240,.92)';const bx=x+f*11,by=y-56;rr(c,bx-6.5,by-4.5,13,9,4);c.fill();c.fillStyle='#2E2019';for(let i=-1;i<=1;i++)circ(c,bx+i*2.8,by+.3,.8)}}
-   {const ft=floorTag(g,k);if(ft)nameTag(c,x,y-50,ft)}}}
- /* the top: walnut, a lighter edge; Phase II a runner and flowers; III place settings and candles */
- c.fillStyle='#4A2E1C';c.fillRect(t.x-half+6,t.y-4,6,12);c.fillRect(t.x+half-12,t.y-4,6,12);c.fillStyle='#5E3B22';rr(c,t.x-half,t.y-16,half*2,13,3);c.fill();c.fillStyle='#7A4E2C';rr(c,t.x-half,t.y-18,half*2,10,3);c.fill();c.fillStyle='rgba(255,255,255,.1)';c.fillRect(t.x-half+4,t.y-17,half*2-8,1.4);
- if(st>=2){c.fillStyle='#E6DCC8';c.fillRect(t.x-24,t.y-18,48,10);c.fillStyle='rgba(0,0,0,.06)';c.fillRect(t.x-24,t.y-10,48,1.5);c.fillStyle='#F2EEE6';rr(c,t.x-4,t.y-24,8,8,2);c.fill();for(const [ox,col] of[[-3,'#E37A6A'],[2,'#F2C46A'],[0,'#F6F0E8']]){c.fillStyle=col;circ(c,t.x+ox,t.y-27,2.2)}c.fillStyle='#5E8A4A';el(c,t.x-5,t.y-25,3,1.4);el(c,t.x+5,t.y-25,3,1.4)}
- const per=seats.filter(s=>s.side===0).map(s=>s.dx);
- if(!g&&!t.dirty&&(held||st>=3)){/* set: a plate and cutlery at each place on the far side */for(const dx of per){c.fillStyle='#FFFFFF';el(c,t.x+dx,t.y-13,5.4,2.6);c.fillStyle='rgba(0,0,0,.08)';el(c,t.x+dx,t.y-12.4,5.4,1);c.strokeStyle='#B9C1C4';c.lineWidth=.7;c.beginPath();c.moveTo(t.x+dx-7.5,t.y-15);c.lineTo(t.x+dx-7.5,t.y-11);c.moveTo(t.x+dx+7.5,t.y-15);c.lineTo(t.x+dx+7.5,t.y-11);c.stroke()}}
- if(st>=3&&duskF()>.4){for(const dx of[-half*.55,half*.55]){const fl=.8+Math.sin(now*10+dx)*.2;c.fillStyle='#E8DFCF';rr(c,t.x+dx-2,t.y-22,4,6,1);c.fill();c.fillStyle='#FFD27A';el(c,t.x+dx,t.y-24,1.1,1.8*fl)}}
- /* the plates while they eat: along the table, as many as were served */
- const n=t.plates.length;const pr=g&&g.state==='eat'&&g.eatDur?clamp(1-g.timer/g.eatDur,0,1):0;t.plates.slice(0,10).forEach((p,i)=>{const dx=-half+16+((i+.5)/Math.max(1,Math.min(10,n)))*(half*2-32);const dy=-12+((i%2)?2:-2);const q=(t.dirty||(g&&g.ate))?'E':p.q;
-  if(q==='E'){c.fillStyle='#fff';el(c,t.x+dx,t.y+dy,6.5,3.6)}else{const cv=dishCanvas(p.d,p.q,64,S.decor.ware>0,p.want);c.drawImage(cv,t.x+dx-10,t.y+dy-10,20,20);if(pr>.15){const e=clamp((pr-.15)/.8,0,1);c.fillStyle='rgba(255,255,255,.95)';el(c,t.x+dx,t.y+dy+.5,6.8*e,4.2*e)}}});
- if(t.dirty&&!n){c.fillStyle='#fff';el(c,t.x-30,t.y-12,6,3.4);el(c,t.x+10,t.y-11,6,3.4);el(c,t.x+40,t.y-13,6,3.4)}}
+/* the long table, down the middle: ivory stone on walnut, upholstered chairs down both sides; the people face each
+   other across it (the game never shows a back); the setting by phase; the plates where the people are */
+function pdChair(c,x,y,side,occ){c.save();c.translate(x,y);if(side>0)c.scale(-1,1);
+ c.fillStyle='rgba(30,22,16,.25)';el(c,0,1,11,3);c.fillStyle=PDC.brassLo;c.fillRect(-8,-3,1.6,5);c.fillRect(6,-3,1.6,5);c.fillStyle=PDC.brass;c.fillRect(-8,1,1.6,1.4);c.fillRect(6,1,1.6,1.4);
+ c.fillStyle=PDC.fabricLo;rr(c,-10,-28,8,27,4);c.fill();c.fillStyle=PDC.fabric;rr(c,-9,-27,6,24,3);c.fill();c.fillStyle='rgba(255,255,255,.15)';c.fillRect(-8,-25,1,20);
+ c.fillStyle=PDC.fabricLo;rr(c,-9,-9,19,7,3);c.fill();c.fillStyle=PDC.fabric;rr(c,-8,-10,17,5,2.5);c.fill();c.restore()}
+function drawPdrTable(c,t,now){const st=Math.max(1,pdStage());const G=pdGeo();const g=t.group;const seated=g&&SEATED_ST.includes(g.state);const seats=pdSeats();const held=!g&&pdHeld();const x0=G.x-G.hw,x1=G.x+G.hw;
+ /* the shadow and the walnut base */c.fillStyle='rgba(20,14,10,.3)';rr(c,x0-4,G.y0+6,G.hw*2+8,G.y1-G.y0+4,6);c.fill();
+ c.fillStyle=PDC.walnut;c.fillRect(x0+5,G.y1-2,6,15);c.fillRect(x1-11,G.y1-2,6,15);c.fillStyle=PDC.brass;c.fillRect(x0+5,G.y1+11,6,2);c.fillRect(x1-11,G.y1+11,6,2);c.fillStyle='#2E1F16';c.fillRect(x0+4,G.y1-3,G.hw*2-8,4);
+ /* the stone top: ivory, a few fine veins, the near edge's thickness, a brass line under it */
+ let tg=c.createLinearGradient(0,G.y0,0,G.y1);tg.addColorStop(0,'#E9E1D2');tg.addColorStop(1,'#F2ECE1');c.fillStyle=tg;rr(c,x0,G.y0,G.hw*2,G.y1-G.y0,3);c.fill();
+ c.strokeStyle='rgba(160,150,135,.38)';c.lineWidth=.7;{const r=rng(31);for(let k=0;k<6;k++){const vy=G.y0+10+r()*(G.y1-G.y0-20);c.beginPath();c.moveTo(x0+2,vy);c.bezierCurveTo(x0+18,vy+8*r(),x0+40,vy-10*r(),x1-3,vy+14*(r()-.5));c.stroke()}}
+ c.fillStyle='rgba(255,255,255,.4)';c.fillRect(x0+2,G.y0+1,G.hw*2-4,1);c.fillStyle='#D6CDBC';c.fillRect(x0,G.y1-1,G.hw*2,5);c.fillStyle=PDC.brass;c.fillRect(x0,G.y1+3,G.hw*2,1.2);
+ /* the chairs and the people, far end first */
+ const mood=g?(g.state==='eat'?'eat':g.pat>.6?'happy':g.pat>.3?'ok':'sad'):'happy';
+ for(let i=0;i<seats.length;i++){const sp=seats[i];const x=t.x+sp.dx,y=t.y+sp.dy;const occ=seated&&i<g.size;pdChair(c,x+(sp.side<0?-4:4),y,sp.side,occ);
+  if(occ){const L0=g.looks[i%g.looks.length];drawPerson(c,x,y,L0,{seated:true,mood,flip:sp.side>0,bob:g.state==='eat'?Math.sin(now*6+i)*.6:Math.sin(now*1.4+g.seed+i*1.7)*.3,chew:g.state==='eat'&&Math.sin(now*9+i)>0,blink:Math.sin(now*1.3+g.seed+i*2)>.97});
+   if(g.size>=2&&['reading','wait','order','eat'].includes(g.state)){const ph=now*.6+g.seed;const who=Math.floor(ph/6.28)%g.size;if(i===who&&Math.sin(ph)>.4){const f=sp.side>0?-1:1;c.fillStyle='rgba(255,250,240,.92)';const bx=x+f*11,by=y-56;rr(c,bx-6.5,by-4.5,13,9,4);c.fill();c.fillStyle='#2E2019';for(let k=-1;k<=1;k++)circ(c,bx+k*2.8,by+.3,.8)}}
+   {const ft=floorTag(g,i);if(ft)nameTag(c,x,y-50,ft)}}}
+ /* the setting at each place: a plate with a gold rim, cutlery; glasses from Phase II; chargers from III */
+ const place=(sp,full)=>{const px=G.x+(sp.side<0?-(G.hw-12):(G.hw-12)),py=t.y+sp.dy-6;if(st>=3){c.fillStyle='#C9A45C';el(c,px,py,8,4.6)}c.fillStyle='#FFFFFF';el(c,px,py,6.4,3.4);c.strokeStyle='rgba(201,164,92,.8)';c.lineWidth=.6;c.beginPath();c.ellipse(px,py,5.2,2.6,0,0,7);c.stroke();c.strokeStyle='#B9C1C4';c.lineWidth=.7;c.beginPath();c.moveTo(px-1,py-6);c.lineTo(px+1,py-6);c.moveTo(px-1,py+6);c.lineTo(px+1,py+6);c.stroke();
+  if(full&&st>=2){const gx=px+(sp.side<0?9:-9);c.fillStyle='rgba(225,236,240,.85)';rr(c,gx-1.6,py-9,3.2,5,1);c.fill();if(st>=3){c.fillStyle='rgba(225,236,240,.7)';rr(c,gx-1.4,py-15,2.8,5,1);c.fill();c.fillStyle='rgba(225,236,240,.6)';c.fillRect(gx-.3,py-10,.6,2)}}};
+ const setN=g?Math.min(seats.length,g.size):(!t.dirty&&(held||st>=2))?seats.length:0;for(let i=0;i<setN;i++)place(seats[i],true);
+ /* down the middle: low flowers (II), candles (III) */
+ if(st>=2){const mid=(G.y0+G.y1)/2;for(const fy of(st>=3?[mid-G.pitch*1.2,mid+G.pitch*1.2]:[mid])){c.fillStyle='#E9E4D8';rr(c,G.x-5,fy-3,10,6,2);c.fill();c.fillStyle='#4F7F45';el(c,G.x-4,fy-4,4,2);el(c,G.x+4,fy-4,4,2);for(const [ox,oy,col] of[[-2,-6,'#E8A0A0'],[2,-7,'#F3E3C0'],[0,-9,'#E37A6A'],[-4,-8,'#F6F0E8']]){c.fillStyle=col;circ(c,G.x+ox,fy+oy,2)}}}
+ if(st>=3&&(duskF()>.35||pdOccupied())){for(const fy of[(G.y0+G.y1)/2,G.y0+18,G.y1-18]){const fl=.8+Math.sin(now*10+fy)*.2;c.fillStyle=PDC.brass;c.fillRect(G.x-2,fy-2,4,3);c.fillStyle='#F2ECE0';c.fillRect(G.x-1.2,fy-8,2.4,6);c.fillStyle='#FFD27A';el(c,G.x,fy-10,1.1,1.8*fl)}}
+ /* the plates while they eat, at their places */
+ const n=t.plates.length;const pr=g&&g.state==='eat'&&g.eatDur?clamp(1-g.timer/g.eatDur,0,1):0;t.plates.slice(0,12).forEach((p,i)=>{const sp=seats[i%Math.max(1,Math.min(seats.length,g?g.size:seats.length))]||seats[0];const extra=Math.floor(i/Math.max(1,Math.min(seats.length,g?g.size:seats.length)));const px=G.x+(sp.side<0?-(G.hw-13):(G.hw-13))+(extra?(sp.side<0?10:-10):0),py=t.y+sp.dy-5+(extra?6:0);const q=(t.dirty||(g&&g.ate))?'E':p.q;
+  if(q==='E'){c.fillStyle='#fff';el(c,px,py,6,3.2)}else{const cv=dishCanvas(p.d,p.q,64,S.decor.ware>0,p.want);c.drawImage(cv,px-9,py-9,18,18);if(pr>.15){const e=clamp((pr-.15)/.8,0,1);c.fillStyle='rgba(255,255,255,.95)';el(c,px,py+.5,6.2*e,3.8*e)}}});
+ if(t.dirty&&!n){for(const k of[0,3,4]){const sp=seats[k];if(!sp)continue;c.fillStyle='#fff';el(c,G.x+(sp.side<0?-(G.hw-13):(G.hw-13)),t.y+sp.dy-5,6,3.2)}}}
 /* ---- the two projects, in 店舖工程 › 二樓的房間. Phase I is real construction, ready by the next opening; II and III
    are improvements to the same room, there the next day (AK). One big job on the floor at a time. Prices: AL, set
    from the measured late-game day (AUDIT_AND_PLAN §8.1): the Staff Room cheaper than the Private Dining Room, each
@@ -4382,9 +4505,9 @@ const SR_PROJ=[null,
  {n:'休息室',sub:'開始像他們的地方',cost:70000,d:'同一間房：置物櫃、小冰箱、一張比較好坐的沙發、咖啡機和熱水壺、多一排插座、多幾個杯子和收納。明天就在。',done:'置物櫃、小冰箱和咖啡機都進來了，牆上多了一排插座。',jill:'嗯。'},
  {n:'休息室',sub:'真的有人生活過',cost:90000,d:'換一張軟一點的沙發和幾個坐墊、一張可以圍著吃東西的桌子、一台小喇叭、更多層架。不是變豪華，是用久了該有的樣子。明天就在。',done:'沙發換了，多了一張桌子，層架上多了一台小喇叭。',jill:'這樣可以。'}];
 const PD_PROJ=[null,
- {n:'私人包廂',sub:'一桌人的地方',cost:240000,d:'二樓窗邊那一區隔出一間包廂：牆、可以關上的門、一張六人長桌、一盞吊燈、一個邊櫃。4–6 位的訂位會自己進來，每組有整桌最低消費；沒有訂位的晚上，4 位以上的客人也可以直接坐。餐廳員工名額 +1。今晚施工，明天開門前完工。',done:'窗邊那一區有了牆和門。裡面一張長桌，一盞低低的吊燈。',jill:'好。',unlock:['包廂（二樓，點門進去）','4–6 位的包廂訂位','餐廳員工名額 +1']},
- {n:'私人包廂',sub:'慢慢吃',cost:120000,d:'長桌加長到 8 位、比較好坐的椅子、窗簾、牆上一幅畫、一盞壁燈、一座衣帽架。4–8 位都能訂，訂位也會多一些。明天就在。',done:'桌子長了一截，窗邊掛上了窗簾。',jill:'嗯。',unlock:['4–8 位的包廂訂位']},
- {n:'私人包廂',sub:'熟悉的位置',cost:160000,d:'包廂做完整：最多坐 10 位、餐具每天擺好、蠟燭、層架、更多綠色。4–10 位都能訂，成了固定會有人訂的房間。餐廳員工名額再 +1。明天就在。',done:'包廂可以坐到十個人了，桌上的餐具每天擺好。',jill:'好。',unlock:['4–10 位的包廂訂位','餐廳員工名額 +1']}];
+ {n:'私人包廂',sub:'一桌人的地方',cost:240000,d:'二樓窗邊那一區隔出一間包廂：牆、可以關上的門；石材地板、一張從門口往窗邊延伸的石材長桌（6 位）、深綠牆板和黃銅線條、包覆的餐椅、一盞黃銅吊燈、邊櫃和一張服務台。4–6 位的訂位會自己進來，每組有整桌最低消費；沒有訂位的晚上，4 位以上的客人也可以直接坐。餐廳員工名額 +1。今晚施工，明天開門前完工。',done:'窗邊那一區有了深綠的牆和一扇門。裡面一張石材長桌，一盞黃銅吊燈。',jill:'好。',unlock:['包廂（二樓，點門進去）','4–6 位的包廂訂位','餐廳員工名額 +1']},
+ {n:'私人包廂',sub:'慢慢吃',cost:120000,d:'同一間房更完整：長桌接長到 8 位、窗邊兩盞壁燈、牆板加上直紋、絲絨窗簾、牆上的畫、靠牆的小桌和燈、衣帽架、桌上的花和水杯。4–8 位都能訂，訂位也會多一些。明天就在。',done:'桌子長了一截，窗邊多了兩盞壁燈和深綠的窗簾。',jill:'嗯。',unlock:['4–8 位的包廂訂位']},
+ {n:'私人包廂',sub:'熟悉的位置',cost:160000,d:'包廂做到最完整：最多坐 10 位、天花的格子、層疊的吊燈、酒櫃、拱形的鏡子、邊櫃換上石材檯面和一盞小燈、每天擺好的全套餐具和酒杯、蠟燭。4–10 位都能訂，成了固定會有人訂的房間。餐廳員工名額再 +1。明天就在。',done:'包廂可以坐到十個人了，桌上的餐具每天擺好，晚上點著蠟燭。',jill:'好。',unlock:['4–10 位的包廂訂位','餐廳員工名額 +1']}];
 const SR_WAIT=[0,0,5,7],PD_WAIT=[0,0,6,8],PD_USES=[0,0,3,9];
 /* what is open to buy now, or why not yet */
 function srNext(){const s=srOf();if(!srOn())return fact('sr_story')?1:0;const st=srStage();if(st===0)return 0;return st<3?st+1:0}
@@ -4503,8 +4626,12 @@ function srLifeUpd(dt){if(!R||phase!=='service'||!srBuilt())return;
  /* a quiet stretch: one goes up for a few minutes, never while the room is needed downstairs */
  R.srT=(R.srT||0)-dt;const busy=queued().length>0||R.tables.some(t=>t.group&&(t.group.state==='order'||t.group.state==='check'||t.group.pat<.4))||R.tickets.some(tk=>tk.items.some(i=>i.st==='ready'&&!i.picked));
  for(const id in R.cw||{}){const w=R.cw[id];if(w.task&&w.task.sr&&w.task.dur<1e6&&busy&&w.room!=='staff'&&!w.task.fired){/* called back before they got there */w.task=null;w.srSpot=null}}
- if(R.closing==null&&R.srT<=0){R.srT=8;if(!busy&&(R.srBreaks||0)<2&&R.t>R.dur*.12&&R.t<R.dur*.85&&R.tables.filter(t=>t.group).length<=Math.max(2,R.tables.length*.4)&&!Object.values(R.cw||{}).some(w=>w.task&&w.task.sr)){
-   const F=(S.crew||[]).filter(m=>(m.role==='waiter'||m.role==='cleaner')&&srHere(m)&&R.cw[m.id]&&!R.cw[m.id].task&&!R.cw[m.id].next&&(R.cw[m.id].cd||0)<=0);if(F.length&&hash('srbr|'+S.day+'|'+Math.floor(R.t/8))%100<30){const m=F[hash('srbm|'+S.day+'|'+Math.floor(R.t))%F.length];if(srSend(m,10+hash('srbd|'+S.day)%5)){R.srBreaks=(R.srBreaks||0)+1;R.srT=60}}}}
+ if(R.closing==null&&R.srT<=0){R.srT=8;/* a quiet moment for the floor: nobody waiting at the door, at most one table to order or pay, and
+   at least three of them with nothing in hand — then one goes up for a few minutes (a busy restaurant has these too) */
+  const F=(S.crew||[]).filter(m=>(m.role==='waiter'||m.role==='cleaner')&&srHere(m)&&R.cw[m.id]&&!R.cw[m.id].task&&!R.cw[m.id].next&&(R.cw[m.id].cd||0)<=0);
+  const quiet=queued().length===0&&R.tables.filter(t=>t.group&&(t.group.state==='order'||t.group.state==='check'||t.group.pat<.35)).length<=1;
+  if(quiet&&F.length>=3&&(R.srBreaks||0)<2&&R.t>R.dur*.12&&R.t<R.dur*.85&&!Object.values(R.cw||{}).some(w=>w.task&&w.task.sr)){
+   if(hash('srbr|'+S.day+'|'+Math.floor(R.t/8))%100<30){const m=F[hash('srbm|'+S.day+'|'+Math.floor(R.t))%F.length];if(srSend(m,10+hash('srbd|'+S.day)%5)){R.srBreaks=(R.srBreaks||0)+1;R.srT=60}}}}
  /* the walkers: up from the kitchen or the bar, to a spot, and sit */
  for(const w of R.srw||[]){if(R.closing==null||R.closing<w.at)continue;if(!w.arr){if(stepTo(w,105*dt)){w.arr=1;w.moving=false;w.face=w.spot.face||1;srArrive(w.m);if(w.m.name==='Hugo'&&srStage()>=2&&w.spot.k==='fridge')w.fr={t:0}}else{w.moving=true;w.step+=dt*11}}
   else if(w.fr){w.fr.t+=dt;const t=w.fr.t;if(t>2&&t<2.6){w.x=w.spot.x-10;w.face=-1}else if(t>=2.6&&t<3.4){w.x=w.spot.x;w.face=1}if(t>6){w.fr=null;const sp=srFreeSpot(null);if(sp&&!sp.stand){w.spot=sp;w.tx=sp.x;w.ty=sp.y;w.arr=0}}}}
@@ -4553,8 +4680,15 @@ function pdHeld(){if(!pdBuilt())return false;const r=pdRes();if(pdResOpen(r))ret
 /* the average check per guest, measured from the evenings themselves (the late-game economy as it is) */
 function pdAvg(){const p=pdOf()||{};if(p.avg)return p.avg;const L=S.lastSummary;if(L&&L.guests>0)return Math.max(120,Math.round(L.rev/L.guests));const ms=menuList();const m=ms.length?ms.reduce((a,d)=>a+priceOf(d),0)/ms.length:150;return Math.round(m*1.6)}
 function pdAvgUpd(st){if(!pdOn()||!st||!(st.guests>0))return;const p=pdW();const v=st.rev/st.guests;p.avg=Math.round(p.avg?p.avg*.75+v*.25:v)}
-/* the minimum: party size × the average check × a modest factor for the room, by phase; rounded to $100 */
-function pdMinFor(size,st){return Math.max(400,Math.round(size*pdAvg()*[0,1.05,1.1,1.15][st||1]/100)*100)}
+/* what a party like this orders at today's menu and prices: the ordering rules themselves, sampled (a seeded draw, so
+   the day's random numbers are not touched and the same evening always gives the same figure) */
+function pdExpect(size,type){const r0=Math.random;let a=(hash('pdx|'+S.day+'|'+size+'|'+type)>>>0)||1;Math.random=()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+ let sum=0;const N=40;try{for(let i=0;i<N;i++)for(const d of orderItems({type:type||'family',size,reg:null},true)){const P=priceOf(d);sum+=P}}catch(e){sum=0}finally{Math.random=r0}
+ return sum>0?sum/N:size*pdAvg()}
+/* the minimum (T, U, AL): what such a party orders, times a modest factor for the room by phase (I .9, II .95, III 1) —
+   a floor most parties pass and a light table is brought up to; it grows with the party; rounded to $100 */
+const PD_MINF=[0,.9,.95,1];
+function pdMinFor(size,st,type){return Math.max(400,Math.round(pdExpect(size,type)*PD_MINF[st||1]/100)*100)}
 function pdPickSize(st,key){const max=PD_MAX[st];const W=[];for(let n=PD_MIN;n<=max;n++)W.push({n,w:n<=6?3-Math.abs(n-5)*.6:n<=8?1.4-(n-7)*.3:.9-(n-9)*.3});let tot=W.reduce((a,o)=>a+o.w,0),x=(hash(key)%1000)/1000*tot;for(const o of W){x-=o.w;if(x<=0)return o.n}return W[W.length-1].n}
 /* at the start of the day (the prep screen): tonight's booking, if one comes in */
 function pdDay(){if(!pdBuilt())return;const p=pdW();if(p.res&&p.res.d===S.day)return;   /* already made (a reload, the same day): never twice */
@@ -4565,9 +4699,9 @@ function pdDay(){if(!pdBuilt())return;const p=pdW();if(p.res&&p.res.d===S.day)re
  if(hash('pdres|'+S.day)%1000/1000>=pr){p.dry=(p.dry||0)+1;return}
  p.dry=0;p.ever=(p.ever||0)+1;const size=pdPickSize(st,'pdsz|'+S.day);const K=PD_KINDS[hash('pdk|'+S.day)%PD_KINDS.length];const sn=PD_SURN[hash('pds|'+S.day)%PD_SURN.length];
  const name=K.k==='family'||K.k==='bday'?`${sn}家`:K.k==='work'?`${sn}先生一行`:K.k==='class'?`${sn}小姐和同學`:K.k==='talk'?`${sn}先生`:`${sn}小姐和朋友`;
- p.res={id:'r'+S.day,d:S.day,size,min:pdMinFor(size,st),kind:K.n,type:K.type,name,t:.26+(hash('pdt|'+S.day)%30)/100,status:'booked',phase:st}}
+ p.res={id:'r'+S.day,d:S.day,meal:'dinner',size,min:pdMinFor(size,st,K.type),kind:K.n,type:K.type,name,t:.26+(hash('pdt|'+S.day)%30)/100,status:'booked',phase:st}}
 /* an authored use of the room on day d (AA–AC): kept unless that evening is already booked */
-function pdBook(d,o){if(!pdBuilt())return false;const p=pdW();if(p.res&&p.res.d===d&&pdResOpen(p.res))return false;if(p.book[d])return false;p.book[d]=Object.assign({kind:'story',status:'booked',d},o||{});return true}
+function pdBook(d,o){if(!pdBuilt())return false;const p=pdW();if(p.res&&p.res.d===d&&pdResOpen(p.res))return false;if(p.book[d])return false;p.book[d]=Object.assign({kind:'story',status:'booked',d,meal:'dinner'},o||{});return true}
 /* who may sit at the table: tonight's booking only; with none, a party that fits (4 up to the phase's size) */
 function pdTableFor(g){if(!pdBuilt()||!g||g.size<PD_MIN||g.size>pdMax())return false;const r=pdRes();if(pdResOpen(r))return g.pdRes===r.id;const b=pdBooking(S.day);if(b&&(b.status==='booked'||b.status==='seated'))return !!g.pdStory&&g.pdStory===b.k;return !g.reg&&!g.lounge}
 function pdSeated(g,t){if(!t||!t.pdr)return;const r=pdRes();if(r&&g.pdRes===r.id){r.status='seated';logLine('',`預約包廂的客人到了：${r.name}，${r.size} 位。`,'e')}const b=pdBooking(S.day);if(b&&g.pdStory===b.k)b.status='seated';
@@ -5600,10 +5734,10 @@ function roomTap(p,e){e.preventDefault();audioInit();
   if(p.y>LH-70&&Math.abs(p.x-200)<60){setRoom('main');return true}return false}
  if(room==='side'){const a=SIDE_L.arch;if(p.x>=a.x-8&&p.x<=a.x+a.w+8&&p.y>=a.y-6&&p.y<=a.y+112){setRoom('main');return true}}
  if(room==='front'){if(Math.abs(p.x-FR.door.x)<30&&p.y>176&&p.y<276){setRoom('main');return true}}
- /* v2.4 rc6: the doors on the floor open the rooms; inside, the door goes back out */if(room==='up'){const inB=(B,m)=>p.x>=B.x0-m&&p.x<=B.x1+m&&p.y>=B.y0-UPW.h-m&&p.y<=B.y1+m;if(srBuilt()&&inB(UPR.sr,4)){setRoom('staff');return true}if(pdBuilt()&&inB(UPR.pd,4)){setRoom('pdr');return true}}
- if((room==='staff'&&Math.abs(p.x-SRL.door.x)<24&&p.y>-10&&p.y<104)||(room==='pdr'&&Math.abs(p.x-PDL.door.x)<26&&p.y>-10&&p.y<104)){setRoom('up');return true}
+ /* v2.4 rc6: the doors on the floor open the rooms; inside, the door goes back out */if(room==='up'){const inB=(B,m)=>p.x>=B.x0-m&&p.x<=B.x1+UPRW.sd+m&&p.y>=B.y0-UPRW.h-m&&p.y<=B.y1+m;if(srBuilt()&&inB(UPR.sr,4)){setRoom('staff');return true}if(pdBuilt()&&inB(UPR.pd,4)){setRoom('pdr');return true}}
+ if((room==='staff'&&Math.abs(p.x-SRL.door.x)<24&&p.y>-10&&p.y<104)||(room==='pdr'&&Math.abs(p.x-PDL.door.x)<46&&p.y>LH-56)){setRoom('up');return true}
  const rg=hitRegular(p);if(rg&&!paused){showRegCard(rg);return true}
- if(!R||paused||phase!=='service')return false;let best=null,bd=1e9;for(const t of R.tables){if((t.room||'main')!==room)continue;const d=Math.hypot((p.x-t.x)*(t.pdr?.4:.85),p.y-(t.y-16));const lim=t.pdr?60:t.seats===4?46:40;if(d<lim&&d<bd){bd=d;best=t}}
+ if(!R||paused||phase!=='service')return false;let best=null,bd=1e9;for(const t of R.tables){if((t.room||'main')!==room)continue;const d=t.pdr?(pdHit(p)?0:1e9):Math.hypot((p.x-t.x)*.85,p.y-(t.y-16));const lim=t.pdr?60:t.seats===4?46:40;if(d<lim&&d<bd){bd=d;best=t}}
  if(best){tapTable(best);return true}return false}
 function tapKItem(k){audioInit();KPOP[k]=performance.now()/1000;const now=performance.now()/1000;
  if(k.startsWith('miss:')){toast(`${k.slice(5)}還沒買，打烊後可以在商店購買`);return}
@@ -6071,12 +6205,12 @@ function crewUpd(dt){R.cw=R.cw||{};for(const m of S.crew||[]){
  if(m.role==='waiter'){
   if(waiterDoes(m,'seat')){const g=queued().find(g=>g.state==='queue'&&!g.claim&&freeTableFor(g)&&!freeTableFor(g).claim);if(g){const t=freeTableFor(g);g.claim=m.id;t.claim=m.id;w.task={k:'seat',g,t,x:g.x+22,y:g.y+2,dur:.25,room:'main'};continue}}
   const lgOK=t=>!t.lounge||waiterDuties(m).lounge;   /* v2.3: the Lounge is a job on the board */
-  if(waiterDoes(m,'order')){const t=R.tables.find(t=>t.group&&t.group.state==='order'&&!t.claim&&!jillTargets(t.i)&&lgOK(t));if(t){t.claim=m.id;w.task={k:'order',g:t.group,t,x:t.x+(t.x<200?-26:26),y:t.y+22,dur:.5};continue}}
-  if(waiterDoes(m,'serve')){const tk=R.tickets.find(t=>t.g.table!=null&&t.g.state==='wait'&&!t.claim&&t.items.some(i=>i.st==='ready'&&!i.picked&&(!i.lbar||!R.tables[t.g.table].lounge))&&!jillTargets(t.g.table)&&!R.jill.carry.some(c0=>c0.tk===t)&&lgOK(R.tables[t.g.table]));if(tk){tk.claim=m.id;w.task={k:'serve',tk,g:tk.g,t:R.tables[tk.g.table],x:PASS.x+(tk.g.table%2?14:-14),y:PASS.y,dur:.25,phase:'pickup',room:'main'};continue}}
-  if(waiterDoes(m,'check')){const t=R.tables.find(t=>t.group&&t.group.state==='check'&&!t.claim&&!jillTargets(t.i)&&lgOK(t));if(t){t.claim=m.id;w.task={k:'check',g:t.group,t,x:t.x+(t.x<200?-26:26),y:t.y+22,dur:.6};continue}}
-  if(waiterDoes(m,'clean')){const t=R.tables.find(t=>t.dirty&&!t.group&&!t.claim&&!jillTargets(t.i)&&lgOK(t));if(t){t.claim=m.id;w.task={k:'clean',t,x:t.x+(t.x<200?-24:24),y:t.y+22,dur:cleanDur(m)+.4};continue}}
+  if(waiterDoes(m,'order')){const t=pdFirst(t=>t.group&&t.group.state==='order'&&!t.claim&&!jillTargets(t.i)&&lgOK(t));if(t){t.claim=m.id;w.task={k:'order',g:t.group,t,x:t.x+(t.x<200?-26:26),y:t.y+22,dur:.5};continue}}
+  if(waiterDoes(m,'serve')){const okT=t=>t.g.table!=null&&t.g.state==='wait'&&!t.claim&&t.items.some(i=>i.st==='ready'&&!i.picked&&(!i.lbar||!R.tables[t.g.table].lounge))&&!jillTargets(t.g.table)&&!R.jill.carry.some(c0=>c0.tk===t)&&lgOK(R.tables[t.g.table]);const tk=R.tickets.find(t=>okT(t)&&R.tables[t.g.table].pdr)||R.tickets.find(okT);if(tk){tk.claim=m.id;w.task={k:'serve',tk,g:tk.g,t:R.tables[tk.g.table],x:PASS.x+(tk.g.table%2?14:-14),y:PASS.y,dur:.25,phase:'pickup',room:'main'};continue}}
+  if(waiterDoes(m,'check')){const t=pdFirst(t=>t.group&&t.group.state==='check'&&!t.claim&&!jillTargets(t.i)&&lgOK(t));if(t){t.claim=m.id;w.task={k:'check',g:t.group,t,x:t.x+(t.x<200?-26:26),y:t.y+22,dur:.6};continue}}
+  if(waiterDoes(m,'clean')){const t=pdFirst(t=>t.dirty&&!t.group&&!t.claim&&!jillTargets(t.i)&&lgOK(t));if(t){t.claim=m.id;w.task={k:'clean',t,x:t.x+(t.x<200?-24:24),y:t.y+22,dur:cleanDur(m)+.4};continue}}
   w.cd=.4;if(w.room!=='main'||Math.hypot(w.x-84,w.y-150)>4){w.tx=84;w.ty=150;w.troom='main';if(!stepTo(w,80*dt)){w.moving=true;w.step+=dt*12}}}
- else{const free=q=>q.dirty&&!q.group&&!q.claim&&!jillTargets(q.i);const t=(crewPool(m)==='lounge'&&R.tables.find(q=>q.lounge&&free(q)))||R.tables.find(free);/* v2.4 rc5: the Lounge's cleaner clears the Lounge first, then wherever she is needed */if(t){t.claim=m.id;w.task={k:'clean',t,x:t.x+(t.x<200?-24:24),y:t.y+22,dur:cleanDur(m)};continue}w.cd=.4}}}
+ else{const free=q=>q.dirty&&!q.group&&!q.claim&&!jillTargets(q.i);const t=(crewPool(m)==='lounge'&&R.tables.find(q=>q.lounge&&free(q)))||pdFirst(free);/* v2.4 rc5: the Lounge's cleaner clears the Lounge first, then wherever she is needed */if(t){t.claim=m.id;w.task={k:'clean',t,x:t.x+(t.x<200?-24:24),y:t.y+22,dur:cleanDur(m)};continue}w.cd=.4}}}
 function crewDraw(c,now,list,rm){
  if(R&&R.cw)for(const m of S.crew||[]){if(m.role==='chef')continue;const w=R.cw[m.id];if(!w||(w.room||'main')!==(rm||'main')||rm==='staff'||srWalker(m.id))continue;/* v2.4 rc6: in the Staff Room they are drawn sitting (srDrawPeople); a bartender walking up is his walker */list.push({y:w.y,f:()=>{const stp=w.moving?Math.sin(w.step):0;const L0=crewLook(m);if(w.phone)L0.acc='phone';drawPerson(c,w.x,w.y,L0,{step:stp,bob:w.moving?Math.abs(stp)*-.8:0,mood:m.name==='秀琴阿姨'&&wallWorrying()?'ok':'happy',flip:w.face<0,carry:!!(w.carry&&w.carry.length),arms:m.role==='cleaner'&&w.task&&w.task.k==='clean'&&!w.moving?[.3,1.0]:null});
   if(w.carry)w.carry.slice(0,3).forEach((it,i)=>{const cv=dishCanvas(it.d,it.q,64,S.decor.ware>0,it.want);c.drawImage(cv,w.x+(i%2?5:-21),w.y-50-Math.floor(i/2)*8,16,16)});
@@ -6207,7 +6341,7 @@ function drawBagSparkle(c,now){const t=now-BAG_T;const base=.35+Math.sin(now*2)*
 /* 小小店主手冊：seven cards, short lines, the same tone as the rest of the game */
 const GUIDE=[   /* the manual describes the game as it is. Audited every release (docs/RELEASE_CHECKLIST.md) — last: v2.4 rc6 (the Staff Room, the Private Dining Room and its bookings, two more places on the restaurant's list), 2026-10-02 */
  {ic:'🍳',h:'開店與料理',sum:'每天 17:00 開店、21:30 打烊。你是 Chef Jill，點餐廳裡的東西就能指揮她。',pts:[
-  ['房間','票券列下面的分頁：店門口・主廳・側廳・二樓（是店裡的以後）・Lounge（蓋好以後）・廚房（也可以用 ←→ 或數字鍵）。上二樓的樓梯門在側廳靠近你的那一邊。二樓隔出員工休息室、私人包廂以後，還是一個「二樓」分頁，上面寫著你在哪一間：在二樓時再點它，會在二樓・休息室・包廂之間輪流切；從別的房間點，會去需要你的那一間（不然就是上次待的那一間）。在二樓也可以直接點那一間的門進去，在房間裡點門回到二樓。主廳的後牆有側廳的拱門，Lounge 蓋好以後旁邊多一道，都可以直接點。主廳底部沒有廚房——廚房是自己的一間，出菜口在那裡；Jill 和服務生會走到主廳最下面去拿菜。'],
+  ['房間','票券列下面的分頁：店門口・主廳・側廳・二樓（是店裡的以後）・Lounge（蓋好以後）・廚房（也可以用 ←→ 或數字鍵）。上二樓的樓梯門在側廳靠近你的那一邊。二樓隔出員工休息室、私人包廂以後，還是一個「二樓」分頁：點它就是整層二樓，看得到兩間房的牆和門在哪裡；點那一間的門（或它的牆）進去，就是那一間自己的畫面。在房間裡，分頁寫著「‹ 二樓」，點它（或點房間裡的門）回到二樓。包廂的門上會掛「已預約」「用餐中」，裡面的桌子需要你時，門上有跟桌子一樣的提示。主廳的後牆有側廳的拱門，Lounge 蓋好以後旁邊多一道，都可以直接點。主廳底部沒有廚房——廚房是自己的一間，出菜口在那裡；Jill 和服務生會走到主廳最下面去拿菜。'],
   ['帶位','有空桌客人會自己坐；客滿時在門口長椅等。想指定順序，點那組客人或點空桌。'],
   ['點餐','桌上出現紅色「!」→ 點桌子，Jill 過去點餐。'],
   ['做菜','切到廚房，點亮著「+」的設備，照料理台的指示一步一步做。有廚師的工作站他們會自己接。'],
@@ -6326,9 +6460,9 @@ function scenePt(e){const r=sc.getBoundingClientRect();return{x:(e.clientX-r.lef
 /* v2.2 X: with a mouse, the cursor says what can be tapped — the same targets as the tap below, nothing else */
 function roomHot(p){if(room==='kitchen'){if(R&&!paused&&phase==='service'&&hitStation(p)>=0)return true;const f=KR.fridge;if(p.x>=f.x-4&&p.x<=f.x+f.w+4&&p.y>=f.y-8&&p.y<=f.y+f.h+12)return true;if(S.rooms&&S.rooms.cooler){const k=KR.cooler;if(p.x>=k.x-4&&p.x<=k.x+k.w+4&&p.y>=k.y-8&&p.y<=k.y+k.h+12)return true}if(p.y>LH-70&&Math.abs(p.x-200)<60)return true;return false}
  if(room==='side'){const a=SIDE_L.arch;if(p.x>=a.x-8&&p.x<=a.x+a.w+8&&p.y>=a.y-6&&p.y<=a.y+112)return true}if(room==='front'&&Math.abs(p.x-FR.door.x)<30&&p.y>176&&p.y<276)return true;if(hitRegular(p)&&!paused)return true;if(!R||paused||phase!=='service')return false;
- for(const t of R.tables){if((t.room||'main')!==room)continue;if(Math.hypot((p.x-t.x)*.85,p.y-(t.y-16))<(t.seats===4?46:40))return true}return false}
+ for(const t of R.tables){if((t.room||'main')!==room)continue;if(t.pdr?pdHit(p):Math.hypot((p.x-t.x)*.85,p.y-(t.y-16))<(t.seats===4?46:40))return true}return false}
 function sceneHot(p){if(room!=='main')return roomHot(p);if(S.rooms&&S.rooms.side&&p.x>=SIDE_ARCH.x-6&&p.x<=SIDE_ARCH.x+SIDE_ARCH.w+6&&p.y>=SIDE_ARCH.y-4&&p.y<=SIDE_ARCH.y+112)return true;if(S.rooms&&S.rooms.lounge&&p.x>=LOUNGE_ARCH.x-6&&p.x<=LOUNGE_ARCH.x+LOUNGE_ARCH.w+6&&p.y>=LOUNGE_ARCH.y-4&&p.y<=LOUNGE_ARCH.y+112)return true;if(paused)return false;if(hitCat(p)||hitRegular(p)||hitSpot(p))return true;if(p.y>FB-16&&hitKItem(p))return true;if(!R||phase!=='service')return false;
- for(const g of queued()){if(g.state!=='queue'&&g.state!=='arrive')continue;if(Math.hypot(p.x-g.x,p.y-(g.y-22))<26)return true}for(const t of R.tables){if((t.room||'main')!==room)continue;if(Math.hypot((p.x-t.x)*.85,p.y-(t.y-16))<(t.seats===4?46:40))return true}return false}
+ for(const g of queued()){if(g.state!=='queue'&&g.state!=='arrive')continue;if(Math.hypot(p.x-g.x,p.y-(g.y-22))<26)return true}for(const t of R.tables){if((t.room||'main')!==room)continue;if(t.pdr?pdHit(p):Math.hypot((p.x-t.x)*.85,p.y-(t.y-16))<(t.seats===4?46:40))return true}return false}
 sc.addEventListener('pointermove',e=>{if(e.pointerType!=='mouse')return;let hot=false;try{hot=sceneHot(scenePt(e))}catch(e2){hot=false}const want=hot?'pointer':'';if(sc.style.cursor!==want)sc.style.cursor=want});sc.addEventListener('pointerleave',()=>{sc.style.cursor=''});
 sc.addEventListener('pointerdown',e=>{const p=scenePt(e);SW={x:e.clientX,y:e.clientY,t:performance.now(),hit:false};
  if(room!=='main'){if(roomTap(p,e))SW.hit=true;return}

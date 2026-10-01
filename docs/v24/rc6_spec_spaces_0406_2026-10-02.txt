@@ -1,0 +1,944 @@
+(Filed verbatim. 2026-10-02 04:06, the player: the RC6 final implementation spec — Staff Room + Private Dining Room + Second Floor integration. The attachment ends mid-section (「33. 新增的是」); filed as received.)
+
+RC6 FINAL IMPLEMENTATION SPEC
+Staff Room + Private Dining Room + Second Floor Integration
+
+IMPORTANT:
+請先完整讀完本文件，再繼續目前 RC6 implementation。
+
+這份文件取代先前可能造成歧義的 RC6 空間理解。
+
+你目前已經有：
+- RC5 Second Floor / Open Floor
+- Second Floor reference
+- Staff Room Phase I–III 獨立 reference
+- Private Dining Room Phase I–III 獨立 reference
+- Staff Room story beats
+- Private Dining story beats
+- Second Floor story / progression
+- 現有 source / saves / migration context
+
+不要重新問我要 reference。
+我已經提供過，而且你也確認你手上有。
+
+最重要的修正先講：
+
+==================================================
+0. CRITICAL SPATIAL ARCHITECTURE CORRECTION
+==================================================
+
+Staff Room、Private Dining Room、Second Floor Commons
+是三個不同的 playable scenes / spaces。
+
+不是：
+
+「一張 Second Floor 大地圖，
+然後把 Staff Room 和 Private Dining 縮小塞在左右兩邊，
+玩家永遠在同一張樓層圖上操作。」
+
+這不是我要的。
+
+正確結構是：
+
+SECOND FLOOR COMMONS
+        │
+        ├── Staff Room → 獨立 full-room playable scene
+        │
+        └── Private Dining → 獨立 full-room playable scene
+
+Second Floor 是樓層／公共空間。
+
+Staff Room 和 Private Dining
+則是位於二樓、可以從二樓進入的兩個獨立房間。
+
+這兩個房間的實際 gameplay、NPC activity、
+furniture、story、upgrade、interaction，
+都必須在各自獨立的完整 scene 裡呈現。
+
+==================================================
+1. 為什麼必須是獨立場景
+==================================================
+
+我已經提供：
+
+- Staff Room Phase I–III 獨立 reference
+- Private Dining Phase I–III 獨立 reference
+
+這些 reference 本來就是房間本身的完整視覺目標。
+
+不要把這些 reference 的內容縮小後，
+塞進 Second Floor Commons 的一個小角落。
+
+原因：
+
+Jill’s Kitchen 現有空間的基本呈現方式本來就是：
+
+Main Hall
+Side Hall
+Lounge
+Kitchen
+Private Dining
+Staff Room
+
+每個重要室內空間都是自己的完整 playable scene。
+
+這樣：
+
+- 人物才看得清楚
+- furniture 才有細節
+- NPC activity 才有存在感
+- story scene 才能成立
+- room upgrade 才有視覺 payoff
+- mobile/iPhone 才不會把所有東西縮成很小的 icon
+
+不要把遊戲變成建築平面圖 simulator。
+
+==================================================
+2. SECOND FLOOR COMMONS 必須保留
+==================================================
+
+RC5 已經完成的 Second Floor Open Floor / Commons
+不要刪掉。
+
+它仍然是一個真正可進入、可觀看、可活動的場景。
+
+這就是玩家最初租下整層樓時看到的空間。
+
+也是：
+
+柔柔先探索
+→ 小齁跟上去
+→ 玩家第一次真正看到整個二樓
+
+的地方。
+
+即使 Staff Room 和 Private Dining 完成後，
+Second Floor Commons 仍然存在。
+
+它不是施工前 temporary placeholder。
+
+==================================================
+3. SECOND FLOOR COMMONS 的長期用途
+==================================================
+
+Second Floor Commons 完成 RC6 後仍然可以有：
+
+- cats
+- window activity
+- circulation
+- staff passing through
+- guests passing through
+- occasional idle behavior
+- future story setup
+- future undefined use
+
+它仍然保留：
+
+- 大窗
+- 樓梯
+- columns / beams
+- open floor feeling
+- shared space
+- cat activity
+- circulation
+- breathing room
+
+不要把它最後切到只剩一條走廊。
+
+==================================================
+4. 二樓的門 = 進入獨立場景
+==================================================
+
+當 Staff Room / Private Dining 建成後：
+
+Second Floor Commons 應該在合理位置看得到：
+
+Staff Room door
+Private Dining Room door
+
+玩家點 Staff Room door：
+
+→ 切換進 Staff Room scene
+
+玩家點 Private Dining door：
+
+→ 切換進 Private Dining scene
+
+房間內應有合理方式：
+
+← 回二樓
+
+回到 Second Floor Commons。
+
+不要求一定用這個文字，
+請依現有 navigation UI 做一致實作。
+
+但概念必須如此。
+
+==================================================
+5. 不需要把所有房間塞進最上層 navigation
+==================================================
+
+目前主 navigation 已經有很多區域。
+
+不要因為新增兩間房，
+硬把手機頂部 tab 再塞爆。
+
+可以保留：
+
+「二樓」
+
+作為主要 navigation destination。
+
+進入 Second Floor Commons 後，
+再由實際 door / room entry
+進 Staff Room / Private Dining。
+
+如果現有 architecture 已經安全支援
+Staff Room / Private Dining direct navigation，
+可以保留方便入口。
+
+但視覺世界關係必須清楚：
+
+它們是在二樓裡的獨立房間。
+
+==================================================
+6. STAFF ROOM 必須是完整獨立場景
+==================================================
+
+Staff Room 的 activity
+不能縮在 Second Floor map 的一個小矩形裡。
+
+進入 Staff Room 後：
+
+整個 playable viewport
+應以 Staff Room 本身為主。
+
+請使用我已提供的 Staff Room Phase I–III reference
+作為主要 visual target。
+
+這樣 Phase I → II → III
+才有真正的 visual progression。
+
+==================================================
+7. STAFF ROOM STORY：需求先於房間
+==================================================
+
+沿用既有：
+
+《箱子》
+《等一下》
+《又在找位置》
+《東西放哪》
+
+之後：
+
+《大家待的地方》
+
+核心不是員工突然提出 quest：
+
+「我們需要休息室。」
+
+而是玩家逐漸看到：
+
+- 包包沒地方放
+- 外套沒有真正位置
+- 提早到／晚走的人只能待在工作區
+- operational area 不適合休息
+- 人多之後這些問題反覆發生
+
+最後 Jill 自己意識到：
+
+餐廳真的需要員工自己的地方。
+
+不要用 emotional exposition 解說。
+
+==================================================
+8. STAFF ROOM PHASE I
+==================================================
+
+Phase I 才是真正建立房間：
+
+- walls
+- closable door
+- basic sofa / chairs
+- table
+- basic storage
+- water
+- outlets
+
+完成後：
+
+Staff Room 已經可以正常使用。
+
+不是空殼。
+
+獨立 Staff Room scene
+必須已經成立。
+
+==================================================
+9. STAFF ROOM PHASE II
+==================================================
+
+同一間 Staff Room 成熟。
+
+依既有 reference 增加例如：
+
+- lockers
+- fridge
+- coffee / tea area
+- better seating
+- more storage
+- cups
+- bags
+- coats
+- everyday staff traces
+
+不是重新蓋一間。
+
+==================================================
+10. STAFF ROOM PHASE III
+==================================================
+
+依既有 Phase III reference
+讓它真正 lived-in。
+
+可以增加：
+
+- better / changed furniture
+- cushions
+- ordinary personal objects
+- speaker
+- everyday food / fruit
+- bags
+- coats
+- wear
+- small persistent details
+
+但：
+
+普通生活用品可以自然出現。
+
+任何代表特定 character history 的物件，
+必須等相應事件真的發生後才 persistent。
+
+不要偽造歷史。
+
+Life happens first.
+Then the room remembers it.
+
+==================================================
+11. STAFF ROOM AMBIENT LIFE
+==================================================
+
+Staff Room 完成後，
+員工必須真的使用。
+
+例如：
+
+- 提早到先坐一下
+- 下班後待一下
+- 放包
+- 掛外套
+- 喝水
+- 喝咖啡
+- 兩人聊幾句
+- 一個人安靜坐著
+- 找東西
+- 順手整理
+- 拿了東西離開
+
+大部分不需要 story。
+
+不要每次都：
+
+Journal update
+dialogue
+Story Photo
+major event
+
+這是一個生活空間。
+
+==================================================
+12. STAFF ROOM 可以讓所有正式員工使用
+==================================================
+
+Restaurant staff 與 Lounge staff
+都可以合理使用 Staff Room。
+
+但：
+
+employment pools 仍然完全分開。
+
+核心：
+
+可以跨區幫忙，
+不能跨池占名額。
+
+使用同一間 Staff Room
+不代表 employmentPool 改變。
+
+==================================================
+13. STAFF ROOM + CATS
+==================================================
+
+Cats 可以低頻自然進 Staff Room。
+
+例如：
+
+- 跟著員工進去
+- 在沙發睡一下
+- 待一下離開
+
+但不要把 Staff Room 變成 Cat Room。
+
+主要二樓 cat activity
+仍應留在 Second Floor Commons / window area。
+
+不要因為新增 Staff Room，
+又讓公共空間看不到貓。
+
+==================================================
+14. STAFF ROOM 不做 HR SIM
+==================================================
+
+不要新增：
+
+- fatigue
+- morale
+- hunger
+- employee happiness
+- friendship meter
+- break scheduling
+- bathroom
+- coffee refill chores
+- cleaning chores
+- complaint management
+
+Staff Room 的價值：
+
+space
++ behavior
++ lived-in history
++ future story infrastructure
+
+==================================================
+15. PRIVATE DINING 也必須是完整獨立場景
+==================================================
+
+Private Dining 的 gameplay
+不能縮在 Second Floor Commons 一角。
+
+點門進去後：
+
+整個 viewport
+就是 Private Dining Room。
+
+請依我已提供的 Private Dining Phase I–III reference
+呈現完整房間。
+
+這尤其重要，因為未來：
+
+4–10 個 NPC
+可能同時在這裡吃飯／發生 story。
+
+如果 Private Dining 只是 Second Floor map 的小角落，
+人物會太小，
+故事沒有視覺重量，
+也失去我提供獨立 reference 的意義。
+
+==================================================
+16. PRIVATE DINING STORY：需求形成
+==================================================
+
+第一個明確需求：
+
+怡君：
+
+「有比較安靜的嗎？」
+
+Jill：
+
+「……沒有。」
+
+這時不要立刻解鎖。
+
+之後至少再有另一組：
+
+不是員工家人的客人
+
+出現相似需求。
+
+這代表：
+
+不是怡君的特殊情況，
+而是餐廳真的缺這種空間。
+
+之後才進：
+
+《關上門以後》
+
+==================================================
+17. PRIVATE DINING 不是 VIP ROOM
+==================================================
+
+不要做成：
+
+- VIP Room
+- luxury room
+- 富豪專用
+- KTV
+- conference room
+
+它就是：
+
+Jill’s Kitchen 的私人包廂。
+
+可以：
+
+- 家庭聚餐
+- 朋友聚餐
+- regulars
+- 小型慶祝
+- 安靜談事情
+- future authored NPC story
+
+==================================================
+18. PRIVATE DINING PHASE I–III
+==================================================
+
+Private Dining 的升級
+不只是換家具。
+
+每階段要改變：
+
+- visual quality
+- seating/capacity
+- reservation usefulness
+- customer situations
+- future story capacity
+
+------------------------------
+PHASE I
+------------------------------
+
+Small Private Dining.
+
+Reservation capacity：
+
+MIN 4
+MAX 6
+
+完成：
+
+- real room
+- wall
+- closable door
+- table/seating
+- reservation
+- minimum spend
+
+適合：
+
+- small family
+- friends
+- quiet meal
+- small celebration
+
+------------------------------
+PHASE II
+------------------------------
+
+Mature Private Dining.
+
+Reservation capacity：
+
+MIN 4
+MAX 8
+
+依 reference：
+空間與 furnishing 更完整。
+
+實際可承接：
+- larger family groups
+- regular gatherings
+- birthdays
+- small celebrations
+- more varied group types
+
+Reservation demand 應提高。
+
+------------------------------
+PHASE III
+------------------------------
+
+Full Private Dining.
+
+Reservation capacity：
+
+MIN 4
+MAX 10
+
+依 reference 做最完整版本。
+
+可以承接：
+- 4–10 人 private gathering
+- larger family groups
+- important regular gatherings
+- future authored character events
+- cross-character story scenes
+
+仍然不是 banquet hall。
+
+MAX = 10。
+
+==================================================
+19. 最低人數不要因升級提高
+==================================================
+
+Phase I：
+4–6
+
+Phase II：
+4–8
+
+Phase III：
+4–10
+
+MIN 永遠維持 4。
+
+不要變成：
+
+升級之後反而 4 人不能訂。
+
+Upgrade 增加 maximum capability，
+不是排除原本客群。
+
+==================================================
+20. PRIVATE DINING RESERVATION
+==================================================
+
+Private Dining 必須真的可以預約。
+
+玩家不需要：
+
+接受
+婉拒
+
+正常訂位自動成立。
+
+條件：
+
+- Private Dining unlocked
+- party size 符合目前 Phase
+- 該餐期沒有既有 reservation
+- 沒有 authored story occupancy conflict
+
+成立後通知玩家。
+
+==================================================
+21. 一個餐期只能一組
+==================================================
+
+Private Dining 是單一房間。
+
+因此：
+
+每個 meal/service period
+只能有一組 reservation。
+
+第一組成立後：
+
+該餐期 = RESERVED
+
+其他 group
+不能再預約同一餐期。
+
+不是玩家挑哪一組。
+
+就是：
+
+先訂走
+→ 沒了。
+
+不要 double-book。
+
+==================================================
+22. MINIMUM SPEND
+==================================================
+
+正式 Private Dining reservation
+都有整桌最低消費。
+
+Minimum spend 依：
+
+- party size
+- current menu economy
+- reasonable average check
+- current Private Dining Phase
+- late-game balance
+
+計算。
+
+使用簡單穩定公式。
+
+不要建立 dynamic-pricing simulator。
+
+玩家只需要看到：
+
+今晚｜私人包廂｜已預約
+9 位
+最低消費 $7,200
+
+類似目前 UI 即可。
+
+==================================================
+23. MINIMUM SPEND LOCK
+==================================================
+
+Reservation 成立時：
+
+保存 minimumSpend。
+
+之後即使：
+
+- menu prices 改變
+- phase upgrade
+- restaurant upgrade
+- save/load
+
+這筆 reservation
+都不重新計算。
+
+==================================================
+24. PRIVATE DINING BILLING
+==================================================
+
+Reservation group：
+
+arrive
+→ seat
+→ order
+→ eat
+→ pay
+
+actualSpend >= minimumSpend
+
+→ finalBill = actualSpend
+
+actualSpend < minimumSpend
+
+→ finalBill = minimumSpend
+
+不要讓 AI 客人為了湊低消
+不自然狂點菜。
+
+Minimum spend 是 billing floor。
+
+==================================================
+25. WALK-IN
+==================================================
+
+如果該餐期沒有 reservation：
+
+Private Dining 可以給合適 walk-in group 使用。
+
+Walk-in：
+
+正常點餐
+正常結帳
+不套 reservation minimum spend
+
+如果已有 reservation：
+
+不要因為客人還沒到
+就先塞 walk-in 進去。
+
+==================================================
+26. RESERVATION 不能變成隱形功能
+==================================================
+
+這個非常重要。
+
+我花錢做 Private Dining，
+就必須真的看得到有人預約。
+
+不要只做極低 random chance。
+
+Private Dining unlock 後：
+
+合理短時間內
+應該看到第一筆 reservation。
+
+之後維持：
+
+Phase I
+→ 穩定但較少
+
+Phase II
+→ 明顯增加
+
+Phase III
+→ 成為成熟餐廳持續存在的需求
+
+可以做：
+
+lightweight soft pity /
+guaranteed opportunity logic。
+
+不要顯示 pity meter。
+
+但 simulation 不得出現：
+
+玩家正常玩十幾二十天
+完全沒有 Private Dining reservation
+成為常態。
+
+==================================================
+27. PRIVATE DINING 是 FUTURE STORY INFRASTRUCTURE
+==================================================
+
+這不是只服務 generic customers。
+
+完成後，
+未來 NPC story 可以使用 Private Dining。
+
+例如未來可以有：
+
+- regular 帶家人來
+- 某人生日
+- 家庭聚餐
+- staff family meal
+- 某個角色第一次帶朋友來
+- 兩條人物線在這裡交叉
+- 某些需要 privacy 的談話
+- 某 NPC 平常一個人來，
+  某天突然訂了一桌
+
+不要現在把這些全部實作。
+
+RC6 需要做的是：
+
+建立安全 reusable story hook。
+
+未來 authored story
+可以 reserve / occupy Private Dining。
+
+==================================================
+28. STORY RESERVATION / RANDOM RESERVATION
+==================================================
+
+在安排 random reservation 前，
+先檢查 authored occupancy。
+
+不要讓 random booking
+把 story 所需時段搶掉。
+
+但：
+
+已經存在於 save 裡、
+先前正式成立的 reservation
+也不要被後來事件粗暴刪除。
+
+安排 future authored event 時，
+選不衝突的日期／餐期。
+
+合理 priority：
+
+canonical authored use scheduling
+> random reservation generation
+> walk-in
+
+但 existing world state 必須被尊重。
+
+==================================================
+29. PRIVATE DINING DOOR STATE
+==================================================
+
+因為 Private Dining 是獨立 room scene：
+
+Second Floor Commons
+可以透過很輕的方式表現 room state。
+
+例如：
+
+- door closed
+- subtle reserved / in use state
+- tiny sign / visual cue
+
+不要做巨大 UI。
+
+玩家點進 Private Dining
+才看到完整聚餐。
+
+這會讓 Second Floor Commons
+和獨立 room scene 彼此連起來。
+
+==================================================
+30. PRIVATE DINING + CATS
+==================================================
+
+有客人正式使用 Private Dining 時：
+
+一般情況不要讓 cats
+隨意穿過 private meal。
+
+除非未來 authored story 明確需要。
+
+空房時：
+
+cats 可以低頻自然進去／經過。
+
+不要建立 cat permission simulator。
+
+==================================================
+31. RESTAURANT STAFF EXPANSION
+==================================================
+
+Second Floor + Private Dining
+讓餐廳營運規模真的增加。
+
+因此 RC6 progression
+應該讓玩家可以再聘新的 Restaurant staff。
+
+最終：
+
+Restaurant employment capacity +2
+
+這 +2
+不是 Lounge capacity。
+
+==================================================
+32. STAFF CAPACITY PROGRESSION
+==================================================
+
+不要因為：
+
+「Staff Room 有沙發」
+
+就增加員工名額。
+
+比較合理的 progression：
+
+Private Dining Phase I /
+Second Floor 正式開始新增營運需求
+
+→ Restaurant capacity +1
+
+Private Dining Phase III /
+Second Floor operation mature
+
+→ Restaurant capacity 再 +1
+
+最終 Restaurant +2。
+
+如果目前 code architecture
+有更安全但語意等價的 implementation，
+可以採用。
+
+產品結果保持：
+
+RC6 最終玩家能多聘兩位 Restaurant staff。
+
+==================================================
+33. 新增的是
