@@ -872,3 +872,268 @@ def v24_jill_calls_the_landlord_and_the_whole_floor_is_hers(b, port, target):
     g.ev("S.day+=6;IDLE=null")
     check(g.ev("upHas('table')&&upHas('cushion')&&upHas('scratch')&&upTrace('cup')") is True, 'a week later: the table, the cats\' things, a cup')
     check(not g.errors, g.errors[:3]); g.close()
+
+
+# ---------------------------------------------------------------- v2.4 rc6: the Staff Room and the Private Dining Room
+FLOOR_TAKEN = r"""(()=>{const set=(k,b)=>{const d=S.day-b;story().facts[k]={d,n:1,l:d}};v24().first=S.day-70;
+ ['yj_meet','yj_look','yj_three','yj_chose','yj_move','yj_key','yj_key_seen','xq_oh'].forEach((k,i)=>set(k,66-i*2));
+ ['wall_worry','wall_call','wall_photos','wall_jill','wall_visit','wall_wang','wall_setback','wall_report','wall_fee','wall_prep','wall_mediation','wall_settle','wall_paid','wall_article','wall_paper','wall_fixed'].forEach((k,i)=>set(k,50-i));
+ ['up_hint','up_staff','up_inspect','up_door','up_cats','up_busy','up_full','sp_box','sp_seat','up_remind','up_ask'].forEach((k,i)=>set(k,32-i));
+ set('up_lease',LEASE);set('up_use',LEASE-2);S.rooms.up=1;const u=upS();const L=S.day-LEASE;u.lease=L;u.furn={table:L+1,cabinet:L+2,coat:L+2,lamp:L+3,cushion:L+3,stool:L+5,scratch:L+5};u.traces={bag:L+2,cup:L+3,charger:L+4,coat:L+6};S.upProj={state:'built'}})()"""
+
+
+def _floor(g, lease_back):
+    g.ev(FLOOR_TAKEN.replace('LEASE', str(lease_back)))
+
+
+def _quiet(g):
+    """the story-update pill over the prep screen (it comes 0.9 s after the prep is drawn) is not what these tests tap"""
+    g.page.wait_for_timeout(950); g.ev("(()=>{const n=document.getElementById('storyNote');if(n)n.hidden=true})()")
+
+
+def _reload(g):
+    g.ev("save()"); g.reload(); g.page.wait_for_timeout(150)
+    g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(150)
+
+
+@test
+def v24_rc6_the_staff_room_comes_from_a_need_and_grows_in_place(b, port, target):
+    """rc6 C–E, AQ, AK, AT: not before the open floor has been lived on a while; 《大家待的地方》 needs the restaurant's
+    people (eight on its list, three of them 熟手 or more — by tenure class, so the legacy crew's two or three counted
+    days do not make them new), someone from outside introduced, two kinds of evidence. The project is offered after it,
+    Phase I is built by the next opening (walls and a door on the floor, the room's own view from then), save/reload
+    while building keeps it; II and III come later, in the same room (the first day never moves), the next day each;
+    a trace that belongs to someone's story only after it happened; one big job on the floor at a time."""
+    g = Game(b, port, target, seed=291, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day52.json')
+    check(g.ev("eraOpen('sr')") is False and g.ev("srStoryReady()") is False, 'nothing before the floor is taken')
+    _floor(g, 3)
+    check(g.ev("eraOpen('sr')") is False, 'the open floor first: not three days after the lease')
+    _floor(g, 8)
+    check(g.ev("eraOpen('sr')") is True, 'a week after the lease the era is open')
+    check(g.ev("srCrewOK()") is True and g.ev("(S.crew||[]).filter(m=>crewLegacy(m)&&(m.days||0)<=3).length") >= 8, 'the legacy crew count as the people they are, not as two-day hires')
+    check(g.ev("upKinds(SP_KINDS)") == 2 and g.ev("srStoryReady()") is True, 'two kinds of evidence (the box, the seat): ready')
+    g.ev("story().facts.yj_meet=null;delete story().facts.yj_meet")
+    check(g.ev("srStoryReady()") is False, 'no one from outside introduced: not yet')
+    _floor(g, 8)
+    check(g.ev("secUpRooms(1e9,()=>'')") == '', 'nothing in 店舖工程 before the story')
+    _upf(g, 'sr_story', 0)
+    g.ev("S.money=600000")
+    html = g.ev("secUpRooms(1e9,(c,a,k,l)=>`<b data-a=\"${a}\" data-k=\"${k}\">${l}</b>`)")
+    check('員工休息室' in html and 'data-a="buySR" data-k="1"' in html and 'data-k="2"' not in html, f'Phase I offered, not II: {html[:300]}')
+    d0 = g.ev("S.day")
+    check(g.ev("buyRoomPhase('sr',1)") is True, 'bought')
+    g.ev("hideReveal()")
+    check(g.ev("srBuilding()&&!srBuilt()&&!roomOpen('staff')&&upWorks()==='sr'") is True, 'being built tonight; no room yet')
+    check(g.ev("buyRoomPhase('sr',2)") is False, 'one thing at a time')
+    _reload(g)
+    check(g.ev("srOf().done") == d0 + 1 and g.ev("srBuilding()") is True, 'a reload keeps the works')
+    g.ev("S.day+=1;IDLE=null")
+    check(g.ev("srBuilt()&&roomOpen('staff')&&srStage()===1&&!upWorks()") is True, 'the next day: the room')
+    check(g.ev("srTrace('cup')||srTrace('seat')||srTrace('yj')") is False, 'no one\'s things before their story')
+    check(g.ev("String(drawSrShelf).includes(\"srTrace('cup')\")&&String(drawSrChair).includes(\"srTrace('seat')\")") is True, 'the drawings ask for the trace first')
+    check(g.ev("buyRoomPhase('sr',2)") is False and g.ev("srWhyNot(2)").startswith('先讓大家用一陣子'), 'Phase II waits a few days')
+    g.ev("S.day+=5")
+    check(g.ev("buyRoomPhase('sr',2)") is True, 'Phase II')
+    g.ev("hideReveal()")
+    check(g.ev("srOf().done") == d0 + 1 and g.ev("srStage()") == 1, 'the same room; tomorrow it shows')
+    g.ev("S.day+=1")
+    check(g.ev("srStage()") == 2 and g.ev("srOf().done") == d0 + 1, 'II, in place')
+    g.ev("S.day+=7")
+    check(g.ev("buyRoomPhase('sr',3)") is True, 'Phase III')
+    g.ev("hideReveal();S.day+=1")
+    check(g.ev("srStage()") == 3 and g.ev("srOf().done") == d0 + 1, 'III, in place')
+    _reload(g)
+    check(g.ev("srStage()") == 3 and g.ev("roomOpen('staff')") is True, 'kept across a reload')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc6_the_staff_room_is_used_and_the_pools_stay_apart(b, port, target):
+    """rc6 F, G, H, AT: at closing some of the crew — the floor, the kitchen, the bar — go up and sit; it is the crew's room,
+    so a bartender up there is still on the Lounge's list and the restaurant's number does not change; the first evening
+    is ordinary (Jill: 「坐啊。」); no major beat is spent on it; the 2F view shows them over the cut walls."""
+    g = Game(b, port, target, seed=292, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day61.json')
+    _floor(g, 20); _upf(g, 'sr_story', 6)
+    g.ev("(()=>{const s=srW();s.bought=S.day-1;s.done=S.day})()")
+    for nm in ['阿拓']:
+        g.ev(f"(()=>{{const b=document.createElement('button');doAct('hireLounge',null,'{nm}',b)}})()")
+    g.ev("hideReveal&&hideReveal();showPrep()"); g.page.wait_for_timeout(100)
+    pools0 = g.ev("JSON.stringify((S.crew||[]).map(m=>[m.name,crewPool(m)]))"); caps0 = g.ev("[restaurantCap(),loungeCap()]")
+    _quiet(g); to_service(g)
+    g.ev("__botUntil('R.closing!=null&&R.closing>40',90000,1/30)")
+    for _ in range(60): g.ev("__tick(1000/30)")
+    ppl = json.loads(g.ev("JSON.stringify(srPeople().map(p=>[p.m.name,p.m.role,crewPool(p.m)]))"))
+    check(len(ppl) >= 3, f'several of them up there: {ppl}')
+    check(any(r == 'chef' for _, r, _ in ppl), f'the kitchen too: {ppl}')
+    check(g.ev("fact('sr_first')&&fact('sr_first').d===S.day") is True, 'the first evening: 「坐啊。」')
+    check(g.ev("['sr_plug','sr_food','sr_fridge','sr_nina','sr_plug2'].filter(k=>fact(k)).length") == 0, 'nothing else that evening')
+    check(g.ev("story().trace.filter(t=>t.d===S.day&&t.lane==='major'&&String(t.k).startsWith('sr')).length") == 0, 'no major beat for using the room')
+    check(g.ev("JSON.stringify((S.crew||[]).map(m=>[m.name,crewPool(m)]))") == pools0 and g.ev("[restaurantCap(),loungeCap()]") == caps0, 'the lists and their numbers are as they were')
+    check(g.ev("setRoom('up');forceDraw=true;__tick(1000/30);room") == 'up', 'the floor draws with them in it')
+    check(g.ev("setRoom('staff');forceDraw=true;__tick(1000/30);room") == 'staff', 'the room draws')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+PD_OPEN = r"""(()=>{const set=(k,b)=>{const d=S.day-b;story().facts[k]={d,n:1,l:d}};['sr_story','sr_first','sr_plug'].forEach((k,i)=>set(k,40-i*3));['pd_yj','pd_other','pd_story'].forEach((k,i)=>set(k,12-i*4));
+ const s=srW();s.bought=S.day-39;s.done=S.day-38;s.st2=S.day-30;s.tr={plug:S.day-34,seat:S.day-20};const p=pdW();p.bought=S.day-2;p.done=S.day-1})()"""
+
+
+@test
+def v24_rc6_private_dining_reservations_follow_the_rules(b, port, target):
+    """rc6 O–Z, AC, AP, AS: party sizes by phase (I 4–6, II 4–8, III 4–10, four always); one booking an evening, made
+    once, never doubled; a story's evening is never taken; walk-ins only on an evening nobody booked; the minimum is
+    fixed when the booking is made (prices, a phase, a reload do not change it) and is the floor of the bill, not an
+    ordering target; no booking before the room exists; the day's news shows it."""
+    g = Game(b, port, target, seed=293, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day61.json')
+    _floor(g, 50)
+    check(g.ev("(pdDay(),!!(S.up.pd&&S.up.pd.res))") is False, 'no room, no booking')
+    g.ev(PD_OPEN)
+    fits = lambda: g.ev("[3,4,6,7,8,9,10,11].map(n=>pdFits(n)?1:0).join('')")
+    check(fits() == '01100000', f'Phase I: 4–6 ({fits()})')
+    g.ev("pdW().st2=S.day")
+    check(fits() == '01111000', f'Phase II: 4–8 ({fits()})')
+    g.ev("pdW().st3=S.day")
+    check(fits() == '01111110', f'Phase III: 4–10, and four still ({fits()})')
+    g.ev("delete pdW().st2;delete pdW().st3")
+    # one a day, never twice; the first by the second evening the room is open
+    g.ev("pdDay();pdDay()")
+    r = json.loads(g.ev("JSON.stringify(pdRes())"))
+    check(r and r['d'] == g.ev("S.day") and 4 <= r['size'] <= 6 and r['min'] >= 400, f'tonight a booking (the second evening open): {r}')
+    check(g.ev("pdBook(S.day,{k:'x'})") is False, 'a story cannot take a booked evening')
+    g.ev("pdDay()")
+    check(g.ev("JSON.stringify(pdRes())") == json.dumps(r, ensure_ascii=False, separators=(',', ':')), 'made once')
+    # the room is held: a walk-in party may not sit there; the booked group may
+    check(g.ev("pdTableFor({size:5,pdWalk:1})") is False and g.ev(f"pdTableFor({{size:{r['size']},pdRes:'{r['id']}'}})") is True, 'held for the booking')
+    # the minimum: fixed; the bill's floor
+    g.ev("for(const d in S.price)S.price[d]*=1.5;pdW().avg=99999;pdW().st2=S.day")
+    check(g.ev("pdRes().min") == r['min'], 'prices and a new phase do not change it')
+    _reload(g)
+    check(g.ev("pdRes().min") == r['min'] and g.ev("pdRes().id") == r['id'], 'nor a reload')
+    g.ev("pdDay()")
+    check(g.ev("pdRes().id") == r['id'], 'no second booking after the reload')
+    g.ev("delete pdW().st2")
+    _quiet(g); to_service(g)
+    t_pd = g.ev("R.tables.findIndex(t=>t.pdr)")
+    check(t_pd >= 0 and g.ev(f"R.tables[{t_pd}].seats") == 6, 'the table is in the evening, six seats')
+    lo = g.ev(f"(()=>{{const g0={{pdRes:pdRes().id,table:{t_pd},size:pdRes().size}};return pdBill(g0,pdRes().min-500)}})()")
+    check(lo == r['min'], f'ate less than the minimum: the minimum ({lo})')
+    g.ev(f"pdRes().status='seated'")
+    hi = g.ev(f"(()=>{{const g0={{pdRes:pdRes().id,table:{t_pd},size:pdRes().size}};return pdBill(g0,pdRes().min+700)}})()")
+    check(hi == r['min'] + 700, f'ate more: what they ate ({hi})')
+    check(g.ev("String(orderItems).includes('pdRes')") is False, 'nobody orders to reach a minimum')
+    # an evening a story holds: no booking that day; walk-ins only when nobody booked
+    g.ev("S.day+=1;delete pdW().res;pdBook(S.day,{k:'story_test',size:4});pdDay()")
+    check(g.ev("!pdRes()&&pdHeld()") is True, 'the story\'s evening: no random booking, the room kept')
+    g.ev("S.day+=1;pdW().dry=0;pdW().ever=1")
+    found_free = False
+    for i in range(12):
+        g.ev("S.day+=1;pdDay()")
+        if g.ev("!pdRes()"):
+            check(g.ev("pdTableFor({size:5,pdWalk:1})") is True and g.ev("pdTableFor({size:3})") is False, 'nobody booked: a party may walk in; three is too few')
+            found_free = True; break
+    check(found_free, 'some evenings nobody books')
+    html = g.ev("(pdDay(),pdNewsHTML())")
+    check('私人包廂' in html, f'the news says it: {html}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc6_private_dining_bookings_are_seen_and_grow_with_the_room(b, port, target):
+    """rc6 Y, AS frequency: over sixty evenings of each phase the bookings are steady and not hidden — no long dry spells
+    (the quiet rise), more in II than in I, more in III than in II."""
+    g = Game(b, port, target, seed=294, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day61.json')
+    _floor(g, 50); g.ev(PD_OPEN)
+    res = {}
+    for st in (1, 2, 3):
+        out = json.loads(g.ev(f"""JSON.stringify((()=>{{const p=pdW();p.done=S.day-1;delete p.st2;delete p.st3;if({st}>=2)p.st2=S.day-1;if({st}>=3)p.st3=S.day-1;p.dry=0;p.ever=0;delete p.res;const d0=S.day;let n=0,dry=0,maxDry=0,first=null;
+          for(let i=0;i<60;i++){{S.day=d0+i;pdDay();const r=pdRes();if(r){{n++;dry=0;if(first==null)first=i}}else{{dry++;maxDry=Math.max(maxDry,dry)}}}}S.day=d0;return{{n,maxDry,first}}}})())"""))
+        res[st] = out
+    check(all(res[s]['first'] is not None and res[s]['first'] <= 1 for s in res), f'the first booking by the second evening: {res}')
+    check(all(res[s]['maxDry'] <= 3 for s in res), f'never long without one: {res}')
+    check(res[1]['n'] >= 25 and res[2]['n'] > res[1]['n'] and res[3]['n'] > res[2]['n'], f'more with each phase: {res}')
+    check(res[3]['n'] < 60, f'not every evening: {res}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc6_two_more_restaurant_places_and_the_lounge_unchanged(b, port, target):
+    """rc6 AG–AJ, AU: the Private Dining Room's first phase adds one place on the restaurant's list, its third another;
+    the Lounge's list stays its five; the new places hire from the restaurant's pool; saved and reloaded."""
+    g = Game(b, port, target, seed=295, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day61.json')
+    _floor(g, 50); g.ev(PD_OPEN)
+    g.ev("pdW().done=S.day+1")
+    base = g.ev("restaurantCap()"); lc = g.ev("loungeCap()"); roster = g.ev("JSON.stringify(LOUNGE_ROSTER.map(r=>r.name))")
+    g.ev("pdW().done=S.day")
+    check(g.ev("restaurantCap()") == base + 1, 'Phase I: +1')
+    g.ev("pdW().st2=S.day;pdW().st3=S.day")
+    check(g.ev("restaurantCap()") == base + 2, 'Phase III: +2 in all')
+    check(g.ev("loungeCap()") == lc and g.ev("JSON.stringify(LOUNGE_ROSTER.map(r=>r.name))") == roster, 'the Lounge as it was')
+    g.ev("S.money=1e6;showShop();shopTab='staff';showShop()"); g.page.wait_for_timeout(80)
+    n0 = g.ev("S.crew.length")
+    for _ in range(2):
+        b0 = g.page.query_selector('#screen [data-act=hire]')
+        check(b0 is not None, 'a restaurant hire is offered')
+        b0.click(); g.page.wait_for_timeout(60)
+    check(g.ev("S.crew.length") == n0 + 2 and g.ev("S.crew.slice(-2).every(m=>crewPool(m)==='restaurant')") is True, 'two more on the restaurant\'s list')
+    _reload(g)
+    check(g.ev("restaurantCap()") == base + 2 and g.ev("S.crew.length") == n0 + 2, 'kept across a reload')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc6_private_dining_story_needs_two_tables_and_a_lived_in_staff_room(b, port, target):
+    """rc6 M, 《關上門以後》 (private_dining_room_brief 八): 怡君's 「有比較安靜的嗎？」 only once the Staff Room has been
+    there a while; the second table days later; the story needs both, two days after the second, the Staff Room ten days
+    old with something of the people in it; then the project. None of it before the Staff Room."""
+    g = Game(b, port, target, seed=296, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day61.json')
+    _floor(g, 40)
+    check(g.ev("due('pd_yj',null,0,'pd')") is False, 'no Staff Room, no Private Dining story')
+    g.ev("(()=>{const s=srW();s.bought=S.day-3;s.done=S.day-2})()"); _upf(g, 'sr_story', 4)
+    check(g.ev("due('pd_yj',null,0,'pd')") is False, 'not while the Staff Room is new')
+    g.ev("(()=>{const s=srW();s.bought=S.day-13;s.done=S.day-12})()")
+    check(g.ev("due('pd_yj',null,0,'pd')") is True, 'some days later: 怡君 may come')
+    _upf(g, 'pd_yj', 1)
+    check(g.ev("due('pd_other','pd_yj',3,'pd')") is False, 'not the next day')
+    _upf(g, 'pd_yj', 4)
+    check(g.ev("due('pd_other','pd_yj',3,'pd')") is True, 'days later, another table')
+    _upf(g, 'pd_other', 1)
+    pd_story = "due('pd_story','pd_other',2,'pd')&&srBuilt()&&S.day-srOf().done>=10&&srLived()>=1&&!pdOn()"
+    check(g.ev(pd_story) is False, 'not the day after')
+    _upf(g, 'pd_other', 2)
+    check(g.ev(pd_story) is False, 'not with nothing of anyone in the Staff Room')
+    g.ev("srTraceSet('seat',S.day-3)")
+    check(g.ev(pd_story) is True, 'ready')
+    check(g.ev("secUpRooms(1e9,()=>'X').includes('私人包廂')") is False, 'nothing to buy before the story')
+    _upf(g, 'pd_story', 0)
+    check(g.ev("secUpRooms(1e9,(c,a,k,l)=>a+':'+k).includes('buyPD:1')") is True, 'after it, Phase I')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc6_one_tab_for_the_floor_and_old_saves_get_nothing(b, port, target):
+    """rc6 navigation and AP: with rooms on the floor the tabs keep one 二樓 (its label the room you are in; tapping it
+    goes round the floor's rooms); every fixture save loads with no room, no booking, no story fact of these."""
+    g = Game(b, port, target, seed=297, manual=True, viewport={'width': 390, 'height': 844})
+    for f in sorted(os.listdir(os.path.join(ROOT, 'tests', 'saves'))):
+        if not f.endswith('.json'): continue
+        load_save(g, f)
+        st = json.loads(g.ev("JSON.stringify({sr:!!(S.up&&S.up.sr),pd:!!(S.up&&S.up.pd),f:['sr_story','pd_yj','pd_story','sp_wait'].filter(k=>fact(k)),open:roomOpen('staff')||roomOpen('pdr')})"))
+        check(not st['sr'] and not st['pd'] and not st['f'] and not st['open'], f'{f}: nothing of rc6 ({st})')
+    load_save(g, 'player_day61.json')
+    _floor(g, 50); g.ev(PD_OPEN)
+    _quiet(g); to_service(g); _quiet(g)
+    tabs = g.ev("[...document.querySelectorAll('#roomTabs button')].map(b=>b.dataset.room).join(',')")
+    check('upgrp' in tabs and 'staff' not in tabs and 'pdr' not in tabs, f'one tab for the floor: {tabs}')
+    seen = []
+    g.ev("setRoom('up')")
+    for _ in range(3):
+        g.click('#roomTabs [data-room=upgrp]'); g.page.wait_for_timeout(40); seen.append(g.ev("room"))
+    check(seen == ['staff', 'pdr', 'up'], f'round the floor\'s rooms: {seen}')
+    check(g.ev("document.querySelector('#roomTabs [data-room=upgrp] span').textContent") == '二樓', 'labelled with where you are')
+    check(not g.errors, g.errors[:3]); g.close()

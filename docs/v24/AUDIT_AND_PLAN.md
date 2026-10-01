@@ -352,3 +352,67 @@ does nothing mechanical yet: it is the floor.
   evening (empty, two boxes) and the furniture arrives from the next day.
 - The staff pools (the player, 19:07–19:16) and 許葳 came in during rc5: `docs/v24/staff_pools_1907_2026-10-01.txt`,
   `docs/V24_RC5_REPORT.md` §7.
+
+## 8. rc6 — P3 the Staff Room + P4 the Private Dining Room (plan, 2026-10-02 03:00)
+
+The spec is `docs/v24/rc6_final_spec_0300_2026-10-02.txt` (the player, 03:00; it wins over everything earlier where
+they differ). With it: `staff_room_brief`, `private_dining_room_brief` (the parts the final spec keeps), the two
+reference pictures (`refs/staff_room_stages_reference`, `refs/private_dining_room_reference`), `second_floor_and_long_arcs`
+§24–27, `second_floor_visual_reference` §8–16, implementation pass L–N1, the 13:37 canon (秀琴阿姨 is 怡君's mother).
+Scope rule from 02:37 (`rule_finish_everything_0237`): rc6 is released and the work goes straight on to P5.
+
+**The floor (B).** The Private Dining Room takes the left window bay (the floor's left window is its window); the Staff
+Room is inside, below it on the left, with no window view. Open: the middle, the right window bay (柔柔's window, the
+stool, the scratching board, the shared table moved there), the column, the stairs, the corner by them (the third
+zone, undecided). Real rooms: cut walls with dark caps in the cutaway view of 二樓 (like the player's second floor
+picture), full-height doors with a narrow glass strip and a name plate; each room also has its own view, drawn from its
+reference picture. Rooms: `staff` (休息室) and `pdr` (包廂), reached through 二樓 (one tab for the floor; tapping it
+again goes through the rooms; the doors on 二樓 open them). Paths on the floor go round the column.
+
+**Staff Room (C–K).**
+- Need: 《箱子》 `sp_box`, 《又在找位置》 `sp_seat`, 《東西放哪》 `sp_stuff` (rc5) and 《等一下》 `sp_wait` (new: 怡君 waits
+  at closing for her mother; nowhere to sit that is not a guest's seat). 《大家待的地方》 (major, closing, Jill alone,
+  the brief's lines) when: the floor taken 7+ days and in use (`up_use`); level 5; 8+ restaurant crew; 3+ of them 熟手
+  or more (tenure classes, never the telemetry days); an outside person introduced (`yj_meet`); 2+ kinds of evidence.
+  Then the project is offered (開始規劃 / 之後再說), like the floor's.
+- Phase I: construction, done the next day (walls, door, sofa, chairs, a table, basic storage, water, outlets; the
+  cabinet, the floor lamp, the coat stand and one odd chair come in from the open floor). Phase II (5+ days later):
+  lockers, a small fridge, a better sofa, tea and coffee, more storage, cups, coats and bags. Phase III (7+ days after
+  II): better furniture, cushions, wear, a dining table. Improvements show the next day. One major construction at a
+  time across the floor.
+- Use (F, G): everyone on the crew, Restaurant and Lounge, with no story: early arrivals sit a moment at the start of
+  the service; quiet moments in the evening (one at a time, short); at closing several go up, sit, drink something,
+  talk, and leave. Lines are rare and small. Cats (H): now and then one follows someone in and sleeps on the sofa,
+  then leaves; most of the floor's cat life stays outside.
+- Traces only after the event (E): 阿珠姐 「插座不夠。」 → (Phase II) 「我就說吧。」; 怡君 brings a power strip her mother
+  mentioned; 阿德's seat; 小彤 「坐啊。」「喔，好。」 on the first day, later her cup; Hugo and the fridge; 秀琴阿姨's
+  food some days. No capacity (K).
+
+**Private Dining (L–AF).**
+- Need: 怡君 with three friends: 「要坐裡面一點嗎？」「有比較安靜的嗎？」「……沒有。」 (`pd_yj`); later a group that is
+  not staff family with the same need (`pd_other`): 周董 with two guests, 「有比較不被打擾的位置嗎？」, where the save
+  knows him, else a family at a busy hour. Then 《關上門以後》 (major, closing): needs both, 2+ days after the second,
+  the Staff Room 10+ days old with traces in it, the room not begun. The project is offered.
+- Phases: I 4–6 people (walls, door, the table for six), II 4–8 (the table extended, more chairs, furnishing),
+  III 4–10 (the full room). Each raises the reservation demand. II and III open with use and money (II after 6 days
+  and 3+ meals in the room; III after 8 more days and 6+ more), no new long arc (AF).
+- Reservations (R–Z): automatic, one per evening (the dinner service is the game's one meal period), made at the start
+  of the day for that evening with its party size and minimum spend fixed in the save (`S.up.pd.res`). The minimum is
+  size × the restaurant's average check per guest (measured, rounded to $100) × a small private factor; never
+  recomputed. The group comes, is seated in the room, orders as usual; the bill is the larger of what they ate and
+  the minimum. On an evening with no reservation, a walk-in group of 4+ that fits may use it (normal bill); on a
+  reserved evening the room waits for its guests. Frequency: a base chance per phase plus a quiet rise after evenings
+  without one (soft pity, never shown); the first one within the first few evenings. The day's news says it:
+  「今晚｜私人包廂｜已預約　6 位・最低消費 $X」.
+- Story hooks (AA–AC): `pdBook(day,{kind:'story',...})` reserves an evening for an authored use first; the scheduler
+  never puts a random reservation on an evening a story holds, and a story never takes an evening already booked.
+  The payoff 「裡面可以嗎？」「可以。」 (the group that asked) uses it. Cats keep out while a meal is on (AD).
+- Staffing (AG–AJ): Restaurant capacity +1 with Phase I, +1 with Phase III; Lounge unchanged.
+
+**Economy (AL).** Prices from the measured late-game day (to be filled in §8.1): the Staff Room cheaper than the Private
+Dining Room; Phase I the main cost of each; II and III less.
+
+**Not built (AE, I, AV):** no approval, deposits, no-shows, calendars, packages, meters, chores, or frameworks.
+
+**Tests (AS–AU)**, the saves, the pacing sims (the Day 52 and Day 61 saves with the floor and the rooms bought as soon
+as they are offered; reservation frequency per phase), phone screenshots, the full suite.

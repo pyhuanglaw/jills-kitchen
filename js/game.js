@@ -601,16 +601,18 @@ const SIDE_ARCH={x:344,y:12,w:40};   /* the arch to the side room, on the dining
 const FR={door:{x:200,y:262},walk:300,enter:{x:-24,y:300},exit:{x:424,y:300},cols:[96,304,200],row:352,bench:{x:350,y:262},sun:{x:48,y:266},nook:{x:88,y:250}};   /* nook: the dog's house by the door (v2.2.1 #10; v2.3 moved in from x 50, where a phone cut it off: it now spans x 48–126, between the left edge and the flower box, and sits 8 px higher so the terrace's first parasol does not cover the cushion) */   /* the street outside */
 const KD={x:64,y:0};   /* the kitchen door in the dining room: at the left end of the counter (y filled from FB) */
 const KR={get door(){return{x:200,y:LH-30}},get fridge(){return{x:318,y:LH-112,w:52,h:80}},get cooler(){return projOn('walkin')?{x:43,y:LH-138,w:57,h:106}:{x:44,y:LH-112,w:48,h:80}}};   /* the walk-in: wider and taller, same corner */   /* the kitchen: the fridge and the cold room stand on the pickup side, the door to the dining room between them */
-function roomOpen(k){return k==='main'||k==='kitchen'||k==='front'||(k==='side'&&!!(S.rooms&&S.rooms.side))||(k==='lounge'&&!!(S.rooms&&S.rooms.lounge))||(k==='up'&&(upTaken()||!!(R&&R.upView)))}   /* v2.4 P2: the second floor — once it is Jill's; before that only the night someone has to go up */
+function roomOpen(k){return k==='main'||k==='kitchen'||k==='front'||(k==='side'&&!!(S.rooms&&S.rooms.side))||(k==='lounge'&&!!(S.rooms&&S.rooms.lounge))||(k==='up'&&(upTaken()||!!(R&&R.upView)))||(k==='staff'&&srBuilt())||(k==='pdr'&&pdBuilt())}   /* v2.4 P2: the second floor — once it is Jill's; before that only the night someone has to go up */
 function doorway(a,b){const kd={x:KD.x,y:FB-8};
  if(a==='main'){if(b==='lounge')return[[LOUNGE_ARCH.x+LOUNGE_ARCH.w/2,100],[LG.door.x,LG.door.y]];if(b==='side')return[[SIDE_ARCH.x+SIDE_ARCH.w/2,100],[SIDE_L.door.x,SIDE_L.door.y]];if(b==='front')return[[DOOR.x,DOOR.y+4],[FR.door.x,FR.door.y]];if(b==='kitchen')return[[kd.x,kd.y],[KR.door.x,KR.door.y]]}
  if(b==='main'){if(a==='lounge')return[[LG.door.x,LG.door.y],[LOUNGE_ARCH.x+LOUNGE_ARCH.w/2,100]];if(a==='side')return[[SIDE_L.door.x,SIDE_L.door.y],[SIDE_ARCH.x+SIDE_ARCH.w/2,100]];if(a==='front')return[[FR.door.x,FR.door.y],[DOOR.x,DOOR.y+4]];if(a==='kitchen')return[[KR.door.x,KR.door.y],[kd.x,kd.y]]}
  /* v2.4 P2: the stairs — the side room's stair door, and the top of the stairs on the second floor */if(a==='side'&&b==='up')return[[UPDOOR.x,UPDOOR.y],[UP_L.entry.x,UP_L.entry.y]];if(a==='up'&&b==='side')return[[UP_L.entry.x,UP_L.entry.y],[UPDOOR.x,UPDOOR.y]];
+ /* v2.4 rc6: the two rooms' doors on the floor, and inside */if(a==='up'&&(b==='staff'||b==='pdr')){const D=upRoomDoor(b),I=b==='staff'?SRL.door:PDL.door;return[[D.x,D.y+8],[I.x,I.y]]}if(b==='up'&&(a==='staff'||a==='pdr')){const D=upRoomDoor(a),I=a==='staff'?SRL.door:PDL.door;return[[I.x,I.y],[D.x,D.y+8]]}
  return null}
-function nextHop(a,b){if(a==='up')return'side';if(b==='up')return a==='side'?'up':a==='main'?'side':'main';return(a==='main'||b==='main')?b:'main'}   /* every door leads to the dining room, except the stairs: they come down in the side room */
+function nextHop(a,b){if(a===b)return b;const pb=roomPath(b);const i=pb.indexOf(a);return i>=0?pb[i+1]:(ROOM_PARENT[a]||'main')}   /* every door leads to the dining room, except the stairs: they come down in the side room */
 /* one movement step for anything with x,y,room and a target tx,ty,troom; through doorways when needed. Returns true on arrival. */
 function stepTo(e,v){const tr=e.troom||e.room||'main';if(!e.room)e.room='main';let tx=e.tx,ty=e.ty;let hop=null;
  if(tr!==e.room){hop=nextHop(e.room,tr);const dw=doorway(e.room,hop);if(!dw){e.room=tr;return false}tx=dw[0][0];ty=dw[0][1]}
+ if(e.room==='up'||e.room==='pdr'){/* v2.4 rc6: round the column, round the long table */const w0=obsVia(e.room,e.x,e.y,tx,ty);if(w0&&Math.hypot(w0.x-e.x,w0.y-e.y)>1){const dx=w0.x-e.x,dy=w0.y-e.y,dd=Math.hypot(dx,dy);if(dd<=v){e.x=w0.x;e.y=w0.y}else{e.x+=dx/dd*v;e.y+=dy/dd*v;if(Math.abs(dx)>.5)e.face=dx>=0?1:-1}return false}}
  const dx=tx-e.x,dy=ty-e.y,d=Math.hypot(dx,dy);
  if(d<=v){e.x=tx;e.y=ty;if(hop){const dw=doorway(e.room,hop);e.room=hop;e.x=dw[1][0];e.y=dw[1][1];return false}return true}
  e.x+=dx/d*v;e.y+=dy/d*v;if(Math.abs(dx)>.5)e.face=dx>=0?1:-1;return false}
@@ -631,10 +633,11 @@ function buildTables(){const out=[];const nM=Math.min(S.tables,MAIN_MAX);const o
  const nS=(S.rooms&&S.rooms.side)?Math.min(S.sideTables||0,SIDE_MAX):0;for(let k=0;k<nS;k++){const r=Math.floor(k/3),c=k%3;out.push({i:out.length,spot:100+k,x:SIDE_L.cols[c],y:SIDE_L.rows[r]+DY*r*.3,seats:r<sideBoothRows()?4:2,group:null,dirty:false,plates:[],busT:0,room:'side'})}
  const nF=(S.rooms&&S.rooms.terrace)?(S.frontTables||0):0;for(let k=0;k<nF;k++)out.push({i:out.length,spot:200+k,x:FR.cols[k],y:FR.row,seats:2,group:null,dirty:false,plates:[],busT:0,room:'front',out:true});
  loungeSeatDefs().forEach((d,k)=>out.push({i:out.length,spot:300+k,x:d.x,y:d.y,seats:d.seats,kind:d.kind,group:null,dirty:false,plates:[],busT:0,room:'lounge',lounge:true}));   /* v2.3: the Lounge's seats — never for dining */
+ if(pdBuilt()){const T=PDL_TABLE();out.push({i:out.length,spot:400,x:T.x,y:T.y,seats:pdMax(),group:null,dirty:false,plates:[],busT:0,room:'pdr',pdr:true})}   /* v2.4 rc6: the Private Dining Room's one table */
  return out}
 function buildSlots(){const a=[];const add=(t,n)=>{for(let i=0;i<n;i++)a.push({type:t,no:i+1,job:null,fx:null,flash:0})};
  add('stove',stoveSlots(S.eq.stove));if(S.eq.oven)add('oven',S.eq.oven>=3?2:1);if(S.eq.bar)add('bar',barCups(S.eq.bar));if(S.eq.prep)add('prep',S.eq.fridge>=3?2:1);return a}
-function seatPos(t){return t.seats===4?[{dx:-14,dy:-15,side:0},{dx:14,dy:-15,side:0},{dx:-36,dy:2,side:-1},{dx:36,dy:2,side:1}]:[{dx:-28,dy:0,side:-1},{dx:28,dy:0,side:1}]}   /* v2.2.1 F: the two-top grew a little (rx 22→25) so it holds its own beside the booths; its chairs step out with it */
+function seatPos(t){if(t.pdr)return pdSeats();return t.seats===4?[{dx:-14,dy:-15,side:0},{dx:14,dy:-15,side:0},{dx:-36,dy:2,side:-1},{dx:36,dy:2,side:1}]:[{dx:-28,dy:0,side:-1},{dx:28,dy:0,side:1}]}   /* v2.2.1 F: the two-top grew a little (rx 22→25) so it holds its own beside the booths; its chairs step out with it */
 
 /* ================= food art ================= */
 function leaf(c,x,y,l,w,a,col){c.save();c.translate(x,y);c.rotate(a);c.fillStyle=col;c.beginPath();c.moveTo(-l/2,0);c.quadraticCurveTo(0,-w,l/2,0);c.quadraticCurveTo(0,w,-l/2,0);c.fill();c.strokeStyle='rgba(255,255,255,.28)';c.lineWidth=.6;c.beginPath();c.moveTo(-l/2+1,0);c.lineTo(l/2-1,0);c.stroke();c.restore()}
@@ -1129,7 +1132,7 @@ function buildSchedule(dur){const T=S.today,n=T.groups,out=[];
  if(loungeArcOpen()){if(Math.random()<.35)out.push({t:rand(.2,.7)*dur,type:'gourmet',size:1,name:KEN});if(fact('ken_pairing')&&!fact('ken_du_argue')&&Math.random()<.3)out.push({t:rand(.2,.7)*dur,type:'gourmet',size:1,name:DU})}   /* v2.3: the arc makes them likelier, never certain */
  if(loungeOpenTonight()){/* v2.3: a few come for the Lounge itself, later in the evening — the number grows with the room */const nL=ri(2,3)+loungeLv();for(let k=0;k<nL;k++){const o=rollGuest();o.lounge=1;o.size=Math.min(o.size,2);o.t=rand(.5,.88)*dur;out.push(o)}}
  for(const r of REGS)if(S.day>=r.day&&!(r.pair&&!r.lead)){const met=(S.regulars[r.id]||0)>0;const retry=S.regMiss&&S.regMiss[r.id]===S.day-1;if(Math.random()<(E.regs?.95:retry?.8:met?.55:.45))out.push(regPlanVisit({t:rand(.1,.85)*dur,type:r.type,reg:r.id,size:r.size}))}
- storySchedule(out,dur);/* v2.3 Phase 7 */
+ pdWalkIns(out,dur);/* v2.4 rc6 */storySchedule(out,dur);/* v2.3 Phase 7 */
  if(S.day>=3){const d=S.dylan;/* a recurring person in Jill's life, not a daily spawn: about every other day, less likely right after a visit */const gap=S.day-(d.last||0);/* v2.2: presence is its own knob — he lives here, so most days he comes by; only the story is rare */const p=S.day<=5?.6:gap<=1?.55:gap>=3?.97:.85;const on=ev==='valentine'||Math.random()<p;/* v2.3: Valentine's, always */dylanTrace({d:S.day,p:Math.round(p*100),s:on?1:0});if(on){const late=Math.random()<(d.stage>=2?.75:d.stage>=1?.6:.35);const t=(late?rand(.6,.86):rand(.1,.55))*dur;dylanTrace({t:Math.round(t)});out.push({t,type:'regular',reg:'dylan',size:1,tries:0})}}
  return out.sort((a,b)=>a.t-b.t)}
 /* v2.2.1 K (#17): a small per-day trace of Dylan — planned (p, s), the planned time (t), came (c, the room), the door look (door),
@@ -1152,8 +1155,8 @@ function queued(){return R.groups.filter(g=>g.state==='arrive'||g.state==='queue
 function requeue(){for(const g of queued()){if(g.state==='arrive'&&!g.landed)continue;
  if(g.spot){const ok=g.spot.k==='seat'?!OCC['bench'+g.spot.i]:true;const upgrade=g.spot.k==='stand'&&g.size<=2&&[0,1,2].some(benchFree);if(ok&&!upgrade)continue;g.spot=null}
  const sp=pickSpot(g);g.spot=sp;const p=sp?spotPos(sp):{x:DOOR.x,y:DOOR.y+22};g.troom='main';g.tx=p.x;g.ty=p.y}}
-function spawn(o){if(R.closed)return;const reg=o.reg?REG_BY[o.reg]:null;const size=Math.min(o.size,maxSeats(R.tables));if(o.looks&&o.looks.length>size)o.looks=o.looks.slice(0,size);
- let nm0=o.name||(reg?reg.n:pick(NAMES[o.type]||NAMES.office));if(!o.reg&&NAMED[nm0]&&(R.groups.some(q=>(q.named||q.name)===nm0&&!q.gone)||((story().named[nm0]||{}).seen===S.day&&!o.tries)||(!o.name&&R.sched.slice(R.si+1).some(q=>q.name===nm0)))){/* one person, one visit a day; a pool pick yields to the same person's planned evening */let alt=(NAMES[o.type]||NAMES.office).filter(n=>!NAMED[n]);if(!alt.length)alt=NAMES.gourmet.concat(NAMES.office).filter(n=>!NAMED[n]);/* every VIP name is a person: another VIP tonight is someone else */if(alt.length)nm0=R.groups.some(q=>(q.named||q.name)===nm0&&!q.gone)?pick(alt):alt[hash(nm0+'|'+S.day+'|'+R.gid)%alt.length]}/* (the visited-today case picks without touching the day's random stream) */if(!o.reg&&NAMED[nm0])namedHist(nm0).seen=S.day;/* one person, one visit a day — counted when they walk in *//* v2.3: a named guest is one person — never two Kens in one evening */const g={id:R.gid++,type:o.type,size,reg:o.reg||null,regs:(o.regs||(o.reg?[o.reg]:[])).slice(0,size),forSig:!!o.forSig,ret:!!o.ret,looks:o.looks||(reg?reg.looks:(NAMED[nm0]?[Object.assign({},NAMED[nm0].looks)].concat(makeLooks(o.type,size).slice(1)):makeLooks(o.type,size))),name:!o.reg&&NAMED[nm0]&&size>1?nm0+' 與朋友':nm0,named:!o.reg&&NAMED[nm0]?nm0:null,story:!!o.story,v24grp:o.v24grp||null,moment:o.moment||null,comp:o.comp||null,together:o.together||null,offduty:!!o.offduty,wantDish:o.wantDish||null,wantSide:!!o.wantSide,catfan:!!o.catfan,/* v2.3 */
+function spawn(o){if(R.closed)return;if(o.pdWalk&&(!pdBuilt()||pdHeld()||pdOccupied()||(R.tables.find(t=>t.pdr)||{}).dirty))return;   /* v2.4 rc6: a party looks in only when the room is free */const reg=o.reg?REG_BY[o.reg]:null;const size=Math.min(o.size,maxSeats(R.tables));if(o.looks&&o.looks.length>size)o.looks=o.looks.slice(0,size);
+ let nm0=o.name||(reg?reg.n:pick(NAMES[o.type]||NAMES.office));if(!o.reg&&NAMED[nm0]&&(R.groups.some(q=>(q.named||q.name)===nm0&&!q.gone)||((story().named[nm0]||{}).seen===S.day&&!o.tries)||(!o.name&&R.sched.slice(R.si+1).some(q=>q.name===nm0)))){/* one person, one visit a day; a pool pick yields to the same person's planned evening */let alt=(NAMES[o.type]||NAMES.office).filter(n=>!NAMED[n]);if(!alt.length)alt=NAMES.gourmet.concat(NAMES.office).filter(n=>!NAMED[n]);/* every VIP name is a person: another VIP tonight is someone else */if(alt.length)nm0=R.groups.some(q=>(q.named||q.name)===nm0&&!q.gone)?pick(alt):alt[hash(nm0+'|'+S.day+'|'+R.gid)%alt.length]}/* (the visited-today case picks without touching the day's random stream) */if(!o.reg&&NAMED[nm0])namedHist(nm0).seen=S.day;/* one person, one visit a day — counted when they walk in *//* v2.3: a named guest is one person — never two Kens in one evening */const g={id:R.gid++,type:o.type,size,reg:o.reg||null,regs:(o.regs||(o.reg?[o.reg]:[])).slice(0,size),forSig:!!o.forSig,ret:!!o.ret,looks:o.looks||(reg?reg.looks:(NAMED[nm0]?[Object.assign({},NAMED[nm0].looks)].concat(makeLooks(o.type,size).slice(1)):makeLooks(o.type,size))),name:!o.reg&&NAMED[nm0]&&size>1?nm0+' 與朋友':nm0,named:!o.reg&&NAMED[nm0]?nm0:null,story:!!o.story,v24grp:o.v24grp||null,pdRes:o.pdRes||null,pdWalk:!!o.pdWalk,pdStory:o.pdStory||null,moment:o.moment||null,comp:o.comp||null,together:o.together||null,offduty:!!o.offduty,wantDish:o.wantDish||null,wantSide:!!o.wantSide,catfan:!!o.catfan,/* v2.3 */
   state:'arrive',table:null,pat:1,room:'front',troom:'main',x:FR.enter.x,y:FR.enter.y,tx:DOOR.x,ty:DOOR.y+22,timer:0,ticket:null,seed:Math.random()*10,mood:'ok'};
  if(reg&&(S.regulars[reg.id]||0)>0)g.ret=true;
  if(o.lounge&&loungeOpenTonight()){/* v2.3: someone who came for the Lounge looks there first — a full dining room does not turn them away */const ls=loungeSeatFor(g);if(ls){R.groups.push(g);R.lastSpawn=R.t;campaignSpawn(g,o);loungeSeat(g,ls,'direct');sfx.door();return}}
@@ -1166,10 +1169,10 @@ function spawn(o){if(R.closed)return;const reg=o.reg?REG_BY[o.reg]:null;const si
 /* what a guest who came for the signature says at the door (pickT keeps the same sentence from coming back soon) */
 function forSigLines(){const n=S.signature&&S.signature.name?`『${S.signature.name}』`:'招牌菜';/* 『』: the line itself is shown in 「」 */return[`朋友說來這裡一定要點${n}。`,`${n}今天有吧？`,`網路上看到${n}，就想來吃吃看。`,`上次沒點到${n}，今天要補回來。`,`是這間吧？${n}那間。`,`今天就是為了${n}來的。`,`同事一直推${n}，我來試試看。`]}
 function drainRate(g){const T=TYPES[g.type];const base={queue:1/32,order:1/28,wait:1/80,check:1/26}[g.state]||0;let m=1/(T.pat*(g.reg||g.story?1.15:1));if(g.reg==='dylan')m*=.5;if(g.reg&&g.reg!=='dylan'){const tier=regTier(S.regulars[g.reg]||0);if(g.reg==='koba'&&!g.unhurried)m*=tier>=1?1.05:1.3;if(tier>=2)m*=.8;else if(tier>=1)m*=.9}if(g.quick)m*=1.15;if(g.state==='queue'&&g.spot&&g.spot.k==='seat')m*=.7;
- if(g.table!=null&&R.tables[g.table]&&R.tables[g.table].lounge)m*=.5;/* v2.3: a glass in hand, or waiting with one — nobody is in a hurry here */m*=1+Math.min(.35,S.day*.012);m*=1-Math.min(.25,ambience()*.02);m*=1-.08*S.decor.chairs;{const wp=WEATHER[R.weather]&&WEATHER[R.weather].pat;if(wp){const f=R.weather==='hot'?hotFactor():1;m/=1-(1-wp)*f}}if(R.musicT>R.t&&(g.state==='queue'||g.state==='arrive'))m*=.7;if(g.catT&&g.catT>R.t)m*=.6;if(!g.rowdy&&g.table!=null&&R.groups.some(o=>o.rowdy&&o.table!=null&&Math.hypot(R.tables[o.table].x-R.tables[g.table].x,R.tables[o.table].y-R.tables[g.table].y)<140))m*=1.7;if(S.day<=2)m*=.62;else if(S.day<=4)m*=.82;return base*m}
+ if(g.table!=null&&R.tables[g.table]&&R.tables[g.table].lounge)m*=.5;if(g.table!=null&&R.tables[g.table]&&R.tables[g.table].pdr)m*=.55;/* v2.4 rc6: a door closed, a long dinner *//* v2.3: a glass in hand, or waiting with one — nobody is in a hurry here */m*=1+Math.min(.35,S.day*.012);m*=1-Math.min(.25,ambience()*.02);m*=1-.08*S.decor.chairs;{const wp=WEATHER[R.weather]&&WEATHER[R.weather].pat;if(wp){const f=R.weather==='hot'?hotFactor():1;m/=1-(1-wp)*f}}if(R.musicT>R.t&&(g.state==='queue'||g.state==='arrive'))m*=.7;if(g.catT&&g.catT>R.t)m*=.6;if(!g.rowdy&&g.table!=null&&R.groups.some(o=>o.rowdy&&o.table!=null&&Math.hypot(R.tables[o.table].x-R.tables[g.table].x,R.tables[o.table].y-R.tables[g.table].y)<140))m*=1.7;if(S.day<=2)m*=.62;else if(S.day<=4)m*=.82;return base*m}
 function updGroup(g,dt){
  if(['arrive','queue','toTable','leave'].includes(g.state)){const there=stepTo(g,78*dt);if(!there){g.walk=(g.walk||0)+dt*11;g.moving=true}else{g.moving=false;
-  if(g.state==='arrive'){g.landed=true;const t=!R.closed&&freeTableFor(g);if(t&&!t.claim){seatGroup(g,t);return}g.state='queue';requeue()}else if(g.state==='toTable'){g.state='reading';g.timer=rand(2.4,3.8)*(TYPES[g.type].read||1)*(S.day===1?.8:1)*(g.usual?.3:1)*(g.reg==='koba'&&!g.unhurried?.55:1)*(g.rushed?.6:1)}else if(g.state==='leave'){if(g.bus){g.bus=false;sendOut(g);sfx.plop()}else{g.gone=true;return}}}}
+  if(g.state==='arrive'){g.landed=true;const t=!R.closed&&freeTableFor(g);if(t&&!t.claim){seatGroup(g,t);return}g.state='queue';requeue()}else if(g.state==='toTable'){g.state='reading';g.timer=rand(2.4,3.8)*(TYPES[g.type].read||1)*(S.day===1?.8:1)*(g.usual?.3:1)*(g.reg==='koba'&&!g.unhurried?.55:1)*(g.rushed?.6:1)*(g.table!=null&&R.tables[g.table]&&R.tables[g.table].pdr?1.3:1)}else if(g.state==='leave'){if(g.bus){g.bus=false;sendOut(g);sfx.plop()}else{g.gone=true;return}}}}
  if(g.state==='queue'||g.state==='order'||g.state==='wait'||g.state==='check'||g.state==='arrive'){const dr=drainRate(g.state==='arrive'?{...g,state:'queue'}:g);g.pat-=dt*dr;if(g.pat<=0){g.pat=0;angryLeave(g);return}}
  if(g.state==='queue'&&!g.moving){g.notice=(g.notice??rand(2,4))-dt;if(g.notice<=0){g.notice=rand(1.5,3);if(!R.closed){const t=freeTableFor(g);if(t&&!t.claim&&!queued().some(o=>o!==g&&o.id<g.id&&o.size<=t.seats)){seatGroup(g,t);return}if(!t&&loungeWaitOK(g)){g.lgTried=1;if(Math.random()<.6){const ls=loungeSeatFor(g);if(ls){loungeSeat(g,ls,'wait');return}}}}requeue()}
   /* waiting is mostly just sitting; now and then they look around, check a phone, watch a cat, or chat */
@@ -1179,7 +1182,7 @@ function updGroup(g,dt){
  if(g.reg==='dylan'&&g.table!=null&&['reading','order','wait','eat','check'].includes(g.state))dylanGuestUpd(g,dt);
  if(g.state==='reading'){g.timer-=dt;if(g.timer<=0){g.state='order';sfx.bubble()}}
  if(g.state==='eat'){g.timer-=dt;if(g.timer<=0&&!storyLinger(g)){g.state='check';g.ate=1;sfx.bubble()}}}
-function seatGroup(g,t){t.group=g;t.dirty=false;g.table=t.i;if(g.reg==='dylan')dylanTrace({r:t.room||'main'});g.state='toTable';g.troom=t.room||'main';g.tx=t.x;g.ty=t.y+8;g.pat=Math.min(1,g.pat+.1);requeue();sfx.tap();jillGreet(g,t);if(projOn('side')&&R.tables.some(q=>q.room==='side')&&R.tables.every(q=>q.room==='front'||q.group))ach('sideful');
+function seatGroup(g,t){t.group=g;t.dirty=false;g.table=t.i;if(t.pdr)pdSeated(g,t);if(g.reg==='dylan')dylanTrace({r:t.room||'main'});g.state='toTable';g.troom=t.room||'main';g.tx=t.x;g.ty=t.y+8;g.pat=Math.min(1,g.pat+.1);requeue();sfx.tap();jillGreet(g,t);if(projOn('side')&&R.tables.some(q=>q.room==='side')&&R.tables.every(q=>q.room==='front'||q.group))ach('sideful');
  if(g.reg&&g.reg!=='dylan'){for(const id of regsOf(g)){const m=regMem(id);m.seats[t.i]=(m.seats[t.i]||0)+1}const v=S.regulars[g.reg]||0;/* v2.2 L: Jill's Card — every fifth visit, something on the house; visits are the only stamp */if((v+1)%5===0&&v>0&&!g.treat){g.treat='dessert';g.card=true}if(usualTable(g.reg)===t.i&&v>=4&&Math.random()<.25&&canChat('seat'+g.reg,300,3))setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,pickT(['老位子。','還是這裡好。','這個位子看得到貓。']))},500);
   const ud=usualDish(g.reg);if(ud&&v>=4&&!g.moment&&Math.random()<.5)g.usual=ud;regSeatMoment(g,t);regMeet(g);regularsNoticeDylan(g)}
  storySeatHook(g,t);storyCopresence(g);storyTick('seat',{g,t});   /* v2.3 */
@@ -1202,7 +1205,8 @@ function ambientTick(dt){if(!R||R.closing!=null)return;R.ambT=(R.ambT||0)+dt;if(
   if(g.reg==='chen'&&!g.saidTora){const T2=catBy('tora');if(T2&&!T2.hidden&&familiar(g)&&Math.hypot(T2.x-t.x,T2.y-t.y)<90)add('chentora',1,()=>{g.saidTora=1;quote(g,pickT(['那隻虎斑今天沒躲我。','虎斑那隻，以前看到我就走。']))})}
   if(g.reg==='koba'&&!g.saidBan){const H=catBy('ban');if(H&&!H.hidden&&Math.hypot(H.x-t.x,H.y-t.y)<60)add('kobaban',.8,()=>{g.saidBan=1;quote(g,'這隻貓每次都來看我吃飯。')})}}
  if(!c.length)return;const pk=wpick(c,o=>o.w);const gap={nexttable:70,newdish:90,askcat:80,check:50,chentora:400,kobaban:400}[pk.k]||60;if(canChat(pk.k,gap,7))pk.f()}
-function freeTableFor(g){const ts=R.tables.filter(t=>!t.group&&!t.dirty&&t.seats>=g.size&&!t.lounge).sort((a,b)=>a.seats-b.seats);
+function freeTableFor(g){const pdOK=pdTableFor(g);const ts=R.tables.filter(t=>!t.group&&!t.dirty&&t.seats>=g.size&&!t.lounge&&(!t.pdr||pdOK)).sort((a,b)=>a.seats-b.seats);
+ {/* v2.4 rc6: a booking, a story's table, a party — to the Private Dining Room; the booked ones wait for it */const pt=pdOK&&ts.find(t=>t.pdr);if(pt&&(g.pdRes||g.pdStory||g.pdWalk||g.size>4))return pt;if(g.pdRes||g.pdStory)return null}
  {const st=storyTableFor(g,ts);if(st)return st}/* v2.3 Phase 7: near a friend; a named guest's usual table; 周董's side hall */
  if(g.reg&&g.reg!=='dylan'&&ts.length){const u=usualTable(g.reg);const ut=u!=null&&ts.find(t=>t.i===u);if(ut&&(S.regulars[g.reg]||0)>=2)return ut;if(REG_BY[g.reg]&&REG_BY[g.reg].pair&&u==null){/* by the window, as they always ask */return ts.slice().sort((a,b)=>(a.seats-b.seats)||(a.x-b.x)||(a.y-b.y))[0]}}
  if(g.reg==='dylan'&&ts.length){/* a seat that sees Jill at the pass but is not in her way: the free dining-room table farthest from the kitchen; now and then the side room, once there is one */const sd=ts.filter(t=>t.room==='side');if(sd.length&&(g.wantSide||(g.wantSide==null&&(g.wantSide=Math.random()<.35))))return sd[0];const m=ts.filter(t=>t.room==='main');return (m.length?m:ts).slice().sort((a,b)=>(a.seats-b.seats)||(Math.hypot(b.x-PASS.x,b.y-PASS.y)-Math.hypot(a.x-PASS.x,a.y-PASS.y)))[0]}
@@ -1247,7 +1251,7 @@ function orderItems(g,est){/* v2.2: a sold-out dish is not on offer (est = the d
    auto-provisioning days the tutorial still lets Jill order a missing unit herself, so nothing is filtered there) */const ms0=menuList().filter(d=>stationOk(d)&&!(DISHES[d]&&DISHES[d].bar));const ms=est||S.day<=2?ms0:ms0.filter(d=>(S.stock[d]||0)>0);const T=TYPES[g.type];const W=R?R.weather:(S.today?S.today.weather:'sun');
  const wf=d=>demandW(d,T);const reco=recoDish();
  const foods=()=>ms.filter(d=>DISH(d).cat!=='drink'&&DISH(d).cat!=='dessert');const drinks=()=>ms.filter(d=>DISH(d).cat==='drink');const des=()=>ms.filter(d=>DISH(d).cat==='dessert');
- const items=[];const cap=g.size===1?3:g.size===2?4:5;const reg=g.reg?REG_BY[g.reg]:null;
+ const items=[];const cap=g.size===1?3:g.size===2?4:g.size>=4?Math.min(8,g.size+2):5;   /* v2.4 rc6: a party of four to ten shares, up to eight plates */const reg=g.reg?REG_BY[g.reg]:null;
  if(!est&&g.wantDish&&g.via==='camp'&&!ms.includes(g.wantDish))g.wantMissed=1;/* v2.3: came for it, it ran out */
  if(namedId(g)==='周董'&&!est){const z=zhouOrder(ms);if(z){g.zhouUsual=1;return z}}/* v2.3: 「隨便」 */
  for(let k=0;k<g.size;k++){let d=null;
@@ -1349,7 +1353,7 @@ function plate(s,q){const j=s.job;s.job=null;const it=j.it;if(!R.tickets.include
  else{R.streak=0;if(q==='B'){sfx.burnt();toast('燒焦了…客人不會太開心')}else if(q==='G')sfx.good();else sfx.okay()}
  coach(4)}
 function startFire(){R.fire=15;R.fireCount++;banner("JILL'S ON FIRE",'Rush Mode：出菜更快、小費 ×1.5','fire');sfx.fire();ach('fire')}
-function checkAllServed(g){if(g.ticket&&g.ticket.items.length&&g.ticket.items.every(it=>it.st==='served')&&g.state==='wait'){g.state='eat';g.timer=rand(7,11)*(TYPES[g.type].eat||1)*(S.day<=2?.8:1)*(R.weather==='storm'?1.2:1)*(g.quick||g.rushed?.7:1)*(g.unhurried?1.3:1);if(g.table!=null&&R.tables[g.table].lounge){g.timer*=g.lg&&g.lg.why==='wait'?1.2:2.4;g.lg&&(g.lg.served=1)}/* v2.3: a glass is not a course — they stay a while */g.eatDur=g.timer}}
+function checkAllServed(g){if(g.ticket&&g.ticket.items.length&&g.ticket.items.every(it=>it.st==='served')&&g.state==='wait'){g.state='eat';g.timer=rand(7,11)*(TYPES[g.type].eat||1)*(S.day<=2?.8:1)*(R.weather==='storm'?1.2:1)*(g.quick||g.rushed?.7:1)*(g.unhurried?1.3:1);if(g.table!=null&&R.tables[g.table].lounge){g.timer*=g.lg&&g.lg.why==='wait'?1.2:2.4;g.lg&&(g.lg.served=1)}/* v2.3: a glass is not a course — they stay a while */if(g.table!=null&&R.tables[g.table].pdr)g.timer*=1.6;/* v2.4 rc6: 慢慢吃 */g.eatDur=g.timer}}
 function serveItems(g,list){const t=R.tables[g.table];let best=null;
  for(const c of list){const it=c.it;if(it.st!=='ready')continue;it.st='served';t.plates.push({d:it.d,q:it.q,want:it.want});g.pat=Math.min(1,g.pat+.12);
   if(it.q==='P'||it.q==='G'){R.combo++;R.maxCombo=Math.max(R.maxCombo,R.combo);if(R.combo>=2){showCombo();sfx.combo(R.combo)}if(R.combo>=10)ach('combo10')}else{if(R.combo>=3)toast('COMBO 中斷');R.combo=0;hideCombo()}
@@ -1416,7 +1420,7 @@ function addReview(g,stars,txt,ctx){const top=g.ticket?g.ticket.items.find(i=>i.
 function collect(g,o){o=o||{};const again=!!(o.tab||g.counted);/* v2.3: a Lounge tab, or a second phase of one visit — money, no second visit, no second review */const T=TYPES[g.type];const items=g.ticket.items.filter(i=>i.st==='served');let rev=0,qs=0,pen=0,bon=0;if(g.table!=null&&R.tables[g.table]&&R.tables[g.table].room==='front'&&items.length)ach('terrace');
  for(const it of items){const m=S.price[it.d]||1;const pr=it.set?Math.round(priceOf(it.d)*SETS[it.set].off/5)*5:priceOf(it.d);rev+=pr;R.st.dishRev=R.st.dishRev||{};R.st.dishRev[it.d]=(R.st.dishRev[it.d]||0)+pr;if(it.set){R.st.sets=(R.st.sets||0)+1;/* v2.2 M: a set is a product of its own — counted and its (discounted) add-on revenue kept, today and for good */R.st.setN=R.st.setN||{};R.st.setN[it.set]=(R.st.setN[it.set]||0)+1;R.st.setRev=R.st.setRev||{};R.st.setRev[it.set]=(R.st.setRev[it.set]||0)+pr}qs+=QV[it.q];pen+=Math.max(0,m-1);bon+=Math.max(0,1-m)}
  const n=Math.max(1,items.length),qa=qs/n;let sat=qa*T.qw+g.pat*100*(1-T.qw);sat-=(pen/n)*80*T.sens;sat+=(bon/n)*30*T.sens;sat+=Math.min(12,ambience()*1.1);sat+=items.reduce((a,it)=>a+starOf(it.d)-1,0)/n*4;if(g.catJoy)sat+=5;if(g.reg)sat+=4;if(g.compl)sat+=g.compl;if(g.strict&&items.some(i=>i.q==='O'||i.q==='B'))sat-=12;if(g.forSig&&items.some(i=>i.d==='signature'))sat+=6;if(items.some(i=>i.d==='signature'&&i.byJill))sat+=3;sat=clamp(sat,0,100);
- let tip=rev*T.tip*Math.pow(sat/80,2)*(R.fire>0?1.5:1)*(1+.04*Math.min(R.combo,10))*(S.decor.ware?1.15:1)*(g.celebrate||g.anniv?1.8:1);if(sat<40)tip=0;if(g.reg==='dylan'&&sat>=40)tip*=1.35;rev=Math.round(rev);tip=Math.round(tip);
+ let tip=rev*T.tip*Math.pow(sat/80,2)*(R.fire>0?1.5:1)*(1+.04*Math.min(R.combo,10))*(S.decor.ware?1.15:1)*(g.celebrate||g.anniv?1.8:1);if(sat<40)tip=0;if(g.reg==='dylan'&&sat>=40)tip*=1.35;rev=Math.round(rev);tip=Math.round(tip);rev=pdBill(g,rev);   /* v2.4 rc6: a booking's minimum spend is the floor of the bill */
  if(g.type==='couple')R.st.couples=(R.st.couples||0)+1;
  S.money+=rev+tip;S.lifetime+=rev+tip;R.st.rev+=rev;R.st.tips+=tip;R.st.guests+=g.size;R.st.groups++;R.st.sats.push(sat);R.st.pats=R.st.pats||[];R.st.pats.push(g.pat);if(pen>0)R.st.pricey=(R.st.pricey||0)+1;if(g.catJoy)R.st.catJoy=(R.st.catJoy||0)+1;if(items.some(i=>i.d==='signature'))R.st.sig=(R.st.sig||0)+items.filter(i=>i.d==='signature').length;if(items.some(i=>i.d==='sigdessert'))R.st.sigd=(R.st.sigd||0)+items.filter(i=>i.d==='sigdessert').length;
  const t=R.tables[g.table];addFloat(t.x,t.y-42,'+'+fmt(rev),'#FFE38A',1,t.room);if(tip>0)addFloat(t.x+6,t.y-58,'小費 +'+fmt(tip),'#BFE3A8',0,t.room);sfx.cash();burst('coins',{x:t.x,y:t.y-20,room:t.room},'#F4C44E');
@@ -2771,7 +2775,7 @@ function upCatSend(c){if(!c||upCatBusy(c)||!freeFloorCat(c))return false;release
 function upCatForce(c){if(!c||upCatBusy(c))return;releaseSpots(c);if(c.perch>=0){if(perchOcc[c.perch]===c)perchOcc[c.perch]=null;c.perch=-1}for(const k in GEAR_OCC)if(GEAR_OCC[k]===c)GEAR_OCC[k]=null;c.gear=null;c.away=null;c.guest=null;c.run=0;upCatAtDoor(c)}   /* off a perch, the sofa or the side room's window: nothing of hers is left held */
 function upCatAtDoor(c){c.away='side';c.hidden=true;c.st='upgo';c.ax=UPDOOR.x+(c.def.id==='mikan'?10:-12);c.ay=UPDOOR.y-18;c.aface=1;c.aoy=0;c.pose='sit';c.moving=false;c.t=rand(2.5,4)}
 function upCatUp(c,sp){c.away='up';c.st='up';c.hidden=true;c.ax=sp.x;c.ay=sp.y;c.aface=sp.face||1;c.aoy=sp.oy||0;c.pose=sp.pose||'sit';c.moving=false;c.upTo=null;c.upT=sp.t==null?null:sp.t;c.upWin=!!sp.win;
- if(upTaken()&&!upNight()&&!upSearching()){/* in by the stairs, round the railing, to her place */const fin=()=>{c.aoy=sp.oy||0;c.pose=sp.pose||'sit';c.aface=sp.face||1};c.ax=UP_L.entry.x;c.ay=UP_L.entry.y-2;c.aoy=0;c.upT=sp.t==null?null:sp.t+6;c.upTo={x:238,y:392,v:38,then:o=>{o.upTo={x:sp.x,y:sp.y,v:38,then:fin}}}}
+ if(upTaken()&&!upNight()&&!upSearching()){/* in by the stairs, round the railing, to her place */const fin=()=>{c.aoy=sp.oy||0;c.pose=sp.pose||'sit';c.aface=sp.face||1};c.ax=UP_L.entry.x;c.ay=UP_L.entry.y-2;c.aoy=0;c.upT=sp.t==null?null:sp.t+6;c.upTo=sp.room==='staff'?{x:UPR.srDoor.x+10,y:UPR.srDoor.y+10,v:38,then:o=>{o.away='staff';o.ax=SRL.door.x;o.ay=SRL.door.y+6;o.upTo={x:sp.x,y:sp.y,v:34,then:fin}}}:{x:238,y:392,v:38,then:o=>{o.upTo={x:sp.x,y:sp.y,v:38,then:fin}}}}
  if(c.def.id==='ban'&&!upNight()){const A=catBy('mikan');if(A&&A.st==='up')upTogether()}
  if(c.def.id==='mikan'&&!upNight()&&upTaken()){if(sp.win){const v=v24();v.upWin=(v.upWin||0)+1}UPC.follow=Math.random()<.45?ctime+rand(3,8):0}}
 function upCatDown(c){c.st='updown';c.away='side';c.hidden=true;c.ax=UPDOOR.x+8;c.ay=UPDOOR.y-18;c.aface=-1;c.aoy=0;c.pose='sit';c.moving=false;c.upTo=null;c.t=1.2}
@@ -2780,16 +2784,17 @@ function upCatsHome(){if(CATS)for(const c of CATS)if(upCatBusy(c))upCatHome(c)}
 function upCatToStairs(c,v){c.upTo={x:238,y:392,v:v||44,then:o=>{o.upTo={x:UP_L.entry.x,y:UP_L.entry.y-2,v:v||44,then:upCatDown}}}}
 function upCatTick(c,dt){if(c.upTo){const T=c.upTo;const dx=T.x-c.ax,dy=T.y-c.ay,d=Math.hypot(dx,dy),v=(T.v||36)*dt;
   if(d<=v){c.ax=T.x;c.ay=T.y;c.moving=false;c.upTo=null;if(T.then)T.then(c)}else{c.ax+=dx/d*v;c.ay+=dy/d*v;if(Math.abs(dx)>.5)c.aface=dx>=0?1:-1;c.moving=true;c.aoy=0}return}
- if(c.upT!=null){c.upT-=dt;if(c.upT<=0){c.upT=null;upCatToStairs(c,40)}}}
+ if(c.upT!=null){c.upT-=dt;if(c.upT<=0){c.upT=null;if(c.away==='staff')c.upTo={x:SRL.door.x,y:SRL.door.y+4,v:40,then:o=>{o.away='up';o.ax=UPR.srDoor.x;o.ay=UPR.srDoor.y+10;o.upTo={x:UP_L.entry.x,y:UP_L.entry.y-2,v:40,then:upCatDown}}};else upCatToStairs(c,40)}}}
 /* where a cat settles up there. The night: 柔柔 at the window looking out, 小齁 poking round the landlord's boxes. The
    open floor (K): the low cushion, the small stool, the table, the floor — 柔柔 now and then at her window again */
 function upCatSpot(c){const id=c.def.id;
  if(upNight()||(R&&R.upSearch&&!R.upSearch.end))return id==='mikan'?{x:UP_L.sill.x,y:UP_L.sill.y-10,face:1,pose:'sit'}:{x:304,y:146,face:1,pose:'sit'};
+ if(srBuilt()&&R&&R.closing!=null&&R.srCatId===id){const so=SR_SEATS.sofa[0];return{room:'staff',x:so.x+8,y:so.y-14,face:1,pose:'loaf',t:rand(30,50)}}   /* v2.4 rc6: after the crew, into the Staff Room for a nap */
  const S0=[];if(id==='mikan')S0.push({x:UP_L.sill.x,y:UP_L.sill.y-10,face:1,pose:'sit',w:3,win:1});
  if(upHas('cushion'))S0.push({x:250,y:UP_L.col.base+13,face:-1,pose:'loaf',w:3});
  if(upHas('stool'))S0.push({x:UP_L.sill.x+40,y:115,oy:16,face:-1,pose:'sit',w:2});
  if(upHas('scratch'))S0.push({x:342,y:Math.round(92+(LH-92)*.42)+1,face:1,pose:'scr',w:1,t:rand(6,10)});
- if(upHas('table'))S0.push({x:122,y:Math.round(92+(LH-92)*.36)+12,face:1,pose:'loaf',w:1.5});
+ if(upHas('table'))S0.push(srOn()?{x:296,y:upTableY()+12,face:1,pose:'loaf',w:1.5}:{x:122,y:Math.round(92+(LH-92)*.36)+12,face:1,pose:'loaf',w:1.5});
  S0.push({x:150+hash(id+'|'+S.day)%90,y:210+hash(S.day+'|'+id)%80,face:1,pose:'sit',w:1});
  const s=wpick(S0,o=>o.w)||S0[S0.length-1];return Object.assign({t:rand(40,100)},s)}
 /* the open floor's cats (K, restrained): now and then one goes up for a while, one at a time; 柔柔 most of all, and 小齁
@@ -3089,6 +3094,9 @@ function restChapters(){const achD=achReal;/* v2.3 follow-up: a beat's day from 
   /* v2.4 P2: the Second Floor (second_floor_and_long_arcs §39: the major beats only — no line for the first question,
      none for the crew's moments; nothing that says what the floor will be) */
   {t:'樓上',showIf:()=>!!fact('up_cats'),beats:[['房東的二樓',BF('up_inspect')],[`${upCatN('mikan')}和${upCatN('ban')}不見的那一晚`,BF('up_cats')],['「……樓上現在還空著嗎？」',BF('up_ask')],['「整層。」',BF('up_lease')]]},
+  /* v2.4 rc6 (AM): the two rooms, each its own restaurant story — the big moments only */
+  {t:'大家待的地方',showIf:()=>!!fact('sr_story'),beats:[['《大家待的地方》',BF('sr_story')],['有門的房間',(()=>{const o=srOf();return o&&srBuilt()?o.done:null})()],['開始像他們的地方',(()=>{const o=srOf();return o&&srStage()>=2?o.st2:null})()],['真的有人生活過',(()=>{const o=srOf();return o&&srStage()>=3?o.st3:null})()]]},
+  {t:'關上門以後',showIf:()=>!!fact('pd_story'),beats:[['《關上門以後》',BF('pd_story')],['一桌人的地方',(()=>{const o=pdOf();return o&&pdBuilt()?o.done:null})()],['「裡面可以嗎？」',BF('pd_back')],['慢慢吃',(()=>{const o=pdOf();return o&&pdStage()>=2?o.st2:null})()],['熟悉的位置',(()=>{const o=pdOf();return o&&pdStage()>=3?o.st3:null})()]]},
  ];return C}
 /* ---- the page ---- */
 let storyFocus=null;
@@ -3298,7 +3306,7 @@ function restTick(dt){const J=R.jill,L=LIFE.jill;L.sinceSit+=dt;L.t-=dt;if(L.gaz
   if(k==='read'){L.t=rand(10,25);L.flipT=rand(4,10)}else if(k==='idle')L.t=rand(5,12);
   else if(k==='look'){L.t=rand(2.5,4);const g=R.groups.find(q=>q.table!=null&&['reading','wait','eat'].includes(q.state));L.gazeT=L.t;L.gazeX=g?R.tables[g.table].x:(L.face>0?L.x+80:L.x-80)}
   else if(k==='pet'){L.petCat=pick(near);L.t=rand(2.5,4.5);L.petCat.hearts.push({x:0,y:-24,t:0});L.petCat.happy=Math.max(L.petCat.happy||0,1.5);L.petCat.quiet=1}}}
-function jillUpd(dt){const J=R.jill;const fire=R.fire>0;if(upSearching()){upJillUpd(dt);return}/* v2.4 P2: the search, the phone call at the stair door */
+function jillUpd(dt){const J=R.jill;const fire=R.fire>0;if(upSearching()||(R&&R.srFirst)){upJillUpd(dt);return}/* v2.4 P2: the search, the phone call at the stair door */
  J.calm=(J.calm||0)+dt;J.wlChk=(J.wlChk||0)+dt;if(J.wlChk>.5){J.wlChk=0;if(J.cur||J.q.length||jillWorkload()>0)J.calm=0}
  if(J.rest==='sit'){restTick(dt);if(J.rest==='sit')return}
  if(J.busy>0){J.busy-=dt*(fire?1.5:1);if(J.busy>0)return;J.busy=0;if(J.cur){if(J.cur.go){J.cur.go=false;const t=R.tables[J.cur.t];J.troom=t.room||'main';J.tx=t.x;J.ty=t.y+26}else if(J.cur.done)J.cur=null}}
@@ -3342,9 +3350,9 @@ function update(dt){R.t+=dt;if(R.v24q&&R.v24q.length)v24Upd();
  for(const p of R.parts){p.t+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=p.g*dt}R.parts=R.parts.filter(p=>p.t<p.life);
  for(const k in S.stock)if(S.stock[k]<0)S.stock[k]=0;
  if(AU.ctx){const n=R.slots.filter(s=>s.job&&s.type==='stove').length;AU.siz.gain.setTargetAtTime(Math.min(.14,n*.05)*(.7+Math.random()*.6),AU.ctx.currentTime,.05);const seated=R.groups.filter(g=>['reading','order','wait','eat','check'].includes(g.state)).length;AU.chat.gain.setTargetAtTime(Math.min(.09,seated*.018),AU.ctx.currentTime,.3);if(Math.random()<.1)AU.chatBp.frequency.setTargetAtTime(380+Math.random()*500,AU.ctx.currentTime,.08)}
- if(R.closed&&R.groups.length===0&&R.closing==null)startClosing();upNightUpd(dt);/* v2.4 P2 */if(R.closing!=null){if(!upSearching())R.closing+=dt;/* the closing waits while they look for the cats */if(R.closing>75&&!R.ended){finishClosing();return}}
+ if(R.closed&&R.groups.length===0&&R.closing==null)startClosing();upNightUpd(dt);try{srLifeUpd(dt);srClosingUpd(dt)}catch(e){console.warn('[sr]',e)}/* v2.4 P2, rc6 */if(R.closing!=null){if(!upSearching())R.closing+=dt;/* the closing waits while they look for the cats */if(R.closing>75&&!R.ended){finishClosing();return}}
  R.cpT=(R.cpT||0)+dt;if(R.cpT>20&&R.closing==null){R.cpT=0;checkpointSave('auto')}}
-function startClosing(){R.closing=0;hideCombo();storyTick('close',{});/* v2.3 */const J=R.jill;J.q=[];J.cur=null;J.carry=[];const wasResting=J.rest==='sit';const keep=wasResting?Object.assign({},LIFE.jill):null;if(J.rest&&!wasResting)endRest();lifePlan();
+function startClosing(){R.closing=0;hideCombo();storyTick('close',{});try{srClosingPlan()}catch(e){console.warn('[sr]',e)}/* v2.3 */const J=R.jill;J.q=[];J.cur=null;J.carry=[];const wasResting=J.rest==='sit';const keep=wasResting?Object.assign({},LIFE.jill):null;if(J.rest&&!wasResting)endRest();lifePlan();
  if(wasResting){LIFE.plan='sofa';const L=LIFE.jill;Object.assign(L,{on:true,reserved:false,pos:keep.pos,x:keep.x,y:SOFA.jy,face:keep.face,legs:0,legTarget:0,act:'settle',t:rand(1,3),sinceSit:0,counted:false,hat:false});J.rest=null;J.sofa=true;J.tx=null;J.ty=null;J.moving=false;J.restTo=false}
  else if(LIFE.plan==='sofa'){J.tx=null;J.ty=null;J.restTo=false;J.moving=false;const L=LIFE.jill;L.x=J.x;L.y=J.y;L.face=J.face;/* first the pass gets wiped down; then the sofa */L.wrapT=rand(4,6.5);if(Math.hypot(J.x-PASS.x,J.y-PASS.y)>4){L.act='standing';jillWalk(L,PASS.x,PASS.y,'wrap')}else L.act='wrap'}
  else{const t=R.tables[0];J.troom='main';J.tx=t.x-25;J.ty=t.y+2;J.restTo=true}$('#closePill').hidden=false;if(CATS)for(const c of CATS){if(c.hidden||['jump','walk','race','dash','bed'].includes(c.st))continue;c.t=Math.min(c.t||0,c.def.id==='tora'?.4:c.def.id==='ban'?rand(1.5,3):rand(2,8))}}
@@ -3382,7 +3390,7 @@ function achDay(st,plated){if(S.stats.days+1>=7)ach('week');if(st.rev>=20000)ach
  const Rc=S.records||{};if((Rc.calmRun||0)>=7)ach('calm7');const W=R.weather;if((W==='rain'||W==='storm')&&(st.dish.soup||0)>=6)ach('rain');if(W==='storm'&&st.guests>=15)ach('storm');if(W==='hot'&&WX_COLD.filter(d=>DISH(d).cat==='drink').reduce((a,d)=>a+(st.dish[d]||0),0)>=12)ach('hot');
  if(R.event==='celebrate')ach('celebrate');if(R.event==='datenight'&&(st.couples||0)>=5)ach('datenight');const pats=st.pats||[];if(st.guests>=20&&pats.length>=8&&pats.every(p=>p>=.5))ach('night0');
  if(rating()>=4.5&&S.reviews.length>=20)ach('rating45');if(Rc.sig&&Rc.sig.v>=100)ach('sig100');const crew=S.crew||[];if(crew.length>=6)ach('staff6');if(crew.length>=3&&crew.every(m=>m.lv>=5))ach('lv5all');if(opsLv('flow')>=3)ach('ops3');if(albumList().length>=50)ach('photos50')}
-function endDay(){if(!R)return;try{upNightEnd()}catch(e){console.warn('[up]',e)}/* v2.4 P2 */clearCheckpoint();const st=R.st,D=S.day;storyTick('dayend',{st});crewDayDone();/* v2.3 */const wages=crewWages();let bonus=0;
+function endDay(){if(!R)return;try{upNightEnd()}catch(e){console.warn('[up]',e)}/* v2.4 P2 */clearCheckpoint();const st=R.st,D=S.day;try{pdAvgUpd(st)}catch(e){}storyTick('dayend',{st});crewDayDone();/* v2.3 */const wages=crewWages();let bonus=0;
  const tasks=S.today.tasks.map(t=>{const p=taskProg(t);const done=p>=t.n;if(done)bonus+=t.reward;return{...t,p,done}});
  S.money+=bonus;let wagesPaid=wages;if(S.money-wages<0){/* v2.2: the till never goes negative — what cannot be paid tonight is noted, not borrowed */wagesPaid=Math.max(0,S.money);S.wageOwed=(S.wageOwed||0)+(wages-wagesPaid)}S.money-=wagesPaid;const avg=st.sats.length?st.sats.reduce((a,b)=>a+b,0)/st.sats.length:0;
  let top=null,topN=0;for(const d in st.dish)if(st.dish[d]>topN){topN=st.dish[d];top=d}
@@ -3433,7 +3441,7 @@ function ticketsLayout(){const el=ticketsEl;const more=$('#tkMore'),back=$('#tkB
 function renderTickets(){if(!R){ticketsEl.innerHTML=`<div class="tk-empty">${phase==='service'?'':'訂單會出現在這裡。'}</div>`;tkVer=-1;tkRefs=[];ticketsEl.classList.remove('scroll','compact');const m=$('#tkMore');if(m){m.hidden=true;$('#tkBack').hidden=true}return}
  if(R.tv===tkVer)return;tkVer=R.tv;
  if(!R.tickets.length){ticketsEl.innerHTML='<div class="tk-empty">還沒有訂單。點有「!」的桌子幫客人點餐。</div>';tkRefs=[];ticketsLayout();return}
- ticketsEl.innerHTML=R.tickets.map(tk=>{const g=tk.g;return`<div class="tk ${g.reg?(g.reg==='dylan'?'isdylan':'isreg'):g.type==='vip'?'isvip':''}" data-tk="${tk.id}"><div class="tk-h"><b>T${tk.no}</b><em data-w>0:00</em></div><div class="tk-who"><img alt="" src="${guestPortrait(g)}"><span>${g.reg==='dylan'?'Dylan':g.name}</span>${g.via==='camp'?'<i class="via" title="看到宣傳來的">📱</i>':''}</div><div class="tk-items">${tk.items.map((it,i)=>`<button class="it ${it.st}" data-tk="${tk.id}" data-i="${i}" aria-label="${DISH(it.d).n}"><img alt="" src="${dishURL(it.d,it.st==='ready'||it.st==='served'?it.q:'G',it.want)}">${it.d==='steak'?`<span class="tag">${STEAK_S[it.want]}</span>`:''}${it.st==='ready'?'<span class="ok">✓</span>':''}${it.st==='order'?'<span class="dl">叫貨中</span>':''}</button>`).join('')}</div><div class="tk-pat"><i data-p></i></div>${(()=>{const st=treatState(g);if(!st.k)return'';if(st.k==='offer')return`<button class="tk-treat" data-treat="${tk.id}" aria-label="招待，今天還可以 ${st.left} 桌">招待<i>${st.left}</i></button>`;return`<span class="tk-treat ${st.k}" title="${st.n}">${st.n}</span>`})()}</div>`}).join('');ticketsLayout();
+ ticketsEl.innerHTML=R.tickets.map(tk=>{const g=tk.g;return`<div class="tk${tk.items.length>5?' big':''} ${g.reg?(g.reg==='dylan'?'isdylan':'isreg'):g.type==='vip'?'isvip':''}" data-tk="${tk.id}"><div class="tk-h"><b>T${tk.no}</b><em data-w>0:00</em></div><div class="tk-who"><img alt="" src="${guestPortrait(g)}"><span>${g.reg==='dylan'?'Dylan':g.name}</span>${g.via==='camp'?'<i class="via" title="看到宣傳來的">📱</i>':''}</div><div class="tk-items">${tk.items.map((it,i)=>`<button class="it ${it.st}" data-tk="${tk.id}" data-i="${i}" aria-label="${DISH(it.d).n}"><img alt="" src="${dishURL(it.d,it.st==='ready'||it.st==='served'?it.q:'G',it.want)}">${it.d==='steak'?`<span class="tag">${STEAK_S[it.want]}</span>`:''}${it.st==='ready'?'<span class="ok">✓</span>':''}${it.st==='order'?'<span class="dl">叫貨中</span>':''}</button>`).join('')}</div><div class="tk-pat"><i data-p></i></div>${(()=>{const st=treatState(g);if(!st.k)return'';if(st.k==='offer')return`<button class="tk-treat" data-treat="${tk.id}" aria-label="招待，今天還可以 ${st.left} 桌">招待<i>${st.left}</i></button>`;return`<span class="tk-treat ${st.k}" title="${st.n}">${st.n}</span>`})()}</div>`}).join('');ticketsLayout();
  tkRefs=[...ticketsEl.querySelectorAll('.tk')].map(el=>({el,tk:R.tickets.find(t=>t.id===+el.dataset.tk),w:el.querySelector('[data-w]'),p:el.querySelector('[data-p]')}));updTicketBars()}
 function updTicketBars(){if(!R)return;for(const r of tkRefs){if(!r.tk)continue;const e=Math.floor(R.t-r.tk.t0);r.w.textContent=`${Math.floor(e/60)}:${String(e%60).padStart(2,'0')}`;const p=r.tk.g.pat;r.p.style.width=(p*100)+'%';r.p.style.background=p>.55?'#5E8F4E':p>.28?'#E0A43A':'#D4553A';r.el.classList.toggle('urgent',p<.28)}}
 /* a long press on a game control (hold-and-release cooking, buttons, the room) must never become a text
@@ -3476,21 +3484,24 @@ function renderStock(){const p=$('#stockPanel');if(!p||p.hidden||!R)return;const
   if(a==='buy'){const d=b.dataset.d,n=+b.dataset.n;buyEmergency(d,n);renderStock();stockChip()}});
  $('#stockChip').addEventListener('click',()=>openStock())}}
 /* ---- room navigation: tabs with badges (what needs you where), swipe on the scene, keys 1–4 on a keyboard ---- */
-const ROOM_ORDER=['front','main','side','up','lounge','kitchen'];
+const ROOM_ORDER=['front','main','side','up','staff','pdr','lounge','kitchen'];   /* v2.4 rc6: the two rooms on the floor */
 function roomsOpen(){return ROOM_ORDER.filter(roomOpen)}
-function setRoom(k){if(!roomOpen(k)||k===room)return;room=k;forceDraw=true;sfx.tap();renderRoomTabs(true)}
+function setRoom(k){if(!roomOpen(k)||k===room)return;room=k;if(UP_ROOMS.includes(k))upLastRoom=k;forceDraw=true;sfx.tap();renderRoomTabs(true)}
 function roomAlerts(){const A={};for(const k of ROOM_ORDER)A[k]={n:0,u:0};if(!R||phase!=='service')return A;
  for(const t of R.tables){const k=t.room||'main';const g=t.group;if(!g){if(t.dirty)A[k].n++;continue}if(g.rowdy){A[k].n++;A[k].u++;continue}if(g.state==='order'||g.state==='check'||(g.state==='wait'&&g.ticket&&g.ticket.items.some(i=>i.st==='ready'&&!i.picked))){A[k].n++;if(g.pat<.3)A[k].u++}}
  for(const s0 of R.slots){if(s0.broken){A.kitchen.n++;A.kitchen.u++;continue}const j=s0.job;if(j&&!chefHandles(s0)){const u=urgency(j);if(u>=2){A.kitchen.n++;if(u>=3)A.kitchen.u++}}}
  for(const tk of R.tickets)for(const it of tk.items)if(it.st==='pending'&&!chefCanAny(it.d)){A.kitchen.n++;break}
  const q=queued().length;if(q){A.main.n+=q}return A}
 let tabsHTML='';
-function roomIsNew(k){const nr=S.newRooms||{};const d=k==='side'?nr.side:k==='up'?nr.up:k==='lounge'?nr.lounge:k==='kitchen'?Math.max(nr.kext||0,nr.cooler||0,nr.pass||0):k==='front'?Math.max(nr.terrace||0,...EXTERIOR.map(e=>S.ext&&S.ext[e.k]?0:0)):0;return!!d&&S.day-d<=1}
+function roomIsNew(k){const nr=S.newRooms||{};const d=k==='side'?nr.side:k==='up'?nr.up:k==='staff'?nr.staff:k==='pdr'?nr.pdr:k==='lounge'?nr.lounge:k==='kitchen'?Math.max(nr.kext||0,nr.cooler||0,nr.pass||0):k==='front'?Math.max(nr.terrace||0,...EXTERIOR.map(e=>S.ext&&S.ext[e.k]?0:0)):0;return!!d&&S.day-d<=1}
 function peeking(){const p=$('#peekPill');return!!p&&!p.hidden}   /* v2.2.1 #8: 看店裡 from the shop or the prep screen */
 function renderRoomTabs(force){const el=$('#roomTabs');if(!el)return;const show=(phase==='service'&&!!R)||(phase!=='service'&&peeking()&&roomsOpen().length>1);el.hidden=!show;if(!show)return;const A=roomAlerts();
- const h=roomsOpen().map(k=>`<button data-room="${k}" class="${k===room?'on':''}${A[k].u?' urgent':''}${roomIsNew(k)&&k!==room?' new':''}"><span>${ROOMS[k].n}</span>${A[k].n?`<b>${A[k].n}</b>`:roomIsNew(k)&&k!==room?'<b class="nw">NEW</b>':''}</button>`).join('');
+ const open0=roomsOpen();const grp=UP_ROOMS.filter(k=>open0.includes(k));const inUp=UP_ROOMS.includes(room);const h=open0.filter(k=>grp.length<2||!UP_ROOMS.includes(k)||k==='up').map(k=>k==='up'&&grp.length>1?(()=>{/* v2.4 rc6: one tab for the floor and its rooms */const n=grp.reduce((a,q)=>a+A[q].n,0),u=grp.some(q=>A[q].u),nw=grp.some(q=>roomIsNew(q))&&!inUp;return`<button data-room="upgrp" class="${inUp?'on':''}${u?' urgent':''}${nw?' new':''}"><span>${ROOMS[inUp?room:'up'].n}</span>${n?`<b>${n}</b>`:nw?'<b class="nw">NEW</b>':''}</button>`})():`<button data-room="${k}" class="${k===room?'on':''}${A[k].u?' urgent':''}${roomIsNew(k)&&k!==room?' new':''}"><span>${ROOMS[k].n}</span>${A[k].n?`<b>${A[k].n}</b>`:roomIsNew(k)&&k!==room?'<b class="nw">NEW</b>':''}</button>`).join('');
  if(force||h!==tabsHTML){tabsHTML=h;el.innerHTML=h}}
-{const rt=$('#roomTabs');if(rt)rt.addEventListener('click',e=>{const b=e.target.closest('[data-room]');if(b)setRoom(b.dataset.room)})}
+{const rt=$('#roomTabs');if(rt)rt.addEventListener('click',e=>{const b=e.target.closest('[data-room]');if(!b)return;if(b.dataset.room==='upgrp')upTabTap();else setRoom(b.dataset.room)})}
+/* v2.4 rc6: the floor's tab — on the floor it goes round its rooms; from elsewhere, to the one that needs you (else the last one you were in) */
+function upTabTap(){const open=roomsOpen();const grp=UP_ROOMS.filter(k=>open.includes(k));if(UP_ROOMS.includes(room)){const i=grp.indexOf(room);setRoom(grp[(i+1)%grp.length]);return}const A=roomAlerts();const need=grp.find(k=>A[k].u)||grp.find(k=>A[k].n);setRoom(need||(grp.includes(upLastRoom)?upLastRoom:'up'))}
+let upLastRoom='up';
 /* v2.2 X: keyboard — Space pauses and resumes a service, Escape closes what is open (a dialogue line, the lightbox, a
    sheet, the pause menu), Enter/Space steps a dialogue. Only when nothing is being typed. */
 document.addEventListener('keydown',e=>{if(e.target&&/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))return;if(e.key==='Enter'||e.key===' '){if($('#dlg')&&!$('#dlg').hidden){e.preventDefault();dlgNext();return}}
@@ -3593,7 +3604,7 @@ function drawChair(c,x,y,side,back){const tier=S.decor.chairs;const wood=tier===
  if(back){c.fillStyle=tier===2?'#B9A88F':wood;rr(c,x-9,y-26,18,16,tier===1?8:3);c.fill();if(tier===1){c.fillStyle='#4E3020';rr(c,x-6,y-23,12,10,5);c.fill()}if(tier===2){c.fillStyle='#CDBFA9';rr(c,x-7,y-24,14,11,4);c.fill()}return}
  const bx=x+side*8;c.fillStyle=wood;c.fillRect(bx-1.5,y-26,3,26);if(tier===2){/* v2.2 I+: an upholstered back in the booths' oatmeal on a charcoal frame */c.fillStyle='#CDBFA9';rr(c,bx-3.4,y-26,6.8,18,3);c.fill();c.fillStyle=wood;c.fillRect(bx-3.4,y-9,6.8,1.2)}else if(tier===1){c.strokeStyle=wood;c.lineWidth=2.4;c.beginPath();c.arc(bx,y-20,6,Math.PI*.5+side*.8,Math.PI*1.5+side*.8,side>0);c.stroke()}else{/* a plain wooden back: two slats and a top rail */c.fillStyle=wood;rr(c,bx-3.2,y-26,6.4,3,1.2);c.fill();c.fillStyle=shade(wood,-.12);c.fillRect(bx-3.2,y-22,1.4,14);c.fillRect(bx+1.8,y-22,1.4,14)}
  softShadow(c,x,y+4,9,2.6,.16);c.fillStyle=seat;el(c,x,y-4,9,3.6);c.fillStyle='rgba(255,255,255,.18)';el(c,x-2,y-5,4.5,1.4);c.fillStyle=wood;c.fillRect(x-7,y-3,2,8);c.fillRect(x+5,y-3,2,8)}
-function drawTableFull(c,t,now){const g=t.group;const seated=g&&['reading','order','wait','eat','check'].includes(g.state);const seats=seatPos(t);const four=t.seats===4;const L=S.level;
+function drawTableFull(c,t,now){if(t.pdr){drawPdrTable(c,t,now);return}const g=t.group;const seated=g&&['reading','order','wait','eat','check'].includes(g.state);const seats=seatPos(t);const four=t.seats===4;const L=S.level;
  softShadow(c,t.x,t.y+6,four?40:31,four?12:10,.24);
  if(four){/* v2.2 I+: quiet luxury — oatmeal upholstery, a walnut base, one brass line; the burgundy is gone */c.fillStyle='#B9A88F';rr(c,t.x-34,t.y-40,68,26,9);c.fill();c.fillStyle='#CDBFA9';rr(c,t.x-32,t.y-38,64,20,7);c.fill();c.fillStyle='#5E3B22';rr(c,t.x-34,t.y-20,68,10,4);c.fill();c.strokeStyle='rgba(0,0,0,.1)';c.lineWidth=1;for(let k=-2;k<=2;k++){c.beginPath();c.moveTo(t.x+k*13,t.y-37);c.lineTo(t.x+k*13,t.y-22);c.stroke()}c.fillStyle='#C99A45';c.fillRect(t.x-34,t.y-41,68,1.6)}
  const order=seats.map((sp,k)=>({sp,k})).sort((a,b)=>a.sp.dy-b.sp.dy);
@@ -3733,7 +3744,7 @@ function blitBg(c,cv,X0,XW,TOP){const T2=Math.round(TOP);c.drawImage(cv,X0,-T2,X
 function drawArch(c,x,y,w,h,label){c.fillStyle='#8A6A42';rr(c,x-4,y-4,w+8,h+6,6);c.fill();c.fillStyle='#2A1C16';rr(c,x,y,w,h+2,5);c.fill();let g=c.createLinearGradient(0,y,0,y+h);g.addColorStop(0,'rgba(255,214,150,.08)');g.addColorStop(1,'rgba(255,214,150,.4)');c.fillStyle=g;rr(c,x,y,w,h+2,5);c.fill();
  c.fillStyle='rgba(255,230,180,.22)';c.fillRect(x+6,y+h-14,w-12,14);/* light spilling onto the floor, and a mat with the sign */let fg=c.createLinearGradient(0,y+h,0,y+h+26);fg.addColorStop(0,'rgba(255,214,150,.3)');fg.addColorStop(1,'rgba(255,214,150,0)');c.fillStyle=fg;c.fillRect(x-6,y+h,w+12,26);c.fillStyle='#8A3A2A';rr(c,x-2,y+h+8,w+4,12,3);c.fill();c.fillStyle='rgba(255,255,255,.12)';rr(c,x,y+h+9.5,w,3,1.5);c.fill();c.fillStyle='#F6EEDF';c.font=`800 6.5px ${FONT}`;c.textAlign='center';c.textBaseline='middle';c.fillText(label,x+w/2,y+h+14.4);c.textBaseline='alphabetic'}
 function drawOtherRoom(c,now,dusk,V,X0,XW,TOP){const k=room;const J=V.jill;const list=[];
- if(k==='kitchen')drawKitchenRoom(c,now,dusk,V,X0,XW,TOP,list);else if(k==='side')drawSideRoom(c,now,dusk,V,X0,XW,TOP,list);else if(k==='lounge')drawLoungeRoom(c,now,dusk,V,X0,XW,TOP,list);else if(k==='up')drawUpRoom(c,now,dusk,V,X0,XW,TOP,list);else drawFrontRoom(c,now,dusk,V,X0,XW,TOP,list);
+ if(k==='kitchen')drawKitchenRoom(c,now,dusk,V,X0,XW,TOP,list);else if(k==='side')drawSideRoom(c,now,dusk,V,X0,XW,TOP,list);else if(k==='lounge')drawLoungeRoom(c,now,dusk,V,X0,XW,TOP,list);else if(k==='up')drawUpRoom(c,now,dusk,V,X0,XW,TOP,list);else if(k==='staff')drawStaffRoom(c,now,dusk,V,X0,XW,TOP,list);else if(k==='pdr')drawPdrRoom(c,now,dusk,V,X0,XW,TOP,list);else drawFrontRoom(c,now,dusk,V,X0,XW,TOP,list);
  for(const t of V.tables)if((t.room||'main')===k&&t.kind!=='bar')list.push({y:t.y,f:()=>drawTableFull(c,t,now)});
  for(const g of V.groups)if(WALK_ST.includes(g.state)&&(g.room||'main')===k)list.push({y:g.y,f:()=>drawWalkers(c,g,now)});
  if(!J.sofa&&(J.room||'main')===k)list.push({y:J.y,f:()=>drawJillAt(c,J,V,now)});
@@ -3744,7 +3755,7 @@ function drawOtherRoom(c,now,dusk,V,X0,XW,TOP){const k=room;const J=V.jill;const
  list.sort((a,b)=>a.y-b.y).forEach(i=>i.f());
  /* the light of the hour, as in the dining room (the street bakes it into its sky) */
  if(k!=='front'){c.save();c.globalCompositeOperation='multiply';c.fillStyle=k==='lounge'?mix(wxTint(tintFor(dusk)),'#5A4E48',.55):wxTint(tintFor(dusk));c.fillRect(X0,-TOP,XW,LH+TOP);/* v2.3: the Lounge is dimmer, whatever the hour */c.restore();
-  /* the room's own lamps come up with the evening */c.save();c.globalCompositeOperation='lighter';const lk=.1+clamp(dusk,0,1)*.22;const spots=k==='side'?[{x:104,y:40,r:90,k:1},{x:296,y:40,r:90,k:1},{x:200,y:150,r:130,k:.8}]:k==='lounge'?[{x:242,y:150,r:96,k:1.5,col:'255,190,110'},{x:322,y:150,r:96,k:1.5,col:'255,190,110'},{x:296,y:70,r:120,k:1.1,col:'255,200,130'}].concat(V.tables.filter(t=>t.room==='lounge'&&t.kind!=='bar').map(t=>({x:t.x-34,y:t.y-30,r:74,k:1.35,col:'255,196,120'}))):k==='up'?upLampSpots():[{x:KX.range.x+KX.range.w/2,y:60,r:120,k:.9,col:'255,236,190'},{x:132,y:KY.rail+20,r:70,k:.9},{x:200,y:KY.rail+20,r:70,k:.9},{x:268,y:KY.rail+20,r:70,k:.9},{x:200,y:LH-60,r:90,k:.5}];
+  /* the room's own lamps come up with the evening */c.save();c.globalCompositeOperation='lighter';const lk=.1+clamp(dusk,0,1)*.22;const spots=k==='side'?[{x:104,y:40,r:90,k:1},{x:296,y:40,r:90,k:1},{x:200,y:150,r:130,k:.8}]:k==='lounge'?[{x:242,y:150,r:96,k:1.5,col:'255,190,110'},{x:322,y:150,r:96,k:1.5,col:'255,190,110'},{x:296,y:70,r:120,k:1.1,col:'255,200,130'}].concat(V.tables.filter(t=>t.room==='lounge'&&t.kind!=='bar').map(t=>({x:t.x-34,y:t.y-30,r:74,k:1.35,col:'255,196,120'}))):k==='up'?upLampSpots():k==='staff'?[{x:200,y:30,r:150,k:.9},{x:360,y:60,r:70,k:.7}]:k==='pdr'?[{x:200,y:PDL_TABLE().y-90,r:160,k:1.1,col:'255,200,130'},{x:340,y:70,r:70,k:.6}]:[{x:KX.range.x+KX.range.w/2,y:60,r:120,k:.9,col:'255,236,190'},{x:132,y:KY.rail+20,r:70,k:.9},{x:200,y:KY.rail+20,r:70,k:.9},{x:268,y:KY.rail+20,r:70,k:.9},{x:200,y:LH-60,r:90,k:.5}];
   for(const L0 of spots){let g=c.createRadialGradient(L0.x,L0.y,2,L0.x,L0.y+30,L0.r);g.addColorStop(0,`rgba(${L0.col||'255,196,120'},${lk*L0.k})`);g.addColorStop(1,'rgba(255,170,90,0)');c.fillStyle=g;c.fillRect(L0.x-L0.r,L0.y-L0.r,L0.r*2,L0.r*2.4)}
   if(k==='side'||k==='lounge')for(const t of V.tables){if(t.room!==k)continue;let g=c.createRadialGradient(t.x,t.y-15,1,t.x,t.y-15,26);g.addColorStop(0,`rgba(255,190,100,${.1+dusk*.12})`);g.addColorStop(1,'rgba(255,190,100,0)');c.fillStyle=g;c.fillRect(t.x-26,t.y-41,52,52)}c.restore()}
  if(R){const pulse=(Math.sin(now*6)+1)/2;for(const t of R.tables)if((t.room||'main')===k)drawTableOverlay(c,t,now,pulse);
@@ -4036,13 +4047,13 @@ function drawUpRoom(c,now,dusk,V,X0,XW,TOP,list){const d=clamp(dusk,0,1);const t
  list.push({y:s.y+88,f:()=>{c.fillStyle='#3A2A1E';c.fillRect(s.x-4,s.y+60,6,30)}});
  /* the landlord's things: a plant in one corner, boxes and a step ladder in the other, a folding table and two chairs
     by the left wall. Once the floor is Jill's: two boxes left from the works, and what has been carried up since */
- list.push({y:118,f:()=>drawPlant(c,58,118,'tall')});
+ if(!pdOn())list.push({y:118,f:()=>drawPlant(c,58,118,'tall')});   /* v2.4 rc6: it went into the Private Dining Room */
  const box=(x,y,w,h)=>list.push({y,f:()=>{c.fillStyle='rgba(0,0,0,.14)';el(c,x+w/2,y+1,w*.6,3);c.fillStyle='#B98E5E';c.fillRect(x,y-h,w,h);c.fillStyle='#A47A4C';c.fillRect(x,y-h,w,4);c.fillStyle='rgba(255,255,255,.25)';c.fillRect(x+w/2-1,y-h,2,h)}});
  box(320,122,22,18);box(343,127,20,14);if(!taken){box(328,104,18,14);box(50,240,22,16);box(54,222,16,12);box(300,118,16,10)}
  if(!taken){/* the step ladder */list.push({y:124,f:()=>{c.strokeStyle='#8A8E92';c.lineWidth=1.8;c.beginPath();c.moveTo(352,126);c.lineTo(359,90);c.lineTo(366,126);c.stroke();for(let k=0;k<3;k++){c.beginPath();c.moveTo(353+k*1.8,119-k*10);c.lineTo(365-k*1.8,119-k*10);c.stroke()}}});
   /* the folding table and chairs */const ty=Math.round(92+(LH-92)*.62);list.push({y:ty,f:()=>{c.fillStyle='rgba(0,0,0,.14)';el(c,82,ty+2,30,5);c.fillStyle='#8A6A48';c.fillRect(56,ty-20,54,6);c.fillStyle='#9E7C58';c.fillRect(56,ty-20,54,2);c.strokeStyle='#5A5550';c.lineWidth=1.3;c.beginPath();c.moveTo(60,ty-14);c.lineTo(65,ty);c.moveTo(106,ty-14);c.lineTo(101,ty);c.stroke()}});
   for(const [x,y] of[[122,ty-4],[74,ty+24]])list.push({y,f:()=>drawFoldChair(c,x,y)})}
- if(taken)drawUpFurniture(c,list,now,d);
+ if(taken){drawUpFurniture(c,list,now,d);upRoomsDraw(c,list,now,d)}
  if(!taken&&d>.45){const a=lamps?.14:.52*Math.min(1,(d-.45)/.35);list.push({y:1e6,f:()=>{c.fillStyle=`rgba(14,14,30,${a})`;c.fillRect(X0,-TOP,XW,LH+TOP);
   c.save();c.globalCompositeOperation='lighter';const e=UP_L.entry;let g=c.createRadialGradient(e.x+46,e.y-50,8,e.x+46,e.y-50,160);g.addColorStop(0,`rgba(255,200,130,${lamps?.04:.2})`);g.addColorStop(1,'rgba(255,200,130,0)');c.fillStyle=g;c.fillRect(e.x-140,e.y-230,330,290);
   for(const w of UP_L.win){let wg=c.createLinearGradient(0,92,0,260);wg.addColorStop(0,`rgba(150,170,225,${lamps?.03:.11})`);wg.addColorStop(1,'rgba(150,170,225,0)');c.fillStyle=wg;c.beginPath();c.moveTo(w.x+6,92);c.lineTo(w.x+w.w-6,92);c.lineTo(w.x+w.w+22,260);c.lineTo(w.x+22,260);c.closePath();c.fill()}c.restore()}})}
@@ -4050,19 +4061,19 @@ function drawUpRoom(c,now,dusk,V,X0,XW,TOP,list){const d=clamp(dusk,0,1);const t
 function drawFoldChair(c,x,y){c.save();c.translate(x,y);c.scale(1.25,1.25);x=0;y=0;drawFoldChair0(c,x,y);c.restore()}
 function drawFoldChair0(c,x,y){c.strokeStyle='#4A4A50';c.lineWidth=1.2;c.beginPath();c.moveTo(x-6,y);c.lineTo(x+5,y-14);c.moveTo(x+5,y);c.lineTo(x-6,y-14);c.stroke();c.fillStyle='#3E3E44';c.fillRect(x-7,y-12,13,3);c.fillRect(x-7,y-24,3,13);c.fillStyle='#55555C';c.fillRect(x-7,y-24,12,5)}
 /* the floor once it is Jill's: what has been carried up, in the order it came (S.up.furn: the day each arrives) */
-function drawUpFurniture(c,list,now,d){const mid=Math.round(92+(LH-92)*.36);
- if(upHas('table')){const x=122,y=mid;list.push({y,f:()=>{c.fillStyle='rgba(0,0,0,.16)';el(c,x,y+5,52,8);c.fillStyle='#8A5E3A';rr(c,x-48,y-28,96,26,2);c.fill();c.fillStyle='#A3744A';c.fillRect(x-48,y-28,96,5);c.fillStyle='#6B4628';c.fillRect(x-44,y-2,5,12);c.fillRect(x+39,y-2,5,12);if(upTrace('cup')){c.fillStyle='#F3EDE2';rr(c,x+14,y-21,6,6,1.5);c.fill();c.fillStyle='#7A4E2E';c.fillRect(x+15,y-20,4,1.5)}if(upTrace('charger')){c.fillStyle='#2E2E34';rr(c,x-20,y-19,9,5,1);c.fill();c.strokeStyle='#E8E4DC';c.lineWidth=.8;c.beginPath();c.moveTo(x-11,y-17);c.quadraticCurveTo(x-4,y-8,x-2,y-2);c.stroke()}}});
-  for(const [cx,cy,k] of[[x-58,mid-4,0],[x+58,mid-4,1],[x-6,mid+22,2]])list.push({y:cy,f:()=>{c.save();c.translate(cx,cy);c.scale(1.3,1.3);drawOddChair(c,0,0,k);c.restore()}});
+function drawUpFurniture(c,list,now,d){const so=srOn();/* v2.4 rc6: with the Staff Room on the left the shared table moves over to the right window; the cabinet, the floor lamp, the coat stand and one chair went into the room */const mid=so?upTableY():Math.round(92+(LH-92)*.36);
+ if(upHas('table')){const x=so?296:122,y=mid;list.push({y,f:()=>{c.fillStyle='rgba(0,0,0,.16)';el(c,x,y+5,52,8);c.fillStyle='#8A5E3A';rr(c,x-48,y-28,96,26,2);c.fill();c.fillStyle='#A3744A';c.fillRect(x-48,y-28,96,5);c.fillStyle='#6B4628';c.fillRect(x-44,y-2,5,12);c.fillRect(x+39,y-2,5,12);if(upTrace('cup')){c.fillStyle='#F3EDE2';rr(c,x+14,y-21,6,6,1.5);c.fill();c.fillStyle='#7A4E2E';c.fillRect(x+15,y-20,4,1.5)}if(upTrace('charger')){c.fillStyle='#2E2E34';rr(c,x-20,y-19,9,5,1);c.fill();c.strokeStyle='#E8E4DC';c.lineWidth=.8;c.beginPath();c.moveTo(x-11,y-17);c.quadraticCurveTo(x-4,y-8,x-2,y-2);c.stroke()}}});
+  for(const [cx,cy,k] of[[x-58,mid-4,0],[x+58,mid-4,1],[x-6,mid+22,2]].filter(q=>!so||q[2]!==0))list.push({y:cy,f:()=>{c.save();c.translate(cx,cy);c.scale(1.3,1.3);drawOddChair(c,0,0,k);c.restore()}});
   if(upTrace('bag'))list.push({y:mid-3,f:()=>{c.fillStyle='#3E4E5E';rr(c,x+50,mid-26,14,12,2);c.fill();c.strokeStyle='#2A3440';c.lineWidth=1.1;c.beginPath();c.arc(x+57,mid-26,4.5,Math.PI,0);c.stroke()}})}
- if(upHas('cabinet')){const y=Math.round(92+(LH-92)*.2),x0=50;list.push({y,f:()=>{c.fillStyle='rgba(0,0,0,.14)';el(c,x0+30,y+2,30,4);c.fillStyle='#7A5232';c.fillRect(x0,y-34,60,34);c.fillStyle='#8E6440';c.fillRect(x0,y-34,60,5);c.fillStyle='#5E3E24';c.fillRect(x0+30,y-28,1,26);c.fillRect(x0+4,y-16,22,1);c.fillStyle='#C99A45';circ(c,x0+26,y-14,1.3);circ(c,x0+35,y-14,1.3);circ(c,x0+15,y-22,1.2)}})}
- if(upHas('coat')){const y=Math.round(92+(LH-92)*.52),x=60;list.push({y,f:()=>{c.fillStyle='rgba(0,0,0,.14)';el(c,x,y+1,9,3);c.fillStyle='#6B4628';c.fillRect(x-1.5,y-64,3,64);c.fillRect(x-9,y-2,18,3);c.fillRect(x-8,y-62,16,2.2);if(upTrace('coat')){c.fillStyle='#A8B0A0';c.beginPath();c.moveTo(x-6,y-60);c.lineTo(x+6,y-60);c.lineTo(x+8,y-30);c.lineTo(x-8,y-30);c.closePath();c.fill()}}})}
- if(upHas('lamp')){const y=Math.round(92+(LH-92)*.3),x=78;list.push({y,f:()=>{c.fillStyle='rgba(0,0,0,.12)';el(c,x,y+1,8,2.5);c.fillStyle='#5A4A3A';c.fillRect(x-1,y-52,2,52);c.fillRect(x-6,y-1.5,12,2);c.fillStyle=d>.3?'#FFE9B8':'#EFE2C8';c.beginPath();c.moveTo(x-9,y-52);c.lineTo(x+9,y-52);c.lineTo(x+6,y-66);c.lineTo(x-6,y-66);c.closePath();c.fill();if(d>.3){c.save();c.globalCompositeOperation='lighter';let g=c.createRadialGradient(x,y-56,3,x,y-56,52);g.addColorStop(0,'rgba(255,214,150,.3)');g.addColorStop(1,'rgba(255,214,150,0)');c.fillStyle=g;c.fillRect(x-52,y-108,104,104);c.restore()}}})}
+ if(upHas('cabinet')&&!so){const y=Math.round(92+(LH-92)*.2),x0=50;list.push({y,f:()=>{c.fillStyle='rgba(0,0,0,.14)';el(c,x0+30,y+2,30,4);c.fillStyle='#7A5232';c.fillRect(x0,y-34,60,34);c.fillStyle='#8E6440';c.fillRect(x0,y-34,60,5);c.fillStyle='#5E3E24';c.fillRect(x0+30,y-28,1,26);c.fillRect(x0+4,y-16,22,1);c.fillStyle='#C99A45';circ(c,x0+26,y-14,1.3);circ(c,x0+35,y-14,1.3);circ(c,x0+15,y-22,1.2)}})}
+ if(upHas('coat')&&!so){const y=Math.round(92+(LH-92)*.52),x=60;list.push({y,f:()=>{c.fillStyle='rgba(0,0,0,.14)';el(c,x,y+1,9,3);c.fillStyle='#6B4628';c.fillRect(x-1.5,y-64,3,64);c.fillRect(x-9,y-2,18,3);c.fillRect(x-8,y-62,16,2.2);if(upTrace('coat')){c.fillStyle='#A8B0A0';c.beginPath();c.moveTo(x-6,y-60);c.lineTo(x+6,y-60);c.lineTo(x+8,y-30);c.lineTo(x-8,y-30);c.closePath();c.fill()}}})}
+ if(upHas('lamp')&&!so){const y=Math.round(92+(LH-92)*.3),x=78;list.push({y,f:()=>{c.fillStyle='rgba(0,0,0,.12)';el(c,x,y+1,8,2.5);c.fillStyle='#5A4A3A';c.fillRect(x-1,y-52,2,52);c.fillRect(x-6,y-1.5,12,2);c.fillStyle=d>.3?'#FFE9B8':'#EFE2C8';c.beginPath();c.moveTo(x-9,y-52);c.lineTo(x+9,y-52);c.lineTo(x+6,y-66);c.lineTo(x-6,y-66);c.closePath();c.fill();if(d>.3){c.save();c.globalCompositeOperation='lighter';let g=c.createRadialGradient(x,y-56,3,x,y-56,52);g.addColorStop(0,'rgba(255,214,150,.3)');g.addColorStop(1,'rgba(255,214,150,0)');c.fillStyle=g;c.fillRect(x-52,y-108,104,104);c.restore()}}})}
  if(upHas('cushion')){const x=250,y=UP_L.col.base+14;list.push({y,f:()=>{c.fillStyle='rgba(0,0,0,.12)';el(c,x,y+2,15,4);c.fillStyle='#9AA88E';el(c,x,y,15,6);c.fillStyle='#B4C0A8';el(c,x,y-1.5,11,4)}})}
  if(upHas('stool')){const x=UP_L.sill.x+40,y=114;list.push({y,f:()=>{c.fillStyle='rgba(0,0,0,.12)';el(c,x,y+1,8,2.5);c.fillStyle='#8E6440';rr(c,x-8,y-16,16,4,1.5);c.fill();c.fillStyle='#6B4628';c.fillRect(x-6,y-12,2,12);c.fillRect(x+4,y-12,2,12)}})}
  if(upHas('scratch')){const x=350,y=Math.round(92+(LH-92)*.42);list.push({y,f:()=>{c.fillStyle='#C9A878';c.save();c.translate(x,y);c.rotate(-.22);c.fillRect(-4,-30,8,30);c.fillStyle='rgba(120,90,50,.35)';for(let k=0;k<6;k++)c.fillRect(-4,-28+k*4.5,8,1);c.restore()}})}}
 function drawOddChair(c,x,y,k){/* three chairs that came from three places */const C=[['#8A5E3A','#A3744A'],['#5E4030','#74503A'],['#4A4A50','#5E5E66']][k];c.fillStyle='rgba(0,0,0,.14)';el(c,x,y+1,8,2.5);c.fillStyle=C[0];c.fillRect(x-7,y-10,14,3);c.fillRect(x-7,y-7,2,7);c.fillRect(x+5,y-7,2,7);c.fillStyle=C[1];if(k===2){c.fillRect(x-7,y-22,3,13);c.fillRect(x-7,y-22,12,5)}else{c.fillRect(x-7,y-24,14,3);c.fillRect(x-7,y-24,2,15);c.fillRect(x+5,y-24,2,15);if(k===0)for(let i=0;i<3;i++)c.fillRect(x-3+i*3,y-21,1.2,11)}}
 /* the second floor's own light: the two pendants once someone switches them on (and the floor lamp, once it is there) */
-function upLampSpots(){const d=clamp(duskF(),0,1);const on=upTaken()?d>.3:!!(R&&R.upLights);if(!on)return[];const S0=[{x:110,y:110,r:130,k:1},{x:290,y:110,r:130,k:1}];if(upTaken()&&upHas('lamp'))S0.push({x:78,y:Math.round(92+(LH-92)*.3)-60,r:70,k:.9});return S0}
+function upLampSpots(){const d=clamp(duskF(),0,1);const on=upTaken()?d>.3:!!(R&&R.upLights);if(!on)return[];const S0=[{x:110,y:110,r:130,k:1},{x:290,y:110,r:130,k:1}];if(upTaken()&&upHas('lamp')&&!srOn())S0.push({x:78,y:Math.round(92+(LH-92)*.3)-60,r:70,k:.9});return S0}
 function upTrace(k){const t=S.up&&S.up.traces;return !!(t&&t[k]!=null&&S.day>=t[k])}
 /* the stair door in the side room's near edge: closed, a wooden door between two jambs with a mat in front; the night
    it did not latch, it stands a hand open and the stairwell's light lies on the floor */
@@ -4073,6 +4084,501 @@ function drawUpDoor(c,now){const x=UPDOOR.x,y=FB+2;const ajar=!!(R&&R.upDoor);
   c.fillStyle='#2A1C14';c.fillRect(x-19,y-22,38,22);c.fillStyle='#FFE1A0';c.fillRect(x-6,y-22,8,22);c.fillStyle='#8A6440';c.beginPath();c.moveTo(x-19,y-22);c.lineTo(x-6,y-25);c.lineTo(x-6,y-1);c.lineTo(x-19,y);c.closePath();c.fill()}
  else{c.fillStyle='#8A6440';c.fillRect(x-19,y-22,38,22);c.fillStyle='#9E7550';c.fillRect(x-19,y-22,38,3);c.strokeStyle='rgba(60,40,25,.45)';c.lineWidth=.8;rr(c,x-15,y-18,13,14,1);c.stroke();rr(c,x+2,y-18,13,14,1);c.stroke();c.fillStyle='#D9B060';circ(c,x+13,y-11,1.6)}
  c.fillStyle='#7A3A2E';rr(c,x-15,y-36,30,9,2);c.fill();c.fillStyle='rgba(255,240,210,.3)';c.fillRect(x-12,y-33,24,1.2)}
+/* ================= v2.4 P3 + P4 (rc6): the Staff Room and the Private Dining Room =================
+   docs/v24/rc6_final_spec_0300_2026-10-02.txt (the player's final spec; it wins), staff_room_brief and
+   private_dining_room_brief with their two reference pictures, second_floor_and_long_arcs §24–27, the 13:37 canon,
+   AUDIT_AND_PLAN §8. Two rooms grow inside the open floor, each the answer to its own need: the people who work here
+   have nowhere that is not work (《大家待的地方》); some tables need a door more than a bigger table (《關上門以後》).
+   Real walls and doors; each room has its own view, drawn from the player's picture; the floor between them stays
+   open — the middle, the right window, the stairs, the corner nobody has decided about. */
+ROOMS.staff={n:'休息室'};ROOMS.pdr={n:'包廂'};
+const UP_ROOMS=['up','staff','pdr'];
+/* where they stand on the floor (B): the Private Dining Room in the left window bay — the floor's left window is its
+   window; the Staff Room inside, below it, no window. Logical coordinates of the 二樓 view; the depth follows LH. */
+const UPR={
+ get pd(){const H=LH-92;return{x0:22,x1:186,y0:92,y1:92+Math.round(clamp(H*.24,104,170))}},
+ get sr(){const H=LH-92;const y0=UPR.pd.y1;return{x0:22,x1:150,y0,y1:y0+Math.round(clamp(H*.36,120,270))}},
+ get pdDoor(){return{x:168,y:UPR.pd.y1}},
+ get srDoor(){return{x:120,y:UPR.sr.y1}}};
+/* state: S.up.sr = {offer, bought, done, st2, st3} (the Staff Room's phases: done the day it is ready; st2 / st3 the
+   day each improvement shows); S.up.pd = {offer, bought, done, st2, st3, res, book, pity, n} (the Private Dining Room) */
+function srOf(){return S.up&&S.up.sr||null}
+function pdOf(){return S.up&&S.up.pd||null}
+function srW(){const u=upS();return u.sr=u.sr||{}}
+function pdW(){const u=upS();const p=u.pd=u.pd||{};p.book=p.book||{};return p}
+function srOn(){const s=srOf();return !!(s&&s.done!=null)}   /* bought: being built, or built */
+function pdOn(){const p=pdOf();return !!(p&&p.done!=null)}
+function srBuilt(){const s=srOf();return !!(s&&s.done!=null&&S.day>=s.done)}
+function pdBuilt(){const p=pdOf();return !!(p&&p.done!=null&&S.day>=p.done)}
+function srBuilding(){return srOn()&&!srBuilt()}
+function pdBuilding(){return pdOn()&&!pdBuilt()}
+function phaseOf(o,built){if(!built)return 0;return o.st3!=null&&S.day>=o.st3?3:o.st2!=null&&S.day>=o.st2?2:1}
+function srStage(){return phaseOf(srOf(),srBuilt())}
+function pdStage(){return phaseOf(pdOf(),pdBuilt())}
+function phaseDay(o,n){return !o?null:n===1?o.done:n===2?o.st2:o.st3}
+/* one big construction on the floor at a time (AK); the other story goes on meanwhile */
+function upWorks(){const busy=o=>!!o&&[o.done,o.st2,o.st3].some(d=>d!=null&&S.day<d);return busy(srOf())?'sr':busy(pdOf())?'pd':null}
+/* how many the Private Dining Room takes, by phase (O, P, Q): always from four */
+const PD_MIN=4,PD_MAX=[0,6,8,10];
+function pdMax(){return PD_MAX[pdStage()]||0}
+function pdFits(n){return pdBuilt()&&n>=PD_MIN&&n<=pdMax()}
+
+/* ---- moving between the rooms. Every room hangs off another: the dining room in the middle, the side room off it,
+   the stairs up from the side room, the two rooms off the floor. A step goes toward the target along that tree. ---- */
+const ROOM_PARENT={side:'main',front:'main',kitchen:'main',lounge:'main',up:'side',staff:'up',pdr:'up'};
+function roomPath(k){const p=[k];let x=k;while(ROOM_PARENT[x]){x=ROOM_PARENT[x];p.unshift(x)}return p}
+/* the doors inside the two rooms (their own views) */
+const SRL={door:{x:252,y:104},get floorY(){return 92}};
+const PDL={door:{x:44,y:106}};
+function upRoomDoor(k){return k==='staff'?UPR.srDoor:UPR.pdDoor}
+/* the column in the middle of the floor: a path through its foot goes round it, in front (B: circulation) */
+function segRect(x0,y0,x1,y1,rx0,ry0,rx1,ry1){let t0=0,t1=1;const dx=x1-x0,dy=y1-y0;const P=[-dx,dx,-dy,dy],Q=[x0-rx0,rx1-x0,y0-ry0,ry1-y0];
+ for(let i=0;i<4;i++){if(P[i]===0){if(Q[i]<0)return false}else{const t=Q[i]/P[i];if(P[i]<0){if(t>t1)return false;if(t>t0)t0=t}else{if(t<t0)return false;if(t<t1)t1=t}}}return true}
+function roomObs(rm){if(rm==='up'){const col=UP_L.col;return{bx0:col.x-24,bx1:col.x+30,by0:col.base-16,by1:col.base+8}}if(rm==='pdr'&&pdBuilt()){const T=PDL_TABLE(),h=pdHalf();return{bx0:T.x-h-14,bx1:T.x+h+14,by0:T.y-26,by1:T.y+12}}return null}
+function obsVia(rm,x0,y0,x1,y1){const o=roomObs(rm);if(!o)return null;const {bx0,bx1,by0,by1}=o;
+ if(!segRect(x0,y0,x1,y1,bx0,by0,bx1,by1))return null;
+ const cost=p=>(segRect(x0,y0,p.x,p.y,bx0,by0,bx1,by1)?1e6:0)+(segRect(p.x,p.y,x1,y1,bx0,by0,bx1,by1)?1e6:0)+Math.hypot(p.x-x0,p.y-y0)+Math.hypot(x1-p.x,y1-p.y);
+ const A={x:bx0-6,y:by1+10},B={x:bx1+6,y:by1+10};return cost(A)<=cost(B)?A:B}
+/* ---- the two rooms in the 二樓 view: the player's floor picture is a cutaway, so the new walls are too — cut low with
+   a dark cap, the doors standing full height with a narrow glass strip and a name plate; what is inside shows over
+   them. While a room is being built: studs, boards, a work lamp. ---- */
+const UPW={h:30,face:'#E7D9C2',side:'#DCCCB2',cap:'#4A3A2E'};
+function upWallFace(c,x0,x1,y,gaps){const h=UPW.h;const segs=[];let a=x0;for(const g of(gaps||[]).slice().sort((p,q)=>p[0]-q[0])){if(g[0]>a)segs.push([a,g[0]]);a=Math.max(a,g[1])}if(a<x1)segs.push([a,x1]);
+ for(const [s0,s1] of segs){c.fillStyle='rgba(0,0,0,.13)';c.fillRect(s0,y,s1-s0,3);c.fillStyle=UPW.face;c.fillRect(s0,y-h,s1-s0,h);c.fillStyle='rgba(90,70,50,.08)';c.fillRect(s0,y-h*.32,s1-s0,h*.32);c.fillStyle='#CDBEA5';c.fillRect(s0,y-3,s1-s0,3);c.fillStyle=UPW.cap;c.fillRect(s0-1,y-h-4,s1-s0+2,4);c.fillStyle='rgba(255,255,255,.12)';c.fillRect(s0,y-h-4,s1-s0,1)}}
+function upWallSide(c,x,y0,y1){const h=UPW.h;c.fillStyle='rgba(0,0,0,.1)';c.fillRect(x+3,y0-h,3,y1-y0+h);c.fillStyle=UPW.cap;c.fillRect(x-2,y0-h-4,5,y1-y0);c.fillStyle=UPW.side;c.fillRect(x-2,y1-h-4,5,h+4);c.fillStyle='rgba(0,0,0,.12)';c.fillRect(x-2,y1-1,5,2)}
+/* a door in a wall that faces you: the frame, the leaf (open while someone goes through), the plate beside it */
+function upDoor(c,x,y,label,open,lit,plateLeft){c.fillStyle='rgba(0,0,0,.16)';c.fillRect(x-14,y-1,28,3);c.fillStyle='#3A2A1E';c.fillRect(x-14,y-48,28,48);c.fillStyle='#4E3A2A';c.fillRect(x-14,y-48,28,3);
+ if(open){c.fillStyle=lit?'#6A5034':'#2A2018';c.fillRect(x-11,y-45,22,45);if(lit){let g=c.createLinearGradient(0,y-45,0,y);g.addColorStop(0,'rgba(255,214,150,.2)');g.addColorStop(1,'rgba(255,214,150,.5)');c.fillStyle=g;c.fillRect(x-11,y-45,22,45)}c.fillStyle='#7A5232';c.beginPath();c.moveTo(x-11,y-45);c.lineTo(x-4,y-49);c.lineTo(x-4,y+2);c.lineTo(x-11,y);c.closePath();c.fill()}
+ else{c.fillStyle='#7A5232';c.fillRect(x-11,y-45,22,45);c.fillStyle='#8E6440';c.fillRect(x-11,y-45,22,2.5);c.fillStyle=lit?'#F3D9A4':'#BFD0D6';c.fillRect(x+3,y-40,3.5,20);c.fillStyle='rgba(0,0,0,.18)';c.fillRect(x+3,y-40,.8,20);c.fillStyle='#D9C08A';c.fillRect(x-8,y-23,4,1.8);circ(c,x-8,y-22,1.2)}
+ if(lit&&!open){c.save();c.globalCompositeOperation='lighter';c.fillStyle='rgba(255,214,150,.35)';c.fillRect(x-10,y-1,20,2.5);c.restore()}
+ if(label){c.font=`800 6.2px ${FONT}`;const w=c.measureText(label).width+8;const px=plateLeft?x-16-w:x+16;c.fillStyle='#2E2620';rr(c,px,y-38,w,10,2);c.fill();c.fillStyle='#F3E6CC';c.textAlign='center';c.textBaseline='middle';c.fillText(label,px+w/2,y-32.6);c.textBaseline='alphabetic'}}
+/* who is near a door on the floor right now (the door stands open while they pass) */
+function upDoorBusy(k){if(!R)return false;const D=upRoomDoor(k);const near=e=>e&&(e.room==='up'||e.room===k)&&Math.hypot(e.x-(e.room==='up'?D.x:(k==='staff'?SRL.door.x:PDL.door.x)),e.y-(e.room==='up'?D.y+6:(k==='staff'?SRL.door.y:PDL.door.y)))<16;
+ if(near(R.jill))return true;for(const id in R.cw||{})if(near(R.cw[id]))return true;for(const w of R.srw||[])if(near(w))return true;for(const g of R.groups)if(!g.gone&&near(g))return true;return false}
+function upRoomsDraw(c,list,now,d){const P=UPR.pd,Sr=UPR.sr;const sOn=srOn(),pOn=pdOn();if(!sOn&&!pOn)return;
+ /* the floors inside: a rug each, and what is in them (scaled, seen over the cut walls) */
+ if(srBuilt())list.push({y:Sr.y0+1,f:()=>srMini(c,now,d)});
+ if(pdBuilt())list.push({y:P.y0+2,f:()=>pdMini(c,now,d)});
+ if(srBuilding())list.push({y:Sr.y0+2,f:()=>upWorksDraw(c,Sr,now,'sr')});
+ if(pdBuilding())list.push({y:P.y0+2,f:()=>upWorksDraw(c,P,now,'pd')});
+ /* the walls: the line between the two rooms (the Staff Room's back, the Private Dining Room's front), the Staff
+    Room's side and front, the Private Dining Room's side */
+ const sb=srBuilt(),pb=pdBuilt();
+ if(sb||pb){const gaps=pb?[[UPR.pdDoor.x-14,UPR.pdDoor.x+14]]:[];list.push({y:P.y1,f:()=>upWallFace(c,P.x0,pb?P.x1:Sr.x1,P.y1,gaps)})}
+ if(pb)list.push({y:P.y1-1,f:()=>upWallSide(c,P.x1,P.y0+2,P.y1)});
+ if(sb){list.push({y:Sr.y1-1,f:()=>upWallSide(c,Sr.x1,Sr.y0,Sr.y1)});list.push({y:Sr.y1,f:()=>upWallFace(c,Sr.x0,Sr.x1,Sr.y1,[[UPR.srDoor.x-14,UPR.srDoor.x+14]])})}
+ if(sb){const D=UPR.srDoor;list.push({y:D.y+.5,f:()=>upDoor(c,D.x,D.y,'休息室',upDoorBusy('staff'),d>.3||srPeople().length>0,true)})}
+ if(pb){const D=UPR.pdDoor;const occ=pdOccupied();list.push({y:D.y+.5,f:()=>{upDoor(c,D.x,D.y,'包廂',upDoorBusy('pdr'),occ||d>.3,true);if(R&&pdHeld()&&!occ){/* reserved tonight: a small card on the plate's line */c.font=`800 5.6px ${FONT}`;c.fillStyle='#8E6422';rr(c,D.x+15,D.y-30,24,9,2);c.fill();c.fillStyle='#FFF4DC';c.textAlign='center';c.textBaseline='middle';c.fillText('已預約',D.x+27,D.y-25.4);c.textBaseline='alphabetic'}}})}}
+/* the works: studs on the new lines, boards leaning, a work lamp, a ladder; the day after, a room */
+function upWorksDraw(c,B,now,k){const r=rng(k==='sr'?77:78);c.fillStyle='rgba(90,80,70,.08)';c.fillRect(B.x0,B.y0,B.x1-B.x0,B.y1-B.y0);
+ c.fillStyle='rgba(235,232,224,.55)';rr(c,B.x0+8,B.y0+10,B.x1-B.x0-16,B.y1-B.y0-20,3);c.fill();   /* the dust sheet */
+ const stud=(x,y)=>{c.fillStyle='#C9A878';c.fillRect(x-1.5,y-UPW.h-12,3,UPW.h+12);c.fillStyle='rgba(0,0,0,.12)';c.fillRect(x+1.5,y-UPW.h-12,1,UPW.h+12)};
+ const lines=k==='sr'?[[B.x0,B.x1,B.y0],[B.x0,B.x1,B.y1]]:[[B.x0,B.x1,B.y1]];for(const [a,b,y] of lines){c.fillStyle='#B8956A';c.fillRect(a,y-UPW.h-12,b-a,3);for(let x=a+6;x<b;x+=16)stud(x,y)}
+ const sx=k==='sr'?B.x1:B.x1;c.fillStyle='#B8956A';c.fillRect(sx-1.5,B.y0-UPW.h-12,3,B.y1-B.y0);
+ /* plasterboard leaning on the line, a ladder, the lamp, a few offcuts */for(let i=0;i<3;i++){c.fillStyle=i%2?'#ECE8DF':'#E2DDD2';c.save();c.translate(B.x0+22+i*8,B.y1-4);c.rotate(-.12);c.fillRect(0,-38,16,38);c.restore()}
+ c.strokeStyle='#8A8E92';c.lineWidth=1.6;c.beginPath();const lx=(B.x0+B.x1)/2+10,ly=B.y1-12;c.moveTo(lx-7,ly);c.lineTo(lx,ly-40);c.lineTo(lx+7,ly);c.stroke();for(let s=0;s<3;s++){c.beginPath();c.moveTo(lx-5+s*1.6,ly-8-s*11);c.lineTo(lx+5-s*1.6,ly-8-s*11);c.stroke()}
+ const wx=B.x1-22,wy=B.y0+30;c.fillStyle='#3A3A3E';c.fillRect(wx-1,wy-18,2,18);c.fillStyle='#E8C24A';rr(c,wx-6,wy-24,12,7,2);c.fill();c.save();c.globalCompositeOperation='lighter';let g=c.createRadialGradient(wx,wy-20,2,wx,wy-20,40);g.addColorStop(0,'rgba(255,230,160,.4)');g.addColorStop(1,'rgba(255,230,160,0)');c.fillStyle=g;c.fillRect(wx-40,wy-60,80,80);c.restore();
+ for(let i=0;i<5;i++){c.fillStyle='rgba(190,160,120,.7)';c.fillRect(B.x0+14+r()*(B.x1-B.x0-28),B.y0+16+r()*(B.y1-B.y0-30),4+r()*8,1.6)}
+ c.font=`800 6.5px ${FONT}`;c.fillStyle='#C99A45';rr(c,B.x0+10,B.y0+8,34,11,2);c.fill();c.fillStyle='#2A1C10';c.textAlign='center';c.textBaseline='middle';c.fillText('施工中',B.x0+27,B.y0+13.6);c.textBaseline='alphabetic'}
+/* what the floor shows inside each room: the room's own view, small (the same things, the same people) */
+function miniMap(B,x,y){const H=LH-92;return{x:B.x0+8+(x/400)*(B.x1-B.x0-16),y:B.y0+UPW.h*.4+6+((y-92)/H)*(B.y1-B.y0-UPW.h*.4-12)}}
+function srMini(c,now,d){const B=UPR.sr;const st=srStage();
+ c.fillStyle=st>=2?'#C99470':'#CC9C70';c.fillRect(B.x0,B.y0,B.x1-B.x0,B.y1-B.y0);c.fillStyle='rgba(255,255,255,.05)';for(let y=B.y0+6;y<B.y1;y+=10)c.fillRect(B.x0,y,B.x1-B.x0,1);
+ const r0=miniMap(B,56,srY(.32)),r1=miniMap(B,336,srY(.76));c.fillStyle=st>=3?'#7E8C76':'#70826A';rr(c,r0.x,r0.y,r1.x-r0.x,r1.y-r0.y,3);c.fill();
+ const sx=(B.x1-B.x0-16)/400,sy=(B.y1-B.y0-UPW.h*.4-12)/(LH-92);c.save();c.beginPath();c.rect(B.x0,B.y0-UPW.h,B.x1-B.x0,B.y1-B.y0+UPW.h);c.clip();c.translate(B.x0+8,B.y0+UPW.h*.4+6);c.scale(sx,sy);c.translate(0,-92);for(const it of srItems(c,now,d).sort((a,b)=>a.y-b.y))it.f();c.restore();
+ for(const p of srPeople()){const q=miniMap(B,p.x,p.y);c.save();c.translate(q.x,q.y);c.scale(.52,.52);drawPerson(c,0,0,p.look,{seated:p.seated,flip:p.face<0,mood:'happy',step:p.moving?Math.sin(p.step||0):0});c.restore()}
+ if(d>.3||srPeople().length){c.save();c.globalCompositeOperation='lighter';const L0=miniMap(B,200,92+(LH-92)*.3);let g=c.createRadialGradient(L0.x,L0.y,3,L0.x,L0.y,70);g.addColorStop(0,'rgba(255,206,140,.22)');g.addColorStop(1,'rgba(255,206,140,0)');c.fillStyle=g;c.fillRect(B.x0,B.y0,B.x1-B.x0,B.y1-B.y0);c.restore()}}
+function pdMini(c,now,d){const B=UPR.pd;const st=pdStage();
+ c.fillStyle='#B98A5C';c.fillRect(B.x0,B.y0,B.x1-B.x0,B.y1-B.y0);c.fillStyle='rgba(60,35,15,.12)';for(let x=B.x0;x<B.x1;x+=9)c.fillRect(x,B.y0,.8,B.y1-B.y0);
+ const T=miniMap(B,200,PDL_TABLE().y);const half=st>=3?50:st>=2?42:34;c.fillStyle='#6E7A62';rr(c,T.x-half-10,T.y-20,(half+10)*2,30,3);c.fill();
+ const g=pdTable()&&pdTable().group;const seated=g&&SEATED_ST.includes(g.state);
+ /* the table and its chairs, the people at it */c.fillStyle='rgba(0,0,0,.18)';el(c,T.x,T.y+4,half+4,6);c.fillStyle='#6B4628';rr(c,T.x-half,T.y-12,half*2,12,2);c.fill();c.fillStyle='#8A5E3A';rr(c,T.x-half,T.y-12,half*2,4,2);c.fill();
+ const n=pdMax()||6;const per=Math.ceil((n-2)/2);for(let i=0;i<per;i++){const x=T.x-half+((i+.5)/per)*half*2;c.fillStyle='#3E5A48';rr(c,x-4,T.y-20,8,7,1.5);c.fill();rr(c,x-4,T.y+1,8,6,1.5);c.fill()}c.fillRect(T.x-half-9,T.y-10,6,8);c.fillRect(T.x+half+3,T.y-10,6,8);
+ if(seated){const S0=pdSeats();for(let k=0;k<g.size&&k<S0.length;k++){const q=miniMap(B,200+S0[k].dx,PDL_TABLE().y+S0[k].dy);c.save();c.translate(q.x,q.y);c.scale(.5,.5);drawPerson(c,0,0,g.looks[k%g.looks.length],{seated:true,flip:S0[k].side>0,mood:g.state==='eat'?'eat':'happy'});c.restore()}}
+ else if(pdHeld()){/* set for the guests who booked it */for(let i=0;i<per;i++){const x=T.x-half+((i+.5)/per)*half*2;c.fillStyle='#FFFFFF';el(c,x,T.y-8,2.6,1.4)}}
+ if(st>=1){c.fillStyle='#5E3E24';rr(c,B.x1-22,B.y0+8,14,26,2);c.fill();c.fillStyle='#7A5232';c.fillRect(B.x1-22,B.y0+8,14,3)}   /* the sideboard along its side wall */
+ if(d>.3||seated){c.save();c.globalCompositeOperation='lighter';let lg=c.createRadialGradient(T.x,T.y-10,3,T.x,T.y-10,64);lg.addColorStop(0,'rgba(255,200,130,.3)');lg.addColorStop(1,'rgba(255,200,130,0)');c.fillStyle=lg;c.fillRect(B.x0,B.y0,B.x1-B.x0,B.y1-B.y0);c.restore()}}
+/* ---- 休息室, its own view: the player's three-stage picture (refs/staff_room_stages_reference). The back wall with the
+   corkboard, the coat hooks, the window, the door back to the floor; terracotta tiles, a green rug. Phase I: a green
+   sofa, a low table, mismatched chairs (one of them came in from the open floor, with the cabinet, the floor lamp and
+   the coat stand), water, a shelf and the outlets. Phase II: lockers, a small fridge, a leather sofa, coffee and tea,
+   cups. Phase III: a softer sofa with cushions and a throw, a proper table, a speaker, the room worn in. Anything that
+   belongs to one person's story appears only after that story happened (E: life before history). ---- */
+function srY(f){return 92+Math.round((LH-92)*f)}
+const SR_SEATS={get sofa(){const y=srY(.42)-2;return[{k:'sofa0',x:66,y,sofa:1},{k:'sofa1',x:92,y,sofa:1},{k:'sofa2',x:118,y,sofa:1}]},
+ get chairs(){const st=srStage();const a=[{k:'odd',x:196,y:srY(.48)+2,face:-1},{k:'stool',x:158,y:srY(.63),face:1},{k:'bench0',x:58,y:srY(.86)-2,face:1,bench:1},{k:'bench1',x:98,y:srY(.86)-2,face:1,bench:1}];if(st<3)a.push({k:'metal',x:238,y:srY(.55)+2,face:-1});if(st>=2)a.push({k:'green',x:214,y:srY(.40)+2,face:-1});if(st>=3)a.push({k:'t0',x:222,y:srY(.71)+2,face:1},{k:'t1',x:304,y:srY(.71)+2,face:-1});return a},
+ get stand(){return[{k:'fridge',x:290,y:112,face:1},{k:'locker',x:204,y:114,face:-1},{k:'window',x:140,y:108,face:-1},{k:'hooks',x:84,y:110,face:-1},{k:'cubby',x:330,y:srY(.80),face:1}]}};
+function srSpots(){return SR_SEATS.sofa.concat(SR_SEATS.chairs,SR_SEATS.stand)}
+/* the people in the room right now, for drawing here and on the floor (the crew's own sprites and the kitchen's walkers) */
+function srPeople(){const out=[];if(!R)return out;for(const m of S.crew||[]){const w=R.cw&&R.cw[m.id];if(!w||w.room!=='staff'||srWalker(m.id))continue;const sp=w.srSpot;const there=!!(sp&&w.task&&w.task.fired&&Math.hypot(w.x-sp.x,w.y-sp.y)<2);out.push({m,x:w.x,y:w.y,look:crewLook(m),seated:there&&!sp.stand,sofa:there&&sp.sofa,face:there&&sp.face?sp.face:w.face,moving:w.moving,step:w.step,hold:there?w.srHold:null})}
+ for(const w of R.srw||[]){if(w.room!=='staff')continue;const sp=w.spot;const there=!!(sp&&Math.hypot(w.x-sp.x,w.y-sp.y)<2);out.push({m:w.m,x:w.x,y:w.y,look:crewLook(w.m),seated:there&&!sp.stand,sofa:there&&sp.sofa,face:there&&sp.face?sp.face:w.face,moving:w.moving,step:w.step,hold:there?w.hold:null})}return out}
+function srWalker(id){return R&&(R.srw||[]).find(w=>w.m.id===id)||null}
+function srTrace(k){const t=S.up&&S.up.sr&&S.up.sr.tr;return !!(t&&t[k]!=null&&S.day>=t[k])}
+function srTraceSet(k,d){const s=srW();s.tr=s.tr||{};if(s.tr[k]==null)s.tr[k]=d==null?S.day:d}
+function drawStaffRoom(c,now,dusk,V,X0,XW,TOP,list){const d=clamp(dusk,0,1);const st=srStage();
+ const bg=roomBg('staff',st+'|'+(srTrace('plug')?1:0)+'|'+(srTrace('yj')?1:0)+'|'+(srTrace('cup')?1:0),TOP,(b,X0,XW,T2)=>{const r=rng(61);
+  /* the walls: warm plaster, a darker skirting, a pipe along the top on the right */let wg=b.createLinearGradient(0,-T2,0,92);wg.addColorStop(0,'#EADFCB');wg.addColorStop(1,'#E1D2B8');b.fillStyle=wg;b.fillRect(X0,-T2,XW,T2+92);
+  for(let i=0;i<260;i++){b.fillStyle=`rgba(${r()<.5?'255,255,255':'100,80,60'},${.015+r()*.025})`;el(b,X0+r()*XW,-T2+r()*(T2+86),3+r()*9,2+r()*5)}
+  b.fillStyle='#7A5A3C';b.fillRect(X0,-T2,XW,Math.min(10,T2));b.fillStyle='#B9A07E';b.fillRect(X0,84,XW,8);b.fillStyle='rgba(0,0,0,.12)';b.fillRect(X0,91,XW,1.5);
+  b.fillStyle='#8E8A84';b.fillRect(300,-T2,5,T2+8);b.fillRect(300,4,XW,4);b.fillStyle='rgba(255,255,255,.25)';b.fillRect(301,-T2,1.2,T2+8);
+  /* the corkboard: the rota, a few notes; photos only once the room has been lived in (III) */b.fillStyle='#8A6440';b.fillRect(18,14,40,46);b.fillStyle='#C99E6A';b.fillRect(21,17,34,40);
+  const notes=[['#FFFDF5',24,20,12,15],['#FFF2B8',38,22,12,10],['#E8F1F5',26,38,10,12],['#FFFDF5',40,36,11,14]];for(const [col,x,y,w,h] of notes){b.fillStyle=col;b.fillRect(x,y,w,h);b.fillStyle='rgba(0,0,0,.18)';for(let k=0;k<3;k++)b.fillRect(x+2,y+3+k*3,w-4,.6);b.fillStyle='#C0392B';circ(b,x+w/2,y+1.5,1.1)}
+  if(st>=3){for(const [x,y,col] of[[45,47,'#7FA8C9'],[23,50,'#E8B48A']]){b.fillStyle='#FFFFFF';b.fillRect(x,y,9,7);b.fillStyle=col;b.fillRect(x+1,y+1,7,4.5)}}
+  /* the coat hooks */b.fillStyle='#6B4628';b.fillRect(62,26,32,3);for(let k=0;k<4;k++){b.fillStyle='#3A2A1E';b.fillRect(65+k*8,28,1.6,4)}
+  /* the window: dark frame, the glass drawn live, plants on the sill */b.fillStyle='rgba(0,0,0,.12)';b.fillRect(103,9,72,54);b.fillStyle='#3A2E26';b.fillRect(102,6,70,54);b.fillStyle='#E4D6BE';b.fillRect(98,60,78,4);
+  /* the door back to the floor: dark wood, a narrow glass strip, a lever */const dx=SRL.door.x;b.fillStyle='#4E3A2A';b.fillRect(dx-19,4,38,88);b.fillStyle='#5E3E28';b.fillRect(dx-16,7,32,85);b.fillStyle='#6E4A30';b.fillRect(dx-16,7,32,3);b.fillStyle='#CFDCE0';b.fillRect(dx+5,16,5,30);b.fillStyle='rgba(0,0,0,.2)';b.fillRect(dx+5,16,1,30);b.fillStyle='#C8C2B8';b.fillRect(dx-13,50,8,2);circ(b,dx-12,51,1.6);
+  b.fillStyle='#ECE6DA';rr(b,dx+22,40,8,12,1);b.fill();b.fillStyle='#B8B2A6';b.fillRect(dx+24,43,4,2);b.fillRect(dx+24,47,4,2);   /* the light switch */
+  /* the outlets on the wall by the shelf: two at first; Phase II adds a strip of them */b.fillStyle='#F2EEE6';rr(b,302,74,12,8,1);b.fill();b.fillStyle='#8A8478';b.fillRect(305,77,1.2,2.4);b.fillRect(310,77,1.2,2.4);
+  if(st>=2){b.fillStyle='#F4F1EA';rr(b,140,76,32,6,1.5);b.fill();b.fillStyle='#8A8478';for(let k=0;k<5;k++)b.fillRect(143+k*6,78,1.4,2)}
+  /* the floor: terracotta tiles */b.fillStyle='#D3946A';b.fillRect(X0,92,XW,LH-92);for(let y=92;y<LH;y+=22){for(let x=X0+((Math.floor((y-92)/22)%2)?11:0);x<LW+BGM;x+=22){const t=(r()-.5)*.08;b.fillStyle=t>0?`rgba(255,235,210,${t})`:`rgba(110,55,25,${-t})`;b.fillRect(x+.6,y+.6,21,21)}}
+  b.strokeStyle='rgba(120,70,40,.28)';b.lineWidth=.7;for(let y=92;y<LH;y+=22){b.beginPath();b.moveTo(X0,y);b.lineTo(LW+BGM,y);b.stroke()}
+  let g=b.createLinearGradient(0,92,0,LH);g.addColorStop(0,'rgba(60,35,20,.22)');g.addColorStop(.12,'rgba(60,35,20,0)');g.addColorStop(1,'rgba(60,35,20,.18)');b.fillStyle=g;b.fillRect(X0,92,XW,LH-92);
+  /* the rug */const ry0=srY(.32),ry1=srY(.76);b.fillStyle='rgba(0,0,0,.08)';rr(b,58,ry0+3,280,ry1-ry0,6);b.fill();b.fillStyle=st>=3?'#7E8C76':'#6F8068';rr(b,56,ry0,280,ry1-ry0,6);b.fill();b.strokeStyle='rgba(255,255,255,.14)';b.lineWidth=1.2;rr(b,62,ry0+6,268,ry1-ry0-12,4);b.stroke();
+  for(let i=0;i<900;i++){b.fillStyle=r()<.5?'rgba(255,255,255,.06)':'rgba(0,0,0,.05)';b.fillRect(58+r()*276,ry0+2+r()*(ry1-ry0-4),.9,.9)}
+ });
+ blitBg(c,bg,X0,XW,TOP);
+ /* the window glass by the hour */{const x=106,y=10,w=62,h=46;const W=wxNow();const wet=W==='rain'||W==='storm';let wg=c.createLinearGradient(0,y,0,y+h);wg.addColorStop(0,mix(wet?'#9AA4AE':'#BFDDF2','#1E2640',d));wg.addColorStop(1,mix(wet?'#B9C1C8':'#F3E6CC','#3B3552',d));c.fillStyle=wg;c.fillRect(x,y,w,h);c.fillStyle=mix('#6F9E5E','#1F2E26',d);for(let k=0;k<4;k++)el(c,x+8+k*16,y+h-6-(k%2)*5,10,8);c.fillStyle='#3A2E26';c.fillRect(x+w/2-1,y,2,h);c.fillRect(x,y+h/2-1,w,2);if(d>.5){c.fillStyle='rgba(255,214,140,.7)';for(let k=0;k<5;k++)c.fillRect(x+6+((k*23)%(w-10)),y+10+((k*13)%(h-20)),2,2)}}
+ list.push({y:62,f:()=>{drawPlant(c,118,62,'bush');drawPlant(c,156,62,'bush')}});
+ /* the pendant lamp over the middle */{const lx=200;c.fillStyle='#2A2420';c.fillRect(lx-.6,-TOP,1.2,TOP+18);c.fillStyle='#2F2A26';c.beginPath();c.moveTo(lx-12,20);c.lineTo(lx+12,20);c.lineTo(lx+5,9);c.lineTo(lx-5,9);c.closePath();c.fill();c.fillStyle=d>.25||srPeople().length?'#FFE7B0':'#D8CFC0';el(c,lx,20.5,9,2.4)}
+ /* the coats on the hooks: two at first, more once people keep things here */{const n=st>=3?4:st>=2?3:2;const cols=['#3E4E5E','#7A6A5A','#2E3A2E','#A8B0A0'];for(let k=0;k<n;k++){const x=67+k*8;list.push({y:60,f:()=>{c.fillStyle=cols[k];c.beginPath();c.moveTo(x-4,31);c.lineTo(x+4,31);c.lineTo(x+6,58);c.lineTo(x-6,58);c.closePath();c.fill();c.fillStyle='rgba(0,0,0,.12)';c.fillRect(x-.5,33,1,24)}})}}
+ for(const it of srItems(c,now,d))list.push(it);
+ /* the people: the crew's sprites are drawn by crewDraw; here, the kitchen's and the bar's walkers */}
+/* the furniture as y-sorted items, in this view's coordinates (the floor's cutaway draws the same, small) */
+function srItems(c,now,d){const st=srStage();const out=[];const P=(y,f)=>out.push({y,f:()=>f(c)});
+ const sofaY=srY(.42);
+ P(sofaY,c=>drawSrSofa(c,92,sofaY,st));
+ if(st<3)P(srY(.55),c=>{const x=96,y=srY(.55);softShadow(c,x,y+2,30,6,.2);c.fillStyle='#7A5232';rr(c,x-30,y-14,60,10,2);c.fill();c.fillStyle='#946640';c.fillRect(x-30,y-14,60,3);c.fillStyle='#5E3E24';c.fillRect(x-26,y-4,3,8);c.fillRect(x+23,y-4,3,8);
+  c.fillStyle='#F3EDE2';rr(c,x-14,y-21,6,6,1.5);c.fill();if(st>=2){c.fillStyle='#E9DCC4';rr(c,x+6,y-21,6,6,1.5);c.fill();c.fillStyle='#4E8A3A';el(c,x+20,y-16,4,2.4)}if(srFoodToday())drawSrFood(c,x-2,y-14)});
+ if(st>=3)P(srY(.71),c=>{const x=262,y=srY(.71);softShadow(c,x,y+3,44,8,.22);c.fillStyle='#8A5E3A';rr(c,x-42,y-22,84,16,2);c.fill();c.fillStyle='#A3744A';c.fillRect(x-42,y-22,84,3.5);c.fillStyle='#5E3E24';c.fillRect(x-38,y-6,4,12);c.fillRect(x+34,y-6,4,12);
+  /* oranges in a bowl, cups, a phone face down */c.fillStyle='#E8E0D2';el(c,x-6,y-17,9,3.4);c.fillStyle='#E8892E';for(const [ox,oy] of[[-10,-20],[-5,-21.5],[-1,-20],[-7,-23]])circ(c,x+ox,y+oy,2.6);c.fillStyle='#F3EDE2';rr(c,x+12,y-24,5,6,1.4);c.fill();c.fillStyle='#C9A0C0';rr(c,x+21,y-23,5,6,1.4);c.fill();c.fillStyle='#2E2E34';rr(c,x+30,y-19,8,4,1);c.fill();if(srFoodToday())drawSrFood(c,x-26,y-21)});
+ for(const s of SR_SEATS.chairs)if(!s.bench)P(s.y-1,c=>drawSrChair(c,s));
+ /* the shelf unit on the right: boxes, the lamp, cups; Phase II the coffee machine and the kettle; Phase III the speaker */
+ P(106,c=>drawSrShelf(c,316,106,st,d));
+ if(st<2)P(104,c=>{const x=288,y=104;softShadow(c,x,y,9,3,.18);c.fillStyle='#F2F0EA';rr(c,x-8,y-34,16,34,2);c.fill();c.fillStyle='#D9D5CC';c.fillRect(x-8,y-12,16,1.2);c.fillStyle='#7FB6D8';rr(c,x-6,y-48,12,15,4);c.fill();c.fillStyle='rgba(255,255,255,.4)';c.fillRect(x-4,y-46,2,11);c.fillStyle='#4A86C5';c.fillRect(x-3,y-26,2,3);c.fillStyle='#D04A3A';c.fillRect(x+1,y-26,2,3)});
+ else P(106,c=>{const x=291,y=106;const open=srFridgeOpen();softShadow(c,x,y,13,3,.2);c.fillStyle='#F4F2EC';rr(c,x-12,y-46,24,46,2);c.fill();c.fillStyle='#E3E0D8';c.fillRect(x-12,y-30,24,1.2);c.fillStyle='#B8B4AC';c.fillRect(x+8,y-42,1.6,9);c.fillRect(x+8,y-26,1.6,12);
+  for(const [ox,oy,col] of[[-6,-40,'#E8B04A'],[0,-37,'#6FA8D8'],[-3,-22,'#E37A6A']]){c.fillStyle=col;circ(c,x+ox,y+oy,1.8)}
+  if(open){c.fillStyle='#FFF6DA';c.fillRect(x-11,y-29,22,27);c.fillStyle='#E9E2CF';c.fillRect(x-11,y-18,22,1.2);c.fillStyle='#F4F2EC';c.beginPath();c.moveTo(x+12,y-30);c.lineTo(x+20,y-33);c.lineTo(x+20,y+1);c.lineTo(x+12,y);c.closePath();c.fill()}});
+ if(st>=2)P(104,c=>drawSrLockers(c,182,104,st));
+ /* from the open floor: the cabinet, the floor lamp, the coat stand (they were already upstairs) */
+ P(srY(.40),c=>{const x=146,y=srY(.40);c.fillStyle='rgba(0,0,0,.12)';el(c,x,y+1,8,2.5);c.fillStyle='#5A4A3A';c.fillRect(x-1,y-52,2,52);c.fillRect(x-6,y-1.5,12,2);c.fillStyle=d>.3?'#FFE9B8':'#EFE2C8';c.beginPath();c.moveTo(x-9,y-52);c.lineTo(x+9,y-52);c.lineTo(x+6,y-66);c.lineTo(x-6,y-66);c.closePath();c.fill()});
+ P(srY(.20),c=>{const x=30,y=srY(.20);c.fillStyle='rgba(0,0,0,.14)';el(c,x,y+1,9,3);c.fillStyle='#6B4628';c.fillRect(x-1.5,y-64,3,64);c.fillRect(x-9,y-2,18,3);c.fillRect(x-8,y-62,16,2.2);c.fillStyle='#A8B0A0';c.beginPath();c.moveTo(x-6,y-60);c.lineTo(x+6,y-60);c.lineTo(x+8,y-30);c.lineTo(x-8,y-30);c.closePath();c.fill()});
+ P(srY(.24)+1,c=>{const x0=344,y=srY(.24)+1;c.fillStyle='rgba(0,0,0,.14)';el(c,x0+14,y+2,30,4);c.fillStyle='#7A5232';c.fillRect(x0-16,y-34,60,34);c.fillStyle='#8E6440';c.fillRect(x0-16,y-34,60,5);c.fillStyle='#5E3E24';c.fillRect(x0+14,y-28,1,26);c.fillStyle='#C99A45';circ(c,x0+10,y-14,1.3);circ(c,x0+19,y-14,1.3)});
+ /* plants and bins in the corners; Phase III the pouf, a guitar case against the wall */
+ P(srY(.66),c=>drawPlant(c,34,srY(.66),'tall'));P(srY(.62),c=>drawPlant(c,368,srY(.62),'bush'));
+ P(srY(.93),c=>{for(const [x,col] of[[300,'#5E6670'],[322,'#7A828C']]){const y=srY(.93);softShadow(c,x,y,9,3,.18);c.fillStyle=col;c.beginPath();c.moveTo(x-9,y-22);c.lineTo(x+9,y-22);c.lineTo(x+7,y);c.lineTo(x-7,y);c.closePath();c.fill();c.fillStyle='rgba(255,255,255,.12)';c.fillRect(x-9,y-22,18,2)}});
+ if(st>=3){P(srY(.70),c=>{const x=150,y=srY(.70);softShadow(c,x,y,12,4,.2);c.fillStyle='#8A9A5A';el(c,x,y-6,12,7);c.fillStyle='#9EAE6A';el(c,x,y-9,10,4);c.strokeStyle='rgba(0,0,0,.15)';c.lineWidth=.6;for(let k=-2;k<=2;k++){c.beginPath();c.moveTo(x+k*4,y-12);c.lineTo(x+k*4.6,y-1);c.stroke()}});
+  P(srY(.56),c=>{const x=380,y=srY(.56);c.save();c.translate(x,y);c.rotate(-.18);c.fillStyle='#2A2A2E';rr(c,-7,-58,14,58,6);c.fill();c.fillStyle='#3A3A40';rr(c,-5,-56,10,20,4);c.fill();c.fillStyle='#C9A24A';c.fillRect(-1,-30,2,4);c.restore()})}
+ P(srY(.86),c=>{const x0=38,x1=120,y=srY(.86);softShadow(c,(x0+x1)/2,y+1,(x1-x0)/2,4,.18);c.fillStyle='#8A5E3A';rr(c,x0,y-14,x1-x0,6,2);c.fill();c.fillStyle='#A3744A';c.fillRect(x0,y-14,x1-x0,2);c.fillStyle='#6B4628';c.fillRect(x0+4,y-8,4,8);c.fillRect(x1-8,y-8,4,8);for(const [sx,col] of[[x0+18,'#2E2E34'],[x0+30,'#2E2E34'],[x0+52,'#E8E4DA'],[x0+64,'#E8E4DA']]){c.fillStyle=col;rr(c,sx,y-4,10,4,2);c.fill()}});
+ P(srY(.80),c=>{const x0=318,y=srY(.80);softShadow(c,x0+30,y,32,4,.18);c.fillStyle='#7A5232';c.fillRect(x0,y-34,60,34);c.fillStyle='#5E3E24';c.fillRect(x0,y-18,60,2);c.fillRect(x0+29,y-34,2,34);c.fillStyle='#3E4E5E';rr(c,x0+4,y-31,20,12,3);c.fill();c.fillStyle='#8A6A5A';rr(c,x0+35,y-15,20,13,3);c.fill();if(st>=2){c.fillStyle='#4A6240';rr(c,x0+34,y-32,22,13,3);c.fill()}if(st>=3){c.fillStyle='#C26A3A';rr(c,x0+5,y-15,18,13,3);c.fill()}});
+ /* Kai's racket bag, on the evenings he works (an object, not a story: nobody says anything) */
+ if(st>=2&&kaiBagToday())P(106,c=>{const x=176,y=106;c.save();c.translate(x,y);c.rotate(.12);c.fillStyle='#2E4E7A';rr(c,-5,-40,10,40,4);c.fill();c.fillStyle='#E8E4DA';c.fillRect(-4,-30,8,1.6);c.fillStyle='#1E3456';rr(c,-6,-46,12,8,3);c.fill();c.restore()});
+ return out}
+function drawSrSofa(c,x,y,st){const W=104;const col=st>=3?['#C9C4BA','#D9D5CC','#B5AFA4']:st>=2?['#9A5E3A','#B07048','#7E4A2C']:['#5E7A4E','#6E8A5C','#4A6240'];
+ softShadow(c,x,y+2,W/2,7,.24);c.fillStyle=col[2];rr(c,x-W/2,y-34,W,22,6);c.fill();c.fillStyle=col[0];rr(c,x-W/2-6,y-26,12,24,4);c.fill();rr(c,x+W/2-6,y-26,12,24,4);c.fill();
+ c.fillStyle=col[1];rr(c,x-W/2+5,y-16,W-10,12,3);c.fill();c.fillStyle='rgba(0,0,0,.12)';c.fillRect(x-W/2+5,y-5,W-10,2);c.strokeStyle='rgba(0,0,0,.12)';c.lineWidth=.8;for(const dx of[-17,17]){c.beginPath();c.moveTo(x+dx,y-15);c.lineTo(x+dx,y-5);c.stroke()}
+ c.fillStyle='#3A2A1E';c.fillRect(x-W/2+2,y-2,3,4);c.fillRect(x+W/2-5,y-2,3,4);
+ /* cushions: one at first, more later; a throw in Phase III */c.fillStyle='#E8E0CF';rr(c,x-W/2+8,y-30,16,13,4);c.fill();if(st>=2){c.fillStyle='#6E8A5C';rr(c,x+W/2-24,y-30,15,12,4);c.fill()}if(st>=3){c.fillStyle='#C26A3A';rr(c,x-6,y-30,15,12,4);c.fill();c.fillStyle='#7A6A5A';c.beginPath();c.moveTo(x+W/2-18,y-20);c.lineTo(x+W/2+2,y-22);c.lineTo(x+W/2+4,y-4);c.lineTo(x+W/2-14,y-4);c.closePath();c.fill();c.strokeStyle='rgba(255,255,255,.25)';c.lineWidth=.7;for(let k=0;k<3;k++){c.beginPath();c.moveTo(x+W/2-16+k*5,y-20);c.lineTo(x+W/2-13+k*5,y-5);c.stroke()}}}
+function drawSrChair(c,s){const x=s.x,y=s.y;const k=s.k;softShadow(c,x,y,8,2.6,.16);
+ if(k==='stool'){c.fillStyle='#8E6440';el(c,x,y-14,8,3);c.fillStyle='#6B4628';c.fillRect(x-6,y-12,2,12);c.fillRect(x+4,y-12,2,12);c.fillRect(x-1,y-12,2,12);return}
+ const C=k==='odd'?['#8A5E3A','#A3744A']:k==='metal'?['#3E3E44','#55555C']:k==='green'?['#5E7A4E','#4A6240']:['#7A5232','#946640'];const f=s.face||1;
+ c.save();c.translate(x,y);c.scale(f,1);c.fillStyle=C[0];c.fillRect(-7,-10,14,3);c.fillRect(-7,-7,2,7);c.fillRect(5,-7,2,7);c.fillStyle=C[1];c.fillRect(5,-26,3,19);c.fillRect(-1,-26,9,4);if(k==='green'){c.fillStyle='#6E8A5C';rr(c,-7,-12,14,4,1.5);c.fill();rr(c,4,-25,4,14,1.5);c.fill()}
+ if(k==='green'&&srTrace('seat')){/* 阿德's folded towel on the back */c.fillStyle='#E9E4D8';c.fillRect(4,-24,4,8);c.fillStyle='#7FA0B8';c.fillRect(4,-20,4,1.4)}c.restore()}
+function drawSrShelf(c,x0,y,st,d){const w=58,h=92;softShadow(c,x0+w/2,y,w/2,4,.16);c.fillStyle='#4A3A2E';c.fillRect(x0,y-h,3,h);c.fillRect(x0+w-3,y-h,3,h);for(let k=0;k<4;k++){c.fillStyle='#6B4E34';c.fillRect(x0,y-h+6+k*24,w,3)}
+ /* bottom: boxes; then folded towels or the kettle; the lamp; the top: plants, later the speaker */
+ c.fillStyle='#B98E5E';c.fillRect(x0+5,y-19,20,16);c.fillStyle='#A47A4C';c.fillRect(x0+5,y-19,20,3);c.fillStyle='#C9A878';c.fillRect(x0+28,y-17,22,14);
+ if(st>=2){c.fillStyle='#2E2E34';rr(c,x0+6,y-45,16,18,2);c.fill();c.fillStyle='#55555C';c.fillRect(x0+9,y-41,10,4);c.fillStyle='#E8E4DA';rr(c,x0+11,y-33,6,5,1);c.fill();c.fillStyle='#D9D5CC';rr(c,x0+30,y-42,12,14,3);c.fill();c.fillStyle='#8A8478';c.fillRect(x0+41,y-38,3,2)}
+ else{c.fillStyle='#E9E4D8';c.fillRect(x0+6,y-36,18,8);c.fillStyle='#D2CBBE';c.fillRect(x0+6,y-32,18,1)}
+ const cups=st>=3?['#F3EDE2','#C9A0C0','#7FA8C9','#E8B04A','#9EC08A']:st>=2?['#F3EDE2','#7FA8C9','#E8B04A']:['#F3EDE2','#F3EDE2'];cups.forEach((col,i)=>{c.fillStyle=col;rr(c,x0+6+i*9,y-62,6,7,1.5);c.fill()});
+ if(srTrace('cup')){/* 小彤's cup: pale pink, a little cat on it — always in the same place */c.fillStyle='#F2C9CF';rr(c,x0+47,y-62,7,8,1.6);c.fill();c.fillStyle='#8A5A5A';circ(c,x0+50.5,y-58,1.2)}
+ if(srTrace('yj')){/* the power strip 怡君 brought — her mother said there were not enough outlets */c.fillStyle='#F7F5EF';rr(c,x0+30,y-86,22,5,1.5);c.fill();c.fillStyle='#9A948A';for(let k=0;k<4;k++)c.fillRect(x0+33+k*5,y-84.4,1.4,1.8);c.strokeStyle='#F7F5EF';c.lineWidth=1.2;c.beginPath();c.moveTo(x0+30,y-84);c.quadraticCurveTo(x0+18,y-82,x0-10,y-30);c.stroke()}
+ else if(srTrace('plug')&&st<2){/* the one outlet, a cube adapter full of chargers */c.strokeStyle='#2E2E34';c.lineWidth=1;for(let k=0;k<3;k++){c.beginPath();c.moveTo(x0-10,y-30);c.quadraticCurveTo(x0-16-k*3,y-16,x0-6-k*8,y-2);c.stroke()}c.fillStyle='#F2EEE6';rr(c,x0-14,y-34,8,8,1);c.fill()}
+ /* the lamp */const lx=x0+44,ly=y-30;c.fillStyle='#3A2E26';c.fillRect(lx-.8,ly-10,1.6,10);c.fillStyle=d>.3?'#FFE4A8':'#EFE2C8';c.beginPath();c.moveTo(lx-6,ly-10);c.lineTo(lx+6,ly-10);c.lineTo(lx+4,ly-18);c.lineTo(lx-4,ly-18);c.closePath();c.fill();
+ if(d>.3){c.save();c.globalCompositeOperation='lighter';let g=c.createRadialGradient(lx,ly-12,2,lx,ly-12,34);g.addColorStop(0,'rgba(255,214,150,.3)');g.addColorStop(1,'rgba(255,214,150,0)');c.fillStyle=g;c.fillRect(lx-34,ly-46,68,68);c.restore()}
+ if(st>=3){c.fillStyle='#2A2A2E';rr(c,x0+6,y-h-12,26,12,2);c.fill();c.fillStyle='#55555C';circ(c,x0+13,y-h-6,3.2);circ(c,x0+25,y-h-6,3.2);c.fillStyle='#8A8478';circ(c,x0+13,y-h-6,1.2);circ(c,x0+25,y-h-6,1.2)}
+ drawPlant(c,x0+46,y-h+2,'bush')}
+function drawSrLockers(c,x0,y,st){const n=3,w=13,h=70;softShadow(c,x0+n*w/2,y,n*w/2+2,4,.18);for(let i=0;i<n;i++){const x=x0+i*w;c.fillStyle='#B8BAB4';c.fillRect(x,y-h,w-1,h);c.fillStyle='#A4A6A0';c.fillRect(x,y-h,w-1,3);c.fillStyle='#8E908A';for(let k=0;k<3;k++)c.fillRect(x+3,y-h+8+k*3,w-7,1);c.fillStyle='#5A5C58';c.fillRect(x+w-5,y-h+30,1.6,8);
+  if(st>=3&&i!==1){/* photos and a sticker on the doors */c.fillStyle='#FFFFFF';c.fillRect(x+2,y-h+18,8,6);c.fillStyle=i?'#E8B48A':'#7FA8C9';c.fillRect(x+3,y-h+19,6,4)}}
+ c.fillStyle='#A27A4A';rr(c,x0+2,y-h-8,24,8,1.5);c.fill();c.fillStyle='#8A6A3A';for(let k=0;k<4;k++)c.fillRect(x0+4+k*6,y-h-7,1,6)}
+function drawSrFood(c,x,y){c.fillStyle='#B8463A';rr(c,x-7,y-7,14,8,2);c.fill();c.fillStyle='#D86A5A';c.beginPath();c.moveTo(x-3,y-7);c.lineTo(x,y-11);c.lineTo(x+3,y-7);c.closePath();c.fill();c.fillStyle='rgba(255,255,255,.3)';c.fillRect(x-6,y-5,12,1)}
+/* the crew in the room: seated where there is a seat, on the sofa with their feet down, a cup or a phone sometimes;
+   the kitchen's and the bar's walkers on their way up through the other rooms */
+function srDrawPeople(c,now,list,rm){if(!R)return;
+ if(rm==='staff'){for(const p of srPeople())list.push({y:p.y,f:()=>{const stp=p.moving?Math.sin(p.step||0):0;drawPerson(c,p.x,p.y,p.look,{seated:p.seated,lounge:p.sofa?{legs:0}:null,step:stp,bob:p.moving?Math.abs(stp)*-.8:Math.sin(now*1.2+p.x)*.3,mood:'happy',flip:p.face<0,hold:p.hold||null,blink:Math.sin(now*1.3+p.x*.1)>.97});nameTag(c,p.x,p.y-(p.seated?54:64),p.m.name)}});return}
+ for(const w of R.srw||[]){if(w.room!==rm||(R.closing!=null&&R.closing<w.at))continue;list.push({y:w.y,f:()=>{const stp=w.moving?Math.sin(w.step):0;drawPerson(c,w.x,w.y,crewLook(w.m),{step:stp,bob:w.moving?Math.abs(stp)*-.8:0,mood:'happy',flip:w.face<0});nameTag(c,w.x,w.y-64,w.m.name)}})}}
+/* ---- 包廂, its own view: the player's picture (refs/private_dining_room_reference) — the big window with the city in
+   it (the floor's left window), the pendant lamp low over one long table, chairs with dark green seats, the sideboard,
+   a plant, the door with its narrow glass strip on the left. Phase II: the table longer, curtains, a runner and
+   flowers, a wall lamp, a painting, the coat stand. Phase III: the table set, candles, the shelf, more green. Clean
+   and quiet: it is reset after every meal (二十：the Staff Room keeps things; this room keeps nothing). ---- */
+function pdY(f){return 92+Math.round((LH-92)*f)}
+function PDL_TABLE(){return{x:200,y:pdY(.46)}}
+/* the seats by phase: people sit along the far side and at the ends (the game never shows a back) */
+function pdSeats(){const st=Math.max(1,pdStage());const S6=[{dx:-54,dy:-16,side:0},{dx:-18,dy:-16,side:0},{dx:18,dy:-16,side:0},{dx:54,dy:-16,side:0},{dx:-96,dy:0,side:-1},{dx:96,dy:0,side:1}];
+ if(st===1)return S6;const back=[-90,-54,-18,18,54,90].map(dx=>({dx,dy:-16,side:0}));if(st===2)return back.concat([{dx:-128,dy:0,side:-1},{dx:128,dy:0,side:1}]);
+ return back.concat([{dx:-126,dy:-6,side:-1},{dx:126,dy:-6,side:1},{dx:-132,dy:10,side:-1},{dx:132,dy:10,side:1}])}
+function pdHalf(){const st=Math.max(1,pdStage());return st===1?82:st===2?114:118}
+function pdTable(){return R?R.tables.find(t=>t.pdr)||null:null}
+function pdOccupied(){const t=pdTable();return !!(t&&t.group&&!t.group.gone)}
+function drawPdrRoom(c,now,dusk,V,X0,XW,TOP,list){const d=clamp(dusk,0,1);const st=Math.max(1,pdStage());const T=PDL_TABLE();
+ const bg=roomBg('pdr',st+'|'+S.level,TOP,(b,X0,XW,T2)=>{const r=rng(67);
+  let wg=b.createLinearGradient(0,-T2,0,92);wg.addColorStop(0,'#EFE6D4');wg.addColorStop(1,'#E6D9C2');b.fillStyle=wg;b.fillRect(X0,-T2,XW,T2+92);for(let i=0;i<220;i++){b.fillStyle=`rgba(${r()<.5?'255,255,255':'100,80,60'},${.015+r()*.02})`;el(b,X0+r()*XW,-T2+r()*(T2+86),3+r()*9,2+r()*5)}
+  /* dark wood: the ceiling trim, the corner posts, the skirting */b.fillStyle='#5A3E28';b.fillRect(X0,-T2,XW,Math.min(9,T2));b.fillRect(X0,84,XW,8);b.fillStyle='#6E4E34';b.fillRect(X0,84,XW,2);b.fillStyle='#5A3E28';b.fillRect(2,-T2,8,T2+92);b.fillRect(390,-T2,8,T2+92);
+  /* the air conditioner over the window */b.fillStyle='#ECEAE4';rr(b,174,-14,52,13,2);b.fill();b.fillStyle='#C9C6BF';b.fillRect(178,-5,44,1.2);b.fillRect(178,-3,44,1.2);
+  /* the big window: the floor's left window, from inside */const wx=104,wy=6,ww=192,wh=74;b.fillStyle='rgba(0,0,0,.14)';b.fillRect(wx-3,wy-1,ww+8,wh+8);b.fillStyle='#2F2A26';b.fillRect(wx-5,wy-5,ww+10,wh+10);b.fillStyle='#E9DCC4';b.fillRect(wx-10,wy+wh+4,ww+20,4);
+  if(st>=2){/* linen curtains */b.fillStyle='#6B4628';b.fillRect(wx-26,wy-10,ww+52,3);for(const cx of[wx-22,wx+ww+6]){let cg=b.createLinearGradient(cx,0,cx+16,0);cg.addColorStop(0,'#CBBBA4');cg.addColorStop(.5,'#DED0BC');cg.addColorStop(1,'#CBBBA4');b.fillStyle=cg;b.beginPath();b.moveTo(cx,wy-7);b.lineTo(cx+16,wy-7);b.lineTo(cx+14,wy+wh+6);b.lineTo(cx+2,wy+wh+6);b.closePath();b.fill()}}
+  /* the door to the floor, on the left: wood, a narrow glass strip, a lever */const dx=PDL.door.x;b.fillStyle='#4A3424';b.fillRect(dx-22,2,44,90);b.fillStyle='#6E4A30';b.fillRect(dx-19,5,38,87);b.fillStyle='#7E5638';b.fillRect(dx-19,5,38,3);b.fillStyle='#CFDCE0';b.fillRect(dx+6,16,6,36);b.fillStyle='rgba(0,0,0,.2)';b.fillRect(dx+6,16,1,36);b.fillStyle='#C8C2B8';b.fillRect(dx-15,52,8,2);circ(b,dx-14,53,1.6);
+  if(st>=2){/* a painting on the right, a wall lamp */b.fillStyle='#8A6A3A';b.fillRect(318,16,50,38);b.fillStyle='#E9E2CC';b.fillRect(321,19,44,32);let pg=b.createLinearGradient(0,19,0,51);pg.addColorStop(0,'#C9D6D8');pg.addColorStop(.55,'#A9B88E');pg.addColorStop(1,'#7E8E5E');b.fillStyle=pg;b.fillRect(323,21,40,28);b.fillStyle='rgba(60,70,40,.5)';el(b,333,40,10,4);el(b,352,43,12,4);b.fillStyle='#8E6422';b.fillRect(336,10,14,2)}
+  if(st>=3){/* a wall shelf with books and a plant */b.fillStyle='#6B4628';b.fillRect(330,60,46,3);const bc=['#8A3A2A','#2E4A3A','#C9A24A','#4A5A7A'];for(let k=0;k<4;k++){b.fillStyle=bc[k];b.fillRect(332+k*5,49+(k%2),4,11-(k%2))}}
+  /* the floor: dark warm planks */b.fillStyle='#9A6A44';b.fillRect(X0,92,XW,LH-92);{const pw=11;let k=0;for(let x=X0;x<LW+BGM;x+=pw,k++){const t=(r()-.5)*.1;b.fillStyle=t>0?`rgba(255,230,200,${t})`:`rgba(50,30,15,${-t})`;b.fillRect(x,92,pw,LH-92);b.fillStyle='rgba(50,30,15,.2)';b.fillRect(x,92,.8,LH-92);for(let y=92+((k*41)%80);y<LH;y+=64+((k*17)%40)){b.fillStyle='rgba(50,30,15,.16)';b.fillRect(x,y,pw,.8)}}}
+  let g=b.createLinearGradient(0,92,0,LH);g.addColorStop(0,'rgba(40,25,15,.26)');g.addColorStop(.12,'rgba(40,25,15,0)');g.addColorStop(1,'rgba(40,25,15,.2)');b.fillStyle=g;b.fillRect(X0,92,XW,LH-92);
+  /* the rug under the table */const half=pdHalf();const ry=PDL_TABLE().y;b.fillStyle='rgba(0,0,0,.1)';rr(b,200-half-46,ry-44,(half+46)*2,74,5);b.fill();b.fillStyle='#6E745A';rr(b,200-half-48,ry-46,(half+48)*2,74,5);b.fill();b.strokeStyle='#A39A6E';b.lineWidth=1.4;rr(b,200-half-42,ry-40,(half+42)*2,62,3);b.stroke();
+ });
+ blitBg(c,bg,X0,XW,TOP);
+ /* the window glass: the street's trees by day, the city's lit windows at night */{const wx=104,wy=6,ww=192,wh=74;const W=wxNow();const wet=W==='rain'||W==='storm';let gg=c.createLinearGradient(0,wy,0,wy+wh);gg.addColorStop(0,mix(wet?'#9AA4AE':'#BFDDF2','#1C2238',d));gg.addColorStop(1,mix(wet?'#B9C1C8':'#F3E6CC','#3A3150',d));c.fillStyle=gg;c.fillRect(wx,wy,ww,wh);
+  c.fillStyle=mix('#B8B0A8','#262838',d);for(let k=0;k<6;k++)c.fillRect(wx+10+k*31,wy+20+(k%3)*7,20,wh-26);if(d>.4){c.fillStyle='rgba(255,212,140,.8)';for(let k=0;k<18;k++)c.fillRect(wx+13+((k*29)%(ww-20)),wy+24+((k*17)%(wh-32)),2.4,2.4)}c.fillStyle=mix('#6F9E5E','#1E2E26',d);for(let k=0;k<7;k++)el(c,wx+12+k*28,wy+wh-8-(k%2)*6,15,10);
+  if(wet){c.strokeStyle='rgba(235,242,250,.4)';c.lineWidth=.8;for(let k=0;k<12;k++){const ph=((now*.5)+k*.37)%1;const rx=wx+4+((k*31)%(ww-8));c.beginPath();c.moveTo(rx,wy+ph*wh);c.lineTo(rx-1,wy+ph*wh+6);c.stroke()}}
+  c.fillStyle='#2F2A26';for(let k=1;k<4;k++)c.fillRect(wx+k*ww/4-1,wy,2,wh);c.fillRect(wx,wy+wh*.45,ww,2)}
+ /* the sideboard (I), a plant, the coat stand (II), the candles (III) */
+ list.push({y:106,f:()=>{const x0=300,y=106;softShadow(c,x0+40,y,42,4,.18);c.fillStyle='#5E3E24';c.fillRect(x0,y-30,80,30);c.fillStyle='#7A5232';c.fillRect(x0,y-30,80,4);c.fillStyle='#4A3020';for(let k=0;k<3;k++)c.fillRect(x0+4+k*26,y-22,23,18);c.fillStyle='#C99A45';for(let k=0;k<3;k++)c.fillRect(x0+13+k*26,y-14,5,1.4);
+  c.fillStyle='#F4F1EA';for(let k=0;k<4;k++)el(c,x0+18,y-33-k*1.6,8,2.4);c.fillStyle='#3A2E26';c.fillRect(x0+60,y-44,1.6,12);c.fillStyle=d>.25?'#FFE4A8':'#EFE2C8';c.beginPath();c.moveTo(x0+54,y-44);c.lineTo(x0+68,y-44);c.lineTo(x0+65,y-52);c.lineTo(x0+57,y-52);c.closePath();c.fill();if(st>=3){c.fillStyle='#4A2E24';for(let k=0;k<3;k++)rr(c,x0+34+k*5,y-46,3.5,14,1.2),c.fill()}}});
+ list.push({y:108,f:()=>drawPlant(c,82,108,'tall')});if(st>=2)list.push({y:pdY(.70),f:()=>drawPlant(c,368,pdY(.70),'bush')});
+ if(st>=2)list.push({y:112,f:()=>{const x=88,y=112;c.fillStyle='rgba(0,0,0,.14)';el(c,x,y+1,9,3);c.fillStyle='#6B4628';c.fillRect(x-1.5,y-64,3,64);c.fillRect(x-9,y-2,18,3);c.fillRect(x-8,y-62,16,2.2)}});
+ list.push({y:pdY(.86),f:()=>drawPlant(c,36,pdY(.86),'tall')});list.push({y:pdY(.84),f:()=>{const x0=318,y=pdY(.84);softShadow(c,x0+30,y,30,4,.16);c.fillStyle='#5E3E24';c.fillRect(x0,y-26,60,26);c.fillStyle='#7A5232';c.fillRect(x0,y-26,60,3);c.fillStyle='#4A3020';c.fillRect(x0+4,y-20,52,1.4);c.fillStyle='#F4F1EA';for(let k=0;k<3;k++)el(c,x0+16,y-28-k*1.6,7,2.2);c.fillStyle='#E9E2CF';rr(c,x0+38,y-36,10,9,2);c.fill();c.fillStyle='#3E6A3A';el(c,x0+43,y-38,5,3)}});
+ if(st>=3)list.push({y:pdY(.74),f:()=>drawPlant(c,34,pdY(.66),'bush')});
+ /* the pendant lamp, low over the table */{const lx=T.x;const ly=Math.max(30,T.y-118);c.fillStyle='#2A2420';c.fillRect(lx-.6,-TOP,1.2,TOP+ly);c.fillStyle='#2A2622';c.beginPath();c.moveTo(lx-16,ly+12);c.lineTo(lx+16,ly+12);c.quadraticCurveTo(lx+10,ly-2,lx,ly-2);c.quadraticCurveTo(lx-10,ly-2,lx-16,ly+12);c.fill();c.fillStyle=d>.2||pdOccupied()?'#FFE3A6':'#D8CFC0';el(c,lx,ly+12.5,12,2.6);
+  if(d>.2||pdOccupied()){c.save();c.globalCompositeOperation='lighter';let g=c.createRadialGradient(lx,T.y-10,6,lx,T.y-10,150);g.addColorStop(0,'rgba(255,206,130,.32)');g.addColorStop(1,'rgba(255,206,130,0)');c.fillStyle=g;c.fillRect(lx-160,T.y-140,320,220);c.restore()}}
+ /* the table itself is in the day's tables (buildTables), drawn by drawTableFull → drawPdrTable */}
+/* the long table: chairs with dark green seats, the people along the far side and at the ends, plates by phase */
+function drawPdrTable(c,t,now){const st=Math.max(1,pdStage());const half=pdHalf();const g=t.group;const seated=g&&SEATED_ST.includes(g.state);const seats=pdSeats();const held=!g&&pdHeld();
+ softShadow(c,t.x,t.y+8,half+6,12,.24);
+ const chair=(x,y,side)=>{c.save();c.translate(x,y);c.scale(side>0?-1:1,1);c.fillStyle='#5E3E24';c.fillRect(-7,-9,14,3);c.fillRect(-7,-6,2,7);c.fillRect(5,-6,2,7);c.fillStyle='#3E5A48';rr(c,-7,-12,14,4,1.5);c.fill();if(side!==0){c.fillStyle='#5E3E24';c.fillRect(-9,-28,3,22);c.fillStyle='#3E5A48';rr(c,-9,-26,4,13,1.5);c.fill()}else{c.fillStyle='#5E3E24';c.fillRect(-7,-30,14,3);c.fillRect(-7,-30,2,22);c.fillRect(5,-30,2,22);c.fillStyle='#3E5A48';rr(c,-6,-28,12,9,2);c.fill()}c.restore()};
+ const order=seats.map((sp,k)=>({sp,k})).sort((a,b)=>a.sp.dy-b.sp.dy);
+ for(const {sp,k} of order){const x=t.x+sp.dx,y=t.y+sp.dy;chair(x,y,sp.side);
+  if(seated&&k<g.size){const L0=g.looks[k%g.looks.length];const mood=g.state==='eat'?'eat':g.pat>.6?'happy':g.pat>.3?'ok':'sad';drawPerson(c,x,y,L0,{seated:true,mood,flip:sp.side>0,bob:g.state==='eat'?Math.sin(now*6+k)*.6:Math.sin(now*1.4+g.seed+k*1.7)*.3,chew:g.state==='eat'&&Math.sin(now*9+k)>0,blink:Math.sin(now*1.3+g.seed+k*2)>.97});
+   if(g.size>=2&&['reading','wait','order','eat'].includes(g.state)){const ph=now*.6+g.seed;const who=Math.floor(ph/6.28)%g.size;if(k===who&&Math.sin(ph)>.4){const f=sp.side>0?-1:1;c.fillStyle='rgba(255,250,240,.92)';const bx=x+f*11,by=y-56;rr(c,bx-6.5,by-4.5,13,9,4);c.fill();c.fillStyle='#2E2019';for(let i=-1;i<=1;i++)circ(c,bx+i*2.8,by+.3,.8)}}
+   {const ft=floorTag(g,k);if(ft)nameTag(c,x,y-50,ft)}}}
+ /* the top: walnut, a lighter edge; Phase II a runner and flowers; III place settings and candles */
+ c.fillStyle='#4A2E1C';c.fillRect(t.x-half+6,t.y-4,6,12);c.fillRect(t.x+half-12,t.y-4,6,12);c.fillStyle='#5E3B22';rr(c,t.x-half,t.y-16,half*2,13,3);c.fill();c.fillStyle='#7A4E2C';rr(c,t.x-half,t.y-18,half*2,10,3);c.fill();c.fillStyle='rgba(255,255,255,.1)';c.fillRect(t.x-half+4,t.y-17,half*2-8,1.4);
+ if(st>=2){c.fillStyle='#E6DCC8';c.fillRect(t.x-24,t.y-18,48,10);c.fillStyle='rgba(0,0,0,.06)';c.fillRect(t.x-24,t.y-10,48,1.5);c.fillStyle='#F2EEE6';rr(c,t.x-4,t.y-24,8,8,2);c.fill();for(const [ox,col] of[[-3,'#E37A6A'],[2,'#F2C46A'],[0,'#F6F0E8']]){c.fillStyle=col;circ(c,t.x+ox,t.y-27,2.2)}c.fillStyle='#5E8A4A';el(c,t.x-5,t.y-25,3,1.4);el(c,t.x+5,t.y-25,3,1.4)}
+ const per=seats.filter(s=>s.side===0).map(s=>s.dx);
+ if(!g&&!t.dirty&&(held||st>=3)){/* set: a plate and cutlery at each place on the far side */for(const dx of per){c.fillStyle='#FFFFFF';el(c,t.x+dx,t.y-13,5.4,2.6);c.fillStyle='rgba(0,0,0,.08)';el(c,t.x+dx,t.y-12.4,5.4,1);c.strokeStyle='#B9C1C4';c.lineWidth=.7;c.beginPath();c.moveTo(t.x+dx-7.5,t.y-15);c.lineTo(t.x+dx-7.5,t.y-11);c.moveTo(t.x+dx+7.5,t.y-15);c.lineTo(t.x+dx+7.5,t.y-11);c.stroke()}}
+ if(st>=3&&duskF()>.4){for(const dx of[-half*.55,half*.55]){const fl=.8+Math.sin(now*10+dx)*.2;c.fillStyle='#E8DFCF';rr(c,t.x+dx-2,t.y-22,4,6,1);c.fill();c.fillStyle='#FFD27A';el(c,t.x+dx,t.y-24,1.1,1.8*fl)}}
+ /* the plates while they eat: along the table, as many as were served */
+ const n=t.plates.length;const pr=g&&g.state==='eat'&&g.eatDur?clamp(1-g.timer/g.eatDur,0,1):0;t.plates.slice(0,10).forEach((p,i)=>{const dx=-half+16+((i+.5)/Math.max(1,Math.min(10,n)))*(half*2-32);const dy=-12+((i%2)?2:-2);const q=(t.dirty||(g&&g.ate))?'E':p.q;
+  if(q==='E'){c.fillStyle='#fff';el(c,t.x+dx,t.y+dy,6.5,3.6)}else{const cv=dishCanvas(p.d,p.q,64,S.decor.ware>0,p.want);c.drawImage(cv,t.x+dx-10,t.y+dy-10,20,20);if(pr>.15){const e=clamp((pr-.15)/.8,0,1);c.fillStyle='rgba(255,255,255,.95)';el(c,t.x+dx,t.y+dy+.5,6.8*e,4.2*e)}}});
+ if(t.dirty&&!n){c.fillStyle='#fff';el(c,t.x-30,t.y-12,6,3.4);el(c,t.x+10,t.y-11,6,3.4);el(c,t.x+40,t.y-13,6,3.4)}}
+/* ---- the two projects, in 店舖工程 › 二樓的房間. Phase I is real construction, ready by the next opening; II and III
+   are improvements to the same room, there the next day (AK). One big job on the floor at a time. Prices: AL, set
+   from the measured late-game day (AUDIT_AND_PLAN §8.1): the Staff Room cheaper than the Private Dining Room, each
+   room's first phase the main cost. ---- */
+const SR_PROJ=[null,
+ {n:'員工休息室',sub:'有地方坐了',cost:160000,d:'二樓左邊、樓梯上來的內側，隔出一間有門的房間：牆、門、燈、插座。一張沙發、幾張椅子、一張矮桌、飲水機、一個層架；開放空間裡的櫃子、立燈和衣帽架也搬進去。今晚施工，明天開門前完工。',done:'二樓左邊多了一面牆、一扇門，門邊一塊小牌子：休息室。',jill:'先這樣。',unlock:['休息室（二樓，點門進去）']},
+ {n:'休息室',sub:'開始像他們的地方',cost:70000,d:'同一間房：置物櫃、小冰箱、一張比較好坐的沙發、咖啡機和熱水壺、多一排插座、多幾個杯子和收納。明天就在。',done:'置物櫃、小冰箱和咖啡機都進來了，牆上多了一排插座。',jill:'嗯。'},
+ {n:'休息室',sub:'真的有人生活過',cost:90000,d:'換一張軟一點的沙發和幾個坐墊、一張可以圍著吃東西的桌子、一台小喇叭、更多層架。不是變豪華，是用久了該有的樣子。明天就在。',done:'沙發換了，多了一張桌子，層架上多了一台小喇叭。',jill:'這樣可以。'}];
+const PD_PROJ=[null,
+ {n:'私人包廂',sub:'一桌人的地方',cost:240000,d:'二樓窗邊那一區隔出一間包廂：牆、可以關上的門、一張六人長桌、一盞吊燈、一個邊櫃。4–6 位的訂位會自己進來，每組有整桌最低消費；沒有訂位的晚上，4 位以上的客人也可以直接坐。餐廳員工名額 +1。今晚施工，明天開門前完工。',done:'窗邊那一區有了牆和門。裡面一張長桌，一盞低低的吊燈。',jill:'好。',unlock:['包廂（二樓，點門進去）','4–6 位的包廂訂位','餐廳員工名額 +1']},
+ {n:'私人包廂',sub:'慢慢吃',cost:120000,d:'長桌加長到 8 位、比較好坐的椅子、窗簾、牆上一幅畫、一盞壁燈、一座衣帽架。4–8 位都能訂，訂位也會多一些。明天就在。',done:'桌子長了一截，窗邊掛上了窗簾。',jill:'嗯。',unlock:['4–8 位的包廂訂位']},
+ {n:'私人包廂',sub:'熟悉的位置',cost:160000,d:'包廂做完整：最多坐 10 位、餐具每天擺好、蠟燭、層架、更多綠色。4–10 位都能訂，成了固定會有人訂的房間。餐廳員工名額再 +1。明天就在。',done:'包廂可以坐到十個人了，桌上的餐具每天擺好。',jill:'好。',unlock:['4–10 位的包廂訂位','餐廳員工名額 +1']}];
+const SR_WAIT=[0,0,5,7],PD_WAIT=[0,0,6,8],PD_USES=[0,0,3,9];
+/* what is open to buy now, or why not yet */
+function srNext(){const s=srOf();if(!srOn())return fact('sr_story')?1:0;const st=srStage();if(st===0)return 0;return st<3?st+1:0}
+function pdNext(){const p=pdOf();if(!pdOn())return fact('pd_story')?1:0;const st=pdStage();if(st===0)return 0;return st<3?st+1:0}
+function srWhyNot(n){if(upWorks())return'樓上正在施工，一次一件。';if(n>=2){const d0=phaseDay(srOf(),n-1);const left=d0+SR_WAIT[n]-S.day;if(left>0)return`先讓大家用一陣子（再 ${left} 天）。`}return null}
+function pdWhyNot(n){if(upWorks())return'樓上正在施工，一次一件。';if(n>=2){const p=pdOf();const d0=phaseDay(p,n-1);const left=d0+PD_WAIT[n]-S.day;if(left>0)return`包廂先用一陣子（再 ${left} 天）。`;const need=PD_USES[n]-(p.n||0);if(need>0)return`包廂再多用幾次（還要 ${need} 次）。`}return null}
+function buyRoomPhase(kind,n){const L=kind==='sr'?SR_PROJ:PD_PROJ;const P=L[n];const nx=kind==='sr'?srNext():pdNext();if(!P||nx!==n||(kind==='sr'?srWhyNot(n):pdWhyNot(n))||S.money<P.cost)return false;
+ S.money-=P.cost;const o=kind==='sr'?srW():pdW();const D=S.day+1;if(n===1){o.bought=S.day;o.done=D;S.newRooms=S.newRooms||{};S.newRooms[kind==='sr'?'staff':'pdr']=D;factSet(kind==='sr'?'sr_build':'pd_build')}else if(n===2){o.b2=S.day;o.st2=D}else{o.b3=S.day;o.st3=D}
+ save();IDLE=null;bg=null;for(const kk in BGC)delete BGC[kk];
+ projectReveal({k:'up',room:'up',n:`${P.n}${n>1?' '+['','I','II','III'][n]:''}《${P.sub}》`,done:P.done+(n===1?'——今晚施工，明天開門前就好。':'——明天就在。'),jill:P.jill,unlock:P.unlock,eyebrow:n===1?'動工':'訂好了'});return true}
+function roomPhaseCard(kind,n,money,btn){const L=kind==='sr'?SR_PROJ:PD_PROJ;const P=L[n];const st=kind==='sr'?srStage():pdStage();const o=kind==='sr'?srOf():pdOf();const nx=kind==='sr'?srNext():pdNext();
+ const dayOf=phaseDay(o,n);const built=dayOf!=null&&S.day>=dayOf,building=dayOf!=null&&S.day<dayOf;
+ const tag=built?'<span class="tier t1">已完工</span>':building?'<span class="tier">明天完工</span>':'';const why=!built&&!building&&nx===n?(kind==='sr'?srWhyNot(n):pdWhyNot(n)):null;
+ const pct=Math.min(100,Math.round(money/P.cost*100));
+ const act=built||building?'':nx!==n?`<div class="act"><span class="lock">${n===1?'':'先做完上一階段。'}</span></div>`:why?`<div class="act"><span class="lock">${why}</span></div>`:`<div class="act">${btn(P.cost,kind==='sr'?'buySR':'buyPD',String(n),n===1?'動工':'訂購')}${money<P.cost?`<span class="muted" style="font-size:11.5px">還差 ${fmt(P.cost-money)}</span>`:''}</div>${money<P.cost?`<div class="gb"><i style="width:${pct}%"></i></div>`:''}`;
+ return`<div class="item ${built?'done':''}"><img alt="" src="${iconURL('upfloor')}"><div class="nm">${P.n}${n>1?' '+['','I','II','III'][n]:' I'}《${P.sub}》 ${tag}</div><div class="d">${built?P.done:P.d}</div>${act}</div>`}
+function secUpRooms(money,btn){if(!upTaken())return'';let out='';
+ const sr=fact('sr_story')||srOn(),pd=fact('pd_story')||pdOn();if(!sr&&!pd)return'';
+ if(sr){out+=`<p class="muted" style="font-size:12px;margin:8px 0 4px">員工休息室——《大家待的地方》之後的事。</p>`;for(let n=1;n<=3;n++){if(n>1&&srStage()<n-1&&srNext()!==n)continue;out+=roomPhaseCard('sr',n,money,btn)}}
+ if(pd){out+=`<p class="muted" style="font-size:12px;margin:8px 0 4px">私人包廂——《關上門以後》之後的事。${pdBuilt()?`現在可訂 4–${pdMax()} 位。`:''}</p>`;for(let n=1;n<=3;n++){if(n>1&&pdStage()<n-1&&pdNext()!==n)continue;out+=roomPhaseCard('pd',n,money,btn)}}
+ return`<div class="nm" style="font-weight:800;font-size:15px;margin:14px 0 2px">二樓的房間</div>`+out}
+/* the offer after the story beat, like the floor's: plan it, or later — it stays in 店舖工程 either way */
+function roomOffer(kind){paused=!!R;sub='roomoffer';const sr=kind==='sr';
+ show(`<div class="modal"><div class="eyebrow">新企劃</div><h2>${sr?'員工休息室':'私人包廂'}</h2><p>${sr?'二樓左邊、樓梯上來的內側那一塊，隔一間有門的房間，給每天在這裡工作的人。':'二樓窗邊那一區，隔一間可以關上門的包廂：一張長桌，給一桌人自己的地方。'}</p><div class="stack"><button class="btn primary" data-act="roomGo" data-k="${kind}|plan">開始規劃 <small>會出現在「店舖工程」</small></button><button class="btn" data-act="roomGo" data-k="${kind}|later">之後再說 <small>不會不見——工程頁隨時找得到</small></button></div></div>`,'dim')}
+function roomGo(k){const [kind,ch]=String(k).split('|');const o=kind==='sr'?srW():pdW();o.offer=S.day;o.plan=ch;hideScreen();sub=null;if(R)paused=false;noteLine(kind==='sr'?(ch==='plan'?'員工休息室列進了店鋪工程。':'休息室先放著。工程頁裡隨時找得到。'):(ch==='plan'?'私人包廂列進了店鋪工程。':'包廂先放著。工程頁裡隨時找得到。'));save()}
+/* ---- the stories (D, M): the need is seen first, more than once, by different people; then Jill sees it herself;
+   then the project. Staff Room: 《箱子》《又在找位置》《東西放哪》 (rc5) and 《等一下》; then 《大家待的地方》. Private
+   Dining: 怡君 「有比較安靜的嗎？」, later a table that is nobody's family (周董, or a family); then 《關上門以後》. ---- */
+V24_ERAS.push(
+ {k:'sr',n:'休息室',settle:7,can:()=>upTaken(),begun:()=>fact('sr_story'),done:()=>srBuilt()?{d:srOf().done}:null},
+ {k:'pd',n:'包廂',settle:5,can:()=>srBuilt(),begun:()=>fact('pd_yj'),done:()=>pdBuilt()?{d:pdOf().done}:null});
+const SP_KINDS=['sp_box','sp_seat','sp_stuff','sp_wait'];
+/* the restaurant has the people for it: eight on the restaurant's list, three of them 熟手 or more (tenure classes —
+   never the days counted since v2.3, AQ) */
+function srCrewOK(){const L=(S.crew||[]).filter(m=>crewPool(m)==='restaurant');return L.length>=8&&L.filter(m=>tenureAtLeast(m,'熟手')).length>=3}
+function srStoryReady(){return eraOpen('sr')&&!!fact('up_use')&&S.level>=5&&srCrewOK()&&!!fact('yj_meet')&&upKinds(SP_KINDS)>=2&&!srOn()&&!fact('sr_story')}
+/* what the room has been: two of its traces, or a story's (Private Dining's condition 4) */
+function srLived(){return['plug','seat','cup','yj'].filter(srTrace).length+(fact('sr_food')?1:0)+(fact('sr_fridge')?1:0)}
+function zhouKnown(){const h=story().named&&story().named['周董'];return !!(h&&(h.n||0)>=2)}
+STORY_EV.push(
+ /* 《等一下》 (staff_room_brief, outside cast): 怡君 comes to pick up her mother; she eats, then gives up her seat and
+    waits by the door — a relative has nowhere to wait that is not a guest's seat */
+ {k:'sp_wait',lane:'ambient',cd:0,at:['served'],
+  when:ctx=>isYJ(ctx.g)&&ctx.g.size===1&&!fact('sp_wait')&&eraOpen('up')&&spOK()&&!!fact('yj_meet')&&!!xiuqin()&&!!xqHere()&&R.t>R.dur*.7,
+  run:ctx=>{const g=ctx.g;factSet('sp_wait');JILL_SAY('今天來接阿姨？',300,{with:YJID});sayG(g,'嗯，她說收完就好。',1600,{who:YJID});JILL_SAY('那妳吃完坐著等。',3000,{with:YJID});
+   sayG(g,queued().length?'我吃完就讓位子啦，外面還有人在排。':'我吃完站門口等就好，不佔你們位子。',4400,{who:YJID});later(()=>{if(R&&phase==='service')noteLine('怡君吃完就站到門邊去等。店裡能坐的地方，都是客人的。')},6200)}},
+ /* 《大家待的地方》 (major, closing): Jill alone, the room quiet; then the project */
+ {k:'sr_story',lane:'major',cls:'A',floor:1,at:['close'],ic:'heart',note:'打烊以後，Jill 想到：好像一直沒有一個地方，是給每天在這裡工作的人待的。',
+  when:()=>srStoryReady()&&!v24Fresh('close')&&!upNight()&&!upSearching(),
+  run:()=>{R.upCloseSaid=1;factSet('sr_story');v24Cap('sr_story');
+   v24Scene([{who:'',text:'打烊以後，大家陸續下班。後場的椅子上還掛著誰的外套，樓上那張桌子，下午有人坐在那裡扒便當。'},{who:'',text:'Jill 把最後幾張椅子收上桌，站了一會兒。'},
+    {who:'',text:'店裡有客人的位置。'},{who:'',text:'有貓的位置。'},{who:'',text:'有吃完飯還不想走的人待的位置。'},{who:'',text:'好像一直沒有一個地方，是給每天在這裡工作的人待的。'}],()=>{if(R)roomOffer('sr')})}},
+ /* 怡君 with three friends: 「要坐裡面一點嗎？」「有比較安靜的嗎？」「……沒有。」 (M) — no unlock, no suggestion */
+ {k:'pd_yj',lane:'v24',cls:'A',floor:2,at:['seat'],
+  when:ctx=>isYJ(ctx.g)&&ctx.g.size>=3&&due('pd_yj',null,0,'pd'),
+  run:ctx=>{const g=ctx.g;factSet('pd_yj');regFactNamed(YJN,'和朋友來吃飯，想找安靜一點的位子——那時店裡沒有。');JILL_SAY('要坐裡面一點嗎？',400,{with:YJID});sayG(g,'有比較安靜的嗎？',1700,{who:YJID});later(()=>{if(R&&phase==='service')noteLine('Jill 看了一下店裡。')},3000);JILL_SAY('……沒有。',4300,{with:YJID})}},
+ /* another table, nobody's family, the same need (M): 周董 with two guests — or, where the save does not know him, a
+    family on a busy evening */
+ {k:'pd_other',lane:'v24',cls:'A',floor:2,at:['seat'],
+  when:ctx=>!!ctx.g&&due('pd_other','pd_yj',3,'pd')&&((namedId(ctx.g)==='周董'&&ctx.g.size>=2)||(!zhouKnown()&&ctx.g.type==='family'&&!ctx.g.reg&&upFull()>=.6)),
+  run:ctx=>{const g=ctx.g;factSet('pd_other');const z=namedId(g)==='周董';
+   if(z){regFactNamed('周董','帶兩位客人來談事情，問有沒有比較不被打擾的位子。');sayG(g,'有比較不被打擾的位置嗎？',500);JILL_SAY('……最裡面那桌。',1900);later(()=>{if(R&&phase==='service')noteLine('周董和客人坐到最裡面，說話的聲音壓得很低。')},3400)}
+   else{sayG(g,'有沒有不會被打擾的位子？我們今天有點事要講。',500);JILL_SAY('……側邊那張會安靜一點。',2000);later(()=>{if(R&&phase==='service')noteLine('那一家人坐下以後，說話聲音一直很小。')},3500)}}},
+ /* 《關上門以後》 (major, closing): Jill passes the Staff Room; then the tables downstairs; the last line is left to the
+    project (no 「也許餐廳需要一個包廂」) */
+ {k:'pd_story',lane:'major',cls:'A',floor:1,at:['close'],ic:'heart',note:'打烊以後，Jill 經過休息室，又回頭看了一眼今天客人坐過的位置。',
+  when:()=>due('pd_story','pd_other',2,'pd')&&srBuilt()&&S.day-srOf().done>=10&&srLived()>=1&&!pdOn()&&!v24Fresh('close')&&!upNight()&&!upSearching(),
+  run:()=>{R.upCloseSaid=1;factSet('pd_story');v24Cap('pd_story');const L=[{who:'',text:'打烊以後，Jill 上樓關燈。'},{who:'',text:'休息室的門半掩著，裡面的燈還亮著。沙發上丟著一件外套，桌上有個沒洗的杯子。'},{who:'',text:'她回頭，往樓下今天客人坐過的位置看了一眼。'}];
+   if(loungeLv())L.push({who:'',text:'有些人留下來，是因為還不想回家。所以有了 Lounge。'});L.push({who:'',text:'有些人需要一個地方，是因為每天都在這裡工作。所以有了休息室。'},{who:'',text:'還有一些人來吃飯，只是今天想跟這張桌上的人待在一起。'});
+   v24Scene(L,()=>{if(R)roomOffer('pd')})}},
+ /* the first payoff (十四): the table that asked, some days after the room opened — 「裡面可以嗎？」「可以。」 */
+ {k:'pd_back',lane:'v24',cls:'A',floor:2,at:['seat'],
+  when:ctx=>!!ctx.g&&ctx.g.pdStory==='pd_back'&&!fact('pd_back')&&ctx.t&&ctx.t.pdr,
+  run:ctx=>{const g=ctx.g;factSet('pd_back');regFactNamed(YJN,'後來又和朋友來，坐了包廂。');JILL_SAY('裡面可以嗎？',300,{with:YJID});later(()=>{if(R&&phase==='service')noteLine('怡君往包廂裡看了一眼。')},1500);sayG(g,'可以。',2700,{who:YJID})}}
+);
+/* who these need: 怡君 late, to pick her mother up; 怡君 and friends; 周董 and two guests; the payoff's table */
+V24_WANTS.push(()=>{const out=[];
+ if(eraOpen('up')&&!fact('sp_wait')&&fact('yj_meet')&&xiuqin()&&spOK())out.push({name:YJN,p:.45,type:'regular',size:1,t:.78});
+ if(due('pd_yj',null,0,'pd'))out.push({name:YJN,p:.85,type:'regular',size:4});
+ if(due('pd_other','pd_yj',3,'pd')&&zhouKnown())out.push({name:'周董',p:.8,type:'vip',size:3});
+ const B=pdBooking(S.day);if(B&&B.k==='pd_back'&&B.status==='booked'&&!fact('pd_back'))out.push({name:YJN,p:1,type:'regular',size:4,o:{pdStory:'pd_back'}});
+ const r=pdRes();if(r&&r.status==='booked')out.push({name:r.name,p:1,type:r.type,size:r.size,t:r.t,o:{pdRes:r.id,story:1}});
+ return out});
+/* the payoff's evening: booked a few days after the room opened, on an evening nobody has booked (AC) */
+function pdStoryDay(){if(!pdBuilt()||fact('pd_back')||!fact('pd_yj'))return;const p=pdOf();if(S.day-p.done<3)return;if(pdBooking(S.day))return;const r=pdRes();if(r&&pdResOpen(r))return;pdBook(S.day,{k:'pd_back',size:4,who:YJN})}
+/* ---- the Staff Room in use (F, G): no story most of the time. Someone in early sits a moment before the doors open;
+   on a quiet stretch one of the floor goes up for a few minutes; at closing a few of them go up — the kitchen too, and
+   the bar — sit, drink something, talk, and the day ends. Restaurant and Lounge alike: it is the crew's room, not a
+   pool. The few lines (an outlet, a fridge, a lunchbox) are said once; after that it is just what people do. ---- */
+const SR_LINE_GAP=2;   /* days between the room's small first-time moments */
+function srHere(m){return !!m&&crewHere(m)&&(S.crew||[]).includes(m)}
+function srFreeSpot(pref){const used=new Set(srPeople().map(p=>p.spotK).filter(Boolean));for(const w of R.srw||[])if(w.spot)used.add(w.spot.k);for(const id in R.cw||{}){const w=R.cw[id];if(w.srSpot&&w.task&&w.task.sr)used.add(w.srSpot.k)}
+ const all=srSpots();if(pref){const p=all.find(s=>s.k===pref&&!used.has(s.k));if(p)return p}const seats=all.filter(s=>!s.stand&&!used.has(s.k));const pool=seats.length?seats:all.filter(s=>!used.has(s.k));if(!pool.length)return null;return pool[hash('srsp|'+S.day+'|'+used.size)%pool.length]}
+function srPrefOf(m){if(m.name==='阿德師傅'&&srStage()>=2)return'green';if(m.name==='Hugo'&&srStage()>=2)return'fridge';if(m.name==='小彤'&&srTrace('cup'))return'stool';return null}
+function srCount(m){const s=srW();s.cnt=s.cnt||{};s.cnt[m.name]=(s.cnt[m.name]||0)+1;return s.cnt[m.name]}
+/* a floor crew member up to the room for a while: the walk-over's task, to a spot in another room */
+function srSend(m,dur,spot){const w=R.cw&&R.cw[m.id];if(!w||w.task||w.next||w.arriving||w.leaving)return false;const sp=spot||srFreeSpot(srPrefOf(m));if(!sp)return false;w.srSpot=sp;w.task={k:'visit',sr:1,t:{x:sp.x+(sp.face||1)*10,y:sp.y-22,room:'staff'},g:null,x:sp.x,y:sp.y,room:'staff',dur,then:()=>srArrive(m),up:dur>1e6?1:0};w.busy=0;return true}
+/* the kitchen and the bar have no walking sprite in the service: at closing they walk up as themselves */
+function srWalk(m,from,spot,at){(R.srw=R.srw||[]).push({m,room:from.room,x:from.x,y:from.y,troom:'staff',tx:spot.x,ty:spot.y,spot,face:1,step:0,moving:false,at,hold:null,arr:0})}
+function srArrive(m){/* first-time moments and quiet habits, once each */const st=srStage();const n=srCount(m);const w=R.cw&&R.cw[m.id];const sw=srWalker(m.id);
+ if(m.name==='小彤'&&st>=2&&n>=4&&!srTrace('cup'))srTraceSet('cup');if(m.name==='阿德師傅'&&st>=2&&n>=3&&!srTrace('seat'))srTraceSet('seat');
+ const hold=m.name==='小彤'&&srTrace('cup')?'mug':(hash('srh|'+S.day+'|'+m.id)%3===0?'phone':null);if(w)w.srHold=hold;if(sw)sw.hold=hold;
+ const f0=fact('sr_first');if(!f0||f0.d===S.day||R.srSaid===S.day)return;const lastLine=(srOf().line||-99);if(S.day-lastLine<SR_LINE_GAP)return;
+ const said=k=>{factSet(k);srW().line=S.day;R.srSaid=S.day};const inRoom=n0=>srPeople().find(p=>p.m.name===n0);
+ if(m.name==='阿珠姐'&&st===1&&!fact('sr_plug')){said('sr_plug');srTraceSet('plug');sayS(m,'插座不夠。',800);return}
+ if(m.name==='阿珠姐'&&st>=2&&fact('sr_plug')&&!fact('sr_plug2')){said('sr_plug2');sayS(m,'我就說吧。',900);return}
+ if(m.name==='秀琴阿姨'&&srFoodToday()&&!fact('sr_food')){said('sr_food');sayS(m,'家裡多煮的，你們吃。',900);return}
+ if(m.name==='Hugo'&&st>=2&&!fact('sr_fridge')&&inRoom('Nina')){said('sr_fridge');const N=crewByName('Nina');later(()=>{if(R&&N)staffSay(N,'你要找什麼？')},3600);sayS(m,'……忘了。',5200);return}
+ if(st>=2&&!fact('sr_nina')&&m.name!=='Nina'&&inRoom('Nina')&&m.role!=='chef'){said('sr_nina');sayS(m,'我充電線呢？',700);const N=crewByName('Nina');later(()=>{if(R&&N&&R.cw)staffSay(N,'你外套口袋。')},2100)}}
+function srFoodToday(){const m=crewByName('秀琴阿姨');return srStage()>=2&&!!m&&crewHere(m)&&hash('srfood|'+S.day)%4===0}
+function kaiBagToday(){const m=crewByName('Kai');return !!m&&crewHere(m)&&hash('kaibag|'+S.day)%3===0}
+function srFridgeOpen(){if(!R)return false;for(const w of R.srw||[]){if(w.room==='staff'&&w.fr){const t=w.fr.t;return(t>.5&&t<2)||(t>3.4&&t<5)}}for(const id in R.cw||{}){const w=R.cw[id];if(w.room==='staff'&&w.fr){const t=w.fr.t;return(t>.5&&t<2)||(t>3.4&&t<5)}}return false}
+function srLifeUpd(dt){if(!R||phase!=='service'||!srBuilt())return;
+ /* in early: one or two of the floor sit a moment before the first guests */
+ if(!R.srEarly&&R.cw&&R.t>.4){R.srEarly=1;const F=(S.crew||[]).filter(m=>(m.role==='waiter'||m.role==='cleaner')&&srHere(m)&&R.cw[m.id]&&!R.cw[m.id].arriving);const k=hash('srearly|'+S.day)%3;F.sort((a,b)=>hash(S.day+'|'+a.id)-hash(S.day+'|'+b.id)).slice(0,k).forEach((m,i)=>{const w=R.cw[m.id];const sp=srFreeSpot(srPrefOf(m));if(!sp)return;w.room='staff';w.x=sp.x;w.y=sp.y;w.tx=sp.x;w.ty=sp.y;w.troom='staff';srSend(m,5+i*3,sp);if(w.task)w.task.fired=1})}
+ /* a quiet stretch: one goes up for a few minutes, never while the room is needed downstairs */
+ R.srT=(R.srT||0)-dt;const busy=queued().length>0||R.tables.some(t=>t.group&&(t.group.state==='order'||t.group.state==='check'||t.group.pat<.4))||R.tickets.some(tk=>tk.items.some(i=>i.st==='ready'&&!i.picked));
+ for(const id in R.cw||{}){const w=R.cw[id];if(w.task&&w.task.sr&&w.task.dur<1e6&&busy&&w.room!=='staff'&&!w.task.fired){/* called back before they got there */w.task=null;w.srSpot=null}}
+ if(R.closing==null&&R.srT<=0){R.srT=8;if(!busy&&(R.srBreaks||0)<2&&R.t>R.dur*.12&&R.t<R.dur*.85&&R.tables.filter(t=>t.group).length<=Math.max(2,R.tables.length*.4)&&!Object.values(R.cw||{}).some(w=>w.task&&w.task.sr)){
+   const F=(S.crew||[]).filter(m=>(m.role==='waiter'||m.role==='cleaner')&&srHere(m)&&R.cw[m.id]&&!R.cw[m.id].task&&!R.cw[m.id].next&&(R.cw[m.id].cd||0)<=0);if(F.length&&hash('srbr|'+S.day+'|'+Math.floor(R.t/8))%100<30){const m=F[hash('srbm|'+S.day+'|'+Math.floor(R.t))%F.length];if(srSend(m,10+hash('srbd|'+S.day)%5)){R.srBreaks=(R.srBreaks||0)+1;R.srT=60}}}}
+ /* the walkers: up from the kitchen or the bar, to a spot, and sit */
+ for(const w of R.srw||[]){if(R.closing==null||R.closing<w.at)continue;if(!w.arr){if(stepTo(w,105*dt)){w.arr=1;w.moving=false;w.face=w.spot.face||1;srArrive(w.m);if(w.m.name==='Hugo'&&srStage()>=2&&w.spot.k==='fridge')w.fr={t:0}}else{w.moving=true;w.step+=dt*11}}
+  else if(w.fr){w.fr.t+=dt;const t=w.fr.t;if(t>2&&t<2.6){w.x=w.spot.x-10;w.face=-1}else if(t>=2.6&&t<3.4){w.x=w.spot.x;w.face=1}if(t>6){w.fr=null;const sp=srFreeSpot(null);if(sp&&!sp.stand){w.spot=sp;w.tx=sp.x;w.ty=sp.y;w.arr=0}}}}
+ for(const id in R.cw||{}){const w=R.cw[id];if(w.room==='staff'&&w.task&&w.task.sr&&w.task.fired&&w.srSpot&&w.srSpot.k==='fridge'&&srStage()>=2){if(!w.fr)w.fr={t:0};w.fr.t+=dt}}
+ /* the first evening: Jill goes up to see it; the newest of them is standing, not sure she may sit */
+ if(R.srFirst)srFirstUpd(dt);
+ /* a cat follows them in now and then, sleeps on the sofa a while, and goes (H) */
+ if(R.closing!=null&&R.closing>30&&!R.srCat&&srPeople().length>=2&&hash('srcat|'+S.day)%100<28&&CATS){R.srCat=1;const W={snow:3,mei:2,tora:1,mikan:1,ban:1};const c=wpick(CATS.filter(o=>freeFloorCat(o)&&!o.guest&&!upCatBusy(o)),o=>W[o.def.id]||.5);if(c){R.srCatId=c.def.id;upCatSend(c)}}}
+/* closing: who goes up, when, to where */
+function srClosingPlan(){if(!srBuilt()||!R||upNight()||(R.upAsk&&!R.upAsk.end))return;R.srw=[];const st=srStage();
+ const floor=(S.crew||[]).filter(m=>(m.role==='waiter'||m.role==='cleaner')&&srHere(m)&&R.cw&&R.cw[m.id]);const cooks=(S.crew||[]).filter(m=>m.role==='chef'&&srHere(m));const bars=loungeLv()?(S.crew||[]).filter(m=>m.role==='bartender'&&srHere(m)):[];
+ const pick=(L,n,key)=>L.slice().sort((a,b)=>(hash(key+S.day+'|'+a.id)%97)-(hash(key+S.day+'|'+b.id)%97)).slice(0,n);
+ const wantN=k=>['阿珠姐','阿德師傅','Hugo','小彤','秀琴阿姨','Nina'].includes(k);
+ const cookN=Math.min(cooks.length,2+(st>=2?1:0)),floorN=Math.min(floor.length,2+(st>=3?1:0));
+ const C=pick(cooks.filter(m=>wantN(m.name)),cookN).concat(pick(cooks.filter(m=>!wantN(m.name)),cookN)).slice(0,cookN);const F=pick(floor.filter(m=>wantN(m.name)),floorN).concat(pick(floor.filter(m=>!wantN(m.name)),floorN)).slice(0,floorN);const B=pick(bars,hash('srbar|'+S.day)%2);
+ let at=4;for(const m of C){const sp=srFreeSpotPlanned(srPrefOf(m));if(!sp)break;srWalk(m,{room:'kitchen',x:KR.door.x+(hash(m.id)%30)-15,y:KR.door.y-10},sp,at);at+=3+hash('srat|'+m.id)%5}
+ for(const m of B){const sp=srFreeSpotPlanned(null);if(!sp)break;srWalk(m,{room:'lounge',x:LG.door.x,y:LG.door.y},sp,at);at+=4}
+ R.srPlan=F.map((m,i)=>({m,at:6+i*5}))}
+function srFreeSpotPlanned(pref){const used=new Set((R.srw||[]).map(w=>w.spot.k));const all=srSpots();if(pref){const p=all.find(s=>s.k===pref&&!used.has(s.k));if(p)return p}const seats=all.filter(s=>!s.stand&&!used.has(s.k));return seats.length?seats[hash('srp|'+S.day+'|'+used.size)%seats.length]:null}
+function srClosingUpd(dt){if(!R||!R.srPlan||R.closing==null)return;for(const p of R.srPlan){if(p.done||R.closing<p.at)continue;p.done=1;if(R.srFirst&&R.srFirst.who===p.m.id)continue;srSend(p.m,1e9)}
+ if(!fact('sr_first')&&!R.srFirst&&R.closing>8&&!DLG)srFirstStart()}
+/* 「坐啊。」「喔，好。」 — the first evening the room is there */
+function srFirstStart(){const F=(S.crew||[]).filter(m=>(m.role==='waiter'||m.role==='cleaner')&&srHere(m)&&R.cw&&R.cw[m.id]);const who=F.find(m=>m.name==='小彤')||F.slice().sort((a,b)=>TENURE_RANK[tenure(a)]-TENURE_RANK[tenure(b)]||((a.days||0)-(b.days||0)))[0];
+ if(!who||(LIFE.plan==='sofa'&&LIFE.jill&&LIFE.jill.on&&false)){factSet('sr_first');return}
+ const sp=srSpots().find(s=>s.k==='window');const w=R.cw[who.id];if(w.task&&w.task.k!=='visit'){if(w.task.g&&w.task.g.claim===who.id)w.task.g.claim=null;if(w.task.t&&w.task.t.claim===who.id)w.task.t.claim=null}w.task=null;w.next=null;srSend(who,1e9,sp);
+ upJillTake();R.srFirst={who:who.id,t:0,step:'go'};upJillGo(SRL.door.x-26,SRL.door.y+30,'staff')}
+function srFirstUpd(dt){const Q=R.srFirst;Q.t+=dt;const J=R.jill;const m=(S.crew||[]).find(x=>x.id===Q.who);const w=m&&R.cw[m.id];
+ if(Q.step==='go'){if((J.room==='staff'&&J.tx==null&&w&&w.task&&w.task.fired)||Q.t>40){if(J.room!=='staff'){J.room='staff';J.x=SRL.door.x-26;J.y=SRL.door.y+30;J.tx=null}Q.step='say';Q.at=Q.t;J.face=-1;if(room==='up')setRoom('staff')}return}
+ if(Q.step==='say'){if(Q.t-Q.at<1.2)return;Q.step='sat';Q.at=Q.t;factSet('sr_first');JILL_SAY('坐啊。',100,{with:'staff:'+m.name});later(()=>{if(R&&m)staffSay(m,'喔，好。')},1500);later(()=>{if(!R||!w)return;const s2=srFreeSpot(m.name==='小彤'?'stool':null);if(s2&&w.task){w.srSpot=s2;w.task.x=s2.x;w.task.y=s2.y;w.task.t={x:s2.x,y:s2.y-22,room:'staff'};w.task.fired=0}},2600);return}
+ if(Q.step==='sat'){if(Q.t-Q.at<6)return;Q.step='down';upJillGo(PASS.x-36,PASS.y-70,'main');return}
+ if(Q.step==='down'){if((J.room==='main'&&J.tx==null)||Q.t-Q.at>40){Q.step='end';R.srFirst=null;upJillGive()}}}
+/* ---- reservations (R–Z, AA–AC). The game's one meal period is the evening; one booking an evening at most, made by
+   the start of the day, with its party size and a minimum spend fixed in the save the moment it is made (V: never
+   recomputed). Automatic — no approving, no deposits, no calendar. The room is kept for them; with no booking a
+   party of four or more may walk in and sit there (X). Frequency: a base chance by phase and a quiet rise after
+   evenings without one (Y: soft pity, never shown); the first comes by the second evening the room is open.
+   Authored stories book an evening the same way (pdBook) and never over a booking already made (AC). ---- */
+const PD_RATE=[0,.34,.5,.66];
+const PD_KINDS=[{k:'family',n:'家庭聚餐',type:'family'},{k:'friends',n:'朋友聚餐',type:'student'},{k:'bday',n:'小型慶生',type:'family'},{k:'work',n:'公司聚餐',type:'office'},{k:'class',n:'老同學聚會',type:'office'},{k:'talk',n:'安靜談事情',type:'office'}];
+const PD_SURN=['林','陳','張','黃','吳','劉','蔡','楊','許','鄭','謝','郭','洪','曾','周','葉'];
+function pdBooking(d){const p=pdOf();return p&&p.book&&p.book[d]||null}
+function pdRes(){const p=pdOf();const r=p&&p.res;return r&&r.d===S.day?r:null}
+function pdResOpen(r){return !!r&&(r.status==='booked'||r.status==='seated')}
+/* the room is kept tonight: for a reservation, or for a story's use of it */
+function pdHeld(){if(!pdBuilt())return false;const r=pdRes();if(pdResOpen(r))return true;const b=pdBooking(S.day);return !!(b&&(b.status==='booked'||b.status==='seated'))}
+/* the average check per guest, measured from the evenings themselves (the late-game economy as it is) */
+function pdAvg(){const p=pdOf()||{};if(p.avg)return p.avg;const L=S.lastSummary;if(L&&L.guests>0)return Math.max(120,Math.round(L.rev/L.guests));const ms=menuList();const m=ms.length?ms.reduce((a,d)=>a+priceOf(d),0)/ms.length:150;return Math.round(m*1.6)}
+function pdAvgUpd(st){if(!pdOn()||!st||!(st.guests>0))return;const p=pdW();const v=st.rev/st.guests;p.avg=Math.round(p.avg?p.avg*.75+v*.25:v)}
+/* the minimum: party size × the average check × a modest factor for the room, by phase; rounded to $100 */
+function pdMinFor(size,st){return Math.max(400,Math.round(size*pdAvg()*[0,1.05,1.1,1.15][st||1]/100)*100)}
+function pdPickSize(st,key){const max=PD_MAX[st];const W=[];for(let n=PD_MIN;n<=max;n++)W.push({n,w:n<=6?3-Math.abs(n-5)*.6:n<=8?1.4-(n-7)*.3:.9-(n-9)*.3});let tot=W.reduce((a,o)=>a+o.w,0),x=(hash(key)%1000)/1000*tot;for(const o of W){x-=o.w;if(x<=0)return o.n}return W[W.length-1].n}
+/* at the start of the day (the prep screen): tonight's booking, if one comes in */
+function pdDay(){if(!pdBuilt())return;const p=pdW();if(p.res&&p.res.d===S.day)return;   /* already made (a reload, the same day): never twice */
+ if(p.res&&p.res.d<S.day&&p.res.status==='booked')p.res.status='missed';
+ for(const d in p.book)if(+d<S.day)delete p.book[d];
+ if(pdBooking(S.day))return;   /* a story has the room tonight */
+ const st=pdStage();const firstDays=S.day-p.done;let pr=PD_RATE[st]+Math.min(.6,.2*(p.dry||0));if(!p.ever&&firstDays>=1)pr=1;
+ if(hash('pdres|'+S.day)%1000/1000>=pr){p.dry=(p.dry||0)+1;return}
+ p.dry=0;p.ever=(p.ever||0)+1;const size=pdPickSize(st,'pdsz|'+S.day);const K=PD_KINDS[hash('pdk|'+S.day)%PD_KINDS.length];const sn=PD_SURN[hash('pds|'+S.day)%PD_SURN.length];
+ const name=K.k==='family'||K.k==='bday'?`${sn}家`:K.k==='work'?`${sn}先生一行`:K.k==='class'?`${sn}小姐和同學`:K.k==='talk'?`${sn}先生`:`${sn}小姐和朋友`;
+ p.res={id:'r'+S.day,d:S.day,size,min:pdMinFor(size,st),kind:K.n,type:K.type,name,t:.26+(hash('pdt|'+S.day)%30)/100,status:'booked',phase:st}}
+/* an authored use of the room on day d (AA–AC): kept unless that evening is already booked */
+function pdBook(d,o){if(!pdBuilt())return false;const p=pdW();if(p.res&&p.res.d===d&&pdResOpen(p.res))return false;if(p.book[d])return false;p.book[d]=Object.assign({kind:'story',status:'booked',d},o||{});return true}
+/* who may sit at the table: tonight's booking only; with none, a party that fits (4 up to the phase's size) */
+function pdTableFor(g){if(!pdBuilt()||!g||g.size<PD_MIN||g.size>pdMax())return false;const r=pdRes();if(pdResOpen(r))return g.pdRes===r.id;const b=pdBooking(S.day);if(b&&(b.status==='booked'||b.status==='seated'))return !!g.pdStory&&g.pdStory===b.k;return !g.reg&&!g.lounge}
+function pdSeated(g,t){if(!t||!t.pdr)return;const r=pdRes();if(r&&g.pdRes===r.id){r.status='seated';logLine('',`預約包廂的客人到了：${r.name}，${r.size} 位。`,'e')}const b=pdBooking(S.day);if(b&&g.pdStory===b.k)b.status='seated';
+ /* a cat that wandered in leaves before the meal (AD) */if(CATS)for(const c of CATS)if(c.away==='pdr'){c.away='up';c.ax=UPR.pdDoor.x;c.ay=UPR.pdDoor.y+10;upCatToStairs(c,44)}}
+/* the bill (W): what they ate, or the minimum if that is more; the tip is on what they ate */
+function pdBill(g,rev){const r=pdRes();if(r&&g.pdRes===r.id&&g.table!=null&&R.tables[g.table]&&R.tables[g.table].pdr){r.actual=rev;r.status='done';if(rev<r.min){R.st.pdTop=(R.st.pdTop||0)+(r.min-rev);rev=r.min}R.st.pdRes=(R.st.pdRes||0)+1}
+ const b=pdBooking(S.day);if(b&&g.pdStory===b.k)b.status='done';if(g.table!=null&&R.tables[g.table]&&R.tables[g.table].pdr){const p=pdW();p.n=(p.n||0)+1;R.st.pdN=(R.st.pdN||0)+1}return rev}
+/* the day's news (Z): plain, readable, the minimum never clipped */
+function pdNewsHTML(){if(!pdBuilt())return'';const r=pdRes();const b=pdBooking(S.day);
+ if(pdResOpen(r))return`<div class="event pdres"><b>今晚｜私人包廂｜已預約</b><span>${r.size} 位・${r.kind}・最低消費 ${fmt(r.min)}</span></div>`;
+ if(b&&b.status==='booked')return`<div class="event pdres"><b>今晚｜私人包廂｜有人訂了</b><span>${b.size?b.size+' 位':''}</span></div>`;
+ return`<div class="event pdres quiet"><b>今晚｜私人包廂</b><span>沒有預約——${PD_MIN} 位以上的客人可以直接坐（最多 ${pdMax()} 位）</span></div>`}
+/* walk-ins: a party now and then, on an evening nobody booked */
+function pdWalkIns(out,dur){if(!pdBuilt()||pdHeld())return;const st=pdStage();const n=(hash('pdw|'+S.day)%100<[0,45,55,65][st]?1:0)+(hash('pdw2|'+S.day)%100<[0,10,18,26][st]?1:0);
+ for(let i=0;i<n;i++){const K=PD_KINDS[hash('pdwk|'+S.day+'|'+i)%PD_KINDS.length];const size=pdPickSize(st,'pdws|'+S.day+'|'+i);const sn=PD_SURN[hash('pdwn|'+S.day+'|'+i)%PD_SURN.length];
+  out.push({t:dur*(.22+(hash('pdwt|'+S.day+'|'+i)%40)/100+i*.25),type:K.type,size,name:K.k==='family'||K.k==='bday'?`${sn}家`:`${sn}${K.k==='work'?'先生一行':'小姐和朋友'}`,pdWalk:1})}}
+function upTableY(){return Math.round(92+(LH-92)*.30)}
 /* ---- the street: the sky by the hour and the weather, the neighbours, the façade with the sign, the door (OPEN while the
    service runs), the pavement with whatever was bought for it, the tables under umbrellas ---- */
 function drawFrontRoom(c,now,dusk,V,X0,XW,TOP,list){const d=clamp(dusk,0,1);const W=wxNow();const wet=W==='rain'||W==='storm';const E=S.ext||{};const dq=Math.round(d*16)/16;
@@ -5088,8 +5594,10 @@ function roomTap(p,e){e.preventDefault();audioInit();
   if(p.y>LH-70&&Math.abs(p.x-200)<60){setRoom('main');return true}return false}
  if(room==='side'){const a=SIDE_L.arch;if(p.x>=a.x-8&&p.x<=a.x+a.w+8&&p.y>=a.y-6&&p.y<=a.y+112){setRoom('main');return true}}
  if(room==='front'){if(Math.abs(p.x-FR.door.x)<30&&p.y>176&&p.y<276){setRoom('main');return true}}
+ /* v2.4 rc6: the doors on the floor open the rooms; inside, the door goes back out */if(room==='up'){const inB=(B,m)=>p.x>=B.x0-m&&p.x<=B.x1+m&&p.y>=B.y0-UPW.h-m&&p.y<=B.y1+m;if(srBuilt()&&inB(UPR.sr,4)){setRoom('staff');return true}if(pdBuilt()&&inB(UPR.pd,4)){setRoom('pdr');return true}}
+ if((room==='staff'&&Math.abs(p.x-SRL.door.x)<24&&p.y>-10&&p.y<104)||(room==='pdr'&&Math.abs(p.x-PDL.door.x)<26&&p.y>-10&&p.y<104)){setRoom('up');return true}
  const rg=hitRegular(p);if(rg&&!paused){showRegCard(rg);return true}
- if(!R||paused||phase!=='service')return false;let best=null,bd=1e9;for(const t of R.tables){if((t.room||'main')!==room)continue;const d=Math.hypot((p.x-t.x)*.85,p.y-(t.y-16));const lim=t.seats===4?46:40;if(d<lim&&d<bd){bd=d;best=t}}
+ if(!R||paused||phase!=='service')return false;let best=null,bd=1e9;for(const t of R.tables){if((t.room||'main')!==room)continue;const d=Math.hypot((p.x-t.x)*(t.pdr?.4:.85),p.y-(t.y-16));const lim=t.pdr?60:t.seats===4?46:40;if(d<lim&&d<bd){bd=d;best=t}}
  if(best){tapTable(best);return true}return false}
 function tapKItem(k){audioInit();KPOP[k]=performance.now()/1000;const now=performance.now()/1000;
  if(k.startsWith('miss:')){toast(`${k.slice(5)}還沒買，打烊後可以在商店購買`);return}
@@ -5459,7 +5967,7 @@ function crewCount(m,k){if(!R)return;R.st.crew=R.st.crew||{};const c=R.st.crew[m
 function poolCrew(p){return(S.crew||[]).filter(m=>crewPool(m)===p)}
 /* the restaurant's people: its size and its own works. (Until v2.4 rc5 this was crewCap() and the Lounge's +2 and +2
    were added in — a Lounge that let the dining room hire four more, and the other way round.) */
-function restaurantCap(){return[1,2,3,4,6][S.level-1]+(opsLv('room')?2:0)+(projOn('side')?2:0)+(projOn('kext')?2:0)+(projOn('kitchen2')?2:0)}
+function restaurantCap(){return[1,2,3,4,6][S.level-1]+(opsLv('room')?2:0)+(projOn('side')?2:0)+(projOn('kext')?2:0)+(projOn('kitchen2')?2:0)+(pdStage()>=1?1:0)+(pdStage()>=3?1:0)}   /* v2.4 rc6 (AG–AH): the Private Dining Room's first and third phase — the restaurant's list only */
 /* the Lounge's: the names on its roster that its works have opened (I: Evan, 沈晴; II: 阿拓, 安安, 許葳) */
 function loungeRosterOpen(){return LOUNGE_ROSTER.filter(r=>loungeLv()>=r.lv)}
 function loungeCap(){return loungeRosterOpen().length}
@@ -5564,10 +6072,10 @@ function crewUpd(dt){R.cw=R.cw||{};for(const m of S.crew||[]){
   w.cd=.4;if(w.room!=='main'||Math.hypot(w.x-84,w.y-150)>4){w.tx=84;w.ty=150;w.troom='main';if(!stepTo(w,80*dt)){w.moving=true;w.step+=dt*12}}}
  else{const free=q=>q.dirty&&!q.group&&!q.claim&&!jillTargets(q.i);const t=(crewPool(m)==='lounge'&&R.tables.find(q=>q.lounge&&free(q)))||R.tables.find(free);/* v2.4 rc5: the Lounge's cleaner clears the Lounge first, then wherever she is needed */if(t){t.claim=m.id;w.task={k:'clean',t,x:t.x+(t.x<200?-24:24),y:t.y+22,dur:cleanDur(m)};continue}w.cd=.4}}}
 function crewDraw(c,now,list,rm){
- if(R&&R.cw)for(const m of S.crew||[]){if(m.role==='chef')continue;const w=R.cw[m.id];if(!w||(w.room||'main')!==(rm||'main'))continue;list.push({y:w.y,f:()=>{const stp=w.moving?Math.sin(w.step):0;const L0=crewLook(m);if(w.phone)L0.acc='phone';drawPerson(c,w.x,w.y,L0,{step:stp,bob:w.moving?Math.abs(stp)*-.8:0,mood:m.name==='秀琴阿姨'&&wallWorrying()?'ok':'happy',flip:w.face<0,carry:!!(w.carry&&w.carry.length),arms:m.role==='cleaner'&&w.task&&w.task.k==='clean'&&!w.moving?[.3,1.0]:null});
+ if(R&&R.cw)for(const m of S.crew||[]){if(m.role==='chef')continue;const w=R.cw[m.id];if(!w||(w.room||'main')!==(rm||'main')||rm==='staff'||srWalker(m.id))continue;/* v2.4 rc6: in the Staff Room they are drawn sitting (srDrawPeople); a bartender walking up is his walker */list.push({y:w.y,f:()=>{const stp=w.moving?Math.sin(w.step):0;const L0=crewLook(m);if(w.phone)L0.acc='phone';drawPerson(c,w.x,w.y,L0,{step:stp,bob:w.moving?Math.abs(stp)*-.8:0,mood:m.name==='秀琴阿姨'&&wallWorrying()?'ok':'happy',flip:w.face<0,carry:!!(w.carry&&w.carry.length),arms:m.role==='cleaner'&&w.task&&w.task.k==='clean'&&!w.moving?[.3,1.0]:null});
   if(w.carry)w.carry.slice(0,3).forEach((it,i)=>{const cv=dishCanvas(it.d,it.q,64,S.decor.ware>0,it.want);c.drawImage(cv,w.x+(i%2?5:-21),w.y-50-Math.floor(i/2)*8,16,16)});
   const hx=w.x+(w.face<0?-12:12);if(m.role==='cleaner'){c.strokeStyle='#8A6A3A';c.lineWidth=1.6;c.beginPath();c.moveTo(hx,w.y-30);c.lineTo(hx+(w.face<0?-4:4),w.y-2);c.stroke();c.fillStyle='#C9A86A';el(c,hx+(w.face<0?-4:4),w.y-1,5,2.4)}else{c.fillStyle='#C9CED0';el(c,hx,w.y-26,7,2)}
-  nameTag(c,w.x,w.y-64,m.name)}})}xqHelperDraw(c,list,rm)}
+  nameTag(c,w.x,w.y-64,m.name)}})}srDrawPeople(c,now,list,rm);xqHelperDraw(c,list,rm)}
 function nameTag(c,x,y,n){c.font=`800 6.5px ${FONT}`;const w=c.measureText(n).width+8;c.fillStyle='rgba(42,42,42,.72)';rr(c,x-w/2,y-6,w,10,4);c.fill();c.fillStyle='#FFF8EC';c.textAlign='center';c.textBaseline='middle';c.fillText(n,x,y-1);c.textBaseline='alphabetic'}
 /* ================= incidents ================= */
 const INC_BAD=['rowdy','broken','thief','inspector'],INC_GOOD=['lucky','delivery','quiet','musician','selfie','power','rainstart','viprush','wave'];
@@ -5917,7 +6425,7 @@ function morningRemark(){if(!S.today||S.morningSaid===S.day||phase!=='prep')retu
 let menuSwap=null;   /* v2.2.1 #5: the weather dish waiting for a slot while the player chooses what to take off */
 function menuSwapHTML(){if(!menuSwap||!S.today)return'';const inn=menuSwap;const exp=expectDemand(S.today.groups,60);const cur=S.menu.filter(x=>S.unlocked.includes(x)).map(d=>({d,e:Math.round(exp[d]||0),st:S.stock[d]||0})).sort((a,b)=>a.e-b.e);
  return`<div class="mswap"><div class="ms-h">菜單已滿，要換掉哪一道？<span class="muted">換成 <b>${dishName(inn)}</b></span><button class="btn sm" data-act="menuSwapNo">取消</button></div><div class="ms-list">${cur.map(x=>`<button class="ms-row" data-act="menuSwapDo" data-d="${x.d}"><img alt="" src="${dishURL(x.d,'P')}"><span class="nm">${dishName(x.d)}</span><small>預估 ${x.e} 份${x.st?`・冰箱 ${x.st}`:''}</small><b>換掉</b></button>`).join('')}</div><p class="small muted" style="margin:6px 0 0">依今天的預估銷量排序，最不會被點的在最前面。換掉的菜庫存留著，明天可以再放回來。</p></div>`}
-function showPrep(){phase='prep';mainScreen='prep';R=null;room='main';try{storyPhotoFlush();staffMealStory();upStaffMeal();/* v2.4 P2 */setTimeout(()=>{try{storyProgressCheck()}catch(e){}},900)}catch(e){console.warn('[story]',e)}/* v2.3 */lifeReset();IDLE=makeIdle();layoutAll();hud(true);renderTickets();planToday();const T=S.today,F=feat();const W=WEATHER[T.weather],E=EVENTS[T.event];
+function showPrep(){phase='prep';mainScreen='prep';R=null;room='main';try{storyPhotoFlush();staffMealStory();upStaffMeal();/* v2.4 P2 */setTimeout(()=>{try{storyProgressCheck()}catch(e){}},900)}catch(e){console.warn('[story]',e)}/* v2.3 */lifeReset();IDLE=makeIdle();layoutAll();hud(true);renderTickets();planToday();try{pdStoryDay();pdDay()}catch(e){console.warn('[pd]',e)}/* v2.4 rc6 */const T=S.today,F=feat();const W=WEATHER[T.weather],E=EVENTS[T.event];
  const ms=menuList();const unlocked=[...S.unlocked];const sug=suggestStock();let restockCost=0;for(const d of ms){const need=Math.max(0,sug[d]-(S.stock[d]||0));restockCost+=need*costOf(d)}
  const cap=fridgeCap(),tot=stockTotal();const menuN=menuCount();
  const rows=unlocked.map(d=>{const D=DISH(d);const on=S.menu.includes(d);const m=S.price[d]||1;const st=S.stock[d]||0;const lv=mLv(d);
@@ -5933,7 +6441,7 @@ function showPrep(){phase='prep';mainScreen='prep';R=null;room='main';try{storyP
   ${shopDay()>=6?(()=>{const t=socialTopic();const c=campaign();const n=socialCands().length;return`<button class="goalline linkline" data-act="bookSocial"><span>社群與宣傳</span><b>${c?`${CAMPS.find(x=>x.k===c.k).n}進行中`:t?`大家在談：${t.k==='food'&&t.dish?dishName(t.dish):TOPICS[t.k].n}`:'最近大家在說什麼'}</b><small>${n?`今天可以發 ${n} 則 ›`:'›'}</small></button>`})():''}
   ${T.event!=='none'?`<div class="event"><b>今日事件：${E.n}</b><br>${E.d}</div>`:''}
   ${S.buzzMsg?`<div class="news">${S.buzzMsg}</div>`:''}
-  ${S.news.length?`<div class="news">${S.news.join('<br>')}</div>`:''}${loungeLv()&&!loungeStaffed()?`<div class="inline-warn" style="margin-top:10px">Lounge 今晚沒有人站吧台——在「員工」聘一位調酒師，或在工作分配把他加到 Lounge 吧台。</div>`:''}
+  ${S.news.length?`<div class="news">${S.news.join('<br>')}</div>`:''}${pdNewsHTML()}${loungeLv()&&!loungeStaffed()?`<div class="inline-warn" style="margin-top:10px">Lounge 今晚沒有人站吧台——在「員工」聘一位調酒師，或在工作分配把他加到 Lounge 吧台。</div>`:''}
   <h3>今日任務</h3><div class="card tasks">${T.tasks.map(t=>`<div class="task"><span>${t.txt}</span><small>獎勵 +${fmt(t.reward)}</small></div>`).join('')}</div>
   ${(()=>{const reco=recoDish();const dt=T.tasks.find(t=>t.k==='dish');const list=menuList().filter(stationOk);if(!list.length)return'';const exp=expectDemand(T.groups,60);
    return`<h3>⭐ 今日推薦</h3><div class="card reco"><p class="d">客人今天會比較容易點這道菜。想主推哪一道就選它，再多備一點料。</p><div class="opts">${list.map(d=>`<button class="${reco===d?'on':''}" data-act="reco" data-d="${d}">${reco===d?'⭐ ':''}${dishName(d)}</button>`).join('')}</div>
@@ -6027,7 +6535,7 @@ function secDreams(money,btn){if(S.level<4)return'';let body=`<div class="nm" st
 function showShop(){phase='shop';mainScreen='shop';R=null;rdAutoUnlock();IDLE=makeIdle();layoutAll();hud(true);renderTickets();if(SHOP_TAB_MAP[shopTab])shopTab=SHOP_TAB_MAP[shopTab];const tabs=shopTabs();if(!tabs.find(t=>t.k===shopTab&&t.on))shopTab='home';
  let body='';const money=S.money;const btn=(cost,act,extra,label)=>`<button class="btn sm ${money>=cost?'primary':''}" data-act="${act}" ${extra||''} ${money>=cost?'':'disabled'}>${label||'購買'} ${fmt(cost)}</button>`;
  if(shopTab==='home'){body+=secTables(money,btn);if(projOn('side')||projOn('terrace'))body+=secRoomTables(money,btn);if(shopDay()>=4)body+=secThemes(money,btn)+secDecor(money,btn);else body+=`<p class="muted" style="font-size:12px;margin:12px 0 0">第 4 天打烊後，這裡會多出店裡的樣子與裝潢。</p>`;if(shopDay()>=3)body+=secExterior(money,btn)}
- if(shopTab==='works'){body+=secExpand(money,btn)+secProjects(money,btn)+secLounge(money,btn)+secUp(money,btn)+secOps(money,btn)+secDreams(money,btn)}
+ if(shopTab==='works'){body+=secExpand(money,btn)+secProjects(money,btn)+secLounge(money,btn)+secUp(money,btn)+secUpRooms(money,btn)+secOps(money,btn)+secDreams(money,btn)}
  if(shopTab==='catlife'){body+=secCats(money,btn)}
  if(shopTab==='social'){body+=secSocial(money,btn)}/* v2.3 */
  if(shopTab==='kitchen'){for(const E of EQUIP){const lv=S.eq[E.k]||0;const max=5;const cost=lv<max?E.cost[lv]:null;const locked=E.k==='oven'&&lv===0&&shopDay()<3;
@@ -6210,6 +6718,7 @@ function doAct0(a,d,k,b){
  case'loungeGo':loungeGo(k);break;
  case'upGo':upGo(k);break;
  case'buyUp':{if(buyUp()){sfx.buy()}break}
+ case'buySR':{if(buyRoomPhase('sr',+k))sfx.buy();break}case'buyPD':{if(buyRoomPhase('pd',+k))sfx.buy();break}case'roomGo':roomGo(k);break;   /* v2.4 rc6 */
  case'buyLounge':{if(buyLounge(+k)){sfx.buy()}break}
  case'jillPost':{if(jillPost(k))sfx.tap();if(sub==='book')showBook();else showShop();break}
  case'campaign':{const sel=b&&b.closest('.item')&&b.closest('.item').querySelector('[data-camp=dish]');if(startCampaign(k,sel?sel.value:null)){sfx.buy();if(sub==='book')showBook();else showShop()}else toast('現在不能開始這個宣傳');break}
@@ -6285,7 +6794,7 @@ screenEl.addEventListener('input',e=>{if(e.target.dataset&&e.target.dataset.cat)
 function projectReveal(P){let el=$('#reveal');if(!el){el=document.createElement('div');el.id='reveal';screenEl.parentNode.appendChild(el)}
  el.hidden=false;el.className='work';el.innerHTML=`<div class="rv"><div class="dust">${Array.from({length:14},(_,i)=>`<i style="left:${8+i*6.5}%;animation-delay:${(i*137%700)/1000}s"></i>`).join('')}</div><b>施工中…</b><span>${P.n}</span></div>`;sfx.buy();
  const T=setTimeout(()=>{if(!$('#reveal')||el.hidden)return;el.className='done';sfx.ding();
-  const pj=portraitOf('jill','cheerful');el.innerHTML=`<div class="rv card ${pj?'with-jill':''}"><div class="eyebrow">完工</div><h2>${P.n}</h2><p class="done">${P.done}</p>${pj?`<div class="say-row"><img class="rv-jill" alt="" src="${pj.src}"><p class="say">Jill：「${P.jill}」</p></div>`:`<p class="say">Jill：「${P.jill}」</p>`}${P.react?`<p class="react">${typeof P.react==='function'?P.react():P.react}</p>`:''}${P.unlock&&P.unlock.length?`<div class="unl"><b>現在可以</b>${P.unlock.map(u=>`<span>${u}</span>`).join('')}</div>`:''}<div class="btns"><button class="btn primary" data-act="revealPeek" data-k="${P.k}">去看看 ›</button><button class="btn" data-act="revealClose">繼續買東西</button></div></div>`},1500);
+  const pj=portraitOf('jill','cheerful');el.innerHTML=`<div class="rv card ${pj?'with-jill':''}"><div class="eyebrow">${P.eyebrow||'完工'}</div><h2>${P.n}</h2><p class="done">${P.done}</p>${pj?`<div class="say-row"><img class="rv-jill" alt="" src="${pj.src}"><p class="say">Jill：「${P.jill}」</p></div>`:`<p class="say">Jill：「${P.jill}」</p>`}${P.react?`<p class="react">${typeof P.react==='function'?P.react():P.react}</p>`:''}${P.unlock&&P.unlock.length?`<div class="unl"><b>現在可以</b>${P.unlock.map(u=>`<span>${u}</span>`).join('')}</div>`:''}<div class="btns"><button class="btn primary" data-act="revealPeek" data-k="${P.k}">去看看 ›</button><button class="btn" data-act="revealClose">繼續買東西</button></div></div>`},1500);
  el.onclick=e=>{const b=e.target.closest('[data-act]');if(!b)return;clearTimeout(T);doAct(b.dataset.act,b.dataset.d,b.dataset.k,b)}}
 function hideReveal(){const el=$('#reveal');if(el){el.hidden=true;el.innerHTML=''}}
 function keepScroll(fn,anchor){const sh=screenEl.querySelector('.sheet');const top=sh?sh.scrollTop:0;const a0=anchor&&sh?screenEl.querySelector(anchor):null;const y0=a0?a0.getBoundingClientRect().top:null;fn();const s2=screenEl.querySelector('.sheet');if(!s2)return;s2.scrollTop=top;

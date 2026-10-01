@@ -3,6 +3,14 @@
 Permanent from v2.3 (2026-10-01). A release is not complete until every item has been done and recorded in the
 release report.
 
+## 0. Scope — finish everything the player asked for (2026-10-02, the player)
+
+- Everything the player has asked for gets finished, whether or not a release was published in between. A release is
+  a checkpoint, not a stopping point (`docs/v24/rule_finish_everything_0237_2026-10-02.txt`).
+- After a release, go straight on to the next part of what was asked (the plan's next release). Stop only when nothing
+  that was asked for is left, or for a product decision only the player can make.
+- 「中間不用停」 means: do not stop, and do not stop after a release either.
+
 ## 1. Content in the release
 
 - [ ] Release content audit table: FEATURE / FIX | STATUS | SOURCE BRANCH | IN THIS RELEASE? | WHY / WHY NOT.

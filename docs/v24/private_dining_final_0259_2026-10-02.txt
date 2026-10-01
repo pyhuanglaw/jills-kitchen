@@ -1,0 +1,46 @@
+(Filed verbatim. 2026-10-02 02:59, the player — SUPERSEDED by the complete spec rc6_final_spec_0300_2026-10-02.txt, sent at 03:00. The final functional spec for rc6's Private Dining Room — phases,
+reservations, story infrastructure. Wins over docs/v24/private_dining_room_brief_2026-10-01.txt where they differ
+(fixed 4–8 people, reservation frequency, minimum spend, reservation acceptance, what each phase does). The message as
+received ends after 「適合：- 小家庭」; the rest is asked for and will be filed below when it arrives.)
+
+【FINAL PRIVATE DINING DESIGN — PHASES / RESERVATIONS / STORY INFRASTRUCTURE】
+
+請以本段作為 RC6 Private Dining Room 的最終功能規格。
+
+若前面關於：
+- 固定 4–8 人
+- reservation frequency
+- minimum spend
+- reservation acceptance
+- Private Dining phase functionality
+
+有衝突，以本段為準。
+
+Private Dining Room 不只是「多一張可以關門的桌子」。
+
+它是一個會隨 Phase I → II → III 成長的 Restaurant facility。
+
+升級後應實際改變：
+
+1. 可以承接的 group size
+2. reservation demand
+3. minimum-spend business value
+4. 可以發生的 customer situations
+5. 未來 NPC / authored story 可以使用的 story space
+
+━━━━━━━━━━━━━━━━━━
+一、Private Dining 三階段
+━━━━━━━━━━━━━━━━━━
+
+PHASE I
+「小型私人包廂」
+
+Reservation party size：
+MIN = 4
+MAX = 6
+
+定位：
+剛建立的私人用餐空間。
+
+適合：
+- 小家庭
