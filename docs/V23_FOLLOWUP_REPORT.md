@@ -343,6 +343,9 @@ their portraits, as the player decided.
 
 ## 9. Phone screenshots (390×844, headless Chromium — T, not O)
 
+The final set was re-taken on the final code (f12b94f). It is in `docs/evidence/v23_followup/phone/`, with a README
+saying what each file shows.
+
 All taken on the player's Day 52 save:
 
 - the story page (both sections, numbered rows, a beat opened to its words);
