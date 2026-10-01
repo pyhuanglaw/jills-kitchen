@@ -280,3 +280,57 @@ Each release gets:
 - a multi-day pacing simulation on Day 52 / Day 46, checked against the targets above;
 - phone screenshots;
 - a full regression.
+
+## 7. P2 — the Second Floor (rc5), as built
+
+Written when rc5 began (2026-10-01, after the player's 「繼續吧」 at 17:57). Sources: `second_floor_and_long_arcs`
+(the canonical direction), `second_floor_visual_reference` and its two pictures (the canonical geometry, Phase 0–1),
+`second_floor_phases`, `implementation_pass` §I–K, S, T. The layout sketch's stair corner (bottom left) is superseded
+by the picture (bottom right).
+
+**The building.** The internal stairs come up from the side room (the unit next door that was opened up): a plain
+wooden stair door at the side room's near edge, centre — there is room for it between the tunnel and the basket, and
+it is the one place inside the restaurant the cats can reach without the kitchen. Closed it is a door and a mat; the
+night it is not latched, the stairwell light spills through. The street view gets the second floor above the sign:
+two big windows, dark while the floor is the landlord's, warm once it is Jill's.
+
+**The room `up` (二樓)**, drawn from the reference in the game's front view: the back wall with the two big window rows
+and the pilaster between them, the air conditioner over it, pendant lamps; a structural column in the middle of the
+floor; the stair opening with its railing at the lower right (the stairs going down inside it); wooden planks.
+- Vacant (the landlord's): boxes and a step ladder in the right corner, a plant in the left one, a folding table with
+  two folding chairs along the left wall, dust. Seen first at night, with the cats.
+- Taken (whole floor, basic works): clean, warm light, the boxes down to two; then movable furniture arrives over the
+  first days — the shared wooden table and mismatched chairs, a plant, a utility cabinet, a coat stand, a floor lamp,
+  and restrained cat things (a low cushion, a small stool, a scratching board). No partitions.
+- Zones are data for later (`UP_ZONES`): staff room on the left, private dining along the windows, the stairs bottom
+  right, an undecided area bottom left, the middle kept for circulation. Nothing is built on them in P2.
+- Not a dining room: no guests, no tables to serve. The tab 二樓 appears once the floor is taken; before that the room
+  is only seen during the missing-cats night.
+
+**State.** Story facts, as everything else: `up_hint`, `up_staff`, `up_inspect`, `up_cats` (with `up_door`, the day's
+unlatched door), customer pressure `up_busy` / `up_full` / `up_small`, staff pressure `sp_box` / `sp_seat` /
+`sp_stuff`, `up_remind`, `up_ask`, `up_leak` (the 《那面牆》 callback). `S.up = {offer, lease, furn:{…}, traces:{…}}`;
+`S.rooms.up` once taken. Old saves start with none of it.
+
+**The arc** (era `up`: two days after the wall's settlement; needs the side room and a mature restaurant):
+
+| # | Beat | Lane | Who | Gap |
+|---|---|---|---|---|
+| U1 | 「樓上也是你們的？」「不是，房東的。」「一直空著？」「好像是。」 — no journal | v24 | an established regular (12+ visits, not one of the wall's people) | era open |
+| U2 | Staff, at closing: 「樓上真的一直都空著喔？」 / 「上面多大？」「不知道。」「妳沒上去過？」「沒有啊。」 | v24 | two present staff | 1 |
+| U3 | The landlord's afternoon visit: he checks the vacant floor; Jill goes up with him; 「地板是好的，窗戶也是好的。」 He locks the door after. Brief, no room view | major | (vignette, the landlord) | 2 |
+| U4 | **The missing cats.** That afternoon the landlord brings someone up to look at the air conditioner; the door closes but does not latch. Late in the evening 柔柔, then 小齁, are not in any room. At closing: 「柔柔呢？」「剛剛不是還在？」「小齁也不在。」 — the present staff and Jill search the rooms (the others are counted: 「包包在這。」…), someone finds the stair door: 「這個怎麼開著？」 「……柔柔？」 Upstairs, at night: 柔柔 by the window, 小齁 comes to Jill first. 「妳們兩個。」 Only then: 「……這裡滿大的欸。」「嗯。」 Down, the door latched. No unlock | major | the cats, Jill, the staff really here | 3 |
+| — | Customer pressure, different needs: 「妳們現在人這麼多，沒想過樓上？」「樓上又不是我的。」「租啊。」「你講得很簡單。」 / a full night: 「今天又滿了？」「樓上還空著？」「還在。」 / 「妳這間越來越不像以前那麼小了。」 | v24 / ambient | different regulars | after U4 (+2) |
+| — | Staff pressure: 《箱子》《又在找位置》《東西放哪》 (also the Staff Room's evidence later) | ambient | the people in them | from the era's opening, days apart |
+| U5 | 「樓上不是還空著？」「那是房東的。」「我知道啊。」 or 「妳不是看過樓上？」「看過。」「很小？」「……不小。」 | v24 | a staff member | after U4 (+2), two staff and two customer kinds seen |
+| U6 | At closing Jill looks toward the stair door: 「……樓上現在還空著嗎？」 She calls the landlord: 「妳真的要租樓上？」「嗯。」「下面不夠用了？」「開始有一點。」「整層？」「整層。」 The project is offered | major | Jill, the landlord | 2 |
+| — | 「先看漏水。」 (Mia), Sophie laughs, 秀琴阿姨: 「真的，先看。」, 王先生 if he is there: 「……這次跟我沒關係。」 — only if the wall happened | ambient | Sophie, Mia, 秀琴阿姨 | after U6 |
+| U7 | The project 二樓（整層） in 店舖工程; the reveal; next day the floor is open | (project) | — | the player |
+
+Then open-floor life: the furniture arrives over a week; staff traces (a bag, a charger, a cup) once people start
+going up; cats may go up on their own (restrained places); 柔柔 now and then back at her window. Not a Staff Room.
+
+**Pacing target, Day 52 save:** the era opens ~Day 81–83 → U1 ~82–84 → U3 ~85–87 → U4 ~88–91 → U6 ~94–98 → the
+project when the player buys it. **Price:** 二樓（整層） $350,000 — the largest building project (Lounge III is
+$220,000, the cat walkway $300,000), about a week of a Day 52 restaurant's net; most mature saves have it by then. It
+does nothing mechanical yet: it is the floor.

@@ -582,12 +582,13 @@ const SIDE_ARCH={x:344,y:12,w:40};   /* the arch to the side room, on the dining
 const FR={door:{x:200,y:262},walk:300,enter:{x:-24,y:300},exit:{x:424,y:300},cols:[96,304,200],row:352,bench:{x:350,y:262},sun:{x:48,y:266},nook:{x:88,y:250}};   /* nook: the dog's house by the door (v2.2.1 #10; v2.3 moved in from x 50, where a phone cut it off: it now spans x 48–126, between the left edge and the flower box, and sits 8 px higher so the terrace's first parasol does not cover the cushion) */   /* the street outside */
 const KD={x:64,y:0};   /* the kitchen door in the dining room: at the left end of the counter (y filled from FB) */
 const KR={get door(){return{x:200,y:LH-30}},get fridge(){return{x:318,y:LH-112,w:52,h:80}},get cooler(){return projOn('walkin')?{x:43,y:LH-138,w:57,h:106}:{x:44,y:LH-112,w:48,h:80}}};   /* the walk-in: wider and taller, same corner */   /* the kitchen: the fridge and the cold room stand on the pickup side, the door to the dining room between them */
-function roomOpen(k){return k==='main'||k==='kitchen'||k==='front'||(k==='side'&&!!(S.rooms&&S.rooms.side))||(k==='lounge'&&!!(S.rooms&&S.rooms.lounge))}
+function roomOpen(k){return k==='main'||k==='kitchen'||k==='front'||(k==='side'&&!!(S.rooms&&S.rooms.side))||(k==='lounge'&&!!(S.rooms&&S.rooms.lounge))||(k==='up'&&(upTaken()||!!(R&&R.upView)))}   /* v2.4 P2: the second floor — once it is Jill's; before that only the night someone has to go up */
 function doorway(a,b){const kd={x:KD.x,y:FB-8};
  if(a==='main'){if(b==='lounge')return[[LOUNGE_ARCH.x+LOUNGE_ARCH.w/2,100],[LG.door.x,LG.door.y]];if(b==='side')return[[SIDE_ARCH.x+SIDE_ARCH.w/2,100],[SIDE_L.door.x,SIDE_L.door.y]];if(b==='front')return[[DOOR.x,DOOR.y+4],[FR.door.x,FR.door.y]];if(b==='kitchen')return[[kd.x,kd.y],[KR.door.x,KR.door.y]]}
  if(b==='main'){if(a==='lounge')return[[LG.door.x,LG.door.y],[LOUNGE_ARCH.x+LOUNGE_ARCH.w/2,100]];if(a==='side')return[[SIDE_L.door.x,SIDE_L.door.y],[SIDE_ARCH.x+SIDE_ARCH.w/2,100]];if(a==='front')return[[FR.door.x,FR.door.y],[DOOR.x,DOOR.y+4]];if(a==='kitchen')return[[KR.door.x,KR.door.y],[kd.x,kd.y]]}
+ /* v2.4 P2: the stairs — the side room's stair door, and the top of the stairs on the second floor */if(a==='side'&&b==='up')return[[UPDOOR.x,UPDOOR.y],[UP_L.entry.x,UP_L.entry.y]];if(a==='up'&&b==='side')return[[UP_L.entry.x,UP_L.entry.y],[UPDOOR.x,UPDOOR.y]];
  return null}
-function nextHop(a,b){return(a==='main'||b==='main')?b:'main'}
+function nextHop(a,b){if(a==='up')return'side';if(b==='up')return a==='side'?'up':a==='main'?'side':'main';return(a==='main'||b==='main')?b:'main'}   /* every door leads to the dining room, except the stairs: they come down in the side room */
 /* one movement step for anything with x,y,room and a target tx,ty,troom; through doorways when needed. Returns true on arrival. */
 function stepTo(e,v){const tr=e.troom||e.room||'main';if(!e.room)e.room='main';let tx=e.tx,ty=e.ty;let hop=null;
  if(tr!==e.room){hop=nextHop(e.room,tr);const dw=doorway(e.room,hop);if(!dw){e.room=tr;return false}tx=dw[0][0];ty=dw[0][1]}
@@ -3171,7 +3172,7 @@ function renderStock(){const p=$('#stockPanel');if(!p||p.hidden||!R)return;const
   if(a==='buy'){const d=b.dataset.d,n=+b.dataset.n;buyEmergency(d,n);renderStock();stockChip()}});
  $('#stockChip').addEventListener('click',()=>openStock())}}
 /* ---- room navigation: tabs with badges (what needs you where), swipe on the scene, keys 1–4 on a keyboard ---- */
-const ROOM_ORDER=['front','main','side','lounge','kitchen'];
+const ROOM_ORDER=['front','main','side','up','lounge','kitchen'];
 function roomsOpen(){return ROOM_ORDER.filter(roomOpen)}
 function setRoom(k){if(!roomOpen(k)||k===room)return;room=k;forceDraw=true;sfx.tap();renderRoomTabs(true)}
 function roomAlerts(){const A={};for(const k of ROOM_ORDER)A[k]={n:0,u:0};if(!R||phase!=='service')return A;
@@ -3180,7 +3181,7 @@ function roomAlerts(){const A={};for(const k of ROOM_ORDER)A[k]={n:0,u:0};if(!R|
  for(const tk of R.tickets)for(const it of tk.items)if(it.st==='pending'&&!chefCanAny(it.d)){A.kitchen.n++;break}
  const q=queued().length;if(q){A.main.n+=q}return A}
 let tabsHTML='';
-function roomIsNew(k){const nr=S.newRooms||{};const d=k==='side'?nr.side:k==='lounge'?nr.lounge:k==='kitchen'?Math.max(nr.kext||0,nr.cooler||0,nr.pass||0):k==='front'?Math.max(nr.terrace||0,...EXTERIOR.map(e=>S.ext&&S.ext[e.k]?0:0)):0;return!!d&&S.day-d<=1}
+function roomIsNew(k){const nr=S.newRooms||{};const d=k==='side'?nr.side:k==='up'?nr.up:k==='lounge'?nr.lounge:k==='kitchen'?Math.max(nr.kext||0,nr.cooler||0,nr.pass||0):k==='front'?Math.max(nr.terrace||0,...EXTERIOR.map(e=>S.ext&&S.ext[e.k]?0:0)):0;return!!d&&S.day-d<=1}
 function peeking(){const p=$('#peekPill');return!!p&&!p.hidden}   /* v2.2.1 #8: 看店裡 from the shop or the prep screen */
 function renderRoomTabs(force){const el=$('#roomTabs');if(!el)return;const show=(phase==='service'&&!!R)||(phase!=='service'&&peeking()&&roomsOpen().length>1);el.hidden=!show;if(!show)return;const A=roomAlerts();
  const h=roomsOpen().map(k=>`<button data-room="${k}" class="${k===room?'on':''}${A[k].u?' urgent':''}${roomIsNew(k)&&k!==room?' new':''}"><span>${ROOMS[k].n}</span>${A[k].n?`<b>${A[k].n}</b>`:roomIsNew(k)&&k!==room?'<b class="nw">NEW</b>':''}</button>`).join('');
@@ -3428,7 +3429,7 @@ function blitBg(c,cv,X0,XW,TOP){const T2=Math.round(TOP);c.drawImage(cv,X0,-T2,X
 function drawArch(c,x,y,w,h,label){c.fillStyle='#8A6A42';rr(c,x-4,y-4,w+8,h+6,6);c.fill();c.fillStyle='#2A1C16';rr(c,x,y,w,h+2,5);c.fill();let g=c.createLinearGradient(0,y,0,y+h);g.addColorStop(0,'rgba(255,214,150,.08)');g.addColorStop(1,'rgba(255,214,150,.4)');c.fillStyle=g;rr(c,x,y,w,h+2,5);c.fill();
  c.fillStyle='rgba(255,230,180,.22)';c.fillRect(x+6,y+h-14,w-12,14);/* light spilling onto the floor, and a mat with the sign */let fg=c.createLinearGradient(0,y+h,0,y+h+26);fg.addColorStop(0,'rgba(255,214,150,.3)');fg.addColorStop(1,'rgba(255,214,150,0)');c.fillStyle=fg;c.fillRect(x-6,y+h,w+12,26);c.fillStyle='#8A3A2A';rr(c,x-2,y+h+8,w+4,12,3);c.fill();c.fillStyle='rgba(255,255,255,.12)';rr(c,x,y+h+9.5,w,3,1.5);c.fill();c.fillStyle='#F6EEDF';c.font=`800 6.5px ${FONT}`;c.textAlign='center';c.textBaseline='middle';c.fillText(label,x+w/2,y+h+14.4);c.textBaseline='alphabetic'}
 function drawOtherRoom(c,now,dusk,V,X0,XW,TOP){const k=room;const J=V.jill;const list=[];
- if(k==='kitchen')drawKitchenRoom(c,now,dusk,V,X0,XW,TOP,list);else if(k==='side')drawSideRoom(c,now,dusk,V,X0,XW,TOP,list);else if(k==='lounge')drawLoungeRoom(c,now,dusk,V,X0,XW,TOP,list);else drawFrontRoom(c,now,dusk,V,X0,XW,TOP,list);
+ if(k==='kitchen')drawKitchenRoom(c,now,dusk,V,X0,XW,TOP,list);else if(k==='side')drawSideRoom(c,now,dusk,V,X0,XW,TOP,list);else if(k==='lounge')drawLoungeRoom(c,now,dusk,V,X0,XW,TOP,list);else if(k==='up')drawUpRoom(c,now,dusk,V,X0,XW,TOP,list);else drawFrontRoom(c,now,dusk,V,X0,XW,TOP,list);
  for(const t of V.tables)if((t.room||'main')===k&&t.kind!=='bar')list.push({y:t.y,f:()=>drawTableFull(c,t,now)});
  for(const g of V.groups)if(WALK_ST.includes(g.state)&&(g.room||'main')===k)list.push({y:g.y,f:()=>drawWalkers(c,g,now)});
  if(!J.sofa&&(J.room||'main')===k)list.push({y:J.y,f:()=>drawJillAt(c,J,V,now)});
@@ -3679,16 +3680,100 @@ function drawSideRoom(c,now,dusk,V,X0,XW,TOP,list){const T=TH();const d=clamp(du
   else{c.fillStyle=`rgba(255,255,255,${.25-d*.2})`;el(c,x+40,y+18,22,6);el(c,x+120,y+30,30,7)}
   c.fillStyle='#F3F1EC';c.fillRect(x+w/2-1.5,y,3,h);c.fillRect(x,y+h/2-1,w,2);if(d>.5){let lg=c.createLinearGradient(0,y,0,y+h);lg.addColorStop(0,'rgba(255,214,150,0)');lg.addColorStop(1,`rgba(255,214,150,${(d-.5)*.5})`);c.fillStyle=lg;c.fillRect(x,y,w,h)}}
  list.push({y:112,f:()=>drawPlant(c,104,110,'tall')},{y:112,f:()=>drawPlant(c,308,110,'bush')});
+ list.push({y:FB-30,f:()=>drawUpDoor(c,now)});   /* v2.4 P2: the building's stairs come down here */
  list.push({y:-40,f:()=>{const t=winTier();if(t>=2)drawWindowLine(c,t,now)}},{y:46.5,f:()=>drawWindowFront(c,winTier(),now,'hammock')},{y:49.5,f:()=>drawWindowFront(c,winTier(),now,'bed')},{y:76,f:()=>drawSideboardTop(c)});   /* v2.3 late game: over the glass */   /* v2.2.1 F: the bush stepped right to leave the floor under the window's right half to the cushion */
  if(d>.45){/* the lamp on the sideboard is on */let lg=c.createRadialGradient(165,64,2,165,64,40);lg.addColorStop(0,`rgba(255,214,150,${.35*d})`);lg.addColorStop(1,'rgba(255,214,150,0)');c.fillStyle=lg;c.fillRect(125,24,80,80)}}
+/* ================= v2.4 P2: the second floor (docs/v24/second_floor_visual_reference_2026-10-01.txt, the player's two
+   pictures) =================
+   The landlord's empty floor above the restaurant, in the game's front view: the back wall with two big window rows and
+   the pilaster between them, the air conditioner, pendant lamps; a structural column in the middle of the floor; the
+   stair opening with its railing at the lower right, the stairs going down inside it. Vacant (the landlord's), or taken
+   (Jill's, after the basic works): then movable furniture arrives over the first days. No partitions — the later rooms
+   grow inside UP_ZONES, which are data until a story builds on them. */
+ROOMS.up={n:'二樓'};
+const UP_L={win:[{x:36,y:4,w:150,h:76},{x:214,y:4,w:150,h:76}],pil:{x:189,w:22},
+ get col(){const by=Math.round(92+(LH-92)*.47);return{x:200,w:22,base:by,top:by-108}},
+ get stair(){return{x:262,y:FB-170,w:114,h:162}},
+ get entry(){return{x:246,y:FB-24}},
+ get sill(){return{x:300,y:98}}};
+const UP_ZONES={get staff(){return{x:22,y:150,w:128,h:Math.round((LH-92)*.48)}},get pdr(){return{x:22,y:94,w:356,h:62}},get stairs(){const s=UP_L.stair;return{x:s.x-16,y:s.y-6,w:s.w+22,h:s.h+14}},get undecided(){return{x:22,y:FB-150,w:206,h:142}},get middle(){return{x:150,y:160,w:110,h:Math.round((LH-92)*.5)}}};
+const UPDOOR={x:204,get y(){return FB-8}};   /* the stair door, at the side room's near edge */
+function upTaken(){return !!(S.rooms&&S.rooms.up)}
+function upHas(k){const f=S.up&&S.up.furn;return !!(f&&f[k]!=null&&S.day>=f[k])}
+function drawUpRoom(c,now,dusk,V,X0,XW,TOP,list){const d=clamp(dusk,0,1);const taken=upTaken();const lamps=taken?d>.3:!!(R&&R.upLights);const s=UP_L.stair,col=UP_L.col;
+ const bg=roomBg('up',(taken?1:0),TOP,(b,X0,XW,T2)=>{const r=rng(91);
+  /* plaster walls, a little grain; the landlord's floor is a shade greyer */let wg=b.createLinearGradient(0,-T2,0,92);wg.addColorStop(0,taken?'#EFE5D3':'#DDD3C1');wg.addColorStop(1,taken?'#E6D8C1':'#D1C5B1');b.fillStyle=wg;b.fillRect(X0,-T2,XW,T2+92);
+  for(let i=0;i<300;i++){b.fillStyle=`rgba(${r()<.5?'255,255,255':'90,80,66'},${.012+r()*.022})`;el(b,X0+r()*XW,-T2+r()*(T2+88),2+r()*8,1.5+r()*4)}
+  /* the ceiling beam and the window wall's lower band */b.fillStyle=taken?'#7A5A3C':'#6E5640';b.fillRect(X0,-T2,XW,Math.min(12,T2));b.fillStyle='rgba(0,0,0,.1)';b.fillRect(X0,-T2+12,XW,2);
+  b.fillStyle=taken?'#D9C8AE':'#C8BAA3';b.fillRect(X0,80,XW,12);b.fillStyle='rgba(0,0,0,.12)';b.fillRect(X0,91,XW,1.5);
+  /* the window frames: dark steel, many panes; the glass is drawn live (the hour) */for(const w of UP_L.win){b.fillStyle='rgba(0,0,0,.14)';b.fillRect(w.x-3,w.y-1,w.w+6,w.h+6);b.fillStyle='#2F2A26';b.fillRect(w.x-4,w.y-4,w.w+8,w.h+8);b.fillStyle=taken?'#E9DCC4':'#D4C6AE';b.fillRect(w.x-8,w.y+w.h+3,w.w+16,4)}
+  /* the pilaster between them, and the air conditioner above */{const p=UP_L.pil;b.fillStyle=taken?'#E6D9C3':'#D2C5AF';b.fillRect(p.x,-T2,p.w,T2+92);b.fillStyle='rgba(0,0,0,.08)';b.fillRect(p.x+p.w-4,-T2,4,T2+92);b.fillStyle='rgba(0,0,0,.1)';b.fillRect(p.x-1,-T2,1,T2+92);
+   b.fillStyle='#ECEAE4';rr(b,120,-20,54,15,2);b.fill();b.fillStyle='#C9C6BF';b.fillRect(124,-10,46,1.2);b.fillRect(124,-8,46,1.2)}
+  /* the floor: long planks, warm wood, end joints staggered */b.fillStyle=taken?'#C99A63':'#B48A5C';b.fillRect(X0,92,XW,LH-92);
+  {const pw=12;let k=0;for(let x=X0;x<LW+BGM;x+=pw,k++){const t=(r()-.5)*.09;b.fillStyle=t>0?`rgba(255,240,215,${t})`:`rgba(70,45,25,${-t})`;b.fillRect(x,92,pw,LH-92);b.fillStyle='rgba(70,45,25,.16)';b.fillRect(x,92,.8,LH-92);for(let y=92+((k*37)%90);y<LH;y+=70+((k*13)%40)){b.fillStyle='rgba(70,45,25,.14)';b.fillRect(x,y,pw,.8)}}
+   for(let i=0;i<2200;i++){b.fillStyle=r()<.5?'rgba(255,240,220,.18)':'rgba(90,60,35,.1)';b.fillRect(X0+r()*XW,92+r()*(LH-92),.9,.9)}
+   let g=b.createLinearGradient(0,92,0,LH);g.addColorStop(0,'rgba(50,35,20,.26)');g.addColorStop(.1,'rgba(50,35,20,0)');g.addColorStop(1,'rgba(50,35,20,.16)');b.fillStyle=g;b.fillRect(X0,92,XW,LH-92)}
+  /* the stair opening: the well, the steps going down to the landing, the wall lamp's bracket */{b.fillStyle='#3B2C20';b.fillRect(s.x,s.y,s.w,s.h);
+   for(let i=0;i<9;i++){const y0=s.y+8+i*15;const sh=Math.min(1,i/9);b.fillStyle=mix('#8A6644','#2E2219',sh*.8);b.fillRect(s.x+8,y0,s.w-30,11);b.fillStyle=mix('#A07A52','#3A2B20',sh*.8);b.fillRect(s.x+8,y0,s.w-30,2.5)}
+   b.fillStyle='#2A1F17';b.fillRect(s.x+s.w-22,s.y,22,s.h);b.fillStyle='rgba(255,220,160,.18)';b.fillRect(s.x+s.w-20,s.y+18,16,40);b.fillStyle='#6B4A2E';b.fillRect(s.x+s.w-12,s.y+30,4,8)}
+  if(!taken){/* dust: the landlord's floor has not been swept in a while */for(let i=0;i<500;i++){b.fillStyle=`rgba(235,228,214,${.05+r()*.08})`;el(b,X0+r()*XW,94+r()*(LH-100),1+r()*5,.6+r()*2)}b.fillStyle='rgba(120,110,95,.08)';b.fillRect(X0,92,XW,LH-92)}
+ });
+ blitBg(c,bg,X0,XW,TOP);
+ /* the glass: the sky by the hour and the weather; at night the city */for(const [i,w] of UP_L.win.entries()){const W=wxNow();const wet=W==='rain'||W==='storm';let g=c.createLinearGradient(0,w.y,0,w.y+w.h);const top=wet?'#9AA4AE':'#BFDDF2',bot=wet?'#B9C1C8':'#F3E6CC';g.addColorStop(0,mix(top,'#1E2640',d));g.addColorStop(1,mix(bot,'#3B3552',d));c.fillStyle=g;c.fillRect(w.x,w.y,w.w,w.h);
+  /* the trees and the buildings across the street */c.fillStyle=mix('#7FA86A','#22302A',d);for(let k=0;k<6;k++)el(c,w.x+10+k*27,w.y+w.h-8-(k%2)*6,16,10);c.fillStyle=mix('#B8B0A8','#2A2C3C',d);for(let k=0;k<4;k++)c.fillRect(w.x+18+k*36,w.y+22+(k%2)*8,18,w.h-30);if(d>.45){c.fillStyle='rgba(255,214,140,.75)';for(let k=0;k<10;k++)c.fillRect(w.x+21+((k*29+i*13)%(w.w-28)),w.y+26+((k*17)%(w.h-36)),2.5,2.5)}
+  if(wet){c.strokeStyle='rgba(235,242,250,.4)';c.lineWidth=.8;for(let k=0;k<10;k++){const ph=((now*.5)+k*.37)%1;const rx=w.x+4+((k*31)%(w.w-8));c.beginPath();c.moveTo(rx,w.y+ph*w.h);c.lineTo(rx-1,w.y+ph*w.h+6);c.stroke()}}
+  c.fillStyle='#2F2A26';for(let k=1;k<5;k++)c.fillRect(w.x+k*w.w/5-1,w.y,2,w.h);c.fillRect(w.x,w.y+w.h*.42,w.w,2);if(!taken){c.fillStyle='rgba(200,190,170,.18)';c.fillRect(w.x,w.y,w.w,w.h)}}
+ /* daylight through the windows onto the floor; the lamps' pools once they are on */if(d<.55){c.save();c.globalCompositeOperation='lighter';for(const w of UP_L.win){const a=(.55-d)*.35*(taken?1:.75);c.fillStyle=`rgba(255,214,150,${a})`;c.beginPath();c.moveTo(w.x+6,92);c.lineTo(w.x+w.w-6,92);c.lineTo(w.x+w.w+24,212);c.lineTo(w.x+30,212);c.closePath();c.fill()}c.restore()}
+ if(lamps){c.save();c.globalCompositeOperation='lighter';for(const lx of[110,290]){let g=c.createRadialGradient(lx,150,6,lx,150,120);g.addColorStop(0,`rgba(255,206,130,${taken?.26:.22})`);g.addColorStop(1,'rgba(255,206,130,0)');c.fillStyle=g;c.fillRect(lx-120,30,240,240)}c.restore()}
+ /* the pendant lamps, hanging in front of the windows */for(const lx of[110,290]){c.fillStyle='#2A2420';c.fillRect(lx-.6,-TOP,1.2,TOP+32);c.fillStyle='#2F2A26';c.beginPath();c.moveTo(lx-9,42);c.lineTo(lx+9,42);c.lineTo(lx+4,32);c.lineTo(lx-4,32);c.closePath();c.fill();if(lamps){c.fillStyle='#FFE7B0';el(c,lx,42.5,7,2.2)}}
+ /* the column in the middle of the floor: a square concrete post, plaster in front, the shaded side, a dark base and capital */list.push({y:col.base,f:()=>{const w=26,sd=8,x0=col.x-w/2;c.fillStyle='rgba(0,0,0,.18)';el(c,col.x+6,col.base+2,w*.75,5);c.fillStyle=taken?'#DCCDB4':'#C9BBA4';c.fillRect(x0,col.top,w,col.base-col.top);c.fillStyle=taken?'#BFAE93':'#AE9F88';c.beginPath();c.moveTo(x0+w,col.top);c.lineTo(x0+w+sd,col.top-4);c.lineTo(x0+w+sd,col.base-4);c.lineTo(x0+w,col.base);c.closePath();c.fill();c.fillStyle='rgba(0,0,0,.06)';c.fillRect(x0,col.top,3,col.base-col.top);c.fillStyle=taken?'#6B4E34':'#5E4A38';c.fillRect(x0-2,col.base-9,w+4,9);c.beginPath();c.moveTo(x0+w+2,col.base-9);c.lineTo(x0+w+sd+2,col.base-13);c.lineTo(x0+w+sd+2,col.base-4);c.lineTo(x0+w+2,col.base);c.closePath();c.fill();c.fillRect(x0-2,col.top-2,w+4,6);c.beginPath();c.moveTo(x0+w+2,col.top-2);c.lineTo(x0+w+sd+2,col.top-6);c.lineTo(x0+w+sd+2,col.top);c.lineTo(x0+w+2,col.top+4);c.closePath();c.fill()}});
+ /* the railing: along the opening's back edge, and down its left side to the way in */list.push({y:s.y,f:()=>{c.fillStyle='#3A2A1E';c.fillRect(s.x-3,s.y-26,s.w+3,4);for(let x=s.x;x<=s.x+s.w;x+=9)c.fillRect(x,s.y-24,2,24);c.fillStyle='rgba(0,0,0,.18)';c.fillRect(s.x,s.y,s.w,2)}});
+ for(let y=s.y;y<=s.y+86;y+=9){const yy=y;list.push({y:yy,f:()=>{c.fillStyle='#3A2A1E';c.fillRect(s.x-1,yy-24,2,24);if(yy+9<=s.y+86)c.fillRect(s.x-3,yy-26,4,9.5)}})}
+ list.push({y:s.y+88,f:()=>{c.fillStyle='#3A2A1E';c.fillRect(s.x-4,s.y+60,6,30)}});
+ /* the landlord's things: a plant in one corner, boxes and a step ladder in the other, a folding table and two chairs
+    by the left wall. Once the floor is Jill's: two boxes left from the works, and what has been carried up since */
+ list.push({y:118,f:()=>drawPlant(c,58,118,'tall')});
+ const box=(x,y,w,h)=>list.push({y,f:()=>{c.fillStyle='rgba(0,0,0,.14)';el(c,x+w/2,y+1,w*.6,3);c.fillStyle='#B98E5E';c.fillRect(x,y-h,w,h);c.fillStyle='#A47A4C';c.fillRect(x,y-h,w,4);c.fillStyle='rgba(255,255,255,.25)';c.fillRect(x+w/2-1,y-h,2,h)}});
+ box(320,122,22,18);box(343,127,20,14);if(!taken){box(328,104,18,14);box(50,240,22,16);box(54,222,16,12);box(300,118,16,10)}
+ if(!taken){/* the step ladder */list.push({y:124,f:()=>{c.strokeStyle='#8A8E92';c.lineWidth=1.8;c.beginPath();c.moveTo(352,126);c.lineTo(359,90);c.lineTo(366,126);c.stroke();for(let k=0;k<3;k++){c.beginPath();c.moveTo(353+k*1.8,119-k*10);c.lineTo(365-k*1.8,119-k*10);c.stroke()}}});
+  /* the folding table and chairs */const ty=Math.round(92+(LH-92)*.62);list.push({y:ty,f:()=>{c.fillStyle='rgba(0,0,0,.14)';el(c,82,ty+2,30,5);c.fillStyle='#8A6A48';c.fillRect(56,ty-20,54,6);c.fillStyle='#9E7C58';c.fillRect(56,ty-20,54,2);c.strokeStyle='#5A5550';c.lineWidth=1.3;c.beginPath();c.moveTo(60,ty-14);c.lineTo(65,ty);c.moveTo(106,ty-14);c.lineTo(101,ty);c.stroke()}});
+  for(const [x,y] of[[122,ty-4],[74,ty+24]])list.push({y,f:()=>drawFoldChair(c,x,y)})}
+ if(taken)drawUpFurniture(c,list,now,d);
+}
+function drawFoldChair(c,x,y){c.save();c.translate(x,y);c.scale(1.25,1.25);x=0;y=0;drawFoldChair0(c,x,y);c.restore()}
+function drawFoldChair0(c,x,y){c.strokeStyle='#4A4A50';c.lineWidth=1.2;c.beginPath();c.moveTo(x-6,y);c.lineTo(x+5,y-14);c.moveTo(x+5,y);c.lineTo(x-6,y-14);c.stroke();c.fillStyle='#3E3E44';c.fillRect(x-7,y-12,13,3);c.fillRect(x-7,y-24,3,13);c.fillStyle='#55555C';c.fillRect(x-7,y-24,12,5)}
+/* the floor once it is Jill's: what has been carried up, in the order it came (S.up.furn: the day each arrives) */
+function drawUpFurniture(c,list,now,d){const mid=Math.round(92+(LH-92)*.36);
+ if(upHas('table')){const x=122,y=mid;list.push({y,f:()=>{c.fillStyle='rgba(0,0,0,.16)';el(c,x,y+5,52,8);c.fillStyle='#8A5E3A';rr(c,x-48,y-28,96,26,2);c.fill();c.fillStyle='#A3744A';c.fillRect(x-48,y-28,96,5);c.fillStyle='#6B4628';c.fillRect(x-44,y-2,5,12);c.fillRect(x+39,y-2,5,12);if(upTrace('cup')){c.fillStyle='#F3EDE2';rr(c,x+14,y-21,6,6,1.5);c.fill();c.fillStyle='#7A4E2E';c.fillRect(x+15,y-20,4,1.5)}if(upTrace('charger')){c.fillStyle='#2E2E34';rr(c,x-20,y-19,9,5,1);c.fill();c.strokeStyle='#E8E4DC';c.lineWidth=.8;c.beginPath();c.moveTo(x-11,y-17);c.quadraticCurveTo(x-4,y-8,x-2,y-2);c.stroke()}}});
+  for(const [cx,cy,k] of[[x-58,mid-4,0],[x+58,mid-4,1],[x-6,mid+22,2]])list.push({y:cy,f:()=>{c.save();c.translate(cx,cy);c.scale(1.3,1.3);drawOddChair(c,0,0,k);c.restore()}});
+  if(upTrace('bag'))list.push({y:mid-3,f:()=>{c.fillStyle='#3E4E5E';rr(c,x+50,mid-26,14,12,2);c.fill();c.strokeStyle='#2A3440';c.lineWidth=1.1;c.beginPath();c.arc(x+57,mid-26,4.5,Math.PI,0);c.stroke()}})}
+ if(upHas('cabinet')){const y=Math.round(92+(LH-92)*.2),x0=50;list.push({y,f:()=>{c.fillStyle='rgba(0,0,0,.14)';el(c,x0+30,y+2,30,4);c.fillStyle='#7A5232';c.fillRect(x0,y-34,60,34);c.fillStyle='#8E6440';c.fillRect(x0,y-34,60,5);c.fillStyle='#5E3E24';c.fillRect(x0+30,y-28,1,26);c.fillRect(x0+4,y-16,22,1);c.fillStyle='#C99A45';circ(c,x0+26,y-14,1.3);circ(c,x0+35,y-14,1.3);circ(c,x0+15,y-22,1.2)}})}
+ if(upHas('coat')){const y=Math.round(92+(LH-92)*.52),x=60;list.push({y,f:()=>{c.fillStyle='rgba(0,0,0,.14)';el(c,x,y+1,9,3);c.fillStyle='#6B4628';c.fillRect(x-1.5,y-64,3,64);c.fillRect(x-9,y-2,18,3);c.fillRect(x-8,y-62,16,2.2);if(upTrace('coat')){c.fillStyle='#A8B0A0';c.beginPath();c.moveTo(x-6,y-60);c.lineTo(x+6,y-60);c.lineTo(x+8,y-30);c.lineTo(x-8,y-30);c.closePath();c.fill()}}})}
+ if(upHas('lamp')){const y=Math.round(92+(LH-92)*.3),x=78;list.push({y,f:()=>{c.fillStyle='rgba(0,0,0,.12)';el(c,x,y+1,8,2.5);c.fillStyle='#5A4A3A';c.fillRect(x-1,y-52,2,52);c.fillRect(x-6,y-1.5,12,2);c.fillStyle=d>.3?'#FFE9B8':'#EFE2C8';c.beginPath();c.moveTo(x-9,y-52);c.lineTo(x+9,y-52);c.lineTo(x+6,y-66);c.lineTo(x-6,y-66);c.closePath();c.fill();if(d>.3){c.save();c.globalCompositeOperation='lighter';let g=c.createRadialGradient(x,y-56,3,x,y-56,52);g.addColorStop(0,'rgba(255,214,150,.3)');g.addColorStop(1,'rgba(255,214,150,0)');c.fillStyle=g;c.fillRect(x-52,y-108,104,104);c.restore()}}})}
+ if(upHas('cushion')){const x=250,y=UP_L.col.base+14;list.push({y,f:()=>{c.fillStyle='rgba(0,0,0,.12)';el(c,x,y+2,15,4);c.fillStyle='#9AA88E';el(c,x,y,15,6);c.fillStyle='#B4C0A8';el(c,x,y-1.5,11,4)}})}
+ if(upHas('stool')){const x=UP_L.sill.x+40,y=114;list.push({y,f:()=>{c.fillStyle='rgba(0,0,0,.12)';el(c,x,y+1,8,2.5);c.fillStyle='#8E6440';rr(c,x-8,y-16,16,4,1.5);c.fill();c.fillStyle='#6B4628';c.fillRect(x-6,y-12,2,12);c.fillRect(x+4,y-12,2,12)}})}
+ if(upHas('scratch')){const x=350,y=Math.round(92+(LH-92)*.42);list.push({y,f:()=>{c.fillStyle='#C9A878';c.save();c.translate(x,y);c.rotate(-.22);c.fillRect(-4,-30,8,30);c.fillStyle='rgba(120,90,50,.35)';for(let k=0;k<6;k++)c.fillRect(-4,-28+k*4.5,8,1);c.restore()}})}}
+function drawOddChair(c,x,y,k){/* three chairs that came from three places */const C=[['#8A5E3A','#A3744A'],['#5E4030','#74503A'],['#4A4A50','#5E5E66']][k];c.fillStyle='rgba(0,0,0,.14)';el(c,x,y+1,8,2.5);c.fillStyle=C[0];c.fillRect(x-7,y-10,14,3);c.fillRect(x-7,y-7,2,7);c.fillRect(x+5,y-7,2,7);c.fillStyle=C[1];if(k===2){c.fillRect(x-7,y-22,3,13);c.fillRect(x-7,y-22,12,5)}else{c.fillRect(x-7,y-24,14,3);c.fillRect(x-7,y-24,2,15);c.fillRect(x+5,y-24,2,15);if(k===0)for(let i=0;i<3;i++)c.fillRect(x-3+i*3,y-21,1.2,11)}}
+function upTrace(k){const t=S.up&&S.up.traces;return !!(t&&t[k]!=null&&S.day>=t[k])}
+/* the stair door in the side room's near edge: closed, a wooden door between two jambs with a mat in front; the night
+   it did not latch, it stands a hand open and the stairwell's light lies on the floor */
+function drawUpDoor(c,now){const x=UPDOOR.x,y=FB+2;const ajar=!!(R&&R.upDoor);
+ c.fillStyle='rgba(0,0,0,.16)';rr(c,x-25,y-24,50,26,2);c.fill();
+ c.fillStyle='#4A3424';c.fillRect(x-24,y-26,48,4);c.fillRect(x-24,y-26,5,28);c.fillRect(x+19,y-26,5,28);
+ if(ajar){let g=c.createLinearGradient(0,y-4,0,y-70);g.addColorStop(0,'rgba(255,214,140,.55)');g.addColorStop(1,'rgba(255,214,140,0)');c.save();c.globalCompositeOperation='lighter';c.fillStyle=g;c.beginPath();c.moveTo(x-8,y-6);c.lineTo(x+18,y-6);c.lineTo(x+36,y-70);c.lineTo(x-26,y-70);c.closePath();c.fill();c.restore();
+  c.fillStyle='#2A1C14';c.fillRect(x-19,y-22,38,22);c.fillStyle='#FFE1A0';c.fillRect(x-6,y-22,8,22);c.fillStyle='#8A6440';c.beginPath();c.moveTo(x-19,y-22);c.lineTo(x-6,y-25);c.lineTo(x-6,y-1);c.lineTo(x-19,y);c.closePath();c.fill()}
+ else{c.fillStyle='#8A6440';c.fillRect(x-19,y-22,38,22);c.fillStyle='#9E7550';c.fillRect(x-19,y-22,38,3);c.strokeStyle='rgba(60,40,25,.45)';c.lineWidth=.8;rr(c,x-15,y-18,13,14,1);c.stroke();rr(c,x+2,y-18,13,14,1);c.stroke();c.fillStyle='#D9B060';circ(c,x+13,y-11,1.6)}
+ c.fillStyle='#7A3A2E';rr(c,x-15,y-36,30,9,2);c.fill();c.fillStyle='rgba(255,240,210,.3)';c.fillRect(x-12,y-33,24,1.2)}
 /* ---- the street: the sky by the hour and the weather, the neighbours, the façade with the sign, the door (OPEN while the
    service runs), the pavement with whatever was bought for it, the tables under umbrellas ---- */
 function drawFrontRoom(c,now,dusk,V,X0,XW,TOP,list){const d=clamp(dusk,0,1);const W=wxNow();const wet=W==='rain'||W==='storm';const E=S.ext||{};const dq=Math.round(d*16)/16;
- const glass=projOn('glass');const bg=roomBg('front',S.level+'|'+W+'|'+dq+'|'+JSON.stringify(E)+'|'+Math.floor(S.day/10)+'|'+(S.rooms&&S.rooms.terrace?S.frontTables:0)+'|'+(glass?1:0),TOP,(b,X0,XW,T2)=>{const d=dq;
+ const glass=projOn('glass');const bg=roomBg('front',S.level+'|'+W+'|'+dq+'|'+JSON.stringify(E)+'|'+Math.floor(S.day/10)+'|'+(S.rooms&&S.rooms.terrace?S.frontTables:0)+'|'+(glass?1:0)+'|'+(S.rooms&&S.rooms.up?1:0),TOP,(b,X0,XW,T2)=>{const d=dq;
   /* sky */{let g=b.createLinearGradient(0,-T2,0,130);const top=wet?'#8E97A2':W==='hot'?'#9FC8EC':W==='cool'?'#C9DDEA':'#A9D3F0',bot=wet?'#B7BFC8':'#F2DEC0';g.addColorStop(0,mix(top,'#1E2438',d));g.addColorStop(1,mix(bot,'#5E4666',d));b.fillStyle=g;b.fillRect(X0,-T2,XW,130+T2);
    if(!wet){b.fillStyle=`rgba(255,240,200,${.9-d*.6})`;circ(b,340-d*60,Math.max(-T2+14,20-T2*.4)+d*40,10);if(d>.6){b.fillStyle=`rgba(255,255,255,${(d-.6)*2})`;for(let k=0;k<26;k++)circ(b,X0+((k*67)%XW),-T2+((k*41)%(90+T2)),.9)}}
    b.fillStyle=`rgba(255,255,255,${.35-d*.3})`;for(const [cx,cy,r0] of[[80,-T2+30,14],[104,-T2+26,18],[128,-T2+32,12]])circ(b,cx,cy,r0);
    /* the neighbours: two quiet buildings */b.fillStyle=mix('#D9CFC2','#2A2A38',d);b.fillRect(X0,56,BGM+34,74);b.fillStyle=mix('#CFC2B4','#2A2A38',d);b.fillRect(366,48,XW,82);b.fillStyle=mix('#B8A898','#1E1E2A',d);b.fillRect(X0,56,BGM+34,5);b.fillRect(366,48,XW,5);for(const [x,y] of[[-36,70],[-36,98],[6,70],[6,98],[376,64],[376,94],[406,64],[406,94]]){b.fillStyle=d>.5?'rgba(255,220,150,.8)':'rgba(120,130,150,.6)';b.fillRect(x,y,11,14)}}
+  /* v2.4 P2: the second floor above the shop — two big windows; dark while it is the landlord's, warm once it is Jill's */{const up=!!(S.rooms&&S.rooms.up);b.fillStyle=mix('#E3D8C2','#36303F',d*.55);b.fillRect(34,24,332,98);{const R2=rng(17);b.fillStyle='rgba(120,100,80,.07)';for(let i=0;i<360;i++)b.fillRect(34+R2()*332,24+R2()*96,1.2,1.2)}b.fillStyle=mix('#8C7B68','#2A2630',d*.5);b.fillRect(30,20,340,6);b.fillStyle='rgba(0,0,0,.1)';b.fillRect(30,26,340,2);
+   for(const wx of[58,212]){b.fillStyle='#2F2A26';b.fillRect(wx-3,46,136,64);let g=b.createLinearGradient(0,49,0,107);if(up&&d>.35){g.addColorStop(0,'#FFE0A6');g.addColorStop(1,'#E9B868')}else{g.addColorStop(0,mix('#A9C3D6','#1E2236',d));g.addColorStop(1,mix('#C9D3D8','#2A2A3A',d))}b.fillStyle=g;b.fillRect(wx,49,130,58);if(up&&d>.35){b.fillStyle='rgba(60,40,30,.25)';b.fillRect(wx,49,130,20);b.fillStyle='rgba(60,40,30,.3)';b.fillRect(wx+30,90,46,10)}else{b.fillStyle='rgba(255,255,255,.14)';b.beginPath();b.moveTo(wx+6,49);b.lineTo(wx+26,49);b.lineTo(wx+12,107);b.lineTo(wx+6,107);b.fill()}b.fillStyle='#2F2A26';for(let k=1;k<5;k++)b.fillRect(wx+k*26-1,49,2,58);b.fillRect(wx,72,130,2);b.fillStyle=mix('#D9CDB6','#2E2A34',d*.55);b.fillRect(wx-6,108,142,4)}}
   /* v2.2 R: the façade — warm plaster with a little grain above, a band of warm stone at waist height, a brass line
      between; the cornice is taupe, not red */const wall=mix('#EADFC8','#3A3446',d*.55),trim=mix('#8C7B68','#2A2630',d*.5);b.fillStyle=wall;b.fillRect(X0+34,120,XW-68,170);{const R0=rng(7);b.fillStyle='rgba(120,100,80,.07)';for(let i=0;i<700;i++)b.fillRect(X0+34+R0()*(XW-68),120+R0()*170,1.2,1.2);b.fillStyle='rgba(255,255,255,.12)';for(let i=0;i<260;i++)b.fillRect(X0+34+R0()*(XW-68),120+R0()*170,1.2,1.2)}
    b.fillStyle=mix('#C9BBA6','#2E2A34',d*.55);b.fillRect(X0+34,250,XW-68,40);b.fillStyle='rgba(0,0,0,.08)';for(let x=X0+34;x<LW+BGM;x+=38)b.fillRect(x,250,1,40);b.fillRect(X0+34,270,XW-68,1);b.fillStyle='#C99A45';b.fillRect(X0+34,248,XW-68,1.6);b.fillStyle=trim;b.fillRect(X0+34,120,XW-68,6);b.fillStyle='rgba(0,0,0,.12)';b.fillRect(X0+34,126,XW-68,3);
