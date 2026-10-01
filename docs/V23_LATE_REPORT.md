@@ -25,8 +25,9 @@
 | b11c328 | 側廳卡座; the side room's window line laid out for a phone; guest-book wording (#39); manual audit |
 | f6f856d | COMBO pill: two short lines (it covered the window seat on a phone) |
 | 10456ea | Window line: a gentler pull, so the dining room keeps its cats |
-| c515ac7, 2022fcc | docs/v24: the player's briefs for the next round |
-| (report commit) | This report, the evidence, `tools/make_release_zips.py` |
+| 14c2db7 | The window places have a tier like every other cat piece (the one failure of the full run) |
+| c515ac7, 2022fcc, ba287ed | docs/v24: the player's briefs and pictures for the next round |
+| 4da3ed6, 7dc2d45 | This report, the evidence, `tools/make_release_zips.py` (every zip under 25,000,000 bytes) |
 
 ## 2. Release content audit
 
