@@ -1050,3 +1050,24 @@ def regular_card_says_her_for_sophie_and_mia(b, port, target):
         txt = g.ev(f"(()=>{{const q=R.groups.find(x=>x.reg==='{reg}');if(!q)return null;showRegCard(q);return document.querySelector('#regcard').innerText}})()")
         check(txt is not None and want in txt, f'{reg}: {want} ({txt})')
     check(not g.errors, g.errors[:3]); g.close()
+
+@test
+def journal_pages_never_show_undefined(b, port, target):
+    """Found in the 2026-10-01 phone screenshots: the 熟客 page quoted r.l[tier], and after the dialogue audit moved the
+    one-time lines out of the habit pools, mature regulars showed 「undefined」. The page now quotes the newest habit
+    line the tier has unlocked (the pool regTalk draws from), or nothing. Every journal page on three real saves is
+    free of undefined / NaN / [object …]."""
+    for name in ('player_day30.json', 'player_day46.json', 'player_day52.json'):
+        g = Game(b, port, target, seed=119, manual=True, viewport={'width': 390, 'height': 844})
+        load_fixture(g, name)
+        g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(200)
+        for tab in ('front', 'story', 'rest', 'social', 'reviews', 'regulars', 'talk', 'mem', 'cats', 'ach', 'mastery'):
+            g.ev(f"paused=true;bookTab='{tab}';showBook()"); g.page.wait_for_timeout(60)
+            txt = g.ev("document.querySelector('#screen').innerText")
+            bad = [w for w in ('undefined', 'NaN', '[object', 'null」', '「null') if w in txt]
+            check(not bad, f'{name} {tab}: {bad} … {txt[max(0, txt.find(bad[0]) - 60):txt.find(bad[0]) + 20] if bad else ""}')
+        g.ev("paused=true;bookTab='regulars';showBook()"); g.page.wait_for_timeout(60)
+        lines = g.ev("REGS.filter(r=>(S.regulars[r.id]||0)>0).map(r=>[r.id,regHabitLine(r,regTier(S.regulars[r.id]||0))])")
+        txt = g.ev("document.querySelector('#screen').innerText")
+        check(all((t is None) or (f'「{t}」' in txt) for _, t in lines), f'{name}: each regular quotes the newest habit line their tier has ({lines})')
+        check(not g.errors, f'{name}: {g.errors[:3]}'); g.close()
