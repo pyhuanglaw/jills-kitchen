@@ -2689,7 +2689,7 @@ def h_i_k_t_shop_rooms_decoration_pass_and_dreams(b, port, target):
     g = Game(b, port, target, seed=51, manual=True)
     player30(g); g.ev("S.phase='shop';showShop()")
     tabs = json.loads(g.ev("JSON.stringify(shopTabs().filter(t=>t.on).map(t=>[t.k,t.n]))"))
-    check([t[1] for t in tabs][:3] == ['家具與佈置', '店舖工程', '貓咪生活'], f'the three big rooms of the shop come first: {tabs}')
+    check([t[1] for t in tabs][:4] == ['家具與佈置', '店舖工程', '社群與宣傳', '貓咪生活'], f'the big rooms of the shop come first, 社群與宣傳 right after 店舖工程 (v2.3 QA: it is found where the player looks): {tabs}')
     # every purchasable thing is reachable from some tab (on a level-5 restaurant that still has everything to buy)
     g.ev("S.tables=4;S.decor={plants:0,lights:0,art:0,chairs:0,rug:0,ware:0,bar:0,sofa:0};S.ext={};S.gear={};S.ops={};S.rooms={side:1};S.sideTables=2;S.eq={stove:1,oven:1,bar:1,prep:1,fridge:1,pan:1};S.unlocked=S.unlocked.filter(d=>!(DISHES[d]||{}).special&&!['duck','steak'].includes(d));S.menu=S.menu.filter(d=>S.unlocked.includes(d));S.themes={};S.money=50000;S.crew=[];for(const d of ['friedrice','pasta','soup'])S.xp[d]=400")
     seen = set()
@@ -2836,7 +2836,7 @@ def q_portraits_are_one_system_with_a_fallback_and_fit_a_phone(b, port, target):
         check(g.ev("portraitOf('dylan','playful').side") == 'right' and g.ev("portraitOf('dylan','playful').src!==portraitOf('dylan').src"), 'Dylan has variants on the right')
         for rid in ['chen', 'mia', 'koba', 'leo', 'sophie', 'wang', 'wangwife']:
             check(g.ev(f"!!portraitOf('{rid}')"), f'regular {rid} has a portrait')
-        check(g.ev("portraitOf('staff:阿德師傅').src!==portraitOf('staff:小茉').src") and g.ev("portraitOf('staff:Hugo')") is not None and g.ev("portraitOf('staff:阿勇')") is None and g.ev("portraitOf('office')") is None, 'named staff by name (v2.2.1 H2: fourteen); nobody else')
+        check(g.ev("portraitOf('staff:阿德師傅').src!==portraitOf('staff:小茉').src") and g.ev("portraitOf('staff:Hugo')") is not None and g.ev("portraitOf('staff:阿勇')") is not None and g.ev("portraitOf('office')") is None, 'named staff by name (2026-10-01: all twenty redrawn by the player, the Lounge four kept); nobody else')
         srcs = json.loads(g.ev("JSON.stringify([portraitOf('jill').src,portraitOf('dylan').src,portraitOf('chen').src,portraitOf('staff:阿德師傅').src])"))
         check(len(set(srcs)) == 4, 'no two characters share a face')
         # the morning remark, once
@@ -3034,7 +3034,7 @@ def x_a_desktop_window_is_used_and_the_mouse_and_keyboard_work(b, port, target):
     sw = g.ev("(()=>{const r=$('.sheet').getBoundingClientRect();return [r.width,r.left]})()")
     check(sw[0] <= 722 and sw[1] > 150, f'a sheet stays readable and centred on a wide window: {sw}')
     start_day(g); install_bot(g); g.ev("window.__act=()=>{}"); g.page.evaluate('()=>window.__play(3,0)')
-    check(g.ev("(()=>{const r=$('#roomTabs').getBoundingClientRect(),w=$('#sceneWrap').getBoundingClientRect();return r.top-w.top})()") > 120, 'the room tabs sit under the sign at desktop scale (76 logical px × the scale)')
+    check(abs(g.ev("(()=>{const r=$('#roomTabs').getBoundingClientRect(),w=$('#sceneWrap').getBoundingClientRect();return r.top-w.top-((ticketsEl.offsetHeight||88)+4)})()")) <= 1, 'the room tabs sit right under the ticket rail at desktop scale too (v2.3 QA: never over the top row of tables)')
     # the mouse: a table → pointer; empty wall → default
     t = json.loads(g.ev("(()=>{const t=R.tables[0];const r=sc.getBoundingClientRect();let cold=null;for(const p of [[200,20],[300,20],[120,20],[60,150],[340,150],[200,120]])if(!sceneHot({x:p[0],y:p[1]})){cold=p;break}return JSON.stringify([r.left+SV.ox+t.x*SV.s,r.top+SV.oy+(t.y-16)*SV.s,r.left+SV.ox+cold[0]*SV.s,r.top+SV.oy+cold[1]*SV.s])})()"))
     g.page.mouse.move(t[0], t[1]); g.page.wait_for_timeout(80); g.page.mouse.move(t[0] + 1, t[1]); g.page.wait_for_timeout(80)
