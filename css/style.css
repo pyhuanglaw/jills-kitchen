@@ -526,9 +526,17 @@ span.tk-treat{pointer-events:none;font-weight:700}
 #dlg .dlg-text{margin:0;font-size:15px;line-height:1.55;font-weight:600}
 #dlg .dlg-next{display:block;text-align:right;margin-top:6px;font-size:11px;color:var(--muted);font-weight:700}
 #dlg.side-right .dlg-name{color:#3E5A7A}
+/* v2.4: a story illustration over the scene (STORY_ILLUS): the picture at the top, its title under it; the faces get smaller */
+#dlg .dlg-illus{position:absolute;left:10px;right:10px;top:calc(10px + env(safe-area-inset-top));display:flex;flex-direction:column;align-items:center;pointer-events:none}
+#dlg .dlg-illus[hidden],#dlg .dlg-illus-tbd[hidden]{display:none}
+#dlg .dlg-illus img{display:block;width:100%;max-width:640px;max-height:46vh;object-fit:contain;border-radius:12px;box-shadow:0 8px 22px rgba(0,0,0,.45);border:2px solid rgba(246,238,223,.92);background:#1D2326}
+#dlg .dlg-illus-t{margin-top:7px;color:#F6EEDF;font-size:13px;font-weight:800;letter-spacing:.16em;padding:3px 12px 3px 14px;border-radius:999px;background:rgba(20,16,12,.55);text-shadow:0 1px 3px rgba(0,0,0,.6)}
+#dlg .dlg-illus-tbd{position:absolute;top:8px;right:max(8px,calc(50% - 312px));background:rgba(30,26,22,.8);color:#F6EEDF;font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:999px;letter-spacing:.08em}
+#dlg.has-illus{background:linear-gradient(rgba(12,18,20,.72) 0%,rgba(12,18,20,.78) 45%,rgba(12,18,20,.86))}
+#dlg.has-illus .dlg-p{height:min(24vh,210px)}
 #sceneWrap{container-type:inline-size}
 /* a wide stage (desktop, section X): more room, not a blown-up phone box */
-@container (min-width:720px){#dlg .dlg-p{height:min(56vh,480px);max-width:440px;bottom:calc(112px + env(safe-area-inset-bottom))}#dlg .dlg-p.left{left:6%}#dlg .dlg-p.right{right:6%}#dlg .dlg-box{left:50%;right:auto;transform:translateX(-50%);width:min(720px,70%);padding:16px 22px 12px;bottom:28px}#dlg .dlg-text{font-size:17px}}
+@container (min-width:720px){#dlg.has-illus .dlg-p{height:min(30vh,300px)}#dlg .dlg-p{height:min(56vh,480px);max-width:440px;bottom:calc(112px + env(safe-area-inset-bottom))}#dlg .dlg-p.left{left:6%}#dlg .dlg-p.right{right:6%}#dlg .dlg-box{left:50%;right:auto;transform:translateX(-50%);width:min(720px,70%);padding:16px 22px 12px;bottom:28px}#dlg .dlg-text{font-size:17px}}
 /* the line card during service */
 #plines{position:absolute;left:8px;right:8px;bottom:calc(72px + env(safe-area-inset-bottom));z-index:5;display:flex;flex-direction:column;gap:6px;pointer-events:none}
 .pline{pointer-events:auto;display:flex;align-items:flex-end;gap:8px;max-width:330px;animation:tIn .25s ease}
@@ -614,6 +622,7 @@ html.desk button,html.desk [data-act],html.desk .polaroid{cursor:pointer}
 /* v2.3 follow-up: the ticket of a guest who came because of a campaign; a story beat's record */
 .tk-who .via{font-style:normal;font-size:10px;margin-left:2px;line-height:1}
 .sline .sb{font-size:12.5px;line-height:1.55;border-top:1px dashed rgba(0,0,0,.08);padding:3px 0}.sline .sb:first-child{border-top:0}
+.sline .sb-ill{margin:6px 0 2px;font-size:12px;padding:4px 10px}   /* v2.4: 看插圖 under a beat */
 .sline details.sb summary{list-style:none;cursor:pointer}.sline details.sb summary::-webkit-details-marker{display:none}
 .sline details.sb summary::after{content:'›';float:right;color:var(--ink2);transition:transform .15s}.sline details.sb[open] summary::after{transform:rotate(90deg)}
 .sline .sn{margin:4px 0 2px 62px;font-size:12px;color:var(--ink2)}.sline .sq{margin:2px 0 4px 62px;font-size:12px}.sline .sq b{margin-right:4px;color:#8A4E2A}.sline .sq .e{color:var(--ink2);font-style:italic}

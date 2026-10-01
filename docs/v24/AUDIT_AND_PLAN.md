@@ -191,7 +191,12 @@ he had never heard of her flat.
 
 ## 5. Illustrations needed from the player
 
-Hooks exist from the start, each with an in-game fallback (asked for on 2026-10-01, corrected for the canon change):
+Hooks exist from the start, each with an in-game fallback (asked for on 2026-10-01, corrected for the canon change).
+**All four were supplied the same afternoon** (`docs/v24/art/illus_*.png`, packed by `tools/story_art.py`; the flat in
+② and ③ is one room, checked side by side; ③ is the player's second version, with Sophie as she looks). The
+stand-ins only show if a picture is missing. Asked for next (optional, they make the scenes better, nothing waits on
+them): expression portraits — 秀琴阿姨 worried / on the phone / 姨母笑, 怡君 tired / relieved, 王先生 lawyer mode / a dry
+smile, Mia thinking; for P2 the landlord, and `up_cats`.
 
 1. `yj_intro`: 怡君 at Jill's Kitchen; 秀琴阿姨 in her cleaner's clothes at her table.
 2. `yj_key`: 怡君's new home, 秀琴阿姨 visiting, the spare key. The wall is in view and looks normal; any old repair

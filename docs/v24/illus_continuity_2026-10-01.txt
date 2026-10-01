@@ -1,0 +1,5 @@
+(Filed verbatim. 2026-10-01 13:46, the player: the apartment in `yj_key` and `wall_leak` is one continuity asset — same
+room, same geometry, the same affected wall; the earlier picture shows the wall looking normal, the later one the water
+damage on that same wall. Applies to the in-game stand-ins and to the final art.)
+
+For `yj_key` and `wall_leak`, please treat the apartment itself as a continuity asset, not two independently generated interiors. Preserve the same room geometry, window/door positions, major furniture, wall proportions, and especially the exact affected wall. `wall_leak` should feel unmistakably like returning to the home already seen in `yj_key`. The earlier image must show the wall in apparently normal condition; any prior repair clue should be subtle enough that neither 怡君 nor the player is expected to identify a defect at that time. The later image reveals the water damage on that same wall. If generating the two images separately cannot reliably preserve this continuity, establish/reuse a single apartment visual reference first rather than accepting two attractive but obviously different rooms.

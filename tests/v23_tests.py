@@ -354,7 +354,7 @@ def staff_learn_places_coarsely_and_veterans_stay_useful(b, port, target):
     check(ev['fam'].get('lounge') == 1 and ch['fam'].get('kitchen') == 1 and not ch['fam'].get('lounge'), 'the bartender the Lounge, the chef the kitchen')
     check(g.ev("(S.dayLog||[]).some(l=>/哪桌|三號/.test(l.t))"), 'she asked where table three is')
     g.ev("showShop();shopTab='staff';showShop()"); g.page.wait_for_timeout(80); txt = g.ev("document.body.innerText")
-    check('在店' in txt and '正在熟悉：Lounge' in txt and '從 v2.3 起算' in txt, 'the card says tenure and what she is learning')
+    check('（v2.3 以前就在）' in txt and '正在熟悉：Lounge' in txt and '從 v2.3 起算' not in txt, 'the card says tenure (v2.4 A2: a class for the old crew, not the days since v2.3) and what she is learning')
     g.ev("S.crew.find(m=>m.id===__w).fam.lounge=12"); check(g.ev("famLabel(12)") == '熟練' and g.ev("loungeShiftMul(S.crew.find(m=>m.id===__w))") < 1, 'a veteran of the Lounge is a little quicker there')
     # 阿拓 from Lounge II; the pantry only at III
     g.ev("buyLounge(2);hideReveal();S.crew=S.crew.filter(m=>m.role!=='chef'||S.crew.filter(q=>q.role==='chef').indexOf(m)<2)")

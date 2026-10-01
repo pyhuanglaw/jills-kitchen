@@ -1,0 +1,15 @@
+== golden_scenario proof (tools: scratch golden_proof.py) ==
+old pool == golden baseline: True
+new pool, day 1 differs in: []
+new pool, day 2 differs in: ['reviewHash']
+new pool, day 3 differs in: ['reviewHash']
+reviews: same count True ; every difference is a renamed name: True ; differing reviews: 3
+    [5, '黃金蛋炒飯完美。小齁從我們桌邊走過去，尾巴翹得很高。一定會再來。', 'Yuki'] -> [..., 'Mina']
+    [5, '黃金蛋炒飯是今晚的重點，沒有之一。看得出來是 Jill 親手做的。', 'Kevin'] -> [..., 'Eric']
+    [5, '黃金蛋炒飯吃到最後一口還在點頭。柔柔慢慢晃過去，沒有理我們。', '阿哲'] -> [..., '阿彥']
+
+== golden_frames proof ==
+golden_frames with the old name pool: PASS (identical to the baseline)
+t=37 old: T1 0:00 阿哲 沒東西可請 |  | DAY 1 18:06 3.4 $288
+t=37 new: T1 0:00 阿彥 沒東西可請 |  | DAY 1 18:06 3.4 $288
+the DOM text differs only by the renamed names: True

@@ -1753,7 +1753,7 @@ def economy_ops_duties_and_prices_v182(b, port, target):
     check('擴建後可以再加' not in txt and '極限' in txt, 'the final restaurant does not promise a next expansion')
     ACT(g, 'tab', k='works')   # v2.2 H: expansion, projects and the operations upgrades live under 店舖工程
     txt = g.ev("$('#screen').innerText")
-    check('動線規劃' in txt and '後場休息室' in txt and '大菜單板' in txt and '門口候位區' in txt, 'operations upgrades are offered')
+    check('動線規劃' in txt and '後場整理區' in txt and '大菜單板' in txt and '門口候位區' in txt, 'operations upgrades are offered')   # v2.4 A1: 後場休息室 → 後場整理區
     caps0 = g.ev("[crewCap(),queueMax(),menuCap(),flowMul('crew')]")
     for k in ['room', 'wait', 'board', 'flow']: ACT(g, 'buyOps', k=k)
     caps1 = g.ev("[crewCap(),queueMax(),menuCap(),flowMul('crew')]")
@@ -3839,6 +3839,8 @@ def named_guests_keep_one_face_and_the_staff_have_theirs(b, port, target):
 
 # v2.3: the story / Lounge tests live in tests/v23_tests.py (same harness, same TESTS list)
 import v23_tests  # noqa: E402,F401
+# v2.4: Staff Lives foundations and stories (tests/v24_tests.py)
+import v24_tests  # noqa: E402,F401
 
 def main():
     ap = argparse.ArgumentParser()

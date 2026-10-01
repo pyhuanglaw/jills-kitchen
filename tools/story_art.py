@@ -1,4 +1,4 @@
-"""Story Photo art: crops of the approved concept sheets (docs/v23/story_photos_*.png), by stable key, packed as
+"""Story Photo art (and the v2.4 story illustrations): crops of the approved concept sheets (docs/v23/story_photos_*.png), by stable key, packed as
 js/story_art.js (window.STORY_ART). Panels are cut inside their frames so no sheet caption ends up in the picture;
 the album carries the title. 720x540 WebP (the album shows 360x270)."""
 import base64, io, os, sys
@@ -13,6 +13,11 @@ SML = os.path.join(ROOT, 'docs/v23/story_photo_sophie_mia_leave.png')       # 20
 KDS = os.path.join(ROOT, 'docs/v23/story_photo_ken_du_seat.png')            # 2026-10-01, supplied by the player: Ken × 杜 「固定的位置」 as a full picture (was a small panel of the concept sheet)
 KDA = os.path.join(ROOT, 'docs/v23/story_photo_ken_du.png')                 # 2026-10-01, supplied by the player: Ken × 杜 「還是沒有同意」 as a full picture (was a small panel of the concept sheet)
 SMA = os.path.join(ROOT, 'docs/v23/story_photo_sophie_mia_arrive.png')      # 2026-10-01, supplied by the player: Sophie × Mia 「今天一起來」, illustrated like 「一起回家」 (was the concept sheet's top banner)
+# v2.4 story illustrations (STORY_ILLUS in game.js): event pictures shown with a scene, not album photos
+YJI = os.path.join(ROOT, 'docs/v24/art/illus_yj_intro_2026-10-01.png')        # 2026-10-01 13:53, supplied by the player: 怡君 eating, 秀琴阿姨 at her table with the spray bottle and cloth
+YJK = os.path.join(ROOT, 'docs/v24/art/illus_yj_key_2026-10-01.png')          # 2026-10-01 13:57, supplied by the player: 怡君's new flat, the spare key — the room 《那面牆》 returns to
+WLK = os.path.join(ROOT, 'docs/v24/art/illus_wall_leak_2026-10-01.png')       # 2026-10-01 14:14, supplied by the player (second version: Sophie as she looks, hair down, black jacket): the same room after the rain — the stained corner, Mia with the light, Sophie with the photos
+WST = os.path.join(ROOT, 'docs/v24/art/illus_wall_settled_2026-10-01.png')    # 2026-10-01 14:13, supplied by the player: after the mediation — 怡君 and 王先生 in the corridor, restrained
 # key -> (sheet, box). Boxes chosen by eye on the sheets; 4:3 is enforced by a centered crop of the box.
 ART = {
     'sophie_mia_leave':  (SML, (15, 0, 1380, 1024)),    # 《一起回家》 — Sophie and Mia arm in arm on the way out, the cat on the counter behind them (the player's full picture, 2026-10-01)
@@ -24,6 +29,10 @@ ART = {
     'jill_dylan_valentine': (VAL, (150, 0, 1515, 1024)), # 《情人節，還在追》 — both of them, the cake, the cat asleep on the counter
     'wang_anniv':        (WANG, (0, 70, 1093, 890)),     # 《今年也在這裡》 — the gift, both faces, the anniversary box
     'staff_meal':        (MEAL, (120, 0, 1485, 1024)),   # 《開店前》 — the player's second version (to spec): the whole crew, the two cats, the room; every face kept whole
+    'yj_intro':          (YJI, (0, 0, 1448, 1086)),      # v2.4 illustration 《吃飯啊》 — 怡君 at her table, 秀琴阿姨 leaning on the chair beside her (the player's picture, whole)
+    'yj_key':            (YJK, (0, 0, 1448, 1086)),      # v2.4 illustration 《備用鑰匙》 — the key handed over in the half-unpacked flat (the player's picture, whole)
+    'wall_leak':         (WLK, (0, 0, 1448, 1086)),      # v2.4 illustration 《那面牆》 — the same room and wall weeks later, after the rain (the player's picture, whole)
+    'wall_settled':      (WST, (0, 0, 1448, 1086)),      # v2.4 illustration 《調解之後》 — 怡君 and 王先生 walking out of the mediation, files under their arms (the player's picture, whole)
 }
 def crop43(im, box):
     x0, y0, x1, y1 = box; w, h = x1 - x0, y1 - y0
