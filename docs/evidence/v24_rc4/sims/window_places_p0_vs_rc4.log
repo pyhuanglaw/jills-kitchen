@@ -1,0 +1,29 @@
+# one evening of the Day 52 save with the whole window line, twelve seeds: distinct window places the cats used
+## P0 build (0bfc482)
+130 ['winBed', 'winHammock', 'winStep2', 'winTop']
+131 ['winBed', 'winHammock', 'winStep2', 'winTop']
+132 ['winBed', 'winSeat1', 'winStep2', 'winTop']
+133 ['winHammock', 'winSeat1', 'winStep1', 'winStep2']
+134 ['winBed', 'winHammock', 'winSeat2', 'winStep1', 'winStep2', 'winTop']
+135 ['winBed', 'winSeat1', 'winSeat2', 'winStep2', 'winTop']
+136 ['winBed', 'winHammock', 'winSeat1', 'winSeat2', 'winStep1', 'winStep2']
+137 ['winHammock', 'winSeat1', 'winSeat2', 'winStep2']
+138 ['winBed', 'winHammock', 'winStep1', 'winStep2']
+139 ['winBed', 'winHammock', 'winSeat2', 'winStep1', 'winTop']
+140 ['winBed', 'winHammock', 'winSeat1', 'winSeat2', 'winStep2', 'winTop']
+141 ['winBed', 'winSeat2', 'winStep1', 'winStep2']
+dist [(130, 4), (131, 4), (132, 4), (133, 4), (134, 6), (135, 5), (136, 6), (137, 4), (138, 4), (139, 5), (140, 6), (141, 4)] mean 4.666666666666667
+## rc4 build
+130 ['winBed', 'winHammock', 'winStep2']
+131 ['winBed', 'winHammock', 'winStep2', 'winTop']
+132 ['winBed', 'winSeat1', 'winStep1', 'winStep2', 'winTop']
+133 ['winHammock', 'winSeat1', 'winStep1', 'winStep2', 'winTop']
+134 ['winBed', 'winHammock', 'winSeat2', 'winStep1', 'winTop']
+135 ['winBed', 'winHammock', 'winSeat2', 'winTop']
+136 ['winBed', 'winHammock', 'winSeat1', 'winSeat2', 'winStep1', 'winStep2']
+137 ['winBed', 'winHammock', 'winSeat1', 'winSeat2']
+138 ['winBed', 'winHammock', 'winSeat1', 'winStep1', 'winStep2']
+139 ['winHammock', 'winSeat2', 'winStep2', 'winTop']
+140 ['winBed', 'winHammock', 'winSeat1', 'winSeat2', 'winStep2', 'winTop']
+141 ['winBed', 'winSeat2', 'winStep1', 'winStep2', 'winTop']
+dist [(130, 3), (131, 4), (132, 5), (133, 5), (134, 5), (135, 4), (136, 6), (137, 4), (138, 5), (139, 4), (140, 6), (141, 5)] mean 4.666666666666667

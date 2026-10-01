@@ -1,0 +1,18 @@
+Day   1  $   2637  rev 2040  guests 17  stars 5  秀琴 -  怡君 -  mode helper  known 0  crew []  
+Day   2  $   6151  rev 3640  guests 22  stars 5  秀琴 -  怡君 -  mode helper  known 0  crew []  
+Day   3  $  10555  rev 4810  guests 27  stars 5  秀琴 -  怡君 -  mode helper  known 0  crew []  
+Day   4  $  14288  rev 4800  guests 33  stars 5  秀琴 -  怡君 -  mode helper  known 0  crew ['小茉']  
+Day   5  $  20006  rev 4800  guests 32  stars 5  秀琴 -  怡君 -  mode helper  known 0  crew ['小茉']  
+Day   6  $  20186  rev 4800  guests 30  stars 5  秀琴 -  怡君 -  mode helper  known 0  crew ['小茉']  
+Day   7  $  25744  rev 4800  guests 31  stars 5  秀琴 -  怡君 -  mode helper  known 0  crew ['小茉']  
+Day   8  $  30776  rev 4320  guests 26  stars 5  秀琴 -  怡君 -  mode helper  known 0  crew ['小茉']  
+Day   9  $  33207  rev 4800  guests 31  stars 5  秀琴 -  怡君 -  mode helper  known 0  crew ['小茉', '阿德師傅']  
+Day  10  $  38632  rev 4800  guests 30  stars 5  秀琴 -  怡君 -  mode helper  known 0  crew ['小茉', '阿德師傅']  
+Day  11  $  44125  rev 4980  guests 33  stars 5  秀琴 -  怡君 -  mode helper  known 0  crew ['小茉', '阿德師傅']  
+Day  12  $  34319  rev 4800  guests 32  stars 5  秀琴 -  怡君 -  mode helper  known 0  crew ['小茉', '阿德師傅']  
+
+first day each: {}
+秀琴阿姨 knows Sophie/Mia: {'sophie': 0, 'mia': 0, 'xqid': 'xq'}
+majors per day > 1: []
+page errors: []
+12 days in 37s

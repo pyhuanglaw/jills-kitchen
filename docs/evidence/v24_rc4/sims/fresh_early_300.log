@@ -1,0 +1,46 @@
+Day   1  $   2637  rev 2040  guests 17  stars 5  秀琴 在  怡君 -  mode helper  known 0  crew []  xq_helper
+Day   2  $   6151  rev 3640  guests 22  stars 5  秀琴 -  怡君 -  mode helper  known 0  crew []  
+Day   3  $  10555  rev 4810  guests 27  stars 5  秀琴 -  怡君 -  mode helper  known 0  crew []  
+Day   4  $  15670  rev 4800  guests 33  stars 5  秀琴 在  怡君 -  mode helper  known 0  crew []  xq_helper·
+Day   5  $  20557  rev 4800  guests 31  stars 5  秀琴 -  怡君 -  mode crew  known 0  crew ['秀琴阿姨(xq)']  
+Day   6  $  20741  rev 4800  guests 30  stars 5  秀琴 -  怡君 -  mode crew  known 0  crew ['秀琴阿姨(xq)']  
+Day   7  $  26320  rev 4800  guests 31  stars 5  秀琴 -  怡君 -  mode crew  known 1  crew ['秀琴阿姨(xq)']  
+Day   8  $  29189  rev 4910  guests 31  stars 5  秀琴 -  怡君 來  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉']  yj_meet
+Day   9  $  34667  rev 4920  guests 34  stars 5  秀琴 -  怡君 來  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉']  yj_look
+Day  10  $  23845  rev 4800  guests 30  stars 5  秀琴 -  怡君 -  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉']  
+Day  11  $  27745  rev 4890  guests 32  stars 5  秀琴 -  怡君 來  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉', '阿德師傅']  yj_three
+Day  12  $  33876  rev 4800  guests 31  stars 5  秀琴 -  怡君 -  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉', '阿德師傅']  yj_chose
+Day  13  $  39609  rev 4980  guests 30  stars 5  秀琴 -  怡君 -  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉', '阿德師傅']  
+Day  14  $  45862  rev 4710  guests 31  stars 5  秀琴 -  怡君 -  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉', '阿德師傅']  yj_move
+Day  15  $  51276  rev 4800  guests 30  stars 5  秀琴 -  怡君 -  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉', '阿德師傅']  
+Day  16  $  56009  rev 4800  guests 31  stars 5  秀琴 -  怡君 -  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉', '阿德師傅']  yj_key yj_key_seen
+Day  17  $  61602  rev 4800  guests 30  stars 5  秀琴 -  怡君 -  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉', '阿德師傅']  
+Day  18  $  66823  rev 5020  guests 33  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉', '阿德師傅']  
+Day  19  $  72730  rev 4800  guests 30  stars 5  秀琴 -  怡君 -  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉', '阿德師傅']  
+Day  20  $  78604  rev 4710  guests 32  stars 5  秀琴 -  怡君 -  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉', '阿德師傅']  
+Day  21  $  84466  rev 4800  guests 32  stars 5  秀琴 -  怡君 -  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉', '阿德師傅']  
+Day  22  $  90561  rev 4800  guests 30  stars 5  秀琴 -  怡君 -  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉', '阿德師傅']  
+Day  23  $  95645  rev 4800  guests 31  stars 5  秀琴 -  怡君 -  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉', '阿德師傅']  
+Day  24  $ 101709  rev 4800  guests 30  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉', '阿德師傅']  
+Day  25  $ 108990  rev 5040  guests 34  stars 5  秀琴 -  怡君 -  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉', '阿德師傅']  
+Day  26  $ 115638  rev 4800  guests 32  stars 5  秀琴 -  怡君 -  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉', '阿德師傅']  
+Day  27  $ 120554  rev 4800  guests 31  stars 5  秀琴 -  怡君 -  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉', '阿德師傅']  
+Day  28  $ 126778  rev 4320  guests 26  stars 5  秀琴 -  怡君 -  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉', '阿德師傅']  
+Day  29  $ 133891  rev 4980  guests 32  stars 5  秀琴 -  怡君 -  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉', '阿德師傅']  
+Day  30  $ 141331  rev 5020  guests 34  stars 5  秀琴 -  怡君 -  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉', '阿德師傅']  wall_worry
+Day  31  $ 145800  rev 4580  guests 28  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉', '阿德師傅']  wall_photos
+Day  32  $ 152951  rev 4800  guests 34  stars 5  秀琴 -  怡君 -  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉', '阿德師傅']  
+Day  33  $ 159975  rev 4800  guests 31  stars 5  秀琴 -  怡君 -  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉', '阿德師傅']  wall_visit
+Day  34  $ 165312  rev 4800  guests 30  stars 5  秀琴 -  怡君 -  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉', '阿德師傅']  wall_wang
+Day  35  $ 171663  rev 4230  guests 27  stars 5  秀琴 -  怡君 -  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉', '阿德師傅']  
+Day  36  $ 178205  rev 4800  guests 35  stars 5  秀琴 -  怡君 -  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉', '阿德師傅']  wall_setback
+Day  37  $ 185680  rev 4800  guests 31  stars 5  秀琴 -  怡君 -  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉', '阿德師傅']  
+Day  38  $ 193650  rev 5120  guests 34  stars 5  秀琴 -  怡君 -  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉', '阿德師傅']  
+Day  39  $ 198795  rev 4320  guests 27  stars 5  秀琴 -  怡君 來  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉', '阿德師傅']  wall_report
+Day  40  $ 205527  rev 4920  guests 31  stars 5  秀琴 -  怡君 來  mode crew  known 1  crew ['秀琴阿姨(xq)', '小茉', '阿德師傅']  wall_fee
+
+first day each: {'xq_helper': 1, 'xq_hired': 4, 'yj_meet': 8, 'yj_look': 9, 'yj_three': 11, 'yj_chose': 12, 'yj_move': 14, 'yj_key': 16, 'yj_key_seen': 16, 'wall_worry': 30, 'wall_photos': 31, 'wall_visit': 33, 'wall_wang': 34, 'wall_setback': 36, 'wall_report': 39, 'wall_fee': 40}
+秀琴阿姨 knows Sophie/Mia: {'sophie': 2, 'mia': 6, 'xqid': 'xq'}
+majors per day > 1: []
+page errors: []
+40 days in 81s

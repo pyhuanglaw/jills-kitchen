@@ -2070,8 +2070,9 @@ def purchases_change_the_place(b, port, target):
     check(g.ev("(R.log||[]).some(l=>l.t.includes('第一天'))"), 'Jill did not mention the new room on its first day')
     # guests find the new tables; waiters serve there; nothing walks through walls
     seen = {'side': False, 'front': False}
-    for i in range(220):
+    for i in range(420):   # the whole service: the terrace's two-seat tables fill when a small party comes while the rooms inside are full — when that happens is the day's luck (v2.4: a tenure draw shifted it past the old 150 s window)
         g.page.evaluate('()=>window.__play(20,0)')
+        if g.ev("phase") != 'service': break
         st = json.loads(g.ev("JSON.stringify({side:R.tables.some(t=>t.room==='side'&&t.group),front:R.tables.some(t=>t.room==='front'&&t.group)})"))
         seen['side'] |= st['side']; seen['front'] |= st['front']
         if all(seen.values()): break
@@ -3813,8 +3814,8 @@ def named_guests_keep_one_face_and_the_staff_have_theirs(b, port, target):
     g = Game(b, port, target, seed=57, manual=True)
     player30(g); fill_fridge(g); start_day(g); install_bot(g); g.ev("window.__act=()=>{}")
     names = json.loads(g.ev("JSON.stringify(Object.keys(NAMED))"))
-    check(len(names) == 10 and all(g.ev("!!portraitData(NAMED[%r].p)" % n) for n in names), f'ten named guests, each with a portrait in the data: {names}')
-    check(g.ev("Object.keys(NAMED).every(n=>n==='衛生檢查員'||Object.values(NAMES).some(l=>l.includes(n)))"), 'every named guest is a name the game actually deals out')
+    check(len(names) == 11 and '怡君' in names and all(g.ev("!!portraitData(NAMED[%r].p)" % n) for n in names), f'ten named guests and 怡君 (v2.4), each with a portrait in the data: {names}')
+    check(g.ev("Object.keys(NAMED).every(n=>n==='衛生檢查員'||(NAMED[n].story&&!Object.values(NAMES).some(l=>l.includes(n)))||Object.values(NAMES).some(l=>l.includes(n)))"), 'every named guest is a name the game actually deals out — except a story character (怡君), who never comes from the random pool')
     # the same look twice, and a face that is the card
     r = json.loads(g.ev("(()=>{const out={};for(const n of ['周董','Mr. Hart','美食部落客 Momo','戴帽子的客人']){const t=n==='戴帽子的客人'?'critic':n==='美食部落客 Momo'?'blogger':'vip';spawn({t:R.t,type:t,size:1,name:n});const a=R.groups[R.groups.length-1];a.gone=true;namedHist(n).seen=0;/* v2.3: one person, one visit a day — the second look is another day's */spawn({t:R.t,type:t,size:1,name:n});const b2=R.groups[R.groups.length-1];out[n]={same:JSON.stringify(a.looks)===JSON.stringify(b2.looks),card:guestPortrait(a)===portraitData(NAMED[n].p),notJill:a.looks[0].hs!==4&&a.looks[0].hs!==9}}return JSON.stringify(out)})()"))
     check(all(v['same'] and v['card'] and v['notJill'] for v in r.values()), f'one look, one face, never Jill\'s or Dylan\'s hair: {r}')

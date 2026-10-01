@@ -1,0 +1,294 @@
+{
+ "rows": [
+  {
+   "day": 1,
+   "money": 2637,
+   "sum": {
+    "rev": 2040,
+    "tips": 332,
+    "guests": 17,
+    "lost": 0,
+    "stars": 5,
+    "net": 2137
+   },
+   "reviews": 8,
+   "xq": 0,
+   "yj": 0,
+   "mode": true,
+   "known": false,
+   "crew": [],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 2,
+   "money": 6151,
+   "sum": {
+    "rev": 3640,
+    "tips": 735,
+    "guests": 22,
+    "lost": 0,
+    "stars": 5,
+    "net": 4014
+   },
+   "reviews": 16,
+   "xq": 0,
+   "yj": 0,
+   "mode": true,
+   "known": false,
+   "crew": [],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 3,
+   "money": 10555,
+   "sum": {
+    "rev": 4810,
+    "tips": 1662,
+    "guests": 27,
+    "lost": 0,
+    "stars": 5,
+    "net": 5904
+   },
+   "reviews": 21,
+   "xq": 0,
+   "yj": 0,
+   "mode": true,
+   "known": false,
+   "crew": [],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 4,
+   "money": 14288,
+   "sum": {
+    "rev": 4800,
+    "tips": 1104,
+    "guests": 33,
+    "lost": 0,
+    "stars": 5,
+    "net": 4933
+   },
+   "reviews": 35,
+   "xq": 0,
+   "yj": 0,
+   "mode": true,
+   "known": false,
+   "crew": [
+    "小茉"
+   ],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 5,
+   "money": 20006,
+   "sum": {
+    "rev": 4800,
+    "tips": 1810,
+    "guests": 32,
+    "lost": 0,
+    "stars": 5,
+    "net": 5718
+   },
+   "reviews": 44,
+   "xq": 0,
+   "yj": 0,
+   "mode": true,
+   "known": false,
+   "crew": [
+    "小茉"
+   ],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 6,
+   "money": 20186,
+   "sum": {
+    "rev": 4800,
+    "tips": 1480,
+    "guests": 30,
+    "lost": 0,
+    "stars": 5,
+    "net": 5480
+   },
+   "reviews": 56,
+   "xq": 0,
+   "yj": 0,
+   "mode": true,
+   "known": false,
+   "crew": [
+    "小茉"
+   ],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 7,
+   "money": 25744,
+   "sum": {
+    "rev": 4800,
+    "tips": 1446,
+    "guests": 31,
+    "lost": 4,
+    "stars": 5,
+    "net": 5558
+   },
+   "reviews": 67,
+   "xq": 0,
+   "yj": 0,
+   "mode": true,
+   "known": false,
+   "crew": [
+    "小茉"
+   ],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 8,
+   "money": 30776,
+   "sum": {
+    "rev": 4320,
+    "tips": 1335,
+    "guests": 26,
+    "lost": 0,
+    "stars": 5,
+    "net": 5032
+   },
+   "reviews": 75,
+   "xq": 0,
+   "yj": 0,
+   "mode": true,
+   "known": false,
+   "crew": [
+    "小茉"
+   ],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 9,
+   "money": 33207,
+   "sum": {
+    "rev": 4800,
+    "tips": 1329,
+    "guests": 31,
+    "lost": 0,
+    "stars": 5,
+    "net": 5331
+   },
+   "reviews": 80,
+   "xq": 0,
+   "yj": 0,
+   "mode": true,
+   "known": false,
+   "crew": [
+    "小茉",
+    "阿德師傅"
+   ],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 10,
+   "money": 38632,
+   "sum": {
+    "rev": 4800,
+    "tips": 1375,
+    "guests": 30,
+    "lost": 0,
+    "stars": 5,
+    "net": 5425
+   },
+   "reviews": 80,
+   "xq": 0,
+   "yj": 0,
+   "mode": true,
+   "known": false,
+   "crew": [
+    "小茉",
+    "阿德師傅"
+   ],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 11,
+   "money": 44125,
+   "sum": {
+    "rev": 4980,
+    "tips": 1198,
+    "guests": 33,
+    "lost": 0,
+    "stars": 5,
+    "net": 5493
+   },
+   "reviews": 80,
+   "xq": 0,
+   "yj": 0,
+   "mode": true,
+   "known": false,
+   "crew": [
+    "小茉",
+    "阿德師傅"
+   ],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 12,
+   "money": 34319,
+   "sum": {
+    "rev": 4800,
+    "tips": 1684,
+    "guests": 32,
+    "lost": 1,
+    "stars": 5,
+    "net": 5894
+   },
+   "reviews": 81,
+   "xq": 0,
+   "yj": 0,
+   "mode": true,
+   "known": false,
+   "crew": [
+    "小茉",
+    "阿德師傅"
+   ],
+   "fired": [],
+   "errors": 0
+  }
+ ],
+ "final": {
+  "xq_helper": null,
+  "xq_hired": null,
+  "yj_meet": null,
+  "yj_look": null,
+  "yj_three": null,
+  "yj_chose": null,
+  "yj_move": null,
+  "yj_move_told": null,
+  "yj_key": null,
+  "yj_key_seen": null,
+  "wall_worry": null,
+  "wall_photos": null,
+  "wall_visit": null,
+  "wall_wang": null,
+  "wall_setback": null,
+  "wall_report": null,
+  "wall_fee": null,
+  "wall_prep": null,
+  "wall_mediation": null,
+  "wall_settle": null
+ },
+ "rel": {
+  "sophie": 0,
+  "mia": 0,
+  "xqid": "xq"
+ },
+ "errors": []
+}

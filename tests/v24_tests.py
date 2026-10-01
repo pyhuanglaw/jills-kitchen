@@ -364,7 +364,7 @@ def v24_day52_save_plays_the_stories_in_order_over_forty_days(b, port, target):
     check(order == sorted(order), f'in order: {F}')
     check(F['wall_worry'] >= F['yj_key'] + 2, f'the wall only after the move settled: {F}')
     # the player's targets for this save (docs/v24/pacing_correction_2026-10-01.txt), first = Day 53
-    check(F['yj_key'] - F['yj_meet'] <= 10 and F['yj_key'] <= first + 9, f'怡君 moved in within about ten days, by Day {first + 9} (59–62): {F}')
+    check(F['yj_key'] - F['yj_meet'] <= 9 and F['yj_key'] <= first + 10, f'怡君 moved in within about ten days, by Day {first + 9} (59–62) — a day later when a dated beat takes her first day (this seed: Dylan on Valentine\'s, Day {first}): {F}')
     check(first + 9 <= F['wall_worry'] <= first + 13, f'the wall begins Day {first + 9}–{first + 13} (62–66): {F}')
     check(F['wall_settle'] - F['wall_worry'] <= 18 and F['wall_settle'] <= first + 29, f'settled within about two and a half weeks, by Day {first + 29} (75–82): {F}')
     up = g.ev("eraOpenDay('up')")
@@ -545,4 +545,33 @@ def v24_manual_tutorial_and_news_cover_the_new_content(b, port, target):
         g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(200)
     news = g.ev("S.news.join(' ')")
     check('秀琴阿姨' in news and '請第一位清潔員，就是請她' in news, f'no cleaner yet: the note says who helps in the evenings: {news}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_the_day_is_held_for_the_beat_its_people_came_for(b, port, target):
+    """Pacing (measured on the Day 52 save): when the schedule brings someone for a due v2.4 major beat, that beat keeps
+    the day's one major slot until it plays or until 85% of the service; another story's major that comes up meanwhile
+    waits (it is counted as missed, so its priority rises) — except a beat that has only this day (floor 0: Dylan on
+    Valentine's), which is never held back. Grouped story visits keep their hour."""
+    g = Game(b, port, target, seed=267, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day52.json')
+    to_service(g)
+    g.ev("STORY_EV.push({k:'__t_major',lane:'major',cls:'A',floor:1,at:['order'],when:()=>true,run:()=>{}},{k:'__t_dated',lane:'major',cls:'A',floor:0,at:['order'],when:()=>true,run:()=>{}})")
+    g.ev("const d=storyDay();d.major=0;d.seen={};v24().res={d:S.day,k:['yj_meet']};R.t=R.dur*.5")
+    check(g.ev("JSON.stringify(v24Held('order'))") == '["yj_meet"]', 'held for 怡君 while her beat is due')
+    fired = g.ev("storyTick('order',{})")
+    check(fired == '__t_dated', f'a beat with only this day still plays: {fired}')
+    g.ev("const d=storyDay();d.major=0;d.seen={};STORY_EV.splice(STORY_EV.findIndex(E=>E.k==='__t_dated'),1)")
+    m0 = g.ev("evState('__t_major').miss")
+    g.ev("storyTick('order',{})")
+    check(g.ev("storyDay().major") == 0 and g.ev("evState('__t_major').n") == 0 and g.ev("evState('__t_major').miss") == m0 + 1, 'another major waits, counted as missed')
+    g.ev("R.t=R.dur*.86;storyTick('order',{})")
+    check(g.ev("v24Held('order')") is None and g.ev("evState('__t_major').n") == 1, 'late in the service the hold is gone, and it plays')
+    g.ev("const d=storyDay();d.major=0;d.seen={};R.t=R.dur*.5;factSet('yj_meet')")
+    check(g.ev("v24Held('order')") is None, 'once the beat has played, nothing is held')
+    g.ev("STORY_EV.splice(STORY_EV.findIndex(E=>E.k==='__t_major'),1)")
+    # grouped story visits keep their hour; the first of a group finds a room with a table for each
+    out = json.loads(g.ev("JSON.stringify((()=>{const out=[];v24Visits(out,R.dur,()=>true);return out})())"))
+    check(all(o.get('hold') for o in out if o.get('v24grp')), f'grouped visits are held at their hour: {out}')
     check(not g.errors, g.errors[:3]); g.close()

@@ -1591,7 +1591,7 @@ function evDone(k){const s=evState(k);return s.n>0}
 function storyTrace(o){const st=story();st.trace.push(Object.assign({d:S.day},o));if(st.trace.length>40)st.trace.splice(0,st.trace.length-40)}
 const STORY_EV=[];   /* filled by the content sections below: {k,lane,cls,at:[...],when,w,cd,once,floor,present:[{can,run}],run,note} */
 const LANE_CAP={major:1,minor:2,v24:1,ambient:99};   /* v2.4: the long stories' smaller steps have one a day of their own, so the older stories' minor moments do not crowd them out; a major beat is still one a day across every story */
-/* v2.4 (pacing): the major beat today's story visits were planned for keeps the day's one major slot until it plays, or until late in the service (85%) — the other stories' major moments wait a day; they are missed, not lost */
+/* v2.4 (pacing): the major beat today's story visits were planned for keeps the day's one major slot until it plays, or until late in the service (85%) — the other stories' major moments wait a day; they are missed, not lost. A beat with floor 0 (it has only this day: Dylan on Valentine's) is never held back. */
 function v24Held(at){if(!R||phase!=='service'||R.t>=R.dur*.85)return null;const v=S.story&&S.story.v24;if(!v||!v.res||v.res.d!==S.day)return null;const open=v.res.k.filter(k=>!fact(k));return open.length?open:null}
 function storyMiss(E,day){if(day.seen[E.k])return;day.seen[E.k]=1;evState(E.k).miss++}
 function storyEligible(E,ctx){const s=evState(E.k);if(E.once&&s.n)return null;const cd=E.cd==null?1:E.cd;if(s.last!=null&&S.day-s.last<cd)return null;let ok=false;try{ok=!!E.when(ctx)}catch(e){ok=false}if(!ok)return null;
@@ -1599,7 +1599,7 @@ function storyEligible(E,ctx){const s=evState(E.k);if(E.once&&s.n)return null;co
 function storyTick(at,ctx){if(!S||phase==='title')return null;ctx=ctx||{};ctx.at=at;const day=storyDay();if(at==='daystart')try{v24Day()}catch(e){console.warn('[v24]',e)}let fired=null;const res=v24Held(at);
  for(const lane of['major','minor','v24','ambient']){if((day[lane]||0)>=LANE_CAP[lane])continue;let cands=[];
   for(const E of STORY_EV){if(E.lane!==lane||!(E.at||[]).includes(at))continue;const pv=storyEligible(E,ctx);if(pv===null)continue;if(pv===false){storyMiss(E,day);continue}const s=evState(E.k);let w=1;try{w=E.w?E.w(ctx):1}catch(e){w=0}if(!(w>0))continue;w*=1+.6*s.miss;if(E.cls==='A'&&s.miss>=(E.floor==null?3:E.floor))w+=1e6;cands.push({E,pv,w})}
-  if(lane==='major'&&res&&cands.length){const keep=cands.filter(o=>res.includes(o.E.k));for(const o of cands)if(!keep.includes(o))storyMiss(o.E,day);cands=keep}
+  if(lane==='major'&&res&&cands.length){const keep=cands.filter(o=>res.includes(o.E.k)||o.E.floor===0);/* floor 0: a beat that has only this day (Dylan on Valentine's) never waits */for(const o of cands)if(!keep.includes(o))storyMiss(o.E,day);cands=keep}
   if(!cands.length)continue;const c=wpick(cands,x=>x.w);if(!c)continue;for(const o of cands)if(o!==c)storyMiss(o.E,day);
   const s=evState(c.E.k);s.n++;s.last=S.day;if(!s.d)s.d=S.day;s.miss=0;day.seen[c.E.k]=1;if(lane!=='ambient')day[lane]=(day[lane]||0)+1;storyTrace({at,k:c.E.k,lane});storyCapStart(c.E.k);try{c.pv.run(ctx)}catch(e){console.warn('[story]',c.E.k,e)}fired=fired||c.E.k}
  try{storyProgressCheck()}catch(e){console.warn('[story]',e)}return fired}

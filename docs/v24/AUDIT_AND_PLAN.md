@@ -169,8 +169,10 @@ Read with it:
 10. **The day's one major, held for the people who came for it** (pacing, measured on the Day 52 save). When the
     schedule brings someone for a due v2.4 major beat (`V24_WANTS … k`), that beat keeps the day's single major slot
     until it plays or until 85% of the service; other stories' major moments that come up meanwhile are counted as
-    missed (their priority rises) and come another day. Grouped story visits keep their hour (`hold`), and the first of
-    a group sits in a room with a free table for each of them, so they really are in the same room.
+    missed (their priority rises) and come another day — except a beat that has only that day (floor 0: Dylan on
+    Valentine's), which is never held back. Grouped story visits keep their hour (`hold`), and the first of a group
+    sits in a room with a free table for each of them, so they really are in the same room. The cost is measured in
+    `docs/V24_RC4_REPORT.md` §4: the v2.3 majors that share those days (Sophie × Mia's) come some days later.
 
 ## 4. The chronology and what a Day 52 player meets
 

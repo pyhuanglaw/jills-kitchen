@@ -1,0 +1,15 @@
+A new game, the late shop plan, seed 300: with her (fresh_late_300) and without her (fresh_late_300_noxqh, window.__noXQH).
+The same day, the same random stream; money, revenue, tips, guests, stars and reviews compared. From the day 怡君 first comes the days differ — she is one more guest — which is the story, not her mother's work.
+
+Day  1  she came: yes  怡君: no   money    2637 /    2637  identical
+Day  2  she came: no   怡君: no   money    6151 /    6151  identical
+Day  3  she came: no   怡君: no   money   10555 /   10555  identical
+Day  4  she came: yes  怡君: no   money   14288 /   14288  identical
+Day  5  she came: yes  怡君: no   money   20006 /   20006  identical
+Day  6  she came: no   怡君: no   money   20186 /   20186  identical
+Day  7  she came: yes  怡君: no   money   25744 /   25744  identical
+Day  8  she came: yes  怡君: yes  money   30873 /   30776  differs
+Day  9  she came: yes  怡君: yes  money   33809 /   33207  differs
+Day 10  she came: no   怡君: no   money   39119 /   38632  differs
+Day 11  she came: yes  怡君: yes  money   44811 /   44125  differs
+Day 12  she came: yes  怡君: no   money   34395 /   34319  differs

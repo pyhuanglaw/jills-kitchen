@@ -1,0 +1,1007 @@
+{
+ "rows": [
+  {
+   "day": 1,
+   "money": 2637,
+   "sum": {
+    "rev": 2040,
+    "tips": 332,
+    "guests": 17,
+    "lost": 0,
+    "stars": 5,
+    "net": 2137
+   },
+   "reviews": 8,
+   "xq": 1,
+   "yj": 0,
+   "mode": true,
+   "known": false,
+   "crew": [],
+   "fired": [
+    "xq_helper"
+   ],
+   "errors": 0
+  },
+  {
+   "day": 2,
+   "money": 6151,
+   "sum": {
+    "rev": 3640,
+    "tips": 735,
+    "guests": 22,
+    "lost": 0,
+    "stars": 5,
+    "net": 4014
+   },
+   "reviews": 16,
+   "xq": 0,
+   "yj": 0,
+   "mode": true,
+   "known": false,
+   "crew": [],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 3,
+   "money": 10555,
+   "sum": {
+    "rev": 4810,
+    "tips": 1662,
+    "guests": 27,
+    "lost": 0,
+    "stars": 5,
+    "net": 5904
+   },
+   "reviews": 21,
+   "xq": 0,
+   "yj": 0,
+   "mode": true,
+   "known": false,
+   "crew": [],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 4,
+   "money": 14288,
+   "sum": {
+    "rev": 4800,
+    "tips": 1104,
+    "guests": 33,
+    "lost": 0,
+    "stars": 5,
+    "net": 4933
+   },
+   "reviews": 35,
+   "xq": 1,
+   "yj": 0,
+   "mode": true,
+   "known": false,
+   "crew": [
+    "小茉"
+   ],
+   "fired": [
+    "xq_helper·"
+   ],
+   "errors": 0
+  },
+  {
+   "day": 5,
+   "money": 20006,
+   "sum": {
+    "rev": 4800,
+    "tips": 1810,
+    "guests": 32,
+    "lost": 0,
+    "stars": 5,
+    "net": 5718
+   },
+   "reviews": 44,
+   "xq": 1,
+   "yj": 0,
+   "mode": true,
+   "known": false,
+   "crew": [
+    "小茉"
+   ],
+   "fired": [
+    "xq_helper·"
+   ],
+   "errors": 0
+  },
+  {
+   "day": 6,
+   "money": 20186,
+   "sum": {
+    "rev": 4800,
+    "tips": 1480,
+    "guests": 30,
+    "lost": 0,
+    "stars": 5,
+    "net": 5480
+   },
+   "reviews": 56,
+   "xq": 0,
+   "yj": 0,
+   "mode": true,
+   "known": false,
+   "crew": [
+    "小茉"
+   ],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 7,
+   "money": 25744,
+   "sum": {
+    "rev": 4800,
+    "tips": 1446,
+    "guests": 31,
+    "lost": 4,
+    "stars": 5,
+    "net": 5558
+   },
+   "reviews": 67,
+   "xq": 1,
+   "yj": 0,
+   "mode": true,
+   "known": true,
+   "crew": [
+    "小茉"
+   ],
+   "fired": [
+    "xq_helper·"
+   ],
+   "errors": 0
+  },
+  {
+   "day": 8,
+   "money": 30873,
+   "sum": {
+    "rev": 4430,
+    "tips": 1364,
+    "guests": 27,
+    "lost": 0,
+    "stars": 5,
+    "net": 5129
+   },
+   "reviews": 75,
+   "xq": 1,
+   "yj": 1,
+   "mode": true,
+   "known": true,
+   "crew": [
+    "小茉"
+   ],
+   "fired": [
+    "xq_helper·",
+    "yj_meet"
+   ],
+   "errors": 0
+  },
+  {
+   "day": 9,
+   "money": 33809,
+   "sum": {
+    "rev": 4960,
+    "tips": 1742,
+    "guests": 32,
+    "lost": 0,
+    "stars": 5,
+    "net": 5836
+   },
+   "reviews": 80,
+   "xq": 1,
+   "yj": 1,
+   "mode": true,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅"
+   ],
+   "fired": [
+    "xq_helper·",
+    "yj_look"
+   ],
+   "errors": 0
+  },
+  {
+   "day": 10,
+   "money": 39119,
+   "sum": {
+    "rev": 4800,
+    "tips": 1277,
+    "guests": 32,
+    "lost": 0,
+    "stars": 4.5,
+    "net": 5310
+   },
+   "reviews": 80,
+   "xq": 0,
+   "yj": 0,
+   "mode": true,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅"
+   ],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 11,
+   "money": 44811,
+   "sum": {
+    "rev": 5070,
+    "tips": 1357,
+    "guests": 33,
+    "lost": 0,
+    "stars": 5,
+    "net": 5692
+   },
+   "reviews": 80,
+   "xq": 1,
+   "yj": 1,
+   "mode": true,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅"
+   ],
+   "fired": [
+    "xq_helper·",
+    "yj_three"
+   ],
+   "errors": 0
+  },
+  {
+   "day": 12,
+   "money": 34395,
+   "sum": {
+    "rev": 4580,
+    "tips": 1284,
+    "guests": 28,
+    "lost": 2,
+    "stars": 4.5,
+    "net": 5284
+   },
+   "reviews": 81,
+   "xq": 1,
+   "yj": 0,
+   "mode": true,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅"
+   ],
+   "fired": [
+    "xq_helper·",
+    "yj_chose"
+   ],
+   "errors": 0
+  },
+  {
+   "day": 13,
+   "money": 40328,
+   "sum": {
+    "rev": 5120,
+    "tips": 1345,
+    "guests": 33,
+    "lost": 0,
+    "stars": 5,
+    "net": 5933
+   },
+   "reviews": 81,
+   "xq": 1,
+   "yj": 0,
+   "mode": true,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅"
+   ],
+   "fired": [
+    "xq_helper·"
+   ],
+   "errors": 0
+  },
+  {
+   "day": 14,
+   "money": 45668,
+   "sum": {
+    "rev": 4800,
+    "tips": 1280,
+    "guests": 32,
+    "lost": 0,
+    "stars": 5,
+    "net": 5640
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": true,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅"
+   ],
+   "fired": [
+    "yj_move"
+   ],
+   "errors": 0
+  },
+  {
+   "day": 15,
+   "money": 50515,
+   "sum": {
+    "rev": 4800,
+    "tips": 1452,
+    "guests": 31,
+    "lost": 0,
+    "stars": 5,
+    "net": 5747
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)"
+   ],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 16,
+   "money": 56621,
+   "sum": {
+    "rev": 4710,
+    "tips": 1836,
+    "guests": 30,
+    "lost": 0,
+    "stars": 5,
+    "net": 6106
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)"
+   ],
+   "fired": [
+    "yj_key",
+    "yj_key_seen"
+   ],
+   "errors": 0
+  },
+  {
+   "day": 17,
+   "money": 62378,
+   "sum": {
+    "rev": 4800,
+    "tips": 1349,
+    "guests": 30,
+    "lost": 0,
+    "stars": 5,
+    "net": 5757
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)"
+   ],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 18,
+   "money": 68856,
+   "sum": {
+    "rev": 5120,
+    "tips": 1665,
+    "guests": 34,
+    "lost": 0,
+    "stars": 5,
+    "net": 6478
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)"
+   ],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 19,
+   "money": 73797,
+   "sum": {
+    "rev": 4620,
+    "tips": 1633,
+    "guests": 31,
+    "lost": 0,
+    "stars": 5,
+    "net": 4941
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)"
+   ],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 20,
+   "money": 79928,
+   "sum": {
+    "rev": 4800,
+    "tips": 1505,
+    "guests": 32,
+    "lost": 0,
+    "stars": 5,
+    "net": 6131
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)"
+   ],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 21,
+   "money": 85740,
+   "sum": {
+    "rev": 4800,
+    "tips": 1689,
+    "guests": 30,
+    "lost": 0,
+    "stars": 5,
+    "net": 5812
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)"
+   ],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 22,
+   "money": 91743,
+   "sum": {
+    "rev": 4800,
+    "tips": 1237,
+    "guests": 30,
+    "lost": 2,
+    "stars": 4.5,
+    "net": 6003
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)"
+   ],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 23,
+   "money": 98257,
+   "sum": {
+    "rev": 4800,
+    "tips": 1683,
+    "guests": 31,
+    "lost": 0,
+    "stars": 5,
+    "net": 6514
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)"
+   ],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 24,
+   "money": 103185,
+   "sum": {
+    "rev": 4800,
+    "tips": 1288,
+    "guests": 31,
+    "lost": 10,
+    "stars": 4.5,
+    "net": 4928
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)"
+   ],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 25,
+   "money": 110115,
+   "sum": {
+    "rev": 5020,
+    "tips": 1668,
+    "guests": 33,
+    "lost": 0,
+    "stars": 5,
+    "net": 6930
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)"
+   ],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 26,
+   "money": 116497,
+   "sum": {
+    "rev": 4800,
+    "tips": 1265,
+    "guests": 33,
+    "lost": 0,
+    "stars": 5,
+    "net": 6382
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)"
+   ],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 27,
+   "money": 122346,
+   "sum": {
+    "rev": 4320,
+    "tips": 1144,
+    "guests": 29,
+    "lost": 0,
+    "stars": 5,
+    "net": 5849
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)"
+   ],
+   "fired": [
+    "wall_worry"
+   ],
+   "errors": 0
+  },
+  {
+   "day": 28,
+   "money": 129149,
+   "sum": {
+    "rev": 4800,
+    "tips": 1526,
+    "guests": 31,
+    "lost": 0,
+    "stars": 5,
+    "net": 6803
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)"
+   ],
+   "fired": [
+    "wall_photos"
+   ],
+   "errors": 0
+  },
+  {
+   "day": 29,
+   "money": 136212,
+   "sum": {
+    "rev": 4980,
+    "tips": 1558,
+    "guests": 30,
+    "lost": 0,
+    "stars": 5,
+    "net": 7063
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)"
+   ],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 30,
+   "money": 142794,
+   "sum": {
+    "rev": 4800,
+    "tips": 1199,
+    "guests": 31,
+    "lost": 0,
+    "stars": 4.5,
+    "net": 6582
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)"
+   ],
+   "fired": [
+    "wall_visit"
+   ],
+   "errors": 0
+  },
+  {
+   "day": 31,
+   "money": 149170,
+   "sum": {
+    "rev": 4560,
+    "tips": 1158,
+    "guests": 30,
+    "lost": 0,
+    "stars": 5,
+    "net": 6376
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)"
+   ],
+   "fired": [
+    "wall_wang"
+   ],
+   "errors": 0
+  },
+  {
+   "day": 32,
+   "money": 154466,
+   "sum": {
+    "rev": 4800,
+    "tips": 1483,
+    "guests": 30,
+    "lost": 8,
+    "stars": 4.5,
+    "net": 5296
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)"
+   ],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 33,
+   "money": 161756,
+   "sum": {
+    "rev": 4800,
+    "tips": 1655,
+    "guests": 33,
+    "lost": 1,
+    "stars": 5,
+    "net": 7290
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)"
+   ],
+   "fired": [
+    "wall_setback"
+   ],
+   "errors": 0
+  },
+  {
+   "day": 34,
+   "money": 168830,
+   "sum": {
+    "rev": 4710,
+    "tips": 1481,
+    "guests": 31,
+    "lost": 0,
+    "stars": 5,
+    "net": 7074
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)"
+   ],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 35,
+   "money": 175423,
+   "sum": {
+    "rev": 4360,
+    "tips": 1248,
+    "guests": 27,
+    "lost": 0,
+    "stars": 5,
+    "net": 6593
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)"
+   ],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 36,
+   "money": 182596,
+   "sum": {
+    "rev": 4800,
+    "tips": 1293,
+    "guests": 30,
+    "lost": 0,
+    "stars": 5,
+    "net": 7173
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 1,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)"
+   ],
+   "fired": [
+    "wall_report"
+   ],
+   "errors": 0
+  },
+  {
+   "day": 37,
+   "money": 189590,
+   "sum": {
+    "rev": 4800,
+    "tips": 1049,
+    "guests": 33,
+    "lost": 10,
+    "stars": 4.5,
+    "net": 6994
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 1,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)"
+   ],
+   "fired": [
+    "wall_fee"
+   ],
+   "errors": 0
+  },
+  {
+   "day": 38,
+   "money": 196766,
+   "sum": {
+    "rev": 4980,
+    "tips": 1269,
+    "guests": 34,
+    "lost": 0,
+    "stars": 4.5,
+    "net": 7476
+   },
+   "reviews": 83,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)"
+   ],
+   "fired": [],
+   "errors": 0
+  },
+  {
+   "day": 39,
+   "money": 201417,
+   "sum": {
+    "rev": 4270,
+    "tips": 1193,
+    "guests": 28,
+    "lost": 12,
+    "stars": 4.5,
+    "net": 4651
+   },
+   "reviews": 83,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)"
+   ],
+   "fired": [
+    "wall_prep"
+   ],
+   "errors": 0
+  },
+  {
+   "day": 40,
+   "money": 207715,
+   "sum": {
+    "rev": 4710,
+    "tips": 1322,
+    "guests": 30,
+    "lost": 0,
+    "stars": 5,
+    "net": 6298
+   },
+   "reviews": 83,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)"
+   ],
+   "fired": [],
+   "errors": 0
+  }
+ ],
+ "final": {
+  "xq_helper": 1,
+  "xq_hired": 14,
+  "yj_meet": 8,
+  "yj_look": 9,
+  "yj_three": 11,
+  "yj_chose": 12,
+  "yj_move": 14,
+  "yj_move_told": null,
+  "yj_key": 16,
+  "yj_key_seen": 16,
+  "wall_worry": 27,
+  "wall_photos": 28,
+  "wall_visit": 30,
+  "wall_wang": 31,
+  "wall_setback": 33,
+  "wall_report": 36,
+  "wall_fee": 37,
+  "wall_prep": 39,
+  "wall_mediation": null,
+  "wall_settle": null
+ },
+ "rel": {
+  "sophie": 4,
+  "mia": 4,
+  "xqid": "xq"
+ },
+ "errors": []
+}

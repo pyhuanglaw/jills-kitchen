@@ -1,0 +1,36 @@
+Day   1  $   2816  rev 2160  guests 18  stars 5  秀琴 在  怡君 -  mode helper  known 0  crew []  xq_helper
+Day   2  $   7391  rev 4480  guests 24  stars 5  秀琴 -  怡君 -  mode helper  known 0  crew []  
+Day   3  $  11427  rev 4810  guests 33  stars 5  秀琴 -  怡君 -  mode helper  known 0  crew []  
+Day   4  $  15494  rev 4800  guests 30  stars 5  秀琴 在  怡君 -  mode helper  known 0  crew ['小茉']  xq_helper·
+Day   5  $  21003  rev 4800  guests 31  stars 5  秀琴 在  怡君 -  mode helper  known 0  crew ['小茉']  xq_helper·
+Day   6  $  20956  rev 4800  guests 31  stars 5  秀琴 -  怡君 -  mode helper  known 0  crew ['小茉']  
+Day   7  $  26486  rev 4710  guests 32  stars 5  秀琴 在  怡君 -  mode helper  known 1  crew ['小茉']  xq_helper·
+Day   8  $  32224  rev 5090  guests 33  stars 5  秀琴 在  怡君 來  mode helper  known 1  crew ['小茉']  xq_helper· yj_meet
+Day   9  $  34754  rev 4920  guests 32  stars 5  秀琴 在  怡君 來  mode helper  known 1  crew ['小茉', '阿德師傅']  xq_helper· yj_look
+Day  10  $  39981  rev 4710  guests 31  stars 5  秀琴 -  怡君 -  mode helper  known 1  crew ['小茉', '阿德師傅']  
+Day  11  $  45655  rev 5180  guests 34  stars 5  秀琴 在  怡君 來  mode helper  known 1  crew ['小茉', '阿德師傅']  xq_helper· yj_three
+Day  12  $  34319  rev 4540  guests 26  stars 4.5  秀琴 在  怡君 -  mode helper  known 1  crew ['小茉', '阿德師傅']  xq_helper· yj_chose
+Day  13  $  39038  rev 4800  guests 30  stars 4.5  秀琴 在  怡君 -  mode helper  known 1  crew ['小茉', '阿德師傅']  xq_helper·
+Day  14  $  44489  rev 5040  guests 34  stars 5  秀琴 -  怡君 -  mode helper  known 1  crew ['小茉', '阿德師傅']  yj_move
+Day  15  $  50023  rev 4800  guests 32  stars 5  秀琴 -  怡君 -  mode helper  known 1  crew ['小茉', '阿德師傅']  
+Day  16  $  55934  rev 4800  guests 33  stars 5  秀琴 在  怡君 -  mode helper  known 1  crew ['小茉', '阿德師傅']  xq_helper· yj_key yj_key_seen
+Day  17  $  62532  rev 4800  guests 31  stars 5  秀琴 在  怡君 -  mode helper  known 1  crew ['小茉', '阿德師傅']  xq_helper· yj_move_told
+Day  18  $  68375  rev 4980  guests 35  stars 5  秀琴 在  怡君 -  mode helper  known 1  crew ['小茉', '阿德師傅']  xq_helper·
+Day  19  $  74922  rev 4800  guests 30  stars 5  秀琴 在  怡君 -  mode helper  known 1  crew ['小茉', '阿德師傅']  xq_helper·
+Day  20  $  80956  rev 4800  guests 31  stars 5  秀琴 在  怡君 -  mode helper  known 1  crew ['小茉', '阿德師傅']  xq_helper·
+Day  21  $  87329  rev 4800  guests 30  stars 5  秀琴 在  怡君 -  mode helper  known 1  crew ['小茉', '阿德師傅']  xq_helper·
+Day  22  $  94017  rev 4930  guests 33  stars 5  秀琴 -  怡君 -  mode helper  known 1  crew ['小茉', '阿德師傅']  
+Day  23  $  99570  rev 4800  guests 31  stars 5  秀琴 -  怡君 -  mode helper  known 1  crew ['小茉', '阿德師傅']  
+Day  24  $ 105923  rev 4800  guests 30  stars 5  秀琴 在  怡君 -  mode helper  known 1  crew ['小茉', '阿德師傅']  xq_helper·
+Day  25  $ 111488  rev 4800  guests 31  stars 4.5  秀琴 -  怡君 -  mode helper  known 1  crew ['小茉', '阿德師傅']  
+Day  26  $ 118151  rev 4710  guests 31  stars 4.5  秀琴 -  怡君 -  mode helper  known 1  crew ['小茉', '阿德師傅']  
+Day  27  $ 124546  rev 5040  guests 34  stars 4.5  秀琴 在  怡君 -  mode helper  known 1  crew ['小茉', '阿德師傅']  xq_helper·
+Day  28  $ 130546  rev 4800  guests 31  stars 5  秀琴 -  怡君 -  mode helper  known 1  crew ['小茉', '阿德師傅']  
+Day  29  $ 136320  rev 4800  guests 32  stars 4  秀琴 在  怡君 -  mode helper  known 1  crew ['小茉', '阿德師傅']  xq_helper·
+Day  30  $ 141896  rev 4360  guests 28  stars 4.5  秀琴 在  怡君 -  mode helper  known 1  crew ['小茉', '阿德師傅']  xq_helper·
+
+first day each: {'xq_helper': 1, 'yj_meet': 8, 'yj_look': 9, 'yj_three': 11, 'yj_chose': 12, 'yj_move': 14, 'yj_move_told': 17, 'yj_key': 16, 'yj_key_seen': 16}
+秀琴阿姨 knows Sophie/Mia: {'sophie': 0, 'mia': 0, 'xqid': 'xq'}
+majors per day > 1: []
+page errors: []
+30 days in 71s
