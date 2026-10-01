@@ -1,0 +1,736 @@
+(Filed verbatim. 2026-10-01 12:10, the player. An upstream correction to the Staff Lives round: the SECOND FLOOR story
+and expansion come BEFORE the Staff Room; the Staff Room and later the Private Dining Room are uses of the already-taken
+second floor. Supersedes the spatial/unlock dependency in docs/v24/staff_lives_brief_2026-10-01.txt,
+staff_room_brief_2026-10-01.txt and private_dining_room_brief_2026-10-01.txt; everything else in them stands.
+State of the work when this arrived: nothing of Staff Lives / Staff Room / Private Room implemented yet — only these
+briefs and reference pictures filed; the v2.3 late-game round (side room, kitchen works, dogs) still being released.)
+
+IMPORTANT PRODUCT / STORY ARCHITECTURE UPDATE
+
+Please pause the current Staff Room progression design before locking its spatial/unlock architecture.
+
+We have made an important upstream story decision:
+
+SECOND FLOOR must come BEFORE Staff Room.
+
+Do NOT implement:
+
+Staff Room → later discover/unlock second floor
+
+and do NOT implement:
+
+Staff Room → Private Room as a building tech tree.
+
+Instead, Second Floor becomes the larger Restaurant Story arc and physical expansion that creates the space in which Staff Room and later Private Dining Room can naturally exist.
+
+If current work has already implemented reusable Staff Lives infrastructure, character facts, authored beats, callbacks, ambient events, tenure logic, outside visitors, etc., KEEP IT.
+
+Do not restart or discard good work.
+
+Only revise the spatial/story dependency that determines where and when Staff Room appears.
+
+
+==================================================
+1. SECOND FLOOR PREMISE
+==================================================
+
+Jill’s Kitchen currently occupies the restaurant floor.
+
+There is an existing second floor above the restaurant that belongs to the landlord / building property but is not currently part of Jill’s Kitchen’s usable leased restaurant space.
+
+It has simply been left unused / unleased.
+
+This is NOT:
+
+- Jill secretly owning an abandoned floor
+- a mysterious locked room
+- a hidden inheritance
+- an old Jill’s Kitchen floor
+- a dramatic secret
+- a ruined haunted space
+- a floor that must be unlocked piece by piece
+
+It is simply:
+
+「房東那邊還留著的二樓。」
+
+A completely believable piece of the building that Jill’s Kitchen has never needed before.
+
+At the beginning, Jill has no strong reason to rent or take over another whole floor.
+
+The restaurant was smaller.
+The existing space was enough.
+
+Over time, that changes.
+
+
+==================================================
+2. SECOND FLOOR MUST BE FORESHADOWED BEFORE IT BECOMES A PROJECT
+==================================================
+
+Do not suddenly add:
+
+SECOND FLOOR EXPANSION AVAILABLE
+
+after a Day threshold.
+
+Players should become aware that the second floor exists before they are allowed to expand into it.
+
+Use several low-frequency authored/ambient moments across many days.
+
+Do not fire them consecutively.
+
+
+==================================================
+3. FIRST FORESHADOW — SOMEONE MENTIONS UPSTAIRS
+==================================================
+
+Use an existing long-time customer / regular whose canon makes sense after auditing the source.
+
+A customer may casually notice or ask about upstairs.
+
+For example:
+
+客人：
+「樓上也是這間的？」
+
+Jill：
+「不是，房東留著的。」
+
+客人：
+「一直空著？」
+
+Jill：
+「好像是。」
+
+END.
+
+No Story Update.
+
+No expansion notification.
+
+No dramatic camera.
+
+No:
+「Maybe someday...」
+
+This should initially feel like ordinary information about the building.
+
+
+==================================================
+4. CUSTOMERS BEGIN TO NOTICE THAT THE RESTAURANT COULD GROW UPWARD
+==================================================
+
+Much later, after Jill’s Kitchen has visibly become busier and more established, another customer may independently notice the same physical possibility.
+
+For example:
+
+熟客：
+「妳們現在人這麼多，沒想過樓上？」
+
+Jill：
+「樓上不是我們的。」
+
+熟客：
+「租啊。」
+
+Jill：
+「你講得很簡單。」
+
+END.
+
+This is not the customer giving the player a quest.
+
+It is simply the first time someone says aloud what the player may already have started thinking:
+
+The restaurant could physically grow upward.
+
+Do not immediately unlock anything.
+
+
+==================================================
+5. STAFF MAY ALSO REFER TO UPSTAIRS NATURALLY
+==================================================
+
+Staff can occasionally mention it once the restaurant is mature enough.
+
+Examples:
+
+Nina:
+「樓上真的一直都空著喔？」
+
+Jill:
+「嗯。」
+
+or:
+
+Hugo:
+「上面多大？」
+
+Jill:
+「不知道。」
+
+Nina:
+「妳沒看過？」
+
+Jill:
+「沒有啊。」
+
+These should be sparse.
+
+Do not make every character suddenly obsessed with the second floor.
+
+
+==================================================
+6. THE CATS ARE THE FIRST ONES TO ACTUALLY CLAIM IT
+==================================================
+
+At some later point, there should be an authored event where Jill gets legitimate access to look at the second floor.
+
+Possible reason after source/architecture audit:
+
+- landlord is showing Jill the space
+- landlord allows Jill to inspect it after she asks
+- landlord mentions it is still unused
+- another mundane property-management reason
+
+Keep landlord involvement ordinary and believable.
+
+No villain landlord.
+No rent dispute.
+No melodrama.
+
+Jill opens the second-floor space for the first time.
+
+The space should feel:
+
+- empty
+- structurally usable
+- dusty / unused enough to show it has been vacant
+- not destroyed
+- not full of mysterious restaurant relics
+- clearly not yet Jill’s Kitchen
+
+There may be basic leftover neutral building items, but do NOT invent sentimental Jill’s Kitchen history upstairs.
+
+Most importantly:
+
+ONE OR MORE OF THE FIVE CATS GET INSIDE.
+
+The cats must remain indoors.
+
+They are not outside and they do not leave the building.
+
+They simply take advantage of an open upstairs door / stair access and explore before Jill intended them to.
+
+This should feel funny and inevitable.
+
+Example:
+
+Jill:
+「欸。」
+
+Cat keeps walking upstairs.
+
+Jill:
+「……回來。」
+
+It does not.
+
+Another cat may follow.
+
+Do not make all five cats march upstairs in formation.
+
+Use actual cat presence / autonomous behavior if architecture allows.
+
+Do not teleport absent cats solely for the cutscene.
+
+
+==================================================
+7. CAT EXPLORATION IS AN IMPORTANT EMOTIONAL FORESHADOW
+==================================================
+
+The cats entering upstairs should NOT instantly turn the second floor into a cat room.
+
+The point is:
+
+For the first time, the player sees this empty floor with something from Jill’s Kitchen already moving through it.
+
+The restaurant has not expanded yet.
+
+But visually, the player can imagine it.
+
+A cat may:
+
+- inspect a corner
+- sit by a window
+- sniff an empty doorway
+- look downstairs
+- briefly settle somewhere Jill did not expect
+
+Jill eventually gets them back downstairs.
+
+No permanent cat furniture yet.
+
+No unlock.
+
+No Story Photo automatically.
+
+This event should create anticipation.
+
+
+==================================================
+8. SECOND FLOOR STORY SHOULD DEVELOP ACROSS TIME
+==================================================
+
+After Jill has actually seen upstairs, normal restaurant life continues.
+
+Do not immediately build it.
+
+Over subsequent days, existing problems make the empty second floor increasingly relevant:
+
+- staff have nowhere appropriate to rest
+- staff meals struggle for space
+- relatives/friends wait for employees
+- private staff belongings lack a place
+- some customer groups want more private dining space
+- mature restaurant capacity / circulation becomes increasingly constrained
+- regulars occasionally mention growth
+- Jill’s Kitchen is visibly no longer the small restaurant it once was
+
+These existing systems should feed one shared Restaurant Story.
+
+The player should gradually reach:
+
+「樓上真的可以用了吧。」
+
+before Jill formally acts.
+
+
+==================================================
+9. FORMAL RESTAURANT STORY — SECOND FLOOR
+==================================================
+
+Only after enough actual observed evidence should the formal Restaurant Story advance.
+
+Do not base this only on Day number.
+
+Eligibility should combine things such as:
+
+- restaurant maturity
+- economic maturity
+- customer volume / established restaurant state
+- meaningful staff tenure
+- at least some observed staff-space problems
+- at least one customer comment / spatial-growth observation
+- Jill has actually inspected upstairs
+- cat exploration event has occurred
+- sufficient spacing since those events
+
+Exact thresholds should fit existing architecture after audit.
+
+Then Jill can finally contact / speak with the landlord about taking the second floor.
+
+Keep dialogue understated.
+
+Example direction:
+
+房東：
+「妳真的要用樓上？」
+
+Jill：
+「嗯。」
+
+「現在下面不夠？」
+
+Jill looks toward restaurant.
+
+「開始有一點。」
+
+That is enough.
+
+Do not write a motivational speech.
+
+
+==================================================
+10. THE PLAYER GETS THE WHOLE SECOND FLOOR
+==================================================
+
+This is the key correction.
+
+When the player commits to the Second Floor expansion:
+
+THE SECOND FLOOR ITSELF becomes Jill’s Kitchen space.
+
+Do NOT divide the narrative into:
+
+unlock first half
+→ one light
+→ unlock second half
+→ second light
+
+Do NOT use the previous “two lights” concept.
+
+Discard that idea.
+
+The player takes over / leases / expands into the WHOLE usable second floor as one major restaurant expansion.
+
+It should feel significant.
+
+This is a mature-game capital investment.
+
+Audit the mature-save economy and set a meaningful cost.
+
+It should be one of the moments where the player thinks:
+
+「餐廳真的變大了。」
+
+
+==================================================
+11. IMPORTANT: WHOLE FLOOR DOES NOT MEAN EVERY ROOM IS FINISHED
+==================================================
+
+Once the second floor becomes part of Jill’s Kitchen, the whole floor is physically accessible / owned by the restaurant’s simulation.
+
+But individual rooms / uses can still develop through later stories.
+
+This distinction is essential:
+
+SECOND FLOOR
+= physical expansion / new restaurant floor
+
+STAFF ROOM
+= one later use of part of that floor
+
+PRIVATE DINING ROOM
+= another later use of part of that floor
+
+Possible future flexible space
+= reserve architecture only if useful; do not invent unnecessary content now.
+
+Do not represent unfinished areas as magically inaccessible halves of the floor.
+
+They can simply be:
+
+- empty
+- lightly furnished
+- awaiting purpose
+- temporarily unused
+
+The player should understand:
+
+「二樓已經是我們的，只是還沒有全部想好要拿來做什麼。」
+
+
+==================================================
+12. STAFF ROOM NOW COMES AFTER SECOND FLOOR
+==================================================
+
+This changes the Staff Room architecture.
+
+All existing Staff Lives events that establish staff-space problems remain valuable.
+
+KEEP:
+
+- Hugo sitting on a box
+- staff meal seating problem
+- outside people waiting for staff
+- bags / coats / personal items lacking space
+- Staff Lives introductions
+- 宇翔
+- 珊珊
+- 怡君
+- 老林
+- 國雄
+- 小彤 parents
+- Kevin
+- existing character arcs / facts
+
+But Staff Room cannot be constructed before the second floor exists.
+
+Instead:
+
+staff-space evidence may begin accumulating BEFORE Second Floor expansion.
+
+This is good.
+
+The player may already know:
+
+「員工真的沒地方休息。」
+
+Then the Second Floor becomes available.
+
+After the whole second floor has become Jill’s Kitchen space, those previously observed problems gain a possible physical answer.
+
+
+==================================================
+13. STAFF ROOM STORY AFTER SECOND FLOOR
+==================================================
+
+Do not instantly place a Staff Room upstairs when construction completes.
+
+Let the player see / use the new second floor first.
+
+Cats may naturally revisit it.
+
+Staff may walk through / inspect it.
+
+Then, after appropriate spacing, trigger the existing Restaurant Story logic:
+
+《大家待的地方》
+
+Jill has already seen:
+
+- customers have places
+- cats have places
+- Lounge exists for people who want to stay
+- staff still do not have a proper place of their own
+
+Use the established text direction:
+
+「店裡有客人的位置。
+有貓的位置。
+有吃完飯還不想走的人待的位置。
+
+好像一直沒有一個地方，
+是給每天在這裡工作的人待的。」
+
+NOW this observation has a physical answer:
+
+There is available space upstairs.
+
+Then unlock the paid Staff Room project within the already-acquired Second Floor.
+
+
+==================================================
+14. PRIVATE DINING ROOM COMES LATER
+==================================================
+
+Private Dining Room should also be a later story use of the second floor.
+
+Do NOT implement it as:
+
+Staff Room Lv.X → Private Room
+
+Instead:
+
+Second Floor exists
++
+customer-side private dining evidence develops
++
+Jill has already experienced how giving people a dedicated space changes restaurant life
+→ Private Dining Room story becomes eligible.
+
+Examples of evidence already discussed:
+
+- 怡君 later asks whether there is somewhere quieter for a family/friend meal
+- a non-staff-family regular group has a similar but distinct need
+- another established customer wants a meal with less interruption
+
+Only later:
+
+《關上門以後》
+
+→ paid Private Dining Room project upstairs.
+
+So the hierarchy is:
+
+RESTAURANT GROWS
+↓
+SECOND FLOOR STORY
+↓
+whole second floor becomes Jill’s Kitchen
+↓
+different real needs gradually give parts of the floor meaning
+↓
+STAFF ROOM
+↓
+PRIVATE DINING ROOM
+↓
+future uses only if actual play creates a reason
+
+
+==================================================
+15. SECOND FLOOR MUST FEEL ALIVE EVEN BEFORE ALL ROOMS ARE BUILT
+==================================================
+
+Do not let unfinished second floor become a dead menu screen.
+
+Once acquired, it should exist spatially.
+
+Possible low-cost ambient behavior:
+
+- cats occasionally explore safe indoor upstairs areas
+- Jill occasionally walks upstairs when idle if appropriate
+- staff occasionally pass through
+- someone looks out the upstairs window
+- temporary furniture / boxes appear during transition
+- finished Staff Room later produces real traffic
+- finished Private Room later produces customer traffic
+
+But avoid excessive wandering that harms restaurant simulation.
+
+Cats remain autonomous and indoors.
+
+
+==================================================
+16. CHARACTER STORIES SHOULD USE THE SECOND FLOOR LATER
+==================================================
+
+Important larger direction:
+
+We are also expanding the newly introduced Staff Lives characters into REAL multi-stage character arcs.
+
+Do not treat these people merely as “employee relative/friend NPCs.”
+
+Current intended longer arcs include:
+
+- 怡君: her own adult-life progression, not merely 阿珠姐’s daughter
+- Kevin: his own restaurant/work transition story, not merely Marco’s old colleague
+- 珊珊: her own recurring life/routine and later persistent trace
+- 宇翔: university-to-first-job progression
+- 小彤 parents: supporting cast within 小彤’s longer growth arc
+- 老林: his long-running friendship/routine with 阿德 develops over time
+- 國雄: his own changing post-retirement / daily-life rhythm alongside 秀琴
+
+These arcs may later use Second Floor spaces where appropriate.
+
+Examples:
+
+- 宇翔 can work on his résumé / wait for Hugo in Staff Room after it exists
+- 珊珊 can eventually leave a handmade object that remains in Staff Room
+- 國雄 can wait upstairs for 秀琴
+- 怡君 may eventually use Private Dining Room for a real later-life meal
+- Kevin may occasionally have a quiet after-close conversation with Marco if presence and story state allow
+
+Do NOT force every arc upstairs.
+
+The second floor is a new stage available to stories, not the subject of every story.
+
+
+==================================================
+17. DO NOT LOSE THE CAT MOMENT
+==================================================
+
+The cat exploration scene is one of the important early emotional beats of the Second Floor arc.
+
+Please preserve it.
+
+It should communicate:
+
+「Jill 還沒決定這裡要變成什麼，貓已經先進來看過了。」
+
+No sentimental narration is needed.
+
+No dialogue explaining symbolism.
+
+The cat walking into the empty upstairs space is enough.
+
+
+==================================================
+18. NO OVERWRITING
+==================================================
+
+Avoid dialogue such as:
+
+「我們的餐廳真的越來越大了。」
+「一路走來真不容易。」
+「這裡以後一定會充滿回憶。」
+「這就是新的開始。」
+「我們終於有二樓了！」
+
+Do not explain the emotional meaning.
+
+Let architecture and repeated use show it.
+
+Good dialogue is mundane:
+
+「樓上也是這間的？」
+「不是，房東的。」
+
+later:
+
+「真的要租？」
+「嗯。」
+
+later:
+
+「你進去等我。」
+「可以喔？」
+「可以。」
+
+The player supplies the emotion.
+
+
+==================================================
+19. SAVE / MIGRATION
+==================================================
+
+Mature saves must not receive the entire Second Floor story immediately.
+
+Historical restaurant maturity does NOT mean the player has already observed:
+
+- customer upstairs comment
+- Jill inspecting upstairs
+- cats exploring upstairs
+- staff-space evidence
+- landlord conversation
+
+New story facts must represent actual observed events.
+
+For mature saves, seed eligibility conservatively and let the story unfold naturally over subsequent days.
+
+Do not retroactively mark authored beats as seen merely because Day / money / staff count is high.
+
+
+==================================================
+20. CURRENT IMPLEMENTATION PRIORITY
+==================================================
+
+Please inspect the current working tree before changing anything.
+
+If Staff Room implementation has already begun:
+
+KEEP reusable:
+- Staff Lives infrastructure
+- character facts
+- outside NPC definitions
+- portraits
+- story beats
+- callbacks
+- ambient logic
+- staff-space evidence
+- tests
+- migration helpers
+
+REVISE only what is necessary so that:
+
+SECOND FLOOR precedes Staff Room spatial construction.
+
+Do not throw away completed good work.
+
+If Staff Room itself has not yet been spatially implemented, this is the preferred moment to insert Second Floor architecture cleanly.
+
+Do not proceed with the old spatial dependency after receiving this update.
+
+
+==================================================
+21. REPORT BACK
+==================================================
+
+After auditing and adapting the current implementation, report:
+
+1. what Staff Lives / Staff Room work already existed before this correction
+2. what can be preserved unchanged
+3. what spatial/unlock assumptions had to change
+4. proposed Second Floor event sequence
+5. exact relationship between landlord / Jill / second-floor access
+6. cat exploration implementation
+7. whole-floor expansion implementation
+8. how unfinished upstairs space is represented
+9. revised Staff Room trigger
+10. how future Private Dining Room fits without becoming a tech-tree dependency
+11. mature-save migration behavior
+12. any actual product decision that still requires my input
+
+If there is no substantive decision conflict, proceed with the correction rather than stopping unnecessarily.

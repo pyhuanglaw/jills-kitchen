@@ -1,0 +1,192 @@
+(Filed verbatim. 2026-10-01 11:45, the player, with the picture docs/v24/refs/staff_room_stages_reference_2026-10-01.png —
+three panels, left to right: Stage I 有地方坐了, Stage II 開始像他們的地方, Stage III 真的有人生活過; one room over time.
+Canonical for the Staff Lives round together with docs/v24/staff_lives_brief_2026-10-01.txt and the two outside-cast
+files; where they differ, the later message wins — e.g. the staff-meal evidence now has its own lines.)
+
+這張圖片是 Jill’s Kitchen「Staff Room／員工休息室」的正式空間與升級方向 visual reference。
+
+請把圖中的三個版本理解為「同一個 Staff Room 隨時間發展的三個階段」，不是三間不同房間。
+
+它的故事功能和 gameplay architecture 如下：
+
+Staff Room 不是普通商店升級，也不能因為 Day X 或 staffCount 達標就直接出現在購買列表。
+
+它必須是 Staff Lives 系統累積出來的一個 Restaurant Story consequence。
+
+在 Staff Room 出現以前，玩家應該先實際看見員工缺乏私人休息空間的問題。
+
+可能的 staff-space evidence 包括：
+
+1. Rush 結束後 Hugo 找不到地方坐，最後坐在箱子上。
+
+Jill：「你幹嘛坐那裡？」
+Hugo：「這裡可以坐。」
+Jill：「……那是箱子。」
+
+2. 老林、國雄、珊珊、宇翔或其他已被正式 introduction 的店外人物來等員工，但沒有適合等待的地方。
+
+3. Staff meal 後大家又在找位置。
+
+Nina：「我們是不是每次都在找地方坐？」
+Marco：「嗯。」
+
+4. 員工的外套、包包、水瓶、充電器等私人用品缺乏合理放置空間。
+
+Staff Room eligibility 應綜合：
+
+- restaurant maturity
+- active staff count
+- meaningful staff tenure
+- 至少一名店外人物已經透過真實事件進入餐廳世界
+- 至少兩種不同類型的 staff-space evidence 已經真正發生
+
+不要只用固定 Day 或單一 staffCount。
+
+條件成立後才觸發 Restaurant Story：
+
+《大家待的地方》
+
+打烊後 Jill 注意到：
+
+「店裡有客人的位置。
+有貓的位置。
+有吃完飯還不想走的人待的位置。
+
+好像一直沒有一個地方，
+是給每天在這裡工作的人待的。」
+
+然後才解鎖付費 Staff Room Project。
+
+Staff Room 是 mature-save money sink，不免費出現。
+
+
+【Stage I：有地方坐了】
+
+對應 reference 圖第一階段。
+
+這是剛完成的 Staff Room。
+
+功能重點：
+- 基本 seating
+- 小桌
+- 基本置物
+- 飲水／簡單 break area
+- 外套與包包終於有地方放
+- 員工可以真的進入、坐下、短暫休息
+
+剛完成時不要立刻塞滿 scripted events。
+
+第一天應該很普通。
+
+例如小彤還站著：
+
+Jill：「坐啊。」
+小彤：「喔，好。」
+
+員工的使用習慣之後才慢慢形成。
+
+
+【Stage II：開始像他們的地方】
+
+對應 reference 圖第二階段。
+
+玩家再次投入資金後新增：
+- lockers
+- 小冰箱
+- 更完整 seating
+- 更多插座
+- tea / coffee area
+- 更完整 storage
+- persistent personal objects
+
+這個階段開始出現角色自己的生活痕跡：
+
+- 阿德逐漸有固定座位
+- Hugo偶爾打開冰箱、忘記自己要找什麼、關起來後又回來
+- Nina知道大家東西放在哪
+- 小彤逐漸有自己的杯子和習慣位置
+- 阿珠姐最早抱怨插座不夠，後來真的證明她是對的
+- 秀琴偶爾帶家裡多的食物
+- Kai上班日偶爾出現羽球袋
+
+不要用 UI 告訴玩家「這是誰的東西」。
+讓玩家從長期遊玩自己認出來。
+
+
+【Stage III：真的有人生活過】
+
+對應 reference 圖第三階段。
+
+這不是豪華升級，而是長時間使用後累積出的完整生活空間。
+
+可以新增：
+- 更舒服的 sofa
+- break/dining table
+- small audio setup
+- 更完整 shelf/storage
+- 更多 personal traces
+- 家人朋友送來後留下的實用物品
+- 水果、食物、不同杯子、外套、包包等自然生活痕跡
+
+房間不能變成：
+- corporate lounge
+- luxury lounge
+- bar
+- game room
+- quest hub
+
+它仍然只是餐廳後面的一間 Staff Room。
+
+差別是玩家看得出來：
+這裡已經被同一群人使用很久。
+
+
+【Staff Room 與 Staff Lives 的連動】
+
+Staff Room 完成後，先前的店外人物可以產生新的合理 consequences：
+
+- 宇翔以前只能在外面等 Hugo，後來 Hugo 可以說：「你進去等我。」
+- 珊珊可以偶爾在裡面等 Nina。
+- 國雄下雨來接秀琴時，可以被 Jill 招呼進去。
+- 怡君可以把阿珠姐曾提過休息室缺少的實用品帶來，而且物品之後真的留在房間裡。
+
+這些事件必須建立在人物已經正式 introduction 的 story facts 上。
+不能因為 Staff Room 建成，就自動讓所有員工家人朋友互相認識。
+
+
+【核心實作原則】
+
+Staff Room 的價值是：
+
+world progression
++ spatial progression
++ Staff Lives consequence
++ late-game money sink
++ visual storytelling
+
+不是新的管理負擔。
+
+絕對不要新增：
+- fatigue meter
+- morale meter
+- affection meter
+- 員工休息需求條
+- 每日補茶／咖啡 chores
+- Staff Room 清潔 chores
+- employee quest board
+- claim reward
+- 手動命令員工去休息
+
+員工應自主使用這個空間。
+
+最重要的設計方向：
+
+Stage I 是「Jill 蓋的房間」。
+Stage II 是「大家開始把東西放進來」。
+Stage III 是「已經看得出哪些人在這裡生活」。
+
+玩家不需要看到「Staff Room Lv.3：歸屬感 +20」。
+
+他只要看那個房間，就應該知道：
+
+「這間餐廳真的已經開很久了。」
