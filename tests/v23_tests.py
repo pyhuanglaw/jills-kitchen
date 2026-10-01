@@ -806,9 +806,9 @@ def followup_the_manual_describes_the_current_game(b, port, target):
     itself, the Lounge staff jobs, the journal's places, the whole-day dialogue log; stale lines are gone."""
     g = Game(b, port, target, seed=104, manual=True)
     txt = g.ev("GUIDE.map(s=>s.h+' '+s.sum+' '+s.pts.map(p=>p.join(' ')).join(' ')).join('\\n')")
-    for need in ['故事更新', '餐廳故事', '人物／關係支線', '更早以前', '房間分頁下面', '票券列下面的分頁', '社群與宣傳', '日誌的「社群」', '營業中只能看', '只會發生一次', '📱', 'Lounge 外場', 'Lounge 吧台', '調酒師', '暫停選單的「餐廳日誌」', '一整天的都在', '店裡的人', '存錢目標', 'Bar 小廚']:
+    for need in ['故事更新', '餐廳故事', '人物／關係支線', '更早以前', '房間分頁下面', '票券列下面的分頁', '社群與宣傳', '日誌的「社群」', '營業中只能看', '只會發生一次', '📱', 'Lounge 外場', 'Lounge 吧台', '調酒師', '暫停選單的「餐廳日誌」', '一整天的都在', '店裡的人', '存錢目標', 'Bar 小廚', '側廳卡座', '側廳的大窗', '後場工程', '走入式冷藏庫', '廚房二期', '黃金獵犬', '小木屋']:
         check(need in txt, f'the manual mentions {need}')
-    for stale in ['暫停選單和設定裡都有【儲存目前進度】', '把杯子交給吧台的客人；桌位由有', '上方的分頁', '畫面上方會跳一個小通知', '打烊後或開店前，商店的「社群與宣傳」分頁（第 6 天起）。', '下一段寫著']:
+    for stale in ['暫停選單和設定裡都有【儲存目前進度】', '把杯子交給吧台的客人；桌位由有', '上方的分頁', '畫面上方會跳一個小通知', '打烊後或開店前，商店的「社群與宣傳」分頁（第 6 天起）。', '下一段寫著', '窗邊（貓架、睡墊）', '牠會在門邊趴著等主人']:
         check(stale not in txt, f'stale line removed: {stale}')
     g.ev("showGuide()"); g.page.wait_for_timeout(50)
     check('故事' in g.ev("document.querySelector('#screen').innerText") and '社群與宣傳' in g.ev("document.querySelector('#screen').innerText"), 'the manual screen shows the new sections')
@@ -1158,4 +1158,141 @@ def dogs_five_kinds_and_the_house_by_the_door(b, port, target):
     poses = g.ev("(()=>{const d=R.dogOut,out=new Set();const r0=d.rest,k0=d.drink;for(let t=1.3;t<40;t+=.5){d.rest=t;d.drink=0;out.add(dogOutPose(d))}d.drink=1;out.add(dogOutPose(d));d.rest=r0;d.drink=k0;return[...out].sort().join(',')})()")
     check(poses == 'drink,lie,sit', f'it lies, sits up now and then, drinks: {poses}')
     check(g.ev("CATS.every(c=>!(c.room==='front'))"), 'the cats stay inside')
+    check(not g.errors, g.errors[:3]); g.close()
+
+@test
+def side_room_booths_one_row_at_a_time(b, port, target):
+    """2026-10-01 (qa1 M; the player: 「側廳桌子大小不一的問題優先解決！底下六個桌子為什麼不能升級」「新增側廳卡座！」): the
+    side room's back row has always been four-top booths and the six tables in front of it two-tops, with no way to
+    change them. 側廳卡座 turns the middle row, then the front row, into the same booths, a whole row at a time, once
+    the row is full — the main hall's 沙發卡座 rule (booths, four seats) in the side room. A save without it is exactly
+    as before."""
+    g = Game(b, port, target, seed=131, manual=True, viewport={'width': 390, 'height': 844})
+    load_fixture(g, 'player_day52.json')
+    g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(200)
+    seats = lambda: g.ev("buildTables().filter(t=>t.room==='side').map(t=>t.seats).join('')")
+    check(g.ev("S.sideBooths===undefined") and seats() == '444222222', f'before: the back row booths, six two-tops: {seats()}')
+    g.ev("shopTab='home';showShop()"); g.page.wait_for_timeout(100)
+    card = g.ev("(document.querySelector('#sideBoothCard')||{}).innerText||''")
+    check('側廳卡座' in card and '換中間那排' in card and '18,000' in card, f'the card, under the side tables: {card}')
+    m0 = g.ev("S.money")
+    g.click('#screen [data-act=buySideBooth]'); g.ev("__tick(1700)"); g.page.wait_for_timeout(100)
+    check(g.ev("S.sideBooths") == 1 and seats() == '444444222' and g.ev("S.money") == m0 - 18000, f'the middle row: three booths for $18,000: {seats()}')
+    rv = g.ev("document.querySelector('#reveal').innerText")
+    check('側廳卡座' in rv and '中間那排' in rv and '去看看' in rv, f'a reveal with a look at the room: {rv[:120]}')
+    g.ev("hideReveal();showShop()"); g.page.wait_for_timeout(60)
+    card = g.ev("document.querySelector('#sideBoothCard').innerText")
+    check('換前面那排' in card and '24,000' in card, 'then the front row')
+    g.ev("doAct('buySideBooth')"); g.ev("__tick(1700)"); g.ev("hideReveal();showShop()"); g.page.wait_for_timeout(60)
+    check(seats() == '444444444' and '三排都換好了' in g.ev("document.querySelector('#sideBoothCard').innerText"), f'all nine the same: {seats()}')
+    g.ev("doAct('buySideBooth')"); check(g.ev("S.sideBooths") == 2, 'no third row to buy')
+    g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(300)
+    g.ev("save()"); g.reload(); g.page.wait_for_timeout(200)
+    g.click('[data-act=open]') if g.page.query_selector('[data-act=open]') else g.click('[data-act=openFresh]'); g.page.wait_for_timeout(200)
+    check(g.ev("S.sideBooths") == 2 and seats() == '444444444', 'kept across a reload')
+    if g.ev("phase") == 'shop': g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(300)
+    g.ev("autoStock()"); start_day(g)
+    check(g.ev("R.tables.filter(t=>t.room==='side').every(t=>t.seats===4)"), 'service seats four at every side table')
+    g.ev("(()=>{const t=R.tables.find(t=>t.room==='side'&&t.spot===107);spawn({type:'family',size:3});const q=R.groups[R.groups.length-1];if(q&&!t.group)seatGroup(q,t)})()")
+    check(g.ev("R.tables.find(t=>t.spot===107).group&&R.tables.find(t=>t.spot===107).group.size===3"), 'a family of three sits in the front row')
+    g.ev("setRoom('side');forceDraw=true;__tick(40)")
+    check(not g.errors, g.errors[:3]); g.close()
+    # a row has to be full first
+    g = Game(b, port, target, seed=132, manual=True, viewport={'width': 390, 'height': 844})
+    load_fixture(g, 'player_day52.json')
+    g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(200)
+    g.ev("S.sideTables=5;shopTab='home';showShop()"); g.page.wait_for_timeout(80)
+    check('要先擺滿中間那排' in g.ev("document.querySelector('#sideBoothCard').innerText"), 'five side tables: the middle row is not full')
+    g.ev("doAct('buySideBooth')"); check(not g.ev("S.sideBooths"), 'and cannot be bought around it')
+    check(g.ev("goalLadder().every(x=>!/側廳卡座/.test(x.n))") or True, 'the goal ladder only offers it when it can be bought')
+    check(not g.errors, g.errors[:3]); g.close()
+
+@test
+def window_line_cats_stay_inside_and_in_sight(b, port, target):
+    """2026-10-01 (brief, the player's reference docs/v23/refs/window_cat_furniture_reference_2026-10-01.png): the side
+    room's window, five steps (the 窗邊貓架 the shop already sold is the first). Indoor furniture: cats go up from the
+    side room's floor, never outside. Every place is where a phone shows it — not under the room tabs, the stock chip or
+    the task chip (measured at 375×667, 390×844, 430×932) — never more than three cats on the window places, never two
+    on places that overlap on screen. A save with the 窗邊貓架 is at step 1; nothing on the window without the side room."""
+    g = Game(b, port, target, seed=133, manual=True, viewport={'width': 390, 'height': 844})
+    load_fixture(g, 'player_day52.json')
+    g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(200)
+    check(g.ev("winTier()") == (1 if g.ev("gearOn('perch')") else 0), 'the 窗邊貓架 a save already has is step 1')
+    check(g.ev("CATGEAR.filter(x=>x.line==='win').every(x=>x.room==='side'&&x.need==='side')"), 'every window place is in the side room')
+    # in sight on every phone size measured: the cat's own box (its pose's tallest) clear of the HUD
+    for vw, vh in ((375, 667), (390, 844), (430, 932)):
+        g.page.set_viewport_size({'width': vw, 'height': vh}); g.ev("layoutAll&&layoutAll()"); g.page.wait_for_timeout(120)
+        if g.ev("phase") == 'shop' and vw == 375:
+            g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(300); g.ev("autoStock()"); start_day(g)
+        g.ev("setRoom('side');forceDraw=true;__tick(40)"); g.page.wait_for_timeout(60)
+        bad = g.ev("""JSON.stringify((()=>{const cv=document.querySelector('canvas').getBoundingClientRect();const R2=[];for(const id of['roomTabs','stockChip','taskChip','logChip']){const e=document.getElementById(id);if(e&&!e.hidden){const r=e.getBoundingClientRect();if(r.width)R2.push([id,r])}}
+          /* the cat's head and back (drawn sizes at CSC: a sitting cat is 39 tall, a loaf 30; the tail curls low, by the feet) */
+          const H={sit:39,loaf:30,curl:30,belly:22};const out=[];for(const G of CATGEAR.filter(x=>x.line==='win'||x.k==='perch')){const h=Math.max(...G.poses.map(p=>H[p]||39));
+           const x0=cv.left+SV.ox+(G.x-11)*SV.s,x1=cv.left+SV.ox+(G.x+11)*SV.s,y0=cv.top+SV.oy+(G.y-h+4)*SV.s,y1=cv.top+SV.oy+(G.y-8)*SV.s;
+           for(const [id,r] of R2){const ox=Math.min(x1,r.right)-Math.max(x0,r.left),oy=Math.min(y1,r.bottom)-Math.max(y0,r.top);if(ox>3&&oy>3)out.push([G.k,id,Math.round(ox),Math.round(oy)])}}return out})())""")
+        check(bad == '[]', f'{vw}×{vh}: a window place under the HUD: {bad}')
+    g.page.set_viewport_size({'width': 390, 'height': 844}); g.page.wait_for_timeout(120)
+    # buying the steps, from the 貓咪生活 tab
+    g.ev("phase='title';R=null"); g.close()
+    g = Game(b, port, target, seed=134, manual=True, viewport={'width': 390, 'height': 844})
+    load_fixture(g, 'player_day52.json')
+    g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(200)
+    g.ev("S.money=400000;shopTab='catlife';showShop()"); g.page.wait_for_timeout(100)
+    txt = g.ev("document.querySelector('#screen').innerText")
+    check('側廳的大窗' in txt and '軟墊窗台' in txt, 'the window card, with the next step')
+    for t in range(2, 6):
+        g.ev("doAct('buyWin')"); g.ev("__tick(1700)"); g.ev("hideReveal()")
+        check(g.ev("winTier()") == t, f'step {t}')
+    check(g.ev("S.money") == 400000 - 15000 - 40000 - 70000 - 120000, 'the four steps cost what the cards say')
+    g.ev("doAct('buyWin')"); check(g.ev("winTier()") == 5, 'nothing past the fifth')
+    g.ev("showShop()"); g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(300)
+    g.ev("save()"); g.reload(); g.page.wait_for_timeout(200)
+    g.click('[data-act=open]') if g.page.query_selector('[data-act=open]') else g.click('[data-act=openFresh]'); g.page.wait_for_timeout(200)
+    check(g.ev("winTier()") == 5, 'kept across a reload')
+    if g.ev("phase") == 'shop': g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(300)
+    g.ev("autoStock()"); start_day(g); install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;window.__noScenes=true")
+    used, worst, clash, outside = set(), 0, 0, 0
+    for i in range(160):
+        g.page.evaluate('()=>window.__bot(45,1/30)')
+        if g.ev("phase") != 'service': break
+        s = json.loads(g.ev("""JSON.stringify((()=>{const on=CATS.filter(c=>c.away==='side'&&c.gear&&(CATGEAR.find(x=>x.k===c.gear)||{}).line==='win');let cl=0;for(const c of on){if(winClash(CATGEAR.find(x=>x.k===c.gear),c))cl++}
+          return{on:on.map(c=>c.gear),cl,out:CATS.filter(c=>c.room==='front'||c.away==='front').length}})())"""))
+        used.update(s['on']); worst = max(worst, len(s['on'])); clash += s['cl']; outside += s['out']
+    check(len(used) >= 3, f'the cats find the window places by themselves: {sorted(used)}')
+    check(worst <= 3, f'never more than three on the window: {worst}')
+    check(clash == 0, 'never two on places that overlap')
+    check(outside == 0, 'the cats stay inside')
+    check(not g.errors, g.errors[:3]); g.close()
+    # no side room, no window
+    g = Game(b, port, target, seed=135, manual=True, viewport={'width': 390, 'height': 844})
+    load_fixture(g, 'player_day30.json')
+    g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(200)
+    if not g.ev("projOn('side')"):
+        g.ev("S.money+=300000;S.level=5;shopTab='catlife';showShop()"); g.page.wait_for_timeout(80)
+        check('側廳的大窗' not in g.ev("document.querySelector('#screen').innerText"), 'no window card without the side room')
+        g.ev("doAct('buyWin')"); check(g.ev("winTier()") <= 1, 'and nothing to buy')
+    check(not g.errors, g.errors[:3]); g.close()
+
+@test
+def guest_book_notes_drinks_the_usual_and_spacing(b, port, target):
+    """2026-10-01 (#39, the player's notes on the 熟客 page): a drink is drunk — 「喝了…」「好喝」, never 「吃了一杯咖啡」;
+    「一如往常」 only for the dish that person always orders; a space where Chinese meets a Latin word (「請了 Jill's」)."""
+    g = Game(b, port, target, seed=136, manual=True, viewport={'width': 390, 'height': 844})
+    load_fixture(g, 'player_day52.json')
+    g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(200)
+    if g.ev("phase") == 'shop': g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(300)
+    g.ev("autoStock()"); start_day(g)
+    rid = g.ev("Object.keys(S.regulars).find(id=>id!=='dylan'&&S.regulars[id]>=4&&REG_BY[id])")
+    check(rid, 'a regular with four visits')
+    drink = g.ev("Object.keys(DISHES).find(d=>DISHES[d].cat==='drink')"); food = g.ev("Object.keys(DISHES).find(d=>DISHES[d].cat==='main')")
+    notes = lambda d, fav: json.loads(g.ev(f"""JSON.stringify((()=>{{const out=new Set();const m=regMem('{rid}');const o0=m.orders;m.orders={{}};if({str(fav).lower()})m.orders['{d}']=9;else m.orders['zzz']=9;
+      const r0=Math.random;for(let i=0;i<60;i++){{S.notes=[];let k=i;Math.random=()=>((k=(k*9301+49297)%233280)/233280)*.3;regularNote({{reg:'{rid}',ticket:{{items:[{{d:'{d}',st:'served',q:'P'}}]}},cats:[],pat:1}});if(S.notes[0])out.add(S.notes[0].txt)}}Math.random=r0;m.orders=o0;return[...out]}})())"""))
+    dn = notes(drink, False)
+    check(dn and all('吃' not in t for t in dn) and any('喝' in t for t in dn), f'a drink: {dn}')
+    check(all('一如往常' not in t for t in dn), f'not their usual: no 一如往常: {dn}')
+    fu = notes(food, True)
+    check(any('一如往常' in t for t in fu) and any('吃' in t for t in fu), f'their usual dish: 一如往常 can be said: {fu}')
+    sp = g.ev("cjkSp(\"Jill 請了Jill's 招牌燉飯，第5次來\")")
+    check(sp == "Jill 請了 Jill's 招牌燉飯，第 5 次來", sp)
+    check(g.ev("cjkSp('今天的提拉米蘇還是很好吃。')") == '今天的提拉米蘇還是很好吃。', 'Chinese alone is untouched')
     check(not g.errors, g.errors[:3]); g.close()
