@@ -797,14 +797,15 @@ def followup_a_campaign_is_felt_in_the_room(b, port, target):
 
 @test
 def followup_the_manual_describes_the_current_game(b, port, target):
-    """v2.3 follow-up: the manual audit — the manual explains the 故事 page and story updates, 社群與宣傳 and how a
-    campaign shows itself, the Lounge staff jobs as they now work, the journal's places, the whole-day dialogue log;
-    stale lines are gone."""
+    """v2.3 follow-up: the manual audit, re-run after the final merge — the manual explains the 故事 page (餐廳故事 and
+    人物／關係支線, numbered stages, 更早以前) and where story updates appear, 社群與宣傳 from the prep screen / shop / journal
+    (read-only in service), the room tabs under the ticket rail, regulars' once-in-a-life events, how a campaign shows
+    itself, the Lounge staff jobs, the journal's places, the whole-day dialogue log; stale lines are gone."""
     g = Game(b, port, target, seed=104, manual=True)
     txt = g.ev("GUIDE.map(s=>s.h+' '+s.sum+' '+s.pts.map(p=>p.join(' ')).join(' ')).join('\\n')")
-    for need in ['故事更新', '下一段', '社群與宣傳', '📱', 'Lounge 外場', 'Lounge 吧台', '調酒師', '暫停選單的「餐廳日誌」', '一整天的都在', '店裡的人', '存錢目標', 'Bar 小廚']:
+    for need in ['故事更新', '餐廳故事', '人物／關係支線', '更早以前', '房間分頁下面', '票券列下面的分頁', '社群與宣傳', '日誌的「社群」', '營業中只能看', '只會發生一次', '📱', 'Lounge 外場', 'Lounge 吧台', '調酒師', '暫停選單的「餐廳日誌」', '一整天的都在', '店裡的人', '存錢目標', 'Bar 小廚']:
         check(need in txt, f'the manual mentions {need}')
-    for stale in ['暫停選單和設定裡都有【儲存目前進度】', '把杯子交給吧台的客人；桌位由有']:
+    for stale in ['暫停選單和設定裡都有【儲存目前進度】', '把杯子交給吧台的客人；桌位由有', '上方的分頁', '畫面上方會跳一個小通知', '打烊後或開店前，商店的「社群與宣傳」分頁（第 6 天起）。', '下一段寫著']:
         check(stale not in txt, f'stale line removed: {stale}')
     g.ev("showGuide()"); g.page.wait_for_timeout(50)
     check('故事' in g.ev("document.querySelector('#screen').innerText") and '社群與宣傳' in g.ev("document.querySelector('#screen').innerText"), 'the manual screen shows the new sections')
