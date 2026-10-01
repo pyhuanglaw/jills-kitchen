@@ -50,7 +50,7 @@ SIM_DAY = r"""window.__simDay=function(steps,dt){let n=0;for(;n<steps;n++){if(!(
  if(sub==='roomoffer'){const b=document.querySelector('#screen [data-act=roomGo]');const k=b?b.dataset.k.split('|')[0]:'?';__rm.offers.push(k);if(b)roomGo(k+'|plan');else{hideScreen();paused=false}}
  if(typeof DLG!=='undefined'&&DLG)dlgNext();
  __act();update(dt);updateCats(dt,0);if(!R)break;
- const m=srPeople().length+(R.srw||[]).filter(w=>w.arr&&w.room==='staff').length;if(m>__rm.most)__rm.most=m;__rm.brk=R.srBreaks||0;__rm.cat=R.srCat?1:0;__rm.early=R.srEarly?1:0;
+ const m=srPeople().length;if(m>__rm.most)__rm.most=m;__rm.brk=R.srBreaks||0;__rm.cat=R.srCat?1:0;__rm.early=R.srEarly?1:0;
  if(n%15===0)for(const q of R.groups){if(q.table!=null&&R.tables[q.table]&&R.tables[q.table].pdr&&!__rm.seen.has(q)){__rm.seen.add(q);if(q.pdWalk)__rm.walk++;else if(!q.pdRes&&!q.pdStory)__rm.other++}}}
  return n}"""
 

@@ -1242,3 +1242,39 @@ def v24_rc6_a_booked_party_comes_eats_and_pays(b, port, target):
     chips = g.ev("[...document.querySelectorAll('#screen .chips span')].map(e=>e.textContent).join('|')")
     check('包廂' in chips, f'and the chip on the summary: {chips}')
     check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc6_the_private_dining_room_minimum_service_and_long_table(b, port, target):
+    """rc6 T–W, AL, the player's 04:25 brief: the minimum grows with the party (4 < 5 < … < 10) and is what such a party
+    orders at today's prices times a modest factor (a floor most parties pass, never a surcharge), the same figure for the
+    same evening; a party of five or more orders a dish each (none cut away), up to twelve; the long table runs down the
+    room (its long axis the screen's height), longer with each phase, every place on the floor, the door at the near
+    end; the crew go up to it first when it needs an order taken, its bill or its table cleared."""
+    g = Game(b, port, target, seed=301, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day61.json')
+    _floor(g, 50); g.ev(PD_OPEN)
+    g.ev("pdW().st2=S.day;pdW().st3=S.day")
+    mins = json.loads(g.ev("JSON.stringify([4,5,6,7,8,9,10].map(n=>pdMinFor(n,3,'family')))"))
+    check(all(mins[i] < mins[i + 1] for i in range(len(mins) - 1)), f'the minimum grows with the party: {mins}')
+    exp6 = g.ev("pdExpect(6,'family')"); m6 = {st: g.ev(f"pdMinFor(6,{st},'family')") for st in (1, 2, 3)}
+    check(m6[1] <= exp6 * .95 and m6[3] <= exp6 * 1.05 + 100 and m6[1] <= m6[2] <= m6[3], f'a floor near what six order ({exp6:.0f}): {m6}')
+    check(g.ev("pdMinFor(6,2,'family')===pdMinFor(6,2,'family')") is True and g.ev("(()=>{const a=Math.random();Math.random=()=>.5;const m=pdMinFor(7,2,'office');Math.random=()=>.9;const n=pdMinFor(7,2,'office');return m===n})()") is True, 'the same figure for the same evening, whatever the day\'s dice')
+    items = json.loads(g.ev("JSON.stringify([5,8,10].map(n=>{let lo=99;for(let i=0;i<30;i++){const o=orderItems({type:'family',size:n,reg:null},true);const mains=o.filter(d=>DISH(d).cat!=='drink'&&DISH(d).cat!=='dessert').length;lo=Math.min(lo,mains)}return lo}))"))
+    check(items[0] >= 5 and items[1] >= 8 and items[2] >= 10, f'a dish each for parties of five and more: {items}')
+    check(g.ev("orderItems({type:'family',size:10,reg:null},true).length<=12") is True, 'at most twelve on the ticket')
+    geo = {}
+    for st in (1, 2, 3):
+        g.ev(f"(()=>{{const p=pdW();delete p.st2;delete p.st3;if({st}>=2)p.st2=S.day;if({st}>=3)p.st3=S.day}})()")
+        geo[st] = json.loads(g.ev("JSON.stringify({G:pdGeo(),n:pdSeats().length,max:pdMax(),LH,door:PDL.door.y,ok:pdSeats().every(s=>{const y=PDL_TABLE().y+s.dy;return y>PDW+20&&y<LH-40})})"))
+    check([geo[s]['n'] for s in (1, 2, 3)] == [6, 8, 10] and all(geo[s]['n'] == geo[s]['max'] for s in geo), f'six, eight, ten places: {geo}')
+    check(all(geo[s]['G']['y1'] - geo[s]['G']['y0'] > 3 * geo[s]['G']['hw'] for s in geo) and geo[1]['G']['y1'] < geo[2]['G']['y1'] < geo[3]['G']['y1'], f'down the room, longer each phase: {geo}')
+    check(all(geo[s]['ok'] for s in geo) and all(geo[s]['G']['y1'] < geo[s]['door'] - 40 for s in geo), 'every place on the floor, the door beyond the near end')
+    # the crew, the room upstairs first
+    _quiet(g); to_service(g)
+    g.ev("__botUntil('R.t>=R.dur*.2',90000,1/30)")
+    r = json.loads(g.ev("""JSON.stringify((()=>{const t=pdTable();const other=R.tables.find(q=>!q.pdr&&!q.lounge&&!q.group&&!q.dirty);if(!t||!other)return{skip:1};
+      const mk=(tb,sz)=>{const g0={size:sz,state:'check',pat:.9,looks:[],ticket:{items:[]},table:tb.i,x:tb.x,y:tb.y,room:tb.room};tb.group=g0;tb.claim=null;return g0};mk(other,2);mk(t,6);
+      const pick=pdFirst(q=>q.group&&q.group.state==='check'&&!q.claim);const res={pick:pick&&pick.pdr};t.group=null;other.group=null;return res})())"""))
+    check(r.get('skip') or r['pick'] is True, f'the Private Dining Room\'s bill first: {r}')
+    check(not g.errors, g.errors[:3]); g.close()

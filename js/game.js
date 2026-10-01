@@ -1272,7 +1272,7 @@ function orderItems(g,est){/* v2.2: a sold-out dish is not on offer (est = the d
   const hasMain=!!d&&DISH(d).cat==='main';const pd=(g.reg==='dylan'?.7:(T.pD||.35))*(W==='hot'?1.5:W==='rain'||W==='storm'?1.2:1)*(reco&&DISH(reco).cat==='drink'?1.25:1)*(hasMain&&setFor('drink')?1.6:1);const dr=drinks();if(dr.length&&(Math.random()<pd||!d))items.push(wpick(dr,wf));
   const ds=des();if(ds.length&&Math.random()<(T.pS||.2)*(reco&&DISH(reco).cat==='dessert'?1.4:1)*(g.celebrate?2.2:1)*(g.broke||g.rushed||g.quick?.2:1)*(hasMain&&setFor('dessert')?1.7:1))items.push((g.forSig||g.wantSig)&&ds.includes('sigdessert')&&Math.random()<.7?'sigdessert':wpick(ds,wf))}
 {const lw=(typeof loungeOpenTonight==='function')&&loungeOpenTonight()&&!est&&wineList().length&&items.some(d=>DISH(d).cat==='main');const pw=({couple:.35,gourmet:.4,vip:.45,office:.18,regular:.22,family:.05,student:.08}[g.type]||.15)*((()=>{const c=campaign();return c&&c.k==='wine'?1.7:1})());const nn=namedId(g);if(lw&&(nn==='品酒師 Ken'||nn==='Monsieur 杜'||Math.random()<pw))items.push(loungeOrder({size:1,type:g.type,name:g.name,reg:g.reg})[0])}/* v2.3 */
- let out=items.filter(Boolean);{const wi=out.findIndex(d=>DISH(d)&&DISH(d).wine);const w=wi>=0?out.splice(wi,1)[0]:null;out=out.slice(0,cap);if(w)out.push(w)}/* v2.3 fix: the dinner glass was rolled, then cut by the ticket cap most of the time */if(!est&&S.day>2){const used={};out=out.filter(d=>{if(DISH(d).wine)return true;used[d]=(used[d]||0)+1;return used[d]<=(S.stock[d]||0)})}if(g.share){/* one dessert, two forks */let seen=false;return out.filter(d=>{if(DISH(d).cat!=='dessert')return true;if(seen)return false;seen=true;return true})}return out}
+ let out=items.filter(Boolean);if(g.size>=5){/* v2.4 rc6: a big table keeps everyone's dish; the extras are what the ticket has room for */const main=d=>DISH(d)&&DISH(d).cat!=='drink'&&DISH(d).cat!=='dessert'&&!DISH(d).wine;out=out.filter(main).concat(out.filter(d=>!main(d)))}{const wi=out.findIndex(d=>DISH(d)&&DISH(d).wine);const w=wi>=0?out.splice(wi,1)[0]:null;out=out.slice(0,cap);if(w)out.push(w)}/* v2.3 fix: the dinner glass was rolled, then cut by the ticket cap most of the time */if(!est&&S.day>2){const used={};out=out.filter(d=>{if(DISH(d).wine)return true;used[d]=(used[d]||0)+1;return used[d]<=(S.stock[d]||0)})}if(g.share){/* one dessert, two forks */let seen=false;return out.filter(d=>{if(DISH(d).cat!=='dessert')return true;if(seen)return false;seen=true;return true})}return out}
 /* expected sales per dish for a day like today: the guest mix and the ordering rules themselves, sampled */
 function expectDemand(groups,n,est){const out={};const G=S.today?S.today.groups:groups||10;const N=n||60;
  for(let i=0;i<N;i++){const o=rollGuest();const g={type:o.type,size:o.size,reg:null,forSig:o.forSig};for(const d of orderItems(g,true))out[d]=(out[d]||0)+1}
@@ -4604,6 +4604,8 @@ function srFreeSpot(pref){const used=new Set(srPeople().map(p=>p.spotK).filter(B
 function srPrefOf(m){if(m.name==='阿德師傅'&&srStage()>=2)return'green';if(m.name==='Hugo'&&srStage()>=2)return'fridge';if(m.name==='小彤'&&srTrace('cup'))return'stool';return null}
 function srCount(m){const s=srW();s.cnt=s.cnt||{};s.cnt[m.name]=(s.cnt[m.name]||0)+1;return s.cnt[m.name]}
 /* a floor crew member up to the room for a while: the walk-over's task, to a spot in another room */
+/* out on the open floor by the right window, standing, the phone out: the floor's table behind, the street below */
+function upWindowSend(m){const w=R.cw&&R.cw[m.id];if(!w||w.task||w.next||w.arriving||w.leaving)return false;const x=318+hash(m.id)%24,y=126;w.task={k:'visit',sr:1,t:{x:x+10,y:y-22,room:'up'},g:null,x,y,room:'up',dur:1e9,then:null,up:1,phone:1};w.srSpot={k:'upwin',x,y,face:-1,stand:1};w.busy=0;return true}
 function srSend(m,dur,spot){const w=R.cw&&R.cw[m.id];if(!w||w.task||w.next||w.arriving||w.leaving)return false;const sp=spot||srFreeSpot(srPrefOf(m));if(!sp)return false;w.srSpot=sp;w.task={k:'visit',sr:1,t:{x:sp.x+(sp.face||1)*10,y:sp.y-22,room:'staff'},g:null,x:sp.x,y:sp.y,room:'staff',dur,then:()=>srArrive(m),up:dur>1e6?1:0};w.busy=0;return true}
 /* the kitchen and the bar have no walking sprite in the service: at closing they walk up as themselves */
 function srWalk(m,from,spot,at){(R.srw=R.srw||[]).push({m,room:from.room,x:from.x,y:from.y,troom:'staff',tx:spot.x,ty:spot.y,spot,face:1,step:0,moving:false,at,hold:null,arr:0})}
@@ -4628,7 +4630,7 @@ function srLifeUpd(dt){if(!R||phase!=='service'||!srBuilt())return;
  for(const id in R.cw||{}){const w=R.cw[id];if(w.task&&w.task.sr&&w.task.dur<1e6&&busy&&w.room!=='staff'&&!w.task.fired){/* called back before they got there */w.task=null;w.srSpot=null}}
  if(R.closing==null&&R.srT<=0){R.srT=8;/* a quiet moment for the floor: nobody waiting at the door, at most one table to order or pay, and
    at least three of them with nothing in hand — then one goes up for a few minutes (a busy restaurant has these too) */
-  const F=(S.crew||[]).filter(m=>(m.role==='waiter'||m.role==='cleaner')&&srHere(m)&&R.cw[m.id]&&!R.cw[m.id].task&&!R.cw[m.id].next&&(R.cw[m.id].cd||0)<=0);
+  const F=(S.crew||[]).filter(m=>(m.role==='waiter'||m.role==='cleaner')&&srHere(m)&&R.cw[m.id]&&!R.cw[m.id].task&&!R.cw[m.id].next&&!R.cw[m.id].arriving&&!R.cw[m.id].leaving);   /* nothing in hand (the idle wait between looks is not work) */
   const quiet=queued().length===0&&R.tables.filter(t=>t.group&&(t.group.state==='order'||t.group.state==='check'||t.group.pat<.35)).length<=1;
   if(quiet&&F.length>=3&&(R.srBreaks||0)<2&&R.t>R.dur*.12&&R.t<R.dur*.85&&!Object.values(R.cw||{}).some(w=>w.task&&w.task.sr)){
    if(hash('srbr|'+S.day+'|'+Math.floor(R.t/8))%100<30){const m=F[hash('srbm|'+S.day+'|'+Math.floor(R.t))%F.length];if(srSend(m,10+hash('srbd|'+S.day)%5)){R.srBreaks=(R.srBreaks||0)+1;R.srT=60}}}}
@@ -4649,9 +4651,11 @@ function srClosingPlan(){if(!srBuilt()||!R||upNight()||(R.upAsk&&!R.upAsk.end))r
  const C=pick(cooks.filter(m=>wantN(m.name)),cookN).concat(pick(cooks.filter(m=>!wantN(m.name)),cookN)).slice(0,cookN);const F=pick(floor.filter(m=>wantN(m.name)),floorN).concat(pick(floor.filter(m=>!wantN(m.name)),floorN)).slice(0,floorN);const B=pick(bars,hash('srbar|'+S.day)%2);
  let at=4;for(const m of C){const sp=srFreeSpotPlanned(srPrefOf(m));if(!sp)break;srWalk(m,{room:'kitchen',x:KR.door.x+(hash(m.id)%30)-15,y:KR.door.y-10},sp,at);at+=3+hash('srat|'+m.id)%5}
  for(const m of B){const sp=srFreeSpotPlanned(null);if(!sp)break;srWalk(m,{room:'lounge',x:LG.door.x,y:LG.door.y},sp,at);at+=4}
- R.srPlan=F.map((m,i)=>({m,at:6+i*5}))}
+ R.srPlan=F.map((m,i)=>({m,at:6+i*5}));
+ /* AO: not everyone goes in — one of the floor stays out by the big window a while, the open floor still lived on */
+ {const rest=floor.filter(m=>!F.includes(m));const m=rest.length?rest[hash('upwin|'+S.day)%rest.length]:null;if(m&&upHas('table'))R.srPlan.push({m,at:9,out:1})}}
 function srFreeSpotPlanned(pref){const used=new Set((R.srw||[]).map(w=>w.spot.k));const all=srSpots();if(pref){const p=all.find(s=>s.k===pref&&!used.has(s.k));if(p)return p}const seats=all.filter(s=>!s.stand&&!used.has(s.k));return seats.length?seats[hash('srp|'+S.day+'|'+used.size)%seats.length]:null}
-function srClosingUpd(dt){if(!R||!R.srPlan||R.closing==null)return;for(const p of R.srPlan){if(p.done||R.closing<p.at)continue;p.done=1;if(R.srFirst&&R.srFirst.who===p.m.id)continue;srSend(p.m,1e9)}
+function srClosingUpd(dt){if(!R||!R.srPlan||R.closing==null)return;for(const p of R.srPlan){if(p.done||R.closing<p.at)continue;p.done=1;if(R.srFirst&&R.srFirst.who===p.m.id)continue;if(p.out){upWindowSend(p.m);continue}srSend(p.m,1e9)}
  if(!fact('sr_first')&&!R.srFirst&&R.closing>8&&!DLG)srFirstStart()}
 /* 「坐啊。」「喔，好。」 — the first evening the room is there */
 function srFirstStart(){const F=(S.crew||[]).filter(m=>(m.role==='waiter'||m.role==='cleaner')&&srHere(m)&&R.cw&&R.cw[m.id]);const who=F.find(m=>m.name==='小彤')||F.slice().sort((a,b)=>TENURE_RANK[tenure(a)]-TENURE_RANK[tenure(b)]||((a.days||0)-(b.days||0)))[0];
@@ -4685,9 +4689,10 @@ function pdAvgUpd(st){if(!pdOn()||!st||!(st.guests>0))return;const p=pdW();const
 function pdExpect(size,type){const r0=Math.random;let a=(hash('pdx|'+S.day+'|'+size+'|'+type)>>>0)||1;Math.random=()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
  let sum=0;const N=40;try{for(let i=0;i<N;i++)for(const d of orderItems({type:type||'family',size,reg:null},true)){const P=priceOf(d);sum+=P}}catch(e){sum=0}finally{Math.random=r0}
  return sum>0?sum/N:size*pdAvg()}
-/* the minimum (T, U, AL): what such a party orders, times a modest factor for the room by phase (I .9, II .95, III 1) —
-   a floor most parties pass and a light table is brought up to; it grows with the party; rounded to $100 */
-const PD_MINF=[0,.9,.95,1];
+/* the minimum (T, U, AL): what such a party orders at today's prices, set just under it and a little higher with each
+   phase (I .88, II .92, III .94 — measured: parties eat about that, give or take a dish): a floor most tables pass and a
+   light one is brought up to, never a surcharge; it grows with the party; rounded to $100 */
+const PD_MINF=[0,.88,.92,.94];
 function pdMinFor(size,st,type){return Math.max(400,Math.round(pdExpect(size,type)*PD_MINF[st||1]/100)*100)}
 function pdPickSize(st,key){const max=PD_MAX[st];const W=[];for(let n=PD_MIN;n<=max;n++)W.push({n,w:n<=6?3-Math.abs(n-5)*.6:n<=8?1.4-(n-7)*.3:.9-(n-9)*.3});let tot=W.reduce((a,o)=>a+o.w,0),x=(hash(key)%1000)/1000*tot;for(const o of W){x-=o.w;if(x<=0)return o.n}return W[W.length-1].n}
 /* at the start of the day (the prep screen): tonight's booking, if one comes in */
@@ -6404,9 +6409,9 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
   ['怎麼來的','都不是升級選單裡冒出來的。二樓開放一陣子以後，換班的東西、等人、找地方坐一下，大家都在二樓找位置；看得夠多了，打烊後 Jill 會自己看見（《大家待的地方》）。休息室用了一段時間、店裡也夠滿以後，會有客人問有沒有比較安靜、不被打擾的位子；之後又是一個打烊後的晚上（《關上門以後》）。企劃都在「店舖工程 › 二樓的房間」，選「之後再說」也不會不見。'],
   ['員工休息室','二樓左邊、樓梯上來的內側，一間有門的房間。I：沙發、幾張椅子、矮桌、飲水機、層架（開放空間的櫃子、立燈、衣帽架搬進去）；II：置物櫃、小冰箱、咖啡機、多一排插座；III：軟一點的沙發、可以圍著吃東西的桌子、小喇叭。I 今晚施工、明天開門前好；II、III 都是隔天就在，要上一階用過幾天才能訂。二樓一次只做一件工程。它不是用餐區，不加座位，也不加員工名額。'],
   ['誰會上去','店裡的人：早到的先上去坐一下；店裡不忙的時候，外場偶爾有人上去喘口氣，一下子就下來（一晚最多兩次；店裡一忙就不會有人上去）；打烊以後，幾個人——廚房的、外場的，有 Lounge 的話吧台的也會——上去坐一下才回家。Lounge 的人用休息室，還是在 Lounge 名單上。客人不會進去。不用你安排，也沒有要照顧的數值。'],
-  ['私人包廂','二樓窗邊那一區，一扇可以關上的門、一張長桌。I：4–6 位；II：桌子加長，4–8 位；III：4–10 位、餐具每天擺好。最少都是 4 位。II 要上一階完工 6 天、包廂用過 3 次；III 要 8 天、用過 9 次。餐廳員工名額 I 和 III 各 +1，Lounge 名單不變。'],
+  ['私人包廂','二樓窗邊那一區，一扇可以關上的門；深綠牆板、石材地板、一張從門口往窗邊延伸的石材長桌。I：4–6 位；II：桌子加長，4–8 位；III：4–10 位、餐具每天擺好。最少都是 4 位。II 要上一階完工 6 天、包廂用過 3 次；III 要 8 天、用過 9 次。餐廳員工名額 I 和 III 各 +1，Lounge 名單不變。'],
   ['預約','訂位會自己進來，一個晚上最多一組，不用接電話也不用排。開店前的新聞會寫「今晚｜私人包廂｜已預約」、幾位、哪一種聚餐、最低消費。剛蓋好的頭一兩個晚上就會有人訂；之後不會每晚都有，II、III 會越來越常。有預約的晚上，包廂留給他們，就算還沒到也不會讓別人坐。'],
-  ['最低消費','訂位的時候就定了：人數 × 最近每位客人的平均消費，再多一點（I／II／III 各 5%／10%／15%）。之後漲價、包廂升級、存檔重開，都不會改。預約的那一桌照常點菜、吃飯、結帳：吃得比最低消費多就照實算，少了就收最低消費——客人不會為了湊低消多點。'],
+  ['最低消費','訂位的時候就定了：照這麼多人、這種聚餐平常會點的菜和當天的價錢來算，訂在稍低一點（包廂越完整，越接近他們會吃的）；人越多越高。之後漲價、包廂升級、存檔重開，都不會改。預約的那一桌照常點菜、吃飯、結帳：吃得比最低消費多就照實算，少了就收最低消費——客人不會為了湊低消多點。'],
   ['沒有預約的晚上','4 位以上、坐得下的客人可以直接坐包廂，照常算，沒有最低消費。熟客和 Lounge 的客人照舊坐他們的位子。結算的晚上會寫「包廂 幾組」；預約的那一桌吃得比最低消費少的話，也寫補足了多少。']]},
  {ic:'🐈',h:'五隻店貓',sum:'樾樾、小齁、寶寶、柔柔、包包住在店裡。不用餵、不用照顧，牠們有自己的生活。',pts:[
   ['個性','樾樾黏 Jill、怕生；小齁愛玩也黏人；寶寶天生明星，總坐在好看的位子；柔柔有點傻，愛埋伏寶寶；包包很會睡。'],
