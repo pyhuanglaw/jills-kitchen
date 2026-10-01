@@ -1,0 +1,126 @@
+Day   1  lv1 side 0 up None  $   2637  rev 2040  guests 17  stars 5  秀琴 在  怡君 -  mode helper  known 0  crew []  xq_helper
+Day   2  lv1 side 0 up None  $   6151  rev 3640  guests 22  stars 5  秀琴 -  怡君 -  mode helper  known 0  crew []  
+Day   3  lv1 side 0 up None  $  10555  rev 4810  guests 27  stars 5  秀琴 -  怡君 -  mode helper  known 0  crew []  
+Day   4  lv1 side 0 up None  $  14288  rev 4800  guests 33  stars 5  秀琴 在  怡君 -  mode helper  known 0  crew ['小茉']  xq_helper·
+Day   5  lv1 side 0 up None  $  20006  rev 4800  guests 32  stars 5  秀琴 在  怡君 -  mode helper  known 0  crew ['小茉']  xq_helper·
+Day   6  lv2 side 0 up None  $  20186  rev 4800  guests 30  stars 5  秀琴 -  怡君 -  mode helper  known 0  crew ['小茉']  
+Day   7  lv2 side 0 up None  $  25744  rev 4800  guests 31  stars 5  秀琴 在  怡君 -  mode helper  known 1  crew ['小茉']  xq_helper·
+Day   8  lv2 side 0 up None  $  30873  rev 4430  guests 27  stars 5  秀琴 在  怡君 來  mode helper  known 1  crew ['小茉']  xq_helper· yj_meet
+Day   9  lv2 side 0 up None  $  33809  rev 4960  guests 32  stars 5  秀琴 在  怡君 來  mode helper  known 1  crew ['小茉', '阿德師傅']  xq_helper· yj_look
+Day  10  lv2 side 0 up None  $  39119  rev 4800  guests 32  stars 4.5  秀琴 -  怡君 -  mode helper  known 1  crew ['小茉', '阿德師傅']  
+Day  11  lv2 side 0 up None  $  44811  rev 5070  guests 33  stars 5  秀琴 在  怡君 來  mode helper  known 1  crew ['小茉', '阿德師傅']  xq_helper· yj_three
+Day  12  lv3 side 0 up None  $  34395  rev 4580  guests 28  stars 4.5  秀琴 在  怡君 -  mode helper  known 1  crew ['小茉', '阿德師傅']  xq_helper· yj_chose
+Day  13  lv3 side 0 up None  $  40328  rev 5120  guests 33  stars 5  秀琴 在  怡君 -  mode helper  known 1  crew ['小茉', '阿德師傅']  xq_helper·
+Day  14  lv3 side 0 up None  $  45668  rev 4800  guests 32  stars 5  秀琴 -  怡君 -  mode helper  known 1  crew ['小茉', '阿德師傅']  yj_move
+Day  15  lv3 side 0 up None  $  50515  rev 4800  guests 31  stars 5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)']  
+Day  16  lv4 side 0 up None  $  12210  rev 4800  guests 30  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai']  yj_key yj_key_seen
+Day  17  lv4 side 0 up None  $  14401  rev 4980  guests 36  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai']  
+Day  18  lv4 side 0 up None  $  15769  rev 4800  guests 31  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai']  
+Day  19  lv4 side 0 up None  $  16440  rev 4800  guests 33  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai']  
+Day  20  lv4 side 0 up None  $  20428  rev 4800  guests 30  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai']  
+Day  21  lv4 side 0 up None  $  23781  rev 4600  guests 30  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai']  
+Day  22  lv4 side 0 up None  $  29439  rev 4800  guests 31  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai']  
+Day  23  lv4 side 0 up None  $  34151  rev 4690  guests 29  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai']  
+Day  24  lv4 side 0 up None  $  38933  rev 4800  guests 31  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai']  
+Day  25  lv4 side 0 up None  $  42283  rev 4430  guests 27  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai']  
+Day  26  lv4 side 0 up None  $  45905  rev 4450  guests 28  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai']  
+Day  27  lv4 side 0 up None  $   4848  rev 4070  guests 26  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤']  
+Day  28  lv4 side 0 up None  $   6136  rev 3390  guests 21  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina']  
+Day  29  lv4 side 0 up None  $  11724  rev 4980  guests 33  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina']  
+Day  30  lv4 side 0 up None  $  15259  rev 4030  guests 26  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina']  
+Day  31  lv4 side 0 up None  $  19296  rev 4510  guests 27  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina']  wall_worry
+Day  32  lv4 side 0 up None  $  24559  rev 4530  guests 29  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina']  wall_photos
+Day  33  lv4 side 0 up None  $  30035  rev 4800  guests 30  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina']  
+Day  34  lv4 side 0 up None  $  34495  rev 4800  guests 35  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina']  wall_visit
+Day  35  lv4 side 0 up None  $  37547  rev 3760  guests 22  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina']  wall_wang
+Day  36  lv4 side 0 up None  $  40870  rev 3810  guests 25  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina']  
+Day  37  lv4 side 0 up None  $  45489  rev 4800  guests 31  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina']  wall_setback
+Day  38  lv4 side 0 up None  $  51912  rev 4980  guests 32  stars 5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina']  
+Day  39  lv4 side 0 up None  $  56761  rev 4320  guests 26  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina']  
+Day  40  lv4 side 0 up None  $  61404  rev 4710  guests 30  stars 4.5  秀琴 -  怡君 來  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina']  wall_report
+Day  41  lv4 side 1 up None  $   2607  rev 2560  guests 16  stars 3.5  秀琴 -  怡君 來  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲']  wall_fee
+Day  42  lv4 side 1 up None  $   3598  rev 2940  guests 18  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  43  lv4 side 1 up None  $   6336  rev 4360  guests 26  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  wall_prep
+Day  44  lv4 side 1 up None  $   4103  rev 3750  guests 22  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  45  lv4 side 1 up None  $   8592  rev 4710  guests 33  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  46  lv4 side 1 up 48  $   2354  rev 1460  guests 8  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  wall_mediation wall_settle
+Day  47  lv4 side 1 up 48  $   3852  rev 2420  guests 16  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  48  lv4 side 1 up 48  $   4339  rev 2650  guests 15  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  sp_seat
+Day  49  lv4 side 1 up 48  $   7471  rev 4640  guests 30  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  50  lv4 side 1 up 48  $   2101  rev 2920  guests 18  stars 4.5  秀琴 -  怡君 來  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  sp_box
+Day  51  lv4 side 1 up 48  $   4421  rev 4010  guests 24  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  52  lv4 side 1 up 48  $   7932  rev 4800  guests 33  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  sp_stuff
+Day  53  lv4 side 1 up 48  $   6402  rev 1170  guests 7  stars 3.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  54  lv4 side 1 up 48  $   7653  rev 2190  guests 14  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  55  lv4 side 1 up 48  $  10307  rev 3270  guests 20  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  56  lv4 side 1 up 48  $   2435  rev 1540  guests 10  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  57  lv4 side 1 up 48  $   1898  rev 580  guests 3  stars 3  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  58  lv4 side 1 up 48  $   1892  rev 1220  guests 6  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  59  lv4 side 1 up 48  $   1836  rev 2230  guests 14  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  60  lv4 side 1 up 48  $   4971  rev 3230  guests 19  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  61  lv4 side 1 up 48  $   7754  rev 2060  guests 12  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  62  lv4 side 1 up 48  $  10827  rev 2330  guests 14  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  63  lv4 side 1 up 48  $   3072  rev 2370  guests 15  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  64  lv4 side 1 up 48  $   3989  rev 1770  guests 10  stars 3.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  65  lv4 side 1 up 48  $   4510  rev 1370  guests 8  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  66  lv4 side 1 up 48  $   9045  rev 3190  guests 19  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  67  lv4 side 1 up 48  $  10786  rev 2350  guests 14  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  68  lv4 side 1 up 48  $  11439  rev 1390  guests 10  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  69  lv4 side 1 up 48  $   5504  rev 4170  guests 28  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  70  lv4 side 1 up 48  $   4525  rev 1580  guests 9  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  71  lv4 side 1 up 48  $   5528  rev 1610  guests 10  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  72  lv4 side 1 up 48  $   8288  rev 3090  guests 17  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  73  lv4 side 1 up 48  $   8660  rev 1030  guests 5  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  74  lv4 side 1 up 48  $   9703  rev 1540  guests 9  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  75  lv4 side 1 up 48  $  12073  rev 2600  guests 14  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  76  lv4 side 1 up 48  $  12697  rev 3040  guests 17  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  77  lv4 side 1 up 48  $  15926  rev 2900  guests 18  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  78  lv4 side 1 up 48  $  16780  rev 1410  guests 9  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  79  lv4 side 1 up 48  $  17468  rev 1270  guests 7  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  80  lv4 side 1 up 48  $  16380  rev 1410  guests 8  stars 3  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  81  lv4 side 1 up 48  $  15022  rev 1410  guests 9  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  82  lv4 side 1 up 48  $  14467  rev 1850  guests 10  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  83  lv4 side 1 up 48  $  17755  rev 3050  guests 19  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  84  lv4 side 1 up 48  $  20543  rev 2900  guests 17  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  85  lv4 side 1 up 48  $  26136  rev 4700  guests 30  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  86  lv4 side 1 up 48  $  27817  rev 1830  guests 10  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  87  lv4 side 1 up 48  $  29819  rev 2160  guests 12  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  88  lv4 side 1 up 48  $  31203  rev 1240  guests 7  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  89  lv4 side 1 up 48  $  33116  rev 2050  guests 10  stars 3.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  90  lv4 side 1 up 48  $  35932  rev 2830  guests 17  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  91  lv4 side 1 up 48  $  36761  rev 970  guests 5  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  92  lv4 side 1 up 48  $  39871  rev 2940  guests 17  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  93  lv4 side 1 up 48  $  42130  rev 2490  guests 15  stars 3.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  94  lv4 side 1 up 48  $  45909  rev 4800  guests 31  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  95  lv4 side 1 up 48  $  46130  rev 470  guests 3  stars 3.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  96  lv4 side 1 up 48  $  48508  rev 2270  guests 13  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  97  lv4 side 1 up 48  $  53666  rev 4530  guests 29  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  98  lv4 side 1 up 48  $  58254  rev 4040  guests 25  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day  99  lv4 side 1 up 48  $  56953  rev 1310  guests 7  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day 100  lv4 side 1 up 48  $  56511  rev 1960  guests 10  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day 101  lv4 side 1 up 48  $  55533  rev 1520  guests 8  stars 3.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day 102  lv4 side 1 up 48  $  57534  rev 1890  guests 12  stars 3.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day 103  lv4 side 1 up 48  $  59888  rev 2030  guests 12  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day 104  lv4 side 1 up 48  $  60300  rev 350  guests 3  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day 105  lv4 side 1 up 48  $  65644  rev 2270  guests 13  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day 106  lv4 side 1 up 48  $  68809  rev 2940  guests 17  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day 107  lv4 side 1 up 48  $  67278  rev 1010  guests 6  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day 108  lv4 side 1 up 48  $  72693  rev 4170  guests 26  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day 109  lv4 side 1 up 48  $  72824  rev 2320  guests 14  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day 110  lv4 side 1 up 48  $  75850  rev 2470  guests 14  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day 111  lv4 side 1 up 48  $  80642  rev 1710  guests 10  stars 3.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day 112  lv4 side 1 up 48  $  83371  rev 2170  guests 14  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day 113  lv4 side 1 up 48  $  88579  rev 4120  guests 25  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day 114  lv4 side 1 up 48  $  89444  rev 690  guests 4  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day 115  lv4 side 1 up 48  $  88688  rev 1670  guests 10  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day 116  lv4 side 1 up 48  $  90952  rev 1600  guests 11  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo']  
+Day 117  lv5 side 1 up 48  $    488  rev 1900  guests 10  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo', '阿明']  up_hint
+Day 118  lv5 side 1 up 48  $   2813  rev 1270  guests 9  stars 4  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo', '阿明']  up_staff
+Day 119  lv5 side 1 up 48  $   2929  rev 3410  guests 22  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo', '阿明', '小威']  
+Day 120  lv5 side 1 up 48  $   6304  rev 2880  guests 16  stars 4.5  秀琴 -  怡君 -  mode crew  known 1  crew ['小茉', '阿德師傅', '秀琴阿姨(xq)', 'Kai', '小彤', 'Nina', '阿哲', 'Momo', '阿明', '小威']  up_inspect
+
+first day each: {'xq_helper': 1, 'xq_hired': 14, 'yj_meet': 8, 'yj_look': 9, 'yj_three': 11, 'yj_chose': 12, 'yj_move': 14, 'yj_key': 16, 'yj_key_seen': 16, 'wall_worry': 31, 'wall_photos': 32, 'wall_visit': 34, 'wall_wang': 35, 'wall_setback': 37, 'wall_report': 40, 'wall_fee': 41, 'wall_prep': 43, 'wall_mediation': 46, 'wall_settle': 46, 'up_hint': 117, 'up_staff': 118, 'up_inspect': 120, 'sp_seat': 48, 'sp_box': 50, 'sp_stuff': 52}
+秀琴阿姨 knows Sophie/Mia: {'sophie': 3, 'mia': 5, 'xqid': 'xq'}
+majors per day > 1: []
+page errors: []
+120 days in 446s

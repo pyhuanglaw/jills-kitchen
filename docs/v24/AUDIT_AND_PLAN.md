@@ -334,3 +334,21 @@ going up; cats may go up on their own (restrained places); 柔柔 now and then b
 project when the player buys it. **Price:** 二樓（整層） $350,000 — the largest building project (Lounge III is
 $220,000, the cat walkway $300,000), about a week of a Day 52 restaurant's net; most mature saves have it by then. It
 does nothing mechanical yet: it is the floor.
+
+### 7.1 As built (rc5, 2026-10-01/02) — where the build differs from the plan above
+
+- The era's first beat also waits for the restaurant's full size (level 5) and a crew of five; the crew's moments
+  (`sp_*`) start with the era itself.
+- U4's start of the day is a two-line scene, not a note: 「下午，房東帶冷氣師傅上樓看了一下冷氣。」 / the landlord,
+  「好了。門我帶上了。」 — the player is told the door was opened that day, and shut.
+- The customer beats have their people: U1 陳伯伯 (else 小林, Leo); 「妳們現在人這麼多…」 小林 on a busy night; 「今天又滿
+  了？」 Leo seated after a wait; 「妳這間越來越不像以前那麼小了。」 王太太; a family wanting somewhere quieter only when
+  the side room is full too. One customer moment a day.
+- 《那面牆》's callback is at Sophie and Mia's table, 秀琴阿姨 walking over (「Jill 要把樓上租下來。」), Mia looking up at
+  the ceiling first.
+- The night: the unlit floor is dark (the stairwell, the street through the glass) until someone finds the switch; the
+  stair well's deep end is the far end, the way on is at the near left; people and cats are routed round the railing.
+- The project is offered at the end of the call like the Lounge (開始規劃 / 之後再說); bought, the floor is open the same
+  evening (empty, two boxes) and the furniture arrives from the next day.
+- The staff pools (the player, 19:07–19:16) and 許葳 came in during rc5: `docs/v24/staff_pools_1907_2026-10-01.txt`,
+  `docs/V24_RC5_REPORT.md` §7.

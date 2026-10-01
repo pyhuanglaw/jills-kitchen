@@ -2768,14 +2768,14 @@ function upAskReady(){return !!fact('up_hint')&&!!fact('up_inspect')&&!!fact('up
 const UP_CAT_ST=['upwalk','upgo','up','updown'];
 function upCatBusy(c){return !!c&&UP_CAT_ST.includes(c.st)}
 function upCatSend(c){if(!c||upCatBusy(c)||!freeFloorCat(c))return false;releaseSpots(c);c.guest=null;c.run=0;c.st='upwalk';c.tx=SIDE_ARCH.x+SIDE_ARCH.w/2;c.ty=108;c.moving=true;return true}
-function upCatForce(c){if(!c||upCatBusy(c))return;releaseSpots(c);if(c.perch>=0){if(perchOcc[c.perch]===c)perchOcc[c.perch]=null;c.perch=-1}c.guest=null;c.run=0;upCatAtDoor(c)}
+function upCatForce(c){if(!c||upCatBusy(c))return;releaseSpots(c);if(c.perch>=0){if(perchOcc[c.perch]===c)perchOcc[c.perch]=null;c.perch=-1}for(const k in GEAR_OCC)if(GEAR_OCC[k]===c)GEAR_OCC[k]=null;c.gear=null;c.away=null;c.guest=null;c.run=0;upCatAtDoor(c)}   /* off a perch, the sofa or the side room's window: nothing of hers is left held */
 function upCatAtDoor(c){c.away='side';c.hidden=true;c.st='upgo';c.ax=UPDOOR.x+(c.def.id==='mikan'?10:-12);c.ay=UPDOOR.y-18;c.aface=1;c.aoy=0;c.pose='sit';c.moving=false;c.t=rand(2.5,4)}
 function upCatUp(c,sp){c.away='up';c.st='up';c.hidden=true;c.ax=sp.x;c.ay=sp.y;c.aface=sp.face||1;c.aoy=sp.oy||0;c.pose=sp.pose||'sit';c.moving=false;c.upTo=null;c.upT=sp.t==null?null:sp.t;c.upWin=!!sp.win;
  if(upTaken()&&!upNight()&&!upSearching()){/* in by the stairs, round the railing, to her place */const fin=()=>{c.aoy=sp.oy||0;c.pose=sp.pose||'sit';c.aface=sp.face||1};c.ax=UP_L.entry.x;c.ay=UP_L.entry.y-2;c.aoy=0;c.upT=sp.t==null?null:sp.t+6;c.upTo={x:238,y:392,v:38,then:o=>{o.upTo={x:sp.x,y:sp.y,v:38,then:fin}}}}
  if(c.def.id==='ban'&&!upNight()){const A=catBy('mikan');if(A&&A.st==='up')upTogether()}
  if(c.def.id==='mikan'&&!upNight()&&upTaken()){if(sp.win){const v=v24();v.upWin=(v.upWin||0)+1}UPC.follow=Math.random()<.45?ctime+rand(3,8):0}}
 function upCatDown(c){c.st='updown';c.away='side';c.hidden=true;c.ax=UPDOOR.x+8;c.ay=UPDOOR.y-18;c.aface=-1;c.aoy=0;c.pose='sit';c.moving=false;c.upTo=null;c.t=1.2}
-function upCatHome(c){c.away=null;c.hidden=false;c.st='rest';c.pose='stretch';c.t=1.4;c.x=SIDE_ARCH.x+SIDE_ARCH.w/2;c.y=110;c.face=-1;c.moving=false;c.upTo=null;c.upT=null;c.aoy=0;c.upWin=false}
+function upCatHome(c){c.away=null;c.gear=null;c.hidden=false;c.st='rest';c.pose='stretch';c.t=1.4;c.x=SIDE_ARCH.x+SIDE_ARCH.w/2;c.y=110;c.face=-1;c.moving=false;c.upTo=null;c.upT=null;c.aoy=0;c.upWin=false}
 function upCatsHome(){if(CATS)for(const c of CATS)if(upCatBusy(c))upCatHome(c)}
 function upCatToStairs(c,v){c.upTo={x:238,y:392,v:v||44,then:o=>{o.upTo={x:UP_L.entry.x,y:UP_L.entry.y-2,v:v||44,then:upCatDown}}}}
 function upCatTick(c,dt){if(c.upTo){const T=c.upTo;const dx=T.x-c.ax,dy=T.y-c.ay,d=Math.hypot(dx,dy),v=(T.v||36)*dt;
@@ -5756,7 +5756,7 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
   ['個性','樾樾黏 Jill、怕生；小齁愛玩也黏人；寶寶天生明星，總坐在好看的位子；柔柔有點傻，愛埋伏寶寶；包包很會睡。'],
   ['點牠們','可以摸，但牠們不一定理你。點睡著的包包，他會睜一下眼、動動耳朵尾巴——然後繼續睡。'],
   ['客人也看貓','客人會轉頭看貓、微笑，有人會拿手機拍一張。等太久的客人，親人的貓有時會去陪一下。常來的客人會慢慢認得某一隻，叫得出名字。'],
-  ['牠們不出門','貓只在店裡，窗邊再熱鬧也是在窗戶裡面。門口的狗是客人帶來的，有五種：博美、臘腸、米克斯、垂耳、黃金獵犬。買了狗狗休息角（門邊那間小木屋），牠會在屋前趴著、坐起來看看、喝水，等主人吃完。'],
+  ['牠們不出門','貓只在店裡，窗邊再熱鬧也是在窗戶裡面。二樓是店裡的以後，偶爾會有一隻上樓待一會兒，再自己下來。門口的狗是客人帶來的，有五種：博美、臘腸、米克斯、垂耳、黃金獵犬。買了狗狗休息角（門邊那間小木屋），牠會在屋前趴著、坐起來看看、喝水，等主人吃完。'],
   ['名字','在餐廳日誌的「店貓」可以直接改名字。']]},
  {ic:'🧪',h:'料理研發',sum:'每種食材都寫著它的角色和味道。用看得到的資訊推理，不是猜密碼。',pts:[
   ['怎麼選','先選一個主角（主體／飲品基底／甜點基底），再配配料、調味或醬汁。選好會先看到相性、整體味道、可能適合哪個工作站。'],

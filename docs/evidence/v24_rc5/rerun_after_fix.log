@@ -1,0 +1,5 @@
+PASS  named_guests_keep_one_face_and_the_staff_have_theirs  (1.3s)
+PASS  followup_the_manual_describes_the_current_game  (0.3s)
+PASS  v24_saves_load_and_nothing_fires_on_load  (16.7s)
+
+3 passed, 0 failed

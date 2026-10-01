@@ -1,0 +1,110 @@
+Day  53  hot    fam [0, 1]  seen ['mia', 'n:怡君'] sat ['mia@side:90'] major 1 miss {}  yj_meet
+Day  54  rain   fam [0, 1]  seen ['n:怡君', 'sophie'] sat ['sophie@side:100'] major 0 miss {}  yj_look
+Day  55  rain   fam [0, 1]  seen [] sat [] major 1 miss {}  
+Day  56  rain   fam [1, 1]  seen ['sophie', 'mia', 'n:怡君'] sat ['sophie@main:120', 'mia@main:180'] major 1 miss {}  yj_three
+Day  57  sun    fam [1, 2]  seen ['mia', 'sophie'] sat ['mia@side:40', 'sophie@main:110'] major 1 miss {}  yj_chose
+Day  58  rain   fam [1, 2]  seen ['sophie', 'mia', 'wang'] sat ['sophie@main:40', 'mia@side:40', 'wang@front:50'] major 0 miss {}  
+Day  59  rain   fam [1, 2]  seen ['mia'] sat ['mia@side:30'] major 1 miss {}  yj_move
+Day  60  cool   fam [2, 2]  seen ['wang', 'sophie', 'mia'] sat ['wang@front:120', 'sophie@main:170', 'mia@side:190'] major 0 miss {}  
+Day  61  sun    fam [2, 3]  seen ['mia'] sat ['mia@side:60'] major 1 miss {}  yj_key yj_key_seen
+Day  62  cloud  fam [2, 3]  seen ['wang'] sat ['wang@front:50'] major 0 miss {}  
+Day  63  rain   fam [2, 4]  seen ['wang', 'sophie', 'mia'] sat ['wang@front:170', 'sophie@main:180', 'mia@side:190'] major 0 miss {}  
+Day  64  rain   fam [2, 4]  seen ['sophie', 'mia'] sat ['sophie@main:70', 'mia@main:80'] major 1 miss {}  wall_worry wall_call
+Day  65  cool   fam [2, 4]  seen ['wang', 'sophie', 'mia'] sat ['wang@front:120', 'sophie@main:180'] major 0 miss {}  
+Day  66  hot    fam [3, 5]  seen ['sophie', 'mia'] sat ['sophie@main:60', 'mia@main:70'] major 1 miss {}  wall_photos wall_jill
+Day  67  cloud  fam [3, 5]  seen [] sat [] major 0 miss {}  
+Day  68  cool   fam [3, 5]  seen ['sophie'] sat ['sophie@main:40'] major 0 miss {}  
+Day  69  storm  fam [3, 5]  seen [] sat [] major 1 miss {}  wall_visit
+Day  70  hot    fam [3, 5]  seen ['sophie', 'mia', 'wang'] sat ['sophie@main:50', 'mia@main:50', 'wang@main:60'] major 1 miss {}  wall_wang
+Day  71  hot    fam [3, 5]  seen ['mia', 'sophie'] sat ['mia@side:100', 'sophie@main:130'] major 1 miss {}  
+Day  72  rain   fam [3, 5]  seen ['wang', 'sophie'] sat ['wang@front:80', 'sophie@main:80'] major 0 miss {}  wall_setback
+Day  73  sun    fam [3, 5]  seen ['mia', 'sophie'] sat ['mia@side:100', 'sophie@side:100'] major 1 miss {}  
+Day  74  sun    fam [3, 5]  seen ['sophie'] sat ['sophie@main:10'] major 0 miss {}  
+Day  75  rain   fam [3, 5]  seen ['n:怡君', 'wang', 'sophie', 'mia'] sat ['wang@main:90', 'sophie@main:190', 'mia@main:200'] major 1 miss {}  wall_report
+Day  76  storm  fam [3, 5]  seen ['n:怡君', 'wang'] sat ['wang@front:130'] major 0 miss {}  wall_fee
+Day  77  rain   fam [3, 5]  seen ['mia', 'sophie', 'wang'] sat ['mia@side:50', 'sophie@side:60', 'wang@front:100'] major 0 miss {}  
+Day  78  hot    fam [3, 5]  seen ['mia', 'sophie'] sat ['mia@front:190', 'sophie@main:190'] major 0 miss {}  wall_prep
+Day  79  cool   fam [3, 5]  seen [] sat [] major 0 miss {}  
+Day  80  rain   fam [3, 5]  seen ['wang', 'mia', 'sophie'] sat ['wang@front:90', 'mia@main:220', 'sophie@side:220'] major 0 miss {}  
+Day  81  sun    fam [3, 5]  seen [] sat [] major 1 miss {}  wall_mediation wall_settle
+Day  82  storm  fam [3, 5]  seen ['wang', 'sophie'] sat ['wang@front:100', 'sophie@side:240'] major 0 miss {}  
+Day  83  sun    fam [3, 5]  seen ['wang', 'mia', 'sophie'] sat ['wang@front:70', 'mia@side:100', 'sophie@side:100'] major 0 miss {}  wall_paid wall_paper sp_seat
+Day  84  sun    fam [3, 5]  seen ['wang', 'sophie', 'n:怡君'] sat ['wang@front:50', 'sophie@main:60'] major 0 miss {}  up_hint
+Day  85  sun    fam [3, 5]  seen ['wang', 'sophie', 'n:怡君', 'mia'] sat ['wang@front:10', 'sophie@main:80', 'mia@side:110'] major 0 miss {'sp_box': 1}  wall_article sp_stuff
+Day  86  cloud  fam [3, 5]  seen ['wang'] sat ['wang@main:200'] major 1 miss {'sp_box': 1}  up_staff
+Day  87  sun    fam [3, 5]  seen [] sat [] major 0 miss {}  sp_box
+Day  88  storm  fam [3, 5]  seen ['sophie', 'wang'] sat ['sophie@main:40', 'wang@front:50'] major 1 miss {}  wall_fixed up_inspect
+Day  89  cloud  fam [3, 5]  seen ['wang', 'mia'] sat ['wang@front:50', 'mia@side:80'] major 0 miss {}  
+Day  90  rain   fam [3, 5]  seen ['wang'] sat ['wang@front:100'] major 0 miss {}  
+Day  91  sun    fam [3, 5]  seen ['sophie', 'mia'] sat ['sophie@main:190', 'mia@main:200'] major 1 miss {}  up_door up_cats
+Day  92  rain   fam [3, 5]  seen ['sophie'] sat ['sophie@side:120'] major 0 miss {}  
+Day  93  cloud  fam [3, 5]  seen ['wang', 'sophie', 'mia'] sat ['wang@front:50', 'sophie@front:130', 'mia@side:130'] major 0 miss {}  up_full
+Day  94  cloud  fam [3, 5]  seen ['sophie'] sat ['sophie@main:170'] major 0 miss {}  up_busy
+Day  95  sun    fam [3, 5]  seen ['mia'] sat ['mia@side:90'] major 0 miss {}  up_quiet up_remind
+Day  96  rain   fam [3, 5]  seen ['mia'] sat ['mia@side:70'] major 0 miss {}  up_small
+Day  97  cloud  fam [3, 5]  seen ['mia'] sat ['mia@side:90'] major 1 miss {}  up_ask
+  (bought the second floor)
+Day  98  cool   fam [3, 5]  seen ['sophie'] sat ['sophie@side:170'] major 0 miss {}  
+Day  99  rain   fam [3, 5]  seen ['mia', 'sophie'] sat ['mia@side:80', 'sophie@side:100'] major 0 miss {}  up_leak up_use
+Day 100  sun    fam [3, 5]  seen ['wang'] sat ['wang@front:90'] major 0 miss {}  
+Day 101  rain   fam [3, 5]  seen ['sophie', 'mia', 'wang'] sat ['sophie@side:120', 'mia@side:120', 'wang@front:160'] major 1 miss {}  
+Day 102  cloud  fam [3, 5]  seen ['mia', 'sophie', 'wang'] sat ['mia@side:30', 'sophie@side:40', 'wang@front:100'] major 0 miss {}  
+Day 103  rain   fam [3, 5]  seen ['wang', 'mia'] sat ['wang@front:180', 'mia@main:210'] major 0 miss {}  
+Day 104  storm  fam [3, 5]  seen ['mia'] sat ['mia@main:200'] major 0 miss {}  
+Day 105  rain   fam [3, 5]  seen ['sophie', 'mia', 'wang'] sat ['sophie@side:140', 'mia@main:150', 'wang@front:190'] major 0 miss {}  
+Day 106  hot    fam [3, 5]  seen [] sat [] major 0 miss {}  
+Day 107  rain   fam [3, 5]  seen ['wang'] sat ['wang@front:60'] major 0 miss {}  up_late
+Day 108  sun    fam [3, 5]  seen ['wang'] sat ['wang@front:70'] major 0 miss {}  
+Day 109  sun    fam [3, 5]  seen ['wang'] sat ['wang@main:180'] major 0 miss {}  
+Day 110  rain   fam [3, 5]  seen ['wang', 'sophie', 'mia'] sat ['wang@front:50', 'sophie@main:200', 'mia@side:210'] major 0 miss {}  
+Day 111  cloud  fam [3, 5]  seen ['wang', 'mia'] sat ['wang@front:120', 'mia@main:200'] major 0 miss {}  
+Day 112  rain   fam [3, 5]  seen [] sat [] major 0 miss {}  
+
+first day each beat happened:
+  yj_meet          53
+  yj_look          54
+  yj_three         56
+  yj_chose         57
+  yj_move          59
+  yj_key           61
+  yj_key_seen      61
+  xq_oh            None
+  wall_worry       64
+  wall_call        64
+  wall_photos      66
+  wall_jill        66
+  wall_visit       69
+  wall_wang        70
+  wall_setback     72
+  wall_report      75
+  wall_fee         76
+  wall_prep        78
+  wall_mediation   81
+  wall_settle      81
+  wall_paid        83
+  wall_article     85
+  wall_paper       83
+  wall_fixed       88
+  up_hint          84
+  up_staff         86
+  up_inspect       88
+  up_door          91
+  up_cats          91
+  sp_seat          83
+  sp_box           87
+  sp_stuff         85
+  up_busy          94
+  up_full          93
+  up_small         96
+  up_quiet         95
+  up_remind        95
+  up_ask           97
+  up_leak          99
+  up_lease         97
+  up_use           99
+  up_late          107
+eras open: {'yj': 53, 'wall': 63, 'up': 83, 'dorm': {}}
+major beats per day (last 40 in the trace): {97: ['up_ask'], 101: ['sm_d']}
+more than one major in a day: []
+page errors: []
+60 days in 502s

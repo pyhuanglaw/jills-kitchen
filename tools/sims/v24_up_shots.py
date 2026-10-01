@@ -225,7 +225,7 @@ with sync_playwright() as p:
         g.page.wait_for_timeout(60)
         g.ev("(()=>{const e=[...document.querySelectorAll('#screen .nm')].find(x=>x.textContent.trim()==='Lounge 名單');if(e)e.scrollIntoView({block:'start'})})()"); g.page.wait_for_timeout(60)
         shot(g, 'staff_lounge_full.png', 'all five hired: 「Lounge 的人都到齊了。」 — no sixth; the restaurant still 12/12')
-        g.ev("window.scrollTo(0,0);document.querySelector('#screen').scrollTop=0"); g.page.wait_for_timeout(40)
+        g.ev("(()=>{for(const e of [document.querySelector('#screen .sheet'),document.querySelector('#screen'),document.scrollingElement])if(e)e.scrollTop=0})()"); g.page.wait_for_timeout(60)
         shot(g, 'staff_two_pools_top.png', 'the top of the staff page: 餐廳員工 12/12・Lounge 員工 5/5')
         if g.page.query_selector('#screen [data-act=toPrep]'): g.click('#screen [data-act=toPrep]'); g.page.wait_for_timeout(120)   # the shop was opened from the prep screen
         begin(g, 9501, scenes=False)

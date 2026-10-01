@@ -109,6 +109,22 @@
 - 廚房用品：`kitchenItems()` 加一筆（繪製和點擊判斷共用同一份座標），`tapKItem` 加 `case`。
 - 房間深度會隨螢幕高度調整（`applyDY`），會跟著地板移動的 y 座標請比照 `SPOT.scr` 寫在 `applyDY` 裡。
 
+### 員工的兩個名單（v2.4 rc5）
+
+員工分兩個聘僱 pool，名額各算各的、永遠不加在一起（玩家 2026-10-01 19:07，`docs/v24/staff_pools_1907_2026-10-01.txt`）：
+
+- 每個員工有 `m.pool`：`'restaurant'` 或 `'lounge'`。讀的時候用 `crewPool(m)`（舊存檔沒有這個欄位：照 `LOUNGE_ROSTER` 的名字與職種、
+  以及任何調酒師，算 Lounge；其他人算餐廳；`crewPoolMig` 在讀檔時補上）。`m.role`（廚師、服務生、清潔員、調酒師）是另一個維度：
+  安安是 Lounge 的服務生、許葳是 Lounge 的清潔員、阿拓是 Lounge 的廚師。
+- 餐廳的名額：`restaurantCap()`——等級、後場整理區、側廳、廚房擴建、廚房二期。**之後任何「餐廳」的空間或升級（二樓、員工休息室…）
+  如果要加人，只能加在這裡。**
+- Lounge 的名額：`loungeCap()`＝`LOUNGE_ROSTER` 裡 Lounge 的工程已經打開的名字。Lounge 不隨機招人；要多人，是在 `LOUNGE_ROSTER`
+  加一個有名有姓的人（附上哪一級打開），不是加一個數字。
+- 不要寫 `cap = 餐廳 + Lounge + 其他`。招募：餐廳用 `hire`（依職種，從 `CREW_NAMES`），Lounge 用 `hireLounge`（依名字）。
+- 在哪裡上班是「工作分配」的事，跟 pool 無關：服務生兩邊共用（`waiterDuties(m).lounge`），廚房只有一個，調酒師只顧吧台。跨區上班
+  不會佔對方的名額。
+- 測試：`v24_restaurant_and_lounge_staff_are_two_pools_that_never_share_places`、`v24_an_old_shared_cap_save_keeps_everyone_and_waits`。
+
 ### 新增存檔欄位
 - **只要在 `newState()` 加上預設值**。舊存檔讀進來時缺少的頂層欄位會自動補上。
 - 如果是放在 `eq`、`decor`、`staff`、`stats` 這四個物件裡的新鍵，也會自動補上（`fillDefaults` 會逐鍵合併）。

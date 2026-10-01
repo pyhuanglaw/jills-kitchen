@@ -2,7 +2,7 @@
 day's story presence, the walk-over, the order of the eras and their dormancy, narrative-time pacing, the story
 illustrations, the name pools. Same harness and TESTS list as run_tests.py (imported at the end of that file), so
 `python3 tests/run_tests.py -k v24` runs these."""
-import json, os, sys, glob
+import json, os, sys, glob, re
 _rt = sys.modules['__main__'] if hasattr(sys.modules.get('__main__'), 'TESTS') else __import__('run_tests')
 test, check, Game, ROOT, start_day, install_bot, LAZY_ACTOR, play_day = (_rt.test, _rt.check, _rt.Game, _rt.ROOT, _rt.start_day, _rt.install_bot, _rt.LAZY_ACTOR, _rt.play_day)
 
@@ -239,7 +239,8 @@ def v24_saves_load_and_nothing_fires_on_load(b, port, target):
         ok = json.loads(g.ev("""JSON.stringify({money:S.money,crew:(S.crew||[]).length,ops:JSON.stringify(S.ops||{}),t:(S.crew||[]).every(m=>!!tenure(m)),
           v24:Object.keys((S.story&&S.story.facts)||{}).filter(k=>/^(yj_|wall_|up_|xq_)/.test(k))})"""))
         check(ok['money'] == raw['money'] and ok['crew'] == len(raw.get('crew') or []) and ok['ops'] == json.dumps(raw.get('ops') or {}, separators=(',', ':')), f'{name}: kept as it was: {ok}')
-        check(ok['t'] and not ok['v24'], f'{name}: tenure classes, no story facts: {ok}')
+        raw_v24 = sorted(k for k in ((raw.get('story') or {}).get('facts') or {}) if re.match(r'^(yj_|wall_|up_|xq_)', k))
+        check(ok['t'] and sorted(ok['v24']) == raw_v24, f'{name}: tenure classes; the v2.4 story facts exactly as saved (none for a save from before v2.4): {ok} vs {raw_v24}')
         check(not g.errors, f'{name}: {g.errors[:3]}'); g.close()
     g = Game(b, port, target, seed=249, manual=True, viewport={'width': 390, 'height': 844})
     load_save(g, 'player_day52.json')

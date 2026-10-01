@@ -18,14 +18,16 @@ from playwright.sync_api import sync_playwright
 ap = argparse.ArgumentParser()
 ap.add_argument('--days', type=int, default=24)
 ap.add_argument('--seed', type=int, default=300)
-ap.add_argument('--plan', default='late', choices=['early', 'late', 'never'])
+ap.add_argument('--plan', default='late', choices=['early', 'late', 'never', 'grow'])
 ap.add_argument('--noxqh', action='store_true')
 ap.add_argument('--json', default=None)
 A = ap.parse_args()
 
 SEED = "Math.random=(function(){let a=%d;return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}})()"
 KEYS = ['xq_helper', 'xq_hired', 'yj_meet', 'yj_look', 'yj_three', 'yj_chose', 'yj_move', 'yj_move_told', 'yj_key', 'yj_key_seen',
-        'wall_worry', 'wall_photos', 'wall_visit', 'wall_wang', 'wall_setback', 'wall_report', 'wall_fee', 'wall_prep', 'wall_mediation', 'wall_settle']
+        'wall_worry', 'wall_photos', 'wall_visit', 'wall_wang', 'wall_setback', 'wall_report', 'wall_fee', 'wall_prep', 'wall_mediation', 'wall_settle',
+        # v2.4 P2 (rc5): the Second Floor
+        'up_hint', 'up_staff', 'up_inspect', 'up_door', 'up_cats', 'sp_seat', 'sp_box', 'sp_stuff', 'up_busy', 'up_full', 'up_small', 'up_quiet', 'up_remind', 'up_ask', 'up_lease']
 # a person's shop: early = the cleaner is the first hire (Day 4); late = a waiter first, the cleaner once the room is bigger
 PLANS = {
     'early': {1: [('rd', {'d': 'pasta'}), ('buyTable', {})], 2: [('buyEq', {'k': 'bar'}), ('buyTable', {})], 4: [('hire', {'k': 'cleaner'})],
@@ -35,6 +37,11 @@ PLANS = {
     'never': {1: [('rd', {'d': 'pasta'}), ('buyTable', {})], 2: [('buyEq', {'k': 'bar'}), ('buyTable', {})], 3: [('hire', {'k': 'waiter'})],
               5: [('expand', {}), ('buyDecor', {'k': 'plants'})], 8: [('hire', {'k': 'chef'}), ('buyTable', {})], 11: [('expand', {})]},
 }
+# rc5: a game that keeps growing — the late plan's first weeks, then every evening whatever a growing restaurant buys
+# once it can afford it (each is a no-op when it cannot): the next expansion, the side room, the kitchen, the staff
+PLANS['grow'] = PLANS['late']
+GROW = [('expand', {}), ('buyProject', {'k': 'side'}), ('buyProject', {'k': 'kext'}), ('buyOps', {'k': 'room'}), ('hire', {'k': 'waiter'}),
+        ('hire', {'k': 'chef'}), ('hire', {'k': 'cleaner'}), ('buyTable', {}), ('buySideTable', {})]
 
 def main():
     t0 = time.time(); rows = []
@@ -66,12 +73,16 @@ def main():
               errors:(window.__errs||[]).length})""" % json.dumps(KEYS)))
             rows.append(info)
             s = info['sum'] or {}
-            print(f"Day {info['day']:3d}  ${info['money']:>7}  rev {s.get('rev')}  guests {s.get('guests')}  stars {s.get('stars')}  "
+            info['lv'] = g.ev("S.level"); info['side'] = g.ev("!!(S.rooms&&S.rooms.side)"); info['era'] = g.ev("eraOpenDay('up')")
+            print(f"Day {info['day']:3d}  lv{info['lv']} side {int(info['side'])} up {info['era']}  ${info['money']:>7}  rev {s.get('rev')}  guests {s.get('guests')}  stars {s.get('stars')}  "
                   f"秀琴 {'在' if info['xq'] else '-'}  怡君 {'來' if info['yj'] else '-'}  mode {'helper' if info['mode'] else 'crew' if any('秀琴' in c for c in info['crew']) else '-'}  "
                   f"known {int(info['known'])}  crew {info['crew']}  {' '.join(info['fired'])}", flush=True)
             if g.ev("phase") == 'summary': g.click('[data-act=toShop]')
             for a, kv in PLANS[A.plan].get(day, []):
                 act(a, **kv); g.ev("__tick(30)")
+            if A.plan == 'grow' and day >= 15:
+                for a, kv in GROW:
+                    act(a, **kv); g.ev("__tick(30);if(typeof hideReveal==='function')hideReveal();if(DLG)while(DLG)dlgNext()")
             g.click('[data-act=nextDay]'); g.ev("__tick(100)")
         final = json.loads(g.ev("JSON.stringify(Object.fromEntries(%s.map(k=>[k,fact(k)?fact(k).d:null])))" % json.dumps(KEYS)))
         rel = json.loads(g.ev("JSON.stringify({sophie:xqKnows('sophie'),mia:xqKnows('mia'),xqid:(xqm()||{}).id||null})"))

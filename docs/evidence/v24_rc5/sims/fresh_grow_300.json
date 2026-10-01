@@ -1,0 +1,3774 @@
+{
+ "rows": [
+  {
+   "day": 1,
+   "money": 2637,
+   "sum": {
+    "rev": 2040,
+    "tips": 332,
+    "guests": 17,
+    "lost": 0,
+    "stars": 5,
+    "net": 2137
+   },
+   "reviews": 8,
+   "xq": 1,
+   "yj": 0,
+   "mode": true,
+   "known": false,
+   "crew": [],
+   "fired": [
+    "xq_helper"
+   ],
+   "errors": 0,
+   "lv": 1,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 2,
+   "money": 6151,
+   "sum": {
+    "rev": 3640,
+    "tips": 735,
+    "guests": 22,
+    "lost": 0,
+    "stars": 5,
+    "net": 4014
+   },
+   "reviews": 16,
+   "xq": 0,
+   "yj": 0,
+   "mode": true,
+   "known": false,
+   "crew": [],
+   "fired": [],
+   "errors": 0,
+   "lv": 1,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 3,
+   "money": 10555,
+   "sum": {
+    "rev": 4810,
+    "tips": 1662,
+    "guests": 27,
+    "lost": 0,
+    "stars": 5,
+    "net": 5904
+   },
+   "reviews": 21,
+   "xq": 0,
+   "yj": 0,
+   "mode": true,
+   "known": false,
+   "crew": [],
+   "fired": [],
+   "errors": 0,
+   "lv": 1,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 4,
+   "money": 14288,
+   "sum": {
+    "rev": 4800,
+    "tips": 1104,
+    "guests": 33,
+    "lost": 0,
+    "stars": 5,
+    "net": 4933
+   },
+   "reviews": 35,
+   "xq": 1,
+   "yj": 0,
+   "mode": true,
+   "known": false,
+   "crew": [
+    "小茉"
+   ],
+   "fired": [
+    "xq_helper·"
+   ],
+   "errors": 0,
+   "lv": 1,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 5,
+   "money": 20006,
+   "sum": {
+    "rev": 4800,
+    "tips": 1810,
+    "guests": 32,
+    "lost": 0,
+    "stars": 5,
+    "net": 5718
+   },
+   "reviews": 44,
+   "xq": 1,
+   "yj": 0,
+   "mode": true,
+   "known": false,
+   "crew": [
+    "小茉"
+   ],
+   "fired": [
+    "xq_helper·"
+   ],
+   "errors": 0,
+   "lv": 1,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 6,
+   "money": 20186,
+   "sum": {
+    "rev": 4800,
+    "tips": 1480,
+    "guests": 30,
+    "lost": 0,
+    "stars": 5,
+    "net": 5480
+   },
+   "reviews": 56,
+   "xq": 0,
+   "yj": 0,
+   "mode": true,
+   "known": false,
+   "crew": [
+    "小茉"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 2,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 7,
+   "money": 25744,
+   "sum": {
+    "rev": 4800,
+    "tips": 1446,
+    "guests": 31,
+    "lost": 4,
+    "stars": 5,
+    "net": 5558
+   },
+   "reviews": 67,
+   "xq": 1,
+   "yj": 0,
+   "mode": true,
+   "known": true,
+   "crew": [
+    "小茉"
+   ],
+   "fired": [
+    "xq_helper·"
+   ],
+   "errors": 0,
+   "lv": 2,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 8,
+   "money": 30873,
+   "sum": {
+    "rev": 4430,
+    "tips": 1364,
+    "guests": 27,
+    "lost": 0,
+    "stars": 5,
+    "net": 5129
+   },
+   "reviews": 75,
+   "xq": 1,
+   "yj": 1,
+   "mode": true,
+   "known": true,
+   "crew": [
+    "小茉"
+   ],
+   "fired": [
+    "xq_helper·",
+    "yj_meet"
+   ],
+   "errors": 0,
+   "lv": 2,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 9,
+   "money": 33809,
+   "sum": {
+    "rev": 4960,
+    "tips": 1742,
+    "guests": 32,
+    "lost": 0,
+    "stars": 5,
+    "net": 5836
+   },
+   "reviews": 80,
+   "xq": 1,
+   "yj": 1,
+   "mode": true,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅"
+   ],
+   "fired": [
+    "xq_helper·",
+    "yj_look"
+   ],
+   "errors": 0,
+   "lv": 2,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 10,
+   "money": 39119,
+   "sum": {
+    "rev": 4800,
+    "tips": 1277,
+    "guests": 32,
+    "lost": 0,
+    "stars": 4.5,
+    "net": 5310
+   },
+   "reviews": 80,
+   "xq": 0,
+   "yj": 0,
+   "mode": true,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 2,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 11,
+   "money": 44811,
+   "sum": {
+    "rev": 5070,
+    "tips": 1357,
+    "guests": 33,
+    "lost": 0,
+    "stars": 5,
+    "net": 5692
+   },
+   "reviews": 80,
+   "xq": 1,
+   "yj": 1,
+   "mode": true,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅"
+   ],
+   "fired": [
+    "xq_helper·",
+    "yj_three"
+   ],
+   "errors": 0,
+   "lv": 2,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 12,
+   "money": 34395,
+   "sum": {
+    "rev": 4580,
+    "tips": 1284,
+    "guests": 28,
+    "lost": 2,
+    "stars": 4.5,
+    "net": 5284
+   },
+   "reviews": 81,
+   "xq": 1,
+   "yj": 0,
+   "mode": true,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅"
+   ],
+   "fired": [
+    "xq_helper·",
+    "yj_chose"
+   ],
+   "errors": 0,
+   "lv": 3,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 13,
+   "money": 40328,
+   "sum": {
+    "rev": 5120,
+    "tips": 1345,
+    "guests": 33,
+    "lost": 0,
+    "stars": 5,
+    "net": 5933
+   },
+   "reviews": 81,
+   "xq": 1,
+   "yj": 0,
+   "mode": true,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅"
+   ],
+   "fired": [
+    "xq_helper·"
+   ],
+   "errors": 0,
+   "lv": 3,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 14,
+   "money": 45668,
+   "sum": {
+    "rev": 4800,
+    "tips": 1280,
+    "guests": 32,
+    "lost": 0,
+    "stars": 5,
+    "net": 5640
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": true,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅"
+   ],
+   "fired": [
+    "yj_move"
+   ],
+   "errors": 0,
+   "lv": 3,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 15,
+   "money": 50515,
+   "sum": {
+    "rev": 4800,
+    "tips": 1452,
+    "guests": 31,
+    "lost": 0,
+    "stars": 5,
+    "net": 5747
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 3,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 16,
+   "money": 12210,
+   "sum": {
+    "rev": 4800,
+    "tips": 1195,
+    "guests": 30,
+    "lost": 3,
+    "stars": 4.5,
+    "net": 4895
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai"
+   ],
+   "fired": [
+    "yj_key",
+    "yj_key_seen"
+   ],
+   "errors": 0,
+   "lv": 4,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 17,
+   "money": 14401,
+   "sum": {
+    "rev": 4980,
+    "tips": 1580,
+    "guests": 36,
+    "lost": 11,
+    "stars": 4.5,
+    "net": 4991
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 18,
+   "money": 15769,
+   "sum": {
+    "rev": 4800,
+    "tips": 1368,
+    "guests": 31,
+    "lost": 2,
+    "stars": 4,
+    "net": 5168
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 19,
+   "money": 16440,
+   "sum": {
+    "rev": 4800,
+    "tips": 1320,
+    "guests": 33,
+    "lost": 0,
+    "stars": 4.5,
+    "net": 5671
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 20,
+   "money": 20428,
+   "sum": {
+    "rev": 4800,
+    "tips": 1208,
+    "guests": 30,
+    "lost": 8,
+    "stars": 4,
+    "net": 3988
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 21,
+   "money": 23781,
+   "sum": {
+    "rev": 4600,
+    "tips": 817,
+    "guests": 30,
+    "lost": 1,
+    "stars": 4,
+    "net": 3353
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 22,
+   "money": 29439,
+   "sum": {
+    "rev": 4800,
+    "tips": 1075,
+    "guests": 31,
+    "lost": 0,
+    "stars": 4,
+    "net": 5658
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 23,
+   "money": 34151,
+   "sum": {
+    "rev": 4690,
+    "tips": 1441,
+    "guests": 29,
+    "lost": 0,
+    "stars": 4,
+    "net": 4712
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 24,
+   "money": 38933,
+   "sum": {
+    "rev": 4800,
+    "tips": 726,
+    "guests": 31,
+    "lost": 0,
+    "stars": 4,
+    "net": 4782
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 25,
+   "money": 42283,
+   "sum": {
+    "rev": 4430,
+    "tips": 940,
+    "guests": 27,
+    "lost": 0,
+    "stars": 4,
+    "net": 3350
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 26,
+   "money": 45905,
+   "sum": {
+    "rev": 4450,
+    "tips": 1219,
+    "guests": 28,
+    "lost": 0,
+    "stars": 4.5,
+    "net": 3622
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 27,
+   "money": 4848,
+   "sum": {
+    "rev": 4070,
+    "tips": 978,
+    "guests": 26,
+    "lost": 0,
+    "stars": 4.5,
+    "net": 4843
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 28,
+   "money": 6136,
+   "sum": {
+    "rev": 3390,
+    "tips": 708,
+    "guests": 21,
+    "lost": 1,
+    "stars": 4,
+    "net": 2488
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 29,
+   "money": 11724,
+   "sum": {
+    "rev": 4980,
+    "tips": 1425,
+    "guests": 33,
+    "lost": 0,
+    "stars": 4.5,
+    "net": 5588
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 30,
+   "money": 15259,
+   "sum": {
+    "rev": 4030,
+    "tips": 1065,
+    "guests": 26,
+    "lost": 2,
+    "stars": 4,
+    "net": 3535
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 31,
+   "money": 19296,
+   "sum": {
+    "rev": 4510,
+    "tips": 1089,
+    "guests": 27,
+    "lost": 3,
+    "stars": 4,
+    "net": 4037
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina"
+   ],
+   "fired": [
+    "wall_worry"
+   ],
+   "errors": 0,
+   "lv": 4,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 32,
+   "money": 24559,
+   "sum": {
+    "rev": 4530,
+    "tips": 1410,
+    "guests": 29,
+    "lost": 0,
+    "stars": 4.5,
+    "net": 5263
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina"
+   ],
+   "fired": [
+    "wall_photos"
+   ],
+   "errors": 0,
+   "lv": 4,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 33,
+   "money": 30035,
+   "sum": {
+    "rev": 4800,
+    "tips": 1286,
+    "guests": 30,
+    "lost": 0,
+    "stars": 4.5,
+    "net": 5476
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 34,
+   "money": 34495,
+   "sum": {
+    "rev": 4800,
+    "tips": 1130,
+    "guests": 35,
+    "lost": 0,
+    "stars": 4,
+    "net": 4460
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina"
+   ],
+   "fired": [
+    "wall_visit"
+   ],
+   "errors": 0,
+   "lv": 4,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 35,
+   "money": 37547,
+   "sum": {
+    "rev": 3760,
+    "tips": 717,
+    "guests": 22,
+    "lost": 0,
+    "stars": 4.5,
+    "net": 3052
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina"
+   ],
+   "fired": [
+    "wall_wang"
+   ],
+   "errors": 0,
+   "lv": 4,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 36,
+   "money": 40870,
+   "sum": {
+    "rev": 3810,
+    "tips": 896,
+    "guests": 25,
+    "lost": 14,
+    "stars": 4,
+    "net": 3323
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 37,
+   "money": 45489,
+   "sum": {
+    "rev": 4800,
+    "tips": 1194,
+    "guests": 31,
+    "lost": 0,
+    "stars": 4.5,
+    "net": 4619
+   },
+   "reviews": 82,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina"
+   ],
+   "fired": [
+    "wall_setback"
+   ],
+   "errors": 0,
+   "lv": 4,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 38,
+   "money": 51912,
+   "sum": {
+    "rev": 4980,
+    "tips": 1500,
+    "guests": 32,
+    "lost": 0,
+    "stars": 5,
+    "net": 6123
+   },
+   "reviews": 83,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 39,
+   "money": 56761,
+   "sum": {
+    "rev": 4320,
+    "tips": 846,
+    "guests": 26,
+    "lost": 0,
+    "stars": 4,
+    "net": 4849
+   },
+   "reviews": 83,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 40,
+   "money": 61404,
+   "sum": {
+    "rev": 4710,
+    "tips": 1304,
+    "guests": 30,
+    "lost": 3,
+    "stars": 4.5,
+    "net": 4643
+   },
+   "reviews": 83,
+   "xq": 0,
+   "yj": 1,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina"
+   ],
+   "fired": [
+    "wall_report"
+   ],
+   "errors": 0,
+   "lv": 4,
+   "side": false,
+   "era": null
+  },
+  {
+   "day": 41,
+   "money": 2607,
+   "sum": {
+    "rev": 2560,
+    "tips": 291,
+    "guests": 16,
+    "lost": 19,
+    "stars": 3.5,
+    "net": 2403
+   },
+   "reviews": 83,
+   "xq": 0,
+   "yj": 1,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲"
+   ],
+   "fired": [
+    "wall_fee"
+   ],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": null
+  },
+  {
+   "day": 42,
+   "money": 3598,
+   "sum": {
+    "rev": 2940,
+    "tips": 894,
+    "guests": 18,
+    "lost": 3,
+    "stars": 4.5,
+    "net": 2191
+   },
+   "reviews": 83,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": null
+  },
+  {
+   "day": 43,
+   "money": 6336,
+   "sum": {
+    "rev": 4360,
+    "tips": 941,
+    "guests": 26,
+    "lost": 0,
+    "stars": 4.5,
+    "net": 5438
+   },
+   "reviews": 84,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [
+    "wall_prep"
+   ],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": null
+  },
+  {
+   "day": 44,
+   "money": 4103,
+   "sum": {
+    "rev": 3750,
+    "tips": 797,
+    "guests": 22,
+    "lost": 3,
+    "stars": 4.5,
+    "net": 1767
+   },
+   "reviews": 84,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": null
+  },
+  {
+   "day": 45,
+   "money": 8592,
+   "sum": {
+    "rev": 4710,
+    "tips": 1364,
+    "guests": 33,
+    "lost": 0,
+    "stars": 4.5,
+    "net": 4489
+   },
+   "reviews": 84,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": null
+  },
+  {
+   "day": 46,
+   "money": 2354,
+   "sum": {
+    "rev": 1460,
+    "tips": 279,
+    "guests": 8,
+    "lost": 3,
+    "stars": 4,
+    "net": -1038
+   },
+   "reviews": 84,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [
+    "wall_mediation",
+    "wall_settle"
+   ],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 47,
+   "money": 3852,
+   "sum": {
+    "rev": 2420,
+    "tips": 613,
+    "guests": 16,
+    "lost": 1,
+    "stars": 4.5,
+    "net": 1498
+   },
+   "reviews": 84,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 48,
+   "money": 4339,
+   "sum": {
+    "rev": 2650,
+    "tips": 614,
+    "guests": 15,
+    "lost": 8,
+    "stars": 4,
+    "net": 487
+   },
+   "reviews": 84,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [
+    "sp_seat"
+   ],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 49,
+   "money": 7471,
+   "sum": {
+    "rev": 4640,
+    "tips": 1262,
+    "guests": 30,
+    "lost": 0,
+    "stars": 4.5,
+    "net": 3132
+   },
+   "reviews": 84,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 50,
+   "money": 2101,
+   "sum": {
+    "rev": 2920,
+    "tips": 779,
+    "guests": 18,
+    "lost": 0,
+    "stars": 4.5,
+    "net": 1130
+   },
+   "reviews": 84,
+   "xq": 0,
+   "yj": 1,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [
+    "sp_box"
+   ],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 51,
+   "money": 4421,
+   "sum": {
+    "rev": 4010,
+    "tips": 1087,
+    "guests": 24,
+    "lost": 0,
+    "stars": 4.5,
+    "net": 2320
+   },
+   "reviews": 84,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 52,
+   "money": 7932,
+   "sum": {
+    "rev": 4800,
+    "tips": 1481,
+    "guests": 33,
+    "lost": 0,
+    "stars": 4.5,
+    "net": 3511
+   },
+   "reviews": 84,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [
+    "sp_stuff"
+   ],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 53,
+   "money": 6402,
+   "sum": {
+    "rev": 1170,
+    "tips": 104,
+    "guests": 7,
+    "lost": 16,
+    "stars": 3.5,
+    "net": -1530
+   },
+   "reviews": 84,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 54,
+   "money": 7653,
+   "sum": {
+    "rev": 2190,
+    "tips": 428,
+    "guests": 14,
+    "lost": 7,
+    "stars": 4.5,
+    "net": 1251
+   },
+   "reviews": 84,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 55,
+   "money": 10307,
+   "sum": {
+    "rev": 3270,
+    "tips": 753,
+    "guests": 20,
+    "lost": 9,
+    "stars": 4.5,
+    "net": 2654
+   },
+   "reviews": 84,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 56,
+   "money": 2435,
+   "sum": {
+    "rev": 1540,
+    "tips": 205,
+    "guests": 10,
+    "lost": 15,
+    "stars": 4,
+    "net": 428
+   },
+   "reviews": 85,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 57,
+   "money": 1898,
+   "sum": {
+    "rev": 580,
+    "tips": 124,
+    "guests": 3,
+    "lost": 0,
+    "stars": 3,
+    "net": -537
+   },
+   "reviews": 85,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 58,
+   "money": 1892,
+   "sum": {
+    "rev": 1220,
+    "tips": 263,
+    "guests": 6,
+    "lost": 0,
+    "stars": 4,
+    "net": 294
+   },
+   "reviews": 86,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 59,
+   "money": 1836,
+   "sum": {
+    "rev": 2230,
+    "tips": 501,
+    "guests": 14,
+    "lost": 0,
+    "stars": 4,
+    "net": -56
+   },
+   "reviews": 86,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 60,
+   "money": 4971,
+   "sum": {
+    "rev": 3230,
+    "tips": 1112,
+    "guests": 19,
+    "lost": 0,
+    "stars": 4.5,
+    "net": 3135
+   },
+   "reviews": 86,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 61,
+   "money": 7754,
+   "sum": {
+    "rev": 2060,
+    "tips": 350,
+    "guests": 12,
+    "lost": 0,
+    "stars": 4,
+    "net": 2783
+   },
+   "reviews": 86,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 62,
+   "money": 10827,
+   "sum": {
+    "rev": 2330,
+    "tips": 610,
+    "guests": 14,
+    "lost": 1,
+    "stars": 4.5,
+    "net": 3373
+   },
+   "reviews": 87,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 63,
+   "money": 3072,
+   "sum": {
+    "rev": 2370,
+    "tips": 473,
+    "guests": 15,
+    "lost": 0,
+    "stars": 4,
+    "net": 1745
+   },
+   "reviews": 87,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 64,
+   "money": 3989,
+   "sum": {
+    "rev": 1770,
+    "tips": 247,
+    "guests": 10,
+    "lost": 0,
+    "stars": 3.5,
+    "net": 917
+   },
+   "reviews": 87,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 65,
+   "money": 4510,
+   "sum": {
+    "rev": 1370,
+    "tips": 263,
+    "guests": 8,
+    "lost": 0,
+    "stars": 4.5,
+    "net": 521
+   },
+   "reviews": 87,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 66,
+   "money": 9045,
+   "sum": {
+    "rev": 3190,
+    "tips": 702,
+    "guests": 19,
+    "lost": 3,
+    "stars": 4,
+    "net": 4535
+   },
+   "reviews": 87,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 67,
+   "money": 10786,
+   "sum": {
+    "rev": 2350,
+    "tips": 743,
+    "guests": 14,
+    "lost": 0,
+    "stars": 4.5,
+    "net": 2041
+   },
+   "reviews": 88,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 68,
+   "money": 11439,
+   "sum": {
+    "rev": 1390,
+    "tips": 280,
+    "guests": 10,
+    "lost": 6,
+    "stars": 4,
+    "net": 653
+   },
+   "reviews": 88,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 69,
+   "money": 5504,
+   "sum": {
+    "rev": 4170,
+    "tips": 1080,
+    "guests": 28,
+    "lost": 0,
+    "stars": 4.5,
+    "net": 5065
+   },
+   "reviews": 88,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 70,
+   "money": 4525,
+   "sum": {
+    "rev": 1580,
+    "tips": 508,
+    "guests": 9,
+    "lost": 20,
+    "stars": 4.5,
+    "net": -679
+   },
+   "reviews": 89,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 71,
+   "money": 5528,
+   "sum": {
+    "rev": 1610,
+    "tips": 342,
+    "guests": 10,
+    "lost": 10,
+    "stars": 4,
+    "net": 1003
+   },
+   "reviews": 89,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 72,
+   "money": 8288,
+   "sum": {
+    "rev": 3090,
+    "tips": 611,
+    "guests": 17,
+    "lost": 0,
+    "stars": 4.5,
+    "net": 2760
+   },
+   "reviews": 89,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 73,
+   "money": 8660,
+   "sum": {
+    "rev": 1030,
+    "tips": 197,
+    "guests": 5,
+    "lost": 0,
+    "stars": 4.5,
+    "net": 372
+   },
+   "reviews": 89,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 74,
+   "money": 9703,
+   "sum": {
+    "rev": 1540,
+    "tips": 309,
+    "guests": 9,
+    "lost": 0,
+    "stars": 4,
+    "net": 1043
+   },
+   "reviews": 89,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 75,
+   "money": 12073,
+   "sum": {
+    "rev": 2600,
+    "tips": 605,
+    "guests": 14,
+    "lost": 0,
+    "stars": 4,
+    "net": 2370
+   },
+   "reviews": 89,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 76,
+   "money": 12697,
+   "sum": {
+    "rev": 3040,
+    "tips": 651,
+    "guests": 17,
+    "lost": 9,
+    "stars": 4,
+    "net": 924
+   },
+   "reviews": 90,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 77,
+   "money": 15926,
+   "sum": {
+    "rev": 2900,
+    "tips": 1131,
+    "guests": 18,
+    "lost": 5,
+    "stars": 4.5,
+    "net": 3229
+   },
+   "reviews": 90,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 78,
+   "money": 16780,
+   "sum": {
+    "rev": 1410,
+    "tips": 248,
+    "guests": 9,
+    "lost": 0,
+    "stars": 4,
+    "net": 854
+   },
+   "reviews": 90,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 79,
+   "money": 17468,
+   "sum": {
+    "rev": 1270,
+    "tips": 197,
+    "guests": 7,
+    "lost": 1,
+    "stars": 4,
+    "net": 688
+   },
+   "reviews": 90,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 80,
+   "money": 16380,
+   "sum": {
+    "rev": 1410,
+    "tips": 252,
+    "guests": 8,
+    "lost": 4,
+    "stars": 3,
+    "net": -1088
+   },
+   "reviews": 90,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 81,
+   "money": 15022,
+   "sum": {
+    "rev": 1410,
+    "tips": 299,
+    "guests": 9,
+    "lost": 0,
+    "stars": 4.5,
+    "net": -1058
+   },
+   "reviews": 91,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 82,
+   "money": 14467,
+   "sum": {
+    "rev": 1850,
+    "tips": 409,
+    "guests": 10,
+    "lost": 2,
+    "stars": 4,
+    "net": -555
+   },
+   "reviews": 91,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 83,
+   "money": 17755,
+   "sum": {
+    "rev": 3050,
+    "tips": 907,
+    "guests": 19,
+    "lost": 0,
+    "stars": 4,
+    "net": 3288
+   },
+   "reviews": 91,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 84,
+   "money": 20543,
+   "sum": {
+    "rev": 2900,
+    "tips": 532,
+    "guests": 17,
+    "lost": 2,
+    "stars": 4,
+    "net": 2788
+   },
+   "reviews": 91,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 85,
+   "money": 26136,
+   "sum": {
+    "rev": 4700,
+    "tips": 1478,
+    "guests": 30,
+    "lost": 0,
+    "stars": 4.5,
+    "net": 5593
+   },
+   "reviews": 91,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 86,
+   "money": 27817,
+   "sum": {
+    "rev": 1830,
+    "tips": 401,
+    "guests": 10,
+    "lost": 0,
+    "stars": 4,
+    "net": 1681
+   },
+   "reviews": 91,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 87,
+   "money": 29819,
+   "sum": {
+    "rev": 2160,
+    "tips": 367,
+    "guests": 12,
+    "lost": 3,
+    "stars": 4,
+    "net": 2002
+   },
+   "reviews": 91,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 88,
+   "money": 31203,
+   "sum": {
+    "rev": 1240,
+    "tips": 290,
+    "guests": 7,
+    "lost": 0,
+    "stars": 4,
+    "net": 1084
+   },
+   "reviews": 92,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 89,
+   "money": 33116,
+   "sum": {
+    "rev": 2050,
+    "tips": 328,
+    "guests": 10,
+    "lost": 0,
+    "stars": 3.5,
+    "net": 1913
+   },
+   "reviews": 92,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 90,
+   "money": 35932,
+   "sum": {
+    "rev": 2830,
+    "tips": 436,
+    "guests": 17,
+    "lost": 3,
+    "stars": 4.5,
+    "net": 2816
+   },
+   "reviews": 92,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 91,
+   "money": 36761,
+   "sum": {
+    "rev": 970,
+    "tips": 274,
+    "guests": 5,
+    "lost": 0,
+    "stars": 4,
+    "net": 829
+   },
+   "reviews": 92,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 92,
+   "money": 39871,
+   "sum": {
+    "rev": 2940,
+    "tips": 614,
+    "guests": 17,
+    "lost": 0,
+    "stars": 4,
+    "net": 3110
+   },
+   "reviews": 92,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 93,
+   "money": 42130,
+   "sum": {
+    "rev": 2490,
+    "tips": 205,
+    "guests": 15,
+    "lost": 3,
+    "stars": 3.5,
+    "net": 2259
+   },
+   "reviews": 92,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 94,
+   "money": 45909,
+   "sum": {
+    "rev": 4800,
+    "tips": 1466,
+    "guests": 31,
+    "lost": 0,
+    "stars": 4.5,
+    "net": 3479
+   },
+   "reviews": 93,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 95,
+   "money": 46130,
+   "sum": {
+    "rev": 470,
+    "tips": 120,
+    "guests": 3,
+    "lost": 0,
+    "stars": 3.5,
+    "net": 221
+   },
+   "reviews": 93,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 96,
+   "money": 48508,
+   "sum": {
+    "rev": 2270,
+    "tips": 435,
+    "guests": 13,
+    "lost": 0,
+    "stars": 4,
+    "net": 2378
+   },
+   "reviews": 93,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 97,
+   "money": 53666,
+   "sum": {
+    "rev": 4530,
+    "tips": 933,
+    "guests": 29,
+    "lost": 0,
+    "stars": 4,
+    "net": 5158
+   },
+   "reviews": 93,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 98,
+   "money": 58254,
+   "sum": {
+    "rev": 4040,
+    "tips": 1142,
+    "guests": 25,
+    "lost": 1,
+    "stars": 4.5,
+    "net": 4888
+   },
+   "reviews": 94,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 99,
+   "money": 56953,
+   "sum": {
+    "rev": 1310,
+    "tips": 132,
+    "guests": 7,
+    "lost": 1,
+    "stars": 4,
+    "net": -1301
+   },
+   "reviews": 94,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 100,
+   "money": 56511,
+   "sum": {
+    "rev": 1960,
+    "tips": 351,
+    "guests": 10,
+    "lost": 0,
+    "stars": 4,
+    "net": -442
+   },
+   "reviews": 94,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 101,
+   "money": 55533,
+   "sum": {
+    "rev": 1520,
+    "tips": 272,
+    "guests": 8,
+    "lost": 5,
+    "stars": 3.5,
+    "net": -978
+   },
+   "reviews": 94,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 102,
+   "money": 57534,
+   "sum": {
+    "rev": 1890,
+    "tips": 295,
+    "guests": 12,
+    "lost": 1,
+    "stars": 3.5,
+    "net": 2001
+   },
+   "reviews": 94,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 103,
+   "money": 59888,
+   "sum": {
+    "rev": 2030,
+    "tips": 493,
+    "guests": 12,
+    "lost": 0,
+    "stars": 4,
+    "net": 2354
+   },
+   "reviews": 94,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 104,
+   "money": 60300,
+   "sum": {
+    "rev": 350,
+    "tips": 189,
+    "guests": 3,
+    "lost": 0,
+    "stars": 4.5,
+    "net": 412
+   },
+   "reviews": 94,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 105,
+   "money": 65644,
+   "sum": {
+    "rev": 2270,
+    "tips": 515,
+    "guests": 13,
+    "lost": 0,
+    "stars": 4,
+    "net": 5344
+   },
+   "reviews": 94,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 106,
+   "money": 68809,
+   "sum": {
+    "rev": 2940,
+    "tips": 599,
+    "guests": 17,
+    "lost": 0,
+    "stars": 4,
+    "net": 3465
+   },
+   "reviews": 95,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 107,
+   "money": 67278,
+   "sum": {
+    "rev": 1010,
+    "tips": 219,
+    "guests": 6,
+    "lost": 9,
+    "stars": 4,
+    "net": -1531
+   },
+   "reviews": 95,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 108,
+   "money": 72693,
+   "sum": {
+    "rev": 4170,
+    "tips": 1279,
+    "guests": 26,
+    "lost": 0,
+    "stars": 4.5,
+    "net": 5415
+   },
+   "reviews": 95,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 109,
+   "money": 72824,
+   "sum": {
+    "rev": 2320,
+    "tips": 578,
+    "guests": 14,
+    "lost": 33,
+    "stars": 4.5,
+    "net": 131
+   },
+   "reviews": 95,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 110,
+   "money": 75850,
+   "sum": {
+    "rev": 2470,
+    "tips": 523,
+    "guests": 14,
+    "lost": 3,
+    "stars": 4.5,
+    "net": 3026
+   },
+   "reviews": 95,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 111,
+   "money": 80642,
+   "sum": {
+    "rev": 1710,
+    "tips": 209,
+    "guests": 10,
+    "lost": 0,
+    "stars": 3.5,
+    "net": 4792
+   },
+   "reviews": 95,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 112,
+   "money": 83371,
+   "sum": {
+    "rev": 2170,
+    "tips": 486,
+    "guests": 14,
+    "lost": 0,
+    "stars": 4,
+    "net": 2729
+   },
+   "reviews": 95,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 113,
+   "money": 88579,
+   "sum": {
+    "rev": 4120,
+    "tips": 980,
+    "guests": 25,
+    "lost": 0,
+    "stars": 4.5,
+    "net": 5208
+   },
+   "reviews": 95,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 114,
+   "money": 89444,
+   "sum": {
+    "rev": 690,
+    "tips": 86,
+    "guests": 4,
+    "lost": 0,
+    "stars": 4,
+    "net": 865
+   },
+   "reviews": 95,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 115,
+   "money": 88688,
+   "sum": {
+    "rev": 1670,
+    "tips": 324,
+    "guests": 10,
+    "lost": 2,
+    "stars": 4,
+    "net": -756
+   },
+   "reviews": 95,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 116,
+   "money": 90952,
+   "sum": {
+    "rev": 1600,
+    "tips": 464,
+    "guests": 11,
+    "lost": 0,
+    "stars": 4,
+    "net": 2264
+   },
+   "reviews": 95,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 4,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 117,
+   "money": 488,
+   "sum": {
+    "rev": 1900,
+    "tips": 261,
+    "guests": 10,
+    "lost": 3,
+    "stars": 4,
+    "net": 436
+   },
+   "reviews": 95,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo",
+    "阿明"
+   ],
+   "fired": [
+    "up_hint"
+   ],
+   "errors": 0,
+   "lv": 5,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 118,
+   "money": 2813,
+   "sum": {
+    "rev": 1270,
+    "tips": 210,
+    "guests": 9,
+    "lost": 0,
+    "stars": 4,
+    "net": 2325
+   },
+   "reviews": 95,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo",
+    "阿明"
+   ],
+   "fired": [
+    "up_staff"
+   ],
+   "errors": 0,
+   "lv": 5,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 119,
+   "money": 2929,
+   "sum": {
+    "rev": 3410,
+    "tips": 1026,
+    "guests": 22,
+    "lost": 0,
+    "stars": 4.5,
+    "net": 1316
+   },
+   "reviews": 95,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo",
+    "阿明",
+    "小威"
+   ],
+   "fired": [],
+   "errors": 0,
+   "lv": 5,
+   "side": true,
+   "era": 48
+  },
+  {
+   "day": 120,
+   "money": 6304,
+   "sum": {
+    "rev": 2880,
+    "tips": 818,
+    "guests": 16,
+    "lost": 4,
+    "stars": 4.5,
+    "net": 3675
+   },
+   "reviews": 96,
+   "xq": 0,
+   "yj": 0,
+   "mode": false,
+   "known": true,
+   "crew": [
+    "小茉",
+    "阿德師傅",
+    "秀琴阿姨(xq)",
+    "Kai",
+    "小彤",
+    "Nina",
+    "阿哲",
+    "Momo",
+    "阿明",
+    "小威"
+   ],
+   "fired": [
+    "up_inspect"
+   ],
+   "errors": 0,
+   "lv": 5,
+   "side": true,
+   "era": 48
+  }
+ ],
+ "final": {
+  "xq_helper": 1,
+  "xq_hired": 14,
+  "yj_meet": 8,
+  "yj_look": 9,
+  "yj_three": 11,
+  "yj_chose": 12,
+  "yj_move": 14,
+  "yj_move_told": null,
+  "yj_key": 16,
+  "yj_key_seen": 16,
+  "wall_worry": 31,
+  "wall_photos": 32,
+  "wall_visit": 34,
+  "wall_wang": 35,
+  "wall_setback": 37,
+  "wall_report": 40,
+  "wall_fee": 41,
+  "wall_prep": 43,
+  "wall_mediation": 46,
+  "wall_settle": 46,
+  "up_hint": 117,
+  "up_staff": 118,
+  "up_inspect": 120,
+  "up_door": null,
+  "up_cats": null,
+  "sp_seat": 48,
+  "sp_box": 50,
+  "sp_stuff": 52,
+  "up_busy": null,
+  "up_full": null,
+  "up_small": null,
+  "up_quiet": null,
+  "up_remind": null,
+  "up_ask": null,
+  "up_lease": null
+ },
+ "rel": {
+  "sophie": 3,
+  "mia": 5,
+  "xqid": "xq"
+ },
+ "errors": []
+}
