@@ -79,3 +79,9 @@ Never promote T to O.
 - [ ] Publish to the **same live URL** the player uses: https://claude.ai/artifact/2vhURujrtCpQ1P5jnSsjps.
   - Saves are kept per URL.
   - Never leave the new build on a different URL while the player's normal one stays old.
+- [ ] Package the release as zips, made from the tag (`git archive <tag>`), and send them to the player with the release reply.
+  - **source**: everything but the large art, the evidence and the saves. Check it: `tools/build_single.py` and `tools/build_artifact.py` run from the unzipped copy must give files identical to the committed single file and to the published page.
+  - **art**: the player's source pictures (`docs/v23` images, `assets/portraits/src`) and the full-size portrait cards (`assets/portraits/*.png`).
+  - **evidence**: this release's screenshots and regression logs.
+  - **saves**: `tests/saves`.
+  - Keep each zip under 25 MB; split a kind into numbered parts when needed. Together the zips hold every file of the tag, except evidence that earlier releases already shipped.
