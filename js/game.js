@@ -1434,7 +1434,7 @@ function regPlanVisit(o){const id=o.reg;if(!id||id==='dylan')return o;const r=RE
    CALLBACK to their own history (`cb`) is said only if that history really happened in this save, rarely (a long gap,
    `cd` days) or once (`once`), and never as if it just happened again. One-time life events (a promotion, moving,
    graduating) are moments that happen once and become a fact (regPlanVisit / regSeatMoment), not lines in a pool. */
-function regTalk(id,tier){const r=REG_BY[id];const c=regCallback(id);if(c)return c;const L=tier===0?r.l.slice(0,1):r.l.slice(1,tier+1);return L.length?pick(L):null}
+function regTalk(id,tier){const r=REG_BY[id];const c=regCallback(id);if(c)return c;const L=tier===0?r.l.slice(0,1):r.l.slice(1,tier+1);return L.length>1?pick(L):L[0]||null}   /* no choice, no draw: the random stream stays as it was */
 function regCallback(id){const r=REG_BY[id];if(!r||!r.cb)return null;const m=regMem(id);
  const due=r.cb.filter(c=>{const st=regMem(c.share||id);st.cb=st.cb||{};const last=st.cb[c.k];if(c.once?last:(last&&S.day-last<c.cd))return false;try{return!!c.need(m)}catch(e){return false}});
  if(!due.length||Math.random()>.3)return null;const c=pick(due);regMem(c.share||id).cb[c.k]=S.day;return c.t}

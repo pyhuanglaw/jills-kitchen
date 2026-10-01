@@ -8,6 +8,7 @@ SM = os.path.join(ROOT, 'docs/v23/story_photos_sophie_mia_concept.png')
 KD = os.path.join(ROOT, 'docs/v23/story_photos_qing_tuo_ken_du_concept.png')
 VAL = os.path.join(ROOT, 'docs/v23/story_photo_jill_dylan_valentine.png')   # 2026-10-01, supplied by the player: Dylan × Jill, Valentine's
 WANG = os.path.join(ROOT, 'docs/v23/story_photo_wang_anniv.jpg')             # 2026-10-01, supplied by the player: 王先生 × 王太太, the anniversary
+MEAL = os.path.join(ROOT, 'docs/v23/story_photo_staff_meal.png')             # 2026-10-01, supplied by the player: the staff meal, everyone at one table
 # key -> (sheet, box). Boxes chosen by eye on the sheets; 4:3 is enforced by a centered crop of the box.
 ART = {
     'sophie_mia_leave':  (SM, (1200, 424, 1536, 690)),   # 《一起回家》 panel, right of its caption
@@ -18,6 +19,7 @@ ART = {
     'qing_tuo_late':     (KD, (325, 936, 610, 1165)),    # 《有你在的晚班》
     'jill_dylan_valentine': (VAL, (150, 0, 1515, 1024)), # 《情人節，還在追》 — both of them, the cake, the cat asleep on the counter
     'wang_anniv':        (WANG, (0, 70, 1093, 890)),     # 《今年也在這裡》 — the gift, both faces, the anniversary box
+    'staff_meal':        (MEAL, (110, 0, 1475, 1024)),   # 《開店前》 — the whole crew around the table, the two cats in front
 }
 def crop43(im, box):
     x0, y0, x1, y1 = box; w, h = x1 - x0, y1 - y0
