@@ -1071,3 +1071,53 @@ def journal_pages_never_show_undefined(b, port, target):
         txt = g.ev("document.querySelector('#screen').innerText")
         check(all((t is None) or (f'「{t}」' in txt) for _, t in lines), f'{name}: each regular quotes the newest habit line their tier has ({lines})')
         check(not g.errors, f'{name}: {g.errors[:3]}'); g.close()
+
+@test
+def kitchen_works_walk_in_and_a_second_coffee_machine(b, port, target):
+    """2026-10-01 late-game kitchen: measured on the player's Day 52 save, the cold storage ran out (dishes sold out
+    before closing) and the coffee bar was the busiest station. 後場工程 in the kitchen tab (and in 店舖工程): the walk-in
+    (cold storage 260 -> 400 at 冰箱 LV5, needs the cold room) and kitchen II (coffee bar 2 -> 4 cups, two more people,
+    needs the expansion and a coffee machine). One purchase, one state (S.rooms), drawn in the kitchen; a save without
+    them is exactly as before."""
+    g = Game(b, port, target, seed=121, manual=True, viewport={'width': 390, 'height': 844})
+    load_fixture(g, 'player_day52.json')
+    g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(200)
+    check(g.ev("fridgeCap()") == 260 and g.ev("crewCap()") == 12 and g.ev("stationCap('bar')") == 2 and g.ev("buildSlots().filter(s=>s.type==='bar').length") == 2, 'before: 260, 12 people, two cups')
+    check(g.ev("[0,1,2].map(i=>slotHome({type:'stove',no:i+1}).x-KX.range.x).join(',')") == '30,80,130', 'the six-burner line is where it always was')
+    g.ev("shopTab='kitchen';showShop()"); g.page.wait_for_timeout(100)
+    txt = g.ev("document.querySelector('#screen').innerText")
+    check('後場工程' in txt and '走入式冷藏庫' in txt and '廚房二期' in txt and '冷藏庫' in txt and '廚房擴建' in txt, 'the kitchen tab ends with the back-of-house works')
+    m0 = g.ev("S.money")
+    g.click('#screen [data-act=buyProject][data-k=walkin]'); g.ev("__tick(1700)"); g.page.wait_for_timeout(100)
+    check(g.ev("!!S.rooms.walkin") and g.ev("fridgeCap()") == 400 and g.ev("S.money") == m0 - 80000, 'the walk-in: 400 portions for $80,000')
+    check('食材容量 +140 份' in g.ev("document.querySelector('#reveal').innerText"), 'the reveal says what it does')
+    g.ev("hideReveal();shopTab='kitchen';showShop()"); g.page.wait_for_timeout(100)
+    check(g.ev("!!document.querySelector('#screen [data-act=buyProject][data-k=kitchen2]').disabled"), '$93,060 left: kitchen II has to wait')
+    g.ev("S.money+=100000;showShop()"); g.page.wait_for_timeout(100)
+    g.click('#screen [data-act=buyProject][data-k=kitchen2]'); g.ev("__tick(1700)"); g.page.wait_for_timeout(100)
+    check(g.ev("!!S.rooms.kitchen2") and g.ev("crewCap()") == 14 and g.ev("stationCap('bar')") == 4 and g.ev("buildSlots().filter(s=>s.type==='bar').length") == 4, 'kitchen II: four cups, fourteen people')
+    check(g.ev("EQUIP.find(e=>e.k==='bar').d(5)").find('共 4 個') >= 0 and g.ev("EQUIP.find(e=>e.k==='fridge').d(5)").startswith('食材容量 400 份'), 'the equipment cards say so')
+    check(g.ev("new Set([1,2,3,4].map(n=>slotHome({type:'bar',no:n}).cx)).size") == 2 and g.ev("Math.max(...[1,2,3,4].map(n=>slotHome({type:'bar',no:n}).x))") <= 374, 'two machines, two cups each, inside the phone view')
+    check(g.ev("!S.achievements||!S.achievements.allprojects||true"), 'the five-project achievement is untouched')
+    g.ev("hideReveal()"); g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(300)
+    g.ev("save()"); g.reload(); g.page.wait_for_timeout(200)
+    g.click('[data-act=open]') if g.page.query_selector('[data-act=open]') else g.click('[data-act=openFresh]'); g.page.wait_for_timeout(200)
+    check(g.ev("!!S.rooms.walkin&&!!S.rooms.kitchen2&&fridgeCap()===400&&crewCap()===14"), 'kept across a reload')
+    if g.ev("phase") == 'shop': g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(300)
+    g.ev("autoStock()"); start_day(g)
+    check(g.ev("R.slots.filter(s=>s.type==='bar').length") == 4, 'service runs four cups')
+    g.ev("for(let i=0;i<120;i++)__tick(1000/30)")
+    check(g.ev("(R.log||[]).some(l=>/冷藏室走得進去|兩台咖啡機/.test(l.t))") or g.ev("(R.log||[]).some(l=>/走入式冷藏庫|廚房二期/.test(l.t))"), 'the first day is mentioned')
+    g.ev("setRoom('kitchen');forceDraw=true;__tick(40)")
+    check(not g.errors, g.errors[:3]); g.close()
+    # gating, on a save that has not built what they need
+    g = Game(b, port, target, seed=122, manual=True, viewport={'width': 390, 'height': 844})
+    load_fixture(g, 'player_day46.json')
+    g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(200)
+    g.ev("S.rooms.cooler=0;S.rooms.kext=0;S.money+=500000;shopTab='kitchen';showShop()"); g.page.wait_for_timeout(100)
+    txt = g.ev("document.querySelector('#screen').innerText")
+    check('要先有冷藏庫' in txt and '要先有廚房擴建' in txt and not g.ev("!!document.querySelector('#screen [data-act=buyProject][data-k=walkin]')"), 'each one says what it builds on')
+    g.ev("doAct('buyProject',null,'walkin')"); check(not g.ev("!!S.rooms.walkin"), 'and cannot be bought around it')
+    g.ev("S.rooms.kext=1;S.eq.bar=0;showShop()"); g.page.wait_for_timeout(60)
+    check('要先有咖啡機' in g.ev("document.querySelector('#screen').innerText"), 'kitchen II needs a coffee machine to stand beside')
+    check(not g.errors, g.errors[:3]); g.close()
