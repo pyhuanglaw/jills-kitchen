@@ -4,7 +4,7 @@
   python3 tools/make_release_zips.py TAG NAME EVIDENCE_DIR [EVIDENCE_DIR ...]
   e.g. python3 tools/make_release_zips.py v2.3-rc3 v23-rc3 docs/evidence/v23_late
 
-Kinds, each zip under 24 MiB (a kind is split into numbered parts when it is larger):
+Kinds, each zip under 25 MB (25,000,000 bytes) (a kind is split into numbered parts when it is larger):
   source    everything but the large art, the evidence and the saves
   art       the player's pictures (docs/vNN images and refs), assets/portraits/src, the full-size portrait cards
   evidence  this release's evidence folders only (earlier releases already shipped theirs)
@@ -20,7 +20,7 @@ import io, os, subprocess, sys, tarfile, tempfile, zipfile, hashlib, zlib
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TAG, NAME, EVID = sys.argv[1], sys.argv[2], [e.rstrip('/') + '/' for e in sys.argv[3:]]
 OUTDIR = os.path.dirname(ROOT)
-LIMIT = 24 * 1024 * 1024
+LIMIT = 24_000_000   # bytes (decimal MB): every zip stays under 25,000,000 bytes, whichever way "25 MB" is read
 PREFIX = 'jills-kitchen-project/'
 IMG = ('.png', '.jpg', '.jpeg', '.webp')
 
@@ -94,7 +94,7 @@ def main():
     print(f'{TAG}: {len(files)} files; in zips {total}; earlier evidence left out {len(skipped)}')
     for label, n, path, size in made:
         print(f'  {os.path.basename(path)}  {n} files  {size / 1048576:.1f} MiB')
-        assert size < 25 * 1024 * 1024, f'{path} is over 25 MiB'
+        assert size < 25_000_000, f'{path} is over 25 MB'
     # the source zip rebuilds the game
     src = [m for m in made if m[0] == 'source'][0][2]
     with tempfile.TemporaryDirectory() as d:
