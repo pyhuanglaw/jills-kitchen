@@ -3058,7 +3058,7 @@ def x_a_desktop_window_is_used_and_the_mouse_and_keyboard_work(b, port, target):
     check(abs(appw2 - want2) < 6 and abs(g.ev("SV.w") - appw2) < 1 and g.ev("sc.width") == round(appw2 * g.ev("DPR")), f'after a resize the column and the canvas follow: {appw2} vs {want2:.0f}')
     g.ev("__tick(200)"); g.page.set_viewport_size({'width': 390, 'height': 844}); g.page.wait_for_timeout(150); g.ev("__tick(200)")
     check(not g.ev("document.documentElement.classList.contains('desk')") and g.ev("$('#app').style.maxWidth") == '' and g.ev("$('#app').getBoundingClientRect().width") == 390, 'a phone-sized window is the phone layout')
-    check(g.ev("(()=>{const r=$('#roomTabs').getBoundingClientRect();return Math.abs(r.top-(SV.oy+76*SV.s+$('#sceneWrap').getBoundingClientRect().top))<2})()"), 'the tabs follow the scene scale on the phone too')
+    check(g.ev("(()=>{const r=$('#roomTabs').getBoundingClientRect();return Math.abs(r.top-((ticketsEl.offsetHeight||88)+4+$('#sceneWrap').getBoundingClientRect().top))<2})()"), 'on the phone too the tabs sit right under the ticket rail (v2.3 QA)')
     check(not g.errors, g.errors[:2])
     g.close()
 
