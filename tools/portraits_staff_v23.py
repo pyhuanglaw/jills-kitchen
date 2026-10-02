@@ -116,7 +116,7 @@ def main():
     paint = ImageDraw.Draw(s8)
     for pid, b, name, outs in CARDS8:
         for r in outs: paint.rectangle(r, fill=(255, 255, 255, 255))
-    # v2.4 rc6 (the full release check, 2026-10-02 13:5x): the scattered sheet too — Momo's box still held a corner of
+    # v2.4 rc6 (the full release check, 2026-10-02 13:40): the scattered sheet too — Momo's box still held a corner of
     # 老周師傅's tray and 小威's a piece of 小魏's sleeve; everything that does not touch the person's own drawing (the
     # largest drawing in the box) is painted with the sheet's white, as for the twelve
     for pid, b, name, outs in CARDS8:

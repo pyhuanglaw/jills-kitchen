@@ -32,7 +32,7 @@ The plan is `docs/v24/AUDIT_AND_PLAN.md` §8. Its corrections are in §8.1 (econ
 | 07:05, 08:12 | The generic guests dressed, not coloured at random; then silhouette and layering | `npc_wardrobe_0705…`, `npc_wardrobe_references_0812…` |
 | 07:09 | Who is where: an order ↔ its table ↔ its people ↔ their words | `customer_identity_linking_0709…` |
 | 08:37–09:21 | The second floor as the player drew it; the night of the cats' new picture; the stair door | `second_floor_plan_0837…` |
-| 09:33–12:16 | The morning's reports, with four saves: Day 61, 67, 68 and 71 | `player_messages_0933_1216_2026-10-02.txt` |
+| 09:33–12:17 | The morning's reports, with four saves: Day 61, 67, 68 and 71; 12:17 「故事進展真的太慢 一堆劇情完全沒後續」 | `player_messages_0933_1216_2026-10-02.txt` |
 | 10:25 | The Second Floor no longer waits for 《那面牆》 | `second_floor_prerequisite_1025_2026-10-02.txt` |
 | 10:32 | Authored story beats hold the restaurant. The audit is `story_presentation_audit_2026-10-02.md`; the player chose what holds at 11:06 | `story_presentation_1032_2026-10-02.txt` |
 
@@ -57,7 +57,11 @@ The plan is `docs/v24/AUDIT_AND_PLAN.md` §8. Its corrections are in §8.1 (econ
 | ea4b5e4 | 12:01 | The player's 11:49: wine research priced like a dish's, each wine doing something; golden_scenario re-recorded with proof; the Day 68 save |
 | d958da5 | 12:27 | The player's 12:16: 晴 × 阿拓 and the day's major slot; what the full regression found; golden_frames re-recorded with proof; the Day 71 save |
 | 6aa7652 | 12:34 | A regular's dated beat keeps its day; the researched wines without a plate |
-| (release) | — | The manual audit, the report, the evidence, the sims, a test for the morning's reports |
+| cc3c62b | 12:45 | The manual audit; a test for the morning's reports; this report's draft; the plan's §8.4; the player's messages filed |
+| 4669f77 | 12:59 | The simulation and screenshot tools tap through a story that holds the restaurant |
+| 0767ac5 | 13:35 | The player's 12:17: every story line audited; Ken × 杜 brought together; the stalled conditions; the day coins mixed |
+| 6013ddb | 13:45 | The scattered sheet's eight staff portraits cleaned like the twelve |
+| (release) | — | The report, the evidence, the simulations |
 
 ## 2. Release content audit
 
@@ -95,6 +99,8 @@ The plan is `docs/v24/AUDIT_AND_PLAN.md` §8. Its corrections are in §8.1 (econ
 | Authored beats hold the restaurant, line by line, then resume exactly — for the player's four kinds | DONE | Yes | §12 (10:32, 11:06) |
 | 晴 × 阿拓 move on: the day's major slot no longer starves a closing beat; 阿拓's day off; the pace | DONE | Yes | §13 (12:16) |
 | Bugs found by the full regression: a non-held beat's scene words; a regular's dated beat losing its day; the catwalk card's text; the researched wines' plate | FIXED | Yes | §14 |
+| Every story line audited (the player's 12:17): Ken × 杜 brought to the Lounge together; 「Lounge 的第一個晚上」 not counted once impossible; 周董's and Madame Lin's conditions; 阿拓's day off; the day coins mixed | DONE | Yes | §13b |
+| Momo's and 小威's portraits still held a neighbour's fragment | FIXED | Yes | §14 |
 | P5 (rc7): the other Staff Lives arcs | NOT STARTED | No | Next, straight after this release |
 
 ## 3. The Staff Room
@@ -421,10 +427,36 @@ The player's Day 71 save had qt_1 on Day 61 and qt_2 on Day 67, then nothing. Th
 - `phase7_the_arcs_run_on_real_history_and_leave_it_changed`: the arc with the absence before the photo; firing 阿拓 still ends it cleanly.
 - Simulation from the player's Day 71 save (§16), with the beats per day:
   - 「多的。」 on Day 71;
-  - the absence on Day 76;
+  - 阿拓's day off and 晴's 「今天炸物怎麼怪怪的？」 on Day 78;
   - the photo on Day 82;
   - the late photo on Day 90;
-  - Sophie and Mia, 《那面牆》, the floor and Sophie × 寶寶 going on beside it, never two major beats in a day.
+  - Sophie and Mia, 《那面牆》, the floor, Ken × 杜 and Madame Lin going on beside it, never two major beats in a day.
+
+## 13b. Every story line, audited (12:17)
+
+The player's words: 「故事進展真的太慢 一堆劇情完全沒後續」.
+
+The method: `tools/sims/v24_lines_audit.py` lists every story line on the player's Day 71 save — its progress, the day it last moved, the next step and the condition that step waits for. It then plays 30 lazy days and lists them again. The logs are `docs/evidence/v24_rc6/sims/lines_audit_day71_before.log` (with only the 12:16 fixes) and `…_after.log`.
+
+| Line | Day 71 | Why it did not move | Fix | Day 100 (simulated) |
+|---|---|---|---|---|
+| Ken × Monsieur 杜 | 1/9, unmoved since Day 52 | Every later step needs the two of them in the Lounge on the same evening. Nothing arranged it: Ken came to the Lounge seven times and 杜 five, never together. On the evening they did come, the stool beside Ken was taken, and nothing kept one for 杜 | Some evenings (40%, a coin from the day) bring them to the Lounge around the same time until their stools are theirs, then 22% until the photo. On such an evening the first to come takes a stool with a free one beside it, kept for the other | 7/8 |
+| (same line) | — | 「Lounge 的第一個晚上」 can only happen in the Lounge's first three days (Day 57–60 here), yet it was still counted as a step to come | No longer counted once impossible | — |
+| 晴 × 阿拓 | 2/6 | §13 | §13. The day off now takes no story slot and comes again if 晴 did not notice it | 6/6 |
+| Madame Lin | 1/2 | The plant needed her to notice three changes between visits | Two changes, or one and ten days of her visits | 2/2 |
+| 周董 | 2/3 | 「那明天再來。」 needed his dessert on the menu and sold out the moment he ordered | Also when his dessert is not on today's menu | still 2/3 in the simulation (his dessert was always on the menu and in stock); it comes in play when it sells out or is off the menu |
+| Sophie × Mia | 2/8 | Slow, not stuck | — (the fairness of §13 and the 10:05 evenings) | 5/8 |
+| 《那面牆》, Dylan, Sophie × 寶寶 | moving | — | — | 11/11, 17/18 (the last is Valentine's), 4/4 |
+
+**The day coins** (`dayCoin`). The plain hash mod 100 moves in steps across consecutive days: 'kdw' gave 64, 83, 78, 97, 40, 59, 54, 73, 65, 46 for Days 72–81, so a 40% coin missed ten days running. The story's new coins mix the hash first: over 400 days the share under 40 is 0.385–0.42, and the longest miss is 8.
+
+**T** — `v24_rc6_stalled_lines_move_on`, on the player's Day 71 save:
+- Ken × 杜 counted out of 8, not 9;
+- the coin evening brings both to the Lounge within seconds, and they share it;
+- 周董 asks on a day his dessert is off the menu;
+- Madame Lin after one change and ten days.
+
+The audit and the simulations are in §16.
 
 ## 14. Found by the full regression (on 693f8f3)
 
@@ -435,6 +467,8 @@ The player's Day 71 save had qt_1 on Day 61 and qt_2 on Day 67, then nothing. Th
 | 小林's 「升職了，今天不趕。」 (Day 28) became 「更早以前」 after one more evening (the player's Day 68 save) | An older save dates that beat by a note, and only the latest six notes are kept | The day kept in the flag when read, and before its note goes | `v24_rc6_a_regulars_dated_beat_keeps_its_day`, `every_player_save_migrates_plays_a_day_and_keeps_its_story` |
 | 貓的空中走道's card read the wooden ceiling's words | `DREAMS[2]` (already wrong before rc6) | The catwalk's own text | — |
 | The researched wines drawn on a plate | Not in the vessel table | A glass on its coaster | Screenshot |
+| Momo's and 小威's portraits held a corner of 老周師傅's tray and a piece of 小魏's sleeve | 09:45's clean cut was done on the sheet of twelve only, not on the scattered sheet of eight | The same cleanup on the eight (`tools/portraits_staff_v23.py`) | Contact sheet before/after (seen) |
+| The screenshot and simulation tools hung on a story that holds the restaurant | A held panel waits 280 ms between taps on the game's clock; a tight `dlgNext()` loop never ended | They tap with the clock moving | The evidence runs |
 | Test updates for intended changes | The eight dream works; a held story arrival at the head of the schedule (Sophie and Mia's, 10:05); a new day's own beat on opening (the staff meal's joke) | Tests in step | `h_i_k_t…`, `outdoor_area…`, `every_player_save…` |
 
 ## 15. Manual (小小店主手冊) — audit (RELEASE_CHECKLIST §2)
@@ -476,11 +510,75 @@ All fourteen sections checked against the final feature set.
 
 ## 16. Simulations (TESTED)
 
-«SIMS»
+All of these ran on the release's code (0767ac5 and later) in `docs/evidence/v24_rc6/sims/`. They are lazy days: the staff do their jobs, and the story arbiter runs as in play.
+
+**From the player's Day 71 save** — the stories:
+
+`arcs_from_day71_7100.log` (20 days, every beat per day):
+- Day 71: 「多的。」 at closing; the floor's first hint.
+- Day 72: Sophie and Mia sit closer; 《那面牆》's setback.
+- Day 73: Madame Lin's plant; the floor's second hint.
+- Day 76–78: Ken and 杜's usual stools, Evan's 「杜來了嗎？」, their photo, 晴's 「他有說幾點嗎？」; 阿拓's day off and 晴's 「今天炸物怎麼怪怪的？」.
+- Day 82: 晴 × 阿拓's photo.
+- Day 84: Sophie and Mia's kept seat; Evan's second coaster.
+- Day 85: the landlord's ask.
+- Day 90: 晴 × 阿拓's late photo.
+- Never two major beats in a day.
+
+`pacing_from_day71_7100.log` (30 days, the long chains):
+- 《那面牆》: settled Day 81, the wall fixed Day 88.
+- The second floor:
+  - hint Day 71;
+  - the landlord's inspection Day 76;
+  - the night of the cats Day 79;
+  - the ask Day 85;
+  - the leak Day 86.
+- No day with two majors.
+
+`lines_audit_day71_before.log` / `…_after.log`: every line before and after 30 days (§13b).
+
+**From the player's Day 71 save** — the rooms (`chain_from_day71_7700.log`, 100 days, the floor bought when offered):
+- 《那面牆》 settled Day 81.
+- The floor leased Day 88.
+- 《大家待的地方》 Day 95, with the Staff Room I / II / III on Days 95, 101, 109.
+- 《關上門以後》 Day 106, with the Private Dining Room I / II / III on Days 106, 113, 122.
+- No day with two majors; no page error.
+
+**The rooms in use** (`rooms_pacing_8100.log`, `rooms_pacing_9300.log`; the Day 61 save with the floor leased the day before, 60 days). The Private Dining Room by phase:
+
+| Phase | Evenings booked | Paid | Minimum avg vs eaten avg |
+|---|---|---|---|
+| I | 2 of 7 | all | $2,300 vs $2,040 |
+| II | 5 of 9 | all | $3,220 vs $3,400–3,590 |
+| III | 17 of 25 | all | $3,610 vs $3,500–4,020 |
+
+- Walk-ins: 1 / 3 / 7 by phase.
+- The Staff Room: about six people up at closing; a break on 29 of 53 evenings; a cat on 12.
+- Net about $53–55k a day.
+- No day with two majors.
+
+**Without a Lounge** (`chain_from_day52_7700.log`: the Day 52 save, which has no Lounge, 100 days, nobody building one). 《那面牆》 settles on Day 80, and the second floor's story does not begin. This is the 10:25 rule: the floor follows the Lounge, not the wall.
+
+**A new game** (`fresh_300.log`, 24 days):
+- 秀琴阿姨 is the evening helper from Day 1 and hired on Day 14.
+- 怡君's chain: Days 9–17.
+- 《那面牆》 begins on Day 21.
+- No day with two majors; no page error.
 
 ## 17. Tests, goldens, saves
 
-«FULL_RUN»
+**The full regression** ran on 0767ac5, the release's game and tests: 181 passed, 0 failed.
+- It ran in two shards in a clean worktree. The logs are `docs/evidence/v24_rc6/full_run_s0.log` and `…_s1.log`.
+- An earlier full run on 693f8f3 (177 tests) found what §14 lists.
+
+After 0767ac5 the only game change is the portrait cleanup in 6013ddb, which touches assets only. On that commit these ran and passed:
+- `single_file_in_sync`;
+- `golden_scenario`;
+- `golden_frames`;
+- `q_portraits_are_one_system_with_a_fallback_and_fit_a_phone`;
+- `portrait_crops_isolate_each_figure`.
+
+The release commit adds only this report, the evidence and the simulation tools.
 
 **golden_scenario** was re-recorded with proof (`docs/evidence/v24_rc6/golden_scenario_proof.log`).
 - The method: take the current code and put back only the 09:39 dialogue changes and the novelty seat pools.
@@ -523,6 +621,7 @@ The player's four saves of this morning are filed with their purposes in `tests/
 7. **The heat.** Does the phone stay cooler in a long service?
 8. **The guests' clothes.** Do the shirts read as clothes, and the waiters as the staff in white?
 9. **The summary.** Is 今天的故事 / Lounge 今天賣了什麼 useful?
+10. **The story lines (12:17).** Over your next evenings, do Ken and 杜 meet in the Lounge, and does each line move at a pace you can see?
 
 ## 20. The published page
 
