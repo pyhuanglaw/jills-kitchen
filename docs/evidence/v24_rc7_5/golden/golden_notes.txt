@@ -1,0 +1,13 @@
+golden_scenario and golden_frames for rc7.5, 2026-10-03.
+
+In the test harness the Day 1 moment is off (window.__noScenes, as for every scene), so a new game reaches Day 2's
+prep without the first photo, and the history path adds it there — the same as a mature save.
+
+- golden_scenario: day 2's digest has one more memory, 「first:1::811c9dc5」 (the history photo: kind first, Day 1,
+  no clock). Days 1 and 3 and every other field as before.
+- golden_frames: one key screen, book_mem (the album on Day 2's prep): 「第一天」 (DAY 1, no clock, no pin) is the
+  first polaroid, and the four photos of Day 1 follow it (book_mem.before/after/diff.png). Day 2's end-of-day digest
+  has the same memory. Every sampled frame of both days is unchanged — the coach, the lines, the rooms.
+- cat_personality_fingerprint: unchanged.
+
+Re-recorded with --record; a second run passes. The ten other screens came back byte for byte the same.

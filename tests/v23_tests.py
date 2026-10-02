@@ -842,7 +842,9 @@ def followup_the_manual_describes_the_current_game(b, port, target):
                  # v2.4 rc7.4: the Lounge's new bites, its TV and sound
                  '水牛城雞翅、起司條', '生蠔', '德國豬腳', 'Lounge 的家具', 'Lounge 大電視（$200,000）', '電視音響系統（$150,000', '有比賽轉播',
                  # v2.4 rc7.5 (23:08): the pizza oven, one more cook, the bar pizza
-                 '披薩烤爐', '酒吧披薩', '披薩麵團', '把一位廚師排到「披薩烤爐」', '廚房二期、披薩烤爐有關']:
+                 '披薩烤爐', '酒吧披薩', '披薩麵團', '把一位廚師排到「披薩烤爐」', '廚房二期、披薩烤爐有關',
+                 # v2.4 rc7.5: the album from the opening day; its real limit
+                 '相簿從開店那天開始', '最多留 240 張']:
         check(need in txt, f'the manual mentions {need}')
     for stale in ['暫停選單和設定裡都有【儲存目前進度】', '把杯子交給吧台的客人；桌位由有', '上方的分頁', '畫面上方會跳一個小通知', '打烊後或開店前，商店的「社群與宣傳」分頁（第 6 天起）。', '下一段寫著', '窗邊（貓架、睡墊）', '牠會在門邊趴著等主人',
                   '人數上限跟擴建、後場整理區、側廳、廚房擴建、廚房二期、Lounge 有關', '有 Lounge 以後才能招募', '第二位調酒師',
@@ -857,7 +859,9 @@ def followup_the_manual_describes_the_current_game(b, port, target):
                   # v2.4 rc7.2 (22:39, 22:51): nobody is let go; LV5 is not three times the start any more
                   '訓練升級、解雇', 'LV5 大約是剛來時的三倍',
                   # v2.4 rc7.4: the old list of the Lounge's bites
-                  '炸雞塊、起司可樂餅、起司拼盤（II 起多蒜香蘑菇）']:
+                  '炸雞塊、起司可樂餅、起司拼盤（II 起多蒜香蘑菇）',
+                  # v2.4 rc7.5: the album never kept only 30
+                  '其他最多留 30 張']:
         check(stale not in txt, f'stale line removed: {stale}')
     g.ev("showGuide()"); g.page.wait_for_timeout(50)
     check('故事' in g.ev("document.querySelector('#screen').innerText") and '社群與宣傳' in g.ev("document.querySelector('#screen').innerText"), 'the manual screen shows the new sections')

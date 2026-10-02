@@ -1374,6 +1374,10 @@ def album_notes_and_journal(b, port, target):
         g.click('[data-act=nextDay]')
     g.page.wait_for_timeout(500)
     a = g.ev("Promise.all(albumList().map(p=>photoGet(p.id).then(d=>({kind:p.kind,day:p.day,clock:p.clock,cap:p.cap,txt:p.txt,keep:p.keep,img:(d||'').slice(0,22)}))))")
+    # v2.4 rc7.5: a save past Day 1 that never had the first photo gets it as history, at the front (Day 1, no clock,
+    # not 珍藏); the days played here come after it
+    first, a = a[0], a[1:]
+    check(first['kind'] == 'first' and first['day'] == 1 and first['clock'] == '' and not first['keep'] and first['img'].startswith('data:image/jpeg'), f'the album opens on the opening day: {first}')
     check(len(a) >= 3, f'three staffed days should leave a few photos: {a}')
     check(all(x['cap'] and x['img'].startswith('data:image/jpeg') and x['day'] >= 6 for x in a), f'photo records: {a}')
     check(any(x['clock'] for x in a), f'photos taken during the day carry the clock: {a}')
@@ -1381,7 +1385,7 @@ def album_notes_and_journal(b, port, target):
     g.ev("(()=>{const el=document.createElement('button');el.dataset.act='book';$('#screen').appendChild(el);el.click();el.remove()})()")
     check(g.page.is_visible('text=餐廳日誌') and g.page.is_visible('text=最近的評價') and g.page.is_visible('text=生活相簿'), 'journal front page')
     g.ev("(()=>{const el=document.createElement('button');el.dataset.act='btab';el.dataset.k='mem';$('#screen').appendChild(el);el.click();el.remove()})()")
-    check(g.page.locator('.polaroid').count() == len(a) and g.page.locator('.polaroid .pin').count() >= 1, 'album tab shows every photo as a polaroid, 珍藏 pinned')
+    check(g.page.locator('.polaroid').count() == len(a) + 1 and g.page.locator('.polaroid .pin').count() >= 1, 'album tab shows every photo as a polaroid, 珍藏 pinned')
     check(g.page.locator('text=COLLECTION').count() == 0, 'no collection counter')
     check(not g.errors, g.errors)
     g.close()

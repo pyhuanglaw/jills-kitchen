@@ -183,7 +183,9 @@
    ]
   ],
   "catHash": "4b9eb7f1",
-  "mem": [],
+  "mem": [
+   "first:1::811c9dc5"
+  ],
   "weights": "4257:325be20",
   "dylan": {
    "stage": 0,
@@ -284,7 +286,9 @@
    ]
   ],
   "catHash": "8c3d5245",
-  "mem": [],
+  "mem": [
+   "first:1::811c9dc5"
+  ],
   "weights": "7026:fea0c928",
   "dylan": {
    "stage": 0,
