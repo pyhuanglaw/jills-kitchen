@@ -3662,3 +3662,78 @@ def v25_first_photo_a_mature_save_gets_day_one_as_history(b, port, target):
     g.ev("__botUntil('R.t>=R.dur*.2',90000,1/30)")
     check(g.ev("!R.jill.fp") and not g.ev("dayLog().some(l=>/拍妳|我的相機/.test(l.t))") and not g.ev("!!S.firstPhoto.pot"), 'nothing replayed')
     check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc76_the_chefs_night(b, port, target):
+    """(14:49; 22:11 「而且你不是說酒吧可以辦活動嗎？除了品酒。」; 07:09 「可以 就是只有主廚之夜的來賓可以點餐廳的」) Jill's night at
+    the Lounge's bar: from Lounge II with a signature dish, planned in the shop for tomorrow — not on a night of Ken's, at
+    most once a week; the news the day before and on the day; that night the six stools are for the six who booked, who
+    eat the night's three courses with a glass each; nobody else in the Lounge orders the restaurant's food; the kitchen
+    cooks, the Lounge's waiter carries; $1,800 a head apart from the Lounge's tabs (whose list stays its takings); the
+    first night held at its start and its end; the summary says so; the album has its picture."""
+    g = Game(b, port, target, seed=7611, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day52.json')
+    check(g.ev("cnWhyNot()") in ('要先有 Lounge II', '要先有招牌菜') and not g.ev("cnPlan()"), f'the Day 52 save: not yet ({g.ev("cnWhyNot()")})')
+    load_save(g, 'player_day74_1508.json')
+    g.ev("S.cn=null;kenS().next=null")
+    check(g.ev("loungeLv()") >= 2 and g.ev("!!S.signature") and g.ev("cnWhyNot()") == '', 'the Day 74 save: Lounge III and a signature')
+    g.ev("kenS().next={d:S.day+1,n:5}")
+    check(g.ev("cnWhyNot()") == '明晚是 Ken 的品酒夜', 'never on a night of Ken\'s')
+    g.ev("kenS().next=null;shopTab='works';showShop()"); g.page.wait_for_timeout(100)
+    card = g.ev("(()=>{const e=document.querySelector('#screen .cn-card');if(!e)return'';e.scrollIntoView({block:'center'});return e.innerText.replace(/\\s+/g,' ')})()")
+    check('主廚之夜' in card and '排在明晚' in card and '$1,800' in card, f'the shop\'s Lounge section has it: {card!r}')
+    g.page.screenshot(path=os.path.join(ROOT, 'tests', 'artifacts', 'rc76_shop_chefs_night.png'))
+    g.ev("document.querySelector('#screen [data-act=cnPlan]').click()"); g.page.wait_for_timeout(150)
+    plan = json.loads(g.ev("JSON.stringify({next:S.cn.next,day:S.day,menu:S.cn.next&&S.cn.next.menu.map(d=>[d,DISH(d).cat])})"))
+    check(plan['next'] and plan['next']['d'] == plan['day'] + 1 and len(plan['menu']) == 3 and [m[1] for m in plan['menu']] == ['starter', 'main', 'dessert'] and plan['menu'][1][0] == 'signature', f'planned for tomorrow, three courses: {plan}')
+    card = g.ev("(document.querySelector('#screen .cn-card')||{}).innerText||''")
+    check('已排' in card and '取消' in card, f'the card says it is planned: {card!r}')
+    check('明晚｜主廚之夜 · 6 席' in g.ev("cnNewsHTML()"), 'the news the day before')
+    # the day (planned from this morning's prep for tomorrow: the test makes tomorrow today)
+    g.ev("closeSub&&closeSub();S.cn.next.d=S.day;showPrep()"); g.page.wait_for_timeout(150)
+    g.ev("for(let i=0;i<30;i++){if(typeof DLG!=='undefined'&&DLG)dlgNext()}"); _quiet(g)
+    check(g.ev("cnTonight()") and '今晚｜主廚之夜 · 6 席' in g.ev("$('#screen').innerText"), f'the news on the day: {g.ev("phase")}')
+    to_service(g); g.ev("window.__act=window.__actLazy;window.__noScenes=false;window.__holds=true;window.__fastSay=0")
+    # what each of the six had, at the moment they paid (a ticket is gone once they leave)
+    g.ev("window.__cnPaid=[];const c0=collect;collect=function(q,o){if(q&&q.cn&&q.ticket)__cnPaid.push({name:q.name,bar:q.table!=null&&R.tables[q.table].kind==='bar',items:q.ticket.items.map(i=>(DISH(i.d).wine?'w':i.d)+':'+i.st)});return c0.apply(this,arguments)}")
+    st = json.loads(g.ev("JSON.stringify({cn:!!R.cn,six:R.sched.filter(o=>o.cn).length,stools:loungeTables().filter(t=>t.kind==='bar').length,res:loungeTables().filter(t=>t.kind==='bar'&&t.cnr).length,other:loungeTables().filter(t=>t.kind==='bar').some(t=>stoolFree(t,{})),kt:!!R.kt})"))
+    check(st['cn'] and st['six'] == 6 and st['stools'] == 6 and st['res'] == 6 and not st['other'] and not st['kt'], f'tonight: the six on the schedule, the six stools theirs: {st}')
+    o = json.loads(g.ev("JSON.stringify((()=>{const out=new Set();for(let i=0;i<300;i++)for(const d of loungeOrder({size:2,type:'office',pat:1}))out.add(DISH(d).wine?'wine':DISH(d).bar?'bar':'food:'+d);return[...out]})())"))
+    check(not any(x.startswith('food:') for x in o), f'anyone else in the Lounge: drinks and bar bites only: {o}')
+    # the night, played: read the held scenes as a player would
+    scenes, seen = {}, set()
+    for _ in range(6000):
+        if g.ev("!!(typeof DLG!=='undefined'&&DLG&&DLG.sh)"):
+            k = g.ev("DLG.sh.k"); lines = []
+            t0 = g.ev("R.t"); g.ev("for(let i=0;i<5;i++)__tick(1000)"); frozen = g.ev("R.t") == t0
+            for _ in range(30):
+                if not g.ev("!!(DLG&&DLG.sh)"): break
+                lines.append(g.ev("$('#dlg .dlg-name').textContent+'：'+$('#dlg .dlg-text').textContent")); g.ev("__tick(300);dlgNext()")
+            scenes.setdefault(k, []).append((frozen, lines)); continue
+        g.page.evaluate('()=>window.__bot(30,1/30)')
+        r = json.loads(g.ev("JSON.stringify(R&&R.cn?{on:R.cn.on,end:R.cn.end,n:R.cn.guests.length}:{gone:1})"))
+        if (r.get('end') and not g.ev("!!(typeof DLG!=='undefined'&&DLG&&DLG.sh)")) or g.ev("phase") != 'service': break
+        if r.get('on') and 'lounge' not in seen:
+            seen.add('lounge'); g.ev("setRoom('lounge')")
+    cnS = scenes.get('cn_first', [])
+    check(len(cnS) >= 2 and cnS[0][0] and any('今天三道。不用點，一道一道上。' in x for x in cnS[0][1]) and any('謝謝。' in x for x in cnS[-1][1]), f'the first night: held at its start and its end: {cnS}')
+    res = json.loads(g.ev("""JSON.stringify((()=>{return{end:R.cn.end,six:R.cn.guests.length,served:R.cn.guests.every(q=>q.gone||q.state==='leave'||(q.ticket&&q.ticket.items.every(i=>i.st==='served'))),
+      fact:!!fact('cn_first'),S:S.cn,list:Object.values(R.st.lgSold||{}).reduce((a,x)=>a+x.rev,0),takings:R.st.lgRev||0,at:Math.floor((17*60+R.cn.t0/R.dur*270)/60)}})())"""))
+    check(res['at'] == 19, f'it begins after seven, as the scene and the manual say: {res["at"]}:xx')
+    check(res['list'] == res['takings'], f'the Lounge\'s list is still its takings: {res}')
+    check(res['end'] and res['six'] == 6 and res['served'], f'the night came to its end: all six, every course and glass out: {res}')
+    check(res['fact'] and res['S']['n'] == 1 and res['S']['next'] is None and res['S']['last'] == g.ev("S.day"), f'counted once: {res["S"]}')
+    # the rest of the day; what they paid; the summary
+    g.ev("window.__holds=false;window.__noScenes=true")
+    g.ev("__botUntil('phase!==\\'service\\'',90000,1/30)")
+    paid = json.loads(g.ev("JSON.stringify(__cnPaid)"))
+    check(len(paid) == 6 and all(x['bar'] for x in paid), f'the six paid, at the bar: {paid}')
+    check(all(len(x['items']) == 6 and sum(1 for y in x['items'] if y.startswith('w:')) == 3 and all(y.endswith(':served') for y in x['items']) for x in paid), f'each had the three courses and three glasses: {paid}')
+    lg = json.loads(g.ev("JSON.stringify(S.lastSummary.lg)"))
+    check(lg['cn'] and lg['cn']['n'] == 6 and lg['cn']['rev'] == 6 * 1800, f'$1,800 a head, on the Lounge\'s line apart from its tabs: {lg}')
+    txt = g.ev("$('#screen').innerText")
+    check('主廚之夜' in txt, 'the summary says so')
+    check(g.ev("albumList().some(p=>p.kind==='chefnight')"), 'the album has the night')
+    check('一週最多一次' in g.ev("cnWhyNot()"), 'and the next one is a week away')
+    check(not g.errors, g.errors[:3]); g.close()
