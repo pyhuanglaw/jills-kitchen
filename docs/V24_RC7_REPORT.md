@@ -25,6 +25,12 @@ Filed in `docs/v24/`.
 - **15:24**: `ken_lounge_continuity_2026-10-02_1524.txt` and `du_collab_wine_payoff_2026-10-02_1524.txt`.
 - **16:42–16:46**: `pianist_yuan_2026-10-02_1642.txt`.
 - **18:07, 18:08**: the 沈晴 × 阿拓 texts are filed on the branch that carries them.
+- **18:53, 18:54, 19:15**: Jill's room and Dylan's desk are filed on the same branch: `jill_room_2026-10-02_1853.txt` and `jill_room_dylan_study_2026-10-02_1854.txt`.
+- **For the next version, filed during the release:**
+  - `lounge_origin_madame_lin_2026-10-02_1919.txt` (re-sent at 19:30);
+  - `life_album_first_photo_2026-10-02_1931.txt`;
+  - `dylan_evan_first_drink_2026-10-02_1942.txt`;
+  - `player_messages_1920_1932_2026-10-02.txt` (19:20, 19:23, 19:32).
 
 ## 1. Commits since v2.4-rc6
 
@@ -40,6 +46,10 @@ Filed in `docs/v24/`.
 | 8a5b1f9 | 17:22 | 林予安, the Lounge's pianist |
 | 8e536ae | 18:04 | The story guests' own faces; golden_frames re-recorded with proof (陳伯伯) |
 | 7af5df7 | 18:44 | The manual audit |
+| dacfeca | 18:51 | The report, the 14:39–18:43 messages, P5 paused in the plan, screenshots |
+| f84ce13 | 20:13 | The full regression's three test fixes (no game change) |
+| 3836908 | 20:24 | The forty-days test re-seeded with proof; §6.1 |
+| (this) | 20:30 | The next version's briefs filed (§0) |
 
 ## 2. Release content audit
 
@@ -56,6 +66,10 @@ Filed in `docs/v24/`.
 | The player's pictures and sheets (16:12–16:59) | Done | master | Yes | Packed with the Ken, 杜 and 予安 work |
 | 沈晴 × 阿拓 after work (18:07, revised Act 5, 18:08) | Built without its pictures | wip/qing-tuo-after-work | No | The player, 18:12 and 18:41: next version, with the pictures |
 | P5, the other Staff Lives arcs | Plan and cards only | master | Cards only (unused) | Paused by the player, 18:38 and 18:39; kept as backlog |
+| Jill's room (18:53, 18:54, 19:15, 19:23) | Audited, not built | — | No | The player: next version (18:53 「下一個版本發佈」) |
+| The Madame Lin origin line and the three restaurant staff pools (19:19 / 19:30) | Audited, not built | — | No | Next version |
+| The Life Album's first photo (19:31, 19:32) | Audited, not built | — | No | Next version |
+| Dylan × Evan: the first drink (19:42) | Filed | — | No | Next version, with 沈晴 × 阿拓 |
 | 主廚之夜 (14:49) | Not started | — | No | Next |
 | Social posts: the picture and likes (15:02) | Not started | — | No | Next |
 

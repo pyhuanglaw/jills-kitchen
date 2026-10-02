@@ -1,0 +1,1177 @@
+(Filed verbatim. 2026-10-02 19:31, the player: the Life Album's first photo — Day 1, Dylan takes one of Jill's own instant cameras and photographs her busy; nobody thinks it matters; it is kept, protected, the album's earliest entry; mature saves get it as history. 19:32, asked whether they would draw it: 「你畫吧 你有遊戲的畫面」 — drawn from the game's own renderer. With 19:23: 「記得主廳的沙發就搬到jill房間喔 貓咪跳上沙發也是在jill房間 jill休息偶爾會回房間」)
+
+請替《Jill’s Kitchen》的 Life Album 補上完整的「第一張照片 / Life Album Origin」。
+
+這次不是新增大型玩法，也不是重做 Life Album。
+
+目標是替現有 Life Album 補上一個非常小、但會讓整個系統突然具有歷史的起點：
+
+Life Album 並不是 Day 1 就以「遊戲蒐集系統」的形式存在。
+
+最開始，只是 Dylan 在開店第一天，
+隨手拿了 Jill 自己的拍立得，
+拍了一張正在忙的 Jill。
+
+當時沒有人覺得這張照片有多重要。
+
+後來又有第二張、第三張、第四張。
+
+照片愈來愈多，
+最後才自然成為玩家現在看到的 Life Album。
+
+核心原則：
+
+THE FIRST PHOTO WAS NOT IMPORTANT WHEN IT WAS TAKEN.
+
+TIME MADE IT IMPORTANT.
+
+
+==================================================
+0. 先 Audit 現有 Life Album
+==================================================
+
+實作前請先 audit：
+
+- 現有 Life Album data model
+- photo generation
+- photo metadata
+- photo ordering
+- ordinary photo cap
+- treasured / protected photo mechanism
+- IndexedDB persistence
+- migration
+- backup / restore
+- photo click / full-screen behavior
+- Story Photo 與 ordinary Life Album photo 的差異
+- existing Day / date metadata
+- current photo formats / aspect ratios
+- mature saves 沒有這張照片時如何安全補入
+
+不要重寫已經穩定的 Life Album architecture。
+
+這次優先使用現有：
+- photo persistence
+- treasured/protected mechanism
+- album UI
+- chronological metadata
+
+只補上 Life Album 的歷史起點與必要 UI 修正。
+
+
+==================================================
+1. Life Album 的起源
+==================================================
+
+Life Album 的第一張照片發生在：
+
+Day 1，Jill’s Kitchen 開店當天。
+
+不是重大劇情完成後。
+
+不是餐廳成熟後。
+
+不是某個 unlock。
+
+就是第一天。
+
+因為這張照片真正的價值不是：
+
+「這是一張很重要的照片。」
+
+而是：
+
+玩家很久以後再回來看，
+才發現它已經變得重要。
+
+
+==================================================
+2. Jill 本來就喜歡拍立得
+==================================================
+
+【HARD CANON】
+
+Jill 本來就喜歡拍立得相機。
+
+這不是因為 Jill’s Kitchen，
+也不是為了 Life Album 才開始的興趣。
+
+她本來就有多台拍立得，
+而且不同尺寸／格式都有。
+
+例如可能包括：
+- 一般尺寸
+- mini
+- wide
+- 其他不同相紙比例
+
+不需要指定現實品牌。
+
+不要使用 trademark / logo。
+
+不要把 Jill 寫成專業攝影師。
+
+她只是本來就喜歡拍立得，
+家裡自然有不少台。
+
+
+==================================================
+3. 拍立得應該存在於 Jill 的生活空間
+==================================================
+
+Jill + Dylan 的私人房間從 Day 1 就存在。
+
+因此如果現有 room rendering / prop system 適合：
+
+可以在私人房間自然放一兩台 Jill 的拍立得。
+
+例如：
+- 書架
+- 淺色櫃子
+- 桌面一角
+- 小型收納區
+
+不要做成：
+
+「拍立得收藏展示櫃」。
+
+不要整排像商品陳列。
+
+玩家不需要一進房間就收到 exposition：
+
+「Jill 收藏很多拍立得！」
+
+它應該只是生活裡自然存在的東西。
+
+之後玩家如果看 Life Album，
+再回頭看到房間裡的相機，
+會自己把兩件事情連起來。
+
+
+==================================================
+4. 第一張照片不是正式開幕紀念照
+==================================================
+
+第一張 Life Album photo 不可以是：
+
+- 全員排排站
+- Jill 正面站好
+- Jill 比 YA
+- 五隻貓集合
+- 開幕布條
+- 盛大剪綵
+- 大家舉杯
+- 正式 opening portrait
+- achievement CG
+- 「我們第一天一定要拍一張！」
+
+它不是紀念照。
+
+它是一張：
+
+「當時只是隨手拍，
+後來才發現再也拍不到了」
+
+的照片。
+
+
+==================================================
+5. 第一張照片的場景
+==================================================
+
+時間：
+
+Day 1。
+
+Madame Lin 的 opening visit 可以已經發生。
+
+也就是：
+
+Madame Lin：
+「終於開了。」
+
+Jill：
+「嗯。」
+
+Madame Lin：
+「恭喜。」
+
+Jill：
+「謝謝。」
+
+Madame Lin 把禮物遞給她。
+
+Jill：
+「妳還帶東西來。」
+
+Madame Lin：
+「開店哪有空手來的。」
+
+Jill：
+「妳不是就在隔壁。」
+
+Madame Lin：
+「隔壁更不能空手。」
+
+Madame Lin 後來離開。
+
+不要把 Madame Lin opening scene
+和 Life Album first photo
+硬合併成一張大合照。
+
+兩件事情發生在同一天，
+但各自自然存在。
+
+Madame Lin 走後，
+Jill 繼續忙開店第一天的事情。
+
+
+==================================================
+6. Dylan 拿的是 Jill 的拍立得
+==================================================
+
+【HARD CANON】
+
+不是 Dylan 自己帶相機。
+
+不是 Dylan 買給 Jill。
+
+不是餐廳為了 opening 準備的相機。
+
+Dylan 拿的是：
+
+Jill 自己原本就有的其中一台拍立得。
+
+可以是 Jill 當天順手帶到前場，
+或放在附近。
+
+不要特別解釋她為什麼帶。
+
+對一個本來就有很多拍立得的人而言，
+有一台出現在附近不需要重大理由。
+
+
+==================================================
+7. 第一張照片怎麼拍
+==================================================
+
+Jill 正在忙自己的事。
+
+例如：
+- 整理桌面
+- 放最後幾樣東西
+- 檢查桌椅
+- 從 Kitchen 出來
+- 拿著東西經過
+- 回頭看 Dylan
+
+她沒有準備拍照。
+
+Dylan 看到附近 Jill 的拍立得，
+拿起來。
+
+沒有叫 Jill：
+
+「看這裡。」
+
+沒有：
+
+「笑一個。」
+
+沒有倒數。
+
+他直接拍。
+
+快門。
+
+照片吐出來。
+
+Jill 聽到聲音才注意到。
+
+
+==================================================
+8. 第一張照片 dialogue
+==================================================
+
+請以非常短的 dialogue 處理。
+
+優先版本：
+
+Jill：「你拿我的相機幹嘛？」
+
+Dylan：「拍妳。」
+
+Jill：「我根本沒在看。」
+
+Dylan：「我知道。」
+
+照片慢慢顯影。
+
+如果畫面中剛好有一隻貓：
+
+Jill 看一下照片。
+
+Jill：「牠也在。」
+
+Dylan 看一眼。
+
+Dylan：「嗯。」
+
+結束。
+
+不要再加任何一句感想。
+
+
+==================================================
+9. 禁止加入的 dialogue
+==================================================
+
+不要讓 Dylan 說：
+
+「第一天當然要拍。」
+「開店第一天要紀念一下。」
+「以後回頭看一定很有意義。」
+「這張要留著。」
+「我們以後可以做一本相簿。」
+「這是妳夢想開始的一天。」
+「以後這裡一定會很熱鬧。」
+「我想把今天記下來。」
+
+不要讓 Jill 說：
+
+「這是我們第一張照片。」
+「那就留著吧。」
+「以後每天都拍一張。」
+「我要記錄這間餐廳。」
+「不知道以後會變成什麼樣子。」
+
+兩個人都不知道未來。
+
+這點非常重要。
+
+
+==================================================
+10. 貓只是意外入鏡
+==================================================
+
+第一張照片可以有一隻貓。
+
+但最多一隻。
+
+請依 Day 1 現有 cat state / staging，
+選最自然的一隻。
+
+不要為了照片違反既有貓咪 personality / location logic。
+
+貓不是被抱來合照。
+
+牠只是剛好：
+
+- 經過 Jill 腳邊
+- 從桌子底下出來
+- 從家具旁探頭
+- 跳上附近某處
+- 背影進入畫面
+- 尾巴剛好在照片邊緣
+
+甚至沒有完整正臉也可以。
+
+這張照片的可愛應該來自：
+
+「怎麼連牠也剛好在裡面。」
+
+不是：
+
+「Jill 與愛貓的開幕紀念照。」
+
+
+==================================================
+11. 照片必須忠實呈現真正的 Day 1
+==================================================
+
+這張照片最重要的功能之一：
+
+保存 Jill’s Kitchen 最早的樣子。
+
+因此照片中的餐廳必須是：
+
+真正的 Day 1 canonical restaurant state。
+
+不要因為玩家後來 Day 70 / Day 100 才查看，
+就以 current save state 即時生成背景。
+
+照片中不能出現後來才有的：
+
+- The Lounge
+- Second Floor
+- Staff Room
+- PDR
+- 後期桌椅
+- 後期大型設備
+- 後期 decor
+- 後期 staff
+- 後期 regulars
+- 後期 upgrades
+
+Main Hall 也必須符合最新 canon：
+
+Jill 原本的 sofa 從 Day 1 就在 Jill/Dylan 私人房間，
+不是 Main Hall。
+
+因此第一張照片不要錯誤出現舊版 Main Hall sofa。
+
+
+==================================================
+12. 第一張照片不要太「完美」
+==================================================
+
+請避免把第一張做成：
+
+非常漂亮的 promotional key art。
+
+它可以好看，
+但應該保有拍立得的偶然感。
+
+例如：
+
+- Jill 沒有看鏡頭
+- 構圖稍微偏一點
+- 貓在奇怪的位置
+- 桌面上還有東西
+- 開店第一天還有一些剛整理完的痕跡
+
+不要故意做髒亂。
+
+重點是：
+
+這是生活照片，不是 marketing photo。
+
+
+==================================================
+13. 照片顯影後怎麼處理
+==================================================
+
+Jill 不需要立刻建立一本相簿。
+
+照片顯影後，
+她看了一下。
+
+然後只是：
+
+把照片留下來。
+
+可以暫時放在：
+- counter 附近
+- 一個小架子
+- 私人房間某個地方
+- 現有環境中合理的位置
+
+不需要角色說：
+
+「我要收好。」
+
+更不要出現：
+
+「Life Album created!」
+
+
+==================================================
+14. Life Album 不是這一天被「發明」的
+==================================================
+
+【HARD DESIGN PRINCIPLE】
+
+第一張照片存在
+≠
+Life Album system 在故事世界裡正式成立。
+
+Day 1：
+
+只有一張照片。
+
+之後：
+
+第二張。
+第三張。
+第四張。
+
+照片慢慢多起來。
+
+某個時候，
+把照片收在一起變成最自然的事情。
+
+最後才成為現在玩家看到的 Life Album。
+
+不要新增一幕：
+
+Jill：「我們來做一本相簿吧。」
+
+Dylan：「好。」
+
+這不需要故事化。
+
+它應該像很多真實家庭相簿一樣：
+
+不是某一天宣布成立。
+
+是東西愈來愈多，
+後來就有了一本。
+
+
+==================================================
+15. Day 1 不要出現遊戲化解鎖
+==================================================
+
+第一張照片拍完時禁止：
+
+- LIFE ALBUM UNLOCKED
+- New Collection
+- 1 / 240
+- Achievement
+- Tutorial popup
+- Collect Memories
+- Treasured Photo!
+- First Memory
+- 第一張珍貴回憶
+- 開始記錄 Jill’s Kitchen 吧
+
+不要把這個很自然的瞬間重新做成遊戲 tutorial。
+
+如果玩家需要知道照片在哪裡，
+可以使用現有 UI 最輕量的提示方式。
+
+但 fiction 上：
+
+沒有人知道自己剛剛建立了一個 game system。
+
+
+==================================================
+16. 第一張照片必須永久保存
+==================================================
+
+這張 Day 1 canonical first photo：
+
+永遠不能被 ordinary photo cleanup 洗掉。
+
+它必須受到現有：
+
+treasured / protected / canonical photo
+
+機制保護。
+
+不能因為：
+
+- ordinary photo cap
+- FIFO cleanup
+- album capacity
+- cache cleanup
+- future photo generation
+- save migration
+
+而消失。
+
+但是 Day 1 不要特別告訴玩家：
+
+「這張是珍貴照片。」
+
+它不是因為系統標成 treasured 才珍貴。
+
+它是因為時間過去了才變珍貴。
+
+
+==================================================
+17. Album chronology
+==================================================
+
+Life Album 必須可以真正往前翻回：
+
+Day 1。
+
+第一張照片永遠是最早 canonical entry。
+
+照片至少保留：
+
+- Day / date metadata
+- chronological ordering
+
+讓玩家在 Day 70 / Day 100 仍然可以一路翻回第一張。
+
+
+==================================================
+18. 第一張照片 caption
+==================================================
+
+Caption 必須普通。
+
+可以：
+
+「第一天」
+
+或：
+
+「開店」
+
+或其他非常短、當下合理的文字。
+
+不要：
+
+「一切開始的地方」
+「夢想開始的那一天」
+「最初的我們」
+「第一頁」
+「我們的起點」
+「故事從這裡開始」
+「最珍貴的一天」
+
+不要預先替未來寫 nostalgia。
+
+
+==================================================
+19. Full-screen / Lightbox
+==================================================
+
+Life Album 的照片必須可以點擊後：
+
+full-screen / lightbox 查看。
+
+這是既有 Life Album 很重要的 usability requirement。
+
+玩家點照片後，
+應該可以真正停下來看：
+
+- 照片本身
+- 人物
+- 貓
+- 當時空間
+- Day / date
+- caption
+
+不要只讓照片維持在小縮圖。
+
+Mobile / iPhone 必須可用。
+
+需要：
+- 合理 tap target
+- 不被其他 UI 遮住
+- 可自然關閉
+- 照片不要被 crop 到失去內容
+
+這次請一起確認。
+
+
+==================================================
+20. 不同拍立得尺寸
+==================================================
+
+因為 canon 上：
+
+Jill 有很多台不同尺寸／格式的拍立得，
+
+Life Album 未來可以有少量照片尺寸差異。
+
+例如：
+- standard
+- mini
+- wide
+
+但這是 OPTIONAL visual depth。
+
+只有在現有 architecture 可以低成本、安全支援時才做。
+
+如果會造成：
+- 大量 UI 重構
+- migration complexity
+- mobile layout 問題
+- photo rendering instability
+
+這次不要硬做。
+
+CANON 仍然成立：
+
+Jill 有不同尺寸的拍立得。
+
+遊戲不需要立刻模擬她所有相機。
+
+
+==================================================
+21. 如果支援不同尺寸，禁止遊戲化
+==================================================
+
+不要建立：
+
+- camera rarity
+- camera unlock
+- camera shop
+- film inventory
+- film cost
+- photo bonus
+- rare format
+- photography level
+- collection completion
+- special camera stats
+
+不同尺寸只是一種：
+
+生活留下的視覺差異。
+
+不是新玩法。
+
+
+==================================================
+22. Ordinary Life Album photos
+==================================================
+
+第一張照片也應該重新確立 Life Album 的整體設計方向：
+
+Life Album 不是 Achievement Gallery。
+
+它應該包含很多：
+
+「拍的時候不知道未來會怎樣」
+
+的照片。
+
+例如：
+
+- 某隻貓睡在一張後來被換掉的椅子
+- Jill 在早期還很空的 Main Hall 工作
+- 某個 regular 第一次出現時剛好在背景
+- 幾個後來變熟的人早期意外同框
+- 某個家具還沒升級前的樣子
+- 某個角色當時還只是普通客人
+- Lounge 還不存在以前的餐廳
+- Second Floor 還沒開始使用以前
+
+不需要為這些全部新增 authored story。
+
+只是未來 photo generation / selection 時，
+不要只偏好「重大事件」。
+
+Life Album 的價值有很大一部分來自：
+
+ordinary moments becoming history。
+
+
+==================================================
+23. Story Photo / Event CG 不要混淆
+==================================================
+
+保持既有區分：
+
+Life Album：
+生活留下的照片。
+
+Story Photo：
+少數真正發生過、值得 canonical 保存的 authored milestone。
+
+Event CG：
+劇情演出畫面。
+
+第一張 Day 1 photo 屬於：
+
+Life Album canonical first photo。
+
+它不是 Event CG。
+
+即使實作上需要 authored composition，
+呈現方式仍然要像：
+
+Dylan 用 Jill 的拍立得拍下來的真實照片。
+
+
+==================================================
+24. Photo truthfulness
+==================================================
+
+Life Album 必須繼續遵守：
+
+PHOTO = EVIDENCE THAT THE MOMENT ACTUALLY HAPPENED。
+
+不要出現：
+
+- 標題寫五隻貓但只有三隻
+- 某角色根本不在場卻出現在照片
+- 客人拍某隻貓但貓當時不存在於場景
+- 空間尚未 unlock 卻出現在照片
+- 人物關係尚未發生卻生成後期構圖
+
+第一張照片尤其必須完全 canonical。
+
+
+==================================================
+25. Mature save migration
+==================================================
+
+現有 mature saves 很可能已經有：
+
+大量 Life Album photos，
+
+但沒有這張新的 Day 1 first photo。
+
+不要因此：
+- reset Album
+- 清掉照片
+- 重新排序錯誤
+- 破壞 treasured status
+- 重播 Day 1 scene
+- 突然在 Day 70 讓 Dylan 拍一次
+- 顯示 NEW PHOTO
+- 顯示新故事通知
+
+對 mature save：
+
+安全補入 canonical Day 1 first photo。
+
+把它視為：
+
+RETROACTIVE HISTORY。
+
+它的 metadata 必須是：
+
+Day 1 / opening day。
+
+不是 migration 發生當天。
+
+
+==================================================
+26. Mature save 的 Day 1 圖像
+==================================================
+
+成熟存檔補第一張時：
+
+禁止使用目前餐廳狀態截圖再標：
+
+Day 1。
+
+請使用：
+
+固定 canonical Day 1 composition / canonical early restaurant state。
+
+因為這張照片是歷史證據。
+
+即使玩家現在：
+- Day 74
+- Lounge 已完成
+- 二樓已完成
+- 餐廳大量升級
+
+第一張仍然必須呈現：
+
+當初真正剛開店的 Jill’s Kitchen。
+
+
+==================================================
+27. Madame Lin chronology compatibility
+==================================================
+
+新的 Life Album origin 必須與 Madame Lin Day 1 origin 相容。
+
+Day 1 chronology 可以大致：
+
+1. Jill’s Kitchen 開店
+2. Madame Lin 帶小禮物來
+3. 《隔壁》短 scene
+4. Madame Lin 回隔壁／離開
+5. Jill 繼續忙
+6. Dylan 拿 Jill 的拍立得
+7. 第一張照片
+8. 正常 Day 1 營業繼續
+
+不需要把 Day 1 塞成連續 cutscene。
+
+請保持 pacing。
+
+Madame Lin scene 與 first photo scene 都應該很短。
+
+
+==================================================
+28. Jill / Dylan relationship tone
+==================================================
+
+這一幕同時會非常輕地讓玩家看到：
+
+Jill 和 Dylan 本來就有共同生活。
+
+但不要用 dialogue 宣告 relationship。
+
+相機是 Jill 的。
+
+Dylan 可以自然拿來用。
+
+Jill 第一反應是：
+
+「你拿我的相機幹嘛？」
+
+而不是：
+
+「你怎麼可以拿我的東西？」
+
+這本身已經有熟悉感。
+
+Dylan：
+
+「拍妳。」
+
+Jill：
+
+「我根本沒看鏡頭。」
+
+Dylan：
+
+「我知道。」
+
+這就夠了。
+
+不要加 romantic speech。
+
+不要讓角色解釋：
+
+「我們已經在一起很多年。」
+
+玩家之後自然會知道。
+
+
+==================================================
+29. Dylan identity reveal compatibility
+==================================================
+
+這張照片不要因此提前破壞：
+
+Restaurant-side Dylan = Jill husband reveal。
+
+Dylan 可以是拍攝者，
+因此根本不需要出現在照片中。
+
+Day 1 first photo 的 metadata / caption
+也不要寫：
+
+「Jill 老公 Dylan 拍攝」。
+
+不要用這張照片直接告訴玩家：
+
+Dylan 是 Jill 的丈夫。
+
+這個資訊仍然依既有 character knowledge / restaurant reveal progression 處理。
+
+Madame Lin 從 pre-game renovation 已經知道 Dylan 是 Jill husband，
+不代表玩家／其他角色自動知道。
+
+
+==================================================
+30. 不要新增的系統
+==================================================
+
+這次不要建立：
+
+- photography gameplay
+- camera upgrades
+- film inventory
+- photo quests
+- daily photo requirement
+- photo skill
+- nostalgia meter
+- memory points
+- album level
+- album rewards
+- camera collection UI
+- photo rarity system
+- NPC photographer system
+- mandatory daily snapshots
+
+Life Album 已經存在。
+
+我們現在只是在回答：
+
+「這本相簿最開始怎麼來的？」
+
+
+==================================================
+31. Mid-build visual checkpoint
+==================================================
+
+在 first-photo composition / Day 1 scene 完成視覺 staging 後：
+
+請主動提供 screenshot / visual evidence。
+
+我要確認：
+
+- Jill 沒有刻意擺拍
+- 餐廳真的是 Day 1 狀態
+- Main Hall 沒有舊 sofa
+- 貓是自然亂入
+- 構圖像生活照片，不像 key art
+- 拍立得 framing 合理
+- Jill / Dylan dialogue staging 自然
+
+REPORT ≠ STOP。
+
+報告後繼續完成已明確、安全的部分。
+
+
+==================================================
+32. QA
+==================================================
+
+至少驗證：
+
+Fresh save：
+- Day 1 scene 可正常發生
+- Madame Lin opening scene chronology 不衝突
+- Dylan 使用 Jill 的拍立得
+- first photo 正確產生
+- first photo metadata = Day 1
+- first photo 永久 protected
+- 不出現 unlock / achievement 式 UI
+- 後續正常照片仍可加入
+
+Mature save：
+- 自動安全補入 Day 1 canonical first photo
+- 不重播 Day 1 scene
+- 不顯示 NEW
+- 不 reset existing album
+- 不刪除 existing photos
+- treasured photos 保留
+- chronological ordering 正確
+
+UI：
+- 點照片可 full-screen / lightbox
+- iPhone tap target 正常
+- 不 crop 重要內容
+- 可正常關閉
+- Day/date/caption 可讀
+
+Persistence：
+- refresh 後仍存在
+- backup / restore 後仍存在
+- IndexedDB persistence 正常
+- ordinary cap 不會刪除 first photo
+
+
+==================================================
+33. 最終玩家體驗
+==================================================
+
+Day 1 玩家看到這張照片時：
+
+最多只應該覺得：
+
+「喔，好可愛。」
+
+甚至可能沒有特別在意。
+
+Day 10：
+
+玩家再看到它：
+
+「喔，這是剛開店的時候。」
+
+Day 70 / Day 100：
+
+玩家可能已經有：
+
+- 很多熟客
+- 很多員工
+- wine
+- The Lounge
+- Evan
+- 予安
+- 沈晴 / 阿拓
+- Second Floor
+- Staff Room
+- PDR
+- 更多設備
+- 更多家具
+- 一整本 Life Album
+- 很多已經走完或仍在繼續的人生故事
+
+然後翻回第一張。
+
+照片裡：
+
+Jill’s Kitchen 還很小。
+
+Jill 根本沒有看鏡頭。
+
+她只是正在忙。
+
+Dylan 拿她的拍立得隨手拍了一張。
+
+旁邊可能還有一隻不知道自己入鏡的貓。
+
+不要在這時觸發任何感想 dialogue。
+
+不要寫：
+
+「我們一路走了好遠。」
+
+不要寫：
+
+「原來已經過這麼久了。」
+
+不要寫：
+
+「一切都是從這裡開始。」
+
+什麼都不要說。
+
+讓照片自己成立。
+
+
+==================================================
+34. HARD CANON SUMMARY
+==================================================
+
+請確認：
+
+- Jill 本來就喜歡拍立得
+- Jill 本來就有很多台、不同尺寸／格式的拍立得
+- 不是為餐廳才買
+- 不做相機 gameplay
+- Day 1 由 Dylan 拿 Jill 的拍立得拍第一張
+- Dylan 沒有叫 Jill 擺拍
+- Jill 沒有看鏡頭
+- 最多一隻貓自然亂入
+- 第一張不是正式開幕照
+- Madame Lin Day 1 opening visit 仍存在
+- 兩幕分開，不做大合照
+- 第一張忠實保存 canonical Day 1 restaurant
+- Main Hall 不得出現已移到私人房間的 sofa
+- Dylan 不出現在照片也完全可以
+- 不提前揭露 Dylan = Jill husband
+- 第一張永久 protected
+- 不被 ordinary photo cap 刪除
+- Life Album 不是 Day 1 被正式「創立」
+- 照片是慢慢累積成 Album
+- 不出現 gamey unlock
+- caption 普通
+- mature save 補的是 retroactive Day 1 history
+- mature save 不重播故事、不 NEW、不 reset
+- Life Album photo 必須可以 full-screen 查看
+- 不同拍立得尺寸只有低成本時才做視覺差異
+- 不做 rarity / camera collection / film management
+- Life Album 仍然是 lived history，不是 achievement gallery
+- Photo 必須忠實於真正發生過的 moment
+
+
+==================================================
+35. 最後的設計準則
+==================================================
+
+這次不要問：
+
+「怎麼讓第一張照片看起來很重要？」
+
+恰恰相反。
+
+請問：
+
+「怎麼讓它在 Day 1 看起來只是一張很普通的照片？」
+
+因為它真正的 payoff
+不是拍下去的那一刻。
+
+是幾十天以後，
+玩家自己翻回來的那一刻。
+
+THE FIRST PHOTO WAS NOT IMPORTANT WHEN IT WAS TAKEN.
+
+TIME MADE IT IMPORTANT.
