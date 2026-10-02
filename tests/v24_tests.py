@@ -151,36 +151,53 @@ def v24_walk_over_is_a_floor_walk_and_never_a_cook(b, port, target):
 
 @test
 def v24_eras_open_in_order_and_dormant_ones_never_reverse(b, port, target):
-    """B / pacing: 怡君 first; 《那面牆》 opens two days after the spare key; the Second Floor two days after the
-    settlement — not walled behind anything else. An era whose people are not on the crew goes dormant once a later
-    one could start and has waited 5 days (the next blocked one with it), and never wakes after a later era began.
-    Nothing at the very start of the first day; no gap between beats except a stage's own."""
+    """B / pacing, and the player's 10:25 correction: two chains that do not wait for each other. 怡君 first; 《那面牆》
+    opens two days after the spare key. The Second Floor opens two days after the Lounge is finished (Lounge I built) —
+    never on the wall, its settlement or anything of 怡君's; the wall's progress, or its dormancy, moves it not a day, and
+    the floor's beginning puts nothing of the other chain to sleep. Within a chain, an era whose people are not on the
+    crew goes dormant once a later era of its chain could start and has waited 5 days, and never wakes after that later
+    era began. Nothing at the very start of the first day; no gap between beats except a stage's own."""
     g = Game(b, port, target, seed=245, manual=True, viewport={'width': 390, 'height': 844})
     load_save(g, 'player_day52.json')
     g.ev("v24()")
     d0 = g.ev("S.day")
-    check(g.ev("v24().first") == d0 and g.ev("eraOpen('yj')") and not g.ev("eraOpen('wall')") and not g.ev("eraOpen('up')"), 'only 怡君 at first')
+    check(g.ev("loungeLv()") == 0 and g.ev("v24().first") == d0 and g.ev("eraOpen('yj')") and not g.ev("eraOpen('wall')") and not g.ev("eraOpen('up')"), 'only 怡君 at first (no Lounge yet: no floor)')
     check(g.ev("v24Fresh('daystart')") and not g.ev("(()=>{S.day++;const r=v24Fresh('daystart');S.day--;return r})()"), 'nothing at the start of the first day only')
     g.ev("factSet('yj_meet');factSet('yj_key')")
     check(not g.ev("eraOpen('wall')") and g.ev("eraOpenDay('wall')") == d0 + 2, 'the wall: two days after the key')
     g.ev("S.day+=2"); check(g.ev("eraOpen('wall')"), 'open on the day')
-    g.ev("factSet('wall_worry');factSet('wall_settle')")
-    check(g.ev("eraOpenDay('up')") == d0 + 4, 'the floor: two days after the settlement')
+    check(g.ev("eraOpenDay('up')") is None, 'the wall open, the floor still not: it waits for the Lounge, not the wall')
+    # the Lounge finished: the floor two days later, whatever the wall is doing
+    g.ev("S.rooms.lounge=1;factSet('lounge_built_1')")
+    dl = g.ev("S.day")
+    check(g.ev("eraOpenDay('up')") == dl + 2 and not g.ev("eraOpen('up')"), 'the floor: two days after the Lounge')
+    g.ev("factSet('wall_worry')")
+    check(g.ev("eraOpenDay('up')") == dl + 2, 'the wall begun: the floor not moved')
+    g.ev("factSet('wall_settle')")
+    check(g.ev("eraOpenDay('up')") == dl + 2, 'the wall settled: the floor not moved')
     check(g.ev("stageGap('wall_settle',0)") and not g.ev("stageGap('wall_settle',1)"), 'a stage waits only its own gap')
-    # dormancy: no 秀琴阿姨, a later era that could start
-    g.ev("delete story().facts.yj_meet;delete story().facts.yj_key;delete story().facts.wall_worry;delete story().facts.wall_settle;S.day-=2")
-    g.ev("window.__xqm=S.crew.find(m=>m.name==='秀琴阿姨');S.crew=S.crew.filter(m=>m!==__xqm);V24_ERAS[2].__can=V24_ERAS[2].can;V24_ERAS[2].can=()=>true")
+    g.ev("S.day+=2"); check(g.ev("eraOpen('up')"), 'open on the day')
+    # the floor's beginning puts nothing of the other chain to sleep: 怡君 not begun, 秀琴阿姨 here, the floor under way
+    g.ev("for(const k of ['yj_meet','yj_key','wall_worry','wall_settle'])delete story().facts[k];factSet('up_hint')")
+    for i in range(7):
+        g.ev("S.day++;v24Dormancy()")
+    check(g.ev("v24().dorm.yj") is None and g.ev("v24().dorm.wall") is None and g.ev("eraOpen('yj')"), 'the floor under way: 怡君 still waits for her day, the wall after her')
+    check(g.ev("eraOpen('up')") and g.ev("due('up_staff','up_hint',1,'up')"), 'and the floor goes on')
+    # dormancy inside a chain: no 秀琴阿姨, the era after 怡君 could start (forced here)
+    g.ev("delete story().facts.up_hint;v24().dorm={};v24().wait={}")
+    g.ev("window.__xqm=S.crew.find(m=>m.name==='秀琴阿姨');S.crew=S.crew.filter(m=>m!==__xqm);eraOf('wall').__can=eraOf('wall').can;eraOf('wall').can=()=>true")
     for i in range(4):
         g.ev("S.day++;v24Dormancy()")
-    check(g.ev("v24().dorm.yj") is None and not g.ev("eraOpen('up')"), 'four days: still waiting')
+    check(g.ev("v24().dorm.yj") is None and not g.ev("eraOpen('wall')"), 'four days: still waiting')
     g.ev("S.day++;v24Dormancy()")
-    check(g.ev("v24().dorm.yj") is not None and g.ev("v24().dorm.wall") is not None and g.ev("eraOpen('up')"), 'the fifth: 怡君 and the wall dormant, the floor open')
-    check(not g.ev("eraOpen('yj')") and not g.ev("eraOpen('wall')"), 'dormant is not done: those eras are closed')
+    check(g.ev("v24().dorm.yj") is not None and g.ev("eraOpen('wall')") and g.ev("eraOpenDay('wall')") == g.ev("v24().dorm.yj"), 'the fifth: 怡君 dormant, the wall open from that day')
+    check(not g.ev("eraOpen('yj')"), 'dormant is not done: that era is closed')
+    check(g.ev("eraOpen('up')") and g.ev("v24().dorm.up") is None, 'the floor untouched by the other chain')
     g.ev("S.crew.push(__xqm);S.day++;v24Dormancy()")
-    check(g.ev("v24().dorm.yj") is None, 'she is back before the floor began: 怡君 wakes')
-    g.ev("S.crew=S.crew.filter(m=>m!==__xqm);for(let i=0;i<5;i++){S.day++;v24Dormancy()}factSet('up_hint');S.crew.push(__xqm);S.day++;v24Dormancy()")
-    check(g.ev("v24().dorm.yj") is not None, 'once the floor began, it does not wake (no reversed chronology)')
-    g.ev("V24_ERAS[2].can=V24_ERAS[2].__can")
+    check(g.ev("v24().dorm.yj") is None, 'she is back before the wall began: 怡君 wakes')
+    g.ev("S.crew=S.crew.filter(m=>m!==__xqm);for(let i=0;i<5;i++){S.day++;v24Dormancy()}factSet('wall_worry');S.crew.push(__xqm);S.day++;v24Dormancy()")
+    check(g.ev("v24().dorm.yj") is not None, 'once the wall began, 怡君 does not wake (no reversed chronology)')
+    g.ev("eraOf('wall').can=eraOf('wall').__can")
     # weather memory for the leak
     g.ev("v24().wx={};v24Wx('sun');S.day++;v24Wx('rain');S.day++;v24Wx('cloud')")
     check(g.ev("rainedWithin(1)") and not g.ev("rainedWithin(0)"), 'rain is remembered for a few days')
@@ -259,8 +276,9 @@ V24_KEYS = ['yj_meet', 'yj_look', 'yj_three', 'yj_chose', 'yj_move', 'yj_key', '
 @test
 def v24_stage_gates_follow_the_chronology_and_their_own_gaps(b, port, target):
     """B / the pacing corrections: each stage needs the one before it and only its own gap (the fiction's time); the
-    wall cannot begin before the spare key (+2 settled days); the Second Floor era opens two days after the settlement;
-    the article only after the settlement; nothing needs a global multi-day gap."""
+    wall cannot begin before the spare key (+2 settled days); the Second Floor era does not wait for the settlement
+    (the player's 10:25: it opens two days after the Lounge is finished); the article only after the settlement;
+    nothing needs a global multi-day gap."""
     g = Game(b, port, target, seed=251, manual=True, viewport={'width': 390, 'height': 844})
     load_save(g, 'player_day52.json')
     g.ev("v24()")
@@ -277,7 +295,9 @@ def v24_stage_gates_follow_the_chronology_and_their_own_gaps(b, port, target):
     g.ev("S.day+=2"); check(g.ev("eraOpen('wall')"), 'two days after the key the wall can begin')
     check(not g.ev("due('wall_article','wall_settle',3,'wall')"), 'no article before the settlement')
     g.ev("for(const k of ['wall_worry','wall_photos','wall_visit','wall_wang','wall_setback','wall_report','wall_fee','wall_prep','wall_mediation','wall_settle'])factSet(k)")
-    check(g.ev("eraOpenDay('up')") == g.ev("S.day") + 2, 'the Second Floor era: two days after the settlement')
+    check(g.ev("eraOpenDay('up')") is None, 'the settlement opens nothing upstairs (no Lounge in this save)')
+    g.ev("S.rooms.lounge=1;factSet('lounge_built_1')")
+    check(g.ev("eraOpenDay('up')") == g.ev("S.day") + 2, 'the Second Floor era: two days after the Lounge')
     check(g.ev("LANE_CAP.major") == 1 and g.ev("LANE_CAP.v24") == 1, 'one major beat a day for every story; the long stories have one smaller step a day of their own')
     check(not g.errors, g.errors[:3]); g.close()
 
@@ -333,9 +353,10 @@ def v24_the_wall_is_written_to_the_rules(b, port, target):
 
 @test
 def v24_day52_save_plays_the_stories_in_order_over_forty_days(b, port, target):
-    """The player's Day 52 save, forty days of lazy play (seeded), the arbiter as in play: 怡君's arc, then the wall,
-    then the Second Floor era opens; never two major beats in a day; nothing on the first day's start; everyone who
-    speaks in a restaurant beat was really there (the beats check it); no page errors."""
+    """The player's Day 52 save, forty days of lazy play (seeded), the arbiter as in play: 怡君's arc, then the wall;
+    the Second Floor era does not open on the wall (the player's 10:25: it waits for the Lounge, which this save has
+    not built — built, the floor opens two days later); never two major beats in a day; nothing on the first day's
+    start; everyone who speaks in a restaurant beat was really there (the beats check it); no page errors."""
     g = Game(b, port, target, seed=254, manual=True, viewport={'width': 390, 'height': 844})
     load_save(g, 'player_day52.json')
     g.ev("window.__fastSay=1")
@@ -368,10 +389,10 @@ def v24_day52_save_plays_the_stories_in_order_over_forty_days(b, port, target):
     check(F['yj_key'] - F['yj_meet'] <= 9 and F['yj_key'] <= first + 10, f'怡君 moved in within about ten days, by Day {first + 9} (59–62) — a day later when a dated beat takes her first day (this seed: Dylan on Valentine\'s, Day {first}): {F}')
     check(first + 9 <= F['wall_worry'] <= first + 13, f'the wall begins Day {first + 9}–{first + 13} (62–66): {F}')
     check(F['wall_settle'] - F['wall_worry'] <= 18 and F['wall_settle'] <= first + 29, f'settled within about two and a half weeks, by Day {first + 29} (75–82): {F}')
-    up = g.ev("eraOpenDay('up')")
-    check(up is not None and up <= first + 33, f'the Second Floor era opens by Day {first + 33} (78–86): {up}')
     check(all(v <= 1 for v in majors.values()), f'never two major beats in a day: {majors}')
-    check(g.ev("eraOpen('up')"), 'the Second Floor era is open after the settlement')
+    check(g.ev("loungeLv()") == 0 and g.ev("eraOpenDay('up')") is None and not g.ev("eraOpen('up')"), 'the wall settled, no Lounge in this save: the floor still waits for the Lounge')
+    g.ev("S.rooms.lounge=1;factSet('lounge_built_1')")
+    check(g.ev("eraOpenDay('up')") == g.ev("S.day") + 2, 'the Lounge finished: the floor two days later')
     check(not g.errors, g.errors[:3]); g.close()
 
 
@@ -698,7 +719,7 @@ def v24_the_signature_steppers_stay_on_their_own_line(b, port, target):
     check(not g.errors, g.errors[:3]); g.close()
 
 
-UP_DONE_BEFORE = r"""(()=>{const set=(k,b)=>{const d=S.day-b;story().facts[k]={d,n:1,l:d}};
+UP_DONE_BEFORE = r"""(()=>{const set=(k,b)=>{const d=S.day-b;story().facts[k]={d,n:1,l:d}};S.rooms.lounge=Math.max(1,S.rooms.lounge|0);set('lounge_built_1',30);
  ['yj_meet','yj_look','yj_three','yj_chose','yj_move','yj_key','yj_key_seen','xq_oh'].forEach((k,i)=>set(k,34-i*2));
  ['wall_worry','wall_call','wall_photos','wall_jill','wall_visit','wall_wang','wall_setback','wall_report','wall_fee','wall_prep','wall_mediation','wall_settle','wall_paid','wall_article','wall_paper','wall_fixed'].forEach((k,i)=>set(k,Math.max(1,18-i)))})()"""
 
@@ -725,14 +746,20 @@ def _up_day(g, key, seed, tries=4):
 
 @test
 def v24_the_second_floor_is_a_story_before_it_is_a_room(b, port, target):
-    """P2 (second_floor_and_long_arcs §3–§16, implementation pass I): the era opens only after the wall, with the side
-    room and a grown restaurant; a regular's question first (no journal), the crew, the landlord's afternoon (Jill goes
-    up once; words only, no room), and only days after that the night of the missing cats. Nothing unlocks."""
+    """P2 (second_floor_and_long_arcs §3–§16, implementation pass I; the player's 10:25): the era opens after the Lounge
+    is finished — not after the wall — with the side room and a grown restaurant; a regular's question first (no
+    journal), the crew, the landlord's afternoon (Jill goes up once; words only, no room), and only days after that the
+    night of the missing cats. Nothing unlocks."""
     g = Game(b, port, target, seed=281, manual=True, viewport={'width': 390, 'height': 844})
     load_save(g, 'player_day52.json')
-    check(g.ev("eraOpen('up')") is False and g.ev("due('up_hint',null,0,'up')") is False, 'not before 怡君 and the wall')
+    check(g.ev("eraOpen('up')") is False and g.ev("due('up_hint',null,0,'up')") is False, 'not before the Lounge')
+    g.ev("(()=>{const d=S.day-20;for(const k of ['yj_meet','yj_key','wall_worry','wall_settle'])story().facts[k]={d,n:1,l:d}})()")
+    check(g.ev("eraOpen('up')") is False, "怡君's story and the wall done: still not — they open nothing upstairs")
+    g.ev("for(const k of ['yj_meet','yj_key','wall_worry','wall_settle'])delete story().facts[k]")
     g.ev(UP_DONE_BEFORE)
-    check(g.ev("eraOpen('up')") is True and g.ev("upCan()") is True, 'two days after the wall settled, with the side room and a crew of twelve')
+    check(g.ev("eraOpen('up')") is True and g.ev("upCan()") is True, 'the Lounge finished: open, with the side room and a crew of twelve')
+    g.ev("for(const k of Object.keys(story().facts))if(/^(yj_|wall_|xq_oh)/.test(k))delete story().facts[k]")
+    check(g.ev("eraOpen('up')") is True and g.ev("due('up_hint',null,0,'up')") is True, "and nothing of 怡君's or the wall's needed")
     g.ev("const s0=S.rooms.side;S.rooms.side=0;window.__c=upCan();S.rooms.side=s0")
     check(g.ev("__c") is False, 'no side room, no stairs, no story')
     check(g.ev("due('up_inspect','up_staff',2,'up')") is False and g.ev("due('up_door','up_inspect',3,'up')") is False, 'each step waits for the one before it')
@@ -906,7 +933,7 @@ def _reload(g):
 def v24_rc6_the_staff_room_comes_from_a_need_and_grows_in_place(b, port, target):
     """rc6 C–E, AQ, AK, AT: not before the open floor has been lived on a while; 《大家待的地方》 needs the restaurant's
     people (eight on its list, three of them 熟手 or more — by tenure class, so the legacy crew's two or three counted
-    days do not make them new), someone from outside introduced, two kinds of evidence. The project is offered after it,
+    days do not make them new), two kinds of evidence — nothing of 怡君's (the player's 10:25). The project is offered after it,
     Phase I is built by the next opening (walls and a door on the floor, the room's own view from then), save/reload
     while building keeps it; II and III come later, in the same room (the first day never moves), the next day each;
     a trace that belongs to someone's story only after it happened; one big job on the floor at a time."""
@@ -920,7 +947,7 @@ def v24_rc6_the_staff_room_comes_from_a_need_and_grows_in_place(b, port, target)
     check(g.ev("srCrewOK()") is True and g.ev("(S.crew||[]).filter(m=>crewLegacy(m)&&(m.days||0)<=3).length") >= 8, 'the legacy crew count as the people they are, not as two-day hires')
     check(g.ev("upKinds(SP_KINDS)") == 2 and g.ev("srStoryReady()") is True, 'two kinds of evidence (the box, the seat): ready')
     g.ev("story().facts.yj_meet=null;delete story().facts.yj_meet")
-    check(g.ev("srStoryReady()") is False, 'no one from outside introduced: not yet')
+    check(g.ev("srStoryReady()") is True, "nothing of 怡君's needed (the player's 10:25)")
     _floor(g, 8)
     check(g.ev("secUpRooms(1e9,()=>'')") == '', 'nothing in 店舖工程 before the story')
     _upf(g, 'sr_story', 0)
@@ -1427,6 +1454,425 @@ def v24_rc6_cats_visit_the_rooms_and_leave(b, port, target):
     check(W2("c.away==='staff'&&!c.upTo") >= 0, 'on the sofa')
     g.ev("setRoom('staff');forceDraw=true;__tick(1000/30)")
     check(W2("!upCatBusy(c)") >= 0, 'and back down')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc6_bar_bites_take_no_menu_slot(b, port, target):
+    """the player's 09:55 (their own Day 61 save, tests/saves/player_day61_0933.json): today's menu at its cap of 20 with
+    the Lounge's four bar bites on it as well — a dish turned off can be turned back on with one tap (the bar bites take
+    no slot, as the screen counts them); at the cap a tap says the menu is full and changes nothing."""
+    g = Game(b, port, target, seed=331, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day61_0933.json')
+    if g.ev("phase") == 'shop': g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(300)
+    g.ev("for(let i=0;i<30;i++){if(typeof DLG!=='undefined'&&DLG)dlgNext()}")
+    st = lambda: json.loads(g.ev("JSON.stringify({phase,count:menuCount(),cap:menuCap(),bars:S.menu.filter(d=>DISHES[d]&&DISHES[d].bar).length})"))
+    s0 = st()
+    check(s0['phase'] == 'prep' and s0['count'] == s0['cap'] and s0['bars'] >= 1, f'the save as the player had it: full, with bar bites: {s0}')
+    off = g.ev("S.menu.find(d=>!DISHES[d].bar&&DISHES[d].cat==='main'&&S.menu.filter(x=>DISHES[x].cat==='main').length>1)")
+    g.click(f'.menu-row [data-act=toggle][data-d="{off}"]'); g.page.wait_for_timeout(80)
+    check(st()['count'] == s0['cap'] - 1 and not g.ev(f"S.menu.includes('{off}')"), 'one dish off')
+    g.click(f'.menu-row [data-act=toggle][data-d="{off}"]'); g.page.wait_for_timeout(80)
+    check(g.ev(f"S.menu.includes('{off}')") and st()['count'] == s0['cap'], 'and back on with one tap')
+    more = g.ev("S.unlocked.find(d=>!S.menu.includes(d)&&!DISHES[d].bar)")
+    g.ev("document.querySelectorAll('#toasts>*').forEach(e=>e.remove())")
+    g.click(f'.menu-row [data-act=toggle][data-d="{more}"]'); g.page.wait_for_timeout(80)
+    toast = g.ev("[...document.querySelectorAll('#toasts>*')].map(e=>e.textContent).join('|')")
+    check(not g.ev(f"S.menu.includes('{more}')") and '菜單已滿' in toast and st()['count'] == s0['cap'], f'at the cap: a word, nothing changed: {toast}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc6_no_empty_sheet_over_a_service(b, port, target):
+    """the player's 09:59–10:01 (their Day 61 save): during a service a 「回到選單 ›」 pill left over from a 看店裡 uncovered
+    an empty sheet when tapped — the screen a step darker, every tap (the pause too) caught by nothing, until the app was
+    left. A sheet opening ends a peek (the pill goes); a service starts without the pill; the pill during a service never
+    uncovers an empty sheet; an empty sheet over a running service is taken away at once and the pause answers."""
+    g = Game(b, port, target, seed=331, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day61_0933.json')
+    if g.ev("phase") == 'shop': g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(300)
+    g.ev("for(let i=0;i<30;i++){if(typeof DLG!=='undefined'&&DLG)dlgNext()}"); _quiet(g)
+    pill = lambda: g.ev("!$('#peekPill').hidden")
+    # the way into it: 看店裡, then the HUD's button opens the settings over the peek; closed again
+    g.click('#screen [data-act=peek]'); g.page.wait_for_timeout(80)
+    check(pill() and g.ev("screenEl.hidden"), 'peeking')
+    g.click('#hPause'); g.page.wait_for_timeout(80)
+    check(not pill() and g.ev("sub==='settings'&&!screenEl.hidden"), 'the settings sheet ends the peek')
+    g.ev("closeSub()"); g.page.wait_for_timeout(80)
+    check(not pill() and g.ev("phase==='prep'&&!screenEl.hidden&&!!screenEl.querySelector('[data-act=start]')"), 'back to the preparation, no pill')
+    # a pill left on over the preparation however it got there: the service starts without it
+    g.ev("$('#peekPill').hidden=false")
+    to_service(g)
+    check(not pill(), 'a service starts with the pill gone')
+    # the pill on during the service by whatever way, and tapped: nothing empty is uncovered, the service goes on
+    g.ev("$('#peekPill').hidden=false")
+    g.click('#peekPill'); g.page.wait_for_timeout(80)
+    check(g.ev("screenEl.hidden&&!paused&&!sub"), 'the pill in a service goes back to the service')
+    # an empty sheet over the running service (any other way): gone within a few frames; the pause button answers
+    g.ev("screenEl.innerHTML='';screenEl.className='';screenEl.hidden=false")
+    t0 = g.ev("R.t"); g.page.evaluate('()=>{for(let i=0;i<20;i++)window.__tick(1000/30)}')
+    check(g.ev("screenEl.hidden") and g.ev("R.t") > t0, 'an empty sheet over a running service is taken away')
+    g.click('#hPause'); g.page.wait_for_timeout(80)
+    check(g.ev("paused&&sub==='pause'&&!screenEl.hidden&&!!screenEl.querySelector('[data-act=resume]')"), 'the pause works')
+    g.click('#screen [data-act=resume]'); g.page.wait_for_timeout(80)
+    check(g.ev("!paused&&screenEl.hidden"), 'and the service goes on')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc6_anan_works_the_lounge_first(b, port, target):
+    """the player's 10:06: 安安 is the Lounge's floor person and should need no setting up — a save whose 安安 lost the
+    Lounge job has it back after loading (once); hired again she comes at LV2 with the job, and the board shows her on
+    「Lounge 外場」 with nothing saying she will not do it; in a service, with an order waiting in the Lounge and one in the
+    dining room, she takes the Lounge's."""
+    raw = json.load(open(os.path.join(ROOT, 'tests', 'saves', 'player_day61_0933.json'), encoding='utf-8')); raw = raw.get('save', raw)
+    for m in raw['crew']:
+        if m['name'] == '安安': m['duties']['lounge'] = False
+    raw.pop('ananMig', None)
+    g = Game(b, port, target, seed=331, manual=True, viewport={'width': 390, 'height': 844})
+    g.ev("phase='title';R=null;localStorage.setItem(KEY,JSON.stringify(%s))" % json.dumps(raw, ensure_ascii=False)); g.reload(); g.page.wait_for_timeout(150)
+    g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(150)
+    check(g.ev("crewByName('安安').duties.lounge===true&&S.ananMig===1"), 'the Lounge job given back on loading')
+    g.ev("crewByName('安安').duties.lounge=false;save()"); _reload(g)
+    check(g.ev("crewByName('安安').duties.lounge===false"), 'once: a player who takes it off later keeps it off')
+    # hired again: LV2, with the job, on the board without a 「LV2 才會做」
+    g.ev("S.crew=S.crew.filter(m=>m.name!=='安安');S.money+=99999;doAct('hireLounge',null,'安安')")
+    a = json.loads(g.ev("JSON.stringify((()=>{const m=crewByName('安安');return m?{lv:m.lv,lounge:waiterDuties(m).lounge}:null})())"))
+    check(a and a['lv'] == 2 and a['lounge'], f'hired: {a}')
+    g.ev("shopTab='staff';showShop()"); g.page.wait_for_timeout(80)
+    row = g.ev("(document.querySelector('.brow[data-d=lounge]')||{}).innerText||''")
+    check('安安' in row and '才會做' not in row, f'the board: {row!r}')
+    # a service: an order in the Lounge and one in the dining room, both waiting; 安安 free — the Lounge's
+    if g.ev("phase") == 'shop': g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(200)
+    g.ev("for(let i=0;i<30;i++){if(typeof DLG!=='undefined'&&DLG)dlgNext()}"); _quiet(g); to_service(g)
+    g.ev("__botUntil('R.t>=R.dur*.2',90000,1/30)")
+    got = json.loads(g.ev("""JSON.stringify((()=>{const an=crewByName('安安');const w=R.cw[an.id];if(!w||!crewHere(an))return{err:'not here'};
+      const L=R.tables.find(t=>t.lounge&&!t.group&&!t.dirty&&!t.claim),M=R.tables.find(t=>!t.lounge&&!t.pdr&&!t.group&&!t.dirty&&!t.claim);if(!L||!M)return{err:'no free tables'};
+      for(const m of S.crew)if(m!==an&&R.cw[m.id])R.cw[m.id].cd=99;L.group={state:'order',id:-1};M.group={state:'order',id:-2};
+      if(w.task&&w.task.t)w.task.t.claim=null;if(w.task&&w.task.g)w.task.g.claim=null;w.task=null;w.busy=0;w.cd=0;const away=w.away;crewUpd(.016);
+      const t=w.task&&w.task.t;const r={k:w.task&&w.task.k,lounge:!!(t&&t.lounge),main:t===M,away:!!away};L.group=null;M.group=null;L.claim=null;M.claim=null;w.task=null;for(const m of S.crew)if(R.cw[m.id])R.cw[m.id].cd=0;return r})())"""))
+    check(got.get('k') == 'order' and got.get('lounge'), f'the Lounge first: {got}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+HOLD_SNAP = r"""JSON.stringify({t:+R.t.toFixed(4),rev:R.st.rev,tickets:R.tickets.map(t=>[t.id,t.items.map(i=>i.st+(i.picked?'p':'')).join('')]).join('|'),
+  groups:R.groups.map(g=>[g.id,g.state,+(g.pat||0).toFixed(4),g.table]).join('|'),slots:R.slots.map(s=>s.job?[s.job.d,s.job.si,+((s.job.step&&s.job.step.p)||0).toFixed(4)].join(','):'-').join('|'),
+  room,paused,clock:clockStr()})"""
+
+
+def _frames(g, n, dt='1000/30'):
+    g.page.evaluate(f'()=>{{for(let i=0;i<{n};i++)window.__tick({dt})}}')
+
+
+@test
+def v24_rc6_an_authored_beat_holds_the_service_until_it_is_read(b, port, target):
+    """the player's 10:32: an authored story beat during a busy service (晴 & 阿拓's 「炸雞好了沒？」, through the arbiter)
+    holds the restaurant — the service clock, the orders, every guest's patience, the cooks — under a panel that says
+    so; the player can take as long as they like; a line moves only on a tap (a second tap at once never skips one); every
+    line of the beat is shown once, in order, and nothing else; pausing and resuming the game meanwhile changes nothing;
+    when the last line is read the service goes on from the very same state, on the room the player was looking at; the
+    beat happened once, its lines are what its story page keeps. An ambient moment still happens in the room in real
+    time. The panel at phone size: the box inside the screen, the chip above it, readable text. Bookings upstairs: a
+    party in the Private Dining Room is held too and is exactly where it was afterwards."""
+    g = Game(b, port, target, seed=331, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day61_0933.json')
+    if g.ev("phase") == 'shop': g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(300)
+    g.ev("for(let i=0;i<30;i++){if(typeof DLG!=='undefined'&&DLG)dlgNext()}"); _quiet(g); to_service(g)
+    g.ev("__botUntil('R.t>=R.dur*.4',90000,1/30)")
+    busy = json.loads(g.ev("JSON.stringify({g:R.groups.length,t:R.tickets.length,q:!!qingOn(),tuo:!!tuoOn()})"))
+    check(busy['g'] >= 8 and busy['q'] and busy['tuo'], f'a busy evening, 晴 and 阿拓 at work: {busy}')
+    # nothing else of the stories tonight (the day's budget spent), and what was already said in the room finished — then
+    # the panel is on, as it is in play
+    g.ev("const d=storyDay();d.major=9;d.minor=9;d.v24=9"); _frames(g, 300)
+    g.ev("window.__holds=true;delete story().ev.qt_1;delete story().facts.qt_1;delete (story().beatLines||{}).qt_1;storyDay().minor=0;"
+         "const E=STORY_EV.find(e=>e.k==='qt_1');E.__w=E.when;E.when=()=>true;room='kitchen';renderRoomTabs(true)")
+    before = json.loads(g.ev(HOLD_SNAP))
+    fired = g.ev("storyTick('order',{})")
+    check(fired == 'qt_1', f'the arbiter fires the beat in the service: {fired}')
+    st = json.loads(g.ev("JSON.stringify({open:!!DLG&&!!DLG.sh&&DLG.hold,vis:!$('#dlg').hidden,chip:$('#dlg .dlg-hold').hidden?'':$('#dlg .dlg-hold').textContent,i:DLG&&DLG.i,text:$('#dlg .dlg-text').textContent,cls:$('#dlg').className})"))
+    check(st['open'] and st['vis'] and '店裡暫停中' in st['chip'] and g.ev("$('#dlg .dlg-hold').classList.contains('ps')") and '晴' in st['chip'] and st['i'] == 0 and st['text'] == '炸雞好了沒？', f'the panel, at once, says the restaurant is held: {st}')
+    # held: three seconds, then a whole minute, and nothing in the restaurant moves
+    _frames(g, 90)
+    s3 = json.loads(g.ev(HOLD_SNAP))
+    check({k: s3[k] for k in s3 if k != 'room'} == {k: before[k] for k in before if k != 'room'}, f'held for three seconds: {before} -> {s3}')
+    _frames(g, 60, '1000')
+    s60 = json.loads(g.ev(HOLD_SNAP))
+    check({k: s60[k] for k in s60 if k != 'room'} == {k: before[k] for k in before if k != 'room'} and g.ev("!!DLG&&DLG.i===0"), f'a minute later: still the first line, still held: {before} -> {s60} {g.ev("JSON.stringify(DLG&&{i:DLG.i,n:DLG.lines.length})")}')
+    # a tap moves one line; a second tap at once does not
+    g.click('#dlg'); g.click('#dlg')
+    check(g.ev("DLG.i") == 1, 'one line per tap, never two')
+    # the app left and come back to (three times) in the middle of it: the pause comes up under the panel; nothing
+    # changes, nothing doubles
+    for i in range(3):
+        g.ev("Object.defineProperty(document,'hidden',{value:true,configurable:true});document.dispatchEvent(new Event('visibilitychange'))")
+        _frames(g, 10)
+        g.ev("Object.defineProperty(document,'hidden',{value:false,configurable:true});document.dispatchEvent(new Event('visibilitychange'))")
+        _frames(g, 10)
+    check(g.ev("!!DLG&&DLG.i===1&&paused&&sub==='pause'") and json.loads(g.ev(HOLD_SNAP))['t'] == before['t'], 'left and come back to three times: the same line, still held, the pause waiting under it')
+    shown = [g.ev("$('#dlg .dlg-text').textContent")]
+    for _ in range(12):
+        if not g.ev("!!DLG"): break
+        _frames(g, 10)
+        g.click('#dlg')
+        if g.ev("!!DLG"): shown.append(g.ev("$('#dlg .dlg-text').textContent"))
+    script = ['看起來好了。', '妳跟 Hugo 講一樣的話。', '那代表我們兩個都正常。']
+    check(shown[-3:] == script and len(shown) == 4 and g.ev("!DLG&&$('#dlg').hidden"), f'every line once, in order, then closed: {shown}')
+    check(g.ev("paused&&sub==='pause'&&!screenEl.hidden"), 'the pause from leaving the app is there after the story')
+    g.click('#screen [data-act=resume]'); g.page.wait_for_timeout(40)
+    after = json.loads(g.ev(HOLD_SNAP))
+    check(after == before, f'the service exactly as it was, on the room that was being looked at: {before} -> {after}')
+    log = json.loads(g.ev("JSON.stringify(dayLog().map(l=>l.t))"))
+    check(all(log.count(t) == 1 for t in ['炸雞好了沒？', '沒有。'] + script), 'each line in the day\'s log once')
+    check(g.ev("evState('qt_1').n===1&&fact('qt_1').n===1") is True, 'the beat happened once')
+    kept = json.loads(g.ev("JSON.stringify(story().beatLines.qt_1)"))
+    check([x['t'] for x in kept] == ['炸雞好了沒？', '沒有。'] + script and {x['w'] for x in kept} == {'沈晴', '阿拓'}, f'its page keeps exactly its lines: {kept}')
+    _frames(g, 30)
+    check(json.loads(g.ev(HOLD_SNAP))['t'] > before['t'], 'and the service goes on')
+    # an ambient moment: in the room, in real time, nothing held
+    g.ev("delete story().ev.hugo_tuo;const E=STORY_EV.find(e=>e.k==='hugo_tuo');E.__w=E.when;E.when=()=>true")
+    t0 = g.ev("R.t"); fired = g.ev("storyTick('order',{})")
+    _frames(g, 120)
+    amb = json.loads(g.ev("JSON.stringify({dlg:!!DLG,log:dayLog().slice(-30).map(l=>l.t)})"))
+    check(fired == 'hugo_tuo' and not amb['dlg'] and g.ev("R.t") > t0 + 2 and '你炸的比較快。' in amb['log'] and '油比較熱。' in amb['log'], f'an ambient moment is not held: {fired} {amb}')
+    # the panel at phone size
+    g.ev("delete story().ev.qt_1;delete story().facts.qt_1;storyDay().minor=0;storyTick('order',{})")
+    lay = json.loads(g.ev("""JSON.stringify((()=>{const b=$('#dlg .dlg-box').getBoundingClientRect(),c=$('#dlg .dlg-hold').getBoundingClientRect(),t=$('#dlg .dlg-text');return{box:[b.left,b.top,b.right,b.bottom],chip:[c.left,c.top,c.right,c.bottom],fs:parseFloat(getComputedStyle(t).fontSize),W:innerWidth,H:innerHeight}})())"""))
+    check(lay['box'][0] >= 0 and lay['box'][2] <= lay['W'] and lay['box'][3] <= lay['H'] and lay['chip'][3] < lay['box'][1] and lay['chip'][1] >= 0 and lay['fs'] >= 15, f'readable at 390×844: {lay}')
+    os.makedirs(os.path.join(ROOT, 'docs', 'evidence', 'v24_rc6'), exist_ok=True)
+    g.page.screenshot(path=os.path.join(ROOT, 'docs', 'evidence', 'v24_rc6', 'story_hold_phone.png'))
+    while g.ev("!!DLG"):
+        _frames(g, 10); g.click('#dlg')
+    g.ev("for(const k of ['qt_1','hugo_tuo']){const E=STORY_EV.find(e=>e.k===k);E.when=E.__w}")
+    check(not g.errors, g.errors[:3]); g.close()
+    # the Private Dining Room: a booked party is held with the rest and is where it was afterwards
+    g = Game(b, port, target, seed=301, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day61.json')
+    _floor(g, 50); g.ev(PD_OPEN); _quiet(g); to_service(g)
+    g.ev("__botUntil('R.t>=R.dur*.2',90000,1/30)")
+    g.ev("pdSeated({size:5,pdWalk:1},pdTable())")
+    _frames(g, 30)
+    g.ev("const d=storyDay();d.major=9;d.minor=9;d.v24=9"); _frames(g, 300)
+    g.ev("window.__holds=true;room='pdr';renderRoomTabs(true);storyDay().minor=0;STORY_EV.push({k:'pd__hold_t',lane:'minor',at:['order'],when:()=>true,run:()=>{JILL_SAY('包廂那桌點好了嗎？',300);noteLine('（測試用的一段。）')}})")
+    pd0 = json.loads(g.ev("JSON.stringify((()=>{const t=pdTable(),q=t&&t.group;return{st:q&&q.state,pat:q&&+q.pat.toFixed(4),tk:q&&q.ticket?q.ticket.items.map(i=>i.st).join(''):null,room,t:+R.t.toFixed(4)}})())"))
+    check(g.ev("storyTick('order',{})") == 'pd__hold_t' and g.ev("!!DLG&&DLG.hold"), 'held, upstairs too')
+    _frames(g, 90)
+    for _ in range(4):
+        if not g.ev("!!DLG"): break
+        _frames(g, 10); g.click('#dlg')
+    pd1 = json.loads(g.ev("JSON.stringify((()=>{const t=pdTable(),q=t&&t.group;return{st:q&&q.state,pat:q&&+q.pat.toFixed(4),tk:q&&q.ticket?q.ticket.items.map(i=>i.st).join(''):null,room,t:+R.t.toFixed(4)}})())"))
+    check(pd0['st'] is not None and pd1 == pd0 and not g.ev("!!DLG"), f'the party upstairs exactly where it was, the view still upstairs: {pd0} -> {pd1}')
+    g.ev("STORY_EV.splice(STORY_EV.findIndex(e=>e.k==='pd__hold_t'),1)")
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc6_story_pages_keep_only_their_own_lines(b, port, target):
+    """the player's 10:08 (their Day 67 save): Sophie and Mia's first page showed Jill's 「哪隻？」 (said to a guest about a
+    cat) and another line of Sophie's mixed into 「妳也常來？」「……妳不是也一樣。」. Loading cleans a page down to the lines
+    its beat says (a page whose words all come from elsewhere is left as it is); in play, a page keeps what its beat's
+    own code said — not what its people happened to say meanwhile."""
+    g = Game(b, port, target, seed=67, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day67_1016.json')
+    sm = json.loads(g.ev("JSON.stringify(story().beatLines.sm_a)"))
+    check(sm == [{'w': 'Mia', 't': '妳也常來？'}, {'w': 'Sophie', 't': '……妳不是也一樣。'}], f'the first page, cleaned: {sm}')
+    bad = json.loads(g.ev("JSON.stringify(Object.entries(story().beatLines).filter(([k,a])=>{const src=beatSrcOf(k);return src&&a.some(x=>beatLineOk(src,x.t))&&a.some(x=>!beatLineOk(src,x.t))}).map(([k])=>k))"))
+    check(bad == [], f'no page keeps a line its beat does not say: {bad}')
+    check(g.ev("story().blMig") == 1, 'once')
+    # in play (no panel in this test): Jill says something else right after the beat began — not on the page
+    g.ev("delete story().beatLines.sm_a")
+    if g.ev("phase") == 'shop': g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(300)
+    g.ev("for(let i=0;i<30;i++){if(typeof DLG!=='undefined'&&DLG)dlgNext()}"); _quiet(g); to_service(g)
+    g.ev("__botUntil('R.t>=R.dur*.3',90000,1/30)")
+    r = json.loads(g.ev("""JSON.stringify((()=>{const gs=R.groups.filter(q=>q.table!=null&&q.state!=='leave');if(gs.length<2)return{skip:1};const m=gs[0],s0=gs[1];
+      const E=STORY_EV.find(e=>e.k==='sm_a');shStart('sm_a',false,null,()=>{sayG(m,'妳也常來？',600);sayG(s0,'……妳不是也一樣。',2200)});jillSay('哪隻？');return{ok:1}})())"""))
+    _frames(g, 120)
+    kept = json.loads(g.ev("JSON.stringify((story().beatLines||{}).sm_a||null)"))
+    check(r.get('skip') or [x['t'] for x in kept] == ['妳也常來？', '……妳不是也一樣。'], f'only the beat\'s own: {kept}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+def _lazy_days(g, n, seedbase, each=None):
+    seed = "Math.random=(function(){let a=%d;return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}})()"
+    for d in range(n):
+        if g.ev("phase") == 'summary':
+            g.click('[data-act=toShop]'); g.page.wait_for_timeout(60)
+        if g.ev("phase") == 'shop':
+            g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(100)
+        g.ev("for(let i=0;i<30;i++){if(typeof DLG!=='undefined'&&DLG)dlgNext()}")
+        g.ev(seed % (seedbase + d)); g.ev("S.today.sugKey=null;S.today.sug=null;autoStock()")
+        start_day(g); install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;window.__noScenes=true")
+        for _ in range(1200):
+            r = g.page.evaluate('()=>window.__bot(150,1/30)')
+            if g.ev("phase") != 'service' or not g.ev("!!R"): break
+            if r['ticks'] < 150: break
+        if g.ev("phase") == 'service':
+            g.ev("closeShop('x');for(const q of R.groups.slice())leaveGroup(q,'ok')"); g.page.evaluate('()=>window.__bot(400,1/30)')
+        if g.ev("phase") == 'service': g.ev("finishClosing()")
+        if each: each(g)
+
+
+@test
+def v24_rc6_sophie_and_mia_begin(b, port, target):
+    """the player's 10:05 (their Day 61 save: Sophie 31 visits, Mia 17, in the room on the same evening once in a
+    fortnight, their story not begun): two who have both been coming for weeks have noticed each other, and the evenings
+    bring them in together now and then until it begins — 「妳也常來？」 within a few days; once, as written."""
+    g = Game(b, port, target, seed=331, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day61_0933.json')
+    g.ev("window.__fastSay=1")
+    check(not g.ev("!!fact('sm_a')") and g.ev("smLongKnown()") is True, 'not begun; they have been around each other long enough')
+    days = []
+    _lazy_days(g, 5, 9100, lambda g: days.append(json.loads(g.ev("JSON.stringify({d:S.day,sm:!!fact('sm_a'),co:relN('sophie','mia','copresent')})"))))
+    first = next((x['d'] for x in days if x['sm']), None)
+    check(first is not None and first <= days[0]['d'] + 4, f'begun within five days: {days}')
+    check(g.ev("fact('sm_a').n") == 1 and json.loads(g.ev("JSON.stringify((story().beatLines.sm_a||[]).map(x=>x.t))")) == ['妳也常來？', '……妳不是也一樣。'], 'once, its own two lines on its page')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc6_a_finished_lounge_opens_the_floor_in_a_mature_save(b, port, target):
+    """the player's 10:25, the legacy check (their Day 67 save: the Lounge finished on Day 57, 《那面牆》 begun on Day 65,
+    nothing of the Second Floor yet): the floor's era is open on loading; the next days bring its first beat, then the
+    next — one at a time, never two of its beats on a day, never two major beats on a day — while the wall goes on."""
+    g = Game(b, port, target, seed=67, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day67_1016.json')
+    g.ev("window.__fastSay=1")
+    check(g.ev("eraOpen('up')") is True and g.ev("eraOpenDay('up')") == 59 and not g.ev("!!fact('up_hint')") and g.ev("!!fact('wall_worry')&&!fact('wall_settle')") is True,
+          'open on loading (the Lounge on Day 57, two days), nothing of it yet, the wall under way')
+    rows = []
+    _lazy_days(g, 4, 6700, lambda g: rows.append(json.loads(g.ev(
+        "JSON.stringify({d:S.day,up:Object.keys(story().facts).filter(k=>/^(up_|sp_)/.test(k)&&story().facts[k].d===S.day),wall:Object.keys(story().facts).filter(k=>/^wall_/.test(k)&&story().facts[k].d===S.day),major:storyDay().major})"))))
+    ups = [k for r in rows for k in r['up'] if k in ('up_hint', 'up_staff', 'up_inspect', 'up_door')]
+    check('up_hint' in ups, f'the first beat came: {rows}')
+    order = ['up_hint', 'up_staff', 'up_inspect', 'up_door']
+    check(ups == order[:len(ups)], f'in its order: {ups}')
+    check(all(len([k for k in r['up'] if k in ('up_hint', 'up_staff', 'up_inspect', 'up_door', 'up_busy', 'up_remind', 'up_ask')]) <= 1 for r in rows), f'one of its beats a day at most: {rows}')
+    check(all(r['major'] <= 1 for r in rows), f'never two major beats on a day: {rows}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc6_new_things_are_talked_about(b, port, target):
+    """the player's 09:39 (「怎麼這麼少對酒吧開張的評論啊 有新增什麼東西都可以評論」): what is new is talked about — in its first
+    days often, by whoever sits down, in their room's words (in the Lounge about the Lounge, elsewhere about the Lounge
+    behind) — and a week later not at all; each word once a day at most."""
+    def evening(g, age):
+        g.ev(f"S.newRooms.lounge2=S.day-{age};S.newRooms.lounge=S.day-{age}-3")
+        if g.ev("phase") == 'shop': g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(300)
+        g.ev("for(let i=0;i<30;i++){if(typeof DLG!=='undefined'&&DLG)dlgNext()}"); _quiet(g)
+        g.ev(f"S.newRooms.lounge2=S.day-{age};S.newRooms.lounge=S.day-{age}-3")
+        to_service(g); g.ev("window.__fastSay=1")
+        g.ev("__botUntil('R.t>=R.dur*.7',120000,1/30)")
+        all2 = json.loads(g.ev("JSON.stringify([].concat(...NOVELTY.filter(T=>/^lounge/.test(T.k)).map(T=>(T.here||[]).concat(T.away||[]))))"))
+        log = json.loads(g.ev("JSON.stringify(dayLog().map(l=>l.t))"))
+        return [t for t in log if t in all2]
+    g = Game(b, port, target, seed=331, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day61_0933.json')
+    said = evening(g, 0)
+    check(len(said) >= 3, f'the Lounge\'s new stage, its first evening: talked about ({said})')
+    check(len(said) == len(set(said)), f'each word once: {said}')
+    g.close()
+    g = Game(b, port, target, seed=331, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day61_0933.json')
+    said7 = evening(g, 9)
+    check(said7 == [], f'nine days on: nothing ({said7})')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+def _act2(g, a, k=None, d=None):
+    g.ev(f"doAct('{a}',{json.dumps(d)},{json.dumps(k)},document.createElement('button'))")
+
+
+@test
+def v24_rc6_more_to_spend_on(b, port, target):
+    """the player's 10:21 (「我已經沒有地方可以花錢了」, their Day 67 save) and 10:40 (「你就一起放」): the Lounge's list grows by
+    research (the oldest bottle wants the cellar) and the player chooses tonight's (never none; the Lounge pours only
+    those); four dream works — the cellar (wines of the second and third stages +10%, a second glass now and then), the
+    piano (a music night about one in three: more stay after dinner), the dry-ageing cabinet (the beef dishes +8%, more
+    ordered), the painting (+2) — each needing what it says; four seasonal sets, one out at a time (+1); three contracts,
+    each a signing fee and a fee a day taken at the summary (on its ledger), their dishes +8% and more ordered, ended at
+    any time; a wine course for a waiter (and a floor at ease with wine sells a glass with dinner more often); the
+    Lounge's own people are trained one level a day."""
+    g = Game(b, port, target, seed=67, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day67_1016.json')
+    g.ev("S.money=3000000")
+    m0 = g.ev("S.money")
+    # the list
+    _act2(g, 'wineDev', 'w_rose'); _act2(g, 'wineDev', 'w_old')
+    check(g.ev("wineHas('w_rose')&&!wineHas('w_old')&&wineAvail().includes('w_rose')") is True and g.ev("S.money") == m0 - 22000, 'researched; the oldest waits for the cellar')
+    for k in json.loads(g.ev("JSON.stringify(wineAvail())")):
+        _act2(g, 'wineT', k)
+    left = json.loads(g.ev("JSON.stringify(wineList())"))
+    check(len(left) == 1 and g.ev("Object.keys(S.wineOff).length") == len(json.loads(g.ev("JSON.stringify(wineAvail())"))) - 1, f'never none: {left}')
+    g.ev("S.wineOff={w_white:1,w_lred:1}")
+    poured = json.loads(g.ev("JSON.stringify((()=>{const out=new Set();for(let i=0;i<300;i++)for(const d of loungeOrder({size:2,type:'office'}))if(WINES[d])out.add(d);return[...out]})())"))
+    check(poured and 'w_white' not in poured and 'w_lred' not in poured and all(p in json.loads(g.ev("JSON.stringify(wineList())")) for p in poured), f'the Lounge pours only tonight\'s: {poured}')
+    # the dream works
+    p0 = json.loads(g.ev("JSON.stringify({steak:priceOf('steak'),fred:priceOf('w_fred'),spark:priceOf('w_spark'),amb:ambience(),wSteak:demandW('steak',TYPES.office)})"))
+    for k in ['cellar', 'piano', 'dryage', 'painting']:
+        _act2(g, 'buyProject', k); g.ev("hideReveal()")
+    on = json.loads(g.ev("JSON.stringify(['cellar','piano','dryage','painting'].map(projOn))"))
+    p1 = json.loads(g.ev("JSON.stringify({steak:priceOf('steak'),fred:priceOf('w_fred'),spark:priceOf('w_spark'),amb:ambience(),wSteak:demandW('steak',TYPES.office)})"))
+    check(all(on), f'built: {on}')
+    check(abs(p1['steak'] / p0['steak'] - 1.08) < .03 and abs(p1['fred'] / p0['fred'] - 1.1) < .03 and p1['spark'] == p0['spark'] and p1['wSteak'] > p0['wSteak'] * 1.1, f'the cabinet and the cellar: {p0} -> {p1}')
+    check(p1['amb'] == p0['amb'] + 2, f'the painting: {p0["amb"]} -> {p1["amb"]}')
+    _act2(g, 'wineDev', 'w_old')
+    check(g.ev("wineHas('w_old')") is True, 'the oldest bottle, now that there is a cellar')
+    nights = g.ev("(()=>{let n=0;const d0=S.day;for(let i=0;i<60;i++){S.day=d0+i;if(pianoNight())n++}S.day=d0;return n})()")
+    check(14 <= nights <= 26, f'a music night about one in three: {nights}/60')
+    g.ev("window.__pn=pianoNight")
+    r = json.loads(g.ev("(()=>{R=R||null;const g0={type:'couple',pat:1};pianoNight=()=>false;const fake={closed:false,t:50,dur:100};const R0=R;R=fake;const a=loungeAfterP(g0);pianoNight=()=>true;const b=loungeAfterP(g0);pianoNight=window.__pn;R=R0;return JSON.stringify([a,b])})()"))
+    check(r[1] >= r[0] * 1.2 or r[1] == .9, f'more stay on a music night: {r}')
+    g.ev("const nf=document.createElement('div')")
+    # the seasons
+    a0 = g.ev("ambience()")
+    _act2(g, 'buySeason', 'autumn')
+    check(g.ev("seasonOn()") == 'autumn' and g.ev("ambience()") == a0 + 1, 'the autumn set out (+1)')
+    _act2(g, 'seasonUse', ''); check(g.ev("seasonOn()") is None and g.ev("ambience()") == a0, 'put away')
+    _act2(g, 'seasonUse', 'spring'); check(g.ev("seasonOn()") is None, 'a set not bought cannot be put out')
+    # the contracts and the course
+    d0 = g.ev("priceOf('duck')")
+    _act2(g, 'contractSign', 'ranch')
+    check(g.ev("contractOn('ranch')&&contractFee()===1400") is True and abs(g.ev("priceOf('duck')") / d0 - 1.08) < .03, 'the ranch: its dishes +8%, a fee a day')
+    wt = g.ev("(S.crew.find(m=>m.role==='waiter'&&(m.wine||0)<40)||{}).id")
+    if wt:
+        b0 = g.ev("wineFloorBoost()")
+        _act2(g, 'wineCourse', wt)
+        check(g.ev(f"S.crew.find(m=>m.id==='{wt}').wine") == 40 and g.ev("wineFloorBoost()") > b0, 'a waiter at ease with wine after the course; the floor sells more glasses')
+    lg = g.ev("(S.crew.find(m=>crewPool(m)==='lounge'&&m.lv<5)||(()=>{const m=S.crew.find(m=>crewPool(m)==='lounge');m.lv=2;return m})()).id")
+    lv0 = g.ev(f"S.crew.find(m=>m.id==='{lg}').lv")
+    _act2(g, 'crewUp', lg); _act2(g, 'crewUp', lg)
+    check(g.ev(f"S.crew.find(m=>m.id==='{lg}').lv") == lv0 + 1, 'the Lounge\'s people: one level a day')
+    # the fee at the end of the day, on the ledger
+    g.ev("if(S.phase==='prep')showPrep()"); g.page.wait_for_timeout(200)
+    if g.ev("phase") == 'shop': g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(300)
+    g.ev("for(let i=0;i<30;i++){if(typeof DLG!=='undefined'&&DLG)dlgNext()}"); _quiet(g); to_service(g); g.ev("window.__fastSay=1")
+    g.ev("__botUntil('R.t>=R.dur*.3',90000,1/30)")
+    g.ev("closeShop('x');for(const q of R.groups.slice())leaveGroup(q,'ok')"); g.page.evaluate('()=>window.__bot(600,1/30)')
+    if g.ev("phase") == 'service': g.ev("finishClosing()")
+    g.page.wait_for_timeout(200)
+    check(g.ev("S.lastSummary.cfee") == 1400 and '食材契作' in g.ev("document.querySelector('#screen .ledger').innerText"), 'the day\'s fee on the summary')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc6_new_places_have_their_photos(b, port, target):
+    """the player's 10:16 (「相簿沒有任何酒吧的照片欸？以後你每個新的空間應該也要有幾個主題是可以拍照的」): the Lounge has its own
+    moments for the album (the bar full of an evening, the sofa table, the corner, a music night), and so do the floor
+    upstairs, the Staff Room and the Private Dining Room; a photo is taken when its room is the one on screen."""
+    g = Game(b, port, target, seed=67, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day67_1016.json')
+    kinds = json.loads(g.ev("JSON.stringify(['lgbar','lgsofa','lgquiet','lgpiano','upwin','upcats','srpool','srdoze','srcat','pdparty'].filter(k=>MEMS[k]&&MEM_TXT[k]))"))
+    check(len(kinds) == 10, f'ten new moments, each with its caption and its line: {kinds}')
+    g.ev("if(S.phase==='prep')showPrep()"); g.page.wait_for_timeout(200)
+    if g.ev("phase") == 'shop': g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(300)
+    g.ev("for(let i=0;i<30;i++){if(typeof DLG!=='undefined'&&DLG)dlgNext()}"); _quiet(g); to_service(g); g.ev("window.__fastSay=1")
+    g.ev("room='lounge';renderRoomTabs(true)")
+    got = []
+    for frac in (.5, .6, .7, .8):
+        g.ev(f"room='lounge';__botUntil('R.t>=R.dur*{frac}',90000,1/30)"); g.ev("forceDraw=true"); _frames(g, 3)
+        got = json.loads(g.ev("JSON.stringify(albumList().filter(p=>p.day===S.day&&/^lg/.test(p.kind)).map(p=>p.kind))"))
+        if got: break
+    check(got, f'a Lounge evening, looked at: a photo of it ({got})')
     check(not g.errors, g.errors[:3]); g.close()
 
 

@@ -1,0 +1,310 @@
+(Filed verbatim. 2026-10-02 10:32, the player — an attachment: how an authored story beat is presented, during a service or not. Read with the code's storyTick, scene(), STORY_HOLD and the audit in docs/v24/story_presentation_audit_2026-10-02.md.)
+
+IMPORTANT CORRECTION — AUTHORED STORY PRESENTATION
+
+Please revise my previous narrative-timing instruction.
+
+I do NOT want the solution to be:
+“important stories should generally be moved outside restaurant service.”
+
+That was the wrong framing.
+
+The actual problem is:
+
+WHEN AN IMPORTANT AUTHORED STORY BEAT OCCURS,
+THE PLAYER SHOULD NOT HAVE TO MANAGE THE RESTAURANT AT THE SAME TIME.
+
+==================================================
+NEW CORE RULE
+==================================================
+
+Important authored story beats MAY happen during active restaurant service.
+
+In fact, some of them SHOULD happen during service when the restaurant/work context is narratively important.
+
+However:
+
+WHEN A MEANINGFUL AUTHORED STORY BEAT STARTS:
+
+→ PAUSE / FREEZE ACTIVE RESTAURANT GAMEPLAY
+→ stop gameplay time from progressing
+→ stop order timers / service pressure from progressing
+→ present the story clearly
+→ require PLAYER INPUT to advance dialogue / pages
+→ do NOT auto-advance meaningful dialogue
+→ after the authored beat is finished, resume the restaurant exactly where it paused
+
+The player should be able to stop managing the restaurant, read the story comfortably, manually advance it, and then return to service.
+
+The player should NEVER need to think:
+
+“Was there just a story happening while I was serving customers?”
+
+or:
+
+“I need to keep watching the screen because a story might suddenly disappear.”
+
+==================================================
+PLAYER-CONTROLLED ADVANCEMENT
+==================================================
+
+For meaningful authored dialogue:
+
+DO NOT let important lines disappear automatically.
+
+The player must explicitly:
+- tap / click to continue
+- advance to the next line / page / dialogue state
+
+The story remains on screen until the player advances it.
+
+If there is a Story Illustration / Event CG:
+- pause gameplay
+- keep it visible
+- player explicitly continues/closes it
+
+The player controls reading speed.
+
+No important authored story should be lost because the player was:
+- serving food
+- reading orders
+- switching rooms
+- managing inventory
+- handling Lounge
+- looking somewhere else on screen
+
+==================================================
+DURING-SERVICE STORIES
+==================================================
+
+Do NOT move a story outside service merely because it is important.
+
+Inspect the actual content.
+
+If the restaurant operating is part of the scene, KEEP IT during service.
+
+Example:
+
+沈晴 × 阿拓
+
+If their relationship develops through:
+- bartending together
+- covering each other's work
+- passing things
+- noticing each other's workflow
+- helping during service
+- work-related chemistry
+
+those beats SHOULD remain during Lounge service.
+
+When a meaningful authored beat triggers:
+pause gameplay → show the scene → player advances → resume service.
+
+This preserves BOTH:
+- the correct narrative context
+- the player's ability to actually read it
+
+==================================================
+CUSTOMER STORIES
+==================================================
+
+Same principle.
+
+If a customer story naturally happens:
+- when arriving
+- when seated
+- while ordering
+- while eating
+- while interacting with another customer
+- because of something happening in the restaurant
+
+KEEP IT there.
+
+Pause gameplay for the meaningful authored portion.
+
+Do not artificially keep everyone until closing just to make story presentation easier.
+
+==================================================
+AFTER-CLOSING / BEFORE-OPENING STORIES
+==================================================
+
+These windows are STILL useful, but only when the CONTENT naturally belongs there.
+
+For example:
+
+《那面牆》
+
+Some substantial discussions may naturally happen after closing:
+- looking carefully at photos/evidence
+- Mia discussing repair traces
+- Sophie reconstructing the timeline
+- 王先生 discussing suspicion vs proof
+- legal next steps
+- 怡君 making decisions
+
+If after closing is narratively natural, use it.
+
+Likewise Second Floor exploration/searching for 柔柔 and 小齁 may naturally fit near/after closing.
+
+But:
+
+DO NOT move scenes after closing simply because it is technically easier.
+
+Story context determines WHEN the event happens.
+
+The pause/manual-advance system ensures the player can read it even if the correct context is during service.
+
+==================================================
+CRITICAL DISTINCTION: AUTHORED STORY vs AMBIENT LIFE
+==================================================
+
+AUTHORED STORY BEAT:
+- meaningful progression
+- important character development
+- relationship progression
+- story facts the player should understand
+- important dialogue
+- Story Illustration / Event CG
+
+→ PAUSE GAMEPLAY
+→ PLAYER-CONTROLLED ADVANCEMENT
+→ NOT MISSABLE
+
+AMBIENT LIFE:
+- cat interactions
+- Jill ↔ cat micro-interactions
+- customer ↔ cat behavior
+- tiny staff interactions
+- casual greetings
+- one-line flavor dialogue
+- visual workplace chemistry
+- ordinary restaurant life
+- callbacks that do not advance important story state
+
+→ DO NOT pause gameplay
+→ may occur in realtime
+→ may be missable
+→ should make the restaurant feel alive
+
+Do not pause the restaurant every time somebody says one casual sentence.
+
+==================================================
+IMPORTANT UX REQUIREMENT
+==================================================
+
+The transition into an authored story must be unmistakable.
+
+When it begins, the player should immediately understand:
+
+“The restaurant is paused. I can read this now.”
+
+Do not leave active order timers visually appearing to run behind the story.
+
+Do not require the player to rush through dialogue because customers are waiting.
+
+Do not automatically resume until the authored sequence is actually complete.
+
+After completion:
+restore the exact gameplay state safely and resume normal service.
+
+==================================================
+AUDIT EXISTING STORIES
+==================================================
+
+Please inspect existing story beats and classify them based on actual content:
+
+A. AUTHORED / NON-MISSABLE
+→ pause + manual advancement
+
+B. AMBIENT / MISSABLE
+→ realtime, no pause
+
+Separately determine the narratively correct setting:
+
+- BEFORE OPENING
+- DURING SERVICE
+- LATE SERVICE
+- AFTER CLOSING
+
+These are TWO DIFFERENT decisions.
+
+Do not confuse:
+“when does this scene naturally happen?”
+with:
+“does gameplay pause while I read it?”
+
+==================================================
+IF AMBIGUOUS
+==================================================
+
+If you genuinely cannot determine whether an existing interaction should be:
+
+AUTHORED / NON-MISSABLE
+or
+AMBIENT / MISSABLE
+
+ASK ME.
+
+Tell me:
+- which event
+- what happens in it
+- your recommended classification
+- why
+
+BUT DO NOT STOP WORK.
+
+REPORT / QUESTION ≠ STOP.
+
+Mark only that decision as pending.
+Continue all other safe and defined RC6 work.
+
+If I reply while you are working:
+incorporate my answer and revise that event if necessary.
+
+If I have not replied:
+leave the ambiguous event unchanged rather than making a canon-changing assumption, and continue everything else.
+
+USER SILENCE ≠ PAUSE.
+
+==================================================
+SCOPE CONTROL
+==================================================
+
+Do NOT:
+- rewrite all stories
+- move all stories after closing
+- remove during-service story beats
+- pause for every ambient interaction
+- create a giant new narrative framework
+- create mandatory cutscenes every day
+- create catch-up dumps
+
+Prefer integrating this into the existing authored-story/dialogue presentation architecture.
+
+Preserve:
+- existing story canon
+- story order/prerequisites except separately approved changes
+- max one major authored beat/day
+- unrelated arcs may progress independently
+- ambient life remains active during service
+- save compatibility
+- mobile usability
+
+Test specifically that:
+
+1. an authored beat can trigger during a busy service
+2. restaurant gameplay/time/order pressure freezes
+3. player can take as long as needed to read
+4. dialogue only advances by player input
+5. no important line is skipped
+6. completing the scene resumes the exact service state correctly
+7. ambient interactions still occur without pausing gameplay
+8. repeated pause/resume does not duplicate story beats or orders
+9. room switching / Lounge / PDR state remains safe across pause/resume
+10. mobile tap targets and dialogue layout remain readable
+
+Then continue RC6 work, regression, packaging and release as planned.
+
+ASK WHEN GENUINELY AMBIGUOUS.
+REPORT WHEN USEFUL.
+KEEP WORKING WHEN SAFE.

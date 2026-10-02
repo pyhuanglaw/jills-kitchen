@@ -10,6 +10,12 @@ release report.
 - After a release, go straight on to the next part of what was asked (the plan's next release). Stop only when nothing
   that was asked for is left, or for a product decision only the player can make.
 - 「中間不用停」 means: do not stop, and do not stop after a release either.
+- Report ≠ stop (2026-10-02 06:44, `docs/v24/report_is_not_stop_0644_2026-10-02.txt`): report progress, screenshots
+  and questions whenever useful, then carry on with the next defined item. A question never blocks the work that
+  does not depend on it (note it as pending; take the safe, reversible default). Stop only when genuinely blocked: two
+  confirmed canons contradict each other, irreversible save loss, a major product fork with no safe reversible
+  default, or a missing asset with nothing else to do. The player's silence is not a pause. Keeping going never means
+  inventing scope. After a release: say 「v2.4-rcN 已發布完成。」 and go straight on to the roadmap's next part.
 
 ## 1. Content in the release
 
@@ -70,8 +76,19 @@ Never promote T to O.
 
 ## 5. Tests and saves
 
+How testing runs between releases (the player's 05:42 strategy, `docs/v24/testing_strategy_0542_2026-10-02.txt`):
+- After each change, run what it can affect first: its own tests, the tests of what depends on it, the closest real
+  save, and the screenshots if the player sees it (`python3 tests/run_tests.py -k name1,name2`). Widen to the
+  integration tests when the change is in a shared system (staff pools, the scheduler, the economy, saves).
+- A failure: fix it, rerun that test, then its neighbours, then wider if needed — not the whole suite for every fix.
+- The player's saves are checkpoints (`tests/saves/README.md` says what each is for), never a save × test matrix.
+- The full regression is the release gate (and the gate for big shared-system changes): never skipped because the
+  targeted tests passed.
+- I / T / O stay apart: a passing test or a scripted run on a real save is TESTED, never OBSERVED.
+
 - [ ] Full regression: `python3 tests/run_tests.py`.
-  - It takes about 40 minutes; run it in the background with a log.
+  - It takes about 65 minutes; run it in the background with a log (in a clean worktree of the commit, so the work
+    tree can keep moving).
   - Re-record goldens (`--record`) only for a change that legitimately moves them, and say which and why.
 - [ ] Mature saves migrate: every fixture in `tests/saves/`, including the player's latest real save.
 - [ ] Story progress and history survive save/reload: no beat fabricated, none lost, nothing announced twice.

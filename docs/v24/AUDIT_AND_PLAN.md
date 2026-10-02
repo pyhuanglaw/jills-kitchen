@@ -488,3 +488,54 @@ Filed: `rc6_spec_spaces_0406`, `second_floor_architecture_0408`, `impact_report_
   III: the table at 10, the coffered ceiling, the tiered chandelier, a wine cabinet, an arched mirror, the sideboard's
   stone top and lamp, chargers, wine glasses, candles. The places are down both sides (the game never shows a back);
   the party comes to the table's near end; the crew serve from there.
+
+### 8.3 The player's corrections of 05:19–05:42 (they replace the parts of §8.2 above that differ)
+
+Filed: `staff_room_muji_0519` (+ `refs/staff_room_muji_ref1–3_0519`), `second_floor_navigation_0523`,
+`rc6_release_order_0532`, `testing_strategy_0542`.
+
+- **The Staff Room, redone** (05:19; the brief overrides `refs/staff_room_stages_reference`): bright, warm, light,
+  MUJI-inspired, from the three pictures — warm white walls, a very pale oak floor, a pale oak ceiling with beams,
+  sheer linen over the window; the palette only warm white, ivory, oatmeal, light greige, pale oak and ash (plants
+  green; small dark hardware only). Three ways to use it, never labelled: the sofa zone (a wide low oatmeal sofa on a
+  pale oak plinth, two oatmeal armchairs, a long low pale oak coffee table, an ivory rug with quiet arcs, a floor lamp,
+  plants) — the heart of the room, facing you; the long table under the window with its banquette and two end chairs
+  (4–6); the built-ins along the far wall — five pale oak lockers with small round pulls and name cards and an open bay
+  with pegs and cubbies on the left, a bench in front; on the right the kitchenette as part of the wall (warm white
+  doors, an oak top, a tiled splash, two open shelves with a warm light under them, a rail of mugs, a stool at the
+  counter, and the tall pale oak unit with the fridge behind its door). The door is at the near end (the bottom of the
+  view), as in the Private Dining Room; a coat stand by it. Phase I is the whole room; II and III are the same room lived
+  in (names on the lockers, everyone's own mug, fruit, a knit throw, a basket of throws, notes on the fridge, a row of
+  outlets in the banquette; then flowers and a runner, photos on the fridge, a throw over the sofa's back, a pouf, the
+  plants grown, a speaker, slippers by the door). The story traces keep their meaning in the new room (小彤's mug on
+  the last hook, 阿德's towel on the left armchair, the power strip 怡君 brought on the long table, the one outlet's
+  cube adapter by the counter).
+- **The far wall comes down** in the Staff Room (y 168 on a phone, 110 on a short desktop screen) so the built-ins sit
+  under the ticket rail and the chips, not behind them. The phone shows x ≈ 38–374 of the room (the 336 design width);
+  everything that matters is inside it.
+- **Standing places are marked** (fridge, coffee, lockers, pegs, window): until this round none was, so srFreeSpot never
+  preferred a seat and people could be drawn "seated" at the fridge. People take seats first now.
+- **A way round the furniture**: the Staff Room has several things in the way (the table, the sofa, the coffee table,
+  the armchairs); a walker goes round the first one its straight line meets, by the corner whose way is clear of the
+  others (`obsVia` with several boxes; one box — the Private Dining Room's table — as before).
+- **二樓 is not an everyday tab** (05:23). The everyday tabs are the rooms: 店門口・主廳・側廳・休息室・包廂・Lounge・廚房
+  (seven fit a phone at a tighter padding). The tab you are in reads the room's whole name — 員工休息室, 私人包廂 — so
+  inside a room the location is the room, never 二樓. A room's door goes down the stairs to the side room (as the
+  kitchen's door goes to the dining room); never to the floor's view.
+- **The open-floor period** (rc5, before any room): the same rule — no 二樓 tab. The player's 05:23 lists the open-floor
+  period among the times the floor is worth seeing; it is seen in its stories (the rc5 and rc6 beats), from 店舖工程
+  (看看整層, any day), and — a decision taken here, since a daily tab is exactly what 05:23 removes — not as a tab.
+- **The floor is shown when it changes**: (1) the stories that happen up there (R.upView, as rc5 built them; 二樓 is a
+  tab, lit, only then); (2) 店舖工程 › 二樓 › 看看整層 — the floor as it is now, the rooms closed (walls, doors, signs,
+  nothing of the inside, nobody in them), the works if any, and — once a room has been bought — a chalked 「？」 on the
+  corner nobody has decided about (two corner marks, a hand-drawn question mark; nothing named, nothing promised);
+  while looking, the tabs are the floor and its rooms only; (3) 去看看 after buying a room's Phase I — the works that
+  evening; (4) the morning a room is finished, 0.45 s after the prep screen: the floor as it was last night (the works),
+  the walls coming up from the floor, the door, the sign last; a card (完工 · 進去看看 / 回到開店準備); inside, the room's
+  own view the first time (morning light, nobody yet, a line on the banner); then back to the day. Once per room
+  (`rv` in the save); never during a service; if something else is open on the prep screen it waits for it. Phases II
+  and III change the inside only, so they have no floor reveal (their purchase card and 去看看 show the room).
+- **Order of work** (05:32): rc6 is released on its own, with all of the above; nothing of P5 in it; P5 (rc7) starts
+  after the release, its URL and zips are confirmed.
+- **Testing** (05:42): targeted tests after each change (risk-based), the player's saves as checkpoints
+  (`tests/saves/README.md`), the full regression at the release gate; `docs/RELEASE_CHECKLIST.md` §5.

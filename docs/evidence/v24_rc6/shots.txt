@@ -1,0 +1,43 @@
+reveal_sr_1_works.png: the morning the Staff Room is finished, before the opening: the floor as it was last night — the works (studs, boards, 施工中); the tab reads 二樓 (the only one); the 「？」 on the undecided corner
+reveal_sr_2_walls.png: the walls coming up from the floor
+reveal_sr_3_done.png: the room: its wall, a frosted window, the pale oak door and its sign 員工休息室; the card 完工 — 進去看看 / 回到開店準備
+reveal_sr_4_first_entry.png: inside, the first time (morning, nobody yet): the tab lit reads 員工休息室; 「還有一點新木頭的味道。」
+sr1_room_evening.png: that evening, inside (Phase I) — tabs: 店門口1 | 主廳5 | 側廳1 | 員工休息室* | Lounge | 廚房
+sr1_room_closing.png: closing, the first evening: some of the crew up in the room — in different places (sofa, armchairs, the long table, the bench by the lockers); Jill came up to see it
+sr_phase1_day.png: 員工休息室 Phase I, in the afternoon light (nobody up there)
+sr_phase1_closing.png: 員工休息室 Phase I at closing: who is where — 秀琴阿姨@sofa3, 小彤@b1, 阿珠姐@sofa1, Hugo@bench0
+sr_phase2_day.png: 員工休息室 Phase II, in the afternoon light (nobody up there)
+sr_phase2_closing.png: 員工休息室 Phase II at closing: who is where — 秀琴阿姨@lc1, 小彤@stool, 阿珠姐@sofa1, Hugo@sofa3, 阿德師傅@lc0
+sr_phase3_day.png: 員工休息室 Phase III, in the afternoon light (nobody up there)
+sr_phase3_closing.png: 員工休息室 Phase III at closing: who is where — 秀琴阿姨@pouf, Nina@b0, 小彤@stool, 阿珠姐@sofa1, Hugo@sofa2, 阿德師傅@lc0
+shop_rooms_offer.png: 店舖工程 › 二樓的房間 after 《大家待的地方》: 員工休息室 I《有地方坐了》, its price and what it builds; the 二樓 line above it has 看看整層
+shop_rooms_bought.png: bought: 動工 — built tonight, ready by the next opening; 現在可以：員工休息室（自己的分頁）
+works_floor.png: 去看看: the floor that evening, from 店舖工程 — the works on the left (studs, boards, a work lamp, 施工中); tabs: 二樓*
+look_open_floor.png: 店舖工程 › 二樓 › 看看整層, the open floor (before any room): the shared table and chairs, the floor lamp, the coat stand, the cats' cushion; no 「？」 — nothing has been divided yet
+look_shop_entry.png: 店舖工程 › 二樓: 看看整層現在的樣子 — and below it 二樓的房間 with both rooms' phases
+look_both_rooms.png: 看看整層 with both rooms: the Private Dining Room's green front and its sign 私人包廂, the Staff Room's pale front and 員工休息室 — walls, doors, signs, nothing of the inside, nobody; the open middle, the right window, the stairs; the chalked 「？」 on the corner nobody has decided about; tabs: 二樓* | 休息室 | 包廂
+look_into_room.png: its door tapped: the Staff Room's own view; tabs: 二樓 | 員工休息室* | 包廂
+pd1_prep_news.png: the prep screen the day after the Private Dining Room opened: 今晚｜私人包廂｜已預約 — party size and the minimum spend
+pd1_room_meal.png: inside the Private Dining Room (Phase I): the booked party down both sides of the ivory stone table; its tab reads 私人包廂 — tabs: 店門口3 | 主廳9 | 側廳5 | 休息室 | 私人包廂* | Lounge1 | 廚房2
+pd1_summary.png: the summary of that evening
+pd3_prep_news.png: Phase III: tonight a party of nine is booked, with its minimum spend
+pd3_room_meal.png: inside the Private Dining Room (Phase III): nine down the long stone table, the tiered chandelier, sconces, drapes, the wine cabinet, candles
+phase1_room_set.png: 包廂 Phase I: set for tonight's booking of 6, before they come — the same room, more complete
+phase1_room_meal.png: 包廂 Phase I: 6 at the table
+phase2_room_set.png: 包廂 Phase II: set for tonight's booking of 8, before they come — the same room, more complete
+phase2_room_meal.png: 包廂 Phase II: 8 at the table
+phase3_room_set.png: 包廂 Phase III: set for tonight's booking of 10, before they come — the same room, more complete
+phase3_room_meal.png: 包廂 Phase III: 10 at the table
+tabs_from_main.png: from the dining room: the tabs are the rooms — 休息室 and 包廂 among them, no 二樓: 店門口2 | 主廳5* | 側廳6 | 休息室 | 包廂 | Lounge | 廚房
+tabs_in_room.png: inside the Private Dining Room: the tab lit reads 私人包廂; the door at the near end reads ‹ 側廳 — 店門口2 | 主廳5 | 側廳6 | 休息室 | 私人包廂* | Lounge | 廚房
+staff_closing.png: closing, the Staff Room in Phase III: the crew up there — 店門口 | 主廳 | 側廳 | 員工休息室* | 包廂 | Lounge | 廚房
+reveal_pd_1_works.png: the morning the Private Dining Room is finished: last night's works by the left window; the Staff Room below it; the 「？」
+reveal_pd_2_walls.png: its walls coming up
+reveal_pd_3_done.png: its green front, the door, the sign 私人包廂, the card
+reveal_pd_4_first_entry.png: inside, the first time: the tab lit reads 私人包廂; 「門關上，外面的聲音就小了。」
+story_sr_1.png: 《大家待的地方》: after closing, Jill alone — 店裡有客人的位置。
+story_sr_2.png: ……好像一直沒有一個地方，是給每天在這裡工作的人待的。
+story_sr_offer.png: the project offered: 開始規劃 / 之後再說
+story_pd_yj.png: 怡君 and three friends: 「要坐裡面一點嗎？」「有比較安靜的嗎？」「……沒有。」 (the lines in the log; nothing unlocks)
+story_pd_yj_log.png: the evening's log: the exchange as it was said
+story_night_floor.png: rc5's night of the missing cats, played on the rc6 build (tools/sims/v24_up_shots.py OUT night, u4_up_found): Jill upstairs with 柔柔 and 小齁, the crew following; the floor shown while the story happens, 二樓 a tab only then

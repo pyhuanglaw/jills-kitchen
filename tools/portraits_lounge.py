@@ -14,7 +14,9 @@ OUT = os.path.join(ROOT, 'assets', 'portraits'); WEB = os.path.join(OUT, 'web')
 DISPLAY_H = 480; WEBP_Q = 84; RADIUS = 18
 A = os.path.join(ROOT, 'docs', 'v23', 'lounge_cast_concept.png')
 B = os.path.join(ROOT, 'docs', 'v23', 'qing_tuo_ken_du_concept.png')
-CARDS = [('staff_evan', A, (215, 70, 384, 300)), ('staff_qing', B, (275, 10, 545, 340)), ('staff_tuo', B, (1060, 10, 1320, 340)), ('staff_anan', A, (1360, 90, 1536, 300))]
+# v2.4 rc6 (the player, 2026-10-02 09:33): 阿拓 is the short-haired cook in the white chef's jacket of the Lounge cast sheet
+# (and of the two 晴 × 阿拓 pictures) — the crop from the second sheet showed someone with Evan's wavy hair
+CARDS = [('staff_evan', A, (215, 70, 384, 300)), ('staff_qing', B, (275, 10, 545, 340)), ('staff_tuo', A, (972, 60, 1158, 340)), ('staff_anan', A, (1360, 90, 1536, 300))]
 
 
 def main():

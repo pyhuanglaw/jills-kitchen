@@ -52,7 +52,7 @@ CARDS = [
     ('v24_landlord', LT, (133, 110, 900, 1150), '房東'),
     ('v24_landlord_talk', LT, (1018, 110, 1784, 1150), '房東 平常'),
     ('v24_landlord_surprised', LT, (1914, 107, 2680, 1150), '房東 整層？'),
-    ('v24_xuwei', XW, (420, 108, 690, 548), '許葳 (Neutral, focused, 敏銳)'),
+    ('v24_xuwei', XW, (420, 150, 690, 525), '許葳 (Neutral, focused, 敏銳)'),   # v2.4 rc6 (the player, 09:53): her card showed only the top of her face — less above the head, so a card shows the whole face, as the others' do
     ('v24_xuwei_work', XW, (708, 36, 966, 324), '許葳 Neutral/Working'),
     ('v24_xuwei_smile', XW, (984, 36, 1244, 324), '許葳 Small Smile'),
     ('v24_xuwei_amused', XW, (708, 352, 966, 640), '許葳 Mildly Amused'),

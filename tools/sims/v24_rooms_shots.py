@@ -1,8 +1,9 @@
 """v2.4 rc6 visual checkpoints: the Staff Room and the Private Dining Room, at phone size (390x844), from the player's
 Day 61 save played for real. The story facts before each state are set as if the earlier beats had happened (the
-floor leased days ago, its furniture arrived); then the day is played by the bot and photographed as it happens.
+floor leased days ago, its furniture arrived); then the day is played by the bot and photographed as it happens. The
+clock is the harness's virtual one: a reveal on the prep screen moves only when the tool ticks it.
 
-  python3 tools/sims/v24_rooms_shots.py [out_dir] [part=all|sr|pd|works|shop|story]
+  python3 tools/sims/v24_rooms_shots.py [out_dir] [part=all|reveal|srph|works|look|pd|pd3|phases|rpd|story]
 """
 import sys, os, json
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))); sys.path.insert(0, os.path.join(ROOT, 'tests'))
@@ -89,90 +90,122 @@ def finish(g):
 def frames(g, n):
     for _ in range(n): g.ev("__tick(1000/30)")
 
+def tabs(g):
+    return g.ev("[...document.querySelectorAll('#roomTabs button')].map(b=>b.textContent+(b.classList.contains('on')?'*':'')).join(' | ')")
+
+def sr_set(g, ph, done_back, tr=None):
+    tr = tr or ("{plug:S.day-%d}" % (done_back - 2) if ph == 1 else "{plug:S.day-%d,seat:S.day-%d,cup:S.day-%d,yj:S.day-%d}" % (done_back - 2, done_back - 15, done_back - 25, done_back - 35))
+    g.ev(f"(()=>{{const s=srW();s.bought=S.day-{done_back+1};s.done=S.day-{done_back};s.rv=S.day-{done_back};if({ph}>=2)s.st2=S.day-{max(1, done_back-12)};if({ph}>=3)s.st3=S.day-{max(1, done_back-30)};s.tr={tr};s.line=S.day-3}})()")
+
 with sync_playwright() as p:
     srv, port = rt.start_server(); b = p.chromium.launch()
-    if PART in ('all', 'sr'):
+    if PART in ('all', 'reveal'):
+        # the morning the Staff Room is finished (05:23 E/F): the floor, last night's works, the walls coming up, the sign;
+        # then the room's own view the first time; that evening and its closing
         g = load(b, 611)
         floor_ready(g, 16)
         setf(g, 'sp_wait', 9); setf(g, 'sr_story', 3)
         g.ev("(()=>{const s=srW();s.offer=S.day-3;s.plan='plan';s.bought=S.day-1;s.done=S.day})()")
-        reprep(g)
+        g.ev("IDLE=null;bg=null;for(const k in BGC)delete BGC[k];showPrep()"); g.ev("__tick(500)")
+        frames(g, 18); shot(g, 'reveal_sr_1_works.png', 'the morning the Staff Room is finished, before the opening: the floor as it was last night — the works (studs, boards, 施工中); the tab reads 二樓 (the only one); the 「？」 on the undecided corner')
+        frames(g, 30); shot(g, 'reveal_sr_2_walls.png', 'the walls coming up from the floor')
+        frames(g, 70); shot(g, 'reveal_sr_3_done.png', 'the room: its wall, a frosted window, the pale oak door and its sign 員工休息室; the card 完工 — 進去看看 / 回到開店準備')
+        g.click('#upRv [data-uprv=in]'); frames(g, 6)
+        shot(g, 'reveal_sr_4_first_entry.png', 'inside, the first time (morning, nobody yet): the tab lit reads 員工休息室; 「還有一點新木頭的味道。」')
+        g.click('#peekPill'); frames(g, 4)
         begin(g, 6101)
         until(g, 'R.t>=R.dur*.45')
-        g.ev("setRoom('up')"); frames(g, 10); clear_toasts(g)
-        shot(g, 'sr1_floor_evening.png', 'Staff Room I, its first evening: the floor in the 二樓 view — the room closed (its wall, a frosted window, the door and its sign), the shared table by the right window, the open middle, the stairs')
         g.ev("setRoom('staff')"); frames(g, 10); clear_toasts(g)
-        shot(g, 'sr1_room_evening.png', 'inside 休息室 (Phase I): green sofa, low table, the chairs (one from the open floor), water, the shelf and its lamp, the cabinet, the floor lamp and the coat stand from the open floor')
+        shot(g, 'sr1_room_evening.png', 'that evening, inside (Phase I) — tabs: ' + tabs(g))
         until(g, 'R.closing!=null&&R.closing>34')
         g.ev("setRoom('staff')"); frames(g, 30); clear_toasts(g)
-        shot(g, 'sr1_room_closing.png', 'closing, the first evening: some of the crew up in the room; Jill came up to see it')
-        g.ev("setRoom('up')"); frames(g, 10); clear_toasts(g)
-        shot(g, 'sr1_floor_closing.png', 'closing on the floor: the Staff Room\'s window and door lit (people inside — seen only inside), one of the floor out by the big window')
+        shot(g, 'sr1_room_closing.png', 'closing, the first evening: some of the crew up in the room — in different places (sofa, armchairs, the long table, the bench by the lockers); Jill came up to see it')
         g.close()
-    if PART in ('all', 'pd'):
-        g = load(b, 612)
-        floor_ready(g, 40)
-        setf(g, 'sp_wait', 33); setf(g, 'sr_story', 30); setf(g, 'sr_first', 27); setf(g, 'sr_plug', 25)
-        for k, back in [('pd_yj', 12), ('pd_other', 8), ('pd_story', 4)]: setf(g, k, back)
-        g.ev("(()=>{const s=srW();s.offer=S.day-30;s.bought=S.day-29;s.done=S.day-28;s.b2=S.day-20;s.st2=S.day-19;s.tr={plug:S.day-25,seat:S.day-15,cup:S.day-12};const p=pdW();p.offer=S.day-4;p.bought=S.day-2;p.done=S.day-1;p.ever=0})()")
-        reprep(g)
-        shot(g, 'pd1_prep_news.png', 'the prep screen the day after the Private Dining Room opened: 今晚｜私人包廂｜已預約 — party size and the minimum spend')
-        begin(g, 6201)
-        until(g, "(()=>{const t=R.tables.find(q=>q.pdr);return !!(t&&t.group&&t.group.state==='eat')})()", 600)
-        g.ev("setRoom('pdr')"); frames(g, 10); clear_toasts(g)
-        shot(g, 'pd1_room_meal.png', 'inside 包廂 (Phase I): the booked party down both sides of the ivory stone table, the stone floor, the green panelling, the brass pendant, the sideboard under the window, the door at the near end')
-        g.ev("setRoom('up')"); frames(g, 10); clear_toasts(g)
-        shot(g, 'pd1_floor_meal.png', 'the floor while they eat: the Private Dining Room\'s green front, its frosted window warm, 用餐中 on the door; the Staff Room below it; the open middle')
-        finish(g)
-        shot(g, 'pd1_summary.png', 'the summary of that evening')
-        g.close()
+    if PART in ('all', 'srph'):
+        # the same room in its three phases (05:19 G, I-12): Phase I already the whole room; II and III the same room lived in
+        for ph in (1, 2, 3):
+            g = load(b, 700 + ph)
+            floor_ready(g, 70)
+            for k, back in [('sp_wait', 62), ('sr_story', 60), ('sr_first', 57), ('sr_plug', 55)]: setf(g, k, back)
+            sr_set(g, ph, 58)
+            reprep(g)
+            begin(g, 7100 + ph)
+            until(g, 'R.t>=R.dur*.30')
+            g.ev("setRoom('staff')"); frames(g, 6); clear_toasts(g)
+            shot(g, f'sr_phase{ph}_day.png', f'員工休息室 Phase {"I" * ph if ph < 3 else "III"}, in the afternoon light (nobody up there)')
+            until(g, 'R.closing!=null&&R.closing>40')
+            g.ev("setRoom('staff')"); frames(g, 30); clear_toasts(g)
+            shot(g, f'sr_phase{ph}_closing.png', f'員工休息室 Phase {"I" * ph if ph < 3 else "III"} at closing: who is where — ' + g.ev("srPeople().map(p=>p.m.name+'@'+((srSpots().find(s=>Math.hypot(s.x-p.x,s.y-p.y)<3)||{}).k||'walking')).join(', ')"))
+            g.close()
     if PART in ('all', 'works'):
         g = load(b, 613)
         floor_ready(g, 16)
         setf(g, 'sp_wait', 9); setf(g, 'sr_story', 2)
         g.ev("S.money=Math.max(S.money,600000);showShop();shopTab='works';showShop()"); g.page.wait_for_timeout(120)
         g.ev("(()=>{const e=[...document.querySelectorAll('#screen .nm')].find(x=>x.textContent.trim()==='二樓的房間');if(e)e.scrollIntoView({block:'start'})})()"); g.page.wait_for_timeout(80)
-        shot(g, 'shop_rooms_offer.png', '店舖工程 › 二樓的房間 after 《大家待的地方》: 員工休息室 I《有地方坐了》, its price and what it builds')
-        g.ev("buyRoomPhase('sr',1)"); g.page.wait_for_timeout(1700)
-        shot(g, 'shop_rooms_bought.png', 'bought: 動工 — built tonight, ready by the next opening')
-        g.ev("hideReveal();screenEl.hidden=true;$('#peekPill').hidden=false;room='up';forceDraw=true;renderRoomTabs(true)"); frames(g, 6)
-        shot(g, 'works_floor.png', 'the floor that evening (看店裡): the works on the left — studs, boards, a work lamp, 施工中')
+        shot(g, 'shop_rooms_offer.png', '店舖工程 › 二樓的房間 after 《大家待的地方》: 員工休息室 I《有地方坐了》, its price and what it builds; the 二樓 line above it has 看看整層')
+        g.ev("buyRoomPhase('sr',1)"); g.ev("__tick(1700)")
+        shot(g, 'shop_rooms_bought.png', 'bought: 動工 — built tonight, ready by the next opening; 現在可以：員工休息室（自己的分頁）')
+        g.click('#reveal [data-act=revealPeek]'); frames(g, 6)
+        shot(g, 'works_floor.png', '去看看: the floor that evening, from 店舖工程 — the works on the left (studs, boards, a work lamp, 施工中); tabs: ' + tabs(g))
         g.close()
-    if PART in ('all', 'sr3'):
-        g = load(b, 614)
-        floor_ready(g, 60)
-        for k, back in [('sp_wait', 50), ('sr_story', 48), ('sr_first', 45), ('sr_plug', 43), ('sr_plug2', 30), ('sr_food', 26), ('sr_fridge', 22)]: setf(g, k, back)
-        g.ev("(()=>{const s=srW();s.bought=S.day-47;s.done=S.day-46;s.st2=S.day-30;s.st3=S.day-10;s.tr={plug:S.day-43,seat:S.day-25,cup:S.day-20,yj:S.day-15};s.line=S.day-5})()")
+    if PART in ('all', 'look'):
+        # 店舖工程's look at the floor (05:23 C, D): the open floor; then with both rooms — closed, signs, the 「？」
+        g = load(b, 801)
+        floor_ready(g, 12)
+        g.ev("S.money=Math.max(S.money,600000);showShop();shopTab='works';showShop()"); g.page.wait_for_timeout(100)
+        g.click('[data-act=upLook]'); frames(g, 6)
+        shot(g, 'look_open_floor.png', '店舖工程 › 二樓 › 看看整層, the open floor (before any room): the shared table and chairs, the floor lamp, the coat stand, the cats\' cushion; no 「？」 — nothing has been divided yet')
+        g.close()
+        g = load(b, 802)
+        floor_ready(g, 90)
+        for k, back in [('sp_wait', 80), ('sr_story', 78), ('sr_first', 75), ('pd_yj', 40), ('pd_other', 36), ('pd_story', 33), ('pd_back', 26)]: setf(g, k, back)
+        sr_set(g, 2, 76)
+        g.ev("(()=>{const p=pdW();p.bought=S.day-31;p.done=S.day-30;p.rv=S.day-30;p.ever=9;p.n=14;p.dry=0})()")
         reprep(g)
-        begin(g, 6301)
-        until(g, 'R.closing!=null&&R.closing>40')
-        g.ev("setRoom('staff')"); frames(g, 30); clear_toasts(g)
-        shot(g, 'sr3_room_closing.png', 'the Staff Room in Phase III at closing: the softer sofa, the table with oranges, the lockers with photos, the speaker, the fridge, 小彤\'s cup, 阿德\'s towel on the green chair, the power strip 怡君 brought')
-        g.ev("setRoom('up')"); frames(g, 10); clear_toasts(g)
-        shot(g, 'sr3_floor_closing.png', 'the floor with the Staff Room in Phase III; the Private Dining Room not built (the left window still the floor\'s)')
+        g.ev("S.money=Math.max(S.money,600000);showShop();shopTab='works';showShop()"); g.page.wait_for_timeout(100)
+        g.ev("(()=>{const e=document.querySelector('[data-act=upLook]');if(e)e.scrollIntoView({block:'center'})})()"); g.page.wait_for_timeout(60)
+        shot(g, 'look_shop_entry.png', '店舖工程 › 二樓: 看看整層現在的樣子 — and below it 二樓的房間 with both rooms\' phases')
+        g.click('[data-act=upLook]'); frames(g, 6)
+        shot(g, 'look_both_rooms.png', '看看整層 with both rooms: the Private Dining Room\'s green front and its sign 私人包廂, the Staff Room\'s pale front and 員工休息室 — walls, doors, signs, nothing of the inside, nobody; the open middle, the right window, the stairs; the chalked 「？」 on the corner nobody has decided about; tabs: ' + tabs(g))
+        g.ev("(()=>{const D=UPR.srDoor;roomTap({x:D.x,y:D.y-20},{preventDefault(){}})})()"); frames(g, 6)
+        shot(g, 'look_into_room.png', 'its door tapped: the Staff Room\'s own view; tabs: ' + tabs(g))
+        g.close()
+    if PART in ('all', 'pd'):
+        g = load(b, 612)
+        floor_ready(g, 40)
+        setf(g, 'sp_wait', 33); setf(g, 'sr_story', 30); setf(g, 'sr_first', 27); setf(g, 'sr_plug', 25)
+        for k, back in [('pd_yj', 12), ('pd_other', 8), ('pd_story', 4)]: setf(g, k, back)
+        g.ev("(()=>{const s=srW();s.offer=S.day-30;s.bought=S.day-29;s.done=S.day-28;s.rv=S.day-28;s.b2=S.day-20;s.st2=S.day-19;s.tr={plug:S.day-25,seat:S.day-15,cup:S.day-12};const p=pdW();p.offer=S.day-4;p.bought=S.day-2;p.done=S.day-1;p.rv=S.day-1;p.ever=0})()")
+        reprep(g)
+        shot(g, 'pd1_prep_news.png', 'the prep screen the day after the Private Dining Room opened: 今晚｜私人包廂｜已預約 — party size and the minimum spend')
+        begin(g, 6201)
+        until(g, "(()=>{const t=R.tables.find(q=>q.pdr);return !!(t&&t.group&&t.group.state==='eat')})()", 600)
+        g.ev("setRoom('pdr')"); frames(g, 10); clear_toasts(g)
+        shot(g, 'pd1_room_meal.png', 'inside the Private Dining Room (Phase I): the booked party down both sides of the ivory stone table; its tab reads 私人包廂 — tabs: ' + tabs(g))
+        finish(g)
+        shot(g, 'pd1_summary.png', 'the summary of that evening')
         g.close()
     if PART in ('all', 'pd3'):
         g = load(b, 615)
         floor_ready(g, 80)
         for k, back in [('sp_wait', 70), ('sr_story', 68), ('sr_first', 65), ('sr_plug', 63), ('pd_yj', 40), ('pd_other', 36), ('pd_story', 33), ('pd_back', 26)]: setf(g, k, back)
-        g.ev("(()=>{const s=srW();s.bought=S.day-67;s.done=S.day-66;s.st2=S.day-55;s.st3=S.day-45;s.tr={plug:S.day-63,seat:S.day-50,cup:S.day-45,yj:S.day-40};const p=pdW();p.bought=S.day-31;p.done=S.day-30;p.st2=S.day-20;p.st3=S.day-2;p.ever=9;p.n=14;p.dry=0;p.avg=700})()")
-        g.ev("(()=>{const p=pdW();const st=3;const size=9;p.res={id:'r'+S.day,d:S.day,size,min:pdMinFor(size,st),kind:'家族聚會',type:'family',name:'陳家',t:.3,status:'booked',phase:st}})()")
+        g.ev("(()=>{const s=srW();s.bought=S.day-67;s.done=S.day-66;s.rv=S.day-66;s.st2=S.day-55;s.st3=S.day-45;s.tr={plug:S.day-63,seat:S.day-50,cup:S.day-45,yj:S.day-40};const p=pdW();p.bought=S.day-31;p.done=S.day-30;p.rv=S.day-30;p.st2=S.day-20;p.st3=S.day-2;p.ever=9;p.n=14;p.dry=0;p.avg=700})()")
+        g.ev("(()=>{const p=pdW();const st=3;const size=9;p.res={id:'r'+S.day,d:S.day,meal:'dinner',size,min:pdMinFor(size,st,'family'),kind:'家族聚會',type:'family',name:'陳家',t:.3,status:'booked',phase:st}})()")
         reprep(g)
         shot(g, 'pd3_prep_news.png', 'Phase III: tonight a party of nine is booked, with its minimum spend')
         begin(g, 6401)
         until(g, "(()=>{const t=R.tables.find(q=>q.pdr);return !!(t&&t.group&&t.group.state==='eat')})()", 700)
         g.ev("setRoom('pdr')"); frames(g, 10); clear_toasts(g)
-        shot(g, 'pd3_room_meal.png', 'inside 包廂 (Phase III): nine down the long stone table, the tiered chandelier, sconces, drapes, the wine cabinet, the console with its lamp, candles')
-        g.ev("setRoom('up')"); frames(g, 10); clear_toasts(g)
-        shot(g, 'pd3_floor_meal.png', 'the floor with both rooms finished: the Private Dining Room\'s door shut on a party, the Staff Room, the open middle, the right window, the stairs and the corner nobody has decided about')
+        shot(g, 'pd3_room_meal.png', 'inside the Private Dining Room (Phase III): nine down the long stone table, the tiered chandelier, sconces, drapes, the wine cabinet, candles')
         g.close()
     if PART in ('all', 'phases'):
-        # the same room in its three phases (the player's 04:25 brief: Phase I already beautiful), set for a booking at dusk
+        # the Private Dining Room in its three phases (the player's 04:25 brief: Phase I already beautiful), set for a booking at dusk
         for ph in (1, 2, 3):
             g = load(b, 620 + ph)
             floor_ready(g, 80)
             for k, back in [('sp_wait', 70), ('sr_story', 68), ('sr_first', 65), ('pd_yj', 40), ('pd_other', 36), ('pd_story', 33), ('pd_back', 26)]: setf(g, k, back)
-            g.ev(f"(()=>{{const s=srW();s.bought=S.day-67;s.done=S.day-66;s.st2=S.day-55;s.st3=S.day-45;s.tr={{plug:S.day-63,seat:S.day-50,cup:S.day-45}};const p=pdW();p.bought=S.day-31;p.done=S.day-30;if({ph}>=2)p.st2=S.day-20;if({ph}>=3)p.st3=S.day-2;p.ever=9;p.n=14;p.dry=0}})()")
+            g.ev(f"(()=>{{const s=srW();s.bought=S.day-67;s.done=S.day-66;s.rv=S.day-66;s.st2=S.day-55;s.st3=S.day-45;s.tr={{plug:S.day-63,seat:S.day-50,cup:S.day-45}};const p=pdW();p.bought=S.day-31;p.done=S.day-30;p.rv=S.day-30;if({ph}>=2)p.st2=S.day-20;if({ph}>=3)p.st3=S.day-2;p.ever=9;p.n=14;p.dry=0}})()")
             size = [0, 6, 8, 10][ph]
             g.ev(f"(()=>{{const p=pdW();p.res={{id:'r'+S.day,d:S.day,meal:'dinner',size:{size},min:pdMinFor({size},{ph},'family'),kind:'家庭聚餐',type:'family',name:'陳家',t:.55,status:'booked',phase:{ph}}}}})()")
             reprep(g)
@@ -184,18 +217,28 @@ with sync_playwright() as p:
             g.ev("setRoom('pdr')"); frames(g, 8); clear_toasts(g)
             shot(g, f'phase{ph}_room_meal.png', f'包廂 Phase {"I" * ph if ph < 3 else "III"}: {size} at the table')
             if ph == 3:
-                g.ev("setRoom('up')"); frames(g, 8); clear_toasts(g)
-                shot(g, 'floor_both_meal.png', 'the floor while the Private Dining Room is in use: its front warm, 用餐中 on the door; nothing of the inside shown')
                 g.ev("setRoom('main')"); frames(g, 4)
-                shot(g, 'tabs_from_main.png', 'from the dining room: one 二樓 tab')
+                shot(g, 'tabs_from_main.png', 'from the dining room: the tabs are the rooms — 休息室 and 包廂 among them, no 二樓: ' + tabs(g))
                 g.ev("setRoom('pdr')"); frames(g, 4)
-                shot(g, 'tabs_in_room.png', 'inside the room: the tab reads ‹ 二樓; the door at the near end has the same sign')
+                shot(g, 'tabs_in_room.png', 'inside the Private Dining Room: the tab lit reads 私人包廂; the door at the near end reads ‹ 側廳 — ' + tabs(g))
                 until(g, 'R.closing!=null&&R.closing>40', 900)
-                g.ev("setRoom('up')"); frames(g, 10); clear_toasts(g)
-                shot(g, 'floor_closing.png', 'closing: the Staff Room lit (the crew in it), one of the floor by the big window, a cat on the cushion')
                 g.ev("setRoom('staff')"); frames(g, 10); clear_toasts(g)
-                shot(g, 'staff_closing.png', 'inside the Staff Room at that moment')
+                shot(g, 'staff_closing.png', 'closing, the Staff Room in Phase III: the crew up there — ' + tabs(g))
             g.close()
+    if PART in ('all', 'rpd'):
+        # the morning the Private Dining Room is finished: the same reveal, the green front, 私人包廂
+        g = load(b, 803)
+        floor_ready(g, 90)
+        for k, back in [('sp_wait', 80), ('sr_story', 78), ('sr_first', 75), ('pd_yj', 40), ('pd_other', 36), ('pd_story', 3)]: setf(g, k, back)
+        sr_set(g, 2, 76)
+        g.ev("(()=>{const p=pdW();p.offer=S.day-3;p.plan='plan';p.bought=S.day-1;p.done=S.day})()")
+        g.ev("IDLE=null;bg=null;for(const k in BGC)delete BGC[k];showPrep()"); g.ev("__tick(500)")
+        frames(g, 18); shot(g, 'reveal_pd_1_works.png', 'the morning the Private Dining Room is finished: last night\'s works by the left window; the Staff Room below it; the 「？」')
+        frames(g, 30); shot(g, 'reveal_pd_2_walls.png', 'its walls coming up')
+        frames(g, 70); shot(g, 'reveal_pd_3_done.png', 'its green front, the door, the sign 私人包廂, the card')
+        g.click('#upRv [data-uprv=in]'); frames(g, 6)
+        shot(g, 'reveal_pd_4_first_entry.png', 'inside, the first time: the tab lit reads 私人包廂; 「門關上，外面的聲音就小了。」')
+        g.close()
     if PART in ('all', 'story'):
         # 《大家待的地方》 at closing, then the offer
         g = load(b, 616)
@@ -210,7 +253,9 @@ with sync_playwright() as p:
         if g.ev("!!fact('sr_story')"):
             for i in range(3): g.ev("dlgNext()")
             shot(g, 'story_sr_1.png', '《大家待的地方》: after closing, Jill alone — 店裡有客人的位置。')
-            for i in range(3): g.ev("dlgNext()")
+            for i in range(8):
+                if not g.ev("!!(typeof DLG!=='undefined'&&DLG)") or '好像一直沒有' in (g.ev("(document.querySelector('#dlg')||{}).innerText||''") or ''): break
+                g.ev("dlgNext()")
             shot(g, 'story_sr_2.png', '……好像一直沒有一個地方，是給每天在這裡工作的人待的。')
             g.ev("while(DLG)dlgNext()"); g.page.wait_for_timeout(120)
             shot(g, 'story_sr_offer.png', 'the project offered: 開始規劃 / 之後再說')

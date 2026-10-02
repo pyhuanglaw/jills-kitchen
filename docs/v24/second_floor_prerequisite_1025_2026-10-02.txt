@@ -1,0 +1,74 @@
+(Filed verbatim. 2026-10-02 10:25, the player — a prerequisite/pacing correction for RC6. Read with
+docs/v24/second_floor_and_long_arcs (the floor's story) and the code's V24_ERAS / eraOpenDay / loungeDoneDay.)
+
+IMPORTANT RC6 PACING / PREREQUISITE CORRECTION
+
+I found one major progression problem:
+
+SECOND FLOOR MUST NO LONGER WAIT FOR 《那面牆》 / 怡君's leak case.
+
+That dependency makes Second Floor arrive far too late, and there is no narrative reason for restaurant expansion to wait for an unrelated housing/legal story.
+
+NEW CANON:
+
+Lounge completion is the progression milestone that allows the Second Floor story arc to BEGIN.
+
+Lounge completed
+→ Second Floor awareness / exploration beats may begin
+→ Jill's legitimate first upstairs visit
+→ 柔柔 explores upstairs first
+→ 小齁 follows
+→ full-floor discovery
+→ repeated restaurant space-pressure beats
+→ Jill asks landlord about upstairs
+→ whole-floor rental
+→ mandatory Open-Floor Period
+→ later Staff Room / Private Dining progression
+
+Do NOT instantly unlock or sell the Second Floor the moment Lounge completes.
+The authored Second Floor story still needs to play naturally.
+
+The change is:
+Lounge completion starts the Second Floor narrative pipeline.
+《那面牆》 is NOT a prerequisite.
+
+《那面牆》 and Second Floor are independent arcs and may progress in parallel, subject only to the existing major-authored-beat pacing rules.
+
+Do not create a new global cooldown to separate them.
+Do not require Wall completion, settlement, Sophie article, or any 怡君 state for Second Floor progression.
+
+IMPORTANT LEGACY SAVE CHECK:
+For mature saves where Lounge is already complete, Second Floor eligibility should be recognized immediately and safely enter the next valid Second Floor beat without catch-up dumping multiple scenes on one day.
+
+Preserve:
+- max one major authored beat/day
+- no same-day story dump
+- existing Second Floor story content/order
+- 柔柔 first explorer, 小齁 follows
+- finding the cats does NOT itself unlock rental
+- whole floor rented once
+- Open-Floor Period remains mandatory
+
+This is a prerequisite/pacing correction, NOT a rewrite of the Second Floor story.
+
+Please update affected scheduler/prerequisite tests and continue RC6.
+REPORT ≠ STOP.
+
+What was done
+- 「Lounge completed」 read as the v2.3 brief uses it: the Lounge's construction finished — Lounge I built (the fact
+  lounge_built_1; for a save from before that fact, the project's own day or the new room's day; for a save with no
+  record at all, long enough ago). II and III are the Lounge's later upgrades and are not waited for.
+- The long stories are two chains now: 怡君 → 《那面牆》 (as before), and the Second Floor → the Staff Room → the Private
+  Dining Room. The floor's era opens two days after the Lounge is finished (its own settle days, as it had after the
+  wall) — nothing of the wall's or 怡君's is asked. Dormancy works inside a chain only, so the floor's beginning puts
+  nothing of the other chain to sleep, and the other chain's dormancy moves the floor not a day.
+- The day's story budget is the only thing the two chains share: one major beat a day across every story, and one of
+  the long stories' smaller steps a day (the arbiter's caps, unchanged). No new gap.
+- The floor's story itself is unchanged: the regular's question, the crew, the landlord's afternoon (Jill's first real
+  look), the night 柔柔 goes up the stairs and 小齁 after her, the whole floor, the pressure, the ask, the lease (once),
+  the open floor (mandatory, as before), then the rooms. Finding the cats unlocks nothing.
+- The Staff Room's story no longer needs 怡君 to have come in (her moment, when it has happened, still counts as one of
+  the needs). The joke at the lease about the leak (up_leak, an optional moment) still needs the wall's settlement —
+  it is about it — and simply does not happen if the wall has not settled; nothing waits for it.
+- A save whose Lounge was finished long ago (the player's Day 67 save) finds the floor's era open on loading and goes
+  into its first beat on a day the regulars come, one beat at a time; tests and a pacing run in step.

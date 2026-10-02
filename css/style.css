@@ -198,6 +198,9 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .sheet{background:var(--paper);color:var(--ink);border-radius:20px 20px 0 0;max-height:80%;overflow-y:auto;padding:16px 16px calc(20px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 30px rgba(0,0,0,.35);-webkit-overflow-scrolling:touch}
 .sheet.tall{max-height:88%}
 .sh-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
+/* v2.4 rc6 (09:51): the journal's top bar — its 關閉 — stays in reach however far a page (the album) is scrolled */
+.sheet.book>.sh-top{position:sticky;top:-16px;z-index:4;background:var(--paper);margin:-16px -16px 12px;padding:14px 16px 10px;box-shadow:0 6px 10px -8px rgba(0,0,0,.25)}
+.sheet.book .footer.bookend{position:static;margin:18px 0 0;padding:0;background:none}
 .sh-top .ttl{flex:1;min-width:0}
 .eyebrow{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--brass3);font-weight:800}
 .sheet h2{margin:2px 0 0;font-family:var(--disp);font-weight:400;font-size:24px;line-height:1.15;text-wrap:balance}
@@ -476,6 +479,10 @@ input.txt{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(
 .sale .n{font-weight:800;font-variant-numeric:tabular-nums}
 .sale .rev{color:var(--ink2);font-variant-numeric:tabular-nums;min-width:52px;text-align:right}
 .sale small{grid-column:2/-1;color:var(--ink3);font-size:11px}
+/* v2.4 rc6 (09:44, 09:52): the day's stories; the Lounge's glasses */
+.sale .glass{width:14px;height:22px;border-radius:2px 2px 7px 7px;justify-self:center;grid-row:span 2;box-shadow:inset 0 -6px 0 rgba(0,0,0,.12),0 0 0 1.5px rgba(80,60,40,.25)}
+.sale.tot{font-weight:800}.sale.tot .n{font-weight:800}
+.stoday{padding:6px 12px 10px}.stoday .st-row{display:flex;flex-wrap:wrap;gap:2px 8px;align-items:baseline;padding:7px 0;border-top:1px solid var(--line);font-size:13px}.stoday .st-row:first-child{border-top:0}.stoday .st-row b{font-weight:800}.stoday .st-row small{flex-basis:100%;color:var(--ink2);font-size:12px;line-height:1.5}.stoday .jmore{margin-top:6px}
 .sale.reco{background:#FFF6DC;margin:0 -12px;padding:6px 12px;border-radius:8px}
 
 /* who is this? a small card over the room */
@@ -529,6 +536,12 @@ span.tk-treat{pointer-events:none;font-weight:700}
 #dlg .dlg-text{margin:0;font-size:15px;line-height:1.55;font-weight:600}
 #dlg .dlg-next{display:block;text-align:right;margin-top:6px;font-size:11px;color:var(--muted);font-weight:700}
 #dlg.side-right .dlg-name{color:#3E5A7A}
+/* v2.4 rc6 (10:32): a story beat during a service — the restaurant is held behind it, and the panel says so */
+#dlg .dlg-hold{position:absolute;top:calc(10px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:2;max-width:calc(100% - 24px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:rgba(20,26,28,.88);color:#F4E6C2;border:1px solid rgba(201,154,69,.65);border-radius:999px;padding:6px 14px;font-size:12.5px;font-weight:800;letter-spacing:.04em;box-shadow:0 4px 12px rgba(0,0,0,.3);pointer-events:none}
+#dlg .dlg-hold.ps::before{content:'';display:inline-block;width:2px;height:10px;border-left:3px solid currentColor;border-right:3px solid currentColor;margin-right:8px;vertical-align:-1px}
+#dlg.hold{background:linear-gradient(rgba(12,18,20,.58) 0%,rgba(12,18,20,.7) 40%,rgba(12,18,20,.86))}
+#dlg.hold .dlg-next{color:#7A5A22}
+#dlg.sh .dlg-illus{top:calc(48px + env(safe-area-inset-top,0px))}
 /* v2.4: a story illustration over the scene (STORY_ILLUS): the picture at the top, its title under it; the faces get smaller */
 #dlg .dlg-illus{position:absolute;left:10px;right:10px;top:calc(10px + env(safe-area-inset-top));display:flex;flex-direction:column;align-items:center;pointer-events:none}
 #dlg .dlg-illus[hidden],#dlg .dlg-illus-tbd[hidden]{display:none}

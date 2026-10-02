@@ -23,6 +23,9 @@ to every run.
 | `player_day52.json` | v2.3 | the **mature late-game** save: 12 crew, everything downstairs bought | the long chains (怡君 → the wall → the second floor → the rooms), the economy, the v2.4 pacing simulations |
 | `player_day52a.json` | v2.3 | a second Day 52 | spare |
 | `player_day61.json` | v2.4 rc5 | the **newest**: the Lounge open, 14 crew, 怡君 met | rc5 / rc6 states — the second floor and the two rooms are reached from it by setting the earlier story facts (`tests/v24_tests.py` `FLOOR_TAKEN`, `PD_OPEN`; `tools/sims/v24_rooms_*.py`) |
+| `player_day61_0933.json` | v2.4 rc5 (the player's own, 2026-10-02 09:33) | Day 61 evening: Lounge I and II, the four bar bites on today's menu, the menu at its cap of 20, 17 crew (Evan, 沈晴, 阿拓, 安安, 許葳 among them) | the menu-cap bug of 09:55 (`v24_rc6_bar_bites_take_no_menu_slot`); the player's reports of 09:33–09:59 (阿拓's face, repeated lines, the Lounge's comments, the summary) |
+| `player_day65_1004.json` | v2.4 rc5 (the player's own, 2026-10-02 10:04) | Day 65 morning: Lounge III, 《那面牆》 just begun, Sophie and Mia in the same room once in a fortnight, their story not begun | the 10:05 report (`v24_rc6_sophie_and_mia_begin` uses its Day 61 sibling) |
+| `player_day67_1016.json` | v2.4 rc5 (the player's own, 2026-10-02 10:16) | Day 67: everything bought (nothing left to spend $202,255 on), the Lounge finished on Day 57, the wall under way, nothing of the second floor; Sophie and Mia's first page with lines that were not theirs | the 10:21 report (`v24_rc6_more_to_spend_on`), the 10:25 legacy check (`v24_rc6_a_finished_lounge_opens_the_floor_in_a_mature_save`), the 10:08 page (`v24_rc6_story_pages_keep_only_their_own_lines`), the summary and the new places' photos |
 
 A release's full regression covers a few representative ones through the tests that need them — fresh (a new game),
 legacy (`player_day30`), mature late (`player_day52`), current (`player_day61`) — never every save × every test.

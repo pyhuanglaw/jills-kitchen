@@ -1,65 +1,72 @@
 Day  61 sr0 pd0        | staff most 0 brk 0 cat 0 | pd - walk 0 other 0 n 0 | net 28,042 money 119,122 | sp_wait 
-Day  62 sr0 pd0        | staff most 0 brk 0 cat 0 | pd - walk 0 other 0 n 0 | net 65,927 money 185,049 |  
+Day  62 sr0 pd0        | staff most 0 brk 0 cat 0 | pd - walk 0 other 0 n 0 | net 65,927 money 185,049 | up_use 
 Day  63 sr0 pd0        | staff most 0 brk 0 cat 0 | pd - walk 0 other 0 n 0 | net 66,120 money 251,169 |  
 Day  64 sr0 pd0        | staff most 0 brk 0 cat 0 | pd - walk 0 other 0 n 0 | net 36,508 money 287,377 |  
 Day  65 sr0 pd0        | staff most 0 brk 0 cat 0 | pd - walk 0 other 0 n 0 | net 63,209 money 350,586 |  
 Day  66 sr0 pd0        | staff most 0 brk 0 cat 0 | pd - walk 0 other 0 n 0 | net 56,284 money 406,870 |  
 Day  67 sr0 pd0        | staff most 0 brk 0 cat 0 | pd - walk 0 other 0 n 0 | net 72,117 money 479,287 | sr_story offer:sr
 Day  68 sr1 pd0 sr1    | staff most 5 brk 1 cat 0 | pd - walk 0 other 0 n 0 | net 75,893 money 395,180 | sr_first 
-Day  69 sr1 pd0        | staff most 4 brk 0 cat 1 | pd - walk 0 other 0 n 0 | net 62,662 money 457,542 | sr_plug 
-Day  70 sr1 pd0        | staff most 4 brk 0 cat 0 | pd - walk 0 other 0 n 0 | net 54,633 money 512,175 |  
-Day  71 sr1 pd0        | staff most 5 brk 0 cat 0 | pd - walk 0 other 0 n 0 | net 43,478 money 555,653 |  
-Day  72 sr1 pd0        | staff most 4 brk 1 cat 0 | pd - walk 0 other 0 n 0 | net 65,051 money 620,704 |  
-Day  73 sr1 pd0        | staff most 5 brk 0 cat 0 | pd - walk 0 other 0 n 0 | net 42,697 money 663,701 | pd_yj 
-Day  74 sr2 pd0 sr2    | staff most 5 brk 1 cat 0 | pd - walk 0 other 0 n 0 | net 54,862 money 648,563 | sr_plug2 
-Day  75 sr2 pd0        | staff most 6 brk 0 cat 0 | pd - walk 0 other 0 n 0 | net 62,480 money 711,043 |  
-Day  76 sr2 pd0        | staff most 5 brk 1 cat 1 | pd - walk 0 other 0 n 0 | net 62,665 money 773,708 | pd_other 
-Day  77 sr2 pd0        | staff most 6 brk 0 cat 0 | pd - walk 0 other 0 n 0 | net 39,137 money 812,845 |  
-Day  78 sr2 pd0        | staff most 5 brk 0 cat 0 | pd - walk 0 other 0 n 0 | net 40,341 money 853,186 | pd_story offer:pd
-Day  79 sr2 pd1 pd1    | staff most 6 brk 1 cat 0 | pd - walk 0 other 0 n 0 | net 58,231 money 671,417 | sr_food 
-Day  80 sr2 pd1        | staff most 6 brk 0 cat 0 | pd res 4p min 1600 ate 1995 done walk 0 other 0 n 1 | net 73,105 money 744,522 |  
-Day  81 sr2 pd1        | staff most 5 brk 0 cat 1 | pd - walk 0 other 0 n 1 | net 56,552 money 801,074 |  
-Day  82 sr3 pd1 sr3    | staff most 7 brk 0 cat 0 | pd story {"k": "pd_back", "status": "done"} walk 0 other 0 n 2 | net 48,495 money 759,569 | sr_fridge pd_back 
-Day  83 sr3 pd1        | staff most 6 brk 1 cat 0 | pd - walk 1 other 0 n 3 | net 32,567 money 792,136 |  
-Day  84 sr3 pd1        | staff most 7 brk 0 cat 0 | pd res 6p min 3500 ate 3965 done walk 0 other 0 n 4 | net 23,474 money 815,910 | sr_nina 
-Day  85 sr3 pd1        | staff most 6 brk 1 cat 0 | pd - walk 0 other 0 n 4 | net 48,779 money 864,689 |  
-Day  86 sr3 pd2 pd2    | staff most 7 brk 1 cat 1 | pd - walk 1 other 0 n 5 | net 49,348 money 794,037 |  
-Day  87 sr3 pd2        | staff most 6 brk 1 cat 0 | pd res 6p min 3500 ate 3725 done walk 0 other 0 n 6 | net 44,081 money 837,818 |  
-Day  88 sr3 pd2        | staff most 7 brk 2 cat 0 | pd res 4p min 1700 ate 2165 done walk 0 other 0 n 7 | net 35,045 money 872,863 |  
-Day  89 sr3 pd2        | staff most 6 brk 0 cat 0 | pd - walk 1 other 0 n 8 | net 31,649 money 904,212 |  
-Day  90 sr3 pd2        | staff most 6 brk 1 cat 1 | pd res 4p min 1800 ate 2020 done walk 0 other 0 n 9 | net 73,288 money 977,500 |  
-Day  91 sr3 pd2        | staff most 7 brk 0 cat 0 | pd - walk 1 other 0 n 10 | net 48,171 money 1,025,971 |  
-Day  92 sr3 pd2        | staff most 6 brk 0 cat 0 | pd res 7p min 4300 ate 5270 done walk 0 other 0 n 11 | net 66,824 money 1,092,795 |  
-Day  93 sr3 pd2        | staff most 7 brk 1 cat 0 | pd - walk 0 other 0 n 11 | net 40,912 money 1,133,707 |  
-Day  94 sr3 pd2        | staff most 6 brk 1 cat 0 | pd - walk 1 other 0 n 12 | net 62,397 money 1,196,104 |  
-Day  95 sr3 pd3 pd3    | staff most 7 brk 0 cat 0 | pd res 9p min 5600 ate 6825 done walk 0 other 0 n 13 | net 59,165 money 1,095,269 |  
-Day  96 sr3 pd3        | staff most 6 brk 1 cat 0 | pd res 5p min 2800 ate 3660 done walk 0 other 0 n 14 | net 82,661 money 1,177,930 |  
-Day  97 sr3 pd3        | staff most 7 brk 0 cat 1 | pd res 7p min 4500 ate 4235 done walk 0 other 0 n 15 | net 73,973 money 1,251,903 |  
-Day  98 sr3 pd3        | staff most 6 brk 1 cat 0 | pd res 4p min 1900 ate 1825 done walk 0 other 0 n 16 | net 57,081 money 1,308,984 |  
-Day  99 sr3 pd3        | staff most 7 brk 0 cat 0 | pd - walk 0 other 0 n 16 | net 38,737 money 1,347,721 |  
-Day 100 sr3 pd3        | staff most 6 brk 1 cat 1 | pd res 9p min 5800 ate 5645 done walk 0 other 0 n 17 | net 51,529 money 1,399,250 |  
-Day 101 sr3 pd3        | staff most 7 brk 0 cat 1 | pd - walk 1 other 0 n 18 | net 82,229 money 1,481,479 |  
-Day 102 sr3 pd3        | staff most 6 brk 0 cat 0 | pd - walk 1 other 0 n 19 | net 36,856 money 1,518,035 |  
-Day 103 sr3 pd3        | staff most 7 brk 0 cat 0 | pd res 6p min 3700 ate 3820 done walk 0 other 0 n 20 | net 55,234 money 1,573,269 |  
-Day 104 sr3 pd3        | staff most 6 brk 1 cat 1 | pd res 5p min 3200 ate 3645 done walk 0 other 0 n 21 | net 48,228 money 1,621,497 |  
-Day 105 sr3 pd3        | staff most 7 brk 1 cat 0 | pd res 7p min 4300 ate 4810 done walk 0 other 0 n 22 | net 79,506 money 1,701,003 |  
-Day 106 sr3 pd3        | staff most 6 brk 1 cat 0 | pd res 6p min 3800 ate 3800 done walk 0 other 0 n 23 | net 48,075 money 1,749,078 |  
-Day 107 sr3 pd3        | staff most 7 brk 1 cat 1 | pd - walk 1 other 0 n 24 | net 63,890 money 1,812,968 |  
-Day 108 sr3 pd3        | staff most 6 brk 1 cat 0 | pd res 8p min 4900 ate 5665 done walk 0 other 0 n 25 | net 30,284 money 1,842,952 |  
-Day 109 sr3 pd3        | staff most 7 brk 1 cat 0 | pd - walk 1 other 0 n 26 | net 41,339 money 1,884,291 |  
-Day 110 sr3 pd3        | staff most 7 brk 0 cat 0 | pd - walk 1 other 0 n 27 | net 71,129 money 1,955,420 |  
-Day 111 sr3 pd3        | staff most 6 brk 1 cat 1 | pd res 6p min 3900 ate 3760 done walk 0 other 0 n 28 | net 53,334 money 2,008,754 |  
-Day 112 sr3 pd3        | staff most 7 brk 1 cat 0 | pd res 7p min 4400 ate 3235 done walk 0 other 0 n 29 | net 55,483 money 2,064,237 |  
-Day 113 sr3 pd3        | staff most 6 brk 0 cat 0 | pd res 5p min 3400 ate 3290 done walk 0 other 0 n 30 | net 48,276 money 2,112,513 |  
-Day 114 sr3 pd3        | staff most 7 brk 1 cat 1 | pd res 5p min 3300 ate 2520 done walk 0 other 0 n 31 | net 86,335 money 2,198,548 |  
-Day 115 sr3 pd3        | staff most 6 brk 0 cat 0 | pd - walk 1 other 0 n 32 | net 59,457 money 2,258,005 |  
-Day 116 sr3 pd3        | staff most 7 brk 1 cat 0 | pd res 4p min 1600 ate 1560 done walk 0 other 0 n 33 | net 77,544 money 2,335,549 |  
-Day 117 sr3 pd3        | staff most 6 brk 0 cat 0 | pd res 8p min 4600 ate 4245 done walk 0 other 0 n 34 | net 50,049 money 2,385,598 |  
-Day 118 sr3 pd3        | staff most 7 brk 1 cat 0 | pd - walk 1 other 0 n 35 | net 58,281 money 2,443,879 |  
-Day 119 sr3 pd3        | staff most 6 brk 1 cat 0 | pd res 6p min 3400 ate 3470 done walk 0 other 0 n 36 | net 68,867 money 2,512,746 |  
-Day 120 sr3 pd3        | staff most 6 brk 0 cat 0 | pd res 4p min 2000 ate 2010 done walk 0 other 0 n 37 | net 43,532 money 2,556,278 |  
+Day  69 sr1 pd0        | staff most 4 brk 1 cat 1 | pd - walk 0 other 0 n 0 | net 66,499 money 461,979 | sr_plug 
+Day  70 sr1 pd0        | staff most 4 brk 1 cat 0 | pd - walk 0 other 0 n 0 | net 75,175 money 537,154 |  
+Day  71 sr1 pd0        | staff most 5 brk 1 cat 0 | pd - walk 0 other 0 n 0 | net 41,743 money 578,897 |  
+Day  72 sr1 pd0        | staff most 4 brk 0 cat 0 | pd - walk 0 other 0 n 0 | net 71,680 money 650,577 |  
+Day  73 sr1 pd0        | staff most 5 brk 0 cat 0 | pd - walk 0 other 0 n 0 | net 26,332 money 677,209 | pd_yj 
+Day  74 sr2 pd0 sr2    | staff most 5 brk 0 cat 0 | pd - walk 0 other 0 n 0 | net 45,064 money 652,273 | sr_plug2 
+Day  75 sr2 pd0        | staff most 6 brk 0 cat 0 | pd - walk 0 other 0 n 0 | net 65,039 money 717,312 |  
+Day  76 sr2 pd0        | staff most 5 brk 0 cat 1 | pd - walk 0 other 0 n 0 | net 87,571 money 804,883 | pd_other 
+Day  77 sr2 pd0        | staff most 6 brk 0 cat 0 | pd - walk 0 other 0 n 0 | net 67,939 money 872,822 |  
+Day  78 sr2 pd0        | staff most 5 brk 0 cat 0 | pd - walk 0 other 0 n 0 | net 63,675 money 936,497 |  
+Day  79 sr2 pd0        | staff most 6 brk 0 cat 0 | pd - walk 0 other 0 n 0 | net 35,696 money 972,193 | sr_food pd_story offer:pd
+Day  80 sr2 pd1 pd1    | staff most 6 brk 0 cat 0 | pd res 4p min 1600 ate 1695 done walk 0 other 0 n 1 | net 63,023 money 795,216 |  
+Day  81 sr2 pd1        | staff most 5 brk 0 cat 1 | pd - walk 0 other 0 n 1 | net 46,619 money 841,835 |  
+Day  82 sr3 pd1 sr3    | staff most 7 brk 0 cat 0 | pd res 5p min 2900 ate 3690 done walk 0 other 0 n 2 | net 56,788 money 808,623 | sr_nina 
+Day  83 sr3 pd1        | staff most 6 brk 1 cat 0 | pd story {"k": "pd_back", "status": "done"} walk 0 other 0 n 3 | net 77,516 money 886,139 | pd_back 
+Day  84 sr3 pd1        | staff most 7 brk 1 cat 0 | pd - walk 0 other 0 n 3 | net 33,088 money 918,927 | sr_fridge 
+Day  85 sr3 pd1        | staff most 6 brk 1 cat 0 | pd - walk 0 other 0 n 3 | net 53,169 money 972,096 |  
+Day  86 sr3 pd1        | staff most 7 brk 2 cat 1 | pd - walk 1 other 0 n 4 | net 47,269 money 1,019,365 |  
+Day  87 sr3 pd2 pd2    | staff most 6 brk 0 cat 0 | pd res 6p min 3500 ate 3745 done walk 0 other 0 n 5 | net 51,207 money 950,272 |  
+Day  88 sr3 pd2        | staff most 7 brk 1 cat 0 | pd res 4p min 1700 ate 2555 done walk 0 other 0 n 6 | net 53,899 money 1,004,171 |  
+Day  89 sr3 pd2        | staff most 6 brk 0 cat 0 | pd - walk 1 other 0 n 7 | net 61,619 money 1,066,090 |  
+Day  90 sr3 pd2        | staff most 6 brk 0 cat 1 | pd res 4p min 1800 ate 2005 done walk 0 other 0 n 8 | net 59,430 money 1,125,520 |  
+Day  91 sr3 pd2        | staff most 7 brk 1 cat 0 | pd - walk 0 other 0 n 8 | net 50,800 money 1,176,620 |  
+Day  92 sr3 pd2        | staff most 6 brk 0 cat 0 | pd res 7p min 4400 ate 4050 done walk 0 other 0 n 9 | net 62,648 money 1,239,268 |  
+Day  93 sr3 pd2        | staff most 7 brk 0 cat 0 | pd - walk 0 other 0 n 9 | net 32,733 money 1,272,301 |  
+Day  94 sr3 pd2        | staff most 6 brk 0 cat 0 | pd - walk 1 other 0 n 10 | net 47,902 money 1,320,203 |  
+Day  95 sr3 pd2        | staff most 7 brk 1 cat 0 | pd res 8p min 4800 ate 5560 done walk 0 other 0 n 11 | net 28,910 money 1,349,113 |  
+Day  96 sr3 pd3 pd3    | staff most 6 brk 1 cat 0 | pd res 5p min 2900 ate 3290 done walk 0 other 0 n 12 | net 65,689 money 1,254,802 |  
+Day  97 sr3 pd3        | staff most 7 brk 0 cat 1 | pd res 7p min 4500 ate 5775 done walk 0 other 0 n 13 | net 76,724 money 1,331,526 |  
+Day  98 sr3 pd3        | staff most 6 brk 1 cat 0 | pd res 4p min 2000 ate 1840 done walk 0 other 0 n 14 | net 53,031 money 1,384,557 |  
+Day  99 sr3 pd3        | staff most 7 brk 0 cat 0 | pd - walk 0 other 0 n 14 | net 39,355 money 1,423,912 |  
+Day 100 sr3 pd3        | staff most 6 brk 0 cat 1 | pd res 9p min 5600 ate 6015 done walk 0 other 0 n 15 | net 72,313 money 1,496,225 |  
+Day 101 sr3 pd3        | staff most 7 brk 0 cat 1 | pd - walk 1 other 0 n 16 | net 46,762 money 1,542,987 |  
+Day 102 sr3 pd3        | staff most 6 brk 1 cat 0 | pd - walk 1 other 0 n 17 | net 42,331 money 1,585,018 |  
+Day 103 sr3 pd3        | staff most 7 brk 1 cat 0 | pd res 6p min 3900 ate 4820 done walk 0 other 0 n 18 | net 47,260 money 1,632,278 |  
+Day 104 sr3 pd3        | staff most 6 brk 2 cat 1 | pd res 5p min 3100 ate 5020 done walk 0 other 0 n 19 | net 82,130 money 1,714,408 |  
+Day 105 sr3 pd3        | staff most 7 brk 1 cat 0 | pd res 7p min 4300 ate 5490 done walk 0 other 0 n 20 | net 63,829 money 1,778,237 |  
+Day 106 sr3 pd3        | staff most 6 brk 0 cat 0 | pd res 6p min 3800 ate 4135 done walk 0 other 0 n 21 | net 54,926 money 1,833,163 |  
+Day 107 sr3 pd3        | staff most 7 brk 1 cat 1 | pd - walk 1 other 0 n 22 | net 65,330 money 1,898,493 |  
+Day 108 sr3 pd3        | staff most 6 brk 1 cat 0 | pd res 8p min 4900 ate 5055 done walk 0 other 0 n 23 | net 38,818 money 1,937,311 |  
+Day 109 sr3 pd3        | staff most 7 brk 1 cat 0 | pd - walk 1 other 0 n 24 | net 55,118 money 1,992,429 |  
+Day 110 sr3 pd3        | staff most 7 brk 0 cat 0 | pd - walk 1 other 0 n 25 | net 50,751 money 2,043,180 |  
+Day 111 sr3 pd3        | staff most 6 brk 1 cat 1 | pd res 6p min 3900 ate 3890 done walk 0 other 0 n 26 | net 54,600 money 2,097,780 |  
+Day 112 sr3 pd3        | staff most 7 brk 0 cat 0 | pd res 7p min 4300 ate 3300 done walk 0 other 0 n 27 | net 65,588 money 2,163,368 |  
+Day 113 sr3 pd3        | staff most 6 brk 0 cat 0 | pd res 5p min 3400 ate 3210 done walk 0 other 0 n 28 | net 38,464 money 2,201,832 |  
+Day 114 sr3 pd3        | staff most 7 brk 0 cat 1 | pd res 5p min 3200 ate 3735 done walk 0 other 0 n 29 | net 29,690 money 2,231,222 |  
+Day 115 sr3 pd3        | staff most 6 brk 0 cat 0 | pd - walk 1 other 0 n 30 | net 45,002 money 2,276,224 |  
+Day 116 sr3 pd3        | staff most 7 brk 1 cat 0 | pd res 4p min 1600 ate 2435 done walk 0 other 0 n 31 | net 49,758 money 2,325,982 |  
+Day 117 sr3 pd3        | staff most 6 brk 0 cat 0 | pd res 8p min 4700 ate 4435 done walk 0 other 0 n 32 | net 50,785 money 2,376,767 |  
+Day 118 sr3 pd3        | staff most 7 brk 1 cat 0 | pd - walk 1 other 0 n 33 | net 43,013 money 2,419,780 |  
+Day 119 sr3 pd3        | staff most 6 brk 1 cat 0 | pd res 6p min 3500 ate 2350 done walk 0 other 0 n 34 | net 59,310 money 2,479,090 |  
+Day 120 sr3 pd3        | staff most 6 brk 1 cat 0 | pd res 4p min 1800 ate 2580 done walk 0 other 0 n 35 | net 62,836 money 2,541,926 |  
 
 the floor leased on Day 60; first day of each beat (days after the lease):
+  wall_settle 28  (+-32)
+  up_hint    37  (+-23)
+  up_inspect 39  (+-21)
+  up_cats    41  (+-19)
+  up_ask     47  (+-13)
+  up_lease   60  (+0)
+  up_use     62  (+2)
   sp_wait    61  (+1)
   sr_story   67  (+7)
   sr_build   67  (+7)
@@ -67,21 +74,21 @@ the floor leased on Day 60; first day of each beat (days after the lease):
   sr_plug    69  (+9)
   sr_plug2   74  (+14)
   sr_food    79  (+19)
-  sr_fridge  82  (+22)
-  sr_nina    84  (+24)
+  sr_fridge  84  (+24)
+  sr_nina    82  (+22)
   pd_yj      73  (+13)
   pd_other   76  (+16)
-  pd_story   78  (+18)
-  pd_build   78  (+18)
-  pd_back    82  (+22)
-bought: [(67, 'sr1'), (73, 'sr2'), (78, 'pd1'), (81, 'sr3'), (85, 'pd2'), (94, 'pd3')]
+  pd_story   79  (+19)
+  pd_build   79  (+19)
+  pd_back    83  (+23)
+bought: [(67, 'sr1'), (73, 'sr2'), (79, 'pd1'), (81, 'sr3'), (86, 'pd2'), (95, 'pd3')]
 
 the Private Dining Room by phase:
-  phase 1: 7 evenings, booked 2 (29%), paid 2, story evenings 1, longest run without a booking 2; minimum avg $2,550 vs eaten avg $2,980; topped up 0× ($0); walk-in parties 1, other parties of 4+ 0
-  phase 2: 9 evenings, booked 4 (44%), paid 4, story evenings 0, longest run without a booking 2; minimum avg $2,825 vs eaten avg $3,295; topped up 0× ($0); walk-in parties 4, other parties of 4+ 0
-  phase 3: 26 evenings, booked 18 (69%), paid 18, story evenings 0, longest run without a booking 2; minimum avg $3,728 vs eaten avg $3,779; topped up 9× ($3,085); walk-in parties 7, other parties of 4+ 0
+  phase 1: 7 evenings, booked 2 (29%), paid 2, story evenings 1, longest run without a booking 3; minimum avg $2,250 vs eaten avg $2,692; topped up 0× ($0); walk-in parties 1, other parties of 4+ 0
+  phase 2: 9 evenings, booked 5 (56%), paid 5, story evenings 0, longest run without a booking 2; minimum avg $3,240 vs eaten avg $3,583; topped up 1× ($350); walk-in parties 2, other parties of 4+ 0
+  phase 3: 25 evenings, booked 17 (68%), paid 17, story evenings 0, longest run without a booking 2; minimum avg $3,612 vs eaten avg $3,963; topped up 6× ($2,775); walk-in parties 7, other parties of 4+ 0
 more than one major in a day: []
-the Staff Room: 53 evenings; people up there at once avg 6.1, evenings with a break 28, with a cat 12
-net per day avg $55,102; money 119,122 → 2,556,278
+the Staff Room: 53 evenings; people up there at once avg 6.1, evenings with a break 25, with a cat 12
+net per day avg $54,842; money 119,122 → 2,541,926
 page errors: []
-60 days in 228s
+60 days in 160s

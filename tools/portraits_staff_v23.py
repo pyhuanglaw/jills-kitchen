@@ -62,11 +62,53 @@ def card(sheet, b, pid, name):
     print(pid, name, c.size)
 
 
+# v2.4 rc6 (the player, 2026-10-02 09:45 and 09:47): the sheet is not a clean grid — an elbow, a sleeve, a wok, a pot, a
+# tray or a glass crosses into the next column — so each of the twelve has a box of its own, chosen by eye (it cuts the
+# person's own arm or pan where a neighbour touches them, never the other way), and inside it everything that is not
+# connected to that person's drawing (a neighbour's sleeve, hand or tray standing apart) is painted with the sheet's
+# white; the person's own outline and its soft edge stay.
+BOXES = {'st23_ade': (0, 18, 300, 392), 'st23_marco': (245, 18, 585, 392), 'st23_xiaolin': (560, 18, 822, 392),
+         'st23_azhu': (828, 18, 1094, 392), 'st23_hugo': (1132, 18, 1342, 392), 'st23_ayong': (1404, 18, 1683, 392),
+         'st23_xiaomo': (0, 466, 275, 838), 'st23_kai': (275, 466, 570, 838), 'st23_nina': (570, 466, 870, 838),
+         'st23_azhe': (841, 466, 1160, 838), 'st23_xiuqin': (1150, 466, 1430, 838), 'st23_xiaotong': (1425, 466, 1683, 838)}
+SEEDS = {'st23_ade': (150, 150), 'st23_marco': (440, 120), 'st23_xiaolin': (720, 140), 'st23_azhu': (991, 120),
+         'st23_hugo': (1261, 140), 'st23_ayong': (1561, 120), 'st23_xiaomo': (150, 600), 'st23_kai': (460, 580),
+         'st23_nina': (700, 620), 'st23_azhe': (1011, 590), 'st23_xiuqin': (1311, 600), 'st23_xiaotong': (1561, 620)}
+
+
+def only_them(sheet, b, seed):
+    """the box, with whatever does not touch the person's own drawing painted white"""
+    import numpy as np
+    import scipy.ndimage as nd
+    A = np.asarray(sheet.crop(b)).copy()
+    rgb = A[..., :3].astype(int)
+    fg = ~((rgb.min(axis=2) >= 238) & ((rgb.max(axis=2) - rgb.min(axis=2)) <= 14))
+    lab, _ = nd.label(fg, structure=np.ones((3, 3)))
+    sx, sy = seed[0] - b[0], seed[1] - b[1]
+    k = lab[sy, sx]
+    if k == 0:
+        ys, xs = np.nonzero(lab); d = (ys - sy) ** 2 + (xs - sx) ** 2; k = lab[ys[d.argmin()], xs[d.argmin()]]
+    keep = nd.binary_dilation(lab == k, iterations=2)
+    A[~keep, :3] = 255
+    return Image.fromarray(A)
+
+
+def card_img(c, pid, name):
+    m = Image.new('L', c.size, 0)
+    ImageDraw.Draw(m).rounded_rectangle((0, 0, c.size[0] - 1, c.size[1] - 1), radius=RADIUS, fill=255)
+    c.putalpha(m)
+    c.save(os.path.join(OUT, pid + '.png'), optimize=True)
+    w, h = c.size
+    if h > DISPLAY_H: c = c.resize((round(w * DISPLAY_H / h), DISPLAY_H), Image.LANCZOS)
+    c.save(os.path.join(WEB, pid + '.webp'), 'WEBP', quality=WEBP_Q, method=6)
+    print(pid, name, c.size)
+
+
 def main():
     os.makedirs(WEB, exist_ok=True)
     sheet = Image.open(SRC).convert('RGBA')
     for pid, row, col, name in CARDS:
-        card(sheet, box(row, col), pid, name)
+        card_img(only_them(sheet, BOXES[pid], SEEDS[pid]), pid, name)
     s8 = Image.open(SRC8).convert('RGBA')
     paint = ImageDraw.Draw(s8)
     for pid, b, name, outs in CARDS8:
