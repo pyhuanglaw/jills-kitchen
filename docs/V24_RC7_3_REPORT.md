@@ -13,7 +13,8 @@ publish it as soon as it was ready (22:18: 「Jill房間如果你不需要我的
   observed on an iPhone. A Chromium touch test is not an iPhone.
 
 **Branch, tag, page**
-- Branch `wip/rc7.3` (rc7.2 merged in), tag `v2.4-rc7.3`.
+- Branch `wip/rc7.3` (rc7.2 merged in) up to the candidate 9a36bbd; the release fixes on `release/rc7.3` from it (§5, §6);
+  tag `v2.4-rc7.3`.
 - Published to the player's usual URL, https://claude.ai/artifact/2vhURujrtCpQ1P5jnSsjps (§7).
 
 ## 0. What the player asked for
@@ -39,7 +40,8 @@ Filed verbatim in `docs/v24/`:
 | 9d7df75 | Goldens re-recorded with before/after/diff proof (§5.1) |
 | ca3f416 | 樾樾 comes out at the closing once he knows the crew; Jill waits for him; evidence screenshots |
 | a9ac17e | The single file rebuilt |
-| (this commit) | The briefs filed on this branch; the evening's room check; golden_frames re-recorded for the closing (§5.1); the report |
+| 9a36bbd | The briefs filed on this branch; the evening's room check; golden_frames re-recorded for the closing (§5.1); the report — the release candidate |
+| (release/rc7.3) | The eight tests the first full regression failed, brought up to the game (§5.2); its log and the forty-days seed sweep as evidence |
 
 ## 2. Release content audit
 
@@ -57,9 +59,11 @@ Filed verbatim in `docs/v24/`:
 | Posts with their pictures and likes (15:02, 22:09) | Done | wip/rc7.3 | Yes | |
 | Dylan's first drink, 晴×拓 Acts 2 and 5 under the new canon (18:53 §9–§11) | Written | wip/qing-tuo-after-work | No | They come with the 晴×拓 story, which waits for the player's pictures (19:20) |
 | The Madame Lin origin line, the bar next door (19:19, 19:30) | Planned | — | No | Needs the player's pictures |
-| Guest preferences (22:39) | Not started | — | No | Next |
-| The Lounge's bites, pizza with an oven and a chef, the TV and its sound system (23:03–23:08) | Not started | — | No | Next |
-| Sprites for the new story people | Not started | — | No | Next |
+| Guest preferences: a favourite dish or glass (22:39) | Implemented after the candidate, being tested | wip/rc7.3 (after 9a36bbd) | No | rc7.4, once its tests and screenshots are done |
+| The Lounge's bites: oysters, cheese sticks, pork knuckle, Buffalo wings (23:03) | Implemented after the candidate, being tested | wip/rc7.3 (after 9a36bbd) | No | rc7.4 |
+| The Lounge's TV ($200,000) and sound system ($150,000) (23:06) | Implemented after the candidate, being tested | wip/rc7.3 (after 9a36bbd) | No | rc7.4 |
+| Sprites for the new story people: Evan, 沈晴, 阿拓 (22:22) | Implemented after the candidate, being tested | wip/rc7.3 (after 9a36bbd) | No | rc7.4 |
+| Pizza, with an oven and one more chef (23:08) | Not started | — | No | After rc7.4 |
 
 ## 3. What changed, with I / T / O
 
@@ -188,9 +192,39 @@ differed from the closing of day 1 on (sample #170, t = 169.7 s), and in the cat
 `book_cats` and `book_mem` sheets (`golden_frames_2/golden_check_ca3f416.log`, before/after/diff beside it). The fingerprint
 and the scenario did not move. Re-recorded once more, and the next run passed unchanged.
 
+### 5.2 Brought up to the game at the release
+
+The first full regression on the candidate (9a36bbd, §6) failed eight tests. None of them was the game going wrong; each
+was a test that still described rc7.2, or that leaned on one seed's random draws. Fixed on `release/rc7.3`:
+- `mature_save_loads_into_2_0`, `purchases_change_the_place`, `z_regression_rooms_kitchen_construction_and_staff_assignment`,
+  `v24_rc6_the_floor_and_its_rooms_are_tabs`: the open rooms, and the tabs, now end with Jill's room (`home`), which is
+  there from Day 1 (18:53 §1). The lists they expected are one room longer.
+- `dylan_leaves_a_trace_and_never_vanishes_at_a_closed_door`: after the reveal his arrival reads 「Dylan 回來吃飯了。」,
+  not 「Dylan 來了。」 (18:53 §16: he lives here). Before the reveal the test now checks that no line about him appears
+  at all.
+- `v24_rc6_a_name_finds_its_person_and_a_person_its_name`: its last check wanted no mark at all four seconds after the
+  taps. The service goes on during those seconds, and a guest who speaks in the room you are looking at is marked
+  softly for 1.8 s (rc6). On 9a36bbd a guest spoke 0.17 s before the end. The check now asks what it means: every mark
+  made before those seconds is gone, and anything left is new and goes as well.
+- `v24_rc7_the_wine_and_monsieur_du`: the morning the wine is due, the landlord's afternoon upstairs (`up_inspect`) is
+  due too, and the morning's major beat is a weighted draw between them. On 9a36bbd the draw went to the landlord.
+  `ken_wine` is class A with a floor of two (passed over twice, it is next), so the test now allows the morning it is
+  due or one of the two after.
+- `v24_day52_save_plays_the_stories_in_order_over_forty_days`: on seed base 7400, 怡君 moved in on Day 63 (ten days after
+  meeting, one more than the target), the wall began on Day 68 and settled on Day 85. Seven seed bases on rc7.2 and on
+  the candidate (`docs/evidence/v24_rc7_3/sims/day52_seeds.txt`): the wall begins Day 63–68 on rc7.3 (64–67 on rc7.2)
+  and settles Day 80–85 on both — about the same spread, earlier at the median. Every seed's trajectory moved because
+  the cats' days in Jill's room draw their own random numbers. 7400 is now the one late seed. The test uses 7600,
+  which meets every target on both builds.
+
+Each was rerun on its own and passed before the whole suite ran again.
+
 ## 6. Full regression
 
-(filled at the release)
+**Run 1, the candidate 9a36bbd** (clean worktree, 01:19–01:55): 200 passed, 8 failed — the eight in §5.2.
+Log: `docs/evidence/v24_rc7_3/regression/full_regression_9a36bbd_200_pass_8_fail.log`.
+
+**Run 2, the release commit**: (filled when it finishes)
 
 ## 7. Build and publish
 
