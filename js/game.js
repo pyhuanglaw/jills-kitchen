@@ -1301,9 +1301,11 @@ function canChat(key,gap,min){if(!R)return false;R.cds=R.cds||{};const now=R.t;i
 /* v2.2 Q/V: Dylan and the regulars speak with their faces (a portrait card) when the assets are there; o.face picks
    another face for a group that has two (the Wangs), o.with puts the person they are answering beside them, dimmed.
    Everyone else stays a toast. */
-function quote(g,txt,o){o=o||{};const who=g.reg&&g.reg!=='dylan'?speakerOf(g,o):g.reg;const name=who&&REG_BY[who]?REG_BY[who].n:(namedId(g)||g.name);logLine(name,txt,g.reg==='dylan'?'d':'g');if(g.reg==='dylan'){g.tagT=R?R.t+2.6:0;if(portraitLine('dylan',txt,{tone:dylanTone(txt),with:'jill',withTone:'default'}))return}
- else if(who){const other=regsOf(g).find(x=>x!==who);if(portraitLine(who,txt,{with:o.with||other||null,tone:o.tone}))return}else if(namedId(g)&&portraitLine('named:'+namedId(g),txt,{with:o.with||null,tone:o.tone}))return;toast(`<b>${namedId(g)||name}</b>：「${txt}」`,'q')}
-function staffSay(m,txt,tone){logLine(m.name,txt,'s');if(portraitLine('staff:'+m.name,txt,{tone}))return;/* v2.3: a face with the line, when the person has one */toast(`<b>${m.name}</b>：「${txt}」`,'q')}
+function quote(g,txt,o){o=o||{};const who=g.reg&&g.reg!=='dylan'?speakerOf(g,o):g.reg;const name=who&&REG_BY[who]?REG_BY[who].n:(namedId(g)||g.name);logLine(name,txt,g.reg==='dylan'?'d':'g');
+ const sk=who&&regsOf(g).includes(who)?regsOf(g).indexOf(who):0;try{idSpeak(g,sk)}catch(e){}   /* v2.4 rc6 (07:09): who is speaking, for a moment, if they are in the room you look at */
+ if(g.reg==='dylan'){g.tagT=R?R.t+2.6:0;if(portraitLine('dylan',txt,{tone:dylanTone(txt),with:'jill',withTone:'default',g,k:0}))return}
+ else if(who){const other=regsOf(g).find(x=>x!==who);if(portraitLine(who,txt,{with:o.with||other||null,tone:o.tone,g,k:sk}))return}else if(namedId(g)&&portraitLine('named:'+namedId(g),txt,{with:o.with||null,tone:o.tone,g,k:0}))return;toast(`<b>${namedId(g)||name}</b>：「${txt}」`,'q',{g,k:sk})}
+function staffSay(m,txt,tone){logLine(m.name,txt,'s');if(portraitLine('staff:'+m.name,txt,{tone}))return;/* v2.3: a face with the line, when the person has one */toast(`<b>${m.name}</b>：「${txt}」`,'q',{who:'staff:'+m.name})}
 function noteLine(txt){logLine('',txt,'e');toast(txt)}
 /* a dish needs its station in the kitchen before anyone can order it (a recipe found before the station exists waits) */
 function stationOk(d){const D=DISH(d);if(!D)return false;const st=D.st;return st==='stove'||!!(S.eq[st])}
@@ -2216,7 +2218,7 @@ function storySchedule(out,dur){const roll=(k,p)=>hash('sched|'+S.day+'|'+k)%100
  if(fact('zhou_tomorrow')&&fact('zhou_tomorrow').l===S.day-1&&!out.some(o=>o.name==='周董'))out.push({t:(.3+.4*(hash('zhout|'+S.day)%100)/100)*dur,type:'vip',size:1,name:'周董'});
  v24Visits(out,dur,roll)}   /* v2.4: the people a due beat needs */
 function showNamedCard(g){const el=$('#regcard');const nn=namedId(g);const h=story().named[nn]||{v:0};const notes=(h.facts||[]).slice(0,2).map(f=>f.txt);const src=portraitData(NAMED[nn].p);const who={'品酒師 Ken':fact('ken_wine_q')?'品酒師。這裡本來沒有酒，是他先問的。':'品酒師。',/* only what happened in this save */'Monsieur 杜':relN(KEN_ID,DU_ID,'argued')?'法國人，對酒的意見很多，跟 Ken 的意見永遠不一樣。':'法國人，對酒的意見很多。','周董':'什麼都說隨便。','Madame Lin':'什麼都看得到。','老饕李先生':'吃過很多，話不多。','戴帽子的客人':'戴著帽子，比較安靜。','衛生檢查員':'衛生局的。','吃貨小琪':'為了一道菜可以跑很遠。','美食部落客 Momo':'拍店，拍貓，拍甜點。','Mr. Hart':'常客裡最安靜的一位。'}[nn]||'';
- el.innerHTML=`<img alt="" ${src?'class="face"':''} src="${src||guestPortrait(g)}"><div><b>${nn}</b> <span class="tier t${h.v>=8?2:h.v>=3?1:0}">${h.v>=8?'老朋友':h.v>=3?'熟面孔':'客人'}</span><p>${h.v?`來店 ${h.v} 次・`:''}${who}${notes.length?'<br>'+notes.join(' '):''}</p></div>`;el.hidden=false;sfx.tap();clearTimeout(regCardT);regCardT=setTimeout(()=>{el.hidden=true},4200)}
+ el.innerHTML=`<img alt="" ${src?'class="face"':''} src="${src||guestPortrait(g)}"><div><b>${nn}</b>${g.table!=null&&R&&R.tables[g.table]?` <span class="tblno">${idTableName(R.tables[g.table])}</span>`:''} <span class="tier t${h.v>=8?2:h.v>=3?1:0}">${h.v>=8?'老朋友':h.v>=3?'熟面孔':'客人'}</span><p>${h.v?`來店 ${h.v} 次・`:''}${who}${notes.length?'<br>'+notes.join(' '):''}</p></div>`;el.hidden=false;sfx.tap();clearTimeout(regCardT);regCardT=setTimeout(()=>{el.hidden=true},4200)}
 /* a fact on a named guest's card (the regulars have regFact; the named have their history entry) */
 function regFactNamed(name,txt){txt=cjkSp(txt);const h=namedHist(name);h.facts=h.facts||[];if(h.facts.some(f=>f.txt===txt))return;h.facts.unshift({day:S.day,txt});if(h.facts.length>6)h.facts.length=6}
 /* ================= v2.3 Phase 8: what people say — Reviews 2.0, a Social page, a small marketing loop =================
@@ -2467,7 +2469,12 @@ const STORY_ILLUS={
  yj_key:{t:'備用鑰匙',cap:'怡君的新家。下次來，不用在樓下等了。',art:'yj_key',stage:c=>drawFlat(c,{key:1})},
  wall_leak:{t:'那面牆',cap:'下過雨以後，同一面牆。',art:'wall_leak',stage:c=>drawFlat(c,{leak:1})},
  wall_settled:{t:'調解之後',cap:'走出調解室。',art:'wall_settled',stage:c=>drawIllusSettled(c)},
+ up_cats:{t:'樓上',get cap(){return`${upCatN('mikan')}和${upCatN('ban')}不見的那一晚，最後是在樓上找到的。`},art:'up_cats',stage:c=>drawIllusUpCats(c)},   /* v2.4 rc6: the player's picture, 2026-10-02 08:15 (「去二樓發現貓的圖」) */
 };
+/* the stand-in for the night upstairs, should the picture be missing: the dark floor from above, the two street windows, the column */
+function drawIllusUpCats(c){c.fillStyle='#2A2018';c.fillRect(0,0,360,270);c.fillStyle='#8A6440';c.fillRect(30,40,300,210);c.fillStyle='rgba(60,40,24,.35)';for(let x=36;x<330;x+=12)c.fillRect(x,40,.8,210);
+ for(const wx of[50,200]){c.fillStyle='#22304A';c.fillRect(wx,14,110,40);c.fillStyle='rgba(255,214,140,.8)';for(let k=0;k<8;k++)c.fillRect(wx+8+((k*29)%96),20+((k*13)%28),2,2);c.fillStyle='#3A2A1E';for(let k=1;k<4;k++)c.fillRect(wx+k*27.5,14,1.5,40)}
+ c.fillStyle='#D8CBB4';c.fillRect(172,60,16,90);c.fillStyle='#3A2A1E';c.fillRect(250,170,70,70);c.fillStyle='#E0A050';el(c,120,40,12,6);c.fillStyle='rgba(255,220,160,.25)';el(c,180,150,120,70)}
 const ILLUS_CACHE={};
 function illusSrc(id){const I=STORY_ILLUS[id];if(!I)return null;const a=I.art&&storyArtSrc(I.art);if(a)return{src:a,tbd:false};
  if(!ILLUS_CACHE[id]){try{const cv=mkCanvas(720,540);const c=cv.getContext('2d');c.scale(2,2);I.stage(c);ILLUS_CACHE[id]=cv.toDataURL('image/jpeg',.88)}catch(e){console.warn('[illus]',id,e);return null}}return{src:ILLUS_CACHE[id],tbd:true}}
@@ -2965,7 +2972,7 @@ function upSearchUpd(dt){const Q=R.upSearch;Q.t+=dt;const T=Q.t-Q.at;const go=s=
    if(Q.t-Q.latchAt<1.8)return;go('back');upJillGo(PASS.x-36,PASS.y-70,'main');P.forEach((m,i)=>upWalk(m,m.role==='waiter'?84:300,m.role==='waiter'?150:420+i*30,'main'));return}
   case'back':{if((J.room==='main'&&J.tx==null)||T>12)upSearchEnd();return}}}
 /* upstairs, the cats safe: 「妳們兩個。」 — and only then the room (§14, §15) */
-function upFoundScene(Q,P){const a=P[0]||null,b=P[1]||null;const L=[{who:'jill',text:'妳們兩個。'}];
+function upFoundScene(Q,P){const a=P[0]||null,b=P[1]||null;const L=[{who:'jill',text:'妳們兩個。',illus:'up_cats'}];   /* v2.4 rc6: the player's picture of that night */
  if(a)L.push({who:'staff:'+a.name,text:'……這裡滿大的欸。'},{who:'jill',text:'嗯。'});
  if(b)L.push({who:'staff:'+b.name,text:'比我想的大。'},{who:'jill',text:'先把貓帶下去。'});else L.push({who:'jill',text:'……下去吧。'});
  v24Cap('up_door');
@@ -3173,7 +3180,7 @@ function restChapters(){const achD=achReal;/* v2.3 follow-up: a beat's day from 
   {t:"Jill's Kitchen — The Lounge",hidden:()=>!fact('lounge_project'),tease:'？？？？？',showIf:()=>!!fact('ken_wine_q'),beats:[['第一個晚上',BF('lounge_first_night')],['酒吧沙發廳',BF('lounge_built_2')],['安靜的角落',BF('lounge_built_3')],['「聽說這裡是你害的。」',BF('evan_origin')],['好像真的開起來了',(()=>{const k=Object.keys(story().facts).find(x=>x.startsWith('milestone_'));return k?fact(k).d:null})()]]},
   /* v2.4 P2: the Second Floor (second_floor_and_long_arcs §39: the major beats only — no line for the first question,
      none for the crew's moments; nothing that says what the floor will be) */
-  {t:'樓上',showIf:()=>!!fact('up_cats'),beats:[['房東的二樓',BF('up_inspect')],[`${upCatN('mikan')}和${upCatN('ban')}不見的那一晚`,BF('up_cats')],['「……樓上現在還空著嗎？」',BF('up_ask')],['「整層。」',BF('up_lease')]]},
+  {t:'樓上',showIf:()=>!!fact('up_cats'),beats:[['房東的二樓',BF('up_inspect')],[`${upCatN('mikan')}和${upCatN('ban')}不見的那一晚`,BF('up_cats'),{illus:'up_cats'}],['「……樓上現在還空著嗎？」',BF('up_ask')],['「整層。」',BF('up_lease')]]},
   /* v2.4 rc6 (AM): the two rooms, each its own restaurant story — the big moments only */
   {t:'大家待的地方',showIf:()=>!!fact('sr_story'),beats:[['《大家待的地方》',BF('sr_story')],['有門的房間',(()=>{const o=srOf();return o&&srBuilt()?o.done:null})()],['開始像他們的地方',(()=>{const o=srOf();return o&&srStage()>=2?o.st2:null})()],['真的有人生活過',(()=>{const o=srOf();return o&&srStage()>=3?o.st3:null})()]]},
   {t:'關上門以後',showIf:()=>!!fact('pd_story'),beats:[['《關上門以後》',BF('pd_story')],['一桌人的地方',(()=>{const o=pdOf();return o&&pdBuilt()?o.done:null})()],['「裡面可以嗎？」',BF('pd_back')],['慢慢吃',(()=>{const o=pdOf();return o&&pdStage()>=2?o.st2:null})()],['熟悉的位置',(()=>{const o=pdOf();return o&&pdStage()>=3?o.st3:null})()]]},
@@ -3187,7 +3194,7 @@ function storyPageHTML(){let h=`<p class="muted" style="font-size:12.5px;margin:
  for(const [i,C] of restChapters().entries()){if(C.showIf&&!C.showIf())continue;const hid=C.hidden&&C.hidden();const done=C.beats.filter(b=>b[1]!=null);const n=done.length;const all=n===C.beats.length;
   h+=`<div class="chap ${all?'done':''}"><div class="ch-h"><small>CHAPTER ${i+1}</small><b>${hid?(C.tease==='？？？？？'?'？？？？？':'？？？'):C.t}</b>${all?'<span class="ok">✓</span>':''}</div>`;
   if(hid){h+=`<p class="muted" style="margin:2px 0 0;font-size:12.5px">${C.tease}</p>`}
-  else{h+=dotsHTML(n,C.beats.length)+`<div class="ch-b">${histOrder(done,b=>b[1]).map((b,j)=>`<div class="sb"><span class="no">${j+1}.</span><span class="d">${b[1]>0?'DAY '+b[1]:'更早以前'}</span>${b[0]}</div>`).join('')}${unseenRowsHTML(n,C.beats.length)}</div>`}
+  else{h+=dotsHTML(n,C.beats.length)+`<div class="ch-b">${histOrder(done,b=>b[1]).map((b,j)=>`<div class="sb"><span class="no">${j+1}.</span><span class="d">${b[1]>0?'DAY '+b[1]:'更早以前'}</span>${b[0]}${b[2]&&b[2].illus&&(story().illus||{})[b[2].illus]?`<button class="btn sm sb-ill" data-act="illus" data-k="${b[2].illus}">看插圖</button>`:''}</div>`).join('')}${unseenRowsHTML(n,C.beats.length)}</div>`}
   h+=`</div>`}
  h+=`</div><div class="nm" style="font-weight:800;font-size:15px;margin:14px 0 6px">人物／關係支線</div>`;
  const open=STORY_LINES.filter(L=>{try{return L.open()&&lineProgress(L).done.length>0}catch(e){return false}});const closed=STORY_LINES.length-open.length;   /* a story is on the page from its first beat; before that it is one of the 「還沒開始」 */
@@ -3497,7 +3504,7 @@ function trayFloat(s,txt,col){s.fx={txt,col,t:0}}
 function showCombo(){const el=$('#combo');el.hidden=false;el.innerHTML='COMBO<b>×'+(R.combo|0)+'</b>';el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump')}
 function hideCombo(){$('#combo').hidden=true}
 function banner(title,subt,kind){const b=$('#banner');const d=document.createElement('div');d.className='bn '+(kind||'');d.innerHTML=`<b>${title}</b>${subt?`<span>${subt}</span>`:''}`;b.innerHTML='';b.appendChild(d);setTimeout(()=>{if(d.parentNode)d.remove()},kind==='perfect'?1050:1700)}
-function toast(html,kind){const box=$('#toasts');const lastT=box.lastElementChild;if(lastT&&lastT.innerHTML===html&&lastT.style.opacity!=='0')return;const d=document.createElement('div');d.className='toast '+(kind||'');d.innerHTML=html;box.appendChild(d);while(box.children.length>2)box.firstChild.remove();setTimeout(()=>{d.style.transition='opacity .4s';d.style.opacity='0';setTimeout(()=>d.remove(),400)},kind==='q'?3600:2800)}
+function toast(html,kind,o){const box=$('#toasts');const lastT=box.lastElementChild;if(lastT&&lastT.innerHTML===html&&lastT.style.opacity!=='0')return;const d=document.createElement('div');d.className='toast '+(kind||'');d.innerHTML=html;if(o&&(o.g||o.who)){d.classList.add('who');d.onclick=()=>{try{if(o.g)idFocusGroup(o.g,o.k||0);else idFocusWho(o.who)}catch(e){}}}   /* v2.4 rc6 (07:09): a line someone said finds them */box.appendChild(d);while(box.children.length>2)box.firstChild.remove();setTimeout(()=>{d.style.transition='opacity .4s';d.style.opacity='0';setTimeout(()=>d.remove(),400)},kind==='q'?3600:2800)}
 function ach(id){if(S.achievements[id])return;S.achievements[id]=S.day;const a=ACH.find(x=>x.id===id);if(a){setTimeout(()=>banner(a.n,'成就解鎖'),600);sfx.buy()}}
 function coach(k){if(!R||R.coach<0)return;if(k===R.coach){showCoach(COACH[k]);R.coach++;if(R.coach>=COACH.length){R.coach=-1;setTimeout(hideCoach,4500)}}}
 function showCoach(txt){const c=$('#coach');c.hidden=false;c.innerHTML=`<img alt="" src="${portraitURL([JILL_LOOK],'jill',true)}"><div>${txt}</div>`}
@@ -3518,6 +3525,59 @@ function ticketsLayout(){const el=ticketsEl;const more=$('#tkMore'),back=$('#tkB
  if(!over){more.hidden=true;back.hidden=true;return}
  const right=el.scrollLeft+el.clientWidth;let hidden=0;for(const t of el.querySelectorAll('.tk')){if(t.offsetLeft+t.offsetWidth>right+4)hidden++}
  more.hidden=hidden===0;more.innerHTML=`›<small>+${hidden}</small>`;back.hidden=el.scrollLeft<24}
+/* ---- v2.4 rc6 (the player's 07:09, docs/v24/customer_identity_linking_0709_2026-10-02.txt): who is where. A name
+   seen anywhere finds its person, and a person seen finds a name — on demand, for a moment, then the room is clean
+   again. An order's number or name takes you to its table (the room it is in, a ring round it, 「T35 · 陳家 · 8 位」);
+   a tap on a table says who is at it; a tap on a regular or a named guest gives their card with where they sit; a tap
+   on a line someone said finds them where they are now — at their table, waiting, walking out — or says they have
+   left; a guest who speaks in the room you are looking at is marked for a moment. Stable references only (the table
+   index, the group object, a regular's id, a named guest's key, a crew member's id), never a name matched as text.
+   Nothing is saved. ---- */
+const IDF=[];   /* the marks of the moment: {at:()=>{x,y,room,seated,tbl}|null, label, sub, t0, dur, strong} */
+function idNow(){return performance.now()/1000}
+function idTableName(t){return'T'+(t.i+1)}
+function idParty(g){return !g?'':g.reg==='dylan'?'Dylan':(g.name||'客人')}
+function idPartyLine(g){const n=g&&g.size||1;return idParty(g)+(n>1?` · ${n} 位`:'')}
+/* one person's own name when the game knows it: a regular, a named guest, Dylan, each of a pair 「A 與 B」 */
+function idMember(g,k){if(!g)return null;if(g.reg==='dylan')return k===0?'Dylan':null;const ids=regsOf(g);if(ids[k]&&REG_BY[ids[k]])return REG_BY[ids[k]].n;const nm=namedId(g)||g.named;if(nm)return k===0?nm:null;const m=/^(.+?) 與 (.+)$/.exec(g.name||'');if(m&&g.size===2&&!/朋友|同事|家人|們/.test(m[2]))return k?m[2]:m[1];return null}
+/* where one of a party is drawn right now */
+function idMemberAt(g,k){if(!R||!g||g.gone||!R.groups.includes(g))return null;const n=g.size||1;
+ if(g.table!=null&&['reading','order','wait','eat','check'].includes(g.state)){const t=R.tables[g.table];if(t){const sps=seatPos(t);const sp=sps[k]||sps[0]||{dx:0,dy:0};return{x:t.x+sp.dx,y:t.y+sp.dy,room:t.room||'main',seated:1}}}
+ if(isSeated(g))return{x:g.x+(n>1?(k%2?6:-6):0),y:g.y+(n>1?(k%2?3:-3):0)+Math.floor(k/2)*14,room:g.room||'main',seated:1};
+ return{x:g.x+(k-(n-1)/2)*11,y:g.y+(k%2)*2,room:g.room||'main'}}
+function idTableAt(t){return()=>({x:t.x,y:t.y,room:t.room||'main',tbl:t})}
+function idMark(at,label,sub,o){o=o||{};const m={at,label,sub:sub||'',t0:idNow(),dur:o.dur||2.4,strong:o.strong!==false};for(let i=IDF.length-1;i>=0;i--)if(IDF[i].strong===m.strong||(m.strong&&!IDF[i].strong))IDF.splice(i,1);IDF.push(m);forceDraw=true;return m}
+function idGo(rm){if(rm&&rm!==room&&roomOpen(rm))setRoom(rm)}
+/* an order's number or its name: the table */
+function idFocusTicket(tk){if(!R||!tk||!tk.g)return;const g=tk.g;const t=g.table!=null?R.tables[g.table]:null;if(!t||!R.groups.includes(g)){idFocusGroup(g,0);return}idGo(t.room||'main');idMark(idTableAt(t),idTableName(t),idPartyLine(g));sfx.tap()}
+/* a table tapped: who is at it (as well as what the tap does there) */
+function idShowTable(t){if(!t||!t.group||t.group.gone)return;idMark(idTableAt(t),idTableName(t),idPartyLine(t.group),{dur:1.9})}
+/* someone of a party: where they are now, or that they have gone */
+function idFocusGroup(g,k,o){o=o||{};const nm=o.name||idMember(g,k)||idParty(g);if(!R||!g||g.gone||!R.groups.includes(g)){if(!o.soft)toast(`${nm} 已經離開了。`);return}const p=idMemberAt(g,k);if(!p)return;if(!o.soft)idGo(p.room);
+ const t=g.table!=null&&['reading','order','wait','eat','check','toTable'].includes(g.state)?R.tables[g.table]:null;const own=idMember(g,k);const sub=t?idTableName(t)+(!own&&g.size>1?` · ${g.size} 位`:''):g.state==='leave'?'正要離開':g.state==='queue'||g.state==='arrive'?'等位中':'';
+ idMark(()=>idMemberAt(g,k),own||nm,sub,{strong:!o.soft,dur:o.soft?1.8:2.6})}
+/* who said a line: the person, wherever they are now */
+function idSpeaker(who){if(!R||!who)return null;
+ if(who==='jill'){const J=R.jill;return{name:'Jill',at:()=>R&&R.jill?{x:R.jill.x,y:R.jill.y,room:R.jill.room||'main'}:null}}
+ if(who.indexOf('staff:')===0){const nm=who.slice(6);const m=(S.crew||[]).find(x=>x.name===nm);if(!m)return null;
+  return{name:nm,at:()=>{if(!R)return null;const sw=srWalker(m.id);if(sw)return{x:sw.x,y:sw.y,room:sw.room};if(m.role==='chef'){const a=R.ck&&R.ck[m.id];return a?{x:a.x,y:a.y,room:'kitchen'}:null}const w=R.cw&&R.cw[m.id];return w?{x:w.x,y:w.y,room:w.room||'main'}:null}}}
+ let g=null,k=0;if(who==='dylan')g=R.groups.find(q=>q.reg==='dylan'&&!q.gone);else if(who.indexOf('named:')===0){const nm=who.slice(6);g=R.groups.find(q=>!q.gone&&namedId(q)===nm)}else if(REG_BY[who]){g=R.groups.find(q=>!q.gone&&regsOf(q).includes(who));if(g)k=Math.max(0,regsOf(g).indexOf(who))}else return null;
+ return g?{g,k,name:whoLabel(who)}:{gone:1,name:whoLabel(who)}}
+function idFocusWho(who){const s=idSpeaker(who);if(!s)return false;if(s.gone){toast(`${s.name} 已經離開了。`);return true}if(s.g){idFocusGroup(s.g,s.k,{name:s.name});return true}const p=s.at();if(!p){toast(`${s.name} 現在不在這裡。`);return true}idGo(p.room);idMark(s.at,s.name,p.room==='kitchen'?'廚房':'');return true}
+/* a guest who speaks in the room you are looking at: marked for a moment, where they are */
+/* a guest walking (to their table, out of the door) tapped: who it is */
+function idHitWalker(p){if(!R)return false;for(const g of R.groups){if(g.gone||!['toTable','leave','arrive'].includes(g.state)||(g.room||'main')!==room)continue;for(let k=0;k<(g.size||1);k++){const q=idMemberAt(g,k);if(q&&q.room===room&&Math.abs(p.x-q.x)<12&&p.y<q.y+5&&p.y>q.y-50){idFocusGroup(g,k,{soft:1});return true}}}return false}
+function idSpeak(g,k){if(!R||!g)return;const p=idMemberAt(g,k||0);if(p&&p.room===room)idFocusGroup(g,k||0,{soft:1,short:1})}
+/* drawn over the room while it lasts: a ring at their feet (round the table for a table), a small label over it */
+function idDraw(c){if(!IDF.length)return;const T=idNow();const vl=-SV.ox/SV.s+3,vr=srVisR()-3;let top=-SV.oy/SV.s+4;try{const tb=$('#roomTabs');if(tb&&!tb.hidden){const r0=tb.getBoundingClientRect(),r1=sc.getBoundingClientRect();top=Math.max(top,(r0.bottom-r1.top-SV.oy)/SV.s+4)}}catch(e){}
+ for(let i=IDF.length-1;i>=0;i--){const m=IDF[i];const age=T-m.t0;if(age>m.dur){IDF.splice(i,1);continue}const p=m.at&&m.at();if(!p||p.room!==room)continue;const a=Math.max(0,Math.min(1,age/.18,(m.dur-age)/.45));const pul=.5+.5*Math.sin(age*7);c.save();c.globalAlpha=a;
+  let ly;if(p.tbl){const t=p.tbl;c.strokeStyle=`rgba(255,212,120,${.6+pul*.35})`;c.lineWidth=2.4;if(t.pdr){const G=pdGeo();rr(c,G.x-G.hw-38,G.y0-24,(G.hw+38)*2,G.y1-G.y0+42,14);c.stroke();ly=G.y0-36}else{c.beginPath();c.ellipse(t.x,t.y-10,t.seats===4?52:44,24,0,0,Math.PI*2);c.stroke();ly=t.y-(t.seats===4?86:74)}}
+  else{c.strokeStyle=`rgba(255,212,120,${(m.strong?.6:.4)+pul*.3})`;c.lineWidth=m.strong?2.2:1.5;c.beginPath();c.ellipse(p.x,p.y+1,15,5.5,0,0,Math.PI*2);c.stroke();ly=p.y-(p.seated?80:92)}
+  idLabel(c,p.x,ly,m.label,m.sub,m.strong,vl,vr,top,p.tbl?p.tbl.y+8:p.y+8);c.restore()}}
+function idLabel(c,x,y,a,b,strong,vl,vr,top,below){const fa=`800 ${strong?10.6:9}px ${FONT}`,fb=`700 ${strong?9.4:8}px ${FONT}`;c.font=fa;const wa=c.measureText(a).width;c.font=fb;const sb=b?' · '+b:'';const wb=sb?c.measureText(sb).width:0;const w=wa+wb+16,h=strong?19:16;
+ let x0=clamp(x-w/2,vl,Math.max(vl,vr-w));let y0=y-h/2;if(y0<top)y0=Math.max(top,below);
+ c.fillStyle=strong?'rgba(34,28,24,.88)':'rgba(34,28,24,.72)';rr(c,x0,y0,w,h,h/2);c.fill();if(strong){c.strokeStyle='rgba(255,212,120,.75)';c.lineWidth=.9;rr(c,x0,y0,w,h,h/2);c.stroke()}
+ c.textBaseline='middle';c.textAlign='left';c.font=fa;c.fillStyle='#FFF6E4';c.fillText(a,x0+8,y0+h/2+.4);if(sb){c.font=fb;c.fillStyle='#E9D6AE';c.fillText(sb,x0+8+wa,y0+h/2+.4)}c.textBaseline='alphabetic'}
 function renderTickets(){if(!R){ticketsEl.innerHTML=`<div class="tk-empty">${phase==='service'?'':'訂單會出現在這裡。'}</div>`;tkVer=-1;tkRefs=[];ticketsEl.classList.remove('scroll','compact');const m=$('#tkMore');if(m){m.hidden=true;$('#tkBack').hidden=true}return}
  if(R.tv===tkVer)return;tkVer=R.tv;
  if(!R.tickets.length){ticketsEl.innerHTML='<div class="tk-empty">還沒有訂單。點有「!」的桌子幫客人點餐。</div>';tkRefs=[];ticketsLayout();return}
@@ -3535,7 +3595,8 @@ ticketsEl.addEventListener('scroll',()=>ticketsLayout(),{passive:true});
  document.addEventListener('keydown',e=>{if(phase==='service'&&R&&!paused&&!sub&&(e.key==='['||e.key===']')){const i=SPEEDS.indexOf(simSpeed());setSpeed(SPEEDS[clamp(i+(e.key===']'?1:-1),0,SPEEDS.length-1)]);return}if(!lightbox)return;if(e.key==='Escape')closeLightbox();else if(e.key==='ArrowLeft')lightboxStep(-1);else if(e.key==='ArrowRight')lightboxStep(1)})}}
 $('#tkMore').addEventListener('click',()=>{ticketsEl.scrollBy({left:ticketsEl.clientWidth*.8,behavior:'smooth'});setTimeout(ticketsLayout,400)});
 $('#tkBack').addEventListener('click',()=>{ticketsEl.scrollBy({left:-ticketsEl.clientWidth*.8,behavior:'smooth'});setTimeout(ticketsLayout,400)});
-ticketsEl.addEventListener('click',e=>{const tb=e.target.closest('[data-treat]');if(tb&&R){const tk=R.tickets.find(t=>t.id===+tb.dataset.treat);if(tk)playerTreat(tk.g);return}const b=e.target.closest('.it');if(!b||!R)return;const tk=R.tickets.find(t=>t.id===+b.dataset.tk);if(!tk)return;const it=tk.items[+b.dataset.i];if(!it)return;
+ticketsEl.addEventListener('click',e=>{const tb=e.target.closest('[data-treat]');if(tb&&R){const tk=R.tickets.find(t=>t.id===+tb.dataset.treat);if(tk)playerTreat(tk.g);return}
+ {const th=e.target.closest('.tk-h,.tk-who');if(th&&R){const el0=th.closest('.tk');const tk=el0&&R.tickets.find(t=>t.id===+el0.dataset.tk);if(tk)idFocusTicket(tk);return}}   /* v2.4 rc6 (07:09): the order's number or name — its table */const b=e.target.closest('.it');if(!b||!R)return;const tk=R.tickets.find(t=>t.id===+b.dataset.tk);if(!tk)return;const it=tk.items[+b.dataset.i];if(!it)return;
  if(it.st==='pending')startCook(tk,it);else if(it.st==='ready'){const t=R.tables[tk.g.table];if(t)tapTable(t)}else if(it.st==='order'){toast(`食材運送中，還要 ${Math.max(1,Math.ceil(it.ordT-R.t))} 秒`)}else if(it.st==='cooking'){const i=R.slots.findIndex(x=>x.job&&x.job.it===it);if(i>=0){R.focus=i;R.panel=true;R.panelT=0}}});
 function renderTasks(){const chip=$('#taskChip');if(!S.today||phase!=='service'){chip.hidden=true;$('#taskPanel').hidden=true;const lp=$('#logPanel');if(lp)lp.hidden=true;const sp=$('#stockPanel');if(sp)sp.hidden=true;logChip();stockChip();const rt=$('#roomTabs');if(rt)rt.hidden=true;return}chip.hidden=false;const ts=S.today.tasks;$('#taskDots').innerHTML=ts.map(t=>`<i class="${taskProg(t)>=t.n?'on':''}"></i>`).join('');
  if(!$('#taskPanel').hidden)$('#taskPanel').innerHTML=`<h4>今日任務</h4>`+ts.map(t=>{const p=Math.min(t.n,taskProg(t));const done=p>=t.n;return`<div class="task ${done?'done':''}"><span>${t.txt}</span><small>+${fmt(t.reward)}</small><div class="bar"><i style="width:${t.k==='noangry'?(R&&R.st.angry?0:100):p/t.n*100}%"></i></div><small>${t.k==='noangry'?(R&&R.st.angry?'失敗':'維持中'):t.k==='revenue'?fmt(p)+' / '+fmt(t.n):p+' / '+t.n}</small></div>`}).join('')}
@@ -3746,7 +3807,7 @@ function drawStringLights(c,now,dusk){if(S.level<2)return;const x0=-BGM,x1=LW+BG
 function drawScene(now){const c=sctx;c.setTransform(1,0,0,1,0,0);c.globalAlpha=1;c.globalCompositeOperation='source-over';if(c.filter!==undefined&&c.filter!=='none')c.filter='none';c.fillStyle='#1E1714';c.fillRect(0,0,sc.width,sc.height);
  bgCheck(now);const s=SV.s*DPR;c.setTransform(s,0,0,s,SV.ox*DPR,SV.oy*DPR);const X0=-BGM,XW=LW+BGM*2;
  const TOP=SV.oy/SV.s,WT=wallTop();
- if(room!=='main'){c.save();c.beginPath();c.rect(X0,-TOP,XW,LH+TOP);c.clip();drawOtherRoom(c,now,duskF(),view(),X0,XW,TOP);c.restore();return}
+ if(room!=='main'){c.save();c.beginPath();c.rect(X0,-TOP,XW,LH+TOP);c.clip();drawOtherRoom(c,now,duskF(),view(),X0,XW,TOP);try{idDraw(c)}catch(e){}c.restore();return}
  if(TOP>1){c.fillStyle=TH().base;c.fillRect(X0,-TOP,XW,TOP);
   if(WT<0){let wg=c.createLinearGradient(0,WT,0,0);wg.addColorStop(0,TH().wall1);wg.addColorStop(1,TH().wall0);c.fillStyle=wg;c.fillRect(X0,WT,XW,-WT);
    c.strokeStyle='rgba(70,70,66,.3)';c.lineWidth=.7;for(let x=X0+10;x<LW+BGM;x+=92){c.beginPath();c.moveTo(x,WT);c.lineTo(x,0);c.stroke()}for(let y=0;y>WT;y-=44){c.beginPath();c.moveTo(X0,y);c.lineTo(LW+BGM,y);c.stroke()}
@@ -3790,6 +3851,7 @@ function drawScene(now){const c=sctx;c.setTransform(1,0,0,1,0,0);c.globalAlpha=1
  if(R&&R.blackout>0){R.blackout-=1/60;const a=R.blackout>2.2?.75:R.blackout>.5?.85:(R.blackout/.5)*.85;c.fillStyle=`rgba(8,6,12,${a})`;c.fillRect(X0,-TOP,XW,LH+TOP)}
  if(FLASH){c.fillStyle=`rgba(255,255,255,${(1-FLASH.t/.5)*.55})`;c.fillRect(FLASH.x-78,FLASH.y-82,156,112)}
  let vg=c.createRadialGradient(206,290,210,206,290,400);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(15,8,4,.38)');c.fillStyle=vg;c.fillRect(X0,-TOP,XW,LH+TOP);
+ try{idDraw(c)}catch(e){}   /* v2.4 rc6 (07:09): who is where, for a moment */
  c.restore()}
 const WALK_ST=['arrive','queue','toTable','leave'];
 function drawWalkers(c,g,now){const n=g.size;const sit=isSeated(g);const wact=g.state==='queue'&&!g.moving?g.wact:null;const mood=g.state==='leave'?(g.mood==='angry'?'angry':g.mood==='sad'?'sad':'happy'):(g.pat>.5?'happy':g.pat>.25?'ok':'sad');
@@ -4918,7 +4980,9 @@ function drawUpPlan(c){const g=upPlanGeo();const P=g.plate,st=upPlanState();cons
  c.fillStyle=WALL;c.fillRect(g.pil.x0,Y(P.y0),g.pil.x1-g.pil.x0,6);
  const sw=[[Y(g.und.y)+14,Y(g.und.y)+62],[Y(g.und.y)+80,Y(g.und.y)+128]];let ys=top;for(const [a,b] of sw){c.fillRect(P.x0-T,ys,T,a-ys);ys=b}c.fillRect(P.x0-T,ys,T,Y(P.y1)+T-ys);
  for(const [a,b] of sw){c.fillStyle='#E4EDF1';c.fillRect(P.x0-T,a,T,b-a);c.strokeStyle=GLASS;c.lineWidth=1.3;for(const xx of[P.x0-T+1.6,P.x0-1.6]){c.beginPath();c.moveTo(xx,a);c.lineTo(xx,b);c.stroke()}c.lineWidth=.9;c.beginPath();c.moveTo(P.x0-T/2,a);c.lineTo(P.x0-T/2,b);c.stroke()}
- c.fillStyle=WALL;c.fillRect(P.x1,top,T,Y(P.y1)+T-top);c.fillRect(P.x0-T,Y(P.y1),P.x1-P.x0+2*T,T);
+ /* the far side wall: solid, with two windows above the stairs (as in the player's picture of the floor, 2026-10-02) */const rw=[[Y(P.y0)+44,Y(P.y0)+108],[Y(P.y0)+150,Y(P.y0)+214]];c.fillStyle=WALL;{let y2=top;for(const [a,b] of rw){c.fillRect(P.x1,y2,T,a-y2);y2=b}c.fillRect(P.x1,y2,T,Y(P.y1)+T-y2)}
+ for(const [a,b] of rw){c.fillStyle='#E4EDF1';c.fillRect(P.x1,a,T,b-a);c.strokeStyle=GLASS;c.lineWidth=1.3;for(const xx of[P.x1+1.6,P.x1+T-1.6]){c.beginPath();c.moveTo(xx,a);c.lineTo(xx,b);c.stroke()}c.lineWidth=.9;c.beginPath();c.moveTo(P.x1+T/2,a);c.lineTo(P.x1+T/2,b);c.stroke()}
+ c.fillStyle=WALL;c.fillRect(P.x0-T,Y(P.y1),P.x1-P.x0+2*T,T);
  /* each room's own walls, its door (the gap, the leaf, the swing) and its name */
  const door=(x,y,w)=>{c.strokeStyle=IN;c.lineWidth=1.3;c.beginPath();c.moveTo(x,y);c.lineTo(x,y-w);c.stroke();c.strokeStyle='rgba(92,80,71,.55)';c.lineWidth=.9;c.setLineDash([3,2]);c.beginPath();c.arc(x,y,w,-Math.PI/2,0);c.stroke();c.setLineDash([])};
  const walls=(B,D,k)=>{if(!st[k])return;const built=st[k]==='built';const x0=B.x0,x1=B.x1,y0=Y(B.y0),y1=Y(B.y1),dw=24,dx0=D.x-dw/2;c.strokeStyle=IN;c.lineWidth=4;if(!built){c.setLineDash([6,4]);c.lineWidth=2.4}
@@ -6064,7 +6128,7 @@ let regCardT=0;
 function showRegCard(g){const el=$('#regcard');if(!el)return;if(!g.reg&&namedId(g)){showNamedCard(g);return}const id=regsOf(g)[g.hitWho||0]||g.reg;const v=S.regulars[id]||0;const isD=id==='dylan';const tier=regTier(v);const rv=isD&&S.dylan.stage>=3;if(isD)g.tagT=R?R.t+2.6:0;
  let who=isD?(rv?DYLAN.who2:DYLAN.who):REG_BY[id].who;const notes=[];if(isD&&!rv){if(S.dylan.stage>=1)notes.push('打烊後偶爾會留下來。');if(S.dylan.clues.knows)notes.push('好像知道東西放在哪。');if(S.dylan.seen&&S.dylan.seen.wang)notes.push('王太太也注意到他了。');if((S.dylan.clues.pet||0)>=1)notes.push('貓對他好像不太怕生。');if((S.dylan.clues.tidy||0)>=1)notes.push('走之前會自己收盤子。');if((S.dylan.clues.pause||0)>=2)notes.push('Jill 經過他那桌的時候，會停一下。')}
  else if(!isD){const cf=(S.catFam&&S.catFam[id])||0;if(cf>=4)notes.push(['wangwife','sophie','mia'].includes(id)?'樾樾不躲她了。':'樾樾不躲他了。');const m=regMem(id);if(m.facts.length)notes.push(m.facts[0].txt);else{const nt=notesFor(id,1);if(nt.length)notes.push(`「${nt[0].txt}」`)}}
- const pf=portraitOf(isD?'dylan':id);el.innerHTML=`<img alt="" ${pf?'class="face"':''} src="${pf?pf.src:isD?portraitURL(DYLAN.looks,'regdylan'):portraitURL(REG_BY[id].looks,'reg'+id)}"><div><b>${isD?'Dylan':REG_BY[id].n}</b> <span class="tier t${Math.floor(tier)}">${rv?'Jill 的先生':TIER_N[tier]}</span><p>${v?`來店 ${v} 次・`:''}${who}${notes.length?'<br>'+notes.join(' '):''}${rv&&S.dylan.trace&&S.dylan.trace.length>1?`<br><span class="muted">這幾天：${S.dylan.trace.slice(-7).map(e=>e.c?'●':e.door?'◐':'○').join('')}</span>`:''}</p></div>`;/* v2.2.1 K: after the reveal his card shows the last days — came ● / looked in at the door ◐ / not today ○ */
+ const pf=portraitOf(isD?'dylan':id);el.innerHTML=`<img alt="" ${pf?'class="face"':''} src="${pf?pf.src:isD?portraitURL(DYLAN.looks,'regdylan'):portraitURL(REG_BY[id].looks,'reg'+id)}"><div><b>${isD?'Dylan':REG_BY[id].n}</b>${g.table!=null&&R&&R.tables[g.table]?` <span class="tblno">${idTableName(R.tables[g.table])}</span>`:''} <span class="tier t${Math.floor(tier)}">${rv?'Jill 的先生':TIER_N[tier]}</span><p>${v?`來店 ${v} 次・`:''}${who}${notes.length?'<br>'+notes.join(' '):''}${rv&&S.dylan.trace&&S.dylan.trace.length>1?`<br><span class="muted">這幾天：${S.dylan.trace.slice(-7).map(e=>e.c?'●':e.door?'◐':'○').join('')}</span>`:''}</p></div>`;/* v2.2.1 K: after the reveal his card shows the last days — came ● / looked in at the door ◐ / not today ○ */
  el.hidden=false;sfx.tap();clearTimeout(regCardT);regCardT=setTimeout(()=>{el.hidden=true},4200)}
 function hitCat(p){if(!CATS)return null;let best=null,bd=0;for(const c of CATS){if(c.hidden)continue;const lying=['sleep','bed','loaf','curl','belly'].includes(c.pose)||c.st==='sleep';const r=(c.def.fluffy?27:22)*(lying?1:1);const d=Math.hypot(p.x-c.x,(p.y-(c.y-(lying?8:12)))*(lying?1.4:1));if(d<r&&(best===null||d<bd)){bd=d;best=c}}return best}
 /* 包包 knows you are there; he just is not getting up. Eyes open a moment, an ear and the tail flick, a purr. */
@@ -6197,9 +6261,9 @@ function roomTap(p,e){e.preventDefault();audioInit();
  if(room==='front'){if(Math.abs(p.x-FR.door.x)<30&&p.y>176&&p.y<276){setRoom('main');return true}}
  /* v2.4 rc6: on the floor its doors open the rooms; inside a room its door goes back out onto the floor (06:36) */if(room==='up'){const inB=(B,m)=>p.x>=B.x0-m&&p.x<=B.x1+UPRW.sd+m&&p.y>=B.y0-UPRW.h-m&&p.y<=B.y1+m;if(UPV==='reveal'){upRevealSkip();return true}if(srBuilt()&&inB(UPR.sr,4)){setRoom('staff');return true}if(pdBuilt()&&inB(UPR.pd,4)){setRoom('pdr');return true}}
  if((room==='staff'&&srDoorHit(p))||(room==='pdr'&&Math.abs(p.x-PDL.door.x)<46&&p.y>LH-56)){setRoom('up');return true}
- const rg=hitRegular(p);if(rg&&!paused){showRegCard(rg);return true}
+ const rg=hitRegular(p);if(rg&&!paused){showRegCard(rg);idFocusGroup(rg,rg.hitWho||0,{soft:1});return true}
  if(!R||paused||phase!=='service')return false;let best=null,bd=1e9;for(const t of R.tables){if((t.room||'main')!==room)continue;const d=t.pdr?(pdHit(p)?0:1e9):Math.hypot((p.x-t.x)*.85,p.y-(t.y-16));const lim=t.pdr?60:t.seats===4?46:40;if(d<lim&&d<bd){bd=d;best=t}}
- if(best){tapTable(best);return true}return false}
+ if(best){tapTable(best);idShowTable(best);return true}return idHitWalker(p)}
 function tapKItem(k){audioInit();KPOP[k]=performance.now()/1000;const now=performance.now()/1000;
  if(k.startsWith('miss:')){toast(`${k.slice(5)}還沒買，打烊後可以在商店購買`);return}
  switch(k){
@@ -6805,6 +6869,7 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
  {ic:'🍳',h:'開店與料理',sum:'每天 17:00 開店、21:30 打烊。你是 Chef Jill，點餐廳裡的東西就能指揮她。',pts:[
   ['房間','票券列下面的分頁：店門口・主廳・側廳・二樓（租下以後）・休息室・包廂（蓋好以後）・Lounge（蓋好以後）・廚房（也可以用 ←→ 或數字鍵）。你在哪一間，那個分頁就亮著，寫著那一間的全名——在休息室裡是「員工休息室」，在包廂裡是「私人包廂」。二樓是整層樓本身：上面的房間關著門，點門就進去，房間裡靠近你的那扇門回到二樓；上二樓的樓梯門在側廳靠近你的那一邊。新的房間蓋好的那天早上，開店前會先帶你上二樓看一眼；整層的平面圖在「店舖工程」的二樓那一欄。包廂的分頁上有跟桌子一樣的提示。主廳的後牆有側廳的拱門，Lounge 蓋好以後旁邊多一道，都可以直接點。主廳底部沒有廚房——廚房是自己的一間，出菜口在那裡；Jill 和服務生會走到主廳最下面去拿菜。'],
   ['帶位','有空桌客人會自己坐；客滿時在門口長椅等。想指定順序，點那組客人或點空桌。'],
+  ['誰在哪裡','訂單上的桌號（T35）或名字點一下，會切到那一桌所在的房間，那一桌亮一下，寫著幾號桌、哪一組、幾位。點一張有客人的桌子也一樣會寫出來。點常客或認得的客人，他的小卡片上寫著坐哪一桌。畫面下方誰說了一句話，點那句話就會找到他現在在哪——還在桌上、在等位、正要離開；已經走了也會告訴你。標示幾秒就消失，平常畫面上不會一直掛著名字。'],
   ['點餐','桌上出現紅色「!」→ 點桌子，Jill 過去點餐。'],
   ['做菜','切到廚房，點亮著「+」的設備，照料理台的指示一步一步做。有廚師的工作站他們會自己接。'],
   ['上菜','桌上出現銀色餐蓋 → 點桌子，Jill 去出菜口端菜。有服務生（LV2 起）他們會自己端。'],
@@ -6930,10 +6995,10 @@ sc.addEventListener('pointerdown',e=>{const p=scenePt(e);SW={x:e.clientX,y:e.cli
  if(room!=='main'){if(roomTap(p,e))SW.hit=true;return}
  if(S.rooms&&S.rooms.side&&p.x>=SIDE_ARCH.x-6&&p.x<=SIDE_ARCH.x+SIDE_ARCH.w+6&&p.y>=SIDE_ARCH.y-4&&p.y<=SIDE_ARCH.y+112&&!hitCat(p)){e.preventDefault();SW.hit=true;setRoom('side');return}
  if(S.rooms&&S.rooms.lounge&&p.x>=LOUNGE_ARCH.x-6&&p.x<=LOUNGE_ARCH.x+LOUNGE_ARCH.w+6&&p.y>=LOUNGE_ARCH.y-4&&p.y<=LOUNGE_ARCH.y+112&&!hitCat(p)){e.preventDefault();SW.hit=true;setRoom('lounge');return}
- if(R&&!paused&&phase==='service'&&tapThief(p)){e.preventDefault();SW.hit=true;return}const ct=hitCat(p);if(ct&&!paused){e.preventDefault();tapCat(ct);return}const rg=hitRegular(p);if(rg&&!paused){e.preventDefault();showRegCard(rg);return}const hs=hitSpot(p);if(hs&&!paused){e.preventDefault();tapSpot(hs);return}if(!paused&&p.y>FB-16){const ki=hitKItem(p);if(ki){e.preventDefault();SW.hit=true;tapKItem(ki);return}}if(!R||paused||phase!=='service')return;e.preventDefault();audioInit();
+ if(R&&!paused&&phase==='service'&&tapThief(p)){e.preventDefault();SW.hit=true;return}const ct=hitCat(p);if(ct&&!paused){e.preventDefault();tapCat(ct);return}const rg=hitRegular(p);if(rg&&!paused){e.preventDefault();showRegCard(rg);idFocusGroup(rg,rg.hitWho||0,{soft:1});return}const hs=hitSpot(p);if(hs&&!paused){e.preventDefault();tapSpot(hs);return}if(!paused&&p.y>FB-16){const ki=hitKItem(p);if(ki){e.preventDefault();SW.hit=true;tapKItem(ki);return}}if(!R||paused||phase!=='service')return;e.preventDefault();audioInit();
  let best=null,bd=1e9;for(const g of queued()){if(g.state!=='queue'&&g.state!=='arrive')continue;const d=Math.hypot(p.x-g.x,p.y-(g.y-22));if(d<26&&d<bd){bd=d;best={g}}}
  for(const t of R.tables){if((t.room||'main')!==room)continue;const d=Math.hypot((p.x-t.x)*.85,p.y-(t.y-16));const lim=t.seats===4?46:40;if(d<lim&&d<bd){bd=d;best={t}}}
- if(!best)return;SW.hit=true;if(best.g){const t=freeTableFor(best.g);if(t)seatGroup(best.g,t);else toast('目前沒有空桌，先收拾一下吧')}else tapTable(best.t)});
+ if(!best){if(idHitWalker(p))SW.hit=true;return}SW.hit=true;if(best.g){const t=freeTableFor(best.g);if(t){seatGroup(best.g,t);idMark(idTableAt(t),idTableName(t),idPartyLine(best.g),{dur:1.9})}else{toast('目前沒有空桌，先收拾一下吧');idFocusGroup(best.g,0,{soft:1})}}else{tapTable(best.t);idShowTable(best.t)}});
 function doCtrl(h){const s=h.s;switch(h.act){case'ing':actIng(s,h.arg);break;case'dose':actDose(s);break;case'doseDone':actDoseDone(s);break;case'tap':actTap(s);break;case'zone':actZone(s);break;case'hold':holdStart(s);break;case'close':R.panel=false;break;case'start':{const n=nextPendingFor(s.type);if(n)startCook(n.tk,n.it);break}}}
 tc.addEventListener('pointerdown',e=>{if(!R||paused||phase!=='service')return;e.preventDefault();audioInit();const r=tc.getBoundingClientRect();const x=e.clientX-r.left,y=e.clientY-r.top;
  for(const h of TRAYHIT.chips){if(inR(h,x,y)){const s=R.slots[h.i];R.focus=h.i;R.focusLock=R.t+1.6;if(!s.job){const n=nextPendingFor(s.type);if(n)startCook(n.tk,n.it)}else sfx.tap();return}}
@@ -7016,7 +7081,8 @@ function dlgNext(){if(!DLG)return;DLG.i++;if(DLG.i>=DLG.lines.length){const d=DL
    Jill/Dylan exchanges show both faces, the speaker lit. ---- */
 function portraitLine(who,txt,o){o=o||{};const p=portraitOf(who,o.tone);if(!p)return false;const box=$('#plines');if(!box)return false;const w=o.with?portraitOf(o.with,o.withTone):null;
  const d=document.createElement('div');d.className='pline '+(p.side==='right'?'right':'left');d.innerHTML=`${w&&w.side==='left'?`<img class="dim" alt="" src="${w.src}">`:''}${p.side==='left'?`<img alt="" src="${p.src}">`:''}<div class="pl-t"><b>${p.name}</b><span>${txt}</span></div>${p.side==='right'?`<img alt="" src="${p.src}">`:''}${w&&w.side==='right'?`<img class="dim" alt="" src="${w.src}">`:''}`;
- box.appendChild(d);while(box.children.length>2)box.firstChild.remove();const T=setTimeout(()=>{d.classList.add('out');setTimeout(()=>d.remove(),260)},o.ms||3400);d.onclick=()=>{clearTimeout(T);d.remove()};return true}
+ box.appendChild(d);while(box.children.length>2)box.firstChild.remove();const T=setTimeout(()=>{d.classList.add('out');setTimeout(()=>d.remove(),260)},o.ms||3400);d.onclick=()=>{clearTimeout(T);d.remove();try{if(o.g&&R)idFocusGroup(o.g,o.k||0,{name:p.name});else idFocusWho(who)}catch(e){}};   /* v2.4 rc6 (07:09): a tap on the line finds who said it */
+ return true}
 function hideScreen(){screenEl.hidden=true;screenEl.innerHTML='';sub=null}
 function topIcons(){return`<button class="icon-btn" data-act="peek" aria-label="看店裡" style="font-weight:800;font-size:11px;width:auto;padding:0 9px">看店裡</button><button class="icon-btn" data-act="guide" aria-label="店主手冊" style="font-weight:800;font-size:15px">?</button><button class="icon-btn" data-act="book" aria-label="餐廳日誌">${SVG.book}</button><button class="icon-btn" data-act="settings" aria-label="設定">${SVG.gear}</button>`}
 

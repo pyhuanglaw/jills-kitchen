@@ -1,0 +1,222 @@
+Use the attached fashion references as ART DIRECTION, not as garments to copy.
+
+The wardrobe pass is clearly better than before. KEEP the current improvement and iterate from it; do not restart the system.
+
+The next problem is no longer simply “more colors / more patterns.”
+The next goal is:
+
+THE NPC SHOULD LOOK LIKE A PERSON WHO GOT DRESSED,
+NOT A CHARACTER GENERATOR THAT SELECTED A PATTERN.
+
+REFERENCE ROLES
+
+1. RALPH LAUREN — PRIMARY REFERENCE
+Use this as the main everyday wardrobe grammar for Jill’s Kitchen customers.
+
+Study:
+- smart casual dressing
+- preppy elements without making everyone preppy
+- shirts under knitwear
+- visible collars
+- cardigans
+- knitwear
+- jackets / blazers
+- stripes
+- restrained checks
+- layering
+- different necklines
+- sleeve variation
+- coherent color combinations
+- texture and material contrast
+- relaxed tailoring
+- outfits that feel polished but still believable for ordinary people going to a restaurant
+
+Ralph Lauren is especially useful because these outfits can look refined without making every customer look like runway fashion.
+
+2. HERMÈS — COLOR / PATTERN REFERENCE
+This reference exists to demonstrate:
+
+COLORFUL ≠ CHEAP
+PATTERNED ≠ BAD
+COMPLEX ≠ NOISY
+
+A garment may contain several colors or a strong graphic pattern when the entire garment has coherent design intent.
+
+Do NOT copy Hermès motifs, logos, trademark patterns, or specific products.
+
+3. CHANEL — TEXTURE / STRUCTURE REFERENCE
+Use this to understand how an ornate garment can still feel controlled and sophisticated through:
+- material
+- trim
+- construction
+- silhouette
+- texture
+- proportion
+
+Do NOT copy Chanel jackets, logos, trademark details, or specific products.
+
+IMPORTANT CORRECTION TO THE CURRENT WARDROBE SHEET
+
+STRIPES ARE GENERALLY SAFE.
+
+I am completely comfortable with tasteful striped shirts, striped knits, rugby/preppy stripes, Breton-like stripes, etc., provided the colors and proportions work.
+
+SMALL FLORALS AND POLKA DOTS ARE NOT GENERIC “GOOD FASHION” OPTIONS.
+
+Do NOT treat:
+- tiny floral print
+- ditsy floral
+- random small flowers
+- polka dots
+- scattered dots
+
+as automatic visual upgrades.
+
+These patterns are extremely dependent on silhouette, scale, palette, styling, age/personality, and the specific wearer.
+
+If the renderer cannot make a floral or dotted outfit genuinely convincing, DO NOT USE IT.
+
+A good plain knit or striped shirt is much better than a mediocre floral print.
+
+Do not increase floral/dot frequency simply to create visual variety.
+
+CURRENT PROBLEM
+
+The current wardrobe sheet has successfully added:
+plain / knit / shirt / cardigan / stripe / check / floral / geometric / tweed / etc.
+
+That is useful infrastructure.
+
+But too many outfits still read as:
+
+same character silhouette
++ different fill
++ different pattern.
+
+Do NOT solve the next iteration by adding 20 more pattern categories.
+
+Instead improve:
+
+SILHOUETTE + LAYERING + GARMENT CONSTRUCTION.
+
+At this small character scale, prioritize visually readable differences such as:
+
+- shirt collar visible under sweater
+- crew neck vs V-neck vs mock neck
+- cardigan over shirt
+- blazer / short jacket
+- overshirt
+- polo
+- different sleeve lengths
+- knit texture
+- structured jacket
+- simple dress silhouette
+- skirt / trouser distinction where readable
+- outer layer vs inner layer
+- contrasting collar / cuff / trim
+- restrained accessories only when readable
+
+The outfit should have an internal relationship.
+
+Example:
+navy knit + pale blue shirt collar
+is better than
+navy shirt with random dots.
+
+cream cardigan + striped inner shirt
+is better than
+another random floral top.
+
+IMPORTANT:
+Do not turn the restaurant into Ralph Lauren, Hermès, or Chanel.
+
+These are references for DESIGN LOGIC only.
+
+Do not reproduce:
+- logos
+- monograms
+- trademark prints
+- recognizable branded motifs
+- exact runway looks
+- exact garments
+
+Generic NPCs should remain original Jill’s Kitchen characters.
+
+GROUP COMPOSITION
+
+A table of 8–10 people should NOT look color-coordinated like they planned a group photo.
+
+Each person dresses independently.
+
+But the group should also not look like:
+red / orange / yellow / green / blue / purple random RGB assignment.
+
+Use natural variation.
+
+Some people can be very simple.
+Some can be polished.
+A few can have stronger fashion.
+Not everyone needs visual interest.
+
+For a typical PDR group, favor:
+- several quiet smart-casual outfits
+- several outfits with good layering / texture / tailoring
+- perhaps 1–2 stronger statement looks
+
+This is visual rhythm, NOT a hard quota.
+
+COLOR
+
+Do not be afraid of color.
+
+The problem was NEVER “too much color.”
+The problem was RANDOM COLOR WITHOUT DESIGN INTENT.
+
+Good:
+- burgundy knit over pale shirt
+- forest cardigan + cream shirt
+- navy blazer + stripe
+- camel knit
+- cobalt jacket used intentionally
+- colorful graphic knit when coherent
+- multicolor textured jacket when genuinely well designed
+
+Bad:
+- random saturated solid colors assigned independently
+- rainbow table
+- cheap-looking tiny floral used as “variety”
+- random dots
+- same silhouette recolored repeatedly
+
+FALLBACK RULE
+
+If a complex garment does not look genuinely good at Jill’s Kitchen’s small sprite scale:
+
+SIMPLIFY IT.
+
+Simple but well-designed > complex but cheap.
+
+Do not force fashion detail that the renderer cannot support.
+
+IMPLEMENTATION APPROACH
+
+Do not rebuild the wardrobe system.
+
+Use the existing wardrobe work as the base.
+
+First make a SMALL comparison sample:
+- current improved wardrobe
+- revised wardrobe emphasizing silhouette/layering
+- one 8–10 person PDR group in actual game scale
+
+Judge the result IN THE REAL PDR SCENE, not only on the wardrobe sheet.
+
+The final test is:
+
+Do these look like 8–10 different people who independently got dressed to have dinner at Jill’s Kitchen?
+
+Not:
+“How many pattern categories are represented?”
+
+Preserve all existing named/canonical character identities and outfits.
+This pass primarily concerns generic customers / random groups / minor noncanonical NPCs.

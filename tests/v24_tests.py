@@ -201,7 +201,7 @@ def v24_illustrations_show_with_the_scene_and_reopen(b, port, target):
     g.ev("dlgNext()")
     check(g.ev("document.querySelector('#dlg .dlg-name').textContent") == '怡君', 'a line can carry a name without a portrait')
     g.ev("dlgNext()"); check(g.ev("$('#dlg').hidden"), 'closed')
-    check(g.ev("['yj_intro','yj_key','wall_leak','wall_settled'].every(k=>!!STORY_ART[k])"), "all four of the player's pictures are in")
+    check(g.ev("['yj_intro','yj_key','wall_leak','wall_settled','up_cats'].every(k=>!!STORY_ART[k])"), "all five of the player's pictures are in")
     g.ev("window.__keep=STORY_ART.wall_leak;delete STORY_ART.wall_leak;for(const k in ILLUS_CACHE)delete ILLUS_CACHE[k]")
     g.ev("scene([{who:'',text:'下過雨以後。'}],null,{illus:'wall_leak'})"); g.page.wait_for_timeout(200)
     s = json.loads(g.ev("JSON.stringify({src:document.querySelector('.dlg-illus img').src.slice(0,16),tbd:!document.querySelector('.dlg-illus-tbd').hidden})"))
@@ -777,17 +777,23 @@ def v24_the_night_of_the_missing_cats(b, port, target):
     party = g.ev("R.upSearch.F")
     check(nina not in party and len(party) >= 1, f'only the people who are here search: {party}')
     c0 = g.ev("R.closing")
-    seen = {'side': False, 'up': False, 'tab': False}
+    seen = {'side': False, 'up': False, 'tab': False, 'illus': False}
     for _ in range(300):   # about a minute and a half of the evening, ten frames at a time
         g.ev("for(let i=0;i<10;i++)__tick(1000/30)")
         if g.ev("!R||!R.upSearch||R.upSearch.end"): break
         if g.ev("room==='side'"): seen['side'] = True
         if g.ev("room==='up'"): seen['up'] = True
         if g.ev("roomsOpen().includes('up')"): seen['tab'] = True
+
     check(g.ev("!!(R&&R.upSearch&&R.upSearch.end)") is True, 'the search ends')
     check(seen['side'] and seen['up'] and seen['tab'], f'the door in the side room, then the floor upstairs: {seen}')
     check(g.ev("R.closing") <= c0 + 1, 'the closing waited for them')
     check(g.ev("fact('up_cats')&&fact('up_cats').d===S.day") is True, 'the cats were found today')
+    check(g.ev("(story().illus||{}).up_cats===S.day") is True, 'found: the scene carried the player\'s picture of that night (2026-10-02), kept for the story page')
+    g.ev("illusOpen('up_cats')")
+    shown = g.ev("!$('#dlg').hidden&&!$('#dlg .dlg-illus').hidden&&$('#dlg .dlg-illus-tbd').hidden&&$('#dlg .dlg-illus img').getAttribute('src')===STORY_ART.up_cats")
+    check(shown is True, 'shown again: the player\'s picture itself, not a stand-in')
+    g.ev("while(typeof DLG!=='undefined'&&DLG)dlgNext()")
     after = json.loads(g.ev("JSON.stringify({cats:['mikan','ban'].map(id=>{const c=catBy(id);return[c.st,!!c.away,c.hidden]}),door:R.upDoor,tab:roomsOpen().includes('up'),pill:$('#closePill').hidden,up:!!S.rooms.up})"))
     check(all(not c[1] and not c[2] for c in after['cats']) and not after['door'] and not after['tab'] and not after['pill'] and not after['up'], f'downstairs, the door latched, the tab gone, the closing on — and nothing unlocked: {after}')
     for _ in range(200):
@@ -1305,6 +1311,79 @@ def v24_rc6_the_staff_room_plays_a_frame_and_dozes(b, port, target):
     if g.ev("phase==='service'&&!!R"):
         check(g.ev("srPeople().filter(p=>/^pool/.test(p.spotK||'')).length") == 0, 'the frame over, they sit down')
     check(g.ev("JSON.stringify(Object.keys(S.up.sr).sort())") in (before, ), 'nothing new in the save')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc6_a_name_finds_its_person_and_a_person_its_name(b, port, target):
+    """the player's 07:09 (an RC6 requirement): ORDER → TABLE (an order's T-number or name takes you to its room and
+    marks the table with who is at it), TABLE → PARTY (a tap on a table says T# · who · how many), PERSON → NAME (a tap
+    on a regular gives their card with the table), DIALOGUE → PERSON (a tap on a line finds who said it where they are
+    now — a guest, a waiter, a cook in the kitchen — or says they have left); across the rooms; the marks last a moment
+    and nothing stays on the floor; nothing is saved. Stable references (the group, the table, the regular's id)."""
+    g = Game(b, port, target, seed=317, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day61.json')
+    _floor(g, 80)
+    g.ev(PD_OPEN)
+    g.ev("(()=>{const p=pdW();p.done=S.day-30;p.st2=S.day-20;p.st3=S.day-2;p.n=14;p.res={id:'r'+S.day,d:S.day,meal:'dinner',size:8,min:pdMinFor(8,3,'family'),kind:'家庭聚餐',type:'family',name:'陳家',t:.18,status:'booked',phase:3}})()")
+    _quiet(g); to_service(g)
+    g.ev("__botUntil('R.groups.some(q=>q.pdRes&&[\\'order\\',\\'wait\\',\\'eat\\'].includes(q.state)&&q.ticket)',20000,1/30)")
+    mark = lambda: json.loads(g.ev("JSON.stringify({room,m:IDF.map(m=>{const p=m.at&&m.at();return{label:m.label,sub:m.sub,strong:m.strong,room:p&&p.room}})})"))
+    check(g.ev("!!R&&R.groups.some(q=>q.pdRes&&q.ticket)") is True, 'the booked party is in, its order on the rail')
+    g.ev("setRoom('main');R.tv++;renderTickets()"); g.page.wait_for_timeout(30)
+    # ORDER → TABLE, across the rooms: the booked party's order, from the dining room
+    sel = g.ev("(()=>{const tk=R.tickets.find(t=>t.g.pdRes);if(!tk)return null;const el=[...document.querySelectorAll('#tickets .tk')].find(e=>+e.dataset.tk===tk.id);if(!el)return null;el.scrollIntoView({inline:'center'});return '#tickets .tk[data-tk=\"'+tk.id+'\"] .tk-h'})()")
+    check(sel is not None, 'the party\'s order is on the rail')
+    g.page.click(sel); g.ev("__tick(1000/30)")
+    st = mark()
+    check(st['room'] == 'pdr' and st['m'] and st['m'][-1]['label'].startswith('T') and '陳家' in st['m'][-1]['sub'] and '8 位' in st['m'][-1]['sub'] and st['m'][-1]['room'] == 'pdr', f'the order takes you to its table in the Private Dining Room: {st}')
+    # DIALOGUE → PERSON: 王先生 comes in and says something while you are elsewhere; a tap on the line finds him
+    g.ev("(()=>{const o=regPlanVisit({t:R.t,type:'couple',reg:'wang',size:1});o.t=R.t+1;R.sched.splice(R.si,0,o)})()")
+    g.ev("__botUntil('R.groups.some(q=>regsOf(q).includes(\\'wang\\')&&[\\'order\\',\\'wait\\',\\'eat\\'].includes(q.state))',20000,1/30)")
+    check(g.ev("!!R&&R.groups.some(q=>regsOf(q).includes('wang')&&q.table!=null)") is True, '王先生 is in, at a table')
+    wroom = g.ev("(()=>{const w=R.groups.find(q=>regsOf(q).includes('wang'));return R.tables[w.table].room||'main'})()")
+    other = 'kitchen' if wroom != 'kitchen' else 'main'
+    g.ev(f"setRoom('{other}');document.querySelectorAll('#plines>*,#toasts>*').forEach(e=>e.remove())")
+    g.ev("(()=>{const w=R.groups.find(q=>regsOf(q).includes('wang'));quote(w,'今天的湯很好喝。',{who:'wang'})})()")
+    line = '#plines .pline' if g.page.query_selector('#plines .pline') else '#toasts .toast.who'
+    g.page.click(line); g.ev("__tick(1000/30)")
+    st = mark()
+    check(st['room'] == wroom and st['m'][-1]['label'] == '王先生' and st['m'][-1]['sub'].startswith('T') and st['m'][-1]['strong'], f'the line finds him where he sits: {st}')
+    # PERSON → NAME: a tap on him — his card says where he sits
+    xy = json.loads(g.ev("JSON.stringify((()=>{const w=R.groups.find(q=>regsOf(q).includes('wang'));const p=idMemberAt(w,regsOf(w).indexOf('wang'));const r=sc.getBoundingClientRect();return[r.left+SV.ox+p.x*SV.s,r.top+SV.oy+(p.y-20)*SV.s]})())"))
+    g.page.mouse.click(xy[0], xy[1]); g.ev("__tick(1000/30)")
+    card = g.ev("$('#regcard').hidden?'':$('#regcard').innerText")
+    check('王先生' in card and re.search(r'T\d+', card), f'his card, with his table: {card!r}')
+    # a waiter's line and a cook's line: where they are now
+    who = g.ev("(()=>{const m=S.crew.find(m=>m.role==='waiter'&&R.cw[m.id]);return m?m.name:null})()")
+    g.ev(f"setRoom('front');document.querySelectorAll('#plines>*,#toasts>*').forEach(e=>e.remove());staffSay(S.crew.find(m=>m.name==='{who}'),'來了。')")
+    line = '#plines .pline' if g.page.query_selector('#plines .pline') else '#toasts .toast.who'
+    g.page.click(line); g.ev("__tick(1000/30)")
+    st = mark(); wr = g.ev(f"(()=>{{const m=S.crew.find(m=>m.name==='{who}');return R.cw[m.id].room||'main'}})()")
+    check(st['room'] == wr and st['m'][-1]['label'] == who, f'a waiter\'s line finds her: {st}')
+    cook = g.ev("(()=>{const m=S.crew.find(m=>m.role==='chef'&&R.ck&&R.ck[m.id]);return m?m.name:null})()")
+    if cook:
+        g.ev(f"setRoom('main');document.querySelectorAll('#plines>*,#toasts>*').forEach(e=>e.remove());staffSay(S.crew.find(m=>m.name==='{cook}'),'好。')")
+        line = '#plines .pline' if g.page.query_selector('#plines .pline') else '#toasts .toast.who'
+        g.page.click(line); g.ev("__tick(1000/30)")
+        st = mark()
+        check(st['room'] == 'kitchen' and st['m'][-1]['label'] == cook, f'a cook\'s line: the kitchen, where he stands: {st}')
+    # TABLE → PARTY: a tap on a table says who is at it
+    g.ev("setRoom('main')")
+    tb = json.loads(g.ev("JSON.stringify((()=>{const t=R.tables.find(t=>(t.room||'main')==='main'&&t.group&&!t.group.reg&&!namedId(t.group)&&['order','wait','eat'].includes(t.group.state));if(!t)return null;const r=sc.getBoundingClientRect();return{i:t.i,n:t.group.name,xy:[r.left+SV.ox+t.x*SV.s,r.top+SV.oy+(t.y-16)*SV.s]}})())"))
+    if tb:
+        g.page.mouse.click(tb['xy'][0], tb['xy'][1]); g.ev("__tick(1000/30)")
+        st = mark()
+        check(st['m'][-1]['label'] == f"T{tb['i']+1}" and tb['n'] in st['m'][-1]['sub'], f'a tap on a table: its number and who is at it: {st} {tb}')
+    # gone: a line from someone who has left
+    g.ev("document.querySelectorAll('#plines>*,#toasts>*').forEach(e=>e.remove());(()=>{const w=R.groups.find(q=>regsOf(q).includes('wang'));quote(w,'謝謝。',{who:'wang'});w.gone=1;R.groups=R.groups.filter(q=>q!==w)})()")
+    line = '#plines .pline' if g.page.query_selector('#plines .pline') else '#toasts .toast.who'
+    g.page.click(line); g.ev("__tick(1000/30)")
+    check('已經離開了' in g.ev("document.querySelector('#toasts').innerText"), 'someone who has left: said so, nothing to find')
+    # a moment, then the floor is clean; nothing of it in the save
+    g.ev("for(let i=0;i<120;i++)__tick(1000/30)")
+    check(g.ev("IDF.length") == 0, 'the marks last a moment')
+    check(g.ev("(()=>{save();const t=localStorage.getItem(KEY);return t.includes('IDF')||t.includes('__op')})()") is False, 'nothing of it saved')
     check(not g.errors, g.errors[:3]); g.close()
 
 
