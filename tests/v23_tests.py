@@ -381,7 +381,7 @@ window.__p7={
   if(q.table==null){const ls=loungeSeatFor(q);if(!ls)return null;loungeSeat(q,ls,why||'direct')}q.state='wait';q.x=R.tables[q.table].x;q.y=R.tables[q.table].y;q.moving=false;return q},
  // a served ticket, so a checkout has items
  fed:(q,dishes)=>{const t=R.tables[q.table];const tk={id:R.tkid++,no:t.i+1,g:q,lounge:t.lounge?1:0,items:dishes.map(d=>({d,st:'served',q:'G',want:0,picked:true,set:null,lbar:DISH(d).wine?1:undefined})),t0:R.t};for(const it of tk.items)t.plates.push({d:it.d,q:'G',want:0});q.ticket=tk;R.tickets.push(tk);q.state='check';q.ate=1;return tk},
- clearDay:()=>{const d=storyDay();d.major=0;d.minor=0;d.seen={};if(S.story&&S.story.v24)S.story.v24.res=null},   // v2.4: a day's major held for a v2.4 beat (怡君 is scheduled on these saves' first v2.4 day) is not what these tests drive
+ clearDay:()=>{const d=storyDay();d.major=0;d.minor=0;d.seen={};if(S.story&&S.story.v24)S.story.v24.res=null;if(S.story)S.story.owe=null},   // v2.4 rc6: nor the slot kept for a beat that waited   // v2.4: a day's major held for a v2.4 beat (怡君 is scheduled on these saves' first v2.4 day) is not what these tests drive
  ev:k=>JSON.parse(JSON.stringify(evState(k))),
  rel:(a,b)=>JSON.parse(JSON.stringify(rel(a,b))),
  back:(k,n)=>{const f=fact(k);if(f){f.d-=n;f.l-=n}},
@@ -478,10 +478,15 @@ def phase7_the_arcs_run_on_real_history_and_leave_it_changed(b, port, target):
     check(g.ev("__p7.ev('qt_2').n") == 1, 'after six shifts together she knows when it is ready')
     g.ev("__p7.back('qt_2',3);__p7.clearDay();storyTick('close',{})")
     check(g.ev("__p7.ev('qt_3').n") == 1 and g.ev("relN('s:cb2','s:ct1','gesture')") == 1, '「多的。」 after closing')
-    g.ev("factSet('qt_extra');factSet('qt_extra');factSet('qt_extra');fact('qt_extra').l=S.day-1;__p7.clearDay();storyTick('close',{})")
-    check(g.ev("!!story().photos.qing_tuo"), 'their Story Photo 《多的》 only after it has happened more than once')
+    g.ev("factSet('qt_extra');factSet('qt_extra');fact('qt_extra').l=S.day-1;__p7.clearDay();storyTick('close',{})")
+    check(not g.ev("!!story().photos.qing_tuo"), 'not yet: it has happened more than once, but 阿拓 has not been missed')
+    # v2.4 rc6 (the player, 12:16): his day off — 晴 notices the fryer, then the photo
+    g.ev("setCrewAway(crewByName('阿拓'),'off');__p7.clearDay();storyTick('order',{g:R.groups.find(x=>x.name==='陳先生'),tk:R.tickets[R.tickets.length-1]})")
+    check(g.ev("__p7.ev('qt_absence').n") == 1 and g.ev("!tuoOn()&&!!qingOn()"), 'the day 阿拓 is off: 「今天炸物怎麼怪怪的？」')
+    g.ev("story().away=null;__p7.clearDay();storyTick('close',{})")
+    check(g.ev("!!story().photos.qing_tuo"), 'their Story Photo 《多的》 after it has happened more than once and he has been missed')
     g.ev("S.crew=S.crew.filter(m=>m.id!=='ct1');__p7.clearDay();storyTick('order',{g:R.groups.find(x=>x.name==='陳先生'),tk:R.tickets[R.tickets.length-1]})")
-    check(g.ev("__p7.ev('qt_absence').n") == 1 and g.ev("(R.log||[]).some(l=>/妳不是在問炸物/.test(l.t))"), '阿拓 fired: the absence beat, and nothing waits for him')
+    check(g.ev("__p7.ev('qt_absence').n") == 1 and g.ev("(R.log||[]).some(l=>/妳不是在問炸物/.test(l.t))"), '阿拓 fired: the absence beat (once), and nothing waits for him')
     check(g.ev("STORY_EV.filter(E=>E.k.startsWith('qt_')).every(E=>{try{return !E.when({tk:{lounge:1,items:[{d:'bites'}]}})||E.k==='qt_absence'}catch(e){return false}})"), 'with him gone every other 晴 × 阿拓 event is simply ineligible (no deadlock, no error)')
     # ---- 周董: 「隨便」 is steak and the dessert; his table; the side hall; the sold-out dessert
     zm = g.ev("(()=>{const ms=menuList().filter(d=>stationOk(d));const main=ms.find(d=>DISH(d).cat==='main'&&d!=='signature'),des=ms.find(d=>DISH(d).cat==='dessert'&&d!=='sigdessert'),drink=ms.find(d=>DISH(d).cat==='drink');window.__zm={main,des,drink};__p7.clearDay();const h=namedHist('周董');h.v=4;h.dishes={};h.dishes[main]=3;h.dishes[des]=3;h.dishes[drink]=2;h.seats={0:3};S.stock[main]=5;S.stock[des]=5;S.stock[drink]=5;return __zm})()")
@@ -985,7 +990,10 @@ def every_player_save_migrates_plays_a_day_and_keeps_its_story(b, port, target):
         if g.ev("phase") == 'shop':
             g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(300)
         g.ev("__tick(1200)")
-        check(g.ev("phase") == 'prep' and g.ev("document.querySelector('#storyNote').hidden"), f'{name}: prep, and nothing announced on opening ({g.ev("phase")})')
+        # the save opens silently; a beat that really happens on the new day (the staff meal's joke at prep, the player's own
+        # Day 62) is news like any other — never a beat of an earlier day brought up by the migration
+        quiet = g.ev("(()=>{const n=document.querySelector('#storyNote');if(n.hidden)return true;const l=storyNoteShow.last;const L=l&&STORY_LINES.find(x=>x.k===l.k);const b=L&&lineProgress(L).done.find(x=>x.t===l.t);return !!b&&b.d===S.day})()")
+        check(g.ev("phase") == 'prep' and quiet, f'{name}: prep, and nothing announced on opening but the new day\'s own beats ({g.ev("phase")}, {g.ev("JSON.stringify(storyNoteShow.last||null)")})')
         counts = "JSON.stringify(STORY_LINES.map(L=>{const P=lineProgress(L);return[L.k,P.done.map(x=>x.id+'@'+x.d),P.total]}).concat([restDone().map(x=>x.id+'@'+x.d)]))"
         c0 = g.ev(counts)
         g.ev("bookTab='story';showBook()"); g.page.wait_for_timeout(60)

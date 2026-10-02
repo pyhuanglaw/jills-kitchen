@@ -1818,7 +1818,15 @@ function makeLooks(type,size,ctx){const P=LOOKS[type]||LOOKS.office;const out=[]
  if(type!=='critic'){const r=wardRng(hash('ward|'+(S?S.day:0)+'|'+(WARD_N++)+'|'+type+'|'+size));const used=new Set();const T=wardTiers(out.length,ctx||'main',type,r);
   if(WARD_MODE==='C'){const D=wardRecipes(ctx||'main',type,r);out.forEach((L,k)=>wardOutfit(L,D[T[k]](),r,used,ctx||'main'))}
   else{const D=wardDecks(ctx||'main',type,r);out.forEach((L,k)=>{let g=D[T[k]]();if(WARD_MODE==='B'&&(g==='stripes'||g==='check'))g=g==='stripes'?'shirtknit':'shirt';wardDress(L,type,r,g,used,ctx||'main')})}}
+ for(const L of out)if(!L.kid)unwhite(L);   /* v2.4 rc6: the Q++ rule — no white top on a guest */
  return out}
+/* v2.4 rc6: a guest never wears a white top or a white tee under a cardigan (Q++): white is the staff's — the waiters'
+   since 10:15, the cooks' jackets — the cream shirt Jill's, the navy cardigan over a white tee Dylan's. The wardrobe's
+   palest shirts and knits are worn a shade deeper, the shirt's collar and cuffs with it. */
+const UNWHITE={'#F4F1EA':'#D5DCE3','#EFE8DA':'#DDCFB6','#E8EEF2':'#CBD3D9','#F2E9E4':'#E0CDC5','#DCE6EF':'#C4D4E6','#F2E4E1':'#E3CAC4','#EDE4D0':'#DCCFB2'};
+function paleTop(c){if(typeof c!=='string'||c[0]!=='#'||c.length<7)return false;const n=parseInt(c.slice(1,7),16);return(((n>>16)&255)+((n>>8)&255)+(n&255))/3>222}
+function deepen(c){const n=parseInt(c.slice(1,7),16);const f=v=>Math.round(v*.88).toString(16).padStart(2,'0');return'#'+f((n>>16)&255)+f((n>>8)&255)+f(n&255)}
+function unwhite(L){const map=c=>UNWHITE[c]||(paleTop(c)?deepen(c):c);if(paleTop(L.top)){const o=L.top,t=map(o);for(const k of['collar','cuff','tail'])if(L[k]===o)L[k]=t;if(L.dress===o)L.dress=t;L.top=t}if(L.pat==='cardi'&&paleTop(L.top2))L.top2=map(L.top2);return L}
 /* the face on a ticket: regulars and Dylan have their own, other guests get one for the day (cleared each night) */
 function guestPortrait(g){if(g.reg==='dylan')return portraitURL(DYLAN.looks,'regdylan');if(namedId(g)){const src=portraitData(NAMED[namedId(g)].p);if(src)return src}const ids=regsOf(g);if(ids.length>1&&ids.every(i=>REG_BY[i]))return portraitURL(ids.flatMap(i=>REG_BY[i].looks),'reg'+ids.join('_'));if(g.reg&&REG_BY[g.reg])return portraitURL(REG_BY[g.reg].looks,'reg'+g.reg);return portraitURL(g.looks,'g'+S.day+'_'+g.id)}
 function portraitURL(looks,key,jill){const k='p'+key;if(ICACHE.has(k))return ICACHE.get(k);const cv=mkCanvas(112),c=cv.getContext('2d');c.fillStyle='#F3E7D2';c.fillRect(0,0,112,112);c.scale(3.2,3.2);
@@ -2662,12 +2670,22 @@ const LANE_CAP={major:1,minor:2,v24:1,ambient:99};   /* v2.4: the long stories' 
 /* v2.4 (pacing): the major beat today's story visits were planned for keeps the day's one major slot until it plays, or until late in the service (85%) — the other stories' major moments wait a day; they are missed, not lost. A beat with floor 0 (it has only this day: Dylan on Valentine's) is never held back. */
 function v24Held(at){if(!R||phase!=='service'||R.t>=R.dur*.85)return null;const v=S.story&&S.story.v24;if(!v||!v.res||v.res.d!==S.day)return null;const open=v.res.k.filter(k=>!fact(k));return open.length?open:null}
 function storyMiss(E,day){if(day.seen[E.k])return;day.seen[E.k]=1;evState(E.k).miss++}
+/* v2.4 rc6 (the player, 12:16 「阿拓跟晴毫無進展」): a major beat due at this moment when the day's major slot is already
+   taken has waited a day too (it was not counted, so a beat that comes at closing — 「多的。」 — could wait forever) */
+function majorMissed(at,ctx,day){for(const E of STORY_EV){if(E.lane!=='major'||!(E.at||[]).includes(at)||day.seen[E.k])continue;let pv=null;try{pv=storyEligible(E,ctx)}catch(e){pv=null}if(pv)storyMiss(E,day)}}
+/* the next day the slot is kept for the major beat that has waited longest and can happen today (its people in);
+   for that one day only — if it still does not come, the others go first the day after */
+function majorOwe(){const st=story();if(st.owe&&st.owe.d===S.day)return;let best=null,bm=0;const last=st.oweLast||{};
+ for(const E of STORY_EV){if(E.lane!=='major')continue;const s=evState(E.k);if(!(s.miss>=1)||last[E.k]===S.day-1)continue;let ok=null;try{ok=storyEligible(E,{at:(E.at||[])[0]})}catch(e){ok=null}if(!ok)continue;if(s.miss>bm){best=E;bm=s.miss}}
+ st.owe=best?{d:S.day,k:best.k}:null;if(best){st.oweLast=Object.assign({},last,{[best.k]:S.day})}}
+function majorOwed(){const o=S.story&&S.story.owe;return o&&o.d===S.day&&evState(o.k).last!==S.day?o.k:null}
 function storyEligible(E,ctx){const s=evState(E.k);if(E.once&&s.n)return null;const cd=E.cd==null?1:E.cd;if(s.last!=null&&S.day-s.last<cd)return null;let ok=false;try{ok=!!E.when(ctx)}catch(e){ok=false}if(!ok)return null;
  const list=E.present||[{run:E.run}];for(const p of list){let can=true;try{can=!p.can||!!p.can(ctx)}catch(e){can=false}if(can)return p}return false}   /* false: eligible but no way to present it today */
-function storyTick(at,ctx){if(!S||phase==='title')return null;if(at==='close'&&typeof upNight==='function'&&upNight())return null;/* v2.4 P2: that closing is the search */ctx=ctx||{};ctx.at=at;const day=storyDay();if(at==='daystart')try{v24Day()}catch(e){console.warn('[v24]',e)}let fired=null;const res=v24Held(at);
- for(const lane of['major','minor','v24','ambient']){if((day[lane]||0)>=LANE_CAP[lane])continue;let cands=[];
+function storyTick(at,ctx){if(!S||phase==='title')return null;if(at==='close'&&typeof upNight==='function'&&upNight())return null;/* v2.4 P2: that closing is the search */ctx=ctx||{};ctx.at=at;const day=storyDay();if(at==='daystart')try{v24Day()}catch(e){console.warn('[v24]',e)}if(at==='daystart')try{majorOwe()}catch(e){console.warn('[owe]',e)}let fired=null;const res=v24Held(at);const owed=majorOwed();
+ for(const lane of['major','minor','v24','ambient']){if((day[lane]||0)>=LANE_CAP[lane]){if(lane==='major')majorMissed(at,ctx,day);continue}let cands=[];
   for(const E of STORY_EV){if(E.lane!==lane||!(E.at||[]).includes(at))continue;const pv=storyEligible(E,ctx);if(pv===null)continue;if(pv===false){storyMiss(E,day);continue}const s=evState(E.k);let w=1;try{w=E.w?E.w(ctx):1}catch(e){w=0}if(!(w>0))continue;w*=1+.6*s.miss;if(E.cls==='A'&&s.miss>=(E.floor==null?3:E.floor))w+=1e6;cands.push({E,pv,w})}
-  if(lane==='major'&&res&&cands.length){const keep=cands.filter(o=>res.includes(o.E.k)||o.E.floor===0);/* floor 0: a beat that has only this day (Dylan on Valentine's) never waits */for(const o of cands)if(!keep.includes(o))storyMiss(o.E,day);cands=keep}
+  if(lane==='major'&&owed&&cands.length){const keep=cands.filter(o=>o.E.k===owed||o.E.floor===0);for(const o of cands)if(!keep.includes(o))storyMiss(o.E,day);cands=keep}   /* v2.4 rc6: today's slot is the longest-waiting beat's */
+  else if(lane==='major'&&res&&cands.length){const keep=cands.filter(o=>res.includes(o.E.k)||o.E.floor===0);/* floor 0: a beat that has only this day (Dylan on Valentine's) never waits */for(const o of cands)if(!keep.includes(o))storyMiss(o.E,day);cands=keep}
   if(!cands.length)continue;const c=wpick(cands,x=>x.w);if(!c)continue;for(const o of cands)if(o!==c)storyMiss(o.E,day);
   const s=evState(c.E.k);s.n++;s.last=S.day;if(!s.d)s.d=S.day;s.miss=0;day.seen[c.E.k]=1;if(lane!=='ambient')day[lane]=(day[lane]||0)+1;storyTrace({at,k:c.E.k,lane});shStart(c.E.k,shAuthored(c.E),ctx.g,()=>c.pv.run(ctx));fired=fired||c.E.k}
  try{storyProgressCheck()}catch(e){console.warn('[story]',e)}return fired}
@@ -3044,9 +3062,9 @@ function catFamOf(id,cid){const f=rel(id,cid);let n=0;for(const k in f)if(k.star
 function knownCatFor(g){const ids=storyIdsOf(g);let best=null;for(const id of ids)for(const C of CAT_DEF){const n=catFamOf(id,C.id);if(n>=4&&(!best||n>best.n))best={id,cid:C.id,n}}return best}
 /* ---- the staff who work the Lounge: how each of them notices (Evan quiet, 安安 spatial, 晴 direct) ---- */
 function evanOn(){const m=crewByName('Evan');return m&&m.role==='bartender'&&m.duty==='lbar'&&loungeLv()?m:null}
-function qingOn(){const m=crewByName('沈晴');return m&&m.role==='bartender'&&m.duty==='lbar'&&loungeLv()?m:null}
+function qingOn(){const m=crewByName('沈晴');return m&&m.role==='bartender'&&m.duty==='lbar'&&loungeLv()&&crewHere(m)?m:null}   /* v2.4 rc6 (12:16): and in today */
 function ananOn(){const m=crewByName('安安');return m&&m.role==='waiter'&&waiterDuties(m).lounge&&loungeLv()?m:null}
-function tuoOn(){const m=crewByName('阿拓');return m&&m.role==='chef'?m:null}
+function tuoOn(){const m=crewByName('阿拓');return m&&m.role==='chef'&&crewHere(m)?m:null}   /* v2.4 rc6 (12:16): and in today — his day off is the absence */
 function hugoOn(){return(S.crew||[]).find(m=>m.role==='chef'&&m.name!=='阿拓')||null}
 function kenAtBar(){const g=kenAt();return g&&R.tables[g.table].kind==='bar'?g:null}
 function duAtBar(){const g=duAt();return g&&R.tables[g.table].kind==='bar'?g:null}
@@ -3131,18 +3149,21 @@ STORY_EV.push(
   run:()=>{const q=qingOn(),t=tuoOn();sayS(q,'炸雞好了沒？',1500);sayS(t,'沒有。',3000);sayS(q,'看起來好了。',4400);sayS(t,'妳跟 Hugo 講一樣的話。',5900);sayS(q,'那代表我們兩個都正常。',7500);relSet('s:'+q.id,'s:'+t.id,'friction');relSet('s:'+q.id,'s:'+t.id,'spoke');factSet('qt_1')}},
  {k:'qt_days',lane:'ambient',cd:1,at:['dayend'],when:()=>qingOn()&&tuoOn()&&fact('qt_1'),run:()=>{const q=qingOn(),t=tuoOn();relSet('s:'+q.id,'s:'+t.id,'shift',true);factSet('qt_days',true)}},
  {k:'qt_2',lane:'minor',cls:'B',at:['order'],once:true,note:'晴沒問，就把盤子接過去了——她知道什麼時候好。',
-  when:ctx=>qingOn()&&tuoOn()&&factN('qt_days')>=6&&ctx.tk&&ctx.tk.lounge&&ctx.tk.items.some(i=>!i.lbar),
+  when:ctx=>qingOn()&&tuoOn()&&factN('qt_days')>=4&&ctx.tk&&ctx.tk.lounge&&ctx.tk.items.some(i=>!i.lbar),
   run:()=>{const q=qingOn(),t=tuoOn();noteLine('晴沒問「好了沒」，時間到了就過去接盤子。');sayS(t,'妳怎麼知道好了。',2400);sayS(q,'看的。',3800);relSet('s:'+q.id,'s:'+t.id,'synchrony');factSet('qt_2')}},
  {k:'qt_3',lane:'major',cls:'A',floor:3,at:['close'],once:true,ic:'heart',note:'打烊後，阿拓在晴旁邊放了一小盤。「多的。」',
-  when:()=>qingOn()&&tuoOn()&&fact('qt_2')&&S.day-fact('qt_2').d>=3,
+  when:()=>qingOn()&&tuoOn()&&fact('qt_2')&&S.day-fact('qt_2').d>=2,
   run:()=>{const q=qingOn(),t=tuoOn();const lines=[{who:'staff:沈晴',text:'什麼？'},{who:'staff:阿拓',text:'多的。'},{who:'staff:沈晴',text:'你明明就是特別做的。'},{who:'staff:阿拓',text:'多的。'}];const done=()=>{relSet('s:'+q.id,'s:'+t.id,'gesture');relSet('s:'+q.id,'s:'+t.id,'sharedFood');factSet('qt_3');noteLine('打烊後，阿拓在晴旁邊放了一小盤，說是多的。')};scene(lines,done)/* scene() runs the callback itself when it cannot show */}},
- {k:'qt_extra',lane:'ambient',cd:6,at:['close'],when:()=>qingOn()&&tuoOn()&&fact('qt_3')&&S.day-fact('qt_3').d>=3&&factN('qt_extra')<6&&Math.random()<.4,
+ {k:'qt_extra',lane:'ambient',cd:4,at:['close'],when:()=>qingOn()&&tuoOn()&&fact('qt_3')&&S.day-fact('qt_3').d>=3&&factN('qt_extra')<6&&Math.random()<.5,
   run:()=>{const q=qingOn(),t=tuoOn();noteLine(pickT(['打烊後阿拓又放了一盤在晴旁邊。「多的。」','晴今天沒問，直接把那盤拿走了。阿拓沒說話。','阿拓：「多的。」晴：「你每天都多。」']));relSet('s:'+q.id,'s:'+t.id,'gesture');factSet('qt_extra')}},
  {k:'qt_absence',lane:'minor',cls:'B',at:['order'],once:true,note:'阿拓不在的那天，晴問：「今天炸物怎麼怪怪的？」Hugo：「妳不是在問炸物？」',
   when:ctx=>qingOn()&&!tuoOn()&&fact('qt_3')&&hugoOn()&&ctx.tk&&ctx.tk.lounge&&ctx.tk.items.some(i=>!i.lbar),
   run:()=>{const q=qingOn(),h=hugoOn();sayS(q,'今天炸物怎麼怪怪的？',1500);sayS(h,'一樣的做法。',3000);sayS(q,'喔。',4300);sayS(q,'……阿拓今天沒來？',6200);sayS(h,'妳不是在問炸物？',7700);relSet('s:'+q.id,'s:'+h.id,'spoke');factSet('qt_absence');const F=story().facts;F.qt_absence.who='s:'+q.id}},
+ {k:'tuo_off',lane:'minor',cls:'B',at:['daystart'],once:true,note:'阿拓今天請假。',
+  when:()=>qingOn()&&tuoOn()&&hugoOn()&&fact('qt_3')&&S.day-fact('qt_3').d>=3&&!fact('qt_absence')&&hash('tuooff|'+S.day)%100<40,
+  run:()=>{const t=tuoOn();setCrewAway(t,'off');noteLine('阿拓今天請假。');factSet('tuo_off')}},
  {k:'qt_photo',lane:'major',cls:'A',floor:2,at:['close'],once:true,ic:'heart',note:'晴和阿拓——從工作開始，到剛好在這裡。',
-  when:()=>qingOn()&&tuoOn()&&fact('qt_3')&&factN('qt_extra')>=3,
+  when:()=>qingOn()&&tuoOn()&&fact('qt_3')&&factN('qt_extra')>=2&&(!!fact('qt_absence')||S.day-fact('qt_3').d>=14),
   run:()=>{storyPhoto('qing_tuo',{})}},
  {k:'qt_photo2',lane:'minor',cls:'B',at:['close'],once:true,when:()=>qingOn()&&tuoOn()&&story().photos.qing_tuo&&factN('qt_days')>=14&&S.day-story().photos.qing_tuo>=8,
   run:()=>{storyPhoto('qing_tuo_late',{})}},
@@ -8189,6 +8210,7 @@ let DLG=null;
    portrait. */
 function scene(lines,onDone,o){o=o||{};const el=$('#dlg');
  if(SCX&&SCX.authored&&shOn()&&lines&&lines.length){const cx=SCX;const n0=cx.q.length;for(const l of lines){const L=Object.assign({},l);if(L.illus)illusSeen(L.illus);cx.q.push(L);shRec(cx,{name:L.name||whoLabel(L.who||''),text:L.text})}if(o.illus){illusSeen(o.illus);cx.q[n0].illus=o.illus}if(onDone)cx.q[cx.q.length-1].after=onDone;shShow(cx);return true}
+ if(SCX&&lines&&lines.length)for(const l of lines)if(l&&l.text)shRec(SCX,{name:l.name||whoLabel(l.who||''),text:l.text});   /* v2.4 rc6: a beat not held keeps its scene's words too (怡君's 「吃飯啊。」) */
  if(DLG&&DLG.sh&&lines&&lines.length){SH_WAIT.push({scene:[lines,onDone,o]});return true}   /* v2.4 rc6: after the beat on screen */if(o.illus)illusSeen(o.illus);for(const l of lines||[])if(l&&l.illus)illusSeen(l.illus);if(!el||!lines||!lines.length){if(onDone)onDone();return false}const ok=(o.illus||o.modal||lines.some(l=>l.illus)||lines.some(l=>portraitOf(l.who,l.tone)))&&(!window.__noScenes||o.force);if(!ok){/* nobody in this scene has a portrait: the plain presentation */for(const l of lines){const nm=l.name||whoLabel(l.who||'');if(nm)logLine(nm,l.text,l.who==='jill'?'j':l.who==='dylan'?'d':(l.who||'').startsWith('staff:')?'s':'g');else if(l.text)logLine('',l.text,'e')}if(onDone)onDone();return false}
  DLG={lines,i:0,onDone,illus:o.illus||null,hold:!!o.hold};el.hidden=false;{/* v2.4: a story-update notice already up waits under the scene, and comes back when it closes */const sn=$('#storyNote');if(sn&&!sn.hidden&&storyNoteShow.last){sn.hidden=true;clearTimeout(storyNoteShow.t);storyNoteShow.pending=storyNoteShow.last}}el.className='';dlgShow();return true}
 function dlgShow(){const el=$('#dlg');const L=DLG.lines[DLG.i];if(L.illus!==undefined)DLG.illus=L.illus||null;{/* v2.4: the story illustration, if the scene has one; rc6: a story's picture on its own line */const ib=el.querySelector('.dlg-illus');const I=L.photo?{src:L.photo,t:L.cap||'',tbd:false}:DLG.illus&&illusSrc(DLG.illus)?Object.assign({t:STORY_ILLUS[DLG.illus].t},illusSrc(DLG.illus)):null;if(ib){ib.hidden=!I;if(I){const im=ib.querySelector('img');if(im.getAttribute('src')!==I.src)im.src=I.src;ib.querySelector('.dlg-illus-t').textContent=I.t;ib.querySelector('.dlg-illus-tbd').hidden=!I.tbd}}el.classList.toggle('has-illus',!!I)}

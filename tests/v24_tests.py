@@ -1983,3 +1983,49 @@ def v24_rc6_the_private_dining_room_minimum_service_and_long_table(b, port, targ
       const pick=pdFirst(q=>q.group&&q.group.state==='check'&&!q.claim);const res={pick:pick&&pick.pdr};t.group=null;other.group=null;return res})())"""))
     check(r.get('skip') or r['pick'] is True, f'the Private Dining Room\'s bill first: {r}')
     check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc6_qing_and_tuo_move_on(b, port, target):
+    """the player's 12:16 (「阿拓跟晴毫無進展」, their Day 71 save: qt_1 on Day 61, qt_2 on Day 67, then nothing): 「多的。」 comes
+    at closing and lost the day's one major slot to any major beat earlier in the day without being counted as waiting
+    (the lane was full before it was looked at), so the old rule — a beat that has waited long enough plays — never
+    reached it. Now a major beat due when the slot is taken counts a missed day, and the next day the slot is kept for
+    the beat that has waited longest (one day; still one major beat a day). 阿拓's absence could never happen (the beat
+    asked whether he was employed, not whether he came in; nobody took a day off): once 「多的。」 has happened he takes
+    one day off, and 晴 notices the fryer. The pace stays a slow burn, a little quicker."""
+    g = Game(b, port, target, seed=71, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day71_1215.json')
+    to_service(g)
+    st0 = json.loads(g.ev("JSON.stringify({q:!!qingOn(),t:!!tuoOn(),qt2:fact('qt_2').d,qt3:!!fact('qt_3'),day:S.day,days:factN('qt_days')})"))
+    check(st0['q'] and st0['t'] and st0['qt2'] == 67 and not st0['qt3'] and st0['day'] == 71, f'the player\'s Day 71: both in, 「多的。」 due and not yet: {st0}')
+    # Day 71 as the player's Day 70 went: another major beat took the slot earlier — 「多的。」 waits, counted
+    g.ev("storyDay().major=1;storyTick('close',{})")
+    check(not g.ev("!!fact('qt_3')") and g.ev("evState('qt_3').miss") == 1, 'the slot was taken: it waits a day, and the wait is counted')
+    # the next day the slot is kept for it: another major beat due earlier is held back, 「多的。」 plays at closing
+    g.ev("finishClosing()") if g.ev("phase") == 'service' else None
+    g.ev("closeSub&&closeSub()")
+    for _ in range(3):
+        if g.ev("phase") == 'summary': g.click('[data-act=toShop]'); g.page.wait_for_timeout(80)
+        if g.ev("phase") == 'shop': g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(120)
+    to_service(g)
+    owe = json.loads(g.ev("JSON.stringify({owe:story().owe,owed:majorOwed(),day:S.day})"))
+    check(owe['owed'] == 'qt_3' and owe['day'] == 72, f'Day 72: the day\'s major slot is kept for the beat that waited: {owe}')
+    g.ev("window.__E=STORY_EV.find(e=>e.k==='sm_c');__E.__w=__E.when;__E.when=()=>true;__E.__p=__E.present;__E.present=[{run:()=>factSet('sm_c')}]")
+    g.ev("storyTick('seat',{g:R.groups[0]||null})")
+    check(not g.ev("!!fact('sm_c')") and g.ev("storyDay().major") == 0, 'another major beat due earlier waits a day (counted too)')
+    g.ev("__E.when=__E.__w;__E.present=__E.__p")
+    g.ev("storyTick('close',{})")
+    check(g.ev("!!fact('qt_3')") and g.ev("fact('qt_3').d") == 72 and g.ev("storyDay().major") == 1 and g.ev("majorOwed()") is None, '「多的。」 plays at closing; one major beat that day; the hold is over')
+    # 阿拓's day off, a few days on: a coin from the day; 晴 notices the fryer
+    d_off = g.ev("(()=>{for(let d=S.day+3;d<S.day+40;d++)if(hash('tuooff|'+d)%100<40)return d;return null})()")
+    check(d_off is not None and d_off - 72 <= 12, f'a day off comes within days: Day {d_off}')
+    g.ev(f"S.day={d_off};story().away=null;storyDay();storyTick('daystart',{{}})")
+    away = json.loads(g.ev("JSON.stringify({f:!!fact('tuo_off'),t:!!tuoOn(),q:!!qingOn(),here:crewHere(crewByName('阿拓')),lbl:crewAwayOf(crewByName('阿拓'))})"))
+    check(away['f'] and not away['t'] and away['q'] and away['here'] is False, f'阿拓 is off today (晴 in): {away}')
+    g.ev("const q=R.groups.find(x=>x.table!=null)||null;const t=R.tables.find(t=>t.lounge&&!t.group);window.__tk={id:R.tkid++,no:1,g:q,lounge:1,items:[{d:'bites',st:'pending',q:null,want:0,picked:false,set:null}],t0:R.t};storyTick('order',{g:q,tk:__tk})")
+    check(g.ev("!!fact('qt_absence')"), 'the absence: 「今天炸物怎麼怪怪的？」')
+    # the pace: four evenings together for qt_2, two days for 「多的。」, the photo after two repeats and the absence
+    E = json.loads(g.ev("JSON.stringify(Object.fromEntries(['qt_2','qt_3','qt_extra','qt_photo'].map(k=>[k,String(STORY_EV.find(e=>e.k===k).when)])))"))
+    check("factN('qt_days')>=4" in E['qt_2'] and "fact('qt_2').d>=2" in E['qt_3'] and 'Math.random()<.5' in E['qt_extra'] and "factN('qt_extra')>=2" in E['qt_photo'] and 'qt_absence' in E['qt_photo'], f'the pace: {E}')
+    check(not g.errors, g.errors[:3]); g.close()

@@ -1,0 +1,84 @@
+{
+ "errors": [],
+ "days": {
+  "day1": {
+   "frames": [
+    7301,
+    7301
+   ],
+   "samples": [
+    244,
+    244
+   ],
+   "differing_keys": {
+    "scene": {
+     "count": 161,
+     "first": 5
+    },
+    "dom": {
+     "count": 145,
+     "first": 5
+    }
+   },
+   "digest_differs": []
+  },
+  "day2": {
+   "frames": [
+    8028,
+    8028
+   ],
+   "samples": [
+    268,
+    268
+   ],
+   "differing_keys": {
+    "scene": {
+     "count": 184,
+     "first": 5
+    },
+    "dom": {
+     "count": 166,
+     "first": 6
+    }
+   },
+   "digest_differs": []
+  }
+ },
+ "screens": {
+  "title": null,
+  "prep": null,
+  "service_20s": [
+   18,
+   85,
+   172,
+   540
+  ],
+  "service_panel": [
+   18,
+   85,
+   172,
+   540
+  ],
+  "pause": [
+   18,
+   85,
+   109,
+   88
+  ],
+  "evening": null,
+  "summary": null,
+  "shop": null,
+  "book_cats": [
+   0,
+   67,
+   390,
+   780
+  ],
+  "book_mem": [
+   0,
+   96,
+   390,
+   800
+  ]
+ }
+}
