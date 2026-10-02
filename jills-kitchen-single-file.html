@@ -533,6 +533,9 @@ input.txt{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(
 .goalline{display:flex;align-items:baseline;gap:8px;margin:8px 0 2px;padding:7px 10px;border-radius:10px;background:rgba(201,154,69,.14);border:1px solid rgba(201,154,69,.35);font-size:12.5px}.goalline span{color:var(--ink2);font-weight:700;font-size:11px;letter-spacing:.06em}.goalline b{font-weight:800}.goalline small{margin-left:auto;color:var(--ink2);font-size:11.5px}
 /* v2.2 L: the player's 招待 chip on a ticket, and Jill's Card stamps in the regulars' book */
 .tk-treat{position:absolute;right:4px;top:19px;height:16px;padding:0 6px;border:1px solid #C99A45;border-radius:8px;background:rgba(255,250,240,.9);color:#7A5A22;font-size:9.5px;font-weight:800;line-height:14px}
+/* rc7.2 (the player, 21:50): in the name's line, after the name and its mark — the name gives way (…), the chip never covers it */
+.tk-who .tk-treat{position:static;order:3;margin-left:auto;flex:none;height:14px;line-height:12px;padding:0 5px;font-size:9px;white-space:nowrap}
+.tk .tk-who::after{order:2}
 .tk-treat:active{transform:translateY(1px)}
 /* v2.2.1 I-13: the chip always says where the table stands — offerable (with the uses left), something already on its way,
    already treated, the day's two used up, nothing in the fridge to give */
@@ -578,7 +581,7 @@ span.tk-treat{pointer-events:none;font-weight:700}
 @container (min-width:720px){#dlg.has-illus .dlg-p{height:min(30vh,300px)}#dlg .dlg-p{height:min(56vh,480px);max-width:440px;bottom:calc(112px + env(safe-area-inset-bottom))}#dlg .dlg-p.left{left:6%}#dlg .dlg-p.right{right:6%}#dlg .dlg-box{left:50%;right:auto;transform:translateX(-50%);width:min(720px,70%);padding:16px 22px 12px;bottom:28px}#dlg .dlg-text{font-size:17px}}
 /* the line card during service */
 #plines{position:absolute;left:8px;right:8px;bottom:calc(72px + env(safe-area-inset-bottom));z-index:5;display:flex;flex-direction:column;gap:6px;pointer-events:none}
-.pline{pointer-events:auto;display:flex;align-items:flex-end;gap:8px;max-width:330px;animation:tIn .25s ease}
+.pline{pointer-events:auto;touch-action:manipulation;display:flex;align-items:flex-end;gap:8px;max-width:330px;animation:tIn .25s ease}
 .pline.right{align-self:flex-end;flex-direction:row}
 .pline img{width:64px;height:76px;object-fit:cover;object-position:top;border-radius:10px;border:1.5px solid rgba(230,194,122,.7);background:rgba(22,33,36,.6);flex:none}
 .pline img.dim{width:44px;height:52px;opacity:.7}
@@ -1122,11 +1125,16 @@ function rentParts(){const P=[['主廳',RENT.lv[S.level]||RENT.lv[5]]];if(projOn
 function rentToday(){return rentParts().reduce((a,p)=>a+p[1],0)}
 /* the day's costs that leave the till at the end of the evening (the food was paid for in the morning) */
 function dayCostsDue(){return crewWages()+rentToday()+contractFee()+Math.round((R&&R.st&&R.st.wineCost)||0)}
-/* (14:46 「錢不夠付的那天 不要先欠著 前十天缺錢的話 秀琴阿姨借給我們20000 安排劇情」): nothing is ever owed. In the first
-   ten days, an evening that cannot pay its costs and still buy tomorrow's food is the evening 秀琴阿姨 lends $20,000 —
-   once; Jill pays it back when the shop can (a scene each). After that the till pays what it can and never goes below $0. */
-const LOAN=20000,LOAN_FLOOR=800;   /* 800: about a first week's morning of food */
-function loanNeeded(){return S.day<=10&&!fact('xq_loan')&&S.money-dayCostsDue()<LOAN_FLOOR}
+/* (14:46 「錢不夠付的那天 不要先欠著 前十天缺錢的話 秀琴阿姨借給我們20000 安排劇情」; rc7.2, the player, 21:57–21:58:
+   「你第一天就給20,000基本上什麼東西都不用升級了…如果10天內小於300他再借3000反正每次小於300他都會借3000，但是記得要還」
+   「只要你的錢超過20,000結算的時候就自動還錢」「首日贊助不用」): the till is never owed anything. In the first ten days, each
+   evening that would leave less than $300 once the day's costs are paid, 秀琴阿姨 lends $3,000 at closing — as often as that
+   happens, never twice in one evening. At the end of a day (the summary) with more than $20,000 left, everything owed to
+   her is paid back. The till pays what it can and never goes below $0. rc7's single $20,000 loan is owed the same way. */
+const LOAN=3000,LOAN_BELOW=300,LOAN_DAYS=10,REPAY_OVER=20000;
+function loanState(){const L=S.loan=S.loan||{};if(L.owed==null){/* rc7: {d,n:20000,back} */L.owed=L.n&&!fact('xq_repay')&&!L.back?L.n:0;L.times=L.n?1:0}return L}
+function loanOwed(){return S.loan?loanState().owed:0}
+function loanNeeded(){const f=fact('xq_loan');return S.day<=LOAN_DAYS&&!(f&&f.l===S.day)&&S.money-dayCostsDue()<LOAN_BELOW}
 function boostOf(d){let p=0,w=0;for(const C of CONTRACTS)if(contractOn(C.k)&&C.dishes.includes(d)){p+=.08;w+=.1}if(projOn('dryage')&&['steak','steak_x','burger','burger_x'].includes(d)){p+=.08;w+=.15}if(projOn('cellar')&&WINES[d]&&WINES[d].lv>=2)p+=.1;return{p,w}}
 /* a music night: about one in three, from the day (never Math.random) */
 function pianoNight(){return projOn('piano')&&(yaNight()||yaTonight())}   /* rc7 (14:49 「怎樣會有人來彈鋼琴?不用付錢嗎」): only when 予安 plays — her nights, and the evening of her trial */
@@ -3858,25 +3866,27 @@ function xqHelperUpd(dt){const h=R.xqh;
   h.moving=false;if(!tk.fired){tk.fired=1;h.face=tk.t.x>=h.x?1:-1;if(tk.phone)h.phone=1;if(tk.then)try{tk.then()}catch(e){console.warn('[visit]',e)}}if(!DLG)h.busy+=dt;if(h.busy>=tk.dur){h.task=null;h.busy=0;h.phone=0;if(h.nextQ&&h.nextQ.length)h.next=h.nextQ.shift()}return}
  if(!xqSpotOK(h.spot)||R.t>=h.spotT){h.spot=xqPickSpot(h);h.spotT=R.t+6+hash('xqd|'+S.day+'|'+h.spots)%40/10}const sp=h.spot;
  if(h.room!=='main'||Math.hypot(h.x-sp.x,h.y-sp.y)>3){h.tx=sp.x;h.ty=sp.y;h.troom='main';h.wipe=0;if(stepTo(h,v*.8))h.moving=false;else{h.moving=true;h.step+=dt*12}}else{h.moving=false;h.wipe=1;h.face=sp.t?(sp.t.x>=h.x?1:-1):1}}
-function xqHelperArrived(){factSet('xq_helper');if(factN('xq_helper')===1)v24Later(6.5,()=>{if(!R||phase!=='service'||R.coach>=0)return;showCoach('那是<b>秀琴阿姨</b>，Jill 認識很久的阿姨。很多晚上她會在快打烊時順路來幫忙收一收——客人和桌子還是要靠你。');setTimeout(()=>{if(R&&!(R.coach>=0))hideCoach()},7000)});   /* after her first three lines (game time), not over them */let f=null;try{f=storyTick('xqin',{})}catch(e){console.warn('[xqin]',e)}if(!f)xqHelperChat()}
+function xqHelperArrived(){factSet('xq_helper');
+ /* rc7.2 (the player, 21:49: 「秀琴阿姨出場要暫停遊戲吧 有劇情的」): her first evening is a story beat — the service waits while she
+    says who she is to the place, and goes on when the player has tapped through it (was: a coach card that came and went) */
+ if(factN('xq_helper')===1){v24Scene([{who:'',text:'快打烊的時候，秀琴阿姨從門口走了進來。'},{who:'staff:秀琴阿姨',text:'我來幫妳收一下。'},{who:'jill',text:'阿姨，不用啦。'},{who:'staff:秀琴阿姨',text:'順路啦。妳一個人怎麼收得完。'},
+  {who:'',text:'秀琴阿姨是 Jill 認識很久的阿姨。很多晚上，她會在快打烊時順路進來幫忙收一收——客人和桌子，還是要靠你。'}]);return}
+ let f=null;try{f=storyTick('xqin',{})}catch(e){console.warn('[xqin]',e)}if(!f)xqHelperChat()}
 /* the evening's few words with Jill; the first evening says who she is to the place */
 function xqHelperChat(){const n=factN('xq_helper');if(fact('yj_move')&&!fact('yj_move_told')){factSet('yj_move_told');shStart('yj_move',false,null,()=>{JILL_SAY('搬完了？',300);xqSay('搬完了。箱子都還沒拆。',1500)});return}if(n>1&&R&&R.sched.some(o=>o.name===YJN)&&yjDueTonight())return;/* her daughter is here tonight: that is the evening's talk */if(n<=1){xqSay('我來幫妳收一下。',300);JILL_SAY('阿姨，不用啦。',1500);xqSay('順路啦。妳一個人怎麼收得完。',2700);return}
  if(hash('xqc|'+S.day)%100>=55)return;const L=[['今天很多人喔。','還好啦。'],['這邊我擦一下就走。','阿姨，真的不用。'],['椅子我幫妳收上去。','謝謝阿姨。'],['妳也早點回去。','嗯，收完就走。']];const p=L[(n+hash('xqp|'+S.day))%L.length];xqSay(p[0],300);JILL_SAY(p[1],1600)}
-/* v2.4 rc7 (the player, 14:46): in the first ten days, the evening the till cannot pay the day's costs and still buy
-   tomorrow's food, 秀琴阿姨 lends $20,000 — at closing, once. Some days later, when the shop can, Jill pays it back. The
-   money moves when the scene starts (a closing cut short keeps it). Neither is held: the restaurant is already closed. */
+/* v2.4 rc7.2 (the player, 21:57–21:58): in the first ten days, each evening that would leave the till under $300 once the
+   day's costs are paid, 秀琴阿姨 lends $3,000 at closing — the first time with the whole scene, later ones short. The money
+   moves when the scene starts (a closing cut short keeps it). It is paid back at the summary (endDay), not here. Neither
+   is held: the restaurant is already closed. */
 STORY_EV.push(
- {k:'xq_loan',lane:'ambient',cd:0,once:true,at:['close','xqin'],
+ {k:'xq_loan',lane:'ambient',cd:1,at:['close','xqin'],
   when:()=>!!R&&R.closing!=null&&loanNeeded()&&!!xqHere(),
-  run:()=>{factSet('xq_loan');S.money+=LOAN;S.loan={d:S.day,n:LOAN};hud(true);
-   v24Scene([{who:'',text:'打烊以後，Jill 對著收銀機算了兩次。'},{who:'staff:秀琴阿姨',text:'對不起來？'},{who:'jill',text:'……還好。'},{who:'staff:秀琴阿姨',text:'還好是多少？'},{who:'jill',text:'明天的菜錢，有點緊。'},
-    {who:'',text:'秀琴阿姨從包包裡拿出一個信封，放在吧台上。'},{who:'staff:秀琴阿姨',text:'兩萬。妳先拿去。'},{who:'jill',text:'阿姨，不行。'},{who:'staff:秀琴阿姨',text:'又不是送妳的。店開起來，再還我。'}],
-    ()=>noteLine('秀琴阿姨借了 $20,000。'));save()}},
- {k:'xq_repay',lane:'ambient',cd:0,once:true,at:['close','xqin'],
-  when:()=>!!R&&R.closing!=null&&!!fact('xq_loan')&&!fact('xq_repay')&&S.day-fact('xq_loan').d>=7&&S.money-dayCostsDue()>=LOAN*3&&!!xqHere(),
-  run:()=>{factSet('xq_repay');S.money-=LOAN;if(S.loan)S.loan.back=S.day;hud(true);
-   v24Scene([{who:'',text:'打烊以後，Jill 把一個信封放到秀琴阿姨面前。'},{who:'staff:秀琴阿姨',text:'這什麼？'},{who:'jill',text:'兩萬。'},{who:'staff:秀琴阿姨',text:'這麼快？'},{who:'jill',text:'店開起來了。'},
-    {who:'staff:秀琴阿姨',text:'……那我收了。'},{who:'staff:秀琴阿姨',text:'明天的湯，幫我留一碗。'},{who:'jill',text:'好。'}],()=>noteLine('Jill 還了秀琴阿姨 $20,000。'));save()}});
+  run:()=>{const first=!fact('xq_loan');factSet('xq_loan');S.money+=LOAN;const L=loanState();L.owed+=LOAN;L.times=(L.times||0)+1;L.d=S.day;hud(true);
+   v24Scene(first?[{who:'',text:'打烊以後，Jill 對著收銀機算了兩次。'},{who:'staff:秀琴阿姨',text:'對不起來？'},{who:'jill',text:'……還好。'},{who:'staff:秀琴阿姨',text:'還好是多少？'},{who:'jill',text:'明天的菜錢，有點緊。'},
+    {who:'',text:'秀琴阿姨從包包裡拿出一個信封，放在吧台上。'},{who:'staff:秀琴阿姨',text:'三千。妳先拿去。'},{who:'jill',text:'阿姨，不行。'},{who:'staff:秀琴阿姨',text:'又不是送妳的。店開起來，再還我。'}]
+    :[{who:'',text:'打烊以後，秀琴阿姨又把一個信封放在吧台上。'},{who:'staff:秀琴阿姨',text:'三千。先拿去。'},{who:'jill',text:'阿姨……'},{who:'staff:秀琴阿姨',text:'我記著。店好了再一起還。'}],
+    ()=>noteLine(`秀琴阿姨借了 ${fmt(LOAN)}。${L.owed>LOAN?`一共欠她 ${fmt(L.owed)}。`:''}`));save()}});
 function yjDueTonight(){return due('yj_meet',null,0,'yj')||due('yj_look','yj_meet',1,'yj')||due('yj_three','yj_look',2,'yj')}
 /* helper mode: 怡君 came late; when a step of hers is due she finishes eating and stays a little, until her mother is in */
 function yjWaitsForMom(g){if(!isYJ(g)||g.yjWait||!xqHelperMode()||!xqHelperToday()||(R.xqhDone&&!(R.xqh&&R.xqh.arriving))||!yjDueTonight())return false;g.yjWait=1;g.timer=Math.min(60,Math.max(6,R.dur*.92-R.t+12));return true}
@@ -4533,10 +4543,16 @@ function upStaffMeal(){if(phase!=='prep'||!eraOpen('up')||fact('sp_seat')||!spOK
  const seated=crew.slice(0,four?4:2),standing=crew.slice(four?4:2,four?7:5);if(!standing.length)return;
  const a=upByName(standing,['Nina'])||standing.find(m=>m.role==='waiter')||standing[0],b=upByName(seated,['Marco'])||seated.find(m=>m.role==='chef')||seated[0];if(!a||!b||a===b)return;
  factSet('sp_seat');later(()=>{if(phase==='prep')staffSay(a,'我們是不是每次都在找地方坐？')},1500);later(()=>{if(phase==='prep')staffSay(b,'嗯。')},3100)}
-const UP_INSPECT_LINES=[{who:'',text:'下午，房東來了一趟。'},{who:'landlord',tone:'talk',text:'我上去一下，拿個東西。'},
- {who:'',text:'樓梯門在側廳。房東開了鎖，回頭看了 Jill 一眼。'},{who:'landlord',text:'要上來看嗎？'},{who:'jill',text:'好。'},
- {who:'',text:'整層都是空的。角落靠著兩支舊滅火器；消防檢查快到了，他要拿去換新的。'},{who:'landlord',tone:'talk',text:'地板是好的，窗戶也是好的。'},{who:'jill',text:'嗯。'},
- {who:'',text:'房東一手提一支滅火器下樓，把門鎖好才走。'}];
+/* rc7.2 (the player, 22:13–22:14: 「房東第二次去看為什麼是房東問？要不要去看看啊？ 好突然。」「你就寫成房東開門貓跑進去 Jill 要去
+   帶貓下來的時候就順便看到房東就介紹啊」): nobody invites anybody. The landlord goes up for something (15:40); the cat who
+   wanders slips through the door he has opened; Jill goes up after her, and the landlord, up there already, says what the
+   floor is. The night the cats go missing (up_door) comes later and is its own story. */
+function upInspectLines(nm){const c=nm||upCatN('mei')||'貓';return[{who:'',text:'下午，房東來了一趟。'},{who:'landlord',tone:'talk',text:'我上去一下，拿個東西。'},
+ {who:'',text:`樓梯門在側廳。房東一開鎖，${c}就從他腳邊鑽進去，一路跑上樓。`},{who:'jill',text:`${c}！`},
+ {who:'',text:`Jill 跟上去帶${c}下來。整層都是空的，${c}已經跳上窗台了。`},
+ {who:'landlord',tone:'talk',text:'上面就這樣，空很久了。地板是好的，窗戶也是好的。'},{who:'jill',text:'嗯。'},
+ {who:'',text:'角落靠著兩支舊滅火器；消防檢查快到了，他上來就是要拿去換新的。'},
+ {who:'',text:`Jill 抱著${c}下樓。房東一手提一支滅火器，把門鎖好才走。`}]}
 STORY_EV.push(
  /* U1 (§4): building information. No journal, no project, no 「maybe someday」 */
  {k:'up_hint',lane:'v24',cls:'A',floor:2,at:['served','collect'],
@@ -4552,9 +4568,9 @@ STORY_EV.push(
  /* U3 (§8, I3): the landlord, the afternoon, a mundane reason; Jill goes up once. Not the reveal: brief, words only */
  /* rc7 (the player, 15:40 「房東說可以上去嗎 要有一個具體原因 而且應該是說 我上去一下 他本來就能上去 就說上去拿個東西」):
     the floor is his — he does not ask anyone; he goes up for something, and asks Jill if she wants to see it */
- {k:'up_inspect',lane:'major',cls:'A',floor:1,at:['daystart'],ic:'heart',note:'房東上樓拿東西，Jill 跟上去看了一眼空著的二樓。',
+ {k:'up_inspect',lane:'major',cls:'A',floor:1,at:['daystart'],ic:'heart',note:()=>`房東上樓拿東西，${upCatN('mei')||'貓'}跟著跑了上去；Jill 上去帶牠下來，看了一眼空著的二樓。`,
   when:()=>due('up_inspect','up_staff',2,'up')&&!v24Fresh('daystart'),
-  run:()=>{factSet('up_inspect');v24Scene(UP_INSPECT_LINES.map(l=>Object.assign({},l)))}},
+  run:()=>{factSet('up_inspect');v24Scene(upInspectLines())}},
  /* U4 (§9–§16): the day of the missing cats. The day's major is taken at the start (the door), the night plays at closing */
  {k:'up_door',lane:'major',cls:'A',floor:1,at:['daystart'],ic:'heart',note:()=>fact('up_cats')?`側廳樓梯的門沒關好，${upCatN('mikan')}和${upCatN('ban')}不見了。最後是在樓上找到的。`:null,
   when:()=>due('up_door','up_inspect',3,'up')&&!v24Fresh('daystart')&&upNightCan(),
@@ -4682,8 +4698,8 @@ const STORY_LINES=[
  {k:'insp',who:'衛生檢查員',names:['衛生檢查員','Jill'],kinds:['s'],faces:['named:衛生檢查員'],title:()=>'今天不是來檢查',open:()=>minD(BF('inspection'),achAt('inspect'))!=null,more:'',
   beats:[[()=>{const a=achReal('inspect');return a===0?0:minD(BF('inspection'),a)},'例行檢查',{key:'inspection'}],['inspector_dinner','「我今天只是來吃飯。」']]},
  /* v2.4 rc7 (14:46): 秀琴阿姨's loan, in the games where the first days were short */
- {k:'xqloan',who:'秀琴阿姨 & Jill',names:['秀琴阿姨','Jill'],kinds:['e'],faces:['staff:秀琴阿姨','jill'],title:()=>'兩萬',open:()=>!!BF('xq_loan'),more:()=>fact('xq_repay')?'':'說好店開起來再還。',
-  beats:[['xq_loan','「兩萬。妳先拿去。」'],['xq_repay','「這麼快？」']]},
+ {k:'xqloan',who:'秀琴阿姨 & Jill',names:['秀琴阿姨','Jill'],kinds:['e'],faces:['staff:秀琴阿姨','jill'],title:()=>'信封',open:()=>!!BF('xq_loan'),more:()=>loanOwed()>0?`還欠她 ${fmt(loanOwed())}，結算時錢超過 $20,000 就會還。`:'',
+  beats:[['xq_loan','「妳先拿去。」'],['xq_repay','結算時還清了']]},
  /* v2.4: 怡君 and 《三個選項》; 《那面牆》 (character stories — the 人物／關係支線 page) */
  {k:'yj',who:'怡君 & 秀琴阿姨',names:['怡君','秀琴阿姨','Jill'],kinds:['e'],faces:['named:怡君','staff:秀琴阿姨'],title:()=>'三個選項',open:()=>!!BF('yj_meet'),more:()=>fact('yj_key')?'':'她還在找。',
   beats:[['yj_meet','吃飯啊',{illus:'yj_intro'}],['yj_look','在看房子'],['yj_three','找到三個'],['yj_chose','小的那間'],['yj_move','搬家'],['yj_key','備用鑰匙',{illus:'yj_key'}]]},
@@ -4809,14 +4825,14 @@ function storyCapLine(who,txt,kind){return;const C=STORY_CAP;if(!C)return;const 
    in. A page whose words all come from elsewhere (a shared pool) is left as it is. Once, on loading. */
 function beatSrcOf(k){const out=[];for(const E of STORY_EV){const src=String(E.run||'')+(E.present||[]).map(p=>String(p.run||'')).join('');if(E.k===k||src.includes(`factSet('${k}'`)||src.includes(`v24Cap('${k}'`))out.push(src)}
  if(k.startsWith('dy_')&&typeof DYLAN_SCENES!=='undefined'){const sc=DYLAN_SCENES.find(x=>'dy_'+x.k===k);if(sc)out.push(JSON.stringify(sc.lines))}
- if(k==='meal_box'||k==='meal_two')out.push(String(staffMealStory));if(k==='yj_move')out.push(String(xqHelperChat));if(k==='up_ask')out.push(String(upAskUpd));if(k==='up_inspect')out.push(JSON.stringify(UP_INSPECT_LINES));return out.join('\n')}
+ if(k==='meal_box'||k==='meal_two')out.push(String(staffMealStory));if(k==='yj_move')out.push(String(xqHelperChat));if(k==='up_ask')out.push(String(upAskUpd));if(k==='up_inspect')out.push(String(upInspectLines));return out.join('\n')}
 function beatLineOk(src,t){if(!t)return false;if(src.includes(t))return true;
  for(const m of src.matchAll(/`([^`]*)`/g)){const parts=m[1].split(/\$\{[^}]*\}/);if(parts.length<2)continue;if(new RegExp('^'+parts.map(p=>p.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('.*')+'$').test(t))return true}
  const lits=[...src.matchAll(/'([^'\\\n]*)'/g)].map(m=>m[1]).filter(Boolean);return lits.some(a=>a.length>=2&&t.startsWith(a)&&lits.some(b=>t.length>a.length&&t.endsWith(b)))}
 var STORY_READY=false;
 function beatLinesMig(o){const st=o&&o.story;if(!st||!st.beatLines)return o;
  {/* v2.4 rc7 (14:55): Madame Lin's gift as it is written now, for a page that kept rc6's words */const L=st.beatLines.lin_gift;if(Array.isArray(L)&&L.some(x=>x&&x.t==='……妳每次到底都在看哪裡？'))st.beatLines.lin_gift=[{t:'Madame Lin 結完帳，從椅子旁邊拿起一盆植物，放到 Jill 面前。'},{w:'Jill',t:'今天怎麼帶東西？'},{w:'Madame Lin',t:'側廳門口旁邊那個角落，空很久了。'},{w:'Madame Lin',t:'放一盆綠的，客人坐下來，眼睛才有地方休息。'},{w:'Jill',t:'……我天天在這裡，都沒注意到。'},{w:'Madame Lin',t:'就是因為天天在。'}]}
- {/* rc7 (15:40): the landlord's afternoon as it is written now (he goes up for something; nobody asks him) */const L=st.beatLines.up_inspect;if(Array.isArray(L)&&L.some(x=>x&&x.t==='我可以一起上去嗎？'))st.beatLines.up_inspect=UP_INSPECT_LINES.map(l=>{const w=whoLabel(l.who||'');return w?{w,t:l.text}:{t:l.text}})}
+ {/* rc7 (15:40), rc7.2 (22:14): the landlord's afternoon as it is written now — a page that kept rc6's words (「我可以一起上去嗎？」) or rc7's (「要上來看嗎？」) */const L=st.beatLines.up_inspect;if(Array.isArray(L)&&L.some(x=>x&&(x.t==='我可以一起上去嗎？'||x.t==='要上來看嗎？'))){const D=CAT_DEF.find(x=>x.id==='mei');const nm=(o.catNames&&o.catNames.mei)||(D&&D.n)||'貓';st.beatLines.up_inspect=upInspectLines(nm).map(l=>{const w=whoLabel(l.who||'');return w?{w,t:l.text}:{t:l.text}})}}
  if(st.blMig)return o;st.blMig=1;
  for(const k in st.beatLines){const arr=st.beatLines[k];if(!Array.isArray(arr)||!arr.length)continue;const src=beatSrcOf(k);if(!src)continue;const ok=arr.map(x=>beatLineOk(src,x&&x.t));if(ok.some(Boolean)&&!ok.every(Boolean))st.beatLines[k]=arr.filter((x,i)=>ok[i])}return o}
 function beatNote(k){const E=STORY_EV.find(x=>x.k===k);if(!E||!E.note)return'';try{return typeof E.note==='function'?E.note(evState(k))||'':E.note}catch(e){return''}}
@@ -5024,7 +5040,10 @@ function achDay(st,plated){if(S.stats.days+1>=7)ach('week');if(st.rev>=20000)ach
 function endDay(){if(!R)return;try{upNightEnd()}catch(e){console.warn('[up]',e)}/* v2.4 P2 */clearCheckpoint();const st=R.st,D=S.day;try{pdAvgUpd(st)}catch(e){}storyTick('dayend',{st});crewDayDone();/* v2.3 */const wages=crewWages();let bonus=0;
  const tasks=S.today.tasks.map(t=>{const p=taskProg(t);const done=p>=t.n;if(done)bonus+=t.reward;return{...t,p,done}});
  const cfee=contractFee();if(cfee){S.money-=Math.min(cfee,Math.max(0,S.money+bonus))}/* v2.4 rc6: the contracts' fee for the day */
- S.money+=bonus;/* v2.4 rc7 (14:39, 14:46): the glasses poured, the rent and the wages leave the till tonight. It never goes below $0 and nothing is carried to another day — in the first ten days 秀琴阿姨's loan comes at closing before it would be short */const wine=Math.round(st.wineCost||0),rent=rentToday(),piano=Math.round(st.piano||0);const pay=n=>{const p=Math.min(n,Math.max(0,S.money));S.money-=p;return p};pay(wine);pay(rent);pay(wages);pay(piano);/* rc7: 予安's fee, on her nights */const avg=st.sats.length?st.sats.reduce((a,b)=>a+b,0)/st.sats.length:0;
+ S.money+=bonus;/* v2.4 rc7 (14:39, 14:46): the glasses poured, the rent and the wages leave the till tonight. It never goes below $0 and nothing is carried to another day — in the first ten days 秀琴阿姨's loan comes at closing before it would be short */const wine=Math.round(st.wineCost||0),rent=rentToday(),piano=Math.round(st.piano||0);const pay=n=>{const p=Math.min(n,Math.max(0,S.money));S.money-=p;return p};pay(wine);pay(rent);pay(wages);pay(piano);/* rc7: 予安's fee, on her nights */
+ /* rc7.2 (the player, 21:58: 「只要你的錢超過20,000結算的時候就自動還錢」): a day that ends over $20,000 pays 秀琴阿姨 back, all of it */
+ let repaid=0;{const o=loanOwed();if(o>0&&S.money>REPAY_OVER){repaid=Math.min(o,S.money);S.money-=repaid;const L=loanState();L.owed=o-repaid;L.back=D;if(L.owed<=0)factSet('xq_repay');noteLine(`結算時還了秀琴阿姨 ${fmt(repaid)}。${L.owed>0?`還欠 ${fmt(L.owed)}。`:''}`)}}
+ const lent=fact('xq_loan')&&fact('xq_loan').l===D?LOAN:0;const avg=st.sats.length?st.sats.reduce((a,b)=>a+b,0)/st.sats.length:0;
  let top=null,topN=0;for(const d in st.dish)if(!String(d).startsWith('w_')&&st.dish[d]>topN){topN=st.dish[d];top=d}
  const dayStars=st.sats.length?clamp(Math.round((avg/100)*5*2)/2,1,5):1;
  let nb=1,msg='';if(st.critic==='good'){nb+=.35;msg="Jill's Kitchen 昨晚突然爆紅！評論家的文章被瘋狂轉發。"}else if(st.critic==='bad'){nb-=.1;msg='評論家的文章不太留情面，今天客人少了一點。'}if(st.blogger==='good'){nb+=.25;msg=msg||'美食部落客的貼文爆了，大家都想來 Jill 的店！'}
@@ -5033,7 +5052,7 @@ function endDay(){if(!R)return;try{upNightEnd()}catch(e){console.warn('[up]',e)}
  if(st.guests>=10)ach('rush');if(plated>=8&&st.q.B===0&&st.q.O===0&&st.angry===0)ach('perfectnight');if(rating()>=4.75&&S.reviews.length>=20)ach('chef');
  const r0=(S.rhist&&S.rhist.length)?S.rhist[S.rhist.length-1].r:3;const story=ratingStory(st,plated);S.rhist=S.rhist||[];S.rhist.push({d:D,r:Math.round(rating()*100)/100,n:st.reviews.length,rs:st.reviews.length?Math.round(st.reviews.reduce((a,r)=>a+r.s,0)/st.reviews.length*10)/10:null,why:story.slice(0,2).map(x=>x.t)});if(S.rhist.length>60)S.rhist.shift();
  const recs=updRecords(st,plated,D);achDay(st,plated);
- S.lastSummary={day:D,rev:st.rev,cost:S.todayCost,wages,cfee,rent,wine,piano,rentParts:rentParts(),loan:(fact('xq_loan')&&fact('xq_loan').d===D?LOAN:0)-(fact('xq_repay')&&fact('xq_repay').d===D?LOAN:0),tips:st.tips,bonus,net:st.rev+st.tips+bonus-S.todayCost-wages-cfee-rent-wine-piano,guests:st.guests,lost:st.lost,walkins:st.walkins||0,families:st.families||0,angry:st.angry,perfect:st.perfect,plated,avg:Math.round(avg),top,stars:dayStars,reviews:st.reviews.slice(-3),tasks,maxCombo:R.maxCombo,reco:recoDish(),recoN:recoDish()?(st.dish[recoDish()]||0):0,photos:albumList().filter(p=>p.day===D).length,r0,r1:Math.round(rating()*100)/100,story,recs,weather:R.weather,event:R.event,treats:st.treats||0,sets:st.sets||0,camp:st.camp&&st.camp.via?Object.assign({},st.camp):null,lg:loungeLv()?{tabs:st.lgTabs||0,rev:st.lgRev||0,tip:st.lgTip||0,wait:st.lgWait||0,after:st.lgAfter||0,direct:st.lgDirect||0,open:loungeOpenTonight()}:null,pd:pdBuilt()?{n:st.pdN||0,res:st.pdRes||0,top:st.pdTop||0}:null,crew:(S.crew||[]).map(m=>({name:m.name,role:m.role,lv:m.lv,wage:crewWage(m),n:(st.crew||{})[m.id]||{},away:(crewAwayOf(m)||{}).k||null})),short:Object.values(st.short||{}).reduce((a,b)=>a+b,0),
+ S.lastSummary={day:D,rev:st.rev,cost:S.todayCost,wages,cfee,rent,wine,piano,rentParts:rentParts(),loan:lent-repaid,tips:st.tips,bonus,net:st.rev+st.tips+bonus-S.todayCost-wages-cfee-rent-wine-piano,guests:st.guests,lost:st.lost,walkins:st.walkins||0,families:st.families||0,angry:st.angry,perfect:st.perfect,plated,avg:Math.round(avg),top,stars:dayStars,reviews:st.reviews.slice(-3),tasks,maxCombo:R.maxCombo,reco:recoDish(),recoN:recoDish()?(st.dish[recoDish()]||0):0,photos:albumList().filter(p=>p.day===D).length,r0,r1:Math.round(rating()*100)/100,story,recs,weather:R.weather,event:R.event,treats:st.treats||0,sets:st.sets||0,camp:st.camp&&st.camp.via?Object.assign({},st.camp):null,lg:loungeLv()?{tabs:st.lgTabs||0,rev:st.lgRev||0,tip:st.lgTip||0,wait:st.lgWait||0,after:st.lgAfter||0,direct:st.lgDirect||0,open:loungeOpenTonight()}:null,pd:pdBuilt()?{n:st.pdN||0,res:st.pdRes||0,top:st.pdTop||0}:null,crew:(S.crew||[]).map(m=>({name:m.name,role:m.role,lv:m.lv,wage:crewWage(m),n:(st.crew||{})[m.id]||{},away:(crewAwayOf(m)||{}).k||null})),short:Object.values(st.short||{}).reduce((a,b)=>a+b,0),
   lgSales:loungeLv()?Object.keys(st.lgSold||{}).map(d=>({d,n:st.lgSold[d].n,rev:st.lgSold[d].rev,wine:String(d).startsWith('w_')})).filter(x=>x.n>0).sort((a,b)=>(b.wine-a.wine)||(b.n-a.n)):null,   /* v2.4 rc7 (14:51): what the Lounge's tabs paid for — its total is the Lounge's takings above */
   dinWine:Object.keys(st.dinWine||{}).map(d=>({d,n:st.dinWine[d].n,rev:st.dinWine[d].rev})).filter(x=>x.n>0).sort((a,b)=>b.n-a.n),
   sales:menuList().filter(d=>!(DISHES[d]&&DISHES[d].bar)).map(d=>({d,n:st.dish[d]||0,rev:(st.dishRev||{})[d]!=null?st.dishRev[d]:(st.dish[d]||0)*priceOf(d),short:(st.short||{})[d]||0,unmet:(st.unmet||{})[d]||0,left:S.stock[d]||0})).sort((a,b)=>b.n-a.n),
@@ -5136,7 +5155,7 @@ function idLabel(c,x,y,a,b,strong,vl,vr,top,below){const fa=`800 ${strong?10.6:9
 function renderTickets(){if(!R){ticketsEl.innerHTML=`<div class="tk-empty">${phase==='service'?'':'訂單會出現在這裡。'}</div>`;tkVer=-1;tkRefs=[];ticketsEl.classList.remove('scroll','compact');const m=$('#tkMore');if(m){m.hidden=true;$('#tkBack').hidden=true}return}
  if(R.tv===tkVer)return;tkVer=R.tv;
  if(!R.tickets.length){ticketsEl.innerHTML='<div class="tk-empty">還沒有訂單。點有「!」的桌子幫客人點餐。</div>';tkRefs=[];ticketsLayout();return}
- ticketsEl.innerHTML=R.tickets.map(tk=>{const g=tk.g;return`<div class="tk${tk.items.length>8?' big huge':tk.items.length>5?' big':''} ${g.reg?(g.reg==='dylan'?'isdylan':'isreg'):g.type==='vip'?'isvip':''}" data-tk="${tk.id}"><div class="tk-h"><b>T${tk.no}</b><em data-w>0:00</em></div><div class="tk-who"><img alt="" src="${guestPortrait(g)}"><span>${g.reg==='dylan'?'Dylan':g.name}</span>${g.via==='camp'?'<i class="via" title="看到宣傳來的">📱</i>':''}</div><div class="tk-items">${tk.items.map((it,i)=>`<button class="it ${it.st}" data-tk="${tk.id}" data-i="${i}" aria-label="${DISH(it.d).n}"><img alt="" src="${dishURL(it.d,it.st==='ready'||it.st==='served'?it.q:'G',it.want)}">${it.d==='steak'?`<span class="tag">${STEAK_S[it.want]}</span>`:''}${it.st==='ready'?'<span class="ok">✓</span>':''}${it.st==='order'?'<span class="dl">叫貨中</span>':''}</button>`).join('')}</div><div class="tk-pat"><i data-p></i></div>${(()=>{const st=treatState(g);if(!st.k)return'';if(st.k==='offer')return`<button class="tk-treat" data-treat="${tk.id}" aria-label="招待，今天還可以 ${st.left} 桌">招待<i>${st.left}</i></button>`;return`<span class="tk-treat ${st.k}" title="${st.n}">${st.n}</span>`})()}</div>`}).join('');ticketsLayout();
+ ticketsEl.innerHTML=R.tickets.map(tk=>{const g=tk.g;return`<div class="tk${tk.items.length>8?' big huge':tk.items.length>5?' big':''} ${g.reg?(g.reg==='dylan'?'isdylan':regTier((S.regulars||{})[g.reg]||0)>=1?'isreg':''):g.type==='vip'?'isvip':''}" data-tk="${tk.id}"><div class="tk-h"><b>T${tk.no}</b><em data-w>0:00</em></div><div class="tk-who"><img alt="" src="${guestPortrait(g)}"><span>${g.reg==='dylan'?'Dylan':g.name}</span>${g.via==='camp'?'<i class="via" title="看到宣傳來的">📱</i>':''}${(()=>{/* rc7.2 (the player, 21:50: 「招待按鈕寫沒東西可請的字重疊到了」): the chip is in the name's line, after it */const st=treatState(g);if(!st.k)return'';if(st.k==='offer')return`<button class="tk-treat" data-treat="${tk.id}" aria-label="招待，今天還可以 ${st.left} 桌">招待<i>${st.left}</i></button>`;return`<span class="tk-treat ${st.k}" title="${st.n}">${st.n}</span>`})()}</div><div class="tk-items">${tk.items.map((it,i)=>`<button class="it ${it.st}" data-tk="${tk.id}" data-i="${i}" aria-label="${DISH(it.d).n}"><img alt="" src="${dishURL(it.d,it.st==='ready'||it.st==='served'?it.q:'G',it.want)}">${it.d==='steak'?`<span class="tag">${STEAK_S[it.want]}</span>`:''}${it.st==='ready'?'<span class="ok">✓</span>':''}${it.st==='order'?'<span class="dl">叫貨中</span>':''}</button>`).join('')}</div><div class="tk-pat"><i data-p></i></div></div>`}).join('');ticketsLayout();
  tkRefs=[...ticketsEl.querySelectorAll('.tk')].map(el=>({el,tk:R.tickets.find(t=>t.id===+el.dataset.tk),w:el.querySelector('[data-w]'),p:el.querySelector('[data-p]')}));updTicketBars()}
 function updTicketBars(){if(!R)return;for(const r of tkRefs){if(!r.tk)continue;const e=Math.floor(R.t-r.tk.t0);r.w.textContent=`${Math.floor(e/60)}:${String(e%60).padStart(2,'0')}`;const p=r.tk.g.pat;r.p.style.width=(p*100)+'%';r.p.style.background=p>.55?'#5E8F4E':p>.28?'#E0A43A':'#D4553A';r.el.classList.toggle('urgent',p<.28)}}
 /* a long press on a game control (hold-and-release cooking, buttons, the room) must never become a text
@@ -7861,6 +7880,7 @@ function hitKItem(p){if(room!=='main')return null;for(const it of kitchenItems()
 function roomTap(p,e){e.preventDefault();audioInit();
  if(room==='kitchen'){if(R&&!paused&&phase==='service'){const si=hitStation(p);if(si>=0){const s0=R.slots[si];if(s0.broken||s0.job||nextPendingFor(s0.type)){tapStation(si);return true}SW.idle=si;return false}}const f=KR.fridge;if(p.x>=f.x-4&&p.x<=f.x+f.w+4&&p.y>=f.y-8&&p.y<=f.y+f.h+12){FRIDGE_T=performance.now()/1000;sfx.fridge();if(R&&phase==='service')openStock(true);return true}
   if(S.rooms&&S.rooms.cooler){const k=KR.cooler;if(p.x>=k.x-4&&p.x<=k.x+k.w+4&&p.y>=k.y-8&&p.y<=k.y+k.h+12){if(R&&phase==='service')openStock(true);return true}}
+  if(R&&!paused&&phase==='service'&&passHit(p)){servePass();return true}
   if(p.y>LH-70&&Math.abs(p.x-200)<60){setRoom('main');return true}return false}
  if(room==='side'){const a=SIDE_L.arch;if(p.x>=a.x-8&&p.x<=a.x+a.w+8&&p.y>=a.y-6&&p.y<=a.y+112){setRoom('main');return true}}
  if(room==='front'){if(Math.abs(p.x-FR.door.x)<30&&p.y>176&&p.y<276){setRoom('main');return true}}
@@ -7869,6 +7889,13 @@ function roomTap(p,e){e.preventDefault();audioInit();
  const rg=hitRegular(p);if(rg&&!paused){showRegCard(rg);idFocusGroup(rg,rg.hitWho||0,{soft:1});return true}
  if(!R||paused||phase!=='service')return false;let best=null,bd=1e9;for(const t of R.tables){if((t.room||'main')!==room)continue;const d=t.pdr?(pdHit(p)?0:1e9):Math.hypot((p.x-t.x)*.85,p.y-(t.y-16));const lim=t.pdr?60:t.seats===4?46:40;if(d<lim&&d<bd){bd=d;best=t}}
  if(best){tapTable(best);idShowTable(best);return true}return idHitWalker(p)}
+/* rc7.2 (the player, 21:49: 「點出餐台就能送餐」): the kitchen's pass — the counter and the ticket rail over it — takes a tap:
+   Jill takes out every table's plates that are ready and not already on their way, the oldest ticket first; the same as
+   tapping each of those tables in the dining room */
+function passHit(p){const big=projOn('pass');const x0=big?64:80,x1=big?336:320;return p.x>=x0-6&&p.x<=x1+6&&p.y>=KY.rail-8&&p.y<=KY.passTop+KY.passH+KY.passFace+8}
+function servePass(){const ts=[];for(const tk of R.tickets){const g=tk.g;if(!g||g.table==null||g.state!=='wait')continue;const t=R.tables[g.table];if(!t||t.group!==g||ts.includes(t)||jillTargets(t.i))continue;if(tk.items.some(it=>it.st==='ready'&&!it.picked))ts.push(t)}
+ if(!ts.length){toast(R.tickets.some(tk=>tk.items.some(it=>it.st==='ready'))?'做好的菜已經在送了':'出菜口還沒有做好的菜');return false}
+ for(const t of ts)tapTable(t);toast(ts.length===1?'Jill 去送菜了':`Jill 去送 ${ts.length} 桌的菜`);return true}
 function tapKItem(k){audioInit();KPOP[k]=performance.now()/1000;const now=performance.now()/1000;
  if(k.startsWith('miss:')){toast(`${k.slice(5)}還沒買，打烊後可以在商店購買`);return}
  switch(k){
@@ -8478,14 +8505,14 @@ function drawBagSparkle(c,now){const t=now-BAG_T;const base=.35+Math.sin(now*2)*
 
 /* ================= guide ================= */
 /* 小小店主手冊：seven cards, short lines, the same tone as the rest of the game */
-const GUIDE=[   /* the manual describes the game as it is. Audited every release (docs/RELEASE_CHECKLIST.md) — last: v2.4 rc7 (the day's money: the glasses' cost, the rent, the wages, 秀琴阿姨's loan, 予安's fee; Ken's tasting nights and 「晚餐之後」; the piano and 予安; Ken's and 予安's stories hold the restaurant; a line said on the way to a table; the story guests look like their portraits — earlier: v2.4 rc6 (the Staff Room, the Private Dining Room and its bookings, two more places on the restaurant's list; the stories that hold the restaurant, the day's stories on the summary, the Lounge's list and sales, the things to spend on, the Second Floor after the Lounge, the new places' photos, a day off)), 2026-10-02 */
+const GUIDE=[   /* the manual describes the game as it is. Audited every release (docs/RELEASE_CHECKLIST.md) — last: v2.4 rc7.2 (秀琴阿姨's $3,000 loans and the payback at the summary; her first evening held; the pass takes a tap; the heart for a regular who is one; the 招待 chip beside the name; a line with a face answers a touch) — earlier: v2.4 rc7 (the day's money: the glasses' cost, the rent, the wages, 秀琴阿姨's loan, 予安's fee; Ken's tasting nights and 「晚餐之後」; the piano and 予安; Ken's and 予安's stories hold the restaurant; a line said on the way to a table; the story guests look like their portraits — earlier: v2.4 rc6 (the Staff Room, the Private Dining Room and its bookings, two more places on the restaurant's list; the stories that hold the restaurant, the day's stories on the summary, the Lounge's list and sales, the things to spend on, the Second Floor after the Lounge, the new places' photos, a day off)), 2026-10-02 */
  {ic:'🍳',h:'開店與料理',sum:'每天 17:00 開店、21:30 打烊。你是 Chef Jill，點餐廳裡的東西就能指揮她。',pts:[
   ['房間','票券列下面的分頁：店門口・主廳・側廳・二樓（租下以後）・休息室・包廂（蓋好以後）・Lounge（蓋好以後）・廚房（也可以用 ←→ 或數字鍵）。你在哪一間，那個分頁就亮著，寫著那一間的全名——在休息室裡是「員工休息室」，在包廂裡是「私人包廂」。二樓是整層樓本身：上面的房間關著門，點門就進去，房間裡靠近你的那扇門回到二樓；上二樓的樓梯門在側廳靠近你的那一邊。新的房間蓋好的那天早上，開店前會先帶你上二樓看一眼；整層的平面圖在「店舖工程」的二樓那一欄。包廂的分頁上有跟桌子一樣的提示。主廳的後牆有側廳的拱門，Lounge 蓋好以後旁邊多一道，都可以直接點。主廳底部沒有廚房——廚房是自己的一間，出菜口在那裡；Jill 和服務生會走到主廳最下面去拿菜。'],
   ['帶位','有空桌客人會自己坐；客滿時在門口長椅等。想指定順序，點那組客人或點空桌。'],
   ['誰在哪裡','訂單上的桌號（T35）或名字點一下，會切到那一桌所在的房間，那一桌亮一下，寫著幾號桌、哪一組、幾位。點一張有客人的桌子也一樣會寫出來。點常客或認得的客人，他的小卡片上寫著坐哪一桌。畫面下方誰說了一句話，點那句話就會找到他現在在哪——還在桌上、在等位、正要離開；已經走了也會告訴你。還在走向座位的路上說的話，會帶你到他要坐的那一桌（他走到之前那一桌會一直亮著）；服務生、調酒師說的「這邊請」「請慢用」，點了會找到她說話的那一桌。標示幾秒就消失，平常畫面上不會一直掛著名字。'],
   ['點餐','桌上出現紅色「!」→ 點桌子，Jill 過去點餐。'],
   ['做菜','切到廚房，點亮著「+」的設備，照料理台的指示一步一步做。有廚師的工作站他們會自己接。'],
-  ['上菜','桌上出現銀色餐蓋 → 點桌子，Jill 去出菜口端菜。有服務生（LV2 起）他們會自己端。'],
+  ['上菜','桌上出現銀色餐蓋 → 點桌子，Jill 去出菜口端菜。在廚房點出菜口，Jill 會把做好的菜都送出去。有服務生（LV2 起）他們會自己端。'],
   ['收錢・收桌','出現金幣點桌子收錢；客人走後點桌子收乾淨才能接下一組。'],
   ['料理台的幾種步驟','放食材（有些要照順序）／Jill 自己來（切、炒、打發，開始後她會做完）／等一下／看準時機（指針到金色區按）／按住放開（在金色區間放開）／撒幾下（數量對了按完成）。'],
   ['把店開得順','連續好評出菜會累積 COMBO，連續 5 道 PERFECT 進入 JILL\'S ON FIRE。速度按鈕可以把整個店開快一點。'],
@@ -8535,7 +8562,7 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
   ['酒水成本','每倒一杯酒——在 Lounge 或晚餐桌上——就是那杯酒的進貨成本，大約售價的三成。酒不用備料，倒了才算。'],
   ['租金','每天付，跟店的大小走：主廳每擴建一次就高一點；側廳、戶外區、廚房擴建、Lounge、二樓各有自己的一份。結算會一項一項列出來。剛開的小店一天 $300。'],
   ['薪水','日薪跟等級走，LV5 大約是剛來時的三倍。'],
-  ['錢不夠的時候','收銀機不會變成負的，付到 $0 為止，不會欠到明天。開店頭十天，要是打烊時付完當天的開銷就買不起明天的菜，秀琴阿姨會借你兩萬；店站穩了，Jill 會還她。']]},
+  ['錢不夠的時候','收銀機不會變成負的，付到 $0 為止，不會欠到明天。開店頭十天，要是打烊時付完當天的開銷剩不到 $300，秀琴阿姨會借你 $3,000——每次不夠都會借。結算時錢超過 $20,000，就會把欠她的全部還掉。']]},
  {ic:'⭐',h:'招牌菜與招牌甜點',sum:'兩道只屬於 Jill 的東西，各自有自己的進程。',pts:[
   ['招牌菜','從主食、蛋白質、醬汁、配菜組一道（$3,000，改配方 $800）。永遠在菜單最上方，客人會專程為它來（客流 +10%）。在爐台用平底鍋做。賣到 40 份換第二版（醬汁畫盤與嫩葉），110 份第三版（食用花與金箔），價格也高一點。'],
   ['招牌甜點','有了招牌菜、擴建到 Jill\'s Kitchen、有冷盤台之後可以研發（$4,000，改配方 $800）：底、奶餡、水果、點綴四樣。排在招牌菜下面，為招牌菜來的客人多半會一起點。在冷盤台冷作擺盤。賣到 30 份換第二版（果泥畫盤與薄荷），80 份第三版（糖絲與金箔）。'],
@@ -8720,7 +8747,7 @@ function dlgNext(){if(!DLG)return;
    Jill/Dylan exchanges show both faces, the speaker lit. ---- */
 function portraitLine(who,txt,o){o=o||{};const p=portraitOf(who,o.tone);if(!p)return false;const box=$('#plines');if(!box)return false;const w=o.with?portraitOf(o.with,o.withTone):null;
  const d=document.createElement('div');d.className='pline '+(p.side==='right'?'right':'left');d.innerHTML=`${w&&w.side==='left'?`<img class="dim" alt="" src="${w.src}">`:''}${p.side==='left'?`<img alt="" src="${p.src}">`:''}<div class="pl-t"><b>${p.name}</b><span>${txt}</span></div>${p.side==='right'?`<img alt="" src="${p.src}">`:''}${w&&w.side==='right'?`<img class="dim" alt="" src="${w.src}">`:''}`;
- box.appendChild(d);while(box.children.length>2)box.firstChild.remove();const T=setTimeout(()=>{d.classList.add('out');setTimeout(()=>d.remove(),260)},o.ms||3400);d.onclick=()=>{clearTimeout(T);d.remove();try{if(o.tg&&R&&idFocusTable(o.tg))return;if(o.g&&R)idFocusGroup(o.g,o.k||0,{name:p.name});else if(!(who==='jill'&&o.with&&idFocusWithWho(o.with)))idFocusWho(who)}catch(e){}};   /* v2.4 rc6 (07:09): a tap on the line finds who said it; rc7 (15:37): a line said at a table finds the table, Jill's to someone finds them */
+ box.appendChild(d);while(box.children.length>2)box.firstChild.remove();const T=setTimeout(()=>{d.classList.add('out');setTimeout(()=>d.remove(),260)},o.ms||4600);let done=false;const act=e=>{if(done)return;done=true;if(e&&e.preventDefault)e.preventDefault();clearTimeout(T);d.remove();try{if(o.tg&&R&&idFocusTable(o.tg))return;if(o.g&&R)idFocusGroup(o.g,o.k||0,{name:p.name});else if(!(who==='jill'&&o.with&&idFocusWithWho(o.with)))idFocusWho(who)}catch(e2){}};d.addEventListener('pointerdown',act);d.onclick=act;   /* rc7.2 (the player, 22:07: 「有出現人頭的點下去不會看到他在哪一組」 — on the phone the tap went nowhere; on a computer it found them): the line answers the touch itself, not the click a phone may never send for it, and stays a little longer to be caught */   /* v2.4 rc6 (07:09): a tap on the line finds who said it; rc7 (15:37): a line said at a table finds the table, Jill's to someone finds them */
  return true}
 function hideScreen(){screenEl.hidden=true;screenEl.innerHTML='';sub=null}
 function topIcons(){return`<button class="icon-btn" data-act="peek" aria-label="看店裡" style="font-weight:800;font-size:11px;width:auto;padding:0 9px">看店裡</button><button class="icon-btn" data-act="guide" aria-label="店主手冊" style="font-weight:800;font-size:15px">?</button><button class="icon-btn" data-act="book" aria-label="餐廳日誌">${SVG.book}</button><button class="icon-btn" data-act="settings" aria-label="設定">${SVG.gear}</button>`}
@@ -8781,7 +8808,7 @@ function wineTonightHTML(){if(!loungeLv())return'';const all=wineAvail();if(!all
 function showSummary(){phase='summary';mainScreen='summary';const s=S.lastSummary;if(!s){showShop();return}hud(true);/* v2.2 A5: the wages just left the till — the HUD must say so on this screen, not on the next */
  const topHTML=s.top?`<img alt="" src="${dishURL(s.top,'P')}" style="width:34px;height:34px;vertical-align:middle;margin-right:4px">${DISH(s.top)?DISH(s.top).n:''}`:'—';
  show(`<div class="sheet tall"><div class="sh-top"><div class="ttl"><div class="eyebrow">今日結算</div><h2>DAY ${s.day}</h2><div class="sum-stars">${starsHTML(s.stars)}</div></div><button class="icon-btn" data-act="peek" style="font-weight:800;font-size:11px;width:auto;padding:0 9px">看店裡</button><button class="icon-btn" data-act="book" aria-label="餐廳日誌">${SVG.book}</button></div>
-  <div class="ledger"><div><span>營業額</span><span>${fmt(s.rev)}</span></div><div class="neg"><span>食材成本</span><span>-${fmt(s.cost)}</span></div>${s.wine?`<div class="neg"><span>酒水成本</span><span>-${fmt(s.wine)}</span></div>`:''}${s.wages?`<div class="neg"><span>薪資</span><span>-${fmt(s.wages)}</span></div>`:''}${s.rent?`<div class="neg rent"><span>租金<small>${(s.rentParts||[]).map(p=>`${p[0]} ${fmt(p[1])}`).join('・')}</small></span><span>-${fmt(s.rent)}</span></div>`:''}${s.cfee?`<div class="neg"><span>食材契作</span><span>-${fmt(s.cfee)}</span></div>`:''}${s.piano?`<div class="neg"><span>鋼琴演奏<small>林予安，今晚在 Lounge</small></span><span>-${fmt(s.piano)}</span></div>`:''}<div class="pos"><span>小費</span><span>+${fmt(s.tips)}</span></div>${s.bonus?`<div class="pos"><span>任務獎勵</span><span>+${fmt(s.bonus)}</span></div>`:''}<div class="net"><span>今日淨利</span><span style="color:${s.net>=0?'var(--sage)':'#A2412B'}">${s.net>=0?'+':''}${fmt(s.net)}</span></div>${s.loan>0?`<div class="pos loan"><span>秀琴阿姨借的<small>說好店開起來再還</small></span><span>+${fmt(s.loan)}</span></div>`:s.loan<0?`<div class="neg loan"><span>還秀琴阿姨</span><span>-${fmt(-s.loan)}</span></div>`:''}</div>
+  <div class="ledger"><div><span>營業額</span><span>${fmt(s.rev)}</span></div><div class="neg"><span>食材成本</span><span>-${fmt(s.cost)}</span></div>${s.wine?`<div class="neg"><span>酒水成本</span><span>-${fmt(s.wine)}</span></div>`:''}${s.wages?`<div class="neg"><span>薪資</span><span>-${fmt(s.wages)}</span></div>`:''}${s.rent?`<div class="neg rent"><span>租金<small>${(s.rentParts||[]).map(p=>`${p[0]} ${fmt(p[1])}`).join('・')}</small></span><span>-${fmt(s.rent)}</span></div>`:''}${s.cfee?`<div class="neg"><span>食材契作</span><span>-${fmt(s.cfee)}</span></div>`:''}${s.piano?`<div class="neg"><span>鋼琴演奏<small>林予安，今晚在 Lounge</small></span><span>-${fmt(s.piano)}</span></div>`:''}<div class="pos"><span>小費</span><span>+${fmt(s.tips)}</span></div>${s.bonus?`<div class="pos"><span>任務獎勵</span><span>+${fmt(s.bonus)}</span></div>`:''}<div class="net"><span>今日淨利</span><span style="color:${s.net>=0?'var(--sage)':'#A2412B'}">${s.net>=0?'+':''}${fmt(s.net)}</span></div>${s.loan>0?`<div class="pos loan"><span>秀琴阿姨借的<small>結算時錢超過 $20,000 就會還她</small></span><span>+${fmt(s.loan)}</span></div>`:s.loan<0?`<div class="neg loan"><span>還秀琴阿姨</span><span>-${fmt(-s.loan)}</span></div>`:''}</div>
   ${(()=>{const W=WEATHER[s.weather]||WEATHER.sun,E=EVENTS[s.event];return`<div class="chips"><span>${W.n}</span>${s.event&&s.event!=='none'&&E?`<span>${E.n}</span>`:''}${s.treats?`<span>請客 ${s.treats} 次</span>`:''}${s.sets?`<span>套餐加點 ${s.sets} 份</span>`:''}${s.short?`<span class="warn">臨時叫貨 ${s.short} 次</span>`:''}${s.camp?`<span>📱 看到宣傳來的 ${s.camp.via} 組${s.camp.first?`（第一次來 ${s.camp.first}）`:''}${s.camp.dishD?`・${dishName(s.camp.dishD)} ${s.camp.dish} 桌`:''}</span>`:''}${s.lg?(s.lg.open?`<span>Lounge ${s.lg.tabs} 桌・營業額 ${fmt(s.lg.rev)}${s.lg.after?`・吃完留下 ${s.lg.after}`:''}${s.lg.wait?`・先坐吧台等 ${s.lg.wait}`:''}</span>`:'<span class="warn">Lounge 沒開（沒有調酒師）</span>'):''}${s.pd&&s.pd.n?`<span>包廂 ${s.pd.n} 組${s.pd.res?'（預約）':''}${s.pd.top?`・低消補足 ${fmt(s.pd.top)}`:''}</span>`:''}</div>`})()}
   ${s.r1!=null?(()=>{const up=s.r1>s.r0+.004,dn=s.r1<s.r0-.004;const F=(s.story||[]).map(x=>x.label?x:{label:x.t,value:'',sub:'',s:x.s});const pos=F.filter(x=>x.s>0).slice(0,3),neg=F.filter(x=>x.s<0).slice(0,3);
    const row=x=>`<div class="rf"><span class="rf-k">${x.label}</span><span class="rf-v">${x.value}</span>${x.sub?`<small class="rf-s">${x.sub}</small>`:''}</div>`;

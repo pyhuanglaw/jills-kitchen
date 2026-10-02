@@ -515,6 +515,9 @@ input.txt{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(
 .goalline{display:flex;align-items:baseline;gap:8px;margin:8px 0 2px;padding:7px 10px;border-radius:10px;background:rgba(201,154,69,.14);border:1px solid rgba(201,154,69,.35);font-size:12.5px}.goalline span{color:var(--ink2);font-weight:700;font-size:11px;letter-spacing:.06em}.goalline b{font-weight:800}.goalline small{margin-left:auto;color:var(--ink2);font-size:11.5px}
 /* v2.2 L: the player's 招待 chip on a ticket, and Jill's Card stamps in the regulars' book */
 .tk-treat{position:absolute;right:4px;top:19px;height:16px;padding:0 6px;border:1px solid #C99A45;border-radius:8px;background:rgba(255,250,240,.9);color:#7A5A22;font-size:9.5px;font-weight:800;line-height:14px}
+/* rc7.2 (the player, 21:50): in the name's line, after the name and its mark — the name gives way (…), the chip never covers it */
+.tk-who .tk-treat{position:static;order:3;margin-left:auto;flex:none;height:14px;line-height:12px;padding:0 5px;font-size:9px;white-space:nowrap}
+.tk .tk-who::after{order:2}
 .tk-treat:active{transform:translateY(1px)}
 /* v2.2.1 I-13: the chip always says where the table stands — offerable (with the uses left), something already on its way,
    already treated, the day's two used up, nothing in the fridge to give */
@@ -560,7 +563,7 @@ span.tk-treat{pointer-events:none;font-weight:700}
 @container (min-width:720px){#dlg.has-illus .dlg-p{height:min(30vh,300px)}#dlg .dlg-p{height:min(56vh,480px);max-width:440px;bottom:calc(112px + env(safe-area-inset-bottom))}#dlg .dlg-p.left{left:6%}#dlg .dlg-p.right{right:6%}#dlg .dlg-box{left:50%;right:auto;transform:translateX(-50%);width:min(720px,70%);padding:16px 22px 12px;bottom:28px}#dlg .dlg-text{font-size:17px}}
 /* the line card during service */
 #plines{position:absolute;left:8px;right:8px;bottom:calc(72px + env(safe-area-inset-bottom));z-index:5;display:flex;flex-direction:column;gap:6px;pointer-events:none}
-.pline{pointer-events:auto;display:flex;align-items:flex-end;gap:8px;max-width:330px;animation:tIn .25s ease}
+.pline{pointer-events:auto;touch-action:manipulation;display:flex;align-items:flex-end;gap:8px;max-width:330px;animation:tIn .25s ease}
 .pline.right{align-self:flex-end;flex-direction:row}
 .pline img{width:64px;height:76px;object-fit:cover;object-position:top;border-radius:10px;border:1.5px solid rgba(230,194,122,.7);background:rgba(22,33,36,.6);flex:none}
 .pline img.dim{width:44px;height:52px;opacity:.7}

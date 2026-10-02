@@ -436,7 +436,7 @@ def v24_xiuqin_is_there_from_day_one_and_is_not_free_labour(b, port, target):
         if helper:
             check(seen['in'] and out[helper]['f'] and out[helper]['f']['d'] == 1, f'she came in on Day 1: {seen}')
             check(any(l.startswith('秀琴阿姨：我來幫妳收一下。') for l in out[helper]['log']) and any(l == 'Jill：阿姨，不用啦。' for l in out[helper]['log']), 'who she is to the place, in her own words')
-            check('Jill 認識很久的阿姨' in seen['coach'], f"the coach names her once: {seen['coach']!r}")
+            check(any('Jill 認識很久的阿姨' in l for l in out[helper]['log']) and '秀琴阿姨' not in seen['coach'], 'who she is, in the scene of her first evening (no coach card)')
             check(not seen['claims'], f'she never claims a table, a ticket or a dish: {seen["claims"][:2]}')
         else:
             check(not seen['in'] and not out[helper]['f'], 'the control run has no helper')
@@ -2149,8 +2149,8 @@ def v24_rc7_the_money(b, port, target):
     """the player's 14:39–14:51: the Lounge's glasses have a cost (「阿lounge不用進貨成本?」) — every glass poured, in the
     Lounge or with dinner, is on the day's 酒水成本; a rent every day for the space the restaurant takes (small while the
     shop is small; 「你租金要計算一下吧 但不要讓剛開始太容易倒店」); the wages a little higher, mostly the seasoned crew
-    (「員工薪水可以再增加一點」); nothing owed — in the first ten days the evening the till cannot pay, 秀琴阿姨 lends $20,000
-    at closing (「前十天缺錢的話 秀琴阿姨借給我們20000 安排劇情」), paid back in a scene when the shop can; the summary's
+    (「員工薪水可以再增加一點」); nothing owed — in the first ten days, each evening the till would be under $300 after the
+    day's costs, 秀琴阿姨 lends $3,000 at closing, paid back at a summary that ends over $20,000 (rc7.2, 21:57–21:58); the summary's
     Lounge figure is what the Lounge's tabs paid, the same as its list's total, with the tips and the glasses at dinner
     apart (「lounge幾桌 多少錢那個錢跟賣了多少酒的金額對不起來」); the menu says how many bar bites of how many (14:47)."""
     g = Game(b, port, target, seed=71, manual=True, viewport={'width': 390, 'height': 844})
@@ -2184,28 +2184,46 @@ def v24_rc7_the_money(b, port, target):
     g.ev("S.money=100;S.wageOwed=0")
     check(g.ev("(()=>{const m=S.money;const pay=n=>{const p=Math.min(n,Math.max(0,S.money));S.money-=p;return p};pay(5000);return S.money})()") == 0, 'paid down to $0, no lower')
     check(not g.errors, g.errors[:3]); g.close()
-    # a new game: the first days are short — 秀琴阿姨's loan at closing, then paid back
+    # a new game, a short first evening: 秀琴阿姨 lends $3,000 at closing (rc7.2, the player 21:57–21:58: not $20,000, no
+    # gift on the first day; each time the till would be under $300 after the day's costs, in the first ten days)
     g = Game(b, port, target, seed=72, manual=True, viewport={'width': 390, 'height': 844})
     g.click('[data-act=open]'); g.page.wait_for_timeout(150)
+    check(g.ev("S.money") == 500 and not g.ev("S.loan"), 'no gift on the first day: a new game starts with $500 and owes nothing')
     g.ev("autoStock()"); start_day(g); install_bot(g)
     for _ in range(300):
         g.page.evaluate('()=>window.__bot(60,1/30)')
         if g.ev("R&&R.closed") or g.ev("phase") != 'service': break
     g.ev("S.money=40")   # an evening that has spent everything
     play_day(g)
-    L = json.loads(g.ev("JSON.stringify({f:!!fact('xq_loan'),loan:S.lastSummary&&S.lastSummary.loan,money:S.money,day:S.day,line:(story().beatLines||{}).xq_loan||null})"))
-    check(L['f'] and L['loan'] == 20000 and L['money'] >= 15000, f'秀琴阿姨 lent $20,000 at closing: {L}')
-    check(L['line'] and any('兩萬' in (x.get('t') or '') for x in L['line']), 'her words are on the story page')
+    L = json.loads(g.ev("JSON.stringify({f:!!fact('xq_loan'),loan:S.lastSummary&&S.lastSummary.loan,money:S.money,day:S.day,owed:loanOwed(),line:(story().beatLines||{}).xq_loan||null})"))
+    check(L['f'] and L['loan'] == 3000 and L['owed'] == 3000 and L['money'] >= 2700, f'秀琴阿姨 lent $3,000 at closing: {L}')
+    check(L['line'] and any('三千' in (x.get('t') or '') for x in L['line']), 'her words are on the story page')
     g.ev("showSummary()"); g.page.wait_for_timeout(100)
-    check('秀琴阿姨借的' in g.ev("document.querySelector('#screen').innerText"), 'and on the summary, under the night\'s net')
-    # once only; and later, when the shop can, Jill pays it back
-    g.ev("S.day=11;S.money=40")
-    check(g.ev("loanNeeded()") is False, 'once only, and only in the first ten days')
-    g.click('[data-act=toShop]'); g.page.wait_for_timeout(100)
-    g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(150)
-    g.ev(f"S.day={L['day'] + 7};S.money=100000;autoStock()"); start_day(g); install_bot(g); play_day(g)
-    P = json.loads(g.ev("JSON.stringify({f:!!fact('xq_repay'),loan:S.lastSummary&&S.lastSummary.loan})"))
-    check(P['f'] and P['loan'] == -20000, f'paid back, a week on, with the till comfortable: {P}')
+    t = g.ev("document.querySelector('#screen').innerText")
+    check('秀琴阿姨借的' in t and '$3,000' in t and '超過 $20,000' in t, 'and on the summary, under the night\'s net, with when it goes back')
+    # the next evening short again: again, shorter; a till over $300 after the costs: nothing
+    g.click('[data-act=toShop]'); g.page.wait_for_timeout(100); g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(150)
+    g.ev("autoStock()"); start_day(g); install_bot(g)
+    g.ev("__botUntil('R.closed||R.closing!=null',90000,1/30)"); g.ev("S.money=10"); play_day(g)
+    L2 = json.loads(g.ev("JSON.stringify({loan:S.lastSummary.loan,owed:loanOwed(),n:factN('xq_loan'),times:S.loan.times,line:(story().beatLines||{}).xq_loan||null})"))
+    check(L2['loan'] == 3000 and L2['owed'] == 6000 and L2['n'] == 2 and L2['times'] == 2, f'a second short evening, a second $3,000: {L2}')
+    check(g.ev("(()=>{const d=S.day,m=S.money;S.day=Math.min(10,d+1);S.money=dayCostsDue()+300;const a=loanNeeded();S.money=dayCostsDue()+299;const b=loanNeeded();S.day=11;const c=loanNeeded();S.day=d;S.money=m;return [a,b,c].join()})()") == 'false,true,false', 'under $300 after the costs, and only in the first ten days')
+    # the summary of a day that ends over $20,000 pays all of it back
+    g.click('[data-act=toShop]'); g.page.wait_for_timeout(100); g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(150)
+    g.ev("autoStock()"); start_day(g); install_bot(g)
+    g.ev("__botUntil('R.closed||R.closing!=null',90000,1/30)"); g.ev("S.money=30000"); play_day(g)
+    P = json.loads(g.ev("JSON.stringify({f:!!fact('xq_repay'),loan:S.lastSummary.loan,owed:loanOwed(),money:S.money})"))
+    check(P['f'] and P['loan'] == -6000 and P['owed'] == 0 and P['money'] > 20000 - 6000, f'over $20,000 at the summary: paid back, all of it: {P}')
+    g.ev("showSummary()"); g.page.wait_for_timeout(100)
+    check('還秀琴阿姨' in g.ev("document.querySelector('#screen').innerText"), 'the summary says so')
+    check(not g.errors, g.errors[:3]); g.close()
+    # rc7's one $20,000 loan, in a save made before this: owed the same way, paid back at a summary over $20,000
+    g = Game(b, port, target, seed=73, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day2_2155.json')
+    check(g.ev("loanOwed()") == 20000 and g.ev("S.money") == 18891, f'the player\'s Day 2 save owes $20,000: {g.ev("loanOwed()")}')
+    to_service(g); g.ev("__botUntil('R.closed||R.closing!=null',90000,1/30)"); g.ev("S.money=Math.max(S.money,26000)"); play_day(g)
+    P = json.loads(g.ev("JSON.stringify({loan:S.lastSummary.loan,owed:loanOwed(),money:S.money})"))
+    check(P['loan'] == -20000 and P['owed'] == 0 and P['money'] >= 0, f'paid back at the first summary over $20,000: {P}')
     check(not g.errors, g.errors[:3]); g.close()
 
 
@@ -2228,14 +2246,20 @@ def v24_rc7_madame_lin_says_which_corner(b, port, target):
 def v24_rc7_the_landlord_goes_up(b, port, target):
     """the player's 15:40 (「房東說可以上去嗎 要有一個具體原因 而且應該是說 我上去一下 他本來就能上去 就說上去拿個東西」):
     the floor is his, so he asks nobody — he says he is going up for something (the two old fire extinguishers, the
-    inspection is coming), and asks Jill if she wants to see it. Nobody asks whether they may go up. A story page that
-    kept the old words shows the scene as it is now."""
+    inspection is coming). rc7.2 (22:13–22:14): and nobody invites anybody — the cat who wanders runs up through the door
+    he opened, Jill goes up after her, and he says what the floor is. A story page that kept rc6's or rc7's words shows the
+    scene as it is now."""
     g = Game(b, port, target, seed=75, manual=True, viewport={'width': 390, 'height': 844})
     raw = json.load(open(os.path.join(ROOT, 'tests', 'saves', 'player_day74_1508.json'), encoding='utf-8')); raw = raw.get('save', raw)
     raw['story'].setdefault('beatLines', {})['up_inspect'] = [{'t': '下午，房東來了一趟。消防檢查快到了，他要上樓看一下。'}, {'w': 'Jill', 't': '我可以一起上去嗎？'}, {'w': '房東', 't': '可以啊。'}]
     g.ev("phase='title';R=null;localStorage.setItem(KEY,JSON.stringify(%s))" % json.dumps(raw, ensure_ascii=False)); g.reload(); g.page.wait_for_timeout(150)
     page = json.loads(g.ev("JSON.stringify(story().beatLines.up_inspect)"))
     check({'w': '房東', 't': '我上去一下，拿個東西。'} in page and not any('可以一起上去' in x['t'] or x['t'] == '可以啊。' for x in page), f'the page: {page}')
+    check(any('跑上樓' in x['t'] for x in page), f'the page tells the afternoon as it is now (rc7.2): {page}')
+    # a page that kept rc7's words (「要上來看嗎？」) is told the new way too
+    g.ev("""story().beatLines.up_inspect=[{t:'下午，房東來了一趟。'},{w:'房東',t:'我上去一下，拿個東西。'},{w:'房東',t:'要上來看嗎？'},{w:'Jill',t:'好。'}];const o=JSON.parse(JSON.stringify(S));beatLinesMig(o);window.__pg=o.story.beatLines.up_inspect""")
+    pg7 = json.loads(g.ev("JSON.stringify(__pg)"))
+    check(not any(x['t'] == '要上來看嗎？' for x in pg7) and any('跑上樓' in x['t'] for x in pg7), f'rc7\'s page, migrated: {pg7}')
     g.ev("window.__noScenes=false;STORY_EV.find(e=>e.k==='up_inspect').run()"); g.page.wait_for_timeout(80)
     shown = []
     for _ in range(14):
@@ -2246,7 +2270,13 @@ def v24_rc7_the_landlord_goes_up(b, port, target):
     check(('房東', '我上去一下，拿個東西。') in shown, 'he says he is going up, for something')
     check(any('滅火器' in t for _, t in shown), 'what he went up for is said: the old fire extinguishers')
     check(not any(('可以' in t and '上去' in t) or t == '可以啊。' for _, t in shown), 'nobody asks whether they may go up')
-    check(('房東', '要上來看嗎？') in shown and ('Jill', '好。') in shown, 'he asks Jill if she wants to see it')
+    # rc7.2 (the player, 22:13–22:14): nobody invites anybody — the cat who wanders runs up through the door he opened, Jill
+    # goes up after her, and the landlord, up there already, says what the floor is
+    cat = g.ev("upCatN('mei')")
+    check(any(cat in t and '跑上樓' in t for _, t in shown), f'{cat} slips through the door and runs up: {shown}')
+    check(any(t.startswith('Jill 跟上去帶' + cat) for _, t in shown), 'Jill goes up to bring her down')
+    check(any(n == '房東' and '地板是好的' in t for n, t in shown), 'the landlord says what the floor is')
+    check(not any('要上來看嗎' in t or '要不要' in t for _, t in shown), 'nobody invites anybody')
     check(g.ev("!!fact('up_inspect')") and not g.ev("!!DLG"), 'the beat is done and the panel closed')
     check(not g.errors, g.errors[:3]); g.close()
 
@@ -2597,4 +2627,100 @@ def v24_rc7_story_guests_have_their_own_faces(b, port, target):
     check(not [x for x in r['own'] if x['acc'] in ('glasses', 'beret')], 'none of them wears the strangers\' round frames or a beret')
     check(r['styles'] == list(range(10, 24)), f'the fourteen styles are all in use: {r["styles"]}')
     check(not r['same'] and not r['errs'], f"each draws something of its own, in every pose: {r['same'][:4]} {r['errs'][:3]}")
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc7_2_xiuqin_first_evening_holds_the_service(b, port, target):
+    """rc7.2 (the player, 21:49: 「秀琴阿姨出場要暫停遊戲吧 有劇情的」): when 秀琴阿姨 walks in for the first time, a scene with her
+    portrait holds the service — the clock, the guests and the stoves wait — until the player has tapped through it; then
+    the evening goes on where it stopped. Her later evenings are the few words in the room, as before."""
+    g = Game(b, port, target, seed=264, manual=True, viewport={'width': 390, 'height': 844})
+    install_bot(g); g.click('[data-act=open]')
+    start_day(g)
+    g.ev("__botUntil('R.t>=R.dur*.9',60000,1/30)")
+    g.ev("window.__noScenes=false")
+    for _ in range(400):
+        g.page.evaluate('()=>window.__bot(15,1/30)')
+        if g.ev("!!(DLG&&DLG.hold)") or g.ev("phase") != 'service': break
+    check(g.ev("!!(DLG&&DLG.hold)") and g.ev("factN('xq_helper')") == 1, 'her first evening opens a held scene')
+    check('秀琴阿姨' in g.ev("$('#dlg .dlg-name').textContent+$('#dlg .dlg-text').textContent"), 'she is in it')
+    t0 = g.ev("R.t"); g.ev("for(let i=0;i<60;i++)__tick(1000/30)")
+    check(g.ev("R.t") == t0, 'the service waits while it is open')
+    texts = []
+    for _ in range(12):
+        if not g.ev("!!DLG"): break
+        texts.append(g.ev("$('#dlg .dlg-text').textContent")); g.ev("dlgNext()"); g.page.wait_for_timeout(30)
+    check(not g.ev("!!DLG") and any('Jill 認識很久的阿姨' in x for x in texts) and '我來幫妳收一下。' in texts, f'tapped through: {texts}')
+    g.ev("for(let i=0;i<30;i++)__tick(1000/30)")
+    check(g.ev("R.t") > t0, 'then the evening goes on')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc7_2_a_tap_on_the_pass_sends_the_plates(b, port, target):
+    """rc7.2 (the player, 21:49: 「點出餐台就能送餐」): in the kitchen, a tap on the pass sends Jill out with every table's ready
+    plates, the oldest ticket first — the same as tapping each table. Nothing ready: it says so, and Jill stays."""
+    g = Game(b, port, target, seed=265, manual=True, touch=True, viewport={'width': 390, 'height': 844})
+    install_bot(g); g.click('[data-act=open]'); g.ev("S.tables=3"); start_day(g)   # a third table (a new game has two)
+    g.ev("window.__act=()=>{}")
+    g.ev("setRoom('kitchen')"); g.page.wait_for_timeout(50)
+    got = g.ev("(()=>{servePass();return [...document.querySelectorAll('#toasts .toast')].map(t=>t.textContent).join('|')})()")
+    check('出菜口還沒有做好的菜' in got and not g.ev("R.jill.q.length"), f'nothing ready: it says so: {got}')
+    # two tables with a ready plate each, one with nothing ready
+    r = json.loads(g.ev("""JSON.stringify((()=>{const out=[];for(let i=0;i<3;i++){const o=rollGuest();o.t=R.t;o.size=1;spawn(o);const q=R.groups[R.groups.length-1];const t=R.tables.find(t=>!t.group&&!t.dirty&&t.seats>=1&&!t.out&&(t.room||'main')==='main');if(!t)return 'no table';seatGroup(q,t);q.x=t.x;q.y=t.y;q.state='wait';const tk={id:R.tkid++,no:R.tickets.length+1,g:q,items:[{d:'friedrice',st:i<2?'ready':'pending',q:'G',want:0}],t0:R.t-i,claim:null};q.ticket=tk;R.tickets.push(tk);out.push(t.i)}return out})())"""))
+    check(isinstance(r, list) and len(r) == 3, f'three tables: {r}')
+    # the tap, through the kitchen's own tap handler, on the pass as drawn
+    g.ev("roomTap({x:200,y:KY.passTop+10},{preventDefault(){}})")
+    q = g.ev("R.jill.q.slice()")
+    check(sorted(q) == sorted(r[:2]), f'Jill is sent to the two tables with ready plates, not the third: {q} of {r}')
+    g.ev("servePass()")
+    check(g.ev("R.jill.q.length") == 2, 'a second tap adds nothing: they are already hers')
+    check(g.ev("passHit({x:200,y:KY.passTop+10})") and g.ev("passHit({x:200,y:KY.rail})") and not g.ev("passHit({x:200,y:KY.top+20})"), 'the pass and its ticket rail take the tap; the line above does not')
+    man = g.ev("JSON.stringify(GUIDE)")
+    check('在廚房點出菜口，Jill 會把做好的菜都送出去' in man, 'the manual says so')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc7_2_the_heart_and_the_treat_chip_on_a_ticket(b, port, target):
+    """rc7.2 (the player, 21:50, 21:55): the heart on a ticket is for a regular who is one — 熟客, four visits — not for a
+    named guest's first visits; and the 招待 chip sits in the name's line after the name, whatever it says, never over it."""
+    g = Game(b, port, target, seed=266, manual=True, viewport={'width': 390, 'height': 844})
+    install_bot(g); g.click('[data-act=open]'); start_day(g); g.ev("window.__act=()=>{}")
+    g.ev("""(()=>{const regs=['mia','chen','leo',null];const vis=[5,0,2,0];for(let i=0;i<4;i++){const reg=regs[i];if(reg)S.regulars[reg]=vis[i];const o=rollGuest();const RG=reg?REG_BY[reg]:null;const gg={id:R.gid++,type:reg?RG.type:o.type,size:2,reg,forSig:false,looks:reg?RG.looks:makeLooks(o.type,2),name:reg?RG.n:pick(NAMES.office),state:'eat',table:null,pat:.8,x:200,y:300,tx:200,ty:300,timer:0,ticket:null,seed:1,mood:'ok'};R.groups.push(gg);const tk={id:R.tkid++,no:i+1,g:gg,items:[{d:'friedrice',st:'served',q:'G',want:0}],t0:R.t,claim:null};gg.ticket=tk;R.tickets.push(tk)}R.tv++;renderTickets()})()""")
+    marks = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('.tk')].map(e=>({n:e.querySelector('.tk-who span').textContent,reg:e.classList.contains('isreg')})))"))
+    by = {m['n']: m['reg'] for m in marks}
+    check(by.get('Mia') is True and not any(v for k, v in by.items() if k != 'Mia'), f'the heart only for Mia (five visits), not for a first or second visit: {marks}')
+    # every chip state, the name and the chip side by side
+    for st, fake in (('offer', "{k:'offer',left:2}"), ('nostock', "{k:'nostock',n:'沒東西可請'}"), ('done', "{k:'done',n:'已招待'}"), ('spent', "{k:'spent',n:'招待 0/2'}"), ('pending', "{k:'pending',n:'集點卡・請甜點'}")):
+        g.ev(f"window.__ts0=window.__ts0||treatState;treatState=()=>({fake});R.tv++;renderTickets()")
+        boxes = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('.tk')].map(e=>{const n=e.querySelector('.tk-who span').getBoundingClientRect(),c=e.querySelector('.tk-treat'),r=c?c.getBoundingClientRect():null,k=e.getBoundingClientRect();return{n:[n.left,n.right],c:r?[r.left,r.right,r.top,r.bottom]:null,k:[k.left,k.right,k.top,k.bottom]}}))"))
+        for x in boxes:
+            check(x['c'] and x['n'][1] <= x['c'][0] + .5 and x['c'][1] <= x['k'][1] + .5 and x['c'][3] <= x['k'][3], f'{st}: the chip after the name, inside the ticket: {x}')
+    g.ev("treatState=window.__ts0;R.tv++;renderTickets()")
+    g.page.screenshot(path=os.path.join(ROOT, 'tests', 'artifacts', 'rc72_tickets.png'), clip={'x': 0, 'y': 40, 'width': 390, 'height': 110})
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc7_2_a_named_guests_line_answers_a_touch(b, port, target):
+    """rc7.2 (the player, 22:07: 「有出現人頭的點下去不會看到他在哪一組」): a named guest's line with a face (Madame Lin's
+    「不用看菜單了，照你們推薦的來。」), touched on a phone-sized screen from another room, goes to their table and marks it —
+    on the touch itself. T evidence: Chromium's touch emulation, not an iPhone."""
+    g = Game(b, port, target, seed=1537, manual=True, touch=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day74_1508.json')
+    to_service(g)
+    g.ev("__botUntil('R.t>=R.dur*.1',90000,1/30)")
+    info = json.loads(g.ev("""JSON.stringify((()=>{const t=R.tables.find(t=>(t.room||'main')==='main'&&!t.group&&!t.dirty&&!t.hold&&!t.pdr&&!t.lounge);if(!t)return null;
+      spawn({t:R.t,type:'vip',size:1});const q=R.groups[R.groups.length-1];q.name='Madame Lin';q.named='Madame Lin';q.looks=[NAMED['Madame Lin'].looks];if(q.table==null)seatGroup(q,t);window.__q=q;return{t:q.table}})())"""))
+    check(info is not None, 'Madame Lin at a table in the dining room')
+    for _ in range(300):
+        if g.ev("['reading','order','wait','eat'].includes(__q.state)"): break
+        g.ev("__tick(1000/30)")
+    g.ev("setRoom('kitchen');document.querySelectorAll('#plines>*,#toasts>*').forEach(e=>e.remove());IDF.length=0;quote(__q,'不用看菜單了，照你們推薦的來。',{keep:1})")
+    check(g.page.query_selector('#plines .pline') is not None, 'her line comes with her face')
+    g.page.tap('#plines .pline'); g.ev("__tick(1000/30)")
+    st = json.loads(g.ev("JSON.stringify({room,m:IDF.map(m=>({label:m.label,sub:m.sub}))})"))
+    check(st['room'] == 'main' and st['m'] and st['m'][-1]['label'] == 'Madame Lin' and st['m'][-1]['sub'] == f"T{info['t']+1}", f'the touch goes to her table and marks it: {st}')
     check(not g.errors, g.errors[:3]); g.close()

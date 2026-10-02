@@ -1623,6 +1623,7 @@ def tickets_keep_the_guest_v182(b, port, target):
     g = Game(b, port, target, seed=5, manual=True)
     install_bot(g); g.click('[data-act=open]')
     g.ev("S.unlocked.push('burger','coffee');S.menu=['friedrice','pasta','burger','coffee'];S.phase='prep';showPrep()"); ACT(g, 'restock'); start_day(g)
+    g.ev("S.regulars.mia=6")   # rc7.2: the heart is for a regular who is one (four visits)
     g.ev("""(()=>{const regs=[null,'mia',null,'dylan','chen',null,'wang',null];for(let i=0;i<8;i++){const o=rollGuest();const reg=regs[i];const RG=reg?REG_BY[reg]:null;const gg={id:R.gid++,type:reg?RG.type:o.type,size:2,reg,forSig:false,looks:reg?RG.looks:makeLooks(o.type,2),name:reg?RG.n:pick(NAMES.office),state:'wait',table:null,pat:.8,x:200,y:300,tx:200,ty:300,timer:0,ticket:null,seed:1,mood:'ok'};R.groups.push(gg);const items=['pasta','burger','coffee'].slice(0,2+(i%2)).map(d=>({d,st:'pending',q:'G',want:0}));const tk={id:R.tkid++,no:i+1,g:gg,items,t0:R.t,claim:null};gg.ticket=tk;R.tickets.push(tk)}R.tv++;renderTickets();__tick(50)})()""")
     st = g.ev("(()=>{const el=ticketsEl;const tks=[...el.querySelectorAll('.tk')];return{compact:el.classList.contains('compact'),scroll:el.classList.contains('scroll'),itemW:document.querySelector('.it').getBoundingClientRect().width,names:tks.map(t=>{const w=t.querySelector('.tk-who');const s=w.querySelector('span');return{txt:s.textContent,vis:w.getBoundingClientRect().height>0,img:!!w.querySelector('img').getAttribute('src'),clipped:s.scrollWidth>s.clientWidth+1,cls:t.className}})}})()")
     check(st['compact'] and st['scroll'], f'the crowded strip still compacts and scrolls: {st}')
@@ -3568,7 +3569,7 @@ def hospitality_stays_with_a_guest_from_stranger_to_regular(b, port, target):
     check(isinstance(r2, dict) and r2['tier'] == 2 and r2['state']['k'] == 'offer' and r2['state']['left'] == 2, f'an established regular can be treated, 2 uses left: {r2}')
     g.ev("R.tv++;renderTickets()"); g.page.wait_for_timeout(50)
     chips = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('.tk')].map(e=>({reg:e.classList.contains('isreg'),chip:e.querySelector('.tk-treat')?e.querySelector('.tk-treat').textContent:null,btn:!!e.querySelector('button.tk-treat')})))"))
-    check(len(chips) == 3 and all(c['btn'] and c['chip'].startswith('招待') for c in chips) and sum(c['reg'] for c in chips) == 2, f'every ticket has the 招待 button, the regulars with their heart too: {chips}')
+    check(len(chips) == 3 and all(c['btn'] and c['chip'].startswith('招待') for c in chips) and sum(c['reg'] for c in chips) == 1, f'every ticket has the 招待 button; the heart only on the established regular (rc7.2: not on a second visit): {chips}')
     # Jill's Card: the fifth visit is an occasion — the chip says what is coming, the player's budget is untouched
     c5 = seated('sophie', 4)
     check(isinstance(c5, dict) and c5['state']['k'] == 'pending' and '集點卡' in c5['state']['n'] and g.ev("R.groups.find(q=>q.id===%d).card===true" % c5['id']), f'the fifth visit shows the card treat coming: {c5}')
