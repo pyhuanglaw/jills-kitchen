@@ -3289,6 +3289,13 @@ def v24_rc74_favourites_learned_in_play_and_marked_on_the_menu(b, port, target):
     # Mia: no tiramisu today — she says it (the roll held down)
     r = json.loads(g.ev(f"""JSON.stringify((()=>{{const M=Math.random;Math.random=()=>.1;let q;try{{q=({seat})('mia')}}finally{{Math.random=M}}return{{known:!!(S.loves.mia&&S.loves.mia.d),said:dayLog().slice(-6).map(l=>l.t)}}}})())"""))
     check(r['known'] and any('提拉米蘇' in t for t in r['said']), f'Mia, without her tiramisu, says so and Jill knows: {r}')
+    # Ken's favourite is Jill's signature: before there is one, he never misses it aloud, and his order goes through
+    # (the first full run of rc7.4 found the order throwing there)
+    k = json.loads(g.ev("""JSON.stringify((()=>{const sig=S.signature;S.signature=null;const M=Math.random;Math.random=()=>.1;const n0=dayLog().length;try{
+      const ok=t=>(t.room||'main')==='main'&&!t.hold&&!t.lounge&&!t.pdr;let t=R.tables.find(t=>ok(t)&&!t.group);if(!t){t=R.tables.find(t=>ok(t)&&t.group);leaveGroup(t.group,'ok')}t.dirty=false;t.plates=[];
+      spawn({t:R.t,type:'gourmet',size:1,name:'品酒師 Ken'});const q=R.groups[R.groups.length-1];if(q.table!=null){R.tables[q.table].group=null;q.table=null}seatGroup(q,t);q.state='order';createTicket(q);
+      return{ticket:!!q.ticket,said:dayLog().slice(n0).map(l=>l.t)}}finally{Math.random=M;S.signature=sig}})())"""))
+    check(k['ticket'] and not any(('沒有' in t and '啊' in t) or '{d}' in t for t in k['said']), f'Ken, with no signature yet: his order, and no word about it: {k}')
     # the journal says it
     g.ev("bookTab='regulars';showBook()"); g.page.wait_for_timeout(60)
     html = g.page.inner_html('#screen')
