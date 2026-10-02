@@ -1,0 +1,17 @@
+v2.4-rc6: the page built from the tag (4789161 bytes, sha256 cb86d8f94732) is inside the live HTML (4789713 bytes) byte for byte, js/game.js once; the host adds 552 bytes (its document skeleton)
+01_title.png: the title with the save: DAY 71, 繼續營業 · 20:00 (the save was made during the evening) | {"phase":"title","day":71,"t":null,"room":"main"}
+02_resumed.png: 繼續營業: the evening resumed where the save stopped (20:00) | {"phase":"service","day":71,"t":"67%","room":"main"}
+03_main.png: the dining room | {"phase":"service","day":71,"t":"67%","room":"main"}
+04_side.png: the side room (the stair door at the near edge) | {"phase":"service","day":71,"t":"68%","room":"side"}
+05_front.png: the street | {"phase":"service","day":71,"t":"68%","room":"front"}
+06_lounge.png: the Lounge | {"phase":"service","day":71,"t":"69%","room":"lounge"}
+07_kitchen.png: the kitchen | {"phase":"service","day":71,"t":"75%","room":"kitchen"}
+08_summary.png: the day's summary | {"phase":"summary","day":71,"t":null,"room":"kitchen"}
+the summary's 今天的故事: 晴 & 阿拓 「多的。」 打烊後，阿拓在晴旁邊放了一小盤。「多的。」
+the staff page: 餐廳員工 14/14 人・Lounge 員工 5/5 人・每日薪資 $11,676。餐廳的人數到頂了。 Lounge 的人是固定的名單，名額跟餐廳分開算。
+09_staff.png: the shop, the staff page: two numbers | {"phase":"shop","day":71,"t":null,"room":"kitchen"}
+10_prep_next_day.png: the next day's prep (Day 72) | {"phase":"prep","day":72,"t":null,"room":"main"}
+restock on Day 72: $723,660 → $704,681
+after the reload the money is still $704,681: the restock was saved
+11_after_reload.png: the page reloaded: the title keeps DAY 72 | {"phase":"title","day":72,"t":null,"room":"main"}
+page errors: none (0)

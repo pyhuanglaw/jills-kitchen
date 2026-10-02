@@ -86,14 +86,24 @@ with sync_playwright() as p:
     g = Live(b, port, live, 6101, {KEY: json.dumps(save, ensure_ascii=False)})
     day0 = save.get('day')
     t = text(g); assert f'DAY {day0}' in t, t[:200]
-    shot(g, '01_title.png', f'the title with the save: DAY {day0}')
-    g.tap('[data-act=open]'); g.page.wait_for_timeout(200)
-    assert g.ev("phase") == 'prep'; inv(g, 'prep')
-    shot(g, '02_prep.png', 'OPEN: the prep screen')
-    if g.page.query_selector('[data-act=restock]:not([disabled])'): g.tap('[data-act=restock]'); g.page.wait_for_timeout(120)   # disabled = 已足夠
-    rt.start_day(g); rt.install_bot(g); g.ev(rt.LAZY_ACTOR + "\nwindow.__act=window.__actLazy")
+    cp = save.get('checkpoint')
+    resumes = bool(cp and cp.get('day') == day0)   # a save made during the evening: the title offers 繼續營業 · the clock, and OPEN resumes it
+    if resumes:
+        assert '繼續營業' in t, t[:200]
+        shot(g, '01_title.png', f'the title with the save: DAY {day0}, 繼續營業 · {cp.get("clock")} (the save was made during the evening)')
+        g.tap('[data-act=open]'); g.page.wait_for_timeout(200)
+        assert g.ev("phase") == 'service', g.ev("phase"); inv(g, 'resumed service')
+        shot(g, '02_resumed.png', f'繼續營業: the evening resumed where the save stopped ({cp.get("clock")})')
+        rt.install_bot(g); g.ev(rt.LAZY_ACTOR + "\nwindow.__act=window.__actLazy")
+    else:
+        shot(g, '01_title.png', f'the title with the save: DAY {day0}')
+        g.tap('[data-act=open]'); g.page.wait_for_timeout(200)
+        assert g.ev("phase") == 'prep'; inv(g, 'prep')
+        shot(g, '02_prep.png', 'OPEN: the prep screen')
+        if g.page.query_selector('[data-act=restock]:not([disabled])'): g.tap('[data-act=restock]'); g.page.wait_for_timeout(120)   # disabled = 已足夠
+        rt.start_day(g); rt.install_bot(g); g.ev(rt.LAZY_ACTOR + "\nwindow.__act=window.__actLazy")
     inv(g, 'service')
-    for frac, k, what in [(.30, 'main', 'the dining room, early evening'), (.42, 'side', 'the side room (the stair door at the near edge)'),
+    for frac, k, what in [(.30, 'main', 'the dining room' + ('' if resumes else ', early evening')), (.42, 'side', 'the side room (the stair door at the near edge)'),
                           (.55, 'front', 'the street'), (.66, 'lounge', 'the Lounge'), (.74, 'kitchen', 'the kitchen')]:
         until(g, f'R.t>=R.dur*{frac}')
         if g.ev("phase") != 'service': break
@@ -106,6 +116,8 @@ with sync_playwright() as p:
     assert g.ev("phase") == 'summary', g.ev("phase"); inv(g, 'summary')
     g.ev("document.querySelectorAll('#toasts>*').forEach(e=>e.remove())")
     shot(g, '08_summary.png', 'the day\'s summary')
+    st = g.ev("(()=>{const e=document.querySelector('#screen .stoday');return e?[...e.querySelectorAll('.st-row')].map(r=>r.innerText.replace(/\\s+/g,' ')).join(' / '):''})()")
+    note('the summary\'s 今天的故事: ' + (st or '(none today)'))
     g.tap('[data-act=toShop]'); g.page.wait_for_timeout(150)
     g.tap('[data-act=tab][data-k=staff]'); g.page.wait_for_timeout(150)
     t = text(g); assert '餐廳員工' in t and 'Lounge 員工' in t, t[:300]
@@ -115,7 +127,13 @@ with sync_playwright() as p:
     g.ev("for(let i=0;i<80&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}")
     assert g.ev("phase") == 'prep' and g.ev("S.day") == day0 + 1; inv(g, 'next prep')
     shot(g, '10_prep_next_day.png', f'the next day\'s prep (Day {day0 + 1})')
+    m1 = None
+    if resumes and g.page.query_selector('[data-act=restock]:not([disabled])'):   # the restock the prep path above taps, here on the next day
+        m0 = g.ev("S.money"); g.tap('[data-act=restock]'); g.page.wait_for_timeout(120); inv(g, 'restock'); m1 = g.ev("S.money")
+        note(f'restock on Day {day0 + 1}: ${m0:,} → ${m1:,}')
     g.reload(); g.page.wait_for_timeout(200)
+    if m1 is not None:   # the purchase was saved by the game itself (nothing here saves)
+        assert g.ev("S.money") == m1, (g.ev("S.money"), m1); note(f'after the reload the money is still ${m1:,}: the restock was saved')
     t = text(g); assert f'DAY {day0 + 1}' in t, t[:200]
     shot(g, '11_after_reload.png', f'the page reloaded: the title keeps DAY {day0 + 1}')
     assert not g.errors, g.errors

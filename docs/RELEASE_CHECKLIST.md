@@ -109,6 +109,7 @@ How testing runs between releases (the player's 05:42 strategy, `docs/v24/testin
   - Run `python3 tools/sims/live_check.py LIVE.html <tag> tests/saves/<the player's latest>.json docs/evidence/<release>_release`.
   - Pass: the page built from the tag sits inside the live HTML byte for byte.
   - Pass: one day plays from the player's save, and the page survives a reload with no page errors.
+    - A save made during the evening (the backup writes the day's checkpoint) opens with 「繼續營業 · HH:MM」: the check resumes it, and does the restock on the next day's prep instead (from v2.4 rc6).
   - Record the published version in the release report.
 - [ ] Package the release as zips, made from the tag (`git archive <tag>`), and send them to the player with the release reply.
   - `python3 tools/make_release_zips.py <tag> <name> <this release's evidence folder>` does all of the below and runs the source check.

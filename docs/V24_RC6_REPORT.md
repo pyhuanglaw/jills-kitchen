@@ -2,7 +2,8 @@
 
 rc6 has two parts:
 - **P3 and P4 of the plan**: the Staff Room and the Private Dining Room, on the second floor that rc5 opened.
-- **Everything the player asked for before release**, from 02:31 to 12:16. That covers the second floor's layout and navigation, the guests' clothes, who is where, and the morning's reports (09:33–12:16). The morning's reports are: what is talked about, the summary, the Lounge's list, the freeze, the phone's heat, Sophie and Mia, 安安, the white uniforms, the album, more to spend on, the second floor's prerequisite, stories that hold the restaurant, and 晴 × 阿拓.
+- **Everything the player asked for before release**, from 02:31 to 12:17. That covers the second floor's layout and navigation, the guests' clothes, who is where, and the morning's reports (09:33–12:17). The morning's reports are: what is talked about, the summary, the Lounge's list, the freeze, the phone's heat, Sophie and Mia, 安安, the white uniforms, the album, more to spend on, the second floor's prerequisite, stories that hold the restaurant, 晴 × 阿拓, and every stalled story line.
+- The player's 12:24 (「我錢都沒地方花了 每天繼續完還沒有任何故事」) came while this release was being published, on rc5. RC6 carries both: §10 (the things to spend on) and §12–§13b (the stories).
 
 The plan is `docs/v24/AUDIT_AND_PLAN.md` §8. Its corrections are in §8.1 (economy), §8.2 (the player's 04:06–04:26) and §8.4 (this morning).
 
@@ -625,7 +626,29 @@ The player's four saves of this morning are filed with their purposes in `tests/
 
 ## 20. The published page
 
-«PUBLISHED»
+- Published to the player's URL as **Version 40** (version id `1790921325-1b26`), with its `downloads` capability kept. This is the page that `tools/build_artifact.py` builds from the tag.
+- Read back from the artifact service and checked with `tools/sims/live_check.py`. The page built from `v2.4-rc6` sits inside the live HTML byte for byte:
+  - built page: 4,789,161 bytes, sha256 `cb86d8f94732`;
+  - `js/game.js` appears once;
+  - the host adds 552 bytes, its document skeleton.
+- Played at 390×844 with touch, using the player's Day 71 save. That save was made by the backup during the evening, so the title offers 「繼續營業 · 20:00」 instead of OPEN FOR DINNER; the check now takes that path when a save holds the day's checkpoint (it used to expect the prep screen, and stopped there):
+  1. the title (DAY 71, 繼續營業 · 20:00);
+  2. the evening resumed at 20:00;
+  3. the rest of the evening with the lazy bot, the five rooms photographed through their tabs;
+  4. the summary. Its 今天的故事 reads 「晴 & 阿拓 「多的。」 打烊後，阿拓在晴旁邊放了一小盤。」: the beat the player's 12:16 said was stuck comes at that evening's closing;
+  5. the staff page, showing 「餐廳員工 14/14 人・Lounge 員工 5/5 人」;
+  6. Day 72's prep screen, then the restock ($723,660 → $704,681);
+  7. the page reloaded: the title keeps DAY 72, and the money is still $704,681 (the game saved the purchase itself).
+
+  No page errors. The screenshots and `live_check.txt` are in `docs/evidence/v24_rc6_release/`. This is T: Chromium on this machine, not a phone, and not the claude.ai frame.
+- The zips are built from the tag with `tools/make_release_zips.py v2.4-rc6 v24-rc6 docs/evidence/v24_rc6`:
+  - source: 15.8 MiB;
+  - art: 5 parts;
+  - portrait cards: 2 parts;
+  - evidence: 12.2 MiB;
+  - saves: 2 parts.
+
+  Built from the unzipped source, the single file and the page come out identical (`cb86d8f94732`). This check's screenshots were taken after the tag, so the zips do not include them.
 
 ## 21. Next
 

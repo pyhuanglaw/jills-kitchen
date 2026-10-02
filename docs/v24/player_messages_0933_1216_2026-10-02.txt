@@ -1,4 +1,4 @@
-(Filed 2026-10-02 12:40. The player's short messages and saves of 09:33–12:16, during RC6. Where the exact words are
+(Filed 2026-10-02 12:40; 12:17 and 12:24 added at the release. The player's short messages and saves of 09:33–12:24, during RC6. Where the exact words are
 kept here they are verbatim; the 09:33–10:06 reports were sent as a run of short messages with screenshots and their
 saves — their words are quoted where the tests and the code quote them, and listed by subject otherwise. The two long
 corrections of this morning are filed on their own: second_floor_prerequisite_1025_2026-10-02.txt and
@@ -32,3 +32,6 @@ story_presentation_1032_2026-10-02.txt.)
 11:49  「研發酒也太貴 感覺就是為了花錢」
 11:59  (save: tests/saves/player_day68_1033.json) 「給你參考」
 12:16  (save: tests/saves/player_day71_1215.json) 「阿拓跟晴毫無進展 你其他的也要繼續做 把沒做的做完」
+12:17  「故事進展真的太慢 一堆劇情完全沒後續」
+12:24  「我錢都沒地方花了 每天繼續完還沒有任何故事」 (answered: RC6 carries both — the things to spend on of 10:40 and
+       11:49, and the stories of 12:16–12:17 — and was being published; the player's live page was still rc5)
