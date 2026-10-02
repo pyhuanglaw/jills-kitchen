@@ -2206,3 +2206,30 @@ def v24_rc7_madame_lin_says_which_corner(b, port, target):
     src = g.ev("String(STORY_EV.find(e=>e.k==='lin_gift').run)")
     check('側廳門口旁邊那個角落' in src and '妳每次到底都在看哪裡' not in src, 'the scene itself')
     check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc7_the_landlord_goes_up(b, port, target):
+    """the player's 15:40 (「房東說可以上去嗎 要有一個具體原因 而且應該是說 我上去一下 他本來就能上去 就說上去拿個東西」):
+    the floor is his, so he asks nobody — he says he is going up for something (the two old fire extinguishers, the
+    inspection is coming), and asks Jill if she wants to see it. Nobody asks whether they may go up. A story page that
+    kept the old words shows the scene as it is now."""
+    g = Game(b, port, target, seed=75, manual=True, viewport={'width': 390, 'height': 844})
+    raw = json.load(open(os.path.join(ROOT, 'tests', 'saves', 'player_day74_1508.json'), encoding='utf-8')); raw = raw.get('save', raw)
+    raw['story'].setdefault('beatLines', {})['up_inspect'] = [{'t': '下午，房東來了一趟。消防檢查快到了，他要上樓看一下。'}, {'w': 'Jill', 't': '我可以一起上去嗎？'}, {'w': '房東', 't': '可以啊。'}]
+    g.ev("phase='title';R=null;localStorage.setItem(KEY,JSON.stringify(%s))" % json.dumps(raw, ensure_ascii=False)); g.reload(); g.page.wait_for_timeout(150)
+    page = json.loads(g.ev("JSON.stringify(story().beatLines.up_inspect)"))
+    check({'w': '房東', 't': '我上去一下，拿個東西。'} in page and not any('可以一起上去' in x['t'] or x['t'] == '可以啊。' for x in page), f'the page: {page}')
+    g.ev("window.__noScenes=false;STORY_EV.find(e=>e.k==='up_inspect').run()"); g.page.wait_for_timeout(80)
+    shown = []
+    for _ in range(14):
+        if not g.ev("!!DLG"): break
+        shown.append((g.ev("$('#dlg .dlg-name').textContent"), g.ev("$('#dlg .dlg-text').textContent")))
+        g.page.wait_for_timeout(300); g.ev("dlgNext()")
+    print('      the scene:', ' / '.join(f'{n or "—"}：{t}' for n, t in shown))
+    check(('房東', '我上去一下，拿個東西。') in shown, 'he says he is going up, for something')
+    check(any('滅火器' in t for _, t in shown), 'what he went up for is said: the old fire extinguishers')
+    check(not any(('可以' in t and '上去' in t) or t == '可以啊。' for _, t in shown), 'nobody asks whether they may go up')
+    check(('房東', '要上來看嗎？') in shown and ('Jill', '好。') in shown, 'he asks Jill if she wants to see it')
+    check(g.ev("!!fact('up_inspect')") and not g.ev("!!DLG"), 'the beat is done and the panel closed')
+    check(not g.errors, g.errors[:3]); g.close()

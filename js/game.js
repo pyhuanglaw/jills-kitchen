@@ -3386,6 +3386,10 @@ function upStaffMeal(){if(phase!=='prep'||!eraOpen('up')||fact('sp_seat')||!spOK
  const seated=crew.slice(0,four?4:2),standing=crew.slice(four?4:2,four?7:5);if(!standing.length)return;
  const a=upByName(standing,['Nina'])||standing.find(m=>m.role==='waiter')||standing[0],b=upByName(seated,['Marco'])||seated.find(m=>m.role==='chef')||seated[0];if(!a||!b||a===b)return;
  factSet('sp_seat');later(()=>{if(phase==='prep')staffSay(a,'我們是不是每次都在找地方坐？')},1500);later(()=>{if(phase==='prep')staffSay(b,'嗯。')},3100)}
+const UP_INSPECT_LINES=[{who:'',text:'下午，房東來了一趟。'},{who:'landlord',tone:'talk',text:'我上去一下，拿個東西。'},
+ {who:'',text:'樓梯門在側廳。房東開了鎖，回頭看了 Jill 一眼。'},{who:'landlord',text:'要上來看嗎？'},{who:'jill',text:'好。'},
+ {who:'',text:'整層都是空的。角落靠著兩支舊滅火器；消防檢查快到了，他要拿去換新的。'},{who:'landlord',tone:'talk',text:'地板是好的，窗戶也是好的。'},{who:'jill',text:'嗯。'},
+ {who:'',text:'房東一手提一支滅火器下樓，把門鎖好才走。'}];
 STORY_EV.push(
  /* U1 (§4): building information. No journal, no project, no 「maybe someday」 */
  {k:'up_hint',lane:'v24',cls:'A',floor:2,at:['served','collect'],
@@ -3399,10 +3403,11 @@ STORY_EV.push(
    if(b){sayS(a,'樓上真的一直都空著喔？',300);JILL_SAY('嗯。',1600,wa);sayS(b,'上面多大？',2900);JILL_SAY('不知道。',4200,{with:'staff:'+b.name});sayS(a,'妳沒上去過？',5500);JILL_SAY('沒有啊。',6800,wa)}
    else{sayS(a,'房東還沒租出去？',300);JILL_SAY('好像還沒。',1700,wa)}}},
  /* U3 (§8, I3): the landlord, the afternoon, a mundane reason; Jill goes up once. Not the reveal: brief, words only */
- {k:'up_inspect',lane:'major',cls:'A',floor:1,at:['daystart'],ic:'heart',note:'房東上樓看空著的二樓，Jill 跟上去看了一眼。',
+ /* rc7 (the player, 15:40 「房東說可以上去嗎 要有一個具體原因 而且應該是說 我上去一下 他本來就能上去 就說上去拿個東西」):
+    the floor is his — he does not ask anyone; he goes up for something, and asks Jill if she wants to see it */
+ {k:'up_inspect',lane:'major',cls:'A',floor:1,at:['daystart'],ic:'heart',note:'房東上樓拿東西，Jill 跟上去看了一眼空著的二樓。',
   when:()=>due('up_inspect','up_staff',2,'up')&&!v24Fresh('daystart'),
-  run:()=>{factSet('up_inspect');v24Scene([{who:'',text:'下午，房東來了一趟。消防檢查快到了，他要上樓看一下。'},{who:'jill',text:'我可以一起上去嗎？'},{who:'landlord',text:'可以啊。'},
-   {who:'',text:'樓梯門在側廳。房東開了鎖，兩個人上樓。整層都是空的。'},{who:'landlord',tone:'talk',text:'地板是好的，窗戶也是好的。'},{who:'jill',text:'嗯。'},{who:'',text:'下樓以後，房東把門鎖好才走。'}])}},
+  run:()=>{factSet('up_inspect');v24Scene(UP_INSPECT_LINES.map(l=>Object.assign({},l)))}},
  /* U4 (§9–§16): the day of the missing cats. The day's major is taken at the start (the door), the night plays at closing */
  {k:'up_door',lane:'major',cls:'A',floor:1,at:['daystart'],ic:'heart',note:()=>fact('up_cats')?`側廳樓梯的門沒關好，${upCatN('mikan')}和${upCatN('ban')}不見了。最後是在樓上找到的。`:null,
   when:()=>due('up_door','up_inspect',3,'up')&&!v24Fresh('daystart')&&upNightCan(),
@@ -3651,13 +3656,14 @@ function storyCapLine(who,txt,kind){return;const C=STORY_CAP;if(!C)return;const 
    in. A page whose words all come from elsewhere (a shared pool) is left as it is. Once, on loading. */
 function beatSrcOf(k){const out=[];for(const E of STORY_EV){const src=String(E.run||'')+(E.present||[]).map(p=>String(p.run||'')).join('');if(E.k===k||src.includes(`factSet('${k}'`)||src.includes(`v24Cap('${k}'`))out.push(src)}
  if(k.startsWith('dy_')&&typeof DYLAN_SCENES!=='undefined'){const sc=DYLAN_SCENES.find(x=>'dy_'+x.k===k);if(sc)out.push(JSON.stringify(sc.lines))}
- if(k==='meal_box'||k==='meal_two')out.push(String(staffMealStory));if(k==='yj_move')out.push(String(xqHelperChat));if(k==='up_ask')out.push(String(upAskUpd));return out.join('\n')}
+ if(k==='meal_box'||k==='meal_two')out.push(String(staffMealStory));if(k==='yj_move')out.push(String(xqHelperChat));if(k==='up_ask')out.push(String(upAskUpd));if(k==='up_inspect')out.push(JSON.stringify(UP_INSPECT_LINES));return out.join('\n')}
 function beatLineOk(src,t){if(!t)return false;if(src.includes(t))return true;
  for(const m of src.matchAll(/`([^`]*)`/g)){const parts=m[1].split(/\$\{[^}]*\}/);if(parts.length<2)continue;if(new RegExp('^'+parts.map(p=>p.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('.*')+'$').test(t))return true}
  const lits=[...src.matchAll(/'([^'\\\n]*)'/g)].map(m=>m[1]).filter(Boolean);return lits.some(a=>a.length>=2&&t.startsWith(a)&&lits.some(b=>t.length>a.length&&t.endsWith(b)))}
 var STORY_READY=false;
 function beatLinesMig(o){const st=o&&o.story;if(!st||!st.beatLines)return o;
  {/* v2.4 rc7 (14:55): Madame Lin's gift as it is written now, for a page that kept rc6's words */const L=st.beatLines.lin_gift;if(Array.isArray(L)&&L.some(x=>x&&x.t==='……妳每次到底都在看哪裡？'))st.beatLines.lin_gift=[{t:'Madame Lin 結完帳，從椅子旁邊拿起一盆植物，放到 Jill 面前。'},{w:'Jill',t:'今天怎麼帶東西？'},{w:'Madame Lin',t:'側廳門口旁邊那個角落，空很久了。'},{w:'Madame Lin',t:'放一盆綠的，客人坐下來，眼睛才有地方休息。'},{w:'Jill',t:'……我天天在這裡，都沒注意到。'},{w:'Madame Lin',t:'就是因為天天在。'}]}
+ {/* rc7 (15:40): the landlord's afternoon as it is written now (he goes up for something; nobody asks him) */const L=st.beatLines.up_inspect;if(Array.isArray(L)&&L.some(x=>x&&x.t==='我可以一起上去嗎？'))st.beatLines.up_inspect=UP_INSPECT_LINES.map(l=>{const w=whoLabel(l.who||'');return w?{w,t:l.text}:{t:l.text}})}
  if(st.blMig)return o;st.blMig=1;
  for(const k in st.beatLines){const arr=st.beatLines[k];if(!Array.isArray(arr)||!arr.length)continue;const src=beatSrcOf(k);if(!src)continue;const ok=arr.map(x=>beatLineOk(src,x&&x.t));if(ok.some(Boolean)&&!ok.every(Boolean))st.beatLines[k]=arr.filter((x,i)=>ok[i])}return o}
 function beatNote(k){const E=STORY_EV.find(x=>x.k===k);if(!E||!E.note)return'';try{return typeof E.note==='function'?E.note(evState(k))||'':E.note}catch(e){return''}}
