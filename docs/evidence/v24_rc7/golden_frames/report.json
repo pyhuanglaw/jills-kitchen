@@ -1,0 +1,72 @@
+{
+ "errors": [],
+ "days": {
+  "day1": {
+   "frames": [
+    7301,
+    7301
+   ],
+   "samples": [
+    244,
+    244
+   ],
+   "differing_keys": {},
+   "digest_differs": [
+    "money",
+    "summary"
+   ]
+  },
+  "day2": {
+   "frames": [
+    8028,
+    8028
+   ],
+   "samples": [
+    268,
+    268
+   ],
+   "differing_keys": {
+    "dom": {
+     "count": 268,
+     "first": 0
+    }
+   },
+   "digest_differs": [
+    "money",
+    "summary"
+   ]
+  }
+ },
+ "screens": {
+  "title": null,
+  "prep": null,
+  "service_20s": null,
+  "service_panel": null,
+  "pause": null,
+  "evening": null,
+  "summary": [
+   15,
+   17,
+   375,
+   734
+  ],
+  "shop": [
+   91,
+   17,
+   313,
+   454
+  ],
+  "book_cats": [
+   287,
+   17,
+   313,
+   29
+  ],
+  "book_mem": [
+   287,
+   17,
+   313,
+   29
+  ]
+ }
+}

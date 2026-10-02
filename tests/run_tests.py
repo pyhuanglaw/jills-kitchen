@@ -376,9 +376,10 @@ def customer_full_flow_and_economy(b, port, target):
     check(s['guests'] > 0 and s['plated'] > 0 and s['rev'] > 0, f'no customers served: {s}')
     check(s['perfect'] == s['plated'], f'perfect bot should plate only PERFECT dishes: {s}')
     m1 = g.ev("S.money"); c1 = g.ev("S.todayCost")
-    expect = m0 + s['rev'] + s['tips'] + s['bonus'] - s['wages'] - (c1 - c0)
+    expect = m0 + s['rev'] + s['tips'] + s['bonus'] - s['wages'] - s.get('rent', 0) - s.get('wine', 0) - (s.get('cfee') or 0) + (s.get('loan') or 0) - (c1 - c0)   # v2.4 rc7: the rent and the glasses poured; 秀琴阿姨's loan
     check(m1 == expect, f'money invariant broken: start {m0}, end {m1}, expected {expect}, summary {s}')
-    check(s['net'] == s['rev'] + s['tips'] + s['bonus'] - s['cost'] - s['wages'], 'net formula mismatch')
+    check(s['net'] == s['rev'] + s['tips'] + s['bonus'] - s['cost'] - s['wages'] - (s.get('cfee') or 0) - s.get('rent', 0) - s.get('wine', 0), 'net formula mismatch')
+    check(s.get('rent') == 300 and not s.get('loan'), f'a first day\'s rent, and no loan on a day that paid its way: {s.get("rent")}, {s.get("loan")}')
     check(g.ev("S.reviews.length") > 0, 'no reviews written')
     check(not g.errors, g.errors)
     g.close()
@@ -1741,7 +1742,7 @@ def rating_story_records_and_panels_v182(b, port, target):
 
 @test
 def economy_ops_duties_and_prices_v182(b, port, target):
-    """Wages climb with level (LV5 ≈ 2.8× LV1); at the final restaurant nothing promises another expansion and the
+    """Wages climb with level (LV5 ≈ 3.2× LV1 since v2.4 rc7); at the final restaurant nothing promises another expansion and the
     operations upgrades add staff, queue and menu capacity and speed; a waiter's duties are toggles that
     crewCovers() honours; the price control says what a markup does; set menus raise add-on orders."""
     g = Game(b, port, target, seed=4, manual=True)

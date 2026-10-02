@@ -1,0 +1,12 @@
+golden_scenario re-recorded (v2.4 rc7, the rent): the old baseline against the new, field by field.
+The 3-day scenario is a Level 1 shop with no staff and no Lounge: the rent is $300 a day, there are no wages and no glasses poured.
+Expected: each day net -300; money -300 x the day (it accumulates); everything else identical.
+
+day 1 money: 2428 -> 2128 (-300) ok
+day 1 summary.net: 1928 -> 1628 (-300) ok
+day 2 money: 6105 -> 5505 (-600) ok
+day 2 summary.net: 4177 -> 3877 (-300) ok
+day 3 money: 6344 -> 5444 (-900) ok
+day 3 summary.net: 239 -> -61 (-300) ok
+
+every difference is the rent: True

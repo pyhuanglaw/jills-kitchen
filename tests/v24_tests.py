@@ -1638,8 +1638,8 @@ def v24_rc6_an_authored_beat_holds_the_service_until_it_is_read(b, port, target)
     g.ev("delete story().ev.qt_1;delete story().facts.qt_1;storyDay().minor=0;storyTick('order',{})")
     lay = json.loads(g.ev("""JSON.stringify((()=>{const b=$('#dlg .dlg-box').getBoundingClientRect(),c=$('#dlg .dlg-hold').getBoundingClientRect(),t=$('#dlg .dlg-text');return{box:[b.left,b.top,b.right,b.bottom],chip:[c.left,c.top,c.right,c.bottom],fs:parseFloat(getComputedStyle(t).fontSize),W:innerWidth,H:innerHeight}})())"""))
     check(lay['box'][0] >= 0 and lay['box'][2] <= lay['W'] and lay['box'][3] <= lay['H'] and lay['chip'][3] < lay['box'][1] and lay['chip'][1] >= 0 and lay['fs'] >= 15, f'readable at 390×844: {lay}')
-    os.makedirs(os.path.join(ROOT, 'docs', 'evidence', 'v24_rc6'), exist_ok=True)
-    g.page.screenshot(path=os.path.join(ROOT, 'docs', 'evidence', 'v24_rc6', 'story_hold_phone.png'))
+    os.makedirs(_rt.ARTIFACTS, exist_ok=True)   # v2.4 rc7: a test run writes its picture to the artifacts, never over a released evidence file
+    g.page.screenshot(path=os.path.join(_rt.ARTIFACTS, 'story_hold_phone.png'))
     while g.ev("!!DLG"):
         _frames(g, 10); g.click('#dlg')
     g.ev("for(const k of ['qt_1','hugo_tuo']){const E=STORY_EV.find(e=>e.k===k);E.when=E.__w}")
@@ -2077,7 +2077,9 @@ def v24_rc6_the_morning_reports(b, port, target):
     g.ev("hideScreen();paused=false;drawScene=__D0")
     check(26 <= n120 <= 36 and 26 <= n60 <= 36 and nsheet <= 14, f'a second of service: {n120} draws at 120 Hz, {n60} at 60 Hz; {nsheet} under a sheet')
     # the summary: today's stories, the Lounge's sales, the bartenders
-    g.ev("factSet('qt_3');R.st.dish.w_spark=(R.st.dish.w_spark||0)+3;R.st.dish.w_fred=(R.st.dish.w_fred||0)+2;R.st.dishRev=R.st.dishRev||{};R.st.dishRev.w_spark=(R.st.dishRev.w_spark||0)+540;R.st.dishRev.w_fred=(R.st.dishRev.w_fred||0)+560")
+    g.ev("factSet('qt_3');R.st.dish.w_spark=(R.st.dish.w_spark||0)+3;R.st.dish.w_fred=(R.st.dish.w_fred||0)+2;R.st.dishRev=R.st.dishRev||{};R.st.dishRev.w_spark=(R.st.dishRev.w_spark||0)+540;R.st.dishRev.w_fred=(R.st.dishRev.w_fred||0)+560;"
+         # v2.4 rc7 (14:51): the Lounge's list is what its tabs paid for (R.st.lgSold), its total the Lounge's takings
+         "const L=R.st.lgSold=R.st.lgSold||{};L.w_spark={n:((L.w_spark||{}).n||0)+3,rev:((L.w_spark||{}).rev||0)+540};L.w_fred={n:((L.w_fred||{}).n||0)+2,rev:((L.w_fred||{}).rev||0)+560};R.st.lgRev=(R.st.lgRev||0)+1100")
     g.ev("closeShop('x');for(const q of R.groups.slice())leaveGroup(q,'ok')"); g.page.evaluate('()=>window.__bot(400,1/30)')
     if g.ev("phase") == 'service': g.ev("finishClosing()")
     g.ev("while(typeof DLG!=='undefined'&&DLG)dlgNext()")
@@ -2123,4 +2125,84 @@ def v24_rc6_stalled_lines_move_on(b, port, target):
     # 周董: his dessert not on today's menu
     z = json.loads(g.ev("(()=>{const E=STORY_EV.find(e=>e.k==='zhou_dessert');const d=namedTop('周董','dessert');const m0=S.menu.slice();S.menu=S.menu.filter(x=>x!==d);const g0={named:'周董',name:'周董',size:1};const ctx={g:g0,tk:{lounge:0,items:[{d:'steak'}]}};const a=E.when(ctx);S.menu=m0;return JSON.stringify({d,a})})()"))
     check(z['d'] and z['a'] is True, f'周董 asks for his dessert on a day it is not on the menu: {z}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc7_the_money(b, port, target):
+    """the player's 14:39–14:51: the Lounge's glasses have a cost (「阿lounge不用進貨成本?」) — every glass poured, in the
+    Lounge or with dinner, is on the day's 酒水成本; a rent every day for the space the restaurant takes (small while the
+    shop is small; 「你租金要計算一下吧 但不要讓剛開始太容易倒店」); the wages a little higher, mostly the seasoned crew
+    (「員工薪水可以再增加一點」); nothing owed — in the first ten days the evening the till cannot pay, 秀琴阿姨 lends $20,000
+    at closing (「前十天缺錢的話 秀琴阿姨借給我們20000 安排劇情」), paid back in a scene when the shop can; the summary's
+    Lounge figure is what the Lounge's tabs paid, the same as its list's total, with the tips and the glasses at dinner
+    apart (「lounge幾桌 多少錢那個錢跟賣了多少酒的金額對不起來」); the menu says how many bar bites of how many (14:47)."""
+    g = Game(b, port, target, seed=71, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day71_1215.json')
+    rent = json.loads(g.ev("JSON.stringify({r:rentToday(),parts:rentParts()})"))
+    check(rent['r'] == 2500 + 2000 + 400 + 800 + 2500 and [p[0] for p in rent['parts']] == ['主廳', '側廳', '戶外區', '廚房擴建', 'Lounge'], f'the Day 71 restaurant\'s rent: {rent}')
+    small = json.loads(g.ev("(()=>{const L=S.level,r0=Object.assign({},S.rooms),lv=S.rooms.lounge;S.level=1;S.rooms={};const a=rentToday();S.level=L;S.rooms=r0;return JSON.stringify(a)})()"))
+    check(small == 300, f'a first-day shop pays {small} a day')
+    w = json.loads(g.ev("JSON.stringify({c1:crewWageAt('chef',1),c5:crewWageAt('chef',5),w5:crewWageAt('waiter',5),cl5:crewWageAt('cleaner',5),b5:crewWageAt('bartender',5),all:crewWages()})"))
+    check(w['c1'] == 264 and w['c5'] == 845 and w['w5'] == 704 and w['cl5'] == 528 and w['b5'] == 1126, f'the wages: {w}')
+    check(11676 * 1.2 < w['all'] < 11676 * 1.35, f'the Day 71 crew: $11,676 a day before, {w["all"]} now')
+    # the menu: three bar bites on tonight, of four
+    g.ev("showPrep()"); g.page.wait_for_timeout(100)
+    h = g.ev("(()=>{const h=[...document.querySelectorAll('#screen h3')].find(e=>e.textContent.includes('今日菜單'));return h?h.textContent:''})()")
+    check('酒吧小點 3 道（共 4 道，不佔名額）' in h, f'the menu header: {h}')
+    # a day: the wine poured, the rent, the wages, the Lounge's figures
+    to_service(g); play_day(g)
+    s = json.loads(g.ev("JSON.stringify(S.lastSummary)"))
+    check(s['wine'] > 0 and s['rent'] == rent['r'] and s['wages'] == w['all'], f'on the ledger: wine {s["wine"]}, rent {s["rent"]}, wages {s["wages"]}')
+    check(s['net'] == s['rev'] + s['tips'] + s['bonus'] - s['cost'] - s['wages'] - (s['cfee'] or 0) - s['rent'] - s['wine'], 'the net counts them')
+    lg = s['lg']; tot = sum(x['rev'] for x in s['lgSales'])
+    check(lg['rev'] == tot and lg['tip'] > 0 and all(x['d'].startswith('w_') or g.ev(f"!!(DISHES['{x['d']}']&&DISHES['{x['d']}'].bar)") for x in s['lgSales']), f'the Lounge: {lg["rev"]} = its list\'s total {tot}; tips {lg["tip"]} apart')
+    din = s.get('dinWine') or []
+    check(all(x['d'].startswith('w_') for x in din), f'the glasses with dinner, apart: {din}')
+    poured = json.loads(g.ev("JSON.stringify(Object.keys(S.lastSummary.lgSales.concat(S.lastSummary.dinWine).reduce((a,x)=>(a[x.d]=1,a),{})))"))
+    check(abs(s['wine'] - sum(g.ev(f"WINES['{d}']?WINES['{d}'].cost:0") * n for d, n in [(x['d'], x['n']) for x in s['lgSales'] + din if x['d'].startswith('w_')])) <= s['wine'] * .2, f'the 酒水成本 is the glasses\' cost (poured, paid or not): {s["wine"]}')
+    g.ev("showSummary()"); g.page.wait_for_timeout(100)
+    t = g.ev("document.querySelector('#screen').innerText")
+    check('酒水成本' in t and '租金' in t and '主廳 $2,500' in t and f'營業額 {g.ev("fmt(S.lastSummary.lg.rev)")}' in t and 'Lounge 的小費' in t and '晚餐桌上配的酒' in t, 'the summary shows them')
+    # the till never goes below $0, and nothing is carried
+    g.ev("S.money=100;S.wageOwed=0")
+    check(g.ev("(()=>{const m=S.money;const pay=n=>{const p=Math.min(n,Math.max(0,S.money));S.money-=p;return p};pay(5000);return S.money})()") == 0, 'paid down to $0, no lower')
+    check(not g.errors, g.errors[:3]); g.close()
+    # a new game: the first days are short — 秀琴阿姨's loan at closing, then paid back
+    g = Game(b, port, target, seed=72, manual=True, viewport={'width': 390, 'height': 844})
+    g.click('[data-act=open]'); g.page.wait_for_timeout(150)
+    g.ev("autoStock()"); start_day(g); install_bot(g)
+    for _ in range(300):
+        g.page.evaluate('()=>window.__bot(60,1/30)')
+        if g.ev("R&&R.closed") or g.ev("phase") != 'service': break
+    g.ev("S.money=40")   # an evening that has spent everything
+    play_day(g)
+    L = json.loads(g.ev("JSON.stringify({f:!!fact('xq_loan'),loan:S.lastSummary&&S.lastSummary.loan,money:S.money,day:S.day,line:(story().beatLines||{}).xq_loan||null})"))
+    check(L['f'] and L['loan'] == 20000 and L['money'] >= 15000, f'秀琴阿姨 lent $20,000 at closing: {L}')
+    check(L['line'] and any('兩萬' in (x.get('t') or '') for x in L['line']), 'her words are on the story page')
+    g.ev("showSummary()"); g.page.wait_for_timeout(100)
+    check('秀琴阿姨借的' in g.ev("document.querySelector('#screen').innerText"), 'and on the summary, under the night\'s net')
+    # once only; and later, when the shop can, Jill pays it back
+    g.ev("S.day=11;S.money=40")
+    check(g.ev("loanNeeded()") is False, 'once only, and only in the first ten days')
+    g.click('[data-act=toShop]'); g.page.wait_for_timeout(100)
+    g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(150)
+    g.ev(f"S.day={L['day'] + 7};S.money=100000;autoStock()"); start_day(g); install_bot(g); play_day(g)
+    P = json.loads(g.ev("JSON.stringify({f:!!fact('xq_repay'),loan:S.lastSummary&&S.lastSummary.loan})"))
+    check(P['f'] and P['loan'] == -20000, f'paid back, a week on, with the till comfortable: {P}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc7_madame_lin_says_which_corner(b, port, target):
+    """the player's 14:55 (「madam lin 說那個角落空很久 Jill回你到底都在看哪超沒邏輯」): she says which corner and why, Jill
+    answers what she said; a story page that kept rc6's words shows the scene as it is now."""
+    g = Game(b, port, target, seed=73, manual=True, viewport={'width': 390, 'height': 844})
+    raw = json.load(open(os.path.join(ROOT, 'tests', 'saves', 'player_day71_1215.json'), encoding='utf-8')); raw = raw.get('save', raw)
+    raw['story'].setdefault('beatLines', {})['lin_gift'] = [{'w': 'Jill', 't': '今天怎麼帶東西？'}, {'w': 'Madame Lin', 't': '那個角落空很久了。'}, {'w': 'Jill', 't': '……妳每次到底都在看哪裡？'}]
+    g.ev("phase='title';R=null;localStorage.setItem(KEY,JSON.stringify(%s))" % json.dumps(raw, ensure_ascii=False)); g.reload(); g.page.wait_for_timeout(150)
+    lines = json.loads(g.ev("JSON.stringify(story().beatLines.lin_gift.map(x=>x.t))"))
+    check('側廳門口旁邊那個角落，空很久了。' in lines and '……妳每次到底都在看哪裡？' not in lines and '就是因為天天在。' in lines, f'the page: {lines}')
+    src = g.ev("String(STORY_EV.find(e=>e.k==='lin_gift').run)")
+    check('側廳門口旁邊那個角落' in src and '妳每次到底都在看哪裡' not in src, 'the scene itself')
     check(not g.errors, g.errors[:3]); g.close()

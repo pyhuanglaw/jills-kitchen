@@ -1,7 +1,7 @@
 [
  {
   "day": 1,
-  "money": 2428,
+  "money": 2128,
   "lifetime": 2269,
   "level": 1,
   "stats": {
@@ -26,7 +26,7 @@
    "tips": 349,
    "bonus": 255,
    "wages": 0,
-   "net": 1928,
+   "net": 1628,
    "guests": 16,
    "lost": 0,
    "perfect": 16,
@@ -99,7 +99,7 @@
  },
  {
   "day": 2,
-  "money": 6105,
+  "money": 5505,
   "lifetime": 7243,
   "level": 1,
   "stats": {
@@ -126,7 +126,7 @@
    "tips": 894,
    "bonus": 330,
    "wages": 0,
-   "net": 4177,
+   "net": 3877,
    "guests": 26,
    "lost": 0,
    "perfect": 37,
@@ -199,7 +199,7 @@
  },
  {
   "day": 3,
-  "money": 6344,
+  "money": 5444,
   "lifetime": 7347,
   "level": 1,
   "stats": {
@@ -227,7 +227,7 @@
    "tips": 14,
    "bonus": 135,
    "wages": 0,
-   "net": 239,
+   "net": -61,
    "guests": 2,
    "lost": 0,
    "perfect": 1,
