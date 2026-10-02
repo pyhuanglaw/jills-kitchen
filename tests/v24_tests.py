@@ -2029,3 +2029,21 @@ def v24_rc6_qing_and_tuo_move_on(b, port, target):
     E = json.loads(g.ev("JSON.stringify(Object.fromEntries(['qt_2','qt_3','qt_extra','qt_photo'].map(k=>[k,String(STORY_EV.find(e=>e.k===k).when)])))"))
     check("factN('qt_days')>=4" in E['qt_2'] and "fact('qt_2').d>=2" in E['qt_3'] and 'Math.random()<.5' in E['qt_extra'] and "factN('qt_extra')>=2" in E['qt_photo'] and 'qt_absence' in E['qt_photo'], f'the pace: {E}')
     check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc6_a_regulars_dated_beat_keeps_its_day(b, port, target):
+    """the full regression on the player's Day 68 save: 小林's 「升職了，今天不趕。」 (Day 28) became 「更早以前」 after one more
+    evening — an older save keeps that beat as a flag of 1 and finds its day in the regular's notes, which keep the latest
+    six. The day now stays in the flag (when the beat is read, and before its note is let go)."""
+    g = Game(b, port, target, seed=68, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day68_1033.json')
+    L = "JSON.stringify(lineProgress(STORY_LINES.find(x=>x.k==='koba')).done.map(x=>x.id+'@'+x.d))"
+    b0 = json.loads(g.ev(L))
+    check('koba_promo@28' in b0 and 'koba_newjob@40' in b0, f'the save: {b0}')
+    check(g.ev("S.regMem.koba.flags.promo") == 28 and g.ev("S.regMem.koba.flags.newjob") == 40, 'read once, the flags keep their days')
+    g.ev("S.regMem.koba.flags.promo=1;S.regMem.koba.flags.newjob=1")   # as the save has them, unread
+    g.ev("regFact('koba','今天坐吧台。');regFact('koba','點了兩杯。');regFact('koba','說下次帶同事來。')")
+    b1 = json.loads(g.ev(L))
+    check('koba_promo@28' in b1 and 'koba_newjob@40' in b1 and g.ev("S.regMem.koba.facts.length") == 6, f'three more notes, the oldest let go, the beats keep their days: {b1}')
+    check(not g.errors, g.errors[:3]); g.close()

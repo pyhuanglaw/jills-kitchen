@@ -1449,7 +1449,7 @@ function scallops(c,x,y,s){for(let k=0;k<3;k++){const px=x+(k-1)*11*s,py=y+(k%2?
 function mash(c,x,y,s){c.fillStyle='#F3E2B6';el(c,x,y,16*s,11*s);c.strokeStyle='#E2CB90';c.lineWidth=1.4*s;c.beginPath();c.arc(x,y,9*s,.5,4);c.stroke();c.beginPath();c.arc(x+2*s,y,4*s,1,5);c.stroke();gloss(c,x-5*s,y-4*s,5*s,2*s,.4)}
 function bread(c,x,y,s){c.save();c.translate(x,y);c.rotate(-.3);c.fillStyle='#9A5A28';rr(c,-12*s,-8*s,24*s,16*s,6*s);c.fill();c.fillStyle='#F2DDB0';rr(c,-10*s,-6*s,20*s,12*s,5*s);c.fill();c.fillStyle='rgba(180,140,90,.5)';for(let k=0;k<6;k++)circ(c,-6*s+k*2.4*s,(k%2?2:-2)*s,.9*s);c.restore()}
 
-const VESSEL={coffee:'cup',blacktea:'cup',sparkling:'glass',fruitsoda:'glass',soup:'bowl',salad:'bowl',soup_x:'bowl',w_spark:'wine',w_white:'wine',w_lred:'wine',w_fwhite:'wine',w_fred:'wine'};
+const VESSEL={coffee:'cup',blacktea:'cup',sparkling:'glass',fruitsoda:'glass',soup:'bowl',salad:'bowl',soup_x:'bowl',w_spark:'wine',w_white:'wine',w_lred:'wine',w_fwhite:'wine',w_fred:'wine',w_rose:'wine',w_orange:'wine',w_pinot:'wine',w_house:'wine',w_cham:'wine',w_old:'wine'};   /* v2.4 rc6: the researched ones too — a glass on its coaster, no plate under it */
 function paintFood(c,id,want){const SP=DISHES[id]&&DISHES[id].special?SPECIALS[DISHES[id].special]:null;if(SP){paintFood(c,DISHES[id].special,want);paintTopping(c,SP.top,rng(hash(id)));return}
  const R=rng(hash(id+'|'+(want||0)+(id==='signature'&&S.signature?JSON.stringify(S.signature):'')+(id==='sigdessert'&&S.sigDessert?JSON.stringify(S.sigDessert):'')));
  const flat=fn=>{c.save();c.scale(1,.8);fn();c.restore()};
@@ -2540,7 +2540,7 @@ function worldMemoryLine(g,force){if(!R||!g.reg||g.reg==='dylan')return false;S.
 function regFaceHTML(id,met,fallback){const p=met?portraitOf(id):null;return p?`<img class="face" alt="" src="${p.src}">`:`<img alt="" src="${fallback}">`}
 /* v2.3 late game (#39): a space where Chinese meets a Latin word — 「Jill 請了 Jill's 招牌…」, not 「請了Jill's」 */
 function cjkSp(t){return String(t).replace(/([\u3400-\u9fff])([A-Za-z0-9])/g,'$1 $2').replace(/([A-Za-z0-9'’])([\u3400-\u9fff])/g,'$1 $2')}
-function regFact(id,txt){txt=cjkSp(txt);const m=regMem(id);if(m.facts.some(f=>f.txt===txt))return;m.facts.unshift({day:S.day,txt});if(m.facts.length>6)m.facts.length=6}
+function regFact(id,txt){txt=cjkSp(txt);const m=regMem(id);if(m.facts.some(f=>f.txt===txt))return;m.facts.unshift({day:S.day,txt});if(m.facts.length>6){for(const f of m.facts.slice(6))for(const k in REG_FLAG_TXT)if(m.flags&&m.flags[k]===1&&REG_FLAG_TXT[k]===f.txt&&f.day>1)m.flags[k]=f.day;/* v2.4 rc6: a dated beat keeps its day when its note goes */m.facts.length=6}}
 function usualTable(id){const m=regMem(id);let best=null,bn=1;for(const k in m.seats)if(m.seats[k]>bn){bn=m.seats[k];best=+k}return best}
 function usualDish(id){const m=regMem(id);let best=null,bn=2;for(const k in m.orders)if(m.orders[k]>bn&&menuList().includes(k)&&(S.stock[k]||0)>0){bn=m.orders[k];best=k}return best}
 function regGate(id,key,gapDays){const m=regMem(id);if((m.last[key]||-99)>S.day-gapDays)return false;m.last[key]=S.day;return true}
@@ -2589,7 +2589,9 @@ function regCallback(id){const r=REG_BY[id];if(!r||!r.cb)return null;const m=reg
 /* the Wangs' anniversary in this save: the day it was spent here (v2.3 keeps the day; older saves, their own record) */
 function regAnnivDay(){const m=regMem('wang');const v=m.flags.anniv;if(!v)return null;if(v>1)return v;const f=(m.facts||[]).concat(regMem('wangwife').facts||[]).find(x=>x.txt==='結婚紀念日是在這裡過的。');return f?f.day:0}
 /* a once-only moment's day: the flag holds it (v2.3), else the regular's own record of it, else 0 (更早以前) */
-function regOnceDay(id,flag,txt){const m=regMem(id);const v=m.flags[flag];if(!v)return null;if(v>1)return v;const f=(m.facts||[]).find(x=>x.txt===txt);return f?f.day:0}
+function regOnceDay(id,flag,txt){const m=regMem(id);const v=m.flags[flag];if(!v)return null;if(v>1)return v;const f=(m.facts||[]).find(x=>x.txt===txt);if(f&&f.day>1){m.flags[flag]=f.day;return f.day}return f?f.day:0}   /* v2.4 rc6: an old save's flag of 1 takes its day from the note, and keeps it */
+/* the notes that date an old save's flags (小林's promotion and new job, Leo's plant, job hunt and graduation) */
+const REG_FLAG_TXT={promo:'升職那天，難得吃了一頓慢的。',newjob:'換了工作，離得遠了。',grad:'畢業了，第一份薪水來這裡吃了一頓。',jobhunt:'快畢業了，在找工作。',plant:'送了一盆多肉，放在窗邊。'};
 /* the first words of a visit, when they sit down */
 function regSeatMoment(g,t){const id=g.reg;if(!id||id==='dylan')return;const k=g.moment;const m=regMem(id);const say=(txt,d)=>setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,txt)},d||600);worldMemoryLine(g);
  if(g.comp==='friend'){say(pick(['今天帶老朋友來。','以前教書的同事，退休了才有空。']));m.flags.friendDay=S.day;regFact(id,'帶了一位老朋友來。');g.memoAt='seat'}
