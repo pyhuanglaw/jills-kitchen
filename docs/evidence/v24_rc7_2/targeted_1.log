@@ -1,0 +1,24 @@
+PASS  single_file_in_sync  (0.2s)
+PASS  tickets_keep_the_guest_v182  (1.0s)
+PASS  save_backup_and_restore  (2.6s)
+PASS  a3_the_pause_menu_is_reachable_on_a_short_phone_and_every_way_out_works  (11.1s)
+PASS  hospitality_stays_with_a_guest_from_stranger_to_regular  (7.2s)
+PASS  the_players_saves_load_through_a_real_reload  (4.2s)
+FAIL  followup_the_manual_describes_the_current_game  (0.3s)
+      the manual mentions 秀琴阿姨會借你兩萬
+PASS  v24_saves_load_and_nothing_fires_on_load  (30.7s)
+PASS  v24_xiuqin_is_there_from_day_one_and_is_not_free_labour  (3.4s)
+PASS  v24_xiuqin_goes_home_a_while_into_the_closing  (0.9s)
+PASS  v24_manual_tutorial_and_news_cover_the_new_content  (3.3s)
+FAIL  v24_rc7_the_money  (6.1s)
+      秀琴阿姨 lent $3,000 at closing: {'f': True, 'loan': 3000, 'money': 3425, 'day': 1, 'owed': 3000, 'line': [{'t': '打烊以後，Jill 對著收銀機算了兩次。'}, {'w': '秀琴阿姨', 't': '對不起來？'}, {'w': 'Jill', 't': '……還好。'}, {'w': '秀琴阿姨', 't': '還好是多少？'}, {'w': 'Jill', 't': '明天的菜錢，有點緊。'}, {'t': '秀琴阿姨從包包裡拿出一個信封，放在吧台上。'}, {'w': '秀琴阿姨', 't': '三千。妳先拿去。'}, {'w': 'Jill', 't': '阿姨，不行。'}, {'w': '秀琴阿姨', 't': '又不是送妳的。店開起來，再還我。'}, {'t': '秀琴阿姨借了 $3,000。'}]}
+      the scene: —：下午，房東來了一趟。 / 房東：我上去一下，拿個東西。 / —：樓梯門在側廳。房東一開鎖，寶寶就從他腳邊鑽進去，一路跑上樓。 / Jill：寶寶！ / —：Jill 跟上去帶寶寶下來。整層都是空的，寶寶已經跳上窗台了。 / 房東：上面就這樣，空很久了。地板是好的，窗戶也是好的。 / Jill：嗯。 / —：角落靠著兩支舊滅火器；消防檢查快到了，他上來就是要拿去換新的。 / —：Jill 抱著寶寶下樓。房東一手提一支滅火器，把門鎖好才走。
+PASS  v24_rc7_the_landlord_goes_up  (3.8s)
+PASS  v24_rc7_a_line_finds_its_table  (5.6s)
+PASS  v24_rc7_2_xiuqin_first_evening_holds_the_service  (1.9s)
+FAIL  v24_rc7_2_a_tap_on_the_pass_sends_the_plates  (0.6s)
+      three tables: no table
+PASS  v24_rc7_2_the_heart_and_the_treat_chip_on_a_ticket  (0.8s)
+PASS  v24_rc7_2_a_named_guests_line_answers_a_touch  (6.1s)
+
+15 passed, 3 failed

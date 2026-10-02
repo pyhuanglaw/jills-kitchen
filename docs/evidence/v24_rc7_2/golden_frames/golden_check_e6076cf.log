@@ -1,0 +1,15 @@
+PASS  cat_personality_fingerprint  (1.4s)
+PASS  golden_scenario  (2.1s)
+FAIL  golden_frames  (144.6s)
+      prep: pixels differ in box (16, 659, 374, 733) (see tests/artifacts/)
+      service_20s: pixels differ in box (16, 50, 267, 137) (see tests/artifacts/)
+      service_panel: pixels differ in box (16, 50, 267, 120) (see tests/artifacts/)
+      pause: pixels differ in box (16, 50, 267, 116) (see tests/artifacts/)
+      evening: pixels differ in box (47, 224, 54, 232) (see tests/artifacts/)
+      book_cats: pixels differ in box (318, 188, 390, 220) (see tests/artifacts/)
+      book_mem: pixels differ in box (318, 174, 390, 206) (see tests/artifacts/)
+      day1: first differing sample #11 (t=11.033): dom
+      day2: first differing sample #0 (t=0.033): dom
+
+2 passed, 1 failed
+EXIT 1

@@ -1,0 +1,6 @@
+PASS  followup_the_manual_describes_the_current_game  (0.4s)
+FAIL  v24_rc7_the_money  (7.3s)
+      under $300 after the costs, and only in the first ten days
+PASS  v24_rc7_2_a_tap_on_the_pass_sends_the_plates  (0.6s)
+
+2 passed, 1 failed
