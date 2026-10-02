@@ -17,6 +17,9 @@ own background kept, nothing redrawn, stretched or recoloured) and packed by too
   st23_xiuqin.
 - 許葳 (the Lounge's cleaner, a new person), supplied by the player at 19:11 (sheet_xuwei_v24.jpg): the large face is her
   portrait; the four expressions are 工作中, 淺笑, 覺得好笑, 已經處理好了 (the labels are left out).
+- v2.4 P5 (rc7): the rest of the outside cast — Kevin, 珊珊, 宇翔 from the first sheet (its other three columns), and
+  小彤's mother, 小彤's father, 老林, 國雄 from the second (docs/v24/refs/outside_cast_2_reference_2026-10-01.png),
+  each with the two expressions under the portrait.
 
   python3 tools/portraits_v24.py && python3 tools/portraits.py
 """
@@ -36,6 +39,7 @@ WT = os.path.join(ROOT, 'assets', 'portraits', 'src', 'sheet_wang_tones_v24.jpg'
 MT = os.path.join(ROOT, 'assets', 'portraits', 'src', 'sheet_mia_tone_v24.jpg')       # 2026-10-01 14:43, the player: Mia 認真看 (the photo of the wall on her phone)
 LT = os.path.join(ROOT, 'assets', 'portraits', 'src', 'sheet_landlord_v24.jpg')       # 2026-10-01 14:50, the player: 房東 (for the Second Floor) — 房東 / 平常 / 整層？
 XW = os.path.join(ROOT, 'assets', 'portraits', 'src', 'sheet_xuwei_v24.jpg')          # 2026-10-01 19:11, the player: 許葳, the Lounge's cleaner — the large face, and four expressions
+OC2 = os.path.join(ROOT, 'docs', 'v24', 'refs', 'outside_cast_2_reference_2026-10-01.png')   # 2026-10-01 11:44, the player: 小彤's mother and father, 老林, 國雄
 # (id, sheet, box, who / tone) — boxes in sheet px, found by the sheets' separators / the figures' ink
 CARDS = [
     ('v24_yj', YJ, (0, 0, 436, 572), '怡君'),
@@ -57,6 +61,31 @@ CARDS = [
     ('v24_xuwei_smile', XW, (984, 36, 1244, 324), '許葳 Small Smile'),
     ('v24_xuwei_amused', XW, (708, 352, 966, 640), '許葳 Mildly Amused'),
     ('v24_xuwei_done', XW, (984, 352, 1244, 640), '許葳 Deadpan/Already Done'),
+    # v2.4 P5 (rc7): the rest of the two outside-cast sheets (2026-10-01 11:42 / 11:44). Each column is one person: the
+    # large panel is the portrait, the two small ones under it two expressions. Boxes inside the sheets' light
+    # separators (measured: columns 437–443 / 884–888 / 1330–1335 and 442–448 / 883–890 / 1325–1333; the small panels'
+    # own at 674–677, 1110–1114, 1566–1569 and 659–663, 1102–1106, 1546–1548), so no neighbour's edge comes along.
+    ('v24_kevin', YJ, (445, 0, 883, 572), 'Kevin'),
+    ('v24_kevin_laugh', YJ, (445, 583, 673, 859), 'Kevin laugh'),
+    ('v24_kevin_side', YJ, (679, 583, 883, 859), 'Kevin side'),
+    ('v24_shan', YJ, (890, 0, 1329, 572), '珊珊'),
+    ('v24_shan_smile', YJ, (890, 583, 1109, 859), '珊珊 smile'),
+    ('v24_shan_down', YJ, (1116, 583, 1329, 859), '珊珊 looking down'),
+    ('v24_yx', YJ, (1337, 0, 1774, 572), '宇翔'),
+    ('v24_yx_smile', YJ, (1337, 583, 1565, 859), '宇翔 smile'),
+    ('v24_yx_side', YJ, (1571, 583, 1774, 859), '宇翔 side'),
+    ('v24_xtm', OC2, (0, 17, 441, 572), '小彤的媽媽'),
+    ('v24_xtm_smile', OC2, (0, 580, 220, 859), '小彤的媽媽 smile'),
+    ('v24_xtm_laugh', OC2, (226, 580, 440, 859), '小彤的媽媽 laugh'),
+    ('v24_xtf', OC2, (450, 17, 882, 572), '小彤的爸爸'),
+    ('v24_xtf_smile', OC2, (450, 580, 658, 859), '小彤的爸爸 smile'),
+    ('v24_xtf_side', OC2, (665, 580, 882, 859), '小彤的爸爸 side'),
+    ('v24_lin', OC2, (892, 17, 1324, 572), '老林'),
+    ('v24_lin_grin', OC2, (892, 580, 1101, 859), '老林 grin'),
+    ('v24_lin_laugh', OC2, (1108, 580, 1324, 859), '老林 laugh'),
+    ('v24_gx', OC2, (1334, 17, 1774, 572), '國雄'),
+    ('v24_gx_front', OC2, (1334, 580, 1545, 859), '國雄 front'),
+    ('v24_gx_side', OC2, (1550, 580, 1774, 859), '國雄 side'),
 ]
 
 
