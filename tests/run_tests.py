@@ -253,7 +253,7 @@ LAB_SOLVER = r"""(()=>{
    cands=cands.map(i=>({i,st:labStations([...known,i]).includes(v.st)?0:1,g:known.some(k=>labPair(k,i)==='great')?0:1})).sort((a,b)=>(a.g-b.g)||(a.st-b.st)).map(c=>c.i);
    let sel=null;for(const c of combos(cands,need)){const key=[...known,...c].sort().join('|');if(!tried.has(key)){sel=[...known,...c];tried.add(key);break}}
    if(!sel)break;labSel=sel.slice();act('labTry');tries++;total++;
-   const L=S.labLast;if(L&&L.kind==='potential'&&L.have){known=[...new Set([v.lead,...L.have])];missDirs=L.missDirs||null}}
+   const L=S.labLast;if(L&&L.kind==='potential'&&L.have&&(L.text||'').includes('（'+ST_N[v.st]+'）')){known=[...new Set([v.lead,...L.have])];missDirs=L.missDirs||null}}   /* rc7.4: the result says which kind of dish it is on its way to (「像是一道…（爐台）的雛形」); a player after the soup does not take the pizza's hint */
   log.push({d,n:v.n,tries,ok:S.unlocked.includes(d),last:S.labLast&&S.labLast.title})}
  return {log,total}})()"""
 
@@ -1320,7 +1320,7 @@ def research_is_solvable_from_visible_info(b, port, target):
     when the expansion or the oven arrives."""
     g = Game(b, port, target, seed=3, manual=True)
     g.click('[data-act=open]')
-    g.ev("S.money=1e6;S.level=5;S.eq.oven=1;S.eq.bar=1;S.eq.prep=1;phase='shop';showShop()")
+    g.ev("S.money=1e6;S.level=5;S.eq.oven=1;S.eq.bar=1;S.eq.prep=1;S.rooms=S.rooms||{};S.rooms.lounge=1;S.rooms.pizzaoven=1;phase='shop';showShop()")   # rc7.4: with the Lounge and the pizza oven, the bar pizza is in the lab too
     r = g.ev(LAB_SOLVER)
     bad = [e for e in r['log'] if not e['ok']]
     check(not bad, f'dishes the reasoning player could not research: {bad}')
