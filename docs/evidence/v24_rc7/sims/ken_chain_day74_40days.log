@@ -1,0 +1,46 @@
+player_day74_1508.json from Day 74, seeds 7600+; Lounge LV3, finished Day 57; Ken×杜 argued 2
+Day  74  Ken in:Y 杜:Y  ·  next None  majors []  Lounge $16410
+Day  75  Ken in:Y 杜:Y  ·  next None  majors ['wall_report']  Lounge $20900
+Day  76  Ken in:Y 杜:Y  ken_propose  next {'d': 79, 'n': 1}  majors ['up_inspect', 'ken_propose']  Lounge $11935
+Day  77  Ken in:Y 杜:Y  ·  next {'d': 79, 'n': 1}  majors []  Lounge $11035
+Day  78  Ken in:Y 杜:Y  ·  next {'d': 79, 'n': 1}  majors []  Lounge $12545  news: 明晚｜Ken 的品酒夜 · 8 席 吧台那晚留給品酒的客人。
+Day  79  Ken in:Y 杜:-  ken_t1 | tasting #1 8 seats: came 8, at the bar 8, Ken leave at [424, 300, 'front'], wines ['w_lred', 'w_fwhite', 'w_fred']  next {'d': 84, 'n': 2}  majors ['kt_night']  Lounge $18085  news: 今晚｜Ken 的品酒夜 · 8 席 吧台的位子留給品酒的客人；Ken 七點前後到，站在吧台後面主持。
+Day  80  Ken in:Y 杜:Y  ·  next {'d': 84, 'n': 2}  majors ['up_door', 'sm_c']  Lounge $11980
+Day  81  Ken in:Y 杜:Y  ·  next {'d': 84, 'n': 2}  majors ['wall_mediation', 'sm_d']  Lounge $10290
+Day  82  Ken in:Y 杜:Y  ·  next {'d': 84, 'n': 2}  majors []  Lounge $10040
+Day  83  Ken in:- 杜:Y  ·  next {'d': 84, 'n': 2}  majors ['qt_photo']  Lounge $10015  news: 明晚｜Ken 的品酒夜 · 8 席 吧台那晚留給品酒的客人。
+Day  84  Ken in:Y 杜:Y  ken_t2 | tasting #2 8 seats: came 8, at the bar 7, Ken leave at [424, 300, 'front'], wines ['w_fred', 'w_rose', 'w_orange']  next {'d': 89, 'n': 3}  majors ['kt_night']  Lounge $17440  news: 今晚｜Ken 的品酒夜 · 8 席 吧台的位子留給品酒的客人；Ken 七點前後到，站在吧台後面主持。
+Day  85  Ken in:Y 杜:Y  ·  next {'d': 89, 'n': 3}  majors ['kd_photo', 'sophie_mei_4']  Lounge $11705
+Day  86  Ken in:Y 杜:Y  ·  next {'d': 89, 'n': 3}  majors ['up_ask']  Lounge $11820
+Day  87  Ken in:Y 杜:Y  ·  next {'d': 89, 'n': 3}  majors []  Lounge $11940
+Day  88  Ken in:Y 杜:Y  ·  next {'d': 89, 'n': 3}  majors []  Lounge $13755  news: 明晚｜Ken 的品酒夜 · 8 席 吧台那晚留給品酒的客人。
+Day  89  Ken in:Y 杜:Y  ken_t3 ken_collab | tasting #3 8 seats: came 8, at the bar 8, Ken leave at [424, 300, 'front'], wines ['w_orange', 'w_pinot', 'w_cham']  next None  majors ['kt_night']  Lounge $18705  news: 今晚｜Ken 的品酒夜 · 8 席 吧台的位子留給品酒的客人；Ken 七點前後到，站在吧台後面主持。
+Day  90  Ken in:Y 杜:Y  ·  next None  majors []  Lounge $14260
+Day  91  Ken in:Y 杜:Y  ·  next None  majors []  Lounge $17030
+Day  92  Ken in:Y 杜:Y  ·  next None  majors []  Lounge $13380
+Day  93  Ken in:Y 杜:Y  ken_samples  next None  majors ['ken_samples']  Lounge $12145
+Day  94  Ken in:Y 杜:Y  ·  next None  majors []  Lounge $15120
+Day  95  Ken in:Y 杜:Y  ·  next None  majors []  Lounge $12865
+Day  96  Ken in:Y 杜:Y  ·  next None  majors []  Lounge $11700
+Day  97  Ken in:Y 杜:Y  ·  next None  majors []  Lounge $9945
+Day  98  Ken in:Y 杜:Y  ken_wine  next {'d': 105, 'n': 4}  majors ['ken_wine']  Lounge $15235 · 晚餐之後 x6
+Day  99  Ken in:Y 杜:Y  ·  next {'d': 105, 'n': 4}  majors []  Lounge $13035 · 晚餐之後 x2
+Day 100  Ken in:Y 杜:Y  ·  next {'d': 105, 'n': 4}  majors []  Lounge $12835 · 晚餐之後 x1
+Day 101  Ken in:Y 杜:Y  ·  next {'d': 105, 'n': 4}  majors []  Lounge $14940 · 晚餐之後 x2
+Day 102  Ken in:Y 杜:Y  du_wine  next {'d': 105, 'n': 4}  majors ['du_wine', 'milestone']  Lounge $15165 · 晚餐之後 x2
+Day 103  Ken in:Y 杜:-  ·  next {'d': 105, 'n': 4}  majors []  Lounge $15800 · 晚餐之後 x1
+Day 104  Ken in:Y 杜:Y  ·  next {'d': 105, 'n': 4}  majors []  Lounge $13055 · 晚餐之後 x3  news: 明晚｜Ken 的品酒夜 · 8 席 吧台那晚留給品酒的客人。
+Day 105  Ken in:Y 杜:Y  · | tasting #4 8 seats: came 8, at the bar 8, Ken leave at [424, 300, 'front'], wines ['w_jk', 'w_cham', 'w_old']  next {'d': 113, 'n': 5}  majors ['kt_night']  Lounge $24515 · 晚餐之後 x8  news: 今晚｜Ken 的品酒夜 · 8 席 吧台的位子留給品酒的客人；Ken 七點前後到，站在吧台後面主持。
+Day 106  Ken in:Y 杜:Y  ·  next {'d': 113, 'n': 5}  majors []  Lounge $13175
+Day 107  Ken in:Y 杜:Y  ·  next {'d': 113, 'n': 5}  majors []  Lounge $11460 · 晚餐之後 x2
+Day 108  Ken in:Y 杜:Y  ·  next {'d': 113, 'n': 5}  majors []  Lounge $14635 · 晚餐之後 x1
+Day 109  Ken in:Y 杜:Y  ·  next {'d': 113, 'n': 5}  majors ['sm_h']  Lounge $11895 · 晚餐之後 x2
+Day 110  Ken in:Y 杜:Y  ·  next {'d': 113, 'n': 5}  majors []  Lounge $10495 · 晚餐之後 x3
+Day 111  Ken in:Y 杜:Y  ·  next {'d': 113, 'n': 5}  majors []  Lounge $9585 · 晚餐之後 x3
+Day 112  Ken in:Y 杜:Y  ·  next {'d': 113, 'n': 5}  majors []  Lounge $8525 · 晚餐之後 x1  news: 明晚｜Ken 的品酒夜 · 8 席 吧台那晚留給品酒的客人。
+Day 113  Ken in:Y 杜:Y  · | tasting #5 8 seats: came 8, at the bar 8, Ken leave at [424, 300, 'front'], wines ['w_jk', 'w_spark', 'w_white']  next {'d': 125, 'n': 6}  majors ['kt_night']  Lounge $15555 · 晚餐之後 x10  news: 今晚｜Ken 的品酒夜 · 8 席 吧台的位子留給品酒的客人；Ken 七點前後到，站在吧台後面主持。
+
+the day each happened: {'ken_lounge': None, 'ken_propose': 76, 'ken_t1': 79, 'ken_t2': 84, 'ken_t3': 89, 'ken_collab': 89, 'ken_samples': 93, 'ken_wine': 98, 'du_wine': 102}
+tasting nights hosted: 5 | on the list: True
+page errors: []
+40 days in 123s

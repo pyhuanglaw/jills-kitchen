@@ -2019,7 +2019,7 @@ def v24_rc6_qing_and_tuo_move_on(b, port, target):
     owe = json.loads(g.ev("JSON.stringify({owe:story().owe,owed:majorOwed(),day:S.day})"))
     check(owe['owed'] == 'qt_3' and owe['day'] == 72, f'Day 72: the day\'s major slot is kept for the beat that waited: {owe}')
     g.ev("window.__E=STORY_EV.find(e=>e.k==='sm_c');__E.__w=__E.when;__E.when=()=>true;__E.__p=__E.present;__E.present=[{run:()=>factSet('sm_c')}]")
-    g.ev("R.t=R.dur*.3;storyTick('seat',{g:R.groups[0]||null})")
+    g.ev("if(S.story.v24)S.story.v24.res=null;R.t=R.dur*.3;storyTick('seat',{g:R.groups[0]||null})")   # (no visit came for a beat today: rc7's Ken may — that would hold the other slot too)
     check(g.ev("!!fact('sm_c')") and g.ev("storyDay().major") == 1, 'rc7 (two major slots a day): another major beat due earlier takes the other slot')
     g.ev("STORY_EV.push({k:'__t_third',lane:'major',cls:'A',floor:1,at:['seat'],w:()=>1e9,when:()=>true,run:()=>{}});R.t=R.dur*.6;storyTick('seat',{g:R.groups[0]||null})")
     check(g.ev("evState('__t_third').n") == 0 and g.ev("evState('__t_third').miss") >= 1 and g.ev("storyDay().major") == 1, 'a third waits (counted): the last slot is kept for 「多的。」')
@@ -2293,4 +2293,184 @@ def v24_rc7_a_line_finds_its_table(b, port, target):
         st = mark()
         check('已經離開了' not in st['toast'] and st['room'] == 'main' and st['m'] and st['m'][-1]['label'] == '衛生檢查員', f'the inspector is found where he walks: {st}')
     g.ev("R.insp=null")
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+KEN_N = '品酒師 Ken'
+
+
+def _ken_lounge_guest(g, name):
+    """someone walks in for the Lounge now (Ken or 杜 as a guest), seated there; returns whether they sat in the Lounge"""
+    return g.ev("""(()=>{const n0=R.groups.length;spawn({t:R.t,type:'gourmet',size:1,name:%s,lounge:1});const q=R.groups[R.groups.length-1];return !!(q&&q.table!=null&&R.tables[q.table].room==='lounge')})()""" % json.dumps(name, ensure_ascii=False))
+
+
+@test
+def v24_rc7_ken_comes_back_and_proposes_a_tasting(b, port, target):
+    """the player's KEN / LOUNGE STORY CONTINUITY PASS (15:24): the finished Lounge is where Ken's next chapter begins. A save
+    whose Lounge was open long before (the player's Day 74: finished on Day 57) skips his first look and starts at the
+    proposal — not on the first day played, with a line that says he has been coming for weeks; the proposal plans the
+    first tasting three days on, and the news says so the day before and on the day. A Lounge just finished: his first
+    look first (no congratulation; he counts the stools), the proposal two days later at the earliest. One Ken scene a
+    day; tastings are only his."""
+    g = Game(b, port, target, seed=1524, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day74_1508.json')
+    g.ev("kenS()")
+    st = json.loads(g.ev("JSON.stringify({first:kenS().first,day:S.day,legacy:kenLegacy(),done:loungeDoneDay(),lounge:kenLoungeDue(),propose:kenProposeDue()})"))
+    check(st['legacy'] and st['first'] == st['day'] and not st['lounge'] and not st['propose'], f'the Lounge open since Day {st["done"]}: no first look, and nothing on the first day played: {st}')
+    g.ev("kenS().first=S.day-1")
+    check(g.ev("kenProposeDue()") is True, 'the next day the proposal is due')
+    wants = json.loads(g.ev("JSON.stringify(V24_WANTS.map(f=>{try{return f()||[]}catch(e){return[]}}).flat().filter(w=>w.name===KEN).map(w=>w.k||w.grp))"))
+    check('ken_propose' in wants, f'the day\'s plan brings him to the Lounge for it: {wants}')
+    to_service(g)
+    g.ev("window.__fastSay=1")
+    g.ev("__botUntil('R.t>=R.dur*.3',90000,1/30)")
+    g.ev("const d=storyDay();d.major=0;d.lp={};d.seen={};if(S.story.v24)S.story.v24.res=null;S.story.owe=null;for(const q of R.groups.slice())if(namedId(q)===KEN){leaveGroup(q,'ok');q.gone=true}R.groups=R.groups.filter(q=>!q.gone);(story().named[KEN]||{}).seen=0")
+    check(_ken_lounge_guest(g, KEN_N), 'Ken sits down in the Lounge')
+    page = json.loads(g.ev("JSON.stringify((story().beatLines||{}).ken_propose||[])"))
+    txt = ' / '.join(x['t'] for x in page)
+    check(g.ev("!!fact('ken_propose')") and '這裡其實可以辦品酒。' in txt and '我在這裡坐了好幾個晚上了。' in txt and '我主持。酒我挑，菜妳配。' in txt, f'the proposal, with the line for a Lounge he has sat in for weeks: {txt}')
+    check(json.loads(g.ev("JSON.stringify(kenS().next)")) == {'d': g.ev("S.day") + 3, 'n': 1}, 'the first night three days on')
+    check(g.ev("kenQuiet()") is False and g.ev("kenLoungeDue()") is False, 'one Ken scene today; his first look never comes in this save')
+    check(not any(k in txt for k in ('終於完成', '這裡真的很棒', '實現夢想')), 'no congratulation')
+    # the news: the day before, and the day
+    g.ev("kenS().next.d=S.day+1")
+    check('明晚｜Ken 的品酒夜 · 8 席' in g.ev("kenNewsHTML()"), 'the day before: 明晚｜Ken 的品酒夜 · 8 席')
+    g.ev("kenS().next.d=S.day")
+    check('今晚｜Ken 的品酒夜 · 8 席' in g.ev("kenNewsHTML()"), 'the day: 今晚｜Ken 的品酒夜 · 8 席')
+    # a Lounge just finished: his first look first
+    g.ev("delete story().facts.ken_propose;delete story().ev.ken_propose;delete (story().beatLines||{}).ken_propose;kenS().next=null;kenS().first=S.day;story().facts.lounge_built_1={d:S.day-1,n:1,l:S.day-1};const d=storyDay();d.major=0;d.lp={};d.seen={};for(const q of R.groups.slice())if(namedId(q)===KEN){leaveGroup(q,'ok');q.gone=true}R.groups=R.groups.filter(q=>!q.gone)")
+    check(g.ev("kenLegacy()") is False and g.ev("kenLoungeDue()") is True and g.ev("kenProposeDue()") is False, 'a Lounge finished yesterday: his first look is due, the proposal is not')
+    g.ev("(story().named[KEN]||{}).seen=0")
+    check(_ken_lounge_guest(g, KEN_N), 'Ken sits down in the Lounge')
+    page = json.loads(g.ev("JSON.stringify((story().beatLines||{}).ken_lounge||[])"))
+    txt = ' / '.join(x['t'] for x in page)
+    check(g.ev("!!fact('ken_lounge')") and '跟我想的不一樣。' in txt and '這裡坐滿是幾個人？' in txt and not any(k in txt for k in ('終於完成', '這裡真的很棒', '實現夢想')), f'his first look: no speech, he counts the stools: {txt}')
+    check(g.ev("kenProposeDue()") is False, 'the proposal waits two days')
+    g.ev("story().facts.ken_lounge.d=S.day-2"); check(g.ev("kenProposeDue()") is True, '...then it can come')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc7_ken_hosts_his_tasting_nights(b, port, target):
+    """Ken's tasting nights (15:24 / 15:33): the first is a scene that holds the restaurant — the panel opens with the
+    player's picture, nothing moves until it is tapped, one line a tap, and the evening goes on exactly where it was
+    after it. He is perceptibly there: behind the bar with a glass (not on a stool), the bar's stools are for the people
+    who came (an ordinary guest cannot take one that night), the glasses set out, the board; the guests order two or three
+    of tonight's wines. When the last of them has gone: 「所以下次換一支。」, the second night planned. The second night
+    is not the first again (returning faces, 杜 at the end of the bar, a different set of wines); the third ends with
+    「做一支我們自己的。」 — and the wine cannot be talked about before it. The count survives a reload."""
+    g = Game(b, port, target, seed=1533, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day74_1508.json')
+    g.ev("factSet('ken_propose');kenS().next={d:S.day,n:1};kenS().back=[];showPrep()")
+    check('今晚｜Ken 的品酒夜 · 8 席' in g.ev("$('#screen').innerText"), 'the news before opening')
+    check(g.ev("!!fact('ken_collab')") is False and g.ev("kenSamplesDue()") is False, 'no talk of a wine before three nights')
+    to_service(g)
+    g.ev("window.__noScenes=false;window.__holds=true")
+    for _ in range(3000):
+        g.page.evaluate('()=>window.__bot(30,1/30)')
+        if g.ev("!!(DLG&&DLG.sh&&DLG.sh.k==='ken_t1')") or g.ev("phase") != 'service': break
+    check(g.ev("!!(DLG&&DLG.sh&&DLG.sh.k==='ken_t1')"), 'the first night begins as a held scene')
+    st = json.loads(g.ev("""JSON.stringify({host:R.kt.host.state,hx:Math.round(R.kt.host.x-KEN_HOST.x),hy:Math.round(R.kt.host.y-KEN_HOST.y),room:R.kt.host.room,table:R.kt.host.table,
+      bar:R.kt.guests.filter(q=>q.table!=null&&R.tables[q.table].kind==='bar'&&['reading','order','wait','eat','check'].includes(q.state)).length,
+      stools:loungeTables().filter(t=>t.kind==='bar').length,tst:loungeTables().filter(t=>t.kind==='bar'&&t.tst).length,
+      other:loungeTables().filter(t=>t.kind==='bar').some(t=>stoolFree(t,{})),guest:loungeTables().filter(t=>t.kind==='bar').every(t=>stoolFree(t,{tasting:1})||!!t.hold),illus:!!(story().illus||{}).ken_t1,hold:$('#dlg .dlg-hold').textContent})"""))
+    check(st['host'] == 'host' and abs(st['hx']) <= 2 and abs(st['hy']) <= 2 and st['room'] == 'lounge' and st['table'] is None, f'Ken behind the bar, not on a stool: {st}')
+    check(st['bar'] >= 4 and st['tst'] == st['stools'] and not st['other'] and st['guest'], f'the bar is the tasting\'s: {st}')
+    check(st['illus'] and '店裡暫停中' in st['hold'] and 'Ken' in st['hold'], f'the picture, and the restaurant held: {st}')
+    t0, i0 = g.ev("R.t"), g.ev("DLG.i")
+    g.ev("for(let i=0;i<10;i++)__tick(1000)")
+    check(g.ev("R.t") == t0 and g.ev("DLG.i") == i0, 'nothing moves while it is open, and the words wait for a tap')
+    seen = []
+    for _ in range(20):
+        if not g.ev("!!(DLG&&DLG.sh)"): break
+        seen.append(g.ev("$('#dlg .dlg-text').textContent")); g.ev("__tick(300);dlgNext()")
+    check('我就知道一定有人不聽。' in seen and '今天三支。不用猜是哪裡的酒，先喝。' in seen, f'the first night\'s words, one per tap: {seen}')
+    g.ev("for(let i=0;i<30;i++)__tick(1000/30)")
+    check(g.ev("R.t") > t0, 'the evening goes on where it was')
+    g.ev("window.__holds=false;window.__noScenes=true;window.__fastSay=1")
+    g.ev("__botUntil('R.kt.guests.some(q=>q.ticket&&q.ticket.items.length>=2)',30000,1/30)")
+    od = json.loads(g.ev("JSON.stringify(R.kt.guests.filter(q=>q.ticket).map(q=>q.ticket.items.filter(i=>R.kt.wines.includes(i.d)).length))"))
+    check(od and all(n >= 2 for n in od), f'each orders two or three of tonight\'s wines: {od}')
+    g.ev("setRoom('main');idFocusWho('named:'+KEN)")
+    check(g.ev("room") == 'lounge' and g.ev("IDF.length&&IDF[IDF.length-1].label") == KEN_N, 'a line of his finds him behind the bar')
+    g.ev("__botUntil('R.kt.end',120000,1/30)")
+    page = ' / '.join(x['t'] for x in json.loads(g.ev("JSON.stringify(story().beatLines.ken_t1)")))
+    check('所以下次換一支。' in page and json.loads(g.ev("JSON.stringify(kenS().next)")) == {'d': g.ev("S.day") + 5, 'n': 2}, f'the end of the night, on the same page; the second planned: {page}')
+    check(g.ev("loungeTables().some(t=>t.tst)") is False and g.ev("kenNightClose.length>=0") and g.ev("R.kt.end") == 1, 'the bar is everyone\'s again')
+    check(len(json.loads(g.ev("JSON.stringify(kenS().back||[])"))) >= 2, 'a few of tonight\'s faces are remembered')
+    # the count survives a reload
+    g.ev("__botUntil('phase!==\\'service\\'',90000,1/30)")
+    g.ev("save()"); g.reload(); g.page.wait_for_timeout(150)
+    rel = json.loads(g.ev("JSON.stringify({t1:!!fact('ken_t1'),tn:factN('ken_tn'),next:kenS().next})"))
+    check(rel['t1'] and rel['tn'] == 1 and rel['next']['n'] == 2, f'after a reload: {rel}')
+    # the second and the third: a day each
+    for n in (2, 3):
+        if g.ev("phase") == 'title':
+            g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(120)
+        for _ in range(3):
+            if g.ev("phase") == 'summary': g.click('[data-act=toShop]'); g.page.wait_for_timeout(60)
+            if g.ev("phase") == 'shop': g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(100)
+        g.ev("kenS().next.d=S.day")
+        to_service(g)
+        g.ev("window.__fastSay=1")
+        g.ev("__botUntil('!R||(R.kt&&R.kt.end)',150000,1/30)")
+        check(g.ev("!!(R&&R.kt&&R.kt.end)"), f'night {n} came and ended: {g.ev("JSON.stringify({phase,day:S.day,next:kenS().next,R:!!R,kt:!!(R&&R.kt),tr:story().trace.filter(t=>t.d===S.day).map(t=>t.k)})")}')
+        k = json.loads(g.ev("JSON.stringify({n:R.kt.n,wines:R.kt.wines,du:R.kt.du,duIn:R.kt.guests.some(q=>namedId(q)===DU),back:R.kt.guests.filter(q=>(kenS().back||[]).some(b=>b.name===q.name)).length,f:['ken_t2','ken_t3','ken_collab'].filter(k=>fact(k))})"))
+        if n == 2:
+            check(k['n'] == 2 and 'ken_t2' in k['f'] and 'ken_collab' not in k['f'] and k['back'] >= 1, f'the second night: returning faces: {k}')
+            check(k['du'] and k['duIn'] and g.ev("relN(KEN_ID,DU_ID,'argued')") >= 3, f'杜 at the end of the bar, and they disagree: {k}')
+            p2 = ' / '.join(x['t'] for x in json.loads(g.ev("JSON.stringify(story().beatLines.ken_t2)")))
+            check('這支配那道，太輕。' in p2 and '下次換一支。' in p2, f'the second night\'s page: {p2}')
+            w2 = k['wines']
+        else:
+            check(k['n'] == 3 and 'ken_t3' in k['f'] and 'ken_collab' in k['f'] and k['wines'] != w2, f'the third night, a different set of wines, and the wine: {k}')
+            pc = ' / '.join(x['t'] for x in json.loads(g.ev("JSON.stringify(story().beatLines.ken_collab)")))
+            check('三次了。' in pc and '做一支我們自己的。' in pc and g.ev("kenS().samples") == g.ev("S.day") + 4 and g.ev("kenS().next") is None, f'「做一支我們自己的。」 {pc}')
+        g.ev("__botUntil('phase!==\\'service\\'',90000,1/30)")
+    check(g.ev("factN('ken_tn')") == 3 and g.ev("factN('ken_t1')+factN('ken_t2')+factN('ken_t3')") == 3, 'three nights, each once')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc7_the_wine_and_monsieur_du(b, port, target):
+    """「晚餐之後」 — JILL'S KITCHEN × KEN (15:24 and the 杜 payoff): three samples tasted against Jill's signature after
+    closing, the name is hers; the wine comes in the afternoon and is on the Lounge's list from then on (not researched;
+    about a pinot's price; it goes with the signature; the list says whose it is); once. 杜 tastes it days later, never the
+    night it came out, only with their arguments behind them: he still says it is too light — and that it is good,
+    sincerely. Afterwards he orders it now and then, unexplained."""
+    g = Game(b, port, target, seed=1535, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day74_1508.json')
+    g.ev("for(const k of ['ken_propose','ken_t1','ken_t2','ken_t3','ken_collab']){const d=S.day-12;story().facts[k]={d,n:1,l:d}}kenS().samples=S.day;kenS().next=null")
+    check(g.ev("wineHas('w_jk')") is False and 'w_jk' not in json.loads(g.ev("JSON.stringify(wineAvail())")), 'not on the list before it exists')
+    to_service(g)
+    g.ev("window.__fastSay=1")
+    g.ev("__botUntil('R.t>=R.dur*.2',90000,1/30)")
+    g.ev("(story().named[KEN]=story().named[KEN]||{v:0,dishes:{}}).seen=S.day;const d=storyDay();d.major=0;d.lp={};d.seen={};storyTick('close',{})")
+    pg = ' / '.join(x['t'] for x in json.loads(g.ev("JSON.stringify((story().beatLines||{}).ken_samples||[])")))
+    check(g.ev("!!fact('ken_samples')") and '叫「晚餐之後」。' in pg and '這裡就是這樣開始的。吃完飯以後，還有地方可以坐。' in pg and g.ev("kenS().wineD") == g.ev("S.day") + 5, f'after closing: the samples, the name: {pg}')
+    g.ev("S.day++;kenS().wineD=S.day;const d=storyDay();d.major=0;d.lp={};d.seen={};storyTick('daystart',{})")   # the next day (one Ken scene a day)
+    check(g.ev("!!fact('ken_wine')") and g.ev("wineHas('w_jk')") and 'w_jk' in json.loads(g.ev("JSON.stringify(wineList())")), 'the wine is in, on tonight\'s list')
+    w = json.loads(g.ev("JSON.stringify({n:WINES.w_jk.n,p:priceOf('w_jk'),pinot:priceOf('w_pinot'),cham:priceOf('w_cham'),dev:WINES.w_jk.dev||null,pair:winePairOk('w_jk',{type:'office'},['signature']),same:Object.keys(WINES).filter(k=>WINES[k].n==='晚餐之後').length,illus:!!(story().illus||{}).ken_wine})"))
+    check(w['n'] == '晚餐之後' and w['pinot'] < w['p'] < w['cham'] and w['dev'] is None and w['pair'] and w['same'] == 1 and w['illus'], f'its place on the list — not overpowered, not researched, with the signature: {w}')
+    g.ev("showPrep()") if g.ev("phase") != 'service' else None
+    html = g.ev("wineTonightHTML()")
+    check('晚餐之後' in html and "JILL'S KITCHEN × KEN" in html, 'the list says whose it is')
+    g.ev("const d=storyDay();d.major=0;d.lp={};d.seen={};storyTick('daystart',{})")
+    check(g.ev("factN('ken_wine')") == 1, 'it comes once')
+    # 杜, not the night it came out
+    g.ev("const d=storyDay();d.major=0;d.lp={};d.seen={};for(const q of R.groups.slice())if([KEN,DU].includes(namedId(q))){leaveGroup(q,'ok');q.gone=true}R.groups=R.groups.filter(q=>!q.gone);for(const n of [KEN,DU])(story().named[n]||{}).seen=0")
+    check(g.ev("duWineDue()") is False, 'not the night it came out')
+    g.ev("story().facts.ken_wine.d=S.day-4;story().facts.ken_wine.l=S.day-4")
+    check(g.ev("duWineDue()") is True, 'four days on, with their arguments behind them, it can come')
+    _ken_lounge_guest(g, KEN_N); _ken_lounge_guest(g, 'Monsieur 杜')
+    g.ev("const d=storyDay();d.major=0;d.lp={};d.seen={};storyTick('lounge',{g:R.groups[R.groups.length-1]})")
+    pd = [x['t'] for x in json.loads(g.ev("JSON.stringify((story().beatLines||{}).du_wine||[])"))]
+    check(g.ev("!!fact('du_wine')") and '太輕。要我選，不會往這個方向走。' in pd and '可是它很好。' in pd and '我說的是酒，不是客氣。' in pd, f'he still disagrees, and he says it is good: {pd}')
+    check(not any(x in ' '.join(pd) for x in ('還可以', '勉強及格', '至少能喝', '怎麼樣？好喝嗎？')), 'nothing that takes the compliment back; nobody asks anxiously')
+    check(g.ev("relN(KEN_ID,DU_ID,'respected')") == 1 and g.ev("(story().illus||{}).du_wine!=null"), 'the respect is remembered; the picture')
+    # afterwards: he orders it now and then
+    g.ev("window.__mr=Math.random;Math.random=()=>.05")
+    o = json.loads(g.ev("JSON.stringify(loungeOrder(R.groups.find(q=>namedId(q)===DU)))"))
+    g.ev("Math.random=window.__mr")
+    check('w_jk' in o, f'杜 orders it again, without a word about it: {o}')
     check(not g.errors, g.errors[:3]); g.close()

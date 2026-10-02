@@ -1,0 +1,519 @@
+KEN / LOUNGE STORY CONTINUITY PASS
+Priority: please do this before expanding unrelated P5 staff stories.
+
+I found a narrative continuity problem in the current game:
+
+Ken is a sommelier / wine professional and is an important character in the Lounge becoming part of Jill's Kitchen.
+
+But after the Lounge is actually built, Ken currently does not have enough story that follows from that change.
+
+This feels wrong.
+
+Ken should not function as:
+Ken appears → helps trigger Lounge → Lounge is built → Ken's role is finished → later Ken × Monsieur Du suddenly happens.
+
+The Lounge being completed should instead be the BEGINNING of the next stage of Ken's story.
+
+==================================================
+CORE STORY CHAIN
+==================================================
+
+Please build / revise Ken's progression around this chain:
+
+Ken
+→ Lounge becomes possible
+→ Lounge is completed
+→ Ken returns and experiences the finished Lounge
+→ Ken proposes holding a wine tasting event
+→ Ken personally hosts the tasting
+→ tasting becomes an occasional Lounge event
+→ Ken hosts THREE tasting events over time
+→ after the third hosted tasting, Jill and Ken develop a Jill's Kitchen × Ken collaboration wine
+→ the collaboration wine permanently enters the restaurant's wine list
+→ Ken's later story, including Monsieur Du, continues naturally from this established history
+
+This should feel like one continuous relationship between:
+KEN + JILL + LOUNGE + WINE
+
+not a collection of unrelated unlocks.
+
+==================================================
+KEN CANON
+==================================================
+
+Ken is 36.
+
+He is a sommelier / wine professional.
+
+He is intelligent, relaxed, mature, slightly playful.
+
+His wine knowledge is already established.
+
+DO NOT write a story about discovering why Ken knows wine.
+
+DO NOT turn him into a tutorial NPC.
+
+DO NOT make him lecture Jill or the player about basic wine knowledge.
+
+The point is:
+
+After the Lounge exists, we finally get to SEE Ken actually doing what he is good at.
+
+His professional competence should reveal more of his personality.
+
+==================================================
+BEAT 1 — KEN RETURNS TO THE FINISHED LOUNGE
+==================================================
+
+Soon after the Lounge is completed, Ken should have an authored follow-up.
+
+He comes into the actual finished Lounge.
+
+Let him experience the space naturally:
+- sit at the bar / Lounge
+- order wine
+- look around
+- notice how Jill actually built and uses the space
+
+Do not make this a long congratulatory scene.
+
+Avoid:
+「終於完成了。」
+「這裡真的很棒。」
+「妳實現夢想了。」
+generic emotional exposition.
+
+The important outcome is that Ken sees the real space and starts thinking about what could happen here.
+
+This leads naturally into his suggestion.
+
+==================================================
+BEAT 2 — KEN PROPOSES A WINE TASTING
+==================================================
+
+Ken himself should suggest:
+
+Why not hold a small wine tasting here?
+
+Not a giant event.
+
+Something appropriate for Jill's Kitchen Lounge:
+roughly 6–8 guests.
+
+Example tone only, NOT mandatory exact dialogue:
+
+Ken：「這裡其實可以辦品酒。」
+Jill：「在這裡？」
+Ken：「嗯。不用很多人。六個、八個就夠了。」
+Jill：「你要辦？」
+Ken：「我可以主持。」
+
+Keep the dialogue understated and natural.
+
+Ken is proposing something because he can genuinely imagine doing it here.
+
+==================================================
+FIRST WINE TASTING
+==================================================
+
+The first tasting MUST be an authored story event.
+
+The player should actually SEE Ken hosting.
+
+This is important.
+
+Do not reduce it to:
+"Wine tasting completed +$X"
+
+For the first time, the player should see a different side of Ken:
+professional, comfortable, confident, but still recognizably Ken.
+
+He should not suddenly become a stiff lecturer.
+
+For example, his hosting can be lightly playful:
+
+Ken：「不用猜產區。先喝。」
+
+Someone immediately starts guessing.
+
+Ken：「我就知道一定有人不聽。」
+
+This is only tone guidance.
+Write dialogue that fits existing Ken canon.
+
+Jill / Lounge staff can naturally be present because they are working.
+
+==================================================
+IMPORTANT PRESENTATION RULE
+==================================================
+
+This is an AUTHORED / NON-MISSABLE story event.
+
+If it occurs during service:
+
+PAUSE ACTIVE RESTAURANT GAMEPLAY.
+
+- gameplay time freezes
+- order/service pressure freezes
+- dialogue does NOT auto-advance
+- player taps/clicks to advance
+- resume the exact service state after the scene
+
+Do not make the player manage customers while trying to read Ken's story.
+
+Ambient tasting behavior may happen in realtime, but important authored dialogue must be player-controlled.
+
+==================================================
+AFTER FIRST TASTING — RECURRING WORLD EVENT
+==================================================
+
+After the authored first tasting succeeds, unlock:
+
+KEN'S WINE TASTING NIGHT
+
+as an occasional Lounge event.
+
+Do NOT create a giant event-management system.
+
+Keep it lightweight and integrated into existing restaurant systems.
+
+Example Today News:
+
+今晚｜Ken 的品酒夜 · 8 席
+
+During a tasting:
+- Ken must actually be present
+- he is the host
+- appropriate Lounge seats may be reserved
+- guests drink wine
+- paired dishes can naturally be ordered / served
+- Lounge visually feels slightly different from an ordinary night
+- the event may produce higher spend if consistent with the existing economy
+
+The important thing is PERCEPTIBILITY.
+
+The player should be able to tell:
+"Tonight is Ken's tasting."
+
+Not merely receive a hidden modifier.
+
+==================================================
+THREE HOSTED TASTINGS
+==================================================
+
+Ken must personally host THREE tasting events before the collaboration wine story becomes available.
+
+Do not make all three identical.
+
+They should show progression.
+
+TASTING #1
+- first trial
+- authored introduction
+- Ken establishes himself as host
+
+TASTING #2
+- the event is becoming familiar
+- some returning guests / different wines / different food pairings / small variation
+- Ken and Jill already understand the rhythm better
+
+TASTING #3
+- this now feels like something Jill's Kitchen actually does
+- Ken and Jill have developed working shorthand
+- it should feel established rather than experimental
+
+Do not turn this into:
+1/3
+2/3
+3/3
+
+No quest counter UI.
+
+The game may track the count internally.
+
+The player should experience three events, not grind a visible progress bar.
+
+==================================================
+AFTER THIRD TASTING — COLLABORATION WINE
+==================================================
+
+After Ken has hosted the third tasting, trigger an authored follow-up.
+
+This is the payoff.
+
+Ken and Jill decide to make:
+
+JILL'S KITCHEN × KEN
+COLLABORATION WINE
+
+The idea should emerge naturally from what they have been doing together.
+
+Do NOT present it as an achievement popup.
+
+A possible tone:
+
+After closing / after the third tasting,
+Ken is still at the bar.
+A few glasses remain.
+
+Jill：「三次了。」
+Ken：「妳有在數？」
+Jill：「你每次都說下次換一支。」
+Ken：「那不要換了。」
+Jill：「嗯？」
+Ken：「做一支自己的。」
+
+Again:
+tone reference only.
+Rewrite naturally if needed.
+
+==================================================
+WHAT "COLLABORATION WINE" MEANS
+==================================================
+
+Ken is a sommelier / wine professional.
+
+Do NOT suddenly make Ken and Jill operate a winery.
+
+Do NOT add vineyard/farming/winemaking simulation.
+
+The collaboration can plausibly involve:
+- Ken's professional wine connections
+- working with an existing winery / producer / supplier
+- selecting or developing an appropriate wine/style
+- Jill contributing the restaurant / food-pairing perspective
+- choosing what fits Jill's Kitchen
+- finalizing the bottle as their collaboration
+
+Keep the production side believable but lightweight.
+
+The story is about:
+Ken + Jill having done this together enough times that they create something lasting.
+
+==================================================
+PERMANENT WORLD CONSEQUENCE
+==================================================
+
+When the collaboration is complete:
+
+The collaboration wine PERMANENTLY enters the Jill's Kitchen wine list.
+
+This is important.
+
+The story should leave something behind in the restaurant.
+
+It can have:
+- its own wine-list entry
+- short description
+- food pairing(s)
+- reasonable gameplay effect/value consistent with the existing wine system
+
+But:
+
+DO NOT make it absurdly overpowered.
+
+Its emotional value is that the player knows where it came from.
+
+Normal customers may order it later.
+
+Ken may occasionally order / comment on it.
+
+Future tasting nights may include it.
+
+Monsieur Du may eventually have his own opinion about it if appropriate.
+
+The collaboration wine should become part of the restaurant's ordinary life.
+
+==================================================
+MONSIEUR DU CONNECTION
+==================================================
+
+Please inspect the existing Ken × Monsieur Du 8-beat story.
+
+Do NOT destroy or rewrite good existing material unnecessarily.
+
+But make sure it now follows naturally from Ken's established Lounge life.
+
+Monsieur Du should not feel like:
+
+"Randomly, Ken now has another story."
+
+If compatible with existing canon, one elegant entry point is a later Ken tasting.
+
+Ken is hosting.
+
+Monsieur Du is attending / present.
+
+He hears Ken say something about a wine.
+
+Monsieur Du makes a restrained comment or disagreement.
+
+Ken notices him.
+
+Do NOT write this as dramatic rivalry introduction.
+
+No:
+「看來遇到對手了。」
+「有意思。」
+anime rival clichés.
+
+They are two mature men who know wine.
+
+The interest should come from specificity, restraint and professional recognition.
+
+If the existing Ken × Du story already has a stronger canonical first meeting, preserve it and connect the tasting history another way.
+
+==================================================
+USE EXISTING SYSTEMS
+==================================================
+
+IMPORTANT:
+
+We just added:
+- wine-list research
+- wine / food pairing
+- tasting-related upgrades/training
+- wine cellar
+- Lounge
+- Lounge staff
+
+Use these systems where appropriate.
+
+Do NOT build duplicate systems.
+
+The point is to make existing restaurant systems acquire narrative meaning.
+
+For example:
+
+Wine research should no longer feel completely disconnected from Ken.
+
+Wine pairing can matter during tasting nights.
+
+The wine cellar can become relevant later if already owned.
+
+But:
+
+DO NOT hard-lock the core Ken story behind expensive optional upgrades unless narratively necessary.
+
+The player built the Lounge.
+That is the main prerequisite for this next chapter of Ken.
+
+==================================================
+DESIGN PRINCIPLE
+==================================================
+
+This is the model I want:
+
+STORY
+→ changes the restaurant
+→ the changed restaurant creates new situations
+→ those situations create more story
+→ story leaves permanent traces in everyday gameplay
+
+Ken helped create the Lounge.
+
+Therefore the Lounge should create the next chapter of Ken.
+
+After three tastings, Ken and Jill create the collaboration wine.
+
+The collaboration wine then remains in the restaurant even when no story scene is playing.
+
+That is the feeling I want.
+
+Characters should NOT disappear after functioning as unlock keys.
+
+==================================================
+PACING
+==================================================
+
+Do not dump all of this immediately after Lounge construction.
+
+There should be ordinary restaurant days between meaningful beats.
+
+But do not create another giant dead zone.
+
+The player should understand fairly soon after Lounge completion:
+
+"Ken's story is continuing here."
+
+Use existing major-story pacing rules.
+
+Do not let unrelated story scheduling permanently starve this line.
+
+If a valid Ken major beat is displaced by another major beat, preserve the existing next-day priority / anti-starvation behavior.
+
+==================================================
+LEGACY SAVE / CURRENT SAVE
+==================================================
+
+This must work safely for mature saves where:
+
+- Lounge is already built
+- Ken has already appeared
+- some Ken × Du progress may already exist
+- wine systems may already be unlocked
+- player may be around Day 70+
+
+DO NOT reset Ken.
+
+DO NOT replay incompatible old scenes.
+
+DO NOT corrupt existing Ken × Du progress.
+
+Create a safe legacy entry / reconstruction strategy.
+
+If Lounge already exists but the new post-Lounge Ken sequence has never occurred, enter at the earliest narratively valid new beat.
+
+If existing Ken × Du history means a specific new scene would contradict established events, adapt or skip that scene rather than rewriting history.
+
+No catch-up dump.
+
+No multiple Ken scenes on one day merely because the save is mature.
+
+==================================================
+QA
+==================================================
+
+Please verify at minimum:
+
+1. Lounge completion can lead into Ken's post-Lounge story.
+2. Ken proposes the tasting.
+3. First tasting is actually visible and hosted by Ken.
+4. Authored tasting dialogue pauses gameplay and uses manual advancement.
+5. Restaurant resumes safely afterward.
+6. Tasting #2 and #3 can occur without duplicating #1.
+7. Three hosted tastings are tracked reliably across save/load.
+8. Collaboration wine cannot unlock before three hosted tastings.
+9. After #3, collaboration-wine story can trigger.
+10. Collaboration wine permanently enters wine list.
+11. It works with existing food-pairing / wine systems.
+12. Ken remains correctly identified in customer/dialogue/table focus systems.
+13. Ken × Monsieur Du existing story remains coherent.
+14. Mature RC6 saves migrate safely.
+15. No catch-up story dump.
+16. Mobile UI remains readable.
+17. No regression to Lounge service/orders/reservations.
+18. No duplicate Ken / duplicate collaboration wine.
+19. Story state survives reload.
+20. Ambient Ken behavior after completion acknowledges the history at low frequency.
+
+==================================================
+PRIORITY / EXECUTION
+==================================================
+
+Treat this as a continuity repair / expansion of the existing Lounge + Ken arc, not as an unrelated feature request.
+
+Please inspect the existing Ken, Lounge, wine, tasting, and Ken × Monsieur Du implementation first.
+
+Reuse what already exists.
+
+Do not create a giant new framework if the existing story/event architecture can support it.
+
+If an existing Ken × Du beat conflicts with this proposal:
+REPORT the exact conflict and recommend the smallest coherent adjustment.
+
+REPORT ≠ STOP.
+
+Continue all unaffected safe work.
+
+After this Ken continuity pass is integrated and validated, continue P5 as planned.

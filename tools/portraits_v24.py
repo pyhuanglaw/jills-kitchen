@@ -17,6 +17,9 @@ own background kept, nothing redrawn, stretched or recoloured) and packed by too
   st23_xiuqin.
 - 許葳 (the Lounge's cleaner, a new person), supplied by the player at 19:11 (sheet_xuwei_v24.jpg): the large face is her
   portrait; the four expressions are 工作中, 淺笑, 覺得好笑, 已經處理好了 (the labels are left out).
+- rc7: Ken's three expressions for his tastings, supplied by the player at 16:21 with his glasses (sheet_ken_tones_v24.png; 16:12's had none): 主持 (talking,
+  a hand out, the glass in the other), 乾笑 (the dry smile that knew it), 品酒 (nosing the glass). 杜先生's three, at
+  16:14 (sheet_du_tones_v24.png): 品酒 (tasting, saying nothing), 不以為然, 真心稱讚 (restrained, sincere).
 - v2.4 P5 (rc7): the rest of the outside cast — Kevin, 珊珊, 宇翔 from the first sheet (its other three columns), and
   小彤's mother, 小彤's father, 老林, 國雄 from the second (docs/v24/refs/outside_cast_2_reference_2026-10-01.png),
   each with the two expressions under the portrait.
@@ -40,6 +43,9 @@ MT = os.path.join(ROOT, 'assets', 'portraits', 'src', 'sheet_mia_tone_v24.jpg') 
 LT = os.path.join(ROOT, 'assets', 'portraits', 'src', 'sheet_landlord_v24.jpg')       # 2026-10-01 14:50, the player: 房東 (for the Second Floor) — 房東 / 平常 / 整層？
 XW = os.path.join(ROOT, 'assets', 'portraits', 'src', 'sheet_xuwei_v24.jpg')          # 2026-10-01 19:11, the player: 許葳, the Lounge's cleaner — the large face, and four expressions
 OC2 = os.path.join(ROOT, 'docs', 'v24', 'refs', 'outside_cast_2_reference_2026-10-01.png')   # 2026-10-01 11:44, the player: 小彤's mother and father, 老林, 國雄
+KT = os.path.join(ROOT, 'assets', 'portraits', 'src', 'sheet_ken_tones_v24.png')   # 2026-10-02 16:21, the player: Ken 主持 / 乾笑 / 品酒, with his glasses (replacing 16:12's, which had none); the labels under each are left out
+DT = os.path.join(ROOT, 'assets', 'portraits', 'src', 'sheet_du_tones_v24.png')    # 2026-10-02 16:14, the player: 杜先生 品酒 / 不以為然 / 真心稱讚
+YA = os.path.join(ROOT, 'assets', 'portraits', 'src', 'sheet_yuan_v24.png')       # 2026-10-02 16:42, the player: 林予安, the Lounge's pianist (docs/v24/pianist_yuan_2026-10-02_1642.txt) — 平常 / 演奏 / 淺笑
 # (id, sheet, box, who / tone) — boxes in sheet px, found by the sheets' separators / the figures' ink
 CARDS = [
     ('v24_yj', YJ, (0, 0, 436, 572), '怡君'),
@@ -86,6 +92,18 @@ CARDS = [
     ('v24_gx', OC2, (1334, 17, 1774, 572), '國雄'),
     ('v24_gx_front', OC2, (1334, 580, 1545, 859), '國雄 front'),
     ('v24_gx_side', OC2, (1550, 580, 1774, 859), '國雄 side'),
+    # rc7: Ken's three (the 16:21 sheet, with his glasses), the same 630×678 window on each (the figures are cut by a straight line at y 696–697)
+    ('v24_ken_talk', KT, (0, 20, 630, 698), 'Ken 主持'),
+    ('v24_ken_wry', KT, (631, 20, 1261, 698), 'Ken 乾笑'),
+    ('v24_ken_taste', KT, (1290, 20, 1920, 698), 'Ken 品酒'),
+    # rc7: 杜先生's three, a 634×676 window on each (cut at y 695)
+    ('v24_du_taste', DT, (0, 20, 634, 696), '杜先生 品酒'),
+    ('v24_du_doubt', DT, (635, 20, 1269, 696), '杜先生 不以為然'),
+    ('v24_du_praise', DT, (1284, 20, 1918, 696), '杜先生 真心稱讚'),
+    # rc7: 林予安's three, a 582×686 window on each (the panels are cut by a straight line at y 690)
+    ('v24_yuan', YA, (37, 4, 619, 690), '林予安 平常'),
+    ('v24_yuan_play', YA, (666, 4, 1248, 690), '林予安 演奏'),
+    ('v24_yuan_smile', YA, (1315, 4, 1897, 690), '林予安 淺笑'),
 ]
 
 

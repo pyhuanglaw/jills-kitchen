@@ -1,0 +1,183 @@
+==================================================
+IMPORTANT PAYOFF — MONSIEUR DU × COLLABORATION WINE
+==================================================
+
+There is one important payoff I want to preserve:
+
+Ken and Monsieur Du do NOT simply agree with each other about wine.
+
+Part of their existing relationship is that they have different opinions,
+different preferences, and may disagree with each other's judgments.
+
+KEEP THAT.
+
+Do not flatten their relationship into:
+"two wine experts who always agree."
+
+Their disagreement is part of why their interactions are interesting.
+
+However, AFTER the Jill's Kitchen × Ken collaboration wine has been completed
+and permanently added to the wine list, I want a later Monsieur Du beat:
+
+MONSIEUR DU DRINKS THE COLLABORATION WINE.
+
+This should pay off their earlier disagreements.
+
+==================================================
+THE IMPORTANT MOMENT
+==================================================
+
+Monsieur Du should taste the collaboration wine seriously.
+
+Ken knows Monsieur Du well enough by this point to expect criticism.
+
+Do not make the scene melodramatic.
+
+Do not have Ken anxiously ask:
+「怎麼樣？好喝嗎？」
+
+Do not make Monsieur Du suddenly overly enthusiastic.
+
+Let the tension come from their established relationship.
+
+Monsieur Du tastes it.
+
+He may initially make one small technical / stylistic observation,
+especially if that fits their previous disagreements.
+
+Then, after a beat, he gives it a clear and genuine compliment.
+
+The important thing is:
+
+MONSIEUR DU ACTUALLY THINKS THE WINE IS GOOD.
+
+Do not undermine the payoff with:
+「還可以。」
+「勉強及格。」
+「至少能喝。」
+or a joke that effectively cancels the compliment.
+
+His praise can still be restrained because that fits him,
+but it must be unmistakably sincere.
+
+For example, tone only:
+
+杜先生喝了一口，沒有立刻說話。
+
+Ken：「怎麼？」
+
+杜先生：「我還是不會照你這個方向選。」
+
+Ken：「我就知道。」
+
+杜先生又喝了一口。
+
+杜先生：「但這支很好。」
+
+Ken looks at him.
+
+杜先生：「真的很好。」
+
+Do NOT copy this mechanically.
+Use their established voices and existing relationship history.
+
+The emotional payoff is:
+
+They STILL disagree about wine.
+
+Monsieur Du has NOT suddenly accepted Ken's entire philosophy.
+
+But he respects what Ken and Jill made.
+
+That distinction matters.
+
+==================================================
+WHY THIS MATTERS
+==================================================
+
+The collaboration wine should become a physical record of Ken's story:
+
+Ken helped inspire the Lounge
+→ Ken began hosting tastings
+→ Ken and Jill learned what works in this restaurant
+→ after three tastings they created their own collaboration wine
+→ Monsieur Du, who often disagrees with Ken, eventually tastes it
+→ and sincerely says it is good.
+
+This gives the collaboration wine meaning beyond stats.
+
+The player remembers:
+
+"This is the wine even Monsieur Du praised."
+
+That is much more valuable than simply giving it a large gameplay bonus.
+
+==================================================
+DO NOT MAKE THIS IMMEDIATE
+==================================================
+
+Monsieur Du should NOT conveniently appear the same night the collaboration
+wine is released just to deliver the payoff.
+
+Let the wine exist in the restaurant first.
+
+Then, on a later valid visit / story beat,
+Monsieur Du encounters it naturally.
+
+This should feel like a callback, not an achievement ceremony.
+
+==================================================
+AFTERWARD — AMBIENT CALLBACK
+==================================================
+
+After this authored beat has happened, allow VERY LOW-FREQUENCY callbacks.
+
+For example, on a future visit Monsieur Du may order the collaboration wine
+without making a big deal about it.
+
+That is enough.
+
+The strongest callback may simply be:
+
+he orders it again.
+
+Do not repeatedly explain:
+"this is the wine Monsieur Du once praised."
+
+Trust the player's memory.
+
+==================================================
+STORY STATE
+==================================================
+
+This beat requires:
+
+- collaboration wine completed
+- collaboration wine available
+- sufficient Ken × Monsieur Du relationship/story history for the disagreement
+  and respect to make sense
+
+It must NOT occur before their relationship has established that they sometimes
+disagree about wine.
+
+If the current Ken × Du 8-beat arc already contains specific disagreements,
+reuse that history rather than inventing duplicate conflicts.
+
+Please inspect the existing implementation first and place this payoff at the
+most narratively appropriate point.
+
+If necessary, this can become a post-8/8 epilogue/callback rather than changing
+the existing 8-beat structure.
+
+Do not force it into 8/8 if doing so damages the current arc.
+
+==================================================
+KEY RULE
+==================================================
+
+Do not resolve Ken × Monsieur Du by making them agree.
+
+Resolve this particular moment by showing that:
+
+THEY CAN DISAGREE WITH EACH OTHER
+AND STILL RECOGNIZE WHEN THE OTHER PERSON HAS MADE SOMETHING GOOD.

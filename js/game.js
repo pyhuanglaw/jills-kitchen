@@ -884,6 +884,7 @@ function drawPerson(c,x,y,L,o){o=o||{};const s=(o.s||1)*(o.pscale===undefined?PS
  if(L.acc==='phone'){c.fillStyle='#222';rr(c,7,base-10+bob,4.5,7,1);c.fill();c.fillStyle='#8FD3F4';c.fillRect(7.8,base-9+bob,2.9,5)}
  if(L.acc==='watch'){/* a wristwatch on the left wrist */c.fillStyle='#2A2A2C';rr(c,-11.6,by+12.2,4.4,2.4,1);c.fill();c.fillStyle='#E8E4DC';circ(c,-9.4,by+13.4,1.1)}
  if(o.hold==='fan'){/* 2.1: a paper fan, waved on a hot day */const t=performance.now()/1000;const dir=o.flip?-1:1;c.save();c.translate(dir*8,hy+2);c.rotate(dir*(-.5+Math.sin(t*9+x)*.35));c.fillStyle='#8A6A42';rr(c,-.8,0,1.6,7,.8);c.fill();c.fillStyle='#F4DFA9';c.beginPath();c.moveTo(0,0);c.arc(0,0,7.5,Math.PI*1.15,Math.PI*1.85);c.closePath();c.fill();c.strokeStyle='rgba(120,90,50,.45)';c.lineWidth=.5;for(let k=0;k<5;k++){const a=Math.PI*1.15+k*Math.PI*.175;c.beginPath();c.moveTo(0,0);c.lineTo(Math.cos(a)*7.5,Math.sin(a)*7.5);c.stroke()}c.fillStyle='#D4553A';circ(c,-1.5,-5,1.2);c.restore()}
+ else if(o.hold==='wine'){/* rc7: a glass of red held up — Ken hosting */const hy2=by+5;c.fillStyle='rgba(236,240,244,.6)';c.beginPath();c.moveTo(4.2,hy2-6.5);c.quadraticCurveTo(4,hy2-1.6,6.6,hy2-1.4);c.quadraticCurveTo(9.2,hy2-1.6,9,hy2-6.5);c.closePath();c.fill();c.fillStyle='#8E1F33';c.beginPath();c.moveTo(4.4,hy2-3.8);c.quadraticCurveTo(4.4,hy2-1.8,6.6,hy2-1.6);c.quadraticCurveTo(8.8,hy2-1.8,8.8,hy2-3.8);c.closePath();c.fill();c.strokeStyle='rgba(236,240,244,.85)';c.lineWidth=.6;c.beginPath();c.moveTo(6.6,hy2-1.4);c.lineTo(6.6,hy2+2.2);c.stroke();c.fillStyle=skin;rr(c,4.8,hy2+1.4,3.8,2.8,1.4);c.fill()}
  else if(o.hold==='mug'){/* v2.2 Q++: a cream mug with a cat on it, held in both hands */const hy2=by+9.5;c.fillStyle='#F4EFE4';rr(c,-3.4,hy2-3.6,6.8,6.4,1.4);c.fill();c.strokeStyle=OL;c.lineWidth=.5;c.stroke();c.strokeStyle='#F4EFE4';c.lineWidth=1.3;c.beginPath();c.arc(4,hy2-.4,1.8,-1.3,1.3);c.stroke();c.fillStyle='#4A3A30';circ(c,-.6,hy2-.2,1.2);c.beginPath();c.moveTo(-1.7,hy2-.6);c.lineTo(-1.5,hy2-2);c.lineTo(-.6,hy2-1.1);c.fill();c.beginPath();c.moveTo(.5,hy2-.6);c.lineTo(.3,hy2-2);c.lineTo(-.6,hy2-1.1);c.fill();c.fillStyle=skin;rr(c,-7.6,hy2-1.4,4.6,3.2,1.6);c.fill();rr(c,3,hy2-1.4,4.6,3.2,1.6);c.fill()}
  else if(o.hold&&o.hold!=='camera'){const ph=o.hold==='phone';const hy2=by+9;c.save();c.translate(0,hy2);c.rotate(-.1);c.fillStyle=ph?'#2A2A2E':'#F2EFE8';rr(c,-4.6,-5,9.2,ph?6.6:8.6,1.2);c.fill();c.strokeStyle=OL;c.lineWidth=.5;c.stroke();c.fillStyle=ph?'#9FD8F5':'#FBFAF6';c.fillRect(-3.7,-4,7.4,ph?4.7:6.6);if(ph){c.fillStyle='rgba(255,255,255,.25)';c.fillRect(-3.7,-4,2.2,4.7)}else{c.fillStyle='rgba(0,0,0,.2)';for(let k=0;k<4;k++)c.fillRect(-2.8,-2.7+k*1.5,5.6-(k===3?2.2:0),.6)}c.restore();
   c.fillStyle=skin;const rh=o.flipPage?-2.4:0;rr(c,-9.4,hy2-1,5,3.4,1.7);c.fill();rr(c,4.4,hy2-1+rh,5,3.4,1.7);c.fill();circ(c,-5.4,hy2+1.4,2.2);circ(c,5.4,hy2+1.4+rh,2.2)}
@@ -1383,9 +1384,11 @@ function requeue(){for(const g of queued()){if(g.state==='arrive'&&!g.landed)con
  if(g.spot){const ok=g.spot.k==='seat'?!OCC['bench'+g.spot.i]:true;const upgrade=g.spot.k==='stand'&&g.size<=2&&[0,1,2].some(benchFree);if(ok&&!upgrade)continue;g.spot=null}
  const sp=pickSpot(g);g.spot=sp;const p=sp?spotPos(sp):{x:DOOR.x,y:DOOR.y+22};g.troom='main';g.tx=p.x;g.ty=p.y}}
 function spawn(o){if(R.closed)return;if(o.pdWalk&&(!pdBuilt()||pdHeld()||pdOccupied()||(R.tables.find(t=>t.pdr)||{}).dirty))return;   /* v2.4 rc6: a party looks in only when the room is free */const reg=o.reg?REG_BY[o.reg]:null;const size=Math.min(o.size,maxSeats(R.tables));if(o.looks&&o.looks.length>size)o.looks=o.looks.slice(0,size);
- let nm0=o.name||(reg?reg.n:pick(NAMES[o.type]||NAMES.office));if(!o.reg&&NAMED[nm0]&&(R.groups.some(q=>(q.named||q.name)===nm0&&!q.gone)||((story().named[nm0]||{}).seen===S.day&&!o.tries)||(!o.name&&R.sched.slice(R.si+1).some(q=>q.name===nm0)))){/* one person, one visit a day; a pool pick yields to the same person's planned evening */let alt=(NAMES[o.type]||NAMES.office).filter(n=>!NAMED[n]);if(!alt.length)alt=NAMES.gourmet.concat(NAMES.office).filter(n=>!NAMED[n]);/* every VIP name is a person: another VIP tonight is someone else */if(alt.length)nm0=R.groups.some(q=>(q.named||q.name)===nm0&&!q.gone)?pick(alt):alt[hash(nm0+'|'+S.day+'|'+R.gid)%alt.length]}/* (the visited-today case picks without touching the day's random stream) */if(!o.reg&&NAMED[nm0])namedHist(nm0).seen=S.day;/* one person, one visit a day — counted when they walk in *//* v2.3: a named guest is one person — never two Kens in one evening */const g={id:R.gid++,type:o.type,size,reg:o.reg||null,regs:(o.regs||(o.reg?[o.reg]:[])).slice(0,size),forSig:!!o.forSig,ret:!!o.ret,looks:o.looks||(reg?reg.looks:(NAMED[nm0]?[Object.assign({},NAMED[nm0].looks)].concat(makeLooks(o.type,size,o.pdRes||o.pdWalk||o.pdStory?'pdr':o.lounge?'lounge':'main').slice(1)):makeLooks(o.type,size,o.pdRes||o.pdWalk||o.pdStory?'pdr':o.lounge?'lounge':'main'))),name:!o.reg&&NAMED[nm0]&&size>1?nm0+' 與朋友':nm0,named:!o.reg&&NAMED[nm0]?nm0:null,story:!!o.story,v24grp:o.v24grp||null,pdRes:o.pdRes||null,pdWalk:!!o.pdWalk,pdStory:o.pdStory||null,moment:o.moment||null,comp:o.comp||null,together:o.together||null,offduty:!!o.offduty,wantDish:o.wantDish||null,wantSide:!!o.wantSide,catfan:!!o.catfan,/* v2.3 */
+ let nm0=o.name||(reg?reg.n:pick(NAMES[o.type]||NAMES.office));if(!o.reg&&NAMED[nm0]&&!o.kenHost&&(R.groups.some(q=>(q.named||q.name)===nm0&&!q.gone)||((story().named[nm0]||{}).seen===S.day&&!o.tries&&!o.tasting)||(!o.name&&R.sched.slice(R.si+1).some(q=>q.name===nm0)))){/* one person, one visit a day; a pool pick yields to the same person's planned evening */let alt=(NAMES[o.type]||NAMES.office).filter(n=>!NAMED[n]);if(!alt.length)alt=NAMES.gourmet.concat(NAMES.office).filter(n=>!NAMED[n]);/* every VIP name is a person: another VIP tonight is someone else */if(alt.length)nm0=R.groups.some(q=>(q.named||q.name)===nm0&&!q.gone)?pick(alt):alt[hash(nm0+'|'+S.day+'|'+R.gid)%alt.length]}/* (the visited-today case picks without touching the day's random stream) */if(!o.reg&&NAMED[nm0])namedHist(nm0).seen=S.day;/* one person, one visit a day — counted when they walk in *//* v2.3: a named guest is one person — never two Kens in one evening */const g={id:R.gid++,type:o.type,size,reg:o.reg||null,regs:(o.regs||(o.reg?[o.reg]:[])).slice(0,size),forSig:!!o.forSig,ret:!!o.ret,looks:o.looks||(reg?reg.looks:(NAMED[nm0]?[Object.assign({},NAMED[nm0].looks)].concat(makeLooks(o.type,size,o.pdRes||o.pdWalk||o.pdStory?'pdr':o.lounge?'lounge':'main').slice(1)):makeLooks(o.type,size,o.pdRes||o.pdWalk||o.pdStory?'pdr':o.lounge?'lounge':'main'))),name:!o.reg&&NAMED[nm0]&&size>1?nm0+' 與朋友':nm0,named:!o.reg&&NAMED[nm0]?nm0:null,story:!!o.story,v24grp:o.v24grp||null,pdRes:o.pdRes||null,pdWalk:!!o.pdWalk,pdStory:o.pdStory||null,moment:o.moment||null,comp:o.comp||null,together:o.together||null,offduty:!!o.offduty,wantDish:o.wantDish||null,wantSide:!!o.wantSide,catfan:!!o.catfan,/* v2.3 */tasting:!!o.tasting,kenHost:!!o.kenHost,/* rc7 */
   state:'arrive',table:null,pat:1,room:'front',troom:'main',x:FR.enter.x,y:FR.enter.y,tx:DOOR.x,ty:DOOR.y+22,timer:0,ticket:null,seed:Math.random()*10,mood:'ok'};
  if(reg&&(S.regulars[reg.id]||0)>0)g.ret=true;
+ if(o.kenHost){/* rc7: Ken hosting — he goes behind the bar, not to a table */g.state='toHost';g.troom='lounge';g.tx=KEN_HOST.x;g.ty=KEN_HOST.y;R.groups.push(g);R.lastSpawn=R.t;if(R.kt)R.kt.host=g;sfx.door();return}
+ if(o.tasting&&R.kt)R.kt.guests.push(g);
  if(o.lounge&&loungeOpenTonight()){/* v2.3: someone who came for the Lounge looks there first — a full dining room does not turn them away */const ls=loungeSeatFor(g);if(ls){R.groups.push(g);R.lastSpawn=R.t;campaignSpawn(g,o);loungeSeat(g,ls,'direct');sfx.door();return}}
  if(queued().length>=queueMax()||(!freeTableFor(g)&&!pickSpot(g))){if(o.story&&(o.tries||0)<3){/* v2.4: someone a story is waiting for comes back a little later rather than missing the day (the retry time is the schedule's own hash, not the day's random stream) */const dl=25+hash('v24rt|'+S.day+'|'+(o.name||o.reg)+'|'+(o.tries||0))%30;if(R.t+dl<R.dur*.85){const o2=Object.assign({},o,{t:R.t+dl,tries:(o.tries||0)+1});let j=R.si+1;while(j<R.sched.length&&R.sched[j].t<=o2.t)j++;R.sched.splice(j,0,o2);return}}if(g.reg==='dylan'){/* v2.2: the room is full — he has time, he comes back later (no queue jumping, no seat taken from anyone); after that, a look in from the door */const dl=rand(28,55);if((o.tries||0)<4&&R.t+dl<R.dur*.92){/* v2.2.1 K: a retry that would land after closing is not scheduled — it used to vanish at the door of a closed shop with no note */R.sched.splice(R.si+1,0,Object.assign({},o,{t:R.t+dl,tries:(o.tries||0)+1,back:true}));return}R.st.lost+=size;dylanTrace({door:1,tries:(o.tries||0)});if((S.regulars.dylan||0)>=3&&!R.dylanDoor){R.dylanDoor=1;noteLine('Dylan 在門口看了一眼，人太多，先走了。');S.dylan.doorDays=(S.dylan.doorDays||0)+1}return}if(g.reg){S.regMiss=S.regMiss||{};S.regMiss[g.reg]=S.day}R.st.lost+=size;R.lostRun=(R.lostRun||0)+1;if(!R.lostToastT||R.t-R.lostToastT>40){const n=R.lostRun;R.lostRun=0;R.lostToastT=R.t;toast(n>1?`${g.name} 和另外 ${n-1} 組看到客滿，失望地走了…`:`${g.name} 看到客滿，失望地走了…`)}return}
  if(o.fromStreet){g.x=o.fromStreet.x;g.y=o.fromStreet.y;g.walkIn=1}R.groups.push(g);R.lastSpawn=R.t;campaignSpawn(g,o);if(o.lounge){const ls=loungeSeatFor(g);if(ls){loungeSeat(g,ls,'direct');sfx.door();return}}/* (a Lounge guest who found no seat there queues like anyone) */requeue();sfx.door();if(g.reg==='dylan'){S.dylan.last=S.day;if(!S.dylan.first)S.dylan.first=S.day;if(o.back)g.back=true;dylanTrace({c:1,at:Math.round(R.t),back:o.back?1:0});if(S.dylan.stage>=3)logLine('',o.back?'Dylan 又回來了。':'Dylan 來了。','e')}
@@ -1398,8 +1401,8 @@ function forSigLines(){const n=S.signature&&S.signature.name?`『${S.signature.n
 function drainRate(g){const T=TYPES[g.type];const base={queue:1/32,order:1/28,wait:1/80,check:1/26}[g.state]||0;let m=1/(T.pat*(g.reg||g.story?1.15:1));if(g.reg==='dylan')m*=.5;if(g.reg&&g.reg!=='dylan'){const tier=regTier(S.regulars[g.reg]||0);if(g.reg==='koba'&&!g.unhurried)m*=tier>=1?1.05:1.3;if(tier>=2)m*=.8;else if(tier>=1)m*=.9}if(g.quick)m*=1.15;if(g.state==='queue'&&g.spot&&g.spot.k==='seat')m*=.7;
  if(g.table!=null&&R.tables[g.table]&&R.tables[g.table].lounge)m*=.5;if(g.table!=null&&R.tables[g.table]&&R.tables[g.table].pdr)m*=g.state==='check'?.15:.35;/* v2.4 rc6: a door closed, a long dinner — and two floors for whoever brings the bill *//* v2.3: a glass in hand, or waiting with one — nobody is in a hurry here */m*=1+Math.min(.35,S.day*.012);m*=1-Math.min(.25,ambience()*.02);m*=1-.08*S.decor.chairs;{const wp=WEATHER[R.weather]&&WEATHER[R.weather].pat;if(wp){const f=R.weather==='hot'?hotFactor():1;m/=1-(1-wp)*f}}if(R.musicT>R.t&&(g.state==='queue'||g.state==='arrive'))m*=.7;if(g.catT&&g.catT>R.t)m*=.6;if(!g.rowdy&&g.table!=null&&R.groups.some(o=>o.rowdy&&o.table!=null&&Math.hypot(R.tables[o.table].x-R.tables[g.table].x,R.tables[o.table].y-R.tables[g.table].y)<140))m*=1.7;if(S.day<=2)m*=.62;else if(S.day<=4)m*=.82;return base*m}
 function updGroup(g,dt){
- if(['arrive','queue','toTable','leave'].includes(g.state)){const there=stepTo(g,78*dt);if(!there){g.walk=(g.walk||0)+dt*11;g.moving=true}else{g.moving=false;
-  if(g.state==='arrive'){g.landed=true;const t=!R.closed&&freeTableFor(g);if(t&&!t.claim){seatGroup(g,t);return}g.state='queue';requeue()}else if(g.state==='toTable'){g.state='reading';g.timer=rand(2.4,3.8)*(TYPES[g.type].read||1)*(S.day===1?.8:1)*(g.usual?.3:1)*(g.reg==='koba'&&!g.unhurried?.55:1)*(g.rushed?.6:1)*(g.table!=null&&R.tables[g.table]&&R.tables[g.table].pdr?1.3:1)}else if(g.state==='leave'){if(g.bus){g.bus=false;sendOut(g);sfx.plop()}else{g.gone=true;return}}}}
+ if(['arrive','queue','toTable','leave','toHost'].includes(g.state)){const there=stepTo(g,78*dt);if(!there){g.walk=(g.walk||0)+dt*11;g.moving=true}else{g.moving=false;
+  if(g.state==='arrive'){g.landed=true;const t=!R.closed&&freeTableFor(g);if(t&&!t.claim){seatGroup(g,t);return}g.state='queue';requeue()}else if(g.state==='toTable'){g.state='reading';g.timer=rand(2.4,3.8)*(TYPES[g.type].read||1)*(S.day===1?.8:1)*(g.usual?.3:1)*(g.reg==='koba'&&!g.unhurried?.55:1)*(g.rushed?.6:1)*(g.table!=null&&R.tables[g.table]&&R.tables[g.table].pdr?1.3:1)}else if(g.state==='leave'){if(g.bus){g.bus=false;sendOut(g);sfx.plop()}else{g.gone=true;return}}else if(g.state==='toHost'){g.state='host';g.tx=g.x+1;g.ty=g.y}}}
  if(g.state==='queue'||g.state==='order'||g.state==='wait'||g.state==='check'||g.state==='arrive'){const dr=drainRate(g.state==='arrive'?{...g,state:'queue'}:g);g.pat-=dt*dr;if(g.pat<=0){g.pat=0;angryLeave(g);return}}
  if(g.state==='queue'&&!g.moving){g.notice=(g.notice??rand(2,4))-dt;if(g.notice<=0){g.notice=rand(1.5,3);if(!R.closed){const t=freeTableFor(g);if(t&&!t.claim&&!queued().some(o=>o!==g&&o.id<g.id&&o.size<=t.seats)){seatGroup(g,t);return}if(!t&&loungeWaitOK(g)){g.lgTried=1;if(Math.random()<.6){const ls=loungeSeatFor(g);if(ls){loungeSeat(g,ls,'wait');return}}}}requeue()}
   /* waiting is mostly just sitting; now and then they look around, check a phone, watch a cat, or chat */
@@ -1520,9 +1523,9 @@ function shOn(){return !!S&&phase!=='title'&&(!window.__noScenes||!!window.__hol
 function shGrab(L){const cx=SCX;if(!cx)return false;shRec(cx,L);if(!cx.authored||!shOn())return false;cx.q.push(L);shShow(cx);return true}
 function shRec(cx,L){const k=cx.rec||(BEAT_LINE[cx.k]?cx.k:null);if(!k||!L||!L.text)return;const st=story();st.beatLines=st.beatLines||{};
  if(cx.recK!==k){cx.recK=k;cx.recOn=!(st.beatLines[k]&&st.beatLines[k].length);if(cx.recOn)st.beatLines[k]=[]}   /* the first time is the one kept */
- const arr=st.beatLines[k];if(cx.recOn&&arr&&arr.length<12)arr.push(L.name?{w:L.name,t:L.text}:{t:L.text})}
+ const arr=st.beatLines[k];if(cx.recOn&&arr&&arr.length<(cx.cap||12))arr.push(L.name?{w:L.name,t:L.text}:{t:L.text})}   /* rc7: a tasting night's page holds its start and its end (cap 20) */
 function shTitle(cx){const L=BEAT_LINE[cx.rec||cx.k];try{return L?lineWho(L):''}catch(e){return''}}
-function shShow(cx){if(DLG&&DLG.sh===cx){if(DLG.wait){DLG.wait=false;DLG.i++;DLG.shownAt=performance.now();dlgShow()}return}
+function shShow(cx){if(DLG&&DLG.sh===cx){if(DLG.wait){DLG.wait=false;DLG.i++;DLG.shownAt=performance.now();dlgShow()}else{const nx=document.querySelector('#dlg .dlg-next');if(nx&&DLG.i<DLG.lines.length-1)nx.textContent='點一下繼續 ›'}return}   /* rc7: a line arriving under the one on screen — the button says there is more */
  if(DLG||cx.open){if(!SH_WAIT.includes(cx))SH_WAIT.push(cx);return}
  const el=$('#dlg');if(!el)return;cx.open=true;cx.room0=room;
  if(R&&phase==='service'&&cx.g&&cx.g.table!=null){const t=R.tables[cx.g.table];const rm=t&&(t.room||'main');if(rm&&rm!==room&&roomOpen(rm)){room=rm;forceDraw=true;renderRoomTabs(true)}}   /* where it happens */
@@ -1539,7 +1542,7 @@ function shNextWaiting(){if(DLG)return;const nx=SH_WAIT.shift();if(!nx){if(story
    crew's and the guests' words about the space, the night, the ask, the lease, the open floor's needs and its two rooms'
    stories; and the love stories — 晴 & 阿拓, Dylan and Jill, 王先生 & 王太太. Everything else happens in the room as it
    always did (a scene that was already a panel stays one). */
-const SH_HOLD=/^(sm_[a-h]$|xq_oh$|wall_|up_|sp_|sr_story$|pd_|qt_|dylan_valentine$|dylan_notices$|wang_dylan_|wang_solo$|wang_anniv)/;
+const SH_HOLD=/^(sm_[a-h]$|xq_oh$|wall_|up_|sp_|sr_story$|pd_|qt_|dylan_valentine$|dylan_notices$|wang_dylan_|wang_solo$|wang_anniv|ken_|du_wine$|tasting_start$|lounge_reveal$)/;   /* rc7 (the player, 15:24): Ken's story holds it too — what brought the Lounge about, his tastings, the wine, and 杜 with the wine; the friendship's everyday beats (kd_) do not */
 function shAuthored(E){return !!E&&SH_HOLD.test(E.k)}
 function staffSay(m,txt,tone,tg){if(shGrab({who:'staff:'+m.name,name:m.name,text:txt,tone}))return;logLine(m.name,txt,'s');if(portraitLine('staff:'+m.name,txt,{tone,tg}))return;/* v2.3: a face with the line, when the person has one */toast(`<b>${m.name}</b>：「${txt}」`,'q',{who:'staff:'+m.name,tg})}   /* rc7: tg — the party at the table it was said to */
 function noteLine(txt){if(shGrab({who:'',name:'',text:txt}))return;noteRaw(txt)}
@@ -2087,16 +2090,20 @@ const WINES={w_spark:{n:'氣泡酒',c:'#F3E4A6',price:180,cost:55,lv:1},w_white:
  w_pinot:{n:'黑皮諾',c:'#9E2E3E',price:360,cost:115,lv:2,dev:4200,pair:{dish:['duck','salmon']},pn:'鴨胸、鮭魚',d:'輕盈、有層次的紅酒。'},
  w_house:{n:'招牌調酒「晚安」',c:'#C9A3CF',price:380,cost:90,lv:2,dev:4800,cocktail:1,pair:{types:['office','student','blogger']},pn:'下班的上班族、學生、部落客',d:'Evan 和晴一起試出來的一杯：琴酒、接骨木花、一點檸檬。'},
  w_cham:{n:'香檳',c:'#F6E7A8',price:560,cost:180,lv:3,dev:6500,flute:1,pair:{cel:1},pn:'有事情要慶祝的那桌、情侶',d:'有事情要慶祝的時候點的那一種。'},
- w_old:{n:'老藤卡本內',c:'#5A1A28',price:680,cost:220,lv:3,dev:8000,need:'cellar',pair:{dish:['steak']},pn:'牛排',d:'放在酒窖裡的老藤卡本內，單寧細。'}};
-function wineHas(k){const W=WINES[k];return !!W&&(!W.dev||(S.wineDev||{})[k]!=null)}   /* researched, or one of the Lounge's own */
+ w_old:{n:'老藤卡本內',c:'#5A1A28',price:680,cost:220,lv:3,dev:8000,need:'cellar',pair:{dish:['steak']},pn:'牛排',d:'放在酒窖裡的老藤卡本內，單寧細。'},
+ /* rc7: Ken's and Jill's — not researched: it is on the list from the day it came (ken_wine), for good; about a pinot's price */
+ w_jk:{n:'晚餐之後',c:'#A0303F',price:420,cost:130,lv:1,story:'ken_wine',pair:{dish:['signature']},pn:'Jill 的招牌菜',d:'JILL\'S KITCHEN × KEN。Ken 認識的酒莊釀的，方向是他挑的；配的是 Jill 的招牌菜。一支輕盈的紅酒。'}};
+function wineHas(k){const W=WINES[k];return !!W&&(W.story?!!fact(W.story):(!W.dev||(S.wineDev||{})[k]!=null))}   /* researched, or one of the Lounge's own */
 function wineAvail(){const lv=loungeLv();return Object.keys(WINES).filter(k=>WINES[k].lv<=lv&&wineHas(k))}
 /* tonight's list: what the Lounge has, less what the player left off before opening (never none) */
 function wineList(){const all=wineAvail();const off=S.wineOff||{};const on=all.filter(k=>!off[k]);return on.length?on:all}
 /* v2.4 rc6 (11:49): what a researched wine goes with — dd is what the table ordered for dinner */
 function winePairOk(k,g,dd){const P=WINES[k]&&WINES[k].pair;if(!P||!g)return false;dd=dd||g.dd||[];if(P.cat)return dd.some(d=>DISH(d)&&DISH(d).cat===P.cat);if(P.types)return P.types.includes(g.type);if(P.cel)return!!g.celebrate||g.type==='couple';return dd.some(d=>DISH(d)&&P.dish.includes(baseOf(d)))}
-function winePairFor(g,dd){const L=wineList().filter(k=>WINES[k].dev&&winePairOk(k,g,dd));return!L.length?null:L.length===1?L[0]:pick(L)}
-function wineDevPoured(){return wineList().filter(k=>WINES[k].dev).length}
-function loungeOrder(g){const list=wineList();if(!list.length)return[];const out=[];const nn=namedId(g);const pr=nn||!wineDevPoured()?null:winePairFor(g);for(let k=0;k<g.size;k++){let w;if(pr&&Math.random()<.5)w=pr;else if(nn==='品酒師 Ken')w=pick(list.filter(x=>/red/.test(x)).length?list.filter(x=>/red/.test(x)):list);else if(nn==='Monsieur 杜')w=list.includes('w_fred')?'w_fred':pick(list);else if(g.type==='couple')w=list.includes('w_spark')&&Math.random()<.5?'w_spark':pick(list);else if(g.type==='student')w=pick(list.slice(0,2));else w=pick(list);out.push(w)}
+function winePairFor(g,dd){const L=wineList().filter(k=>(WINES[k].dev||WINES[k].story)&&winePairOk(k,g,dd));return!L.length?null:L.length===1?L[0]:pick(L)}
+function wineDevPoured(){return wineList().filter(k=>WINES[k].dev||WINES[k].story).length}
+function loungeOrder(g){const list=wineList();if(!list.length)return[];
+ if(g.tasting&&R&&R.kt&&!R.kt.end){/* rc7: two or three of tonight's wines and a bite */const W=R.kt.wines.filter(k=>wineHas(k));const o2=[];for(let k=0;k<g.size;k++){if(W[0])o2.push(W[0]);if(W[1])o2.push(W[1]);if(W[2]&&Math.random()<.65)o2.push(W[2])}const bf2=barDishes().filter(d=>menuList().includes(d)&&stationOk(d)&&(S.stock[d]||0)>0);if(bf2.length)o2.push(pick(bf2));if(o2.length)return o2}
+ const out=[];const nn=namedId(g);const pr=nn||!wineDevPoured()?null:winePairFor(g);for(let k=0;k<g.size;k++){let w;if(pr&&Math.random()<.5)w=pr;else if(nn==='品酒師 Ken')w=fact('ken_wine')&&list.includes('w_jk')&&Math.random()<.25?'w_jk':pick(list.filter(x=>/red/.test(x)).length?list.filter(x=>/red/.test(x)):list);else if(nn==='Monsieur 杜')w=fact('du_wine')&&list.includes('w_jk')&&Math.random()<.2?'w_jk':list.includes('w_fred')?'w_fred':pick(list);/* rc7: now and then, the wine — never explained */else if(g.type==='couple')w=list.includes('w_spark')&&Math.random()<.5?'w_spark':pick(list);else if(g.type==='student')w=pick(list.slice(0,2));else w=pick(list);out.push(w)}
   if(projOn('cellar')&&g.size>=1&&Math.random()<.2)out.push(pick(list));/* v2.4 rc6: the cellar — another glass */const bf=barDishes().filter(d=>menuList().includes(d)&&stationOk(d)&&(S.stock[d]||0)>0);if(bf.length&&Math.random()<(g.size>=2?.45:.25))out.push(pick(bf));
  return out}
 /* the bartender: mixes at the bar (a pending wine becomes ready after a moment), serves the stools himself, and — when no
@@ -2198,6 +2205,7 @@ function drawLoungeRoom(c,now,dusk,V,X0,XW,TOP,list){const lv=loungeLv();const d
   drawInfra(b,'lounge')});
  blitBg(c,bg,X0,XW,TOP);
  for(const t of V.tables)if(t.room==='lounge'){if(t.kind==='bar')list.push({y:t.y,f:()=>drawBarSeat(c,t,now)})}
+ try{kenNightDraw(c,list)}catch(e){}   /* rc7: Ken's tasting night */
  if(projOn('piano')){const P=LG.piano;list.push({y:P.y,f:()=>drawPiano(c,P.x,P.y,now,pianoNight()&&phase==='service'&&!!R&&!R.closed)})}}   /* v2.4 rc6 */
 /* ================= v2.3 Phase 4: the Lounge's origin — Ken, wine, a tasting, an idea =================
    《餐廳是不是少了什麼？》 Ken (a named gourmet, history from v2.3 on) notices there is no wine; the idea keeps coming
@@ -2319,7 +2327,7 @@ function pairFor(g){for(const id of storyIdsOf(g)){const p=pairOf(id);if(p)retur
 /* the free dining table nearest the partner's table, when the pair has reached that point and the partner is seated */
 function storyNearTable(g,free){const p=pairFor(g);if(!p||!p.P.near()||free.length<2)return null;const og=seatedId(p.other);if(!og||og.table==null)return null;const ot=R.tables[og.table];if(ot.lounge)return null;const cand=free.filter(t=>(t.room||'main')===(ot.room||'main')&&t.seats>=g.size);if(cand.length<2)return null;cand.sort((x,y)=>Math.hypot(x.x-ot.x,x.y-ot.y)-Math.hypot(y.x-ot.x,y.y-ot.y));g.nearPick={i:cand[0].i,other:p.other,alt:cand.length-1};return cand[0]}
 /* a stool next to the partner's stool; the held stool (a bag on it) is only for the one it is held for */
-function stoolFree(t,g){if(!t.hold)return true;if(!stoolHoldValid(t))return true;return storyIdsOf(g).includes(t.hold)}
+function stoolFree(t,g){if(t.tst&&R&&R.kt&&!R.kt.end&&!(g&&g.tasting))return false;/* rc7: Ken's tasting night — the bar is for the people who came for it */if(!t.hold)return true;if(!stoolHoldValid(t))return true;return storyIdsOf(g).includes(t.hold)}
 function stoolHoldValid(t){if(!t.hold)return false;const h=seatedId(t.holdBy);if(!h||h.table==null||R.tables[h.table]!==t.holdOf){t.hold=null;t.holdBy=null;t.holdOf=null;return false}return true}
 function storyNearStool(g,free){const p=pairFor(g);if(!p||!p.P.near())return null;const og=seatedId(p.other);if(!og||og.table==null)return null;const ot=R.tables[og.table];if(ot.kind!=='bar')return null;const adj=free.filter(t=>t.kind==='bar'&&Math.abs(t.x-ot.x)<34&&t!==ot);if(!adj.length)return null;g.nearPick={i:adj[0].i,other:p.other,alt:free.length-1};return adj[0]}
 function holdStoolFor(g,t){if(!t||t.kind!=='bar'||!R)return;const p=pairFor(g);if(!p||!p.P.near()||!fact('sm_c')&&p.P.a==='sophie')return;if(p.P.a===KEN_ID&&!fact('kd_usual')&&!kdNightNow())return;if(seatedId(p.other))return;const n=loungeTables().find(q=>q.kind==='bar'&&!q.group&&!q.dirty&&!q.claim&&!q.hold&&Math.abs(q.x-t.x)<34&&q!==t);if(!n)return;n.hold=p.other;n.holdBy=p.me;n.holdOf=t;factSet('held_'+p.me,true)}
@@ -2821,7 +2829,16 @@ const STORY_ILLUS={
  wall_leak:{t:'那面牆',cap:'下過雨以後，同一面牆。',art:'wall_leak',stage:c=>drawFlat(c,{leak:1})},
  wall_settled:{t:'調解之後',cap:'走出調解室。',art:'wall_settled',stage:c=>drawIllusSettled(c)},
  up_cats:{t:'樓上',get cap(){return`側廳樓梯的門沒關好，${upCatN('mikan')}和${upCatN('ban')}跑上了二樓。那一晚，最後是在樓上找到牠們的。`},art:'up_cats',stage:c=>drawIllusUpCats(c)},   /* v2.4 rc6: the player's picture, 2026-10-02 08:41 (「去二樓發現貓的圖 修改成這一張」, replacing 08:15's); 08:44: the stair door is downstairs, in the side room — it did not close, the cats went up the stairs behind it */
+ ken_t1:{t:'Ken 的品酒夜',cap:'第一次品酒夜。Ken 站在吧台後面，吧台前坐滿了。',art:'ken_t1',stage:c=>drawIllusKen(c,0)},   /* rc7: the player's pictures, 2026-10-02 16:19 / 16:25 / 16:32 */
+ ken_wine:{t:'晚餐之後',cap:'「晚餐之後」——JILL\'S KITCHEN × KEN。',art:'ken_wine',stage:c=>drawIllusKen(c,1)},
+ du_wine:{t:'可是它很好',cap:'Monsieur 杜喝了「晚餐之後」。Ken 坐在旁邊。',art:'du_wine',stage:c=>drawIllusKen(c,2)},
 };
+/* rc7: the stand-ins for Ken's three pictures, should one be missing: the bar at night, glasses, a bottle */
+function drawIllusKen(c,k){c.fillStyle='#1E1A18';c.fillRect(0,0,360,270);c.fillStyle='#2A2523';c.fillRect(0,0,360,150);for(let i=0;i<18;i++){c.fillStyle=['#5A1E22','#C9A26E','#2E4A3A','#4A2A3A'][i%4];rr(c,20+i*18,40+(i%3)*4,6,26,2);c.fill()}
+ c.fillStyle='#5A3E28';c.fillRect(0,170,360,24);c.fillStyle='#8E6A48';c.fillRect(0,166,360,6);let g=c.createRadialGradient(180,120,10,180,120,190);g.addColorStop(0,'rgba(255,200,130,.28)');g.addColorStop(1,'rgba(255,200,130,0)');c.fillStyle=g;c.fillRect(0,0,360,270);
+ const glass=(x,y)=>{c.fillStyle='rgba(236,240,244,.55)';c.beginPath();c.moveTo(x-8,y-22);c.quadraticCurveTo(x-9,y-6,x,y-5);c.quadraticCurveTo(x+9,y-6,x+8,y-22);c.closePath();c.fill();c.fillStyle='#8E1F33';c.beginPath();c.moveTo(x-7,y-13);c.quadraticCurveTo(x-7,y-6,x,y-6);c.quadraticCurveTo(x+7,y-6,x+7,y-13);c.closePath();c.fill();c.fillStyle='rgba(236,240,244,.7)';c.fillRect(x-.8,y-5,1.6,9);c.fillRect(x-5,y+4,10,1.6)};
+ if(k===1){c.fillStyle='#6E1F2C';rr(c,160,70,40,100,8);c.fill();c.fillRect(172,40,16,34);c.fillStyle='#F2EBDD';rr(c,164,104,32,44,3);c.fill();c.fillStyle='#5A3E28';c.font=`700 8px ${DFONT}`;c.textAlign='center';c.fillText('晚餐之後',180,124);c.font=`600 4.5px ${DFONT}`;c.fillText("JILL'S KITCHEN × KEN",180,134);glass(110,166);glass(250,166)}
+ else{for(let i=0;i<(k===0?6:2);i++)glass(60+i*(k===0?48:120),166)}}
 /* the stand-in for the night upstairs, should the picture be missing: the dark floor from above, the two street windows, the column */
 function drawIllusUpCats(c){c.fillStyle='#2A2018';c.fillRect(0,0,360,270);c.fillStyle='#8A6440';c.fillRect(30,40,300,210);c.fillStyle='rgba(60,40,24,.35)';for(let x=36;x<330;x+=12)c.fillRect(x,40,.8,210);
  for(const wx of[50,200]){c.fillStyle='#22304A';c.fillRect(wx,14,110,40);c.fillStyle='rgba(255,214,140,.8)';for(let k=0;k<8;k++)c.fillRect(wx+8+((k*29)%96),20+((k*13)%28),2,2);c.fillStyle='#3A2A1E';for(let k=1;k<4;k++)c.fillRect(wx+k*27.5,14,1.5,40)}
@@ -3011,8 +3028,180 @@ V24_WANTS.push(()=>{const out=[];if(fact('sm_h'))return out;const A=REG_BY.sophi
 /* v2.4 rc6 (the player, 12:17): Ken and Monsieur 杜 argued once at the next table and then never sat in the Lounge on the
    same evening — and every later step of theirs needs that. Some evenings bring the two of them in to the Lounge around
    the same time (one coin for the pair, from the day) until their stools are theirs, then now and then until the photo */
-V24_WANTS.push(()=>{const out=[];if(!loungeOpenTonight()||!fact('ken_du_argue')||fact('kd_photo'))return out;if(!NAMED[KEN]||!NAMED[DU])return out;
+V24_WANTS.push(()=>{const out=[];if(!loungeOpenTonight()||!fact('ken_du_argue')||fact('kd_photo'))return out;if(!NAMED[KEN]||!NAMED[DU]||kenNightToday())return out;   /* rc7: on Ken's tasting night he is hosting */
  const p=!fact('kd_usual')?40:22;if(dayCoin('kdw|'+S.day)>=p)return out;story().kdNight=S.day;out.push({name:KEN,p:1,type:'gourmet',size:1,grp:'kd',o:{lounge:1}},{name:DU,p:1,type:'gourmet',size:1,grp:'kd',o:{lounge:1}});return out});
+/* ================= rc7: Ken after the Lounge — his tastings and the wine =================
+   The player's KEN / LOUNGE STORY CONTINUITY PASS (2026-10-02 15:24), 15:24 「他的劇情除了友情線不用中斷餐廳，其他包括觸發
+   酒吧設立和後續品酒會和聯名酒都要觸發劇情」 and 15:33 「所以要由ken觸發品酒會喔 以後有也是他辦」. The finished Lounge is where
+   Ken's next chapter begins: he comes back and sits in the room he talked Jill into (ken_lounge), proposes a small tasting
+   at the bar (ken_propose), hosts three — the first two end with 「下次換一支」, the third with 「做一支我們自己的」 (ken_t1–
+   ken_t3, ken_collab) — brings three unlabelled samples to taste against Jill's signature (ken_samples), and the wine
+   arrives: 「晚餐之後」, JILL'S KITCHEN × KEN, on the list for good (ken_wine). Days later Monsieur 杜 orders it (du_wine,
+   the friendship line's payoff: they still disagree, and he says it is good). All of these hold the restaurant (SH_HOLD).
+   After the third, Ken's tasting night comes back every week or two, in the room, unheld; nobody else holds a tasting.
+   A tasting night: the news says 「今晚｜Ken 的品酒夜 · 8 席」 (the day before, 「明晚」); the bar's stools are for the
+   people who came for it; Ken stands behind the bar with a glass, the glasses are set out on the counter, a small board
+   stands by the bar; the guests take two or three of tonight's wines and a bite; Ken stays until the last of them leaves.
+   A save whose Lounge was open well before this existed (the player's Day 74) skips his first look and begins at the
+   proposal, with a line that says he has been coming for weeks — not on the first day played, nothing replayed, one Ken
+   scene a day at most. */
+const KEN_HOST={get x(){return LG.bar.x0+16},get y(){return LG.bar.y-6}};   /* behind the bar, at its near end (the bartenders stand further along) */
+const KEN_KEYS=['ken_lounge','ken_propose','ken_t1','ken_t2','ken_t3','ken_collab','ken_samples','ken_wine','du_wine'];
+function kenS(){const st=story();const k=st.ken=st.ken||{};if(k.first==null)k.first=S.day;return k}
+/* the Lounge was open well before this chapter existed: he has been sitting there for weeks — his first look is skipped */
+function kenLegacy(){const d=loungeDoneDay();return d!=null&&d<=kenS().first-4}
+function kenPost(){const d=loungeDoneDay();return loungeLv()>=1&&d!=null&&S.day>d&&!!NAMED[KEN]}
+function kenQuiet(){return !KEN_KEYS.some(k=>{const f=fact(k);return f&&f.d===S.day})}   /* one Ken scene a day */
+function kenInLounge(ctx){return !!(ctx&&ctx.g&&namedId(ctx.g)===KEN&&!ctx.g.kenHost&&ctx.g.table!=null&&R.tables[ctx.g.table]&&R.tables[ctx.g.table].room==='lounge')}
+function kenNightToday(){const n=kenS().next;return !!(n&&n.d<=S.day)}
+function kenSeats(){return loungeLv()>=2?8:6}
+function kenLoungeDue(){return kenPost()&&!kenLegacy()&&!fact('ken_lounge')&&!fact('ken_propose')}
+function kenProposeDue(){if(fact('ken_propose')||!kenPost())return false;if(kenLegacy())return S.day>kenS().first;const f=fact('ken_lounge');return !!f&&S.day-f.d>=2}
+function kenSamplesDue(){return !!fact('ken_collab')&&!fact('ken_samples')&&S.day>=(kenS().samples||0)}
+function kenWineDue(){return !!fact('ken_samples')&&!fact('ken_wine')&&S.day>=(kenS().wineD||0)}
+function duWineDue(){const f=fact('ken_wine');return !!f&&!fact('du_wine')&&S.day-f.d>=4&&!!NAMED[DU]&&relN(KEN_ID,DU_ID,'argued')>=2}
+function kenSigName(){return S.signature&&S.signature.name?`『${S.signature.name}』`:'招牌菜'}
+/* what Ken pours on a night: three, a different set each time; from the fourth night his own is one of them */
+function kenWines(n){const L=wineList().filter(k=>!WINES[k].cocktail);if(!L.length)return wineList().slice(0,3);const out=[];if(n>=4&&L.includes('w_jk'))out.push('w_jk');const rest=L.filter(k=>!out.includes(k));for(let i=0;out.length<3&&i<rest.length;i++){const k=rest[(i+n*2)%rest.length];if(!out.includes(k))out.push(k)}return out}
+function kenGuestNames(n){const pool=NAMES.office.concat(NAMES.gourmet,NAMES.student).filter(x=>!NAMED[x]&&!/與|家/.test(x));const out=[];for(let i=0;out.length<n&&i<400;i++){const nm=pool[hash('ktn|'+S.day+'|'+i)%pool.length];if(!out.includes(nm))out.push(nm)}return out}
+/* the evening's moments, outside the arbiter: the night itself was the day's major beat. append: the end of a night goes on
+   the same story page as its start */
+function kenScene(k,g,fn,append){const r0=room;let moved=false;if(R&&phase==='service'&&shOn()&&room!=='lounge'&&roomOpen('lounge')&&!(g&&g.table!=null)){room='lounge';forceDraw=true;renderRoomTabs(true);moved=true}
+ const cx=shCtx(k,true,g);cx.cap=20;if(append){cx.rec=k;cx.recK=k;cx.recOn=true}shRun(cx,fn);if(shOn())while(!cx.q.length&&shFlushOne(cx)){}if(moved){if(cx.open||SH_WAIT.includes(cx))cx.room0=r0;else{room=r0;renderRoomTabs(true)}}return cx}
+function kenSayH(txt,ms,tone){const K=R&&R.kt;const g=K&&K.host;if(g)sayG(g,txt,ms,tone?{tone}:undefined)}
+function kenNote(txt,illus){if(illus){illusSeen(illus);if(SCX&&SCX.authored&&shOn()&&shGrab({who:'',name:'',text:txt,illus}))return}noteLine(txt)}   /* the picture over the panel when it is held; in the room, the words */
+/* ---- the day of a tasting: Ken and the people who came for it are on tonight's schedule; the bar is theirs ---- */
+function kenNightStart(){const K=kenS();const n=K.next.n;const seats=kenSeats();const dur=R.dur;
+ R.kt={n,seats,wines:kenWines(n),guests:[],host:null,on:0,end:0,said:0,t0:null,du:0};
+ for(const t of loungeTables())if(t.kind==='bar')t.tst=1;
+ const du=n===2&&!!NAMED[DU];R.sched=R.sched.filter((o,i)=>i<R.si||!((o.name===KEN&&!o.kenHost)||(du&&o.name===DU)));   /* one Ken tonight, the host; and 杜 comes for the tasting */
+ R.sched.push({t:dur*.24,type:'gourmet',size:1,name:KEN,lounge:1,kenHost:1,story:1});
+ const G=[];for(const b of(K.back||[]).slice(0,n===2?2:n===3?3:1))G.push({name:b.name,type:b.type,looks:b.looks?[Object.assign({},b.looks)]:undefined});
+ if(du){G.push({name:DU,type:'gourmet'});R.kt.du=1}
+ const nm=kenGuestNames(seats+4).filter(x=>!G.some(o=>o.name===x));let i=0;while(G.length<seats){G.push({name:nm[i]||('客人'+i),type:pickH(['gourmet','office','gourmet','student'],'ktt|'+S.day+'|'+i)});i++}
+ G.forEach((o,j)=>R.sched.push(Object.assign({t:dur*(.27+.013*j)+(hash('ktt0|'+S.day+'|'+j)%30)/10,size:1,lounge:1,tasting:1,story:1},o)));R.sched.sort((a,b)=>a.t-b.t);
+ if(n>=4)later(()=>{if(R&&phase==='service')noteLine('今晚是 Ken 的品酒夜：吧台的位子留給品酒的客人。')},1800)}
+/* a night that did not come to its end (the page was closed): its bookkeeping, without its words */
+function kenAdvance(n){const K=kenS();if(n<3)K.next={d:S.day+5,n:n+1};else if(n===3)K.next=null;else K.next={d:S.day+8+hash('ktn+|'+S.day)%5,n:n+1}}
+function kenNightUpd(dt){const K=R&&R.kt;if(!K||K.end)return;const H=K.host;
+ const here=K.guests.filter(g=>!g.gone&&g.state!=='leave'&&R.groups.includes(g));const seated=here.filter(g=>g.table!=null&&R.tables[g.table]&&R.tables[g.table].room==='lounge'&&['reading','order','wait','eat','check'].includes(g.state));   /* sitting there, not still walking over */
+ if(!K.on){if(H&&H.state==='host'&&(seated.length>=Math.ceil(K.seats/2)||(R.t>R.dur*.42&&seated.length>=2))){K.on=1;K.t0=R.t;kenNightOpen(seated)}else if(R.closed||R.t>R.dur*.75)kenNightClose();/* it never began: the same night tomorrow, and he goes home */return}
+ kenNightTalk(seated);
+ const coming=R.sched.slice(R.si).some(o=>o.tasting);if(!coming&&!here.length)kenNightClose()}
+/* the start of the night: the first three are scenes; after them, a word in the room */
+function kenNightOpen(seated){const K=R.kt,n=K.n;factSet('ken_tn');const g0=seated[0]||null;const guest=(i,txt,ms)=>{const q=seated[i%Math.max(1,seated.length)];if(q)sayG(q,txt,ms)};
+ const du=K.du?seated.find(q=>namedId(q)===DU):null;const dish=(menuList().includes('signature')&&'signature')||menuList().find(d=>DISH(d)&&DISH(d).cat==='main');const dn=dish?(dish==='signature'?kenSigName():dishName(dish)):'今天的主菜';
+ if(n===1)kenScene('ken_t1',g0,()=>{factSet('ken_t1');kenNote(`七點多，吧台前坐滿了。每個位子前面擺了三個杯子；Ken 站在吧台後面，手上拿著第一支。`,'ken_t1');
+  kenSayH('今天三支。不用猜是哪裡的酒，先喝。',600,'talk');guest(1,'……這支是法國的吧？',1900);kenSayH('我就知道一定有人不聽。',3200,'wry');
+  later(()=>noteLine('吧台這頭有人笑出來。Ken 把第一支倒了一輪。'),4500);JILL_SAY('菜什麼時候出？',5800,{with:'named:'+KEN});kenSayH('第二支以後。先讓他們喝一口沒有配菜的。',7100,'talk');JILL_SAY('好。',8400,{with:'named:'+KEN});relSet(KEN_ID,'jill','sharedEvent')});
+ else if(n===2)kenScene('ken_t2',g0,()=>{factSet('ken_t2');const b=(kenS().back||[])[0];const bg=b&&seated.find(q=>q.name===b.name);
+  kenNote(bg?'第二次的品酒夜。吧台前有兩張上次見過的臉。':'第二次的品酒夜。這次 Ken 先把杯子排好才開門。');
+  if(bg){sayG(bg,'上次那支還有嗎？',600);kenSayH('沒有。說好換一支。',1900,'wry')}
+  if(du){const known=!!fact('ken_du_argue')||relN(KEN_ID,DU_ID,'spoke')>0;
+   if(known){later(()=>noteLine('吧台最旁邊坐著 Monsieur 杜。他沒有看 Ken，先把杯子拿起來聞了很久。'),3200);kenSayH('你怎麼也來了？',4500);sayG(du,'我付了錢的。',5800,{tone:'taste'});kenSayH(`第二支，配 Jill 今天的${dn}。`,7100,'talk');sayG(du,'這支配那道，太輕。',8400,{tone:'doubt'});kenSayH('它本來就該輕。',9700);sayG(du,'我知道你會這樣說。',11000,{tone:'doubt'})}
+   else{later(()=>noteLine('吧台最旁邊坐著一位打領巾的客人，杯子拿起來聞了很久。'),3200);kenSayH(`第二支，配 Jill 今天的${dn}。`,4500,'talk');sayG(du,'這支配那道，太輕。',5800,{tone:'doubt'});kenSayH('……它本來就該輕。',7100);sayG(du,'那就是菜選錯了。',8400,{tone:'doubt'});kenSayH('下次你也來。',9700,'wry');factSet('ken_du_argue')}
+   relSet(KEN_ID,DU_ID,'argued');relSet(KEN_ID,DU_ID,'spoke');relSet(KEN_ID,DU_ID,'sharedEvent');relSet(KEN_ID,DU_ID,'sharedTable');JILL_SAY('那我出菜了。',12300,{with:'named:'+KEN})}
+  else{kenSayH(`第二支，配 Jill 今天的${dn}。`,3200,'talk');JILL_SAY('那我出菜了。',4500,{with:'named:'+KEN})}});
+ else if(n===3)kenScene('ken_t3',g0,()=>{factSet('ken_t3');const b=(kenS().back||[])[0];const bg=b&&seated.find(q=>q.name===b.name);
+  kenNote('第三次。客人自己找位子坐下，杯子 Ken 早就排好了。');JILL_SAY('老樣子？',600,{with:'named:'+KEN});kenSayH('老樣子。第一支給他們猜。',1900,'talk');
+  if(bg)sayG(bg,'這次可以猜了？',3200);else guest(0,'這次可以猜了？',3200);kenSayH('這次隨便你們。',4500,'wry');JILL_SAY(`第三支跟${dn}？`,5800,{with:'named:'+KEN});kenSayH(`跟${dn}。`,7100,'talk')});
+ else{toast('Ken 的品酒夜開始了（Lounge）。');later(()=>{if(R&&R.kt)kenSayH(pickT(['今天三支。照順序喝。','第一支先不要配東西。','今天有一支你們應該認得。']),0,'talk')},900)}}
+/* during the night, a few words in the room (never held) */
+function kenNightTalk(seated){const K=R.kt;if(!K.host||K.said>=3||!seated.length)return;const due=K.t0+R.dur*(.06+.09*K.said);if(R.t<due)return;K.said++;
+ if(K.said===1)kenSayH(pickT(['第二支。這支先不要配東西。','慢一點喝，它會變。','這支要等一下，讓它醒。']),0,'talk');
+ else if(K.said===2){const q=seated[hash('kts|'+S.day)%seated.length];if(q)sayG(q,pickT(['這支跟剛剛那支差好多。','我喜歡第二支。','原來配菜差這麼多。']),0)}
+ else kenSayH(pickT(['最後一支，等菜來再喝。','最後一支。','最後這支，配 Jill 的菜。']),0,'talk')}
+/* the end of the night: the last of them has gone (or the doors are closing) */
+function kenNightClose(){const K=R.kt;if(!K||K.end)return;K.end=1;for(const t of loungeTables())t.tst=0;const n=K.n,H=K.host;const KS=kenS();
+ if(!K.on){/* he came, nobody stayed long enough to begin: the same night again tomorrow */KS.next={d:S.day+1,n};if(H&&!H.gone)leaveGroup(H,'ok');return}
+ if(n===1){const pool=K.guests.filter(g=>!/^客人/.test(g.name)&&namedId(g)!==DU);KS.back=pool.slice(0,3).map(g=>({name:g.name,type:g.type,looks:g.looks&&g.looks[0]?Object.assign({},g.looks[0]):null}))}
+ if(n===1)kenScene('ken_t1',H,()=>{kenNote('最後一位品酒的客人也走了。吧台上剩一排空杯子。');JILL_SAY('比我想的順。',600,{with:'named:'+KEN});kenSayH('第二支開太早了。',1900,'taste');JILL_SAY('是你說要先開的。',3200,{with:'named:'+KEN});kenSayH('所以下次換一支。',4500,'wry')},true);
+ else if(n===2)kenScene('ken_t2',H,()=>{kenNote('吧台收得差不多了。');JILL_SAY('這次你沒有先開。',600,{with:'named:'+KEN});kenSayH('學到了。',1900,'wry');JILL_SAY('下次呢？',3200,{with:'named:'+KEN});kenSayH('下次換一支。',4500,'wry')},true);
+ else if(n===3){kenScene('ken_collab',H,()=>{kenCollab(null)});const s=evState('ken_collab');s.n=(s.n||0)+1;s.last=S.day;if(!s.d)s.d=S.day}   /* the arbiter's own record, so its fallback never comes */
+ kenAdvance(n);
+ if(H&&!H.gone&&H.state!=='leave')later(()=>{if(R&&R.groups.includes(H)&&H.state==='host')leaveGroup(H,'ok')},n<=3?9000:1500)}
+/* 「做一支我們自己的。」 — the third night's end (or, if that evening was cut short, his next evening in the Lounge) */
+function kenCollab(ctx){factSet('ken_collab');kenS().samples=S.day+4;const say=ctx?(t,ms,tone)=>kenSayG(ctx,t,ms,tone):kenSayH;   /* ctx: his next evening as a guest (the third night's end was cut short) */
+ kenNote(!ctx?'最後一位客人走了以後，Ken 還在吧台。杯子收得差不多了，只剩他面前那一個。':'Ken 在吧台坐下，看了一會兒那面酒牆。');
+ JILL_SAY('三次了。',600,{with:'named:'+KEN});say('妳在數？',1900);JILL_SAY('你每次收杯子都說，下次換一支。',3200,{with:'named:'+KEN});say('那下次不換了。',4500,'wry');JILL_SAY('嗯？',5800,{with:'named:'+KEN});say('做一支我們自己的。',7100,'talk');
+ JILL_SAY('我們又沒有酒莊。',8400,{with:'named:'+KEN});say('我認識一間，量做得不多。他們釀，我挑方向。',9700);say('可是最後要配的是妳的菜。妳說好才算。',11000,'talk');JILL_SAY('……那要先試。',12300,{with:'named:'+KEN});say('我帶樣酒來。',13600,'wry');relSet(KEN_ID,'jill','sharedEvent')}
+/* Ken's own lines when he is a guest (not hosting): kenSayH needs the host; these use his table */
+function kenSayG(ctx,txt,ms,tone){if(ctx&&ctx.g)sayG(ctx.g,txt,ms,tone?{tone}:undefined)}
+/* the news before opening: tonight's, and tomorrow's */
+function kenNewsHTML(){const n=kenS().next;if(!n||!loungeLv())return'';const seats=kenSeats();
+ if(n.d<=S.day)return loungeOpenTonight()?`<div class="event kent"><b>今晚｜Ken 的品酒夜 · ${seats} 席</b><span>吧台的位子留給品酒的客人；Ken 七點前後到，站在吧台後面主持。</span></div>`:`<div class="event kent quiet"><b>Ken 的品酒夜</b><span>Lounge 今晚沒有人站吧台——品酒夜改到有人站吧台的那天。</span></div>`;
+ if(n.d===S.day+1)return`<div class="event kent quiet"><b>明晚｜Ken 的品酒夜 · ${seats} 席</b><span>吧台那晚留給品酒的客人。</span></div>`;return''}
+/* ---- drawn on a tasting night: the glasses set out along the counter, the small board by the bar ---- */
+function kenNightDraw(c,list){const K=R&&R.kt;if(!K||K.end||room!=='lounge')return;const by=LG.bar.y;
+ list.push({y:by+11,f:()=>{for(const t of loungeTables()){if(t.kind!=='bar')continue;for(let j=0;j<3;j++){const gx=t.x-6+j*6,gy=by+2;c.fillStyle='rgba(236,240,244,.55)';c.beginPath();c.moveTo(gx-1.8,gy-5);c.quadraticCurveTo(gx-2,gy-1.2,gx,gy-1);c.quadraticCurveTo(gx+2,gy-1.2,gx+1.8,gy-5);c.closePath();c.fill();if(K.on&&j<=Math.min(2,K.said)){c.fillStyle='#8E1F33';c.beginPath();c.moveTo(gx-1.5,gy-3);c.quadraticCurveTo(gx-1.5,gy-1.3,gx,gy-1.2);c.quadraticCurveTo(gx+1.5,gy-1.3,gx+1.5,gy-3);c.closePath();c.fill()}c.fillStyle='rgba(236,240,244,.7)';c.fillRect(gx-.3,gy-1,.6,2.4);c.fillRect(gx-1.3,gy+1.2,2.6,.6)}}}});
+ const bx=LG.bar.x0-22,byy=by+58;list.push({y:byy,f:()=>{c.fillStyle='#5E3B22';c.fillRect(bx-9,byy-26,1.6,26);c.fillRect(bx+8,byy-26,1.6,26);c.fillStyle='#2B2B2B';rr(c,bx-11,byy-34,24,20,2);c.fill();c.strokeStyle='#8A6A42';c.lineWidth=1.2;rr(c,bx-11,byy-34,24,20,2);c.stroke();c.fillStyle='#F2EDE2';c.textAlign='center';c.font=`700 5px ${DFONT}`;c.fillText('Ken 的',bx+1,byy-26);c.font=`700 6px ${DFONT}`;c.fillText('品酒夜',bx+1,byy-18)}})}
+STORY_EV.push(
+ /* the day of a tasting: the night is set going (its scenes are the evening's own) */
+ {k:'kt_night',lane:'major',cls:'A',floor:0,w:()=>1e9,at:['daystart'],   /* planned days ahead and in the news: it is the day's first beat (another due at the start of the day waits a day, counted) */
+  when:()=>{const K=kenS(),n=K.next;if(!n||n.d>S.day||R.kt)return false;if(!loungeOpenTonight()||!NAMED[KEN]){n.d=S.day+1;return false}/* the Lounge is not open tonight: the next day it is */
+   if(n.n<=3&&fact('ken_t'+n.n)){kenAdvance(n.n);return false}/* that night happened; its end did not (the page was closed) */return true},
+  run:()=>kenNightStart()},
+ /* Ken comes back and sits in the room he talked Jill into — no speech about it */
+ {k:'ken_lounge',lane:'major',cls:'A',floor:2,at:['lounge'],once:true,ic:'star',note:'Lounge 蓋好以後，Ken 第一次坐進來。他問吧台坐滿是幾個人。',
+  when:ctx=>kenLoungeDue()&&kenInLounge(ctx)&&kenQuiet(),
+  run:ctx=>{factSet('ken_lounge');const n=kenSeats();kenNote('Ken 第一次坐進蓋好的 Lounge。他點了一杯紅酒，沒有馬上喝，先轉過身看了一圈。');
+   kenSayG(ctx,'跟我想的不一樣。',600);JILL_SAY('哪裡不一樣？',1900,{with:'named:'+KEN});kenSayG(ctx,'比較安靜。',3200);
+   let t=4500;if(fact('tasting_night')){kenSayG(ctx,'上次試酒，是在外面那幾桌。',t,'wry');JILL_SAY('你記得？',t+1300,{with:'named:'+KEN});kenSayG(ctx,'六瓶。我帶來的。',t+2600);t+=3900}
+   later(()=>noteLine('他看了看吧台前那一排高腳椅，又看了看後面的酒牆。'),t);kenSayG(ctx,'這裡坐滿是幾個人？',t+1300);JILL_SAY(`吧台${'零一二三四五六七八九'[n]||n}個。`,t+2600,{with:'named:'+KEN});kenSayG(ctx,'嗯。',t+3900,'taste');
+   later(()=>noteLine('他終於喝了第一口，沒有再說什麼。'),t+5200);relSet(KEN_ID,'jill','spoke')}},
+ /* the proposal: a small tasting at the bar, his */
+ {k:'ken_propose',lane:'major',cls:'A',floor:2,at:['lounge'],once:true,ic:'star',note:()=>`Ken 說這裡可以辦品酒：吧台坐得下就好，他主持。`,
+  when:ctx=>kenProposeDue()&&kenInLounge(ctx)&&kenQuiet(),
+  run:ctx=>{factSet('ken_propose');const n=kenSeats();let t=600;
+   if(kenLegacy()){kenSayG(ctx,'我在這裡坐了好幾個晚上了。',t);JILL_SAY('我知道，你都坐同一張。',t+1300,{with:'named:'+KEN});t+=2600}
+   kenSayG(ctx,'這裡其實可以辦品酒。',t,'talk');JILL_SAY('在這裡？',t+1300,{with:'named:'+KEN});kenSayG(ctx,'嗯。不用很多人，吧台坐得下就好。',t+2600);JILL_SAY('你要辦？',t+3900,{with:'named:'+KEN});
+   kenSayG(ctx,'我主持。酒我挑，菜妳配。',t+5200,'talk');JILL_SAY('哪一天？',t+6500,{with:'named:'+KEN});kenSayG(ctx,'妳店裡比較不忙的那天。',t+7800,'wry');JILL_SAY('……那就過三天。',t+9100,{with:'named:'+KEN});
+   later(()=>noteLine(`Jill 在吧台的小黑板上寫了一行：Ken 的品酒夜・${n} 席。`),t+10400);kenS().next={d:S.day+3,n:1};relSet(KEN_ID,'jill','spoke')}},
+ /* the third night's end did not come (the page was closed): his next evening in the Lounge */
+ {k:'ken_collab',lane:'major',cls:'A',floor:1,at:['lounge'],once:true,ic:'heart',note:'第三次品酒夜之後，Ken 說：「做一支我們自己的。」',
+  when:ctx=>!!fact('ken_t3')&&!fact('ken_collab')&&S.day>fact('ken_t3').d&&kenInLounge(ctx)&&kenQuiet(),
+  run:ctx=>kenCollab(ctx)},
+ /* three bottles without labels, tasted against Jill's signature, after closing */
+ {k:'ken_samples',lane:'major',cls:'A',floor:2,at:['close'],once:true,ic:'star',note:'打烊後，Ken 帶來三瓶樣酒，配著招牌菜試。Jill 把酒取名叫「晚餐之後」。',
+  when:()=>kenSamplesDue()&&(namedHist(KEN).seen===S.day)&&!kenNightToday()&&kenQuiet(),
+  run:()=>{factSet('ken_samples');kenS().wineD=S.day+5;const sn=kenSigName();
+   noteLine('打烊後，Ken 沒有走。他從袋子裡拿出三瓶沒有酒標的酒，一字排開。');KEN_SAY_N('同一間酒莊，三個方向。配妳的招牌試。',600,'talk');
+   later(()=>noteLine(`Jill 端出一盤${sn}，三個杯子各倒一點。`),1900);JILL_SAY('第一支太重，菜都被蓋過去了。',3200,{with:'named:'+KEN});KEN_SAY_N('第三支呢？',4500,'taste');JILL_SAY('第三支……吃完會想再喝一口。',5800,{with:'named:'+KEN});
+   KEN_SAY_N('那就是它。名字妳取。',7100,'wry');JILL_SAY('叫「晚餐之後」。',8400,{with:'named:'+KEN});KEN_SAY_N('為什麼？',9700);JILL_SAY('這裡就是這樣開始的。吃完飯以後，還有地方可以坐。',11000,{with:'named:'+KEN});KEN_SAY_N('……好。',12300,'wry')}},
+ /* the wine arrives, in the afternoon; from tonight it is on the list, for good */
+ {k:'ken_wine',lane:'major',cls:'A',floor:2,at:['daystart'],once:true,ic:'star',note:'「晚餐之後」——JILL\'S KITCHEN × KEN——上了 Lounge 的酒單。',
+  when:()=>kenWineDue()&&!v24Fresh('daystart')&&loungeLv()>=1&&kenQuiet(),
+  run:()=>{factSet('ken_wine');kenNote('下午，Ken 搬了兩箱酒進來。米白色的酒標，上面寫著「晚餐之後」，下面一行小字：JILL\'S KITCHEN × KEN。','ken_wine');
+   KEN_SAY_N('第一批。',600);JILL_SAY('放哪裡？',1900,{with:'named:'+KEN});KEN_SAY_N('酒單上。',3200,'wry');later(()=>noteLine('「晚餐之後」上了 Lounge 的酒單。'),4500);
+   S.wineOff=S.wineOff||{};delete S.wineOff.w_jk;kenS().next={d:S.day+7,n:4};regFactNamed(KEN,'和 Jill 做了一支酒：「晚餐之後」。')}},
+ /* the friendship line's payoff: 杜 orders it, days after it came out; they still disagree, and he says it is good */
+ {k:'du_wine',lane:'major',cls:'A',floor:2,at:['lounge','order'],once:true,ic:'heart',note:'Monsieur 杜點了「晚餐之後」。他說太輕——也說它很好。',
+  when:()=>duWineDue()&&!!kenAtLounge()&&!!duAtLounge()&&kenQuiet(),
+  run:()=>{const k=kenAtLounge(),d=duAtLounge();factSet('du_wine');const bt=evanOn()||qingOn();
+   later(()=>noteLine('Monsieur 杜在吧台坐下，翻開酒單，在「晚餐之後」那一行停了一下。'),300);sayG(d,'這支是你的。',1600);sayG(k,'我們的。',2900);
+   later(()=>kenNote(bt?`${bt.name}倒了一杯給他。杜先生喝了一口，放下杯子，很久沒有說話。`:'杜先生點了一杯。他喝了一口，放下杯子，很久沒有說話。','du_wine'),4200);
+   sayG(k,'太輕？',5500,{tone:'wry'});sayG(d,'太輕。要我選，不會往這個方向走。',6800,{tone:'doubt'});sayG(k,'我知道你不會。',8100);
+   later(()=>noteLine('杜先生又喝了一口，這次喝得比較慢。'),9400);sayG(d,'可是它很好。',10700,{tone:'praise'});later(()=>noteLine('Ken 轉過頭看他。'),12000);sayG(d,'我說的是酒，不是客氣。',13300,{tone:'praise'});
+   later(()=>noteLine('Ken 沒有接話，拿起自己的杯子，輕輕碰了一下他的。'),14600);relSet(KEN_ID,DU_ID,'respected');relSet(KEN_ID,DU_ID,'spoke');regFactNamed(DU,'喝了「晚餐之後」。說它太輕，也說它很好。')}},
+ /* afterwards, now and then — never explained again */
+ {k:'kx_asks',lane:'ambient',cd:7,at:['lounge'],when:ctx=>!!fact('ken_wine')&&kenInLounge(ctx)&&!R.kt&&(evanOn()||qingOn())&&Math.random()<.35,
+  run:ctx=>{const b=evanOn()||qingOn();const o=R.st.lgSold&&R.st.lgSold.w_jk;const n=o?o.n:0;kenSayG(ctx,'今天有人點那支嗎？',700);sayS(b,n?`${'零一二三四五六七八九'[Math.min(n,9)]}杯了。`:'還沒。',2100);kenSayG(ctx,n?'嗯。':'還早。',3500,'wry')}},
+ {k:'kx_du_orders',lane:'ambient',cd:10,at:['order'],when:ctx=>!!fact('du_wine')&&ctx.g&&namedId(ctx.g)===DU&&ctx.tk&&ctx.tk.lounge&&ctx.tk.items.some(i=>i.d==='w_jk')&&Math.random()<.5,
+  run:ctx=>{sayG(ctx.g,'這支。',600)}},
+ {k:'kx_heard',lane:'ambient',cd:5,at:['lounge'],when:ctx=>factN('ken_tn')>=1&&ctx.g&&!ctx.g.reg&&!namedId(ctx.g)&&!ctx.g.tasting&&!R.kt&&Math.random()<.12,
+  run:ctx=>{sayG(ctx.g,pickT(['聽說這裡有品酒夜？','Ken 的品酒夜下次是什麼時候？','上次那個品酒會，還會辦嗎？']),700);const b=evanOn()||qingOn();const nx=kenS().next;if(b)sayS(b,nx&&nx.d-S.day<=7?'過幾天就有。開店前會寫在外面。':'Ken 說了算。',2100)}}
+);
+function kenAtLounge(){return R&&R.groups.find(g=>namedId(g)===KEN&&!g.kenHost&&g.table!=null&&!g.gone&&R.tables[g.table].room==='lounge'&&SEATED_ST.concat(['toTable']).includes(g.state))||null}
+function duAtLounge(){return R&&R.groups.find(g=>namedId(g)===DU&&g.table!=null&&!g.gone&&R.tables[g.table].room==='lounge'&&SEATED_ST.concat(['toTable']).includes(g.state))||null}
+/* Ken's words when he is not a party in the room (after closing, the afternoon): his face and name, said to the room */
+function KEN_SAY_N(txt,ms,tone){later(()=>{if(!S)return;const L={who:'named:'+KEN,name:KEN,text:txt,tone};if(shGrab(L))return;logLine(KEN,txt,'g');if(!portraitLine('named:'+KEN,txt,{tone}))toast(`<b>${KEN}</b>：「${txt}」`,'q')},ms||400)}
+/* who the evening needs: Ken in the Lounge for his next step; Ken and 杜 together once the wine is out */
+V24_WANTS.push(()=>{const out=[];if(!loungeOpenTonight()||!NAMED[KEN]||kenNightToday())return out;
+ const want=k=>out.push({name:KEN,p:.6,type:'gourmet',size:1,o:{lounge:1},k});
+ if(kenLoungeDue())want('ken_lounge');else if(kenProposeDue())want('ken_propose');else if(kenSamplesDue())want('ken_samples');
+ else if(fact('ken_t3')&&!fact('ken_collab')&&S.day>fact('ken_t3').d)want('ken_collab');
+ else if(duWineDue()&&NAMED[DU]&&dayCoin('dwn|'+S.day)<45)out.push({name:KEN,p:1,type:'gourmet',size:1,grp:'kdw',o:{lounge:1},k:'du_wine'},{name:DU,p:1,type:'gourmet',size:1,grp:'kdw',o:{lounge:1},k:'du_wine'});
+ return out});
 function smPair(){if(!R)return null;const s=seatedId('sophie'),m=seatedId('mia');if(!s||!m)return null;const ts=R.tables[s.table],tm=R.tables[m.table];return ts&&tm&&(ts.room||'main')===(tm.room||'main')?{s,m}:null}
 function wallWorrying(){return !!fact('wall_worry')&&!fact('wall_mediation')}
 /* the leak shows after rain: rain in the last two days; when it has stayed dry since the move settled (two days after
@@ -3513,7 +3702,10 @@ const STORY_LINES=[
  {k:'sophiemei',who:'Sophie & 寶寶',names:['Sophie','Jill'],faces:['sophie','cat:mei'],title:()=>'我沒有特別喜歡貓',open:()=>!!BF('sophie_mei_1'),more:'寶寶好像記得她。',photos:['sophie_mei'],
   beats:[['sophie_mei_1','「可以不要讓牠靠我的包嗎？」'],['sophie_mei_2','「今天那隻呢？」'],['sophie_mei_3','低頭看了一下'],['sophie_mei_4','「給你們店裡的。」']]},
  {k:'kd',who:'Ken & Monsieur 杜',names:['品酒師 Ken','Monsieur 杜','Evan','沈晴','安安','Jill'],faces:['named:品酒師 Ken','named:Monsieur 杜'],title:()=>'總是談不攏的兩個人',tag:'友情故事',open:()=>!!(BF('ken_du_argue')||BF('kd_usual')),more:'他們還在吵。',photos:['ken_du','ken_du_seat'],
-  beats:[['ken_du_argue','第一次吵起來'],['lounge_first_night','Lounge 的第一個晚上',{can:()=>!!BF('lounge_first_night')||!S.newRooms||S.newRooms.lounge==null||S.day-(S.newRooms.lounge||0)<=3}],['kd_usual','固定的位子'],['kd_evan_1','「杜來了嗎？」'],['kd_qing','「他有說幾點嗎？」'],[['kd_absence','kd_absence_du'],'那個人今天沒來'],['kd_coaster','第二個杯墊'],['kd_photo','還是沒有同意'],['kd_photo2','固定的位置']]},
+  beats:[['ken_du_argue','第一次吵起來'],['lounge_first_night','Lounge 的第一個晚上',{can:()=>!!BF('lounge_first_night')||!S.newRooms||S.newRooms.lounge==null||S.day-(S.newRooms.lounge||0)<=3}],['kd_usual','固定的位子'],['kd_evan_1','「杜來了嗎？」'],['kd_qing','「他有說幾點嗎？」'],[['kd_absence','kd_absence_du'],'那個人今天沒來'],['kd_coaster','第二個杯墊'],['kd_photo','還是沒有同意'],['kd_photo2','固定的位置'],['du_wine','「可是它很好。」',{can:()=>!!fact('ken_wine'),illus:'du_wine'}]]},
+ /* rc7: Ken after the Lounge — his tastings, the wine */
+ {k:'ken',who:'品酒師 Ken',names:['品酒師 Ken','Jill','Monsieur 杜','Evan','沈晴'],faces:['named:品酒師 Ken','jill'],title:()=>'下次換一支',open:()=>!!(BF('ken_lounge')||BF('ken_propose')),more:()=>fact('ken_wine')?'':'他還會再辦。',
+  beats:[['ken_lounge','「跟我想的不一樣。」',{can:()=>!kenLegacy()}],['ken_propose','「這裡其實可以辦品酒。」'],['ken_t1','第一次品酒夜',{illus:'ken_t1'}],['ken_t2','「下次換一支。」'],['ken_t3','老樣子'],['ken_collab','「做一支我們自己的。」'],['ken_samples','三瓶沒有酒標的酒'],['ken_wine','「晚餐之後」',{illus:'ken_wine'}]]},
  {k:'qt',who:'晴 & 阿拓',names:['沈晴','阿拓','Jill'],kinds:['s'],faces:['staff:沈晴','staff:阿拓'],title:()=>'多的',open:()=>!!BF('qt_1'),more:'（只要他們還在這裡工作。）',photos:['qing_tuo','qing_tuo_late'],
   beats:[['qt_1','「炸雞好了沒？」'],['qt_2','不用問了'],['qt_3','「多的。」'],['qt_absence','「今天炸物怎麼怪怪的？」'],['qt_photo','從工作開始'],['qt_photo2','有你在的晚班']]},
  {k:'dylan',who:()=>dylanOut()?'Jill & Dylan':'Dylan',names:['Dylan','Jill','王太太','王先生'],faces:()=>dylanOut()?['dylan','jill']:['dylan'],title:()=>dylanOut()?'結婚十一年，還在追':'那位常來的客人',open:()=>(S.regulars.dylan||0)>=1,more:()=>dylanOut()?'他們的故事還在繼續。':'好像有什麼……',photos:['jill_dylan_valentine'],
@@ -3564,7 +3756,7 @@ function restChapters(){const achD=achReal;/* v2.3 follow-up: a beat's day from 
   {t:'小小的餐廳',beats:[['開店',has(true,1)],['第一位員工',has((S.crew||[]).length>0||achD('hire')!=null,firstHireDay())],['第一次擴建',has(S.level>=2,S.level===2&&S.grewDay?S.grewDay:null)],['有了熟客',has(REGS.some(r=>(S.regulars[r.id]||0)>=4),achD('regular4'))]]},
   {t:'店開始有自己的樣子',beats:[['招牌菜',has(!!S.signature,achD('sig'))],['側廳',has(projOn('side'),S.newRooms&&S.newRooms.side)],['第二道招牌',has(!!S.sigDessert,achD('sigd'))],["Jill's Kitchen — JILL",has(S.level>=5,achD('jill'))]]},
   {t:'晚餐之後',hidden:()=>!fact('ken_wine_q'),tease:'店裡好像還少了什麼。',showIf:()=>S.level>=4,beats:[['「妳真的完全不賣酒？」',BF('ken_wine_q')],['這道要配什麼',BF('ken_pairing')],['有人吃完了還不想走',BF('lounge_idea')],['試酒的晚上',BF('tasting_night')],['「讓人吃完飯以後，還有地方可以坐。」',BF('lounge_project')],['Lounge 開了',BF('lounge_built_1')]]},
-  {t:"Jill's Kitchen — The Lounge",hidden:()=>!fact('lounge_project'),tease:'？？？？？',showIf:()=>!!fact('ken_wine_q'),beats:[['第一個晚上',BF('lounge_first_night')],['酒吧沙發廳',BF('lounge_built_2')],['安靜的角落',BF('lounge_built_3')],['「聽說這裡是你害的。」',BF('evan_origin')],['好像真的開起來了',(()=>{const k=Object.keys(story().facts).find(x=>x.startsWith('milestone_'));return k?fact(k).d:null})()]]},
+  {t:"Jill's Kitchen — The Lounge",hidden:()=>!fact('lounge_project'),tease:'？？？？？',showIf:()=>!!fact('ken_wine_q'),beats:[['第一個晚上',BF('lounge_first_night')],['酒吧沙發廳',BF('lounge_built_2')],['安靜的角落',BF('lounge_built_3')],['「聽說這裡是你害的。」',BF('evan_origin')],['Ken 的品酒夜',BF('ken_t1')],['「晚餐之後」上了酒單',BF('ken_wine')],['好像真的開起來了',(()=>{const k=Object.keys(story().facts).find(x=>x.startsWith('milestone_'));return k?fact(k).d:null})()]]},
   /* v2.4 P2: the Second Floor (second_floor_and_long_arcs §39: the major beats only — no line for the first question,
      none for the crew's moments; nothing that says what the floor will be) */
   {t:'樓上',showIf:()=>!!fact('up_cats'),beats:[['房東的二樓',BF('up_inspect')],[`${upCatN('mikan')}和${upCatN('ban')}不見的那一晚`,BF('up_cats'),{illus:'up_cats'}],['「……樓上現在還空著嗎？」',BF('up_ask')],['「整層。」',BF('up_lease')]]},
@@ -3840,9 +4032,9 @@ function update(dt){R.t+=dt;if(R.v24q&&R.v24q.length)v24Upd();
  for(const p of R.parts){p.t+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=p.g*dt}R.parts=R.parts.filter(p=>p.t<p.life);
  for(const k in S.stock)if(S.stock[k]<0)S.stock[k]=0;
  if(AU.ctx){const n=R.slots.filter(s=>s.job&&s.type==='stove').length;AU.siz.gain.setTargetAtTime(Math.min(.14,n*.05)*(.7+Math.random()*.6),AU.ctx.currentTime,.05);const seated=R.groups.filter(g=>['reading','order','wait','eat','check'].includes(g.state)).length;AU.chat.gain.setTargetAtTime(Math.min(.09,seated*.018),AU.ctx.currentTime,.3);if(Math.random()<.1)AU.chatBp.frequency.setTargetAtTime(380+Math.random()*500,AU.ctx.currentTime,.08)}
- if(R.closed&&R.groups.length===0&&R.closing==null)startClosing();upNightUpd(dt);try{srLifeUpd(dt);srClosingUpd(dt)}catch(e){console.warn('[sr]',e)}/* v2.4 P2, rc6 */if(R.closing!=null){if(!upSearching())R.closing+=dt;/* the closing waits while they look for the cats */if(R.closing>75&&!R.ended){finishClosing();return}}
+ try{kenNightUpd(dt)}catch(e){console.warn('[ken]',e)}/* rc7 */if(R.closed&&R.groups.length===0&&R.closing==null)startClosing();upNightUpd(dt);try{srLifeUpd(dt);srClosingUpd(dt)}catch(e){console.warn('[sr]',e)}/* v2.4 P2, rc6 */if(R.closing!=null){if(!upSearching())R.closing+=dt;/* the closing waits while they look for the cats */if(R.closing>75&&!R.ended){finishClosing();return}}
  R.cpT=(R.cpT||0)+dt;if(R.cpT>20&&R.closing==null){R.cpT=0;checkpointSave('auto')}}
-function startClosing(){R.closing=0;hideCombo();storyTick('close',{});try{srClosingPlan()}catch(e){console.warn('[sr]',e)}/* v2.3 */const J=R.jill;J.q=[];J.cur=null;J.carry=[];const wasResting=J.rest==='sit';const keep=wasResting?Object.assign({},LIFE.jill):null;if(J.rest&&!wasResting)endRest();lifePlan();
+function startClosing(){R.closing=0;hideCombo();try{if(R.kt&&!R.kt.end)kenNightClose()}catch(e){console.warn('[ken]',e)}/* rc7 */storyTick('close',{});try{srClosingPlan()}catch(e){console.warn('[sr]',e)}/* v2.3 */const J=R.jill;J.q=[];J.cur=null;J.carry=[];const wasResting=J.rest==='sit';const keep=wasResting?Object.assign({},LIFE.jill):null;if(J.rest&&!wasResting)endRest();lifePlan();
  if(wasResting){LIFE.plan='sofa';const L=LIFE.jill;Object.assign(L,{on:true,reserved:false,pos:keep.pos,x:keep.x,y:SOFA.jy,face:keep.face,legs:0,legTarget:0,act:'settle',t:rand(1,3),sinceSit:0,counted:false,hat:false});J.rest=null;J.sofa=true;J.tx=null;J.ty=null;J.moving=false;J.restTo=false}
  else if(LIFE.plan==='sofa'){J.tx=null;J.ty=null;J.restTo=false;J.moving=false;const L=LIFE.jill;L.x=J.x;L.y=J.y;L.face=J.face;/* first the pass gets wiped down; then the sofa */L.wrapT=rand(4,6.5);if(Math.hypot(J.x-PASS.x,J.y-PASS.y)>4){L.act='standing';jillWalk(L,PASS.x,PASS.y,'wrap')}else L.act='wrap'}
  else{const t=R.tables[0];J.troom='main';J.tx=t.x-25;J.ty=t.y+2;J.restTo=true}$('#closePill').hidden=false;if(CATS)for(const c of CATS){if(c.hidden||['jump','walk','race','dash','bed'].includes(c.st))continue;c.t=Math.min(c.t||0,c.def.id==='tora'?.4:c.def.id==='ban'?rand(1.5,3):rand(2,8))}}
@@ -3980,7 +4172,7 @@ function idFocusWithWho(who){const s=idSpeaker(who);if(!s||!s.g)return false;idF
 function idFocusWho(who){const s=idSpeaker(who);if(!s)return false;if(s.gone){toast(`${s.name} 已經離開了。`);return true}if(s.g){idFocusGroup(s.g,s.k,{name:s.name});return true}const p=s.at();if(!p){toast(`${s.name} 現在不在這裡。`);return true}idGo(p.room);idMark(s.at,s.name,p.room==='kitchen'?'廚房':'');return true}
 /* a guest who speaks in the room you are looking at: marked for a moment, where they are */
 /* a guest walking (to their table, out of the door) tapped: who it is */
-function idHitWalker(p){if(!R)return false;for(const g of R.groups){if(g.gone||!['toTable','leave','arrive'].includes(g.state)||(g.room||'main')!==room)continue;for(let k=0;k<(g.size||1);k++){const q=idMemberAt(g,k);if(q&&q.room===room&&Math.abs(p.x-q.x)<12&&p.y<q.y+5&&p.y>q.y-50){idFocusGroup(g,k,{soft:1});return true}}}return false}
+function idHitWalker(p){if(!R)return false;for(const g of R.groups){if(g.gone||!['toTable','leave','arrive','toHost','host'].includes(g.state)||(g.room||'main')!==room)continue;for(let k=0;k<(g.size||1);k++){const q=idMemberAt(g,k);if(q&&q.room===room&&Math.abs(p.x-q.x)<12&&p.y<q.y+5&&p.y>q.y-50){idFocusGroup(g,k,{soft:1});return true}}}return false}
 function idSpeak(g,k){if(!R||!g)return;const p=idMemberAt(g,k||0);if(p&&p.room===room)idFocusGroup(g,k||0,{soft:1,short:1})}
 /* drawn over the room while it lasts: a ring at their feet (round the table for a table), a small label over it */
 function idDraw(c){if(!IDF.length)return;const T=idNow();const vl=-SV.ox/SV.s+3,vr=srVisR()-3;let top=-SV.oy/SV.s+4;try{const tb=$('#roomTabs');if(tb&&!tb.hidden){const r0=tb.getBoundingClientRect(),r1=sc.getBoundingClientRect();top=Math.max(top,(r0.bottom-r1.top-SV.oy)/SV.s+4)}}catch(e){}
@@ -4268,10 +4460,10 @@ function drawScene(now){const c=sctx;c.setTransform(1,0,0,1,0,0);c.globalAlpha=1
  let vg=c.createRadialGradient(206,290,210,206,290,400);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(15,8,4,.38)');c.fillStyle=vg;c.fillRect(X0,-TOP,XW,LH+TOP);
  try{idDraw(c)}catch(e){}   /* v2.4 rc6 (07:09): who is where, for a moment */
  c.restore()}
-const WALK_ST=['arrive','queue','toTable','leave'];
+const WALK_ST=['arrive','queue','toTable','leave','toHost','host'];
 function drawWalkers(c,g,now){const n=g.size;const sit=isSeated(g);const wact=g.state==='queue'&&!g.moving?g.wact:null;const mood=g.state==='leave'?(g.mood==='angry'?'angry':g.mood==='sad'?'sad':'happy'):(g.pat>.5?'happy':g.pat>.25?'ok':'sad');
   g.looks.forEach((L0,k)=>{const off=(k-(n-1)/2)*11;const stp=g.moving?Math.sin(g.walk+k):0;let gaze=null,hold=null;
-   if(wact==='phone'&&k===0){hold='phone';gaze={x:0,y:.6}}else if(wact==='cat'&&g.wcat&&!g.wcat.hidden){gaze={x:g.wcat.x>=g.x?1:-1,y:g.wcat.y>g.y-20?.5:-.2}}else if(wact==='look'){gaze={x:1,y:-.1}}else if(wact==='talk'&&n>1){gaze={x:k?1:-1,y:.1}}
+   if(g.state==='host'&&k===0)hold='wine';else if(wact==='phone'&&k===0){hold='phone';gaze={x:0,y:.6}}else if(wact==='cat'&&g.wcat&&!g.wcat.hidden){gaze={x:g.wcat.x>=g.x?1:-1,y:g.wcat.y>g.y-20?.5:-.2}}else if(wact==='look'){gaze={x:1,y:-.1}}else if(wact==='talk'&&n>1){gaze={x:k?1:-1,y:.1}}
    if(sit){drawPerson(c,g.x+(n>1?(k%2?6:-6):0),g.y+(n>1?(k%2?3:-3):0)+Math.floor(k/2)*14,L0,{seated:true,lounge:{legs:0},mood,flip:false,hold,gaze,bob:Math.sin(now*1.3+g.seed+k*1.7)*.3,blink:Math.sin(now*1.4+g.seed+k)>.97});return}
    drawPerson(c,g.x+off,g.y+(k%2)*2,L0,{step:stp,bob:g.moving?Math.abs(stp)*-.8:0,mood,flip:g.tx<g.x,hold:g.moving?null:hold,gaze:g.moving?null:gaze,blink:Math.sin(now*1.4+g.seed+k)>.97});if(k===0&&(g.room||'main')==='front'&&streetWet())drawUmbrella(c,g.x+off+(g.tx<g.x?-3:3),g.y-30,UMB_COLS[Math.floor(g.seed*7)%UMB_COLS.length]);if(g.bus&&k===0){const fl=g.tx<g.x?-1:1;const px=g.x+off+fl*7,py=g.y-27;c.fillStyle='#FBFAF6';c.beginPath();c.ellipse(px,py,6.5,2.8,0,0,7);c.fill();c.strokeStyle='rgba(60,45,35,.55)';c.lineWidth=.7;c.stroke();c.fillStyle='rgba(120,90,70,.25)';c.beginPath();c.ellipse(px,py,3.2,1.2,0,0,7);c.fill()}})}
 function drawJillAt(c,J,V,now){const moving=J.moving;const stp=moving?Math.sin(J.step):0;
@@ -5757,7 +5949,7 @@ function streetSpawn(){const dir=Math.random()<.5?1:-1;const type=pick(STREET_TY
  if(w.dog)w.v=Math.min(w.v,30);
  if(!R.closed&&Math.random()<streetStopP()){const spots=[110,290,FR.door.x+(dir>0?-34:34)];if(projOn('terrace')&&(S.frontTables||0)>0)spots.push(FR.cols[0]+(dir>0?-46:46));w.stopX=pick(spots)}
  STREET.ppl.push(w)}
-function streetJoin(w){if(R.closed||R.t>R.dur*.9||R.si>=R.sched.length)return false;const o=R.sched[R.si];if(o.reg||o.hold||o.t-R.t>45||o.forSig)return false;if(queued().length>=queueMax()-1)return false;if(Math.random()>(w.dog&&extOn('dognook')?.75:.6))return false;
+function streetJoin(w){if(R.closed||R.t>R.dur*.9||R.si>=R.sched.length)return false;const o=R.sched[R.si];if(o.reg||o.hold||o.t-R.t>45||o.forSig||o.kenHost||o.looks||(o.name&&NAMED[o.name]))return false;   /* rc7: a named guest (Ken, 杜, Madame Lin…) or someone whose looks are set is never a passer-by's random looks — they walk in as themselves */if(queued().length>=queueMax()-1)return false;if(Math.random()>(w.dog&&extOn('dognook')?.75:.6))return false;
  const spec=Object.assign({},o,{t:R.t,looks:o.size===w.n?w.looks:null,fromStreet:{x:w.x,y:w.y}});R.si++;spawn(spec);
  if(w.dog&&!R.dogOut){const g=R.groups[R.groups.length-1];if(g&&g.walkIn){const nook=extOn('dognook');R.dogOut={gid:g.id,col:w.dogCol,type:w.dogT||dogTypeOf(w.seed),x:w.x,y:w.y,tx:nook?FR.nook.x+2:FR.door.x+(w.x<FR.door.x?-48:48),ty:nook?FR.nook.y+20:296,ph:0,face:1,nook,rest:0,drink:0};if(nook&&!R.dogNookNoted){R.dogNookNoted=1;noteLine('有隻狗在門口的休息角趴下來了。')}}}
  return true}
@@ -7411,6 +7603,8 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
   ['今晚倒哪幾種','開店前，「今日菜單」下面有「Lounge 酒單」：每一種酒都可以開或關，至少留一種；Lounge 的客人只會點今晚有倒的。酒吧小點在上面的菜單裡，不佔菜單名額，名額旁邊會寫「＋ 酒吧小點 幾道（不佔名額）」。'],
   ['品酒課','員工頁每位服務生的卡片上（有 Lounge 以後）：$12,000，上完對酒就「自在」了。外場懂酒的人多，主廳、側廳吃飯的客人更常點一杯。'],
   ['Lounge 的人怎麼升級','Lounge 名單上的人是在店裡邊做邊學的：訓練升級一天最多一級，先讓他上一天班再說。'],
+  ['Ken 的品酒夜','Lounge 開了以後，Ken 會回來坐坐，然後提議在吧台辦小型的品酒夜——品酒會只有 Ken 辦。辦的那天，開店前的新聞會寫「今晚｜Ken 的品酒夜 · 8 席」（Lounge I 是 6 席），前一天先寫「明晚」。那一晚吧台的位子留給品酒的客人：Ken 站在吧台後面主持，吧台上排著杯子，吧台旁邊立著小黑板；品酒的客人每人點兩三杯今晚的酒和一份小食，Ken 會待到最後一位走了才走。前三次是故事（店裡暫停，點一下繼續）；之後每一兩個禮拜他會再辦一次，不用你安排。Lounge 那晚沒有人站吧台的話，改到有人站吧台的那天。'],
+  ['晚餐之後','Ken 辦過三次品酒夜以後，會和 Jill 一起做一支酒：「晚餐之後」（JILL\'S KITCHEN × KEN），一支輕盈的紅酒，配 Jill 的招牌菜。酒進來以後就一直在 Lounge 的酒單上，一杯大約 $420；不用研發，也可以在「Lounge 酒單」關掉。'],
   ['帳','結算的晚上會寫「Lounge 幾桌・營業額・吃完留下幾組」。營業額是 Lounge 那幾桌付的錢，不含小費，跟下面「Lounge 今天賣了什麼」的合計一樣；Lounge 的小費另外一行，晚餐桌上配的酒也另外一行。員工那一欄寫調酒師調了幾杯。']]},
  {ic:'🚪',h:'二樓：休息室與包廂',sum:'二樓租下來以後，有兩間房會從店裡的日子裡長出來：先是給每天在這裡工作的人的，再是給一桌人的。',pts:[
   ['怎麼來的','都不是升級選單裡冒出來的。二樓開放一陣子以後，換班的東西、等人、找地方坐一下，大家都在二樓找位置；看得夠多了，打烊後 Jill 會自己看見（《大家待的地方》）。休息室用了一段時間、店裡也夠滿以後，會有客人問有沒有比較安靜、不被打擾的位子；之後又是一個打烊後的晚上（《關上門以後》）。企劃都在「店舖工程 › 二樓的房間」，選「之後再說」也不會不見。房間蓋好的那天早上，開店前會先帶你上二樓看一眼：昨晚還是工地，今天多了牆、門和門牌；可以直接進去看看，之後就從分頁進去。'],
@@ -7543,7 +7737,7 @@ function portraitData(key){const D=window.PORTRAIT_DATA;return D&&key&&D[key]?D[
 /* who: 'jill' | 'dylan' | a regular id | 'staff:<name>'. Returns {src,name,side} or null (= keep the plain presentation). */
 /* v2.4: a few people have more than one face (the player's expression sheets). A line in a mood nobody drew for that
    person (STRICT_TONES) shows no face rather than the everyday one — never a laugh on a worried line. */
-const PORTRAIT_TONES={'staff:許葳':{work:'v24_xuwei_work',smile:'v24_xuwei_smile',amused:'v24_xuwei_amused',done:'v24_xuwei_done'},'staff:秀琴阿姨':{worried:'v24_xiuqin_worried',phone:'v24_xiuqin_phone',oh:'v24_xiuqin_oh'},'named:怡君':{laugh:'v24_yj_laugh',side:'v24_yj_side',tired:'v24_yj_tired',relieved:'v24_yj_relieved'}};
+const PORTRAIT_TONES={'named:品酒師 Ken':{talk:'v24_ken_talk',wry:'v24_ken_wry',taste:'v24_ken_taste'},'named:Monsieur 杜':{taste:'v24_du_taste',doubt:'v24_du_doubt',praise:'v24_du_praise'},/* rc7: the player's sheets, 16:21 and 16:14 */'staff:許葳':{work:'v24_xuwei_work',smile:'v24_xuwei_smile',amused:'v24_xuwei_amused',done:'v24_xuwei_done'},'staff:秀琴阿姨':{worried:'v24_xiuqin_worried',phone:'v24_xiuqin_phone',oh:'v24_xiuqin_oh'},'named:怡君':{laugh:'v24_yj_laugh',side:'v24_yj_side',tired:'v24_yj_tired',relieved:'v24_yj_relieved'}};
 const STRICT_TONES=new Set(['worried','phone','tired','thinking','serious']);
 function portraitOf(who,tone){if(!who)return null;const T=PORTRAIT_TONES[who],tk=T&&tone&&T[tone];const strict=!!(tone&&!tk&&STRICT_TONES.has(tone));
  if(who.startsWith&&who.startsWith('staff:')){if(strict)return null;const nm=who.slice(6);const src=portraitData(tk||STAFF_PORTRAITS[nm]);return src?{src,name:nm,side:'right'}:null}if(who.startsWith&&who.startsWith('named:')){if(strict)return null;const nm=who.slice(6);const N=NAMED[nm];const src=N&&portraitData(tk||N.p);return src?{src,name:nm,side:'right'}:null}const P=PORTRAITS[who];if(!P)return null;const key=P.v[tone]||(tone&&STRICT_TONES.has(tone)?null:P.v.default);if(!key)return null;const src=portraitData(key);return src?{src,name:P.name,side:P.side}:null}
@@ -7612,7 +7806,7 @@ function showPrep(){phase='prep';mainScreen='prep';R=null;room='main';try{storyP
   ${shopDay()>=6?(()=>{const t=socialTopic();const c=campaign();const n=socialCands().length;return`<button class="goalline linkline" data-act="bookSocial"><span>社群與宣傳</span><b>${c?`${CAMPS.find(x=>x.k===c.k).n}進行中`:t?`大家在談：${t.k==='food'&&t.dish?dishName(t.dish):TOPICS[t.k].n}`:'最近大家在說什麼'}</b><small>${n?`今天可以發 ${n} 則 ›`:'›'}</small></button>`})():''}
   ${T.event!=='none'?`<div class="event"><b>今日事件：${E.n}</b><br>${E.d}</div>`:''}
   ${S.buzzMsg?`<div class="news">${S.buzzMsg}</div>`:''}
-  ${S.news.length?`<div class="news">${S.news.join('<br>')}</div>`:''}${pdNewsHTML()}${loungeLv()&&!loungeStaffed()?`<div class="inline-warn" style="margin-top:10px">Lounge 今晚沒有人站吧台——在「員工」聘一位調酒師，或在工作分配把他加到 Lounge 吧台。</div>`:''}
+  ${S.news.length?`<div class="news">${S.news.join('<br>')}</div>`:''}${pdNewsHTML()}${kenNewsHTML()}${loungeLv()&&!loungeStaffed()?`<div class="inline-warn" style="margin-top:10px">Lounge 今晚沒有人站吧台——在「員工」聘一位調酒師，或在工作分配把他加到 Lounge 吧台。</div>`:''}
   <h3>今日任務</h3><div class="card tasks">${T.tasks.map(t=>`<div class="task"><span>${t.txt}</span><small>獎勵 +${fmt(t.reward)}</small></div>`).join('')}</div>
   ${(()=>{const reco=recoDish();const dt=T.tasks.find(t=>t.k==='dish');const list=menuList().filter(stationOk);if(!list.length)return'';const exp=expectDemand(T.groups,60);
    return`<h3>⭐ 今日推薦</h3><div class="card reco"><p class="d">客人今天會比較容易點這道菜。想主推哪一道就選它，再多備一點料。</p><div class="opts">${list.map(d=>`<button class="${reco===d?'on':''}" data-act="reco" data-d="${d}">${reco===d?'⭐ ':''}${dishName(d)}</button>`).join('')}</div>
@@ -7633,7 +7827,7 @@ function storyToday(D){const out=[];for(const L of STORY_LINES){let P=null;try{P
 function storyTodayHTML(D){const L=storyToday(D);if(!L.length)return'';return`<h3>今天的故事</h3><div class="card stoday">${L.map(x=>`<div class="st-row"><b>${x.who}</b><span>「${String(x.t).replace(/^「|」$/g,'')}」</span>${x.note?`<small>${x.note}</small>`:''}</div>`).join('')}<button class="jmore" data-act="bookStory">看故事頁 ›</button></div>`}
 /* v2.4 rc6 (09:56): the Lounge's list for tonight, chosen before opening — at least one */
 function wineTonightHTML(){if(!loungeLv())return'';const all=wineAvail();if(!all.length)return'';const off=S.wineOff||{};const on=all.filter(k=>!off[k]);
- return`<h3>Lounge 酒單 <small>今晚倒 ${on.length||all.length} 種${Object.keys(WINES).some(k=>WINES[k].dev&&!wineHas(k))?'・更多在「菜單研發」':''}</small></h3><div class="card wines">${all.map(k=>{const W=WINES[k];const o=!off[k];return`<div class="menu-row wrow ${o?'':'off'}"><img alt="" src="${dishURL(k,'P')}"><div class="nm">${W.n}<small>${W.cocktail?'調酒':'酒'} · 一杯 ${fmt(priceOf(k))}${W.pn?` · 配${W.pn}`:''}</small></div><button class="tog ${o?'on':''}" data-act="wineT" data-k="${k}" aria-label="${o?'今晚不倒':'今晚倒'}"></button></div>`}).join('')}<p class="small muted" style="margin:6px 2px 2px">Lounge 的客人只會點今晚有倒的酒。酒吧小點在上面的菜單裡，不佔名額。</p></div>`}
+ return`<h3>Lounge 酒單 <small>今晚倒 ${on.length||all.length} 種${Object.keys(WINES).some(k=>WINES[k].dev&&!wineHas(k))?'・更多在「菜單研發」':''}</small></h3><div class="card wines">${all.map(k=>{const W=WINES[k];const o=!off[k];return`<div class="menu-row wrow ${o?'':'off'}"><img alt="" src="${dishURL(k,'P')}"><div class="nm">${W.n}<small>${W.story?'JILL\'S KITCHEN × KEN · ':''}${W.cocktail?'調酒':'酒'} · 一杯 ${fmt(priceOf(k))}${W.pn?` · 配${W.pn}`:''}</small></div><button class="tog ${o?'on':''}" data-act="wineT" data-k="${k}" aria-label="${o?'今晚不倒':'今晚倒'}"></button></div>`}).join('')}<p class="small muted" style="margin:6px 2px 2px">Lounge 的客人只會點今晚有倒的酒。酒吧小點在上面的菜單裡，不佔名額。</p></div>`}
 function showSummary(){phase='summary';mainScreen='summary';const s=S.lastSummary;if(!s){showShop();return}hud(true);/* v2.2 A5: the wages just left the till — the HUD must say so on this screen, not on the next */
  const topHTML=s.top?`<img alt="" src="${dishURL(s.top,'P')}" style="width:34px;height:34px;vertical-align:middle;margin-right:4px">${DISH(s.top)?DISH(s.top).n:''}`:'—';
  show(`<div class="sheet tall"><div class="sh-top"><div class="ttl"><div class="eyebrow">今日結算</div><h2>DAY ${s.day}</h2><div class="sum-stars">${starsHTML(s.stars)}</div></div><button class="icon-btn" data-act="peek" style="font-weight:800;font-size:11px;width:auto;padding:0 9px">看店裡</button><button class="icon-btn" data-act="book" aria-label="餐廳日誌">${SVG.book}</button></div>

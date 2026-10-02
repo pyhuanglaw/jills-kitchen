@@ -682,3 +682,8 @@ html.desk button,html.desk [data-act],html.desk .polaroid{cursor:pointer}
 .pline{cursor:pointer}
 .tk-h,.tk-who{cursor:pointer}
 #regcard .tblno{display:inline-block;margin-left:4px;padding:0 6px;border-radius:7px;background:#2E2620;color:#F3E6CC;font-size:11px;font-weight:800;line-height:17px;vertical-align:1px}
+/* rc7: Ken's tasting night in the day's news — the title on its own line, the words under it; the evening's colours */
+.event.kent{display:block;background:#2A2320;border-style:solid;border-color:rgba(201,162,110,.55);color:#F2E6D2}
+.event.kent b{display:block;color:#E8C690;letter-spacing:.02em;margin-bottom:2px}
+.event.kent span{display:block;font-size:13px;line-height:1.5;color:#E9DDC8}
+.event.kent.quiet{background:#F3E9DA;border-color:rgba(142,100,34,.35);color:var(--ink)}.event.kent.quiet b{color:#8E6422}.event.kent.quiet span{color:var(--ink)}
