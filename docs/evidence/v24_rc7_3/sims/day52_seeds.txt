@@ -1,0 +1,50 @@
+The forty days from the player's Day 52 save (tests/v24_tests.py v24_day52_save_plays_the_stories_in_order_over_forty_days),
+seven seed bases on two builds: 8a3e1a8 (rc7.2, published) and 9a36bbd (the rc7.3 candidate). The day each beat happened.
+Targets (docs/v24/pacing_correction_2026-10-01.txt; first played day = 53): 怡君 moves in within about ten days (yj_key -
+yj_meet <= 9, by Day 63); the wall begins Day 62-66; it settles within 18 days, by Day 82.
+Tool: the test's own loop with another seed base (tools/sims/day52_seeds.py ROOT SEEDBASE: the same code as the test).
+Run 2026-10-03 02:01-02:15, the two builds side by side.
+
+== 8a3e1a8 (rc7.2)
+7000: yj_meet 53, yj_key 61, wall_worry 67, wall_settle 82, wall_article 85  — misses: the wall in 62-66
+7100: yj_meet 54, yj_key 63, wall_worry 67, wall_settle 85, wall_article 89  — misses: the wall in 62-66, settled in time
+7200: yj_meet 53, yj_key 63, wall_worry 65, wall_settle 84, wall_article 87  — misses: the move by ten days, settled in time
+7300: yj_meet 53, yj_key 61, wall_worry 66, wall_settle 83, wall_article 88  — misses: settled in time
+7400: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 80, wall_article 83  — meets every target
+7500: yj_meet 53, yj_key 61, wall_worry 65, wall_settle 82, wall_article 85  — meets every target
+7600: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 82, wall_article 85  — meets every target
+
+== 9a36bbd (rc7.3 candidate)
+7000: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 81, wall_article 84  — meets every target
+7100: yj_meet 53, yj_key 61, wall_worry 65, wall_settle 80, wall_article 83  — meets every target
+7200: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 80, wall_article 83  — meets every target
+7300: yj_meet 53, yj_key 63, wall_worry 65, wall_settle 82, wall_article 85  — misses: the move by ten days
+7400: yj_meet 53, yj_key 63, wall_worry 68, wall_settle 85, wall_article 89  — misses: the move by ten days, the wall in 62-66, settled in time
+7500: yj_meet 53, yj_key 61, wall_worry 63, wall_settle 80, wall_article 83  — meets every target
+7600: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 80, wall_article 83  — meets every target
+
+rc7.2: yj_key 61-63; the wall begins 64-67 (median 65); settles 80-85 (median 82)
+rc7.3: yj_key 61-63; the wall begins 63-68 (median 64); settles 80-85 (median 80)
+
+Reading: about the same spread on both builds (the wall begins 63-68 against 64-67, settles 80-85 on both), a day or two
+earlier at the median on rc7.3. Seven seeds do not show rc7.3 holding the stories back. Each seed is one trajectory, and the
+cats' days in Jill's room (rc7.3) draw their own random numbers from the first frame, so every trajectory moved. On rc7.3 the test's seed base 7400 became the one late seed (the wall on Day 68, settled on Day 85).
+The test now uses 7600, which meets every target on both builds (the wall begins on Day 64 on both).
+
+Raw (one JSON line per run):
+-- rc7.2
+{"base": 7000, "first": 53, "yj_key": 61, "wall_worry": 67, "wall_settle": 82, "F": {"yj_meet": 53, "yj_look": 54, "yj_three": 56, "yj_chose": 57, "yj_move": 59, "yj_key": 61, "wall_worry": 67, "wall_photos": 68, "wall_visit": 70, "wall_wang": 71, "wall_setback": 73, "wall_report": 76, "wall_fee": 77, "wall_prep": 79, "wall_mediation": 82, "wall_settle": 82, "wall_article": 85}}
+{"base": 7100, "first": 53, "yj_key": 63, "wall_worry": 67, "wall_settle": 85, "F": {"yj_meet": 54, "yj_look": 55, "yj_three": 58, "yj_chose": 59, "yj_move": 61, "yj_key": 63, "wall_worry": 67, "wall_photos": 68, "wall_visit": 71, "wall_wang": 74, "wall_setback": 76, "wall_report": 79, "wall_fee": 80, "wall_prep": 82, "wall_mediation": 85, "wall_settle": 85, "wall_article": 89}}
+{"base": 7200, "first": 53, "yj_key": 63, "wall_worry": 65, "wall_settle": 84, "F": {"yj_meet": 53, "yj_look": 54, "yj_three": 58, "yj_chose": 59, "yj_move": 61, "yj_key": 63, "wall_worry": 65, "wall_photos": 68, "wall_visit": 72, "wall_wang": 73, "wall_setback": 75, "wall_report": 78, "wall_fee": 79, "wall_prep": 81, "wall_mediation": 84, "wall_settle": 84, "wall_article": 87}}
+{"base": 7300, "first": 53, "yj_key": 61, "wall_worry": 66, "wall_settle": 83, "F": {"yj_meet": 53, "yj_look": 54, "yj_three": 56, "yj_chose": 57, "yj_move": 59, "yj_key": 61, "wall_worry": 66, "wall_photos": 67, "wall_visit": 71, "wall_wang": 72, "wall_setback": 74, "wall_report": 77, "wall_fee": 78, "wall_prep": 80, "wall_mediation": 83, "wall_settle": 83, "wall_article": 88}}
+{"base": 7400, "first": 53, "yj_key": 61, "wall_worry": 64, "wall_settle": 80, "F": {"yj_meet": 53, "yj_look": 54, "yj_three": 56, "yj_chose": 57, "yj_move": 59, "yj_key": 61, "wall_worry": 64, "wall_photos": 65, "wall_visit": 68, "wall_wang": 69, "wall_setback": 71, "wall_report": 74, "wall_fee": 75, "wall_prep": 77, "wall_mediation": 80, "wall_settle": 80, "wall_article": 83}}
+{"base": 7500, "first": 53, "yj_key": 61, "wall_worry": 65, "wall_settle": 82, "F": {"yj_meet": 53, "yj_look": 54, "yj_three": 56, "yj_chose": 57, "yj_move": 59, "yj_key": 61, "wall_worry": 65, "wall_photos": 66, "wall_visit": 69, "wall_wang": 70, "wall_setback": 73, "wall_report": 76, "wall_fee": 77, "wall_prep": 79, "wall_mediation": 82, "wall_settle": 82, "wall_article": 85}}
+{"base": 7600, "first": 53, "yj_key": 61, "wall_worry": 64, "wall_settle": 82, "F": {"yj_meet": 53, "yj_look": 54, "yj_three": 56, "yj_chose": 57, "yj_move": 59, "yj_key": 61, "wall_worry": 64, "wall_photos": 65, "wall_visit": 69, "wall_wang": 71, "wall_setback": 73, "wall_report": 76, "wall_fee": 77, "wall_prep": 79, "wall_mediation": 82, "wall_settle": 82, "wall_article": 85}}
+-- rc7.3
+{"base": 7000, "first": 53, "yj_key": 61, "wall_worry": 64, "wall_settle": 81, "F": {"yj_meet": 53, "yj_look": 54, "yj_three": 56, "yj_chose": 57, "yj_move": 59, "yj_key": 61, "wall_worry": 64, "wall_photos": 67, "wall_visit": 69, "wall_wang": 70, "wall_setback": 72, "wall_report": 75, "wall_fee": 76, "wall_prep": 78, "wall_mediation": 81, "wall_settle": 81, "wall_article": 84}}
+{"base": 7100, "first": 53, "yj_key": 61, "wall_worry": 65, "wall_settle": 80, "F": {"yj_meet": 53, "yj_look": 54, "yj_three": 56, "yj_chose": 57, "yj_move": 59, "yj_key": 61, "wall_worry": 65, "wall_photos": 66, "wall_visit": 68, "wall_wang": 69, "wall_setback": 71, "wall_report": 74, "wall_fee": 75, "wall_prep": 77, "wall_mediation": 80, "wall_settle": 80, "wall_article": 83}}
+{"base": 7200, "first": 53, "yj_key": 61, "wall_worry": 64, "wall_settle": 80, "F": {"yj_meet": 53, "yj_look": 54, "yj_three": 56, "yj_chose": 57, "yj_move": 59, "yj_key": 61, "wall_worry": 64, "wall_photos": 66, "wall_visit": 68, "wall_wang": 69, "wall_setback": 71, "wall_report": 74, "wall_fee": 75, "wall_prep": 77, "wall_mediation": 80, "wall_settle": 80, "wall_article": 83}}
+{"base": 7300, "first": 53, "yj_key": 63, "wall_worry": 65, "wall_settle": 82, "F": {"yj_meet": 53, "yj_look": 54, "yj_three": 58, "yj_chose": 59, "yj_move": 61, "yj_key": 63, "wall_worry": 65, "wall_photos": 66, "wall_visit": 68, "wall_wang": 69, "wall_setback": 73, "wall_report": 76, "wall_fee": 77, "wall_prep": 79, "wall_mediation": 82, "wall_settle": 82, "wall_article": 85}}
+{"base": 7400, "first": 53, "yj_key": 63, "wall_worry": 68, "wall_settle": 85, "F": {"yj_meet": 53, "yj_look": 54, "yj_three": 58, "yj_chose": 59, "yj_move": 61, "yj_key": 63, "wall_worry": 68, "wall_photos": 69, "wall_visit": 71, "wall_wang": 73, "wall_setback": 76, "wall_report": 79, "wall_fee": 80, "wall_prep": 82, "wall_mediation": 85, "wall_settle": 85, "wall_article": 89}}
+{"base": 7500, "first": 53, "yj_key": 61, "wall_worry": 63, "wall_settle": 80, "F": {"yj_meet": 53, "yj_look": 54, "yj_three": 56, "yj_chose": 57, "yj_move": 59, "yj_key": 61, "wall_worry": 63, "wall_photos": 64, "wall_visit": 67, "wall_wang": 68, "wall_setback": 70, "wall_report": 74, "wall_fee": 75, "wall_prep": 77, "wall_mediation": 80, "wall_settle": 80, "wall_article": 83}}
+{"base": 7600, "first": 53, "yj_key": 61, "wall_worry": 64, "wall_settle": 80, "F": {"yj_meet": 53, "yj_look": 54, "yj_three": 56, "yj_chose": 57, "yj_move": 59, "yj_key": 61, "wall_worry": 64, "wall_photos": 66, "wall_visit": 68, "wall_wang": 69, "wall_setback": 71, "wall_report": 74, "wall_fee": 75, "wall_prep": 77, "wall_mediation": 80, "wall_settle": 80, "wall_article": 83}}

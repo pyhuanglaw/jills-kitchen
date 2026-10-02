@@ -367,13 +367,17 @@ def v24_day52_save_plays_the_stories_in_order_over_forty_days(b, port, target):
     # the wall begins Day 64–67 now (65–66 before, and one seed where it never began in forty days), settles Day 80–85
     # (82–84 before) — the same spread; on 7000 Sophie and Mia's own beats took the evenings they came in together (sm_c,
     # sm_d), the wall the next one. 7400 meets every target of the player's on this build.
+    # rc7.3 release: the cats' days in Jill's room draw their own random numbers, so every trajectory moved again. Seven
+    # seeds on rc7.2 (8a3e1a8) and rc7.3 (9a36bbd), docs/evidence/v24_rc7_3/sims/day52_seeds.txt: the wall begins Day
+    # 63–68 (64–67 on rc7.2), settles Day 80–85 (80–85) — about the same spread, earlier at the median; 7400 is now the
+    # one late seed (68, 85). 7600 meets every target on both builds (the wall on Day 64 on both).
     first = None; majors = {}
     for d in range(40):
         if g.ev("phase") == 'summary':
             g.click('[data-act=toShop]'); g.page.wait_for_timeout(60)
         if g.ev("phase") == 'shop':
             g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(100)
-        g.ev(seed % (7400 + d)); g.ev("S.today.sugKey=null;S.today.sug=null;autoStock()")
+        g.ev(seed % (7600 + d)); g.ev("S.today.sugKey=null;S.today.sug=null;autoStock()")
         start_day(g); install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;window.__noScenes=true")
         if first is None:
             first = g.ev("S.day")
@@ -1184,7 +1188,7 @@ def v24_rc6_the_floor_and_its_rooms_are_tabs(b, port, target):
     g.ev(PD_OPEN)
     _quiet(g); to_service(g); _quiet(g)
     tabs = g.ev("[...document.querySelectorAll('#roomTabs button')].map(b=>b.dataset.room).join(',')")
-    check(tabs == 'front,main,side,up,staff,pdr,lounge,kitchen', f'二樓 and its two rooms are tabs: {tabs}')
+    check(tabs == 'front,main,side,up,staff,pdr,lounge,kitchen,home', f'二樓 and its two rooms are tabs (rc7.3: Jill\'s room last): {tabs}')
     lab = lambda: g.ev("[...document.querySelectorAll('#roomTabs button')].map(b=>b.textContent+(b.classList.contains('on')?'*':'')).join(',')")
     g.ev("setRoom('main')"); g.click('#roomTabs [data-room=up]'); g.page.wait_for_timeout(40)
     check(g.ev("room") == 'up' and '二樓*' in lab(), f'one tap up to the floor: {lab()}')
@@ -1428,9 +1432,17 @@ def v24_rc6_a_name_finds_its_person_and_a_person_its_name(b, port, target):
     line = '#plines .pline' if g.page.query_selector('#plines .pline') else '#toasts .toast.who'
     g.page.click(line); g.ev("__tick(1000/30)")
     check('已經離開了' in g.ev("document.querySelector('#toasts').innerText"), 'someone who has left: said so, nothing to find')
-    # a moment, then the floor is clean; nothing of it in the save
+    # a moment, then the floor is clean; nothing of it in the save. (rc7.3 release: the service goes on meanwhile, and a guest
+    # who speaks in the room you look at is marked softly for 1.8 s (idSpeak) — so a mark may be there at the end; what
+    # must be true is that every mark made before the moment is gone, and that whatever is left is new and goes too.)
+    t0 = g.ev("idNow()")
     g.ev("for(let i=0;i<120;i++)__tick(1000/30)")
-    check(g.ev("IDF.length") == 0, 'the marks last a moment')
+    left = json.loads(g.ev("JSON.stringify(IDF.map(m=>({label:m.label,t0:m.t0,dur:m.dur,strong:m.strong,age:idNow()-m.t0})))"))
+    check(all(m['t0'] > t0 and m['age'] <= m['dur'] for m in left), f'the marks last a moment: every mark made before is gone, anything left is new: {left}')
+    if left:
+        g.ev("for(let i=0;i<%d;i++)__tick(1000/30)" % (int(max(m['dur'] for m in left) * 30) + 6))
+        still = g.ev("JSON.stringify(IDF.filter(m=>%s.includes(m.t0)).map(m=>m.label))" % json.dumps([m['t0'] for m in left]))
+        check(still == '[]', f'and those go too: {still}')
     check(g.ev("(()=>{save();const t=localStorage.getItem(KEY);return t.includes('IDF')||t.includes('__op')})()") is False, 'nothing of it saved')
     check(not g.errors, g.errors[:3]); g.close()
 
@@ -2495,8 +2507,17 @@ def v24_rc7_the_wine_and_monsieur_du(b, port, target):
     g.ev("(story().named[KEN]=story().named[KEN]||{v:0,dishes:{}}).seen=S.day;const d=storyDay();d.major=0;d.lp={};d.seen={};storyTick('close',{})")
     pg = ' / '.join(x['t'] for x in json.loads(g.ev("JSON.stringify((story().beatLines||{}).ken_samples||[])")))
     check(g.ev("!!fact('ken_samples')") and '叫「晚餐之後」。' in pg and '這裡就是這樣開始的。吃完飯以後，還有地方可以坐。' in pg and g.ev("kenS().wineD") == g.ev("S.day") + 5, f'after closing: the samples, the name: {pg}')
-    g.ev("S.day++;kenS().wineD=S.day;const d=storyDay();d.major=0;d.lp={};d.seen={};storyTick('daystart',{})")   # the next day (one Ken scene a day)
-    check(g.ev("!!fact('ken_wine')") and g.ev("wineHas('w_jk')") and 'w_jk' in json.loads(g.ev("JSON.stringify(wineList())")), 'the wine is in, on tonight\'s list')
+    # the next day (one Ken scene a day). rc7.3 release: the day's major slot is a weighted draw among the beats due that
+    # morning (wpick) — with this save the landlord's afternoon (up_inspect) is due too, and which one a seed draws first
+    # moves whenever anything else draws a random number (rc7.3's cats do). ken_wine is class A with a floor of 2: passed
+    # over twice, it is next. So: the morning it is due, or one of the two after.
+    g.ev("kenS().wineD=S.day+1")
+    days = 0
+    for _ in range(3):
+        g.ev("S.day++;const d=storyDay();d.major=0;d.lp={};d.seen={};storyTick('daystart',{})"); days += 1
+        if g.ev("!!fact('ken_wine')"): break
+    mornings = g.ev("JSON.stringify(story().trace.filter(t=>t.at==='daystart').slice(-3))")
+    check(g.ev("!!fact('ken_wine')") and g.ev("wineHas('w_jk')") and 'w_jk' in json.loads(g.ev("JSON.stringify(wineList())")), f'the wine is in, on tonight\'s list (morning {days} of 3): {mornings}')
     w = json.loads(g.ev("JSON.stringify({n:WINES.w_jk.n,p:priceOf('w_jk'),pinot:priceOf('w_pinot'),cham:priceOf('w_cham'),dev:WINES.w_jk.dev||null,pair:winePairOk('w_jk',{type:'office'},['signature']),same:Object.keys(WINES).filter(k=>WINES[k].n==='晚餐之後').length,illus:!!(story().illus||{}).ken_wine})"))
     check(w['n'] == '晚餐之後' and w['pinot'] < w['p'] < w['cham'] and w['dev'] is None and w['pair'] and w['same'] == 1 and w['illus'], f'its place on the list — not overpowered, not researched, with the signature: {w}')
     g.ev("showPrep()") if g.ev("phase") != 'service' else None

@@ -2009,7 +2009,8 @@ def mature(g):
 @test
 def mature_save_loads_into_2_0(b, port, target):
     """A Day-25 save from before 2.0 keeps everything it had, gets the new fields, opens three rooms (the side room is a
-    purchase) and plays a whole day with the staff cooking on the line, in every room, without an error."""
+    purchase) — and, since rc7.3, Jill's room, which is there from Day 1 — and plays a whole day with the staff cooking on
+    the line, in every room, without an error."""
     g = Game(b, port, target, seed=25, manual=True)
     before = json.loads(mature(g))
     after = json.loads(g.ev("JSON.stringify({money:S.money,level:S.level,dishes:S.unlocked.length,crew:S.crew.length,regs:Object.keys(S.regulars).length,ach:Object.keys(S.achievements).length,album:(S.album||[]).length})"))
@@ -2017,7 +2018,7 @@ def mature_save_loads_into_2_0(b, port, target):
     exp['money'] = before['money'] + 6500 + 8000 + 10000   # v2.2.1 F: the main hall holds 9; tables 10–12 are refunded at their price (no side hall to move them to)
     check(exp == after and g.ev("S.regulars.wangwife===S.regulars.wang"), f'the mature save lost something: {before} -> {after}')
     check(g.ev("!!S.rooms && !!S.ext && !!S.gear && !!S.gearUse && S.sideTables===0 && S.frontTables===0"), 'the 2.0 fields were not filled in')
-    check(g.ev("JSON.stringify(roomsOpen())") == '["front","main","kitchen"]', 'a pre-2.0 save should open the street, the dining room and the kitchen')
+    check(g.ev("JSON.stringify(roomsOpen())") == '["front","main","kitchen","home"]', 'a pre-2.0 save should open the street, the dining room, the kitchen and (rc7.3) Jill\'s room')
     check(g.ev("S.dylan.stage===3 && DYLAN.who2.includes('結婚')"), 'the Dylan reveal and the journal line were lost')
     g.click('[data-act=open]'); start_day(g); install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;")
     check(g.ev("R.tables.length===9 && S.hallMig===1 && R.slots.filter(s=>s.type==='stove').length===4"), 'the mature kitchen should have the four-burner range and the 9 tables of the v2.2.1 main hall')
@@ -2074,7 +2075,7 @@ def purchases_change_the_place(b, port, target):
     g.ev("shopTab='projects';showShop()")
     g.ev("doAct('buySideTable',null,null,null);doAct('buyFrontTable',null,null,null);doAct('buyExt',null,'awning',null);doAct('buyExt',null,'bench',null)")
     check(g.ev("S.sideTables===3 && S.frontTables===2 && extOn('awning') && extOn('bench') && queueMax()===%d" % (base['q'] + 3)), 'side/front tables or street pieces did not buy')
-    check(g.ev("JSON.stringify(roomsOpen())") == '["front","main","side","kitchen"]', 'the side room did not open')
+    check(g.ev("JSON.stringify(roomsOpen())") == '["front","main","side","kitchen","home"]', 'the side room did not open (rc7.3: Jill\'s room is the last tab, from Day 1)')
     g.ev("doAct('nextDay',null,null,null)"); g.ev("S.today.weather='sun'"); start_day(g); install_bot(g); g.ev("R.weather='sun'")   # (nobody sits outside in the rain)
     check(g.ev("R.tables.filter(t=>t.room==='side').length===3 && R.tables.filter(t=>t.room==='front').length===2 && R.slots.filter(s=>s.type==='stove').length===6"), 'the new tables and burners are not in the run state')
     check(g.ev("$('#roomTabs').innerText.includes('NEW')"), 'the new room should be marked NEW on its tab')
@@ -3110,7 +3111,7 @@ def z_regression_rooms_kitchen_construction_and_staff_assignment(b, port, target
     g.reload(); d2 = json.loads(g.ev("JSON.stringify(waiterDuties(S.crew.find(m=>m.id==='w1')))")); check(d2 == d, 'the assignment survives a reload')
     # service: rooms + kitchen + the assignment in action (no player at all)
     g.ev("showPrep()"); fill_fridge(g); start_day(g); install_bot(g); g.ev("window.__act=()=>{}")
-    check(json.loads(g.ev("JSON.stringify(roomsOpen())")) == ['front', 'main', 'side', 'kitchen'], 'four rooms open')
+    check(json.loads(g.ev("JSON.stringify(roomsOpen())")) == ['front', 'main', 'side', 'kitchen', 'home'], 'four rooms open, and (rc7.3) Jill\'s room')
     for k in ['side', 'kitchen', 'front', 'main']:
         g.ev(f"setRoom('{k}')"); g.ev("__tick(120)")
         check(g.ev("room") == k and g.ev("$('#roomTabs button.on').dataset.room||$('#roomTabs button.on').textContent.length>0"), f'room {k} is current and its tab is lit')
@@ -3704,10 +3705,10 @@ def dylan_leaves_a_trace_and_never_vanishes_at_a_closed_door(b, port, target):
     # he comes in: the trace and the log
     g.ev("R.sched=R.sched.filter(o=>o.reg!=='dylan');for(const q of R.groups.slice())leaveGroup(q,'ok');for(const t of R.tables){t.dirty=false;t.group=null}")
     n1 = g.ev("(R.log||[]).length"); g.ev("spawn({t:R.t,type:'regular',reg:'dylan',size:1,tries:0})")
-    check(g.ev("R.groups.some(q=>q.reg==='dylan')") and g.ev("S.dylan.stage") < 3 and g.ev("!(R.log||[]).slice(%d).some(l=>l.t==='Dylan 來了。')" % n1), 'before the reveal (the Day 30 save is at stage 2) he comes in without a word in the log')
+    check(g.ev("R.groups.some(q=>q.reg==='dylan')") and g.ev("S.dylan.stage") < 3 and g.ev("!(R.log||[]).slice(%d).some(l=>/^Dylan /.test(l.t))" % n1), 'before the reveal (the Day 30 save is at stage 2) he comes in without a word in the log')
     g.ev("(()=>{const q=R.groups.find(q=>q.reg==='dylan');leaveGroup(q,'ok');S.dylan.stage=3})()"); n1 = g.ev("(R.log||[]).length"); g.ev("spawn({t:R.t,type:'regular',reg:'dylan',size:1,tries:0})")
     check(g.ev("R.groups.some(q=>q.reg==='dylan')"), 'he came in')
-    check(g.ev("(R.log||[]).slice(%d).some(l=>l.k==='e'&&l.t==='Dylan 來了。')" % n1), 'after the reveal his arrival is a quiet line in the log')
+    check(g.ev("(R.log||[]).slice(%d).some(l=>l.k==='e'&&l.t==='Dylan 回來吃飯了。')" % n1), 'after the reveal his arrival is a quiet line in the log (rc7.3, the player\'s 18:53 §16: he lives here — 「回來吃飯了」, not 「來了」)')
     for i in range(40):
         g.ev("for(let i=0;i<15;i++)__tick(1000/30)")
         if g.ev("R.groups.some(q=>q.reg==='dylan'&&q.table!=null)"): break
