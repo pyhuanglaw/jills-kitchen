@@ -1,0 +1,20 @@
+golden_scenario 的重錄證明（v2.4 rc6，2026-10-02 11:57）
+
+方法：把目前的 js/game.js（693f8f3 加上 11:49 的酒單研發調整）複製到 HEAD 的乾淨 worktree，只把兩組會合法改變 golden 的修改放回舊版（golden_scenario_proof_revert.py）：
+  1. p21（09:39）：客人路過說的話一天只說一次、更多種回答、VIP 和熟客自己的點菜台詞、多兩句問貓的話；
+  2. 新東西被談論的座位台詞池（09:39，取代舊的 decor 池）。
+其餘 rc6 的改動全部保留（暫停劇情、二樓前置條件、花錢項目、酒單、重繪頻率上限、安安、制服……）。
+
+== 1. 只放回這兩組的程式碼 × 舊的 golden（tests/golden/scenario.json @ 693f8f3）
+PASS  golden_scenario  (3.7s)
+
+1 passed, 0 failed
+
+== 2. 目前的程式碼 × 舊的 golden（第 1 天相同，第 2 天起不同：一句話一天只說一次，少抽了亂數）
+FAIL  golden_scenario  (2.9s)
+      day 2 differs from golden baseline: {"summary": [{"rev": 4170, "cost": 1127, "tips": 853, "bonus": 330, "wages": 0, "net": 4226, "guests": 26, "lost": 0, "perfect": 38, "plated": 38, "avg": 98, "top": "friedrice", "stars": 5}, {"rev": 4080, "cost": 1127, "tips": 894, "bonus": 330, "wages": 0, "net": 4177, "guests": 26, "lost": 0, "perfect": 37, "plated": 37, "avg": 98, "top": "friedrice", "stars": 5}], "catHash": ["832efd1e", "c61189a7"], "stats": [{"guests": 42, "perfect": 54, "days": 2, "walkins": 2, "families": 0}, {"guests": 42, "perfect": 53, "days": 2, "walkins": 2, "families": 0}], "reviews": [16, 14], "weights": ["4487:5d53fa0c", "4451:3433632f"], "stock": [{"friedrice": 0, "coffee": 0}, {"friedrice": 0, "coffee": 1}], "lifetime": [7292, 7243], "reviewHash": ["75b989c1", "fd40a419"], "cats": [[["tora", "walk", "rub", 219, 327, -1, false], ["ban", "rest", "sit", 252, 124, -1, false], ["snow", "sleep", "belly", 160, 132, -1, false], ["mikan", "hide2", "stretch", 288, 336, -1, true], ["mei", "walk", "groom", 312, 495, -1, false]], [["tora", "walk", "loaf", 251, 131, -1, false], ["ban", "walk", "rub", 295, 271, -1, false], ["snow", "sleep", "curl", 184, 132, -1, false], ["mikan", "rest", "loaf", 166, 90, -1, false], ["mei", "sleep", "loaf", 192, 90, -1, false]]], "money": [6154, 6105], "xp": [{"friedrice": 82, "coffee": 26}, {"friedrice": 82, "coffee": 24}]}
+
+0 passed, 1 failed
+
+== 3. 重錄（python3 tests/run_tests.py --record -k golden_scenario）之後
+PASS  golden_scenario

@@ -1798,7 +1798,11 @@ def v24_rc6_more_to_spend_on(b, port, target):
     m0 = g.ev("S.money")
     # the list
     _act2(g, 'wineDev', 'w_rose'); _act2(g, 'wineDev', 'w_old')
-    check(g.ev("wineHas('w_rose')&&!wineHas('w_old')&&wineAvail().includes('w_rose')") is True and g.ev("S.money") == m0 - 22000, 'researched; the oldest waits for the cellar')
+    check(g.ev("wineHas('w_rose')&&!wineHas('w_old')&&wineAvail().includes('w_rose')") is True and g.ev("S.money") == m0 - g.ev("WINES.w_rose.dev"), 'researched; the oldest waits for the cellar')
+    # the player's 11:49 (「研發酒也太貴 感覺就是為了花錢」): a wine's research costs what a dish's does, and it goes with something
+    devs = json.loads(g.ev("JSON.stringify(Object.values(WINES).filter(W=>W.dev).map(W=>[W.dev,!!W.pair,!!W.pn]))"))
+    rds = json.loads(g.ev("JSON.stringify(Object.values(DISHES).map(D=>D.rd||0).concat(Object.values(SPECIALS).map(X=>X.rd)))"))
+    check(all(d <= max(rds) * 1.25 and p and n for d, p, n in devs) and sum(d for d, _, _ in devs) < 40000, f'priced like the kitchen\'s research, each with its pairing: {devs} (dishes up to {max(rds)})')
     for k in json.loads(g.ev("JSON.stringify(wineAvail())")):
         _act2(g, 'wineT', k)
     left = json.loads(g.ev("JSON.stringify(wineList())"))
@@ -1817,6 +1821,16 @@ def v24_rc6_more_to_spend_on(b, port, target):
     check(p1['amb'] == p0['amb'] + 2, f'the painting: {p0["amb"]} -> {p1["amb"]}')
     _act2(g, 'wineDev', 'w_old')
     check(g.ev("wineHas('w_old')") is True, 'the oldest bottle, now that there is a cellar')
+    # what a researched wine does (11:49): a table that ate what it goes with has it more often, with dinner and after; more stay
+    g.ev("S.wineOff={}")
+    _act2(g, 'wineDev', 'w_pinot')
+    pair = json.loads(g.ev("JSON.stringify([winePairFor({type:'family'},['duck']),winePairFor({type:'family'},['pasta']),winePairFor({type:'family'},['steak_x']),winePairFor({type:'family'},['tiramisu'])])"))
+    check(pair == ['w_pinot', None, 'w_old', 'w_rose'], f'what each goes with: {pair}')
+    share = json.loads(g.ev("JSON.stringify((()=>{const f=dd=>{let n=0,t=0;for(let i=0;i<400;i++)for(const d of loungeOrder({size:2,type:'family',dd}))if(WINES[d]){t++;if(d==='w_pinot')n++}return n/t};return[f(['pasta']),f(['duck'])]})())"))
+    check(share[1] > share[0] + .25, f'a table that had duck has the pinot after dinner more often: {share}')
+    g.ev("window.__wl=wineList")
+    st = json.loads(g.ev("(()=>{const g0={type:'office',pat:1,dd:['duck']};const g1={type:'office',pat:1,dd:['pasta']};const R0=R;R={closed:false,t:50,dur:100};const pn=pianoNight;pianoNight=()=>false;const a=loungeAfterP(g1);const b=loungeAfterP(g0);wineList=()=>['w_spark','w_white','w_lred'];const c=loungeAfterP(g1);wineList=window.__wl;pianoNight=pn;R=R0;return JSON.stringify([c,a,b])})()"))
+    check(st[0] < st[1] < st[2], f'more stay with researched wines poured, more again when one goes with dinner: {st}')
     nights = g.ev("(()=>{let n=0;const d0=S.day;for(let i=0;i<60;i++){S.day=d0+i;if(pianoNight())n++}S.day=d0;return n})()")
     check(14 <= nights <= 26, f'a music night about one in three: {nights}/60')
     g.ev("window.__pn=pianoNight")
