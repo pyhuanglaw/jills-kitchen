@@ -4471,7 +4471,12 @@ document.addEventListener('keydown',e=>{if(phase!=='service'||!R||sub||DLG)retur
 let SW=null;
 function swipeEnd(e){if(!SW||!R)return;const dx=e.clientX-SW.x,dy=e.clientY-SW.y,dt=performance.now()-SW.t;const hit=SW.hit,idle=SW.idle;SW=null;const swiped=!R.holdSlot&&dt<=700&&Math.abs(dx)>=70&&Math.abs(dy)<=Math.abs(dx)*.6;if(idle!=null&&!swiped&&Math.hypot(dx,dy)<12){if(!paused&&room==='kitchen')tapStation(idle);return}if(hit||!swiped)return;const list=roomsOpen();const i=list.indexOf(room)+(dx<0?1:-1);if(list[i])setRoom(list[i])}
 window.addEventListener('pointerup',swipeEnd);
-function renderLog(){const p=$('#logPanel');if(!p||p.hidden)return;const L=dayLog();const keep=p.querySelector('.lbody');const st=keep?keep.scrollTop:0;p.innerHTML=`<div class="lhead"><h4>今天大家說了什麼 <small>${L.length} 句</small></h4><button class="lclose" data-logclose aria-label="關閉">×</button></div><div class="lbody">${logHTML(L,L.length)}</div>`;const nb=p.querySelector('.lbody');if(nb)nb.scrollTop=st}
+function renderLog(){const p=$('#logPanel');if(!p||p.hidden)return;const L=dayLog();
+ /* rc7.2 (the player, 22:28: 「這個對話框的叉叉按不了很久了」): the head and its × are built once and kept; only the count and the
+    lines are redrawn as new ones come in. Redrawing the whole panel on every new line replaced the × between a finger's
+    touch and its click, so on a busy evening the tap landed on a button that was no longer there. */
+ if(!p.querySelector('[data-logclose]')||!p.querySelector('.lbody'))p.innerHTML=`<div class="lhead"><h4>今天大家說了什麼 <small data-logn></small></h4><button class="lclose" data-logclose aria-label="關閉">×</button></div><div class="lbody"></div>`;
+ const n=p.querySelector('[data-logn]');if(n)n.textContent=`${L.length} 句`;const nb=p.querySelector('.lbody');const st=nb.scrollTop;nb.innerHTML=logHTML(L,L.length);nb.scrollTop=st}
 function closeLog(){const p=$('#logPanel');if(p)p.hidden=true;logNew=0;logChip()}
 {const ch=$('#logChip');if(ch){ch.addEventListener('click',()=>{const p=$('#logPanel');p.hidden=!p.hidden;logNew=0;logChip();renderLog();$('#taskPanel').hidden=true;const sp=$('#stockPanel');if(sp)sp.hidden=true});$('#logPanel').addEventListener('click',e=>{if(e.target.closest('[data-logclose]'))closeLog()})}}/* v2.3 QA: only the × closes it — a tap while scrolling does not */
 $('#taskPanel').addEventListener('click',()=>{$('#taskPanel').hidden=true});
@@ -6989,6 +6994,10 @@ function catBelly(c,C,ph,o){const W=C.white||{};catShadow(c,15);
  c.fillStyle=C.base;c.save();c.beginPath();c.ellipse(1,-5,13,5.6,0,0,7);c.fill();c.clip();if(C.str){c.strokeStyle=C.str;c.globalAlpha=.7;c.lineWidth=1.2;for(let i=-3;i<=3;i++){c.beginPath();c.moveTo(i*3.4,1);c.lineTo(i*3.4+1,-3);c.stroke()}c.globalAlpha=1}c.fillStyle=W.belly||C.fluffy?'#FFFFFF':C.belly;el(c,1,-8.4,10,3.6);c.fillStyle='rgba(240,170,170,.35)';el(c,3,-8.4,4,1.8);c.restore();if(C.fluffy)fluff(c,C.base,1,-5,12,5,14,1.8);
  c.save();c.translate(-13,-6);c.rotate(-1.25);catHead(c,C,0,0,C.fluffy?6.2:5.6,{sleep:!o.wake,twitch:o.twitch},false);c.restore()}
 
+/* rc7.2 (the player, 22:29: 「點桌子的時候不小心點到常客的頭就會跳他的說明整個擋住你的操作」): during a service, a tap on a regular's
+   head at a table that has work waiting (an order to take, plates to bring, a bill, a table to clear, a scene to calm) is a
+   tap on that table — the work first; their card only when the table has nothing for Jill to do */
+function regTableWork(g){if(!R||phase!=='service'||!g||g.table==null)return null;const t=R.tables[g.table];return t&&t.group===g&&tableActionable(t)?t:null}
 function hitRegular(p){if(!R)return null;for(const g of R.groups){if(!(g.reg||namedId(g))||g.table==null||!['reading','order','wait','eat','check'].includes(g.state))continue;const t=R.tables[g.table];if((t.room||'main')!==room)continue;const n=Math.max(1,regsOf(g).length);const sps=seatPos(t);for(let k=0;k<n&&k<sps.length;k++){const x=t.x+sps[k].dx,y=t.y+sps[k].dy;if(Math.abs(p.x-x)<14&&p.y<y+6&&p.y>y-46){g.hitWho=k;return g}}}return null}
 /* a small card, not a dialogue: name, how well the place knows them, what has been noticed */
 let regCardT=0;
@@ -7129,7 +7138,7 @@ function roomTap(p,e){e.preventDefault();audioInit();
  if(room==='front'){if(Math.abs(p.x-FR.door.x)<30&&p.y>176&&p.y<276){setRoom('main');return true}}
  /* v2.4 rc6: on the floor its doors open the rooms; inside a room its door goes back out onto the floor (06:36) */if(room==='up'){const inB=(B,m)=>p.x>=B.x0-m&&p.x<=B.x1+UPRW.sd+m&&p.y>=B.y0-UPRW.h-m&&p.y<=B.y1+m;if(UPV==='reveal'){upRevealSkip();return true}if(srBuilt()&&(inB(UPR.sr,4)||(p.x>=UPR.sr.x1&&p.x<=UPR.srDoor.fx+14&&p.y>=UPR.srDoor.y0-20&&p.y<=UPR.srDoor.y1+6))){setRoom('staff');return true}if(pdBuilt()&&inB(UPR.pd,4)){setRoom('pdr');return true}}
  if((room==='staff'&&srDoorHit(p))||(room==='pdr'&&Math.abs(p.x-PDL.door.x)<46&&p.y>LH-56)){setRoom('up');return true}
- const rg=hitRegular(p);if(rg&&!paused){showRegCard(rg);idFocusGroup(rg,rg.hitWho||0,{soft:1});return true}
+ const rg=hitRegular(p);if(rg&&!paused){const wt=regTableWork(rg);if(wt){tapTable(wt);idShowTable(wt);return true}showRegCard(rg);idFocusGroup(rg,rg.hitWho||0,{soft:1});return true}
  if(!R||paused||phase!=='service')return false;let best=null,bd=1e9;for(const t of R.tables){if((t.room||'main')!==room)continue;const d=t.pdr?(pdHit(p)?0:1e9):Math.hypot((p.x-t.x)*.85,p.y-(t.y-16));const lim=t.pdr?60:t.seats===4?46:40;if(d<lim&&d<bd){bd=d;best=t}}
  if(best){tapTable(best);idShowTable(best);return true}return idHitWalker(p)}
 /* rc7.2 (the player, 21:49: 「點出餐台就能送餐」): the kitchen's pass — the counter and the ticket rail over it — takes a tap:
@@ -7896,7 +7905,7 @@ sc.addEventListener('pointerdown',e=>{const p=scenePt(e);SW={x:e.clientX,y:e.cli
  if(room!=='main'){if(roomTap(p,e))SW.hit=true;return}
  if(S.rooms&&S.rooms.side&&p.x>=SIDE_ARCH.x-6&&p.x<=SIDE_ARCH.x+SIDE_ARCH.w+6&&p.y>=SIDE_ARCH.y-4&&p.y<=SIDE_ARCH.y+112&&!hitCat(p)){e.preventDefault();SW.hit=true;setRoom('side');return}
  if(S.rooms&&S.rooms.lounge&&p.x>=LOUNGE_ARCH.x-6&&p.x<=LOUNGE_ARCH.x+LOUNGE_ARCH.w+6&&p.y>=LOUNGE_ARCH.y-4&&p.y<=LOUNGE_ARCH.y+112&&!hitCat(p)){e.preventDefault();SW.hit=true;setRoom('lounge');return}
- if(R&&!paused&&phase==='service'&&tapThief(p)){e.preventDefault();SW.hit=true;return}const ct=hitCat(p);if(ct&&!paused){e.preventDefault();tapCat(ct);return}const rg=hitRegular(p);if(rg&&!paused){e.preventDefault();showRegCard(rg);idFocusGroup(rg,rg.hitWho||0,{soft:1});return}const hs=hitSpot(p);if(hs&&!paused){e.preventDefault();tapSpot(hs);return}if(!paused&&p.y>FB-16){const ki=hitKItem(p);if(ki){e.preventDefault();SW.hit=true;tapKItem(ki);return}}if(!R||paused||phase!=='service')return;e.preventDefault();audioInit();
+ if(R&&!paused&&phase==='service'&&tapThief(p)){e.preventDefault();SW.hit=true;return}const ct=hitCat(p);if(ct&&!paused){e.preventDefault();tapCat(ct);return}const rg=hitRegular(p);if(rg&&!paused){e.preventDefault();const wt=regTableWork(rg);if(wt){SW.hit=true;tapTable(wt);idShowTable(wt);return}showRegCard(rg);idFocusGroup(rg,rg.hitWho||0,{soft:1});return}const hs=hitSpot(p);if(hs&&!paused){e.preventDefault();tapSpot(hs);return}if(!paused&&p.y>FB-16){const ki=hitKItem(p);if(ki){e.preventDefault();SW.hit=true;tapKItem(ki);return}}if(!R||paused||phase!=='service')return;e.preventDefault();audioInit();
  let best=null,bd=1e9;for(const g of queued()){if(g.state!=='queue'&&g.state!=='arrive')continue;const d=Math.hypot(p.x-g.x,p.y-(g.y-22));if(d<26&&d<bd){bd=d;best={g}}}
  for(const t of R.tables){if((t.room||'main')!==room)continue;const d=Math.hypot((p.x-t.x)*.85,p.y-(t.y-16));const lim=t.seats===4?46:40;if(d<lim&&d<bd){bd=d;best={t}}}
  if(!best){if(idHitWalker(p))SW.hit=true;return}SW.hit=true;if(best.g){const t=freeTableFor(best.g);if(t){seatGroup(best.g,t);idMark(idTableAt(t),idTableName(t),idPartyLine(best.g),{dur:1.9})}else{toast('目前沒有空桌，先收拾一下吧');idFocusGroup(best.g,0,{soft:1})}}else{tapTable(best.t);idShowTable(best.t)}});

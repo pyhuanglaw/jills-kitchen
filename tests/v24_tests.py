@@ -1392,7 +1392,9 @@ def v24_rc6_a_name_finds_its_person_and_a_person_its_name(b, port, target):
     g.page.click(line); g.ev("__tick(1000/30)")
     st = mark()
     check(st['room'] == wroom and st['m'][-1]['label'] == '王先生' and st['m'][-1]['sub'].startswith('T') and st['m'][-1]['strong'], f'the line finds him where he sits: {st}')
-    # PERSON → NAME: a tap on him — his card says where he sits
+    # PERSON → NAME: a tap on him — his card says where he sits (rc7.2: while his table has nothing for Jill to do — a tap
+    # on a regular at a table with work waiting is that table's work, tests below)
+    g.ev("__botUntil('R.groups.some(q=>regsOf(q).includes(\\'wang\\')&&q.state===\\'eat\\')',40000,1/30)")
     xy = json.loads(g.ev("JSON.stringify((()=>{const w=R.groups.find(q=>regsOf(q).includes('wang'));const p=idMemberAt(w,regsOf(w).indexOf('wang'));const r=sc.getBoundingClientRect();return[r.left+SV.ox+p.x*SV.s,r.top+SV.oy+(p.y-20)*SV.s]})())"))
     g.page.mouse.click(xy[0], xy[1]); g.ev("__tick(1000/30)")
     card = g.ev("$('#regcard').hidden?'':$('#regcard').innerText")
@@ -2723,4 +2725,42 @@ def v24_rc7_2_a_named_guests_line_answers_a_touch(b, port, target):
     g.page.tap('#plines .pline'); g.ev("__tick(1000/30)")
     st = json.loads(g.ev("JSON.stringify({room,m:IDF.map(m=>({label:m.label,sub:m.sub}))})"))
     check(st['room'] == 'main' and st['m'] and st['m'][-1]['label'] == 'Madame Lin' and st['m'][-1]['sub'] == f"T{info['t']+1}", f'the touch goes to her table and marks it: {st}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+
+@test
+def v24_rc7_2_a_regulars_head_at_a_busy_table_and_the_log_closes(b, port, target):
+    """rc7.2 (the player, 22:29: 「點桌子的時候不小心點到常客的頭就會跳他的說明整個擋住你的操作」): a tap on a regular's head at a
+    table that has work waiting is a tap on that table — Jill goes; no card in the way. With nothing to do there, the card
+    as before. (22:28: 「這個對話框的叉叉按不了很久了」): the conversation log's × stays the same button while new lines come in,
+    and closes the log."""
+    g = Game(b, port, target, seed=2229, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day74_1508.json')
+    to_service(g)
+    g.ev("__botUntil('R.groups.some(q=>q.reg&&q.reg!==\\'dylan\\'&&q.table!=null&&[\\'reading\\',\\'eat\\'].includes(q.state))',60000,1/30)")
+    info = json.loads(g.ev("""JSON.stringify((()=>{const q=R.groups.find(q=>q.reg&&q.reg!=='dylan'&&q.table!=null&&['reading','eat'].includes(q.state));if(!q)return null;window.__rq=q;window.__st0=q.state;const t=R.tables[q.table];setRoom(t.room||'main');return{t:t.i,room:t.room||'main',reg:q.reg}})())"""))
+    check(info is not None, 'a regular at a table')
+    g.ev("window.__act=()=>{};__tick(1000/30)")
+    head = "JSON.stringify((()=>{const q=__rq;const p=idMemberAt(q,0);const r=sc.getBoundingClientRect();return[r.left+SV.ox+p.x*SV.s,r.top+SV.oy+(p.y-20)*SV.s]})())"
+    # work waiting: the order is ready to be taken
+    clear = "document.querySelectorAll('#plines>*,#toasts>*').forEach(e=>e.remove())"   # nothing said lies over the table
+    g.ev("__rq.state='order';R.jill.q.length=0;$('#regcard').hidden=true;" + clear)
+    xy = json.loads(g.ev(head)); g.page.mouse.click(xy[0], xy[1]); g.ev("__tick(1000/30)")
+    st = json.loads(g.ev("JSON.stringify({card:!$('#regcard').hidden,q:R.jill.q.slice(),cur:R.jill.cur?R.jill.cur.t:null})"))
+    check(not st['card'] and (info['t'] in st['q'] or st['cur'] == info['t']), f'the tap on his head took the order: Jill goes, no card: {st}')
+    # nothing to do there: the card
+    g.ev("R.jill.q.length=0;R.jill.cur=null;__rq.state='eat';" + clear)
+    xy = json.loads(g.ev(head)); g.page.mouse.click(xy[0], xy[1]); g.ev("__tick(1000/30)")
+    check(not g.ev("$('#regcard').hidden"), 'eating, nothing to do: his card, as before')
+    g.ev("$('#regcard').hidden=true")
+    # the log: open it, a new line comes in, the same × closes it
+    g.click('#logChip'); g.page.wait_for_timeout(80)
+    g.ev("window.__x0=document.querySelector('#logPanel [data-logclose]')")
+    for i in range(3):
+        g.ev(f"logLine('Jill','測試 {i}','j');renderLog()")
+    check(g.ev("document.querySelector('#logPanel [data-logclose]')===window.__x0"), 'the × is the same button after new lines')
+    check(str(g.ev("$('#logPanel [data-logn]').textContent")).endswith('句'), 'the count is kept up to date')
+    g.click('#logPanel [data-logclose]'); g.page.wait_for_timeout(60)
+    check(g.ev("$('#logPanel').hidden"), 'the × closes the log')
     check(not g.errors, g.errors[:3]); g.close()
