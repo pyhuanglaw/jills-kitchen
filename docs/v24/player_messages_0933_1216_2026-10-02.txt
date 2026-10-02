@@ -1,0 +1,34 @@
+(Filed 2026-10-02 12:40. The player's short messages and saves of 09:33–12:16, during RC6. Where the exact words are
+kept here they are verbatim; the 09:33–10:06 reports were sent as a run of short messages with screenshots and their
+saves — their words are quoted where the tests and the code quote them, and listed by subject otherwise. The two long
+corrections of this morning are filed on their own: second_floor_prerequisite_1025_2026-10-02.txt and
+story_presentation_1032_2026-10-02.txt.)
+
+09:33–10:06 (with the save tests/saves/player_day61_0933.json, then player_day65_1004.json)
+  - 阿拓's portrait: use the one from the Lounge cast sheet (not sheet B's); every staff portrait cut clean of its
+    neighbours; 許葳's whole face.
+  - The same guest lines over and over.
+  - 09:39 「怎麼這麼少對酒吧開張的評論啊 有新增什麼東西都可以評論」
+  - The day's summary: which stories happened today, what the bartenders did (not 「沒有桌子要收」), what the Lounge sold.
+  - The album's close button out of reach at the bottom of the journal.
+  - The Lounge's list of drinks on the menu page.
+  - 09:55 the menu at its cap with the four bar bites on it.
+  - 09:59–10:01 the screen dimmed and froze during a service.
+  - The phone heating up.
+  - 10:05 Sophie and Mia's story had not begun (Day 65).
+  - 10:06 安安 should work the Lounge without being set up.
+  - 10:08 「這是什麼對話？」 — lines on Sophie and Mia's story page that were not theirs.
+
+10:10  「你如果酒吧加四道菜的話，你應該要往上調吧菜單」
+10:10  「你現在有哪些沒有做？然後哪些做完了？預計要多久你做到百分之多少你跟我講完之後請你繼續做」
+10:15  「服務生的制服可以不要是綠色的嗎？可以白色嗎？」
+10:16  「相簿沒有任何酒吧的照片欸？以後你每個新的空間應該也要有幾個主題是可以拍照的」
+10:21  (save: tests/saves/player_day67_1016.json) 「我已經沒有地方可以花錢了」
+10:25  the Second Floor's prerequisite — second_floor_prerequisite_1025_2026-10-02.txt
+10:32  authored story presentation — story_presentation_1032_2026-10-02.txt (the audit: story_presentation_audit_2026-10-02.md)
+10:40  「你就一起放」 (the things to spend on, into RC6; the sixth, buying the whole building, left for the player to decide)
+11:06  「Sophie和Mia的暫停 漏水案的暫停 會觸發二樓的事件暫停 戀愛事件暫停 其他不用」
+11:17  「你現在在做什麼還有多久 回我後繼續做」
+11:49  「研發酒也太貴 感覺就是為了花錢」
+11:59  (save: tests/saves/player_day68_1033.json) 「給你參考」
+12:16  (save: tests/saves/player_day71_1215.json) 「阿拓跟晴毫無進展 你其他的也要繼續做 把沒做的做完」

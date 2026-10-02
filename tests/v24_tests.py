@@ -2047,3 +2047,48 @@ def v24_rc6_a_regulars_dated_beat_keeps_its_day(b, port, target):
     b1 = json.loads(g.ev(L))
     check('koba_promo@28' in b1 and 'koba_newjob@40' in b1 and g.ev("S.regMem.koba.facts.length") == 6, f'three more notes, the oldest let go, the beats keep their days: {b1}')
     check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc6_the_morning_reports(b, port, target):
+    """the player's 09:33–10:15 reports that had no test of their own: a guest's passing words are said once a day (the
+    same words from another guest are left unsaid; a regular's own line, given with who, is not); the VIPs order in their
+    own words; the waiters wear white shirts (10:15); the room is drawn at most ~30 times a second in a service — by the
+    clock, so 120 frames a second draw no more than 60 — and ~10 under a sheet (the phone's heat); the summary says which
+    stories moved today, what the Lounge sold (each glass and bite, and the total) and what the bartenders did (not
+    「沒有桌子要收」); the journal's album has its close button at the bottom too (09:51)."""
+    g = Game(b, port, target, seed=33, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day71_1215.json')
+    to_service(g)
+    g.page.evaluate('()=>window.__bot(300,1/30)')
+    said = json.loads(g.ev("(()=>{const gs=R.groups.filter(q=>!q.reg&&!namedId(q)).slice(0,2);if(gs.length<2)return JSON.stringify(null);const n0=dayLog().length;const a=quote(gs[0],'今天的燈好舒服喔。'),b=quote(gs[1],'今天的燈好舒服喔。');const n=dayLog().slice(n0).filter(l=>l.t==='今天的燈好舒服喔。').length;return JSON.stringify([a,b,n])})()"))
+    check(said == [True, False, 1], f'a guest\'s passing words once a day: {said}')
+    check(g.ev("VIP_ORDER.length>=6&&new Set(VIP_ORDER).size===VIP_ORDER.length&&(()=>{const a=pickH(VIP_ORDER,'vip|71|5'),b=pickH(VIP_ORDER,'vip|71|6');return VIP_ORDER.includes(a)&&VIP_ORDER.includes(b)&&a!==b})()"), 'the VIPs have their own ways of ordering (one said is not said again right away)')
+    tops = json.loads(g.ev("JSON.stringify([crewLook({id:'w1',role:'waiter',name:'x',lv:1}).top,crewLook({id:'w2',role:'waiter',name:'y',lv:3}).top,crewLook({id:'c1',role:'chef',name:'z',lv:1}).top])"))
+    check(tops[0] == tops[1] == '#F4F1EA' and tops[2] in ('#FFFFFF', '#fff'), f'the waiters in white shirts, the cooks in their white jackets: {tops}')
+    # the room's draws: by the clock
+    g.ev("window.__D0=drawScene;window.__nd=0;drawScene=function(t){__nd++;return __D0(t)}")
+    g.ev("__nd=0;for(let i=0;i<120;i++){__act();__tick(1000/120)}")
+    n120 = g.ev("__nd")
+    g.ev("__nd=0;for(let i=0;i<60;i++){__act();__tick(1000/60)}")
+    n60 = g.ev("__nd")
+    g.ev("showPause();__nd=0;for(let i=0;i<120;i++)__tick(1000/120)")
+    nsheet = g.ev("__nd")
+    g.ev("hideScreen();paused=false;drawScene=__D0")
+    check(26 <= n120 <= 36 and 26 <= n60 <= 36 and nsheet <= 14, f'a second of service: {n120} draws at 120 Hz, {n60} at 60 Hz; {nsheet} under a sheet')
+    # the summary: today's stories, the Lounge's sales, the bartenders
+    g.ev("factSet('qt_3');R.st.dish.w_spark=(R.st.dish.w_spark||0)+3;R.st.dish.w_fred=(R.st.dish.w_fred||0)+2;R.st.dishRev=R.st.dishRev||{};R.st.dishRev.w_spark=(R.st.dishRev.w_spark||0)+540;R.st.dishRev.w_fred=(R.st.dishRev.w_fred||0)+560")
+    g.ev("closeShop('x');for(const q of R.groups.slice())leaveGroup(q,'ok')"); g.page.evaluate('()=>window.__bot(400,1/30)')
+    if g.ev("phase") == 'service': g.ev("finishClosing()")
+    g.ev("while(typeof DLG!=='undefined'&&DLG)dlgNext()")
+    if g.ev("phase") != 'summary': g.ev("showSummary()")
+    txt = g.ev("document.querySelector('#screen').innerText")
+    check('今天的故事' in txt and '晴 & 阿拓' in txt and '多的' in txt and '看故事頁' in txt, f'today\'s stories: {txt[:400]}')
+    check('Lounge 今天賣了什麼' in txt and '氣泡酒' in txt and '杯' in txt and '合計' in txt, 'the Lounge\'s sales, each glass and the total')
+    bt = json.loads(g.ev("JSON.stringify((S.lastSummary.crew||[]).filter(c=>c.role==='bartender').map(c=>c.lines||c.txt||c))"))
+    check('沒有桌子要收' not in g.ev("[...document.querySelectorAll('#screen *')].filter(e=>/Evan|沈晴/.test(e.textContent)&&e.children.length<4).map(e=>e.textContent).join('|')") and ('調了' in txt or '今晚沒有調酒' in txt), f'the bartenders\' line: {bt}')
+    # the journal's album: a close button at the bottom
+    g.click('[data-act=toShop]') if g.page.query_selector('[data-act=toShop]') else None
+    g.ev("bookTab='mem';showBook()"); g.page.wait_for_timeout(100)
+    check(g.ev("!!document.querySelector('#screen .bookend [data-act=closeSub]')") and '關閉日誌' in g.ev("document.querySelector('#screen .bookend').innerText"), 'the album ends with 「關閉日誌」')
+    check(not g.errors, g.errors[:3]); g.close()

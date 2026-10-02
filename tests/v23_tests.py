@@ -820,7 +820,10 @@ def followup_the_manual_describes_the_current_game(b, port, target):
                  # v2.4 rc6 (the player's 05:19, 05:23, 06:36, 06:43): the rooms are tabs and so is the floor; its plan in 店舖工程; the Staff Room's pool table and massage chair
                  '寫著那一間的全名', '二樓（租下以後）', '看看整層', '「？」', '開店前會先帶你上二樓看一眼', '二樓平面圖', '點一下放大', '全部蓋完也一直在', '淺色橡木', '燕麥色沙發', '淺木置物櫃', '撞球台', '按摩椅', '沒有分數',
                  # v2.4 rc6 (07:09): who is where
-                 '誰在哪裡', '訂單上的桌號', '點那句話就會找到他']:
+                 '誰在哪裡', '訂單上的桌號', '點那句話就會找到他',
+                 # v2.4 rc6 (09:39–12:16): the stories that hold the restaurant, the day's stories, the Lounge's list, research and sales, the things to spend on, the floor after the Lounge, 安安, a day off, the new places' photos
+                 '店裡暫停中', '一句一句點著看', '今天的故事', '只收那一段自己的話', 'Lounge 今天賣了什麼', '今晚倒哪幾種', '酒單研發', '和研發一道菜差不多', '最多 +15%', '品酒課', '訓練升級一天最多一級',
+                 '委託的一幅畫', '乾式熟成櫃', 'Lounge 的酒窖', 'Lounge 的鋼琴', '季節佈置', '食材契作', 'Lounge 蓋好以後，樓上的事就會慢慢開始', '來的時候就是 LV2', '偶爾也會請一天假', '下班以後的一局撞球']:
         check(need in txt, f'the manual mentions {need}')
     for stale in ['暫停選單和設定裡都有【儲存目前進度】', '把杯子交給吧台的客人；桌位由有', '上方的分頁', '畫面上方會跳一個小通知', '打烊後或開店前，商店的「社群與宣傳」分頁（第 6 天起）。', '下一段寫著', '窗邊（貓架、睡墊）', '牠會在門邊趴著等主人',
                   '人數上限跟擴建、後場整理區、側廳、廚房擴建、廚房二期、Lounge 有關', '有 Lounge 以後才能招募', '第二位調酒師',

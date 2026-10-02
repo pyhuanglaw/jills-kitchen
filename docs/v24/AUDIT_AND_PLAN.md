@@ -539,3 +539,33 @@ Filed: `staff_room_muji_0519` (+ `refs/staff_room_muji_ref1–3_0519`), `second_
   after the release, its URL and zips are confirmed.
 - **Testing** (05:42): targeted tests after each change (risk-based), the player's saves as checkpoints
   (`tests/saves/README.md`), the full regression at the release gate; `docs/RELEASE_CHECKLIST.md` §5.
+
+### 8.4 The player's corrections of 06:36–12:16 (they replace the parts of §8.3 above that differ)
+
+Filed: `second_floor_three_uses_0636`, `staff_room_recreation_pdr_polish_0643`, `pdr_spatial_polish_0657`,
+`npc_wardrobe_0705`, `customer_identity_linking_0709`, `npc_wardrobe_references_0812`, `second_floor_plan_0837`,
+`player_messages_0933_1216`, `second_floor_prerequisite_1025`, `story_presentation_1032` (+ the audit).
+
+- **二樓 is an everyday tab again** (06:36, replacing 05:23): the simple floor with its closed rooms, the rooms' doors back
+  out onto it; 店舖工程 › 二樓 has the floor's plan for good (architecture only, 「？」 where undecided, 「今天完工」, full
+  screen on a tap). The reveal walk the morning a room is finished stays.
+- **The floor as the player drew it** (08:37): the Private Dining Room top-left over the street windows, the Staff Room
+  directly below it to the back wall, the hall an L down the right, both doors onto the hall where the rooms meet; the
+  stairs across the bottom-right corner at half the size (09:14); no column.
+- **The Staff Room's recreation** (06:43): a pale oak pool table from II, a massage chair and books from III; at closing
+  now and then a frame, someone dozing (runtime only). **The Private Dining Room's walkways** (06:57): only the stone
+  sideboard serves.
+- **The guests** (07:05, 08:12): a wardrobe, then silhouette and layering, from a hash of the day; Q++ kept (no white
+  top on a guest — white is the staff's, the waiters' too since 10:15). **Who is where** (07:09).
+- **The Second Floor's story begins with the finished Lounge** (10:25): `V24_ERAS.up.open = loungeDoneDay()` (+2 days),
+  no longer `prev:'wall'`; 《那面牆》 and the floor are independent chains that share only the day's story budget.
+- **Authored beats hold the restaurant** (10:32; the four kinds chosen at 11:06: Sophie and Mia, the leak case, what
+  brings the Second Floor about and its rooms, the love stories): the restaurant stops, one line per tap, the service
+  resumes exactly; `SH_HOLD`, `shStart`, the story context `SCX`.
+- **More to spend on** (10:21, 10:40, 11:49): four dream works, four seasonal sets, three contracts, a wine course, the
+  Lounge's people a level a day; wine research priced like a dish's ($2,500–$8,000) with pairings that bring glasses
+  and guests. 買下整棟 waits for the player.
+- **The day's one major slot is fair** (12:16): a major beat due when the slot is taken counts a missed day; the next
+  day the slot is kept for the beat that has waited longest and can happen today (one day; still one major a day; no
+  new cooldown). 晴 and 阿拓 count as there only when they came in; 阿拓 takes one day off after 「多的。」; the slow burn
+  a little quicker.

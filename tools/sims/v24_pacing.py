@@ -5,8 +5,13 @@ the day each 怡君 / 秀琴阿姨 × Sophie-Mia / 《那面牆》 beat happened
   怡君 moved in (the spare key)   ~Day 59–62
   《那面牆》 begins               ~Day 62–66
   《那面牆》 settled               ~Day 75–82
-  Second Floor era opens          ~Day 78–86   (two days after the settlement)
-  v2.4 P2 (AUDIT_AND_PLAN §7): era ~81–83 → U1 82–84 → U3 85–87 → U4 88–91 → U6 94–98
+  Second Floor era opens          two days after the Lounge is finished (v2.4 rc6, the player's 10:25: no longer after
+                                  the settlement — the two chains share only the day's story budget)
+  v2.4 rc6: a major beat that finds the day's slot taken counts a missed day, and the next day the slot is kept for the
+  beat that has waited longest (the player's 12:16) — still one major beat a day
+
+  The player's latest saves (tests/saves/player_day67_1016.json, player_day71_1215.json) start where the Lounge is
+  long finished: pass one as the third argument.
 
   python3 tools/sims/v24_pacing.py [days=36] [seedbase=7000] [save=tests/saves/player_day52.json]
 """
