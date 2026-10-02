@@ -308,7 +308,10 @@ def lounge_i_content_bar_food_in_the_kitchen_wine_at_dinner_the_cast_by_name(b, 
     load_fixture(g, 'player_day46.json'); g.click('[data-act=openFresh]'); g.page.wait_for_timeout(120)
     g.ev("S.money+=400000;factSet('lounge_project');buyLounge(1);hideReveal&&hideReveal()")
     check(g.ev("loungeLv()") == 1 and g.ev("S.unlocked.includes('bites')&&S.menu.includes('bites')&&S.unlocked.includes('cheeseplate')") and not g.ev("S.unlocked.includes('mushroom')"), 'Lounge I unlocked the bites (II keeps the mushrooms)')
-    n0 = g.ev("menuCount()"); check(g.ev("menuCount()") <= g.ev("menuCap()") and g.ev("S.menu.filter(d=>DISHES[d]&&DISHES[d].bar).length") == 3, 'bar dishes take no menu slot')
+    # rc7.4: Lounge I's short list grew from three to five (水牛城雞翅、起司條); the pizza is researched, never given by the room
+    bar1 = sorted(g.ev("S.menu.filter(d=>DISHES[d]&&DISHES[d].bar)"))
+    n0 = g.ev("menuCount()"); check(g.ev("menuCount()") <= g.ev("menuCap()") and bar1 == sorted(['bites', 'croquette', 'cheeseplate', 'wings', 'cheesestick']), f'bar dishes take no menu slot: {bar1}')
+    check(not g.ev("S.unlocked.includes('pizza')"), 'building the Lounge does not hand out the researched pizza')
     g.ev("(()=>{const b=document.createElement('button');b.dataset.act='hireLounge';b.dataset.k='Evan';doAct('hireLounge',null,'Evan',b)})()")   # v2.4 rc5: the Lounge hires by name, from its own list
     if g.ev("!S.crew.some(m=>m.role==='bartender')"):
         g.ev("S.crew.push({id:'cb1',role:'bartender',name:CREW_NAMES.bartender[0],lv:1,duty:'lbar'})")

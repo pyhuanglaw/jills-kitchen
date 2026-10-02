@@ -841,8 +841,9 @@ def v24_the_night_of_the_missing_cats(b, port, target):
     shown = g.ev("!$('#dlg').hidden&&!$('#dlg .dlg-illus').hidden&&$('#dlg .dlg-illus-tbd').hidden&&$('#dlg .dlg-illus img').getAttribute('src')===STORY_ART.up_cats")
     check(shown is True, 'shown again: the player\'s picture itself, not a stand-in')
     g.ev("while(typeof DLG!=='undefined'&&DLG)dlgNext()")
-    after = json.loads(g.ev("JSON.stringify({cats:['mikan','ban'].map(id=>{const c=catBy(id);return[c.st,!!c.away,c.hidden]}),door:R.upDoor,tab:roomsOpen().includes('up'),pill:$('#closePill').hidden,up:!!S.rooms.up})"))
-    check(all(not c[1] and not c[2] for c in after['cats']) and not after['door'] and not after['tab'] and not after['pill'] and not after['up'], f'downstairs, the door latched, the tab gone, the closing on — and nothing unlocked: {after}')
+    after = json.loads(g.ev("JSON.stringify({cats:['mikan','ban'].map(id=>{const c=catBy(id);return[c.st,!!c.away,c.hidden,c.hidden&&['hide','hide2'].includes(c.st)&&c.x===SPOT.cave.x&&c.y===SPOT.cave.y]}),door:R.upDoor,tab:roomsOpen().includes('up'),pill:$('#closePill').hidden,up:!!S.rooms.up})"))
+    # rc7.4 (found by the full run): back downstairs, 小齁 may go straight into the cave — hidden, but in the main hall
+    check(all(c[0] not in ('up', 'upgo') and not c[1] and (not c[2] or c[3]) for c in after['cats']) and not after['door'] and not after['tab'] and not after['pill'] and not after['up'], f'downstairs, the door latched, the tab gone, the closing on — and nothing unlocked: {after}')
     for _ in range(200):
         if g.ev("phase") != 'service': break
         g.ev("for(let i=0;i<30;i++)__tick(1000/30)")
@@ -2184,10 +2185,12 @@ def v24_rc7_the_money(b, port, target):
     # rc7.2 (the player, 22:51): LV5 twice the rc7 wage, a new hire 15% more
     check(w['c1'] == 304 and w['c5'] == 1690 and w['w5'] == 1408 and w['cl5'] == 1056 and w['b5'] == 2253, f'the wages: {w}')
     check(14679 * 1.98 < w['all'] < 14679 * 2.02, f'the Day 71 crew, all LV5: $14,679 a day in rc7, {w["all"]} now')
-    # the menu: three bar bites on tonight, of four
+    # the menu: the bar bites on tonight, of how many — three of four on this save before rc7.4; rc7.4's four new ones
+    # (水牛城雞翅、起司條、生蠔、德國豬腳 — this Lounge is III) come onto the menu with the morning's news: seven of eight
     g.ev("showPrep()"); g.page.wait_for_timeout(100)
     h = g.ev("(()=>{const h=[...document.querySelectorAll('#screen h3')].find(e=>e.textContent.includes('今日菜單'));return h?h.textContent:''})()")
-    check('酒吧小點 3 道（共 4 道，不佔名額）' in h, f'the menu header: {h}')
+    bars = json.loads(g.ev("JSON.stringify({on:S.menu.filter(d=>DISHES[d]&&DISHES[d].bar).length,all:S.unlocked.filter(d=>DISHES[d]&&DISHES[d].bar).length,lv:loungeLv()})"))
+    check(f"酒吧小點 {bars['on']} 道（共 {bars['all']} 道，不佔名額）" in h and (bars['on'], bars['all'], bars['lv']) == (7, 8, 3), f'the menu header: {h} {bars}')
     # a day: the wine poured, the rent, the wages, the Lounge's figures
     to_service(g); play_day(g)
     s = json.loads(g.ev("JSON.stringify(S.lastSummary)"))
@@ -2963,6 +2966,8 @@ def v24_rc7_2_vip_cards_and_the_lounge_after_dinner(b, port, target):
     to_service(g)
     g.ev("__botUntil('R.t>=R.dur*.5',90000,1/30)")
     g.ev("window.__act=()=>{}")
+    # rc7.4 (found by the full run): at half past the evening every main-hall table can be taken — the test makes one free
+    g.ev("window.__freeMain=()=>{const ok=t=>(t.room||'main')==='main'&&!t.lounge&&!t.pdr&&!t.hold;let t=R.tables.find(t=>ok(t)&&!t.group&&!t.dirty);if(!t){t=R.tables.find(ok);if(t.group){const q=t.group;leaveGroup(q,'ok');q.gone=true;R.groups=R.groups.filter(x=>x!==q)}t.group=null;t.dirty=false;t.claim=null;t.plates=[]}return t}")
     rates = json.loads(g.ev("""JSON.stringify((()=>{const mk=(reg,v,o)=>{S.regulars[reg]=v;return Object.assign({reg,regs:null,name:REG_BY[reg].n,size:1,counted:0},o||{})};const out={};
       out.r4=billRate(mk('mia',3));out.r5=billRate(mk('mia',4));out.r9=billRate(mk('mia',8));out.r10=billRate(mk('mia',9));
       out.lgAfter0=billRate(mk('mia',3,{counted:1,ticket:{lounge:1},lg:{why:'after'}}));out.lgAfter5=billRate(mk('mia',5,{counted:1,ticket:{lounge:1},lg:{why:'after'}}));out.lgAfter10=billRate(mk('mia',10,{counted:1,ticket:{lounge:1},lg:{why:'after'}}));
@@ -2970,7 +2975,7 @@ def v24_rc7_2_vip_cards_and_the_lounge_after_dinner(b, port, target):
       out.anon=billRate({size:2,counted:0});out.anonAfter=billRate({size:2,counted:1,ticket:{lounge:1},lg:{why:'after'}});return out})())"""))
     check(rates == {'r4': 1, 'r5': .9, 'r9': .9, 'r10': .8, 'lgAfter0': .8, 'lgAfter5': .8, 'lgAfter10': .7, 'lgDirect0': 1, 'lgDirect5': .9, 'lgDirect10': .8, 'anon': 1, 'anonAfter': .8}, f'the rates: {rates}')
     # a bill: Mia's fifth visit, at dinner — 九折 item by item; the card given, said once
-    r = json.loads(g.ev("""JSON.stringify((()=>{S.regulars.mia=4;delete (S.vip||{}).mia;const t=R.tables.find(t=>(t.room||'main')==='main'&&!t.group&&!t.dirty&&!t.hold&&!t.lounge&&!t.pdr);spawn({t:R.t,type:'office',size:1});const q=R.groups[R.groups.length-1];q.reg='mia';q.name='Mia';q.looks=REG_BY.mia.looks;q.ret=true;if(q.table==null)seatGroup(q,t);
+    r = json.loads(g.ev("""JSON.stringify((()=>{S.regulars.mia=4;delete (S.vip||{}).mia;const t=__freeMain();spawn({t:R.t,type:'office',size:1});const q=R.groups[R.groups.length-1];q.reg='mia';q.name='Mia';q.looks=REG_BY.mia.looks;q.ret=true;if(q.table==null)seatGroup(q,t);
       q.ticket={id:R.tkid++,no:99,g:q,items:[{d:'steak',st:'served',q:'G',want:0,picked:true},{d:'coffee',st:'served',q:'G',want:0,picked:true}],t0:R.t};R.tickets.push(q.ticket);q.state='check';
       const want=['steak','coffee'].reduce((a,d)=>a+Math.round(priceOf(d)*.9/5)*5,0),full=priceOf('steak')+priceOf('coffee');const r0=R.st.rev,v0=R.st.vipOff||0;document.querySelectorAll('#toasts>*').forEach(e=>e.remove());collect(q);
       return{paid:R.st.rev-r0,want,full,off:(R.st.vipOff||0)-v0,vip:S.vip.mia,day:S.day,visits:S.regulars.mia,toasts:[...document.querySelectorAll('#toasts .toast')].map(e=>e.textContent).join('|'),note:dayLog().some(l=>/Mia 第 5 次來，Jill 給了一張 VIP 卡/.test(l.t))}})())"""))
@@ -2984,7 +2989,7 @@ def v24_rc7_2_vip_cards_and_the_lounge_after_dinner(b, port, target):
     check(r and r['paid'] == r['want'] and r['off'] == r['full'] - r['want'], f'the Lounge after dinner: 八折: {r}')
     check(r['list'] == r['takings'], f'the Lounge\'s list is still its takings: {r}')
     # the ticket says the rate; the cards on the journal's VIP page
-    g.ev("""(()=>{R.tickets.length=0;S.regulars.leo=12;const t=R.tables.find(t=>(t.room||'main')==='main'&&!t.group&&!t.dirty&&!t.hold&&!t.lounge&&!t.pdr);spawn({t:R.t,type:'student',size:1});const q=R.groups[R.groups.length-1];q.reg='leo';q.name='Leo';q.looks=REG_BY.leo.looks;if(q.table!=null){R.tables[q.table].group=null;q.table=null}seatGroup(q,t);q.state='eat';q.ticket={id:R.tkid++,no:97,g:q,items:[{d:'pasta',st:'served',q:'G',want:0}],t0:R.t};R.tickets.push(q.ticket);R.tv++;renderTickets()})()""")
+    g.ev("""(()=>{R.tickets.length=0;S.regulars.leo=12;const t=__freeMain();spawn({t:R.t,type:'student',size:1});const q=R.groups[R.groups.length-1];q.reg='leo';q.name='Leo';q.looks=REG_BY.leo.looks;if(q.table!=null){R.tables[q.table].group=null;q.table=null}seatGroup(q,t);q.state='eat';q.ticket={id:R.tkid++,no:97,g:q,items:[{d:'pasta',st:'served',q:'G',want:0}],t0:R.t};R.tickets.push(q.ticket);R.tv++;renderTickets()})()""")
     tk = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('.tk')].filter(e=>e.textContent.includes('Leo')).map(e=>{const n=e.querySelector('.tk-who span');return{off:(e.querySelector('.tk-h .tk-off')||{}).textContent||null,treat:!!e.querySelector('.tk-who .tk-treat'),cut:n.scrollWidth>n.clientWidth+1}}))"))
     check(tk and tk[0]['off'] == '八折' and tk[0]['treat'] and not tk[0]['cut'], f'the ticket\'s top line says 八折 for a ten-visit card; the 招待 chip is there and the name is whole (23:46): {tk}')
     g.ev("bookTab='vip';showBook()"); g.page.wait_for_timeout(80)
@@ -3463,6 +3468,9 @@ def v24_rc75_the_pizza_oven_one_more_cook_and_the_bar_pizza(b, port, target):
     check(g.ev("!labRD().includes('pizza')&&!pantry().includes('dough')"), 'nothing of the pizza in the lab')
     g.ev("shopTab='menu';showShop()"); g.page.wait_for_timeout(60)
     check('酒吧披薩' not in g.ev("$('#screen').innerText"), 'nor on the research list')
+    # building the Lounge (here, on this save) gives its bites, never the pizza (the 03:45 discovery-run finding)
+    g.ev("factSet('lounge_project');S.level=Math.max(S.level,4);buyLounge(1);hideReveal&&hideReveal()")
+    check(g.ev("loungeLv()") == 1 and g.ev("S.unlocked.includes('wings')&&S.unlocked.includes('cheesestick')") and not g.ev("S.unlocked.includes('pizza')||S.menu.includes('pizza')"), 'Lounge I built: its bites, and no pizza without the oven and the lab')
     # with a Lounge
     load_save(g, 'player_day74_1508.json')
     g.ev("barMenuMig()")
