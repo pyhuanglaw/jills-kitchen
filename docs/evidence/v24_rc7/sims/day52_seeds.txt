@@ -1,0 +1,63 @@
+The forty days from the player's Day 52 save (tests/v24_tests.py v24_day52_save_plays_the_stories_in_order_over_forty_days),
+seven seed bases on two builds: 8800715 (rc7 before Ken's commit) and 7af5df7 (rc7). The day each of the wall's beats happened.
+Targets (docs/v24/pacing_correction_2026-10-01.txt; first played day = 53): the wall begins Day 62–66, settles by Day 82.
+Tool: the test's own loop with another seed base (tools/sims/day52_seeds.py ROOT SEEDBASE: the same code as the test).
+
+== 8800715 (before Ken)
+7000: wall begins within 62–66 (the test passed on this build: 75.1 s)
+7100: yj_key 63, wall_worry 65, wall_settle 82, wall_article 85
+7200: yj_key 63, wall_worry 65, wall_settle 84, wall_article 88
+7300: yj_key 61, wall_worry 65, wall_settle 84, wall_article 88
+7400: yj_key 63, wall_worry 66, wall_settle 84, wall_article 87
+7500: yj_key 61, wall_worry 65, wall_settle 82, wall_article 85
+7600: yj_key 61, wall_worry None, wall_settle None, wall_article None
+
+== 7af5df7 (rc7)
+7000: yj_key 61, wall_worry 67 (the test's failure: the wall begins Day 62–66)
+7100: yj_key 63, wall_worry 67, wall_settle 85, wall_article 89
+7200: yj_key 63, wall_worry 65, wall_settle 84, wall_article 87
+7300: yj_key 61, wall_worry 66, wall_settle 83, wall_article 88
+7400: yj_key 61, wall_worry 64, wall_settle 80, wall_article 83
+7500: yj_key 61, wall_worry 65, wall_settle 82, wall_article 85
+7600: yj_key 61, wall_worry 64, wall_settle 82, wall_article 85
+
+Why 7000 waits on rc7 (tools/sims/day52_wall_diag.py ROOT 7000 15): Sophie and Mia come in together on Day 64, but their own
+arc's beat sm_d takes that evening's major slot at 22% (the wall's conditions were met then too); Day 65 only Sophie comes,
+Day 66 neither, Day 67 the wall. On 8800715 they came in together on Day 63 and the wall began. The weather differs from
+Day 57 on: the trajectories part once the day's random draws differ.
+
+--- rc7, seed 7000, day by day ---
+Day 53 storm sophie+1 mia+1 sched [['sophie', 'sophie', 45], ['mia', 'mia', 46]]  smPair calls 0 ok 0 ok&xq 0 first_ok None  majors ['yj_meet@85']
+Day 54 cloud sophie+0 mia+1 sched [['mia', 'mia', 25]]  smPair calls 0 ok 0 ok&xq 0 first_ok None  majors []
+Day 55 cloud sophie+1 mia+1 sched [['sophie', 'sophie', 68], ['mia', 'mia', 77]]  smPair calls 0 ok 0 ok&xq 0 first_ok None  majors ['ken_tasting@0']
+Day 56 sun   sophie+1 mia+1 sched [['sophie', 'sophie', 31], ['mia', 'mia', 33]]  smPair calls 0 ok 0 ok&xq 0 first_ok None  majors ['yj_three@88', 'lounge_reveal@122']
+Day 57 rain  sophie+0 mia+0 sched [['sophie', 'sophie', 73], ['mia', 'mia', 74]]  smPair calls 0 ok 0 ok&xq 0 first_ok None  majors []
+Day 58 rain  sophie+0 mia+0 sched [['sophie', 'sophie', 66], ['mia', 'mia', 66]]  smPair calls 0 ok 0 ok&xq 0 first_ok None  majors []
+Day 59 sun   sophie+1 mia+1 sched [['sophie', 'sophie', 54], ['mia', 'mia', 56]]  smPair calls 0 ok 0 ok&xq 0 first_ok None  majors []
+Day 60 cool  sophie+0 mia+0 sched [['sophie', 'sophie', 40], ['mia', 'mia', 64]]  smPair calls 0 ok 0 ok&xq 0 first_ok None  majors []
+Day 61 sun   sophie+1 mia+1 sched [['mia', 'mia', 78], ['sophie', 'sophie', 79]]  smPair calls 0 ok 0 ok&xq 0 first_ok None  majors ['yj_key@0']
+Day 62 sun   sophie+0 mia+0 sched [['mia', 'mia', 36], ['sophie', 'sophie', 37]]  smPair calls 0 ok 0 ok&xq 0 first_ok None  majors ['sm_c@38']
+Day 63 cloud sophie+0 mia+0 sched []  smPair calls 0 ok 0 ok&xq 0 first_ok None  majors []
+Day 64 cloud sophie+1 mia+1 sched [['sophie', 'sophie', 20], ['mia', 'mia', 21]]  smPair calls 2 ok 1 ok&xq 1 first_ok {'d': 64, 't': 22, 'ok': True, 'xq': True, 'maj': 0}  majors ['sm_d@22']
+Day 65 hot   sophie+1 mia+0 sched [['sophie', 'sophie', 58], ['mia', 'mia', 59]]  smPair calls 2 ok 0 ok&xq 0 first_ok None  majors []
+Day 66 cloud sophie+0 mia+0 sched [['sophie', 'sophie', 68], ['mia', 'mia', 71]]  smPair calls 0 ok 0 ok&xq 0 first_ok None  majors []
+Day 67 sun   sophie+1 mia+1 sched [['sophie', 'sophie', 24], ['mia', 'mia', 25]]  smPair calls 4 ok 3 ok&xq 3 first_ok {'d': 67, 't': 26, 'ok': True, 'xq': True, 'maj': 0}  majors ['wall_worry@26']
+yj_key 61 wall_worry 67
+
+--- 8800715, seed 7000, day by day ---
+Day 53 storm sophie+1 mia+1 sched [['sophie', 'sophie', 45], ['mia', 'mia', 46]]  smPair calls 0 ok 0 ok&xq 0 first_ok None  majors ['yj_meet@85']
+Day 54 cloud sophie+0 mia+1 sched [['mia', 'mia', 25]]  smPair calls 0 ok 0 ok&xq 0 first_ok None  majors []
+Day 55 cloud sophie+1 mia+1 sched [['sophie', 'sophie', 68], ['mia', 'mia', 77]]  smPair calls 0 ok 0 ok&xq 0 first_ok None  majors ['ken_tasting@0']
+Day 56 sun   sophie+1 mia+1 sched [['sophie', 'sophie', 24], ['mia', 'mia', 26]]  smPair calls 0 ok 0 ok&xq 0 first_ok None  majors ['yj_three@97', 'lounge_reveal@120']
+Day 57 sun   sophie+1 mia+1 sched [['sophie', 'sophie', 73], ['mia', 'mia', 74]]  smPair calls 0 ok 0 ok&xq 0 first_ok None  majors []
+Day 58 rain  sophie+0 mia+0 sched []  smPair calls 0 ok 0 ok&xq 0 first_ok None  majors []
+Day 59 hot   sophie+1 mia+0 sched [['sophie', 'sophie', 46], ['mia', 'mia', 48]]  smPair calls 0 ok 0 ok&xq 0 first_ok None  majors []
+Day 60 storm sophie+1 mia+1 sched [['mia', 'mia', 10], ['sophie', 'sophie', 10]]  smPair calls 0 ok 0 ok&xq 0 first_ok None  majors ['sm_c@11']
+Day 61 cool  sophie+1 mia+0 sched [['sophie', 'sophie', 74]]  smPair calls 0 ok 0 ok&xq 0 first_ok None  majors ['yj_key@0']
+Day 62 sun   sophie+1 mia+1 sched [['mia', 'mia', 36], ['sophie', 'sophie', 37]]  smPair calls 0 ok 0 ok&xq 0 first_ok None  majors []
+Day 63 sun   sophie+1 mia+0 sched [['sophie', 'sophie', 46], ['mia', 'mia', 47]]  smPair calls 4 ok 3 ok&xq 3 first_ok {'d': 63, 't': 48, 'ok': True, 'xq': True, 'maj': 0}  majors ['wall_worry@48']
+Day 64 sun   sophie+1 mia+1 sched [['sophie', 'sophie', 20], ['mia', 'mia', 21]]  smPair calls 3 ok 2 ok&xq 2 first_ok {'d': 64, 't': 22, 'ok': True, 'xq': True, 'maj': 0}  majors ['wall_photos@22']
+Day 65 rain  sophie+1 mia+0 sched [['sophie', 'sophie', 50], ['mia', 'mia', 51]]  smPair calls 0 ok 0 ok&xq 0 first_ok None  majors ['sophie_mei_4@79']
+Day 66 cool  sophie+1 mia+0 sched [['sophie', 'sophie', 71]]  smPair calls 0 ok 0 ok&xq 0 first_ok None  majors ['wall_visit@0']
+Day 67 cloud sophie+1 mia+1 sched [['sophie', 'sophie', 21], ['mia', 'mia', 23]]  smPair calls 3 ok 2 ok&xq 2 first_ok {'d': 67, 't': 24, 'ok': True, 'xq': True, 'maj': 0}  majors ['sm_d@24']
+yj_key 61 wall_worry 63

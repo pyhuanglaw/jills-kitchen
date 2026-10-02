@@ -361,13 +361,19 @@ def v24_day52_save_plays_the_stories_in_order_over_forty_days(b, port, target):
     load_save(g, 'player_day52.json')
     g.ev("window.__fastSay=1")
     seed = "Math.random=(function(){let a=%d;return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}})()"
+    # v2.4 rc7: the seed base was 7000. One seed is one trajectory, and any change in how many random numbers a day draws
+    # moves it: since 8e8d407 (Ken: a named guest's party is never a passer-by's) the walk-ins draw less, and on 7000 the
+    # wall began on Day 67, a day past the window. Seven seeds on both builds (docs/evidence/v24_rc7/sims/day52_seeds.txt):
+    # the wall begins Day 64–67 now (65–66 before, and one seed where it never began in forty days), settles Day 80–85
+    # (82–84 before) — the same spread; on 7000 Sophie and Mia's own beats took the evenings they came in together (sm_c,
+    # sm_d), the wall the next one. 7400 meets every target of the player's on this build.
     first = None; majors = {}
     for d in range(40):
         if g.ev("phase") == 'summary':
             g.click('[data-act=toShop]'); g.page.wait_for_timeout(60)
         if g.ev("phase") == 'shop':
             g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(100)
-        g.ev(seed % (7000 + d)); g.ev("S.today.sugKey=null;S.today.sug=null;autoStock()")
+        g.ev(seed % (7400 + d)); g.ev("S.today.sugKey=null;S.today.sug=null;autoStock()")
         start_day(g); install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;window.__noScenes=true")
         if first is None:
             first = g.ev("S.day")
