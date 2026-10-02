@@ -1,0 +1,4 @@
+day 79 due False plan [{"who":"sophie","regs":["sophie"],"t":187.6,"grp":null,"hold":false}] seated {"both":0,"sophie":12,"yj":0,"first":null} article null
+day 80 due False plan [{"who":"sophie","regs":["sophie"],"t":160.8,"grp":"sm","hold":true}] seated {"both":0,"sophie":20,"yj":0,"first":null} article null
+day 81 due False plan [{"who":"sophie","regs":["sophie"],"t":127.4,"grp":null,"hold":false}] seated {"both":0,"sophie":27,"yj":0,"first":null} article null
+day 82 due True plan [{"who":"sophie","regs":["sophie"],"t":75.7,"grp":"ys","hold":true},{"who":"怡君","t":80.9,"grp":"ys","hold":true}] seated {"both":9,"sophie":10,"yj":18,"first":85} article {"d":83,"n":1,"l":83}

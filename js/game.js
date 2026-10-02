@@ -1583,7 +1583,7 @@ function buildSchedule(dur){const T=S.today,n=T.groups,out=[];
  if(loungeArcOpen()){if(Math.random()<.35)out.push({t:rand(.2,.7)*dur,type:'gourmet',size:1,name:KEN});if(fact('ken_pairing')&&!fact('ken_du_argue')&&Math.random()<.3)out.push({t:rand(.2,.7)*dur,type:'gourmet',size:1,name:DU})}   /* v2.3: the arc makes them likelier, never certain */
  if(loungeOpenTonight()){/* v2.3: a few come for the Lounge itself, later in the evening — the number grows with the room */const nL=ri(2,3)+loungeLv();for(let k=0;k<nL;k++){const o=rollGuest();o.lounge=1;o.size=Math.min(o.size,2);o.t=rand(.5,.88)*dur;out.push(o)}
   if(sportsNight()){/* rc7.4: the game on the Lounge's TV — two (three with the sound) come for it */const nS=lgFurnOn('sound')?3:2;for(let k=0;k<nS;k++){const o=rollGuest();o.lounge=1;o.sport=1;o.size=Math.min(o.size,2);o.t=rand(.45,.8)*dur;out.push(o)}}}
- for(const r of REGS)if(S.day>=r.day&&!(r.pair&&!r.lead)){const met=(S.regulars[r.id]||0)>0;const retry=S.regMiss&&S.regMiss[r.id]===S.day-1;const lv=[r.id,r.pair].some(id=>id&&LOVES[id]&&S.menu.includes(LOVES[id].d));/* rc7.4 */if(Math.random()<(E.regs?.95:retry?.8:met?(lv?.66:.55):(lv?.54:.45)))out.push(regPlanVisit({t:rand(.1,.85)*dur,type:r.type,reg:r.id,size:r.size}))}
+ for(const r of REGS)if(S.day>=r.day&&!(r.pair&&!r.lead)){const met=(S.regulars[r.id]||0)>0;const retry=S.regMiss&&S.regMiss[r.id]===S.day-1;if(Math.random()<(E.regs?.95:retry?.8:met?.55:.45))/* rc7.4: a favourite on the menu does not bring anyone more often — it did on the branch, and the busier evenings held the stories back (docs/evidence/v24_rc7_4/sims/day52_seeds.txt) */out.push(regPlanVisit({t:rand(.1,.85)*dur,type:r.type,reg:r.id,size:r.size}))}
  pdWalkIns(out,dur);/* v2.4 rc6 */storySchedule(out,dur);/* v2.3 Phase 7 */
  if(S.day>=3){const d=S.dylan;/* a recurring person in Jill's life, not a daily spawn: about every other day, less likely right after a visit */const gap=S.day-(d.last||0);/* v2.2: presence is its own knob — he lives here, so most days he comes by; only the story is rare */const p=S.day<=5?.6:gap<=1?.55:gap>=3?.97:.85;const on=ev==='valentine'||Math.random()<p;/* v2.3: Valentine's, always */dylanTrace({d:S.day,p:Math.round(p*100),s:on?1:0});if(on){const late=Math.random()<(d.stage>=2?.75:d.stage>=1?.6:.35);const t=(late?rand(.6,.86):rand(.1,.55))*dur;dylanTrace({t:Math.round(t)});out.push({t,type:'regular',reg:'dylan',size:1,tries:0})}}
  return out.sort((a,b)=>a.t-b.t)}
@@ -1792,8 +1792,8 @@ function recoDish(){const r=S.today&&S.today.reco;return r&&S.menu.includes(r)&&
 /* ---- rc7.4 (the player, 22:39 「可不可以建立客人對某個餐點或某杯酒的特殊喜好」): each regular, and each named guest who
    orders for herself (not 周董: his is 「隨便」), loves one dish and one glass. Nobody announces it: the player learns it
    when they order it (「今天有蛋炒飯，太好了。」) or when it is not on (「今天沒有提拉米蘇啊……」); from then on the journal
-   says it, and the menu marks whose it is. When it is on the menu they come a little more often, order it (not every
-   single time) and leave a little happier. Ken's and 杜's glasses stay their own authored habits; theirs is only learned. */
+   says it, and the menu marks whose it is. When it is on the menu they order it (not every single time) and leave a
+   little happier; they do not come more often for it (the branch had that, and the busier evenings held the stories back). Ken's and 杜's glasses stay their own authored habits; theirs is only learned. */
 const LOVES={chen:{d:'friedrice',g:'blacktea'},mia:{d:'tiramisu',g:'coffee'},koba:{d:'burger',g:'fruitsoda'},leo:{d:'pasta',g:'sparkling'},sophie:{d:'duck',g:'w_pinot'},wang:{d:'steak',g:'w_fred'},wangwife:{d:'basque',g:'w_rose'},
  'Madame Lin':{d:'prosciutto',g:'w_spark'},'Mr. Hart':{d:'salmon',g:'w_white'},'老饕李先生':{d:'risotto',g:'w_fwhite'},'Monsieur 杜':{d:'chicken',g:'w_fred'},'品酒師 Ken':{d:'signature',g:'w_lred'},'吃貨小琪':{d:'fries',g:'fruitsoda'},'美食部落客 Momo':{d:'souffle',g:'w_house'}};
 const LOVE_HIT=['今天有{d}，太好了。','{d}！就這個。','還好今天有{d}。','我就是來吃{d}的。'],LOVE_HIT_G=['{g}，一杯。','今晚有{g}，那就這個。'],LOVE_MISS=['今天沒有{d}啊……','{d}今天沒有喔？那我看看別的。','沒有{d}，好可惜。'],LOVE_WISH=['要是有{d}就好了。','這裡會不會有{d}？'];
@@ -8454,7 +8454,7 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
   ['票券上的字','招待＝現在可以；集點卡・請甜點／紀念日・請甜點＝這桌已經有東西要送過去了；已招待＝這桌今天請過了；招待 0/2＝今天的兩桌用完了；沒東西可請＝冰箱裡沒有飲料或甜點。'],
   ['Jill 自己請','等太久的客人，她可能主動請一杯（熟客更常）；這也是一天兩桌，跟你的分開算。'],
   ['集點卡與紀念日','熟客每第 5 次來，Jill 會請甜點；王先生王太太的結婚紀念日也是。這些是約定，不受任何限制。'],
-  ['熟客','來過 2 次眼熟、4 次熟客、12 次老客人；老客人耐心多一點。日誌的「熟客」有他們的老位子、常點的菜和留言；點店裡的熟客也會看到他的卡片。有名字的客人（品酒師 Ken、周董、Madame Lin……）也會被記得：點他們有卡片，日誌「熟客」最下面的「店裡的人」列著他們。熟客也有自己的生活——升職、換工作、搬家、畢業這種事只會發生一次，之後記在他們的卡片上；平常點餐時說的是他們的習慣。有故事的客人在店裡的樣子跟頭像一樣——自己的髮型、眼鏡、鬍子、衣服，一般客人不會有，遠遠就認得出來。'],  ['最愛的一道、一杯','每位熟客、還有有名字的客人，都有一道最愛的菜、一杯最愛的飲料或酒。沒有人會直接告訴你：他點到的時候會說（「今天有蛋炒飯，太好了。」），菜單上沒有的時候有時也會說一聲（「今天沒有提拉米蘇啊……」）。知道以後，日誌的「熟客」會寫「最愛」，開店前的菜單和 Lounge 酒單上，那一道旁邊會標 ♥ 和他的名字。放上菜單的那天，他們來得勤一點、多半會點它，吃完也開心一點；隨機選菜單也會稍微偏向有人最愛的菜。'],
+  ['熟客','來過 2 次眼熟、4 次熟客、12 次老客人；老客人耐心多一點。日誌的「熟客」有他們的老位子、常點的菜和留言；點店裡的熟客也會看到他的卡片。有名字的客人（品酒師 Ken、周董、Madame Lin……）也會被記得：點他們有卡片，日誌「熟客」最下面的「店裡的人」列著他們。熟客也有自己的生活——升職、換工作、搬家、畢業這種事只會發生一次，之後記在他們的卡片上；平常點餐時說的是他們的習慣。有故事的客人在店裡的樣子跟頭像一樣——自己的髮型、眼鏡、鬍子、衣服，一般客人不會有，遠遠就認得出來。'],  ['最愛的一道、一杯','每位熟客、還有有名字的客人，都有一道最愛的菜、一杯最愛的飲料或酒。沒有人會直接告訴你：他點到的時候會說（「今天有蛋炒飯，太好了。」），菜單上沒有的時候有時也會說一聲（「今天沒有提拉米蘇啊……」）。知道以後，日誌的「熟客」會寫「最愛」，開店前的菜單和 Lounge 酒單上，那一道旁邊會標 ♥ 和他的名字。放上菜單的那天，他們多半會點它，吃完也開心一點；隨機選菜單也會稍微偏向有人最愛的菜。'],
 
   ['Dylan','常常在打烊前才來的那位。他不是員工，也不用你招待。你認識他以後，他來的時候日誌會記一行，他的卡片會顯示最近幾天來了沒（●來了・◐門口看了一眼・○沒來）。客滿時他會晚點再來，打烊前來不及就只在門口看一眼。']]},
  {ic:'🪑',h:'商店：家具、工程、營運',sum:'打烊後（開店前也可以）用今天賺的錢把店變成你要的樣子。錢買得到的都看得到。',pts:[

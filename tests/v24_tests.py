@@ -371,6 +371,13 @@ def v24_day52_save_plays_the_stories_in_order_over_forty_days(b, port, target):
     # seeds on rc7.2 (8a3e1a8) and rc7.3 (9a36bbd), docs/evidence/v24_rc7_3/sims/day52_seeds.txt: the wall begins Day
     # 63–68 (64–67 on rc7.2), settles Day 80–85 (80–85) — about the same spread, earlier at the median; 7400 is now the
     # one late seed (68, 85). 7600 meets every target on both builds (the wall on Day 64 on both).
+    # rc7.4 release: on the branch a favourite on the menu brought its regular a little more often, and the full run on
+    # 6e82c77 settled the wall on Day 83 here. Seven seeds (docs/evidence/v24_rc7_4/sims/day52_seeds.txt): the busier
+    # evenings held the stories back (settled by Day 82 on four of seven, the article seven days after the settlement
+    # on three), and a regular the story asked for, who was coming anyway, was lost at the door when the room was full
+    # (Sophie, the evenings 怡君 came for the article — fixed in 57e6f80). Without the extra visits: settles Day 79–82
+    # (rc7.3: 80–85), the wall begins 63–66, the article three days after on all seven; five seeds of seven meet every
+    # target (five on rc7.3), 7600 among them on both.
     first = None; majors = {}
     for d in range(40):
         if g.ev("phase") == 'summary':
@@ -3276,7 +3283,7 @@ def v24_rc74_favourites_learned_in_play_and_marked_on_the_menu(b, port, target):
     Nobody announces it: 陳伯伯 orders his 蛋炒飯 when it is on, says so, and from then on the journal says 「最愛」 and
     tomorrow's menu marks the row 「♥ 陳伯伯」; Mia, with no tiramisu on, says that instead — and Jill knows hers too. A
     demand estimate learns nothing. In the Lounge, Sophie's glass is the pinot when it is poured. They are a little
-    happier for it at the bill, and come a little more often when it is on."""
+    happier for it at the bill. (They do not come more often for it: the branch had that, and it held the stories back.)"""
     g = Game(b, port, target, seed=7421, manual=True, viewport={'width': 390, 'height': 844})
     load_save(g, 'player_day74_1508.json')
     g.ev("S.loves={};for(const d of['friedrice'])if(!S.menu.includes(d))S.menu.push(d);S.stock.friedrice=Math.max(S.stock.friedrice||0,6);S.menu=S.menu.filter(d=>d!=='tiramisu')")
@@ -3310,7 +3317,7 @@ def v24_rc74_favourites_learned_in_play_and_marked_on_the_menu(b, port, target):
     # the Lounge: Sophie's glass
     w = json.loads(g.ev("JSON.stringify((()=>{const L=wineList();return{has:L.includes('w_pinot'),o:loungeOrder({size:1,type:'gourmet',reg:'sophie',name:'Sophie'})}})())"))
     if w['has']: check(w['o'][0] == 'w_pinot', f'Sophie orders the pinot when it is poured: {w}')
-    # the bill: +6 when they had it; the plan: likelier when it is on
+    # the bill: +6 when they had it
     check('loveIdsOf(g)' in g.ev("String(collect)") and 'sat+=6' in g.ev("String(collect)"), 'the bill counts it')
     # tomorrow's menu marks the rows
     g.ev("(()=>{closeShop('x');for(const q of R.groups.slice())leaveGroup(q,'ok');finishClosing()})()")
