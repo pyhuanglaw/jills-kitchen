@@ -107,7 +107,21 @@ Filed verbatim in `docs/v24/player_messages_2219_2308_2026-10-02.txt`:
 
 ## 4. Manual audit (小小店主手冊)
 
-(filled at the release)
+Checked against the final feature set: 熟客 and 店裡的人, 日誌's 熟客 page, 今天的菜單 and the random menu, the Lounge's
+section (Bar Food, the furniture, 晚餐後八折, VIP), 家具與佈置.
+- **New**: 「最愛的一道、一杯」 — everyone with a name has a favourite dish and glass; nobody announces it; what a guest
+  says when it is on, and sometimes when it is off; once known, 「最愛」 in the journal and ♥ with the name on the menu
+  and the wine list; they come a little more often, order it and are a little happier; the random menu leans to the
+  favourites.
+- **New**: 「電視與音響」 — where the two pieces are (家具與佈置 › Lounge 的家具), the prices, the sound needs the TV,
+  about two game nights a week, the fans, staying on, music on the other nights, the summary's 「有比賽轉播」.
+- **Changed**: Bar Food lists the new bites and the level each comes with (II: 生蠔; III: 德國豬腳).
+- **Changed**: the journal's 熟客 page lists 「最愛（知道以後）」.
+- **Removed**: the old Bar Food list (`followup_the_manual_describes_the_current_game` keeps it as a stale phrase).
+- The three new looks: no change required. The manual says how the story guests look (「有故事的客人在店裡的樣子跟
+  頭像一樣」) and names Evan, 沈晴 and 阿拓 with their jobs; it describes no one's looks on the staff, and nothing in it is
+  now wrong.
+- The audit stamp on `GUIDE` says rc7.4.
 
 ## 5. Tests
 
