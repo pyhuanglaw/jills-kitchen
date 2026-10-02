@@ -4337,7 +4337,7 @@ function update(dt){R.t+=dt;if(R.v24q&&R.v24q.length)v24Upd();
 function startClosing(){R.closing=0;hideCombo();try{if(R.kt&&!R.kt.end)kenNightClose()}catch(e){console.warn('[ken]',e)}/* rc7 */storyTick('close',{});try{srClosingPlan()}catch(e){console.warn('[sr]',e)}/* v2.3 */const J=R.jill;J.q=[];J.cur=null;J.carry=[];const wasResting=J.rest==='sit';const keep=wasResting?Object.assign({},LIFE.jill):null;if(J.rest&&!wasResting)endRest();lifePlan();
  if(wasResting){LIFE.plan='sofa';const L=LIFE.jill;Object.assign(L,{on:true,reserved:false,pos:keep.pos,x:keep.x,y:SOFA.jy,room:'home',troom:'home',face:keep.face,legs:0,legTarget:0,act:'settle',t:rand(1,3),sinceSit:0,counted:false,hat:false});J.rest=null;J.sofa=true;J.tx=null;J.ty=null;J.moving=false;J.restTo=false}
  else if(LIFE.plan==='sofa'){J.tx=null;J.ty=null;J.restTo=false;J.moving=false;const L=LIFE.jill;L.x=J.x;L.y=J.y;L.face=J.face;L.room=J.room||'main';L.troom=L.room;/* first the pass gets wiped down; then the sofa */L.wrapT=rand(4,6.5);if(L.room!=='main'||Math.hypot(J.x-PASS.x,J.y-PASS.y)>4){L.act='standing';jillWalk(L,PASS.x,PASS.y,'wrap','main')}else L.act='wrap'}
- else{const t=R.tables[0];J.troom='main';J.tx=t.x-25;J.ty=t.y+2;J.restTo=true}$('#closePill').hidden=false;if(CATS)for(const c of CATS){if(c.hidden||['jump','walk','race','dash','bed'].includes(c.st))continue;c.t=Math.min(c.t||0,c.def.id==='tora'?.4:c.def.id==='ban'?rand(1.5,3):rand(2,8))}}
+ else{const t=R.tables[0];J.troom='main';J.tx=t.x-25;J.ty=t.y+2;J.restTo=true}$('#closePill').hidden=false;try{toraAtClosing()}catch(e){console.warn('[tora]',e)}if(CATS)for(const c of CATS){if(c.hidden||['jump','walk','race','dash','bed'].includes(c.st))continue;c.t=Math.min(c.t||0,c.def.id==='tora'?.4:c.def.id==='ban'?rand(1.5,3):rand(2,8))}}
 function finishClosing(){if(!R||R.ended)return;R.ended=true;$('#closePill').hidden=true;endDay()}
 /* Why the stars went where they went today, in the player's words. Each cause carries a sign and a weight so the
    summary can show the ones that mattered. Computed from what happened, not from the formula's decimals. */
@@ -6943,7 +6943,7 @@ function catArrive(c){const a=c.after;const id=c.def.id;
  if(a==='stealWatch'){const t=c.stealT,g=c.stealG;c.st='steal';c.pose='sit';c.face=t&&t.x>=c.x?1:-1;c.t=rand(6,12);c.lookAt=t?{x:t.x,y:t.y-20,hidden:false}:null;if(g)catEv(g,'watch',c);return}
  if(a==='meowAt'){const g=c.guest;if(!g||!R||!R.groups.includes(g)||g.table==null){catDecide(c);return}const t=R.tables[g.table];c.st='visit';c.pose='sit';c.t=6;c.face=t.x>=c.x?1:-1;g.mewed=1;addFloat(c.x,c.y-30,'喵～','#FFF6E8',0,'main');c.hearts.push({x:0,y:-26,t:0},{x:4,y:-30,t:-.3});
   setTimeout(()=>{if(R&&R.groups.includes(g))quote(g,pickT(['好可愛……','她在叫我欸。',`${catName(c.def)}在跟我講話。`,'怎麼這麼可愛。','我要融化了。']))},700);catCheer(g,.08);catEv(g,'meow',c);return}
- if(a==='waitJill'){c.st='rest';c.pose='sit';c.face=-1;c.t=90;c.waitJill=true;return}   /* 樾樾, after closing, by the kitchen door */
+ if(a==='waitJill'){c.st='rest';c.pose='sit';c.face=1;c.t=90;c.waitJill=true;c.toJill=false;return}   /* 樾樾, after closing, by the kitchen door, looking out at her */
  if(a==='playWith'){const m=c.target;c.target=null;if(m&&freeFloorCat(m)&&['rest','daze','stare','sleep'].includes(m.st)&&Math.hypot(m.x-c.x,m.y-c.y)<60){startPlay(c,m);return}c.st='rest';c.pose='sit';c.t=rand(2,4);return}
  if(a==='guide'){const b=catBy('snow');if(b&&b.forgot==='eat'&&Math.hypot(b.x-c.x,b.y-c.y)<60){b.forgot=null;b.st='walk';b.tx=SPOT.bowl.x+8;b.ty=SPOT.bowl.y-2;b.after='eat';b.afterT=0;b.moving=true;b.run=0;memo('guide',(c.x+b.x)/2,(c.y+b.y)/2,{a:catName(c.def),b:catName(b.def),subj:[b]});catWalk(c,SPOT.bowl.x-14,SPOT.bowl.y-4,'rest',rand(3,5));return}c.st='rest';c.pose='sit';c.t=rand(2,4);return}
  if(a==='sofaUp'){const s=c.sofa;if(!s){catDecide(c);return}if(s.kind==='seat'||s.kind==='lap')catJump(c,s.x,s.y,'sofaLand');else{c.chain=[{x:s.x,y:s.y}];c.chainEnd='sofaLand';catJump(c,clamp(s.x,SOFA.seatL+8,SOFA.seatR-8),SOFA.catY,'chain')}return}
@@ -7031,7 +7031,7 @@ function initCats(){CATS=CAT_DEF.map(d=>({def:d,x:0,y:0,st:'rest',pose:'sit',per
  OCC.bed.push(Bb);Bb.bedSide=-1;Bb.x=SPOT.bed.x-10;Bb.y=SPOT.bed.y;Bb.st='bed';Bb.pose='curl';Bb.t=rand(20,40);
  /* rc7.3: 樾樾 starts the day in the room with Dylan, 寶寶 on her tree there */perchOcc[6]=null;B.perch=-1;homeCatIn(T);homeCatIn(B)}
 function updateCats(dt,now){if(!CATS)initCats();ctime+=dt;upCatLife(dt);homeSayTick(dt);
- {const L=LIFE.jill;if(evening()&&(L.troom==='home'||L.room==='home'))for(const c of CATS)if(c.waitJill&&!c.away&&c.st==='rest'){c.waitJill=false;homeGo(c,'withJill')}}/* v2.4 P2 */RACE_CD-=dt;TOY.amp=Math.max(1,TOY.amp-dt*.6);if(FLASH){FLASH.t+=dt;if(FLASH.t>.5)FLASH=null}
+ {const L=LIFE.jill;if(evening()&&(L.troom==='home'||L.room==='home'))for(const c of CATS)if((c.waitJill&&!c.away&&c.st==='rest')||(c.def.id==='tora'&&!c.away&&c.st==='side'&&R&&R.closing!=null)){c.waitJill=false;homeGo(c,'withJill')}}   /* rc7.3: she heads for her room — 樾樾, waiting by the kitchen door or sitting by her at the pass, goes with her *//* v2.4 P2 */RACE_CD-=dt;TOY.amp=Math.max(1,TOY.amp-dt*.6);if(FLASH){FLASH.t+=dt;if(FLASH.t>.5)FLASH=null}
  for(const c of CATS){c.ph+=dt*(c.run?2.4:1);c.cd=Math.max(0,c.cd-dt);if(c.wcd>0)c.wcd-=dt;if(c.wakeT>0)c.wakeT-=dt;if(c.flickT>0)c.flickT-=dt;if(c.hopT>0)c.hopT-=dt;if(c.forgot&&c.st!=='daze'&&c.st!=='walk')c.forgot=null;
   if(c.swatT!=null&&c.st==='play'){c.swatT-=dt;if(c.swatT<=0){c.swatT=null;const o=c.swatAt;c.swatAt=null;c.swatShow=.5;if(o&&o.st==='play'){o.hopT=.45;o.hearts.push({x:0,y:-26,t:0});memo('swat',(c.x+o.x)/2,(c.y+o.y)/2,{a:catName(c.def),b:catName(o.def),subj:[c,o]})}}}if(c.swatShow>0)c.swatShow-=dt;if(c.happy>0){c.happy-=dt;if(c.happy<=0){c.quiet=0;if(c.st==='pet')catDecide(c)}}for(const h of c.hearts)h.t+=dt;c.hearts=c.hearts.filter(h=>h.t<1.4);
   switch(c.st){
@@ -7533,10 +7533,14 @@ function drawHomeLitter(c){const L=HM.litter;const y=L.y;srShadow(c,(L.x0+L.x1)/
 const HOME_W={tora:3.2,mikan:.3,ban:.7,snow:.6,mei:1.4};    /* the pull of home, from the dining room */
 const HOME_OUT={tora:.05,mikan:.62,ban:.42,snow:.36,mei:.2};  /* the pull of the dining room, from home */
 function toraBrave(){return (S.crew||[]).some(m=>(m.days||0)>=10)||S.day>=21}   /* the crew are faces he knows */
+/* the closing has begun (the guests all gone), Jill is still out there, and he has not been out yet tonight */
+function toraOut(){const T=catBy('tora');const L=LIFE.jill;return !!(T&&R&&R.closing!=null&&!R.ended&&toraBrave()&&T.waitedTonight!==S.day&&(L.troom||L.room||'main')!=='home'&&(L.room||'main')!=='home'&&!R.groups.some(g=>!g.gone&&g.table!=null&&g.room!=='lounge'))}
+/* the moment the closing begins he stirs (asleep or not), so the coming out is part of the closing, not after it */
+function toraAtClosing(){const T=catBy('tora');if(!T||T.away!=='home'||T.upTo||!toraBrave()||T.waitedTonight===S.day)return;T.hT=Math.min(T.hT||99,rand(.6,1.6))}
 function homeWeight(c){const id=c.def.id;let w=HOME_W[id]||.5;if(evening())w*=id==='tora'&&c.waitJill?0:2.2;const L=LIFE.jill;if((L.on||L.reserved)&&L.room==='home')w*=1.5;
  if(id==='tora'&&homeDylanAtDesk())w*=1.3;if(id==='ban'&&homeDylanAtDesk()&&!(c.meowCD>ctime))w*=1.8;return w}
 function homeGo(c,why){releaseSpots(c);if(c.perch>=0){if(perchOcc[c.perch]===c)perchOcc[c.perch]=null;c.perch=-1}c.homeWhy=why||null;catWalk(c,KD.x+8,FB-10,'homeIn')}
-function homeCatIn(c){c.st='home';c.away='home';c.hidden=true;c.moving=false;c.waitJill=false;c.ax=HM.door.x+(Math.random()<.5?-8:8);c.ay=HM.door.y-6;c.aface=1;c.aoy=0;c.homeY=null;c.upTo=null;c.hT=0;homeCatDecide(c,true)}
+function homeCatIn(c){c.st='home';c.away='home';c.hidden=true;c.moving=false;c.waitJill=false;c.toJill=false;c.ax=HM.door.x+(Math.random()<.5?-8:8);c.ay=HM.door.y-6;c.aface=1;c.aoy=0;c.homeY=null;c.upTo=null;c.hT=0;homeCatDecide(c,true)}
 function homeCatOut(c){/* back into the dining room, by the corridor beside the kitchen */if(c.sofa){c.sofa=null;c.sofaOn=false}c.homeSleep=false;c.away=null;c.hidden=false;c.st='rest';c.pose='stretch';c.x=KD.x+8;c.y=FB-10;c.face=1;c.t=rand(1,2.5);c.moving=false;c.upTo=null;c.homeY=null;c.homeSpot=null}
 function homeCatLeave(c,then){c.homeSpot=null;if(c.sofa){c.sofa=null;c.sofaOn=false}c.homeY=null;c.upTo={x:HM.door.x,y:HM.door.y-4,v:44,then:o=>{if(then)then(o);else homeCatOut(o)}}}
 /* the places in the room, by cat */
@@ -7560,9 +7564,10 @@ function homeSpots(c){const id=c.def.id;const out=[];const B=HM.bed,D=HM.desk,T=
 /* deciding, in the room */
 function homeCatDecide(c,fresh){const id=c.def.id;
  if(!fresh&&c.waitJill)c.waitJill=false;
+ if(!fresh&&id==='tora'&&toraOut()&&Math.random()<.85){/* the guests gone: out to the kitchen door, to wait for Jill (22:54) */c.waitedTonight=S.day;c.toJill=true;c.homeSleep=false;if(c.sofa){c.sofa=null;c.sofaOn=false}homeCatLeave(c,o=>{homeCatOut(o);o.waitJill=true;catWalk(o,KD.x+62,FB-12,'waitJill')});return}   /* clear of the cat tree by the door and of the closing's pill: in sight */
  if(!fresh&&c.sofa&&c.sofaOn){homeSofaDecide(c);return}   /* on the sofa: stay, shift nearer Jill, or hop down (as v2.0) */
- if(!fresh){let out=HOME_OUT[id]||.3;if(evening())out*=.35;if(id==='mei'&&meowGuest()&&!((c.meowGCD||0)>ctime))out*=4;if(id==='ban'&&stealTable(c))out*=1.6;if(id==='tora'&&R&&R.closing!=null&&toraBrave()&&c.waitedTonight!==S.day&&!R.groups.some(g=>!g.gone&&g.table!=null&&!(g.room==='lounge')))out=4;   /* the guests gone: out to wait for Jill */
-  const stay=1;if(Math.random()<out/(out+stay)){if(id==='tora'&&R&&R.closing!=null){c.waitedTonight=S.day;homeCatLeave(c,o=>{homeCatOut(o);o.waitJill=true;catWalk(o,KD.x+30,FB-16,'waitJill')})}else homeCatLeave(c);return}}
+ if(!fresh){let out=HOME_OUT[id]||.3;if(evening())out*=.35;if(id==='mei'&&meowGuest()&&!((c.meowGCD||0)>ctime))out*=4;if(id==='ban'&&stealTable(c))out*=1.6;
+  const stay=1;if(Math.random()<out/(out+stay)){homeCatLeave(c);return}}
  const sp=homeSpots(c);const why=c.homeWhy;c.homeWhy=null;c.homeSleep=false;if(c.sofa&&!c.sofaOn)c.sofa=null;
  let s=((why==='jill'||why==='withJill')&&sp.find(o=>o.k==='jill'))||wpick(sp,o=>o.w);
  if(s.k==='jill'){homeSofaJill(c);return}
@@ -7712,7 +7717,7 @@ function sofaDecide(c){const id=c.def.id;const J=LIFE.jill;
  leaveSofa(c,'decide')}
 /* ---- Jill's evening ---- */
 function lifePlan(){if(LIFE.day===S.day&&LIFE.plan)return;LIFE.day=S.day;LIFE.t=0;LIFE.revealRoll=0;LIFE.say=[];
- LIFE.plan='sofa';const J=LIFE.jill;Object.assign(J,{on:false,bed:false,preferBed:Math.random()<.15,reserved:false,pos:null,legs:0,legTarget:0,act:null,last:null,t:0,walking:false,via:null,after:null,sitT:0,catNew:0,sinceSit:0,counted:false,tvFirst:false})}
+ LIFE.plan='sofa';const J=LIFE.jill;Object.assign(J,{on:false,bed:false,preferBed:Math.random()<.15,waitTora:0,sawTora:0,reserved:false,pos:null,legs:0,legTarget:0,act:null,last:null,t:0,walking:false,via:null,after:null,sitT:0,catNew:0,sinceSit:0,counted:false,tvFirst:false})}
 function freeJillPos(){const ivs=seatIvs(null);const ok=p=>ivFree(JPOS[p].x-13,JPOS[p].x+13,ivs);const clearHead=p=>!sofaCats().some(o=>o.sofa.kind==='back'&&Math.abs(o.sofa.x-JPOS[p].x)<20);
  const order=Math.random()<.7?['L','R','M']:['R','L','M'];return order.find(p=>ok(p)&&clearHead(p))||order.find(ok)||null}
 function jillWalk(L,x,y,after,rm){L.tx=x;L.ty=y;L.after=after;L.walking=true;L.via=null;L.troom=rm||L.room||'main';if(!L.room)L.room='main';if(L.troom!==L.room)return;   /* rc7.3: to another room: through its doors (stepTo) */
@@ -7744,7 +7749,10 @@ function jillLife(J,L,dt){const tv=LIFE.tv;
   else if(['read','idle','tv','pet'].includes(L.act)&&L.t<=0){if(L.act==='pet'&&L.petCat)L.petCat=null;jillDecide(L)}
   if(L.act==='tv'&&!(tv.on&&tv.at==='use')){L.act=null;jillDecide(L)}
   if(L.catNew>0&&L.act!=='pet'&&L.act!=='settle'&&Math.random()<dt*.25){const near=sofaCats().filter(c=>Math.abs(c.x-L.x)<46);if(near.length){L.petCat=pick(near);L.act='pet';L.t=rand(2,4);L.petCat.hearts.push({x:0,y:-24,t:0});if(Math.random()<.5)L.petCat.happy=Math.max(L.petCat.happy,1.5),L.petCat.quiet=1}L.catNew=0}}
- else if(L.act==='wrap'){L.face=1;L.wrapT=(L.wrapT||0)-dt;if(L.wrapT<=0)L.act='toSofa'}
+ else if(L.act==='wrap'){L.face=1;L.wrapT=(L.wrapT||0)-dt;if(L.wrapT<=0){const T=catBy('tora');const here=T&&T.waitJill&&!T.away&&T.st==='rest'&&!T.moving;
+   if(T&&!here&&(T.toJill||T.waitJill)&&(L.waitTora=(L.waitTora||0)+dt)<14){L.face=-1;return}   /* 樾樾 is on his way out to her: she waits (22:54) */
+   if(here&&!L.sawTora){L.sawTora=1;L.face=T.x>=L.x?1:-1;T.hearts.push({x:0,y:-26,t:0});T.happy=Math.max(T.happy||0,1.6);L.wrapT=1.4;return}   /* she sees him; then the two of them go */
+   L.act='toSofa'}}
  else if(L.act==='reveal'){L.revealT-=dt;if(L.revealT<=0){L.act='toSofa';const D=LIFE.dylan;if(D){D.goHome=true;D.state='think';D.t=1.4}}}   /* 「老公，走了。」「好。」 — then home, the two of them */
  else if(L.act==='standing'&&!L.walking){/* stood up but has nothing to do: sit back down */L.act='toSofa'}
  /* mirror into the view's Jill so everything that reads view().jill sees her where she is */

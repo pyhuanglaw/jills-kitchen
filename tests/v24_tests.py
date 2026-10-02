@@ -3204,3 +3204,40 @@ def v24_rc73_posts_carry_their_picture_and_likes_that_keep_coming(b, port, targe
     check(r['jillCat'] > r['jillFood'] and r['guestCat'] > r['guestFood'], f'a cat brings more than a plate: {r}')
     check(r['guestFood'] < 60 and r['momo'] > r['guestFood'] * 20, f'an ordinary guest a handful, Momo many: {r}')
     check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc73_tora_waits_for_jill_after_closing(b, port, target):
+    """(22:54) 樾樾 is shy: when the guests have gone he still keeps to the room — until the crew are faces he knows. Then,
+    once the closing begins, he comes out by the kitchen door and waits; Jill, the pass wiped, waits for him if he is on
+    his way, sees him, and the two of them go to her room."""
+    # shy: a new game's first evening — he stays in the room
+    g = Game(b, port, target, seed=7321, manual=True, viewport={'width': 390, 'height': 844})
+    install_bot(g); g.click('[data-act=open]'); start_day(g)
+    g.ev("__botUntil('R.closing!=null',90000,1/30)")
+    check(g.ev("!toraBrave()"), 'Day 1: the crew are strangers to him')
+    g.ev("(()=>{const T=catBy('tora');if(T.away!=='home'){releaseSpots(T);homeCatIn(T)}})()")
+    out = g.ev("(()=>{const T=catBy('tora');let o=false;for(let i=0;i<1500&&phase==='service';i++){__tick(1000/30);if(T.waitJill||(!T.away&&!T.hidden))o=true}return o})()")
+    check(not out, 'a shy 樾樾 stays in the room through the closing')
+    check(not g.errors, g.errors[:3]); g.close()
+    # brave: the player's Day 74
+    seen = []
+    for seed in (7322, 7323, 7324):
+        g = Game(b, port, target, seed=seed, manual=True, viewport={'width': 390, 'height': 844})
+        load_save(g, 'player_day74_1508.json')
+        to_service(g)
+        g.ev("__botUntil('R.closing!=null',120000,1/30)")
+        check(g.ev("toraBrave()"), 'Day 74: he knows the crew')
+        g.ev("(()=>{const T=catBy('tora');if(T.away!=='home'){releaseSpots(T);homeCatIn(T)}T.hT=Math.min(T.hT,rand(.6,1.6))})()")
+        r = json.loads(g.ev("""JSON.stringify((()=>{const T=catBy('tora'),L=LIFE.jill;const o={came:null,saw:null,jillLeft:null,home:null,waitedSpot:null};
+          for(let i=0;i<2400&&phase==='service';i++){__tick(1000/30);const t=+(R?R.closing:0).toFixed(1);
+            if(o.came==null&&T.waitJill&&!T.away&&T.st==='rest'){o.came=t;o.waitedSpot=[T.x|0,T.y|0]}
+            if(o.saw==null&&L.sawTora)o.saw=t;
+            if(o.jillLeft==null&&(L.troom==='home'||L.room==='home'))o.jillLeft=t;
+            if(o.home==null&&o.came!=null&&T.away==='home')o.home=t}
+          return o})())"""))
+        seen.append(r)
+        g.close()
+    ok = [r for r in seen if r['came'] is not None and r['saw'] is not None and r['jillLeft'] is not None and r['home'] is not None and r['came'] <= r['saw'] <= r['jillLeft']]
+    check(len(ok) >= 2, f'he comes out, she sees him, then they go — on most evenings: {seen}')
+    check(all(r['waitedSpot'] and abs(r['waitedSpot'][0] - 126) < 6 for r in ok), f'by the kitchen door: {seen}')
