@@ -696,3 +696,15 @@ html.desk button,html.desk [data-act],html.desk .polaroid{cursor:pointer}
 .schap .chap.focus{box-shadow:0 0 0 2px #C99A45;border-radius:8px;padding:8px 6px}
 /* rc7.2 (22:39): 🎲 隨機選菜單 above today's menu */
 .mrand{display:flex;align-items:center;gap:8px;margin:2px 0 8px}.mrand .btn{flex:none;white-space:nowrap}.mrand small{color:var(--ink2);font-size:11.5px;line-height:1.35}
+/* rc7.3 (15:02, 22:09): a post with its picture and its likes */
+.posts{display:flex;flex-direction:column;gap:10px}
+.post{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 10px 8px}
+.post-h{font-size:13px;margin:0 0 6px}
+.post-ph{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;background:#EFE6D8}
+.post p{margin:8px 0 4px;font-size:13.5px;line-height:1.5}
+.post-f{display:flex;justify-content:space-between;align-items:center}
+.post-f .likes{color:#C2526A;font-weight:800;font-size:12.5px}
+.post-f small{color:var(--ink3);font-size:11px}
+/* rc7.3: nine room tabs (Jill's room) */
+#roomTabs.many9{gap:0}#roomTabs.many9 button{padding:0 5px;min-width:30px;font-size:11px;letter-spacing:-.01em}
+@media (min-width:700px){#roomTabs.many9 button{padding:0 10px;min-width:48px;font-size:13px}}

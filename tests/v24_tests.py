@@ -1451,6 +1451,9 @@ def v24_rc6_cats_visit_the_rooms_and_leave(b, port, target):
     check(g.ev("pdFreeForCat()") is True, 'the room is empty and nobody booked it')
     picks = g.ev("(()=>{const c=CATS[0];let n=0;for(let i=0;i<600;i++)if(upCatSpot(c).room==='pdr')n++;return n})()")
     check(10 <= picks <= 120, f'a rare place, not the usual one: {picks}/600')
+    # rc7.3: two of the five now live mostly in Jill's room, so at a given instant the floor may have no cat free to
+    # follow; the service runs on (bounded) until one is
+    check(g.ev("(()=>{for(let i=0;i<600;i++){if(CATS.some(o=>freeFloorCat(o)))return true;__tick(100)}return false})()"), 'no cat free on the floor in a minute of service')
     cid = g.ev("(()=>{const c=CATS.find(o=>freeFloorCat(o));upCatForce(c);upCatUp(c,{room:'pdr',x:290,y:PDW+22,face:1,pose:'sit',t:12});return c.def.id})()")
     W = lambda cond, n=2500: g.ev(f"(()=>{{const c=catBy('{cid}');for(let i=0;i<{n};i++){{if({cond})return i;__tick(100)}}return -1}})()")
     check(W("c.away==='pdr'&&!c.upTo") >= 0, 'in the Private Dining Room, by the window')
@@ -1465,6 +1468,7 @@ def v24_rc6_cats_visit_the_rooms_and_leave(b, port, target):
     check(g.ev("pdFreeForCat()") is False and g.ev("(()=>{const c=CATS[0];let n=0;for(let i=0;i<300;i++)if(upCatSpot(c).room==='pdr')n++;return n})()") == 0, 'a kept evening: never')
     # the Staff Room: after the crew, a nap on the sofa
     g.ev("(()=>{const s=srW();s.bought=S.day-30;s.done=S.day-29})()")
+    check(g.ev("(()=>{for(let i=0;i<600;i++){if(CATS.some(o=>freeFloorCat(o)))return true;__tick(100)}return false})()"), 'no cat free on the floor in a minute of service (2)')
     sid = g.ev("(()=>{const c=CATS.find(o=>freeFloorCat(o));const c0=R.closing;R.closing=40;R.srCatId=c.def.id;const sp=upCatSpot(c);R.closing=c0;upCatForce(c);upCatUp(c,Object.assign(sp,{t:8}));return sp.room+'|'+c.def.id})()")
     check(sid.startswith('staff|'), f'the Staff Room spot after the crew: {sid}')
     cid = sid.split('|')[1]
@@ -3023,4 +3027,166 @@ def v24_rc7_2_no_firing_and_the_wages(b, port, target):
     check(f'每日薪資 {g.ev("fmt(crewWages())")}' in scr, 'the page shows the day\'s wages')
     man = g.ev("JSON.stringify(GUIDE)")
     check('廚師 LV1 一天 $304、LV5 一天 $1,690' in man and '請了就是店裡的人，沒有解雇' in man and '訓練升級、解雇' not in man, 'the manual')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+# ---------------------------------------------------------------- rc7.3: Jill's room (docs/v24/jill_room_2026-10-02_1853.txt, _1854, jill_room_cats_2026-10-02_2218.txt)
+@test
+def v24_rc73_jills_room_is_there_from_day_one(b, port, target):
+    """A new game, Day 1: 「Jill 的房間」 is a room tab (the last one, behind the kitchen) — not an unlock; the oatmeal sofa,
+    the TV and the right-hand cat tree are in it and no longer in the dining room (one sofa, never two); the dining room's
+    cats never pick that tree's perches. During a service Jill rests in her room (through the kitchen), reads only there,
+    and comes back out when a table needs her."""
+    g = Game(b, port, target, seed=7311, manual=True, viewport={'width': 390, 'height': 844})
+    install_bot(g); g.click('[data-act=open]'); start_day(g); g.ev("window.__act=()=>{}")
+    st = json.loads(g.ev("JSON.stringify({open:roomsOpen(),order:ROOM_ORDER.slice(-2),n:ROOMS.home.n,full:ROOMS.home.full,day:S.day,parent:ROOM_PARENT.home})"))
+    check('home' in st['open'] and st['order'] == ['kitchen', 'home'] and st['n'] == '房間' and st['full'] == 'Jill 的房間' and st['day'] == 1 and st['parent'] == 'kitchen', f'the room from Day 1: {st}')
+    code = json.loads(g.ev("JSON.stringify({main:String(drawScene),home:String(homeItems)})"))
+    check('drawSofaGroup' not in code['main'] and 'drawTV(' not in code['main'] and 'drawCatTree2' not in code['main'], 'the dining room draws no sofa, no TV, no second cat tree')
+    check('drawSofaGroup' in code['home'] and 'drawTV' in code['home'] and 'drawCatTree2' in code['home'], 'the room draws them')
+    check(g.ev("TREE.perches.every((p,i)=>p.t!==2||!perchVis(i))"), 'the dining room\'s cats never pick the moved tree')
+    g.ev("setRoom('home')"); g.ev("for(let i=0;i<4;i++)__tick(1000/30)")
+    check(g.ev("$('#roomTabs button.on').textContent").startswith('Jill 的房間'), 'the open tab says whose room it is')
+    g.page.screenshot(path=os.path.join(ROOT, 'tests', 'artifacts', 'rc73_room_day1.png'))
+    # a rest in her room
+    g.ev("setRoom('main');(()=>{const pos=freeJillPos();if(pos)startRest(pos)})()")
+    rooms = set()
+    for _ in range(600):
+        g.ev("__tick(1000/30)"); rooms.add(g.ev("R.jill.room||'main'"))
+        if g.ev("R.jill.rest==='sit'"): break
+    st = json.loads(g.ev("JSON.stringify({rest:R.jill.rest,room:R.jill.room,L:LIFE.jill.room,on:LIFE.jill.on,sofa:R.jill.sofa})"))
+    check(st['rest'] == 'sit' and st['room'] == 'home' and st['L'] == 'home' and st['on'], f'she rests on her sofa, in her room: {st}')
+    check('kitchen' in rooms, f'through the kitchen: {rooms}')
+    reads = json.loads(g.ev("JSON.stringify((()=>{const L=LIFE.jill;const out=[];for(let i=0;i<900;i++){__tick(1000/30);if(L.act==='read')out.push(L.room)}return out})())"))
+    check(all(r == 'home' for r in reads), f'the e-book only in her room: {set(reads)}')
+    # a table needs her: she comes back out
+    # a table in the dining room that needs her: an empty one made dirty, or (all taken) one whose guests need something
+    g.ev("""(()=>{let t=R.tables.find(t=>(t.room||'main')==='main'&&!t.group);if(t){t.dirty=true;t.plates=[{d:'friedrice'}]}else t=R.tables.find(t=>(t.room||'main')==='main'&&tableActionable(t))||R.tables.find(t=>(t.room||'main')==='main');tapTable(t)})()""")
+    back = None
+    for _ in range(900):
+        g.ev("__tick(1000/30)")
+        if g.ev("(R.jill.room||'main')==='main'"): back = True; break
+    check(back and not g.ev("R.jill.rest"), 'up, and back in the dining room for the table')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc73_the_evening_is_in_her_room(b, port, target):
+    """After closing Jill wipes the pass and goes to her room (she walks there; nobody is teleported); the summary's
+    evening is in the room — on the sofa, the TV, the cats; Dylan, when he is home, at his desk. Before the reveal too
+    (19:15): a player who looks in finds him studying."""
+    g = Game(b, port, target, seed=7312, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day74_1508.json')
+    check(g.ev("!!homeDylanAtDesk()"), 'the morning: Dylan at his desk')
+    to_service(g)
+    g.ev("__botUntil('R.closing!=null',90000,1/30)")
+    path = set()
+    for _ in range(1500):
+        g.ev("__tick(1000/30)"); path.add(g.ev("LIFE.jill.room||'main'"))
+        if g.ev("phase") != 'service' or g.ev("LIFE.jill.on&&LIFE.jill.room==='home'"): break
+    check('home' in path, f'she went to her room after closing: {path}')
+    for _ in range(200):
+        if g.ev("phase") != 'service': break
+        g.ev("for(let i=0;i<30;i++)__tick(1000/30)")
+    g.ev("for(let i=0;i<300;i++)__tick(1000/30)")
+    st = json.loads(g.ev("JSON.stringify({ph:phase,L:LIFE.jill.room,on:LIFE.jill.on,V:view().jill.room,desk:!!homeDylanAtDesk(),dy:LIFE.dylan?LIFE.dylan.room:null})"))
+    check(st['ph'] in ('summary', 'shop') and st['L'] == 'home' and st['V'] == 'home', f'the evening is in her room: {st}')
+    check(st['desk'] or st['dy'] is not None, f'Dylan is somewhere: at his desk, or still about: {st}')
+    g.ev("setRoom('home')") if g.ev("roomOpen('home')") else None
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc73_the_cats_live_between_the_room_and_the_restaurant(b, port, target):
+    """The room is the cats' home, not a pen (18:53 §7, 22:18–22:54): in a service, cats are both in the restaurant and in
+    the room; 樾樾 is mostly in the room, 柔柔 mostly about the restaurant; the sofa's cats are in the room; nobody is
+    sent home all at once at closing."""
+    g = Game(b, port, target, seed=7313, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day74_1508.json')
+    to_service(g)
+    samples = json.loads(g.ev("""JSON.stringify((()=>{const out=[];for(let i=0;i<2400&&R.closing==null;i++){__bot(1,1/30);if(i%40===0)out.push(CATS.map(c=>[c.def.id,c.away==='home',!c.hidden&&!c.away]))}return out})())"""))
+    check(len(samples) >= 30, f'a service sampled: {len(samples)}')
+    both = sum(1 for s in samples if any(x[1] for x in s) and sum(1 for x in s if x[2]) >= 2)
+    check(both >= len(samples) // 3, f'cats in the room and in the restaurant at once: {both} of {len(samples)}')
+    frac = lambda cid: sum(1 for s in samples for x in s if x[0] == cid and x[1]) / len(samples)
+    check(frac('tora') >= .6 and frac('mikan') <= .5, f'樾樾 mostly in the room ({frac("tora"):.2f}), 柔柔 mostly out ({frac("mikan"):.2f})')
+    check(g.ev("CATS.filter(c=>c.sofa&&c.sofaOn).every(c=>c.away==='home')"), 'a cat on the sofa is in the room')
+    g.ev("__botUntil('R.closing!=null',90000,1/30)")
+    n0 = g.ev("CATS.filter(c=>c.away==='home').length")
+    g.ev("__tick(1000/30)")
+    check(g.ev("CATS.filter(c=>c.away==='home').length") <= n0 + 1, 'no bedtime teleport at closing')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc73_the_cats_try_their_luck_and_never_get_it(b, port, target):
+    """(22:26–22:27) 小齁 jumps on a table for the fried food, 寶寶 for the steak — never every time, never successful: a
+    word, and down they go, the plate untouched; 包包 is after the chicken but mostly sits under the table looking up.
+    (22:18) 寶寶 meows at people she knows, and they melt."""
+    g = Game(b, port, target, seed=7314, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day74_1508.json')
+    to_service(g)
+    g.ev("__botUntil('R.t>=R.dur*.2',90000,1/30)"); g.ev("window.__act=()=>{}")
+    mk = """(d=>{const t=R.tables.find(t=>(t.room||'main')==='main'&&!t.group&&!t.dirty&&!t.hold&&!t.lounge&&!t.pdr);spawn({t:R.t,type:'office',size:1});const q=R.groups[R.groups.length-1];if(q.table!=null){R.tables[q.table].group=null;q.table=null}seatGroup(q,t);q.state='eat';q.timer=999;q.ticket={id:R.tkid++,no:90,g:q,items:[{d,st:'served',q:'G',want:0,picked:true}],t0:R.t};R.tickets.push(q.ticket);return q})"""
+    for cid, dish in (('ban', 'fries'), ('mei', 'steak')):
+        g.ev(f"window.__q={mk}('{dish}');(()=>{{const c=catBy('{cid}');if(c.away==='home')homeCatOut(c);c.stealCD=0;R.groups.filter(x=>x!==__q).forEach(x=>x.stolenAt=R.t);stealGo(c)}})()")
+        seen = {'on': False}
+        for _ in range(600):
+            g.ev("__tick(1000/30)")
+            if g.ev(f"!!catBy('{cid}').onTable"): seen['on'] = True
+            if seen['on'] and not g.ev(f"catBy('{cid}').onTable") and g.ev(f"catBy('{cid}').st!=='steal'"): break
+        r = json.loads(g.ev(f"JSON.stringify({{plate:__q.ticket.items[0].st,stolen:__q.stolenAt!=null,cat:catBy('{cid}').onTable}})"))
+        check(seen['on'] and r['plate'] == 'served' and r['stolen'] and not r['cat'], f'{cid} up on the table for the {dish}, and down again — the plate untouched: {r}')
+    g.ev("Math.random=(()=>{let k=0;return()=>{k++;return .2}})()")
+    g.ev(f"window.__q={mk}('chicken');(()=>{{const c=catBy('snow');if(c.away==='home')homeCatOut(c);c.stealCD=0;stealGo(c)}})()")
+    w = json.loads(g.ev("JSON.stringify({watch:catBy('snow').stealWatch,after:catBy('snow').after})"))
+    check(w['watch'] and w['after'] == 'stealWatch', f'包包 mostly watches from below: {w}')
+    # 寶寶 and the people she knows
+    g.ev("""window.__r=(()=>{const t=R.tables.find(t=>(t.room||'main')==='main'&&!t.group&&!t.dirty&&!t.hold&&!t.lounge&&!t.pdr);spawn({t:R.t,type:'office',size:1});const q=R.groups[R.groups.length-1];q.reg='mia';q.name='Mia';q.looks=REG_BY.mia.looks;S.catFam=S.catFam||{};S.catFam.mia=9;if(q.table!=null){R.tables[q.table].group=null;q.table=null}seatGroup(q,t);q.state='eat';q.timer=999;R.groups.filter(x=>x!==q).forEach(x=>x.mewed=1);return q})();(()=>{const c=catBy('mei');if(c.away==='home')homeCatOut(c);c.meowGCD=0;meowGo(c)})()""")
+    for _ in range(600):
+        g.ev("__tick(1000/30)")
+        if g.ev("__r.mewed"): break
+    g.ev("for(let i=0;i<40;i++)__tick(1000/30)")
+    r = json.loads(g.ev("JSON.stringify({mewed:!!__r.mewed,f:R.floats.some(f=>f.txt==='喵～')||true,said:dayLog().some(l=>l.w==='Mia'&&/可愛|叫我|講話|融化/.test(l.t))})"))
+    check(r['mewed'] and r['said'], f'寶寶 meows at Mia, who melts: {r}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc73_posts_carry_their_picture_and_likes_that_keep_coming(b, port, target):
+    """rc7.3 (the player, 15:02 and 22:09 「貼文還是沒有照片啊」): on the player's own Day 74, every post on the social page
+    carries a picture — Jill's own album photo when she posted one (the same photo, by its id), otherwise the thing the
+    post is about drawn from the game's art, the same picture every time — and a like count. Likes keep coming: a day
+    later every post has at least as many and the young ones more; cats bring the most, an ordinary guest a handful."""
+    g = Game(b, port, target, seed=7341, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day74_1508.json')
+    g.click('[data-act=book]'); g.click('[data-act=btab][data-k=social]')
+    cards = json.loads(g.ev("""JSON.stringify([...document.querySelectorAll('#screen .posts .post')].map(e=>{const im=e.querySelector('img.post-ph');const lk=e.querySelector('.likes');return{src:im?im.getAttribute('src').slice(0,22):'',w:im?im.naturalWidth:0,pid:im?im.dataset.pid||null:null,likes:lk?+lk.textContent.replace(/[^0-9]/g,''):-1}})"""))
+    check(len(cards) == 6, f'the six most recent posts: {len(cards)}')
+    check(all(c['src'].startswith('data:image/') or c['pid'] for c in cards) and all(c['likes'] >= 1 for c in cards), f'each with a picture and likes: {cards}')
+    g.page.wait_for_timeout(200)
+    check(all(w > 0 for w in g.ev("[...document.querySelectorAll('#screen .posts img.post-ph')].map(i=>i.naturalWidth)")), 'the pictures load')
+    g.page.screenshot(path=os.path.join(ROOT, 'tests', 'artifacts', 'rc73_posts_day74.png'))
+    # all forty, behind the button
+    g.click('[data-act=postsAll]')
+    check(g.ev("document.querySelectorAll('#screen .posts .post').length") == g.ev("S.social.posts.length"), 'every post, with the button')
+    # Jill's album photo is the one she posted; the drawn ones are the same every time
+    r = json.loads(g.ev("""JSON.stringify((()=>{const P=S.social.posts;const withPid=P.filter(p=>p.pid&&albumList().some(a=>a.id===p.pid));
+      const same=withPid.every(p=>postPhoto(p)===photoSrc(albumList().find(a=>a.id===p.pid)));
+      const drawn=P.filter(p=>!p.pid).slice(0,8);const a1=drawn.map(postPhoto);POST_PH.clear();const a2=drawn.map(postPhoto);
+      return{n:withPid.length,same,drawn:drawn.length,stable:a1.every((u,i)=>u&&u===a2[i]),distinct:new Set(a1).size}})())"""))
+    check(r['n'] >= 1 and r['same'], f'her own photo: {r}')
+    check(r['drawn'] >= 4 and r['stable'] and r['distinct'] >= min(4, r['drawn']), f'the drawn pictures are the same each time and not all alike: {r}')
+    # likes over time, and who brings them
+    r = json.loads(g.ev("""JSON.stringify((()=>{const P=S.social.posts;const d0=S.day;const now=P.map(postLikes);S.day=d0+1;const later=P.map(postLikes);S.day=d0;
+      const young=P.map((p,i)=>i).filter(i=>d0-(P[i].day||d0)<=2);
+      const mk=(who,topic,extra)=>Object.assign({id:9000+Math.floor(Math.random()*1000),day:d0-5,who,topic,txt:'x'},extra||{});
+      const jillFood=postLikes(Object.assign(mk('Jill','food'),{id:9001})),jillCat=postLikes(Object.assign(mk('Jill','cats',{cat:'snow'}),{id:9001}));
+      const guestFood=postLikes(Object.assign(mk('小安','food'),{id:9002})),guestCat=postLikes(Object.assign(mk('小安','cats',{cat:'snow'}),{id:9002}));
+      const momo=postLikes(Object.assign(mk('美食部落客 Momo','food'),{id:9003}));
+      return{never_less:now.every((v,i)=>later[i]>=v),young_more:young.every(i=>later[i]>now[i]),nyoung:young.length,jillFood,jillCat,guestFood,guestCat,momo}})())"""))
+    check(r['never_less'], f'likes never go down: {r}')
+    check(r['nyoung'] == 0 or r['young_more'], f'young posts keep collecting: {r}')
+    check(r['jillCat'] > r['jillFood'] and r['guestCat'] > r['guestFood'], f'a cat brings more than a plate: {r}')
+    check(r['guestFood'] < 60 and r['momo'] > r['guestFood'] * 20, f'an ordinary guest a handful, Momo many: {r}')
     check(not g.errors, g.errors[:3]); g.close()

@@ -179,9 +179,9 @@ window.__evening = function(seconds, dt, every, hook){
   return out;
 };
 window.__lifeSample = t => { const L=LIFE.jill, D=LIFE.dylan, tv=LIFE.tv;
-  return {t:+t.toFixed(1), phase, plan:LIFE.plan, jill:{on:L.on,act:L.act,legs:+L.legs.toFixed(2),pos:L.pos,x:L.x|0,y:L.y|0,walking:L.walking},
+  return {t:+t.toFixed(1), phase, plan:LIFE.plan, jill:{on:L.on,bed:!!L.bed,act:L.act,legs:+L.legs.toFixed(2),pos:L.pos,x:L.x|0,y:L.y|0,walking:L.walking},
           tv:{at:tv.at,on:tv.on,x:tv.x|0,y:tv.y|0,mover:tv.mover}, dylan:D?{st:D.state,x:D.x|0,y:D.y|0,onSofa:D.onSofa,seated:D.seated,act:D.act}:null,
-          cats:CATS.map(c=>({id:c.def.id,st:c.st,pose:c.pose,x:c.x|0,y:c.y|0,slot:c.sofa?c.sofa.k:null,kind:c.sofa?c.sofa.kind:null,on:!!c.sofaOn}))}};
+          cats:CATS.map(c=>({id:c.def.id,st:c.away==='home'&&c.homeSleep?'sleep':c.st,pose:c.pose,x:c.x|0,y:c.y|0,slot:c.sofa?c.sofa.k:null,kind:c.sofa?c.sofa.kind:null,on:!!c.sofaOn}))}};
 window.__lifeInvariants = function(){ const bad=[]; const L=LIFE.jill, D=LIFE.dylan, tv=LIFE.tv; if (!CATS) return bad;
   const on = CATS.filter(c=>c.sofa&&c.sofaOn);
   const keys = on.map(c=>c.sofa.k); if (new Set(keys).size!==keys.length) bad.push('two cats in one sofa slot: '+keys.join(','));
@@ -657,7 +657,9 @@ def touch_controls(b, port, target):
     g.page.mouse.click(hx, hy); g.ev("__tick(1000/30)")
     check(g.ev("R.panel===false && $('#trayWrap').hidden"), 'panel did not close')
     # 5) pet a cat that is sitting on the floor away from the counter
-    find_cat = "(()=>{const c=CATS.find(c=>!c.hidden&&c.def.id!=='mei'&&c.def.id!=='snow'&&c.y<FB-40&&c.perch<0&&!c.sofa&&c.benchI<0&&!R.groups.some(q=>Math.hypot(q.x-c.x,q.y-c.y)<40)&&!R.tables.some(t=>Math.hypot(t.x-c.x,t.y-c.y)<50));return c?c.def.id:null})()"
+    # rc7.3: and one the finger can actually reach — on the scene canvas at that point (nothing over it, inside the phone's
+    # view) and the cat the game would pick there (not a closer one)
+    find_cat = "(()=>{const r=sc.getBoundingClientRect();const ok=c=>{const px=r.left+SV.ox+c.x*SV.s,py=r.top+SV.oy+(c.y-12)*SV.s;return document.elementFromPoint(px,py)===sc&&hitCat({x:c.x,y:c.y-12})===c};const c=CATS.find(c=>!c.hidden&&c.def.id!=='mei'&&c.def.id!=='snow'&&c.y<FB-40&&c.perch<0&&!c.sofa&&c.benchI<0&&!R.groups.some(q=>Math.hypot(q.x-c.x,q.y-c.y)<40)&&!R.tables.some(t=>Math.hypot(t.x-c.x,t.y-c.y)<50)&&ok(c));return c?c.def.id:null})()"
     cid = None
     for _ in range(180):   # up to ~90 s of the service: the cats' walk is random, one of them settles on the floor soon enough
         cid = g.ev(find_cat)
@@ -730,7 +732,7 @@ def jill_evening_life(b, port, target):
         nights.append({'seed': seed, 'plan': samples[-1]['plan'], 'sat': any(x['jill']['on'] for x in samples),
                        'legs': max(x['jill']['legs'] for x in samples), 'acts': acts,
                        'tv': any(x['tv']['on'] for x in samples), 'tvmoved': any(x['tv']['at'] in ('use', 'moving') for x in samples),
-                       'endSeated': samples[-1]['jill']['on'] or samples[-1]['plan'] == 'table',
+                       'endSeated': samples[-1]['jill']['on'] or samples[-1]['jill']['bed'] or samples[-1]['plan'] == 'table',   # rc7.3: or on the edge of the bed, in her room
                        'cats': max(sum(1 for c in x['cats'] if c['on']) for x in samples)})
         g.close()
     sat = [n for n in nights if n['sat']]
@@ -852,13 +854,16 @@ def dylan_reveal_scenario(g, evenings=14, checks=True):
         g.ev("(()=>{const g=R.groups.find(x=>x.reg==='dylan');if(g&&g.table==null){const t=freeTableFor(g);if(t)seatGroup(g,t)}})()")
         play_day(g)
         force = 'if(%s&&S.dylan.stage===2&&LIFE.revealRoll===-1)LIFE.revealRoll=1;' % ('true' if d >= 2 else 'false')
-        hook = "t=>{%sif(S.dylan.stage===3&&!window.__rv){window.__rv={t,jillOn:LIFE.jill.on,dylanOn:!!(LIFE.dylan&&LIFE.dylan.onSofa),phase}}}" % force
+        # rc7.3: she gets up from her sofa (in her room), walks out through the kitchen to his table and says it there —
+        # recorded at the moment the stage turns: where each of them is, how far apart, and that it came that way
+        hook = "t=>{%sif(S.dylan.stage===3&&!window.__rv){const L=LIFE.jill,D=LIFE.dylan;window.__rv={t,jillOn:L.on,act:L.act,jillRoom:L.room||'main',dylanRoom:D?(D.room||'main'):null,dst:D?D.state:null,dist:D?Math.round(Math.hypot(L.x-D.x,L.y-D.y)):null,phase}}}" % force
         samples = g.ev(f"__evening(120,1/20,10,{hook})")['samples']
         rv = g.page.evaluate('window.__rv||null')
         if rv and revealed_at is None:
             revealed_at = d
             if checks:
-                check(rv['jillOn'] and rv['dylanOn'], f'the reveal happened away from the sofa: {rv}')
+                check(not rv['jillOn'] and rv['act'] == 'reveal' and rv['dst'] == 'reveal', f'the reveal did not come from her getting up and going to him: {rv}')
+                check(rv['jillRoom'] == 'main' and rv['dylanRoom'] == 'main' and rv['dist'] is not None and rv['dist'] < 40, f'the reveal happened away from his table: {rv}')
                 check(g.ev("S.dylan.reveal") == g.ev("S.day"), 'reveal day not recorded')
         if g.ev("S.dylan.stage") == 3 and g.ev("!!LIFE.dylan"):
             if any(x['dylan'] and x['dylan']['onSofa'] for x in samples): beside += 1
@@ -871,8 +876,10 @@ def dylan_reveal_scenario(g, evenings=14, checks=True):
 @test
 def dylan_hidden_reveal(b, port, target):
     """The relationship is only shown once several quiet things have happened, and only on an evening
-    where Jill is already settled on the sofa; it is one photo and one line in the book, and the game
-    just goes on. Afterwards he sometimes sits beside her and sometimes has to sit elsewhere."""
+    where Jill is already settled on the sofa — rc7.3: in her room; she gets up, goes to his table in the
+    dining room and says it there (「老公。」「嗯。」), then they go back together. It is one photo and one line
+    in the book, and the game just goes on. Afterwards he sometimes sits beside her and sometimes has to
+    sit elsewhere."""
     g = Game(b, port, target, seed=88, manual=True)
     revealed_at, beside, elsewhere = dylan_reveal_scenario(g)
     check(revealed_at is not None, 'the reveal never happened in 14 evenings')
