@@ -298,7 +298,7 @@ def v24_stage_gates_follow_the_chronology_and_their_own_gaps(b, port, target):
     check(g.ev("eraOpenDay('up')") is None, 'the settlement opens nothing upstairs (no Lounge in this save)')
     g.ev("S.rooms.lounge=1;factSet('lounge_built_1')")
     check(g.ev("eraOpenDay('up')") == g.ev("S.day") + 2, 'the Second Floor era: two days after the Lounge')
-    check(g.ev("LANE_CAP.major") == 1 and g.ev("LANE_CAP.v24") == 1, 'one major beat a day for every story; the long stories have one smaller step a day of their own')
+    check(g.ev("LANE_CAP.major") == 2 and g.ev("LANE_CAP.v24") == 2, 'two major beats a day across the stories; the long stories have two smaller steps a day of their own (rc7, 15:39)')
     check(not g.errors, g.errors[:3]); g.close()
 
 
@@ -355,7 +355,7 @@ def v24_the_wall_is_written_to_the_rules(b, port, target):
 def v24_day52_save_plays_the_stories_in_order_over_forty_days(b, port, target):
     """The player's Day 52 save, forty days of lazy play (seeded), the arbiter as in play: 怡君's arc, then the wall;
     the Second Floor era does not open on the wall (the player's 10:25: it waits for the Lounge, which this save has
-    not built — built, the floor opens two days later); never two major beats in a day; nothing on the first day's
+    not built — built, the floor opens two days later); never more than two major beats in a day (rc7); nothing on the first day's
     start; everyone who speaks in a restaurant beat was really there (the beats check it); no page errors."""
     g = Game(b, port, target, seed=254, manual=True, viewport={'width': 390, 'height': 844})
     load_save(g, 'player_day52.json')
@@ -389,7 +389,7 @@ def v24_day52_save_plays_the_stories_in_order_over_forty_days(b, port, target):
     check(F['yj_key'] - F['yj_meet'] <= 9 and F['yj_key'] <= first + 10, f'怡君 moved in within about ten days, by Day {first + 9} (59–62) — a day later when a dated beat takes her first day (this seed: Dylan on Valentine\'s, Day {first}): {F}')
     check(first + 9 <= F['wall_worry'] <= first + 13, f'the wall begins Day {first + 9}–{first + 13} (62–66): {F}')
     check(F['wall_settle'] - F['wall_worry'] <= 18 and F['wall_settle'] <= first + 29, f'settled within about two and a half weeks, by Day {first + 29} (75–82): {F}')
-    check(all(v <= 1 for v in majors.values()), f'never two major beats in a day: {majors}')
+    check(all(v <= 2 for v in majors.values()), f'never more than two major beats in a day (rc7, 15:39; was one): {majors}')
     check(g.ev("loungeLv()") == 0 and g.ev("eraOpenDay('up')") is None and not g.ev("eraOpen('up')"), 'the wall settled, no Lounge in this save: the floor still waits for the Lounge')
     g.ev("S.rooms.lounge=1;factSet('lounge_built_1')")
     check(g.ev("eraOpenDay('up')") == g.ev("S.day") + 2, 'the Lounge finished: the floor two days later')
@@ -573,26 +573,33 @@ def v24_manual_tutorial_and_news_cover_the_new_content(b, port, target):
 @test
 def v24_the_day_is_held_for_the_beat_its_people_came_for(b, port, target):
     """Pacing (measured on the Day 52 save): when the schedule brings someone for a due v2.4 major beat, that beat keeps
-    the day's one major slot until it plays or until 85% of the service; another story's major that comes up meanwhile
-    waits (it is counted as missed, so its priority rises) — except a beat that has only this day (floor 0: Dylan on
-    Valentine's), which is never held back. Grouped story visits keep their hour."""
+    a major slot until it plays or until 85% of the service; another story's major that comes up while every free slot
+    is spoken for waits (it is counted as missed, so its priority rises) — except a beat that has only this day (floor
+    0: Dylan on Valentine's), which is never held back. rc7 (the player, 15:39 「一天可以不只一個劇情」): two major slots
+    a day, so with both free another story's major may take one; the two are a part of the evening apart. Grouped story
+    visits keep their hour."""
     g = Game(b, port, target, seed=267, manual=True, viewport={'width': 390, 'height': 844})
     load_save(g, 'player_day52.json')
     to_service(g)
-    g.ev("STORY_EV.push({k:'__t_major',lane:'major',cls:'A',floor:1,at:['order'],when:()=>true,run:()=>{}},{k:'__t_dated',lane:'major',cls:'A',floor:0,at:['order'],when:()=>true,run:()=>{}})")
-    g.ev("const d=storyDay();d.major=0;d.seen={};v24().res={d:S.day,k:['yj_meet']};R.t=R.dur*.5")
+    g.ev("STORY_EV.push({k:'__t_major',lane:'major',cls:'A',floor:1,at:['order'],w:()=>1e9,when:()=>true,run:()=>{}},{k:'__t_major2',lane:'major',cls:'A',floor:1,at:['order'],w:()=>1e9,when:()=>true,run:()=>{}},{k:'__t_dated',lane:'major',cls:'A',floor:0,at:['order'],w:()=>1e12,when:()=>false,run:()=>{}})")
+    g.ev("const d=storyDay();d.major=0;d.lp={};d.seen={};v24().res={d:S.day,k:['yj_meet']};R.t=R.dur*.4")
     check(g.ev("JSON.stringify(v24Held('order'))") == '["yj_meet"]', 'held for 怡君 while her beat is due')
+    first = g.ev("storyTick('order',{})")
+    check(first in ('__t_major', '__t_major2') and g.ev("storyDay().major") == 1, f'two slots free: another story\'s major takes one ({first}); one stays kept')
+    other = '__t_major2' if first == '__t_major' else '__t_major'
+    g.ev("R.t=R.dur*.5"); n0 = g.ev("storyDay().major"); g.ev("storyTick('order',{})")
+    check(g.ev("storyDay().major") == n0 and g.ev(f"evState('{other}').n") == 0, 'not in the same part of the evening as the last one')
+    g.ev("R.t=R.dur*.7;storyTick('order',{})")
+    check(g.ev("storyDay().major") == 1 and g.ev(f"evState('{other}').n") == 0 and g.ev(f"evState('{other}').miss") >= 1, 'the last free slot is kept for 怡君: another major waits, counted as missed (once a day)')
+    g.ev("STORY_EV.find(E=>E.k==='__t_dated').when=()=>true")
     fired = g.ev("storyTick('order',{})")
-    check(fired == '__t_dated', f'a beat with only this day still plays: {fired}')
-    g.ev("const d=storyDay();d.major=0;d.seen={};STORY_EV.splice(STORY_EV.findIndex(E=>E.k==='__t_dated'),1)")
-    m0 = g.ev("evState('__t_major').miss")
-    g.ev("storyTick('order',{})")
-    check(g.ev("storyDay().major") == 0 and g.ev("evState('__t_major').n") == 0 and g.ev("evState('__t_major').miss") == m0 + 1, 'another major waits, counted as missed')
+    check(fired == '__t_dated' and g.ev("storyDay().major") == 2, f'a beat with only this day still plays: {fired}')
+    g.ev("STORY_EV.splice(STORY_EV.findIndex(E=>E.k==='__t_dated'),1);const d=storyDay();d.major=1;d.lp={}")
     g.ev("R.t=R.dur*.86;storyTick('order',{})")
-    check(g.ev("v24Held('order')") is None and g.ev("evState('__t_major').n") == 1, 'late in the service the hold is gone, and it plays')
-    g.ev("const d=storyDay();d.major=0;d.seen={};R.t=R.dur*.5;factSet('yj_meet')")
+    check(g.ev("v24Held('order')") is None and g.ev(f"evState('{other}').n") == 1, 'late in the service the hold is gone, and it plays')
+    g.ev("const d=storyDay();d.major=0;d.lp={};d.seen={};R.t=R.dur*.5;factSet('yj_meet')")
     check(g.ev("v24Held('order')") is None, 'once the beat has played, nothing is held')
-    g.ev("STORY_EV.splice(STORY_EV.findIndex(E=>E.k==='__t_major'),1)")
+    g.ev("for(const k of ['__t_major','__t_major2'])STORY_EV.splice(STORY_EV.findIndex(E=>E.k===k),1)")
     # grouped story visits keep their hour; the first of a group finds a room with a table for each
     out = json.loads(g.ev("JSON.stringify((()=>{const out=[];v24Visits(out,R.dur,()=>true);return out})())"))
     check(all(o.get('hold') for o in out if o.get('v24grp')), f'grouped visits are held at their hour: {out}')
@@ -1584,7 +1591,7 @@ def v24_rc6_an_authored_beat_holds_the_service_until_it_is_read(b, port, target)
     # nothing else of the stories tonight (the day's budget spent), and what was already said in the room finished — then
     # the panel is on, as it is in play
     g.ev("const d=storyDay();d.major=9;d.minor=9;d.v24=9"); _frames(g, 300)
-    g.ev("window.__holds=true;delete story().ev.qt_1;delete story().facts.qt_1;delete (story().beatLines||{}).qt_1;storyDay().minor=0;"
+    g.ev("window.__holds=true;delete story().ev.qt_1;delete story().facts.qt_1;delete (story().beatLines||{}).qt_1;storyDay().minor=0;storyDay().lp={};"
          "const E=STORY_EV.find(e=>e.k==='qt_1');E.__w=E.when;E.when=()=>true;room='kitchen';renderRoomTabs(true)")
     before = json.loads(g.ev(HOLD_SNAP))
     fired = g.ev("storyTick('order',{})")
@@ -1635,7 +1642,7 @@ def v24_rc6_an_authored_beat_holds_the_service_until_it_is_read(b, port, target)
     amb = json.loads(g.ev("JSON.stringify({dlg:!!DLG,log:dayLog().slice(-30).map(l=>l.t)})"))
     check(fired == 'hugo_tuo' and not amb['dlg'] and g.ev("R.t") > t0 + 2 and '你炸的比較快。' in amb['log'] and '油比較熱。' in amb['log'], f'an ambient moment is not held: {fired} {amb}')
     # the panel at phone size
-    g.ev("delete story().ev.qt_1;delete story().facts.qt_1;storyDay().minor=0;storyTick('order',{})")
+    g.ev("delete story().ev.qt_1;delete story().facts.qt_1;storyDay().minor=0;storyDay().lp={};storyTick('order',{})")
     lay = json.loads(g.ev("""JSON.stringify((()=>{const b=$('#dlg .dlg-box').getBoundingClientRect(),c=$('#dlg .dlg-hold').getBoundingClientRect(),t=$('#dlg .dlg-text');return{box:[b.left,b.top,b.right,b.bottom],chip:[c.left,c.top,c.right,c.bottom],fs:parseFloat(getComputedStyle(t).fontSize),W:innerWidth,H:innerHeight}})())"""))
     check(lay['box'][0] >= 0 and lay['box'][2] <= lay['W'] and lay['box'][3] <= lay['H'] and lay['chip'][3] < lay['box'][1] and lay['chip'][1] >= 0 and lay['fs'] >= 15, f'readable at 390×844: {lay}')
     os.makedirs(_rt.ARTIFACTS, exist_ok=True)   # v2.4 rc7: a test run writes its picture to the artifacts, never over a released evidence file
@@ -1652,7 +1659,7 @@ def v24_rc6_an_authored_beat_holds_the_service_until_it_is_read(b, port, target)
     g.ev("pdSeated({size:5,pdWalk:1},pdTable())")
     _frames(g, 30)
     g.ev("const d=storyDay();d.major=9;d.minor=9;d.v24=9"); _frames(g, 300)
-    g.ev("window.__holds=true;room='pdr';renderRoomTabs(true);storyDay().minor=0;STORY_EV.push({k:'pd__hold_t',lane:'minor',at:['order'],when:()=>true,run:()=>{JILL_SAY('包廂那桌點好了嗎？',300);noteLine('（測試用的一段。）')}})")
+    g.ev("window.__holds=true;room='pdr';renderRoomTabs(true);storyDay().minor=0;storyDay().lp={};STORY_EV.push({k:'pd__hold_t',lane:'minor',at:['order'],when:()=>true,run:()=>{JILL_SAY('包廂那桌點好了嗎？',300);noteLine('（測試用的一段。）')}})")
     pd0 = json.loads(g.ev("JSON.stringify((()=>{const t=pdTable(),q=t&&t.group;return{st:q&&q.state,pat:q&&+q.pat.toFixed(4),tk:q&&q.ticket?q.ticket.items.map(i=>i.st).join(''):null,room,t:+R.t.toFixed(4)}})())"))
     check(g.ev("storyTick('order',{})") == 'pd__hold_t' and g.ev("!!DLG&&DLG.hold"), 'held, upstairs too')
     _frames(g, 90)
@@ -1732,7 +1739,7 @@ def v24_rc6_sophie_and_mia_begin(b, port, target):
 def v24_rc6_a_finished_lounge_opens_the_floor_in_a_mature_save(b, port, target):
     """the player's 10:25, the legacy check (their Day 67 save: the Lounge finished on Day 57, 《那面牆》 begun on Day 65,
     nothing of the Second Floor yet): the floor's era is open on loading; the next days bring its first beat, then the
-    next — one at a time, never two of its beats on a day, never two major beats on a day — while the wall goes on."""
+    next — one at a time, never two of its beats on a day, never more than two major beats on a day (rc7) — while the wall goes on."""
     g = Game(b, port, target, seed=67, manual=True, viewport={'width': 390, 'height': 844})
     load_save(g, 'player_day67_1016.json')
     g.ev("window.__fastSay=1")
@@ -1746,7 +1753,7 @@ def v24_rc6_a_finished_lounge_opens_the_floor_in_a_mature_save(b, port, target):
     order = ['up_hint', 'up_staff', 'up_inspect', 'up_door']
     check(ups == order[:len(ups)], f'in its order: {ups}')
     check(all(len([k for k in r['up'] if k in ('up_hint', 'up_staff', 'up_inspect', 'up_door', 'up_busy', 'up_remind', 'up_ask')]) <= 1 for r in rows), f'one of its beats a day at most: {rows}')
-    check(all(r['major'] <= 1 for r in rows), f'never two major beats on a day: {rows}')
+    check(all(r['major'] <= 2 for r in rows), f'never more than two major beats on a day (rc7, 15:39): {rows}')
     check(not g.errors, g.errors[:3]); g.close()
 
 
@@ -1991,7 +1998,7 @@ def v24_rc6_qing_and_tuo_move_on(b, port, target):
     at closing and lost the day's one major slot to any major beat earlier in the day without being counted as waiting
     (the lane was full before it was looked at), so the old rule — a beat that has waited long enough plays — never
     reached it. Now a major beat due when the slot is taken counts a missed day, and the next day the slot is kept for
-    the beat that has waited longest (one day; still one major beat a day). 阿拓's absence could never happen (the beat
+    the beat that has waited longest (one day; rc7: one of the day's two major slots). 阿拓's absence could never happen (the beat
     asked whether he was employed, not whether he came in; nobody took a day off): once 「多的。」 has happened he takes
     one day off, and 晴 notices the fryer. The pace stays a slow burn, a little quicker."""
     g = Game(b, port, target, seed=71, manual=True, viewport={'width': 390, 'height': 844})
@@ -2000,8 +2007,8 @@ def v24_rc6_qing_and_tuo_move_on(b, port, target):
     st0 = json.loads(g.ev("JSON.stringify({q:!!qingOn(),t:!!tuoOn(),qt2:fact('qt_2').d,qt3:!!fact('qt_3'),day:S.day,days:factN('qt_days')})"))
     check(st0['q'] and st0['t'] and st0['qt2'] == 67 and not st0['qt3'] and st0['day'] == 71, f'the player\'s Day 71: both in, 「多的。」 due and not yet: {st0}')
     # Day 71 as the player's Day 70 went: another major beat took the slot earlier — 「多的。」 waits, counted
-    g.ev("storyDay().major=1;storyTick('close',{})")
-    check(not g.ev("!!fact('qt_3')") and g.ev("evState('qt_3').miss") == 1, 'the slot was taken: it waits a day, and the wait is counted')
+    g.ev("storyDay().major=LANE_CAP.major;storyTick('close',{})")
+    check(not g.ev("!!fact('qt_3')") and g.ev("evState('qt_3').miss") == 1, 'the day\'s slots were taken: it waits a day, and the wait is counted')
     # the next day the slot is kept for it: another major beat due earlier is held back, 「多的。」 plays at closing
     g.ev("finishClosing()") if g.ev("phase") == 'service' else None
     g.ev("closeSub&&closeSub()")
@@ -2012,11 +2019,13 @@ def v24_rc6_qing_and_tuo_move_on(b, port, target):
     owe = json.loads(g.ev("JSON.stringify({owe:story().owe,owed:majorOwed(),day:S.day})"))
     check(owe['owed'] == 'qt_3' and owe['day'] == 72, f'Day 72: the day\'s major slot is kept for the beat that waited: {owe}')
     g.ev("window.__E=STORY_EV.find(e=>e.k==='sm_c');__E.__w=__E.when;__E.when=()=>true;__E.__p=__E.present;__E.present=[{run:()=>factSet('sm_c')}]")
-    g.ev("storyTick('seat',{g:R.groups[0]||null})")
-    check(not g.ev("!!fact('sm_c')") and g.ev("storyDay().major") == 0, 'another major beat due earlier waits a day (counted too)')
-    g.ev("__E.when=__E.__w;__E.present=__E.__p")
+    g.ev("R.t=R.dur*.3;storyTick('seat',{g:R.groups[0]||null})")
+    check(g.ev("!!fact('sm_c')") and g.ev("storyDay().major") == 1, 'rc7 (two major slots a day): another major beat due earlier takes the other slot')
+    g.ev("STORY_EV.push({k:'__t_third',lane:'major',cls:'A',floor:1,at:['seat'],w:()=>1e9,when:()=>true,run:()=>{}});R.t=R.dur*.6;storyTick('seat',{g:R.groups[0]||null})")
+    check(g.ev("evState('__t_third').n") == 0 and g.ev("evState('__t_third').miss") >= 1 and g.ev("storyDay().major") == 1, 'a third waits (counted): the last slot is kept for 「多的。」')
+    g.ev("__E.when=__E.__w;__E.present=__E.__p;STORY_EV.splice(STORY_EV.findIndex(E=>E.k==='__t_third'),1)")
     g.ev("storyTick('close',{})")
-    check(g.ev("!!fact('qt_3')") and g.ev("fact('qt_3').d") == 72 and g.ev("storyDay().major") == 1 and g.ev("majorOwed()") is None, '「多的。」 plays at closing; one major beat that day; the hold is over')
+    check(g.ev("!!fact('qt_3')") and g.ev("fact('qt_3').d") == 72 and g.ev("storyDay().major") == 2 and g.ev("majorOwed()") is None, '「多的。」 plays at closing; two major beats that day; the hold is over')
     # 阿拓's day off, a few days on: a coin from the day; 晴 notices the fryer
     d_off = g.ev("(()=>{for(let d=S.day+3;d<S.day+40;d++)if(dayCoin('tuooff|'+d)<40)return d;return null})()")
     check(d_off is not None and d_off - 72 <= 12, f'a day off comes within days: Day {d_off}')

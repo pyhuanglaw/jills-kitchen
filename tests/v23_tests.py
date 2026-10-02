@@ -14,7 +14,7 @@ def load_fixture(g, name):
 @test
 def story_foundation_facts_lanes_overdue_and_reload(b, port, target):
     """v2.3 Phase 1: facts are idempotent and dated, relationship facts are per pair (and once a day when asked),
-    familiarity is computed from them, the arbiter keeps its lanes (major 1 / minor 2 a day), counts a miss for an
+    familiarity is computed from them, the arbiter keeps its lanes (major 2 / minor 3 a day since rc7), counts a miss for an
     eligible event that was not chosen and raises its weight, prefers an overdue Class A event, falls back to the
     presentation that can run, never fires a once-event twice, and everything survives a save and a reload."""
     g = Game(b, port, target, seed=5, manual=True)
@@ -34,18 +34,18 @@ def story_foundation_facts_lanes_overdue_and_reload(b, port, target):
     # the arbiter, with a test registry
     g.ev("""STORY_EV.length=0;window.__ran=[];
       const mk=(k,lane,o)=>Object.assign({k,lane,at:['seat'],when:()=>true,run:()=>__ran.push(k)},o||{});
-      STORY_EV.push(mk('m1','major'),mk('m2','major'),mk('n1','minor'),mk('n2','minor'),mk('n3','minor'),mk('a1','ambient',{cd:0}),
+      STORY_EV.push(mk('m1','major'),mk('m2','major'),mk('m3','major'),mk('n1','minor'),mk('n2','minor'),mk('n3','minor'),mk('n4','minor'),mk('a1','ambient',{cd:0}),
         mk('once','minor',{once:true,w:()=>100}),
         mk('fb','minor',{present:[{can:()=>false,run:()=>__ran.push('fb-crowded')},{can:()=>true,run:()=>__ran.push('fb-table')}]}),
         mk('never','minor',{present:[{can:()=>false,run:()=>__ran.push('never')}]}));""")
     for _ in range(6): g.ev("storyTick('seat',{})")
     ran = g.ev("JSON.stringify(__ran)")
     day = g.ev("JSON.stringify(storyDay())")
-    check(g.ev("storyDay().major") == 1 and g.ev("storyDay().minor") == 2, f'lanes: major 1, minor 2 a day — {day} ran {ran}')
+    check(g.ev("storyDay().major") == 2 and g.ev("storyDay().minor") == 3, f'lanes: major 2, minor 3 a day (rc7, 15:39) — {day} ran {ran}')
     check(g.ev("__ran.filter(k=>k==='a1').length") >= 2, f'ambient events keep going with their own cooldown: {ran}')
     check(g.ev("__ran.includes('once')") and g.ev("__ran.filter(k=>k==='once').length") == 1, f'the weighted once-event fired exactly once: {ran}')
     check(g.ev("evState('never').miss") >= 1 and not g.ev("__ran.includes('never')"), 'an event with no presentation that can run counts a miss and never fires')
-    check(g.ev("evState('m1').miss+evState('m2').miss") >= 1, 'the major event not chosen counted a miss')
+    check(g.ev("evState('m1').miss+evState('m2').miss+evState('m3').miss") >= 1 and g.ev("['m1','m2','m3'].filter(k=>evState(k).n).length") == 2, 'the major event not chosen counted a miss')
     # overdue: a Class A event with misses at the floor goes first
     g.ev("S.day=2;STORY_EV.length=0;__ran.length=0;STORY_EV.push({k:'A',lane:'major',cls:'A',floor:2,at:['seat'],when:()=>true,w:()=>1,run:()=>__ran.push('A')},{k:'B',lane:'major',at:['seat'],when:()=>true,w:()=>1000,run:()=>__ran.push('B')});evState('A').miss=2;evState('A').last=null;evState('B').last=null")
     g.ev("storyTick('seat',{})"); check(g.ev("__ran[0]") == 'A', f'an overdue Class A event goes first over a heavier one: {g.ev("JSON.stringify(__ran)")}')
@@ -381,7 +381,7 @@ window.__p7={
   if(q.table==null){const ls=loungeSeatFor(q);if(!ls)return null;loungeSeat(q,ls,why||'direct')}q.state='wait';q.x=R.tables[q.table].x;q.y=R.tables[q.table].y;q.moving=false;return q},
  // a served ticket, so a checkout has items
  fed:(q,dishes)=>{const t=R.tables[q.table];const tk={id:R.tkid++,no:t.i+1,g:q,lounge:t.lounge?1:0,items:dishes.map(d=>({d,st:'served',q:'G',want:0,picked:true,set:null,lbar:DISH(d).wine?1:undefined})),t0:R.t};for(const it of tk.items)t.plates.push({d:it.d,q:'G',want:0});q.ticket=tk;R.tickets.push(tk);q.state='check';q.ate=1;return tk},
- clearDay:()=>{const d=storyDay();d.major=0;d.minor=0;d.seen={};if(S.story&&S.story.v24)S.story.v24.res=null;if(S.story)S.story.owe=null},   // v2.4 rc6: nor the slot kept for a beat that waited   // v2.4: a day's major held for a v2.4 beat (怡君 is scheduled on these saves' first v2.4 day) is not what these tests drive
+ clearDay:()=>{const d=storyDay();d.major=0;d.minor=0;d.v24=0;d.lp={};d.seen={};if(S.story&&S.story.v24)S.story.v24.res=null;if(S.story)S.story.owe=null},   // v2.4 rc6: nor the slot kept for a beat that waited   // v2.4: a day's major held for a v2.4 beat (怡君 is scheduled on these saves' first v2.4 day) is not what these tests drive
  ev:k=>JSON.parse(JSON.stringify(evState(k))),
  rel:(a,b)=>JSON.parse(JSON.stringify(rel(a,b))),
  back:(k,n)=>{const f=fact(k);if(f){f.d-=n;f.l-=n}},

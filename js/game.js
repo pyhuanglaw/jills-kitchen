@@ -1946,8 +1946,15 @@ function evState(k){const E=story().ev;return E[k]=E[k]||{n:0,miss:0}}
 function evDone(k){const s=evState(k);return s.n>0}
 function storyTrace(o){const st=story();st.trace.push(Object.assign({d:S.day},o));if(st.trace.length>40)st.trace.splice(0,st.trace.length-40)}
 const STORY_EV=[];   /* filled by the content sections below: {k,lane,cls,at:[...],when,w,cd,once,floor,present:[{can,run}],run,note} */
-const LANE_CAP={major:1,minor:2,v24:1,ambient:99};   /* v2.4: the long stories' smaller steps have one a day of their own, so the older stories' minor moments do not crowd them out; a major beat is still one a day across every story */
-/* v2.4 (pacing): the major beat today's story visits were planned for keeps the day's one major slot until it plays, or until late in the service (85%) — the other stories' major moments wait a day; they are missed, not lost. A beat with floor 0 (it has only this day: Dylan on Valentine's) is never held back. */
+/* v2.4: the long stories' smaller steps have a lane of their own, so the older stories' minor moments do not crowd them
+   out. rc7 (the player, 15:39 「一天可以不只一個劇情不然太慢」): two major beats a day (was one), two of the long stories'
+   steps (was one), three minor moments (was two). Two beats of a lane on one day are a part of the evening apart
+   (LANE_GAP, a share of the service; the start of the day is 0, the closing after the service), so two stories never
+   land in the same minute. One story still moves one step at a time — its own beats keep their days apart (due()). */
+const LANE_CAP={major:2,minor:3,v24:2,ambient:99};
+const LANE_GAP={major:.2,minor:.04,v24:.1};
+function storyPos(at){if(at==='daystart')return 0;if(at==='close'||at==='dayend')return 9;/* the closing is a moment of its own: never too close to the evening's beats, and nothing after it */return R&&R.dur?R.t/R.dur:null}
+/* v2.4 (pacing): the major beat today's story visits were planned for keeps a major slot until it plays, or until late in the service (85%) — the other stories' major moments wait while every free slot is spoken for; they are missed, not lost. A beat with floor 0 (it has only this day: Dylan on Valentine's) is never held back. */
 function v24Held(at){if(!R||phase!=='service'||R.t>=R.dur*.85)return null;const v=S.story&&S.story.v24;if(!v||!v.res||v.res.d!==S.day)return null;const open=v.res.k.filter(k=>!fact(k));return open.length?open:null}
 function storyMiss(E,day){if(day.seen[E.k])return;day.seen[E.k]=1;evState(E.k).miss++}
 /* v2.4 rc6 (the player, 12:16 「阿拓跟晴毫無進展」): a major beat due at this moment when the day's major slot is already
@@ -1962,12 +1969,17 @@ function majorOwed(){const o=S.story&&S.story.owe;return o&&o.d===S.day&&evState
 function storyEligible(E,ctx){const s=evState(E.k);if(E.once&&s.n)return null;const cd=E.cd==null?1:E.cd;if(s.last!=null&&S.day-s.last<cd)return null;let ok=false;try{ok=!!E.when(ctx)}catch(e){ok=false}if(!ok)return null;
  const list=E.present||[{run:E.run}];for(const p of list){let can=true;try{can=!p.can||!!p.can(ctx)}catch(e){can=false}if(can)return p}return false}   /* false: eligible but no way to present it today */
 function storyTick(at,ctx){if(!S||phase==='title')return null;if(at==='close'&&typeof upNight==='function'&&upNight())return null;/* v2.4 P2: that closing is the search */ctx=ctx||{};ctx.at=at;const day=storyDay();if(at==='daystart')try{v24Day()}catch(e){console.warn('[v24]',e)}if(at==='daystart')try{majorOwe()}catch(e){console.warn('[owe]',e)}let fired=null;const res=v24Held(at);const owed=majorOwed();
- for(const lane of['major','minor','v24','ambient']){if((day[lane]||0)>=LANE_CAP[lane]){if(lane==='major')majorMissed(at,ctx,day);continue}let cands=[];
+ const pos=storyPos(at);
+ for(const lane of['major','minor','v24','ambient']){if((day[lane]||0)>=LANE_CAP[lane]){if(lane==='major')majorMissed(at,ctx,day);continue}
+  if(pos!==9){const lp=day.lp&&day.lp[lane];if(lp!=null&&pos!=null&&pos-lp<(LANE_GAP[lane]||0))continue}   /* rc7: not in the same part of the evening as this lane's last beat today (not missed: later today) */
+  let cands=[];
   for(const E of STORY_EV){if(E.lane!==lane||!(E.at||[]).includes(at))continue;const pv=storyEligible(E,ctx);if(pv===null)continue;if(pv===false){storyMiss(E,day);continue}const s=evState(E.k);let w=1;try{w=E.w?E.w(ctx):1}catch(e){w=0}if(!(w>0))continue;w*=1+.6*s.miss;if(E.cls==='A'&&s.miss>=(E.floor==null?3:E.floor))w+=1e6;cands.push({E,pv,w})}
-  if(lane==='major'&&owed&&cands.length){const keep=cands.filter(o=>o.E.k===owed||o.E.floor===0);for(const o of cands)if(!keep.includes(o))storyMiss(o.E,day);cands=keep}   /* v2.4 rc6: today's slot is the longest-waiting beat's */
-  else if(lane==='major'&&res&&cands.length){const keep=cands.filter(o=>res.includes(o.E.k)||o.E.floor===0);/* floor 0: a beat that has only this day (Dylan on Valentine's) never waits */for(const o of cands)if(!keep.includes(o))storyMiss(o.E,day);cands=keep}
+  /* v2.4 rc6: the longest-waiting beat's day (owed) and the beat today's visits came for (res) each keep a slot; rc7: with
+     two slots a day, the others wait only while every free slot is spoken for */
+  if(lane==='major'&&cands.length&&(owed||res)){const want=[];if(owed)want.push(owed);for(const k of res||[])if(!want.includes(k))want.push(k);
+   if(LANE_CAP.major-(day.major||0)<=want.length){const keep=cands.filter(o=>want.includes(o.E.k)||o.E.floor===0);/* floor 0: a beat that has only this day (Dylan on Valentine's) never waits */for(const o of cands)if(!keep.includes(o))storyMiss(o.E,day);cands=keep}}
   if(!cands.length)continue;const c=wpick(cands,x=>x.w);if(!c)continue;for(const o of cands)if(o!==c)storyMiss(o.E,day);
-  const s=evState(c.E.k);s.n++;s.last=S.day;if(!s.d)s.d=S.day;s.miss=0;day.seen[c.E.k]=1;if(lane!=='ambient')day[lane]=(day[lane]||0)+1;storyTrace({at,k:c.E.k,lane});shStart(c.E.k,shAuthored(c.E),ctx.g,()=>c.pv.run(ctx));fired=fired||c.E.k}
+  const s=evState(c.E.k);s.n++;s.last=S.day;if(!s.d)s.d=S.day;s.miss=0;day.seen[c.E.k]=1;if(lane!=='ambient'){day[lane]=(day[lane]||0)+1;if(pos!=null)(day.lp=day.lp||{})[lane]=pos}storyTrace({at,k:c.E.k,lane});shStart(c.E.k,shAuthored(c.E),ctx.g,()=>c.pv.run(ctx));fired=fired||c.E.k}
  try{storyProgressCheck()}catch(e){console.warn('[story]',e)}return fired}
 /* what a story event leaves in the journal's week timeline (read by storyEvents) */
 function storyNotes(){const out=[];const E=story().ev;for(const S0 of STORY_EV)if(S0.note&&E[S0.k]&&E[S0.k].n){const t=typeof S0.note==='function'?S0.note(E[S0.k]):S0.note;if(t)out.push({day:E[S0.k].d,t,ic:S0.ic||'heart'})}return out}
