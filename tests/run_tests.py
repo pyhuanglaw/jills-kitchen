@@ -3817,7 +3817,9 @@ def named_guests_keep_one_face_and_the_staff_have_theirs(b, port, target):
     g = Game(b, port, target, seed=57, manual=True)
     player30(g); fill_fridge(g); start_day(g); install_bot(g); g.ev("window.__act=()=>{}")
     names = json.loads(g.ev("JSON.stringify(Object.keys(NAMED))"))
-    check(len(names) == 11 and '怡君' in names and all(g.ev("!!portraitData(NAMED[%r].p)" % n) for n in names), f'ten named guests and 怡君 (v2.4), each with a portrait in the data: {names}')
+    ten = ['周董', 'Madame Lin', 'Mr. Hart', '老饕李先生', 'Monsieur 杜', '品酒師 Ken', '戴帽子的客人', '吃貨小琪', '美食部落客 Momo', '衛生檢查員']
+    story = [n for n in names if n not in ten]
+    check(all(n in names for n in ten) and '怡君' in story and '林予安' in story and all(g.ev("!!NAMED[%r].story" % n) for n in story) and all(g.ev("!!portraitData(NAMED[%r].p)" % n) for n in names), f'the ten named guests and the story characters (怡君, v2.4; 林予安, rc7), each with a portrait in the data: {names}')
     check(g.ev("Object.keys(NAMED).every(n=>n==='衛生檢查員'||(NAMED[n].story&&!Object.values(NAMES).some(l=>l.includes(n)))||Object.values(NAMES).some(l=>l.includes(n)))"), 'every named guest is a name the game actually deals out — except a story character (怡君), who never comes from the random pool')
     # the same look twice, and a face that is the card
     r = json.loads(g.ev("(()=>{const out={};for(const n of ['周董','Mr. Hart','美食部落客 Momo','戴帽子的客人']){const t=n==='戴帽子的客人'?'critic':n==='美食部落客 Momo'?'blogger':'vip';spawn({t:R.t,type:t,size:1,name:n});const a=R.groups[R.groups.length-1];a.gone=true;namedHist(n).seen=0;/* v2.3: one person, one visit a day — the second look is another day's */spawn({t:R.t,type:t,size:1,name:n});const b2=R.groups[R.groups.length-1];out[n]={same:JSON.stringify(a.looks)===JSON.stringify(b2.looks),card:guestPortrait(a)===portraitData(NAMED[n].p),notJill:a.looks[0].hs!==4&&a.looks[0].hs!==9}}return JSON.stringify(out)})()"))

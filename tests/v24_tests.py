@@ -2561,3 +2561,34 @@ def v24_rc7_yuan_comes_to_play_the_piano(b, port, target):
     check('鋼琴演奏' in g.ev("$('#screen').innerText"), 'the summary says so')
     check(g.ev("yaNight(S.day+1)") is False, 'not every night')
     check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc7_story_guests_have_their_own_faces(b, port, target):
+    """the player's 15:38 (「有劇情的npc在遊戲裡的臉和髮型可不可以特別一點 不要都跟別人一樣」): every guest with a story — the seven
+    regulars, the named guests, 怡君 and 予安, Dylan — has a hair style a stranger is never given (10–23, drawn from their
+    portraits; 陳伯伯's older man's 5; Dylan's 9; the hatted critic's disguise is his hat), no two of them the same style
+    and colour; a stranger never has their glasses, beard, earrings, pearls, cravat, overalls or camera, and none of them
+    wears the strangers' round frames or a beret; every style draws something of its own, in every pose."""
+    g = Game(b, port, target, seed=1538, manual=True, viewport={'width': 390, 'height': 844})
+    r = json.loads(g.ev(r"""JSON.stringify((()=>{
+      const SF=['specs','beard','brow','lash','lips','eye','ear','earc','neckl','cravat','overall','camera','lock','bangs','tie2'];
+      const T=['office','student','gourmet','couple','family','vip','blogger','regular'],ctx=['main','pdr','lounge'];const gen=[];
+      for(let i=0;i<1500;i++)for(const L of makeLooks(T[i%T.length],1+(i%4),ctx[i%3]))gen.push(L);
+      const genHs=[...new Set(gen.map(L=>L.hs))].sort((a,b)=>a-b),genSF=gen.filter(L=>SF.some(k=>L[k]!=null)).length,genHat=gen.filter(L=>L.acc==='hat').length;
+      const cast=REGS.map(r=>({n:r.n,L:r.looks[0]})).concat(Object.keys(NAMED).map(k=>({n:k,L:NAMED[k].looks})),[{n:'Dylan',L:DYLAN.looks[0]}]);
+      const own=cast.filter(x=>x.L.acc!=='hat').map(x=>({n:x.n,hs:x.L.hs,hair:x.L.hair,acc:x.L.acc||null}));
+      const keys={};for(const x of own){const k=x.hs+'|'+x.hair;(keys[k]=keys[k]||[]).push(x.n)}
+      /* each story style draws something a stranger's short hair (0) does not, standing and seated, either way round */
+      const cv=document.createElement('canvas');cv.width=120;cv.height=140;const c=cv.getContext('2d');const px=(L,o)=>{c.clearRect(0,0,120,140);drawPerson(c,60,130,L,Object.assign({pscale:2},o));return c.getImageData(0,0,120,140).data};
+      const same=[];let errs=[];for(const x of cast){if(x.L.hs<10)continue;for(const o of[{},{seated:true,mood:'eat',chew:1},{flip:true,mood:'sad'},{mood:'angry',blink:1}]){try{const a=px(Object.assign({},x.L),o),b=px(Object.assign({},x.L,{hs:0}),o);let d=0;for(let i=0;i<a.length;i+=4)if(Math.abs(a[i]-b[i])+Math.abs(a[i+1]-b[i+1])+Math.abs(a[i+2]-b[i+2])+Math.abs(a[i+3]-b[i+3])>60)d++;if(d<120)same.push(x.n+' '+JSON.stringify(o)+' '+d)}catch(e){errs.push(x.n+': '+e.message)}}}
+      return{genHs,genSF,genHat,own,dup:Object.values(keys).filter(v=>v.length>1),same,errs,styles:[...new Set(own.map(x=>x.hs))].filter(h=>h>=10).sort((a,b)=>a-b)}})())"""))
+    check(set(r['genHs']) <= {0, 1, 2, 3, 4, 6, 7, 8}, f"a stranger's hair is one of the common styles: {r['genHs']}")
+    check(r['genSF'] == 0 and r['genHat'] == 0, f"no stranger has a story guest's details (or the critic's hat): {r['genSF']}, {r['genHat']}")
+    common = [x for x in r['own'] if x['hs'] in r['genHs']]
+    check(not common, f'every story guest has a style no stranger is given: {common}')
+    check(not r['dup'], f'no two story guests share a style and a colour: {r["dup"]}')
+    check(not [x for x in r['own'] if x['acc'] in ('glasses', 'beret')], 'none of them wears the strangers\' round frames or a beret')
+    check(r['styles'] == list(range(10, 24)), f'the fourteen styles are all in use: {r["styles"]}')
+    check(not r['same'] and not r['errs'], f"each draws something of its own, in every pose: {r['same'][:4]} {r['errs'][:3]}")
+    check(not g.errors, g.errors[:3]); g.close()
