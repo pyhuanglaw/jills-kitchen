@@ -30,7 +30,23 @@ Filed verbatim in `docs/v24/player_messages_2219_2308_2026-10-02.txt`:
 
 ## 1. Commits since rc7.3
 
-(filled at the release)
+| Commit | What |
+|---|---|
+| a5acc6a | Evan, 沈晴 and 阿拓 look like their portraits; a favourite dish and glass for everyone with a name; the four new bites; the TV and the sound system |
+| abb7d9e | Tests for the bites and the TV |
+| 7ed0d32, f55fd3b | `release/rc7.3` merged in |
+| 2afdcf1, 1e88ded | The manual's audit stamp; the report's first draft and its manual audit |
+| ddfe212 | Ken's favourite is Jill's signature: before there is one, his order threw (the first full run) |
+| 34e9ead | The pizza oven, one more cook and the bar pizza (built on `wip/rc7.5`) |
+| b9ebb9d | Evidence screenshots |
+| db97f4e, 6e82c77 | The pizza joins this release; the single file rebuilt |
+| f97f4e5 | The pizza's evidence; the report |
+| bb3d6da | `research_is_solvable_from_visible_info` has the Lounge and the oven |
+| 9aad866 | Building the Lounge never hands out the pizza; a story that needs someone at an hour has them then (the Wangs at 予安's trial); four tests brought up to rc7.4 |
+| 57e6f80 | A regular the story asked for is not lost at the door |
+| 8eb880a | No extra visits for a favourite; `golden_frames` re-recorded; the report's fixes, goldens and pacing |
+| 54e503c | The 怡君 test starts her first visit at once — the tag |
+| (this) | The report's §1, §6, §7, §10; the regression logs |
 
 ## 2. Release content audit
 
@@ -223,11 +239,29 @@ All of it is the favourites (`docs/evidence/v24_rc7_4/golden/golden_notes.txt`):
 
 ## 6. Full regression
 
-(filled at the release)
+`python3 tests/run_tests.py`, each run in a clean worktree of its commit. Logs in `docs/evidence/v24_rc7_4/regression/`.
+
+| Commit | Result | What came of it |
+|---|---|---|
+| 1e88ded | Stopped at test 32 | Ken's order threw — fixed in ddfe212 (§5) |
+| 6e82c77 | 203 passed, 9 failed | Three game bugs and six tests — fixed in bb3d6da, 9aad866, 57e6f80, 8eb880a (§5, §5.1, §5.2) |
+| 8eb880a | 211 passed, 1 failed | `v24_yijun_comes_to_eat_and_her_mother_walks_over`: with the extra visits gone the day's plan put 怡君 at 139 s of 250 into a full room, and her first visit took the evening; the test now starts it at once (54e503c). It passes on 57e6f80's game too |
+| 54e503c | Stopped at test 47 | The cloud workspace restarted under the run (`…54e503c.interrupted.log`); started again from the first test |
+| **54e503c** | **212 passed, 0 failed** | The release (`full_regression_rc74_54e503c.log`, 06:11–06:53) |
 
 ## 7. Build and publish
 
-(filled at the release)
+- `tools/build_single.py` on 54e503c: the single file is in step (`single_file_in_sync` passed in §6's run).
+- `tools/build_artifact.py`: 6,510,161 bytes.
+- Tag `v2.4-rc7.4` on 54e503c (moved to this report's commit afterwards).
+- Published to https://claude.ai/artifact/2vhURujrtCpQ1P5jnSsjps — version 47, id 1790981664-f246, 2026-10-03 06:54.
+- Read back with Artifact's read and checked with `tools/sims/live_check.py` (`docs/evidence/v24_rc7_4_release/`):
+  - the page built from the tag is inside the live HTML byte for byte (the host adds 552 bytes, its skeleton);
+  - the player's Day 74 save opens with 「繼續營業 · 21:48」 and the evening resumes; every room, the summary, the
+    staff page; the next day's prep restocks ($220,777 → $194,557) and survives a reload; no page errors.
+- Not checked on an iPhone.
+- The `GUIDE` audit stamp reads 「last: v2.4 rc7.5 (the pizza oven…) — before: v2.4 rc7.4 (…)」: both parts are in this
+  release — the pizza was built on `wip/rc7.5` and joined rc7.4. The stamp is a code comment; rc7.5 rewrites it.
 
 ## 8. Evidence (390×844, headless Chromium — T, not O)
 
@@ -270,4 +304,8 @@ day: from Day 74, 17 in ten weeks (Day 74 is one, then 77, 81, 85, 86, 92, 93, 9
 
 ## 10. Text
 
-(filled at the release)
+- `python3 tools/hans_scan.py js/game.js index.html docs/V24_RC7_4_REPORT.md docs/evidence/v24_rc7_4/sims/day52_seeds.txt
+  docs/evidence/v24_rc7_4/golden/golden_notes.txt docs/v24/player_messages_2219_2308_2026-10-02.txt`: three distinct
+  hits, all valid Traditional: 干貝 (×3), 沉 in 睡得很沉 (×3), 宿舍 (×1).
+- The new lines (favourites, the bites' news, the TV's cards, the pizza) are written in the game's plain style; nobody
+  explains a favourite or announces a feature.
