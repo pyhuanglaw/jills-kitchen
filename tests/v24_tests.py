@@ -2959,9 +2959,9 @@ def v24_rc7_2_vip_cards_and_the_lounge_after_dinner(b, port, target):
     check(r and r['paid'] == r['want'] and r['off'] == r['full'] - r['want'], f'the Lounge after dinner: 八折: {r}')
     check(r['list'] == r['takings'], f'the Lounge\'s list is still its takings: {r}')
     # the ticket says the rate; the cards on the journal's VIP page
-    g.ev("""(()=>{S.regulars.leo=12;spawn({t:R.t,type:'student',size:1});const q=R.groups[R.groups.length-1];q.reg='leo';q.name='Leo';q.looks=REG_BY.leo.looks;q.ticket={id:R.tkid++,no:97,g:q,items:[{d:'pasta',st:'pending',q:'G',want:0}],t0:R.t};R.tickets.push(q.ticket);R.tv++;renderTickets()})()""")
-    tk = g.ev("[...document.querySelectorAll('.tk')].map(e=>e.querySelector('.tk-who').textContent).filter(t=>t.includes('Leo')).join('|')")
-    check('八折' in tk, f'the ticket says 八折 for a ten-visit card: {tk}')
+    g.ev("""(()=>{R.tickets.length=0;S.regulars.leo=12;const t=R.tables.find(t=>(t.room||'main')==='main'&&!t.group&&!t.dirty&&!t.hold&&!t.lounge&&!t.pdr);spawn({t:R.t,type:'student',size:1});const q=R.groups[R.groups.length-1];q.reg='leo';q.name='Leo';q.looks=REG_BY.leo.looks;if(q.table!=null){R.tables[q.table].group=null;q.table=null}seatGroup(q,t);q.state='eat';q.ticket={id:R.tkid++,no:97,g:q,items:[{d:'pasta',st:'served',q:'G',want:0}],t0:R.t};R.tickets.push(q.ticket);R.tv++;renderTickets()})()""")
+    tk = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('.tk')].filter(e=>e.textContent.includes('Leo')).map(e=>{const n=e.querySelector('.tk-who span');return{off:(e.querySelector('.tk-h .tk-off')||{}).textContent||null,treat:!!e.querySelector('.tk-who .tk-treat'),cut:n.scrollWidth>n.clientWidth+1}}))"))
+    check(tk and tk[0]['off'] == '八折' and tk[0]['treat'] and not tk[0]['cut'], f'the ticket\'s top line says 八折 for a ten-visit card; the 招待 chip is there and the name is whole (23:46): {tk}')
     g.ev("bookTab='vip';showBook()"); g.page.wait_for_timeout(80)
     page = g.ev("$('#screen').innerText")
     check('來 5 次的客人有 VIP 卡' in page and 'Leo' in page and 'VIP 八折' in page and 'Mia' in page and 'VIP 九折' in page, 'the VIP list: who, which card')
