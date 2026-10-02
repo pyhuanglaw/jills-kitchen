@@ -833,7 +833,11 @@ def followup_the_manual_describes_the_current_game(b, port, target):
                  '在廚房點出菜口', '隨機選菜單', '今日任務要賣的菜和宣傳中的菜會留著', '晚餐後八折', 'VIP 卡', 'VIP 名單', '吃完再去 Lounge 七折', '沒有解雇', '五倍多', '做好了由她送過去',
                  # v2.4 rc7.3: Jill's room, its doors, the bed, petting there, the steals, 寶寶 and the regulars, the posts
                  'Jill 的房間', '從第一天就在', '「房間 ›」', '「‹ 廚房」', '看電子書只在房間', '坐在床邊看書', '房間裡的貓也一樣可以摸',
-                 '從來沒成功', '盤子沒事', '桌子底下抬頭看', '當場融化', '樾樾等 Jill', '照片和讚']:
+                 '從來沒成功', '盤子沒事', '桌子底下抬頭看', '當場融化', '樾樾等 Jill', '照片和讚',
+                 # v2.4 rc7.4: favourites
+                 '最愛的一道、一杯', '沒有人會直接告訴你', '標 ♥ 和他的名字', '偏向有人最愛的菜',
+                 # v2.4 rc7.4: the Lounge's new bites, its TV and sound
+                 '水牛城雞翅、起司條', '生蠔', '德國豬腳', 'Lounge 的家具', 'Lounge 大電視（$200,000）', '電視音響系統（$150,000', '有比賽轉播']:
         check(need in txt, f'the manual mentions {need}')
     for stale in ['暫停選單和設定裡都有【儲存目前進度】', '把杯子交給吧台的客人；桌位由有', '上方的分頁', '畫面上方會跳一個小通知', '打烊後或開店前，商店的「社群與宣傳」分頁（第 6 天起）。', '下一段寫著', '窗邊（貓架、睡墊）', '牠會在門邊趴著等主人',
                   '人數上限跟擴建、後場整理區、側廳、廚房擴建、廚房二期、Lounge 有關', '有 Lounge 以後才能招募', '第二位調酒師',
@@ -846,7 +850,9 @@ def followup_the_manual_describes_the_current_game(b, port, target):
                   # v2.4 rc7.2 (21:57–21:58): not one loan of $20,000
                   '秀琴阿姨會借你兩萬', '店站穩了，Jill 會還她',
                   # v2.4 rc7.2 (22:39, 22:51): nobody is let go; LV5 is not three times the start any more
-                  '訓練升級、解雇', 'LV5 大約是剛來時的三倍']:
+                  '訓練升級、解雇', 'LV5 大約是剛來時的三倍',
+                  # v2.4 rc7.4: the old list of the Lounge's bites
+                  '炸雞塊、起司可樂餅、起司拼盤（II 起多蒜香蘑菇）']:
         check(stale not in txt, f'stale line removed: {stale}')
     g.ev("showGuide()"); g.page.wait_for_timeout(50)
     check('故事' in g.ev("document.querySelector('#screen').innerText") and '社群與宣傳' in g.ev("document.querySelector('#screen').innerText"), 'the manual screen shows the new sections')

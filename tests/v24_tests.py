@@ -3241,3 +3241,51 @@ def v24_rc73_tora_waits_for_jill_after_closing(b, port, target):
     ok = [r for r in seen if r['came'] is not None and r['saw'] is not None and r['jillLeft'] is not None and r['home'] is not None and r['came'] <= r['saw'] <= r['jillLeft']]
     check(len(ok) >= 2, f'he comes out, she sees him, then they go — on most evenings: {seen}')
     check(all(r['waitedSpot'] and abs(r['waitedSpot'][0] - 126) < 6 for r in ok), f'by the kitchen door: {seen}')
+
+
+# ---------------------------------------------------------------- rc7.4: favourites (the player, 22:39)
+@test
+def v24_rc74_favourites_learned_in_play_and_marked_on_the_menu(b, port, target):
+    """(22:39 「可不可以建立客人對某個餐點或某杯酒的特殊喜好」) Each regular and each named guest loves one dish and one glass.
+    Nobody announces it: 陳伯伯 orders his 蛋炒飯 when it is on, says so, and from then on the journal says 「最愛」 and
+    tomorrow's menu marks the row 「♥ 陳伯伯」; Mia, with no tiramisu on, says that instead — and Jill knows hers too. A
+    demand estimate learns nothing. In the Lounge, Sophie's glass is the pinot when it is poured. They are a little
+    happier for it at the bill, and come a little more often when it is on."""
+    g = Game(b, port, target, seed=7421, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day74_1508.json')
+    g.ev("S.loves={};for(const d of['friedrice'])if(!S.menu.includes(d))S.menu.push(d);S.stock.friedrice=Math.max(S.stock.friedrice||0,6);S.menu=S.menu.filter(d=>d!=='tiramisu')")
+    to_service(g); g.ev("window.__act=()=>{}")
+    # an estimate learns nothing
+    g.ev("for(let i=0;i<30;i++)orderItems({type:'regular',size:1,reg:null},true)")
+    check(g.ev("Object.keys(S.loves).length") == 0, 'the demand estimate learns nothing')
+    day_ok = g.ev("hash('chen|'+S.day)%100<85")
+    seat = """(id=>{const ok=t=>(t.room||'main')==='main'&&!t.hold&&!t.lounge&&!t.pdr;let t=R.tables.find(t=>ok(t)&&!t.group);if(!t){t=R.tables.find(t=>ok(t)&&t.group);leaveGroup(t.group,'ok')}t.dirty=false;t.plates=[];
+      spawn({t:R.t,type:REG_BY[id].type,reg:id,size:1});const q=R.groups[R.groups.length-1];if(q.table!=null){R.tables[q.table].group=null;q.table=null}seatGroup(q,t);q.x=t.x;q.y=t.y;q.usual=null;q.wantDish=null;q.forSig=false;q.state='order';createTicket(q);return q})"""
+    r = json.loads(g.ev(f"""JSON.stringify((()=>{{const q=({seat})('chen');const items=q.ticket?q.ticket.items.map(i=>i.d):[];return{{items,known:!!(S.loves.chen&&S.loves.chen.d),said:dayLog().slice(-6).map(l=>l.t)}}}})())"""))
+    if day_ok:
+        check('friedrice' in r['items'] and r['known'], f'陳伯伯 orders his favourite and Jill learns it: {r}')
+        check(any('蛋炒飯' in t for t in r['said']), f'he says so: {r["said"]}')
+    # Mia: no tiramisu today — she says it (the roll held down)
+    r = json.loads(g.ev(f"""JSON.stringify((()=>{{const M=Math.random;Math.random=()=>.1;let q;try{{q=({seat})('mia')}}finally{{Math.random=M}}return{{known:!!(S.loves.mia&&S.loves.mia.d),said:dayLog().slice(-6).map(l=>l.t)}}}})())"""))
+    check(r['known'] and any('提拉米蘇' in t for t in r['said']), f'Mia, without her tiramisu, says so and Jill knows: {r}')
+    # the journal says it
+    g.ev("bookTab='regulars';showBook()"); g.page.wait_for_timeout(60)
+    html = g.page.inner_html('#screen')
+    if day_ok: check('最愛 黃金蛋炒飯' in html, 'the journal: 陳伯伯, 最愛 黃金蛋炒飯')
+    check('最愛 提拉米蘇' in html, 'the journal: Mia, 最愛 提拉米蘇')
+    g.ev("closeSub()")
+    # the Lounge: Sophie's glass
+    w = json.loads(g.ev("JSON.stringify((()=>{const L=wineList();return{has:L.includes('w_pinot'),o:loungeOrder({size:1,type:'gourmet',reg:'sophie',name:'Sophie'})}})())"))
+    if w['has']: check(w['o'][0] == 'w_pinot', f'Sophie orders the pinot when it is poured: {w}')
+    # the bill: +6 when they had it; the plan: likelier when it is on
+    check('loveIdsOf(g)' in g.ev("String(collect)") and 'sat+=6' in g.ev("String(collect)"), 'the bill counts it')
+    # tomorrow's menu marks the rows
+    g.ev("(()=>{closeShop('x');for(const q of R.groups.slice())leaveGroup(q,'ok');finishClosing()})()")
+    if g.ev("phase") == 'summary': g.click('[data-act=toShop]')
+    if g.ev("phase") == 'shop': g.click('[data-act=nextDay]')
+    g.page.wait_for_timeout(150)
+    rows = g.ev("[...document.querySelectorAll('#screen .menu-row')].map(r=>r.innerText.replace(/\\s+/g,' '))")
+    if day_ok: check(any('黃金蛋炒飯' in t and '♥ 陳伯伯' in t for t in rows), f'the menu row says whose favourite it is: {[t for t in rows if "蛋炒飯" in t]}')
+    check(any('提拉米蘇' in t and '♥ Mia' in t for t in rows), f'and the tiramisu, Mia: {[t for t in rows if "提拉米蘇" in t]}')
+    g.page.screenshot(path=os.path.join(ROOT, 'tests', 'artifacts', 'rc74_menu_favourites.png'))
+    check(not g.errors, g.errors[:3]); g.close()
