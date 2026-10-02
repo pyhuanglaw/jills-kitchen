@@ -76,6 +76,13 @@ Never promote T to O.
 
 ## 5. Tests and saves
 
+**Permanent (the player, 2026-10-02 22:20 and 22:22: 「你不可以跳過任何測試，你已經做過一次很危險的事了」「這個不能跳過任何測試的規定應該要永久記憶」):**
+never skip a test. Every publish — a release, a hotfix, a one-line fix — runs the full regression (every test) on the
+exact commit that will be published, and is published only when all of it passes. A failure is fixed and the whole
+suite runs again. Targeted runs are for working, never a substitute for the full run before a publish. (rc7.1 was
+published at 21:12 on targeted checks alone, and its backup box froze the player's iPhone.)
+
+
 How testing runs between releases (the player's 05:42 strategy, `docs/v24/testing_strategy_0542_2026-10-02.txt`):
 - After each change, run what it can affect first: its own tests, the tests of what depends on it, the closest real
   save, and the screenshots if the player sees it (`python3 tests/run_tests.py -k name1,name2`). Widen to the
