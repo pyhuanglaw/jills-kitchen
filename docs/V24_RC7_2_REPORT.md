@@ -197,7 +197,16 @@ suite on the final commit.
 
 - `tools/build_single.py`: the single file is in step with 1114bf6 (6,256 KB; rebuilt, no change).
 - `tools/build_artifact.py`: the page for the live URL (6,405,135 bytes).
-- Tag `v2.4-rc7.2`.
+- Tag `v2.4-rc7.2` at the commit that adds this section and the live check's screenshots. It was first set at 326f262 and
+  moved there before the zips were made; nothing the page is built from changed in between.
+- **Published** to https://claude.ai/artifact/2vhURujrtCpQ1P5jnSsjps, version 45 (version id 1790959148-e9fb), at 00:40.
+- **Checked** (`tools/sims/live_check.py`, `docs/evidence/v24_rc7_2_release/`):
+  - The page built from the tag sits inside the live HTML byte for byte. The host adds 552 bytes, its document skeleton.
+  - The player's Day 74 save, made during the evening, opens on 「繼續營業 · 21:48」. The check resumes it, walks the rooms
+    and finishes the day: the summary (its VIP chip 「VIP 卡 1 桌・折了 $365」 and the Lounge line 「晚餐後折扣 −$150」), then
+    the staff page (「餐廳員工 14/14 人・Lounge 員工 5/5 人・每日薪資 $29,360」).
+  - Day 75's restock is saved ($220,697 → $195,033), and the page survives a reload.
+  - No page errors.
 
 ## 8. Text
 
