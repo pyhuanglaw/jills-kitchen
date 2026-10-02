@@ -5114,7 +5114,7 @@ function update(dt){R.t+=dt;if(R.v24q&&R.v24q.length)v24Upd();
 function startClosing(){R.closing=0;hideCombo();try{if(R.kt&&!R.kt.end)kenNightClose()}catch(e){console.warn('[ken]',e)}/* rc7 */storyTick('close',{});try{srClosingPlan()}catch(e){console.warn('[sr]',e)}/* v2.3 */const J=R.jill;J.q=[];J.cur=null;J.carry=[];const wasResting=J.rest==='sit';const keep=wasResting?Object.assign({},LIFE.jill):null;if(J.rest&&!wasResting)endRest();lifePlan();
  if(wasResting){LIFE.plan='sofa';const L=LIFE.jill;Object.assign(L,{on:true,reserved:false,pos:keep.pos,x:keep.x,y:SOFA.jy,room:'home',troom:'home',face:keep.face,legs:0,legTarget:0,act:'settle',t:rand(1,3),sinceSit:0,counted:false,hat:false});J.rest=null;J.sofa=true;J.tx=null;J.ty=null;J.moving=false;J.restTo=false}
  else if(LIFE.plan==='sofa'){J.tx=null;J.ty=null;J.restTo=false;J.moving=false;const L=LIFE.jill;L.x=J.x;L.y=J.y;L.face=J.face;L.room=J.room||'main';L.troom=L.room;/* first the pass gets wiped down; then the sofa */L.wrapT=rand(4,6.5);if(L.room!=='main'||Math.hypot(J.x-PASS.x,J.y-PASS.y)>4){L.act='standing';jillWalk(L,PASS.x,PASS.y,'wrap','main')}else L.act='wrap'}
- else{const t=R.tables[0];J.troom='main';J.tx=t.x-25;J.ty=t.y+2;J.restTo=true}$('#closePill').hidden=false;if(CATS)for(const c of CATS){if(c.hidden||['jump','walk','race','dash','bed'].includes(c.st))continue;c.t=Math.min(c.t||0,c.def.id==='tora'?.4:c.def.id==='ban'?rand(1.5,3):rand(2,8))}}
+ else{const t=R.tables[0];J.troom='main';J.tx=t.x-25;J.ty=t.y+2;J.restTo=true}$('#closePill').hidden=false;try{toraAtClosing()}catch(e){console.warn('[tora]',e)}if(CATS)for(const c of CATS){if(c.hidden||['jump','walk','race','dash','bed'].includes(c.st))continue;c.t=Math.min(c.t||0,c.def.id==='tora'?.4:c.def.id==='ban'?rand(1.5,3):rand(2,8))}}
 function finishClosing(){if(!R||R.ended)return;R.ended=true;$('#closePill').hidden=true;endDay()}
 /* Why the stars went where they went today, in the player's words. Each cause carries a sign and a weight so the
    summary can show the ones that mattered. Computed from what happened, not from the formula's decimals. */
@@ -7720,7 +7720,7 @@ function catArrive(c){const a=c.after;const id=c.def.id;
  if(a==='stealWatch'){const t=c.stealT,g=c.stealG;c.st='steal';c.pose='sit';c.face=t&&t.x>=c.x?1:-1;c.t=rand(6,12);c.lookAt=t?{x:t.x,y:t.y-20,hidden:false}:null;if(g)catEv(g,'watch',c);return}
  if(a==='meowAt'){const g=c.guest;if(!g||!R||!R.groups.includes(g)||g.table==null){catDecide(c);return}const t=R.tables[g.table];c.st='visit';c.pose='sit';c.t=6;c.face=t.x>=c.x?1:-1;g.mewed=1;addFloat(c.x,c.y-30,'喵～','#FFF6E8',0,'main');c.hearts.push({x:0,y:-26,t:0},{x:4,y:-30,t:-.3});
   setTimeout(()=>{if(R&&R.groups.includes(g))quote(g,pickT(['好可愛……','她在叫我欸。',`${catName(c.def)}在跟我講話。`,'怎麼這麼可愛。','我要融化了。']))},700);catCheer(g,.08);catEv(g,'meow',c);return}
- if(a==='waitJill'){c.st='rest';c.pose='sit';c.face=-1;c.t=90;c.waitJill=true;return}   /* 樾樾, after closing, by the kitchen door */
+ if(a==='waitJill'){c.st='rest';c.pose='sit';c.face=1;c.t=90;c.waitJill=true;c.toJill=false;return}   /* 樾樾, after closing, by the kitchen door, looking out at her */
  if(a==='playWith'){const m=c.target;c.target=null;if(m&&freeFloorCat(m)&&['rest','daze','stare','sleep'].includes(m.st)&&Math.hypot(m.x-c.x,m.y-c.y)<60){startPlay(c,m);return}c.st='rest';c.pose='sit';c.t=rand(2,4);return}
  if(a==='guide'){const b=catBy('snow');if(b&&b.forgot==='eat'&&Math.hypot(b.x-c.x,b.y-c.y)<60){b.forgot=null;b.st='walk';b.tx=SPOT.bowl.x+8;b.ty=SPOT.bowl.y-2;b.after='eat';b.afterT=0;b.moving=true;b.run=0;memo('guide',(c.x+b.x)/2,(c.y+b.y)/2,{a:catName(c.def),b:catName(b.def),subj:[b]});catWalk(c,SPOT.bowl.x-14,SPOT.bowl.y-4,'rest',rand(3,5));return}c.st='rest';c.pose='sit';c.t=rand(2,4);return}
  if(a==='sofaUp'){const s=c.sofa;if(!s){catDecide(c);return}if(s.kind==='seat'||s.kind==='lap')catJump(c,s.x,s.y,'sofaLand');else{c.chain=[{x:s.x,y:s.y}];c.chainEnd='sofaLand';catJump(c,clamp(s.x,SOFA.seatL+8,SOFA.seatR-8),SOFA.catY,'chain')}return}
@@ -7808,7 +7808,7 @@ function initCats(){CATS=CAT_DEF.map(d=>({def:d,x:0,y:0,st:'rest',pose:'sit',per
  OCC.bed.push(Bb);Bb.bedSide=-1;Bb.x=SPOT.bed.x-10;Bb.y=SPOT.bed.y;Bb.st='bed';Bb.pose='curl';Bb.t=rand(20,40);
  /* rc7.3: 樾樾 starts the day in the room with Dylan, 寶寶 on her tree there */perchOcc[6]=null;B.perch=-1;homeCatIn(T);homeCatIn(B)}
 function updateCats(dt,now){if(!CATS)initCats();ctime+=dt;upCatLife(dt);homeSayTick(dt);
- {const L=LIFE.jill;if(evening()&&(L.troom==='home'||L.room==='home'))for(const c of CATS)if(c.waitJill&&!c.away&&c.st==='rest'){c.waitJill=false;homeGo(c,'withJill')}}/* v2.4 P2 */RACE_CD-=dt;TOY.amp=Math.max(1,TOY.amp-dt*.6);if(FLASH){FLASH.t+=dt;if(FLASH.t>.5)FLASH=null}
+ {const L=LIFE.jill;if(evening()&&(L.troom==='home'||L.room==='home'))for(const c of CATS)if((c.waitJill&&!c.away&&c.st==='rest')||(c.def.id==='tora'&&!c.away&&c.st==='side'&&R&&R.closing!=null)){c.waitJill=false;homeGo(c,'withJill')}}   /* rc7.3: she heads for her room — 樾樾, waiting by the kitchen door or sitting by her at the pass, goes with her *//* v2.4 P2 */RACE_CD-=dt;TOY.amp=Math.max(1,TOY.amp-dt*.6);if(FLASH){FLASH.t+=dt;if(FLASH.t>.5)FLASH=null}
  for(const c of CATS){c.ph+=dt*(c.run?2.4:1);c.cd=Math.max(0,c.cd-dt);if(c.wcd>0)c.wcd-=dt;if(c.wakeT>0)c.wakeT-=dt;if(c.flickT>0)c.flickT-=dt;if(c.hopT>0)c.hopT-=dt;if(c.forgot&&c.st!=='daze'&&c.st!=='walk')c.forgot=null;
   if(c.swatT!=null&&c.st==='play'){c.swatT-=dt;if(c.swatT<=0){c.swatT=null;const o=c.swatAt;c.swatAt=null;c.swatShow=.5;if(o&&o.st==='play'){o.hopT=.45;o.hearts.push({x:0,y:-26,t:0});memo('swat',(c.x+o.x)/2,(c.y+o.y)/2,{a:catName(c.def),b:catName(o.def),subj:[c,o]})}}}if(c.swatShow>0)c.swatShow-=dt;if(c.happy>0){c.happy-=dt;if(c.happy<=0){c.quiet=0;if(c.st==='pet')catDecide(c)}}for(const h of c.hearts)h.t+=dt;c.hearts=c.hearts.filter(h=>h.t<1.4);
   switch(c.st){
@@ -8213,7 +8213,7 @@ function drawKitchenHomeDoor(c){const y0=KY.passTop-46,y1=KY.passTop+34;const xl
 /* the furniture, each at its place in the drawing order */
 function homeItems(c,now,d){const out=[];const P=(y,f)=>out.push({y,f:()=>f(c)});
  {const D=LIFE.dylan;if(D&&D.room==='home'&&!D.onSofa&&!D.desk)P(D.y,c=>drawDylanFree(c,D,now))}
- {const L=LIFE.jill;if(L.bed&&(L.room||'home')==='home')P(L.y,c=>drawJillOnBed(c,now))}
+ {const L=LIFE.jill;if(L.bed&&(L.room||'home')==='home')P(HM.bed.y1+19,c=>drawJillOnBed(c,now))}   /* in front of the cats lying on the bed (their key is the bed's front + 18) */
  P(9999,c=>{drawSay(c,'home');drawHomeSay(c)});
  P(HM.lamp.y,c=>drawHomeFloorLamp(c,HM.lamp.x,HM.lamp.y,d));
  P(SOFA.y,c=>drawSofaGroup(c,now));
@@ -8310,10 +8310,14 @@ function drawHomeLitter(c){const L=HM.litter;const y=L.y;srShadow(c,(L.x0+L.x1)/
 const HOME_W={tora:3.2,mikan:.3,ban:.7,snow:.6,mei:1.4};    /* the pull of home, from the dining room */
 const HOME_OUT={tora:.05,mikan:.62,ban:.42,snow:.36,mei:.2};  /* the pull of the dining room, from home */
 function toraBrave(){return (S.crew||[]).some(m=>(m.days||0)>=10)||S.day>=21}   /* the crew are faces he knows */
+/* the closing has begun (the guests all gone), Jill is still out there, and he has not been out yet tonight */
+function toraOut(){const T=catBy('tora');const L=LIFE.jill;return !!(T&&R&&R.closing!=null&&!R.ended&&toraBrave()&&T.waitedTonight!==S.day&&(L.troom||L.room||'main')!=='home'&&(L.room||'main')!=='home'&&!R.groups.some(g=>!g.gone&&g.table!=null&&g.room!=='lounge'))}
+/* the moment the closing begins he stirs (asleep or not), so the coming out is part of the closing, not after it */
+function toraAtClosing(){const T=catBy('tora');if(!T||T.away!=='home'||T.upTo||!toraBrave()||T.waitedTonight===S.day)return;T.hT=Math.min(T.hT||99,rand(.6,1.6))}
 function homeWeight(c){const id=c.def.id;let w=HOME_W[id]||.5;if(evening())w*=id==='tora'&&c.waitJill?0:2.2;const L=LIFE.jill;if((L.on||L.reserved)&&L.room==='home')w*=1.5;
  if(id==='tora'&&homeDylanAtDesk())w*=1.3;if(id==='ban'&&homeDylanAtDesk()&&!(c.meowCD>ctime))w*=1.8;return w}
 function homeGo(c,why){releaseSpots(c);if(c.perch>=0){if(perchOcc[c.perch]===c)perchOcc[c.perch]=null;c.perch=-1}c.homeWhy=why||null;catWalk(c,KD.x+8,FB-10,'homeIn')}
-function homeCatIn(c){c.st='home';c.away='home';c.hidden=true;c.moving=false;c.waitJill=false;c.ax=HM.door.x+(Math.random()<.5?-8:8);c.ay=HM.door.y-6;c.aface=1;c.aoy=0;c.homeY=null;c.upTo=null;c.hT=0;homeCatDecide(c,true)}
+function homeCatIn(c){c.st='home';c.away='home';c.hidden=true;c.moving=false;c.waitJill=false;c.toJill=false;c.ax=HM.door.x+(Math.random()<.5?-8:8);c.ay=HM.door.y-6;c.aface=1;c.aoy=0;c.homeY=null;c.upTo=null;c.hT=0;homeCatDecide(c,true)}
 function homeCatOut(c){/* back into the dining room, by the corridor beside the kitchen */if(c.sofa){c.sofa=null;c.sofaOn=false}c.homeSleep=false;c.away=null;c.hidden=false;c.st='rest';c.pose='stretch';c.x=KD.x+8;c.y=FB-10;c.face=1;c.t=rand(1,2.5);c.moving=false;c.upTo=null;c.homeY=null;c.homeSpot=null}
 function homeCatLeave(c,then){c.homeSpot=null;if(c.sofa){c.sofa=null;c.sofaOn=false}c.homeY=null;c.upTo={x:HM.door.x,y:HM.door.y-4,v:44,then:o=>{if(then)then(o);else homeCatOut(o)}}}
 /* the places in the room, by cat */
@@ -8337,9 +8341,10 @@ function homeSpots(c){const id=c.def.id;const out=[];const B=HM.bed,D=HM.desk,T=
 /* deciding, in the room */
 function homeCatDecide(c,fresh){const id=c.def.id;
  if(!fresh&&c.waitJill)c.waitJill=false;
+ if(!fresh&&id==='tora'&&toraOut()&&Math.random()<.85){/* the guests gone: out to the kitchen door, to wait for Jill (22:54) */c.waitedTonight=S.day;c.toJill=true;c.homeSleep=false;if(c.sofa){c.sofa=null;c.sofaOn=false}homeCatLeave(c,o=>{homeCatOut(o);o.waitJill=true;catWalk(o,KD.x+62,FB-12,'waitJill')});return}   /* clear of the cat tree by the door and of the closing's pill: in sight */
  if(!fresh&&c.sofa&&c.sofaOn){homeSofaDecide(c);return}   /* on the sofa: stay, shift nearer Jill, or hop down (as v2.0) */
- if(!fresh){let out=HOME_OUT[id]||.3;if(evening())out*=.35;if(id==='mei'&&meowGuest()&&!((c.meowGCD||0)>ctime))out*=4;if(id==='ban'&&stealTable(c))out*=1.6;if(id==='tora'&&R&&R.closing!=null&&toraBrave()&&c.waitedTonight!==S.day&&!R.groups.some(g=>!g.gone&&g.table!=null&&!(g.room==='lounge')))out=4;   /* the guests gone: out to wait for Jill */
-  const stay=1;if(Math.random()<out/(out+stay)){if(id==='tora'&&R&&R.closing!=null){c.waitedTonight=S.day;homeCatLeave(c,o=>{homeCatOut(o);o.waitJill=true;catWalk(o,KD.x+30,FB-16,'waitJill')})}else homeCatLeave(c);return}}
+ if(!fresh){let out=HOME_OUT[id]||.3;if(evening())out*=.35;if(id==='mei'&&meowGuest()&&!((c.meowGCD||0)>ctime))out*=4;if(id==='ban'&&stealTable(c))out*=1.6;
+  const stay=1;if(Math.random()<out/(out+stay)){homeCatLeave(c);return}}
  const sp=homeSpots(c);const why=c.homeWhy;c.homeWhy=null;c.homeSleep=false;if(c.sofa&&!c.sofaOn)c.sofa=null;
  let s=((why==='jill'||why==='withJill')&&sp.find(o=>o.k==='jill'))||wpick(sp,o=>o.w);
  if(s.k==='jill'){homeSofaJill(c);return}
@@ -8489,7 +8494,7 @@ function sofaDecide(c){const id=c.def.id;const J=LIFE.jill;
  leaveSofa(c,'decide')}
 /* ---- Jill's evening ---- */
 function lifePlan(){if(LIFE.day===S.day&&LIFE.plan)return;LIFE.day=S.day;LIFE.t=0;LIFE.revealRoll=0;LIFE.say=[];
- LIFE.plan='sofa';const J=LIFE.jill;Object.assign(J,{on:false,bed:false,preferBed:Math.random()<.15,reserved:false,pos:null,legs:0,legTarget:0,act:null,last:null,t:0,walking:false,via:null,after:null,sitT:0,catNew:0,sinceSit:0,counted:false,tvFirst:false})}
+ LIFE.plan='sofa';const J=LIFE.jill;Object.assign(J,{on:false,bed:false,preferBed:Math.random()<.15,waitTora:0,sawTora:0,reserved:false,pos:null,legs:0,legTarget:0,act:null,last:null,t:0,walking:false,via:null,after:null,sitT:0,catNew:0,sinceSit:0,counted:false,tvFirst:false})}
 function freeJillPos(){const ivs=seatIvs(null);const ok=p=>ivFree(JPOS[p].x-13,JPOS[p].x+13,ivs);const clearHead=p=>!sofaCats().some(o=>o.sofa.kind==='back'&&Math.abs(o.sofa.x-JPOS[p].x)<20);
  const order=Math.random()<.7?['L','R','M']:['R','L','M'];return order.find(p=>ok(p)&&clearHead(p))||order.find(ok)||null}
 function jillWalk(L,x,y,after,rm){L.tx=x;L.ty=y;L.after=after;L.walking=true;L.via=null;L.troom=rm||L.room||'main';if(!L.room)L.room='main';if(L.troom!==L.room)return;   /* rc7.3: to another room: through its doors (stepTo) */
@@ -8521,7 +8526,10 @@ function jillLife(J,L,dt){const tv=LIFE.tv;
   else if(['read','idle','tv','pet'].includes(L.act)&&L.t<=0){if(L.act==='pet'&&L.petCat)L.petCat=null;jillDecide(L)}
   if(L.act==='tv'&&!(tv.on&&tv.at==='use')){L.act=null;jillDecide(L)}
   if(L.catNew>0&&L.act!=='pet'&&L.act!=='settle'&&Math.random()<dt*.25){const near=sofaCats().filter(c=>Math.abs(c.x-L.x)<46);if(near.length){L.petCat=pick(near);L.act='pet';L.t=rand(2,4);L.petCat.hearts.push({x:0,y:-24,t:0});if(Math.random()<.5)L.petCat.happy=Math.max(L.petCat.happy,1.5),L.petCat.quiet=1}L.catNew=0}}
- else if(L.act==='wrap'){L.face=1;L.wrapT=(L.wrapT||0)-dt;if(L.wrapT<=0)L.act='toSofa'}
+ else if(L.act==='wrap'){L.face=1;L.wrapT=(L.wrapT||0)-dt;if(L.wrapT<=0){const T=catBy('tora');const here=T&&T.waitJill&&!T.away&&T.st==='rest'&&!T.moving;
+   if(T&&!here&&(T.toJill||T.waitJill)&&(L.waitTora=(L.waitTora||0)+dt)<14){L.face=-1;return}   /* 樾樾 is on his way out to her: she waits (22:54) */
+   if(here&&!L.sawTora){L.sawTora=1;L.face=T.x>=L.x?1:-1;T.hearts.push({x:0,y:-26,t:0});T.happy=Math.max(T.happy||0,1.6);L.wrapT=1.4;return}   /* she sees him; then the two of them go */
+   L.act='toSofa'}}
  else if(L.act==='reveal'){L.revealT-=dt;if(L.revealT<=0){L.act='toSofa';const D=LIFE.dylan;if(D){D.goHome=true;D.state='think';D.t=1.4}}}   /* 「老公，走了。」「好。」 — then home, the two of them */
  else if(L.act==='standing'&&!L.walking){/* stood up but has nothing to do: sit back down */L.act='toSofa'}
  /* mirror into the view's Jill so everything that reads view().jill sees her where she is */
@@ -8696,7 +8704,7 @@ function lifeEnsureEvening(){if(!evening())return;if(LIFE.day!==S.day||!LIFE.pla
 function lifeNoRoom(){/* rc7.3: the cats have the whole sofa — she sits on the edge of the bed instead, in her room. (Before: her old seat at the
    dining room's first table; the dining room is not where she rests any more — 18:53 §5.) */const L=LIFE.jill;L.reserved=false;L.pos=null;L.act='toBed'}
 /* the edge of the bed, between the pillows' end and the foot, where the cats on the bed lie behind her */
-function bedSeat(){const B=HM.bed;return{x:B.x0+80,y:B.y1+22}}   /* drawn seated, the mattress's front edge is her seat (as SOFA.seat is to SOFA.jy) */
+function bedSeat(){const B=HM.bed;return{x:B.x0+80,y:B.y1+10}}   /* drawn seated: her lap on the mattress's front edge, her feet at the floor (as on the sofa: SOFA.jy, 8 above SOFA.front) */
 function bedDecide(L){const W=[];const add=(k,w)=>{if(w>0)W.push([k,w])};add('read',L.last==='read'?2:4);add('idle',L.last==='idle'?1.2:2.4);
  if(!L.preferBed&&L.sinceSit>20&&freeJillPos())add('sofa',2);   /* the sofa has room again */
  const k=wpick(W,o=>o[1])[0];L.last=k;
@@ -9002,9 +9010,9 @@ function drawBagSparkle(c,now){const t=now-BAG_T;const base=.35+Math.sin(now*2)*
 
 /* ================= guide ================= */
 /* 小小店主手冊：seven cards, short lines, the same tone as the rest of the game */
-const GUIDE=[   /* the manual describes the game as it is. Audited every release (docs/RELEASE_CHECKLIST.md) — last: v2.4 rc7.2 (秀琴阿姨's $3,000 loans and the payback at the summary; her first evening held; the pass takes a tap; the heart for a regular who is one; the 招待 chip beside the name; a line with a face answers a touch; the log's ×; a regular's head at a busy table is the table; a story on the summary opens its page; no 解雇; 🎲 隨機選菜單; the wages (LV5 twice); the missing cats found and the open door held; Sophie's pad seen and marked; 晚餐後 Lounge 八折) — earlier: v2.4 rc7 (the day's money: the glasses' cost, the rent, the wages, 秀琴阿姨's loan, 予安's fee; Ken's tasting nights and 「晚餐之後」; the piano and 予安; Ken's and 予安's stories hold the restaurant; a line said on the way to a table; the story guests look like their portraits — earlier: v2.4 rc6 (the Staff Room, the Private Dining Room and its bookings, two more places on the restaurant's list; the stories that hold the restaurant, the day's stories on the summary, the Lounge's list and sales, the things to spend on, the Second Floor after the Lounge, the new places' photos, a day off)), 2026-10-02 */
+const GUIDE=[   /* the manual describes the game as it is. Audited every release (docs/RELEASE_CHECKLIST.md) — last: v2.4 rc7.3 (Jill's room: the room tab and its doors, her rest and her evening there — the sofa or the edge of the bed —, the cats' home, petting in the room, the steals that never work, 寶寶 and the regulars, the posts' pictures and likes) — before: v2.4 rc7.2 (秀琴阿姨's $3,000 loans and the payback at the summary; her first evening held; the pass takes a tap; the heart for a regular who is one; the 招待 chip beside the name; a line with a face answers a touch; the log's ×; a regular's head at a busy table is the table; a story on the summary opens its page; no 解雇; 🎲 隨機選菜單; the wages (LV5 twice); the missing cats found and the open door held; Sophie's pad seen and marked; 晚餐後 Lounge 八折) — earlier: v2.4 rc7 (the day's money: the glasses' cost, the rent, the wages, 秀琴阿姨's loan, 予安's fee; Ken's tasting nights and 「晚餐之後」; the piano and 予安; Ken's and 予安's stories hold the restaurant; a line said on the way to a table; the story guests look like their portraits — earlier: v2.4 rc6 (the Staff Room, the Private Dining Room and its bookings, two more places on the restaurant's list; the stories that hold the restaurant, the day's stories on the summary, the Lounge's list and sales, the things to spend on, the Second Floor after the Lounge, the new places' photos, a day off)), 2026-10-02 */
  {ic:'🍳',h:'開店與料理',sum:'每天 17:00 開店、21:30 打烊。你是 Chef Jill，點餐廳裡的東西就能指揮她。',pts:[
-  ['房間','票券列下面的分頁：店門口・主廳・側廳・二樓（租下以後）・休息室・包廂（蓋好以後）・Lounge（蓋好以後）・廚房（也可以用 ←→ 或數字鍵）。你在哪一間，那個分頁就亮著，寫著那一間的全名——在休息室裡是「員工休息室」，在包廂裡是「私人包廂」。二樓是整層樓本身：上面的房間關著門，點門就進去，房間裡靠近你的那扇門回到二樓；上二樓的樓梯門在側廳靠近你的那一邊。新的房間蓋好的那天早上，開店前會先帶你上二樓看一眼；整層的平面圖在「店舖工程」的二樓那一欄。包廂的分頁上有跟桌子一樣的提示。主廳的後牆有側廳的拱門，Lounge 蓋好以後旁邊多一道，都可以直接點。主廳底部沒有廚房——廚房是自己的一間，出菜口在那裡；Jill 和服務生會走到主廳最下面去拿菜。'],
+  ['房間','票券列下面的分頁：店門口・主廳・側廳・二樓（租下以後）・休息室・包廂（蓋好以後）・Lounge（蓋好以後）・廚房・房間（也可以用 ←→ 或數字鍵）。你在哪一間，那個分頁就亮著，寫著那一間的全名——在休息室裡是「員工休息室」，在包廂裡是「私人包廂」，在房間裡是「Jill 的房間」。二樓是整層樓本身：上面的房間關著門，點門就進去，房間裡靠近你的那扇門回到二樓；上二樓的樓梯門在側廳靠近你的那一邊。新的房間蓋好的那天早上，開店前會先帶你上二樓看一眼；整層的平面圖在「店舖工程」的二樓那一欄。包廂的分頁上有跟桌子一樣的提示。主廳的後牆有側廳的拱門，Lounge 蓋好以後旁邊多一道，都可以直接點。主廳底部沒有廚房——廚房是自己的一間，出菜口在那裡；Jill 和服務生會走到主廳最下面去拿菜。'],
   ['帶位','有空桌客人會自己坐；客滿時在門口長椅等。想指定順序，點那組客人或點空桌。'],
   ['誰在哪裡','訂單上的桌號（T35）或名字點一下，會切到那一桌所在的房間，那一桌亮一下，寫著幾號桌、哪一組、幾位。點一張有客人的桌子也一樣會寫出來。點常客或認得的客人，他的小卡片上寫著坐哪一桌。畫面下方誰說了一句話，點那句話就會找到他現在在哪——還在桌上、在等位、正要離開；已經走了也會告訴你。還在走向座位的路上說的話，會帶你到他要坐的那一桌（他走到之前那一桌會一直亮著）；服務生、調酒師說的「這邊請」「請慢用」，點了會找到她說話的那一桌。標示幾秒就消失，平常畫面上不會一直掛著名字。'],
   ['點餐','桌上出現紅色「!」→ 點桌子，Jill 過去點餐。'],
@@ -9092,14 +9100,16 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
   ['最低消費','訂位的時候就定了：照這麼多人、這種聚餐平常會點的菜和當天的價錢來算，訂在稍低一點（包廂越完整，越接近他們會吃的）；人越多越高。之後漲價、包廂升級、存檔重開，都不會改。預約的那一桌照常點菜、吃飯、結帳：吃得比最低消費多就照實算，少了就收最低消費——客人不會為了湊低消多點。'],
   ['沒有預約的晚上','4 位以上、坐得下的客人可以直接坐包廂，照常算，沒有最低消費。熟客和 Lounge 的客人照舊坐他們的位子。結算的晚上會寫「包廂 幾組」；預約的那一桌吃得比最低消費少的話，也寫補足了多少。']]},
  {ic:'🛋️',h:'Jill 的房間',sum:'廚房後面那一間，是 Jill 自己住的房間——從第一天就在。不是工程，不用買，也沒有要照顧的數值。',pts:[
-  ['怎麼進去','房間分頁的最後一個「房間」（點開寫著「Jill 的房間」）。Jill 從廚房右手邊那扇淺木門進出；房間另外有一扇自己的門，通到後巷。'],
+  ['怎麼進去','房間分頁的最後一個「房間」（點開寫著「Jill 的房間」）。也可以在廚房點右手邊那扇淺木門（寫著「房間 ›」）；在房間裡點門口的「‹ 廚房」回到廚房。Jill 也是走那扇門；房間另外有一扇自己的門，通到後巷。'],
   ['裡面有什麼','窗下那張燕麥色沙發、可以推過來推過去的電視、一張雙人床、一張堆滿書和講義的書桌、貓抓板、貓床、收在淺木櫃裡的貓砂，還有從主廳搬進來的那座貓跳台。主廳原本放沙發的地方空了出來，留給走道。'],
-  ['Jill 在房間','營業中沒事的時候，她會回房間坐一下；打烊後把出菜口擦一擦，就回房間。看電子書只在房間。'],
+  ['Jill 在房間','營業中沒事的時候，她會回房間坐一下；打烊後把出菜口擦一擦，就回房間。看電子書只在房間。沙發被貓佔滿的晚上，或她想換個地方的時候，她會坐在床邊看書。'],
   ['貓的家','房間是五隻貓的家，不是關牠們的地方：營業中牠們一樣在店裡走來走去，也會自己回房間。樾樾幾乎都待在房間；柔柔愛在店裡晃，睡覺會回房間；小齁偶爾跑回房間喵一聲；包包在房間睡，也會在店裡最熱鬧的地方睡；寶寶喜歡房間，偶爾出來看看。打烊以後回房間的貓多一點，但不會一下子全部回去。'],
   ['樾樾等 Jill','樾樾很怕生，客人走光了也不太敢出來。等他跟店裡的人熟了，打烊以後他會出來，在廚房門口等 Jill，再跟她一起回房間。']]},
  {ic:'🐈',h:'五隻店貓',sum:'樾樾、小齁、寶寶、柔柔、包包住在店裡。不用餵、不用照顧，牠們有自己的生活。',pts:[
   ['個性','樾樾黏 Jill、怕生，大部分時間在 Jill 的房間；小齁愛玩也黏人；寶寶天生明星，總坐在好看的位子；柔柔有點傻，愛埋伏寶寶；包包很會睡。'],
-  ['點牠們','可以摸，但牠們不一定理你。點睡著的包包，他會睜一下眼、動動耳朵尾巴——然後繼續睡。'],
+  ['點牠們','可以摸，但牠們不一定理你。點睡著的包包，他會睜一下眼、動動耳朵尾巴——然後繼續睡。在 Jill 的房間裡的貓也一樣可以摸。'],
+  ['偷吃（從來沒成功）','小齁看到炸物、寶寶看到牛排，偶爾會跳上客人的桌子想偷吃。不是每次，也從來沒成功：客人或 Jill 一句話，牠們就跳下去，盤子沒事。包包想吃雞腿，但大多只是坐在桌子底下抬頭看。'],
+  ['寶寶和熟客','寶寶偶爾會從房間出來，走到認得她的客人旁邊叫一聲「喵～」；對方通常當場融化。'],
   ['客人也看貓','客人會轉頭看貓、微笑，有人會拿手機拍一張。等太久的客人，親人的貓有時會去陪一下。常來的客人會慢慢認得某一隻，叫得出名字。'],
   ['牠們不出門','貓只在店裡，窗邊再熱鬧也是在窗戶裡面。二樓是店裡的以後，偶爾會有一隻上樓待一會兒，再自己下來；有了休息室，打烊後有人在裡面坐的時候，偶爾會有一隻跟進去在沙發上睡一下；包廂空著的晚上也可能有一隻進去晃一下，有客人要坐的時候牠會自己出來。門口的狗是客人帶來的，有五種：博美、臘腸、米克斯、垂耳、黃金獵犬。買了狗狗休息角（門邊那間小木屋），牠會在屋前趴著、坐起來看看、喝水，等主人吃完。'],
   ['名字','在餐廳日誌的「店貓」可以直接改名字。']]},
