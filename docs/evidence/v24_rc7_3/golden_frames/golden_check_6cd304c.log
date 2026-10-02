@@ -1,0 +1,23 @@
+FAIL  cat_personality_fingerprint  (1.3s)
+      cat behaviour differs from the baseline in: ['evening.states', 'evening.time', 'evening.weights', 'prep.states', 'prep.time', 'prep.weights', 'service.states', 'service.weights']
+FAIL  golden_scenario  (2.0s)
+      day 1 differs from golden baseline: {"lifetime": [2269, 2612], "reviews": [7, 8], "cats": [[["tora", "walk", "loaf", 198, 316, -1, false], ["ban", "bed", "curl", 252, 124, -1, false], ["snow", "sleep", "loaf", 85, 459, 1, false], ["mikan", "side", "loaf", 178, 529, -1, false], ["mei", "rest", "loaf", 166, 90, -1, false]], [["tora", "home", "walk", 72, 525, -1, true], ["ban", "walk", "scr", 116, 488, -1, false], ["snow", "home", "curl", 72, 525, -1, true], ["mikan", "home", "loaf", 94, 100, -1, true], ["mei", "home", "groom", 166, 90, -1, true]]], "stats": [{"guests": 16, "perfect": 16, "days": 1, "walkins": 0, "families": 0}, {"guests": 19, "perfect": 19, "days": 1, "walkins": 1, "families": 0}], "reviewHash": ["3857073c", "f4331daf"], "summary": [{"rev": 1920, "cost": 596, "tips": 349, "bonus": 255, "wages": 0, "net": 1628, "guests": 16, "lost": 0, "perfect": 16, "plated": 16, "avg": 98, "top": "friedrice", "stars": 5}, {"rev": 2280, "cost": 755, "tips": 332, "bonus": 255, "wages": 0, "net": 1812, "guests": 19, "lost": 0, "perfect": 19, "plated": 19, "avg": 99, "top": "friedrice", "stars": 5}], "weights": ["2088:a3f29ec4", "2005:a6a2eac3"], "catHash": ["6b44ae15", "f3a20a53"], "money": [2128, 2312], "xp": [{"friedrice": 32}, {"friedrice": 38}]}
+FAIL  golden_frames  (118.2s)
+      title: pixels differ in box (44, 245, 390, 782) (see tests/artifacts/)
+      service_20s: pixels differ in box (0, 74, 390, 782) (see tests/artifacts/)
+      service_panel: pixels differ in box (0, 74, 390, 782) (see tests/artifacts/)
+      pause: pixels differ in box (0, 74, 390, 782) (see tests/artifacts/)
+      evening: pixels differ in box (8, 17, 390, 786) (see tests/artifacts/)
+      summary: pixels differ in box (45, 17, 375, 591) (see tests/artifacts/)
+      shop: pixels differ in box (44, 17, 382, 454) (see tests/artifacts/)
+      book_cats: pixels differ in box (156, 17, 334, 110) (see tests/artifacts/)
+      book_mem: pixels differ in box (22, 17, 366, 800) (see tests/artifacts/)
+      day1: 7127 frames, baseline 7301
+      day1: first differing sample #0 (t=0.033): scene, cats, weights
+      day1: end-of-day digest differs: money, lifetime, stats, xp, reviews, reviewHash, summary, cats, catHash, mem, weights, life
+      day2: 7806 frames, baseline 8028
+      day2: first differing sample #0 (t=0.033): scene, dom, cats, weights
+      day2: end-of-day digest differs: money, lifetime, stats, xp, stock, reviews, reviewHash, summary, cats, catHash, mem, weights, life
+
+0 passed, 3 failed
+EXIT 1
