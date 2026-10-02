@@ -1,0 +1,9 @@
+14 errors: []
+the card before: 披薩烤爐 在廚房後牆、排煙罩旁邊砌一座磚造的披薩烤爐，底下是石板：可以在「菜單研發」研發酒吧披薩，給 Lounge 的客人。烤爐要有人顧——餐廳員工可以再多聘 1 位，在「工作分配」把一位廚師排到「披薩烤爐」；沒有人顧的晚上，Jill 自己烤。要先有 Lounge。 開工 $120,000
+the recipe before: 酒吧披薩 前菜 售價 $380 · 成本 $110 · 披薩烤爐 · 難度 ● 研究進度 ○○○ · 3 種食材，主角是「披薩麵團」 需要先購買披薩烤爐
+the board: 披薩烤爐 1/1・今天沒有料理 老周師傅 LV1 × 已滿
+the lab: 大成功！ 披薩麵團＋番茄醬汁＋起司片，就是「酒吧披薩」。
+unlocked True, on the menu True
+Jill's first: ready/P, steps [(0, 'add'), (1, 'hold'), (2, 'add'), (3, 'zone'), ('zone-mid',)]
+the Lounge's pizza: {'it': 'served', 'oven': False, 'p': 0, 't': None} (baked in the oven seen: True; steps seen ['add', 'hold', 'add', 'zone'])
+d74 errors: []
