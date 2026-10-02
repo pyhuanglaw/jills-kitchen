@@ -475,7 +475,7 @@ def v24_xiuqin_goes_home_a_while_into_the_closing(b, port, target):
 def v24_the_first_cleaner_hired_is_her_and_keeps_what_she_knows(b, port, target):
     """Hiring the first cleaner is hiring her: the same person (id 'xq'), what she knows (who she has talked to) carries
     over, one line — 「那以後就天天來了。」; from then on an ordinary cleaner and no evening helper. The next cleaner is
-    someone else. Let her go and she does not come back to help in the evenings."""
+    someone else. (rc7.2, the player 22:39: nobody is let go — there is no 解雇.)"""
     g = Game(b, port, target, seed=261, manual=True, viewport={'width': 390, 'height': 844})
     install_bot(g)
     g.click('[data-act=open]'); g.ev("window.__fastSay=1")
@@ -493,8 +493,11 @@ def v24_the_first_cleaner_hired_is_her_and_keeps_what_she_knows(b, port, target)
     g.ev("S.level=Math.max(S.level,3)")
     _act(g, 'hire', k='cleaner'); g.ev("__tick(30)")
     check(g.ev("S.crew.map(m=>m.name).join()") == '秀琴阿姨,小彤', 'the next cleaner is someone else')
-    _act(g, 'crewFire', k='xq'); _act(g, 'crewFire', k=g.ev("S.crew[0].id"))
-    check(g.ev("!!fact('xq_gone')&&!xqHelperMode()&&!xqm()"), 'let go: no evening helper after that')
+    g.ev("shopTab='staff';showShop()"); g.page.wait_for_timeout(60)
+    scr = g.ev("document.querySelector('#screen').innerText")
+    check('解雇' not in scr and not g.ev("!!document.querySelector('[data-act=crewFire]')"), 'no 解雇 on the staff page (rc7.2, 22:39)')
+    _act(g, 'crewFire', k='xq')
+    check(g.ev("S.crew.map(m=>m.name).join()") == '秀琴阿姨,小彤' and not g.ev("!!fact('xq_gone')"), 'and no way to let her go: she stays')
     check(not g.errors, g.errors[:3]); g.close()
 
 
@@ -2162,8 +2165,9 @@ def v24_rc7_the_money(b, port, target):
     small = json.loads(g.ev("(()=>{const L=S.level,r0=Object.assign({},S.rooms),lv=S.rooms.lounge;S.level=1;S.rooms={};const a=rentToday();S.level=L;S.rooms=r0;return JSON.stringify(a)})()"))
     check(small == 300, f'a first-day shop pays {small} a day')
     w = json.loads(g.ev("JSON.stringify({c1:crewWageAt('chef',1),c5:crewWageAt('chef',5),w5:crewWageAt('waiter',5),cl5:crewWageAt('cleaner',5),b5:crewWageAt('bartender',5),all:crewWages()})"))
-    check(w['c1'] == 264 and w['c5'] == 845 and w['w5'] == 704 and w['cl5'] == 528 and w['b5'] == 1126, f'the wages: {w}')
-    check(11676 * 1.2 < w['all'] < 11676 * 1.35, f'the Day 71 crew: $11,676 a day before, {w["all"]} now')
+    # rc7.2 (the player, 22:51): LV5 twice the rc7 wage, a new hire 15% more
+    check(w['c1'] == 304 and w['c5'] == 1690 and w['w5'] == 1408 and w['cl5'] == 1056 and w['b5'] == 2253, f'the wages: {w}')
+    check(14679 * 1.98 < w['all'] < 14679 * 2.02, f'the Day 71 crew, all LV5: $14,679 a day in rc7, {w["all"]} now')
     # the menu: three bar bites on tonight, of four
     g.ev("showPrep()"); g.page.wait_for_timeout(100)
     h = g.ev("(()=>{const h=[...document.querySelectorAll('#screen h3')].find(e=>e.textContent.includes('今日菜單'));return h?h.textContent:''})()")
@@ -2763,4 +2767,260 @@ def v24_rc7_2_a_regulars_head_at_a_busy_table_and_the_log_closes(b, port, target
     check(str(g.ev("$('#logPanel [data-logn]').textContent")).endswith('句'), 'the count is kept up to date')
     g.click('#logPanel [data-logclose]'); g.page.wait_for_timeout(60)
     check(g.ev("$('#logPanel').hidden"), 'the × closes the log')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc7_2_a_story_on_the_summary_opens_its_page(b, port, target):
+    """rc7.2 (the player, 22:38: 「結算看故事頁點進去就不會跳到那個故事啊，要從最上面自己找很不方便」): each of the day's stories
+    on the summary is a way into its own page — a tap opens the journal's story page at that story, marked; a restaurant
+    chapter opens at that chapter."""
+    g = Game(b, port, target, seed=2238, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day74_1508.json')
+    to_service(g); play_day(g)
+    for _ in range(200):
+        if g.ev("phase") != 'service': break
+        g.ev("for(let i=0;i<30;i++)__tick(1000/30)")
+    check(g.ev("phase") == 'summary' and g.ev("!!S.lastSummary"), 'a day played: the summary')
+    k = g.ev("(STORY_LINES.filter(L=>{try{return L.open()&&lineProgress(L).done.length>0}catch(e){return false}}).slice(-1)[0]||{}).k")
+    check(bool(k), f'an open story in the save: {k}')
+    ch = g.ev("restChapters().findIndex((C,i)=>i>0&&(!C.showIf||C.showIf())&&!(C.hidden&&C.hidden()))")
+    check(ch >= 1, f'a restaurant chapter past the first: {ch}')
+    g.ev(f"window.__st0=storyToday;storyToday=D=>[{{who:'他們',t:'測試的一段',note:'',k:'{k}'}},{{who:'餐廳',t:'測試的一章',note:'',k:'ch{ch}'}}];showSummary()")
+    g.page.wait_for_timeout(80)
+    rows = g.ev("[...document.querySelectorAll('.stoday .st-row')].map(e=>e.dataset.act+':'+e.dataset.k)")
+    check(rows == [f'story:{k}', f'story:ch{ch}'], f'the rows are ways in: {rows}')
+    g.click('.stoday .st-row b'); g.ev("__tick(100)"); g.page.wait_for_timeout(100)   # openStory scrolls on a 60 ms timer (virtual time here)
+    st = json.loads(g.ev(f"JSON.stringify({{sub,bookTab,focus:storyFocus,mark:!!document.querySelector('#sl-{k}.focus'),vis:(()=>{{const e=document.getElementById('sl-{k}');if(!e)return null;const r=e.getBoundingClientRect();return r.top<innerHeight&&r.bottom>0}})()}})"))
+    check(st['sub'] == 'book' and st['bookTab'] == 'story' and st['focus'] == k and st['mark'] and st['vis'], f'the journal at that story, marked and in view: {st}')
+    g.ev("showSummary()"); g.page.wait_for_timeout(80)
+    g.click(f'.stoday .st-row[data-k=ch{ch}]'); g.ev("__tick(100)"); g.page.wait_for_timeout(100)
+    st = json.loads(g.ev(f"JSON.stringify({{bookTab,focus:storyFocus,mark:!!document.querySelector('#sl-ch{ch}.focus'),vis:(()=>{{const e=document.getElementById('sl-ch{ch}');if(!e)return null;const r=e.getBoundingClientRect();return r.top<innerHeight&&r.bottom>0}})()}})"))
+    check(st['bookTab'] == 'story' and st['focus'] == f'ch{ch}' and st['mark'] and st['vis'], f'a chapter opens at the chapter: {st}')
+    g.ev("storyToday=window.__st0")
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc7_2_the_random_menu(b, port, target):
+    """rc7.2 (the player, 22:39: 「我其實到最後都懶得換菜單耶，可不可以給我一個按鍵是隨機選？」): 🎲 隨機選菜單 on the menu page
+    fills the menu's places with dishes a guest can order tonight (their station is there) — at least one 主食, a bit of
+    each kind — keeps today's task dish, leaves the bar bites as they were, and gives another menu on another tap."""
+    g = Game(b, port, target, seed=2239, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day74_1508.json')
+    if g.ev("phase") == 'shop':
+        g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(200)
+    check(g.ev("phase") == 'prep' and g.ev("!!document.querySelector('[data-act=menuRandom]')"), 'the button is on the menu page')
+    check('🎲 隨機選菜單' in g.ev("$('#screen').innerText"), 'and says what it is')
+    r = json.loads(g.ev("""JSON.stringify((()=>{const cap=menuCap();const bars0=S.menu.filter(d=>DISHES[d]&&DISHES[d].bar).sort().join();const dt=(S.today.tasks||[]).find(t=>t.k==='dish');S.today.tasks=S.today.tasks||[];
+      const can=d=>S.unlocked.includes(d)&&!!DISHES[d]&&!DISHES[d].bar&&stationOk(d);const pool=S.unlocked.filter(can);let task=dt?dt.d:null;if(!task||!can(task)){task=pool[pool.length-1];S.today.tasks.push({k:'dish',d:task,n:3,txt:'test',reward:100})}
+      const rolls=[];for(let i=0;i<8;i++){const p=menuRandom();rolls.push({p,count:menuCount(),bars:S.menu.filter(d=>DISHES[d]&&DISHES[d].bar).sort().join(),all:p.every(can),main:p.some(d=>['main','starter'].includes(DISH(d).cat)),cats:[...new Set(p.map(d=>DISH(d).cat))].length,task:p.includes(task)})}
+      const kinds=new Set(pool.map(d=>DISH(d).cat)).size;return{cap,pool:pool.length,bars0,kinds,task,rolls,distinct:new Set(rolls.map(x=>x.p.slice().sort().join())).size}})())"""))
+    want = min(r['cap'], r['pool'])
+    for x in r['rolls']:
+        check(len(x['p']) == want and x['count'] == want, f'the menu filled to its places ({want}): {x}')
+        check(x['all'] and x['main'] and x['task'] and x['bars'] == r['bars0'], f'orderable, a 主食, the task dish, the bites as they were: {x}')
+        check(x['cats'] >= min(r['kinds'], 3), f'a bit of each kind: {x["cats"]} of {r["kinds"]}')
+    check(r['distinct'] >= 3, f'another tap, another menu: {r["distinct"]} different menus in 8 taps')
+    g.click('[data-act=menuRandom]'); g.page.wait_for_timeout(80)
+    check('菜單隨機排好了' in g.ev("[...document.querySelectorAll('#toasts .toast')].map(t=>t.textContent).join('|')"), 'the tap says it is done')
+    check(g.ev("phase") == 'prep' and g.ev("menuCount()") == want, 'still on the menu page, the menu full')
+    man = g.ev("JSON.stringify(GUIDE)")
+    check('隨機選菜單' in man and '今日任務要賣的菜和宣傳中的菜會留著' in man, 'the manual says so')
+    # a new game: few dishes — all of them, at least one 主食
+    g.ev("localStorage.removeItem(KEY)"); g.reload(); g.page.wait_for_timeout(150); g.click('[data-act=open]'); g.page.wait_for_timeout(150)
+    n = json.loads(g.ev("(()=>{const p=menuRandom();return JSON.stringify({p,cap:menuCap(),pool:S.unlocked.filter(d=>!!DISHES[d]&&!DISHES[d].bar&&stationOk(d)).length,main:p.some(d=>['main','starter'].includes(DISH(d).cat))})})()"))
+    check(len(n['p']) == min(n['cap'], n['pool']) and n['main'], f'a new game: {n}')
+    g.page.screenshot(path=os.path.join(ROOT, 'tests', 'artifacts', 'rc72_random_menu.png'))
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc7_2_the_missing_cats_stop_the_evening(b, port, target):
+    """rc7.2 (the player, 22:44: 「上2樓找的時候先發現柔柔不見了 後來發現小齁也不見呀 而且發現貓不見的時候就一定要中斷了，就不是自己
+    播放是要點一下才會繼續」): the moment they find the cats gone is a held scene — the evening stops, one line per tap — and it
+    names both cats at once (「柔柔和小齁都不見了。」); the open door is held too, and Jill calls them both. Then the search,
+    the floor, the cats down, the door latched, as before."""
+    g = Game(b, port, target, seed=2244, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day52.json')
+    to_service(g); play_day(g, max_steps=60000)
+    for _ in range(200):
+        if g.ev("phase") != 'service': break
+        g.ev("for(let i=0;i<30;i++)__tick(1000/30)")
+    g.ev(UP_DONE_BEFORE); _upf(g, 'up_hint', 6); _upf(g, 'up_staff', 5); _upf(g, 'up_inspect', 3)
+    check(_up_day(g, 'up_door', 9302), 'the night\'s day starts')
+    nA, nB = g.ev("upCatN('mikan')"), g.ev("upCatN('ban')")
+    g.ev("__botUntil('R.closing!=null',90000,1/30)")
+    g.ev("window.__noScenes=false")
+    seen = []
+    def held_lines():
+        out = []
+        for _ in range(12):
+            if not g.ev("!!DLG"): break
+            out.append(g.ev("$('#dlg .dlg-text').textContent")); g.ev("DLG.shownAt=0;dlgNext()"); g.page.wait_for_timeout(20)
+        return out
+    other = []
+    def until(cond, n):
+        for _ in range(n):
+            if g.ev(cond): return True
+            if g.ev("!!DLG"):
+                other.extend(held_lines()); continue   # another story's scene at closing: tapped through
+            g.ev("__tick(1000/30)")
+        return bool(g.ev(cond))
+    ok = until("!!(DLG&&DLG.hold)&&!!R.upSearch&&R.upSearch.step==='noticing'", 600)
+    check(ok, f'finding them gone: a held scene (other scenes on the way: {other[:3]})')
+    t0 = g.ev("R.t"); g.ev("for(let i=0;i<60;i++)__tick(1000/30)")
+    check(g.ev("R.t") == t0, 'the evening waits while it is open')
+    first = held_lines(); seen += first
+    check(f'{nA}呢？' in first[0] or first[0] == f'{nA}？', f'it starts with {nA}: {first}')
+    check(f'{nA}和{nB}都不見了。' in first and any(nB in x for x in first[:-1]), f'and says both are gone, at once: {first}')
+    ok = until("!!(DLG&&DLG.hold)&&!!R.upSearch&&R.upSearch.step==='door'", 3000)
+    check(ok, 'the open door: held too')
+    door = held_lines(); seen += door
+    check('這個怎麼開著？' in door and f'……{nA}？{nB}？' in door, f'Jill calls them both: {door}')
+    for _ in range(4000):
+        g.ev("__tick(1000/30)")
+        if g.ev("!!DLG"): seen += held_lines()
+        if g.ev("!R||!R.upSearch||R.upSearch.end"): break
+    check(g.ev("!!(R&&R.upSearch&&R.upSearch.end)") is True and g.ev("fact('up_cats')&&fact('up_cats').d===S.day") is True, f'found, and the search ends: {seen[-4:]}')
+    check('妳們兩個。' in seen, 'the floor, held as before')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc7_2_sophies_pad_seen_and_marked(b, port, target):
+    """rc7.2 (the player, 22:49: 「Sophie帶給寶寶的禮物的時候沒有讓我們先看到長什麼樣子後來放到店裡說是在走道邊，但是店裡的貓的東西
+    太多了，根本認不出出來哪個是多出來」): the gift scene shows the pad itself on its first lines and holds the service; placed,
+    the pad in the dining room is marked — a ring and 「Sophie 送的小貓墊」 — that day and the next, then not; a save that
+    already has the pad shows the mark once."""
+    g = Game(b, port, target, seed=2249, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day74_1508.json')
+    to_service(g)
+    g.ev("__botUntil('R.t>=R.dur*.2',90000,1/30)")
+    g.ev("window.__act=()=>{}")
+    g.ev("""(()=>{const t=R.tables.find(t=>(t.room||'main')==='main'&&!t.group&&!t.dirty&&!t.hold&&!t.lounge&&!t.pdr);spawn({t:R.t,type:'gourmet',size:1});const q=R.groups[R.groups.length-1];q.reg='sophie';q.name='Sophie';q.looks=REG_BY.sophie.looks;if(q.table==null)seatGroup(q,t);window.__sq=q})()""")
+    g.ev("window.__noScenes=false;STORY_EV.find(e=>e.k==='sophie_mei_4').run({g:__sq,items:[{d:'duck'}]})")
+    check(g.ev("!!(DLG&&DLG.hold)"), 'the gift is a held scene')
+    shots = []
+    for i in range(10):
+        if not g.ev("!!DLG"): break
+        shots.append(json.loads(g.ev("JSON.stringify({t:$('#dlg .dlg-text').textContent,ill:!$('#dlg .dlg-illus').hidden,src:($('#dlg .dlg-illus img').getAttribute('src')||'').slice(0,23),cap:$('#dlg .dlg-illus-t').textContent})")))
+        if i == 0:
+            g.page.screenshot(path=os.path.join(ROOT, 'tests', 'artifacts', 'rc72_sophie_pad_scene.png'))
+        g.ev("dlgNext()"); g.page.wait_for_timeout(30)
+    check([x['ill'] for x in shots[:3]] == [True, True, True] and all(x['src'] == 'data:image/jpeg;base64,' and x['cap'] == 'Sophie 帶來的小貓墊' for x in shots[:3]), f'the pad itself on the first three lines: {shots[:3]}')
+    check(not any(x['ill'] for x in shots[3:]), f'then the words: {shots[3:]}')
+    st = json.loads(g.ev("JSON.stringify({on:gearOn('sophiepad'),n:S.gearNew&&S.gearNew.sophiepad,d:S.day,mark:gearNewOn('sophiepad')})"))
+    check(st['on'] and st['n'] == st['d'] and st['mark'], f'placed and marked: {st}')
+    said = g.ev("(()=>{const cv=mkCanvas(400,500),c=cv.getContext('2d');const L=[];const f=c.fillText.bind(c);c.fillText=(t,x,y)=>{L.push(t);f(t,x,y)};drawGearNew(c,1);return L})()")
+    check(said == ['Sophie 送的小貓墊'], f'the tag says who it is from: {said}')
+    g.ev("setRoom('main');for(let i=0;i<4;i++)__tick(1000/30)"); g.page.wait_for_timeout(60)
+    g.page.screenshot(path=os.path.join(ROOT, 'tests', 'artifacts', 'rc72_sophie_pad_marked.png'))
+    check(g.ev("(()=>{const d=S.day;S.day=d+1;const a=gearNewOn('sophiepad');S.day=d+2;const b=gearNewOn('sophiepad');S.day=d;return a&&!b})()"), 'marked the next day too, then not')
+    m = json.loads(g.ev("(()=>{const o=JSON.parse(JSON.stringify(S));o.gear=Object.assign({},o.gear,{sophiepad:5});delete o.gearNew;const r=parseSave(JSON.stringify(o));return JSON.stringify({err:r.err||null,n:r.o&&r.o.gearNew&&r.o.gearNew.sophiepad,d:r.o&&r.o.day})})()"))
+    check(m['err'] is None and m['n'] == m['d'], f'a save that already has it: marked once from the day it is loaded: {m}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc7_2_vip_cards_and_the_lounge_after_dinner(b, port, target):
+    """rc7.2 (the player, 23:00: 「如果從餐廳用餐再去酒吧，應該可以打八折」; 23:02: 「來五次以上的客人有VIP卡不管是餐廳還是酒吧都是九折
+    但是如果是餐廳之後去酒吧就是餐廳九折酒吧八折 你自己幫我記錄一個VIP名單 來10次以上的話，酒吧和餐廳都是八折，吃完餐廳再去酒吧酒吧
+    就七折」): the rates; the bill at the card's rate item by item (rounded to $5) with the Lounge's list still equal to its
+    takings; the card given at the fifth visit and changed at the tenth, said once; the list in the journal; the rate on
+    the ticket; a save's people who already came five or ten times have their cards, with no toast."""
+    g = Game(b, port, target, seed=2302, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day74_1508.json')
+    mig = json.loads(g.ev("JSON.stringify({vip:S.vip,regs:S.regulars,named:Object.fromEntries(Object.entries(story().named).map(([k,v])=>[k,v.v]))})"))
+    want = {k for k, v in mig['regs'].items() if v >= 5} | {k for k, v in mig['named'].items() if (v or 0) >= 5}
+    check(set(mig['vip']) == want and all(x['d1'] == 0 for x in mig['vip'].values()), f'the people who already came five times have cards, given before there were cards: {len(mig["vip"])} of {len(want)}')
+    check(all((x['d2'] == 0) == ((mig['regs'].get(k) or mig['named'].get(k) or 0) >= 10) for k, x in mig['vip'].items()), 'and ten times: the 八折 card')
+    to_service(g)
+    g.ev("__botUntil('R.t>=R.dur*.5',90000,1/30)")
+    g.ev("window.__act=()=>{}")
+    rates = json.loads(g.ev("""JSON.stringify((()=>{const mk=(reg,v,o)=>{S.regulars[reg]=v;return Object.assign({reg,regs:null,name:REG_BY[reg].n,size:1,counted:0},o||{})};const out={};
+      out.r4=billRate(mk('mia',3));out.r5=billRate(mk('mia',4));out.r9=billRate(mk('mia',8));out.r10=billRate(mk('mia',9));
+      out.lgAfter0=billRate(mk('mia',3,{counted:1,ticket:{lounge:1},lg:{why:'after'}}));out.lgAfter5=billRate(mk('mia',5,{counted:1,ticket:{lounge:1},lg:{why:'after'}}));out.lgAfter10=billRate(mk('mia',10,{counted:1,ticket:{lounge:1},lg:{why:'after'}}));
+      out.lgDirect0=billRate(mk('mia',2,{ticket:{lounge:1},lg:{why:'direct'}}));out.lgDirect5=billRate(mk('mia',4,{ticket:{lounge:1},lg:{why:'direct'}}));out.lgDirect10=billRate(mk('mia',9,{ticket:{lounge:1},lg:{why:'direct'}}));
+      out.anon=billRate({size:2,counted:0});out.anonAfter=billRate({size:2,counted:1,ticket:{lounge:1},lg:{why:'after'}});return out})())"""))
+    check(rates == {'r4': 1, 'r5': .9, 'r9': .9, 'r10': .8, 'lgAfter0': .8, 'lgAfter5': .8, 'lgAfter10': .7, 'lgDirect0': 1, 'lgDirect5': .9, 'lgDirect10': .8, 'anon': 1, 'anonAfter': .8}, f'the rates: {rates}')
+    # a bill: Mia's fifth visit, at dinner — 九折 item by item; the card given, said once
+    r = json.loads(g.ev("""JSON.stringify((()=>{S.regulars.mia=4;delete (S.vip||{}).mia;const t=R.tables.find(t=>(t.room||'main')==='main'&&!t.group&&!t.dirty&&!t.hold&&!t.lounge&&!t.pdr);spawn({t:R.t,type:'office',size:1});const q=R.groups[R.groups.length-1];q.reg='mia';q.name='Mia';q.looks=REG_BY.mia.looks;q.ret=true;if(q.table==null)seatGroup(q,t);
+      q.ticket={id:R.tkid++,no:99,g:q,items:[{d:'steak',st:'served',q:'G',want:0,picked:true},{d:'coffee',st:'served',q:'G',want:0,picked:true}],t0:R.t};R.tickets.push(q.ticket);q.state='check';
+      const want=['steak','coffee'].reduce((a,d)=>a+Math.round(priceOf(d)*.9/5)*5,0),full=priceOf('steak')+priceOf('coffee');const r0=R.st.rev,v0=R.st.vipOff||0;document.querySelectorAll('#toasts>*').forEach(e=>e.remove());collect(q);
+      return{paid:R.st.rev-r0,want,full,off:(R.st.vipOff||0)-v0,vip:S.vip.mia,day:S.day,visits:S.regulars.mia,toasts:[...document.querySelectorAll('#toasts .toast')].map(e=>e.textContent).join('|'),note:dayLog().some(l=>/Mia 第 5 次來，Jill 給了一張 VIP 卡/.test(l.t))}})())"""))
+    check(r['paid'] == r['want'] and r['off'] == r['full'] - r['want'] and r['want'] < r['full'], f'九折, item by item: {r}')
+    check(r['visits'] == 5 and r['vip'] == {'d1': r['day']} and 'Mia 拿到 VIP 卡（九折）' in r['toasts'] and r['note'], f'the card, given at the fifth visit and said: {r}')
+    # the Lounge after dinner, no card: 八折; the Lounge's list equals its takings
+    r = json.loads(g.ev("""JSON.stringify((()=>{const ls=R.tables.find(t=>t.lounge&&!t.group&&t.kind!=='bar');if(!ls)return null;spawn({t:R.t,type:'couple',size:2});const q=R.groups[R.groups.length-1];if(q.table!=null){const t0=R.tables[q.table];t0.group=null;q.table=null}seatGroup(q,ls);q.counted=1;q.lg={why:'after',at:R.t};
+      const w=wineList()[0];q.ticket={id:R.tkid++,no:98,g:q,lounge:1,items:[{d:w,st:'served',q:'G',want:0,picked:true,lbar:1},{d:w,st:'served',q:'G',want:0,picked:true,lbar:1}],t0:R.t};R.tickets.push(q.ticket);q.state='check';
+      const want=2*Math.round(priceOf(w)*.8/5)*5;const r0=R.st.lgRev||0,o0=R.st.lgOff||0;collect(q);const L=R.st.lgSold||{};
+      return{paid:(R.st.lgRev||0)-r0,want,off:(R.st.lgOff||0)-o0,full:2*priceOf(w),list:Object.values(L).reduce((a,x)=>a+x.rev,0),takings:R.st.lgRev}})())"""))
+    check(r and r['paid'] == r['want'] and r['off'] == r['full'] - r['want'], f'the Lounge after dinner: 八折: {r}')
+    check(r['list'] == r['takings'], f'the Lounge\'s list is still its takings: {r}')
+    # the ticket says the rate; the cards on the journal's VIP page
+    g.ev("""(()=>{S.regulars.leo=12;spawn({t:R.t,type:'student',size:1});const q=R.groups[R.groups.length-1];q.reg='leo';q.name='Leo';q.looks=REG_BY.leo.looks;q.ticket={id:R.tkid++,no:97,g:q,items:[{d:'pasta',st:'pending',q:'G',want:0}],t0:R.t};R.tickets.push(q.ticket);R.tv++;renderTickets()})()""")
+    tk = g.ev("[...document.querySelectorAll('.tk')].map(e=>e.querySelector('.tk-who').textContent).filter(t=>t.includes('Leo')).join('|')")
+    check('八折' in tk, f'the ticket says 八折 for a ten-visit card: {tk}')
+    g.ev("bookTab='vip';showBook()"); g.page.wait_for_timeout(80)
+    page = g.ev("$('#screen').innerText")
+    check('來 5 次的客人有 VIP 卡' in page and 'Leo' in page and 'VIP 八折' in page and 'Mia' in page and 'VIP 九折' in page, 'the VIP list: who, which card')
+    g.page.screenshot(path=os.path.join(ROOT, 'tests', 'artifacts', 'rc72_vip_list.png'))
+    check(g.ev("[...document.querySelectorAll('.tabs button')].some(b=>b.textContent==='VIP')"), 'a tab of its own')
+    man = g.ev("JSON.stringify(GUIDE)")
+    check('VIP 卡' in man and '晚餐後八折' in man and '吃完再去 Lounge 七折' in man, 'the manual says so')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc7_2_the_lounges_own_waiter_carries_its_bites(b, port, target):
+    """rc7.2 (the player, 23:07: 「酒吧的菜還是可以給餐廳的廚師煮 但是要讓酒吧專屬的服務生去送餐」): a Lounge table's bite, cooked
+    in the one kitchen, is carried by the Lounge's own waiter (安安) when she is in — not by the dining room's waiters, and
+    the pass's 送菜 leaves it to her; with her off, as before."""
+    g = Game(b, port, target, seed=2307, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day74_1508.json')
+    to_service(g)
+    g.ev("__botUntil('R.t>=R.dur*.3',90000,1/30)")
+    g.ev("window.__act=()=>{}")   # nobody taps for the player
+    an = g.ev("(S.crew.find(m=>m.name==='安安')||{}).id")
+    g.ev(f"(()=>{{const st=story();if(st.away&&st.away.m)delete st.away.m['{an}']}})()")   # in today, whatever the day's draw said
+    check(bool(an) and g.ev(f"crewPool(S.crew.find(m=>m.id==='{an}'))") == 'lounge' and g.ev("lgWaiterHere()"), 'she is here, the Lounge\'s own')
+    mk = """(()=>{const ls=R.tables.find(t=>t.lounge&&!t.group&&t.kind!=='bar');if(!ls)return null;spawn({t:R.t,type:'couple',size:2});const q=R.groups[R.groups.length-1];if(q.table!=null){const t0=R.tables[q.table];t0.group=null;q.table=null}seatGroup(q,ls);q.state='wait';q.x=ls.x;q.y=ls.y;
+      const tk={id:R.tkid++,no:96,g:q,lounge:1,items:[{d:'bites',st:'ready',q:'G',want:0}],t0:R.t,claim:null};q.ticket=tk;R.tickets.push(tk);window.__lt=tk;return ls.i})()"""
+    ti = g.ev(mk)
+    check(ti is not None, 'a Lounge table with a bite ready at the pass')
+    g.ev("R.jill.q.length=0;servePass()")
+    check(ti not in g.ev("R.jill.q.slice()"), 'the pass\'s 送菜 leaves it to her')
+    who = None
+    for _ in range(900):
+        g.ev("__tick(1000/30)")
+        who = g.ev("__lt.claim")
+        if who: break
+    check(who == an, f'she carries it, nobody else: {who} (安安 is {an})')
+    # with her off: as before (another waiter with the Lounge job, the bartender, or Jill)
+    g.ev(f"setCrewAway(S.crew.find(m=>m.id==='{an}'),'off')")
+    check(not g.ev("lgWaiterHere()"), 'off today')
+    ti2 = g.ev(mk)
+    g.ev("R.jill.q.length=0;servePass()")
+    check(ti2 in g.ev("R.jill.q.slice()"), 'the pass\'s 送菜 takes it again')
+    man = g.ev("JSON.stringify(GUIDE)")
+    check('做好了由她送過去' in man, 'the manual says so')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc7_2_no_firing_and_the_wages(b, port, target):
+    """rc7.2 (the player, 22:39: 「員工如果請了就不要再有解雇的選項了」): no 解雇 on any card, for either list; (22:51: 「我覺得他們的
+    薪水應該都是現在的兩倍…你自己去推算他們一開始的但也不要差太多」): LV5 twice the rc7 wage, a new hire 15% more, the levels between
+    in steps; the staff page and the manual say the numbers."""
+    g = Game(b, port, target, seed=2251, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day74_1508.json')
+    g.ev("shopTab='staff';showShop()"); g.page.wait_for_timeout(80)
+    scr = g.ev("$('#screen').innerText")
+    check('解雇' not in scr and not g.ev("!!document.querySelector('[data-act=crewFire]')") and g.ev("document.querySelectorAll('#screen .item').length") >= 10, 'the staff page: every card, no 解雇')
+    w = json.loads(g.ev("JSON.stringify(['chef','waiter','cleaner','bartender'].map(r=>[1,2,3,4,5].map(l=>crewWageAt(r,l))))"))
+    check(w == [[304, 532, 832, 1224, 1690], [253, 443, 693, 1020, 1408], [190, 332, 520, 765, 1056], [405, 709, 1109, 1632, 2253]], f'the wages: {w}')
+    check(f'每日薪資 {g.ev("fmt(crewWages())")}' in scr, 'the page shows the day\'s wages')
+    man = g.ev("JSON.stringify(GUIDE)")
+    check('廚師 LV1 一天 $304、LV5 一天 $1,690' in man and '請了就是店裡的人，沒有解雇' in man and '訓練升級、解雇' not in man, 'the manual')
     check(not g.errors, g.errors[:3]); g.close()

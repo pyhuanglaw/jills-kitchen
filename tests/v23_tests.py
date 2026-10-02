@@ -828,7 +828,9 @@ def followup_the_manual_describes_the_current_game(b, port, target):
                  '每天的帳', '酒水成本', '租金', '一天 $300', '不會欠到明天', '秀琴阿姨會借你 $3,000', '每次不夠都會借', '結算時錢超過 $20,000', '不含小費', '晚餐桌上配的酒也另外一行',
                  # v2.4 rc7 (15:24–16:46): Ken's tasting nights and the wine, 予安 and the piano, their stories hold, a line on the way to a table, the story guests' looks
                  'Ken 的品酒夜', '品酒會只有 Ken 辦', '晚餐之後', '鋼琴與予安', '一個禮拜彈三個晚上', '鋼琴演奏', '一開始沒有人彈', 'Ken 的故事', '予安和鋼琴的故事',
-                 '走向座位的路上', '跟頭像一樣']:
+                 '走向座位的路上', '跟頭像一樣',
+                 # v2.4 rc7.2 (22:38–23:07): the pass, the random menu, the cards and the Lounge after dinner, no 解雇, the wages, 安安 carries the bites
+                 '在廚房點出菜口', '隨機選菜單', '今日任務要賣的菜和宣傳中的菜會留著', '晚餐後八折', 'VIP 卡', 'VIP 名單', '吃完再去 Lounge 七折', '沒有解雇', '五倍多', '做好了由她送過去']:
         check(need in txt, f'the manual mentions {need}')
     for stale in ['暫停選單和設定裡都有【儲存目前進度】', '把杯子交給吧台的客人；桌位由有', '上方的分頁', '畫面上方會跳一個小通知', '打烊後或開店前，商店的「社群與宣傳」分頁（第 6 天起）。', '下一段寫著', '窗邊（貓架、睡墊）', '牠會在門邊趴著等主人',
                   '人數上限跟擴建、後場整理區、側廳、廚房擴建、廚房二期、Lounge 有關', '有 Lounge 以後才能招募', '第二位調酒師',
@@ -839,7 +841,9 @@ def followup_the_manual_describes_the_current_game(b, port, target):
                   # v2.4 rc7 (14:49): the piano no longer plays itself
                   '大約三個晚上有一晚現場演奏',
                   # v2.4 rc7.2 (21:57–21:58): not one loan of $20,000
-                  '秀琴阿姨會借你兩萬', '店站穩了，Jill 會還她']:
+                  '秀琴阿姨會借你兩萬', '店站穩了，Jill 會還她',
+                  # v2.4 rc7.2 (22:39, 22:51): nobody is let go; LV5 is not three times the start any more
+                  '訓練升級、解雇', 'LV5 大約是剛來時的三倍']:
         check(stale not in txt, f'stale line removed: {stale}')
     g.ev("showGuide()"); g.page.wait_for_timeout(50)
     check('故事' in g.ev("document.querySelector('#screen').innerText") and '社群與宣傳' in g.ev("document.querySelector('#screen').innerText"), 'the manual screen shows the new sections')
