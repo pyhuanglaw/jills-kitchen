@@ -517,8 +517,10 @@ def old_saves_load(b, port, target):
         if orig.get('mem'):
             g.click('.links [data-act=book]'); g.click('[data-act=btab][data-k=mem]')
             n = g.page.locator('.polaroid img').count()
-            check(n == len(orig['mem']), f'{name}: expected {len(orig["mem"])} photos in album, saw {n}')
-            check(g.page.locator('.polaroid .pin').count() == n, f'{name}: photos from before the album are all 珍藏')
+            # v2.4 rc7.5: and the opening day's photo, as history, at the front — no pin (it is not 珍藏, only kept)
+            check(n == len(orig['mem']) + 1, f'{name}: expected {len(orig["mem"])} photos in album and the first day\'s, saw {n}')
+            check(g.page.locator('.polaroid .pin').count() == n - 1, f'{name}: photos from before the album are all 珍藏')
+            check('第一天' in g.page.locator('.polaroid').first.inner_text(), f'{name}: the album opens on the first day')
             srcs = g.page.eval_on_selector_all('.memgrid img', 'els=>els.map(e=>e.src.slice(0,22))')
             check(all(s.startswith('data:image/') for s in srcs), f'{name}: photo images broken')
             g.click('[data-act=closeSub]')
@@ -1537,8 +1539,9 @@ def album_store_and_viewer_v181(b, port, target):
     data = json.load(open(dl.value.path()))
     check(len(data.get('photos', {})) == n and all(v.startswith('data:image/jpeg') for v in data['photos'].values()), 'the backup file carries every picture')
     # capacity
-    r = g.ev(r"""(()=>{for(let i=0;i<260;i++){S.day=100+i;albumAdd('nap3','data:image/jpeg;base64,/9j/x'+i,{})}const ord=albumList().filter(p=>!p.keep);return {ord:ord.length,keep:albumList().filter(p=>p.keep).length}})()""")
-    check(r['ord'] == 240 and r['keep'] >= 1, f'240 ordinary photos are kept, 珍藏 never counted: {r}')
+    r = g.ev(r"""(()=>{for(let i=0;i<260;i++){S.day=100+i;albumAdd('nap3','data:image/jpeg;base64,/9j/x'+i,{})}const ord=albumList().filter(p=>!p.keep&&!p.first);return {ord:ord.length,keep:albumList().filter(p=>p.keep).length,first:albumList().filter(p=>p.first).length}})()""")
+    # v2.4 rc7.5: the opening day's photo is kept apart from both — never rotated out, never counted
+    check(r['ord'] == 240 and r['keep'] >= 1 and r['first'] == 1, f'240 ordinary photos are kept, 珍藏 never counted, the first day\'s kept: {r}')
     check(not g.errors, g.errors)
     g.close()
     # a real V18 save (inline pictures): loads, migrates, keeps everything

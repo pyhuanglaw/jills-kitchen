@@ -1,0 +1,24 @@
+(Filed verbatim, 2026-10-03. The player's messages between rc7.4's release and rc7.5.)
+
+07:09  (answering the question in the rc7.4 release message: on a chef's night, the six at the bar eat Jill's set
+       menu — they came for the event, they are not ordering — and the rest of the Lounge orders drinks and bites as
+       before. Is that all right?)
+       可以 就是只有主廚之夜的來賓可以點餐廳的
+07:10  然後我一直覺得吧台人坐的太擠
+07:11  我如果買額外usage他每單位usage是max方案的幾倍價格？
+       (answered in the conversation: no official multiple — extra usage is billed at standard API rates, and the Max
+       plans' included usage is not published in tokens)
+07:11  你回答完就繼續做
+07:13  Dylan在書房的時候有辦法讓玩家看不出來他是Dylan嗎？就比較宅的樣子頭像一樣穿搭不同？不然揭曉前就知道了
+07:16  繼續
+
+The chef's night as proposed in the rc7.4 release message (06:58), and approved at 07:09 with the rule above:
+- Jill hosts it (the tastings are Ken's).
+- From Lounge II, once there is a signature dish; scheduled from the shop's Lounge page, never on a night of Ken's,
+  at most once a week; the day before, the news says 「明晚｜主廚之夜 · 6 席」.
+- That night the bar is for six who booked (eight at Lounge III was proposed; the bar now has six stools at every
+  level, 07:10), arriving around seven; three courses from what Jill does best — a starter, the signature, the
+  signature dessert (or her best dessert) — each with a glass; the kitchen cooks as always, the Lounge's waiter carries;
+  $1,800 a head, wine included.
+- The first one: a short scene at the start and when the last course is served (the restaurant held, a tap goes on);
+  later ones are not held.

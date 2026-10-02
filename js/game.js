@@ -1206,6 +1206,9 @@ const WARD_PAT={
  pin:(c,L,by)=>{c.fillStyle=L.vst||'#7F98B3';for(let x=-8.2;x<8.6;x+=2.1)c.fillRect(x,by,.55,17.5)},
  rugby:(c,L,by)=>{c.fillStyle=L.st||'#2C3A55';for(let y=by+3.4;y<by+17.5;y+=5.6)c.fillRect(-8.6,y,17.2,2.8)},
  yoke:(c,L,by,top)=>{const a=L.y1||'#2C3A55',b2=L.y2||'#B83A3A';c.fillStyle=a;c.fillRect(-8.6,by+2.4,17.2,.8);c.fillRect(-8.6,by+8.2,17.2,.8);for(let x=-8;x<8.6;x+=2.6){c.fillStyle=b2;c.beginPath();c.moveTo(x,by+7.6);c.lineTo(x+1.3,by+4.4);c.lineTo(x+2.6,by+7.6);c.closePath();c.fill();c.fillStyle=a;circ(c,x+1.3,by+3.8,.5)}c.fillStyle='rgba(0,0,0,.06)';for(let x=-7.7;x<8.6;x+=1.7)c.fillRect(x,by+9.4,.5,5.4)},
+ hoodie:(c,L,by,top)=>{/* rc7.5 (07:13): Dylan at home — the hood on the shoulders, the strings, the front pocket, the ribbed hem */const hd=L.hood||shade(top,-.12);c.fillStyle=hd;el(c,0,by+.6,7.6,3);c.fillStyle='rgba(255,255,255,.14)';el(c,-2.6,by+.2,3,1);
+  c.strokeStyle='#ECE8E1';c.lineWidth=.55;c.beginPath();c.moveTo(-1.7,by+2.6);c.lineTo(-2,by+7.4);c.moveTo(1.7,by+2.6);c.lineTo(2,by+7.4);c.stroke();c.fillStyle='#ECE8E1';circ(c,-2,by+7.6,.45);circ(c,2,by+7.6,.45);
+  c.fillStyle=shade(top,-.08);rr(c,-5.6,by+9.4,11.2,5.4,2);c.fill();c.strokeStyle='rgba(0,0,0,.2)';c.lineWidth=.45;c.beginPath();c.moveTo(-5.6,by+9.8);c.lineTo(-3.8,by+14.4);c.moveTo(5.6,by+9.8);c.lineTo(3.8,by+14.4);c.stroke();c.fillStyle=shade(top,-.16);c.fillRect(-8.6,by+15.3,17.2,2.2)},
  tweed:(c,L,by,top)=>{let sd=hash(top+(L.trim||'')+(L.tw||[]).join(''))||7;const rn=()=>(sd=(Math.imul(sd^(sd>>>15),2246822519)+1013904223)>>>0)/4294967296;const T=L.tw||['#FFF'];for(let i=0;i<54;i++){c.fillStyle=T[i%T.length];c.fillRect(-8.4+rn()*16.8,by+rn()*17.2,.7,.7)}
   if(L.trim){c.strokeStyle=L.trim;c.lineWidth=.9;c.beginPath();c.moveTo(0,by+2.6);c.lineTo(0,by+17.5);c.moveTo(-8.6,by+16.9);c.lineTo(8.6,by+16.9);c.stroke();c.fillStyle=L.trim;for(let y=by+5.5;y<by+16;y+=3.6)circ(c,1.4,y,.5)}}};
 function wardRng(seed){let a=seed>>>0||1;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
@@ -2316,7 +2319,8 @@ const LG={get piano(){return{x:326,y:404+DY*.62}},door:{x:66,y:104},arch:{x:44,y
 function loungeLv(){return(S.rooms&&S.rooms.lounge)||0}
 function loungeStaffed(){return loungeLv()>0&&(S.crew||[]).some(m=>m.role==='bartender'&&m.duty==='lbar')}
 function loungeOpenTonight(){return loungeLv()>0&&loungeStaffed()}
-function loungeSeatDefs(){const lv=loungeLv();if(!lv)return[];const out=[];const n=lv>=2?8:6;const x0=lv>=2?200:214,step=lv>=2?23:28;/* keeps the last stool inside the 336-wide phone view (x ≤ 374) */for(let k=0;k<n;k++)out.push({x:x0+k*step,y:LG.bar.y+66,seats:1,kind:'bar'});
+function loungeSeatDefs(){const lv=loungeLv();if(!lv)return[];const out=[];/* rc7.5 (the player, 07:10 「我一直覺得吧台人坐的太擠」): six stools at every level, a hand's width between two people (the
+   last inside the 336-wide phone view, x ≤ 374); Lounge II used to squeeze eight onto the same counter, shoulder to shoulder */const n=6,x0=205,step=30;for(let k=0;k<n;k++)out.push({x:x0+k*step,y:LG.bar.y+66,seats:1,kind:'bar'});
  out.push({x:96,y:262+DY*.3,seats:2,kind:'small'},{x:96,y:352+DY*.6,seats:2,kind:'small'},{x:200,y:352+DY*.6,seats:2,kind:'small'});
  if(lv>=2){const s=LG.sofa;out.push({x:200,y:262+DY*.3,seats:2,kind:'small'},{x:s.x,y:s.y,seats:4,kind:'sofa'})}
  if(lv>=3){const q=LG.quiet;out.push({x:q.x,y:q.y,seats:2,kind:'quiet'})}return out}
@@ -2548,7 +2552,7 @@ function loungeProjectReveal(){factSet('lounge_project');S.loungeProj=S.loungePr
 function loungeGo(k){S.loungeProj=S.loungeProj||{revealed:S.day};S.loungeProj.state=k==='plan'?'planned':'deferred';S.loungeProj.at=S.day;hideScreen();sub=null;if(R)paused=false;noteLine(k==='plan'?'Lounge 列進了店鋪工程。':'Lounge 先放著。工程頁裡隨時找得到。');save()}
 const LOUNGE_PROJ=[
  {lv:1,n:'Lounge I — 小酒吧',cost:120000,need:4,d:'打開後面那一間：一段吧台、六個吧台位、三張小桌、一面放酒的牆。要有一位調酒師才開得了；開了以後，吃完飯的人可以留下來，等位子的人可以先坐吧台。Lounge 的人有自己的名單：Evan 和沈晴（調酒師），不佔餐廳的名額。',done:'吧台的燈亮了。牆上有酒，桌上有杯子——後面那間現在叫 Lounge。',jill:'讓人吃完飯以後，還有地方可以坐。',unlock:['Lounge 名單：Evan、沈晴（員工 › Lounge 名單）','Lounge 外場（工作分配）','Lounge 的小食（菜單）']},
- {lv:2,n:'Lounge II — 酒吧沙發廳',cost:160000,need:4,d:'吧台加長到八個位子，多一張小桌、一組四人沙發；一座有燈的酒櫃，酒單全開（五種）。Lounge 名單多三位：阿拓（Bar Food 料理員，在廚房）、安安（Lounge 外場）、許葳（Lounge 清潔）。',done:'吧台加長了，沙發進來了。酒櫃的燈在牆上亮著。',jill:'現在像個真的晚上了。',unlock:['Lounge 名單：阿拓、安安、許葳','四人沙發座','酒單五種']},
+ {lv:2,n:'Lounge II — 酒吧沙發廳',cost:160000,need:4,d:'多一張小桌、一組四人沙發；一座有燈的酒櫃，酒單全開（五種）。Lounge 名單多三位：阿拓（Bar Food 料理員，在廚房）、安安（Lounge 外場）、許葳（Lounge 清潔）。',done:'吧台加長了，沙發進來了。酒櫃的燈在牆上亮著。',jill:'現在像個真的晚上了。',unlock:['Lounge 名單：阿拓、安安、許葳','四人沙發座','酒單五種']},
  {lv:3,n:'Lounge III — 安靜的角落',cost:220000,need:5,d:'最裡面隔出一個安靜的角落：兩張扶手椅、一盞落地燈；酒牆多一層；適合說話的位子。',done:'角落的燈亮了。有人會在那裡坐到很晚。',jill:'留一個地方給說話的人。',unlock:['安靜角落（兩位）','酒牆第三層']},
 ];
 function loungeNext(){const lv=loungeLv();return LOUNGE_PROJ.find(p=>p.lv===lv+1)||null}
@@ -3379,7 +3383,7 @@ V24_WANTS.push(()=>{const out=[];if(!loungeOpenTonight()||!fact('ken_du_argue')|
    arrives: 「晚餐之後」, JILL'S KITCHEN × KEN, on the list for good (ken_wine). Days later Monsieur 杜 orders it (du_wine,
    the friendship line's payoff: they still disagree, and he says it is good). All of these hold the restaurant (SH_HOLD).
    After the third, Ken's tasting night comes back every week or two, in the room, unheld; nobody else holds a tasting.
-   A tasting night: the news says 「今晚｜Ken 的品酒夜 · 8 席」 (the day before, 「明晚」); the bar's stools are for the
+   A tasting night: the news says 「今晚｜Ken 的品酒夜 · 6 席」 (the bar's six stools; the day before, 「明晚」); the bar's stools are for the
    people who came for it; Ken stands behind the bar with a glass, the glasses are set out on the counter, a small board
    stands by the bar; the guests take two or three of tonight's wines and a bite; Ken stays until the last of them leaves.
    A save whose Lounge was open well before this existed (the player's Day 74) skips his first look and begins at the
@@ -3394,7 +3398,7 @@ function kenPost(){const d=loungeDoneDay();return loungeLv()>=1&&d!=null&&S.day>
 function kenQuiet(){return !KEN_KEYS.some(k=>{const f=fact(k);return f&&f.d===S.day})}   /* one Ken scene a day */
 function kenInLounge(ctx){return !!(ctx&&ctx.g&&namedId(ctx.g)===KEN&&!ctx.g.kenHost&&ctx.g.table!=null&&R.tables[ctx.g.table]&&R.tables[ctx.g.table].room==='lounge')}
 function kenNightToday(){const n=kenS().next;return !!(n&&n.d<=S.day)}
-function kenSeats(){return loungeLv()>=2?8:6}
+function kenSeats(){return 6}   /* rc7.5: the bar's six stools (07:10) */
 function kenLoungeDue(){return kenPost()&&!kenLegacy()&&!fact('ken_lounge')&&!fact('ken_propose')}
 function kenProposeDue(){if(fact('ken_propose')||!kenPost())return false;if(kenLegacy())return S.day>kenS().first;const f=fact('ken_lounge');return !!f&&S.day-f.d>=2}
 function kenSamplesDue(){return !!fact('ken_collab')&&!fact('ken_samples')&&S.day>=(kenS().samples||0)}
@@ -7748,7 +7752,7 @@ function drawHomeDesk(c,now,d){const D=HM.desk;const x0=D.x0,x1=D.x1,w=x1-x0;con
 /* the chair at the desk and, when he is there, Dylan at it — from behind: the dark hair, the headphones, the cardigan */
 function drawHomeChairAndDylan(c,now){const C=HM.chair;const D=LIFE.dylan;const at=homeDylanAtDesk();
  srShadow(c,C.x,C.y+1,12,2.6,.14);
- if(at)drawPersonBack(c,C.x,C.y-6,DYLAN.looks[0],{headphones:true,bob:Math.sin(now*1.3)*.25,turn:at.turn||0});
+ if(at)drawPersonBack(c,C.x,C.y-6,DYLAN_HOME,{headphones:true,bob:Math.sin(now*1.3)*.25,turn:at.turn||0});
  /* the chair back, in front of him: pale oak with an oatmeal cushion */
  srOak(c,C.x-11,C.y-20,22,4,SRC.oakHi,true);c.fillStyle=SRC.oat;rr(c,C.x-10,C.y-17,20,9,3);c.fill();c.strokeStyle=SRC.edge;c.lineWidth=.5;c.stroke();
  for(const lx of[C.x-10,C.x+8])srOak(c,lx,C.y-8,2.4,9,SRC.oakMid)}
@@ -7905,6 +7909,7 @@ function drawHomeSay(c){for(const s0 of HOME_SAY){const a=s0.t<.2?s0.t/.2:s0.t>s
 /* someone seen from behind, seated (Dylan at his desk): the same proportions as drawPerson's seated figure */
 function drawPersonBack(c,x,y,L,o){o=o||{};const s=(o.s||1)*PSC;c.save();c.translate(x,y);c.scale(s,s);const OL='rgba(60,34,22,.5)';const bob=o.bob||0;const base=-4,hy=base-25+bob,by=base-17+bob;
  const top=L.pat==='cardi'&&L.top2?L.top2:L.top;c.fillStyle=top;c.strokeStyle=OL;c.lineWidth=.6;rr(c,-11,by,22,17,6);c.fill();c.stroke();c.fillStyle='rgba(0,0,0,.08)';c.fillRect(-.4,by+2,.8,14);
+ if(L.hood){/* a hoodie: the hood down his back */c.fillStyle=L.hood;rr(c,-8,by-2,16,12,5.5);c.fill();c.stroke();c.fillStyle='rgba(0,0,0,.1)';el(c,0,by+6.4,4.6,2.4);c.fillStyle=shade(L.top,-.16);c.fillRect(-11,by+14.6,22,2.2)}
  c.fillStyle=shade(L.skin,-.05);rr(c,-3,hy+8,6,5,2);c.fill();
  const hair=L.hair;c.fillStyle=hair;el(c,(o.turn||0)*1.2,hy,11.2,11);c.stroke();c.fillStyle=shade(hair,.25);el(c,-3+(o.turn||0),hy-5,4,2.2);c.fillStyle=shade(hair,-.2);rr(c,-8,hy+4,16,5,3);c.fill();
  c.fillStyle=L.skin;el(c,-11.2,hy+1.5,1.8,2.6);el(c,11.2,hy+1.5,1.8,2.6);
@@ -7919,6 +7924,12 @@ function homeDylanAtDesk(){const D=LIFE.dylan;if(D)return(D.room||'main')==='hom
 const DYLAN={id:'dylan',n:'Dylan',type:'regular',size:1,fav:['signature'],looks:[{skin:'#EDC19C',hair:'#1A1614',hs:9,top:'#F6F3EC',pat:'cardi',top2:'#1F2A45',acc:'watch',pants:'#2E2D36'}],/* v2.2 Q+: the portrait's look — short dark hair with a straight fringe (style 9 is his alone), navy cardigan over a white tee, a watch */
  who:'一個人來，話不多。喜歡坐看得到廚房的位子。',who2:'Jill 的先生。結婚 11 年。跟 Jill 住在廚房後面的房間，不在店裡的時候多半在書桌前念書。打烊以後，有時候會在店裡多坐一會兒——然後隔天再追一次。'};
 REG_BY.dylan=DYLAN;
+/* rc7.5 (the player, 07:13 「Dylan在書房的時候有辦法讓玩家看不出來他是Dylan嗎？就比較宅的樣子頭像一樣穿搭不同？不然揭曉前就知道了」):
+   at home he is in home clothes — a soft grey hoodie, grey sweatpants, his reading glasses. The same face and hair as his
+   portrait, not the navy cardigan over the white tee that the restaurant knows him by: before the reveal, a player who
+   looks in finds someone studying at the desk, not the regular from the dining room. Everywhere in Jill's room (the desk,
+   the sofa, walking about); in the dining room he is the guest he always was. */
+const DYLAN_HOME=Object.assign({},DYLAN.looks[0],{top:'#A4A8AD',pat:'hoodie',top2:null,hood:'#8E9297',acc:'glasses',pants:'#4A4E56'});
 const LIFE={day:0,plan:null,t:0,jill:null,tv:null,dylan:null,say:[],revealRoll:0};
 function lifeReset(){LIFE.day=0;LIFE.plan=null;LIFE.t=0;LIFE.revealRoll=0;LIFE.say=[];LIFE.dylan=null;
  LIFE.jill={on:false,pos:null,x:PASS.x,y:PASS.y,face:1,step:0,legs:0,legTarget:0,act:null,last:null,t:0,flipT:0,flip:0,gazeT:0,gazeX:0,settleT:32,bobT:0,catNew:0,sinceSit:0,walking:false,tx:0,ty:0,via:null,after:null,sitT:0,petCat:null,counted:false};
@@ -8225,7 +8236,7 @@ function drawSofaGroup(c,now){drawSofaBody(c);const L=LIFE.jill,D=LIFE.dylan;con
   /* her face after hours: amused when he is doing his act, warm when a cat or he has her attention, tired-but-content early in the evening, otherwise soft */
   const expr=LIFE.say.some(q=>q.who==='d'&&q.t>=0&&q.t<q.life)?'amused':(L.gazeT>0||L.act==='pet')?'smile':(LIFE.t<25&&L.sinceSit<25)?'tired':'soft';
   drawPerson(c,L.x,SOFA.jy,JILL_LOOK,{jill:true,me:true,seated:true,s:1.1,bob,mood:'happy',expr,flip,blink:Math.sin(now*1.7)>.985,hat:!!L.hat,lounge:{legs:L.legs,len:(10+L.legs*32)/(1.1*PSC)},hold:L.act==='read'||(L.act==='wantTV'&&L.last==='read')?'reader':null,flipPage:L.flip>0,gaze})}
- if(D&&D.onSofa){const flip=D.face<0;const look=D.act==='tv'&&tv.on?tv.x:(D.gazeT>0?L.x:null);drawPerson(c,D.x,SOFA.jy,DYLAN.looks[0],{seated:true,mood:'happy',flip,blink:Math.sin(now*1.3+2)>.975,lounge:{legs:0},hold:D.phone?'phone':null,gaze:look!=null?{x:(look>=D.x?1:-1)*(flip?-1:1),y:D.act==='phone'?.5:.2}:(D.act==='phone'?{x:0,y:.6}:null)})}
+ if(D&&D.onSofa){const flip=D.face<0;const look=D.act==='tv'&&tv.on?tv.x:(D.gazeT>0?L.x:null);drawPerson(c,D.x,SOFA.jy,DYLAN_HOME,{seated:true,mood:'happy',flip,blink:Math.sin(now*1.3+2)>.975,lounge:{legs:0},hold:D.phone?'phone':null,gaze:look!=null?{x:(look>=D.x?1:-1)*(flip?-1:1),y:D.act==='phone'?.5:.2}:(D.act==='phone'?{x:0,y:.6}:null)})}
  for(const k of byKind('lap'))drawCat(c,k,now);for(const k of byKind('seat'))drawCat(c,k,now);for(const k of byKind('arm'))drawCat(c,k,now);
  if(L.on&&L.act==='pet'&&L.petCat&&L.petCat.sofa){const p=L.petCat;c.fillStyle=JILL_LOOK.skin;circ(c,p.x+(p.x<L.x?5:-5),p.y-9,2.6);c.fillStyle='rgba(60,34,22,.35)';c.beginPath();c.arc(p.x+(p.x<L.x?5:-5),p.y-9,2.6,0,7);c.stroke()}}
 function drawTV(c,tv,now){const {x,y}=tv;const dir=tv.face;const roll=tv.at==='moving'?Math.sin(tv.step)*.6:0;
@@ -8239,7 +8250,7 @@ function drawTV(c,tv,now){const {x,y}=tv;const dir=tv.face;const roll=tv.at==='m
  c.restore();
  if(tv.on){c.save();c.globalCompositeOperation='lighter';let g=c.createRadialGradient(x+dir*22,y-14,4,x+dir*22,y-14,56);g.addColorStop(0,'rgba(150,190,255,.16)');g.addColorStop(1,'rgba(150,190,255,0)');c.fillStyle=g;c.fillRect(x-64,y-72,128,92);c.restore()}}
 function drawDylanFree(c,D,now){const stp=D.moving?Math.sin(D.step):0;const crouch=D.state==='crouch';
- drawPerson(c,D.x,D.y,DYLAN.looks[0],{step:stp,bob:D.moving?Math.abs(stp)*-.8:Math.sin(now*1.5)*.3,mood:'happy',flip:D.face<0,seated:crouch,s:crouch?.95:1,hold:!D.moving&&D.phone&&D.state==='stand'?'phone':null,blink:Math.sin(now*1.3+2)>.975,lounge:crouch?{legs:0}:null});
+ drawPerson(c,D.x,D.y,(D.room||'main')==='home'?DYLAN_HOME:DYLAN.looks[0],{step:stp,bob:D.moving?Math.abs(stp)*-.8:Math.sin(now*1.5)*.3,mood:'happy',flip:D.face<0,seated:crouch,s:crouch?.95:1,hold:!D.moving&&D.phone&&D.state==='stand'?'phone':null,blink:Math.sin(now*1.3+2)>.975,lounge:crouch?{legs:0}:null});
  if(D.carry){c.fillStyle='#fff';el(c,D.x+(D.face<0?-9:9),D.y-34,6.5,4.2);el(c,D.x+(D.face<0?-9:9),D.y-36.5,6.5,4.2)}}
 function drawSay(c,rm){for(const s of LIFE.say){if(s.t<0||(s.room||'main')!==(rm||'main'))continue;const a=s.t<.2?s.t/.2:s.t>s.life-.4?(s.life-s.t)/.4:1;c.globalAlpha=Math.max(0,a);c.font=`700 6.5px ${FONT}`;const w=c.measureText(s.txt).width+10;c.fillStyle='#FFFDF7';rr(c,s.x-w/2,s.y-8,w,12,6);c.fill();c.beginPath();c.moveTo(s.x-2.5,s.y+4);c.lineTo(s.x+2.5,s.y+4);c.lineTo(s.x,s.y+7.5);c.fill();c.fillStyle='#2E2019';c.textAlign='center';c.textBaseline='middle';c.fillText(s.txt,s.x,s.y-1.6);c.textBaseline='alphabetic';c.globalAlpha=1}}
 
@@ -8564,7 +8575,7 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
   ['在哪裡看','商店的「招牌菜」分頁；日誌的「熟練度」也有它們。']]},
  {ic:'🍷',h:'Lounge：留下來的地方',sum:'主廳是吃飯，側廳是聚餐，Lounge 是留下來。不是升級選單裡冒出來的——是 Ken 先嫌沒有酒，才有的。',pts:[
   ['怎麼來的','品酒師 Ken 來過幾次以後會問「妳真的完全不賣酒？」，之後會一直提搭配（Monsieur 杜在的話會跟他吵）；別的客人也會問附近有沒有地方再喝一杯。夠多了以後，會有一個試酒的晚上，Jill 打烊後想到：讓人吃完飯以後，還有地方可以坐。企劃就出現在「店鋪工程」，選「之後再說」也不會不見。'],
-  ['Lounge I／II／III','I：吧台六個位子、三張小桌、一面酒牆（三種酒）。II：吧台八個位子、四人沙發、有燈的酒櫃（五種酒），Lounge 名單多阿拓、安安、許葳。III：最裡面一個安靜的角落。'],
+  ['Lounge I／II／III','I：吧台六個位子（坐得開，不會肩碰肩）、三張小桌、一面酒牆（三種酒）。II：多一張小桌、四人沙發、有燈的酒櫃（五種酒），Lounge 名單多阿拓、安安、許葳。III：最裡面一個安靜的角落。'],
   ['安安','來的時候就是 LV2，排在「Lounge 外場」：先顧 Lounge 的桌子（點單、上菜、結帳），Lounge 沒事的時候才去主廳幫忙。Lounge 的小點還是餐廳的廚師在廚房做，做好了由她送過去；她今天在的話，別的服務生和出菜口的「送菜」都不會去送 Lounge 的小點。'],
   ['要有調酒師','沒有人站吧台，Lounge 那晚不開。調酒師倒酒，也負責把酒送到吧台和小桌；點單、結帳、送小食由有「Lounge 外場」職責的服務生做——沒有人負責的部分，調酒師自己來。'],
   ['客人怎麼用','客滿的時候，等桌的人會先坐吧台喝一杯，位子好了再過去（帳是分開的，不會多算一次來店）；吃完飯的人有些會留下來再喝一杯；也有人晚一點專程來。主廳、側廳的桌上從此也會點酒——由調酒師倒、服務生端。'],
@@ -8576,7 +8587,7 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
   ['今晚倒哪幾種','開店前，「今日菜單」下面有「Lounge 酒單」：每一種酒都可以開或關，至少留一種；Lounge 的客人只會點今晚有倒的。酒吧小點在上面的菜單裡，不佔菜單名額，名額旁邊會寫「＋ 酒吧小點 幾道（不佔名額）」。'],
   ['品酒課','員工頁每位服務生的卡片上（有 Lounge 以後）：$12,000，上完對酒就「自在」了。外場懂酒的人多，主廳、側廳吃飯的客人更常點一杯。'],
   ['Lounge 的人怎麼升級','Lounge 名單上的人是在店裡邊做邊學的：訓練升級一天最多一級，先讓他上一天班再說。'],
-  ['Ken 的品酒夜','Lounge 開了以後，Ken 會回來坐坐，然後提議在吧台辦小型的品酒夜——品酒會只有 Ken 辦。辦的那天，開店前的新聞會寫「今晚｜Ken 的品酒夜 · 8 席」（Lounge I 是 6 席），前一天先寫「明晚」。那一晚吧台的位子留給品酒的客人：Ken 站在吧台後面主持，吧台上排著杯子，吧台旁邊立著小黑板；品酒的客人每人點兩三杯今晚的酒和一份小食，Ken 會待到最後一位走了才走。前三次是故事（店裡暫停，點一下繼續）；之後每一兩個禮拜他會再辦一次，不用你安排。Lounge 那晚沒有人站吧台的話，改到有人站吧台的那天。'],
+  ['Ken 的品酒夜','Lounge 開了以後，Ken 會回來坐坐，然後提議在吧台辦小型的品酒夜——品酒會只有 Ken 辦。辦的那天，開店前的新聞會寫「今晚｜Ken 的品酒夜 · 6 席」，前一天先寫「明晚」。那一晚吧台的位子留給品酒的客人：Ken 站在吧台後面主持，吧台上排著杯子，吧台旁邊立著小黑板；品酒的客人每人點兩三杯今晚的酒和一份小食，Ken 會待到最後一位走了才走。前三次是故事（店裡暫停，點一下繼續）；之後每一兩個禮拜他會再辦一次，不用你安排。Lounge 那晚沒有人站吧台的話，改到有人站吧台的那天。'],
   ['鋼琴與予安','鋼琴買來以後，一開始沒有人彈。過一陣子，一位常來 Lounge 的客人——予安——會成為固定的鋼琴師：一個禮拜彈三個晚上。那幾晚開店前的新聞會寫「今晚｜予安在 Lounge 彈琴」，吃完飯留下來的人比較多；每晚付她演奏費 $2,500，結算會列一行「鋼琴演奏」。她不彈的晚上，鋼琴就安靜地放著。'],
   ['晚餐之後','Ken 辦過三次品酒夜以後，會和 Jill 一起做一支酒：「晚餐之後」（JILL\'S KITCHEN × KEN），一支輕盈的紅酒，配 Jill 的招牌菜。酒進來以後就一直在 Lounge 的酒單上，一杯大約 $420；不用研發，也可以在「Lounge 酒單」關掉。'],
   ['帳','結算的晚上會寫「Lounge 幾桌・營業額・吃完留下幾組」。營業額是 Lounge 那幾桌付的錢，不含小費，跟下面「Lounge 今天賣了什麼」的合計一樣；Lounge 的小費另外一行，晚餐桌上配的酒也另外一行。員工那一欄寫調酒師調了幾杯。']]},

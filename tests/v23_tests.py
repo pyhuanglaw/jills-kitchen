@@ -369,7 +369,7 @@ def staff_learn_places_coarsely_and_veterans_stay_useful(b, port, target):
     check(g.ev("OPS.find(o=>o.k==='pantry').need()") is True, 'at III it is offered')
     g.ev("(()=>{const b=document.createElement('button');b.dataset.k='pantry';doAct('buyOps',null,'pantry',b)})()")
     check(g.ev("opsLv('pantry')") == 1 and g.ev("stoveSlots(S.eq.stove)") == n0 + 1, 'the pantry adds a burner')
-    check(g.ev("loungeSeatDefs().some(d=>d.kind==='quiet')&&loungeSeatDefs().some(d=>d.kind==='sofa')&&loungeSeatDefs().filter(d=>d.kind==='bar').length===8"), 'Lounge III: eight stools, a sofa, the quiet corner')
+    check(g.ev("loungeSeatDefs().some(d=>d.kind==='quiet')&&loungeSeatDefs().some(d=>d.kind==='sofa')&&loungeSeatDefs().filter(d=>d.kind==='bar').length===6"), 'Lounge III: six stools (rc7.5, 07:10: the bar was too crowded with eight), a sofa, the quiet corner')
     check(not g.errors, g.errors[:3]); g.close()
 
 P7_HELPERS = r"""

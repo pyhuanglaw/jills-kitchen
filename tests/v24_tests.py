@@ -2405,9 +2405,9 @@ def v24_rc7_ken_comes_back_and_proposes_a_tasting(b, port, target):
     check(not any(k in txt for k in ('終於完成', '這裡真的很棒', '實現夢想')), 'no congratulation')
     # the news: the day before, and the day
     g.ev("kenS().next.d=S.day+1")
-    check('明晚｜Ken 的品酒夜 · 8 席' in g.ev("kenNewsHTML()"), 'the day before: 明晚｜Ken 的品酒夜 · 8 席')
+    check('明晚｜Ken 的品酒夜 · 6 席' in g.ev("kenNewsHTML()"), 'the day before: 明晚｜Ken 的品酒夜 · 6 席')
     g.ev("kenS().next.d=S.day")
-    check('今晚｜Ken 的品酒夜 · 8 席' in g.ev("kenNewsHTML()"), 'the day: 今晚｜Ken 的品酒夜 · 8 席')
+    check('今晚｜Ken 的品酒夜 · 6 席' in g.ev("kenNewsHTML()"), 'the day: 今晚｜Ken 的品酒夜 · 6 席')
     # a Lounge just finished: his first look first
     g.ev("delete story().facts.ken_propose;delete story().ev.ken_propose;delete (story().beatLines||{}).ken_propose;kenS().next=null;kenS().first=S.day;story().facts.lounge_built_1={d:S.day-1,n:1,l:S.day-1};const d=storyDay();d.major=0;d.lp={};d.seen={};for(const q of R.groups.slice())if(namedId(q)===KEN){leaveGroup(q,'ok');q.gone=true}R.groups=R.groups.filter(q=>!q.gone)")
     check(g.ev("kenLegacy()") is False and g.ev("kenLoungeDue()") is True and g.ev("kenProposeDue()") is False, 'a Lounge finished yesterday: his first look is due, the proposal is not')
@@ -2433,7 +2433,7 @@ def v24_rc7_ken_hosts_his_tasting_nights(b, port, target):
     g = Game(b, port, target, seed=1533, manual=True, viewport={'width': 390, 'height': 844})
     load_save(g, 'player_day74_1508.json')
     g.ev("factSet('ken_propose');kenS().next={d:S.day,n:1};kenS().back=[];showPrep()")
-    check('今晚｜Ken 的品酒夜 · 8 席' in g.ev("$('#screen').innerText"), 'the news before opening')
+    check('今晚｜Ken 的品酒夜 · 6 席' in g.ev("$('#screen').innerText"), 'the news before opening')
     check(g.ev("!!fact('ken_collab')") is False and g.ev("kenSamplesDue()") is False, 'no talk of a wine before three nights')
     to_service(g)
     g.ev("window.__noScenes=false;window.__holds=true")
