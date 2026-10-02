@@ -2182,9 +2182,15 @@ def the_street_has_passers_by_and_some_walk_in(b, port, target):
         if st['walkins'] >= 1 and seen['veh'] and seen['look']: break
     check(seen['walk'] > 0 and seen['look'] > 0 and seen['veh'] > 0, f'the street stayed empty: {seen}')
     # a walk-in: force one from a looker and check the bookkeeping
-    r = g.ev(r"""(()=>{const si=R.si;const o=R.sched[si];if(!o)return{no:1};o.reg=null;o.forSig=false;o.t=R.t+5;R.groups=R.groups.filter(q=>q.state!=='arrive'&&q.state!=='queue');
-      STREET.ppl=[];streetSpawn();const w=STREET.ppl[0];w.x=110;w.y=350;w.st='look';w.t=99;w.dur=1;let ok=false;for(let k=0;k<12&&!ok;k++){Math.random=(()=>{let n=0;return()=>[.1,.1,.1,.1][n++%4]})();ok=streetJoin(w)}
-      const g=R.groups[R.groups.length-1];return{no:0,ok,si:R.si-si,walkIn:g&&g.walkIn,x:g&&Math.round(g.x),y:g&&Math.round(g.y),room:g&&g.room,st:g&&g.state}})()""")
+    # (v2.4 rc7: the party a passer-by may take is a stranger's — the next one on this day's list is often a regular with
+    #  their own looks, so the fixture makes it a stranger's; a party with its own looks or a named guest's is first
+    #  checked to be refused: they walk in as themselves, never with a passer-by's face — Ken had a stranger's)
+    r = g.ev(r"""(()=>{const si=R.si;const o=R.sched[si];if(!o)return{no:1};o.reg=null;o.regs=null;o.forSig=false;o.hold=0;o.kenHost=false;o.t=R.t+5;R.groups=R.groups.filter(q=>q.state!=='arrive'&&q.state!=='queue');
+      STREET.ppl=[];streetSpawn();const w=STREET.ppl[0];w.x=110;w.y=350;w.st='look';w.t=99;w.dur=1;const lo=()=>{Math.random=(()=>{let n=0;return()=>[.1,.1,.1,.1][n++%4]})()};
+      o.looks=o.looks||makeLooks(o.type||'office',o.size||1);o.name=null;lo();const own=streetJoin(w);o.looks=null;o.name='Madame Lin';lo();const named=streetJoin(w);o.name=null;
+      let ok=false;for(let k=0;k<12&&!ok;k++){lo();ok=streetJoin(w)}
+      const g=R.groups[R.groups.length-1];return{no:0,own,named,ok,si:R.si-si,walkIn:g&&g.walkIn,x:g&&Math.round(g.x),y:g&&Math.round(g.y),room:g&&g.room,st:g&&g.state}})()""")
+    check(r.get('no') == 0 and r['own'] is False and r['named'] is False, f'a party with its own looks or a named guest is never taken by a passer-by: {r}')
     check(r.get('no') == 0 and r['ok'] and r['si'] == 1 and r['walkIn'] == 1 and r['x'] == 110 and r['y'] == 350 and r['room'] == 'front' and r['st'] == 'arrive', f'the walk-in should replace the next scheduled party and start on the pavement: {r}')
     g.page.evaluate('()=>window.__play(200,0)')
     check(g.ev("R.groups.some(q=>q.walkIn&&(q.table!=null||q.state==='queue'))||R.st.guests>0"), 'the walk-in never got in')
@@ -3538,7 +3544,7 @@ def outdoor_area_is_a_project_and_its_tables_are_furniture_and_the_dog_rests_out
     check(d1 and d1.get('nook') and abs(d1['x'] - (nk['x'] + 2)) < 1 and abs(d1['y'] - (nk['y'] + 20)) < 1 and d1['rest'] > 1.5, f'with the nook the dog lies on the cushion: {d1} {nk}')
     check(g.ev("(R.log||[]).some(l=>(l.t||'').includes('休息角'))"), 'the log noticed the dog settling in')
     # a walker with a dog is likelier to come in with the nook (the same roll)
-    r = json.loads(g.ev("(()=>{const w={x:100,y:350,dir:1,v:30,looks:makeLooks('office',1),type:'office',n:1,walk:0,st:'look',t:0,dur:0,seed:1,dog:true,dogCol:'#C9A063',umb:null,stopX:null,bub:0};const mr=Math.random;const si=R.si;R.si=Math.max(0,Math.min(R.si,R.sched.length-1));const o=R.sched[R.si];const keep=Object.assign({},o);Object.assign(o,{t:R.t,reg:null,forSig:false,hold:0});/* v2.4 rc6: the next arrival may be a story's pair, held for them (Sophie and Mia, 10:05) — the roll is about any walk-in */Math.random=()=>.7;let a,b2;try{S.ext.dognook=0;a=streetJoin(w);R.si=si;S.ext.dognook=1;b2=streetJoin(w)}finally{Math.random=mr;Object.assign(o,keep)}return JSON.stringify({without:a,with_:b2})})()"))
+    r = json.loads(g.ev("(()=>{const w={x:100,y:350,dir:1,v:30,looks:makeLooks('office',1),type:'office',n:1,walk:0,st:'look',t:0,dur:0,seed:1,dog:true,dogCol:'#C9A063',umb:null,stopX:null,bub:0};const mr=Math.random;const si=R.si;R.si=Math.max(0,Math.min(R.si,R.sched.length-1));const o=R.sched[R.si];const keep=Object.assign({},o);Object.assign(o,{t:R.t,reg:null,regs:null,forSig:false,hold:0,kenHost:false,looks:null,name:null});/* v2.4 rc6: the next arrival may be a story's pair, held for them (Sophie and Mia, 10:05) — the roll is about any walk-in. rc7: nor a regular's or a named guest's party (they walk in as themselves) */Math.random=()=>.7;let a,b2;try{S.ext.dognook=0;a=streetJoin(w);R.si=si;S.ext.dognook=1;b2=streetJoin(w)}finally{Math.random=mr;Object.assign(o,keep)}return JSON.stringify({without:a,with_:b2})})()"))
     check(r['without'] is False and r['with_'] is True, f'the roll that turns a dog walker away without the nook lets them in with it: {r}')
     check(not g.errors, g.errors[:2])
     g.close()
