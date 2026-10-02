@@ -696,6 +696,8 @@ html.desk button,html.desk [data-act],html.desk .polaroid{cursor:pointer}
 .schap .chap.focus{box-shadow:0 0 0 2px #C99A45;border-radius:8px;padding:8px 6px}
 /* rc7.2 (22:39): 🎲 隨機選菜單 above today's menu */
 .mrand{display:flex;align-items:center;gap:8px;margin:2px 0 8px}.mrand .btn{flex:none;white-space:nowrap}.mrand small{color:var(--ink2);font-size:11.5px;line-height:1.35}
+/* rc7.2 (23:46): the rate a table pays, in the ticket's top line */
+.tk-h .tk-off{align-self:center;flex:none;height:13px;padding:0 4px;border-radius:6px;background:#F3E3C0;color:#7A5A22;font-size:9px;font-weight:800;line-height:13px;letter-spacing:.02em}
 /* rc7.3 (15:02, 22:09): a post with its picture and its likes */
 .posts{display:flex;flex-direction:column;gap:10px}
 .post{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 10px 8px}

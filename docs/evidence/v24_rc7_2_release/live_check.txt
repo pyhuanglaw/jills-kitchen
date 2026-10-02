@@ -1,0 +1,17 @@
+v2.4-rc7.2: the page built from the tag (6405135 bytes, sha256 0c9084642ffc) is inside the live HTML (6405687 bytes) byte for byte, js/game.js once; the host adds 552 bytes (its document skeleton)
+01_title.png: the title with the save: DAY 74, 繼續營業 · 21:48 (the save was made during the evening) | {"phase":"title","day":74,"t":null,"room":"main"}
+02_resumed.png: 繼續營業: the evening resumed where the save stopped (21:48) | {"phase":"service","day":74,"t":"107%","room":"main"}
+03_main.png: the dining room | {"phase":"service","day":74,"t":"107%","room":"main"}
+04_side.png: the side room (the stair door at the near edge) | {"phase":"service","day":74,"t":"108%","room":"side"}
+05_front.png: the street | {"phase":"service","day":74,"t":"108%","room":"front"}
+06_lounge.png: the Lounge | {"phase":"service","day":74,"t":"109%","room":"lounge"}
+07_kitchen.png: the kitchen | {"phase":"service","day":74,"t":"109%","room":"kitchen"}
+08_summary.png: the day's summary | {"phase":"summary","day":74,"t":null,"room":"kitchen"}
+the summary's 今天的故事: (none today)
+the staff page: 餐廳員工 14/14 人・Lounge 員工 5/5 人・每日薪資 $29,360。餐廳的人數到頂了。 Lounge 的人是固定的名單，名額跟餐廳分開算。
+09_staff.png: the shop, the staff page: two numbers | {"phase":"shop","day":74,"t":null,"room":"kitchen"}
+10_prep_next_day.png: the next day's prep (Day 75) | {"phase":"prep","day":75,"t":null,"room":"main"}
+restock on Day 75: $220,697 → $195,033
+after the reload the money is still $195,033: the restock was saved
+11_after_reload.png: the page reloaded: the title keeps DAY 75 | {"phase":"title","day":75,"t":null,"room":"main"}
+page errors: none (0)
