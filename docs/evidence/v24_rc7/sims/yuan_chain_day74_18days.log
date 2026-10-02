@@ -1,0 +1,24 @@
+player_day74_1508.json from Day 74, seeds 7700+; piano bought Day 71
+Day  74  予安 in:-  ·  fee 0  majors []  Lounge $15240
+Day  75  予安 in:-  ·  fee 0  majors ['wall_report']  Lounge $11840
+Day  76  予安 in:Y  ·  fee 0  majors ['up_inspect', 'ken_propose']  Lounge $16105
+Day  77  予安 in:Y  ya_1  fee 0  majors ['ya_1']  Lounge $12820
+Day  78  予安 in:-  ·  fee 0  majors []  Lounge $14630
+Day  79  予安 in:-  ·  fee 0  majors ['kt_night']  Lounge $22225
+Day  80  予安 in:Y  ya_2  fee 0  majors ['up_door', 'ya_2']  Lounge $9565
+Day  81  予安 in:-  ·  fee 0  majors ['wall_mediation']  Lounge $10900
+Day  82  予安 in:Y  ya_3  fee 0  majors ['ya_3']  Lounge $13215
+Day  83  予安 in:-  ·  fee 0  majors ['sm_c', 'qt_photo']  Lounge $14365
+Day  84  予安 in:Y  ya_trial ya_join | at the piano: {'trial': True, 'st': 'leave', 'on': 1, 'clap': True, 'ask': True, 'done': True, 't': 110, 'wang': False}  fee 0  majors ['kt_night']  Lounge $16945
+Day  85  予安 in:Y  · | at the piano: {'trial': False, 'st': 'leave', 'on': 1, 'clap': False, 'ask': False, 'done': True, 't': 120, 'wang': False}  fee 2500  majors ['up_ask']  Lounge $9920  news: 今晚｜予安在 Lounge 彈琴 七點左右開始，彈到快打烊；演奏費 $2,500。
+Day  86  予安 in:-  ·  fee 0  majors ['sm_d']  Lounge $9080
+Day  87  予安 in:Y  · | at the piano: {'trial': False, 'st': 'leave', 'on': 1, 'clap': False, 'ask': False, 'done': True, 't': 114, 'wang': False}  fee 2500  majors []  Lounge $15205  news: 今晚｜予安在 Lounge 彈琴 七點左右開始，彈到快打烊；演奏費 $2,500。
+Day  88  予安 in:-  ·  fee 0  majors []  Lounge $12895
+Day  89  予安 in:Y  · | at the piano: {'trial': False, 'st': 'leave', 'on': 1, 'clap': False, 'ask': False, 'done': True, 't': 116, 'wang': False}  fee 2500  majors ['kt_night']  Lounge $22745  news: 今晚｜予安在 Lounge 彈琴 七點左右開始，彈到快打烊；演奏費 $2,500。
+Day  90  予安 in:-  ·  fee 0  majors []  Lounge $10285
+Day  91  予安 in:-  ·  fee 0  majors []  Lounge $13850
+
+the day each happened: {'ya_1': 77, 'ya_2': 80, 'ya_3': 82, 'ya_trial': 84, 'ya_join': 84}
+her nights in the next two weeks: [92, 94, 96, 99, 101, 103]
+page errors: []
+18 days in 60s

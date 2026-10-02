@@ -1794,7 +1794,7 @@ def v24_rc6_more_to_spend_on(b, port, target):
     """the player's 10:21 (「我已經沒有地方可以花錢了」, their Day 67 save) and 10:40 (「你就一起放」): the Lounge's list grows by
     research (the oldest bottle wants the cellar) and the player chooses tonight's (never none; the Lounge pours only
     those); four dream works — the cellar (wines of the second and third stages +10%, a second glass now and then), the
-    piano (a music night about one in three: more stay after dinner), the dry-ageing cabinet (the beef dishes +8%, more
+    piano (rc7: played only on 予安's nights — three a week once she has said yes; more stay after dinner), the dry-ageing cabinet (the beef dishes +8%, more
     ordered), the painting (+2) — each needing what it says; four seasonal sets, one out at a time (+1); three contracts,
     each a signing fee and a fee a day taken at the summary (on its ledger), their dishes +8% and more ordered, ended at
     any time; a wine course for a waiter (and a floor at ease with wine sells a glass with dinner more often); the
@@ -1838,8 +1838,9 @@ def v24_rc6_more_to_spend_on(b, port, target):
     g.ev("window.__wl=wineList")
     st = json.loads(g.ev("(()=>{const g0={type:'office',pat:1,dd:['duck']};const g1={type:'office',pat:1,dd:['pasta']};const R0=R;R={closed:false,t:50,dur:100};const pn=pianoNight;pianoNight=()=>false;const a=loungeAfterP(g1);const b=loungeAfterP(g0);wineList=()=>['w_spark','w_white','w_lred'];const c=loungeAfterP(g1);wineList=window.__wl;pianoNight=pn;R=R0;return JSON.stringify([c,a,b])})()"))
     check(st[0] < st[1] < st[2], f'more stay with researched wines poured, more again when one goes with dinner: {st}')
-    nights = g.ev("(()=>{let n=0;const d0=S.day;for(let i=0;i<60;i++){S.day=d0+i;if(pianoNight())n++}S.day=d0;return n})()")
-    check(14 <= nights <= 26, f'a music night about one in three: {nights}/60')
+    count = "(()=>{let n=0;const d0=S.day;for(let i=0;i<60;i++){S.day=d0+i;if(pianoNight())n++}S.day=d0;return n})()"
+    n0 = g.ev(count); g.ev("factSet('ya_join')"); nights = g.ev(count); g.ev("delete story().facts.ya_join")
+    check(n0 == 0 and 24 <= nights <= 27, f'rc7: nobody plays it until 予安 has said yes; then three nights a week: {n0}, {nights}/60')
     g.ev("window.__pn=pianoNight")
     r = json.loads(g.ev("(()=>{R=R||null;const g0={type:'couple',pat:1};pianoNight=()=>false;const fake={closed:false,t:50,dur:100};const R0=R;R=fake;const a=loungeAfterP(g0);pianoNight=()=>true;const b=loungeAfterP(g0);pianoNight=window.__pn;R=R0;return JSON.stringify([a,b])})()"))
     check(r[1] >= r[0] * 1.2 or r[1] == .9, f'more stay on a music night: {r}')
@@ -2473,4 +2474,90 @@ def v24_rc7_the_wine_and_monsieur_du(b, port, target):
     o = json.loads(g.ev("JSON.stringify(loungeOrder(R.groups.find(q=>namedId(q)===DU)))"))
     g.ev("Math.random=window.__mr")
     check('w_jk' in o, f'杜 orders it again, without a word about it: {o}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc7_yuan_comes_to_play_the_piano(b, port, target):
+    """the player's 16:42–16:46 (docs/v24/pianist_yuan_2026-10-02_1642.txt): the piano is silent until 予安 — no one plays
+    it every third night any more (14:49 「怎樣會有人來彈鋼琴?不用付錢嗎」). She comes in as a guest and keeps looking at it;
+    「那台有人彈嗎？」; 「妳們有在找彈琴的人嗎？」「妳有認識的？」「我。」…「妳也沒問。」; the next time she plays (the Wangs
+    in the Lounge): each scene holds the restaurant and waits for a tap, her playing does not; at the end of the piece 王太太
+    says 「彈得真好。」 and she says 「謝謝。」; later 「下週還有空嗎？」「星期幾？」. From then on: three nights a week, the
+    news says so, the piano draws her, her fee is on the summary; nobody else plays it."""
+    g = Game(b, port, target, seed=1646, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day74_1508.json')
+    check(g.ev("pianoDay()") == 71 and g.ev("[0,1,2,3,4,5,6].some(i=>{const d0=S.day;S.day=d0+i;const r=pianoNight();S.day=d0;return r})") is False, 'the piano bought on Day 71 is silent: no night of it plays by itself')
+    g.ev("yaFirst()")
+    check(g.ev("yaDue('ya_1')") is False, 'not on the first day played')
+    g.ev("story().yaFirst=S.day-1")
+    check(g.ev("yaDue('ya_1')") is True, 'the next day her first evening is due')
+    to_service(g); g.ev("window.__fastSay=1")
+    g.ev("__botUntil('R.t>=R.dur*.25',90000,1/30)")
+    def seat_ya():
+        g.ev("const d=storyDay();d.major=0;d.lp={};d.seen={};if(S.story.v24)S.story.v24.res=null;S.story.owe=null;(story().named[YA]||{}).seen=0;for(const q of R.groups.slice())if(namedId(q)===YA){leaveGroup(q,'ok');q.gone=true}R.groups=R.groups.filter(q=>!q.gone)")
+        return _ken_lounge_guest(g, '林予安')
+    page = lambda k: ' / '.join(x['t'] for x in json.loads(g.ev(f"JSON.stringify((story().beatLines||{{}}).{k}||[])")))
+    check(seat_ya(), 'she sits down in the Lounge, a guest')
+    p1 = page('ya_1')
+    check(g.ev("!!fact('ya_1')") and '她的視線，好幾次落在那台沒有人彈的鋼琴上。' in p1 and '彈' not in p1.replace('沒有人彈的鋼琴', ''), f'her first evening: she looks at the piano and says nothing about it: {p1}')
+    g.ev("story().facts.ya_1.d=S.day-2"); check(seat_ya(), 'again')
+    p2 = page('ya_2')
+    check('那台有人彈嗎？' in p2 and '目前沒有。買來以後就一直放著。' in p2 and '我。' not in p2, f'「那台有人彈嗎？」 and no more: {p2}')
+    g.ev("story().facts.ya_2.d=S.day-2"); check(seat_ya(), 'again')
+    p3 = page('ya_3')
+    check('妳們有在找彈琴的人嗎？' in p3 and '妳有認識的？' in p3 and '我。' in p3 and '妳也沒問。' in p3, f'「我。」: {p3}')
+    check(g.ev("yaTrialDue()") is False, 'the trial is the next time she comes')
+    # the trial: a day of its own
+    g.ev("__botUntil('phase!==\\'service\\'',90000,1/30)")
+    for _ in range(3):
+        if g.ev("phase") == 'summary': g.click('[data-act=toShop]'); g.page.wait_for_timeout(60)
+        if g.ev("phase") == 'shop': g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(100)
+    g.ev("story().facts.ya_3.d=S.day-2")
+    check(g.ev("yaTrialDue()") is True, 'two days on, the trial')
+    to_service(g); g.ev("window.__noScenes=false;window.__holds=true")
+    plan = json.loads(g.ev("JSON.stringify(R.sched.filter(o=>o.pianist||o.reg==='wang').map(o=>({p:!!o.pianist,trial:!!o.yaTrial,wang:o.reg==='wang',lounge:!!o.lounge})))"))
+    check(any(o['p'] and o['trial'] for o in plan) and any(o['wang'] and o['lounge'] for o in plan), f'tonight: her, and the Wangs in the Lounge: {plan}')
+    def held(keys, n=24):
+        for _ in range(4000):
+            if g.ev("!!(DLG&&DLG.sh&&!%s.includes(DLG.sh.k))" % json.dumps(keys)):   # another story's panel: read it, as a player would
+                g.ev("for(let i=0;i<30&&DLG&&DLG.sh&&!%s.includes(DLG.sh.k);i++){__tick(300);dlgNext()}" % json.dumps(keys)); continue
+            g.page.evaluate('()=>window.__bot(30,1/30)')
+            if g.ev("!!(DLG&&DLG.sh&&%s.includes(DLG.sh.k))" % json.dumps(keys)) or g.ev("phase") != 'service': break
+        if not g.ev("!!(DLG&&DLG.sh)"): return None
+        t0 = g.ev("R.t"); g.ev("for(let i=0;i<6;i++)__tick(1000)"); frozen = g.ev("R.t") == t0
+        out = []
+        for _ in range(n):
+            if not g.ev("!!(DLG&&DLG.sh)"): break
+            out.append(g.ev("$('#dlg .dlg-name').textContent+'：'+$('#dlg .dlg-text').textContent")); g.ev("__tick(300);dlgNext()")
+        return frozen, out
+    r = held(['ya_trial'])
+    check(r and r[0] and '林予安：現在。' in r[1], f'she sits down at the piano — a scene, the restaurant held: {r}')
+    t1 = g.ev("R.t"); g.ev("for(let i=0;i<40;i++)__tick(1000/30)")
+    check(g.ev("R.t") > t1 and g.ev("!!yaAtPiano()") and g.ev("JSON.stringify(yaAtPiano())") == g.ev("JSON.stringify(NAMED[YA].looks)"), 'while she plays the evening goes on, and the piano draws her')
+    check(g.ev("pianoNight()") is True, 'tonight the piano is played')
+    r = held(['ya_trial'])
+    check(r and r[0] and '王太太：彈得真好。' in r[1] and '林予安：謝謝。' in r[1] and any('拍手' in x for x in r[1]), f'the end of the piece: applause, 王太太, 「謝謝。」: {r}')
+    check(not any(x for x in r[1] if x.startswith('王先生：')), '王先生 has no line')
+    check(g.ev("(story().illus||{}).ya_trial!=null"), 'the picture')
+    r = held(['ya_join'])
+    check(r and r[0] and 'Jill：下週還有空嗎？' in r[1] and '林予安：星期幾？' in r[1] and g.ev("!!fact('ya_join')"), f'「下週還有空嗎？」「星期幾？」: {r}')
+    j = g.ev("fact('ya_join').d")
+    nights = [d for d in range(j, j + 14) if g.ev(f"yaNight({d})")]
+    check(len(nights) == 6 and all(d > j for d in nights) and nights[:3] == [j + 1, j + 3, j + 5], f'three nights a week: {nights}')
+    # one of her nights: the news, her at the piano, the fee
+    g.ev("window.__holds=false;window.__noScenes=true")
+    g.ev("__botUntil('phase!==\\'service\\'',90000,1/30)")
+    for _ in range(3):
+        if g.ev("phase") == 'summary': g.click('[data-act=toShop]'); g.page.wait_for_timeout(60)
+        if g.ev("phase") == 'shop': g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(100)
+    check(g.ev("S.day") == j + 1 and '今晚｜予安在 Lounge 彈琴' in g.ev("$('#screen').innerText"), 'her first night: the news before opening')
+    to_service(g)
+    g.ev("__botUntil('R.ya&&R.ya.on',60000,1/30)")
+    check(g.ev("!!yaAtPiano()") and g.ev("R.st.piano") == 2500, 'she plays; her fee for the night')
+    g.ev("__botUntil('phase!==\\'service\\'',90000,1/30)")
+    s = json.loads(g.ev("JSON.stringify({piano:S.lastSummary.piano,net:S.lastSummary.net,calc:S.lastSummary.rev+S.lastSummary.tips+S.lastSummary.bonus-S.lastSummary.cost-S.lastSummary.wages-S.lastSummary.cfee-S.lastSummary.rent-S.lastSummary.wine-S.lastSummary.piano})"))
+    check(s['piano'] == 2500 and s['net'] == s['calc'], f'the fee is on the night\'s accounts: {s}')
+    check('鋼琴演奏' in g.ev("$('#screen').innerText"), 'the summary says so')
+    check(g.ev("yaNight(S.day+1)") is False, 'not every night')
     check(not g.errors, g.errors[:3]); g.close()
