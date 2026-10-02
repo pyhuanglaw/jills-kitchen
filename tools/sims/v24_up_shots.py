@@ -75,7 +75,7 @@ def begin_until(g, key, d_seed, scenes=True, tries=4):
         begin(g, d_seed + i, scenes)
         if g.ev(f"!!fact('{key}')&&fact('{key}').d===S.day"): return True
         print(f'  ({key} waited: Day', g.ev("S.day"), 'went to', g.ev("JSON.stringify(story().trace.filter(t=>t.d===S.day&&t.lane==='major').map(t=>t.k))"), ')', flush=True)
-        g.ev("window.__noScenes=true;if(DLG){while(DLG)dlgNext()}"); finish(g)
+        g.ev("window.__noScenes=true;if(DLG){for(let i=0;i<80&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}}"); finish(g)
     raise SystemExit(f'{key} never fired')
 
 def story_ready(g):
@@ -107,7 +107,7 @@ with sync_playwright() as p:
         frames(g, 3)
         g.ev("dlgNext()")
         shot(g, 'u4_start.png', 'U4, the start of the service (the day\'s major is this one): the landlord brought someone up to look at the air conditioner — 「好了。門我帶上了。」')
-        g.ev("while(DLG)dlgNext()")
+        g.ev("for(let i=0;i<80&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}")
         g.ev("__botUntil('R.t>=R.dur*.75',90000,1/30)"); flush(g)
         g.ev("setRoom('side')"); clear_toasts(g)
         shot(g, 'u4_side_door_closed.png', '21:00-ish: the side room; the stair door at the near edge is shut')

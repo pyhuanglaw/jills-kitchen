@@ -72,7 +72,7 @@ with sync_playwright() as p:
     g.ev("window.__noScenes=false")
     act(g, 'hire', k='cleaner'); g.ev("__tick(30)")
     shot(g, 'hire_her_line.png', 'hiring the first cleaner is hiring her: her one line over the shop, 「那以後就天天來了。」')
-    g.ev("while(DLG)dlgNext()"); g.ev("const c=[...document.querySelectorAll('#screen *')].find(e=>e.children.length===0&&e.textContent.trim()==='今天起正式上班'||e.textContent.includes('今天起正式上班')&&e.children.length===0);if(c)c.scrollIntoView({block:'center'})")
+    g.ev("for(let i=0;i<80&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}"); g.ev("const c=[...document.querySelectorAll('#screen *')].find(e=>e.children.length===0&&e.textContent.trim()==='今天起正式上班'||e.textContent.includes('今天起正式上班')&&e.children.length===0);if(c)c.scrollIntoView({block:'center'})")
     shot(g, 'hire_her_card.png', 'her card: 清潔員, 「今天起正式上班」 — she was in most evenings before')
     g.ev("window.__noScenes=true")
     g.close()

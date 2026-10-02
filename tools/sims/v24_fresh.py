@@ -82,7 +82,7 @@ def main():
                 act(a, **kv); g.ev("__tick(30)")
             if A.plan == 'grow' and day >= 15:
                 for a, kv in GROW:
-                    act(a, **kv); g.ev("__tick(30);if(typeof hideReveal==='function')hideReveal();if(DLG)while(DLG)dlgNext()")
+                    act(a, **kv); g.ev("__tick(30);if(typeof hideReveal==='function')hideReveal();if(DLG)for(let i=0;i<80&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}")
             g.click('[data-act=nextDay]'); g.ev("__tick(100)")
         final = json.loads(g.ev("JSON.stringify(Object.fromEntries(%s.map(k=>[k,fact(k)?fact(k).d:null])))" % json.dumps(KEYS)))
         rel = json.loads(g.ev("JSON.stringify({sophie:xqKnows('sophie'),mia:xqKnows('mia'),xqid:(xqm()||{}).id||null})"))

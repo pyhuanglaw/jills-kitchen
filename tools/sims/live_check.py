@@ -71,7 +71,7 @@ def lines(g):
 def until(g, cond):
     for _ in range(200):
         if g.ev(f"phase!=='service'||!R||!!({cond})"): break
-        g.ev("while(typeof DLG!=='undefined'&&DLG)dlgNext()")   # a line on screen: the player taps on
+        g.ev("for(let i=0;i<80&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}")   # a line on screen: the player taps on
         g.ev(f"__botUntil({json.dumps(cond)},1500,1/30)")
     lines(g)
 
@@ -101,7 +101,7 @@ with sync_playwright() as p:
         shot(g, f'0{3 + [.30, .42, .55, .66, .74].index(frac)}_{k}.png', what)
     for _ in range(1500):
         if g.ev("phase") != 'service': break
-        g.ev("while(typeof DLG!=='undefined'&&DLG)dlgNext()")
+        g.ev("for(let i=0;i<80&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}")
         g.page.evaluate('()=>window.__bot(150,1/30)')
     assert g.ev("phase") == 'summary', g.ev("phase"); inv(g, 'summary')
     g.ev("document.querySelectorAll('#toasts>*').forEach(e=>e.remove())")
@@ -112,7 +112,7 @@ with sync_playwright() as p:
     note('the staff page: ' + re.search(r'餐廳員工[^\n]*', t).group(0))
     shot(g, '09_staff.png', 'the shop, the staff page: two numbers')
     g.tap('#screen [data-act=nextDay]'); g.page.wait_for_timeout(250)
-    g.ev("while(typeof DLG!=='undefined'&&DLG)dlgNext()")
+    g.ev("for(let i=0;i<80&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}")
     assert g.ev("phase") == 'prep' and g.ev("S.day") == day0 + 1; inv(g, 'next prep')
     shot(g, '10_prep_next_day.png', f'the next day\'s prep (Day {day0 + 1})')
     g.reload(); g.page.wait_for_timeout(200)

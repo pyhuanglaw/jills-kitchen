@@ -58,7 +58,7 @@ def to_prep(g):
         g.click('[data-act=toShop]'); g.page.wait_for_timeout(80)
     if g.ev("phase") == 'shop':
         g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(150)
-    g.ev("while(typeof DLG!=='undefined'&&DLG)dlgNext()")
+    g.ev("for(let i=0;i<80&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}")
 
 def reprep(g):
     """after changing the state on the prep screen: draw it again (the day's booking is made here)"""
@@ -74,7 +74,7 @@ def begin(g, d_seed, scenes=False):
 def until(g, cond, maxn=400):
     for _ in range(maxn):
         if g.ev(f"phase!=='service'||!R||!!({cond})"): break
-        g.ev("while(typeof DLG!=='undefined'&&DLG)dlgNext()")
+        g.ev("for(let i=0;i<80&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}")
         g.ev(f"__botUntil({json.dumps(cond)},1500,1/30)")
     flush(g)
 
@@ -82,7 +82,7 @@ def finish(g):
     g.ev("window.__noScenes=true")
     for _ in range(600):
         if g.ev("phase") != 'service': break
-        g.ev("while(typeof DLG!=='undefined'&&DLG)dlgNext()")
+        g.ev("for(let i=0;i<80&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}")
         g.page.evaluate('()=>window.__bot(150,1/30)')
     if g.ev("phase") == 'service': g.ev("finishClosing()")
     g.ev("for(let i=0;i<20;i++)__tick(1000/30)")
@@ -167,7 +167,7 @@ with sync_playwright() as p:
         g.ev("(()=>{const e=document.querySelector('[data-act=upLook]');if(e)e.scrollIntoView({block:'center'})})()"); g.page.wait_for_timeout(60)
         shot(g, 'look_shop_entry.png', '店舖工程 › 二樓: 看看整層現在的樣子 — and below it 二樓的房間 with both rooms\' phases')
         g.click('[data-act=upLook]'); frames(g, 6)
-        shot(g, 'look_both_rooms.png', '看看整層 with both rooms: the Private Dining Room\'s green front and its sign 私人包廂, the Staff Room\'s pale front and 員工休息室 — walls, doors, signs, nothing of the inside, nobody; the open middle, the right window, the stairs; the chalked 「？」 on the corner nobody has decided about; tabs: ' + tabs(g))
+        shot(g, 'look_both_rooms.png', '看看整層 with both rooms (the floor as the player drew it, 08:37): the Private Dining Room\'s green front top-left, its door and sign 私人包廂 at the corner; the Staff Room\'s pale front below it, its door in its east wall near the top, 員工休息室 — walls, doors, signs, nothing of the inside, nobody; the hall down the right with the street window, the shared table, the cats\' cushion; the stairs across the bottom-right corner; no 「？」 once both rooms are built; tabs: ' + tabs(g))
         g.ev("(()=>{const D=UPR.srDoor;roomTap({x:D.x,y:D.y-20},{preventDefault(){}})})()"); frames(g, 6)
         shot(g, 'look_into_room.png', 'its door tapped: the Staff Room\'s own view; tabs: ' + tabs(g))
         g.close()
@@ -197,7 +197,7 @@ with sync_playwright() as p:
         begin(g, 6401)
         until(g, "(()=>{const t=R.tables.find(q=>q.pdr);return !!(t&&t.group&&t.group.state==='eat')})()", 700)
         g.ev("setRoom('pdr')"); frames(g, 10); clear_toasts(g)
-        shot(g, 'pd3_room_meal.png', 'inside the Private Dining Room (Phase III): nine down the long stone table, the tiered chandelier, sconces, drapes, the wine cabinet, candles')
+        shot(g, 'pd3_room_meal.png', 'inside the Private Dining Room (Phase III): nine down the long stone table, the tiered chandelier, sconces, drapes, candles; the walkways clear (06:57)')
         g.close()
     if PART in ('all', 'phases'):
         # the Private Dining Room in its three phases (the player's 04:25 brief: Phase I already beautiful), set for a booking at dusk
@@ -218,9 +218,9 @@ with sync_playwright() as p:
             shot(g, f'phase{ph}_room_meal.png', f'包廂 Phase {"I" * ph if ph < 3 else "III"}: {size} at the table')
             if ph == 3:
                 g.ev("setRoom('main')"); frames(g, 4)
-                shot(g, 'tabs_from_main.png', 'from the dining room: the tabs are the rooms — 休息室 and 包廂 among them, no 二樓: ' + tabs(g))
+                shot(g, 'tabs_from_main.png', 'from the dining room: the tabs — 二樓 an everyday tab again (06:36), 休息室 and 包廂 among the rooms: ' + tabs(g))
                 g.ev("setRoom('pdr')"); frames(g, 4)
-                shot(g, 'tabs_in_room.png', 'inside the Private Dining Room: the tab lit reads 私人包廂; the door at the near end reads ‹ 側廳 — ' + tabs(g))
+                shot(g, 'tabs_in_room.png', 'inside the Private Dining Room: the tab lit reads 私人包廂; the door at the near end reads ‹ 二樓 (06:36) — ' + tabs(g))
                 until(g, 'R.closing!=null&&R.closing>40', 900)
                 g.ev("setRoom('staff')"); frames(g, 10); clear_toasts(g)
                 shot(g, 'staff_closing.png', 'closing, the Staff Room in Phase III: the crew up there — ' + tabs(g))
@@ -247,7 +247,12 @@ with sync_playwright() as p:
         begin(g, 6501, scenes=True)
         g.ev("window.__noScenes=false")
         for _ in range(500):
-            if g.ev("phase!=='service'||!!(typeof DLG!=='undefined'&&DLG)"): break
+            if g.ev("phase!=='service'"): break
+            if g.ev("!!(typeof DLG!=='undefined'&&DLG)"):
+                if g.ev("!!fact('sr_story')"): break
+                # v2.4 rc6 (10:32, 11:06): another story that holds the restaurant came first (王先生 and 王太太, Sophie and
+                # Mia …) — read it through, a tap at a time, and play on to closing
+                g.ev("for(let i=0;i<60&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}"); continue
             g.ev("__botUntil('R.closing!=null||!!(typeof DLG!==\\'undefined\\'&&DLG)',1500,1/30)")
         flush(g)
         if g.ev("!!fact('sr_story')"):
@@ -257,7 +262,7 @@ with sync_playwright() as p:
                 if not g.ev("!!(typeof DLG!=='undefined'&&DLG)") or '好像一直沒有' in (g.ev("(document.querySelector('#dlg')||{}).innerText||''") or ''): break
                 g.ev("dlgNext()")
             shot(g, 'story_sr_2.png', '……好像一直沒有一個地方，是給每天在這裡工作的人待的。')
-            g.ev("while(DLG)dlgNext()"); g.page.wait_for_timeout(120)
+            g.ev("for(let i=0;i<80&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}"); g.page.wait_for_timeout(120)
             shot(g, 'story_sr_offer.png', 'the project offered: 開始規劃 / 之後再說')
         else:
             print('sr_story did not fire:', g.ev("JSON.stringify({ready:srStoryReady(),tr:story().trace.filter(t=>t.d===S.day).map(t=>t.k+':'+t.lane)})"))

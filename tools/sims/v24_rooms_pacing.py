@@ -88,7 +88,7 @@ def main():
                             g.ev("hideReveal&&hideReveal()"); bought.append(f'{kind}{n}'); buys.append((g.ev('S.day'), f'{kind}{n}'))
             if g.ev("phase") == 'shop':
                 g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(120)
-            g.ev("while(typeof DLG!=='undefined'&&DLG)dlgNext()")
+            g.ev("for(let i=0;i<80&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}")
             g.ev(SEED % (SEEDBASE + d)); g.ev("S.today.sugKey=null;S.today.sug=null;autoStock()")
             rt.start_day(g); rt.install_bot(g); g.ev(rt.LAZY_ACTOR + "\nwindow.__act=window.__actLazy;window.__noScenes=true")
             g.ev("window.__rm={most:0,brk:0,cat:0,early:0,walk:0,other:0,seen:new Set(),offers:[]}")
