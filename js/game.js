@@ -3638,9 +3638,10 @@ function cnNightEnd(done){const K=R.cn,C=cnS();if(!K||K.end)return;K.end=1;
  const here=K.guests.filter(g=>!g.gone&&R.groups.includes(g)&&g.table!=null);const n=K.guests.filter(g=>g.ticket).length;
  C.n=(C.n||0)+1;C.last=S.day;C.next=null;factSet('cn_night');
  const g0=here[0]||null;const bar=loungeTables().filter(t=>t.kind==='bar'&&t.group&&t.group.cn);
+ /* the picture first: the scene below takes the view to the Lounge, where the camera is (flushMem takes the room on screen) */
+ if(bar.length>=3)memo('chefnight',(LG.bar.x0+LG.bar.x1)/2,LG.bar.y+24,{n,room:'lounge',always:true,subj:bar.slice(0,4).map(t=>({x:t.x,y:t.y}))});
  if(K.first&&R.closing==null)kenScene('cn_first',g0,()=>{factSet('cn_first');kenNote(`最後一道是${dishName(K.menu[2])}。吧台這頭先有人拍手，接著一整排都拍了。`);JILL_SAY('謝謝。',900);later(()=>noteLine('Jill 點個頭，回廚房去了。'),2200)},true);
- else if(R.closing==null)noteLine('主廚之夜的最後一道上完了。');
- if(bar.length>=3)memo('chefnight',(LG.bar.x0+LG.bar.x1)/2,LG.bar.y+24,{n,room:'lounge',subj:bar.slice(0,4).map(t=>({x:t.x,y:t.y}))})}
+ else if(R.closing==null)noteLine('主廚之夜的最後一道上完了。')}
 function cnNewsHTML(){const C=cnS(),n=C.next;if(!n||!loungeLv())return'';const M=(n.menu||[]).map(dishName).join('、');
  if(n.d===S.day)return`<div class="event kent quiet"><b>今晚｜主廚之夜 · ${CN_SEATS} 席</b><span>三道：${M}，每道配一杯；每位 ${fmt(CN_PRICE)}（含酒）。吧台的位子留給訂位的客人。</span></div>`;
  if(n.d===S.day+1)return`<div class="event kent quiet"><b>明晚｜主廚之夜 · ${CN_SEATS} 席</b><span>三道：${M}。</span></div>`;return''}
@@ -7302,7 +7303,7 @@ function startRace(c){const o=catBy(c.def.id==='tora'?'snow':'tora');if(!o)retur
 function raceStep(c){const n=c.path&&c.path.shift();if(!n){c.run=0;c.path=null;const f=CATS.find(o=>o.st==='race'&&o.target===c);if(f){f.st='rest';f.run=0;f.target=null;finishRace(f)}finishRace(c);return}c.st='walk';c.tx=n.x;c.ty=n.y;c.after='raceNext';c.run=1}
 function finishRace(c){c.run=0;if(c.def.id==='snow'){if(spotFree('bed')&&Math.random()<.4)catGo(c,'bed');else sleepHere(c,30,60)}else{c.st='rest';c.pose='groom';c.t=rand(4,8)}}
 /* ---- memories ---- */
-function memo(id,x,y,info){if(!MEMS[id])return;if(MEMQ.some(m=>m.id===id)||!albumAllows(id))return;MEMQ.push({id,x,y,info,room:(info&&info.room)||'main'})}
+function memo(id,x,y,info){if(!MEMS[id])return;if(MEMQ.some(m=>m.id===id)||(!albumAllows(id)&&!(info&&info.always)))return;   /* info.always: a night's own picture (rc7.6, the chef's night) whatever else the day kept */MEMQ.push({id,x,y,info,room:(info&&info.room)||'main'})}
 /* The frame is built from the subjects of the moment (info.subj: the cats, Jill, the guest…), not from one
    point: a close-up for one subject, wider when there are several, the whole room if that is what it takes.
    Whatever the caption names is inside the picture. */
