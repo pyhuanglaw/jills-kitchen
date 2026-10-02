@@ -283,7 +283,15 @@ All under `docs/evidence/v24_rc7/`:
 
 ## 9. Build and publish
 
-(filled in below)
+- `tools/build_single.py`: the single file is in step with the tag (6,233 KB; no change since 7af5df7, which touched only tests and docs after it).
+- `tools/build_artifact.py`: the page for the live URL (6,382,199 bytes).
+- Tag `v2.4-rc7` at 09f8603.
+- **Published** to https://claude.ai/artifact/2vhURujrtCpQ1P5jnSsjps, version 41 (version id 1790943927-f653), at 20:25.
+- **Checked** (`tools/sims/live_check.py`, `docs/evidence/v24_rc7_release/`):
+  - The page built from the tag sits inside the live HTML byte for byte. The host adds 552 bytes, its document skeleton.
+  - The player's Day 74 save, made during the evening, opens on 「繼續營業 · 21:48」. The check resumes it, walks the rooms and finishes the day: the summary, then the staff page (「餐廳員工 14/14 人・Lounge 員工 5/5 人」).
+  - Day 75's restock is saved, and the page survives a reload.
+  - No page errors.
 
 ## 10. What only the player can judge (O)
 
