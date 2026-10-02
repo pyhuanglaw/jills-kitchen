@@ -569,3 +569,181 @@ Filed: `second_floor_three_uses_0636`, `staff_room_recreation_pdr_polish_0643`, 
   day the slot is kept for the beat that has waited longest and can happen today (one day; still one major a day; no
   new cooldown). 晴 and 阿拓 count as there only when they came in; 阿拓 takes one day off after 「多的。」; the slow burn
   a little quicker.
+
+## 9. P5 — the other Staff Lives arcs (rc7; plan, 2026-10-02 14:30)
+
+Started after v2.4-rc6 was published (Version 40) and its page and zips were checked. Sources:
+- `staff_lives_brief_2026-10-01.txt`, the canonical brief;
+- the two outside-cast messages and their pictures. They win where they differ from the brief: 宇翔's first lines, 老林's first lines and his milestone;
+- `canon_change_xiuqin_2026-10-01.txt`: 秀琴阿姨 is 國雄's wife and 怡君's mother; 阿珠姐 keeps no family story;
+- the PDR brief §15–16 and the rc6 spec's list of later uses ("員工替家人訂位");
+- the player's 05:32 list for rc7: 國雄, 宇翔, 珊珊, 老林, Kevin, 小彤 and her parents, Kai, the crossovers, 怡君's boyfriend, a staff family booking the Private Dining Room.
+
+Also read with it: the player's 12:17 and 12:24 (「故事進展真的太慢」, 「每天…還沒有任何故事」). The first meetings must come soon after updating, a few days apart. Each arc must move at a pace the player can see.
+
+### 9.1 Canon found in the code (rc6)
+
+**Staff and saves**
+- The staff have names, roles, portraits and sprites, and nothing else: no ages, no families, no lives outside.
+- Tenure: `TENURE_CANON` marks 阿珠姐, 秀琴阿姨 and 阿德師傅 as 資深, and 小彤 as 較新 (熟手 after 45 counted days). Everyone else uses the counted days.
+- The player's Day 71 crew includes every staff member these arcs need, all legacy: 阿德師傅, Marco, Hugo, 秀琴阿姨, Kai, Nina and 小彤. Momo and 小威 are new (Day 63).
+- There are no weekdays anywhere: the 週末 event is a random draw, not a calendar.
+
+**Already done in rc4–rc6, kept as is**
+- 怡君: her arc, her wait at closing (`sp_wait`), the Private Dining Room's 「有比較安靜的嗎？」 and its payoff.
+- The Staff Room traces:
+  - 小彤's 「坐啊。」 on its first evening (`srFirstStart` picks her), then her mug and the stool;
+  - 阿德's armchair;
+  - Hugo and the fridge;
+  - 阿珠姐's 「插座不夠。」/「我就說吧。」;
+  - 秀琴阿姨's food from home;
+  - Kai's racket bag on some evenings (`kaiBagToday`; an object, no story).
+- 《第二層左邊》 stays 阿珠姐's.
+- The new hire's first shift (`first_shift`) asks waiters and cooks only. Its cleaner version comes now, with 小彤's arc.
+
+### 9.2 Conflicts and adaptations
+
+| Brief | Decision |
+|---|---|
+| 《星期三》: Kai asks for no Wednesday evenings, but the game has no weekdays | His request fixes the week. The day after he asks is a Tuesday, so every seventh day from the day after that is "星期三" for him: he is off that day, with a morning note. No weekday appears anywhere else |
+| 「下面第二格」 needs a new employee, and the crew is full in a mature save | It waits for a real new hire: the Private Dining Room's +1/+1, or anyone hired after a departure. It is very late by design. The setup comes early: 小彤 asks where the big rubbish bags are, and 秀琴阿姨 answers 「後面櫃子，下面第二格。」 Later 小彤 gives a new hire the same answer |
+| Cooks never leave the kitchen during a service (阿德, Marco, Hugo) | Mid-service, a visitor comes to the kitchen door, one step inside, and the cook comes to the door. At closing a cook walks out of the kitchen door and through the dining room to whoever is waiting. Nobody cooks less |
+| 「你進去等我」 and the rest need the Staff Room, which the player's save does not have yet | These beats wait for the room. Until then the same people wait by the door, standing, which is the brief's own Staff Room evidence (`sp_wait`, once the floor's story has begun) |
+| 怡君's boyfriend: 阿珠姐's lines in the brief | 秀琴阿姨's, by the canon change |
+| 國雄 must not act as if he had never heard of 怡君's flat | No line of his contradicts it. Once the wall is settled, one pickup has 國雄：「怡君說牆弄好了。」 秀琴：「我知道，我去看過了。」 |
+| The story hold (11:06): only Sophie and Mia, the leak case, the second floor's triggers and the love stories hold | No P5 beat holds the restaurant. A beat at closing hides the 收店 pill for its few seconds, so the closing cannot be skipped in the middle of it. Nothing else waits |
+
+### 9.3 Architecture (on the arbiter, nothing parallel)
+
+- **The outside cast** are `NAMED` entries with `story:1`. Each has a portrait card and two expressions from the player's sheets, and a matching sprite. They are never in a random pool, visit at most once a day, are not staff, and draw no wage.
+- **Three ways to be there:**
+  1. **As a guest**: sits, orders, eats, pays, through the schedule (`V24_WANTS`).
+  2. **Waiting for someone**: walks in near the end of the service, waits by the door, then leaves with their person at closing. Waiting means standing at first, on a chair by the door on the rainy evening Jill asks, or in the Staff Room once someone has said so.
+  3. **At the kitchen door**: walks in, steps into the kitchen doorway, and the cook comes to the door when his hands are free.
+
+  A visitor who is not a guest is a sprite of their own (`R.p5v`), drawn in whatever room they are in. They are never seated at a guest's table and never take a guest's place.
+- **Their person is really there.** A visitor comes only when their staff member is on the crew and in today. That includes 國雄's evening alone (秀琴 is working) and excludes 老林's day without 阿德: he comes for the restaurant itself, which is the point of that beat.
+  - Let the staff member go, and their outside person stops coming. 老林 is the exception once he is 林叔.
+  - Hire them back and their arc goes on: facts are kept by beat, not by crew id.
+- **The p5 lane.** One P5 beat a day, beside the other lanes: major 1, minor 2, v24 1. It never takes the day's major slot. The later, quieter visits are ambient and have their own cooldowns.
+- **Pacing.**
+  - Each arc opens on its own day: the first day played with rc7, plus 1–8 days, in a fixed order (§9.4). In a new game the arcs open no earlier than Day 14, and only once their staff member has worked 7 days.
+  - Nothing happens on the first day played (no load-time dump).
+  - Inside an arc, each beat waits only its own gap in days, and for the visits or tenure its fiction needs.
+  - When a beat is due, the schedule brings its visitor that day with a high chance, using its own hash coin; the day's random stream is untouched.
+- **Knowledge.**
+  - An outside person is introduced by a fact, written the moment the first beat happens.
+  - The coworkers in the room then are written as having met them (`relSet('s:'+id, 'n:'+name, 'met')`).
+  - A line that names someone checks those facts; nobody knows anyone before they have met.
+- **Journal.** One line per arc on 人物／關係支線, holding the meaningful beats only. Ambient visits and the life-progress mentions are not in the count.
+
+### 9.4 The beats
+
+The order in which arcs open after updating (days after the first day played):
+1. 小彤 asks;
+2. 國雄;
+3. Kevin;
+4. 珊珊;
+5. Kai;
+6. 宇翔;
+7. 老林;
+8. 小彤's parents.
+
+Gaps are in days after the beat before.
+
+**小彤 — 《下面第二格》**
+
+| # | Beat | How | Needs | Gap |
+|---|---|---|---|---|
+| T1 | 「阿姨，大垃圾袋放哪？」「後面櫃子，下面第二格。」 | During the service; both cleaners. Without 秀琴阿姨, the senior cleaner or Jill answers. In a new game, at her first shift | 小彤 較新 | — |
+| T2 | 《你們怎麼來了》: 「你們怎麼來了！」「吃飯啊。」 Her mother: 「妳去忙，不用管我們。」 At the bill: Jill 「小彤很認真喔。」 Mother 「真的？她在家都……」 小彤 「媽！」 | The parents as guests. 小彤 walks over, then glances at their table while she works | 小彤 in, 7+ days on the crew | 3 |
+| T3 | 《想很久了》: 「妳換鞋了？」「嗯。想很久了。」 | At the staff meal, before opening | 小彤 30+ counted days, or 熟手 | 6 |
+| T4 | 「坐啊。」 | The Staff Room's first evening (rc6) | — | — |
+| T5 | 《家人訂位》: 小彤 books the Private Dining Room for her parents' anniversary. 「這是妳訂的？」「嗯。」「很貴吧？」「員工價。」 The bill says 員工家屬 八折 | A story booking (`pdBook`) and the news card | Room built, T3 | 10 |
+| T6 | 《第二格》: a new hire asks; 小彤 answers 「下面第二格。」 If she is in, 秀琴阿姨 is there and says nothing | The new hire's first shifts | 小彤 熟手, T1, a hire in their first 3 days | — |
+
+**秀琴阿姨 & 國雄 — 《來接妳》**
+
+| # | Beat | How | Needs | Gap |
+|---|---|---|---|---|
+| G1 | 《來接妳》: 「先生，我們打烊了喔。」「我等人。」 秀琴 「我先生。」 「好了沒？」「椅子還沒收。」「喔。」 | Waiting by the door at closing | 秀琴阿姨 in | — |
+| G2 | 《下雨》: 「下雨耶，進來坐。」「不用，我站這裡就好。」「坐啦。」 He sits on a chair by the door | Waiting, a rainy evening | Rain, no Staff Room | 3 |
+| G3 | 「你去裡面等她。」 He waits upstairs | Waiting | The Staff Room, 2+ days old | 2 |
+| G4 | His own days: 「你今天又去爬山？」「跟老張他們。」 (and, once the wall is settled, 「怡君說牆弄好了。」) | A pickup, ambient | 4+ pickups | 6 |
+| G5 | 《今天不想煮》: 「你不是跟朋友出去？」「回來了。」「那你來幹嘛？」「吃飯。」「家裡不能吃？」「今天不想煮。」 | 國雄 as a guest; 秀琴 walks over | G4 | 12 |
+
+**Marco & Kevin — 《以前一起做事的人》**
+
+| # | Beat | How | Needs | Gap |
+|---|---|---|---|---|
+| K1 | Kevin orders the hardest dish on the station Marco is cooking. Marco at the ticket: 「……白痴。」 At the bill: 「跟 Marco 說，太慢了。」 | Kevin as a guest | Marco in | — |
+| K2 | 「走，喝一杯。」「明天早班。」「你哪次不是早班。」「……一杯。」 Jill 「你們認識很久了？」 Kevin 「以前在飯店，他在我隔壁站。」 Marco 「他切菜很慢。」 Kevin 「是你太快。」 | Waiting at closing; Marco walks out of the kitchen | Kevin 2+ visits | 5 |
+| K3 | 《待滿久了》: 「你這裡待滿久了。」「嗯。」「不走了？」「目前沒有。」 | Waiting at closing | Kevin 3+ visits; Marco long there (legacy and 20+ days since P5 began, or 60+ counted days) | 10 |
+
+Between the beats, Kevin comes now and then for dinner, and sometimes orders the same dish again.
+
+**Nina & 珊珊 — 《等妳》**
+
+| # | Beat | How | Needs | Gap |
+|---|---|---|---|---|
+| N1 | 《等妳》: 「妳朋友？」「高中同學。」「她以前很安靜。」「誰？」「妳可以走了。」 | Waiting at closing | Nina in | — |
+| N2 | Nina at 珊珊's table: 「老樣子？」「嗯。」 A note: the two of them hardly speak. A coworker who met her at N1: 「Nina 在那桌好安靜。」 「高中同學。」 | 珊珊 as a guest; Nina walks over | — | 4 |
+| N3 | 「上去等吧，樓上有位子。」「可以嗎？」 Nina 「可以啦。」 | Waiting | The Staff Room | 2 |
+| N4 | 「Nina，珊珊來了。」 A coworker says her name for the first time | Waiting | 4+ visits; a coworker who has seen her twice | 6 |
+
+**Hugo & 宇翔 — 《我弟》**
+
+| # | Beat | How | Needs | Gap |
+|---|---|---|---|---|
+| H1 | 《我弟》: 「哥。」「你怎麼來了？」「拿東西給你。」「放著就好。」 A cook beside him: 「你弟？」「嗯。」 | The kitchen door | Hugo in | — |
+| H2 | Hugo at the ticket: 「那桌算我的。」 Jill 「哪桌？」 「我弟。」 At the bill: 「你哥付了。」「……喔。」 | 宇翔 as a guest | — | 4 |
+| H3 | 「你進去等我。」「可以喔？」「可以。」 | The kitchen door, then he goes up and waits | The Staff Room | 2 |
+| H4 | His life, ambient, days apart: 「他實習找到了。」 → 「他下禮拜畢業。」 → 宇翔 in a shirt: 「哥，我第一天上班。」「嗯。吃了沒？」 | The last of the three is a beat | H2 | 12 / 15 / 15 |
+
+**阿德師傅 & 老林 — 《等一下》**
+
+| # | Beat | How | Needs | Gap |
+|---|---|---|---|---|
+| L1 | 《等一下》: 「阿德還有一下。」「沒事，我等。」 | Waiting at closing; 阿德 walks out | 阿德 in | — |
+| L2 | 「明天要不要去？」「幾點？」「四點。」「太早了。」「魚又不等你。」「……三點半出門。」 A coworker: 「阿德師傅今天話好多。」 | Waiting at closing | — | 4 |
+| L3 | 「林叔，又來等阿德師傅？」「欸，叫得很順喔。」 From then on the crew call him 林叔 | Waiting, or as a guest | 4+ visits | 5 |
+| L4 | 《今天阿德沒上班》: 「林叔今天沒點魚？」「你們阿德今天又沒上班。」 | 阿德's day off (a morning note), 老林 as a guest | L3, 6+ visits | 6 |
+
+He orders the fish when 阿德 is in. After L4 he comes now and then on his own, even if 阿德 has left the restaurant.
+
+**Kai — 《星期三》**
+
+| # | Beat | How | Needs | Gap |
+|---|---|---|---|---|
+| A1 | 《星期三》: 「Jill，星期三晚上可以不要排我嗎？」「怎麼了？」「打羽球。固定的。」「好啊。」 | At the staff meal. From then on his Wednesdays are off | Kai in | — |
+| A2 | 《四個人》: 「你們小聲一點。」「服務態度很差欸。」 At the bill: 「星期三見。」「嗯。」 | Four friends as guests, one with a racket bag | Not his Wednesday | 3 |
+| A3 | The result, ambient, the day after some Wednesdays: 「昨天贏了沒？」「贏了。」 or 「……不要問。」 | The staff meal | A1 | — |
+
+**怡君, later**
+
+| # | Beat | How | Needs |
+|---|---|---|---|
+| Y7 | Nina recognizes her: 「秀琴阿姨的女兒？」「妳怎麼知道？」「妳們笑起來一樣。」 | 怡君 as a guest; Nina serves | Nina on the crew for 2 of 怡君's visits |
+| Y8 | Her boyfriend: 「那是怡君男朋友？」「嗯。」「妳看過了？」「看過。」「怎麼樣？」「吃飯。」 | 怡君 and him as guests | Y7; the wall settled 14+ days ago (or her key 30+ days, if the wall is dormant) |
+| — | Nina 「怡君她們在裡面。」 秀琴 「嗯。」 (PDR brief §15) | Ambient, once | 怡君's party in the Private Dining Room |
+
+**Crossovers** (once each, sparse):
+- 國雄 and 老林 waiting on the same evening: 「你也在等人？」「等我太太。」「我等阿德。」「你釣魚嗎？」「不釣。」「可以學。」
+- 小彤 and 宇翔: 「你是 Hugo 的弟弟？」「嗯。」「不太像。」「大家都這樣說。」
+
+### 9.5 Deferred (not in rc7)
+
+- 《休息一下》, the Staff Room's later authored photo. The brief says not to make it yet.
+- 阿珠姐's own outside life. The canon change says not to invent a replacement family.
+- 小彤's 第二格 in a save that never hires again: the beat simply waits.
+
+### 9.6 Migration and QA
+
+**Migration**
+- Old saves start every P5 arc from nothing; nothing is inferred.
+- Nothing happens on the first day played. The arcs open over the following eight days, one P5 beat a day at most.
+
+**QA**
+- Tests: migration; progression; spacing; presence (nobody comes for someone who is not in); prerequisites; no premature knowledge; letting go and hiring back; dialogue repetition.
+- Simulations: 30 and 60 days from the player's Day 71 save, and a new game.
+- Phone screenshots of every first meeting.
