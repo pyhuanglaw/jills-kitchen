@@ -1,0 +1,6 @@
+PASS  cat_personality_fingerprint  (1.4s)
+PASS  golden_scenario  (2.0s)
+FAIL  golden_frames  (116.1s)
+      day2: first differing sample #75 (t=75.033): scene
+
+2 passed, 1 failed

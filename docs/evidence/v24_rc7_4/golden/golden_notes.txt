@@ -1,0 +1,25 @@
+golden_scenario and golden_frames for rc7.4, 2026-10-03.
+
+1. On 57e6f80 (the branch, with the favourites' extra visits), without --record (golden_check_57e6f80.log):
+   cat_personality_fingerprint passes; golden_scenario differs from day 2 on (day 1 identical); golden_frames differs
+   from day 2, sample #75 (t = 75.0 s), the scene; none of the ten key screens differs.
+
+2. Which change is it? The harness can run another game.js (JK_GAME_JS):
+   - 57e6f80 with the favourites' visit boost off (`const lv=false;`): golden_scenario passes
+     (golden_experiment_no_visit_boost.log). The day's plan had 陳伯伯 come more often while his 黃金蛋炒飯 was on.
+   - 57e6f80 with no favourites at all (`const LOVES={}`): golden_scenario and golden_frames both pass. Everything
+     that moved is the favourites (22:39); the bites, the TV, the pizza and the fixes found by the full run change
+     nothing in a new game's first two days.
+
+3. The visit boost came out of the release (it held the stories back: sims/day52_seeds.txt). On the final game
+   (golden_check_final_no_visit_boost.log, against rc7.3's baselines): the fingerprint and golden_scenario pass —
+   the three days end exactly as on rc7.3. golden_frames differs at day 2, t = 75 s, and only there.
+
+4. That frame, by golden_frames' own steps (gf_day2.py; day2_t75.before.png on rc7.3's game.js, day2_t75.after.png on
+   the final one, day2_t75.diff.png): the same evening, the same people; 陳伯伯 has ordered his 黃金蛋炒飯 and says
+   「還好今天有黃金蛋炒飯。」 — his portrait line, his name over him and the ring at his table. That is the favourite
+   being said, as designed.
+
+5. golden_frames re-recorded with --record on the final game: tests/golden/frames.json (two lines, day 2's trace); the
+   ten screens were written back byte for byte the same; tests/golden/scenario.json unchanged from rc7.3. Run again
+   without --record: both pass.

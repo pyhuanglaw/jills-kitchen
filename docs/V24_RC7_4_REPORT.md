@@ -68,8 +68,9 @@ Filed verbatim in `docs/v24/player_messages_2219_2308_2026-10-02.txt`:
 - Once Jill has heard it:
   - the journal's 熟客 page and 店裡的人 say 「最愛 …」;
   - the menu and the Lounge's wine list mark the row 「♥ name」.
-- At the bill, a guest who had their favourite is a little happier (+6). They come a little more often while it is on
-  the menu.
+- At the bill, a guest who had their favourite is a little happier (+6).
+- They do **not** come more often for it. The branch had that (a regular 20% likelier to come while the favourite is
+  on), and the busier evenings held the stories back; it came out before the release (§5.2).
 - A demand estimate (the stock suggestion) learns nothing.
 - I: yes. T: `v24_rc74_favourites_learned_in_play_and_marked_on_the_menu` and the menu screenshot. O: not yet.
 
@@ -133,8 +134,8 @@ Checked against the final feature set: 熟客 and 店裡的人, 日誌's 熟客 
 section (Bar Food, the furniture, 晚餐後八折, VIP), 家具與佈置.
 - **New**: 「最愛的一道、一杯」 — everyone with a name has a favourite dish and glass; nobody announces it; what a guest
   says when it is on, and sometimes when it is off; once known, 「最愛」 in the journal and ♥ with the name on the menu
-  and the wine list; they come a little more often, order it and are a little happier; the random menu leans to the
-  favourites.
+  and the wine list; they order it and are a little happier; the random menu leans to the favourites. (The branch's
+  「來得勤一點」 came out with the extra visits.)
 - **New**: 「電視與音響」 — where the two pieces are (家具與佈置 › Lounge 的家具), the prices, the sound needs the TV,
   about two game nights a week, the fans, staying on, music on the other nights, the summary's 「有比賽轉播」.
 - **Changed**: Bar Food lists the new bites and the level each comes with (II: 生蠔; III: 德國豬腳), and points to the
@@ -166,8 +167,59 @@ section (Bar Food, the furniture, 晚餐後八折, VIP), 家具與佈置.
   and before there is one his order threw (`loveOrdered` read the name of a dish that does not exist yet). Two story
   tests failed on it. Fixed in ddfe212: a favourite with no name yet is never missed aloud. The favourites test now
   seats Ken with no signature and checks that his order goes through without a word about it.
+- The full run on 6e82c77 (the pizza in) failed nine tests (`docs/evidence/v24_rc7_4/regression/full_regression_rc74_6e82c77.log`). Three were the game:
+  - **Building the Lounge handed out the pizza.** `buyLounge` unlocked every bar dish of its level, the researched
+    pizza too, oven or not. Now it skips a researched dish (9aad866). Found by
+    `lounge_i_content_bar_food_in_the_kitchen_wine_at_dinner_the_cast_by_name`; the pizza test now builds Lounge I on
+    the Day 52 save and checks the pizza stays locked.
+  - **予安's trial without 王太太.** The trial night wants the Wangs in the Lounge a little before her. When they were
+    coming that evening anyway, their visit kept its own hour (here 148 s, after the piece ended at 113 s), so nobody
+    said 「彈得真好」. Now a story that needs someone at an hour moves their visit to it (9aad866). Found by
+    `v24_rc7_yuan_comes_to_play_the_piano`.
+  - **A regular the story asked for was lost at the door.** Found tracing the forty days (§5.2): Sophie was in the plan
+    for the article with 怡君 and a full room turned her away for the day, because her visit was her own, not the
+    story's. Now such a visit is the story's: a full room sends her back a little later, as it does anyone the story
+    asked for (57e6f80).
+- The other six were tests that described rc7.3 or leaned on one seed's draws:
+  - `research_is_solvable_from_visible_info`: its solver now has the Lounge and the oven, and takes a result's hint
+    only for its own kind of dish (bb3d6da).
+  - `lounge_i_content_…`: Lounge I gives five bites now, not three.
+  - `v24_rc7_the_money`: the Day 71 menu has seven bar bites of eight (rc7.4's four came onto it).
+  - `v24_rc7_2_vip_cards_and_the_lounge_after_dinner`: at half the evening every main-hall table can be taken; the test
+    frees one before it seats Mia and Leo.
+  - `v24_the_night_of_the_missing_cats`: back downstairs, 小齁 can go straight into the cave (hidden, in the main hall);
+    the test counts that as downstairs.
+  - `v24_day52_save_plays_the_stories_in_order_over_forty_days`: see §5.2.
+- Goldens: §5.1.
 
-(the rest filled at the release)
+### 5.1 Goldens
+
+All of it is the favourites (`docs/evidence/v24_rc7_4/golden/golden_notes.txt`):
+- On the branch, `golden_scenario` and `golden_frames` differed from day 2 on. With `LOVES` emptied (the harness's
+  `JK_GAME_JS`), both passed: nothing else in rc7.4 changes a new game's first two days.
+- Without the extra visits (the release), `golden_scenario` and the fingerprint pass against rc7.3's own baselines:
+  the three days end exactly as before.
+- `golden_frames` differs at one sample: day 2, t = 75 s. By the test's own steps (`gf_day2.py`), that frame on rc7.3
+  and on the release: the same evening, and 陳伯伯 saying 「還好今天有黃金蛋炒飯。」 — his portrait line, his name, the
+  ring at his table (`day2_t75.before/after/diff.png`).
+- `tests/golden/frames.json` re-recorded (two lines, day 2's trace); the ten key screens came back byte for byte the
+  same; `scenario.json` is rc7.3's. Both pass on a second run.
+
+### 5.2 The forty days from Day 52
+
+`docs/evidence/v24_rc7_4/sims/day52_seeds.txt`: seven seed bases on four builds, with the test's own targets.
+- The branch (9aad866), with regulars likelier to come while their favourite is on: settled by Day 82 on three seeds
+  of seven (six on rc7.3); the article seven days after the settlement on three (three or four days on every rc7.3
+  seed). The full run's failure was one of these.
+- The trace of one seed (7100): Sophie, planned with 怡君 for the article, turned away by a full room on two evenings
+  — the bug above.
+- With that fixed (57e6f80), the article came back to three days; the wall still began late on two seeds (68).
+- Without the extra visits (the release): the wall begins Day 63–66 on all seven and settles by Day 82 within 18 days
+  of beginning (79–82, median 81; rc7.3 80–85, median 80); the article three days after on all seven. Five seeds of
+  seven meet every target, as on rc7.3; the two others miss 怡君's move-in by one day (it moves between seeds on every
+  build).
+- So the favourites stay — the orders, the lines, the marks, the bill — and the extra visits went.
+- 7600 meets every target on rc7.3 and on the release, and the test keeps it.
 
 ## 6. Full regression
 

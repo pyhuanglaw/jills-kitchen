@@ -1,0 +1,65 @@
+The forty days from the player's Day 52 save (tests/v24_tests.py v24_day52_save_plays_the_stories_in_order_over_forty_days),
+seven seed bases on four builds. The day each beat happened.
+Targets, as the test checks them (docs/v24/pacing_correction_2026-10-01.txt; first played day = 53): 怡君 moves in
+within about ten days (yj_key - yj_meet <= 9 and yj_key <= 63); the wall begins Day 62-66; it settles within 18 days of
+beginning and by Day 82.
+Tool: tools/sims/day52_seeds.py ROOT SEEDBASE (the test's own loop); a build other than the worktree's through
+JK_GAME_JS. Run 2026-10-03 04:08-05:00. The release's js/game.js is the last build's file with one comment and one
+sentence of the manual changed (checked by replacing both and comparing: identical).
+
+== 904f489 (rc7.3, published)
+7000: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 81, wall_article 84 (+3)  — meets every target
+7100: yj_meet 53, yj_key 61, wall_worry 65, wall_settle 80, wall_article 83 (+3)  — meets every target
+7200: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 80, wall_article 83 (+3)  — meets every target
+7300: yj_meet 53, yj_key 63, wall_worry 65, wall_settle 82, wall_article 85 (+3)  — misses: the move within ten days
+7400: yj_meet 53, yj_key 63, wall_worry 68, wall_settle 85, wall_article 89 (+4)  — misses: the move within ten days, the wall in 62-66, settled within 18 days, by 82
+7500: yj_meet 53, yj_key 61, wall_worry 63, wall_settle 80, wall_article 83 (+3)  — meets every target
+7600: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 80, wall_article 83 (+3)  — meets every target
+   every target: 5 of 7; the wall begins 63-68 (median 64); settles 80-85 (median 80); the article +3, +3, +3, +3, +4, +3, +3 days after
+
+== 9aad866 (the branch: the favourites bring regulars more often)
+7000: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 80, wall_article 83 (+3)  — meets every target
+7100: yj_meet 54, yj_key 63, wall_worry 66, wall_settle 83, wall_article 90 (+7)  — misses: settled within 18 days, by 82
+7200: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 80, wall_article 83 (+3)  — meets every target
+7300: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 83, wall_article 90 (+7)  — misses: settled within 18 days, by 82
+7400: yj_meet 53, yj_key 63, wall_worry 66, wall_settle 82, wall_article 85 (+3)  — misses: the move within ten days
+7500: yj_meet 53, yj_key 61, wall_worry 65, wall_settle 83, wall_article 87 (+4)  — misses: settled within 18 days, by 82
+7600: yj_meet 53, yj_key 61, wall_worry 63, wall_settle 83, wall_article 90 (+7)  — misses: settled within 18 days, by 82
+   every target: 2 of 7; the wall begins 63-66 (median 64); settles 80-83 (median 83); the article +3, +7, +3, +7, +3, +4, +7 days after
+
+== 57e6f80 (the branch + a story's regular is not lost at the door)
+7000: yj_meet 53, yj_key 61, wall_worry 63, wall_settle 79, wall_article 82 (+3)  — meets every target
+7100: yj_meet 54, yj_key 63, wall_worry 68, wall_settle 85, wall_article 88 (+3)  — misses: the wall in 62-66, settled within 18 days, by 82
+7200: yj_meet 53, yj_key 63, wall_worry 65, wall_settle 80, wall_article 83 (+3)  — misses: the move within ten days
+7300: yj_meet 53, yj_key 61, wall_worry 65, wall_settle 80, wall_article 83 (+3)  — meets every target
+7400: yj_meet 53, yj_key 63, wall_worry 66, wall_settle 81, wall_article 84 (+3)  — misses: the move within ten days
+7500: yj_meet 53, yj_key 63, wall_worry 68, wall_settle 83, wall_article 88 (+5)  — misses: the move within ten days, the wall in 62-66, settled within 18 days, by 82
+7600: yj_meet 53, yj_key 61, wall_worry 63, wall_settle 82, wall_article 85 (+3)  — misses: settled within 18 days, by 82
+   every target: 2 of 7; the wall begins 63-68 (median 65); settles 79-85 (median 81); the article +3, +3, +3, +3, +3, +5, +3 days after
+
+== the release (57e6f80 without the extra visits)
+7000: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 79, wall_article 82 (+3)  — meets every target
+7100: yj_meet 53, yj_key 61, wall_worry 65, wall_settle 82, wall_article 85 (+3)  — meets every target
+7200: yj_meet 53, yj_key 63, wall_worry 65, wall_settle 81, wall_article 84 (+3)  — misses: the move within ten days
+7300: yj_meet 53, yj_key 61, wall_worry 66, wall_settle 81, wall_article 84 (+3)  — meets every target
+7400: yj_meet 53, yj_key 61, wall_worry 63, wall_settle 79, wall_article 82 (+3)  — meets every target
+7500: yj_meet 53, yj_key 63, wall_worry 65, wall_settle 82, wall_article 85 (+3)  — misses: the move within ten days
+7600: yj_meet 53, yj_key 61, wall_worry 63, wall_settle 79, wall_article 82 (+3)  — meets every target
+   every target: 5 of 7; the wall begins 63-66 (median 65); settles 79-82 (median 81); the article +3, +3, +3, +3, +3, +3, +3 days after
+
+Reading:
+- With the favourites bringing regulars a little more often (9aad866), the evenings were busier and the stories that
+  need two people at one table waited: settled by Day 82 on three seeds of seven, the article seven days after the
+  settlement on three (three or four on every rc7.3 seed).
+- The trace of seed 7100 on 9aad866 (article_trace_7100_9aad866*.txt, trace_article.py, run with JK_GAME_JS set to
+  9aad866's js/game.js): on the two evenings traced as 「day 86」 and 「day 87」 Sophie was in the plan with 怡君 for the
+  article and never walked in, and S.regMiss.sophie moved to a new day number after each of them. The only place that
+  sets it is the full-room path in spawn() (js/game.js), so a full room turned her away both times. She was coming
+  those evenings anyway, so the story's want for her had been skipped and her visit was not the story's — no coming
+  back a little later. 57e6f80 makes such a visit the story's: the article is back to three days after the settlement
+  on six seeds of seven, but the wall still begins later on some seeds (68 on two).
+- Without the extra visits (the release): every seed's wall begins in 62-66 and settles by Day 82, within 18 days;
+  the article three days after on all seven. Five seeds of seven meet every target (five on rc7.3); the two that
+  miss, miss 怡君's move-in by one day (yj_three on Day 58, not 56 — it moves between seeds on every build).
+- So the favourites stay — the orders, the lines, the marks, the bill — without the extra visits.
+- 7600 meets every target on rc7.3 and on the release; the test keeps it.
