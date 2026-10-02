@@ -747,3 +747,22 @@ He orders the fish when 阿德 is in. After L4 he comes now and then on his own,
 - Tests: migration; progression; spacing; presence (nobody comes for someone who is not in); prerequisites; no premature knowledge; letting go and hiring back; dialogue repetition.
 - Simulations: 30 and 60 days from the player's Day 71 save, and a new game.
 - Phone screenshots of every first meeting.
+
+### 9.7 Paused (the player, 2026-10-02 18:38 and 18:39)
+
+P5 is paused, not cancelled (`docs/v24/player_messages_1439_1843_2026-10-02.txt`).
+
+- Kept as they are: this plan, the seven outside-cast portrait cards (1241ee3, in `js/portraits.js`, used by nothing yet), and `tools/sims/p5_cast_sheet.py`. They are the backlog for when P5 resumes.
+- Not built while paused:
+  - the seven outside people (Kevin, 珊珊, 宇翔, 小彤's parents, 老林, 國雄) and their lines;
+  - the general mechanisms of waiting at closing and coming to the kitchen door;
+  - the p5 lane.
+- Not P5, and kept in full: 怡君 is 秀琴阿姨's daughter (canon). Her arc, 《那面牆》, 《三個選項》, her visits and her wait at closing (`sp_wait`) are existing stories.
+- The focus now is the people and places the player already knows:
+  - the Lounge's own life;
+  - Ken, 杜 and the two of them together;
+  - 予安 and Evan;
+  - 沈晴 × 阿拓;
+  - Dylan and the Lounge's people;
+  - the continuity between characters;
+  - what an authored story leaves behind in normal play.
