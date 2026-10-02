@@ -224,11 +224,25 @@ Each was rerun on its own and passed before the whole suite ran again.
 **Run 1, the candidate 9a36bbd** (clean worktree, 01:19–01:55): 200 passed, 8 failed — the eight in §5.2.
 Log: `docs/evidence/v24_rc7_3/regression/full_regression_9a36bbd_200_pass_8_fail.log`.
 
-**Run 2, the release commit**: (filled when it finishes)
+**Run 2, the release commit 22d92e0** (a clean worktree of the commit, 02:19–03:02): **208 passed, 0 failed.**
+Log: `docs/evidence/v24_rc7_3/regression/full_regression_22d92e0_208_pass.log`. This is the commit the page was built
+from; nothing the page is built from changed after it (the commit after it adds this report's §6–§7, the live check's
+screenshots, and Jill's room to the live check's walk).
 
 ## 7. Build and publish
 
-(filled at the release)
+- `tools/build_single.py` on 22d92e0: the single file was already in step (6,318 KB; rebuilt, no change).
+- `tools/build_artifact.py`: the page for the live URL (6,468,631 bytes).
+- Tag `v2.4-rc7.3`: first set at 22d92e0, moved to the commit that adds this section and the live check's screenshots,
+  before the zips were made. Nothing the page is built from changed in between.
+- **Published** to https://claude.ai/artifact/2vhURujrtCpQ1P5jnSsjps, version 46 (version id 1790967750-ba52), at 03:03.
+- **Checked** (`tools/sims/live_check.py`, `docs/evidence/v24_rc7_3_release/`):
+  - The page built from the tag sits inside the live HTML byte for byte. The host adds 552 bytes, its document skeleton.
+  - The player's Day 74 save, made during the evening, opens on 「繼續營業 · 21:48」. The check resumes it and walks the
+    rooms through their tabs, Jill's room too (`07b_home.png`, added to the walk for this release). Then it finishes
+    the day: the summary, then the staff page (「餐廳員工 14/14 人・Lounge 員工 5/5 人・每日薪資 $29,360」).
+  - Day 75's restock is saved ($220,777 → $195,630), and the page survives a reload.
+  - No page errors.
 
 ## 8. Evidence (390×844, headless Chromium — T, not O)
 

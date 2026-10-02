@@ -103,12 +103,13 @@ with sync_playwright() as p:
         if g.page.query_selector('[data-act=restock]:not([disabled])'): g.tap('[data-act=restock]'); g.page.wait_for_timeout(120)   # disabled = 已足夠
         rt.start_day(g); rt.install_bot(g); g.ev(rt.LAZY_ACTOR + "\nwindow.__act=window.__actLazy")
     inv(g, 'service')
-    for frac, k, what in [(.30, 'main', 'the dining room' + ('' if resumes else ', early evening')), (.42, 'side', 'the side room (the stair door at the near edge)'),
-                          (.55, 'front', 'the street'), (.66, 'lounge', 'the Lounge'), (.74, 'kitchen', 'the kitchen')]:
+    walk = [(.30, 'main', 'the dining room' + ('' if resumes else ', early evening')), (.42, 'side', 'the side room (the stair door at the near edge)'),
+            (.55, 'front', 'the street'), (.66, 'lounge', 'the Lounge'), (.74, 'kitchen', 'the kitchen'), (.80, 'home', 'Jill\'s room (rc7.3)')]
+    for i, (frac, k, what) in enumerate(walk):
         until(g, f'R.t>=R.dur*{frac}')
         if g.ev("phase") != 'service': break
         if g.page.query_selector(f'#roomTabs [data-room={k}]'): room(g, k)
-        shot(g, f'0{3 + [.30, .42, .55, .66, .74].index(frac)}_{k}.png', what)
+        shot(g, f'0{3 + i}_{k}.png' if i < 5 else f'07b_{k}.png', what)   # (07b: the numbers after it stay what they were)
     for _ in range(1500):
         if g.ev("phase") != 'service': break
         g.ev("for(let i=0;i<80&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}")
