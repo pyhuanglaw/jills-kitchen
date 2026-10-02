@@ -3441,3 +3441,88 @@ def v24_rc74_the_lounge_tv_and_its_sound(b, port, target):
     check('有比賽轉播（' in summ and '位來看球）' in summ, f'the summary: {summ[:400]!r}')
     g.ev("sportsNight=window.__SN")
     check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc75_the_pizza_oven_one_more_cook_and_the_bar_pizza(b, port, target):
+    """(23:08 「酒吧應該可以開發披薩吧 但可能要烤爐 所以要再增加一個廚師」) The pizza oven is a kitchen work (後場工程,
+    $120,000) that needs the Lounge. Built, the restaurant can hire one more; the kitchen has a 披薩烤爐 station on the
+    board, and the next cook hired goes to it if nobody is there. The bar pizza is researched, not given: before the oven
+    nothing of it is in the lab; with the oven the pantry has the dough, and dough + tomato sauce + cheese is the pizza;
+    the Lounge's morning news never hands it out. It is a Lounge bite (no menu slot). Jill makes the first one; then the
+    cook at the oven bakes it — dressed on the counter, baked in the oven's mouth — and the Lounge's waiter carries it.
+    The Lounge's guests order it, the fans too."""
+    g = Game(b, port, target, seed=7501, manual=True, viewport={'width': 390, 'height': 844})
+    # no Lounge: nothing of it
+    load_save(g, 'player_day52.json')
+    g.ev("S.money=Math.max(S.money,999999);shopTab='kitchen';showShop()"); g.page.wait_for_timeout(80)
+    card = g.ev("(()=>{const e=[...document.querySelectorAll('#screen .item')].find(e=>((e.querySelector('.nm')||{}).textContent||'').startsWith('披薩烤爐'));return e?e.innerText.replace(/\\s+/g,' '):''})()")
+    check('要先有 Lounge' in card and not g.page.query_selector('#screen [data-act=buyProject][data-k=pizzaoven]'), f'no Lounge: the oven waits for it: {card!r}')
+    m0 = g.ev("S.money"); g.ev("doAct('buyProject',null,'pizzaoven',null)")
+    check(not g.ev("projOn('pizzaoven')") and g.ev("S.money") == m0, 'and cannot be built')
+    check(g.ev("!labRD().includes('pizza')&&!pantry().includes('dough')"), 'nothing of the pizza in the lab')
+    g.ev("shopTab='menu';showShop()"); g.page.wait_for_timeout(60)
+    check('酒吧披薩' not in g.ev("$('#screen').innerText"), 'nor on the research list')
+    # with a Lounge
+    load_save(g, 'player_day74_1508.json')
+    g.ev("barMenuMig()")
+    check(g.ev("!S.unlocked.includes('pizza')"), 'the Lounge\'s bites news never hands the pizza out')
+    g.ev("S.money=Math.max(S.money,999999);shopTab='menu';showShop()"); g.page.wait_for_timeout(60)
+    row = g.ev("(()=>{const e=[...document.querySelectorAll('#screen .item')].find(e=>((e.querySelector('.nm')||{}).textContent||'').startsWith('酒吧披薩'));return e?e.innerText.replace(/\\s+/g,' '):''})()")
+    check('需要先購買披薩烤爐' in row and not g.ev("labRD().includes('pizza')"), f'on the research list, waiting for the oven: {row!r}')
+    cap0 = g.ev("restaurantCap()"); m0 = g.ev("S.money")
+    g.ev("shopTab='kitchen';showShop()"); g.page.wait_for_timeout(60)
+    check(g.page.query_selector('#screen [data-act=buyProject][data-k=pizzaoven]') is not None, 'the oven is offered in 廚房設備')
+    g.ev("doAct('buyProject',null,'pizzaoven',null)"); g.ev("__tick(1800)")
+    st = json.loads(g.ev("JSON.stringify({on:projOn('pizzaoven'),money:S.money,cap:restaurantCap(),slots:buildSlots().filter(s=>s.type==='pizza').length,scap:stationCap('pizza'),rv:$('#reveal').hidden?'':$('#reveal').innerText})"))
+    check(st['on'] and st['money'] == m0 - 120000 and st['cap'] == cap0 + 1 and st['slots'] == 1 and st['scap'] == 1 and '披薩烤爐' in st['rv'], f'built: $120,000, one more on the restaurant\'s list, a station of its own, its card: {st}')
+    g.ev("hideReveal()")
+    # the next cook hired goes to the oven
+    n = g.ev("S.crew.length"); free = g.ev("restaurantCap()-poolCrew('restaurant').length")
+    check(free >= 1, f'there is room for one more: {free}')
+    g.ev("shopTab='staff';showShop()"); g.ev("doAct('hire',null,'chef',null)")
+    h = json.loads(g.ev("JSON.stringify((()=>{const m=S.crew[S.crew.length-1];return{n:S.crew.length,role:m.role,duty:m.duty,name:m.name}})())"))
+    check(h['n'] == n + 1 and h['role'] == 'chef' and h['duty'] == 'pizza', f'the new cook is at the oven: {h}')
+    g.ev("shopTab='staff';showShop()"); g.page.wait_for_timeout(60)
+    brow = g.ev("(document.querySelector('.brow[data-st=pizza]')||{}).innerText||''")
+    check('披薩烤爐' in brow and h['name'] in brow, f'the board has its row: {brow!r}')
+    # researched: dough + tomato sauce + cheese
+    check(g.ev("pantry().includes('dough')&&labRD().includes('pizza')"), 'with the oven, the dough is in the pantry')
+    mc = g.ev("menuCount()")
+    g.ev("labSel=['dough','tomato','cheese'];doAct('labTry',null,null,null)")
+    check(g.ev("S.unlocked.includes('pizza')&&S.menu.includes('pizza')") and g.ev("menuCount()") == mc, 'the lab finds it; it is on the menu, taking no slot')
+    # Jill makes the first; then the cook at the oven
+    check(g.ev("chefCanAny('pizza')") is False, 'the first one is Jill\'s')
+    g.ev("S.xp.pizza=Math.max(S.xp.pizza||0,1);S.stock.pizza=Math.max(S.stock.pizza||0,8)")
+    if g.ev("phase") == 'shop':
+        g.click('#screen [data-act=toPrep]' if g.page.query_selector('#screen [data-act=toPrep]') else '#screen [data-act=nextDay]'); g.page.wait_for_timeout(200)
+    g.ev("for(let i=0;i<30;i++){if(typeof DLG!=='undefined'&&DLG)dlgNext()}"); _quiet(g)
+    g.ev("S.stock.pizza=Math.max(S.stock.pizza||0,8);if(!S.menu.includes('pizza'))S.menu.push('pizza')")
+    to_service(g); g.ev("window.__act=()=>{}")
+    check(g.ev("R.slots.filter(s=>s.type==='pizza').length") == 1 and g.ev("chefCanAny('pizza')") is True, 'tonight the oven has its station and its cook')
+    o = json.loads(g.ev("JSON.stringify((()=>{let n=0,f=0;for(let i=0;i<400;i++)if(loungeOrder({size:2,type:'office',pat:1}).includes('pizza'))n++;for(let i=0;i<300;i++)if(loungeOrder({size:2,type:'office',pat:1,sport:1}).includes('pizza'))f++;return{n,f}})())"))
+    check(o['n'] > 0 and o['f'] > 0, f'the Lounge orders it, the fans too: {o}')
+    g.ev("__botUntil('R.t>=R.dur*.3',90000,1/30)")
+    where = g.ev("""(()=>{const free=t=>t.room==='lounge'&&t.kind!=='bar'&&t.seats>=2&&!t.group&&!t.dirty&&!t.claim;if(!R.tables.some(free)){const t=R.tables.find(t=>t.room==='lounge'&&t.kind!=='bar'&&t.seats>=2&&t.group);if(t)leaveGroup(t.group,'ok')}
+      for(const t of R.tables)if(t.room==='lounge'&&t.kind!=='bar'&&!t.group){t.dirty=false;t.claim=null;t.plates=[]}
+      window.__LO=window.__LO||loungeOrder;loungeOrder=q=>q.__want||__LO(q);spawn({t:R.t,type:'office',size:2,lounge:1});const q=R.groups[R.groups.length-1];q.__want=['w_house','pizza'];q.__probe=1;return q.table!=null?R.tables[q.table].room:null})()""")
+    check(where == 'lounge', f'two guests in the Lounge: {where}')
+    seen = set(); shot = False; r = {}
+    for _ in range(600):
+        r = json.loads(g.ev("""JSON.stringify((()=>{const q=R.groups.find(q=>q.__probe);if(!q)return{gone:1};const tk=q.ticket;if(!tk)return{st:q.state};const it=tk.items.find(i=>i.d==='pizza');const s=R.slots.find(s=>s.job&&s.job.it===it);
+          const ch=s&&s.job.chef!=null?S.crew.find(m=>m.id===s.job.chef):null;const sp=s?stepSpot(s):null;const m=tk.claim!=null?S.crew.find(m=>m.id===tk.claim):null;
+          return{it:it&&it.st,picked:!!(it&&it.picked),slot:s?s.type:null,cook:ch?ch.duty:(s?'jill':null),oven:!!(sp&&sp.inOven),step:s&&s.job.step?s.job.step.t:null,claim:m&&it&&it.picked?[m.role,crewPool(m)]:null}})())"""))
+        if r.get('slot'): seen.add(('slot', r['slot'], r['cook']))
+        if r.get('oven'):
+            seen.add(('oven', r['step']))
+            if not shot:
+                g.ev("setRoom('kitchen');for(let i=0;i<2;i++)__tick(1000/30);document.querySelectorAll('#plines>*,#toasts>*').forEach(e=>e.remove())"); g.page.wait_for_timeout(60)
+                g.page.screenshot(path=os.path.join(ROOT, 'tests', 'artifacts', 'rc75_kitchen_pizza_baking.png')); shot = True
+        if r.get('claim'): seen.add(('carried', tuple(r['claim'])))
+        if r.get('it') == 'served' or r.get('gone'): break
+        g.ev("for(let i=0;i<15;i++)__tick(1000/30)")
+    check(r.get('it') == 'served', f'the pizza reached the table: {r} {seen}')
+    check(('slot', 'pizza', 'pizza') in seen and ('oven', 'zone') in seen, f'the cook at the oven made it, and it baked in the oven\'s mouth: {seen}')
+    check(any(x[0] == 'carried' and x[1] == ('waiter', 'lounge') for x in seen), f'the Lounge\'s waiter carried it: {seen}')
+    g.ev("loungeOrder=window.__LO")
+    check(not g.errors, g.errors[:3]); g.close()

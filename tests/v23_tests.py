@@ -837,7 +837,9 @@ def followup_the_manual_describes_the_current_game(b, port, target):
                  # v2.4 rc7.4: favourites
                  '最愛的一道、一杯', '沒有人會直接告訴你', '標 ♥ 和他的名字', '偏向有人最愛的菜',
                  # v2.4 rc7.4: the Lounge's new bites, its TV and sound
-                 '水牛城雞翅、起司條', '生蠔', '德國豬腳', 'Lounge 的家具', 'Lounge 大電視（$200,000）', '電視音響系統（$150,000', '有比賽轉播']:
+                 '水牛城雞翅、起司條', '生蠔', '德國豬腳', 'Lounge 的家具', 'Lounge 大電視（$200,000）', '電視音響系統（$150,000', '有比賽轉播',
+                 # v2.4 rc7.5 (23:08): the pizza oven, one more cook, the bar pizza
+                 '披薩烤爐', '酒吧披薩', '披薩麵團', '把一位廚師排到「披薩烤爐」', '廚房二期、披薩烤爐有關']:
         check(need in txt, f'the manual mentions {need}')
     for stale in ['暫停選單和設定裡都有【儲存目前進度】', '把杯子交給吧台的客人；桌位由有', '上方的分頁', '畫面上方會跳一個小通知', '打烊後或開店前，商店的「社群與宣傳」分頁（第 6 天起）。', '下一段寫著', '窗邊（貓架、睡墊）', '牠會在門邊趴著等主人',
                   '人數上限跟擴建、後場整理區、側廳、廚房擴建、廚房二期、Lounge 有關', '有 Lounge 以後才能招募', '第二位調酒師',
