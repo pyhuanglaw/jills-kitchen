@@ -131,6 +131,10 @@ section (Bar Food, the furniture, 晚餐後八折, VIP), 家具與佈置.
   - `v24_rc74_the_lounge_tv_and_its_sound`
 - `followup_the_manual_describes_the_current_game`: the new phrases (favourites, the bites, the TV) and the old Bar Food
   list as a stale phrase.
+- The first full run on the branch (1e88ded, stopped at test 32) found a real bug: Ken's favourite is Jill's signature,
+  and before there is one his order threw (`loveOrdered` read the name of a dish that does not exist yet). Two story
+  tests failed on it. Fixed in ddfe212: a favourite with no name yet is never missed aloud. The favourites test now
+  seats Ken with no signature and checks that his order goes through without a word about it.
 
 (the rest filled at the release)
 
@@ -144,7 +148,26 @@ section (Bar Food, the furniture, 晚餐後八折, VIP), 家具與佈置.
 
 ## 8. Evidence (390×844, headless Chromium — T, not O)
 
-(filled at the release)
+`docs/evidence/v24_rc7_4/` (the script's own log: `evidence_log.txt`). Everything from the player's Day 74 save
+(`player_day74_1508.json`), saved before rc7.4:
+
+| File | What |
+|---|---|
+| `01_evan_qing_tuo_beside_their_portraits.png` | Each of the three beside their portrait: the sprite at 4×, then at game size standing and seated |
+| `02_d74_lounge_game_night.png`, `02b_d74_lounge_the_tv.png` | A game night: the TV on between the arch and the bar (2:1 on the screen), the speakers either side; Evan behind the bar; 3× close-up of the TV |
+| `03_d74_kitchen.png` | The kitchen in service: 阿拓 on the line |
+| `04_d74_menu_favourites.png` | The next morning's menu: 「♥ 陳伯伯」 beside 黃金蛋炒飯 |
+| `05_d74_journal_favourites.png` | The journal's 熟客: 「最愛 黃金蛋炒飯」, 「最愛 提拉米蘇」 |
+| `06_d74_wine_list_favourite.png` | The Lounge's wine list: 「♥ Sophie」 beside 黑皮諾 |
+| `07_d74_morning_news_of_the_bites.png` | The morning after the update: 「Lounge 的小點多了：水牛城雞翅、起司條、生蠔、德國豬腳。……」 |
+| `08_the_four_bites.png` | The four bites as served, and their pieces |
+| `09_d74_lounge_bites_at_a_table.png`, `09b_d74_lounge_bites_close.png` | Wings and oysters on a Lounge table (3× close-up) |
+| `10_d74_shop_lounge_furniture.png`, `10b_d74_shop_both_owned.png` | The shop: 「Lounge 的家具」, the sound's price shown while it waits; then both owned |
+| `11_d74_tv_bought.png`, `11b_d74_tv_look.png` | The TV's card; the look at the Lounge |
+| `13_d74_summary_game_night.png` | The summary: 「有比賽轉播（5 位來看球）」 on the Lounge line |
+
+The game night in 02 and 13 is forced (the test's way: the day's coin held). Which nights are game nights is fixed per
+day: from Day 74, 17 in ten weeks (Day 74 is one, then 77, 81, 85, 86, 92, 93, 96 …); over 700 days, 1.85 a week.
 
 ## 9. What only the player can judge (O)
 
