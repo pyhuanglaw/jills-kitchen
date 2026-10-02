@@ -768,6 +768,8 @@ function rr(c,x,y,w,h,r){r=Math.max(0,Math.min(r,w/2,h/2));c.beginPath();c.moveT
 function circ(c,x,y,r){c.beginPath();c.arc(x,y,Math.max(.1,r),0,Math.PI*2);c.fill()}
 function rng(seed){let a=seed>>>0;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+/* v2.4 rc6: a coin for the day, 0–99 — the hash above mod 100 runs in steps across consecutive days (a 40% coin could miss ten days in a row), so the story's day coins mix it first */
+function dayCoin(k){let h=hash(k);h^=h>>>16;h=Math.imul(h,0x85ebca6b);h^=h>>>13;h=Math.imul(h,0xc2b2ae35);h^=h>>>16;return(h>>>0)%100}
 function mkCanvas(w,h){const c=document.createElement('canvas');c.width=w;c.height=h||w;return c}
 /* accepts '#rrggbb' and 'rgb(r,g,b)' (mix() returns the latter, and its result is sometimes mixed again) */
 function hex2rgb(h){if(h.charAt(0)!=='#'){const m=h.match(/[\d.]+/g)||[];return[+m[0]||0,+m[1]||0,+m[2]||0]}h=h.replace('#','');return[parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]}
@@ -2774,7 +2776,7 @@ function loungeSeatDefs(){const lv=loungeLv();if(!lv)return[];const out=[];const
  if(lv>=3){const q=LG.quiet;out.push({x:q.x,y:q.y,seats:2,kind:'quiet'})}return out}
 function loungeTables(){return R?R.tables.filter(t=>t.room==='lounge'):[]}
 function loungeSeatFor(g){if(!R||!loungeOpenTonight())return null;const free=loungeTables().filter(t=>!t.group&&!t.dirty&&!t.claim);const size=g.size;
- if(size===1){const b=free.filter(t=>t.kind==='bar'&&stoolFree(t,g));const ns=storyNearStool(g,b)||usualStool(g,b);if(ns)return ns;if(b.length)return pick(b)}/* v2.3 Phase 7 */
+ if(size===1){const b=free.filter(t=>t.kind==='bar'&&stoolFree(t,g));const ns=storyNearStool(g,b)||usualStool(g,b)||pairStool(g,b);if(ns)return ns;if(b.length)return pick(b)}/* v2.3 Phase 7 */
  const ts=free.filter(t=>t.kind!=='bar'&&t.seats>=size).sort((a,b)=>a.seats-b.seats);if(ts.length)return ts[0];
  if(size===2){/* two stools side by side */const b=free.filter(t=>t.kind==='bar'&&stoolFree(t,g)).sort((a,b)=>a.x-b.x);for(let i=0;i<b.length-1;i++)if(Math.abs(b[i+1].x-b[i].x)<32)return b[i]}return null}
 /* who is inclined to stay after dinner, or to wait with a drink: a weight, then a roll — never everyone */
@@ -3022,7 +3024,7 @@ function romanticEligible(a,b){if(!romancePair(a,b))return false;const f=rel(a,b
 const KEN_ID='n:'+KEN,DU_ID='n:'+DU;
 const PAIRS=[
  {a:'sophie',b:'mia',near:()=>fact('sm_b'),linger:()=>fact('sm_e'),leave:()=>fact('sm_f')},
- {a:KEN_ID,b:DU_ID,near:()=>relN(KEN_ID,DU_ID,'sharedTable')>=1,linger:()=>fact('kd_usual'),leave:()=>fact('kd_usual')},
+ {a:KEN_ID,b:DU_ID,near:()=>relN(KEN_ID,DU_ID,'sharedTable')>=1||kdNightNow(),linger:()=>fact('kd_usual'),leave:()=>fact('kd_usual')},
 ];
 function pairOf(id){for(const P of PAIRS)if(P.a===id||P.b===id)return{P,me:id,other:P.a===id?P.b:P.a};return null}
 function pairFor(g){for(const id of storyIdsOf(g)){const p=pairOf(id);if(p)return p}return null}
@@ -3032,7 +3034,7 @@ function storyNearTable(g,free){const p=pairFor(g);if(!p||!p.P.near()||free.leng
 function stoolFree(t,g){if(!t.hold)return true;if(!stoolHoldValid(t))return true;return storyIdsOf(g).includes(t.hold)}
 function stoolHoldValid(t){if(!t.hold)return false;const h=seatedId(t.holdBy);if(!h||h.table==null||R.tables[h.table]!==t.holdOf){t.hold=null;t.holdBy=null;t.holdOf=null;return false}return true}
 function storyNearStool(g,free){const p=pairFor(g);if(!p||!p.P.near())return null;const og=seatedId(p.other);if(!og||og.table==null)return null;const ot=R.tables[og.table];if(ot.kind!=='bar')return null;const adj=free.filter(t=>t.kind==='bar'&&Math.abs(t.x-ot.x)<34&&t!==ot);if(!adj.length)return null;g.nearPick={i:adj[0].i,other:p.other,alt:free.length-1};return adj[0]}
-function holdStoolFor(g,t){if(!t||t.kind!=='bar'||!R)return;const p=pairFor(g);if(!p||!p.P.near()||!fact('sm_c')&&p.P.a==='sophie')return;if(p.P.a===KEN_ID&&!fact('kd_usual'))return;if(seatedId(p.other))return;const n=loungeTables().find(q=>q.kind==='bar'&&!q.group&&!q.dirty&&!q.claim&&!q.hold&&Math.abs(q.x-t.x)<34&&q!==t);if(!n)return;n.hold=p.other;n.holdBy=p.me;n.holdOf=t;factSet('held_'+p.me,true)}
+function holdStoolFor(g,t){if(!t||t.kind!=='bar'||!R)return;const p=pairFor(g);if(!p||!p.P.near()||!fact('sm_c')&&p.P.a==='sophie')return;if(p.P.a===KEN_ID&&!fact('kd_usual')&&!kdNightNow())return;if(seatedId(p.other))return;const n=loungeTables().find(q=>q.kind==='bar'&&!q.group&&!q.dirty&&!q.claim&&!q.hold&&Math.abs(q.x-t.x)<34&&q!==t);if(!n)return;n.hold=p.other;n.holdBy=p.me;n.holdOf=t;factSet('held_'+p.me,true)}
 /* ---- waiting: the meal is over, the partner is on the schedule for later — she stays (once), and only if the partner is really coming ---- */
 function partnerLater(id){if(!R||R.closed)return null;for(let i=R.si;i<R.sched.length;i++){const o=R.sched[i];const oid=o.reg?o.reg:o.name&&NAMED[o.name]?'n:'+o.name:null;if(oid===id&&o.t-R.t<110)return o}return null}
 function storyLinger(g){if(!R||g.lingered||g.table==null)return false;if(yjWaitsForMom(g))return true;if(R.closed)return false;if(namedId(g)==='周董'&&!g.zhouStay){const t0=R.tables[g.table];const c=catBy('snow');if(c&&!c.hidden&&(c.st==='sleep'||c.st==='bed')&&(t0.room||'main')==='main'&&Math.hypot(c.x-t0.x,c.y-t0.y)<100){g.zhouStay=1;g.timer=25;JILL_SAY('你不是有事？',600,{with:'named:周董'});sayG(g,'牠在睡。',2000);g.lookT=R.t+3;g.lookCat=c;relSet('n:周董','snow','stayedFor');regFactNamed('周董',`${catName(c.def)}在旁邊睡著，他就沒走。`);return true}}const p=pairFor(g);if(!p||!p.P.linger())return false;if(seatedId(p.other)||presentId(p.other))return false;const o=partnerLater(p.other);if(!o)return false;g.lingered=1;g.lingerFor=p.other;g.timer=Math.max(8,Math.min(120,o.t-R.t+20));
@@ -3161,8 +3163,8 @@ STORY_EV.push(
  {k:'qt_absence',lane:'minor',cls:'B',at:['order'],once:true,note:'阿拓不在的那天，晴問：「今天炸物怎麼怪怪的？」Hugo：「妳不是在問炸物？」',
   when:ctx=>qingOn()&&!tuoOn()&&fact('qt_3')&&hugoOn()&&ctx.tk&&ctx.tk.lounge&&ctx.tk.items.some(i=>!i.lbar),
   run:()=>{const q=qingOn(),h=hugoOn();sayS(q,'今天炸物怎麼怪怪的？',1500);sayS(h,'一樣的做法。',3000);sayS(q,'喔。',4300);sayS(q,'……阿拓今天沒來？',6200);sayS(h,'妳不是在問炸物？',7700);relSet('s:'+q.id,'s:'+h.id,'spoke');factSet('qt_absence');const F=story().facts;F.qt_absence.who='s:'+q.id}},
- {k:'tuo_off',lane:'minor',cls:'B',at:['daystart'],once:true,note:'阿拓今天請假。',
-  when:()=>qingOn()&&tuoOn()&&hugoOn()&&fact('qt_3')&&S.day-fact('qt_3').d>=3&&!fact('qt_absence')&&hash('tuooff|'+S.day)%100<40,
+ {k:'tuo_off',lane:'ambient',cd:6,at:['daystart'],note:'阿拓今天請假。',   /* not a story step of its own (no slot taken from the day's stories); again some days later if 晴 did not notice that day */
+  when:()=>qingOn()&&tuoOn()&&hugoOn()&&fact('qt_3')&&S.day-fact('qt_3').d>=3&&!fact('qt_absence')&&dayCoin('tuooff|'+S.day)<40,
   run:()=>{const t=tuoOn();setCrewAway(t,'off');noteLine('阿拓今天請假。');factSet('tuo_off')}},
  {k:'qt_photo',lane:'major',cls:'A',floor:2,at:['close'],once:true,ic:'heart',note:'晴和阿拓——從工作開始，到剛好在這裡。',
   when:()=>qingOn()&&tuoOn()&&fact('qt_3')&&factN('qt_extra')>=2&&(!!fact('qt_absence')||S.day-fact('qt_3').d>=14),
@@ -3188,7 +3190,7 @@ STORY_EV.push(
  {k:'lin_same',lane:'ambient',cd:3,at:['seat'],when:ctx=>ctx.g&&namedId(ctx.g)==='Madame Lin'&&namedHist('Madame Lin').saw&&!opsLv('ac')&&Math.random()<.4&&fact('lin_saw'),
   run:ctx=>{sayG(ctx.g,'冷氣還沒換啊。',900)}},
  {k:'lin_gift',lane:'major',cls:'A',floor:3,at:['collect'],once:true,ic:'heart',note:'Madame Lin 帶來一盆植物：「那個角落空很久了。」',
-  when:ctx=>ctx.g&&namedId(ctx.g)==='Madame Lin'&&!ctx.again&&factN('lin_saw')>=3&&!propOn('linplant'),
+  when:ctx=>ctx.g&&namedId(ctx.g)==='Madame Lin'&&!ctx.again&&(factN('lin_saw')>=2||(!!fact('lin_saw')&&S.day-fact('lin_saw').d>=10&&(namedHist('Madame Lin').v||0)>=8))&&!propOn('linplant'),   /* v2.4 rc6 (12:17): two changes noticed, or one and ten days of her visits */
   run:ctx=>{const lines=[{who:'jill',text:'今天怎麼帶東西？'},{who:'named:Madame Lin',text:'那個角落空很久了。'},{who:'jill',tone:'teasing',text:'……妳每次到底都在看哪裡？'}];const done=()=>{propSet('linplant');factSet('lin_gift');relSet('n:Madame Lin','jill','gift');regFactNamed('Madame Lin','帶來一盆植物，放在主廳的角落。');noteLine('Madame Lin 帶來的植物放在主廳角落。');ach('gift')};scene(lines,done)/* scene() runs the callback itself when it cannot show */}},
  /* ===== 周董 — 「隨便」 ===== */
  {k:'zhou_seat',lane:'minor',cls:'B',at:['seat'],once:true,note:'周董平常的位子有人坐，員工說了一聲；他第一次坐到側廳。',
@@ -3197,7 +3199,7 @@ STORY_EV.push(
  {k:'zhou_random',lane:'ambient',cd:3,at:['order'],when:ctx=>ctx.g&&namedId(ctx.g)==='周董'&&ctx.tk&&!ctx.tk.lounge&&ctx.g.zhouUsual&&Math.random()<.6,
   run:ctx=>{const g=ctx.g;sayG(g,pickT(['隨便。','都可以。','你們看著辦。']),300);const w=(S.crew||[]).find(m=>m.role==='waiter'&&relN('s:'+m.id,'n:周董','served')>=3);if(w){const main=namedTop('周董','main'),des=namedTop('周董','dessert');sayS(w,`周董的「隨便」，就是${main?dishName(main):''}${main&&des?'加':''}${des?dishName(des):''}。`,2200);relSet('s:'+w.id,'n:周董','knowsHabit',true)}}},
  {k:'zhou_dessert',lane:'minor',cls:'B',cd:6,at:['order'],note:'周董問「布丁還有嗎？」——賣完了。「你不是都隨便？」「……那明天再來。」',
-  when:ctx=>ctx.g&&namedId(ctx.g)==='周董'&&ctx.tk&&!ctx.tk.lounge&&factN('zhou_tomorrow')<3&&(()=>{const d=namedTop('周董','dessert');return d&&menuList().includes(d)&&(S.stock[d]||0)<=0&&!ctx.tk.items.some(i=>i.d===d)})(),
+  when:ctx=>ctx.g&&namedId(ctx.g)==='周董'&&ctx.tk&&!ctx.tk.lounge&&factN('zhou_tomorrow')<3&&(()=>{const d=namedTop('周董','dessert');return d&&(!menuList().includes(d)||(S.stock[d]||0)<=0)&&!ctx.tk.items.some(i=>i.d===d)})(),   /* v2.4 rc6 (12:17): or not on today's menu */
   run:ctx=>{const g=ctx.g,d=namedTop('周董','dessert');sayG(g,`${dishName(d)}還有嗎？`,600);JILL_SAY('今天沒有了。',2000,{with:'named:周董'});sayG(g,'喔。',3300);JILL_SAY('你不是都隨便？',4600,{with:'named:周董'});sayG(g,'……那明天再來。',6100);factSet('zhou_tomorrow');regFactNamed('周董',`${dishName(d)}賣完的那天說：「那明天再來。」`)}},
  /* ===== 神秘美食評論家 — the later return ===== */
  {k:'critic_back',lane:'minor',cls:'B',at:['seat'],once:true,note:'戴帽子的客人又來了。Jill：「今天還戴帽子？」「比較安靜。」',
@@ -3250,6 +3252,10 @@ function storySeatHook(g,t){if(!t)return;namedSeat(g,t);try{campaignSeat(g,t)}ca
 function storyTableFor(g,ts){if(!ts.length)return null;const nt=storyNearTable(g,ts);if(nt)return nt;
  if(g.v24grp){/* v2.4: someone a story brought with others sits in the same room as them (any free table there — not a chosen seat beside them) */const mate=R.groups.find(q=>q!==g&&q.v24grp===g.v24grp&&q.table!=null&&!q.gone);if(mate){const rm=R.tables[mate.table].room||'main';const c=ts.filter(t=>(t.room||'main')===rm);if(c.length)return c[0]}
   else{/* the first of them: a room with a free table for each who is coming (the dining room first; no outdoor table in the rain) */const n=1+R.sched.slice(R.si).filter(o=>o.v24grp===g.v24grp).length+R.groups.filter(q=>q!==g&&q.v24grp===g.v24grp&&!q.gone&&q.table==null).length;const wet=R.weather==='rain'||R.weather==='storm';const by={};for(const t of ts){if(t.out&&wet)continue;const rm=t.room||'main';(by[rm]=by[rm]||[]).push(t)}const ok=Object.keys(by).filter(rm=>by[rm].length>=n).sort((a,b)=>(a==='main'?-1:b==='main'?1:by[b].length-by[a].length));if(ok.length)return by[ok[0]][0]}}if(g.wantSide){const sd=ts.filter(t=>(t.room||'main')==='side'&&t.seats>=g.size);if(sd.length)return sd[0]}const nn=namedId(g);if(!nn)return null;const u=namedUsualTable(nn);if(u==null)return null;const ut=ts.find(t=>t.i===u);if(ut)return ut;if(nn==='周董'&&projOn('side')){const sd=ts.filter(t=>(t.room||'main')==='side');if(sd.length&&(!fact('zhou_side')||Math.random()<.4))return sd[0]}return null}
+/* v2.4 rc6 (12:17): the evening a coin brings Ken and 杜 in together; the first to come takes a stool with a free one
+   beside it (kept for the other by holdStoolFor) */
+function kdNightNow(){return !!S&&!!S.story&&S.story.kdNight===S.day}
+function pairStool(g,b){const nn=namedId(g);if(!kdNightNow()||(nn!==KEN&&nn!==DU))return null;if(seatedId(nn===KEN?DU_ID:KEN_ID))return null;const s=b.slice().sort((x,y)=>x.x-y.x);for(const t of s)if(s.some(q=>q!==t&&Math.abs(q.x-t.x)<34))return t;return null}
 function usualStool(g,b){const nn=namedId(g);if(!nn||(nn!==KEN&&nn!==DU))return null;const F=fact('kd_usual');if(!F||!F.seat)return null;const mine=F.seat[nn===KEN?0:1];const t=b.find(q=>q.i===mine);if(t)return t;const other=b.find(q=>q.i===F.seat[nn===KEN?1:0]);return other||null}
 function storySchedule(out,dur){const roll=(k,p)=>hash('sched|'+S.day+'|'+k)%1000<p*1000;/* the schedule's own coin — the day's random stream is left as it was */storyScheduleTogether(out);campaignGuests(out,dur);
  if(fact('sm_b')){const A=out.find(o=>o.reg==='sophie'),B=out.find(o=>o.reg==='mia');if(A&&!B&&S.day>=REG_BY.mia.day&&roll('mia+',.3))out.push(regPlanVisit({t:A.t,type:'office',reg:'mia',size:1}));else if(B&&!A&&S.day>=REG_BY.sophie.day&&roll('sophie+',.3))out.push(regPlanVisit({t:B.t,type:'gourmet',reg:'sophie',size:1}))}
@@ -3513,7 +3519,7 @@ function v24Visits(out,dur,roll){let want=[];for(const f of V24_WANTS){try{want=
   if(w.reg){const r=REG_BY[w.reg];if(!r||S.day<r.day)continue;if(!roll('v24|'+key,w.p))continue;const o=regPlanVisit({t:tt,type:r.type,reg:w.reg,size:r.size});o.story=1;out.push(o);resv(w.k)}
   else{if(!roll('v24|'+key,w.p))continue;out.push(Object.assign({t:tt,type:w.type||'regular',size:w.size||1,name:w.name,story:1},w.o||{}));resv(w.k)}}
  /* the people one beat needs together come around the same time (a nudge in the plan, like Sophie and Mia's) */
- for(const w of want){if(!w.grp)continue;const e=entry(w);if(e&&!(grp[w.grp]=grp[w.grp]||[]).includes(e))grp[w.grp].push(e)}
+ for(const w of want){if(!w.grp)continue;const e=entry(w);if(e&&w.o&&w.o.lounge)e.lounge=1;/* v2.4 rc6: a pair that meets in the Lounge (Ken and 杜) */if(e&&!(grp[w.grp]=grp[w.grp]||[]).includes(e))grp[w.grp].push(e)}
  for(const k in grp){const es=grp[k];if(es.length<2)continue;const t0=Math.max(dur*.18,Math.min(...es.map(e=>e.t)));es.forEach((e,i)=>{e.v24grp=k;e.hold=1;/* the hour is the point: not pulled earlier on a quiet evening */e.t=Math.min(dur*.8,t0+i*(2+hash('v24g|'+S.day+'|'+k+'|'+i)%40/10))})}}
 /* ---- story illustrations (docs/v24/visual_addendum, illus_continuity): a picture for a few big moments, shown over
    the scene's lines and reopenable from the journal; never a Life Album photo by itself. art: a key of
@@ -3697,6 +3703,11 @@ function tablesNear(a,b,d){const ta=a&&a.table!=null&&R.tables[a.table],tb=b&&b.
 function smLongKnown(){return relN('sophie','mia','copresent')>=1&&(S.regulars.sophie||0)>=12&&(S.regulars.mia||0)>=8}
 V24_WANTS.push(()=>{const out=[];if(fact('sm_h'))return out;const A=REG_BY.sophie,B=REG_BY.mia;if(!A||!B||S.day<Math.max(A.day,B.day)+7||(S.regulars.sophie||0)<6||(S.regulars.mia||0)<4)return out;
  const p=!fact('sm_a')?60:fact('sm_b')?30:40;if(hash('smw|'+S.day)%100>=p)return out;out.push({reg:'sophie',p:1,grp:'sm'},{reg:'mia',p:1,grp:'sm'});return out});
+/* v2.4 rc6 (the player, 12:17): Ken and Monsieur 杜 argued once at the next table and then never sat in the Lounge on the
+   same evening — and every later step of theirs needs that. Some evenings bring the two of them in to the Lounge around
+   the same time (one coin for the pair, from the day) until their stools are theirs, then now and then until the photo */
+V24_WANTS.push(()=>{const out=[];if(!loungeOpenTonight()||!fact('ken_du_argue')||fact('kd_photo'))return out;if(!NAMED[KEN]||!NAMED[DU])return out;
+ const p=!fact('kd_usual')?40:22;if(dayCoin('kdw|'+S.day)>=p)return out;story().kdNight=S.day;out.push({name:KEN,p:1,type:'gourmet',size:1,grp:'kd',o:{lounge:1}},{name:DU,p:1,type:'gourmet',size:1,grp:'kd',o:{lounge:1}});return out});
 function smPair(){if(!R)return null;const s=seatedId('sophie'),m=seatedId('mia');if(!s||!m)return null;const ts=R.tables[s.table],tm=R.tables[m.table];return ts&&tm&&(ts.room||'main')===(tm.room||'main')?{s,m}:null}
 function wallWorrying(){return !!fact('wall_worry')&&!fact('wall_mediation')}
 /* the leak shows after rain: rain in the last two days; when it has stayed dry since the move settled (two days after
@@ -4192,7 +4203,7 @@ const STORY_LINES=[
  {k:'sophiemei',who:'Sophie & 寶寶',names:['Sophie','Jill'],faces:['sophie','cat:mei'],title:()=>'我沒有特別喜歡貓',open:()=>!!BF('sophie_mei_1'),more:'寶寶好像記得她。',photos:['sophie_mei'],
   beats:[['sophie_mei_1','「可以不要讓牠靠我的包嗎？」'],['sophie_mei_2','「今天那隻呢？」'],['sophie_mei_3','低頭看了一下'],['sophie_mei_4','「給你們店裡的。」']]},
  {k:'kd',who:'Ken & Monsieur 杜',names:['品酒師 Ken','Monsieur 杜','Evan','沈晴','安安','Jill'],faces:['named:品酒師 Ken','named:Monsieur 杜'],title:()=>'總是談不攏的兩個人',tag:'友情故事',open:()=>!!(BF('ken_du_argue')||BF('kd_usual')),more:'他們還在吵。',photos:['ken_du','ken_du_seat'],
-  beats:[['ken_du_argue','第一次吵起來'],['lounge_first_night','Lounge 的第一個晚上'],['kd_usual','固定的位子'],['kd_evan_1','「杜來了嗎？」'],['kd_qing','「他有說幾點嗎？」'],[['kd_absence','kd_absence_du'],'那個人今天沒來'],['kd_coaster','第二個杯墊'],['kd_photo','還是沒有同意'],['kd_photo2','固定的位置']]},
+  beats:[['ken_du_argue','第一次吵起來'],['lounge_first_night','Lounge 的第一個晚上',{can:()=>!!BF('lounge_first_night')||!S.newRooms||S.newRooms.lounge==null||S.day-(S.newRooms.lounge||0)<=3}],['kd_usual','固定的位子'],['kd_evan_1','「杜來了嗎？」'],['kd_qing','「他有說幾點嗎？」'],[['kd_absence','kd_absence_du'],'那個人今天沒來'],['kd_coaster','第二個杯墊'],['kd_photo','還是沒有同意'],['kd_photo2','固定的位置']]},
  {k:'qt',who:'晴 & 阿拓',names:['沈晴','阿拓','Jill'],kinds:['s'],faces:['staff:沈晴','staff:阿拓'],title:()=>'多的',open:()=>!!BF('qt_1'),more:'（只要他們還在這裡工作。）',photos:['qing_tuo','qing_tuo_late'],
   beats:[['qt_1','「炸雞好了沒？」'],['qt_2','不用問了'],['qt_3','「多的。」'],['qt_absence','「今天炸物怎麼怪怪的？」'],['qt_photo','從工作開始'],['qt_photo2','有你在的晚班']]},
  {k:'dylan',who:()=>dylanOut()?'Jill & Dylan':'Dylan',names:['Dylan','Jill','王太太','王先生'],faces:()=>dylanOut()?['dylan','jill']:['dylan'],title:()=>dylanOut()?'結婚十一年，還在追':'那位常來的客人',open:()=>(S.regulars.dylan||0)>=1,more:()=>dylanOut()?'他們的故事還在繼續。':'好像有什麼……',photos:['jill_dylan_valentine'],

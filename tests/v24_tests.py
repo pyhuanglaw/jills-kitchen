@@ -2018,7 +2018,7 @@ def v24_rc6_qing_and_tuo_move_on(b, port, target):
     g.ev("storyTick('close',{})")
     check(g.ev("!!fact('qt_3')") and g.ev("fact('qt_3').d") == 72 and g.ev("storyDay().major") == 1 and g.ev("majorOwed()") is None, '「多的。」 plays at closing; one major beat that day; the hold is over')
     # 阿拓's day off, a few days on: a coin from the day; 晴 notices the fryer
-    d_off = g.ev("(()=>{for(let d=S.day+3;d<S.day+40;d++)if(hash('tuooff|'+d)%100<40)return d;return null})()")
+    d_off = g.ev("(()=>{for(let d=S.day+3;d<S.day+40;d++)if(dayCoin('tuooff|'+d)<40)return d;return null})()")
     check(d_off is not None and d_off - 72 <= 12, f'a day off comes within days: Day {d_off}')
     g.ev(f"S.day={d_off};story().away=null;storyDay();storyTick('daystart',{{}})")
     away = json.loads(g.ev("JSON.stringify({f:!!fact('tuo_off'),t:!!tuoOn(),q:!!qingOn(),here:crewHere(crewByName('阿拓')),lbl:crewAwayOf(crewByName('阿拓'))})"))
@@ -2091,4 +2091,36 @@ def v24_rc6_the_morning_reports(b, port, target):
     g.click('[data-act=toShop]') if g.page.query_selector('[data-act=toShop]') else None
     g.ev("bookTab='mem';showBook()"); g.page.wait_for_timeout(100)
     check(g.ev("!!document.querySelector('#screen .bookend [data-act=closeSub]')") and '關閉日誌' in g.ev("document.querySelector('#screen .bookend').innerText"), 'the album ends with 「關閉日誌」')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc6_stalled_lines_move_on(b, port, target):
+    """the player's 12:17 (「故事進展真的太慢 一堆劇情完全沒後續」, every line audited on their Day 71 save): Ken × Monsieur 杜
+    sat at 1/9 since Day 52 — every later step needs the two of them in the Lounge on the same evening, and nothing
+    arranged that (Ken came to the Lounge seven times, 杜 five, never together). Some evenings now bring the two of them to
+    the Lounge around the same time until their stools are theirs; 「Lounge 的第一個晚上」, possible only in the Lounge's
+    first three days, is no longer a step still to come once that is past. 周董's 「那明天再來。」 also comes when his
+    dessert is not on today's menu; Madame Lin brings her plant after two changes noticed, or one and ten days."""
+    g = Game(b, port, target, seed=72, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day71_1215.json')
+    # Madame Lin: one change noticed, ten days and her visits
+    l = json.loads(g.ev("(()=>{const E=STORY_EV.find(e=>e.k==='lin_gift');const g0={named:'Madame Lin',name:'Madame Lin',size:1};const f=fact('lin_saw');const a=E.when({g:g0});const keep=f.d;f.d=S.day-3;const b=E.when({g:g0});f.d=keep;return JSON.stringify({n:factN('lin_saw'),since:S.day-keep,visits:namedHist('Madame Lin').v,a,b})})()"))
+    check(l['n'] == 1 and l['since'] >= 10 and l['a'] is True and l['b'] is False, f'Madame Lin\'s plant after one change and ten days (not after three): {l}')
+    kd = json.loads(g.ev("JSON.stringify((()=>{const P=lineProgress(STORY_LINES.find(x=>x.k==='kd'));return{n:P.done.length,total:P.total}})())"))
+    check(kd == {'n': 1, 'total': 8}, f'Ken × 杜: the Lounge\'s first night (Day 57–60) is past and no longer counted: {kd}')
+    d = g.ev("(()=>{for(let d=S.day+1;d<S.day+30;d++)if(dayCoin('kdw|'+d)<40)return d;return null})()")   # (the save's own Day 71 has had their visits)
+    check(d is not None and d - 71 <= 6, f'a coin within days: Day {d}')
+    g.ev(f"S.day={d}")
+    to_service(g)
+    sched = json.loads(g.ev("JSON.stringify(R.sched.filter(o=>o.name===KEN||o.name===DU).map(o=>({n:o.name,lounge:!!o.lounge,grp:o.v24grp||null,t:Math.round(o.t)})))"))
+    check(len(sched) == 2 and all(o['lounge'] and o['grp'] == 'kd' for o in sched) and abs(sched[0]['t'] - sched[1]['t']) <= 8, f'that evening the two of them come to the Lounge, around the same time: {sched}')
+    for _ in range(400):
+        g.page.evaluate('()=>window.__bot(60,1/30)')
+        if g.ev("!!kenAt()&&!!duAt()") or g.ev("phase") != 'service': break
+    both = json.loads(g.ev("JSON.stringify({k:!!kenAt(),d:!!duAt(),bar:!!kdBoth(),shared:relN(KEN_ID,DU_ID,'sharedTable')})"))
+    check(both['k'] and both['d'] and both['shared'] >= 1, f'both in the Lounge, sharing it: {both}')
+    # 周董: his dessert not on today's menu
+    z = json.loads(g.ev("(()=>{const E=STORY_EV.find(e=>e.k==='zhou_dessert');const d=namedTop('周董','dessert');const m0=S.menu.slice();S.menu=S.menu.filter(x=>x!==d);const g0={named:'周董',name:'周董',size:1};const ctx={g:g0,tk:{lounge:0,items:[{d:'steak'}]}};const a=E.when(ctx);S.menu=m0;return JSON.stringify({d,a})})()"))
+    check(z['d'] and z['a'] is True, f'周董 asks for his dessert on a day it is not on the menu: {z}')
     check(not g.errors, g.errors[:3]); g.close()

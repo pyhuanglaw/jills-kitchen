@@ -84,6 +84,9 @@ def story_ready(g):
         setf(g, k, 34 - i * 2)
     for i, k in enumerate(['wall_worry', 'wall_call', 'wall_photos', 'wall_jill', 'wall_visit', 'wall_wang', 'wall_setback', 'wall_report', 'wall_fee', 'wall_prep', 'wall_mediation', 'wall_settle', 'wall_paid', 'wall_article', 'wall_paper', 'wall_fixed']):
         setf(g, k, max(1, 18 - i))
+    # v2.4 rc6 (the player's 10:25): the floor's story begins once the Lounge is finished — this Day 52 save has none, so
+    # it is set as built three weeks ago (the wall above is no longer what opens the floor)
+    g.ev("(()=>{S.rooms.lounge=1;S.loungeProj={revealed:S.day-23,state:'built',at:S.day-21};S.newRooms=S.newRooms||{};S.newRooms.lounge=S.day-21;story().facts.lounge_built_1={d:S.day-21,n:1,l:S.day-21}})()")
 
 def dlg_text(g):
     return g.ev("(()=>{const e=$('#dlg');return e&&!e.hidden?($('#dlg .dlg-name').textContent+'：'+$('#dlg .dlg-text').textContent):null})()")
@@ -97,15 +100,15 @@ with sync_playwright() as p:
         begin_until(g, 'up_inspect', 9101)
         frames(g, 3)
         shot(g, 'u3_inspect_1.png', 'U3, the start of the service: the landlord came that afternoon (the fire inspection); Jill asks to go up with him')
-        for i in range(3): g.ev("dlgNext()")
+        for i in range(3): g.ev("__tick(400);dlgNext()")
         shot(g, 'u3_inspect_2.png', 'U3: 「地板是好的，窗戶也是好的。」 — words only; the floor is not shown yet')
-        for i in range(5): g.ev("dlgNext()")
+        for i in range(5): g.ev("__tick(400);dlgNext()")
         finish(g); to_prep(g)
         setf(g, 'up_inspect', 3)   # three days later (the gap the fiction needs: "several days")
         # ---- U4: the night ----
         begin_until(g, 'up_door', 9102)
         frames(g, 3)
-        g.ev("dlgNext()")
+        g.ev("__tick(400);dlgNext()")
         shot(g, 'u4_start.png', 'U4, the start of the service (the day\'s major is this one): the landlord brought someone up to look at the air conditioner — 「好了。門我帶上了。」')
         g.ev("for(let i=0;i<80&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}")
         g.ev("__botUntil('R.t>=R.dur*.75',90000,1/30)"); flush(g)
@@ -140,10 +143,10 @@ with sync_playwright() as p:
             frames(g, 10)
             if dlg_text(g): break
         shot(g, 'u4_scene_1.png', '「妳們兩個。」')
-        g.ev("dlgNext()"); shot(g, 'u4_scene_2.png', 'only after the cats: 「……這裡滿大的欸。」')
+        g.ev("__tick(400);dlgNext()"); shot(g, 'u4_scene_2.png', 'only after the cats: 「……這裡滿大的欸。」')
         for _ in range(8):
             if not dlg_text(g): break
-            g.ev("dlgNext()")
+            g.ev("__tick(400);dlgNext()")
         frames(g, 60)
         shot(g, 'u4_down.png', 'down they go — the cats first')
         for _ in range(80):
@@ -173,10 +176,10 @@ with sync_playwright() as p:
             frames(g, 10)
             if dlg_text(g): break
         shot(g, 'u6_ask_1.png', 'U6, closing: Jill at the stair door, the phone — 「……樓上現在還空著嗎？」')
-        for i in range(7): g.ev("dlgNext()")
+        for i in range(7): g.ev("__tick(400);dlgNext()")
         shot(g, 'u6_ask_2.png', '「整層？」')
-        g.ev("dlgNext()"); shot(g, 'u6_ask_3.png', '「整層。」')
-        g.ev("dlgNext()")
+        g.ev("__tick(400);dlgNext()"); shot(g, 'u6_ask_3.png', '「整層。」')
+        g.ev("__tick(400);dlgNext()")
         for _ in range(60):
             frames(g, 10)
             if g.ev("sub==='upproj'"): break

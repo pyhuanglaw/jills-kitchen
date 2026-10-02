@@ -93,9 +93,9 @@ with sync_playwright() as p:
                 g.ev("hud(true);forceDraw=true"); g.ev("__tick(1000/30)")
                 shot(g, 'yj_meet_helper_scene.png', f'a new game, Day {g.ev("S.day")}, no cleaner hired: 怡君 came late to eat; her mother, in to help close up, walked over — 「妳怎麼來了？」 with the player\'s yj_intro picture')
                 for _ in range(3):
-                    g.ev("dlgNext()"); g.page.wait_for_timeout(40)
+                    g.ev("__tick(400);dlgNext()"); g.page.wait_for_timeout(40)
                 shot(g, 'yj_meet_helper_scene_line4.png', 'the same scene, the last line 「不能吃妳工作的喔？」 (怡君, laughing)')
-                while g.ev("!!DLG"): g.ev("dlgNext()")
+                while g.ev("!!DLG"): g.ev("__tick(400);dlgNext()")
                 got = True
             g.ev("window.__noScenes=true;window.__fastSay=1")
         finish_day(g)

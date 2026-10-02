@@ -19,6 +19,7 @@ SEED = "Math.random=(function(){let a=%d;return function(){a|=0;a=a+0x6D2B79F5|0
 notes = []
 
 def shot(g, name, what):
+    g.ev("try{hud(true)}catch(e){}")   # the bot steps the day without frames; a story's hold then stops the HUD's own refresh — in play the frames before it have drawn the clock
     g.ev("forceDraw=true"); g.ev("__tick(1000/30)")
     g.page.wait_for_timeout(60)
     g.page.screenshot(path=os.path.join(OUT, name))
@@ -256,11 +257,11 @@ with sync_playwright() as p:
             g.ev("__botUntil('R.closing!=null||!!(typeof DLG!==\\'undefined\\'&&DLG)',1500,1/30)")
         flush(g)
         if g.ev("!!fact('sr_story')"):
-            for i in range(3): g.ev("dlgNext()")
+            for i in range(2): g.ev("__tick(400);dlgNext()")   # a held panel: one line per tap, 280 ms apart
             shot(g, 'story_sr_1.png', '《大家待的地方》: after closing, Jill alone — 店裡有客人的位置。')
             for i in range(8):
                 if not g.ev("!!(typeof DLG!=='undefined'&&DLG)") or '好像一直沒有' in (g.ev("(document.querySelector('#dlg')||{}).innerText||''") or ''): break
-                g.ev("dlgNext()")
+                g.ev("__tick(400);dlgNext()")
             shot(g, 'story_sr_2.png', '……好像一直沒有一個地方，是給每天在這裡工作的人待的。')
             g.ev("for(let i=0;i<80&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}"); g.page.wait_for_timeout(120)
             shot(g, 'story_sr_offer.png', 'the project offered: 開始規劃 / 之後再說')

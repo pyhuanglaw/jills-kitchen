@@ -1,0 +1,19 @@
+Day 71 → Day 100
+line         who                    open       @71  last     @100  last  next (what it waits for)
+sm           Sophie & Mia           True       2/8    66      5/8    88  sm_f: ctx=>ctx.g&&ctx.g.reg==='mia'&&relN('sophie','mia','waitedFor')>=1
+sophiemei    Sophie & 寶寶            True       2/4    65      4/4    99  -: 
+kd           Ken & Monsieur 杜       True       1/8    52      7/8    94  lounge_first_night: ctx=>loungeLv()>0&&ctx.g&&(namedId(ctx.g)===DU||namedId(ctx.g)===KEN)&&!!kenAt()&&!!duAt()&&(S.newRooms.lounge||0)>=S.day-3
+qt           晴 & 阿拓                 True       2/6    67      6/6    90  -: 
+dylan        Jill & Dylan           True     16/18    70    17/18    74  dylan_valentine: ctx=>ctx.g&&ctx.g.reg==='dylan'&&R.event==='valentine'&&!fact('valentine_'+S.day)
+wang         王先生 & 王太太              True       2/2    66      2/2    66  -: 
+koba         小林                     True       3/3    54      3/3    54  -: 
+leo          Leo                    True       1/4    60      2/4    76  leo_plant: 
+meal         阿哲 & Marco             True       1/2    62      2/2    79  -: 
+zhou         周董                     True       2/3    59      2/3    59  STALLED  zhou_dessert: ctx=>ctx.g&&namedId(ctx.g)==='周董'&&ctx.tk&&!ctx.tk.lounge&&factN('zhou_tomorrow')<3&&(()=>{const d=namedTop('周董','dessert');return d&&(!menuList().includes(d)||(S.stock[d]||0)<=0)&&!ctx.tk.items.some(
+lin          Madame Lin             True       1/2    61      2/2    73  -: 
+li           老饕李先生                  True       1/1    52      1/1    52  li_1: ctx=>ctx.g&&namedId(ctx.g)==='老饕李先生'&&!ctx.again&&S.signature&&!S.sigDessert&&(ctx.items||[]).some(i=>i.d==='signature')
+critic       戴帽子的客人                 True       2/2    64      2/2    64  -: 
+insp         衛生檢查員                  True       2/2    57      2/2    57  -: 
+yj           怡君 & 秀琴阿姨              True       6/6    63      6/6    63  -: 
+wall         秀琴阿姨・Sophie・Mia・王先生    True      4/10    70    11/11    84  -: 
+page errors []
