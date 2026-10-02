@@ -1,0 +1,12 @@
+FAIL  golden_frames  (114.5s)
+      summary: pixels differ in box (156, 59, 197, 96) (see tests/artifacts/)
+      shop: pixels differ in box (153, 59, 261, 311) (see tests/artifacts/)
+      book_cats: pixels differ in box (153, 59, 200, 110) (see tests/artifacts/)
+      book_mem: pixels differ in box (156, 59, 308, 800) (see tests/artifacts/)
+      day1: first differing sample #170 (t=169.733): scene, cats
+      day1: end-of-day digest differs: cats, catHash, weights
+      day2: 7860 frames, baseline 7806
+      day2: first differing sample #0 (t=0.033): scene, cats, weights
+      day2: end-of-day digest differs: money, lifetime, stats, xp, stock, reviews, reviewHash, summary, cats, catHash, mem, weights, life
+PASS  followup_the_manual_describes_the_current_game  (0.4s)
+PASS  v24_rc73_jills_room_is_there_from_day_one  (9.5s)

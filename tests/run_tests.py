@@ -179,7 +179,7 @@ window.__evening = function(seconds, dt, every, hook){
   return out;
 };
 window.__lifeSample = t => { const L=LIFE.jill, D=LIFE.dylan, tv=LIFE.tv;
-  return {t:+t.toFixed(1), phase, plan:LIFE.plan, jill:{on:L.on,bed:!!L.bed,act:L.act,legs:+L.legs.toFixed(2),pos:L.pos,x:L.x|0,y:L.y|0,walking:L.walking},
+  return {t:+t.toFixed(1), phase, plan:LIFE.plan, jill:{on:L.on,bed:!!L.bed,room:L.room||'main',act:L.act,legs:+L.legs.toFixed(2),pos:L.pos,x:L.x|0,y:L.y|0,walking:L.walking},
           tv:{at:tv.at,on:tv.on,x:tv.x|0,y:tv.y|0,mover:tv.mover}, dylan:D?{st:D.state,x:D.x|0,y:D.y|0,onSofa:D.onSofa,seated:D.seated,act:D.act}:null,
           cats:CATS.map(c=>({id:c.def.id,st:c.away==='home'&&c.homeSleep?'sleep':c.st,pose:c.pose,x:c.x|0,y:c.y|0,slot:c.sofa?c.sofa.k:null,kind:c.sofa?c.sofa.kind:null,on:!!c.sofaOn}))}};
 window.__lifeInvariants = function(){ const bad=[]; const L=LIFE.jill, D=LIFE.dylan, tv=LIFE.tv; if (!CATS) return bad;
@@ -729,7 +729,8 @@ def jill_evening_life(b, port, target):
         g.click('[data-act=open]')
         samples = run_evening(g, seconds=150, every=10)
         acts = set(x['jill']['act'] for x in samples if x['jill']['on'])
-        nights.append({'seed': seed, 'plan': samples[-1]['plan'], 'sat': any(x['jill']['on'] for x in samples),
+        seated_rooms = set(x['jill']['room'] for x in samples if x['jill']['on'] or x['jill']['bed'])
+        nights.append({'seed': seed, 'plan': samples[-1]['plan'], 'rooms': seated_rooms, 'sat': any(x['jill']['on'] for x in samples),
                        'legs': max(x['jill']['legs'] for x in samples), 'acts': acts,
                        'tv': any(x['tv']['on'] for x in samples), 'tvmoved': any(x['tv']['at'] in ('use', 'moving') for x in samples),
                        'endSeated': samples[-1]['jill']['on'] or samples[-1]['jill']['bed'] or samples[-1]['plan'] == 'table',   # rc7.3: or on the edge of the bed, in her room
@@ -739,6 +740,8 @@ def jill_evening_life(b, port, target):
     check(len(sat) >= 8, f'Jill used the sofa on only {len(sat)}/12 nights: {nights}')
     check(sum(1 for n in sat if n['legs'] >= .95) >= len(sat) // 2, f'legs stretched on too few nights: {[n["legs"] for n in sat]}')
     check(all(n['endSeated'] for n in nights), f'someone is stuck standing at the end of the evening: {[n for n in nights if not n["endSeated"]]}')
+    # rc7.3 (18:53 §5–§6): wherever she sits down for the evening — the sofa or the edge of the bed — it is in her room, never a dining table
+    check(all(n['plan'] != 'table' and n['rooms'] <= {'home'} for n in nights), f'the evening is in her room: {[(n["seed"], n["plan"], n["rooms"]) for n in nights]}')
     all_acts = set().union(*[n['acts'] for n in sat])
     check({'read', 'idle'} <= all_acts, f'expected reading and doing nothing across nights, saw {all_acts}')
     check(any(n['tv'] for n in nights), f'the TV was never watched in 12 nights: {[n["tvmoved"] for n in nights]}')
