@@ -1153,7 +1153,10 @@ def v24_rc6_the_floor_and_its_rooms_are_tabs(b, port, target):
     check(tap("PDL.door.x", "LH-30") == 'up', 'its door at the near end: back out onto the floor')
     g.ev("setRoom('staff')")
     check(tap("SRL.door.x", "LH-20") == 'up', 'the Staff Room\'s door: the same')
-    check(tap("UPR.pd.x0+60", "UPR.pd.y1-30") == 'pdr', 'on the floor, the Private Dining Room\'s wall or door: in')
+    up = lambda x, y: g.ev(f"(()=>{{setRoom('up');roomTap({{x:{x},y:{y}}},{{preventDefault(){{}}}});return room}})()")
+    check(up("UPR.pdDoor.x", "UPR.pdDoor.y-20") == 'pdr' and up("UPR.pd.x0+60", "UPR.pd.y0+20") == 'pdr', 'on the floor, the Private Dining Room\'s door or the room itself: in')
+    if g.ev("srBuilt()"):
+        check(up("UPR.srDoor.fx", "UPR.srDoor.y") == 'staff' and up("UPR.sr.x0+40", "UPR.sr.y1-30") == 'staff', 'the Staff Room\'s door in its side wall, or the room: in (08:37)')
     check(g.ev("(()=>{setRoom('side');document.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowRight'}));return room})()") == 'up', 'the arrow keys go over the same tabs')
     check(g.ev("(()=>{document.dispatchEvent(new KeyboardEvent('keydown',{key:'6'}));return room})()") == 'pdr', 'and the number keys')
     check(not g.errors, g.errors[:3]); g.close()
@@ -1189,7 +1192,7 @@ def v24_rc6_the_floor_is_shown_when_it_changes(b, port, target):
     g.ev("for(let i=0;i<70;i++)__tick(1000/30)")
     st = json.loads(g.ev("JSON.stringify({p:upRevealP(),sign:upSignOn('sr'),card:!$('#upRv').hidden,txt:$('#upRv').innerText,q:__spy.q,sr:__spy.sr})"))
     check(st['p'] == 1 and st['sign'] and st['card'] and '員工休息室' in st['txt'] and '進去看看' in st['txt'], f'then the room, its sign, and a card: {st}')
-    check(st['q'] > 0 and st['sr'] == 0, f'the 「？」 on the undecided corner; nothing of the room\'s inside drawn on the floor: {st}')
+    check(st['q'] > 0 and st['sr'] == 0, f'the 「？」 where the other room is not yet; nothing of the room\'s inside drawn on the floor: {st}')
     g.click('#upRv [data-uprv=in]'); g.ev("for(let i=0;i<4;i++)__tick(1000/30)")
     st = json.loads(g.ev("JSON.stringify({room,UPV,pill:$('#peekPill').textContent,on:(document.querySelector('#roomTabs .on span')||{}).textContent,sr:__spy.sr})"))
     check(st['room'] == 'staff' and st['pill'].startswith('回到開店準備') and st['on'] == '員工休息室' and st['sr'] > 0, f'into the room\'s own view, the first time: {st}')
@@ -1259,13 +1262,13 @@ def v24_rc6_the_floor_plan_grows_with_the_building(b, port, target):
     check(st['st']['sr'] == 'works' and '施工中' in st['t'] and '施工中' in st['cap'], f'tonight: the works, hatched: {st}')
     g.ev("S.day+=1;srW().rv=S.day")
     st = json.loads(shop())
-    check(st['st']['sr'] == 'built' and '員工休息室' in st['t'] and '今天完工' in st['t'] and st['t'].count('？') == 2, f'the morning after: its walls, door and name, 「今天完工」; 「？」 where the floor is still open: {st}')
+    check(st['st']['sr'] == 'built' and '員工休息室' in st['t'] and '今天完工' in st['t'] and st['t'].count('？') == 1, f'the morning after: its walls, door and name, 「今天完工」; 「？」 where the other room is not yet: {st}')
     g.ev("S.day+=1")
     st = json.loads(shop())
     check('今天完工' not in st['t'], 'only that day')
     g.ev("(()=>{const s=srW();s.st2=S.day-1;s.st3=S.day;const p=pdW();p.offer=S.day-2;p.plan='plan';p.bought=S.day-1;p.done=S.day;p.rv=S.day;p.st2=S.day;p.st3=S.day})()")
     st = json.loads(shop())
-    check(st['st'] == {'sr': 'built', 'pd': 'built'} and '私人包廂' in st['t'] and st['t'].count('？') == 1 and st['p'] == 0, f'both rooms (and nothing more to buy): the plan stays, the last 「？」 on the corner: {st}')
+    check(st['st'] == {'sr': 'built', 'pd': 'built'} and '私人包廂' in st['t'] and st['t'].count('？') == 0 and st['p'] == 0, f'both rooms (and nothing more to buy): the plan stays; the player\'s plan (08:37) leaves nothing undecided: {st}')
     g.click('.upplan'); g.page.wait_for_timeout(60)
     big = json.loads(g.ev("JSON.stringify({open:!$('#upPlanBig').hidden,w:parseFloat($('#upPlanBig canvas').style.width)})"))
     check(big['open'] and big['w'] >= 340, f'a tap: full screen: {big}')
@@ -1429,15 +1432,18 @@ def v24_rc6_cats_visit_the_rooms_and_leave(b, port, target):
 
 @test
 def v24_rc6_the_open_floor_keeps_its_ways(b, port, target):
-    """rc6 B, AT (circulation): with both rooms the open floor keeps the stairs, the middle, the column, the right window
-    and the corner nobody has decided; the people walk from the stairs to each door and back round the column, never
-    through a wall; the floor's view still draws its furniture and the cut walls."""
+    """rc6 B, AT (circulation), and the player's own plan of the floor (08:37): the Private Dining Room the big room in the
+    top-left over the street windows, its east wall on the right window's first mullion; the Staff Room directly below it
+    the whole way to the back wall, narrower; the hall an L on the right; the stairs across the back corner, half the
+    size they were, the way in at their left end (09:14), and no column; the Private Dining Room's door in its front wall
+    at its corner, the Staff Room's in its east wall near the top, each with its front on the hall; the people walk from
+    the stairs to each door and back, never through a wall; the floor's view still draws."""
     g = Game(b, port, target, seed=299, manual=True, viewport={'width': 390, 'height': 844})
     load_save(g, 'player_day61.json')
     _floor(g, 50); g.ev(PD_OPEN)
     g.ev("(()=>{const p=pdW();p.ever=3;p.res={id:'r'+S.day,d:S.day,size:5,min:3800,kind:'x',type:'family',name:'x',t:.9,status:'missed',phase:1}})()")
-    z = json.loads(g.ev("JSON.stringify((()=>{const P=UPR.pd,Q=UPR.sr,in_=(r,x,y)=>x>=r.x0&&x<=r.x1&&y>=r.y0&&y<=r.y1;const s=UP_L.stair,col=UP_L.col,win=UP_L.win[1],e=UP_L.entry;return{stairs:!in_(P,s.x,s.y)&&!in_(Q,s.x,s.y)&&!in_(P,s.x+s.w,s.y+s.h),col:!in_(P,col.x,col.base)&&!in_(Q,col.x,col.base),win:win.x>P.x1,entry:!in_(P,e.x,e.y)&&!in_(Q,e.x,e.y),corner:!in_(Q,UP_ZONES.undecided.x+UP_ZONES.undecided.w,UP_ZONES.undecided.y+UP_ZONES.undecided.h-1)||Q.y1<UP_ZONES.undecided.y+UP_ZONES.undecided.h}})())"))
-    check(all(z.values()), f'the open floor keeps its parts: {z}')
+    z = json.loads(g.ev("JSON.stringify((()=>{const P=UPR.pd,Q=UPR.sr,in_=(r,x,y)=>x>=r.x0&&x<=r.x1&&y>=r.y0&&y<=r.y1;const s=UP_L.stair,win=UP_L.win[1],e=UP_L.entry,dp=UPR.pdDoor,ds=UPR.srDoor;return{stairs:s.w>s.h&&s.h<=81&&s.x>Q.x1+UPRW.sd&&s.x+s.w<=378&&s.y+s.h<=FB&&!in_(P,s.x,s.y)&&!in_(Q,s.x,s.y),nocolumn:UP_L.col===undefined,win:P.x1===win.x+win.w/5,plan:P.x0===Q.x0&&P.y0===92&&Q.y0===P.y1&&Q.y1===FB&&Q.x1<P.x1,entry:!in_(P,e.x,e.y)&&!in_(Q,e.x,e.y)&&e.x<s.x,doors:dp.side==='s'&&dp.x>Q.x1+UPRW.sd&&dp.x<P.x1&&ds.side==='e'&&ds.y0>=Q.y0&&ds.y1<Q.y0+(Q.y1-Q.y0)/3&&!in_(P,dp.fx,dp.fy)&&!in_(Q,dp.fx,dp.fy)&&!in_(P,ds.fx,ds.fy)&&!in_(Q,ds.fx,ds.fy)}})())"))
+    check(all(z.values()), f'the floor as the player drew it: {z}')
     _quiet(g); to_service(g)
     g.ev("__botUntil('R.t>=R.dur*.1',90000,1/30)")
     # a walker from the stairs to each door and back: every step outside the rooms' boxes while on the floor

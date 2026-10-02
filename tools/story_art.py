@@ -18,7 +18,7 @@ YJI = os.path.join(ROOT, 'docs/v24/art/illus_yj_intro_2026-10-01.png')        # 
 YJK = os.path.join(ROOT, 'docs/v24/art/illus_yj_key_2026-10-01.png')          # 2026-10-01 13:57, supplied by the player: 怡君's new flat, the spare key — the room 《那面牆》 returns to
 WLK = os.path.join(ROOT, 'docs/v24/art/illus_wall_leak_2026-10-01.png')       # 2026-10-01 14:14, supplied by the player (second version: Sophie as she looks, hair down, black jacket): the same room after the rain — the stained corner, Mia with the light, Sophie with the photos
 WST = os.path.join(ROOT, 'docs/v24/art/illus_wall_settled_2026-10-01.png')    # 2026-10-01 14:13, supplied by the player: after the mediation — 怡君 and 王先生 in the corridor, restrained
-UPC = os.path.join(ROOT, 'docs/v24/art/illus_up_cats_2026-10-02.jpg')         # 2026-10-02 08:15, supplied by the player (「去二樓發現貓的圖」): the night of the missing cats — the whole floor at night from above, the street windows, the column, the stairs, Jill and two of the crew, the cats (a portrait picture: kept whole, not cut to 4:3)
+UPC = os.path.join(ROOT, 'docs/v24/art/illus_up_cats_2026-10-02_0841.png')    # 2026-10-02 08:41, supplied by the player (「去二樓發現貓的圖 修改成這一張」, replacing the 08:15 picture): the night of the missing cats — the empty floor at night from above, the two street windows with the city, the orange cat on the sill, Jill bending to the tabby, the column, the boxes and the ladder, two of the crew at the stairs (a portrait picture: kept whole, not cut to 4:3)
 # key -> (sheet, box). Boxes chosen by eye on the sheets; 4:3 is enforced by a centered crop of the box.
 ART = {
     'sophie_mia_leave':  (SML, (15, 0, 1380, 1024)),    # 《一起回家》 — Sophie and Mia arm in arm on the way out, the cat on the counter behind them (the player's full picture, 2026-10-01)
@@ -34,7 +34,7 @@ ART = {
     'yj_key':            (YJK, (0, 0, 1448, 1086)),      # v2.4 illustration 《備用鑰匙》 — the key handed over in the half-unpacked flat (the player's picture, whole)
     'wall_leak':         (WLK, (0, 0, 1448, 1086)),      # v2.4 illustration 《那面牆》 — the same room and wall weeks later, after the rain (the player's picture, whole)
     'wall_settled':      (WST, (0, 0, 1448, 1086)),      # v2.4 illustration 《調解之後》 — 怡君 and 王先生 walking out of the mediation, files under their arms (the player's picture, whole)
-    'up_cats':           (UPC, (20, 19, 1212, 1521)),    # v2.4 illustration 《樓上》 — the night the two cats were found upstairs (the player's picture, whole, portrait; the sheet's white margin and the sliver of the next panel left out)
+    'up_cats':           (UPC, (18, 16, 1106, 1386)),    # v2.4 illustration 《樓上》 — the night the two cats were found upstairs (the player's 08:41 picture, whole, portrait; the white margin and the sliver of the next panel left out)
 }
 KEEP = {'up_cats': 760}   # pictures kept whole at their own proportions (height in px); the dialog shows them contained
 def crop43(im, box):
