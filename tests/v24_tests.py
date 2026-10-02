@@ -3526,3 +3526,122 @@ def v24_rc75_the_pizza_oven_one_more_cook_and_the_bar_pizza(b, port, target):
     check(any(x[0] == 'carried' and x[1] == ('waiter', 'lounge') for x in seen), f'the Lounge\'s waiter carried it: {seen}')
     g.ev("loungeOrder=window.__LO")
     check(not g.errors, g.errors[:3]); g.close()
+
+
+FP_WORDS = ['相簿', '相冊', 'Album', 'album', '解鎖', '珍貴', '收藏', 'NEW', '回憶', '第一張', '成就', '紀念']
+
+
+@test
+def v25_first_photo_day_one_dylan_takes_one_of_jills_cameras(b, port, target):
+    """rc7.5 (the player, 19:31–19:32; docs/v24/life_album_first_photo_2026-10-02_1931.txt): Day 1, as the doors open,
+    Jill carries a pot of herbs toward the window and stops to look at it; Dylan takes her with one of her own cameras —
+    the shutter, the flash; she was not looking. The photo is the room as it was that instant (the game's own picture,
+    without its marks), the album's first entry: Day 1, 「第一天」, protected from the cap, not 珍藏. Four lines, two more
+    only if a cat is in the frame. No unlock, no achievement, no word about an album. The pot ends on the sill and the
+    day goes on; the coach and the lines never cover each other. Then: a reload, a backup and its restore, the cap."""
+    g = Game(b, port, target, seed=7508, manual=True, viewport={'width': 390, 'height': 844})
+    g.ev("window.__firstPhoto=1")
+    g.click('[data-act=open]'); g.page.wait_for_timeout(150)
+    check(g.ev("S.day") == 1 and g.ev("albumList().length") == 0 and not g.ev("S.firstPhoto"), 'a new game: no photo yet')
+    ach0 = set(json.loads(g.ev("JSON.stringify(Object.keys(S.achievements||{}))")))
+    start_day(g); install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy")
+    phases, overlap, said, t_shot, t_pot = [], [], set(), None, None
+    for _ in range(1500):
+        r = json.loads(g.ev("JSON.stringify({fp:R.jill.fp?R.jill.fp.phase:null,first:!!S.firstPhoto,pot:!!(S.firstPhoto&&S.firstPhoto.pot),t:R.t})"))
+        if r['fp'] and (not phases or phases[-1] != r['fp']): phases.append(r['fp'])
+        if r['first'] and t_shot is None: t_shot = r['t']
+        if t_shot is not None:
+            said |= set(g.ev("[...document.querySelectorAll('#toasts .toast,#banner *')].map(e=>e.textContent)"))
+            said.add(g.ev("$('#banner').textContent||''"))
+        ov = g.ev("(()=>{const c=$('#coach');const ls=[...document.querySelectorAll('#plines>*')];if(c.hidden||!ls.length)return null;const a=c.getBoundingClientRect();return ls.some(e=>{const b=e.getBoundingClientRect();return b.bottom>a.top+1&&b.top<a.bottom-1&&b.right>a.left&&b.left<a.right})})()")
+        if ov is not None: overlap.append(ov)
+        if r['pot'] and t_pot is None: t_pot = r['t']
+        if t_pot is not None and r['t'] > t_shot + 13: break
+        # the player plays until the shutter; then the frames run on the clock (the lines are timed, as on a phone)
+        if t_shot is None: g.page.evaluate('()=>window.__bot(6,1/30)')
+        else: g.ev("for(let i=0;i<6;i++)__tick(1000/30)")
+    check(phases == ['go', 'stand', 'turn', 'sill', 'place'], f'to the window with the herbs, a look at them, the shutter, a look back, the sill: {phases}')
+    check(t_shot is not None and t_shot < 12, f'as the doors open, before the first guest has ordered: the shutter at {t_shot}')
+    shot = json.loads(g.ev("JSON.stringify(R.fpShot)"))
+    p = json.loads(g.ev("JSON.stringify(albumList()[0])"))
+    check(p['kind'] == 'first' and p['day'] == 1 and p['cap'] == '第一天' and p.get('first') == 1 and p['keep'] is False and p['clock'].startswith('17:') and p['id'] == 'p1_first', f'the album\'s first entry: Day 1, 「第一天」, not 珍藏: {p}')
+    img = json.loads(g.ev("(async()=>{const u=albumList()[0].img||await photoGet('p1_first');if(!u)return JSON.stringify(null);const im=new Image();await new Promise(r=>{im.onload=r;im.src=u});return JSON.stringify([u.slice(0,15),im.naturalWidth,im.naturalHeight])})()"))
+    check(img and img[0] == 'data:image/jpeg' and img[1:] == [360, 270], f'a picture, 4:3, the size of the others: {img}')
+    f = shot['f']
+    check(f and f['x'] <= FP_X and FP_X <= f['x'] + f['w'] and shot['cats'] in (0, 1), f'Jill is in the frame, and at most one cat: {shot}')
+    lines = json.loads(g.ev("JSON.stringify(dayLog().filter(l=>['Jill','Dylan'].includes(l.w)).map(l=>l.w+'：'+l.t))"))
+    want = ['Jill：你拿我的相機幹嘛？', 'Dylan：拍妳。', 'Jill：我根本沒在看。', 'Dylan：我知道。'] + (['Jill：牠也在。', 'Dylan：嗯。'] if shot['cats'] == 1 else [])
+    got = [x for x in lines if x in want + ['Jill：牠也在。', 'Dylan：嗯。']]
+    check(got == want, f'the lines, in order (the cat\'s two only with a cat in it): {got}')
+    bad = [w for w in FP_WORDS for x in said if w in x]
+    check(not bad, f'nothing says album, unlock, treasured, NEW: {bad} in {said}')
+    new_ach = set(json.loads(g.ev("JSON.stringify(Object.keys(S.achievements||{}))"))) - ach0
+    check(not [a for a in new_ach if re.search('photo|album|first|mem', a)], f'no achievement for it: {new_ach}')
+    check(overlap and not any(overlap), f'the coach and the lines never covered each other ({len(overlap)} frames with both)')
+    check(g.ev("!!(S.firstPhoto&&S.firstPhoto.pot)") and g.ev("!R.jill.fp"), 'the pot is on the sill; Jill is back to work')
+    # the day goes on
+    play_day(g, max_steps=60000)
+    for _ in range(200):
+        if g.ev("phase") != 'service': break
+        g.ev("for(let i=0;i<30;i++)__tick(1000/30)")
+    s = json.loads(g.ev("JSON.stringify(S.lastSummary||{})"))
+    check(g.ev("phase") == 'summary' and s.get('guests', 0) >= 5, f'the day ends as any first day does: {s.get("guests")} guests')
+    check(g.ev("albumList().filter(p=>p.kind==='first').length") == 1, 'one first photo')
+    # Day 2: no history added on top of it; ordinary photos still come
+    g.click('[data-act=toShop]'); g.page.wait_for_timeout(60); g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(150)
+    check(g.ev("albumList().filter(p=>p.kind==='first').length") == 1 and not g.ev("S.firstPhoto.retro"), 'the next morning changes nothing')
+    g.ev("albumAdd('pet','data:image/jpeg;base64,/9j/',{a:'柔柔'})")
+    check(g.ev("albumList().length") >= 2 and g.ev("albumList()[0].kind") == 'first', 'the next photo goes after it')
+    # a reload
+    g.ev("save()"); g.reload(); g.page.wait_for_timeout(200)
+    r = json.loads(g.ev("(async()=>{const p=albumList().find(p=>p.kind==='first');if(!p)return JSON.stringify(null);const u=p.img||await photoGet(p.id);return JSON.stringify({id:p.id,day:p.day,img:(u||'').slice(0,15)})})()"))
+    check(r and r['day'] == 1 and r['img'] == 'data:image/jpeg', f'after a reload: {r}')
+    # a backup and its restore, in another browser
+    txt = g.ev("(async()=>backupText(await photoAll()))()")
+    check('p1_first' in txt, 'the backup has it, with its picture')
+    g2 = Game(b, port, target, seed=7509, manual=True, viewport={'width': 390, 'height': 844})
+    g2.ev("importSaveText(%s);importConfirm()" % json.dumps(txt)); g2.page.wait_for_timeout(200)
+    r = json.loads(g2.ev("(async()=>{const p=albumList().find(p=>p.kind==='first');if(!p)return JSON.stringify(null);const u=p.img||await photoGet(p.id);return JSON.stringify({day:p.day,cap:p.cap,img:(u||'').slice(0,15)})})()"))
+    check(r and r['day'] == 1 and r['cap'] == '第一天' and r['img'] == 'data:image/jpeg', f'restored from the backup: {r}')
+    # the cap: three hundred ordinary photos later it is still there
+    n = g2.ev("(()=>{for(let i=0;i<300;i++)albumAdd(i%2?'pet':'nap','data:image/jpeg;base64,/9j/',{a:'柔柔'});return albumList().filter(p=>!p.keep&&!p.first).length})()")
+    check(n <= g2.ev("albumCap()") and g2.ev("albumList().filter(p=>p.kind==='first').length") == 1 and g2.ev("albumList()[0].kind") == 'first', f'the ordinary photos rotate ({n} kept), the first one stays')
+    check(not g.errors and not g2.errors, (g.errors + g2.errors)[:3]); g.close(); g2.close()
+
+
+FP_X = 236
+
+
+@test
+def v25_first_photo_a_mature_save_gets_day_one_as_history(b, port, target):
+    """rc7.5: a save past Day 1 that never had the moment gets the photo as history — the Day 1 restaurant drawn as it
+    was (newState), Jill with the herbs, 包包 on the bed by the window — at the front of the album: Day 1, 「第一天」, no
+    clock. Nothing else in the album moves or goes; nothing is said (no news, no toast, no line, no NEW); the moment is not
+    played on Day 74. The lightbox opens on it (Day 1, the caption, the picture whole), the album reads from it, and the
+    restaurant's own window has no pot on its sill (that pot belongs to a Day 1 that was played)."""
+    g = Game(b, port, target, seed=7510, manual=True, viewport={'width': 390, 'height': 844})
+    raw = load_save(g, 'player_day74_1508.json')
+    before = raw.get('album') or []
+    A = json.loads(g.ev("JSON.stringify(albumList().map(p=>({id:p.id,kind:p.kind,day:p.day,keep:!!p.keep,clock:p.clock,cap:p.cap})))"))
+    check(len(A) == len(before) + 1 and A[0]['kind'] == 'first' and A[0]['day'] == 1 and A[0]['cap'] == '第一天' and A[0]['clock'] == '', f'one more, at the front, Day 1: {len(before)} -> {len(A)}, {A[0]}')
+    check([(p['id'], bool(p.get('keep'))) for p in before] == [(p['id'], p['keep']) for p in A[1:]], 'every photo that was there is there, in its order, 珍藏 as it was')
+    check(g.ev("JSON.stringify(S.firstPhoto)") == '{"day":1,"retro":1}', 'history, not news')
+    news = g.ev("JSON.stringify((S.news||[]).filter(n=>/照片|相機|相簿|第一天/.test(n)))")
+    toasts = g.ev("[...document.querySelectorAll('#toasts .toast')].map(e=>e.textContent).join('|')")
+    check(news == '[]' and not any(w in toasts for w in FP_WORDS + ['照片', '相機']), f'nothing said: {news} {toasts}')
+    img = json.loads(g.ev("(async()=>{const p=albumList()[0];const u=p.img||await photoGet(p.id);if(!u)return JSON.stringify(null);const im=new Image();await new Promise(r=>{im.onload=r;im.src=u});return JSON.stringify([u.slice(0,15),im.naturalWidth,im.naturalHeight])})()"))
+    check(img and img[0] == 'data:image/jpeg' and img[1:] == [360, 270], f'the picture: {img}')
+    # the lightbox, from the album page
+    g.ev("bookTab='mem';showBook()"); g.page.wait_for_timeout(250)
+    g.ev("openLightbox('p1_first')"); g.page.wait_for_timeout(200)
+    lb = json.loads(g.ev("JSON.stringify((()=>{const el=$('#lightbox');const im=el.querySelector('.lb-card img');const r=im.getBoundingClientRect();const c=el.querySelector('.lb-close').getBoundingClientRect();return{open:!el.hidden,txt:el.querySelector('figcaption').innerText.replace(/\\s+/g,' '),count:el.querySelector('.lb-count').textContent,w:Math.round(r.width),h:Math.round(r.height),nat:[im.naturalWidth,im.naturalHeight],close:[Math.round(c.width),Math.round(c.height)],pin:!!el.querySelector('.pin')}})())"))
+    check(lb['open'] and 'DAY 1' in lb['txt'] and '第一天' in lb['txt'] and lb['count'].startswith('1 /') and not lb['pin'], f'the lightbox: Day 1, its caption, the first of the album, no pin: {lb}')
+    check(lb['w'] >= 300 and abs(lb['w'] / max(1, lb['h']) - 4 / 3) < .03 and min(lb['close']) >= 32, f'the whole picture, big enough on a phone, a close button a thumb can hit: {lb}')
+    g.click('#lightbox .lb-close'); g.page.wait_for_timeout(120)
+    check(g.ev("$('#lightbox').hidden"), 'it closes')
+    check(g.ev("JSON.stringify(albumList().slice().sort((a,b)=>a.day-b.day)[0].id)") == '"p1_first"', 'the album reads from it')
+    # Day 74 is played as Day 74: no moment, no pot on the restaurant's sill
+    g.ev("closeSub&&closeSub()"); to_service(g); g.ev("window.__firstPhoto=1")
+    g.ev("__botUntil('R.t>=R.dur*.2',90000,1/30)")
+    check(g.ev("!R.jill.fp") and not g.ev("dayLog().some(l=>/拍妳|我的相機/.test(l.t))") and not g.ev("!!S.firstPhoto.pot"), 'nothing replayed')
+    check(not g.errors, g.errors[:3]); g.close()

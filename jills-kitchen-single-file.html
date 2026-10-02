@@ -1919,7 +1919,7 @@ function drawPerson(c,x,y,L,o){o=o||{};const s=(o.s||1)*(o.pscale===undefined?PS
  if(ex==='smile'&&!o.blink){c.strokeStyle=ink;c.lineWidth=1.25;c.beginPath();for(const sx of E){c.moveTo(sx+Math.cos(Math.PI*1.1)*1.9,hy+2.4+Math.sin(Math.PI*1.1)*1.9);c.arc(sx,hy+2.4,1.9,Math.PI*1.1,Math.PI*1.9)}c.stroke();brows(0,-.2)}
  else if(ex==='amused'&&!o.blink){openEyes(0);c.strokeStyle=hairDk;c.globalAlpha*=.7;c.lineWidth=.7;c.beginPath();c.moveTo(-5.2,hy-3.4);c.quadraticCurveTo(-3.2,hy-4.2,-1.6,hy-3.6);c.moveTo(1.6,hy-4.8);c.quadraticCurveTo(3.4,hy-5.8,5.4,hy-5);c.stroke();c.globalAlpha/=.7}
  else if((ex==='soft'||ex==='tired')&&!o.blink){openEyes(ex==='tired'?.55:.4);brows(0,ex==='tired'?.3:0)}
- else if(ex==='focus'&&!o.blink){openEyes(.22);brows(.4,.2)}
+ else if(ex==='focus'&&!o.blink){openEyes(.22);brows(.4,.2)}else if(ex==='down'&&!o.blink){openEyes(.55);brows(0,.45)}   /* rc7.5: her eyes on what her hands are doing (the album's first photo) */
  else if(m==='angry'){c.fillStyle=ink;c.fillRect(-4.8,hy+.8,3,1.2);c.fillRect(1.8,hy+.8,3,1.2);c.strokeStyle=hairDk;c.lineWidth=1;c.beginPath();c.moveTo(-5.4,hy-3.4);c.lineTo(-1.6,hy-1.4);c.moveTo(5.4,hy-3.4);c.lineTo(1.6,hy-1.4);c.stroke()}
  else if(o.blink){c.strokeStyle=ink;c.lineWidth=.9;c.beginPath();c.moveTo(-5,hy+1.6);c.lineTo(-1.8,hy+1.6);c.moveTo(1.8,hy+1.6);c.lineTo(5,hy+1.6);c.stroke();brows(0,0)}
  else{openEyes(m==='sad'?.3:L.eye==='calm'?.2:0);brows(m==='sad'?-.6:0,m==='sad'?.4:m==='happy'?-.3:0)}
@@ -1931,7 +1931,7 @@ function drawPerson(c,x,y,L,o){o=o||{};const s=(o.s||1)*(o.pscale===undefined?PS
  if(L.beard)drawStoryFace(c,L,hy,'jaw');
  c.strokeStyle=L.lips?shade(L.lips,-.3):'#5A2E22';c.lineWidth=1;c.beginPath();
  if(ex==='amused'){c.moveTo(-1.4,hy+6.3);c.quadraticCurveTo(1.4,hy+7.4,3.2,hy+5.6)}
- else if(ex==='focus'||ex==='tired'){c.moveTo(-1.5,hy+6.4);c.lineTo(1.5,hy+6.4)}
+ else if(ex==='down'){c.moveTo(-1.6,hy+6.1);c.quadraticCurveTo(0,hy+7.1,1.6,hy+6.1)}else if(ex==='focus'||ex==='tired'){c.moveTo(-1.5,hy+6.4);c.lineTo(1.5,hy+6.4)}
  else if(ex==='soft'){c.arc(0,hy+4.8,1.9,.45,Math.PI-.45)}
  else if(m==='happy'||ex==='smile'||ex==='bright'){c.arc(0,hy+4.3,2.3,.25,Math.PI-.25);c.stroke();c.fillStyle=L.lips||'rgba(180,80,70,.35)';c.beginPath();c.arc(0,hy+4.3,2.2,.35,Math.PI-.35);c.closePath();c.fill();c.beginPath()}
  else if(m==='sad'){c.arc(0,hy+7.6,2,Math.PI+.45,-.45)}
@@ -5144,6 +5144,8 @@ function tableActionable(t){const g=t.group;if(!g)return t.dirty;if(g.rowdy)retu
 function planAct(){const J=R.jill,t=R.tables[J.cur.t],g=t.group;const need=g&&g.ticket&&g.ticket.items.some(it=>it.st==='ready'&&!it.picked);
  if(need){J.cur.step='pickup';J.troom='main';J.tx=PASS.x+(t.x<200?-14:14);J.ty=PASS.y}else{J.cur.step='table';J.troom=t.room||'main';J.tx=t.x;J.ty=t.y+26}}
 function arriveAct(){const J=R.jill;if(J.restTo){J.restTo=false;J.sit=true;J.face=1;return}
+ if(J.fp&&!J.cur&&J.fp.phase==='go'){J.fp.phase='stand';J.fp.t=.9;J.face=-1;J.lookAt={x:J.x-8,y:J.y-30,t:1.4,down:true};return}   /* rc7.5: on her way to the window with the herbs, a look at them */
+ if(J.fp&&!J.cur&&J.fp.phase==='sill'){J.fp.phase='place';J.fp.t=.8;J.face=-1;J.lookAt={x:FP_SILL.x-12,y:FP_SILL.y-28,t:.8};return}   /* and onto the sill */
  if(J.visit&&J.visit.phase==='go'&&J.visit.kind==='selfie'){const V=J.visit;V.phase='stand';V.t=rand(2,3);const t=V.t0,g=V.g;J.face=t.x>=J.x?1:-1;J.lookAt={x:t.x,y:t.y-8,t:V.t};if(R.groups.includes(g)){jillSay(pickT(['好啊。','來。','貓也要一起嗎？']));g.pat=Math.min(1,g.pat+.1);memo('selfie',t.x,t.y-6,{g:g.name,subj:[{x:J.x,y:J.y}]})}return}
  if(J.visit&&J.visit.phase==='go'&&J.visit.kind==='treat'){const V=J.visit;V.phase='stand';V.t=rand(1.4,2.2);const t=V.t0;J.face=t.x>=J.x?1:-1;J.lookAt={x:t.x,y:t.y-8,t:V.t};treatArrive(V);return}
  if(J.visit&&J.visit.phase==='go'){const V=J.visit;V.phase='stand';V.t=rand(2.2,3.6);const t=V.t0,g=V.g;J.face=t.x>=J.x?1:-1;J.lookAt={x:t.x,y:t.y-8,t:V.t};
@@ -5198,14 +5200,21 @@ function jillUpd(dt){const J=R.jill;const fire=R.fire>0;if(upSearching()||(R&&R.
  if(J.rest==='sit'){restTick(dt);if(J.rest==='sit')return}
  if(J.busy>0){J.busy-=dt*(fire?1.5:1);if(J.busy>0)return;J.busy=0;if(J.cur){if(J.cur.go){J.cur.go=false;const t=R.tables[J.cur.t];J.troom=t.room||'main';J.tx=t.x;J.ty=t.y+26}else if(J.cur.done)J.cur=null}}
  if(!J.cur&&J.q.length){J.cur={t:J.q.shift()};planAct();J.idle=0}
+ if(J.fp&&(J.cur||J.q.length||R.closing!=null))fpDrop();   /* rc7.5: work comes first */
  if(J.tx!=null){const v=165*flowMul('jill')*(fire?1.5:1)*dt;if(stepTo(J,v)){J.tx=null;J.moving=false;arriveAct()}else{J.step+=dt*12;J.moving=true}return}
  if(J.room!=='main'){/* away from the dining room with nothing to do: back to the pass */J.troom='main';J.tx=PASS.x;J.ty=PASS.y;return}
+ if(J.fp){const F=J.fp;/* rc7.5: the look at the herbs, the shutter, a look back at him, then on to the sill */
+  if(F.phase==='stand'){F.t-=dt;if(F.t<=0){firstPhotoShutter();F.phase='turn';F.t=1.3;J.face=1;J.lookAt={x:J.x+16,y:J.y+70,t:1.3}}return}
+  if(F.phase==='turn'){F.t-=dt;if(F.t<=0){F.phase='sill';J.troom='main';J.tx=FP_SILL.x;J.ty=FP_SILL.y}return}
+  if(F.phase==='place'){F.t-=dt;if(F.t<=0){fpDrop();J.idle=0}return}
+  fpDrop()}
  if(J.pet){J.pet.t-=dt;if(J.pet.t<=0){J.pet=null;J.idle=0}else if(J.q.length||jillWorkload()>2)J.pet=null}
  if(!J.cur&&!J.pet&&R.closing==null&&J.idle>1.5&&(J.petCD||0)<R.t&&CATS&&Math.random()<dt*.5){/* a cat wandered close: look down, crouch, one pat */const near=CATS.find(c=>!c.hidden&&c.perch<0&&!c.sofa&&['rest','daze','stare','sleep','side'].includes(c.st)&&Math.hypot(c.x-J.x,c.y-J.y)<42);
   if(near){const id=near.def.id;const p=id==='tora'?.9:id==='ban'?.85:id==='mikan'?.6:id==='mei'?.45:.35;J.petCD=R.t+rand(18,40);if(Math.random()<p){J.pet={cat:near,t:rand(1.6,3),crouch:near.st!=='side'};if(near.st!=='side')memo('pet',near.x,near.y-6,{a:catName(near.def),subj:[{x:J.x,y:J.y}]});J.face=near.x>=J.x?1:-1;if(near.st!=='sleep'){releaseSpots(near);near.st='pet';near.pose=near.st==='sleep'?near.pose:'rub';near.happy=rand(2,3.5);near.quiet=1;near.face=J.x>=near.x?1:-1}near.hearts.push({x:0,y:-26,t:0});if(id==='snow'&&near.st==='sleep')snowNudge(near)}else{J.lookAt={x:near.x,y:near.y,t:rand(1,2),down:true}}}}
  if(J.lookAt){J.lookAt.t-=dt;if(J.lookAt.t<=0)J.lookAt=null}if(J.nod>0)J.nod-=dt;
  if(J.visit){const V=J.visit;if(J.q.length||jillWorkload()>1||!R.groups.includes(V.g)||V.g.table==null){cancelVisit()}else if(V.phase==='stand'){V.t-=dt;J.lookAt={x:V.t0.x,y:V.t0.y-8,t:.3};if(V.t<=0){J.visit=null;J.idle=2.3}return}}
  if(!J.cur&&R.closing==null){J.idle+=dt;treatTick();if(J.visit)return;
+  if(!J.fp&&!J.pet&&!J.rest&&J.idle>.6&&firstPhotoDue()){J.fp={phase:'go'};J.troom='main';J.tx=FP_SPOT.x;J.ty=FP_SPOT.y;return}
   /* Dylan is here and she has a moment: she goes over and stands by his table for a bit. Not a job; once a visit. */
   if(!J.visit&&!J.rest&&!J.pet&&J.idle>1.2&&J.calm>2.5&&(J.visitCD||0)<R.t&&Math.random()<dt*.35&&jillWorkload()<=1){const g=R.groups.find(q=>q.reg==='dylan'&&q.table!=null&&['wait','eat'].includes(q.state)&&!q.paused);if(g){const t=R.tables[g.table];g.paused=true;J.visitCD=R.t+60;J.visit={g,t0:t,phase:'go'};J.troom=t.room||'main';J.tx=t.x+(t.x<200?30:-30);J.ty=t.y+20;S.dylan.clues.pause=(S.dylan.clues.pause||0)+1;return}}
   /* a quiet moment: nothing on the pass, nobody waiting on her -> she may sit down on the sofa for a bit */
@@ -5313,8 +5322,10 @@ function banner(title,subt,kind){const b=$('#banner');const d=document.createEle
 function toast(html,kind,o){const box=$('#toasts');const lastT=box.lastElementChild;if(lastT&&lastT.innerHTML===html&&lastT.style.opacity!=='0')return;const d=document.createElement('div');d.className='toast '+(kind||'');d.innerHTML=html;if(o&&(o.g||o.who||o.tg)){d.classList.add('who');d.onclick=()=>{try{if(o.tg&&idFocusTable(o.tg))return;if(o.g)idFocusGroup(o.g,o.k||0);else idFocusWho(o.who)}catch(e){}}}   /* v2.4 rc6 (07:09): a line someone said finds them */box.appendChild(d);while(box.children.length>2)box.firstChild.remove();setTimeout(()=>{d.style.transition='opacity .4s';d.style.opacity='0';setTimeout(()=>d.remove(),400)},kind==='q'?3600:2800)}
 function ach(id){if(S.achievements[id])return;S.achievements[id]=S.day;const a=ACH.find(x=>x.id===id);if(a){setTimeout(()=>banner(a.n,'成就解鎖'),600);sfx.buy()}}
 function coach(k){if(!R||R.coach<0)return;if(k===R.coach){showCoach(COACH[k]);R.coach++;if(R.coach>=COACH.length){R.coach=-1;setTimeout(hideCoach,4500)}}}
-function showCoach(txt){const c=$('#coach');c.hidden=false;c.innerHTML=`<img alt="" src="${portraitURL([JILL_LOOK],'jill',true)}"><div>${txt}</div>`}
-function hideCoach(){$('#coach').hidden=true}
+function showCoach(txt){const c=$('#coach');c.hidden=false;c.innerHTML=`<img alt="" src="${portraitURL([JILL_LOOK],'jill',true)}"><div>${txt}</div>`;plinesLift()}
+function hideCoach(){$('#coach').hidden=true;plinesLift()}
+/* rc7.5: while the coach talks, the lines people say sit above it (they shared the bottom of the screen) */
+function plinesLift(){const c=$('#coach'),p=$('#plines');if(!p)return;if(!c||c.hidden){p.style.bottom='';return}const need=(parseFloat(c.style.bottom)||8)+(c.offsetHeight||0)+8;p.style.bottom=need>72?need+'px':''}
 
 /* ================= HUD & tickets ================= */
 let hudCache={};
@@ -5484,7 +5495,7 @@ $('#taskPanel').addEventListener('click',()=>{$('#taskPanel').hidden=true});
    and the tickets span the same width as the room. Below 900 px it is the phone layout, untouched. */
 function desktopWidth(){const W=window.innerWidth,H=window.innerHeight;if(!(W>=900&&H>=560))return 0;const hudH=($('#hud')&&$('#hud').offsetHeight)||44;const want=Math.round((H-hudH)/424*(LW+BGM*2));return clamp(want,540,W)}
 function layoutAll(){{const dw=desktopWidth();const app=$('#app');if(dw){app.style.maxWidth=dw+'px';document.documentElement.classList.add('desk')}else{app.style.maxWidth='';document.documentElement.classList.remove('desk')}}const r=sc.getBoundingClientRect();DPR=Math.min(2,window.devicePixelRatio||1,1600/Math.max(1,r.width));/* v2.2 X: on a big window the backing store is capped (≈1600 px wide) — the room is drawn at 2× on a phone, never at 2× across a 27-inch display */if(!R&&r.width>0){const s0=r.width/336;const nd=clamp(Math.floor(r.height/s0-424-96),0,240);if(Math.abs(nd-DY)>2)applyDY(nd)}if(!IDLE)IDLE=makeIdle();sc.width=Math.round(r.width*DPR);sc.height=Math.round(r.height*DPR);SV.w=r.width;SV.h=r.height;SV.s=Math.min(r.width/336,r.height/LH);SV.ox=r.width/2-206*SV.s;SV.oy=Math.max(0,r.height-LH*SV.s);
- const W=Math.max(200,r.width-12);const kTop=SV.oy+FB*SV.s;{const pb=Math.max(18,r.height-kTop+10)+'px';$('#closePill').style.bottom=pb;$('#peekPill').style.bottom=pb}const WS=Math.round(clamp(r.height*.3,160,196));TL={n:0,chipW:0,CH:0,WS,pad:0,gap:0,x0:0,W};tc.style.height=WS+'px';tc.width=Math.round(W*DPR);tc.height=Math.round(WS*DPR);$('#trayWrap').style.top=Math.max(4,SV.oy+134*SV.s-WS)+'px';{const rt=$('#roomTabs');if(rt)rt.style.top=Math.round((ticketsEl.offsetHeight||88)+4)+'px'}/* v2.3 QA (iPhone): the room tabs sit right under the ticket rail — never over the top row of tables and their order bubbles */const tb=Math.max(8,r.height-kTop+8)+'px';$('#toasts').style.bottom=tb;$('#coach').style.bottom=tb;bg=null;forceDraw=true;if(typeof ticketsLayout==='function')ticketsLayout()}
+ const W=Math.max(200,r.width-12);const kTop=SV.oy+FB*SV.s;{const pb=Math.max(18,r.height-kTop+10)+'px';$('#closePill').style.bottom=pb;$('#peekPill').style.bottom=pb}const WS=Math.round(clamp(r.height*.3,160,196));TL={n:0,chipW:0,CH:0,WS,pad:0,gap:0,x0:0,W};tc.style.height=WS+'px';tc.width=Math.round(W*DPR);tc.height=Math.round(WS*DPR);$('#trayWrap').style.top=Math.max(4,SV.oy+134*SV.s-WS)+'px';{const rt=$('#roomTabs');if(rt)rt.style.top=Math.round((ticketsEl.offsetHeight||88)+4)+'px'}/* v2.3 QA (iPhone): the room tabs sit right under the ticket rail — never over the top row of tables and their order bubbles */const tb=Math.max(8,r.height-kTop+8)+'px';$('#toasts').style.bottom=tb;$('#coach').style.bottom=tb;plinesLift();bg=null;forceDraw=true;if(typeof ticketsLayout==='function')ticketsLayout()}
 function makeIdle(){const t=buildTables();const ev=['summary','shop'].includes(phase);if(ev)lifeEnsureEvening();const L=LIFE.jill;
  const jill=ev&&LIFE.plan==='sofa'?{x:L.x,y:L.y,sit:L.on||!!L.bed,sofa:L.on?L.pos:(L.bed?'bed':null),carry:[],q:[],cur:null,face:L.face,step:0,room:L.room||'home'}:(ev&&t[0])?{x:t[0].x-25,y:t[0].y+2,sit:true,carry:[],q:[],cur:null,face:1,step:0}:{x:PASS.x,y:PASS.y,carry:[],q:[],cur:null,face:1,step:0};
  return{tables:t,slots:buildSlots(),groups:[],tickets:[],jill,floats:[],parts:[],fire:0}}
@@ -5548,7 +5559,8 @@ function drawWindows(c,dusk,now){const wins=[[88,10,42,68]];const d=clamp(dusk,0
    for(let yy=y+4;yy<y+h-4;yy+=3.3){c.fillStyle='#FCFBF8';c.fillRect(px+3.5,yy,pw-7,2.1);c.fillStyle=d<.55?`rgba(255,214,150,${.55-d*.7})`:`rgba(36,38,62,${.25+(d-.55)*.6})`;c.fillRect(px+3.5,yy+2.1,pw-7,1.2)}
    c.fillStyle='#E4E0D9';c.fillRect(px+pw/2-.6,y+4,1.2,h-8);c.strokeStyle='#E0DCD4';c.lineWidth=1;c.strokeRect(px+1,y+1,pw-2,h-2)}
   c.strokeStyle='#E6E3DC';c.lineWidth=2.2;c.strokeRect(x,y,w,h);c.fillStyle='#EFECE6';c.fillRect(x-3,y+h,w+6,3);
-  if(S.decor.plants>=3){c.fillStyle='#C06A3E';rr(c,x+w-16,y+h-8,12,9,2);c.fill();for(let k=0;k<5;k++)leaf(c,x+w-10+Math.cos(k)*4,y+h-11-k,10,4,-1.6+k*.6,k%2?'#3F7F32':'#5E9E3D')}}}
+  if(S.decor.plants>=3){c.fillStyle='#C06A3E';rr(c,x+w-16,y+h-8,12,9,2);c.fill();for(let k=0;k<5;k++)leaf(c,x+w-10+Math.cos(k)*4,y+h-11-k,10,4,-1.6+k*.6,k%2?'#3F7F32':'#5E9E3D')}
+  if(S.firstPhoto&&S.firstPhoto.pot&&!(R&&R.jill&&R.jill.fp))herbPot(c,x+11,y+h-5.4)}}   /* rc7.5: the pot she was carrying on Day 1 */
 function lightSpots(){const L=S.decor.lights;const a=[{x:53,y:14,r:40,k:.6}];if(L>=1)a.push({x:110,y:58,r:120,k:1.05},{x:272,y:58,r:120,k:1.05});if(L>=2)a.push({x:84,y:44,r:60,k:.7},{x:14,y:44,r:55,k:.6},{x:74,y:112,r:70,k:.75});if(L>=3)a.push({x:200,y:22,r:160,k:1.1});if(S.decor.bar)a.push({x:345,y:80,r:70,k:.7});if(projOn('chandelier'))a.push({x:200,y:16,r:150,k:.9},{x:200,y:(LH-16)*.55,r:LH*.7,k:.62,soft:1});/* v2.3 QA (iPhone): the main light reaches the floor — the lower half is lit too, softly *//* v2.2.1 J: the main light — the whole room warms at dusk */return a}
 function drawLampBodies(c,now){const L=S.decor.lights;const brass=(x,y,w)=>{let g=c.createLinearGradient(x-w,0,x+w,0);g.addColorStop(0,'#9A6E22');g.addColorStop(.5,'#EAC274');g.addColorStop(1,'#8E6422');return g};
  if(L>=1)for(const x of[110,272]){c.strokeStyle='#3A2A20';c.lineWidth=.8;c.beginPath();c.moveTo(x,0);c.lineTo(x,48);c.stroke();c.fillStyle=brass(x,0,12);c.beginPath();c.moveTo(x-4,46);c.lineTo(x+4,46);c.lineTo(x+13,58);c.lineTo(x-13,58);c.closePath();c.fill();c.fillStyle='#FFF1C4';el(c,x,58.5,5,1.8)}
@@ -5653,7 +5665,7 @@ function drawScene(now){const c=sctx;c.setTransform(1,0,0,1,0,0);c.globalAlpha=1
  for(const g of V.groups)if(WALK_ST.includes(g.state)&&(g.room||'main')==='main')list.push({y:g.y,f:()=>drawWalkers(c,g,now)});
  if(!J.sofa&&(J.room||'main')==='main')list.push({y:J.y,f:()=>drawJillAt(c,J,V,now)});
  crewDraw(c,now,list,'main');incDraw(c,now,list);
- list.sort((a,b)=>a.y-b.y).forEach(i=>i.f());drawSay(c);
+ list.sort((a,b)=>a.y-b.y).forEach(i=>i.f());if(!SNAP)drawSay(c);
  drawCounter(c,now,V);
  c.save();c.globalCompositeOperation='multiply';c.fillStyle=wxTint(tintFor(dusk));c.fillRect(X0,-TOP,XW,LH+TOP);
  if(evening()&&!(R&&R.closing!=null&&R.closing<6)){/* after hours: the light gathers where someone is — the sofa when Jill is there, otherwise the room's middle */const L=LIFE.jill;const cx=L&&(L.on||L.reserved)?(SOFA.x0+SOFA.x1)/2:200,cy=L&&(L.on||L.reserved)?SOFA.seat:250;let eg=c.createRadialGradient(cx,cy,60,cx,cy,330);eg.addColorStop(0,'rgba(255,255,255,1)');eg.addColorStop(1,'rgba(196,186,200,1)');c.fillStyle=eg;c.fillRect(X0,-TOP,XW,LH+TOP)}c.restore();
@@ -5661,8 +5673,8 @@ function drawScene(now){const c=sctx;c.setTransform(1,0,0,1,0,0);c.globalAlpha=1
  for(const t of V.tables){if(S.level>=2){let g=c.createRadialGradient(t.x,t.y-15,1,t.x,t.y-15,26);g.addColorStop(0,`rgba(255,190,100,${.1+dusk*.12})`);g.addColorStop(1,'rgba(255,190,100,0)');c.fillStyle=g;c.fillRect(t.x-26,t.y-41,52,52)}}
  {let g=c.createRadialGradient(220,380+FY,10,220,380+FY,140);g.addColorStop(0,'rgba(255,170,80,.12)');g.addColorStop(1,'rgba(255,170,80,0)');c.fillStyle=g;c.fillRect(60,260,320,180)}
  if(LIFE.tv.on){const tv=LIFE.tv;let g=c.createRadialGradient(tv.x,tv.y-36,3,tv.x,tv.y-36,26);g.addColorStop(0,'rgba(170,200,255,.5)');g.addColorStop(.45,'rgba(170,200,255,.22)');g.addColorStop(1,'rgba(170,200,255,0)');c.fillStyle=g;c.fillRect(tv.x-28,tv.y-64,56,56)}c.restore();
- drawGearNew(c,now);
- if(R){const pulse=(Math.sin(now*6)+1)/2;
+ if(!SNAP)drawGearNew(c,now);
+ if(R&&!SNAP){const pulse=(Math.sin(now*6)+1)/2;
   for(const t of R.tables)if((t.room||'main')==='main')drawTableOverlay(c,t,now,pulse);
   queued().forEach(g=>{if(g.state==='queue'&&!g.moving)patBar(c,g.x,g.y-(isSeated(g)?50:56),g.pat)});
   const qs=(J.cur?[J.cur.t]:[]).concat(J.q);qs.forEach((ti,k)=>{const t=R.tables[ti];if((t.room||'main')!=='main')return;c.fillStyle='#2E2019';circ(c,t.x+(t.seats===4?40:30),t.y-22,7);c.fillStyle='#E6C27A';c.font=`800 8px ${FONT}`;c.textAlign='center';c.textBaseline='middle';c.fillText(String(k+1),t.x+(t.seats===4?40:30),t.y-21.5)});
@@ -5670,9 +5682,9 @@ function drawScene(now){const c=sctx;c.setTransform(1,0,0,1,0,0);c.globalAlpha=1
   for(const f of R.floats){if((f.room||'main')!=='main')continue;const a=1-f.t/f.life;c.globalAlpha=Math.min(1,a*1.5);c.font=`800 ${f.big?12:9.5}px ${FONT}`;c.textAlign='center';c.textBaseline='middle';c.lineWidth=3;c.strokeStyle='rgba(30,20,15,.8)';c.strokeText(f.txt,f.x,f.y-f.t*22);c.fillStyle=f.col;c.fillText(f.txt,f.x,f.y-f.t*22);c.globalAlpha=1}
   if(R.fire>0){const a=.25+Math.sin(now*8)*.08;let g=c.createRadialGradient(200,220,150,200,220,320);g.addColorStop(0,'rgba(255,120,30,0)');g.addColorStop(1,`rgba(255,110,30,${a})`);c.fillStyle=g;c.fillRect(X0,-TOP,XW,LH+TOP)}}
  if(R&&R.blackout>0){R.blackout-=1/60;const a=R.blackout>2.2?.75:R.blackout>.5?.85:(R.blackout/.5)*.85;c.fillStyle=`rgba(8,6,12,${a})`;c.fillRect(X0,-TOP,XW,LH+TOP)}
- if(FLASH){c.fillStyle=`rgba(255,255,255,${(1-FLASH.t/.5)*.55})`;c.fillRect(FLASH.x-78,FLASH.y-82,156,112)}
+ if(FLASH&&!SNAP){c.fillStyle=`rgba(255,255,255,${(1-FLASH.t/.5)*.55})`;c.fillRect(FLASH.x-78,FLASH.y-82,156,112)}
  let vg=c.createRadialGradient(206,290,210,206,290,400);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(15,8,4,.38)');c.fillStyle=vg;c.fillRect(X0,-TOP,XW,LH+TOP);
- try{idDraw(c)}catch(e){}   /* v2.4 rc6 (07:09): who is where, for a moment */
+ if(!SNAP)try{idDraw(c)}catch(e){}   /* v2.4 rc6 (07:09): who is where, for a moment */
  c.restore()}
 const WALK_ST=['arrive','queue','toTable','leave','toHost','host','toPiano'];   /* at the piano 予安 is drawn by the piano */
 function drawWalkers(c,g,now){const n=g.size;const sit=isSeated(g);const wact=g.state==='queue'&&!g.moving?g.wact:null;const mood=g.state==='leave'?(g.mood==='angry'?'angry':g.mood==='sad'?'sad':'happy'):(g.pat>.5?'happy':g.pat>.25?'ok':'sad');
@@ -5685,8 +5697,8 @@ function drawJillAt(c,J,V,now){const moving=J.moving;const stp=moving?Math.sin(J
   const cooking=!moving&&R&&phase==='service'&&Math.hypot(J.x-PASS.x,J.y-PASS.y)<6&&R.slots.some(s=>s.job&&s.job.step&&!chefHandles(s)&&(s.job.step.t==='work'||(s.job.step.t==='wait'&&s.job.step.anim==='stir')));
   if(V.fire>0){let fg=c.createRadialGradient(J.x,J.y-20,2,J.x,J.y-20,30);fg.addColorStop(0,'rgba(255,150,50,.5)');fg.addColorStop(1,'rgba(255,90,20,0)');c.fillStyle=fg;el(c,J.x,J.y-20,30,34)}
   /* concentrating while she cooks or hurries somewhere with a job; her usual smile otherwise; tired once the closing starts */
-  const expr=(R&&R.closing!=null)?'tired':(cooking||(moving&&R&&R.jill.cur))?'focus':'smile';const pet=R&&R.jill.pet;const crouch=!!(pet&&pet.crouch);const look=R&&R.jill.lookAt?R.jill.lookAt:(pet?{x:pet.cat.x,y:pet.cat.y}:null);const gaze=look?{x:((look.x>=J.x?1:-1)*(J.face<0?-1:1)),y:(pet||look.down)?.55:.15}:null;
-  const nod=R&&R.jill.nod>0?Math.sin(R.jill.nod*9)*1.4:0;const carrying=!!(J.carry&&J.carry.length);drawPerson(c,J.x,J.y+(crouch?4:0),JILL_LOOK,{jill:true,me:true,tall:!crouch,seated:!!J.sit||crouch,s:crouch?1:1.1,step:stp,carry:carrying,arms:cooking?[.35,1.0+Math.sin(now*9)*.2]:null,bob:(moving?Math.abs(stp)*-1:cooking?Math.abs(Math.sin(now*9))*-1.2:Math.sin(now*2)*.4)+nod,mood:'happy',expr,gaze,flip:J.face<0,blink:Math.sin(now*1.7)>.985,hat:false/* v2.2 Q+: her hair is her silhouette; the toque stays an option in drawPerson */});
+  const fpDown=!!(R&&J===R.jill&&R.jill.fp&&(R.jill.fp.phase==='stand'||R.jill.fp.phase==='place'));/* rc7.5: her eyes on the herbs, not on anyone */const expr=fpDown?'down':(R&&R.closing!=null)?'tired':(cooking||(moving&&R&&R.jill.cur))?'focus':'smile';const pet=R&&R.jill.pet;const crouch=!!(pet&&pet.crouch);const look=R&&R.jill.lookAt?R.jill.lookAt:(pet?{x:pet.cat.x,y:pet.cat.y}:null);const gaze=look?{x:((look.x>=J.x?1:-1)*(J.face<0?-1:1)),y:(pet||look.down)?.55:.15}:null;
+  const nod=R&&R.jill.nod>0?Math.sin(R.jill.nod*9)*1.4:0;const herbs=!!(R&&R.jill.fp&&J===R.jill);const carrying=!!(J.carry&&J.carry.length)||herbs;drawPerson(c,J.x,J.y+(crouch?4:0),JILL_LOOK,{jill:true,me:true,tall:!crouch,seated:!!J.sit||crouch,s:crouch?1:1.1,step:stp,carry:carrying,arms:cooking?[.35,1.0+Math.sin(now*9)*.2]:null,bob:(moving?Math.abs(stp)*-1:cooking?Math.abs(Math.sin(now*9))*-1.2:Math.sin(now*2)*.4)+nod,mood:'happy',expr,gaze,flip:J.face<0,blink:Math.sin(now*1.7)>.985,hat:false/* v2.2 Q+: her hair is her silhouette; the toque stays an option in drawPerson */});if(herbs)herbPot(c,J.x,J.y-22);
   if(R&&R.closing!=null&&LIFE.jill.act==='wrap'&&!moving){const wx=J.x+9+Math.sin(now*5.5)*6,wy=J.y-19;c.fillStyle='#BFD9EC';c.save();c.translate(wx,wy);c.rotate(Math.sin(now*5.5)*.3);rr(c,-4,-2.2,8,4.4,1.4);c.fill();c.restore();c.fillStyle=JILL_LOOK.skin;circ(c,wx-2,wy-1,2.3)}
   if(pet&&pet.cat){const p=pet.cat;const hx=p.x+(p.x<J.x?6:-6),hy=p.y-(p.st==='sleep'?6:10);c.fillStyle=JILL_LOOK.skin;circ(c,hx,hy,2.6);c.fillStyle='rgba(60,34,22,.35)';c.beginPath();c.arc(hx,hy,2.6,0,7);c.stroke()}
   if(cooking){const f=J.face<0?-1:1;const a=Math.sin(now*9);c.save();c.translate(J.x+f*4,J.y-29+a*1.6);c.rotate(f*(-.55+a*.3));c.fillStyle='#D9D9DD';rr(c,-1.1,-8,2.4,9.5,1);c.fill();c.strokeStyle='rgba(60,34,22,.4)';c.lineWidth=.5;c.stroke();c.fillStyle='#4A3226';rr(c,-1.4,1.4,3,4.4,1.2);c.fill();c.restore()}
@@ -7723,7 +7735,7 @@ function applyDY(d){DY=d;LH=424+d;FB=LH-16;FY=FB-364;PDW=LH<520?112:150;ROWS=[16
  TREE.perches.forEach(p=>{if(p.by==null)p.by=p.y;p.y=p.by+(p.t===3?0:FY)});
  SPOT.scr.y=FB-6;SPOT.bowl.y=FB-4;SPOT.toy.y=FB-40;
  CATS=null;perchOcc.length=0;OCC.scr=OCC.scr2=OCC.cave=OCC.toy=null;OCC.bed=[];SIDE.R=SIDE.L=null;IDLE=null;bg=null;if(typeof LIFE!=='undefined'&&LIFE.dylan&&LIFE.dylan.seated){LIFE.dylan.seated=false;LIFE.dylan.state='think';LIFE.dylan.t=1}}
-const SIDE={R:null,L:null};let RACE_CD=90,BAO_LAST=null;const MEMQ=[];let FLASH=null;
+const SIDE={R:null,L:null};let RACE_CD=90,BAO_LAST=null;const MEMQ=[];let FLASH=null;let SNAP=false;   /* rc7.5: the first photo's redraw — the room without the game's own marks (bubbles, numbers, names, the flash) */
 const MEMS={hammock:'吊床上的午睡',windowcats:'窗邊的位子',together:'今天一起走',leocats:'終於都在',/* v2.3 */sofa:'今晚的沙發',sofafull:'沙發客滿',husband:'Dylan — Jill 的先生',sides:'Jill 左右各一隻',ambush:'埋伏成功',what:'妳到底在幹嘛',waited:'白等了',race:'突然開賽',sleepgod:'睡神',nearby:'今天也在附近',best:'最佳座位',nap3:'三貓午睡',everyone:'今天大家都在',
  rest:'偷閒',lap:'膝上的重量',photo:'被拍了',pet:'摸一下',dylan:'留下來的人',
  play:'玩起來了',swat:'柔柔的小巴掌',pressed:'靠著柔柔',greeter:'不怕生',cushion:'一起擠軟墊',distracted:'走到一半忘了',guide:'小齁帶路',oldfriends:'又見面了',dylancat:'他們好像認識',quiet:'打烊後',oddspot:'怎麼睡在這',newroom:'新的店',newspot:'牠自己找到的',boxcat:'紙箱裡有東西',window:'窗邊',tunnel:'隧道的另一頭',reading:'各自安靜',pause:'經過的時候',company:'今天不是一個人',gift:'拿來的東西',anniversary:'紀念日',neighbors:'在店裡遇到',treat:'這個請你',bagcat:'比較喜歡袋子',rainday:'下雨天',selfie:'合照',dishphoto:'先拍再吃',firstspecial:'第一道特製版',kidcat:'小朋友與貓',grass:'啃草的時間',sophiecat:'只是坐一下',tasting:'Ken 自己開的頭'/* v2.3 */,
@@ -7764,10 +7776,72 @@ function albumList(){if(!S.album){S.album=[];/* photos from before the album exi
  for(const p of S.album)if(!p.id)p.id='p'+p.day+'_'+p.kind+'_'+Math.random().toString(36).slice(2,8);return S.album}
 function albumAllows(kind){const A=albumList();const today=A.filter(p=>p.day===S.day);if(today.length>=4)return false;const same=A.filter(p=>p.kind===kind);if(!same.length)return true;const last=same[same.length-1];if(S.day-last.day<3)return false;return today.filter(p=>!p.keep).length<2}
 function eveningClock(){const m=Math.floor(21*60+30+Math.min(LIFE.t||0,180)*(75/180));const h=Math.floor(m/60),mm=m%60;return`${h}:${String(mm).padStart(2,'0')}`}
+/* rc7.5 (the player, 19:31–19:32): the album's first photo. Day 1: Dylan picks up one of Jill's own instant cameras and
+   takes her, busy, not looking; at most one cat, by chance. A save that has the moment gets the room as it was that
+   instant — the game's own picture of it, the way every album photo is taken (flushMem), without the game's marks.
+   A save that never had it (a mature save) gets the restaurant as it was on Day 1, drawn from newState() with the
+   same functions, never from the current save: the photo is evidence of that day. Not a portrait, not a key art. */
+function filmLook(c,W,H){/* the film: warm, a touch faded, the flash brighter in the middle, soft at the corners */
+ c.save();c.globalCompositeOperation='soft-light';c.fillStyle='rgba(255,200,140,.35)';c.fillRect(0,0,W,H);c.restore();
+ c.save();const fg=c.createRadialGradient(W*.6,H*.5,20,W*.5,H*.5,W*.72);fg.addColorStop(0,'rgba(255,250,235,.18)');fg.addColorStop(.55,'rgba(255,250,235,0)');fg.addColorStop(1,'rgba(40,24,12,.34)');c.fillStyle=fg;c.fillRect(0,0,W,H);c.restore();
+ c.save();c.globalCompositeOperation='screen';c.fillStyle='rgba(60,48,36,.10)';c.fillRect(0,0,W,H);c.restore()}
+/* the frame Dylan had: the back wall — the window, the first sign — and Jill a step in front of it, off to the right; on
+   a narrow screen, what the screen holds. A cat in it is chance; two would be a group photo, so the frame moves a little */
+function fpCatIn(k,f){return!k.away&&(!k.hidden||(k.st==='hide2'&&k.peekT>0))&&!(k.sofa&&k.sofaOn)&&k.x>=f.x+3&&k.x<=f.x+f.w-3&&k.y>=f.y+12&&k.y<=f.y+f.h+10}
+function firstPhotoFrame(J){const Wv=SV.w/SV.s,Hv=SV.h/SV.s;const w=Math.min(236,Wv,Hv*4/3),h=w*3/4;const x0=-SV.ox/SV.s,y0=-SV.oy/SV.s;let best=null;
+ for(const dx of[0,-16,16,-32,32,-48]){const f={x:clamp(J.x-w*.73+dx,x0,x0+Wv-w),y:clamp(J.y+27-h,y0,y0+Hv-h),w,h};if(J.x<f.x+w*.45||J.x>f.x+w*.9)continue;f.cats=CATS?CATS.filter(k=>fpCatIn(k,f)).length:0;if(!best)best=f;if(f.cats<=1){best=f;break}}
+ return best}
+function firstPhotoSnap(J){if(!sc||!sc.width||!(SV.s>0))return null;const f=firstPhotoFrame(J);if(!f)return null;const room0=room,M=Math.random;let url=null;
+ try{room='main';SNAP=true;Math.random=rng(19);drawScene(performance.now()/1000);const s=SV.s*DPR;const cv=mkCanvas(360,270),c=cv.getContext('2d');
+  c.drawImage(sc,(SV.ox+f.x*SV.s)*DPR,(SV.oy+f.y*SV.s)*DPR,f.w*s,f.h*s,0,0,360,270);filmLook(c,360,270);url=cv.toDataURL('image/jpeg',.84)}
+ catch(e){console.warn('[first photo]',e)}
+ finally{SNAP=false;Math.random=M;room=room0;forceDraw=true}
+ return url?{url,cats:f.cats,f}:null}
+/* the history: the same frame on the Day 1 room. The cat is 包包 on the bed by the window — where the cats are when the
+   doors open on Day 1 — half curled, not looking either */
+const FP_CANON_CAT={id:'snow',x:264,y:124,face:-1,pose:'curl',st:'bed'};
+function firstPhotoImage(o){o=o||{};const S0=S,R0=R,bg0=bg,bgk0=bgKey,C0=CATS,M=Math.random;let url=null;
+ try{S=newState();fillDefaults(S);S.day=1;R=null;CATS=[];Math.random=rng(23);
+  const B=makeBg();const T=buildTables();
+  const W=360,H=270,fw=236,fh=177,fx=64,fy=0;const cv=mkCanvas(W,H),c=cv.getContext('2d');const k=W/fw;const now=9.3;
+  c.save();c.scale(k,k);c.translate(-fx,-fy);c.drawImage(B,-BGM,0,LW+BGM*2,LH);drawWindows(c,.03,now);drawProps(c);drawWallRun(c,now);
+  const jx=236,jy=150;const list=[];
+  for(const t of T)if((t.room||'main')==='main')list.push({y:t.y,f:()=>drawTableFull(c,t,now)});
+  for(const p of plantSpots())list.push({y:p.y,f:()=>drawPlant(c,p.x,p.y,p.k)});
+  list.push({y:352+FY,f:()=>drawCatTree(c,now)},{y:SPOT.scr2.y,f:()=>drawPost(c,now)},{y:BENCH.seats[0]-20,f:()=>drawBench(c)},{y:SPOT.bed.y,f:()=>drawBed(c,now)});
+  const K=o.cat===undefined?FP_CANON_CAT:o.cat;const D=K&&CAT_DEF.find(x=>x.id===K.id);
+  if(D)list.push({y:K.y+2,f:()=>drawCat(c,{def:D,x:K.x,y:K.y,face:K.face,ph:2.1,happy:0,pose:K.pose,moving:false,st:K.st,hearts:[],zz:[],t:0,perch:-1},now)});
+  list.push({y:jy,f:()=>{drawPerson(c,jx,jy,JILL_LOOK,{jill:true,me:true,tall:true,s:1.1,mood:'ok',expr:'down',carry:true,flip:true,bob:.5});herbPot(c,jx,jy-22)}});
+  list.sort((a,b)=>a.y-b.y).forEach(i=>i.f());
+  c.save();c.globalCompositeOperation='multiply';c.fillStyle=tintFor(.03);c.fillRect(fx,fy,fw,fh);c.restore();
+  c.restore();filmLook(c,W,H);url=cv.toDataURL('image/jpeg',.84)}
+ catch(e){console.warn('[first photo]',e)}
+ finally{S=S0;R=R0;bg=bg0;bgKey=bgk0;CATS=C0;Math.random=M}
+ return url}
+function herbPot(c,px,py){c.fillStyle='rgba(0,0,0,.14)';el(c,px+.6,py+5.6,5.2,1.6);c.fillStyle='#B8673C';c.beginPath();c.moveTo(px-4.4,py-1);c.lineTo(px+4.4,py-1);c.lineTo(px+3.2,py+5.4);c.lineTo(px-3.2,py+5.4);c.closePath();c.fill();c.fillStyle='#9A5230';c.fillRect(px-4.8,py-2,9.6,1.6);
+ for(let q=0;q<7;q++)leaf(c,px+Math.cos(q*.9)*2.4,py-4-Math.sin(q*1.3)*2.2,6.4,2.6,-1.57+Math.sin(q*2.1)*.9,q%2?'#4E8A3A':'#6FAE45')}
+function firstPhotoHave(){return albumList().some(p=>p.kind==='first')}
+function firstPhotoAdd(clock,img0){if(firstPhotoHave())return null;const img=img0||firstPhotoImage();if(!img)return null;const A=albumList();
+ const p={id:'p1_first',kind:'first',day:1,clock:clock||'',cap:'第一天',txt:'',keep:false,first:1};A.unshift(p);
+ photoPut(p.id,img).then(ok=>{if(!ok){p.img=img;save()}});S.firstPhoto=S.firstPhoto||{day:1};return p}
+/* a save past Day 1 that never had it gets the same Day 1: history, not news — no line, no NEW, nothing replayed */
+function firstPhotoMig(){if(!S||S.day<=1||S.firstPhoto)return;if(firstPhotoHave()){S.firstPhoto={day:1};return}S.firstPhoto={day:1,retro:1};firstPhotoAdd('')}
+/* Day 1, early in the evening, the first moment Jill has nothing to do: she takes a pot of herbs to the window. Dylan
+   has picked up one of her cameras. The shutter; the photo comes out; four short lines, and two more once she has
+   looked at it. (Off in the test harness's quiet mode unless a test asks for it, like the other scenes.) */
+const FP_SPOT={x:236,y:150},FP_SILL={x:112,y:100};
+function firstPhotoDue(){if(!(S.day===1&&!S.firstPhoto&&!!R&&phase==='service'&&R.closing==null&&R.t>=.5&&(R.fpTry||0)<=R.t&&!(window.__noScenes&&!window.__firstPhoto)))return false;
+ /* a moment nobody is waiting on her — the first of them is the opening itself, before the first guest sits down */return jillWorkload()===0&&!firstPhotoHave()}
+/* she put the pot down somewhere: if the photo was taken, it is on the sill; if not, she tries again later */
+function fpDrop(){const J=R.jill;if(!J.fp)return;J.fp=null;if(S.firstPhoto&&!S.firstPhoto.retro)S.firstPhoto.pot=1;else R.fpTry=R.t+15}
+function firstPhotoShutter(){const J=R.jill;const shot=firstPhotoSnap(J);R.fpShot={cats:shot?shot.cats:null,f:shot?shot.f:null,t:R.t};FLASH={x:J.x,y:J.y-20,t:0};sfx.shutter();firstPhotoAdd(clockStr(),shot&&shot.url);S.firstPhoto=S.firstPhoto||{day:1};save();
+ /* four short lines; the last two only if a cat is in it — she has looked at the photo by then */
+ const L=[['jill','你拿我的相機幹嘛？'],['dylan','拍妳。'],['jill','我根本沒在看。'],['dylan','我知道。']];if(!shot||shot.cats===1)L.push(['jill','牠也在。'],['dylan','嗯。']);
+ L.forEach(([w,t],i)=>setTimeout(()=>{if(!R||phase!=='service')return;if(w==='jill')jillSay(t,{with:'dylan',withTone:'default'});else{logLine('Dylan',t,'d');portraitLine('dylan',t,{tone:'default',with:'jill',withTone:'default'})}},(window.__fastSay?0:500)+i*1700+(i>=4?1500:0)))}
 function albumAdd(kind,img,info){const A=albumList();if(ACH_BY_MEMO[kind])ach(ACH_BY_MEMO[kind]);if(A.length+1>=50)ach('photos50');const keep=!A.some(p=>p.kind===kind);const clock=R&&R.closing==null?clockStr():evening()?eveningClock():'';let txt='';try{txt=(MEM_TXT[kind]||(()=>''))(info||{})}catch(e){}
  const p={id:'p'+S.day+'_'+kind+'_'+Math.random().toString(36).slice(2,8),kind,day:S.day,clock,cap:(info&&info.cap)||MEMS[kind]||kind,txt:(info&&info.txt)||txt,keep};A.push(p);
  photoPut(p.id,img).then(ok=>{if(!ok){p.img=img;save()}});   /* no store: the picture stays in the save */
- const ord=A.filter(p=>!p.keep);while(ord.length>albumCap()){const old=ord.shift();A.splice(A.indexOf(old),1);photoDel(old.id)}return p}
+ const ord=A.filter(p=>!p.keep&&!p.first);while(ord.length>albumCap()){const old=ord.shift();A.splice(A.indexOf(old),1);photoDel(old.id)}return p}   /* rc7.5: the first photo is never one of them */
 function catBy(id){return CATS?CATS.find(c=>c.def.id===id):null}
 function evening(){return(R&&R.closing!=null)||['summary','shop'].includes(phase)}
 function jillA(){const J=view().jill;const idle=!R||(!J.cur&&!(J.q&&J.q.length)&&!J.moving);if(R&&phase==='service'&&R.closing==null&&J.room&&J.room!=='main')return{x:PASS.x,y:PASS.y,idle:false,sit:false};if(R&&phase==='service'&&R.closing==null&&J.rest){return{x:LIFE.jill.x,y:SOFA.front+10,idle:false,sit:true}}if(R&&phase==='service'&&R.closing==null){const near=Math.hypot(J.x-PASS.x,J.y-PASS.y)<30;return{x:PASS.x,y:PASS.y,idle:idle&&near,sit:false}}return{x:J.x,y:J.y,idle,sit:!!J.sit}}
@@ -8406,6 +8480,7 @@ function homeItems(c,now,d){const out=[];const P=(y,f)=>out.push({y,f:()=>f(c)})
  P(HM.desk.legs,c=>drawHomeDesk(c,now,d));
  P(HM.chair.y+2,c=>drawHomeChairAndDylan(c,now));
  P(HM.night.y,c=>drawHomeNightstand(c,d));
+ P(HM.win.y1+7,c=>drawHomeCamera(c));   /* rc7.5: one of her instant cameras on the sill — and, from Day 1, the photo */
  P(HM.bed.y1,c=>drawHomeBed(c,now));
  P(HM.catbed.y,c=>drawHomeCatBed(c,HM.catbed.x,HM.catbed.y));
  P(HM.lounger.y,c=>drawHomeLounger(c,HM.lounger.x,HM.lounger.y));
@@ -8457,6 +8532,12 @@ function drawHomeChairAndDylan(c,now){const C=HM.chair;const D=LIFE.dylan;const 
  srOak(c,C.x-11,C.y-20,22,4,SRC.oakHi,true);c.fillStyle=SRC.oat;rr(c,C.x-10,C.y-17,20,9,3);c.fill();c.strokeStyle=SRC.edge;c.lineWidth=.5;c.stroke();
  for(const lx of[C.x-10,C.x+8])srOak(c,lx,C.y-8,2.4,9,SRC.oakMid)}
 /* the nightstand by the bed's head and its small lamp */
+/* rc7.5 (19:31): Jill has always liked instant cameras — there are several at home, in different sizes. One sits on
+   the sill, no more than that; after Day 1 the first photo leans against it. No label, nothing on display. */
+function drawHomeCamera(c){const w=HM.win,x=w.x0+18,y=w.y1+2;
+ if(S.firstPhoto){/* the photo: a little white frame, the picture a warm smudge, leaning back */c.save();c.translate(x+13,y-1);c.rotate(-.12);c.fillStyle='rgba(0,0,0,.12)';c.fillRect(-3.6,-8.4,8,9);c.fillStyle='#FBF8F2';c.fillRect(-4,-9,8,9.6);c.fillStyle='#C8A57E';c.fillRect(-3,-8,6,5.2);c.fillStyle='#E9B07A';c.fillRect(-1,-6.6,1.6,2.6);c.restore()}
+ c.fillStyle='rgba(0,0,0,.14)';el(c,x+.6,y+.4,6.6,1.4);c.fillStyle='#EFE7DA';rr(c,x-6,y-8,12,8,2);c.fill();c.fillStyle='#E2D7C6';c.fillRect(x-6,y-3,12,1);c.strokeStyle='rgba(120,100,80,.35)';c.lineWidth=.4;rr(c,x-6,y-8,12,8,2);c.stroke();
+ c.fillStyle='#3A3836';circ(c,x+1,y-4.4,2.4);c.fillStyle='#6E7A86';circ(c,x+1,y-4.4,1.3);c.fillStyle='rgba(255,255,255,.7)';circ(c,x+.5,y-5,.45);c.fillStyle='#F6F3EC';rr(c,x-5,y-7.2,3,1.8,.5);c.fill()}
 function drawHomeNightstand(c,d){const N=HM.night;srShadow(c,(N.x0+N.x1)/2,N.y+1,14,2.4,.13);srOak(c,N.x0,N.y-18,N.x1-N.x0,18,SRC.oakHi,true);c.fillStyle='rgba(112,86,56,.18)';c.fillRect(N.x0+3,N.y-10,N.x1-N.x0-6,.8);c.fillStyle='#C9A45C';c.fillRect((N.x0+N.x1)/2-2,N.y-6,4,1.2);
  const lx=N.x0+9;c.fillStyle='#E9E1D4';el(c,lx,N.y-19,4,1.4);c.fillStyle='#CDBFA8';c.fillRect(lx-.6,N.y-30,1.2,11);c.fillStyle='#F7F1E6';c.beginPath();c.moveTo(lx-6,N.y-29);c.lineTo(lx+6,N.y-29);c.lineTo(lx+4.5,N.y-37);c.lineTo(lx-4.5,N.y-37);c.closePath();c.fill();c.strokeStyle=SRC.edge;c.lineWidth=.4;c.stroke();
  if(d>.35){c.fillStyle=`rgba(255,226,160,${.3+d*.3})`;el(c,lx,N.y-29,6,1.2)}
@@ -9474,7 +9555,7 @@ function menuSwapHTML(){if(!menuSwap||!S.today)return'';const inn=menuSwap;const
  return`<div class="mswap"><div class="ms-h">菜單已滿，要換掉哪一道？<span class="muted">換成 <b>${dishName(inn)}</b></span><button class="btn sm" data-act="menuSwapNo">取消</button></div><div class="ms-list">${cur.map(x=>`<button class="ms-row" data-act="menuSwapDo" data-d="${x.d}"><img alt="" src="${dishURL(x.d,'P')}"><span class="nm">${dishName(x.d)}</span><small>預估 ${x.e} 份${x.st?`・冰箱 ${x.st}`:''}</small><b>換掉</b></button>`).join('')}</div><p class="small muted" style="margin:6px 0 0">依今天的預估銷量排序，最不會被點的在最前面。換掉的菜庫存留著，明天可以再放回來。</p></div>`}
 /* rc7.4: a Lounge already built when the new bites came has them on its list from the next morning, said once */
 function barMenuMig(){if(!loungeLv())return;const add=barDishes().filter(d=>!S.unlocked.includes(d)&&!DISHES[d].rd);if(!add.length)return;for(const d of add)unlockDish(d);S.news=S.news||[];S.news.push(`<b>Lounge 的小點多了：</b>${add.map(dishName).join('、')}。一樣是餐廳的廚師在廚房做（每道新菜的第一份還是 Jill 親自做），Lounge 的外場送過去；不佔菜單名額，冰箱記得補。`)}
-function showPrep(){try{barMenuMig()}catch(e){console.warn('[bar]',e)}phase='prep';mainScreen='prep';R=null;room='main';try{storyPhotoFlush();staffMealStory();upStaffMeal();/* v2.4 P2 */setTimeout(()=>{try{if(UPV==='reveal')return;storyProgressCheck()}catch(e){}},900)}catch(e){console.warn('[story]',e)}/* v2.3 */if(upRevealDue())setTimeout(()=>{try{upRevealStart()}catch(e){console.warn('[uprv]',e)}},450);/* v2.4 rc6 (05:23): a room finished overnight is shown first */lifeReset();IDLE=makeIdle();layoutAll();hud(true);renderTickets();planToday();try{pdStoryDay();pdDay()}catch(e){console.warn('[pd]',e)}/* v2.4 rc6 */const T=S.today,F=feat();const W=WEATHER[T.weather],E=EVENTS[T.event];
+function showPrep(){try{barMenuMig()}catch(e){console.warn('[bar]',e)}try{firstPhotoMig()}catch(e){console.warn('[first photo]',e)}phase='prep';mainScreen='prep';R=null;room='main';try{storyPhotoFlush();staffMealStory();upStaffMeal();/* v2.4 P2 */setTimeout(()=>{try{if(UPV==='reveal')return;storyProgressCheck()}catch(e){}},900)}catch(e){console.warn('[story]',e)}/* v2.3 */if(upRevealDue())setTimeout(()=>{try{upRevealStart()}catch(e){console.warn('[uprv]',e)}},450);/* v2.4 rc6 (05:23): a room finished overnight is shown first */lifeReset();IDLE=makeIdle();layoutAll();hud(true);renderTickets();planToday();try{pdStoryDay();pdDay()}catch(e){console.warn('[pd]',e)}/* v2.4 rc6 */const T=S.today,F=feat();const W=WEATHER[T.weather],E=EVENTS[T.event];
  const ms=menuList();const unlocked=[...S.unlocked];const sug=suggestStock();let restockCost=0;for(const d of ms){const need=Math.max(0,sug[d]-(S.stock[d]||0));restockCost+=need*costOf(d)}
  const cap=fridgeCap(),tot=stockTotal();const menuN=menuCount();
  const rows=unlocked.map(d=>{const D=DISH(d);const on=S.menu.includes(d);const m=S.price[d]||1;const st=S.stock[d]||0;const lv=mLv(d);
@@ -9714,7 +9795,7 @@ function storyEvents(){const ev=[{day:1,t:'開店。第一天。',ic:'signlamp'}
  for(const id in S.regMem||{}){const r=REG_BY[id];if(!r)continue;const first=r.n.split('與')[0];for(const f of (S.regMem[id].facts||[]))if(f.day&&!/^「/.test(f.txt))ev.push({day:f.day,t:(f.txt.startsWith(first)||/^(王先生|王太太|Jill)/.test(f.txt))?f.txt:`${r.n}${f.txt}`,ic:'heart',reg:id})}
  const seen=new Set();return ev.filter(e=>e.day>0&&e.day<=S.day&&!seen.has(e.day+e.t)&&seen.add(e.day+e.t)).sort((a,b)=>a.day-b.day)}
 function weekOf(day){return Math.floor((day-1)/7)+1}
-function albumStoryHTML(){const A=albumList().slice().sort((a,b)=>a.day-b.day);const ev=storyEvents();const wk=weekOf(S.day);const weeks=[];for(let w=1;w<=wk;w++){const ph=A.filter(p=>weekOf(p.day)===w),ee=ev.filter(e=>weekOf(e.day)===w);if(ph.length||ee.length||w===wk)weeks.push({w,ph,ee})}
+function albumStoryHTML(){try{firstPhotoMig()}catch(e){}const A=albumList().slice().sort((a,b)=>a.day-b.day);const ev=storyEvents();const wk=weekOf(S.day);const weeks=[];for(let w=1;w<=wk;w++){const ph=A.filter(p=>weekOf(p.day)===w),ee=ev.filter(e=>weekOf(e.day)===w);if(ph.length||ee.length||w===wk)weeks.push({w,ph,ee})}
  const cats=CATS?CATS.filter(c=>!c.hidden).length:CAT_DEF.length;const today=`<div class="story-now"><span class="when">DAY ${S.day}${S.today&&S.today.day===S.day&&WEATHER[S.today.weather]?' · '+WEATHER[S.today.weather].n:''}</span><b>今天。</b><span>營業了 ${S.stats.days||0} 天，店還開著。${cats} 隻貓都在，${S.crew.length?`${S.crew.length} 位員工，`:''}熟客 ${REGS.filter(r=>(S.regulars[r.id]||0)>=4).length} 位。還在繼續。</span></div>`;
  if(!A.length&&ev.length<=1)return `<div class="card"><p class="muted" style="margin:0">還沒有留下任何畫面。</p></div>`+today;
  let i=0;return weeks.map(({w,ph,ee})=>{const d0=(w-1)*7+1,d1=Math.min(S.day,w*7);const evH=ee.length?`<div class="story-ev">${ee.map(e=>`<div><img alt="" src="${iconURL(e.ic||'star')}"><span class="when">DAY ${e.day}</span><span>${e.t}</span></div>`).join('')}</div>`:'';
