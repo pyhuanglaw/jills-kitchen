@@ -2290,7 +2290,7 @@ function shNextWaiting(){if(DLG)return;const nx=SH_WAIT.shift();if(!nx){if(story
    always did (a scene that was already a panel stays one). */
 const SH_HOLD=/^(sm_[a-h]$|xq_oh$|wall_|up_|sp_|sr_story$|pd_|qt_|dylan_valentine$|dylan_notices$|wang_dylan_|wang_solo$|wang_anniv)/;
 function shAuthored(E){return !!E&&SH_HOLD.test(E.k)}
-function staffSay(m,txt,tone){if(shGrab({who:'staff:'+m.name,name:m.name,text:txt,tone}))return;logLine(m.name,txt,'s');if(portraitLine('staff:'+m.name,txt,{tone}))return;/* v2.3: a face with the line, when the person has one */toast(`<b>${m.name}</b>：「${txt}」`,'q',{who:'staff:'+m.name})}
+function staffSay(m,txt,tone,tg){if(shGrab({who:'staff:'+m.name,name:m.name,text:txt,tone}))return;logLine(m.name,txt,'s');if(portraitLine('staff:'+m.name,txt,{tone,tg}))return;/* v2.3: a face with the line, when the person has one */toast(`<b>${m.name}</b>：「${txt}」`,'q',{who:'staff:'+m.name,tg})}   /* rc7: tg — the party at the table it was said to */
 function noteLine(txt){if(shGrab({who:'',name:'',text:txt}))return;noteRaw(txt)}
 function noteRaw(txt){logLine('',txt,'e');toast(txt)}
 /* a dish needs its station in the kitchen before anyone can order it (a recipe found before the station exists waits) */
@@ -2863,7 +2863,7 @@ function bartenderUpd(m,w,dt){const lv=m.lv;const post={x:LG.bar.x0+70+((S.crew|
   if(tk.k==='fetch'&&tk.phase==='pass'){w.carry=tk.tk.items.filter(i=>i.st==='ready'&&!i.picked&&!i.lbar);for(const i of w.carry)i.picked=true;tk.phase='table';tk.room='lounge';Object.assign(tk,spotOf(tk.t));w.busy=0;R.tv++;return}
   if(tk.k==='fetch'){serveItems(tk.g,w.carry.map(it=>({it})));w.carry=null;tk.tk.claim=null}
   if(tk.k==='mix'){tk.it.st='ready';tk.it.q='G';tk.it.picked=false;R.tv++;sfx.plop();if(m.wine==null)m.wine=0;m.wine+=1}
-  if(tk.k==='serve'){serveItems(tk.g,w.carry.map(it=>({it})));w.carry=null;tk.tk.claim=null;if(Math.random()<.1&&canChat('bartender',60,5))staffSay(m,pick(['請慢用。','這杯適合這道。','慢慢喝。']))}
+  if(tk.k==='serve'){serveItems(tk.g,w.carry.map(it=>({it})));w.carry=null;tk.tk.claim=null;if(Math.random()<.1&&canChat('bartender',60,5))staffSay(m,pick(['請慢用。','這杯適合這道。','慢慢喝。']),undefined,tk.g)}
   if(tk.k==='order'&&tk.g.state==='order')createTicket(tk.g);
   if(tk.k==='check'&&tk.g.state==='check'){collect(tk.g)}
   crewCount(m,tk.k==='mix'?'cook':tk.k);if(tk.t)tk.t.claim=null;w.task=null;w.busy=0;w.cd=Math.max(.25,.9-.12*lv);return}
@@ -3035,7 +3035,7 @@ function tenureLine(m){if(crewLegacy(m))return`${tenure(m)}（v2.3 以前就在�
 /* a first Lounge shift is slower, and someone asks where table three is — once; a veteran answers a newcomer, once */
 function loungeShiftMul(m){if(m.role!=='waiter')return 1;const f=famOfArea(m,'lounge');return f>=10?.92:f>=3?1:1.25}
 function firstShiftLine(m,t){if(!R||!t||!t.lounge||m.role!=='waiter'||famOfArea(m,'lounge')>=3||m.askedLg)return;m.askedLg=1;const vet=(S.crew||[]).find(q=>q!==m&&q.role==='waiter'&&famOfArea(q,'lounge')>=10)||(S.crew||[]).find(q=>q.role==='bartender'&&q.duty==='lbar');
- staffSay(m,pickT(['這杯是哪桌？','三號是哪邊？','Lounge 的三號在哪？']));if(vet)setTimeout(()=>{if(R&&phase==='service')staffSay(vet,famOfArea(vet,'lounge')>=10?'靠牆第二桌。':'三號。')},1600);relSet('s:'+m.id,vet?'s:'+vet.id:'jill','helped');if(vet)relSet('s:'+vet.id,'s:'+m.id,'helpedBy')}
+ staffSay(m,pickT(['這杯是哪桌？','三號是哪邊？','Lounge 的三號在哪？']),undefined,t.group||undefined);if(vet)setTimeout(()=>{if(R&&phase==='service')staffSay(vet,famOfArea(vet,'lounge')>=10?'靠牆第二桌。':'三號。',undefined,t.group||undefined)},1600);relSet('s:'+m.id,vet?'s:'+vet.id:'jill','helped');if(vet)relSet('s:'+vet.id,'s:'+m.id,'helpedBy')}
 /* 阿拓's hand: bar food, faster and surer; the pantry's fryer gives every chef a little of it */
 function barCookMul(m,d){const D=DISH(d);if(!D||!D.bar)return 1;let k=1;if(m&&m.name==='阿拓')k*=.7;if(opsLv('pantry'))k*=.8;return k}
 /* ================= v2.3 Phase 7: people who know each other — the authored arcs, on the foundation =================
@@ -4659,7 +4659,7 @@ function trayFloat(s,txt,col){s.fx={txt,col,t:0}}
 function showCombo(){const el=$('#combo');el.hidden=false;el.innerHTML='COMBO<b>×'+(R.combo|0)+'</b>';el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump')}
 function hideCombo(){$('#combo').hidden=true}
 function banner(title,subt,kind){const b=$('#banner');const d=document.createElement('div');d.className='bn '+(kind||'');d.innerHTML=`<b>${title}</b>${subt?`<span>${subt}</span>`:''}`;b.innerHTML='';b.appendChild(d);setTimeout(()=>{if(d.parentNode)d.remove()},kind==='perfect'?1050:1700)}
-function toast(html,kind,o){const box=$('#toasts');const lastT=box.lastElementChild;if(lastT&&lastT.innerHTML===html&&lastT.style.opacity!=='0')return;const d=document.createElement('div');d.className='toast '+(kind||'');d.innerHTML=html;if(o&&(o.g||o.who)){d.classList.add('who');d.onclick=()=>{try{if(o.g)idFocusGroup(o.g,o.k||0);else idFocusWho(o.who)}catch(e){}}}   /* v2.4 rc6 (07:09): a line someone said finds them */box.appendChild(d);while(box.children.length>2)box.firstChild.remove();setTimeout(()=>{d.style.transition='opacity .4s';d.style.opacity='0';setTimeout(()=>d.remove(),400)},kind==='q'?3600:2800)}
+function toast(html,kind,o){const box=$('#toasts');const lastT=box.lastElementChild;if(lastT&&lastT.innerHTML===html&&lastT.style.opacity!=='0')return;const d=document.createElement('div');d.className='toast '+(kind||'');d.innerHTML=html;if(o&&(o.g||o.who||o.tg)){d.classList.add('who');d.onclick=()=>{try{if(o.tg&&idFocusTable(o.tg))return;if(o.g)idFocusGroup(o.g,o.k||0);else idFocusWho(o.who)}catch(e){}}}   /* v2.4 rc6 (07:09): a line someone said finds them */box.appendChild(d);while(box.children.length>2)box.firstChild.remove();setTimeout(()=>{d.style.transition='opacity .4s';d.style.opacity='0';setTimeout(()=>d.remove(),400)},kind==='q'?3600:2800)}
 function ach(id){if(S.achievements[id])return;S.achievements[id]=S.day;const a=ACH.find(x=>x.id===id);if(a){setTimeout(()=>banner(a.n,'成就解鎖'),600);sfx.buy()}}
 function coach(k){if(!R||R.coach<0)return;if(k===R.coach){showCoach(COACH[k]);R.coach++;if(R.coach>=COACH.length){R.coach=-1;setTimeout(hideCoach,4500)}}}
 function showCoach(txt){const c=$('#coach');c.hidden=false;c.innerHTML=`<img alt="" src="${portraitURL([JILL_LOOK],'jill',true)}"><div>${txt}</div>`}
@@ -4708,16 +4708,24 @@ function idFocusTicket(tk){if(!R||!tk||!tk.g)return;const g=tk.g;const t=g.table
 /* a table tapped: who is at it (as well as what the tap does there) */
 function idShowTable(t){if(!t||!t.group||t.group.gone)return;idMark(idTableAt(t),idTableName(t),idPartyLine(t.group),{dur:1.9})}
 /* someone of a party: where they are now, or that they have gone */
-function idFocusGroup(g,k,o){o=o||{};const nm=o.name||idMember(g,k)||idParty(g);if(!R||!g||g.gone||!R.groups.includes(g)){if(!o.soft)toast(`${nm} 已經離開了。`);return}const p=idMemberAt(g,k);if(!p)return;if(!o.soft)idGo(p.room);
- const t=g.table!=null&&['reading','order','wait','eat','check','toTable'].includes(g.state)?R.tables[g.table]:null;const own=idMember(g,k);const sub=t?idTableName(t)+(!own&&g.size>1?` · ${g.size} 位`:''):g.state==='leave'?'正要離開':g.state==='queue'||g.state==='arrive'?'等位中':'';
- idMark(()=>idMemberAt(g,k),own||nm,sub,{strong:!o.soft,dur:o.soft?1.8:2.6})}
+function idFocusGroup(g,k,o){o=o||{};const nm=o.name||idMember(g,k)||idParty(g);if(!R||!g||g.gone||!R.groups.includes(g)){if(!o.soft)toast(`${nm} 已經離開了。`);return}const p=idMemberAt(g,k);if(!p)return;
+ const t=g.table!=null&&['reading','order','wait','eat','check','toTable'].includes(g.state)?R.tables[g.table]:null;
+ /* rc7 (the player, 15:37 「會出現頭像的對話反而點對話不會跳到那個桌子?」): someone with a table is found at their table — also
+    while still walking to it from another room (the tap went to the room they were crossing) */
+ const rm=t?(t.room||'main'):p.room;if(!o.soft)idGo(rm);
+ const own=idMember(g,k);const sub=t?idTableName(t)+(!own&&g.size>1?` · ${g.size} 位`:''):g.state==='leave'?'正要離開':g.state==='queue'||g.state==='arrive'?'等位中':'';
+ idMark(t&&p.room!==rm?()=>{const q=idMemberAt(g,k);return q&&q.room===rm?q:{x:t.x,y:t.y,room:rm,tbl:t}}:()=>idMemberAt(g,k),own||nm,sub,{strong:!o.soft,dur:o.soft?1.8:2.6})}
+/* rc7 (15:37): a line said at a table by the crew (「久等了。」, 「慢慢喝。」) or by Jill to someone at one finds that table */
+function idFocusTable(g){if(!R||!g||g.gone||!R.groups.includes(g))return false;const t=g.table!=null?R.tables[g.table]:null;if(!t)return false;idGo(t.room||'main');idMark(idTableAt(t),idTableName(t),idPartyLine(g));return true}
 /* who said a line: the person, wherever they are now */
 function idSpeaker(who){if(!R||!who)return null;
  if(who==='jill'){const J=R.jill;return{name:'Jill',at:()=>R&&R.jill?{x:R.jill.x,y:R.jill.y,room:R.jill.room||'main'}:null}}
+ if(who==='named:衛生檢查員'&&R.insp&&!R.insp.out)return{name:'衛生檢查員',at:()=>R&&R.insp?{x:R.insp.x,y:R.insp.y,room:R.insp.room||'main'}:null};   /* rc7: the inspector walks the room; he is not a party (his line said he had left) */
  if(who.indexOf('staff:')===0){const nm=who.slice(6);const m=(S.crew||[]).find(x=>x.name===nm);if(!m)return null;
   return{name:nm,at:()=>{if(!R)return null;const sw=srWalker(m.id);if(sw)return{x:sw.x,y:sw.y,room:sw.room};if(m.role==='chef'){const a=R.ck&&R.ck[m.id];return a?{x:a.x,y:a.y,room:'kitchen'}:null}const w=R.cw&&R.cw[m.id];return w?{x:w.x,y:w.y,room:w.room||'main'}:null}}}
  let g=null,k=0;if(who==='dylan')g=R.groups.find(q=>q.reg==='dylan'&&!q.gone);else if(who.indexOf('named:')===0){const nm=who.slice(6);g=R.groups.find(q=>!q.gone&&namedId(q)===nm)}else if(REG_BY[who]){g=R.groups.find(q=>!q.gone&&regsOf(q).includes(who));if(g)k=Math.max(0,regsOf(g).indexOf(who))}else return null;
  return g?{g,k,name:whoLabel(who)}:{gone:1,name:whoLabel(who)}}
+function idFocusWithWho(who){const s=idSpeaker(who);if(!s||!s.g)return false;idFocusGroup(s.g,s.k,{name:s.name});return true}   /* Jill's line to a guest: the guest, at their table */
 function idFocusWho(who){const s=idSpeaker(who);if(!s)return false;if(s.gone){toast(`${s.name} 已經離開了。`);return true}if(s.g){idFocusGroup(s.g,s.k,{name:s.name});return true}const p=s.at();if(!p){toast(`${s.name} 現在不在這裡。`);return true}idGo(p.room);idMark(s.at,s.name,p.room==='kitchen'?'廚房':'');return true}
 /* a guest who speaks in the room you are looking at: marked for a moment, where they are */
 /* a guest walking (to their table, out of the door) tapped: who it is */
@@ -7927,11 +7935,11 @@ function crewUpd(dt){R.cw=R.cw||{};for(const m of S.crew||[]){
   if(!stepTo(w,v)){w.step+=dt*12;w.moving=true}
   else{w.moving=false;if(tk.k==='visit'){/* v2.4: there — the exchange plays; she stays a moment after it, then back to work */if(!tk.fired){tk.fired=1;w.face=tk.t.x>=w.x?1:-1;if(tk.phone)w.phone=1;if(tk.then)try{tk.then()}catch(e){console.warn('[visit]',e)}}if(!DLG)w.busy+=dt;if(w.busy>=tk.dur){w.task=null;w.busy=0;w.cd=.3;w.phone=0;if(w.nextQ&&w.nextQ.length&&!w.next)w.next=w.nextQ.shift()}continue}
    w.busy+=dt;if(w.busy>=tk.dur){
-   if(tk.k==='seat'){seatGroup(tk.g,tk.t);if(Math.random()<.08&&canChat('waiter',60,5))staffSay(m,pick(['這邊請。','兩位這邊。','請坐。']))}
+   if(tk.k==='seat'){seatGroup(tk.g,tk.t);if(Math.random()<.08&&canChat('waiter',60,5))staffSay(m,pick(['這邊請。','兩位這邊。','請坐。']),undefined,tk.g)}
    if(tk.k==='order'&&!jillTargets(tk.t.i))createTicket(tk.g);else if(tk.k==='order'&&tk.g.state==='order')createTicket(tk.g);
    if(tk.k==='clean'){tk.t.dirty=false;tk.t.plates=[];tk.t.busT=0;sfx.clear()}
    if(tk.k==='serve'&&tk.phase==='pickup'){w.carry=tk.tk.items.filter(i=>i.st==='ready'&&!i.picked&&(!i.lbar||!tk.t.lounge));for(const i of w.carry)i.picked=true;tk.phase='table';tk.room=tk.t.room||'main';tk.x=tk.t.x+(tk.t.x<200?-26:26);tk.y=tk.t.y+22;w.busy=0;R.tv++;continue}
-   if(tk.k==='serve'){if(w.carry.some(i=>i.lbar))m.wineDay=(m.wineDay||0)+w.carry.filter(i=>i.lbar).length;/* v2.3 */serveItems(tk.g,w.carry.map(it=>({it})));w.carry=null;tk.tk.claim=null;if(Math.random()<.08&&canChat('waiter',60,5))staffSay(m,pick(['久等了。','請慢用。','小心燙。']))}
+   if(tk.k==='serve'){if(w.carry.some(i=>i.lbar))m.wineDay=(m.wineDay||0)+w.carry.filter(i=>i.lbar).length;/* v2.3 */serveItems(tk.g,w.carry.map(it=>({it})));w.carry=null;tk.tk.claim=null;if(Math.random()<.08&&canChat('waiter',60,5))staffSay(m,pick(['久等了。','請慢用。','小心燙。']),undefined,tk.g)}
    if(tk.k==='check'&&tk.g.state==='check'){regularNote(tk.g);collect(tk.g)}
    crewCount(m,tk.k);if(tk.g)tk.g.claim=null;if(tk.t)tk.t.claim=null;w.task=null;w.busy=0;w.cd=m.role==='waiter'?waiterDelay(m):.35}}
   continue}
@@ -8317,7 +8325,7 @@ function dlgNext(){if(!DLG)return;
    Jill/Dylan exchanges show both faces, the speaker lit. ---- */
 function portraitLine(who,txt,o){o=o||{};const p=portraitOf(who,o.tone);if(!p)return false;const box=$('#plines');if(!box)return false;const w=o.with?portraitOf(o.with,o.withTone):null;
  const d=document.createElement('div');d.className='pline '+(p.side==='right'?'right':'left');d.innerHTML=`${w&&w.side==='left'?`<img class="dim" alt="" src="${w.src}">`:''}${p.side==='left'?`<img alt="" src="${p.src}">`:''}<div class="pl-t"><b>${p.name}</b><span>${txt}</span></div>${p.side==='right'?`<img alt="" src="${p.src}">`:''}${w&&w.side==='right'?`<img class="dim" alt="" src="${w.src}">`:''}`;
- box.appendChild(d);while(box.children.length>2)box.firstChild.remove();const T=setTimeout(()=>{d.classList.add('out');setTimeout(()=>d.remove(),260)},o.ms||3400);d.onclick=()=>{clearTimeout(T);d.remove();try{if(o.g&&R)idFocusGroup(o.g,o.k||0,{name:p.name});else idFocusWho(who)}catch(e){}};   /* v2.4 rc6 (07:09): a tap on the line finds who said it */
+ box.appendChild(d);while(box.children.length>2)box.firstChild.remove();const T=setTimeout(()=>{d.classList.add('out');setTimeout(()=>d.remove(),260)},o.ms||3400);d.onclick=()=>{clearTimeout(T);d.remove();try{if(o.tg&&R&&idFocusTable(o.tg))return;if(o.g&&R)idFocusGroup(o.g,o.k||0,{name:p.name});else if(!(who==='jill'&&o.with&&idFocusWithWho(o.with)))idFocusWho(who)}catch(e){}};   /* v2.4 rc6 (07:09): a tap on the line finds who said it; rc7 (15:37): a line said at a table finds the table, Jill's to someone finds them */
  return true}
 function hideScreen(){screenEl.hidden=true;screenEl.innerHTML='';sub=null}
 function topIcons(){return`<button class="icon-btn" data-act="peek" aria-label="看店裡" style="font-weight:800;font-size:11px;width:auto;padding:0 9px">看店裡</button><button class="icon-btn" data-act="guide" aria-label="店主手冊" style="font-weight:800;font-size:15px">?</button><button class="icon-btn" data-act="book" aria-label="餐廳日誌">${SVG.book}</button><button class="icon-btn" data-act="settings" aria-label="設定">${SVG.gear}</button>`}

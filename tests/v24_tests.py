@@ -2242,3 +2242,55 @@ def v24_rc7_the_landlord_goes_up(b, port, target):
     check(('房東', '要上來看嗎？') in shown and ('Jill', '好。') in shown, 'he asks Jill if she wants to see it')
     check(g.ev("!!fact('up_inspect')") and not g.ev("!!DLG"), 'the beat is done and the panel closed')
     check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc7_a_line_finds_its_table(b, port, target):
+    """the player's 15:37 (「會出現頭像的對話反而點對話不會跳到那個桌子?」): a guest's line with a face, said while they are
+    still walking to their table through another room, took the tap to the room they were crossing — now it goes to
+    their table; a waiter's 「久等了。」 or 「這邊請。」 and the bartender's 「慢慢喝。」 find the table they were said at; Jill's
+    line to a guest finds the guest; the inspector's 「衛生局，例行檢查。」 finds him (it said he had left)."""
+    g = Game(b, port, target, seed=1537, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day74_1508.json')
+    to_service(g)
+    g.ev("__botUntil('R.t>=R.dur*.1',90000,1/30)")
+    mark = lambda: json.loads(g.ev("JSON.stringify({room,m:IDF.map(m=>{const p=m.at&&m.at();return{label:m.label,sub:m.sub,room:p&&p.room}}),toast:$('#toasts').textContent})"))
+    clear = "document.querySelectorAll('#plines>*,#toasts>*').forEach(e=>e.remove());IDF.length=0"
+    # a regular walking to a table in another room
+    info = json.loads(g.ev("""JSON.stringify((()=>{const t=R.tables.find(t=>['side','lounge'].includes(t.room)&&!t.group&&!t.dirty&&!t.hold&&t.seats>=1&&!t.pdr);if(!t)return null;
+      const o=regPlanVisit({t:R.t,type:'gourmet',reg:'leo',size:1});o.moment=null;spawn(o);const q=R.groups[R.groups.length-1];seatGroup(q,t);window.__q=q;return{t:t.i,room:t.room}})())"""))
+    check(info is not None, 'a free table in the side room or the Lounge')
+    for _ in range(400):
+        if g.ev("__q.room==='main'&&__q.state==='toTable'"): break
+        g.ev("__tick(1000/30)")
+    check(g.ev("__q.room==='main'&&__q.state==='toTable'"), f'Leo is walking through the dining room to his table: {g.ev("JSON.stringify([__q.room,__q.state])")}')
+    g.ev(f"setRoom('kitchen');{clear};quote(__q,'今天人好多。',{{who:'leo'}})")
+    check(g.page.query_selector('#plines .pline') is not None, 'his line comes with his face')
+    g.page.click('#plines .pline'); g.ev("__tick(1000/30)")
+    st = mark()
+    check(st['room'] == info['room'] and st['m'] and st['m'][-1]['label'] == 'Leo' and st['m'][-1]['sub'] == f"T{info['t']+1}" and st['m'][-1]['room'] == info['room'], f'the tap goes to his table ({info}), not the room he is crossing: {st}')
+    # a waiter's line at a table, from another room
+    tg = json.loads(g.ev("""JSON.stringify((()=>{const q=R.groups.find(q=>q.table!=null&&['order','wait','eat'].includes(q.state)&&q!==__q);if(!q)return null;window.__t=q;const t=R.tables[q.table];return{t:t.i,room:t.room||'main',name:q.name||q.reg}})())"""))
+    check(tg is not None, 'a party at a table')
+    other = 'kitchen' if tg['room'] != 'kitchen' else 'main'
+    who = g.ev("(()=>{const m=S.crew.find(m=>m.role==='waiter'&&STAFF_PORTRAITS[m.name]);return m?m.name:null})()")
+    g.ev(f"setRoom('{other}');{clear};staffSay(S.crew.find(m=>m.name==={json.dumps(who)}),'久等了。',undefined,__t)")
+    line = '#plines .pline' if g.page.query_selector('#plines .pline') else '#toasts .toast.who'
+    g.page.click(line); g.ev("__tick(1000/30)")
+    st = mark()
+    check(st['room'] == tg['room'] and st['m'][-1]['label'] == f"T{tg['t']+1}", f"{who}'s 「久等了。」 finds the table she said it at ({tg}): {st}")
+    # Jill's line to a guest finds the guest, at their table
+    g.ev("__botUntil('__q.state!==\\'toTable\\'',20000,1/30)")
+    g.ev(f"setRoom('kitchen');{clear};jillSay('嗯，今天比較忙。',{{with:'leo'}})")
+    check(g.page.query_selector('#plines .pline') is not None, 'Jill\'s line to him comes with the two faces')
+    g.page.click('#plines .pline'); g.ev("__tick(1000/30)")
+    st = mark()
+    check(st['room'] == info['room'] and st['m'][-1]['label'] == 'Leo', f'Jill\'s line to Leo finds Leo at his table: {st}')
+    # the inspector walks the room; his line finds him
+    g.ev(f"setRoom('kitchen');{clear};R.insp={{t:0,dur:22,x:DOOR.x,y:DOOR.y+20,tx:224,ty:204,b0:R.st.q.B,out:false}};portraitLine('named:衛生檢查員','衛生局，例行檢查。')")
+    if g.page.query_selector('#plines .pline'):
+        g.page.click('#plines .pline'); g.ev("__tick(1000/30)")
+        st = mark()
+        check('已經離開了' not in st['toast'] and st['room'] == 'main' and st['m'] and st['m'][-1]['label'] == '衛生檢查員', f'the inspector is found where he walks: {st}')
+    g.ev("R.insp=null")
+    check(not g.errors, g.errors[:3]); g.close()
