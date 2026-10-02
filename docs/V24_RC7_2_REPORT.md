@@ -30,7 +30,9 @@ Filed verbatim in `docs/v24/`:
 | 809465b | A portrait line's touch handler is a property, not one more listener per line (long_play_is_stable); the release checklist's permanent rule: never skip a test |
 | 5e25fa1 | 22:28 the conversation log's ×; 22:29 a tap on a regular's head at a table with work waiting is that table's work |
 | e6076cf | 22:38–23:07: the summary's stories open their pages; no 解雇; 🎲 隨機選菜單; the wages; the missing cats held; Sophie's pad; 晚餐後 Lounge 八折 and the VIP cards; 安安 carries the Lounge's bites |
-| (see §5) | golden_frames re-recorded, the report |
+| 8e1f9d7 | golden_frames re-recorded with before/after/diff proof (§5.1); the report's draft; phone screenshots |
+| 1114bf6 | 23:46: the rate a table pays sits in the ticket's top line, so the name, the heart and the 招待 chip keep their room |
+| (this commit) | the report: goldens, the full regression on 1114bf6, the build |
 
 ## 2. Release content audit
 
@@ -119,7 +121,11 @@ Filed verbatim in `docs/v24/`:
 | VIP (10 visits) | 八折 | 八折 | 七折 |
 
 - Each item is discounted and rounded to $5. A table pays at the best card at it.
-- The ticket shows the rate beside the name. The summary has a VIP chip; the Lounge line gives the after-dinner discount.
+- The ticket shows the rate in its top line, between the table number and the clock (`.tk-h .tk-off`: 九折 / 八折 / 七折). It
+  first sat after the name and squeezed it (「So…」) and pushed the 招待 chip off; the player read that as 「幾折功能也把招待功能關了」
+  (23:46). 招待 was never off: the screenshot was taken with guests not yet seated. Since 1114bf6 a seated VIP's ticket shows
+  八折 in the top line and the face, the name (whole) and 招待 below it (`tickets_vip_and_treat.png`).
+- The summary has a VIP chip; the Lounge line gives the after-dinner discount.
 - The card is given at the fifth visit and changed at the tenth, each said once.
 - The journal has a VIP tab: who, which card, the day it was given, and who is one visit away.
 - Saves: people who already have 5 or 10 visits have their cards ("before there were cards"), with no toast.
@@ -153,15 +159,45 @@ Sections checked: 營業中（上菜）, 開店前：備料與菜單, Jill 與�
 
 ### 5.1 Goldens re-recorded
 
-(filled at the release)
+`golden_frames` failed on e6076cf in seven frames, every one an intended change (`golden_frames/golden_check_e6076cf.log`):
+
+| Frame | Box | What changed |
+|---|---|---|
+| prep | (16, 659, 374, 733) | the 🎲 隨機選菜單 row above the menu list |
+| service_20s, service_panel, pause | (16, 50, 267, 137) | the tickets' guest line: before, 「沒東西可請」 printed over the name; after, the face, the name, then the chip |
+| evening | (47, 224, 54, 232) | the log's count 20 → 22 (秀琴阿姨's first evening adds two lines) |
+| book_cats, book_mem | (318, 188, 390, 220) | the journal's tab row gains 「VIP」 |
+
+`day1` and `day2` differed in the DOM samples for the same reasons (the ticket markup). Re-recorded in 8e1f9d7 with
+`--record -k golden_frames`; each frame's before/after/diff is in `docs/evidence/v24_rc7_2/golden_frames/`. 1114bf6 changes
+only a VIP's ticket, and no golden frame has one: `golden_frames` passed on 1114bf6 without re-recording (§6).
 
 ## 6. Full regression
 
-(filled at the release)
+**On 1114bf6, the commit whose game is published: 202 passed, 0 failed** (`python3 tests/run_tests.py`, in a clean
+worktree of 1114bf6, 23:49 → 00:32; `docs/evidence/v24_rc7_2/regression/full_regression_1114bf6.log`). golden_scenario and
+golden_frames passed without re-recording.
+
+The commit that carries this report adds only docs and evidence: `git diff 1114bf6 -- js css index.html
+jills-kitchen-single-file.html tests tools` is empty, so the page published is the page tested.
+
+Earlier full runs on this branch, each stopped and superseded (logs in the same folder):
+
+| Commit | Result | Why it stopped |
+|---|---|---|
+| e4e2b07 | 30 passed, 1 failed | `long_play_is_stable`: a portrait line added a touch listener per line. Fixed in 809465b. |
+| 809465b | 30 passed | Stopped for 5e25fa1 (the player's 22:28–22:29). |
+| 5e25fa1 | 100 passed, 1 failed | `golden_frames`: the tickets' guest line (the 招待 chip beside the name), an intended change. Re-recorded in 8e1f9d7 (§5.1). |
+| 8e1f9d7 | 51 passed | Stopped for 1114bf6 (the player's 23:46). |
+
+The permanent rule (`docs/RELEASE_CHECKLIST.md` §5) was kept: no publish on targeted runs; the publish waited for the full
+suite on the final commit.
 
 ## 7. Build and publish
 
-(filled at the release)
+- `tools/build_single.py`: the single file is in step with 1114bf6 (6,256 KB; rebuilt, no change).
+- `tools/build_artifact.py`: the page for the live URL (6,405,135 bytes).
+- Tag `v2.4-rc7.2`.
 
 ## 8. Text
 
