@@ -310,7 +310,9 @@ def v24_yijun_comes_to_eat_and_her_mother_walks_over(b, port, target):
     load_save(g, 'player_day52.json')
     to_service(g)
     g.ev("story().v24=Object.assign(v24(),{first:S.day-1});window.__xq=xiuqin();setCrewAway(__xq,'off')")
-    g.ev("if(!R.sched.slice(R.si).some(o=>o.name==='怡君'))spawn({t:R.t,type:'regular',size:1,name:'怡君',story:1})")
+    # rc7.4 (found by the full run on 8eb880a): she comes now, not at the hour the day's plan gave her — at 139 s of 250 the
+    # room was full, she queued, and her first visit took the rest of the evening, leaving no time for the second
+    g.ev("R.sched=R.sched.filter((o,i)=>i<R.si||o.name!=='怡君');spawn({t:R.t,type:'regular',size:1,name:'怡君',story:1})")
     for i in range(300):
         g.page.evaluate('()=>window.__bot(60,1/30)')
         if g.ev("phase") != 'service' or g.ev("!!story().named['怡君']&&story().named['怡君'].seen===S.day&&!R.groups.some(q=>namedId(q)==='怡君')"): break
