@@ -3127,7 +3127,9 @@ def v24_rc73_the_cats_try_their_luck_and_never_get_it(b, port, target):
     load_save(g, 'player_day74_1508.json')
     to_service(g)
     g.ev("__botUntil('R.t>=R.dur*.2',90000,1/30)"); g.ev("window.__act=()=>{}")
-    mk = """(d=>{const t=R.tables.find(t=>(t.room||'main')==='main'&&!t.group&&!t.dirty&&!t.hold&&!t.lounge&&!t.pdr);spawn({t:R.t,type:'office',size:1});const q=R.groups[R.groups.length-1];if(q.table!=null){R.tables[q.table].group=null;q.table=null}seatGroup(q,t);q.state='eat';q.timer=999;q.ticket={id:R.tkid++,no:90,g:q,items:[{d,st:'served',q:'G',want:0,picked:true}],t0:R.t};R.tickets.push(q.ticket);return q})"""
+    # a table in the dining room for the scene: a free one, or (Day 74 is busy) one whose guests are sent on their way
+    g.ev("""window.__freeT=()=>{const ok=t=>(t.room||'main')==='main'&&!t.hold&&!t.lounge&&!t.pdr;let t=R.tables.find(t=>ok(t)&&!t.group);if(!t){t=R.tables.find(t=>ok(t)&&t.group&&t.group!==window.__q&&t.group!==window.__r);leaveGroup(t.group,'ok')}t.dirty=false;t.plates=[];return t}""")
+    mk = """(d=>{const t=__freeT();spawn({t:R.t,type:'office',size:1});const q=R.groups[R.groups.length-1];if(q.table!=null){R.tables[q.table].group=null;q.table=null}seatGroup(q,t);q.state='eat';q.timer=999;q.ticket={id:R.tkid++,no:90,g:q,items:[{d,st:'served',q:'G',want:0,picked:true}],t0:R.t};R.tickets.push(q.ticket);return q})"""
     for cid, dish in (('ban', 'fries'), ('mei', 'steak')):
         g.ev(f"window.__q={mk}('{dish}');(()=>{{const c=catBy('{cid}');if(c.away==='home')homeCatOut(c);c.stealCD=0;R.groups.filter(x=>x!==__q).forEach(x=>x.stolenAt=R.t);stealGo(c)}})()")
         seen = {'on': False}
@@ -3142,7 +3144,7 @@ def v24_rc73_the_cats_try_their_luck_and_never_get_it(b, port, target):
     w = json.loads(g.ev("JSON.stringify({watch:catBy('snow').stealWatch,after:catBy('snow').after})"))
     check(w['watch'] and w['after'] == 'stealWatch', f'包包 mostly watches from below: {w}')
     # 寶寶 and the people she knows
-    g.ev("""window.__r=(()=>{const t=R.tables.find(t=>(t.room||'main')==='main'&&!t.group&&!t.dirty&&!t.hold&&!t.lounge&&!t.pdr);spawn({t:R.t,type:'office',size:1});const q=R.groups[R.groups.length-1];q.reg='mia';q.name='Mia';q.looks=REG_BY.mia.looks;S.catFam=S.catFam||{};S.catFam.mia=9;if(q.table!=null){R.tables[q.table].group=null;q.table=null}seatGroup(q,t);q.state='eat';q.timer=999;R.groups.filter(x=>x!==q).forEach(x=>x.mewed=1);return q})();(()=>{const c=catBy('mei');if(c.away==='home')homeCatOut(c);c.meowGCD=0;meowGo(c)})()""")
+    g.ev("""window.__r=(()=>{const t=__freeT();spawn({t:R.t,type:'office',size:1});const q=R.groups[R.groups.length-1];q.reg='mia';q.name='Mia';q.looks=REG_BY.mia.looks;S.catFam=S.catFam||{};S.catFam.mia=9;if(q.table!=null){R.tables[q.table].group=null;q.table=null}seatGroup(q,t);q.state='eat';q.timer=999;R.groups.filter(x=>x!==q).forEach(x=>x.mewed=1);return q})();(()=>{const c=catBy('mei');if(c.away==='home')homeCatOut(c);c.meowGCD=0;meowGo(c)})()""")
     for _ in range(600):
         g.ev("__tick(1000/30)")
         if g.ev("__r.mewed"): break
@@ -3159,17 +3161,29 @@ def v24_rc73_posts_carry_their_picture_and_likes_that_keep_coming(b, port, targe
     post is about drawn from the game's art, the same picture every time — and a like count. Likes keep coming: a day
     later every post has at least as many and the young ones more; cats bring the most, an ordinary guest a handful."""
     g = Game(b, port, target, seed=7341, manual=True, viewport={'width': 390, 'height': 844})
-    load_save(g, 'player_day74_1508.json')
+    # the player's backup file as the game reads it (設定 → 讀取存檔): the save and its 184 photos
+    raw = json.load(open(os.path.join(ROOT, 'tests', 'saves', 'player_day74_1508.json'), encoding='utf-8'))
+    check(len(raw.get('photos') or {}) > 100, 'the backup carries its photos')
+    g.ev("importSaveText(%s);importConfirm()" % json.dumps(json.dumps(raw, ensure_ascii=False)))
+    g.page.wait_for_timeout(300)
+    g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(150)
+    check(g.ev("S.day") == 74, 'the backup is in')
     g.click('[data-act=book]'); g.click('[data-act=btab][data-k=social]')
-    cards = json.loads(g.ev("""JSON.stringify([...document.querySelectorAll('#screen .posts .post')].map(e=>{const im=e.querySelector('img.post-ph');const lk=e.querySelector('.likes');return{src:im?im.getAttribute('src').slice(0,22):'',w:im?im.naturalWidth:0,pid:im?im.dataset.pid||null:null,likes:lk?+lk.textContent.replace(/[^0-9]/g,''):-1}})"""))
+    cards = json.loads(g.ev("""JSON.stringify([...document.querySelectorAll('#screen .posts .post')].map(e=>{const im=e.querySelector('img.post-ph');const lk=e.querySelector('.likes');return{src:im?im.getAttribute('src').slice(0,22):'',w:im?im.naturalWidth:0,pid:im?im.dataset.pid||null:null,likes:lk?+lk.textContent.replace(/[^0-9]/g,''):-1}}))"""))
     check(len(cards) == 6, f'the six most recent posts: {len(cards)}')
     check(all(c['src'].startswith('data:image/') or c['pid'] for c in cards) and all(c['likes'] >= 1 for c in cards), f'each with a picture and likes: {cards}')
     g.page.wait_for_timeout(200)
     check(all(w > 0 for w in g.ev("[...document.querySelectorAll('#screen .posts img.post-ph')].map(i=>i.naturalWidth)")), 'the pictures load')
     g.page.screenshot(path=os.path.join(ROOT, 'tests', 'artifacts', 'rc73_posts_day74.png'))
-    # all forty, behind the button
+    # all forty, behind the button; Jill's own photos come in from the album's store
     g.click('[data-act=postsAll]')
     check(g.ev("document.querySelectorAll('#screen .posts .post').length") == g.ev("S.social.posts.length"), 'every post, with the button')
+    loaded = False
+    for _ in range(40):
+        g.page.wait_for_timeout(100)
+        st = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('#screen .posts img.post-ph[data-pid]')].map(i=>i.src!==PHOTO_BLANK&&i.naturalWidth>0))"))
+        if st and all(st): loaded = True; break
+    check(loaded, f"Jill's posts show the photos she posted: {st}")
     # Jill's album photo is the one she posted; the drawn ones are the same every time
     r = json.loads(g.ev("""JSON.stringify((()=>{const P=S.social.posts;const withPid=P.filter(p=>p.pid&&albumList().some(a=>a.id===p.pid));
       const same=withPid.every(p=>postPhoto(p)===photoSrc(albumList().find(a=>a.id===p.pid)));

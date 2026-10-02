@@ -7436,7 +7436,7 @@ function drawKitchenHomeDoor(c){const y0=KY.passTop-46,y1=KY.passTop+34;const xl
 /* the furniture, each at its place in the drawing order */
 function homeItems(c,now,d){const out=[];const P=(y,f)=>out.push({y,f:()=>f(c)});
  {const D=LIFE.dylan;if(D&&D.room==='home'&&!D.onSofa&&!D.desk)P(D.y,c=>drawDylanFree(c,D,now))}
- {const L=LIFE.jill;if(L.bed&&(L.room||'home')==='home')P(L.y,c=>drawJillOnBed(c,now))}
+ {const L=LIFE.jill;if(L.bed&&(L.room||'home')==='home')P(HM.bed.y1+19,c=>drawJillOnBed(c,now))}   /* in front of the cats lying on the bed (their key is the bed's front + 18) */
  P(9999,c=>{drawSay(c,'home');drawHomeSay(c)});
  P(HM.lamp.y,c=>drawHomeFloorLamp(c,HM.lamp.x,HM.lamp.y,d));
  P(SOFA.y,c=>drawSofaGroup(c,now));
@@ -7919,7 +7919,7 @@ function lifeEnsureEvening(){if(!evening())return;if(LIFE.day!==S.day||!LIFE.pla
 function lifeNoRoom(){/* rc7.3: the cats have the whole sofa — she sits on the edge of the bed instead, in her room. (Before: her old seat at the
    dining room's first table; the dining room is not where she rests any more — 18:53 §5.) */const L=LIFE.jill;L.reserved=false;L.pos=null;L.act='toBed'}
 /* the edge of the bed, between the pillows' end and the foot, where the cats on the bed lie behind her */
-function bedSeat(){const B=HM.bed;return{x:B.x0+80,y:B.y1+22}}   /* drawn seated, the mattress's front edge is her seat (as SOFA.seat is to SOFA.jy) */
+function bedSeat(){const B=HM.bed;return{x:B.x0+80,y:B.y1+10}}   /* drawn seated: her lap on the mattress's front edge, her feet at the floor (as on the sofa: SOFA.jy, 8 above SOFA.front) */
 function bedDecide(L){const W=[];const add=(k,w)=>{if(w>0)W.push([k,w])};add('read',L.last==='read'?2:4);add('idle',L.last==='idle'?1.2:2.4);
  if(!L.preferBed&&L.sinceSit>20&&freeJillPos())add('sofa',2);   /* the sofa has room again */
  const k=wpick(W,o=>o[1])[0];L.last=k;
@@ -8225,9 +8225,9 @@ function drawBagSparkle(c,now){const t=now-BAG_T;const base=.35+Math.sin(now*2)*
 
 /* ================= guide ================= */
 /* 小小店主手冊：seven cards, short lines, the same tone as the rest of the game */
-const GUIDE=[   /* the manual describes the game as it is. Audited every release (docs/RELEASE_CHECKLIST.md) — last: v2.4 rc7.2 (秀琴阿姨's $3,000 loans and the payback at the summary; her first evening held; the pass takes a tap; the heart for a regular who is one; the 招待 chip beside the name; a line with a face answers a touch; the log's ×; a regular's head at a busy table is the table; a story on the summary opens its page; no 解雇; 🎲 隨機選菜單; the wages (LV5 twice); the missing cats found and the open door held; Sophie's pad seen and marked; 晚餐後 Lounge 八折) — earlier: v2.4 rc7 (the day's money: the glasses' cost, the rent, the wages, 秀琴阿姨's loan, 予安's fee; Ken's tasting nights and 「晚餐之後」; the piano and 予安; Ken's and 予安's stories hold the restaurant; a line said on the way to a table; the story guests look like their portraits — earlier: v2.4 rc6 (the Staff Room, the Private Dining Room and its bookings, two more places on the restaurant's list; the stories that hold the restaurant, the day's stories on the summary, the Lounge's list and sales, the things to spend on, the Second Floor after the Lounge, the new places' photos, a day off)), 2026-10-02 */
+const GUIDE=[   /* the manual describes the game as it is. Audited every release (docs/RELEASE_CHECKLIST.md) — last: v2.4 rc7.3 (Jill's room: the room tab and its doors, her rest and her evening there — the sofa or the edge of the bed —, the cats' home, petting in the room, the steals that never work, 寶寶 and the regulars, the posts' pictures and likes) — before: v2.4 rc7.2 (秀琴阿姨's $3,000 loans and the payback at the summary; her first evening held; the pass takes a tap; the heart for a regular who is one; the 招待 chip beside the name; a line with a face answers a touch; the log's ×; a regular's head at a busy table is the table; a story on the summary opens its page; no 解雇; 🎲 隨機選菜單; the wages (LV5 twice); the missing cats found and the open door held; Sophie's pad seen and marked; 晚餐後 Lounge 八折) — earlier: v2.4 rc7 (the day's money: the glasses' cost, the rent, the wages, 秀琴阿姨's loan, 予安's fee; Ken's tasting nights and 「晚餐之後」; the piano and 予安; Ken's and 予安's stories hold the restaurant; a line said on the way to a table; the story guests look like their portraits — earlier: v2.4 rc6 (the Staff Room, the Private Dining Room and its bookings, two more places on the restaurant's list; the stories that hold the restaurant, the day's stories on the summary, the Lounge's list and sales, the things to spend on, the Second Floor after the Lounge, the new places' photos, a day off)), 2026-10-02 */
  {ic:'🍳',h:'開店與料理',sum:'每天 17:00 開店、21:30 打烊。你是 Chef Jill，點餐廳裡的東西就能指揮她。',pts:[
-  ['房間','票券列下面的分頁：店門口・主廳・側廳・二樓（租下以後）・休息室・包廂（蓋好以後）・Lounge（蓋好以後）・廚房（也可以用 ←→ 或數字鍵）。你在哪一間，那個分頁就亮著，寫著那一間的全名——在休息室裡是「員工休息室」，在包廂裡是「私人包廂」。二樓是整層樓本身：上面的房間關著門，點門就進去，房間裡靠近你的那扇門回到二樓；上二樓的樓梯門在側廳靠近你的那一邊。新的房間蓋好的那天早上，開店前會先帶你上二樓看一眼；整層的平面圖在「店舖工程」的二樓那一欄。包廂的分頁上有跟桌子一樣的提示。主廳的後牆有側廳的拱門，Lounge 蓋好以後旁邊多一道，都可以直接點。主廳底部沒有廚房——廚房是自己的一間，出菜口在那裡；Jill 和服務生會走到主廳最下面去拿菜。'],
+  ['房間','票券列下面的分頁：店門口・主廳・側廳・二樓（租下以後）・休息室・包廂（蓋好以後）・Lounge（蓋好以後）・廚房・房間（也可以用 ←→ 或數字鍵）。你在哪一間，那個分頁就亮著，寫著那一間的全名——在休息室裡是「員工休息室」，在包廂裡是「私人包廂」，在房間裡是「Jill 的房間」。二樓是整層樓本身：上面的房間關著門，點門就進去，房間裡靠近你的那扇門回到二樓；上二樓的樓梯門在側廳靠近你的那一邊。新的房間蓋好的那天早上，開店前會先帶你上二樓看一眼；整層的平面圖在「店舖工程」的二樓那一欄。包廂的分頁上有跟桌子一樣的提示。主廳的後牆有側廳的拱門，Lounge 蓋好以後旁邊多一道，都可以直接點。主廳底部沒有廚房——廚房是自己的一間，出菜口在那裡；Jill 和服務生會走到主廳最下面去拿菜。'],
   ['帶位','有空桌客人會自己坐；客滿時在門口長椅等。想指定順序，點那組客人或點空桌。'],
   ['誰在哪裡','訂單上的桌號（T35）或名字點一下，會切到那一桌所在的房間，那一桌亮一下，寫著幾號桌、哪一組、幾位。點一張有客人的桌子也一樣會寫出來。點常客或認得的客人，他的小卡片上寫著坐哪一桌。畫面下方誰說了一句話，點那句話就會找到他現在在哪——還在桌上、在等位、正要離開；已經走了也會告訴你。還在走向座位的路上說的話，會帶你到他要坐的那一桌（他走到之前那一桌會一直亮著）；服務生、調酒師說的「這邊請」「請慢用」，點了會找到她說話的那一桌。標示幾秒就消失，平常畫面上不會一直掛著名字。'],
   ['點餐','桌上出現紅色「!」→ 點桌子，Jill 過去點餐。'],
@@ -8315,14 +8315,16 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
   ['最低消費','訂位的時候就定了：照這麼多人、這種聚餐平常會點的菜和當天的價錢來算，訂在稍低一點（包廂越完整，越接近他們會吃的）；人越多越高。之後漲價、包廂升級、存檔重開，都不會改。預約的那一桌照常點菜、吃飯、結帳：吃得比最低消費多就照實算，少了就收最低消費——客人不會為了湊低消多點。'],
   ['沒有預約的晚上','4 位以上、坐得下的客人可以直接坐包廂，照常算，沒有最低消費。熟客和 Lounge 的客人照舊坐他們的位子。結算的晚上會寫「包廂 幾組」；預約的那一桌吃得比最低消費少的話，也寫補足了多少。']]},
  {ic:'🛋️',h:'Jill 的房間',sum:'廚房後面那一間，是 Jill 自己住的房間——從第一天就在。不是工程，不用買，也沒有要照顧的數值。',pts:[
-  ['怎麼進去','房間分頁的最後一個「房間」（點開寫著「Jill 的房間」）。Jill 從廚房右手邊那扇淺木門進出；房間另外有一扇自己的門，通到後巷。'],
+  ['怎麼進去','房間分頁的最後一個「房間」（點開寫著「Jill 的房間」）。也可以在廚房點右手邊那扇淺木門（寫著「房間 ›」）；在房間裡點門口的「‹ 廚房」回到廚房。Jill 也是走那扇門；房間另外有一扇自己的門，通到後巷。'],
   ['裡面有什麼','窗下那張燕麥色沙發、可以推過來推過去的電視、一張雙人床、一張堆滿書和講義的書桌、貓抓板、貓床、收在淺木櫃裡的貓砂，還有從主廳搬進來的那座貓跳台。主廳原本放沙發的地方空了出來，留給走道。'],
-  ['Jill 在房間','營業中沒事的時候，她會回房間坐一下；打烊後把出菜口擦一擦，就回房間。看電子書只在房間。'],
+  ['Jill 在房間','營業中沒事的時候，她會回房間坐一下；打烊後把出菜口擦一擦，就回房間。看電子書只在房間。沙發被貓佔滿的晚上，或她想換個地方的時候，她會坐在床邊看書。'],
   ['貓的家','房間是五隻貓的家，不是關牠們的地方：營業中牠們一樣在店裡走來走去，也會自己回房間。樾樾幾乎都待在房間；柔柔愛在店裡晃，睡覺會回房間；小齁偶爾跑回房間喵一聲；包包在房間睡，也會在店裡最熱鬧的地方睡；寶寶喜歡房間，偶爾出來看看。打烊以後回房間的貓多一點，但不會一下子全部回去。'],
   ['樾樾等 Jill','樾樾很怕生，客人走光了也不太敢出來。等他跟店裡的人熟了，打烊以後他會出來，在廚房門口等 Jill，再跟她一起回房間。']]},
  {ic:'🐈',h:'五隻店貓',sum:'樾樾、小齁、寶寶、柔柔、包包住在店裡。不用餵、不用照顧，牠們有自己的生活。',pts:[
   ['個性','樾樾黏 Jill、怕生，大部分時間在 Jill 的房間；小齁愛玩也黏人；寶寶天生明星，總坐在好看的位子；柔柔有點傻，愛埋伏寶寶；包包很會睡。'],
-  ['點牠們','可以摸，但牠們不一定理你。點睡著的包包，他會睜一下眼、動動耳朵尾巴——然後繼續睡。'],
+  ['點牠們','可以摸，但牠們不一定理你。點睡著的包包，他會睜一下眼、動動耳朵尾巴——然後繼續睡。在 Jill 的房間裡的貓也一樣可以摸。'],
+  ['偷吃（從來沒成功）','小齁看到炸物、寶寶看到牛排，偶爾會跳上客人的桌子想偷吃。不是每次，也從來沒成功：客人或 Jill 一句話，牠們就跳下去，盤子沒事。包包想吃雞腿，但大多只是坐在桌子底下抬頭看。'],
+  ['寶寶和熟客','寶寶偶爾會從房間出來，走到認得她的客人旁邊叫一聲「喵～」；對方通常當場融化。'],
   ['客人也看貓','客人會轉頭看貓、微笑，有人會拿手機拍一張。等太久的客人，親人的貓有時會去陪一下。常來的客人會慢慢認得某一隻，叫得出名字。'],
   ['牠們不出門','貓只在店裡，窗邊再熱鬧也是在窗戶裡面。二樓是店裡的以後，偶爾會有一隻上樓待一會兒，再自己下來；有了休息室，打烊後有人在裡面坐的時候，偶爾會有一隻跟進去在沙發上睡一下；包廂空著的晚上也可能有一隻進去晃一下，有客人要坐的時候牠會自己出來。門口的狗是客人帶來的，有五種：博美、臘腸、米克斯、垂耳、黃金獵犬。買了狗狗休息角（門邊那間小木屋），牠會在屋前趴著、坐起來看看、喝水，等主人吃完。'],
   ['名字','在餐廳日誌的「店貓」可以直接改名字。']]},
