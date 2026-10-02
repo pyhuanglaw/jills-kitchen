@@ -825,14 +825,19 @@ def followup_the_manual_describes_the_current_game(b, port, target):
                  '店裡暫停中', '一句一句點著看', '今天的故事', '只收那一段自己的話', 'Lounge 今天賣了什麼', '今晚倒哪幾種', '酒單研發', '和研發一道菜差不多', '最多 +15%', '品酒課', '訓練升級一天最多一級',
                  '委託的一幅畫', '乾式熟成櫃', 'Lounge 的酒窖', 'Lounge 的鋼琴', '季節佈置', '食材契作', 'Lounge 蓋好以後，樓上的事就會慢慢開始', '來的時候就是 LV2', '偶爾也會請一天假', '下班以後的一局撞球',
                  # v2.4 rc7 (14:39–14:51): the day's money — the glasses' cost, the rent, the wages, 秀琴阿姨's loan; the Lounge's figure without its tips
-                 '每天的帳', '酒水成本', '租金', '一天 $300', '不會欠到明天', '秀琴阿姨會借你兩萬', '不含小費', '晚餐桌上配的酒也另外一行']:
+                 '每天的帳', '酒水成本', '租金', '一天 $300', '不會欠到明天', '秀琴阿姨會借你兩萬', '不含小費', '晚餐桌上配的酒也另外一行',
+                 # v2.4 rc7 (15:24–16:46): Ken's tasting nights and the wine, 予安 and the piano, their stories hold, a line on the way to a table, the story guests' looks
+                 'Ken 的品酒夜', '品酒會只有 Ken 辦', '晚餐之後', '鋼琴與予安', '一個禮拜彈三個晚上', '鋼琴演奏', '一開始沒有人彈', 'Ken 的故事', '予安和鋼琴的故事',
+                 '走向座位的路上', '跟頭像一樣']:
         check(need in txt, f'the manual mentions {need}')
     for stale in ['暫停選單和設定裡都有【儲存目前進度】', '把杯子交給吧台的客人；桌位由有', '上方的分頁', '畫面上方會跳一個小通知', '打烊後或開店前，商店的「社群與宣傳」分頁（第 6 天起）。', '下一段寫著', '窗邊（貓架、睡墊）', '牠會在門邊趴著等主人',
                   '人數上限跟擴建、後場整理區、側廳、廚房擴建、廚房二期、Lounge 有關', '有 Lounge 以後才能招募', '第二位調酒師',
                   # v2.4 rc6: the rc5 line that said the staff list's number came only from the ground floor
                   '側廳、廚房擴建、廚房二期有關；', '輪流切',
                   # v2.4 rc6 (05:23): the Staff Room is no longer green; (06:36) the floor is an everyday tab again — the lines that said it was not are gone
-                  '還是一個「二樓」分頁', '置物櫃、小冰箱、咖啡機、多一排插座', '整層二樓只在幾個時候出現', '二樓本身不是每天要看的分頁', '點它回到側廳']:
+                  '還是一個「二樓」分頁', '置物櫃、小冰箱、咖啡機、多一排插座', '整層二樓只在幾個時候出現', '二樓本身不是每天要看的分頁', '點它回到側廳',
+                  # v2.4 rc7 (14:49): the piano no longer plays itself
+                  '大約三個晚上有一晚現場演奏']:
         check(stale not in txt, f'stale line removed: {stale}')
     g.ev("showGuide()"); g.page.wait_for_timeout(50)
     check('故事' in g.ev("document.querySelector('#screen').innerText") and '社群與宣傳' in g.ev("document.querySelector('#screen').innerText"), 'the manual screen shows the new sections')
