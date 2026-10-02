@@ -84,10 +84,13 @@ def only_them(sheet, b, seed):
     rgb = A[..., :3].astype(int)
     fg = ~((rgb.min(axis=2) >= 238) & ((rgb.max(axis=2) - rgb.min(axis=2)) <= 14))
     lab, _ = nd.label(fg, structure=np.ones((3, 3)))
-    sx, sy = seed[0] - b[0], seed[1] - b[1]
-    k = lab[sy, sx]
-    if k == 0:
-        ys, xs = np.nonzero(lab); d = (ys - sy) ** 2 + (xs - sx) ** 2; k = lab[ys[d.argmin()], xs[d.argmin()]]
+    if seed is None:   # the person is the largest drawing in their box
+        sizes = np.bincount(lab.ravel()); sizes[0] = 0; k = int(sizes.argmax())
+    else:
+        sx, sy = seed[0] - b[0], seed[1] - b[1]
+        k = lab[sy, sx]
+        if k == 0:
+            ys, xs = np.nonzero(lab); d = (ys - sy) ** 2 + (xs - sx) ** 2; k = lab[ys[d.argmin()], xs[d.argmin()]]
     keep = nd.binary_dilation(lab == k, iterations=2)
     A[~keep, :3] = 255
     return Image.fromarray(A)
@@ -113,8 +116,11 @@ def main():
     paint = ImageDraw.Draw(s8)
     for pid, b, name, outs in CARDS8:
         for r in outs: paint.rectangle(r, fill=(255, 255, 255, 255))
+    # v2.4 rc6 (the full release check, 2026-10-02 13:5x): the scattered sheet too — Momo's box still held a corner of
+    # 老周師傅's tray and 小威's a piece of 小魏's sleeve; everything that does not touch the person's own drawing (the
+    # largest drawing in the box) is painted with the sheet's white, as for the twelve
     for pid, b, name, outs in CARDS8:
-        card(s8, b, pid, name)
+        card_img(only_them(s8, b, None), pid, name)
 
 
 if __name__ == '__main__':
