@@ -3289,3 +3289,127 @@ def v24_rc74_favourites_learned_in_play_and_marked_on_the_menu(b, port, target):
     check(any('提拉米蘇' in t and '♥ Mia' in t for t in rows), f'and the tiramisu, Mia: {[t for t in rows if "提拉米蘇" in t]}')
     g.page.screenshot(path=os.path.join(ROOT, 'tests', 'artifacts', 'rc74_menu_favourites.png'))
     check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc74_the_lounges_new_bites(b, port, target):
+    """(23:03 「酒吧應該新增生蠔、起司條、德國豬腳」「酒吧還要有水牛城雞翅」; 23:06 「就維持酒吧的客人沒辦法點餐餐廳的餐」;
+    23:07 「酒吧的菜還是可以給餐廳的廚師煮 / 但是要讓酒吧專屬的服務生去送餐」) Four more bites for the Lounge: Buffalo wings
+    and cheese sticks from its first level, oysters from the second, the pork knuckle from the third. A save that already
+    has the Lounge gets the ones its level allows the next morning, with one line of news, once. They take no menu slot.
+    The Lounge's guests order them, and never a dish from the restaurant's menu; the ones who came for a game order the
+    fried ones. The restaurant's cooks make them; the Lounge's own waiter carries them over."""
+    g = Game(b, port, target, seed=7432, manual=True, viewport={'width': 390, 'height': 844})
+    NEW = ['wings', 'cheesestick', 'oyster', 'knuckle']; NAMES = ['水牛城雞翅', '起司條', '生蠔', '德國豬腳']
+    load_save(g, 'player_day74_1508.json')   # the player's Day 74, saved before rc7.4: the Lounge at its third level
+    d = json.loads(g.ev("JSON.stringify(%s.map(d=>[DISHES[d].n,!!DISHES[d].bar,DISHES[d].lv,DISHES[d].st]))" % json.dumps(NEW)))
+    check(d == [['水牛城雞翅', True, 1, 'stove'], ['起司條', True, 1, 'stove'], ['生蠔', True, 2, 'prep'], ['德國豬腳', True, 3, 'oven']], f'the four, their levels and stations: {d}')
+    lv = json.loads(g.ev("JSON.stringify([0,1,2,3].map(L=>{const o=S.rooms.lounge;S.rooms.lounge=L;const r=barDishes().filter(d=>%s.includes(d));S.rooms.lounge=o;return r}))" % json.dumps(NEW)))
+    check(lv == [[], NEW[:2], NEW[:3], NEW], f'what each level of the Lounge allows: {lv}')
+    news = lambda: json.loads(g.ev("JSON.stringify((S.news||[]).filter(n=>n.includes('Lounge 的小點多了')))"))
+    s = json.loads(g.ev("JSON.stringify({phase,lv:loungeLv(),un:%s.filter(d=>S.unlocked.includes(d))})" % json.dumps(NEW)))
+    check(s['phase'] == 'prep' and s['lv'] == 3 and s['un'] == NEW, f'the next morning, all four (this Lounge is at its third level): {s}')
+    n = news()
+    check(len(n) == 1 and all(x in n[0] for x in NAMES) and '不佔菜單名額' in n[0], f'one line of news names them: {n}')
+    shown = g.ev("document.querySelector('#screen').innerText")
+    check('Lounge 的小點多了' in shown, 'the morning shows it')
+    g.ev("showPrep()"); check(len(news()) == 1, f'once: {news()}')
+    _reload(g)
+    check(g.ev("%s.every(d=>S.unlocked.includes(d))" % json.dumps(NEW)) and len(news()) <= 1, f'a reload keeps them and says it no second time: {news()}')
+    # no menu slot
+    n0 = g.ev("menuCount()")
+    g.ev("for(const d of %s){if(!S.menu.includes(d))S.menu.push(d);S.stock[d]=Math.max(S.stock[d]||0,8)}save();showPrep()" % json.dumps(NEW))
+    check(g.ev("menuCount()") == n0, 'on the menu, they take no slot')
+    check(all(g.page.query_selector(f'#screen .menu-row [data-d="{x}"]') is not None for x in NEW), 'each has its row on the menu')
+    # what the Lounge's guests order
+    to_service(g); g.ev("window.__act=()=>{}")
+    o = json.loads(g.ev("""JSON.stringify((()=>{const N=%s;const cnt={},fan={};const bad=[],fanBad=[];const ok=d=>!!(DISH(d)||{}).wine||barDishes().includes(d);
+      for(let i=0;i<400;i++)for(const d of loungeOrder({size:2,type:'office',pat:1})){if(N.includes(d))cnt[d]=(cnt[d]||0)+1;if(!ok(d))bad.push(d)}
+      for(let i=0;i<300;i++)for(const d of loungeOrder({size:2,type:'office',pat:1,sport:1})){if(N.includes(d))fan[d]=(fan[d]||0)+1;if(!ok(d))fanBad.push(d)}
+      return{cnt,bad,fan,fanBad}})())""" % json.dumps(NEW)))
+    check(all(o['cnt'].get(x, 0) > 0 for x in NEW) and not o['bad'], f'the Lounge orders each of them, and nothing from the restaurant: {o}')
+    check(o['fan'].get('wings', 0) > 0 and o['fan'].get('cheesestick', 0) > 0 and not o['fan'].get('oyster') and not o['fan'].get('knuckle') and not o['fanBad'], f'the fans: the fried ones: {o}')
+    # the way it goes: a Lounge table orders the wings; the kitchen cooks them; the Lounge's own waiter carries them. Every
+    # new dish's first portion is Jill's (the manual: 每道新菜的第一份，永遠由 Jill 親自做) — the cooks take it from then on.
+    check(g.ev("chefCanAny('wings')") is False, 'a new dish: the first one is Jill\'s')
+    g.ev("S.xp.wings=Math.max(S.xp.wings||0,1)")
+    check(g.ev("chefCanAny('wings')") is True, 'once she has made it, the cooks can')
+    g.ev("__botUntil('R.t>=R.dur*.3',90000,1/30)")
+    where = g.ev("""(()=>{const free=t=>t.room==='lounge'&&t.kind!=='bar'&&t.seats>=2&&!t.group&&!t.dirty&&!t.claim;if(!R.tables.some(free)){const t=R.tables.find(t=>t.room==='lounge'&&t.kind!=='bar'&&t.seats>=2&&t.group);if(t)leaveGroup(t.group,'ok')}
+      for(const t of R.tables)if(t.room==='lounge'&&t.kind!=='bar'&&!t.group){t.dirty=false;t.claim=null;t.plates=[]}
+      window.__LO=window.__LO||loungeOrder;loungeOrder=q=>q.__want||__LO(q);
+      spawn({t:R.t,type:'office',size:2,lounge:1});const q=R.groups[R.groups.length-1];q.__want=['w_house','wings'];q.__probe=1;return q.table!=null?R.tables[q.table].room:null})()""")
+    check(where == 'lounge', f'two guests sit straight down in the Lounge: {where}')
+    claims = set(); cooks = set(); r = {}
+    for _ in range(500):
+        r = json.loads(g.ev("""JSON.stringify((()=>{const q=R.groups.find(q=>q.__probe);if(!q)return{gone:1};const tk=q.ticket;if(!tk)return{st:q.state};const it=tk.items.find(i=>i.d==='wings');
+          const m=tk.claim!=null?S.crew.find(m=>m.id===tk.claim):null;const s=R.slots.find(s=>s.job&&s.job.it===it);const ch=s&&s.job.chef!=null?S.crew.find(m=>m.id===s.job.chef):null;
+          return{st:q.state,it:it&&it.st,picked:!!(it&&it.picked),claim:m?[m.name,m.role,crewPool(m),!!waiterDuties(m).lounge,lgWaiterHere()]:null,cook:s?s.type+':'+(ch?ch.role+':'+crewPool(ch):'jill'):null,jill:R.jill.carry.some(c=>c.tk===tk)}})())"""))
+        if r.get('claim') and r.get('picked'): claims.add(tuple(r['claim']))   # who has the plate (the bartender's claim is the glass)
+        if r.get('cook'): cooks.add(r['cook'])
+        if r.get('it') == 'served' or r.get('gone'): break
+        g.ev("for(let i=0;i<15;i++)__tick(1000/30)")
+    check(r.get('it') == 'served', f'the wings reached the table: {r}')
+    check(cooks == {'stove:chef:restaurant'}, f'cooked on the kitchen\'s stove by the restaurant\'s cook: {cooks}')
+    check(claims and all(c[1] == 'waiter' and c[2] == 'lounge' and c[3] for c in claims if c[4]), f'carried by the Lounge\'s own waiter: {claims}')
+    g.ev("setRoom('lounge');for(let i=0;i<10;i++)__tick(1000/30);document.querySelectorAll('#plines>*,#toasts>*').forEach(e=>e.remove())"); g.page.wait_for_timeout(60)
+    g.page.screenshot(path=os.path.join(ROOT, 'tests', 'artifacts', 'rc74_lounge_wings.png'))
+    g.ev("loungeOrder=window.__LO")
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc74_the_lounge_tv_and_its_sound(b, port, target):
+    """(23:06 「酒吧要新增電視大的電視轉播運動比賽 / 這個就放在家具類，應該要200,000 / 然後電視的音響系統150,000」) Two pieces
+    of furniture for the Lounge in the shop's 店裡的樣子 tab: the big TV, $200,000, and its sound system, $150,000, which
+    needs the TV. Without a Lounge neither is offered. Each, bought, is shown in the Lounge. On a game night (about two a
+    week) the TV is on during the service: two fans come for the game, three with the sound; more guests stay on after
+    dinner; the day's summary says there was a game and how many came for it."""
+    g = Game(b, port, target, seed=7433, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day52.json')   # no Lounge
+    g.ev("S.money=Math.max(S.money,600000);shopTab='home';showShop()"); g.page.wait_for_timeout(80)
+    m0 = g.ev("S.money")
+    check('Lounge 的家具' not in g.ev("$('#screen').innerText") and g.ev("(doAct('buyLgFurn',null,'tv',null),!lgFurnOn('tv')&&S.money===%d)" % m0), 'no Lounge: nothing offered, nothing bought')
+    load_save(g, 'player_day74_1508.json')
+    check(g.ev("!lgFurnOn('tv')&&![...Array(70).keys()].some(i=>sportsNight(S.day+i))"), 'no TV, no game nights')
+    g.ev("S.money=Math.max(S.money,600000);shopTab='home';showShop()"); g.page.wait_for_timeout(80)
+    items = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('#screen .item')].filter(e=>/^(Lounge 大電視|電視音響系統)/.test(((e.querySelector('.nm')||{}).textContent)||'')).map(e=>e.innerText.replace(/\\s+/g,' ')))"))
+    check('Lounge 的家具' in g.ev("$('#screen').innerText") and len(items) == 2 and '$200,000' in items[0] and '要先有 Lounge 大電視・$150,000' in items[1], f'the shop\'s Lounge furniture (the sound\'s price shows before the TV is in): {items}')
+    m0 = g.ev("S.money")
+    g.ev("doAct('buyLgFurn',null,'sound',null)")
+    check(g.ev("!lgFurnOn('sound')") and g.ev("S.money") == m0, 'the sound waits for the TV')
+    g.ev("doAct('buyLgFurn',null,'tv',null)"); g.ev("__tick(1800)")
+    check(g.ev("lgFurnOn('tv')&&S.lgFurn.tv===S.day") and g.ev("S.money") == m0 - 200000, 'the TV: $200,000')
+    rv = g.ev("$('#reveal').hidden?'':$('#reveal').innerText")
+    check('Lounge 大電視' in rv, f'and its card: {rv!r}')
+    g.ev("doAct('revealPeek',null,'lgtv',null)"); g.ev("for(let i=0;i<4;i++)__tick(1000/30)")
+    check(g.ev("room") == 'lounge' and g.ev("!$('#peekPill').hidden"), 'a look: the Lounge')
+    g.page.screenshot(path=os.path.join(ROOT, 'tests', 'artifacts', 'rc74_lounge_tv_bought.png'))
+    g.click('#peekPill'); g.ev("__tick(1000/30)")
+    g.ev("hideReveal();shopTab='home';showShop()")
+    g.ev("doAct('buyLgFurn',null,'sound',null)"); g.ev("__tick(1800)"); g.ev("hideReveal()")
+    check(g.ev("lgFurnOn('sound')") and g.ev("S.money") == m0 - 350000, 'the sound: $150,000')
+    g.ev("doAct('buyLgFurn',null,'tv',null);doAct('buyLgFurn',null,'sound',null)")
+    check(g.ev("S.money") == m0 - 350000, 'neither twice')
+    nights = g.ev("[...Array(70).keys()].filter(i=>sportsNight(S.day+i)).length")
+    check(10 <= nights <= 30, f'game nights: about two a week ({nights} in ten weeks)')
+    # a game night: the service
+    g.ev("window.__SN=sportsNight;sportsNight=()=>true;save()")
+    if g.ev("phase") == 'shop':   # the shop opened from the morning's preparation goes back to it
+        g.click('#screen [data-act=toPrep]' if g.page.query_selector('#screen [data-act=toPrep]') else '#screen [data-act=nextDay]'); g.page.wait_for_timeout(200)
+    g.ev("for(let i=0;i<30;i++){if(typeof DLG!=='undefined'&&DLG)dlgNext()}"); _quiet(g)
+    to_service(g); g.ev("window.__act=()=>{}")
+    fans = g.ev("R.sched.filter(o=>o.sport&&o.lounge).length")
+    check(fans == 3, f'three come for the game (the sound): {fans}')
+    p = json.loads(g.ev("(()=>{const q={type:'office',size:2,pat:1};R.t=R.dur*.6;const on=loungeAfterP(q);sportsNight=()=>false;const off=loungeAfterP(q);sportsNight=()=>true;return JSON.stringify({on,off})})()"))
+    check(p['on'] > p['off'] > 0, f'more stay on after dinner on a game night: {p}')
+    g.ev("__botUntil('R.t>=R.dur*.82',150000,1/30)")
+    st = json.loads(g.ev("JSON.stringify({tv:lgTvOn(),sport:R.st.sport||0,fans:R.groups.filter(q=>q.sport).length})"))
+    check(st['tv'] and st['sport'] >= 1, f'the TV is on, and the fans are in: {st}')
+    g.ev("setRoom('lounge');for(let i=0;i<20;i++)__tick(1000/30);document.querySelectorAll('#plines>*,#toasts>*').forEach(e=>e.remove())"); g.page.wait_for_timeout(80)
+    g.page.screenshot(path=os.path.join(ROOT, 'tests', 'artifacts', 'rc74_lounge_tv_game.png'))
+    g.ev("(()=>{closeShop('x');for(const q of R.groups.slice())leaveGroup(q,'ok');finishClosing()})()"); g.page.wait_for_timeout(120)
+    summ = g.ev("$('#screen').innerText")
+    check('有比賽轉播（' in summ and '位來看球）' in summ, f'the summary: {summ[:400]!r}')
+    g.ev("sportsNight=window.__SN")
+    check(not g.errors, g.errors[:3]); g.close()
