@@ -1,0 +1,4 @@
+FAIL  v24_day52_save_plays_the_stories_in_order_over_forty_days  (85.2s)
+      the wall begins Day 62–66 (62–66): {'yj_meet': 53, 'yj_look': 54, 'yj_three': 56, 'yj_chose': 57, 'yj_move': 59, 'yj_key': 61, 'wall_worry': 67, 'wall_photos': 68, 'wall_visit': 70, 'wall_wang': 71, 'wall_setback': 73, 'wall_report': 76, 'wall_fee': 77, 'wall_prep': 79, 'wall_mediation': 82, 'wall_settle': 82, 'wall_article': 85}
+
+0 passed, 1 failed

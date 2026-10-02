@@ -285,7 +285,7 @@ All under `docs/evidence/v24_rc7/`:
 
 - `tools/build_single.py`: the single file is in step with the tag (6,233 KB; no change since 7af5df7, which touched only tests and docs after it).
 - `tools/build_artifact.py`: the page for the live URL (6,382,199 bytes).
-- Tag `v2.4-rc7` at 09f8603.
+- Tag `v2.4-rc7` at the commit that adds this section and the regression logs (`docs/evidence/v24_rc7/regression/`). It was first set at 09f8603 and moved there before the zips were made; nothing the page is built from changed in between.
 - **Published** to https://claude.ai/artifact/2vhURujrtCpQ1P5jnSsjps, version 41 (version id 1790943927-f653), at 20:25.
 - **Checked** (`tools/sims/live_check.py`, `docs/evidence/v24_rc7_release/`):
   - The page built from the tag sits inside the live HTML byte for byte. The host adds 552 bytes, its document skeleton.

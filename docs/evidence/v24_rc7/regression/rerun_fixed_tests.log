@@ -1,0 +1,10 @@
+(master after f84ce13; the console output of the re-runs, copied as printed)
+$ python3 tests/run_tests.py -k the_street_has_passers_by_and_some_walk_in,outdoor_area_is_a_project_and_its_tables_are_furniture_and_the_dog_rests_outside
+PASS  the_street_has_passers_by_and_some_walk_in  (32.5s)
+PASS  outdoor_area_is_a_project_and_its_tables_are_furniture_and_the_dog_rests_outside  (2.3s)
+
+2 passed, 0 failed
+$ python3 tests/run_tests.py -k v24_manual_tutorial_and_news_cover_the_new_content
+PASS  v24_manual_tutorial_and_news_cover_the_new_content  (5.4s)
+
+1 passed, 0 failed
