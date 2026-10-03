@@ -4324,7 +4324,8 @@ function qaHome(){const H=qaS().home;return H&&S.day>=H.d&&S.day<H.back?H:null} 
 function qaEve(){return loungeOpenTonight()&&!qaBooked()&&!!evanOn()}   /* Dylan's evenings at the bar (《今天喝？》): not a booked-out night, the room is the event's */
 function qaClose(){return loungeOpenTonight()&&!!evanOn()}   /* after closing (the player, 2026-10-03: 「包場夜打烊後店員還是可以留下的吧 只要看你需要的店員那天有沒有上班」): any night The Lounge was open, Evan in; each scene checks its own people */   /* an ordinary night at The Lounge */
 function qaYa(){return !!fact('ya_join')&&yaNight()}   /* 予安 played tonight: she is still there at closing */
-function qa1Due(){const d0=loungeDoneDay();return d0!=null&&!fact('qt_drink')&&!!fact('evan_knows_dylan')&&S.day>=d0+10&&qaEve()}
+/* rc8 (the player, 2026-10-03: 「DYLAN揭曉才進那個劇情阿……而且有告白劇情一定要有圖」): the line starts after the reveal — its pictures show Dylan's face */
+function qa1Due(){const d0=loungeDoneDay();return d0!=null&&!fact('qt_drink')&&!!fact('evan_knows_dylan')&&dylanOut()&&S.day>=d0+10&&qaEve()}
 /* the people of one evening: Evan behind the bar, the rest on the guests' side of it; the piano's bench and its side */
 function qaStage(ids,at){const bx=LG.bar.x0,by=LG.bar.y,L=LOUNGE_LOOKS;
  const spot=Object.assign({evan:[bx+128,by-6,1],qing:[bx+64,by+74],tuo:[bx+94,by+76],dylan:[bx+124,by+78],ya:[bx+156,by+74]},at||{});

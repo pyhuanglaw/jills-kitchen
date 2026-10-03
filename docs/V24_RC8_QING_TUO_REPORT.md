@@ -57,7 +57,7 @@ story still moves one step at a time: its own conditions below keep its scenes o
 
 | Scene | When |
 |---|---|
-| 《今天喝？》 | Evan knows Dylan (the signing), The Lounge open ten days or more; planned as Dylan's evening at The Lounge (half the eligible evenings); fires when he sits down |
+| 《今天喝？》 | Dylan revealed (the player: 「DYLAN揭曉才進那個劇情阿」 — the pictures show his face; a game from Day 1 reveals him long before), Evan knows Dylan (the signing), The Lounge open ten days or more; planned as Dylan's evening at The Lounge (half the eligible evenings); fires when he sits down |
 | 《晚點回去》 | 「多的。」 done; 《今天喝？》 two days back or more; Dylan has had one more drink there (his evenings at The Lounge 35% a day until then, 14% after); 沈晴 and 阿拓 in; she is not away |
 | 《最近比較常》 | 《晚點回去》 two days back or more; 予安 the pianist since the day before or longer, one of her nights (she is still there at closing; 「只要予安有上班就可以吧」); 沈晴 and 阿拓 in |
 | 《你喜歡予安？》 | 沈晴 at her parents' (`qx_home`); one of 予安's nights; 阿拓 in |

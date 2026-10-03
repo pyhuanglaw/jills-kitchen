@@ -4664,7 +4664,8 @@ def v24_rc8_qing_tuo_after_work_five_scenes(b, port, target):
     check(g.ev("JSON.stringify(Object.keys(story().facts).filter(k=>/^qt_/.test(k)).sort())") == f0, 'the after-hours lines change no step of the story')
     # 4 《你喜歡予安？》
     _qt_next_day(g)
-    check(_qt_evening(g, 'qt_ya', ya + ";story().facts.qt_often.d=Math.min(story().facts.qt_often.d,S.day-5);if(!qaHome()){qaS().home={d:S.day,back:S.day+2}}", 2), '《你喜歡予安？》 at closing, while 沈晴 is at her parents\'')
+    # rc8: up to six evenings — as in play, if her two evenings go elsewhere (阿拓's day off, the night upstairs) she goes home again
+    check(_qt_evening(g, 'qt_ya', ya + ";story().facts.qt_often.d=Math.min(story().facts.qt_often.d,S.day-5);if(!qaHome()){qaS().home={d:S.day,back:S.day+2}}", 6), '《你喜歡予安？》 at closing, while 沈晴 is at her parents\'')
     check(g.ev("!qingOn()&&!!qaHome()") is True, '沈晴 not in tonight')
     st = g.ev("JSON.stringify(STAGE.who.map(p=>p.id))")
     out = _qt_lines(g, 'qt_ya', 90, "!!fact('dylan_knows_qt')")
@@ -4704,4 +4705,8 @@ def v24_rc8_qing_tuo_after_work_five_scenes(b, port, target):
     check(g.ev("STORY_LINES.find(L=>L.k==='qt').beats.slice(-5).map(b=>b[0]).join()") == 'qt_drink,qt_late,qt_often,qt_ya,qt_said', 'the story page carries the five')
     days = json.loads(g.ev("JSON.stringify(['qt_drink','qt_late','qt_often','qt_ya','qt_said'].map(k=>fact(k).d))"))
     check(len(set(days)) == 5 and days == sorted(days), f'one an evening, in order: {days}')
+    # rc8: the line starts after Dylan's reveal (「DYLAN揭曉才進那個劇情阿」) — its pictures show his face; every scene has its picture
+    pre = g.ev("(()=>{const st=S.dylan.stage,q=story().facts.qt_drink;delete story().facts.qt_drink;S.dylan.stage=2;const a=qa1Due();S.dylan.stage=st;story().facts.qt_drink=q;return a})()")
+    check(pre is False, 'before the reveal 《今天喝？》 is not due')
+    check(g.ev("['qt_first','qt_more','qt_lesson','qt_play','qt_alone'].every(k=>{const s=illusSrc(k);return s&&!s.tbd})") is True, 'the five pictures are the player\'s')
     check(not g.errors, g.errors[:3]); g.close()

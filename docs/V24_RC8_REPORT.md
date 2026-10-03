@@ -81,6 +81,7 @@ Nothing previously requested is dropped.
 | The cooks: a cook from another station covers one with no cook; a dish's first plate is a cook's too; Jill rests when the crew has the work | I | T (`jill_rests_when_staff_cover_the_floor` and the staff tests; 0.91/0.89/0.90 of the service on seeds 7/8/9) | — |
 | 晴 × 阿拓 pacing: Day 82 / 84 / 88 / 90 / 95 from the Day 74 save (was 82 / 94 / 99 / 113 / 118) | I | T (`tools/sims/story_per_day.py`, `docs/evidence/v24_rc8/qing_tuo/pacing/`) | — |
 | The scenes after closing on a booked-out night too, when their people are in; 《今天喝？》 never on one | I | T (the same sim: 《晚點回去》 after Ken's tasting, Day 84) | — |
+| 晴 × 阿拓 starts after Dylan's reveal (its pictures show his face; every scene keeps its picture) | I | T (`v24_rc8_qing_tuo_after_work_five_scenes`) | — |
 | Jill hosts the opening (the first tenth of the service) and the end (from 88%) in the Main Hall, rests only in between; a rest still going at 88% ends; at the closing she is always up (「你就設定jill開店和關店都會在主廳歡迎和送客」) | I | T (`jill_rests…`, `v24_rc73_tora_waits_for_jill_after_closing`: 樾樾 comes out, she sees him, they go) | — |
 
 ### Jill's rest (the player: 「不要為了讓測試通過直接調高 Jill 的休息機率……讓這個長期 known failure 正式結案」)
