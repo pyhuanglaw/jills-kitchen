@@ -496,12 +496,13 @@ def phase7_the_arcs_run_on_real_history_and_leave_it_changed(b, port, target):
     g.ev("__p7.back('qt_2',3);__p7.clearDay();storyTick('close',{})")
     check(g.ev("__p7.ev('qt_3').n") == 1 and g.ev("relN('s:cb2','s:ct1','gesture')") == 1, '「多的。」 after closing')
     g.ev("factSet('qt_extra');factSet('qt_extra');fact('qt_extra').l=S.day-1;__p7.clearDay();storyTick('close',{})")
-    check(not g.ev("!!story().photos.qing_tuo"), 'not yet: it has happened more than once, but 阿拓 has not been missed')
+    check(not g.ev("!!fact('qt_photo')"), 'not yet: it has happened more than once, but 阿拓 has not been missed')
     # v2.4 rc6 (the player, 12:16): his day off — 晴 notices the fryer, then the photo
     g.ev("setCrewAway(crewByName('阿拓'),'off');__p7.clearDay();storyTick('order',{g:R.groups.find(x=>x.name==='陳先生'),tk:R.tickets[R.tickets.length-1]})")
     check(g.ev("__p7.ev('qt_absence').n") == 1 and g.ev("!tuoOn()&&!!qingOn()"), 'the day 阿拓 is off: 「今天炸物怎麼怪怪的？」')
     g.ev("story().away=null;__p7.clearDay();storyTick('close',{})")
-    check(g.ev("!!story().photos.qing_tuo"), 'their Story Photo 《多的》 after it has happened more than once and he has been missed')
+    # rc8 (the player, 2026-10-03: 「多的不用圖」): the step 「從工作開始」 comes as before, with no photo
+    check(g.ev("!!fact('qt_photo')&&!story().photos.qing_tuo"), 'their step 「從工作開始」 after it has happened more than once and he has been missed — no photo')
     g.ev("S.crew=S.crew.filter(m=>m.id!=='ct1');__p7.clearDay();storyTick('order',{g:R.groups.find(x=>x.name==='陳先生'),tk:R.tickets[R.tickets.length-1]})")
     check(g.ev("__p7.ev('qt_absence').n") == 1 and g.ev("(R.log||[]).some(l=>/妳不是在問炸物/.test(l.t))"), '阿拓 fired: the absence beat (once), and nothing waits for him')
     check(g.ev("STORY_EV.filter(E=>E.k.startsWith('qt_')).every(E=>{try{return !E.when({tk:{lounge:1,items:[{d:'bites'}]}})||E.k==='qt_absence'}catch(e){return false}})"), 'with him gone every other 晴 × 阿拓 event is simply ineligible (no deadlock, no error)')
@@ -555,7 +556,7 @@ def phase7_the_arcs_run_on_real_history_and_leave_it_changed(b, port, target):
     after = json.loads(g.ev("JSON.stringify({ev:story().ev,ph:story().photos,rel:Object.keys(story().rel).length,f:Object.keys(story().facts).length})"))
     check(before == after, 'the story survives the reload unchanged')
     check(g.ev("STORY_EV.filter(E=>E.once&&evState(E.k).n).every(E=>storyEligible(E,{})===null)"), 'every once-only beat that ran is ineligible afterwards')
-    check(g.ev("albumList().filter(p=>p.story).length") == 3, 'three Story Photos, one each')
+    check(g.ev("albumList().filter(p=>p.story).length") == 2, 'two Story Photos, one each (rc8: 《多的》 has none — 「多的不用圖」)')
     check(not g.errors, g.errors[:3]); g.close()
 
 @test
