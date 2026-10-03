@@ -4641,6 +4641,10 @@ def v24_rc8_qing_tuo_after_work_five_scenes(b, port, target):
     # 1 《今天喝？》
     to_service(g); g.ev("window.__act=window.__actLazy;window.__noScenes=true;R.sched=R.sched.filter(o=>o.reg!=='dylan'&&!(o.regs||[]).includes('dylan'))")
     g.ev("__botUntil('R.t>=R.dur*.3',200000,1/30)")
+    # rc8 (the player, 2026-10-03, on the Day 81 save: 「他第一次去酒吧的故事都還沒開始前他不能去酒吧」): before 《今天喝？》 no seat in The
+    # Lounge for Dylan — not waiting for a table (the full-house rule) — except the evening planned for that scene
+    pre = json.loads(g.ev("JSON.stringify((()=>{for(const t of loungeTables()){t.group=null;t.dirty=false;t.claim=null}const a=loungeSeatFor({reg:'dylan',size:1,type:'regular'});const b=loungeSeatFor({reg:'dylan',size:1,type:'regular',lgPlan:1});return{wait:!!a,planned:!!b,due:qa1Due()}})())"))
+    check(not pre['wait'] and pre['planned'] == pre['due'], f'before 《今天喝？》 Dylan is not seated in The Lounge, only on its planned evening: {pre}')
     g.ev("window.__col=[];const __st=storyTick;storyTick=function(k,c){if(k==='collect'&&c&&c.g&&c.g.reg==='dylan')__col.push(!!c.again);return __st.apply(this,arguments)}")
     g.ev("R.sched.splice(R.si,0,{t:R.t+2,type:'regular',reg:'dylan',size:1,story:1,lounge:1,lgRetry:1,tries:1});window.__noScenes=false;window.__holds=true")
     check(_qt_until(g, 'qt_drink') and g.ev("room") == 'lounge' and g.ev("JSON.stringify(STAGE.who.map(p=>p.id))") == '["evan","dylan"]', '《今天喝？》 held in The Lounge, Evan and Dylan')
