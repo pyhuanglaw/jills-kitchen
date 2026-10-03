@@ -3609,12 +3609,14 @@ def v25_first_photo_day_one_dylan_takes_one_of_jills_cameras(b, port, target):
     ach0 = set(json.loads(g.ev("JSON.stringify(Object.keys(S.achievements||{}))")))
     start_day(g); install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy")
     phases, overlap, said, t_shot, t_pot = [], [], set(), None, None
+    dyface = False
     for _ in range(1500):
         r = json.loads(g.ev("JSON.stringify({fp:R.jill.fp?R.jill.fp.phase:null,first:!!S.firstPhoto,pot:!!(S.firstPhoto&&S.firstPhoto.pot),t:R.t})"))
         if r['fp'] and (not phases or phases[-1] != r['fp']): phases.append(r['fp'])
         if r['first'] and t_shot is None: t_shot = r['t']
         if t_shot is not None:
             said |= set(g.ev("[...document.querySelectorAll('#toasts .toast,#banner *')].map(e=>e.textContent)"))
+            if g.ev("(()=>{const p=portraitOf('dylan','default');const src=p&&(p.src||p);return !!src&&[...document.querySelectorAll('#plines img')].some(i=>i.getAttribute('src')===src)})()"): dyface = True
             said.add(g.ev("$('#banner').textContent||''"))
         ov = g.ev("(()=>{const c=$('#coach');const ls=[...document.querySelectorAll('#plines>*')];if(c.hidden||!ls.length)return null;const a=c.getBoundingClientRect();return ls.some(e=>{const b=e.getBoundingClientRect();return b.bottom>a.top+1&&b.top<a.bottom-1&&b.right>a.left&&b.left<a.right})})()")
         if ov is not None: overlap.append(ov)
@@ -3632,9 +3634,12 @@ def v25_first_photo_day_one_dylan_takes_one_of_jills_cameras(b, port, target):
     check(img and img[0] == 'data:image/jpeg' and img[1:] == [360, 270], f'a picture, 4:3, the size of the others: {img}')
     f = shot['f']
     check(f and f['x'] <= FP_X and FP_X <= f['x'] + f['w'] and shot['cats'] in (0, 1), f'Jill is in the frame, and at most one cat: {shot}')
-    lines = json.loads(g.ev("JSON.stringify(dayLog().filter(l=>['Jill','Dylan'].includes(l.w)).map(l=>l.w+'：'+l.t))"))
-    want = ['Jill：你拿我的相機幹嘛？', 'Dylan：拍妳。', 'Jill：我根本沒在看。', 'Dylan：我知道。'] + (['Jill：牠也在。', 'Dylan：嗯。'] if shot['cats'] == 1 else [])
-    got = [x for x in lines if x in want + ['Jill：牠也在。', 'Dylan：嗯。']]
+    # rc8 (the player: 「第一天就寫jill先生但不露臉」): before the reveal his lines are 「Jill 先生」's, and his face is not on screen
+    lines = json.loads(g.ev("JSON.stringify(dayLog().filter(l=>['Jill','Jill 先生','Dylan'].includes(l.w)).map(l=>l.w+'：'+l.t))"))
+    want = ['Jill：你拿我的相機幹嘛？', 'Jill 先生：拍妳。', 'Jill：我根本沒在看。', 'Jill 先生：我知道。'] + (['Jill：牠也在。', 'Jill 先生：嗯。'] if shot['cats'] == 1 else [])
+    got = [x for x in lines if x in want + ['Jill：牠也在。', 'Jill 先生：嗯。']]
+    check(not any(x.startswith('Dylan：') for x in lines), f'no line under his name before the reveal: {lines}')
+    check(not dyface, 'his face is not on screen before the reveal')
     check(got == want, f'the lines, in order (the cat\'s two only with a cat in it): {got}')
     bad = [w for w in FP_WORDS for x in said if w in x]
     check(not bad, f'nothing says album, unlock, treasured, NEW: {bad} in {said}')

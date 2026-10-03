@@ -15,6 +15,7 @@
 - **運算是付費的**：完整回歸只用在 release gate 和高風險修改；先想清楚這次執行要回答什麼問題。
 - **Commit ≠ Push ≠ Publish**：開發中隨時 commit、push 到開發 branch；玩家說「發布」才發布。
 - **I / T / O 分開報告**：測試通過不等於玩家在 iPhone 上看得到。
+- **改到遊戲基本架構（不只劇情）就檢查店主手冊**（`GUIDE`），每一項要短、好讀。
 - **報告 ≠ 停下**：回報後繼續已定義的工作，除非遇到 canon 衝突、存檔風險，或需要玩家做的產品決策。
 - 玩家說「這個是 hard canon，寫進 project memory」時，更新 `docs/PROJECT_MEMORY.md` 對應的段落，附上日期和原話，然後 commit。
 

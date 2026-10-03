@@ -7747,7 +7747,11 @@ function fpDrop(){const J=R.jill;if(!J.fp)return;J.fp=null;if(S.firstPhoto&&!S.f
 function firstPhotoShutter(){const J=R.jill;const shot=firstPhotoSnap(J);R.fpShot={cats:shot?shot.cats:null,f:shot?shot.f:null,t:R.t};FLASH={x:J.x,y:J.y-20,t:0};sfx.shutter();firstPhotoAdd(clockStr(),shot&&shot.url);S.firstPhoto=S.firstPhoto||{day:1};save();
  /* four short lines; the last two only if a cat is in it — she has looked at the photo by then */
  const L=[['jill','你拿我的相機幹嘛？'],['dylan','拍妳。'],['jill','我根本沒在看。'],['dylan','我知道。']];if(!shot||shot.cats===1)L.push(['jill','牠也在。'],['dylan','嗯。']);
- L.forEach(([w,t],i)=>setTimeout(()=>{if(!R||phase!=='service')return;if(w==='jill')jillSay(t,{with:'dylan',withTone:'default'});else{logLine('Dylan',t,'d');portraitLine('dylan',t,{tone:'default',with:'jill',withTone:'default'})}},(window.__fastSay?0:500)+i*1700+(i>=4?1500:0)))}
+ /* rc8 (the player, 2026-10-03: 「我發現dylan第一天就露臉了」「第一天就寫jill先生但不露臉」): before the reveal he is 「Jill 先生」 on
+    this line and his face is not shown — Jill's lines carry only hers */
+ const pre=!dylanOut();
+ L.forEach(([w,t],i)=>setTimeout(()=>{if(!R||phase!=='service')return;if(w==='jill'){if(!pre)jillSay(t,{with:'dylan',withTone:'default'});else{logLine('Jill',t,'j');if(!portraitLine('jill',t,{tone:'default'}))toast(`<b>Jill</b>：「${t}」`,'q')}}
+  else if(pre){logLine('Jill 先生',t,'d');toast(`<b>Jill 先生</b>：「${t}」`,'q')}else{logLine('Dylan',t,'d');portraitLine('dylan',t,{tone:'default',with:'jill',withTone:'default'})}},(window.__fastSay?0:500)+i*1700+(i>=4?1500:0)))}
 function albumAdd(kind,img,info){const A=albumList();if(ACH_BY_MEMO[kind])ach(ACH_BY_MEMO[kind]);if(A.length+1>=50)ach('photos50');const keep=!A.some(p=>p.kind===kind);const clock=R&&R.closing==null?clockStr():evening()?eveningClock():'';let txt='';try{txt=(MEM_TXT[kind]||(()=>''))(info||{})}catch(e){}
  const p={id:'p'+S.day+'_'+kind+'_'+Math.random().toString(36).slice(2,8),kind,day:S.day,clock,cap:(info&&info.cap)||MEMS[kind]||kind,txt:(info&&info.txt)||txt,keep};A.push(p);
  photoPut(p.id,img).then(ok=>{if(!ok){p.img=img;save()}});   /* no store: the picture stays in the save */
