@@ -94,6 +94,9 @@
    單獨重跑過）、`phase7_the_arcs_run_on_real_history_and_leave_it_changed`（659fc4f 改成「多的不用圖」，重跑過）、
    `golden_frames`（Jill 的房間生活改了第 1 天晚上，**要重錄**：`python3 tests/run_tests.py --record -k golden_frames`，也看一下
    `golden_scenario`、`cat_personality_fingerprint` 要不要一起重錄，並在報告寫原因）。
+   第四個失敗（還沒查）：`v24_rc8_the_bar_next_door_from_kens_question_to_jills_decision`——`pairing_start` 的 held scene
+   （「Jill：今晚那幾支，可以再幫我進嗎？」）沒有演，只出現 note 版（「收店的時候，Jill 把今晚那幾支酒的名字抄下來……」）。
+   rc8.1 的 gate 是過的，先在 abc9d38（房間生活之前）和 ec17365（之後）各跑一次這個測試，看是哪一批造成的。
 2. 重錄後，在**最後要發布的那個 commit** 上跑完整回歸（全部 237 個，不能跳），全過才發布。
 3. `build_single.py`、`build_artifact.py` → 發布到 https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA → 讀回 → `live_check.py` → 報告
    （I／T／O 分開）。不打 zip。
