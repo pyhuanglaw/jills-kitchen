@@ -3908,3 +3908,41 @@ def v24_rc77_the_page_carries_only_the_portraits_the_game_shows(b, port, target)
         ok = g.ev(f"!!(portraitOf({json.dumps(who, ensure_ascii=False)},{json.dumps(tone)})||{{}}).src")
         check(ok, f'{who} ({tone}) has a face')
     check(not g.errors, g.errors[:3]); g.close()
+
+
+def _load_raw(g, raw):
+    g.ev("phase='title';R=null;localStorage.setItem(KEY,JSON.stringify(%s))" % json.dumps(raw, ensure_ascii=False)); g.reload(); g.page.wait_for_timeout(150)
+    g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(150)
+
+
+@test
+def v24_rc77_evan_is_behind_the_bar_from_the_first_night(b, port, target):
+    """10:32 「Lounge 剛蓋好、還沒請 bartender 不應該有這種情況 因為Evan 一開始就要在酒吧裡」 (and the canon of 2026-10-02 19:19
+    §11C/§16: Evan was Madame Lin's bartender and stays on): building Lounge I puts Evan behind the bar that night — no
+    hiring, no fee, never a recruitment card — and the Lounge opens its first night. A save whose Lounge was built without
+    him has him back when it loads; a save that has him keeps him as he is."""
+    g = Game(b, port, target, seed=7702, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day46.json')
+    check(g.ev("loungeLv()") == 0 and not g.ev("S.crew.some(m=>m.name==='Evan')"), 'Day 46: no Lounge, no Evan yet')
+    m0 = g.ev("S.money+=400000;S.money"); cost = g.ev("LOUNGE_PROJ[0].cost")
+    g.ev("factSet('lounge_project');buyLounge(1);hideReveal&&hideReveal()")
+    ev = json.loads(g.ev("JSON.stringify(S.crew.find(m=>m.name==='Evan')||null)"))
+    check(ev and ev['role'] == 'bartender' and ev['duty'] == 'lbar' and ev['pool'] == 'lounge' and ev['lv'] == 1, f'Evan is there, behind the bar: {ev}')
+    check(g.ev("S.money") == m0 - cost, 'nothing paid for him, only the room')
+    check(g.ev("loungeOpenTonight()") and g.ev("S.crew.filter(m=>m.name==='Evan').length") == 1, 'the Lounge opens its first night; one Evan')
+    g.ev("shopTab='staff';showShop()"); g.page.wait_for_timeout(100)
+    check(not g.ev("!!document.querySelector('#screen [data-act=hireLounge][data-k=\"Evan\"]')") and '在店裡' in g.ev("(()=>{const e=[...document.querySelectorAll('#screen .item')].find(e=>e.innerText.includes('Evan 林奕文'));return e?e.innerText:''})()"), 'his card: in the shop, no recruitment')
+    g.ev("closeSub&&closeSub()")
+    # an older save whose Lounge was built without him: he is back when it loads, behind the bar
+    raw = json.load(open(os.path.join(ROOT, 'tests', 'saves', 'player_day74_1508.json'), encoding='utf-8')); raw = raw.get('save', raw)
+    others = sorted(m['name'] for m in raw['crew'] if m.get('pool') == 'lounge' and m['name'] != 'Evan')
+    no = dict(raw); no['crew'] = [m for m in raw['crew'] if m['name'] != 'Evan']
+    _load_raw(g, no)
+    back = json.loads(g.ev("JSON.stringify({e:S.crew.filter(m=>m.name==='Evan'),lg:poolCrew('lounge').map(m=>m.name).sort(),open:loungeOpenTonight()})"))
+    check(len(back['e']) == 1 and back['e'][0]['lv'] == 1 and back['e'][0]['duty'] == 'lbar' and back['e'][0]['pool'] == 'lounge', f'Evan is back: {back["e"]}')
+    check(sorted(n for n in back['lg'] if n != 'Evan') == others and back['open'], f'the rest of the Lounge as it was: {back["lg"]}')
+    # a save that has him keeps him as he is
+    _load_raw(g, raw)
+    keep = json.loads(g.ev("JSON.stringify(S.crew.filter(m=>m.name==='Evan').map(m=>m.lv))"))
+    check(keep == [[m for m in raw['crew'] if m['name'] == 'Evan'][0]['lv']], f'kept as he was: {keep}')
+    check(not g.errors, g.errors[:3]); g.close()

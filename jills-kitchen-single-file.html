@@ -1031,6 +1031,12 @@ function crewPool(m){if(!m)return'restaurant';if(m.pool==='restaurant'||m.pool==
 function crewPoolMig(o){for(const m of o.crew||[])if(m.pool!=='restaurant'&&m.pool!=='lounge')m.pool=crewPool(m);
  if(!o.ananMig){o.ananMig=1;for(const m of o.crew||[])if(m.name==='安安'&&m.role==='waiter'&&m.pool==='lounge'){if(!m.duties){const d=m.duty||'both';m.duties={seat:d!=='order',order:d!=='seat',serve:d==='both',check:d==='both',clean:false}}m.duties.lounge=true}}   /* v2.4 rc6 (10:06) */
  return o}
+/* rc7.7 (the player, 2026-10-03 10:32 「Lounge 剛蓋好、還沒請 bartender 不應該有這種情況 因為Evan 一開始就要在酒吧裡」; the canon of
+   2026-10-02 19:19 §11C/§16: Evan was Madame Lin's bartender and stays on when Jill takes the bar over): Evan is behind the
+   bar from the day the Lounge is built — never hired, never a recruitment card. A save whose Lounge was built without him
+   (he was never hired, or was let go before rc7.2) has him back, at LV1, behind the bar. */
+function evanNew(day){return{id:'c'+Date.now().toString(36)+Math.floor(Math.random()*999),role:'bartender',name:'Evan',lv:1,duty:'lbar',since:day||1,days:0,fam:{},pool:'lounge'}}
+function evanMig(o){if(((o.rooms&&o.rooms.lounge)||0)>0&&!(o.crew||[]).some(m=>m.name==='Evan'&&m.role==='bartender')){o.crew=o.crew||[];o.crew.push(evanNew(o.day))}return o}
 const CREW_NAMES={bartender:['Evan','沈晴'],chef:['阿德師傅','Marco','小林師傅','阿珠姐','Hugo','阿勇','老周師傅','小魏'],waiter:['小茉','Kai','Nina','阿哲','Momo','小威','阿芳'],cleaner:['秀琴阿姨','小彤','阿明','Yuki','阿桂']};   /* v2.2.1: the pools are longer than the crew cap, so nobody is ever called just 廚師 */
 /* Operations: what a restaurant that cannot grow any bigger can still get better at. Each one is a real capacity or
    throughput change, bought once (or in tiers), and none of them needs a next expansion. */
@@ -1388,7 +1394,7 @@ function parseSave(t){let o;try{o=JSON.parse(t)}catch(e){return{err:'notjson'}}
  if(typeof o.v!=='number'||o.v%1)return{err:'notsave'};
  if(!(typeof o.day==='number'&&typeof o.money==='number'&&Array.isArray(o.unlocked)&&Array.isArray(o.menu)))return{err:'notsave'};
  if(o.v<1)return{err:'notsave'};if(o.v>SAVE_V)return{err:'newer',v:o.v};
- try{for(let n=o.v;n<SAVE_V;n++){MIGRATE[n](o);o.v=n+1}o=giftTagMig(crewPoolMig(dlgAuditMig(crewNameFix(mainHallMig(legacyWang(legacyCrew(fillDefaults(o))))))))}catch(e){return{err:'broken'}}if(STORY_READY)try{beatLinesMig(o)}catch(e){console.warn('[beatLines]',e)}   /* a save loaded in play; the first one is cleaned at boot, when every story's code is there */
+ try{for(let n=o.v;n<SAVE_V;n++){MIGRATE[n](o);o.v=n+1}o=evanMig(giftTagMig(crewPoolMig(dlgAuditMig(crewNameFix(mainHallMig(legacyWang(legacyCrew(fillDefaults(o)))))))))}catch(e){return{err:'broken'}}if(STORY_READY)try{beatLinesMig(o)}catch(e){console.warn('[beatLines]',e)}   /* a save loaded in play; the first one is cleaned at boot, when every story's code is there */
  if(!(o.day>=1&&isFinite(o.money)&&o.unlocked.every(d=>typeof d==='string')&&o.menu.every(d=>typeof d==='string')&&Array.isArray(o.crew)&&o.dylan&&typeof o.dylan==='object'))return{err:'broken'};
  o.day=Math.max(1,Math.floor(o.day));o.money=Math.round(o.money);return{o,photos}}
 /* rc7.2 (22:49): a save that already has Sophie's pad is shown, once, which one it is (a new gift's tag, that day and the next) */
@@ -3397,7 +3403,7 @@ function loungeProjectReveal(){factSet('lounge_project');S.loungeProj=S.loungePr
  show(`<div class="modal"><div class="eyebrow">新企劃</div><h2>Jill's Kitchen — Lounge</h2><p>把後面那間打開：一段吧台、幾張小桌、放酒的地方。讓人吃完飯以後，還有地方可以坐。這是工程，不是一個晚上；也不急。</p><div class="stack"><button class="btn primary" data-act="loungeGo" data-k="plan">開始規劃 <small>會出現在「店鋪工程」，存夠了就開工</small></button><button class="btn" data-act="loungeGo" data-k="later">之後再說 <small>不會不見——工程頁隨時找得到</small></button></div></div>`,'dim')}
 function loungeGo(k){S.loungeProj=S.loungeProj||{revealed:S.day};S.loungeProj.state=k==='plan'?'planned':'deferred';S.loungeProj.at=S.day;hideScreen();sub=null;if(R)paused=false;noteLine(k==='plan'?'Lounge 列進了店鋪工程。':'Lounge 先放著。工程頁裡隨時找得到。');save()}
 const LOUNGE_PROJ=[
- {lv:1,n:'Lounge I — 小酒吧',cost:120000,need:4,d:'打開後面那一間：一段吧台、六個吧台位、三張小桌、一面放酒的牆。要有一位調酒師才開得了；開了以後，吃完飯的人可以留下來，等位子的人可以先坐吧台。Lounge 的人有自己的名單：Evan 和沈晴（調酒師），不佔餐廳的名額。',done:'吧台的燈亮了。牆上有酒，桌上有杯子——後面那間現在叫 Lounge。',jill:'讓人吃完飯以後，還有地方可以坐。',unlock:['Lounge 名單：Evan、沈晴（員工 › Lounge 名單）','Lounge 外場（工作分配）','Lounge 的小食（菜單）']},
+ {lv:1,n:'Lounge I — 小酒吧',cost:120000,need:4,d:'打開後面那一間：一段吧台、六個吧台位、三張小桌、一面放酒的牆。開了以後，吃完飯的人可以留下來，等位子的人可以先坐吧台。Evan（首席調酒師）蓋好那天就在吧台後面，不用招募；Lounge 的人有自己的名單，沈晴（調酒師）可以再請，不佔餐廳的名額。',done:'吧台的燈亮了。牆上有酒，桌上有杯子，Evan 已經站在吧台後面——後面那間現在叫 Lounge。',jill:'讓人吃完飯以後，還有地方可以坐。',unlock:['Evan，首席調酒師（從今晚起就在吧台）','Lounge 名單：沈晴（員工 › Lounge 名單）','Lounge 外場（工作分配）','Lounge 的小食（菜單）']},
  {lv:2,n:'Lounge II — 酒吧沙發廳',cost:160000,need:4,d:'吧台加長、轉成 L 型（九個位子）；多一張小桌、一組四人沙發；一座有燈的酒櫃，酒單全開（五種）。Lounge 名單多三位：阿拓（Bar Food 料理員，在廚房）、安安（Lounge 外場）、許葳（Lounge 清潔）。',done:'吧台加長了，沙發進來了。酒櫃的燈在牆上亮著。',jill:'現在像個真的晚上了。',unlock:['Lounge 名單：阿拓、安安、許葳','四人沙發座','酒單五種']},
  {lv:3,n:'Lounge III — 安靜的角落',cost:220000,need:5,d:'最裡面隔出一個安靜的角落：兩張扶手椅、一盞落地燈；酒牆多一層；適合說話的位子。',done:'角落的燈亮了。有人會在那裡坐到很晚。',jill:'留一個地方給說話的人。',unlock:['安靜角落（兩位）','酒牆第三層']},
 ];
@@ -3407,7 +3413,7 @@ function secLounge(money,btn){const P=loungeNext();if(!fact('lounge_project')&&!
   body+=`<div class="item ${on?'done':''}"><img alt="" src="${iconURL('loungebar')}"><div class="nm">${Q.n} ${on?'<span class="tier t1">已完工</span>':''}</div><div class="d">${on?Q.done:Q.d}</div>${on?'':`<div class="act">${ok?btn(Q.cost,'buyLounge',`data-k="${Q.lv}"`,'開工'):`<span class="muted">需要擴建到 ${LEVELS[Q.need-1].n}</span>`}${ok&&money<Q.cost?`<span class="muted" style="font-size:11.5px">還差 ${fmt(Q.cost-money)}</span>`:''}</div>${ok&&money<Q.cost?`<div class="gb"><i style="width:${pct}%"></i></div>`:''}`}</div>`}
  body+=secChefNight();   /* rc7.6 */
  return body}
-function buyLounge(lv){const Q=LOUNGE_PROJ.find(p=>p.lv===lv);if(!Q||loungeLv()!==lv-1||S.money<Q.cost||S.level<Q.need)return false;S.money-=Q.cost;S.rooms.lounge=lv;S.newRooms=S.newRooms||{};if(lv===1)S.newRooms.lounge=S.day;S.newRooms['lounge'+lv]=S.day;factSet('lounge_built_'+lv);S.loungeProj=S.loungeProj||{};S.loungeProj.state='built';for(const d of barDishes())if(!DISHES[d].rd)unlockDish(d);/* rc7.4: a researched dish (the pizza) is never unlocked by building the room */if(lv===1)ach('lounge1');else if(lv===2)ach('lounge2');else ach('lounge3');save();IDLE=null;bg=null;for(const kk in BGC)delete BGC[kk];projectReveal({k:'lounge',n:Q.n,done:Q.done,jill:Q.jill,unlock:Q.unlock,room:'lounge'});return true}
+function buyLounge(lv){const Q=LOUNGE_PROJ.find(p=>p.lv===lv);if(!Q||loungeLv()!==lv-1||S.money<Q.cost||S.level<Q.need)return false;S.money-=Q.cost;S.rooms.lounge=lv;S.newRooms=S.newRooms||{};if(lv===1){S.newRooms.lounge=S.day;S.crew=S.crew||[];if(!S.crew.some(m=>m.name==='Evan'&&m.role==='bartender'))S.crew.push(evanNew(S.day))}/* rc7.7: Evan, behind the bar from the first night */S.newRooms['lounge'+lv]=S.day;factSet('lounge_built_'+lv);S.loungeProj=S.loungeProj||{};S.loungeProj.state='built';for(const d of barDishes())if(!DISHES[d].rd)unlockDish(d);/* rc7.4: a researched dish (the pizza) is never unlocked by building the room */if(lv===1)ach('lounge1');else if(lv===2)ach('lounge2');else ach('lounge3');save();IDLE=null;bg=null;for(const kk in BGC)delete BGC[kk];projectReveal({k:'lounge',n:Q.n,done:Q.done,jill:Q.jill,unlock:Q.unlock,room:'lounge'});return true}
 /* ================= v2.3 Phase 6: people learn places — station and wine familiarity, tenure, the pantry =================
    Coarse and lightweight: days worked in a place (m.fam[area]) and glasses handled (m.wine), counted at the end of a
    day. Familiarity transfers — an experienced server is not a beginner in the Lounge, only slower on the first shifts
@@ -9480,14 +9486,14 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
   ['售價','每道菜可以調價；客人有自己的預算與敏感度，太貴會有人抱怨。']]},
  {ic:'👩🏻‍🍳',h:'Jill 與員工',sum:'商店的「員工」分頁：先是「工作分配」看板，再是每個人；最下面是招募（餐廳員工）和 Lounge 名單。',pts:[
   ['工作分配','每個工作站一列（爐台・烤箱・冷盤台・咖啡吧，有 Lounge 以後多「Lounge 吧台」，寫著 n／容量和今天有幾道菜），每項外場工作一列（帶位・點餐・上菜・結帳・收桌，有 Lounge 以後多「Lounge 外場」），直接看到誰在哪裡。點 × 把人移出（廚師會進「待命」列），點 ＋ 從名單裡挑人加進來；已滿的站會寫「已滿」。開店前如果有站沒人而菜單需要它，備料畫面會提醒。'],
-  ['員工','等級、日薪、訓練升級；最下面是招募。請了就是店裡的人，沒有解雇。員工分兩個名單，名額各算各的、互不佔用：<b>餐廳員工</b>（廚師、服務生、清潔員）的上限跟擴建、後場整理區、側廳、廚房擴建、廚房二期、披薩烤爐有關，私人包廂 I 和 III 也各多一位（休息室不加名額）；<b>Lounge 名單</b>是固定的幾個人——Lounge I 的 Evan、沈晴，Lounge II 再加阿拓、安安、許葳——都聘了就滿了，不會出現別人。在哪裡上班照「工作分配」：服務生兩邊共用，廚房只有一個（阿拓也在裡面），調酒師只顧吧台。每個人的卡片寫著在店幾天、熟悉哪裡（新／熟悉／熟練）；v2.3 以前就在的人沒有天數（那之前沒記），卡片寫的是資深、熟手或較新。'],
+  ['員工','等級、日薪、訓練升級；最下面是招募。請了就是店裡的人，沒有解雇。員工分兩個名單，名額各算各的、互不佔用：<b>餐廳員工</b>（廚師、服務生、清潔員）的上限跟擴建、後場整理區、側廳、廚房擴建、廚房二期、披薩烤爐有關，私人包廂 I 和 III 也各多一位（休息室不加名額）；<b>Lounge 名單</b>是固定的幾個人：Evan 在 Lounge I 蓋好那天就在吧台，不用聘；沈晴（Lounge I 起）和阿拓、安安、許葳（Lounge II 起）要聘——人都到了就滿了，不會出現別人。在哪裡上班照「工作分配」：服務生兩邊共用，廚房只有一個（阿拓也在裡面），調酒師只顧吧台。每個人的卡片寫著在店幾天、熟悉哪裡（新／熟悉／熟練）；v2.3 以前就在的人沒有天數（那之前沒記），卡片寫的是資深、熟手或較新。'],
   ['新來的人','頭幾班會問東西放哪，做久的人會回答；剛排到 Lounge 的服務生頭幾班慢一點，待久了反而比較快。'],
   ['廚師','LV1 只做簡單的菜，LV3 起也會接手 Jill 做到一半的菜；LV5 才做招牌菜和招牌甜點（Jill 先做過一次）。每道新菜的第一份永遠由 Jill 親自做。'],
   ['服務生','帶位、點餐、收桌；LV2 起端菜，LV3 起結帳。做哪些在工作分配裡點。'],
   ['清潔員','客人走後自動收桌，比服務生快。第一位清潔員是秀琴阿姨。'],
   ['秀琴阿姨','Jill 認識很久的阿姨。還沒有清潔員的時候，很多晚上她會在快打烊時順路進來，幫忙擦一擦、收一收，收完就回家——不收桌、不招呼客人，店裡的事還是要你來。請第一位清潔員就是請她：之後營業時間她也在，跟其他清潔員一樣收桌。'],
   ['晚點到','員工也有自己的事，有時候會晚點到，偶爾也會請一天假（當天開店時會說）。還沒到、或沒來的那段時間，他負責的工作沒有人做，日薪照付；到了就照常上工。'],
-  ['調酒師','Lounge 名單上的 Evan 和沈晴（Lounge I）。站在吧台倒酒；主廳和側廳點的酒也是他們倒、服務生端。'],
+  ['調酒師','Lounge 名單上的 Evan 和沈晴。Evan 是首席調酒師，Lounge 蓋好那天就在吧台；沈晴從 Lounge I 起可以聘。站在吧台倒酒；主廳和側廳點的酒也是他們倒、服務生端。'],
   ['Jill 的空檔','沒有急事時她會回房間坐一下（穿過廚房，房間在廚房後面）：看電子書、滑手機、跟貓待著。工作一來她馬上起身——你點桌子，她也會立刻回來，只是要多走一段。']]},
  {ic:'🎁',h:'招待與熟客',sum:'招待是店主的一個動作；熟客的心是關係。兩件事各自算，誰都不會因為變熟而少了什麼。',pts:[
   ['招待（你的）','營業中每張票券右上有「招待」：Jill 有空會端一杯飲料（或一份甜點）過去，算店裡請的，扣一份庫存。一天兩桌，票券上寫著還剩幾桌。'],
@@ -9525,7 +9531,7 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
   ['怎麼來的','品酒師 Ken 來過幾次以後會問「妳真的完全不賣酒？」，之後會一直提搭配（Monsieur 杜在的話會跟他吵）；別的客人也會問附近有沒有地方再喝一杯。夠多了以後，會有一個試酒的晚上，Jill 打烊後想到：讓人吃完飯以後，還有地方可以坐。企劃就出現在「店鋪工程」，選「之後再說」也不會不見。'],
   ['Lounge I／II／III','I：吧台六個位子（坐得開，不會肩碰肩）、三張小桌、一面酒牆（三種酒）。II：吧台加長、轉成 L 型，九個位子（一樣坐得開）；多一張小桌、四人沙發、有燈的酒櫃（五種酒），Lounge 名單多阿拓、安安、許葳。III：最裡面一個安靜的角落。'],
   ['安安','來的時候就是 LV2，排在「Lounge 外場」：先顧 Lounge 的桌子（點單、上菜、結帳），Lounge 沒事的時候才去主廳幫忙。Lounge 的小點還是餐廳的廚師在廚房做，做好了由她送過去；她今天在的話，別的服務生和出菜口的「送菜」都不會去送 Lounge 的小點。'],
-  ['要有調酒師','沒有人站吧台，Lounge 那晚不開。調酒師倒酒，也負責把酒送到吧台和小桌；點單、結帳、送小食由有「Lounge 外場」職責的服務生做——沒有人負責的部分，調酒師自己來。'],
+  ['要有調酒師','Lounge 蓋好那天，Evan 就站在吧台後面。「工作分配」上把吧台的人都移開的話，Lounge 那晚不開。調酒師倒酒，也負責把酒送到吧台和小桌；點單、結帳、送小食由有「Lounge 外場」職責的服務生做——沒有人負責的部分，調酒師自己來。'],
   ['客人怎麼用','客滿的時候，等桌的人會先坐吧台喝一杯，位子好了再過去（帳是分開的，不會多算一次來店）；吃完飯的人有些會留下來再喝一杯；也有人晚一點專程來。主廳、側廳的桌上從此也會點酒——由調酒師倒、服務生端。'],
   ['晚餐後八折','在主廳或側廳吃完飯、再到 Lounge 坐的客人，Lounge 那一單打八折（酒和小點都算，每樣四捨五入到 $5）；知道有折扣，吃完留下來的人會多一點。結算的 Lounge 那一行會寫「吃完留下 n（晚餐後折扣 −$…）」。'],
   ['VIP 卡','來店 5 次的客人拿到 VIP 卡：餐廳、Lounge 都九折，吃完晚餐再去 Lounge 八折。來 10 次換成八折卡：都八折，吃完再去 Lounge 七折。一桌照桌上最好的那張卡算；單子上的名字旁邊會寫幾折。日誌的「VIP」分頁是 VIP 名單：誰有卡、哪一張、哪天拿到的，還有誰再來一次就有。'],
