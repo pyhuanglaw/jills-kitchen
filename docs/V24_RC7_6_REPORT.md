@@ -31,7 +31,19 @@ Filed verbatim: `docs/v24/player_messages_0709_0716_2026-10-03.txt`, `docs/v24/p
 
 ## 1. Commits since rc7.5
 
-(filled at the release)
+- e88a89f — 主廚之夜, first build (the 07:09 plan: the bar's six, the kitchen cooking the courses).
+- 6a0e326 — its photo taken before the closing scene moves the view, kept whatever else the day kept.
+- 4112608 — Dylan's hood up in Jill's room (07:44); the player's messages 07:44–08:00 filed.
+- 1d8aa2e — the bar's L from Lounge II; both nights book out the whole Lounge (07:44, 08:00); Ken's rounds; the chef's
+  night plated at the bar, course by course, carried in the Lounge; texts and the manual.
+- c435d84 — the evening's schedule kept in time order; the chef's night photo while the room is full; tests for all of it.
+- 9c83f76 — this report's first draft.
+- 84c7899 — after 「晚餐之後」 the tasting night is the player's to hold (08:51); the manual; a test.
+- 8514239 — the chef's night's card and note say who makes its courses; Ken's first night begins 「快七點了」.
+- 7a69925 — evidence so far (the measurements, Dylan, the L bar).
+- 66e50c6 — merge of the released rc7.5 (`v2.4-rc7.5`).
+- 3b075fe — the single file rebuilt. **The full regression ran on 3b075fe** (§6).
+- (the report's final commit at the release: documents only)
 
 ## 2. Release content audit
 
@@ -124,23 +136,65 @@ Filed verbatim: `docs/v24/player_messages_0709_0716_2026-10-03.txt`, `docs/v24/p
 
 ## 4. Manual audit (小小店主手冊)
 
-(written at the release)
+Audited against the final rc7.6 set (after the merge of rc7.5).
+- **Changed — 主廚之夜**: rewritten — 包場, the whole Lounge (N 席), the Lounge's own people come to it, around seven,
+  three courses made in the morning and plated at the bar 「一道一道上」, the plates at 「吧台 L 型的那一頭」, the Lounge's
+  waiter and the bartenders carry, the glass with its plate, $1,800, the summary. Removed: 「吧台的六個位子留給訂位的客人」,
+  「廚房照常做」, 「只有主廚之夜的客人在 Lounge 吃餐廳的菜」 (no one else is in the Lounge that night).
+- **Changed — Ken 的品酒夜**: the whole Lounge (N 席), twos and fours, 「一輪一輪倒」, the board at the bar's end, 「每桌一份
+  小食」; after 「晚餐之後」 the player holds it before opening (「Ken 的品酒夜｜今晚要辦嗎？」, 「今晚辦」, 「這次不辦」, once a
+  week, not on the chef's night); by the glass, and that the day usually takes a little less. Removed: 「提議在吧台辦小型的
+  品酒夜」, 「那一晚吧台的位子留給品酒的客人」, 「之後每一兩個禮拜他會再辦一次，不用你安排」.
+- **Changed — Lounge I／II／III**: 「II：吧台加長、轉成 L 型，九個位子（一樣坐得開）」. The shop's Lounge II card says the same.
+- **Changed — the chef's night's shop card**: the buyout, 23 seats, made in the morning and plated at the bar.
+- **No change required — Dylan's hood**: verified, the manual says nothing of what he wears.
+- **No change required — the schedule's order**: an internal fix; nothing the manual says changes.
+- The GUIDE stamp: `last: v2.4 rc7.6 (主廚之夜, booked out — the whole Lounge, plated at the bar, course by course; Ken's
+  tasting night the whole Lounge, poured a round at a time; the bar's L from Lounge II, nine seats)`.
+- `followup_the_manual_describes_the_current_game`: the new phrases above required, the removed ones stale.
 
 ## 5. Tests
 
-(written at the release)
+- New: `v24_rc76_the_bar_turns_into_an_l`, `v24_rc76_dylan_at_home_keeps_his_hood_up`,
+  `v24_rc76_after_the_wine_the_tasting_night_is_the_players`.
+- Rewritten: `v24_rc76_the_chefs_night` (booked out: 23 people with twos and a four; nobody else in the Lounge; the
+  Lounge's own come to it (`lgBook`); course by course; never through the kitchen's stations; over by 21:03 (.9 of the
+  evening); $41,400; the album).
+- Changed: `v24_rc7_ken_hosts_his_tasting_nights` (the whole room, 23, the first round poured at the tables by Ken, Ken
+  goes home), `v24_rc7_ken_comes_back_and_proposes_a_tasting` (23 seats in the news), the Lounge levels test (nine
+  stools at III, two on the L), the manual test (phrases).
+- No golden moved: `golden_scenario` and `golden_frames` pass unchanged (no golden frame shows a Lounge II+ room).
 
 ## 6. Full regression
 
-(filled at the release)
+- **3b075fe (the published commit): 218 passed, 0 failed** — `regression/full_regression_3b075fe.log`, a clean worktree
+  of the commit, 09:12–09:51. Every test ran; none was skipped or deselected.
 
 ## 7. Build and publish
 
-(filled at the release)
+- `tools/build_single.py` on 3b075fe: no change to the committed single file. `tools/build_artifact.py` →
+  `jills-kitchen-rc7.6.html` (6,557,802 bytes). Tag `v2.4-rc7.6`.
+- Published to https://claude.ai/artifact/2vhURujrtCpQ1P5jnSsjps — **version 49** (id 1790992322-ea10), read back at
+  09:52.
+- Read back and checked (`tools/sims/live_check.py`, `docs/evidence/v24_rc7_6_release/`): the page built from the tag is
+  inside the live HTML byte for byte (sha256 c93dd4db1180; the host adds its 552-byte skeleton); the player's Day 74 save
+  opens with 「繼續營業 · 21:48」, the evening resumes, every room photographed (Jill's room too), the summary, the staff
+  page, Day 75's prep and restock ($208,704 → $183,573), a reload keeps DAY 75 and the money; no page errors.
+- The tag moves to this report's commit (documents only; the game is 3b075fe's).
 
 ## 8. Evidence (390×844, headless Chromium — T, not O)
 
-(filled at the release)
+`docs/evidence/v24_rc7_6/`:
+- `screens/events/` — taken on 3b075fe (`evidence_rc76.py`, its log `evidence_log.txt`): the chef's night's card,
+  planned, the news the day before and on the day, its first night opening (held, 19:08) and ending (held, 20:29), the
+  whole Lounge at 19:40 with plates waiting at the L's end, the summary (「主廚之夜 23 位 · $41,400」, the day's net
+  $72,347), the album's picture; Ken's night: the news, the whole Lounge at 19:08 with glasses on every table, the bar,
+  the L and the board; after the wine: 「今晚要辦嗎？」 and the night held.
+- `screens/lbar/` — the L on the phone and on a desktop with every stool taken, close-ups, the room with a coordinate
+  grid before (rc7.5) and after.
+- `screens/dylan/` — the sheet (the restaurant and the room), Jill's room at gameplay scale (Day 52, Day 74), the desk.
+- `sims/` — the measurements and `notes.txt` (how the chef's night got its shape; the three-seed comparison).
+- `regression/` — the full regression log (§6).
 
 ## 9. What only the player can judge (O)
 
@@ -151,4 +205,5 @@ Filed verbatim: `docs/v24/player_messages_0709_0716_2026-10-03.txt`, `docs/v24/p
 
 ## 10. Text
 
-(filled at the release)
+`python3 tools/hans_scan.py js/game.js index.html docs/V24_RC7_6_REPORT.md docs/v24/player_messages_0744_0800_2026-10-03.txt docs/evidence/v24_rc7_6/sims/notes.txt`:
+three expected hits only — 干 (干貝), 沉 (睡得很沉), 舍 (宿舍).
