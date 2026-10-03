@@ -849,7 +849,9 @@ def followup_the_manual_describes_the_current_game(b, port, target):
                  '主廚之夜', '明晚｜主廚之夜 · N 席', '主廚之夜是包場', '一道一道上', '吧台 L 型的那一頭', '七點左右到',
                  '那一晚整個 Lounge 都留給品酒的客人', '一輪一輪倒', '吧台加長、轉成 L 型，九個位子',
                  # v2.4 rc7.6 (08:51): after the wine, the player holds a tasting night
-                 'Ken 的品酒夜｜今晚要辦嗎？', '按「今晚辦」就是今晚', '這次不辦']:
+                 'Ken 的品酒夜｜今晚要辦嗎？', '按「今晚辦」就是今晚', '這次不辦',
+                 # v2.4 rc7.7 (10:10, 10:32): the Lounge's people pour the rounds; Ken's share; Evan from the first night
+                 '吧台那一排由調酒師倒', '品酒夜分潤', '友情主持', 'Evan 在 Lounge I 蓋好那天就在吧台']:
         check(need in txt, f'the manual mentions {need}')
     for stale in ['暫停選單和設定裡都有【儲存目前進度】', '把杯子交給吧台的客人；桌位由有', '上方的分頁', '畫面上方會跳一個小通知', '打烊後或開店前，商店的「社群與宣傳」分頁（第 6 天起）。', '下一段寫著', '窗邊（貓架、睡墊）', '牠會在門邊趴著等主人',
                   '人數上限跟擴建、後場整理區、側廳、廚房擴建、廚房二期、Lounge 有關', '有 Lounge 以後才能招募', '第二位調酒師',
@@ -868,7 +870,9 @@ def followup_the_manual_describes_the_current_game(b, port, target):
                   # v2.4 rc7.5: the album never kept only 30
                   '其他最多留 30 張',
                   # v2.4 rc7.6: the chef's night is no longer the bar's six; Ken's night no longer the bar's stools only
-                  '吧台的六個位子留給訂位的客人', '只有主廚之夜的客人在 Lounge 吃餐廳的菜', '那一晚吧台的位子留給品酒的客人', '提議在吧台辦小型的品酒夜', '之後每一兩個禮拜他會再辦一次，不用你安排']:
+                  '吧台的六個位子留給訂位的客人', '只有主廚之夜的客人在 Lounge 吃餐廳的菜', '那一晚吧台的位子留給品酒的客人',
+                  # v2.4 rc7.7: Ken no longer pours every round himself; Evan is never hired
+                  '今晚的三支他一輪一輪倒', 'Lounge I 的 Evan、沈晴', '提議在吧台辦小型的品酒夜', '之後每一兩個禮拜他會再辦一次，不用你安排']:
         check(stale not in txt, f'stale line removed: {stale}')
     g.ev("showGuide()"); g.page.wait_for_timeout(50)
     check('故事' in g.ev("document.querySelector('#screen').innerText") and '社群與宣傳' in g.ev("document.querySelector('#screen').innerText"), 'the manual screen shows the new sections')

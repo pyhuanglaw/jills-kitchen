@@ -2400,6 +2400,7 @@ def v24_rc7_ken_comes_back_and_proposes_a_tasting(b, port, target):
     page = json.loads(g.ev("JSON.stringify((story().beatLines||{}).ken_propose||[])"))
     txt = ' / '.join(x['t'] for x in page)
     check(g.ev("!!fact('ken_propose')") and '這裡其實可以辦品酒。' in txt and '我在這裡坐了好幾個晚上了。' in txt and '我主持。酒我挑，菜妳配。' in txt, f'the proposal, with the line for a Lounge he has sat in for weeks: {txt}')
+    check('不用算。我自己喜歡，友情主持。' in txt and '不行。那晚品酒的利潤，三成給你。' in txt and '我知道。所以是我要給。' in txt and g.ev("!!fact('ken_cut')"), f'rc7.7 (10:10): he would host it as a friend; Jill offers the share herself: {txt}')
     check(json.loads(g.ev("JSON.stringify(kenS().next)")) == {'d': g.ev("S.day") + 3, 'n': 1}, 'the first night three days on')
     check(g.ev("kenQuiet()") is False and g.ev("kenLoungeDue()") is False, 'one Ken scene today; his first look never comes in this save')
     check(not any(k in txt for k in ('終於完成', '這裡真的很棒', '實現夢想')), 'no congratulation')
@@ -2428,8 +2429,9 @@ def v24_rc7_ken_hosts_his_tasting_nights(b, port, target):
     player's picture, nothing moves until it is tapped, one line a tap, and the evening goes on exactly where it was
     after it. He is perceptibly there: behind the bar with a glass (not on a stool); rc7.6 (07:44 「酒吧品酒日不只吧台
     整個酒吧都是品酒日的來賓」): the whole Lounge is for the people who came — every seat, nobody else seated there that
-    night — some in twos and fours; the guests order two or three of tonight's wines each, and Ken pours them a round at a
-    time at every seat (the bartenders never pour them). When the last of them has gone: 「所以下次換一支。」, the second
+    night — some in twos and fours; the guests order two or three of tonight's wines each, a round at a time at every
+    seat (rc7.7, 10:10: Ken opens each and says what it is; the Lounge's people pour it — never through the bartenders'
+    mixing). When the last of them has gone: 「所以下次換一支。」, the second
     night planned, and he goes home. The second night is not the first again (returning faces, 杜 among them, a different
     set of wines); the third ends with 「做一支我們自己的。」 — and the wine cannot be talked about before it. The count
     survives a reload."""
@@ -2469,7 +2471,7 @@ def v24_rc7_ken_hosts_his_tasting_nights(b, port, target):
     g.ev("__botUntil('R.kt.on&&R.kt.guests.some(q=>q.ticket&&q.table!=null&&R.tables[q.table].kind!==\\'bar\\'&&q.ticket.items.some(i=>i.ktw&&i.st===\\'served\\'))',60000,1/30)")
     rd = json.loads(g.ev("""JSON.stringify({tables:R.kt.guests.filter(q=>q.ticket&&q.table!=null&&R.tables[q.table].kind!=='bar'&&q.ticket.items.some(i=>i.ktw&&i.round===0&&i.st==='served')).length,
       mixed:R.tickets.some(t=>t.items.some(i=>i.ktw&&(i.st==='pending'||i.lbar))),said:R.kt.said})"""))
-    check(rd['tables'] >= 1 and not rd['mixed'], f'Ken pours the first round at the tables too, never through the bartenders: {rd}')
+    check(rd['tables'] >= 1 and not rd['mixed'], f'the first round reaches the tables too, never through the bartenders\' mixing: {rd}')
     g.ev("setRoom('main');idFocusWho('named:'+KEN)")
     check(g.ev("room") == 'lounge' and g.ev("IDF.length&&IDF[IDF.length-1].label") == KEN_N, 'a line of his finds him behind the bar')
     g.ev("__botUntil('R.kt.end',120000,1/30)")
@@ -3945,4 +3947,77 @@ def v24_rc77_evan_is_behind_the_bar_from_the_first_night(b, port, target):
     _load_raw(g, raw)
     keep = json.loads(g.ev("JSON.stringify(S.crew.filter(m=>m.name==='Evan').map(m=>m.lv))"))
     check(keep == [[m for m in raw['crew'] if m['name'] == 'Evan'][0]['lv']], f'kept as he was: {keep}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc77_the_lounge_pours_kens_rounds(b, port, target):
+    """10:10 「Ken自己倒酒也太累了吧 酒吧的服務生不能幫忙嗎？品酒日的時候原本的bartender要不要上班」: on a tasting night the
+    bartenders are on as every night; Ken hosts behind the bar and opens each of the three; a round opened at the bar is
+    handed along the bar by the bartenders and carried to the tables and the sofa by the Lounge's floor person, from the
+    end of the bar's L, where it waits on a tray — never on the kitchen's pass, never fetched by the restaurant's floor.
+    With no floor person in, the bartenders walk it over. Every round reaches every seat."""
+    spy = """window.__kp=[];const s0=serveItems;serveItems=function(g,list){for(const c of list){const it=c.it;if(it&&it.ktp&&it.st==='ready'){const t=R.tables[g.table];
+      const m=(S.crew||[]).find(m=>{const w=R.cw&&R.cw[m.id];return w&&w.carry&&w.carry.includes(it)});const j=R.jill.carry.some(c0=>c0.it===it);
+      __kp.push({bar:t.kind==='bar',role:m?m.role:(j?'jill':'?'),name:m?m.name:'',lg:m?crewPool(m):''})}}return s0.apply(this,arguments)};
+      window.__pass=0;window.__tray=0;const u0=kenRounds;kenRounds=function(){const r=u0.apply(this,arguments);for(const tk of R.tickets)for(const it of tk.items)if(it.ktp&&it.st==='ready'&&!it.picked){__tray++;if(it.lbar||!tk.kt)__pass++}return r}"""
+    for floor in (True, False):
+        g = Game(b, port, target, seed=7703 if floor else 7704, manual=True, viewport={'width': 390, 'height': 844})
+        load_save(g, 'player_day74_1508.json')
+        g.ev("factSet('ken_propose');factSet('ken_cut');S.cn=null;kenS().next={d:S.day,n:5};showPrep()")
+        if not floor:
+            g.ev("for(const m of S.crew)if(m.name==='安安')m.duties.lounge=false")
+        on = json.loads(g.ev("JSON.stringify(S.crew.filter(m=>m.role==='bartender'&&m.duty==='lbar').map(m=>m.name))"))
+        check(len(on) >= 1, f'the bartenders are on tonight: {on}')
+        to_service(g); g.ev("window.__act=window.__actLazy")
+        g.ev(spy)
+        g.ev("__botUntil('R.kt&&R.kt.end',150000,1/30)")
+        kp = json.loads(g.ev("JSON.stringify(__kp)"))
+        bar = [k for k in kp if k['bar']]; tab = [k for k in kp if not k['bar']]
+        check(bar and all(k['role'] == 'bartender' for k in bar), f'along the bar, the bartenders: {bar[:6]}')
+        if floor:
+            check(tab and all(k['role'] == 'waiter' and k['lg'] == 'lounge' for k in tab), f'to the tables, the Lounge\'s floor person: {tab[:6]}')
+        else:
+            check(tab and all(k['role'] == 'bartender' for k in tab), f'no floor person in: the bartenders walk them over: {tab[:6]}')
+        check(not any(k['role'] in ('?', 'jill') for k in kp), 'every round was carried by someone of the Lounge')
+        left = json.loads(g.ev("JSON.stringify(R.kt.guests.filter(q=>q.ticket).map(q=>q.ticket.items.filter(i=>i.ktw&&i.ktp&&i.st!=='served').length))"))
+        check(sum(left) == 0, f'every round that was opened reached its seat: {left}')
+        check(g.ev("__tray") >= 1 and g.ev("__pass") == 0, 'a round waits at the bar, never at the pass')
+        check(g.ev("R.kt.host.state==='host'||R.kt.host.gone||!R.groups.includes(R.kt.host)") and g.ev("R.kt.host.table==null"), 'Ken hosted from behind the bar, never sat')
+        check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc77_kens_share_of_a_tasting_night(b, port, target):
+    """10:10 「Ken辦品酒日也可以分潤給他吧？當天百分之三十利潤給Ken 才合理，從第一次開始就要，Ken本來想友情主持，而且是自己喜歡，但是
+    Jill主動說要給」: from the first night the summary takes 30% of what the tasting guests paid for the glasses and the bites,
+    less what those cost, on its own line 「品酒夜分潤」, and the day's net is that much less. A day with no tasting night
+    pays nothing. A save whose proposal came before this (no 「三成」 said) hears Jill say it at the end of its next night."""
+    g = Game(b, port, target, seed=7705, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day74_1508.json')
+    g.ev("factSet('ken_propose');S.cn=null;kenS().next={d:S.day,n:5};showPrep()")
+    check(g.ev("!fact('ken_cut')"), 'a save past the proposal, before the share')
+    to_service(g); g.ev("window.__act=window.__actLazy;window.__fastSay=1")
+    g.ev("""window.__paid=[];const c0=collect;collect=function(g,o){let rec=null;if(g.tasting&&R.kt&&R.kt.guests.includes(g)&&g.ticket){const items=g.ticket.items.filter(i=>i.st==='served');rec={n:g.size,cost:items.reduce((a,it)=>{const D=DISH(it.d);return a+(D&&D.wine?(D.cost||0):costOf(it.d))},0)}}const r=c0.apply(this,arguments);if(rec)__paid.push(rec);return r}""")
+    g.ev("__botUntil('phase!==\\'service\\'',150000,1/30)")
+    s = json.loads(g.ev("JSON.stringify({ken:S.lastSummary.ken,kt:S.lastSummary.kt,net:S.lastSummary.net,cut:!!fact('ken_cut')})"))
+    paid = json.loads(g.ev("JSON.stringify(__paid)"))
+    check(s['kt'] and s['kt']['n'] == sum(p['n'] for p in paid) and s['kt']['n'] >= 10, f'the night\'s guests counted: {s["kt"]} / {len(paid)} tabs')
+    check(abs(s['kt']['cost'] - round(sum(p['cost'] for p in paid))) <= 1, f'what they had cost: {s["kt"]["cost"]}')
+    check(s['ken'] == round(.3 * max(0, s['kt']['rev'] - s['kt']['cost'])) and s['ken'] > 0, f'30% of the night\'s profit: {s}')
+    txt = g.ev("$('#screen').innerText")
+    check('品酒夜分潤' in txt and 'Ken，品酒客利潤的三成' in txt and f'Ken 的品酒夜 {s["kt"]["n"]} 位' in txt, 'the summary\'s lines')
+    check(s['cut'], 'Jill said it at the night\'s end (a save past the proposal)')
+    lines = ' / '.join(x['t'] for x in json.loads(g.ev("JSON.stringify((story().beatLines||{}).ken_cut||[])")))
+    check('今晚品酒的利潤，三成。以後每一次都是。' in lines and '我知道。所以是我要給。' in lines, f'her words: {lines}')
+    # a day without a tasting night: nothing
+    g.ev("document.querySelector('[data-act=toShop]')&&document.querySelector('[data-act=toShop]').click()")
+    g.page.wait_for_timeout(100)
+    g.ev("kenS().next=null;S.cn=null")
+    v = g.ev("phase")
+    if v == 'shop':
+        g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(200)
+    to_service(g); g.ev("window.__act=window.__actLazy")
+    g.ev("__botUntil('phase!==\\'service\\'',150000,1/30)")
+    check(not g.ev("S.lastSummary.ken") and not g.ev("S.lastSummary.kt") and '品酒夜分潤' not in g.ev("$('#screen').innerText"), 'a day without a tasting night pays nothing')
     check(not g.errors, g.errors[:3]); g.close()
