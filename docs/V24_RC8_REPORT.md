@@ -79,8 +79,8 @@ Nothing previously requested is dropped.
 | 晴 × 阿拓, five held scenes; who knows what | I | T (`v24_rc8_qing_tuo_after_work_five_scenes`, q1–q6) | — |
 | The ten pictures in their scenes and the story pages | I | T (`v24_illustrations_show_with_the_scene_and_reopen`; release screenshots) | — |
 | The cooks: a cook from another station covers one with no cook; a dish's first plate is a cook's too; Jill rests when the crew has the work | I | T (`jill_rests_when_staff_cover_the_floor` and the staff tests; 0.91/0.89/0.90 of the service on seeds 7/8/9) | — |
-| 晴 × 阿拓 pacing: Day 81 / 83 / 95 / 97 / 104 from the Day 74 save (was 82 / 94 / 99 / 113 / 118) | I | T (`tools/sims/story_per_day.py`, `docs/evidence/v24_rc8/qing_tuo/pacing/`) | — |
-| No 晴 × 阿拓 scene after a tasting night or the chef's night | I | T (the same sim: none on Days 79, 84, 89; `v24_rc7_ken_hosts_his_tasting_nights`) | — |
+| 晴 × 阿拓 pacing: Day 82 / 84 / 88 / 90 / 95 from the Day 74 save (was 82 / 94 / 99 / 113 / 118) | I | T (`tools/sims/story_per_day.py`, `docs/evidence/v24_rc8/qing_tuo/pacing/`) | — |
+| The scenes after closing on a booked-out night too, when their people are in; 《今天喝？》 never on one | I | T (the same sim: 《晚點回去》 after Ken's tasting, Day 84) | — |
 
 ### Jill's rest (the player: 「不要為了讓測試通過直接調高 Jill 的休息機率……讓這個長期 known failure 正式結案」)
 
@@ -104,8 +104,10 @@ Nothing previously requested is dropped.
   save over 46 days: two majors on seven days, free major slots on most of the days between 晴 × 阿拓's scenes. No
   regression and no test assumption behind it: the line's own waits (this session's, none from the brief) were the
   limit, and the line's report wrongly said 「one major a day」 — corrected.
-- Shortened at the player's choice (「再縮更多」): two days between the first three scenes (was five and four), one more
-  drink of Dylan's (was two), 予安 a week at the piano (was ten days), 沈晴 home two days after 《最近比較常》 (was five).
+- Shortened at the player's choice (「再縮更多」, then 「隔一天也可以」「只要予安有上班就可以吧」「包場夜打烊後店員還是可以留下
+  的吧」): two days between the scenes (was five and four), one more drink of Dylan's (was two), 予安 from the day after
+  she joins on one of her nights (was ten days), 沈晴 home two days after 《最近比較常》 (was five), and the four scenes
+  after closing on a booked-out night too (each checks its own people).
 
 ## 4. Manual audit (小小店主手冊)
 

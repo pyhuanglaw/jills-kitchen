@@ -3531,7 +3531,8 @@ function drawIllusKen(c,k){c.fillStyle='#1E1A18';c.fillRect(0,0,360,270);c.fillS
 function qaS(){const st=story();return st.qa||(st.qa={})}
 function qaBooked(){return kenNightToday()||cnTonight()||!!(R&&(R.kt||R.cn))}   /* the night itself too: at the closing Ken's night has already moved his next one on (kenNightClose → kenAdvance), the chef's night its own */
 function qaHome(){const H=qaS().home;return H&&S.day>=H.d&&S.day<H.back?H:null}   /* 沈晴 at her parents' */
-function qaEve(){return loungeOpenTonight()&&!qaBooked()&&!!evanOn()}   /* an ordinary night at The Lounge */
+function qaEve(){return loungeOpenTonight()&&!qaBooked()&&!!evanOn()}   /* Dylan's evenings at the bar (《今天喝？》): not a booked-out night, the room is the event's */
+function qaClose(){return loungeOpenTonight()&&!!evanOn()}   /* after closing (the player, 2026-10-03: 「包場夜打烊後店員還是可以留下的吧 只要看你需要的店員那天有沒有上班」): any night The Lounge was open, Evan in; each scene checks its own people */   /* an ordinary night at The Lounge */
 function qaYa(){return !!fact('ya_join')&&yaNight()}   /* 予安 played tonight: she is still there at closing */
 function qa1Due(){const d0=loungeDoneDay();return d0!=null&&!fact('qt_drink')&&!!fact('evan_knows_dylan')&&S.day>=d0+10&&qaEve()}
 /* the people of one evening: Evan behind the bar, the rest on the guests' side of it; the piano's bench and its side */
@@ -3568,7 +3569,7 @@ STORY_EV.push(
   run:ctx=>{factSet('qx_dylan',true);if(dayCoin('qxd|'+S.day)<60){sayS(evanOn(),'一樣？',700);sayG(ctx.g,'嗯。',1900)}}},
  /* the evenings after closing: Evan, 沈晴 and 阿拓 stay for one, often; later Dylan some nights, 予安 some of hers. Never
     a story step: nothing waits for these, nothing counts them. */
- {k:'qx_after',lane:'ambient',cd:3,at:['close'],when:()=>!storyDay().qa&&!!fact('qt_3')&&qaEve()&&!!qingOn()&&!!tuoOn()&&dayCoin('qxa|'+S.day)<40,
+ {k:'qx_after',lane:'ambient',cd:3,at:['close'],when:()=>!storyDay().qa&&!!fact('qt_3')&&qaClose()&&!!qingOn()&&!!tuoOn()&&dayCoin('qxa|'+S.day)<40,
   run:()=>{const L=['收店以後，Evan、沈晴、阿拓留下來喝了一杯。','收店以後，晴和阿拓又留下來了。Evan 說他只喝一杯。','收店以後。Evan：「喝一杯？」晴：「一杯。」阿拓已經坐下了。'];
    if(fact('qt_late'))L.push('收店以後，Dylan 也在吧台坐了一下。走的時候，杯子底下壓著酒錢。','晴伸手找酒，阿拓已經把那一支遞過去了。');
    if(fact('qt_often')&&qaYa())L.push('予安坐了一杯就走了。','阿拓沒問，倒的就是晴平常喝的那一支。予安看了一眼，低頭喝自己的。');
@@ -3577,14 +3578,15 @@ STORY_EV.push(
  /* 沈晴 goes home to her parents for two days — her life, not anyone's plan; it falls on one of 予安's nights */
  {k:'qx_home',lane:'ambient',cd:0,at:['daystart'],note:'沈晴回老家兩天。',
   when:()=>{const q=crewByName('沈晴');if(!q)return false;if(qaHome())return true;const H=qaS().home;
-   return !!fact('qt_often')&&!fact('qt_ya')&&S.day-fact('qt_often').d>=2&&qaYa()&&qaEve()&&!!tuoOn()&&(!H||S.day>=H.back+3)&&dayCoin('qxh|'+S.day)<70},   /* rc8 pacing (the player, 2026-10-03 「再縮更多」): 2 days after 《最近比較常》 (was 5), again 3 days after (was 7), 70% (was 50%) */
+   return !!fact('qt_often')&&!fact('qt_ya')&&S.day-fact('qt_often').d>=2&&qaYa()&&qaClose()&&!!tuoOn()&&(!H||S.day>=H.back+3)&&dayCoin('qxh|'+S.day)<70},   /* rc8 pacing (the player, 2026-10-03 「再縮更多」): 2 days after 《最近比較常》 (was 5), again 3 days after (was 7), 70% (was 50%) */
   run:()=>{const q=crewByName('沈晴'),A=qaS();if(!qaHome()){A.home={d:S.day,back:S.day+2};noteLine('沈晴這兩天回老家。');factSet('qx_home',true)}setCrewAway(q,'off')}},
  /* 2 《晚點回去》: the first evening after closing the player sees; Dylan stays on. Jill is not there (§19). rc8 pacing (the player,
     2026-10-03 「再縮更多」, the scheduler's two majors a day confirmed): two days after 《今天喝？》 (was 5) and one more
     drink of his at The Lounge (was two; his evenings there 35% until then, was 14%); 《最近比較常》 two days after (was 4),
-    予安 a week at the piano (was ten days). */
+    予安 at the piano from the day after she joins, one of her nights (「只要予安有上班就可以吧」; was ten days, then a week).
+    The scenes after closing come on a booked-out night too (qaClose). */
  {k:'qt_late',lane:'major',cls:'A',floor:2,at:['close'],once:true,ic:'heart',note:'收店以後，Evan、沈晴、阿拓留在吧台，Dylan 也坐著。晴伸手找酒，阿拓直接把那一支遞給她。',
-  when:()=>!!fact('qt_drink')&&!!fact('qt_3')&&factN('qx_dylan')>=1&&S.day-fact('qt_drink').d>=2&&qaEve()&&!!qingOn()&&!!tuoOn()&&!qaHome(),
+  when:()=>!!fact('qt_drink')&&!!fact('qt_3')&&factN('qx_dylan')>=1&&S.day-fact('qt_drink').d>=2&&qaClose()&&!!qingOn()&&!!tuoOn()&&!qaHome(),
   run:()=>{if(SCX){SCX.cap=24;SCX.stageRoom='lounge'}factSet('qt_late');qaScene(['evan','qing','tuo','dylan'],[
    {who:'',text:'收店了。Lounge 只剩吧台那一區的燈。'},{who:'',text:'Evan、沈晴、阿拓留下來喝一點。Dylan 還坐在吧台。'},{who:'',text:'Evan 多拿了一個杯子，放在 Dylan 前面。'},
    {who:'staff:沈晴',text:'今天沙發那四個，炸雞點了三次。'},{who:'staff:阿拓',text:'四次。'},{who:'staff:沈晴',text:'第四次是外帶。'},{who:'staff:Evan',text:'外帶也算。'},
@@ -3592,7 +3594,7 @@ STORY_EV.push(
    {who:'',text:'散的時候，Dylan 把錢壓在杯子底下。'}])}},
  /* 3 《最近比較常》: 予安, a while after she became The Lounge's pianist, stays for one; she sees 沈晴's look and says nothing */
  {k:'qt_often',lane:'major',cls:'A',floor:2,at:['close'],once:true,ic:'heart',note:'予安第一次留下來喝。「你們下班都會留下來？」「偶爾。」「最近比較常。」',
-  when:()=>!!fact('qt_late')&&!!fact('ya_join')&&S.day-fact('ya_join').d>=7&&S.day-fact('qt_late').d>=2&&qaYa()&&qaEve()&&!!qingOn()&&!!tuoOn()&&!qaHome(),
+  when:()=>!!fact('qt_late')&&!!fact('ya_join')&&S.day-fact('ya_join').d>=1&&S.day-fact('qt_late').d>=2&&qaYa()&&qaClose()&&!!qingOn()&&!!tuoOn()&&!qaHome(),
   run:()=>{if(SCX){SCX.cap=24;SCX.stageRoom='lounge'}factSet('qt_often');qaScene(['evan','qing','tuo','dylan','ya'],[
    {who:'',text:'收店了。予安把琴蓋闔上。'},{who:'staff:Evan',text:'喝一杯？'},{who:'',text:'予安看了一下時間。'},
    {who:'named:'+YA,text:'一杯。',after:()=>qaGo('ya',[LG.bar.x0+156,LG.bar.y+74])},
@@ -3603,7 +3605,7 @@ STORY_EV.push(
  /* 4 《你喜歡予安？》: the night 沈晴 is at her parents'; 阿拓 asks Evan, Dylan guesses wrong, Evan sees the piano, 予安 knows
     at once and teaches him five notes — one evening, one scene */
  {k:'qt_ya',lane:'major',cls:'A',floor:2,at:['close'],once:true,ic:'heart',note:'沈晴回老家的那晚。「如果你想跟一個人講清楚，你會怎麼講？」「你喜歡予安？」「是沈晴。」予安教阿拓按五個音。',
-  when:()=>!!fact('qt_often')&&!!qaHome()&&!qingOn()&&qaYa()&&qaEve()&&!!tuoOn(),
+  when:()=>!!fact('qt_often')&&!!qaHome()&&!qingOn()&&qaYa()&&qaClose()&&!!tuoOn(),
   run:()=>{if(SCX){SCX.cap=80;SCX.stageRoom='lounge'}factSet('qt_ya');const Y='named:'+YA,E='staff:Evan',T='staff:阿拓',D='dylan';
    const toPiano=()=>{qaGo('tuo',qaSide(-58,18),1);qaGo('evan',qaSide(-84,26),1);qaGo('dylan',qaSide(-108,22),1)};
    qaScene(['evan','tuo','dylan','ya'],[
@@ -3630,7 +3632,7 @@ STORY_EV.push(
  /* 5 《講完》: some evenings after 沈晴 is back, all five stay; 阿拓 plays the five notes himself; the words do not all come
     out, and she answers. Dylan claps twice. Evan, 予安 and Dylan go; the two of them are left. No scene after this one. */
  {k:'qt_said',lane:'major',cls:'A',floor:2,at:['close'],once:true,ic:'heart',note:'阿拓彈了那五個音。「那妳要不要……在……」「在什麼？」「……好啊。」',
-  when:()=>{const H=qaS().home;return !!fact('qt_ya')&&!!H&&S.day>=H.back+2&&qaYa()&&qaEve()&&!!qingOn()&&!!tuoOn()},
+  when:()=>{const H=qaS().home;return !!fact('qt_ya')&&!!H&&S.day>=H.back+2&&qaYa()&&qaClose()&&!!qingOn()&&!!tuoOn()},
   run:()=>{if(SCX){SCX.cap=60;SCX.stageRoom='lounge'}factSet('qt_said');const Q='staff:沈晴',T='staff:阿拓',E='staff:Evan',Y='named:'+YA,D='dylan';
    qaScene(['evan','qing','tuo','dylan','ya'],[
    {who:'',text:'沈晴回來幾天了。收店以後，大家又留了下來。'},{who:'',text:'Evan 在吧台後面。予安和 Dylan 坐在吧台。'},

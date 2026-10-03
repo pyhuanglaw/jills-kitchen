@@ -47,8 +47,9 @@ signing, §11C, and he hardly drinks, §18). While one of the five is on screen,
 ## 2. Each scene's prerequisites and the scheduler (I, T)
 
 All five are held (the restaurant, its clock and its orders stop; one line a tap; it resumes where it was), staged in The
-Lounge, on an ordinary Lounge night (not Ken's tasting, not the chef's night — the night itself too, at its closing:
-`qaBooked` looks at `R.kt`/`R.cn`, since a tasting moves Ken's next date on before the closing's beats), Evan on. The
+Lounge, Evan on. 《今天喝？》 (Dylan at the bar in the evening) is never on a booked-out night (Ken's tasting, the chef's
+night); the four after closing can be (the player, 2026-10-03: 「包場夜打烊後店員還是可以留下的吧 只要看你需要的店員那天有沒有
+上班」) — each checks its own people (`qaClose`). The
 story scheduler is rc7's (the player, 15:39 「一天可以不只一個劇情不然太慢」): two major beats a day, a fifth of the evening
 apart (`LANE_CAP`, `LANE_GAP`), the beat a day's visits came for and the longest-waiting one keep a slot, a missed beat
 waits and is not lost. (An earlier draft of this report said one major a day: wrong — the cap is two and works, §6.) One
@@ -58,7 +59,7 @@ story still moves one step at a time: its own conditions below keep its scenes o
 |---|---|
 | 《今天喝？》 | Evan knows Dylan (the signing), The Lounge open ten days or more; planned as Dylan's evening at The Lounge (half the eligible evenings); fires when he sits down |
 | 《晚點回去》 | 「多的。」 done; 《今天喝？》 two days back or more; Dylan has had one more drink there (his evenings at The Lounge 35% a day until then, 14% after); 沈晴 and 阿拓 in; she is not away |
-| 《最近比較常》 | 《晚點回去》 two days back or more; 予安 the pianist a week or more; one of her nights (she is still there at closing); 沈晴 and 阿拓 in |
+| 《最近比較常》 | 《晚點回去》 two days back or more; 予安 the pianist since the day before or longer, one of her nights (she is still there at closing; 「只要予安有上班就可以吧」); 沈晴 and 阿拓 in |
 | 《你喜歡予安？》 | 沈晴 at her parents' (`qx_home`); one of 予安's nights; 阿拓 in |
 | 《講完》 | 沈晴 back two days or more (not the day she is back); one of 予安's nights; 沈晴 and 阿拓 in |
 
@@ -70,8 +71,9 @@ three days later.
 for a reasonable acquaintance before Act 2, 予安 a while at the piano before Act 3, 沈晴 really away for Act 4, and Act 5
 not the day she is back). Before: five, two drinks, four, ten, five, a week. From the player's Day 74 save
 (`tools/sims/story_per_day.py`, `pacing/`): before, Day 82 / 94 / 99 / 113 / 118 (37 days) — with free major slots on
-most of the days between (two majors on seven of them: the cap works); after, Day 81 / 83 / 95 / 97 / 104 (23 days),
-none on a tasting night (79, 84, 89). Days 83 → 95 wait for 予安's own line (ya_join) and her first week.
+most of the days between (two majors on seven of them: the cap works); after, Day 82 / 84 / 88 / 90 / 95 (13 days;
+《晚點回去》 after Ken's tasting on Day 84). 予安 plays three fixed nights a week; the prep screen has no choice of her
+nights (not asked for in a brief; a possible later change).
 
 **《你喜歡予安？》 is one scene**: the question, the wrong guess, 「是沈晴」, Evan seeing the piano, going over, 予安's
 「沈晴？」 and the lesson are the lines of one held beat on one evening — nothing is split into stages.

@@ -567,7 +567,7 @@ def v24_manual_tutorial_and_news_cover_the_new_content(b, port, target):
         check(need in txt, f'the manual mentions {need}')
     for stale in ['後場休息室', '吧台我擦']:
         check(stale not in txt, f'not in the manual: {stale}')
-    check('— last: v2.4 rc7' in open(os.path.join(ROOT, 'js', 'game.js'), encoding='utf-8').read(), 'the audit stamp on GUIDE (the release checklist §2: the stamp says the release the manual was last audited for)')
+    check('— last: v2.4 rc8' in open(os.path.join(ROOT, 'js', 'game.js'), encoding='utf-8').read(), 'the audit stamp on GUIDE (the release checklist §2: the stamp says the release the manual was last audited for)')
     g.click('[data-act=open]'); g.page.wait_for_timeout(100)
     check('2.4' not in g.ev("S.news.join(' ')") and g.ev("S.news24") == -1, 'a new game: no update note')
     g.close()
