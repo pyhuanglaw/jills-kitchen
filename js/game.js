@@ -3505,7 +3505,7 @@ function kenNightUpd(dt){const K=R&&R.kt;if(!K)return;if(K.end){/* rc7.6: the ho
 /* the start of the night: the first three are scenes; after them, a word in the room */
 function kenNightOpen(seated){const K=R.kt,n=K.n;factSet('ken_tn');const g0=seated[0]||null;const guest=(i,txt,ms)=>{const q=seated[i%Math.max(1,seated.length)];if(q)sayG(q,txt,ms)};
  const du=K.du?seated.find(q=>namedId(q)===DU):null;const dish=(menuList().includes('signature')&&'signature')||menuList().find(d=>DISH(d)&&DISH(d).cat==='main');const dn=dish?(dish==='signature'?kenSigName():dishName(dish)):'今天的主菜';
- if(n===1)kenScene('ken_t1',g0,()=>{factSet('ken_t1');kenNote(`六點半，Lounge 的人陸續坐下——吧台、小桌、沙發。每個位子前面擺了三個杯子；Ken 站在吧台後面，手上拿著第一支。`,'ken_t1');
+ if(n===1)kenScene('ken_t1',g0,()=>{factSet('ken_t1');kenNote(`快七點了，Lounge 的人陸續坐下——吧台、小桌、沙發。每個位子前面擺了三個杯子；Ken 站在吧台後面，手上拿著第一支。`,'ken_t1');
   kenSayH('今天三支。不用猜是哪裡的酒，先喝。',600,'talk');guest(1,'……這支是法國的吧？',1900);kenSayH('我就知道一定有人不聽。',3200,'wry');
   later(()=>noteLine('吧台這頭有人笑出來。Ken 把第一支倒了一輪。'),4500);JILL_SAY('菜什麼時候出？',5800,{with:'named:'+KEN});kenSayH('第二支以後。先讓他們喝一口沒有配菜的。',7100,'talk');JILL_SAY('好。',8400,{with:'named:'+KEN});relSet(KEN_ID,'jill','sharedEvent')});
  else if(n===2)kenScene('ken_t2',g0,()=>{factSet('ken_t2');const b=(kenS().back||[])[0];const bg=b&&seated.find(q=>q.name===b.name);
@@ -3684,10 +3684,13 @@ function yaJoinAsk(){const g=R.ya.g;kenScene('ya_join',yaNear(),()=>{factSet('ya
    「明晚｜主廚之夜 · N 席」. rc7.6 (08:00 「主廚之夜就是包場整間辦主廚之夜…整間都是給主廚之夜辦」): the whole Lounge is booked
    out for it (lgBook) — every seat is the chef's night's, and the Lounge's usual people who come that night (Ken,
    Monsieur 杜, the Lounge's guests) come to it, like everyone else. Around seven they sit down and the three courses come —
-   the best starter on the menu, the signature, the signature dessert (or the best dessert) — each with a glass the
-   bartender pours. The kitchen cooks as always (the portions were set aside in the morning: not from the day's fridge,
-   their cost on the day's food cost), the Lounge's waiter carries. $1,800 a head, wine included, on the summary's Lounge
-   line, apart from the Lounge's tabs. The first night: a short scene as it starts and when the last course is out, the
+   the best starter on the menu, the signature, the signature dessert (or the best dessert) — each with a glass. The
+   portions were made in the kitchen in the morning (not from the day's fridge, their cost on the day's food cost); at
+   night each course is plated behind the bar, one after the other (cnCourses: the next when the one before is eaten),
+   and set at the end of the bar's L — never through the kitchen's stations, so the dining room's evening goes on (the
+   first try cooked them there: 69 plates jammed the kitchen and the dining room lost twice its guests); the Lounge's
+   waiter carries them to the tables, the bartenders hand them over at the bar, each course's glass goes with its plate.
+   $1,800 a head, wine included, on the summary's Lounge line, apart from the Lounge's tabs. The first night: a short scene as it starts and when the last course is out, the
    restaurant held; later nights, a line in the room. */
 const CN_PRICE=1800;
 function cnSeats(){return lgSeatsAll()}
@@ -3747,7 +3750,7 @@ function cnNewsHTML(){const C=cnS(),n=C.next;if(!n||!loungeLv())return'';const M
  if(n.d===S.day)return`<div class="event kent quiet"><b>今晚｜主廚之夜 · ${cnSeats()} 席</b><span>包場：整個 Lounge 都是訂位的客人。三道：${M}，每道配一杯；每位 ${fmt(CN_PRICE)}（含酒）。</span></div>`;
  if(n.d===S.day+1)return`<div class="event kent quiet"><b>明晚｜主廚之夜 · ${cnSeats()} 席</b><span>整個 Lounge 包場。三道：${M}。</span></div>`;return''}
 function secChefNight(){if(!loungeLv())return'';const C=cnS();const why=cnWhyNot();
- const d='Jill 自己的一晚，包下整個 Lounge：所有位子（現在 '+cnSeats()+' 席）都是主廚之夜的客人，平常來 Lounge 的人那晚也是來參加主廚之夜。三道——前菜、招牌菜、招牌甜點（沒有招牌甜點就是最拿手的甜點）——每道配一杯。廚房照常做，Lounge 的服務生端；每位 '+fmt(CN_PRICE)+'（含酒）。';
+ const d='Jill 自己的一晚，包下整個 Lounge：所有位子（現在 '+cnSeats()+' 席）都是主廚之夜的客人，平常來 Lounge 的人那晚也是來參加主廚之夜。三道——前菜、招牌菜、招牌甜點（沒有招牌甜點就是最拿手的甜點）——每道配一杯，一道一道上。份量早上在廚房做好，晚上在吧台後面裝盤，不佔晚上的爐台；Lounge 的服務生和調酒師端。每位 '+fmt(CN_PRICE)+'（含酒）。';
  const act=C.next?`<span class="muted">已排：DAY ${C.next.d}（${(C.next.menu||[]).map(dishName).join('、')}）</span>${phase==='service'&&C.next.d===S.day?'':' <button class="btn sm" data-act="cnCancel">取消</button>'}`:why?`<span class="muted">${why}</span>`:(phase==='service'?'<span class="muted" style="font-size:12px">打烊後可以排</span>':'<button class="btn sm primary" data-act="cnPlan">排在明晚</button>');
  return`<div class="item cn-card"><img alt="" src="${iconURL('loungebar')}"><div class="nm">主廚之夜${C.n?` <span class="tier">辦過 ${C.n} 次</span>`:''}</div><div class="d">${d}</div><div class="act">${act}</div></div>`}
 /* the news before opening, on her nights */
