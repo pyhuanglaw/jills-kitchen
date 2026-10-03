@@ -1525,7 +1525,7 @@ function doorway(a,b){const kd={x:KD.x,y:FB-8};
  return null}
 function nextHop(a,b,e){if(a===b)return b;const P=hopTree(a,b,e);const pb=roomPathIn(b,P);const i=pb.indexOf(a);return i>=0?pb[i+1]:(P[a]||'main')}
 /* rc8: which way — the staff and Jill between the Lounge and the restaurant's rooms take the back corridor; to and from the street, and every guest, the street */
-function hopTree(a,b,e){if(e&&e.bk&&(a==='lounge'||b==='lounge')&&a!=='front'&&b!=='front')return ROOM_PARENT_BK;return ROOM_PARENT}   /* every door leads to the dining room, except the stairs: they come down in the side room */
+function hopTree(a,b,e){if(e&&e.bk&&(b==='lounge'||(a==='lounge'&&b!=='front')))return ROOM_PARENT_BK;return ROOM_PARENT}   /* rc8.3: the staff go into the Lounge by the back even from the shopfront (a waiter out there seating the queue); out to the street they may use its door */   /* every door leads to the dining room, except the stairs: they come down in the side room */
 /* one movement step for anything with x,y,room and a target tx,ty,troom; through doorways when needed. Returns true on arrival. */
 function stepTo(e,v){const tr=e.troom||e.room||'main';if(!e.room)e.room='main';let tx=e.tx,ty=e.ty;let hop=null;
  if(tr!==e.room){hop=nextHop(e.room,tr,e);const dw=doorway(e.room,hop);if(!dw){e.room=tr;return false}tx=dw[0][0];ty=dw[0][1]}

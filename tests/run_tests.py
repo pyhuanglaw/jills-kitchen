@@ -3787,6 +3787,9 @@ def stock_suggestion_follows_each_dish_and_counts_the_demand_it_missed(b, port, 
     # the demand that met an empty shelf is counted, shown, and blended into the history
     fill_fridge(g); start_day(g); install_bot(g); g.ev("window.__act=()=>{}")
     d = g.ev("(()=>{const ds=menuList().filter(d=>stationOk(d)&&DISH(d).cat==='main');const d=ds[0];S.stock[d]=0;return d})()")
+    # rc8.3: a party that came for it walks in — before, the check waited for one to come by chance, and on the rc8.3 gate's
+    # trajectory none of the first fourteen tables would have ordered it (all the same, 905 of 4000 rolled guests would)
+    if d == 'signature': g.ev("spawn({t:R.t,type:'gourmet',size:2,forSig:true})")
     got = False
     for i in range(80):
         g.ev("(()=>{for(const q of R.groups)if(q.table!=null&&q.state==='order')createTicket(q);for(let i=0;i<20;i++)__tick(1000/30)})()")

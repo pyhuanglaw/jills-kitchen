@@ -224,7 +224,7 @@ def a_lounge_guest_pays_once_per_phase_and_a_review_only_for_the_visit(b, port, 
     check(g.ev("__q.state") == 'leave' and g.ev("__q.id") == gid, 'and they leave as the same group')
     # waiting in the Lounge, then a table
     g.ev("R.groups.slice().forEach(q=>leaveGroup(q,'ok'));R.groups.length=0;for(const t of R.tables){t.group=null;t.dirty=false}")
-    g.ev("for(const t of R.tables)if(!t.lounge)t.group={id:9000+t.i,state:'eat',size:1,pat:1,looks:[],name:'x'};R.t=R.dur*.5;spawn({type:'office',size:1});window.__w=R.groups.find(q=>q.type==='office'&&q.state!=='leave');__w.state='queue';__w.landed=true;__w.room='main';__w.x=__w.tx;__w.y=__w.ty;__w.moving=false;__w.notice=0;for(const t of R.tables)t.claim=null;Math.random=()=>0.1")
+    g.ev("for(const t of R.tables)if(!t.lounge)t.group={id:9000+t.i,state:'eat',size:1,pat:1,looks:[],name:'x'};R.t=R.dur*.5;spawn({type:'office',size:1});window.__w=R.groups.find(q=>q.type==='office'&&q.state!=='leave');__w.state='queue';__w.landed=true;__w.room=__w.troom;__w.x=__w.tx;__w.y=__w.ty;__w.moving=false;__w.notice=0;for(const t of R.tables)t.claim=null;Math.random=()=>0.1")
     g.ev("updGroup(__w,.05)")
     check(g.ev("__w.lg&&__w.lg.why==='wait'&&__w.table!=null&&R.tables[__w.table].lounge"), f'no table: the office worker waits in the Lounge — {g.ev("JSON.stringify({st:__w.state,lg:__w.lg,t:__w.table})")}')
     wid = g.ev("__w.id"); g.ev("__w.state='order';createTicket(__w);__w.ticket.items.forEach(i=>i.st='served');__w.state='eat';__w.timer=99;__w.lg.served=1;__w.moving=false;__w.x=R.tables[__w.table].x;__w.y=R.tables[__w.table].y")
@@ -318,7 +318,10 @@ def lounge_i_content_bar_food_in_the_kitchen_wine_at_dinner_the_cast_by_name(b, 
     # tabs with bar food a day in nine days of ten — the feature is unchanged, only that one day moved.
     # rc8: seed 51 again — the cooks' rule and Jill's hosting hours shifted the stream, and seed 52's day became one with no
     # bar food (0). Seeds 51/53/54/55/56 gave 4/2/1/3/3 bites on 72834a3 and 5/1/3/2/3 on 252ff1c: the same spread.
-    g = Game(b, port, target, seed=51, manual=True, viewport={'width': 390, 'height': 844})
+    # rc8.3: seed 53 — the queue moved to the shopfront and the cats have their bowls, the stream moved again, and seed 51's
+    # day had none. Seeds 51–56: 0/3/6/3/2/1 bites on rc8.3, 3/3/3/5/6/3 on rc8.2 (b443ab5), Lounge tickets 57 and 55 —
+    # the same feature; 53 has bites on both.
+    g = Game(b, port, target, seed=53, manual=True, viewport={'width': 390, 'height': 844})
     load_fixture(g, 'player_day46.json'); g.click('[data-act=openFresh]'); g.page.wait_for_timeout(120)
     g.ev("S.money+=400000;factSet('lounge_project');buyLounge(1);hideReveal&&hideReveal()")
     check(g.ev("loungeLv()") == 1 and g.ev("S.unlocked.includes('bites')&&S.menu.includes('bites')&&S.unlocked.includes('cheeseplate')") and not g.ev("S.unlocked.includes('mushroom')"), 'Lounge I unlocked the bites (II keeps the mushrooms)')
