@@ -2531,7 +2531,7 @@ def v24_rc7_the_wine_and_monsieur_du(b, port, target):
     g.ev("__botUntil('R.t>=R.dur*.2',90000,1/30)")
     g.ev("(story().named[KEN]=story().named[KEN]||{v:0,dishes:{}}).seen=S.day;const d=storyDay();d.major=0;d.lp={};d.seen={};storyTick('close',{})")
     pg = ' / '.join(x['t'] for x in json.loads(g.ev("JSON.stringify((story().beatLines||{}).ken_samples||[])")))
-    check(g.ev("!!fact('ken_samples')") and '叫「晚餐之後」。' in pg and '這裡就是這樣開始的。吃完飯以後，還有地方可以坐。' in pg and g.ev("kenS().wineD") == g.ev("S.day") + 5, f'after closing: the samples, the name: {pg}')
+    check(g.ev("!!fact('ken_samples')") and '叫「晚餐之後」。' in pg and '吃完飯以後，還有地方可以坐。' in pg and '這裡就是這樣開始的' not in pg and g.ev("kenS().wineD") == g.ev("S.day") + 5, f'after closing: the samples, the name: {pg}')
     # the next day (one Ken scene a day). rc7.3 release: the day's major slot is a weighted draw among the beats due that
     # morning (wpick) — with this save the landlord's afternoon (up_inspect) is due too, and which one a seed draws first
     # moves whenever anything else draws a random number (rc7.3's cats do). ken_wine is class A with a floor of 2: passed
@@ -4109,3 +4109,212 @@ def v24_rc8_the_lounge_is_the_shop_next_door(b, port, target):
     g.ev("roomTap({x:LG.door.x,y:30},{preventDefault(){}})")
     check(g.ev("room") == 'front', 'and its door from inside goes back out onto the street')
     check(not g.errors, g.errors[:3]); g.close()
+
+
+# ---------------------------------------------------------------- rc8 Checkpoint B: the Madame Lin line, stories 1–6
+def _dlg_lines(g, cap=40):
+    """step through the dialogue on screen; each line as 「name：text」"""
+    out = []
+    for _ in range(cap):
+        if not g.ev("!!(typeof DLG!=='undefined'&&DLG)"): break
+        out.append(g.ev("(()=>{const n=document.querySelector('#dlg .dlg-name'),t=document.querySelector('#dlg .dlg-text');return(n&&n.textContent?n.textContent+'：':'')+(t?t.textContent:'')})()"))
+        g.ev("__tick(400);dlgNext()"); g.ev("for(let j=0;j<2;j++)__tick(1000/30)")
+    return out
+
+
+def _lin_play_days(g, days, stop=None):
+    """the lazy bot through whole days, the scenes unseen, the main loop's evening run at closing (the bot does not), the
+    player's two answers given (the tasting: food; next door: 接下隔壁); a dict of what each day did"""
+    log = []
+    for _ in range(days):
+        for _k in range(3):
+            if g.ev("phase") == 'summary': g.click('[data-act=toShop]'); g.page.wait_for_timeout(60)
+            if g.ev("phase") == 'shop': g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(100)
+        g.ev("for(let i=0;i<80&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}")
+        news = g.ev("(()=>{const h=linNewsHTML();return h?h.replace(/<[^>]+>/g,' ').replace(/\\s+/g,' ').trim():''})()")
+        g.ev("autoStock()")
+        if g.ev("phase") != 'service': start_day(g)
+        install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;window.__noScenes=true")
+        day = g.ev("S.day")
+        for _i in range(2500):
+            if g.ev("sub==='tasting'"): g.ev("tastingDir('food')")
+            if g.ev("sub==='loungeproj'"): g.ev("loungeGo('plan')")
+            g.ev("for(let i=0;i<20&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}")
+            n = g.ev("__botUntil(\"sub==='loungeproj'||sub==='tasting'||!!(typeof DLG!=='undefined'&&DLG)||(R.closing!=null&&!storyDay().eve)\",150,1/30)")
+            if g.ev("!!R&&R.closing!=null&&!storyDay().eve"): g.ev("lifeEnsureEvening()")
+            if g.ev("phase") != 'service' or not g.ev("!!R"): break
+            if n < 150 and not g.ev("paused||sub==='loungeproj'||sub==='tasting'||!!(typeof DLG!=='undefined'&&DLG)"): break
+        if g.ev("phase") == 'service': g.ev("__bot(60000,1/30)")
+        if g.ev("sub==='loungeproj'"): g.ev("loungeGo('plan')")
+        log.append(json.loads(g.ev("JSON.stringify({d:S.day,bar:barState(),din:S.lastSummary&&S.lastSummary.dinWine?S.lastSummary.dinWine.reduce((a,x)=>a+x.n,0):0,wineCost:S.lastSummary&&S.lastSummary.wine||0})")) | {'news': news})
+        if stop and g.ev(stop): break
+    return log
+
+
+@test
+def v24_rc8_madame_lin_next_door_on_day_one(b, port, target):
+    """The player's 2026-10-02 19:19 §3 《隔壁》: Day 1, a few minutes before opening, Madame Lin — the bar next door —
+    brings a small present: a brass door bell, hung on the shop's door. The scene holds the restaurant and is staged in
+    the hall (she and Jill a few steps in from the door); one line says who she is, no more; nobody explains the present;
+    nothing about Dylan. It never comes again, and never on a mature save."""
+    g = Game(b, port, target, seed=9101, manual=True, viewport={'width': 390, 'height': 844})
+    g.ev("__tick(500)"); g.click('[data-act=open]'); g.page.wait_for_timeout(150)
+    g.ev("window.__noScenes=false;window.__holds=true")
+    start_day(g); install_bot(g); g.ev("for(let i=0;i<3;i++)__tick(1000/30)")
+    st = json.loads(g.ev("JSON.stringify({day:S.day,held:!!(DLG&&DLG.hold),k:DLG&&DLG.sh&&DLG.sh.k,room,stage:STAGE&&STAGE.who.map(p=>p.id),jill:R.jill.room,j0:STAGE&&STAGE.jill0&&{x:Math.round(STAGE.jill0.x),y:Math.round(STAGE.jill0.y)}})"))
+    check(st['day'] == 1 and st['held'] and st['k'] == 'lin_hello' and st['room'] == 'main' and st['stage'] == ['lin'] and st['jill'] == 'main', f'Day 1, before the first guest: her scene holds the hall, she stands in it: {st}')
+    txt = ' / '.join(_dlg_lines(g))
+    for w in ['隔壁酒吧的 Madame Lin', 'Madame Lin：終於開了。', 'Jill：嗯。', 'Madame Lin：恭喜。', 'Jill：謝謝。', 'Jill：妳還帶東西來。', 'Madame Lin：開店哪有空手來的。', 'Jill：妳不是就在隔壁。', 'Madame Lin：隔壁更不能空手。', '黃銅的小門鈴']:
+        check(w in txt, f'「{w}」: {txt}')
+    check(not any(w in txt for w in ('Dylan', '老公', '先生', '代表', '象徵', '祝你')), f'nothing about Dylan; nobody explains the present: {txt}')
+    af = json.loads(g.ev("JSON.stringify({bell:propOn('linbell'),stage:STAGE,room,jill:{x:Math.round(R.jill.x),y:Math.round(R.jill.y),room:R.jill.room},barv:BARV,page:((story().beatLines||{}).lin_hello||[]).length,line:lineProgress(STORY_LINES.find(L=>L.k==='nextdoor')).done.map(b=>b.k)})"))
+    check(af['bell'] and af['stage'] is None and af['room'] == 'main' and {'x': af['jill']['x'], 'y': af['jill']['y']} == st['j0'] and af['barv'] is None, f'the bell is on the door; the stage cleared, Jill back where she was: {af} {st}')
+    check(af['page'] >= 11 and 'lin_hello' in af['line'], f'the story page 「隔壁」 keeps it, every line: {af}')
+    g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;window.__noScenes=true")
+    g.ev("__botUntil('phase!==\"service\"',200000,1/30)")
+    g.click('[data-act=toShop]'); g.page.wait_for_timeout(60); g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(100)
+    g.ev("autoStock()"); start_day(g)
+    check(g.ev("S.day") == 2 and g.ev("evState('lin_hello').n") == 1 and not g.ev("!!(DLG&&DLG.sh&&DLG.sh.k==='lin_hello')"), 'once')
+    check(not g.errors, g.errors[:3]); g.close()
+    g = Game(b, port, target, seed=9102, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day74_1508.json'); to_service(g)
+    check(not g.ev("!!fact('lin_hello')") and g.ev("evState('lin_hello').n") == 0, 'a mature save: no Day 1 scene on Day 74')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc8_the_bar_next_door_from_kens_question_to_jills_decision(b, port, target):
+    """§4–§12 on the player's Day 52 save (Ken has asked, no tasting yet, Dylan not revealed), played day by day (the
+    scenes unseen; food; 接下隔壁): the tasting, and as Ken pays Jill keeps the pairing wines (「想喝酒，隔壁就有。」) —
+    poured with dinner from then on, before any Lounge (at the pass, by the floor; in the wine cost and the summary);
+    meanwhile Madame Lin's bar is open next door and guests walk over after dinner; a week or more of that, then
+    「我做到月底。」 — her last night twelve days on, in the news before opening; Ken: 「不然吃完去哪？」; that night or later,
+    in their room, 「……我有點想接。」 — before Dylan's reveal he is 「先生」, with no name; the book two days or more after;
+    the viewing the next morning or later, one scene (the place, the kitchen behind it, Evan; nobody mentions Dylan);
+    Jill decides that evening; Madame Lin's last night closes the bar. Nothing reveals Dylan."""
+    g = Game(b, port, target, seed=8200, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day52.json')
+    check(g.ev("!!fact('ken_wine_q')") and not g.ev("!!fact('tasting_night')") and g.ev("S.dylan.stage") == 2 and g.ev("barState()") == 'lin', 'the save: Ken has asked; no tasting yet; Dylan not revealed; her bar open')
+    g.ev("window.__walked=[];const __so=sendOut;sendOut=function(q){if(q&&q.toBar&&barState()==='lin'&&!q.__w){q.__w=1;__walked.push({d:S.day,n:namedId(q)||q.type})}return __so.apply(this,arguments)}")
+    g.ev("window.__din=[];const __sv=serveItems;serveItems=function(q,list){for(const c of list||[]){const it=c.it;if(it&&DISH(it.d)&&DISH(it.d).wine){const m=(S.crew||[]).find(m=>{const w=R.cw&&R.cw[m.id];return w&&w.carry&&w.carry.includes(it)});__din.push({d:S.day,dinw:!!it.dinw,lbar:!!it.lbar,by:m?m.role:'jill',room:(R.tables[q.table]||{}).room||'main'})}}return __sv.apply(this,arguments)}")
+    log = _lin_play_days(g, 34, stop="!!fact('lin_closed')&&!!fact('lounge_project')")
+    F = json.loads(g.ev("JSON.stringify(Object.fromEntries(['tasting_night','pairing_wine','lin_retiring','ken_where','jd_want','dylan_book','lin_viewing','lounge_project','lin_take','lin_closed'].map(k=>[k,fact(k)?fact(k).d:null])))"))
+    E = json.loads(g.ev("JSON.stringify(Object.fromEntries(['ken_tasting','pairing_start','lin_retire','ken_where','jd_want','dylan_book','lin_viewing','lin_decide','lin_last','lounge_reveal'].map(k=>[k,evState(k).d||null])))"))
+    check(all(F[k] for k in F) and not E['lounge_reveal'], f'every step happened, and no after-close Lounge idea: {F} {E}')
+    check(F['tasting_night'] == F['pairing_wine'] == E['pairing_start'], f'the wines kept the night of the tasting: {F} {E}')
+    check(F['lin_retiring'] - F['pairing_wine'] >= 7, f'a week or more of that life before 「我做到月底」: {F}')
+    check(F['lin_retiring'] <= F['ken_where'] <= F['jd_want'] and F['jd_want'] > F['lin_retiring'], f'Ken minds it after she says it; Jill tells Dylan after: {F}')
+    check(F['dylan_book'] - F['jd_want'] >= 2 and F['lin_viewing'] > F['dylan_book'] and F['lounge_project'] == F['lin_take'] >= F['lin_viewing'], f'the book days after she told him; the viewing after the book; then her decision: {F}')
+    check(F['lin_closed'] == F['lin_retiring'] + 12 and g.ev("linLast()") == F['lin_closed'], f'「月底」: twelve days on, her last night: {F}')
+    news = [x for x in log if x['news']]
+    check(any('最後一晚' in x['news'] and x['d'] == F['lin_closed'] for x in news) and all(x['d'] >= F['lin_closed'] - 3 for x in news), f'the news before opening counts down her last nights: {news}')
+    din = json.loads(g.ev("JSON.stringify(__din)"))
+    before = [x for x in din if x['d'] < F['pairing_wine']]; after = [x for x in din if x['d'] > F['pairing_wine']]
+    check(not before and len(after) >= 20 and all(x['dinw'] and not x['lbar'] for x in after) and any(x['by'] == 'waiter' for x in after), f'no wine before the tasting; after it, pairing glasses poured at the pass and carried by the floor: {len(before)} / {len(after)} {after[:3]}')
+    check(all(x['wineCost'] > 0 for x in log if x['d'] > F['pairing_wine'] and x['din'] > 0), 'each glass is in the day\'s wine cost')
+    walked = json.loads(g.ev("JSON.stringify(__walked)"))
+    check(len([w for w in walked if w['d'] < F['lin_closed']]) >= 30 and any(w['n'] == '品酒師 Ken' for w in walked) and not [w for w in walked if w['d'] > F['lin_closed']], f'while her bar is open, guests walk over after dinner (Ken too); after her last night, nobody: {len(walked)}')
+    check(all(x['bar'] == 'lin' for x in log if x['d'] < F['lin_closed']) and log[-1]['bar'] == 'closed', f'the bar stays open to her last night, even after Jill decides: {[(x["d"], x["bar"]) for x in log[-6:]]}')
+    W = json.loads(g.ev("JSON.stringify(Object.fromEntries(['pairing_start','lin_retire','ken_where','jd_want','dylan_book','lin_viewing'].map(k=>[k,((story().beatLines||{})[k]||[]).map(x=>(x.w?x.w+'：':'')+x.t)])))"))
+    want = {'pairing_start': ['Jill：今晚那幾支，可以再幫我進嗎？', '品酒師 Ken：妳要賣？', 'Jill：配菜的。', 'Jill：想喝酒，隔壁就有。'],
+            'lin_retire': ['Madame Lin：我做到月底。', 'Jill：隔壁？', 'Madame Lin：退休。', 'Jill：有人接嗎？', 'Madame Lin：還沒有。'],
+            'ken_where': ['品酒師 Ken：她真的不做了？', '品酒師 Ken：最好有人接。', 'Jill：你這麼擔心？', '品酒師 Ken：不然吃完去哪？', 'Jill：回家。'],
+            'jd_want': ['Jill：Madame Lin 要退休了。', '先生：嗯。', 'Jill：隔壁還沒有人接。', 'Jill：……我有點想接。', '先生：酒吧？', '先生：妳想做？', 'Jill：還不知道。', '先生：那就先看看。'],
+            'dylan_book': ['Jill：這你的？', '先生：嗯。', 'Jill：我不是說還不知道嗎？', '先生：我知道。', 'Jill：那你買這個幹嘛？', '先生：看看。'],
+            'lin_viewing': ['Jill：妳那邊有人接了嗎？', 'Madame Lin：還沒。', 'Jill：我可以看看嗎？', 'Madame Lin：走啊。', 'Jill：兩邊一起顧，應該滿麻煩的。', 'Madame Lin：妳跟我不一樣。', 'Madame Lin：妳廚房就在後面。', 'Madame Lin：這邊不用再弄一個。', 'Jill：還是多一間店。', 'Madame Lin：那當然。', 'Madame Lin：還有他。', 'Evan：……什麼叫還有我。', 'Madame Lin：你不是說想繼續做？', 'Evan：是。', 'Jill：你想留下？', 'Evan：如果妳接的話。', 'Jill：我還沒決定。', 'Evan：我知道。', 'Jill：如果我改很多呢？', 'Evan：妳的店，妳改啊。', 'Jill：那你還留下？', 'Evan：有吧台就行。']}
+    for k, ws in want.items():
+        for w in ws:
+            check(w in W[k], f'{k}: 「{w}」 in {W[k]}')
+    every = ' '.join(t for k in W for t in W[k])
+    check('Dylan' not in every and '老公' not in every and g.ev("S.dylan.stage") == 2, 'before his reveal nothing says Dylan, nor 老公 — and nothing revealed him')
+    check(not any(w in every for w in ('妳一定可以', '我相信妳', '新的開始', '承載', '像家', '夢想', '我支持妳', '好機會', '妳應該接', '把隔壁買下來', '生病', '撐不下去', '時代變了')), 'none of the words the brief rules out')
+    page = json.loads(g.ev("JSON.stringify(lineProgress(STORY_LINES.find(L=>L.k==='nextdoor')).done.map(b=>b.k))"))
+    check(all(k in page for k in ('ken_wine_q', 'pairing_start', 'lin_retire', 'ken_where', 'jd_want', 'dylan_book', 'lin_viewing', 'lin_take', 'lin_closed')), f'the story page 「隔壁」: {page}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc8_the_bar_next_door_scenes_are_staged_where_they_happen(b, port, target):
+    """§9–§11 as a player sees them (the Day 52 save, the steps before each set as facts): 《有點想接》 and the book play
+    in Jill and Dylan's room after closing — Jill on the sofa, Dylan at his desk (his headphones off when she says it),
+    the bar design book on his exam books; before his reveal the panel names him 「先生」 with no face, after it
+    「Dylan」. 《看看》 begins on the street at her door, goes inside her bar (the tab reads 「隔壁」; Evan behind the
+    counter, her by the back door, then at her records) and ends back in the hall with nothing left behind."""
+    g = Game(b, port, target, seed=8301, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day52.json')
+    g.ev("const st=story();for(const k of ['tasting_night','pairing_wine'])st.facts[k]={d:S.day-12,n:1,l:S.day-12};st.facts.lin_retiring={d:S.day-3,n:1,l:S.day-3};linS().last=S.day+9;st.facts.ken_where={d:S.day-1,n:1,l:S.day-1};for(const k of ['pairing_start','lin_retire','ken_where'])evState(k).n=1")
+    to_service(g); g.ev("window.__noScenes=false;window.__holds=true;R.sched=R.sched.filter(o=>o.reg!=='dylan')")
+    g.ev("__botUntil('R.closing!=null',200000,1/30)"); g.ev("lifeEnsureEvening()"); g.ev("for(let i=0;i<3;i++)__tick(1000/30)")
+    for _ in range(40):   # another story's scene may come first tonight (its panel waits its turn)
+        if g.ev("!!(DLG&&DLG.sh&&DLG.sh.k==='jd_want')") or not g.ev("!!DLG"): break
+        g.ev("__tick(400);dlgNext()"); g.ev("__tick(1000/30)")
+    s1 = json.loads(g.ev("JSON.stringify({k:DLG&&DLG.sh&&DLG.sh.k,room,on:LIFE.jill.on,jroom:LIFE.jill.room,desk:!!homeDylanAtDesk(),off:!!HOME_DY.off})"))
+    check(s1['k'] == 'jd_want' and s1['room'] == 'home' and s1['on'] and s1['jroom'] == 'home' and s1['desk'] and not s1['off'], f'after closing, their room: Jill on the sofa, Dylan at his desk with his headphones on: {s1}')
+    seen = []
+    for _ in range(20):
+        if not g.ev("!!DLG"): break
+        t = g.ev("(document.querySelector('#dlg .dlg-text')||{}).textContent||''"); n = g.ev("(document.querySelector('#dlg .dlg-name')||{}).textContent||''")
+        face = g.ev("(()=>{const L=DLG&&DLG.lines[DLG.i];return L?(portraitOf(L.who||'',L.tone)?1:0):0})()")
+        seen.append((n, t, face, g.ev("!!HOME_DY.off")))
+        g.ev("__tick(400);dlgNext()"); g.ev("for(let j=0;j<2;j++)__tick(1000/30)")
+    his = [x for x in seen if x[0] == '先生']
+    check(len(his) == 5 and all(x[2] == 0 for x in his), f'before the reveal: 「先生」, five lines, no face: {seen}')
+    check([x for x in seen if '停下來' in x[1]][0][3], f'his headphones come off when she says it: {seen}')
+    g.ev("const st=story();st.facts.jd_want.d=S.day-2;st.facts.jd_want.l=S.day-2")
+    check(g.ev("linBookOn()"), 'two days on, the book is on his desk')
+    g.ev("window.__books=0;const __db=drawBarBook;drawBarBook=function(){__books++;return __db.apply(this,arguments)};setRoom('home');for(let i=0;i<3;i++)__tick(1000/30)")
+    check(g.ev("__books") > 0, 'drawn on the desk')
+    check(not g.errors, g.errors[:3]); g.close()
+    # after his reveal: Dylan by name
+    g = Game(b, port, target, seed=8302, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day52.json')
+    g.ev("S.dylan.stage=3;S.dylan.reveal=S.day-6;const st=story();for(const k of ['tasting_night','pairing_wine'])st.facts[k]={d:S.day-12,n:1,l:S.day-12};st.facts.lin_retiring={d:S.day-4,n:1,l:S.day-4};linS().last=S.day+8;st.facts.ken_where={d:S.day-3,n:1,l:S.day-3};st.facts.jd_want={d:S.day-3,n:1,l:S.day-3};for(const k of ['pairing_start','lin_retire','ken_where','jd_want'])evState(k).n=1")
+    to_service(g); g.ev("window.__noScenes=false;window.__holds=true;R.sched=R.sched.filter(o=>o.reg!=='dylan')")
+    g.ev("__botUntil('R.closing!=null',200000,1/30)"); g.ev("lifeEnsureEvening()"); g.ev("for(let i=0;i<3;i++)__tick(1000/30)")
+    for _ in range(40):
+        if g.ev("!!(DLG&&DLG.sh&&DLG.sh.k==='dylan_book')") or not g.ev("!!DLG"): break
+        g.ev("__tick(400);dlgNext()"); g.ev("__tick(1000/30)")
+    check(g.ev("DLG&&DLG.sh&&DLG.sh.k") == 'dylan_book' and g.ev("room") == 'home', 'the book, in the room')
+    lines = _dlg_lines(g)
+    check('Dylan：看看。' in lines and '先生：看看。' not in lines, f'after the reveal: Dylan: {lines}')
+    check(not g.errors, g.errors[:3]); g.close()
+    # the viewing: the street, her bar, Evan; back to the hall
+    g = Game(b, port, target, seed=8303, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day52.json')
+    g.ev("const st=story();for(const k of ['tasting_night','pairing_wine'])st.facts[k]={d:S.day-12,n:1,l:S.day-12};st.facts.lin_retiring={d:S.day-6,n:1,l:S.day-6};linS().last=S.day+6;for(const k of ['ken_where','jd_want'])st.facts[k]={d:S.day-4,n:1,l:S.day-4};st.facts.dylan_book={d:S.day-1,n:1,l:S.day-1};for(const k of ['pairing_start','lin_retire','ken_where','jd_want','dylan_book'])evState(k).n=1")
+    if g.ev("phase") == 'shop': g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(200)
+    g.ev("autoStock();window.__noScenes=false;window.__holds=true"); start_day(g); install_bot(g); g.ev("for(let i=0;i<3;i++)__tick(1000/30)")
+    v0 = json.loads(g.ev("JSON.stringify({k:DLG&&DLG.sh&&DLG.sh.k,room,stage:STAGE&&STAGE.room,lin:STAGE&&STAGE.who.find(p=>p.id==='lin'),jill:R.jill.room,t:Math.round(R.t)})"))
+    check(v0['k'] == 'lin_viewing' and v0['room'] == 'front' and v0['stage'] == 'front' and v0['jill'] == 'front' and v0['t'] == 0 and abs(v0['lin']['x'] - g.ev("FR.ldoor.x")) < 30, f'before opening, on the street at her door: {v0}')
+    steps = []
+    for _ in range(40):
+        if not g.ev("!!DLG"): break
+        steps.append(json.loads(g.ev("JSON.stringify({t:(document.querySelector('#dlg .dlg-text')||{}).textContent,room,tab:roomTabName('lounge'),barv:BARV,evan:STAGE&&!STAGE.who.find(p=>p.id==='evan').hide,lin:STAGE&&STAGE.who.find(p=>p.id==='lin'),evanY:STAGE&&STAGE.who.find(p=>p.id==='evan').y})")))
+        g.ev("__tick(400);dlgNext()"); g.ev("for(let j=0;j<2;j++)__tick(1000/30)")
+    inside = [x for x in steps if x['room'] == 'lounge']
+    check(inside and all(x['barv'] == 1 and x['tab'] == '隔壁' and x['evan'] and x['evanY'] < g.ev("LG.bar.y") for x in inside), f'inside her bar: the tab 「隔壁」, Evan behind the counter: {inside[:2]}')
+    kit = [x for x in steps if x['t'] and '妳廚房就在後面' in x['t']][0]
+    check(abs(kit['lin']['x'] - g.ev("LG.bk.x")) < 40, f'she says it by the back door: {kit}')
+    rec = [x for x in steps if x['t'] and '你想留下' in x['t']][0]
+    check(abs(rec['lin']['x'] - g.ev("LIN_RECORDS.x")) < 40, f'she has gone to her records; the two of them talk: {rec}')
+    end = json.loads(g.ev("JSON.stringify({room,barv:BARV,stage:STAGE,tab:roomsOpen().map(roomTabName),jill:R.jill.room})"))
+    check(end['room'] == 'main' and end['barv'] is None and end['stage'] is None and '隔壁' not in end['tab'] and end['jill'] == 'main', f'and back to the hall, nothing left behind: {end}')
+    check(not any('Dylan' in (x['t'] or '') or '老公' in (x['t'] or '') for x in steps), 'Evan has not met Dylan; nobody mentions him')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc8_mature_saves_hear_nothing_new_from_next_door(b, port, target):
+    """Saves past the Lounge's opening (Day 61, Day 74): a day plays with none of the Madame Lin line's new scenes
+    (Checkpoint C marks their history), the bar next door is The Lounge, nobody walks 「next door」 to it as to her bar,
+    and dinner's glasses are the Lounge's (poured by the bartender), as before."""
+    for name in ('player_day61.json', 'player_day74_1508.json'):
+        g = Game(b, port, target, seed=8401, manual=True, viewport={'width': 390, 'height': 844})
+        load_save(g, name)
+        g.ev("window.__noScenes=true")
+        to_service(g)
+        g.ev("window.__dw=0;const __sv=serveItems;serveItems=function(q,list){for(const c of list||[])if(c.it&&c.it.dinw)__dw++;return __sv.apply(this,arguments)}")
+        g.ev("__botUntil('phase!==\"service\"',200000,1/30)")
+        new = json.loads(g.ev("JSON.stringify(['lin_hello','pairing_start','lin_retire','ken_where','jd_want','dylan_book','lin_viewing','lin_decide','lin_last'].filter(k=>evState(k).n))"))
+        check(not new and g.ev("barState()") == 'lounge' and g.ev("__dw") == 0, f'{name}: nothing new fires; The Lounge; no pass-poured glasses: {new}')
+        check(not g.errors, g.errors[:3]); g.close()

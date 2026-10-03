@@ -1,0 +1,29 @@
+player_day52.json from Day 52 (level 5, Dylan stage 2, Ken visits 3, Madame Lin visits 3), seeds 8200+
+Day  53  bar lin             visits Ken@49%                next door 3       glasses   0  facts ·  events ·
+Day  54  bar lin             visits Ken@11%,Madame Lin@30% next door 8       glasses   0  facts ken_pairing lounge_idea  events ·
+Day  55  bar lin             visits Ken@30%,Madame Lin@53% next door 6 (Ken) glasses   4  facts tasting_night pairing_wine  events ken_tasting tasting_start pairing_start
+Day  56  bar lin             visits Ken@22%,Madame Lin@28% next door 4       glasses   8  facts ken_pairing  events ·
+Day  57  bar lin             visits Madame Lin@55%,Ken@56% next door 5       glasses  10  facts lounge_idea  events ·
+Day  58  bar lin             visits Ken@29%,Madame Lin@44% next door 4       glasses   5  facts ·  events ·
+Day  59  bar lin             visits Madame Lin@50%,Ken@55% next door 8 (Ken) glasses  13  facts ·  events ·
+Day  60  bar lin             visits Ken@17%,Madame Lin@65% next door 5       glasses  14  facts lounge_idea  events ·
+Day  61  bar lin             visits -                      next door 0       glasses   4  facts ·  events ·
+Day  62  bar lin    last 74  visits Ken@11%,Madame Lin@40% next door 4       glasses  17  facts lin_retiring  events lin_retire
+Day  63  bar lin    last 74  visits Madame Lin@42%,Ken@62% next door 4       glasses  11  facts ken_where jd_want  events ken_where jd_want
+Day  64  bar lin    last 74  visits Madame Lin@31%,Ken@69% next door 5 (Ken) glasses  12  facts ·  events ·
+Day  65  bar lin    last 74  visits Ken@13%,Madame Lin@48% next door 7       glasses  23  facts ·  events ·
+Day  66  bar lin    last 74  visits Madame Lin@20%,Ken@43% next door 8 (Ken) glasses  13  facts dylan_book  events dylan_book
+Day  67  bar lin    last 74  visits Madame Lin@43%,Ken@44% next door 8       glasses  10  facts lin_viewing lounge_project lin_take  events lin_viewing lin_decide
+Day  68  bar lin    last 74  visits Ken@3%,Madame Lin@49%  next door 6       glasses  12  facts ·  events ·
+Day  69  bar lin    last 74  visits Ken@21%,Madame Lin@34% next door 5       glasses  16  facts ·  events ·
+Day  70  bar lin    last 74  visits Ken@18%                next door 7       glasses  14  facts ·  events ·
+Day  71  bar lin    last 74  visits Madame Lin@51%         next door 4       glasses   9  facts ·  events ·  news: 隔壁｜Madame Lin 的店再開 3 晚 她做到月底。
+Day  72  bar lin    last 74  visits Ken@16%,Madame Lin@51% next door 6       glasses   6  facts ·  events ·  news: 隔壁｜Madame Lin 的店再開 2 晚 她做到月底。
+Day  73  bar lin    last 74  visits Madame Lin@74%         next door 3       glasses  11  facts ·  events ·  news: 隔壁｜Madame Lin 的店再開 1 晚 她做到月底。
+Day  74  bar closed last 74  visits Ken@37%,Madame Lin@90% next door 9       glasses  15  facts lin_closed  events lin_last  news: 今晚｜隔壁 Madame Lin 的店，最後一晚 明天起，隔壁的門會關著。
+
+the day of each fact: {'lin_hello': None, 'ken_wine_q': 51, 'ken_pairing': 52, 'lounge_idea': 51, 'tasting_night': 55, 'pairing_wine': 55, 'lin_retiring': 62, 'ken_where': 63, 'jd_want': 63, 'dylan_book': 66, 'lin_viewing': 67, 'lounge_project': 67, 'lin_take': 67, 'lin_closed': 74, 'lounge_built_1': None}
+the day of each event: {'ken_tasting': 55, 'tasting_start': 55, 'pairing_start': 55, 'lin_retire': 62, 'ken_where': 63, 'jd_want': 63, 'dylan_book': 66, 'lin_viewing': 67, 'lin_decide': 67, 'lin_last': 74}
+words kept: {"lin_retire":9,"ken_where":9,"jd_want":12,"dylan_book":7,"lin_viewing":12,"pairing_start":6}
+page errors: []
+22 days in 54s

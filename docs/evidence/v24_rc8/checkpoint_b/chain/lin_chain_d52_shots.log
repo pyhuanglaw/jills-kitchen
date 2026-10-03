@@ -1,0 +1,49 @@
+player_day52.json from Day 52 (level 5, Dylan stage 2, Ken visits 3, Madame Lin visits 3), seeds 8200+
+Day  53  bar lin             visits Ken@48%                next door 4       glasses   0  facts ·  events ·
+Day  54  bar lin             visits Madame Lin@66%,Ken@68% next door 10       glasses   0  facts ken_pairing lounge_idea  events ·
+   shot pairing_start_1_day55.png  「今晚那幾支，可以再幫我進嗎？」
+   shot pairing_start_2_day55.png  「想喝酒，隔壁就有。」
+Day  55  bar lin             visits Madame Lin@16%,Ken@22% next door 3       glasses   5  facts tasting_night pairing_wine  events ken_tasting tasting_start pairing_start
+Day  56  bar lin             visits Madame Lin@30%,Ken@40% next door 1       glasses   6  facts ken_pairing  events ·
+Day  57  bar lin             visits Madame Lin@16%,Ken@51% next door 8 (Ken) glasses   9  facts lounge_idea  events ·
+Day  58  bar lin             visits Ken@35%,Madame Lin@53% next door 3       glasses  10  facts ·  events ·
+Day  59  bar lin             visits Ken@66%                next door 5 (Ken) glasses  10  facts ·  events ·
+Day  60  bar lin             visits Ken@17%,Madame Lin@27% next door 6       glasses   9  facts lounge_idea  events ·
+Day  61  bar lin             visits Ken@91%                next door 2 (Ken) glasses   9  facts ·  events ·
+   shot lin_retire_1_day62.png  「我做到月底。」
+   shot lin_retire_2_day62.png  「還沒有。」
+Day  62  bar lin    last 74  visits Ken@22%,Madame Lin@38% next door 7 (Ken) glasses   9  facts lin_retiring  events lin_retire
+Day  63  bar lin    last 74  visits Madame Lin@23%,Ken@24% next door 5       glasses  10  facts ·  events ·
+   shot ken_where_1_day64.png  「她真的不做了？」
+   shot ken_where_2_day64.png  「不然吃完去哪？」
+Day  64  bar lin    last 74  visits Ken@11%,Madame Lin@53% next door 1       glasses  13  facts ken_where  events ken_where
+Day  65  bar lin    last 74  visits Ken@5%,Madame Lin@57%  next door 8       glasses   9  facts ·  events ·
+Day  66  bar lin    last 74  visits Madame Lin@13%,Ken@50% next door 9 (Ken) glasses  15  facts ·  events ·
+Day  67  bar lin    last 74  visits Madame Lin@33%,Ken@52% next door 2       glasses  12  facts ·  events ·
+   shot jd_want_1_day68.png  「Madame Lin 要退休了。」
+   shot jd_want_2_day68.png  「……我有點想接。」
+   shot jd_want_3_day68.png  「那就先看看。」
+Day  68  bar lin    last 74  visits Ken@46%,Madame Lin@84% next door 4       glasses  17  facts jd_want  events jd_want
+Day  69  bar lin    last 74  visits Ken@31%,Madame Lin@95% next door 7       glasses  17  facts ·  events ·
+Day  70  bar lin    last 74  visits Ken@52%                next door 7 (Ken) glasses  12  facts ·  events ·
+Day  71  bar lin    last 74  visits Madame Lin@3%          next door 5       glasses  11  facts ·  events ·  news: 隔壁｜Madame Lin 的店再開 3 晚 她做到月底。
+   shot dylan_book_1_day72.png  「打烊以後，Jill 回到房間。書桌上，考試的書和講義中間，多了一本很大的書：深色」
+   shot dylan_book_2_day72.png  「這你的？」
+   shot dylan_book_3_day72.png  「看看。」
+Day  72  bar lin    last 74  visits Madame Lin@3%,Ken@50%  next door 8       glasses  14  facts dylan_book  events dylan_book  news: 隔壁｜Madame Lin 的店再開 2 晚 她做到月底。
+   shot lin_viewing_1_day73.png  「妳那邊有人接了嗎？」
+   shot lin_viewing_2_day73.png  「Madame Lin 的酒吧。磨石子地，老吧台擦得發亮，凳子是紅的。Evan 在」
+   shot lin_viewing_3_day73.png  「Madame Lin 帶她繞過吧台，推開後場的門。走廊的另一頭，就是 Jill 」
+   shot lin_viewing_4_day73.png  「妳廚房就在後面。」
+   shot lin_viewing_5_day73.png  「還有他。」
+   shot lin_viewing_6_day73.png  「你想留下？」
+   shot lin_viewing_7_day73.png  「有吧台就行。」
+   shot lin_decide_1_day73.png
+Day  73  bar lin    last 74  visits Ken@45%                next door 2       glasses   8  facts lin_viewing lounge_project lin_take  events lin_viewing lin_decide  news: 隔壁｜Madame Lin 的店再開 1 晚 她做到月底。
+Day  74  bar closed last 74  visits Ken@42%                next door 15 (Ken) glasses  11  facts lin_closed  events lin_last  news: 今晚｜隔壁 Madame Lin 的店，最後一晚 明天起，隔壁的門會關著。
+
+the day of each fact: {'lin_hello': None, 'ken_wine_q': 51, 'ken_pairing': 52, 'lounge_idea': 51, 'tasting_night': 55, 'pairing_wine': 55, 'lin_retiring': 62, 'ken_where': 64, 'jd_want': 68, 'dylan_book': 72, 'lin_viewing': 73, 'lounge_project': 73, 'lin_take': 73, 'lin_closed': 74, 'lounge_built_1': None}
+the day of each event: {'ken_tasting': 55, 'tasting_start': 55, 'pairing_start': 55, 'lin_retire': 62, 'ken_where': 64, 'jd_want': 68, 'dylan_book': 72, 'lin_viewing': 73, 'lin_decide': 73, 'lin_last': 74}
+words kept: {"lin_retire":9,"ken_where":9,"jd_want":13,"dylan_book":7,"lin_viewing":28,"pairing_start":6}
+page errors: []
+22 days in 81s

@@ -1,0 +1,6 @@
+jd_want: room home, held True, dylan at desk True, jill {"on":true,"pos":"R","room":"home","x":174,"y":134}, book False
+jd_want lines: 秀琴阿姨：妳怎麼來了？ / 怡君：吃飯啊。 / 秀琴阿姨：附近那麼多間。 / 怡君：不能吃妳工作的喔？ / 打烊以後，Jill 回到房間，在沙發坐下。她先生在書桌前，耳機裡是課。 / Jill：Madame Lin 要退休了。 / 先生：嗯。 / Jill：隔壁還沒有人接。 / 先生：嗯。 / 過了一會兒。 / Jill：……我有點想接。 / 他停下來，拿下耳機，轉過頭。 / 先生：酒吧？ / Jill：嗯。 / 先生：妳想做？ / Jill：還不知道。 / 先生：那就先看看。
+jd_want errors: []
+dylan_book: room home, held True, dylan at desk True, jill {"on":true,"pos":"R","room":"home","x":174,"y":134}, book True
+dylan_book lines: 秀琴阿姨：妳怎麼來了？ / 怡君：吃飯啊。 / 秀琴阿姨：附近那麼多間。 / 怡君：不能吃妳工作的喔？ / 打烊以後，Jill 回到房間。書桌上，考試的書和講義中間，多了一本很大的書：深色的封面，上面是一間小酒吧的吧台。跟旁邊那些書完全不像。 / Jill：這你的？ / 先生：嗯。 / Jill：我不是說還不知道嗎？ / 先生：我知道。 / Jill：那你買這個幹嘛？ / 先生：看看。
+dylan_book errors: []

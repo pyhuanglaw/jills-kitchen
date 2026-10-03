@@ -1,0 +1,4 @@
+day 1, phase service, room main, held True, fact True
+lines: ：開店前幾分鐘，門被推開。不是客人——是隔壁酒吧的 Madame Lin。 / Madame Lin：終於開了。 / Jill：嗯。 / Madame Lin：恭喜。 / Jill：謝謝。 / ：Madame Lin 把一個小紙盒遞給她。 / Jill：妳還帶東西來。 / Madame Lin：開店哪有空手來的。 / Jill：妳不是就在隔壁。 / Madame Lin：隔壁更不能空手。 / ：紙盒裡是一個黃銅的小門鈴。Jill 把它掛在門上。 / ：隔壁 Madame Lin 送的門鈴，掛在店門上。
+after: bell True, STAGE True, room main, jill {"x":200,"y":568,"room":"main"}
+day 1 ends: phase summary, errors []
