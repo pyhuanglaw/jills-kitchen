@@ -78,11 +78,12 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .tk-items{flex:none;display:flex;gap:4px;margin-top:1px}
 .it{width:36px;height:36px;border-radius:9px;border:1.5px dashed rgba(46,32,25,.4);background:#fff;padding:0;position:relative;display:block}
 .it img{width:100%;height:100%;display:block;border-radius:7px}
-.it.cooking{border:2px solid var(--brass)}
+.it.cooking,.it.plate{border:2px solid var(--brass)}
 .it.cooking::after{content:"";position:absolute;inset:-5px;border-radius:12px;border:2px solid transparent;border-top-color:var(--brass);animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .it.ready{border:2px solid var(--sage);box-shadow:0 0 0 3px rgba(94,143,78,.25)}
 .it.served{opacity:.4;border:1.5px solid rgba(46,32,25,.2)}
+.it.later,.it.pour,.it.round{opacity:.55;border:1.5px dashed rgba(46,32,25,.28);filter:grayscale(.5)}   /* rc7.6: a chef's night course still to come; its glass, poured when its plate is up; a glass of Ken's next round */
 .it.order{border:2px dashed #C99A45;opacity:.8}
 .it .dl{position:absolute;left:-4px;right:-4px;bottom:-5px;font-size:8px;font-weight:800;background:#C99A45;color:#fff;border-radius:5px;padding:1px 0;text-align:center}
 .stars{color:#C99A45;font-size:11px;letter-spacing:1px;margin-left:2px}
