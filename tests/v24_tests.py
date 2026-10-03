@@ -2365,7 +2365,8 @@ def v24_rc7_a_line_finds_its_table(b, port, target):
     line = '#plines .pline' if g.page.query_selector('#plines .pline') else '#toasts .toast.who'
     g.page.click(line); g.ev("__tick(1000/30)")
     st = mark()
-    check(st['room'] == tg['room'] and st['m'][-1]['label'] == f"T{tg['t']+1}", f"{who}'s 「久等了。」 finds the table she said it at ({tg}): {st}")
+    # rc8: any of the marks — the previous step's mark (Leo's) can still be fading, after the new one
+    check(st['room'] == tg['room'] and any(x['label'] == f"T{tg['t']+1}" and x['room'] == tg['room'] for x in st['m']), f"{who}'s 「久等了。」 finds the table she said it at ({tg}): {st}")
     # Jill's line to a guest finds the guest, at their table
     g.ev("__botUntil('__q.state!==\\'toTable\\'',20000,1/30)")
     g.ev(f"setRoom('kitchen');{clear};jillSay('嗯，今天比較忙。',{{with:'leo'}})")

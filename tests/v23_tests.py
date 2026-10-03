@@ -316,7 +316,9 @@ def lounge_i_content_bar_food_in_the_kitchen_wine_at_dinner_the_cast_by_name(b, 
     # seed 52 (was 51): the two-cats-on-one-cushion fix shifted the shared random stream, and seed 51's lazy day became
     # the rare one with no bar food in the Lounge (0 of 9 tabs). Measured over seeds 51–60 on this build: 2–4 Lounge
     # tabs with bar food a day in nine days of ten — the feature is unchanged, only that one day moved.
-    g = Game(b, port, target, seed=52, manual=True, viewport={'width': 390, 'height': 844})
+    # rc8: seed 51 again — the cooks' rule and Jill's hosting hours shifted the stream, and seed 52's day became one with no
+    # bar food (0). Seeds 51/53/54/55/56 gave 4/2/1/3/3 bites on 72834a3 and 5/1/3/2/3 on 252ff1c: the same spread.
+    g = Game(b, port, target, seed=51, manual=True, viewport={'width': 390, 'height': 844})
     load_fixture(g, 'player_day46.json'); g.click('[data-act=openFresh]'); g.page.wait_for_timeout(120)
     g.ev("S.money+=400000;factSet('lounge_project');buyLounge(1);hideReveal&&hideReveal()")
     check(g.ev("loungeLv()") == 1 and g.ev("S.unlocked.includes('bites')&&S.menu.includes('bites')&&S.unlocked.includes('cheeseplate')") and not g.ev("S.unlocked.includes('mushroom')"), 'Lounge I unlocked the bites (II keeps the mushrooms)')
