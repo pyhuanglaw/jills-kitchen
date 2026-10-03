@@ -9586,7 +9586,7 @@ function jillLife(J,L,dt){const tv=LIFE.tv;
  else if(L.on){L.sinceSit+=dt;L.t-=dt;
   /* legs: stretch out when the seat beside her is free, pull them in when someone needs the room */
   const want=L.legTarget;const room=ivFree(L.face>0?L.x+3:L.x-3-42,L.face>0?L.x+3+42:L.x-3,seatIvs(null).filter(v=>v.who!=='jill'&&v.who!=='legs'));
-  if(L.legTarget===0&&room&&['read','idle','tv','game','text'].includes(L.act)&&Math.random()<dt*.04)L.legTarget=1;
+  if(L.legTarget===0&&room&&['read','idle','tv'].includes(L.act)&&Math.random()<dt*.04)L.legTarget=1;
   const target=(L.act==='fetch'||L.act==='standing')?0:want;if(Math.abs(L.legs-target)>.01){const st=L.legs<target?1.6:2.2;L.legs=L.legs<target?Math.min(target,L.legs+dt*st):Math.max(target,L.legs-dt*st)}
   if(L.gazeT>0)L.gazeT-=dt;if(L.flip>0)L.flip-=dt;if(L.bobT>0)L.bobT-=dt;
   L.settleT-=dt;if(L.settleT<=0){L.settleT=rand(25,50);L.bobT=.5}
