@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Builds the page published to the player's live URL (https://claude.ai/artifact/2vhURujrtCpQ1P5jnSsjps).
+"""Builds the page published to the player's live URL (https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA).
 
 The artifact host wraps the page in its own document skeleton, so this is a fragment:
   a fixed head (title, theme colour, fonts)

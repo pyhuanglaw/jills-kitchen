@@ -131,7 +131,10 @@ How testing runs between releases (the player's 05:42 strategy, `docs/v24/testin
   - The test `single_file_in_sync` checks that the single file matches.
 - [ ] `python3 tools/build_artifact.py` writes the page for the live URL.
 - [ ] Tag the release.
-- [ ] Publish to the **same live URL** the player uses: https://claude.ai/artifact/2vhURujrtCpQ1P5jnSsjps.
+- [ ] Publish to the **same live URL** the player uses: https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA.
+  - The live URL moved here on 2026-10-03, from v24 rc7.6 on.
+    - Releases up to v24 rc7.6 went to https://claude.ai/artifact/2vhURujrtCpQ1P5jnSsjps; the release reports name that URL.
+    - Saves from the old URL come over only through the in-game backup (設定・存檔).
   - Saves are kept per URL.
   - Never leave the new build on a different URL while the player's normal one stays old.
 - [ ] Check the published page (from v2.4 rc5).
