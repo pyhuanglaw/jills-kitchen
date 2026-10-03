@@ -62,6 +62,7 @@ For every section, check:
 6. Is a newly added system important enough that a normal player would expect the manual to explain it?
 7. Did any old sentence become misleading because of this update?
 8. Does it explain the feature in player language, not implementation terms?
+9. Does a sentence about a space (side room, terrace, Lounge, second floor and its rooms) wait for that space? `GUIDE_WHEN` holds those gates; a new or reworded sentence about a space needs its rule.
 
 Update the manual in the same release.
 

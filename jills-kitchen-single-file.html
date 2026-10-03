@@ -10049,6 +10049,7 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
   ['點餐','桌上出現紅色「!」→ 點桌子，Jill 過去點餐。'],
   ['做菜','切到廚房，點亮著「+」的設備，照料理台的指示一步一步做。有廚師的工作站他們會自己接；沒有廚師的工作站，其他廚師有空時會過去幫忙。'],
   ['上菜','桌上出現銀色餐蓋 → 點桌子，Jill 去出菜口端菜。在廚房點出菜口，Jill 會把做好的菜都送出去。有服務生（LV2 起）他們會自己端。'],
+  ['配菜的酒','試酒的晚上以後，晚餐桌上就有配菜的酒：氣泡酒、清爽白酒、輕盈紅酒。客人點了，服務生或 Jill 在出菜口倒好、端過去；「酒水成本」照杯算，結算也另外列「晚餐桌上配的酒」。Lounge 開了以後，晚餐桌上的酒改由調酒師倒，酒單也更長。'],
   ['收錢・收桌','出現金幣點桌子收錢；客人走後點桌子收乾淨才能接下一組。'],
   ['料理台的幾種步驟','放食材（有些要照順序）／Jill 自己來（切、炒、打發，開始後她會做完）／等一下／看準時機（指針到金色區按）／按住放開（在金色區間放開）／撒幾下（數量對了按完成）。'],
   ['把店開得順','連續好評出菜會累積 COMBO，連續 5 道 PERFECT 進入 JILL\'S ON FIRE。速度按鈕可以把整個店開快一點。'],
@@ -10079,6 +10080,7 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
   ['票券上的字','招待＝現在可以；集點卡・請甜點／紀念日・請甜點＝這桌已經有東西要送過去了；已招待＝這桌今天請過了；招待 0/2＝今天的兩桌用完了；沒東西可請＝冰箱裡沒有飲料或甜點。'],
   ['Jill 自己請','等太久的客人，她可能主動請一杯（熟客更常）；這也是一天兩桌，跟你的分開算。'],
   ['集點卡與紀念日','熟客每第 5 次來，Jill 會請甜點；王先生王太太的結婚紀念日也是。這些是約定，不受任何限制。'],
+  ['VIP 卡','來店 5 次的客人拿到 VIP 卡：餐廳、Lounge 都九折，吃完晚餐再去 Lounge 八折。來 10 次換成八折卡：都八折，吃完再去 Lounge 七折。一桌照桌上最好的那張卡算；單子上的名字旁邊會寫幾折。日誌的「VIP」分頁是 VIP 名單：誰有卡、哪一張、哪天拿到的，還有誰再來一次就有。'],
   ['熟客','來過 2 次眼熟、4 次熟客、12 次老客人；老客人耐心多一點。日誌的「熟客」有他們的老位子、常點的菜和留言；最下面的「店裡的人」列著有名字的客人。升職、換工作、畢業這種事只會發生一次，之後記在卡片上。有故事的客人樣子跟頭像一樣，遠遠就認得出來。'],  ['最愛的一道、一杯','每位熟客和有名字的客人，都有一道最愛的菜、一杯最愛的酒或飲料。沒有人會直接告訴你：點到時他會說出來。知道以後，日誌會寫「最愛」，菜單上那一道旁邊會標 ♥ 和他的名字；放上菜單那天他多半會點。隨機選菜單也會稍微偏向有人最愛的菜。'],
 
   ['Dylan','常常在打烊前才來的那位。他不是員工，也不用你招待。你認識他以後，他來的時候日誌會記一行，他的卡片會顯示最近幾天來了沒（●來了・◐門口看了一眼・○沒來）。客滿時他會晚點再來，打烊前來不及就只在門口看一眼。']]},
@@ -10108,13 +10110,11 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
   ['在哪裡看','商店的「招牌菜」分頁；日誌的「熟練度」也有它們。']]},
  {ic:'🍷',h:'Lounge：留下來的地方',sum:'主廳是吃飯，側廳是聚餐，Lounge 是留下來。它本來是隔壁 Madame Lin 開了很多年的酒吧，不是升級選單裡冒出來的。',pts:[
   ['怎麼來的','店門口右邊是 Madame Lin 開了很多年的酒吧，開店那天她就是鄰居；Jill 一開始不賣酒——想喝酒，隔壁就有。品酒師 Ken 會問「妳真的不賣酒？」，之後晚餐桌上才有配菜的酒。過一陣子 Madame Lin 會說她做到月底。Jill 看過隔壁以後自己決定要不要接，選「再想想」也不會不見。接了，等她最後一晚過了，在「店鋪工程」按「簽約・開工」；改裝兩天，The Lounge 就開幕，Evan 留下來。'],
-  ['配菜的酒','試酒的晚上以後，晚餐桌上就有配菜的酒：氣泡酒、清爽白酒、輕盈紅酒。客人點了，服務生或 Jill 在出菜口倒好、端過去；「酒水成本」照杯算，結算也另外列「晚餐桌上配的酒」。Lounge 開了以後，晚餐桌上的酒改由調酒師倒，酒單也更長。'],
   ['Lounge I／II／III','I：吧台六個位子（坐得開，不會肩碰肩）、三張小桌、一面酒牆（三種酒）。II：吧台加長、轉成 L 型——調酒師在 L 裡面，靠牆那一頭留了進出的口——九個位子（一樣坐得開）；多一張小桌、四人沙發、有燈的酒櫃（五種酒），Lounge 名單多阿拓、安安、許葳。III：最裡面一個安靜的角落。'],
   ['安安','來的時候就是 LV2，排在「Lounge 外場」：先顧 Lounge 的桌子，沒事才去主廳幫忙。Lounge 的小點在廚房做，從後場遞到 Lounge 吧台的那一頭，由她送過去。出菜口的「送菜」只送主廳、側廳的菜。'],
   ['要有調酒師','Lounge 蓋好那天，Evan 就在吧台後面；把吧台的人都移開的話，Lounge 那晚不開。調酒師倒酒、送酒。點單、結帳、送小食由「Lounge 外場」的服務生做，沒人負責時調酒師自己來。'],
   ['客人怎麼用','客滿的時候，等桌的人會先坐吧台喝一杯，位子好了再過去（帳是分開的，不會多算一次來店）；吃完飯的人有些會留下來再喝一杯；也有人晚一點專程來。主廳、側廳桌上的酒，從此由調酒師倒、服務生端。'],
   ['晚餐後八折','在主廳或側廳吃完飯、再到 Lounge 坐的客人，Lounge 那一單打八折（酒和小點都算，每樣四捨五入到 $5）；知道有折扣，吃完留下來的人會多一點。結算「今天的店」的 Lounge 下面會寫「吃完留下 n 位・晚餐後折扣 −$…」。'],
-  ['VIP 卡','來店 5 次的客人拿到 VIP 卡：餐廳、Lounge 都九折，吃完晚餐再去 Lounge 八折。來 10 次換成八折卡：都八折，吃完再去 Lounge 七折。一桌照桌上最好的那張卡算；單子上的名字旁邊會寫幾折。日誌的「VIP」分頁是 VIP 名單：誰有卡、哪一張、哪天拿到的，還有誰再來一次就有。'],
   ['Bar Food','炸雞塊、起司可樂餅、起司拼盤、水牛城雞翅、起司條（II 起多蒜香蘑菇、生蠔；III 起多德國豬腳）。在同一個廚房做，不佔菜單名額，備料在同一台冰箱。Lounge 生意好，廚房就忙。'],  ['酒吧披薩','後場工程的「披薩烤爐」（要先有 Lounge）蓋好以後，「菜單研發」可以研發酒吧披薩，試做的食材多了「披薩麵團」。酒吧披薩是 Lounge 的小點，不佔菜單名額。在「工作分配」把一位廚師排到「披薩烤爐」；烤爐沒有自己的廚師時，其他廚師有空會過去，沒有廚師才是 Jill 自己烤。'],  ['主廚之夜','Lounge II 以後、有了招牌菜，可以在「店舖工程」的 Lounge 那一段排主廚之夜，排在明晚；前一天的新聞會寫「明晚｜主廚之夜 · N 席」。主廚之夜是包場：那一晚整個 Lounge 都是主廚之夜的客人。三道是 Jill 最拿手的前菜、招牌菜、招牌甜點，每道配一杯，一道一道上。每位 $1,800（含酒）。一週最多一次，不跟 Ken 的品酒夜同一晚。'],  ['電視與音響','「家具與佈置」最下面的「Lounge 的家具」：Lounge 大電視（$200,000），有比賽的晚上（大約一週兩晚）轉播，會多看球的客人，小點點得多。電視音響系統（$150,000，要先有電視）讓看球的人更多，沒有比賽的晚上放音樂。結算的 Lounge 下面會寫「有比賽轉播」。'],
 
   ['酒單研發','「菜單研發」的最下面：粉紅氣泡酒、橘酒、黑皮諾、招牌調酒「晚安」、香檳、老藤卡本內（要有酒窖）。價錢和研發一道菜差不多，研發一次就能在 Lounge 倒。每一支都有配的菜或客人，那一桌更常配一杯、更常留下來。今晚倒的酒裡每多一支研發過的，留下來的人多一點（最多 +15%）。'],
@@ -10186,9 +10186,46 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
   ['備份到檔案','設定 → 備份到檔案，會下載一個 .json。從備份檔恢復時會先檢查檔案，確認沒問題才覆蓋現在的進度。也可以複製／貼上備份文字。'],
   ['舊存檔','主廳超過 9 張桌的舊存檔載入時，多的桌子會搬到側廳（側廳放不下就按原價退還），打烊後的新聞會說明。'],
   ['清除瀏覽器資料','會連存檔一起清掉。備份檔留著就不怕。']]}];
+/* rc8 (the player, 2026-10-03: 「每個空間等他出現才出現在說明書吧」 — the manual of an 80-day save had all of them, and a new
+   shop's had them too): the manual shows a space once the shop has met it. A section, an entry or one line about a room
+   the shop does not have yet is left out when the manual opens, and a line can lose only the words about that room.
+   GUIDE keeps every word (the release audit and the tests read all of it); this is only what the page shows today. */
+function guideHas(){const F=k=>!!fact(k),L=loungeLv()>0,up=upTaken();return{side:projOn('side'),ter:projOn('terrace'),kext:projOn('kext'),L,LP:L||F('lounge_project'),wine:L||F('pairing_wine'),UPA:up||F('up_ask'),up,sr:up&&(F('sr_story')||srOn()),pd:up&&(F('pd_story')||pdOn()),srB:srBuilt(),pdB:pdBuilt()}}
+const GUIDE_WHEN={
+ sec:{'Lounge：留下來的地方':h=>h.LP,'二樓：休息室與包廂':h=>h.up},
+ pt:{'開店與料理|配菜的酒':h=>h.wine,'Jill 與員工|調酒師':h=>h.L,'商店：家具、工程、營運|側廳的大窗':h=>h.side,'每天的帳|酒水成本':h=>h.wine,
+  '二樓：休息室與包廂|員工休息室':h=>h.sr,'二樓：休息室與包廂|誰會上去':h=>h.sr,'二樓：休息室與包廂|私人包廂':h=>h.pd,'二樓：休息室與包廂|預約':h=>h.pd,
+  '二樓：休息室與包廂|最低消費':h=>h.pd,'二樓：休息室與包廂|沒有預約的晚上':h=>h.pd},
+ /* [words in the line, when they stay, what they become otherwise (none: the line goes; a function's null: the line goes)] */
+ line:[
+  ['店門口・主廳・側廳・二樓（租下以後）・休息室・包廂（蓋好以後）・Lounge（蓋好以後）・廚房・房間',h=>h.side&&h.up&&h.srB&&h.pdB&&h.L,h=>[['店門口',1],['主廳',1],['側廳',h.side],['二樓',h.up],['休息室',h.srB],['包廂',h.pdB],['Lounge',h.L],['廚房',1],['房間',1]].filter(x=>x[1]).map(x=>x[0]).join('・')+'（新的房間蓋好以後會加進來）'],
+  ['上二樓的樓梯門在側廳',h=>h.up],['開店前會先帶你上二樓看一眼',h=>h.up],['Lounge 是隔壁的店，跟主廳不相通',h=>h.L],
+  ['Lounge 開了以後，晚餐桌上的酒改由調酒師倒',h=>h.L],
+  ['（有 Lounge 以後多「Lounge 吧台」「Lounge 外場」）',h=>h.L,''],['和 Lounge 名單',h=>h.L,''],
+  ['員工分兩個名單，名額各算各的、互不佔用',h=>h.L],['（例：披薩烤爐廚師 +1、私人包廂 I 和 III 服務生各 +1；休息室不加名額）',h=>h.L&&h.pd,'（例：側廳服務生 +2）'],
+  ['<b>Lounge 名單</b>是固定的幾個人',h=>h.L],['沈晴、阿拓、安安、許葳要聘',h=>h.L],['剛排到 Lounge 的服務生頭幾班慢一點',h=>h.L],
+  ['酒吧小點和招牌菜不動',h=>h.L,'招牌菜不動'],
+  ['餐廳、Lounge 都九折，吃完晚餐再去 Lounge 八折',h=>h.L,'九折'],['都八折，吃完再去 Lounge 七折',h=>h.L,'八折'],
+  ['側廳最多 9 張，「側廳卡座」把整排換成卡座',h=>h.side],['露天桌 1–3 張',h=>h.ter],
+  ['Lounge 的企劃出現以後也在這裡',h=>h.LP],['Lounge 蓋好以後，樓上的事就會慢慢開始',h=>h.UPA],['這裡會多「二樓（整層）」',h=>h.UPA],
+  ['租下二樓以後有一張二樓平面圖',h=>h.up],['「看看整層」是整層現在的樣子',h=>h.up],
+  ['Lounge III 以後的 Bar 小廚／油炸站',h=>h.L],['有 Lounge II 以後還有 Lounge 的酒窖',h=>h.L],['側廳的東西分兩區',h=>h.side],['有 Lounge 以後還有披薩烤爐',h=>h.L],
+  ['酒水成本、薪資',h=>h.wine,'薪資'],['鋼琴演奏、品酒夜分潤、',h=>h.L,''],['天氣、Lounge、',h=>h.L,'天氣、'],['、包廂、VIP',h=>h.pd,'、VIP'],
+  ['品酒夜和主廚之夜那晚，Lounge 只寫那一行',h=>h.L],['——在 Lounge 或晚餐桌上——',h=>h.L,'——在晚餐桌上——'],
+  ['側廳、戶外區、廚房擴建、Lounge、二樓各有自己的一份',h=>h.side&&h.ter&&h.kext&&h.L&&h.up,h=>{const n=[['側廳',h.side],['戶外區',h.ter],['廚房擴建',h.kext],['Lounge',h.L],['二樓',h.up]].filter(x=>x[1]).map(x=>x[0]);return n.length?n.join('、')+(/[A-Za-z]$/.test(n[n.length-1])?' ':'')+(n.length>1?'各有':'有')+'自己的一份':null}],
+  ['大家開始在二樓找地方坐一下',h=>h.sr],['之後有客人想要安靜、不被打擾的位子',h=>h.pd],
+  ['二樓是店裡的以後',h=>h.up],['、Lounge、貓',h=>h.L,'、貓'],['予安和鋼琴的故事、',h=>h.L,''],
+  ['付酒水、租金',h=>h.wine,'付租金'],['，例如下班以後的一局撞球',h=>h.srB,''],
+  ['、側廳／聚餐',h=>h.side,''],['、晚餐／酒單（有 Lounge 以後）',h=>h.L,'']]};
+function guideCut(t,h){for(const [w,ok,to] of GUIDE_WHEN.line){if(t==null)break;if(!t.includes(w)||ok(h))continue;if(to===undefined)return null;const r=typeof to==='function'?to(h):to;t=r==null?null:t.replace(w,r)}return t}
+function guideView(){const full=()=>GUIDE.map(g=>({ic:g.ic,h:g.h,sum:g.sum,pts:g.pts.map(([k,t])=>[k,guideLines(t)])}));let h;try{h=guideHas()}catch(e){return full()}
+ const out=[];for(const g of GUIDE){const sw=GUIDE_WHEN.sec[g.h];if(sw&&!sw(h))continue;const pts=[];
+  for(const [k,t] of g.pts){const pw=GUIDE_WHEN.pt[g.h+'|'+k];if(pw&&!pw(h))continue;const L=guideLines(t).map(l=>guideCut(l,h)).filter(l=>l);if(L.length)pts.push([k,L])}
+  if(pts.length)out.push({ic:g.ic,h:g.h,sum:guideCut(g.sum,h)||g.sum,pts})}
+ return out}
 function showGuide(){sub='guide';show(`<div class="sheet tall"><div class="sh-top"><div class="ttl"><div class="eyebrow">JILL'S KITCHEN</div><h2>小小店主手冊</h2></div><button class="btn sm" data-act="closeSub">關閉</button></div>
  <p class="muted" style="font-size:12.5px;margin:0 0 10px">點一張卡片展開。</p>
- <div class="guide2">${GUIDE.map((g,i)=>`<details class="gcard" ${i===0?'open':''}><summary><span class="gic">${g.ic}</span><span class="gh"><b>${g.h}</b><small>${g.sum}</small></span><span class="gchev">›</span></summary><div class="gbody">${g.pts.map(([k,t])=>{const L=guideLines(t);return`<div class="gpt"><b>${k}</b><span${L.length>1?' class="ml"':''}>${L.map(l=>`<i>${L.length>1?l.replace(/；$/,''):l}</i>`).join('')}</span></div>`}).join('')}</div></details>`).join('')}</div>
+ <div class="guide2">${guideView().map((g,i)=>`<details class="gcard" ${i===0?'open':''}><summary><span class="gic">${g.ic}</span><span class="gh"><b>${g.h}</b><small>${g.sum}</small></span><span class="gchev">›</span></summary><div class="gbody">${g.pts.map(([k,L])=>{return`<div class="gpt"><b>${k}</b><span${L.length>1?' class="ml"':''}>${L.map(l=>`<i>${L.length>1?l.replace(/；$/,''):l}</i>`).join('')}</span></div>`}).join('')}</div></details>`).join('')}</div>
  <div class="footer"><button class="btn primary big" data-act="closeSub">知道了</button></div></div>`)}
 
 /* ================= input ================= */

@@ -597,6 +597,43 @@ def v24_manual_tutorial_and_news_cover_the_new_content(b, port, target):
 
 
 @test
+def rc8_the_manual_shows_a_space_once_the_shop_has_it(b, port, target):
+    """The player, 2026-10-03: 「每個空間等他出現才出現在說明書吧」 (an 80-day save had them all, and so did a new shop).
+    A new game's manual has no Lounge, no second floor, no side room, no terrace — not as a section, an entry or a word
+    in a line — and its room tabs are the four it has; the VIP card and the dinner wine sit in sections a shop always
+    has. The player's Day 81 save (the Lounge III, no second floor yet) has the Lounge and still no 二樓; the floor's
+    section comes with the lease, and each of its rooms with its own story. GUIDE itself keeps every word."""
+    page = "(document.querySelectorAll('#screen details').forEach(d=>d.open=true),document.querySelector('#screen').innerText)"   # every card open: a closed card's words are not in innerText
+    g = Game(b, port, target, seed=811, manual=True, viewport={'width': 390, 'height': 844})
+    g.click('[data-act=open]'); g.page.wait_for_timeout(100)
+    g.ev("showGuide()"); g.page.wait_for_timeout(50)
+    t = g.ev(page)
+    for gone in ['Lounge', '二樓', '包廂', '休息室', '側廳的大窗', '露天桌', '酒窖', '予安', '配菜的酒', '酒水成本', '調酒師']:
+        check(gone not in t, f'a new shop: no {gone} in the manual')
+    check('店門口・主廳・廚房・房間（新的房間蓋好以後會加進來）' in t, 'the tabs it has')
+    check('來店 5 次的客人拿到 VIP 卡：九折' in t and '來 10 次換成八折卡：八折' in t, 'the VIP card, from the first day, without the Lounge')
+    check('小小店主手冊' in t and '五隻店貓' in t and 'Jill 的房間' in t, 'the rest of the manual is there')
+    g.ev("S.rooms.side=1;showGuide()"); g.page.wait_for_timeout(50); t = g.ev(page)
+    check('側廳的大窗' in t and '店門口・主廳・側廳・廚房・房間' in t and '二樓' not in t, 'the side room comes with the side room')
+    full = g.ev("GUIDE.map(s=>s.h+' '+s.sum+' '+s.pts.map(p=>p.join(' ')).join(' ')).join('\\n')")
+    check('Lounge：留下來的地方' in full and '員工休息室' in full and '天氣、Lounge、包廂、VIP 卡' in full, 'GUIDE keeps every word')
+    stale = g.ev("""(()=>{const all=GUIDE.flatMap(g=>[g.sum,...g.pts.flatMap(([k,t])=>guideLines(t))]);const bad=GUIDE_WHEN.line.map(r=>r[0]).filter(w=>all.filter(l=>l.includes(w)).length!==1);
+      for(const k in GUIDE_WHEN.pt){const [h,l]=k.split('|');if(!GUIDE.some(g=>g.h===h&&g.pts.some(p=>p[0]===l)))bad.push(k)}for(const k in GUIDE_WHEN.sec)if(!GUIDE.some(g=>g.h===k))bad.push(k);return bad})()""")
+    check(stale == [], f'every gate still finds its words in GUIDE (an edited line would quietly stop being gated): {stale}')
+    check(not g.errors, g.errors[:3]); g.close()
+    g = Game(b, port, target, seed=812, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day81_2206.json')
+    g.ev("showGuide()"); g.page.wait_for_timeout(50); t = g.ev(page)
+    check('Lounge：留下來的地方' in t and '吃完再去 Lounge 七折' in t and '配菜的酒' in t and '調酒師' in t, 'Day 81: the Lounge is in the manual')
+    check('二樓' not in t and '包廂' not in t and '休息室' not in t, 'Day 81: the second floor is not hers yet, and not in the manual')
+    g.ev("S.rooms.up=1;S.up=S.up||{};showGuide()"); g.page.wait_for_timeout(50); t = g.ev(page)
+    check('二樓：休息室與包廂' in t and '二樓平面圖' in t and '員工休息室' not in t and '私人包廂' not in t, 'the lease: the floor, not yet its rooms')
+    g.ev("S.up.sr={done:S.day};showGuide()"); g.page.wait_for_timeout(50); t = g.ev(page)
+    check('員工休息室' in t and '誰會上去' in t and '私人包廂' not in t, 'the staff room with its own story')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
 def v24_the_day_is_held_for_the_beat_its_people_came_for(b, port, target):
     """Pacing (measured on the Day 52 save): when the schedule brings someone for a due v2.4 major beat, that beat keeps
     a major slot until it plays or until 85% of the service; another story's major that comes up while every free slot
