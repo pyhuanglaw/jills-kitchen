@@ -3742,6 +3742,48 @@ def v24_rc76_dylan_at_home_keeps_his_hood_up(b, port, target):
 
 
 @test
+def v24_rc76_after_the_wine_the_tasting_night_is_the_players(b, port, target):
+    """08:51 「少賺沒關係 但是之後聯名酒出了之後開店前可以選擇要不要舉辦品酒夜」: once 「晚餐之後」 is out Ken no longer plans his
+    nights; before opening the news asks 「Ken 的品酒夜｜今晚要辦嗎？」 — 「今晚辦」 makes tonight his (the whole Lounge), 「這次
+    不辦」 takes it back before the doors open. At most once a week, never on the chef's night. A later night a save had
+    already planned by itself becomes the player's to hold. Before the wine, nothing changes (the story's three)."""
+    g = Game(b, port, target, seed=7633, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day74_1508.json')
+    g.ev("S.cn=null;kenS().next=null;showPrep()"); g.page.wait_for_timeout(100)
+    check('今晚要辦嗎' not in g.ev("$('#screen').innerText") and g.ev("ktHold()") is False, 'before the wine: no choice to make')
+    g.ev("""for(const k of ['ken_propose','ken_t1','ken_t2','ken_t3','ken_collab','ken_samples','ken_wine']){const d=S.day-10;story().facts[k]={d,n:1,l:d}}
+      const K=kenS();K.next={d:S.day+3,n:5};K.lastD=S.day-10""")
+    mig = json.loads(g.ev("JSON.stringify({next:kenS().next,nextN:kenS().nextN})"))
+    check(mig['next'] is None and mig['nextN'] == 5, f'a night the save had planned by itself is the player\'s now: {mig}')
+    g.ev("showPrep()"); g.page.wait_for_timeout(100)
+    txt = g.ev("$('#screen').innerText")
+    check('Ken 的品酒夜｜今晚要辦嗎？' in txt and g.page.locator('#screen [data-act=ktHold]').count() == 1, 'before opening, the news asks')
+    g.ev("(()=>{const e=document.querySelector('#screen .kt-ask');if(e)e.scrollIntoView({block:'center'})})()"); g.page.wait_for_timeout(80)
+    g.page.screenshot(path=os.path.join(ROOT, 'tests', 'artifacts', 'rc76_tasting_ask.png'))
+    g.page.locator('#screen [data-act=ktHold]').click(); g.page.wait_for_timeout(150)
+    txt = g.ev("$('#screen').innerText")
+    check(json.loads(g.ev("JSON.stringify(kenS().next)")) == {'d': g.ev("S.day"), 'n': 5} and '今晚｜Ken 的品酒夜 · 23 席' in txt and g.page.locator('#screen [data-act=ktCancel]').count() == 1, f'「今晚辦」: tonight is his, and it can still be taken back: {g.ev("JSON.stringify(kenS().next)")}')
+    g.page.locator('#screen [data-act=ktCancel]').click(); g.page.wait_for_timeout(150)
+    check(g.ev("kenS().next") is None and '今晚要辦嗎' in g.ev("$('#screen').innerText"), '「這次不辦」: not tonight')
+    # not on the chef's night
+    g.ev("S.cn={n:1,last:S.day-9,next:{d:S.day,menu:cnMenu()}};showPrep()"); g.page.wait_for_timeout(100)
+    check(g.ev("ktWhyNot()") == '今晚是主廚之夜' and g.ev("ktHold()") is False and '今晚要辦嗎' not in g.ev("$('#screen').innerText"), 'never on the chef\'s night')
+    g.ev("S.cn=null;showPrep()"); g.page.wait_for_timeout(100)
+    g.page.locator('#screen [data-act=ktHold]').click(); g.page.wait_for_timeout(150)
+    to_service(g); g.ev("window.__act=window.__actLazy")
+    check(g.ev("!!R.kt&&R.kt.n===5&&R.kt.people===23"), f'the night is on, the whole room: {g.ev("JSON.stringify(R.kt&&{n:R.kt.n,people:R.kt.people})")}')
+    g.ev("__botUntil('R.kt.end||phase!==\\'service\\'',150000,1/30)")
+    after = json.loads(g.ev("JSON.stringify({end:R.kt.end,next:kenS().next,nextN:kenS().nextN,lastD:kenS().lastD,day:S.day})"))
+    check(after['end'] and after['next'] is None and after['nextN'] == 6 and after['lastD'] == after['day'], f'afterwards nothing is planned for the player; the next would be the sixth: {after}')
+    g.ev("__botUntil('phase!==\\'service\\'',90000,1/30)")
+    g.ev("S.day++;S.phase='prep';phase='prep';showPrep()"); g.page.wait_for_timeout(100)
+    check('今晚要辦嗎' not in g.ev("$('#screen').innerText") and '一週最多一次' in g.ev("ktWhyNot()"), f'once a week: {g.ev("ktWhyNot()")}')
+    g.ev("S.day+=6;showPrep()"); g.page.wait_for_timeout(100)
+    check('今晚要辦嗎' in g.ev("$('#screen').innerText") and g.ev("ktWhyNot()") == '', 'a week on, it can be held again')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
 def v24_rc76_the_chefs_night(b, port, target):
     """(14:49; 22:11 「而且你不是說酒吧可以辦活動嗎？除了品酒。」; 08:00 「主廚之夜就是包場整間辦主廚之夜…整間都是給主廚之夜辦」)
     Jill's night in the Lounge, booked out: from Lounge II with a signature dish, planned in the shop for tomorrow — not on a

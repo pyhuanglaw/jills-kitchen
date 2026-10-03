@@ -3460,7 +3460,7 @@ V24_WANTS.push(()=>{const out=[];if(!loungeOpenTonight()||!fact('ken_du_argue')|
    scene a day at most. */
 const KEN_HOST={get x(){return LG.bar.x0+16},get y(){return LG.bar.y-6}};   /* behind the bar, at its near end (the bartenders stand further along) */
 const KEN_KEYS=['ken_lounge','ken_propose','ken_t1','ken_t2','ken_t3','ken_collab','ken_samples','ken_wine','du_wine'];
-function kenS(){const st=story();const k=st.ken=st.ken||{};if(k.first==null)k.first=S.day;return k}
+function kenS(){const st=story();const k=st.ken=st.ken||{};if(k.first==null)k.first=S.day;if(k.next&&k.next.n>=4&&k.next.d>S.day&&st.facts&&st.facts.ken_wine){/* rc7.6 (08:51): a later night a save had planned by itself becomes the player's to hold */k.nextN=k.next.n;k.next=null}return k}
 /* the Lounge was open well before this chapter existed: he has been sitting there for weeks — his first look is skipped */
 function kenLegacy(){const d=loungeDoneDay();return d!=null&&d<=kenS().first-4}
 function kenPost(){const d=loungeDoneDay();return loungeLv()>=1&&d!=null&&S.day>d&&!!NAMED[KEN]}
@@ -3495,7 +3495,7 @@ function kenNightStart(){const K=kenS();const n=K.next.n;const seats=kenSeats();
  const all=lgBook('tasting',G,j=>dur*(.27+.011*j)+(hash('ktt0|'+S.day+'|'+j)%30)/10,(i,sz)=>({name:nm[i]||('客人'+i),type:pickH(sz>=3?['office','gourmet']:sz===2?['couple','gourmet','office']:['gourmet','office','gourmet','student'],'ktt|'+S.day+'|'+i)}));R.kt.people=all.reduce((a,o)=>a+(o.size||1),0);
  if(n>=4)later(()=>{if(R&&phase==='service')noteLine('今晚是 Ken 的品酒夜：整個 Lounge 都是品酒的客人。')},1800)}
 /* a night that did not come to its end (the page was closed): its bookkeeping, without its words */
-function kenAdvance(n){const K=kenS();if(n<3)K.next={d:S.day+5,n:n+1};else if(n===3)K.next=null;else K.next={d:S.day+8+hash('ktn+|'+S.day)%5,n:n+1}}
+function kenAdvance(n){const K=kenS();K.lastD=S.day;if(n<3)K.next={d:S.day+5,n:n+1};else if(n===3)K.next=null;else{K.next=null;K.nextN=n+1}}   /* rc7.6 (08:51): after the third, the next is the player's choice (ktHold), not a date */
 function kenNightUpd(dt){const K=R&&R.kt;if(!K)return;if(K.end){/* rc7.6: the host goes home a moment after the night ends, by the evening's own clock as well as the timer (a night that ends at closing time is not left with him standing there) */const H=K.host;if(H&&!H.gone&&H.state==='host'&&R.groups.includes(H)&&K.endT!=null&&R.t>=K.endT+(K.n<=3?9:2))leaveGroup(H,'ok');return}   /* (a held scene stops the evening's clock: he stays through it) */const H=K.host;
  const here=K.guests.filter(g=>!g.gone&&g.state!=='leave'&&R.groups.includes(g));const seated=here.filter(g=>g.table!=null&&R.tables[g.table]&&R.tables[g.table].room==='lounge'&&['reading','order','wait','eat','check'].includes(g.state));   /* sitting there, not still walking over */
  const sn=seated.reduce((a,g)=>a+g.size,0);   /* people, not tables (rc7.6: twos and fours too) */
@@ -3532,7 +3532,7 @@ function kenNightTalk(seated){const K=R.kt;if(!K.host||K.said>=3||!seated.length
  else kenSayH(pickT(['最後一支，等菜來再喝。','最後一支。','最後這支，配 Jill 的菜。']),0,'talk')}
 /* the end of the night: the last of them has gone (or the doors are closing) */
 function kenNightClose(){const K=R.kt;if(!K||K.end)return;K.end=1;K.endT=R.t;for(const g of K.guests){const tk=g.ticket;if(tk)for(const i of tk.items)if(i.ktw&&i.st==='round'){i.st='pending';i.lbar=1}}   /* rc7.6: a glass Ken did not get to pour is the bar's */for(const t of loungeTables())t.tst=0;const n=K.n,H=K.host;const KS=kenS();
- if(!K.on){/* he came, nobody stayed long enough to begin: the same night again tomorrow */KS.next={d:S.day+1,n};if(H&&!H.gone)leaveGroup(H,'ok');return}
+ if(!K.on){/* he came, nobody stayed long enough to begin: the same night again tomorrow (after the wine: the player may hold it again) */KS.next=n>=4&&kenFree()?null:{d:S.day+1,n};if(H&&!H.gone)leaveGroup(H,'ok');return}
  if(n===1){const pool=K.guests.filter(g=>!/^客人/.test(g.name)&&namedId(g)!==DU);KS.back=pool.slice(0,3).map(g=>({name:g.name,type:g.type,looks:g.looks&&g.looks[0]?Object.assign({},g.looks[0]):null}))}
  if(n===1)kenScene('ken_t1',H,()=>{kenNote('最後一位品酒的客人也走了。吧台上剩一排空杯子。');JILL_SAY('比我想的順。',600,{with:'named:'+KEN});kenSayH('第二支開太早了。',1900,'taste');JILL_SAY('是你說要先開的。',3200,{with:'named:'+KEN});kenSayH('所以下次換一支。',4500,'wry')},true);
  else if(n===2)kenScene('ken_t2',H,()=>{kenNote('吧台收得差不多了。');JILL_SAY('這次你沒有先開。',600,{with:'named:'+KEN});kenSayH('學到了。',1900,'wry');JILL_SAY('下次呢？',3200,{with:'named:'+KEN});kenSayH('下次換一支。',4500,'wry')},true);
@@ -3547,7 +3547,17 @@ function kenCollab(ctx){factSet('ken_collab');kenS().samples=S.day+4;const say=c
 /* Ken's own lines when he is a guest (not hosting): kenSayH needs the host; these use his table */
 function kenSayG(ctx,txt,ms,tone){if(ctx&&ctx.g)sayG(ctx.g,txt,ms,tone?{tone}:undefined)}
 /* the news before opening: tonight's, and tomorrow's */
-function kenNewsHTML(){const n=kenS().next;if(!n||!loungeLv())return'';const seats=kenSeats();
+/* rc7.6 (the player, 08:51 「少賺沒關係 但是之後聯名酒出了之後開店前可以選擇要不要舉辦品酒夜」): once 「晚餐之後」 is out, a tasting
+   night is the player's to hold — before opening, in the news: 「今晚辦」 makes tonight Ken's (at most once a week, never on
+   the chef's night), 「這次不辦」 takes it back before the doors open. The story's three nights are still his to plan. */
+function kenFree(){return !!fact('ken_wine')}
+function ktWhyNot(){const K=kenS();if(!loungeOpenTonight())return'Lounge 今晚沒有人站吧台';if(cnTonight())return'今晚是主廚之夜';if(K.lastD!=null&&S.day-K.lastD<7)return`一週最多一次——DAY ${K.lastD+7} 以後可以再辦`;return''}
+function ktHold(){const K=kenS();if(!kenFree()||!loungeLv()||phase!=='prep'||K.next||ktWhyNot())return false;K.next={d:S.day,n:K.nextN||4};save();return true}
+function ktCancel(){const K=kenS();if(!kenFree()||phase!=='prep'||!K.next||K.next.d>S.day||(K.next.n||0)<4)return false;K.next=null;save();return true}
+function kenNewsHTML(){const n=kenS().next;if(!loungeLv())return'';const seats=kenSeats();
+ if(kenFree()&&phase==='prep'&&!(n&&n.n<4)){if(n&&n.d<=S.day)return`<div class="event kent kt-ask"><b>今晚｜Ken 的品酒夜 · ${seats} 席</b><span>整個 Lounge 留給品酒的客人——吧台、小桌、沙發都是；Ken 六點多就到，站在吧台後面主持，一輪一輪倒。</span><button class="btn sm" data-act="ktCancel">這次不辦</button></div>`;
+  return ktWhyNot()?'':`<div class="event kent quiet kt-ask"><b>Ken 的品酒夜｜今晚要辦嗎？</b><span>整個 Lounge 包場給品酒的客人（${seats} 席），Ken 一輪一輪倒；酒照杯算，那晚 Lounge 不接其他客人。一週最多一次。</span><button class="btn sm primary" data-act="ktHold">今晚辦</button></div>`}
+ if(!n)return'';
  if(n.d<=S.day)return loungeOpenTonight()?`<div class="event kent"><b>今晚｜Ken 的品酒夜 · ${seats} 席</b><span>整個 Lounge 留給品酒的客人——吧台、小桌、沙發都是；Ken 六點多就到，站在吧台後面主持，一輪一輪倒。</span></div>`:`<div class="event kent quiet"><b>Ken 的品酒夜</b><span>Lounge 今晚沒有人站吧台——品酒夜改到有人站吧台的那天。</span></div>`;
  if(n.d===S.day+1)return`<div class="event kent quiet"><b>明晚｜Ken 的品酒夜 · ${seats} 席</b><span>那晚整個 Lounge 留給品酒的客人。</span></div>`;return''}
 /* ---- drawn on a tasting night: the glasses set out along the counter, the small board by the bar ---- */
@@ -3559,7 +3569,7 @@ function kenNightDraw(c,list){const K=R&&R.kt;if(!K||K.end||room!=='lounge')retu
 STORY_EV.push(
  /* the day of a tasting: the night is set going (its scenes are the evening's own) */
  {k:'kt_night',lane:'major',cls:'A',floor:0,w:()=>1e9,at:['daystart'],   /* planned days ahead and in the news: it is the day's first beat (another due at the start of the day waits a day, counted) */
-  when:()=>{const K=kenS(),n=K.next;if(!n||n.d>S.day||R.kt)return false;if(R.cn){n.d=S.day+1;return false}/* rc7.6: the chef's night has the bar tonight: his is tomorrow */if(!loungeOpenTonight()||!NAMED[KEN]){n.d=S.day+1;return false}/* the Lounge is not open tonight: the next day it is */
+  when:()=>{const K=kenS(),n=K.next;if(!n||n.d>S.day||R.kt)return false;const free=n.n>=4&&kenFree();/* rc7.6 (08:51): a night the player chose before opening */if(R.cn){if(free)K.next=null;else n.d=S.day+1;return false}/* rc7.6: the chef's night has the Lounge tonight: his is tomorrow */if(!loungeOpenTonight()||!NAMED[KEN]){if(free){K.next=null;later(()=>{if(R&&phase==='service')noteLine('Lounge 今晚沒有人站吧台，品酒夜沒辦成。')},1600)}else n.d=S.day+1;return false}/* the Lounge is not open tonight: the next day it is */
    if(n.n<=3&&fact('ken_t'+n.n)){kenAdvance(n.n);return false}/* that night happened; its end did not (the page was closed) */return true},
   run:()=>kenNightStart()},
  /* Ken comes back and sits in the room he talked Jill into — no speech about it */
@@ -3594,7 +3604,7 @@ STORY_EV.push(
   when:()=>kenWineDue()&&!v24Fresh('daystart')&&loungeLv()>=1&&kenQuiet(),
   run:()=>{factSet('ken_wine');kenNote('下午，Ken 搬了兩箱酒進來。米白色的酒標，上面寫著「晚餐之後」，下面一行小字：JILL\'S KITCHEN × KEN。','ken_wine');
    KEN_SAY_N('第一批。',600);JILL_SAY('放哪裡？',1900,{with:'named:'+KEN});KEN_SAY_N('酒單上。',3200,'wry');later(()=>noteLine('「晚餐之後」上了 Lounge 的酒單。'),4500);
-   S.wineOff=S.wineOff||{};delete S.wineOff.w_jk;kenS().next={d:S.day+7,n:4};regFactNamed(KEN,'和 Jill 做了一支酒：「晚餐之後」。')}},
+   S.wineOff=S.wineOff||{};delete S.wineOff.w_jk;{const K=kenS();K.next=null;K.nextN=4;if(K.lastD==null)K.lastD=S.day}/* rc7.6 (08:51): from now on a tasting night is the player's to hold (ktHold) */regFactNamed(KEN,'和 Jill 做了一支酒：「晚餐之後」。')}},
  /* the friendship line's payoff: 杜 orders it, days after it came out; they still disagree, and he says it is good */
  {k:'du_wine',lane:'major',cls:'A',floor:2,at:['lounge','order'],once:true,ic:'heart',note:'Monsieur 杜點了「晚餐之後」。他說太輕——也說它很好。',
   when:()=>duWineDue()&&!!kenAtLounge()&&!!duAtLounge()&&kenQuiet(),
@@ -8742,7 +8752,7 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
   ['今晚倒哪幾種','開店前，「今日菜單」下面有「Lounge 酒單」：每一種酒都可以開或關，至少留一種；Lounge 的客人只會點今晚有倒的。酒吧小點在上面的菜單裡，不佔菜單名額，名額旁邊會寫「＋ 酒吧小點 幾道（不佔名額）」。'],
   ['品酒課','員工頁每位服務生的卡片上（有 Lounge 以後）：$12,000，上完對酒就「自在」了。外場懂酒的人多，主廳、側廳吃飯的客人更常點一杯。'],
   ['Lounge 的人怎麼升級','Lounge 名單上的人是在店裡邊做邊學的：訓練升級一天最多一級，先讓他上一天班再說。'],
-  ['Ken 的品酒夜','Lounge 開了以後，Ken 會回來坐坐，然後提議在 Lounge 辦品酒夜——品酒會只有 Ken 辦。辦的那天，開店前的新聞會寫「今晚｜Ken 的品酒夜 · N 席」（N 是整個 Lounge 的位子），前一天先寫「明晚」。那一晚整個 Lounge 都留給品酒的客人——吧台、小桌、沙發、角落；有人一個人來，也有兩個、四個一起來的。平常會來 Lounge 的人那晚來，也是來品酒；其他想喝一杯的客人那晚坐餐廳，吃完飯也不會換到 Lounge。Ken 站在吧台後面主持，每個位子前面排著三個杯子，吧台的一頭立著小黑板；今晚的三支他一輪一輪倒：開始的時候第一支，接著第二支，最後一支。品酒的客人每人兩三杯，每桌一份小食（廚房做、Lounge 的服務生端），Ken 會待到最後一位走了才走。前三次是故事（店裡暫停，點一下繼續）；之後每一兩個禮拜他會再辦一次，不用你安排。Lounge 那晚沒有人站吧台的話，改到有人站吧台的那天。'],
+  ['Ken 的品酒夜','Lounge 開了以後，Ken 會回來坐坐，然後提議在 Lounge 辦品酒夜——品酒會只有 Ken 辦。辦的那天，開店前的新聞會寫「今晚｜Ken 的品酒夜 · N 席」（N 是整個 Lounge 的位子），前一天先寫「明晚」。那一晚整個 Lounge 都留給品酒的客人——吧台、小桌、沙發、角落；有人一個人來，也有兩個、四個一起來的。平常會來 Lounge 的人那晚來，也是來品酒；其他想喝一杯的客人那晚坐餐廳，吃完飯也不會換到 Lounge。Ken 站在吧台後面主持，每個位子前面排著三個杯子，吧台的一頭立著小黑板；今晚的三支他一輪一輪倒：開始的時候第一支，接著第二支，最後一支。品酒的客人每人兩三杯，每桌一份小食（廚房做、Lounge 的服務生端），Ken 會待到最後一位走了才走。前三次是故事（店裡暫停，點一下繼續），Ken 自己排；Lounge 那晚沒有人站吧台的話，改到有人站吧台的那天。「晚餐之後」出來以後，要不要辦由你決定：開店前的新聞會問「Ken 的品酒夜｜今晚要辦嗎？」，按「今晚辦」就是今晚，開店前也可以按「這次不辦」取消；一週最多一次，不跟主廚之夜同一晚。酒照杯算；整間包場的晚上，主廳等位的客人不能先去吧台坐，所以那天通常比平常少賺一點。'],
   ['鋼琴與予安','鋼琴買來以後，一開始沒有人彈。過一陣子，一位常來 Lounge 的客人——予安——會成為固定的鋼琴師：一個禮拜彈三個晚上。那幾晚開店前的新聞會寫「今晚｜予安在 Lounge 彈琴」，吃完飯留下來的人比較多；每晚付她演奏費 $2,500，結算會列一行「鋼琴演奏」。她不彈的晚上，鋼琴就安靜地放著。'],
   ['晚餐之後','Ken 辦過三次品酒夜以後，會和 Jill 一起做一支酒：「晚餐之後」（JILL\'S KITCHEN × KEN），一支輕盈的紅酒，配 Jill 的招牌菜。酒進來以後就一直在 Lounge 的酒單上，一杯大約 $420；不用研發，也可以在「Lounge 酒單」關掉。'],
   ['帳','結算的晚上會寫「Lounge 幾桌・營業額・吃完留下幾組」。營業額是 Lounge 那幾桌付的錢，不含小費，跟下面「Lounge 今天賣了什麼」的合計一樣；Lounge 的小費另外一行，晚餐桌上配的酒也另外一行。員工那一欄寫調酒師調了幾杯。']]},
@@ -9290,6 +9300,8 @@ function doAct0(a,d,k,b){
  case'buySR':{if(buyRoomPhase('sr',+k))sfx.buy();break}case'buyPD':{if(buyRoomPhase('pd',+k))sfx.buy();break}case'roomGo':roomGo(k);break;   /* v2.4 rc6 */
  case'buyLounge':{if(buyLounge(+k)){sfx.buy()}break}
  case'cnPlan':{if(cnPlan()){sfx.buy();toast('明晚是主廚之夜。');keepScroll(showShop,'.cn-card')}break}   /* rc7.6 */
+ case'ktHold':{if(ktHold()){sfx.tap();toast('今晚是 Ken 的品酒夜。');keepScroll(showPrep,'.kt-ask')}break}   /* rc7.6 (08:51) */
+ case'ktCancel':{if(ktCancel()){sfx.tap();toast('品酒夜這次不辦。');keepScroll(showPrep,'.kt-ask')}break}
  case'cnCancel':{if(cnCancel()){sfx.tap();toast('主廚之夜取消了。');keepScroll(showShop,'.cn-card')}break}
  case'jillPost':{if(jillPost(k))sfx.tap();if(sub==='book')showBook();else showShop();break}
  case'postsAll':{postsAll=!postsAll;sfx.tap();keepScroll(sub==='book'?showBook:showShop,'[data-act=postsAll]');break}
