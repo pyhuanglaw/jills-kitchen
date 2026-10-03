@@ -3878,3 +3878,33 @@ def v24_rc76_the_chefs_night(b, port, target):
     check(g.ev("albumList().some(p=>p.kind==='chefnight')"), 'the album has the night')
     check('一週最多一次' in g.ev("cnWhyNot()"), 'and the next one is a week away')
     check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc77_the_page_carries_only_the_portraits_the_game_shows(b, port, target):
+    """rc7.1 (the player, 2026-10-02 21:05: the page took more than ten seconds to open on the phone) took the portraits the
+    game never shows out of the page — the seven outside-cast cards of P5 (paused) and the 2.2.1 staff cards the player
+    redrew as st23_*; they stay as files in assets/portraits. rc7.2 was built on rc7 without rc7.1 (the text-box backup
+    that froze the iPhone), and the 35 came back with it: 0.77 MB the game never used, from rc7.2 to rc7.6. rc7.7 takes
+    them out again. Every face the game can show is still in the page; nothing it cannot show is."""
+    g = Game(b, port, target, seed=7701, manual=True, viewport={'width': 390, 'height': 844})
+    r = json.loads(g.ev("""JSON.stringify((()=>{const want=new Set();
+      for(const P of Object.values(PORTRAITS))for(const k of Object.values(P.v))want.add(k);
+      for(const k of Object.values(STAFF_PORTRAITS))want.add(k);
+      for(const T of Object.values(PORTRAIT_TONES))for(const k of Object.values(T))want.add(k);
+      for(const N of Object.values(NAMED))if(N&&N.p)want.add(N.p);
+      const have=Object.keys(window.PORTRAIT_DATA||{});return{want:[...want],have,missing:[...want].filter(k=>!PORTRAIT_DATA[k])}})())"""))
+    check(len(r['want']) >= 60, f"the game's faces were found: {len(r['want'])}")
+    check(not r['missing'], f'every face the game can show is in the page: missing {r["missing"]}')
+    src = open(os.path.join(ROOT, 'js', 'game.js'), encoding='utf-8').read()
+    unused = [k for k in r['have'] if k not in src]
+    check(not unused, f'the page carries no portrait the game never refers to: {unused}')
+    gone = re.compile(r'^(v24_(xtm|shan|gx|lin|kevin|yx|xtf)(_[a-z]+)?|staff_([1-6]|xiaotong|momo|nina|yuki|azhu|hugo|azhe|aming))$')
+    check(not [k for k in r['have'] if gone.match(k)], 'the outside cast and the 2.2.1 cards are not in the page')
+    kept = [os.path.basename(p)[:-4] for p in glob.glob(os.path.join(ROOT, 'assets', 'portraits', '*.png'))]
+    check(any(gone.match(k) for k in kept), 'they are still kept as files in assets/portraits')
+    # a face from each source still shows: Jill, a regular, a named guest with moods, the staff
+    for who, tone in [('jill', 'warm'), ('mia', 'thinking'), ('named:品酒師 Ken', 'wry'), ('staff:許葳', 'work'), ('staff:沈晴', None)]:
+        ok = g.ev(f"!!(portraitOf({json.dumps(who, ensure_ascii=False)},{json.dumps(tone)})||{{}}).src")
+        check(ok, f'{who} ({tone}) has a face')
+    check(not g.errors, g.errors[:3]); g.close()
