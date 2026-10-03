@@ -27,6 +27,8 @@ YAF = os.path.join(ROOT, 'docs/v24/art/illus_ya_first_2026-10-02_1657.png')  # 2
 YAJ = os.path.join(ROOT, 'docs/v24/art/illus_ya_join_2026-10-02_1659.png')   # 2026-10-02 16:59, supplied by the player: after the trial, the room thinner — Jill and 予安 at the bar, 「下週還有空嗎？」
 LHI = os.path.join(ROOT, 'docs/v24/art/illus_lin_hello_2026-10-03.webp')  # 2026-10-03, supplied by the player: 《隔壁》 — Day 1 at the door, Madame Lin handing Jill the small box
 DBK = os.path.join(ROOT, 'docs/v24/art/illus_dylan_book_2026-10-03.webp')  # 2026-10-03, supplied by the player: 《一本不一樣的書》 — Dylan from behind at his desk (hoodie, headphones), the dark bar-design book among the exam books, Jill looking at it
+LVW = os.path.join(ROOT, 'docs/v24/art/illus_lin_viewing_2026-10-03.webp')  # 2026-10-03, supplied by the player: 《看看》 — Madame Lin's own bar before opening (terrazzo, the old bar, red stools, the turntable), Madame Lin showing Jill in, Evan polishing a glass behind the bar
+LSG = os.path.join(ROOT, 'docs/v24/art/illus_lin_sign_2026-10-03.webp')  # 2026-10-03, supplied by the player: 《簽約》 — the same bar, closed, in the morning: the contract, the pen and the keys on the bar top, Jill signing, Madame Lin beside her, Evan, Dylan from behind
 # key -> (sheet, box). Boxes chosen by eye on the sheets; 4:3 is enforced by a centered crop of the box.
 ART = {
     'sophie_mia_leave':  (SML, (15, 0, 1380, 1024)),    # 《一起回家》 — Sophie and Mia arm in arm on the way out, the cat on the counter behind them (the player's full picture, 2026-10-01)
@@ -48,9 +50,11 @@ ART = {
     'du_wine':           (DWN, (0, 0, 1448, 1086)),      # rc7 illustration 《可是它很好》 — 杜先生 with the glass, Ken watching him, the bottle between them (the player's picture, whole)
     'ya_trial':          (YAT, (0, 0, 1448, 1086)),      # rc7 illustration 《彈得真好》 — the trial at the Lounge's piano (the player's picture, whole)
     'ya_first':          (YAF, (0, 0, 1448, 1086)),      # rc7 illustration 《那台鋼琴》 — 予安 at a small table, looking at the piano (the player's picture, whole)
-    'ya_join':           (YAJ, (0, 0, 1448, 1086)),
+    'ya_join':           (YAJ, (0, 0, 1448, 1086)),      # rc7 illustration 《星期幾？》 — Jill and 予安 at the bar after the trial (the player's picture, whole)
     'lin_hello':         (LHI, (0, 0, 1448, 1086)),      # rc8 illustration 《隔壁》 — Madame Lin's present at the door, Day 1 (the player's picture, whole)
-    'dylan_book':        (DBK, (0, 0, 1448, 1086)),      # rc8 illustration 《一本不一樣的書》 — the book on the exam books; Dylan's face never shown (the player's picture, whole)      # rc7 illustration 《星期幾？》 — Jill and 予安 at the bar after the trial (the player's picture, whole)
+    'dylan_book':        (DBK, (0, 0, 1448, 1086)),      # rc8 illustration 《一本不一樣的書》 — the book on the exam books; Dylan's face never shown (the player's picture, whole)
+    'lin_viewing':       (LVW, (0, 0, 1448, 1086)),      # rc8 illustration 《看看》 — her bar, Evan behind it (the player's picture, whole)
+    'lin_sign':          (LSG, (0, 0, 1448, 1086)),      # rc8 illustration 《簽約》 — the contract, the pen, the keys; Dylan's face never shown (the player's picture, whole)
 }
 KEEP = {'up_cats': 760}   # pictures kept whole at their own proportions (height in px); the dialog shows them contained
 def crop43(im, box):

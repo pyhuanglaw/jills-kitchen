@@ -104,8 +104,9 @@ errors.
 
 ## 8. Known limitations
 
-- Pictures: `qt_first`, `qt_more`, `qt_lesson`, `qt_play`, `qt_alone` (and the five Madame Lin ones) are drawn stand-ins
-  until the player's art files arrive.
+- Pictures: `qt_first`, `qt_more`, `qt_lesson`, `qt_play`, `qt_alone` and Madame Lin's `lin_guest` are drawn stand-ins
+  until the player's art files arrive. The player's `lin_hello`, `dylan_book` (with this line's commit), `lin_viewing` and
+  `lin_sign` (the commit after) are in.
 - The Lounge does not dim to 「只剩吧台那一區的燈」 on screen; the narration says it, the stand-in picture shows it.
 - The five-note phrase plays as a simple tone sequence.
 - Nothing here has been played by the player (O).
