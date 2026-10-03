@@ -145,11 +145,31 @@ Checked against the final feature set: every section. Changed in this release:
 
 ## 6. Full regression
 
-RESULT_PLACEHOLDER
+- **252ff1c (the game published): 233 tests, 231 passed, 2 failed** — `docs/evidence/v24_rc8_release/regression/
+  full_regression_252ff1c.log`, a clean worktree of the commit, in three shards side by side. Every test ran; none was
+  skipped or deselected.
+- The two failures were tests, not the game (each classified before anything changed):
+  `lounge_i_content_bar_food…` — seed 52's day had no Lounge bar food; seeds 51/53–56 gave 4/2/1/3/3 bites before the
+  cooks' rule and 5/1/3/2/3 after, the same spread; back to seed 51. `v24_rc7_a_line_finds_its_table` — the right table
+  was marked, the check read the last mark while the previous one was still fading. Fixed in 8f7d6b2 (tests only) and
+  re-run: both pass. The game files of 8f7d6b2 are 252ff1c's, and the page built from it is the same file.
+- Earlier full runs in this batch (72834a3, 5d21f20) found the failures fixed in 25a0710 (樾樾 and the closing, the
+  Lounge's novelty talk), 31b75bb (the cat sofa test) and cb6c385 (the manual stamp test); the targeted runs after each
+  fix are in their commits.
 
 ## 7. Build and publish
 
-PUBLISH_PLACEHOLDER
+- `tools/build_single.py`: the committed single file matches (`single_file_in_sync` passes). `tools/build_artifact.py`
+  → `jills-kitchen-rc8.html` (6,620,821 bytes, sha256 05bb90ced9e8). Tag `v2.4-rc8`.
+- Published to https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA — **version 2** (id 1791034406-f0f8), read back at once.
+  The player chose this URL in this batch (2026-10-03) over the old one, which keeps rc7.6; saves come over by 設定・存檔.
+- Read back and checked (`tools/sims/live_check.py`, `docs/evidence/v24_rc8_release/live/`): the page built from the tag
+  is inside the live HTML byte for byte (the host adds its 552-byte skeleton); the player's Day 74 save opens with
+  「繼續營業 · 21:48」, the evening resumes, every room photographed (The Lounge and Jill's room too), the summary, the
+  staff page (廚師 6/6・服務生 6/6・清潔員 2/2・Lounge 員工 5/5), Day 75's prep and restock ($208,704 → $183,341), a
+  reload keeps DAY 75 and the money; no page errors.
+- The tag moves to this report's commit (documents and evidence only; the game is 252ff1c's).
+- Zips: not made this time — the player asked to publish straight away; every file is in `wip/lin` and the tag on GitHub.
 
 ## 8. Evidence (390×844, headless Chromium — T, not O)
 
