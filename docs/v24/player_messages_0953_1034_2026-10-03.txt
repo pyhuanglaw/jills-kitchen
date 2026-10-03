@@ -1,0 +1,43 @@
+(Filed verbatim, 2026-10-03. The player's messages from 09:53 to 10:34, while rc7.6 was being released and rc7.7 begun.)
+
+09:53  所以Ken還有品酒液以前的規則跟現在的規則有什麼差別？回答完我之後繼續做
+
+10:10  Ken自己倒酒也太累了吧 酒吧的服務生不能幫忙嗎？品酒日的時候原本的bartender要不要上班
+
+       主廚之夜是怎麼決定要不要辦
+
+       Ken辦品酒日也可以分潤給他吧？當天百分之三十利潤給Ken 才合理，從第一次開始就要，Ken本來想友情主持，而且是自己喜歡，但是Jill主動說要給
+
+       為什麼lounge會有沒人站吧台這種情況？
+
+10:11  你可以大概跟我說一下從昨天零點開始為什麼？你分那麼多次發佈版本嗎？因為這樣不是要每次發佈都要跑很多測試你這樣消耗了很多我的用量因為沒有這麼多更新，不是嗎？
+
+10:16  PUBLISH ≠ PROGRESS
+
+       Continue implementation, testing, regression, simulation, and safe fixes autonomously, but do NOT publish a new production Artifact merely because a subtask is completed.
+
+       Batch completed fixes into one release candidate. Publish only when:
+
+       1. the current requested batch is complete,
+       2. regression tests pass,
+       3. migration/save compatibility is verified,
+       4. there is a meaningful build ready for iPhone normal-play QA.
+
+       During autonomous work, prefer local/internal builds and evidence. Do not repeatedly publish intermediate versions unless publication itself is necessary to test a host-specific problem.
+
+       If several small fixes are discovered after an RC, accumulate them into the next RC rather than publishing one version per fix.
+
+10:32  (quoting: 「Lounge 剛蓋好、還沒請 bartender」)
+       不應該有這種情況 因為Evan 一開始就要在酒吧裡 之後會有更新劇情他是madam Lin 開酒吧的時候原本就在的員工
+
+10:34  “Publish” always means one consolidated release at the end of the current batch unless I explicitly say “publish this change now.” Do not infer permission to publish intermediate builds from phrases such as “先做不用圖的”、“先做這些”、“這個先處理” or “可以先完成的先做”. These mean implementation priority, not release frequency.
+
+How they were read (told to the player):
+- 10:10, the share: 30% of what the tasting night's guests paid for the glasses and the bites, less what those cost —
+  not 30% of the whole day's profit. From the first night. In 「Ken 提議」 he says he will host it as a friend (友情主持),
+  because he enjoys it; Jill offers the share herself.
+- 10:10, the pouring: Ken hosts behind the bar; the bartenders pour along the bar; the Lounge's floor person carries the
+  rounds to the tables and the sofa (the bartenders too, when there is no floor person in).
+- 10:16 and 10:34: permanent — written into docs/RELEASE_CHECKLIST.md §0a.
+- 10:32: Evan is behind the bar from the day the Lounge is built, never hired. Canon for the later Madame Lin story:
+  Evan already worked at Madame Lin's bar when she opened it.

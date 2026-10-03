@@ -5,8 +5,9 @@ release report.
 
 ## 0. Scope — finish everything the player asked for (2026-10-02, the player)
 
-- Everything the player has asked for gets finished, whether or not a release was published in between. A release is
-  a checkpoint, not a stopping point (`docs/v24/rule_finish_everything_0237_2026-10-02.txt`).
+- Everything the player has asked for gets finished. A release is never a stopping point
+  (`docs/v24/rule_finish_everything_0237_2026-10-02.txt`) — and finishing something is never a reason for a release
+  (§0a).
 - After a release, go straight on to the next part of what was asked (the plan's next release). Stop only when nothing
   that was asked for is left, or for a product decision only the player can make.
 - 「中間不用停」 means: do not stop, and do not stop after a release either.
@@ -16,6 +17,28 @@ release report.
   confirmed canons contradict each other, irreversible save loss, a major product fork with no safe reversible
   default, or a missing asset with nothing else to do. The player's silence is not a pause. Keeping going never means
   inventing scope. After a release: say 「v2.4-rcN 已發布完成。」 and go straight on to the roadmap's next part.
+
+## 0a. Publish ≠ progress — one consolidated release per batch (permanent)
+
+The player, 2026-10-03 10:16 and 10:34 (`docs/v24/player_messages_0953_1034_2026-10-03.txt`).
+
+- Implementation, tests, regressions, simulations and safe fixes go on autonomously. Finishing a subtask is never a
+  reason to publish.
+- "Publish" always means ONE consolidated release at the end of the current batch, unless the player explicitly says
+  「publish this change now」.
+- Publish only when all four hold:
+  1. the current requested batch is complete;
+  2. the full regression passes on the commit to be published (§5);
+  3. migration and save compatibility are verified;
+  4. the build is meaningful for the player's normal play on the iPhone.
+- During the work: local and internal builds and evidence only. An intermediate version is published only when
+  publishing is itself needed to test a problem specific to the host (claude.ai), and the player is told why.
+- Small fixes found after a release candidate go into the next one — never one version per fix.
+- 「先做不用圖的」「先做這些」「這個先處理」「可以先完成的先做」 and the like set what to implement first. They are never
+  permission to publish an intermediate build.
+- Why: from 2026-10-02 00:00 to 2026-10-03 09:52 there were ten publishes (v40–v49). rc7.3 + rc7.4 were one batch,
+  and so were rc7.5 + rc7.6. Every publish ran the whole release — the regression, the build, the read-back, the live
+  check, the report, eleven zips — and used the player's allowance for little.
 
 ## 1. Content in the release
 
