@@ -9644,6 +9644,7 @@ function freeJillPos(){const ivs=seatIvs(null);const ok=p=>ivFree(JPOS[p].x-13,J
 function jillWalk(L,x,y,after,rm){L.tx=x;L.ty=y;L.after=after;L.walking=true;L.via=null;L.troom=rm||L.room||'main';if(!L.room)L.room='main';if(L.troom!==L.room)return;   /* rc7.3: to another room: through its doors (stepTo) */
  if(L.y<148&&y>=148)L.via={x:L.x,y:152};else if(y<148&&L.y>=148)L.via={x,y:152}}
 function jillLife(J,L,dt){const tv=LIFE.tv;
+ if(!L.on&&CATS)for(const c of CATS)if(c.sofa&&c.sofa.kind==='lean'&&c.sofaOn)leaveSofa(c);   /* rc8.3: nobody to lean on — and her place is hers when she comes back (seed 42 of jill_evening_life: 寶寶 stayed where she leant and Jill, back with the TV, had nowhere to sit) */
  if(L.walking&&(L.troom||L.room||'main')!==(L.room||'main')){/* rc7.3: across rooms — the kitchen, then her own room */L.step+=dt*12;if(stepTo(L,140*dt)){L.walking=false;const a=L.after;L.after=null;jillArrive(L,a)}}
  else if(L.walking){const tx=L.via?L.via.x:L.tx,ty=L.via?L.via.y:L.ty;const dx=tx-L.x,dy=ty-L.y,d=Math.hypot(dx,dy),v=140*dt;
   if(d<=v){L.x=tx;L.y=ty;if(L.via){L.via=null}else{L.walking=false;const a=L.after;L.after=null;jillArrive(L,a)}}else{L.x+=dx/d*v;L.y+=dy/d*v;L.face=dx>=0?1:-1;L.step+=dt*12}}

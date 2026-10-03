@@ -729,7 +729,9 @@ def sofa_geometry(b, port, target):
 @test
 def jill_evening_life(b, port, target):
     """Twelve seeded evenings: Jill finds her own way to the sofa most nights, stretches out when the seat is
-    free, reads / watches the rolling TV / does nothing, and never breaks a rule doing it."""
+    free, reads / watches the rolling TV / does nothing, and never breaks a rule doing it. At the end of the evening she is
+    seated — or, since rc8.2's room life, up and doing something (walking, fetching or pushing the TV, looking at Dylan's
+    screen); never standing still with nothing to do."""
     nights = []
     for seed in range(40, 52):
         g = Game(b, port, target, seed=seed, manual=True)
@@ -741,7 +743,8 @@ def jill_evening_life(b, port, target):
         nights.append({'seed': seed, 'plan': samples[-1]['plan'], 'rooms': seated_rooms, 'sat': any(x['jill']['on'] for x in samples),
                        'legs': max(x['jill']['legs'] for x in samples), 'acts': acts,
                        'tv': any(x['tv']['on'] for x in samples), 'tvmoved': any(x['tv']['at'] in ('use', 'moving') for x in samples),
-                       'endSeated': samples[-1]['jill']['on'] or samples[-1]['jill']['bed'] or samples[-1]['plan'] == 'table',   # rc7.3: or on the edge of the bed, in her room
+                       'endSeated': samples[-1]['jill']['on'] or samples[-1]['jill']['bed'] or samples[-1]['plan'] == 'table'   # rc7.3: or on the edge of the bed, in her room
+                                    or samples[-1]['jill']['walking'] or samples[-1]['jill']['act'] in ('fetch', 'pushing', 'peeking'),   # rc8.2's room life: up for something, not stuck (seed 42 on rc8.3: from Dylan's screen to the TV)
                        'cats': max(sum(1 for c in x['cats'] if c['on']) for x in samples)})
         g.close()
     sat = [n for n in nights if n['sat']]
