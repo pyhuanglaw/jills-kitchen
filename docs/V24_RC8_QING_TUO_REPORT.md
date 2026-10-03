@@ -109,9 +109,9 @@ errors.
 
 ## 8. Known limitations
 
-- Pictures: `qt_lesson`, `qt_play` and `qt_alone` are drawn stand-ins until the player's art files arrive. The player's
-  `lin_hello`, `dylan_book` (with this line's commit), `lin_viewing`, `lin_sign`, `lin_guest`, `qt_first` and `qt_more`
-  (the commits after) are in.
+- Pictures: all ten of the player's pictures are in — `lin_hello` and `dylan_book` with this line's commit; `lin_viewing`,
+  `lin_sign`, `lin_guest`, `qt_first`, `qt_more`, `qt_lesson`, `qt_play` and `qt_alone` in the commits after. The drawn
+  stand-ins stay in the code as the fallback.
 - The Lounge does not dim to 「只剩吧台那一區的燈」 on screen; the narration says it, the stand-in picture shows it.
 - The five-note phrase plays as a simple tone sequence.
 - Nothing here has been played by the player (O).

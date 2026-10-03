@@ -32,6 +32,9 @@ LSG = os.path.join(ROOT, 'docs/v24/art/illus_lin_sign_2026-10-03.webp')  # 2026-
 LGU = os.path.join(ROOT, 'docs/v24/art/illus_lin_guest_2026-10-03.webp')  # 2026-10-03, supplied by the player: 《你選》 — Madame Lin on the guest side of The Lounge's bar for the first time, the drinks list open, Evan behind the bar waiting
 QTF = os.path.join(ROOT, 'docs/v24/art/illus_qt_first_2026-10-03.webp')  # 2026-10-03, supplied by the player: 《今天喝？》 — Dylan's first drink at The Lounge's bar, a glass in front of him, Evan behind the bar polishing a glass
 QTM = os.path.join(ROOT, 'docs/v24/art/illus_qt_more_2026-10-03.webp')   # 2026-10-03, supplied by the player: 《最近比較常》 — the bar after closing: 阿拓 pours for 沈晴, 予安 beside them, Evan behind the bar, Dylan with his glass
+QTL2 = os.path.join(ROOT, 'docs/v24/art/illus_qt_lesson_2026-10-03.webp')  # 2026-10-03, supplied by the player: 《你喜歡予安？》 — 予安 beside 阿拓 at the black grand piano, one finger each on the keys; Dylan and Evan at the bar with their glasses, watching; 沈晴 away
+QTP = os.path.join(ROOT, 'docs/v24/art/illus_qt_play_2026-10-03.webp')    # 2026-10-03, supplied by the player: 《講完》 — 阿拓 at the piano, one finger on a key; 沈晴 leaning on the piano, looking at him; Evan, 予安 and Dylan far back at the bar
+QTA = os.path.join(ROOT, 'docs/v24/art/illus_qt_alone_2026-10-03.webp')   # 2026-10-03, supplied by the player: 《難怪》 — the empty Lounge from afar, the door shut, part of it dark; 阿拓 on the piano bench, 沈晴 standing by the piano
 # key -> (sheet, box). Boxes chosen by eye on the sheets; 4:3 is enforced by a centered crop of the box.
 ART = {
     'sophie_mia_leave':  (SML, (15, 0, 1380, 1024)),    # 《一起回家》 — Sophie and Mia arm in arm on the way out, the cat on the counter behind them (the player's full picture, 2026-10-01)
@@ -61,6 +64,9 @@ ART = {
     'lin_guest':         (LGU, (0, 0, 1448, 1086)),      # rc8 illustration 《你選》 — Madame Lin at The Lounge's bar with the list, Evan waiting (the player's picture, whole)
     'qt_first':          (QTF, (0, 0, 1448, 1086)),      # rc8 illustration 《今天喝？》 — Dylan at The Lounge's bar, Evan behind it (the player's picture, whole)
     'qt_more':           (QTM, (0, 0, 1448, 1086)),      # rc8 illustration 《最近比較常》 — 阿拓 pours for 沈晴 after closing (the player's picture, whole)
+    'qt_lesson':         (QTL2, (0, 0, 1448, 1086)),     # rc8 illustration 《你喜歡予安？》 — 予安 shows 阿拓 the five notes (the player's picture, whole)
+    'qt_play':           (QTP, (0, 0, 1448, 1086)),      # rc8 illustration 《講完》 — 阿拓 plays them for 沈晴 (the player's picture, whole)
+    'qt_alone':          (QTA, (0, 0, 1448, 1086)),      # rc8 illustration 《難怪》 — the two of them left in the Lounge (the player's picture, whole)
 }
 KEEP = {'up_cats': 760}   # pictures kept whole at their own proportions (height in px); the dialog shows them contained
 def crop43(im, box):
