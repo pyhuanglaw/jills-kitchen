@@ -3405,10 +3405,10 @@ def v24_rc74_the_lounges_new_bites(b, port, target):
     check(all(o['cnt'].get(x, 0) > 0 for x in NEW) and not o['bad'], f'the Lounge orders each of them, and nothing from the restaurant: {o}')
     check(o['fan'].get('wings', 0) > 0 and o['fan'].get('cheesestick', 0) > 0 and not o['fan'].get('oyster') and not o['fan'].get('knuckle') and not o['fanBad'], f'the fans: the fried ones: {o}')
     # the way it goes: a Lounge table orders the wings; the kitchen cooks them; the Lounge's own waiter carries them. Every
-    # new dish's first portion is Jill's (the manual: 每道新菜的第一份，永遠由 Jill 親自做) — the cooks take it from then on.
-    check(g.ev("chefCanAny('wings')") is False, 'a new dish: the first one is Jill\'s')
+    # new dish's first portion is the cooks' too (rc8, the player 2026-10-03: 「不管是不是第一次做那道菜，有廚師她就不用做」).
+    check(g.ev("(()=>{const x=S.xp.wings;S.xp.wings=0;const a=chefCanAny('wings');S.xp.wings=x;return a})()") is True, 'a new dish: the cooks can make the first one')
     g.ev("S.xp.wings=Math.max(S.xp.wings||0,1)")
-    check(g.ev("chefCanAny('wings')") is True, 'once she has made it, the cooks can')
+    check(g.ev("chefCanAny('wings')") is True, 'and every one after')
     g.ev("__botUntil('R.t>=R.dur*.3',90000,1/30)")
     where = g.ev("""(()=>{const free=t=>t.room==='lounge'&&t.kind!=='bar'&&t.seats>=2&&!t.group&&!t.dirty&&!t.claim;if(!R.tables.some(free)){const t=R.tables.find(t=>t.room==='lounge'&&t.kind!=='bar'&&t.seats>=2&&t.group);if(t)leaveGroup(t.group,'ok')}
       for(const t of R.tables)if(t.room==='lounge'&&t.kind!=='bar'&&!t.group){t.dirty=false;t.claim=null;t.plates=[]}
@@ -3545,8 +3545,8 @@ def v24_rc75_the_pizza_oven_one_more_cook_and_the_bar_pizza(b, port, target):
     mc = g.ev("menuCount()")
     g.ev("labSel=['dough','tomato','cheese'];doAct('labTry',null,null,null)")
     check(g.ev("S.unlocked.includes('pizza')&&S.menu.includes('pizza')") and g.ev("menuCount()") == mc, 'the lab finds it; it is on the menu, taking no slot')
-    # Jill makes the first; then the cook at the oven
-    check(g.ev("chefCanAny('pizza')") is False, 'the first one is Jill\'s')
+    # the cook at the oven, from the first one (rc8, the player 2026-10-03: 「不管是不是第一次做那道菜，有廚師她就不用做」)
+    check(g.ev("(S.xp.pizza||0)===0&&chefCanAny('pizza')") is True, 'the first one is the cook\'s too')
     g.ev("S.xp.pizza=Math.max(S.xp.pizza||0,1);S.stock.pizza=Math.max(S.stock.pizza||0,8)")
     if g.ev("phase") == 'shop':
         g.click('#screen [data-act=toPrep]' if g.page.query_selector('#screen [data-act=toPrep]') else '#screen [data-act=nextDay]'); g.page.wait_for_timeout(200)

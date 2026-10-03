@@ -964,14 +964,15 @@ def cooking_flow_families(b, port, target):
 
 @test
 def kitchen_staff_ladder(b, port, target):
-    """Chefs grow by capability: LV1 only simple dishes Jill has already cooked, LV2 ordinary ones, LV3+
-    also takes over a dish Jill started. The signature dish and the first serving of any dish stay Jill's."""
+    """Chefs grow by capability: LV1 only simple dishes, LV2 ordinary ones, LV3+ also takes over a dish Jill
+    started. The signature dish stays Jill's until LV5. rc8 (the player, 2026-10-03: 「不管是不是第一次做那道菜，有廚師她就
+    不用做」): a dish's first serving is no longer Jill's alone — a chef of the right level cooks a dish she never has."""
     g = Game(b, port, target, seed=12, manual=True)
     g.ev("S.level=5;S.eq.stove=3;S.eq.oven=3;S.eq.bar=3;for(const d in DISHES)if(!S.unlocked.includes(d))S.unlocked.push(d);S.signature={base:'mash',protein:'duck',sauce:'redwine',side:'asparagus',name:'Sig'};S.xp={friedrice:30,seafood:30,burger:30};S.crew=[{id:'c1',role:'chef',name:'阿德',lv:1,duty:'stove'}]")
     r = g.ev("(()=>{const m=S.crew[0];const at=lv=>{m.lv=lv;return{fr:chefCan(m,'friedrice'),pasta:chefCan(m,'pasta'),seafood:chefCan(m,'seafood'),sig:chefCan(m,'signature')}};return{l1:at(1),l2:at(2),l3:at(3),l5:at(5)}})()")
     check(r['l1'] == {'fr': True, 'pasta': False, 'seafood': False, 'sig': False}, f'LV1 chef scope wrong: {r}')
-    check(r['l3']['seafood'] and not r['l3']['sig'] and not r['l5']['sig'], f'LV3+/signature scope wrong: {r}')
-    check(not r['l2']['pasta'], 'a dish Jill has never cooked (xp 0) must stay hers')
+    check(r['l3']['seafood'] and not r['l3']['sig'] and r['l5']['sig'], f'LV3+/signature scope wrong (rc8: LV5 cooks the signature, first time or not): {r}')
+    check(r['l2']['pasta'] and g.ev("(S.xp.pasta||0)") == 0, 'rc8: a dish Jill has never cooked (xp 0) is a LV2 chef\'s too')
     g.click('[data-act=open]'); start_day(g)
     r = g.ev(r"""(()=>{const g0={name:'T',size:1,table:0,state:'wait',pat:1,type:'office',looks:[]};const mk=d=>{const it={d,st:'pending',q:null,want:0,picked:false};const tk={id:900+Math.random()*99|0,no:1,g:g0,items:[it],t0:R.t};R.tickets.push(tk);startCook(tk,it,true);return R.slots.find(x=>x.job&&x.job.it===it)};
       const m=S.crew[0];m.lv=1;const s1=mk('friedrice');const a=!!chefHandles(s1);m.lv=3;const b=!!chefHandles(s1);const s2=mk('seafood');const c=!!chefHandles(s2);m.lv=1;const d=!!chefHandles(s2);return{a,b,c,d}})()""")
@@ -1271,11 +1272,11 @@ def jill_rests_when_staff_cover_the_floor(b, port, target):
     g.click('[data-act=open]')
     def run_day(actor):
         start_day(g)
-        stats = g.ev("(()=>{window.__rs={sit:0,frames:0,acts:new Set(),pets:0};return 1})()")
+        stats = g.ev("(()=>{window.__rs={sit:0,frames:0,acts:new Set(),pets:0,cov:new Set()};return 1})()")
         for _ in range(1500):
-            r = g.ev("(()=>{for(let i=0;i<10;i++){if(!(phase==='service'&&R))return 0;if(i===0)%s();__tick(1000/30);const J=R.jill;__rs.frames++;if(J.rest==='sit'){__rs.sit++;__rs.acts.add(LIFE.jill.act)}if(J.pet)__rs.pets++;if(R.closing!=null&&R.closing>2&&!R.ended){finishClosing();return 0}}return 1})()" % actor)
+            r = g.ev("(()=>{for(let i=0;i<10;i++){if(!(phase==='service'&&R))return 0;if(i===0)%s();__tick(1000/30);const J=R.jill;__rs.frames++;if(J.rest==='sit'){__rs.sit++;__rs.acts.add(LIFE.jill.act)}if(J.pet)__rs.pets++;for(const s of R.slots){const m=s.job&&s.job.chef&&(S.crew||[]).find(q=>q.id===s.job.chef);if(m&&m.duty!==s.type)__rs.cov.add(s.type)}if(R.closing!=null&&R.closing>2&&!R.ended){finishClosing();return 0}}return 1})()" % actor)
             if not r: break
-        return g.ev("({sit:__rs.sit,frames:__rs.frames,acts:[...__rs.acts],pets:__rs.pets})")
+        return g.ev("({sit:__rs.sit,frames:__rs.frames,acts:[...__rs.acts],pets:__rs.pets,cov:[...__rs.cov]})")
     alone = run_day('__act')
     check(alone['sit'] / max(1, alone['frames']) < .03, f'day 1 alone: Jill has no time to sit ({alone})')
     check(alone['pets'] > 0, 'even on a busy day she pats a cat that comes by')
@@ -1285,11 +1286,15 @@ def jill_rests_when_staff_cover_the_floor(b, port, target):
     g.ev("(()=>{const el=document.createElement('button');el.dataset.act='restock';$('#screen').appendChild(el);el.click();el.remove()})()")
     staffed = run_day('__actLazy')
     frac = staffed['sit'] / max(1, staffed['frames'])
-    # The fraction is a wide stochastic quantity on this 12–14-guest Day 2: it depends on how many of the day's orders
-    # are oven/prep dishes (the only ones Jill cooks with a stove chef and a bar chef on). Measured on the same seeds
-    # 7/8/9: v2.1 0.34/0.41/0.26, v2.2 0.65/0.17/0.30 (docs/evidence/v22_rng_invariants.md) — the mechanism is
-    # unchanged, so the bound is "not never, not always", not a point estimate.
-    check(.12 < frac < .75, f'with a full crew she should sit part of the day, not never and not always: {staffed}')
+    # Up to rc8 the oven and cold-station dishes were Jill's on this day (a stove chef and a bar chef on, no cook at
+    # those two), so the fraction swung with how many of them the guests ordered (v2.1 0.34/0.41/0.26, v2.2
+    # 0.65/0.17/0.30 on seeds 7/8/9; rc7.7 0.46/0.44/0.12, so the old 0.12 bound failed on rc7.7's seed 9 too) and the
+    # bound was "not never, not always". rc8 (the player, 2026-10-03): 「其他時候廚師都可以自己接手」 and 「不管是不是第一次
+    # 做那道菜，有廚師她就不用做」 — a station with no cook of its own gets one from another station (chefCover), so with
+    # a crew this day is the cooks' and she rests most of the service (0.91/0.89/0.90 on seeds 7/8/9). "Not always" is
+    # her own day (above) and the tapped table that gets her up at once (below).
+    check(frac > .5, f'with a full crew she rests most of the service: {staffed}')
+    check('oven' in staffed['cov'] or 'prep' in staffed['cov'], f'a cook from another station took the oven or cold-station dishes: {staffed}')
     check('read' in staffed['acts'] or 'look' in staffed['acts'], f'on the sofa she reads or looks around: {staffed}')
     # work arrives while she sits: she gets up at once
     if g.ev("phase") == 'summary': g.click('[data-act=toShop]')
@@ -1476,7 +1481,8 @@ def demand_recommendation_staff_v181(b, port, target):
     check(g.ev("R.slots.some(s=>s.job&&s.job.d==='signature'&&s.job.chef==='c3')"), f'the LV5 chef should pick up the Signature order ({n} frames)')
     check(g.ev("S.taught") == 8 and '交給你了' in g.page.locator('#toasts').inner_text(), 'the hand-over moment fires once, on the first Signature the chef takes')
     # staff list
-    g.ev("phase='shop';S.phase='shop';R=null;showShop()")
+    # rc8: a dish Jill has never made no longer locks it (the player, 2026-10-03); a LV2 cook still has 🔒 by level (the Signature: LV5)
+    g.ev("phase='shop';S.phase='shop';R=null;S.crew[0].lv=2;showShop()")
     g.ev("(()=>{const el=document.createElement('button');el.dataset.act='tab';el.dataset.k='staff';$('#screen').appendChild(el);el.click();el.remove()})()")
     caps = g.page.locator('.item .cap span').all_inner_texts()
     check(any('✓' in c for c in caps) and any('🔒' in c for c in caps), f'capability list should show both ✓ and 🔒: {caps}')
@@ -3814,8 +3820,8 @@ def a_second_signature_the_dessert_with_its_own_progression(b, port, target):
     # guests who came for the signature take it for dessert most of the time
     r = json.loads(g.ev("(()=>{let n=0,d=0;for(let i=0;i<200;i++){const it=orderItems({type:'gourmet',size:1,reg:null,forSig:true,seed:i},true);if(it.some(x=>DISH(x).cat==='dessert'))n++;if(it.includes('sigdessert'))d++}return JSON.stringify({n,d})})()"))
     check(r['n'] > 0 and r['d'] / r['n'] >= .5, f'of the signature guests who take a dessert, most take the signature dessert: {r}')
-    # chefs: LV5 and after Jill's first plate, like the main
-    check(g.ev("(()=>{const m={lv:5,role:'chef',duty:'prep'};S.xp.sigdessert=0;const a=chefCan(m,'sigdessert');S.xp.sigdessert=1;const b2=chefCan(m,'sigdessert');const c0=chefCan({lv:4,role:'chef',duty:'prep'},'sigdessert');return !a&&b2&&!c0})()"), 'a LV5 chef takes it over once Jill has made one; LV4 cannot')
+    # chefs: LV5, like the main (rc8, the player 2026-10-03: whether or not Jill has made one — 「不管是不是第一次」)
+    check(g.ev("(()=>{const m={lv:5,role:'chef',duty:'prep'};S.xp.sigdessert=0;const a=chefCan(m,'sigdessert');S.xp.sigdessert=1;const b2=chefCan(m,'sigdessert');const c0=chefCan({lv:4,role:'chef',duty:'prep'},'sigdessert');return a&&b2&&!c0})()"), 'a LV5 chef takes it over, made before or not; LV4 cannot')
     # the redesign costs 800
     g.ev("showShop();shopTab='sig';showShop()"); g.page.wait_for_timeout(60); g.click('[data-act=sigdOpen]'); g.page.wait_for_timeout(60)
     check(g.ev("$('[data-act=sigMake]').textContent").startswith('更新配方 $800'), 'redesign for 800')
