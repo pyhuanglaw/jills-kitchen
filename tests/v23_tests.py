@@ -833,7 +833,7 @@ def followup_the_manual_describes_the_current_game(b, port, target):
                  'Ken 的品酒夜', '品酒會只有 Ken 辦', '晚餐之後', '鋼琴與予安', '一個禮拜彈三個晚上', '鋼琴演奏', '一開始沒有人彈', 'Ken 的故事', '予安和鋼琴的故事',
                  '走向座位的路上', '跟頭像一樣',
                  # v2.4 rc7.2 (22:38–23:07): the pass, the random menu, the cards and the Lounge after dinner, no 解雇, the wages, 安安 carries the bites
-                 '在廚房點出菜口', '隨機選菜單', '今日任務要賣的菜和宣傳中的菜會留著', '晚餐後八折', 'VIP 卡', 'VIP 名單', '吃完再去 Lounge 七折', '沒有解雇', '五倍多', '做好了由她送過去',
+                 '在廚房點出菜口', '隨機選菜單', '今日任務要賣的菜和宣傳中的菜會留著', '晚餐後八折', 'VIP 卡', 'VIP 名單', '吃完再去 Lounge 七折', '沒有解雇', '五倍多', '由她送過去',
                  # v2.4 rc7.3: Jill's room, its doors, the bed, petting there, the steals, 寶寶 and the regulars, the posts
                  'Jill 的房間', '從第一天就在', '「房間 ›」', '「‹ 廚房」', '看電子書只在房間', '坐在床邊看書', '房間裡的貓也一樣可以摸',
                  '從來沒成功', '盤子沒事', '桌子底下抬頭看', '當場融化', '樾樾等 Jill', '照片和讚',
@@ -851,7 +851,9 @@ def followup_the_manual_describes_the_current_game(b, port, target):
                  # v2.4 rc7.6 (08:51): after the wine, the player holds a tasting night
                  'Ken 的品酒夜｜今晚要辦嗎？', '按「今晚辦」就是今晚', '這次不辦',
                  # v2.4 rc7.7 (10:10, 10:32): the Lounge's people pour the rounds; Ken's share; Evan from the first night
-                 '吧台那一排由調酒師倒', '品酒夜分潤', '友情主持', 'Evan 在 Lounge I 蓋好那天就在吧台']:
+                 '吧台那一排由調酒師倒', '品酒夜分潤', '友情主持', 'Evan 在 Lounge I 蓋好那天就在吧台',
+                 # rc8 (2026-10-02 19:19): the Lounge is the shop next door
+                 'Lounge 是隔壁的店', '從後場遞到 Lounge 吧台的那一頭']:
         check(need in txt, f'the manual mentions {need}')
     for stale in ['暫停選單和設定裡都有【儲存目前進度】', '把杯子交給吧台的客人；桌位由有', '上方的分頁', '畫面上方會跳一個小通知', '打烊後或開店前，商店的「社群與宣傳」分頁（第 6 天起）。', '下一段寫著', '窗邊（貓架、睡墊）', '牠會在門邊趴著等主人',
                   '人數上限跟擴建、後場整理區、側廳、廚房擴建、廚房二期、Lounge 有關', '有 Lounge 以後才能招募', '第二位調酒師',
@@ -872,7 +874,9 @@ def followup_the_manual_describes_the_current_game(b, port, target):
                   # v2.4 rc7.6: the chef's night is no longer the bar's six; Ken's night no longer the bar's stools only
                   '吧台的六個位子留給訂位的客人', '只有主廚之夜的客人在 Lounge 吃餐廳的菜', '那一晚吧台的位子留給品酒的客人',
                   # v2.4 rc7.7: Ken no longer pours every round himself; Evan is never hired
-                  '今晚的三支他一輪一輪倒', 'Lounge I 的 Evan、沈晴', '提議在吧台辦小型的品酒夜', '之後每一兩個禮拜他會再辦一次，不用你安排']:
+                  '今晚的三支他一輪一輪倒', 'Lounge I 的 Evan、沈晴',
+                  # rc8: no arch from the Main Hall to the Lounge
+                  'Lounge 蓋好以後旁邊多一道', '放在拱門和吧台之間的牆邊', '提議在吧台辦小型的品酒夜', '之後每一兩個禮拜他會再辦一次，不用你安排']:
         check(stale not in txt, f'stale line removed: {stale}')
     g.ev("showGuide()"); g.page.wait_for_timeout(50)
     check('故事' in g.ev("document.querySelector('#screen').innerText") and '社群與宣傳' in g.ev("document.querySelector('#screen').innerText"), 'the manual screen shows the new sections')

@@ -3048,14 +3048,22 @@ def v24_rc7_2_the_lounges_own_waiter_carries_its_bites(b, port, target):
         who = g.ev("__lt.claim")
         if who: break
     check(who == an, f'she carries it, nobody else: {who} (安安 is {an})')
-    # with her off: as before (another waiter with the Lounge job, the bartender, or Jill)
+    # with her off: the bartenders (or a waiter with the Lounge job) fetch it — rc8 (the player, 2026-10-02 19:19): the Lounge is
+    # the shop next door, its plates are passed through the back to the end of its bar; nothing of it waits at the Main Hall's pass
     g.ev(f"setCrewAway(S.crew.find(m=>m.id==='{an}'),'off')")
     check(not g.ev("lgWaiterHere()"), 'off today')
     ti2 = g.ev(mk)
     g.ev("R.jill.q.length=0;servePass()")
-    check(ti2 in g.ev("R.jill.q.slice()"), 'the pass\'s 送菜 takes it again')
+    check(ti2 not in g.ev("R.jill.q.slice()"), 'the pass\'s 送菜 leaves it: it is not at the pass')
+    who2 = None
+    for _ in range(900):
+        g.ev("__tick(1000/30)")
+        who2 = g.ev("__lt.claim")
+        if who2: break
+    w2 = json.loads(g.ev(f"JSON.stringify((()=>{{const m=S.crew.find(m=>m.id==='{who2}');const w=m&&R.cw[m.id];return{{role:m&&m.role,room:w&&w.task?w.task.room:null,x:w&&w.task?Math.round(w.task.x):null}}}})())")) if who2 else {}
+    check(who2 and w2.get('role') in ('bartender', 'waiter') and w2.get('room') == 'lounge', f'fetched from the end of the Lounge\'s bar: {who2} {w2}')
     man = g.ev("JSON.stringify(GUIDE)")
-    check('做好了由她送過去' in man, 'the manual says so')
+    check('由她送過去' in man and '出菜口的「送菜」只送主廳、側廳的菜' in man, 'the manual says so')
     check(not g.errors, g.errors[:3]); g.close()
 
 
@@ -3394,6 +3402,8 @@ def v24_rc74_the_lounges_new_bites(b, port, target):
       window.__LO=window.__LO||loungeOrder;loungeOrder=q=>q.__want||__LO(q);
       spawn({t:R.t,type:'office',size:2,lounge:1});const q=R.groups[R.groups.length-1];q.__want=['w_house','wings'];q.__probe=1;return q.table!=null?R.tables[q.table].room:null})()""")
     check(where == 'lounge', f'two guests sit straight down in the Lounge: {where}')
+    g.ev("""window.__carried=[];const sv0=serveItems;serveItems=function(q,list){for(const c of list){const it=c.it;if(it&&it.d==='wings'&&it.st==='ready'){const m=(S.crew||[]).find(m=>{const w=R.cw&&R.cw[m.id];return w&&w.carry&&w.carry.includes(it)});
+      __carried.push(m?[m.name,m.role,crewPool(m),!!waiterDuties(m).lounge,lgWaiterHere()]:(R.jill.carry.some(c0=>c0.it===it)?['Jill']:['?']))}}return sv0.apply(this,arguments)}""")   # rc8: who carried it, at the moment it reached the table (the walk from the end of the Lounge's bar is short)
     claims = set(); cooks = set(); r = {}
     for _ in range(500):
         r = json.loads(g.ev("""JSON.stringify((()=>{const q=R.groups.find(q=>q.__probe);if(!q)return{gone:1};const tk=q.ticket;if(!tk)return{st:q.state};const it=tk.items.find(i=>i.d==='wings');
@@ -3404,8 +3414,9 @@ def v24_rc74_the_lounges_new_bites(b, port, target):
         if r.get('it') == 'served' or r.get('gone'): break
         g.ev("for(let i=0;i<15;i++)__tick(1000/30)")
     check(r.get('it') == 'served', f'the wings reached the table: {r}')
-    check(cooks == {'stove:chef:restaurant'}, f'cooked on the kitchen\'s stove by the restaurant\'s cook: {cooks}')
-    check(claims and all(c[1] == 'waiter' and c[2] == 'lounge' and c[3] for c in claims if c[4]), f'carried by the Lounge\'s own waiter: {claims}')
+    check(cooks and all(c.startswith('stove:chef:') for c in cooks), f'cooked on the kitchen\'s stove by a cook (the restaurant\'s, or 阿拓 of the Lounge\'s list — the one kitchen): {cooks}')
+    claims = set(tuple(x) for x in json.loads(g.ev("JSON.stringify(__carried)")))
+    check(claims and all(c[1] == 'waiter' and c[2] == 'lounge' and c[3] for c in claims if len(c) > 4 and c[4]), f'carried by the Lounge\'s own waiter: {claims}')
     g.ev("setRoom('lounge');for(let i=0;i<10;i++)__tick(1000/30);document.querySelectorAll('#plines>*,#toasts>*').forEach(e=>e.remove())"); g.page.wait_for_timeout(60)
     g.page.screenshot(path=os.path.join(ROOT, 'tests', 'artifacts', 'rc74_lounge_wings.png'))
     g.ev("loungeOrder=window.__LO")
@@ -3536,6 +3547,8 @@ def v24_rc75_the_pizza_oven_one_more_cook_and_the_bar_pizza(b, port, target):
       for(const t of R.tables)if(t.room==='lounge'&&t.kind!=='bar'&&!t.group){t.dirty=false;t.claim=null;t.plates=[]}
       window.__LO=window.__LO||loungeOrder;loungeOrder=q=>q.__want||__LO(q);spawn({t:R.t,type:'office',size:2,lounge:1});const q=R.groups[R.groups.length-1];q.__want=['w_house','pizza'];q.__probe=1;return q.table!=null?R.tables[q.table].room:null})()""")
     check(where == 'lounge', f'two guests in the Lounge: {where}')
+    g.ev("""window.__carried=[];const sv0=serveItems;serveItems=function(q,list){for(const c of list){const it=c.it;if(it&&it.d==='pizza'&&it.st==='ready'){const m=(S.crew||[]).find(m=>{const w=R.cw&&R.cw[m.id];return w&&w.carry&&w.carry.includes(it)});
+      __carried.push(m?[m.name,m.role,crewPool(m),!!waiterDuties(m).lounge,lgWaiterHere()]:(R.jill.carry.some(c0=>c0.it===it)?['Jill']:['?']))}}return sv0.apply(this,arguments)}""")   # rc8: who carried it, at the moment it reached the table (the walk from the end of the Lounge's bar is short)
     seen = set(); shot = False; r = {}
     for _ in range(600):
         r = json.loads(g.ev("""JSON.stringify((()=>{const q=R.groups.find(q=>q.__probe);if(!q)return{gone:1};const tk=q.ticket;if(!tk)return{st:q.state};const it=tk.items.find(i=>i.d==='pizza');const s=R.slots.find(s=>s.job&&s.job.it===it);
@@ -3552,7 +3565,8 @@ def v24_rc75_the_pizza_oven_one_more_cook_and_the_bar_pizza(b, port, target):
         g.ev("for(let i=0;i<15;i++)__tick(1000/30)")
     check(r.get('it') == 'served', f'the pizza reached the table: {r} {seen}')
     check(('slot', 'pizza', 'pizza') in seen and ('oven', 'zone') in seen, f'the cook at the oven made it, and it baked in the oven\'s mouth: {seen}')
-    check(any(x[0] == 'carried' and x[1] == ('waiter', 'lounge') for x in seen), f'the Lounge\'s waiter carried it: {seen}')
+    carried = [tuple(x[1:3]) for x in json.loads(g.ev("JSON.stringify(__carried)"))]
+    check(carried and all(c == ('waiter', 'lounge') for c in carried), f'the Lounge\'s waiter carried it: {carried} {seen}')
     g.ev("loungeOrder=window.__LO")
     check(not g.errors, g.errors[:3]); g.close()
 
@@ -4024,4 +4038,56 @@ def v24_rc77_kens_share_of_a_tasting_night(b, port, target):
     to_service(g); g.ev("window.__act=window.__actLazy")
     g.ev("__botUntil('phase!==\\'service\\'',150000,1/30)")
     check(not g.ev("S.lastSummary.ken") and not g.ev("S.lastSummary.kt") and '品酒夜分潤' not in g.ev("$('#screen').innerText"), 'a day without a tasting night pays nothing')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_rc8_the_lounge_is_the_shop_next_door(b, port, target):
+    """The player's brief of 2026-10-02 19:19 (§0, HARD CANON): Jill's Kitchen and the bar next door each have their own door on
+    the street; the wall between them is never opened — no door from the Main Hall to the Lounge; a guest walks out onto the
+    street and in at its own door; the staff (and Jill) go the back way, the two shops' back rooms meeting behind the kitchen;
+    the kitchen still makes the Lounge's food, its plates passed through the back to the end of the Lounge's bar. The street
+    shows the bar next door in each of its states: Madame Lin's (open), closed after her last night, papered over for the work,
+    The Lounge."""
+    g = Game(b, port, target, seed=8104, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day2_2155.json')
+    m = json.loads(g.ev("""JSON.stringify({guest:nextHop('main','lounge',{}),staff:nextHop('main','lounge',{bk:1}),staffK:nextHop('kitchen','lounge',{bk:1}),
+      out:nextHop('lounge','front',{bk:1}),back:doorway('main','lounge'),street:doorway('front','lounge'),st:barState(),tab:roomsOpen().includes('lounge')})"""))
+    check(m['guest'] == 'front' and m['staff'] == 'lounge' and m['staffK'] == 'main' and m['out'] == 'front', f'a guest by the street, the staff by the back: {m}')
+    check(m['back'][1] == [g.ev("LG.bk.x"), g.ev("LG.bk.y")] and m['street'][0] == [g.ev("FR.ldoor.x"), g.ev("FR.ldoor.y")], f'the back door, the street door: {m}')
+    check(m['st'] == 'lin' and not m['tab'], f'Day 2: Madame Lin\'s bar next door, open; not a room of Jill\'s: {m}')
+    check(not g.ev("typeof LOUNGE_ARCH!=='undefined'"), 'no arch from the Main Hall')
+    states = [g.ev("barState()")]
+    g.ev("factSet('lin_closed')"); states.append(g.ev("barState()"))
+    g.ev("factSet('lin_signed')"); states.append(g.ev("barState()"))
+    check(states == ['lin', 'closed', 'reno'], f'the bar next door: open, closed after her last night, papered over: {states}')
+    g.ev("BARV=1"); check(g.ev("roomsOpen().includes('lounge')") and g.ev("roomTabName('lounge')") == '隔壁', 'seen from inside in a scene: 「隔壁」')
+    g.ev("BARV=null"); g.close()
+    # Day 74: The Lounge; who walks which way, all evening
+    g = Game(b, port, target, seed=8105, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day74_1508.json')
+    check(g.ev("barState()") == 'lounge', 'Day 74: The Lounge next door')
+    to_service(g); g.ev("window.__act=window.__actLazy")
+    g.ev("""window.__walk={guestIn:[],staffIn:[],viaMain:0,staffViaFront:0};const s0=stepTo;stepTo=function(e,v){const r0=e.room;const r=s0.apply(this,arguments);if(e.room!==r0){
+      const isCrew=!!e.bk;if(e.room==='lounge'){(isCrew?__walk.staffIn:__walk.guestIn).push(r0);if(!isCrew&&r0==='main')__walk.viaMain++;if(isCrew&&r0==='front')__walk.staffViaFront++}}return r}""")
+    g.ev("__botUntil('phase!==\\'service\\'',200000,1/30)")
+    w = json.loads(g.ev("JSON.stringify(__walk)"))
+    check(len(w['guestIn']) >= 5 and set(w['guestIn']) == {'front'} and w['viaMain'] == 0, f'every guest came into the Lounge from the street: {w["guestIn"][:12]}')
+    check(len(w['staffIn']) >= 2 and 'main' in w['staffIn'] and w['staffViaFront'] == 0, f'the staff came in by the back: {w["staffIn"][:12]}')
+    g.close()
+    # the kitchen's plates for the Lounge wait at the end of its bar; a tap on the street door goes in, from inside back out
+    g = Game(b, port, target, seed=8106, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day74_1508.json')
+    to_service(g); g.ev("window.__act=window.__actLazy")
+    g.ev("__botUntil('R.t>=R.dur*.2',90000,1/30)")
+    pu = json.loads(g.ev("JSON.stringify({lg:pickupFor(R.tables.find(t=>t.lounge),0),main:pickupFor(R.tables.find(t=>t.room==='main'),0),pick:cnPick()})"))
+    check(pu['lg']['room'] == 'lounge' and abs(pu['lg']['x'] - pu['pick']['x']) < 1 and pu['main']['room'] == 'main', f'the Lounge\'s plates at the end of its bar, the rest at the pass: {pu}')
+    g.ev("setRoom('front')")
+    sx, sy = g.ev("SV.ox+FR.ldoor.x*SV.s"), g.ev("SV.oy+(FR.ldoor.y-40)*SV.s")
+    g.page.mouse.click(sx, sy); g.page.wait_for_timeout(150)
+    check(g.ev("room") == 'lounge', 'a tap on the Lounge\'s door on the street goes in')
+    # from inside (on a phone the top-left corner sits under the HUD's buttons, as the Main Hall's front door does: the tabs are
+    # the way; the door answers a tap where it is not covered, as on a desktop)
+    g.ev("roomTap({x:LG.door.x,y:30},{preventDefault(){}})")
+    check(g.ev("room") == 'front', 'and its door from inside goes back out onto the street')
     check(not g.errors, g.errors[:3]); g.close()

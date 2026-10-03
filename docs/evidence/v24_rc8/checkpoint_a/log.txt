@@ -1,0 +1,8 @@
+phone Day 2: barState=lin loungeLv=0 tabs=["店門口","主廳","廚房","房間"]
+phone inside: tab=隔壁
+phone errors: []
+phone errors: []
+desk Day 2: barState=lin loungeLv=0 tabs=["店門口","主廳","廚房","房間"]
+desk inside: tab=隔壁
+desk errors: []
+desk errors: []
