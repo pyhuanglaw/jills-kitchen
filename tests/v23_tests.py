@@ -369,7 +369,7 @@ def staff_learn_places_coarsely_and_veterans_stay_useful(b, port, target):
     check(g.ev("OPS.find(o=>o.k==='pantry').need()") is True, 'at III it is offered')
     g.ev("(()=>{const b=document.createElement('button');b.dataset.k='pantry';doAct('buyOps',null,'pantry',b)})()")
     check(g.ev("opsLv('pantry')") == 1 and g.ev("stoveSlots(S.eq.stove)") == n0 + 1, 'the pantry adds a burner')
-    check(g.ev("loungeSeatDefs().some(d=>d.kind==='quiet')&&loungeSeatDefs().some(d=>d.kind==='sofa')&&loungeSeatDefs().filter(d=>d.kind==='bar').length===6"), 'Lounge III: six stools (rc7.5, 07:10: the bar was too crowded with eight), a sofa, the quiet corner')
+    check(g.ev("loungeSeatDefs().some(d=>d.kind==='quiet')&&loungeSeatDefs().some(d=>d.kind==='sofa')&&loungeSeatDefs().filter(d=>d.kind==='bar').length===9&&loungeSeatDefs().filter(d=>d.leg).length===2"), 'Lounge III: nine stools — seven along the counter and two on its L (rc7.6, 07:44; a hand apart as rc7.5 made them, 07:10) — a sofa, the quiet corner')
     check(not g.errors, g.errors[:3]); g.close()
 
 P7_HELPERS = r"""
@@ -845,8 +845,9 @@ def followup_the_manual_describes_the_current_game(b, port, target):
                  '披薩烤爐', '酒吧披薩', '披薩麵團', '把一位廚師排到「披薩烤爐」', '廚房二期、披薩烤爐有關',
                  # v2.4 rc7.5: the album from the opening day; its real limit
                  '相簿從開店那天開始', '最多留 240 張',
-                 # v2.4 rc7.6: the chef's night
-                 '主廚之夜', '明晚｜主廚之夜 · 6 席', '只有主廚之夜的客人在 Lounge 吃餐廳的菜', '七點左右到']:
+                 # v2.4 rc7.6: the chef's night, booked out (08:00); Ken's night the whole room (07:44); the bar's L (07:44–07:45)
+                 '主廚之夜', '明晚｜主廚之夜 · N 席', '主廚之夜是包場', '一道一道上', '吧台 L 型的那一頭', '七點左右到',
+                 '那一晚整個 Lounge 都留給品酒的客人', '一輪一輪倒', '吧台加長、轉成 L 型，九個位子']:
         check(need in txt, f'the manual mentions {need}')
     for stale in ['暫停選單和設定裡都有【儲存目前進度】', '把杯子交給吧台的客人；桌位由有', '上方的分頁', '畫面上方會跳一個小通知', '打烊後或開店前，商店的「社群與宣傳」分頁（第 6 天起）。', '下一段寫著', '窗邊（貓架、睡墊）', '牠會在門邊趴著等主人',
                   '人數上限跟擴建、後場整理區、側廳、廚房擴建、廚房二期、Lounge 有關', '有 Lounge 以後才能招募', '第二位調酒師',
@@ -863,7 +864,9 @@ def followup_the_manual_describes_the_current_game(b, port, target):
                   # v2.4 rc7.4: the old list of the Lounge's bites
                   '炸雞塊、起司可樂餅、起司拼盤（II 起多蒜香蘑菇）',
                   # v2.4 rc7.5: the album never kept only 30
-                  '其他最多留 30 張']:
+                  '其他最多留 30 張',
+                  # v2.4 rc7.6: the chef's night is no longer the bar's six; Ken's night no longer the bar's stools only
+                  '吧台的六個位子留給訂位的客人', '只有主廚之夜的客人在 Lounge 吃餐廳的菜', '那一晚吧台的位子留給品酒的客人', '提議在吧台辦小型的品酒夜']:
         check(stale not in txt, f'stale line removed: {stale}')
     g.ev("showGuide()"); g.page.wait_for_timeout(50)
     check('故事' in g.ev("document.querySelector('#screen').innerText") and '社群與宣傳' in g.ev("document.querySelector('#screen').innerText"), 'the manual screen shows the new sections')
