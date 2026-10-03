@@ -1989,8 +1989,8 @@ def v24_rc6_a_booked_party_comes_eats_and_pays(b, port, target):
         g.ev("while(typeof DLG!=='undefined'&&DLG)dlgNext()"); g.ev("__tick(1000)")
     s = json.loads(g.ev("JSON.stringify(S.lastSummary&&S.lastSummary.pd)"))
     check(s and s['n'] >= 1 and s['res'] == 1 and s['top'] == max(0, r['min'] - st['actual']), f'the summary: {s} (min {r["min"]}, ate {st["actual"]})')
-    chips = g.ev("[...document.querySelectorAll('#screen .chips span')].map(e=>e.textContent).join('|')")
-    check('包廂' in chips, f'and the chip on the summary: {chips}')
+    chips = g.ev("[...document.querySelectorAll('#screen .daynotes div')].map(e=>e.innerText.replace(/\\s+/g,' ')).join('|')")
+    check('包廂' in chips, f'and the line in the day\'s notes on the summary: {chips}')
     check(not g.errors, g.errors[:3]); g.close()
 
 
@@ -2400,7 +2400,8 @@ def v24_rc7_ken_comes_back_and_proposes_a_tasting(b, port, target):
     page = json.loads(g.ev("JSON.stringify((story().beatLines||{}).ken_propose||[])"))
     txt = ' / '.join(x['t'] for x in page)
     check(g.ev("!!fact('ken_propose')") and '這裡其實可以辦品酒。' in txt and '我在這裡坐了好幾個晚上了。' in txt and '我主持。酒我挑，菜妳配。' in txt, f'the proposal, with the line for a Lounge he has sat in for weeks: {txt}')
-    check('不用算。我自己喜歡，友情主持。' in txt and '不行。那晚品酒的利潤，三成給你。' in txt and '我知道。所以是我要給。' in txt and g.ev("!!fact('ken_cut')"), f'rc7.7 (10:10): he would host it as a friend; Jill offers the share herself: {txt}')
+    check('不用算。我自己喜歡，友情主持。' in txt and '不行，該算的還是要算。' in txt and '我又不是為了錢。' in txt and g.ev("!!fact('ken_cut')"), f'rc7.7 (10:10): he would host it as a friend; Jill offers the share herself: {txt}')
+    check('三成' not in txt and '所以是我要給' not in txt, f'12:43 「就直接說不行該算的還是要算就好了啊，不用直接說三成」: {txt}')
     check(json.loads(g.ev("JSON.stringify(kenS().next)")) == {'d': g.ev("S.day") + 3, 'n': 1}, 'the first night three days on')
     check(g.ev("kenQuiet()") is False and g.ev("kenLoungeDue()") is False, 'one Ken scene today; his first look never comes in this save')
     check(not any(k in txt for k in ('終於完成', '這裡真的很棒', '實現夢想')), 'no congratulation')
@@ -3475,7 +3476,8 @@ def v24_rc74_the_lounge_tv_and_its_sound(b, port, target):
     g.page.screenshot(path=os.path.join(ROOT, 'tests', 'artifacts', 'rc74_lounge_tv_game.png'))
     g.ev("(()=>{closeShop('x');for(const q of R.groups.slice())leaveGroup(q,'ok');finishClosing()})()"); g.page.wait_for_timeout(120)
     summ = g.ev("$('#screen').innerText")
-    check('有比賽轉播（' in summ and '位來看球）' in summ, f'the summary: {summ[:400]!r}')
+    notes = g.ev("[...document.querySelectorAll('#screen .daynotes div')].map(e=>e.innerText.replace(/\\s+/g,' ')).join('|')")
+    check(re.search(r'有比賽轉播 \d+ 位來看球', notes), f'the summary\'s Lounge line, the match under it: {notes!r}')
     g.ev("sportsNight=window.__SN")
     check(not g.errors, g.errors[:3]); g.close()
 
@@ -3696,8 +3698,13 @@ def v24_rc76_the_bar_turns_into_an_l(b, port, target):
     at its left end — seven stools along it and two along the L, nine in all, as far apart as rc7.5 made them (07:10:
     not shoulder to shoulder), every one inside a phone's view. Lounge I keeps its six in a row. The first six keep their
     places in the list (a regular's usual stool; the old saves), the three new ones come last. Someone walking in from
-    the arch to the counter goes round the L, never through it; the bartender serves the L's two across the corner; on a
-    tasting night the small board stands at the L's end; the shop and the manual say so."""
+    the street door to the counter goes round the L, never through it; the bartender serves the L's two across the corner; on a
+    tasting night the small board stands at the L's end; the shop and the manual say so.
+    rc7.7 (12:43 「L型吧台包在裡面的是店員啊 原本橫的不變 但直的應該是要往上面的方向延伸啊」): the counter as it was; the
+    return runs from its left end back toward the wall, so the L closes round the bartenders: their places, Ken's on a
+    tasting night and the corner they serve the L's two from are inside it, the L's stools and the place the floor picks
+    up from outside it. It stops short of the wall: the bartenders come in from the back door through that gap, never
+    through the return or the counter."""
     g = Game(b, port, target, seed=7631, manual=True, viewport={'width': 390, 'height': 844})
     load_save(g, 'player_day74_1508.json')
     d = json.loads(g.ev("JSON.stringify({lv:loungeLv(),defs:loungeSeatDefs().map(x=>[x.kind,x.x,x.y,x.leg?1:0]),leg:LG.leg,x0:LG.bar.x0,w0:LG.bar.w0,by:LG.bar.y})"))
@@ -3705,14 +3712,20 @@ def v24_rc76_the_bar_turns_into_an_l(b, port, target):
     check(d['lv'] >= 2 and len(bars) == 9 and len(run) == 7 and len(leg) == 2 and d['leg'], f'Lounge III: nine stools, seven along and two on the L: {bars}')
     check(all(b2 - a >= 30 for a, b2 in zip(run, run[1:])) and run[-1] + 12 <= 374 and run[0] - 12 >= d['leg']['x1'], f'a hand apart along the counter, the last inside a phone\'s view, the first clear of the L: {run}')
     ly = sorted(x[2] for x in leg)
-    check(ly[1] - ly[0] >= 26 and all(x[1] + 12 <= d['leg']['x0'] for x in leg) and all(d['by'] < y <= d['leg']['y1'] + 24 for y in ly), f'the L\'s two, one behind the other beside it: {leg} {d["leg"]}')
+    check(ly[1] - ly[0] >= 26 and all(x[1] + 12 <= d['leg']['x0'] for x in leg) and all(d['leg']['y0'] <= y <= d['by'] + 36 for y in ly) and d['leg']['y0'] < d['by'], f'the L\'s two, one behind the other beside it — the return running back from the counter toward the wall: {leg} {d["leg"]}')
     check(d['x0'] < d['w0'] and d['defs'][0][0] == 'bar' and all(x[0] == 'bar' for x in d['defs'][:6]) and all(x[0] == 'bar' for x in d['defs'][-3:]) and d['defs'][-1][3] == 1, f'the counter longer than the wine wall; the first six first, the new three last: {d["defs"]}')
     # walking in from the arch to the first stool past the L: round it
     w = json.loads(g.ev("""JSON.stringify((()=>{const L=LG.leg,b=LG.bar,t=loungeSeatDefs().filter(x=>x.kind==='bar'&&!x.leg).sort((a,c)=>a.x-c.x)[0];const e={x:LG.door.x,y:LG.door.y,room:'lounge',troom:'lounge',tx:t.x,ty:t.y+8};const path=[];let ok=false;
       for(let i=0;i<800;i++){if(stepTo(e,2)){ok=true;break}path.push([e.x,e.y])}
-      const inL=path.filter(p=>p[0]>L.x0&&p[0]<L.x1&&p[1]>b.y&&p[1]<L.y1+24).length,inC=path.filter(p=>p[0]>b.x0&&p[0]<b.x1&&p[1]>b.y&&p[1]<b.y+34).length;return{ok,steps:path.length,inL,inC}})())"""))
-    check(w['ok'] and w['inL'] == 0 and w['inC'] == 0, f'from the arch to the counter: round the L, never through it or the counter: {w}')
-    check(g.ev("(()=>{const L=LG.leg,b=LG.bar;const t={kind:'bar',leg:1,x:LGB.x0-18,y:LGB.legY[0]};const post={x:b.x0+10,y:b.y-6};return Math.abs(post.x-(LG.bar.x0+10))<1})()"), 'the L\'s two are served across the corner')
+      const inL=path.filter(p=>p[0]>L.x0&&p[0]<L.x1&&p[1]>L.y0&&p[1]<b.y+34).length,inC=path.filter(p=>p[0]>b.x0&&p[0]<b.x1&&p[1]>b.y&&p[1]<b.y+34).length;return{ok,steps:path.length,inL,inC}})())"""))
+    check(w['ok'] and w['inL'] == 0 and w['inC'] == 0, f'from the street door to the counter: round the L, never through it or the counter: {w}')
+    # rc7.7 (12:43): the L closes round the bartenders — from the back door they come in by the gap at the return's far end
+    k = json.loads(g.ev("""JSON.stringify((()=>{const L=LG.leg,b=LG.bar;const out=[];for(const px of[b.x0+70,b.x0+140,b.x0+210]){const e={x:LG.bk.x,y:LG.bk.y,room:'lounge',troom:'lounge',bk:1,tx:px,ty:b.y-6};const path=[];let ok=false;
+      for(let i=0;i<900;i++){if(stepTo(e,2)){ok=true;break}path.push([e.x,e.y])}
+      out.push({px,ok,inL:path.filter(p=>p[0]>L.x0&&p[0]<L.x1&&p[1]>L.y0&&p[1]<b.y+34).length,inC:path.filter(p=>p[0]>L.x1&&p[0]<b.x1&&p[1]>b.y+2&&p[1]<b.y+34).length,gap:path.filter(p=>p[0]>=L.x0-4&&p[0]<=L.x1+4&&p[1]<L.y0).length})}
+      return{out,inside:[KEN_HOST.x>L.x1&&KEN_HOST.y<b.y,b.x0+70>L.x1],pick:cnPick(),L,by:b.y}})())"""))
+    check(all(o['ok'] and o['inL'] == 0 and o['inC'] == 0 and o['gap'] > 0 for o in k['out']), f'from the back door to each bartender\'s place: by the gap at the return\'s far end, never through it or the counter: {k["out"]}')
+    check(all(k['inside']) and k['pick']['x'] < k['L']['x0'] and k['pick']['y'] < k['L']['y0'] + 10, f'inside the L: the bartenders\' places and Ken\'s; outside it, at its far end: where the floor picks up: {k}')
     check('L 型' in g.ev("LOUNGE_PROJ.find(p=>p.lv===2).d") and '九個位子' in g.ev("LOUNGE_PROJ.find(p=>p.lv===2).d"), 'the shop\'s Lounge II says so')
     # Lounge I: six in a row, no L
     g.ev("S.rooms.lounge=1;IDLE=null;bg=null;for(const k in BGC)delete BGC[k]")
@@ -3891,6 +3904,8 @@ def v24_rc76_the_chefs_night(b, port, target):
     check(lg['cn'] and lg['cn']['n'] == 23 and lg['cn']['rev'] == 23 * 1800, f'$1,800 a head, on the Lounge\'s line apart from its tabs: {lg}')
     txt = g.ev("$('#screen').innerText")
     check('主廚之夜' in txt, 'the summary says so')
+    notes = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('#screen .daynotes div')].map(e=>e.innerText.replace(/\\s+/g,' ')))"))
+    check('主廚之夜 23 位・營業額 $41,400' in notes and not any(x.startswith('Lounge ') for x in notes), f'12:43: the whole room booked, so the night is one line, the chef\'s night — no 「Lounge 0 桌」 beside it: {notes}')
     check(g.ev("albumList().some(p=>p.kind==='chefnight')"), 'the album has the night')
     check('一週最多一次' in g.ev("cnWhyNot()"), 'and the next one is a week away')
     check(not g.errors, g.errors[:3]); g.close()
@@ -4010,7 +4025,8 @@ def v24_rc77_kens_share_of_a_tasting_night(b, port, target):
     """10:10 「Ken辦品酒日也可以分潤給他吧？當天百分之三十利潤給Ken 才合理，從第一次開始就要，Ken本來想友情主持，而且是自己喜歡，但是
     Jill主動說要給」: from the first night the summary takes 30% of what the tasting guests paid for the glasses and the bites,
     less what those cost, on its own line 「品酒夜分潤」, and the day's net is that much less. A day with no tasting night
-    pays nothing. A save whose proposal came before this (no 「三成」 said) hears Jill say it at the end of its next night."""
+    pays nothing. A save whose proposal came before this (no share said) hears Jill say it at the end of its next night —
+    (12:43) 「不行，該算的還是要算」, with no figure in her words; the figure is on the summary's line."""
     g = Game(b, port, target, seed=7705, manual=True, viewport={'width': 390, 'height': 844})
     load_save(g, 'player_day74_1508.json')
     g.ev("factSet('ken_propose');S.cn=null;kenS().next={d:S.day,n:5};showPrep()")
@@ -4024,10 +4040,12 @@ def v24_rc77_kens_share_of_a_tasting_night(b, port, target):
     check(abs(s['kt']['cost'] - round(sum(p['cost'] for p in paid))) <= 1, f'what they had cost: {s["kt"]["cost"]}')
     check(s['ken'] == round(.3 * max(0, s['kt']['rev'] - s['kt']['cost'])) and s['ken'] > 0, f'30% of the night\'s profit: {s}')
     txt = g.ev("$('#screen').innerText")
-    check('品酒夜分潤' in txt and 'Ken，品酒客利潤的三成' in txt and f'Ken 的品酒夜 {s["kt"]["n"]} 位' in txt, 'the summary\'s lines')
+    check('品酒夜分潤' in txt and 'Ken，品酒客利潤的三成' in txt, 'the ledger\'s line')
+    notes = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('#screen .daynotes div')].map(e=>e.innerText.replace(/\\s+/g,' ')))"))
+    check(f'Ken 的品酒夜 {s["kt"]["n"]} 位・營業額 ${s["kt"]["rev"]:,}' in notes and not any(x.startswith('Lounge ') for x in notes), f'12:43: the night shows once, as the tasting night — not 「Lounge N 桌」 beside it: {notes}')
     check(s['cut'], 'Jill said it at the night\'s end (a save past the proposal)')
     lines = ' / '.join(x['t'] for x in json.loads(g.ev("JSON.stringify((story().beatLines||{}).ken_cut||[])")))
-    check('今晚品酒的利潤，三成。以後每一次都是。' in lines and '我知道。所以是我要給。' in lines, f'her words: {lines}')
+    check('今晚的。以後每一次都有。' in lines and '不行，該算的還是要算。' in lines and '三成' not in lines, f'her words: {lines}')
     # a day without a tasting night: nothing
     g.ev("document.querySelector('[data-act=toShop]')&&document.querySelector('[data-act=toShop]').click()")
     g.page.wait_for_timeout(100)

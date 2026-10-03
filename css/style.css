@@ -713,3 +713,13 @@ html.desk button,html.desk [data-act],html.desk .polaroid{cursor:pointer}
 @media (min-width:700px){#roomTabs.many9 button{padding:0 10px;min-width:48px;font-size:13px}}
 /* rc7.4 (22:39): whose favourite a dish or a glass is, on the menu */
 .menu-row .nm .love{font-size:11px;font-weight:800;color:#B4434A;white-space:nowrap}
+/* rc7.7 (the player, 12:43): the day's notes under the net, an item of their own — one line each, label left, figure right */
+.daynotes{padding:4px 12px 6px;font-variant-numeric:tabular-nums}
+.daynotes div{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:7px 0;border-top:1px dotted rgba(46,32,25,.22);font-size:13px}
+.daynotes div:first-child{border-top:0}
+.daynotes div span:first-child{color:var(--ink2);font-weight:700;white-space:nowrap}
+.daynotes div span:last-child{font-weight:700;text-align:right}
+.daynotes div.sub{border-top:0;padding:1px 0 5px 12px;font-size:12px}
+.daynotes div.sub span:first-child{font-weight:600;color:var(--ink3)}
+.daynotes div.sub span:last-child{font-weight:600;color:var(--ink2)}
+.daynotes div.warn span:last-child{color:#8A3A2A}

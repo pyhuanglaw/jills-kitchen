@@ -1,0 +1,12 @@
+geometry: {"leg":{"x0":136,"x1":158,"y0":128},"bar":{"x0":136,"x1":392,"y":146},"bk":{"x":93,"y":104},"pick":{"x":122,"y":118},"host":{"x":188,"y":140},"legSeats":[[118,152],[118,180]]}
+Evan: 900 steps in the Lounge, through the return / the counter: (0, 0), by the gap at its far end: 169; first [[93, 104]], last [[206, 140]]
+沈晴: 900 steps in the Lounge, through the return / the counter: (0, 0), by the gap at its far end: 156; first [[93, 104]], last [[276, 140]]
+許葳: 900 steps in the Lounge, through the return / the counter: (0, 0), by the gap at its far end: 0; first [[93, 124]], last [[93, 124]]
+bartenders now: [{"n":"Evan","x":206,"y":140,"room":"lounge"},{"n":"沈晴","x":276,"y":140,"room":"lounge"}]
+summary, an ordinary night: 今天 下雨・附近的市集 | Lounge 21 桌・$11,900 | 吃完留下 14 位・晚餐後折扣 −$1,990 | 先坐吧台等 3 位 | VIP 卡 5 桌・折了 $1,225 | 套餐加點 122 份 | 宣傳 看到宣傳來的 6 組（第一次來 6）
+phone errors: []
+tasting night: {"clock":"18:45","host":{"x":188,"y":140,"st":"host"},"floor":[{"n":"安安","x":270,"y":230,"k":"serve"}]}
+summary, the tasting night: 今天 下雨・附近的市集 | Ken 的品酒夜 23 位・$16,415 | VIP 卡 3 桌・折了 $620 | 套餐加點 88 份 | 請客 1 次 | 宣傳 看到宣傳來的 5 組（第一次來 5）
+phone errors: []
+desk errors: []
+desk errors: []
