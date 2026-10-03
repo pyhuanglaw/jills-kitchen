@@ -71,7 +71,7 @@ def story_state_is_empty_on_old_saves_and_stable_over_reloads(b, port, target):
         check(g.ev("S.day") == raw['day'], f'{name}: Day {g.ev("S.day")} != {raw["day"]}')
         check(g.ev(f"localStorage.getItem('{SAVE_KEY}-unreadable')") is None, f'{name}: rescued as unreadable')
         st = g.ev("JSON.stringify(story())"); regs0 = g.ev("JSON.stringify(S.regulars)")   # after the first load (the Day 30 save gains 王太太's record from the v2.2 migration)
-        check(g.ev("Object.keys(story().facts).length+Object.keys(story().rel).length+Object.keys(story().ev).length+Object.keys(story().photos).length+Object.keys(story().named).length") == 0, f'{name}: the story starts empty, nothing fabricated')
+        check(g.ev("Object.values(story().facts).filter(f=>!f.retro).length+Object.keys(story().rel).length+Object.values(story().ev).filter(e=>!e.retro).length+Object.keys(story().photos).length+Object.keys(story().named).length") == 0 and g.ev("Object.keys(story().facts).every(k=>k==='lin_hello')") is True, f'{name}: the story starts empty, nothing fabricated (rc8 Checkpoint C: only Madame Lin\'s Day 1, as history)')
         g.ev("save()"); g.reload(); g.ev("save()"); g.reload()
         check(g.ev("S.day") == raw['day'] and g.ev("JSON.stringify(story())") == st, f'{name}: two reloads changed the day or the story record')
         check(g.ev("S.crew.length") == len(raw['crew']) and g.ev("JSON.stringify(S.regulars)") == regs0, f'{name}: crew or regulars changed over the reloads')
@@ -297,9 +297,9 @@ def the_lounge_has_an_origin_ken_wine_a_tasting_and_a_project_that_never_disappe
     check(g.ev("sub") == 'loungeproj' and '隔壁' in t and 'Madame Lin 的店' in t and '接下隔壁' in t and '再想想' in t, f'the decision: 「隔壁」 — {t[:120]!r}')
     g.ev("loungeGo('later')"); check(g.ev("S.loungeProj.state") == 'deferred' and g.ev("sub") is None, '再想想')
     g.ev("showShop();shopTab='works';showShop()"); g.page.wait_for_timeout(80)
-    check(g.ev("!!document.querySelector('[data-act=buyLounge][data-k=\"1\"]')") and '隔壁的事，還在這裡' in g.ev("document.body.innerText"), 'the deferred project is still in the shop')
-    m0 = g.ev("S.money"); g.ev("buyLounge(1)"); g.page.wait_for_timeout(50)
-    check(g.ev("loungeLv()") == 1 and g.ev("S.money") == m0 - 120000 and g.ev("S.newRooms.lounge") == g.ev("S.day") and g.ev("!!S.achievements.lounge1"), 'Lounge I bought')
+    check(g.ev("!!document.querySelector('[data-act=linTake]')") and not g.ev("!!document.querySelector('[data-act=buyLounge][data-k=\"1\"]')") and '隔壁的事，還在這裡' in g.ev("document.body.innerText"), 'the deferred project is still in the shop: 「接下隔壁」 (rc8: Lounge I is never bought outright — 簽約・開工 after her last night)')
+    m0 = g.ev("S.money"); g.ev("buyLounge(1)"); g.page.wait_for_timeout(50)   # the test builds it directly (in play: 接下隔壁 → 簽約・開工 → 《簽約》 → two days; v24_rc8_the_signing_*)
+    check(g.ev("loungeLv()") == 1 and g.ev("S.money") == m0 - 120000 and g.ev("S.newRooms.lounge") == g.ev("S.day") and g.ev("!!S.achievements.lounge1"), 'Lounge I built')
     check(g.ev("!loungeArcOpen()"), 'the origin arc is closed by the project')
     g.ev("save()"); g.reload(); check(g.ev("loungeLv()") == 1 and g.ev("!!fact('tasting_night')") and g.ev("evDone('ken_wine_q')"), 'all of it survives a reload')
     check(not g.errors, g.errors[:3]); g.close()
@@ -355,8 +355,8 @@ def staff_learn_places_coarsely_and_veterans_stay_useful(b, port, target):
     needs Lounge III and adds a burner; old crew carry no invented history (tenure counts from v2.3)."""
     g = Game(b, port, target, seed=61, manual=True, viewport={'width': 390, 'height': 844})
     load_fixture(g, 'player_day46.json'); g.click('[data-act=openFresh]'); g.page.wait_for_timeout(120)
-    g.ev("S.money+=900000;factSet('lounge_project');buyLounge(1);hideReveal();S.crew.push({id:'cb1',role:'bartender',name:'Evan',lv:2,duty:'lbar'});const w=S.crew.find(m=>m.role==='waiter');waiterDuties(w).lounge=true;window.__w=w.id;showPrep();autoStock()")
-    check(g.ev("S.crew.every(m=>!m.since)"), 'no invented tenure before a day is played')
+    g.ev("S.money+=900000;factSet('lounge_project');buyLounge(1);hideReveal();const ev=S.crew.find(m=>m.name==='Evan'&&m.role==='bartender');ev.id='cb1';ev.lv=2;const w=S.crew.find(m=>m.role==='waiter');waiterDuties(w).lounge=true;window.__w=w.id;showPrep();autoStock()")
+    check(g.ev("S.crew.every(m=>!m.since||(m.id==='cb1'&&m.since===S.day))"), 'no invented tenure before a day is played (Evan starts the day the Lounge is built, rc7.7)')
     check(g.ev("loungeShiftMul(S.crew.find(m=>m.id===__w))") == 1.25, 'a first Lounge shift is slower')
     start_day(g); install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;")
     play_day(g, max_steps=60000)
@@ -566,7 +566,7 @@ def phase8_reviews_say_what_happened_posts_amplify_it_and_a_campaign_is_counted(
     reports real numbers when it ends; the page renders."""
     g = Game(b, port, target, seed=88, manual=True, viewport={'width': 390, 'height': 844})
     load_fixture(g, 'player_day46.json'); g.click('[data-act=openFresh]'); g.page.wait_for_timeout(120)
-    g.ev("S.money+=900000;factSet('lounge_project');buyLounge(1);hideReveal();S.crew.push({id:'cb1',role:'bartender',name:'Evan',lv:2,duty:'lbar'});showPrep();autoStock()")
+    g.ev("S.money+=900000;factSet('lounge_project');buyLounge(1);hideReveal();const ev=S.crew.find(m=>m.name==='Evan'&&m.role==='bartender');ev.id='cb1';ev.lv=2;showPrep();autoStock()")
     start_day(g); g.ev(P7_HELPERS)
     # reviews: topics consistent with the text
     res = json.loads(g.ev("JSON.stringify((()=>{const out=[];for(let i=0;i<24;i++){const q=__p7.lounge('Emma');__p7.fed(q,['w_white','bites']);q.lg={why:'after'};const r=addReview(q,5,null,{});out.push({t:r.txt,tp:r.topics,tags:r.tags})}return out})())"))
@@ -775,7 +775,7 @@ def followup_a_campaign_is_felt_in_the_room(b, port, target):
     people staying for the Lounge. A ticket shows 📱; the day's summary confirms the count. Not every table says it."""
     g = Game(b, port, target, seed=103, manual=True, viewport={'width': 390, 'height': 844})
     load_fixture(g, 'player_day46.json'); g.click('[data-act=openFresh]'); g.page.wait_for_timeout(150)
-    g.ev("S.money+=900000;factSet('lounge_project');buyLounge(1);hideReveal();S.crew.push({id:'cb1',role:'bartender',name:'Evan',lv:2,duty:'lbar'});showPrep();autoStock()")
+    g.ev("S.money+=900000;factSet('lounge_project');buyLounge(1);hideReveal();const ev=S.crew.find(m=>m.name==='Evan'&&m.role==='bartender');ev.id='cb1';ev.lv=2;showPrep();autoStock()")
     check(g.ev("startCampaign('cats')") and g.ev("campaign()&&campaign().start===S.day"), 'bought before opening: it runs today')
     start_day(g); g.ev(P7_HELPERS); g.ev("__tick(40)")
     spawn_camp = "(o=>{window.__scn=(window.__scn||0)+1;o.name='測試客'+__scn;o.t=R.t;o.via='camp';const want=o.wantSide?'side':'main';let t=R.tables.find(t=>!t.lounge&&(t.room||'main')===want&&!t.group&&!t.dirty&&t.seats>=o.size)||R.tables.find(t=>!t.lounge&&(t.room||'main')===want&&t.seats>=o.size);if(t&&t.group){t.group.gone=true;leaveGroup(t.group,'ok')}if(t){t.dirty=false;t.claim=null}R.groups=R.groups.filter(q=>!q.gone);spawn(o);const q=R.groups.find(x=>x.name===o.name);if(!q)return null;if(q.table==null){const tt=freeTableFor(q)||t;seatGroup(q,tt)}q.state='wait';q.moving=false;return q})"

@@ -1,0 +1,50 @@
+OK    before_reveal: 《簽約》 held at the opening, in her bar
+      before_reveal lines: 開店前，Jill 和先生一起去隔壁。 / 吧台上放著合約、一支筆，還有一串鑰匙。 / Jill 簽了名。 / Madame Lin：那就這樣。 / Jill：嗯。 / Madame Lin 把鑰匙交給她。 / Madame Lin：Evan，這 Jill 老公。 / Evan：你好。 / 先生：你好。 / 隔壁的鑰匙在 Jill 手上了。改裝 2 天，Day 55 開幕。
+OK    before_reveal: after the keys, Evan meets Dylan — Madame Lin：Evan，這 Jill 老公。 Evan：你好。 先生：你好。
+OK    before_reveal: Evan knows Dylan now; the restaurant's reveal untouched (stage 2)
+OK    before_reveal: papered over, two days of work
+OK    before_reveal: the morning card 「開幕 · The Lounge」
+OK    before_reveal: Evan on The Lounge's list from the opening day, never hired: [{'role': 'bartender', 'pool': 'lounge', 'since': 55, 'day': 55}]
+OK    no recruitment card for Evan on the Lounge's list
+      staff line: 餐廳員工：廚師 6/6・服務生 4/4・清潔員 2/2・Lounge 員工 1/2・每日薪資 $18,289。廚師、服務生、清潔員各有自己的名額，不能互相借；擴建和工程都寫著多哪一種。 Lounge 的人是固定的名單，名額跟餐廳分開算。
+OK    before_reveal: no page errors []
+OK    after_reveal: 《簽約》 held at the opening, in her bar
+      after_reveal lines: 開店前，Jill 和 Dylan 一起去隔壁。 / 吧台上放著合約、一支筆，還有一串鑰匙。 / Jill 簽了名。 / Madame Lin：那就這樣。 / Jill：嗯。 / Madame Lin 把鑰匙交給她。 / Madame Lin：Evan，這 Dylan。 / Madame Lin：Jill 老公。 / Evan：你好。 / Dylan：你好。 / 隔壁的鑰匙在 Jill 手上了。改裝 2 天，Day 55 開幕。
+OK    after_reveal: after the keys, Evan meets Dylan — Madame Lin：Evan，這 Dylan。 Madame Lin：Jill 老公。 Evan：你好。 Dylan：你好。
+OK    after_reveal: Evan knows Dylan now; the restaurant's reveal untouched (stage 3)
+OK    after_reveal: papered over, two days of work
+OK    after_reveal: the morning card 「開幕 · The Lounge」
+OK    after_reveal: Evan on The Lounge's list from the opening day, never hired: [{'role': 'bartender', 'pool': 'lounge', 'since': 55, 'day': 55}]
+OK    after_reveal: no page errors []
+      lin_guest lines: 開門進來的是 Madame Lin。 / Jill：坐哪？ / Madame Lin 看了一下。 / Madame Lin：隨便。 / Evan：喝什麼？ / 她看了看酒單。 / Madame Lin：你選。
+OK    Madame Lin, retired, comes in as a guest: 「坐哪？」「隨便。」「喝什麼？」「你選。」
+OK    lin_guest: no page errors []
+OK    player_day61.json: every employee kept with name, role, since (tenure) and level (14)
+OK    player_day61.json: every story fact it had, unchanged (46), incl. 晴×阿拓 []
+OK    player_day61.json: The Lounge 2, Dylan stage 2, Ken's wine as it was
+OK    player_day61.json: the Madame Lin line given as history (retro): ['dylan_book', 'evan_knows_dylan', 'jd_want', 'ken_where', 'lin_closed', 'lin_hello', 'lin_retiring', 'lin_signed', 'lin_take', 'lin_viewing', 'pairing_wine', 'sp_seat']
+OK    player_day61.json: a whole day played — no catch-up of the line: []
+OK    player_day61.json: the story page 「隔壁」 says 「更早以前」
+      player_day61.json staff line: 餐廳員工：廚師 6/6・服務生 4/4・清潔員 2/2・Lounge 員工 2/5・每日薪資 $22,390。廚師、服務生、清潔員各有自己的名額，不能互相借；擴建和工程都寫著多哪一種。 Lounge 的人是固定的名單，名額跟餐廳分開算。
+OK    player_day61.json: no page errors []
+OK    player_day74_1508.json: every employee kept with name, role, since (tenure) and level (19)
+OK    player_day74_1508.json: every story fact it had, unchanged (91), incl. 晴×阿拓 ['qt_1', 'qt_2', 'qt_3', 'qt_days']
+OK    player_day74_1508.json: The Lounge 3, Dylan stage 3, Ken's wine as it was
+OK    player_day74_1508.json: the Madame Lin line given as history (retro): ['dylan_book', 'evan_knows_dylan', 'jd_want', 'ken_where', 'lin_closed', 'lin_hello', 'lin_retiring', 'lin_signed', 'lin_take', 'lin_viewing', 'pairing_wine']
+OK    player_day74_1508.json: a whole day played — no catch-up of the line: []
+OK    player_day74_1508.json: the story page 「隔壁」 says 「更早以前」
+      player_day74_1508.json staff line: 餐廳員工：廚師 6/6・服務生 6/6・清潔員 2/2・Lounge 員工 5/5・每日薪資 $29,360。廚師、服務生、清潔員各有自己的名額，不能互相借；擴建和工程都寫著多哪一種。 Lounge 的人是固定的名單，名額跟餐廳分開算。
+OK    player_day74_1508.json: no page errors []
+OK    over the waiters' number (6/4): all 16 kept on load
+      over-list staff line: 餐廳員工：廚師 6/6・服務生 6/4・清潔員 2/2・Lounge 員工 2/5・每日薪資 $25,206。廚師、服務生、清潔員各有自己的名額，不能互相借；擴建和工程都寫著多哪一種。 服務生現在有 6 位，比名額多：以前的名額是大家共用的。大家都留著；要等人數降到名額以下，才能再聘服務生。 Lounge 的人是固定的名單，名額跟餐廳分開算。
+OK    the staff page says everyone stays
+OK    no waiter is hired while the list is over its number
+OK    after a day and a reload: still all 16, nobody fired
+OK    over-list: no page errors []
+OK    a new game: the chef's place takes no waiter and no cleaner
+      new game staff line: 餐廳員工：廚師 0/1・服務生 0/0・清潔員 0/0・每日薪資 $0。廚師、服務生、清潔員各有自己的名額，不能互相借；擴建和工程都寫著多哪一種。
+OK    Day 1: the bell is on the door
+OK    Day 74 save (The Lounge III): the bell still on the door
+OK    and after a reload
+
+0 FAIL

@@ -1,0 +1,209 @@
+fresh_day1.json from Day 1 (level 1, Dylan stage 0, Ken visits 0, Madame Lin visits 0), seeds 8200+
+Day   1  bar lin             visits -                      next door 1       glasses   0  facts lin_hello  events ·
+Day   2  bar lin             visits -                      next door 2       glasses   0  facts ·  events ·
+Day   3  bar lin             visits -                      next door 0       glasses   0  facts ·  events ·
+Day   4  bar lin             visits Madame Lin@47%,Ken@59% next door 4       glasses   0  facts ·  events ·
+Day   5  bar lin             visits Ken@56%                next door 2       glasses   0  facts ken_wine_q  events ·
+Day   6  bar lin             visits Ken@77%                next door 0       glasses   0  facts ken_pairing  events ·
+Day   7  bar lin             visits Ken@52%                next door 5 (Ken) glasses   0  facts lounge_idea  events ·
+Day   8  bar lin             visits Madame Lin@28%,Ken@72% next door 1       glasses   0  facts ken_pairing  events ·
+Day   9  bar lin             visits Ken@24%                next door 2       glasses   0  facts ·  events ·
+Day  10  bar lin             visits -                      next door 2       glasses   0  facts lounge_idea  events ·
+Day  11  bar lin             visits -                      next door 2       glasses   0  facts ·  events ·
+Day  12  bar lin             visits -                      next door 4       glasses   0  facts ·  events ·
+Day  13  bar lin             visits Ken@3%,Madame Lin@15%  next door 1       glasses   0  facts ken_pairing  events ·
+Day  14  bar lin             visits Ken@16%                next door 1       glasses   0  facts lounge_idea  events ·
+Day  15  bar lin             visits Madame Lin@35%         next door 6       glasses   0  facts ·  events ·
+Day  16  bar lin             visits Ken@3%                 next door 2       glasses   0  facts ·  events ·
+Day  17  bar lin             visits Madame Lin@19%         next door 3       glasses   0  facts lounge_idea  events ·
+Day  18  bar lin             visits -                      next door 0       glasses   0  facts ·  events ·
+Day  19  bar lin             visits -                      next door 1       glasses   0  facts ·  events ·
+Day  20  bar lin             visits Madame Lin@12%,Ken@36% next door 5 (Ken) glasses   0  facts ·  events ·
+Day  21  bar lin             visits Ken@17%                next door 2       glasses   0  facts ·  events ·
+Day  22  bar lin             visits -                      next door 6       glasses   0  facts ·  events ·
+Day  23  bar lin             visits Ken@76%,Madame Lin@77% next door 3 (Ken) glasses   0  facts ·  events ·
+Day  24  bar lin             visits Ken@48%,Madame Lin@50% next door 4 (Ken) glasses   0  facts ·  events ·
+Day  25  bar lin             visits Ken@52%                next door 2 (Ken) glasses   0  facts ·  events ·
+Day  26  bar lin             visits Ken@1%                 next door 4       glasses   0  facts ·  events ·
+Day  27  bar lin             visits -                      next door 2       glasses   0  facts ·  events ·
+Day  28  bar lin             visits Ken@37%                next door 3 (Ken) glasses   0  facts ·  events ·
+Day  29  bar lin             visits -                      next door 4       glasses   0  facts ·  events ·
+Day  30  bar lin             visits Madame Lin@27%         next door 2       glasses   0  facts ·  events ·
+Day  31  bar lin             visits Ken@1%                 next door 2       glasses   0  facts ·  events ·
+Day  32  bar lin             visits Ken@94%                next door 3       glasses   0  facts ·  events ·
+Day  33  bar lin             visits Ken@15%                next door 2       glasses   0  facts ·  events ·
+Day  34  bar lin             visits Ken@11%                next door 5       glasses   0  facts ·  events ·
+Day  35  bar lin             visits Ken@40%                next door 1 (Ken) glasses   0  facts ·  events ·
+Day  36  bar lin             visits Ken@46%                next door 4 (Ken) glasses   0  facts ·  events ·
+Day  37  bar lin             visits Ken@3%,Madame Lin@42%  next door 3       glasses   0  facts ·  events ·
+Day  38  bar lin             visits Ken@14%,Madame Lin@23% next door 3       glasses   0  facts ·  events ·
+Day  39  bar lin             visits Ken@76%                next door 2 (Ken) glasses   0  facts ·  events ·
+Day  40  bar lin             visits Madame Lin@32%         next door 7       glasses   0  facts ·  events ·
+Day  41  bar lin             visits -                      next door 3       glasses   0  facts ·  events ·
+Day  42  bar lin             visits Ken@21%                next door 1       glasses   0  facts ·  events ·
+Day  43  bar lin             visits Madame Lin@29%,Ken@30% next door 1       glasses   0  facts ·  events ·
+Day  44  bar lin             visits Ken@69%                next door 2 (Ken) glasses   0  facts ·  events ·
+Day  45  bar lin             visits -                      next door 3       glasses   0  facts ·  events ·
+Day  46  bar lin             visits -                      next door 1       glasses   0  facts ·  events ·
+Day  47  bar lin             visits -                      next door 5       glasses   0  facts ·  events ·
+Day  48  bar lin             visits -                      next door 1       glasses   0  facts ·  events ·
+Day  49  bar lin             visits -                      next door 0       glasses   0  facts ·  events ·
+Day  50  bar lin             visits Madame Lin@26%         next door 6       glasses   0  facts ·  events ·
+Day  51  bar lin             visits -                      next door 3       glasses   0  facts ·  events ·
+Day  52  bar lin             visits Madame Lin@28%         next door 3       glasses   0  facts ·  events ·
+Day  53  bar lin             visits Ken@39%,Madame Lin@48% next door 5 (Ken) glasses   0  facts ·  events ·
+Day  54  bar lin             visits Ken@59%                next door 3 (Ken) glasses   0  facts ·  events ·
+Day  55  bar lin             visits Ken@67%                next door 3 (Ken) glasses   0  facts ·  events ·
+Day  56  bar lin             visits -                      next door 3       glasses   0  facts ·  events ·
+Day  57  bar lin             visits -                      next door 2       glasses   0  facts ·  events ·
+Day  58  bar lin             visits -                      next door 1       glasses   0  facts ·  events ·
+Day  59  bar lin             visits -                      next door 3       glasses   0  facts ·  events ·
+Day  60  bar lin             visits Madame Lin@48%         next door 2       glasses   0  facts ·  events ·
+Day  61  bar lin             visits Ken@58%                next door 2       glasses   0  facts ·  events ·
+Day  62  bar lin             visits -                      next door 1       glasses   0  facts ·  events ·
+Day  63  bar lin             visits Ken@42%                next door 4 (Ken) glasses   0  facts ·  events ·
+Day  64  bar lin             visits Ken@46%,Madame Lin@46% next door 3 (Ken) glasses   0  facts ·  events ·
+Day  65  bar lin             visits -                      next door 5       glasses   0  facts ·  events ·
+Day  66  bar lin             visits Ken@21%                next door 3 (Ken) glasses   0  facts ·  events ·
+Day  67  bar lin             visits -                      next door 1       glasses   0  facts ·  events ·
+Day  68  bar lin             visits Ken@3%                 next door 4       glasses   0  facts ·  events ·
+Day  69  bar lin             visits Madame Lin@3%          next door 3       glasses   0  facts ·  events ·
+Day  70  bar lin             visits -                      next door 5       glasses   0  facts ·  events ·
+Day  71  bar lin             visits Ken@27%,Madame Lin@30% next door 4       glasses   0  facts ·  events ·
+Day  72  bar lin             visits -                      next door 4       glasses   0  facts ·  events ·
+Day  73  bar lin             visits -                      next door 1       glasses   0  facts ·  events ·
+Day  74  bar lin             visits Ken@24%                next door 1       glasses   0  facts ·  events ·
+Day  75  bar lin             visits Ken@44%                next door 3 (Ken) glasses   0  facts ·  events ·
+Day  76  bar lin             visits -                      next door 1       glasses   0  facts ·  events ·
+Day  77  bar lin             visits Madame Lin@29%         next door 3       glasses   0  facts ·  events ·
+Day  78  bar lin             visits Ken@34%                next door 5 (Ken) glasses   0  facts ·  events ·
+Day  79  bar lin             visits -                      next door 1       glasses   0  facts ·  events ·
+Day  80  bar lin             visits -                      next door 1       glasses   0  facts ·  events ·
+Day  81  bar lin             visits Madame Lin@13%,Ken@39% next door 4       glasses   0  facts ·  events ·
+Day  82  bar lin             visits Ken@21%                next door 3       glasses   0  facts ·  events ·
+Day  83  bar lin             visits -                      next door 3       glasses   0  facts ·  events ·
+Day  84  bar lin             visits -                      next door 1       glasses   0  facts ·  events ·
+Day  85  bar lin             visits -                      next door 1       glasses   0  facts ·  events ·
+Day  86  bar lin             visits Ken@24%,Madame Lin@54% next door 4       glasses   0  facts ·  events ·
+Day  87  bar lin             visits -                      next door 3       glasses   0  facts ·  events ·
+Day  88  bar lin             visits Ken@11%                next door 2       glasses   0  facts ·  events ·
+Day  89  bar lin             visits -                      next door 2       glasses   0  facts ·  events ·
+Day  90  bar lin             visits Ken@28%                next door 5 (Ken) glasses   0  facts ·  events ·
+Day  91  bar lin             visits Ken@16%,Madame Lin@76% next door 3       glasses   0  facts ·  events ·
+Day  92  bar lin             visits Madame Lin@31%,Ken@68% next door 4 (Ken) glasses   0  facts ·  events ·
+Day  93  bar lin             visits -                      next door 2       glasses   0  facts ·  events ·
+Day  94  bar lin             visits Ken@1%                 next door 2       glasses   0  facts ·  events ·
+Day  95  bar lin             visits Madame Lin@44%         next door 3       glasses   0  facts ·  events ·
+Day  96  bar lin             visits Ken@24%                next door 2       glasses   0  facts ·  events ·
+Day  97  bar lin             visits -                      next door 3       glasses   0  facts ·  events ·
+Day  98  bar lin             visits Ken@31%                next door 4 (Ken) glasses   0  facts ·  events ·
+Day  99  bar lin             visits Ken@21%                next door 1       glasses   0  facts ·  events ·
+Day 100  bar lin             visits Ken@34%                next door 8 (Ken) glasses   0  facts ·  events ·
+Day 101  bar lin             visits -                      next door 4       glasses   0  facts ·  events ·
+Day 102  bar lin             visits Madame Lin@26%,Ken@48% next door 3       glasses   0  facts ·  events ·
+Day 103  bar lin             visits -                      next door 3       glasses   0  facts ·  events ·
+Day 104  bar lin             visits -                      next door 1       glasses   0  facts ·  events ·
+Day 105  bar lin             visits Madame Lin@64%         next door 2       glasses   0  facts ·  events ·
+Day 106  bar lin             visits Ken@27%                next door 2       glasses   0  facts ·  events ·
+Day 107  bar lin             visits Ken@21%                next door 4       glasses   0  facts ·  events ·
+Day 108  bar lin             visits Madame Lin@44%         next door 2       glasses   0  facts ·  events ·
+Day 109  bar lin             visits -                      next door 1       glasses   0  facts ·  events ·
+Day 110  bar lin             visits Ken@92%                next door 4 (Ken) glasses   0  facts ·  events ·
+Day 111  bar lin             visits Ken@26%                next door 3       glasses   0  facts ·  events ·
+Day 112  bar lin             visits -                      next door 2       glasses   0  facts ·  events ·
+Day 113  bar lin             visits Ken@1%                 next door 7       glasses   0  facts ·  events ·
+Day 114  bar lin             visits Ken@96%                next door 3       glasses   0  facts ·  events ·
+Day 115  bar lin             visits Ken@73%,Madame Lin@74% next door 3       glasses   0  facts ·  events ·
+Day 116  bar lin             visits Ken@45%                next door 3 (Ken) glasses   0  facts ·  events ·
+Day 117  bar lin             visits Ken@3%,Madame Lin@39%  next door 6       glasses   0  facts ·  events ·
+Day 118  bar lin             visits Ken@32%                next door 3 (Ken) glasses   0  facts ·  events ·
+Day 119  bar lin             visits -                      next door 5       glasses   0  facts ·  events ·
+Day 120  bar lin             visits Ken@15%                next door 2       glasses   0  facts ·  events ·
+Day 121  bar lin             visits Ken@27%,Madame Lin@28% next door 5 (Ken) glasses   0  facts ·  events ·
+Day 122  bar lin             visits Ken@31%                next door 3 (Ken) glasses   0  facts ·  events ·
+Day 123  bar lin             visits Madame Lin@37%         next door 1       glasses   0  facts ·  events ·
+Day 124  bar lin             visits Madame Lin@74%         next door 4       glasses   0  facts ·  events ·
+Day 125  bar lin             visits Ken@16%                next door 3       glasses   0  facts ·  events ·
+Day 126  bar lin             visits -                      next door 0       glasses   0  facts ·  events ·
+Day 127  bar lin             visits -                      next door 3       glasses   0  facts ·  events ·
+Day 128  bar lin             visits Madame Lin@14%         next door 3       glasses   0  facts ·  events ·
+Day 129  bar lin             visits -                      next door 2       glasses   0  facts ·  events ·
+Day 130  bar lin             visits Ken@70%                next door 3 (Ken) glasses   0  facts ·  events ·
+Day 131  bar lin             visits Ken@39%                next door 2 (Ken) glasses   0  facts ·  events ·
+Day 132  bar lin             visits -                      next door 2       glasses   0  facts ·  events ·
+Day 133  bar lin             visits Ken@36%,Madame Lin@60% next door 6 (Ken) glasses   0  facts ·  events ·
+Day 134  bar lin             visits -                      next door 2       glasses   0  facts ·  events ·
+Day 135  bar lin             visits Madame Lin@31%         next door 4       glasses   0  facts ·  events ·
+Day 136  bar lin             visits Madame Lin@69%         next door 3       glasses   0  facts ·  events ·
+Day 137  bar lin             visits -                      next door 2       glasses   0  facts ·  events ·
+Day 138  bar lin             visits Ken@47%                next door 4 (Ken) glasses   0  facts ·  events ·
+Day 139  bar lin             visits -                      next door 1       glasses   0  facts ·  events ·
+Day 140  bar lin             visits Madame Lin@95%         next door 0       glasses   0  facts ·  events ·
+Day 141  bar lin             visits Ken@1%,Madame Lin@3%   next door 3       glasses   0  facts ·  events ·
+Day 142  bar lin             visits Ken@11%                next door 0       glasses   0  facts ·  events ·
+Day 143  bar lin             visits Madame Lin@30%         next door 3       glasses   0  facts ·  events ·
+Day 144  bar lin             visits Ken@24%                next door 2       glasses   0  facts ·  events ·
+Day 145  bar lin             visits Ken@21%                next door 3       glasses   0  facts ·  events ·
+Day 146  bar lin             visits Ken@68%                next door 3 (Ken) glasses   0  facts ·  events ·
+Day 147  bar lin             visits Ken@26%                next door 1       glasses   0  facts ·  events ·
+Day 148  bar lin             visits Madame Lin@44%         next door 6       glasses   0  facts ·  events ·
+Day 149  bar lin             visits Ken@94%                next door 2 (Ken) glasses   0  facts ·  events ·
+Day 150  bar lin             visits -                      next door 3       glasses   0  facts ·  events ·
+Day 151  bar lin             visits -                      next door 2       glasses   0  facts ·  events ·
+Day 152  bar lin             visits Ken@15%                next door 3       glasses   0  facts ·  events ·
+Day 153  bar lin             visits Ken@14%                next door 3       glasses   0  facts ·  events ·
+Day 154  bar lin             visits Ken@31%,Madame Lin@71% next door 4 (Ken) glasses   0  facts ·  events ·
+Day 155  bar lin             visits Ken@50%                next door 3 (Ken) glasses   0  facts ·  events ·
+Day 156  bar lin             visits Ken@61%                next door 3 (Ken) glasses   0  facts ·  events ·
+Day 157  bar lin             visits Ken@40%                next door 2 (Ken) glasses   0  facts ·  events ·
+Day 158  bar lin             visits -                      next door 4       glasses   0  facts ·  events ·
+Day 159  bar lin             visits -                      next door 1       glasses   0  facts ·  events ·
+Day 160  bar lin             visits -                      next door 4       glasses   0  facts ·  events ·
+Day 161  bar lin             visits Ken@26%                next door 2       glasses   0  facts ·  events ·
+Day 162  bar lin             visits Ken@35%                next door 2 (Ken) glasses   0  facts ·  events ·
+Day 163  bar lin             visits -                      next door 2       glasses   0  facts ·  events ·
+Day 164  bar lin             visits Madame Lin@40%         next door 4       glasses   0  facts ·  events ·
+Day 165  bar lin             visits -                      next door 1       glasses   0  facts ·  events ·
+Day 166  bar lin             visits -                      next door 2       glasses   0  facts ·  events ·
+Day 167  bar lin             visits Madame Lin@58%,Ken@68% next door 3 (Ken) glasses   0  facts ·  events ·
+Day 168  bar lin             visits -                      next door 2       glasses   0  facts ·  events ·
+Day 169  bar lin             visits -                      next door 0       glasses   0  facts ·  events ·
+Day 170  bar lin             visits Madame Lin@10%         next door 3       glasses   0  facts ·  events ·
+Day 171  bar lin             visits Madame Lin@26%         next door 2       glasses   0  facts ·  events ·
+Day 172  bar lin             visits Ken@20%,Madame Lin@53% next door 4       glasses   0  facts ·  events ·
+Day 173  bar lin             visits Madame Lin@73%         next door 3       glasses   0  facts ·  events ·
+Day 174  bar lin             visits -                      next door 1       glasses   0  facts ·  events ·
+Day 175  bar lin             visits Madame Lin@49%         next door 3       glasses   0  facts ·  events ·
+Day 176  bar lin             visits -                      next door 1       glasses   0  facts ·  events ·
+Day 177  bar lin             visits Madame Lin@88%         next door 1       glasses   0  facts ·  events ·
+Day 178  bar lin             visits -                      next door 1       glasses   0  facts ·  events ·
+Day 179  bar lin             visits -                      next door 2       glasses   0  facts ·  events ·
+Day 180  bar lin             visits Ken@3%                 next door 3       glasses   0  facts ·  events ·
+Day 181  bar lin             visits Ken@66%                next door 2 (Ken) glasses   0  facts ·  events ·
+Day 182  bar lin             visits -                      next door 3       glasses   0  facts ·  events ·
+Day 183  bar lin             visits -                      next door 3       glasses   0  facts ·  events ·
+Day 184  bar lin             visits -                      next door 3       glasses   0  facts ·  events ·
+Day 185  bar lin             visits Ken@29%,Madame Lin@43% next door 5       glasses   0  facts ·  events ·
+Day 186  bar lin             visits Ken@45%                next door 3 (Ken) glasses   0  facts ·  events ·
+Day 187  bar lin             visits Madame Lin@32%         next door 5       glasses   0  facts ·  events ·
+Day 188  bar lin             visits Ken@38%                next door 3 (Ken) glasses   0  facts ·  events ·
+Day 189  bar lin             visits -                      next door 1       glasses   0  facts ·  events ·
+Day 190  bar lin             visits Ken@50%                next door 2       glasses   0  facts ·  events ·
+Day 191  bar lin             visits -                      next door 0       glasses   0  facts ·  events ·
+Day 192  bar lin             visits -                      next door 3       glasses   0  facts ·  events ·
+Day 193  bar lin             visits -                      next door 3       glasses   0  facts ·  events ·
+Day 194  bar lin             visits -                      next door 5       glasses   0  facts ·  events ·
+Day 195  bar lin             visits -                      next door 2       glasses   0  facts ·  events ·
+Day 196  bar lin             visits Ken@1%                 next door 2       glasses   0  facts ·  events ·
+Day 197  bar lin             visits Madame Lin@25%         next door 4       glasses   0  facts ·  events ·
+Day 198  bar lin             visits Ken@15%                next door 1       glasses   0  facts ·  events ·
+Day 199  bar lin             visits Ken@25%                next door 5 (Ken) glasses   0  facts ·  events ·
+Day 200  bar lin             visits Ken@48%                next door 3       glasses   0  facts ·  events ·
+
+the day of each fact: {'lin_hello': 1, 'ken_wine_q': 5, 'ken_pairing': 6, 'lounge_idea': 7, 'tasting_night': None, 'pairing_wine': None, 'lin_retiring': None, 'ken_where': None, 'jd_want': None, 'dylan_book': None, 'lin_viewing': None, 'lounge_project': None, 'lin_take': None, 'lin_closed': None, 'lin_signed': None, 'evan_knows_dylan': None, 'lounge_built_1': None, 'lin_guest': None}
+the day of each event: {'ken_tasting': None, 'tasting_start': None, 'pairing_start': None, 'lin_retire': None, 'ken_where': None, 'jd_want': None, 'dylan_book': None, 'lin_viewing': None, 'lin_decide': None, 'lin_last': None, 'lin_sign': None, 'lin_guest': None}
+words kept: {"lin_retire":0,"ken_where":0,"jd_want":0,"dylan_book":0,"lin_viewing":0,"pairing_start":0,"lin_sign":0,"lin_guest":0}
+Evan: []  Dylan stage: 1  money: 2296047  level: 1
+page errors: []
+200 days in 371s
+EXIT 0
