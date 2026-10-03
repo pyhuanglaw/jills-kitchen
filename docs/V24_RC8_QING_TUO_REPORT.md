@@ -89,7 +89,12 @@ earlier 晴 × 阿拓 beat is replayed and none is marked as history.
   the lines the briefs forbid absent (「我喜歡妳」「跟我在一起」「你不要鼓掌」, any 「空間」/「不打擾」, 「司法官」…);
   only 沈晴 and 阿拓 on stage at the end; the after-hours line changes no story step; the five on five different days, in
   order; the story page lists them.
-- Regression: see the commit message for the run on this commit.
+- Regression on 0d3ab73: the 111 tests whose names touch Dylan, The Lounge, the stories, 予安, Ken, the bar, Madame Lin,
+  saves and migration, staff and Evan, regulars, the scenes and the album, with the two goldens — **110 passed, 1 failed**
+  (`docs/evidence/v24_rc8/qing_tuo/regression.txt`). The one failure is `jill_rests_when_staff_cover_the_floor`, the
+  same as at Checkpoint C and with the same numbers (sit 517 of 5907 frames): Checkpoint A's, not this line's (Checkpoint
+  C report §3). From the 52nd test on, the tree also had 2c1d303's two pictures (data only); the illustration and signing
+  tests ran on them and pass. The full regression (232) belongs to the release gate.
 
 ## 6. Simulations (T) — `docs/evidence/v24_rc8/qing_tuo/chain/qt_chain_d74.log`
 
