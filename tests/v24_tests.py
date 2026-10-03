@@ -736,6 +736,128 @@ def rc8_duode_has_no_picture(b, port, target):
 
 
 @test
+def rc83_a_special_evening_comes_back_with_its_room(b, port, target):
+    """The player's Day 87 save, made at 19:19 on the chef's night with 予安 at the piano: 「繼續營業」 used to open an empty
+    shop (29 guests, then none) — 'piano' was not a state the restore knew, so the whole rebuild threw and it fell back to an
+    empty room at the same clock. Now the room comes back: everyone in it, 予安 at the piano, the chef's night with its
+    guests and the Lounge still its own; the evening plays on."""
+    g = Game(b, port, target, seed=883, manual=True, viewport={'width': 390, 'height': 844})
+    raw = json.load(open(os.path.join(ROOT, 'tests', 'saves', 'player_day87_2257.json'), encoding='utf-8'))
+    raw = raw.get('save', raw)
+    n0 = sum(1 for q in raw['checkpoint']['snap']['groups'])
+    g.ev("phase='title';R=null;localStorage.setItem(KEY,JSON.stringify(%s))" % json.dumps(raw, ensure_ascii=False)); g.reload(); g.page.wait_for_timeout(150)
+    check(g.page.is_visible('text=繼續營業'), 'the title offers to continue the evening')
+    g.click('[data-act=open]'); g.page.wait_for_timeout(150)
+    st = json.loads(g.ev("JSON.stringify({ph:phase,n:R.groups.length,clock:clockStr(),ya:!!(R.ya&&R.ya.g&&R.ya.g.state==='piano'),cn:!!R.cn,cng:R.cn?R.cn.guests.length:0,cnr:R.tables.filter(t=>t.room==='lounge').every(t=>t.cnr),toast:$('#toasts').innerText})"))
+    check(st['ph'] == 'service' and st['n'] == n0, f'every one of the {n0} parties is back: {st}')
+    check(st['ya'] and st['cn'] and st['cng'] > 0 and st['cnr'], f'予安 at the piano, the chef\'s night and its guests, the Lounge booked out: {st}')
+    check('無法完整還原' not in st['toast'], f'no fallback: {st}')
+    install_bot(g); g.ev("window.__noScenes=true"); g.ev("__play(900,0)")
+    check(g.ev("phase") == 'service' and not g.errors, f'the evening plays on: {g.errors[:3]}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def rc83_the_queue_waits_at_the_shopfront(b, port, target):
+    """The player: 「排隊的人可不可以改到店門口啊 在主廳好礙事」. A full house waits outside — on the bench by the door when the
+    shop has bought it, else standing by the door; nobody waits in the hall. Their patience and the tab's count are at
+    the shopfront, and a tap on a waiting party there seats it at a free table."""
+    g = Game(b, port, target, seed=884, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day89_2320.json')
+    to_service(g)
+    g.ev("R.sched=R.sched.slice(0,R.si);for(let i=0;i<40&&R.tables.some(t=>!t.group&&!t.lounge&&!t.pdr&&(t.room||'main')!=='front');i++)spawn({t:R.t,type:'office',size:2})")
+    g.ev("for(let i=0;i<3;i++)spawn({t:R.t,type:'office',size:2})")
+    g.ev("for(let i=0;i<30*12;i++)update(1/30)")
+    q = json.loads(g.ev("JSON.stringify(queued().map(g=>({room:g.room,troom:g.troom,k:g.spot&&g.spot.k,st:g.state})))"))
+    check(q and all(o['room'] == 'front' and o['troom'] == 'front' for o in q), f'they wait at the shopfront: {q}')
+    check(all(o['k'] in ('oseat', 'ostand') for o in q if o['st'] == 'queue'), f'on the bench outside or by the door, never the hall\'s bench: {q}')
+    check(g.ev("roomAlerts().front.n") >= len(q), 'the shopfront tab counts them')
+    g.ev("const t=R.tables.find(t=>t.group&&!t.lounge&&!t.pdr&&(t.room||'main')==='main');leaveGroup(t.group,'ok');t.dirty=false;t.group=null;t.claim=null;for(const g0 of queued())g0.notice=99")
+    g.ev("setRoom('front')")
+    first = g.ev("(()=>{const g0=queued().find(q=>q.state==='queue');return g0?g0.id:null})()")
+    check(first is not None, 'someone is waiting')
+    hit = g.ev("(()=>{const g0=R.groups.find(q=>q.id===%d);const p={x:g0.x,y:g0.y-22};return roomTap(p,{preventDefault(){}})&&g0.table!=null})()" % first)
+    check(hit, 'a tap on them at the shopfront seats them')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def rc83_three_pizzas(b, port, target):
+    """The player: 「披薩只有一種嗎」「lounge根本沒人點披薩」. With the pizza oven the lab has three pies — the bar pie (dough +
+    tomato sauce + cheese), 瑪格麗特 (dough + tomato sauce + basil), 蘑菇白醬 (dough + cream + mushroom slices) — each with
+    its own plate and cooking art; and a Lounge party of two or more picks a pie, whichever, as often as three other bites."""
+    g = Game(b, port, target, seed=885, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day74_1508.json')
+    g.ev("barMenuMig();S.rooms.pizzaoven=1")
+    check(g.ev("['pizza','pzmarg','pzfungi'].every(d=>labRD().includes(d))"), 'all three in the lab once the oven is there')
+    check(g.ev("labEval(['dough','tomato','cheese']).d") == 'pizza' and g.ev("labEval(['dough','tomato','basil']).d") == 'pzmarg' and g.ev("labEval(['dough','cream','pzmush']).d") == 'pzfungi', 'each its own three')
+    check(g.ev("pantry().includes('pzmush')"), 'the mushroom slices in the pantry')
+    for d in ('pizza', 'pzmarg', 'pzfungi'):
+        check(g.ev("typeof dishURL('%s','P')==='string'&&dishURL('%s','P').length>200" % (d, d)), f'{d}: its plate draws')
+    check(g.ev("['freshmoz','pzwhite','pzmush'].every(i=>typeof ingURL(i)==='string')"), 'the new toppings draw')
+    g.ev("for(const d of['pizza','pzmarg','pzfungi']){unlockDish(d);S.stock[d]=50}")
+    share = g.ev("""(()=>{const bf=barDishes().filter(d=>menuList().includes(d)&&stationOk(d)&&(S.stock[d]||0)>0);let pz=0,n=0;R=R||{};const M=Math.random;for(let k=0;k<4000;k++){const o=loungeOrder({type:'couple',size:2});for(const d of o)if(bf.includes(d)){n++;if(isPizza(d))pz++}}return{pz,n,bf:bf.length,np:bf.filter(isPizza).length}})()""")
+    np, nb = share['np'], share['bf']
+    expect = 3 / (3 + (nb - np))
+    check(np == 3 and abs(share['pz'] / share['n'] - expect) < .06, f'pies together about {expect:.2f} of the bites a couple orders: {share}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def rc83_small_things_from_the_players_evenings(b, port, target):
+    """The rest of the player's Day 83–89 notes, one check each: the favourite-dish complaint once in six days (「Sophie連續
+    兩天說沒有香煎鴨胸很白癡」); PERFECT no longer a banner across the screen (「可以不要一直跳出perfect擋住選區嗎」); Evan's two
+    coasters say whose seat the second is, the brief's lines kept (「這段對話沒頭沒尾欸」); Ken's share is Jill's envelope
+    to Ken; the third tasting night's guess is about the wine (「怎麼是猜什麼干貝」); Jill's room has two litter cabinets
+    and the bowls; 寶寶 leans against Jill, 柔柔 likes her legs."""
+    g = Game(b, port, target, seed=886, manual=True, viewport={'width': 390, 'height': 844})
+    src = open(os.path.join(ROOT, 'js', 'game.js'), encoding='utf-8').read()
+    check("banner('✨ PERFECT! ✨'" not in src, 'no PERFECT banner')
+    check("sayG(g,'他今天沒來。'" in src and 'Monsieur 杜平常坐的位子' in src, 'the coasters: whose seat, and the brief\'s words')
+    check('把 Ken 的那一份裝進信封，推到他面前' in src and '不用給我。' in src, 'the envelope goes to Ken')
+    check('這次可以猜是哪裡的酒了？' in src and '第三支配${dn}？' in src, 'the guess is the wine\'s')
+    load_save(g, 'player_day89_2320.json')
+    to_service(g)
+    g.ev("S.regulars.sophie=Math.max(S.regulars.sophie||0,5);S.loveMiss={};Math.random=()=>0")
+    said = g.ev("(()=>{spawn({t:R.t,type:'office',size:1,reg:'sophie'});const s=R.groups[R.groups.length-1];const tk={items:[{d:'coffee'}]};const a=loveOrdered(s,tk);const b=loveOrdered(s,tk);S.day+=6;const c=loveOrdered(s,tk);S.day-=6;return[a,b,c]})()")
+    check(said == [True, False, True], f'said once, not the next time, said again six days on: {said}')
+    check(g.ev("!!(HM.litter2&&HM.bowls)&&homeItems.toString().includes('drawHomeLitter(c,HM.litter2)')&&homeItems.toString().includes('drawHomeBowls(c)')"), 'two litter cabinets and the bowls in the room')
+    g.ev("setRoom('home');forceDraw=true"); g.ev("for(let i=0;i<6;i++)__tick(1000/30)"); g.ev("setRoom('main')")
+    check(g.ev("homeSpots(catBy('tora')).some(s=>s.k==='bowl')"), 'a cat can go to the bowls')
+    near = json.loads(g.ev("""JSON.stringify((()=>{if(!fact('sm_b'))factSet('sm_b');const main=R.tables.filter(t=>(t.room||'main')==='main'&&!t.lounge&&!t.pdr&&t.seats>=2);
+      spawn({t:R.t,type:'office',size:1,reg:'mia'});const m=R.groups[R.groups.length-1];const T0=main[0];seatGroup(m,T0);
+      spawn({t:R.t,type:'office',size:1,reg:'sophie'});const s=R.groups[R.groups.length-1];
+      const d=t=>Math.hypot(t.x-T0.x,t.y-T0.y);const others=main.filter(t=>t!==T0).sort((a,b)=>d(a)-d(b));
+      const a=storyNearTable(s,others);const far=others.filter(t=>d(t)>d(others[0])*1.15);const b=far.length>=2?storyNearTable(s,far):undefined;
+      return{next:a===others[0],far:b===null,nf:far.length}})())"""))
+    check(near['next'] and near['far'] and near['nf'] >= 2, f'Sophie and Mia: 「旁邊」 is the next table, or not today (「sophie mia根本沒有坐在一起」): {near}')
+    g.ev("const J=LIFE.jill;J.on=true;J.x=150;J.face=1;J.legs=0;J.legTarget=0;for(const c of CATS)if(c.sofa)c.sofa=null")
+    check(g.ev("sofaSlots(catBy('mei')).some(s=>s.kind==='lean')") and not g.ev("sofaSlots(catBy('snow')).some(s=>s.kind==='lean')"), '寶寶 alone can lean against Jill')
+    g.ev("Math.random=(()=>{let a=886;return()=>{a=(a*1103515245+12345)%2147483648;return a/2147483648}})();const J=LIFE.jill;J.legs=1;J.legTarget=1")
+    lap = g.ev("(()=>{const c=catBy('mikan');let n=0;for(let i=0;i<400;i++){const s=pickSofaSlot(c,false);if(s&&s.kind==='lap')n++}return n})()")
+    check(lap >= 80, f'柔柔 on her legs, often, when she stretches them out: {lap}/400')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def rc83_a_new_space_has_its_first_photo(b, port, target):
+    """The player: 「新增房間之後要有拍照時刻是設計給房間的吧」. In a new space's first days, the first time it is on screen
+    during the evening, a photo of it — once."""
+    g = Game(b, port, target, seed=887, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day74_1508.json')
+    g.ev("S.newRooms=S.newRooms||{};S.newRooms.lounge=S.day;S.spacePhoto={}")
+    to_service(g)
+    g.ev("setRoom('lounge');forceDraw=true")
+    g.ev("for(let i=0;i<10;i++)__tick(1000/30)")
+    g.ev("spacePhotoCheck();flushMem()")
+    a = json.loads(g.ev("JSON.stringify(albumList().filter(p=>p.kind==='newspace').map(p=>p.txt||p.text||''))"))
+    check(len(a) == 1 and 'The Lounge' in a[0], f'one photo of the new Lounge: {a}')
+    g.ev("spacePhotoCheck();flushMem()")
+    check(g.ev("albumList().filter(p=>p.kind==='newspace').length") == 1, 'once')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
 def v24_the_day_is_held_for_the_beat_its_people_came_for(b, port, target):
     """Pacing (measured on the Day 52 save): when the schedule brings someone for a due v2.4 major beat, that beat keeps
     a major slot until it plays or until 85% of the service; another story's major that comes up while every free slot
