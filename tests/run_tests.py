@@ -435,13 +435,17 @@ def five_cats_initialise(b, port, target):
 
 @test
 def cat_ai_keeps_running(b, port, target):
+    """No cat freezes: over five minutes of Day 1 every cat changes what she is doing at least three times. Since rc7.3 a
+    cat may spend the evening in Jill's room (st 'home'); there, going from one of her spots to another is a change too
+    (rc8.3: on this seed 寶寶 — who likes the room — stayed in it the whole five minutes, at the window, the tree, the
+    rug, the bed and the tree again, and the count of st alone called her stuck)."""
     g = Game(b, port, target, seed=7, manual=True)
     install_bot(g)
     g.click('[data-act=open]'); start_day(g)
     r = g.ev(r"""(()=>{__bot(1,1/30);const changes={},last={},sleep={},nearJ={},bad=[];const ids=CATS.map(c=>c.def.id);ids.forEach(i=>{changes[i]=0;sleep[i]=0;nearJ[i]=0});
       const force=[()=>startRace(catBy('tora')),()=>startAmbush(catBy('mikan'))];
       for(let n=0;n<9000;n++){__bot(1,1/30);if(phase!=='service')break;if(n===1500)force[0]();if(n===3000)force[1]();
-        for(const c of CATS){if(c.st!==last[c.def.id]){changes[c.def.id]++;last[c.def.id]=c.st}
+        for(const c of CATS){const k=c.st+'|'+(c.st==='home'?c.homeSpot||'':'');if(k!==last[c.def.id]){changes[c.def.id]++;last[c.def.id]=k}
           if(c.st==='sleep'||c.st==='bed')sleep[c.def.id]++;if(Math.hypot(c.x-PASS.x,c.y-PASS.y)<60)nearJ[c.def.id]++;
           if(!isFinite(c.x)||!isFinite(c.y))bad.push(c.def.id+' NaN');
           if(c.x<-BGM-5||c.x>LW+BGM+5||c.y>LH+5||c.y<wallTop()-40)bad.push(c.def.id+' out of bounds '+Math.round(c.x)+','+Math.round(c.y)+' '+c.st)}
@@ -620,18 +624,20 @@ def touch_controls(b, port, target):
         g.page.mouse.click(p[0], p[1]); g.ev("__tick(1000/30)")
     g.ev("__tick(100)")
     g.click('[data-act=open]'); start_day(g)
-    # 1) the tables are all dirty, so a guest group waits on the bench -> free a table and tap the
-    #    group -> it gets seated at once (left alone it would get up by itself a few seconds later)
+    # 1) the tables are all dirty, so a guest group waits outside, at the shopfront (rc8.3) -> free a table, go to the
+    #    shopfront and tap the group -> it gets seated at once (left alone it would get up by itself a few seconds later)
     g.ev("for(const t of R.tables)t.dirty=true;__tick(1000/30)")
     for _ in range(60):
         if g.ev("queued().some(x=>x.state==='queue'&&!x.moving)"): break
         g.ev("for(let i=0;i<30;i++)__tick(1000/30)")
     gid = g.ev("(()=>{const q=queued().find(x=>x.state==='queue'&&!x.moving);return q?q.id:null})()")
     check(gid is not None, 'no guests arrived to wait')
-    check(g.ev(f"isSeated(R.groups.find(x=>x.id==={gid}))"), 'a small party should sit on the bench while waiting')
+    check(g.ev(f"(()=>{{const q=R.groups.find(x=>x.id==={gid});return q.room==='front'&&!!q.spot&&q.spot.k==='ostand'}})()"), 'a new shop has no bench outside: the party waits standing by the door')
     gx, gy = g.ev(f"(()=>{{R.tables[0].dirty=false;const q=R.groups.find(x=>x.id==={gid});return[q.x,q.y-22]}})()")
+    g.ev("setRoom('front')"); g.ev("__tick(1000/30)")
     tap(gx, gy)
     check(g.ev(f"R.groups.find(x=>x.id==={gid}).table!=null"), 'tapping the waiting guests did not seat them')
+    g.ev("setRoom('main')"); g.ev("__tick(1000/30)")
     g.ev("for(const t of R.tables)if(!t.group)t.dirty=false")
     # 2) walk the service forward until a ticket exists, then tap the station to open the kitchen panel
     for _ in range(60):
@@ -1007,10 +1013,10 @@ def waiter_serves_ready_food(b, port, target):
 
 @test
 def waiting_bench(b, port, target):
-    """Full house: small parties sit on the bench by the door, a party of four stands beside it, the
-    first party that fits gets up and walks (no teleport) when a table frees, a cat on a place is
-    handled, Dylan waits like everyone else, and the bench keeps clear of the door, tables, sofa,
-    cat tree, TV and staff spots."""
+    """Full house: the queue waits outside, at the shopfront (rc8.3, the player: 「排隊的人可不可以改到店門口啊 在主廳好礙事」) —
+    small parties on the 門口長椅 when the shop has it, a party of four standing by the door; the first party that fits gets
+    up and walks in (no teleport) when a table frees, Dylan waits like everyone else, and nobody waits on the hall's bench
+    (a cat on it is left alone). The hall's bench still keeps clear of the door, tables, sofa, cat tree, TV and staff spots."""
     g = Game(b, port, target, seed=7, manual=True)
     install_bot(g)
     # geometry: nothing the bench could block
@@ -1021,7 +1027,7 @@ def waiting_bench(b, port, target):
       for(const sp of BENCH.stand)if(hit(sp.x,sp.y))bad.push('stand spot on bench');if(hit(84,150))bad.push('waiter spot');if(hit(PASS.x,PASS.y))bad.push('pass');
       for(const k in SPOT)if(hit(SPOT[k].x,SPOT[k].y))bad.push('spot '+k);return bad})()""")
     check(not geo, f'bench overlaps: {geo}')
-    g.ev("S.day=9;S.level=2;S.tables=5;S.decor.sofa=1;S.money=6000;S.dylan.stage=1;S.regulars.dylan=4")
+    g.ev("S.day=9;S.level=2;S.tables=5;S.decor.sofa=1;S.money=6000;S.dylan.stage=1;S.regulars.dylan=4;S.ext=S.ext||{};S.ext.bench=1")
     g.click('[data-act=open]'); start_day(g)
     g.ev("__botUntil('R.t>8',3000,1/30)")
     # a cat takes the first place, then every table is dirty and three parties arrive
@@ -1035,11 +1041,12 @@ def waiting_bench(b, port, target):
         if g.ev("queued().length===3&&queued().every(q=>q.state==='queue'&&!q.moving)"): break
     q = g.ev("queued().map(q=>({n:q.name,size:q.size,spot:q.spot?q.spot.k+q.spot.i:null,sit:isSeated(q),x:q.x,y:q.y}))")
     check(len(q) == 3 and all(x['spot'] for x in q), f'waiting parties have no place: {q}')
-    check([x['spot'] for x in q if x['size'] <= 2] == ['seat1', 'seat2'], f'small parties should take the free bench places (the cat has place 0): {q}')
-    check([x['spot'] for x in q if x['size'] == 4] == ['stand0'], f'a party of four should stand beside the bench: {q}')
+    check([x['spot'] for x in q if x['size'] <= 2] == ['oseat0', 'oseat1'], f'small parties should sit on the bench outside (the cat on the hall\'s bench is not in the way): {q}')
+    check([x['spot'] for x in q if x['size'] == 4] == ['ostand0'], f'a party of four should stand by the door: {q}')
+    check(g.ev("queued().every(q=>q.room==='front')"), 'they wait at the shopfront, not in the hall')
     check(all(x['sit'] for x in q if x['size'] <= 2) and not any(x['sit'] for x in q if x['size'] == 4), f'seated/standing wrong: {q}')
     dy = [x for x in q if x['n'] == 'Dylan'][0]
-    check(dy['spot'] == 'seat2', f'Dylan must queue behind the party that came first: {q}')
+    check(dy['spot'] == 'oseat1', f'Dylan must queue behind the party that came first: {q}')
     # free the tables: the first party that fits gets up and walks over; nobody jumps
     g.ev("window.__noClean=false;for(const t of R.tables)if(!t.group)t.dirty=false")
     jumps = g.ev(r"""(()=>{const bad=[];let prev=new Map(R.groups.map(g=>[g.id,[g.x,g.y,g.room]]));let first=null;

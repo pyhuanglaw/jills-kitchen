@@ -1,0 +1,6 @@
+Cats' share of time in Jill's room (st 'home') before opening, eight seeds (31338-31345), 18000 cat updates each;
+in brackets the share at the new bowls. tools: docs/evidence/v24_rc8_3/sims/home_share.py (rc8.2 through JK_GAME_JS).
+rc8.3 {'tora': (92, 0.8), 'ban': (20, 0.7), 'snow': (47, 0.0), 'mikan': (5, 0.0), 'mei': (62, 0.3)}
+rc8.2 {'tora': (97, 0.0), 'ban': (28, 0.0), 'snow': (36, 0.0), 'mikan': (6, 0.0), 'mei': (55, 0.0)}
+Reading: the same shape (樾樾 nearly always home, 柔柔 nearly never, 寶寶 and 包包 about half); the single-seed
+fingerprint (tests/golden/cats.json) moved a lot because one long stay more or less changes one trajectory.
