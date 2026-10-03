@@ -1010,6 +1010,22 @@ function drawStoryWear(c,L,hy,by,OL){
    gaze{x,y} (local, -1..1), mood (happy|ok|sad|angry|eat) + chew, blink, expr (Jill only: smile|focus|
    soft|amused|tired). Look L: skin, hair, hs 0..9 (4 Jill's, 9 Dylan's; 10–23 the story guests', drawStoryHair),
    top, acc, pants, and the story guests' own details (drawStoryFace, drawStoryWear). */
+/* rc7.6 (the player, 07:44 「在房間Dylan就穿帽T一直戴著帽T帽子吧」): a hoodie's hood up. Behind the head: the hood's round back
+   and its sides coming down to the shoulders. In front: the hood covers the top of the head and the ears; the face shows in
+   its opening, a little fringe under the edge, the edge itself a soft fold. */
+function hoodUpBack(c,L,hy,OL){const hd=L.hood||'#8E9297';c.fillStyle=hd;c.strokeStyle=OL;c.lineWidth=.6;c.beginPath();c.ellipse(0,hy-.8,12.4,12.6,0,0,7);c.fill();c.stroke();
+ c.beginPath();c.moveTo(-11.6,hy+3);c.quadraticCurveTo(-11.4,hy+10.6,-6.6,hy+12.4);c.lineTo(6.6,hy+12.4);c.quadraticCurveTo(11.4,hy+10.6,11.6,hy+3);c.closePath();c.fill();
+ c.fillStyle='rgba(0,0,0,.16)';el(c,0,hy+10.6,7.4,2.4)}
+function hoodUpFront(c,L,hy,OL){const hd=L.hood||'#8E9297';const oy=hy+1.8,orx=8.3,ory=8.1;   /* the opening: the brows inside it, the ears outside */
+ /* the fringe first, under the edge: a short dark line of hair across the forehead */
+ c.fillStyle=L.hair;c.beginPath();c.moveTo(-6.8,oy-4.6);c.quadraticCurveTo(0,oy-13.6,6.8,oy-4.6);c.quadraticCurveTo(5.2,oy-6.4,3.6,oy-6);c.quadraticCurveTo(2,oy-7.4,.4,oy-6.4);c.quadraticCurveTo(-1.6,oy-7.6,-3.4,oy-6.4);c.quadraticCurveTo(-5,oy-7,-6.8,oy-4.6);c.closePath();c.fill();
+ /* the hood: everything above the chin outside the opening */
+ c.fillStyle=hd;c.beginPath();c.ellipse(0,hy-.8,12.4,12.6,0,Math.PI*.86,Math.PI*2.14);c.lineTo(9.6,hy+10.4);c.lineTo(-9.6,hy+10.4);c.closePath();c.ellipse(0,oy,orx,ory,0,0,Math.PI*2,true);c.fill('evenodd');
+ c.strokeStyle=OL;c.lineWidth=.6;c.beginPath();c.ellipse(0,hy-.8,12.4,12.6,0,Math.PI*.86,Math.PI*2.14);c.stroke();
+ /* the edge: a soft fold round the face, darker inside, a light line on its crown */
+ c.strokeStyle=shade(hd,-.22);c.lineWidth=1.5;c.beginPath();c.ellipse(0,oy,orx+.6,ory+.6,0,Math.PI*.94,Math.PI*2.06);c.stroke();
+ c.strokeStyle='rgba(255,255,255,.22)';c.lineWidth=.9;c.beginPath();c.ellipse(0,oy,orx+2.2,ory+2.2,0,Math.PI*1.18,Math.PI*1.62);c.stroke();
+ c.strokeStyle='rgba(0,0,0,.14)';c.lineWidth=.7;c.beginPath();c.moveTo(0,hy-13.2);c.quadraticCurveTo(.6,hy-11.6,0,oy-ory-1.6);c.stroke()}   /* the seam over the crown */
 function drawPerson(c,x,y,L,o){o=o||{};const s=(o.s||1)*(o.pscale===undefined?PSC:o.pscale)*(L.kid?.74:1);c.save();c.translate(x,y);c.scale((o.flip?-1:1)*s,s);
  const seated=o.seated,bob=o.bob||0,step=o.step||0;const OL='rgba(60,34,22,.5)';c.lineJoin='round';c.lineCap='round';
  const pc=L.pants||'#3B3542';const skin=L.skin,hair=L.hair;const hairDk=shade(hair,-.28),hairLt=shade(hair,.3);
@@ -1105,11 +1121,13 @@ function drawPerson(c,x,y,L,o){o=o||{};const s=(o.s||1)*(o.pscale===undefined?PS
     torso so all of it shows, its root under the head; it swings with her steps; a small tie where it gathers */c.fillStyle=hair;c.save();c.translate(8.4,hy+4.5);c.rotate(-.06+Math.sin((o.step||0)*1.6+(o.bob||0))*.12);c.beginPath();c.moveTo(-2.6,-2);c.quadraticCurveTo(-5.2,9,-2.2,22);c.quadraticCurveTo(.2,25,3,21.5);c.quadraticCurveTo(5.4,9,3,-2);c.closePath();c.fill();c.strokeStyle=OL;c.lineWidth=.5;c.stroke();c.strokeStyle=hairLt;c.lineWidth=.9;c.beginPath();c.moveTo(.4,2);c.quadraticCurveTo(-1.6,10,.2,19);c.stroke();c.fillStyle='#B98A5C';rr(c,-3,-.4,6,2.6,1.3);c.fill();c.restore()}
  /* head */
  c.fillStyle='rgba(0,0,0,.12)';el(c,0,hy+9.4,6.2,1.6);
+ if(L.hoodUp)hoodUpBack(c,L,hy,OL);   /* rc7.6: the hood up — behind the head, down to the shoulders */
  let hg=c.createRadialGradient(-3,hy-3,1,0,hy,11);hg.addColorStop(0,shade(skin,.12));hg.addColorStop(1,shade(skin,-.08));c.fillStyle=hg;circ(c,0,hy,9.6);c.strokeStyle=OL;c.lineWidth=.7;c.beginPath();c.arc(0,hy,9.6,0,7);c.stroke();
  c.fillStyle=shade(skin,-.06);circ(c,-9.3,hy+1.6,1.8);circ(c,9.3,hy+1.6,1.8);c.fillStyle='rgba(200,110,90,.35)';circ(c,-9.3,hy+1.7,.8);circ(c,9.3,hy+1.7,.8);
  /* hair on top */
  c.fillStyle=hair;
- if(L.hs>=STORY_HS_MIN)drawStoryHair(c,L,hy,'top');
+ if(L.hoodUp)hoodUpFront(c,L,hy,OL);   /* rc7.6: the hood over his hair; a little fringe under its edge */
+ else if(L.hs>=STORY_HS_MIN)drawStoryHair(c,L,hy,'top');
  else if(L.hs===5){c.beginPath();c.arc(0,hy-.5,9.9,Math.PI*1.05,Math.PI*1.95);c.fill();el(c,-9,hy,1.8,4);el(c,9,hy,1.8,4);c.fillStyle='rgba(255,255,255,.2)';el(c,-3,hy-7.4,3,1.2)}
  else{c.beginPath();c.arc(0,hy-.5,10.3,Math.PI*.98,Math.PI*2.02);c.closePath();c.fill();
   if(L.hs===6){for(const [bx,br] of[[-6.2,3.8],[-1,4.6],[4.6,4]]){c.beginPath();c.arc(bx,hy-7.2,br,0,7);c.fill()}c.beginPath();c.moveTo(-9.6,hy-2);c.quadraticCurveTo(-4,hy-1,-1.5,hy+.5);c.quadraticCurveTo(-3,hy-3.6,-7,hy-5);c.fill()}
@@ -1206,7 +1224,7 @@ const WARD_PAT={
  pin:(c,L,by)=>{c.fillStyle=L.vst||'#7F98B3';for(let x=-8.2;x<8.6;x+=2.1)c.fillRect(x,by,.55,17.5)},
  rugby:(c,L,by)=>{c.fillStyle=L.st||'#2C3A55';for(let y=by+3.4;y<by+17.5;y+=5.6)c.fillRect(-8.6,y,17.2,2.8)},
  yoke:(c,L,by,top)=>{const a=L.y1||'#2C3A55',b2=L.y2||'#B83A3A';c.fillStyle=a;c.fillRect(-8.6,by+2.4,17.2,.8);c.fillRect(-8.6,by+8.2,17.2,.8);for(let x=-8;x<8.6;x+=2.6){c.fillStyle=b2;c.beginPath();c.moveTo(x,by+7.6);c.lineTo(x+1.3,by+4.4);c.lineTo(x+2.6,by+7.6);c.closePath();c.fill();c.fillStyle=a;circ(c,x+1.3,by+3.8,.5)}c.fillStyle='rgba(0,0,0,.06)';for(let x=-7.7;x<8.6;x+=1.7)c.fillRect(x,by+9.4,.5,5.4)},
- hoodie:(c,L,by,top)=>{/* rc7.5 (07:13): Dylan at home — the hood on the shoulders, the strings, the front pocket, the ribbed hem */const hd=L.hood||shade(top,-.12);c.fillStyle=hd;el(c,0,by+.6,7.6,3);c.fillStyle='rgba(255,255,255,.14)';el(c,-2.6,by+.2,3,1);
+ hoodie:(c,L,by,top)=>{/* rc7.5 (07:13): Dylan at home — the hood on the shoulders, the strings, the front pocket, the ribbed hem (rc7.6: the hood up, nothing on the shoulders) */const hd=L.hood||shade(top,-.12);if(!L.hoodUp){c.fillStyle=hd;el(c,0,by+.6,7.6,3);c.fillStyle='rgba(255,255,255,.14)';el(c,-2.6,by+.2,3,1)}
   c.strokeStyle='#ECE8E1';c.lineWidth=.55;c.beginPath();c.moveTo(-1.7,by+2.6);c.lineTo(-2,by+7.4);c.moveTo(1.7,by+2.6);c.lineTo(2,by+7.4);c.stroke();c.fillStyle='#ECE8E1';circ(c,-2,by+7.6,.45);circ(c,2,by+7.6,.45);
   c.fillStyle=shade(top,-.08);rr(c,-5.6,by+9.4,11.2,5.4,2);c.fill();c.strokeStyle='rgba(0,0,0,.2)';c.lineWidth=.45;c.beginPath();c.moveTo(-5.6,by+9.8);c.lineTo(-3.8,by+14.4);c.moveTo(5.6,by+9.8);c.lineTo(3.8,by+14.4);c.stroke();c.fillStyle=shade(top,-.16);c.fillRect(-8.6,by+15.3,17.2,2.2)},
  tweed:(c,L,by,top)=>{let sd=hash(top+(L.trim||'')+(L.tw||[]).join(''))||7;const rn=()=>(sd=(Math.imul(sd^(sd>>>15),2246822519)+1013904223)>>>0)/4294967296;const T=L.tw||['#FFF'];for(let i=0;i<54;i++){c.fillStyle=T[i%T.length];c.fillRect(-8.4+rn()*16.8,by+rn()*17.2,.7,.7)}
@@ -7968,11 +7986,12 @@ function drawHomeSay(c){for(const s0 of HOME_SAY){const a=s0.t<.2?s0.t/.2:s0.t>s
 /* someone seen from behind, seated (Dylan at his desk): the same proportions as drawPerson's seated figure */
 function drawPersonBack(c,x,y,L,o){o=o||{};const s=(o.s||1)*PSC;c.save();c.translate(x,y);c.scale(s,s);const OL='rgba(60,34,22,.5)';const bob=o.bob||0;const base=-4,hy=base-25+bob,by=base-17+bob;
  const top=L.pat==='cardi'&&L.top2?L.top2:L.top;c.fillStyle=top;c.strokeStyle=OL;c.lineWidth=.6;rr(c,-11,by,22,17,6);c.fill();c.stroke();c.fillStyle='rgba(0,0,0,.08)';c.fillRect(-.4,by+2,.8,14);
- if(L.hood){/* a hoodie: the hood down his back */c.fillStyle=L.hood;rr(c,-8,by-2,16,12,5.5);c.fill();c.stroke();c.fillStyle='rgba(0,0,0,.1)';el(c,0,by+6.4,4.6,2.4);c.fillStyle=shade(L.top,-.16);c.fillRect(-11,by+14.6,22,2.2)}
+ if(L.hood&&!L.hoodUp){/* a hoodie: the hood down his back */c.fillStyle=L.hood;rr(c,-8,by-2,16,12,5.5);c.fill();c.stroke();c.fillStyle='rgba(0,0,0,.1)';el(c,0,by+6.4,4.6,2.4)}if(L.hood)c.fillStyle=shade(L.top,-.16),c.fillRect(-11,by+14.6,22,2.2);
  c.fillStyle=shade(L.skin,-.05);rr(c,-3,hy+8,6,5,2);c.fill();
- const hair=L.hair;c.fillStyle=hair;el(c,(o.turn||0)*1.2,hy,11.2,11);c.stroke();c.fillStyle=shade(hair,.25);el(c,-3+(o.turn||0),hy-5,4,2.2);c.fillStyle=shade(hair,-.2);rr(c,-8,hy+4,16,5,3);c.fill();
- c.fillStyle=L.skin;el(c,-11.2,hy+1.5,1.8,2.6);el(c,11.2,hy+1.5,1.8,2.6);
- if(o.headphones){c.strokeStyle='#2E3036';c.lineWidth=1.6;c.beginPath();c.arc(0,hy+1,11.6,Math.PI*1.08,Math.PI*1.92);c.stroke();c.fillStyle='#3A3C42';rr(c,-13.8,hy-2,4,7,1.8);c.fill();rr(c,9.8,hy-2,4,7,1.8);c.fill()}
+ if(L.hoodUp){/* rc7.6 (07:44): the hood up — no hair, no ears: the hood's round back, its seam, a little light on its crown, its edge where it meets the shoulders */const hd=L.hood,tx=(o.turn||0)*1.2;c.fillStyle=hd;c.beginPath();c.ellipse(tx*.6,hy-.6,12.6,12.8,0,0,7);c.fill();c.stroke();c.beginPath();c.moveTo(-11.4,hy+3);c.quadraticCurveTo(-11,hy+11,-7,hy+12.6);c.lineTo(7,hy+12.6);c.quadraticCurveTo(11,hy+11,11.4,hy+3);c.closePath();c.fill();c.strokeStyle=shade(hd,-.2);c.lineWidth=.8;c.beginPath();c.moveTo(tx*.6,hy-13.2);c.quadraticCurveTo(tx*.6+1.2,hy-1,tx*.4,hy+11.6);c.stroke();c.fillStyle='rgba(255,255,255,.16)';el(c,-4+tx,hy-6,4.4,2.6);c.fillStyle='rgba(0,0,0,.12)';el(c,0,hy+11.4,8.6,1.8)}
+ else{const hair=L.hair;c.fillStyle=hair;el(c,(o.turn||0)*1.2,hy,11.2,11);c.stroke();c.fillStyle=shade(hair,.25);el(c,-3+(o.turn||0),hy-5,4,2.2);c.fillStyle=shade(hair,-.2);rr(c,-8,hy+4,16,5,3);c.fill();
+ c.fillStyle=L.skin;el(c,-11.2,hy+1.5,1.8,2.6);el(c,11.2,hy+1.5,1.8,2.6)}
+ if(o.headphones){const hr=L.hoodUp?13:11.6,hx=L.hoodUp?15:13.8;/* over the hood when it is up */c.strokeStyle='#2E3036';c.lineWidth=1.6;c.beginPath();c.arc(0,hy+1,hr,Math.PI*1.08,Math.PI*1.92);c.stroke();c.fillStyle='#3A3C42';rr(c,-hx,hy-2,4,7,1.8);c.fill();rr(c,hx-4,hy-2,4,7,1.8);c.fill()}
  c.restore()}
 /* Dylan's day when he is not in the restaurant: at his desk, studying (18:54 「在房間裡念書」; 19:15 「揭曉之前也坐在那邊念書 但
    餐廳的人都不知道 就好了 玩家讓他自己發現」 — before the reveal too: nobody in the restaurant knows, and a player who looks in
@@ -7988,7 +8007,9 @@ REG_BY.dylan=DYLAN;
    portrait, not the navy cardigan over the white tee that the restaurant knows him by: before the reveal, a player who
    looks in finds someone studying at the desk, not the regular from the dining room. Everywhere in Jill's room (the desk,
    the sofa, walking about); in the dining room he is the guest he always was. */
-const DYLAN_HOME=Object.assign({},DYLAN.looks[0],{top:'#A4A8AD',pat:'hoodie',top2:null,hood:'#8E9297',acc:'glasses',pants:'#4A4E56'});
+/* rc7.6 (07:44 「在房間Dylan就穿帽T一直戴著帽T帽子吧」): the hood stays up in the room — over his hair, at the desk, on the sofa,
+   walking about; only his face shows, as in his portrait */
+const DYLAN_HOME=Object.assign({},DYLAN.looks[0],{top:'#A4A8AD',pat:'hoodie',top2:null,hood:'#8E9297',hoodUp:true,acc:'glasses',pants:'#4A4E56'});
 const LIFE={day:0,plan:null,t:0,jill:null,tv:null,dylan:null,say:[],revealRoll:0};
 function lifeReset(){LIFE.day=0;LIFE.plan=null;LIFE.t=0;LIFE.revealRoll=0;LIFE.say=[];LIFE.dylan=null;
  LIFE.jill={on:false,pos:null,x:PASS.x,y:PASS.y,face:1,step:0,legs:0,legTarget:0,act:null,last:null,t:0,flipT:0,flip:0,gazeT:0,gazeX:0,settleT:32,bobT:0,catNew:0,sinceSit:0,walking:false,tx:0,ty:0,via:null,after:null,sitT:0,petCat:null,counted:false};

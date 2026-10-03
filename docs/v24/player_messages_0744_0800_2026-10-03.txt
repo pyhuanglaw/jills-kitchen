@@ -1,0 +1,22 @@
+(Filed verbatim, 2026-10-03. The player's messages while rc7.5's full regression ran; all three go into rc7.6.)
+
+07:44  在房間Dylan就穿帽T一直戴著帽T帽子吧
+07:44  酒吧品酒日不只吧台 整個酒吧都是品酒日的來賓可以嗎
+07:44  吧檯新增L型就能增加位子
+07:45  而且可以變長一點
+08:00  (answering: should the chef's night take the whole Lounge too, or keep 07:09 — the bar's six for the chef's
+       night, the other seats open as usual, only its guests eating the restaurant's food?)
+       主廚之夜就是包場整間辦主廚之夜 就是讓酒吧的客人也能吃到餐廳的厲害的菜，所以整個酒吧的客人平常的酒吧的客人也可以來呀，只是他們來的是主廚之夜的活動，那整間都是給主廚之夜辦
+
+What was said back, and is being built (rc7.6):
+- Dylan in Jill's room: the hoodie's hood up, always — at the desk, on the sofa, walking about; his face, his glasses,
+  a little fringe; no hair, no ears.
+- The Lounge's bar, from Lounge II: longer, and turned into an L; more stools at the same spacing (rc7.5's, 07:10).
+  The count is decided on the screenshots.
+- Ken's tasting night: the whole Lounge — the bar, the small tables, the sofa, the corner — is for the people who
+  came for it; nobody else is seated in the Lounge that night; the news counts the whole room's seats. Some come in
+  twos and fours, for the tables and the sofa.
+- The chef's night (08:00): a buyout of the whole Lounge. Every seat is the chef's night's; the Lounge's usual people
+  (Ken, Monsieur 杜, the Lounge's regulars) can come that night — they come to the chef's night, three courses with
+  three glasses, like everyone else; $1,800 a head as approved. The kitchen's load on the player's Day 74 save is
+  measured before this is settled (about 70 extra plates on a full night).
