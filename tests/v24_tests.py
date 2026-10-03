@@ -2446,7 +2446,7 @@ def v24_rc7_ken_hosts_his_tasting_nights(b, port, target):
       stools:loungeTables().filter(t=>t.kind==='bar').length,tst:loungeTables().filter(t=>t.kind==='bar'&&t.tst).length,
       other:loungeTables().filter(t=>t.kind==='bar').some(t=>stoolFree(t,{})),guest:loungeTables().filter(t=>t.kind==='bar').every(t=>stoolFree(t,{tasting:1})||!!t.hold),illus:!!(story().illus||{}).ken_t1,hold:$('#dlg .dlg-hold').textContent})"""))
     check(st['host'] == 'host' and abs(st['hx']) <= 2 and abs(st['hy']) <= 2 and st['room'] == 'lounge' and st['table'] is None, f'Ken behind the bar, not on a stool: {st}')
-    check(st['bar'] >= 4 and st['tst'] == st['stools'] and not st['other'] and st['guest'], f'the bar is the tasting\'s: {st}')
+    check(st['bar'] >= (st['stools'] + 1) // 2 and st['tst'] == st['stools'] and not st['other'] and st['guest'], f'the bar is the tasting\'s: {st}')   # rc7.5: it opens with half of the six (07:10), not four of eight
     check(st['illus'] and '店裡暫停中' in st['hold'] and 'Ken' in st['hold'], f'the picture, and the restaurant held: {st}')
     t0, i0 = g.ev("R.t"), g.ev("DLG.i")
     g.ev("for(let i=0;i<10;i++)__tick(1000)")
