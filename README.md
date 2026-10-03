@@ -1,5 +1,7 @@
 # Jill's Kitchen
 
+> **給接手的 AI／開發者：先讀 [`CLAUDE.md`](CLAUDE.md) → [`docs/PROJECT_MEMORY.md`](docs/PROJECT_MEMORY.md)（設計 canon 與原因）→ [`docs/CURRENT_STATE.md`](docs/CURRENT_STATE.md)（目前狀態）。**
+
 A Restaurant by Chef Jill — 手機優先的餐廳經營遊戲。純 HTML / CSS / JavaScript，不需要安裝任何套件或建置工具。
 
 ## 專案結構

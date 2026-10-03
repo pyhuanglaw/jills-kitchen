@@ -1,6 +1,6 @@
 # Jill's Kitchen：程式結構與擴充守則
 
-這份文件給「之後要繼續加東西的人」（包括未來的 Claude）。先讀這份，再動 `js/game.js`。
+這份文件給「之後要繼續加東西的人」（包括未來的 Claude）。先讀 `docs/PROJECT_MEMORY.md`（設計 canon），再讀這份，再動 `js/game.js`。
 
 ## 1. 檔案
 
