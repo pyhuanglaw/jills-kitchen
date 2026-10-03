@@ -828,6 +828,9 @@ def followup_the_manual_describes_the_current_game(b, port, target):
     itself, the Lounge staff jobs, the journal's places, the whole-day dialogue log; stale lines are gone."""
     g = Game(b, port, target, seed=104, manual=True)
     txt = g.ev("GUIDE.map(s=>s.h+' '+s.sum+' '+s.pts.map(p=>p.join(' ')).join(' ')).join('\\n')")
+    # rc8 (the player, 2026-10-03: 「店主手冊也太冗長吧」「每一項都一大坨 很難閱讀」): the manual is short lines now; the details it no
+    # longer carries (the Staff Room's woods, the floor plan's 「？」 and zoom, how each round is poured, the hour the chef's night's
+    # guests come, each project's places one by one) are the game's to show — their phrases left this list.
     for need in ['故事更新', '餐廳故事', '人物／關係支線', '更早以前', '房間分頁下面', '票券列下面的分頁', '社群與宣傳', '日誌的「社群」', '營業中只能看', '只會發生一次', '📱', 'Lounge 外場', 'Lounge 吧台', '調酒師', '暫停選單的「餐廳日誌」', '一整天的都在', '店裡的人', '存錢目標', 'Bar 小廚', '側廳卡座', '側廳的大窗', '後場工程', '走入式冷藏庫', '廚房二期', '黃金獵犬', '小木屋',
                  # v2.4 rc5: the two staff lists, the Lounge's people, the second floor
                  '餐廳員工', 'Lounge 名單', '許葳', '互不佔用', '二樓', '樓梯門', '上樓待一會兒',
@@ -835,7 +838,7 @@ def followup_the_manual_describes_the_current_game(b, port, target):
                  '二樓：休息室與包廂', '員工休息室', '私人包廂', '二樓的房間', '今晚｜私人包廂｜已預約', '最低消費', '4–6 位', '4–8 位', '4–10 位',
                  '一個晚上最多一組', '客人不會為了湊低消多點', '私人包廂 I 和 III 服務生各 +1', '休息室不加名額', '包廂 幾組',
                  # v2.4 rc6 (the player's 05:19, 05:23, 06:36, 06:43): the rooms are tabs and so is the floor; its plan in 店舖工程; the Staff Room's pool table and massage chair
-                 '寫著那一間的全名', '二樓（租下以後）', '看看整層', '「？」', '開店前會先帶你上二樓看一眼', '二樓平面圖', '點一下放大', '全部蓋完也一直在', '淺色橡木', '燕麥色沙發', '淺木置物櫃', '撞球台', '按摩椅', '沒有分數',
+                 '寫著那一間的全名', '二樓（租下以後）', '看看整層', '開店前會先帶你上二樓看一眼', '二樓平面圖', '燕麥色沙發', '撞球台', '按摩椅', '沒有分數',
                  # v2.4 rc6 (07:09): who is where
                  '誰在哪裡', '訂單上的桌號', '點那句話就會找到他',
                  # v2.4 rc6 (09:39–12:16): the stories that hold the restaurant, the day's stories, the Lounge's list, research and sales, the things to spend on, the floor after the Lounge, 安安, a day off, the new places' photos
@@ -860,17 +863,17 @@ def followup_the_manual_describes_the_current_game(b, port, target):
                  # v2.4 rc7.5: the album from the opening day; its real limit
                  '相簿從開店那天開始', '最多留 240 張',
                  # v2.4 rc7.6: the chef's night, booked out (08:00); Ken's night the whole room (07:44); the bar's L (07:44–07:45)
-                 '主廚之夜', '明晚｜主廚之夜 · N 席', '主廚之夜是包場', '一道一道上', '吧台 L 型的那一頭', '七點左右到',
-                 '那一晚整個 Lounge 都留給品酒的客人', '一輪一輪倒', '九個位子（一樣坐得開）',
+                 '主廚之夜', '明晚｜主廚之夜 · N 席', '主廚之夜是包場', '一道一道上',
+                 '那一晚整個 Lounge 都留給品酒的客人', '九個位子（一樣坐得開）',
                  # v2.4 rc7.6 (08:51): after the wine, the player holds a tasting night
                  'Ken 的品酒夜｜今晚要辦嗎？', '按「今晚辦」就是今晚', '這次不辦',
                  # v2.4 rc7.7 (10:10, 10:32): the Lounge's people pour the rounds; Ken's share; Evan from the first night
-                 '吧台那一排由調酒師倒', '品酒夜分潤', '友情主持', 'Evan 在 Lounge I 蓋好那天就在吧台',
+                 '品酒夜分潤', '友情主持', 'Evan 在 Lounge I 蓋好那天就在吧台',
                  # rc8 (2026-10-02 19:19): the Lounge is the shop next door
                  'Lounge 是隔壁的店', '從後場遞到 Lounge 吧台的那一頭',
                  '淨利下面另外一項「今天的店」',
                  # rc8 §21: the restaurant's three lists
-                 '分成廚師、服務生、清潔員三種', '廚師的名額只能聘廚師', '側廳服務生 +2', '廚房擴建廚師和清潔員各 +1', '後場整理區廚師和服務生各 +1', '廚房二期服務生 +2', '寫在擴建的卡片上', '它本來是隔壁 Madame Lin 開了很多年的酒吧', '想喝酒，隔壁就有', '晚餐桌上就有配菜的酒', '自己決定要不要接', '調酒師在 L 裡面，靠牆那一頭留了進出的口', '那晚 Lounge 只寫「Ken 的品酒夜」或「主廚之夜」那一行']:
+                 '分成廚師、服務生、清潔員三種', '廚師的名額只能聘廚師', '寫在擴建的卡片上', '它本來是隔壁 Madame Lin 開了很多年的酒吧', '想喝酒，隔壁就有', '晚餐桌上就有配菜的酒', '自己決定要不要接', '調酒師在 L 裡面，靠牆那一頭留了進出的口']:
         check(need in txt, f'the manual mentions {need}')
     for stale in ['暫停選單和設定裡都有【儲存目前進度】', '把杯子交給吧台的客人；桌位由有', '上方的分頁', '畫面上方會跳一個小通知', '打烊後或開店前，商店的「社群與宣傳」分頁（第 6 天起）。', '下一段寫著', '窗邊（貓架、睡墊）', '牠會在門邊趴著等主人',
                   '人數上限跟擴建、後場整理區、側廳、廚房擴建、廚房二期、Lounge 有關', '有 Lounge 以後才能招募', '第二位調酒師',

@@ -222,6 +222,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .gpt:first-child{border-top:0;padding-top:10px}
 .gpt b{color:var(--brass3);font-size:12.5px}
 .gpt span{color:var(--ink)}
+.gpt span i{display:block;font-style:normal}.gpt span.ml i{position:relative;padding-left:10px}.gpt span.ml i+i{margin-top:5px}.gpt span.ml i::before{content:'';position:absolute;left:1px;top:.68em;width:4px;height:4px;border-radius:50%;background:var(--brass2)}   /* rc8: an entry is short lines, each a dot */
 .guide h3{margin:16px 0 4px}
 .guide p{margin:0;font-size:13.5px;line-height:1.7;color:var(--ink)}
 .guide b{color:var(--brass3)}
