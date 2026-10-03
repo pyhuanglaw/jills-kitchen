@@ -144,7 +144,11 @@ How testing runs between releases (the player's 05:42 strategy, `docs/v24/testin
   - Pass: one day plays from the player's save, and the page survives a reload with no page errors.
     - A save made during the evening (the backup writes the day's checkpoint) opens with 「繼續營業 · HH:MM」: the check resumes it, and does the restock on the next day's prep instead (from v2.4 rc6).
   - Record the published version in the release report.
-- [ ] Package the release as zips, made from the tag (`git archive <tag>`), and send them to the player with the release reply.
+- [ ] **No zips for a routine release** (the player, 2026-10-03, permanent): 「Do not generate ZIP packages for routine
+  releases. GitHub is the primary source backup and version history. Generate a full offline ZIP only when explicitly
+  requested or at major milestone releases.」 Push the branch (and the tag) to GitHub instead.
+- [ ] Only when the player asks for it, or at a major milestone: package the release as zips, made from the tag
+  (`git archive <tag>`), and send them to the player with the release reply.
   - `python3 tools/make_release_zips.py <tag> <name> <this release's evidence folder>` does all of the below and runs the source check.
   - **source**: everything but the large art, the evidence and the saves. Check it: `tools/build_single.py` and `tools/build_artifact.py` run from the unzipped copy must give files identical to the committed single file and to the published page.
   - **art**: the player's source pictures (`docs/v23` images, `assets/portraits/src`) and the full-size portrait cards (`assets/portraits/*.png`).
