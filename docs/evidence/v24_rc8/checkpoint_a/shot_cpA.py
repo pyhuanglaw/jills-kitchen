@@ -11,7 +11,7 @@ srv, port = rt.start_server()
 log = []
 def shot(g, name):
     g.ev("try{if(typeof hud==='function')hud(true)}catch(e){}")
-    g.ev("document.querySelectorAll('#plines>*,#toasts>*').forEach(e=>e.remove())")
+    g.ev("document.querySelectorAll('#plines>*,#toasts>*,#banner>*').forEach(e=>e.remove())")
     g.page.wait_for_timeout(150); g.page.screenshot(path=OUT + name); print('  shot', name, flush=True)
 def go(g, rm, n=6):
     g.ev(f"setRoom('{rm}')"); g.ev(f"for(let i=0;i<{n};i++)__tick(1000/30)")
