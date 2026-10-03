@@ -735,7 +735,7 @@ function stepTo(e,v){const tr=e.troom||e.room||'main';if(!e.room)e.room='main';l
  if(d<=v){e.x=tx;e.y=ty;if(hop){const dw=doorway(e.room,hop);const from=e.room;e.room=hop;e.x=dw[1][0];e.y=dw[1][1];if(((from==='front'&&hop==='main')||(from==='main'&&hop==='front'))&&R&&R.groups.includes(e))bellRing();return false}return true}   /* rc8: a guest through the front door — the bell */
  e.x+=dx/d*v;e.y+=dy/d*v;if(Math.abs(dx)>.5)e.face=dx>=0?1:-1;return false}
 function sendOut(g){g.troom='front';if(g.toBar&&barState()==='lin'){g.tx=FR.ldoor.x;g.ty=FR.ldoor.y+6}else{g.tx=FR.exit.x;g.ty=FR.exit.y}}   /* rc8: to Madame Lin's, next door */
-function barNextP(g){const nn=namedId(g);if(nn==='Madame Lin')return 1;/* back to her own bar */if(R&&R.t<R.dur*.4)return 0;if(nn==='品酒師 Ken')return .75;if(nn)return .2;return({couple:.3,gourmet:.3,vip:.25,office:.25,regular:.12}[g.type]||0)*(g.size<=2?1:.5)}
+function barNextP(g){const nn=namedId(g);if(nn==='Madame Lin')return 1;if(g.reg==='dylan')return 0;/* he hardly drinks, and Evan has not met him before the signing (19:19 §11C, §18) *//* back to her own bar */if(R&&R.t<R.dur*.4)return 0;if(nn==='品酒師 Ken')return .75;if(nn)return .2;return({couple:.3,gourmet:.3,vip:.25,office:.25,regular:.12}[g.type]||0)*(g.size<=2?1:.5)}
 const DOOR={x:53,y:104};
 const PASS={x:200,y:360};
 /* Waiting area: a small wooden bench under the door, three places, plus two standing spots beside it
@@ -2652,7 +2652,7 @@ function drawLoungeRoom(c,now,dusk,V,X0,XW,TOP,list){const lv=loungeLv();const d
    /* plants in the corners — dark green, a little light on the leaves */for(const [px,py] of[[X0+BGM+18,88],[LW-18,88]]){b.fillStyle='#3A2E26';rr(b,px-8,py-14,16,16,3);b.fill();for(let k=0;k<7;k++)leaf(b,px+(k-3)*4,py-16-(k%2)*6,12,5,-.9+k*.3,k%2?'#2F4A2E':'#456B3C')}}
   drawInfra(b,'lounge')});
  blitBg(c,bg,X0,XW,TOP);
- for(const t of V.tables)if(t.room==='lounge'){if(t.kind==='bar')list.push({y:t.y,f:()=>drawBarSeat(c,t,now)})}
+ for(const t of V.tables)if(t.room==='lounge'){if(t.kind==='bar')list.push({y:t.y,f:()=>qaSolo('lounge')?noGroup(t,()=>drawBarSeat(c,t,now)):drawBarSeat(c,t,now)})}
  try{kenNightDraw(c,list)}catch(e){}   /* rc7: Ken's tasting night */
  try{lgPickDraw(c,list)}catch(e){}   /* rc8: the kitchen's plates for the Lounge, waiting at the end of the bar */
  try{cnNightDraw(c,list)}catch(e){}   /* rc7.6: the chef's night — the plates waiting at the end of the L */
@@ -3056,7 +3056,7 @@ STORY_EV.push(
  {k:'qt_3',lane:'major',cls:'A',floor:3,at:['close'],once:true,ic:'heart',note:'打烊後，阿拓在晴旁邊放了一小盤。「多的。」',
   when:()=>qingOn()&&tuoOn()&&fact('qt_2')&&S.day-fact('qt_2').d>=2,
   run:()=>{const q=qingOn(),t=tuoOn();const lines=[{who:'staff:沈晴',text:'什麼？'},{who:'staff:阿拓',text:'多的。'},{who:'staff:沈晴',text:'你明明就是特別做的。'},{who:'staff:阿拓',text:'多的。'}];const done=()=>{relSet('s:'+q.id,'s:'+t.id,'gesture');relSet('s:'+q.id,'s:'+t.id,'sharedFood');factSet('qt_3');noteLine('打烊後，阿拓在晴旁邊放了一小盤，說是多的。')};scene(lines,done)/* scene() runs the callback itself when it cannot show */}},
- {k:'qt_extra',lane:'ambient',cd:4,at:['close'],when:()=>qingOn()&&tuoOn()&&fact('qt_3')&&S.day-fact('qt_3').d>=3&&factN('qt_extra')<6&&Math.random()<.5,
+ {k:'qt_extra',lane:'ambient',cd:4,at:['close'],when:()=>qingOn()&&tuoOn()&&fact('qt_3')&&S.day-fact('qt_3').d>=3&&factN('qt_extra')<6&&!storyDay().qa&&Math.random()<.5,   /* rc8: not on an evening one of the after-work scenes has */
   run:()=>{const q=qingOn(),t=tuoOn();noteLine(pickT(['打烊後阿拓又放了一盤在晴旁邊。「多的。」','晴今天沒問，直接把那盤拿走了。阿拓沒說話。','阿拓：「多的。」晴：「你每天都多。」']));relSet('s:'+q.id,'s:'+t.id,'gesture');factSet('qt_extra')}},
  {k:'qt_absence',lane:'minor',cls:'B',at:['order'],once:true,note:'阿拓不在的那天，晴問：「今天炸物怎麼怪怪的？」Hugo：「妳不是在問炸物？」',
   when:ctx=>qingOn()&&!tuoOn()&&fact('qt_3')&&hugoOn()&&ctx.tk&&ctx.tk.lounge&&ctx.tk.items.some(i=>!i.lbar),
@@ -3474,11 +3474,11 @@ V24_WANTS.push(()=>{const out=[];if(typeof loungeOpenTonight!=='function'||!loun
 function v24Visits(out,dur,roll){let want=[];for(const f of V24_WANTS){try{want=want.concat(f()||[])}catch(e){console.warn('[v24 want]',e)}}
  const grp={};const entry=w=>out.find(o=>w.reg?(o.reg===w.reg||(o.regs||[]).includes(w.reg)):(o.name===w.name||o.named===w.name));
  const resv=k=>{if(!k)return;const v=v24();if(!v.res||v.res.d!==S.day)v.res={d:S.day,k:[]};if(!v.res.k.includes(k))v.res.k.push(k)};
- for(const w of want){const key=w.reg||w.name;if(!key)continue;const tt=(w.t!=null?w.t:.22+.46*(hash('v24t|'+S.day+'|'+key)%100)/100)*dur;if(entry(w)){/* rc7.4 (found by the full run): already coming tonight anyway — they are still who the story is waiting for: a full room sends them back a little later, as it does anyone the story asked for (a regular's own visit used to be lost at the door, and the beat with it — Sophie, the day 怡君 was there for the article); and a beat that needs them at an hour has them then (the Wangs before 予安's trial piece) */const e=entry(w);e.story=1;if(w.t!=null&&w.o&&w.o.hold){e.t=tt;e.hold=1}if(w.o&&w.o.lounge)e.lounge=1;resv(w.k);continue}
+ for(const w of want){const key=w.reg||w.name;if(!key)continue;const tt=(w.t!=null?w.t:.22+.46*(hash('v24t|'+S.day+'|'+key)%100)/100)*dur;if(entry(w)){/* rc7.4 (found by the full run): already coming tonight anyway — they are still who the story is waiting for: a full room sends them back a little later, as it does anyone the story asked for (a regular's own visit used to be lost at the door, and the beat with it — Sophie, the day 怡君 was there for the article); and a beat that needs them at an hour has them then (the Wangs before 予安's trial piece) */const e=entry(w);e.story=1;if(w.t!=null&&w.o&&w.o.hold){e.t=tt;e.hold=1}if(w.o&&w.o.lounge){e.lounge=1;if(w.o.lgRetry)e.lgRetry=1}resv(w.k);continue}
   if(w.reg){const r=REG_BY[w.reg];if(!r||S.day<r.day)continue;if(!roll('v24|'+key,w.p))continue;const o=regPlanVisit({t:tt,type:r.type,reg:w.reg,size:r.size});o.story=1;out.push(o);resv(w.k)}
   else{if(!roll('v24|'+key,w.p))continue;out.push(Object.assign({t:tt,type:w.type||'regular',size:w.size||1,name:w.name,story:1},w.o||{}));resv(w.k)}}
  /* the people one beat needs together come around the same time (a nudge in the plan, like Sophie and Mia's) */
- for(const w of want){if(!w.grp)continue;const e=entry(w);if(e&&w.o&&w.o.lounge)e.lounge=1;/* v2.4 rc6: a pair that meets in the Lounge (Ken and 杜) */if(e&&!(grp[w.grp]=grp[w.grp]||[]).includes(e))grp[w.grp].push(e)}
+ for(const w of want){if(!w.grp)continue;const e=entry(w);if(e&&w.o&&w.o.lounge){e.lounge=1;if(w.o.lgRetry)e.lgRetry=1}/* v2.4 rc6: a pair that meets in the Lounge (Ken and 杜) */if(e&&!(grp[w.grp]=grp[w.grp]||[]).includes(e))grp[w.grp].push(e)}
  for(const k in grp){const es=grp[k];if(es.length<2)continue;const t0=Math.max(dur*.18,Math.min(...es.map(e=>e.t)));es.forEach((e,i)=>{e.v24grp=k;e.hold=1;/* the hour is the point: not pulled earlier on a quiet evening */e.t=Math.min(dur*.8,t0+i*(2+hash('v24g|'+S.day+'|'+k+'|'+i)%40/10))})}}
 /* ---- story illustrations (docs/v24/visual_addendum, illus_continuity): a picture for a few big moments, shown over
    the scene's lines and reopenable from the journal; never a Life Album photo by itself. art: a key of
@@ -3522,6 +3522,151 @@ function drawIllusKen(c,k){c.fillStyle='#1E1A18';c.fillRect(0,0,360,270);c.fillS
  const glass=(x,y)=>{c.fillStyle='rgba(236,240,244,.55)';c.beginPath();c.moveTo(x-8,y-22);c.quadraticCurveTo(x-9,y-6,x,y-5);c.quadraticCurveTo(x+9,y-6,x+8,y-22);c.closePath();c.fill();c.fillStyle='#8E1F33';c.beginPath();c.moveTo(x-7,y-13);c.quadraticCurveTo(x-7,y-6,x,y-6);c.quadraticCurveTo(x+7,y-6,x+7,y-13);c.closePath();c.fill();c.fillStyle='rgba(236,240,244,.7)';c.fillRect(x-.8,y-5,1.6,9);c.fillRect(x-5,y+4,10,1.6)};
  if(k===1){c.fillStyle='#6E1F2C';rr(c,160,70,40,100,8);c.fill();c.fillRect(172,40,16,34);c.fillStyle='#F2EBDD';rr(c,164,104,32,44,3);c.fill();c.fillStyle='#5A3E28';c.font=`700 8px ${DFONT}`;c.textAlign='center';c.fillText('晚餐之後',180,124);c.font=`600 4.5px ${DFONT}`;c.fillText("JILL'S KITCHEN × KEN",180,134);glass(110,166);glass(250,166)}
  else{for(let i=0;i<(k===0?6:2);i++)glass(60+i*(k===0?48:120),166)}}
+/* ===== rc8 晴 × 阿拓 after work (the player's brief of 2026-10-03; 19:19 §18–§19): Dylan's first drink at The Lounge,
+   the evenings after closing, and what 阿拓 finally says. Five held scenes, all staged in The Lounge and none with Jill —
+   qt_drink 《今天喝？》, qt_late 《晚點回去》, qt_often 《最近比較常》, qt_ya 《你喜歡予安？》, qt_said 《講完》 — and around
+   them a few lines that hold nothing and move nothing: these evenings happen (qx_after), Dylan drinks there now and then
+   (qx_dylan, qx_pay on his first night), 沈晴 goes home for two days (qx_home). Who knows is two plain facts: 予安 saw it
+   in 《最近比較常》 (ya_sees_qt); Dylan hears it in 《你喜歡予安？》 (dylan_knows_qt). ===== */
+function qaS(){const st=story();return st.qa||(st.qa={})}
+function qaBooked(){return kenNightToday()||cnTonight()}
+function qaHome(){const H=qaS().home;return H&&S.day>=H.d&&S.day<H.back?H:null}   /* 沈晴 at her parents' */
+function qaEve(){return loungeOpenTonight()&&!qaBooked()&&!!evanOn()}   /* an ordinary night at The Lounge */
+function qaYa(){return !!fact('ya_join')&&yaNight()}   /* 予安 played tonight: she is still there at closing */
+function qa1Due(){const d0=loungeDoneDay();return d0!=null&&!fact('qt_drink')&&!!fact('evan_knows_dylan')&&S.day>=d0+10&&qaEve()}
+/* the people of one evening: Evan behind the bar, the rest on the guests' side of it; the piano's bench and its side */
+function qaStage(ids,at){const bx=LG.bar.x0,by=LG.bar.y,L=LOUNGE_LOOKS;
+ const spot=Object.assign({evan:[bx+128,by-6,1],qing:[bx+64,by+74],tuo:[bx+94,by+76],dylan:[bx+124,by+78],ya:[bx+156,by+74]},at||{});
+ const who={evan:[L.Evan,'Evan'],qing:[L['沈晴'],'沈晴'],tuo:[L['阿拓'],'阿拓'],dylan:[DYLAN.looks[0],'Dylan'],ya:[NAMED[YA]&&NAMED[YA].looks,'予安']};
+ return{room:'lounge',solo:1,who:ids.filter(id=>who[id]&&who[id][0]).map(id=>({id,x:spot[id][0],y:spot[id][1],L:who[id][0],o:{flip:!!spot[id][2]},name:who[id][1]}))}}
+/* an after-hours scene: The Lounge shows its cast only — tonight's guests and crew are not drawn under it */
+function qaSolo(rm){return !!STAGE&&!!STAGE.solo&&STAGE.room===rm}
+function noGroup(t,f){const g=t.group;t.group=null;try{f()}finally{t.group=g}}
+function qaBench(){return[YA_SPOT.x,YA_SPOT.y]}
+function qaSide(dx,dy){return[YA_SPOT.x+dx,YA_SPOT.y+dy]}
+function qaGo(id,p,face){stageAt(id,p[0],p[1],face)}
+function qaGone(...ids){if(!STAGE)return;for(const p of STAGE.who)if(ids.includes(p.id))p.hide=1;forceDraw=true}
+function qaScene(ids,lines,at,done){storyDay().qa=1;const r0=room||'main';STAGE=qaStage(ids,at);room=null;setRoom('lounge');v24Scene(lines,()=>{stageEnd(r0);if(done)done()})}   /* done: what the evening leaves, kept even when the scene is not shown */
+/* five notes, one hand; slow and with a stop when he plays them himself */
+function qaPhrase(slow){try{const N=[523,587,659,587,523];let t=0;N.forEach((f,i)=>{tone(f,t,.5,'triangle',.06);t+=slow?(i===2?.95:.55):.38})}catch(e){}}
+function qaClap(){try{noiseHit(0,.05,1800,1.4,.09);noiseHit(.32,.05,1800,1.4,.09)}catch(e){}}
+STORY_EV.push(
+ /* 1 《今天喝？》: the day his first exam is done, Dylan sits down at The Lounge's bar for the first time. Evan has known
+    him since the signing and knows he hardly drinks — 「稀奇」 is that he sits down, not that he is there. */
+ {k:'qt_drink',lane:'major',cls:'A',floor:2,at:['lounge'],once:true,ic:'star',note:'Dylan 第一次坐進 The Lounge 喝酒。「今天喝？」「稀奇。」「考完了。」',
+  when:ctx=>!!ctx.g&&ctx.g.reg==='dylan'&&ctx.why==='direct'&&qa1Due(),
+  run:ctx=>{if(SCX){SCX.cap=20;SCX.stageRoom='lounge'}factSet('qt_drink');const t=ctx.g.table!=null&&R?R.tables[ctx.g.table]:null;
+   qaScene(['evan','dylan'],[{who:'',text:'Dylan 在吧台坐下。',illus:'qt_first'},{who:'staff:Evan',text:'今天喝？',illus:false},{who:'dylan',text:'嗯。'},{who:'staff:Evan',text:'稀奇。'},
+    {who:'dylan',text:'考完了。'},{who:'staff:Evan',text:'考試？'},{who:'dylan',text:'嗯。'},{who:'staff:Evan',text:'考得怎樣？'},{who:'dylan',text:'考完了。'},{who:'staff:Evan',text:'……行。'}],
+    t?{dylan:[t.x,t.y+8]}:null)}},
+ /* his first night: he pays, and Evan finds he means it (unheld; the bill is the evening's own, once) */
+ {k:'qx_pay',lane:'minor',cls:'B',at:['collect'],once:true,note:'Dylan 結帳。「這杯算了。」「不用。」「你還真的付喔。」「不然呢？」',
+  when:ctx=>!!ctx.g&&ctx.g.reg==='dylan'&&ctx.g.room==='lounge'&&!!fact('qt_drink')&&fact('qt_drink').d===S.day&&!!evanOn(),
+  run:ctx=>{const e=evanOn(),g=ctx.g;sayS(e,'這杯算了。',300);sayG(g,'不用。',1500);sayS(e,'你還真的付喔。',2800);sayG(g,'不然呢？',4100);factSet('qx_pay')}},
+ /* after that, now and then a drink at The Lounge; Evan's shorthand */
+ {k:'qx_dylan',lane:'ambient',cd:0,at:['lounge'],when:ctx=>!!ctx.g&&ctx.g.reg==='dylan'&&!!fact('qt_drink')&&fact('qt_drink').d<S.day&&!!evanOn(),
+  run:ctx=>{factSet('qx_dylan',true);if(dayCoin('qxd|'+S.day)<60){sayS(evanOn(),'一樣？',700);sayG(ctx.g,'嗯。',1900)}}},
+ /* the evenings after closing: Evan, 沈晴 and 阿拓 stay for one, often; later Dylan some nights, 予安 some of hers. Never
+    a story step: nothing waits for these, nothing counts them. */
+ {k:'qx_after',lane:'ambient',cd:3,at:['close'],when:()=>!storyDay().qa&&!!fact('qt_3')&&qaEve()&&!!qingOn()&&!!tuoOn()&&dayCoin('qxa|'+S.day)<40,
+  run:()=>{const L=['收店以後，Evan、沈晴、阿拓留下來喝了一杯。','收店以後，晴和阿拓又留下來了。Evan 說他只喝一杯。','收店以後。Evan：「喝一杯？」晴：「一杯。」阿拓已經坐下了。'];
+   if(fact('qt_late'))L.push('收店以後，Dylan 也在吧台坐了一下。走的時候，杯子底下壓著酒錢。','晴伸手找酒，阿拓已經把那一支遞過去了。');
+   if(fact('qt_often')&&qaYa())L.push('予安坐了一杯就走了。','阿拓沒問，倒的就是晴平常喝的那一支。予安看了一眼，低頭喝自己的。');
+   if(fact('qt_said'))L.push('收店以後。阿拓：「還要？」晴：「一點。」');
+   noteLine(pickH(L,'qxa|'+S.day));factSet('qx_after',true)}},
+ /* 沈晴 goes home to her parents for two days — her life, not anyone's plan; it falls on one of 予安's nights */
+ {k:'qx_home',lane:'ambient',cd:0,at:['daystart'],note:'沈晴回老家兩天。',
+  when:()=>{const q=crewByName('沈晴');if(!q)return false;if(qaHome())return true;const H=qaS().home;
+   return !!fact('qt_often')&&!fact('qt_ya')&&S.day-fact('qt_often').d>=5&&qaYa()&&qaEve()&&!!tuoOn()&&(!H||S.day>=H.back+7)&&dayCoin('qxh|'+S.day)<50},
+  run:()=>{const q=crewByName('沈晴'),A=qaS();if(!qaHome()){A.home={d:S.day,back:S.day+2};noteLine('沈晴這兩天回老家。');factSet('qx_home',true)}setCrewAway(q,'off')}},
+ /* 2 《晚點回去》: the first evening after closing the player sees; Dylan stays on. Jill is not there (§19). */
+ {k:'qt_late',lane:'major',cls:'A',floor:2,at:['close'],once:true,ic:'heart',note:'收店以後，Evan、沈晴、阿拓留在吧台，Dylan 也坐著。晴伸手找酒，阿拓直接把那一支遞給她。',
+  when:()=>!!fact('qt_drink')&&!!fact('qt_3')&&factN('qx_dylan')>=2&&S.day-fact('qt_drink').d>=5&&qaEve()&&!!qingOn()&&!!tuoOn()&&!qaHome(),
+  run:()=>{if(SCX){SCX.cap=24;SCX.stageRoom='lounge'}factSet('qt_late');qaScene(['evan','qing','tuo','dylan'],[
+   {who:'',text:'收店了。Lounge 只剩吧台那一區的燈。'},{who:'',text:'Evan、沈晴、阿拓留下來喝一點。Dylan 還坐在吧台。'},{who:'',text:'Evan 多拿了一個杯子，放在 Dylan 前面。'},
+   {who:'staff:沈晴',text:'今天沙發那四個，炸雞點了三次。'},{who:'staff:阿拓',text:'四次。'},{who:'staff:沈晴',text:'第四次是外帶。'},{who:'staff:Evan',text:'外帶也算。'},
+   {who:'',text:'沈晴伸手找酒。阿拓剛好在旁邊，直接把那一支遞給她。'},{who:'staff:沈晴',text:'謝啦。'},{who:'',text:'阿拓點了一下頭。'},
+   {who:'',text:'散的時候，Dylan 把錢壓在杯子底下。'}])}},
+ /* 3 《最近比較常》: 予安, a while after she became The Lounge's pianist, stays for one; she sees 沈晴's look and says nothing */
+ {k:'qt_often',lane:'major',cls:'A',floor:2,at:['close'],once:true,ic:'heart',note:'予安第一次留下來喝。「你們下班都會留下來？」「偶爾。」「最近比較常。」',
+  when:()=>!!fact('qt_late')&&!!fact('ya_join')&&S.day-fact('ya_join').d>=10&&S.day-fact('qt_late').d>=4&&qaYa()&&qaEve()&&!!qingOn()&&!!tuoOn()&&!qaHome(),
+  run:()=>{if(SCX){SCX.cap=24;SCX.stageRoom='lounge'}factSet('qt_often');qaScene(['evan','qing','tuo','dylan','ya'],[
+   {who:'',text:'收店了。予安把琴蓋闔上。'},{who:'staff:Evan',text:'喝一杯？'},{who:'',text:'予安看了一下時間。'},
+   {who:'named:'+YA,text:'一杯。',after:()=>qaGo('ya',[LG.bar.x0+156,LG.bar.y+74])},
+   {who:'named:'+YA,text:'你們下班都會留下來？'},{who:'staff:Evan',text:'偶爾。'},{who:'staff:阿拓',text:'最近比較常。'},
+   {who:'',text:'沈晴抬眼看了阿拓一下。阿拓沒有注意。'},{who:'',text:'予安看見了。她什麼都沒說。',after:()=>factSet('ya_sees_qt')},
+   {who:'staff:阿拓',text:'還要？'},{who:'staff:沈晴',text:'一點。'},{who:'',text:'阿拓替她倒。',illus:'qt_more'},{who:'',text:'予安看了他們一眼，低頭喝自己的酒。',illus:false}],
+   {ya:qaSide(-12,22)},()=>factSet('ya_sees_qt'))}},
+ /* 4 《你喜歡予安？》: the night 沈晴 is at her parents'; 阿拓 asks Evan, Dylan guesses wrong, Evan sees the piano, 予安 knows
+    at once and teaches him five notes — one evening, one scene */
+ {k:'qt_ya',lane:'major',cls:'A',floor:2,at:['close'],once:true,ic:'heart',note:'沈晴回老家的那晚。「如果你想跟一個人講清楚，你會怎麼講？」「你喜歡予安？」「是沈晴。」予安教阿拓按五個音。',
+  when:()=>!!fact('qt_often')&&!!qaHome()&&!qingOn()&&qaYa()&&qaEve()&&!!tuoOn(),
+  run:()=>{if(SCX){SCX.cap=80;SCX.stageRoom='lounge'}factSet('qt_ya');const Y='named:'+YA,E='staff:Evan',T='staff:阿拓',D='dylan';
+   const toPiano=()=>{qaGo('tuo',qaSide(-58,18),1);qaGo('evan',qaSide(-84,26),1);qaGo('dylan',qaSide(-108,22),1)};
+   qaScene(['evan','tuo','dylan','ya'],[
+   {who:'',text:'沈晴這兩天回老家。收店以後，Evan、阿拓、Dylan 留在吧台。'},{who:'',text:'予安剛彈完，在鋼琴旁邊收東西，準備走。'},{who:'',text:'喝了一陣。'},
+   {who:T,text:'我想問你一件事。'},{who:E,text:'嗯。'},{who:T,text:'如果你想跟一個人講清楚，你會怎麼講？'},{who:E,text:'你終於要講了？'},
+   {who:'',text:'Dylan 抬頭。看看阿拓，再看看店裡。沈晴不在。予安在。'},{who:D,text:'你喜歡予安？'},{who:T,text:'蛤？'},{who:'',text:'Evan 轉頭看 Dylan。'},{who:D,text:'不是嗎？'},
+   {who:E,text:'你為什麼會覺得是予安？'},{who:D,text:'沈晴又不在。'},{who:T,text:'是沈晴。'},{who:'',text:'Dylan 停了一下。'},
+   {who:D,text:'……沈晴？',after:()=>factSet('dylan_knows_qt')},{who:T,text:'嗯。'},{who:D,text:'等一下，你喜歡沈晴？'},{who:E,text:'他剛剛不是講了嗎。'},
+   {who:D,text:'不是，我是說……你一直都喜歡沈晴？'},{who:T,text:'一陣子了。'},{who:D,text:'喔。'},{who:E,text:'你現在才知道？'},{who:D,text:'我為什麼會知道？'},
+   {who:E,text:'你跟我們喝幾次了？'},{who:D,text:'喝酒跟這有什麼關係？'},
+   {who:T,text:'所以我才問你。要怎麼講？'},{who:'',text:'Evan 想了一下。予安在鋼琴旁邊收自己的東西。'},{who:E,text:'欸。'},{who:T,text:'嗯？'},{who:E,text:'鋼琴啊。'},
+   {who:D,text:'你要彈？'},{who:E,text:'不是。'},{who:E,text:'你彈。'},{who:T,text:'我不會。'},{who:E,text:'所以才要學啊。',after:toPiano},
+   {who:E,text:'予安。'},{who:Y,text:'嗯？'},{who:E,text:'妳現在趕時間嗎？'},{who:Y,text:'還好。'},{who:E,text:'教他一個最簡單的。'},
+   {who:'',text:'予安看看 Evan，再看看阿拓。'},{who:Y,text:'沈晴？'},{who:'',text:'阿拓停了一下。'},{who:T,text:'……嗯。'},
+   {who:D,text:'妳知道？'},{who:Y,text:'知道啊。'},{who:D,text:'很明顯嗎？'},{who:Y,text:'嗯。'},{who:D,text:'喔。'},{who:'',text:'Evan 笑了一下。'},
+   {who:Y,text:'你會彈嗎？'},{who:T,text:'不會。'},{who:Y,text:'完全不會？'},{who:T,text:'完全不會。'},
+   {who:'',text:'予安把剛拿起來的包包放回琴上。'},{who:Y,text:'坐。',after:()=>{qaGo('tuo',qaBench(),1);qaGo('ya',qaSide(-28,14),1)}},
+   {who:'',text:'她用一隻手按了五個音。很短。',illus:'qt_lesson',after:()=>qaPhrase(false)},{who:'',text:'阿拓照著按。第一個就錯了。'},
+   {who:Y,text:'不是那個。'},{who:T,text:'這個？'},{who:Y,text:'左邊。'},{who:'',text:'再來。'},
+   {who:D,text:'你明天記得嗎？'},{who:T,text:'你可以不要講話。'},
+   {who:'',text:'過了一陣，阿拓終於從頭按到尾。很慢，有點硬，但沒錯。',after:()=>qaPhrase(true)},{who:Y,text:'可以。'},{who:T,text:'這樣就可以？'},
+   {who:Y,text:'你又不是要去表演。'},{who:'',text:'阿拓自己再按一次。這次記住了。'},{who:Y,text:'記住就好。',illus:false}],
+   {ya:qaSide(-26,16)},()=>{if(!fact('dylan_knows_qt'))factSet('dylan_knows_qt')})}},
+ /* 5 《講完》: some evenings after 沈晴 is back, all five stay; 阿拓 plays the five notes himself; the words do not all come
+    out, and she answers. Dylan claps twice. Evan, 予安 and Dylan go; the two of them are left. No scene after this one. */
+ {k:'qt_said',lane:'major',cls:'A',floor:2,at:['close'],once:true,ic:'heart',note:'阿拓彈了那五個音。「那妳要不要……在……」「在什麼？」「……好啊。」',
+  when:()=>{const H=qaS().home;return !!fact('qt_ya')&&!!H&&S.day>=H.back+2&&qaYa()&&qaEve()&&!!qingOn()&&!!tuoOn()},
+  run:()=>{if(SCX){SCX.cap=60;SCX.stageRoom='lounge'}factSet('qt_said');const Q='staff:沈晴',T='staff:阿拓',E='staff:Evan',Y='named:'+YA,D='dylan';
+   qaScene(['evan','qing','tuo','dylan','ya'],[
+   {who:'',text:'沈晴回來幾天了。收店以後，大家又留了下來。'},{who:'',text:'Evan 在吧台後面。予安和 Dylan 坐在吧台。'},
+   {who:T,text:'沈晴。'},{who:Q,text:'嗯？'},{who:T,text:'妳過來一下。',after:()=>qaGo('tuo',qaBench(),1)},
+   {who:'',text:'沈晴走過去。阿拓在鋼琴前坐下。',after:()=>qaGo('qing',qaSide(-30,16),1)},{who:Q,text:'你會彈琴？'},{who:T,text:'不會。'},
+   {who:Q,text:'……那你坐這裡幹嘛？'},{who:T,text:'等一下。'},
+   {who:'',text:'阿拓開始彈。一隻手，五個音。按到第四個，他停了一下。',illus:'qt_play',after:()=>qaPhrase(true)},{who:'',text:'然後把最後一個按完。'},
+   {who:'',text:'沈晴看著他。'},{who:'',text:'吧台那邊，Evan 放下手上的杯子。',illus:false},
+   {who:T,text:'我本來有想好要講什麼。'},{who:Q,text:'嗯。'},{who:T,text:'現在忘了。'},{who:'',text:'沈晴笑了一下。'},
+   {who:T,text:'妳知道我要講什麼嗎？'},{who:'',text:'沈晴停了一下。'},{who:Q,text:'……大概。'},
+   {who:T,text:'那妳要不要……在……'},{who:Q,text:'在什麼？'},{who:'',text:'阿拓卡住了。'},{who:'',text:'沈晴看了他一下。'},{who:Q,text:'……好啊。'},
+   {who:'',text:'阿拓愣了一下。'},{who:'',text:'安靜了一兩秒。'},{who:'',text:'啪、啪。',after:qaClap},{who:'',text:'是 Dylan 在拍手。'},{who:'',text:'Evan 笑了。予安也笑了。'},
+   {who:E,text:'好啦，我先走了。',after:()=>qaGone('evan')},{who:Y,text:'我也走了。',after:()=>qaGone('ya')},{who:D,text:'先走了。',after:()=>qaGone('dylan')},
+   {who:'',text:'Evan 出門前，把吧台那一區的燈關了。門關上。'},{who:'',text:'Lounge 一下子安靜很多。',illus:'qt_alone'},
+   {who:'',text:'沈晴看看門，再看看阿拓。阿拓還坐在鋼琴前。'},{who:Q,text:'你什麼時候學的？'},{who:T,text:'妳回家的時候。'},{who:Q,text:'予安教你的？'},{who:T,text:'嗯。'},
+   {who:'',text:'沈晴看了他一下。'},{who:Q,text:'難怪。'},{who:T,text:'什麼難怪？'},{who:'',text:'沈晴笑了一下，沒有回答。'}],
+   {})}}
+);
+/* the evenings Dylan comes to The Lounge: the first on the day his exam is done (some days after it opens), then now and then */
+V24_WANTS.push(()=>{const out=[];if(typeof qaEve!=='function'||!qaEve()||!REG_BY.dylan)return out;
+ if(qa1Due())out.push({reg:'dylan',p:.5,t:.5,grp:'qtd',o:{lounge:1,lgRetry:1},k:'qt_drink'});
+ else if(fact('qt_drink')&&fact('qt_drink').d<S.day&&dayCoin('qtdy|'+S.day)<14)out.push({reg:'dylan',p:1,t:.5,grp:'qtd',o:{lounge:1,lgRetry:1}});
+ return out});
+Object.assign(STORY_ILLUS,{
+ qt_first:{t:'今天喝？',cap:'Dylan 第一次坐在 Lounge 的吧台。',art:'qt_first',stage:c=>drawIllusQt(c,0)},
+ qt_more:{t:'最近比較常',cap:'收店以後的吧台。阿拓替沈晴倒酒。',art:'qt_more',stage:c=>drawIllusQt(c,1)},
+ qt_lesson:{t:'你喜歡予安？',cap:'沈晴回老家的那晚。予安教阿拓按五個音。',art:'qt_lesson',stage:c=>drawIllusQt(c,2)},
+ qt_play:{t:'講完',cap:'阿拓自己彈那五個音。',art:'qt_play',stage:c=>drawIllusQt(c,3)},
+ qt_alone:{t:'難怪',cap:'其他人都走了。',art:'qt_alone',stage:c=>drawIllusQt(c,4)}});
+/* the stand-ins until the player's pictures: The Lounge after closing — the bar and its wall (0, 1), the piano (2–4); the
+   lit area smaller in the last */
+function drawIllusQt(c,k){c.fillStyle='#17130F';c.fillRect(0,0,360,270);c.fillStyle='#231D18';c.fillRect(0,0,360,150);
+ for(let i=0;i<18;i++){c.fillStyle=['#5A1E22','#C9A26E','#2E4A3A','#4A2A3A'][i%4];rr(c,20+i*18,40+(i%3)*4,6,26,2);c.fill()}
+ c.fillStyle='#4A3424';c.fillRect(0,170,k<2?360:200,22);c.fillStyle='#7A5A3E';c.fillRect(0,166,k<2?360:200,6);
+ if(k>=2){c.fillStyle='#0E0C0B';rr(c,214,146,128,64,10);c.fill();c.fillStyle='#1C1916';c.fillRect(222,204,6,40);c.fillRect(326,204,6,40);
+  c.fillStyle='#EDE8DE';c.fillRect(224,176,108,10);c.fillStyle='#0E0C0B';for(let i=0;i<14;i++)if(i%7!==2&&i%7!==6)c.fillRect(228+i*7.6,176,3.4,6);
+  c.fillStyle='#2A2420';rr(c,244,214,52,10,3);c.fill()}
+ const r=k===4?110:200,cx=k>=2?250:180,cy=k>=2?180:120;let g=c.createRadialGradient(cx,cy,10,cx,cy,r);g.addColorStop(0,'rgba(255,200,130,.30)');g.addColorStop(1,'rgba(255,200,130,0)');c.fillStyle=g;c.fillRect(0,0,360,270);
+ if(k<2){for(let i=0;i<(k===0?1:3);i++){const x=k===0?180:110+i*70;c.fillStyle='rgba(236,240,244,.6)';rr(c,x-6,146,12,20,3);c.fill();c.fillStyle='rgba(200,150,70,.7)';c.fillRect(x-5,156,10,8)}}}
 /* the stand-in for the night upstairs, should the picture be missing: the dark floor from above, the two street windows, the column */
 function drawIllusUpCats(c){c.fillStyle='#2A2018';c.fillRect(0,0,360,270);c.fillStyle='#8A6440';c.fillRect(30,40,300,210);c.fillStyle='rgba(60,40,24,.35)';for(let x=36;x<330;x+=12)c.fillRect(x,40,.8,210);
  for(const wx of[50,200]){c.fillStyle='#22304A';c.fillRect(wx,14,110,40);c.fillStyle='rgba(255,214,140,.8)';for(let k=0;k<8;k++)c.fillRect(wx+8+((k*29)%96),20+((k*13)%28),2,2);c.fillStyle='#3A2A1E';for(let k=1;k<4;k++)c.fillRect(wx+k*27.5,14,1.5,40)}
@@ -4592,7 +4737,7 @@ const STORY_LINES=[
  {k:'ken',who:'品酒師 Ken',names:['品酒師 Ken','Jill','Monsieur 杜','Evan','沈晴'],faces:['named:品酒師 Ken','jill'],title:()=>'下次換一支',open:()=>!!(BF('ken_lounge')||BF('ken_propose')),more:()=>fact('ken_wine')?'':'他還會再辦。',
   beats:[['ken_lounge','「跟我想的不一樣。」',{can:()=>!kenLegacy()}],['ken_propose','「這裡其實可以辦品酒。」'],['ken_t1','第一次品酒夜',{illus:'ken_t1'}],['ken_t2','「下次換一支。」'],['ken_t3','老樣子'],['ken_collab','「做一支我們自己的。」'],['ken_samples','三瓶沒有酒標的酒'],['ken_wine','「晚餐之後」',{illus:'ken_wine'}]]},
  {k:'qt',who:'晴 & 阿拓',names:['沈晴','阿拓','Jill'],kinds:['s'],faces:['staff:沈晴','staff:阿拓'],title:()=>'多的',open:()=>!!BF('qt_1'),more:'（只要他們還在這裡工作。）',photos:['qing_tuo','qing_tuo_late'],
-  beats:[['qt_1','「炸雞好了沒？」'],['qt_2','不用問了'],['qt_3','「多的。」'],['qt_absence','「今天炸物怎麼怪怪的？」'],['qt_photo','從工作開始'],['qt_photo2','有你在的晚班']]},
+  beats:[['qt_1','「炸雞好了沒？」'],['qt_2','不用問了'],['qt_3','「多的。」'],['qt_absence','「今天炸物怎麼怪怪的？」'],['qt_photo','從工作開始'],['qt_photo2','有你在的晚班'],['qt_drink','今天喝？'],['qt_late','晚點回去'],['qt_often','最近比較常'],['qt_ya','你喜歡予安？'],['qt_said','講完']]},
  {k:'dylan',who:()=>dylanOut()?'Jill & Dylan':'Dylan',names:['Dylan','Jill','王太太','王先生'],faces:()=>dylanOut()?['dylan','jill']:['dylan'],title:()=>dylanOut()?'結婚十一年，還在追':'那位常來的客人',open:()=>(S.regulars.dylan||0)>=1,more:()=>dylanOut()?'他們的故事還在繼續。':'好像有什麼……',photos:['jill_dylan_valentine'],
   beats:[[()=>S.dylan.stage>=1?(S.dylan.st1||0):null,'打烊後還在',{key:'dy_stay'}],
    ...Object.keys(DY_SCENE_T).map(k=>[()=>dyScene(k),DY_SCENE_T[k],{key:'dy_'+k,note:()=>dySceneNote(k),can:k==='gear'?()=>CATGEAR.some(G=>!gearOn(G.k)||S.day-(S.gear[G.k]||0)<=3):null}]),
@@ -4902,7 +5047,7 @@ function jillUpd(dt){const J=R.jill;const fire=R.fire>0;if(upSearching()||(R&&R.
  if(!J.cur&&R.closing==null){J.idle+=dt;treatTick();if(J.visit)return;
   if(!J.fp&&!J.pet&&!J.rest&&J.idle>.6&&firstPhotoDue()){J.fp={phase:'go'};J.troom='main';J.tx=FP_SPOT.x;J.ty=FP_SPOT.y;return}
   /* Dylan is here and she has a moment: she goes over and stands by his table for a bit. Not a job; once a visit. */
-  if(!J.visit&&!J.rest&&!J.pet&&J.idle>1.2&&J.calm>2.5&&(J.visitCD||0)<R.t&&Math.random()<dt*.35&&jillWorkload()<=1){const g=R.groups.find(q=>q.reg==='dylan'&&q.table!=null&&['wait','eat'].includes(q.state)&&!q.paused);if(g){const t=R.tables[g.table];g.paused=true;J.visitCD=R.t+60;J.visit={g,t0:t,phase:'go'};J.troom=t.room||'main';J.tx=t.x+(t.x<200?30:-30);J.ty=t.y+20;S.dylan.clues.pause=(S.dylan.clues.pause||0)+1;return}}
+  if(!J.visit&&!J.rest&&!J.pet&&J.idle>1.2&&J.calm>2.5&&(J.visitCD||0)<R.t&&Math.random()<dt*.35&&jillWorkload()<=1){const g=R.groups.find(q=>q.reg==='dylan'&&q.table!=null&&q.room!=='lounge'&&['wait','eat'].includes(q.state)&&!q.paused);if(g){const t=R.tables[g.table];g.paused=true;J.visitCD=R.t+60;J.visit={g,t0:t,phase:'go'};J.troom=t.room||'main';J.tx=t.x+(t.x<200?30:-30);J.ty=t.y+20;S.dylan.clues.pause=(S.dylan.clues.pause||0)+1;return}}
   /* a quiet moment: nothing on the pass, nobody waiting on her -> she may sit down on the sofa for a bit */
   if(!J.rest&&!J.pet&&J.calm>5&&(J.restCD||0)<R.t&&R.t>10&&R.t<R.dur*.92&&Math.random()<dt*.3&&jillWorkload()===0){const pos=freeJillPos();if(pos){startRest(pos);return}J.restCD=R.t+15}
   if(J.idle>2.2&&Math.hypot(J.x-PASS.x,J.y-PASS.y)>3){J.troom='main';J.tx=PASS.x;J.ty=PASS.y}}}
@@ -5416,8 +5561,8 @@ function drawArch(c,x,y,w,h,label){c.fillStyle='#8A6A42';rr(c,x-4,y-4,w+8,h+6,6)
  c.fillStyle='rgba(255,230,180,.22)';c.fillRect(x+6,y+h-14,w-12,14);/* light spilling onto the floor, and a mat with the sign */let fg=c.createLinearGradient(0,y+h,0,y+h+26);fg.addColorStop(0,'rgba(255,214,150,.3)');fg.addColorStop(1,'rgba(255,214,150,0)');c.fillStyle=fg;c.fillRect(x-6,y+h,w+12,26);c.fillStyle='#8A3A2A';rr(c,x-2,y+h+8,w+4,12,3);c.fill();c.fillStyle='rgba(255,255,255,.12)';rr(c,x,y+h+9.5,w,3,1.5);c.fill();c.fillStyle='#F6EEDF';c.font=`800 6.5px ${FONT}`;c.textAlign='center';c.textBaseline='middle';c.fillText(label,x+w/2,y+h+14.4);c.textBaseline='alphabetic'}
 function drawOtherRoom(c,now,dusk,V,X0,XW,TOP){const k=room;const J=V.jill;const list=[];
  if(k==='kitchen')drawKitchenRoom(c,now,dusk,V,X0,XW,TOP,list);else if(k==='side')drawSideRoom(c,now,dusk,V,X0,XW,TOP,list);else if(k==='lounge')drawLoungeRoom(c,now,dusk,V,X0,XW,TOP,list);else if(k==='up')drawUpRoom(c,now,dusk,V,X0,XW,TOP,list);else if(k==='staff')drawStaffRoom(c,now,dusk,V,X0,XW,TOP,list);else if(k==='pdr')drawPdrRoom(c,now,dusk,V,X0,XW,TOP,list);else if(k==='home')drawHomeRoom(c,now,dusk,V,X0,XW,TOP,list);else drawFrontRoom(c,now,dusk,V,X0,XW,TOP,list);
- for(const t of V.tables)if((t.room||'main')===k&&t.kind!=='bar')list.push({y:t.y,f:()=>drawTableFull(c,t,now)});
- for(const g of V.groups)if(WALK_ST.includes(g.state)&&(g.room||'main')===k)list.push({y:g.y,f:()=>drawWalkers(c,g,now)});
+ for(const t of V.tables)if((t.room||'main')===k&&t.kind!=='bar')list.push({y:t.y,f:()=>qaSolo(k)?noGroup(t,()=>drawTableFull(c,t,now)):drawTableFull(c,t,now)});
+ for(const g of V.groups)if(WALK_ST.includes(g.state)&&(g.room||'main')===k&&!qaSolo(k))list.push({y:g.y,f:()=>drawWalkers(c,g,now)});
  if(!J.sofa&&(J.room||'main')===k)list.push({y:J.y,f:()=>drawJillAt(c,J,V,now)});
  crewDraw(c,now,list,k);
  if(CATS)for(const cat of CATS){if(cat.away!==k)continue;if(k==='home'&&cat.sofa&&cat.sofaOn)continue;list.push({y:cat.homeY!=null?cat.homeY:cat.ay,f:()=>{const sx=cat.x,sy=cat.y,sf=cat.face;cat.x=cat.ax;cat.y=cat.ay-(cat.aoy||0);cat.face=cat.aface||1;drawCat(c,cat,now);cat.x=sx;cat.y=sy;cat.face=sf}})}
@@ -8949,7 +9094,7 @@ function crewUpd(dt){R.cw=R.cw||{};for(const m of S.crew||[]){
   if(waiterDoes(m,'clean')){const t=pdFirst(t=>t.dirty&&!t.group&&!t.claim&&!jillTargets(t.i)&&lgOK(t));if(t){t.claim=m.id;w.task={k:'clean',t,x:t.x+(t.x<200?-24:24),y:t.y+22,dur:cleanDur(m)+.4};continue}}
   w.cd=.4;if(w.room!=='main'||Math.hypot(w.x-84,w.y-150)>4){w.tx=84;w.ty=150;w.troom='main';if(!stepTo(w,80*dt)){w.moving=true;w.step+=dt*12}}}
  else{const free=q=>q.dirty&&!q.group&&!q.claim&&!jillTargets(q.i);const t=(crewPool(m)==='lounge'&&R.tables.find(q=>q.lounge&&free(q)))||pdFirst(free);/* v2.4 rc5: the Lounge's cleaner clears the Lounge first, then wherever she is needed */if(t){t.claim=m.id;w.task={k:'clean',t,x:t.x+(t.x<200?-24:24),y:t.y+22,dur:cleanDur(m)};continue}w.cd=.4}}}
-function crewDraw(c,now,list,rm){
+function crewDraw(c,now,list,rm){if(qaSolo(rm)){stageDraw(c,list,rm);return}
  if(R&&R.cw)for(const m of S.crew||[]){if(m.role==='chef')continue;const w=R.cw[m.id];if(!w||(w.room||'main')!==(rm||'main')||rm==='staff'||srWalker(m.id))continue;/* v2.4 rc6: in the Staff Room they are drawn sitting (srDrawPeople); a bartender walking up is his walker */list.push({y:w.y,f:()=>{const stp=w.moving?Math.sin(w.step):0;const L0=crewLook(m);if(w.phone)L0.acc='phone';drawPerson(c,w.x,w.y,L0,{step:stp,bob:w.moving?Math.abs(stp)*-.8:0,mood:m.name==='秀琴阿姨'&&wallWorrying()?'ok':'happy',flip:w.face<0,carry:!!(w.carry&&w.carry.length),arms:m.role==='cleaner'&&w.task&&w.task.k==='clean'&&!w.moving?[.3,1.0]:null});
   if(w.carry)w.carry.slice(0,3).forEach((it,i)=>{const cv=dishCanvas(it.d,it.q,64,S.decor.ware>0,it.want);c.drawImage(cv,w.x+(i%2?5:-21),w.y-50-Math.floor(i/2)*8,16,16)});
   const hx=w.x+(w.face<0?-12:12);if(m.role==='cleaner'){c.strokeStyle='#8A6A3A';c.lineWidth=1.6;c.beginPath();c.moveTo(hx,w.y-30);c.lineTo(hx+(w.face<0?-4:4),w.y-2);c.stroke();c.fillStyle='#C9A86A';el(c,hx+(w.face<0?-4:4),w.y-1,5,2.4)}else{c.fillStyle='#C9CED0';el(c,hx,w.y-26,7,2)}

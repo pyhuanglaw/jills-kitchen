@@ -1,0 +1,54 @@
+player_day74_1508.json from Day 74 (level 5, Dylan stage 3, Ken visits 21, Madame Lin visits 19), seeds 8400+
+Day  74  bar lounge          visits -                      next door 0       glasses  25  facts ·  events ·
+Day  75  bar lounge          visits Madame Lin@35%,Ken@75% next door 0       glasses  29  facts ·  events ·
+Day  76  bar lounge          visits Madame Lin@21%,Ken@35% next door 0       glasses  26  facts ·  events ·
+Day  77  bar lounge          visits Ken@22%,Madame Lin@40% next door 0       glasses  21  facts ·  events ·
+Day  78  bar lounge          visits Ken@60%                next door 0       glasses  28  facts ·  events ·
+Day  79  bar lounge          visits Madame Lin@3%,Ken@21%  next door 0       glasses  26  facts ·  events ·
+Day  80  bar lounge          visits Madame Lin@32%,Ken@62% next door 0       glasses  23  facts ya_1  events ·
+Day  81  bar lounge          visits Ken@1%,Madame Lin@51%  next door 0       glasses  26  facts qt_drink qx_pay  events qt_drink
+Day  82  bar lounge          visits Ken@18%,Madame Lin@66% next door 0       glasses  29  facts ya_2  events ·
+Day  83  bar lounge          visits Madame Lin@39%         next door 0       glasses  29  facts ·  events ·
+Day  84  bar lounge          visits Ken@12%                next door 0       glasses  26  facts ·  events ·
+Day  85  bar lounge          visits Madame Lin@16%,Ken@24% next door 0       glasses  27  facts ya_3  events ·
+Day  86  bar lounge          visits Ken@46%,Madame Lin@75% next door 0       glasses  22  facts ·  events ·
+Day  87  bar lounge          visits Ken@10%,Madame Lin@12% next door 0       glasses  25  facts ya_join  events ·
+Day  88  bar lounge          visits Madame Lin@9%,Ken@79%  next door 0       glasses  25  facts ·  events ·
+Day  89  bar lounge          visits Ken@7%,Madame Lin@45%  next door 0       glasses  29  facts ·  events ·
+Day  90  bar lounge          visits Madame Lin@24%,Ken@35% next door 0       glasses  27  facts ·  events ·
+Day  91  bar lounge          visits Ken@7%,Madame Lin@46%  next door 0       glasses  32  facts ·  events ·
+Day  92  bar lounge          visits Madame Lin@46%,Ken@72% next door 0       glasses  20  facts ·  events ·
+Day  93  bar lounge          visits Ken@79%,Madame Lin@84% next door 0       glasses  21  facts ·  events ·
+Day  94  bar lounge          visits Ken@29%,Madame Lin@32% next door 0       glasses  25  facts qt_late  events qt_late
+Day  95  bar lounge          visits Madame Lin@23%,Ken@47% next door 0       glasses  31  facts ·  events ·
+Day  96  bar lounge          visits Ken@64%                next door 0       glasses  27  facts ·  events ·
+Day  97  bar lounge          visits Madame Lin@50%,Ken@84% next door 0       glasses  32  facts ·  events ·
+Day  98  bar lounge          visits Ken@3%,Madame Lin@21%  next door 0       glasses  28  facts ·  events ·
+Day  99  bar lounge          visits Madame Lin@17%,Ken@47% next door 0       glasses  29  facts qt_often ya_sees_qt  events qt_often
+Day 100  bar lounge          visits Ken@49%                next door 0       glasses  28  facts ·  events ·
+Day 101  bar lounge          visits Madame Lin@27%,Ken@70% next door 0       glasses  27  facts ·  events ·
+Day 102  bar lounge          visits Ken@32%,Madame Lin@56% next door 0       glasses  23  facts ·  events ·
+Day 103  bar lounge          visits Ken@14%,Madame Lin@30% next door 0       glasses  28  facts ·  events ·
+Day 104  bar lounge          visits Madame Lin@71%,Ken@76% next door 0       glasses  23  facts ·  events ·
+Day 105  bar lounge          visits Ken@47%                next door 0       glasses  28  facts ·  events ·
+Day 106  bar lounge          visits Ken@16%,Madame Lin@55% next door 0       glasses  27  facts ·  events ·
+Day 107  bar lounge          visits Madame Lin@16%,Ken@29% next door 0       glasses  24  facts ·  events ·
+Day 108  bar lounge          visits Ken@1%,Madame Lin@18%  next door 0       glasses  25  facts ·  events ·
+Day 109  bar lounge          visits Ken@51%,Madame Lin@64% next door 0       glasses  34  facts ·  events ·
+Day 110  bar lounge          visits Madame Lin@52%,Ken@52% next door 0       glasses  26  facts ·  events ·
+Day 111  bar lounge          visits Ken@46%,Madame Lin@50% next door 0       glasses  23  facts ·  events ·
+Day 112  bar lounge          visits Madame Lin@32%,Ken@57% next door 0       glasses  13  facts ·  events ·
+Day 113  bar lounge          visits Madame Lin@42%,Ken@65% next door 0       glasses  20  facts qt_ya dylan_knows_qt  events qt_ya qx_home
+Day 114  bar lounge          visits Madame Lin@10%         next door 0       glasses  26  facts ·  events qx_home
+Day 115  bar lounge          visits Madame Lin@7%,Ken@72%  next door 0       glasses  30  facts ·  events ·
+Day 116  bar lounge          visits Madame Lin@38%,Ken@66% next door 0       glasses  27  facts ·  events ·
+Day 117  bar lounge          visits Madame Lin@5%,Ken@59%  next door 0       glasses  34  facts ·  events ·
+Day 118  bar lounge          visits Ken@52%                next door 0       glasses  25  facts qt_said  events qt_said
+
+the day of each fact: {'qt_3': 71, 'ya_1': 80, 'ya_2': 82, 'ya_3': 85, 'ya_join': 87, 'qt_drink': 81, 'qx_pay': 81, 'qt_late': 94, 'qt_often': 99, 'ya_sees_qt': 99, 'qt_ya': 113, 'dylan_knows_qt': 113, 'qt_said': 118}
+the day of each event: {'qt_drink': 81, 'qt_late': 94, 'qt_often': 99, 'qt_ya': 113, 'qt_said': 118, 'qx_home': 113}
+words kept: {"lin_retire":0,"ken_where":0,"jd_want":0,"dylan_book":0,"lin_viewing":0,"pairing_start":0,"lin_sign":0,"lin_guest":7}
+Evan: [{"role":"bartender","pool":"lounge","since":57}]  Dylan stage: 3  money: 3878652  level: 5
+page errors: []
+45 days in 138s
+EXIT 0

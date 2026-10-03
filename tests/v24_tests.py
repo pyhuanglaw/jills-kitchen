@@ -4563,3 +4563,140 @@ def v24_rc8_the_bell_rings_when_the_door_opens(b, port, target):
     man = g.ev("JSON.stringify(GUIDE)")
     check('門鈴' not in man and '鈴' not in man.replace('鈴聲', ''), 'the manual says nothing about the bell')
     check(not g.errors, g.errors[:3]); g.close()
+
+
+# ---------------------------------------------------------------- rc8 晴 × 阿拓 after work: the five scenes
+def _qt_until(g, key, cap=12):
+    """the bot through the evening until the held scene `key` is on screen; any other held scene is stepped through"""
+    for _ in range(cap):
+        g.ev("__botUntil(\"!!(typeof DLG!=='undefined'&&DLG)||phase!=='service'\",200000,1/30)")
+        if g.ev("phase") != 'service': return False
+        if g.ev("!!(DLG&&DLG.sh&&DLG.sh.k===%r)" % key): return True
+        g.ev("for(let i=0;i<80&&DLG&&!(DLG.sh&&DLG.sh.k===%r);i++){__tick(400);dlgNext()}" % key)
+        if g.ev("!!(DLG&&DLG.sh&&DLG.sh.k===%r)" % key): return True
+    return False
+
+
+def _qt_next_day(g):
+    """the evening to its end and on to the next day's prep, whatever card or sheet is up"""
+    g.ev("for(let i=0;i<120&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}")
+    g.ev("__botUntil('phase!==\"service\"',200000,1/30)"); g.page.wait_for_timeout(60)
+    for _ in range(8):
+        g.ev("for(let i=0;i<80&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}")
+        ph = g.ev("phase")
+        if ph == 'prep': return
+        g.ev("try{if($('#reveal')&&!$('#reveal').hidden)hideReveal()}catch(e){}")
+        g.ev("doAct(%r,null,null,null)" % ('toShop' if ph == 'summary' else 'nextDay')); g.page.wait_for_timeout(100); g.ev("__tick(1200)")
+
+
+def _qt_evening(g, key, setup='', days=6):
+    """evenings until the held scene `key` comes (the day's one story slot may be another line's); `setup` before each"""
+    for _ in range(days):
+        g.ev(setup + ";kenS().next=null;cnS().next=null")
+        to_service(g); g.ev("window.__act=window.__actLazy;window.__noScenes=false;window.__holds=true")
+        if _qt_until(g, key): return True
+        _qt_next_day(g)
+    return False
+
+
+def _qt_lines(g, key, cap=90, probe=None):
+    """the held scene `key`, line by line (a scene queued after it is not read); with `probe`, a JS value per line"""
+    out = []
+    for _ in range(cap):
+        if not g.ev("!!(typeof DLG!=='undefined'&&DLG&&DLG.sh&&DLG.sh.k===%r)" % key): break
+        l = g.ev("(()=>{const n=document.querySelector('#dlg .dlg-name'),t=document.querySelector('#dlg .dlg-text');return(n&&n.textContent?n.textContent+'：':'')+(t?t.textContent:'')})()")
+        out.append((l, g.ev(probe)) if probe else l)
+        g.ev("__tick(400);dlgNext()"); g.ev("for(let j=0;j<2;j++)__tick(1000/30)")
+    return out
+
+
+_QT_FORBID = ('我喜歡妳', '跟我在一起', '你不要鼓掌', '空間給', '不打擾', '慢慢聊', '終於在一起', '新的開始', '才沒有', '我們只是同事', '誰喜歡他', '早就懷疑', '難怪你', '司法官', '律師')
+
+
+@test
+def v24_rc8_qing_tuo_after_work_five_scenes(b, port, target):
+    """The player's brief of 2026-10-03 (晴 × 阿拓 after work) with 19:19 §18–§19, on the player's Day 74 save: five held
+    scenes in The Lounge, one an evening, none with Jill. 《今天喝？》 — Dylan's first drink there (Evan has known him since
+    the signing: 「稀奇」), the exam never named, his bill paid once (「這杯算了。」「不用。」…). 《晚點回去》 — after closing,
+    the bottle handed over. 《最近比較常》 — 予安 (a while a pianist) stays for one and sees 沈晴's look; nothing said.
+    《你喜歡予安？》 — 沈晴 at her parents'; Dylan's wrong guess; he learns it only at 「……沈晴？」; Evan sees the piano;
+    予安 knows without being told; five notes, one hand. 《講完》 — 沈晴 back some days; 阿拓 plays them himself; the
+    sentence unfinished; 「……好啊。」; Dylan claps twice; the three go; the two of them are left. The after-hours
+    lines move nothing."""
+    g = Game(b, port, target, seed=9401, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day74_1508.json')
+    g.ev("kenS().next=null;cnS().next=null")
+    check(g.ev("!!fact('evan_knows_dylan')&&!fact('qt_drink')&&loungeDoneDay()!=null&&S.day>=loungeDoneDay()+10") is True, 'the save: Evan has known Dylan since the signing (its history); The Lounge open a while')
+    # 1 《今天喝？》
+    to_service(g); g.ev("window.__act=window.__actLazy;window.__noScenes=true;R.sched=R.sched.filter(o=>o.reg!=='dylan'&&!(o.regs||[]).includes('dylan'))")
+    g.ev("__botUntil('R.t>=R.dur*.3',200000,1/30)")
+    g.ev("window.__col=[];const __st=storyTick;storyTick=function(k,c){if(k==='collect'&&c&&c.g&&c.g.reg==='dylan')__col.push(!!c.again);return __st.apply(this,arguments)}")
+    g.ev("R.sched.splice(R.si,0,{t:R.t+2,type:'regular',reg:'dylan',size:1,story:1,lounge:1,lgRetry:1,tries:1});window.__noScenes=false;window.__holds=true")
+    check(_qt_until(g, 'qt_drink') and g.ev("room") == 'lounge' and g.ev("JSON.stringify(STAGE.who.map(p=>p.id))") == '["evan","dylan"]', '《今天喝？》 held in The Lounge, Evan and Dylan')
+    lines = _qt_lines(g, 'qt_drink')
+    check(lines == ['Dylan 在吧台坐下。', 'Evan：今天喝？', 'Dylan：嗯。', 'Evan：稀奇。', 'Dylan：考完了。', 'Evan：考試？', 'Dylan：嗯。', 'Evan：考得怎樣？', 'Dylan：考完了。', 'Evan：……行。'], f'the lines: {lines}')
+    g.ev("window.__noScenes=true")
+    g.ev("__botUntil(\"__col.length>0||!R.groups.some(q=>q.reg==='dylan')\",200000,1/30)"); g.ev("for(let i=0;i<200;i++)__tick(1000/30)")
+    check(g.ev("JSON.stringify(__col)") == '[false]' and g.ev("!!fact('qx_pay')"), f'he pays, once ({g.ev("JSON.stringify(__col)")}); 「這杯算了。」「不用。」「你還真的付喔。」「不然呢？」')
+    # 2 《晚點回去》
+    _qt_next_day(g)
+    check(_qt_evening(g, 'qt_late', "story().facts.qx_dylan=story().facts.qx_dylan||{d:S.day-3,n:2,l:S.day-1};story().facts.qt_drink.d=Math.min(story().facts.qt_drink.d,S.day-5)"), '《晚點回去》 at closing')   # two later drinks there, on two evenings
+    st = g.ev("JSON.stringify(STAGE.who.map(p=>p.id))"); lines = _qt_lines(g, 'qt_late')
+    check(st == '["evan","qing","tuo","dylan"]' and 'Evan 多拿了一個杯子，放在 Dylan 前面。' in lines and '沈晴伸手找酒。阿拓剛好在旁邊，直接把那一支遞給她。' in lines and '沈晴：謝啦。' in lines and lines[-1] == '散的時候，Dylan 把錢壓在杯子底下。', f'Evan, 晴, 阿拓 and Dylan; the bottle; his money under the glass: {st} {lines}')
+    check(not any(l.startswith('Jill') for l in lines) and 'Jill' not in st, 'no Jill')
+    # 3 《最近比較常》
+    _qt_next_day(g)
+    check(not g.ev("fact('ya_sees_qt')"), '予安 has seen nothing yet')
+    ya = "story().facts.ya_join=story().facts.ya_join||{d:S.day-15,n:1,l:S.day-15};story().facts.ya_join.d=Math.min(story().facts.ya_join.d,S.day-10);while(!yaNight())story().facts.ya_join.d--"
+    check(_qt_evening(g, 'qt_often', ya + ";story().facts.qt_late.d=Math.min(story().facts.qt_late.d,S.day-4)"), '《最近比較常》 at closing, on one of 予安\'s nights, a while after she became the pianist')
+    lines = _qt_lines(g, 'qt_often')
+    want = ['Evan：喝一杯？', '予安看了一下時間。', '林予安：一杯。', '林予安：你們下班都會留下來？', 'Evan：偶爾。', '阿拓：最近比較常。', '沈晴抬眼看了阿拓一下。阿拓沒有注意。', '予安看見了。她什麼都沒說。', '阿拓：還要？', '沈晴：一點。', '阿拓替她倒。']
+    check(all(w in lines for w in want) and not any('沒有啊' in l for l in lines), f'the lines: {lines}')
+    check(g.ev("!!fact('ya_sees_qt')&&!fact('dylan_knows_qt')") is True, '予安 has seen it; Dylan has not')
+    # an evening's after-hours line moves nothing
+    f0 = g.ev("JSON.stringify(Object.keys(story().facts).filter(k=>/^qt_/.test(k)).sort())")
+    g.ev("STORY_EV.find(e=>e.k==='qx_after').run({})")
+    check(g.ev("JSON.stringify(Object.keys(story().facts).filter(k=>/^qt_/.test(k)).sort())") == f0, 'the after-hours lines change no step of the story')
+    # 4 《你喜歡予安？》
+    _qt_next_day(g)
+    check(_qt_evening(g, 'qt_ya', ya + ";story().facts.qt_often.d=Math.min(story().facts.qt_often.d,S.day-5);if(!qaHome()){qaS().home={d:S.day,back:S.day+2}}", 2), '《你喜歡予安？》 at closing, while 沈晴 is at her parents\'')
+    check(g.ev("!qingOn()&&!!qaHome()") is True, '沈晴 not in tonight')
+    st = g.ev("JSON.stringify(STAGE.who.map(p=>p.id))")
+    out = _qt_lines(g, 'qt_ya', 90, "!!fact('dylan_knows_qt')")
+    lines = [l for l, _ in out]
+    i = {l: n for n, l in reversed(list(enumerate(lines)))}
+    seq = ['阿拓：如果你想跟一個人講清楚，你會怎麼講？', 'Evan：你終於要講了？', 'Dylan：你喜歡予安？', '阿拓：蛤？', 'Evan：你為什麼會覺得是予安？', 'Dylan：沈晴又不在。', '阿拓：是沈晴。', 'Dylan：……沈晴？',
+           'Evan：鋼琴啊。', 'Evan：你彈。', 'Evan：教他一個最簡單的。', '林予安：沈晴？', 'Dylan：妳知道？', '林予安：知道啊。', 'Dylan：很明顯嗎？', '林予安：嗯。', '林予安：坐。', '林予安：記住就好。']
+    check(all(s in i for s in seq) and [i[s] for s in seq] == sorted(i[s] for s in seq), f'one evening, in order — the question, the wrong guess, 「是沈晴」, the piano, 予安 knows, the lesson: {lines}')
+    check('qing' not in st and 'Jill' not in st and not any(l.startswith('沈晴：') or l.startswith('Jill') for l in lines), f'沈晴 not there, nor Jill: {st}')
+    at = i['Dylan：……沈晴？']
+    check(not any(k for l, k in out[:at + 1]) and all(k for l, k in out[at + 1:]), 'Dylan learns it at 「……沈晴？」 (the step past it), not before')
+    ev_before = [l for l in lines[:i['林予安：沈晴？']] if l.startswith('Evan：')]
+    check(not any('沈晴' in l or '告白' in l for l in ev_before), f'nobody tells 予安: {ev_before}')
+    yl = [l for l in lines if l.startswith('林予安：')]
+    check(all(len(l) <= 16 for l in yl) and not any(w in ''.join(yl) for w in ('喜歡', '告白', '感情', '心')), f'予安 says only what the piano needs: {yl}')
+    check(any('五個音' in l for l in lines) and any('一隻手' in l for l in lines) and not any(w in ''.join(lines) for w in ('整首', '一首')), 'one hand, five notes — not a piece')
+    check(not any(w in ''.join(lines) for w in _QT_FORBID), 'no line the brief forbids')
+    # 5 《講完》 — not the day she is back, some evenings later
+    _qt_next_day(g)
+    while g.ev("!!qaHome()"):
+        g.ev("kenS().next=null;cnS().next=null"); to_service(g); g.ev("window.__act=window.__actLazy;window.__noScenes=true")
+        check(not g.ev("STORY_EV.find(e=>e.k==='qt_said').when({})"), 'not while she is away'); g.ev("__botUntil('phase!==\"service\"',200000,1/30)"); _qt_next_day(g)
+    g.ev(ya + ";kenS().next=null;cnS().next=null"); to_service(g); g.ev("window.__act=window.__actLazy;window.__noScenes=true")
+    check(g.ev("!!qingOn()") is True and not g.ev("STORY_EV.find(e=>e.k==='qt_said').when({})"), 'back — and not on the day she is back')
+    g.ev("__botUntil('phase!==\"service\"',200000,1/30)"); _qt_next_day(g)
+    check(_qt_evening(g, 'qt_said', ya), '《講完》 some evenings after she is back')
+    pairs = _qt_lines(g, 'qt_said', 80, "JSON.stringify(STAGE?STAGE.who.filter(p=>!p.hide).map(p=>p.id):[])")
+    out = [l for l, _ in pairs]; vis = [v for _, v in pairs]
+    lines = out
+    seq = ['阿拓：沈晴。', '阿拓：妳過來一下。', '沈晴：你會彈琴？', '阿拓：不會。', '沈晴：……那你坐這裡幹嘛？', '阿拓：等一下。', '阿拓：我本來有想好要講什麼。', '阿拓：現在忘了。', '阿拓：妳知道我要講什麼嗎？', '沈晴：……大概。',
+           '阿拓：那妳要不要……在……', '沈晴：在什麼？', '阿拓卡住了。', '沈晴：……好啊。', '啪、啪。', '是 Dylan 在拍手。', 'Evan：好啦，我先走了。', '林予安：我也走了。', 'Dylan：先走了。', '沈晴：你什麼時候學的？', '阿拓：妳回家的時候。', '沈晴：難怪。']
+    pos = [lines.index(s) if s in lines else -1 for s in seq]
+    check(-1 not in pos and pos == sorted(pos), f'the lines, in order: {lines}')
+    check(not any(w in ''.join(lines) for w in _QT_FORBID) and not any(l.startswith('Jill') for l in lines), 'no 「我喜歡妳」, no 「跟我在一起」, nobody scolds him, nobody says why they go; no Jill')
+    check(not any(('予安' in l and ('彈' in l or '伴奏' in l)) for l in lines), '阿拓 plays it himself — 予安 does not')
+    check(json.loads(vis[-1]) == ['qing', 'tuo'], f'at the end only the two of them: {vis[-1]}')
+    check(g.ev("STORY_LINES.find(L=>L.k==='qt').beats.slice(-5).map(b=>b[0]).join()") == 'qt_drink,qt_late,qt_often,qt_ya,qt_said', 'the story page carries the five')
+    days = json.loads(g.ev("JSON.stringify(['qt_drink','qt_late','qt_often','qt_ya','qt_said'].map(k=>fact(k).d))"))
+    check(len(set(days)) == 5 and days == sorted(days), f'one an evening, in order: {days}')
+    check(not g.errors, g.errors[:3]); g.close()
