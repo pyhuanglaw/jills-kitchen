@@ -4586,6 +4586,11 @@ function due(k,prev,gap,era){if(fact(k)||!eraOpen(era))return false;if(!prev){co
 function isYJ(g){return !!g&&namedId(g)===YJN}
 function yjG(ctx){return ctx.g||(ctx.at==='xqin'?seatedId(YJID):null)}
 function smG(ctx){return ctx.g||(ctx.at==='xqin'?(seatedId('sophie')||seatedId('mia')):null)}
+/* rc8.2: 秀琴's small talk is with each of them, three times at most. It was capped on the two together, so Sophie (asked first,
+   and seated more often) could take all six and Mia none — and the wall, which needs her to know both, never began (the
+   forty days from the player's Day 52 save, seed 7400). Now the one she has talked with less, and up to three each. */
+function xqSmId(g){const ids=g?storyIdsOf(g).filter(id=>id==='sophie'||id==='mia'):[];return ids.sort((a,b)=>xqKnows(a)-xqKnows(b))[0]||null}
+function xqSmG(ctx){if(ctx.g)return xqSmId(ctx.g)?ctx.g:null;if(ctx.at!=='xqin')return null;const c=[seatedId('sophie'),seatedId('mia')].filter(Boolean);c.sort((a,b)=>xqKnows(xqSmId(a))-xqKnows(xqSmId(b)));return c[0]||null}
 function xqHere(){const m=xqm();const w=crewSprite(m);return m&&crewHere(m)&&w&&!w.arriving&&!w.leaving?m:null}
 function xqFree(){const m=xqHere();return m&&!walkingOver(m)?m:null}
 /* 秀琴阿姨 before she is on the crew (docs/v24/xiuqin_from_day1): Jill's acquaintance who comes by most evenings when
@@ -5081,8 +5086,8 @@ STORY_EV.push(
  {k:'yj_key_seen',lane:'ambient',cd:0,at:['order','xqin'],when:()=>!!fact('yj_key')&&!fact('yj_key_seen')&&!!xqHere()&&R&&R.t>40,
   run:()=>{const m=xqm();factSet('yj_key_seen');JILL_SAY('新鑰匙？',300);xqSay('她給的。',1500)}},
  /* ---- 秀琴阿姨 × Sophie / Mia (H1): she clears their tables often enough to know them; later she notices ---- */
- {k:'xq_sm_talk',lane:'ambient',cd:1,at:['seat','xqin'],when:ctx=>{const g=smG(ctx);return !!g&&storyIdsOf(g).some(id=>id==='sophie'||id==='mia')&&!v24Fresh(ctx.at)&&!!xqFree()&&xqKnows('sophie')+xqKnows('mia')<6&&hash('xqt|'+S.day+'|'+g.id)%100<70},
-  run:ctx=>{const g=smG(ctx);const id=storyIdsOf(g).includes('sophie')?'sophie':'mia';xqTo(g,()=>{const m=xqm();const n=relN('s:'+m.id,id,'spoke');relSet('s:'+m.id,id,'spoke',true);
+ {k:'xq_sm_talk',lane:'ambient',cd:1,at:['seat','xqin'],when:ctx=>{const g=xqSmG(ctx);return !!g&&!v24Fresh(ctx.at)&&!!xqFree()&&xqKnows(xqSmId(g))<3&&hash('xqt|'+S.day+'|'+g.id)%100<70},
+  run:ctx=>{const g=xqSmG(ctx);const id=xqSmId(g);xqTo(g,()=>{const m=xqm();const n=relN('s:'+m.id,id,'spoke');relSet('s:'+m.id,id,'spoke',true);
    const L=id==='sophie'?[['今天也坐這？','嗯，老位子。'],['這桌我剛擦好。','謝謝阿姨。'],['今天比較晚喔。','稿子寫不完。']]:[['今天很早喔。','今天沒加班。'],['這桌我剛擦好。','謝謝阿姨。'],['外面風很大吧？','超大。']];const p=L[n%L.length];xqSay(p[0],400);sayG(g,p[1],1700,{who:id})},{dur:3})}},
  {k:'xq_oh',lane:'v24',cls:'B',at:['seat'],note:'秀琴阿姨：「今天怎麼只有妳？」「她加班。」「喔～～」',
   when:ctx=>ctx.g&&storyIdsOf(ctx.g).includes('sophie')&&!storyIdsOf(ctx.g).includes('mia')&&!fact('xq_oh')&&!!(fact('sm_h')||fact('sm_g'))&&!presentId('mia')&&!R.sched.slice(R.si).some(o=>o.reg==='mia'||(o.regs||[]).includes('mia'))&&xqKnows('sophie')>=1&&!!xqHere(),

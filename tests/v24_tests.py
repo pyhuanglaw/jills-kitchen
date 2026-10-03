@@ -380,13 +380,19 @@ def v24_day52_save_plays_the_stories_in_order_over_forty_days(b, port, target):
     # (Sophie, the evenings 怡君 came for the article — fixed in 57e6f80). Without the extra visits: settles Day 79–82
     # (rc7.3: 80–85), the wall begins 63–66, the article three days after on all seven; five seeds of seven meet every
     # target (five on rc7.3), 7600 among them on both.
+    # rc8.2 release: on 7600 the wall began on Day 63 and settled on Day 82 — 19 days. Seven seeds on rc8.1 (df8a95b), the
+    # candidate (a36c900) and the release (docs/evidence/v24_rc8_2/sims/day52_seeds.txt): on the candidate one seed (7400)
+    # never began the wall — 秀琴's small talk stopped at six for Sophie and Mia together, and Sophie had taken all six; the wall
+    # needs her to know both. The release talks with each (three apiece, the one she knows less first): the wall begins
+    # Day 63–66 and settles by Day 82 on all seven (rc8.1: 79–84), every target on four of seven (rc8.1 four). 7000 meets
+    # every target on rc8.1 and on the release.
     first = None; majors = {}
     for d in range(40):
         if g.ev("phase") == 'summary':
             g.click('[data-act=toShop]'); g.page.wait_for_timeout(60)
         if g.ev("phase") == 'shop':
             g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(100)
-        g.ev(seed % (7600 + d)); g.ev("S.today.sugKey=null;S.today.sug=null;autoStock()")
+        g.ev(seed % (7000 + d)); g.ev("S.today.sugKey=null;S.today.sug=null;autoStock()")
         start_day(g); install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;window.__noScenes=true")
         if first is None:
             first = g.ev("S.day")

@@ -1,0 +1,50 @@
+The forty days from the player's Day 52 save (tests/v24_tests.py v24_day52_save_plays_the_stories_in_order_over_forty_days),
+seven seed bases on three builds. The day each beat happened.
+Targets, as the test checks them (docs/v24/pacing_correction_2026-10-01.txt; first played day = 53): 怡君 moves in
+within about ten days (yj_key - yj_meet <= 9 and yj_key <= 63); the wall begins Day 62-66; it settles within 18 days of
+beginning and by Day 82.
+Tool: tools/sims/day52_seeds.py ROOT SEEDBASE (the test's own loop); rc8.1 through JK_GAME_JS. Run 2026-10-03 17:41-18:20.
+Why: the rc8.2 release gate (96ad643, again on a36c900) failed this test on its seed base 7600: the wall began Day 63 and
+settled Day 82, 19 days.
+
+== df8a95b (rc8.1, published)
+7000: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 80 (16 days), wall_article 83 (+3)  — meets every target
+7100: yj_meet 53, yj_key 63, wall_worry 65, wall_settle 81 (16 days), wall_article 84 (+3)  — misses: the move within ten days
+7200: yj_meet 53, yj_key 61, wall_worry 65, wall_settle 80 (15 days), wall_article 83 (+3)  — meets every target
+7300: yj_meet 53, yj_key 61, wall_worry 66, wall_settle 83 (17 days), wall_article 87 (+4)  — misses: by 82
+7400: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 79 (15 days), wall_article 82 (+3)  — meets every target
+7500: yj_meet 53, yj_key 61, wall_worry 66, wall_settle 84 (18 days), wall_article 88 (+4)  — misses: by 82
+7600: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 82 (18 days), wall_article 85 (+3)  — meets every target
+   every target: 4 of 7
+
+== a36c900 (the rc8.2 candidate)
+7000: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 82 (18 days), wall_article 85 (+3)  — meets every target
+7100: yj_meet 53, yj_key 61, wall_worry 65, wall_settle 83 (18 days), wall_article 87 (+4)  — misses: by 82
+7200: yj_meet 54, yj_key 63, wall_worry 65, wall_settle 80 (15 days), wall_article 83 (+3)  — meets every target
+7300: yj_meet 53, yj_key 63, wall_worry 67, wall_settle 83 (16 days), wall_article 87 (+4)  — misses: the move within ten days, the wall in 62-66, by 82
+7400: yj_meet 53, yj_key 63, wall_worry -, wall_settle -  — misses: the wall never began in forty days
+7500: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 84 (20 days), wall_article 88 (+4)  — misses: settled within 18 days, by 82
+7600: yj_meet 53, yj_key 61, wall_worry 63, wall_settle 82 (19 days), wall_article 85 (+3)  — misses: settled within 18 days
+   every target: 2 of 7
+
+== a36c900 + 秀琴 talks with each of them (the release)
+7000: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 80 (16 days), wall_article 83 (+3)  — meets every target
+7100: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 81 (17 days), wall_article 84 (+3)  — meets every target
+7200: yj_meet 54, yj_key 63, wall_worry 65, wall_settle 81 (16 days), wall_article 84 (+3)  — meets every target
+7300: yj_meet 53, yj_key 63, wall_worry 66, wall_settle 81 (15 days), wall_article 84 (+3)  — misses: the move within ten days
+7400: yj_meet 53, yj_key 63, wall_worry 66, wall_settle 81 (15 days), wall_article 84 (+3)  — misses: the move within ten days
+7500: yj_meet 53, yj_key 61, wall_worry 65, wall_settle 81 (16 days), wall_article 84 (+3)  — meets every target
+7600: yj_meet 53, yj_key 61, wall_worry 63, wall_settle 82 (19 days), wall_article 85 (+3)  — misses: settled within 18 days
+   every target: 4 of 7
+
+Reading:
+- On a36c900, seed 7400 never began the wall. A probe of the wall's conditions each day (wall_probe.py: due, wallRain,
+  smFamiliar, smLongTime and 秀琴's talks with each): from Day 65 everything held but smFamiliar — 秀琴 had talked with Sophie
+  six times and with Mia never. xq_sm_talk stopped at six talks for the two together, and asks Sophie first, so Sophie took
+  all six; smFamiliar needs at least one with each. The same code is in rc8.1: a matter of which trajectory, not this
+  release's change.
+- The fix: three talks each, the one she has talked with less first (xqSmId / xqSmG). On it the wall begins on all seven
+  seeds (63-66) and settles by Day 82 on all seven (80-82; rc8.1 79-84, a36c900 80-84 and one never); the article three
+  days after on all. Every target on four seeds of seven (rc8.1 four).
+- 7600 began on Day 63 and settled on Day 82: 19 days, by Day 82. 7000 meets every target on rc8.1 and on the release:
+  the test's seed base moves to 7000 (as in rc7, rc7.3 and rc7.4).
