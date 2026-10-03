@@ -12,16 +12,19 @@
 
 ## 已發布
 
-- **v2.4 rc8**，2026-10-03，發布到 **https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA**（version 2，id 1791034406-f0f8）。
-  遊戲內容＝ commit 252ff1c；報告 `docs/V24_RC8_REPORT.md`；tag `v2.4-rc8`（只在本機：推 tag 時 GitHub 端斷線，branch 已推）。
+- **v2.4 rc8.1**（緊急更新），2026-10-03，發布到 **https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA**（version 3，id
+  1791037558-a88f）。遊戲內容＝ commit df8a95b（tag `v2.4-rc8.1`，只在本機：推 tag 時 GitHub 端斷線，branch 已推）。
+  內容：教學提示 9 秒後自己收起（「這一段開店很久都不消失！」）、Day 1 揭曉前 Dylan 寫「Jill 先生」不露臉、店主手冊一行一點變短。
+  Gate：db8dd56 上完整回歸 232/233，唯一失敗是手冊少一句玩法規則，df8a95b 補回，讀手冊的測試全部重跑通過；讀回與
+  live_check 通過（`docs/evidence/v24_rc8_1/`）。
+- 前一版 v2.4 rc8（version 2，252ff1c；報告 `docs/V24_RC8_REPORT.md`）。
 - 玩家在 2026-10-03 選擇以後都發布到這個新網址。舊網址 https://claude.ai/artifact/2vhURujrtCpQ1P5jnSsjps 停在 rc7.6（version
   49），不再更新。舊網址的存檔要用遊戲裡的「設定・存檔」備份後搬過來。
 - 新網址的分享設定由玩家在頁面的分享選單決定（目前是「知道連結的人都能看」）。
 
-## 已做、還沒發布（rc8 之後，在 `wip/lin`）
+## 已做、還沒發布
 
-- Day 1 第一張照片：揭曉前 Dylan 的台詞寫「Jill 先生」，不放頭像（acd1d28）。
-- 店主手冊：每一項拆成一行一點，最長的 29 項重寫變短；「酒吧披薩」改成新的廚師規則（d1dbbda）。
+- 目前沒有（rc8.1 之後）。
 
 ## 測試
 
