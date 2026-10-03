@@ -5877,7 +5877,7 @@ function update(dt){R.t+=dt;if(R.v24q&&R.v24q.length)v24Upd();
  for(const g of R.groups)updGroup(g,dt);R.groups=R.groups.filter(g=>!g.gone);
  kitchenUpd(dt);streetUpd(dt);
  for(const s of R.slots){if(s.job)updJob(s,dt);if(s.pop)s.pop.t+=dt;if(s.fx){s.fx.t+=dt;if(s.fx.t>1)s.fx=null}if(s.flash>0)s.flash=Math.max(0,s.flash-dt*1.5);if(s.shake>0)s.shake=Math.max(0,s.shake-dt*8);if(s.flipT>0)s.flipT=Math.max(0,s.flipT-dt)}
- staffUpd(dt);xqHelperUpd(dt);ambientTick(dt);if(R.panel){const sl=R.slots[R.focus];const k=sl&&sl.job&&sl.job.step;const done=!sl||!sl.job||!!chefHandles(sl);if(done||(k&&(k.t==='wait'||k.t==='work')&&!R.holdSlot)){R.panelT=(R.panelT||0)+dt;if(R.panelT>(done?.7:.9)){R.panel=false;R.panelT=0}}else R.panelT=0}jillUpd(dt);
+ staffUpd(dt);xqHelperUpd(dt);ambientTick(dt);if(R.coachAt!=null&&R.t-R.coachAt>COACH_SHOW){R.coachAt=null;hideCoach()}if(R.panel){const sl=R.slots[R.focus];const k=sl&&sl.job&&sl.job.step;const done=!sl||!sl.job||!!chefHandles(sl);if(done||(k&&(k.t==='wait'||k.t==='work')&&!R.holdSlot)){R.panelT=(R.panelT||0)+dt;if(R.panelT>(done?.7:.9)){R.panel=false;R.panelT=0}}else R.panelT=0}jillUpd(dt);
  for(const f of R.floats)f.t+=dt;R.floats=R.floats.filter(f=>f.t<f.life);
  for(const p of R.parts){p.t+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=p.g*dt}R.parts=R.parts.filter(p=>p.t<p.life);
  for(const k in S.stock)if(S.stock[k]<0)S.stock[k]=0;
@@ -5957,7 +5957,10 @@ function banner(title,subt,kind){const b=$('#banner');const d=document.createEle
 function toast(html,kind,o){const box=$('#toasts');const lastT=box.lastElementChild;if(lastT&&lastT.innerHTML===html&&lastT.style.opacity!=='0')return;const d=document.createElement('div');d.className='toast '+(kind||'');d.innerHTML=html;if(o&&(o.g||o.who||o.tg)){d.classList.add('who');d.onclick=()=>{try{if(o.tg&&idFocusTable(o.tg))return;if(o.g)idFocusGroup(o.g,o.k||0);else idFocusWho(o.who)}catch(e){}}}   /* v2.4 rc6 (07:09): a line someone said finds them */box.appendChild(d);while(box.children.length>2)box.firstChild.remove();setTimeout(()=>{d.style.transition='opacity .4s';d.style.opacity='0';setTimeout(()=>d.remove(),400)},kind==='q'?3600:2800)}
 function ach(id){if(S.achievements[id])return;S.achievements[id]=S.day;const a=ACH.find(x=>x.id===id);if(a){setTimeout(()=>banner(a.n,'成就解鎖'),600);sfx.buy()}}
 function coach(k){if(!R||R.coach<0)return;if(k===R.coach){showCoach(COACH[k]);R.coach++;if(R.coach>=COACH.length){R.coach=-1;setTimeout(hideCoach,4500)}}}
-function showCoach(txt){const c=$('#coach');c.hidden=false;c.innerHTML=`<img alt="" src="${portraitURL([JILL_LOOK],'jill',true)}"><div>${txt}</div>`;plinesLift()}
+/* rc8 (the player, 2026-10-03: 「這一段開店很久都不消失！」): a tip shows for 9 seconds of the service and goes; the next step still
+   brings the next tip. Before, a tip stayed until its step was done — 「客人在看菜單……」 covered the room until the first order. */
+const COACH_SHOW=9;
+function showCoach(txt){const c=$('#coach');c.hidden=false;if(R)R.coachAt=R.t;c.innerHTML=`<img alt="" src="${portraitURL([JILL_LOOK],'jill',true)}"><div>${txt}</div>`;plinesLift()}
 function hideCoach(){$('#coach').hidden=true;plinesLift()}
 /* rc7.5: while the coach talks, the lines people say sit above it (they shared the bottom of the screen) */
 function plinesLift(){const c=$('#coach'),p=$('#plines');if(!p)return;if(!c||c.hidden){p.style.bottom='';return}const need=(parseFloat(c.style.bottom)||8)+(c.offsetHeight||0)+8;p.style.bottom=need>72?need+'px':''}
