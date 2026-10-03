@@ -1,0 +1,40 @@
+(Filed verbatim. 2026-10-01 11:01, the player, after supplying the visual references in docs/v23/refs/:
+dog_types_reference_2026-10-01.png, dog_nook_reference_2026-10-01.png, window_cat_furniture_reference_2026-10-01.png,
+kitchen_walkin_twin_espresso_reference_2026-10-01.png. Earlier the same morning: 「廚房擴充和冰箱擴充還有狗屋你先做」「其他沒做的繼續做」.)
+
+參考圖都提供完了，請繼續剛才的實作。
+這些圖片都是 visual reference，不是要直接放進遊戲的 asset。請依目前 Jill’s Kitchen 既有的程式繪圖方式、比例與視覺風格轉譯，不需要逐像素照抄，也不要為了配合參考圖重做既有美術系統。
+請繼續完成我們這一輪尚未完成的項目，包含你剛才已確認／規劃的：
+
+* 廚房擴充：依你用 Day 52 實際模擬找到的瓶頸處理；目前確認是咖啡站擴充，而不是無理由增加閒置設備。
+* 冷藏／庫存升級：包含你規劃的 260 → 400 容量與走入式冷藏庫視覺升級。
+* Side Hall 窗邊貓家具升級線：參考我提供的 concept sheet，保留五隻貓的既有外觀與自主行為原則。這是室內家具，貓永遠不出餐廳。
+* Side Hall 座位／桌子配置與先前指出的一致性問題。
+* 五種狗與門口狗狗等候區：參考提供的狗種與等候區 concept；狗在店外，店內五隻貓仍然只在室內。
+* 這些 late-game upgrades 應該同時解決 Day 52 成熟存檔「錢很多但缺乏值得花錢的地方」的問題，而不只是免費出現的新裝飾。
+
+請延續目前工作，不要從頭重新規劃，也不要重做已經完成並驗證過的 rc2 系統。
+你可以依 dependency 與風險自行決定實作順序；已經能做的直接做，不需要等我逐項批准。
+對新增內容請維持既有原則：
+
+1. 升級必須在遊戲畫面中有可見變化，不只是數值。
+2. 價格與效果要適合 Day 50+ 已有大量現金的成熟存檔，形成真正有意義的 money sinks，但不要為了燒錢而亂定荒謬價格。
+3. 不要為設備購買硬編新的 Story beat 或 Story Photo；一般 Life Album 可以自然記錄實際發生的畫面。
+4. 不要建立第二套 simulation/state；沿用現有架構與 save。
+5. 舊存檔 migration 必須安全，尤其用我的 Day 52 存檔驗證。
+6. 自動測試之外，請實際用成熟存檔模擬數天，確認容量、throughput、購買價格、空間配置與行為真的有 gameplay 意義。
+7. 最後請做視覺 screenshot audit，因為小尺寸 Canvas 元件即使功能正確，也可能在實際畫面重疊、看不清楚或比例奇怪。
+
+如果實作過程發現原先方案在實際 simulation 中沒有意義，像你剛才發現烤箱／冷盤並不是瓶頸那樣，不要為了符合舊文字規格硬做；以實際 gameplay evidence 調整，但請在最後 report 說明「原本想做什麼、你觀察到什麼、因此改成什麼」。
+除非遇到真正需要我做產品決策、提供額外素材，或兩個方案各有明顯取捨，否則不用停下來問我，直接繼續做到這一輪可以交給我正常遊玩的版本。
+完成後請給我：
+
+* 實際完成項目
+* 有意識地沒做／延後的項目與原因
+* gameplay simulation 結果
+* save migration 結果
+* regression / automated test 結果
+* screenshot audit 結果
+* 最後需要我在手機正常遊玩中特別觀察的地方
+
+現在直接繼續實作。

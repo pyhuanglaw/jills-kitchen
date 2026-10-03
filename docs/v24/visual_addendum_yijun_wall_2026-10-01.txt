@@ -1,0 +1,61 @@
+(Filed verbatim. 2026-10-01 13:23, the player: the visual addendum to docs/v24/implementation_pass_2026-10-01.txt for
+怡君, 《三個選項》 and 《那面牆》 — four illustrated story moments, event illustrations (not automatically Life Album
+photos), built as swappable hooks with a fallback until the art is supplied.)
+
+IMPORTANT VISUAL CONTENT ADDENDUM — 怡君 / 《那面牆》
+
+Do not implement the entire 怡君 → 《三個選項》 → 《那面牆》 long-form arc as dialogue / Journal text only.
+
+This is now one of the game's major authored character arcs and requires visual storytelling.
+
+At minimum, plan explicit visual / illustrated moments for these milestones:
+
+1. 怡君 INTRODUCTION
+- Establish 怡君 visually as 阿珠姐's adult daughter.
+- Prefer a natural Jill's Kitchen moment rather than a posed character introduction.
+- This should make her feel like a real recurring person, not a name that exists only in dialogue.
+
+2. 《三個選項》 PAYOFF / MOVED-IN HOME
+- Prefer the completed move / first lived-in-home moment over a generic “looking at listings” image.
+- Strong candidate: 阿珠姐 visiting 怡君's new home and receiving / seeing the spare key.
+- The purpose is to visually establish:
+  「這就是怡君選的家，她真的搬進來了。」
+- This visual history is important because the later leak must affect a place the player already recognizes.
+
+3. 《那面牆》 — THE ACTUAL LEAK
+- This is a REQUIRED major illustrated story moment.
+- Show 怡君's home and the actual affected wall / ceiling area.
+- Mia can be physically examining / looking at the suspicious repair / moisture area.
+- Sophie can be reviewing photographs / records / timeline material.
+- 阿珠姐 may be present.
+- Do not make it a melodramatic disaster scene.
+- The value is that the player finally sees the physical problem everyone has been discussing.
+
+4. MEDIATION / RESOLUTION
+- Give the long arc a visual payoff.
+- This does not need to look like a courtroom.
+- It may depict the mediation context, or a restrained post-mediation moment involving 怡君 and 王先生, depending on what fits the game's visual language best.
+- The purpose is to make the player feel:
+  「這件拖了這麼久的事情真的走到結果了。」
+
+IMPORTANT:
+These are STORY VISUALS / EVENT ILLUSTRATIONS.
+
+Do NOT automatically treat all of them as Life Album Polaroids.
+
+Life Album rules remain:
+- actual lived moment;
+- appropriate for the album;
+- actual characters present;
+- no fake staged scene.
+
+A legal dispute / leaking wall does not need to become a sentimental Album collectible merely because it has an illustration.
+
+Also:
+do NOT block the entire implementation waiting for final art if the image assets are not yet supplied.
+
+Build explicit asset hooks / scene IDs / fallback presentation for these visual beats and report exactly which illustrations are still needed from the user.
+
+Do not silently replace required art with generic portraits.
+
+When final art references are supplied later, they should be swappable into these hooks without rewriting story logic.

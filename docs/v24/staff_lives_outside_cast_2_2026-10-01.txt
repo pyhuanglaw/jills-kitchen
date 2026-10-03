@@ -1,0 +1,101 @@
+(Filed verbatim. 2026-10-01 11:44, the player, with the picture docs/v24/refs/outside_cast_2_reference_2026-10-01.png —
+four columns, left to right in the order of the list below: 小彤的媽媽, 小彤的爸爸, 老林, 國雄; each a large portrait and
+two smaller expressions. Canonical for the Staff Lives round (docs/v24/staff_lives_brief_2026-10-01.txt); where the two
+differ, this later message wins — e.g. 老林's first scene and his milestone now have their own lines.)
+
+這張圖片是 Jill’s Kitchen Staff Lives 系統第二組店外人物的正式角色視覺 reference。
+
+請把圖中的人物視為 canonical recurring characters，而不是隨機生成客人。
+
+四名人物如下：
+
+1. 小彤的媽媽，約50歲
+2. 小彤的爸爸，約53歲
+
+兩人是小彤的父母。
+
+小彤約22歲，這是她人生早期第一段真正穩定的工作生活。
+父母和她關係正常、親近，不要寫成控制型父母、苦情家庭或家庭 drama。
+
+他們第一次來 Jill’s Kitchen 是一個很普通的事件：想看看女兒工作的地方，也順便吃飯。
+
+小彤看到他們：
+
+小彤：「你們怎麼來了！」
+爸爸：「吃飯啊。」
+
+小彤在工作過程中會忍不住偶爾注意父母那桌，但不要把事件寫成大型感人橋段。
+
+這個事件的重要性在於：
+玩家第一次明確看到，小彤離開餐廳以後仍然是某個家庭裡的女兒。
+
+這也是她長期成長線的一部分：
+剛入職時不知道東西在哪、休息時甚至不確定自己該坐哪裡；
+經過很多遊戲日後，她會成為可以直接告訴新員工：
+「下面第二格。」
+的人。
+
+3. 老林，約50歲
+
+阿德師傅認識十幾年以上的釣魚朋友。
+
+老林比阿德健談、自在。
+
+第一次出現時，他只是來等阿德下班：
+
+Jill：「阿德還有一下。」
+老林：「沒事，我等。」
+
+此時如果 Staff Room 尚未存在，他沒有真正適合等待的地方。
+這個事件可以成為 Staff Room unlock 所需的 staff-space evidence 之一。
+
+之後老林可以再次來訪。
+玩家會發現平常安靜的阿德跟老林在一起時，話明顯比較多。
+
+來訪足夠多次之後，員工可以自然開始叫他「林叔」。
+
+最重要的長期 milestone：
+某一天阿德根本沒有排班，老林仍然自己來 Jill’s Kitchen 吃飯。
+
+例如：
+
+Kai：「林叔今天沒點魚？」
+老林：「你們阿德今天又沒上班。」
+
+這代表老林已經不再只是「阿德的朋友 NPC」。
+他已經成為 Jill’s Kitchen 自己認識的人。
+
+4. 國雄，約60歲
+
+秀琴阿姨的丈夫。
+兩人是生活很多年的普通夫妻，不需要婚姻 drama，也不要寫成刻意展示恩愛的模範夫妻。
+
+國雄最初偶爾只是來接秀琴下班。
+
+雨天可能提早到店裡等她。
+如果 Staff Room 尚未建立，他也沒有真正適合等待的地方，這同樣可以形成 staff-space evidence。
+
+Staff Room 建成後，Jill可以第一次自然告訴他：
+「你去裡面等她。」
+
+更後期，國雄甚至可以在沒有要接秀琴的情況下自己來吃飯：
+
+秀琴：「你來幹嘛？」
+國雄：「吃飯。」
+秀琴：「家裡不能吃？」
+國雄：「今天不想煮。」
+
+這就是他的長期關係完成感。
+不要再加感性台詞。
+
+重要實作規則：
+
+- 四人都是 stable recurring characters。
+- 使用這張圖作為正式 visual reference。
+- 小彤父母第一次真正來店以前，其他員工不能假裝已經認識他們。
+- 老林必須經過多次實際來訪，才逐漸從「阿德的朋友」變成「林叔」。
+- 國雄必須先以秀琴丈夫／接她下班的人被介紹，後面才能自然獨立來店。
+- 他們都不是員工。
+- 不要每次出現都觸發 Story。
+- 第一次 introduction 和少數 milestone 是 authored beats；其餘應逐漸轉為 ambient life。
+- 外部人物最後可以與餐廳建立自己的關係，而不是永遠只是某位員工的附屬 NPC。

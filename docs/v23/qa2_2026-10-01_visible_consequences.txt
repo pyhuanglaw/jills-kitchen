@@ -1,0 +1,447 @@
+Jill’s Kitchen v2.3 Follow-up
+VISIBLE CONSEQUENCES + STORY VISIBILITY + MANUAL AUDIT
+
+This is a focused follow-up to the current build.
+
+Do NOT revisit or reimplement previously requested equipment, dog, lighting,
+Side Hall furniture, seating, refrigerator, or other already-discussed items in this task.
+
+Do NOT design or implement a new Restaurant Main Story / Main Quest yet.
+The main progression is still under design.
+
+This task has THREE product goals:
+
+1. Marketing effects must be perceptible in the restaurant.
+2. Existing character side stories must visibly show that they are progressing.
+3. Every future game change must include a mandatory in-game manual audit.
+
+Preserve the existing v2.3 architecture and mature saves.
+
+==================================================
+1. MARKETING — THE PLAYER MUST FEEL THE EFFECT
+==================================================
+
+The Social / Marketing system is now accessible and working.
+
+The problem is no longer discoverability.
+
+The real normal-play problem is:
+
+The player starts an advertisement/campaign, the game says that the campaign
+has started, but during normal service the player cannot FEEL that anything
+has changed.
+
+The campaign may already affect demand and telemetry internally.
+That is not enough.
+
+CORE RULE:
+
+IF A SYSTEM CHANGES THE SIMULATION,
+THE PLAYER MUST BE ABLE TO SEE THE SIMULATION CHANGE.
+
+Do not solve this mainly with larger numbers, dashboards, popups, or
+“+60% demand” labels.
+
+Translate campaign effects into visible restaurant behaviour.
+
+--------------------------------------------------
+A. 店貓宣傳 / Cat campaign
+--------------------------------------------------
+
+If customers genuinely arrived because of this campaign, some of them should
+visibly behave like people who came after seeing the cats.
+
+Possible contextual behaviour/dialogue:
+
+「就是這間吧？我看到那篇貓咪的。」
+「照片裡那隻今天在嗎？」
+「欸，是樾樾嗎？」
+
+They may:
+- look for cats;
+- react when they see one;
+- take a photo;
+- mention cats in a later review;
+- choose behaviour appropriate to someone who came because of the cat post.
+
+Do NOT force cats to appear.
+Do NOT teleport cats.
+Do NOT create cat-management mechanics.
+
+If the advertised cats happen to be sleeping somewhere else, that itself can
+produce natural reactions.
+
+--------------------------------------------------
+B. 料理宣傳 / Dish campaign
+--------------------------------------------------
+
+The promoted dish should become visibly more popular.
+
+The player should notice this from actual tickets/orders.
+
+Campaign-origin customers may say things such as:
+
+「是不是網路上那一道？」
+「我就是看到這個才來的。」
+
+If the dish sells out, campaign-origin guests may react appropriately.
+
+The kitchen should genuinely experience the consequence of promoting a dish.
+
+--------------------------------------------------
+C. 在地宣傳 / Local campaign
+--------------------------------------------------
+
+The player should visibly encounter more first-time/local guests.
+
+Appropriate lines might communicate:
+
+「每天經過，今天第一次進來。」
+「住附近很久了，一直沒來過。」
+
+Do not make every customer announce the campaign.
+Use enough presentation that the effect becomes perceptible without becoming repetitive.
+
+--------------------------------------------------
+D. 側廳宣傳
+--------------------------------------------------
+
+Customers generated/influenced by this campaign should visibly care about the
+Side Hall when appropriate.
+
+Examples:
+- groups specifically wanting the Side Hall;
+- comments about the space;
+- reviews mentioning it;
+- observable increase in relevant group demand.
+
+--------------------------------------------------
+E. 晚餐酒單 / Lounge-wine campaign
+--------------------------------------------------
+
+This should be especially perceptible.
+
+The player should see:
+- more Lounge/wine interest;
+- customers asking about the wine list;
+- more relevant drink orders;
+- bartenders visibly busier;
+- appropriate Lounge occupancy changes;
+- later reviews/social comments reflecting the experience.
+
+Again:
+do not fake guests or violate capacity/simulation rules.
+
+--------------------------------------------------
+F. Campaign result screen
+--------------------------------------------------
+
+Keep the existing telemetry/results.
+
+It is useful to know afterward:
+- first-time guests;
+- campaign-origin groups;
+- promoted dish orders;
+- returning guests;
+- relevant review topics.
+
+But the report should CONFIRM something the player already felt during service,
+not be the first evidence that the campaign did anything.
+
+==================================================
+2. CHARACTER SIDE STORIES MUST SHOW PROGRESS
+==================================================
+
+v2.3 already contains substantial character stories.
+
+The problem is that a player can experience normal service without clearly
+knowing:
+
+“That story just progressed.”
+
+This must change.
+
+IMPORTANT:
+
+We DO want visible story progress.
+
+We DO NOT want RPG-style tasks.
+
+The player should know:
+
+- this is a continuing story;
+- how far they have seen;
+- that more remains;
+- when a meaningful new beat has occurred.
+
+The player should NOT be told how to mechanically force the next event.
+
+CORE RULE:
+
+SHOW HOW FAR THE STORY HAS GONE.
+DO NOT SHOW HOW TO FORCE THE NEXT BEAT.
+
+--------------------------------------------------
+A. Story section
+--------------------------------------------------
+
+Add / develop a clearly accessible 「故事」 section within the Restaurant Journal.
+
+For existing authored character arcs, show meaningful story milestones.
+
+Example presentation:
+
+Sophie & Mia
+「慢慢變得不一樣」
+
+●━━●━━●━━○━━○━━○━━○━━○
+
+3 / 8 個故事片段
+
+DAY XX
+「開始記得彼此」
+
+DAY XX
+「今天坐得近了一點」
+
+DAY XX
+「留了一個位置」
+
+Next:
+？？？
+
+「她們的故事還在繼續。」
+
+This is only a presentation example.
+Use the real existing story events/facts.
+
+Do NOT expose internal facts such as:
+madeSpace
+choseNear
+sharedFood
+waitedFor
+
+Do NOT say:
+“Seat Sophie next to Mia twice.”
+
+Do NOT add:
+- quest objectives;
+- checklists;
+- claim buttons;
+- story XP;
+- affection meters;
+- rewards for clicking completed beats.
+
+--------------------------------------------------
+B. What counts as progress
+--------------------------------------------------
+
+Only MEANINGFUL authored story beats should advance visible progress.
+
+Ambient/repeat dialogue does not count as another progress node.
+
+The existing Story Facts / Relationship Facts remain source of truth.
+
+Do not manufacture historical progress that did not occur.
+
+Do not infer fake pre-v2.3 events.
+
+--------------------------------------------------
+C. Existing arcs
+--------------------------------------------------
+
+Apply this concept to existing genuine authored arcs where appropriate,
+including:
+
+- Sophie × Mia
+- Ken × Monsieur 杜
+- 晴 × 阿拓
+- Sophie × 寶寶
+- Jill × Dylan
+- 王先生 × 王太太
+- other genuinely persistent authored character stories already present
+
+Do not invent filler arcs merely to populate the page.
+
+Ken × Monsieur 杜 must remain explicitly a FRIENDSHIP story, never romance.
+
+Dylan remains Jill’s husband from Day 1.
+The reveal does NOT mean his story is finished.
+
+--------------------------------------------------
+D. Undiscovered future
+--------------------------------------------------
+
+The player may see that future beats exist without being spoiled.
+
+For example:
+
+●━━●━━●━━○━━○━━○
+
+or:
+
+下一段：？？？
+
+This creates anticipation.
+
+The UI may also show some not-yet-discovered story lines as tasteful
+silhouettes / ??? where appropriate.
+
+Do not reveal identities when the mystery itself matters.
+
+--------------------------------------------------
+E. Story update notification
+--------------------------------------------------
+
+When a meaningful story beat genuinely occurs, show a subtle non-blocking
+notification.
+
+Example:
+
+故事更新
+Sophie & Mia
+「留了一個位置」
+3 / 8
+
+It must NOT pause service.
+
+Tapping it should deep-link to the relevant story entry.
+
+This is important because the restaurant can be extremely busy.
+
+The player may miss the live presentation.
+
+THE PLAYER MUST NOT LOSE THE STORY BECAUSE THEY WERE BUSY SERVING CUSTOMERS.
+
+Design principle:
+
+“You may miss the performance, but you must not miss the story.”
+
+Important story dialogue/event information should therefore remain retrievable
+from the story/history presentation after the live moment has passed.
+
+==================================================
+3. DO NOT IMPLEMENT MAIN STORY YET
+==================================================
+
+Do NOT create:
+- Main Quest
+- Restaurant Chapters
+- Restaurant Story progression
+- endgame objective
+- Lounge-as-main-quest structure
+- a main-story progress tree
+
+in this task.
+
+We are still designing what the main story of Jill’s Kitchen should be.
+
+Character SIDE-STORY visibility may be implemented now.
+
+Leave the main-story design untouched until a later explicit specification.
+
+==================================================
+4. MANDATORY IN-GAME MANUAL AUDIT — NOW AND EVERY FUTURE RELEASE
+==================================================
+
+From this release onward, auditing the in-game
+「小小店主手冊」
+is a mandatory part of EVERY update.
+
+This is not optional documentation cleanup.
+
+The manual is part of the game.
+
+After ANY gameplay/UI/system/content/navigation change, explicitly check:
+
+1. Does the manual already describe this feature?
+2. Is that description still accurate?
+3. Did the access path change?
+4. Did unlock conditions change?
+5. Did costs, limits, effects, progression, controls, or behaviour change?
+6. Is a newly added system important enough that a normal player would expect
+   the manual to explain it?
+7. Did any old sentence become misleading because of this update?
+8. Does the manual explain the feature in PLAYER language rather than internal
+   implementation terminology?
+
+If anything changed, update the manual in the SAME release.
+
+Do not leave this for a later documentation pass.
+
+Before declaring a release complete, include in the release report:
+
+MANUAL AUDIT
+- sections checked
+- sections changed
+- new sections added
+- obsolete wording removed
+- “no change required” only when actually verified
+
+Add this manual audit to the permanent release checklist for future versions.
+
+==================================================
+5. IMPORTANT PRODUCT PRINCIPLE
+==================================================
+
+This update exposes a broader problem:
+
+A feature being implemented in code is not the same as a feature existing in
+the player's experience.
+
+We now have multiple examples where underlying systems existed but normal play
+did not make their existence/effect sufficiently perceptible.
+
+Therefore use this rule going forward:
+
+IMPLEMENTED ≠ PERCEIVED.
+
+For player-facing features, validate both:
+
+I — Is the system actually implemented?
+T — Does targeted testing show it functions?
+O — Can a normal player actually notice, understand, and retrieve it?
+
+Do not promote T to O.
+
+For marketing:
+O means the player can feel the restaurant change during a campaign.
+
+For story:
+O means the player can tell that a relationship/story has advanced without
+needing to inspect source code or know the event architecture.
+
+For the manual:
+O means a player can use the manual to understand the CURRENT game rather than
+a previous version.
+
+==================================================
+6. SCOPE CONTROL
+==================================================
+
+Do not use this task as an excuse for a broad rewrite.
+
+Do not redesign previously discussed:
+- kitchen equipment;
+- refrigerator;
+- dogs;
+- dog area;
+- Side Hall furniture;
+- lighting;
+- seating;
+- other unrelated normal-play findings.
+
+Those are handled separately.
+
+Do not design the main story.
+
+Focus this task on:
+
+1. perceptible marketing consequences;
+2. visible/retrievable character side-story progression;
+3. permanent manual-audit discipline.
+
+Preserve saves and existing story/campaign state.
+
+Before implementation, briefly explain how you will map these changes onto
+the EXISTING systems rather than creating parallel ones.

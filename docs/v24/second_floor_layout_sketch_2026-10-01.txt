@@ -1,0 +1,24 @@
+(Filed verbatim. 2026-10-01 12:19, the player: a layout sketch of the second floor, sent right after
+docs/v24/second_floor_and_long_arcs_2026-10-01.txt. Read with it: the big windows along the top; the future Private
+Dining Room along the windows; the future Staff Room on the left; a central shared space for circulation; the stair
+head (the way up) bottom left; a reserved empty area bottom right. A layout, not the visual master reference that
+section 44 asks for.)
+
+【大片窗戶／採光面】
+
+┌──────────────────────────────────────┐
+│                                      │
+│      未來 Private Dining Room 區      │
+│                                      │
+│                                      │
+├───────────────┐                      │
+│               │                      │
+│  未來         │      中央共用空間      │
+│  Staff Room   │      / circulation   │
+│               │                      │
+│               │                      │
+├───────────────┘                      │
+│                                      │
+│   樓梯口／二樓入口        預留空白區    │
+│                                      │
+└──────────────────────────────────────┘

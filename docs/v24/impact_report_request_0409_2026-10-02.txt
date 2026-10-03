@@ -1,0 +1,294 @@
+(Filed verbatim. 2026-10-02 04:09, the player: the impact report request; then 04:09 「關於空間有什麼要問的現在問清楚」 and 04:13 「你如果有問問題問我我還沒回答你之前你也是給我我繼續做下去」.)
+
+在你開始依照我剛才的 Second Floor architecture correction 修改以前，
+請先給我一次非常具體的現況與 impact report。
+
+這不是要你停掉 RC6，也不是重新規劃整個專案。
+我要知道這次修正相較於你原本正在做的版本，實際增加多少工作。
+
+請回答以下內容：
+
+━━━━━━━━━━━━━━━━━━
+1. 你現在實際做到哪裡？
+━━━━━━━━━━━━━━━━━━
+
+請不要只回答「RC6 進行中」。
+
+請具體列出目前：
+
+Staff Room：
+- story 做到哪
+- Phase I / II / III 各做到哪
+- 獨立場景是否已存在
+- furniture / NPC activity 做到哪
+- navigation 做到哪
+- save state 做到哪
+
+Private Dining：
+- story 做到哪
+- Phase I / II / III 各做到哪
+- 獨立場景是否已存在
+- reservation / minimum spend 做到哪
+- NPC/customer usage 做到哪
+- navigation 做到哪
+- save state 做到哪
+
+Second Floor：
+- 目前空間是怎麼實作的
+- Staff Room / Private Dining 現在與 Second Floor 的關係是什麼
+- 目前是不是把兩個 room 直接當成 Second Floor overview 裡的操作區
+- 哪些部分已經完成、哪些還沒開始
+
+Restaurant staff expansion：
+- 是否已開始
+- capacity +2 是否已實作
+- recruitment 是否已接上
+
+Tests / migration / mobile：
+- 已完成哪些
+- 尚未完成哪些
+
+請用：
+DONE
+IN PROGRESS
+NOT STARTED
+區分。
+
+━━━━━━━━━━━━━━━━━━
+2. 我剛才的 architecture correction 會推翻多少現有工作？
+━━━━━━━━━━━━━━━━━━
+
+我要知道：
+
+哪些東西可以 100% 保留？
+
+例如可能包括：
+- story state
+- Phase progression
+- room assets
+- furniture layouts
+- reservation logic
+- minimum spend logic
+- staff ambient behaviors
+- save fields
+- economy
+- tests
+
+哪些東西需要修改？
+
+哪些東西需要重做？
+
+請特別回答：
+
+如果 Staff Room / Private Dining
+改成：
+
+Second Floor overview
+→ 點門
+→ 獨立 full-screen room scene
+
+目前已經完成的 Staff Room / Private Dining 畫面
+能不能直接保留並重新接 navigation？
+
+還是目前它們真的被寫死在 Second Floor canvas 裡，
+需要拆出來？
+
+我希望你先 inspect 現有 code，
+不要憑印象估計。
+
+━━━━━━━━━━━━━━━━━━
+3. 你準備怎麼改 architecture？
+━━━━━━━━━━━━━━━━━━
+
+請用實際 code architecture 解釋，
+不要只講產品概念。
+
+我要知道你預計會怎麼形成：
+
+Second Floor
+→ Staff Room
+→ Second Floor
+
+Second Floor
+→ Private Dining
+→ Second Floor
+
+請說明：
+
+- scene / room state 怎麼表示
+- navigation 怎麼切換
+- Second Floor overview 怎麼保留房間位置／入口
+- Staff Room full scene 怎麼 render
+- Private Dining full scene 怎麼 render
+- NPC / customer entities 在不同 scene 怎麼處理
+- room occupancy 怎麼處理
+- reservation group 進 Private Dining 時怎麼顯示
+- Staff Room staff activity 怎麼顯示
+- save/load 要不要增加或修改欄位
+- Phase I / II / III state 是否能共用原本資料
+- mobile viewport 是否因此更簡單
+
+請優先採用現有 architecture 的最小修改。
+
+不要因為這次修正建立大型 generic scene engine，
+除非現有 code 確實沒有安全方法。
+
+━━━━━━━━━━━━━━━━━━
+4. Second Floor overview 要怎麼改？
+━━━━━━━━━━━━━━━━━━
+
+請說明你會如何讓 Second Floor 仍然是一個完整可看的空間，
+
+同時讓玩家清楚知道：
+
+- Staff Room 在哪
+- Private Dining 在哪
+- remaining future space 在哪
+
+我希望：
+
+從 Second Floor 看得到房間的位置／外牆／門／入口，
+
+但真正的 furniture / NPC activity / detailed gameplay
+是在獨立 room scene 裡。
+
+請告訴我目前 Second Floor layout
+需要改多少才能做到。
+
+━━━━━━━━━━━━━━━━━━
+5. 這次修正「額外」增加多少時間？
+━━━━━━━━━━━━━━━━━━
+
+這一點請分開估。
+
+不要重新告訴我整個 RC6 還要多久而已。
+
+我要兩個數字：
+
+A. 如果沒有我剛才這個 architecture correction，
+按照你原本正在做的版本，
+從「現在這一刻」到 RC6 完成，
+你原本估計還需要多少時間？
+
+B. 加入這次 architecture correction 後，
+從「現在這一刻」到 RC6 完成，
+現在估計需要多少時間？
+
+然後明確告訴我：
+
+C. 這次 architecture correction
+「額外增加」多少時間？
+
+例如：
+
+原本剩餘：X 小時
+修正後剩餘：Y 小時
+本次修改額外增加：Z 小時
+
+不要把已經花掉的時間算進「額外增加」。
+
+━━━━━━━━━━━━━━━━━━
+6. 額外時間花在哪裡？
+━━━━━━━━━━━━━━━━━━
+
+請把新增工時拆開估：
+
+- scene extraction / separation
+- navigation
+- Second Floor overview adjustment
+- Staff Room integration
+- Private Dining integration
+- NPC / customer scene routing
+- reservation occupancy integration
+- save / migration adjustment
+- mobile UI
+- regression tests
+- manual verification / screenshots
+- packaging
+
+如果某項其實不用改，
+直接寫 0 或 negligible。
+
+我想知道真正的成本在哪，
+不是只要一個總數。
+
+━━━━━━━━━━━━━━━━━━
+7. 有沒有現有成果會浪費？
+━━━━━━━━━━━━━━━━━━
+
+請明確回答：
+
+這次修改屬於：
+
+A. 主要是重新接 scene/navigation，既有 room work 大多可保留
+
+B. 有一部分 room implementation 必須重構
+
+C. 大量 RC6 工作必須重做
+
+選最接近的一個，
+並解釋原因。
+
+如果已有 Staff Room / Private Dining 的完整獨立畫面，
+優先 reuse。
+
+不要因為 architecture correction
+把已經正確的 visual / story / gameplay 全部重寫。
+
+━━━━━━━━━━━━━━━━━━
+8. 修改後的最終玩家流程
+━━━━━━━━━━━━━━━━━━
+
+請用非常簡單的 player flow 確認：
+
+二樓
+→ 玩家看到整層樓與各房間位置
+→ 點 Staff Room
+→ 進 Staff Room full-screen scene
+→ 返回二樓
+
+二樓
+→ 點 Private Dining
+→ 進 Private Dining full-screen scene
+→ 返回二樓
+
+Private Dining 有 reservation 時：
+→ Second Floor 能看出該 room 正在使用／已預約
+→ 進去看到完整 reservation group
+
+Staff Room 有員工時：
+→ 進去看到完整 Staff Room activity
+
+未來 remaining space：
+→ 仍然保留在 Second Floor
+→ 未來若發展成新空間，也採「二樓有位置＋進去獨立 full scene」架構
+
+確認你的 implementation 最終就是這個體驗。
+
+━━━━━━━━━━━━━━━━━━
+9. 回報完就繼續做
+━━━━━━━━━━━━━━━━━━
+
+請先給我以上 impact report。
+
+這次我要求 report，
+不是要你在 report 後等我再次批准。
+
+除非你 inspect code 後發現：
+
+- 這個修改會造成不可逆 save loss
+- 或現有 architecture 有重大衝突，必須由我在兩種完全不同的產品結果之間選擇
+
+否則：
+
+回報完之後直接依照新的 architecture correction 繼續完成 RC6。
+
+不要等我回覆「可以開始」。
+
+我主要是要知道：
+你現在做到哪、
+這次修改多增加多少時間、
+你準備怎麼改，
+而不是再建立一個新的 approval checkpoint。
+04:09 關於空間有什麼要問的現在問清楚
+04:13 你如果有問問題問我我還沒回答你之前你也是給我我繼續做下去

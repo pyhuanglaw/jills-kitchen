@@ -1,0 +1,235 @@
+(Filed verbatim. 2026-10-02 06:44, the player: report ≠ stop — report whenever useful, keep working; a question never blocks the rest; stop only when genuinely blocked; RC6 first, then say 「v2.4-rc6 已發布完成。」 and go straight on to P5; silence is not a pause; keeping going never means inventing scope. Also docs/RELEASE_CHECKLIST.md §0.)
+
+另外補充一個非常重要的執行原則：
+
+從現在開始，請把「回報」和「停止工作」完全分開。
+
+你可以隨時向我回報進度、完成項目、測試結果、screenshots、發現的問題、設計判斷或需要我決定的事情。
+
+【但回報之後不要因此停下來等我回覆。】
+
+只要 roadmap 上仍然有已經明確定義、可以安全繼續執行的工作，就直接繼續做。
+
+━━━━━━━━━━━━━━━━━━
+1｜REPORT ≠ STOP
+━━━━━━━━━━━━━━━━━━
+
+例如你可以回報：
+
+- Staff Room polish 完成
+- PDR polish 完成
+- Second Floor floor plan 完成
+- targeted tests 通過
+- regression 進度
+- mobile screenshot QA 結果
+- 發現某個小問題
+- 某個 implementation choice
+
+回報完後：
+
+【直接繼續下一個尚未完成的項目。】
+
+不要把每一次 progress report 當成等待我批准的 checkpoint。
+
+不要因為你已經傳了一份 report，
+就停在那裡等我說「繼續」。
+
+我不希望自己變成 human Continue button。
+
+━━━━━━━━━━━━━━━━━━
+2｜有問題可以問我，但不要讓問題阻塞所有工作
+━━━━━━━━━━━━━━━━━━
+
+如果你遇到真的需要我判斷的問題，可以直接問我。
+
+但如果我沒有立即回答：
+
+請把該問題標記為 pending，
+然後繼續處理其他不依賴這個答案的工作。
+
+例如：
+
+你對某個 visual detail 有疑問
+→ 問我
+→ 暫時不要對該 detail 做不可逆決定
+→ 繼續 tests / QA / 其他已明確項目 / packaging preparation / documentation 等工作。
+
+不要：
+
+問一個問題
+→ 整個專案停止。
+
+【Question ≠ Project Blocker】
+
+━━━━━━━━━━━━━━━━━━
+3｜只有真正 BLOCKING 的情況才停
+━━━━━━━━━━━━━━━━━━
+
+只有以下這類情況才需要停下等待我：
+
+- 兩個已確認 canon 直接互相衝突，無法同時成立
+- 繼續執行會造成不可逆的 save loss / player data loss
+- 必須由我在兩個重大產品方向中做選擇，而且不存在安全的 reversible default
+- 缺少必要 asset / information，導致該項工作客觀上無法完成，且也沒有其他獨立工作可以繼續
+
+除此之外：
+
+請自行做合理、保守、可逆的工程判斷並繼續。
+
+如果不確定：
+
+優先選擇
+- preserve existing behavior
+- preserve save compatibility
+- minimal change
+- reversible implementation
+- existing architecture
+- 不增加 scope
+
+然後繼續工作。
+
+━━━━━━━━━━━━━━━━━━
+4｜目前第一優先：把 RC6 完整做完並發布
+━━━━━━━━━━━━━━━━━━
+
+目前不要因為新的回報、screenshots 或小問題，
+讓 RC6 一直停在「快完成」狀態。
+
+請持續完成目前 RC6 尚未完成的所有項目，包括：
+
+- Second Floor 最終 UX / expansion floor plan
+- Staff Room final visual / recreation polish
+- PDR final visual polish
+- mobile QA
+- targeted fixes
+- save / migration verification
+- 必要 tests
+- final full regression
+- final evidence screenshots
+- I / T / O report
+- RC6 documentation
+- build / package
+- 發布 v2.4-rc6
+- 發布後 read-back / deployment verification
+- 提供最終 zip / artifact
+
+中間可以回報。
+
+【但不要因為回報而停止。】
+
+目標是盡快把一個完整、可玩的 v2.4-rc6 真正交到我手上。
+
+━━━━━━━━━━━━━━━━━━
+5｜RC6 發布完成也不是整個工作停止點
+━━━━━━━━━━━━━━━━━━
+
+RC6 成功發布、read-back verification 完成、artifact / zip 提供後：
+
+先明確告訴我：
+
+「v2.4-rc6 已發布完成。」
+
+然後如果 roadmap 上還有已經明確定義、可以安全執行的剩餘工作：
+
+【直接繼續。】
+
+目前也就是繼續後續既定工作 / P5（rc7）內容。
+
+不要再次停下來只問：
+
+「要不要繼續 P5？」
+
+既然 roadmap 已經存在，就可以開始。
+
+我會在你工作的過程中繼續看成果、玩 RC6、提供 feedback。
+
+如果我之後提出新的方向或修改 P5 scope，
+再依我的最新指示調整。
+
+━━━━━━━━━━━━━━━━━━
+6｜我沒有立即回覆，不代表要停
+━━━━━━━━━━━━━━━━━━
+
+這點請特別注意：
+
+我可能在睡覺、玩 build、讀書、離開裝置，
+或只是暫時沒有看到訊息。
+
+所以：
+
+【我的 silence 不代表 pause instruction。】
+
+如果你問了我一個問題而我沒有回答：
+
+- 記錄 pending question
+- 避免對該問題做高風險不可逆決策
+- 繼續所有不受影響的工作
+- 如果存在安全、可逆、符合既有 canon 的 default，可以採取該 default 繼續
+- 後續再把結果與判斷一起回報
+
+不要因為我 10 分鐘、1 小時或更久沒有回答，
+就讓整個 implementation pipeline 停住。
+
+━━━━━━━━━━━━━━━━━━
+7｜不要為了「持續工作」而亂擴 scope
+━━━━━━━━━━━━━━━━━━
+
+持續工作不代表自己發明更多 feature。
+
+請按照：
+
+已確認 roadmap
+→ 已確認 canon
+→ 已確認 current tasks
+
+往下完成。
+
+不要因為「不能停」就自行加入：
+
+- 新 management systems
+- 新大型 framework
+- 額外房間
+- 未確認 Residence / Dylan Study
+- 額外 Staff Lives
+- 新 minigames
+- 不必要 refactor
+- 不在 roadmap 的 feature
+
+「繼續」的意思是：
+
+【把已經決定要做的事情做完。】
+
+不是：
+
+【永遠自己找新東西做。】
+
+━━━━━━━━━━━━━━━━━━
+8｜最終執行原則
+━━━━━━━━━━━━━━━━━━
+
+請用這個順序理解：
+
+ASK when useful
+→ REPORT whenever useful
+→ CONTINUE whenever safe
+→ STOP only when genuinely blocked
+
+也就是：
+
+可以問。
+可以回報。
+可以提出你自己的判斷。
+可以告訴我你發現更好的方案。
+
+但除非真的 blocking：
+
+【不要等我的「繼續」。】
+
+目前請繼續完成 RC6，
+盡快發布完整 v2.4-rc6。
+
+RC6 發布完成後，
+再繼續 roadmap 上剩餘、已明確定義的工作。
+
+如果我期間有新的 feedback，
+以我最新的明確指示為準。

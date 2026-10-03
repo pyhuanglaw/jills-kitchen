@@ -1,0 +1,77 @@
+[22:57:43] START target=single days=6
+[22:57:44] guide opened from title: cards=7
+[22:57:45] DAY 1 opened. brightness=201.8 crew= tables=2 money=45
+[22:58:34]   49s: a guest is photographing a cat
+[23:01:28]   CLOSING sequence (15 states): 0.2s wrap|False|snow|- → 6.9s toSofa|False|snow|- → 9.6s settle|True|snow|- → 11.3s idle|True|snow|- → 20.6s idle|True|snow,mei|- → 21.1s pet|True|snow,mei|- → 23.1s wantTV|True|snow,mei|- → 26.7s fetch|True|snow,mei|- → 27.2s standing|False|snow,mei|- → 27.7s standing|False|snow,mikan,mei|- → 28.8s pushing|False|snow,mikan,mei|- → 35.6s standing|False|ban,snow,mikan,mei|-
+[23:01:28]   pressed 結束今天・看結算
+[23:01:28] DAY 1 done (223s real). phase=summary sits=0 sitTime=0% gotUpForWork=0 pets=3 looks=1 nods=0 chats=0 guestLooks=16 photos=3 errors=[]
+[23:01:29]   shop: 明日預估基本備料 約 $420 | 建議保留 約 $583
+[23:01:29]   after shopping: money=1487 crew= level=1 toasts=研發成功：番茄義大利麵！已加入菜單 / 新桌子搬進來了！
+[23:01:34]   -> DAY 2 prep. brightness behind prep=195.2
+[23:01:34] day 2 prep -> shop: header="DAY 2 · 開店前" budget="明日預估基本備料 約 $989 | 建議保留 約 $1,237" footer="回到開店準備 ›"
+[23:01:35]    back in prep: phase=prep day=2
+[23:01:35] DAY 2 opened. brightness=201.5 crew= tables=3 money=498
+[23:02:35]   PAUSE menu: 暫停中 |  | DAY 2 · 18:35 · 目前營業額 $620 |  | 繼續營業 | ✓ 本機自動儲存 | 最後儲存：DAY 2 · 18:35 |  | 營業中每 20 秒、暫停時、切到別的 App 時都會存下目前的店內狀況（客人、訂單、爐上的菜、Jill 和員工）。下次開啟可以從這個時間點繼續。 |  | 儲存目前進度 | 備份與移轉 |  | 換手機、換瀏覽器、以防萬一：把進度存成
+[23:02:36]   pressed 儲存目前進度 -> label: DAY 2 · 18:35 checkpoint at 18:35
+[23:02:38]   background/foreground: audio running -> running music setting=True bgm scheduled=True
+[23:02:38]   backup download: JillsKitchen_Save_2026-09-26_2302_Day2.json
+[23:02:38]   resumed: paused=False phase=service
+[23:02:59]   81s: a guest is photographing a cat
+[23:06:15]   CLOSING sequence (19 states): 0.3s standing|False|snow|- → 0.8s wrap|False|snow|- → 4.1s wrap|False|snow,mikan|- → 5.2s toSofa|False|snow,mikan|- → 7.8s sitting|False|snow,mikan|- → 8.3s settle|True|snow,mikan|- → 11.1s read|True|snow,mikan|- → 16.3s read|True|snow,mikan,mei|- → 19.0s pet|True|snow,mikan,mei|- → 21.0s pet|True|ban,snow,mikan,mei|- → 22.6s idle|True|ban,snow,mikan,mei|- → 23.2s pet|True|ban,snow,mikan,mei|-
+[23:06:15] DAY 2 done (279s real). phase=summary sits=0 sitTime=0% gotUpForWork=0 pets=0 looks=1 nods=0 chats=0 guestLooks=22 photos=4 errors=[]
+[23:06:16]   shop: 明日預估基本備料 約 $856 | 建議保留 約 $1,084
+[23:06:16]   R&D try 1: patty+tomato+bun -> 有潛力的試作品 — 像是一道主餐（爐台）的雛形。牛肉排、漢堡麵包是對的，還缺1種配料。研究進度 ●○○
+[23:06:16]   R&D try 2: patty+bun+cheese -> 大成功！ — 牛肉排＋漢堡麵包＋起司片，就是「經典牛肉漢堡」。
+[23:06:17]   after shopping: money=3497 crew= level=1 toasts=咖啡機 升級完成：LV2 / 觀葉植物 裝好了，看看店裡！
+[23:06:22]   -> DAY 3 prep. brightness behind prep=195.1
+[23:06:22] day 3 prep -> shop: header="DAY 3 · 開店前" budget="明日預估基本備料 約 $1,440 | 建議保留 約 $1,756" footer="回到開店準備 ›"
+[23:06:23]    back in prep: phase=prep day=3
+[23:06:23] DAY 3 opened. brightness=201.4 crew= tables=3 money=2057
+[23:06:53]   30s: tapped sleeping 包包 at (257,125) -> {'st': 'bed', 'wake': True, 'flick': True, 'hearts': 1}
+[23:09:20]   176s: a guest is photographing a cat
+[23:10:52]   CLOSING sequence (11 states): 0.1s wrap|False|snow,mei|- → 4.8s toSofa|False|snow,mei|- → 7.2s sitting|False|snow,mei|- → 7.7s settle|True|snow,mei|- → 11.2s read|True|snow,mei|- → 20.6s read|True|tora,snow,mei|- → 24.2s pet|True|tora,snow,mei|- → 26.8s pet|True|tora,ban,snow,mei|- → 27.3s idle|True|tora,ban,snow,mei|- → 28.9s pet|True|tora,ban,snow,mei|- → 31.5s read|True|tora,ban,snow,mei|-
+[23:10:52]   pressed 結束今天・看結算
+[23:10:52] DAY 3 done (268s real). phase=summary sits=0 sitTime=0% gotUpForWork=0 pets=2 looks=1 nods=1 chats=0 guestLooks=26 photos=1 errors=[]
+[23:10:53]   shop: 明日預估基本備料 約 $1,247 | 建議保留 約 $1,534
+[23:10:53]   after shopping: money=7492 crew=waiter1both level=1 toasts=小茉 加入了 Jill's Kitchen！
+[23:10:54]   JOURNAL front: JILL'S KITCHEN JOURNAL | 餐廳日誌 | 關閉 | 總覽 | 評價 | 熟客 | 相簿 | 店貓 | 成就 | 熟練度 | 4.5 | 25 則評價 · 開業 3 天 · 54 位客人 | 最近的評價 | 全部 › |  | 「Jill 主廚的經典牛肉漢堡真的太厲害了。」 |  | Grace · DAY 3 |  | 「Chef Jill 是天才，這句不是誇飾。」 |  | 品酒師 Ken · DAY 3 | 熟
+[23:10:54]   album photos: 最佳座位@1; 今天也在附近@1 17:26; 被拍了@1 18:28; Jill 左右各一隻@1 18:42; 三貓午睡@2; 今天大家都在@2; 睡神@2 17:59; 今晚的沙發@2 21:35; 突然開賽@3 18:02; 沙發客滿@3 21:38; 膝上的重量@3 21:38
+[23:10:54]   notes so far: 
+[23:10:59]   -> DAY 4 prep. brightness behind prep=195.1
+[23:11:00] day 4 prep -> shop: header="DAY 4 · 開店前" budget="明日預估基本備料 約 $1,165 | 建議保留 約 $1,440" footer="回到開店準備 ›"
+[23:11:00]    back in prep: phase=prep day=4
+[23:11:01] DAY 4 opened. brightness=200.5 crew=waiter1 tables=3 money=6327
+[23:11:25]   24s: a guest is photographing a cat
+[23:16:07]   CLOSING sequence (12 states): 0.2s wrap|False|snow|- → 4.3s standing|False|snow|- → 7.5s pushing|False|snow|- → 11.6s standing|False|snow|- → 12.1s sitting|False|snow|- → 12.7s settle|True|snow|- → 15.6s read|True|snow,mei|- → 28.7s read|True|tora,snow,mei|- → 29.2s read|True|tora,snow,mikan,mei|- → 30.8s read|True|tora,ban,snow,mikan,mei|- → 38.1s pet|True|tora,ban,snow,mikan,mei|- → 41.2s tv|True|tora,ban,snow,mikan,mei|-
+[23:16:07] DAY 4 done (306s real). phase=summary sits=0 sitTime=0% gotUpForWork=0 pets=1 looks=7 nods=2 chats=0 guestLooks=30 photos=7 errors=[]
+[23:16:08]   shop: 明日預估基本備料 約 $1,286 | 建議保留 約 $1,579
+[23:16:08]   R&D try 1: tea+milk -> 有潛力的試作品 — 像是一道飲料（咖啡吧）的雛形。紅茶葉是對的，還缺1種飲品配料。研究進度 ●○○
+[23:16:08]   R&D try 2: tea+milk -> 有潛力的試作品 — 像是一道飲料（咖啡吧）的雛形。紅茶葉是對的，還缺1種飲品配料。研究進度 ●●○
+[23:16:08]   R&D try 3: tea+milk -> 研究完成！ — 第三次試作，終於成形了。
+[23:16:09]   after shopping: money=6100 crew=waiter1both level=2 toasts=新料理：錫蘭檸檬紅茶 / 烤箱 購買完成：LV1
+[23:16:14]   -> DAY 5 prep. brightness behind prep=196.3
+[23:16:14] day 5 prep -> shop: header="DAY 5 · 開店前" budget="明日預估基本備料 約 $1,304 | 建議保留 約 $1,600" footer="回到開店準備 ›"
+[23:16:14]    back in prep: phase=prep day=5
+[23:16:15] DAY 5 opened. brightness=201.8 crew=waiter1 tables=3 money=4796
+[23:17:33]   77s: a guest is photographing a cat
+[23:18:30]   135s: tapped sleeping 包包 at (257,125) -> {'st': 'bed', 'wake': False, 'flick': False, 'hearts': 0}
+[23:21:00]   CLOSING sequence (9 states): 0.2s wrap|False||- → 6.0s toSofa|False||- → 8.6s settle|True||- → 11.4s read|True||- → 19.8s read|True|ban|- → 21.9s pet|True|ban|- → 25.1s idle|True|ban,mikan|- → 28.3s pet|True|tora,ban,mikan|- → 32.0s read|True|tora,ban,mikan|-
+[23:21:01]   pressed 結束今天・看結算
+[23:21:01] DAY 5 done (285s real). phase=summary sits=0 sitTime=0% gotUpForWork=0 pets=1 looks=5 nods=2 chats=0 guestLooks=31 photos=3 errors=[]
+[23:21:01]   shop: 明日預估基本備料 約 $1,544 | 建議保留 約 $1,876
+[23:21:02]   after shopping: money=10327 crew=waiter1both,chef1bar level=2 toasts=阿德師傅 加入了 Jill's Kitchen！ / 新椅子 裝好了，看看店裡！
+[23:21:07]   -> DAY 6 prep. brightness behind prep=195.4
+[23:21:07] day 6 prep -> shop: header="DAY 6 · 開店前" budget="明日預估基本備料 約 $1,588 | 建議保留 約 $1,926" footer="回到開店準備 ›"
+[23:21:07]    back in prep: phase=prep day=6
+[23:21:08] DAY 6 opened. brightness=201 crew=waiter1,chef1 tables=3 money=8739
+[23:21:33]   24s: a guest is photographing a cat
+[23:22:16]   68s: tapped sleeping 包包 at (366,114) -> {'st': 'sleep', 'wake': True, 'flick': True, 'hearts': 1}
+[23:26:25]   CLOSING sequence (16 states): 0.0s wrap|False||- → 5.2s standing|False||- → 8.6s pushing|False||- → 12.3s standing|False||- → 12.8s sitting|False||- → 13.3s settle|True||- → 15.1s read|True||- → 20.4s read|True|ban|- → 24.5s read|True|tora,ban|- → 25.6s read|True|tora,ban,mei|- → 26.2s pet|True|tora,ban,mei|- → 29.8s read|True|tora,ban,mei|-
+[23:26:25] DAY 6 done (316s real). phase=summary sits=0 sitTime=0% gotUpForWork=0 pets=2 looks=4 nods=0 chats=0 guestLooks=33 photos=4 errors=[]
+[23:26:25]   shop: 明日預估基本備料 約 $1,532 | 建議保留 約 $1,862
+[23:26:25]   R&D try 1: soda+milk+lemon -> 有潛力的試作品 — 像是一道飲料（咖啡吧）的雛形。檸檬片、氣泡水是對的，還缺1種飲品配料。研究進度 ●○○
+[23:26:26]   R&D try 2: soda+lemon+milk -> 有潛力的試作品 — 像是一道飲料（咖啡吧）的雛形。檸檬片、氣泡水是對的，還缺1種飲品配料。研究進度 ●●○
+[23:26:26]   R&D try 3: soda+lemon+milk -> 研究完成！ — 第三次試作，終於成形了。
+[23:26:26]   after shopping: money=12925 crew=waiter2both,chef2bar level=2 toasts=小茉 升到 LV2！ / 阿德師傅 升到 LV2！
+[23:26:31]   -> DAY 7 prep. brightness behind prep=195.4
+[23:26:33] END album=17 keep=11 notes=0 reviews=58 money=12925 rating=4.64 errors=[]

@@ -1,0 +1,348 @@
+(Filed verbatim. 2026-10-02 04:17, the player, after the impact report: the Second Floor overview's visual correction — closed rooms with real architecture, the floor recomposed, Restaurant → Second Floor → Room navigation; then finish RC6 without new checkpoints.)
+
+我看完你的 impact report 了。
+
+你現在對 architecture 的理解是正確的：
+
+- Staff Room 本來就是獨立 full-screen scene
+- Private Dining 本來就是獨立 full-screen scene
+- Second Floor 是另外一個完整場景
+- 從 Second Floor 進門才切換到 Staff Room / Private Dining
+- 兩個房間現有的 full-screen scene、家具、人物活動、Phase、故事、預約、存檔全部保留
+
+所以不要重做 Staff Room / Private Dining，也不要建立新的 scene engine。
+
+現在真正需要修正的是：
+
+【Second Floor overview 的視覺呈現】
+
+目前 `upRoomsDraw` 裡的 `srMini / pdMini` 把 Staff Room 和 Private Dining 的內部縮小後直接畫在二樓總覽上。
+
+這就是我要拿掉的東西。
+
+目前看起來像兩個縮小的 dollhouse / miniature room 被塞在大木地板上，人物、家具、房間尺度全部混在一起，視覺上很像 prototype，而不是已完成的二樓。
+
+請直接修改，不需要再問我。
+
+━━━━━━━━━━━━━━━━━━
+一、不要只是把 miniature room 用色塊蓋掉
+━━━━━━━━━━━━━━━━━━
+
+這點非常重要。
+
+我不是要：
+
+刪掉 srMini / pdMini
+→ 畫兩個純色矩形
+→ 完成。
+
+我要的是：
+
+二樓總覽本身看起來就是一個真正完成室內規劃的樓層。
+
+Staff Room 和 Private Dining 在 Second Floor overview 上要呈現成：
+
+「實際蓋在這一層樓上的兩個完整房間」
+
+而不是：
+- miniature dollhouse
+- cutaway room
+- 縮小版 interior
+- 空白矩形
+- 純色 placeholder
+- UI card
+
+━━━━━━━━━━━━━━━━━━
+二、Second Floor overview 要畫「房間外部」
+━━━━━━━━━━━━━━━━━━
+
+請把兩間房在二樓總覽裡改成真正的 architectural presence。
+
+至少要有：
+
+- 完整實牆
+- 清楚的牆角
+- 合理牆厚
+- 門框
+- 真正的門
+- 門把／必要細節
+- 適度陰影
+- 與二樓一致的材質
+- 合理的牆面與地板銜接
+- 房間入口
+- 必要而克制的門牌／標示
+
+玩家一看就知道：
+
+「這裡是一間房。」
+
+而不是：
+
+「這裡有一個縮小版遊戲畫面。」
+
+從二樓總覽不需要看到：
+- Staff Room 的沙發
+- 冰箱
+- 員工
+- 私人物品
+- Private Dining 的完整餐桌
+- 客人
+- 菜
+- 縮小 NPC
+
+這些細節全部留在各自 full-screen scene。
+
+━━━━━━━━━━━━━━━━━━
+三、房間狀態只從「外面」透露
+━━━━━━━━━━━━━━━━━━
+
+Second Floor overview 可以知道房間現在有沒有被使用，
+
+但要用環境方式表達，不要重新把裡面畫出來。
+
+例如：
+
+Staff Room：
+- 有人在裡面時，可以有很輕微的門縫光／室內暖光
+- 不需要顯示縮小員工
+
+Private Dining：
+- 預約尚未開始：門口可有低調「已預約」狀態
+- 正在用餐：可有低調「用餐中」狀態
+- 可以透過門縫／霧面或細長玻璃有一點暖光
+- 不需要直接看到整桌客人
+
+狀態提示要融入空間，不要像 debug UI。
+
+真正想知道裡面發生什麼：
+
+玩家點門 → 進 full-screen room。
+
+━━━━━━━━━━━━━━━━━━
+四、重新整理整張 Second Floor 的構圖
+━━━━━━━━━━━━━━━━━━
+
+不要只修改兩個房間本身。
+
+拿掉 miniature room 之後，請重新看整張 Second Floor 的 composition。
+
+現在的問題之一是：
+
+大量空木地板
+＋兩個縮小房間
+＋樓梯
+＋柱子
+
+視覺重心很散，像還沒完成的 prototype floor。
+
+修改後請讓：
+
+- Staff Room
+- Private Dining
+- shared/open area
+- 大窗
+- 柱子
+- 樓梯
+- circulation
+- remaining future space
+
+共同形成一張合理的樓層平面。
+
+二樓仍然要保留「寬敞」，
+但不要變成「空」。
+
+請使用建築本身創造層次，例如：
+
+- 牆體
+- 轉角
+- 門
+- 窗
+- 柱
+- 光影
+- 地板方向／材質連續
+- 少量公共區家具或生活痕跡（若符合既有設定）
+- 貓的活動
+
+不要為了填空間亂加新功能。
+
+━━━━━━━━━━━━━━━━━━
+五、保留 Second Floor 自己的生命
+━━━━━━━━━━━━━━━━━━
+
+Second Floor 不是 navigation menu。
+
+它本身仍然是一個 playable / observable space。
+
+這裡原本就是：
+
+- 第一次上樓看到的完整空間
+- 柔柔先探索的地方
+- 小齁跟上來的地方
+- 貓可以活動的地方
+- 樓梯與房間之間的 circulation
+- shared/open space
+- 未來仍可發展的剩餘空間
+
+所以即使 Staff Room 和 Private Dining 完成，
+
+Second Floor 也不能變成：
+
+「兩扇門 + 空走廊」。
+
+保留足夠的 shared/open area，
+讓它仍然像 Jill’s Kitchen 真正存在的一整層樓。
+
+━━━━━━━━━━━━━━━━━━
+六、剩餘空間不要現在決定用途
+━━━━━━━━━━━━━━━━━━
+
+目前尚未決定用途的 Second Floor remaining space 繼續保留。
+
+不要因為重新排版就：
+
+- 塞第三個功能房
+- 自己決定新用途
+- 加新系統
+- 加商店
+- 加辦公室
+- 加新的 gameplay feature
+
+現在只要讓這塊空間在建築上合理存在。
+
+未來如果它發展成新的正式空間，
+同樣採：
+
+Second Floor 看得到實際位置與入口
+→ 點門
+→ 進入自己的 full-screen scene。
+
+━━━━━━━━━━━━━━━━━━
+七、Staff Room / Private Dining full-screen scene 不要重做
+━━━━━━━━━━━━━━━━━━
+
+你已經確認這兩個 scene 本來就是獨立的，而且沒有寫死在 Second Floor canvas。
+
+所以：
+
+KEEP：
+- `drawStaffRoom`
+- `drawPdrRoom`
+- room state
+- ROOM_PARENT
+- 現有 navigation 基礎
+- Phase I / II / III
+- furniture
+- story state
+- NPC activity
+- cat activity
+- reservation logic
+- minimum spend
+- customer usage
+- save fields
+- pricing
+- restaurant staff +2
+
+不要因為這次 Second Floor visual correction
+去重寫已經正確的系統。
+
+━━━━━━━━━━━━━━━━━━
+八、Navigation 要讓玩家感覺真的「走進房間」
+━━━━━━━━━━━━━━━━━━
+
+玩家在 Second Floor：
+
+點 Staff Room 的門
+→ Staff Room full-screen scene
+
+點 Private Dining 的門
+→ Private Dining full-screen scene
+
+進房之後，
+畫面就是完整房間。
+
+返回時：
+→ 明確回到 Second Floor。
+
+不要讓「二樓」分頁在 Staff Room / Private Dining 裡造成像三個場景輪流切換、分不清自己在哪裡的感覺。
+
+UI / navigation wording 請配合實際空間層級：
+
+Restaurant
+→ Second Floor
+→ Room
+
+而不是把 Second Floor / Staff Room / Private Dining 視覺上當成三個同層級區域。
+
+━━━━━━━━━━━━━━━━━━
+九、視覺品質標準
+━━━━━━━━━━━━━━━━━━
+
+這次不是單純 functional fix。
+
+請把 Second Floor overview 當成正式 release scene 做。
+
+我不接受：
+
+「功能正確，但看起來像 debug / prototype。」
+
+請和目前已經比較成熟的 Main Hall、Lounge、Kitchen、獨立 Staff Room、獨立 Private Dining 的完成度比較。
+
+我要的是：
+
+玩家第一次看到完成後的 Second Floor，
+會覺得：
+
+「這真的是餐廳樓上的另一整層。」
+
+而不是：
+
+「這是一張拿來選房間的地圖。」
+
+尤其 mobile 上請實際截圖檢查：
+- 空間比例
+- 門是否容易辨識／點擊
+- 房間是否有建築存在感
+- open space 是否過空
+- 樓梯是否過度搶畫面
+- 柱子是否造成奇怪切割
+- 房間外牆是否像完整建築
+- 是否仍然有 miniature / dollhouse 感
+- 是否有大片沒有資訊、沒有生活感的木地板
+
+━━━━━━━━━━━━━━━━━━
+十、這次直接做，不需要再問我
+━━━━━━━━━━━━━━━━━━
+
+你的 impact report 已經確認：
+
+- scene extraction = 0
+- 兩個 full-screen room 可 100% 保留
+- 主要修改集中在 Second Floor overview
+- navigation 只需要小幅調整
+- 不需要新增 scene engine
+- 不需要新增 save schema
+
+所以請直接依此修改並繼續 RC6。
+
+不要在修改完 Second Floor 後停下來等我批准。
+
+接著完成你 report 裡原本還在進行中的：
+
+- Staff Room activity 問題
+- Private Dining minimum spend 修正
+- reservation group service priority bug
+- simulation rerun
+- mobile screenshot verification
+- full regression
+- evidence / report
+- packaging / release
+
+直到 RC6 完整完成才停。
+
+除非遇到：
+1. 不可逆 save loss 風險
+2. 必須由我決定的重大產品方向衝突
+
+否則不要再建立新的 approval checkpoint。
+
+你已經有足夠資訊，直接完成。

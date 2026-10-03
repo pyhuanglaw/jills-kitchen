@@ -1,0 +1,72 @@
+(Filed verbatim. 2026-10-01 15:07, the player: a fresh-game premise correction — 秀琴阿姨 exists in Jill's Kitchen's world
+from Day 1, without a free full-strength cleaner; 怡君 is not gated on a late-game day or on Sophie × Mia; two separate
+progressions that meet in 《那面牆》; validate on the Day 52 save and on a fresh save. A P1 prerequisite / pacing
+correction, not new beats, not more rc4 scope.)
+
+我想修正一個 fresh-game 的角色前提：秀琴阿姨應該從 Day 1／開店初期就已經存在於 Jill’s Kitchen 的世界裡。
+
+這裡請特別區分兩件事：
+
+「角色已經存在於餐廳生活中」
+≠
+「玩家已經解鎖／聘用了完整 cleaner gameplay 能力」
+
+我希望 fresh game 從 Day 1 開始，玩家就知道秀琴阿姨是 Jill 認識、固定會來店裡幫忙整理／清潔的人。她不是等到某個中後期 hiring unlock 才突然第一次出現的人。
+
+理由不是要讓 early game 更簡單，而是她現在已經是長期重要角色：
+- 怡君的母親；
+- 國雄的妻子；
+- Staff Lives 的核心人物之一；
+- 長期在餐廳裡接觸客人；
+- 後來會自然認識 Sophie、Mia；
+- 《三個選項》與《那面牆》的重要人物。
+
+所以玩家之後看到怡君、國雄或《那面牆》時，應該有「這是我從開店初期就認識的秀琴阿姨，她原來還有店外的生活」的感覺，而不是「系統最近新增了一個 cleaner，現在又新增她的家人」。
+
+但請保留 early-game progression：
+
+- Day 1 不代表免費取得一名完整強度的 cleaner。
+- 不要因此讓玩家一開始就少掉原本需要自己完成的清潔／收桌 gameplay。
+- 不要大改現有 hiring、staff cap、薪資、效率或 early-game balance。
+- 如果目前 employee system 必須等到某個時間才能正式聘用 cleaner，可以讓秀琴在那之前以「早期固定幫忙／開店熟人／非完整 gameplay staff」的方式存在。
+- 到原本合理的員工解鎖時點，再自然把她轉成正式可配置的 cleaner。
+- 不要建立第二套員工模擬或複雜排班系統，只需要最小、安全的角色存在方式。
+
+重點是：
+
+Day 1 的玩家應該已經「認識秀琴阿姨」，
+但 Day 1 的玩家不應該因此「免費得到一個完整清潔員」。
+
+請優先使用現有 staff / story / ambient 系統完成，不要為此另建大型架構。
+
+另外這會影響 P1 pacing prerequisite：
+
+怡君的首次登場不應綁在 Day 52 或任何 late-game day gate。Day 52→54 是我目前舊存檔的 catch-up 路徑，不是 fresh-game canon。
+
+Fresh game 中，只要秀琴已經自然存在一段時間、玩家已建立她是 Jill’s Kitchen 日常人物的認知，怡君就可以在合理的早期／中早期第一次來店。
+
+怡君也不需要等待 Sophie × Mia 感情線完成才能存在。
+
+Sophie / Mia 與秀琴的熟悉，主要是後續《那面牆》的 prerequisite：
+她們應先透過長期來店與秀琴自然認識，之後漏水事件發生時，她們的介入才合理。
+
+因此請把兩條 progression 分開：
+
+A. 秀琴 → 怡君 →《三個選項》→ 買房／搬家
+B. Sophie / Mia → 長期來店 → 與秀琴自然熟悉
+
+之後 A、B 兩條條件都成熟，才匯流進《那面牆》。
+
+請在目前 pacing work 裡同時驗證：
+
+1. 我的 Day 52 legacy save：
+   新內容自然 catch up，不一次大量補發事件。
+
+2. Fresh save：
+   秀琴從 Day 1／開店初期就是世界中的既有人物；
+   怡君可以在合理較早階段自然出現；
+   不會被 late-game gate 或 Sophie × Mia romance completion 不必要地卡住；
+   同時 early-game restaurant progression 沒有因此被秀琴的免費勞動破壞。
+
+這是目前 P1 prerequisite / pacing correction，不是要求新增更多 story beats。
+不要因此擴大 rc4 scope。

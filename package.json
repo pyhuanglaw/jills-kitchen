@@ -1,0 +1,16 @@
+{
+  "name": "jills-kitchen",
+  "private": true,
+  "description": "Jill's Kitchen — dev tooling only. The game itself needs no install and no build step.",
+  "scripts": {
+    "test": "python3 tests/run_tests.py",
+    "lint": "node tools/lint.mjs",
+    "analyze": "node tools/analyze.js",
+    "build": "python3 tools/build_single.py"
+  },
+  "devDependencies": {
+    "acorn": "^8.14.0",
+    "acorn-walk": "^8.3.4",
+    "eslint": "^10.1.0"
+  }
+}

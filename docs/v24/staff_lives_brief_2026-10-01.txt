@@ -1,0 +1,225 @@
+(Filed verbatim. 2026-10-01 11:18, the player: the canonical design brief for the NEXT expansion — Staff Lives / Staff Room. Not part of the v2.3 late-game round in progress. Attachment b4f3b3fa-attachment.txt.)
+
+Please treat this as the canonical design brief for the next Staff Life / Staff Room expansion.
+Before implementation, audit the existing source for all staff identities, ages if defined, portraits, roles, tenure, dialogue, staff meals, new-hire/veteran events, Story Facts, Journal architecture, event arbitration, room architecture, save schema and existing Lounge expansion logic.
+Existing source canon wins over any accidental contradiction in this brief. If an age/name/detail conflicts, preserve existing canon and adapt the new material. Do not silently replace existing character facts.
+CORE PRODUCT IDEA
+The system is Staff Lives, not merely Staff Room.
+Employees continue to have lives outside Jill’s Kitchen. The player gradually discovers those lives because people, habits, schedules and small consequences occasionally cross the restaurant boundary.
+Staff Room is a major Restaurant Story consequence of this system, not its starting point and not a level-based shop unlock.
+Do NOT create an employee-management simulator.
+No morale, fatigue, affection, needs, employee quests, claim rewards or daily maintenance chores.
+STORY ARCHITECTURE
+Separate:
+1. Canonical facts — true in the world but not necessarily known by player/NPCs.
+2. Introduced facts — actually revealed through a real event.
+3. Authored beats — one-time meaningful events with eligibility and presence checks.
+4. Callbacks — only legal after their prerequisite event really happened.
+5. Ambient consequences — low-frequency evidence that established lives continue.
+Canon knowledge must never automatically become NPC knowledge.
+A character cannot refer to a relative/friend/event that has not actually been introduced in that save.
+Reuse the existing Story Facts/history/event-arbiter architecture rather than building a second relationship engine.
+Presence must be real. Never teleport absent characters into a scene.
+CORE STAFF CAST
+Build the first Staff Lives layer around:
+阿珠姐, Marco, Nina, Hugo, 小彤, 阿德師傅, 秀琴阿姨, Kai.
+晴×阿拓 already have a substantial relationship arc and should remain available as staff-room occupants, but do not let Staff Room become another 晴×阿拓 romance system.
+阿珠姐
+Approx. 54 unless existing canon says otherwise.
+Veteran cook. Adult daughter 怡君, 27, working and living independently.
+Arc:
+1. 《搬家》 — 阿珠姐 asks for a slight schedule adjustment because her daughter is moving.
+2. 《吃飯啊》 — days later 怡君 visits with a friend.
+   阿珠姐：「妳怎麼來了？」
+   怡君：「吃飯啊。」
+   阿珠姐：「附近那麼多間。」
+   怡君：「不能吃妳工作的喔？」
+3. 怡君 later returns alone as ambient consequence.
+4. After Staff Room exists, 怡君 brings a practical object 阿珠姐 previously mentioned the room needed. The object becomes a persistent visual trace.
+5. Much later 怡君 may bring her boyfriend. Do not turn this into approval drama.
+   Nina：「那是怡君男朋友？」
+   阿珠姐：「嗯。」
+   Nina：「妳看過了？」
+   阿珠姐：「看過。」
+   Nina：「怎麼樣？」
+   阿珠姐：「吃飯。」
+Marco
+Approx. 35. Experienced restaurant worker with previous workplaces.
+Old colleague Kevin, approx. 36, still works in restaurants.
+Arc:
+1. 《以前一起做事的人》 — Kevin visits and intentionally orders an inconvenient dish Marco is handling. Marco sees ticket:「……白痴。」
+2. Later visit establishes their old-industry familiarity.
+3. High-tenure milestone 《待滿久了》:
+   Kevin：「你這裡待滿久了。」
+   Marco：「嗯。」
+   Kevin：「不走了？」
+   Marco：「目前沒有。」
+Never add a speech about finally finding a home.
+Nina
+Approx. 26. Fast, observant, remembers people's habits. Not “the gossip girl.”
+Long-time high-school friend 珊珊, same age, quieter/slower temperament.
+Arc:
+1. 《等妳》 — 珊珊 first waits for Nina after work.
+   Jill：「妳朋友？」
+   Nina：「高中同學。」
+   珊珊：「她以前很安靜。」
+   Jill：「誰？」
+   Nina：「妳可以走了。」
+2. Later scene shows Nina is naturally quieter around her oldest friend.
+3. After Staff Room, 珊珊 can sometimes wait inside.
+4. Later coworkers naturally recognize her only after real introductions.
+Hugo
+Approx. 31. Highly reliable while working; comically low-power while resting. He is not stupid.
+Younger brother 宇翔, 22.
+Arc:
+1. 《我弟》 — 宇翔 brings something to Hugo. Coworkers discover Hugo has a younger brother.
+2. Small later scene reveals Hugo naturally handles a practical problem for him; do not verbally explain that Hugo is caring.
+3. After Staff Room:
+   Hugo：「你進去等我。」
+   宇翔：「可以喔？」
+   Hugo：「可以。」
+4. Later ambient references to 宇翔's internship/graduation/life progression.
+小彤
+Approx. 22, living with parents, early stable working life.
+This is a long time-progression arc.
+1. Existing/new-hire uncertainty: asks where things are; unsure whether she may sit during breaks.
+2. 《你們怎麼來了》 — parents visit restaurant.
+   小彤：「你們怎麼來了！」
+   爸爸：「吃飯啊。」
+3. 《想很久了》 — after earning stable wages, she buys an ordinary personal item she had wanted for months. Do not frame as wealth achievement.
+4. Staff Room: initially Jill has to tell her「坐啊。」 Over time she gains a habitual place/cup.
+5. Very late 《第二格》 — a new employee asks where something is. 小彤 answers immediately:「下面第二格。」
+This is the completion of her transformation from new hire to someone who knows the restaurant.
+阿德師傅
+Approx. 47. Quiet, stable routines.
+Long-time fishing friend 老林, approx. 50, more talkative.
+1. 《等一下》 — 老林 comes to wait for 阿德; there is nowhere appropriate to wait. This can contribute Staff Room evidence.
+2. Later player sees 阿德 talks much more naturally with 老林 than at work.
+3. After repeated real visits, staff may naturally begin calling him「林叔」.
+4. 《今天阿德沒上班》 — eventually 老林 visits even when 阿德 is absent and still eats there. He has become part of Jill’s Kitchen’s own social world.
+秀琴阿姨
+Approx. 58, legacy staff who has watched restaurant grow.
+Husband 國雄, approx. 60. Ordinary long marriage; no melodrama.
+1. 《來接妳》 — 國雄 first appears waiting to pick her up.
+2. 《下雨》 — on a rainy day Jill invites him to sit while waiting.
+3. After Staff Room, Jill can tell him to wait inside.
+4. 《今天不想煮》 — much later 國雄 comes alone.
+   秀琴：「你來幹嘛？」
+   國雄：「吃飯。」
+   秀琴：「家裡不能吃？」
+   國雄：「今天不想煮。」
+Kai
+Approx. 29. Regular badminton group outside work. No major trauma/romance/family arc is needed.
+1. 《星期三》 — Kai asks not to be scheduled Wednesday evening because he plays badminton.
+2. 《四個人》 — four badminton friends visit.
+   Kai：「你們小聲一點。」
+   Friend：「服務態度很差欸。」
+3. Later callback about his badminton result.
+The four friends do not need four independent story arcs.
+STAFF ROOM RESTAURANT STORY
+Staff Room cannot simply appear in the upgrade shop.
+Accumulate real staff-space evidence across different event types:
+- Hugo sits on a box after rush because there is nowhere to sit.
+  Jill：「你幹嘛坐那裡？」
+  Hugo：「這裡可以坐。」
+  Jill：「……那是箱子。」
+- a relative/friend has nowhere appropriate to wait
+- staff meal ends with people searching for somewhere to sit
+- personal coats/bags/water bottles/chargers lack a proper place
+Do not unlock based only on Day number or staffCount.
+Eligibility should combine restaurant maturity + active staff + tenure + at least one outside-life visitor actually introduced + at least two different categories of staff-space evidence.
+Then trigger the Restaurant Story beat:
+《大家待的地方》
+Jill observes after closing:
+「店裡有客人的位置。
+有貓的位置。
+有吃完飯還不想走的人待的位置。
+好像一直沒有一個地方，
+是給每天在這裡工作的人待的。」
+This unlocks the paid Staff Room Project.
+STAFF ROOM PROGRESSION
+Design three meaningful paid stages suitable for a mature Day-50+ economy.
+Staff Room I — 有地方坐了
+Basic seating, table, storage, water/basic break space. Unlocks room-life scenes.
+Staff Room II — 開始像他們的地方
+Lockers, small refrigerator, better seating, outlets, tea/coffee area and persistent personal objects.
+Staff Room III — 真的有人生活過
+Better sofa/table, small audio setup, shelf/storage and richer personal traces.
+Do not make it luxurious. It should look accumulated and lived-in, not like a corporate lounge.
+Upgrades should create visible spatial changes, not only numbers.
+ROOM ECOLOGY
+Build low-cost autonomous behaviors rather than scripted scenes every visit:
+- 阿德 develops a preferred seat.
+- Hugo sometimes opens refrigerator, forgets what he wanted, closes it, then returns.
+- Nina remembers where people's things are.
+- Marco often listens without joining.
+- 小彤 gradually develops her own seat/cup.
+- 阿珠姐 first complains there are not enough outlets; later the room visibly proves her right.
+- 秀琴 sometimes brings excess food from home.
+- Kai's badminton bag may occasionally appear when he is working that day.
+These should not generate constant notifications.
+SOCIAL-WORLD CROSSOVER
+Outside characters must eventually stop behaving like isolated quest NPCs.
+Once legitimately introduced, they may gradually recognize other staff.
+Examples:
+- Nina eventually recognizes 怡君.
+- 小彤 may casually speak with 宇翔 because they are close in age.
+- 國雄 and 老林 may once overlap while waiting.
+- 老林 eventually becomes a restaurant visitor independent of 阿德.
+Keep these interactions sparse and natural. Do not turn everyone into best friends.
+JOURNAL
+Meaningful authored beats may appear under existing 人物／關係支線.
+Ambient hints/callbacks should NOT inflate denominator.
+Staff Room itself belongs to 餐廳故事 because it changes the restaurant.
+Preserve current chapter architecture unless audit shows a clean extension point. Do not create a giant new employee quest UI.
+LIFE ALBUM
+Ordinary visits can be captured organically by normal Life Album if the real characters are present.
+Do not generate Story Photos for every relative/friend introduction.
+Reserve one possible future authored photo concept, 《休息一下》, for a much later lived-in Staff Room scene. Do not implement/generate it yet; first see whether actual play makes the moment worthy.
+WRITING RULE
+Emotion should come from behavior, shorthand, routine and changed space.
+Avoid explanatory sentimental dialogue such as:
+- 「這裡真的像家。」
+- 「大家已經不只是同事了。」
+- 「我終於找到屬於自己的地方。」
+- 「謝謝 Jill 給我們一個家。」
+Prefer lines like:
+「插座不夠。」
+later:「我就說吧。」
+or:
+「你進去等我。」
+「可以喔？」
+「可以。」
+Never explain an emotion the player can already infer.
+IMPLEMENTATION / QA
+First audit the existing game against this brief.
+If existing canon conflicts, adapt this design rather than overwrite canon and document the change.
+If there is no substantive product decision requiring me, proceed directly from audit to implementation without stopping for approval.
+Do not consume every arc in one release. Implement enough early/mid beats and infrastructure that mature saves immediately begin revealing the system while preserving later events for long-term play.
+Migration must be safe for mature saves. Existing saves must not receive a flood of retroactive story events on load.
+Test:
+- old-save migration
+- new-save progression
+- event spacing
+- presence requirements
+- prerequisite facts
+- no premature NPC knowledge
+- firing/re-hiring implications
+- relatives/friends when their staff member is absent
+- Staff Room unlock eligibility
+- room upgrade persistence
+- dialogue repetition/cooldowns
+- multi-day Day-50+ simulation
+- screenshot audit at mobile dimensions
+At completion report:
+1. existing canon discovered
+2. conflicts/adaptations
+3. implemented Staff Lives infrastructure
+4. implemented beats by character
+5. Staff Room trigger and progression
+6. intentionally deferred later beats
+7. save migration result
+8. multi-day simulation result
+9. regression tests
+10. screenshot audit
+11. what I should specifically observe during normal iPhone play.

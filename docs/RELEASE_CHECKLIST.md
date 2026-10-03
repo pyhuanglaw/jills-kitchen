@@ -1,0 +1,127 @@
+# Release checklist — every release
+
+Permanent from v2.3 (2026-10-01). A release is not complete until every item has been done and recorded in the
+release report.
+
+## 0. Scope — finish everything the player asked for (2026-10-02, the player)
+
+- Everything the player has asked for gets finished, whether or not a release was published in between. A release is
+  a checkpoint, not a stopping point (`docs/v24/rule_finish_everything_0237_2026-10-02.txt`).
+- After a release, go straight on to the next part of what was asked (the plan's next release). Stop only when nothing
+  that was asked for is left, or for a product decision only the player can make.
+- 「中間不用停」 means: do not stop, and do not stop after a release either.
+- Report ≠ stop (2026-10-02 06:44, `docs/v24/report_is_not_stop_0644_2026-10-02.txt`): report progress, screenshots
+  and questions whenever useful, then carry on with the next defined item. A question never blocks the work that
+  does not depend on it (note it as pending; take the safe, reversible default). Stop only when genuinely blocked: two
+  confirmed canons contradict each other, irreversible save loss, a major product fork with no safe reversible
+  default, or a missing asset with nothing else to do. The player's silence is not a pause. Keeping going never means
+  inventing scope. After a release: say 「v2.4-rcN 已發布完成。」 and go straight on to the roadmap's next part.
+
+## 1. Content in the release
+
+- [ ] Release content audit table: FEATURE / FIX | STATUS | SOURCE BRANCH | IN THIS RELEASE? | WHY / WHY NOT.
+- [ ] Nothing previously requested silently disappears.
+  - READY work on other branches is merged.
+  - NOT READY work is listed with what remains and why.
+- [ ] Briefs and corrections from the player are filed verbatim under `docs/vNN/`.
+
+## 2. The in-game manual (小小店主手冊) — mandatory, after the final merge
+
+The manual is part of the game. Audit it against the **final** feature set, not an earlier one.
+
+For every section, check:
+
+1. Does the manual already describe this feature?
+2. Is that description still accurate?
+3. Did the access path change?
+4. Did unlock conditions change?
+5. Did costs, limits, effects, progression, controls or behaviour change?
+6. Is a newly added system important enough that a normal player would expect the manual to explain it?
+7. Did any old sentence become misleading because of this update?
+8. Does it explain the feature in player language, not implementation terms?
+
+Update the manual in the same release.
+
+Record in the release report:
+
+- **MANUAL AUDIT**: sections checked, sections changed, new sections added, obsolete wording removed.
+- Write "no change required" only when it was actually verified.
+
+Keep `followup_the_manual_describes_the_current_game` in step: new required phrases and stale phrases.
+
+Update the audit stamp on `GUIDE` in `js/game.js` ("last: …").
+
+## 3. Implemented ≠ perceived (I / T / O)
+
+For each player-facing feature, report:
+
+- **I** — implemented: the code is in.
+- **T** — targeted test or simulation shows it works.
+- **O** — a normal player can notice, understand and retrieve it.
+
+Never promote T to O.
+
+- Mark O as observed only after the player confirms it.
+- Phone screenshots are evidence for T, not for O.
+- Never claim an iPhone observation.
+
+## 4. Text
+
+- [ ] Traditional Chinese only, in the game, the docs and the report.
+  - Scan with ICU's Hans-Hant transform (system libicu, no network): `python3 tools/hans_scan.py js/game.js index.html <new docs>`.
+  - Review every hit. Valid Traditional forms such as 沉, 干貝, 宿舍 are expected.
+- [ ] Dialogue follows the written rules:
+  - `docs/v23/qa4_2026-10-01_dylan_dialogue.txt` for Jill × Dylan;
+  - `docs/v23/dialogue_audit_2026-10-01.md` for one-time events vs habits.
+
+## 5. Tests and saves
+
+**Permanent (the player, 2026-10-02 22:20 and 22:22: 「你不可以跳過任何測試，你已經做過一次很危險的事了」「這個不能跳過任何測試的規定應該要永久記憶」):**
+never skip a test. Every publish — a release, a hotfix, a one-line fix — runs the full regression (every test) on the
+exact commit that will be published, and is published only when all of it passes. A failure is fixed and the whole
+suite runs again. Targeted runs are for working, never a substitute for the full run before a publish. (rc7.1 was
+published at 21:12 on targeted checks alone, and its backup box froze the player's iPhone.)
+
+
+How testing runs between releases (the player's 05:42 strategy, `docs/v24/testing_strategy_0542_2026-10-02.txt`):
+- After each change, run what it can affect first: its own tests, the tests of what depends on it, the closest real
+  save, and the screenshots if the player sees it (`python3 tests/run_tests.py -k name1,name2`). Widen to the
+  integration tests when the change is in a shared system (staff pools, the scheduler, the economy, saves).
+- A failure: fix it, rerun that test, then its neighbours, then wider if needed — not the whole suite for every fix.
+- The player's saves are checkpoints (`tests/saves/README.md` says what each is for), never a save × test matrix.
+- The full regression is the release gate (and the gate for big shared-system changes): never skipped because the
+  targeted tests passed.
+- I / T / O stay apart: a passing test or a scripted run on a real save is TESTED, never OBSERVED.
+
+- [ ] Full regression: `python3 tests/run_tests.py`.
+  - It takes about 65 minutes; run it in the background with a log (in a clean worktree of the commit, so the work
+    tree can keep moving).
+  - Re-record goldens (`--record`) only for a change that legitimately moves them, and say which and why.
+- [ ] Mature saves migrate: every fixture in `tests/saves/`, including the player's latest real save.
+- [ ] Story progress and history survive save/reload: no beat fabricated, none lost, nothing announced twice.
+- [ ] Phone screenshots at 390×844 from realistic saves for every player-visible change.
+  - Investigate anything suspicious; do not crop it away.
+
+## 6. Build and publish
+
+- [ ] `python3 tools/build_single.py`.
+  - The test `single_file_in_sync` checks that the single file matches.
+- [ ] `python3 tools/build_artifact.py` writes the page for the live URL.
+- [ ] Tag the release.
+- [ ] Publish to the **same live URL** the player uses: https://claude.ai/artifact/2vhURujrtCpQ1P5jnSsjps.
+  - Saves are kept per URL.
+  - Never leave the new build on a different URL while the player's normal one stays old.
+- [ ] Check the published page (from v2.4 rc5).
+  - Read it back with Artifact's read action, which saves the live HTML.
+  - Run `python3 tools/sims/live_check.py LIVE.html <tag> tests/saves/<the player's latest>.json docs/evidence/<release>_release`.
+  - Pass: the page built from the tag sits inside the live HTML byte for byte.
+  - Pass: one day plays from the player's save, and the page survives a reload with no page errors.
+    - A save made during the evening (the backup writes the day's checkpoint) opens with 「繼續營業 · HH:MM」: the check resumes it, and does the restock on the next day's prep instead (from v2.4 rc6).
+  - Record the published version in the release report.
+- [ ] Package the release as zips, made from the tag (`git archive <tag>`), and send them to the player with the release reply.
+  - `python3 tools/make_release_zips.py <tag> <name> <this release's evidence folder>` does all of the below and runs the source check.
+  - **source**: everything but the large art, the evidence and the saves. Check it: `tools/build_single.py` and `tools/build_artifact.py` run from the unzipped copy must give files identical to the committed single file and to the published page.
+  - **art**: the player's source pictures (`docs/v23` images, `assets/portraits/src`) and the full-size portrait cards (`assets/portraits/*.png`).
+  - **evidence**: this release's screenshots and regression logs.
+  - **saves**: `tests/saves`.
+  - Keep each zip under 25 MB; split a kind into numbered parts when needed. Together the zips hold every file of the tag, except evidence that earlier releases already shipped.

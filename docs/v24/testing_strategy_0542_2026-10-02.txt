@@ -1,0 +1,272 @@
+(Filed verbatim. 2026-10-02 05:42, the player: the testing strategy from now on — real saves are QA checkpoints, risk-based targeted tests for everyday changes, the full regression at release gates; no save × test matrix; I/T/O kept apart. The saves and what each is for: tests/saves/README.md.)
+
+我之後會持續提供一些「真實玩家存檔」給你作為 QA checkpoint。
+
+請調整後續 testing strategy，但注意：
+
+我的目的不是減少測試品質，也不是要求你刪除 regression tests。
+
+目標是：
+
+「用真實存檔縮短抵達特定遊戲狀態的時間，並讓日常修改採用風險導向測試；正式 release 前仍維持完整 regression。」
+
+請遵循以下原則。
+
+━━━━━━━━━━━━━━━━━━
+1. 真實存檔 = QA CHECKPOINT，不是新的 full regression matrix
+━━━━━━━━━━━━━━━━━━
+
+我提供的存檔主要用途是：
+
+- 快速抵達特定遊戲階段
+- 驗證真實玩家狀態
+- 驗證 legacy migration
+- 驗證已累積大量 story flags / staff / upgrades / economy 的成熟世界
+- 重現特定 bug
+- 避免為了測一個 late-game feature，每次都重新模擬幾十個遊戲日
+
+不要因為我提供更多存檔，就把：
+
+每個 save × 全部 tests × 全部 simulation
+
+全部排列組合。
+
+不要讓 regression time 隨存檔數量線性膨脹。
+
+真實存檔是 checkpoints，不是要求建立 exhaustive save matrix。
+
+━━━━━━━━━━━━━━━━━━
+2. 不要刪除既有重要 regression coverage
+━━━━━━━━━━━━━━━━━━
+
+這次調整的是「測試執行策略」，不是降低 coverage。
+
+不要為了縮短時間而：
+
+- 刪除重要既有 tests
+- 關閉 migration tests
+- 移除 save/load tests
+- 移除 economy tests
+- 移除 story scheduler tests
+- 移除 staff tests
+- 移除 reservation tests
+- 移除 Lounge / Restaurant employment pool isolation tests
+- 移除 cat / room / navigation 相關必要 regression
+- 把原本 deterministic test 改成只靠人工目測
+
+正式 RC / release 前仍然需要完整 regression。
+
+━━━━━━━━━━━━━━━━━━
+3. 日常修改採用 RISK-BASED / TARGETED TESTING
+━━━━━━━━━━━━━━━━━━
+
+每次修改後，先判斷這次改動可能影響哪些 systems。
+
+優先跑：
+
+A. 修改功能本身的 targeted tests
+B. 直接 dependency / integration tests
+C. 最相關的真實玩家 save checkpoint
+D. 必要的 screenshot / normal-play QA
+
+例如：
+
+如果只修改 Staff Room furniture / visual：
+
+優先測：
+- Staff Room render
+- Phase I / II / III
+- staff enter / exit
+- room navigation
+- mobile screenshot
+- save/load if state representation changed
+
+不需要因為 sofa 改了，就立刻跑所有 unrelated economy / reservation / long simulation。
+
+如果修改 PDR reservation：
+
+優先測：
+- party-size boundaries
+- reservation formation
+- minimum spend
+- walk-in conflict
+- authored occupancy
+- save/load reservation
+- PDR relevant mature save
+
+如果修改 employmentPool：
+
+這屬於高風險 shared system，
+則需要擴大到：
+- Restaurant recruitment
+- Lounge recruitment
+- capacity
+- duties
+- migration
+- save/load
+- PDR / Staff Room relevant staff usage
+等 integration/regression。
+
+測試範圍應依 dependency / risk 擴張，而不是固定全部跑或固定少跑。
+
+━━━━━━━━━━━━━━━━━━
+4. 使用最接近問題狀態的真實存檔
+━━━━━━━━━━━━━━━━━━
+
+如果我要測 late-game feature，不要無必要地從 Day 1 重跑。
+
+優先選擇最接近該狀態的 checkpoint save。
+
+例如：
+
+- legacy migration 問題 → legacy save
+- Staff Room Phase II → 接近 Staff Room Phase II 的 save
+- PDR reservation → PDR 已開啟的 save
+- mature economy → mature late-game save
+- story progression → 位於該 story 前後的 save
+
+必要時可以複製 checkpoint 並建立 controlled test state。
+
+不要修改我的原始存檔。
+
+━━━━━━━━━━━━━━━━━━
+5. RELEASE GATE 仍然跑 FULL REGRESSION
+━━━━━━━━━━━━━━━━━━
+
+以下時點仍然必須跑完整 regression：
+
+- RC release
+- 正式版本 release
+- 大型 shared-system refactor
+- save schema / migration 大幅修改
+- scheduler 核心修改
+- economy 核心修改
+- employment architecture 修改
+- 其他可能跨系統影響大量既有功能的變更
+
+因此：
+
+日常小修改
+≠ 每次 full regression
+
+但：
+
+正式發布
+= full regression required
+
+不要因為 targeted tests 已通過，就跳過 release gate 的完整 regression。
+
+━━━━━━━━━━━━━━━━━━
+6. FULL REGRESSION 不等於每個存檔全部重跑
+━━━━━━━━━━━━━━━━━━
+
+即使 release 前跑 full regression，也不要把所有真實玩家存檔全部乘上所有測試。
+
+請選少量「代表性存檔」做 compatibility / migration coverage。
+
+例如概念上可以涵蓋：
+
+- fresh / early-game
+- legacy save
+- mid-game
+- mature late-game
+- current-version RC state
+
+實際選哪些請依版本修改內容決定。
+
+其餘存檔保留為 targeted checkpoints。
+
+如果兩個存檔覆蓋的風險狀態高度重複，不需要兩個都跑完整流程。
+
+━━━━━━━━━━━━━━━━━━
+7. FAIL 時採取逐層擴張，而不是立刻重跑全部
+━━━━━━━━━━━━━━━━━━
+
+如果 targeted test fail：
+
+先定位問題
+→ 修正
+→ 重跑 failed test
+→ 跑直接相關 tests
+→ 必要時擴張到 integration suite
+
+不要每修一次小 bug 就立即重新跑 65 分鐘 full regression。
+
+等該修改群組穩定後，再於 release gate 跑完整 regression。
+
+如果 full regression 最後 fail：
+
+定位失敗項目
+→ 修正
+→ targeted verification
+→ affected suite
+→ 最終再確認完整 release regression
+
+避免無意義地重複跑完整 suite。
+
+━━━━━━━━━━━━━━━━━━
+8. 自動測試與真實遊玩仍然分開
+━━━━━━━━━━━━━━━━━━
+
+請繼續嚴格區分：
+
+I = Implemented
+T = Tested
+O = Observed in normal play
+
+Automated test / simulation PASS
+不能寫成 O。
+
+真實存檔被 script 載入並自動跑過
+也不等於正常玩家體驗已被 Observed。
+
+視覺、節奏、可感知性、mobile usability 等仍需 screenshot / normal-play QA。
+
+━━━━━━━━━━━━━━━━━━
+9. 不要為此建立過度複雜的 testing framework
+━━━━━━━━━━━━━━━━━━
+
+不要因為這項要求另外建立：
+
+- 巨型 save matrix
+- exhaustive combinatorial runner
+- universal state generator
+- 大型 testing dashboard
+- 複雜 test orchestration framework
+
+除非現有 architecture 明確需要。
+
+優先利用目前已有：
+- tests
+- simulation
+- save import/load
+- targeted scenarios
+- screenshots
+- regression scripts
+
+目標是讓測試更有效率，不是再做一個測試產品。
+
+━━━━━━━━━━━━━━━━━━
+10. 核心原則
+━━━━━━━━━━━━━━━━━━
+
+不要把這理解成：
+
+「以後少測一點。」
+
+正確理解是：
+
+「小修改先測最可能被影響的地方；
+真實存檔讓你快速抵達需要驗證的狀態；
+高風險修改擴大測試；
+正式 release 前仍跑完整 regression。」
+
+我要的是：
+
+更快的 feedback loop
++
+不降低 release safety。
+
+不是用速度交換可靠性。
+
+我之後提供新的玩家存檔時，請自行判斷它最適合成為哪一類 QA checkpoint，記錄其用途；不要自動把每一份新 save 加入每次 full regression。

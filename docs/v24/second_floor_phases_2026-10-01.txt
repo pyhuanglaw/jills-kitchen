@@ -1,0 +1,68 @@
+(Filed verbatim. 2026-10-01 12:20, the player, a refinement of docs/v24/second_floor_and_long_arcs_2026-10-01.txt and
+second_floor_layout_sketch_2026-10-01.txt: after the lease the floor stays ONE open space (basic works only); the
+Staff Room and later the Private Dining Room each "grow walls" in their own zone when their story happens; the third
+zone is deliberately left undecided — do not invent its use.)
+
+租下來之後，也不要立刻切房間
+這點我會改得比剛才更徹底。
+Second Floor — Phase 0
+房東的空二樓。
+Second Floor — Phase 1
+Jill 租下完整二樓。
+做基本工程：
+
+* 清潔
+* 修整地板／牆
+* Jill’s Kitchen 一致的暖光
+* 安全欄杆
+* 樓梯整理
+* 電力
+* 基礎空調
+* 少量臨時家具
+
+但還是一個大空間。
+玩家真的可以先看到：
+「這整層現在都是我的了，但我還沒拿它幹嘛。」
+這個感覺很爽。
+然後 Staff Room 才真的「長出牆」
+等《大家待的地方》發生。
+其中一區開始施工。
+隔間牆、門出現。
+→ Staff Room I。
+剩下二樓仍然存在。
+所以玩家會直接看到：
+原本空空的一整層，被生活慢慢切出用途。
+這比一開始就給三扇門：
+`Staff Room / Private Room / ???`
+漂亮太多。
+Private Room 也是如此
+後來《關上門以後》。
+另一區施工。
+新的隔間、真正有隔音感的門、餐桌、燈光。
+→ Private Dining Room。
+所以它不是 menu unlock。
+二樓的建築本身真的變了。
+甚至玩家如果很早截過圖，拿 Day 60 跟 Day 120 比：
+Day 60：
+空二樓＋兩隻偷跑進來的貓。
+Day 80：
+整修後的大空間，Staff Room 已經在一側。
+Day 120：
+Staff Room 有生活痕跡，另一側 Private Room 已經營業，中間還保留一點公共 circulation。
+這個視覺成長非常值。
+第三塊我刻意不決定
+我會預留一塊空間，但現在不告訴 Claude 那是什麼。
+不要現在腦補：
+
+* 辦公室
+* 第二廚房
+* 貓房
+* 活動室
+* 酒窖
+
+都不要。
+因為未來正常玩到 Day 100、150，我們可能會真的發現：
+「幹，我現在缺的是＿＿＿。」
+那時候再讓故事把最後一塊空間吃掉。
+這跟我們現在確立的設計哲學完全一致：
+不是先畫功能格子，再想理由；是餐廳先活出需求，空間才得到用途。

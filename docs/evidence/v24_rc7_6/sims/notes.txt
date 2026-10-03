@@ -1,0 +1,34 @@
+rc7.6 — the booked-out Lounge, measured on the player's Day 74 save (headless, the harness's bot; T, not O)
+
+sim_events.py runs the same day (same seed) three ways: no event, the chef's night (a later night, unheld), Ken's
+tasting night (a later night, unheld). Each row of a .jsonl is one day: the night's people and end, the summary
+(revenue, net, guests, turned away at the door, angry, the Lounge's line), the kitchen's backlog over the evening.
+
+How the chef's night got its shape (seed 7621; "none" that day: net 50,904, guests 145, turned away 25):
+- iteration 1 — the whole Lounge, the kitchen cooks the three courses like any order: the oven and the prep station
+  (two slots each) jammed with 69 plates; the last course at closing; net 45,075, turned away 50 (twice a normal day).
+- iteration 2 — the same, the prepared portions cooked 1.8x faster: net 57,231, turned away 39; still to closing, two
+  guests without a course.
+- iteration 3 — course by course, each glass with its plate, the dining room's floor carrying too: the dining room
+  starved (its waiters on long walks to the Lounge): net 16,430, guests 83, turned away 53, angry 22.
+- iteration 4 — the courses plated at the bar from what the kitchen made in the morning (never the evening's stations),
+  carried in the Lounge (its waiter to the tables, the bartenders at the bar): all 69 out by 20:28; net 74,929, turned
+  away 35.
+- final (sim_events_final.*) — plus the schedule kept in time order (a held visit no longer waits behind walk-ins the
+  quiet moment pushed back) and the guests around seven; three seeds:
+
+  seed   none: net / turned away     chef's night: net / turned away / last course     tasting night: net / turned away
+  7621   50,904 / 25                  74,175 / 37 / 20:40                                49,955 / 33
+  7622   77,570 / 9                   79,705 / 22 / 20:31                                62,440 / 19
+  7623   57,026 / 24                  74,798 / 30 / 20:41                                48,601 / 33
+
+  (the last course's clock from its fraction of the day: 17:00 + fraction × 270 min)
+
+The tasting night takes about $16k in the Lounge against $13k on a normal day, but the dining room has no bar to send
+its waiting guests to that night: 8–10 more turned away. Told to the player (08:48); 08:51: 「少賺沒關係」.
+
+probe_kitchen.py — the kitchen's stations and the bar's glasses over the chef's night, item by item.
+probe_cn_timeline.py — the chef's night, table by table: seated, ordered, each course out, paid.
+dbg_sorted.py — when the evening's schedule stopped being in time order (it was the quiet moment, with or without an
+event).
+sim_kt.py — Ken's night, table by table: seated, served, paid.

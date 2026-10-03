@@ -1,0 +1,764 @@
+(Filed verbatim. 2026-10-01 12:38, the player, with two pictures: docs/v24/refs/second_floor_reference_1_2026-10-01.png —
+top row, the floor from above in three states (the missing-cats night with Jill, staff and two cats; the newly taken
+open floor; early open-floor use with a shared table, a lamp, a coat stand and a cat cushion), bottom row two views
+from the stair head and the early movable furniture; and docs/v24/refs/second_floor_reference_2_2026-10-01.png — the
+empty floor from above (windows along the top, two columns, the stair opening with its railing bottom right, the door
+bottom centre) and the view from the stairs. The canonical Phase 0–1 reference that section 44 of
+second_floor_and_long_arcs_2026-10-01.txt asked for. The cats in the pictures are concept art: the game's own cats win.)
+
+SECOND FLOOR VISUAL / SPATIAL REFERENCE UPDATE
+
+I now have the visual reference for the Second Floor.
+
+Please treat the supplied image as the canonical reference for:
+
+SECOND FLOOR — PHASE 0 / PHASE 1
+
+It defines:
+- the overall second-floor architecture
+- staircase position
+- windows
+- columns
+- floor proportions
+- initial vacant state
+- Missing Cats scene
+- newly acquired open-floor state
+- early movable furniture
+- early human/cat use
+
+IMPORTANT:
+
+The image intentionally does NOT show the later Staff Room or Private Dining Room partitions.
+
+Do NOT interpret this to mean the second floor remains permanently open-plan.
+
+The correct architectural progression is:
+
+VACANT OPEN FLOOR
+→
+JILL ACQUIRES WHOLE SECOND FLOOR
+→
+EARLY OPEN-FLOOR USE
+→
+STAFF ROOM STORY
+→
+REAL STAFF ROOM CONSTRUCTION
+→
+PRIVATE DINING STORY
+→
+REAL PRIVATE DINING ROOM CONSTRUCTION
+
+The architecture must physically evolve over time.
+
+
+==================================================
+1. USE THIS IMAGE AS THE BASE FLOOR
+==================================================
+
+Treat the supplied Second Floor image as the canonical base geometry.
+
+Preserve as closely as technically practical:
+
+- staircase / stair opening
+- railing
+- windows
+- structural columns
+- overall floor proportions
+- circulation logic
+- main open-floor character
+
+Do not redesign the second floor into a different building.
+
+The first acquired state should look very close to this reference.
+
+
+==================================================
+2. WHY THERE ARE NO PARTITIONS YET
+==================================================
+
+This is intentional.
+
+When Jill first leases the second floor, she is leasing:
+
+THE FLOOR.
+
+She is not simultaneously building every future room.
+
+At first, Jill only performs basic work:
+
+- cleaning
+- safety
+- electrical
+- lighting
+- floor/wall maintenance
+- climate control
+- staircase safety
+
+Then the whole floor can exist as an open usable area for some time.
+
+The player should have a period where they experience:
+
+「二樓已經是 Jill’s Kitchen 的了，
+但還沒有被決定成什麼。」
+
+This is an important part of the progression.
+
+
+==================================================
+3. EARLY FURNITURE IS TEMPORARY / MOVABLE
+==================================================
+
+The reference shows early furniture such as:
+
+- shared wooden table
+- mismatched chairs
+- utility cabinet
+- coat/bag stand
+- lamp
+- plant
+- small cat cushion/perch/scratching object
+
+Treat these as movable furniture.
+
+They do NOT define permanent room boundaries.
+
+When later construction occurs, they may:
+
+- move
+- be reused
+- migrate into Staff Room where appropriate
+- disappear if replaced by better furniture
+
+Do not build future architecture around their exact temporary positions.
+
+
+==================================================
+4. MISSING CATS EVENT
+==================================================
+
+Use the reference as visual direction for the Missing Cats authored beat.
+
+Canonical event:
+
+Near closing, Jill / present employees notice 柔柔 is missing.
+
+Then they realize 小齁 is also missing.
+
+They immediately search.
+
+They discover the upstairs access is not fully latched.
+
+This occurred that day / recently.
+
+DO NOT imply the door was open for several days.
+
+The cats have only been unaccounted for for a believable short period.
+
+Jill and the ACTUALLY PRESENT closing staff go upstairs.
+
+They find:
+
+柔柔
++
+小齁
+
+safe inside the vacant second floor.
+
+柔柔 should plausibly be comfortable near the window / exploring.
+
+小齁 is nearby.
+
+They have NOT escaped outside.
+
+The scene begins with real concern and ends with relief + mild comedy.
+
+This is also the player's first memorable experience of the scale of the second floor.
+
+Do not immediately unlock the expansion after this event.
+
+
+==================================================
+5. IMPORTANT CAT VISUAL CORRECTION
+==================================================
+
+The supplied image is a CONCEPT reference, not permission to alter cat identities.
+
+Runtime cat visuals must continue to follow canonical cat definitions / existing sprites.
+
+柔柔:
+- fluffy orange / ginger long-haired female
+- fluffy tail
+- not shy
+
+小齁:
+- brown/gray tabby + white female
+- approximately one-third visible white fur
+- white chest/belly/legs/part face
+
+Do not copy incorrect generic-cat appearance from generated concept art if it conflicts with existing canonical assets.
+
+Existing canonical game assets win.
+
+
+==================================================
+6. EARLY OPEN-FLOOR LIFE
+==================================================
+
+After Jill eventually acquires the whole floor:
+
+Do NOT immediately trigger Staff Room.
+
+Allow the second floor to exist in its open state for a meaningful period.
+
+During this period:
+
+- Jill may occasionally use it
+- staff may briefly sit / place something there
+- cats may safely visit
+- the shared table may get used casually
+- movable objects gradually appear
+
+But:
+
+THIS IS NOT THE STAFF ROOM.
+
+Do not silently give the open floor all Staff Room functionality.
+
+
+==================================================
+7. IMPORTANT PRODUCT BEHAVIOR
+==================================================
+
+The open second floor should actually help make the later Staff Room story stronger.
+
+Example:
+
+A staff member briefly sits at the shared table.
+
+Someone leaves a bag there.
+
+Someone charges a phone there.
+
+An outside friend/relative waits there once access is appropriate.
+
+This creates the feeling:
+
+people are already trying to use the new space.
+
+But the space still lacks:
+
+- privacy
+- proper employee storage
+- comfortable permanent seating
+- dedicated break facilities
+- employee fridge
+- lockers
+- appropriate rest environment
+
+So the player can feel:
+
+「二樓有了，但這還不等於員工有休息室。」
+
+That distinction matters.
+
+
+==================================================
+8. STAFF ROOM MUST BECOME A REAL ROOM
+==================================================
+
+When the Staff Room Restaurant Story eventually reaches:
+
+《大家待的地方》
+
+and the player purchases the Staff Room project:
+
+ACTUAL CONSTRUCTION must occur.
+
+Do NOT implement Staff Room as:
+
+- sofa placed in corner
+- Staff Room furniture spawned in open floor
+- invisible zone
+- menu-only room
+- floor mat defining a room
+- open-plan employee corner
+
+It must become an architectural room.
+
+
+==================================================
+9. STAFF ROOM CONSTRUCTION
+==================================================
+
+Use one appropriate side / corner of the canonical second-floor geometry.
+
+Add:
+
+- real partition walls
+- real doorway
+- closable door
+- appropriate interior lighting
+- enough acoustic / visual separation to feel like an employee room
+
+Preserve:
+
+- central circulation
+- stair access
+- windows where appropriate
+- remaining usable second-floor area
+- future Private Dining Room possibility
+
+The Staff Room must NOT consume the entire floor.
+
+The player should visibly see:
+
+BEFORE:
+open floor
+
+AFTER:
+one part of the floor has now become a room.
+
+
+==================================================
+10. STAFF ROOM SHOULD HAVE A DOOR
+==================================================
+
+This is important.
+
+Employees need a place that is genuinely separate from customer/public restaurant space.
+
+The Staff Room should feel:
+
+「進去休息。」
+
+not:
+
+「坐在二樓角落。」
+
+A door also creates useful story staging:
+
+- 宇翔 can wait inside
+- 珊珊 can wait inside
+- 國雄 can be invited inside
+- Jill can enter
+- staff can come and go
+- cats may enter only when appropriate
+
+The doorway itself becomes part of restaurant life.
+
+
+==================================================
+11. STAFF ROOM VISUAL PROGRESSION
+==================================================
+
+Staff Room can still have its own later I / II / III furnishing progression.
+
+But all stages occur INSIDE the constructed Staff Room.
+
+Conceptually:
+
+STAFF ROOM I
+《有地方坐了》
+
+Real room exists.
+Basic:
+- sofa / chairs
+- table
+- storage
+- water
+- basic outlets
+
+STAFF ROOM II
+《開始像他們的地方》
+
+Add:
+- lockers
+- small fridge
+- better seating
+- more outlets / charging
+- tea / coffee
+- varied cups
+- personal traces
+
+STAFF ROOM III
+《真的有人生活過》
+
+Accumulated:
+- improved sofa
+- proper break table
+- small audio
+- fuller storage
+- recurring personal objects
+- gifts / objects from outside-character arcs
+- subtle wear / habits
+
+Do not make later Staff Room physically larger unless actual design requires it.
+
+Growth should primarily be inside the room.
+
+
+==================================================
+12. SOME EARLY FURNITURE MAY MIGRATE
+==================================================
+
+This would be a nice continuity detail.
+
+When Staff Room is constructed:
+
+some early second-floor movable furniture can plausibly move inside.
+
+For example:
+
+- one mismatched chair
+- shared table if size fits
+- coat stand
+- lamp
+- plant
+
+Do not force all of them.
+
+But if practical, preserving one or two recognizable early objects would make the player feel:
+
+「這些東西本來就在二樓。」
+
+Then later upgrades gradually replace / supplement them.
+
+This creates physical history.
+
+
+==================================================
+13. PRIVATE DINING ROOM ALSO REQUIRES REAL CONSTRUCTION
+==================================================
+
+Later, after its OWN customer-side story evidence and:
+
+《關上門以後》
+
+the Private Dining Room project becomes available.
+
+Again:
+
+DO NOT implement it as furniture placed in another corner.
+
+Actual construction:
+
+- partition walls
+- proper doorway
+- closable door
+- appropriate acoustic separation
+- lighting
+- dining-service-compatible interior
+
+It should become a real room.
+
+
+==================================================
+14. PRIVATE DINING ROOM MUST REMAIN DISTINCT
+==================================================
+
+The Staff Room and Private Dining Room solve different problems.
+
+STAFF ROOM:
+people who work here need somewhere of their own.
+
+PRIVATE DINING ROOM:
+some customer groups need one table to have a space of its own.
+
+Do not make them symmetrical “Room Upgrade A / Room Upgrade B.”
+
+Their story triggers, furniture, traffic and use should remain different.
+
+
+==================================================
+15. CENTRAL SECOND-FLOOR SPACE MUST SURVIVE
+==================================================
+
+After Staff Room exists:
+
+there must still be visible open second-floor circulation / shared space.
+
+After Private Dining Room exists:
+
+there must STILL be usable central circulation.
+
+Do not partition the whole floor into a hallway with doors.
+
+The player should continue to recognize the original second floor.
+
+This is important visually.
+
+The architecture should tell its history:
+
+original large open floor
++
+rooms gradually grew inside it.
+
+
+==================================================
+16. KEEP SOME OPEN / FUTURE SPACE
+==================================================
+
+Even after Staff Room and Private Dining Room are eventually built:
+
+do not automatically consume every remaining square meter.
+
+Preserve some flexible / undefined space if geometry allows.
+
+Do not invent its future function yet.
+
+No:
+- office
+- second kitchen
+- cat room
+- event room
+- wine cellar
+
+unless future normal play creates a real need.
+
+
+==================================================
+17. CAT FURNITURE IN THE OPEN SECOND FLOOR
+==================================================
+
+The supplied reference also establishes a small amount of early cat furniture.
+
+Keep this restrained.
+
+Allowed in open/shared area:
+
+- low padded cushion
+- small movable wooden perch/stool
+- simple scratching board
+
+These can remain even after later rooms are built,
+as long as circulation remains clear.
+
+Do NOT build:
+
+- giant cat tree
+- wall climbing network
+- cat hotel
+- cat room
+- five-cat tower
+
+The major dedicated window-cat furniture progression remains elsewhere in the restaurant.
+
+Second-floor cat presence should feel incidental and domestic,
+not like a second cat attraction.
+
+
+==================================================
+18. 柔柔 CALLBACK
+==================================================
+
+After the second floor becomes officially accessible:
+
+allow a very low-frequency ambient callback where 柔柔 returns to / rests near the same safe window area where she was originally found.
+
+No Journal update.
+
+No quest.
+
+No dialogue required.
+
+Do not force it.
+
+If the player happens to notice:
+
+they can remember the Missing Cats event themselves.
+
+This is exactly the kind of environmental continuity we want.
+
+
+==================================================
+19. OTHER CATS
+==================================================
+
+After safe official access:
+
+other cats may occasionally use the second floor according to their personalities.
+
+Do not make the second floor exclusively 柔柔 + 小齁 territory.
+
+Do not line up all five.
+
+Do not teleport cats for scenery.
+
+Use actual autonomous cat state / presence where possible.
+
+
+==================================================
+20. SECOND FLOOR DEVELOPMENT STATES
+==================================================
+
+Please conceptually support something like:
+
+STATE 0
+Landlord-owned vacant floor
+
+STATE 1
+Player has become aware of upstairs
+
+STATE 2
+Jill has inspected upstairs
+
+STATE 3
+Missing Cats event occurred
+
+STATE 4
+Second Floor project becomes available later
+
+STATE 5
+Whole floor acquired / basic renovation
+
+STATE 6
+Open-floor early life
+
+STATE 7
+Staff Room constructed in part of floor
+
+STATE 8
+Staff Room develops over time
+
+STATE 9
+Private Dining Room later constructed in another part
+
+Do not necessarily implement these exact enum names.
+
+Use the existing architecture cleanly.
+
+
+==================================================
+21. DO NOT TIE ROOM CONSTRUCTION TO THE CAT EVENT
+==================================================
+
+Very important:
+
+Missing Cats is memorable discovery / physical-space storytelling.
+
+It is NOT:
+
+cats found upstairs
+→ Staff Room available
+
+and NOT:
+
+cats found upstairs
+→ Second Floor purchase button immediately appears.
+
+Customer pressure,
+staff pressure,
+restaurant maturity,
+economic maturity,
+Jill's knowledge of the floor,
+and later story beats must still converge.
+
+
+==================================================
+22. VISUAL IMPLEMENTATION PRIORITY
+==================================================
+
+Use the supplied image as:
+
+CANONICAL PHASE 0–1 SECOND FLOOR VISUAL REFERENCE.
+
+Do not wait for another image in order to implement:
+
+- base second-floor geometry
+- vacant state
+- Missing Cats scene
+- newly acquired open-floor state
+- early movable furniture
+- early cat furniture
+- story state / save state
+- future partition-compatible architecture
+
+For the exact final visual design of:
+
+- Staff Room interior
+- Private Dining Room interior
+
+separate references may be provided.
+
+Therefore:
+
+build the spatial system so later room visuals can slot into the existing floor
+without redesigning the floor itself.
+
+
+==================================================
+23. SAVE / MIGRATION
+==================================================
+
+Persist:
+
+- second-floor acquisition
+- construction state
+- early furniture state
+- Staff Room existence
+- Staff Room upgrade state
+- Private Dining existence
+- later room upgrade state
+- relevant story facts
+
+Mature saves must experience the authored sequence.
+
+Do not infer Missing Cats occurred from Day number.
+
+Do not infer Staff Room exists from staff count.
+
+Do not retroactively construct rooms.
+
+
+==================================================
+24. QA
+==================================================
+
+Please specifically verify:
+
+1. Vacant second floor matches reference geometry.
+2. Missing Cats scene uses same geometry.
+3. 柔柔 / 小齁 identities remain canonically correct.
+4. Cat missing duration is short and believable.
+5. Only actually present employees participate.
+6. Second Floor does not unlock immediately from cat event.
+7. Newly acquired floor begins open-plan.
+8. Early furniture does not accidentally create Staff Room functionality.
+9. Staff Room later adds REAL walls + door.
+10. Staff Room construction does not block stairs/circulation.
+11. Private Dining Room later adds REAL walls + door.
+12. Private Dining construction does not destroy Staff Room or circulation.
+13. Some recognizable original open-floor geometry remains visible.
+14. Cat furniture does not block movement.
+15. Save/reload preserves architecture correctly.
+16. Mature-save migration does not event-dump.
+17. Mobile / iPhone view remains readable after partitions are added.
+
+
+==================================================
+25. PRODUCT INTENT
+==================================================
+
+The important visual progression is:
+
+At first:
+「樓上什麼都沒有。」
+
+Then:
+「柔柔跟小齁居然跑到這裡。」
+
+Then:
+「這整層現在是 Jill’s Kitchen 的。」
+
+Then:
+「大家開始不知不覺用這裡。」
+
+Then:
+「員工終於有了一個真的可以關上門休息的地方。」
+
+Much later:
+「有些客人也終於有了一個可以關上門，好好吃一頓飯的地方。」
+
+The walls should appear because restaurant life created a reason for them.
+
+Do not start with rooms and invent reasons afterward.

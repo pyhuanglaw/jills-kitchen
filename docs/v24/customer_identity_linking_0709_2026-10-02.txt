@@ -1,0 +1,774 @@
+CUSTOMER IDENTITY & SPATIAL LINKING PASS
+讓「名字、訂單、對話、桌位、場景人物」真正連成同一個人
+
+這是一個我想改很久的 usability / immersion 問題。
+
+目前 Jill’s Kitchen 裡：
+
+- 訂單卡有 customer / party name
+- 訂單卡有 T1 / T7 / T35 等 table number
+- 對話會顯示 speaker name
+- restaurant scene 裡也真的有 customers 坐在桌邊
+- named regulars / story characters 也會實際來餐廳
+
+但作為玩家，我幾乎完全無法把這些資訊對起來。
+
+例如：
+
+我看到：
+
+T35｜陳家
+
+但我不知道 T35 在畫面上到底是哪一桌。
+
+我看到某個角色說話，
+但我不知道畫面裡到底是哪一個人在說話。
+
+我看到一桌 8 個 customers，
+但我不知道：
+
+- 他們是誰
+- 哪一個是 order card 上的名字
+- 哪一個剛剛講過話
+- 有沒有 named regular 坐在裡面
+
+結果目前：
+
+ORDER SYSTEM
+DIALOGUE SYSTEM
+CUSTOMER SPRITES
+TABLE SYSTEM
+CHARACTER SYSTEM
+
+雖然資料可能彼此有關，
+但玩家感知上是完全分離的。
+
+這會讓 customers 看起來像：
+
+「來、吃、走的 anonymous sprites」
+
+而不是 Jill’s Kitchen 裡真正存在的人。
+
+目前我在場景裡幾乎只穩定認得：
+
+Jill
+Dylan
+
+這需要改善。
+
+━━━━━━━━━━━━━━━━━━
+CORE DESIGN PRINCIPLE
+━━━━━━━━━━━━━━━━━━
+
+請建立：
+
+【NAME ↔ PERSON ↔ TABLE ↔ ORDER ↔ DIALOGUE】
+
+之間的雙向 spatial linking。
+
+最重要的 UX 原則：
+
+【只要玩家在任何 UI 看見一個人的名字，
+就應該能很容易找到這個人現在在哪裡。】
+
+反過來：
+
+【只要玩家在 restaurant scene 看見一個 customer，
+也應該能很容易知道這個人是誰。】
+
+不要要求玩家自己記：
+
+T35 在哪裡。
+
+不要要求玩家自己比對：
+
+order name 和 sprite。
+
+不要讓 dialogue speaker 只是浮在 UI 裡的一個名字。
+
+━━━━━━━━━━━━━━━━━━
+1｜ORDER CARD → TABLE
+━━━━━━━━━━━━━━━━━━
+
+目前 order card 已經有：
+
+T1
+T7
+T35
+etc.
+
+請讓 order card / table number 可以點擊。
+
+例如玩家 tap：
+
+T35
+
+或 tap 整張 order card 的適當區域，
+
+系統應該：
+
+1. 自動切換到該桌所在的 room
+2. camera / viewport focus 到該 table
+3. 該 table 短暫 highlight
+4. 必要時該桌 customers 也有非常短暫、低干擾的 focus cue
+
+例如：
+
+- subtle glow
+- outline
+- pulse
+- table-number badge
+- brief name label
+
+持續約 1–2 秒即可。
+
+不要做成長期 flashing UI。
+
+玩家應該立刻理解：
+
+「喔，T35 就是這桌。」
+
+如果 T35 在：
+
+Main Hall
+Side Hall
+Lounge
+Private Dining
+
+都應該能正確切換。
+
+━━━━━━━━━━━━━━━━━━
+2｜TABLE → ORDER / PARTY IDENTITY
+━━━━━━━━━━━━━━━━━━
+
+反方向也要成立。
+
+玩家直接 tap restaurant scene 裡的一張 occupied table 時，
+
+應該能看到一個非常輕量的 identity popover。
+
+例如：
+
+T35
+陳家
+8 人
+
+如果有 relevant named customer：
+
+T7
+王先生、王太太
+2 人
+
+如果是 generic party，
+顯示目前 existing order / party name 即可。
+
+不要做大型 customer-management panel。
+
+只需要讓玩家知道：
+
+【這桌就是誰。】
+
+如果現有 order card 還存在，
+可以提供非常自然的 visual link / focus，
+但不要跳出複雜 menu。
+
+━━━━━━━━━━━━━━━━━━
+3｜PERSON → IDENTITY
+━━━━━━━━━━━━━━━━━━
+
+玩家應該可以直接 tap customer sprite。
+
+tap 後至少顯示：
+
+【名字】
+
+如果有 table：
+
+【T7】
+
+如果是 named regular / story character，
+可以使用 canonical name。
+
+例如：
+
+王先生
+T7
+
+Sophie
+T12
+
+Mia
+T12
+
+Dylan
+T3
+
+generic customer 也應該使用目前系統已經存在的 customer name，
+不要全部叫：
+
+客人
+
+如果 party system 目前只有 party-level name，
+請 inspect data model。
+
+不要為了這個功能硬生成大量永久人物資料。
+
+可以依現有資料能力選擇：
+
+陳先生
+T35｜陳家
+
+或其他合理呈現。
+
+核心不是建立完整人口資料庫。
+
+核心是：
+
+【我點這個人，我知道他是誰、坐哪桌。】
+
+━━━━━━━━━━━━━━━━━━
+4｜DIALOGUE → SPEAKER
+━━━━━━━━━━━━━━━━━━
+
+這是非常重要的一部分。
+
+目前 dialogue 出現：
+
+「王先生：……」
+
+玩家讀得到名字，
+但未必知道王先生現在坐在哪裡。
+
+請讓 dialogue speaker identity 可以被 spatially located。
+
+最直覺方案：
+
+tap speaker name / portrait / dialogue header
+
+→ 自動切換到 speaker 所在 room
+→ focus speaker
+→ speaker 短暫 highlight
+→ speaker name 短暫出現在人物附近
+
+例如：
+
+[王先生]
+
+1–2 秒後自然 fade。
+
+如果 dialogue 發生時 speaker 已經在目前 viewport，
+也可以直接 focus / highlight，
+不需要 unnecessary room transition。
+
+━━━━━━━━━━━━━━━━━━
+5｜DIALOGUE 發生時最好直接建立視覺關聯
+━━━━━━━━━━━━━━━━━━
+
+不要完全依賴玩家主動點。
+
+如果某個 customer 在場景裡說話，
+
+dialogue 開始時可以考慮：
+
+- very subtle speaker highlight
+- tiny temporary name tag
+- short focus cue
+- portrait ↔ sprite visual association
+
+不要讓整個場景停住或大幅 zoom。
+
+只是讓玩家眼睛自然知道：
+
+【現在是這個人在講話。】
+
+尤其 named regular / story character，
+這非常重要。
+
+玩家經過幾次之後，
+應該自然開始認得：
+
+「喔，這個就是 Sophie。」
+
+而不是永遠只認 dialogue portrait。
+
+━━━━━━━━━━━━━━━━━━
+6｜NAMED CHARACTERS 要比 GENERIC CUSTOMERS 更容易辨認
+━━━━━━━━━━━━━━━━━━
+
+對：
+
+- regulars
+- story characters
+- recurring guests
+- special guests
+
+請優先確保：
+
+canonical identity
+↔ scene sprite
+↔ dialogue portrait
+↔ table
+↔ order
+
+是一致而且可追蹤的。
+
+如果某個 named character：
+
+portrait 長這樣，
+
+但 scene sprite 完全沒有任何可辨識特徵，
+
+請 inspect 是否能以現有 rendering architecture，
+加入少量 identity cues：
+
+- hair
+- glasses
+- clothing silhouette
+- signature color / garment
+- accessory
+- age cue
+- hairstyle
+
+不要要求 scene sprite 完全複製 portrait。
+
+只需要讓 recurring characters 有：
+
+【recognition anchor】
+
+例如玩家看過 5 次王先生之後，
+應該有機會不點名字就猜得到：
+
+「那個應該是王先生。」
+
+這對角色 attachment 非常重要。
+
+━━━━━━━━━━━━━━━━━━
+7｜不要永久顯示所有人的姓名
+━━━━━━━━━━━━━━━━━━
+
+我不要畫面變成：
+
+王先生
+陳先生
+Emma
+Sophie
+Mia
+Kevin
+T35
+T21
+T7
+
+全部永遠浮在每個人的頭上。
+
+這會破壞目前餐廳畫面。
+
+Identity UI 應該：
+
+ON DEMAND
++
+TEMPORARY
++
+CONTEXTUAL
+
+例如：
+
+tap person → name appears
+tap table → party identity appears
+tap order → table highlight
+tap dialogue speaker → person highlight
+
+平常 restaurant scene 保持乾淨。
+
+━━━━━━━━━━━━━━━━━━
+8｜TABLE NUMBER 本身也要可以被找到
+━━━━━━━━━━━━━━━━━━
+
+現在 order card 顯示 T35，
+但玩家不知道 T35 在場景哪裡。
+
+除了 tap-to-focus 以外，
+
+可以考慮 occupied table 被點擊／focus 時，
+短暫顯示：
+
+T35
+
+不需要每張桌子永久放巨大桌號。
+
+如果現有 restaurant layout 已經有 table IDs，
+直接利用 existing IDs。
+
+不要建立另一套 table numbering system。
+
+━━━━━━━━━━━━━━━━━━
+9｜PRIVATE DINING ROOM 特別重要
+━━━━━━━━━━━━━━━━━━
+
+PDR 會有：
+
+4–10 人 party
+
+因此更容易出現：
+
+「我知道這桌叫陳家，但不知道哪個人是誰。」
+
+如果是 generic family / party，
+不需要替 10 個人全部建立深度 identity。
+
+但至少：
+
+TABLE / PARTY identity 要清楚。
+
+如果其中存在：
+
+named character
+story character
+regular
+staff family member
+
+那個人必須可以被單獨辨認。
+
+例如未來：
+
+小彤爸媽訂包廂
+
+玩家應該可以知道：
+
+「喔，這個就是小彤，她爸媽坐這裡。」
+
+而不是只看到 8 個彩色 NPC。
+
+━━━━━━━━━━━━━━━━━━
+10｜ROOM NAVIGATION 必須一起工作
+━━━━━━━━━━━━━━━━━━
+
+因為現在 Jill’s Kitchen 已經有：
+
+Main Hall
+Side Hall
+Second Floor
+Staff Room
+Private Dining
+Lounge
+Kitchen
+
+所以 identity linking 不能只在目前 room 生效。
+
+例如：
+
+玩家目前在 Main Hall。
+
+tap order：
+T35｜陳家
+
+而 T35 在 Private Dining。
+
+應該直接：
+
+Main Hall
+→ Private Dining
+→ focus T35
+
+同樣：
+
+tap dialogue speaker Sophie
+
+而 Sophie 在 Side Hall，
+
+應該：
+
+→ Side Hall
+→ focus Sophie
+
+這樣整間餐廳第一次會真正成為：
+
+【同一個空間】
+
+而不是很多互不相干的 tabs。
+
+━━━━━━━━━━━━━━━━━━
+11｜如果角色暫時不在座位
+━━━━━━━━━━━━━━━━━━
+
+請處理合理 edge cases。
+
+例如 character：
+
+- walking
+- interacting with cat
+- temporarily standing
+- moving between positions
+- leaving
+- story staging
+
+如果玩家從 dialogue / identity link 找他，
+
+focus 應該跟到：
+
+【actual current character position】
+
+而不是永遠只跳回 assigned table。
+
+ORDER → TABLE
+可以找 table。
+
+PERSON / DIALOGUE → PERSON
+應該優先找 actual person。
+
+━━━━━━━━━━━━━━━━━━
+12｜如果角色已經離開
+━━━━━━━━━━━━━━━━━━
+
+不要 focus 一個不存在的 sprite。
+
+如果 customer 已經離場，
+可以簡單不提供 spatial focus，
+或顯示符合現有 UI language 的：
+
+「已離店」
+
+不要建立 complicated customer history tracker。
+
+━━━━━━━━━━━━━━━━━━
+13｜不要增加管理負擔
+━━━━━━━━━━━━━━━━━━
+
+這不是新 management system。
+
+玩家不需要：
+
+- 記名字
+- 管 customer profiles
+- 分配座位
+- 建 contact list
+- 管 relationship
+- 點名
+- 手動追蹤 customer
+
+這純粹是：
+
+【information ↔ physical world linking】
+
+讓已經存在的資料，
+終於在玩家腦中變成同一個世界。
+
+━━━━━━━━━━━━━━━━━━
+14｜優先重用現有資料
+━━━━━━━━━━━━━━━━━━
+
+請先 inspect：
+
+- order customer ID
+- party ID
+- table ID
+- seated customer entities
+- named character IDs
+- dialogue speaker IDs
+- room IDs
+- sprite/entity mapping
+- current camera / room switching
+- table focus / highlight capability
+
+優先建立可靠 mapping：
+
+characterId
+partyId
+tableId
+roomId
+orderId
+speakerId
+
+不要依 displayName 做 fragile matching。
+
+不要用：
+
+"王先生" === text
+
+這種方式猜角色。
+
+如果現有 stable IDs 已經存在，
+請直接使用。
+
+━━━━━━━━━━━━━━━━━━
+15｜不要 overengineer
+━━━━━━━━━━━━━━━━━━
+
+不需要建立：
+
+- customer CRM
+- social graph
+- relationship database
+- NPC tracking framework
+- minimap
+- restaurant directory
+- permanent nameplate system
+- customer encyclopedia
+
+我只需要幾個非常直接的 interaction：
+
+ORDER → TABLE
+TABLE → PARTY
+PERSON → NAME
+DIALOGUE → PERSON
+
+加上：
+
+NAMED CHARACTER VISUAL RECOGNITION
+
+這就足夠。
+
+━━━━━━━━━━━━━━━━━━
+16｜MOBILE UX
+━━━━━━━━━━━━━━━━━━
+
+這是 mobile-first interaction。
+
+請特別確認：
+
+- order card tap target 足夠大
+- customer sprite 可以正常 tap
+- 不會和 drag / scroll / serving interaction 衝突
+- popover 不會遮住重要 UI
+- name tag 不會 crop
+- room switching 不會跳錯
+- 10-person PDR 仍能準確選到 customer
+- dialogue tap target 清楚
+- highlight 在手機尺寸仍看得見
+- 不需要 pixel-perfect 點角色頭部
+
+如果直接 tap sprite 太難，
+可以擴大 invisible hitbox。
+
+━━━━━━━━━━━━━━━━━━
+17｜最重要的 PLAYTEST
+━━━━━━━━━━━━━━━━━━
+
+不要只驗證：
+
+「tap callback works」。
+
+請做一次正常 mobile play observation。
+
+測試問題是：
+
+假設玩家完全不知道任何 table layout，
+也沒有記任何 NPC sprite。
+
+當畫面上出現：
+
+T35｜陳家
+
+玩家能不能在 1–2 次 tap 內知道：
+
+【陳家現在坐在哪裡？】
+
+當：
+
+王先生說一句話
+
+玩家能不能在 1–2 次 tap 內知道：
+
+【王先生就是畫面裡哪一個人？】
+
+當玩家看到：
+
+一個似乎很眼熟的 customer
+
+能不能 tap 他知道：
+
+【喔，原來是小林。】
+
+如果這三件事成立，
+這個 pass 才算成功。
+
+━━━━━━━━━━━━━━━━━━
+18｜產品目的
+━━━━━━━━━━━━━━━━━━
+
+這個功能真正的目的不是 navigation convenience。
+
+而是：
+
+【讓角色從 UI 裡的人名，變成餐廳裡實際存在的人。】
+
+現在玩家看到的是：
+
+order
+dialogue
+sprite
+
+我希望修改後玩家感受到的是：
+
+「王先生今天坐那桌。」
+「Sophie 又跟 Mia 一起來了。」
+「原來剛剛講那句話的是坐窗邊那個人。」
+「陳家今天訂了包廂。」
+「Dylan 又坐在那裡。」
+
+這會直接影響 Jill’s Kitchen 最重要的 living restaurant feeling。
+
+請先 inspect 現有 architecture，
+選擇最小、最可靠的 implementation。
+
+不要建立大型新系統。
+
+如果中途已經有可見 interaction，
+請提供 mobile screenshot / evidence，
+但 REPORT ≠ STOP；
+可以繼續做不受影響的 implementation。
+━━━━━━━━━━━━━━━━━━
+(2026-10-02 07:09, the player's follow-up, filed verbatim)
+
+PRIORITY / RELEASE PLACEMENT UPDATE
+
+前一則 Customer Identity & Spatial Linking Pass 不放到 P5，也不要排成 v2.5 future work。
+
+我希望它直接納入目前 v2.4-rc6，並在 RC6 publish 前完成。
+
+原因是這不是新的 content expansion，而是目前既有：
+order → table → customer → dialogue → character
+之間缺少的基本 UX connection。
+
+目前遊戲已經有很多 named characters / regulars / story characters，
+但實際遊玩時我幾乎只穩定認得 Jill 和 Dylan。
+
+如果先進 P5 再增加更多 staff / family / character stories，
+只會讓這個 identity disconnect 更嚴重。
+
+因此 RC6 release order 請調整為：
+
+1. Finish current RC6 Staff Room / PDR / Second Floor polish
+2. Finish Customer Identity & Spatial Linking Pass
+3. Targeted mobile QA for this pass
+4. Existing RC6 release QA / full regression
+5. Publish v2.4-rc6
+6. Then continue P5 as already planned
+
+For RC6, prioritize the smallest complete version:
+
+MUST HAVE
+- tap order / T-number → switch to correct room + focus/highlight that table
+- tap occupied table → show table number + party/customer identity
+- tap visible customer → show name + table number where applicable
+- tap dialogue speaker/name → locate/focus/highlight the actual speaker
+- all of the above must work across rooms
+- named characters must use their real canonical identity, not generic labels
+
+NICE TO HAVE IN RC6 ONLY IF CHEAP / SAFE
+- stronger visual recognition cues for recurring named characters
+- improved sprite/outfit resemblance to portrait
+- additional identity polish
+
+Do NOT delay RC6 by building a large NPC identity framework or redrawing the whole cast.
+
+The immediate goal is extremely concrete:
+
+When I see a name, I can find the person.
+When I see a person, I can know the name.
+
+I want this in the RC6 build I play next, not in a later roadmap version.
+
+Please treat this as an RC6 release requirement.
+
+REPORT ≠ STOP.
+Continue implementation and release work unless genuinely blocked.

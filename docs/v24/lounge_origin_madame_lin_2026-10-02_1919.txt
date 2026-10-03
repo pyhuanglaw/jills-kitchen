@@ -1,0 +1,1359 @@
+(Filed verbatim. 2026-10-02 19:19, the player — re-sent at 19:30 when the first copy was lost to a context compaction: the Madame Lin → the bar next door → The Lounge origin line, and the staff architecture (the restaurant's chefs, waiters and cleaners as three pools; the Lounge's own pool). Before it, 19:20: 「這些你先做 有需要圖的跟我說要什麼圖 我會明天跟晴×拓劇情一起給你 需要圖的 等我給你圖之後才發布」 — next version; the parts that need pictures wait for them.)
+
+請實作／重構 Jill’s Kitchen 的「Madame Lin → 隔壁酒吧 → The Lounge」完整起源線。
+
+這次的目的不是單純補 dialogue，而是把目前已存在的：
+- Madame Lin
+- Ken / wine progression
+- The Lounge
+- Evan
+- Jill
+- Dylan
+- Jill/Dylan 私人房間
+- shared Kitchen
+- 沈晴×阿拓 after-hours stories
+
+整理成一條從 Day 1 就成立、前後一致的世界觀。
+
+請先 audit 現有 code / story data / save schema / Lounge unlock / wine progression / character knowledge / mature-save migration。
+
+不要破壞已經完成且與新 canon 相容的內容。
+不要把這次工作擴張成 generic multi-store framework。
+
+==================================================
+0. 核心世界觀
+==================================================
+
+Jill’s Kitchen 原始店面與 The Lounge 不是同一個店面。
+
+原始 Jill’s Kitchen 一樓包含：
+- Main Hall
+- Side Hall
+- Kitchen
+- Jill + Dylan 私人房間
+
+The Lounge 位於 Jill’s Kitchen「隔壁的獨立店面」。
+
+它原本是一間已經營業很多年的 neighborhood bar，
+老闆就是現有角色 Madame Lin。
+
+【HARD CANON】
+
+Jill’s Kitchen 與隔壁酒吧：
+- 各自有獨立對客入口
+- 中間牆不能打通
+- 不存在 Main Hall → Lounge 的直接門
+- 玩家切換時可以使用簡單 UI / transition
+- 世界觀上是走出本店，再進隔壁
+
+但兩邊後場位置使 Jill’s Kitchen 的 Kitchen 可以支援 Lounge。
+
+因此：
+- 保留現有 shared Kitchen production logic
+- Lounge 不需要建立第二套完整 Kitchen
+- Lounge food 可以由 Jill’s Kitchen Kitchen 製作／支援
+- 不需要把後場 service route 做成複雜 walking simulation
+
+「前場不相連」與「共用 Kitchen production」並不衝突。
+
+這個條件後來也會成為 Madame Lin 認為 Jill 接手具有實際可行性的理由之一。
+
+==================================================
+1. Madame Lin 的既有身分
+==================================================
+
+Madame Lin 不是為 Lounge origin 新增的 NPC。
+
+她本來就是既有 special regular。
+
+現在補充她一直存在的背景：
+
+Madame Lin 是 Jill’s Kitchen 隔壁酒吧的老闆，
+已經經營很多年。
+
+她住／生活在這個 neighborhood，
+與這個地方有長期關係。
+
+她不是：
+- 神秘富豪
+- 房東
+- 投資人
+- 商業導師
+- 悲情前店主
+
+她就是一個經營隔壁小酒吧很多年的成熟女性。
+
+她與 Jill 的關係從「鄰居店家」自然發展成 regular。
+
+==================================================
+2. Pre-game history：Madame Lin 已經認識 Jill + Dylan
+==================================================
+
+在 Day 1 正式開店以前：
+
+Jill 與 Dylan 已經一起整理／準備／裝修 Jill’s Kitchen。
+
+因為 Madame Lin 的酒吧就在隔壁，
+她在這段期間自然認識兩人。
+
+因此遊戲開始時：
+
+Madame Lin 已經知道：
+Dylan = Jill 的丈夫。
+
+她不需要透過後來的 reveal 才知道。
+
+【重要】
+
+這不代表其他 NPC 也知道。
+
+不要建立 global knowledge sync。
+
+角色知道資訊必須依實際經歷決定。
+
+初期大致為：
+
+- Jill：當然知道
+- Madame Lin：pre-game 裝修期就知道
+- Evan：尚未認識 Dylan / 尚不知道
+- Restaurant staff / regulars：依原有 story progression，未必知道
+
+因此原本 Jill’s Kitchen 餐廳內的：
+
+「Dylan 原來是 Jill 老公」
+
+reveal story 可以保留。
+
+Madame Lin 早就知道，不會破壞這條線。
+
+==================================================
+3. STORY 1：《隔壁》
+Day 1 / very early
+==================================================
+
+Jill’s Kitchen 正式開店。
+
+Madame Lin 帶一個簡單、自然的開店小禮物來。
+
+目的：
+在遊戲一開始就讓玩家知道：
+
+1. Madame Lin 是隔壁酒吧老闆
+2. 她與 Jill 已經認識
+3. 她是鄰居
+4. 兩家店在物理上相鄰
+5. 她對 Jill 開店是友善、自然的態度
+
+不要把這幕寫成大量 exposition。
+
+參考：
+Madame Lin：「終於開了。」
+Jill：「嗯。」
+Madame Lin：「恭喜。」
+Jill：「謝謝。」
+Madame Lin把禮物遞給她。
+Jill：「妳還帶東西來。」
+Madame Lin：「開店哪有空手來的。」
+Jill：「妳不是就在隔壁。」
+Madame Lin：「隔壁更不能空手。」
+
+即可。
+
+禮物可以是：
+- 小植物
+- 小型實用物
+- 簡單開店禮
+
+不要豪華。
+不要象徵意味過重。
+不要讓角色解釋禮物代表什麼。
+
+如果 Dylan 在場，
+Madame Lin 可以自然與他打招呼，
+因為兩人在裝修期間已經見過。
+
+但不要在此特別向玩家宣布：
+「這是 Jill 的老公。」
+
+保留餐廳內未來 Dylan 身分 reveal 的空間。
+
+==================================================
+4. 早期 Jill’s Kitchen 為什麼不賣酒
+==================================================
+
+Fresh game early stage：
+
+Jill’s Kitchen 一開始不正式賣 wine。
+
+這件事現在有很自然的世界觀背景：
+
+隔壁本來就有 Madame Lin 的酒吧。
+
+Jill 的思考是：
+
+「想喝酒隔壁就有。」
+
+因此她一開始沒有覺得自己的餐廳需要建立完整 wine offering。
+
+不要把它寫成：
+- Jill 討厭酒
+- Jill 不懂酒所以不敢賣
+- 酒牌問題
+- 成本問題
+- Madame Lin 不准她賣
+
+兩家並不是競爭／排他關係。
+
+==================================================
+5. STORY 2：《你真的不賣酒？》
+Ken
+==================================================
+
+這幕必須發生在：
+
+- Madame Lin 宣布退休之前
+- Lounge expansion 之前
+- Jill 正式建立 wine progression 之前或最早期
+
+Ken：
+
+「你真的不賣酒？」
+
+Jill：
+
+「隔壁就有。」
+
+Ken：
+
+「那是隔壁。」
+
+Jill：
+
+「嗯。」
+
+不要讓 Ken 立即提出：
+- 開 Lounge
+- 做酒吧
+- 接隔壁
+- 酒類 business plan
+
+Ken 此時只是在指出：
+
+「隔壁有酒」與「妳自己的料理有沒有 wine pairing」
+是兩件不同的事情。
+
+後續 Ken 可以在適合的料理上說：
+
+「這個沒有酒有點可惜。」
+
+這才慢慢讓 Jill 思考：
+
+自己的料理本來就可以有自己的 wine pairing。
+
+==================================================
+6. Wine progression
+==================================================
+
+沿用／整合現有 wine research / pairing progression。
+
+Jill 後來開始賣 wine，
+是因為：
+
+FOOD × WINE PAIRING。
+
+不是因為想開酒吧。
+
+Madame Lin 此時仍然正常經營隔壁酒吧。
+
+因此兩家的定位可以自然共存：
+
+Jill’s Kitchen：
+- dinner
+- food
+- pairing wine
+
+Madame Lin’s bar：
+- neighborhood bar
+- 吃完飯後繼續坐著喝
+- 單純想喝酒也可以去
+
+這個生活模式必須先存在一段時間。
+
+之後 Madame Lin 的退休才有重量。
+
+==================================================
+7. STORY 3：《做到月底》
+Madame Lin retirement
+==================================================
+
+只有在 Jill 已經開始有自己的 wine progression 之後，
+才進入 Madame Lin retirement story。
+
+Madame Lin 某天照常來 Jill’s Kitchen。
+
+不要用 dramatic setup。
+
+她很普通地提：
+
+Madame Lin：「我做到月底。」
+
+Jill：「隔壁？」
+
+Madame Lin：「嗯。」
+
+Jill：「不做了？」
+
+Madame Lin：「退休。」
+
+如果需要：
+
+Jill：「有人接嗎？」
+
+Madame Lin：「還沒有。」
+
+結束。
+
+【HARD CANON】
+
+Madame Lin 退休的原因只有：
+
+她到了想退休的年紀，而且她想退休。
+
+不要新增：
+- 生病
+- 經營困難
+- 負債
+- 生意不好
+- 房租壓力
+- 家庭事故
+- 搬離城市
+- 子女要求
+- 夜生活太累的悲情故事
+- 「時代變了」
+- 「我撐不下去了」
+
+她的店可以一直經營正常。
+
+她只是：
+
+「做夠了，想退休。」
+
+這很重要。
+
+因為退休後她仍然住在／活動於附近，
+也仍然可以自然成為 Jill’s Kitchen 與未來 The Lounge 的客人。
+
+==================================================
+8. STORY 4：《不然吃完去哪？》
+Ken reaction
+==================================================
+
+Ken 後來知道 Madame Lin 要退休。
+
+他在意的不是：
+「Jill 缺一間 Lounge。」
+
+而是：
+
+他原本已經習慣的 neighborhood routine
+「Jill’s Kitchen 吃飯 → 隔壁喝酒」
+可能要消失。
+
+參考：
+
+Ken：「她真的不做了？」
+Jill：「嗯。」
+Ken：「有人接嗎？」
+Jill：「還沒有吧。」
+Ken：「最好有人接。」
+Jill：「你這麼擔心？」
+Ken：「不然吃完去哪？」
+Jill：「回家。」
+Ken：「……」
+
+不要讓 Ken 說：
+
+- 妳應該接
+- 妳可以開 Lounge
+- 酒有了，喝酒的地方沒有
+- 這是很好的 expansion opportunity
+- 我覺得妳可以把隔壁買下來
+
+Ken 不是 Lounge quest giver。
+
+他只是很真實地：
+
+不希望自己熟悉的酒吧消失。
+
+這一幕可以讓「Jill 是否可能接手」第一次出現在玩家腦中，
+但角色不必直接說。
+
+==================================================
+9. STORY 5：《有點想接》
+Jill × Dylan private-room conversation
+==================================================
+
+【非常重要】
+
+Dylan 不可以在 Jill 還沒跟他談過之前，
+自己神奇地開始研究 bar interior。
+
+Jill 必須先跟 Dylan 討論。
+
+場景：
+Jill + Dylan 的私人房間。
+
+Dylan 原本在自己的書桌：
+- laptop
+- course / lecture
+- books
+- handouts
+- notes
+- papers
+- pens
+
+Jill 可以在 sofa。
+
+她主動提：
+
+Jill：「Madame Lin 要退休了。」
+Dylan：「嗯。」
+Jill：「隔壁還沒有人接。」
+Dylan：「嗯。」
+
+pause
+
+Jill：「……我有點想接。」
+
+Dylan 才停下來／抬頭。
+
+Dylan：「酒吧？」
+Jill：「嗯。」
+Dylan：「妳想做？」
+Jill：「還不知道。」
+
+Dylan 可以：
+
+「那就先看看。」
+
+或同等程度的簡短回應。
+
+不要讓 Dylan：
+- 替 Jill 決定
+- 分析 ROI
+- 告訴 Jill 這是好機會
+- 說「我知道妳一定會接」
+- 說「我支持妳追夢」
+- 主動制定 renovation plan
+
+這是 Jill 的 restaurant。
+
+Dylan 是丈夫，不是 business consultant。
+
+==================================================
+10. Dylan bar-design-book callback
+==================================================
+
+在 STORY 5 之後，
+但 Jill 尚未決定接手以前：
+
+Jill 回到私人房間。
+
+Dylan 原本滿桌都是讀書／考試相關材料。
+
+現在其中混進一本：
+
+bar interior design / small bar design book。
+
+必須視覺上很容易注意到：
+它跟旁邊那些書完全不是同一類。
+
+Jill：
+
+「這你的？」
+
+Dylan：
+
+「嗯。」
+
+Jill：
+
+「我不是說還不知道嗎？」
+
+Dylan：
+
+「我知道。」
+
+Jill：
+
+「那你買這個幹嘛？」
+
+Dylan：
+
+「看看。」
+
+結束。
+
+不要追加情緒解釋。
+
+不要：
+- 「因為我知道妳會接」
+- 「我想幫妳」
+- 「我相信妳」
+- 「這是我們的新開始」
+
+書本本身就是他的反應。
+
+這可以是：
+- STORY 5 的 callback
+或
+- 很短的 authored/ambient follow-up
+
+不需要硬拆成大型 Journal chapter。
+
+==================================================
+11. STORY 6：《看看》
+看店 + shared Kitchen + Evan
+==================================================
+
+這是一個完整 authored scene。
+
+不要拆成：
+「看店」
+「Madame Lin 解釋 Kitchen」
+「Evan 去留」
+三個獨立故事。
+
+它們本來就是 Jill 同一次接店前考察中會確認的事情。
+
+Jill 主動找 Madame Lin：
+
+Jill：「妳那邊有人接了嗎？」
+
+Madame Lin：「還沒。」
+
+Jill：「我可以看看嗎？」
+
+Madame Lin：
+
+「走啊。」
+
+玩家第一次正式進入 Madame Lin 原本的酒吧。
+
+==================================================
+11A. 原酒吧視覺
+==================================================
+
+這是一間：
+- 經營很多年的 neighborhood bar
+- 有使用痕跡
+- 有自己的個性
+- 保養正常
+- 正常營業
+- 不破敗
+- 不豪華
+- 不神秘
+- 不髒亂
+- 不像即將倒閉
+
+它不是完成版 The Lounge。
+
+也不要直接把現在 The Lounge 換個名字當 Madame Lin 酒吧。
+
+要讓玩家看得出：
+
+Jill 後來確實重新設計／整理過。
+
+但可以保留少量 architectural continuity，
+尤其是吧台等合理元素。
+
+不要做：
+- sports bar
+- neon nightclub
+- izakaya
+- luxury hotel bar
+
+它應該像一間在 neighborhood 開很多年的成熟小酒吧。
+
+==================================================
+11B. Jill 的真正疑慮
+==================================================
+
+Jill 看店時，
+她真正擔心的是：
+
+「我是不是等於要再養一間完整的店？」
+
+Madame Lin 可以在走到後場／談營運時指出：
+
+Jill 與她不同。
+
+參考：
+
+Jill：「兩邊一起顧，應該滿麻煩的。」
+
+Madame Lin：「妳跟我不一樣。」
+
+Jill：「哪裡？」
+
+Madame Lin：「妳廚房就在後面。」
+
+Jill 看她。
+
+Madame Lin：「這邊不用再弄一個。」
+
+Jill：「還是多一間店。」
+
+Madame Lin：「那當然。」
+
+這段的功能：
+
+讓 shared Kitchen 從單純遊戲機制，
+變成 Jill 接手這間店的實際優勢。
+
+但 Madame Lin 不可以把風險講沒。
+
+她不是推銷員。
+
+她只是在指出：
+Jill 已經擁有一套成熟 Kitchen，
+所以這個 bar space 對 Jill 而言，
+比從零開第二間完整餐廳合理很多。
+
+==================================================
+11C. Evan 就在同一次看店裡處理
+==================================================
+
+【HARD CANON】
+
+Evan 原本就是 Madame Lin 酒吧的 bartender。
+
+他不是 Jill 開 The Lounge 後才從 recruitment system 生成的人。
+
+他已經在這裡工作一段時間。
+
+Jill 來看店時，
+Evan 就在酒吧工作／整理吧台。
+
+Madame Lin 自然提到：
+
+Madame Lin：「還有他。」
+
+Evan：「……什麼叫還有我。」
+
+Madame Lin：「你不是說想繼續做？」
+
+Evan：「是。」
+
+Madame Lin 可以讓兩人自己談。
+
+Jill：
+
+「你想留下？」
+
+Evan：
+
+「如果妳接的話。」
+
+Jill：
+
+「我還沒決定。」
+
+Evan：
+
+「我知道。」
+
+Jill 可以問：
+
+「如果我改很多呢？」
+
+Evan：
+
+「妳的店，妳改啊。」
+
+Jill：
+
+「那你還留下？」
+
+Evan：
+
+「有吧台就行。」
+
+可以依角色聲音微調，
+但保留這種短、自然、不煽情的感覺。
+
+【重要】
+
+Evan 此時尚未見過／正式認識 Dylan。
+
+不要讓 Evan：
+- 提 Dylan
+- 知道 Dylan 是 Jill 丈夫
+- 說以前常看到 Dylan
+- 說 Dylan 常來酒吧
+
+Evan 原本主要在 Madame Lin 的酒吧工作，
+並沒有參與 Jill’s Kitchen 本店日常。
+
+==================================================
+12. Jill 做決定
+==================================================
+
+完成 STORY 6 後，
+Jill 已經知道：
+
+- 空間實際長什麼樣
+- 前場不能與 Jill’s Kitchen 打通
+- shared Kitchen 可以支援
+- 仍然是額外一間需要管理的店
+- Evan 願意在新經營者接手後繼續做
+
+這時 Jill 才做最後決定。
+
+不要讓：
+- Ken 決定
+- Dylan 決定
+- Madame Lin 說服到 Jill 無法拒絕
+- Evan 成為決定性原因
+
+這些人都只是構成 Jill 判斷的資訊／生活背景。
+
+最終：
+
+Jill 決定接。
+
+==================================================
+13. STORY 7：《簽約》
+==================================================
+
+正式簽約日。
+
+地點：
+仍然是 Madame Lin 原本的酒吧。
+
+人物：
+- Jill
+- Dylan
+- Madame Lin
+- Evan
+
+【重要】
+
+Dylan 陪 Jill 來。
+
+這是丈夫陪妻子來完成一件重要事情。
+
+Dylan 不要：
+- 主導談判
+- 幫 Jill 審合約
+- 糾正條款
+- 報價
+- 分析投資
+- 替 Jill 簽
+- 搶 Jill 的決策位置
+
+Jill 才是接店的人。
+
+Madame Lin 與 Jill 完成確認／簽約。
+
+桌上可以有：
+- 合約
+- 筆
+- 鑰匙
+
+但不要做成法律戲。
+
+簽完：
+
+Madame Lin：「那就這樣。」
+
+Jill：「嗯。」
+
+Madame Lin 將鑰匙交給 Jill。
+
+==================================================
+13A. Evan 第一次認識 Dylan
+==================================================
+
+這是 Evan 第一次正式見到／認識 Dylan。
+
+不要寫：
+
+「你一直不知道吧。」
+
+因為 Evan 並沒有長期看到 Dylan 的前提。
+
+Madame Lin 本來就認識 Dylan，
+所以可以很自然介紹：
+
+Madame Lin：「Evan，這 Dylan。」
+「Jill 老公。」
+
+Evan：「你好。」
+
+Dylan：「你好。」
+
+即可。
+
+不要強迫 Evan：
+- 驚訝
+- 誤會
+- 恍然大悟
+- 說「原來是你」
+
+他沒有這些前史。
+
+==================================================
+14. Dylan reveal story 必須保留
+==================================================
+
+【非常重要】
+
+Evan 在簽約時知道 Dylan 是 Jill 老公，
+不代表 Jill’s Kitchen 其他 staff / regulars 同時知道。
+
+原本餐廳內：
+
+「Dylan 原來是 Jill 老公」
+
+的 reveal story 必須保留。
+
+Knowledge is local, not global.
+
+大致：
+
+Madame Lin：
+pre-game 就知道。
+
+Evan：
+Lounge 簽約時知道。
+
+Restaurant staff / regulars：
+依各自 story / actual experience 得知。
+
+不要因為 Evan 知道，
+就把全體 NPC knowledge flag 設為 true。
+
+如果 Madame Lin 或 Evan 日後剛好在餐廳 reveal scene 附近，
+他們不需要跟著其他人一起驚訝。
+
+==================================================
+15. Renovation → The Lounge
+==================================================
+
+簽約後才正式 renovation。
+
+Jill 把 Madame Lin 的舊 bar 改造成：
+
+Jill’s Kitchen — The Lounge。
+
+Final Lounge visual direction 維持：
+
+- dark warm-grey / charcoal
+- wood
+- warm lighting
+- brass accents
+- mature evening atmosphere
+
+不是：
+- sports bar
+- neon bar
+- black-and-gold luxury cliché
+- izakaya
+- beige café
+
+但請讓完成版 Lounge 與 Madame Lin 原酒吧存在合理 continuity。
+
+可以保留一兩個原空間元素，
+例如：
+- 吧台位置
+- 某個結構
+- 一小部分合理的固定元素
+
+不要全部砍掉重做到像另一棟建築。
+
+同時也不要因為「有歷史」就塞大量 nostalgic props。
+
+==================================================
+16. Evan employment canon
+==================================================
+
+Evan 是：
+
+Madame Lin bar
+→ Jill 接手
+→ The Lounge
+
+之間最直接的人員 continuity。
+
+他不是被當成店面設備一起「送給 Jill」。
+
+他有自己的選擇。
+
+因此故事順序必須是：
+
+Jill 尚未簽約
+→ 看店
+→ Madame Lin 提到 Evan 想繼續
+→ Jill 與 Evan 自己談
+→ Evan 表示若 Jill 接手且仍做酒吧，他願意留下
+→ Jill 後來才正式簽約
+→ Evan 成為 The Lounge 初始 bartender
+
+不要寫：
+「Madame Lin 把 Evan 留給 Jill。」
+
+概念上是：
+Madame Lin 介紹兩人談。
+
+==================================================
+17. Lounge opening 後的 Madame Lin
+==================================================
+
+Madame Lin 退休後不要消失。
+
+她只是：
+retired from running the bar。
+
+不是：
+retired from the neighborhood。
+
+The Lounge 開幕一段時間後，
+安排一個很短的 callback：
+
+Madame Lin 第一次以客人身分進入現在的 The Lounge。
+
+不要煽情。
+
+不要：
+
+「看到這裡有新的生命真好。」
+「這裡承載了我很多回憶。」
+「現在終於輪到我當客人了。」
+「謝謝妳保留這個地方。」
+「新的開始。」
+
+可以非常普通：
+
+Jill：「坐哪？」
+
+Madame Lin 看一下。
+
+「隨便。」
+
+Evan：
+
+「喝什麼？」
+
+Madame Lin 看酒單。
+
+「你選。」
+
+就夠了。
+
+玩家自己知道：
+以前她站在這裡當老闆，
+現在她坐下來喝。
+
+==================================================
+18. Dylan × Evan 後續 continuity
+==================================================
+
+Evan 從簽約日開始認識 Dylan。
+
+之後 renovation / Lounge life 中，
+兩人才逐漸變成熟面孔。
+
+Dylan 仍然不是 Lounge regular drinker。
+
+他大部分時間：
+- 在 Jill/Dylan 私人房間讀書
+- 上 laptop 課程
+- 看書
+- 寫筆記
+
+The Lounge 開幕後，
+他也不會突然開始天天喝。
+
+因此保留後來：
+
+Dylan 考完「一試」後，
+第一次真正坐進 Lounge 喝酒。
+
+不要揭露考試種類。
+
+Evan：
+
+「今天喝？」
+
+Dylan：
+
+「嗯。」
+
+Evan：
+
+「稀奇。」
+
+Dylan：
+
+「考完了。」
+
+Evan：
+
+「考試？」
+
+Dylan：
+
+「嗯。」
+
+Evan：
+
+「考得怎樣？」
+
+Dylan：
+
+「考完了。」
+
+Evan：
+
+「……行。」
+
+這裡「稀奇」成立，
+因為 Evan 從簽約／改裝／營業一路已經認識 Dylan，
+知道他平常幾乎不坐下來喝。
+
+不是因為 Evan 在 Madame Lin 時代就認識 Dylan。
+
+==================================================
+19. After-hours Lounge continuity
+==================================================
+
+The Lounge 是隔壁獨立店面。
+
+因此 Jill’s Kitchen 本店打烊後：
+
+Jill 可以回 Jill/Dylan 私人房間。
+
+Evan、沈晴、阿拓、予安等人若在 Lounge 收店後偶爾留下喝酒，
+不會打擾 Jill 的私人空間。
+
+Dylan 如果參加，
+是從本店／私人房間出去到隔壁 Lounge。
+
+喝完後，
+他離開 Lounge，回 Jill’s Kitchen 私人房間。
+
+因此 audit 沈晴 × 阿拓五幕故事：
+
+如果某幕不需要 Jill，
+不要為了交代她「離開」而硬塞：
+
+「你還不走？」
+「你還要喝？」
+
+Jill 根本可以沒有出現在 Lounge。
+
+她在本店私人房間即可。
+
+==================================================
+20. Shared Kitchen — system consistency
+==================================================
+
+保留 Lounge 使用 Jill’s Kitchen Kitchen 的既有 production architecture。
+
+但 audit 以下問題：
+
+- Lounge menu 與 Restaurant menu 不應因 shared Kitchen 而被錯誤視為同一 menu
+- production source 可以共用
+- venue/menu identity 仍分開
+- Lounge food orders 應正確 routing
+- Main Restaurant service 不應錯認 Lounge table
+- Lounge service 不應錯認 Restaurant table
+
+不要為了故事重寫一套第二 Kitchen。
+
+==================================================
+21. STAFF ARCHITECTURE — 同次實作
+==================================================
+
+這次請同時正式修正 staff capacity architecture。
+
+Restaurant staff 不再使用一個 generic shared pool。
+
+必須拆成三個獨立 employment categories：
+
+1. Chef / 廚師
+2. Waiter / 服務員
+3. Cleaner / 清潔員
+
+三者各自獨立：
+
+- hiring category
+- capacity
+- occupied slots
+- roster accounting
+- expansion bonus
+- unlock / upgrade effects
+
+例如：
+
++1 Chef slot
+只能聘 Chef。
+
+不能拿去聘 Waiter / Cleaner。
+
++1 Waiter slot
+不能被 Chef / Cleaner 使用。
+
++1 Cleaner slot
+不能被 Chef / Waiter 使用。
+
+未來所有 staff-capacity upgrades，
+都必須明確指定增加哪一個職種。
+
+不要再出現：
+
+Restaurant Staff +2
+
+但實際上三種職業可以任意共用的 generic pool。
+
+==================================================
+22. Lounge employment pool
+==================================================
+
+Restaurant role split 不可以破壞 Lounge staff architecture。
+
+Lounge staff 仍然與 Restaurant 分開。
+
+Lounge：
+- bartender
+- Lounge waiter
+- Lounge cleaner
+
+以及：
+
+予安 = fixed special Pianist。
+
+予安不吃 bartender / waiter / cleaner slot。
+
+Evan 是 Lounge bartender，
+而且是透過 Madame Lin → Jill 的 authored continuity 留下，
+不是 generic recruitment。
+
+跨區支援可以存在，
+但：
+
+temporary duty / support
+≠
+employment pool identity。
+
+Restaurant Waiter 去 Lounge 幫忙，
+仍然是 Restaurant Waiter。
+
+不要因此佔 Lounge waiter employment slot。
+
+==================================================
+23. Legacy save migration
+==================================================
+
+必須保護 mature saves。
+
+現有已解鎖 Lounge 的 mature save：
+
+不要：
+- 關掉 Lounge
+- 強迫重新簽約
+- 重播整條 origin
+- 刪除 Evan
+- reset Ken wine progression
+- reset Madame Lin
+- reset Lounge staff
+- reset 沈晴×阿拓
+- reset Dylan relationships
+
+對 mature save，
+可以把新 origin 視為 retroactive history 已發生，
+依現有 progression 標記必要 flags。
+
+不要一次補播七幕 catch-up dump。
+
+Fresh save：
+完整走新 chronology。
+
+Mid-progress save：
+進入 earliest logically valid unresolved beat，
+不要倒退故事。
+
+==================================================
+24. Dialogue / writing rules
+==================================================
+
+整條故事請保持：
+
+短。
+生活化。
+角色不把主題說破。
+
+避免：
+
+「這裡對我來說像家。」
+「這間店承載了很多回憶。」
+「妳一定可以讓它變得更好。」
+「這是新的開始。」
+「我相信妳。」
+「我們一起努力。」
+「這是妳夢想的下一步。」
+「我終於可以放心退休了。」
+「這個地方會延續下去。」
+「我們不只是同事。」
+
+不要讓角色知道劇本。
+
+不要讓每個角色都正確理解所有人的想法。
+
+Ken 只是在意喝酒。
+Dylan 只是聽到老婆有點想接，所以默默開始看書。
+Evan 只是想繼續做 bartender。
+Madame Lin 只是想退休，也知道這間店實際怎麼運作。
+Jill 最後自己決定。
+
+==================================================
+25. Narrative design principle
+==================================================
+
+不要把這條線做成：
+
+「完成條件 → 解鎖 Lounge。」
+
+玩家體驗應該是：
+
+Day 1 就認識隔壁 Madame Lin
+→ 生活中知道隔壁一直有酒吧
+→ Ken 問 Jill 為什麼自己不賣酒
+→ Jill 慢慢發展 pairing wine
+→ 原本穩定存在的 Madame Lin 某天說要退休
+→ Ken 擔心自己熟悉的地方要沒了
+→ Jill 開始想到「要不要接」
+→ 回家跟 Dylan 談
+→ Dylan 幾天後默默看 bar design book
+→ Jill 去看店
+→ 發現 shared Kitchen 讓事情實際可行
+→ 認識原 bartender Evan，知道他願意留下
+→ Jill 自己做決定
+→ Dylan 陪 Jill 去簽約
+→ Evan 第一次正式認識 Dylan
+→ 改裝
+→ The Lounge 出現
+→ Madame Lin 退休後偶爾回來喝
+→ Lounge 又開始產生 Ken / Evan / 沈晴 / 阿拓 / 予安 / Dylan 的新故事
+
+核心：
+
+NEED / LIFE PATTERN FIRST
+→ OPPORTUNITY LATER
+→ SPACE CHANGES
+→ NEW LIFE HAPPENS INSIDE THE SPACE
+
+不是：
+BUILDING UNLOCK → CONTENT SPAWNS。
+
+==================================================
+26. Mid-build evidence / QA
+==================================================
+
+請不要一路做到最後才第一次讓我看到。
+
+至少在以下 checkpoint 主動提供 screenshot / playable evidence / implementation summary：
+
+CHECKPOINT A
+Madame Lin 原酒吧視覺 + Jill’s Kitchen / neighboring storefront spatial relationship 完成時。
+
+我要確認：
+- 真的是隔壁
+- 前場不相通
+- 沒有直接穿牆門
+- 原酒吧不是完成版 Lounge
+- 空間尺度合理
+
+REPORT ≠ STOP。
+報告後繼續做已明確、安全的部分。
+
+CHECKPOINT B
+STORY 1–6 dialogue / staging 可實際觸發後。
+
+我要確認：
+- Madame Lin Day 1 身分
+- Ken chronology
+- Jill/Dylan discussion occurs BEFORE design-book callback
+- 看店 + shared Kitchen + Evan 是同一幕
+- Evan 此時不認識 Dylan
+
+REPORT ≠ STOP。
+
+CHECKPOINT C
+簽約 + renovation + mature-save migration + staff architecture 完成後。
+
+請提供：
+- Fresh-save chronology evidence
+- mature-save migration evidence
+- Evan continuity evidence
+- Restaurant Chef / Waiter / Cleaner independent capacity evidence
+- Lounge pool unaffected evidence
+
+==================================================
+27. STOP CONDITIONS
+==================================================
+
+不要因為：
+- 做完一個 checkpoint
+- 完成一幕
+- 報告進度
+- 有小型 implementation choice
+
+就停止工作。
+
+REPORT ≠ STOP。
+
+只有以下情況才停下問我：
+
+1. 發現與上述 HARD CANON 真正衝突且無法安全自行解決
+2. migration 有不可逆 save/data-loss risk
+3. 現有 architecture 使「兩店不相通但 shared Kitchen」無法在不大改系統下成立
+4. 必須由我決定新的角色／重大劇情 canon
+
+其他 implementation details 請自行做合理決策並繼續。
+
+==================================================
+28. 最後請特別確認這些 HARD CANON
+==================================================
+
+- Madame Lin 從 Day 1 就是隔壁酒吧老闆
+- 她在 Jill 開店前裝修期已認識 Jill + Dylan
+- 她從 Day 1 就知道 Dylan 是 Jill 丈夫
+- 其他角色不因此自動知道
+- 原餐廳 Dylan husband reveal 保留
+- Evan 原本就是 Madame Lin 的 bartender
+- Evan 在 Jill 看店時才與 Jill 正式談是否留下
+- Evan 在簽約時才第一次正式認識 Dylan
+- Jill 必須先跟 Dylan 說「我有點想接」
+- Dylan 之後才開始看 bar design book
+- Dylan 不替 Jill 做決策
+- Ken 的「你真的不賣酒？」早於 Madame Lin retirement
+- Jill 先發展自己的 pairing wine
+- Madame Lin 之後才退休
+- 她退休只是因為想退休
+- Ken 擔心的是既有 neighborhood bar 消失
+- Jill 主動去看店
+- 看店 + shared Kitchen discussion + Evan 去留是同一幕
+- Jill 自己做最後決定
+- Dylan 陪 Jill 去簽約
+- Lounge 是隔壁獨立店面
+- 中間牆不能打通
+- 沒有 Main Hall → Lounge 直接門
+- Lounge 仍由既有 Kitchen 後場支援
+- Madame Lin 退休後仍可回來當客人
+- Evan 成為 The Lounge 初始 bartender
+- Dylan 一試後第一次真正坐 Lounge 喝酒
+- Restaurant Chef / Waiter / Cleaner employment capacities 從此獨立
+- Lounge employment pool 繼續獨立
+- mature saves 不 reset、不 catch-up dump

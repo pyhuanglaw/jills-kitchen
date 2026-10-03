@@ -1,0 +1,322 @@
+(Filed verbatim. 2026-10-02 04:08, the player: 【重要修正｜Second Floor 的空間層級與操作方式】.)
+
+【重要修正｜Second Floor 的空間層級與操作方式】
+
+你已經知道 Staff Room、Private Dining Room 的既有規格、三階段 reference、故事與功能，這些不用重新討論。
+
+我現在只修正一個非常重要的空間／UI architecture 理解：
+
+「二樓放得下 Staff Room 和 Private Dining」
+不等於
+「Staff Room 和 Private Dining 要直接在整張二樓畫面裡操作」。
+
+這兩件事請明確分開。
+
+━━━━━━━━━━━━━━━━━━
+1. Second Floor 是「樓層總覽空間」
+━━━━━━━━━━━━━━━━━━
+
+玩家進入「二樓」時，
+
+看到的是整個 Second Floor 的 shared / common spatial view。
+
+這張畫面的作用之一，是讓玩家理解：
+
+- 樓梯在哪裡
+- 公共區域在哪裡
+- 窗戶在哪裡
+- 貓在哪裡活動
+- Staff Room 位於二樓哪一區
+- Private Dining 位於二樓哪一區
+- 未來其他空間位於二樓哪一區
+
+所以：
+
+Staff Room 和 Private Dining 建成後，
+玩家從 Second Floor view 應該可以「看得出它們存在於這層樓的哪裡」。
+
+例如可以看到：
+- 房間外牆
+- 門
+- 入口
+- 空間占用的位置
+- 適度的 room state
+
+這是 spatial continuity。
+
+但這張 Second Floor view
+不是 Staff Room / Private Dining 的主要 gameplay view。
+
+━━━━━━━━━━━━━━━━━━
+2. Staff Room 必須進入後切成獨立完整畫面
+━━━━━━━━━━━━━━━━━━
+
+玩家從 Second Floor
+點 Staff Room 的門／入口：
+
+→ 進入 Staff Room。
+
+進入後：
+
+整個 gameplay viewport
+都應該是 Staff Room 本身。
+
+不是把 camera 留在 Second Floor，
+然後操作其中一個縮小的矩形。
+
+不是讓 Staff Room 只占手機畫面的 1/4 或 1/3。
+
+Staff Room 是一個完整的 playable room scene。
+
+玩家進去後，
+看到的應該就是我已經提供給你的
+Staff Room 獨立 reference 所代表的完整空間。
+
+因此：
+
+員工活動
+家具
+生活痕跡
+Phase I–III 的變化
+NPC interaction
+future Staff Lives scenes
+
+全部都可以使用完整畫面呈現。
+
+這樣房間才能有足夠的細節與精緻度。
+
+━━━━━━━━━━━━━━━━━━
+3. Private Dining 也是同樣架構
+━━━━━━━━━━━━━━━━━━
+
+玩家從 Second Floor
+點 Private Dining 的門／入口：
+
+→ 進入 Private Dining。
+
+進入後：
+
+整個 gameplay viewport
+都是 Private Dining Room。
+
+不要讓玩家站在 Second Floor overview
+遠遠操作一張縮小的包廂桌。
+
+我已經提供的 Private Dining 獨立 reference，
+就是這個獨立完整 room scene 的 visual target。
+
+所以未來：
+
+- 一桌客人
+- reservation group
+- 4–10 人聚餐
+- regular 帶家人
+- authored NPC event
+- character story
+- room upgrade
+
+都能在完整 Private Dining scene 裡呈現。
+
+尤其未來如果有重要 NPC story 在包廂發生，
+玩家應該看到的是完整的一場飯局，
+
+不是 Second Floor 大圖角落裡幾個很小的人。
+
+━━━━━━━━━━━━━━━━━━
+4. 正確的世界結構
+━━━━━━━━━━━━━━━━━━
+
+請把概念理解成：
+
+SECOND FLOOR
+＝樓層／shared spatial hub
+
+在這張圖上可以看到：
+
+[ Staff Room ]
+[ Private Dining ]
+[ remaining / future space ]
+[ shared/common area ]
+[ stairs / windows / circulation / cats ]
+
+但：
+
+點 Staff Room
+→ STAFF ROOM FULL SCENE
+
+返回
+→ SECOND FLOOR
+
+點 Private Dining
+→ PRIVATE DINING FULL SCENE
+
+返回
+→ SECOND FLOOR
+
+也就是：
+
+Second Floor 負責「這些地方彼此在哪裡」。
+
+Independent Room Scene 負責
+「玩家進去之後真正看到、操作、生活的內容」。
+
+━━━━━━━━━━━━━━━━━━
+5. 不要刪掉 Second Floor 原本的大空間
+━━━━━━━━━━━━━━━━━━
+
+這一點也很重要。
+
+RC5 原本的 Second Floor Open Floor
+不是 Staff Room / Private Dining 建成前的 temporary placeholder。
+
+即使兩個房間都完成，
+
+Second Floor view 仍然存在。
+
+因為這裡本來就是：
+
+- 玩家第一次上樓看到的地方
+- 柔柔先探索的地方
+- 小齁跟上來的地方
+- 貓可以活動的地方
+- 樓層 circulation
+- shared/open space
+- 未來還可以繼續發展的空間
+
+所以不要在 RC6 完成後
+把 Second Floor view 刪掉，
+也不要讓它退化成純 navigation menu。
+
+它仍然是一個可以看的、可以有生活發生的空間。
+
+━━━━━━━━━━━━━━━━━━
+6. 未來剩餘空間也遵守同一原則
+━━━━━━━━━━━━━━━━━━
+
+這個 architecture 不只為 Staff Room 和 Private Dining。
+
+Second Floor 目前仍有未決定用途的剩餘空間。
+
+現在不要替它決定用途。
+
+但是未來如果那塊區域發展成新的完整功能空間，
+
+也應遵守相同邏輯：
+
+Second Floor overview
+→ 看得到它位於哪裡／入口在哪裡
+
+點進去
+→ 切換成那個空間自己的 full-screen playable scene
+
+而不是未來繼續把更多家具、NPC、系統
+全部縮小塞進 Second Floor overview。
+
+所以 Second Floor 本質上具有：
+
+「樓層空間連續性」
+
+而每個重要 room 則具有：
+
+「獨立 gameplay scene」。
+
+這是未來二樓擴充也要保留的 architecture。
+
+━━━━━━━━━━━━━━━━━━
+7. 為什麼這是必要的
+━━━━━━━━━━━━━━━━━━
+
+原因不是技術，而是產品體驗。
+
+如果 Staff Room / Private Dining
+全部直接在 Second Floor 大圖內操作：
+
+- 每個房間會太小
+- furniture 細節消失
+- NPC 太小
+- mobile 上更嚴重
+- Phase upgrade 不明顯
+- ambient life 不容易看到
+- authored story 沒有畫面重量
+- 我提供的獨立 room reference 失去意義
+
+我希望 Jill’s Kitchen 的每個重要空間
+都有自己的視覺個性與生活密度。
+
+所以：
+
+「一層樓可以容納很多空間」
+
+不代表
+
+「玩家要在一張畫面同時操作整層樓」。
+
+━━━━━━━━━━━━━━━━━━
+8. 請修正目前 implementation
+━━━━━━━━━━━━━━━━━━
+
+如果目前 implementation 已經把：
+
+Staff Room
+Private Dining
+
+直接作為 Second Floor overview 裡的小型操作區域，
+
+請調整成：
+
+A. Second Floor overview
+保留房間的位置、外觀、牆／門／入口與 shared space。
+
+B. Staff Room
+獨立完整 playable scene。
+
+C. Private Dining
+獨立完整 playable scene。
+
+D. 房間與 Second Floor 之間可以正常進出。
+
+E. Save / progression / Phase state
+仍然保持同一套資料，
+不要因為拆 scene 而 reset 玩家進度。
+
+F. 不要重做已經正確的 Staff Room / Private Dining visual assets。
+如果現在已有完整獨立畫面，
+請保留並把它們正確接回 Second Floor spatial structure。
+
+━━━━━━━━━━━━━━━━━━
+9. 最後驗收標準
+━━━━━━━━━━━━━━━━━━
+
+我要能做到：
+
+我點「二樓」
+→ 看到整個二樓，知道 Staff Room、Private Dining 和剩餘空間各自在什麼位置。
+
+我點 Staff Room 的入口
+→ 整個畫面進入精緻的 Staff Room。
+
+我可以在裡面看員工活動與房間細節。
+
+我返回
+→ 回到 Second Floor。
+
+我點 Private Dining
+→ 整個畫面進入精緻的 Private Dining。
+
+我可以完整看到一桌客人、reservation、NPC event。
+
+我返回
+→ 回到 Second Floor。
+
+而 Second Floor 剩餘的空間
+未來如果發展成第四個／其他功能空間，
+
+也可以使用同樣方式：
+
+在樓層總覽有實體位置，
+進入後有自己的完整 playable scene。
+
+這才是我要的 Second Floor architecture。
+
+請直接依此修正並繼續 RC6。
+不需要再詢問我這個空間架構。

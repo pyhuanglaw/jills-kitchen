@@ -1,0 +1,865 @@
+(Filed verbatim. 2026-10-01 12:00, the player. A Restaurant Story on top of the Staff Lives / Staff Room round —
+docs/v24/staff_lives_brief_2026-10-01.txt, staff_room_brief_2026-10-01.txt and the two outside-cast files. It needs
+the Staff Room to exist and to have been lived in first, so it comes after it in that round.)
+
+我想在目前 Jill’s Kitchen 的 Staff Lives / Staff Room expansion 上，再加入一條完整的 Restaurant Story：
+
+PRIVATE DINING ROOM / 包廂
+
+請把以下內容視為完整 product + story + gameplay architecture。
+
+這不是單純新增一個可購買房間。
+
+核心要求：
+
+「包廂必須是玩家先實際看見需求，Jill 才想到要做的空間。」
+
+它和 Lounge、Side Hall、Staff Room 必須各自回答不同問題，不能功能重疊。
+
+
+==================================================
+一、先 audit 現有遊戲
+==================================================
+
+實作前請先 audit：
+
+- Main Hall
+- Side Hall
+- Lounge
+- Staff Room（如果目前正在實作，請依目前 working tree 的最新狀態）
+- expansion / construction architecture
+- room navigation
+- table assignment / seating
+- customer groups
+- regulars
+- VIP / gourmet / critic / special guests
+- staff outside-life visitors
+- Restaurant Story
+- Story Facts
+- Journal
+- event arbiter
+- Life Album
+- save schema / migration
+- mature-save economy
+
+不要重新設計已經存在且正常運作的 room systems。
+
+如果以下設計與現有 architecture 有衝突，優先沿用既有 architecture，再把這套需求合理接進去。
+
+不要為 Private Room 建第二套 simulation。
+
+
+==================================================
+二、每個空間必須有不同存在理由
+==================================================
+
+請把 Jill’s Kitchen 的主要空間理解成：
+
+MAIN HALL
+= 正常吃飯。
+核心是一般 dining flow / turnover。
+
+SIDE HALL
+= 更多人一起吃飯。
+核心是 group dining / capacity。
+
+LOUNGE
+= 吃完以後還不想走。
+核心是 longer stay / drinks / social density / after-dinner life。
+
+STAFF ROOM
+= 每天在這裡工作的人，也需要一個不屬於工作站的位置。
+核心是 staff life / private staff space / outside-life crossover。
+
+PRIVATE DINING ROOM
+= 有些聚餐需要的不是更大的桌子，而是一個只屬於「這一桌」的空間。
+核心是 privacy / occasion / intimacy of a group。
+
+Private Room 絕對不能只是：
+
+- Side Hall but prettier
+- VIP room
+- expensive customer room
+- Lounge with a door
+- higher-tip room
+- rich-people room
+
+它存在的理由不是「高級」。
+
+而是：
+
+「這一桌今天不只是需要一張桌子。」
+
+
+==================================================
+三、Staff Room 與 Private Room 的關係
+==================================================
+
+Private Room 不應該寫成：
+
+Staff Room Lv.2 → unlock Private Room
+
+也不要建立科技樹式 dependency。
+
+Staff Room 的作用是讓 Jill 和玩家先透過實際生活學到：
+
+「一個屬於特定人的空間，會改變他們怎麼使用餐廳。」
+
+例如 Staff Room 完成後：
+
+- Hugo 可以叫宇翔進去等
+- 珊珊可以在裡面等 Nina
+- 國雄不需要占用客席等秀琴
+- 員工餐有自己的地方
+- 大家的私人物品開始有位置
+- 房間慢慢留下使用痕跡
+
+這些事情必須真的發生一段時間。
+
+Private Room 的 conceptual prerequisite 是：
+
+Jill 已經親眼看過「自己的空間」帶來的差別。
+
+但 Private Room 本身仍然必須由「客人端」的新需求觸發。
+
+
+==================================================
+四、Private Dining Evidence 系統
+==================================================
+
+不要 Day X 自動解鎖。
+
+不要 Restaurant Level X 自動解鎖。
+
+不要 Staff Room 完成隔天就跳通知。
+
+建立 hidden evidence：
+
+PRIVATE_DINING_EVIDENCE
+
+玩家必須先實際遇到不同種類的「這桌需要自己的空間」事件。
+
+至少需要兩個不同 category 的 evidence。
+
+其中：
+
+至少一個可以來自 Staff Lives / employee outside-life network。
+
+至少一個必須來自非員工家庭的既有 customer / regular / restaurant world。
+
+這樣 Private Room 不會看起來像為某個 NPC 家庭特別蓋的。
+
+
+==================================================
+五、第一類 Evidence：Staff Lives
+==================================================
+
+優先使用已經建立的阿珠姐 × 怡君線。
+
+前提：
+
+- 怡君已經透過《吃飯啊》正式 introduction
+- 玩家已經認識她
+- 她已經至少有一次後續自然回訪
+- 不要讓第一次見怡君就立刻拿她觸發 Private Room
+
+後期某次，怡君和數名家人／朋友來吃飯。
+
+這不是婚宴。
+不是重大 drama。
+不是求婚。
+不是家庭危機。
+
+就只是一頓比平常更私人、比較想自己說話的聚餐。
+
+Jill安排座位時：
+
+Jill：
+「要坐裡面一點嗎？」
+
+怡君：
+「有比較安靜的嗎？」
+
+Jill看一下目前餐廳。
+
+「……沒有。」
+
+事件到這裡即可。
+
+不要立刻跳：
+
+PRIVATE ROOM UNLOCKED!
+
+不要讓怡君說：
+「你們應該蓋包廂。」
+
+不要讓 NPC 幫玩家做 game-design suggestion。
+
+只記錄：
+
+privateDiningEvidence.staffLife = true
+
+這一幕的作用只是：
+
+第一次讓 Jill 和玩家發現，
+「大桌子」和「自己的空間」不是同一件事。
+
+
+==================================================
+六、第二類 Evidence：Restaurant World
+==================================================
+
+第二個 evidence 必須來自非 staff-family。
+
+請先 audit 現有 regulars / special customers，選擇最符合目前 canon 的人物。
+
+優先考慮：
+
+- 王先生 / 王太太與家人
+- 已建立關係的熟客群
+- 周董或既有商務型人物
+- 其他已有 stable identity 的 recurring customer
+
+不要為了這個 trigger 硬創造一個只出現一次的新 NPC。
+
+這次需求也不要和怡君完全相同。
+
+例如可以是：
+
+A. 家庭／熟人聚餐
+一桌人想聊比較私人的事情，不希望坐在主要客流旁。
+
+或：
+
+B. 小型商務餐
+不是秘密交易，不要戲劇化。
+只是對方問：
+
+「有比較不被打擾的位置嗎？」
+
+Jill只能提供目前最靠裡的位置。
+
+或：
+
+C. 某個熟客的小型慶祝
+他們不需要全餐廳一起唱生日歌，也不想被其他客人圍觀。
+
+重要：
+
+第二個 evidence 要證明 Private Room 是餐廳本身真正存在的需求，
+不是「怡君需要一個房間」。
+
+
+==================================================
+七、第三類 Optional Evidence
+==================================================
+
+可以存在第三個 optional evidence，但不是必要條件。
+
+例如：
+
+- 熟客生日希望安靜吃飯
+- 小型家庭聚餐
+- 長輩聚餐
+- 商務餐
+- 很久沒見的一群人想慢慢聊天
+
+這些 evidence 不必每次都觸發 Story Update。
+
+它們只是讓世界反覆證明同一件事情：
+
+「有些桌需要的不是更大，而是更自己的空間。」
+
+
+==================================================
+八、真正的 Restaurant Story Trigger
+==================================================
+
+Private Room 的正式 Restaurant Story beat 必須在以下條件成立後才 eligible：
+
+1. Restaurant maturity 達合理門檻
+2. Staff Room 已經存在
+3. Staff Room 已經實際使用一段時間，而不是剛完成
+4. 至少一個 Staff Room consequence 已經實際發生
+   例如：
+   - 宇翔進 Staff Room 等 Hugo
+   - 珊珊進去等 Nina
+   - 國雄進去等秀琴
+   - Staff Room 已累積 personal traces
+5. 至少一個 staff-life private dining evidence
+6. 至少一個 non-staff private dining evidence
+7. Private Room 尚未開始建設
+8. event arbiter 判定當天沒有更重要事件競爭
+
+不要要求所有可能 evidence 都發生。
+
+不要因為 mature save 已經滿足大量條件，就在 load save 後一次傾瀉全部劇情。
+
+
+==================================================
+九、Restaurant Story：《關上門以後》
+==================================================
+
+正式觸發時，不需要 NPC 開會討論要蓋包廂。
+
+讓 Jill 自己從已經發生過的事情理解。
+
+可以發生在打烊後。
+
+她經過 Staff Room。
+
+門可能半掩著。
+
+裡面有人坐著、東西放著，或者只是已經明顯是一個「有人使用的地方」。
+
+Jill再看向今天客人坐過的位置。
+
+Journal / internal observation：
+
+《關上門以後》
+
+「有些人留下來，
+是因為還不想回家。
+
+所以有了 Lounge。
+
+有些人需要一個地方，
+是因為每天都在這裡工作。
+
+所以有了休息室。
+
+還有一些人來吃飯，
+只是今天想跟這張桌上的人待在一起。」
+
+不要再補：
+
+「也許餐廳需要一個包廂。」
+
+讓 UI / project unlock 自己完成最後一句。
+
+然後：
+
+PRIVATE DINING ROOM PROJECT unlocked.
+
+
+==================================================
+十、Private Room 是 paid expansion
+==================================================
+
+Private Room 必須是 mature-save meaningful money sink。
+
+價格請根據目前 mature-save economy audit 決定。
+
+不要因為它是 story unlock 就免費送。
+
+玩家應該有：
+
+「喔，終於可以蓋了。」
+
+然後看到價格：
+
+「……好，真的要花錢了。」
+
+的感覺。
+
+但不要做成荒謬 grind wall。
+
+
+==================================================
+十一、Private Room 空間定位
+==================================================
+
+視覺上：
+
+- 延續 Jill’s Kitchen 現有 warm restaurant language
+- 有真正可以關上的門
+- 約 4–8 人最合理，依目前 seating architecture 調整
+- 一張主要 dining table
+- seating 舒服但仍然是餐廳
+- lighting 比 Main Hall 稍微集中、安靜
+- acoustic / spatial separation 可以視覺暗示
+- 可以有少量 shelf / artwork / plant / service furniture
+- 不要過度奢華
+
+禁止：
+
+- 金碧輝煌 VIP room
+- 黑金商務會所
+- KTV
+- conference room
+- cigar room
+- hotel banquet room
+- secret room
+- Lounge 2.0
+- 大量酒吧元素
+
+這是：
+
+PRIVATE DINING
+
+不是：
+
+VIP ENTERTAINMENT.
+
+
+==================================================
+十二、Private Room 的 gameplay identity
+==================================================
+
+Private Room 的客人不是單純：
+
+pay +30%
+tip +50%
+
+不要讓它只剩經濟 buff。
+
+它的 gameplay identity 應該是：
+
+- 較低 turnover
+- 一次占用時間較長
+- group size 通常較完整
+- occasion / privacy suitability
+- 更高機率承載特定 authored 或 ambient social moments
+- reservation / assignment 若現有 architecture 支援，可以有簡單 room suitability
+- 不增加大量 micro-management
+
+不要讓玩家一直手動開門、送毛巾、補茶、調燈光。
+
+不要建立 Private Room service minigame。
+
+它仍然由同一套 restaurant simulation 運作。
+
+
+==================================================
+十三、誰可以使用 Private Room
+==================================================
+
+完成後不要只讓劇情 NPC 使用。
+
+Private Room 必須真的成為餐廳的一部分。
+
+可使用類型包括：
+
+- family groups
+- established regular groups
+- small celebrations
+- quiet birthday meals
+- reunion meals
+- business meals
+- recurring characters with appropriate group context
+- staff-family groups when logically dining as customers
+
+但不是所有 group 都優先進 Private Room。
+
+普通四人吃飯完全可以坐 Main Hall / Side Hall。
+
+需要有：
+
+privateDiningSuitability
+
+而不是：
+
+groupSize >= 4 → Private Room
+
+
+==================================================
+十四、完成後的第一個 payoff
+==================================================
+
+Private Room 完成後，不要立刻安排十場劇情。
+
+第一個 payoff 可以非常簡單。
+
+讓之前曾問：
+
+「有比較安靜的嗎？」
+
+的某一組人，在之後某天再次出現。
+
+這次 Jill：
+
+「裡面可以嗎？」
+
+對方看一下。
+
+「可以。」
+
+就這樣。
+
+不要說：
+
+「哇，你們真的蓋包廂了！」
+
+不要角色替玩家總結 progression。
+
+玩家自己知道。
+
+
+==================================================
+十五、Staff Lives callback
+==================================================
+
+怡君的後續 family meal 可以真正使用 Private Room。
+
+但不要讓她變成 Private Room mascot。
+
+她只是第一批讓 Jill 看見需求的人之一。
+
+如果阿珠姐當天有上班，可以有極小 callback：
+
+Nina：
+「怡君她們在裡面。」
+
+阿珠姐：
+「嗯。」
+
+就夠了。
+
+不要讓阿珠姐一直跑去包廂陪家人。
+她在工作。
+
+
+==================================================
+十六、既有 Regulars 的新生活
+==================================================
+
+Private Room 應該讓既有角色產生新的可能，而不是只增加新 NPC。
+
+例如：
+
+王先生 / 王太太：
+偶爾帶家人吃飯。
+
+周董：
+偶爾真正有 small business dining context。
+不要每次來都自動包廂，否則會變 VIP room。
+
+Sophie / Mia：
+如果只是兩個人正常吃飯，不應該因為 romance 就塞進 Private Room。
+Privacy ≠ romance room。
+
+Ken / Monsieur 杜：
+他們是 friendship。
+正常喝酒／吃飯優先仍屬 Lounge / normal restaurant context。
+不要因為兩人關係深就自動安排包廂。
+
+Dylan / Jill：
+不要把 Private Room 變成 Dylan romance scene generator。
+
+空間應服務 situation，而不是 relationship label。
+
+
+==================================================
+十七、Private Room 內的 Story / Ambient Rules
+==================================================
+
+Private Room 可以提高某些「適合私人場合的事件」的 eligibility。
+
+但：
+
+Private Room does NOT create relationships.
+
+它只提供一個已存在關係可以自然發生某些事情的空間。
+
+例如：
+
+family dinner
+old friends reunion
+small celebration
+quiet conversation
+
+事件仍必須遵守：
+
+- actual presence
+- established relationship
+- story prerequisites
+- cooldown
+- event arbiter
+- no teleport
+- no fake history
+
+
+==================================================
+十八、Life Album
+==================================================
+
+Private Room 可以被普通 Life Album 捕捉。
+
+例如：
+
+- family dinner
+- familiar regular group
+- birthday meal
+- 怡君 family meal
+
+但不要：
+
+「第一次使用包廂」＝自動 Story Photo。
+
+不要拍 ribbon cutting。
+
+不要把每次 private dining 都當收藏事件。
+
+只有未來真的出現值得永久保存的 authored milestone，
+才另外考慮 Story Photo。
+
+
+==================================================
+十九、Private Room 的後續升級
+==================================================
+
+第一版不要做五級。
+
+最多預留 2–3 階段 architecture。
+
+建議：
+
+PRIVATE ROOM I
+《一桌人的地方》
+
+基本 private dining：
+- door
+- table
+- seating
+- focused warm lighting
+- simple service furniture
+
+PRIVATE ROOM II
+《慢慢吃》
+
+後期 money sink：
+- 更舒服 seating
+- 更好的 acoustic / visual privacy
+- improved service storage
+- richer but restrained decor
+- subtle table-setting improvement
+
+PRIVATE ROOM III（可以先 defer）
+《熟悉的位置》
+
+不是豪華化。
+
+重點是 lived-in / established restaurant character：
+- subtle traces of repeated use
+- refined artwork / shelf / plant
+- seasonal table details
+- richer occasion variations
+
+不要把升級方向做成：
+wood → marble → gold。
+
+Jill’s Kitchen 的 progression 是：
+
+more lived-in / more capable / more specific
+
+不是：
+
+more expensive-looking.
+
+
+==================================================
+二十、和 Staff Room 的視覺對照
+==================================================
+
+這兩個空間應該有非常有趣的反差：
+
+STAFF ROOM：
+越後期越有點不整齊。
+杯子、外套、球袋、食物、私人物品慢慢留下。
+因為它屬於每天生活在這裡的人。
+
+PRIVATE ROOM：
+每次客人離開後會重新整理。
+比較乾淨、安靜、克制。
+因為它每一次都暫時屬於「今天這一桌」。
+
+所以：
+
+Staff Room 的時間感來自「東西留下來」。
+
+Private Room 的時間感來自「不同的人一次又一次使用同一張桌子」。
+
+不要把兩個房間做成換色版本。
+
+
+==================================================
+二十一、不要做的東西
+==================================================
+
+絕對不要新增：
+
+- privacy meter
+- guest intimacy meter
+- VIP satisfaction meter
+- manually close/open door mechanic
+- table-service chores
+- reservation paperwork minigame
+- room-cleaning chores
+- relationship bonus meter
+- package selection
+- birthday package
+- business package
+- proposal package
+- premium package
+- room rental timer UI
+
+不要 mobile-game monetization language。
+
+這是 Steam cozy restaurant game 的世界／空間 progression。
+
+
+==================================================
+二十二、Save / Migration
+==================================================
+
+這點非常重要。
+
+成熟存檔可能已經：
+
+- Day 50+
+- 有大量 staff tenure
+- Staff Lives 條件已部分成立
+- Lounge 已存在
+- 很有錢
+- 很多 regular relationships 已建立
+
+不要因為 migration 時 inferred conditions 成立，
+就在第一次 load 時直接：
+
+怡君事件
+→ 王先生事件
+→ Jill observation
+→ Private Room unlock
+
+全部連發。
+
+Historical state 不等於 observed evidence。
+
+只有真正被玩家看到的事件，才應計入 story evidence。
+
+如果需要 migration seed：
+
+- preserve existing facts
+- initialize new evidence conservatively
+- let mature saves encounter new evidence naturally over subsequent days
+
+不要偽造玩家已經看過的故事。
+
+
+==================================================
+二十三、Event pacing
+==================================================
+
+這條 expansion 的節奏應該是：
+
+Staff Room 已經成為日常
+↓
+第一次 private-dining evidence
+↓
+數個正常營業日
+↓
+第二種不同 evidence
+↓
+不要當天立刻觸發
+↓
+某個適合的打烊時刻
+↓
+《關上門以後》
+↓
+Project available
+↓
+玩家自己決定何時花錢建
+↓
+施工／完成
+↓
+先讓房間普通運作
+↓
+過一段時間才發生第一次 meaningful callback
+
+不要：
+
+event → event → unlock → construction → payoff
+
+在兩天內全部跑完。
+
+
+==================================================
+二十四、驗收標準
+==================================================
+
+完成後，我在 normal play 中應該可以感受到：
+
+1. 我先看到「有人需要更私人的 dining space」。
+2. 當時遊戲沒有立刻拿 unlock 獎勵砸我。
+3. 後來另一群不同的人又證明同樣需求。
+4. 我已經透過 Staff Room 理解「自己的空間」對 Jill’s Kitchen 的意義。
+5. Jill 才自己想到下一個空間。
+6. 我花一筆真的有感的錢把它蓋出來。
+7. 包廂完成後，它真的被不同類型的客人使用。
+8. 它和 Main Hall / Side Hall / Lounge 功能明顯不同。
+9. 它沒有變成 VIP room。
+10. 它沒有增加新的煩人 chores。
+11. 舊角色因為新空間多了新的生活可能。
+12. 玩家感覺餐廳是在「學會怎麼容納不同的人」，而不是單純升級建築。
+
+
+==================================================
+二十五、Implementation / QA
+==================================================
+
+請先 audit，然後直接 implementation。
+
+只有遇到真正需要我做 product decision 的衝突才停下來問我。
+
+請特別測試：
+
+- mature-save migration
+- new save progression
+- Staff Room prerequisite
+- staff-life evidence prerequisite
+- non-staff evidence prerequisite
+- evidence cannot be granted by unseen history
+- event spacing
+- event arbiter conflicts
+- customer presence
+- recurring-character knowledge
+- Private Room seating assignment
+- group suitability
+- normal procedural group usage
+- regular usage
+- Lounge vs Private Room routing
+- Side Hall vs Private Room routing
+- revenue balance
+- long occupancy behavior
+- save/reload while room is under construction
+- save/reload after room completion
+- mobile layout / room navigation
+- screenshot audit
+- multi-day Day-50+ simulation
+
+最後 report：
+
+1. existing architecture reused
+2. exact Private Room eligibility
+3. implemented evidence events
+4. 《關上門以後》 implementation
+5. construction cost and economic rationale
+6. room gameplay behavior
+7. customer routing rules
+8. Staff Lives callbacks
+9. migration behavior
+10. multi-day simulation result
+11. regression test result
+12. screenshots / visual audit
+13. intentionally deferred Private Room II / III content
+14. what I should specifically watch for during normal iPhone play
+
+最重要：
+
+不要把 Private Room 做成「更多功能」。
+
+要讓它像 Jill’s Kitchen 其他好的 expansion 一樣：
+
+玩家先遇見一個生活上的問題，
+餐廳過了一段時間，
+才長出一個回答。

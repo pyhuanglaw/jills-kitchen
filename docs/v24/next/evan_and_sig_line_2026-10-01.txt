@@ -1,0 +1,14 @@
+(Filed verbatim. 2026-10-01 18:32, the player, with a phone screenshot of the published v2.4-rc4 (artifact version 38):
+Day 58, 17:32, the Lounge tab — two bartenders behind the bar, the one tagged Evan drawn with long hair; at the bottom
+周董's line 「我是專程為了 Jill 的招牌菜來的！」 and the toast 「VIP 貴賓到了！消費高，要求也高。」. Picture:
+evan_and_sig_line_2026-10-01.png. For rc5.)
+
+Evan是男的吧
+然後一堆npc一直重複是為了Jill招牌菜來的
+
+Cause (from the code, rc4):
+- Evan's sprite look (LOUNGE_LOOKS) has hair style 2 — the long hair Sophie has. Every other named employee's sprite takes
+  its hair style from a hash of the id ([0,1,2,3,6,6,7]), not from the portrait, so a man can get long hair and a woman
+  a short crop.
+- spawn(): every guest who comes for the signature (5–12% of random guests, VIPs like 周董 included) says the same
+  sentence on arrival, 「我是專程為了 Jill 的招牌菜來的！」 — several times an evening, word for word.

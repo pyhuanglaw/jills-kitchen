@@ -1,0 +1,438 @@
+IMPORTANT RECONCILIATION:
+THE EXISTING KEN / MONSIEUR 杜 WINE ARC IS NOW THE NARRATIVE ORIGIN OF THE LOUNGE.
+
+Do not replace the previously designed wine-trigger story with a simple construction unlock.
+
+The player must not suddenly see “Build Lounge” in the upgrade menu merely because a revenue/day/rating threshold was reached.
+
+The Lounge should first exist as an IDEA inside the restaurant’s story.
+
+==================================================
+LOUNGE ORIGIN ARC — 《餐廳是不是少了什麼？》
+==================================================
+
+This supersedes the earlier implementation concept where Ken merely unlocks a small wine-service feature inside the existing dining room.
+
+The narrative material is preserved, but its consequence becomes larger:
+
+KEN’S QUESTION
+→ WINE / PAIRING CONVERSATIONS
+→ JILL BEGINS CONSIDERING IT
+→ SMALL REAL-WORLD EXPERIMENT / TASTING
+→ AFTER-CLOSE LOUNGE PROJECT DISCUSSION
+→ PLAYER MAY START OR DEFER PROJECT
+→ BUILD LOUNGE I
+→ PERMANENT WINE / BAR SERVICE BEGINS
+
+The Lounge therefore has an authored origin.
+
+It is not an upgrade that appears from nowhere.
+
+--------------------------------------------------
+BEAT 1 — KEN NOTICES THE ABSENCE
+--------------------------------------------------
+
+After Ken has genuinely visited Jill’s Kitchen enough to know the food,
+and has actually eaten suitable dishes:
+
+Ken:
+
+「妳真的完全不賣酒？」
+
+Jill:
+
+「目前沒有。」
+
+Ken:
+
+「有幾道菜，我每次吃到一半，都覺得旁邊少了一個東西。」
+
+Jill:
+
+「你是來吃飯還是來找工作？」
+
+Ken:
+
+「吃飯。」
+
+This creates a real fact such as:
+
+kenRaisedWineQuestion = true
+
+Do not expose the flag to the player.
+
+Do not trigger solely from calendar day.
+
+Ken must have real restaurant history.
+
+--------------------------------------------------
+BEAT 2 — MONSIEUR 杜 DISAGREES
+--------------------------------------------------
+
+Ideal presentation:
+
+Ken and Monsieur 杜 are genuinely co-present later.
+
+Ken begins discussing what he would pair with a dish.
+
+Monsieur 杜:
+
+「不要。」
+
+Ken:
+
+「我還沒講。」
+
+杜:
+
+「我知道你要講什麼。」
+
+This begins their wine disagreement and establishes their relationship.
+
+IMPORTANT DEADLOCK PROTECTION:
+
+Monsieur 杜 co-presence should NOT be an absolute prerequisite for the entire Lounge system.
+
+If repeated natural opportunities fail to produce Ken × 杜 co-presence,
+Ken’s wine discussion may continue through another valid presentation.
+
+Monsieur 杜 can enter the arc later and react to it.
+
+Therefore:
+
+Ken is the structural origin.
+
+Ken × Monsieur 杜 is the preferred authored enrichment.
+
+Do not allow unlucky scheduling to permanently block Lounge construction.
+
+--------------------------------------------------
+BEAT 3 — THE IDEA KEEPS RETURNING
+--------------------------------------------------
+
+Do NOT immediately unlock construction after one dialogue.
+
+Over subsequent REAL visits, the idea should recur lightly.
+
+Examples:
+
+Ken notices another dish that would pair well.
+
+Jill sees someone ordering dinner and lingering afterward.
+
+A customer asks whether there is somewhere to have one more drink.
+
+A suitable existing regular remains after dinner.
+
+These should be sparse callbacks, not repetitive prompts.
+
+The restaurant gradually develops a reason for a Lounge.
+
+The player should feel:
+
+「好像真的可以做。」
+
+not:
+
+「系統叫我升級了。」
+
+--------------------------------------------------
+BEAT 4 — SMALL TASTING / PROOF OF CONCEPT
+--------------------------------------------------
+
+Before permanent Lounge construction, allow ONE authored experimental evening.
+
+This is NOT permanent wine service yet.
+
+Possible framing:
+
+Ken helps Jill prepare a very small tasting selection.
+
+No bottle inventory system.
+
+No permanent wine menu.
+
+No new daily management.
+
+The event uses a limited number of actual guests.
+
+Ken:
+
+「我只是問妳為什麼沒有。」
+
+Jill:
+
+「現在有了。」
+
+Ken:
+
+「……那我要負責？」
+
+Jill:
+
+「要。」
+
+Monsieur 杜 may attend if naturally eligible.
+
+If present, he and Ken can disagree over pairing.
+
+The player may make one or two meaningful high-level choices about pairing direction.
+
+There is no objectively correct answer.
+
+The purpose of this event is:
+
+1. narrative
+2. prove that wine fits Jill’s Kitchen
+3. introduce wine visually
+4. create Album / Review / Social history
+5. make Jill seriously consider a permanent space
+
+It is NOT a hidden tutorial for a giant wine simulator.
+
+--------------------------------------------------
+BEAT 5 — AFTER CLOSING: THE LOUNGE IDEA
+--------------------------------------------------
+
+After the tasting / sufficient wine-origin facts,
+trigger a quiet after-close moment.
+
+Jill looks at the restaurant after service.
+
+Possible dialogue:
+
+Jill:
+「如果真的要做，我不想只是放一個酒櫃。」
+
+Ken:
+「那妳想怎樣？」
+
+Jill:
+「讓人吃完飯以後，還有地方可以坐。」
+
+This is the conceptual birth of the Lounge.
+
+The project is then revealed to the PLAYER:
+
+NEW PROJECT:
+Jill’s Kitchen — Lounge
+
+Possible player choices:
+
+[開始規劃]
+[之後再說]
+
+IMPORTANT:
+
+“之後再說” NEVER permanently loses the Lounge.
+
+The project can be revisited later through Restaurant Records / project UI / another natural reminder.
+
+Do not repeatedly nag the player.
+
+--------------------------------------------------
+BEAT 6 — PROJECT, NOT INSTANT PURCHASE
+--------------------------------------------------
+
+Once the player chooses to pursue it:
+
+The Lounge becomes a visible expansion project.
+
+It should require:
+- appropriate restaurant maturity
+- physical expansion availability
+- substantial money investment
+
+Exact balance must be audited.
+
+Do NOT require arbitrary story grind after Jill has already decided to build it.
+
+Do NOT require friendship meters.
+
+Do NOT require Monsieur 杜 to appear again.
+
+The player is now making a restaurant-development decision.
+
+--------------------------------------------------
+BEAT 7 — CONSTRUCTION COMPLETES
+--------------------------------------------------
+
+When Lounge I is completed:
+
+The physical restaurant changes.
+
+This is the moment permanent Lounge service becomes available.
+
+At minimum:
+- bar counter
+- initial seating
+- wine storage/display
+- glassware
+- Lounge assignment destination
+- Bar Food eligibility
+- bartender staffing requirement
+
+Permanent alcohol service begins here.
+
+Do NOT permanently sell the full wine menu in Main Hall before Lounge I exists.
+
+The earlier tasting was an authored experiment, not normal daily service.
+
+After Lounge opens, Main/Side guests may eventually order eligible wine with dinner,
+but the Lounge remains the operational and narrative home of the wine program.
+
+--------------------------------------------------
+BEAT 8 — FIRST REAL LOUNGE NIGHT
+--------------------------------------------------
+
+The first night should NOT be a giant scripted cutscene.
+
+Let normal service occur.
+
+But use restrained authored callbacks.
+
+Ken should have elevated likelihood to appear if naturally valid.
+
+If Monsieur 杜 appears:
+
+Ken:
+「你不是說不要？」
+
+杜:
+「我說的是你的搭配。」
+
+Ken:
+「所以你還是來了。」
+
+杜:
+「我來吃飯。」
+
+Jill:
+「你現在坐在酒吧。」
+
+Do not require this exact wording.
+
+The important thing is continuity:
+
+These people remember why this room exists.
+
+--------------------------------------------------
+LONG-TERM CONSEQUENCE
+--------------------------------------------------
+
+After Lounge opens:
+
+Ken does NOT become staff.
+
+Monsieur 杜 does NOT become staff.
+
+They remain paying customers.
+
+They may gradually become Lounge regulars.
+
+Evan / 晴 may later learn their habits through REAL service history.
+
+This creates a new relationship chain:
+
+Ken ↔ Monsieur 杜
+Ken ↔ Evan
+Monsieur 杜 ↔ Evan
+Ken ↔ 晴
+Jill ↔ Lounge history
+
+The origin event therefore continues generating story instead of ending after unlock.
+
+==================================================
+TRIGGER ARCHITECTURE / DEADLOCK SAFETY
+==================================================
+
+Do NOT implement this as:
+
+Day 35 → Ken line
+Day 38 → 杜 line
+Day 40 → tasting
+Day 42 → Lounge
+
+Do NOT implement it as one fragile linear stage chain.
+
+Represent important historical facts separately.
+
+Conceptually:
+
+Ken has enough real visit history
+Ken has eaten relevant food
+Ken raised wine question
+Ken discussed pairing
+Monsieur 杜 participated in wine disagreement (optional enrichment)
+experimental tasting occurred
+Jill considered permanent wine service
+Lounge project revealed
+player deferred / accepted
+Lounge construction started
+Lounge completed
+first Lounge service occurred
+
+Only true logical requirements are HARD.
+
+Use eligibility windows / weighted selection / overdue priority for presentation.
+
+Most importantly:
+
+The system must distinguish:
+
+STRUCTURAL PROGRESSION
+from
+OPTIONAL CHARACTER ENRICHMENT.
+
+Structural:
+
+Ken raises question
+→ Jill experiments
+→ Lounge project becomes possible
+
+Enrichment:
+
+Monsieur 杜 happened to argue with Ken
+Momo posted about tasting
+老饕 commented on pairing
+Sophie attended tasting
+etc.
+
+Optional enrichment must NEVER deadlock structural progression.
+
+==================================================
+MATURE-SAVE SAFETY
+==================================================
+
+Do not assume the player reaches this arc in one exact restaurant-development order.
+
+The player may already have:
+- Side Hall
+- mature staff
+- high revenue
+- Signature dishes
+- infrastructure upgrades
+- long Ken history
+
+Eligibility should recognize existing valid history where available.
+
+Do not replay logically obsolete introductory material merely because a new field was added.
+
+At the same time:
+
+Never fabricate that an event occurred if the save has no evidence for it.
+
+Use safe migration defaults and allow the next natural visit to begin the missing story.
+
+==================================================
+NARRATIVE PRINCIPLE
+==================================================
+
+The player should eventually be able to remember:
+
+「這個酒吧是 Ken 當初一直嫌 Jill 的餐廳沒有酒，後來才真的弄出來的。」
+
+The Lounge must have provenance.
+
+It should feel like something that happened in Jill’s Kitchen history,
+not a feature that appeared in a patch.

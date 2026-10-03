@@ -1,0 +1,91 @@
+(Filed verbatim. 2026-10-01 11:42, the player, with the picture docs/v24/refs/outside_cast_reference_2026-10-01.png —
+four columns, left to right in the order of the list below: 怡君, Kevin, 珊珊, 宇翔; each a large portrait and two
+smaller expressions. Canonical for the Staff Lives round (docs/v24/staff_lives_brief_2026-10-01.txt); where the two
+differ, this later message wins — e.g. 宇翔's first scene now has its own lines.)
+
+這張圖片是 Jill’s Kitchen 新增店外人物的正式角色視覺 reference。
+
+請把圖中的人物視為後續 Staff Lives 系統的 canonical visual references。不要把他們當成隨機客人，也不要自行改變人物身分、關係或性格。
+
+四名人物如下：
+
+1. 怡君，27歲
+阿珠姐的成年女兒。
+已經工作並搬出去自己生活，和阿珠姐關係很好，但母女相處很生活化、直接，不走煽情路線。
+她第一次正式進入餐廳世界的重要事件，是到 Jill’s Kitchen 吃飯：
+
+阿珠姐：「妳怎麼來了？」
+怡君：「吃飯啊。」
+阿珠姐：「附近那麼多間。」
+怡君：「不能吃妳工作的喔？」
+
+之後她可以低頻回訪。
+Staff Room 建成後，她也可能把阿珠姐曾提過休息室缺少的實用物品帶來，該物品可以成為休息室永久的生活痕跡。
+更後期她可能帶男友來吃飯，但不要發展成審核女婿或家庭 drama。
+
+2. Kevin，約36歲
+Marco以前在其他餐廳工作時認識的老同事，目前仍在餐飲業。
+他和 Marco 認識很多年，很知道怎麼故意煩對方，但不是反派、競爭者或搞笑角色。
+
+第一次來 Jill’s Kitchen 時，他會故意點 Marco 當天負責、比較麻煩的料理。
+Marco看到 ticket 後只說：
+「……白痴。」
+
+後續 Kevin 可以低頻再次來訪。
+Marco tenure 足夠長後，兩人有一個重要 milestone：
+
+Kevin：「你這裡待滿久了。」
+Marco：「嗯。」
+Kevin：「不走了？」
+Marco：「目前沒有。」
+
+不要把這段改寫成 Marco「終於找到家」之類的感性告白。
+
+3. 珊珊，26歲
+Nina從高中一路認識到現在的摯友。
+個性比 Nina 安靜、節奏較慢，但不是害羞或社恐。
+
+她第一次出現，是來等 Nina 下班：
+
+Jill：「妳朋友？」
+Nina：「高中同學。」
+珊珊：「她以前很安靜。」
+Jill：「誰？」
+Nina：「妳可以走了。」
+
+她的重要作用，是讓玩家看到 Nina 在真正認識很多年的朋友旁邊，反而可以很自然地安靜下來。
+
+Staff Room 建成後，珊珊偶爾可以進去等 Nina。
+她和 Nina 是多年摯友，不是 romance。
+
+4. 宇翔，22歲
+Hugo的弟弟，比 Hugo 小約9歲，目前是大學生／大學年紀。
+Hugo從小很習慣照顧他，因此兩人的關係自然，不需要煽情。
+
+第一次出現是來店裡送東西給 Hugo：
+
+宇翔：「哥。」
+Hugo：「你怎麼來了？」
+宇翔：「拿東西給你。」
+Hugo：「放著就好。」
+
+其他員工也是從實際見到他之後，才逐漸知道 Hugo 有一個弟弟。
+
+Staff Room 建成後要保留一個重要 callback：
+
+Hugo：「你進去等我。」
+宇翔：「可以喔？」
+Hugo：「可以。」
+
+這句話的功能是讓玩家感受到 Staff Room 已經真正改變員工與店外生活接觸的方式。
+
+重要實作規則：
+
+- 這四人都有 stable identity，不是 procedural customers。
+- 使用這張圖作為四人的正式 visual reference。
+- 第一次正式 introduction 發生前，其他角色不能無中生有認識他們。
+- 第一次事件發生後，才逐步解鎖 callbacks、ambient visits 和其他角色對他們的認識。
+- 不要為了劇情 teleport；人物必須真的在場。
+- 他們不是員工，不加入 staff roster。
+- 不要把每次來訪都做成 Story notification。
+- 後續普通來訪主要作為 ambient life，讓玩家感覺他們在劇情之外仍然生活。

@@ -1,0 +1,54 @@
+(Filed verbatim. 2026-10-02 08:37–09:21, the player: the second floor as it really is — a plan drawn by hand; the
+picture of the night the cats were found; where the stair door is; the stairs and the column. Read with
+docs/v24/second_floor_three_uses_0636_2026-10-02.txt (the plan in 店舖工程) and the code's UPR / UP_L.)
+
+08:37 — an image, docs/v24/art/second_floor_plan_0837_2026-10-02.jpg: a hand-drawn plan of the floor (the street at the
+top, as the game's own plan has it). 私人包廂 the big room in the top-left, from the left wall to about 61% of the width
+and down to a little under half the depth; 員工 (the Staff Room) directly below it, from the left wall to about 46% of
+the width, all the way to the back wall; the rest is the hall, an L down the right; 樓梯 a wide, short box in the
+bottom-right corner along the back wall. Two doors, each 「門」 with its swing: the Private Dining Room's in its front
+wall at its bottom-right corner, hinged at the corner, swinging in; the Staff Room's in its east wall at the top, hinged
+at the corner, swinging in — both onto the hall where the two rooms meet.
+
+「2樓的平面圖其實是這樣的，你可以改一下嗎？」
+
+08:41 — an image (docs/v24/art/illus_up_cats_2026-10-02_0841.png): the empty floor at night from above — the two
+street windows with the city behind, the orange cat on the sill, Jill bending to the tabby, the boxes and the ladder,
+two of the crew at the stairs in the bottom right.
+
+「去二樓發現貓的圖 修改成這一張」
+
+08:42 — 「你發佈R C六還要多久？」 08:42 — 「回答完就繼續做」
+
+08:44 —
+「OK然後因為看起來2樓沒有門，所以我們說他們門沒有關好
+貓才跑上去
+好像2樓那看起來樓梯的門是在1樓反正如果你劇情有提到就不要矛盾了，照這個改這個版本就是1樓的門沒關好，然後後面有樓梯梯他跑上2樓」
+
+09:14 — an image (the floor's view on a desktop screen, with the first version of the new plan) and:
+「你的樓梯比例太大了吧他應該縮小一半啊，然後他是要橫的不然他會佔太多右邊的空間
+中間的柱子其實可以直接不用吧沒有需要這麼寫實啦」
+
+09:21 — 「改得真好」 (on the four states of the floor and the plan, phone)
+
+What was done
+- The floor (UPR): the Private Dining Room x 22–244 (its east wall on the right window's first mullion, 62% of the
+  width), from the street wall to UPR.mid (47% of the depth); the Staff Room x 22–187 (46%), from UPR.mid to the back
+  wall. The Private Dining Room's door in its front wall at its corner (x 226), the Staff Room's in its east wall near
+  the top; each door knows the spot in front of it on the hall (fx, fy), which the walkers, the cats and the taps use.
+- The floor's view: the rooms' tops in their own materials (the Private Dining Room's deep olive with a brass edge, the
+  Staff Room's pale oak and a light warm grey), so two big rooms read as built rooms and not dark boxes; the Staff
+  Room's door seen edge-on in its side wall (its pale oak leaf, the frosted light lit when someone is in there, the mat
+  and the light under the door on the hall floor), its sign on its own wall; the 「？」 chalked where the other room is not
+  yet (nothing left undecided when both are built); the shared table, the cushion and the scratching post in the hall.
+- The stairs (09:14): across the bottom-right corner along the back wall, about half the size (132 × 70 instead of
+  114 × 162), the way in at their left end on the hall, the treads going down to the right, the railing along the open
+  side; the stair well is in the way for walkers. The column (09:14): gone, everywhere.
+- The plan in 店舖工程: the same — the doors with their swings where the player drew them, the stairs across the corner.
+- The night of the cats (08:41, 08:44): the player's new picture is the scene's illustration (whole, the white margin
+  left out); the story already was that version — the stair door is downstairs in the side room, the landlord pulled it
+  shut that afternoon and it did not latch, the cats went up the stairs behind it, 「這個怎麼開著？」 at that door,
+  「扣好了。」 after; the caption and the journal now say so: 「側廳樓梯的門沒關好……」. Upstairs the stairs come up into
+  the open floor with a railing and no door, as in the picture.
+- The words: the projects, the offers, the finished-room cards and the manual say where the rooms are and where their
+  doors open (no column).

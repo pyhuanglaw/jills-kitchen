@@ -1,0 +1,10 @@
+the card: 主廚之夜 Jill 自己的一晚，包下整個 Lounge：所有位子（現在 23 席）都是主廚之夜的客人，平常來 Lounge 的人那晚也是來參加主廚之夜。三道——前菜、招牌菜、招牌甜點（沒有招牌甜點就是最拿手的甜點）——每道配一杯，一道一道上。份量早上在廚房做好，晚上在吧台後面裝盤，不佔晚上的爐台；Lounge 的服務生和調酒師端。每位 $1,800（含酒）。 排在明晚
+mid-night: {"clock":"19:40","in":23,"up":2}
+the night: {"end":1,"people":23,"S":{"n":1,"last":74,"next":null},"endClock":"20:30"}
+summary lg: {"tabs":7,"rev":3110,"off":930,"tip":1453,"wait":0,"after":7,"direct":15,"sport":0,"cn":{"n":23,"rev":41400},"open":true} net 72347
+photo: "主廚之夜"
+errors (chef's night): []
+tasting: {"clock":"19:08","said":1,"in":23}
+tasting summary lg: {"tabs":15,"rev":16305,"off":0,"tip":4573,"wait":0,"after":0,"direct":15,"sport":0,"cn":null,"open":true}
+errors (tasting): []
+errors (choice): []

@@ -1,0 +1,40 @@
+2026-10-01 — Dylan × Jill dialogue revision for v2.3 (from the player/designer, filed verbatim in substance)
+
+1. DELETE the cooler scene completely:
+   Dylan「冷藏庫。」 Jill「嗯。」 Dylan「好，那我不問了。」
+   No replacement cooler scene in this release. The exchange has no understandable conversational premise.
+
+2. Post-reveal 王太太 exchange:
+   王太太「追到了沒？」 Dylan「還在努力。」 Jill「不要理他。」   (was: Jill「十一年了。」)
+
+3. Writing rule for Jill × Dylan (going forward):
+   Convey the relationship through shorthand, shared habits, unfinished sentences the player still understands,
+   knowing each other's routines, teasing, ordinary domestic familiarity, Dylan still "pursuing" his own wife,
+   Jill acting unimpressed while clearly in on the joke.
+   Avoid dialogue whose main purpose is to tell the player "they have been together eleven years" or
+   "they are a loving long-term couple" — let the player infer it. The story title / character information
+   can carry that fact.
+   Dylan can be considerate but is not a flat, constantly gentle perfect romantic lead.
+   Jill can call him annoying or brush him off, but never reads as genuinely cold toward him.
+   Test: if the same exchange could be given to almost any generic romantic NPC, it is not specific enough.
+   Good examples already in the game: 「老樣子？」「嗯。」 / 「老闆娘，晚上一起吃飯？」「回家吃。」「好。」 /
+   「老闆娘，明天有空嗎？」「不行，我老公會生氣。」「那確實滿麻煩的。」 / the reveal 「老公，走了。」「好。」
+
+4. Revised lines:
+   「老闆娘，我可以追妳嗎？」「你不是在追？」「那我繼續。」            (was: 「追到了再說。」「那就是可以。」)
+   「老闆娘，妳一個人住嗎？」「跟五隻貓，還有一個很煩的人。」「誰？」「你。」   (was: 「聽起來滿熱鬧的。」)
+
+5. Anniversary:
+   「紀念日想吃什麼？」「你決定。」「我每次決定妳都說不要。」「所以你先想三個。」
+   (was: 「老闆娘，紀念日想吃什麼？」「你記得日期？」「我只是問問。」「……那天店裡吃。」 — it made Dylan sound like
+   a husband who may not remember the date)
+
+6. Do NOT broadly rewrite the rest of the Dylan/Jill dialogue in this task. Keep the lines that already work.
+
+Implementation note (v2.3 follow-up): the running act (DYLAN_ACT) only ever said three lines, so a fourth line
+(Jill's) was silently dropped — 「跟貓。」, 「你不是已經每天來了。」 and the old anniversary ending were never heard.
+The act now plays Dylan / Jill / Dylan / Jill, which the two revised four-line exchanges need.
+
+Lines still in the game that touch the "eleven years" fact, NOT changed here (rule 6), listed for a later
+decision: VAL_LINES.post 「十一年了，還帶。」 (Jill, Valentine's after the reveal); the Story Photo caption
+「十一年了，他還是每年帶花來。」 (a caption, not dialogue); the story title 「結婚十一年，還在追」 (a title — allowed by rule 3).

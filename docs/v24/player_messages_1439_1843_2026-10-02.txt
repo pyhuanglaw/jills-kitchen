@@ -1,0 +1,107 @@
+(Filed for v2.4 rc7, 2026-10-02 18:50. The player's messages from 14:39 to 18:43 that rc7 answers or that change its
+scope. Where the full text survives it is verbatim. 14:39–15:40 came before this part of the work and their full text was
+not filed at the time; what survives verbatim is the line each commit quoted, marked [quoted in commit …]; the rest of
+those messages is summarised in brackets and marked as a summary. 15:24 and 16:42 have their own files.)
+
+14:39–15:03  the day's money
+  [summary: the Lounge's drinks cost nothing; a rent; higher wages; no debt — the till never goes negative; a small loan
+  in the first days if the money runs out]
+  14:49 「怎樣會有人來彈鋼琴?不用付錢嗎」 [quoted in commit 8a5b1f9]
+  14:51 「lounge幾桌 多少錢那個錢跟賣了多少酒的金額對不起來」 [quoted in commit 6dfc442]
+  [14:49 also asked for evenings that are events — a piano night, a tasting, a chef's night (主廚之夜). 15:02 asked that a
+  social post show the picture that was posted, and likes that grow (cats most, Momo many, Jill by her fame, ordinary
+  guests fewer; old posts too). Summary.]
+
+15:24  KEN / LOUNGE STORY CONTINUITY PASS, and the Monsieur 杜 payoff
+  docs/v24/ken_lounge_continuity_2026-10-02_1524.txt, docs/v24/du_collab_wine_payoff_2026-10-02_1524.txt
+15:33  「所以要由ken觸發品酒會喔 以後有也是他辦」 [quoted in commit 8e8d407]
+15:37  「會出現頭像的對話反而點對話不會跳到那個桌子?」 [quoted in commit 8800715]
+15:38  「有劇情的npc在遊戲裡的臉和髮型可不可以特別一點 不要都跟別人一樣」 [quoted in commit 8e536ae]
+15:39  「一天可以不只一個劇情不然太慢」 [quoted in commit 485c87e]
+15:40  「房東說可以上去嗎 要有一個具體原因 而且應該是說 我上去一下 他本來就能上去 就說上去拿個東西」 [quoted in commit 2f9be97]
+
+15:56  「需要給你什麼圖片」
+16:02  「給我Ken、Monsieur 杜各自獨立的圖片還有 現在 Lounge 的實際遊戲截圖」
+16:03  「給我玩繼續你剛剛的工作 完成P5和下個版本發布」
+16:03  「先給我給我Ken、Monsieur 杜各自獨立的圖片還有 現在 Lounge 的實際遊戲截圖 之後繼續你剛剛的工作 完成P5和下個版本發布」
+16:07  「你沒給我圖片ㄚ 然後跟我說你生成圖片的要求 畫質 怎樣你好截圖 之後繼續你剛剛的工作 完成P5和下個版本發布」
+16:07  「收到了」
+16:12  (with Ken's expression sheet) 「* Ken 1. 主持、正在講話（嘴巴微開，一手拿杯） 2. 乾乾的、心裡有數的笑（「我就知道」） 3. 低頭專心看酒或聞酒」
+16:14  (with 杜's sheet) 「杜先生 1. 專注品酒、不說話 2. 不以為然（挑眉或微皺眉） 3. 真心稱讚：克制的淺笑、眼神放軟，不要咧嘴大笑」
+16:19  (with the first tasting's picture) 「1. 第一次品酒會：Ken 在吧台主持，吧台上一排杯子，6–8 位客人坐在高腳椅上。 我會再給你他戴眼鏡的表情圖」
+16:21  (Ken's sheet with his glasses)
+16:25  (with the bottle's picture) 「1. 聯名酒：一瓶淺色系紅酒的酒瓶特寫和酒標。酒標字是「晚餐之後」和「JILL'S KITCHEN × KEN」。AI 常把字畫壞，所以可以畫成空白酒標，字我在遊戲裡加。」
+16:32  (with the picture) 「杜先生在吧台喝那支酒，Ken 坐在旁邊，安靜的一幕。」
+16:42  林予安, the Lounge's pianist — docs/v24/pianist_yuan_2026-10-02_1642.txt
+16:43  「觸發鋼琴師的劇情也要中斷餐廳進行 玩家點滑鼠才繼續 跟我說你需要的圖」
+16:45  「1. 試彈。這一段店照常營業，不暫停、沒有人鼓掌。 不應該沒人股長吧 要彈得很好吧 王太太出面說彈得真好」
+16:46  【第一次試彈｜重要修正】 — in docs/v24/pianist_yuan_2026-10-02_1642.txt
+16:46  「重新跟我說你要什麼圖 給我相關人物獨立的圖 告訴我你的圖片要求 之後繼續你的工作」
+16:54, 16:57, 16:59  (with 予安's three pictures: the trial, her first evening, 「下週還有空嗎？」)
+
+18:07  沈晴 × 阿拓 after work, five acts — docs/v24/qing_tuo_after_work_2026-10-02_1807.txt (branch wip/qing-tuo-after-work)
+18:07  the revised Act 5 — docs/v24/qing_tuo_act5_revised_2026-10-02_1807.txt (same branch)
+18:08  「這條告白線是不能默默進行 要每個故事發生都中斷餐廳 要玩家自己點畫面才會進行
+        跟我說你要什麼圖然後給我相關人士的獨立圖檔案 你要的圖要求的規格 和 內容
+        給我之後你繼續做你的事情」 (also docs/v24/qing_tuo_hold_2026-10-02_1808.txt on the branch)
+18:12  「這個故事線你先做沒有圖的部分保留先不發布 等我給你圖再發布 你先發佈別的故事線」
+18:16  「這次 rc7你寫完那些 還要寫那些 預計多久? 回復完我繼續做」
+18:38  「先暫停 P5 其他員工生活線，不刪除既有設計與素材，也不要繼續新增七位店外人物或「收店等人／廚房門口找人」機制。保留現有規格供未來使用。現階段優先把已存在的角色、Lounge、Ken／杜先生、予安、沈晴／阿拓等既有故事與 normal play 的連結做深。不要因暫停 P5 而移除已經完成且穩定的內容；如果某部分已實作完成，保留即可，不再向外擴張。
+
+        怡君是秀琴阿姨女兒的部分保留」
+18:39  「先暫停 P5「其他員工生活線」的後續擴張。
+
+        具體而言：
+
+        - 不刪除既有設計、資料、素材或已完成且穩定的實作。
+        - 暫時不要繼續新增七位店外人物（Kevin、珊珊、宇翔、小彤爸媽、老林、國雄等）及其獨立生活線。
+        - 暫時不要新增／擴張「收店時等人」「到廚房門口找人」等通用機制。
+        - 已經完成且穩定的相關內容保留，不要因本次暫停而回滾、移除或破壞存檔相容性。
+        - 尚未完成的 P5 規格與素材保留，作為未來可能恢復開發的 backlog，不需要刪除。
+
+        【重要例外：怡君 × 秀琴的既有家庭關係必須完整保留】
+
+        怡君是秀琴的女兒，這是既有 canon，也是《三個選項》《那面牆》等既有故事的重要人物關係，不屬於本次要暫停的「新增店外人物生活線」。
+
+        因此：
+
+        - 秀琴 = 怡君的母親
+        - 怡君 = 秀琴的女兒
+        - 兩人的既有關係、對話、故事 prerequisite、Wall／《三個選項》相關內容全部保留
+        - 怡君仍然可以正常出現在餐廳、找秀琴、與既有角色互動
+        - 不要因為暫停 P5 而停用、刪除或降級怡君相關內容
+        - 如果現有程式把怡君誤歸類在 P5「員工店外親友擴張」中，請把她視為既有正式故事角色處理，而不是一起關閉
+
+        國雄與其他尚未需要進場的 P5 店外人物則暫時不再向外擴張；若已有穩定實作可以保留，但不要為了 P5 繼續增加新場景、新機制或新人物。
+
+        【現階段開發重心】
+
+        現階段不要用「增加更多人物」來增加內容量。
+
+        優先把已經存在、玩家已經認識的人物與空間做深，尤其：
+
+        - Lounge 本身的生活感
+        - Ken
+        - Monsieur 杜
+        - Ken × 杜先生
+        - 予安
+        - Evan
+        - 沈晴 × 阿拓
+        - Dylan 與 Lounge 這群人的關係
+        - 既有角色之間的 cross-character continuity
+        - authored story 發生後，在 normal play 中留下的 ambient / callback / permanent consequence
+
+        方向是：
+
+        「讓玩家想知道已經認識的人接下來會怎樣」
+
+        而不是：
+
+        「再讓玩家認識七個新的人。」
+
+        因此本次只是暫停 P5 外擴，不是刪除 P5，也不是重構既有內容。
+
+        REPORT ≠ STOP。
+        若 P5 暫停後仍有其他已明確定義、沒有 canon conflict 的工作，請繼續執行，不要因為收到這項優先順序調整就停止整體工作。」
+18:41  「晴×拓下一個版本再發佈 你先發佈rc7」
+18:43  「這樣你還需要多久 跟我講完就繼續發佈rc7」

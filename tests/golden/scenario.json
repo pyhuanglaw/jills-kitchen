@@ -1,0 +1,318 @@
+[
+ {
+  "day": 1,
+  "money": 2312,
+  "lifetime": 2612,
+  "level": 1,
+  "stats": {
+   "guests": 19,
+   "perfect": 19,
+   "days": 1,
+   "walkins": 1,
+   "families": 0
+  },
+  "xp": {
+   "friedrice": 38
+  },
+  "stock": {
+   "friedrice": 0
+  },
+  "reviews": 8,
+  "reviewHash": "f4331daf",
+  "regulars": {},
+  "summary": {
+   "rev": 2280,
+   "cost": 755,
+   "tips": 332,
+   "bonus": 255,
+   "wages": 0,
+   "net": 1812,
+   "guests": 19,
+   "lost": 0,
+   "perfect": 19,
+   "plated": 19,
+   "avg": 99,
+   "top": "friedrice",
+   "stars": 5
+  },
+  "cats": [
+   [
+    "tora",
+    "home",
+    "walk",
+    72,
+    525,
+    -1,
+    true
+   ],
+   [
+    "ban",
+    "walk",
+    "scr",
+    116,
+    488,
+    -1,
+    false
+   ],
+   [
+    "snow",
+    "home",
+    "curl",
+    72,
+    525,
+    -1,
+    true
+   ],
+   [
+    "mikan",
+    "home",
+    "loaf",
+    94,
+    100,
+    -1,
+    true
+   ],
+   [
+    "mei",
+    "home",
+    "groom",
+    166,
+    90,
+    -1,
+    true
+   ]
+  ],
+  "catHash": "f3a20a53",
+  "mem": [],
+  "weights": "2005:a6a2eac3",
+  "dylan": {
+   "stage": 0,
+   "stay": 0,
+   "reveal": 0,
+   "last": 0,
+   "clues": {}
+  },
+  "life": {
+   "sofa": 0,
+   "tv": 0
+  }
+ },
+ {
+  "day": 2,
+  "money": 5782,
+  "lifetime": 7758,
+  "level": 1,
+  "stats": {
+   "guests": 45,
+   "perfect": 57,
+   "days": 2,
+   "walkins": 2,
+   "families": 0
+  },
+  "xp": {
+   "friedrice": 86,
+   "coffee": 28
+  },
+  "stock": {
+   "friedrice": 3,
+   "coffee": 0
+  },
+  "reviews": 16,
+  "reviewHash": "591f6c87",
+  "regulars": {},
+  "summary": {
+   "rev": 4140,
+   "cost": 1206,
+   "tips": 1006,
+   "bonus": 330,
+   "wages": 0,
+   "net": 3970,
+   "guests": 26,
+   "lost": 0,
+   "perfect": 38,
+   "plated": 38,
+   "avg": 99,
+   "top": "friedrice",
+   "stars": 5
+  },
+  "cats": [
+   [
+    "tora",
+    "home",
+    "loaf",
+    114,
+    90,
+    -1,
+    true
+   ],
+   [
+    "ban",
+    "side",
+    "sit",
+    222,
+    529,
+    -1,
+    false
+   ],
+   [
+    "snow",
+    "sleep",
+    "curl",
+    63,
+    425,
+    2,
+    false
+   ],
+   [
+    "mikan",
+    "walk",
+    "groom",
+    224,
+    237,
+    -1,
+    false
+   ],
+   [
+    "mei",
+    "home",
+    "sit",
+    166,
+    90,
+    -1,
+    true
+   ]
+  ],
+  "catHash": "4b9eb7f1",
+  "mem": [
+   "first:1::811c9dc5"
+  ],
+  "weights": "4257:325be20",
+  "dylan": {
+   "stage": 0,
+   "stay": 0,
+   "reveal": 0,
+   "last": 0,
+   "clues": {}
+  },
+  "life": {
+   "sofa": 0,
+   "tv": 0
+  }
+ },
+ {
+  "day": 3,
+  "money": 5878,
+  "lifetime": 8154,
+  "level": 1,
+  "stats": {
+   "guests": 48,
+   "perfect": 60,
+   "days": 3,
+   "walkins": 2,
+   "families": 0
+  },
+  "xp": {
+   "friedrice": 92,
+   "coffee": 28,
+   "pasta": 0
+  },
+  "stock": {
+   "friedrice": 0,
+   "coffee": 0
+  },
+  "reviews": 17,
+  "reviewHash": "93771497",
+  "regulars": {},
+  "summary": {
+   "rev": 360,
+   "cost": 0,
+   "tips": 36,
+   "bonus": 0,
+   "wages": 0,
+   "net": 96,
+   "guests": 3,
+   "lost": 0,
+   "perfect": 3,
+   "plated": 3,
+   "avg": 98,
+   "top": "friedrice",
+   "stars": 5
+  },
+  "cats": [
+   [
+    "tora",
+    "home",
+    "sit",
+    114,
+    90,
+    -1,
+    true
+   ],
+   [
+    "ban",
+    "side",
+    "loaf",
+    222,
+    529,
+    -1,
+    false
+   ],
+   [
+    "snow",
+    "sleep",
+    "loaf",
+    190,
+    -49,
+    13,
+    false
+   ],
+   [
+    "mikan",
+    "eat",
+    "eat",
+    150,
+    532,
+    -1,
+    false
+   ],
+   [
+    "mei",
+    "rest",
+    "groom",
+    232,
+    -53,
+    12,
+    false
+   ]
+  ],
+  "catHash": "8c3d5245",
+  "mem": [
+   "first:1::811c9dc5"
+  ],
+  "weights": "7026:fea0c928",
+  "dylan": {
+   "stage": 0,
+   "stay": 0,
+   "reveal": 0,
+   "last": 3,
+   "clues": {},
+   "trace": [
+    {
+     "d": 3,
+     "p": 60,
+     "s": 1,
+     "t": 60,
+     "c": 1,
+     "at": 26,
+     "back": 0,
+     "r": "main"
+    }
+   ],
+   "first": 3
+  },
+  "life": {
+   "sofa": 0,
+   "tv": 0
+  }
+ }
+]

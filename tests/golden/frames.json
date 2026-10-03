@@ -1,0 +1,4729 @@
+{
+"day1": {
+"samples": [
+{
+"t": 0.033,
+"phase": "service",
+"scene": "583a0b4f",
+"tray": "-",
+"dom": "589dcd5",
+"cats": "dca16110",
+"weights": "1402:238da19d"
+},
+{
+"t": 1.033,
+"phase": "service",
+"scene": "536fa8d",
+"tray": "-",
+"dom": "194b3d34",
+"cats": "dca16110",
+"weights": "1402:238da19d"
+},
+{
+"t": 2.033,
+"phase": "service",
+"scene": "e70b5d2f",
+"tray": "-",
+"dom": "f2cdfb01",
+"cats": "dca16110",
+"weights": "1402:238da19d"
+},
+{
+"t": 3.033,
+"phase": "service",
+"scene": "145db1b7",
+"tray": "-",
+"dom": "bdc9480b",
+"cats": "dca16110",
+"weights": "1402:238da19d"
+},
+{
+"t": 4.033,
+"phase": "service",
+"scene": "b7769eba",
+"tray": "-",
+"dom": "36484ddd",
+"cats": "dca16110",
+"weights": "1402:238da19d"
+},
+{
+"t": 5.033,
+"phase": "service",
+"scene": "bb5e9709",
+"tray": "-",
+"dom": "c04f2fa6",
+"cats": "835a17d9",
+"weights": "1421:9b358269"
+},
+{
+"t": 6.033,
+"phase": "service",
+"scene": "c6ef986b",
+"tray": "-",
+"dom": "a8449c11",
+"cats": "64bfe9fb",
+"weights": "1421:9b358269"
+},
+{
+"t": 7.033,
+"phase": "service",
+"scene": "db609e96",
+"tray": "-",
+"dom": "c3faa63f",
+"cats": "146d02e",
+"weights": "1421:9b358269"
+},
+{
+"t": 8.033,
+"phase": "service",
+"scene": "a098b310",
+"tray": "-",
+"dom": "239d2415",
+"cats": "821f0564",
+"weights": "1421:9b358269"
+},
+{
+"t": 9.033,
+"phase": "service",
+"scene": "ca2f4c1d",
+"tray": "-",
+"dom": "50ca91a4",
+"cats": "7b81e09a",
+"weights": "1422:1eb3e4be"
+},
+{
+"t": 10.033,
+"phase": "service",
+"scene": "63da33de",
+"tray": "-",
+"dom": "a9468e02",
+"cats": "f0876ebb",
+"weights": "1422:1eb3e4be"
+},
+{
+"t": 11.033,
+"phase": "service",
+"scene": "c441b30a",
+"tray": "-",
+"dom": "2dd3024a",
+"cats": "53b66211",
+"weights": "1424:e07e2ea0"
+},
+{
+"t": 12.033,
+"phase": "service",
+"scene": "dd0898bc",
+"tray": "-",
+"dom": "5ec5603b",
+"cats": "b8a1d956",
+"weights": "1424:e07e2ea0"
+},
+{
+"t": 13.033,
+"phase": "service",
+"scene": "bcdaba03",
+"tray": "-",
+"dom": "b96168c",
+"cats": "930a5caa",
+"weights": "1424:e07e2ea0"
+},
+{
+"t": 14.033,
+"phase": "service",
+"scene": "a71ccc1a",
+"tray": "-",
+"dom": "9bfc4f0",
+"cats": "68df3d8c",
+"weights": "1425:6db416d2"
+},
+{
+"t": 15.033,
+"phase": "service",
+"scene": "9ac18b28",
+"tray": "-",
+"dom": "2ec53219",
+"cats": "b721aa48",
+"weights": "1425:6db416d2"
+},
+{
+"t": 16.033,
+"phase": "service",
+"scene": "e8daad58",
+"tray": "-",
+"dom": "b9fb5ef4",
+"cats": "b721aa48",
+"weights": "1425:6db416d2"
+},
+{
+"t": 17.033,
+"phase": "service",
+"scene": "aae4d407",
+"tray": "-",
+"dom": "9e0c620e",
+"cats": "b721aa48",
+"weights": "1425:6db416d2"
+},
+{
+"t": 18.033,
+"phase": "service",
+"scene": "7a63e8e9",
+"tray": "-",
+"dom": "d0e7adeb",
+"cats": "b721aa48",
+"weights": "1425:6db416d2"
+},
+{
+"t": 19.033,
+"phase": "service",
+"scene": "5defb728",
+"tray": "-",
+"dom": "fd71194",
+"cats": "352e9efe",
+"weights": "1426:b1b52619"
+},
+{
+"t": 20.1,
+"phase": "service",
+"scene": "1ff1d62",
+"tray": "-",
+"dom": "c38443d",
+"cats": "352e9efe",
+"weights": "1426:b1b52619"
+},
+{
+"t": 21.1,
+"phase": "service",
+"scene": "d51cee61",
+"tray": "-",
+"dom": "59147359",
+"cats": "352e9efe",
+"weights": "1426:b1b52619"
+},
+{
+"t": 22.1,
+"phase": "service",
+"scene": "d4b9f1f9",
+"tray": "-",
+"dom": "e22046ca",
+"cats": "352e9efe",
+"weights": "1426:b1b52619"
+},
+{
+"t": 23.1,
+"phase": "service",
+"scene": "d85038e0",
+"tray": "-",
+"dom": "cc1feedd",
+"cats": "bccd9a22",
+"weights": "1426:b1b52619"
+},
+{
+"t": 24.1,
+"phase": "service",
+"scene": "3640d2c4",
+"tray": "-",
+"dom": "347f3535",
+"cats": "c3d91b49",
+"weights": "1445:48389269"
+},
+{
+"t": 25.1,
+"phase": "service",
+"scene": "4df81455",
+"tray": "-",
+"dom": "8576f377",
+"cats": "c76ae9d6",
+"weights": "1445:48389269"
+},
+{
+"t": 26.1,
+"phase": "service",
+"scene": "5eb73182",
+"tray": "-",
+"dom": "63959c39",
+"cats": "80d66c0b",
+"weights": "1446:249c14be"
+},
+{
+"t": 27.1,
+"phase": "service",
+"scene": "13b0d121",
+"tray": "-",
+"dom": "8b326477",
+"cats": "d9b5cd8a",
+"weights": "1447:298671d3"
+},
+{
+"t": 28.1,
+"phase": "service",
+"scene": "8224bb76",
+"tray": "-",
+"dom": "efd94a9a",
+"cats": "8a0de6aa",
+"weights": "1448:9c9663aa"
+},
+{
+"t": 29.1,
+"phase": "service",
+"scene": "342c9eea",
+"tray": "-",
+"dom": "408d26a9",
+"cats": "e77186c3",
+"weights": "1448:9c9663aa"
+},
+{
+"t": 30.1,
+"phase": "service",
+"scene": "92b9a4d0",
+"tray": "-",
+"dom": "c3a22f91",
+"cats": "ce68ac20",
+"weights": "1448:9c9663aa"
+},
+{
+"t": 31.1,
+"phase": "service",
+"scene": "a8ff612c",
+"tray": "-",
+"dom": "4a848e4c",
+"cats": "f5419531",
+"weights": "1448:9c9663aa"
+},
+{
+"t": 32.1,
+"phase": "service",
+"scene": "8dfb884b",
+"tray": "-",
+"dom": "90590db",
+"cats": "ad9461b9",
+"weights": "1449:e789ea18"
+},
+{
+"t": 33.1,
+"phase": "service",
+"scene": "eba6e9bc",
+"tray": "-",
+"dom": "e255d98b",
+"cats": "e3fc27b1",
+"weights": "1478:3a6754c"
+},
+{
+"t": 34.1,
+"phase": "service",
+"scene": "b599f0c4",
+"tray": "-",
+"dom": "4752755c",
+"cats": "a071c4a2",
+"weights": "1478:3a6754c"
+},
+{
+"t": 35.1,
+"phase": "service",
+"scene": "9f008411",
+"tray": "-",
+"dom": "998f60e",
+"cats": "661cacfa",
+"weights": "1478:3a6754c"
+},
+{
+"t": 36.1,
+"phase": "service",
+"scene": "f70fcd8",
+"tray": "-",
+"dom": "645641cd",
+"cats": "7256a645",
+"weights": "1478:3a6754c"
+},
+{
+"t": 37.1,
+"phase": "service",
+"scene": "4cca6fcf",
+"tray": "-",
+"dom": "8f0491ff",
+"cats": "7256a645",
+"weights": "1478:3a6754c"
+},
+{
+"t": 38.1,
+"phase": "service",
+"scene": "4eb8f8c2",
+"tray": "-",
+"dom": "6241b41",
+"cats": "7256a645",
+"weights": "1478:3a6754c"
+},
+{
+"t": 39.1,
+"phase": "service",
+"scene": "a5c0f3e4",
+"tray": "-",
+"dom": "e589fa26",
+"cats": "7256a645",
+"weights": "1479:282d7c87"
+},
+{
+"t": 40.1,
+"phase": "service",
+"scene": "bb5f16d5",
+"tray": "-",
+"dom": "503f2c5f",
+"cats": "9d2c4b94",
+"weights": "1491:51812fe8"
+},
+{
+"t": 41.1,
+"phase": "service",
+"scene": "70545ebb",
+"tray": "-",
+"dom": "94e0579",
+"cats": "25010d4d",
+"weights": "1492:412a3f6a"
+},
+{
+"t": 42.1,
+"phase": "service",
+"scene": "b99f3ee",
+"tray": "-",
+"dom": "d92123c",
+"cats": "25010d4d",
+"weights": "1492:412a3f6a"
+},
+{
+"t": 43.1,
+"phase": "service",
+"scene": "a1f79345",
+"tray": "-",
+"dom": "5bed0aac",
+"cats": "9cb7a59c",
+"weights": "1492:412a3f6a"
+},
+{
+"t": 44.1,
+"phase": "service",
+"scene": "a26ea2f9",
+"tray": "-",
+"dom": "e6b7fef1",
+"cats": "9cb7a59c",
+"weights": "1492:412a3f6a"
+},
+{
+"t": 45.1,
+"phase": "service",
+"scene": "1266395c",
+"tray": "-",
+"dom": "2fc22833",
+"cats": "9cb7a59c",
+"weights": "1494:33bb6102"
+},
+{
+"t": 46.1,
+"phase": "service",
+"scene": "965ae859",
+"tray": "-",
+"dom": "ea8acbd4",
+"cats": "b2ae5dee",
+"weights": "1513:c0c78681"
+},
+{
+"t": 47.1,
+"phase": "service",
+"scene": "a38ffd1e",
+"tray": "-",
+"dom": "773985ab",
+"cats": "2c5d0708",
+"weights": "1513:c0c78681"
+},
+{
+"t": 48.1,
+"phase": "service",
+"scene": "effcdd31",
+"tray": "-",
+"dom": "89438252",
+"cats": "ff3b3700",
+"weights": "1513:c0c78681"
+},
+{
+"t": 49.1,
+"phase": "service",
+"scene": "9637b99",
+"tray": "-",
+"dom": "820812eb",
+"cats": "ff3b3700",
+"weights": "1514:bfa29253"
+},
+{
+"t": 50.1,
+"phase": "service",
+"scene": "86148339",
+"tray": "-",
+"dom": "fcfd5d5e",
+"cats": "ff3b3700",
+"weights": "1514:bfa29253"
+},
+{
+"t": 51.1,
+"phase": "service",
+"scene": "b54f6002",
+"tray": "-",
+"dom": "986da919",
+"cats": "ff3b3700",
+"weights": "1514:bfa29253"
+},
+{
+"t": 52.1,
+"phase": "service",
+"scene": "c067d126",
+"tray": "-",
+"dom": "94e52333",
+"cats": "ff3b3700",
+"weights": "1514:bfa29253"
+},
+{
+"t": 53.1,
+"phase": "service",
+"scene": "c2cd3834",
+"tray": "-",
+"dom": "cb530be9",
+"cats": "ff3b3700",
+"weights": "1515:c558afab"
+},
+{
+"t": 54.1,
+"phase": "service",
+"scene": "7318c1b",
+"tray": "-",
+"dom": "cb1afed",
+"cats": "ff3b3700",
+"weights": "1515:c558afab"
+},
+{
+"t": 55.1,
+"phase": "service",
+"scene": "274a57d0",
+"tray": "-",
+"dom": "aa6346e4",
+"cats": "ff3b3700",
+"weights": "1515:c558afab"
+},
+{
+"t": 56.1,
+"phase": "service",
+"scene": "ad834a7c",
+"tray": "-",
+"dom": "ecbbb7a9",
+"cats": "ff3b3700",
+"weights": "1516:c0dc5eaa"
+},
+{
+"t": 57.1,
+"phase": "service",
+"scene": "94e841ac",
+"tray": "-",
+"dom": "11661bf7",
+"cats": "9def6525",
+"weights": "1518:3f270742"
+},
+{
+"t": 58.1,
+"phase": "service",
+"scene": "8c698105",
+"tray": "-",
+"dom": "fa124aaa",
+"cats": "c3ea2ea0",
+"weights": "1547:f9144511"
+},
+{
+"t": 59.1,
+"phase": "service",
+"scene": "68b8198e",
+"tray": "-",
+"dom": "40f94402",
+"cats": "d4e4fb25",
+"weights": "1547:f9144511"
+},
+{
+"t": 60.1,
+"phase": "service",
+"scene": "aa1ec0aa",
+"tray": "-",
+"dom": "6e0bd463",
+"cats": "fbbd811c",
+"weights": "1547:f9144511"
+},
+{
+"t": 61.1,
+"phase": "service",
+"scene": "c06858e2",
+"tray": "-",
+"dom": "9a85d369",
+"cats": "fbbd811c",
+"weights": "1548:40d4bc03"
+},
+{
+"t": 62.1,
+"phase": "service",
+"scene": "fc883938",
+"tray": "-",
+"dom": "f1b50ee1",
+"cats": "fbbd811c",
+"weights": "1548:40d4bc03"
+},
+{
+"t": 63.1,
+"phase": "service",
+"scene": "4245f6b7",
+"tray": "-",
+"dom": "39c8c3ee",
+"cats": "4c702831",
+"weights": "1549:392b4a32"
+},
+{
+"t": 64.1,
+"phase": "service",
+"scene": "9533e84e",
+"tray": "-",
+"dom": "e2964971",
+"cats": "4c702831",
+"weights": "1550:29d50990"
+},
+{
+"t": 65.1,
+"phase": "service",
+"scene": "49697518",
+"tray": "-",
+"dom": "2dacbb30",
+"cats": "4c702831",
+"weights": "1551:3a258413"
+},
+{
+"t": 66.1,
+"phase": "service",
+"scene": "bb86eada",
+"tray": "-",
+"dom": "f90c490c",
+"cats": "4c702831",
+"weights": "1551:3a258413"
+},
+{
+"t": 67.1,
+"phase": "service",
+"scene": "de74671",
+"tray": "-",
+"dom": "1cca4287",
+"cats": "6e68ab20",
+"weights": "1564:75f79c37"
+},
+{
+"t": 68.1,
+"phase": "service",
+"scene": "6c1a96d3",
+"tray": "-",
+"dom": "99e7cf27",
+"cats": "6e68ab20",
+"weights": "1564:75f79c37"
+},
+{
+"t": 69.1,
+"phase": "service",
+"scene": "55a41053",
+"tray": "-",
+"dom": "c0690f0f",
+"cats": "6e68ab20",
+"weights": "1564:75f79c37"
+},
+{
+"t": 70.1,
+"phase": "service",
+"scene": "966e2260",
+"tray": "-",
+"dom": "464d2d46",
+"cats": "6e68ab20",
+"weights": "1564:75f79c37"
+},
+{
+"t": 71.1,
+"phase": "service",
+"scene": "239aecff",
+"tray": "-",
+"dom": "18c2fb63",
+"cats": "48c73a22",
+"weights": "1583:3c558e9a"
+},
+{
+"t": 72.1,
+"phase": "service",
+"scene": "d74708e0",
+"tray": "-",
+"dom": "c1764847",
+"cats": "8857a8c6",
+"weights": "1583:3c558e9a"
+},
+{
+"t": 73.1,
+"phase": "service",
+"scene": "fc563cf0",
+"tray": "-",
+"dom": "818b7499",
+"cats": "7968e4f2",
+"weights": "1583:3c558e9a"
+},
+{
+"t": 74.1,
+"phase": "service",
+"scene": "ff1ce31e",
+"tray": "-",
+"dom": "2c78e426",
+"cats": "71fddd29",
+"weights": "1583:3c558e9a"
+},
+{
+"t": 75.1,
+"phase": "service",
+"scene": "5514df72",
+"tray": "-",
+"dom": "7cbe406a",
+"cats": "42da2091",
+"weights": "1584:9208128"
+},
+{
+"t": 76.1,
+"phase": "service",
+"scene": "9ec93371",
+"tray": "-",
+"dom": "b1787a1f",
+"cats": "42da2091",
+"weights": "1584:9208128"
+},
+{
+"t": 77.1,
+"phase": "service",
+"scene": "cd10b772",
+"tray": "-",
+"dom": "dc25c187",
+"cats": "42da2091",
+"weights": "1584:9208128"
+},
+{
+"t": 78.1,
+"phase": "service",
+"scene": "7411600d",
+"tray": "-",
+"dom": "544c0a3d",
+"cats": "42da2091",
+"weights": "1584:9208128"
+},
+{
+"t": 79.1,
+"phase": "service",
+"scene": "47570c29",
+"tray": "-",
+"dom": "8aeb43a2",
+"cats": "42da2091",
+"weights": "1584:9208128"
+},
+{
+"t": 80.1,
+"phase": "service",
+"scene": "bf0a2b00",
+"tray": "-",
+"dom": "82966c19",
+"cats": "c0e7b54a",
+"weights": "1600:f10e7570"
+},
+{
+"t": 81.1,
+"phase": "service",
+"scene": "348128e1",
+"tray": "-",
+"dom": "59760a16",
+"cats": "d575f316",
+"weights": "1600:f10e7570"
+},
+{
+"t": 82.1,
+"phase": "service",
+"scene": "dd5be0f8",
+"tray": "-",
+"dom": "5db771a8",
+"cats": "73acff22",
+"weights": "1601:10e20e5d"
+},
+{
+"t": 83.1,
+"phase": "service",
+"scene": "c8d79fee",
+"tray": "-",
+"dom": "dea2873b",
+"cats": "4c702831",
+"weights": "1601:10e20e5d"
+},
+{
+"t": 84.1,
+"phase": "service",
+"scene": "15930641",
+"tray": "-",
+"dom": "26be3e9c",
+"cats": "4c702831",
+"weights": "1601:10e20e5d"
+},
+{
+"t": 85.1,
+"phase": "service",
+"scene": "362d237d",
+"tray": "-",
+"dom": "80dfb785",
+"cats": "4c702831",
+"weights": "1601:10e20e5d"
+},
+{
+"t": 86.1,
+"phase": "service",
+"scene": "d83d32fb",
+"tray": "-",
+"dom": "2e1841a2",
+"cats": "4c702831",
+"weights": "1601:10e20e5d"
+},
+{
+"t": 87.1,
+"phase": "service",
+"scene": "5f9dcfbe",
+"tray": "-",
+"dom": "7215ed16",
+"cats": "4c702831",
+"weights": "1601:10e20e5d"
+},
+{
+"t": 88.1,
+"phase": "service",
+"scene": "d69be114",
+"tray": "-",
+"dom": "13a0035e",
+"cats": "4c702831",
+"weights": "1602:5aa546a0"
+},
+{
+"t": 89.1,
+"phase": "service",
+"scene": "a254576f",
+"tray": "-",
+"dom": "5ffca86",
+"cats": "4c702831",
+"weights": "1609:9bf33830"
+},
+{
+"t": 90.1,
+"phase": "service",
+"scene": "cf355bbb",
+"tray": "-",
+"dom": "82d8e887",
+"cats": "4c702831",
+"weights": "1609:9bf33830"
+},
+{
+"t": 91.1,
+"phase": "service",
+"scene": "447b60d7",
+"tray": "-",
+"dom": "57004eaf",
+"cats": "5f7e3072",
+"weights": "1609:9bf33830"
+},
+{
+"t": 92.1,
+"phase": "service",
+"scene": "94463572",
+"tray": "-",
+"dom": "55e5da04",
+"cats": "3dfe7304",
+"weights": "1629:8bb0f9b4"
+},
+{
+"t": 93.1,
+"phase": "service",
+"scene": "7e65c967",
+"tray": "-",
+"dom": "2ab3563a",
+"cats": "e6afdb33",
+"weights": "1629:8bb0f9b4"
+},
+{
+"t": 94.1,
+"phase": "service",
+"scene": "6343f69e",
+"tray": "-",
+"dom": "74c78133",
+"cats": "e6afdb33",
+"weights": "1629:8bb0f9b4"
+},
+{
+"t": 95.1,
+"phase": "service",
+"scene": "73a5352b",
+"tray": "-",
+"dom": "f4c65271",
+"cats": "3f91daac",
+"weights": "1658:95641f31"
+},
+{
+"t": 96.1,
+"phase": "service",
+"scene": "19f5aef9",
+"tray": "-",
+"dom": "e002d764",
+"cats": "c88dda3f",
+"weights": "1690:5266d97b"
+},
+{
+"t": 97.1,
+"phase": "service",
+"scene": "ee495c31",
+"tray": "-",
+"dom": "be5a746a",
+"cats": "23a63fad",
+"weights": "1690:5266d97b"
+},
+{
+"t": 98.1,
+"phase": "service",
+"scene": "751e876b",
+"tray": "-",
+"dom": "dffe47e0",
+"cats": "23a63fad",
+"weights": "1709:92f717cd"
+},
+{
+"t": 99.1,
+"phase": "service",
+"scene": "a59e6ebb",
+"tray": "-",
+"dom": "59348172",
+"cats": "23a63fad",
+"weights": "1709:92f717cd"
+},
+{
+"t": 100.1,
+"phase": "service",
+"scene": "d70a3ce2",
+"tray": "-",
+"dom": "45cfcff",
+"cats": "69e05c3c",
+"weights": "1709:92f717cd"
+},
+{
+"t": 101.1,
+"phase": "service",
+"scene": "5bc40c1f",
+"tray": "-",
+"dom": "4d7685da",
+"cats": "2173f1fd",
+"weights": "1727:9b61b488"
+},
+{
+"t": 102.1,
+"phase": "service",
+"scene": "60a7ebda",
+"tray": "-",
+"dom": "a6d2343b",
+"cats": "3a4ddb1c",
+"weights": "1727:9b61b488"
+},
+{
+"t": 103.1,
+"phase": "service",
+"scene": "9f364f41",
+"tray": "-",
+"dom": "8f9870cd",
+"cats": "fbb709eb",
+"weights": "1727:9b61b488"
+},
+{
+"t": 104.1,
+"phase": "service",
+"scene": "3b8efe3",
+"tray": "-",
+"dom": "4dc60260",
+"cats": "5d3c1768",
+"weights": "1727:9b61b488"
+},
+{
+"t": 105.1,
+"phase": "service",
+"scene": "502126a",
+"tray": "-",
+"dom": "77ccd03c",
+"cats": "f76201c3",
+"weights": "1730:7cc80f21"
+},
+{
+"t": 106.1,
+"phase": "service",
+"scene": "854631ec",
+"tray": "-",
+"dom": "a9cea812",
+"cats": "df4d1d13",
+"weights": "1735:706999de"
+},
+{
+"t": 107.1,
+"phase": "service",
+"scene": "d2295480",
+"tray": "-",
+"dom": "508258e8",
+"cats": "6e6a46d8",
+"weights": "1736:601dc67d"
+},
+{
+"t": 108.1,
+"phase": "service",
+"scene": "ea8854a7",
+"tray": "-",
+"dom": "c5d5546f",
+"cats": "9c956835",
+"weights": "1737:585899fa"
+},
+{
+"t": 109.1,
+"phase": "service",
+"scene": "7a23aa91",
+"tray": "-",
+"dom": "8db2f9dc",
+"cats": "32ed0110",
+"weights": "1738:5eb710f7"
+},
+{
+"t": 110.1,
+"phase": "service",
+"scene": "107353b8",
+"tray": "-",
+"dom": "172bd85d",
+"cats": "b299899f",
+"weights": "1739:f3a03a55"
+},
+{
+"t": 111.1,
+"phase": "service",
+"scene": "c64e769f",
+"tray": "-",
+"dom": "1c6125b4",
+"cats": "c4c1f247",
+"weights": "1745:676c2945"
+},
+{
+"t": 112.1,
+"phase": "service",
+"scene": "fd565f9d",
+"tray": "-",
+"dom": "6093f359",
+"cats": "c4c1f247",
+"weights": "1745:676c2945"
+},
+{
+"t": 113.1,
+"phase": "service",
+"scene": "c61857b3",
+"tray": "-",
+"dom": "da235b89",
+"cats": "c4c1f247",
+"weights": "1745:676c2945"
+},
+{
+"t": 114.1,
+"phase": "service",
+"scene": "96d72c74",
+"tray": "-",
+"dom": "82fe887",
+"cats": "8fa43a36",
+"weights": "1746:8387d959"
+},
+{
+"t": 115.1,
+"phase": "service",
+"scene": "74006171",
+"tray": "-",
+"dom": "46f903ab",
+"cats": "8fa43a36",
+"weights": "1747:1472e9f4"
+},
+{
+"t": 116.1,
+"phase": "service",
+"scene": "d1db15d4",
+"tray": "-",
+"dom": "ec2a5478",
+"cats": "fc583b90",
+"weights": "1766:30d1a424"
+},
+{
+"t": 117.1,
+"phase": "service",
+"scene": "a0642192",
+"tray": "-",
+"dom": "80780504",
+"cats": "5ff6aac0",
+"weights": "1782:2a8adfa4"
+},
+{
+"t": 118.1,
+"phase": "service",
+"scene": "41c3e07a",
+"tray": "-",
+"dom": "7d7143cf",
+"cats": "b220166",
+"weights": "1783:2c66e6e5"
+},
+{
+"t": 119.1,
+"phase": "service",
+"scene": "7a17e14f",
+"tray": "-",
+"dom": "ef1abcb9",
+"cats": "940a218a",
+"weights": "1797:a13b5c0e"
+},
+{
+"t": 120.1,
+"phase": "service",
+"scene": "493603dd",
+"tray": "-",
+"dom": "383b6805",
+"cats": "96c821d5",
+"weights": "1800:15bca91f"
+},
+{
+"t": 121.1,
+"phase": "service",
+"scene": "7451ec4c",
+"tray": "-",
+"dom": "95be3f9e",
+"cats": "64fe07a5",
+"weights": "1807:de9dc048"
+},
+{
+"t": 122.1,
+"phase": "service",
+"scene": "7c6c2653",
+"tray": "-",
+"dom": "3f5733bf",
+"cats": "dba8b31d",
+"weights": "1807:de9dc048"
+},
+{
+"t": 123.1,
+"phase": "service",
+"scene": "143f8a65",
+"tray": "-",
+"dom": "fd4c57b2",
+"cats": "e9f8985",
+"weights": "1807:de9dc048"
+},
+{
+"t": 124.1,
+"phase": "service",
+"scene": "c67cd102",
+"tray": "-",
+"dom": "9b4053bc",
+"cats": "c3e6aa7e",
+"weights": "1807:de9dc048"
+},
+{
+"t": 125.1,
+"phase": "service",
+"scene": "d254c840",
+"tray": "-",
+"dom": "fff1ef48",
+"cats": "bb163e9c",
+"weights": "1822:1e577c93"
+},
+{
+"t": 126.1,
+"phase": "service",
+"scene": "a36a854f",
+"tray": "-",
+"dom": "c03f3538",
+"cats": "de8f1211",
+"weights": "1822:1e577c93"
+},
+{
+"t": 127.1,
+"phase": "service",
+"scene": "563190d",
+"tray": "-",
+"dom": "b9d3dcfc",
+"cats": "e7ae831f",
+"weights": "1823:4bc9db22"
+},
+{
+"t": 128.1,
+"phase": "service",
+"scene": "71af8078",
+"tray": "-",
+"dom": "29cef432",
+"cats": "ec65f5ef",
+"weights": "1823:4bc9db22"
+},
+{
+"t": 129.1,
+"phase": "service",
+"scene": "78dfc7bc",
+"tray": "-",
+"dom": "6d79d525",
+"cats": "2a349a5f",
+"weights": "1825:6c4b8fda"
+},
+{
+"t": 130.1,
+"phase": "service",
+"scene": "959a57ef",
+"tray": "-",
+"dom": "7989652d",
+"cats": "22365f28",
+"weights": "1826:b0c4ef9b"
+},
+{
+"t": 131.1,
+"phase": "service",
+"scene": "79fdeac9",
+"tray": "-",
+"dom": "253b6fca",
+"cats": "22365f28",
+"weights": "1827:e4b7e7d4"
+},
+{
+"t": 132.1,
+"phase": "service",
+"scene": "8b4dc1c4",
+"tray": "-",
+"dom": "b6a7d844",
+"cats": "aa180c82",
+"weights": "1843:fb3c7014"
+},
+{
+"t": 133.1,
+"phase": "service",
+"scene": "57aaa3b9",
+"tray": "-",
+"dom": "bad2a524",
+"cats": "c73897ab",
+"weights": "1849:c736a9e8"
+},
+{
+"t": 134.1,
+"phase": "service",
+"scene": "4156a1e0",
+"tray": "-",
+"dom": "9bfbd966",
+"cats": "fd05808a",
+"weights": "1849:c736a9e8"
+},
+{
+"t": 135.1,
+"phase": "service",
+"scene": "98cf41d",
+"tray": "-",
+"dom": "eb239d48",
+"cats": "f68b14fd",
+"weights": "1849:c736a9e8"
+},
+{
+"t": 136.1,
+"phase": "service",
+"scene": "938e5baf",
+"tray": "-",
+"dom": "241f0b7",
+"cats": "b9ca3844",
+"weights": "1850:67ed0d6a"
+},
+{
+"t": 137.1,
+"phase": "service",
+"scene": "62b1f8f9",
+"tray": "-",
+"dom": "7c58362e",
+"cats": "42f3a01a",
+"weights": "1850:67ed0d6a"
+},
+{
+"t": 138.1,
+"phase": "service",
+"scene": "ab06bc54",
+"tray": "-",
+"dom": "850b9ef2",
+"cats": "81e244ee",
+"weights": "1850:67ed0d6a"
+},
+{
+"t": 139.1,
+"phase": "service",
+"scene": "6fff8e28",
+"tray": "-",
+"dom": "19921ffd",
+"cats": "207c9b47",
+"weights": "1853:a19346bf"
+},
+{
+"t": 140.1,
+"phase": "service",
+"scene": "c42a5ae1",
+"tray": "-",
+"dom": "b10c3a69",
+"cats": "ac728b26",
+"weights": "1854:5f7bf473"
+},
+{
+"t": 141.1,
+"phase": "service",
+"scene": "9655a675",
+"tray": "-",
+"dom": "91d9d7e4",
+"cats": "97579f30",
+"weights": "1856:206bcd53"
+},
+{
+"t": 142.1,
+"phase": "service",
+"scene": "ae087b66",
+"tray": "-",
+"dom": "1be8a776",
+"cats": "2b21e1cb",
+"weights": "1857:77a34ae2"
+},
+{
+"t": 143.1,
+"phase": "service",
+"scene": "ba11d83a",
+"tray": "-",
+"dom": "44e87e2c",
+"cats": "2b21e1cb",
+"weights": "1857:77a34ae2"
+},
+{
+"t": 144.1,
+"phase": "service",
+"scene": "62c50618",
+"tray": "-",
+"dom": "60307a17",
+"cats": "2b21e1cb",
+"weights": "1857:77a34ae2"
+},
+{
+"t": 145.1,
+"phase": "service",
+"scene": "cfe534e0",
+"tray": "-",
+"dom": "d7529646",
+"cats": "2b21e1cb",
+"weights": "1858:73df0422"
+},
+{
+"t": 146.1,
+"phase": "service",
+"scene": "ed13d894",
+"tray": "-",
+"dom": "f339f708",
+"cats": "2b21e1cb",
+"weights": "1858:73df0422"
+},
+{
+"t": 147.1,
+"phase": "service",
+"scene": "f1f59d0e",
+"tray": "-",
+"dom": "e91ecb24",
+"cats": "8d21848a",
+"weights": "1858:73df0422"
+},
+{
+"t": 148.1,
+"phase": "service",
+"scene": "efb0a777",
+"tray": "-",
+"dom": "3edb4472",
+"cats": "8d21848a",
+"weights": "1858:73df0422"
+},
+{
+"t": 149.1,
+"phase": "service",
+"scene": "805e8c09",
+"tray": "-",
+"dom": "38844fee",
+"cats": "27b1de37",
+"weights": "1871:e4f24c72"
+},
+{
+"t": 150.1,
+"phase": "service",
+"scene": "85d78615",
+"tray": "-",
+"dom": "5b05290",
+"cats": "27b1de37",
+"weights": "1871:e4f24c72"
+},
+{
+"t": 151.1,
+"phase": "service",
+"scene": "8b8d6fa",
+"tray": "-",
+"dom": "29c74cf5",
+"cats": "27b1de37",
+"weights": "1871:e4f24c72"
+},
+{
+"t": 152.1,
+"phase": "service",
+"scene": "68f3ca6b",
+"tray": "-",
+"dom": "eea9adc4",
+"cats": "27b1de37",
+"weights": "1871:e4f24c72"
+},
+{
+"t": 153.1,
+"phase": "service",
+"scene": "41738c6d",
+"tray": "-",
+"dom": "2f8fff01",
+"cats": "27b1de37",
+"weights": "1872:f021a339"
+},
+{
+"t": 154.1,
+"phase": "service",
+"scene": "262825e5",
+"tray": "-",
+"dom": "4231ffd0",
+"cats": "27b1de37",
+"weights": "1872:f021a339"
+},
+{
+"t": 155.1,
+"phase": "service",
+"scene": "e4b770a1",
+"tray": "-",
+"dom": "cd93d19d",
+"cats": "c6dc41c",
+"weights": "1885:da1ba2fb"
+},
+{
+"t": 156.1,
+"phase": "service",
+"scene": "9d752382",
+"tray": "-",
+"dom": "97e92489",
+"cats": "1dda24a7",
+"weights": "1885:da1ba2fb"
+},
+{
+"t": 157.1,
+"phase": "service",
+"scene": "873254de",
+"tray": "-",
+"dom": "f24738e9",
+"cats": "f129c522",
+"weights": "1886:fb984b21"
+},
+{
+"t": 158.1,
+"phase": "service",
+"scene": "1b2d6793",
+"tray": "-",
+"dom": "53aa02b2",
+"cats": "d4714cd4",
+"weights": "1886:fb984b21"
+},
+{
+"t": 159.1,
+"phase": "service",
+"scene": "ec516e52",
+"tray": "-",
+"dom": "f791a2ec",
+"cats": "619980fd",
+"weights": "1886:fb984b21"
+},
+{
+"t": 160.1,
+"phase": "service",
+"scene": "60175799",
+"tray": "-",
+"dom": "7b194d49",
+"cats": "d29094de",
+"weights": "1904:bf3bbb4"
+},
+{
+"t": 161.1,
+"phase": "service",
+"scene": "e483f83d",
+"tray": "-",
+"dom": "cf884503",
+"cats": "b9a82a88",
+"weights": "1904:bf3bbb4"
+},
+{
+"t": 162.1,
+"phase": "service",
+"scene": "834c093b",
+"tray": "-",
+"dom": "7175ba94",
+"cats": "3376cd39",
+"weights": "1904:bf3bbb4"
+},
+{
+"t": 163.1,
+"phase": "service",
+"scene": "e1261fe0",
+"tray": "-",
+"dom": "6abd21a",
+"cats": "6722921c",
+"weights": "1904:bf3bbb4"
+},
+{
+"t": 164.1,
+"phase": "service",
+"scene": "700ede0f",
+"tray": "-",
+"dom": "1461f990",
+"cats": "efae11b9",
+"weights": "1904:bf3bbb4"
+},
+{
+"t": 165.1,
+"phase": "service",
+"scene": "6e410f3c",
+"tray": "-",
+"dom": "76051226",
+"cats": "cce9caeb",
+"weights": "1916:9e85f443"
+},
+{
+"t": 166.1,
+"phase": "service",
+"scene": "920f5071",
+"tray": "-",
+"dom": "2c3d4c03",
+"cats": "3ccd2e71",
+"weights": "1916:9e85f443"
+},
+{
+"t": 167.1,
+"phase": "service",
+"scene": "6f03cac1",
+"tray": "-",
+"dom": "67ef1795",
+"cats": "45471a7c",
+"weights": "1945:60fccc5a"
+},
+{
+"t": 167.733,
+"phase": "service",
+"scene": "62b26eea",
+"tray": "-",
+"dom": "3c1c3c6a",
+"cats": "cb21f5a",
+"weights": "1945:60fccc5a"
+},
+{
+"t": 168.733,
+"phase": "service",
+"scene": "bec2b4cb",
+"tray": "-",
+"dom": "8629b0c",
+"cats": "dc453c4f",
+"weights": "1945:60fccc5a"
+},
+{
+"t": 169.733,
+"phase": "service",
+"scene": "bd69c485",
+"tray": "-",
+"dom": "cfc4917e",
+"cats": "9287ac12",
+"weights": "1945:60fccc5a"
+},
+{
+"t": 170.733,
+"phase": "service",
+"scene": "175c5c3b",
+"tray": "-",
+"dom": "b6272b48",
+"cats": "d2c498cc",
+"weights": "1945:60fccc5a"
+},
+{
+"t": 171.733,
+"phase": "service",
+"scene": "40678238",
+"tray": "-",
+"dom": "61ebe26a",
+"cats": "a946906e",
+"weights": "1945:60fccc5a"
+},
+{
+"t": 172.733,
+"phase": "service",
+"scene": "d6e18ff0",
+"tray": "-",
+"dom": "35b30f3c",
+"cats": "c61bfe17",
+"weights": "1945:60fccc5a"
+},
+{
+"t": 173.733,
+"phase": "service",
+"scene": "7671cc7d",
+"tray": "-",
+"dom": "36d688c2",
+"cats": "30e6688f",
+"weights": "1958:4891f9b1"
+},
+{
+"t": 174.733,
+"phase": "service",
+"scene": "a1cbec72",
+"tray": "-",
+"dom": "815517f8",
+"cats": "cf3485fa",
+"weights": "1976:8c68b215"
+},
+{
+"t": 175.733,
+"phase": "service",
+"scene": "85406fb",
+"tray": "-",
+"dom": "7290d6ee",
+"cats": "e7ddbff9",
+"weights": "1990:b4363b12"
+},
+{
+"t": 176.733,
+"phase": "service",
+"scene": "40a4a2f8",
+"tray": "-",
+"dom": "3eac0ddb",
+"cats": "8aecdb41",
+"weights": "1990:b4363b12"
+},
+{
+"t": 177.733,
+"phase": "service",
+"scene": "901cdaa3",
+"tray": "-",
+"dom": "9d86e4b1",
+"cats": "ca88c97f",
+"weights": "1990:b4363b12"
+},
+{
+"t": 178.733,
+"phase": "service",
+"scene": "241729b2",
+"tray": "-",
+"dom": "9e137304",
+"cats": "ca88c97f",
+"weights": "1990:b4363b12"
+},
+{
+"t": 179.733,
+"phase": "service",
+"scene": "93c040eb",
+"tray": "-",
+"dom": "610f788a",
+"cats": "ca88c97f",
+"weights": "1990:b4363b12"
+},
+{
+"t": 180.733,
+"phase": "service",
+"scene": "83d5b99f",
+"tray": "-",
+"dom": "ae4c8d40",
+"cats": "8d9f1411",
+"weights": "2006:f4f12e7e"
+},
+{
+"t": 181.733,
+"phase": "service",
+"scene": "c70c668e",
+"tray": "-",
+"dom": "26bb9fd6",
+"cats": "78f947e8",
+"weights": "2006:f4f12e7e"
+},
+{
+"t": 182.733,
+"phase": "service",
+"scene": "c9335bb1",
+"tray": "-",
+"dom": "433e9389",
+"cats": "7ec97cc1",
+"weights": "2006:f4f12e7e"
+},
+{
+"t": 183.733,
+"phase": "service",
+"scene": "4304acb4",
+"tray": "-",
+"dom": "f2448a8e",
+"cats": "43c4b32a",
+"weights": "2018:c4801efe"
+},
+{
+"t": 184.733,
+"phase": "service",
+"scene": "d7711360",
+"tray": "-",
+"dom": "12d9618",
+"cats": "43c4b32a",
+"weights": "2018:c4801efe"
+},
+{
+"t": 185.733,
+"phase": "service",
+"scene": "bde7a2c6",
+"tray": "-",
+"dom": "c84ac5e2",
+"cats": "43c4b32a",
+"weights": "2018:c4801efe"
+},
+{
+"t": 186.733,
+"phase": "service",
+"scene": "ac958977",
+"tray": "-",
+"dom": "43e852bf",
+"cats": "43c4b32a",
+"weights": "2018:c4801efe"
+},
+{
+"t": 187.733,
+"phase": "service",
+"scene": "e8fa4929",
+"tray": "-",
+"dom": "c3d80639",
+"cats": "43c4b32a",
+"weights": "2018:c4801efe"
+},
+{
+"t": 188.733,
+"phase": "service",
+"scene": "8eb4e176",
+"tray": "-",
+"dom": "2fd0cbb3",
+"cats": "e16fbbfb",
+"weights": "2018:c4801efe"
+},
+{
+"t": 189.733,
+"phase": "service",
+"scene": "c4527ea7",
+"tray": "-",
+"dom": "b300576",
+"cats": "d3bf7510",
+"weights": "2020:8c01b80f"
+},
+{
+"t": 190.733,
+"phase": "service",
+"scene": "83fab343",
+"tray": "-",
+"dom": "37d4960",
+"cats": "d3bf7510",
+"weights": "2020:8c01b80f"
+},
+{
+"t": 191.733,
+"phase": "service",
+"scene": "cae03e3e",
+"tray": "-",
+"dom": "3f0ec0aa",
+"cats": "2e7d104b",
+"weights": "2020:8c01b80f"
+},
+{
+"t": 192.733,
+"phase": "service",
+"scene": "3d23cd76",
+"tray": "-",
+"dom": "6c0d1381",
+"cats": "e8eb43c6",
+"weights": "2020:8c01b80f"
+},
+{
+"t": 193.733,
+"phase": "service",
+"scene": "8057fd4f",
+"tray": "-",
+"dom": "baa792eb",
+"cats": "ea7d9ff6",
+"weights": "2020:8c01b80f"
+},
+{
+"t": 194.733,
+"phase": "service",
+"scene": "95c15aa5",
+"tray": "-",
+"dom": "b26e57d0",
+"cats": "f1adf793",
+"weights": "2034:3aab4386"
+},
+{
+"t": 195.733,
+"phase": "service",
+"scene": "ed9b2a74",
+"tray": "-",
+"dom": "a5fdd866",
+"cats": "a70cf162",
+"weights": "2034:3aab4386"
+},
+{
+"t": 196.733,
+"phase": "service",
+"scene": "be2c507a",
+"tray": "-",
+"dom": "f7d06553",
+"cats": "f441ecbb",
+"weights": "2034:3aab4386"
+},
+{
+"t": 197.733,
+"phase": "service",
+"scene": "aff64380",
+"tray": "-",
+"dom": "44e495f1",
+"cats": "7f4baa15",
+"weights": "2034:3aab4386"
+},
+{
+"t": 198.733,
+"phase": "service",
+"scene": "17e99173",
+"tray": "-",
+"dom": "d04e6eb7",
+"cats": "3c8ac9a3",
+"weights": "2034:3aab4386"
+},
+{
+"t": 199.733,
+"phase": "service",
+"scene": "12ab2963",
+"tray": "-",
+"dom": "3c4cbec5",
+"cats": "3c8ac9a3",
+"weights": "2034:3aab4386"
+},
+{
+"t": 200.733,
+"phase": "service",
+"scene": "b41d95c8",
+"tray": "-",
+"dom": "8d24cdf5",
+"cats": "76178176",
+"weights": "2034:3aab4386"
+},
+{
+"t": 201.733,
+"phase": "service",
+"scene": "d43b5b75",
+"tray": "-",
+"dom": "1f4c10b",
+"cats": "76178176",
+"weights": "2034:3aab4386"
+},
+{
+"t": 202.733,
+"phase": "service",
+"scene": "6738c3d4",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "76178176",
+"weights": "2034:3aab4386"
+},
+{
+"t": 203.733,
+"phase": "service",
+"scene": "606fc4f7",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "76178176",
+"weights": "2034:3aab4386"
+},
+{
+"t": 204.733,
+"phase": "service",
+"scene": "7fdf41c0",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "76178176",
+"weights": "2034:3aab4386"
+},
+{
+"t": 205.733,
+"phase": "service",
+"scene": "4ae71d9",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "76178176",
+"weights": "2034:3aab4386"
+},
+{
+"t": 206.733,
+"phase": "service",
+"scene": "ad5f06e1",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "76178176",
+"weights": "2034:3aab4386"
+},
+{
+"t": 207.733,
+"phase": "service",
+"scene": "806fd676",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "76178176",
+"weights": "2034:3aab4386"
+},
+{
+"t": 208.733,
+"phase": "service",
+"scene": "ce150161",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "76178176",
+"weights": "2034:3aab4386"
+},
+{
+"t": 209.733,
+"phase": "service",
+"scene": "329af45f",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "76178176",
+"weights": "2034:3aab4386"
+},
+{
+"t": 210.733,
+"phase": "service",
+"scene": "91500a01",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "76178176",
+"weights": "2034:3aab4386"
+},
+{
+"t": 211.733,
+"phase": "service",
+"scene": "1901b836",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "76178176",
+"weights": "2034:3aab4386"
+},
+{
+"t": 212.733,
+"phase": "service",
+"scene": "be8473c",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "76178176",
+"weights": "2034:3aab4386"
+},
+{
+"t": 213.733,
+"phase": "service",
+"scene": "497c7cd1",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "76178176",
+"weights": "2034:3aab4386"
+},
+{
+"t": 214.733,
+"phase": "service",
+"scene": "1f2000f4",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "76178176",
+"weights": "2034:3aab4386"
+},
+{
+"t": 215.733,
+"phase": "service",
+"scene": "4914bb9",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "76178176",
+"weights": "2034:3aab4386"
+},
+{
+"t": 216.733,
+"phase": "service",
+"scene": "55c9f438",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "76178176",
+"weights": "2034:3aab4386"
+},
+{
+"t": 217.733,
+"phase": "service",
+"scene": "fb5fd18e",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "4313bec9",
+"weights": "2034:3aab4386"
+},
+{
+"t": 218.733,
+"phase": "service",
+"scene": "b3878d69",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "4313bec9",
+"weights": "2034:3aab4386"
+},
+{
+"t": 219.733,
+"phase": "service",
+"scene": "521daeb4",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "4313bec9",
+"weights": "2034:3aab4386"
+},
+{
+"t": 220.733,
+"phase": "service",
+"scene": "f139ef0a",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "4313bec9",
+"weights": "2034:3aab4386"
+},
+{
+"t": 221.733,
+"phase": "service",
+"scene": "cadfed78",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "de82145b",
+"weights": "2059:5c57b7b6"
+},
+{
+"t": 222.733,
+"phase": "service",
+"scene": "72ac3a0d",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "de82145b",
+"weights": "2059:5c57b7b6"
+},
+{
+"t": 223.733,
+"phase": "service",
+"scene": "5da66032",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "de82145b",
+"weights": "2059:5c57b7b6"
+},
+{
+"t": 224.733,
+"phase": "service",
+"scene": "9de98e3c",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "de82145b",
+"weights": "2059:5c57b7b6"
+},
+{
+"t": 225.733,
+"phase": "service",
+"scene": "626ccd44",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "c9dde27b",
+"weights": "2070:6d916cbb"
+},
+{
+"t": 226.733,
+"phase": "service",
+"scene": "a37a26fb",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "dccb29ae",
+"weights": "2070:6d916cbb"
+},
+{
+"t": 227.733,
+"phase": "service",
+"scene": "7cd3992b",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "dccb29ae",
+"weights": "2070:6d916cbb"
+},
+{
+"t": 228.733,
+"phase": "service",
+"scene": "65b95081",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "dccb29ae",
+"weights": "2070:6d916cbb"
+},
+{
+"t": 229.733,
+"phase": "service",
+"scene": "7ac97cec",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "dccb29ae",
+"weights": "2070:6d916cbb"
+},
+{
+"t": 230.733,
+"phase": "service",
+"scene": "addcdd2c",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "dccb29ae",
+"weights": "2070:6d916cbb"
+},
+{
+"t": 231.733,
+"phase": "service",
+"scene": "df34f27b",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "dccb29ae",
+"weights": "2070:6d916cbb"
+},
+{
+"t": 232.733,
+"phase": "service",
+"scene": "b5112acd",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "dccb29ae",
+"weights": "2070:6d916cbb"
+},
+{
+"t": 233.733,
+"phase": "service",
+"scene": "42b9b4e6",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "dccb29ae",
+"weights": "2070:6d916cbb"
+},
+{
+"t": 234.733,
+"phase": "service",
+"scene": "1a978055",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "dccb29ae",
+"weights": "2070:6d916cbb"
+},
+{
+"t": 235.733,
+"phase": "service",
+"scene": "64bfc651",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "dccb29ae",
+"weights": "2070:6d916cbb"
+},
+{
+"t": 236.733,
+"phase": "service",
+"scene": "6d5ce7fb",
+"tray": "-",
+"dom": "ae7e8dec",
+"cats": "dccb29ae",
+"weights": "2070:6d916cbb"
+}
+],
+"frames": 7127,
+"digest": {
+"day": 1,
+"money": 2040,
+"lifetime": 2128,
+"level": 1,
+"stats": {
+"guests": 15,
+"perfect": 15,
+"days": 1,
+"walkins": 0,
+"families": 0
+},
+"xp": {
+"friedrice": 30
+},
+"stock": {
+"friedrice": 0
+},
+"reviews": 8,
+"reviewHash": "9c3f0fc0",
+"regulars": {},
+"summary": {
+"rev": 1800,
+"cost": 543,
+"tips": 328,
+"bonus": 255,
+"wages": 0,
+"net": 1540,
+"guests": 15,
+"lost": 0,
+"perfect": 15,
+"plated": 15,
+"avg": 99,
+"top": "friedrice",
+"stars": 5
+},
+"cats": [
+[
+"tora",
+"home",
+"loaf",
+72,
+525,
+-1,
+true
+],
+[
+"ban",
+"home",
+"loaf",
+72,
+525,
+-1,
+true
+],
+[
+"snow",
+"sleep",
+"loaf",
+190,
+-49,
+13,
+false
+],
+[
+"mikan",
+"home",
+"loaf",
+72,
+525,
+-1,
+true
+],
+[
+"mei",
+"daze",
+"daze",
+252,
+124,
+-1,
+false
+]
+],
+"catHash": "f7033461",
+"mem": [
+"sleepgod:1:K:811c9dc5",
+"photo:1:K:811c9dc5",
+"nap3:1:K:811c9dc5",
+"best:1:K:811c9dc5"
+],
+"weights": "2070:6d916cbb",
+"dylan": {
+"stage": 0,
+"stay": 0,
+"reveal": 0,
+"last": 0,
+"clues": {}
+},
+"life": {
+"sofa": 0,
+"tv": 0,
+"bed": 1
+}
+}
+},
+"day2": {
+"samples": [
+{
+"t": 0.033,
+"phase": "service",
+"scene": "9bd32e9",
+"tray": "-",
+"dom": "e3807d00",
+"cats": "f7033461",
+"weights": "4119:b9ca3028"
+},
+{
+"t": 1.033,
+"phase": "service",
+"scene": "aaecba29",
+"tray": "-",
+"dom": "38809cda",
+"cats": "f7033461",
+"weights": "4119:b9ca3028"
+},
+{
+"t": 2.033,
+"phase": "service",
+"scene": "c19a64e8",
+"tray": "-",
+"dom": "1d9c1e28",
+"cats": "f7033461",
+"weights": "4119:b9ca3028"
+},
+{
+"t": 3.033,
+"phase": "service",
+"scene": "fdbd2e6b",
+"tray": "-",
+"dom": "fdb3230e",
+"cats": "62c547a4",
+"weights": "4119:b9ca3028"
+},
+{
+"t": 4.033,
+"phase": "service",
+"scene": "828dd2b5",
+"tray": "-",
+"dom": "e9850c10",
+"cats": "7e6e9654",
+"weights": "4119:b9ca3028"
+},
+{
+"t": 5.033,
+"phase": "service",
+"scene": "27d8c6a8",
+"tray": "-",
+"dom": "b9ba4e11",
+"cats": "7e6e9654",
+"weights": "4119:b9ca3028"
+},
+{
+"t": 6.033,
+"phase": "service",
+"scene": "46eea352",
+"tray": "-",
+"dom": "96826383",
+"cats": "eaa806be",
+"weights": "4134:78d251df"
+},
+{
+"t": 7.033,
+"phase": "service",
+"scene": "9d24733d",
+"tray": "-",
+"dom": "33d75ee0",
+"cats": "869678f4",
+"weights": "4134:78d251df"
+},
+{
+"t": 8.033,
+"phase": "service",
+"scene": "301c6108",
+"tray": "-",
+"dom": "3da88e37",
+"cats": "340f5fab",
+"weights": "4134:78d251df"
+},
+{
+"t": 9.033,
+"phase": "service",
+"scene": "df92f4cb",
+"tray": "-",
+"dom": "959ba305",
+"cats": "3f2be016",
+"weights": "4150:d321ec7b"
+},
+{
+"t": 10.033,
+"phase": "service",
+"scene": "5439222d",
+"tray": "-",
+"dom": "b671763a",
+"cats": "df58e970",
+"weights": "4152:d12ca0e0"
+},
+{
+"t": 11.033,
+"phase": "service",
+"scene": "dde7803a",
+"tray": "-",
+"dom": "f84cba14",
+"cats": "5ef8575e",
+"weights": "4166:46961ac9"
+},
+{
+"t": 12.033,
+"phase": "service",
+"scene": "c6c3d86c",
+"tray": "-",
+"dom": "7b48c92d",
+"cats": "58ec7a5b",
+"weights": "4166:46961ac9"
+},
+{
+"t": 13.033,
+"phase": "service",
+"scene": "24b4367f",
+"tray": "-",
+"dom": "f653ecef",
+"cats": "9357fef3",
+"weights": "4169:3a7bbdac"
+},
+{
+"t": 14.033,
+"phase": "service",
+"scene": "679d192d",
+"tray": "-",
+"dom": "e2b42da6",
+"cats": "3f58a530",
+"weights": "4182:1dc6688"
+},
+{
+"t": 15.033,
+"phase": "service",
+"scene": "13eb5992",
+"tray": "-",
+"dom": "add577c5",
+"cats": "ef81c5ba",
+"weights": "4183:b5a5d60a"
+},
+{
+"t": 16.033,
+"phase": "service",
+"scene": "85f7a034",
+"tray": "-",
+"dom": "a5f422ec",
+"cats": "9fc96068",
+"weights": "4183:b5a5d60a"
+},
+{
+"t": 17.033,
+"phase": "service",
+"scene": "e62c79ad",
+"tray": "-",
+"dom": "3eb5abea",
+"cats": "fab73a94",
+"weights": "4183:b5a5d60a"
+},
+{
+"t": 18.033,
+"phase": "service",
+"scene": "fac31122",
+"tray": "-",
+"dom": "23d881d1",
+"cats": "4b87516a",
+"weights": "4184:4194b1fc"
+},
+{
+"t": 19.033,
+"phase": "service",
+"scene": "29504d02",
+"tray": "-",
+"dom": "a448056a",
+"cats": "d6b05b56",
+"weights": "4184:4194b1fc"
+},
+{
+"t": 20.033,
+"phase": "service",
+"scene": "fdc3fcdb",
+"tray": "-",
+"dom": "13f53e82",
+"cats": "752d4b6c",
+"weights": "4197:1cfac70a"
+},
+{
+"t": 21.033,
+"phase": "service",
+"scene": "7fb81bda",
+"tray": "-",
+"dom": "f2a89f85",
+"cats": "752d4b6c",
+"weights": "4198:5eeb733d"
+},
+{
+"t": 22.033,
+"phase": "service",
+"scene": "339e2b8f",
+"tray": "-",
+"dom": "930bfaaa",
+"cats": "752d4b6c",
+"weights": "4198:5eeb733d"
+},
+{
+"t": 23.033,
+"phase": "service",
+"scene": "8131186a",
+"tray": "-",
+"dom": "26ab1b88",
+"cats": "752d4b6c",
+"weights": "4198:5eeb733d"
+},
+{
+"t": 24.033,
+"phase": "service",
+"scene": "6bcefd38",
+"tray": "-",
+"dom": "290b6e1b",
+"cats": "752d4b6c",
+"weights": "4198:5eeb733d"
+},
+{
+"t": 25.033,
+"phase": "service",
+"scene": "ea68afd0",
+"tray": "-",
+"dom": "14612ad7",
+"cats": "2dd88d01",
+"weights": "4211:6a416c7f"
+},
+{
+"t": 26.033,
+"phase": "service",
+"scene": "e7bc2acf",
+"tray": "-",
+"dom": "e9b698e1",
+"cats": "2dd88d01",
+"weights": "4212:c2e10efd"
+},
+{
+"t": 27.033,
+"phase": "service",
+"scene": "a42ac2d3",
+"tray": "-",
+"dom": "5a6117e1",
+"cats": "2dd88d01",
+"weights": "4212:c2e10efd"
+},
+{
+"t": 28.033,
+"phase": "service",
+"scene": "b159b2ea",
+"tray": "-",
+"dom": "b10f4c4e",
+"cats": "2dd88d01",
+"weights": "4212:c2e10efd"
+},
+{
+"t": 29.033,
+"phase": "service",
+"scene": "f4579f13",
+"tray": "-",
+"dom": "3d135dad",
+"cats": "dac87ed4",
+"weights": "4212:c2e10efd"
+},
+{
+"t": 30.033,
+"phase": "service",
+"scene": "46691071",
+"tray": "-",
+"dom": "90a76b64",
+"cats": "dac87ed4",
+"weights": "4212:c2e10efd"
+},
+{
+"t": 31.033,
+"phase": "service",
+"scene": "4a5dbb7b",
+"tray": "-",
+"dom": "73135a9",
+"cats": "dac87ed4",
+"weights": "4212:c2e10efd"
+},
+{
+"t": 32.033,
+"phase": "service",
+"scene": "38e9148d",
+"tray": "-",
+"dom": "ec8d3cf2",
+"cats": "dac87ed4",
+"weights": "4212:c2e10efd"
+},
+{
+"t": 33.033,
+"phase": "service",
+"scene": "a3e53b41",
+"tray": "-",
+"dom": "b9fb7cbf",
+"cats": "edf38b8d",
+"weights": "4213:a0d8c361"
+},
+{
+"t": 34.033,
+"phase": "service",
+"scene": "de79510f",
+"tray": "-",
+"dom": "d3670d58",
+"cats": "691f21a6",
+"weights": "4225:bb83a5d9"
+},
+{
+"t": 35.033,
+"phase": "service",
+"scene": "32cd9e7a",
+"tray": "-",
+"dom": "45faf2e2",
+"cats": "691f21a6",
+"weights": "4225:bb83a5d9"
+},
+{
+"t": 36.033,
+"phase": "service",
+"scene": "9ff26f0b",
+"tray": "-",
+"dom": "a577cc40",
+"cats": "4073eb80",
+"weights": "4242:4b5a70fe"
+},
+{
+"t": 37.033,
+"phase": "service",
+"scene": "1b9b7eb",
+"tray": "-",
+"dom": "32ae101b",
+"cats": "4073eb80",
+"weights": "4243:19851748"
+},
+{
+"t": 38.033,
+"phase": "service",
+"scene": "d643d4aa",
+"tray": "-",
+"dom": "a8d62f9d",
+"cats": "e3fc43e",
+"weights": "4258:eef8ece3"
+},
+{
+"t": 39.033,
+"phase": "service",
+"scene": "700b0fb1",
+"tray": "-",
+"dom": "5f4c56c4",
+"cats": "18e88299",
+"weights": "4260:e3ece94f"
+},
+{
+"t": 40.033,
+"phase": "service",
+"scene": "d28aa156",
+"tray": "-",
+"dom": "9c150ecd",
+"cats": "64487a1e",
+"weights": "4261:6e07ffad"
+},
+{
+"t": 41.033,
+"phase": "service",
+"scene": "bdfdbfb4",
+"tray": "-",
+"dom": "d27e9786",
+"cats": "4baec587",
+"weights": "4261:6e07ffad"
+},
+{
+"t": 42.033,
+"phase": "service",
+"scene": "3eb4dbc3",
+"tray": "-",
+"dom": "7b972536",
+"cats": "968fa0fa",
+"weights": "4262:278a9e71"
+},
+{
+"t": 43.033,
+"phase": "service",
+"scene": "b61166ea",
+"tray": "-",
+"dom": "32c3df2",
+"cats": "9871c631",
+"weights": "4263:950aac26"
+},
+{
+"t": 44.033,
+"phase": "service",
+"scene": "c1ccc6a0",
+"tray": "-",
+"dom": "caa22628",
+"cats": "6f706af8",
+"weights": "4264:683efeb5"
+},
+{
+"t": 45.033,
+"phase": "service",
+"scene": "ab6f6877",
+"tray": "-",
+"dom": "cdd3b47c",
+"cats": "1564ed67",
+"weights": "4267:f2c4d791"
+},
+{
+"t": 46.033,
+"phase": "service",
+"scene": "f873972",
+"tray": "-",
+"dom": "941a5966",
+"cats": "8b2bc44f",
+"weights": "4268:9bf401cb"
+},
+{
+"t": 47.033,
+"phase": "service",
+"scene": "a841423c",
+"tray": "-",
+"dom": "a691bcdf",
+"cats": "74785385",
+"weights": "4270:da4a4626"
+},
+{
+"t": 48.033,
+"phase": "service",
+"scene": "2605ef8c",
+"tray": "-",
+"dom": "5eda9752",
+"cats": "c636ad73",
+"weights": "4270:da4a4626"
+},
+{
+"t": 49.033,
+"phase": "service",
+"scene": "85e8f62d",
+"tray": "-",
+"dom": "ed6bc775",
+"cats": "9b0ef736",
+"weights": "4271:7b5c40ae"
+},
+{
+"t": 50.033,
+"phase": "service",
+"scene": "4cea79e9",
+"tray": "-",
+"dom": "5e2fa676",
+"cats": "82a04f1",
+"weights": "4272:b03ed043"
+},
+{
+"t": 51.033,
+"phase": "service",
+"scene": "fe2a5faf",
+"tray": "-",
+"dom": "effa4968",
+"cats": "13097263",
+"weights": "4272:b03ed043"
+},
+{
+"t": 52.033,
+"phase": "service",
+"scene": "ce869242",
+"tray": "-",
+"dom": "8ea80f0",
+"cats": "cf2dd37c",
+"weights": "4272:b03ed043"
+},
+{
+"t": 53.033,
+"phase": "service",
+"scene": "9f3a14eb",
+"tray": "-",
+"dom": "dd16aace",
+"cats": "f11117d8",
+"weights": "4272:b03ed043"
+},
+{
+"t": 54.033,
+"phase": "service",
+"scene": "5c6225c4",
+"tray": "-",
+"dom": "82fd48fb",
+"cats": "bc3c0e8b",
+"weights": "4273:2fb3c9fb"
+},
+{
+"t": 55.033,
+"phase": "service",
+"scene": "bd6b6e22",
+"tray": "-",
+"dom": "7e145385",
+"cats": "136222b2",
+"weights": "4285:215c67df"
+},
+{
+"t": 56.033,
+"phase": "service",
+"scene": "edf9d627",
+"tray": "-",
+"dom": "16c28fe7",
+"cats": "136222b2",
+"weights": "4285:215c67df"
+},
+{
+"t": 57.033,
+"phase": "service",
+"scene": "a614bab8",
+"tray": "-",
+"dom": "15b007",
+"cats": "4bf3f1d3",
+"weights": "4298:16b9e48a"
+},
+{
+"t": 58.033,
+"phase": "service",
+"scene": "1cb46d2e",
+"tray": "-",
+"dom": "a659a02f",
+"cats": "4bf3f1d3",
+"weights": "4300:1c3b7163"
+},
+{
+"t": 59.033,
+"phase": "service",
+"scene": "18e2b3e6",
+"tray": "-",
+"dom": "515550bf",
+"cats": "4bf3f1d3",
+"weights": "4303:168dc85e"
+},
+{
+"t": 60.033,
+"phase": "service",
+"scene": "b10e35a5",
+"tray": "-",
+"dom": "f822ee8f",
+"cats": "4bf3f1d3",
+"weights": "4305:2c40a2c7"
+},
+{
+"t": 61.033,
+"phase": "service",
+"scene": "b7b9df1c",
+"tray": "-",
+"dom": "1565cfd3",
+"cats": "4bf3f1d3",
+"weights": "4305:2c40a2c7"
+},
+{
+"t": 62.033,
+"phase": "service",
+"scene": "df48823e",
+"tray": "-",
+"dom": "3a893e2f",
+"cats": "4bf3f1d3",
+"weights": "4306:1e84c210"
+},
+{
+"t": 63.033,
+"phase": "service",
+"scene": "afdcbe18",
+"tray": "-",
+"dom": "59777dca",
+"cats": "4bf3f1d3",
+"weights": "4306:1e84c210"
+},
+{
+"t": 64.033,
+"phase": "service",
+"scene": "75fa59e0",
+"tray": "-",
+"dom": "87e46fbd",
+"cats": "4bf3f1d3",
+"weights": "4306:1e84c210"
+},
+{
+"t": 65.033,
+"phase": "service",
+"scene": "e4d4c8cc",
+"tray": "-",
+"dom": "eef71f41",
+"cats": "4bf3f1d3",
+"weights": "4307:45c7110c"
+},
+{
+"t": 66.033,
+"phase": "service",
+"scene": "97ed9f0e",
+"tray": "-",
+"dom": "8a00fcfa",
+"cats": "4bf3f1d3",
+"weights": "4308:2c74bb00"
+},
+{
+"t": 67.033,
+"phase": "service",
+"scene": "e174ddd9",
+"tray": "-",
+"dom": "af3f884c",
+"cats": "4bf3f1d3",
+"weights": "4308:2c74bb00"
+},
+{
+"t": 68.033,
+"phase": "service",
+"scene": "487d6677",
+"tray": "-",
+"dom": "e76ece5b",
+"cats": "4bf3f1d3",
+"weights": "4308:2c74bb00"
+},
+{
+"t": 69.033,
+"phase": "service",
+"scene": "4b20af00",
+"tray": "-",
+"dom": "50d4bd68",
+"cats": "4bf3f1d3",
+"weights": "4308:2c74bb00"
+},
+{
+"t": 70.033,
+"phase": "service",
+"scene": "252a4816",
+"tray": "-",
+"dom": "5447b7f4",
+"cats": "4bf3f1d3",
+"weights": "4309:c3c0e663"
+},
+{
+"t": 71.033,
+"phase": "service",
+"scene": "2ca9d5a3",
+"tray": "-",
+"dom": "c2f4ca9e",
+"cats": "4bf3f1d3",
+"weights": "4310:8adbee92"
+},
+{
+"t": 72.033,
+"phase": "service",
+"scene": "4dca62e2",
+"tray": "-",
+"dom": "29f8e662",
+"cats": "4bf3f1d3",
+"weights": "4311:6f7526ea"
+},
+{
+"t": 73.033,
+"phase": "service",
+"scene": "2d847ca5",
+"tray": "-",
+"dom": "e8bd8c52",
+"cats": "2b1daca2",
+"weights": "4311:6f7526ea"
+},
+{
+"t": 74.033,
+"phase": "service",
+"scene": "1c2cea84",
+"tray": "-",
+"dom": "da2ba0eb",
+"cats": "2b1daca2",
+"weights": "4311:6f7526ea"
+},
+{
+"t": 75.033,
+"phase": "service",
+"scene": "ebb67291",
+"tray": "-",
+"dom": "f48680c3",
+"cats": "2b1daca2",
+"weights": "4311:6f7526ea"
+},
+{
+"t": 76.033,
+"phase": "service",
+"scene": "c0103815",
+"tray": "-",
+"dom": "c44c4f11",
+"cats": "2b1daca2",
+"weights": "4311:6f7526ea"
+},
+{
+"t": 77.033,
+"phase": "service",
+"scene": "589106ab",
+"tray": "-",
+"dom": "4f735a21",
+"cats": "801f020b",
+"weights": "4324:e8dfceba"
+},
+{
+"t": 78.033,
+"phase": "service",
+"scene": "56ea5e9d",
+"tray": "-",
+"dom": "f705682b",
+"cats": "3d10d6c",
+"weights": "4324:e8dfceba"
+},
+{
+"t": 79.033,
+"phase": "service",
+"scene": "f3460aaa",
+"tray": "-",
+"dom": "b11cf1bb",
+"cats": "cbaf09e3",
+"weights": "4324:e8dfceba"
+},
+{
+"t": 80.033,
+"phase": "service",
+"scene": "5bdf7aea",
+"tray": "-",
+"dom": "bbcc8305",
+"cats": "29c33f86",
+"weights": "4324:e8dfceba"
+},
+{
+"t": 81.033,
+"phase": "service",
+"scene": "4807cd56",
+"tray": "-",
+"dom": "a3226f71",
+"cats": "999d35c9",
+"weights": "4342:f5302c13"
+},
+{
+"t": 82.033,
+"phase": "service",
+"scene": "79093b4b",
+"tray": "-",
+"dom": "3784dc45",
+"cats": "2fd55bf6",
+"weights": "4344:d0db540b"
+},
+{
+"t": 83.033,
+"phase": "service",
+"scene": "72cd4bab",
+"tray": "-",
+"dom": "7d4cc4ed",
+"cats": "a23d5ede",
+"weights": "4344:d0db540b"
+},
+{
+"t": 84.033,
+"phase": "service",
+"scene": "82c0d54c",
+"tray": "-",
+"dom": "4ab659e0",
+"cats": "4489884",
+"weights": "4344:d0db540b"
+},
+{
+"t": 85.033,
+"phase": "service",
+"scene": "3df7a57e",
+"tray": "-",
+"dom": "726674fd",
+"cats": "9ba1f1c0",
+"weights": "4347:daecc73b"
+},
+{
+"t": 86.033,
+"phase": "service",
+"scene": "4596cad",
+"tray": "-",
+"dom": "12df875b",
+"cats": "3613ea75",
+"weights": "4362:c2bca2a7"
+},
+{
+"t": 87.033,
+"phase": "service",
+"scene": "1543738a",
+"tray": "-",
+"dom": "812d4625",
+"cats": "44b554a2",
+"weights": "4363:153ec1dc"
+},
+{
+"t": 88.033,
+"phase": "service",
+"scene": "c81255d3",
+"tray": "-",
+"dom": "7716faa6",
+"cats": "a4372669",
+"weights": "4363:153ec1dc"
+},
+{
+"t": 89.033,
+"phase": "service",
+"scene": "97411704",
+"tray": "-",
+"dom": "8a7c804d",
+"cats": "849afc7b",
+"weights": "4364:922fbd59"
+},
+{
+"t": 90.033,
+"phase": "service",
+"scene": "21f0d48f",
+"tray": "-",
+"dom": "99a723a0",
+"cats": "46c3a446",
+"weights": "4375:be85cc8b"
+},
+{
+"t": 91.033,
+"phase": "service",
+"scene": "9884cba1",
+"tray": "-",
+"dom": "aef2b5e",
+"cats": "6f810c2b",
+"weights": "4377:4db81bf8"
+},
+{
+"t": 92.033,
+"phase": "service",
+"scene": "5f0063fb",
+"tray": "-",
+"dom": "c340f609",
+"cats": "8bdd05a3",
+"weights": "4378:bcfc316b"
+},
+{
+"t": 93.033,
+"phase": "service",
+"scene": "d95be82",
+"tray": "-",
+"dom": "c54344dd",
+"cats": "339bbe3d",
+"weights": "4378:bcfc316b"
+},
+{
+"t": 94.033,
+"phase": "service",
+"scene": "82d023d4",
+"tray": "-",
+"dom": "59b75c12",
+"cats": "1f54129e",
+"weights": "4378:bcfc316b"
+},
+{
+"t": 95.033,
+"phase": "service",
+"scene": "92836c7a",
+"tray": "-",
+"dom": "4db6e98",
+"cats": "fa3f0ece",
+"weights": "4380:7a0f4ac6"
+},
+{
+"t": 96.033,
+"phase": "service",
+"scene": "adeb2f4c",
+"tray": "-",
+"dom": "9db7b54e",
+"cats": "98cbcfe9",
+"weights": "4380:7a0f4ac6"
+},
+{
+"t": 97.033,
+"phase": "service",
+"scene": "4e554628",
+"tray": "-",
+"dom": "5a7da685",
+"cats": "c66a5bf4",
+"weights": "4394:c96b6583"
+},
+{
+"t": 98.033,
+"phase": "service",
+"scene": "dd40b34d",
+"tray": "-",
+"dom": "a288064e",
+"cats": "3cbe2694",
+"weights": "4406:23fdad10"
+},
+{
+"t": 99.033,
+"phase": "service",
+"scene": "4d5ba1eb",
+"tray": "-",
+"dom": "422f1502",
+"cats": "ec414f7b",
+"weights": "4406:23fdad10"
+},
+{
+"t": 100.033,
+"phase": "service",
+"scene": "63b3d39",
+"tray": "-",
+"dom": "38654ac6",
+"cats": "ec414f7b",
+"weights": "4406:23fdad10"
+},
+{
+"t": 101.033,
+"phase": "service",
+"scene": "f87b6a4b",
+"tray": "-",
+"dom": "64b087e6",
+"cats": "ec414f7b",
+"weights": "4406:23fdad10"
+},
+{
+"t": 102.033,
+"phase": "service",
+"scene": "98b77451",
+"tray": "-",
+"dom": "db94522",
+"cats": "ec414f7b",
+"weights": "4407:2e95bf22"
+},
+{
+"t": 103.033,
+"phase": "service",
+"scene": "e0c369e4",
+"tray": "-",
+"dom": "b0de3aa3",
+"cats": "ec414f7b",
+"weights": "4407:2e95bf22"
+},
+{
+"t": 104.033,
+"phase": "service",
+"scene": "15f966c9",
+"tray": "-",
+"dom": "1e19bc7c",
+"cats": "f559d302",
+"weights": "4407:2e95bf22"
+},
+{
+"t": 105.033,
+"phase": "service",
+"scene": "bccedb5f",
+"tray": "-",
+"dom": "8ffa2bb4",
+"cats": "f559d302",
+"weights": "4407:2e95bf22"
+},
+{
+"t": 106.033,
+"phase": "service",
+"scene": "7b780a31",
+"tray": "-",
+"dom": "443ec817",
+"cats": "b284eb08",
+"weights": "4408:74914ab4"
+},
+{
+"t": 107.033,
+"phase": "service",
+"scene": "d43eec4c",
+"tray": "-",
+"dom": "2935d46c",
+"cats": "363a73b",
+"weights": "4425:fbd6dae6"
+},
+{
+"t": 108.033,
+"phase": "service",
+"scene": "1cbd0bc2",
+"tray": "-",
+"dom": "415a70f6",
+"cats": "4ff8f0b4",
+"weights": "4427:11631924"
+},
+{
+"t": 109.033,
+"phase": "service",
+"scene": "587998c5",
+"tray": "-",
+"dom": "9f4a5942",
+"cats": "214c7bbd",
+"weights": "4427:11631924"
+},
+{
+"t": 110.033,
+"phase": "service",
+"scene": "dabea44f",
+"tray": "-",
+"dom": "2f44a1fd",
+"cats": "bbf264aa",
+"weights": "4427:11631924"
+},
+{
+"t": 111.033,
+"phase": "service",
+"scene": "a891ff4a",
+"tray": "-",
+"dom": "807cd72d",
+"cats": "a3631bc7",
+"weights": "4427:11631924"
+},
+{
+"t": 112.033,
+"phase": "service",
+"scene": "c8ffc726",
+"tray": "-",
+"dom": "17e9fed5",
+"cats": "b3b0dd48",
+"weights": "4427:11631924"
+},
+{
+"t": 113.033,
+"phase": "service",
+"scene": "a7f49628",
+"tray": "-",
+"dom": "a3c9054e",
+"cats": "c4851a75",
+"weights": "4428:75af140c"
+},
+{
+"t": 114.033,
+"phase": "service",
+"scene": "e423ed01",
+"tray": "-",
+"dom": "3c1ffb22",
+"cats": "8719e739",
+"weights": "4428:75af140c"
+},
+{
+"t": 115.033,
+"phase": "service",
+"scene": "fc0093a6",
+"tray": "-",
+"dom": "be7d31fc",
+"cats": "a9682540",
+"weights": "4429:ccede9a9"
+},
+{
+"t": 116.033,
+"phase": "service",
+"scene": "f336c416",
+"tray": "-",
+"dom": "640cfd2e",
+"cats": "fa199a90",
+"weights": "4451:e5fc7d48"
+},
+{
+"t": 117.033,
+"phase": "service",
+"scene": "7d56811f",
+"tray": "-",
+"dom": "f16a0f4a",
+"cats": "d2c35edc",
+"weights": "4451:e5fc7d48"
+},
+{
+"t": 118.033,
+"phase": "service",
+"scene": "17044c4e",
+"tray": "-",
+"dom": "4c3146a9",
+"cats": "349a32cf",
+"weights": "4453:1e919221"
+},
+{
+"t": 119.033,
+"phase": "service",
+"scene": "7846e956",
+"tray": "-",
+"dom": "31910354",
+"cats": "ffe75fa0",
+"weights": "4468:eb6c7d49"
+},
+{
+"t": 120.033,
+"phase": "service",
+"scene": "82684c81",
+"tray": "-",
+"dom": "86c152f2",
+"cats": "1ae7105d",
+"weights": "4468:eb6c7d49"
+},
+{
+"t": 121.033,
+"phase": "service",
+"scene": "7641404d",
+"tray": "-",
+"dom": "37684322",
+"cats": "1d0863fb",
+"weights": "4468:eb6c7d49"
+},
+{
+"t": 122.033,
+"phase": "service",
+"scene": "98cf6397",
+"tray": "-",
+"dom": "6eec990a",
+"cats": "2da03726",
+"weights": "4472:d8296c85"
+},
+{
+"t": 123.033,
+"phase": "service",
+"scene": "25fe614",
+"tray": "-",
+"dom": "141a30af",
+"cats": "ea1500bb",
+"weights": "4475:d3fdb15d"
+},
+{
+"t": 124.033,
+"phase": "service",
+"scene": "2ab5874a",
+"tray": "-",
+"dom": "170370ca",
+"cats": "3f520e0a",
+"weights": "4476:2020ffa0"
+},
+{
+"t": 125.033,
+"phase": "service",
+"scene": "9d5bd865",
+"tray": "-",
+"dom": "82b06a9c",
+"cats": "cb2a22a3",
+"weights": "4476:2020ffa0"
+},
+{
+"t": 126.033,
+"phase": "service",
+"scene": "e9ecf6a0",
+"tray": "-",
+"dom": "dbfe0f5f",
+"cats": "5e08b63b",
+"weights": "4498:348cbc0a"
+},
+{
+"t": 127.033,
+"phase": "service",
+"scene": "ba9e19a7",
+"tray": "-",
+"dom": "f5919afe",
+"cats": "e28cf969",
+"weights": "4498:348cbc0a"
+},
+{
+"t": 128.033,
+"phase": "service",
+"scene": "ad2928e0",
+"tray": "-",
+"dom": "573c64e3",
+"cats": "96fb2cee",
+"weights": "4498:348cbc0a"
+},
+{
+"t": 129.033,
+"phase": "service",
+"scene": "e7a64ca9",
+"tray": "-",
+"dom": "48ff078b",
+"cats": "38b4be7",
+"weights": "4518:8bcf30a0"
+},
+{
+"t": 130.033,
+"phase": "service",
+"scene": "aa02a6a2",
+"tray": "-",
+"dom": "47171168",
+"cats": "38b4be7",
+"weights": "4519:5d18fcd2"
+},
+{
+"t": 131.033,
+"phase": "service",
+"scene": "6ee393ba",
+"tray": "-",
+"dom": "eb333dab",
+"cats": "38b4be7",
+"weights": "4520:4afb7819"
+},
+{
+"t": 132.033,
+"phase": "service",
+"scene": "ad93926",
+"tray": "-",
+"dom": "dd732582",
+"cats": "580b384d",
+"weights": "4536:2fd111b5"
+},
+{
+"t": 133.033,
+"phase": "service",
+"scene": "c94d0747",
+"tray": "-",
+"dom": "d3078525",
+"cats": "580b384d",
+"weights": "4538:f7643e8"
+},
+{
+"t": 134.033,
+"phase": "service",
+"scene": "15987533",
+"tray": "-",
+"dom": "645b374",
+"cats": "580b384d",
+"weights": "4540:9001f351"
+},
+{
+"t": 135.033,
+"phase": "service",
+"scene": "c021968",
+"tray": "-",
+"dom": "65a51804",
+"cats": "580b384d",
+"weights": "4541:eec82171"
+},
+{
+"t": 136.033,
+"phase": "service",
+"scene": "61174038",
+"tray": "-",
+"dom": "90373113",
+"cats": "580b384d",
+"weights": "4542:d4a28de3"
+},
+{
+"t": 137.033,
+"phase": "service",
+"scene": "236eb1af",
+"tray": "-",
+"dom": "2273e74a",
+"cats": "50f2afae",
+"weights": "4543:37c474cc"
+},
+{
+"t": 138.033,
+"phase": "service",
+"scene": "d9511282",
+"tray": "-",
+"dom": "3a07c323",
+"cats": "50f2afae",
+"weights": "4549:d2bc62ee"
+},
+{
+"t": 139.033,
+"phase": "service",
+"scene": "209aa982",
+"tray": "-",
+"dom": "1ad349ad",
+"cats": "50f2afae",
+"weights": "4549:d2bc62ee"
+},
+{
+"t": 140.033,
+"phase": "service",
+"scene": "154a4a59",
+"tray": "-",
+"dom": "68a0c807",
+"cats": "50f2afae",
+"weights": "4549:d2bc62ee"
+},
+{
+"t": 141.033,
+"phase": "service",
+"scene": "c9c4ba16",
+"tray": "-",
+"dom": "aa0b2b08",
+"cats": "914084f",
+"weights": "4550:6bf057cc"
+},
+{
+"t": 142.033,
+"phase": "service",
+"scene": "91707dd",
+"tray": "-",
+"dom": "47cda056",
+"cats": "914084f",
+"weights": "4550:6bf057cc"
+},
+{
+"t": 143.033,
+"phase": "service",
+"scene": "36031175",
+"tray": "-",
+"dom": "7679d61b",
+"cats": "914084f",
+"weights": "4550:6bf057cc"
+},
+{
+"t": 144.033,
+"phase": "service",
+"scene": "74f1969a",
+"tray": "-",
+"dom": "78784843",
+"cats": "914084f",
+"weights": "4553:337cb042"
+},
+{
+"t": 145.033,
+"phase": "service",
+"scene": "865f7fae",
+"tray": "-",
+"dom": "576d94ad",
+"cats": "c53f095c",
+"weights": "4568:866f5b5c"
+},
+{
+"t": 146.033,
+"phase": "service",
+"scene": "d023faad",
+"tray": "-",
+"dom": "19dcfafb",
+"cats": "914084f",
+"weights": "4568:866f5b5c"
+},
+{
+"t": 147.033,
+"phase": "service",
+"scene": "1679c32b",
+"tray": "-",
+"dom": "cf24a871",
+"cats": "914084f",
+"weights": "4570:d375b6e4"
+},
+{
+"t": 148.033,
+"phase": "service",
+"scene": "d6d31e8f",
+"tray": "-",
+"dom": "a2fd7d55",
+"cats": "c759008f",
+"weights": "4570:d375b6e4"
+},
+{
+"t": 149.033,
+"phase": "service",
+"scene": "13c0efbd",
+"tray": "-",
+"dom": "e312ed3c",
+"cats": "c759008f",
+"weights": "4570:d375b6e4"
+},
+{
+"t": 150.033,
+"phase": "service",
+"scene": "f199a35",
+"tray": "-",
+"dom": "945ec388",
+"cats": "914084f",
+"weights": "4594:6aa2333d"
+},
+{
+"t": 151.033,
+"phase": "service",
+"scene": "6d7aa2cc",
+"tray": "-",
+"dom": "89f76e2e",
+"cats": "914084f",
+"weights": "4594:6aa2333d"
+},
+{
+"t": 152.033,
+"phase": "service",
+"scene": "85be7f32",
+"tray": "-",
+"dom": "f193ce57",
+"cats": "4e560098",
+"weights": "4595:e27a3287"
+},
+{
+"t": 153.033,
+"phase": "service",
+"scene": "7fde9714",
+"tray": "-",
+"dom": "cf4c3926",
+"cats": "4e560098",
+"weights": "4601:c4171787"
+},
+{
+"t": 154.033,
+"phase": "service",
+"scene": "dabe811f",
+"tray": "-",
+"dom": "6b0b9065",
+"cats": "4e560098",
+"weights": "4601:c4171787"
+},
+{
+"t": 155.033,
+"phase": "service",
+"scene": "6d315e2e",
+"tray": "-",
+"dom": "34e95eac",
+"cats": "4e560098",
+"weights": "4601:c4171787"
+},
+{
+"t": 156.033,
+"phase": "service",
+"scene": "4b61ad47",
+"tray": "-",
+"dom": "4e7ae526",
+"cats": "4e560098",
+"weights": "4602:e2c9f56f"
+},
+{
+"t": 157.033,
+"phase": "service",
+"scene": "7f11ea55",
+"tray": "-",
+"dom": "d2255006",
+"cats": "4e560098",
+"weights": "4602:e2c9f56f"
+},
+{
+"t": 158.033,
+"phase": "service",
+"scene": "6f3e1a38",
+"tray": "-",
+"dom": "9722593d",
+"cats": "4e560098",
+"weights": "4602:e2c9f56f"
+},
+{
+"t": 159.033,
+"phase": "service",
+"scene": "5d018fc0",
+"tray": "-",
+"dom": "357dd3b7",
+"cats": "4e560098",
+"weights": "4602:e2c9f56f"
+},
+{
+"t": 160.033,
+"phase": "service",
+"scene": "be0f5b95",
+"tray": "-",
+"dom": "75a46649",
+"cats": "4e560098",
+"weights": "4603:ad56964f"
+},
+{
+"t": 161.033,
+"phase": "service",
+"scene": "c4a124e3",
+"tray": "-",
+"dom": "74db6168",
+"cats": "4e560098",
+"weights": "4603:ad56964f"
+},
+{
+"t": 162.033,
+"phase": "service",
+"scene": "2375a2a2",
+"tray": "-",
+"dom": "116572ae",
+"cats": "4e560098",
+"weights": "4611:66bdcdb3"
+},
+{
+"t": 163.033,
+"phase": "service",
+"scene": "245ee097",
+"tray": "-",
+"dom": "99f0093",
+"cats": "b54c2593",
+"weights": "4611:66bdcdb3"
+},
+{
+"t": 164.033,
+"phase": "service",
+"scene": "b818d048",
+"tray": "-",
+"dom": "2a50cc57",
+"cats": "b54c2593",
+"weights": "4611:66bdcdb3"
+},
+{
+"t": 165.033,
+"phase": "service",
+"scene": "3120872a",
+"tray": "-",
+"dom": "1c456249",
+"cats": "b54c2593",
+"weights": "4612:276ac80b"
+},
+{
+"t": 166.033,
+"phase": "service",
+"scene": "ab9f506a",
+"tray": "-",
+"dom": "910993ac",
+"cats": "b54c2593",
+"weights": "4612:276ac80b"
+},
+{
+"t": 167.033,
+"phase": "service",
+"scene": "7e05f22d",
+"tray": "-",
+"dom": "900d653b",
+"cats": "4f681c58",
+"weights": "4624:d787363f"
+},
+{
+"t": 168.033,
+"phase": "service",
+"scene": "c78a1ae5",
+"tray": "-",
+"dom": "4f1c67df",
+"cats": "4f681c58",
+"weights": "4625:7442906"
+},
+{
+"t": 169.033,
+"phase": "service",
+"scene": "4dca9112",
+"tray": "-",
+"dom": "80f4d43f",
+"cats": "4f681c58",
+"weights": "4628:d3999fc8"
+},
+{
+"t": 170.033,
+"phase": "service",
+"scene": "fe083edb",
+"tray": "-",
+"dom": "3d792f12",
+"cats": "a22b90c0",
+"weights": "4630:e96c3478"
+},
+{
+"t": 171.033,
+"phase": "service",
+"scene": "18389075",
+"tray": "-",
+"dom": "ba90773c",
+"cats": "a22b90c0",
+"weights": "4630:e96c3478"
+},
+{
+"t": 172.033,
+"phase": "service",
+"scene": "78398ae4",
+"tray": "-",
+"dom": "9965d773",
+"cats": "d27ef4a3",
+"weights": "4665:12871a0e"
+},
+{
+"t": 173.033,
+"phase": "service",
+"scene": "2d8de9ff",
+"tray": "-",
+"dom": "ca3811be",
+"cats": "52077c8b",
+"weights": "4665:12871a0e"
+},
+{
+"t": 174.033,
+"phase": "service",
+"scene": "8e82c067",
+"tray": "-",
+"dom": "16327006",
+"cats": "8969255a",
+"weights": "4665:12871a0e"
+},
+{
+"t": 175.033,
+"phase": "service",
+"scene": "a8bbde93",
+"tray": "-",
+"dom": "6daf53b5",
+"cats": "b7e4b401",
+"weights": "4665:12871a0e"
+},
+{
+"t": 176.033,
+"phase": "service",
+"scene": "682dfe43",
+"tray": "-",
+"dom": "651aa713",
+"cats": "546ba4df",
+"weights": "4666:9d172e8d"
+},
+{
+"t": 177.033,
+"phase": "service",
+"scene": "f5a9532a",
+"tray": "-",
+"dom": "7465ed59",
+"cats": "4679a5a0",
+"weights": "4667:aa75c870"
+},
+{
+"t": 178.033,
+"phase": "service",
+"scene": "e7a3d4ab",
+"tray": "-",
+"dom": "6a767947",
+"cats": "42769990",
+"weights": "4668:76c4b993"
+},
+{
+"t": 179.033,
+"phase": "service",
+"scene": "c0ce24f4",
+"tray": "-",
+"dom": "fd5085a2",
+"cats": "ed384ac1",
+"weights": "4668:76c4b993"
+},
+{
+"t": 180.033,
+"phase": "service",
+"scene": "e938739",
+"tray": "-",
+"dom": "ce8dd33d",
+"cats": "58cecde",
+"weights": "4668:76c4b993"
+},
+{
+"t": 181.033,
+"phase": "service",
+"scene": "633f6503",
+"tray": "-",
+"dom": "9460df4a",
+"cats": "1648c17f",
+"weights": "4668:76c4b993"
+},
+{
+"t": 182.033,
+"phase": "service",
+"scene": "1b38908e",
+"tray": "-",
+"dom": "4589197f",
+"cats": "f840828c",
+"weights": "4668:76c4b993"
+},
+{
+"t": 183.033,
+"phase": "service",
+"scene": "7a1e51ba",
+"tray": "-",
+"dom": "866949d6",
+"cats": "54fe0450",
+"weights": "4668:76c4b993"
+},
+{
+"t": 184.033,
+"phase": "service",
+"scene": "f4308c8c",
+"tray": "-",
+"dom": "3a1f8604",
+"cats": "4e99221b",
+"weights": "4668:76c4b993"
+},
+{
+"t": 185.033,
+"phase": "service",
+"scene": "59264eae",
+"tray": "-",
+"dom": "b1831edd",
+"cats": "4e99221b",
+"weights": "4668:76c4b993"
+},
+{
+"t": 186.033,
+"phase": "service",
+"scene": "83cfaa87",
+"tray": "-",
+"dom": "a1ec743f",
+"cats": "4e99221b",
+"weights": "4668:76c4b993"
+},
+{
+"t": 187.033,
+"phase": "service",
+"scene": "ff037abf",
+"tray": "-",
+"dom": "f56f1ca0",
+"cats": "869943b2",
+"weights": "4668:76c4b993"
+},
+{
+"t": 188.033,
+"phase": "service",
+"scene": "2470a9a2",
+"tray": "-",
+"dom": "ea0d5552",
+"cats": "869943b2",
+"weights": "4668:76c4b993"
+},
+{
+"t": 189.033,
+"phase": "service",
+"scene": "697ccdce",
+"tray": "-",
+"dom": "48762838",
+"cats": "fe6acc44",
+"weights": "4668:76c4b993"
+},
+{
+"t": 190.033,
+"phase": "service",
+"scene": "11575cd8",
+"tray": "-",
+"dom": "3941ec91",
+"cats": "fe6acc44",
+"weights": "4668:76c4b993"
+},
+{
+"t": 191.033,
+"phase": "service",
+"scene": "4d89cdc5",
+"tray": "-",
+"dom": "778f437",
+"cats": "fe6acc44",
+"weights": "4668:76c4b993"
+},
+{
+"t": 192.033,
+"phase": "service",
+"scene": "a64f0d66",
+"tray": "-",
+"dom": "373487ec",
+"cats": "fe6acc44",
+"weights": "4668:76c4b993"
+},
+{
+"t": 193.033,
+"phase": "service",
+"scene": "681d436a",
+"tray": "-",
+"dom": "2f552fd2",
+"cats": "fe6acc44",
+"weights": "4668:76c4b993"
+},
+{
+"t": 194.033,
+"phase": "service",
+"scene": "f7c7abea",
+"tray": "-",
+"dom": "81c7a320",
+"cats": "fe6acc44",
+"weights": "4668:76c4b993"
+},
+{
+"t": 195.033,
+"phase": "service",
+"scene": "30df0475",
+"tray": "-",
+"dom": "43ecd1f9",
+"cats": "fe6acc44",
+"weights": "4668:76c4b993"
+},
+{
+"t": 196.033,
+"phase": "service",
+"scene": "1c8d7041",
+"tray": "-",
+"dom": "ba66c922",
+"cats": "8a85b333",
+"weights": "4680:c92bb460"
+},
+{
+"t": 197.033,
+"phase": "service",
+"scene": "17326aba",
+"tray": "-",
+"dom": "b547e5",
+"cats": "8a85b333",
+"weights": "4680:c92bb460"
+},
+{
+"t": 198.033,
+"phase": "service",
+"scene": "145ced0d",
+"tray": "-",
+"dom": "51e32e87",
+"cats": "7ccce4c0",
+"weights": "4693:aacee7ce"
+},
+{
+"t": 199.033,
+"phase": "service",
+"scene": "295be230",
+"tray": "-",
+"dom": "95685221",
+"cats": "7ccce4c0",
+"weights": "4693:aacee7ce"
+},
+{
+"t": 200.033,
+"phase": "service",
+"scene": "b146cbd5",
+"tray": "-",
+"dom": "2faf86c8",
+"cats": "5d2b062d",
+"weights": "4693:aacee7ce"
+},
+{
+"t": 201.033,
+"phase": "service",
+"scene": "5efa9fdc",
+"tray": "-",
+"dom": "734b02a",
+"cats": "5d2b062d",
+"weights": "4693:aacee7ce"
+},
+{
+"t": 202.033,
+"phase": "service",
+"scene": "49d25c0d",
+"tray": "-",
+"dom": "46a096a",
+"cats": "5d2b062d",
+"weights": "4696:557bedf4"
+},
+{
+"t": 203.033,
+"phase": "service",
+"scene": "c2a3d0a5",
+"tray": "-",
+"dom": "69827fe4",
+"cats": "5d2b062d",
+"weights": "4696:557bedf4"
+},
+{
+"t": 204.033,
+"phase": "service",
+"scene": "5fada33c",
+"tray": "-",
+"dom": "d54977ed",
+"cats": "5d2b062d",
+"weights": "4696:557bedf4"
+},
+{
+"t": 205.033,
+"phase": "service",
+"scene": "c43733f6",
+"tray": "-",
+"dom": "1d940c8f",
+"cats": "5d2b062d",
+"weights": "4696:557bedf4"
+},
+{
+"t": 206.033,
+"phase": "service",
+"scene": "791f37cf",
+"tray": "-",
+"dom": "62f1fec9",
+"cats": "5d2b062d",
+"weights": "4696:557bedf4"
+},
+{
+"t": 207.033,
+"phase": "service",
+"scene": "fb04e6ba",
+"tray": "-",
+"dom": "75a36262",
+"cats": "5d2b062d",
+"weights": "4696:557bedf4"
+},
+{
+"t": 208.033,
+"phase": "service",
+"scene": "22b22b20",
+"tray": "-",
+"dom": "e563a4bd",
+"cats": "5d2b062d",
+"weights": "4696:557bedf4"
+},
+{
+"t": 209.033,
+"phase": "service",
+"scene": "fcfef1c4",
+"tray": "-",
+"dom": "38bd9eb4",
+"cats": "92823e3e",
+"weights": "4696:557bedf4"
+},
+{
+"t": 210.033,
+"phase": "service",
+"scene": "4cdfa947",
+"tray": "-",
+"dom": "c7ad4f7a",
+"cats": "92823e3e",
+"weights": "4696:557bedf4"
+},
+{
+"t": 211.033,
+"phase": "service",
+"scene": "ebf85f38",
+"tray": "-",
+"dom": "9d943f80",
+"cats": "92823e3e",
+"weights": "4696:557bedf4"
+},
+{
+"t": 212.033,
+"phase": "service",
+"scene": "52753314",
+"tray": "-",
+"dom": "e485149f",
+"cats": "92823e3e",
+"weights": "4696:557bedf4"
+},
+{
+"t": 213.033,
+"phase": "service",
+"scene": "e985c715",
+"tray": "-",
+"dom": "f0cde5f5",
+"cats": "92823e3e",
+"weights": "4696:557bedf4"
+},
+{
+"t": 214.033,
+"phase": "service",
+"scene": "2f404099",
+"tray": "-",
+"dom": "5d599b4c",
+"cats": "92823e3e",
+"weights": "4696:557bedf4"
+},
+{
+"t": 215.033,
+"phase": "service",
+"scene": "3187a67e",
+"tray": "-",
+"dom": "28369e85",
+"cats": "92823e3e",
+"weights": "4696:557bedf4"
+},
+{
+"t": 216.033,
+"phase": "service",
+"scene": "a4ffdc96",
+"tray": "-",
+"dom": "7965c142",
+"cats": "92823e3e",
+"weights": "4696:557bedf4"
+},
+{
+"t": 217.033,
+"phase": "service",
+"scene": "5fcffe2e",
+"tray": "-",
+"dom": "d4cfb5e8",
+"cats": "92823e3e",
+"weights": "4696:557bedf4"
+},
+{
+"t": 218.033,
+"phase": "service",
+"scene": "e22cf03e",
+"tray": "-",
+"dom": "5902d8de",
+"cats": "92823e3e",
+"weights": "4696:557bedf4"
+},
+{
+"t": 219.033,
+"phase": "service",
+"scene": "e871906",
+"tray": "-",
+"dom": "5584a2a7",
+"cats": "5fc179ae",
+"weights": "4696:557bedf4"
+},
+{
+"t": 220.033,
+"phase": "service",
+"scene": "e496b91b",
+"tray": "-",
+"dom": "659a5acd",
+"cats": "5fc179ae",
+"weights": "4696:557bedf4"
+},
+{
+"t": 221.033,
+"phase": "service",
+"scene": "4e8ffb16",
+"tray": "-",
+"dom": "672fb1ff",
+"cats": "5fc179ae",
+"weights": "4696:557bedf4"
+},
+{
+"t": 222.033,
+"phase": "service",
+"scene": "8cdd9b4d",
+"tray": "-",
+"dom": "5f4e3339",
+"cats": "5fc179ae",
+"weights": "4696:557bedf4"
+},
+{
+"t": 223.033,
+"phase": "service",
+"scene": "4d56525e",
+"tray": "-",
+"dom": "1ebc44f3",
+"cats": "9bc2da6e",
+"weights": "4714:548681ac"
+},
+{
+"t": 224.033,
+"phase": "service",
+"scene": "65188e2f",
+"tray": "-",
+"dom": "ff6de9da",
+"cats": "4f210656",
+"weights": "4714:548681ac"
+},
+{
+"t": 225.033,
+"phase": "service",
+"scene": "56ddca51",
+"tray": "-",
+"dom": "d7b6cf14",
+"cats": "ca0dca29",
+"weights": "4714:548681ac"
+},
+{
+"t": 226.033,
+"phase": "service",
+"scene": "d9406f52",
+"tray": "-",
+"dom": "20e08c77",
+"cats": "c680e959",
+"weights": "4714:548681ac"
+},
+{
+"t": 227.033,
+"phase": "service",
+"scene": "cfd453ab",
+"tray": "-",
+"dom": "834c57bf",
+"cats": "31627b0c",
+"weights": "4714:548681ac"
+},
+{
+"t": 228.033,
+"phase": "service",
+"scene": "6c498b4f",
+"tray": "-",
+"dom": "273d0cf9",
+"cats": "31627b0c",
+"weights": "4714:548681ac"
+},
+{
+"t": 229.033,
+"phase": "service",
+"scene": "15147ec",
+"tray": "-",
+"dom": "66a56220",
+"cats": "31627b0c",
+"weights": "4714:548681ac"
+},
+{
+"t": 230.033,
+"phase": "service",
+"scene": "476f01fe",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "b2847429",
+"weights": "4714:548681ac"
+},
+{
+"t": 231.033,
+"phase": "service",
+"scene": "6b0e8b82",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "b2847429",
+"weights": "4714:548681ac"
+},
+{
+"t": 232.033,
+"phase": "service",
+"scene": "993e6886",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "b2847429",
+"weights": "4714:548681ac"
+},
+{
+"t": 233.033,
+"phase": "service",
+"scene": "c333b03",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "370c1a74",
+"weights": "4714:548681ac"
+},
+{
+"t": 234.033,
+"phase": "service",
+"scene": "8bd8bb8e",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "51fd81dd",
+"weights": "4732:aa1579a4"
+},
+{
+"t": 235.033,
+"phase": "service",
+"scene": "d58ff259",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "5847db84",
+"weights": "4735:dd474ac8"
+},
+{
+"t": 236.033,
+"phase": "service",
+"scene": "30e0188a",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "1c59a53",
+"weights": "4735:dd474ac8"
+},
+{
+"t": 237.033,
+"phase": "service",
+"scene": "ac70176c",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "58dee176",
+"weights": "4735:dd474ac8"
+},
+{
+"t": 238.033,
+"phase": "service",
+"scene": "bfe13794",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "cb65bd9",
+"weights": "4735:dd474ac8"
+},
+{
+"t": 239.033,
+"phase": "service",
+"scene": "d348df7d",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "e1671787",
+"weights": "4735:dd474ac8"
+},
+{
+"t": 240.033,
+"phase": "service",
+"scene": "56d4b998",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "34e72b3e",
+"weights": "4735:dd474ac8"
+},
+{
+"t": 241.033,
+"phase": "service",
+"scene": "f2c0df0c",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "893b543",
+"weights": "4735:dd474ac8"
+},
+{
+"t": 242.033,
+"phase": "service",
+"scene": "6d43687",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "fab8cedb",
+"weights": "4735:dd474ac8"
+},
+{
+"t": 243.033,
+"phase": "service",
+"scene": "ba471451",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "365f6870",
+"weights": "4735:dd474ac8"
+},
+{
+"t": 244.033,
+"phase": "service",
+"scene": "47b3a60e",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "69203a04",
+"weights": "4735:dd474ac8"
+},
+{
+"t": 245.033,
+"phase": "service",
+"scene": "db5ffb0",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "e0458dd0",
+"weights": "4740:bcf35f52"
+},
+{
+"t": 246.033,
+"phase": "service",
+"scene": "72516e95",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "896959de",
+"weights": "4756:74913eea"
+},
+{
+"t": 247.033,
+"phase": "service",
+"scene": "5fdd4bd7",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "dd401143",
+"weights": "4756:74913eea"
+},
+{
+"t": 248.033,
+"phase": "service",
+"scene": "8634c75",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "aa857e28",
+"weights": "4756:74913eea"
+},
+{
+"t": 249.033,
+"phase": "service",
+"scene": "dd9d3900",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "ff9e3347",
+"weights": "4772:10d9eafb"
+},
+{
+"t": 250.033,
+"phase": "service",
+"scene": "21a3d8ab",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "ff9e3347",
+"weights": "4772:10d9eafb"
+},
+{
+"t": 251.033,
+"phase": "service",
+"scene": "4384ce39",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "ff9e3347",
+"weights": "4772:10d9eafb"
+},
+{
+"t": 252.033,
+"phase": "service",
+"scene": "623292e7",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "ff9e3347",
+"weights": "4772:10d9eafb"
+},
+{
+"t": 253.033,
+"phase": "service",
+"scene": "1e2903b",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "dd334af3",
+"weights": "4772:10d9eafb"
+},
+{
+"t": 254.033,
+"phase": "service",
+"scene": "75a9a7d8",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "dd334af3",
+"weights": "4772:10d9eafb"
+},
+{
+"t": 255.033,
+"phase": "service",
+"scene": "92520f3c",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "9a6ea000",
+"weights": "4786:579a2066"
+},
+{
+"t": 256.033,
+"phase": "service",
+"scene": "573f2b56",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "ca865020",
+"weights": "4786:579a2066"
+},
+{
+"t": 257.033,
+"phase": "service",
+"scene": "902657b6",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "ca865020",
+"weights": "4786:579a2066"
+},
+{
+"t": 258.033,
+"phase": "service",
+"scene": "9e835d87",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "ca865020",
+"weights": "4786:579a2066"
+},
+{
+"t": 259.033,
+"phase": "service",
+"scene": "5c92437d",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "fa11dfa8",
+"weights": "4786:579a2066"
+},
+{
+"t": 260.033,
+"phase": "service",
+"scene": "d0acc220",
+"tray": "-",
+"dom": "73cae60c",
+"cats": "fa11dfa8",
+"weights": "4786:579a2066"
+},
+{
+"t": 261.033,
+"phase": "service",
+"scene": "fb7245df",
+"tray": "-",
+"dom": "f3a3b7b3",
+"cats": "fa11dfa8",
+"weights": "4786:579a2066"
+}
+],
+"frames": 7860,
+"digest": {
+"day": 2,
+"money": 4395,
+"lifetime": 5368,
+"level": 1,
+"stats": {
+"guests": 32,
+"perfect": 39,
+"days": 2,
+"walkins": 0,
+"families": 0
+},
+"xp": {
+"friedrice": 62,
+"coffee": 16
+},
+"stock": {
+"friedrice": 5,
+"coffee": 2
+},
+"reviews": 14,
+"reviewHash": "51e0665e",
+"regulars": {
+"chen": 1
+},
+"summary": {
+"rev": 2640,
+"cost": 915,
+"tips": 600,
+"bonus": 330,
+"wages": 0,
+"net": 2355,
+"guests": 17,
+"lost": 0,
+"perfect": 24,
+"plated": 24,
+"avg": 98,
+"top": "friedrice",
+"stars": 5
+},
+"cats": [
+[
+"tora",
+"home",
+"loaf",
+140,
+90,
+-1,
+true
+],
+[
+"ban",
+"home",
+"loaf",
+150,
+132,
+-1,
+true
+],
+[
+"snow",
+"home",
+"walk",
+72,
+525,
+-1,
+true
+],
+[
+"mikan",
+"home",
+"sit",
+112,
+132,
+-1,
+true
+],
+[
+"mei",
+"home",
+"loaf",
+114,
+90,
+-1,
+true
+]
+],
+"catHash": "fa11dfa8",
+"mem": [
+"first:1::811c9dc5",
+"sleepgod:1:K:811c9dc5",
+"photo:1:K:811c9dc5",
+"nap3:1:K:811c9dc5",
+"best:1:K:811c9dc5",
+"sofa:2:K:811c9dc5",
+"waited:2:K:811c9dc5",
+"sofafull:2:K:811c9dc5",
+"lap:2:K:811c9dc5"
+],
+"weights": "4786:579a2066",
+"dylan": {
+"stage": 0,
+"stay": 0,
+"reveal": 0,
+"last": 0,
+"clues": {}
+},
+"life": {
+"sofa": 1,
+"tv": 0,
+"bed": 1
+}
+}
+}
+}

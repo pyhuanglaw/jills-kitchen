@@ -1,0 +1,2258 @@
+(Filed verbatim. 2026-10-01 12:18, the player. The current canonical direction for the next round: the Second Floor as a long
+Restaurant Story arc before the Staff Room (with the missing-cat search for 柔柔 and 小齁), and the outside characters
+as real multi-stage arcs. Supersedes docs/v24/second_floor_brief_2026-10-01.txt and the earlier spatial progression
+where they differ. Needs a Second Floor master reference picture before the floor layout is locked (section 44).
+State when it arrived: nothing of Staff Lives / Second Floor / Staff Room / Private Room implemented yet.)
+
+IMPORTANT STORY ARCHITECTURE UPDATE
+SECOND FLOOR + STAFF LIVES LONG-FORM STORY PASS
+
+Please treat this as the current canonical direction and supersede the earlier
+Second Floor / Staff Room spatial progression where inconsistent.
+
+Do NOT restart good work.
+
+First inspect the current working tree and preserve all reusable work already completed:
+- Staff Lives infrastructure
+- character canon/facts
+- outside recurring NPCs
+- portraits
+- authored beats
+- callbacks
+- ambient events
+- tenure logic
+- staff-space evidence
+- Story Facts
+- Journal integration
+- event arbiter
+- save migration
+- tests
+
+The major correction is:
+
+SECOND FLOOR must become a real long-form Restaurant Story arc BEFORE Staff Room.
+
+But this is NOT merely a cat-triggered expansion.
+
+The Second Floor arc must gradually involve:
+- customers
+- staff
+- Jill
+- the cats
+- existing spatial problems
+- later Staff Lives character arcs
+
+The player should feel that many different parts of restaurant life gradually point toward the same physical possibility:
+
+“There is an unused second floor above Jill’s Kitchen.”
+
+Then Jill eventually decides to take it over.
+
+
+==================================================
+1. CORE STORY PRINCIPLE
+==================================================
+
+Do not design the Second Floor as:
+
+Day X
+→ expansion unlocked
+→ pay money
+→ second floor
+
+Do not design it as:
+
+cats discover upstairs
+→ second floor unlocked
+
+Do not design it as:
+
+Staff Room problem
+→ second floor unlocked
+
+Instead:
+
+CUSTOMERS notice the restaurant could physically grow upward.
+
+STAFF become aware of the unused upstairs space and occasionally talk about it.
+
+JILL has mundane contact with the landlord / upstairs space.
+
+THE CATS accidentally create the first real exploration of the space.
+
+STAFF and CUSTOMERS continue generating different spatial pressures.
+
+The player remembers that the unused floor exists.
+
+Only after enough time and actual lived evidence does Jill seriously consider leasing it.
+
+The Second Floor should feel like an idea that slowly becomes obvious.
+
+
+==================================================
+2. WHAT THE SECOND FLOOR IS
+==================================================
+
+There is an existing second floor above Jill’s Kitchen.
+
+It belongs to the landlord / building property.
+
+It is currently unused / unleased and is NOT part of Jill’s Kitchen.
+
+It is NOT:
+
+- Jill’s secret property
+- an abandoned former Jill’s Kitchen
+- an old family restaurant
+- a mysterious locked floor
+- a sentimental archive
+- a ruined building
+- a haunted space
+- a hidden inheritance
+- a secret expansion room
+
+It is simply:
+
+「房東那邊還空著的二樓。」
+
+Earlier in Jill’s Kitchen’s life, Jill had no reason to pay for another whole floor.
+
+The restaurant was smaller.
+
+Now the restaurant is changing.
+
+
+==================================================
+3. THIS MUST BE A LONG ARC, NOT ONE EVENT
+==================================================
+
+Spread the Second Floor arc across many game days.
+
+Conceptually:
+
+PHASE A
+Customers first make the player aware of upstairs.
+
+PHASE B
+Staff casually acknowledge that upstairs exists.
+
+PHASE C
+Jill has a mundane reason to inspect it with / through the landlord.
+
+PHASE D
+Days later, during normal restaurant life, the upstairs door is accidentally not fully latched.
+
+PHASE E
+At closing, 柔柔 and 小齁 are discovered missing.
+
+PHASE F
+Staff and Jill immediately search for them.
+
+PHASE G
+The search leads everyone upstairs.
+
+PHASE H
+The cats are found safely exploring the empty second floor.
+
+PHASE I
+The restaurant returns to normal. No expansion unlock yet.
+
+PHASE J
+Over later days, customer and staff space problems continue.
+
+PHASE K
+Different people independently reference upstairs again.
+
+PHASE L
+Jill eventually realizes the second floor now has an actual use.
+
+PHASE M
+Jill approaches landlord.
+
+PHASE N
+Player gets the major paid Second Floor expansion project.
+
+PHASE O
+The WHOLE second floor becomes part of Jill’s Kitchen.
+
+PHASE P
+Only later do Staff Room and Private Dining Room emerge as separate story-driven uses of areas upstairs.
+
+
+==================================================
+4. CUSTOMER FORESHADOWING — FIRST AWARENESS
+==================================================
+
+The first mention of upstairs should preferably come from an established customer / regular after source audit.
+
+Use someone who has been coming long enough to naturally notice the building.
+
+Example tone:
+
+客人：
+「樓上也是你們的？」
+
+Jill：
+「不是，房東的。」
+
+客人：
+「一直空著？」
+
+Jill：
+「好像是。」
+
+END.
+
+No Journal update.
+
+No project.
+
+No “maybe someday.”
+
+No camera pan announcing future DLC.
+
+This is just building information.
+
+The player now knows:
+
+There is another floor.
+
+
+==================================================
+5. CUSTOMER FORESHADOWING — THE RESTAURANT IS GETTING BIG
+==================================================
+
+Much later, another established customer notices how busy Jill’s Kitchen has become.
+
+This must be a separate event.
+
+Example:
+
+熟客：
+「妳們現在人這麼多，沒想過樓上？」
+
+Jill：
+「樓上又不是我的。」
+
+熟客：
+「租啊。」
+
+Jill：
+「你講得很簡單。」
+
+END.
+
+Again:
+
+NO UNLOCK.
+
+The purpose is to let a customer say what the player may already be thinking.
+
+Do not reuse exactly the same customer for every Second Floor beat.
+
+The restaurant community should gradually make the idea feel real.
+
+
+==================================================
+6. CUSTOMER PRESSURE SHOULD NOT ALL BE “MORE SEATS”
+==================================================
+
+Very important:
+
+Different customers should reveal different spatial needs.
+
+Do not reduce everything to capacity.
+
+Examples:
+
+A. ordinary busy night:
+Main Hall is simply crowded.
+
+B. established family / group:
+Side Hall can hold them, but it is still part of the active restaurant.
+
+C. later private-dining evidence:
+someone wants somewhere quieter.
+
+D. Lounge:
+some guests want to stay after eating.
+
+These are different problems.
+
+The Second Floor becomes valuable because Jill’s Kitchen has become a more complex place,
+not merely because seatCount is too low.
+
+
+==================================================
+7. STAFF FORESHADOWING
+==================================================
+
+Staff should also become aware of upstairs before expansion.
+
+Keep it casual.
+
+Possible lines:
+
+Nina:
+「樓上真的一直都空著喔？」
+
+Jill:
+「嗯。」
+
+or:
+
+Hugo:
+「上面多大？」
+
+Jill:
+「不知道。」
+
+Nina:
+「妳沒上去過？」
+
+Jill:
+「沒有啊。」
+
+or another veteran:
+
+「房東還沒租出去？」
+
+Jill:
+「好像還沒。」
+
+Do NOT make the whole staff immediately campaign for expansion.
+
+Nobody should say:
+
+「我們應該把樓上租下來做員工休息室！」
+
+That is too game-design-aware.
+
+At this stage, upstairs is simply part of the building.
+
+
+==================================================
+8. JILL INSPECTS THE SECOND FLOOR BEFORE THE CAT EVENT
+==================================================
+
+At some point, Jill has a mundane legitimate reason to go upstairs.
+
+Preferably through ordinary landlord/property interaction.
+
+Examples:
+
+- landlord is checking the unused floor
+- Jill asks to see it after customers have mentioned it
+- landlord mentions it is still vacant
+- ordinary building inspection / access reason
+
+Keep landlord mundane.
+
+No landlord storyline is required unless later play creates a reason.
+
+No villain.
+No rent dispute.
+No emotional speech.
+
+Jill goes upstairs and sees the space.
+
+IMPORTANT:
+
+This is NOT yet the big player-facing Second Floor reveal.
+
+It can be brief.
+
+The story fact should establish:
+
+Jill has been upstairs.
+
+She knows roughly what it is.
+
+The space is structurally usable.
+
+Then she goes back downstairs.
+
+No project.
+
+
+==================================================
+9. CRITICAL CONTINUITY RULE FOR THE CAT EVENT
+==================================================
+
+Do NOT write:
+
+Jill inspected upstairs several days ago,
+forgot to close the door,
+and only several days later noticed cats missing.
+
+That is not believable for people living / working with five indoor cats.
+
+Instead:
+
+Jill inspected upstairs several days earlier.
+
+The upstairs access was properly closed afterward.
+
+Then on THE DAY OF THE CAT EVENT,
+the door / latch becomes imperfectly closed again through a mundane reason.
+
+Possibilities depending on architecture:
+
+- Jill briefly accesses it again
+- landlord / maintenance access occurs
+- the latch is imperfect and does not fully catch
+- someone closes it but it does not fully latch
+
+The door appears closed enough that staff do not immediately notice.
+
+Later it opens slightly / remains just wide enough.
+
+柔柔 gets through.
+
+小齁 follows.
+
+They have been missing only for a believable short period:
+
+minutes to perhaps around an hour or two.
+
+NOT days.
+
+
+==================================================
+10. THE MISSING CAT EVENT
+==================================================
+
+This is a major authored beat.
+
+It happens near / after closing.
+
+The restaurant is winding down.
+
+Staff are cleaning / closing.
+
+Someone notices:
+
+「柔柔呢？」
+
+Jill:
+「剛剛不是還在？」
+
+Then:
+
+「小齁也不在。」
+
+At this point, everyone immediately takes it seriously.
+
+This is NOT a cute scavenger hunt.
+
+People who live with five indoor cats do not casually shrug when two cannot be found.
+
+The restaurant closing flow temporarily changes into a search.
+
+
+==================================================
+11. SEARCH BEHAVIOR
+==================================================
+
+Use ACTUAL character presence.
+
+Do not teleport every employee into the event.
+
+The employees who are actually working / present that evening participate.
+
+Search plausible indoor locations:
+
+- Main Hall
+- Side Hall
+- Lounge
+- kitchen-safe areas where appropriate
+- normal cat resting spots
+- furniture / corners
+- other established indoor cat locations
+
+Other cats may be accounted for naturally.
+
+For example:
+
+「包包在這。」
+
+「樾樾呢？」
+
+「這裡。」
+
+Do not force an explicit checklist of all five every time if it becomes clunky,
+but the scene should communicate that Jill / staff are genuinely accounting for the cats.
+
+
+==================================================
+12. WHY 柔柔 + 小齁
+==================================================
+
+Use 柔柔 and 小齁 specifically unless existing runtime presence makes this impossible.
+
+This pairing is intentional.
+
+Canonical personality / relationship:
+
+柔柔:
+- female
+- fluffy orange cat
+- natural airhead
+- innocent
+- affectionate
+- curious in her own uncomplicated way
+- especially not shy
+- close to 小齁
+
+小齁:
+- female
+- tabby + white
+- attached to Jill
+- gentle / stable
+- likes interacting with 柔柔
+- may actively seek 柔柔 out
+
+The likely logic is:
+
+柔柔 gets through / explores.
+
+小齁 follows or joins her.
+
+Do not make them perform human-like conspiracy.
+
+Do not write:
+「她們決定一起冒險。」
+
+They are cats.
+
+
+==================================================
+13. DISCOVERING THE DOOR
+==================================================
+
+During the search, someone notices the upstairs access.
+
+Example:
+
+員工：
+「這個怎麼開著？」
+
+Jill sees it.
+
+She remembers the recent upstairs access.
+
+Short reaction.
+
+No long explanation.
+
+They go upstairs immediately.
+
+
+==================================================
+14. FIRST REAL SECOND-FLOOR REVEAL
+==================================================
+
+THIS should be the meaningful player-facing reveal of the second floor.
+
+The player is not going upstairs because a UI says:
+
+NEW AREA AVAILABLE.
+
+The player is going upstairs because:
+
+WHERE ARE 柔柔 AND 小齁?
+
+Then the scene opens into the unused second floor.
+
+The floor should be:
+
+- empty
+- structurally sound
+- clearly unused
+- slightly dusty / quiet
+- believable as vacant commercial/building space
+- not destroyed
+- not a warehouse full of Jill’s Kitchen history
+- not already furnished as Staff Room
+- not already designed as Private Room
+
+Then:
+
+柔柔 and 小齁 are there.
+
+Safe.
+
+Exploring.
+
+Possible behavior:
+
+柔柔 has already settled somewhere absurdly comfortably.
+
+小齁 is nearby inspecting another corner.
+
+Or 柔柔 is looking out a safe closed window.
+
+小齁 notices Jill first.
+
+Jill:
+
+「妳們兩個。」
+
+That may be enough.
+
+No sentimental speech.
+
+
+==================================================
+15. STAFF ARE PART OF THIS REVEAL
+==================================================
+
+The staff present should react naturally.
+
+Not everyone needs a line.
+
+One person may be relieved.
+
+Another may notice the room.
+
+Example after cats are clearly safe:
+
+Nina:
+「……這裡滿大的欸。」
+
+Jill:
+「嗯。」
+
+or:
+
+Hugo:
+「比我想的大。」
+
+Jill:
+「先把貓帶下去。」
+
+Good.
+
+The priority remains the cats.
+
+Only AFTER they are found safe does anyone notice the spatial possibility.
+
+This is important.
+
+
+==================================================
+16. DO NOT UNLOCK THE SECOND FLOOR HERE
+==================================================
+
+After finding the cats:
+
+- bring / guide them downstairs
+- secure the door
+- finish closing
+- return to normal life
+
+NO expansion unlock.
+
+NO Journal entry saying:
+“Maybe we could use upstairs.”
+
+NO:
+SECOND FLOOR PROJECT AVAILABLE.
+
+The event's job is to give the player a real memory of the space.
+
+From now on:
+
+When someone later says “樓上,”
+
+the player knows exactly what they mean.
+
+
+==================================================
+17. AFTER THE CAT EVENT — CUSTOMER THREAD CONTINUES
+==================================================
+
+Later, customer-side events should continue pointing toward spatial growth.
+
+Not immediately.
+
+Give the cat event room to breathe.
+
+Possible examples:
+
+A regular sees a crowded night:
+
+「今天又滿了？」
+
+Jill:
+「嗯。」
+
+「樓上還空著？」
+
+Jill:
+「還在。」
+
+or:
+
+A family / familiar group needs a quieter place.
+
+Jill can only offer the best current alternative.
+
+They do not complain dramatically.
+
+They simply expose a limitation.
+
+or:
+
+A long-time regular notices the restaurant has added Lounge / other improvements:
+
+「妳這間越來越不像以前那麼小了。」
+
+Do not make this sentimental.
+
+Do not make everyone say “expand upstairs.”
+
+Different people should expose different needs.
+
+
+==================================================
+18. AFTER THE CAT EVENT — STAFF THREAD CONTINUES
+==================================================
+
+Existing Staff Lives / staff-space evidence should also continue.
+
+KEEP existing ideas such as:
+
+《箱子》
+Hugo sits on a box after rush.
+
+Jill:
+「你幹嘛坐那裡？」
+
+Hugo:
+「這裡可以坐。」
+
+Jill:
+「……那是箱子。」
+
+KEEP:
+
+《又在找位置》
+Staff meal / break:
+Nina:
+「我們是不是每次都在找地方坐？」
+
+Marco:
+「嗯。」
+
+KEEP:
+
+《東西放哪》
+bags / coats / bottles / chargers / personal belongings lack proper space.
+
+阿珠姐:
+「這裡早晚會找不到東西。」
+
+KEEP outside-person waiting situations:
+- 珊珊 waiting for Nina
+- 宇翔 waiting for Hugo
+- 老林 waiting for 阿德
+- 國雄 waiting for 秀琴
+
+These events should NOT unlock Staff Room yet.
+
+At this stage they become part of the larger truth:
+
+Jill’s Kitchen has outgrown the simplicity of its original floor.
+
+
+==================================================
+19. CROSS-PRESSURE IS WHAT MAKES SECOND FLOOR INEVITABLE
+==================================================
+
+The Second Floor project should not come from one category.
+
+Require a combination of observed categories.
+
+Conceptually:
+
+SECOND_FLOOR_EVIDENCE:
+
+A. BUILDING AWARENESS
+- customer has mentioned upstairs
+- Jill knows landlord still has it vacant
+
+B. PHYSICAL KNOWLEDGE
+- Jill has inspected upstairs
+- missing-cat event has occurred
+- player has actually seen upstairs
+
+C. STAFF PRESSURE
+- at least two different staff-space problem categories observed
+
+D. CUSTOMER PRESSURE
+- at least two different customer-space / restaurant-growth observations
+
+E. RESTAURANT MATURITY
+- sufficiently mature restaurant state
+- meaningful customer volume
+- meaningful staff presence / tenure
+
+F. ECONOMIC MATURITY
+- expansion is plausible for the player's restaurant
+
+Do not require every possible event.
+
+Use enough categories to create causal richness without making progression brittle.
+
+
+==================================================
+20. A LATER EMPLOYEE SHOULD BE THE ONE WHO FINALLY SAYS IT
+==================================================
+
+After enough evidence has accumulated, allow one employee to make the obvious connection.
+
+Not immediately after the cat event.
+
+For example after another cramped staff moment:
+
+Nina:
+「樓上不是還空著？」
+
+Jill:
+「那是房東的。」
+
+Nina:
+「我知道啊。」
+
+END.
+
+That is enough.
+
+Or a veteran might say:
+
+「妳不是看過樓上？」
+
+Jill:
+「看過。」
+
+「很小？」
+
+Jill:
+「……不小。」
+
+END.
+
+This is stronger than an employee proposing a Staff Room.
+
+They are only reminding Jill that the space exists.
+
+
+==================================================
+21. CUSTOMER + STAFF + CAT MEMORY CONVERGE
+==================================================
+
+The formal Restaurant Story beat should happen later, ideally at closing / quiet time.
+
+Jill has now experienced:
+
+- customers asking about upstairs
+- customers needing more / different kinds of space
+- staff lacking appropriate space
+- friends / relatives waiting awkwardly
+- the actual physical second floor
+- the night 柔柔 and 小齁 were found upstairs
+
+Do not replay these as flashbacks.
+
+Do not summarize them in exposition.
+
+A small visual cue is enough.
+
+Jill looks toward the upstairs access.
+
+Then:
+
+Jill:
+「……樓上現在還空著嗎？」
+
+This can be directed to landlord later / via appropriate contact.
+
+This is the moment the idea becomes action.
+
+
+==================================================
+22. LANDLORD CONVERSATION
+==================================================
+
+Keep it ordinary.
+
+Example:
+
+房東:
+「妳真的要租樓上？」
+
+Jill:
+「嗯。」
+
+「下面不夠用了？」
+
+Jill looks back toward restaurant.
+
+「開始有一點。」
+
+or:
+
+房東:
+「整層？」
+
+Jill:
+「整層。」
+
+This line is useful.
+
+Because:
+
+YES.
+
+THE WHOLE FLOOR.
+
+
+==================================================
+23. WHOLE SECOND FLOOR EXPANSION
+==================================================
+
+When the player accepts the project:
+
+Jill’s Kitchen takes over the WHOLE usable second floor.
+
+Do NOT use the old concept:
+
+half floor
+→ one light
+→ second half
+→ second light
+
+DELETE that architecture.
+
+Do NOT split the floor into artificial unlock chunks.
+
+This should feel like a major mature-game capital investment.
+
+Audit current mature-save economy.
+
+Set a meaningful price.
+
+The player should think:
+
+「幹，這次真的擴店了。」
+
+But avoid unreasonable grinding.
+
+
+==================================================
+24. WHOLE FLOOR ≠ ALL ROOMS FINISHED
+==================================================
+
+After expansion:
+
+The whole second floor is now Jill’s Kitchen space.
+
+It is physically accessible.
+
+It is cleaned / made safe / lit / connected to restaurant circulation.
+
+But not every area has a purpose yet.
+
+This is GOOD.
+
+There can be:
+
+- open usable area
+- temporarily empty area
+- simple temporary furniture
+- boxes from setup
+- circulation
+- windows
+- architectural divisions that can later become rooms
+
+Do not immediately install:
+
+Staff Room
+Private Room
+five other features
+
+Let the player experience:
+
+「我們真的多了一層樓。」
+
+before:
+
+「這一格是員工休息室。」
+「這一格是包廂。」
+
+
+==================================================
+25. CATS AFTER SECOND FLOOR ACQUISITION
+==================================================
+
+Once the second floor is legitimately part of Jill’s Kitchen:
+
+cats may safely and autonomously use appropriate indoor areas.
+
+This is different from the earlier accidental escape/search event.
+
+The irony is:
+
+柔柔 and 小齁 technically saw it first.
+
+Do NOT have characters repeatedly explain this joke.
+
+Maybe one low-frequency callback much later:
+
+Nina:
+「妳們兩個比我們早用。」
+
+Jill:
+「不要提醒我。」
+
+Only if it feels natural.
+
+No repeated gag.
+
+
+==================================================
+26. STAFF ROOM COMES AFTER SECOND FLOOR
+==================================================
+
+The existing Staff Room story remains valuable.
+
+But spatially:
+
+SECOND FLOOR FIRST.
+
+Then, after the new floor has existed for a while and staff-space problems remain visible:
+
+《大家待的地方》
+
+The realization becomes:
+
+Jill now has space upstairs,
+but has not yet decided what all of it should become.
+
+She sees again that employees still lack a place.
+
+Journal direction:
+
+「店裡有客人的位置。
+有貓的位置。
+有吃完飯還不想走的人待的位置。
+
+好像一直沒有一個地方，
+是給每天在這裡工作的人待的。」
+
+Then:
+
+STAFF ROOM PROJECT becomes available within Second Floor.
+
+Paid project.
+
+Not free.
+
+
+==================================================
+27. PRIVATE DINING ROOM COMES EVEN LATER
+==================================================
+
+Private Dining Room also belongs upstairs.
+
+But it has its OWN evidence chain.
+
+Do not make:
+
+Staff Room Lv2 → Private Room
+
+Instead:
+
+Second Floor exists.
+
+Then customer-side private dining evidence develops.
+
+Examples:
+
+怡君 later comes with family / friends:
+
+Jill:
+「要坐裡面一點嗎？」
+
+怡君:
+「有比較安靜的嗎？」
+
+Jill looks around.
+
+「……沒有。」
+
+Another NON-staff-family group later exposes a similar but distinct need.
+
+Only after multiple real observed situations:
+
+《關上門以後》
+
+→ Private Dining Room project.
+
+So:
+
+Second Floor is the physical expansion.
+
+Staff Room and Private Dining Room are later answers to different lived needs.
+
+
+==================================================
+28. IMPORTANT NEW DIRECTION: OUTSIDE CHARACTERS NEED REAL STORY ARCS
+==================================================
+
+Separate but related correction:
+
+The newly introduced Staff Lives people cannot remain functional NPCs whose entire purpose is:
+
+“show that employee X has a life outside work.”
+
+They need actual multi-stage stories.
+
+A character having:
+
+- a name
+- a portrait
+- a relationship
+- three visits
+
+is NOT automatically a story.
+
+For each important recurring outside character, build:
+
+1. INTRODUCTION
+2. OWN LIFE SITUATION / WANT
+3. DEVELOPMENT ACROSS MANY DAYS
+4. JILL’S KITCHEN INVOLVEMENT
+5. PAYOFF
+6. AFTERLIFE AFTER THE ARC
+
+The player should sometimes think:
+
+「欸，那件事後來怎樣了？」
+
+That is the target.
+
+
+==================================================
+29. 怡君 — LONG ARC
+==================================================
+
+怡君 is not merely:
+
+阿珠姐’s daughter.
+
+She is 27 and has her own adult life.
+
+Build a multi-stage arc around her deciding / establishing her next independent living stage.
+
+Working title:
+
+《三個選項》
+
+Exact details can adapt to existing canon.
+
+Possible progression:
+
+A. Introduction:
+《吃飯啊》
+
+阿珠姐:
+「妳怎麼來了？」
+
+怡君:
+「吃飯啊。」
+
+「附近那麼多間。」
+
+「不能吃妳工作的喔？」
+
+B. Later:
+阿珠姐 casually mentions 怡君 has been looking at places / making a practical life decision.
+
+C. 怡君 later appears alone looking at options on her phone.
+
+Jill:
+「找到了？」
+
+怡君:
+「三個。」
+
+No advice minigame.
+
+D. Different later visits reveal she is actually deciding.
+
+She may come with a friend / partner / family depending on canon.
+
+E. Eventually:
+
+阿珠姐:
+「她決定了。」
+
+Nina:
+「哪個？」
+
+阿珠姐:
+「最小那個。」
+
+「為什麼？」
+
+「離公司近。」
+
+F. Payoff:
+怡君 later gives 阿珠姐 a spare key / practical sign that the move or new living stage actually happened.
+
+No sentimental mother-daughter speech.
+
+Afterward:
+
+怡君 continues to visit occasionally.
+
+Her life does not stop because her arc completed.
+
+
+==================================================
+30. KEVIN — LONG ARC
+==================================================
+
+Kevin is not merely Marco’s old colleague.
+
+Working title:
+
+《那間店》
+
+Marco and Kevin used to work together at another restaurant.
+
+Kevin still works in the restaurant world.
+
+Early:
+
+Kevin visits and annoys Marco by ordering a troublesome dish.
+
+Marco:
+「你怎麼來了。」
+
+Kevin:
+「吃飯。」
+
+Later Kevin is quieter.
+
+Marco:
+「怎樣？」
+
+Kevin:
+「店要收了。」
+
+Marco:
+「什麼時候？」
+
+Kevin:
+「月底。」
+
+The old restaurant is closing because the owner is ending / changing the business.
+
+No bankruptcy melodrama.
+No villain.
+No tragedy.
+
+Kevin now has to decide what he does next.
+
+He is NOT automatically asking Jill for a job.
+
+Do not turn Jill’s Kitchen into a rescue center for every character.
+
+Across later days:
+
+- Kevin considers other restaurant jobs / paths
+- Marco knows more than he says
+- Jill may ask once
+- Kevin continues visiting
+
+Possible Staff Room later:
+
+Jill:
+「Kevin最近還有來？」
+
+Marco:
+「有。」
+
+「找到工作了？」
+
+「他說有兩間。」
+
+「你沒問？」
+
+「他會講。」
+
+Payoff much later:
+
+Kevin returns.
+
+Marco:
+「決定了？」
+
+Kevin:
+「嗯。」
+
+「哪間？」
+
+He tells him.
+
+Then still orders the annoying dish.
+
+Marco:
+「……你換工作跟這道菜有什麼關係？」
+
+Kevin:
+「沒有。」
+
+Afterlife:
+
+Kevin remains a recurring person in Jill’s Kitchen world.
+
+
+==================================================
+31. 珊珊 — LONG ARC
+==================================================
+
+珊珊 is not merely “Nina’s friend who waits for her.”
+
+Working title:
+
+《星期四》
+
+She has a stable outside routine.
+
+Preferred current idea:
+
+she takes a weekly pottery class.
+
+Do not make this a career dream.
+
+It is simply something she does.
+
+Early:
+
+She often appears around the same weekday / time.
+
+One week:
+
+Nina:
+「今天不是星期四？」
+
+珊珊:
+「停課。」
+
+This is the first clue.
+
+Later player learns she does pottery.
+
+Nina:
+「妳那個杯子可以裝水嗎？」
+
+珊珊:
+「可以。」
+
+「確定？」
+
+「老師說可以。」
+
+Later still:
+
+she improves.
+
+No skill meter.
+
+No pottery minigame.
+
+After Staff Room exists, eventual payoff:
+
+珊珊 brings a slightly imperfect handmade cup / object.
+
+Nina:
+「這什麼？」
+
+珊珊:
+「放你們休息室。」
+
+「為什麼？」
+
+「家裡放不下。」
+
+Clearly a gift without saying “I made this for you.”
+
+The object becomes a permanent Staff Room prop.
+
+Afterlife:
+
+珊珊 continues Thursday life.
+
+The cup remains.
+
+This is how a 20-day story becomes architecture.
+
+
+==================================================
+32. 宇翔 — LONG ARC
+==================================================
+
+宇翔 is not merely Hugo’s younger brother.
+
+He is 22.
+
+Working title:
+
+《畢業以前》
+
+His life stage:
+
+university graduation → internship/job search → first job.
+
+Keep it ordinary.
+
+No existential breakdown.
+
+No inspirational career speech.
+
+Early introduction remains:
+
+宇翔:
+「哥。」
+
+Hugo:
+「你怎麼來了？」
+
+「拿東西給你。」
+
+Later, once Staff Room exists:
+
+宇翔 waits for Hugo while working on résumé / applications.
+
+小彤:
+「你要找工作喔？」
+
+宇翔:
+「嗯。」
+
+「什麼？」
+
+「不知道。」
+
+Hugo later knows interview logistics:
+
+「面試幾點？」
+
+「兩點。」
+
+「幾點出門？」
+
+「十二點。」
+
+「十一點半。」
+
+「太早了吧。」
+
+「十二點。」
+
+One interview may fail.
+
+Hugo:
+「怎樣？」
+
+宇翔:
+「沒有。」
+
+Hugo:
+「喔。」
+
+No speech.
+
+He gives / pushes him something to eat.
+
+Much later:
+
+宇翔 enters.
+
+「哥。」
+
+Hugo:
+「嗯？」
+
+「有了。」
+
+Hugo:
+「哪間？」
+
+The player understands what “有了” means because they saw the whole arc.
+
+Afterlife:
+
+his clothing / visit timing / routine can subtly change once he starts working.
+
+Do not remove him from the game after payoff.
+
+
+==================================================
+33. 小彤 + PARENTS — LONG ARC
+==================================================
+
+小彤’s parents are supporting cast.
+
+Do NOT create separate giant arcs for both parents.
+
+The main story belongs to 小彤.
+
+Working title:
+
+《下面第二格》
+
+This should connect existing architecture:
+
+NEW EMPLOYEE
+→ FIRST STABLE WORK
+→ PARENTS VISIT
+→ FIRST PERSONAL PURCHASE FROM STABLE PAY
+→ STAFF ROOM HABIT
+→ SHE BECOMES THE PERSON WHO KNOWS THINGS
+→ NEW EMPLOYEE ASKS HER
+→ 「下面第二格。」
+
+Early:
+she asks where things are.
+
+Parents visit:
+
+小彤:
+「你們怎麼來了！」
+
+Dad:
+「吃飯啊。」
+
+Later she buys a good pair of headphones / ordinary personal object she had wanted for months.
+
+Nina:
+「新的？」
+
+小彤:
+「嗯。」
+
+「買很久了？」
+
+「昨天。」
+
+「我是說想多久。」
+
+「……半年。」
+
+After Staff Room:
+
+initially she is unsure whether she can sit.
+
+Jill:
+「坐啊。」
+
+小彤:
+「喔，好。」
+
+Over time she develops a regular place / cup.
+
+Very late:
+
+a new employee asks where supplies are.
+
+小彤:
+「下面第二格。」
+
+This intentionally echoes existing veteran story architecture.
+
+Do not explain the parallel.
+
+The player should notice.
+
+
+==================================================
+34. 老林 — LONG ARC
+==================================================
+
+老林 is not merely 阿德’s fishing friend.
+
+Working title:
+
+《星期天沒有魚》
+
+阿德 and 老林 have gone fishing together for many years.
+
+At some point, 阿德 stops going for several weeks.
+
+No fight.
+
+No friendship breakup.
+
+He is simply tired and wants his Sundays differently now.
+
+老林 initially asks:
+
+「你們阿德最近很忙？」
+
+Jill:
+「還好啊。」
+
+Later:
+
+老林:
+「他以前五點就到了。」
+
+阿德:
+「以前是以前。」
+
+老林 still goes fishing.
+
+Sometimes brings something back.
+
+阿德:
+「不要再拿來。」
+
+But still handles / cooks / stores it appropriately.
+
+Eventually:
+
+老林 is leaving.
+
+阿德:
+「幾點？」
+
+老林:
+「五點。」
+
+「太早。」
+
+「那你不要來。」
+
+阿德:
+「五點半。」
+
+END.
+
+No reconciliation speech.
+
+They were never broken.
+
+The story is about a long friendship adjusting to time.
+
+Afterlife:
+
+老林 remains an independent Jill’s Kitchen regular.
+
+He may sometimes visit even when 阿德 is not working.
+
+
+==================================================
+35. 國雄 — LONG ARC
+==================================================
+
+國雄 is not merely 秀琴’s husband who picks her up.
+
+Working title:
+
+《今天不回去吃》
+
+Possible canon:
+
+國雄 has recently retired / semi-retired.
+
+秀琴 still enjoys working.
+
+Do not make this marital conflict.
+
+Do not make him controlling.
+
+Early:
+
+he often comes to pick her up.
+
+秀琴:
+「你怎麼這麼早。」
+
+國雄:
+「順路。」
+
+Later Jill learns he has recently retired.
+
+秀琴:
+「他很閒。」
+
+Over time:
+
+he has to find his own daily rhythm.
+
+He stops appearing every single time.
+
+He begins doing things with his own friends / routines.
+
+One day:
+
+秀琴:
+「他今天不來。」
+
+Jill:
+「去哪？」
+
+「不知道，說跟朋友出去。」
+
+Later payoff:
+
+國雄 comes alone to eat.
+
+秀琴:
+「你不是跟朋友出去？」
+
+國雄:
+「回來了。」
+
+「那你來幹嘛？」
+
+「吃飯。」
+
+「家裡不能吃？」
+
+「今天不想煮。」
+
+This old cute exchange now becomes payoff to a longer story.
+
+Afterlife:
+
+國雄 has his own recurring relationship with Jill’s Kitchen,
+not merely “the man waiting for 秀琴.”
+
+
+==================================================
+36. THESE CHARACTER ARCS DO NOT ALL START AT ONCE
+==================================================
+
+Critical pacing rule.
+
+Do NOT introduce:
+
+怡君
+Kevin
+珊珊
+宇翔
+小彤 parents
+老林
+國雄
+
+and immediately begin all long arcs simultaneously.
+
+Stagger them.
+
+Some should be dormant for many days after introduction.
+
+A character can exist for a while before their larger story begins.
+
+The player should experience:
+
+「喔，原來這個人後來還有故事。」
+
+Not:
+
+“Seven NPC questlines unlocked.”
+
+
+==================================================
+37. CHARACTER ARCS MAY INTERSECT MAIN RESTAURANT STORY
+==================================================
+
+These arcs can sometimes contribute to the Second Floor / Staff Room / Private Room progression.
+
+But they must not exist ONLY to serve the main story.
+
+Examples:
+
+宇翔 waiting for Hugo
+→ contributes staff-space evidence
+→ later his own job-search arc continues.
+
+珊珊 waiting for Nina
+→ contributes staff-space evidence
+→ later her pottery story continues.
+
+國雄 waiting for 秀琴
+→ contributes staff-space evidence
+→ later retirement-rhythm arc continues.
+
+怡君 family meal
+→ later contributes Private Dining evidence
+→ but her own adult-life arc exists independently.
+
+This is the desired structure:
+
+CHARACTER STORY
+intersects
+RESTAURANT STORY
+
+Neither exists merely as a trigger for the other.
+
+
+==================================================
+38. STORY DEPTH RULE
+==================================================
+
+From now on, distinguish:
+
+BACKGROUND
+= who someone is.
+
+EVENT
+= something happened once.
+
+ARC
+= something changes over time.
+
+A portrait + biography + three visits is NOT an arc.
+
+An arc needs:
+
+setup
+→ uncertainty / ongoing situation
+→ development
+→ time
+→ payoff
+→ changed normal life afterward.
+
+We need fewer disposable vignettes and more things the player can wonder about across multiple days.
+
+
+==================================================
+39. JOURNAL RULES
+==================================================
+
+Do NOT create:
+
+Staff Stories 3/42
+NPC Quests
+Relationship Quests
+Second Floor Quest 4/8
+
+Use existing Journal architecture.
+
+Major Restaurant Story beats:
+→ 餐廳故事
+
+Meaningful character arc beats:
+→ 人物／關係支線
+
+Ambient steps:
+→ no Journal update.
+
+Not every stage belongs in Journal.
+
+Example:
+
+宇翔 submitting a résumé:
+ambient.
+
+宇翔 first failed interview:
+possibly authored but not necessarily Journal.
+
+宇翔:
+「有了。」
+→ meaningful payoff, potentially Journal-worthy.
+
+Keep denominator meaningful.
+
+
+==================================================
+40. LIFE ALBUM RULES
+==================================================
+
+Do not automatically turn each arc payoff into Story Photo.
+
+Ordinary actual moments can become normal Life Album captures if the characters are physically present.
+
+Only create authored Story Photos for truly major moments that deserve permanent canonical preservation.
+
+No fake staged photos.
+
+No teleporting people into photographs.
+
+
+==================================================
+41. WRITING RULE
+==================================================
+
+Avoid AI emotional explanation.
+
+Do NOT write:
+
+「看著弟弟成長，Hugo感到欣慰。」
+「這間餐廳見證了大家的人生。」
+「時間讓友情有了新的模樣。」
+「Jill突然明白，這裡已經不只是一間餐廳。」
+「每個人都在這裡找到了屬於自己的地方。」
+「樓上將承載新的回憶。」
+
+Never explain what the scene means.
+
+Use mundane dialogue and persistent consequences.
+
+GOOD:
+
+「有了。」
+「哪間？」
+
+GOOD:
+
+「五點。」
+「太早。」
+「那你不要來。」
+「五點半。」
+
+GOOD:
+
+「這個怎麼開著？」
+「……柔柔？」
+
+GOOD:
+
+「整層？」
+「整層。」
+
+
+==================================================
+42. IMPLEMENTATION ARCHITECTURE
+==================================================
+
+Reuse the existing Story Facts / event arbiter / relationship facts / character presence architecture.
+
+Do NOT create a second giant quest engine.
+
+Need conceptually:
+
+- observed facts
+- authored event prerequisites
+- cooldown / spacing
+- presence requirements
+- persistent arc state
+- post-arc ambient state
+- room availability
+- second-floor state
+- landlord / inspection state
+- cat-search event state
+
+Possible conceptual Second Floor state:
+
+unknown_to_player
+mentioned
+jill_inspected
+cats_found_upstairs
+pressure_accumulating
+jill_considering
+project_available
+under_construction
+active
+
+Use existing project conventions where possible.
+
+Do not implement these exact enum names if architecture has a better equivalent.
+
+
+==================================================
+43. CAT EVENT SAFETY / CONTINUITY
+==================================================
+
+Because all five cats are indoor cats:
+
+Never imply they escaped the building.
+
+The upstairs search is still INSIDE Jill’s Kitchen’s building.
+
+The emotional tension is:
+
+“Where inside the building did they go?”
+
+not:
+
+“the cats may be lost outside.”
+
+Once found, the event resolves safely.
+
+Do not make this frightening or traumatic.
+
+It should have short genuine concern followed by relief and a funny reveal.
+
+
+==================================================
+44. SECOND FLOOR VISUAL REQUIREMENT
+==================================================
+
+IMPORTANT:
+
+Second Floor now needs its own visual reference.
+
+Do NOT improvise final Second Floor architecture solely from Staff Room and Private Room references.
+
+If a Second Floor Master Reference has not yet been provided, prepare implementation so that visual/layout work can consume one cleanly.
+
+The Second Floor Master Reference should eventually define:
+
+- vacant landlord-owned state
+- first reveal / cat-search state
+- acquired Jill’s Kitchen state
+- overall floor circulation
+- stair access
+- windows
+- future room-compatible zones
+- relationship to existing restaurant style
+
+Do not lock arbitrary architecture that would make later visual reference impossible to integrate.
+
+Logic/story infrastructure can proceed while keeping layout data-driven if needed.
+
+
+==================================================
+45. MIGRATION
+==================================================
+
+Mature saves are especially important.
+
+A Day 50+ save may already have:
+
+- large cash reserve
+- many staff
+- high tenure
+- Lounge
+- many regulars
+- mature customer volume
+
+Do NOT infer:
+
+“therefore the player already saw the upstairs cat event.”
+
+Observed authored story ≠ historical eligibility.
+
+For migrated mature saves:
+
+- preserve current world facts
+- conservatively initialize new story state
+- allow Second Floor foreshadowing to occur naturally
+- space events across subsequent days
+- do not dump seven character arcs at once
+- do not immediately unlock Second Floor because money is available
+
+The mature player should still get to EXPERIENCE the new story.
+
+
+==================================================
+46. TESTING
+==================================================
+
+Please test:
+
+SECOND FLOOR:
+- first customer mention
+- repeated mentions do not spam
+- Jill inspection
+- cat-event door continuity
+- 柔柔 / 小齁 presence
+- no multi-day missing-cat implication
+- actual staff presence during search
+- other cat accounting behavior
+- second-floor reveal
+- no immediate unlock
+- later staff pressure
+- later customer pressure
+- formal project eligibility
+- landlord interaction
+- whole-floor acquisition
+- save/reload before project
+- save/reload during construction
+- save/reload after activation
+- mature-save pacing
+
+STAFF LIVES:
+- each recurring outside character persists
+- long arcs do not all begin together
+- prerequisites respect introduction
+- no character knows facts before introduction
+- employee firing / absence does not deadlock unrelated systems
+- relative/friend does not appear nonsensically when anchor employee is gone unless independent relationship has already been established
+- payoff changes later ambient behavior
+- permanent Staff Room props persist when applicable
+
+ROOM PROGRESSION:
+- Staff Room impossible before Second Floor
+- Staff Room evidence can accumulate before Second Floor
+- Staff Room project becomes eligible later
+- Private Dining Room remains separate
+- no accidental tech-tree dependency
+- no duplicate room state
+- no second simulation
+
+PACING:
+Run multi-day mature-save simulations.
+
+Check that the experience is NOT:
+
+Day 53 upstairs mentioned
+Day 54 cats
+Day 55 second floor
+Day 56 Staff Room
+Day 57 seven NPC stories
+
+That would fail.
+
+We need breathing room.
+
+
+==================================================
+47. IMPLEMENTATION PRIORITY
+==================================================
+
+Please first audit what is currently already implemented.
+
+Then:
+
+1. preserve reusable Staff Lives work
+2. correct Second Floor → Staff Room dependency
+3. implement / scaffold the long Second Floor arc
+4. implement the missing-cat authored beat with correct continuity
+5. establish customer + staff evidence contribution
+6. implement whole-floor project architecture
+7. integrate Staff Room as later upstairs project
+8. deepen recurring outside characters into multi-stage arcs
+9. stagger those arcs
+10. preserve Private Dining Room as later future development
+11. test mature-save migration and pacing
+
+If visual assets are needed before final Second Floor layout can be locked:
+DO NOT invent final art.
+
+Implement data / story / state architecture safely,
+clearly report the visual dependency,
+and continue everything that does not require that art.
+
+
+==================================================
+48. COMPLETION REPORT
+==================================================
+
+At completion, report:
+
+A. CURRENT STATE
+- what already existed before this update
+- what was preserved
+- what was changed
+
+B. SECOND FLOOR ARC
+- exact event sequence
+- customer beats
+- staff beats
+- Jill / landlord beats
+- cat-search event
+- formal project eligibility
+- pacing rules
+
+C. CAT EVENT
+- why door access is believable
+- maximum implied missing time
+- who participates
+- how actual presence is enforced
+- how 柔柔 / 小齁 are handled
+
+D. SECOND FLOOR SPACE
+- whole-floor architecture
+- unfinished-space representation
+- visual-reference dependency
+- navigation
+
+E. STAFF ROOM
+- revised prerequisite
+- preserved evidence
+- project timing
+
+F. CHARACTER ARCS
+For each:
+- 怡君
+- Kevin
+- 珊珊
+- 宇翔
+- 小彤
+- 老林
+- 國雄
+
+report:
+- introduction
+- long arc
+- payoff
+- post-arc ambient life
+- Restaurant Story intersections
+
+G. MIGRATION
+- mature-save behavior
+- anti-event-dump safeguards
+
+H. QA
+- tests
+- multi-day simulations
+- screenshots if visual work exists
+- regression status
+- save compatibility
+
+I. DEFERRED
+Clearly separate:
+IMPLEMENTED
+SCAFFOLDED
+DEFERRED
+
+Do not claim simulated/tested behavior was observed in normal play.
+
+Use the existing I / T / O distinction honestly.
+
+
+==================================================
+49. FINAL PRODUCT TARGET
+==================================================
+
+The goal is NOT:
+
+“Jill’s Kitchen now has more NPC events.”
+
+The goal is:
+
+The player remembers unfinished things.
+
+They wonder:
+
+「怡君最後選哪個？」
+「Kevin的店不是要收了嗎？」
+「宇翔面試後來怎樣？」
+「老林跟阿德這星期還有去釣魚嗎？」
+「珊珊星期四到底都去哪？」
+「樓上不是還空著嗎？」
+
+Then, many days later, the game answers.
+
+Meanwhile the restaurant itself also has an unfinished question:
+
+「樓上一直空著，Jill到底會不會用？」
+
+Customers notice it.
+Staff notice it.
+Jill has seen it.
+柔柔和小齁甚至先偷偷進去過。
+
+But Jill does not expand because a progression threshold tells her to.
+
+She expands when the life already happening inside Jill’s Kitchen has finally become too large and too varied for the original restaurant space.
+
+That is the story.

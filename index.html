@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Jill's Kitchen 2.3</title>
+<meta name="theme-color" content="#1E2B2F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Jill's Kitchen">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+  <header id="hud">
+    <div class="h-day"><small>DAY</small><b id="hDay">1</b></div>
+    <div class="h-clock" id="hClock">17:00</div>
+    <div class="h-stat"><svg viewBox="0 0 24 24"><path fill="#F4C44E" d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17l-5.9 3.3 1.3-6.5L2.5 9.3l6.6-.8z"/></svg><b id="hRate">3.0</b></div>
+    <div class="h-stat h-money"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5" fill="#E6C27A"/><circle cx="12" cy="12" r="7" fill="none" stroke="#8E6422" stroke-width="1.3"/><path d="M12 7v10M14.6 9.2c-.6-.9-1.6-1.3-2.6-1.3-1.5 0-2.6.8-2.6 1.9 0 2.7 5.5 1.3 5.5 4.2 0 1.2-1.2 2-2.8 2-1.2 0-2.3-.5-2.9-1.4" fill="none" stroke="#6B4712" stroke-width="1.5" stroke-linecap="round"/></svg><b id="hMoney">$0</b></div>
+    <button class="icon-btn" id="hPause" aria-label="暫停"><svg viewBox="0 0 16 16"><rect x="3.5" y="3" width="3" height="10" rx="1" fill="#F7EDDC"/><rect x="9.5" y="3" width="3" height="10" rx="1" fill="#F7EDDC"/></svg></button>
+  </header>
+  <div id="sceneWrap">
+    <canvas id="scene"></canvas>
+    <div id="tickets"></div>
+    <div id="lightbox" class="lb" hidden></div>
+    <button id="tkMore" class="tk-nav" hidden aria-label="更多訂單">›</button><button id="tkBack" class="tk-nav back" hidden aria-label="回到前面的訂單">‹</button>
+    <div id="roomTabs" hidden></div>
+    <button class="chip" id="taskChip" hidden><span>今日任務</span><span class="dots" id="taskDots"></span></button>
+    <div id="taskPanel" hidden></div>
+    <button class="chip left" id="stockChip" hidden aria-label="庫存"><span>庫存</span><span class="n" id="stockN"></span></button>
+    <button class="chip left two" id="logChip" hidden aria-label="今天大家說了什麼"><span>💬</span><span class="n" id="logN">0</span></button>
+    <div id="stockPanel" class="lpanel" hidden></div>
+    <div id="logPanel" class="lpanel" hidden></div>
+    <div id="combo" hidden></div>
+    <div id="fire" hidden>JILL'S ON FIRE<div class="fb"><i id="fireBar"></i></div></div>
+    <div id="banner"></div>
+    <div id="coach" hidden></div>
+    <div id="regcard" hidden></div>
+    <div id="toasts"></div>
+    <button id="storyNote" hidden aria-label="故事更新"></button>
+    <div id="dlg" hidden><div class="dlg-hold" hidden></div><div class="dlg-illus" hidden><img alt=""><span class="dlg-illus-tbd">插圖待補</span><b class="dlg-illus-t"></b></div><div class="dlg-p left"><img alt=""></div><div class="dlg-p right"><img alt=""></div><div class="dlg-box"><b class="dlg-name"></b><p class="dlg-text"></p><small class="dlg-next">點一下繼續 ›</small></div></div>
+    <div id="plines"></div>
+    <button id="closePill" class="pill" hidden>結束今天・看結算 ›</button>
+    <button id="peekPill" class="pill" hidden>回到選單 ›</button>
+    <div id="trayWrap" hidden><canvas id="tray"></canvas></div>
+  </div>
+  <div id="screen" hidden></div>
+</div>
+<script src="js/portraits.js"></script>
+<script src="js/story_art.js"></script>
+<script src="js/game.js"></script>
+<script>
+/* installable app: the service worker only registers when the game is served over http(s) as files (not the single file / artifact) */
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!navigator.webdriver&&!document.querySelector('script[data-single]')){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})})}
+</script>
+</body>
+</html>

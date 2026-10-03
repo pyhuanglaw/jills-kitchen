@@ -1,0 +1,686 @@
+Jill’s Kitchen v2.3 — Normal-Play QA + Story Visibility + Late-Game Depth Pass
+
+Use the current v2.3 RC1 as the baseline.
+
+This is a focused follow-up based on real iPhone normal play around Day 48.
+
+IMPORTANT:
+- Do NOT rewrite the game.
+- Do NOT replace the existing v2.3 Story Facts / Relationship Facts / Story Event Arbiter architecture.
+- Do NOT create a second narrative simulation.
+- Preserve mature saves and all existing history.
+- Preserve the single-file playable Artifact output.
+- This pass should make existing systems more visible, usable, spatially rich, and rewarding in normal play.
+- Fix real observed UX/gameplay issues before adding unnecessary infrastructure.
+- Do not spend excessive time on pixel-perfect automated screenshot tooling. Real mobile playability matters more.
+
+==================================================
+A. CORE PRODUCT OBSERVATION
+==================================================
+
+v2.3 has substantially more story and simulation underneath, but normal play still hides too much of it.
+
+The player should be able to KNOW:
+
+“This character story is progressing.”
+
+without being told:
+
+“Perform action X twice to unlock event Y.”
+
+New design principle:
+
+SHOW HOW FAR THE STORY HAS GONE.
+DO NOT SHOW HOW TO FORCE THE NEXT BEAT.
+
+The player may miss a live presentation during a busy service.
+The player must NOT permanently miss the story because of that.
+
+“You may miss the performance, but you must not miss the story.”
+
+==================================================
+B. STORY MAP / STORY PROGRESS
+==================================================
+
+Add a clearly visible “故事” section to the Restaurant Journal.
+
+This is NOT a quest checklist and NOT an RPG mission system.
+
+No:
+- “Talk to Mia 2/3 times”
+- “Seat Sophie beside Mia”
+- claim-reward buttons
+- XP rewards
+- affection meters
+- exclamation marks over characters
+- visible trigger conditions
+- hidden-system terminology such as madeSpace / choseNear
+- fake progress generated from pre-v2.3 history
+
+Instead, show authored STORY LINES and their discovered beats.
+
+Two categories:
+
+1. 餐廳故事 / Restaurant Story
+2. 人物故事 / Character Stories
+
+--------------------------------------------------
+B1. Character Story presentation
+--------------------------------------------------
+
+Example:
+
+Sophie & Mia
+「慢慢變得不一樣」
+
+●━━●━━●━━○━━○━━○━━○━━○
+
+3 / 8 個故事片段
+
+DAY XX
+「開始記得彼此」
+
+DAY XX
+「今天坐得近了一點」
+
+DAY XX
+「留了一個位置」
+
+Next:
+？？？
+
+「她們的故事還在繼續。」
+
+The player should clearly know:
+- this is a real continuing story line;
+- it has progressed;
+- more remains.
+
+But the player should NOT know the mechanical requirements for the next beat.
+
+Use existing real Story Facts/events as the source of truth.
+Do not invent completed beats.
+
+Important:
+The progress count should correspond to meaningful authored story milestones, NOT every ambient callback.
+
+Ambient/repeat dialogue should not inflate story progress.
+
+--------------------------------------------------
+B2. Dylan
+--------------------------------------------------
+
+Before the reveal, the line may appear as something like:
+
+Jill & Dylan
+「那位常來的客人」
+
+The player should see that something is developing, without being told the truth.
+
+Possible discovered-beat language should reflect only what the player has actually observed:
+- 又來了
+- Jill 記得他的習慣
+- 五隻貓好像很熟悉他
+etc.
+
+When the existing husband reveal genuinely occurs, update the story title/presentation.
+
+After reveal:
+
+Jill & Dylan
+「結婚十一年，還在追」
+
+CRITICAL:
+The reveal is NOT “story complete”.
+
+Dylan’s story continues after the reveal:
+Valentine’s Day, waiting after closing, regular-life callbacks, shared restaurant history, etc.
+
+Being revealed as Jill’s husband must not make Dylan less romantic.
+
+--------------------------------------------------
+B3. Ken × Monsieur 杜
+--------------------------------------------------
+
+Make the nature of this line clear:
+
+Ken & Monsieur 杜
+「總是談不攏的兩個人」
+友情故事
+
+Show meaningful discovered milestones.
+
+Never imply romance.
+Do not use generic intimacy = romance logic.
+
+Their required friendship Story Photo can appear as one of the meaningful milestones when genuinely unlocked.
+
+--------------------------------------------------
+B4. Other lines
+--------------------------------------------------
+
+Use the existing authored v2.3 arcs where appropriate:
+- 晴 × 阿拓
+- Sophie × 寶寶
+- 王先生 × 王太太
+- Jill × Dylan
+- Ken × Monsieur 杜
+- Sophie × Mia
+- other genuinely authored persistent arcs already in the game
+
+Do not manufacture story lines merely to fill the page.
+
+Some undiscovered lines may appear as silhouettes / “？？？” if useful, so the player understands that more stories exist.
+
+But avoid excessive spoilers.
+
+==================================================
+C. RESTAURANT MAIN STORY / PROGRESSION
+==================================================
+
+Create a visible Restaurant Story progression.
+
+This is the story of Jill’s Kitchen itself.
+
+It should make the player feel:
+“The restaurant still has somewhere to go.”
+
+It can visually resemble chapters / a progression path, but must be driven by actual restaurant history and existing unlock logic.
+
+Example conceptual structure — adapt to actual game state rather than blindly hardcoding this exact wording:
+
+Chapter 1
+小小的餐廳
+✓ opening / early growth / first expansion
+
+↓
+
+Chapter 2
+店開始有自己的樣子
+✓ staff / Side Hall / signature development / etc.
+
+↓
+
+Chapter 3
+晚餐之後
+●━━●━━●━━○━━○
+Ken’s wine question
+pairing conversations
+tasting
+Jill’s after-close idea
+???
+???
+
+↓
+
+Chapter 4
+？？？？？
+
+When the Lounge project is genuinely discovered:
+the hidden chapter/title may reveal itself as:
+
+Jill’s Kitchen — The Lounge
+
+The player should know progression exists before every secret is revealed.
+
+Do NOT turn this into a list of chores.
+
+The Restaurant Story should reflect:
+伏筆 → 世界反應 → 可見事件 → permanent/semi-permanent change.
+
+==================================================
+D. STORY UPDATE NOTIFICATION
+==================================================
+
+When a meaningful authored story milestone occurs, give the player a subtle, non-blocking notification:
+
+故事更新
+Sophie & Mia
+「留了一個位置」
+3 / 8
+
+or equivalent.
+
+The notification should NOT pause service.
+
+Tapping it should deep-link to that story in the Restaurant Journal.
+
+This is especially important during busy service.
+
+If the player misses the dialogue bubble/event visually, the Story Journal still preserves the meaningful development.
+
+Do not notify for every ambient callback.
+Only meaningful story progression.
+
+==================================================
+E. DIALOGUE HISTORY — CURRENT SYSTEM LOSES IMPORTANT CONTENT
+==================================================
+
+Observed on iPhone:
+
+During busy service, dialogue can accumulate very quickly — sometimes 30–40 lines.
+
+The current visible dialogue history appears too short (roughly the latest ~14), so older dialogue becomes inaccessible.
+
+Some NPC dialogue also appears not to reliably enter the history.
+
+This is now unacceptable because v2.3 dialogue can carry real story progression, especially:
+- Dylan
+- Sophie / Mia
+- Ken / Monsieur 杜
+- Lounge staff
+- other authored arcs
+
+Fix this structurally.
+
+Requirements:
+
+1. Keep the COMPLETE dialogue history for the current service/day, not only ~14 recent lines.
+
+2. Make it scrollable and mobile-friendly.
+
+3. Ensure meaningful named-NPC/story dialogue reliably enters the history.
+
+4. Important story-progress dialogue should additionally be preserved through the Story Journal milestone/history where appropriate.
+
+5. Ordinary repeated ambient chatter does not need permanent multi-day storage.
+
+6. Avoid duplicate spam.
+
+7. Do not let the dialogue log become the source of story truth.
+Story Facts remain source of truth.
+
+==================================================
+F. DIALOGUE PANEL MOBILE CLOSE CONTROL
+==================================================
+
+Observed:
+Closing the dialogue panel currently requires tapping the small dialogue bubble again.
+
+On iPhone, especially during rush, this is frustrating and difficult.
+
+Add a clear visible × close button inside the dialogue panel.
+
+Requirements:
+- comfortably tappable mobile hit target;
+- closes immediately;
+- does not require repeatedly finding/tapping the original speech-bubble button;
+- does not interfere with scrolling dialogue history.
+
+==================================================
+G. RESTAURANT JOURNAL DISCOVERABILITY
+==================================================
+
+The Restaurant Journal is now one of the most important systems in the game:
+reviews, regulars, dialogue/history, Album, cats, achievements, restaurant history, and now Story.
+
+It is currently too difficult to locate consistently across game phases.
+
+Fix the information architecture.
+
+At minimum:
+
+- Add “餐廳日誌” directly to the Pause menu.
+- It should be accessible consistently during service.
+- It should remain accessible during prep / after closing / evening management wherever technically reasonable.
+- Do not make the player remember which phase exposes it.
+- Preserve existing Journal content.
+- Add the new Story section cleanly rather than creating another disconnected hidden menu.
+
+The Journal should feel like the restaurant’s permanent record.
+
+==================================================
+H. SOCIAL / MARKETING DISCOVERABILITY
+==================================================
+
+Current implementation exists, but real play showed a serious discoverability problem.
+
+The player knew that Social / Marketing had been implemented and STILL could not find it.
+
+Current path is effectively:
+close restaurant → evening upgrade/shop → horizontally scroll deep into shop tabs → 社群與宣傳.
+
+That is too hidden for a recurring management system.
+
+Audit its placement.
+
+Do NOT delete the existing system.
+
+Find a clearer access point / navigation treatment so the player can reasonably discover and revisit:
+- social posts;
+- what people are talking about;
+- Jill post candidates;
+- active campaign;
+- campaign results.
+
+It may still be editable/launchable at an appropriate management time, but it should not feel like a secret submenu inside furniture/upgrades.
+
+Do not duplicate the state/system.
+
+==================================================
+I. KITCHEN / LATE-GAME EQUIPMENT DEPTH
+==================================================
+
+Observed around Day 48:
+Kitchen equipment feels too sparse.
+The player has substantial money and too few meaningful things to buy.
+
+Audit late-game kitchen progression.
+
+Add meaningful equipment/upgrade depth where it genuinely improves gameplay/space.
+
+In particular:
+- refrigerator/cold storage should have further meaningful capacity upgrade(s);
+- consider additional high-end kitchen equipment / workflow improvements;
+- equipment should be visually represented where appropriate;
+- avoid adding meaningless +5% stat clutter;
+- avoid turning the game into inventory micromanagement.
+
+The restaurant should LOOK and FEEL more developed after major investment.
+
+The player currently reports:
+“I have nowhere to spend money.”
+
+Treat this as an economy/progression problem, not merely “add one expensive decoration.”
+
+==================================================
+J. SIDE HALL — WINDOW CAT LIFE
+==================================================
+
+Observed:
+The Side Hall has a large window area with almost nothing happening on it.
+
+This is wasted spatial storytelling.
+
+Add purchasable indoor cat window furniture.
+
+Examples:
+- window-mounted cat shelf;
+- padded window perch;
+- multi-level window walk;
+- suspended/window hammock;
+- premium multi-cat observation platform.
+
+These are INDOOR.
+
+Cats may autonomously:
+- jump up;
+- sleep there;
+- sit and look outside;
+- move between levels;
+- occasionally share nearby levels/perches.
+
+Do NOT add:
+- cat chores;
+- cat hunger/happiness meters;
+- required cat management.
+
+This should be:
+player improves restaurant → cats gain richer autonomous life → player gets to notice it.
+
+It should also provide meaningful late-game money sinks.
+
+==================================================
+K. MAIN HALL LIGHTING
+==================================================
+
+Observed on real iPhone:
+After purchasing the expensive Main Hall lighting upgrade, the upper half appears brighter but the lower half can look comparatively DARKER.
+
+This makes an expensive visual upgrade feel worse.
+
+Audit actual rendered lighting on mobile.
+
+Fix illumination/falloff/overlay so:
+- the expensive upgrade visibly improves the room;
+- the lower half is not unintentionally darkened;
+- the room retains warmth/depth and is not flattened into uniform brightness.
+
+Do not solve this merely by globally increasing canvas brightness.
+
+==================================================
+L. MOBILE TICKET / ROOM TAB OVERLAP
+==================================================
+
+Observed:
+The top row of customer/order needs can sometimes be obscured by the room-switching controls.
+
+This is a real mobile UI collision.
+
+Fix responsive layout/zoning so room tabs never cover actionable customer/ticket information.
+
+Test at iPhone-like viewport around 390×844.
+
+==================================================
+M. SIDE HALL TABLE / SEATING CONSISTENCY
+==================================================
+
+Observed:
+- the first/top row Side Hall tables still appear noticeably larger;
+- Main Hall seating can be upgraded to support more people, while Side Hall does not behave consistently.
+
+Audit Side Hall table sizing and seating progression.
+
+If Side Hall intentionally uses larger group-dining tables, make that design rule clear and coherent.
+
+Otherwise, align furniture progression with Main Hall conventions.
+
+Do not leave accidental visual/functional inconsistency.
+
+==================================================
+N. LIFE ALBUM — OVERLAPPING CAT PHOTO BUG
+==================================================
+
+Observed:
+The photo caption says 小齁 and 寶寶 are squeezed together on the same cushion, but visually only 寶寶 is visible because the sprites overlap.
+
+Fix this.
+
+Album rule remains:
+
+If the caption says two specific cats are visibly sharing a moment, both cats must actually be visually readable in the captured photo.
+
+For this composition:
+- offset bodies/heads enough to read both identities;
+- preserve the “squeezed together” feeling;
+- do not simply separate them so far that the moment disappears.
+
+Add regression coverage if practical.
+
+==================================================
+O. DOG GUEST / DOG HOUSE VISUAL PASS
+==================================================
+
+Observed on iPhone:
+- the dog house/waiting area looks crude;
+- it sits too far left and can be partially clipped by the viewport;
+- every visiting dog appears effectively the same;
+- the current dog silhouette can read more like a mouse than a dog.
+
+Redesign this feature.
+
+Create at least FIVE visibly distinct dog archetypes.
+
+Do NOT make five recolors of one sprite.
+
+Use clearly different silhouettes/body proportions, for example:
+
+1. Small fluffy dog
+   - Pomeranian-like
+   - compact round body
+   - fluffy curled tail
+   - small pointed ears
+
+2. Small long-bodied dog
+   - dachshund-like
+   - short legs
+   - long torso
+   - long/floppy ears
+
+3. Medium mixed-breed dog
+   - natural proportions
+   - semi-pointed ears
+   - curved tail
+   - friendly everyday neighborhood-dog feel
+
+4. Medium floppy-ear dog
+   - softer face
+   - hanging ears
+   - slightly stockier body
+
+5. Large retriever-like dog
+   - clearly larger scale
+   - longer legs/body
+   - broad friendly head
+   - feathered/relaxed tail
+
+They do not need to represent literal copyrighted/brand-specific breeds.
+They need readable DOG silhouettes and variety.
+
+Optional low-cost idle behavior:
+- sit;
+- lie down;
+- tail wag;
+- look toward restaurant/owner.
+
+Do NOT create a dog-management subsystem.
+
+Redesign the dog waiting spot / dog house so it looks intentional and appropriate to Jill’s Kitchen.
+
+Ensure safe responsive margins:
+nothing important should be clipped on iPhone.
+
+==================================================
+P. MONEY SINK / LONG-TERM PROGRESSION AUDIT
+==================================================
+
+Day ~48 mature play currently reaches a point where the player has a large cash balance and feels there is nothing meaningful left to buy.
+
+Audit the economy from the PLAYER perspective.
+
+Potential categories:
+- kitchen progression;
+- refrigerator/cold storage;
+- Side Hall improvements;
+- cat window environment;
+- Lounge upgrades where applicable;
+- meaningful visual/functional restaurant improvements;
+- future restaurant-story expansions.
+
+Do not solve this with arbitrary ultra-expensive decorative junk.
+
+Money sinks should make the restaurant visibly or behaviorally richer.
+
+==================================================
+Q. DO NOT BREAK THESE V2.3 PRINCIPLES
+==================================================
+
+Preserve:
+
+- one restaurant simulation;
+- one save object;
+- Story Facts / Relationship Facts as truth;
+- Story Event Arbiter;
+- idempotent consequences;
+- event-boundary story evaluation, not every frame;
+- max story density philosophy;
+- mature-save migration;
+- cats autonomous, not managed;
+- named guests remain persistent people;
+- no fake character presence;
+- no teleporting characters for Story Photos;
+- romance only for authored/eligible relationships;
+- Ken × Monsieur 杜 friendship, never romance;
+- Dylan is Jill’s husband from Day 1 even before player reveal;
+- reveal does not end Dylan’s story;
+- Story Photos unlock only from history that really occurred.
+
+==================================================
+R. IMPLEMENTATION ORDER
+==================================================
+
+Before coding:
+1. inspect the current v2.3 RC1 implementation;
+2. map each request above onto existing systems;
+3. identify which items are bugs, UX changes, content additions, and progression additions;
+4. propose the smallest coherent architecture change;
+5. avoid creating parallel systems.
+
+Recommended priority:
+
+P0
+- save safety / migration
+- ticket-room-tab overlap
+- dialogue history loss
+- dialogue panel close control
+- Album two-cat overlap bug
+
+P1
+- Journal accessibility
+- Story Map / story-progress visibility
+- story update notifications
+- Social/Marketing discoverability
+- Main Hall lighting
+- Side Hall seating consistency
+
+P2
+- kitchen depth / refrigerator upgrades
+- late-game money sinks
+- Side Hall window-cat furniture/behaviors
+- dog visual variety / dog waiting area
+
+Do not sacrifice P0/P1 correctness merely to ship more P2 content.
+
+==================================================
+S. TESTING / DELIVERY
+==================================================
+
+Keep I / T / O distinctions.
+
+Do NOT call automated tests “Observed normal play”.
+
+Required targeted tests:
+- mature-save migration;
+- Story progress derives only from real facts;
+- story notification fires once per meaningful milestone;
+- no repeat milestone inflation;
+- Dylan pre/post reveal presentation;
+- Ken × 杜 remains friendship;
+- dialogue log preserves a heavy service worth of dialogue;
+- named/story dialogue is not silently dropped;
+- Journal accessible in intended phases;
+- Social/Marketing state preserved after navigation;
+- campaign state/results unchanged by UI relocation;
+- Side Hall cat-window furniture save/reload;
+- Album two-cat composition;
+- mobile layout no ticket/room-tab collision;
+- dog waiting area within safe viewport;
+- existing golden/regression suite;
+- mature Day 30/35/46+ saves as available.
+
+For story simulation:
+verify that making progression VISIBLE does not change the underlying probability/timing of story progression unless a real bug requires it.
+
+Do not accelerate Sophie × Mia merely because a progress UI now exists.
+
+Deliver:
+- updated single-file Artifact;
+- source;
+- save fixtures;
+- test report;
+- concise change report;
+- explicit remaining iPhone O checklist;
+- rollback point/tag.
+
+Most importantly:
+
+This pass is not about adding the largest number of features.
+
+It is about making the restaurant’s existing depth VISIBLE, RETRIEVABLE, and WORTH INVESTING IN.
+
+The player should finish this pass feeling:
+
+“I can see my restaurant growing.”
+“I can see these people’s stories moving.”
+“I know there are still things ahead.”
+“And when service gets busy, I no longer lose the moments I cared about.”
