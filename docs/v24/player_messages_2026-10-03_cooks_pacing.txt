@@ -1,0 +1,45 @@
+The player's messages of 2026-10-03 (this session), verbatim, on Jill's rest, the cooks and the story pacing.
+
+1. 請單獨處理 `jill_rests_when_staff_cover_the_floor` 這個長期失敗測試。不要為了讓測試通過直接調高 Jill 的休息機率。先確認 Checkpoint A 到底改變了什麼，並判斷：
+
+1. Jill 的實際休息／idle 行為是否發生 gameplay regression；或
+2. 測試的舊門檻或「休息」定義已不符合目前遊戲。
+
+如果是 gameplay regression，就修根因；如果目前行為符合設計，就更新或重寫測試，使它驗證真正需要保證的 invariant，而不是舊的休息次數。
+目標不是把測試硬弄綠，而是讓這個長期 known failure 正式結案。完成後做 targeted verification，回報你改的是 gameplay 還是 test，以及原因。
+
+2. 設計意圖本來就是：
+早期 Jill 很忙，很多事情自己做。
+員工慢慢補齊之後，餐廳不再凡事需要 Jill。
+她因此真的有餘裕坐下、休息、回私人房間、看電子書、滑手機、陪貓
+所以如果目前是 52% calm/idle、卻只有 8.8% sitting，我認為這是需要修的 gameplay regression。請繼續找出是什麼 workload 過早打斷她的休息，修根因，不要降低測試標準來配合現在的行為。也不要單純硬調高坐下機率；員工能 cover 時，Jill 應該真的能把工作交給員工、持續休息一段合理時間。
+
+3. 這個處理好就發布遊戲
+
+4. 第一次做的菜是她要做 其他時候廚師都可以自己接手
+
+5. 備料不用站起來吧 點冰箱就可以了
+
+6. 你不能直接改規則嗎
+
+7. 我覺得直接改成不管是不是第一次做那道菜 有廚師她就不用做
+
+8. 「一天可以不只一個劇情，不然太慢。」
+而且不是只有企劃想法，當時 scheduler 已經真的改過：
+
+* 原本：一天最多 1 個 major beat
+* 後來：一天最多 2 個 major beats
+* long-story steps 也從一天 1 個提高到 2 個
+* minor moments 從 2 個提高到 3 個
+* 同一天兩個故事會用 `LANE_GAP` 錯開，不會同一分鐘一起跳出來
+* 同一條 story 仍然按照順序一幕一幕走，不會 Act 2 跳過 Act 1
+* planned visit 之類的重要事件仍有 slot 保護，避免互撞
+* 沒排到不是消失，而是延後排
+我補充一個既有 canon／scheduler 規則：之前因為我覺得劇情進度太慢，已經明確改成「一天可以不只一個劇情」。
+舊版後來的實作不是一天只能一個 major story：daily major lane cap 已提高到 2 major beats/day，long-story steps 也可到 2/day，minor moments 是 3/day；同日事件用既有 LANE_GAP 錯開，不應在同一分鐘重疊。planned story visit 仍應有 slot protection，沒排到的 eligible beat 延後而不是消失。
+所以你先前判斷「scheduler only allows one major step per day」是舊規則。請在發布前檢查目前程式為什麼又呈現一天一個 major 的行為：是測試假設錯誤、目前 branch regression，還是新版 scheduler 的其他限制造成。
+不要直接為了縮短晴×阿拓天數硬調她們的 trigger/cooldown。 先確認既有「一天最多 2 個 major beats」的 scheduler 規則是否仍正確存在並運作。
+這也可能解釋 Day 74 模擬中晴×阿拓五幕被拉到 Day 81 / 94 / 99 / 113 / 118。修正／確認 scheduler 後，再重新看一次自然 progression 是否合理。
+這項和目前 jill_rests root-cause 一起列入發布前檢查；確認沒有 regression 後再發布最新版。
+
+9. (answer to 「晴×阿拓五幕自然進行要約 37 天……要怎麼處理？」) 再縮更多

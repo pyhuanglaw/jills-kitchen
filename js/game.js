@@ -3529,7 +3529,7 @@ function drawIllusKen(c,k){c.fillStyle='#1E1A18';c.fillRect(0,0,360,270);c.fillS
    (qx_dylan, qx_pay on his first night), 沈晴 goes home for two days (qx_home). Who knows is two plain facts: 予安 saw it
    in 《最近比較常》 (ya_sees_qt); Dylan hears it in 《你喜歡予安？》 (dylan_knows_qt). ===== */
 function qaS(){const st=story();return st.qa||(st.qa={})}
-function qaBooked(){return kenNightToday()||cnTonight()}
+function qaBooked(){return kenNightToday()||cnTonight()||!!(R&&(R.kt||R.cn))}   /* the night itself too: at the closing Ken's night has already moved his next one on (kenNightClose → kenAdvance), the chef's night its own */
 function qaHome(){const H=qaS().home;return H&&S.day>=H.d&&S.day<H.back?H:null}   /* 沈晴 at her parents' */
 function qaEve(){return loungeOpenTonight()&&!qaBooked()&&!!evanOn()}   /* an ordinary night at The Lounge */
 function qaYa(){return !!fact('ya_join')&&yaNight()}   /* 予安 played tonight: she is still there at closing */
@@ -3577,11 +3577,14 @@ STORY_EV.push(
  /* 沈晴 goes home to her parents for two days — her life, not anyone's plan; it falls on one of 予安's nights */
  {k:'qx_home',lane:'ambient',cd:0,at:['daystart'],note:'沈晴回老家兩天。',
   when:()=>{const q=crewByName('沈晴');if(!q)return false;if(qaHome())return true;const H=qaS().home;
-   return !!fact('qt_often')&&!fact('qt_ya')&&S.day-fact('qt_often').d>=5&&qaYa()&&qaEve()&&!!tuoOn()&&(!H||S.day>=H.back+7)&&dayCoin('qxh|'+S.day)<50},
+   return !!fact('qt_often')&&!fact('qt_ya')&&S.day-fact('qt_often').d>=2&&qaYa()&&qaEve()&&!!tuoOn()&&(!H||S.day>=H.back+3)&&dayCoin('qxh|'+S.day)<70},   /* rc8 pacing (the player, 2026-10-03 「再縮更多」): 2 days after 《最近比較常》 (was 5), again 3 days after (was 7), 70% (was 50%) */
   run:()=>{const q=crewByName('沈晴'),A=qaS();if(!qaHome()){A.home={d:S.day,back:S.day+2};noteLine('沈晴這兩天回老家。');factSet('qx_home',true)}setCrewAway(q,'off')}},
- /* 2 《晚點回去》: the first evening after closing the player sees; Dylan stays on. Jill is not there (§19). */
+ /* 2 《晚點回去》: the first evening after closing the player sees; Dylan stays on. Jill is not there (§19). rc8 pacing (the player,
+    2026-10-03 「再縮更多」, the scheduler's two majors a day confirmed): two days after 《今天喝？》 (was 5) and one more
+    drink of his at The Lounge (was two; his evenings there 35% until then, was 14%); 《最近比較常》 two days after (was 4),
+    予安 a week at the piano (was ten days). */
  {k:'qt_late',lane:'major',cls:'A',floor:2,at:['close'],once:true,ic:'heart',note:'收店以後，Evan、沈晴、阿拓留在吧台，Dylan 也坐著。晴伸手找酒，阿拓直接把那一支遞給她。',
-  when:()=>!!fact('qt_drink')&&!!fact('qt_3')&&factN('qx_dylan')>=2&&S.day-fact('qt_drink').d>=5&&qaEve()&&!!qingOn()&&!!tuoOn()&&!qaHome(),
+  when:()=>!!fact('qt_drink')&&!!fact('qt_3')&&factN('qx_dylan')>=1&&S.day-fact('qt_drink').d>=2&&qaEve()&&!!qingOn()&&!!tuoOn()&&!qaHome(),
   run:()=>{if(SCX){SCX.cap=24;SCX.stageRoom='lounge'}factSet('qt_late');qaScene(['evan','qing','tuo','dylan'],[
    {who:'',text:'收店了。Lounge 只剩吧台那一區的燈。'},{who:'',text:'Evan、沈晴、阿拓留下來喝一點。Dylan 還坐在吧台。'},{who:'',text:'Evan 多拿了一個杯子，放在 Dylan 前面。'},
    {who:'staff:沈晴',text:'今天沙發那四個，炸雞點了三次。'},{who:'staff:阿拓',text:'四次。'},{who:'staff:沈晴',text:'第四次是外帶。'},{who:'staff:Evan',text:'外帶也算。'},
@@ -3589,7 +3592,7 @@ STORY_EV.push(
    {who:'',text:'散的時候，Dylan 把錢壓在杯子底下。'}])}},
  /* 3 《最近比較常》: 予安, a while after she became The Lounge's pianist, stays for one; she sees 沈晴's look and says nothing */
  {k:'qt_often',lane:'major',cls:'A',floor:2,at:['close'],once:true,ic:'heart',note:'予安第一次留下來喝。「你們下班都會留下來？」「偶爾。」「最近比較常。」',
-  when:()=>!!fact('qt_late')&&!!fact('ya_join')&&S.day-fact('ya_join').d>=10&&S.day-fact('qt_late').d>=4&&qaYa()&&qaEve()&&!!qingOn()&&!!tuoOn()&&!qaHome(),
+  when:()=>!!fact('qt_late')&&!!fact('ya_join')&&S.day-fact('ya_join').d>=7&&S.day-fact('qt_late').d>=2&&qaYa()&&qaEve()&&!!qingOn()&&!!tuoOn()&&!qaHome(),
   run:()=>{if(SCX){SCX.cap=24;SCX.stageRoom='lounge'}factSet('qt_often');qaScene(['evan','qing','tuo','dylan','ya'],[
    {who:'',text:'收店了。予安把琴蓋闔上。'},{who:'staff:Evan',text:'喝一杯？'},{who:'',text:'予安看了一下時間。'},
    {who:'named:'+YA,text:'一杯。',after:()=>qaGo('ya',[LG.bar.x0+156,LG.bar.y+74])},
@@ -3649,7 +3652,7 @@ STORY_EV.push(
 /* the evenings Dylan comes to The Lounge: the first on the day his exam is done (some days after it opens), then now and then */
 V24_WANTS.push(()=>{const out=[];if(typeof qaEve!=='function'||!qaEve()||!REG_BY.dylan)return out;
  if(qa1Due())out.push({reg:'dylan',p:.5,t:.5,grp:'qtd',o:{lounge:1,lgRetry:1},k:'qt_drink'});
- else if(fact('qt_drink')&&fact('qt_drink').d<S.day&&dayCoin('qtdy|'+S.day)<14)out.push({reg:'dylan',p:1,t:.5,grp:'qtd',o:{lounge:1,lgRetry:1}});
+ else if(fact('qt_drink')&&fact('qt_drink').d<S.day&&dayCoin('qtdy|'+S.day)<(!fact('qt_late')&&factN('qx_dylan')<1?35:14))out.push({reg:'dylan',p:1,t:.5,grp:'qtd',o:{lounge:1,lgRetry:1}});
  return out});
 Object.assign(STORY_ILLUS,{
  qt_first:{t:'今天喝？',cap:'Dylan 第一次坐在 Lounge 的吧台。',art:'qt_first',stage:c=>drawIllusQt(c,0)},
