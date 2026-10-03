@@ -1097,8 +1097,8 @@ def world_stays_visible_across_days(b, port, target):
         g.ev(f"(()=>{{const el=document.createElement('button');el.dataset.act='{a}';{ds}$('#screen').appendChild(el);el.click();el.remove()}})()")
     plan = {1: [('rd', {'d': 'pasta'}), ('rd', {'d': 'salad'}), ('buyTable', {})],
             2: [('buyEq', {'k': 'bar'}), ('rd', {'d': 'coffee'}), ('buyDecor', {'k': 'plants'}), ('buyTable', {})],
-            3: [('hire', {'k': 'waiter'}), ('rd', {'d': 'burger'}), ('buyDecor', {'k': 'lights'})],
-            4: [('buyEq', {'k': 'oven'}), ('rd', {'d': 'fries'}), ('expand', {}), ('hire', {'k': 'cleaner'})],
+            3: [('hire', {'k': 'chef'}), ('rd', {'d': 'burger'}), ('buyDecor', {'k': 'lights'})],   # rc8 §21: the first place is a chef's
+            4: [('buyEq', {'k': 'oven'}), ('rd', {'d': 'fries'}), ('expand', {}), ('hire', {'k': 'waiter'})],   # the Bistro's is a waiter's
             5: [('expand', {}), ('hire', {'k': 'chef'}), ('rd', {'d': 'soup'}), ('buyDecor', {'k': 'chairs'}), ('buyEq', {'k': 'stove'})],
             6: [('buyEq', {'k': 'fridge'}), ('rd', {'d': 'blacktea'}), ('buyDecor', {'k': 'art'}), ('buyTable', {})],
             7: [('rd', {'d': 'tiramisu'}), ('buyEq', {'k': 'pan'}), ('buyDecor', {'k': 'rug'})],

@@ -63,12 +63,12 @@ with sync_playwright() as p:
         if day > 2:
             g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(100)
         g.ev(SEED % (270000 + day)); rt.start_day(g); finish_day(g)
-        if day == 3: act(g, 'hire', k='waiter'); g.ev("__tick(30)")
+        if day == 3: act(g, 'hire', k='chef'); g.ev("__tick(30)")   # rc8 §21: a new shop's one place is a chef's
     g.ev("shopTab='staff';showShop()"); g.page.wait_for_timeout(80)
     g.ev("const it=[...document.querySelectorAll('#screen .item')].find(e=>e.innerText.includes('清潔員'));if(it)it.scrollIntoView({block:'center'})")
     shot(g, 'day4_staff_tab.png', 'Day 4, the staff tab opens: the recruit list says the first cleaner is 秀琴阿姨')
     g.ev("S.money=Math.max(S.money,5000)")
-    if g.ev("(S.crew||[]).length>=crewCap()"): g.ev("S.level=Math.max(S.level,2)")
+    if g.ev("roleCrew('cleaner').length>=roleCap('cleaner')"): g.ev("S.level=Math.max(S.level,5)")   # rc8 §21: the first cleaner's place comes with JILL (or 廚房擴建)
     g.ev("window.__noScenes=false")
     act(g, 'hire', k='cleaner'); g.ev("__tick(30)")
     shot(g, 'hire_her_line.png', 'hiring the first cleaner is hiring her: her one line over the shop, 「那以後就天天來了。」')
@@ -99,7 +99,7 @@ with sync_playwright() as p:
                 got = True
             g.ev("window.__noScenes=true;window.__fastSay=1")
         finish_day(g)
-        if day == 3: act(g, 'hire', k='waiter'); g.ev("__tick(30)")
+        if day == 3: act(g, 'hire', k='chef'); g.ev("__tick(30)")   # rc8 §21: a new shop's one place is a chef's
         if got: break
         g.click('#screen [data-act=nextDay]'); g.ev("__tick(100)")
     if not got: notes.append('yj_meet_helper_scene.png: NOT TAKEN — 怡君 did not meet her mother within 14 days with this seed')

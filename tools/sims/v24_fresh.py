@@ -30,12 +30,12 @@ KEYS = ['xq_helper', 'xq_hired', 'yj_meet', 'yj_look', 'yj_three', 'yj_chose', '
         'up_hint', 'up_staff', 'up_inspect', 'up_door', 'up_cats', 'sp_seat', 'sp_box', 'sp_stuff', 'up_busy', 'up_full', 'up_small', 'up_quiet', 'up_remind', 'up_ask', 'up_lease']
 # a person's shop: early = the cleaner is the first hire (Day 4); late = a waiter first, the cleaner once the room is bigger
 PLANS = {
-    'early': {1: [('rd', {'d': 'pasta'}), ('buyTable', {})], 2: [('buyEq', {'k': 'bar'}), ('buyTable', {})], 4: [('hire', {'k': 'cleaner'})],
-              5: [('expand', {}), ('buyDecor', {'k': 'plants'})], 7: [('hire', {'k': 'waiter'}), ('buyTable', {})], 9: [('expand', {})], 10: [('hire', {'k': 'chef'})]},
-    'late': {1: [('rd', {'d': 'pasta'}), ('buyTable', {})], 2: [('buyEq', {'k': 'bar'}), ('buyTable', {})], 3: [('hire', {'k': 'waiter'})],
-             5: [('expand', {}), ('buyDecor', {'k': 'plants'})], 8: [('hire', {'k': 'chef'}), ('buyTable', {})], 11: [('expand', {})], 14: [('hire', {'k': 'cleaner'})]},
-    'never': {1: [('rd', {'d': 'pasta'}), ('buyTable', {})], 2: [('buyEq', {'k': 'bar'}), ('buyTable', {})], 3: [('hire', {'k': 'waiter'})],
-              5: [('expand', {}), ('buyDecor', {'k': 'plants'})], 8: [('hire', {'k': 'chef'}), ('buyTable', {})], 11: [('expand', {})]},
+    'early': {1: [('rd', {'d': 'pasta'}), ('buyTable', {})], 2: [('buyEq', {'k': 'bar'}), ('buyTable', {})], 4: [('hire', {'k': 'chef'})],   # rc8 §21: the first place is a chef's
+              5: [('expand', {}), ('buyDecor', {'k': 'plants'})], 7: [('hire', {'k': 'waiter'}), ('buyTable', {})], 9: [('expand', {})], 10: [('hire', {'k': 'chef'})], 16: [('hire', {'k': 'cleaner'})]},
+    'late': {1: [('rd', {'d': 'pasta'}), ('buyTable', {})], 2: [('buyEq', {'k': 'bar'}), ('buyTable', {})], 3: [('hire', {'k': 'chef'})],
+             5: [('expand', {}), ('buyDecor', {'k': 'plants'})], 8: [('hire', {'k': 'waiter'}), ('buyTable', {})], 11: [('expand', {})], 14: [('hire', {'k': 'cleaner'})]},
+    'never': {1: [('rd', {'d': 'pasta'}), ('buyTable', {})], 2: [('buyEq', {'k': 'bar'}), ('buyTable', {})], 3: [('hire', {'k': 'chef'})],
+              5: [('expand', {}), ('buyDecor', {'k': 'plants'})], 8: [('hire', {'k': 'waiter'}), ('buyTable', {})], 11: [('expand', {})]},
 }
 # rc5: a game that keeps growing — the late plan's first weeks, then every evening whatever a growing restaurant buys
 # once it can afford it (each is a no-op when it cannot): the next expansion, the side room, the kitchen, the staff

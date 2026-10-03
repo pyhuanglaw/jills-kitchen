@@ -831,7 +831,7 @@ def followup_the_manual_describes_the_current_game(b, port, target):
                  '餐廳員工', 'Lounge 名單', '許葳', '互不佔用', '二樓', '樓梯門', '上樓待一會兒',
                  # v2.4 rc6: the two rooms upstairs, the bookings, the two places
                  '二樓：休息室與包廂', '員工休息室', '私人包廂', '二樓的房間', '今晚｜私人包廂｜已預約', '最低消費', '4–6 位', '4–8 位', '4–10 位',
-                 '一個晚上最多一組', '客人不會為了湊低消多點', '私人包廂 I 和 III 也各多一位', '休息室不加名額', '包廂 幾組',
+                 '一個晚上最多一組', '客人不會為了湊低消多點', '私人包廂 I 和 III 服務生各 +1', '休息室不加名額', '包廂 幾組',
                  # v2.4 rc6 (the player's 05:19, 05:23, 06:36, 06:43): the rooms are tabs and so is the floor; its plan in 店舖工程; the Staff Room's pool table and massage chair
                  '寫著那一間的全名', '二樓（租下以後）', '看看整層', '「？」', '開店前會先帶你上二樓看一眼', '二樓平面圖', '點一下放大', '全部蓋完也一直在', '淺色橡木', '燕麥色沙發', '淺木置物櫃', '撞球台', '按摩椅', '沒有分數',
                  # v2.4 rc6 (07:09): who is where
@@ -854,7 +854,7 @@ def followup_the_manual_describes_the_current_game(b, port, target):
                  # v2.4 rc7.4: the Lounge's new bites, its TV and sound
                  '水牛城雞翅、起司條', '生蠔', '德國豬腳', 'Lounge 的家具', 'Lounge 大電視（$200,000）', '電視音響系統（$150,000', '有比賽轉播',
                  # v2.4 rc7.5 (23:08): the pizza oven, one more cook, the bar pizza
-                 '披薩烤爐', '酒吧披薩', '披薩麵團', '把一位廚師排到「披薩烤爐」', '廚房二期、披薩烤爐有關',
+                 '披薩烤爐', '酒吧披薩', '披薩麵團', '把一位廚師排到「披薩烤爐」', '披薩烤爐廚師 +1',
                  # v2.4 rc7.5: the album from the opening day; its real limit
                  '相簿從開店那天開始', '最多留 240 張',
                  # v2.4 rc7.6: the chef's night, booked out (08:00); Ken's night the whole room (07:44); the bar's L (07:44–07:45)
@@ -866,7 +866,9 @@ def followup_the_manual_describes_the_current_game(b, port, target):
                  '吧台那一排由調酒師倒', '品酒夜分潤', '友情主持', 'Evan 在 Lounge I 蓋好那天就在吧台',
                  # rc8 (2026-10-02 19:19): the Lounge is the shop next door
                  'Lounge 是隔壁的店', '從後場遞到 Lounge 吧台的那一頭',
-                 '淨利下面另外一項「今天的店」', '它本來是隔壁 Madame Lin 開了很多年的酒吧', '想喝酒，隔壁就有', '晚餐桌上就有配菜的酒', '自己決定要不要接', '調酒師在 L 裡面，靠牆那一頭留了進出的口', '那晚 Lounge 只寫「Ken 的品酒夜」或「主廚之夜」那一行']:
+                 '淨利下面另外一項「今天的店」',
+                 # rc8 §21: the restaurant's three lists
+                 '分成廚師、服務生、清潔員三種', '廚師的名額只能聘廚師', '側廳服務生 +2', '廚房擴建廚師和清潔員各 +1', '後場整理區廚師和服務生各 +1', '廚房二期服務生 +2', '寫在擴建的卡片上', '它本來是隔壁 Madame Lin 開了很多年的酒吧', '想喝酒，隔壁就有', '晚餐桌上就有配菜的酒', '自己決定要不要接', '調酒師在 L 裡面，靠牆那一頭留了進出的口', '那晚 Lounge 只寫「Ken 的品酒夜」或「主廚之夜」那一行']:
         check(need in txt, f'the manual mentions {need}')
     for stale in ['暫停選單和設定裡都有【儲存目前進度】', '把杯子交給吧台的客人；桌位由有', '上方的分頁', '畫面上方會跳一個小通知', '打烊後或開店前，商店的「社群與宣傳」分頁（第 6 天起）。', '下一段寫著', '窗邊（貓架、睡墊）', '牠會在門邊趴著等主人',
                   '人數上限跟擴建、後場整理區、側廳、廚房擴建、廚房二期、Lounge 有關', '有 Lounge 以後才能招募', '第二位調酒師',
@@ -889,7 +891,9 @@ def followup_the_manual_describes_the_current_game(b, port, target):
                   # v2.4 rc7.7: Ken no longer pours every round himself; Evan is never hired
                   '今晚的三支他一輪一輪倒', 'Lounge I 的 Evan、沈晴',
                   # rc8: no arch from the Main Hall to the Lounge
-                  'Lounge 蓋好以後旁邊多一道', '放在拱門和吧台之間的牆邊', '結算的 Lounge 那一行會寫', '結算在 Lounge 那一行另外寫', '是 Ken 先嫌沒有酒，才有的', 'Jill 打烊後想到：讓人吃完飯以後', '妳真的完全不賣酒', '附近有沒有地方再喝一杯', '後面那間', '提議在吧台辦小型的品酒夜', '之後每一兩個禮拜他會再辦一次，不用你安排']:
+                  'Lounge 蓋好以後旁邊多一道', '放在拱門和吧台之間的牆邊', '結算的 Lounge 那一行會寫', '結算在 Lounge 那一行另外寫', '是 Ken 先嫌沒有酒，才有的', 'Jill 打烊後想到：讓人吃完飯以後', '妳真的完全不賣酒', '附近有沒有地方再喝一杯', '後面那間', '提議在吧台辦小型的品酒夜', '之後每一兩個禮拜他會再辦一次，不用你安排',
+                  # rc8 §21: no generic +2 any more
+                  '員工上限多兩人', '員工上限多一人', '私人包廂 I 和 III 也各多一位', '的上限跟擴建、後場整理區、側廳、廚房擴建、廚房二期、披薩烤爐有關']:
         check(stale not in txt, f'stale line removed: {stale}')
     g.ev("showGuide()"); g.page.wait_for_timeout(50)
     check('故事' in g.ev("document.querySelector('#screen').innerText") and '社群與宣傳' in g.ev("document.querySelector('#screen').innerText"), 'the manual screen shows the new sections')

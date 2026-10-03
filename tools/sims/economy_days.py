@@ -20,8 +20,8 @@ from playwright.sync_api import sync_playwright
 SRC, DAYS, SEED = sys.argv[1], int(sys.argv[2]), int(sys.argv[3])
 PLAN = sys.argv[4] if len(sys.argv) > 4 else 'grow'
 RNG = "Math.random=(function(){let a=%d;return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}})()"
-EARLY = {1: [('rd', {'d': 'pasta'}), ('buyTable', {})], 2: [('buyEq', {'k': 'bar'}), ('buyTable', {})], 3: [('hire', {'k': 'waiter'})],
-         5: [('expand', {}), ('buyDecor', {'k': 'plants'})], 8: [('hire', {'k': 'chef'}), ('buyTable', {})], 11: [('expand', {})]}
+EARLY = {1: [('rd', {'d': 'pasta'}), ('buyTable', {})], 2: [('buyEq', {'k': 'bar'}), ('buyTable', {})], 3: [('hire', {'k': 'chef'})],   # rc8 §21: the first place is a chef's,
+         5: [('expand', {}), ('buyDecor', {'k': 'plants'})], 8: [('hire', {'k': 'waiter'}), ('buyTable', {})], 11: [('expand', {})]}   # the Bistro's a waiter's
 GROW = [('expand', {}), ('buyProject', {'k': 'side'}), ('buyProject', {'k': 'kext'}), ('buyOps', {'k': 'room'}), ('hire', {'k': 'waiter'}),
         ('hire', {'k': 'chef'}), ('hire', {'k': 'cleaner'}), ('buyTable', {}), ('buySideTable', {})]
 INFO = """JSON.stringify((()=>{const s=S.lastSummary||{};return{day:S.day,money:S.money,lv:S.level,crew:(S.crew||[]).length,
