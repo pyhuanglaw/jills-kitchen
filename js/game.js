@@ -272,6 +272,10 @@ function linMig(o){if(!o||o.linMig)return o;o.linMig=1;const st=o.story=o.story&
  if(!lv&&F.tasting_night&&!F.pairing_wine){F.pairing_wine={d:F.tasting_night.d||0,n:1,l:F.tasting_night.d||0,retro:1};done('pairing_start')}
  if((o.day||1)>=2&&!F.lin_hello){retro('lin_hello');done('lin_hello');bell()}
  return o}
+/* rc8: a floor leased before the Staff Room came with it — the room is there, as of the lease (and 《大家待的地方》, if it
+   had not played, is history: it is why she called) */
+function srLeaseMig(o){if(!o||!(o.rooms&&o.rooms.up))return o;const u=o.up=o.up||{};const sr=u.sr=u.sr||{};if(sr.done!=null)return o;const L=u.lease!=null?u.lease:(o.day||1);sr.bought=L;sr.done=L;o.newRooms=o.newRooms||{};if(o.newRooms.staff==null)o.newRooms.staff=L;
+ const st=o.story=o.story&&typeof o.story==='object'?o.story:{v:1};const F=st.facts=st.facts||{};if(!F.sr_story)F.sr_story={d:0,n:1,l:0,retro:1};if(!F.sr_build)F.sr_build={d:L,n:1,l:L};return o}
 function evanMig(o){if(((o.rooms&&o.rooms.lounge)||0)>0&&!(o.crew||[]).some(m=>m.name==='Evan'&&m.role==='bartender')){o.crew=o.crew||[];o.crew.push(evanNew(o.day))}return o}
 const CREW_NAMES={bartender:['Evan','沈晴'],chef:['阿德師傅','Marco','小林師傅','阿珠姐','Hugo','阿勇','老周師傅','小魏'],waiter:['小茉','Kai','Nina','阿哲','Momo','小威','阿芳'],cleaner:['秀琴阿姨','小彤','阿明','Yuki','阿桂']};   /* v2.2.1: the pools are longer than the crew cap, so nobody is ever called just 廚師 */
 /* Operations: what a restaurant that cannot grow any bigger can still get better at. Each one is a real capacity or
@@ -630,7 +634,7 @@ function parseSave(t){let o;try{o=JSON.parse(t)}catch(e){return{err:'notjson'}}
  if(typeof o.v!=='number'||o.v%1)return{err:'notsave'};
  if(!(typeof o.day==='number'&&typeof o.money==='number'&&Array.isArray(o.unlocked)&&Array.isArray(o.menu)))return{err:'notsave'};
  if(o.v<1)return{err:'notsave'};if(o.v>SAVE_V)return{err:'newer',v:o.v};
- try{for(let n=o.v;n<SAVE_V;n++){MIGRATE[n](o);o.v=n+1}o=linMig(evanMig(giftTagMig(crewPoolMig(dlgAuditMig(crewNameFix(mainHallMig(legacyWang(legacyCrew(fillDefaults(o))))))))))}catch(e){return{err:'broken'}}if(STORY_READY)try{beatLinesMig(o)}catch(e){console.warn('[beatLines]',e)}   /* a save loaded in play; the first one is cleaned at boot, when every story's code is there */
+ try{for(let n=o.v;n<SAVE_V;n++){MIGRATE[n](o);o.v=n+1}o=srLeaseMig(linMig(evanMig(giftTagMig(crewPoolMig(dlgAuditMig(crewNameFix(mainHallMig(legacyWang(legacyCrew(fillDefaults(o)))))))))))}catch(e){return{err:'broken'}}if(STORY_READY)try{beatLinesMig(o)}catch(e){console.warn('[beatLines]',e)}   /* a save loaded in play; the first one is cleaned at boot, when every story's code is there */
  if(!(o.day>=1&&isFinite(o.money)&&o.unlocked.every(d=>typeof d==='string')&&o.menu.every(d=>typeof d==='string')&&Array.isArray(o.crew)&&o.dylan&&typeof o.dylan==='object'))return{err:'broken'};
  o.day=Math.max(1,Math.floor(o.day));o.money=Math.round(o.money);return{o,photos}}
 /* rc7.2 (22:49): a save that already has Sophie's pad is shown, once, which one it is (a new gift's tag, that day and the next) */
@@ -4589,7 +4593,7 @@ function upAskStart(){upJillTake();R.upAsk={t:0};upJillGo(UPDOOR.x-30,UPDOOR.y-3
 function upAskUpd(dt){const A=R.upAsk;A.t+=dt;const J=R.jill;
  if(!A.arr){if(J.room==='side'&&J.tx==null){A.arr=1;A.at=A.t;J.face=1;if(room!=='side')setRoom('side')}else if(A.t>14){A.arr=1;A.at=A.t;J.room='side';J.x=UPDOOR.x-30;J.y=UPDOOR.y-34;J.tx=null;J.face=1;if(room!=='side')setRoom('side')}return}
  if(!A.sc){if(A.t-A.at<1.6)return;A.sc=1;factSet('up_ask');v24Cap('up_ask');
-  v24Scene([{who:'',text:'收店的時候，Jill 在樓梯門前站了一會兒，拿出手機。'},{who:'jill',text:'……樓上現在還空著嗎？'},{who:'landlord',tone:'surprised',text:'妳真的要租樓上？'},{who:'jill',text:'嗯。'},{who:'landlord',text:'下面不夠用了？'},{who:'',text:'Jill 回頭看了一眼店裡。'},{who:'jill',text:'開始有一點。'},{who:'landlord',tone:'talk',text:'整層？'},{who:'jill',text:'整層。'}],
+  v24Scene([{who:'',text:'收店的時候，Jill 在樓梯門前站了一會兒，拿出手機。'},{who:'jill',text:'……樓上現在還空著嗎？'},{who:'landlord',tone:'surprised',text:'妳真的要租樓上？'},{who:'jill',text:'嗯。'},{who:'landlord',text:'下面不夠用了？'},{who:'',text:'Jill 回頭看了一眼店裡。'},{who:'jill',text:'開始有一點。'},{who:'jill',text:'店裡的人，連坐下來的地方都沒有。'},{who:'landlord',tone:'talk',text:'整層？'},{who:'jill',text:'整層。'}],
    ()=>{if(!R)return;A.back=1;A.backAt=A.t;upJillGo(SIDE_L.door.x+30,SIDE_L.door.y+40,'side')});return}
  if(!A.back)return;
  if(!A.out){if((J.tx==null&&J.room==='side')||A.t-A.backAt>8){A.out=1;upJillGo(SIDE_ARCH.x+SIDE_ARCH.w/2-10,140,'main')}return}
@@ -4597,16 +4601,20 @@ function upAskUpd(dt){const A=R.upAsk;A.t+=dt;const J=R.jill;
 
 /* ---- the project (U7): the whole floor — basic works only (J): cleaning, floor and walls, power, light, air, the stair
    rail. Not a dining room: no seats, nothing mechanical; it is the floor. ---- */
-const UP_PROJ={k:'up',n:'二樓（整層）',cost:350000,room:'up',d:'把房東那邊空著的二樓整層租下來，做基本工程：打掃、地板和牆面整理、電力、燈、冷氣、樓梯扶手。不隔間——先是一整層空間。不是用餐區，不會多座位。',done:'整層打掃乾淨了。地板整理過，牆補過、漆過；燈和冷氣都接好了，樓梯加了扶手。一整層，還空著。',jill:'先這樣。',unlock:['二樓（自己的分頁；店舖工程裡有整層的平面圖）','樓梯門在側廳']};
+/* rc8 (the player, 2026-10-03: 「玩家第一次正式取得／解鎖二樓時，Staff Room 就必須已經存在並可見……不能先出現一個完全空的二樓，再過幾天
+   才蓋 Staff Room」): the lease's works partition the Staff Room off too — it is there the day the floor is Jill's; the
+   rest of the floor stays open. The price is the two it replaces (the floor 350,000 + the room's first phase 160,000). */
+const UP_PROJ={k:'up',n:'二樓（整層）',cost:510000,room:'up',d:'把房東那邊空著的二樓整層租下來：打掃、地板和牆面整理、電力、燈、冷氣、樓梯扶手，再在左手邊靠後面隔出一間給店裡的人的員工休息室——有門、沙發、長桌、置物櫃和小廚房。其他地方先空著。不是用餐區，不會多座位。',done:'整層打掃乾淨了，燈和冷氣都接好了，樓梯加了扶手。左邊靠後面多了一面牆、一扇淺色的門：員工休息室。其他地方還空著。',jill:'先這樣。',unlock:['二樓（自己的分頁；店舖工程裡有整層的平面圖）','員工休息室（自己的分頁）','樓梯門在側廳']};
 function upProjectReveal(){S.upProj=S.upProj||{revealed:S.day};paused=!!R;sub='upproj';
- show(`<div class="modal"><div class="eyebrow">新企劃</div><h2>二樓（整層）</h2><p>房東說可以，整層。打掃、地板、牆、電、燈、冷氣、樓梯扶手——基本工程做完，先是一整層空間；要拿來做什麼，之後再說。也不急。</p><div class="stack"><button class="btn primary" data-act="upGo" data-k="plan">開始規劃 <small>會出現在「店鋪工程」，存夠了就租下來</small></button><button class="btn" data-act="upGo" data-k="later">之後再說 <small>不會不見——工程頁隨時找得到</small></button></div></div>`,'dim')}
+ show(`<div class="modal"><div class="eyebrow">新企劃</div><h2>二樓（整層）</h2><p>房東說可以，整層。打掃、地板、牆、電、燈、冷氣、樓梯扶手，再隔出一間給大家的休息室；其他地方先空著，要拿來做什麼，之後再說。也不急。</p><div class="stack"><button class="btn primary" data-act="upGo" data-k="plan">開始規劃 <small>會出現在「店鋪工程」，存夠了就租下來</small></button><button class="btn" data-act="upGo" data-k="later">之後再說 <small>不會不見——工程頁隨時找得到</small></button></div></div>`,'dim')}
 function upGo(k){S.upProj=S.upProj||{revealed:S.day};S.upProj.state=k==='plan'?'planned':'deferred';S.upProj.at=S.day;hideScreen();sub=null;if(R)paused=false;noteLine(k==='plan'?'二樓列進了店鋪工程。':'二樓先放著。工程頁裡隨時找得到。');save()}
 function secUp(money,btn){const on=upTaken();if(!fact('up_ask')&&!on)return'';const Q=UP_PROJ;const pct=Math.min(100,Math.round(money/Q.cost*100));
  return`<div class="nm" style="font-weight:800;font-size:15px;margin:14px 0 2px">二樓</div><p class="muted" style="font-size:12px;margin:0 0 6px">${on?'整層都是店裡的了。':S.upProj&&S.upProj.state==='deferred'?'之後再說過的那件事——還在這裡。':'房東說：「整層？」Jill 說：「整層。」'}</p>${on?upPlanCard()+`<button class="goalline linkline" data-act="upLook" style="margin:0 0 8px"><span>二樓</span><b>${srOn()||pdOn()?'看看整層現在的樣子':'看看整層'}</b><small>›</small></button>`:''}<div class="item ${on?'done':''}"><img alt="" src="${iconURL('upfloor')}"><div class="nm">${Q.n} ${on?'<span class="tier t1">已完工</span>':''}</div><div class="d">${on?Q.done:Q.d}</div>${on?'':`<div class="act">${btn(Q.cost,'buyUp','','租下來')}${money<Q.cost?`<span class="muted" style="font-size:11.5px">還差 ${fmt(Q.cost-money)}</span>`:''}</div>${money<Q.cost?`<div class="gb"><i style="width:${pct}%"></i></div>`:''}`}</div>`}
 /* the furniture comes up over the first week, in the order it would (the table first, the cats' things last); the
    crew's traces once they have started going up */
 function buyUp(){if(upTaken()||!fact('up_ask')||S.money<UP_PROJ.cost)return false;S.money-=UP_PROJ.cost;S.rooms.up=1;S.newRooms=S.newRooms||{};S.newRooms.up=S.day;const u=upS(),L=S.day;u.lease=L;
- u.furn={table:L+1,cabinet:L+2,coat:L+2,lamp:L+3,cushion:L+3,stool:L+5,scratch:L+5};u.traces={bag:L+2,cup:L+3,charger:L+4,coat:L+6};factSet('up_lease');S.upProj=S.upProj||{};S.upProj.state='built';
+ u.furn={table:L+1,cabinet:L+2,coat:L+2,lamp:L+3,cushion:L+3,stool:L+5,scratch:L+5};u.traces={bag:L+2,cup:L+3,charger:L+4,coat:L+6};factSet('up_lease');
+ {const o=srW();if(o.done==null){o.bought=L;o.done=L;S.newRooms.staff=L;factSet('sr_build')}}   /* rc8: the Staff Room comes with the lease */S.upProj=S.upProj||{};S.upProj.state='built';
  save();IDLE=null;bg=null;for(const kk in BGC)delete BGC[kk];projectReveal({k:'up',n:UP_PROJ.n,done:UP_PROJ.done,jill:UP_PROJ.jill,unlock:UP_PROJ.unlock,room:'up'});return true}
 
 /* ---- the crew's moments about space (§18 KEEP; ambient, no journal): the staff meal half of them eat standing up;
@@ -4678,7 +4686,7 @@ STORY_EV.push(
    else{const m=upFloorOrder()[0]||upCooks()[0];const w={with:'staff:'+m.name};sayS(m,'樓上不是還空著？',300);JILL_SAY('那是房東的。',1700,w);sayS(m,'我知道啊。',3100)}}},
  /* U6 (§21, §22): the idea becomes a phone call */
  {k:'up_ask',lane:'major',cls:'A',floor:1,at:['close'],ic:'heart',note:'Jill 打給房東：「……樓上現在還空著嗎？」「整層？」「整層。」',
-  when:()=>due('up_ask','up_remind',2,'up')&&upAskReady()&&!upNight()&&!upSearching(),
+  when:()=>due('up_ask','sr_story',1,'up')&&upAskReady()&&!upNight()&&!upSearching(),   /* rc8: after 《大家待的地方》 */
   run:()=>{R.upCloseSaid=1;upAskStart()}},
  /* 《那面牆》's callback (I5): only if the wall really happened; 王先生 only if he is in the room anyway */
  {k:'up_leak',lane:'ambient',cd:0,at:['seat','served'],
@@ -4804,7 +4812,7 @@ function restChapters(){const achD=achReal;/* v2.3 follow-up: a beat's day from 
      none for the crew's moments; nothing that says what the floor will be) */
   {t:'樓上',showIf:()=>!!fact('up_cats'),beats:[['房東的二樓',BF('up_inspect')],[`${upCatN('mikan')}和${upCatN('ban')}不見的那一晚`,BF('up_cats'),{illus:'up_cats'}],['「……樓上現在還空著嗎？」',BF('up_ask')],['「整層。」',BF('up_lease')]]},
   /* v2.4 rc6 (AM): the two rooms, each its own restaurant story — the big moments only */
-  {t:'大家待的地方',showIf:()=>!!fact('sr_story'),beats:[['《大家待的地方》',BF('sr_story')],['有門的房間',(()=>{const o=srOf();return o&&srBuilt()?o.done:null})()],['開始像他們的地方',(()=>{const o=srOf();return o&&srStage()>=2?o.st2:null})()],['真的有人生活過',(()=>{const o=srOf();return o&&srStage()>=3?o.st3:null})()]]},
+  {t:'大家待的地方',showIf:()=>!!fact('sr_story')||srOn(),beats:[['《大家待的地方》',BF('sr_story')],['有門的房間',(()=>{const o=srOf();return o&&srBuilt()?o.done:null})()],['開始像他們的地方',(()=>{const o=srOf();return o&&srStage()>=2?o.st2:null})()],['真的有人生活過',(()=>{const o=srOf();return o&&srStage()>=3?o.st3:null})()]]},
   {t:'關上門以後',showIf:()=>!!fact('pd_story'),beats:[['《關上門以後》',BF('pd_story')],['一桌人的地方',(()=>{const o=pdOf();return o&&pdBuilt()?o.done:null})()],['「裡面可以嗎？」',BF('pd_back')],['慢慢吃',(()=>{const o=pdOf();return o&&pdStage()>=2?o.st2:null})()],['熟悉的位置',(()=>{const o=pdOf();return o&&pdStage()>=3?o.st3:null})()]]},
  ];return C}
 /* ---- the page ---- */
@@ -6739,7 +6747,7 @@ function roomPhaseCard(kind,n,money,btn){const L=kind==='sr'?SR_PROJ:PD_PROJ;con
  return`<div class="item ${built?'done':''}"><img alt="" src="${iconURL('upfloor')}"><div class="nm">${P.n}${n>1?' '+['','I','II','III'][n]:' I'}《${P.sub}》 ${tag}</div><div class="d">${built?P.done:P.d}</div>${act}</div>`}
 function secUpRooms(money,btn){if(!upTaken())return'';let out='';
  const sr=fact('sr_story')||srOn(),pd=fact('pd_story')||pdOn();if(!sr&&!pd)return'';
- if(sr){out+=`<p class="muted" style="font-size:12px;margin:8px 0 4px">員工休息室——《大家待的地方》之後的事。</p>`;for(let n=1;n<=3;n++){if(n>1&&srStage()<n-1&&srNext()!==n)continue;out+=roomPhaseCard('sr',n,money,btn)}}
+ if(sr){out+=`<p class="muted" style="font-size:12px;margin:8px 0 4px">員工休息室——租下整層的時候一起隔出來的。</p>`;for(let n=1;n<=3;n++){if(n>1&&srStage()<n-1&&srNext()!==n)continue;out+=roomPhaseCard('sr',n,money,btn)}}
  if(pd){out+=`<p class="muted" style="font-size:12px;margin:8px 0 4px">私人包廂——《關上門以後》之後的事。${pdBuilt()?`現在可訂 4–${pdMax()} 位。`:''}</p>`;for(let n=1;n<=3;n++){if(n>1&&pdStage()<n-1&&pdNext()!==n)continue;out+=roomPhaseCard('pd',n,money,btn)}}
  return`<div class="nm" style="font-weight:800;font-size:15px;margin:14px 0 2px">二樓的房間</div>`+out}
 /* ---- the floor plan (the player's 06:36): in 店舖工程 › 二樓, from the day the floor is leased and for good — a large
@@ -6832,13 +6840,13 @@ function upRevealEnd(){upViewClose();$('#peekPill').hidden=true;screenEl.hidden=
    then the project. Staff Room: 《箱子》《又在找位置》《東西放哪》 (rc5) and 《等一下》; then 《大家待的地方》. Private
    Dining: 怡君 「有比較安靜的嗎？」, later a table that is nobody's family (周董, or a family); then 《關上門以後》. ---- */
 V24_ERAS.push(
- {k:'sr',n:'休息室',prev:'up',settle:7,can:()=>upTaken(),begun:()=>fact('sr_story'),done:()=>srBuilt()?{d:srOf().done}:null},
- {k:'pd',n:'包廂',prev:'sr',settle:5,can:()=>srBuilt(),begun:()=>fact('pd_yj'),done:()=>pdBuilt()?{d:pdOf().done}:null});
+ {k:'sr',n:'休息室',prev:'up',settle:0,can:()=>upTaken(),begun:()=>upTaken(),done:()=>srBuilt()?{d:srOf().done}:null},   /* rc8: with the lease (the floor's own story has the need) */
+ {k:'pd',n:'包廂',prev:'sr',settle:12,can:()=>srBuilt(),begun:()=>fact('pd_yj'),done:()=>pdBuilt()?{d:pdOf().done}:null});
 const SP_KINDS=['sp_box','sp_seat','sp_stuff','sp_wait'];
 /* the restaurant has the people for it: eight on the restaurant's list, three of them 熟手 or more (tenure classes —
    never the days counted since v2.3, AQ) */
 function srCrewOK(){const L=(S.crew||[]).filter(m=>crewPool(m)==='restaurant');return L.length>=8&&L.filter(m=>tenureAtLeast(m,'熟手')).length>=3}
-function srStoryReady(){return eraOpen('sr')&&!!fact('up_use')&&S.level>=5&&srCrewOK()&&upKinds(SP_KINDS)>=2&&!srOn()&&!fact('sr_story')}   /* rc6 (10:25): nothing of 怡君's required */
+function srStoryReady(){return eraOpen('up')&&!upTaken()&&!!fact('up_remind')&&S.level>=5&&upKinds(SP_KINDS)>=2&&!fact('sr_story')}   /* rc6 (10:25): nothing of 怡君's required; rc8: before the lease — the crew's want of a place is why she calls (the room comes with the floor) */
 /* what the room has been: two of its traces, or a story's (Private Dining's condition 4) */
 function srLived(){return['plug','seat','cup','yj'].filter(srTrace).length+(fact('sr_food')?1:0)+(fact('sr_fridge')?1:0)}
 function zhouKnown(){const h=story().named&&story().named['周董'];return !!(h&&(h.n||0)>=2)}
@@ -6853,8 +6861,8 @@ STORY_EV.push(
  {k:'sr_story',lane:'major',cls:'A',floor:1,at:['close'],ic:'heart',note:'打烊以後，Jill 想到：好像一直沒有一個地方，是給每天在這裡工作的人待的。',
   when:()=>srStoryReady()&&!v24Fresh('close')&&!upNight()&&!upSearching(),
   run:()=>{R.upCloseSaid=1;factSet('sr_story');v24Cap('sr_story');
-   v24Scene([{who:'',text:'打烊以後，大家陸續下班。後場的椅子上還掛著誰的外套，樓上那張桌子，下午有人坐在那裡扒便當。'},{who:'',text:'Jill 把最後幾張椅子收上桌，站了一會兒。'},
-    {who:'',text:'店裡有客人的位置。'},{who:'',text:'有貓的位置。'},{who:'',text:'有吃完飯還不想走的人待的位置。'},{who:'',text:'好像一直沒有一個地方，是給每天在這裡工作的人待的。'}],()=>{if(R)roomOffer('sr')})}},
+   v24Scene([{who:'',text:'打烊以後，大家陸續下班。後場的椅子上還掛著誰的外套，紙箱上留著有人坐過的印子。'},{who:'',text:'Jill 把最後幾張椅子收上桌，站了一會兒。'},
+    {who:'',text:'店裡有客人的位置。'},{who:'',text:'有貓的位置。'},{who:'',text:'有吃完飯還不想走的人待的位置。'},{who:'',text:'好像一直沒有一個地方，是給每天在這裡工作的人待的。'}])}},
  /* 怡君 with three friends: 「要坐裡面一點嗎？」「有比較安靜的嗎？」「……沒有。」 (M) — no unlock, no suggestion */
  {k:'pd_yj',lane:'v24',cls:'A',floor:2,at:['seat'],
   when:ctx=>isYJ(ctx.g)&&ctx.g.size>=3&&due('pd_yj',null,0,'pd'),
@@ -9405,8 +9413,8 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
   ['鋼琴與予安','鋼琴買來以後，一開始沒有人彈。過一陣子，一位常來 Lounge 的客人——予安——會成為固定的鋼琴師：一個禮拜彈三個晚上。那幾晚開店前的新聞會寫「今晚｜予安在 Lounge 彈琴」，吃完飯留下來的人比較多；每晚付她演奏費 $2,500，結算會列一行「鋼琴演奏」。她不彈的晚上，鋼琴就安靜地放著。'],
   ['晚餐之後','Ken 辦過三次品酒夜以後，會和 Jill 一起做一支酒：「晚餐之後」（JILL\'S KITCHEN × KEN），一支輕盈的紅酒，配 Jill 的招牌菜。酒進來以後就一直在 Lounge 的酒單上，一杯大約 $420；不用研發，也可以在「Lounge 酒單」關掉。'],
   ['帳','結算的晚上會寫「Lounge 幾桌・營業額・吃完留下幾組」。營業額是 Lounge 那幾桌付的錢，不含小費，跟下面「Lounge 今天賣了什麼」的合計一樣；Lounge 的小費另外一行，晚餐桌上配的酒也另外一行。員工那一欄寫調酒師調了幾杯。']]},
- {ic:'🚪',h:'二樓：休息室與包廂',sum:'二樓租下來以後，有兩間房會從店裡的日子裡長出來：先是給每天在這裡工作的人的，再是給一桌人的。',pts:[
-  ['怎麼來的','二樓的房間都不是升級選單裡冒出來的。大家開始在二樓找地方坐一下，打烊後 Jill 會自己看見（《大家待的地方》）；之後有客人想要安靜、不被打擾的位子（《關上門以後》）。企劃都在「店舖工程 › 二樓的房間」，選「之後再說」也不會不見。'],
+ {ic:'🚪',h:'二樓：休息室與包廂',sum:'二樓整層租下來的時候，就一起隔出一間給店裡的人的員工休息室，其他地方先空著；給一桌人的包廂，是之後從店裡的日子裡長出來的。',pts:[
+  ['怎麼來的','二樓的房間都不是升級選單裡冒出來的。店裡的人連坐下來的地方都沒有，打烊後 Jill 自己看見了（《大家待的地方》），才打給房東；所以休息室是跟整層一起來的。之後有客人想要安靜、不被打擾的位子（《關上門以後》），包廂的企劃才會出現在「店舖工程 › 二樓的房間」，選「之後再說」也不會不見。'],
   ['員工休息室','二樓的一間房，給店裡的人換班、等人、坐一下。I 就是完整的房間；II 多一張撞球台和每個人自己的東西；III 多一張按摩椅，是用久了的樣子。有些晚上打烊後會有人打一局撞球。這些都只是他們的日子：沒有分數，也不用管。二樓一次只做一件工程；休息室不是用餐區，不加座位，也不加員工名額。'],
   ['誰會上去','早到的先上去坐一下；店裡不忙時，外場偶爾上去喘口氣；打烊後有人上去坐一下才回家。客人不會進去。不用你安排，也沒有要照顧的數值。'],
   ['私人包廂','二樓臨街窗前最大的那一間，有一扇可以關上的門。I：4–6 位；II：4–8 位；III：4–10 位，最少都是 4 位。上一階用過一陣子才能升級。服務生名額 I 和 III 各 +1。'],
@@ -9493,7 +9501,7 @@ const GUIDE_WHEN={
   ['酒水成本、薪資',h=>h.wine,'薪資'],['鋼琴演奏、品酒夜分潤、',h=>h.L,''],['天氣、Lounge、',h=>h.L,'天氣、'],['、包廂、VIP',h=>h.pd,'、VIP'],
   ['品酒夜和主廚之夜那晚，Lounge 只寫那一行',h=>h.L],['——在 Lounge 或晚餐桌上——',h=>h.L,'——在晚餐桌上——'],
   ['側廳、戶外區、廚房擴建、Lounge、二樓各有自己的一份',h=>h.side&&h.ter&&h.kext&&h.L&&h.up,h=>{const n=[['側廳',h.side],['戶外區',h.ter],['廚房擴建',h.kext],['Lounge',h.L],['二樓',h.up]].filter(x=>x[1]).map(x=>x[0]);return n.length?n.join('、')+(/[A-Za-z]$/.test(n[n.length-1])?' ':'')+(n.length>1?'各有':'有')+'自己的一份':null}],
-  ['大家開始在二樓找地方坐一下',h=>h.sr],['之後有客人想要安靜、不被打擾的位子',h=>h.pd],
+  ['之後有客人想要安靜、不被打擾的位子',h=>h.pd],
   ['二樓是店裡的以後',h=>h.up],['、Lounge、貓',h=>h.L,'、貓'],['予安和鋼琴的故事、',h=>h.L,''],
   ['付酒水、租金',h=>h.wine,'付租金'],['，例如下班以後的一局撞球',h=>h.srB,''],
   ['、側廳／聚餐',h=>h.side,''],['、晚餐／酒單（有 Lounge 以後）',h=>h.L,'']]};

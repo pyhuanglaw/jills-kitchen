@@ -626,10 +626,10 @@ def rc8_the_manual_shows_a_space_once_the_shop_has_it(b, port, target):
     g.ev("showGuide()"); g.page.wait_for_timeout(50); t = g.ev(page)
     check('Lounge：留下來的地方' in t and '吃完再去 Lounge 七折' in t and '配菜的酒' in t and '調酒師' in t, 'Day 81: the Lounge is in the manual')
     check('二樓' not in t and '包廂' not in t and '休息室' not in t, 'Day 81: the second floor is not hers yet, and not in the manual')
-    g.ev("S.rooms.up=1;S.up=S.up||{};showGuide()"); g.page.wait_for_timeout(50); t = g.ev(page)
-    check('二樓：休息室與包廂' in t and '二樓平面圖' in t and '員工休息室' not in t and '私人包廂' not in t, 'the lease: the floor, not yet its rooms')
-    g.ev("S.up.sr={done:S.day};showGuide()"); g.page.wait_for_timeout(50); t = g.ev(page)
-    check('員工休息室' in t and '誰會上去' in t and '私人包廂' not in t, 'the staff room with its own story')
+    g.ev("S.rooms.up=1;const o=srW();o.bought=o.done=S.day;showGuide()"); g.page.wait_for_timeout(50); t = g.ev(page)
+    check('二樓：休息室與包廂' in t and '二樓平面圖' in t and '員工休息室' in t and '誰會上去' in t and '私人包廂' not in t, 'the lease: the floor and its Staff Room (rc8 canon), not yet the Private Dining Room')
+    g.ev("S.up.pd={done:S.day};showGuide()"); g.page.wait_for_timeout(50); t = g.ev(page)
+    check('私人包廂' in t and '最低消費' in t, 'the Private Dining Room with its own story')
     check(not g.errors, g.errors[:3]); g.close()
 
 
@@ -987,10 +987,12 @@ def v24_the_night_cut_short_is_not_counted_and_comes_again(b, port, target):
 @test
 def v24_jill_calls_the_landlord_and_the_whole_floor_is_hers(b, port, target):
     """P2 U5–U7: the reminder needs the night two days back, two kinds of crew pressure and two kinds of customer
-    pressure; the call needs the reminder two days back and a restaurant that can afford to think of it; at closing she
+    pressure; rc8: then 《大家待的地方》 (the crew have nowhere to sit), and the call the day after it, in a restaurant that
+    can afford to think of it; at closing she
     stands at the stair door and calls; the project is offered (開始規劃 / 之後再說) and only then is in 店舖工程; bought,
-    the whole floor is a room (furniture over the next days, traces later), the street's windows warm, no seat and no
-    staff place added; kept across reloads before and after."""
+    the whole floor is hers and the Staff Room with it (rc8, the player's canon: never an empty floor first; furniture on
+    the open floor over the next days, traces later), no seat and no staff place added; kept across reloads before and
+    after."""
     g = Game(b, port, target, seed=284, manual=True, viewport={'width': 390, 'height': 844})
     load_save(g, 'player_day52.json')
     g.ev(UP_DONE_BEFORE)
@@ -1000,12 +1002,14 @@ def v24_jill_calls_the_landlord_and_the_whole_floor_is_hers(b, port, target):
     for k, back in [('sp_seat', 12), ('sp_box', 9), ('up_busy', 7), ('up_small', 5)]:
         _upf(g, k, back)
     check(g.ev("due('up_remind','up_cats',2,'up')&&upKinds(UP_STAFF)>=2&&upKinds(UP_CUST)>=2") is True, 'two of each: someone may say it')
-    _upf(g, 'up_remind', 1)
-    check(g.ev("due('up_ask','up_remind',2,'up')") is False, 'not the next day')
-    _upf(g, 'up_remind', 2); g.ev("S.money=50000")
+    _upf(g, 'up_remind', 2)
+    check(g.ev("due('up_ask','sr_story',1,'up')") is False, 'no call before 《大家待的地方》')
+    _upf(g, 'sr_story', 0)
+    check(g.ev("due('up_ask','sr_story',1,'up')") is False, 'not the same day')
+    _upf(g, 'sr_story', 1); g.ev("S.money=50000")
     check(g.ev("upAskReady()") is False, 'not with an empty till')
     g.ev("S.money=420000")
-    check(g.ev("due('up_ask','up_remind',2,'up')&&upAskReady()") is True, 'ready')
+    check(g.ev("due('up_ask','sr_story',1,'up')&&upAskReady()") is True, 'ready')
     to_service(g)
     g.ev("__botUntil('R.closing!=null',90000,1/30)")
     for _ in range(600):
@@ -1022,8 +1026,9 @@ def v24_jill_calls_the_landlord_and_the_whole_floor_is_hers(b, port, target):
     g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(150)
     check(g.ev("!!fact('up_ask')&&!S.rooms.up&&secUp(1e9,()=>'X').includes('二樓（整層）')") is True, 'kept across a reload, and in 店舖工程')
     caps0 = g.ev("[restaurantCap(),loungeCap(),tablesTotal()]")
-    g.ev("S.money=Math.max(S.money,400000)")
+    g.ev("S.money=Math.max(S.money,600000)")
     check(g.ev("buyUp()") is True, 'bought')
+    check(g.ev("srBuilt()&&roomOpen('staff')&&srOf().done===S.up.lease") is True, 'the Staff Room with the floor, the same day')
     g.ev("hideReveal()")
     st = json.loads(g.ev("JSON.stringify({up:S.rooms.up,everyday:roomOpen('up'),look:(()=>{upLookOpen();const o=roomOpen('up')&&room==='up';upViewClose();$('#peekPill').hidden=true;screenEl.hidden=false;return o})(),shop:secUp(1e9,()=>'').includes('data-act=\"upLook\"'),plan:secUp(1e9,()=>'').includes('upPlanCv'),lease:S.up.lease,furn:S.up.furn,caps:[restaurantCap(),loungeCap(),tablesTotal()],fact:!!fact('up_lease')})"))
     check(st['up'] == 1 and st['everyday'] and st['look'] and st['shop'] and st['plan'] and st['fact'] and st['caps'] == caps0, f'the floor is Jill\'s — an everyday tab (06:36), its plan and its look in 店舖工程; no seat, no staff place: {st}')
@@ -1062,53 +1067,60 @@ def _reload(g):
 
 @test
 def v24_rc6_the_staff_room_comes_from_a_need_and_grows_in_place(b, port, target):
-    """rc6 C–E, AQ, AK, AT: not before the open floor has been lived on a while; 《大家待的地方》 needs the restaurant's
-    people (eight on its list, three of them 熟手 or more — by tenure class, so the legacy crew's two or three counted
-    days do not make them new), two kinds of evidence — nothing of 怡君's (the player's 10:25). The project is offered after it,
-    Phase I is built by the next opening (walls and a door on the floor, the room's own view from then), save/reload
-    while building keeps it; II and III come later, in the same room (the first day never moves), the next day each;
-    a trace that belongs to someone's story only after it happened; one big job on the floor at a time."""
+    """rc8 (the player, 2026-10-03, hard canon: 「玩家第一次正式取得／解鎖二樓時，Staff Room 就必須已經存在並可見……不能先出現
+    一個完全空的二樓，再過幾天才蓋 Staff Room」「PDR 仍然可以是之後才出現的獨立發展」): the crew's want of a place —
+    two kinds of it (the box, the seat), nothing of 怡君's — is 《大家待的地方》, before the lease; the call to the landlord
+    comes after it; the lease's works give the Staff Room with the floor: a room with its own tab on the day the floor is
+    hers, the rest of the floor open. II and III come later, in the same room (the first day never moves), the next day
+    each; a trace that belongs to someone's story only after it happened; the Private Dining Room's era opens days later.
+    A save whose floor was leased empty has the room on load, as of the lease, and the story as history."""
     g = Game(b, port, target, seed=291, manual=True, viewport={'width': 390, 'height': 844})
     load_save(g, 'player_day52.json')
-    check(g.ev("eraOpen('sr')") is False and g.ev("srStoryReady()") is False, 'nothing before the floor is taken')
-    _floor(g, 3)
-    check(g.ev("eraOpen('sr')") is False, 'the open floor first: not three days after the lease')
-    _floor(g, 8)
-    check(g.ev("eraOpen('sr')") is True, 'a week after the lease the era is open')
-    check(g.ev("srCrewOK()") is True and g.ev("(S.crew||[]).filter(m=>crewLegacy(m)&&(m.days||0)<=3).length") >= 8, 'the legacy crew count as the people they are, not as two-day hires')
-    check(g.ev("upKinds(SP_KINDS)") == 2 and g.ev("srStoryReady()") is True, 'two kinds of evidence (the box, the seat): ready')
+    g.ev(FLOOR_TAKEN.replace('LEASE', '8'))
+    # back before the lease: the floor not taken, the call not made
+    g.ev("(()=>{S.rooms.up=0;delete S.up;for(const k of['up_lease','up_use','up_ask','sr_story'])delete story().facts[k];if(!loungeLv())S.rooms.lounge=1})()")   # the floor's era follows the Lounge
+    check(g.ev("upTaken()") is False and g.ev("eraOpen('up')") is True, 'the floor\'s era, the floor not taken')
+    check(g.ev("upKinds(SP_KINDS)") == 2 and g.ev("srStoryReady()") is True, 'two kinds of the want (the box, the seat): 《大家待的地方》 is ready, before the lease')
     g.ev("story().facts.yj_meet=null;delete story().facts.yj_meet")
     check(g.ev("srStoryReady()") is True, "nothing of 怡君's needed (the player's 10:25)")
-    _floor(g, 8)
-    check(g.ev("secUpRooms(1e9,()=>'')") == '', 'nothing in 店舖工程 before the story')
-    _upf(g, 'sr_story', 0)
+    check(g.ev("due('up_ask','sr_story',1,'up')") is False, 'no call to the landlord before it')
+    _upf(g, 'sr_story', 2)
+    check(g.ev("srStoryReady()") is False and g.ev("due('up_ask','sr_story',1,'up')") is True, 'after it, the call')
+    _upf(g, 'up_ask', 1)
     g.ev("S.money=600000")
-    html = g.ev("secUpRooms(1e9,(c,a,k,l)=>`<b data-a=\"${a}\" data-k=\"${k}\">${l}</b>`)")
-    check('員工休息室' in html and 'data-a="buySR" data-k="1"' in html and 'data-k="2"' not in html, f'Phase I offered, not II: {html[:300]}')
+    check(g.ev("UP_PROJ.cost") == 510000 and '員工休息室' in g.ev("UP_PROJ.d") and '員工休息室' in g.ev("UP_PROJ.done"), 'the lease says what it gives')
     d0 = g.ev("S.day")
-    check(g.ev("buyRoomPhase('sr',1)") is True, 'bought')
+    check(g.ev("buyUp()") is True, 'leased')
     g.ev("hideReveal()")
-    check(g.ev("srBuilding()&&!srBuilt()&&!roomOpen('staff')&&upWorks()==='sr'") is True, 'being built tonight; no room yet')
-    check(g.ev("buyRoomPhase('sr',2)") is False, 'one thing at a time')
-    _reload(g)
-    check(g.ev("srOf().done") == d0 + 1 and g.ev("srBuilding()") is True, 'a reload keeps the works')
-    g.ev("S.day+=1;IDLE=null")
-    check(g.ev("srBuilt()&&roomOpen('staff')&&srStage()===1&&!upWorks()") is True, 'the next day: the room')
+    check(g.ev("upTaken()&&srBuilt()&&roomOpen('staff')&&srStage()===1&&!upWorks()") is True, 'the floor and the Staff Room, the same day: no empty floor first')
+    check(g.ev("srOf().done") == d0 and g.ev("upPlanState().sr") == 'built' and g.ev("pdOn()") is False, 'on the plan from the lease; no Private Dining Room')
+    check(g.ev("eraOpen('pd')") is False, 'the Private Dining Room is a later development of its own')
+    html = g.ev("secUpRooms(1e9,(c,a,k,l)=>`<b data-a=\"${a}\" data-k=\"${k}\">${l}</b>`)")
+    check('員工休息室' in html and 'data-a="buySR" data-k="1"' not in html and '租下整層的時候一起隔出來的' in html, f'in 店舖工程: built with the floor, nothing to buy for it: {html[:300]}')
     check(g.ev("srTrace('cup')||srTrace('seat')||srTrace('yj')") is False, 'no one\'s things before their story')
     check(g.ev("String(drawSrKitchenette).includes(\"srTrace('cup')\")&&String(drawSrArmchair).includes(\"srTrace('seat')\")&&String(drawSrTable).includes(\"srTrace('yj')\")") is True, 'the drawings ask for the trace first')
     check(g.ev("buyRoomPhase('sr',2)") is False and g.ev("srWhyNot(2)").startswith('先讓大家用一陣子'), 'Phase II waits a few days')
     g.ev("S.day+=5")
     check(g.ev("buyRoomPhase('sr',2)") is True, 'Phase II')
     g.ev("hideReveal()")
-    check(g.ev("srOf().done") == d0 + 1 and g.ev("srStage()") == 1, 'the same room; tomorrow it shows')
+    check(g.ev("srOf().done") == d0 and g.ev("srStage()") == 1, 'the same room; tomorrow it shows')
     g.ev("S.day+=1")
-    check(g.ev("srStage()") == 2 and g.ev("srOf().done") == d0 + 1, 'II, in place')
-    g.ev("S.day+=7")
+    check(g.ev("srStage()") == 2 and g.ev("srOf().done") == d0, 'II, in place')
+    check(g.ev("eraOpen('pd')") is False, 'still no Private Dining Room era six days after the lease')
+    g.ev("S.day+=7;S.money+=200000")
     check(g.ev("buyRoomPhase('sr',3)") is True, 'Phase III')
     g.ev("hideReveal();S.day+=1")
-    check(g.ev("srStage()") == 3 and g.ev("srOf().done") == d0 + 1, 'III, in place')
+    check(g.ev("srStage()") == 3 and g.ev("srOf().done") == d0, 'III, in place')
+    check(g.ev("eraOpen('pd')") is True, 'twelve days and more after the lease, the Private Dining Room\'s era opens')
     _reload(g)
     check(g.ev("srStage()") == 3 and g.ev("roomOpen('staff')") is True, 'kept across a reload')
+    check(not g.errors, g.errors[:3]); g.close()
+    # the player's Day 87 save: the floor leased on Day 85, empty, before this version — the room is there, as of the lease
+    g = Game(b, port, target, seed=293, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day87_2257.json')
+    st = g.ev("({built:srBuilt(),done:srOf()&&srOf().done,lease:upS().lease,tab:roomOpen('staff'),story:fact('sr_story'),stage:srStage()})")
+    check(st['built'] and st['tab'] and st['done'] == st['lease'] == 85 and st['stage'] == 1, f'Day 87: the Staff Room, as of the lease: {st}')
+    check(st['story'] and st['story'].get('retro') == 1, f'《大家待的地方》 is history (更早以前), never played: {st}')
     check(not g.errors, g.errors[:3]); g.close()
 
 
@@ -1286,14 +1298,20 @@ def v24_rc6_the_floor_and_its_rooms_are_tabs(b, port, target):
     """rc6 navigation (the player's 06:36, which keeps the daily 二樓 that 05:23 had taken away; 05:19): 二樓 is a tab
     once the floor is Jill's — the simple floor with its closed rooms — and the Staff Room and the Private Dining Room
     are tabs of their own; the tab you are in reads the room's whole name (員工休息室, 私人包廂); each room's door goes
-    back out onto the floor; the floor's doors go into the rooms; the keys go over the same tabs; every fixture save
-    loads with no room, no booking, no story fact of these."""
+    back out onto the floor; the floor's doors go into the rooms; the keys go over the same tabs. Every fixture save
+    loads with nothing invented: no room, no booking, no story fact it did not have — except, rc8 (the player's canon: the
+    Staff Room comes with the floor), a save that had leased the floor empty has its Staff Room, as of the lease, and
+    《大家待的地方》 as history (the player's own Day 87 and Day 89 saves)."""
     g = Game(b, port, target, seed=297, manual=True, viewport={'width': 390, 'height': 844})
     for f in sorted(os.listdir(os.path.join(ROOT, 'tests', 'saves'))):
         if not f.endswith('.json'): continue
-        load_save(g, f)
-        st = json.loads(g.ev("JSON.stringify({sr:!!(S.up&&S.up.sr),pd:!!(S.up&&S.up.pd),f:['sr_story','pd_yj','pd_story','sp_wait'].filter(k=>fact(k)),open:roomOpen('staff')||roomOpen('pdr')||roomOpen('up')})"))
-        check(not st['sr'] and not st['pd'] and not st['f'] and not st['open'], f'{f}: nothing of rc6 ({st})')
+        raw = load_save(g, f)
+        had = [k for k in ['sr_story', 'pd_yj', 'pd_story', 'sp_wait'] if ((raw.get('story') or {}).get('facts') or {}).get(k)]
+        st = json.loads(g.ev("JSON.stringify({up:upTaken(),sr:srBuilt(),srDone:srOf()&&srOf().done,lease:S.up&&S.up.lease,pd:!!(S.up&&S.up.pd&&S.up.pd.done!=null),f:['sr_story','pd_yj','pd_story','sp_wait'].filter(k=>fact(k)&&!fact(k).retro),retro:!!(fact('sr_story')&&fact('sr_story').retro),open:[roomOpen('staff'),roomOpen('pdr'),roomOpen('up')]})"))
+        if not st['up']:
+            check(not st['sr'] and not st['pd'] and set(st['f']) <= set(had) and not any(st['open']), f'{f}: nothing invented ({st}, the save had {had})')
+        else:
+            check(st['sr'] and st['srDone'] == st['lease'] and st['open'][0] and st['open'][2] and not st['pd'] and set(st['f']) <= set(had) and (st['retro'] or 'sr_story' in had), f'{f}: the floor leased — its Staff Room, as of the lease ({st}, the save had {had})')
     load_save(g, 'player_day61.json')
     _floor(g, 50)
     check(g.ev("upTaken()&&roomOpen('up')&&roomsOpen().includes('up')") is True, 'the open floor is Jill\'s, and a tab')
