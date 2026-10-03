@@ -29,6 +29,8 @@ LHI = os.path.join(ROOT, 'docs/v24/art/illus_lin_hello_2026-10-03.webp')  # 2026
 DBK = os.path.join(ROOT, 'docs/v24/art/illus_dylan_book_2026-10-03.webp')  # 2026-10-03, supplied by the player: 《一本不一樣的書》 — Dylan from behind at his desk (hoodie, headphones), the dark bar-design book among the exam books, Jill looking at it
 LVW = os.path.join(ROOT, 'docs/v24/art/illus_lin_viewing_2026-10-03.webp')  # 2026-10-03, supplied by the player: 《看看》 — Madame Lin's own bar before opening (terrazzo, the old bar, red stools, the turntable), Madame Lin showing Jill in, Evan polishing a glass behind the bar
 LSG = os.path.join(ROOT, 'docs/v24/art/illus_lin_sign_2026-10-03.webp')  # 2026-10-03, supplied by the player: 《簽約》 — the same bar, closed, in the morning: the contract, the pen and the keys on the bar top, Jill signing, Madame Lin beside her, Evan, Dylan from behind
+QTF = os.path.join(ROOT, 'docs/v24/art/illus_qt_first_2026-10-03.webp')  # 2026-10-03, supplied by the player: 《今天喝？》 — Dylan's first drink at The Lounge's bar, a glass in front of him, Evan behind the bar polishing a glass
+QTM = os.path.join(ROOT, 'docs/v24/art/illus_qt_more_2026-10-03.webp')   # 2026-10-03, supplied by the player: 《最近比較常》 — the bar after closing: 阿拓 pours for 沈晴, 予安 beside them, Evan behind the bar, Dylan with his glass
 # key -> (sheet, box). Boxes chosen by eye on the sheets; 4:3 is enforced by a centered crop of the box.
 ART = {
     'sophie_mia_leave':  (SML, (15, 0, 1380, 1024)),    # 《一起回家》 — Sophie and Mia arm in arm on the way out, the cat on the counter behind them (the player's full picture, 2026-10-01)
@@ -55,6 +57,8 @@ ART = {
     'dylan_book':        (DBK, (0, 0, 1448, 1086)),      # rc8 illustration 《一本不一樣的書》 — the book on the exam books; Dylan's face never shown (the player's picture, whole)
     'lin_viewing':       (LVW, (0, 0, 1448, 1086)),      # rc8 illustration 《看看》 — her bar, Evan behind it (the player's picture, whole)
     'lin_sign':          (LSG, (0, 0, 1448, 1086)),      # rc8 illustration 《簽約》 — the contract, the pen, the keys; Dylan's face never shown (the player's picture, whole)
+    'qt_first':          (QTF, (0, 0, 1448, 1086)),      # rc8 illustration 《今天喝？》 — Dylan at The Lounge's bar, Evan behind it (the player's picture, whole)
+    'qt_more':           (QTM, (0, 0, 1448, 1086)),      # rc8 illustration 《最近比較常》 — 阿拓 pours for 沈晴 after closing (the player's picture, whole)
 }
 KEEP = {'up_cats': 760}   # pictures kept whole at their own proportions (height in px); the dialog shows them contained
 def crop43(im, box):
