@@ -90,7 +90,7 @@
 ## 接手：v2.4 rc8.2 還沒發布（2026-10-03 22:30，玩家的用量到上限，週二 16:00 重置）
 
 這一批（玩家定義的 A–K）程式都做完、推上 `wip/lin` 了，只差發布 gate：
-1. 在 cb3470f 跑的完整回歸做到一半（約 80/237）。到那時為止三個失敗都已處理：`cats_use_sofa_by_personality`（147165d 修好，
+1. 在 cb3470f 跑的完整回歸已跑完：233 過、4 個失敗。其中三個已處理：`cats_use_sofa_by_personality`（147165d 修好，
    單獨重跑過）、`phase7_the_arcs_run_on_real_history_and_leave_it_changed`（659fc4f 改成「多的不用圖」，重跑過）、
    `golden_frames`（Jill 的房間生活改了第 1 天晚上，**要重錄**：`python3 tests/run_tests.py --record -k golden_frames`，也看一下
    `golden_scenario`、`cat_personality_fingerprint` 要不要一起重錄，並在報告寫原因）。
