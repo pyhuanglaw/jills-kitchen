@@ -87,6 +87,18 @@
 - Madame Lin 線從新遊戲 Day 1 開始的節奏（模擬是從 Day 30、Day 52 的存檔跑的）。
 - 樾樾打烊後出來等 Jill、Jill 在開店和快打烊時在主廳。
 
+## 接手：v2.4 rc8.2 還沒發布（2026-10-03 22:30，玩家的用量到上限，週二 16:00 重置）
+
+這一批（玩家定義的 A–K）程式都做完、推上 `wip/lin` 了，只差發布 gate：
+1. 在 cb3470f 跑的完整回歸做到一半（約 80/237）。到那時為止三個失敗都已處理：`cats_use_sofa_by_personality`（147165d 修好，
+   單獨重跑過）、`phase7_the_arcs_run_on_real_history_and_leave_it_changed`（659fc4f 改成「多的不用圖」，重跑過）、
+   `golden_frames`（Jill 的房間生活改了第 1 天晚上，**要重錄**：`python3 tests/run_tests.py --record -k golden_frames`，也看一下
+   `golden_scenario`、`cat_personality_fingerprint` 要不要一起重錄，並在報告寫原因）。
+2. 重錄後，在**最後要發布的那個 commit** 上跑完整回歸（全部 237 個，不能跳），全過才發布。
+3. `build_single.py`、`build_artifact.py` → 發布到 https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA → 讀回 → `live_check.py` → 報告
+   （I／T／O 分開）。不打 zip。
+4. 發布後確認玩家最新存檔（Day 89）還能「繼續營業」，Day 86 存檔讀檔時二樓有員工休息室（發布前已在本機確認過兩者）。
+
 ## 下次發布前
 
 照 `docs/RELEASE_CHECKLIST.md`：這一批要求做完 → 完整回歸（在要發布的 commit 上）→ 手冊檢查與 GUIDE 戳記 → 繁體掃描 →
