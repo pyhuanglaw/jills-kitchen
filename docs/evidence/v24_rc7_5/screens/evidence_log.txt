@@ -1,0 +1,11 @@
+01 t=2.2 going to the window, Jill at (222,310)
+02 t=3.23 stopped, looking at the pot
+03 t=4.27 the shutter (the flash)
+   the frame {'x': 63.72, 'y': 0, 'w': 236, 'h': 177, 'cats': 1}, cats in it: 1
+05 t=10.03 lines vs coach (y ranges): 601-677,683-759 / coach 768-817
+the log: ["17:08 Jill：你拿我的相機幹嘛？","17:11 Dylan：拍妳。","17:14 Jill：我根本沒在看。","17:17 Dylan：我知道。","17:23 Jill：牠也在。","17:26 Dylan：嗯。"]
+album[0]: {"id":"p1_first","kind":"first","day":1,"clock":"17:07","cap":"第一天","keep":false,"first":1}
+the day: phase summary, guests 14
+errors: []
+Day 74: album 184 -> 185, S.firstPhoto {"day":1,"retro":1}
+errors: []
