@@ -29,10 +29,13 @@
 - 店主手冊只寫店裡已經有的空間（「每個空間等他出現才出現在說明書吧」）：`GUIDE_WHEN`。新遊戲的手冊是 14 節 101 項，沒有 Lounge、
   二樓、側廳、露天；Day 81 存檔有 Lounge、沒有二樓（她還沒租）。「VIP 卡」搬到「招待與熟客」、「配菜的酒」搬到「開店與料理」。
   截圖：`docs/evidence/v24_rc8_next/guide_gate_*.png`。新測試 `rc8_the_manual_shows_a_space_once_the_shop_has_it`。
+- Jill 在房間自己找事做（電視、手遊、跟先生聊天、看他在忙什麼、傳訊息、叫貓）：營業中的休息和打烊後都有。順手修了電視推過去時
+  會被主廳的貓「擋住」的舊 bug（主廳的貓跟房間共用座標）。截圖 `docs/evidence/v24_rc8_next/room_*.png`；新測試
+  `rc8_jill_has_things_to_do_in_her_room`。手冊「Jill 的空檔」「Jill 在房間」已更新。
 
 ## 測試
 
-- 234 個測試（`python3 tests/run_tests.py`；`-k a,b,c` 跑指定的）。rc8 的 gate：252ff1c 上 231 過、2 個失敗都是測試本身，已在
+- 235 個測試（`python3 tests/run_tests.py`；`-k a,b,c` 跑指定的）。rc8 的 gate：252ff1c 上 231 過、2 個失敗都是測試本身，已在
   8f7d6b2 修好並重跑通過。
 - 已知會在單一 seed 上偶爾落差的機率性測試，都在測試註解裡寫了量過的分布（例：`lounge_i_content_bar_food…`、
   `v24_rc6_new_things_are_talked_about`）。

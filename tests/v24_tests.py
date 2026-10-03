@@ -634,6 +634,59 @@ def rc8_the_manual_shows_a_space_once_the_shop_has_it(b, port, target):
 
 
 @test
+def rc8_jill_has_things_to_do_in_her_room(b, port, target):
+    """The player, 2026-10-03: 「Jill有房間後多讓他在房間有事做吧 自動會做的 看閨蜜機電視（可移動的）打手遊 我老婆常常跟網友打pubg
+    或跟老公聊天 看老公在幹嘛 跟貓咪互動」. On a long rest in the service, by herself: a game on her phone (a word to her
+    friends now and then), the rolling TV — she gets up, rolls it to her end of the sofa and sits back down to watch —,
+    a few words with him at his desk, a look over his shoulder, a cat called. Work gets her up at once from any of it:
+    from the game with a word to her friends, from the TV's push with the TV left where it is, off, and no step left
+    half done. The words are bubbles in the room and nothing in the log."""
+    g = Game(b, port, target, seed=871, manual=True)
+    g.click('[data-act=open]'); g.page.wait_for_timeout(100); start_day(g)
+    g.ev("window.__wl=jillWorkload;jillWorkload=()=>0;R.t=R.dur*.3;R.jill.q=[];R.jill.cur=null")
+    acts = g.ev("""(()=>{const seen={},says=[];const log0=(R.log||[]).length;for(let n=0;n<60*30*9;n++){R.jill.q.length=0;R.groups.length=0;if(R.t>R.dur*.8)R.t=R.dur*.3;
+        if(!R.jill.rest&&(R.jill.restCD||0)>R.t)R.jill.restCD=0;if(!R.jill.rest&&R.jill.calm<6)R.jill.calm=6;__tick(1000/30);
+        const J=R.jill,L=LIFE.jill;if(J.rest==='sit'){const k=J.up?'up:'+J.up.k+':'+J.up.ph:L.act;seen[k]=(seen[k]||0)+1}
+        for(const s of HOME_SAY)if(!s.seen&&s.t>=0){s.seen=1;says.push(s.txt)}}
+       return{seen,says,tv:LIFE.tv.at}})()""")
+    seen = acts['seen']
+    check(seen.get('game', 0) > 0 and any(s in acts['says'] for s in ['我這邊有人。', '左邊左邊！', '等我，我在補血。', '我倒了，救我。', '你們先跳，我跟著。', '我沒子彈了。', '這圈好小。', '車給我開。']), f'a game on her phone, a word to her friends: {seen}')
+    check(seen.get('chat', 0) + seen.get('up:peek:do', 0) > 0, f'a word with him at his desk, or a look at his screen: {seen}')
+    check(len(set(seen)) >= 6, f'more than one thing to do: {seen}')
+    # work gets her up: from the game, and from the TV's push
+    g.ev("(()=>{const J=R.jill,L=LIFE.jill;if(!J.rest){const p=freeJillPos();startRest(p);J.x=L.x=JPOS[p].x;J.y=SOFA.front+10;J.rest='go';J.tx=null}})()")
+    for _ in range(40):
+        if g.ev("R.jill.rest==='sit'&&!R.jill.up"): break
+        g.ev("__tick(1000/30)")
+    g.ev("(()=>{const L=LIFE.jill;L.act='game';L.t=30;HOME_SAY.length=0;endRest()})()")
+    check(any(s in g.ev("HOME_SAY.map(s=>s.txt)") for s in ['我先下了，店裡有事。', '等我一下，有客人。', '你們先打，我等等回來。']), 'up from the game: a word to her friends')
+    g.ev("(()=>{const J=R.jill,L=LIFE.jill;LIFE.tv.at='park';LIFE.tv.tried=0;LIFE.tv.x=TV_PARK.x;LIFE.tv.y=TV_PARK.y;J.restCD=0;const p=freeJillPos();startRest(p);J.x=JPOS[p].x;J.y=SOFA.front+10})()")
+    for _ in range(60):
+        g.ev("__tick(1000/30)")
+        if g.ev("R.jill.rest==='sit'"): break
+    # the TV (a cat on her lap keeps her where she is, so on this seed's rest she never chose it): she rolls it over and watches
+    g.ev("(()=>{const J=R.jill,L=LIFE.jill;L.t=0;restUpStart(J,L,'tv')})()")
+    tv = g.ev("(()=>{const ph=new Set();let n=0;while(n<1500&&R.jill.rest==='sit'&&!(LIFE.jill.on&&LIFE.jill.act==='tv')){R.jill.q.length=0;R.groups.length=0;__tick(1000/30);if(R.jill.up)ph.add(R.jill.up.ph);n++}return{ph:[...ph],act:LIFE.jill.act,on:LIFE.jill.on,at:LIFE.tv.at,tvOn:LIFE.tv.on,n}})()")
+    check(tv['act'] == 'tv' and tv['on'] and tv['at'] == 'use' and tv['tvOn'] and {'go', 'push', 'back'} <= set(tv['ph']), f'she gets up, rolls the TV to her end of the sofa, sits back down and watches: {tv}')
+    g.ev("(()=>{const J=R.jill,L=LIFE.jill;endRest();LIFE.tv.at='park';LIFE.tv.tried=0;LIFE.tv.x=TV_PARK.x;LIFE.tv.y=TV_PARK.y;J.restCD=0;const p=freeJillPos();startRest(p);J.x=JPOS[p].x;J.y=SOFA.front+10})()")
+    for _ in range(60):
+        g.ev("__tick(1000/30)")
+        if g.ev("R.jill.rest==='sit'"): break
+    g.ev("(()=>{const J=R.jill,L=LIFE.jill;L.t=0;restUpStart(J,L,'tv')})()")
+    for _ in range(400):
+        if g.ev("!!(R.jill.up&&R.jill.up.ph==='push'&&LIFE.tv.at==='moving')"): break
+        g.ev("__tick(1000/30)")
+    check(g.ev("LIFE.tv.mover==='jill'"), 'she is rolling the TV')
+    g.ev("endRest()")
+    st = g.ev("({up:R.jill.up,mover:LIFE.tv.mover,at:LIFE.tv.at,on:LIFE.tv.on,sofa:R.jill.sofa,rest:R.jill.rest})")
+    check(st == {'up': None, 'mover': None, 'at': 'park', 'on': False, 'sofa': False, 'rest': None}, f'up mid-push: the TV where she left it, off; nothing half done: {st}')
+    n = g.ev("(()=>{let n=0;while(n<400&&R.jill.room!=='main'){__tick(1000/30);n++}return n})()")
+    check(g.ev("R.jill.room") == 'main', f'and she goes back out to work ({n} frames)')
+    g.ev("jillWorkload=__wl")
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
 def v24_the_day_is_held_for_the_beat_its_people_came_for(b, port, target):
     """Pacing (measured on the Day 52 save): when the schedule brings someone for a due v2.4 major beat, that beat keeps
     a major slot until it plays or until 85% of the service; another story's major that comes up while every free slot

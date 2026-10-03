@@ -1936,6 +1936,8 @@ function drawPerson(c,x,y,L,o){o=o||{};const s=(o.s||1)*(o.pscale===undefined?PS
  if(o.hold==='fan'){/* 2.1: a paper fan, waved on a hot day */const t=performance.now()/1000;const dir=o.flip?-1:1;c.save();c.translate(dir*8,hy+2);c.rotate(dir*(-.5+Math.sin(t*9+x)*.35));c.fillStyle='#8A6A42';rr(c,-.8,0,1.6,7,.8);c.fill();c.fillStyle='#F4DFA9';c.beginPath();c.moveTo(0,0);c.arc(0,0,7.5,Math.PI*1.15,Math.PI*1.85);c.closePath();c.fill();c.strokeStyle='rgba(120,90,50,.45)';c.lineWidth=.5;for(let k=0;k<5;k++){const a=Math.PI*1.15+k*Math.PI*.175;c.beginPath();c.moveTo(0,0);c.lineTo(Math.cos(a)*7.5,Math.sin(a)*7.5);c.stroke()}c.fillStyle='#D4553A';circ(c,-1.5,-5,1.2);c.restore()}
  else if(o.hold==='wine'){/* rc7: a glass of red held up — Ken hosting */const hy2=by+5;c.fillStyle='rgba(236,240,244,.6)';c.beginPath();c.moveTo(4.2,hy2-6.5);c.quadraticCurveTo(4,hy2-1.6,6.6,hy2-1.4);c.quadraticCurveTo(9.2,hy2-1.6,9,hy2-6.5);c.closePath();c.fill();c.fillStyle='#8E1F33';c.beginPath();c.moveTo(4.4,hy2-3.8);c.quadraticCurveTo(4.4,hy2-1.8,6.6,hy2-1.6);c.quadraticCurveTo(8.8,hy2-1.8,8.8,hy2-3.8);c.closePath();c.fill();c.strokeStyle='rgba(236,240,244,.85)';c.lineWidth=.6;c.beginPath();c.moveTo(6.6,hy2-1.4);c.lineTo(6.6,hy2+2.2);c.stroke();c.fillStyle=skin;rr(c,4.8,hy2+1.4,3.8,2.8,1.4);c.fill()}
  else if(o.hold==='mug'){/* v2.2 Q++: a cream mug with a cat on it, held in both hands */const hy2=by+9.5;c.fillStyle='#F4EFE4';rr(c,-3.4,hy2-3.6,6.8,6.4,1.4);c.fill();c.strokeStyle=OL;c.lineWidth=.5;c.stroke();c.strokeStyle='#F4EFE4';c.lineWidth=1.3;c.beginPath();c.arc(4,hy2-.4,1.8,-1.3,1.3);c.stroke();c.fillStyle='#4A3A30';circ(c,-.6,hy2-.2,1.2);c.beginPath();c.moveTo(-1.7,hy2-.6);c.lineTo(-1.5,hy2-2);c.lineTo(-.6,hy2-1.1);c.fill();c.beginPath();c.moveTo(.5,hy2-.6);c.lineTo(.3,hy2-2);c.lineTo(-.6,hy2-1.1);c.fill();c.fillStyle=skin;rr(c,-7.6,hy2-1.4,4.6,3.2,1.6);c.fill();rr(c,3,hy2-1.4,4.6,3.2,1.6);c.fill()}
+ else if(o.hold==='game'){/* rc8: a game on her phone, held sideways in both hands, the thumbs going */const hy2=by+9;const t=performance.now()/1000;c.save();c.translate(0,hy2);c.fillStyle='#24242A';rr(c,-6.6,-4.6,13.2,6.4,1.6);c.fill();c.strokeStyle=OL;c.lineWidth=.5;c.stroke();const gg=c.createLinearGradient(0,-3.8,0,1.2);gg.addColorStop(0,'#9EC3D8');gg.addColorStop(.55,'#B9C98E');gg.addColorStop(1,'#8E9A62');c.fillStyle=gg;c.fillRect(-5.6,-3.8,11.2,4.8);c.fillStyle='rgba(60,50,30,.6)';c.fillRect(-5.6+((t*3)%10),-1.2,.9,1.6);if(Math.sin(t*7+x)>.85){c.fillStyle='#FFE08A';circ(c,1.5,-1.6,.7)}c.restore();
+  c.fillStyle=skin;const th=Math.sin(t*11+x)*.5;rr(c,-10.6,hy2-2.6,5,3.4,1.7);c.fill();rr(c,5.6,hy2-2.6,5,3.4,1.7);c.fill();circ(c,-6.2,hy2-1+th,1.6);circ(c,6.2,hy2-1-th,1.6)}
  else if(o.hold&&o.hold!=='camera'){const ph=o.hold==='phone';const hy2=by+9;c.save();c.translate(0,hy2);c.rotate(-.1);c.fillStyle=ph?'#2A2A2E':'#F2EFE8';rr(c,-4.6,-5,9.2,ph?6.6:8.6,1.2);c.fill();c.strokeStyle=OL;c.lineWidth=.5;c.stroke();c.fillStyle=ph?'#9FD8F5':'#FBFAF6';c.fillRect(-3.7,-4,7.4,ph?4.7:6.6);if(ph){c.fillStyle='rgba(255,255,255,.25)';c.fillRect(-3.7,-4,2.2,4.7)}else{c.fillStyle='rgba(0,0,0,.2)';for(let k=0;k<4;k++)c.fillRect(-2.8,-2.7+k*1.5,5.6-(k===3?2.2:0),.6)}c.restore();
   c.fillStyle=skin;const rh=o.flipPage?-2.4:0;rr(c,-9.4,hy2-1,5,3.4,1.7);c.fill();rr(c,4.4,hy2-1+rh,5,3.4,1.7);c.fill();circ(c,-5.4,hy2+1.4,2.2);circ(c,5.4,hy2+1.4+rh,2.2)}
  if(L.hs===4&&o.me){/* v2.2 Q+: her hair is pulled back into a low ponytail that falls over her shoulder — drawn over the
@@ -5816,7 +5818,9 @@ function jillWorkload(){if(!R||R.closing!=null)return 9;const J=R.jill;let w=0;
  for(const s0 of R.slots){if(s0.broken)w+=2;if(s0.job&&!chefHandles(s0))w++}
  if(R.thief||R.insp)w+=3;return w}
 function startRest(pos){const J=R.jill,L=LIFE.jill;J.rest='go';J.restPos=pos;L.pos=pos;L.reserved=true;L.on=false;L.face=JPOS[pos].face;L.legs=0;L.legTarget=0;L.act=null;L.petCat=null;L.hat=false;J.troom='home';J.tx=JPOS[pos].x;J.ty=SOFA.front+10;J.idle=0}   /* rc7.3: her rest is in her own room (18:53 §6) */
-function endRest(){const J=R.jill,L=LIFE.jill;if(!J.rest)return;const was=L.on;const x=L.x;J.rest=null;J.sofa=false;L.on=false;L.reserved=false;L.pos=null;L.act=null;L.petCat=null;L.hat=false;if(was){J.x=x;J.y=SOFA.front+12}J.tx=null;J.ty=null;J.moving=false;J.restCD=R.t+rand(25,45);J.idle=0;J.calm=0;
+function endRest(){const J=R.jill,L=LIFE.jill;if(!J.rest)return;if(L.on&&L.act==='game')roomSayJ(L,pick(ROOM_LINES.quit));/* rc8: up from the game: a word to her friends */
+ {const tv=LIFE.tv;if(J.up){if(tv.mover==='jill'){tv.mover=null;tv.path=null;tv.at='park';L.walking=false;L.after=null}J.up=null}tv.on=false;if(tv.at==='use')tv.at='park'}   /* rc8: the TV stays where she left it, off */
+ const was=L.on;const x=L.x;J.rest=null;J.sofa=false;L.on=false;L.reserved=false;L.pos=null;L.act=null;L.petCat=null;L.hat=false;if(was){J.x=x;J.y=SOFA.front+12}J.tx=null;J.ty=null;J.moving=false;J.restCD=R.t+rand(25,45);J.idle=0;J.calm=0;
  for(const c of CATS||[])if(c.sofa&&c.sofa.kind==='lap'&&c.sofaOn)leaveSofa(c)}
 /* rc8 (the player, 2026-10-03: 「你就設定jill開店和關店都會在主廳歡迎和送客」): the first tenth of the service and its end
    (from 88%) are hers in the Main Hall — welcoming the first tables, seeing the last ones off; she rests only in between,
@@ -5825,12 +5829,74 @@ const JILL_HOST=[.1,.88];
 function restTick(dt){const J=R.jill,L=LIFE.jill;L.sinceSit+=dt;L.t-=dt;if(L.gazeT>0)L.gazeT-=dt;if(L.flip>0)L.flip-=dt;if(L.bobT>0)L.bobT-=dt;
  if(L.act==='read'){L.flipT-=dt;if(L.flipT<=0){L.flipT=rand(5,13);L.flip=.35}}
  J.restChk=(J.restChk||0)+dt;if(J.restChk>.5){J.restChk=0;if(J.q.length||jillWorkload()>0||R.t>=R.dur*JILL_HOST[1]){endRest();return}}
+ if(J.up){restUpTick(J,L,dt);return}
+ roomActTick(L,dt);if(LIFE.tv.on&&!LIFE.tv.mover)tvUpd(dt);   /* the TV goes off a while after nobody watches */
  if(L.t<=0){const lap=(CATS||[]).find(c=>c.sofa&&c.sofa.kind==='lap'&&c.sofaOn);const near=sofaCats().filter(c=>Math.abs(c.x-L.x)<46);
-  const W=[['read',L.last==='read'?1.5:3],['idle',L.last==='idle'?1:2],['look',2]];if(near.length&&L.act!=='pet')W.push(['pet',lap?4:3]);
-  const k=wpick(W,o=>o[1])[0];L.last=L.act;L.act=k;
+  const W=[['read',L.last==='read'?1.5:3],['idle',L.last==='idle'?1:2],['look',1.2]];if(near.length&&L.act!=='pet')W.push(['pet',lap?4:3]);roomActWeights(L,W,'rest');
+  const k=wpick(W,o=>o[1])[0];if(L.act==='game')roomGameEnd(L);L.last=L.act;L.act=k;
   if(k==='read'){L.t=rand(10,25);L.flipT=rand(4,10)}else if(k==='idle')L.t=rand(5,12);
-  else if(k==='look'){L.t=rand(2.5,4);const g=R.groups.find(q=>q.table!=null&&['reading','wait','eat'].includes(q.state));L.gazeT=L.t;L.gazeX=g?R.tables[g.table].x:(L.face>0?L.x+80:L.x-80)}
-  else if(k==='pet'){L.petCat=pick(near);L.t=rand(2.5,4.5);L.petCat.hearts.push({x:0,y:-24,t:0});L.petCat.happy=Math.max(L.petCat.happy||0,1.5);L.petCat.quiet=1}}}
+  else if(k==='look'){L.t=rand(2.5,4);L.gazeT=L.t;L.gazeX=roomLookX(L)}
+  else if(k==='pet'){L.petCat=pick(near);L.t=rand(2.5,4.5);L.petCat.hearts.push({x:0,y:-24,t:0});L.petCat.happy=Math.max(L.petCat.happy||0,1.5);L.petCat.quiet=1}
+  else if(k==='tv'&&!(LIFE.tv.at==='use'&&tvUsable())){restUpStart(J,L,'tv')}
+  else if(k==='peek'){restUpStart(J,L,'peek')}
+  else roomActStart(L,k,'rest')}}
+/* ---- rc8 (the player, 2026-10-03: 「Jill有房間後多讓他在房間有事做吧 自動會做的 看閨蜜機電視（可移動的）打手遊 我老婆常常跟網友打
+   pubg 或跟老公聊天 看老公在幹嘛 跟貓咪互動」): what she does in her own room, by herself — on a rest in the service and
+   in the evening alike. Besides the e-book, the phone and the cats on the sofa: the rolling TV (in the service too she
+   rolls it over herself), a game on her phone with her friends online (a word now and then into the mic), a few words
+   with him at his desk, a look over his shoulder at what he is doing, a text to him when he is not in the room, and a
+   cat called over (they do not always come). The words are bubbles in the room only — for whoever looks in; nothing
+   in the log, no name on him. ---- */
+const ROOM_LINES={
+ game:['我這邊有人。','左邊左邊！','等我，我在補血。','我倒了，救我。','你們先跳，我跟著。','我沒子彈了。','這圈好小。','車給我開。'],
+ win:['吃雞了！','欸，我們贏了！'],quit:['我先下了，店裡有事。','等我一下，有客人。','你們先打，我等等回來。'],
+ chat:[[['j','休息一下啦。'],['d','再一頁。'],['j','你上一頁也這樣說。']],[['j','喝水。'],['d','有喝。'],['j','那杯是早上的。']],
+  [['j','你今天念到哪了？'],['d','比昨天多一點。']],[['j','晚上吃什麼？'],['d','妳決定。'],['j','每次都我決定。']],
+  [['j','欸。'],['d','嗯？'],['j','沒事，叫叫看。']],[['j','你背好駝。'],['d','我在用功。'],['j','用功也要坐好。']]],
+ chatPhones:[[['j','你耳機開多大聲？'],['d','……嗯？']]],
+ chatRest:[[['d','外面很忙？'],['j','還好，我偷懶一下。']]],
+ chatNight:[[['j','我今天好累。'],['d','那我念小聲一點。'],['j','你本來就沒出聲。']]],
+ peek:[[['j','在看什麼？'],['d','講義。'],['j','……這是貓的影片。'],['d','休息一下。']],[['j','你全部都畫重點。'],['d','都很重要。']],
+  [['j','你在買什麼？'],['d','沒有啊。'],['j','我看到了。'],['d','那妳不要看到。']],[['j','字好多。'],['d','妳要念嗎？'],['j','不要。']],
+  [['j','（看一眼他的螢幕）'],['d','不要偷看。'],['j','我光明正大看。']]],
+ text:[['貓砂快沒了。','好，我買。'],['等等幫我買牛奶。','好。'],['今天好累。','我等妳。'],['寶寶又在亂叫。','她想妳。']]};
+function roomJY(L){return L.bed?L.y-52:L.on?SOFA.jy-52:(view().jill.y-62)}
+function roomSayJ(L,txt,delay){const J=view().jill;homeSay(L.on||L.bed?L.x:J.x,roomJY(L),txt,delay)}
+function roomSayD(txt,delay){homeSay(HM.chair.x,HM.chair.y-50,txt,delay)}
+function roomTalk(L,lines){const at=homeDylanAtDesk();let t=0;for(const [w,txt] of lines){if(w==='d')roomSayD(txt,t);else roomSayJ(L,txt,t);t+=1.7}if(at){at.turn=1;at.turnT=t+1.2}return t+.8}
+function roomLookX(L){const at=homeDylanAtDesk();if(at&&Math.random()<.6)return HM.chair.x;const c=(CATS||[]).filter(o=>o.away==='home'&&!o.sofa);return c.length?pick(c).ax:(HM.win.x0+HM.win.x1)/2}
+function roomCallable(){return (CATS||[]).filter(c=>c.away==='home'&&c.st==='home'&&!c.sofa&&!c.upTo&&!c.homeSleep&&!c.toJill&&!c.waitJill)}
+/* the weights, beside the ones she always had; `where`: 'rest' (a rest in the service), 'sofa' or 'bed' (the evening) */
+function roomActWeights(L,W,where){const at=homeDylanAtDesk(),tv=LIFE.tv,lap=(CATS||[]).some(c=>c.sofa&&c.sofa.kind==='lap'&&c.sofaOn),t=R?R.t:0,cd=k=>(L.cd&&L.cd[k]||-1)>(R&&phase==='service'?t:LIFE.t);
+ W.push(['game',L.last==='game'?.5:1.3]);
+ if(at&&!cd('chat'))W.push(['chat',1.3]);else if(!at&&!(LIFE.dylan&&(LIFE.dylan.room||'main')==='home')&&!cd('text'))W.push(['text',.9]);
+ if(at&&where!=='bed'&&!cd('peek'))W.push(['peek',.8]);
+ if(where==='rest'&&!cd('tv')&&(tv.at==='use'?tvUsable():(tvUsable()&&!lap&&R.t<R.dur*JILL_HOST[1]-40)))W.push(['tv',L.last==='tv'?.5:1.1]);
+ if(where!=='bed'&&roomCallable().length&&!cd('call'))W.push(['call',1])}
+function roomCD(L,k,s){L.cd=L.cd||{};L.cd[k]=(R&&phase==='service'?R.t:LIFE.t)+s}
+function roomActStart(L,k,where){const ev=where!=='rest';
+ if(k==='game'){L.t=ev?rand(25,60):rand(15,35);L.gameSay=rand(3,8);S.life=S.life||{};S.life.game=(S.life.game||0)+1}
+ else if(k==='text'){const m=pick(ROOM_LINES.text);roomSayJ(L,'📱 '+m[0]);roomSayJ(L,'📱 '+m[1],3.4);L.t=rand(7,12);roomCD(L,'text',ev?60:45)}
+ else if(k==='chat'){const at=homeDylanAtDesk();const pool=ROOM_LINES.chat.concat(at&&!at.off?ROOM_LINES.chatPhones:[],ev?ROOM_LINES.chatNight:ROOM_LINES.chatRest);L.t=roomTalk(L,pick(pool));L.gazeT=L.t;L.gazeX=HM.chair.x;roomCD(L,'chat',ev?70:50)}
+ else if(k==='call'){const c=pick(roomCallable());L.t=rand(2.5,3.5);roomCD(L,'call',40);if(!c)return;roomSayJ(L,catName(c.def)+'，過來。');L.gazeT=L.t;L.gazeX=c.ax;
+  const id=c.def.id;const p=id==='tora'?.9:id==='ban'?.85:id==='mikan'?.6:id==='mei'?.45:.35;if(Math.random()<p){c.hearts.push({x:0,y:-26,t:0});homeSofaJill(c)}else c.aface=(L.x>=c.ax?1:-1)}
+ else if(k==='tv'){const tv=LIFE.tv;tv.on=true;tv.face=L.pos==='R'?1:-1;L.t=ev?rand(30,90):rand(18,40);S.life=S.life||{};S.life.tv=(S.life.tv||0)+1;tvNoticed()}}
+function roomActTick(L,dt){if(L.act==='game'){L.gameSay=(L.gameSay||0)-dt;if(L.gameSay<=0){L.gameSay=rand(9,20);roomSayJ(L,pick(ROOM_LINES.game))}}}
+function roomGameEnd(L){if(Math.random()<.2)roomSayJ(L,pick(ROOM_LINES.win))}
+/* in the service she gets up for two of them — the TV, and a look at his screen — and sits back down where she was */
+function restUpStart(J,L,k){if(k==='peek'&&!homeDylanAtDesk()){L.act='idle';L.t=rand(3,6);return}
+ for(const c of sofaCats())if(c.sofa.kind==='lap')leaveSofa(c);
+ L.act=k==='tv'?'fetch':'up';L.on=false;L.reserved=true;J.sofa=false;J.x=L.x;J.y=SOFA.front+10;J.room='home';J.troom='home';J.face=L.face;
+ const tv=LIFE.tv;J.up={k,ph:'go'};if(k==='tv'){J.tx=tv.x+18;J.ty=tv.y+4}else{J.tx=HM.chair.x-22;J.ty=HM.chair.y+14}roomCD(L,k,k==='tv'?20:90)}
+function restUpTick(J,L,dt){const U=J.up,tv=LIFE.tv;const seat=()=>{U.ph='back';J.tx=JPOS[L.pos].x;J.ty=SOFA.front+10};
+ if(U.ph==='go'||U.ph==='back'){if(stepTo(J,120*dt)){J.tx=null;J.moving=false;
+   if(U.ph==='back'){restUpSit(J,L);return}
+   if(U.k==='tv'){if(tv.mover||tv.at==='use'){seat();return}tv.mover='jill';tv.path=[{x:tv.x,y:tvUsePos().y},{x:tvUsePos().x,y:tvUsePos().y}];tv.wait=0;U.ph='push';J.face=-1}
+   else{U.ph='do';J.face=1;U.t=roomTalk(L,pick(ROOM_LINES.peek))+.6}}else{J.step+=dt*12;J.moving=true}return}
+ if(U.ph==='push'){tvUpd(dt);if(tv.mover==='jill'){J.x=tv.x+18;J.y=tv.y+3;J.face=-1;J.moving=true;J.step=tv.step}else{J.moving=false;L.walking=false;L.after=null;L.moving=false;seat()}return}
+ if(U.ph==='do'){U.t-=dt;if(U.t<=0)seat()}}
+function restUpSit(J,L){const U=J.up;J.up=null;J.sofa=true;J.moving=false;L.on=true;L.reserved=false;L.x=JPOS[L.pos].x;L.y=SOFA.jy;L.face=JPOS[L.pos].face;J.x=L.x;J.y=SOFA.front+10;J.face=L.face;L.sinceSit=0;L.last=U.k;L.bobT=.5;
+ if(U.k==='tv'&&LIFE.tv.at==='use'&&tvUsable()){L.act='tv';roomActStart(L,'tv','rest')}else{L.act='idle';L.t=rand(3,6)}}
 function jillUpd(dt){const J=R.jill;const fire=R.fire>0;if(upSearching()||(R&&R.srFirst)){upJillUpd(dt);return}/* v2.4 P2: the search, the phone call at the stair door */
  J.calm=(J.calm||0)+dt;J.wlChk=(J.wlChk||0)+dt;if(J.wlChk>.5){J.wlChk=0;if(J.cur||J.q.length||jillWorkload()>0)J.calm=0}
  if(J.rest==='sit'){restTick(dt);if(J.rest==='sit')return}
@@ -9200,9 +9266,9 @@ function homeItems(c,now,d){const out=[];const P=(y,f)=>out.push({y,f:()=>f(c)})
  P(352+FY,c=>drawCatTree2(c,now));
  return out}
 /* rc7.3: Jill on the edge of the bed — reading, or just sitting — when the sofa is the cats' tonight, or she would rather */
-function drawJillOnBed(c,now){const L=LIFE.jill;const flip=L.face<0;const read=L.act==='read';
+function drawJillOnBed(c,now){const L=LIFE.jill;const flip=L.face<0;const read=L.act==='read';const hold=read?'reader':L.act==='game'?'game':L.act==='text'?'phone':null;const look=L.gazeT>0?{x:(L.gazeX>=L.x?1:-1)*(flip?-1:1),y:.35}:hold?{x:0,y:.6}:null;
  const expr=LIFE.say.some(q=>q.who==='d'&&q.t>=0&&q.t<q.life)?'amused':(LIFE.t<25&&L.sinceSit<25)?'tired':'soft';
- drawPerson(c,L.x,L.y,JILL_LOOK,{jill:true,me:true,seated:true,s:1.1,bob:Math.sin(now*1.4)*.3,mood:'happy',expr,flip,blink:Math.sin(now*1.7)>.985,hat:false,lounge:{legs:0},hold:read?'reader':null,flipPage:L.flip>0,gaze:read?{x:0,y:.6}:null})}
+ drawPerson(c,L.x,L.y,JILL_LOOK,{jill:true,me:true,seated:true,s:1.1,bob:Math.sin(now*1.4)*.3,mood:'happy',expr,flip,blink:Math.sin(now*1.7)>.985,hat:false,lounge:{legs:0},hold,flipPage:L.flip>0,gaze:look})}
 function drawHomeFloorLamp(c,x,y,d){srShadow(c,x,y+1,9,2.4,.14);c.fillStyle='#CDBFA8';el(c,x,y,8,2.2);c.fillStyle='#BFAE92';c.fillRect(x-.8,y-62,1.6,62);
  c.fillStyle='#F7F1E6';c.beginPath();c.moveTo(x-11,y-60);c.lineTo(x+11,y-60);c.lineTo(x+8,y-76);c.lineTo(x-8,y-76);c.closePath();c.fill();c.strokeStyle=SRC.edge;c.lineWidth=.5;c.stroke();
  if(d>.2){c.fillStyle=`rgba(255,226,160,${.25+d*.35})`;c.beginPath();c.moveTo(x-11,y-60);c.lineTo(x+11,y-60);c.lineTo(x+8,y-62);c.lineTo(x-8,y-62);c.closePath();c.fill()}}
@@ -9397,9 +9463,9 @@ function meowGuest(){if(!R)return null;for(const g of R.groups){if(g.table==null
 function meowGo(c){const g=meowGuest();if(!g){c.st='rest';c.t=2;return}releaseSpots(c);c.guest=g;c.meowGCD=ctime+rand(90,180);const t=R.tables[g.table];catWalk(c,clamp(t.x+rand(-14,14),96,316),Math.min(FB-8,t.y+20),'meowAt')}
 /* a cat's word in the room (小齁's 「喵～」 at Dylan): its own little list, kept moving whatever the hour */
 const HOME_SAY=[];
-function homeSay(x,y,txt){HOME_SAY.push({x,y,txt,t:0,life:2.2})}
-function homeSayTick(dt){for(const s0 of HOME_SAY)s0.t+=dt;for(let i=HOME_SAY.length-1;i>=0;i--)if(HOME_SAY[i].t>=HOME_SAY[i].life)HOME_SAY.splice(i,1);if(HOME_DY.turnT>0){HOME_DY.turnT-=dt;if(HOME_DY.turnT<=0)HOME_DY.turn=0}}
-function drawHomeSay(c){for(const s0 of HOME_SAY){const a=s0.t<.2?s0.t/.2:s0.t>s0.life-.4?(s0.life-s0.t)/.4:1;c.globalAlpha=Math.max(0,a);c.font=`700 6.5px ${FONT}`;const w=c.measureText(s0.txt).width+10;c.fillStyle='#FFFDF7';rr(c,s0.x-w/2,s0.y-8,w,12,6);c.fill();c.beginPath();c.moveTo(s0.x-2.5,s0.y+4);c.lineTo(s0.x+2.5,s0.y+4);c.lineTo(s0.x,s0.y+7.5);c.fill();c.fillStyle='#2E2019';c.textAlign='center';c.textBaseline='middle';c.fillText(s0.txt,s0.x,s0.y-1.6);c.textBaseline='alphabetic';c.globalAlpha=1}}
+function homeSay(x,y,txt,delay){HOME_SAY.push({x,y,txt,t:-(delay||0),life:2.2})}
+function homeSayTick(dt){for(const s0 of HOME_SAY)s0.t+=dt;for(let i=HOME_SAY.length-1;i>=0;i--)if(HOME_SAY[i].t>=HOME_SAY[i].life)HOME_SAY.splice(i,1);if(HOME_DY.turnT>0){HOME_DY.turnT-=dt;if(HOME_DY.turnT<=0)HOME_DY.turn=0}{const D=LIFE.dylan;if(D&&D.turnT>0){D.turnT-=dt;if(D.turnT<=0)D.turn=0}}}
+function drawHomeSay(c){for(const s0 of HOME_SAY){if(s0.t<0)continue;const a=s0.t<.2?s0.t/.2:s0.t>s0.life-.4?(s0.life-s0.t)/.4:1;c.globalAlpha=Math.max(0,a);c.font=`700 6.5px ${FONT}`;const w=c.measureText(s0.txt).width+10;c.fillStyle='#FFFDF7';rr(c,s0.x-w/2,s0.y-8,w,12,6);c.fill();c.beginPath();c.moveTo(s0.x-2.5,s0.y+4);c.lineTo(s0.x+2.5,s0.y+4);c.lineTo(s0.x,s0.y+7.5);c.fill();c.fillStyle='#2E2019';c.textAlign='center';c.textBaseline='middle';c.fillText(s0.txt,s0.x,s0.y-1.6);c.textBaseline='alphabetic';c.globalAlpha=1}}
 /* someone seen from behind, seated (Dylan at his desk): the same proportions as drawPerson's seated figure */
 function drawPersonBack(c,x,y,L,o){o=o||{};const s=(o.s||1)*PSC;c.save();c.translate(x,y);c.scale(s,s);const OL='rgba(60,34,22,.5)';const bob=o.bob||0;const base=-4,hy=base-25+bob,by=base-17+bob;
  const top=L.pat==='cardi'&&L.top2?L.top2:L.top;c.fillStyle=top;c.strokeStyle=OL;c.lineWidth=.6;rr(c,-11,by,22,17,6);c.fill();c.stroke();c.fillStyle='rgba(0,0,0,.08)';c.fillRect(-.4,by+2,.8,14);
@@ -9489,7 +9555,7 @@ function sofaDecide(c){const id=c.def.id;const J=LIFE.jill;
  leaveSofa(c,'decide')}
 /* ---- Jill's evening ---- */
 function lifePlan(){if(LIFE.day===S.day&&LIFE.plan)return;LIFE.day=S.day;LIFE.t=0;LIFE.revealRoll=0;LIFE.say=[];
- LIFE.plan='sofa';const J=LIFE.jill;Object.assign(J,{on:false,bed:false,preferBed:Math.random()<.15,waitTora:0,sawTora:0,reserved:false,pos:null,legs:0,legTarget:0,act:null,last:null,t:0,walking:false,via:null,after:null,sitT:0,catNew:0,sinceSit:0,counted:false,tvFirst:false})}
+ LIFE.plan='sofa';const J=LIFE.jill;Object.assign(J,{on:false,bed:false,preferBed:Math.random()<.15,waitTora:0,sawTora:0,reserved:false,pos:null,legs:0,legTarget:0,act:null,last:null,t:0,walking:false,via:null,after:null,sitT:0,catNew:0,sinceSit:0,counted:false,tvFirst:false,cd:{},gameSay:0})}
 function freeJillPos(){const ivs=seatIvs(null);const ok=p=>ivFree(JPOS[p].x-13,JPOS[p].x+13,ivs);const clearHead=p=>!sofaCats().some(o=>o.sofa.kind==='back'&&Math.abs(o.sofa.x-JPOS[p].x)<20);
  const order=Math.random()<.7?['L','R','M']:['R','L','M'];return order.find(p=>ok(p)&&clearHead(p))||order.find(ok)||null}
 function jillWalk(L,x,y,after,rm){L.tx=x;L.ty=y;L.after=after;L.walking=true;L.via=null;L.troom=rm||L.room||'main';if(!L.room)L.room='main';if(L.troom!==L.room)return;   /* rc7.3: to another room: through its doors (stepTo) */
@@ -9502,23 +9568,23 @@ function jillLife(J,L,dt){const tv=LIFE.tv;
    if(!L.counted){L.counted=true;S.life=S.life||{};S.life.sofa=(S.life.sofa||0)+1}
    for(const c of CATS||[]){if(c.st==='side'){releaseSpots(c);c.st='rest';c.pose='sit';c.t=rand(.4,1.8)}else if(c.st==='walk'&&c.after==='side'){releaseSpots(c);c.after='rest';c.afterT=rand(.5,2)}}}}
  else if(L.act==='toBed'){const b=bedSeat();L.act='standing';jillWalk(L,b.x,b.y+8,'bed','home')}
- else if(L.bed){L.sinceSit+=dt;L.t-=dt;if(L.flip>0)L.flip-=dt;if(L.act==='read'){L.flipT-=dt;if(L.flipT<=0){L.flipT=rand(5,13);L.flip=.35}}if(L.t<=0)bedDecide(L)}
+ else if(L.bed){L.sinceSit+=dt;L.t-=dt;if(L.flip>0)L.flip-=dt;if(L.gazeT>0)L.gazeT-=dt;if(L.act==='read'){L.flipT-=dt;if(L.flipT<=0){L.flipT=rand(5,13);L.flip=.35}}roomActTick(L,dt);if(L.t<=0)bedDecide(L)}
  else if(L.act==='toSofa'){const pos=L.reserved&&L.pos?L.pos:(L.preferBed?null:freeJillPos());if(!pos){lifeNoRoom();return}L.pos=pos;L.reserved=true;L.face=JPOS[pos].face;
   if(!L.tvFirst&&tv.at==='park'&&!tv.mover&&tv.tried<2&&Math.random()<.4){L.tvFirst=true;L.act='standing';jillWalk(L,tv.x+18,tv.y+4,'grabTV','home');return} /* on her way: bring the TV over first */
   jillWalk(L,JPOS[pos].x,SOFA.front+10,'sit','home')}
  else if(L.on){L.sinceSit+=dt;L.t-=dt;
   /* legs: stretch out when the seat beside her is free, pull them in when someone needs the room */
   const want=L.legTarget;const room=ivFree(L.face>0?L.x+3:L.x-3-42,L.face>0?L.x+3+42:L.x-3,seatIvs(null).filter(v=>v.who!=='jill'&&v.who!=='legs'));
-  if(L.legTarget===0&&room&&['read','idle','tv'].includes(L.act)&&Math.random()<dt*.04)L.legTarget=1;
+  if(L.legTarget===0&&room&&['read','idle','tv','game','text'].includes(L.act)&&Math.random()<dt*.04)L.legTarget=1;
   const target=(L.act==='fetch'||L.act==='standing')?0:want;if(Math.abs(L.legs-target)>.01){const st=L.legs<target?1.6:2.2;L.legs=L.legs<target?Math.min(target,L.legs+dt*st):Math.max(target,L.legs-dt*st)}
   if(L.gazeT>0)L.gazeT-=dt;if(L.flip>0)L.flip-=dt;if(L.bobT>0)L.bobT-=dt;
   L.settleT-=dt;if(L.settleT<=0){L.settleT=rand(25,50);L.bobT=.5}
-  if(L.act==='read'){L.flipT-=dt;if(L.flipT<=0){L.flipT=rand(5,13);L.flip=.35}}
+  if(L.act==='read'){L.flipT-=dt;if(L.flipT<=0){L.flipT=rand(5,13);L.flip=.35}}roomActTick(L,dt);
   if(L.act==='settle'&&L.t<=0){L.legTarget=room&&Math.random()<.85?1:0;jillDecide(L)}
   else if(L.act==='wantTV'){if(tv.mover){L.act='waitTV';L.t=30}else if(L.t<=0){if(!CATS.some(c=>c.sofa&&c.sofa.kind==='lap')&&tvUsable()&&tv.tried<2){L.act='fetch';L.fetch='legsIn';L.t=0}else{L.last='tv';L.act=null;jillDecide(L)}}}
   else if(L.act==='waitTV'){if(tv.at==='use'&&!tv.mover){tv.on=true;L.act='tv';L.t=rand(30,90);S.life.tv=(S.life.tv||0)+1}else if(!tv.mover||L.t<=0){L.act=null;L.last='tv';jillDecide(L)}}
-  else if(L.act==='fetch'){if(L.fetch==='legsIn'&&L.legs<.05){L.fetch='stand';L.on=false;L.reserved=true;L.y=SOFA.front+10;L.act='standing';jillWalk(L,tv.x+18,tv.y+4,'grabTV','home')}}
-  else if(['read','idle','tv','pet'].includes(L.act)&&L.t<=0){if(L.act==='pet'&&L.petCat)L.petCat=null;jillDecide(L)}
+  else if(L.act==='fetch'){if(L.fetch==='legsIn'&&L.legs<.05){L.fetch='stand';L.on=false;L.reserved=true;L.y=SOFA.front+10;L.act='standing';if(L.fetchTo==='peek'){L.fetchTo=null;jillWalk(L,HM.chair.x-22,HM.chair.y+14,'peek','home')}else jillWalk(L,tv.x+18,tv.y+4,'grabTV','home')}}
+  else if(['read','idle','tv','pet','game','text','chat','call'].includes(L.act)&&L.t<=0){if(L.act==='pet'&&L.petCat)L.petCat=null;jillDecide(L)}
   if(L.act==='tv'&&!(tv.on&&tv.at==='use')){L.act=null;jillDecide(L)}
   if(L.catNew>0&&L.act!=='pet'&&L.act!=='settle'&&Math.random()<dt*.25){const near=sofaCats().filter(c=>Math.abs(c.x-L.x)<46);if(near.length){L.petCat=pick(near);L.act='pet';L.t=rand(2,4);L.petCat.hearts.push({x:0,y:-24,t:0});if(Math.random()<.5)L.petCat.happy=Math.max(L.petCat.happy,1.5),L.petCat.quiet=1}L.catNew=0}}
  else if(L.act==='wrap'){L.face=1;L.wrapT=(L.wrapT||0)-dt;if(L.wrapT<=0){const T=catBy('tora');const here=T&&T.waitJill&&!T.away&&T.st==='rest'&&!T.moving;
@@ -9526,6 +9592,7 @@ function jillLife(J,L,dt){const tv=LIFE.tv;
    if(here&&!L.sawTora){L.sawTora=1;L.face=T.x>=L.x?1:-1;T.hearts.push({x:0,y:-26,t:0});T.happy=Math.max(T.happy||0,1.6);L.wrapT=1.4;return}   /* she sees him; then the two of them go */
    L.act='toSofa'}}
  else if(L.act==='reveal'){L.revealT-=dt;if(L.revealT<=0){L.act='toSofa';const D=LIFE.dylan;if(D){D.goHome=true;D.state='think';D.t=1.4}}}   /* 「老公，走了。」「好。」 — then home, the two of them */
+ else if(L.act==='peeking'){L.t-=dt;if(L.t<=0)L.act='toSofa'}   /* rc8: behind his chair, then back to her seat */
  else if(L.act==='standing'&&!L.walking){/* stood up but has nothing to do: sit back down */L.act='toSofa'}
  /* mirror into the view's Jill so everything that reads view().jill sees her where she is */
  J.x=L.x;J.y=L.y;J.face=L.face;J.moving=L.walking||L.act==='pushing';J.step=L.step;J.sit=L.on||!!L.bed;J.sofa=L.on?L.pos:(L.bed?'bed':null);J.room=L.room||'main';J.troom=J.room}
@@ -9535,21 +9602,25 @@ function jillArrive(L,a){const tv=LIFE.tv;
  else if(a==='back'){L.act='toSofa'}
  else if(a==='bed'){const b=bedSeat();L.bed=true;L.x=b.x;L.y=b.y;L.face=1;L.act='settle';L.t=rand(1.5,3);L.sinceSit=0;if(!L.counted){L.counted=true;S.life=S.life||{};S.life.bed=(S.life.bed||0)+1}}
  else if(a==='wrap'){L.act='wrap'}
+ else if(a==='peek'){if(!homeDylanAtDesk()){L.act='toSofa';return}L.act='peeking';L.face=1;L.t=roomTalk(L,pick(ROOM_LINES.peek))+.6}
  else if(a==='atHim'){const D=LIFE.dylan;if(!D||S.dylan.stage!==2){L.act='toSofa';return}L.act='reveal';L.revealT=5.6;L.face=D.x>=L.x?1:-1;D.state='reveal';D.face=L.x>=D.x?1:-1;doReveal()}}
-function jillDecide(L){const tv=LIFE.tv,D=LIFE.dylan;const W=[];const add=(k,w)=>{if(w>0)W.push([k,w])};
+function jillDecide(L){const tv=LIFE.tv,D=LIFE.dylan;const W=[];const add=(k,w)=>{if(w>0)W.push([k,w])};const prev=L.act;
  add('read',L.last==='read'?2:4);add('idle',L.last==='idle'?1.2:2.4);
  const lap=CATS.some(c=>c.sofa&&c.sofa.kind==='lap');const tvOk=tvUsable()&&!(tv.at!=='use'&&lap&&!(D&&!D.onSofa&&S.dylan.stage>=1));
  add('tv',tvOk?(L.last==='tv'?1.2:2.4)*(tv.at==='use'?1.3:1)*(D&&D.onSofa&&S.dylan.stage>=3?1.4:1):0);
+ roomActWeights(L,W,'sofa');   /* rc8: her room's other evenings */
  if(revealDue()&&L.on&&L.sinceSit>3){W.length=0;add('callHim',1)}
- const k=wpick(W,o=>o[1])[0];L.last=k;L.act=k;
+ const k=wpick(W,o=>o[1])[0];if(prev==='game')roomGameEnd(L);L.last=k;L.act=k;
  if(k==='callHim'){/* rc7.3: up from the sofa, out through the kitchen, to his table */for(const c of sofaCats())if(c.sofa.kind==='lap')leaveSofa(c);const D=LIFE.dylan;L.on=false;L.reserved=false;L.pos=null;L.legs=0;L.legTarget=0;L.act='standing';L.y=SOFA.front+10;jillWalk(L,clamp(D.x+(D.x<200?24:-24),40,360),clamp(D.y+6,150,FB-6),'atHim','main');return}
  if(k==='read'){L.t=rand(25,75);L.flipT=rand(4,10)}else if(k==='idle')L.t=rand(10,40);
- else if(k==='tv'){if(tv.at==='use'&&!tv.mover){tv.on=true;L.t=rand(30,90);S.life.tv=(S.life.tv||0)+1;tvNoticed()}else{L.act='wantTV';L.t=rand(2,6)}}}
+ else if(k==='tv'){if(tv.at==='use'&&!tv.mover){tv.on=true;L.t=rand(30,90);S.life.tv=(S.life.tv||0)+1;tvNoticed()}else{L.act='wantTV';L.t=rand(2,6)}}
+ else if(k==='peek'){/* up, round to his chair, a look at his screen, back */for(const c of sofaCats())if(c.sofa.kind==='lap')leaveSofa(c);L.act='fetch';L.fetch='legsIn';L.fetchTo='peek';L.t=0;roomCD(L,'peek',120)}
+ else roomActStart(L,k,'sofa')}
 /* ---- the rolling TV ---- */
 function tvUsable(){const tv=LIFE.tv;if(tv.at==='use')return Math.abs(tv.x-tvUsePos().x)<3;if(tv.mover)return false;return tv.tried<2&&tv.at==='park'}
 function tvNoticed(){for(const c of CATS||[]){if(c.hidden||c.st!=='rest'||Math.random()>.3)continue;const d=Math.hypot(c.x-LIFE.tv.x,c.y-LIFE.tv.y);if(d<130)c.lookAt={x:LIFE.tv.x,y:LIFE.tv.y-20,hidden:false}}}
 function tvBlocked(tv,dx,dy){const px=tv.x+dx*26,py=tv.y+dy*24;const who=tv.mover;const near=(x,y,r)=>Math.hypot(x-px,y-py)<r;
- for(const c of CATS||[]){if(c.hidden||c.perch>=0||c.sofa)continue;if(near(c.x,c.y-6,22)||Math.hypot(c.x-tv.x,c.y-6-tv.y)<19)return true}
+ for(const c of CATS||[]){/* rc8: a cat in her room (since rc7.3 the TV is there; the dining room's cats only shared its numbers) */if(c.away!=='home'||c.sofa||c.homeSleep||c.upTo)continue;if(near(c.ax,c.ay-6,22)||Math.hypot(c.ax-tv.x,c.ay-6-tv.y)<19)return true}
  if(who!=='jill'&&LIFE.jill.on===false&&near(LIFE.jill.x,LIFE.jill.y-10,22))return true;
  if(who!=='dylan'&&LIFE.dylan&&!LIFE.dylan.onSofa&&!LIFE.dylan.seated&&near(LIFE.dylan.x,LIFE.dylan.y-10,22))return true;return false}
 function tvUpd(dt){const tv=LIFE.tv;
@@ -9700,11 +9771,11 @@ function lifeNoRoom(){/* rc7.3: the cats have the whole sofa — she sits on the
    dining room's first table; the dining room is not where she rests any more — 18:53 §5.) */const L=LIFE.jill;L.reserved=false;L.pos=null;L.act='toBed'}
 /* the edge of the bed, between the pillows' end and the foot, where the cats on the bed lie behind her */
 function bedSeat(){const B=HM.bed;return{x:B.x0+80,y:B.y1+10}}   /* drawn seated: her lap on the mattress's front edge, her feet at the floor (as on the sofa: SOFA.jy, 8 above SOFA.front) */
-function bedDecide(L){const W=[];const add=(k,w)=>{if(w>0)W.push([k,w])};add('read',L.last==='read'?2:4);add('idle',L.last==='idle'?1.2:2.4);
+function bedDecide(L){const W=[];const add=(k,w)=>{if(w>0)W.push([k,w])};const prev=L.act;add('read',L.last==='read'?2:4);add('idle',L.last==='idle'?1.2:2.4);roomActWeights(L,W,'bed');
  if(!L.preferBed&&L.sinceSit>20&&freeJillPos())add('sofa',2);   /* the sofa has room again */
- const k=wpick(W,o=>o[1])[0];L.last=k;
+ const k=wpick(W,o=>o[1])[0];if(prev==='game')roomGameEnd(L);L.last=k;
  if(k==='sofa'){L.bed=false;L.act='toSofa';L.y=bedSeat().y+8;return}
- L.act=k;if(k==='read'){L.t=rand(25,75);L.flipT=rand(4,10)}else L.t=rand(10,40)}
+ L.act=k;if(['game','chat','text'].includes(k)){roomActStart(L,k,'bed');return}if(k==='read'){L.t=rand(25,75);L.flipT=rand(4,10)}else L.t=rand(10,40)}
 /* ---- per-frame ---- */
 function lifeUpd(dt){if(!evening())return;LIFE.t+=dt;lifeEnsureEvening();
  const V=view();const J=V.jill;const L=LIFE.jill;
@@ -9729,10 +9800,10 @@ function drawSofaGroup(c,now){drawSofaBody(c);const L=LIFE.jill,D=LIFE.dylan;con
  const byKind=k=>on.filter(o=>o.sofa.kind===k).sort((a,b)=>a.x-b.x);
  for(const k of byKind('back'))drawCat(c,k,now);
  if(L.on){const flip=L.face<0;const bob=L.bobT>0?Math.sin(L.bobT*6)*.8:Math.sin(now*1.6)*.35;const look=L.gazeT>0?L.gazeX:L.act==='tv'&&tv.on?tv.x:null;
-  const gaze=look!=null?{x:(look>=L.x?1:-1)*(flip?-1:1),y:.35}:L.act==='read'?{x:0,y:.6}:null;
+  const gaze=look!=null?{x:(look>=L.x?1:-1)*(flip?-1:1),y:.35}:['read','game','text'].includes(L.act)?{x:0,y:.6}:null;
   /* her face after hours: amused when he is doing his act, warm when a cat or he has her attention, tired-but-content early in the evening, otherwise soft */
   const expr=LIFE.say.some(q=>q.who==='d'&&q.t>=0&&q.t<q.life)?'amused':(L.gazeT>0||L.act==='pet')?'smile':(LIFE.t<25&&L.sinceSit<25)?'tired':'soft';
-  drawPerson(c,L.x,SOFA.jy,JILL_LOOK,{jill:true,me:true,seated:true,s:1.1,bob,mood:'happy',expr,flip,blink:Math.sin(now*1.7)>.985,hat:!!L.hat,lounge:{legs:L.legs,len:(10+L.legs*32)/(1.1*PSC)},hold:L.act==='read'||(L.act==='wantTV'&&L.last==='read')?'reader':null,flipPage:L.flip>0,gaze})}
+  drawPerson(c,L.x,SOFA.jy,JILL_LOOK,{jill:true,me:true,seated:true,s:1.1,bob,mood:'happy',expr,flip,blink:Math.sin(now*1.7)>.985,hat:!!L.hat,lounge:{legs:L.legs,len:(10+L.legs*32)/(1.1*PSC)},hold:L.act==='read'||(L.act==='wantTV'&&L.last==='read')?'reader':L.act==='game'?'game':L.act==='text'?'phone':null,flipPage:L.flip>0,gaze})}
  if(D&&D.onSofa){const flip=D.face<0;const look=D.act==='tv'&&tv.on?tv.x:(D.gazeT>0?L.x:null);drawPerson(c,D.x,SOFA.jy,DYLAN_HOME,{seated:true,mood:'happy',flip,blink:Math.sin(now*1.3+2)>.975,lounge:{legs:0},hold:D.phone?'phone':null,gaze:look!=null?{x:(look>=D.x?1:-1)*(flip?-1:1),y:D.act==='phone'?.5:.2}:(D.act==='phone'?{x:0,y:.6}:null)})}
  for(const k of byKind('lap'))drawCat(c,k,now);for(const k of byKind('seat'))drawCat(c,k,now);for(const k of byKind('arm'))drawCat(c,k,now);
  if(L.on&&L.act==='pet'&&L.petCat&&L.petCat.sofa){const p=L.petCat;c.fillStyle=JILL_LOOK.skin;circ(c,p.x+(p.x<L.x?5:-5),p.y-9,2.6);c.fillStyle='rgba(60,34,22,.35)';c.beginPath();c.arc(p.x+(p.x<L.x?5:-5),p.y-9,2.6,0,7);c.stroke()}}
@@ -10074,7 +10145,7 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
   ['秀琴阿姨','Jill 認識很久的阿姨。還沒有清潔員的時候，很多晚上她會在快打烊時順路進來，幫忙擦一擦、收一收，收完就回家——不收桌、不招呼客人，店裡的事還是要你來。請第一位清潔員就是請她：之後營業時間她也在，跟其他清潔員一樣收桌。'],
   ['晚點到','員工也有自己的事，有時候會晚點到，偶爾也會請一天假（當天開店時會說）。還沒到、或沒來的那段時間，他負責的工作沒有人做，日薪照付；到了就照常上工。'],
   ['調酒師','Lounge 名單上的 Evan 和沈晴。Evan 是首席調酒師，Lounge 蓋好那天就在吧台；沈晴從 Lounge I 起可以聘。站在吧台倒酒；主廳和側廳點的酒也是他們倒、服務生端。'],
-  ['Jill 的空檔','沒有急事時她會回房間坐一下（穿過廚房，房間在廚房後面）：看電子書、滑手機、跟貓待著。員工夠、廚師把菜都接走的晚上，她大半個晚上都能休息。工作一來她馬上起身——你點桌子，她也會立刻回來，只是要多走一段。剛開店和快打烊的時候她都在主廳，迎接第一批客人、送最後一批客人走。']]},
+  ['Jill 的空檔','沒有急事時她會回房間坐一下（穿過廚房，房間在廚房後面）：看電子書、看電視、跟網友打一場手遊、跟先生聊兩句、跟貓待著。員工夠、廚師把菜都接走的晚上，她大半個晚上都能休息。工作一來她馬上起身——你點桌子，她也會立刻回來，只是要多走一段。剛開店和快打烊的時候她都在主廳，迎接第一批客人、送最後一批客人走。']]},
  {ic:'🎁',h:'招待與熟客',sum:'招待是店主的一個動作；熟客的心是關係。兩件事各自算，誰都不會因為變熟而少了什麼。',pts:[
   ['招待（你的）','營業中每張票券右上有「招待」：Jill 有空會端一杯飲料（或一份甜點）過去，算店裡請的，扣一份庫存。一天兩桌，票券上寫著還剩幾桌。'],
   ['票券上的字','招待＝現在可以；集點卡・請甜點／紀念日・請甜點＝這桌已經有東西要送過去了；已招待＝這桌今天請過了；招待 0/2＝今天的兩桌用完了；沒東西可請＝冰箱裡沒有飲料或甜點。'],
@@ -10136,7 +10207,7 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
  {ic:'🛋️',h:'Jill 的房間',sum:'廚房後面那一間，是 Jill 自己住的房間——從第一天就在。不是工程，不用買，也沒有要照顧的數值。',pts:[
   ['怎麼進去','房間分頁的最後一個「房間」（點開寫著「Jill 的房間」）。也可以在廚房點右手邊那扇淺木門（寫著「房間 ›」）；在房間裡點門口的「‹ 廚房」回到廚房。Jill 也是走那扇門；房間另外有一扇自己的門，通到後巷。'],
   ['裡面有什麼','窗下那張燕麥色沙發、可以推過來推過去的電視、一張雙人床、一張堆滿書和講義的書桌、貓抓板、貓床、收在淺木櫃裡的貓砂，還有從主廳搬進來的那座貓跳台。主廳原本放沙發的地方空了出來，留給走道。'],
-  ['Jill 在房間','營業中沒事的時候，她會回房間坐一下（剛開店和快打烊的時候除外，那時她在主廳）；打烊後把出菜口擦一擦，就回房間。看電子書只在房間。沙發被貓佔滿的晚上，或她想換個地方的時候，她會坐在床邊看書。'],
+  ['Jill 在房間','營業中沒事的時候，她會回房間坐一下（剛開店和快打烊的時候除外，那時她在主廳）；打烊後把出菜口擦一擦，就回房間。她會自己找事做：把電視推過來看、跟網友打手遊、跟書桌前的先生聊兩句、走到他背後看他在忙什麼、傳訊息給他、叫貓過來（牠們不一定來）。看電子書只在房間。沙發被貓佔滿的晚上，或她想換個地方的時候，她會坐在床邊看書。'],
   ['貓的家','房間是五隻貓的家，不是關牠們的地方：營業中牠們一樣在店裡走來走去，也會自己回房間。樾樾幾乎都待在房間；柔柔愛在店裡晃，睡覺會回房間；小齁偶爾跑回房間喵一聲；包包在房間睡，也會在店裡最熱鬧的地方睡；寶寶喜歡房間，偶爾出來看看。打烊以後回房間的貓多一點，但不會一下子全部回去。'],
   ['樾樾等 Jill','樾樾很怕生，客人走光了也不太敢出來。等他跟店裡的人熟了，打烊以後他會出來，在廚房門口等 Jill，再跟她一起回房間。']]},
  {ic:'🐈',h:'五隻店貓',sum:'樾樾、小齁、寶寶、柔柔、包包住在店裡。不用餵、不用照顧，牠們有自己的生活。',pts:[
