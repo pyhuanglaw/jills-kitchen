@@ -13,34 +13,19 @@
 
 ## 已發布
 
-- **v2.4 rc8.1**（緊急更新），2026-10-03，發布到 **https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA**（version 3，id
-  1791037558-a88f）。遊戲內容＝ commit df8a95b（tag `v2.4-rc8.1`，只在本機：推 tag 時 GitHub 端斷線，branch 已推）。
-  內容：教學提示 9 秒後自己收起（「這一段開店很久都不消失！」）、Day 1 揭曉前 Dylan 寫「Jill 先生」不露臉、店主手冊一行一點變短。
-  Gate：db8dd56 上完整回歸 232/233，唯一失敗是手冊少一句玩法規則，df8a95b 補回，讀手冊的測試全部重跑通過；讀回與
-  live_check 通過（`docs/evidence/v24_rc8_1/`）。
-- 前一版 v2.4 rc8（version 2，252ff1c；報告 `docs/V24_RC8_REPORT.md`）。
+- **v2.4 rc8.2**，2026-10-03，發布到 **https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA**（**Version 4**，id 1791051380-9922）。
+  遊戲內容＝ commit b443ab5（tag `v2.4-rc8.2`）。報告：`docs/V24_RC8_2_REPORT.md`。Gate：b443ab5 上 237/237；讀回與 live_check
+  通過（`docs/evidence/v24_rc8_2/`）。內容：Jill 在房間的生活、租二樓就有員工休息室、店主手冊只寫店裡有的空間、《今天喝？》前
+  Dylan 不進 Lounge、包場夜不撞故事晚上、「多的」不用圖；gate 找到一起修的：快沒耐心的客人的帳先收（Ken 品酒夜）、包包上沙發、
+  秀琴阿姨跟 Sophie／Mia 各聊三次（《那面牆》可能永遠不開始）。
+- 前一版 v2.4 rc8.1（version 3，df8a95b）；再前一版 v2.4 rc8（version 2，252ff1c；報告 `docs/V24_RC8_REPORT.md`）。
 - 玩家在 2026-10-03 選擇以後都發布到這個新網址。舊網址 https://claude.ai/artifact/2vhURujrtCpQ1P5jnSsjps 停在 rc7.6（version
   49），不再更新。舊網址的存檔要用遊戲裡的「設定・存檔」備份後搬過來。
 - 新網址的分享設定由玩家在頁面的分享選單決定（目前是「知道連結的人都能看」）。
 
 ## 已做、還沒發布
 
-- b6be7c2：《今天喝？》之前 Dylan 不會坐進 Lounge（Day 81 存檔：「他第一次去酒吧的故事都還沒開始前他不能去酒吧」）。原因是客滿時
-  一兩位的客人會先到 Lounge 吧台等位子，Dylan 也被帶過去。存檔放在 `tests/saves/player_day81_2206.json`。
-- 店主手冊只寫店裡已經有的空間（「每個空間等他出現才出現在說明書吧」）：`GUIDE_WHEN`。新遊戲的手冊是 14 節 101 項，沒有 Lounge、
-  二樓、側廳、露天；Day 81 存檔有 Lounge、沒有二樓（她還沒租）。「VIP 卡」搬到「招待與熟客」、「配菜的酒」搬到「開店與料理」。
-  截圖：`docs/evidence/v24_rc8_next/guide_gate_*.png`。新測試 `rc8_the_manual_shows_a_space_once_the_shop_has_it`。
-- Jill 在房間自己找事做（電視、手遊、跟先生聊天、看他在忙什麼、傳訊息、叫貓）：營業中的休息和打烊後都有。順手修了電視推過去時
-  會被主廳的貓「擋住」的舊 bug（主廳的貓跟房間共用座標）。截圖 `docs/evidence/v24_rc8_next/room_*.png`；新測試
-  `rc8_jill_has_things_to_do_in_her_room`。手冊「Jill 的空檔」「Jill 在房間」已更新。
-- 二樓 hard canon（玩家 2026-10-03）：租下二樓時員工休息室就在。《大家待的地方》移到租下之前，變成打給房東的理由；租二樓
-  $510,000（原本整層 $350,000＋休息室第一階段 $160,000）；包廂 era 租下後 12 天才開。舊存檔租了空二樓的，讀檔時休息室就在
-  （算租下那天蓋的，`srLeaseMig`）——玩家的 Day 87、Day 89 存檔都是這種。截圖 `docs/evidence/v24_rc8_next/lease_*.png`。
-  二樓相關 30 個測試全過（4 個測試改成新 canon）。
-- 主廚之夜／予安試彈撞在同一晚（玩家 Day 87）：順延的主廚之夜在排客人時就算今晚；包場夜不讓予安來試彈；試彈改在晚餐後
-  （王先生王太太 40%、予安 46%），拍手等 Lounge 有人，插圖只在 Lounge 坐滿、王太太在場時出現。Ken 的品酒夜本來就這樣算，
-  沒有同樣的問題。測試 `rc8_a_booked_out_lounge_never_shares_its_evening_with_the_trial`。
-- 「多的」不用圖：「從工作開始」不再拍照（已經有這張照片的存檔照片留著）。測試 `rc8_duode_has_no_picture`。
+- rc8.3 的工作（見下面「rc8.3」）。
 
 ## 測試
 

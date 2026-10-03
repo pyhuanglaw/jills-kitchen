@@ -5,8 +5,8 @@ rc8.2 建立在 rc8.1（上一個發布的版本）之上，是玩家 2026-10-03
 **怎麼報告**（`docs/RELEASE_CHECKLIST.md` §3）：I＝程式在 tag 裡；T＝測試或在玩家存檔上跑過的腳本證明它會動（390×844 的
 無頭 Chromium 截圖算 T）；O＝玩家在自己的遊戲裡確認過。這份報告裡沒有任何一項是 O，也沒有在 iPhone 上看過。
 
-- Branch `wip/lin`，tag `v2.4-rc8.2`（commit 見下面 §4）。
-- 發布到玩家的網址：https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA。
+- Branch `wip/lin`，tag `v2.4-rc8.2` ＝ commit `b443ab5`。
+- 發布到玩家的網址：https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA ——**Version 4**（version id 1791051380-9922），2026-10-03 18:16 UTC。
 
 ## 1. 這一批有什麼
 
@@ -42,7 +42,8 @@ GUIDE 全文仍完整（測試讀全文）。戳記：`last: v2.4 rc8.2`。
 
 ## 4. 測試與存檔
 
-- 完整回歸：GATE_RESULT
+- 完整回歸：b443ab5 上 **237 個全部通過**（分三份同時跑，各 79 個；`docs/evidence/v24_rc8_2/regression/`）。之前兩次 gate：96ad643 上 235 過、2 個失敗（Day 86 存檔一打開就宣布《有門的房間》→ a36c900 修好；四十天的測試 → 上面《那面牆》那一項）。
+- 發布後檢查（`tools/sims/live_check.py`，`docs/evidence/v24_rc8_2/live/`）：從 tag 建出來的頁面一個字不差地在線上的頁面裡（主機只加了 552 bytes 的外框）；用玩家 Day 89 的存檔（21:43 營業中存的）在 390×844 觸控視窗打開：「繼續營業 · 21:43」接回當晚、各房間、結算、員工頁、隔天備料，重新整理頁面後存檔還在（Day 90、錢對得上），沒有任何頁面錯誤。
 - 重錄：`tests/golden/frames.json`（`golden_frames`）。原因：Jill 的房間生活改了第 1 天晚上她做的事（第一個差異在第 1 天晚上），
   也改了第 2 天的亂數。`golden_scenario`、`cat_personality_fingerprint` 沒變、沒重錄。
 - 換種子：`v24_day52_save_plays_the_stories_in_order_over_forty_days` 從 7600 換成 7000（原因見上面《那面牆》那一項）。
