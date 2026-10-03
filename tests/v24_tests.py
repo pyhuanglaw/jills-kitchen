@@ -687,6 +687,49 @@ def rc8_jill_has_things_to_do_in_her_room(b, port, target):
 
 
 @test
+def rc8_a_booked_out_lounge_never_shares_its_evening_with_the_trial(b, port, target):
+    """The player's Day 87 (「予安彈鋼琴配上大家畫面的時候 遊戲裡居然還沒人 人是後來才陸續進來」; 「主廚之夜我到結算才知道」): a chef's night
+    carried over from an earlier day is moved onto tonight only when the service starts (cnDayStart), after the evening's
+    guests were planned — so the plan did not see it, and 予安's trial was planned onto a booked-out Lounge: she played
+    to an empty room, the chef's night's guests came after. Now an overdue chef's night is tonight for the plan too, as
+    Ken's tasting night already was; the trial waits for another night; and on a booked-out night she is not let in for
+    it. On an ordinary night the trial is planned after dinner, the Wangs a little before her."""
+    g = Game(b, port, target, seed=873, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day87_2257.json')
+    g.ev("delete story().facts.ya_trial;delete story().facts.ya_join;delete story().ev.ya_trial;delete story().ev.ya_join")
+    trial = "V24_WANTS.flatMap(f=>f()||[]).filter(o=>o.o&&o.o.yaTrial).map(o=>o.t)"
+    check(g.ev("yaTrialDue()") is True and g.ev("cnS().next&&cnS().next.d") == g.ev("S.day"), 'Day 87: the trial is due, and a chef\'s night is tonight')
+    check(g.ev(trial) == [], 'not planned onto the chef\'s night')
+    g.ev("cnS().next.d=S.day-1")
+    check(g.ev("cnTonight()") is True and g.ev(trial) == [] and '今晚｜主廚之夜' in g.ev("cnNewsHTML()"), 'carried over from yesterday: tonight, for the plan and the news too')
+    g.ev("const n=cnS().next;cnS().next=null;window.__cn=n;kenS().next={d:S.day-1,n:1}")
+    check(g.ev("kenNightToday()") is True and g.ev(trial) == [], 'Ken\'s tasting night, carried over: the same')
+    g.ev("kenS().next=null")
+    check(g.ev(trial) == [0.46], 'an ordinary night: the trial, after dinner')
+    g.ev("cnS().next=window.__cn;cnS().next.d=S.day-1")
+    to_service(g)
+    check(g.ev("!!R.cn&&cnS().next.d===S.day") is True, 'the carried-over chef\'s night is tonight')
+    check(g.ev("(R.sched||[]).some(o=>o.yaTrial)") is False and not g.ev("!!(R.ya&&R.ya.trial)"), 'and nothing of the trial tonight')
+    check(g.ev("(()=>{const g0=R.groups.length;spawn({t:R.t,name:YA,type:'gourmet',size:1,pianist:1,yaTrial:1,hold:1,story:1});return R.groups.length-g0+(R.ya&&R.ya.trial?10:0)})()") == 0, 'on a booked-out night she is not let in for the trial')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def rc8_duode_has_no_picture(b, port, target):
+    """The player, 2026-10-03: 「阿拓 多的 跟圖出來的時候也不一樣」, then 「多的不用圖」 — the step 「從工作開始」 used to arrive as the
+    story photo 「多的」 with nothing of it on screen. It is a step with no picture now: no photo, nothing staged; a save that
+    already has the photo keeps it; the late photo 「有你在的晚班」 still follows the step."""
+    g = Game(b, port, target, seed=874, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day81_2206.json')
+    to_service(g)
+    g.ev("window.__noScenes=false;delete story().photos.qing_tuo;STORY_EV.find(e=>e.k==='qt_photo').run({})")
+    check(g.ev("!!fact('qt_photo')&&!story().photos.qing_tuo&&!STAGE&&!DLG") is True, 'the step, no photo, nothing staged')
+    g.ev("story().facts.qt_photo.d=S.day-8;story().facts.qt_days={d:S.day,n:14,l:S.day}")
+    check(g.ev("STORY_EV.find(e=>e.k==='qt_photo2').when({})") == g.ev("!!(qingOn()&&tuoOn())"), 'the late photo still follows the step')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
 def v24_the_day_is_held_for_the_beat_its_people_came_for(b, port, target):
     """Pacing (measured on the Day 52 save): when the schedule brings someone for a due v2.4 major beat, that beat keeps
     a major slot until it plays or until 85% of the service; another story's major that comes up while every free slot

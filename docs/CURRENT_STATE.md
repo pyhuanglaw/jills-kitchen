@@ -36,10 +36,14 @@
   $510,000（原本整層 $350,000＋休息室第一階段 $160,000）；包廂 era 租下後 12 天才開。舊存檔租了空二樓的，讀檔時休息室就在
   （算租下那天蓋的，`srLeaseMig`）——玩家的 Day 87、Day 89 存檔都是這種。截圖 `docs/evidence/v24_rc8_next/lease_*.png`。
   二樓相關 30 個測試全過（4 個測試改成新 canon）。
+- 主廚之夜／予安試彈撞在同一晚（玩家 Day 87）：順延的主廚之夜在排客人時就算今晚；包場夜不讓予安來試彈；試彈改在晚餐後
+  （王先生王太太 40%、予安 46%），拍手等 Lounge 有人，插圖只在 Lounge 坐滿、王太太在場時出現。Ken 的品酒夜本來就這樣算，
+  沒有同樣的問題。測試 `rc8_a_booked_out_lounge_never_shares_its_evening_with_the_trial`。
+- 「多的」不用圖：「從工作開始」不再拍照（已經有這張照片的存檔照片留著）。測試 `rc8_duode_has_no_picture`。
 
 ## 測試
 
-- 235 個測試（`python3 tests/run_tests.py`；`-k a,b,c` 跑指定的）。rc8 的 gate：252ff1c 上 231 過、2 個失敗都是測試本身，已在
+- 237 個測試（`python3 tests/run_tests.py`；`-k a,b,c` 跑指定的）。rc8 的 gate：252ff1c 上 231 過、2 個失敗都是測試本身，已在
   8f7d6b2 修好並重跑通過。
 - 已知會在單一 seed 上偶爾落差的機率性測試，都在測試註解裡寫了量過的分布（例：`lounge_i_content_bar_food…`、
   `v24_rc6_new_things_are_talked_about`）。
@@ -47,7 +51,6 @@
 ## 待辦／待確認
 
 - **太太的手機不用登入就能匯出／備份存檔**：還沒解決，需要玩家用手機實測。不要用「文字框複製」的方式（會讓 iPhone 當機）。
-- 《晚點回去》的四句工作閒聊（「今天沙發那四個，炸雞點了三次。」……）是開發 session 寫的，玩家可以換。
 - `docs/evidence/v24_rc8/release/qing_tuo/` 的重拍截圖缺《講完》那一組（截圖腳本逾時）；原本的 q5 在 `docs/evidence/v24_rc8/qing_tuo/`。
 
 ## 美術
