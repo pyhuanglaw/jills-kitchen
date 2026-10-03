@@ -81,6 +81,7 @@ Nothing previously requested is dropped.
 | The cooks: a cook from another station covers one with no cook; a dish's first plate is a cook's too; Jill rests when the crew has the work | I | T (`jill_rests_when_staff_cover_the_floor` and the staff tests; 0.91/0.89/0.90 of the service on seeds 7/8/9) | — |
 | 晴 × 阿拓 pacing: Day 82 / 84 / 88 / 90 / 95 from the Day 74 save (was 82 / 94 / 99 / 113 / 118) | I | T (`tools/sims/story_per_day.py`, `docs/evidence/v24_rc8/qing_tuo/pacing/`) | — |
 | The scenes after closing on a booked-out night too, when their people are in; 《今天喝？》 never on one | I | T (the same sim: 《晚點回去》 after Ken's tasting, Day 84) | — |
+| Jill hosts the opening (the first tenth of the service) and the end (from 88%) in the Main Hall, rests only in between; a rest still going at 88% ends; at the closing she is always up (「你就設定jill開店和關店都會在主廳歡迎和送客」) | I | T (`jill_rests…`, `v24_rc73_tora_waits_for_jill_after_closing`: 樾樾 comes out, she sees him, they go) | — |
 
 ### Jill's rest (the player: 「不要為了讓測試通過直接調高 Jill 的休息機率……讓這個長期 known failure 正式結案」)
 
@@ -93,6 +94,11 @@ Nothing previously requested is dropped.
 - **Gameplay changed** (`chefCan`, `chefCover`, `crewUpd`): a cook takes a dish Jill has never made (his level's dishes;
   the signature and the signature dessert still LV5); a station with no cook of its own today gets a cook from another
   station, a dish at a time, after his own station's. Jill is not called up for them.
+- Found by the full regression on the cooks' rule: with a crew she was resting in her room at the closing on most
+  evenings, and the closing kept her on the sofa (a V18 rule from when rests were rare) — so 樾樾's waiting for her at
+  the kitchen door (rc7.3) no longer happened. The player: 「你就設定jill開店和關店都會在主廳歡迎和送客」 — she now hosts
+  the first tenth of the service and its end (from 88%) in the Main Hall and rests only in between; at the closing she
+  is always up. `v24_rc73_tora_waits_for_jill_after_closing` passes again; she still rests most of the service.
 - **The test changed to the new rule, not loosened**: the lower bound from 0.12 to 0.5; the 0.75 cap (the old rule:
   oven and cold dishes hers) goes; new: a cook from another station took the oven or cold-station dishes; her own day
   (she never sits) and the tapped table (she is up at once) unchanged. Four other tests that encoded 「第一份永遠由 Jill
@@ -109,6 +115,15 @@ Nothing previously requested is dropped.
   she joins on one of her nights (was ten days), 沈晴 home two days after 《最近比較常》 (was five), and the four scenes
   after closing on a booked-out night too (each checks its own people).
 
+### Two more tests from the full regression
+
+- `cats_use_sofa_by_personality` (failing since Checkpoint B): its 16 evenings are all Day 1, which now opens with Madame
+  Lin's held 《隔壁》. With the scene marked as seen the evenings are rc7.7's to the sample; the cats' code is unchanged.
+  The test marks Day 1's scene as seen; its thresholds are unchanged.
+- `v24_rc6_new_things_are_talked_about`: one evening (seed 331) said two words about The Lounge's new stage. Seeds 331–336
+  said 5/5/4/7/5/2 before the cooks' rule and 2/5/5/6/5/4 after — the same spread. The test now plays three evenings and
+  asks for three words or more on most of them.
+
 ## 4. Manual audit (小小店主手冊)
 
 Checked against the final feature set: every section. Changed in this release:
@@ -116,6 +131,7 @@ Checked against the final feature set: every section. Changed in this release:
   next door, the signing and the works), 配菜的酒, Lounge I／II／III, 安安, 要有調酒師, 客人怎麼用, 晚餐後八折, Bar Food,
   Ken 的品酒夜, 結算, 廚房設備, 私人包廂 — written with rc7.7 and Checkpoints A–C, checked again.
 - 做菜, 廚師, 誰來做 and the chef's card — the cooks' new rule (no more 「每道新菜的第一份永遠由 Jill 親自做」).
+- Jill 的空檔, Jill 在房間 — she rests most of a staffed evening, and is in the Main Hall at the opening and the end.
 - The prep screen's warning for a station with nobody says the other cooks will help.
 - No new section: 晴 × 阿拓 and Madame Lin's visits are stories, not systems.
 - Audit stamp on `GUIDE` updated (last: v2.4 rc8). `followup_the_manual_describes_the_current_game` passes.
