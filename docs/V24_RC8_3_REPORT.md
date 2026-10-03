@@ -5,8 +5,8 @@ rc8.3 建立在 rc8.2（Version 4）之上，是玩家 2026-10-03 晚上玩 Day 
 **怎麼報告**（`docs/RELEASE_CHECKLIST.md` §3）：I＝程式在 tag 裡；T＝測試或在玩家存檔上跑過的腳本證明它會動（390×844 的
 無頭 Chromium 截圖算 T）；O＝玩家在自己的遊戲裡確認過。這份報告裡沒有任何一項是 O，也沒有在 iPhone 上看過。
 
-- Branch `wip/lin`，tag `v2.4-rc8.3` ＝ commit GATE_COMMIT。
-- 發布到玩家的網址：https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA ——PUBLISHED_VERSION。
+- Branch `wip/lin`，tag `v2.4-rc8.3` ＝ commit `e797665`。
+- 發布到玩家的網址：https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA ——**Version 5**（version id 1791055230-dd7a），2026-10-03 19:33 UTC。
 
 ## 1. 這一批有什麼
 
@@ -39,7 +39,12 @@ rc8.3 建立在 rc8.2（Version 4）之上，是玩家 2026-10-03 晚上玩 Day 
 
 ## 4. 測試與存檔
 
-- 完整回歸：GATE_RESULT
+- 完整回歸：e797665 上 **242 個全部通過**（分三份，`docs/evidence/v24_rc8_3/regression/`）。前一次 gate（1aafb1b）242 個裡 237 過、
+  5 個失敗，都修了：員工從店門口走 Lounge 臨街的門進去（服務生出去帶位以後；改成從後面進）、靠著 Jill 的貓（上面）、三個測試照
+  新的候位位置或不再靠運氣（`a_lounge_guest_pays_once_per_phase…`、`lounge_i_content_bar_food…` 換種子，六個種子 rc8.3 與 rc8.2
+  的分布一樣、`stock_suggestion_follows_each_dish…` 直接讓一組為招牌菜來的客人進來）。
+- 發布後檢查（`tools/sims/live_check.py`，`docs/evidence/v24_rc8_3/live/`）：從 tag 建的頁面一個字不差地在線上頁面裡；玩家 Day 89
+  存檔「繼續營業 · 21:43」接回、各房間、結算、員工頁、隔天備料、重新整理後存檔還在，沒有頁面錯誤。
 - 重錄：`golden_frames`、`golden_scenario`、`cat_personality_fingerprint`。原因：PERFECT 橫幅拿掉、候位改到店門口、貓多了碗架
   這個地方（從第一個畫面起，貓選地方的權重就不一樣）。貓的個性沒有變：八個種子貓在房間的時間跟 rc8.2 一樣，包包仍然最愛睡。
 - 改寫的測試（照新的設計，不是放寬）：`waiting_bench`、`touch_controls`（候位在店門口）；`cat_ai_keeps_running`（在 Jill 的房間
