@@ -761,6 +761,10 @@ def cats_use_sofa_by_personality(b, port, target):
     for seed in range(60, 76):
         g = Game(b, port, target, seed=seed, manual=True)
         install_bot(g)
+        # rc8: Day 1 opens with Madame Lin's held 《隔壁》 (Checkpoint B), a day unlike the others — with it played, these 16
+        # evenings move (寶寶 lap 0 → 545); with it seen, they are rc7.7's to the sample (arm 809, back 284, seat 269). The
+        # cats' code is unchanged; the test samples ordinary evenings, so Day 1's scene is marked as seen.
+        g.ev("(()=>{story().facts.lin_hello={d:1,n:1,l:1};Object.assign(evState('lin_hello'),{n:1,d:1,last:1});return 1})()")
         g.click('[data-act=open]')
         samples = run_evening(g, seconds=140, every=8)
         for x in samples:
