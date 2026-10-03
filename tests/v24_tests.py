@@ -3888,7 +3888,10 @@ def v24_rc77_the_page_carries_only_the_portraits_the_game_shows(b, port, target)
     game never shows out of the page — the seven outside-cast cards of P5 (paused) and the 2.2.1 staff cards the player
     redrew as st23_*; they stay as files in assets/portraits. rc7.2 was built on rc7 without rc7.1 (the text-box backup
     that froze the iPhone), and the 35 came back with it: 0.77 MB the game never used, from rc7.2 to rc7.6. rc7.7 takes
-    them out again. Every face the game can show is still in the page; nothing it cannot show is."""
+    them out again, with Sophie's and Mia's first cards (sophie, mia: redrawn as reg23_* in v2.3, never asked for since).
+    The game asks PORTRAIT_DATA only for the keys in its four tables (PORTRAITS, STAFF_PORTRAITS, PORTRAIT_TONES, NAMED):
+    the page holds exactly those — every face the game can show, nothing it cannot. (A key found somewhere in game.js is
+    not enough: 'sophie' and 'mia' are there as people, not as portraits.)"""
     g = Game(b, port, target, seed=7701, manual=True, viewport={'width': 390, 'height': 844})
     r = json.loads(g.ev("""JSON.stringify((()=>{const want=new Set();
       for(const P of Object.values(PORTRAITS))for(const k of Object.values(P.v))want.add(k);
@@ -3898,10 +3901,11 @@ def v24_rc77_the_page_carries_only_the_portraits_the_game_shows(b, port, target)
       const have=Object.keys(window.PORTRAIT_DATA||{});return{want:[...want],have,missing:[...want].filter(k=>!PORTRAIT_DATA[k])}})())"""))
     check(len(r['want']) >= 60, f"the game's faces were found: {len(r['want'])}")
     check(not r['missing'], f'every face the game can show is in the page: missing {r["missing"]}')
+    extra = sorted(set(r['have']) - set(r['want']))
+    check(not extra, f'the page carries no portrait the game never asks for: {extra}')
     src = open(os.path.join(ROOT, 'js', 'game.js'), encoding='utf-8').read()
-    unused = [k for k in r['have'] if k not in src]
-    check(not unused, f'the page carries no portrait the game never refers to: {unused}')
-    gone = re.compile(r'^(v24_(xtm|shan|gx|lin|kevin|yx|xtf)(_[a-z]+)?|staff_([1-6]|xiaotong|momo|nina|yuki|azhu|hugo|azhe|aming))$')
+    check(src.count('portraitData(') == 9, 'the game asks for a portrait in the nine places this test knows (a new one: add its table above)')
+    gone = re.compile(r'^(v24_(xtm|shan|gx|lin|kevin|yx|xtf)(_[a-z]+)?|staff_([1-6]|xiaotong|momo|nina|yuki|azhu|hugo|azhe|aming)|sophie|mia)$')
     check(not [k for k in r['have'] if gone.match(k)], 'the outside cast and the 2.2.1 cards are not in the page')
     kept = [os.path.basename(p)[:-4] for p in glob.glob(os.path.join(ROOT, 'assets', 'portraits', '*.png'))]
     check(any(gone.match(k) for k in kept), 'they are still kept as files in assets/portraits')
