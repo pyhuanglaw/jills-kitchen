@@ -1,0 +1,187 @@
+(The player, 2026-10-04, after v2.4 rc8.4. Verbatim, in order. Earlier lines of the same evening are in
+dialogue_too_much_2026-10-04.txt.)
+
+[with the save JillsKitchen_Save_2026-10-04_2105_Day92.json — tests/saves/player_day92_2105.json]
+好像變成關店才會有員工休息室的tab 但關店根本不會有人阿
+
+我發現目前有一個很嚴重的「空間存在，但玩家看不到」問題。
+
+請先不要重新設計任何空間。
+
+Staff Room（員工休息室）和 PDR（私人包廂）之前都已經完整設計過，而且兩個空間都有 Stage I → II → III 三階段。請先查 Git 歷史與目前程式，把既有設計找回來、核對現在還剩多少，再處理可見性。
+
+【二樓基本結構】
+
+Staff Room 與 PDR 都是二樓真正存在、有牆、有門的獨立房間，不是抽象功能。
+
+二樓正式租下並可使用時，Staff Room 就已經存在。
+不要再出現「先有空二樓，之後才突然長出 Staff Room」的階段。
+
+Staff Room 和 PDR 是兩個不同空間：
+- PDR 是較大的私人包廂。
+- Staff Room 是員工使用的休息空間。
+- 都應該能從二樓走廊進入。
+- 玩家必須能實際看見房間內部，而不是只有員工 routing 或資料狀態存在。
+
+
+【Staff Room｜員工休息室】
+
+這不是要重新設計。原本已經有完整室內配置，而且員工會實際進去。
+
+視覺方向：
+- warm MUJI / Scandinavian
+- 暖白牆面
+- 淺色天然 oak / ash 木材
+- oatmeal / ivory 布料
+- 自然日光＋暖色燈
+- 安靜、舒服、真的像員工下班或空檔會待的地方
+- 不要做成制式公司休息室
+- 不要做成更衣室
+- 不要做成日式主題房
+
+既有主要配置：
+- sofa
+- 兩張 armchairs
+- ivory rug
+- 長桌
+- 窗邊 banquette
+- 左側 built-in lockers
+- 右側 kitchenette
+- 冰箱藏在淺木門板後
+- coffee machine
+- 飲水
+- mugs / hooks
+- open shelves
+
+Stage I：
+是一間「已經完整裝修完成、可以正常使用」的 Staff Room。
+不是空殼，也不是等 Stage II、III 才變成真正的房間。
+
+Stage II：
+保持同一個格局，不重新裝修成另一間房。
+開始增加員工真正使用後留下的個人痕跡，例如：
+- locker names
+- personal mugs
+- throw
+- fridge notes
+- 一些個人物品
+
+Stage III：
+仍然延續同一個房間與格局，進一步變成真正「被這群人生活過」的空間，例如：
+- photos
+- plants
+- coats
+- 更多 persistent story objects
+- 使用痕跡
+- 與已發生的員工故事相符的物件
+
+Stage II / III 的物件必須跟已發生的故事同步，不要提前劇透。
+
+Staff Room 的核心不是數值系統。
+不要新增 fatigue / morale / needs / chores。
+
+它的作用是讓員工真的：
+- 進去休息
+- 坐沙發或椅子
+- 在桌邊待著
+- 喝水／咖啡
+- 等其他人
+- 偶爾同處一室
+- 留下生活痕跡
+
+玩家要能「看到」這些事情發生。
+
+
+【PDR｜私人包廂｜《關上門以後》】
+
+PDR 也已經有 Stage I → II → III，不要重新設計。
+
+核心需求來自：
+- privacy
+- group dining
+- quiet conversation
+
+不是 VIP 系統。
+不要做 VIP dashboard。
+不要做 VIP minigame。
+不要變成另一套 management chore。
+
+整體視覺固定為 Contemporary Art Deco：
+- deep olive / forest green
+- warm charcoal / taupe stone
+- light stone dining table
+- brass details
+- warm restrained lighting
+- 有留白
+- 成熟、安靜、有隱私感
+
+必須是真牆、真正可以關上的門，而且視覺上要明確感覺與外面隔開。
+
+Stage I：
+- 約 4–6 席
+- 已經是完整可使用的私人包廂
+- 適合小型家庭聚餐、安靜談話、小型慶祝
+
+Stage II：
+- 約 4–8 席
+- 延續原本 Art Deco 設計
+- 空間與使用能力提升，但不是換一間房
+
+Stage III：
+- 約 4–10 席
+- 是這間 PDR 的成熟最終狀態
+- 可以承載較完整的家庭聚餐、慶祝、重要談話與故事事件
+
+三階都必須維持同一個房間的連續成長感，而不是三套完全不同的裝潢。
+
+
+【現在要查的 bug / UX 問題】
+
+我現在正常遊玩時，Staff Room 幾乎完全看不到。
+
+但之前的版本已經有 Staff Room 的內部配置圖，而且員工實際會進去，所以請先查：
+
+1. 現在 main 裡 Staff Room 的室內畫面是否仍存在。
+2. Stage I / II / III 的既有配置是否仍存在。
+3. 員工進入 Staff Room 的 routing 是否仍存在。
+4. 玩家目前到底從哪裡切換／進入 Staff Room。
+5. 二樓 UI、入口、房間切換、鏡頭是否把它藏掉了。
+6. PDR 是否也有同樣問題：程式存在，但玩家正常遊玩感知不到。
+7. 用我的成熟存檔實際測試，不要只看 code 判斷。
+
+不要因為現在玩家看不到，就另做一套 Staff Room 或 PDR。
+優先恢復／接回既有內容。
+
+修好後我要看到實際證據：
+
+- 二樓走廊／入口
+- 玩家如何進 Staff Room
+- Staff Room Stage I / II / III 現有狀態
+- Staff Room 完整室內畫面
+- 至少一個員工真的走進去並待在裡面
+- PDR 的入口
+- PDR 現有 Stage 狀態與室內畫面
+- 我的成熟存檔可以正常看到這兩個空間
+
+如果 Git 歷史中的舊實作和現在 main 有差異，先告訴我差在哪裡，不要直接覆蓋現在版本。
+
+[then]
+我找到 Staff Room 現在真正的問題了：（Staff Room tab 只有關店後才出現 … 請給我「營業中 Staff Room 裡真的有員工」的實際截圖證據，不要只告訴我測試通過。）
+
+現在好像有了 營業時間也有 但沒看到任何員工去
+
+Staff Room 現在營業時間已經可以看到了，這部分先不要再改。
+但我正常營業觀察了一段時間，完全沒有看到任何員工進 Staff Room。
+請先查既有行為，不要直接新增一套休息系統。
+（1–9：是否存在營業中自行進 Staff Room 的行為、哪些職位、觸發條件、一天幾次、停留多久、是否 render、是否被工作排程壓過、
+是否 routing 成功又被召回、用成熟存檔跑完整營業日記錄 entry / exit）
+如果現有系統理論上會去、實際 simulation 卻幾乎永遠看不到，那就是可感知性問題。
+Staff Room 的存在目的之一，就是偶爾讓玩家真的看到員工在裡面休息、喝東西、坐一下或跟另一名員工同處。
+不需要 fatigue / morale / needs meter，也不要做成玩家管理員工休息。
+我要的是 autonomous ambient life：員工在工作空檔自然使用這個已經存在的空間。
+請先告訴我目前實際機制和完整營業日的觀察結果，再決定最小修改。
+如果需要修改，目標不是「大量員工一直休息」，而是正常玩時偶爾能自然撞見，而且停留時間長到玩家有機會看到。
+修完請提供：一個完整營業日 Staff Room entry / exit log；至少一張營業中員工真的待在 Staff Room 的畫面；確認不會因此造成主廳缺人、
+出菜卡住或服務異常。
+
+無法升級到二級休息室 訂購70000按不下去

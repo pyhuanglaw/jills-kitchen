@@ -1,0 +1,27 @@
+01_service_tabs.png: 營業中的主廳：上面的房間分頁有「休息室」 | {"clock":"17:18","room":"main","inside":["秀琴阿姨（走進來）"]}
+02_second_floor.png: 二樓：走廊、員工休息室的牆和門 | {"clock":"17:19","room":"up","inside":["秀琴阿姨（走進來）"]}
+03_in_from_the_floor.png: 在二樓點員工休息室：進到裡面 | {"clock":"17:21","room":"staff","inside":["秀琴阿姨（走進來）"]}
+04_crew_inside.png: 營業中：Nina 自己上樓休息，坐在休息室裡 | {"clock":"17:43","room":"staff","inside":["Nina（坐著）"]}
+05_after_they_left.png: Nina 回去工作以後的休息室 | {"clock":"18:11","room":"staff","inside":[]}
+06_back_downstairs.png: 回到主廳 | {"clock":"18:13","room":"main","inside":[]}
+errors: []
+the evening: {"guests":146,"rev":122655,"angry":0,"lost":7}
+
+休息室進出紀錄（營業中與打烊後）：
+17:34 Nina 出發上樓
+17:41 Nina 進了休息室
+18:07 Nina 離開休息室，回去工作
+18:26 Kai 出發上樓
+18:32 Kai 進了休息室
+18:54 Kai 離開休息室，回去工作
+19:01 許葳 出發上樓
+19:08 許葳 進了休息室
+19:36 許葳 離開休息室，回去工作
+20:19 秀琴阿姨 出發上樓
+20:22 秀琴阿姨 進了休息室
+20:52 秀琴阿姨 離開休息室，回去工作
+22:18 小彤 出發上樓
+22:21 Nina 出發上樓
+22:22 小彤 進了休息室
+22:23 秀琴阿姨 出發上樓
+22:29 秀琴阿姨 進了休息室

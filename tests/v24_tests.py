@@ -925,6 +925,62 @@ def rc85_a_picture_always_holds_the_service(b, port, target):
 
 
 @test
+def rc85_the_rooms_upstairs_are_bought_by_their_buttons(b, port, target):
+    """The player, 2026-10-04: 「無法升級到二級休息室 訂購70000按不下去」 (and on a computer: 「升級餐廳點不到右邊的項目」). Since rc6 the
+    phase buttons of the Staff Room and the Private Dining Room were written without their phase (a bare attribute 「2」), so a
+    tap bought nothing; the tests had called buyRoomPhase directly. On the player's Day 92 save: the button carries its
+    phase, a real tap buys Phase II for $70,000 and it is there the next day; no button in the shop carries a stray
+    attribute."""
+    g = Game(b, port, target, seed=930, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day92_2105.json')
+    g.ev("for(let i=0;i<30;i++){if(typeof DLG!=='undefined'&&DLG)dlgNext()}")
+    if g.ev("phase") != 'shop': g.ev("showShop()")
+    bad = []
+    for t in json.loads(g.ev("JSON.stringify(shopTabs().filter(t=>t.on).map(t=>t.k))")):
+        g.ev(f"shopTab='{t}';showShop()")
+        bad += json.loads(g.ev("JSON.stringify([...screenEl.querySelectorAll('[data-act]')].filter(e=>[...e.attributes].some(a=>!/^(data-|class|style|disabled|id|title|aria-|type|alt|src|href|role|tabindex)/.test(a.name))).map(e=>e.outerHTML.slice(0,100)))"))
+    check(not bad, f'every button in the shop says what it buys: {bad[:3]}')
+    g.ev("shopTab='works';showShop()")
+    check(g.ev("document.querySelector('[data-act=buySR]').dataset.k") == '2', 'the Staff Room II button carries its phase')
+    m0 = g.ev("S.money"); g.click('[data-act=buySR]')
+    check(g.ev("S.money") == m0 - 70000 and g.ev("srOf().st2") == g.ev("S.day") + 1, f'a tap buys it: {g.ev("JSON.stringify(srOf())")}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def rc85_the_crew_go_up_to_the_staff_room_in_a_busy_evening(b, port, target):
+    """The player, 2026-10-04: 「營業時間也有 但沒看到任何員工去」. On the player's Day 92 save (ten of the floor, a queue at the door
+    most of the evening) nobody reached the Staff Room in a whole service: a break waited for the whole restaurant to be
+    quiet (6% of the evening) and one on the stairs was called back the moment anyone waited at the door. Now a break waits
+    for spare hands (three of the floor with nothing in hand — 92% of that evening): in a whole service several of the
+    floor go up on their own, one at a time, each stays long enough to be come across, and comes back down; nobody is
+    called back while others are free; the room's tab is there all evening and shows them inside."""
+    g = Game(b, port, target, seed=9204, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day92_2105.json')
+    g.ev("for(let i=0;i<30;i++){if(typeof DLG!=='undefined'&&DLG)dlgNext()}"); to_service(g)
+    st = {}; visits = []; tabs = True; most = 0
+    while g.ev("phase==='service'&&!!R&&R.closing==null"):
+        g.ev("__botUntil('false',15,1/30)")
+        if not g.ev("!!R"): break
+        tabs = tabs and g.ev("roomsOpen().includes('staff')")
+        s = json.loads(g.ev("JSON.stringify({t:R.t/R.dur,cw:(S.crew||[]).filter(m=>R.cw&&R.cw[m.id]).map(m=>{const w=R.cw[m.id];return[m.name,w.room==='staff'&&!!(w.task&&w.task.sr&&w.task.fired),!!(w.task&&w.task.sr)]}),seen:srPeople().filter(p=>p.seated).length})"))
+        if s['t'] < .05: continue
+        most = max(most, s['seen'])
+        for n, inside, sr in s['cw']:
+            o = st.get(n, {'in': None, 'sr': False})
+            if inside and o['in'] is None: o['in'] = s['t']
+            if o['sr'] and not sr:
+                visits.append((n, (s['t'] - o['in']) if o['in'] is not None else None)); o['in'] = None
+            o['sr'] = sr; st[n] = o
+    stayed = [v for v in visits if v[1] is not None]
+    check(tabs, 'the Staff Room tab is there all through the service')
+    check(len(stayed) >= 2 and all(v[1] > .06 for v in stayed), f'several of the floor went up on their own and stayed a while (more than ~16 minutes each): {visits}')
+    check(len(visits) - len(stayed) <= 1, f'at most one called back on the way: {visits}')
+    check(most >= 1 and most <= 2, f'one at a time, two together at most: {most}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
 def v24_the_day_is_held_for_the_beat_its_people_came_for(b, port, target):
     """Pacing (measured on the Day 52 save): when the schedule brings someone for a due v2.4 major beat, that beat keeps
     a major slot until it plays or until 85% of the service; another story's major that comes up while every free slot
@@ -1527,7 +1583,7 @@ def v24_rc6_private_dining_story_needs_two_tables_and_a_lived_in_staff_room(b, p
     check(g.ev(pd_story) is True, 'ready')
     check(g.ev("secUpRooms(1e9,()=>'X').includes('私人包廂')") is False, 'nothing to buy before the story')
     _upf(g, 'pd_story', 0)
-    check(g.ev("secUpRooms(1e9,(c,a,k,l)=>a+':'+k).includes('buyPD:1')") is True, 'after it, Phase I')
+    check(g.ev("secUpRooms(1e9,(c,a,k,l)=>a+':'+k).includes('buyPD:data-k=\"1\"')") is True, 'after it, Phase I (rc8.5: the button carries its phase as data-k)')
     check(not g.errors, g.errors[:3]); g.close()
 
 

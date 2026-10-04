@@ -6798,11 +6798,13 @@ function buyRoomPhase(kind,n){const L=kind==='sr'?SR_PROJ:PD_PROJ;const P=L[n];c
  S.money-=P.cost;const o=kind==='sr'?srW():pdW();const D=S.day+1;if(n===1){o.bought=S.day;o.done=D;S.newRooms=S.newRooms||{};S.newRooms[kind==='sr'?'staff':'pdr']=D;factSet(kind==='sr'?'sr_build':'pd_build')}else if(n===2){o.b2=S.day;o.st2=D}else{o.b3=S.day;o.st3=D}
  save();IDLE=null;bg=null;for(const kk in BGC)delete BGC[kk];
  projectReveal({k:(kind==='sr'?'upsr':'uppd')+(n===1?'1':''),room:'up',n:`${P.n}${n>1?' '+['','I','II','III'][n]:''}《${P.sub}》`,done:P.done+(n===1?'——今晚施工，明天開門前就好。':'——明天就在。'),jill:P.jill,unlock:P.unlock,eyebrow:n===1?'動工':'訂好了'});return true}
+/* rc8.5 (the player, 2026-10-04: 「無法升級到二級休息室 訂購70000按不下去」): the button carries its phase (data-k) — since rc6 it
+   was written as a bare attribute 「2」, so a tap bought nothing; the tests had called buyRoomPhase directly */
 function roomPhaseCard(kind,n,money,btn){const L=kind==='sr'?SR_PROJ:PD_PROJ;const P=L[n];const st=kind==='sr'?srStage():pdStage();const o=kind==='sr'?srOf():pdOf();const nx=kind==='sr'?srNext():pdNext();
  const dayOf=phaseDay(o,n);const built=dayOf!=null&&S.day>=dayOf,building=dayOf!=null&&S.day<dayOf;
  const tag=built?'<span class="tier t1">已完工</span>':building?'<span class="tier">明天完工</span>':'';const why=!built&&!building&&nx===n?(kind==='sr'?srWhyNot(n):pdWhyNot(n)):null;
  const pct=Math.min(100,Math.round(money/P.cost*100));
- const act=built||building?'':nx!==n?`<div class="act"><span class="lock">${n===1?'':'先做完上一階段。'}</span></div>`:why?`<div class="act"><span class="lock">${why}</span></div>`:`<div class="act">${btn(P.cost,kind==='sr'?'buySR':'buyPD',String(n),n===1?'動工':'訂購')}${money<P.cost?`<span class="muted" style="font-size:11.5px">還差 ${fmt(P.cost-money)}</span>`:''}</div>${money<P.cost?`<div class="gb"><i style="width:${pct}%"></i></div>`:''}`;
+ const act=built||building?'':nx!==n?`<div class="act"><span class="lock">${n===1?'':'先做完上一階段。'}</span></div>`:why?`<div class="act"><span class="lock">${why}</span></div>`:`<div class="act">${btn(P.cost,kind==='sr'?'buySR':'buyPD',`data-k="${n}"`,n===1?'動工':'訂購')}${money<P.cost?`<span class="muted" style="font-size:11.5px">還差 ${fmt(P.cost-money)}</span>`:''}</div>${money<P.cost?`<div class="gb"><i style="width:${pct}%"></i></div>`:''}`;
  return`<div class="item ${built?'done':''}"><img alt="" src="${iconURL('upfloor')}"><div class="nm">${P.n}${n>1?' '+['','I','II','III'][n]:' I'}《${P.sub}》 ${tag}</div><div class="d">${built?P.done:P.d}</div>${act}</div>`}
 function secUpRooms(money,btn){if(!upTaken())return'';let out='';
  const sr=fact('sr_story')||srOn(),pd=fact('pd_story')||pdOn();if(!sr&&!pd)return'';
@@ -6990,14 +6992,27 @@ function srLifeUpd(dt){if(!R||phase!=='service'||!srBuilt())return;
  /* in early: one or two of the floor sit a moment before the first guests */
  if(!R.srEarly&&R.cw&&R.t>.4){R.srEarly=1;const F=(S.crew||[]).filter(m=>(m.role==='waiter'||m.role==='cleaner')&&srHere(m)&&R.cw[m.id]&&!R.cw[m.id].arriving);const k=hash('srearly|'+S.day)%3;F.sort((a,b)=>hash(S.day+'|'+a.id)-hash(S.day+'|'+b.id)).slice(0,k).forEach((m,i)=>{const w=R.cw[m.id];const sp=srFreeSpot(srPrefOf(m));if(!sp)return;w.room='staff';w.x=sp.x;w.y=sp.y;w.tx=sp.x;w.ty=sp.y;w.troom='staff';srSend(m,5+i*3,sp);if(w.task)w.task.fired=1})}
  /* a quiet stretch: one goes up for a few minutes, never while the room is needed downstairs */
- R.srT=(R.srT||0)-dt;const busy=queued().length>0||R.tables.some(t=>t.group&&(t.group.state==='order'||t.group.state==='check'||t.group.pat<.4))||R.tickets.some(tk=>tk.items.some(i=>i.st==='ready'&&!i.picked));
- for(const id in R.cw||{}){const w=R.cw[id];if(w.task&&w.task.sr&&w.task.dur<1e6&&busy&&w.room!=='staff'&&!w.task.fired){/* called back before they got there */w.task=null;w.srSpot=null}}
+ /* rc8.5 (the player, 2026-10-04: 「營業時間也有 但沒看到任何員工去」「目標不是大量員工一直休息，而是正常玩時偶爾能自然撞見，而且
+    停留時間長到玩家有機會看到」). Measured on the player's Day 92 save (tools/sims/staff_room_day.py): three or more of the floor
+    had nothing in hand 92% of a busy evening, but the old rule wanted the whole restaurant quiet — no plate at the pass, at
+    most one table ordering or paying, nobody at the door — which held 6% of it; and one on the stairs was called back the
+    moment anyone waited at the door. So nobody reached the room in a whole service. Now a break waits for spare hands, not
+    for a quiet restaurant, and one on the way is called back only when the floor is short: work waiting and nobody else
+    free to do it */
+ R.srT=(R.srT||0)-dt;const srIdle=()=>(S.crew||[]).filter(m=>(m.role==='waiter'||m.role==='cleaner')&&srHere(m)&&R.cw[m.id]&&!R.cw[m.id].task&&!R.cw[m.id].next&&!R.cw[m.id].arriving&&!R.cw[m.id].leaving);
+ const work=()=>{const q=queued();return (q.length>0&&!!freeTableFor(q[0]))||R.tables.some(t=>t.group&&(t.group.state==='order'||t.group.state==='check'||t.group.pat<.3))||R.tickets.some(tk=>tk.items.some(i=>i.st==='ready'&&!i.picked))};
+ const short=work()&&srIdle().length<1;
+ for(const id in R.cw||{}){const w=R.cw[id];if(w.task&&w.task.sr&&w.task.dur<1e6&&short&&w.room!=='staff'&&!w.task.fired){/* called back before they got there */w.task=null;w.srSpot=null}}
  if(R.closing==null&&R.srT<=0){R.srT=8;/* a quiet moment for the floor: nobody waiting at the door, at most one table to order or pay, and
    at least three of them with nothing in hand — then one goes up for a few minutes (a busy restaurant has these too) */
-  const F=(S.crew||[]).filter(m=>(m.role==='waiter'||m.role==='cleaner')&&srHere(m)&&R.cw[m.id]&&!R.cw[m.id].task&&!R.cw[m.id].next&&!R.cw[m.id].arriving&&!R.cw[m.id].leaving);   /* nothing in hand (the idle wait between looks is not work) */
-  const quiet=queued().length===0&&R.tables.filter(t=>t.group&&(t.group.state==='order'||t.group.state==='check'||t.group.pat<.35)).length<=1;
-  if(quiet&&F.length>=3&&(R.srBreaks||0)<2&&R.t>R.dur*.12&&R.t<R.dur*.85&&!Object.values(R.cw||{}).some(w=>w.task&&w.task.sr)){
-   if(hash('srbr|'+S.day+'|'+Math.floor(R.t/8))%100<30){const m=F[hash('srbm|'+S.day+'|'+Math.floor(R.t))%F.length];const ms=srStage()>=3&&hash('srbm2|'+S.day+'|'+Math.floor(R.t))%3===0?srMassFree():null;if(srSend(m,10+hash('srbd|'+S.day)%5,ms||undefined)){R.srBreaks=(R.srBreaks||0)+1;R.srT=60}}}}
+  const F=srIdle();   /* nothing in hand (the idle wait between looks is not work) */
+  /* rc8.5: spare hands — three or more of the floor with nothing in hand (four when someone at the door has a table to be
+     shown to); at most four breaks an evening, one at a time (two together now and then on a floor with five free), each
+     long enough to be come across (about 20–30 minutes of the evening) */
+  const q=queued();const quiet=F.length>=(q.length&&freeTableFor(q[0])?4:3);
+  const away=Object.values(R.cw||{}).filter(w=>w.task&&w.task.sr&&w.task.dur<1e6).length;
+  if(quiet&&away<(F.length>=5&&hash('sr2|'+S.day)%3===0?2:1)&&(R.srBreaks||0)<4&&R.t>R.dur*.08&&R.t<R.dur*.88&&!Object.values(R.cw||{}).some(w=>w.task&&w.task.sr&&w.task.dur>1e6)){
+   if(hash('srbr|'+S.day+'|'+Math.floor(R.t/8))%100<40){const m=F[hash('srbm|'+S.day+'|'+Math.floor(R.t))%F.length];const ms=srStage()>=3&&hash('srbm2|'+S.day+'|'+Math.floor(R.t))%3===0?srMassFree():null;if(srSend(m,20+hash('srbd|'+S.day+'|'+m.id)%11,ms||undefined)){R.srBreaks=(R.srBreaks||0)+1;R.srT=16}}}}
  /* the pool table's frame at closing, the massage chair's sleepers, the words said up here (06:43) */
  if(R.srPool&&R.closing!=null)srPoolUpd(dt);
  {const MA=R.srMassAt=R.srMassAt||{};const seen={};for(const p of srPeople())if(p.spotK==='mass'){MA[p.m.id]=(MA[p.m.id]||0)+dt;seen[p.m.id]=1}for(const id in MA)if(!seen[id])delete MA[id]}
