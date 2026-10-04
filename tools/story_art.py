@@ -20,6 +20,8 @@ WLK = os.path.join(ROOT, 'docs/v24/art/illus_wall_leak_2026-10-01.png')       # 
 WST = os.path.join(ROOT, 'docs/v24/art/illus_wall_settled_2026-10-01.png')    # 2026-10-01 14:13, supplied by the player: after the mediation — 怡君 and 王先生 in the corridor, restrained
 UPC = os.path.join(ROOT, 'docs/v24/art/illus_up_cats_2026-10-02_0841.png')    # 2026-10-02 08:41, supplied by the player (「去二樓發現貓的圖 修改成這一張」, replacing the 08:15 picture): the night of the missing cats — the empty floor at night from above, the two street windows with the city, the orange cat on the sill, Jill bending to the tabby, the column, the boxes and the ladder, two of the crew at the stairs (a portrait picture: kept whole, not cut to 4:3)
 KT1 = os.path.join(ROOT, 'docs/v24/art/illus_ken_t1_2026-10-02_1619.png')    # 2026-10-02 16:19, supplied by the player: Ken's first tasting — Ken behind the bar with a glass, the bottles and the decanter, guests on the stools
+KT2 = os.path.join(ROOT, 'docs/v24/art/illus_ken_t2_2026-10-04.webp')   # 2026-10-04, supplied by the player: the second 品酒之夜 — Ken out among the tables, a glass raised, talking; Evan pouring at the bar; the room fuller
+KT3 = os.path.join(ROOT, 'docs/v24/art/illus_ken_t3_2026-10-04.webp')   # 2026-10-04, supplied by the player: the third 品酒之夜 — the whole Lounge tasting, Ken seated among the guests, Jill and Evan behind the bar
 KWN = os.path.join(ROOT, 'docs/v24/art/illus_ken_wine_2026-10-02_1625.png')  # 2026-10-02 16:25, supplied by the player: the collaboration wine — the bottle, its label 「晚餐之後」 JILL'S KITCHEN × KEN, a glass poured
 DWN = os.path.join(ROOT, 'docs/v24/art/illus_du_wine_2026-10-02_1632.png')   # 2026-10-02 16:32, supplied by the player: 杜先生 tasting 「晚餐之後」 at the bar, Ken beside him, quiet
 YAT = os.path.join(ROOT, 'docs/v24/art/illus_ya_trial_2026-10-02_1654.png')  # 2026-10-02 16:54, supplied by the player: 予安's trial — the piece just ended, 王太太 at the piano 「彈得真好。」, 王先生 smiling behind, a few tables clapping, Jill at the bar
@@ -52,6 +54,8 @@ ART = {
     'wall_settled':      (WST, (0, 0, 1448, 1086)),      # v2.4 illustration 《調解之後》 — 怡君 and 王先生 walking out of the mediation, files under their arms (the player's picture, whole)
     'up_cats':           (UPC, (18, 16, 1106, 1386)),    # v2.4 illustration 《樓上》 — the night the two cats were found upstairs (the player's 08:41 picture, whole, portrait; the white margin and the sliver of the next panel left out)
     'ken_t1':            (KT1, (0, 0, 1448, 1086)),      # rc7 illustration 《Ken 的品酒夜》 — the first tasting, Ken hosting from behind the bar (the player's picture, whole)
+    'ken_night2':        (KT2, (0, 0, 1448, 1086)),      # rc8.4 《有模有樣》 — the second 品酒之夜 (the player's picture, whole); the illustration and the album photo
+    'ken_night3':        (KT3, (0, 0, 1448, 1086)),      # rc8.4 《變成這裡的一部分》 — the third 品酒之夜 (the player's picture, whole); the illustration and the album photo
     'ken_wine':          (KWN, (0, 0, 1448, 1086)),      # rc7 illustration 《晚餐之後》 — the collaboration wine on the bar (the player's picture, whole)
     'du_wine':           (DWN, (0, 0, 1448, 1086)),      # rc7 illustration 《可是它很好》 — 杜先生 with the glass, Ken watching him, the bottle between them (the player's picture, whole)
     'ya_trial':          (YAT, (0, 0, 1448, 1086)),      # rc7 illustration 《彈得真好》 — the trial at the Lounge's piano (the player's picture, whole)
