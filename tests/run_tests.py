@@ -1280,8 +1280,11 @@ def jill_rests_when_staff_cover_the_floor(b, port, target):
     """Jill's breaks come from her real workload, not from a staff count: on a day she runs alone she
     never sits; with a full crew (and a player who lets them work) she sits on the sofa during service,
     reads or looks around, and gets up the moment a table is tapped. Tapping sleeping 包包 gives visible
-    feedback (eyes, tail) without waking him."""
-    g = Game(b, port, target, seed=7, manual=True)
+    feedback (eyes, tail) without waking him.
+    rc8.5: seed 7 → 16. On a day she runs alone she pats a passing cat on about three days in four, rc8.4 and rc8.5
+    alike (15/20 and 16/20 seeds, 32 and 29 pats; docs/evidence/v24_rc8_5/sims/jill_pats_*.txt); the small-talk budget
+    moved the random stream and seed 7 landed on a day without one."""
+    g = Game(b, port, target, seed=16, manual=True)
     install_bot(g)
     g.ev(LAZY_ACTOR)
     g.click('[data-act=open]')
