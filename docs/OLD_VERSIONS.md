@@ -1,6 +1,8 @@
 # 舊版本：要查以前怎麼做的時候
 
-每一個舊版本都在 `wip/lin` 的 git 歷史裡，不需要另外的 zip。要看某一版，就用那一版的 commit 開一個唯讀的 worktree：
+每一個舊版本都在 `main` 的 git 歷史裡（2026-10-03 以前叫 `wip/lin` 的那條開發線，2026-10-04 起由 `main` 接手），不需要另外的
+zip。2026-10-03 把 rc7.6 的 zip 匯入 GitHub 的那一個 commit 不在這條歷史裡，保存在 `archive/rc7.6-import-main`（d0947ea）。
+要看某一版，就用那一版的 commit 開一個唯讀的 worktree：
 
 ```
 git worktree add --detach ../jills-kitchen-old/v2.2.1 7dbcaff

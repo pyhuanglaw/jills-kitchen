@@ -20,7 +20,8 @@
   都發布，也不要等所有回報清空才發布；新回報先記錄，不是 release blocker 就不要卡住眼前可以發布的版本。「記到下一批」不是「不做」。
 - **Canon 衝突就停下來問玩家**，用 `CONFLICT FOUND` 的格式。不要用測試、模擬、換 seed、程式現況替玩家決定產品設計。
 - **運算是付費的**：完整回歸只用在 release gate 和高風險修改；先想清楚這次執行要回答什麼問題。
-- **Commit ≠ Push ≠ Publish**：開發中隨時 commit、push 到開發 branch；玩家說「發布」才發布。
+- **Commit ≠ Push ≠ Publish**：開發中隨時 commit、push；玩家說「發布」才發布。`main` 是正式主線，還沒做完的遊戲功能放在短期的
+  `feature/…` 或 `wip/…` branch，做完、測試通過才回到 `main`（PROJECT_MEMORY §10；現有 branch 見 CURRENT_STATE）。
 - **I / T / O 分開報告**：測試通過不等於玩家在 iPhone 上看得到。
 - **改到遊戲基本架構（不只劇情）就檢查店主手冊**（`GUIDE`），每一項要短、好讀。
 - **報告 ≠ 停下**：回報後繼續已定義的工作，除非遇到 canon 衝突、存檔風險，或需要玩家做的產品決策。

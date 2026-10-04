@@ -215,6 +215,17 @@ Madame Lin：Day 1 之前就是隔壁 neighborhood bar 的老闆。不是房東�
 9. 開幕 5 天以上、普通的一晚（不是品酒夜或主廚之夜），Madame Lin 第一次以客人身分來：「坐哪？」「隨便。」「喝什麼？」「你選。」
    不要感傷的退休致詞。
 
+### Ken 的前三次品酒夜：三張 Story Photo（玩家 2026-10-04；原文 `docs/v24/ken_tasting_pictures_2026-10-04.txt`）
+
+已決定，不要再問 A／B／C。
+- 「Ken 前三次自主舉辦的品酒夜，各自有專屬插圖；每張只在對應場次首次出現。第三次之後進入常態品酒夜，不再播放 Story Photo。」
+- 第一次｜剛開始辦：Ken 比較像主角，站著介紹酒；客人不多，桌上三杯酒，像第一次試辦。第二次｜已經有模有樣：人明顯多一點、Lounge
+  熱鬧，Ken 在客人之間講酒，可以有熟面孔。第三次｜變成這裡的一部分：拉遠，整個 Lounge 都在品酒，有人討論、有人拿杯子，Jill／Evan
+  自然在裡面。
+- 三張是同一個 Lounge、同一個 Ken、類似構圖，人數、動作、氣氛慢慢變——不是三個不同的活動，也不是同一張重播。放進相簿
+  （Life Album）連著看。
+- 第一張用現有的那張（`ken_t1`）。第二、第三張由玩家提供；圖來之前不自己生假圖，也不拿同一張圖冒充三張。
+
 ---
 
 ## 7. 晴 × 阿拓（rc8，已實作；原始 brief：`docs/v24/qing_tuo_after_work_brief_2026-10-03.txt`；報告：`docs/V24_RC8_QING_TUO_REPORT.md`）
@@ -298,6 +309,11 @@ Event CG（`STORY_ILLUS`）＝故事插圖。PHOTO = evidence that the moment ac
 - 發布到玩家正在用的網址（目前是哪一個見 `docs/CURRENT_STATE.md`）。發布後用 Artifact read 讀回，跑 `tools/sims/live_check.py`。
 - 一般發布不打 zip；GitHub 是備份與版本紀錄。只有玩家要求或重大里程碑才做完整離線 zip。
 
+**Git branch**（2026-10-04 玩家：「main = Jill's Kitchen 現行正式主線」「Madame Lin 是遊戲角色／故事線，不是整個專案永久的 Git
+branch」）：`main` 是正式、目前、穩定的主線，發布的 commit 在 `main` 上。還沒做完的功能開短期的 `feature/…` 或 `wip/…` branch，
+做完、測試通過再回到 `main`，不讓兩條線長期並行。不要 merge 沒有共同祖先的歷史（`archive/rc7.6-import-main`），不要改寫已推上去的
+歷史。現在有哪些 branch 見 `docs/CURRENT_STATE.md`。
+
 ---
 
 ## 11. 已改掉的舊規則（看到就不要再改回去）
@@ -316,6 +332,7 @@ Event CG（`STORY_ILLUS`）＝故事插圖。PHOTO = evidence that the moment ac
 | 第一天贊助 $20,000 | 前 10 天錢少於 $300 就借 $3,000，超過 $20,000 結算時自動還 | 2026-10-02 晚上（rc7.2） |
 | 發布到舊網址 2vhURujrtCpQ1P5jnSsjps | 新網址（見 CURRENT_STATE） | 2026-10-03，玩家在此 session 選擇 |
 | 每次發布打包 zip | 一般發布不打 zip | 2026-10-03 |
+| 開發 branch 是 `wip/lin`，`main` 只是 rc7.6 匯入 | `main` 是正式主線；舊的匯入在 `archive/rc7.6-import-main`；工作 branch 短期用 | 2026-10-04 玩家 |
 | 客滿時在主廳門邊的長椅等位 | 在店門口外面等（門口長椅坐、沒有就站在門邊）；主廳長椅給貓 | 2026-10-03 玩家「排隊的人可不可以改到店門口啊 在主廳好礙事」，rc8.3 |
 | 每道 PERFECT 在畫面中間跳橫幅 | 只有出餐台上的小字、金光、音效 | 2026-10-03 玩家「可以不要一直跳出perfect擋住選區嗎」，rc8.3 |
 | 秀琴阿姨跟 Sophie、Mia 的閒聊「兩人合計 6 次」 | 每人各 3 次、先找聊得少的（合計會讓 Mia 一次都沒有，《那面牆》開不了） | 2026-10-03，b443ab5 |
