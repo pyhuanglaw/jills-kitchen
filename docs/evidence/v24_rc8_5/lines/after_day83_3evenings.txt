@@ -1,0 +1,34 @@
+seed 8301, 3 evening(s) from Day 83: 87 lines popped up
+per day: {83: 24, 84: 26, 85: 37}
+story trace: {83: ['kt_night/major', 'veteran_knows/ambient', 'anan_seat/ambient', 'cat_known/ambient', 'lin_seen/ambient', 'up_small/ambient', 'qx_dylan/ambient', 'ya_3/major', 'xq_sm_talk/ambient', 'qt_days/ambient'], 84: ['wall_mediation/major', 'recognize/ambient', 'zhou_random/ambient', 'lin_seen/ambient', 'koba_not_today/ambient', 'sr_story/major', 'qx_after/ambient', 'qt_days/ambient'], 85: ['sm_c/major', 'cat_known/ambient', 'kx_heard/ambient', 'lin_seen/ambient', 'qt_days/ambient']}
+    10  other/stockWatch
+     9  other/createTicket
+     8  other/serveItems
+     7  other/spawn
+     6  other/f
+     6  other/loveOrdered
+     5  other/fireIncident
+     4  other/seatLine
+     4  other/addXP
+     3  other/streetUpd
+     3  other/collect
+     3  other/closeShop
+     3  story/?
+     3  other/yaUpd
+     2  other/staffBark
+     2  other/streetJoin
+     2  other/leftTogether
+     2  other/treatArrive
+     1  story/ambient
+     1  other/storyLinger
+     1  other/incUpd
+     1  other/jillGreet
+     1  other/lingerMet
+the same words more than once:
+  3×  VIP 貴賓到了！消費高，要求也高。
+  3×  有人在門口看了一下，走進來了。
+  3×  21:30 打烊，不再接新客人
+  2×  Jill，今天的醬汁我想再試一次。
+  2×  有隻狗在門口的休息角趴下來了。
+  2×  香烤鮭魚 只剩 2 份
+story beats (lines): {'ya_trial': 2, 'qx_after': 1, 'ya_join': 1}

@@ -1,0 +1,280 @@
+Day 83 17:11  [seatLine]  黃先生：「下雨天就想喝點熱的。」
+Day 83 17:19  [f]  黃先生：「水牛城雞翅是新的？」
+Day 83 17:20  [spawn]  VIP 貴賓到了！消費高，要求也高。
+Day 83 17:21  [createTicket]  黃先生：「聽說這裡的東西都是 Jill 親手做的？」
+Day 83 17:25  [serveItems]  阿傑與小雯：「這個要拍一下。」
+Day 83 17:27  [spawn]  VIP 貴賓到了！消費高，要求也高。
+Day 83 17:27  [streetUpd]  有人在門口看了一下，走進來了。
+Day 83 17:30  [createTicket]  Emma：「每一道都想吃，好難選。」
+Day 83 17:32  [createTicket]  蔡課長：「今天有什麼特別的？」
+Day 83 17:32  [serveItems]  Emma：「先拍照，等我一下！」
+Day 83 17:38  [createTicket]  張經理：「招牌的都上一份。」
+Day 83 17:40  [f]  Ruby：「那隻貓好可愛。」
+Day 83 17:45  [update]  Rush Mode 結束，呼！
+Day 83 17:55  [crewUpd]  久等了。
+Day 83 18:03  [update]  Rush Mode 結束，呼！
+Day 83 18:06  [collect]  Chloe：「老闆娘手藝真好。」
+Day 83 18:07  [loveOrdered]  沒有番茄義大利麵，好可惜。
+Day 83 18:16  [serveItems]  我的檸檬氣泡水！
+Day 83 18:20  [update]  Rush Mode 結束，呼！
+Day 83 18:24  [seatLine]  阿傑與小雯：「傘都濕透了。」
+Day 83 18:41  [update]  Rush Mode 結束，呼！
+Day 83 18:44  [createTicket]  王家三口：「今天想吃點好的。」
+Day 83 18:47  [seatLine]  陳先生：「外面雨好大。」
+Day 83 18:51  [serveItems]  王家三口：「小朋友把薯條先搶走了。」
+Day 83 18:56  [collect]  Tina：「謝謝招待。」
+Day 83 18:59  [update]  Rush Mode 結束，呼！
+Day 83 19:01  [serveItems]  Jason：「這盤擺得也太好看。」
+Day 83 19:01  [moveToLounge]  張經理 到 Lounge 再喝一杯。
+Day 83 19:02  [moveToLounge]  阿傑與小雯 吃完了，換到 Lounge 坐。
+Day 83 19:05  [spawn]  VIP 貴賓到了！消費高，要求也高。
+Day 83 19:07  [fireIncident]  衛生局，例行檢查。
+Day 83 19:07  [seatLine]  小周與阿晴：「朋友說一定要來吃 Jill 的店。」
+Day 83 19:09  [spawn]  VIP 貴賓到了！消費高，要求也高。
+Day 83 19:09  [createTicket]  林小姐：「有推薦的嗎？算了，都點吧。」
+Day 83 19:13  [serveItems]  Emma：「終於吃到了。」
+Day 83 19:15  [update]  Rush Mode 結束，呼！
+Day 83 19:16  [spawn]  VIP 貴賓到了！消費高，要求也高。
+Day 83 19:17  [createTicket]  Amy：「先來一杯，菜慢慢上。」
+Day 83 19:19  [createTicket]  小周與阿晴：「看了好久，就這幾道。」
+Day 83 19:22  [f]  Emma：「這道以前沒看過。」
+Day 83 19:26  [createTicket]  Emma：「把你們最好的端上來吧。」
+Day 83 19:28  [serveItems]  張媽媽一家：「松露蘑菇牛肉堡，就是這個。」
+Day 83 19:32  [update]  Rush Mode 結束，呼！
+Day 83 19:36  [f]  吳小姐：「他們那桌吃的看起來不錯。」
+Day 83 19:38  [dylanAct]  這位子有人坐嗎？
+Day 83 19:40  [createTicket]  Emma：「不用看菜單了，照你們推薦的來。」
+Day 83 19:41  [seatLine]  張經理：「聽說很難等到位子。」
+Day 83 19:44  [addXP]  熟練度提升：酒吧披薩 LV2
+Day 83 19:46  [serveItems]  Emma：「我的松露蘑菇牛肉堡！」
+Day 83 19:46  [spawn]  Ryan 與 Ivy 看到客滿，失望地走了…
+Day 83 19:48  [update]  Rush Mode 結束，呼！
+Day 83 19:51  [collect]  張媽媽一家：「Jill's 檸檬奶油干貝很好吃，謝謝。」
+Day 83 20:04  [fireIncident]  供應商多送了 2 份焦糖布丁的料，算他們請的
+Day 83 20:06  [update]  Rush Mode 結束，呼！
+Day 83 20:09  [crewUpd]  久等了。
+Day 83 20:14  [moveToLounge]  Emma 到 Lounge 再喝一杯。
+Day 83 20:17  [serveItems]  Eric：「來了來了。」
+Day 83 20:18  [loungeToDining]  Eric 的位子好了，從 Lounge 過去。
+Day 83 20:21  [loungeToDining]  Emma 的位子好了，從 Lounge 過去。
+Day 83 20:21  [stockWatch]  Jill's 檸檬奶油干貝 只剩 2 份
+Day 83 20:22  [moveToLounge]  阿彥 吃完了，換到 Lounge 坐。
+Day 83 20:25  [seatLine]  Ryan 與 Ivy：「窗邊的位子不錯。」
+Day 83 20:25  [loungeToDining]  張經理 的位子好了，從 Lounge 過去。
+Day 83 20:25  [loungeToDining]  Eric 的位子好了，從 Lounge 過去。
+Day 83 20:26  [update]  Rush Mode 結束，呼！
+Day 83 20:26  [loungeToDining]  陳先生 的位子好了，從 Lounge 過去。
+Day 83 20:36  [moveToLounge]  Emma 吃完了，換到 Lounge 坐。
+Day 83 20:38  [moveToLounge]  林小姐 到 Lounge 再喝一杯。
+Day 83 20:39  [moveToLounge]  Eric 到 Lounge 再喝一杯。
+Day 83 20:42  [loveOrdered]  炙烤肋眼牛排！就這個。
+Day 83 20:43  [update]  Rush Mode 結束，呼！
+Day 83 20:44  [bartenderUpd]  慢慢喝。
+Day 83 20:47  [spawn]  VIP 貴賓到了！消費高，要求也高。
+Day 83 20:50  [serveItems]  Emma：「跟一般版差在哪？我看看。」
+Day 83 20:52  [loveOrdered]  今天沒有提拉米蘇啊……
+Day 83 20:56  [addXP]  熟練度提升：起司條 LV2
+Day 83 20:59  [update]  Rush Mode 結束，呼！
+Day 83 21:07  [createTicket]  Jill，今天的醬汁我想再試一次。
+Day 83 21:08  [collect]  林家三口：「人真的很多，還好有等。」
+Day 83 21:15  [serveItems]  Eric：「哇，Jill 主廚的擺盤好美。」
+Day 83 21:16  [spawn]  VIP 貴賓到了！消費高，要求也高。
+Day 83 21:16  [update]  Rush Mode 結束，呼！
+Day 83 21:21  [serveItems]  Ben 與 Lily：「拍一張再吃。」
+Day 83 21:22  [loungeToDining]  Chloe 的位子好了，從 Lounge 過去。
+Day 83 21:23  [loungeToDining]  Emma 的位子好了，從 Lounge 過去。
+Day 83 21:26  [collect]  Ryan 與 Ivy：「跟包包說再見。」
+Day 83 21:30  [closeShop]  21:30 打烊，不再接新客人
+Day 83 21:33  [update]  Rush Mode 結束，呼！
+Day 83 21:34  [stockWatch]  巴斯克乳酪蛋糕 只剩 2 份
+Day 83 21:34  [createTicket]  林小姐：「好吃的都來。」
+Day 83 21:38  [f]  Emma：「牠是店裡的貓嗎？」
+Day 83 21:49  [serveItems]  Chloe：「份量剛好。」
+Day 83 21:52  [update]  Rush Mode 結束，呼！
+Day 83 21:58  [f]  Jill：「還合口味嗎？」
+Day 83 22:08  [update]  Rush Mode 結束，呼！
+Day 84 17:12  [f]  Ben 與 Lily：「菜單上有新東西。」
+Day 84 17:17  [streetUpd]  有人在門口看了一下，走進來了。
+Day 84 17:20  [f]  Chloe：「這隻貓叫什麼名字？」
+Day 84 17:26  [seatLine]  Jill：「歡迎回來。」
+Day 84 17:33  [serveItems]  Ben 與 Lily：「抹茶舒芙蕾，就是這個。」
+Day 84 17:40  [serveItems]  Emma：「櫻桃鴨胸長這樣啊。」
+Day 84 17:46  [update]  Rush Mode 結束，呼！
+Day 84 17:57  [crewUpd]  小心燙。
+Day 84 18:03  [update]  Rush Mode 結束，呼！
+Day 84 18:13  [collect]  Ben 與 Lily：「下次還要點香烤鮭魚。」
+Day 84 18:17  [serveItems]  陳家：「小朋友把薯條先搶走了。」
+Day 84 18:20  [update]  Rush Mode 結束，呼！
+Day 84 18:26  [f]  林小姐：「隔壁桌那個是什麼？」
+Day 84 18:33  [serveItems]  李家：「專程來吃這道的。」
+Day 84 18:40  [update]  Rush Mode 結束，呼！
+Day 84 18:47  [f]  黃先生：「那隻貓好可愛。」
+Day 84 18:55  [createTicket]  陳先生：「先點這些，不夠再加。」
+Day 84 18:56  [seatLine]  阿凱：「這次換點別的。」
+Day 84 19:00  [update]  Rush Mode 結束，呼！
+Day 84 19:02  [fireIncident]  外面突然下起雨了
+Day 84 19:02  [fireIncident]  雨來得真快。
+Day 84 19:03  [serveItems]  Ryan 與 Ivy：「松露蘑菇牛肉堡，就是這個。」
+Day 84 19:05  [createTicket]  阿凱：「看了好久，就這幾道。」
+Day 84 19:08  [serveItems]  Ryan 與 Ivy：「海膽燉飯長這樣啊。」
+Day 84 19:10  [moveToLounge]  Sophie 到 Lounge 再喝一杯。
+Day 84 19:14  [crewUpd]  久等了。
+Day 84 19:18  [update]  Rush Mode 結束，呼！
+Day 84 19:18  [moveToLounge]  Ryan 與 Ivy 到 Lounge 再喝一杯。
+Day 84 19:19  [moveToLounge]  小安 吃完了，換到 Lounge 坐。
+Day 84 19:21  [collect]  陳先生：「很好吃，謝謝。」
+Day 84 19:23  [moveToLounge]  Ryan 與 Ivy 吃完了，換到 Lounge 坐。
+Day 84 19:29  [f]  Ryan 與 Ivy：「香烤鮭魚是新的？」
+Day 84 19:31  [spawn]  VIP 貴賓到了！消費高，要求也高。
+Day 84 19:31  [moveToLounge]  阿凱 吃完了，換到 Lounge 坐。
+Day 84 19:32  [moveToLounge]  張媽媽一家 吃完了，換到 Lounge 坐。
+Day 84 19:32  [createTicket]  Ruby：「每一道都想吃，好難選。」
+Day 84 19:32  [spawn]  VIP 貴賓到了！消費高，要求也高。
+Day 84 19:34  [update]  Rush Mode 結束，呼！
+Day 84 19:34  [stockWatch]  南瓜濃湯 只剩 2 份
+Day 84 19:35  [serveItems]  這盤擺得也太好看。
+Day 84 19:36  [moveToLounge]  Ryan 與 Ivy 到 Lounge 再喝一杯。
+Day 84 19:44  [createTicket]  今天不趕時間，慢慢上。
+Day 84 19:45  [spawn]  品酒師 Ken 看到客滿，失望地走了…
+Day 84 19:47  [seatLine]  蔡課長：「好香喔，是 Jill 在煎東西嗎？」
+Day 84 19:50  [loveOrdered]  經典牛肉漢堡今天沒有喔？那我看看別的。
+Day 84 19:51  [fireIncident]  店裡突然安靜下來了
+Day 84 19:51  [update]  Rush Mode 結束，呼！
+Day 84 19:56  [createTicket]  陳先生：「不用看菜單了，照你們推薦的來。」
+Day 84 20:03  [serveItems]  小安：「來了來了。」
+Day 84 20:04  [moveToLounge]  Ruby 吃完了，換到 Lounge 坐。
+Day 84 20:06  [moveToLounge]  蔡課長 吃完了，換到 Lounge 坐。
+Day 84 20:08  [update]  Rush Mode 結束，呼！
+Day 84 20:09  [moveToLounge]  Emma 到 Lounge 再喝一杯。
+Day 84 20:11  [seatLine]  陳家：「傘都濕透了。」
+Day 84 20:19  [f]  阿傑與小雯：「可以摸嗎？」
+Day 84 20:20  [stockWatch]  巴斯克乳酪蛋糕 只剩 2 份
+Day 84 20:21  [moveToLounge]  佳佳 到 Lounge 再喝一杯。
+Day 84 20:23  [moveToLounge]  老饕李先生 與朋友 吃完了，換到 Lounge 坐。
+Day 84 20:25  [update]  Rush Mode 結束，呼！
+Day 84 20:25  [moveToLounge]  小安 到 Lounge 再喝一杯。
+Day 84 20:28  [loungeToDining]  小林 的位子好了，從 Lounge 過去。
+Day 84 20:28  [loungeToDining]  蔡課長 的位子好了，從 Lounge 過去。
+Day 84 20:29  [loungeToDining]  Ben 與 Lily 的位子好了，從 Lounge 過去。
+Day 84 20:31  [spawn]  VIP 貴賓到了！消費高，要求也高。
+Day 84 20:33  [collect]  Mina：「老闆娘手藝真好。」
+Day 84 20:33  [moveToLounge]  Mina 吃完了，換到 Lounge 坐。
+Day 84 20:34  [moveToLounge]  小周與阿晴 吃完了，換到 Lounge 坐。
+Day 84 20:35  [moveToLounge]  小安 吃完了，換到 Lounge 坐。
+Day 84 20:37  [loveOrdered]  沒有松露燉飯，好可惜。
+Day 84 20:42  [createTicket]  今天有什麼特別的？
+Day 84 20:42  [update]  Rush Mode 結束，呼！
+Day 84 20:48  [serveItems]  Tina：「炙烤肋眼牛排長這樣啊。」
+Day 84 20:49  [stockWatch]  抹茶舒芙蕾 只剩 2 份
+Day 84 20:53  [loveOrdered]  炙烤肋眼牛排！就這個。
+Day 84 20:57  [spawn]  VIP 貴賓到了！消費高，要求也高。
+Day 84 21:00  [update]  Rush Mode 結束，呼！
+Day 84 21:01  [bartenderUpd]  這杯適合這道。
+Day 84 21:03  [treatArrive]  Jill：「來了這麼多次，這個算我的。」
+Day 84 21:04  [spawn]  Emma 和另外 2 組看到客滿，失望地走了…
+Day 84 21:06  [treatArrive]  Jill：「第五次了，這個請你。」
+Day 84 21:07  [serveItems]  佳佳：「上面那個是烤骨髓？」
+Day 84 21:16  [update]  Rush Mode 結束，呼！
+Day 84 21:16  [crewUpd]  小心燙。
+Day 84 21:22  [serveItems]  Ben 與 Lily：「看起來好好吃。」
+Day 84 21:30  [closeShop]  21:30 打烊，不再接新客人
+Day 84 21:31  [collect]  Tina：「人真的很多，還好有等。」
+Day 84 21:34  [update]  Rush Mode 結束，呼！
+Day 84 21:45  [serveItems]  張媽媽一家：「爸爸：「這家的貓不怕人。」」
+Day 84 21:51  [update]  Rush Mode 結束，呼！
+Day 84 22:12  [qx_after]  收店以後。Evan：「喝一杯？」晴：「一杯。」阿拓已經坐下了。
+Day 85 17:12  [f]  張經理：「香烤鮭魚是新的？」
+Day 85 17:25  [serveItems]  張經理：「哇，Jill 主廚的擺盤好美。」
+Day 85 17:33  [collect]  張經理：「下次還要點香烤鮭魚。」
+Day 85 17:42  [streetUpd]  有人在門口看了一下，走進來了。
+Day 85 17:42  [f]  Chloe：「他們那桌吃的看起來不錯。」
+Day 85 17:50  [update]  Rush Mode 結束，呼！
+Day 85 17:50  [f]  吳小姐：「牠都不怕人耶。」
+Day 85 17:57  [seatLine]  Eric：「上次路過就想進來了。」
+Day 85 18:07  [update]  Rush Mode 結束，呼！
+Day 85 18:15  [createTicket]  Chloe：「看了好久，就這幾道。」
+Day 85 18:16  [spawn]  VIP 貴賓到了！消費高，要求也高。
+Day 85 18:20  [collect]  Eric：「會再來。」
+Day 85 18:21  [spawn]  VIP 貴賓到了！消費高，要求也高。
+Day 85 18:22  [spawn]  VIP 貴賓到了！消費高，要求也高。
+Day 85 18:25  [createTicket]  把你們最好的端上來吧。
+Day 85 18:25  [update]  Rush Mode 結束，呼！
+Day 85 18:26  [serveItems]  Mina：「招牌菜長這樣。」
+Day 85 18:29  [createTicket]  Ruby：「聽說這裡的東西都是 Jill 親手做的？」
+Day 85 18:30  [loveOrdered]  Jill's 檸檬奶油干貝！就這個。
+Day 85 18:30  [createTicket]  黃先生：「今天不趕時間，慢慢上。」
+Day 85 18:36  [createTicket]  Jason：「有什麼是今天才有的？」
+Day 85 18:45  [update]  Rush Mode 結束，呼！
+Day 85 18:47  [serveItems]  我的Jill's 檸檬奶油干貝！
+Day 85 18:53  [createTicket]  Mina：「今天想吃點好的。」
+Day 85 18:56  [f]  Mina：「這道以前沒看過。」
+Day 85 18:59  [storyLinger]  品酒師 Ken 與朋友 吃完了，還坐著。
+Day 85 19:01  [serveItems]  Mina：「拍一張再吃。」
+Day 85 19:02  [update]  Rush Mode 結束，呼！
+Day 85 19:03  [loveOrdered]  濃郁紅酒，一杯。
+Day 85 19:06  [seatLine]  張媽媽一家：「終於有位子了。」
+Day 85 19:08  [moveToLounge]  黃先生 吃完了，換到 Lounge 坐。
+Day 85 19:10  [streetJoin]  有隻狗在門口的休息角趴下來了。
+Day 85 19:13  [crewUpd]  久等了。
+Day 85 19:14  [moveToLounge]  阿彥 吃完了，換到 Lounge 坐。
+Day 85 19:15  [ya_trial]  予安來了。這次她沒有點酒，直接走到鋼琴前面。
+Day 85 19:16  [fireIncident]  供應商多送了 2 份松露燉飯的料，算他們請的
+Day 85 19:19  [update]  Rush Mode 結束，呼！
+Day 85 19:19  [yaUpd]  靠近鋼琴的那一桌，原本在聊天的客人慢慢小聲了。
+Day 85 19:21  [serveItems]  蔡課長：「拿鐵咖啡長這樣啊。」
+Day 85 19:23  [loveOrdered]  今天有香煎鴨胸，太好了。
+Day 85 19:23  [yaUpd]  吧台有一位客人放下酒杯，聽了一小段。
+Day 85 19:26  [moveToLounge]  Jason 吃完了，換到 Lounge 坐。
+Day 85 19:27  [yaUpd]  Lounge 裡有人轉過頭，看了鋼琴好一會兒。
+Day 85 19:28  [createTicket]  張媽媽一家：「先點這些，不夠再加。」
+Day 85 19:32  [ya_trial]  一首彈完，Lounge 安靜了一下。靠近鋼琴的那一桌先拍手，接著又有兩三桌。
+Day 85 19:35  [seatLine]  Grace：「這次換點別的。」
+Day 85 19:37  [update]  Rush Mode 結束，呼！
+Day 85 19:43  [spawn]  Eric 看到客滿，失望地走了…
+Day 85 19:47  [f]  小周與阿晴：「隔壁桌那個是什麼？」
+Day 85 19:47  [moveToLounge]  林小姐 到 Lounge 再喝一杯。
+Day 85 19:50  [lingerMet]  品酒師 Ken 等的人來了。
+Day 85 19:52  [fireIncident]  點那張桌子，讓 Jill 過去安撫
+Day 85 19:52  [serveItems]  張媽媽一家：「布拉塔番茄麵，就是這個。」
+Day 85 19:55  [update]  Rush Mode 結束，呼！
+Day 85 19:57  [serveItems]  張媽媽一家：「媽媽：「先吃飯，貓等一下再看。」」
+Day 85 19:58  [arriveAct]  小安：「好啦好啦…看在 Jill 的面子上。」
+Day 85 20:02  [collect]  張經理：「等有點久，不過值得。」
+Day 85 20:05  [moveToLounge]  Ben 與 Lily 吃完了，換到 Lounge 坐。
+Day 85 20:08  [spawn]  VIP 貴賓到了！消費高，要求也高。
+Day 85 20:10  [createTicket]  小安：「有推薦的嗎？算了，都點吧。」
+Day 85 20:12  [update]  Rush Mode 結束，呼！
+Day 85 20:12  [loungeToDining]  Chloe 的位子好了，從 Lounge 過去。
+Day 85 20:15  [serveItems]  阿凱：「份量剛好。」
+Day 85 20:17  [collect]  不錯。
+Day 85 20:20  [jillGreet]  Leo，今天想吃什麼？
+Day 85 20:20  [ya_join]  客人散了一些。予安彈完最後一首，闔上琴蓋，走到吧台邊。
+Day 85 20:21  [createTicket]  小周一家：「每一道都想吃，好難選。」
+Day 85 20:22  [stockWatch]  Jill's 檸檬奶油干貝 只剩 2 份
+Day 85 20:23  [moveToLounge]  Chloe 到 Lounge 再喝一杯。
+Day 85 20:25  [crewUpd]  請慢用。
+Day 85 20:28  [loungeToDining]  Jason 的位子好了，從 Lounge 過去。
+Day 85 20:28  [loungeToDining]  Grace 的位子好了，從 Lounge 過去。
+Day 85 20:28  [update]  Rush Mode 結束，呼！
+Day 85 20:29  [loungeToDining]  阿凱 的位子好了，從 Lounge 過去。
+Day 85 20:32  [moveToLounge]  Sam 與 Lena 吃完了，換到 Lounge 坐。
+Day 85 20:37  [createTicket]  Jill，老樣子，快快快。
+Day 85 20:39  [loungeToDining]  小周與阿晴 的位子好了，從 Lounge 過去。
+Day 85 20:42  [bartenderUpd]  請慢用。
+Day 85 20:45  [update]  Rush Mode 結束，呼！
+Day 85 20:51  [stockWatch]  布拉塔番茄麵 只剩 2 份
+Day 85 21:01  [update]  Rush Mode 結束，呼！
+Day 85 21:05  [serveItems]  小周與阿晴：「松露蘑菇牛肉堡，就是這個。」
+Day 85 21:11  [serveItems]  張媽媽一家：「小朋友把薯條先搶走了。」
+Day 85 21:15  [addXP]  熟練度提升：生蠔 LV3
+Day 85 21:19  [update]  Rush Mode 結束，呼！
+Day 85 21:20  [collect]  Emma：「老闆娘手藝真好。」
+Day 85 21:22  [loungeToDining]  蔡課長 的位子好了，從 Lounge 過去。
+Day 85 21:23  [loungeToDining]  Amy 的位子好了，從 Lounge 過去。
+Day 85 21:30  [closeShop]  21:30 打烊，不再接新客人
+Day 85 21:30  [stockWatch]  香煎鴨胸 只剩 2 份
+Day 85 21:38  [update]  Rush Mode 結束，呼！
+Day 85 21:38  [crewUpd]  請慢用。
+Day 85 21:46  [f]  Grace：「可以摸嗎？」
+Day 85 21:55  [update]  Rush Mode 結束，呼！
+Day 85 22:13  [qt_extra]  打烊後阿拓又放了一盤在晴旁邊。「多的。」

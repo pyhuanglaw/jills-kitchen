@@ -1,0 +1,51 @@
+seed 8301, 3 evening(s) from Day 83: 280 lines popped up
+per day: {83: 95, 84: 90, 85: 95}
+story trace: {83: ['kt_night/major', 'veteran_knows/ambient', 'anan_seat/ambient', 'cat_known/ambient', 'lin_seen/ambient', 'up_small/ambient', 'qx_dylan/ambient', 'ya_3/major', 'xq_sm_talk/ambient', 'qt_days/ambient'], 84: ['wall_mediation/major', 'recognize/ambient', 'zhou_random/ambient', 'lin_seen/ambient', 'kx_heard/ambient', 'up_busy/v24', 'sr_story/major', 'qx_after/ambient', 'qt_days/ambient'], 85: ['cat_known/ambient', 'lin_seen/ambient', 'sm_c/major', 'koba_not_today/ambient', 'qt_extra/ambient', 'qt_days/ambient']}
+    46  other/update
+    35  other/serveItems
+    30  other/moveToLounge
+    28  other/createTicket
+    19  other/spawn
+    18  other/f
+    17  other/loungeToDining
+    14  other/collect
+    13  other/seatLine
+     9  other/loveOrdered
+     8  other/crewUpd
+     8  other/stockWatch
+     7  other/fireIncident
+     3  other/streetUpd
+     3  other/addXP
+     3  other/bartenderUpd
+     3  other/closeShop
+     3  story/?
+     3  other/yaUpd
+     2  other/treatArrive
+     2  story/ambient
+     1  other/dylanAct
+     1  other/storyLinger
+     1  other/streetJoin
+     1  other/lingerMet
+     1  other/arriveAct
+     1  other/jillGreet
+the same words more than once:
+  46×  Rush Mode 結束，呼！
+  15×  VIP 貴賓到了！消費高，要求也高。
+  4×  久等了。
+  3×  有人在門口看了一下，走進來了。
+  3×  21:30 打烊，不再接新客人
+  3×  請慢用。
+  2×  Emma 到 Lounge 再喝一杯。
+  2×  Eric 的位子好了，從 Lounge 過去。
+  2×  Emma 的位子好了，從 Lounge 過去。
+  2×  Jill's 檸檬奶油干貝 只剩 2 份
+  2×  阿彥 吃完了，換到 Lounge 坐。
+  2×  林小姐 到 Lounge 再喝一杯。
+  2×  炙烤肋眼牛排！就這個。
+  2×  Chloe 的位子好了，從 Lounge 過去。
+  2×  巴斯克乳酪蛋糕 只剩 2 份
+  2×  小心燙。
+  2×  Ryan 與 Ivy 到 Lounge 再喝一杯。
+  2×  小安 吃完了，換到 Lounge 坐。
+  2×  蔡課長 的位子好了，從 Lounge 過去。
+story beats (lines): {'ya_trial': 2, 'qx_after': 1, 'ya_join': 1, 'qt_extra': 1}

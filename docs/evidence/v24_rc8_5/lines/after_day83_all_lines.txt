@@ -1,0 +1,87 @@
+Day 83 17:11  [seatLine]  黃先生：「下雨天就想喝點熱的。」
+Day 83 17:20  [spawn]  VIP 貴賓到了！消費高，要求也高。
+Day 83 17:25  [serveItems]  阿傑與小雯：「這個要拍一下。」
+Day 83 17:27  [streetUpd]  有人在門口看了一下，走進來了。
+Day 83 17:40  [f]  Ruby：「那隻貓好可愛。」
+Day 83 17:55  [staffBark]  久等了。
+Day 83 18:07  [loveOrdered]  沒有番茄義大利麵，好可惜。
+Day 83 18:16  [serveItems]  我的檸檬氣泡水！
+Day 83 18:44  [createTicket]  王家三口：「今天想吃點好的。」
+Day 83 19:01  [serveItems]  Jason：「這盤擺得也太好看。」
+Day 83 19:07  [fireIncident]  衛生局，例行檢查。
+Day 83 19:17  [createTicket]  Amy：「先來一杯，菜慢慢上。」
+Day 83 19:36  [f]  吳小姐：「他們那桌吃的看起來不錯。」
+Day 83 19:44  [addXP]  熟練度提升：酒吧披薩 LV2
+Day 83 19:46  [spawn]  Ryan 與 Ivy 看到客滿，失望地走了…
+Day 83 19:51  [collect]  張媽媽一家：「Jill's 檸檬奶油干貝很好吃，謝謝。」
+Day 83 20:04  [fireIncident]  供應商多送了 2 份焦糖布丁的料，算他們請的
+Day 83 20:21  [stockWatch]  Jill's 檸檬奶油干貝 只剩 2 份
+Day 83 20:42  [loveOrdered]  炙烤肋眼牛排！就這個。
+Day 83 20:52  [createTicket]  Jill 主廚，今天也拜託你的咖啡續命。
+Day 83 20:56  [addXP]  熟練度提升：起司條 LV2
+Day 83 21:07  [createTicket]  Jill，今天的醬汁我想再試一次。
+Day 83 21:30  [closeShop]  21:30 打烊，不再接新客人
+Day 83 21:34  [stockWatch]  巴斯克乳酪蛋糕 只剩 2 份
+Day 84 17:10  [f]  張媽媽一家：「菜單上有新東西。」
+Day 84 17:29  [serveItems]  張媽媽一家：「比照片還好看。」
+Day 84 17:34  [streetJoin]  有隻狗在門口的休息角趴下來了。
+Day 84 17:34  [streetUpd]  有人在門口看了一下，走進來了。
+Day 84 17:47  [collect]  阿凱：「跟樾樾說再見。」
+Day 84 18:13  [f]  阿傑與小雯：「可以摸嗎？」
+Day 84 18:14  [fireIncident]  外面突然下起雨了
+Day 84 18:28  [createTicket]  陳家：「看了好久，就這幾道。」
+Day 84 18:36  [spawn]  美食部落客走進來了，手機已經拿出來了。
+Day 84 18:45  [loveOrdered]  我就是來吃Jill's 檸檬奶油干貝的。
+Day 84 18:47  [spawn]  VIP 貴賓到了！消費高，要求也高。
+Day 84 18:54  [fireIncident]  外面一下子來了一群人
+Day 84 19:01  [seatLine]  Jason：「傘都濕透了。」
+Day 84 19:03  [createTicket]  Jill，今天還是老樣子。
+Day 84 19:25  [serveItems]  Lin family：「海膽燉飯跟一般的差在哪？」
+Day 84 19:34  [spawn]  Ben 與 Lily 看到客滿，失望地走了…
+Day 84 19:45  [collect]  等有點久，不過值得。
+Day 84 19:50  [addXP]  熟練度提升：水牛城雞翅 LV3
+Day 84 20:01  [loveOrdered]  今晚有輕盈紅酒，那就這個。
+Day 84 20:01  [stockWatch]  香烤鮭魚 只剩 2 份
+Day 84 20:13  [addXP]  熟練度提升：酒吧披薩 LV3
+Day 84 20:45  [stockWatch]  海膽燉飯 只剩 2 份
+Day 84 20:54  [leftTogether]  品酒師 Ken 和 Monsieur 杜 一起走了。
+Day 84 21:13  [stockWatch]  莓果蘇打 只剩 2 份
+Day 84 21:30  [closeShop]  21:30 打烊，不再接新客人
+Day 84 22:23  [qx_after]  收店以後。Evan：「喝一杯？」晴：「一杯。」阿拓已經坐下了。
+Day 85 17:05  [seatLine]  Jill：「歡迎回來。」
+Day 85 17:20  [f]  小周與阿晴：「牠都不怕人耶。」
+Day 85 17:37  [serveItems]  小宇：「檸檬氣泡水長這樣啊。」
+Day 85 17:50  [loveOrdered]  今天有番茄義大利麵，太好了。
+Day 85 17:53  [streetJoin]  有隻狗在門口的休息角趴下來了。
+Day 85 17:53  [streetUpd]  有人在門口看了一下，走進來了。
+Day 85 17:56  [createTicket]  Chloe：「有推薦的嗎？算了，都點吧。」
+Day 85 18:02  [spawn]  VIP 貴賓到了！消費高，要求也高。
+Day 85 18:08  [storyLinger]  品酒師 Ken 吃完了，還坐著。
+Day 85 18:13  [serveItems]  Chloe：「終於吃到了。」
+Day 85 18:29  [f]  Emma：「隔壁桌那個是什麼？」
+Day 85 18:33  [incUpd]  小偷帶著 拿鐵咖啡×4 跑掉了…
+Day 85 18:47  [jillGreet]  Mia，還撐得住嗎？
+Day 85 18:51  [createTicket]  Tina：「聽說這裡的東西都是 Jill 親手做的？」
+Day 85 19:00  [loveOrdered]  今晚有濃郁紅酒，那就這個。
+Day 85 19:03  [treatArrive]  Jill：「來了這麼多次，這個算我的。」
+Day 85 19:04  [createTicket]  Jill，今天的醬汁我想再試一次。
+Day 85 19:06  [seatLine]  Sam 與 Lena：「朋友說一定要來吃 Jill 的店。」
+Day 85 19:08  [treatArrive]  Jill：「第五次了，這個請你。」
+Day 85 19:15  [ya_trial]  予安來了。這次她沒有點酒，直接走到鋼琴前面。
+Day 85 19:16  [stockWatch]  香烤鮭魚 只剩 2 份
+Day 85 19:19  [yaUpd]  靠近鋼琴的那一桌，原本在聊天的客人慢慢小聲了。
+Day 85 19:21  [staffBark]  小心燙。
+Day 85 19:23  [yaUpd]  吧台有一位客人放下酒杯，聽了一小段。
+Day 85 19:27  [yaUpd]  Lounge 裡有人轉過頭，看了鋼琴好一會兒。
+Day 85 19:39  [serveItems]  陳家：「先吃飯，貓等一下再看。」
+Day 85 19:50  [lingerMet]  品酒師 Ken 等的人來了。
+Day 85 19:51  [stockWatch]  提拉米蘇 只剩 2 份
+Day 85 19:52  [spawn]  張經理 看到客滿，失望地走了…
+Day 85 20:19  [stockWatch]  南瓜濃湯 只剩 2 份
+Day 85 20:20  [fireIncident]  門口有人在唱歌，等位的客人不那麼急了
+Day 85 20:36  [ya_trial]  一首彈完，Lounge 安靜了一下。有人拍了手。
+Day 85 20:36  [ya_join]  客人散了一些。予安彈完最後一首，闔上琴蓋，走到吧台邊。
+Day 85 20:46  [stockWatch]  布拉塔番茄麵 只剩 2 份
+Day 85 20:50  [leftTogether]  Monsieur 杜 和 品酒師 Ken 一起走了。
+Day 85 21:28  [stockWatch]  香煎鴨胸 只剩 2 份
+Day 85 21:30  [closeShop]  21:30 打烊，不再接新客人
