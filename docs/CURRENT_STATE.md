@@ -10,7 +10,7 @@
   `main` 上只有文件與紀錄。從 v2.2.1 起的完整開發歷史都在 `main` 上。
 - 還沒做完的遊戲功能，另外開短期的 `feature/…` 或 `wip/…` branch；做完、測試通過才回到 `main`，發布的 commit 一定在 `main` 上。
   文件與紀錄可以直接在 `main`。不要讓工作 branch 跟 `main` 長期並行。
-- 目前的工作 branch：`feature/ken-tasting-pictures`（b87b77b）——Ken 品酒夜圖片，進行中，見下面「進行中／等待玩家素材」。
+- 目前的工作 branch：`feature/ken-tasting-pictures`——品酒之夜的圖片與改名，進行中，見下面「進行中／等待玩家素材」。
 - `wip/lin`：舊的開發 branch 名稱（Madame Lin 是遊戲裡的一條故事線，不是這個專案的主線）。2026-10-04 起不再使用；它指向的 b87b77b
   就是 `feature/ken-tasting-pictures`，沒有別的內容。玩家已同意刪除；這個工作環境不能刪 GitHub 上的 branch，要在 GitHub 網頁刪。
 - `archive/rc7.6-import-main`（d0947ea）：2026-10-03 把 rc7.6 的 12 個 zip 匯入 GitHub 時建的那一個 commit，原本的 `main`。跟現在的
@@ -44,12 +44,16 @@
 
 ### 進行中／等待玩家素材
 
-- **Ken 前三次品酒夜的圖片**（branch `feature/ken-tasting-pictures`，b87b77b；**沒發布、沒跑完整回歸，還不能合回 `main`**）
+- **品酒之夜（Ken 前三次）的圖片**（branch `feature/ken-tasting-pictures`：b87b77b 圖片、25d53f8 改名；**沒發布、沒跑完整回歸，
+  還不能合回 `main`**）
+  - 改名已做（25d53f8，玩家 2026-10-04「ken品酒夜 請改成品酒之夜」）：遊戲裡的「Ken 的品酒夜」「品酒夜」都改成「品酒之夜」，相關測試
+    跟著改，相關的 11 個測試通過。跟圖片一起發布。
   - 規則（玩家 2026-10-04 決定，不要再問 A／B／C）：Ken 前三次自己安排的品酒夜，各自一張專屬 Story Photo，每張只在那一晚第一次
     出現，也放進相簿連著看；第三次之後的品酒夜不再出現圖。詳細在 `docs/PROJECT_MEMORY.md` §6，原文
     `docs/v24/ken_tasting_pictures_2026-10-04.txt`。
   - 第一張：沿用現有的那張（`ken_t1`）。
-  - **缺第二、第三張：等玩家提供。** 圖來之前不要自己生假圖，也不要拿同一張圖冒充三張。
+  - **缺第二、第三張：等玩家提供。** 規格與內容要求：`docs/v24/art/tasting_night_pictures_spec_2026-10-04.md`（已給玩家）。圖來之前
+    不要自己生假圖，也不要拿同一張圖冒充三張。
   - 收到圖之後依序要做：
     1. 修正 b87b77b 的代用圖行為：現在第二、三次開場會顯示程式畫的「插圖待補」代用圖，改成沒有真的圖就不顯示。
     2. 修正 b87b77b 的第一張：它假設三張都是新圖、第一張會被換掉；改成第一張保留現有的 `ken_t1`，第一次品酒夜的相簿照片也用
