@@ -6,18 +6,17 @@
 ## Repo 與 branch
 
 - GitHub：`pyhuanglaw/jills-kitchen`，預設 branch 是 `main`。
-- **`main` ＝ Jill's Kitchen 的正式主線**：目前的、穩定的、發布出去的版本都在這裡（現在是 b865d3c＝v2.4 rc8.3 正式版 e797665 ＋ 它的
-  發布紀錄）。從 v2.2.1 起的完整開發歷史都在 `main` 上。
+- **`main` ＝ Jill's Kitchen 的正式主線**：目前的、穩定的、發布出去的版本都在這裡。最新正式版是 e797665（v2.4 rc8.3），之後
+  `main` 上只有文件與紀錄。從 v2.2.1 起的完整開發歷史都在 `main` 上。
 - 還沒做完的遊戲功能，另外開短期的 `feature/…` 或 `wip/…` branch；做完、測試通過才回到 `main`，發布的 commit 一定在 `main` 上。
   文件與紀錄可以直接在 `main`。不要讓工作 branch 跟 `main` 長期並行。
-- 目前的工作 branch：`feature/ken-tasting-pictures`（b87b77b，Ken 前三次品酒夜的圖；**沒發布、沒跑完整回歸**，等玩家的圖，並要照
-  2026-10-04 的規則改過，見下面「等玩家的圖」）。
+- 目前的工作 branch：`feature/ken-tasting-pictures`（b87b77b）——Ken 品酒夜圖片，進行中，見下面「進行中／等待玩家素材」。
 - `wip/lin`：舊的開發 branch 名稱（Madame Lin 是遊戲裡的一條故事線，不是這個專案的主線）。2026-10-04 起不再使用；它指向的 b87b77b
-  就是 `feature/ken-tasting-pictures`，沒有別的內容，確認後刪除。
+  就是 `feature/ken-tasting-pictures`，沒有別的內容。玩家已同意刪除；這個工作環境不能刪 GitHub 上的 branch，要在 GitHub 網頁刪。
 - `archive/rc7.6-import-main`（d0947ea）：2026-10-03 把 rc7.6 的 12 個 zip 匯入 GitHub 時建的那一個 commit，原本的 `main`。跟現在的
   `main` 沒有共同祖先，只是保存，不合併。
 - `claude/jills-kitchen-github-setup-4x7483`（8ca784b）：接在那個匯入 commit 後面，把網址改到新的 artifact；同樣的改動已在主線上
-  （ec985d1）。
+  （ec985d1）。玩家已同意刪除，同樣要在 GitHub 網頁刪。
 - 2026-10-04 的整理：`main` 從 d0947ea 強制改指到 b865d3c（舊的保存在 `archive/rc7.6-import-main`）。要復原：
   `git push --force-with-lease=refs/heads/main:<目前的 main> origin d0947ead2c18167ab3955fef51478a9168f5b8fd:refs/heads/main`。
 - 本機的 `bundle` remote 是原開發 session 的備份 bundle，只是還原來源，不推送。
@@ -37,9 +36,27 @@
   49），不再更新。舊網址的存檔要用遊戲裡的「設定・存檔」備份後搬過來。
 - 新網址的分享設定由玩家在頁面的分享選單決定（目前是「知道連結的人都能看」）。
 
-## 已做、還沒發布
+## 尚未發布的工作
 
-- `feature/ken-tasting-pictures`（見上）。`main` 上沒有未發布的遊戲程式。
+### 已完成、尚未發布
+
+- 沒有。`main` 上沒有未發布的遊戲程式。
+
+### 進行中／等待玩家素材
+
+- **Ken 前三次品酒夜的圖片**（branch `feature/ken-tasting-pictures`，b87b77b；**沒發布、沒跑完整回歸，還不能合回 `main`**）
+  - 規則（玩家 2026-10-04 決定，不要再問 A／B／C）：Ken 前三次自己安排的品酒夜，各自一張專屬 Story Photo，每張只在那一晚第一次
+    出現，也放進相簿連著看；第三次之後的品酒夜不再出現圖。詳細在 `docs/PROJECT_MEMORY.md` §6，原文
+    `docs/v24/ken_tasting_pictures_2026-10-04.txt`。
+  - 第一張：沿用現有的那張（`ken_t1`）。
+  - **缺第二、第三張：等玩家提供。** 圖來之前不要自己生假圖，也不要拿同一張圖冒充三張。
+  - 收到圖之後依序要做：
+    1. 修正 b87b77b 的代用圖行為：現在第二、三次開場會顯示程式畫的「插圖待補」代用圖，改成沒有真的圖就不顯示。
+    2. 修正 b87b77b 的第一張：它假設三張都是新圖、第一張會被換掉；改成第一張保留現有的 `ken_t1`，第一次品酒夜的相簿照片也用
+       這張，只有第二、三張是新圖。
+    3. 把第二、三張放進遊戲。
+    4. 完整回歸（全部測試）通過。
+    5. 合回 `main`，再照 `docs/RELEASE_CHECKLIST.md` 發布。
 
 ## 測試
 
@@ -57,24 +74,15 @@
 - **太太的手機不用登入就能匯出／備份存檔**：還沒解決，需要玩家用手機實測。不要用「文字框複製」的方式（會讓 iPhone 當機）。
 - `docs/evidence/v24_rc8/release/qing_tuo/` 的重拍截圖缺《講完》那一組（截圖腳本逾時）；原本的 q5 在 `docs/evidence/v24_rc8/qing_tuo/`。
 
-## 等玩家的圖
-
-- Ken 前三次自己安排的品酒夜，各自一張專屬 Story Photo（玩家 2026-10-04 決定，不再是 A／B／C；規則在 `docs/PROJECT_MEMORY.md` §6、
-  原文 `docs/v24/ken_tasting_pictures_2026-10-04.txt`）。第一張用現有的那張；玩家之後再給第二、第三張。圖來之前不要自己生假圖，
-  也不要拿同一張圖冒充三張。
-- 程式在 `feature/ken-tasting-pictures`（b87b77b），寫在這個決定之前，圖來時要先改：(1) 第二、三次開場現在會顯示程式畫的
-  「插圖待補」代用圖 → 改成沒有圖就不顯示；(2) 它假設三張新圖、第一張會被換掉 → 第一張保留現有的（`ken_t1`），只有第二、三張
-  是新圖；第一次品酒夜的相簿照片也用現有那張。改完、完整回歸通過，合回 `main` 再發布。
-
 ## 玩家回報、下一批
 
-- 玩家 2026-10-03 晚上 Day 83–89 的回報都在 rc8.3 做完了（`docs/V24_RC8_3_REPORT.md`）。品酒會插圖已決定，等圖（見上）。
+- 玩家 2026-10-03 晚上 Day 83–89 的回報都在 rc8.3 做完了（`docs/V24_RC8_3_REPORT.md`）。
 - 長期方向（PROJECT_MEMORY §3）：Jill 的房間是一層「生活」，之後繼續加。
 
 ## 美術
 
 - 玩家要的十張插圖（Madame Lin 線 5 張、晴 × 阿拓 5 張）都已放進遊戲。
-- 缺：Ken 第二、第三次品酒夜的圖（玩家之後提供，見「等玩家的圖」）。
+- 缺的圖見上面「進行中／等待玩家素材」。
 
 ## 需要玩家正常遊玩才能確認的（O）
 
