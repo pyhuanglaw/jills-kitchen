@@ -851,7 +851,7 @@ def followup_the_manual_describes_the_current_game(b, port, target):
                  # v2.4 rc7 (14:39–14:51): the day's money — the glasses' cost, the rent, the wages, 秀琴阿姨's loan; the Lounge's figure without its tips
                  '每天的帳', '酒水成本', '租金', '一天 $300', '不會欠到明天', '秀琴阿姨會借你 $3,000', '每次不夠都會借', '結算時錢超過 $20,000', '不含小費', '晚餐桌上配的酒也另外一行',
                  # v2.4 rc7 (15:24–16:46): Ken's tasting nights and the wine, 予安 and the piano, their stories hold, a line on the way to a table, the story guests' looks
-                 'Ken 的品酒夜', '品酒會只有 Ken 辦', '晚餐之後', '鋼琴與予安', '一個禮拜彈三個晚上', '鋼琴演奏', '一開始沒有人彈', 'Ken 的故事', '予安和鋼琴的故事',
+                 '品酒之夜', '品酒會只有 Ken 辦', '晚餐之後', '鋼琴與予安', '一個禮拜彈三個晚上', '鋼琴演奏', '一開始沒有人彈', 'Ken 的故事', '予安和鋼琴的故事',
                  '走向座位的路上', '跟頭像一樣',
                  # v2.4 rc7.2 (22:38–23:07): the pass, the random menu, the cards and the Lounge after dinner, no 解雇, the wages, 安安 carries the bites
                  '在廚房點出菜口', '隨機選菜單', '今日任務要賣的菜和宣傳中的菜會留著', '晚餐後八折', 'VIP 卡', 'VIP 名單', '吃完再去 Lounge 七折', '沒有解雇', '五倍多', '由她送過去',
@@ -870,9 +870,9 @@ def followup_the_manual_describes_the_current_game(b, port, target):
                  '主廚之夜', '明晚｜主廚之夜 · N 席', '主廚之夜是包場', '一道一道上',
                  '那一晚整個 Lounge 都留給品酒的客人', '九個位子（一樣坐得開）',
                  # v2.4 rc7.6 (08:51): after the wine, the player holds a tasting night
-                 'Ken 的品酒夜｜今晚要辦嗎？', '按「今晚辦」就是今晚', '這次不辦',
+                 '品酒之夜｜今晚要辦嗎？', '按「今晚辦」就是今晚', '這次不辦',
                  # v2.4 rc7.7 (10:10, 10:32): the Lounge's people pour the rounds; Ken's share; Evan from the first night
-                 '品酒夜分潤', '友情主持', 'Evan 在 Lounge I 蓋好那天就在吧台',
+                 '品酒之夜分潤', '友情主持', 'Evan 在 Lounge I 蓋好那天就在吧台',
                  # rc8 (2026-10-02 19:19): the Lounge is the shop next door
                  'Lounge 是隔壁的店', '從後場遞到 Lounge 吧台的那一頭',
                  '淨利下面另外一項「今天的店」',
@@ -900,7 +900,7 @@ def followup_the_manual_describes_the_current_game(b, port, target):
                   # v2.4 rc7.7: Ken no longer pours every round himself; Evan is never hired
                   '今晚的三支他一輪一輪倒', 'Lounge I 的 Evan、沈晴',
                   # rc8: no arch from the Main Hall to the Lounge
-                  'Lounge 蓋好以後旁邊多一道', '放在拱門和吧台之間的牆邊', '結算的 Lounge 那一行會寫', '結算在 Lounge 那一行另外寫', '是 Ken 先嫌沒有酒，才有的', 'Jill 打烊後想到：讓人吃完飯以後', '妳真的完全不賣酒', '附近有沒有地方再喝一杯', '後面那間', '提議在吧台辦小型的品酒夜', '之後每一兩個禮拜他會再辦一次，不用你安排',
+                  'Lounge 蓋好以後旁邊多一道', '放在拱門和吧台之間的牆邊', '結算的 Lounge 那一行會寫', '結算在 Lounge 那一行另外寫', '是 Ken 先嫌沒有酒，才有的', 'Jill 打烊後想到：讓人吃完飯以後', '妳真的完全不賣酒', '附近有沒有地方再喝一杯', '後面那間', '提議在吧台辦小型的品酒之夜', '之後每一兩個禮拜他會再辦一次，不用你安排',
                   # rc8 §21: no generic +2 any more
                   '員工上限多兩人', '員工上限多一人', '私人包廂 I 和 III 也各多一位', '的上限跟擴建、後場整理區、側廳、廚房擴建、廚房二期、披薩烤爐有關']:
         check(stale not in txt, f'stale line removed: {stale}')

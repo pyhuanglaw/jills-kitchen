@@ -2727,9 +2727,9 @@ def v24_rc7_ken_comes_back_and_proposes_a_tasting(b, port, target):
     # the news: the day before, and the day
     g.ev("kenS().next.d=S.day+1")
     seats = g.ev("lgSeatsAll()")
-    check(seats == 23 and f'明晚｜Ken 的品酒夜 · {seats} 席' in g.ev("kenNewsHTML()") and '整個 Lounge' in g.ev("kenNewsHTML()"), f'the day before: 明晚｜Ken 的品酒夜 · {seats} 席 — the whole Lounge (rc7.6, 07:44)')
+    check(seats == 23 and f'明晚｜品酒之夜 · {seats} 席' in g.ev("kenNewsHTML()") and '整個 Lounge' in g.ev("kenNewsHTML()"), f'the day before: 明晚｜品酒之夜 · {seats} 席 — the whole Lounge (rc7.6, 07:44)')
     g.ev("kenS().next.d=S.day")
-    check(f'今晚｜Ken 的品酒夜 · {seats} 席' in g.ev("kenNewsHTML()") and '整個 Lounge 留給品酒的客人' in g.ev("kenNewsHTML()"), f'the day: 今晚｜Ken 的品酒夜 · {seats} 席')
+    check(f'今晚｜品酒之夜 · {seats} 席' in g.ev("kenNewsHTML()") and '整個 Lounge 留給品酒的客人' in g.ev("kenNewsHTML()"), f'the day: 今晚｜品酒之夜 · {seats} 席')
     # a Lounge just finished: his first look first
     g.ev("delete story().facts.ken_propose;delete story().ev.ken_propose;delete (story().beatLines||{}).ken_propose;kenS().next=null;kenS().first=S.day;story().facts.lounge_built_1={d:S.day-1,n:1,l:S.day-1};const d=storyDay();d.major=0;d.lp={};d.seen={};for(const q of R.groups.slice())if(namedId(q)===KEN){leaveGroup(q,'ok');q.gone=true}R.groups=R.groups.filter(q=>!q.gone)")
     check(g.ev("kenLegacy()") is False and g.ev("kenLoungeDue()") is True and g.ev("kenProposeDue()") is False, 'a Lounge finished yesterday: his first look is due, the proposal is not')
@@ -2758,7 +2758,7 @@ def v24_rc7_ken_hosts_his_tasting_nights(b, port, target):
     g = Game(b, port, target, seed=1533, manual=True, viewport={'width': 390, 'height': 844})
     load_save(g, 'player_day74_1508.json')
     g.ev("factSet('ken_propose');kenS().next={d:S.day,n:1};kenS().back=[];showPrep()")
-    check('今晚｜Ken 的品酒夜 · 23 席' in g.ev("$('#screen').innerText") and '整個 Lounge 留給品酒的客人' in g.ev("$('#screen').innerText"), 'the news before opening: the whole Lounge, 23 seats')
+    check('今晚｜品酒之夜 · 23 席' in g.ev("$('#screen').innerText") and '整個 Lounge 留給品酒的客人' in g.ev("$('#screen').innerText"), 'the news before opening: the whole Lounge, 23 seats')
     check(g.ev("!!fact('ken_collab')") is False and g.ev("kenSamplesDue()") is False, 'no talk of a wine before three nights')
     to_service(g)
     g.ev("window.__noScenes=false;window.__holds=true")
@@ -4099,8 +4099,8 @@ def v24_rc76_dylan_at_home_keeps_his_hood_up(b, port, target):
 
 @test
 def v24_rc76_after_the_wine_the_tasting_night_is_the_players(b, port, target):
-    """08:51 「少賺沒關係 但是之後聯名酒出了之後開店前可以選擇要不要舉辦品酒夜」: once 「晚餐之後」 is out Ken no longer plans his
-    nights; before opening the news asks 「Ken 的品酒夜｜今晚要辦嗎？」 — 「今晚辦」 makes tonight his (the whole Lounge), 「這次
+    """08:51 「少賺沒關係 但是之後聯名酒出了之後開店前可以選擇要不要舉辦品酒之夜」: once 「晚餐之後」 is out Ken no longer plans his
+    nights; before opening the news asks 「品酒之夜｜今晚要辦嗎？」 — 「今晚辦」 makes tonight his (the whole Lounge), 「這次
     不辦」 takes it back before the doors open. At most once a week, never on the chef's night. A later night a save had
     already planned by itself becomes the player's to hold. Before the wine, nothing changes (the story's three)."""
     g = Game(b, port, target, seed=7633, manual=True, viewport={'width': 390, 'height': 844})
@@ -4113,12 +4113,12 @@ def v24_rc76_after_the_wine_the_tasting_night_is_the_players(b, port, target):
     check(mig['next'] is None and mig['nextN'] == 5, f'a night the save had planned by itself is the player\'s now: {mig}')
     g.ev("showPrep()"); g.page.wait_for_timeout(100)
     txt = g.ev("$('#screen').innerText")
-    check('Ken 的品酒夜｜今晚要辦嗎？' in txt and g.page.locator('#screen [data-act=ktHold]').count() == 1, 'before opening, the news asks')
+    check('品酒之夜｜今晚要辦嗎？' in txt and g.page.locator('#screen [data-act=ktHold]').count() == 1, 'before opening, the news asks')
     g.ev("(()=>{const e=document.querySelector('#screen .kt-ask');if(e)e.scrollIntoView({block:'center'})})()"); g.page.wait_for_timeout(80)
     g.page.screenshot(path=os.path.join(ROOT, 'tests', 'artifacts', 'rc76_tasting_ask.png'))
     g.page.locator('#screen [data-act=ktHold]').click(); g.page.wait_for_timeout(150)
     txt = g.ev("$('#screen').innerText")
-    check(json.loads(g.ev("JSON.stringify(kenS().next)")) == {'d': g.ev("S.day"), 'n': 5} and '今晚｜Ken 的品酒夜 · 23 席' in txt and g.page.locator('#screen [data-act=ktCancel]').count() == 1, f'「今晚辦」: tonight is his, and it can still be taken back: {g.ev("JSON.stringify(kenS().next)")}')
+    check(json.loads(g.ev("JSON.stringify(kenS().next)")) == {'d': g.ev("S.day"), 'n': 5} and '今晚｜品酒之夜 · 23 席' in txt and g.page.locator('#screen [data-act=ktCancel]').count() == 1, f'「今晚辦」: tonight is his, and it can still be taken back: {g.ev("JSON.stringify(kenS().next)")}')
     g.page.locator('#screen [data-act=ktCancel]').click(); g.page.wait_for_timeout(150)
     check(g.ev("kenS().next") is None and '今晚要辦嗎' in g.ev("$('#screen').innerText"), '「這次不辦」: not tonight')
     # not on the chef's night
@@ -4157,7 +4157,7 @@ def v24_rc76_the_chefs_night(b, port, target):
     g.ev("S.cn=null;kenS().next=null")
     check(g.ev("loungeLv()") >= 2 and g.ev("!!S.signature") and g.ev("cnWhyNot()") == '', 'the Day 74 save: Lounge III and a signature')
     g.ev("kenS().next={d:S.day+1,n:5}")
-    check(g.ev("cnWhyNot()") == '明晚是 Ken 的品酒夜', 'never on a night of Ken\'s')
+    check(g.ev("cnWhyNot()") == '明晚是品酒之夜', 'never on a night of Ken\'s')
     g.ev("kenS().next=null;shopTab='works';showShop()"); g.page.wait_for_timeout(100)
     card = g.ev("(()=>{const e=document.querySelector('#screen .cn-card');if(!e)return'';e.scrollIntoView({block:'center'});return e.innerText.replace(/\\s+/g,' ')})()")
     check('主廚之夜' in card and '排在明晚' in card and '$1,800' in card and '包下整個 Lounge' in card and '23 席' in card, f'the shop\'s Lounge section has it, booked out: {card!r}')
@@ -4351,7 +4351,7 @@ def v24_rc77_the_lounge_pours_kens_rounds(b, port, target):
 def v24_rc77_kens_share_of_a_tasting_night(b, port, target):
     """10:10 「Ken辦品酒日也可以分潤給他吧？當天百分之三十利潤給Ken 才合理，從第一次開始就要，Ken本來想友情主持，而且是自己喜歡，但是
     Jill主動說要給」: from the first night the summary takes 30% of what the tasting guests paid for the glasses and the bites,
-    less what those cost, on its own line 「品酒夜分潤」, and the day's net is that much less. A day with no tasting night
+    less what those cost, on its own line 「品酒之夜分潤」, and the day's net is that much less. A day with no tasting night
     pays nothing. A save whose proposal came before this (no share said) hears Jill say it at the end of its next night —
     (12:43) 「不行，該算的還是要算」, with no figure in her words; the figure is on the summary's line."""
     g = Game(b, port, target, seed=7705, manual=True, viewport={'width': 390, 'height': 844})
@@ -4367,9 +4367,9 @@ def v24_rc77_kens_share_of_a_tasting_night(b, port, target):
     check(abs(s['kt']['cost'] - round(sum(p['cost'] for p in paid))) <= 1, f'what they had cost: {s["kt"]["cost"]}')
     check(s['ken'] == round(.3 * max(0, s['kt']['rev'] - s['kt']['cost'])) and s['ken'] > 0, f'30% of the night\'s profit: {s}')
     txt = g.ev("$('#screen').innerText")
-    check('品酒夜分潤' in txt and 'Ken，品酒客利潤的三成' in txt, 'the ledger\'s line')
+    check('品酒之夜分潤' in txt and 'Ken，品酒客利潤的三成' in txt, 'the ledger\'s line')
     notes = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('#screen .daynotes div')].map(e=>e.innerText.replace(/\\s+/g,' ')))"))
-    check(f'Ken 的品酒夜 {s["kt"]["n"]} 位・營業額 ${s["kt"]["rev"]:,}' in notes and not any(x.startswith('Lounge ') for x in notes), f'12:43: the night shows once, as the tasting night — not 「Lounge N 桌」 beside it: {notes}')
+    check(f'品酒之夜 {s["kt"]["n"]} 位・營業額 ${s["kt"]["rev"]:,}' in notes and not any(x.startswith('Lounge ') for x in notes), f'12:43: the night shows once, as the tasting night — not 「Lounge N 桌」 beside it: {notes}')
     check(s['cut'], 'Jill said it at the night\'s end (a save past the proposal)')
     lines = ' / '.join(x['t'] for x in json.loads(g.ev("JSON.stringify((story().beatLines||{}).ken_cut||[])")))
     check('今晚的。以後每一次都有。' in lines and '不行，該算的還是要算。' in lines and '三成' not in lines, f'her words: {lines}')
@@ -4382,7 +4382,7 @@ def v24_rc77_kens_share_of_a_tasting_night(b, port, target):
         g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(200)
     to_service(g); g.ev("window.__act=window.__actLazy")
     g.ev("__botUntil('phase!==\\'service\\'',150000,1/30)")
-    check(not g.ev("S.lastSummary.ken") and not g.ev("S.lastSummary.kt") and '品酒夜分潤' not in g.ev("$('#screen').innerText"), 'a day without a tasting night pays nothing')
+    check(not g.ev("S.lastSummary.ken") and not g.ev("S.lastSummary.kt") and '品酒之夜分潤' not in g.ev("$('#screen').innerText"), 'a day without a tasting night pays nothing')
     check(not g.errors, g.errors[:3]); g.close()
 
 

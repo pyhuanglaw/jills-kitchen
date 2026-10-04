@@ -3364,7 +3364,7 @@ function storyPhotoPending(){const st=story();return st.photosPending=st.photosP
 function storyPhotoFlush(){const P=storyPhotoPending();for(const k in P){if(story().photos[k]){delete P[k];continue}const D=STORY_PHOTOS[k];if(D&&D.art&&storyArtSrc(D.art)){const info=P[k].info||{};const day0=P[k].day;delete P[k];const ok=storyPhoto(k,info);if(ok){const p=albumList().find(x=>x.kind==='story:'+k);if(p&&day0)p.day=day0}}}}
 /* rc8.4: Ken's first three tasting nights, a photo each (the player, 2026-10-04) — no stage: they wait in a slot until the
    player's pictures are in, then join the album on the night's own day */
-STORY_PHOTOS.ken_night1={cap:'剛開始辦',txt:()=>'Ken 的第一次品酒夜。',art:'ken_night1',who:[KEN_ID]};
+STORY_PHOTOS.ken_night1={cap:'剛開始辦',txt:()=>'第一次品酒之夜。',art:'ken_night1',who:[KEN_ID]};
 STORY_PHOTOS.ken_night2={cap:'有模有樣',txt:()=>'第二次，人多了，Ken 在客人之間講酒。',art:'ken_night2',who:[KEN_ID]};
 STORY_PHOTOS.ken_night3={cap:'變成這裡的一部分',txt:()=>'第三次，整個 Lounge 都在品酒。',art:'ken_night3',who:[KEN_ID,'jill']};
 STORY_PHOTOS.jill_dylan_valentine={cap:'情人節，還在追',txt:()=>'十一年了，他還是每年帶花來。',art:'jill_dylan_valentine',who:['jill','dylan']};
@@ -3540,14 +3540,14 @@ const STORY_ILLUS={
  ya_first:{t:'那台鋼琴',cap:'第一次來的那位客人，一直看著那台沒有人彈的鋼琴。',art:'ya_first',stage:c=>drawIllusKen(c,3)},   /* rc7: the player's pictures, 2026-10-02 16:54 / 16:57 / 16:59 */
  ya_trial:{t:'彈得真好',cap:'予安第一次在 Lounge 彈琴。王太太走過來說：「彈得真好。」',art:'ya_trial',stage:c=>drawIllusKen(c,3)},
  ya_join:{t:'星期幾？',cap:'「下週還有空嗎？」「星期幾？」',art:'ya_join',stage:c=>drawIllusKen(c,3)},
- ken_t1:{t:'剛開始辦',cap:'第一次品酒夜。Ken 站在吧台後面，吧台前坐滿了。',art:'ken_t1',stage:c=>drawIllusKen(c,0)},
+ ken_t1:{t:'剛開始辦',cap:'第一次品酒之夜。Ken 站在吧台後面，吧台前坐滿了。',art:'ken_t1',stage:c=>drawIllusKen(c,0)},
  /* rc8.4 (the player, 2026-10-04, docs/v24/ken_tasting_pictures_2026-10-04.txt): each of the three nights Ken arranges has its own
     picture — the same Lounge, the same Ken, the room filling and the night becoming the shop's own; each shown the first time
     its night plays; after the third, no picture. The same three are the nights' Story Photos in the album (STORY_PHOTOS
     ken_night1–3, 「放進 Life Album 連著看」): art keys ken_night1–3, one picture each for both. Stand-ins until the player's
     pictures come; then ken_t1's art moves to ken_night1. */
- ken_t2:{t:'有模有樣',cap:'第二次品酒夜。人多了一點，Ken 在客人之間講酒；吧台前有上次見過的臉。',art:'ken_night2',stage:c=>drawIllusKen(c,0)},
- ken_t3:{t:'變成這裡的一部分',cap:'第三次品酒夜。整個 Lounge 都在品酒：有人在討論，有人舉著杯子，Jill 和 Evan 也在裡面。',art:'ken_night3',stage:c=>drawIllusKen(c,0)},   /* rc7: the player's pictures, 2026-10-02 16:19 / 16:25 / 16:32 */
+ ken_t2:{t:'有模有樣',cap:'第二次品酒之夜。人多了一點，Ken 在客人之間講酒；吧台前有上次見過的臉。',art:'ken_night2',stage:c=>drawIllusKen(c,0)},
+ ken_t3:{t:'變成這裡的一部分',cap:'第三次品酒之夜。整個 Lounge 都在品酒：有人在討論，有人舉著杯子，Jill 和 Evan 也在裡面。',art:'ken_night3',stage:c=>drawIllusKen(c,0)},   /* rc7: the player's pictures, 2026-10-02 16:19 / 16:25 / 16:32 */
  ken_wine:{t:'晚餐之後',cap:'「晚餐之後」——JILL\'S KITCHEN × KEN。',art:'ken_wine',stage:c=>drawIllusKen(c,1)},
  du_wine:{t:'可是它很好',cap:'Monsieur 杜喝了「晚餐之後」。Ken 坐在旁邊。',art:'du_wine',stage:c=>drawIllusKen(c,2)},
  /* rc8 (19:19): the Madame Lin line — slots for the player's pictures (STORY_ART keys); stand-ins until they come */
@@ -3934,7 +3934,7 @@ V24_WANTS.push(()=>{const out=[];if(!loungeOpenTonight()||!fact('ken_du_argue')|
    arrives: 「晚餐之後」, JILL'S KITCHEN × KEN, on the list for good (ken_wine). Days later Monsieur 杜 orders it (du_wine,
    the friendship line's payoff: they still disagree, and he says it is good). All of these hold the restaurant (SH_HOLD).
    After the third, Ken's tasting night comes back every week or two, in the room, unheld; nobody else holds a tasting.
-   A tasting night: the news says 「今晚｜Ken 的品酒夜 · N 席」 (rc7.6, 07:44: the whole Lounge's seats; the day before, 「明晚」); the
+   A tasting night: the news says 「今晚｜品酒之夜 · N 席」 (rc7.6, 07:44: the whole Lounge's seats; the day before, 「明晚」); the
    whole room is for the people who came for it (lgBook) — singles at the bar, twos and fours at the tables and the sofa;
    Ken stands behind the bar with a glass and pours tonight's three a round at a time at every seat (kenRounds), the
    glasses are set out on the counter and the tables, a small board stands at the end of the bar; the guests take two or
@@ -3977,7 +3977,7 @@ function kenNightStart(){const K=kenS();const n=K.next.n;const seats=kenSeats();
  if(du){G.push({name:DU,type:'gourmet'});R.kt.du=1}
  const nm=kenGuestNames(seats+4).filter(x=>!G.some(o=>o.name===x));
  const all=lgBook('tasting',G,j=>dur*(.27+.011*j)+(hash('ktt0|'+S.day+'|'+j)%30)/10,(i,sz)=>({name:nm[i]||('客人'+i),type:pickH(sz>=3?['office','gourmet']:sz===2?['couple','gourmet','office']:['gourmet','office','gourmet','student'],'ktt|'+S.day+'|'+i)}));R.kt.people=all.reduce((a,o)=>a+(o.size||1),0);
- if(n>=4)later(()=>{if(R&&phase==='service')noteLine('今晚是 Ken 的品酒夜：整個 Lounge 都是品酒的客人。')},1800)}
+ if(n>=4)later(()=>{if(R&&phase==='service')noteLine('今晚是品酒之夜：整個 Lounge 都是品酒的客人。')},1800)}
 /* a night that did not come to its end (the page was closed): its bookkeeping, without its words */
 function kenAdvance(n){const K=kenS();K.lastD=S.day;if(n<3)K.next={d:S.day+5,n:n+1};else if(n===3)K.next=null;else{K.next=null;K.nextN=n+1}}   /* rc7.6 (08:51): after the third, the next is the player's choice (ktHold), not a date */
 function kenNightUpd(dt){const K=R&&R.kt;if(!K)return;if(K.end){/* rc7.6: the host goes home a moment after the night ends, by the evening's own clock as well as the timer (a night that ends at closing time is not left with him standing there) */const H=K.host;if(H&&!H.gone&&H.state==='host'&&R.groups.includes(H)&&K.endT!=null&&R.t>=K.endT+(K.n<=3?9:2))leaveGroup(H,'ok');return}   /* (a held scene stops the evening's clock: he stays through it) */const H=K.host;
@@ -3993,7 +3993,7 @@ function kenNightOpen(seated){const K=R.kt,n=K.n;factSet('ken_tn');const g0=seat
   kenSayH('今天三支。不用猜是哪裡的酒，先喝。',600,'talk');guest(1,'……這支是法國的吧？',1900);kenSayH('我就知道一定有人不聽。',3200,'wry');
   later(()=>noteLine('吧台這頭有人笑出來。Ken 開了第一支，Evan 他們跟著一個位子一個位子倒過去。'),4500);JILL_SAY('菜什麼時候出？',5800,{with:'named:'+KEN});kenSayH('第二支以後。先讓他們喝一口沒有配菜的。',7100,'talk');JILL_SAY('好。',8400,{with:'named:'+KEN});relSet(KEN_ID,'jill','sharedEvent')});
  else if(n===2)kenScene('ken_t2',g0,()=>{factSet('ken_t2');const b=(kenS().back||[])[0];const bg=b&&seated.find(q=>q.name===b.name);
-  kenNote(bg?'Ken 的第二次品酒夜。整個 Lounge 都是來品酒的客人，每個位子前面三個杯子；吧台前有兩張上次見過的臉。':'Ken 的第二次品酒夜。整個 Lounge 都是來品酒的客人；這次 Ken 先把每個位子的三個杯子排好才開門。','ken_t2');storyPhoto('ken_night2');   /* rc8.3 (the player, Day 83: 「我甚至看不出來他辦了什麼」): what tonight is, said in its first line */
+  kenNote(bg?'第二次品酒之夜。整個 Lounge 都是來品酒的客人，每個位子前面三個杯子；吧台前有兩張上次見過的臉。':'第二次品酒之夜。整個 Lounge 都是來品酒的客人；這次 Ken 先把每個位子的三個杯子排好才開門。','ken_t2');storyPhoto('ken_night2');   /* rc8.3 (the player, Day 83: 「我甚至看不出來他辦了什麼」): what tonight is, said in its first line */
   if(bg){sayG(bg,'上次那支還有嗎？',600);kenSayH('沒有。說好換一支。',1900,'wry')}
   if(du){const known=!!fact('ken_du_argue')||relN(KEN_ID,DU_ID,'spoke')>0;
    if(known){later(()=>noteLine('吧台最旁邊坐著 Monsieur 杜。他沒有看 Ken，先把杯子拿起來聞了很久。'),3200);kenSayH('你怎麼也來了？',4500);sayG(du,'我付了錢的。',5800,{tone:'taste'});kenSayH(`第二支，配 Jill 今天的${dn}。`,7100,'talk');sayG(du,'這支配那道，太輕。',8400,{tone:'doubt'});kenSayH('它本來就該輕。',9700);sayG(du,'我知道你會這樣說。',11000,{tone:'doubt'})}
@@ -4001,10 +4001,10 @@ function kenNightOpen(seated){const K=R.kt,n=K.n;factSet('ken_tn');const g0=seat
    relSet(KEN_ID,DU_ID,'argued');relSet(KEN_ID,DU_ID,'spoke');relSet(KEN_ID,DU_ID,'sharedEvent');relSet(KEN_ID,DU_ID,'sharedTable');JILL_SAY('那我出菜了。',12300,{with:'named:'+KEN})}
   else{kenSayH(`第二支，配 Jill 今天的${dn}。`,3200,'talk');JILL_SAY('那我出菜了。',4500,{with:'named:'+KEN})}});
  else if(n===3)kenScene('ken_t3',g0,()=>{factSet('ken_t3');const b=(kenS().back||[])[0];const bg=b&&seated.find(q=>q.name===b.name);
-  kenNote('Ken 的第三次品酒夜。客人自己找位子坐下，每個位子前面的三個杯子 Ken 早就排好了。','ken_t3');storyPhoto('ken_night3');JILL_SAY('老樣子？',600,{with:'named:'+KEN});kenSayH('老樣子。第一支給他們猜。',1900,'talk');
+  kenNote('第三次品酒之夜。客人自己找位子坐下，每個位子前面的三個杯子 Ken 早就排好了。','ken_t3');storyPhoto('ken_night3');JILL_SAY('老樣子？',600,{with:'named:'+KEN});kenSayH('老樣子。第一支給他們猜。',1900,'talk');
   /* rc8.3 (the player: 「品酒會的對話猜 怎麼是猜什麼干貝」): the guess is the wine's — said so — and the third glass goes with a dish (配), a separate thing */
   if(bg)sayG(bg,'這次可以猜是哪裡的酒了？',3200);else guest(0,'這次可以猜是哪裡的酒了？',3200);kenSayH('這次隨便你們猜。',4500,'wry');guest(1,'……義大利？',5800);kenSayH('不是。',7100,'wry');JILL_SAY(`第三支配${dn}？`,8400,{with:'named:'+KEN});kenSayH(`配${dn}。`,9700,'talk')});
- else{toast('Ken 的品酒夜開始了（Lounge）。');later(()=>{if(R&&R.kt)kenSayH(pickT(['今天三支。照順序喝。','第一支先不要配東西。','今天有一支你們應該認得。']),0,'talk')},900)}}
+ else{toast('品酒之夜開始了（Lounge）。');later(()=>{if(R&&R.kt)kenSayH(pickT(['今天三支。照順序喝。','第一支先不要配東西。','今天有一支你們應該認得。']),0,'talk')},900)}}
 /* rc7.6 (07:44, the whole room): a round at every seat — the first of tonight's three as the night opens, the second and
    the last as Ken says so (kenNightTalk); someone who sits down after a round has theirs as they sit.
    rc7.7 (the player, 10:10 「Ken自己倒酒也太累了吧 酒吧的服務生不能幫忙嗎？品酒日的時候原本的bartender要不要上班」): Ken hosts —
@@ -4041,7 +4041,7 @@ function kenCollab(ctx){factSet('ken_collab');kenS().samples=S.day+4;const say=c
 /* Ken's own lines when he is a guest (not hosting): kenSayH needs the host; these use his table */
 function kenSayG(ctx,txt,ms,tone){if(ctx&&ctx.g)sayG(ctx.g,txt,ms,tone?{tone}:undefined)}
 /* the news before opening: tonight's, and tomorrow's */
-/* rc7.6 (the player, 08:51 「少賺沒關係 但是之後聯名酒出了之後開店前可以選擇要不要舉辦品酒夜」): once 「晚餐之後」 is out, a tasting
+/* rc7.6 (the player, 08:51 「少賺沒關係 但是之後聯名酒出了之後開店前可以選擇要不要舉辦品酒之夜」): once 「晚餐之後」 is out, a tasting
    night is the player's to hold — before opening, in the news: 「今晚辦」 makes tonight Ken's (at most once a week, never on
    the chef's night), 「這次不辦」 takes it back before the doors open. The story's three nights are still his to plan. */
 function kenFree(){return !!fact('ken_wine')}
@@ -4049,24 +4049,24 @@ function ktWhyNot(){const K=kenS();if(!loungeOpenTonight())return'Lounge 今晚�
 function ktHold(){const K=kenS();if(!kenFree()||!loungeLv()||phase!=='prep'||K.next||ktWhyNot())return false;K.next={d:S.day,n:K.nextN||4};save();return true}
 function ktCancel(){const K=kenS();if(!kenFree()||phase!=='prep'||!K.next||K.next.d>S.day||(K.next.n||0)<4)return false;K.next=null;save();return true}
 function kenNewsHTML(){const n=kenS().next;if(!loungeLv())return'';const seats=kenSeats();
- if(kenFree()&&phase==='prep'&&!(n&&n.n<4)){if(n&&n.d<=S.day)return`<div class="event kent kt-ask"><b>今晚｜Ken 的品酒夜 · ${seats} 席</b><span>整個 Lounge 留給品酒的客人——吧台、小桌、沙發都是；Ken 六點多就到，站在吧台後面主持；吧台和外場一輪一輪倒。</span><button class="btn sm" data-act="ktCancel">這次不辦</button></div>`;
-  return ktWhyNot()?'':`<div class="event kent quiet kt-ask"><b>Ken 的品酒夜｜今晚要辦嗎？</b><span>整個 Lounge 包場給品酒的客人（${seats} 席），Ken 主持，吧台和外場一輪一輪倒；酒照杯算，品酒客的利潤三成給 Ken；那晚 Lounge 不接其他客人。一週最多一次。</span><button class="btn sm primary" data-act="ktHold">今晚辦</button></div>`}
+ if(kenFree()&&phase==='prep'&&!(n&&n.n<4)){if(n&&n.d<=S.day)return`<div class="event kent kt-ask"><b>今晚｜品酒之夜 · ${seats} 席</b><span>整個 Lounge 留給品酒的客人——吧台、小桌、沙發都是；Ken 六點多就到，站在吧台後面主持；吧台和外場一輪一輪倒。</span><button class="btn sm" data-act="ktCancel">這次不辦</button></div>`;
+  return ktWhyNot()?'':`<div class="event kent quiet kt-ask"><b>品酒之夜｜今晚要辦嗎？</b><span>整個 Lounge 包場給品酒的客人（${seats} 席），Ken 主持，吧台和外場一輪一輪倒；酒照杯算，品酒客的利潤三成給 Ken；那晚 Lounge 不接其他客人。一週最多一次。</span><button class="btn sm primary" data-act="ktHold">今晚辦</button></div>`}
  if(!n)return'';
- if(n.d<=S.day)return loungeOpenTonight()?`<div class="event kent"><b>今晚｜Ken 的品酒夜 · ${seats} 席</b><span>整個 Lounge 留給品酒的客人——吧台、小桌、沙發都是；Ken 六點多就到，站在吧台後面主持；吧台和外場一輪一輪倒。</span></div>`:`<div class="event kent quiet"><b>Ken 的品酒夜</b><span>Lounge 今晚沒有人站吧台——品酒夜改到有人站吧台的那天。</span></div>`;
- if(n.d===S.day+1)return`<div class="event kent quiet"><b>明晚｜Ken 的品酒夜 · ${seats} 席</b><span>那晚整個 Lounge 留給品酒的客人。</span></div>`;return''}
+ if(n.d<=S.day)return loungeOpenTonight()?`<div class="event kent"><b>今晚｜品酒之夜 · ${seats} 席</b><span>整個 Lounge 留給品酒的客人——吧台、小桌、沙發都是；Ken 六點多就到，站在吧台後面主持；吧台和外場一輪一輪倒。</span></div>`:`<div class="event kent quiet"><b>品酒之夜</b><span>Lounge 今晚沒有人站吧台——品酒之夜改到有人站吧台的那天。</span></div>`;
+ if(n.d===S.day+1)return`<div class="event kent quiet"><b>明晚｜品酒之夜 · ${seats} 席</b><span>那晚整個 Lounge 留給品酒的客人。</span></div>`;return''}
 /* ---- drawn on a tasting night: the glasses set out along the counter, the small board by the bar ---- */
 function kenNightDraw(c,list){const K=R&&R.kt;if(!K||K.end||room!=='lounge')return;const by=LG.bar.y;
  list.push({y:by+11,f:()=>{for(const t of loungeTables()){if(t.kind!=='bar')continue;for(let j=0;j<3;j++){const gx=t.leg?LG.leg.x0+5+j*6:t.x-6+j*6,gy=t.leg?t.y-30:by+2;c.fillStyle='rgba(236,240,244,.55)';c.beginPath();c.moveTo(gx-1.8,gy-5);c.quadraticCurveTo(gx-2,gy-1.2,gx,gy-1);c.quadraticCurveTo(gx+2,gy-1.2,gx+1.8,gy-5);c.closePath();c.fill();if(K.on&&j<=Math.min(2,K.said)){c.fillStyle='#8E1F33';c.beginPath();c.moveTo(gx-1.5,gy-3);c.quadraticCurveTo(gx-1.5,gy-1.3,gx,gy-1.2);c.quadraticCurveTo(gx+1.5,gy-1.3,gx+1.5,gy-3);c.closePath();c.fill()}c.fillStyle='rgba(236,240,244,.7)';c.fillRect(gx-.3,gy-1,.6,2.4);c.fillRect(gx-1.3,gy+1.2,2.6,.6)}}}});
  /* rc7.6 (07:44): the whole room — three glasses set at every seat of every table too */
  for(const t of loungeTables()){if(t.kind==='bar')continue;const sp=seatPos(t);list.push({y:t.y+.5,f:()=>{for(let k=0;k<sp.length;k++){const q=sp[k];for(let j=0;j<3;j++){const gx=t.x+q.dx*.42+(j-1)*4.4,gy=t.y-15+(t.seats===4&&q.side===0?-6:0);c.fillStyle='rgba(236,240,244,.6)';c.beginPath();c.moveTo(gx-1.6,gy-4.4);c.quadraticCurveTo(gx-1.8,gy-1,gx,gy-.9);c.quadraticCurveTo(gx+1.8,gy-1,gx+1.6,gy-4.4);c.closePath();c.fill();if(K.on&&j<=Math.min(2,K.said)&&t.group&&k<t.group.size){c.fillStyle='#8E1F33';c.beginPath();c.moveTo(gx-1.3,gy-2.7);c.quadraticCurveTo(gx-1.3,gy-1.2,gx,gy-1.1);c.quadraticCurveTo(gx+1.3,gy-1.2,gx+1.3,gy-2.7);c.closePath();c.fill()}c.fillStyle='rgba(236,240,244,.75)';c.fillRect(gx-.3,gy-1,.6,2.2);c.fillRect(gx-1.2,gy+1,2.4,.5)}}}})}
- const bx=LG.leg?LG.leg.x0+4:LG.bar.x0-22,byy=LG.leg?by+78:by+58;list.push({y:byy,f:()=>{c.fillStyle='#5E3B22';c.fillRect(bx-9,byy-26,1.6,26);c.fillRect(bx+8,byy-26,1.6,26);c.fillStyle='#2B2B2B';rr(c,bx-11,byy-34,24,20,2);c.fill();c.strokeStyle='#8A6A42';c.lineWidth=1.2;rr(c,bx-11,byy-34,24,20,2);c.stroke();c.fillStyle='#F2EDE2';c.textAlign='center';c.font=`700 5px ${DFONT}`;c.fillText('Ken 的',bx+1,byy-26);c.font=`700 6px ${DFONT}`;c.fillText('品酒夜',bx+1,byy-18)}});
+ const bx=LG.leg?LG.leg.x0+4:LG.bar.x0-22,byy=LG.leg?by+78:by+58;list.push({y:byy,f:()=>{c.fillStyle='#5E3B22';c.fillRect(bx-9,byy-26,1.6,26);c.fillRect(bx+8,byy-26,1.6,26);c.fillStyle='#2B2B2B';rr(c,bx-11,byy-34,24,20,2);c.fill();c.strokeStyle='#8A6A42';c.lineWidth=1.2;rr(c,bx-11,byy-34,24,20,2);c.stroke();c.fillStyle='#F2EDE2';c.textAlign='center';c.font=`700 6px ${DFONT}`;c.fillText('品酒',bx+1,byy-26);c.fillText('之夜',bx+1,byy-18)}});
  /* rc7.7: a round opened for the tables waits on a tray at the end of the bar's L until it is carried */
  {const up=[];for(const g of K.guests){const tk=g.ticket;if(!tk||!tk.kt||g.gone||g.table==null)continue;const t0=R.tables[g.table];if(!t0||t0.kind==='bar')continue;for(const i of tk.items)if(i.ktp&&i.st==='ready'&&!i.picked)up.push(i)}
   if(up.length){const L=LG.leg;const ox=L?L.x0+2:LG.bar.x0+4,oy=L?L.y0-17:LG.bar.y+8;list.push({y:oy+10,f:()=>{c.fillStyle='rgba(46,34,26,.6)';el(c,ox+9,oy+2.5,11,3.2);up.slice(0,8).forEach((i,k)=>{const gx=ox+1.5+(k%4)*5,gy=oy+1-(k>=4?5:0);c.fillStyle='rgba(236,240,244,.6)';c.beginPath();c.moveTo(gx-1.6,gy-4.4);c.quadraticCurveTo(gx-1.8,gy-1,gx,gy-.9);c.quadraticCurveTo(gx+1.8,gy-1,gx+1.6,gy-4.4);c.closePath();c.fill();c.fillStyle='#8E1F33';c.beginPath();c.moveTo(gx-1.3,gy-2.7);c.quadraticCurveTo(gx-1.3,gy-1.2,gx,gy-1.1);c.quadraticCurveTo(gx+1.3,gy-1.2,gx+1.3,gy-2.7);c.closePath();c.fill();c.fillStyle='rgba(236,240,244,.75)';c.fillRect(gx-.3,gy-1,.6,2.2);c.fillRect(gx-1.2,gy+1,2.4,.5)})}})}}}
 STORY_EV.push(
  /* the day of a tasting: the night is set going (its scenes are the evening's own) */
  {k:'kt_night',lane:'major',cls:'A',floor:0,w:()=>1e9,at:['daystart'],   /* planned days ahead and in the news: it is the day's first beat (another due at the start of the day waits a day, counted) */
-  when:()=>{const K=kenS(),n=K.next;if(!n||n.d>S.day||R.kt)return false;const free=n.n>=4&&kenFree();/* rc7.6 (08:51): a night the player chose before opening */if(R.cn){if(free)K.next=null;else n.d=S.day+1;return false}/* rc7.6: the chef's night has the Lounge tonight: his is tomorrow */if(!loungeOpenTonight()||!NAMED[KEN]){if(free){K.next=null;later(()=>{if(R&&phase==='service')noteLine('Lounge 今晚沒有人站吧台，品酒夜沒辦成。')},1600)}else n.d=S.day+1;return false}/* the Lounge is not open tonight: the next day it is */
+  when:()=>{const K=kenS(),n=K.next;if(!n||n.d>S.day||R.kt)return false;const free=n.n>=4&&kenFree();/* rc7.6 (08:51): a night the player chose before opening */if(R.cn){if(free)K.next=null;else n.d=S.day+1;return false}/* rc7.6: the chef's night has the Lounge tonight: his is tomorrow */if(!loungeOpenTonight()||!NAMED[KEN]){if(free){K.next=null;later(()=>{if(R&&phase==='service')noteLine('Lounge 今晚沒有人站吧台，品酒之夜沒辦成。')},1600)}else n.d=S.day+1;return false}/* the Lounge is not open tonight: the next day it is */
    if(n.n<=3&&fact('ken_t'+n.n)){kenAdvance(n.n);return false}/* that night happened; its end did not (the page was closed) */return true},
   run:()=>kenNightStart()},
  /* Ken comes back and sits in the room he talked Jill into — no speech about it */
@@ -4086,9 +4086,9 @@ STORY_EV.push(
    kenSayG(ctx,'我主持。酒我挑，菜妳配。',t+5200,'talk');
    /* rc7.7 (10:10): he would do it as a friend; Jill offers the share herself — (12:43) in so many words: no figure */JILL_SAY('那你的部分怎麼算？',t+6500,{with:'named:'+KEN});kenSayG(ctx,'不用算。我自己喜歡，友情主持。',t+7800,'wry');JILL_SAY('不行，該算的還是要算。',t+9100,{with:'named:'+KEN});kenSayG(ctx,'我又不是為了錢。',t+10400);JILL_SAY('我知道。',t+11700,{with:'named:'+KEN});kenSayG(ctx,'……好。',t+13000,'taste');factSet('ken_cut');t+=7800;
    JILL_SAY('哪一天？',t+6500,{with:'named:'+KEN});kenSayG(ctx,'妳店裡比較不忙的那天。',t+7800,'wry');JILL_SAY('……那就過三天。',t+9100,{with:'named:'+KEN});
-   later(()=>noteLine(`Jill 在吧台的小黑板上寫了一行：Ken 的品酒夜・${n} 席。`),t+10400);kenS().next={d:S.day+3,n:1};relSet(KEN_ID,'jill','spoke')}},
+   later(()=>noteLine(`Jill 在吧台的小黑板上寫了一行：品酒之夜・${n} 席。`),t+10400);kenS().next={d:S.day+3,n:1};relSet(KEN_ID,'jill','spoke')}},
  /* the third night's end did not come (the page was closed): his next evening in the Lounge */
- {k:'ken_collab',lane:'major',cls:'A',floor:1,at:['lounge'],once:true,ic:'heart',note:'第三次品酒夜之後，Ken 說：「做一支我們自己的。」',
+ {k:'ken_collab',lane:'major',cls:'A',floor:1,at:['lounge'],once:true,ic:'heart',note:'第三次品酒之夜之後，Ken 說：「做一支我們自己的。」',
   when:ctx=>!!fact('ken_t3')&&!fact('ken_collab')&&S.day>fact('ken_t3').d&&kenInLounge(ctx)&&kenQuiet(),
   run:ctx=>kenCollab(ctx)},
  /* three bottles without labels, tasted against Jill's signature, after closing */
@@ -4119,7 +4119,7 @@ STORY_EV.push(
  {k:'kx_du_orders',lane:'ambient',cd:10,at:['order'],when:ctx=>!!fact('du_wine')&&ctx.g&&namedId(ctx.g)===DU&&ctx.tk&&ctx.tk.lounge&&ctx.tk.items.some(i=>i.d==='w_jk')&&Math.random()<.5,
   run:ctx=>{sayG(ctx.g,'這支。',600)}},
  {k:'kx_heard',lane:'ambient',cd:5,at:['lounge'],when:ctx=>factN('ken_tn')>=1&&ctx.g&&!ctx.g.reg&&!namedId(ctx.g)&&!ctx.g.tasting&&!R.kt&&Math.random()<.12,
-  run:ctx=>{sayG(ctx.g,pickT(['聽說這裡有品酒夜？','Ken 的品酒夜下次是什麼時候？','上次那個品酒會，還會辦嗎？']),700);const b=evanOn()||qingOn();const nx=kenS().next;if(b)sayS(b,nx&&nx.d-S.day<=7?'過幾天就有。開店前會寫在外面。':'Ken 說了算。',2100)}}
+  run:ctx=>{sayG(ctx.g,pickT(['聽說這裡有品酒之夜？','品酒之夜下次是什麼時候？','上次那個品酒會，還會辦嗎？']),700);const b=evanOn()||qingOn();const nx=kenS().next;if(b)sayS(b,nx&&nx.d-S.day<=7?'過幾天就有。開店前會寫在外面。':'Ken 說了算。',2100)}}
 );
 function kenAtLounge(){return R&&R.groups.find(g=>namedId(g)===KEN&&!g.kenHost&&g.table!=null&&!g.gone&&R.tables[g.table].room==='lounge'&&SEATED_ST.concat(['toTable']).includes(g.state))||null}
 function duAtLounge(){return R&&R.groups.find(g=>namedId(g)===DU&&g.table!=null&&!g.gone&&R.tables[g.table].room==='lounge'&&SEATED_ST.concat(['toTable']).includes(g.state))||null}
@@ -4201,7 +4201,7 @@ function cnOpen(){return loungeLv()>=2&&!!S.signature}
 function cnMenu(){const L=menuList();const best=cat=>L.filter(d=>{const D=DISH(d);return D&&D.cat===cat&&!D.bar&&!D.wine&&!isSig(d)}).sort((a,b)=>(S.xp[b]||0)-(S.xp[a]||0)||(a<b?-1:1))[0]||null;
  return[best('starter'),S.signature?'signature':best('main'),S.sigDessert?'sigdessert':best('dessert')].filter(Boolean)}
 function cnTonight(){const n=cnS().next;return !!(n&&n.d<=S.day)}   /* rc8: an overdue night is tonight (cnDayStart moves it) — as kenNightToday; the evening's plan, made before cnDayStart, sees it (Day 87: 予安's trial on a booked-out Lounge) */
-function cnWhyNot(){const C=cnS();if(!cnOpen())return loungeLv()<2?'要先有 Lounge II':'要先有招牌菜';const d=S.day+1;if(C.last!=null&&d-C.last<7)return`一週最多一次——DAY ${C.last+7} 以後可以再排`;const k=kenS().next;if(k&&k.d===d)return'明晚是 Ken 的品酒夜';if(cnMenu().length<3)return'菜單上要有前菜和甜點';return''}
+function cnWhyNot(){const C=cnS();if(!cnOpen())return loungeLv()<2?'要先有 Lounge II':'要先有招牌菜';const d=S.day+1;if(C.last!=null&&d-C.last<7)return`一週最多一次——DAY ${C.last+7} 以後可以再排`;const k=kenS().next;if(k&&k.d===d)return'明晚是品酒之夜';if(cnMenu().length<3)return'菜單上要有前菜和甜點';return''}
 function cnCanPlan(){return !cnS().next&&!cnWhyNot()}
 function cnPlan(){if(!cnCanPlan())return false;cnS().next={d:S.day+1,menu:cnMenu()};save();return true}
 function cnCancel(){const C=cnS();if(!C.next||(phase==='service'&&C.next.d===S.day))return false;C.next=null;save();return true}
@@ -4807,7 +4807,7 @@ const STORY_LINES=[
   beats:[['ya_1','她一直看那台鋼琴',{illus:'ya_first'}],['ya_2','「那台有人彈嗎？」'],['ya_3','「我。」'],['ya_trial','「彈得真好。」',{illus:'ya_trial'}],['ya_join','「星期幾？」',{illus:'ya_join'}]]},
  /* rc7: Ken after the Lounge — his tastings, the wine */
  {k:'ken',who:'品酒師 Ken',names:['品酒師 Ken','Jill','Monsieur 杜','Evan','沈晴'],faces:['named:品酒師 Ken','jill'],title:()=>'下次換一支',open:()=>!!(BF('ken_lounge')||BF('ken_propose')),more:()=>fact('ken_wine')?'':'他還會再辦。',
-  beats:[['ken_lounge','「跟我想的不一樣。」',{can:()=>!kenLegacy()}],['ken_propose','「這裡其實可以辦品酒。」'],['ken_t1','第一次品酒夜',{illus:'ken_t1'}],['ken_t2','「下次換一支。」',{illus:'ken_t2'}],['ken_t3','老樣子',{illus:'ken_t3'}],['ken_collab','「做一支我們自己的。」'],['ken_samples','三瓶沒有酒標的酒'],['ken_wine','「晚餐之後」',{illus:'ken_wine'}]]},
+  beats:[['ken_lounge','「跟我想的不一樣。」',{can:()=>!kenLegacy()}],['ken_propose','「這裡其實可以辦品酒。」'],['ken_t1','第一次品酒之夜',{illus:'ken_t1'}],['ken_t2','「下次換一支。」',{illus:'ken_t2'}],['ken_t3','老樣子',{illus:'ken_t3'}],['ken_collab','「做一支我們自己的。」'],['ken_samples','三瓶沒有酒標的酒'],['ken_wine','「晚餐之後」',{illus:'ken_wine'}]]},
  {k:'qt',who:'晴 & 阿拓',names:['沈晴','阿拓','Jill'],kinds:['s'],faces:['staff:沈晴','staff:阿拓'],title:()=>'多的',open:()=>!!BF('qt_1'),more:'（只要他們還在這裡工作。）',photos:['qing_tuo','qing_tuo_late'],
   beats:[['qt_1','「炸雞好了沒？」'],['qt_2','不用問了'],['qt_3','「多的。」'],['qt_absence','「今天炸物怎麼怪怪的？」'],['qt_photo','從工作開始'],['qt_photo2','有你在的晚班'],['qt_drink','今天喝？'],['qt_late','晚點回去'],['qt_often','最近比較常'],['qt_ya','你喜歡予安？'],['qt_said','講完']]},
  {k:'dylan',who:()=>dylanOut()?'Jill & Dylan':'Dylan',names:['Dylan','Jill','王太太','王先生'],faces:()=>dylanOut()?['dylan','jill']:['dylan'],title:()=>dylanOut()?'結婚十一年，還在追':'那位常來的客人',open:()=>(S.regulars.dylan||0)>=1,more:()=>dylanOut()?'他們的故事還在繼續。':'好像有什麼……',photos:['jill_dylan_valentine'],
@@ -4863,7 +4863,7 @@ function restChapters(){const achD=achReal;/* v2.3 follow-up: a beat's day from 
   {t:'小小的餐廳',beats:[['開店',has(true,1)],['第一位員工',has((S.crew||[]).length>0||achD('hire')!=null,firstHireDay())],['第一次擴建',has(S.level>=2,S.level===2&&S.grewDay?S.grewDay:null)],['有了熟客',has(REGS.some(r=>(S.regulars[r.id]||0)>=4),achD('regular4'))]]},
   {t:'店開始有自己的樣子',beats:[['招牌菜',has(!!S.signature,achD('sig'))],['側廳',has(projOn('side'),S.newRooms&&S.newRooms.side)],['第二道招牌',has(!!S.sigDessert,achD('sigd'))],["Jill's Kitchen — JILL",has(S.level>=5,achD('jill'))]]},
   {t:'晚餐之後',hidden:()=>!fact('ken_wine_q'),tease:'店裡好像還少了什麼。',showIf:()=>S.level>=4,beats:[['「妳真的不賣酒？」',BF('ken_wine_q')],['這道要配什麼',BF('ken_pairing')],['吃完飯，去隔壁',BF('lounge_idea')],['試酒的晚上',BF('tasting_night')],['配菜的酒',BF('pairing_wine')],['Lounge 開了',BF('lounge_built_1')]]},   /* rc8 (19:19 §6): the wine came for the food; the Lounge came from next door */
-  {t:"Jill's Kitchen — The Lounge",hidden:()=>!fact('lounge_project'),tease:'？？？？？',showIf:()=>!!fact('ken_wine_q'),beats:[['第一個晚上',BF('lounge_first_night')],['酒吧沙發廳',BF('lounge_built_2')],['安靜的角落',BF('lounge_built_3')],['「你以前就坐這個位子。」',BF('evan_origin')],['Ken 的品酒夜',BF('ken_t1')],['「晚餐之後」上了酒單',BF('ken_wine')],['好像真的開起來了',(()=>{const k=Object.keys(story().facts).find(x=>x.startsWith('milestone_'));return k?fact(k).d:null})()]]},
+  {t:"Jill's Kitchen — The Lounge",hidden:()=>!fact('lounge_project'),tease:'？？？？？',showIf:()=>!!fact('ken_wine_q'),beats:[['第一個晚上',BF('lounge_first_night')],['酒吧沙發廳',BF('lounge_built_2')],['安靜的角落',BF('lounge_built_3')],['「你以前就坐這個位子。」',BF('evan_origin')],['品酒之夜',BF('ken_t1')],['「晚餐之後」上了酒單',BF('ken_wine')],['好像真的開起來了',(()=>{const k=Object.keys(story().facts).find(x=>x.startsWith('milestone_'));return k?fact(k).d:null})()]]},
   /* v2.4 P2: the Second Floor (second_floor_and_long_arcs §39: the major beats only — no line for the first question,
      none for the crew's moments; nothing that says what the floor will be) */
   {t:'樓上',showIf:()=>!!fact('up_cats'),beats:[['房東的二樓',BF('up_inspect')],[`${upCatN('mikan')}和${upCatN('ban')}不見的那一晚`,BF('up_cats'),{illus:'up_cats'}],['「……樓上現在還空著嗎？」',BF('up_ask')],['「整層。」',BF('up_lease')]]},
@@ -9482,7 +9482,7 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
   ['存錢目標','開店前會寫一個存錢目標：只列現在真的買得到的東西，還差多少、大約幾天。'],
   ['看店裡','商店和開店前畫面都有「看店裡」，看的時候可以切房間。']]},
  {ic:'💰',h:'每天的帳',sum:'營業額和小費在營業中進來；食材是開店前就付了；打烊以後付酒水、租金和薪水。',pts:[
-  ['結算','營業額、食材成本、酒水成本、薪資、租金、食材契作、鋼琴演奏、品酒夜分潤、小費、任務獎勵，最後是今日淨利。淨利下面另外一項「今天的店」，一行一項：天氣、Lounge、包廂、VIP 卡、宣傳……。品酒夜和主廚之夜那晚，Lounge 只寫那一行。'],
+  ['結算','營業額、食材成本、酒水成本、薪資、租金、食材契作、鋼琴演奏、品酒之夜分潤、小費、任務獎勵，最後是今日淨利。淨利下面另外一項「今天的店」，一行一項：天氣、Lounge、包廂、VIP 卡、宣傳……。品酒之夜和主廚之夜那晚，Lounge 只寫那一行。'],
   ['酒水成本','每倒一杯酒——在 Lounge 或晚餐桌上——就是那杯酒的進貨成本，大約售價的三成。酒不用備料，倒了才算。'],
   ['租金','每天付，跟店的大小走：主廳每擴建一次就高一點；側廳、戶外區、廚房擴建、Lounge、二樓各有自己的一份。結算會一項一項列出來。剛開的小店一天 $300。'],
   ['薪水','日薪跟等級走：剛來的時候最便宜，每升一級都多一截，LV5 是剛來時的五倍多（廚師 LV1 一天 $304、LV5 一天 $1,690）。'],
@@ -9499,15 +9499,15 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
   ['要有調酒師','Lounge 蓋好那天，Evan 就在吧台後面；把吧台的人都移開的話，Lounge 那晚不開。調酒師倒酒、送酒。點單、結帳、送小食由「Lounge 外場」的服務生做，沒人負責時調酒師自己來。'],
   ['客人怎麼用','客滿的時候，等桌的人會先坐吧台喝一杯，位子好了再過去（帳是分開的，不會多算一次來店）；吃完飯的人有些會留下來再喝一杯；也有人晚一點專程來。主廳、側廳桌上的酒，從此由調酒師倒、服務生端。'],
   ['晚餐後八折','在主廳或側廳吃完飯、再到 Lounge 坐的客人，Lounge 那一單打八折（酒和小點都算，每樣四捨五入到 $5）；知道有折扣，吃完留下來的人會多一點。結算「今天的店」的 Lounge 下面會寫「吃完留下 n 位・晚餐後折扣 −$…」。'],
-  ['Bar Food','炸雞塊、起司可樂餅、起司拼盤、水牛城雞翅、起司條（II 起多蒜香蘑菇、生蠔；III 起多德國豬腳）。在同一個廚房做，不佔菜單名額，備料在同一台冰箱。Lounge 生意好，廚房就忙。'],  ['酒吧披薩','後場工程的「披薩烤爐」（要先有 Lounge）蓋好以後，「菜單研發」可以研發三種披薩：酒吧披薩、瑪格麗特披薩、蘑菇白醬披薩，試做的食材多了「披薩麵團」。披薩是 Lounge 的小點，不佔菜單名額；兩個人以上、或來看球的客人比較常點。在「工作分配」把一位廚師排到「披薩烤爐」；烤爐沒有自己的廚師時，其他廚師有空會過去，沒有廚師才是 Jill 自己烤。'],  ['主廚之夜','Lounge II 以後、有了招牌菜，可以在「店舖工程」的 Lounge 那一段排主廚之夜，排在明晚；前一天的新聞會寫「明晚｜主廚之夜 · N 席」。主廚之夜是包場：那一晚整個 Lounge 都是主廚之夜的客人。三道是 Jill 最拿手的前菜、招牌菜、招牌甜點，每道配一杯，一道一道上。每位 $1,800（含酒）。一週最多一次，不跟 Ken 的品酒夜同一晚。'],  ['電視與音響','「家具與佈置」最下面的「Lounge 的家具」：Lounge 大電視（$200,000），有比賽的晚上（大約一週兩晚）轉播，會多看球的客人，小點點得多。電視音響系統（$150,000，要先有電視）讓看球的人更多，沒有比賽的晚上放音樂。結算的 Lounge 下面會寫「有比賽轉播」。'],
+  ['Bar Food','炸雞塊、起司可樂餅、起司拼盤、水牛城雞翅、起司條（II 起多蒜香蘑菇、生蠔；III 起多德國豬腳）。在同一個廚房做，不佔菜單名額，備料在同一台冰箱。Lounge 生意好，廚房就忙。'],  ['酒吧披薩','後場工程的「披薩烤爐」（要先有 Lounge）蓋好以後，「菜單研發」可以研發三種披薩：酒吧披薩、瑪格麗特披薩、蘑菇白醬披薩，試做的食材多了「披薩麵團」。披薩是 Lounge 的小點，不佔菜單名額；兩個人以上、或來看球的客人比較常點。在「工作分配」把一位廚師排到「披薩烤爐」；烤爐沒有自己的廚師時，其他廚師有空會過去，沒有廚師才是 Jill 自己烤。'],  ['主廚之夜','Lounge II 以後、有了招牌菜，可以在「店舖工程」的 Lounge 那一段排主廚之夜，排在明晚；前一天的新聞會寫「明晚｜主廚之夜 · N 席」。主廚之夜是包場：那一晚整個 Lounge 都是主廚之夜的客人。三道是 Jill 最拿手的前菜、招牌菜、招牌甜點，每道配一杯，一道一道上。每位 $1,800（含酒）。一週最多一次，不跟品酒之夜同一晚。'],  ['電視與音響','「家具與佈置」最下面的「Lounge 的家具」：Lounge 大電視（$200,000），有比賽的晚上（大約一週兩晚）轉播，會多看球的客人，小點點得多。電視音響系統（$150,000，要先有電視）讓看球的人更多，沒有比賽的晚上放音樂。結算的 Lounge 下面會寫「有比賽轉播」。'],
 
   ['酒單研發','「菜單研發」的最下面：粉紅氣泡酒、橘酒、黑皮諾、招牌調酒「晚安」、香檳、老藤卡本內（要有酒窖）。價錢和研發一道菜差不多，研發一次就能在 Lounge 倒。每一支都有配的菜或客人，那一桌更常配一杯、更常留下來。今晚倒的酒裡每多一支研發過的，留下來的人多一點（最多 +15%）。'],
   ['今晚倒哪幾種','開店前，「今日菜單」下面有「Lounge 酒單」：每一種酒都可以開或關，至少留一種；Lounge 的客人只會點今晚有倒的。酒吧小點在上面的菜單裡，不佔菜單名額，名額旁邊會寫「＋ 酒吧小點 幾道（不佔名額）」。'],
   ['品酒課','員工頁每位服務生的卡片上（有 Lounge 以後）：$12,000，上完對酒就「自在」了。外場懂酒的人多，主廳、側廳吃飯的客人更常點一杯。'],
   ['Lounge 的人怎麼升級','Lounge 名單上的人是在店裡邊做邊學的：訓練升級一天最多一級，先讓他上一天班再說。'],
-  ['Ken 的品酒夜','Lounge 開了以後，Ken 會提議在 Lounge 辦品酒夜（品酒會只有 Ken 辦）。那一晚整個 Lounge 都留給品酒的客人，酒照杯算。前三次 Ken 自己排；「晚餐之後」出來以後，開店前的新聞會問「Ken 的品酒夜｜今晚要辦嗎？」，按「今晚辦」就是今晚，也可以按「這次不辦」。一週最多一次，不跟主廚之夜同一晚。品酒的收入扣掉成本，三成是 Ken 的「品酒夜分潤」——他本來說友情主持就好，是 Jill 堅持要給。'],
+  ['品酒之夜','Lounge 開了以後，Ken 會提議在 Lounge 辦品酒之夜（品酒會只有 Ken 辦）。那一晚整個 Lounge 都留給品酒的客人，酒照杯算。前三次 Ken 自己排；「晚餐之後」出來以後，開店前的新聞會問「品酒之夜｜今晚要辦嗎？」，按「今晚辦」就是今晚，也可以按「這次不辦」。一週最多一次，不跟主廚之夜同一晚。品酒的收入扣掉成本，三成是 Ken 的「品酒之夜分潤」——他本來說友情主持就好，是 Jill 堅持要給。'],
   ['鋼琴與予安','鋼琴買來以後，一開始沒有人彈。過一陣子，一位常來 Lounge 的客人——予安——會成為固定的鋼琴師：一個禮拜彈三個晚上。那幾晚開店前的新聞會寫「今晚｜予安在 Lounge 彈琴」，吃完飯留下來的人比較多；每晚付她演奏費 $2,500，結算會列一行「鋼琴演奏」。她不彈的晚上，鋼琴就安靜地放著。'],
-  ['晚餐之後','Ken 辦過三次品酒夜以後，會和 Jill 一起做一支酒：「晚餐之後」（JILL\'S KITCHEN × KEN），一支輕盈的紅酒，配 Jill 的招牌菜。酒進來以後就一直在 Lounge 的酒單上，一杯大約 $420；不用研發，也可以在「Lounge 酒單」關掉。'],
+  ['晚餐之後','Ken 辦過三次品酒之夜以後，會和 Jill 一起做一支酒：「晚餐之後」（JILL\'S KITCHEN × KEN），一支輕盈的紅酒，配 Jill 的招牌菜。酒進來以後就一直在 Lounge 的酒單上，一杯大約 $420；不用研發，也可以在「Lounge 酒單」關掉。'],
   ['帳','結算的晚上會寫「Lounge 幾桌・營業額・吃完留下幾組」。營業額是 Lounge 那幾桌付的錢，不含小費，跟下面「Lounge 今天賣了什麼」的合計一樣；Lounge 的小費另外一行，晚餐桌上配的酒也另外一行。員工那一欄寫調酒師調了幾杯。']]},
  {ic:'🚪',h:'二樓：休息室與包廂',sum:'二樓整層租下來的時候，就一起隔出一間給店裡的人的員工休息室，其他地方先空著；給一桌人的包廂，是之後從店裡的日子裡長出來的。',pts:[
   ['怎麼來的','二樓的房間都不是升級選單裡冒出來的。店裡的人連坐下來的地方都沒有，打烊後 Jill 自己看見了（《大家待的地方》），才打給房東；所以休息室是跟整層一起來的。之後有客人想要安靜、不被打擾的位子（《關上門以後》），包廂的企劃才會出現在「店舖工程 › 二樓的房間」，選「之後再說」也不會不見。'],
@@ -9594,8 +9594,8 @@ const GUIDE_WHEN={
   ['Lounge 的企劃出現以後也在這裡',h=>h.LP],['Lounge 蓋好以後，樓上的事就會慢慢開始',h=>h.UPA],['這裡會多「二樓（整層）」',h=>h.UPA],
   ['租下二樓以後有一張二樓平面圖',h=>h.up],['「看看整層」是整層現在的樣子',h=>h.up],
   ['Lounge III 以後的 Bar 小廚／油炸站',h=>h.L],['有 Lounge II 以後還有 Lounge 的酒窖',h=>h.L],['側廳的東西分兩區',h=>h.side],['有 Lounge 以後還有披薩烤爐',h=>h.L],
-  ['酒水成本、薪資',h=>h.wine,'薪資'],['鋼琴演奏、品酒夜分潤、',h=>h.L,''],['天氣、Lounge、',h=>h.L,'天氣、'],['、包廂、VIP',h=>h.pd,'、VIP'],
-  ['品酒夜和主廚之夜那晚，Lounge 只寫那一行',h=>h.L],['——在 Lounge 或晚餐桌上——',h=>h.L,'——在晚餐桌上——'],
+  ['酒水成本、薪資',h=>h.wine,'薪資'],['鋼琴演奏、品酒之夜分潤、',h=>h.L,''],['天氣、Lounge、',h=>h.L,'天氣、'],['、包廂、VIP',h=>h.pd,'、VIP'],
+  ['品酒之夜和主廚之夜那晚，Lounge 只寫那一行',h=>h.L],['——在 Lounge 或晚餐桌上——',h=>h.L,'——在晚餐桌上——'],
   ['側廳、戶外區、廚房擴建、Lounge、二樓各有自己的一份',h=>h.side&&h.ter&&h.kext&&h.L&&h.up,h=>{const n=[['側廳',h.side],['戶外區',h.ter],['廚房擴建',h.kext],['Lounge',h.L],['二樓',h.up]].filter(x=>x[1]).map(x=>x[0]);return n.length?n.join('、')+(/[A-Za-z]$/.test(n[n.length-1])?' ':'')+(n.length>1?'各有':'有')+'自己的一份':null}],
   ['之後有客人想要安靜、不被打擾的位子',h=>h.pd],
   ['二樓是店裡的以後',h=>h.up],['、Lounge、貓',h=>h.L,'、貓'],['予安和鋼琴的故事、',h=>h.L,''],
@@ -9804,7 +9804,7 @@ function wineTonightHTML(){if(!loungeLv())return'';const all=wineAvail();if(!all
 function dayNotesHTML(s){const W=WEATHER[s.weather]||WEATHER.sun,E=EVENTS[s.event];const R0=[];const row=(k,v,c)=>R0.push(`<div class="${c||''}"><span>${k}</span><span>${v}</span></div>`);const sub=(k,v)=>row(k,v,'sub');
  row('今天',W.n+(s.event&&s.event!=='none'&&E?`・${E.n}`:''));
  if(s.lg){const L=s.lg;
-  if(s.kt){row('Ken 的品酒夜',`${s.kt.n} 位・營業額 ${fmt(s.kt.rev)}`);if(L.rev>s.kt.rev)sub('其他 Lounge 客人',fmt(L.rev-s.kt.rev))}
+  if(s.kt){row('品酒之夜',`${s.kt.n} 位・營業額 ${fmt(s.kt.rev)}`);if(L.rev>s.kt.rev)sub('其他 Lounge 客人',fmt(L.rev-s.kt.rev))}
   else if(L.cn){row('主廚之夜',`${L.cn.n} 位・營業額 ${fmt(L.cn.rev)}`);if(L.tabs)sub('其他 Lounge 客人',`${L.tabs} 桌・${fmt(L.rev)}`)}
   else if(L.open){row('Lounge',`${L.tabs} 桌・營業額 ${fmt(L.rev)}`);if(L.after)sub('吃完留下',`${L.after} 位${L.off?`・晚餐後折扣 −${fmt(L.off)}`:''}`);if(L.wait)sub('先坐吧台等',`${L.wait} 位`);if(L.sport)sub('有比賽轉播',`${L.sport} 位來看球`)}
   else row('Lounge','沒開（沒有調酒師）','warn')}
@@ -9818,7 +9818,7 @@ function dayNotesHTML(s){const W=WEATHER[s.weather]||WEATHER.sun,E=EVENTS[s.even
 function showSummary(){phase='summary';mainScreen='summary';const s=S.lastSummary;if(!s){showShop();return}hud(true);/* v2.2 A5: the wages just left the till — the HUD must say so on this screen, not on the next */
  const topHTML=s.top?`<img alt="" src="${dishURL(s.top,'P')}" style="width:34px;height:34px;vertical-align:middle;margin-right:4px">${DISH(s.top)?DISH(s.top).n:''}`:'—';
  show(`<div class="sheet tall"><div class="sh-top"><div class="ttl"><div class="eyebrow">今日結算</div><h2>DAY ${s.day}</h2><div class="sum-stars">${starsHTML(s.stars)}</div></div><button class="icon-btn" data-act="peek" style="font-weight:800;font-size:11px;width:auto;padding:0 9px">看店裡</button><button class="icon-btn" data-act="book" aria-label="餐廳日誌">${SVG.book}</button></div>
-  <div class="ledger"><div><span>營業額</span><span>${fmt(s.rev)}</span></div><div class="neg"><span>食材成本</span><span>-${fmt(s.cost)}</span></div>${s.wine?`<div class="neg"><span>酒水成本</span><span>-${fmt(s.wine)}</span></div>`:''}${s.wages?`<div class="neg"><span>薪資</span><span>-${fmt(s.wages)}</span></div>`:''}${s.rent?`<div class="neg rent"><span>租金<small>${(s.rentParts||[]).map(p=>`${p[0]} ${fmt(p[1])}`).join('・')}</small></span><span>-${fmt(s.rent)}</span></div>`:''}${s.cfee?`<div class="neg"><span>食材契作</span><span>-${fmt(s.cfee)}</span></div>`:''}${s.piano?`<div class="neg"><span>鋼琴演奏<small>林予安，今晚在 Lounge</small></span><span>-${fmt(s.piano)}</span></div>`:''}${s.ken?`<div class="neg"><span>品酒夜分潤<small>Ken，品酒客利潤的三成</small></span><span>-${fmt(s.ken)}</span></div>`:''}<div class="pos"><span>小費</span><span>+${fmt(s.tips)}</span></div>${s.bonus?`<div class="pos"><span>任務獎勵</span><span>+${fmt(s.bonus)}</span></div>`:''}<div class="net"><span>今日淨利</span><span style="color:${s.net>=0?'var(--sage)':'#A2412B'}">${s.net>=0?'+':''}${fmt(s.net)}</span></div>${s.loan>0?`<div class="pos loan"><span>秀琴阿姨借的<small>結算時錢超過 $20,000 就會還她</small></span><span>+${fmt(s.loan)}</span></div>`:s.loan<0?`<div class="neg loan"><span>還秀琴阿姨</span><span>-${fmt(-s.loan)}</span></div>`:''}</div>
+  <div class="ledger"><div><span>營業額</span><span>${fmt(s.rev)}</span></div><div class="neg"><span>食材成本</span><span>-${fmt(s.cost)}</span></div>${s.wine?`<div class="neg"><span>酒水成本</span><span>-${fmt(s.wine)}</span></div>`:''}${s.wages?`<div class="neg"><span>薪資</span><span>-${fmt(s.wages)}</span></div>`:''}${s.rent?`<div class="neg rent"><span>租金<small>${(s.rentParts||[]).map(p=>`${p[0]} ${fmt(p[1])}`).join('・')}</small></span><span>-${fmt(s.rent)}</span></div>`:''}${s.cfee?`<div class="neg"><span>食材契作</span><span>-${fmt(s.cfee)}</span></div>`:''}${s.piano?`<div class="neg"><span>鋼琴演奏<small>林予安，今晚在 Lounge</small></span><span>-${fmt(s.piano)}</span></div>`:''}${s.ken?`<div class="neg"><span>品酒之夜分潤<small>Ken，品酒客利潤的三成</small></span><span>-${fmt(s.ken)}</span></div>`:''}<div class="pos"><span>小費</span><span>+${fmt(s.tips)}</span></div>${s.bonus?`<div class="pos"><span>任務獎勵</span><span>+${fmt(s.bonus)}</span></div>`:''}<div class="net"><span>今日淨利</span><span style="color:${s.net>=0?'var(--sage)':'#A2412B'}">${s.net>=0?'+':''}${fmt(s.net)}</span></div>${s.loan>0?`<div class="pos loan"><span>秀琴阿姨借的<small>結算時錢超過 $20,000 就會還她</small></span><span>+${fmt(s.loan)}</span></div>`:s.loan<0?`<div class="neg loan"><span>還秀琴阿姨</span><span>-${fmt(-s.loan)}</span></div>`:''}</div>
   ${dayNotesHTML(s)}
   ${s.r1!=null?(()=>{const up=s.r1>s.r0+.004,dn=s.r1<s.r0-.004;const F=(s.story||[]).map(x=>x.label?x:{label:x.t,value:'',sub:'',s:x.s});const pos=F.filter(x=>x.s>0).slice(0,3),neg=F.filter(x=>x.s<0).slice(0,3);
    const row=x=>`<div class="rf"><span class="rf-k">${x.label}</span><span class="rf-v">${x.value}</span>${x.sub?`<small class="rf-s">${x.sub}</small>`:''}</div>`;
@@ -10111,8 +10111,8 @@ function doAct0(a,d,k,b){
  case'buySR':{if(buyRoomPhase('sr',+k))sfx.buy();break}case'buyPD':{if(buyRoomPhase('pd',+k))sfx.buy();break}case'roomGo':roomGo(k);break;   /* v2.4 rc6 */
  case'buyLounge':{if(buyLounge(+k)){sfx.buy()}break}
  case'cnPlan':{if(cnPlan()){sfx.buy();toast('明晚是主廚之夜。');keepScroll(showShop,'.cn-card')}break}   /* rc7.6 */
- case'ktHold':{if(ktHold()){sfx.tap();toast('今晚是 Ken 的品酒夜。');keepScroll(showPrep,'.kt-ask')}break}   /* rc7.6 (08:51) */
- case'ktCancel':{if(ktCancel()){sfx.tap();toast('品酒夜這次不辦。');keepScroll(showPrep,'.kt-ask')}break}
+ case'ktHold':{if(ktHold()){sfx.tap();toast('今晚是品酒之夜。');keepScroll(showPrep,'.kt-ask')}break}   /* rc7.6 (08:51) */
+ case'ktCancel':{if(ktCancel()){sfx.tap();toast('品酒之夜這次不辦。');keepScroll(showPrep,'.kt-ask')}break}
  case'cnCancel':{if(cnCancel()){sfx.tap();toast('主廚之夜取消了。');keepScroll(showShop,'.cn-card')}break}
  case'jillPost':{if(jillPost(k))sfx.tap();if(sub==='book')showBook();else showShop();break}
  case'postsAll':{postsAll=!postsAll;sfx.tap();keepScroll(sub==='book'?showBook:showShop,'[data-act=postsAll]');break}
