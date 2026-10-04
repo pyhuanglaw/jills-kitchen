@@ -140,7 +140,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 @keyframes tabpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
 @media (min-width:700px){#roomTabs button{height:34px;min-width:60px;font-size:13px}}
 #roomTabs.many{gap:1px}#roomTabs.many button{padding:0 7.5px;min-width:36px}   /* v2.4 rc6: seven or eight rooms (二樓, the Staff Room and the Private Dining Room are tabs) still fit a phone */
-#roomTabs.many8 button{padding:0 6px;min-width:33px;font-size:11.5px;letter-spacing:0}
+#roomTabs.many8 button{padding:0 5px;min-width:32px;font-size:11.5px;letter-spacing:0}   /* rc8.8: a little tighter, so 「Jill & Dylan」 fits a 390 phone with eight rooms */
 @media (min-width:700px){#roomTabs.many button,#roomTabs.many8 button{padding:0 11px;min-width:52px;font-size:13px}}
 
 /* scene */
@@ -1525,7 +1525,7 @@ const COLS=[112,200,288],RSH=[0,0,0];let ROWS=[168,252,336];
 const SPOT_ORDER=[4,3,5,7,6,8,1,0,2];   /* the middle row first, then the front, the back row last */
 /* ---- 2.0: rooms. The restaurant is four spaces drawn one at a time; the simulation runs in all of them. Every moving
    thing carries .room, and a target in another room is reached through a doorway (all doorways lead to the dining room). ---- */
-const ROOMS={main:{n:'主廳'},kitchen:{n:'廚房'},side:{n:'側廳'},front:{n:'店門口'},lounge:{n:'Lounge'},home:{n:'房間',full:'Jill 的房間'}};   /* rc7.3: Jill's and Dylan's room, from Day 1 */   /* v2.3: the Lounge */   /* v2.2.1 #6: 主廳 — with a side hall both rooms are dining rooms */
+const ROOMS={main:{n:'主廳'},kitchen:{n:'廚房'},side:{n:'側廳'},front:{n:'店門口'},lounge:{n:'Lounge'},home:{n:'房間',get full(){return S&&S.dylan&&dylanOut()?'Jill 和 Dylan 的房間':'Jill 的房間'},get mid(){return S&&S.dylan&&dylanOut()?'Jill & Dylan':null}}};   /* rc8.8 (the player, 2026-10-05: 「Dylan已經揭露但在房間還是沒寫Dylan」): theirs by name once he is out */   /* rc7.3: Jill's and Dylan's room, from Day 1 */   /* v2.3: the Lounge */   /* v2.2.1 #6: 主廳 — with a side hall both rooms are dining rooms */
 let room='main';
 /* v2.4 rc6: the second floor's view outside a service — 店舖工程's look after a purchase ('look') and a finished room's
    reveal on the morning it opens ('reveal'); in a service it is a room like the others (the player's 06:36) */
@@ -6395,11 +6395,14 @@ function peeking(){const p=$('#peekPill');return!!p&&!p.hidden}   /* v2.2.1 #8: 
 /* v2.4 rc6 (the player's 05:19, 05:23, 06:36): every room is its own tab — the floor (二樓) and, once they are built,
    the Staff Room and the Private Dining Room, each one tap from anywhere (nobody has to cross the floor to reach them);
    the tab you are in reads the room's whole name (員工休息室, 私人包廂), so inside a room it is that room, never 二樓. */
-function roomTabName(k){if(k==='lounge'&&!loungeLv())return'隔壁';/* rc8: before it is Jill's, the bar next door */const r=ROOMS[k];return k===room&&r.full?r.full:r.n}
+function roomTabName(k,lv){if(k==='lounge'&&!loungeLv())return'隔壁';/* rc8: before it is Jill's, the bar next door */const r=ROOMS[k];if(k!==room)return r.n;lv=lv||0;return lv===0&&r.full?r.full:lv<=1&&r.mid?r.mid:r.n}
 function renderRoomTabs(force){const el=$('#roomTabs');if(!el)return;const rv=phase!=='service'&&UPV==='reveal';const show=(phase==='service'&&!!R)||rv||(phase!=='service'&&peeking()&&roomsOpen().length>1);el.hidden=!show;if(!show)return;const A=roomAlerts();
  const list=rv?['up']:UPV==='look'&&phase!=='service'?['up','staff','pdr'].filter(roomOpen):roomsOpen();el.classList.toggle('many',list.length>=7);el.classList.toggle('many8',list.length>=8);el.classList.toggle('many9',list.length>=9);   /* the floor's look (店舖工程, a reveal): the floor and its rooms only */
  const h=list.map(k=>`<button data-room="${k}" class="${k===room?'on':''}${A[k].u?' urgent':''}${roomIsNew(k)&&k!==room?' new':''}"><span>${roomTabName(k)}</span>${A[k].n?`<b>${A[k].n}</b>`:roomIsNew(k)&&k!==room?'<b class="nw">NEW</b>':''}</button>`).join('');
- if(force||h!==tabsHTML){tabsHTML=h;el.innerHTML=h}}
+ if(force||h!==tabsHTML){tabsHTML=h;el.innerHTML=h;
+  /* rc8.8: the row never runs off the screen (eight or nine rooms on a 375–390 phone): the lit tab's full name gives way to a
+     shorter one, then to the room's short name */
+  for(let lv=1;lv<=2&&el.getBoundingClientRect().width>innerWidth-8;lv++){const sp=el.querySelector('button.on span');if(!sp)break;sp.textContent=roomTabName(room,lv)}}}
 {const rt=$('#roomTabs');if(rt)rt.addEventListener('click',e=>{const b=e.target.closest('[data-room]');if(!b||UPV==='reveal')return;setRoom(b.dataset.room)})}
 /* v2.2 X: keyboard — Space pauses and resumes a service, Escape closes what is open (a dialogue line, the lightbox, a
    sheet, the pause menu), Enter/Space steps a dialogue. Only when nothing is being typed. */
@@ -9613,7 +9616,7 @@ function drawBarBook(c,x,y){c.save();c.translate(x,y);c.rotate(-.05);c.fillStyle
 /* the chair at the desk and, when he is there, Dylan at it — from behind: the dark hair, the headphones, the cardigan */
 function drawHomeChairAndDylan(c,now){const C=HM.chair;const D=LIFE.dylan;const at=homeDylanAtDesk();
  srShadow(c,C.x,C.y+1,12,2.6,.14);
- if(at)drawPersonBack(c,C.x,C.y-6,DYLAN_HOME,{headphones:!at.off,bob:Math.sin(now*1.3)*.25,turn:at.turn||0});
+ if(at){drawPersonBack(c,C.x,C.y-6,dyHomeLook(),{headphones:!at.off,bob:Math.sin(now*1.3)*.25,turn:at.turn||0});dyHomeTag(c,C.x,C.y-66)}
  /* the chair back, in front of him: pale oak with an oatmeal cushion */
  srOak(c,C.x-11,C.y-20,22,4,SRC.oakHi,true);c.fillStyle=SRC.oat;rr(c,C.x-10,C.y-17,20,9,3);c.fill();c.strokeStyle=SRC.edge;c.lineWidth=.5;c.stroke();
  for(const lx of[C.x-10,C.x+8])srOak(c,lx,C.y-8,2.4,9,SRC.oakMid)}
@@ -9799,6 +9802,11 @@ REG_BY.dylan=DYLAN;
 /* rc7.6 (07:44 「在房間Dylan就穿帽T一直戴著帽T帽子吧」): the hood stays up in the room — over his hair, at the desk, on the sofa,
    walking about; only his face shows, as in his portrait */
 const DYLAN_HOME=Object.assign({},DYLAN.looks[0],{top:'#A4A8AD',pat:'hoodie',top2:null,hood:'#8E9297',hoodUp:true,acc:'glasses',pants:'#4A4E56'});
+/* rc8.8 (the player, 2026-10-05: 「Dylan已經揭露但在房間還是沒寫Dylan」): his name over him in their room, as anyone's on the
+   floor — 「先生」 before the reveal, 「Dylan」 after (PROJECT_MEMORY §4: 「揭曉前名牌、旁白叫『先生』」). The hood stays up in the room,
+   before the reveal and after (the player, 2026-10-03 07:44: 「在房間Dylan就穿帽T一直戴著帽T帽子吧」) */
+function dyHomeLook(){return DYLAN_HOME}
+function dyHomeTag(c,x,y){nameTag(c,x,y,dylanOut()?'Dylan':'先生')}
 const LIFE={day:0,plan:null,t:0,jill:null,tv:null,dylan:null,say:[],revealRoll:0};
 function lifeReset(){LIFE.day=0;LIFE.plan=null;LIFE.t=0;LIFE.revealRoll=0;LIFE.say=[];LIFE.dylan=null;
  LIFE.jill={on:false,pos:null,x:PASS.x,y:PASS.y,face:1,step:0,legs:0,legTarget:0,act:null,last:null,t:0,flipT:0,flip:0,gazeT:0,gazeX:0,settleT:32,bobT:0,catNew:0,sinceSit:0,walking:false,tx:0,ty:0,via:null,after:null,sitT:0,petCat:null,counted:false};
@@ -10113,7 +10121,7 @@ function drawSofaGroup(c,now){drawSofaBody(c);const L=LIFE.jill,D=LIFE.dylan;con
   /* her face after hours: amused when he is doing his act, warm when a cat or he has her attention, tired-but-content early in the evening, otherwise soft */
   const expr=LIFE.say.some(q=>q.who==='d'&&q.t>=0&&q.t<q.life)?'amused':(L.gazeT>0||L.act==='pet')?'smile':(LIFE.t<25&&L.sinceSit<25)?'tired':'soft';
   drawPerson(c,L.x,SOFA.jy,JILL_LOOK,{jill:true,me:true,seated:true,s:1.1,bob,mood:'happy',expr,flip,blink:Math.sin(now*1.7)>.985,hat:!!L.hat,lounge:{legs:L.legs,len:(10+L.legs*32)/(1.1*PSC)},hold:L.act==='read'||(L.act==='wantTV'&&L.last==='read')?'reader':L.act==='game'?'game':L.act==='text'?'phone':null,flipPage:L.flip>0,gaze})}
- if(D&&D.onSofa){const flip=D.face<0;const look=D.act==='tv'&&tv.on?tv.x:(D.gazeT>0?L.x:null);drawPerson(c,D.x,SOFA.jy,DYLAN_HOME,{seated:true,mood:'happy',flip,blink:Math.sin(now*1.3+2)>.975,lounge:{legs:0},hold:D.phone?'phone':null,gaze:look!=null?{x:(look>=D.x?1:-1)*(flip?-1:1),y:D.act==='phone'?.5:.2}:(D.act==='phone'?{x:0,y:.6}:null)})}
+ if(D&&D.onSofa){const flip=D.face<0;const look=D.act==='tv'&&tv.on?tv.x:(D.gazeT>0?L.x:null);dyHomeTag(c,D.x,SOFA.jy-62);drawPerson(c,D.x,SOFA.jy,dyHomeLook(),{seated:true,mood:'happy',flip,blink:Math.sin(now*1.3+2)>.975,lounge:{legs:0},hold:D.phone?'phone':null,gaze:look!=null?{x:(look>=D.x?1:-1)*(flip?-1:1),y:D.act==='phone'?.5:.2}:(D.act==='phone'?{x:0,y:.6}:null)})}
  for(const k of byKind('lap'))drawCat(c,k,now);for(const k of byKind('seat'))drawCat(c,k,now);for(const k of byKind('lean'))drawCat(c,k,now);for(const k of byKind('arm'))drawCat(c,k,now);
  if(L.on&&L.act==='pet'&&L.petCat&&L.petCat.sofa){const p=L.petCat;c.fillStyle=JILL_LOOK.skin;circ(c,p.x+(p.x<L.x?5:-5),p.y-9,2.6);c.fillStyle='rgba(60,34,22,.35)';c.beginPath();c.arc(p.x+(p.x<L.x?5:-5),p.y-9,2.6,0,7);c.stroke()}}
 function drawTV(c,tv,now){const {x,y}=tv;const dir=tv.face;const roll=tv.at==='moving'?Math.sin(tv.step)*.6:0;
@@ -10127,7 +10135,7 @@ function drawTV(c,tv,now){const {x,y}=tv;const dir=tv.face;const roll=tv.at==='m
  c.restore();
  if(tv.on){c.save();c.globalCompositeOperation='lighter';let g=c.createRadialGradient(x+dir*22,y-14,4,x+dir*22,y-14,56);g.addColorStop(0,'rgba(150,190,255,.16)');g.addColorStop(1,'rgba(150,190,255,0)');c.fillStyle=g;c.fillRect(x-64,y-72,128,92);c.restore()}}
 function drawDylanFree(c,D,now){const stp=D.moving?Math.sin(D.step):0;const crouch=D.state==='crouch';
- drawPerson(c,D.x,D.y,(D.room||'main')==='home'?DYLAN_HOME:DYLAN.looks[0],{step:stp,bob:D.moving?Math.abs(stp)*-.8:Math.sin(now*1.5)*.3,mood:'happy',flip:D.face<0,seated:crouch,s:crouch?.95:1,hold:!D.moving&&D.phone&&D.state==='stand'?'phone':null,blink:Math.sin(now*1.3+2)>.975,lounge:crouch?{legs:0}:null});
+ if((D.room||'main')==='home')dyHomeTag(c,D.x,D.y-66);drawPerson(c,D.x,D.y,(D.room||'main')==='home'?dyHomeLook():DYLAN.looks[0],{step:stp,bob:D.moving?Math.abs(stp)*-.8:Math.sin(now*1.5)*.3,mood:'happy',flip:D.face<0,seated:crouch,s:crouch?.95:1,hold:!D.moving&&D.phone&&D.state==='stand'?'phone':null,blink:Math.sin(now*1.3+2)>.975,lounge:crouch?{legs:0}:null});
  if(D.carry){c.fillStyle='#fff';el(c,D.x+(D.face<0?-9:9),D.y-34,6.5,4.2);el(c,D.x+(D.face<0?-9:9),D.y-36.5,6.5,4.2)}}
 function drawSay(c,rm){for(const s of LIFE.say){if(s.t<0||(s.room||'main')!==(rm||'main'))continue;const a=s.t<.2?s.t/.2:s.t>s.life-.4?(s.life-s.t)/.4:1;c.globalAlpha=Math.max(0,a);c.font=`700 6.5px ${FONT}`;const w=c.measureText(s.txt).width+10;c.fillStyle='#FFFDF7';rr(c,s.x-w/2,s.y-8,w,12,6);c.fill();c.beginPath();c.moveTo(s.x-2.5,s.y+4);c.lineTo(s.x+2.5,s.y+4);c.lineTo(s.x,s.y+7.5);c.fill();c.fillStyle='#2E2019';c.textAlign='center';c.textBaseline='middle';c.fillText(s.txt,s.x,s.y-1.6);c.textBaseline='alphabetic';c.globalAlpha=1}}
 
@@ -10442,7 +10450,7 @@ function drawBagSparkle(c,now){const t=now-BAG_T;const base=.35+Math.sin(now*2)*
 /* rc8 (the player, 2026-10-03: 「每一項都一大坨 很難閱讀」): an entry reads as short lines — one sentence a line, split at 。 and ；
    outside 「」（）『』 */
 function guideLines(t){const out=[];let d=0,cur='';for(const ch of t){cur+=ch;if('「（『(['.includes(ch))d++;else if('」）』)]'.includes(ch))d=Math.max(0,d-1);else if((ch==='。'||ch==='；')&&d===0){out.push(cur);cur=''}}if(cur.trim())out.push(cur);return out}
-const GUIDE=[   /* the manual describes the game as it is. Audited every release (docs/RELEASE_CHECKLIST.md) — last: v2.4 rc8.7, 2026-10-07 (story first: the Lounge's people — 沈晴、阿拓 from Lounge I, 安安、許葳 with II; no level, rating or Lounge II for the Lounge, the piano, 予安 or the floor, and the manual names none; checked, that one line changed) — before: v2.4 rc8.6, 2026-10-07 (the stock rule as the game plays it: from Day 3 a dish with nothing in the fridge cannot be ordered; Jill orders one herself only on the first two days); the rewrite of 2026-10-06 from docs/audit/2026-10-06/ws5_manual.md: the first card is how a day is played; only what the screen does not tell and a player needs to know stays (what the screen already says, how the game was built, old saves and stories still to come left it); a space, and a story's own entry, comes into it when it is there */
+const GUIDE=[   /* the manual describes the game as it is. Audited every release (docs/RELEASE_CHECKLIST.md) — last: v2.4 rc8.8, 2026-10-07 (the room's lit tab says whose it is once Dylan is out and his name is over him there; 怎麼進去 already says only 「房間分頁的最後一個」 and the tab list gives the short names: checked, no line changed) — before: v2.4 rc8.7, 2026-10-07 (story first: the Lounge's people — 沈晴、阿拓 from Lounge I, 安安、許葳 with II; no level, rating or Lounge II for the Lounge, the piano, 予安 or the floor, and the manual names none; checked, that one line changed) — before: v2.4 rc8.6, 2026-10-07 (the stock rule as the game plays it: from Day 3 a dish with nothing in the fridge cannot be ordered; Jill orders one herself only on the first two days); the rewrite of 2026-10-06 from docs/audit/2026-10-06/ws5_manual.md: the first card is how a day is played; only what the screen does not tell and a player needs to know stays (what the screen already says, how the game was built, old saves and stories still to come left it); a space, and a story's own entry, comes into it when it is there */
  {ic:"🍳",h:"一天怎麼玩",sum:"第一次玩，先看這一張。",pts:[
   ["一天","開店前選今天的菜單、備料 → 17:00 開店 → 21:30 打烊，客人吃完就結算 → 用今天賺的錢在商店買東西 → 準備下一天。前兩天開店時，遊戲會自動幫你補好備料（照價付）。"],
   ["營業中","客人會自己找空桌坐。桌上出現紅色「!」：點桌子點餐。到廚房點訂單上的菜（或點那道菜的設備）開始做，照料理台上的指示做完。桌上出現銀色餐蓋：點桌子把菜端過去。出現金幣：點桌子收錢；客人走了再點一次收桌。"],
