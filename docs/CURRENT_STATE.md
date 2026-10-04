@@ -10,14 +10,12 @@
   `main` 上只有文件與紀錄。從 v2.2.1 起的完整開發歷史都在 `main` 上。
 - 還沒做完的遊戲功能，另外開短期的 `feature/…` 或 `wip/…` branch；做完、測試通過才回到 `main`，發布的 commit 一定在 `main` 上。
   文件與紀錄可以直接在 `main`。不要讓工作 branch 跟 `main` 長期並行。
-- 目前沒有進行中的工作 branch。`feature/ken-tasting-pictures`（81cbe46，品酒之夜的圖片與改名）已在 rc8.4 合回 `main`，內容都在
-  `main` 裡，可以在 GitHub 網頁刪掉。
-- `wip/lin`：舊的開發 branch 名稱（Madame Lin 是遊戲裡的一條故事線，不是這個專案的主線）。2026-10-04 起不再使用；它指向的 b87b77b
-  已經在 `main` 裡，沒有別的內容。玩家已同意刪除；這個工作環境不能刪 GitHub 上的 branch，要在 GitHub 網頁刪。
+- GitHub 上只有兩條 branch（2026-10-04 確認）：`main`，和下面的 `archive/rc7.6-import-main`。目前沒有進行中的工作 branch。
+- 已刪除（玩家 2026-10-04 在 GitHub 網頁刪掉）：`feature/ken-tasting-pictures`（81cbe46，rc8.4 已合回 `main`）、`wip/lin`（舊的開發
+  branch 名稱；最後指向的 b87b77b 在 `main` 裡）、`claude/jills-kitchen-github-setup-4x7483`（8ca784b，接在舊的匯入 commit 後面改網址；
+  同樣的改動在主線的 ec985d1）。三條的內容都已經在 `main` 或不需要了。
 - `archive/rc7.6-import-main`（d0947ea）：2026-10-03 把 rc7.6 的 12 個 zip 匯入 GitHub 時建的那一個 commit，原本的 `main`。跟現在的
   `main` 沒有共同祖先，只是保存，不合併。
-- `claude/jills-kitchen-github-setup-4x7483`（8ca784b）：接在那個匯入 commit 後面，把網址改到新的 artifact；同樣的改動已在主線上
-  （ec985d1）。玩家已同意刪除，同樣要在 GitHub 網頁刪。
 - 2026-10-04 的整理：`main` 從 d0947ea 強制改指到 b865d3c（舊的保存在 `archive/rc7.6-import-main`）。要復原：
   `git push --force-with-lease=refs/heads/main:<目前的 main> origin d0947ead2c18167ab3955fef51478a9168f5b8fd:refs/heads/main`。
 - 本機的 `bundle` remote 是原開發 session 的備份 bundle，只是還原來源，不推送。
