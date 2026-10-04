@@ -859,24 +859,26 @@ def rc83_a_new_space_has_its_first_photo(b, port, target):
 
 @test
 def rc84_kens_three_nights_three_pictures(b, port, target):
-    """The player, 2026-10-04 (docs/v24/ken_tasting_pictures_2026-10-04.txt): each of the three tasting nights Ken arranges
-    has its own picture — 剛開始辦, 有模有樣, 變成這裡的一部分 — shown the first time its night plays (stand-ins until the
-    player's pictures come); after the third, none. On the story page each of the three beats has its picture to reopen. A
-    save that had the second or third night before its picture existed gets it on the story page once the art is in."""
+    """The player, 2026-10-04 (docs/v24/ken_tasting_pictures_2026-10-04.txt): each of the first three 品酒之夜 Ken arranges has
+    its own picture — 剛開始辦 (the existing picture), 有模有樣 and 變成這裡的一部分 (the player's two of 2026-10-04) — shown the
+    first time its night plays, and the same three are Story Photos in the album; after the third, none. No stand-ins: a
+    picture without its art is not shown. The player's save, past all three nights, gets the three on the story page and in the
+    album on the nights' own days."""
     g = Game(b, port, target, seed=884, manual=True, viewport={'width': 390, 'height': 844})
     load_save(g, 'player_day89_2320.json')
-    il = json.loads(g.ev("JSON.stringify(['ken_t1','ken_t2','ken_t3'].map(k=>({k,t:STORY_ILLUS[k]&&STORY_ILLUS[k].t,src:!!illusSrc(k)})))"))
-    check([x['t'] for x in il] == ['剛開始辦', '有模有樣', '變成這裡的一部分'] and all(x['src'] for x in il), f'three pictures, three names: {il}')
+    il = json.loads(g.ev("JSON.stringify(['ken_t1','ken_t2','ken_t3'].map(k=>({k,t:STORY_ILLUS[k].t,art:!!storyArtSrc(STORY_ILLUS[k].art),tbd:(illusSrc(k)||{}).tbd})))"))
+    check([x['t'] for x in il] == ['剛開始辦', '有模有樣', '變成這裡的一部分'] and all(x['art'] and x['tbd'] is False for x in il), f'three pictures, the player\'s, no stand-in: {il}')
+    check(g.ev("STORY_PHOTOS.ken_night1.art") == 'ken_t1' and g.ev("storyArtSrc('ken_night2')!==storyArtSrc('ken_night3')&&storyArtSrc('ken_night2')!==storyArtSrc('ken_t1')"), 'the first is the existing picture; three different pictures')
     beats = json.loads(g.ev("JSON.stringify(STORY_LINES.find(L=>L.k==='ken').beats.filter(b=>b[2]&&b[2].illus).map(b=>b[0]))"))
     check(beats[:3] == ['ken_t1', 'ken_t2', 'ken_t3'], f'the story page: each night its picture: {beats}')
-    check(g.ev("!!(fact('ken_t2')&&fact('ken_t3'))") and not g.ev("!!(story().illus||{}).ken_t2"), 'the player\'s save had the nights before the pictures: nothing to open yet')
-    pend = json.loads(g.ev("JSON.stringify(Object.fromEntries(['ken_night1','ken_night2','ken_night3'].map(k=>[k,(storyPhotoPending()[k]||{}).day||null])))"))
-    check(pend == {'ken_night1': g.ev("fact('ken_t1').d"), 'ken_night2': g.ev("fact('ken_t2').d"), 'ken_night3': g.ev("fact('ken_t3').d")}, f'the three album photos wait for their pictures, each with its night\'s day: {pend}')
-    mig = json.loads(g.ev("(()=>{window.STORY_ART=window.STORY_ART||{};STORY_ART.ken_night2='data:image/webp;base64,AA';const o=kenIllusMig({story:{facts:{ken_t2:{d:83,n:1,l:83},ken_t3:{d:88,n:1,l:88}},illus:{}}});delete STORY_ART.ken_night2;return JSON.stringify({illus:o.story.illus,pend:Object.keys(o.story.photosPending)})})()"))
-    check(mig['illus'] == {'ken_t2': 83} and mig['pend'] == ['ken_night2', 'ken_night3'], f'once a picture is in, a night already had keeps it on the story page (the one without art waits): {mig}')
-    # a night played now: the picture over its opening, the photo's slot with today's day
-    g.ev("const d=S.day;delete story().photosPending.ken_night2;storyPhoto('ken_night2')")
-    check(g.ev("storyPhotoPending().ken_night2.day") == g.ev("S.day") and not g.ev("!!story().photos.ken_night2"), 'no art yet: the photo waits in its slot')
+    days = json.loads(g.ev("JSON.stringify(['ken_t1','ken_t2','ken_t3'].map(k=>fact(k).d))"))
+    seen = json.loads(g.ev("JSON.stringify(['ken_t2','ken_t3'].map(k=>(story().illus||{})[k]||null))"))
+    check(seen == days[1:], f'the player\'s save: the second and third nights\' pictures on the story page, on their days: {seen} {days}')
+    alb = json.loads(g.ev("JSON.stringify(['ken_night1','ken_night2','ken_night3'].map(k=>{const p=albumList().find(x=>x.kind==='story:'+k);return p?p.day:null}))"))
+    check(alb == days, f'and in the album, the three in a row on the nights\' own days: {alb} {days}')
+    # a picture without its art: nothing shown, the photo waits
+    w = json.loads(g.ev("(()=>{const a=STORY_ART.ken_night3;delete STORY_ART.ken_night3;delete ILLUS_CACHE.ken_t3;const r={src:illusSrc('ken_t3')};const o=kenIllusMig({story:{facts:{ken_t2:{d:83,n:1,l:83},ken_t3:{d:88,n:1,l:88}},illus:{}}});r.illus=o.story.illus;r.pend=Object.keys(o.story.photosPending);STORY_ART.ken_night3=a;return JSON.stringify(r)})()"))
+    check(w['src'] is None and w['illus'] == {'ken_t2': 83} and w['pend'] == ['ken_night2', 'ken_night3'], f'without its art: no picture, the photo waits: {w}')
     check(not g.errors, g.errors[:3]); g.close()
 
 

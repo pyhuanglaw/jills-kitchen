@@ -3362,11 +3362,12 @@ function secSocial(money,btn,live){const s=social();const cands=socialCands();co
 /* ---- Story Photo slots without art: the unlock is kept, the album entry waits for the picture ---- */
 function storyPhotoPending(){const st=story();return st.photosPending=st.photosPending||{}}
 function storyPhotoFlush(){const P=storyPhotoPending();for(const k in P){if(story().photos[k]){delete P[k];continue}const D=STORY_PHOTOS[k];if(D&&D.art&&storyArtSrc(D.art)){const info=P[k].info||{};const day0=P[k].day;delete P[k];const ok=storyPhoto(k,info);if(ok){const p=albumList().find(x=>x.kind==='story:'+k);if(p&&day0)p.day=day0}}}}
-/* rc8.4: Ken's first three tasting nights, a photo each (the player, 2026-10-04) — no stage: they wait in a slot until the
-   player's pictures are in, then join the album on the night's own day */
-STORY_PHOTOS.ken_night1={cap:'剛開始辦',txt:()=>'第一次品酒之夜。',art:'ken_night1',who:[KEN_ID]};
-STORY_PHOTOS.ken_night2={cap:'有模有樣',txt:()=>'第二次，人多了，Ken 在客人之間講酒。',art:'ken_night2',who:[KEN_ID]};
-STORY_PHOTOS.ken_night3={cap:'變成這裡的一部分',txt:()=>'第三次，整個 Lounge 都在品酒。',art:'ken_night3',who:[KEN_ID,'jill']};
+/* rc8.4: Ken's first three 品酒之夜, a photo each (the player, 2026-10-04) — the first the existing picture, the second and
+   third the player's; no stage, so one without its art waits in its slot and joins the album, on its night's own day, once
+   the art is in */
+STORY_PHOTOS.ken_night1={cap:'剛開始辦',txt:()=>'第一次品酒之夜。Ken 站在吧台後面，一支一支介紹。',art:'ken_t1',who:[KEN_ID]};
+STORY_PHOTOS.ken_night2={cap:'有模有樣',txt:()=>'第二次，人多了，Ken 走到客人中間講酒。',art:'ken_night2',who:[KEN_ID,'s:Evan']};
+STORY_PHOTOS.ken_night3={cap:'變成這裡的一部分',txt:()=>'第三次，整個 Lounge 都在品酒。',art:'ken_night3',who:[KEN_ID,'jill','s:Evan']};
 STORY_PHOTOS.jill_dylan_valentine={cap:'情人節，還在追',txt:()=>'十一年了，他還是每年帶花來。',art:'jill_dylan_valentine',who:['jill','dylan']};
 STORY_PHOTOS.wang_anniv={cap:'今年也在這裡',txt:()=>'王先生和王太太的結婚紀念日，在這裡過。',art:'wang_anniv',who:['wang','wangwife']};   /* the anniversary happens once in a save (a count here always said 「第 1 次」, against 「今年也在這裡」) */
 STORY_PHOTOS.staff_meal={cap:'開店前',txt:i=>`${i.names||'大家'}——這些人現在是一家店了。`,art:'staff_meal',who:['staff']};
@@ -3544,10 +3545,10 @@ const STORY_ILLUS={
  /* rc8.4 (the player, 2026-10-04, docs/v24/ken_tasting_pictures_2026-10-04.txt): each of the three nights Ken arranges has its own
     picture — the same Lounge, the same Ken, the room filling and the night becoming the shop's own; each shown the first time
     its night plays; after the third, no picture. The same three are the nights' Story Photos in the album (STORY_PHOTOS
-    ken_night1–3, 「放進 Life Album 連著看」): art keys ken_night1–3, one picture each for both. Stand-ins until the player's
-    pictures come; then ken_t1's art moves to ken_night1. */
- ken_t2:{t:'有模有樣',cap:'第二次品酒之夜。人多了一點，Ken 在客人之間講酒；吧台前有上次見過的臉。',art:'ken_night2',stage:c=>drawIllusKen(c,0)},
- ken_t3:{t:'變成這裡的一部分',cap:'第三次品酒之夜。整個 Lounge 都在品酒：有人在討論，有人舉著杯子，Jill 和 Evan 也在裡面。',art:'ken_night3',stage:c=>drawIllusKen(c,0)},   /* rc7: the player's pictures, 2026-10-02 16:19 / 16:25 / 16:32 */
+    ken_night1–3, 「放進 Life Album 連著看」). The first is the existing picture (art ken_t1); the second and third are the
+    player's pictures of 2026-10-04 (art ken_night2, ken_night3). No stand-in: without its art a picture is not shown. */
+ ken_t2:{t:'有模有樣',cap:'第二次品酒之夜。人多了，Ken 走出吧台，在客人之間講酒；Evan 在吧台後面倒酒。',art:'ken_night2'},
+ ken_t3:{t:'變成這裡的一部分',cap:'第三次品酒之夜。整個 Lounge 都在品酒，Ken 坐在客人中間；Jill 和 Evan 在吧台後面。',art:'ken_night3'},   /* rc7: the player's pictures, 2026-10-02 16:19 / 16:25 / 16:32 */
  ken_wine:{t:'晚餐之後',cap:'「晚餐之後」——JILL\'S KITCHEN × KEN。',art:'ken_wine',stage:c=>drawIllusKen(c,1)},
  du_wine:{t:'可是它很好',cap:'Monsieur 杜喝了「晚餐之後」。Ken 坐在旁邊。',art:'du_wine',stage:c=>drawIllusKen(c,2)},
  /* rc8 (19:19): the Madame Lin line — slots for the player's pictures (STORY_ART keys); stand-ins until they come */
@@ -3732,7 +3733,7 @@ function drawIllusUpCats(c){c.fillStyle='#2A2018';c.fillRect(0,0,360,270);c.fill
  for(const wx of[50,200]){c.fillStyle='#22304A';c.fillRect(wx,14,110,40);c.fillStyle='rgba(255,214,140,.8)';for(let k=0;k<8;k++)c.fillRect(wx+8+((k*29)%96),20+((k*13)%28),2,2);c.fillStyle='#3A2A1E';for(let k=1;k<4;k++)c.fillRect(wx+k*27.5,14,1.5,40)}
  c.fillStyle='#D8CBB4';c.fillRect(172,60,16,90);c.fillStyle='#3A2A1E';c.fillRect(250,170,70,70);c.fillStyle='#E0A050';el(c,120,40,12,6);c.fillStyle='rgba(255,220,160,.25)';el(c,180,150,120,70)}
 const ILLUS_CACHE={};
-function illusSrc(id){const I=STORY_ILLUS[id];if(!I)return null;const a=I.art&&storyArtSrc(I.art);if(a)return{src:a,tbd:false};
+function illusSrc(id){const I=STORY_ILLUS[id];if(!I)return null;const a=I.art&&storyArtSrc(I.art);if(a)return{src:a,tbd:false};if(!I.stage)return null;   /* rc8.4: a picture with no stand-in waits for its art */
  if(!ILLUS_CACHE[id]){try{const cv=mkCanvas(720,540);const c=cv.getContext('2d');c.scale(2,2);I.stage(c);ILLUS_CACHE[id]=cv.toDataURL('image/jpeg',.88)}catch(e){console.warn('[illus]',id,e);return null}}return{src:ILLUS_CACHE[id],tbd:true}}
 function illusSeen(id){if(!STORY_ILLUS[id])return;const st=story();st.illus=st.illus||{};if(!st.illus[id])st.illus[id]=S.day}
 function illusOpen(id){const I=STORY_ILLUS[id];if(!I||!(story().illus||{})[id])return false;return scene([{who:'',text:I.cap}],null,{illus:id,force:1})}
