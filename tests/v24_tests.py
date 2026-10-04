@@ -858,6 +858,29 @@ def rc83_a_new_space_has_its_first_photo(b, port, target):
 
 
 @test
+def rc84_kens_three_nights_three_pictures(b, port, target):
+    """The player, 2026-10-04 (docs/v24/ken_tasting_pictures_2026-10-04.txt): each of the three tasting nights Ken arranges
+    has its own picture — 剛開始辦, 有模有樣, 變成這裡的一部分 — shown the first time its night plays (stand-ins until the
+    player's pictures come); after the third, none. On the story page each of the three beats has its picture to reopen. A
+    save that had the second or third night before its picture existed gets it on the story page once the art is in."""
+    g = Game(b, port, target, seed=884, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day89_2320.json')
+    il = json.loads(g.ev("JSON.stringify(['ken_t1','ken_t2','ken_t3'].map(k=>({k,t:STORY_ILLUS[k]&&STORY_ILLUS[k].t,src:!!illusSrc(k)})))"))
+    check([x['t'] for x in il] == ['剛開始辦', '有模有樣', '變成這裡的一部分'] and all(x['src'] for x in il), f'three pictures, three names: {il}')
+    beats = json.loads(g.ev("JSON.stringify(STORY_LINES.find(L=>L.k==='ken').beats.filter(b=>b[2]&&b[2].illus).map(b=>b[0]))"))
+    check(beats[:3] == ['ken_t1', 'ken_t2', 'ken_t3'], f'the story page: each night its picture: {beats}')
+    check(g.ev("!!(fact('ken_t2')&&fact('ken_t3'))") and not g.ev("!!(story().illus||{}).ken_t2"), 'the player\'s save had the nights before the pictures: nothing to open yet')
+    pend = json.loads(g.ev("JSON.stringify(Object.fromEntries(['ken_night1','ken_night2','ken_night3'].map(k=>[k,(storyPhotoPending()[k]||{}).day||null])))"))
+    check(pend == {'ken_night1': g.ev("fact('ken_t1').d"), 'ken_night2': g.ev("fact('ken_t2').d"), 'ken_night3': g.ev("fact('ken_t3').d")}, f'the three album photos wait for their pictures, each with its night\'s day: {pend}')
+    mig = json.loads(g.ev("(()=>{window.STORY_ART=window.STORY_ART||{};STORY_ART.ken_night2='data:image/webp;base64,AA';const o=kenIllusMig({story:{facts:{ken_t2:{d:83,n:1,l:83},ken_t3:{d:88,n:1,l:88}},illus:{}}});delete STORY_ART.ken_night2;return JSON.stringify({illus:o.story.illus,pend:Object.keys(o.story.photosPending)})})()"))
+    check(mig['illus'] == {'ken_t2': 83} and mig['pend'] == ['ken_night2', 'ken_night3'], f'once a picture is in, a night already had keeps it on the story page (the one without art waits): {mig}')
+    # a night played now: the picture over its opening, the photo's slot with today's day
+    g.ev("const d=S.day;delete story().photosPending.ken_night2;storyPhoto('ken_night2')")
+    check(g.ev("storyPhotoPending().ken_night2.day") == g.ev("S.day") and not g.ev("!!story().photos.ken_night2"), 'no art yet: the photo waits in its slot')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
 def v24_the_day_is_held_for_the_beat_its_people_came_for(b, port, target):
     """Pacing (measured on the Day 52 save): when the schedule brings someone for a due v2.4 major beat, that beat keeps
     a major slot until it plays or until 85% of the service; another story's major that comes up while every free slot
@@ -2801,11 +2824,13 @@ def v24_rc7_ken_hosts_his_tasting_nights(b, port, target):
             check(k['du'] and k['duIn'] and g.ev("relN(KEN_ID,DU_ID,'argued')") >= 3, f'杜 at the end of the bar, and they disagree: {k}')
             p2 = ' / '.join(x['t'] for x in json.loads(g.ev("JSON.stringify(story().beatLines.ken_t2)")))
             check('這支配那道，太輕。' in p2 and '下次換一支。' in p2, f'the second night\'s page: {p2}')
+            check(g.ev("(story().illus||{}).ken_t2") == g.ev("S.day"), 'rc8.4: the second night has its own picture')
             w2 = k['wines']
         else:
             check(k['n'] == 3 and 'ken_t3' in k['f'] and 'ken_collab' in k['f'] and k['wines'] != w2, f'the third night, a different set of wines, and the wine: {k}')
             pc = ' / '.join(x['t'] for x in json.loads(g.ev("JSON.stringify(story().beatLines.ken_collab)")))
             check('三次了。' in pc and '做一支我們自己的。' in pc and g.ev("kenS().samples") == g.ev("S.day") + 4 and g.ev("kenS().next") is None, f'「做一支我們自己的。」 {pc}')
+            check(g.ev("(story().illus||{}).ken_t3") == g.ev("S.day"), 'rc8.4: the third night has its own picture')
         g.ev("__botUntil('phase!==\\'service\\'',90000,1/30)")
     check(g.ev("factN('ken_tn')") == 3 and g.ev("factN('ken_t1')+factN('ken_t2')+factN('ken_t3')") == 3, 'three nights, each once')
     check(not g.errors, g.errors[:3]); g.close()

@@ -217,6 +217,15 @@ Madame Lin：Day 1 之前就是隔壁 neighborhood bar 的老闆。不是房東�
 
 ---
 
+### Ken 的前三次品酒夜：三張圖（玩家 2026-10-04，原文 `docs/v24/ken_tasting_pictures_2026-10-04.txt`）
+
+- 「Ken 前三次自主舉辦的品酒夜，各自有專屬插圖；每張只在對應場次首次出現。第三次之後進入常態品酒夜，不再播放 Story Photo。」
+- 三張是一條小 progression，不是同一張重播：第一次｜剛開始辦（Ken 站著介紹酒，客人不多，三杯酒）；第二次｜已經有模有樣（人多、
+  熱鬧、Ken 在客人之間講酒、熟面孔）；第三次｜變成這裡的一部分（拉遠，整個 Lounge 在品酒，Jill／Evan 自然在裡面）。同一個
+  Lounge、同一個 Ken、類似構圖，人數、動作、氣氛慢慢變。
+- 同樣三張也是相簿（Life Album）的 Story Photo，「放進 Life Album 連著看」。程式：插圖 `STORY_ILLUS` ken_t1–3，相簿
+  `STORY_PHOTOS` ken_night1–3，同一張圖（art key ken_night1–3）；圖沒來之前相簿的照片等在 slot，來了就照那一晚的日子補進去。
+
 ## 7. 晴 × 阿拓（rc8，已實作；原始 brief：`docs/v24/qing_tuo_after_work_brief_2026-10-03.txt`；報告：`docs/V24_RC8_QING_TUO_REPORT.md`）
 
 五幕都是 held scene（暫停餐廳，點一下往下走），在 The Lounge。**沒有第六幕。** 這條線在 **Dylan 揭曉之後**才開始（2026-10-03：

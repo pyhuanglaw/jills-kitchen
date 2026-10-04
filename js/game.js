@@ -278,6 +278,10 @@ function linMig(o){if(!o||o.linMig)return o;o.linMig=1;const st=o.story=o.story&
  return o}
 /* rc8: a floor leased before the Staff Room came with it — the room is there, as of the lease (and 《大家待的地方》, if it
    had not played, is history: it is why she called) */
+/* rc8.4: a save that has had Ken's tasting nights before their pictures existed — once the player's picture is in
+   (STORY_ART), the night's beat on the story page has it to open (「看插圖」), and the album gets the night's photo on its
+   own day; nothing plays again */
+function kenIllusMig(o){const st=o&&o.story;if(!st||!st.facts)return o;for(const n of[1,2,3]){const k='ken_t'+n,f=st.facts[k];if(!f)continue;const I=STORY_ILLUS[k];if(n>1&&I&&storyArtSrc(I.art)&&!(st.illus&&st.illus[k])){st.illus=st.illus||{};st.illus[k]=f.d}const pk='ken_night'+n;st.photos=st.photos||{};st.photosPending=st.photosPending||{};if(!st.photos[pk]&&!st.photosPending[pk])st.photosPending[pk]={day:f.d,info:{}}}return o}   /* the photo's slot is kept with the night's day; storyPhotoFlush puts it in the album when the art comes */
 function srLeaseMig(o){if(!o||!(o.rooms&&o.rooms.up))return o;const u=o.up=o.up||{};const sr=u.sr=u.sr||{};if(sr.done!=null)return o;const L=u.lease!=null?u.lease:(o.day||1);sr.bought=L;sr.done=L;sr.mig=1;o.newRooms=o.newRooms||{};if(o.newRooms.staff==null)o.newRooms.staff=L;
  const st=o.story=o.story&&typeof o.story==='object'?o.story:{v:1};const F=st.facts=st.facts||{};if(!F.sr_story)F.sr_story={d:0,n:1,l:0,retro:1};if(!F.sr_build)F.sr_build={d:L,n:1,l:L};return o}
 function evanMig(o){if(((o.rooms&&o.rooms.lounge)||0)>0&&!(o.crew||[]).some(m=>m.name==='Evan'&&m.role==='bartender')){o.crew=o.crew||[];o.crew.push(evanNew(o.day))}return o}
@@ -638,7 +642,7 @@ function parseSave(t){let o;try{o=JSON.parse(t)}catch(e){return{err:'notjson'}}
  if(typeof o.v!=='number'||o.v%1)return{err:'notsave'};
  if(!(typeof o.day==='number'&&typeof o.money==='number'&&Array.isArray(o.unlocked)&&Array.isArray(o.menu)))return{err:'notsave'};
  if(o.v<1)return{err:'notsave'};if(o.v>SAVE_V)return{err:'newer',v:o.v};
- try{for(let n=o.v;n<SAVE_V;n++){MIGRATE[n](o);o.v=n+1}o=srLeaseMig(linMig(evanMig(giftTagMig(crewPoolMig(dlgAuditMig(crewNameFix(mainHallMig(legacyWang(legacyCrew(fillDefaults(o)))))))))))}catch(e){return{err:'broken'}}if(STORY_READY)try{beatLinesMig(o)}catch(e){console.warn('[beatLines]',e)}   /* a save loaded in play; the first one is cleaned at boot, when every story's code is there */
+ try{for(let n=o.v;n<SAVE_V;n++){MIGRATE[n](o);o.v=n+1}o=srLeaseMig(linMig(evanMig(giftTagMig(crewPoolMig(dlgAuditMig(crewNameFix(mainHallMig(legacyWang(legacyCrew(fillDefaults(o)))))))))))}catch(e){return{err:'broken'}}if(STORY_READY){try{beatLinesMig(o)}catch(e){console.warn('[beatLines]',e)}try{kenIllusMig(o)}catch(e){console.warn('[kenIllus]',e)}}   /* a save loaded in play; the first one is cleaned at boot, when every story's code is there */
  if(!(o.day>=1&&isFinite(o.money)&&o.unlocked.every(d=>typeof d==='string')&&o.menu.every(d=>typeof d==='string')&&Array.isArray(o.crew)&&o.dylan&&typeof o.dylan==='object'))return{err:'broken'};
  o.day=Math.max(1,Math.floor(o.day));o.money=Math.round(o.money);return{o,photos}}
 /* rc7.2 (22:49): a save that already has Sophie's pad is shown, once, which one it is (a new gift's tag, that day and the next) */
@@ -3358,6 +3362,11 @@ function secSocial(money,btn,live){const s=social();const cands=socialCands();co
 /* ---- Story Photo slots without art: the unlock is kept, the album entry waits for the picture ---- */
 function storyPhotoPending(){const st=story();return st.photosPending=st.photosPending||{}}
 function storyPhotoFlush(){const P=storyPhotoPending();for(const k in P){if(story().photos[k]){delete P[k];continue}const D=STORY_PHOTOS[k];if(D&&D.art&&storyArtSrc(D.art)){const info=P[k].info||{};const day0=P[k].day;delete P[k];const ok=storyPhoto(k,info);if(ok){const p=albumList().find(x=>x.kind==='story:'+k);if(p&&day0)p.day=day0}}}}
+/* rc8.4: Ken's first three tasting nights, a photo each (the player, 2026-10-04) — no stage: they wait in a slot until the
+   player's pictures are in, then join the album on the night's own day */
+STORY_PHOTOS.ken_night1={cap:'剛開始辦',txt:()=>'Ken 的第一次品酒夜。',art:'ken_night1',who:[KEN_ID]};
+STORY_PHOTOS.ken_night2={cap:'有模有樣',txt:()=>'第二次，人多了，Ken 在客人之間講酒。',art:'ken_night2',who:[KEN_ID]};
+STORY_PHOTOS.ken_night3={cap:'變成這裡的一部分',txt:()=>'第三次，整個 Lounge 都在品酒。',art:'ken_night3',who:[KEN_ID,'jill']};
 STORY_PHOTOS.jill_dylan_valentine={cap:'情人節，還在追',txt:()=>'十一年了，他還是每年帶花來。',art:'jill_dylan_valentine',who:['jill','dylan']};
 STORY_PHOTOS.wang_anniv={cap:'今年也在這裡',txt:()=>'王先生和王太太的結婚紀念日，在這裡過。',art:'wang_anniv',who:['wang','wangwife']};   /* the anniversary happens once in a save (a count here always said 「第 1 次」, against 「今年也在這裡」) */
 STORY_PHOTOS.staff_meal={cap:'開店前',txt:i=>`${i.names||'大家'}——這些人現在是一家店了。`,art:'staff_meal',who:['staff']};
@@ -3531,7 +3540,14 @@ const STORY_ILLUS={
  ya_first:{t:'那台鋼琴',cap:'第一次來的那位客人，一直看著那台沒有人彈的鋼琴。',art:'ya_first',stage:c=>drawIllusKen(c,3)},   /* rc7: the player's pictures, 2026-10-02 16:54 / 16:57 / 16:59 */
  ya_trial:{t:'彈得真好',cap:'予安第一次在 Lounge 彈琴。王太太走過來說：「彈得真好。」',art:'ya_trial',stage:c=>drawIllusKen(c,3)},
  ya_join:{t:'星期幾？',cap:'「下週還有空嗎？」「星期幾？」',art:'ya_join',stage:c=>drawIllusKen(c,3)},
- ken_t1:{t:'Ken 的品酒夜',cap:'第一次品酒夜。Ken 站在吧台後面，吧台前坐滿了。',art:'ken_t1',stage:c=>drawIllusKen(c,0)},   /* rc7: the player's pictures, 2026-10-02 16:19 / 16:25 / 16:32 */
+ ken_t1:{t:'剛開始辦',cap:'第一次品酒夜。Ken 站在吧台後面，吧台前坐滿了。',art:'ken_t1',stage:c=>drawIllusKen(c,0)},
+ /* rc8.4 (the player, 2026-10-04, docs/v24/ken_tasting_pictures_2026-10-04.txt): each of the three nights Ken arranges has its own
+    picture — the same Lounge, the same Ken, the room filling and the night becoming the shop's own; each shown the first time
+    its night plays; after the third, no picture. The same three are the nights' Story Photos in the album (STORY_PHOTOS
+    ken_night1–3, 「放進 Life Album 連著看」): art keys ken_night1–3, one picture each for both. Stand-ins until the player's
+    pictures come; then ken_t1's art moves to ken_night1. */
+ ken_t2:{t:'有模有樣',cap:'第二次品酒夜。人多了一點，Ken 在客人之間講酒；吧台前有上次見過的臉。',art:'ken_night2',stage:c=>drawIllusKen(c,0)},
+ ken_t3:{t:'變成這裡的一部分',cap:'第三次品酒夜。整個 Lounge 都在品酒：有人在討論，有人舉著杯子，Jill 和 Evan 也在裡面。',art:'ken_night3',stage:c=>drawIllusKen(c,0)},   /* rc7: the player's pictures, 2026-10-02 16:19 / 16:25 / 16:32 */
  ken_wine:{t:'晚餐之後',cap:'「晚餐之後」——JILL\'S KITCHEN × KEN。',art:'ken_wine',stage:c=>drawIllusKen(c,1)},
  du_wine:{t:'可是它很好',cap:'Monsieur 杜喝了「晚餐之後」。Ken 坐在旁邊。',art:'du_wine',stage:c=>drawIllusKen(c,2)},
  /* rc8 (19:19): the Madame Lin line — slots for the player's pictures (STORY_ART keys); stand-ins until they come */
@@ -3973,11 +3989,11 @@ function kenNightUpd(dt){const K=R&&R.kt;if(!K)return;if(K.end){/* rc7.6: the ho
 /* the start of the night: the first three are scenes; after them, a word in the room */
 function kenNightOpen(seated){const K=R.kt,n=K.n;factSet('ken_tn');const g0=seated[0]||null;const guest=(i,txt,ms)=>{const q=seated[i%Math.max(1,seated.length)];if(q)sayG(q,txt,ms)};
  const du=K.du?seated.find(q=>namedId(q)===DU):null;const dish=(menuList().includes('signature')&&'signature')||menuList().find(d=>DISH(d)&&DISH(d).cat==='main');const dn=dish?(dish==='signature'?kenSigName():dishName(dish)):'今天的主菜';
- if(n===1)kenScene('ken_t1',g0,()=>{factSet('ken_t1');kenNote(`快七點了，Lounge 的人陸續坐下——吧台、小桌、沙發。每個位子前面擺了三個杯子；Ken 站在吧台後面，手上拿著第一支。`,'ken_t1');
+ if(n===1)kenScene('ken_t1',g0,()=>{factSet('ken_t1');kenNote(`快七點了，Lounge 的人陸續坐下——吧台、小桌、沙發。每個位子前面擺了三個杯子；Ken 站在吧台後面，手上拿著第一支。`,'ken_t1');storyPhoto('ken_night1');
   kenSayH('今天三支。不用猜是哪裡的酒，先喝。',600,'talk');guest(1,'……這支是法國的吧？',1900);kenSayH('我就知道一定有人不聽。',3200,'wry');
   later(()=>noteLine('吧台這頭有人笑出來。Ken 開了第一支，Evan 他們跟著一個位子一個位子倒過去。'),4500);JILL_SAY('菜什麼時候出？',5800,{with:'named:'+KEN});kenSayH('第二支以後。先讓他們喝一口沒有配菜的。',7100,'talk');JILL_SAY('好。',8400,{with:'named:'+KEN});relSet(KEN_ID,'jill','sharedEvent')});
  else if(n===2)kenScene('ken_t2',g0,()=>{factSet('ken_t2');const b=(kenS().back||[])[0];const bg=b&&seated.find(q=>q.name===b.name);
-  kenNote(bg?'Ken 的第二次品酒夜。整個 Lounge 都是來品酒的客人，每個位子前面三個杯子；吧台前有兩張上次見過的臉。':'Ken 的第二次品酒夜。整個 Lounge 都是來品酒的客人；這次 Ken 先把每個位子的三個杯子排好才開門。');   /* rc8.3 (the player, Day 83: 「我甚至看不出來他辦了什麼」): what tonight is, said in its first line */
+  kenNote(bg?'Ken 的第二次品酒夜。整個 Lounge 都是來品酒的客人，每個位子前面三個杯子；吧台前有兩張上次見過的臉。':'Ken 的第二次品酒夜。整個 Lounge 都是來品酒的客人；這次 Ken 先把每個位子的三個杯子排好才開門。','ken_t2');storyPhoto('ken_night2');   /* rc8.3 (the player, Day 83: 「我甚至看不出來他辦了什麼」): what tonight is, said in its first line */
   if(bg){sayG(bg,'上次那支還有嗎？',600);kenSayH('沒有。說好換一支。',1900,'wry')}
   if(du){const known=!!fact('ken_du_argue')||relN(KEN_ID,DU_ID,'spoke')>0;
    if(known){later(()=>noteLine('吧台最旁邊坐著 Monsieur 杜。他沒有看 Ken，先把杯子拿起來聞了很久。'),3200);kenSayH('你怎麼也來了？',4500);sayG(du,'我付了錢的。',5800,{tone:'taste'});kenSayH(`第二支，配 Jill 今天的${dn}。`,7100,'talk');sayG(du,'這支配那道，太輕。',8400,{tone:'doubt'});kenSayH('它本來就該輕。',9700);sayG(du,'我知道你會這樣說。',11000,{tone:'doubt'})}
@@ -3985,7 +4001,7 @@ function kenNightOpen(seated){const K=R.kt,n=K.n;factSet('ken_tn');const g0=seat
    relSet(KEN_ID,DU_ID,'argued');relSet(KEN_ID,DU_ID,'spoke');relSet(KEN_ID,DU_ID,'sharedEvent');relSet(KEN_ID,DU_ID,'sharedTable');JILL_SAY('那我出菜了。',12300,{with:'named:'+KEN})}
   else{kenSayH(`第二支，配 Jill 今天的${dn}。`,3200,'talk');JILL_SAY('那我出菜了。',4500,{with:'named:'+KEN})}});
  else if(n===3)kenScene('ken_t3',g0,()=>{factSet('ken_t3');const b=(kenS().back||[])[0];const bg=b&&seated.find(q=>q.name===b.name);
-  kenNote('Ken 的第三次品酒夜。客人自己找位子坐下，每個位子前面的三個杯子 Ken 早就排好了。');JILL_SAY('老樣子？',600,{with:'named:'+KEN});kenSayH('老樣子。第一支給他們猜。',1900,'talk');
+  kenNote('Ken 的第三次品酒夜。客人自己找位子坐下，每個位子前面的三個杯子 Ken 早就排好了。','ken_t3');storyPhoto('ken_night3');JILL_SAY('老樣子？',600,{with:'named:'+KEN});kenSayH('老樣子。第一支給他們猜。',1900,'talk');
   /* rc8.3 (the player: 「品酒會的對話猜 怎麼是猜什麼干貝」): the guess is the wine's — said so — and the third glass goes with a dish (配), a separate thing */
   if(bg)sayG(bg,'這次可以猜是哪裡的酒了？',3200);else guest(0,'這次可以猜是哪裡的酒了？',3200);kenSayH('這次隨便你們猜。',4500,'wry');guest(1,'……義大利？',5800);kenSayH('不是。',7100,'wry');JILL_SAY(`第三支配${dn}？`,8400,{with:'named:'+KEN});kenSayH(`配${dn}。`,9700,'talk')});
  else{toast('Ken 的品酒夜開始了（Lounge）。');later(()=>{if(R&&R.kt)kenSayH(pickT(['今天三支。照順序喝。','第一支先不要配東西。','今天有一支你們應該認得。']),0,'talk')},900)}}
@@ -4791,7 +4807,7 @@ const STORY_LINES=[
   beats:[['ya_1','她一直看那台鋼琴',{illus:'ya_first'}],['ya_2','「那台有人彈嗎？」'],['ya_3','「我。」'],['ya_trial','「彈得真好。」',{illus:'ya_trial'}],['ya_join','「星期幾？」',{illus:'ya_join'}]]},
  /* rc7: Ken after the Lounge — his tastings, the wine */
  {k:'ken',who:'品酒師 Ken',names:['品酒師 Ken','Jill','Monsieur 杜','Evan','沈晴'],faces:['named:品酒師 Ken','jill'],title:()=>'下次換一支',open:()=>!!(BF('ken_lounge')||BF('ken_propose')),more:()=>fact('ken_wine')?'':'他還會再辦。',
-  beats:[['ken_lounge','「跟我想的不一樣。」',{can:()=>!kenLegacy()}],['ken_propose','「這裡其實可以辦品酒。」'],['ken_t1','第一次品酒夜',{illus:'ken_t1'}],['ken_t2','「下次換一支。」'],['ken_t3','老樣子'],['ken_collab','「做一支我們自己的。」'],['ken_samples','三瓶沒有酒標的酒'],['ken_wine','「晚餐之後」',{illus:'ken_wine'}]]},
+  beats:[['ken_lounge','「跟我想的不一樣。」',{can:()=>!kenLegacy()}],['ken_propose','「這裡其實可以辦品酒。」'],['ken_t1','第一次品酒夜',{illus:'ken_t1'}],['ken_t2','「下次換一支。」',{illus:'ken_t2'}],['ken_t3','老樣子',{illus:'ken_t3'}],['ken_collab','「做一支我們自己的。」'],['ken_samples','三瓶沒有酒標的酒'],['ken_wine','「晚餐之後」',{illus:'ken_wine'}]]},
  {k:'qt',who:'晴 & 阿拓',names:['沈晴','阿拓','Jill'],kinds:['s'],faces:['staff:沈晴','staff:阿拓'],title:()=>'多的',open:()=>!!BF('qt_1'),more:'（只要他們還在這裡工作。）',photos:['qing_tuo','qing_tuo_late'],
   beats:[['qt_1','「炸雞好了沒？」'],['qt_2','不用問了'],['qt_3','「多的。」'],['qt_absence','「今天炸物怎麼怪怪的？」'],['qt_photo','從工作開始'],['qt_photo2','有你在的晚班'],['qt_drink','今天喝？'],['qt_late','晚點回去'],['qt_often','最近比較常'],['qt_ya','你喜歡予安？'],['qt_said','講完']]},
  {k:'dylan',who:()=>dylanOut()?'Jill & Dylan':'Dylan',names:['Dylan','Jill','王太太','王先生'],faces:()=>dylanOut()?['dylan','jill']:['dylan'],title:()=>dylanOut()?'結婚十一年，還在追':'那位常來的客人',open:()=>(S.regulars.dylan||0)>=1,more:()=>dylanOut()?'他們的故事還在繼續。':'好像有什麼……',photos:['jill_dylan_valentine'],
@@ -10223,7 +10239,7 @@ function frameBody(now){frameN++;if(frameN%15===0)screenGuard();const covered=ph
  if(sc.width>0){let due=forceDraw;if(!covered){if(now-lastDrawS>=29){lastDrawS=now;due=true}}else if(frameN%3===0&&now-lastDrawC>=(screenEl.hidden?45:85)){lastDrawC=now;due=true}if(due){forceDraw=false;drawScene(t);flushMem()}}{const tw=$('#trayWrap');const want=!!(R&&R.panel&&phase==='service'&&!paused);if(tw.hidden===want)tw.hidden=!want;if(want&&tc.width>0)drawTray(t)}}
 
 /* ================= boot ================= */
-function boot(){STORY_READY=true;try{beatLinesMig(S)}catch(e){console.warn('[beatLines]',e)}layoutAll();hud(true);renderTickets();showTitle();requestAnimationFrame(frame);photoOpen().then(()=>photoMigrate());
+function boot(){STORY_READY=true;try{beatLinesMig(S)}catch(e){console.warn('[beatLines]',e)}try{kenIllusMig(S)}catch(e){console.warn('[kenIllus]',e)}layoutAll();hud(true);renderTickets();showTitle();requestAnimationFrame(frame);photoOpen().then(()=>photoMigrate());
  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{bg=null;layoutAll()})}
 boot();
 })();
