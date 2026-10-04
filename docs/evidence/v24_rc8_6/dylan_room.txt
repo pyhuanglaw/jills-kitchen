@@ -1,0 +1,5 @@
+01_out_desk.png: 揭曉後：書桌前的 Dylan，分頁「Jill 和 Dylan 的房間」 | {"day":89,"phase":"service","out":true,"tab":"Jill & Dylan","desk":true,"sofa":false}
+after closing: {"phase":"summary","room":"home","dy":null}
+02_out_evening.png: 揭曉後：打烊後他們的房間（「看店裡」） | {"day":89,"phase":"summary","out":true,"tab":"Jill & Dylan","desk":true,"sofa":false}
+03_before_desk.png: 揭曉前（新遊戲）：書桌前的「先生」，帽子戴著，分頁「Jill 的房間」 | {"day":1,"phase":"service","out":false,"tab":"Jill 的房間","desk":true,"sofa":false}
+errors: []

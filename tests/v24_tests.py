@@ -1010,6 +1010,41 @@ def rc85_small_talk_is_rare_and_makes_sense(b, port, target):
 
 
 @test
+def rc86_dylan_is_named_in_their_room(b, port, target):
+    """The player, 2026-10-05 (docs/v24/dylan_room_name_2026-10-05.txt): 「Dylan已經揭露但在房間還是沒寫Dylan」. On the player's
+    Day 89 save (he is out since Day 69): over him at his desk the name says Dylan, the lit tab says whose room it is with his
+    name (「Jill & Dylan」 when 「Jill 和 Dylan 的房間」 does not fit eight rooms on a 390 phone), and the hood stays up (the
+    player, 2026-10-03 07:44: 「在房間Dylan就穿帽T一直戴著帽T帽子吧」). A new game, before the reveal: 「先生」 over him, 「Jill 的房間」.
+    The tab row never runs off the screen."""
+    g = Game(b, port, target, seed=8952, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day89_0448.json')
+    g.ev("for(let i=0;i<30;i++){if(typeof DLG!=='undefined'&&DLG)dlgNext()}")
+    if g.ev("phase") != 'service': start_day(g)
+    g.ev("window.__tags=[];window.__hood=[];const n0=nameTag;nameTag=function(c,x,y,n){__tags.push(n);return n0.apply(this,arguments)};const b0=drawPersonBack;drawPersonBack=function(c,x,y,L,o){if(L&&L.hs===9)__hood.push(!!L.hoodUp);return b0.apply(this,arguments)}")
+    g.ev("for(let i=0;i<5;i++)__tick(1000/30);setRoom('home')")
+    for _ in range(80):
+        if g.ev("!!homeDylanAtDesk()"): break
+        g.ev("for(let i=0;i<30;i++)__tick(1000/30)")
+    g.ev("__tags.length=0;__hood.length=0;forceDraw=true;for(let i=0;i<4;i++)__tick(1000/30)")
+    st = json.loads(g.ev("JSON.stringify({out:dylanOut(),desk:!!homeDylanAtDesk(),tags:[...new Set(__tags)],hood:[...new Set(__hood)],full:ROOMS.home.full,tab:document.querySelector('#roomTabs .on').textContent,w:Math.round($('#roomTabs').getBoundingClientRect().width),n:roomsOpen().length})"))
+    check(st['out'] and st['desk'] and 'Dylan' in st['tags'] and '先生' not in st['tags'], f'out: his name over him at the desk: {st}')
+    check(st['hood'] == [True], f'the hood stays up in the room: {st}')
+    check(st['full'] == 'Jill 和 Dylan 的房間' and 'Dylan' in st['tab'] and st['w'] <= 390 - 8, f'the room is theirs by name, and the row fits ({st["n"]} rooms): {st}')
+    check(not g.errors, g.errors[:3]); g.close()
+    g = Game(b, port, target, seed=8953, manual=True, viewport={'width': 390, 'height': 844})
+    install_bot(g); g.click('[data-act=open]'); start_day(g)
+    g.ev("window.__tags=[];const n0=nameTag;nameTag=function(c,x,y,n){__tags.push(n);return n0.apply(this,arguments)}")
+    g.ev("for(let i=0;i<5;i++)__tick(1000/30);setRoom('home')")
+    for _ in range(80):
+        if g.ev("!!homeDylanAtDesk()"): break
+        g.ev("for(let i=0;i<30;i++)__tick(1000/30)")
+    g.ev("__tags.length=0;forceDraw=true;for(let i=0;i<4;i++)__tick(1000/30)")
+    st = json.loads(g.ev("JSON.stringify({out:dylanOut(),desk:!!homeDylanAtDesk(),tags:[...new Set(__tags)],tab:document.querySelector('#roomTabs .on').textContent})"))
+    check(not st['out'] and st['desk'] and '先生' in st['tags'] and 'Dylan' not in st['tags'] and st['tab'].startswith('Jill 的房間'), f'before the reveal: 「先生」, 「Jill 的房間」: {st}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
 def v24_the_day_is_held_for_the_beat_its_people_came_for(b, port, target):
     """Pacing (measured on the Day 52 save): when the schedule brings someone for a due v2.4 major beat, that beat keeps
     a major slot until it plays or until 85% of the service; another story's major that comes up while every free slot
