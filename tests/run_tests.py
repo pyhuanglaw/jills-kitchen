@@ -2911,7 +2911,7 @@ def q_portraits_are_one_system_with_a_fallback_and_fit_a_phone(b, port, target):
         g.ev("window.PORTRAIT_DATA=window.__pd")
         # during service: Dylan's line is a card with his face, Jill's answer with hers; a guest stays a toast
         fill_fridge(g); start_day(g); install_bot(g); g.ev("window.__act=()=>{}"); g.page.evaluate('()=>window.__play(30,0)')
-        g.ev("$('#toasts').innerHTML='';quote({name:'Dylan',reg:'dylan'},'老闆娘，今天有空嗎？');jillSay('沒有。',{with:'dylan'});quote({name:'客人',type:'office'},'好吃。')")
+        g.ev("$('#toasts').innerHTML='';R.chatAt=null;R.chatN=0;S.chatSeen={};quote({name:'Dylan',reg:'dylan'},'老闆娘，今天有空嗎？');jillSay('沒有。',{with:'dylan'});quote({name:'客人',type:'office'},'好吃。')")   # rc8.5: the budget cleared
         check(g.ev("$('#plines').querySelectorAll('.pline.right img').length") >= 1 and g.ev("$('#plines').querySelectorAll('.pline.left').length") == 1, 'the exchange is two portrait cards')
         check(g.ev("$('#toasts').textContent.includes('客人')") and not g.ev("$('#toasts').textContent.includes('Dylan')"), 'the guest is a toast, Dylan is not')
         check(g.ev("!$('#dlg')||$('#dlg').hidden"), 'no modal during service')
@@ -3000,7 +3000,7 @@ def u_v_world_memory_and_regulars_speak_with_their_faces(b, port, target):
     check(g.ev("$('#plines .pline:last-child .pl-t b').textContent") == '王先生' and g.ev("$('#plines .pline:last-child').querySelectorAll('img').length") == 1, 'alone: his face only')
     g.ev("__rq.regs=['wang','wangwife'];__rq.size=2")
     # the seat moment of a regular goes through the same card; a plain guest is still a toast
-    g.ev("$('#plines').innerHTML='';$('#toasts').innerHTML='';quote(__rq,'今天也來了。');quote({name:'客人',type:'office'},'好吃。')")
+    g.ev("$('#plines').innerHTML='';$('#toasts').innerHTML='';R.chatAt=null;R.chatN=0;S.chatSeen={};quote(__rq,'今天也來了。');quote({name:'客人',type:'office'},'好吃。')")   # rc8.5: the small-talk budget cleared, as at the start of an evening
     check(g.ev("$('#plines').querySelectorAll('.pline').length") == 1 and g.ev("$('#toasts').textContent.includes('客人')"), 'regular → card, guest → toast')
     # V: the regulars page shows the supplied faces once known; the unknown keep the silhouette
     g.ev("S.regulars.sophie=0;bookTab='regulars';showBook()"); g.page.wait_for_timeout(50)
@@ -3607,7 +3607,7 @@ def hospitality_stays_with_a_guest_from_stranger_to_regular(b, port, target):
     check(isinstance(r2, dict) and r2['tier'] == 2 and r2['state']['k'] == 'offer' and r2['state']['left'] == 2, f'an established regular can be treated, 2 uses left: {r2}')
     g.ev("R.tv++;renderTickets()"); g.page.wait_for_timeout(50)
     chips = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('.tk')].map(e=>({reg:e.classList.contains('isreg'),chip:e.querySelector('.tk-treat')?e.querySelector('.tk-treat').textContent:null,btn:!!e.querySelector('button.tk-treat')})))"))
-    check(len(chips) == 3 and all(c['btn'] and c['chip'].startswith('招待') for c in chips) and sum(c['reg'] for c in chips) == 1, f'every ticket has the 招待 button; the heart only on the established regular (rc7.2: not on a second visit): {chips}')
+    check(len(chips) == 3 and all(c['btn'] and c['chip'].startswith('招待') for c in chips) and sum(c['reg'] for c in chips) == 0, f'every ticket has the 招待 button; no heart on 小林 or Koba (rc8.5: the heart is Sophie and Mia\'s alone): {chips}')
     # Jill's Card: the fifth visit is an occasion — the chip says what is coming, the player's budget is untouched
     c5 = seated('sophie', 4)
     check(isinstance(c5, dict) and c5['state']['k'] == 'pending' and '集點卡' in c5['state']['n'] and g.ev("R.groups.find(q=>q.id===%d).card===true" % c5['id']), f'the fifth visit shows the card treat coming: {c5}')

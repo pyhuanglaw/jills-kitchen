@@ -883,6 +883,133 @@ def rc84_kens_three_nights_three_pictures(b, port, target):
 
 
 @test
+def rc85_a_picture_always_holds_the_service(b, port, target):
+    """The player, 2026-10-04 (docs/v24/illus_always_holds_2026-10-04.txt): 「有跳出我生成圖片的畫面的劇情 都是要 停止餐廳營業 玩家手動
+    按才繼續 避免玩家沒注意到」. Whatever brings one of the player's pictures up during a service holds the restaurant until
+    its last line is tapped — a scene that is not a held beat (怡君's first evening), a story photo taken outside a beat
+    (shown now, not only named), 「看插圖」 from the journal; Ken and 杜's two photos are held beats. A line with only a face
+    still lets the service run."""
+    g = Game(b, port, target, seed=885, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day89_2320.json')
+    g.ev("for(let i=0;i<30;i++){if(typeof DLG!=='undefined'&&DLG)dlgNext()}"); _quiet(g); to_service(g)
+    g.ev("__botUntil('R.t>=R.dur*.3',90000,1/30)")
+    g.ev("const d=storyDay();d.major=9;d.minor=9;d.v24=9"); _frames(g, 200)   # nothing else of the stories tonight
+    g.ev("window.__noScenes=false")
+    def held(what):
+        st = json.loads(g.ev("JSON.stringify({dlg:!!DLG,hold:!!(DLG&&DLG.hold),chip:$('#dlg .dlg-hold').hidden?'':$('#dlg .dlg-hold').textContent,pic:!document.querySelector('#dlg .dlg-illus').hidden,src:(document.querySelector('#dlg .dlg-illus img').getAttribute('src')||'').slice(0,15)})"))
+        check(st['dlg'] and st['hold'] and '店裡暫停中' in st['chip'] and st['pic'] and st['src'].startswith('data:image/'), f'{what}: the picture, and the restaurant held: {st}')
+        before = json.loads(g.ev(HOLD_SNAP)); _frames(g, 90); after = json.loads(g.ev(HOLD_SNAP))
+        check(after == before, f'{what}: nothing moves while it is up: {before} -> {after}')
+    # a scene that is not a held beat, with the player's picture
+    g.ev("scene([{who:'staff:秀琴阿姨',text:'妳怎麼來了？'},{who:'',name:'怡君',text:'吃飯啊。'}],null,{illus:'yj_intro'})")
+    held('a scene with a picture')
+    g.ev("dlgNext()"); check(g.ev("!!DLG&&DLG.hold"), 'still held on its second line')
+    g.ev("dlgNext()"); check(g.ev("DLG") is None, 'closed on the last tap')
+    t0 = g.ev("R.t"); _frames(g, 30); check(g.ev("R.t") > t0, 'and the service goes on')
+    # a line with only faces is not held
+    g.ev("scene([{who:'jill',text:'今天還好嗎？'},{who:'dylan',text:'嗯。'}],null,{})")
+    check(g.ev("!!DLG&&!DLG.hold"), 'faces only: the service runs under it, as before')
+    g.ev("while(typeof DLG!=='undefined'&&DLG)dlgNext()")
+    # a story photo with the player's picture, taken outside a beat: shown, and held
+    g.ev("delete story().photos.staff_meal;storyPhoto('staff_meal',{names:'阿拓、安安'})")
+    check(g.ev("$('#dlg .dlg-text').textContent").startswith('相簿多了一張'), 'the photo is shown with its line')
+    held('a story photo')
+    g.ev("dlgNext()"); check(g.ev("DLG") is None and g.ev("albumList().some(p=>p.kind==='story:staff_meal')"), 'one tap, and it is in the album')
+    # 「看插圖」 during a service
+    check(g.ev("illusOpen('ken_t1')") is True, 'a seen picture reopens')
+    held('看插圖')
+    g.ev("dlgNext()"); check(g.ev("DLG") is None, 'closed')
+    # Ken and 杜's two photos are held beats; their everyday arguing is not
+    check(g.ev("shAuthored({k:'kd_photo'})&&shAuthored({k:'kd_photo2'})&&!shAuthored({k:'kd_argue'})"), 'kd_photo and kd_photo2 hold; kd_argue does not')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def rc85_the_rooms_upstairs_are_bought_by_their_buttons(b, port, target):
+    """The player, 2026-10-04: 「無法升級到二級休息室 訂購70000按不下去」 (and on a computer: 「升級餐廳點不到右邊的項目」). Since rc6 the
+    phase buttons of the Staff Room and the Private Dining Room were written without their phase (a bare attribute 「2」), so a
+    tap bought nothing; the tests had called buyRoomPhase directly. On the player's Day 92 save: the button carries its
+    phase, a real tap buys Phase II for $70,000 and it is there the next day; no button in the shop carries a stray
+    attribute."""
+    g = Game(b, port, target, seed=930, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day92_2105.json')
+    g.ev("for(let i=0;i<30;i++){if(typeof DLG!=='undefined'&&DLG)dlgNext()}")
+    if g.ev("phase") != 'shop': g.ev("showShop()")
+    bad = []
+    for t in json.loads(g.ev("JSON.stringify(shopTabs().filter(t=>t.on).map(t=>t.k))")):
+        g.ev(f"shopTab='{t}';showShop()")
+        bad += json.loads(g.ev("JSON.stringify([...screenEl.querySelectorAll('[data-act]')].filter(e=>[...e.attributes].some(a=>!/^(data-|class|style|disabled|id|title|aria-|type|alt|src|href|role|tabindex)/.test(a.name))).map(e=>e.outerHTML.slice(0,100)))"))
+    check(not bad, f'every button in the shop says what it buys: {bad[:3]}')
+    g.ev("shopTab='works';showShop()")
+    check(g.ev("document.querySelector('[data-act=buySR]').dataset.k") == '2', 'the Staff Room II button carries its phase')
+    m0 = g.ev("S.money"); g.click('[data-act=buySR]')
+    check(g.ev("S.money") == m0 - 70000 and g.ev("srOf().st2") == g.ev("S.day") + 1, f'a tap buys it: {g.ev("JSON.stringify(srOf())")}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def rc85_the_crew_go_up_to_the_staff_room_in_a_busy_evening(b, port, target):
+    """The player, 2026-10-04: 「營業時間也有 但沒看到任何員工去」. On the player's Day 92 save (ten of the floor, a queue at the door
+    most of the evening) nobody reached the Staff Room in a whole service: a break waited for the whole restaurant to be
+    quiet (6% of the evening) and one on the stairs was called back the moment anyone waited at the door. Now a break waits
+    for spare hands (three of the floor with nothing in hand — 92% of that evening): in a whole service several of the
+    floor go up on their own, one at a time, each stays long enough to be come across, and comes back down; nobody is
+    called back while others are free; the room's tab is there all evening and shows them inside."""
+    g = Game(b, port, target, seed=9204, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day92_2105.json')
+    g.ev("for(let i=0;i<30;i++){if(typeof DLG!=='undefined'&&DLG)dlgNext()}"); to_service(g)
+    st = {}; visits = []; tabs = True; most = 0
+    while g.ev("phase==='service'&&!!R&&R.closing==null"):
+        g.ev("__botUntil('false',15,1/30)")
+        if not g.ev("!!R"): break
+        tabs = tabs and g.ev("roomsOpen().includes('staff')")
+        s = json.loads(g.ev("JSON.stringify({t:R.t/R.dur,cw:(S.crew||[]).filter(m=>R.cw&&R.cw[m.id]).map(m=>{const w=R.cw[m.id];return[m.name,w.room==='staff'&&!!(w.task&&w.task.sr&&w.task.fired),!!(w.task&&w.task.sr)]}),seen:srPeople().filter(p=>p.seated).length})"))
+        if s['t'] < .05: continue
+        most = max(most, s['seen'])
+        for n, inside, sr in s['cw']:
+            o = st.get(n, {'in': None, 'sr': False})
+            if inside and o['in'] is None: o['in'] = s['t']
+            if o['sr'] and not sr:
+                visits.append((n, (s['t'] - o['in']) if o['in'] is not None else None)); o['in'] = None
+            o['sr'] = sr; st[n] = o
+    stayed = [v for v in visits if v[1] is not None]
+    check(tabs, 'the Staff Room tab is there all through the service')
+    check(len(stayed) >= 2 and all(v[1] > .06 for v in stayed), f'several of the floor went up on their own and stayed a while (more than ~16 minutes each): {visits}')
+    check(len(visits) - len(stayed) <= 1, f'at most one called back on the way: {visits}')
+    check(most >= 1 and most <= 2, f'one at a time, two together at most: {most}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def rc85_small_talk_is_rare_and_makes_sense(b, port, target):
+    """The player, 2026-10-04 (docs/v24/dialogue_too_much_2026-10-04.txt): 「跳出的對話有些太重複沒有意義 又太頻繁 一些不重要的npc沒有
+    劇情的對話可以少一點 而且有的對話非常沒有邏輯不像人在說話 例如 這是果味」. A whole evening on the player's Day 83 save: the
+    nameless guests' and the crew's small talk is ten lines at most, one at a time with a gap between; 「Rush Mode 結束」 never
+    pops up, 「VIP 貴賓到了」 once at most, the moves to and from the Lounge are in the day's log, not over the room. Ken and
+    杜's arguments say what they are about. Things that pop up: about a third of before (93 an evening measured on this
+    save, docs/evidence/v24_rc8_5/lines/)."""
+    g = Game(b, port, target, seed=8301, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day83_2218.json')
+    g.ev("for(let i=0;i<30;i++){if(typeof DLG!=='undefined'&&DLG)dlgNext()}"); to_service(g)
+    g.ev("window.__pop=[];const t0=toast;toast=function(h,k,o){if(R)__pop.push({h:String(h).replace(/<[^>]+>/g,''),k:k||'',t:R.t});return t0.apply(this,arguments)};const p0=portraitLine;portraitLine=function(w,t,o){const r=p0.apply(this,arguments);if(r&&R)__pop.push({h:t,k:'face',t:R.t});return r}")
+    g.ev("window.__small=[];const c0=chatSaid;chatSaid=function(t){if(R&&phase==='service'&&!SCX)__small.push(R.t);return c0.apply(this,arguments)}")
+    while g.ev("phase==='service'&&!!R"):
+        g.ev("__botUntil('false',90,1/30)"); g.page.wait_for_timeout(5)
+    pops = json.loads(g.ev("JSON.stringify(window.__pop)")); small = json.loads(g.ev("JSON.stringify(window.__small)")); dur = 250
+    check(len(small) <= 10, f'ten lines of small talk at most: {len(small)}')
+    gaps = [b2 - a for a, b2 in zip(small, small[1:])]
+    check(all(x >= dur * .05 - .5 for x in gaps), f'one at a time, with a gap: {[round(x, 1) for x in gaps]}')
+    texts = [p['h'] for p in pops]
+    check(not any('Rush Mode 結束' in t for t in texts), 'the end of Rush Mode is no news')
+    check(sum('VIP 貴賓到了' in t for t in texts) <= 1, 'the VIPs: the first of the evening')
+    check(not any('換到 Lounge 坐' in t or '再喝一杯' in t or '從 Lounge 過去' in t for t in texts), 'the Lounge moves are in the log, not over the room')
+    check(len(pops) <= 45, f'what pops up in an evening: {len(pops)} (93 before)')
+    kd = g.ev("String(STORY_EV.find(e=>e.k==='kd_argue').run)")
+    check('那是果香，不是糖。' in kd and "'那是果味。'" not in kd and g.ev("STORY_EV.find(e=>e.k==='kd_argue').cd") == 5, 'Ken and 杜 say what they argue about, every five days at most')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
 def v24_the_day_is_held_for_the_beat_its_people_came_for(b, port, target):
     """Pacing (measured on the Day 52 save): when the schedule brings someone for a due v2.4 major beat, that beat keeps
     a major slot until it plays or until 85% of the service; another story's major that comes up while every free slot
@@ -1485,7 +1612,7 @@ def v24_rc6_private_dining_story_needs_two_tables_and_a_lived_in_staff_room(b, p
     check(g.ev(pd_story) is True, 'ready')
     check(g.ev("secUpRooms(1e9,()=>'X').includes('私人包廂')") is False, 'nothing to buy before the story')
     _upf(g, 'pd_story', 0)
-    check(g.ev("secUpRooms(1e9,(c,a,k,l)=>a+':'+k).includes('buyPD:1')") is True, 'after it, Phase I')
+    check(g.ev("secUpRooms(1e9,(c,a,k,l)=>a+':'+k).includes('buyPD:data-k=\"1\"')") is True, 'after it, Phase I (rc8.5: the button carries its phase as data-k)')
     check(not g.errors, g.errors[:3]); g.close()
 
 
@@ -2428,7 +2555,7 @@ def v24_rc6_the_morning_reports(b, port, target):
     load_save(g, 'player_day71_1215.json')
     to_service(g)
     g.page.evaluate('()=>window.__bot(300,1/30)')
-    said = json.loads(g.ev("(()=>{const gs=R.groups.filter(q=>!q.reg&&!namedId(q)).slice(0,2);if(gs.length<2)return JSON.stringify(null);const n0=dayLog().length;const a=quote(gs[0],'今天的燈好舒服喔。'),b=quote(gs[1],'今天的燈好舒服喔。');const n=dayLog().slice(n0).filter(l=>l.t==='今天的燈好舒服喔。').length;return JSON.stringify([a,b,n])})()"))
+    said = json.loads(g.ev("(()=>{const gs=R.groups.filter(q=>!q.reg&&!namedId(q)).slice(0,2);if(gs.length<2)return JSON.stringify(null);R.chatAt=null;R.chatN=0;S.chatSeen={};const n0=dayLog().length;const a=quote(gs[0],'今天的燈好舒服喔。'),b=quote(gs[1],'今天的燈好舒服喔。');const n=dayLog().slice(n0).filter(l=>l.t==='今天的燈好舒服喔。').length;return JSON.stringify([a,b,n])})()"))
     check(said == [True, False, 1], f'a guest\'s passing words once a day: {said}')
     check(g.ev("VIP_ORDER.length>=6&&new Set(VIP_ORDER).size===VIP_ORDER.length&&(()=>{const a=pickH(VIP_ORDER,'vip|71|5'),b=pickH(VIP_ORDER,'vip|71|6');return VIP_ORDER.includes(a)&&VIP_ORDER.includes(b)&&a!==b})()"), 'the VIPs have their own ways of ordering (one said is not said again right away)')
     tops = json.loads(g.ev("JSON.stringify([crewLook({id:'w1',role:'waiter',name:'x',lv:1}).top,crewLook({id:'w2',role:'waiter',name:'y',lv:3}).top,crewLook({id:'c1',role:'chef',name:'z',lv:1}).top])"))
@@ -3064,10 +3191,11 @@ def v24_rc7_2_a_tap_on_the_pass_sends_the_plates(b, port, target):
 @test
 def v24_rc7_2_the_heart_and_the_treat_chip_on_a_ticket(b, port, target):
     """rc7.2 (the player, 21:50, 21:55): the heart on a ticket is for a regular who is one — 熟客, four visits — not for a
-    named guest's first visits; and the 招待 chip sits in the name's line after the name, whatever it says, never over it."""
+    named guest's first visits; and the 招待 chip sits in the name's line after the name, whatever it says, never over it.
+    rc8.5 (2026-10-04, the player's choice B): the heart is Sophie's and Mia's alone — 陳伯伯, a regular too, has none."""
     g = Game(b, port, target, seed=266, manual=True, viewport={'width': 390, 'height': 844})
     install_bot(g); g.click('[data-act=open]'); start_day(g); g.ev("window.__act=()=>{}")
-    g.ev("""(()=>{const regs=['mia','chen','leo',null];const vis=[5,0,2,0];for(let i=0;i<4;i++){const reg=regs[i];if(reg)S.regulars[reg]=vis[i];const o=rollGuest();const RG=reg?REG_BY[reg]:null;const gg={id:R.gid++,type:reg?RG.type:o.type,size:2,reg,forSig:false,looks:reg?RG.looks:makeLooks(o.type,2),name:reg?RG.n:pick(NAMES.office),state:'eat',table:null,pat:.8,x:200,y:300,tx:200,ty:300,timer:0,ticket:null,seed:1,mood:'ok'};R.groups.push(gg);const tk={id:R.tkid++,no:i+1,g:gg,items:[{d:'friedrice',st:'served',q:'G',want:0}],t0:R.t,claim:null};gg.ticket=tk;R.tickets.push(tk)}R.tv++;renderTickets()})()""")
+    g.ev("""(()=>{const regs=['mia','chen','leo',null];const vis=[5,6,2,0];for(let i=0;i<4;i++){const reg=regs[i];if(reg)S.regulars[reg]=vis[i];const o=rollGuest();const RG=reg?REG_BY[reg]:null;const gg={id:R.gid++,type:reg?RG.type:o.type,size:2,reg,forSig:false,looks:reg?RG.looks:makeLooks(o.type,2),name:reg?RG.n:pick(NAMES.office),state:'eat',table:null,pat:.8,x:200,y:300,tx:200,ty:300,timer:0,ticket:null,seed:1,mood:'ok'};R.groups.push(gg);const tk={id:R.tkid++,no:i+1,g:gg,items:[{d:'friedrice',st:'served',q:'G',want:0}],t0:R.t,claim:null};gg.ticket=tk;R.tickets.push(tk)}R.tv++;renderTickets()})()""")
     marks = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('.tk')].map(e=>({n:e.querySelector('.tk-who span').textContent,reg:e.classList.contains('isreg')})))"))
     by = {m['n']: m['reg'] for m in marks}
     check(by.get('Mia') is True and not any(v for k, v in by.items() if k != 'Mia'), f'the heart only for Mia (five visits), not for a first or second visit: {marks}')

@@ -1,0 +1,12 @@
+00_shop_rooms_upstairs.png: 店舖工程 › 二樓的房間：員工休息室 II 的「訂購」、私人包廂 I 的「動工」（《關上門以後》提前打開）
+00b_pdr_works_card.png: 按下「動工」以後的卡片
+the Private Dining Room Phase I bought by its button: {"book":{},"bought":92,"done":93}
+the Staff Room Phase II set for tomorrow: {"bought":85,"done":85,"mig":1,"cnt":{"小彤":2,"阿珠姐":2,"秀琴阿姨":2,"Hugo":2,"沈晴":1},"b2":92,"st2":93}
+01_floor_both_doors.png: 二樓：走廊、員工休息室和包廂的牆與門 | {"day":93,"clock":"17:28","room":"up","sr":2,"pd":1}
+02_staff_room_phase2.png: 員工休息室 II（直接打開；它的訂購按鈕另有測試） | {"day":93,"clock":"17:29","room":"staff","sr":2,"pd":1}
+03_pdr_phase1.png: 私人包廂 I | {"day":93,"clock":"17:30","room":"pdr","sr":2,"pd":1}
+04_staff_room_phase3.png: 員工休息室 III（提前打開） | {"day":93,"clock":"17:31","room":"staff","sr":3,"pd":2}
+05_pdr_phase2.png: 私人包廂 II（提前打開） | {"day":93,"clock":"17:32","room":"pdr","sr":3,"pd":2}
+06_pdr_phase3.png: 私人包廂 III（提前打開） | {"day":93,"clock":"17:33","room":"pdr","sr":3,"pd":3}
+07_staff_room_phase1.png: 員工休息室 I（你存檔現在的樣子） | {"day":93,"clock":"17:34","room":"staff","sr":1,"pd":3}
+errors: []
