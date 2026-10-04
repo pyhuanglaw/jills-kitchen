@@ -3162,10 +3162,11 @@ def v24_rc7_2_a_tap_on_the_pass_sends_the_plates(b, port, target):
 @test
 def v24_rc7_2_the_heart_and_the_treat_chip_on_a_ticket(b, port, target):
     """rc7.2 (the player, 21:50, 21:55): the heart on a ticket is for a regular who is one — 熟客, four visits — not for a
-    named guest's first visits; and the 招待 chip sits in the name's line after the name, whatever it says, never over it."""
+    named guest's first visits; and the 招待 chip sits in the name's line after the name, whatever it says, never over it.
+    rc8.5 (2026-10-04, the player's choice B): the heart is Sophie's and Mia's alone — 陳伯伯, a regular too, has none."""
     g = Game(b, port, target, seed=266, manual=True, viewport={'width': 390, 'height': 844})
     install_bot(g); g.click('[data-act=open]'); start_day(g); g.ev("window.__act=()=>{}")
-    g.ev("""(()=>{const regs=['mia','chen','leo',null];const vis=[5,0,2,0];for(let i=0;i<4;i++){const reg=regs[i];if(reg)S.regulars[reg]=vis[i];const o=rollGuest();const RG=reg?REG_BY[reg]:null;const gg={id:R.gid++,type:reg?RG.type:o.type,size:2,reg,forSig:false,looks:reg?RG.looks:makeLooks(o.type,2),name:reg?RG.n:pick(NAMES.office),state:'eat',table:null,pat:.8,x:200,y:300,tx:200,ty:300,timer:0,ticket:null,seed:1,mood:'ok'};R.groups.push(gg);const tk={id:R.tkid++,no:i+1,g:gg,items:[{d:'friedrice',st:'served',q:'G',want:0}],t0:R.t,claim:null};gg.ticket=tk;R.tickets.push(tk)}R.tv++;renderTickets()})()""")
+    g.ev("""(()=>{const regs=['mia','chen','leo',null];const vis=[5,6,2,0];for(let i=0;i<4;i++){const reg=regs[i];if(reg)S.regulars[reg]=vis[i];const o=rollGuest();const RG=reg?REG_BY[reg]:null;const gg={id:R.gid++,type:reg?RG.type:o.type,size:2,reg,forSig:false,looks:reg?RG.looks:makeLooks(o.type,2),name:reg?RG.n:pick(NAMES.office),state:'eat',table:null,pat:.8,x:200,y:300,tx:200,ty:300,timer:0,ticket:null,seed:1,mood:'ok'};R.groups.push(gg);const tk={id:R.tkid++,no:i+1,g:gg,items:[{d:'friedrice',st:'served',q:'G',want:0}],t0:R.t,claim:null};gg.ticket=tk;R.tickets.push(tk)}R.tv++;renderTickets()})()""")
     marks = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('.tk')].map(e=>({n:e.querySelector('.tk-who span').textContent,reg:e.classList.contains('isreg')})))"))
     by = {m['n']: m['reg'] for m in marks}
     check(by.get('Mia') is True and not any(v for k, v in by.items() if k != 'Mia'), f'the heart only for Mia (five visits), not for a first or second visit: {marks}')

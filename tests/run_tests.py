@@ -3607,7 +3607,7 @@ def hospitality_stays_with_a_guest_from_stranger_to_regular(b, port, target):
     check(isinstance(r2, dict) and r2['tier'] == 2 and r2['state']['k'] == 'offer' and r2['state']['left'] == 2, f'an established regular can be treated, 2 uses left: {r2}')
     g.ev("R.tv++;renderTickets()"); g.page.wait_for_timeout(50)
     chips = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('.tk')].map(e=>({reg:e.classList.contains('isreg'),chip:e.querySelector('.tk-treat')?e.querySelector('.tk-treat').textContent:null,btn:!!e.querySelector('button.tk-treat')})))"))
-    check(len(chips) == 3 and all(c['btn'] and c['chip'].startswith('招待') for c in chips) and sum(c['reg'] for c in chips) == 1, f'every ticket has the 招待 button; the heart only on the established regular (rc7.2: not on a second visit): {chips}')
+    check(len(chips) == 3 and all(c['btn'] and c['chip'].startswith('招待') for c in chips) and sum(c['reg'] for c in chips) == 0, f'every ticket has the 招待 button; no heart on 小林 or Koba (rc8.5: the heart is Sophie and Mia\'s alone): {chips}')
     # Jill's Card: the fifth visit is an occasion — the chip says what is coming, the player's budget is untouched
     c5 = seated('sophie', 4)
     check(isinstance(c5, dict) and c5['state']['k'] == 'pending' and '集點卡' in c5['state']['n'] and g.ev("R.groups.find(q=>q.id===%d).card===true" % c5['id']), f'the fifth visit shows the card treat coming: {c5}')
