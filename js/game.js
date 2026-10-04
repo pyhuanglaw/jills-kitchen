@@ -1773,7 +1773,7 @@ const NOVELTY=[
  {k:'season',d:()=>seasonOn()?S.seasonDay:null,get away(){return{spring:['桌上的櫻花好可愛。','有櫻花耶。'],summer:['桌上有向日葵耶。','好有夏天的感覺。'],autumn:['桌上有楓葉。','秋天了。'],winter:['松枝的味道好香。','桌上那個紅色的小果子是真的嗎？']}[seasonOn()]||[]}}];
 function noveltyPools(t){const out=[];const rm=t?(t.room||'main'):'main';for(const T of NOVELTY){let d=null;try{d=T.d()}catch(e){d=null}if(!d)continue;const a=S.day-d;if(a<0||a>6)continue;const lines=T.in===rm&&T.here?T.here:T.away;if(!lines||!lines.length)continue;out.push({k:'nov:'+T.k,w:a<=1?1.2:a<=3?.7:.35,lines})}return out}
 function seatLine(g){const W=R.weather;const pools=[];const t=g.table!=null?R.tables[g.table]:null;if(t&&t.room==='side')pools.push(['side',(S.newRooms&&S.day-(S.newRooms.side||0)<=3)?.9:.35]);if(t&&t.room==='front')pools.push(['front',.6]);if(g.ret&&S.newRooms&&Object.values(S.newRooms).some(d=>d&&S.day-d<=2))pools.push(['grew',.7]);if(g.ret)pools.push(['ret',.5]);if(SEAT_LINES[W])pools.push([W,.45]);const nov=noveltyPools(t);for(const N of nov)pools.push([N.k,N.w]);if(queued().length>=3)pools.push(['crowd',.3]);pools.push(['any',.35]);
- const k=wpick(pools,p=>p[1])[0];const N=nov.find(x=>x.k===k);const p=N?.45:k==='ret'?.4:k==='any'?.14:.3;if(Math.random()<p&&canChat('seat',18,4))quote(g,pickT(N?N.lines:k==='any'&&namedId(g)?SEAT_KNOWN:SEAT_LINES[k]));
+ const k=wpick(pools,p=>p[1])[0];const N=nov.find(x=>x.k===k);const p=N?.45:k==='ret'?.4:k==='any'?.14:.3;if(Math.random()<p&&canChat('seat',18,4))quote(g,pickT(N?N.lines:k==='any'&&namedId(g)?SEAT_KNOWN:SEAT_LINES[k]),N?{nov:1}:undefined);
  else if(g.ret&&!g.reg&&Math.random()<.3&&chatOK()&&canChat('jillret',60,4)){const J=R.jill;if(!J.cur&&!J.q.length&&!J.rest){chatSaid();jillSay(pickT(['又來了，歡迎。','歡迎回來。','今天想吃什麼？']))}}}
 /* now and then someone in the room says something that fits: about the food at the next table, a new dish, a cat,
    the wait; Jill asks a table how it was when she has a moment. One line at a time, with long gaps. */
@@ -1812,12 +1812,13 @@ function canChat(key,gap,min){if(!R)return false;R.cds=R.cds||{};const now=R.t;i
 /* v2.4 rc6 (the player, 09:39): what guests say in passing is said once a day at most — the same words from a second
    guest, or from the same one again, are left unsaid (a story's line or a regular's own, given with who, never is).
    Returns whether the line was said, for whoever answers it. */
-function quote(g,txt,o){if(!txt)return false;if(R&&!(o&&(o.who||o.keep))){R.saidT=R.saidT||{};if(R.saidT[txt]&&!SCX)return false;if(!chatOK(txt))return false;R.saidT[txt]=1;chatSaid(txt)}quote0(g,txt,o);return true}
+function quote(g,txt,o){if(!txt)return false;if(R&&!(o&&(o.who||o.keep))){R.saidT=R.saidT||{};if(R.saidT[txt]&&!SCX)return false;const small=!g.reg&&!namedId(g)&&!(o&&o.nov);if(small&&!chatOK(txt))return false;R.saidT[txt]=1;if(small)chatSaid(txt)}quote0(g,txt,o);return true}   /* rc8.5: the budget is for the guests with no name and no story (Dylan, the regulars and the named are people); what is new and what a campaign brought (o.nov) are news, not small talk */
 /* rc8.5 (the player, 2026-10-04: 「跳出的對話有些太重複沒有意義 又太頻繁 一些不重要的npc沒有劇情的對話可以少一點」; measured on the
    player's Day 83 save: ~40 lines of passing talk an evening, docs/evidence/v24_rc8_5/lines/): the restaurant's own small talk —
    what a guest says in passing, a waiter's 「請慢用」, Jill asking a table how it was — shares one budget an evening: one at a
    time with about a twentieth of the service between two, ten at most, and the same words not again for a week. A story's
-   lines (SCX), a regular's own (quote's who), and what the player needs to know are not part of it. Not said is not logged. */
+   lines (SCX), Dylan's, a regular's or a named guest's, what is new in the restaurant and what the player's campaign brought
+   in, and what the player needs to know are not part of it. Not said is not logged. */
 const CHAT_GAP=.05,CHAT_MAX=10,CHAT_DAYS=7;
 function chatOK(txt){if(!R||phase!=='service'||SCX)return true;if((R.chatN||0)>=CHAT_MAX)return false;if(R.chatAt!=null&&R.t-R.chatAt<R.dur*CHAT_GAP)return false;if(txt){const M=S.chatSeen||{};if(M[txt]!=null&&S.day-M[txt]<CHAT_DAYS)return false}return true}
 function chatSaid(txt){if(!R||phase!=='service'||SCX)return;R.chatN=(R.chatN||0)+1;R.chatAt=R.t;if(txt){const M=S.chatSeen=S.chatSeen||{};M[txt]=S.day;for(const k in M)if(S.day-M[k]>=CHAT_DAYS)delete M[k]}}
@@ -1918,7 +1919,7 @@ function loveWineOf(g,list){const id=loveIdOf(g);if(!id||id==='品酒師 Ken'||i
 /* at the order: the first time (or now and then after) they say so; when it is not on, sometimes they say that */
 function loveDishName(d){return dishName(d)||(DISHES[d]&&DISHES[d].n)||''}   /* '' for the signature before there is one */
 function loveOrdered(g,tk){const ids=loveIdsOf(g);if(!ids.length)return false;const has=x=>tk.items.some(i=>i.d===x||baseOf(i.d)===x);const who=id=>REG_BY[id]?{who:id}:undefined;
- /* rc8.5 (2026-10-04, three regulars in one evening each saying it): a favourite already known is said once an evening at most */const once=()=>{if(!R)return true;if(R.loveSaid)return false;R.loveSaid=1;return true};
+ /* rc8.5 (2026-10-04, three regulars in one evening each saying it): a favourite already known is said once an evening at most */const once=()=>{if(!R)return true;if(R.loveSaid===S.day)return false;R.loveSaid=S.day;return true};
  for(const id of ids){const L=LOVES[id];if(has(L.d)){const first=loveLearn(id,'d');if(first||(Math.random()<.3&&once())){quote(g,pickT(LOVE_HIT).replace('{d}',dishName(L.d)),who(id));return true}}}
  for(const id of ids){const L=LOVES[id];if(has(L.d)||(REG_BY[id]&&(S.regulars[id]||0)<2)||!loveDishName(L.d))continue;const M=S.loveMiss=S.loveMiss||{};if(M[id]!=null&&S.day-M[id]<LOVE_MISS_GAP)continue;/* rc8.3 (the player: 「Sophie連續兩天說沒有香煎鴨胸很白癡」): once, then not for a while */if(Math.random()<.35&&once()){const have=S.unlocked.includes(baseOf(L.d))||(L.d==='signature'&&S.signature);quote(g,pickT(have?LOVE_MISS:LOVE_WISH).replace('{d}',loveDishName(L.d)),who(id));loveLearn(id,'d');M[id]=S.day;return true}}   /* rc7.4: a favourite with no name yet (Ken's: Jill's signature, before there is one) is not missed aloud */   /* the dish matters more for the menu than the glass */
  for(const id of ids){const L=LOVES[id];if(L.g&&has(L.g)&&loveLearn(id,'g')){quote(g,pickT(LOVE_HIT_G).replace('{g}',dishName(L.g)),who(id));return true}}
@@ -4940,7 +4941,7 @@ function openStory(k){storyFocus=k&&k!=='_rest'?k:null;bookTab='story';const el=
 function campaignRec(){const c=S.social&&S.social.camp;return c&&!c.done&&c.until>=S.day?c:null}   /* bought: running or starting tomorrow (the page) */
 function campVia(g){const c=campaign();return c&&g&&g.via==='camp'?c:null}
 function campCan(gap){if(!R)return false;if(R.t-(R.campT==null?-99:R.campT)<(gap||9))return false;if((R.campN||0)>=10)return false;R.campT=R.t;R.campN=(R.campN||0)+1;return true}   /* its own pace: a few seconds apart, ten a day at most */
-function campSay(g,pool,ms,gap){if(!R||g.campSaid||!campCan(gap))return false;g.campSaid=1;sayG(g,pickT(pool),ms||700);return true}
+function campSay(g,pool,ms,gap){if(!R||g.campSaid||!campCan(gap))return false;g.campSaid=1;sayG(g,pickT(pool),ms||700,{nov:1});return true}
 function campDay(){if(!R)return null;const c=campaign();if(!c)return null;const st=R.st.camp=R.st.camp||{k:c.k,via:0,first:0,dish:0,dishD:null};st.k=c.k;if(c.dish)st.dishD=c.dish;return st}
 /* seated: the local first-timer, the Side Hall group, the one who came for the cats, the Lounge guest who read about the wine */
 function campaignSeat(g,t){const c=campVia(g);if(!c||!t)return;const room=t.room||'main';
@@ -4950,16 +4951,16 @@ function campaignSeat(g,t){const c=campVia(g);if(!c||!t)return;const room=t.room
  else if(c.k==='wine'&&t.lounge){if(Math.random()<.6)campSay(g,['聽說你們晚上有酒？','酒單呢？','是這裡吧？看到說吃完可以坐一下。'],900)}}
 /* ordering: the dish they came for, or the dish they came for and cannot have; a glass because of the wine post */
 function campaignOrderLine(g,tk){const c=campVia(g);const day=campDay();if(day&&c&&c.dish&&tk.items.some(i=>i.d===c.dish))day.dish++;
- if(!c)return;if(c.k==='dish'){if(g.wantMissed){if(!g.campSaid&&campCan(6)){g.campSaid=1;sayG(g,pickT([`不是說有${dishName(c.dish)}嗎？`,`${dishName(c.dish)}賣完了喔……`,'就是為了那一道來的耶。']),700);if((R.campMissJ||0)<2&&canChat('campMissJ',90,0)){R.campMissJ=(R.campMissJ||0)+1;JILL_SAY(pickT(['今天賣完了，抱歉。','那道今天沒有了。','今天的份已經沒了。']),2200)}}}
-  else if(tk.items.some(i=>i.d===c.dish)&&Math.random()<.5)campSay(g,['是不是網路上那一道？','我就是看到這個才來的。',`${dishName(c.dish)}，就是這個。`],700)}
+ if(!c)return;if(c.k==='dish'){if(g.wantMissed){if(!g.campSaid&&campCan(6)){g.campSaid=1;sayG(g,pickT([`不是說有${dishName(c.dish)}嗎？`,`${dishName(c.dish)}賣完了喔……`,`就是為了${dishName(c.dish)}來的耶。`]),700,{nov:1});if((R.campMissJ||0)<2&&canChat('campMissJ',90,0)){R.campMissJ=(R.campMissJ||0)+1;JILL_SAY(pickT(['今天賣完了，抱歉。','那道今天沒有了。','今天的份已經沒了。']),2200)}}}
+  else if(tk.items.some(i=>i.d===c.dish)&&Math.random()<.5)campSay(g,[`${dishName(c.dish)}，網路上那一道？`,'我就是看到這個才來的。',`${dishName(c.dish)}，就是這個。`],700)}
  else if(c.k==='wine'&&tk.items.some(i=>i.lbar)&&Math.random()<.45)campSay(g,['今天有什麼酒？','配這道的那一杯。','看到說晚上有酒，就來了。'],700)}
 /* the ones who came for the cats look for them; when they cannot find one they ask, and Jill answers with where the cats really are */
 function campaignCatLook(g){if(!g.catfan||g.catAsked||g.table==null||!R)return;if(g.cats&&g.cats.length)return;if(!['eat','wait'].includes(g.state))return;const t=R.tables[g.table];if((t.room||'main')!=='main')return;if(!campCan(12))return;g.catAsked=1;
- sayG(g,pickT(g.campSaid?['還是沒看到貓。','牠們今天在哪？']:['照片裡那隻今天在嗎？','今天貓呢？','牠們今天在哪？']),600);
+ sayG(g,pickT(g.campSaid?['還是沒看到貓。','牠們今天在哪？']:['照片裡那隻今天在嗎？','今天貓呢？','牠們今天在哪？']),600,{nov:1});
  const vis=CATS?CATS.filter(c=>!c.hidden):[];const sleeper=vis.find(c=>c.st==='sleep'||c.st==='bed'||c.perch>=0);const away=CATS?CATS.find(c=>c.away==='side'):null;
  if(sleeper){JILL_SAY(sleeper.perch>=0?`${catName(sleeper.def)}在上面。`:`${catName(sleeper.def)}在那邊睡覺。`,2000);later(()=>{if(R&&R.groups.includes(g)&&!sleeper.hidden){g.lookT=R.t+3;g.lookCat=sleeper;catEv(g,'look',sleeper)}},2600)}
  else if(away)JILL_SAY(`${catName(away.def)}在側廳。`,2000);else JILL_SAY('今天都躲起來了。',2000)}
-function campaignCatSeen(g,c){if(!g.catfan||g.catSeenSaid)return;g.catSeenSaid=1;if(!campCan(5))return;sayG(g,pickT([`欸，是${catName(c.def)}嗎？`,`${catName(c.def)}！跟照片一樣。`,`真的有${catName(c.def)}。`]),500)}
+function campaignCatSeen(g,c){if(!g.catfan||g.catSeenSaid)return;g.catSeenSaid=1;if(!campCan(5))return;sayG(g,pickT([`欸，是${catName(c.def)}嗎？`,`${catName(c.def)}！跟照片一樣。`,`真的有${catName(c.def)}。`]),500,{nov:1})}
 /* the local campaign: more people on the street stop at the window, and more of them come in */
 function campaignStreetBoost(){const c=campaign();return c&&c.k==='local'?.14:0}
 /* a later review / post says what the campaign guest really found */

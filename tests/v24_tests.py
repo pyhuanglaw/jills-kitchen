@@ -981,6 +981,35 @@ def rc85_the_crew_go_up_to_the_staff_room_in_a_busy_evening(b, port, target):
 
 
 @test
+def rc85_small_talk_is_rare_and_makes_sense(b, port, target):
+    """The player, 2026-10-04 (docs/v24/dialogue_too_much_2026-10-04.txt): 「跳出的對話有些太重複沒有意義 又太頻繁 一些不重要的npc沒有
+    劇情的對話可以少一點 而且有的對話非常沒有邏輯不像人在說話 例如 這是果味」. A whole evening on the player's Day 83 save: the
+    nameless guests' and the crew's small talk is ten lines at most, one at a time with a gap between; 「Rush Mode 結束」 never
+    pops up, 「VIP 貴賓到了」 once at most, the moves to and from the Lounge are in the day's log, not over the room. Ken and
+    杜's arguments say what they are about. Things that pop up: about a third of before (93 an evening measured on this
+    save, docs/evidence/v24_rc8_5/lines/)."""
+    g = Game(b, port, target, seed=8301, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day83_2218.json')
+    g.ev("for(let i=0;i<30;i++){if(typeof DLG!=='undefined'&&DLG)dlgNext()}"); to_service(g)
+    g.ev("window.__pop=[];const t0=toast;toast=function(h,k,o){if(R)__pop.push({h:String(h).replace(/<[^>]+>/g,''),k:k||'',t:R.t});return t0.apply(this,arguments)};const p0=portraitLine;portraitLine=function(w,t,o){const r=p0.apply(this,arguments);if(r&&R)__pop.push({h:t,k:'face',t:R.t});return r}")
+    g.ev("window.__small=[];const c0=chatSaid;chatSaid=function(t){if(R&&phase==='service'&&!SCX)__small.push(R.t);return c0.apply(this,arguments)}")
+    while g.ev("phase==='service'&&!!R"):
+        g.ev("__botUntil('false',90,1/30)"); g.page.wait_for_timeout(5)
+    pops = json.loads(g.ev("JSON.stringify(window.__pop)")); small = json.loads(g.ev("JSON.stringify(window.__small)")); dur = 250
+    check(len(small) <= 10, f'ten lines of small talk at most: {len(small)}')
+    gaps = [b2 - a for a, b2 in zip(small, small[1:])]
+    check(all(x >= dur * .05 - .5 for x in gaps), f'one at a time, with a gap: {[round(x, 1) for x in gaps]}')
+    texts = [p['h'] for p in pops]
+    check(not any('Rush Mode 結束' in t for t in texts), 'the end of Rush Mode is no news')
+    check(sum('VIP 貴賓到了' in t for t in texts) <= 1, 'the VIPs: the first of the evening')
+    check(not any('換到 Lounge 坐' in t or '再喝一杯' in t or '從 Lounge 過去' in t for t in texts), 'the Lounge moves are in the log, not over the room')
+    check(len(pops) <= 45, f'what pops up in an evening: {len(pops)} (93 before)')
+    kd = g.ev("String(STORY_EV.find(e=>e.k==='kd_argue').run)")
+    check('那是果香，不是糖。' in kd and "'那是果味。'" not in kd and g.ev("STORY_EV.find(e=>e.k==='kd_argue').cd") == 5, 'Ken and 杜 say what they argue about, every five days at most')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
 def v24_the_day_is_held_for_the_beat_its_people_came_for(b, port, target):
     """Pacing (measured on the Day 52 save): when the schedule brings someone for a due v2.4 major beat, that beat keeps
     a major slot until it plays or until 85% of the service; another story's major that comes up while every free slot
@@ -2526,7 +2555,7 @@ def v24_rc6_the_morning_reports(b, port, target):
     load_save(g, 'player_day71_1215.json')
     to_service(g)
     g.page.evaluate('()=>window.__bot(300,1/30)')
-    said = json.loads(g.ev("(()=>{const gs=R.groups.filter(q=>!q.reg&&!namedId(q)).slice(0,2);if(gs.length<2)return JSON.stringify(null);const n0=dayLog().length;const a=quote(gs[0],'今天的燈好舒服喔。'),b=quote(gs[1],'今天的燈好舒服喔。');const n=dayLog().slice(n0).filter(l=>l.t==='今天的燈好舒服喔。').length;return JSON.stringify([a,b,n])})()"))
+    said = json.loads(g.ev("(()=>{const gs=R.groups.filter(q=>!q.reg&&!namedId(q)).slice(0,2);if(gs.length<2)return JSON.stringify(null);R.chatAt=null;R.chatN=0;S.chatSeen={};const n0=dayLog().length;const a=quote(gs[0],'今天的燈好舒服喔。'),b=quote(gs[1],'今天的燈好舒服喔。');const n=dayLog().slice(n0).filter(l=>l.t==='今天的燈好舒服喔。').length;return JSON.stringify([a,b,n])})()"))
     check(said == [True, False, 1], f'a guest\'s passing words once a day: {said}')
     check(g.ev("VIP_ORDER.length>=6&&new Set(VIP_ORDER).size===VIP_ORDER.length&&(()=>{const a=pickH(VIP_ORDER,'vip|71|5'),b=pickH(VIP_ORDER,'vip|71|6');return VIP_ORDER.includes(a)&&VIP_ORDER.includes(b)&&a!==b})()"), 'the VIPs have their own ways of ordering (one said is not said again right away)')
     tops = json.loads(g.ev("JSON.stringify([crewLook({id:'w1',role:'waiter',name:'x',lv:1}).top,crewLook({id:'w2',role:'waiter',name:'y',lv:3}).top,crewLook({id:'c1',role:'chef',name:'z',lv:1}).top])"))
