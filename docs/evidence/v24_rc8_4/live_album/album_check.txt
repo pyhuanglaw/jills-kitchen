@@ -1,0 +1,8 @@
+the title: {"phase":"title","day":89}
+the nights: Day [78,83,88]; the album at the title: [null,null,null]; the story page's pictures seen on: [83,88]
+the prep screen ({"phase":"prep","day":89}): the album: [{"day":78,"cap":"剛開始辦"},{"day":83,"cap":"有模有樣"},{"day":88,"cap":"變成這裡的一部分"}]
+album_night1.png: the album at Day 78 (剛開始辦)
+album_night2.png: the album at the ken_night2 photo
+album_night3.png: the album at the ken_night3 photo
+illus_again_t2.png: 「看插圖」 — the second night
+page errors: 0 []

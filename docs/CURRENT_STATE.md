@@ -1,18 +1,19 @@
 # Jill's Kitchen — 目前狀態（暫時的，會一直更新）
 
 這份只放「現在」的狀態：branch、版本、待辦、待確認。永久的設計規則在 `docs/PROJECT_MEMORY.md`，不要寫到這裡；這裡的內容過時了就
-直接改掉或刪掉。最後更新：2026-10-04，branch 整理之後（v2.4 rc8.3 已發布）。
+直接改掉或刪掉。最後更新：2026-10-04，v2.4 rc8.4 發布之後。
 
 ## Repo 與 branch
 
 - GitHub：`pyhuanglaw/jills-kitchen`，預設 branch 是 `main`。
-- **`main` ＝ Jill's Kitchen 的正式主線**：目前的、穩定的、發布出去的版本都在這裡。最新正式版是 e797665（v2.4 rc8.3），之後
+- **`main` ＝ Jill's Kitchen 的正式主線**：目前的、穩定的、發布出去的版本都在這裡。最新正式版是 922223b（v2.4 rc8.4），之後
   `main` 上只有文件與紀錄。從 v2.2.1 起的完整開發歷史都在 `main` 上。
 - 還沒做完的遊戲功能，另外開短期的 `feature/…` 或 `wip/…` branch；做完、測試通過才回到 `main`，發布的 commit 一定在 `main` 上。
   文件與紀錄可以直接在 `main`。不要讓工作 branch 跟 `main` 長期並行。
-- 目前的工作 branch：`feature/ken-tasting-pictures`——品酒之夜的圖片與改名，進行中，見下面「進行中／等待玩家素材」。
+- 目前沒有進行中的工作 branch。`feature/ken-tasting-pictures`（81cbe46，品酒之夜的圖片與改名）已在 rc8.4 合回 `main`，內容都在
+  `main` 裡，可以在 GitHub 網頁刪掉。
 - `wip/lin`：舊的開發 branch 名稱（Madame Lin 是遊戲裡的一條故事線，不是這個專案的主線）。2026-10-04 起不再使用；它指向的 b87b77b
-  就是 `feature/ken-tasting-pictures`，沒有別的內容。玩家已同意刪除；這個工作環境不能刪 GitHub 上的 branch，要在 GitHub 網頁刪。
+  已經在 `main` 裡，沒有別的內容。玩家已同意刪除；這個工作環境不能刪 GitHub 上的 branch，要在 GitHub 網頁刪。
 - `archive/rc7.6-import-main`（d0947ea）：2026-10-03 把 rc7.6 的 12 個 zip 匯入 GitHub 時建的那一個 commit，原本的 `main`。跟現在的
   `main` 沒有共同祖先，只是保存，不合併。
 - `claude/jills-kitchen-github-setup-4x7483`（8ca784b）：接在那個匯入 commit 後面，把網址改到新的 artifact；同樣的改動已在主線上
@@ -20,16 +21,18 @@
 - 2026-10-04 的整理：`main` 從 d0947ea 強制改指到 b865d3c（舊的保存在 `archive/rc7.6-import-main`）。要復原：
   `git push --force-with-lease=refs/heads/main:<目前的 main> origin d0947ead2c18167ab3955fef51478a9168f5b8fd:refs/heads/main`。
 - 本機的 `bundle` remote 是原開發 session 的備份 bundle，只是還原來源，不推送。
-- 版本 tag（`v2.4-rc8` 到 `v2.4-rc8.3` 等）只在本機：推 tag 到 GitHub 時連線會被中斷。各版的 commit 寫在它的發布報告裡。
+- 版本 tag（`v2.4-rc8` 到 `v2.4-rc8.4` 等）只在本機：推 tag 到 GitHub 時連線會被中斷。各版的 commit 寫在它的發布報告裡。
 - 舊版本（玩家 2026-10-03 給的 v2.2.1、v2.4 rc4，以及其他每一版）怎麼查：`docs/OLD_VERSIONS.md`。
 
 ## 已發布
 
-- **v2.4 rc8.3**，2026-10-03，發布到 **https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA**（**Version 5**，id 1791055230-dd7a）。
-  遊戲內容＝ commit e797665（tag `v2.4-rc8.3`，只在本機）。報告：`docs/V24_RC8_3_REPORT.md`。Gate：e797665 上 242/242；讀回與
-  live_check 通過（`docs/evidence/v24_rc8_3/`）。內容：候位到店門口、三種披薩、房間的貓砂盆與碗架、寶寶靠著 Jill／柔柔睡腳上、
-  拿掉 PERFECT 橫幅、Sophie 和 Mia 坐隔壁桌、杯墊那段的旁白、香煎鴨胸 6 天說一次、Ken 品酒夜的分帳與開場、猜酒、新空間的照片、
-  特別的晚上「繼續營業」接得回來。
+- **v2.4 rc8.4**，2026-10-04，發布到 **https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA**（**Version 6**，id 1791111026-22f7）。
+  遊戲內容＝ commit 922223b（tag `v2.4-rc8.4`，只在本機）。報告：`docs/V24_RC8_4_REPORT.md`。Gate：922223b 上 243/243；讀回與
+  live_check 通過，線上頁面的相簿有三張品酒之夜（`docs/evidence/v24_rc8_4/`）。內容：Ken 前三次品酒之夜各一張圖和一張相簿照片
+  （第一張原本的，第二、三張玩家 2026-10-04 給的），舊存檔辦過的那幾晚補上故事頁的「看插圖」和相簿照片；名稱改成「品酒之夜」。
+- v2.4 rc8.3（Version 5，e797665；報告 `docs/V24_RC8_3_REPORT.md`）：候位到店門口、三種披薩、房間的貓砂盆與碗架、寶寶靠著 Jill／
+  柔柔睡腳上、拿掉 PERFECT 橫幅、Sophie 和 Mia 坐隔壁桌、杯墊那段的旁白、香煎鴨胸 6 天說一次、品酒之夜的分帳與開場、猜酒、
+  新空間的照片、特別的晚上「繼續營業」接得回來。
 - v2.4 rc8.2（Version 4，b443ab5；報告 `docs/V24_RC8_2_REPORT.md`）。
 - 前一版 v2.4 rc8.1（version 3，df8a95b）；再前一版 v2.4 rc8（version 2，252ff1c；報告 `docs/V24_RC8_REPORT.md`）。
 - 玩家在 2026-10-03 選擇以後都發布到這個新網址。舊網址 https://claude.ai/artifact/2vhURujrtCpQ1P5jnSsjps 停在 rc7.6（version
@@ -44,28 +47,12 @@
 
 ### 進行中／等待玩家素材
 
-- **品酒之夜（Ken 前三次）的圖片**（branch `feature/ken-tasting-pictures`：b87b77b 圖片、25d53f8 改名；**沒發布、沒跑完整回歸，
-  還不能合回 `main`**）
-  - 改名已做（25d53f8，玩家 2026-10-04「ken品酒夜 請改成品酒之夜」）：遊戲裡的「Ken 的品酒夜」「品酒夜」都改成「品酒之夜」，相關測試
-    跟著改，相關的 11 個測試通過。跟圖片一起發布。
-  - 規則（玩家 2026-10-04 決定，不要再問 A／B／C）：Ken 前三次自己安排的品酒夜，各自一張專屬 Story Photo，每張只在那一晚第一次
-    出現，也放進相簿連著看；第三次之後的品酒夜不再出現圖。詳細在 `docs/PROJECT_MEMORY.md` §6，原文
-    `docs/v24/ken_tasting_pictures_2026-10-04.txt`。
-  - 第一張：沿用現有的那張（`ken_t1`）。
-  - **缺第二、第三張：等玩家提供。** 規格與內容要求：`docs/v24/art/tasting_night_pictures_spec_2026-10-04.md`（已給玩家）。圖來之前
-    不要自己生假圖，也不要拿同一張圖冒充三張。
-  - 收到圖之後依序要做：
-    1. 修正 b87b77b 的代用圖行為：現在第二、三次開場會顯示程式畫的「插圖待補」代用圖，改成沒有真的圖就不顯示。
-    2. 修正 b87b77b 的第一張：它假設三張都是新圖、第一張會被換掉；改成第一張保留現有的 `ken_t1`，第一次品酒夜的相簿照片也用
-       這張，只有第二、三張是新圖。
-    3. 把第二、三張放進遊戲。
-    4. 完整回歸（全部測試）通過。
-    5. 合回 `main`，再照 `docs/RELEASE_CHECKLIST.md` 發布。
+- 沒有。品酒之夜的三張圖已在 rc8.4 發布。
 
 ## 測試
 
-- 242 個測試（`tests/run_tests.py` 95、`tests/v23_tests.py` 30、`tests/v24_tests.py` 117；`python3 tests/run_tests.py` 全跑，`-k a,b,c`
-  跑指定的）。最近一次完整回歸：rc8.3 的 e797665 上 242/242（`docs/evidence/v24_rc8_3/regression/`）。
+- 243 個測試（`tests/run_tests.py` 95、`tests/v23_tests.py` 30、`tests/v24_tests.py` 118；`python3 tests/run_tests.py` 全跑，`-k a,b,c`
+  跑指定的）。最近一次完整回歸：rc8.4 的 922223b 上 243/243（`docs/evidence/v24_rc8_4/regression/`）。
 - 已知會在單一 seed 上偶爾落差的機率性測試，都在測試註解裡寫了量過的分布（例：`lounge_i_content_bar_food…`、
   `v24_rc6_new_things_are_talked_about`）。
 
