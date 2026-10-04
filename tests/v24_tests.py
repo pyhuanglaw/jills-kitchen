@@ -883,6 +883,48 @@ def rc84_kens_three_nights_three_pictures(b, port, target):
 
 
 @test
+def rc85_a_picture_always_holds_the_service(b, port, target):
+    """The player, 2026-10-04 (docs/v24/illus_always_holds_2026-10-04.txt): 「有跳出我生成圖片的畫面的劇情 都是要 停止餐廳營業 玩家手動
+    按才繼續 避免玩家沒注意到」. Whatever brings one of the player's pictures up during a service holds the restaurant until
+    its last line is tapped — a scene that is not a held beat (怡君's first evening), a story photo taken outside a beat
+    (shown now, not only named), 「看插圖」 from the journal; Ken and 杜's two photos are held beats. A line with only a face
+    still lets the service run."""
+    g = Game(b, port, target, seed=885, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day89_2320.json')
+    g.ev("for(let i=0;i<30;i++){if(typeof DLG!=='undefined'&&DLG)dlgNext()}"); _quiet(g); to_service(g)
+    g.ev("__botUntil('R.t>=R.dur*.3',90000,1/30)")
+    g.ev("const d=storyDay();d.major=9;d.minor=9;d.v24=9"); _frames(g, 200)   # nothing else of the stories tonight
+    g.ev("window.__noScenes=false")
+    def held(what):
+        st = json.loads(g.ev("JSON.stringify({dlg:!!DLG,hold:!!(DLG&&DLG.hold),chip:$('#dlg .dlg-hold').hidden?'':$('#dlg .dlg-hold').textContent,pic:!document.querySelector('#dlg .dlg-illus').hidden,src:(document.querySelector('#dlg .dlg-illus img').getAttribute('src')||'').slice(0,15)})"))
+        check(st['dlg'] and st['hold'] and '店裡暫停中' in st['chip'] and st['pic'] and st['src'].startswith('data:image/'), f'{what}: the picture, and the restaurant held: {st}')
+        before = json.loads(g.ev(HOLD_SNAP)); _frames(g, 90); after = json.loads(g.ev(HOLD_SNAP))
+        check(after == before, f'{what}: nothing moves while it is up: {before} -> {after}')
+    # a scene that is not a held beat, with the player's picture
+    g.ev("scene([{who:'staff:秀琴阿姨',text:'妳怎麼來了？'},{who:'',name:'怡君',text:'吃飯啊。'}],null,{illus:'yj_intro'})")
+    held('a scene with a picture')
+    g.ev("dlgNext()"); check(g.ev("!!DLG&&DLG.hold"), 'still held on its second line')
+    g.ev("dlgNext()"); check(g.ev("DLG") is None, 'closed on the last tap')
+    t0 = g.ev("R.t"); _frames(g, 30); check(g.ev("R.t") > t0, 'and the service goes on')
+    # a line with only faces is not held
+    g.ev("scene([{who:'jill',text:'今天還好嗎？'},{who:'dylan',text:'嗯。'}],null,{})")
+    check(g.ev("!!DLG&&!DLG.hold"), 'faces only: the service runs under it, as before')
+    g.ev("while(typeof DLG!=='undefined'&&DLG)dlgNext()")
+    # a story photo with the player's picture, taken outside a beat: shown, and held
+    g.ev("delete story().photos.staff_meal;storyPhoto('staff_meal',{names:'阿拓、安安'})")
+    check(g.ev("$('#dlg .dlg-text').textContent").startswith('相簿多了一張'), 'the photo is shown with its line')
+    held('a story photo')
+    g.ev("dlgNext()"); check(g.ev("DLG") is None and g.ev("albumList().some(p=>p.kind==='story:staff_meal')"), 'one tap, and it is in the album')
+    # 「看插圖」 during a service
+    check(g.ev("illusOpen('ken_t1')") is True, 'a seen picture reopens')
+    held('看插圖')
+    g.ev("dlgNext()"); check(g.ev("DLG") is None, 'closed')
+    # Ken and 杜's two photos are held beats; their everyday arguing is not
+    check(g.ev("shAuthored({k:'kd_photo'})&&shAuthored({k:'kd_photo2'})&&!shAuthored({k:'kd_argue'})"), 'kd_photo and kd_photo2 hold; kd_argue does not')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
 def v24_the_day_is_held_for_the_beat_its_people_came_for(b, port, target):
     """Pacing (measured on the Day 52 save): when the schedule brings someone for a due v2.4 major beat, that beat keeps
     a major slot until it plays or until 85% of the service; another story's major that comes up while every free slot
