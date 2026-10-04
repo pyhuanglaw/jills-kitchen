@@ -6,8 +6,8 @@ rc8.5 建立在 rc8.4（Version 6）之上，是玩家 2026-10-04 晚上（Day 8
 **怎麼報告**（`docs/RELEASE_CHECKLIST.md` §3）：I＝程式在 tag 裡；T＝測試或在玩家存檔上跑過的腳本證明它會動（390×844 的
 無頭 Chromium 截圖算 T）；O＝玩家在自己的遊戲裡確認過。這份報告裡沒有任何一項是 O，也沒有在 iPhone 上看過。
 
-- Branch `main`，tag `v2.4-rc8.5` ＝ commit `a5be9fb`（`feature/fewer-lines` 合回 `main`）。
-- 發布到玩家的網址：https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA ——PUBLISHED_VERSION。
+- Branch `main`，tag `v2.4-rc8.5` ＝ commit `bded558`（`feature/fewer-lines` 合回 `main`）。
+- 發布到玩家的網址：https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA ——**Version 7**（version id 1791128420-4d10），2026-10-04。
 
 ## 1. 這一批有什麼
 
@@ -40,7 +40,22 @@ rc8.5 建立在 rc8.4（Version 6）之上，是玩家 2026-10-04 晚上（Day 8
 
 ## 5. 測試與存檔
 
-GATE_RESULT
+- 完整回歸：bded558 上 **247 個全部通過**（rc8.4 的 243 個加 4 個新測試；分三份同時跑，`docs/evidence/v24_rc8_5/regression/`）。
+- 前一次 gate（a5be9fb）247 個裡 242 過、5 個失敗，都是「誰在什麼時候說話」改了以後亂數順序跟著動，沒有行為壞掉，修法：
+  - `jill_evening_life`「電視撞到柔柔」：是測試的錯。電視從 rc7.3 起在 Jill 的房間，檢查卻拿主廳長椅上的柔柔來比（兩個房間的座標
+    剛好重疊）；遊戲本身從 rc8 起就只看房間裡的貓。檢查改成跟遊戲一樣。
+  - `jill_rests_when_staff_cover_the_floor`「忙的一天她也會摸一下經過的貓」：種子 7 → 16。20 個種子比較，Jill 一個人顧店的一天有摸到貓的
+    天數 rc8.4 是 15/20、rc8.5 是 16/20（總次數 32、29），一樣；種子 7 這次剛好落在沒摸到的那四分之一
+    （`docs/evidence/v24_rc8_5/sims/jill_pats_*.txt`）。
+  - 重錄 `golden_scenario`（Day 1 的客人 16 → 18 組，都 Perfect，錢和評論跟著）、`golden_frames`（evening、summary、shop、book_cats、
+    book_mem：當天的數字和貓的位置）、`cat_personality_fingerprint`。貓的個性沒變：8 個種子在營業中和打烊後每隻貓各狀態的比例，
+    rc8.4 和 rc8.5 是同樣的貓（樾樾幾乎都在房間、包包最愛睡、柔柔到處走；`docs/evidence/v24_rc8_5/sims/cat_moods.txt`）。
+- 發布後檢查（`tools/sims/live_check.py`，`docs/evidence/v24_rc8_5/live/`）：從 tag 建的頁面一個字不差地在線上頁面裡（主機只加了 552 bytes
+  的外框）；玩家 Day 92 存檔（打烊後存的）打開在升級餐廳 → 隔天開店前 → 玩完 Day 93 → 各房間、結算、員工頁 → Day 94 開店前 → 重新整理後
+  存檔還在，沒有頁面錯誤。live_check 這次學會從「打烊後存的檔」走到隔天（原本只會從開店前或營業中開始）。
+- 休息室：`tools/sims/staff_room_day.py`、`tools/sims/staff_room_shots.py`（玩家 Day 92 存檔，營業中有人上樓的截圖與整晚進出紀錄）；
+  兩個房間各階段：`tools/sims/up_rooms_stages.py`。
+- 玩家存檔：Day 92（新加的 checkpoint，`tests/saves/README.md`）。
 
 ## 6. 需要玩家正常遊玩才能確認的（O）
 

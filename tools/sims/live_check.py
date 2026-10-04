@@ -98,7 +98,12 @@ with sync_playwright() as p:
     else:
         shot(g, '01_title.png', f'the title with the save: DAY {day0}')
         g.tap('[data-act=open]'); g.page.wait_for_timeout(200)
-        assert g.ev("phase") == 'prep'; inv(g, 'prep')
+        if g.ev("phase") == 'shop':   # rc8.5: a save made after closing opens on 升級餐廳 — the next day from there, as a player would
+            shot(g, '01b_shop.png', 'OPEN: the save was made after closing — 升級餐廳')
+            g.tap('#screen [data-act=nextDay]'); g.page.wait_for_timeout(300)
+            g.ev("for(let i=0;i<40&&typeof DLG!=='undefined'&&DLG;i++)dlgNext()")
+        assert g.ev("phase") == 'prep', g.ev("phase"); inv(g, 'prep')
+        day0 = g.ev("S.day")   # the day played (the one after the save's, when it was saved after closing)
         shot(g, '02_prep.png', 'OPEN: the prep screen')
         if g.page.query_selector('[data-act=restock]:not([disabled])'): g.tap('[data-act=restock]'); g.page.wait_for_timeout(120)   # disabled = 已足夠
         rt.start_day(g); rt.install_bot(g); g.ev(rt.LAZY_ACTOR + "\nwindow.__act=window.__actLazy")
