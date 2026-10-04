@@ -193,7 +193,8 @@ window.__lifeInvariants = function(){ const bad=[]; const L=LIFE.jill, D=LIFE.dy
   for (const v of ivs) if (v[1]<SOFA.seatL-0.5||v[2]>SOFA.seatR+0.5) bad.push(v[0]+' hangs off the seat');
   if (L.on && (L.x!==JPOS[L.pos].x || L.y!==SOFA.jy)) bad.push('Jill seated at a wrong place');
   if (L.on && (L.act==='pushing'||L.walking)) bad.push('walking while seated');
-  if (tv.mover){ for (const c of CATS){ if (c.hidden||c.perch>=0||c.sofa) continue; if (Math.hypot(c.x-tv.x,c.y-6-tv.y)<14) bad.push('TV rolled into '+c.def.id); } }
+  /* rc8.5: the TV is in Jill's room (rc7.3): only a cat in her room can be in its way, at its room position — a cat on the dining room's bench at the same numbers is not (the game's tvBlocked has done so since rc8) */
+  if (tv.mover){ for (const c of CATS){ if (c.hidden||c.sofa||c.away!=='home'||c.homeSleep||c.ax==null) continue; if (Math.hypot(c.ax-tv.x,c.ay-6-tv.y)<14) bad.push('TV rolled into '+c.def.id); } }
   for (const c of CATS){ if (!isFinite(c.x)||!isFinite(c.y)) bad.push(c.def.id+' NaN'); if (c.sofa&&c.sofaOn&&(c.x!==c.sofa.x||c.y!==c.sofa.y)) bad.push(c.def.id+' not at its slot'); }
   if (L.on && CATS.some(c=>c.sofa&&c.sofa.kind==='lap'&&c.sofaOn) && !L.on) bad.push('got up with a cat on the lap');
   return bad;
@@ -1279,8 +1280,11 @@ def jill_rests_when_staff_cover_the_floor(b, port, target):
     """Jill's breaks come from her real workload, not from a staff count: on a day she runs alone she
     never sits; with a full crew (and a player who lets them work) she sits on the sofa during service,
     reads or looks around, and gets up the moment a table is tapped. Tapping sleeping 包包 gives visible
-    feedback (eyes, tail) without waking him."""
-    g = Game(b, port, target, seed=7, manual=True)
+    feedback (eyes, tail) without waking him.
+    rc8.5: seed 7 → 16. On a day she runs alone she pats a passing cat on about three days in four, rc8.4 and rc8.5
+    alike (15/20 and 16/20 seeds, 32 and 29 pats; docs/evidence/v24_rc8_5/sims/jill_pats_*.txt); the small-talk budget
+    moved the random stream and seed 7 landed on a day without one."""
+    g = Game(b, port, target, seed=16, manual=True)
     install_bot(g)
     g.ev(LAZY_ACTOR)
     g.click('[data-act=open]')

@@ -1,0 +1,4 @@
+rc8.4 service ban side 34% walk 25% rest 20% sleep 7% | mei home 57% rest 15% walk 15% sleep 6% | mikan walk 29% rest 23% sleep 15% side 13% | snow sleep 60% walk 14% home 7% daze 5% | tora home 92% walk 3% rest 3% side 2%
+rc8.4 evening ban side 41% home 38% walk 10% sleep 5% | mei home 73% rest 8% walk 7% side 7% | mikan home 37% side 29% walk 14% rest 8% | snow home 69% sleep 21% walk 5% daze 2% | tora home 97% side 1% walk 1% rest 0%
+rc8.5 service ban side 39% walk 23% rest 18% sleep 7% | mei home 57% rest 17% walk 11% sleep 11% | mikan walk 30% rest 23% sleep 15% side 12% | snow sleep 69% walk 10% home 9% daze 6% | tora home 83% side 8% walk 4% rest 3%
+rc8.5 evening ban home 49% side 34% walk 9% rest 3% | mei home 71% rest 7% sleep 7% side 7% | mikan side 33% home 31% walk 15% rest 7% | snow home 52% sleep 35% walk 5% daze 4% | tora home 94% side 5% walk 0% scr 0%
