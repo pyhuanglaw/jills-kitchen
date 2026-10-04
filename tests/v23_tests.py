@@ -851,7 +851,7 @@ def followup_the_manual_describes_the_current_game(b, port, target):
                  # v2.4 rc7 (14:39–14:51): the day's money — the glasses' cost, the rent, the wages, 秀琴阿姨's loan; the Lounge's figure without its tips
                  '每天的帳', '酒水成本', '租金', '一天 $300', '不會欠到明天', '秀琴阿姨會借你 $3,000', '每次不夠都會借', '結算時錢超過 $20,000', '不含小費', '晚餐桌上配的酒也另外一行',
                  # v2.4 rc7 (15:24–16:46): Ken's tasting nights and the wine, 予安 and the piano, their stories hold, a line on the way to a table, the story guests' looks
-                 '品酒之夜', '品酒會只有 Ken 辦', '晚餐之後', '鋼琴與予安', '一個禮拜彈三個晚上', '鋼琴演奏', '一開始沒有人彈', 'Ken 的故事', '予安和鋼琴的故事',
+                 '品酒之夜', '品酒會只有 Ken 辦', '營業中跳出插圖時，店裡會停住', '會輪流上去坐一會兒', '晚餐之後', '鋼琴與予安', '一個禮拜彈三個晚上', '鋼琴演奏', '一開始沒有人彈', 'Ken 的故事', '予安和鋼琴的故事',
                  '走向座位的路上', '跟頭像一樣',
                  # v2.4 rc7.2 (22:38–23:07): the pass, the random menu, the cards and the Lounge after dinner, no 解雇, the wages, 安安 carries the bites
                  '在廚房點出菜口', '隨機選菜單', '今日任務要賣的菜和宣傳中的菜會留著', '晚餐後八折', 'VIP 卡', 'VIP 名單', '吃完再去 Lounge 七折', '沒有解雇', '五倍多', '由她送過去',
