@@ -9,16 +9,6 @@
     "since": "2026-10-06",
     "what": "改過桌數以後，舊的營業中存檔接回變空店"
   },
-  "qa_every_tab_reaches_by_mouse_in_a_small_window": {
-    "finding": "使用者 2026-10-04、10-06",
-    "since": "2026-10-06",
-    "what": "電腦版小視窗：滑鼠到不了「員工」「招牌菜」和日誌最後幾個分頁"
-  },
-  "qa_the_selected_tab_is_on_screen": {
-    "finding": "W3-11／WS2-06",
-    "since": "2026-10-06",
-    "what": "商店打開時選中的分頁在畫面外；選了右邊的分頁，分頁列又跳回最左"
-  },
   "qa_the_pause_button_works_outside_the_service": {
     "finding": "WS2-03",
     "since": "2026-10-06",

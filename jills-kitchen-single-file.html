@@ -401,7 +401,13 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .tabs::-webkit-scrollbar{display:none}
 .tabs button{flex:0 0 auto;border:0;border-radius:999px;padding:7px 13px;background:var(--paper2);color:var(--ink2);font-weight:700;font-size:13px;box-shadow:inset 0 0 0 1px var(--line)}
 .tabs button.on{background:var(--ink);color:var(--paper)}
-.tabs button:disabled{opacity:.4}
+.tabs button:disabled,.tabs button.off{opacity:.4}
+/* audit 2026-10-06: more tabs off to one side — the strip fades there (a finger swipes it); with a mouse every tab is on
+   the screen (the strip wraps: no hidden row a wheel cannot reach) */
+.tabs.more-r{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 48px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 48px),transparent)}
+.tabs.more-l{-webkit-mask-image:linear-gradient(90deg,transparent,#000 48px);mask-image:linear-gradient(90deg,transparent,#000 48px)}
+.tabs.more-l.more-r{-webkit-mask-image:linear-gradient(90deg,transparent,#000 48px,#000 calc(100% - 48px),transparent);mask-image:linear-gradient(90deg,transparent,#000 48px,#000 calc(100% - 48px),transparent)}
+@media (hover:hover) and (pointer:fine){.tabs{flex-wrap:wrap;overflow-x:visible;row-gap:6px}.tabs button{cursor:pointer}.tabs button.off{cursor:help}}
 .item{display:grid;grid-template-columns:56px 1fr;gap:4px 12px;padding:12px 0;border-top:1px solid var(--line)}
 .item:first-child{border-top:0}
 .item img{width:56px;height:56px;grid-row:span 3;border-radius:12px;background:#F6EEDF}
@@ -10609,7 +10615,14 @@ const SVG={
  hot:`<svg viewBox="0 0 40 40"><circle cx="20" cy="18" r="10" fill="#F28A3A"/><path d="M8 32h24" stroke="#F2B43A" stroke-width="2.4" stroke-linecap="round"/><path d="M11 36h18" stroke="#F2B43A" stroke-width="2" stroke-linecap="round" opacity=".6"/></svg>`,
 };
 function starsHTML(v){let h='';for(let i=1;i<=5;i++)h+=v>=i?SVG.star(1):v>=i-.5?SVG.half():SVG.star(0);return h}
-function show(html,cls){screenEl.hidden=false;{const pp=$('#peekPill');if(pp&&!pp.hidden){pp.hidden=true;if(UPV==='look')upViewClose()}}/* v2.4 rc6 (10:00): a sheet ends a peek — the pill never outlives it */{const sn=$('#storyNote');if(sn)sn.hidden=true}screenEl.className=cls||'';screenEl.innerHTML=html;$('#taskPanel').hidden=true;renderTasks()}
+function show(html,cls){screenEl.hidden=false;{const pp=$('#peekPill');if(pp&&!pp.hidden){pp.hidden=true;if(UPV==='look')upViewClose()}}/* v2.4 rc6 (10:00): a sheet ends a peek — the pill never outlives it */{const sn=$('#storyNote');if(sn)sn.hidden=true}const tabX=[...screenEl.querySelectorAll('.tabs')].map(e=>e.scrollLeft);screenEl.className=cls||'';screenEl.innerHTML=html;$('#taskPanel').hidden=true;renderTasks();tabsSettle(tabX)}
+/* audit 2026-10-06 (W3-11, WS2-06, the user: 「電腦版升級餐廳點不到右邊的項目」): a strip of tabs keeps where the player
+   left it across a re-render, the open tab is always in view (it opened off the screen, or jumped back to the start after
+   a tab further right was chosen), and a strip with more tabs to one side fades on that side. With a mouse the strips
+   wrap instead (style.css): every tab is on the screen. */
+function tabsSettle(prev){[...screenEl.querySelectorAll('.tabs')].forEach((s,i)=>{if(prev&&prev[i]!=null)s.scrollLeft=prev[i];tabsShowOn(s);tabsEdge(s);if(!s.__edge){s.__edge=1;s.addEventListener('scroll',()=>tabsEdge(s),{passive:true})}})}
+function tabsShowOn(s){const on=s.querySelector('.on');if(!on||s.scrollWidth<=s.clientWidth+1)return;const sr=s.getBoundingClientRect(),r=on.getBoundingClientRect(),pad=28;if(r.left<sr.left+pad)s.scrollLeft-=Math.ceil(sr.left+pad-r.left);else if(r.right>sr.right-pad)s.scrollLeft+=Math.ceil(r.right-(sr.right-pad))}
+function tabsEdge(s){const more=s.scrollWidth>s.clientWidth+1;s.classList.toggle('more-r',more&&s.scrollLeft+s.clientWidth<s.scrollWidth-2);s.classList.toggle('more-l',more&&s.scrollLeft>2)}
 /* ================= v2.2 Q: dialogue portraits =================
    One reusable system: a character id → its portrait asset(s), the side it enters from, and a fallback. The assets
    are the supplied illustrations (assets/portraits, cut by tools/portraits.py; the display versions ride in
@@ -10794,7 +10807,7 @@ function shopDay(){return S.phase==='prep'&&phase==='shop'?S.day-1:S.day}
 /* v2.2 H: the shop in three big rooms of its own — 家具與佈置 (what the place looks like), 店舖工程 (what changes the
    place), 貓咪生活 (the cats' things) — plus the kitchen, the research, the staff and the signature. Every item that was
    in the old eight tabs is still here; the old tab keys still open the right page. */
-function shopTabs(){const D=shopDay();return[{k:'home',n:'家具與佈置',on:true},{k:'works',n:'店舖工程',on:D>=3},{k:'social',n:'社群與宣傳',on:D>=6},{k:'catlife',n:'貓咪生活',on:D>=4},{k:'kitchen',n:'廚房設備',on:D>=2},{k:'menu',n:'菜單研發',on:D>=2},{k:'staff',n:'員工',on:D>=4},{k:'sig',n:'招牌菜',on:D>=7}]}
+function shopTabs(){const D=shopDay();return[{k:'home',n:'家具與佈置',from:1},{k:'works',n:'店舖工程',from:3},{k:'social',n:'社群與宣傳',from:6},{k:'catlife',n:'貓咪生活',from:4},{k:'kitchen',n:'廚房設備',from:2},{k:'menu',n:'菜單研發',from:2},{k:'staff',n:'員工',from:4},{k:'sig',n:'招牌菜',from:7}].map(t=>Object.assign(t,{on:D>=t.from}))}
 const SHOP_TAB_MAP={tables:'home',decor:'home',projects:'works',cats:'catlife'};
 function secTables(money,btn){const cap=tableCap();const next=S.tables<cap?TABLE_COST[S.tables]:null;let body='';
   body+=`<div class="item"><img alt="" src="${iconURL('table')}"><div class="nm">餐桌 <span class="muted" style="font-weight:600;font-size:12px">${S.tables} / ${cap} 張</span></div><div class="d">多一張桌子，同時就能多接待一組客人。${S.decor.sofa?`其中 ${S.decor.sofa*2} 張是四人卡座。`:''}</div><div class="act">${next!=null?btn(next,'buyTable','','加一張桌子'):LEVELS[S.level]?`<span class="lock">這個規模最多 ${cap} 張，擴建後可以再加</span>`:`<span class="lock">${cap} 張是 JILL 的極限。想接待更多人：沙發卡座、候位區、動線。</span>`}</div></div>`;
@@ -10903,7 +10916,7 @@ function showShop(){phase='shop';mainScreen='shop';R=null;rdAutoUnlock();IDLE=ma
  show(`<div class="sheet tall"><div class="sh-top"><div class="ttl"><div class="eyebrow">${S.phase==='prep'?`DAY ${S.day} · 開店前`:`DAY ${S.day} · 打烊後`}</div><h2>升級 Jill 的餐廳</h2></div>${topIcons()}</div>
   <div class="row" style="margin-bottom:6px"><span class="muted" style="font-weight:700">目前現金</span><span class="moneytag">${fmt(S.money)}</span><span style="margin-left:auto" class="muted">評分 ${rating().toFixed(1)}</span></div>
   ${(()=>{const est=restockEstimate(),keep=keepAside();const low=S.money<keep;const when=S.phase==='prep'?'今天':'明日';return`<div class="budget ${low?'low':''}"><span>${when}預估基本備料 約 ${fmt(est)}</span><span>建議保留 約 ${fmt(keep)}</span>${low?`<span class="w">⚠ 現在的現金可能不夠完成建議備料，${when}可以少備一點或臨時叫貨</span>`:''}</div>`})()}
-  <div class="tabs">${tabs.map(t=>`<button class="${t.k===shopTab?'on':''}" data-act="tab" data-k="${t.k}" ${t.on?'':'disabled'}>${t.n}</button>`).join('')}</div>
+  <div class="tabs">${tabs.map(t=>`<button class="${t.k===shopTab?'on':''}${t.on?'':' off'}" data-act="tab" data-k="${t.k}" ${t.on?'':'aria-disabled="true"'}>${t.n}</button>`).join('')}</div>
   <div class="card">${body}</div>
   <div class="footer">${S.phase==='prep'?`<button class="btn primary big" data-act="toPrep">回到開店準備 ›</button>`:`<button class="btn primary big" data-act="nextDay">準備 DAY ${S.day+1}</button>`}</div></div>`);try{upPlanPaint()}catch(e){console.warn('[plan]',e)}}
 
@@ -11037,7 +11050,7 @@ function doAct0(a,d,k,b){
  case'toShop':showShop();break;
  case'backShop':showShop();break;
  case'toPrep':showPrep();break;
- case'tab':shopTab=k;sfx.tap();showShop();break;
+ case'tab':{const t=shopTabs().find(x=>x.k===k);if(t&&!t.on){toast(`「${t.n}」第 ${t.from} 天打烊後開放。`);break}/* audit WS1-07: a grey tab says when it opens (it said nothing) */shopTab=k;sfx.tap();showShop();break}
  case'buyTable':{const c=TABLE_COST[S.tables];if(S.money>=c&&S.tables<tableCap()){S.money-=c;S.tables++;sfx.buy();toast('新桌子搬進來了！');save();IDLE=null;showShop();shopAfterBuy()}break}
  case'buySideTable':{const n=S.sideTables||0;const c=SIDE_TABLE_COST[n];if(projOn('side')&&c!=null&&S.money>=c){S.money-=c;S.sideTables=n+1;sfx.buy();toast('側廳多了一張桌子');save();IDLE=null;keepScroll(showShop);shopAfterBuy()}break}
  case'buySideBooth':{const b=S.sideBooths|0;const c=SIDE_BOOTH_COST[b];if(!projOn('side')||c==null||(S.sideTables||0)<(b+2)*3||S.money<c)break;S.money-=c;S.sideBooths=b+1;save();IDLE=null;bg=null;for(const kk in BGC)delete BGC[kk];

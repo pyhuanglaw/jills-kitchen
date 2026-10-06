@@ -638,7 +638,7 @@ def ui_basics(b, port, target):
     install_bot(g); play_day(g); state_ok(g, 'summary')
     g.click('[data-act=toShop]'); state_ok(g, 'shop')
     for k in ['tables', 'kitchen', 'menu', 'decor', 'staff', 'sig']:
-        if g.page.locator(f'[data-act=tab][data-k={k}]:not([disabled])').count():
+        if g.page.locator(f'[data-act=tab][data-k={k}]:not([disabled]):not([aria-disabled=true])').count():
             g.click(f'[data-act=tab][data-k={k}]')
     g.click('[data-act=nextDay]'); state_ok(g, 'next day prep')
     check(g.ev("phase") == 'prep' and g.ev("S.day") == 2, 'next day failed')

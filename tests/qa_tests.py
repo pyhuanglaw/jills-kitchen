@@ -204,7 +204,7 @@ def qa_every_button_in_the_shop_does_something(b, port, target):
                 p.tap('#screen [data-act=open]')
             setup_check(p.state()['phase'] == 'shop', f'{where}: not in the shop: {p.state()}')
             p.ev("S.money=Math.max(S.money,5e6)")   # enough to buy anything offered, so a refusal is never the reason
-            tabs = p.page.evaluate("()=>[...document.querySelectorAll('#screen .tabs [data-act=tab]')].filter(e=>!e.disabled).map(e=>e.dataset.k)")
+            tabs = p.page.evaluate("()=>[...document.querySelectorAll('#screen .tabs [data-act=tab]')].filter(e=>!e.disabled&&e.getAttribute('aria-disabled')!=='true').map(e=>e.dataset.k)")
             n0, d0 = len(tapped), len(dead)
             for k in tabs:
                 _sweep_tab(p, k, dead, tapped)
@@ -435,7 +435,7 @@ def qa_the_screens_fit_375_390_430(b, port, target):
         try:
             _overflow_everywhere(p, 'title', bad)
             p.tap('#screen [data-act=open]')
-            for k in p.page.evaluate("()=>[...document.querySelectorAll('#screen .tabs [data-act=tab]')].filter(e=>!e.disabled).map(e=>e.dataset.k)"):
+            for k in p.page.evaluate("()=>[...document.querySelectorAll('#screen .tabs [data-act=tab]')].filter(e=>!e.disabled&&e.getAttribute('aria-disabled')!=='true').map(e=>e.dataset.k)"):
                 p.tap(f'#screen .tabs [data-act=tab][data-k={k}]'); _overflow_everywhere(p, f'shop › {k}', bad)
             p.tap('#screen [data-act=book]')
             for k in p.page.evaluate("()=>[...document.querySelectorAll('#screen .tabs [data-act=btab]')].map(e=>e.dataset.k)"):
@@ -460,7 +460,7 @@ def qa_every_tab_reaches_by_finger(b, port, target):
         p = Player(b, port, target, save=LATE, W=W)
         try:
             p.tap('#screen [data-act=open]')
-            for k in p.page.evaluate("()=>[...document.querySelectorAll('#screen .tabs [data-act=tab]')].filter(e=>!e.disabled).map(e=>e.dataset.k)"):
+            for k in p.page.evaluate("()=>[...document.querySelectorAll('#screen .tabs [data-act=tab]')].filter(e=>!e.disabled&&e.getAttribute('aria-disabled')!=='true').map(e=>e.dataset.k)"):
                 try:
                     p.tap(f'#screen .tabs [data-act=tab][data-k={k}]')
                     if p.ev("shopTab") != k:
@@ -480,47 +480,73 @@ def qa_every_tab_reaches_by_finger(b, port, target):
 
 @test
 def qa_every_tab_reaches_by_mouse_in_a_small_window(b, port, target):
-    """Known-open (the user, 2026-10-04 and 10-06: 「電腦版升級餐廳點不到右邊的項目」): a desktop window under 900×560 gets
-    the phone's layout, and its tab strips have no scrollbar and no arrows — a mouse wheel scrolls the sheet, not the
-    strip, so 員工 and 招牌菜 (and the journal's last tabs) cannot be reached."""
+    """W3-11 / the user (2026-10-04, 10-06: 「電腦版升級餐廳點不到右邊的項目」— the blocker before testing on a computer):
+    under 900×560 a desktop window got the phone's layout, the tab strips had no scrollbar and no arrows, and a mouse
+    wheel scrolls the sheet, not the strip — 員工 and 招牌菜 (and the journal's last tabs) could not be reached; the old
+    tests scrolled them into view and passed. Now, with a mouse, every tab of the shop and of the journal is on the
+    screen (the strip wraps): nothing hidden to the side, each one clicked where it is (no scrolling done for the
+    player), the shop or the journal turns to it, and the open tab stays in sight. Common desktop windows, from
+    1366×768 down to 800×600 (1024, 900 and just under 900 among them)."""
     bad = []
-    for W, H in ((899, 800), (1280, 540)):
+    for W, H in ((1366, 768), (1280, 540), (1024, 768), (900, 700), (899, 800), (800, 600)):
         p = Player(b, port, target, save=LATE, W=W, H=H, touch=False)
         try:
             p.tap('#screen [data-act=open]')
-            for k in p.page.evaluate("()=>[...document.querySelectorAll('#screen .tabs [data-act=tab]')].filter(e=>!e.disabled).map(e=>e.dataset.k)"):
-                if not p.can_reach(f'#screen .tabs [data-act=tab][data-k={k}]'):
-                    bad.append(f'{W}×{H} shop › {k}')
-            p.ev("showShop()"); p.tap('#screen [data-act=book]')
-            for k in p.page.evaluate("()=>[...document.querySelectorAll('#screen .tabs [data-act=btab]')].map(e=>e.dataset.k)"):
-                if not p.can_reach(f'#screen .tabs [data-act=btab][data-k={k}]'):
-                    bad.append(f'{W}×{H} journal › {k}')
+            for sheet, act, var in (('shop', 'tab', 'shopTab'), ('journal', 'btab', 'bookTab')):
+                if sheet == 'journal':
+                    p.ev("showShop()"); p.tap('#screen [data-act=book]')
+                st = p.strip('#screen .tabs')
+                hidden = [x['text'] for x in st['items'] if not x['visible']] if st else ['(no strip)']
+                if hidden:
+                    bad.append(f'{W}×{H} {sheet}: tabs off the screen with a mouse: {hidden}')
+                keys = p.page.evaluate(f"()=>[...document.querySelectorAll('#screen .tabs [data-act={act}]')].filter(e=>!e.disabled&&e.getAttribute('aria-disabled')!=='true').map(e=>e.dataset.k)")
+                for k in keys:
+                    sel = f'#screen .tabs [data-act={act}][data-k={k}]'
+                    try:
+                        p.tap(sel)
+                    except Exception as e:
+                        bad.append(f'{W}×{H} {sheet} › {k}: {e}'); continue
+                    if p.ev(var) != k:
+                        bad.append(f'{W}×{H} {sheet} › {k}: clicked, but it shows {p.ev(var)}'); continue
+                    st = p.strip('#screen .tabs'); on = [x for x in st['items'] if x['on']]
+                    if not on or not on[0]['visible']:
+                        bad.append(f'{W}×{H} {sheet} › {k}: the open tab is out of sight')
         finally:
             p.close()
-    check(not bad, 'a mouse cannot reach: ' + ', '.join(bad))
+    check(not bad, 'with a mouse: ' + '; '.join(bad[:10]))
 
 
 @test
 def qa_the_selected_tab_is_on_screen(b, port, target):
-    """Known-open (W3-11, WS2-06): the shop opens on the tab the player used last — on the late save that is 廚房設備,
-    which sits outside the screen; and after a tab further right is chosen, the strip jumps back to the start. The tab
-    that is open must be one the player can see."""
+    """W3-11, WS2-06: the shop opens on the tab the player used last — on the late save that is 廚房設備, which sat
+    outside the screen; and after a tab further right was chosen, the strip jumped back to the start. On a phone the open
+    tab is always in sight (the strip keeps where the finger left it); the strip is still one row a finger swipes
+    sideways (the user: 「手機原本的橫向操作不要被修壞」), and where more tabs are off to one side it fades on that side."""
     bad = []
     for W in WIDTHS:
         p = Player(b, port, target, save=LATE, W=W)
         try:
             p.tap('#screen [data-act=open]')
-            st = p.strip('#screen .tabs')
-            on = [x for x in st['items'] if x['on']]
-            if on and not on[0]['visible']:
-                bad.append(f'{W}px: the shop opens on 「{on[0]["text"]}」 off the screen')
-            p.tap('#screen .tabs [data-act=tab][data-k=sig]')
-            st = p.strip('#screen .tabs'); on = [x for x in st['items'] if x['on']]
-            if on and not on[0]['visible']:
-                bad.append(f'{W}px: after choosing 「{on[0]["text"]}」 the strip hides it')
+            def look(when):
+                st = p.strip('#screen .tabs')
+                on = [x for x in st['items'] if x['on']]
+                if on and not on[0]['visible']:
+                    bad.append(f'{W}px {when}: the open tab 「{on[0]["text"]}」 is off the screen')
+                tops = p.page.evaluate("()=>[...document.querySelectorAll('#screen .tabs button')].map(e=>Math.round(e.getBoundingClientRect().top))")
+                if len(set(tops)) != 1 or st['scrollWidth'] <= st['clientWidth']:
+                    bad.append(f'{W}px {when}: the strip is no longer one sideways row ({len(set(tops))} rows, {st["scrollWidth"]}/{st["clientWidth"]})')
+                cls = p.ev("document.querySelector('#screen .tabs').className")
+                idx = [i for i, x in enumerate(st['items']) if x['visible']]
+                if idx and idx[-1] < len(st['items']) - 1 and 'more-r' not in cls:
+                    bad.append(f'{W}px {when}: tabs to the right, no sign of them')
+                if idx and idx[0] > 0 and 'more-l' not in cls:
+                    bad.append(f'{W}px {when}: tabs to the left, no sign of them')
+            look('opening the shop')
+            p.tap('#screen .tabs [data-act=tab][data-k=sig]'); look('after 招牌菜')
+            p.tap('#screen .tabs [data-act=tab][data-k=home]'); look('after 家具與佈置')
         finally:
             p.close()
-    check(not bad, ' | '.join(bad))
+    check(not bad, '; '.join(bad[:8]))
 
 
 @test
@@ -1152,6 +1178,11 @@ def qa_the_savings_goals_are_in_tonights_shop(b, port, target):
                     bad.append(f"Day {K}: 「{gl['n']}」 is not for sale on 「{gl['where']}」 that evening")
                 p.ev("S.phase='summary';phase='summary';hideScreen()")
         check(not bad, '; '.join(bad[:8]))
+        # and a grey tab, tapped, says when it opens (it did nothing): Day 1's evening, 店舖工程
+        p.ev("S.day=1;S.phase='shop';phase='shop';shopTab='home';showShop()")
+        p.tap('#screen .tabs [data-act=tab][data-k=works]')
+        msg = p.ev("[...document.querySelectorAll('#toasts .toast')].map(e=>e.textContent).join(' ')")
+        check('第 3 天' in msg and p.ev("shopTab") == 'home', f'the grey 店舖工程, tapped, said {msg!r} (the shop on {p.ev("shopTab")})')
     finally:
         p.close()
 
