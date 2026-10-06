@@ -24,7 +24,8 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 #app{height:100%;max-width:540px;margin:0 auto;display:flex;flex-direction:column;position:relative;background:var(--night);overflow:hidden}
 
 /* HUD */
-#hud{display:flex;align-items:center;gap:10px;padding:7px 12px;background:linear-gradient(#162124,#1E2B2F);border-bottom:1px solid rgba(201,154,69,.35);font-variant-numeric:tabular-nums;flex:0 0 auto}
+#hud{display:flex;align-items:center;gap:10px;padding:7px 12px;background:linear-gradient(#162124,#1E2B2F);border-bottom:1px solid rgba(201,154,69,.35);font-variant-numeric:tabular-nums;flex:0 0 auto;
+  position:relative;z-index:21}   /* audit WS2-03: above a sheet's clear backdrop (the prep screen, the shop), so its 「II」 opens 設定・存檔 there; a dimmed modal (z 22) and a story (z 30) still cover it */
 .h-day{display:flex;flex-direction:column;line-height:1}
 .h-day small{font-size:9px;letter-spacing:.16em;color:var(--brass2);font-weight:700}
 .h-day b{font-family:var(--disp);font-size:20px;font-weight:400}
@@ -195,7 +196,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
 /* overlay screens */
 #screen{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(rgba(18,26,28,.15),rgba(18,26,28,.6))}
-#screen.dim{background:rgba(14,20,22,.72);justify-content:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px 0}   /* v2.2: a modal taller than the phone scrolls instead of losing its top (the pause menu's 繼續營業 was off-screen on short iPhones) */
+#screen.dim{z-index:22;background:rgba(14,20,22,.72);justify-content:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px 0}   /* v2.2: a modal taller than the phone scrolls instead of losing its top (the pause menu's 繼續營業 was off-screen on short iPhones) */
 .sheet{background:var(--paper);color:var(--ink);border-radius:20px 20px 0 0;max-height:80%;overflow-y:auto;padding:16px 16px calc(20px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 30px rgba(0,0,0,.35);-webkit-overflow-scrolling:touch}
 .sheet.tall{max-height:88%}
 .sh-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}

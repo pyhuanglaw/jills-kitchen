@@ -408,9 +408,9 @@ def customer_full_flow_and_economy(b, port, target):
     check(s['guests'] > 0 and s['plated'] > 0 and s['rev'] > 0, f'no customers served: {s}')
     check(s['perfect'] == s['plated'], f'perfect bot should plate only PERFECT dishes: {s}')
     m1 = g.ev("S.money"); c1 = g.ev("S.todayCost")
-    expect = m0 + s['rev'] + s['tips'] + s['bonus'] - s['wages'] - s.get('rent', 0) - s.get('wine', 0) - (s.get('cfee') or 0) + (s.get('loan') or 0) - (c1 - c0)   # v2.4 rc7: the rent and the glasses poured; 秀琴阿姨's loan
+    expect = m0 + s['rev'] + s['tips'] + s['bonus'] + (s.get('insp') or 0) - s['wages'] - s.get('rent', 0) - s.get('wine', 0) - (s.get('cfee') or 0) + (s.get('loan') or 0) - (c1 - c0)   # v2.4 rc7: the rent and the glasses poured; 秀琴阿姨's loan
     check(m1 == expect, f'money invariant broken: start {m0}, end {m1}, expected {expect}, summary {s}')
-    check(s['net'] == s['rev'] + s['tips'] + s['bonus'] - s['cost'] - s['wages'] - (s.get('cfee') or 0) - s.get('rent', 0) - s.get('wine', 0), 'net formula mismatch')
+    check(s['net'] == s['rev'] + s['tips'] + s['bonus'] + (s.get('insp') or 0) - s['cost'] - s['wages'] - (s.get('cfee') or 0) - s.get('rent', 0) - s.get('wine', 0), 'net formula mismatch')
     check(s.get('rent') == 300 and not s.get('loan'), f'a first day\'s rent, and no loan on a day that paid its way: {s.get("rent")}, {s.get("loan")}')
     check(g.ev("S.reviews.length") > 0, 'no reviews written')
     check(not g.errors, g.errors)

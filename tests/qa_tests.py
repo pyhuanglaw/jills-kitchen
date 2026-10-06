@@ -41,7 +41,7 @@ def _to_service_from_late(p):
 def _till_vs_summary(p, m0, c0):
     """the money the till gained over a day against what the summary says the day made"""
     s = p.ev("S.lastSummary"); m1 = p.ev("S.money"); c1 = p.ev("S.todayCost")
-    expect = m0 + s['rev'] + s['tips'] + s['bonus'] - s['wages'] - s.get('rent', 0) - s.get('wine', 0) - (s.get('cfee') or 0) + (s.get('loan') or 0) - (c1 - c0)
+    expect = m0 + s['rev'] + s['tips'] + s['bonus'] + (s.get('insp') or 0) - s['wages'] - s.get('rent', 0) - s.get('wine', 0) - (s.get('cfee') or 0) + (s.get('loan') or 0) - (c1 - c0)
     return m1, expect, s
 
 
@@ -646,8 +646,11 @@ def qa_table_hearts_only_for_sophie_and_mia(b, port, target):
     try:
         _to_service_from_late(p)
         install_bot(p.g); p.ev(LAZY_ACTOR); p.ev("window.__act=window.__actLazy")
-        p.ev("""(()=>{if(window.__hearts!=null)return;window.__hearts=0;const P=CanvasRenderingContext2D.prototype,f0=P.fill;
-          P.fill=function(){if(String(this.fillStyle).toLowerCase()==='#e8798a'&&this.canvas===sc)window.__hearts++;return f0.apply(this,arguments)}})()""")
+        # a heart is the pink shape drawn with curves (the table's bubble heart: two bezier lobes); the pink of a flower on
+        # the table, a bow in a guest's hair or the season's decorations is drawn with arcs and lines and is not one
+        p.ev("""(()=>{if(window.__hearts!=null)return;window.__hearts=0;const P=CanvasRenderingContext2D.prototype,f0=P.fill,b0=P.beginPath,z0=P.bezierCurveTo;
+          P.beginPath=function(){this.__bz=false;return b0.apply(this,arguments)};P.bezierCurveTo=function(){this.__bz=true;return z0.apply(this,arguments)};
+          P.fill=function(){if(this.__bz&&String(this.fillStyle).toLowerCase()==='#e8798a'&&this.canvas===sc)window.__hearts++;return f0.apply(this,arguments)}})()""")
         bad = 0
         for _ in range(80):
             p.settle(); p.ev("window.__hearts=0;for(let i=0;i<30;i++){__act();__tick(1000/30)}")

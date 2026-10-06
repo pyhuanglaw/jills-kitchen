@@ -2658,7 +2658,7 @@ def v24_rc7_the_money(b, port, target):
     to_service(g); play_day(g)
     s = json.loads(g.ev("JSON.stringify(S.lastSummary)"))
     check(s['wine'] > 0 and s['rent'] == rent['r'] and s['wages'] == w['all'], f'on the ledger: wine {s["wine"]}, rent {s["rent"]}, wages {s["wages"]}')
-    check(s['net'] == s['rev'] + s['tips'] + s['bonus'] - s['cost'] - s['wages'] - (s['cfee'] or 0) - s['rent'] - s['wine'], 'the net counts them')
+    check(s['net'] == s['rev'] + s['tips'] + s['bonus'] + (s.get('insp') or 0) - s['cost'] - s['wages'] - (s['cfee'] or 0) - s['rent'] - s['wine'], 'the net counts them')
     lg = s['lg']; tot = sum(x['rev'] for x in s['lgSales'])
     check(lg['rev'] == tot and lg['tip'] > 0 and all(x['d'].startswith('w_') or g.ev(f"!!(DISHES['{x['d']}']&&DISHES['{x['d']}'].bar)") for x in s['lgSales']), f'the Lounge: {lg["rev"]} = its list\'s total {tot}; tips {lg["tip"]} apart')
     din = s.get('dinWine') or []
