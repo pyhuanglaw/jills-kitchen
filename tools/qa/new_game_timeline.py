@@ -37,8 +37,9 @@ GROW = [('expand', {}), ('buyProject', {'k': 'side'}), ('buyProject', {'k': 'kex
         # the story's offers, taken when there (each a no-op otherwise; 'linTake' is rc8.5's 「接下隔壁」 — since 2026-10-06
         # 《看看》 decides it and the button is gone)
         # Lounge I is 簽約・開工 (linSign): the game has no button 「buyLounge 1」 (pressing one built Lounge I around the story
-        # once its level requirement went, 2026-10-06 — the game now refuses it too)
-        ('linTake', {}), ('linSign', {}), ('buyLounge', {'k': '2'}), ('buyLounge', {'k': '3'}),
+        # once its level requirement went, 2026-10-06 — the game now refuses it too). 'noop' keeps its place: every press
+        # moves the game's clock a little, and the same number of presses keeps a seed's days the same as in the runs before
+        ('linTake', {}), ('linSign', {}), ('noop', {}), ('buyLounge', {'k': '2'}), ('buyLounge', {'k': '3'}),
         ('buyUp', {}), ('buySR', {'k': '2'}), ('buySR', {'k': '3'}), ('buyPD', {'k': '1'}), ('buyPD', {'k': '2'}), ('buyPD', {'k': '3'})]
 def main():
     t0 = time.time(); rows = []
