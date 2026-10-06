@@ -1,7 +1,7 @@
 # Jill's Kitchen — 目前狀態（暫時的，會一直更新）
 
 這份只放「現在」的狀態：branch、版本、待辦、待確認。永久的設計規則在 `docs/PROJECT_MEMORY.md`，不要寫到這裡；這裡的內容過時了就
-直接改掉或刪掉。最後更新：2026-10-06，全面 Audit 與例行 QA 之後（遊戲還是 rc8.5）。
+直接改掉或刪掉。最後更新：2026-10-06，全面 Audit 與例行 QA 合回 `main` 之後（遊戲還是 rc8.5，沒有發布）。
 
 ## Repo 與 branch
 
@@ -11,8 +11,8 @@
 - 還沒做完的遊戲功能，另外開短期的 `feature/…` 或 `wip/…` branch；做完、測試通過才回到 `main`，發布的 commit 一定在 `main` 上。
   文件與紀錄可以直接在 `main`。不要讓工作 branch 跟 `main` 長期並行。
 - GitHub 上的 branch：`main`、`archive/rc7.6-import-main`、`feature/fewer-lines`（rc8.5，已合回 `main`，可以在 GitHub 網頁刪掉）、
-  `feature/dylan-room`（Dylan 在房間的名字，還沒合回、還沒發布）、`qa/audit-2026-10-06`（全面 Audit 與例行 QA：測試、工具、文件，
-  沒有遊戲程式）。
+  `feature/dylan-room`（Dylan 在房間的名字，還沒合回、還沒發布）、`feature/lounge-decided`（《看看》後直接決定接隔壁、Lounge I 的新條件；
+  還沒合回、還沒發布）、`qa/audit-2026-10-06`（全面 Audit 與例行 QA；2026-10-06 使用者同意合回 `main`，已合回，可以在 GitHub 網頁刪掉）。
 - 已刪除（玩家 2026-10-04 在 GitHub 網頁刪掉）：`feature/ken-tasting-pictures`（81cbe46，rc8.4 已合回 `main`）、`wip/lin`（舊的開發
   branch 名稱；最後指向的 b87b77b 在 `main` 裡）、`claude/jills-kitchen-github-setup-4x7483`（8ca784b，接在舊的匯入 commit 後面改網址；
   同樣的改動在主線的 ec985d1）。三條的內容都已經在 `main` 或不需要了。
@@ -50,7 +50,7 @@
   分頁那一排不會再超出畫面；帽子照玩家 10/3 的話一直戴著。相關測試通過（`rc86_dylan_is_named_in_their_room` 等）。玩家說「發布」時：
   合回 `main` → 完整回歸 → 發布。
 
-- **2026-10-06 全面 Audit 與例行 QA**（branch `qa/audit-2026-10-06`；沒有改遊戲）：報告 `docs/audit/2026-10-06/README.md`；
+- **2026-10-06 全面 Audit 與例行 QA**（已合回 `main`，使用者 2026-10-06「Audit 這套 QA 工具和測試我同意合回 main」；沒有改遊戲、沒有發布）：報告 `docs/audit/2026-10-06/README.md`；
   例行 QA `python3 tests/run_tests.py --qa`（`docs/QA.md`）；全面 Audit 的做法 `docs/audit/PLAYBOOK.md`。Audit 找到、還沒修的問題，
   每一條都已經有測試在等（`tests/qa_known_open.json`）。
 
