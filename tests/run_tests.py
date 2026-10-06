@@ -312,6 +312,14 @@ def check(cond, msg):
     if not cond:
         raise AssertionError(msg)
 
+class SetupFailed(AssertionError):
+    """the test never reached the case it is about (a save, a screen, a button that should be there was not) — for a
+    known-open test that is a broken test, not the finding still being open"""
+
+def setup_check(cond, msg):
+    if not cond:
+        raise SetupFailed('setup: ' + msg)
+
 @test
 def single_file_in_sync(b, port, target):
     import subprocess
@@ -3934,7 +3942,8 @@ def main():
                 else:
                     print(f'PASS  {fn.__name__}  ({time.time()-t0:.1f}s)')
             except Exception as e:
-                if fn.__name__ in known:
+                # OPEN only when the finding's own check fails; a setup that did not reach the case, or a crash, is a FAIL
+                if fn.__name__ in known and isinstance(e, AssertionError) and not isinstance(e, SetupFailed):
                     still_open.append(fn.__name__)
                     print(f'OPEN  {fn.__name__}  ({time.time()-t0:.1f}s)  known: {known[fn.__name__].get("finding")} {known[fn.__name__].get("what", "")}\n      {str(e)[:300]}')
                 else:

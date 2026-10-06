@@ -12,7 +12,7 @@ whether a feature is noticed — those need eyes (the deep audit, docs/audit/PLA
 """
 import json, os, re, sys
 _rt = sys.modules['__main__'] if hasattr(sys.modules.get('__main__'), 'TESTS') else __import__('run_tests')
-test, check, ROOT, install_bot, LAZY_ACTOR = _rt.test, _rt.check, _rt.ROOT, _rt.install_bot, _rt.LAZY_ACTOR
+test, check, setup_check, ROOT, install_bot, LAZY_ACTOR = _rt.test, _rt.check, _rt.setup_check, _rt.ROOT, _rt.install_bot, _rt.LAZY_ACTOR
 from player import Player, Unreachable, BROKEN_TEXT, SAVES_DIR, SAVE_KEY
 
 LATE = 'player_day92_2105.json'      # Day 92 after closing: $1.18M, 20 crew, the second floor (the late game)
@@ -112,7 +112,7 @@ def qa_a_new_game_first_day_by_taps(b, port, target):
 FINGERPRINT = """JSON.stringify([S.money,phase,sub||'',typeof shopTab!=='undefined'?shopTab:'',window.__toastN||0,
   (()=>{let h=0;const s=JSON.stringify(S,(k,v)=>k==='savedAt'||k==='savedLabel'?undefined:v);for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0;return h})(),
   (()=>{const e=document.querySelector('#screen');return e?e.innerHTML.length:0})(),
-  [...document.querySelectorAll('#reveal,#dlg')].map(e=>e.hidden?0:1).join('')])"""
+  [...document.querySelectorAll('#reveal,#dlg,#upPlanBig,#peekPill')].map(e=>e.hidden?0:1).join('')])"""
 SKIP_ACTS = {'tab', 'closeSub', 'nextDay', 'peek', 'guide', 'book', 'settings', 'reset', 'resetNo'}
 
 
@@ -123,6 +123,8 @@ def _back_to(p, where, k=None):
     # a question the press asked (換掉哪一道？ / are you sure?): the player answers no
     p.ev("for(const a of ['menuSwapNo','resetNo','importNo','pasteCancel','cnCancel','ktCancel']){const e=[...document.querySelectorAll('[data-act='+a+']')].find(e=>e.offsetParent!==null);if(e)e.click()}")
     p.ev("try{if(typeof hideReveal==='function')hideReveal()}catch(e){};if(sub&&sub!=='pause'){sub=null}")
+    # a look at a room (二樓 看看整層) or the floor plan's zoom: the player taps 「回到店舖工程 ›」 / the picture to come back
+    p.ev("for(const id of ['upPlanBig','peekPill']){const e=document.getElementById(id);if(e&&!e.hidden)e.click()}")
     if where == 'shop':
         if k:
             p.ev(f"shopTab='{k}'")
@@ -143,7 +145,7 @@ def _sweep_tab(p, k, dead, tapped):
         if not todo or len(seen) >= 25:
             return
         i, act, kk, txt = todo[0]; seen.add((act, kk))   # its label may change after a press (a price, a count): the same button
-        if '使用中' in txt:
+        if '使用中' in txt or '現在' in txt:   # the one in use now (a theme, a set): pressing it again is meant to do nothing
             continue
         before = p.ev(FINGERPRINT)
         sel = '#screen .sheet button, #screen .sheet [data-act]'
@@ -168,15 +170,22 @@ def _sweep_tab(p, k, dead, tapped):
 
 
 def _new_game_shop(b, port, target, days=7):
-    """a new game played quickly to the shop after Day `days` (the fast bot serves; the fridge stocked as the game does on
-    Days 1–2) — a shop with almost everything still to buy"""
+    """a new game played to the shop after Day `days` (the fast bot serves; a story that holds the service stops the bot,
+    so it is read through, as a player would, and the day goes on; the summary's 升級餐廳 by a tap) — a shop with almost
+    everything still to buy"""
     p = Player(b, port, target)
     p.tap('[data-act=open]'); p.settle()
-    for _ in range(days):
+    for day in range(1, days + 1):
         p.ev("autoStock()"); p.start_day()
-        install_bot(p.g); p.ev("__bot(60000,1/30)"); p.ev("while(typeof DLG!=='undefined'&&DLG)dlgNext()")
-        p.ev("if(phase==='summary')showShop()")
-        if p.state()['day'] < days:
+        install_bot(p.g)
+        for _ in range(300):
+            if p.state()['phase'] != 'service':
+                break
+            p.settle(); p.ev("__bot(2000,1/30)")
+        p.settle()
+        setup_check(p.state()['phase'] == 'summary', f'Day {day} did not reach the summary: {p.state()}')
+        p.tap('#screen [data-act=toShop]')
+        if day < days:
             p.tap('#screen [data-act=nextDay]'); p.settle()
     return p
 
@@ -193,7 +202,7 @@ def qa_every_button_in_the_shop_does_something(b, port, target):
         try:
             if where == 'day92':
                 p.tap('#screen [data-act=open]')
-            check(p.state()['phase'] == 'shop', f'{where}: not in the shop: {p.state()}')
+            setup_check(p.state()['phase'] == 'shop', f'{where}: not in the shop: {p.state()}')
             p.ev("S.money=Math.max(S.money,5e6)")   # enough to buy anything offered, so a refusal is never the reason
             tabs = p.page.evaluate("()=>[...document.querySelectorAll('#screen .tabs [data-act=tab]')].filter(e=>!e.disabled).map(e=>e.dataset.k)")
             n0, d0 = len(tapped), len(dead)
@@ -251,17 +260,21 @@ def qa_every_button_on_the_prep_screen_does_something(b, port, target):
 @test
 def qa_restock_says_why_it_cannot(b, port, target):
     """Known-open (WS2-04): 「補滿」 beside one dish fills the whole fridge with it (拿鐵 2→243, 400/400); then
-    「一鍵補到建議量」 does nothing at all — no money, no toast, no change. A button that cannot do its job says why."""
+    「一鍵補到建議量」 cannot buy the dishes still short — and says nothing. A button that cannot do its job says why: after
+    the press every dish is at its suggestion, or something on screen (a toast, a line about the fridge) said why not."""
     p = Player(b, port, target, save=LATE)
     try:
         p.tap('#screen [data-act=open]'); p.tap('#screen [data-act=nextDay]'); p.settle()
         p.ev("if(!window.__toastWrap){window.__toastWrap=1;window.__toastN=0;const t0=toast;toast=function(){__toastN++;return t0.apply(this,arguments)}}")
-        d = p.ev("(document.querySelector('#screen [data-act=stockTo][data-k=max]')||{dataset:{}}).dataset.d")
-        check(d, 'no 補滿 button on the prep screen')
+        d = p.ev("([...document.querySelectorAll('#screen [data-act=stockTo][data-k=max]')].find(e=>e.offsetParent!==null&&!e.disabled)||{dataset:{}}).dataset.d")
+        setup_check(d, 'no 補滿 button a player can see on the prep screen')
         p.tap(f'#screen [data-act=stockTo][data-k=max][data-d="{d}"]')
-        check(p.ev("stockTotal()>=fridgeCap()"), 'the fridge is not full after 補滿')
-        before = p.ev(FINGERPRINT); p.tap('#screen [data-act=restock]')
-        check(p.ev(FINGERPRINT) != before, '一鍵補到建議量 with a full fridge: nothing happens and nothing says why')
+        SHORT = "JSON.stringify(Object.entries(suggestStock()).filter(([k,v])=>(S.stock[k]||0)<v).map(([k])=>k))"
+        setup_check(p.ev("stockTotal()>=fridgeCap()") and json.loads(p.ev(SHORT)), f'the case: the fridge full after 補滿 {d}, other dishes short of their suggestion')
+        t0, txt0 = p.ev("__toastN"), p.text('#screen'); p.tap('#screen [data-act=restock]')
+        short, txt1 = json.loads(p.ev(SHORT)), p.text('#screen')
+        said = p.ev("__toastN") > t0 or txt1.count('冰箱') > txt0.count('冰箱')
+        check(not short or said, f'一鍵補到建議量 with a full fridge: {short} stay short and nothing says why')
     finally:
         p.close()
 

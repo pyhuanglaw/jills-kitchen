@@ -122,15 +122,21 @@ class Player:
         h = loc.element_handle()
         info = self.page.evaluate("""([e,touch])=>{if(e.offsetParent===null&&getComputedStyle(e).position!=='fixed')return {err:'hidden'};
           if(e.disabled)return {err:'disabled'};
+          let list=null;
           for(let a=e.parentElement;a;a=a.parentElement){const cs=getComputedStyle(a);const r=a.getBoundingClientRect(),q=e.getBoundingClientRect();
-            if(['auto','scroll'].includes(cs.overflowY)&&a.scrollHeight>a.clientHeight+1){if(q.top<r.top||q.bottom>r.bottom)a.scrollTop+=((q.top+q.bottom)/2-(r.top+r.bottom)/2)}
+            if(['auto','scroll'].includes(cs.overflowY)&&a.scrollHeight>a.clientHeight+1){list=list||a;if(q.top<r.top||q.bottom>r.bottom)a.scrollTop+=((q.top+q.bottom)/2-(r.top+r.bottom)/2)}
             if(['auto','scroll'].includes(cs.overflowX)&&a.scrollWidth>a.clientWidth+1&&(q.left<r.left||q.right>r.right)){
               const bar=a.offsetHeight-a.clientHeight>2&&cs.scrollbarWidth!=='none';
               if(touch||bar)a.scrollLeft+=((q.left+q.right)/2-(r.left+r.right)/2);else return {err:'sideways: a mouse cannot scroll this strip (no scrollbar, no arrows)'}}}
-          const q=e.getBoundingClientRect();if(q.bottom<=0||q.top>=innerHeight||q.right<=0||q.left>=innerWidth)return {err:'off the screen'};
-          const x=Math.min(innerWidth-1,Math.max(0,(q.left+q.right)/2)),y=Math.min(innerHeight-1,Math.max(0,(q.top+q.bottom)/2));
-          const top=document.elementFromPoint(x,y);if(!top||!(top===e||e.contains(top)))return {err:'covered by '+(top?(top.id?'#'+top.id:top.tagName+'.'+String(top.className).split(' ')[0]):'nothing')};
-          return {x,y}}""", [h, self.touch])
+          const hit=()=>{const q=e.getBoundingClientRect();if(q.bottom<=0||q.top>=innerHeight||q.right<=0||q.left>=innerWidth)return {err:'off the screen'};
+            const x=Math.min(innerWidth-1,Math.max(0,(q.left+q.right)/2)),y=Math.min(innerHeight-1,Math.max(0,(q.top+q.bottom)/2));
+            const top=document.elementFromPoint(x,y);if(!top||!(top===e||e.contains(top)))return {err:'covered by '+(top?(top.id?'#'+top.id:top.tagName+'.'+String(top.className).split(' ')[0]):'nothing')};
+            return {x,y}};
+          let at=hit();
+          /* in the list but under something that floats over it (the sheet's 開始營業 bar): a finger moves the list until
+             the button is in the middle, then taps — still covered there, nobody can reach it */
+          if(at.err&&at.err.startsWith('covered')&&list){const r=list.getBoundingClientRect(),q=e.getBoundingClientRect();list.scrollTop+=((q.top+q.bottom)/2-(r.top+r.bottom)/2);at=hit()}
+          return at}""", [h, self.touch])
         if 'err' in info:
             raise Unreachable(info['err'])
         return info['x'], info['y']
