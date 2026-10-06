@@ -60,8 +60,10 @@ def timeline(o):
     paid = first(rows, lambda r: (r.get('proj') or {}).get('state') in ('signing', 'reno', 'built'))
     pd = day_of(paid)
     sign_press = next((d for d in log if d['kind'] == 'decide' and d['pressed'] and '簽約' in d['pressed'] and d.get('cost')), None)
-    # Madame Lin's last night: signed before it, it is the evening before the signing (the branch's rule, 2026-10-06)
-    last_night = beats.get('lin_last') or ((sign_press['day'] - 1) if sign_press else None)
+    # Madame Lin's last night: signed before it, it is the signing's own evening when 簽約・開工 is pressed in the evening's
+    # shop, the evening before when it is pressed before opening (linSignPay: L.last=P.paidPrep?S.day-1:S.day); the
+    # simulated player buys in the evening
+    last_night = beats.get('lin_last') or (sign_press['day'] if sign_press else None)
     top = []
     wines = []
     if opened:
