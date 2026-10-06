@@ -220,6 +220,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
     <p class="small">建議從第 1 晚依序玩：每一晚只多一、兩件新的事。教學提示每件事只出現一次；<button id="resetTut" style="text-decoration:underline;color:var(--gold)">重新顯示教學</button>。</p>
   </div>
   <div class="ov" id="sum" hidden></div>
+  <div class="ov" id="lineChoice" hidden></div>
 </div>
 
 <script>
@@ -301,7 +302,7 @@ const NIGHTS=[
   {k:2,n:'烤箱與漢堡',d:'烤箱很慢但不會焦，一次放兩樣。漢堡要兩樣東西：肉排和麵包，組起來才是一份。',dur:300,
    st:['wok','pot','pan','coffee','pantry','asm','oven','shelf','trash'],dishes:{friedrice:2,pasta:2,coffee:2,chicken:2.4,burger:2.6},
    size:[.35,.45,.2],gap:[22,13],waiters:['小茉','Kai'],cooks:[]},
-  {k:3,n:'第一位廚師',d:'阿德師傅顧爐台：炒鍋、湯鍋、平底鍋上好了的東西，他會拿去下一站或盤子。你可以接更多桌。布丁可以先做起來放著。',dur:300,
+  {k:3,n:'第一位廚師',d:'阿德師傅幫你顧一條線（開店前你選哪一條）：上面好了的東西他會送走。你可以接更多桌。布丁可以先做起來放著。',dur:300,
    st:['wok','pot','pan','coffee','pantry','asm','oven','chill','shelf','trash'],dishes:{friedrice:2.2,pasta:2.2,coffee:2,chicken:2,burger:2.2,pudding:2},
    size:[.25,.5,.25],gap:[18,10.5],waiters:['小茉','Kai'],cooks:[{n:'阿德',line:['wok','pot','pan']}]},
   {k:4,n:'披薩窯',d:'披薩要過三站：鋪料、窯烤（很燙、很快）、切。沈晴接手咖啡。廚房更大，單更多。',dur:300,
@@ -325,11 +326,21 @@ function newGame(k,opt){
   for(const nm of N.waiters)G.staff.push({role:'waiter',n:nm,x:344,y:612,state:'idle',el:null});
   for(const c of N.cooks)G.staff.push({role:'cook',n:c.n,line:c.line,x:60,y:454,hx:60,hy:454,state:'idle',el:null});
   if(N.barista)G.staff.push({role:'barista',n:N.barista,x:322,y:452,hx:322,hy:452,state:'idle',el:null});
-  G.staff.forEach((s,i)=>{s.el=mk('div','pp '+s.role,`${s.n.slice(0,2)}<span class="nm">${s.n}</span>`);stage.appendChild(s.el);if(s.role==='waiter'){s.hx=344-i*30;s.hy=600;s.x=s.hx;s.y=s.hy}});
+  G.staff.forEach((s,i)=>{s.el=mk('div','pp '+s.role,`${s.n.slice(0,2)}<span class="nm">${s.n}</span>`);stage.appendChild(s.el);if(s.role==='waiter'){s.hx=334-i*30;s.hy=600;s.x=s.hx;s.y=s.hy}});
   $('#hNight').textContent=`第 ${k} 晚`;$('#hTitle').textContent=N.n;
   hint(null);
   if(G.tut)tutTicket();
+  if(G.staff.some(s=>s.role==='cook')&&!opt.line)chooseLine();else if(opt.line)G.staff.filter(s=>s.role==='cook').forEach(s=>{s.line=LINES[opt.line].st});
 }
+/* multi-cook handling, made a decision: a cook keeps one line (a few stations) — which one is the player's call for the
+   night's menu; he lands and carries on it, never starts anything */
+const LINES={stove:{n:'爐台',st:['wok','pot','pan'],d:'炒鍋、湯鍋、平底鍋：好了的炒飯、麵、肉排，他拿去下一站或盤子'},
+  oven:{n:'烤箱和組裝台',st:['oven','asm'],d:'烤雞、麵包、組好的漢堡：他拿去組裝台或盤子'},
+  pizza:{n:'披薩線',st:['pzbench','pzoven','board'],d:'鋪好料的、烤好的、切好的披薩：他一站一站送，窯裡的不會焦'}};
+function chooseLine(){paused=true;const el=$('#lineChoice');el.hidden=false;const opts=Object.keys(LINES).filter(k=>LINES[k].st.every(x=>G.N.st.includes(x)));
+  el.innerHTML=`<div class="eyebrow">第 ${G.k} 晚 · 開店前</div><h1>阿德師傅今晚顧哪一條線？</h1><p>他只收、只送：顧的那幾個設備上好了的東西，他會拿去下一站或盤子，焦了的丟掉。他不會自己下鍋——先做什麼還是你。</p>
+   <div class="nights">${opts.map(k=>`<button class="night" data-line="${k}"><b>${LINES[k].n}</b><span>${LINES[k].d}</span></button>`).join('')}</div>`;
+  el.querySelectorAll('[data-line]').forEach(b=>b.addEventListener('click',()=>{const L=LINES[b.dataset.line];G.staff.filter(s=>s.role==='cook').forEach(s=>{s.line=L.st;const c=stCenter(L.st[0]);s.hx=Math.max(24,Math.min(336,c.x));s.hy=454;s.x=s.hx;s.y=s.hy});G.cookLine=b.dataset.line;el.hidden=true;paused=false;hint(null)}))}
 function genSched(N,R){
   const out=[],end=N.dur*.86;let t=N.tut?2:3;
   const names=Object.keys(N.dishes),wsum=names.reduce((a,d)=>a+N.dishes[d],0);
@@ -720,7 +731,7 @@ const B={
   burnt:{txt:'焦掉了。把它拖到<b>垃圾桶</b>（或點它、再點垃圾桶），重做一份。',hl:()=>['st_trash'],min:3},
   oven:{txt:'<b>香草烤雞</b>進烤箱要 35 秒，但烤箱不會焦，一次放兩樣。慢的先下，等的時間去做別的。',hl:()=>['bin_chicken_r','st_oven']},
   asm:{txt:'<b>經典牛肉漢堡</b>是兩樣東西：肉排在<b>平底鍋</b>煎、麵包進<b>烤箱</b>烤。兩樣都好了放上<b>組裝台</b>，自己會組起來。',hl:()=>['bin_patty','bin_bun','st_asm']},
-  cook:{txt:'今天有<b>阿德師傅</b>顧爐台：炒鍋、湯鍋、平底鍋上好了的東西，他會拿去下一站或盤子上。你只要決定先下什麼。',hl:()=>['st_wok','st_pot','st_pan'],min:7},
+  cook:{txt:'<b>阿德師傅</b>顧你選的那一條線：上面好了的東西，他會拿去下一站或盤子上。你決定先下什麼。',hl:()=>{const c=G.staff.find(s=>s.role==='cook');return c?c.line.map(x=>'st_'+x):[]},min:7},
   ahead:{txt:'<b>焦糖布丁</b>要冷藏 40 秒，可以先做起來放著不會壞。有空的時候先冰幾個，客人點了直接拿。',hl:()=>['bin_custard','st_chill'],min:6},
   pizza:{txt:'<b>瑪格麗特披薩</b>走三站：<b>披薩檯</b>鋪料 → <b>披薩窯</b>（10 秒就好，好了很快會焦）→ <b>砧板</b>切片。',hl:()=>['bin_dough','st_pzbench','st_pzoven','st_board']},
   barista:{txt:'<b>沈晴</b>今天負責咖啡：單上有咖啡，她會自己煮好、端上盤子。',hl:()=>['st_coffee'],min:6},
@@ -800,7 +811,7 @@ function endNight(){
     <div>平均同時在煮</div><div>${(S.conc/Math.max(1,S.concT)).toFixed(1)} 樣（最多 ${S.peak||0} 樣）</div>
     <div>你搬動食物</div><div>${S.moves} 次（每分鐘 ${(S.moves/Math.max(.1,mins)).toFixed(0)}）</div>
     <div>連續從同一個地方拿</div><div>${S.moves?Math.round(S.same/S.moves*100):0}%</div>
-    ${G.staff.some(s=>s.role!=='waiter')?`<div>員工幫你搬</div><div>${S.staff} 次</div>`:''}
+    ${G.staff.some(s=>s.role!=='waiter')?`<div>員工幫你搬${G.cookLine?`（阿德顧${LINES[G.cookLine].n}）`:''}</div><div>${S.staff} 次</div>`:''}
    </div>
    <div class="row">${G.k<NIGHTS.length?`<button class="btn pri" data-go="${G.k+1}">下一晚：${NIGHTS[G.k].n}</button>`:''}<button class="btn" data-go="${G.k}">再玩一次</button><button class="btn" data-menu="1">選單</button></div>`;
   window.__cookLast={k:G.k,...S,q,stars,mins};
