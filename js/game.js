@@ -9578,7 +9578,7 @@ function guideLines(t){const out=[];let d=0,cur='';for(const ch of t){cur+=ch;if
 const GUIDE=[   /* the manual describes the game as it is. Audited every release (docs/RELEASE_CHECKLIST.md) — last: v2.4 rc8 audit 2026-10-06, rewritten from docs/audit/2026-10-06/ws5_manual.md: the first card is how a day is played; only what the screen does not tell and a player needs to know stays (what the screen already says, how the game was built, old saves and stories still to come left it); a space, and a story's own entry, comes into it when it is there */
  {ic:"🍳",h:"一天怎麼玩",sum:"第一次玩，先看這一張。",pts:[
   ["一天","開店前選今天的菜單、備料 → 17:00 開店 → 21:30 打烊，客人吃完就結算 → 用今天賺的錢在商店買東西 → 準備下一天。前兩天開店時，遊戲會自動幫你補好備料（照價付）。"],
-  ["營業中","客人會自己找空桌坐。桌上出現紅色「!」：點桌子點餐。到廚房點訂單上的菜（或亮著「+」的設備）開始做，照料理台上的指示做完。桌上出現銀色餐蓋：點桌子把菜端過去。出現金幣：點桌子收錢；客人走了再點一次收桌。"],
+  ["營業中","客人會自己找空桌坐。桌上出現紅色「!」：點桌子點餐。到廚房點訂單上的菜（或點那道菜的設備）開始做，照料理台上的指示做完。桌上出現銀色餐蓋：點桌子把菜端過去。出現金幣：點桌子收錢；客人走了再點一次收桌。"],
   ["員工","請了廚師、服務生、清潔員，他們會自己接工作。Jill 有空時會回房間坐一下，你點桌子她就回來。"],
   ["故事","重要的故事發生時，店裡會整個停住；一句一句點著看完，店才接著營業。錯過的都在「餐廳日誌」。"],
   ["暫停","營業中點右上的「II」：調營業速度、看日誌、存檔備份、提早打烊。"],
@@ -9749,7 +9749,7 @@ function show(html,cls){screenEl.hidden=false;{const pp=$('#peekPill');if(pp&&!p
    left it across a re-render, the open tab is always in view (it opened off the screen, or jumped back to the start after
    a tab further right was chosen), and a strip with more tabs to one side fades on that side. With a mouse the strips
    wrap instead (style.css): every tab is on the screen. */
-function tabsSettle(prev){[...screenEl.querySelectorAll('.tabs')].forEach((s,i)=>{if(prev&&prev[i]!=null)s.scrollLeft=prev[i];tabsShowOn(s);tabsEdge(s);if(!s.__edge){s.__edge=1;s.addEventListener('scroll',()=>tabsEdge(s),{passive:true})}})}
+function tabsSettle(prev){[...screenEl.querySelectorAll('.tabs')].forEach((s,i)=>{if(prev&&prev[i]!=null)s.scrollLeft=prev[i];tabsShowOn(s);tabsEdge(s)})}
 function tabsShowOn(s){const on=s.querySelector('.on');if(!on||s.scrollWidth<=s.clientWidth+1)return;const sr=s.getBoundingClientRect(),r=on.getBoundingClientRect(),pad=28;if(r.left<sr.left+pad)s.scrollLeft-=Math.ceil(sr.left+pad-r.left);else if(r.right>sr.right-pad)s.scrollLeft+=Math.ceil(r.right-(sr.right-pad))}
 function tabsEdge(s){const more=s.scrollWidth>s.clientWidth+1;s.classList.toggle('more-r',more&&s.scrollLeft+s.clientWidth<s.scrollWidth-2);s.classList.toggle('more-l',more&&s.scrollLeft>2)}
 /* ================= v2.2 Q: dialogue portraits =================
@@ -10156,6 +10156,8 @@ function closeSub(){sub=null;if(phase==='service'){if(bookFromNote){bookFromNote
 
 let startWarned=false,discardArmed=false;
 screenEl.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;audioInit();doAct(b.dataset.act,b.dataset.d,b.dataset.k,b)});
+/* a tab strip's fades follow its scroll: one listener for every strip the screen will ever draw (scroll does not bubble; it is caught on the way down) */
+screenEl.addEventListener('scroll',e=>{const s=e.target;if(s&&s.classList&&s.classList.contains('tabs'))tabsEdge(s)},{capture:true,passive:true});
 {const dl=$('#dlg');if(dl)dl.addEventListener('click',e=>{e.preventDefault();audioInit();sfx.tap();dlgNext()})}
 function doAct(a,d,k,b){const money0=S.money;try{doAct0(a,d,k,b)}finally{if(S.money!==money0)hud(true)}}
 function doAct0(a,d,k,b){
