@@ -129,7 +129,7 @@ def main():
         for x in after:
             print(f"  Day {x['day']:3d} ${x['money']:>7}  淨 {x['net'] or 0:+6}  收 {(x['rev'] or 0) + (x['tips'] or 0):>6}（Lounge {x['lounge_tabs'] or 0} 桌 {x['lounge_rev'] or 0}）  貨 {x['cost'] or 0:>5}  薪 {x['wages'] or 0:>5}  租 {x['rent'] or 0:>5}  酒 {x['wine'] or 0:>5}")
         LINES = [('Lounge 第一晚（Ken 和杜）', 'lounge_first_night'), ('Ken 第一次坐進 Lounge', 'ken_lounge'), ('Ken 提議品酒', 'ken_propose'),
-                 ('第一次品酒之夜', 'ken_t1'), ('第二次品酒之夜', 'ken_t2'), ('第三次品酒之夜', 'ken_t3'), ('Ken：做一支我們自己的', 'ken_collab'),
+                 ('第一次品酒之夜', 'kt_night'), ('Evan 的來歷', 'evan_origin'), ('Ken 和杜：第二個杯墊', 'kd_coaster'), ('Ken 和杜：照片', 'kd_photo'),
                  ('樣酒', 'ken_samples'), ('「晚餐之後」上酒單', 'ken_wine'), ('Ken 和杜：固定的位子', 'kd_usual'), ('Evan：「杜來了嗎？」', 'kd_evan_1'),
                  ('Madame Lin 來當客人', 'lin_guest'), ('晴 × 阿拓 開始', 'qt_1'), ('晴 × 阿拓：今天喝？', 'qt_drink'), ('晴 × 阿拓：講完', 'qt_said'),
                  ('予安 開始', 'ya_1'), ('予安：「星期幾？」', 'ya_join')]
