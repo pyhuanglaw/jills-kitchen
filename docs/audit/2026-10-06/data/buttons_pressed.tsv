@@ -1,0 +1,880 @@
+畫面	存檔	分頁/流程	按鈕文字	data-act（或選擇器）	data-k/d	大小(px)	結果（錢、toast、畫面、子畫面、存檔欄位）	判讀
+升級餐廳（商店）	day92 Day 92 打烊後	home	看店裡	peek		53x34	peek: 回到選單 › | tabs: 店門口 主廳 側廳 二樓 休息室 Lounge 廚房 房間 | screenHidden False→True | screen: [DAY 92 · 打烊後 升級 Jill 的餐廳 看店裡 ? 目前現金 $1,179,146 評分 4.7 明日預估基本→]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	home	?	guide		34x34	sub None→guide | screen: [DAY 92 · 打烊後 升級→JILL'S KITCHEN 小小店主手冊 關閉 點一張卡片展開。 🍳 開店與料理 每天 17:00 開店、21:30 ] [的餐廳 看店裡 ? 目前現金 $1,179,146 評分 4.7 明日預估基本備料 約 $23,699 建議保留 約 $→在出菜口倒好、端過去 「酒水成本」照杯算，結算也另外列「晚餐桌上配的酒」。 Lounge 開了以後，晚餐桌上的酒改由調酒] [貓咪生活 廚房設備 菜單研發 員工 招牌菜 餐桌 9 / 9 張 多一張桌子，同時就能多接待一組客人。其中 6 張是四人→大家在談什麼、Jil	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	home	餐廳日誌	book		34x34	sub None→book | bookTab reviews→front | screen: [→JILL'S KITCHEN JOURNAL 餐廳日誌 關閉 總覽 故事 餐廳 社群 評價 熟客 VIP 話語 相簿 店] [打烊後 升級→18:05 「合照」 Eric想跟] [的餐廳 看店裡 ? 目前現金 $1,179,146 評分 4.7 明日預估基本備料 約 $23,699 建議保留 約 $→合照。 DAY 92 · 17:26 「不怕生」 柔柔在陌生客人旁邊待得很自在。 五隻店貓 店貓 › 樾樾 小齁 包包 ]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	home	設定	settings		34x34	sub None→settings | screen: [DAY→設定・存檔 背景音樂 音效 ✓ 本機自動儲存 最後儲存：DAY] [升級 Jill 的餐廳 看店裡 ? 目前現金 $1,179,146 評分 4.7 明日預估基本備料 約 $23,699 →每天打烊、購買升級後都會自動存檔。 存檔 備份與移轉 換手機、換瀏覽器、以防萬一：把進度存成一個檔案，之後再讀回來。 備]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	home	家具與佈置	tab	home	91x32	NOTHING VISIBLE	已在這個分頁（預期無變化）
+升級餐廳（商店）	day92 Day 92 打烊後	home	店舖工程	tab	works	78x32	shopTab home→works | screen: [餐桌 9 / 9 張 多一張桌子，同時就能多接待一組客人。其中 6 張是四人卡座。 9 張是→] [的極限。想接待更多人：沙發卡座、候位區、動線。 側廳的桌子 9 / 9 張 側廳可以放 9 張桌，三排三張；靠後牆那一排→門口的招牌上，只剩下一個名字。這就是] [親自挑的畫。 氛圍 +1 已擁有全部 新椅子 坐得舒服，客人耐心 +8%。 氛圍 +1 已擁有全部 手織地毯 已擁有 讓→的餐廳——不會再更大了，但還可以更好。 大工程 會把店變成另一個樣子的東西。買了以後，第二天開店就看得到。 戶外區（陽傘]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	home	社群與宣傳	tab	social	91x32	shopTab home→social | screen: [餐桌→社群 客人自己會發；Jill 偶爾也發一則——只能是真的發生過的事。發了以後幾天，會有人為了那件事來。 最近大家在說 🍝] [/ 9 張 多一張桌子，同時就能多接待一組客人。其中 6 張是四人卡座。 9 張是 JILL 的極限。想接待更多人：沙發→DAY 92 Ben 與 Lily 🍝 南瓜濃湯，推。 ♥ 8 DAY 92 張經理 🍝 香草烤雞，推。 ♥ 8 DAY]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	home	貓咪生活	tab	catlife	78x32	shopTab home→catlife | screen: [餐桌 9 / 9 張 多一張桌子，同時就能多接待一組客人。其中 6 張是四人卡座。 9 張是 JILL 的極限。想接待更→貓咪生活 買給牠們的。誰會用、怎麼用，牠們自己決定。用過的會記在相簿裡。 基本一個角落就夠了的東西。 紙箱 已擺好 就是] [組。 裝好了 門口花箱 兩個花箱，門口有了顏色。客流 +2%。 裝好了 門口串燈 沿著屋簷掛一排小燈，天黑以後整條街最溫→個位子，寶寶和包包不用再搶。 側廳的大窗一階一階加上去，前一階會留著。 窗邊貓家具 多貓觀景平台 窗邊貓架 → 軟墊窗台]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	home	廚房設備	tab	kitchen	78x32	shopTab home→kitchen | screen: [餐桌 9 / 9 張 多一張桌子，同時就能多接待一組客人。其中 6 張是四人卡座。 9 張是 JILL 的極限。想接待更→爐灶 LV5 7 口爐・加熱速度 ×1.55（擴建後的大爐） 已達最高等級 平底鍋 LV5 煎類料理速度 +32%・Pe] [組。 裝好了 門口花箱 兩個花箱，門口有了顏色。客流 +2%。 裝好了 門口串燈 沿著屋簷掛一排小燈，天黑以後整條街最溫→塊砧板・冷藏速度 ×1.55 已達最高等級 後場工程 設備升滿以後，後場還可以再做大。完工後，第二天開店就看得到。 大出]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	home	菜單研發	tab	menu	78x32	shopTab home→menu | screen: [餐桌 9 / 9 張 多一張桌子，同時就能多接待一組客人。其中 6 張是四人卡座。 9 張是 JILL 的極限。想接待更→料理研發 每種食材都標著它的角色和味道。選 2–3 種試做（每次 $150）：組合對了就是新料理；方向對了會累積研究進度] [/→星。 黃金蛋炒飯 ★★★ 目前售價 $155 已滿星 拿鐵咖啡 ★★★ 目前售價 $115 已滿星 番茄義大利麵 ★★★] [張 陽傘下的雙人桌。下雨的日子沒有人想坐外面。 人行道放不下更多了 店裡的樣子 地板、牆和吧台的顏色。買過的隨時可以換回→種食材，主角是「披薩麵團」 直接買食譜 $	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	home	員工	tab	staff	52x32	shopTab home→staff | screen: [餐桌 9 / 9 張 多一張桌子，同時就能多接待一組客人。其中→餐廳員工：廚師 7/7・服務生 6/6・清潔員 2/2・Lounge 員工 5/5・每日薪資 $31,050。廚師、服務] [張是四人卡座。 9 張是 JILL 的極限。想接待更多人：沙發卡座、候位區、動線。 側廳的桌子 9 / 9 張 側廳可以→道 小林師傅 LV5 × ＋ 加人 冷盤台 1/2・今天 6 道 Marco LV5 × ＋ 加人 咖啡吧 2/4・今天] [/→人・LV2 起 阿哲 LV5 × 安安 LV5 × Momo LV5 × ＋ 加人 員工 等級、薪	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	home	招牌菜	tab	sig	65x32	shopTab home→sig | screen: [餐桌 9 / 9 張 多一張桌子，同時就能多接待一組客人。其中 6 張是四人卡座。 9 張是 JILL 的極限。想接待更→★ CHEF JILL'S SIGNATURE ★ Jill's 檸檬奶油干貝 $940 · 奶油薯泥・干貝・檸檬奶油・]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	home	原本的樣子 已擁有	theme	classic	106x101	screen: [→現在 溫暖木頭] [溫暖木頭 現在→] | S: theme	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	home	溫暖木頭 現在	theme	wood	106x101	NOTHING VISIBLE	目前使用中的主題（預期無變化）
+升級餐廳（商店）	day92 Day 92 打烊後	home	奶油白 $2,500	theme	cream	106x101	money 1179146→1176646 (-2500) | toast: 奶油白：換好了 | screen: [$1,179,146→$1,176,646] [→已擁有 奶油白] [奶油白 $2,500→] | S: money,theme,themes	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	home	夜色 $3,500	theme	evening	106x99	money 1179146→1175646 (-3500) | toast: 夜色：換好了 | screen: [$1,179,146→$1,175,646] [現在→已擁有] [$3,500→現在] | S: money,theme,themes	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	home	淡淡的綠 $3,000	theme	sage	106x99	money 1179146→1176146 (-3000) | toast: 淡淡的綠：換好了 | screen: [$1,179,146→$1,176,146] [現在→已擁有] [$3,000→現在] | S: money,theme,themes	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	home	簡單的灰 $3,000	theme	modern	106x99	money 1179146→1176146 (-3000) | toast: 簡單的灰：換好了 | screen: [$1,179,146→$1,176,146] [現在→已擁有] [$3,000→現在] | S: money,theme,themes	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	home	購買 $150,000	buyLgFurn	sound	116x31	money 1179146→1029146 (-150000) | reveal: 裝好了 電視音響系統 喇叭接好了。轉播的時候整間 Lounge 都聽得到。 Jill：「……好像太好聽了。」 去看看 › 繼續買東西 | S: money,newRooms,lgFurn	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	home	換上這一套	seasonUse	spring	85x31	screen: [→擺著] [換上這一套→收起來] [擺著→] | S: seasonOn,seasonDay	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	home	換上這一套	seasonUse	summer	85x31	screen: [→擺著] [換上這一套→收起來] [擺著→] | S: seasonOn,seasonDay	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	home	換上這一套	seasonUse	autumn	85x31	screen: [→擺著] [→收起來 冬：松枝與紅果 每張桌子一小束松枝和紅果。] [冬：松枝與紅果 擺著 每張桌子一小束松枝和紅果。 收起來→] | S: seasonOn,seasonDay	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	home	收起來	seasonUse		59x31	screen: [38：客人耐心與滿意度都會提升。買完上方就能看到店裡變化。→37：客人耐心與滿意度都會提升。買完上方就能看到店裡變化。] [擺著→] [收起來→換上這一套] | S: seasonOn	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	home	換顏色	extStyle	awning	59x31	screen: [深藍白→紅白] | S: ext	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	home	準備 DAY 93	nextDay		358x51	phase shop→prep | main shop→prep | day 92→93 | dlg: 晴天。客人會多，桌子先擦一遍。包包還在睡，先不吵牠。 | screen: [92 · 打烊後 升級 Jill 的餐廳→93 · 開店前 JILL] [目前現金 $1,179,146 評分 4.7 明日預估基本備料 約 $23,699 建議保留 約 $27,354 家具與→晴朗 · 預計約 102 位客人 適合出門吃晚餐的好天氣。 今天可能要多準備：Jill's 莓果奶酪、舒芙蕾、巴斯克乳酪] [貓咪生活 廚房設備 菜單研發 員工→大家在談：氣氛 今天可以發 2 則 › 今日事件：今天是情人節	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	works	二樓平面圖 點一下放大 第 85 天 租下整層 · 第 85 天 員工休息室	upPlanBig		334x484	upPlanBig: 二樓平面圖 第 85 天 租下整層 · 第 85 天 員工休息室 關閉	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	works	二樓 看看整層現在的樣子 ›	upLook		334x32	peek: 回到店舖工程 › | tabs: 二樓 休息室 | screenHidden False→True | screen: [DAY 92 · 打烊後 升級 Jill 的餐廳 看店裡 ? 目前現金 $1,179,146 評分 4.7 明日預估基本→]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	works	訂購 $70,000	buySR	2	107x31	money 1179146→1109146 (-70000) | reveal: 訂好了 員工休息室 II《開始像他們的地方》 置物櫃寫上了名字，杯子一個一個不一樣了，中間多了一張撞球台。——明天就在。 Jill：「嗯。」 去看看 › 繼續買東西 | S: money,up	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	social	發這則	jillPost	dessert	59x31	toast: Jill 發了一則：Jill's 莓果奶酪：Jill 自己想的第二道。 | screen: [這幾天大家在談：✨ 氣氛（Jill→這幾天大家在談：🍰 甜點（Jill] [94）→95）] [第二道招牌→店裡的一天 合照 發這則 最近的貼文 讚會一直慢慢多 Jill's Kitchen 🍰] | S: dayLog,story,social	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	social	發這則	jillPost	cats:p91_tunnel_c2ryar	59x31	toast: Jill 發了一則：小齁從隧道另一頭衝出來。 | screen: [這幾天大家在談：✨ 氣氛（Jill→這幾天大家在談：🐈 貓咪（Jill] [94）→95）] [隧道的另一頭→合照] | S: dayLog,story,social	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	social	看更早的貼文（共 40 則）	postsAll		334x31	screen: [最近的貼文→所有貼文] [看更早的貼文（共 40 則）→Madame Lin 與朋友 🍷 有酒可以配了。 ♥ 13 DAY 91 張經理 🚪 側廳好坐。 ♥ 16 DAY 91]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	social	開始 $6,000	campaign	local	99x31	money 1179146→1173146 (-6000) | toast: 在地宣傳明天開始，一共三天。 | screen: [$1,179,146→$1,173,146] [附近的人知道這裡：多一些第一次來的家庭、一個人吃飯的人。能不能回來，看那一頓。 開始 $6,000 料理宣傳 宣傳一道菜→明天開始 DAY 93–95。開始以後，看到宣傳來的客人會在票券名字旁有 📱。] | S: money,dayLog,social	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	social	開始 $9,000	campaign	dish	99x31	money 1179146→1170146 (-9000) | toast: 料理宣傳明天開始，一共三天。 | screen: [$1,179,146→$1,170,146] [在地宣傳 附近的人知道這裡：多一些第一次來的家庭、一個人吃飯的人。能不能回來，看那一頓。 開始 $6,000 料理宣傳 →料理宣傳：Jill's] [Jill's 莓果奶酪 舒芙蕾 巴斯克乳酪蛋糕 莓果蘇打 拿鐵咖啡 松露薯條 香煎鴨胸 松露燉飯 乾式熟成肋眼 海膽燉飯→明天開始 DAY 93–95。開始以後，看到宣傳來的客人會在票券名字旁有 📱。] | S: money,dayLog,social	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	social	開始 $9,000	campaign	side	99x31	money 1179146→1170146 (-9000) | toast: 側廳／聚餐明天開始，一共三天。 | screen: [$1,179,146→$1,170,146] [在地宣傳 附近的人知道這裡：多一些第一次來的家庭、一個人吃飯的人。能不能回來，看那一頓。 開始 $6,000 料理宣傳 →] [讓人知道後面有一間可以坐一桌人的側廳：聚餐、家庭、坐得久的桌。 開始 $9,000 店貓／生活感 讓人知道店裡有五隻貓：→明天開始 DAY 93–95。開始以後，看到宣傳來的客人會在票券名字旁有 📱。] | S: money,dayLog,social	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	social	開始 $7,000	campaign	cats	99x31	money 1179146→1172146 (-7000) | toast: 店貓／生活感明天開始，一共三天。 | screen: [$1,179,146→$1,172,146] [在地宣傳 附近的人知道這裡：多一些第一次來的家庭、一個人吃飯的人。能不能回來，看那一頓。 開始 $6,000 料理宣傳 →] [讓人知道店裡有五隻貓：好奇的第一次客人、愛貓的人、拍照的人。貓不會因此上班。 開始 $7,000 晚餐／酒單 晚餐與酒：→明天開始 DAY 93–95。開始以後，看到宣傳來的客人會在票券名字旁有 📱。] | S: money,dayLog,social	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	social	開始 $12,000	campaign	wine	107x31	money 1179146→1167146 (-12000) | toast: 晚餐／酒單明天開始，一共三天。 | screen: [$1,179,146→$1,167,146] [在地宣傳 附近的人知道這裡：多一些第一次來的家庭、一個人吃飯的人。能不能回來，看那一頓。 開始 $6,000 料理宣傳 →] [晚餐與酒：想配一杯的人、吃完想再坐一下的人。 開始 $12,000→明天開始 DAY 93–95。開始以後，看到宣傳來的客人會在票券名字旁有 📱。] | S: money,dayLog,social	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	kitchen	停止合作	contractEnd	farm	72x31	toast: 停止合作了。 | screen: [合作中→] [停止合作→簽約 $40,000] | S: contracts	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	kitchen	停止合作	contractEnd	port	72x31	toast: 停止合作了。 | screen: [合作中→] [$6,240，扣掉契作費→$6,000，扣掉契作費] [$4,840。 停止合作→$4,600。 簽約 $60,000] | S: contracts	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	kitchen	停止合作	contractEnd	ranch	72x31	toast: 停止合作了。 | screen: [合作中→] [$7,160，扣掉契作費→$7,190，扣掉契作費] [$5,760。 停止合作→$5,790。 簽約 $60,000] | S: contracts	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	試做 $150	labTry		85x31	DISABLED ctx: 料理研發 每種食材都標著它的角色和味道。選 2–3 種試做（每次 $150）：組合對了就是新料理；方向對了會累積研究進度，三次就能完成；不對也會告訴你為什麼。 普通試作品 可以吃，但還不像一道能上菜單的料理。 義大利麵比較適合烤箱的料理，換一種配料或醬汁試試。 主體 雞蛋 $ 白飯 $ 義大利麵 $ 牛肉排 $$ 薯條	disabled（見 ctx 有沒有寫原因）
+升級餐廳（商店）	day92 Day 92 打烊後	menu	雞蛋 $	labPick	egg	79x32	screen: [點食材看它的特性；選 2–3 種再試做。主角＋配料或醬汁，是最常見的組合。→雞蛋 主體 清爽↑ 濃郁↑ 口感↑ · $ 整體味道：清爽↑ 濃郁↑ 口感↑ 可能適合：爐台 · 主餐] [$150還沒選→$150已選 1/3]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	白飯 $	labPick	rice	79x32	screen: [整體味道：清爽↑→白飯 主體 清爽↑ 口感↑↑ · $ 相性：雞蛋×白飯 很好 整體味道：清爽↑↑] [口感↑→口感↑↑↑] [1/3→2/3]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	義大利麵 $	labPick	noodle	105x32	screen: [→義大利麵 主體 清爽↑ 口感↑↑ · $] [很好→很好雞蛋×義大利麵 不合白飯×義大利麵 不合] [2/3→3/3]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	牛肉排 $$	labPick	patty	99x32	toast: 最多選 3 種食材	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	薯條 $	labPick	potato	79x32	NOTHING VISIBLE	同一個「最多選 3 種食材」toast 還在畫面上，不重複（非死按鈕）
+升級餐廳（商店）	day92 Day 92 打烊後	menu	南瓜塊 $	labPick	pumpkin	92x32	toast: 最多選 3 種食材 | S: gearUse,dayLog,gearN	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	時蔬 $	labPick	vegmix	79x32	screen: [點食材看它的特性；選 2–3 種再試做。主角＋配料或醬汁，是最常見的組合。→時蔬 主體 清爽↑↑ 香氣↑ 口感↑↑ · $ 整體味道：清爽↑↑ 香氣↑ 口感↑↑ 可能適合：烤箱／爐台 · 前菜] [$150還沒選→$150已選 1/3]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	鴨胸 $$$	labPick	duck	93x32	screen: [整體味道：清爽↑↑→鴨胸 主體 濃郁↑↑↑] [可能適合：烤箱／爐台→· $$$ 相性：時蔬×鴨胸 不合 整體味道：清爽↑↑ 濃郁↑↑↑ 香氣↑↑ 口感↑↑↑ 可能適合：爐台／烤箱] [1/3→2/3]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	雞腿 $$	labPick	chicken	86x32	screen: [→雞腿 主體 濃郁↑↑ 香氣↑ 口感↑↑ · $$] [→不合時蔬×雞腿 不合鴨胸×雞腿] [整體味道：清爽↑↑→整體味道：清爽↑]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	肋眼 $$$	labPick	steak	93x32	toast: 最多選 3 種食材	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	鮭魚 $$$	labPick	salmon	93x32	NOTHING VISIBLE	同一個「最多選 3 種食材」toast 還在畫面上，不重複（非死按鈕）
+升級餐廳（商店）	day92 Day 92 打烊後	menu	燉飯米 $$	labPick	arborio	99x32	toast: 最多選 3 種食材 | S: gearUse,dayLog,gearN	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	生火腿 $$$	labPick	prosciutto	106x32	screen: [點食材看它的特性；選 2–3 種再試做。主角＋配料或醬汁，是最常見的組合。→生火腿 主體 濃郁↑↑ 香氣↑↑ 口感↑ · $$$ 整體味道：濃郁↑↑ 香氣↑↑ 口感↑ 可能適合：冷盤台 · 前菜] [$150還沒選→$150已選 1/3]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	披薩麵團 $	labPick	dough	105x32	screen: [整體味道：濃郁↑↑ 香氣↑↑ 口感↑ 可能適合：冷盤台→披薩麵團 主體 濃郁↑ 香氣↑ 口感↑↑↑ · $ 相性：生火腿×披薩麵團 不合 整體味道：濃郁↑↑↑ 香氣↑↑↑ 口感] [1/3→2/3]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	羅勒葉 $	labPick	basil	92x32	screen: [→羅勒葉 配料 清爽↑ 濃郁↑ 香氣↑ 口感↑ · $] [不合 整體味道：濃郁↑↑↑ 香氣↑↑↑→不合生火腿×羅勒葉 可以披薩麵團×羅勒葉 可以 整體味道：清爽↑ 濃郁↑↑ 香氣↑↑] [2/3→3/3]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	鮮蝦 $$	labPick	shrimp	86x32	toast: 最多選 3 種食材	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	漢堡麵包 $	labPick	bun	105x32	NOTHING VISIBLE	同一個「最多選 3 種食材」toast 還在畫面上，不重複（非死按鈕）
+升級餐廳（商店）	day92 Day 92 打烊後	menu	起司片 $	labPick	cheese	92x32	toast: 最多選 3 種食材 | S: gearUse,dayLog,gearN	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	蘆筍 $$	labPick	asparagus	86x32	screen: [點食材看它的特性；選 2–3 種再試做。主角＋配料或醬汁，是最常見的組合。→蘆筍 配料 清爽↑↑ 香氣↑ 口感↑↑ · $$ 整體味道：清爽↑↑ 香氣↑ 口感↑↑ 可能適合：烤箱 · 主餐] [$150還沒選→$150已選 1/3]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	無花果 $$	labPick	fig	99x32	screen: [整體味道：清爽↑↑ 香氣↑ 口感↑↑ 可能適合：烤箱 · 主餐→無花果 配料 清爽↑ 濃郁↑ 香氣↑↑ 口感↑ · $$ 相性：蘆筍×無花果 可以 整體味道：清爽↑↑↑ 濃郁↑ 香氣↑] [1/3→2/3]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	蘑菇片 $	labPick	pzmush	92x32	screen: [→蘑菇片 配料 濃郁↑↑ 香氣↑↑ 口感↑ · $] [→可以蘆筍×蘑菇片 可以無花果×蘑菇片] [整體味道：清爽↑↑↑ 濃郁↑→整體味道：清爽↑↑ 濃郁↑↑]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	蒜片 $	labPick	garlic	79x32	toast: 最多選 3 種食材	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	鹽與胡椒 $	labPick	salt	105x32	NOTHING VISIBLE	同一個「最多選 3 種食材」toast 還在畫面上，不重複（非死按鈕）
+升級餐廳（商店）	day92 Day 92 打烊後	menu	橄欖油 $	labPick	oil	92x32	toast: 最多選 3 種食材 | S: gearUse,dayLog,gearN	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	香草鹽 $	labPick	herbs	92x32	screen: [點食材看它的特性；選 2–3 種再試做。主角＋配料或醬汁，是最常見的組合。→香草鹽 調味 清爽↑ 香氣↑↑↑ · $ 整體味道：清爽↑ 香氣↑↑↑ 可能適合：烤箱 · 主餐] [$150還沒選→$150已選 1/3]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	番茄醬汁 $	labPick	tomato	105x32	screen: [整體味道：清爽↑→番茄醬汁 醬汁 清爽↑↑ 濃郁↑ 香氣↑ · $ 相性：香草鹽×番茄醬汁 不合 整體味道：清爽↑↑↑ 濃郁↑] [可能適合：烤箱→可能適合：披薩烤爐／烤箱] [1/3→2/3]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	高湯 $	labPick	stock	79x32	screen: [→高湯 醬汁 濃郁↑↑ 香氣↑↑ · $] [→不合香草鹽×高湯 不合番茄醬汁×高湯] [整體味道：清爽↑↑↑ 濃郁↑→整體味道：清爽↑↑ 濃郁↑↑]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	鮮奶油 $	labPick	cream	92x32	toast: 最多選 3 種食材	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	奶油 $	labPick	butter	79x32	NOTHING VISIBLE	同一個「最多選 3 種食材」toast 還在畫面上，不重複（非死按鈕）
+升級餐廳（商店）	day92 Day 92 打烊後	menu	橙醬 $$	labPick	orange	86x32	toast: 最多選 3 種食材 | S: gearUse,dayLog,gearN	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	白酒 $$	labPick	wine	86x32	screen: [點食材看它的特性；選 2–3 種再試做。主角＋配料或醬汁，是最常見的組合。→白酒 醬汁 清爽↑ 濃郁↑ 香氣↑↑↑ · $$ 整體味道：清爽↑ 濃郁↑ 香氣↑↑↑ 可能適合：爐台 · 主餐] [$150還沒選→$150已選 1/3]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	巴薩米克醋 $$	labPick	balsamic	125x32	screen: [整體味道：清爽↑→巴薩米克醋 醬汁 清爽↑↑ 香氣↑↑ · $$ 相性：白酒×巴薩米克醋 不合 整體味道：清爽↑↑↑] [可能適合：爐台→可能適合：爐台／冷盤台] [1/3→2/3]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	咖啡豆 $	labPick	beans	92x32	screen: [→咖啡豆 飲品基底 濃郁↑↑ 香氣↑↑↑ · $] [→不合白酒×咖啡豆 不合巴薩米克醋×咖啡豆] [整體味道：清爽↑↑↑ 濃郁↑→整體味道：清爽↑↑ 濃郁↑↑]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	紅茶葉 $	labPick	tea	92x32	toast: 最多選 3 種食材	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	氣泡水 $	labPick	soda	92x32	NOTHING VISIBLE	同一個「最多選 3 種食材」toast 還在畫面上，不重複（非死按鈕）
+升級餐廳（商店）	day92 Day 92 打烊後	menu	牛奶 $	labPick	milk	79x32	toast: 最多選 3 種食材 | S: gearUse,dayLog,gearN	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	檸檬片 $	labPick	lemon	92x32	screen: [點食材看它的特性；選 2–3 種再試做。主角＋配料或醬汁，是最常見的組合。→檸檬片 飲品配料 清爽↑↑↑ 香氣↑↑ · $ 整體味道：清爽↑↑↑ 香氣↑↑ 可能適合：咖啡吧 · 飲料] [$150還沒選→$150已選 1/3]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	冰塊 $	labPick	ice	79x32	screen: [→冰塊 飲品配料 清爽↑↑↑ 口感↑ · $ 相性：檸檬片×冰塊 很好] [可能適合：咖啡吧→口感↑ 可能適合：咖啡吧／冷盤台] [1/3→2/3]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	水果片 $	labPick	fruit	92x32	screen: [→水果片 飲品配料 清爽↑↑ 香氣↑↑ 口感↑ · $] [→很好檸檬片×水果片 可以冰塊×水果片] [2/3→3/3]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	布丁液 $	labPick	custard	92x32	toast: 最多選 3 種食材	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	手指餅乾 $	labPick	ladyfinger	105x32	NOTHING VISIBLE	同一個「最多選 3 種食材」toast 還在畫面上，不重複（非死按鈕）
+升級餐廳（商店）	day92 Day 92 打烊後	menu	乳酪糊 $$	labPick	cheesebatter	99x32	toast: 最多選 3 種食材 | S: gearUse,dayLog,gearN	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	蛋白霜 $	labPick	whites	92x32	screen: [點食材看它的特性；選 2–3 種再試做。主角＋配料或醬汁，是最常見的組合。→蛋白霜 甜點基底 清爽↑ 口感↑↑↑ · $ 整體味道：清爽↑ 口感↑↑↑ 可能適合：烤箱 · 甜點] [$150還沒選→$150已選 1/3]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	焦糖 $	labPick	caramel	79x32	screen: [→焦糖 甜點配料 濃郁↑↑ 香氣↑↑ · $ 相性：蛋白霜×焦糖 可以] [→濃郁↑↑ 香氣↑↑] [可能適合：烤箱→可能適合：烤箱／冷盤台]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	馬斯卡彭 $$	labPick	mascarpone	112x32	screen: [→馬斯卡彭 甜點配料 濃郁↑↑↑ 口感↑↑ · $$] [→可以蛋白霜×馬斯卡彭 可以焦糖×馬斯卡彭] [濃郁↑↑ 香氣↑↑→濃郁↑↑↑ 香氣↑]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	可可粉 $	labPick	cocoa	92x32	toast: 最多選 3 種食材	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	莓果 $	labPick	berries	79x32	NOTHING VISIBLE	同一個「最多選 3 種食材」toast 還在畫面上，不重複（非死按鈕）
+升級餐廳（商店）	day92 Day 92 打烊後	menu	糖粉 $	labPick	sugar	79x32	toast: 最多選 3 種食材 | S: gearUse,dayLog,gearN	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	直接買食譜 $2,800	rd	pzmarg	138x31	money 1179146→1176346 (-2800) | toast: 研發成功：瑪格麗特披薩！已加入菜單 | screen: [$1,179,146→$1,176,346] [$23,699→$24,372] [$27,354→$28,128] | S: money,unlocked,menu,xp,today,menuSince	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	menu	直接買食譜 $3,400	rd	pzfungi	138x31	money 1179146→1175746 (-3400) | toast: 研發成功：蘑菇白醬披薩！已加入菜單 | screen: [$1,179,146→$1,175,746] [$23,699→$24,231] [$27,354→$27,966] | S: money,unlocked,menu,xp,today,menuSince	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRm	cmujzynxy994	24x24	toast: Hugo 離開爐台，待命中 | screen: [3/7・今天→2/7・今天] [Hugo LV5 ×→] [→待命 沒有安排，薪水照付 Hugo 廚師] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRm	cmun0rulo108	24x24	toast: 阿勇 離開爐台，待命中 | screen: [3/7・今天→2/7・今天] [LV5 × 阿勇→] [→待命 沒有安排，薪水照付 阿勇 廚師] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRm	cmuqa8ed9818	24x24	toast: 阿拓 離開爐台，待命中 | screen: [3/7・今天→2/7・今天] [LV5 × 阿拓→] [→待命 沒有安排，薪水照付 阿拓 廚師] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	＋ 加人	bdOpen		70x30	screen: [＋ 加人→收起 阿德師傅 從咖啡吧移過來 Marco 從冷盤台移過來 小林師傅 從烤箱移過來 阿珠姐 從咖啡吧移過來 老周師傅 從]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRm	cmuir5rsn47	24x24	toast: 小林師傅 離開烤箱，待命中 | screen: [收起 阿德師傅 從咖啡吧移過來 Marco 從冷盤台移過來 小林師傅 從烤箱移過來 阿珠姐 從咖啡吧移過來 老周師傅 從→＋ 加人] [1/2・今天→0/2・今天] [小林師傅 LV5 ×→] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRm	cmuioxn5652	24x24	toast: Marco 離開冷盤台，待命中 | screen: [收起 阿德師傅 從咖啡吧移過來 Marco 從冷盤台移過來 阿珠姐 從咖啡吧移過來 Hugo 從爐台移過來 阿勇 從爐台→＋ 加人] [1/2・今天→0/2・今天] [Marco LV5 ×→] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRm	cmuije1ik139	24x24	toast: 阿德師傅 離開咖啡吧，待命中 | screen: [收起 阿德師傅 從咖啡吧移過來 小林師傅 從烤箱移過來 阿珠姐 從咖啡吧移過來 Hugo 從爐台移過來 阿勇 從爐台移過→＋ 加人] [2/4・今天→1/4・今天] [阿德師傅 LV5 ×→] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRm	cmuivk53067	24x24	toast: 阿珠姐 離開咖啡吧，待命中 | screen: [2/4・今天→1/4・今天] [LV5 × 阿珠姐→] [→待命 沒有安排，薪水照付 阿珠姐 廚師] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRm	cmusgxc3f387	24x24	toast: 老周師傅 離開披薩烤爐，待命中 | screen: [收起 Marco 從冷盤台移過來 小林師傅 從烤箱移過來 Hugo 從爐台移過來 阿勇 從爐台移過來 阿拓 從爐台移過來→＋ 加人] [1/1・今天→0/1・今天] [老周師傅 LV5 × 已滿→＋ 加人] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRm	cmupdy1ix96	24x24	toast: Evan 離開Lounge 吧台，待命中 | screen: [2/2・今晚開放 Evan LV5 ×→1/2・今晚開放] [已滿→＋ 加人] [→待命 沒有安排，薪水照付 Evan 調酒師] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRm	cmupe3zxq227	24x24	toast: 沈晴 離開Lounge 吧台，待命中 | screen: [2/2・今晚開放→1/2・今晚開放] [沈晴 LV5 × 已滿→＋ 加人] [→待命 沒有安排，薪水照付 沈晴 調酒師] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRmD	cmujyhgtx171/seat	24x24	screen: [5→4] [Kai LV5 ×→] [Kai 帶位＋點餐 反應 0.5 秒→] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRmD	cmujzz8d7273/seat	24x24	screen: [5→4] [LV5 × 阿哲→] [阿哲 全部都做・Lounge 反應 0.5 秒→] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRmD	cmuqa8fo0621/seat	24x24	screen: [5→4] [LV5 × 安安→] [安安 帶位＋點餐・Lounge 反應 0.5 秒→] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRmD	cmuqb7vtw884/seat	24x24	screen: [5→4] [LV5 × Momo→] [Momo 帶位＋點餐＋上菜＋結帳・Lounge 反應 0.5 秒→] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRmD	cmuqb82m4269/seat	24x24	screen: [5→4] [LV5 × 小威→] [帶位＋點餐＋上菜＋結帳→點餐＋上菜＋結帳] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	＋ 加人	bdOpen	seat	70x30	screen: [＋ 加人→收起 小茉 Nina]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRmD	cmujyhgtx171/order	24x24	screen: [收起 小茉 Nina→＋ 加人] [5→4] [Kai LV5 ×→] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRmD	cmujzz8d7273/order	24x24	screen: [5→4] [LV5 × 阿哲→] [阿哲 全部都做・Lounge 反應 0.5 秒→] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRmD	cmuqa8fo0621/order	24x24	screen: [5→4] [LV5 × 安安→] [安安 帶位＋點餐・Lounge 反應 0.5 秒→] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRmD	cmuqb7vtw884/order	24x24	screen: [5→4] [LV5 × Momo→] [Momo 帶位＋點餐＋上菜＋結帳・Lounge 反應 0.5 秒→] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRmD	cmuqb82m4269/order	24x24	screen: [5→4] [LV5 × 小威→] [帶位＋點餐＋上菜＋結帳→帶位＋上菜＋結帳] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	＋ 加人	bdOpen	order	70x30	screen: [＋ 加人→收起 小茉 Nina]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRmD	cmuikqc4s442/serve	24x24	screen: [收起 小茉 Nina→＋ 加人] [5→4] [小茉 LV5 ×→] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRmD	cmujyiynf163/serve	24x24	screen: [5→4] [LV5 × Nina→] [上菜＋結帳＋收桌→結帳＋收桌] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRmD	cmujzz8d7273/serve	24x24	screen: [5→4] [LV5 × 阿哲→] [全部都做・Lounge→帶位＋點餐＋結帳＋收桌・Lounge] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRmD	cmuqb7vtw884/serve	24x24	screen: [5→4] [LV5 × Momo→] [帶位＋點餐＋上菜＋結帳・Lounge→帶位＋點餐＋結帳・Lounge] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRmD	cmuqb82m4269/serve	24x24	screen: [5→4] [LV5 × 小威→] [帶位＋點餐＋上菜＋結帳→帶位＋點餐＋結帳] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	＋ 加人	bdOpen	serve	70x30	screen: [＋ 加人→收起 Kai 安安]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRmD	cmuikqc4s442/check	24x24	screen: [收起 Kai 安安→＋ 加人] [5→4] [小茉 LV5 ×→] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRmD	cmujyiynf163/check	24x24	screen: [5→4] [LV5 × Nina→] [上菜＋結帳＋收桌→上菜＋收桌] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRmD	cmujzz8d7273/check	24x24	screen: [5→4] [LV5 × 阿哲→] [全部都做・Lounge→帶位＋點餐＋上菜＋收桌・Lounge] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRmD	cmuqb7vtw884/check	24x24	screen: [5→4] [LV5 × Momo→] [帶位＋點餐＋上菜＋結帳・Lounge→帶位＋點餐＋上菜・Lounge] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRmD	cmuqb82m4269/check	24x24	screen: [5→4] [LV5 × 小威→] [帶位＋點餐＋上菜＋結帳→帶位＋點餐＋上菜] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	＋ 加人	bdOpen	check	70x30	screen: [＋ 加人→收起 Kai 安安]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRmD	cmujyiynf163/clean	24x24	screen: [收起 Kai 安安→＋ 加人] [5→4] [Nina LV5 ×→] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRmD	cmujzz8d7273/clean	24x24	screen: [5→4] [阿哲 LV5 ×→] [全部都做・Lounge→帶位＋點餐＋上菜＋結帳・Lounge] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	＋ 加人	bdOpen	clean	70x30	screen: [＋ 加人→收起 小茉 Kai 安安 Momo 小威]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRmD	cmujzz8d7273/lounge	24x24	screen: [收起 小茉 Kai 安安 Momo 小威→＋ 加人] [3→2] [阿哲 LV5 ×→] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRmD	cmuqa8fo0621/lounge	24x24	screen: [3→2] [LV5 × 安安→] [帶位＋點餐・Lounge→帶位＋點餐] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	×	bdRmD	cmuqb7vtw884/lounge	24x24	screen: [3→2] [LV5 × Momo→] [帶位＋點餐＋上菜＋結帳・Lounge→帶位＋點餐＋上菜＋結帳] | S: crew	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	staff	＋ 加人	bdOpen	lounge	70x30	screen: [＋ 加人→收起 小茉 Kai Nina 小威]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	sig	重新設計 $800	sigOpen		111x31	sub None→sig | screen: [DAY 92 · 打烊後 升級 Jill 的餐廳 看店裡 ? 目前現金 $1,179,146 評分 4.7 明日預估基本→JILL'S SIGNATURE DISH 設計招牌菜 取消] [$940→售價 $610] [奶油薯泥・干貝・檸檬奶油・烤蔬菜 第三版 · 食用花與金箔 招牌菜永遠在菜單最上方，有些客人會專程為它而來。賣得夠多，J→在爐台用平底鍋煎，看準時機起鍋 主食 香料米飯+40 奶油薯泥+50 手工寬麵+60 酸種麵包+40 蛋白質 鴨胸+16]	有反應
+升級餐廳（商店）	day92 Day 92 打烊後	sig	重新設計 $800	sigdOpen		111x31	sub None→sig | screen: [DAY 92 · 打烊後 升級 Jill 的餐廳 看店裡 ? 目前現金 $1,179,146 評分 4.7 明日預估基本→] [★ Jill's 檸檬奶油干貝 $940 · 奶油薯泥・干貝・檸檬奶油・烤蔬菜 第三版 · 食用花與金箔 招牌菜永遠在菜→DESSERT 設計招牌甜點 取消] [$360→售價 $320]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	home	看店裡	peek		53x34	peek: 回到選單 › | tabs: 店門口 主廳 側廳 Lounge 廚房 房間 | screenHidden False→True | screen: [DAY 74 · 打烊後 升級 Jill 的餐廳 看店裡 ? 目前現金 $208,704 評分 4.5 明日預估基本備料→]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	home	?	guide		34x34	sub None→guide | screen: [DAY 74 · 打烊後 升級→JILL'S KITCHEN 小小店主手冊 關閉 點一張卡片展開。 🍳 開店與料理 每天 17:00 開店、21:30 ] [的餐廳 看店裡 ? 目前現金 $208,704 評分 4.5 明日預估基本備料 約 $24,542 建議保留 約 $28→在出菜口倒好、端過去 「酒水成本」照杯算，結算也另外列「晚餐桌上配的酒」。 Lounge 開了以後，晚餐桌上的酒改由調酒] [貓咪生活 廚房設備 菜單研發 員工 招牌菜 餐桌 9 / 9 張 多一張桌子，同時就能多接待一組客人。其中 6 張是四人→大家在談什麼、Jil	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	home	餐廳日誌	book		34x34	sub None→book | bookTab reviews→front | screen: [→JILL'S KITCHEN JOURNAL 餐廳日誌 關閉 總覽 故事 餐廳 社群 評價 熟客 VIP 話語 相簿 店] [打烊後 升級 Jill 的餐廳 看店裡 ? 目前現金 $208,704 評分 4.5 明日預估基本備料 約 $24,54→20:07 「沙發那一桌」 Lounge 的沙發那一桌，3 個人，聊得很慢。 珍藏 DAY 74 · 17:11 「不怕] [9 張 多一張桌子，同時就能多接待一組客人。其中 6 張是四人卡座。 9 張是 JILL 的極限。想接待更多人：沙發卡座→78	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	home	設定	settings		34x34	sub None→settings | screen: [DAY→設定・存檔 背景音樂 音效 ✓ 本機自動儲存 最後儲存：DAY] [打烊後 升級 Jill 的餐廳 看店裡 ? 目前現金 $208,704 評分 4.5 明日預估基本備料 約 $24,54→23:04 每天打烊、購買升級後都會自動存檔。 存檔 備份與移轉 換手機、換瀏覽器、以防萬一：把進度存成一個檔案，之後再]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	home	家具與佈置	tab	home	91x32	NOTHING VISIBLE	已在這個分頁（預期無變化）
+升級餐廳（商店）	day74→Day 74 打烊後	home	店舖工程	tab	works	78x32	shopTab home→works | screen: [餐桌 9 / 9 張 多一張桌子，同時就能多接待一組客人。其中 6 張是四人卡座。 9 張是→] [的極限。想接待更多人：沙發卡座、候位區、動線。 側廳的桌子 9 / 9 張 側廳可以放 9 張桌，三排三張；靠後牆那一排→門口的招牌上，只剩下一個名字。這就是 Jill 的餐廳——不會再更大了，但還可以更好。 大工程 會把店變成另一個樣子的東] [溫暖木頭 現在 奶油白 $2,500 夜色 $3,500 淡淡的綠 $3,000 簡單的灰 $3,000 裝潢 植物、燈→門口多一排椅子：客滿時多等 2 組客人，少一點失望離開的人。 已達最高	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	home	社群與宣傳	tab	social	91x32	shopTab home→social | screen: [餐桌 9 / 9 張 多一張桌子，同時就能多接待一組客人。其中 6 張是四人卡座。 9 張是 JILL 的極限。想接待更→社群 客人自己會發；Jill 偶爾也發一則——只能是真的發生過的事。發了以後幾天，會有人為了那件事來。 最近大家在說 🍝] [親自挑的畫。 氛圍 +1 已擁有全部 新椅子 坐得舒服，客人耐心 +8%。 氛圍 +1 已擁有全部 手織地毯 已擁有 讓→今天要發什麼？ 店裡的一天 膝上的重量 發這則 最近的貼文 讚會一直慢慢多 阿凱 🍝 松露蘑菇牛肉堡，推。 ♥ 11 D]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	home	貓咪生活	tab	catlife	78x32	shopTab home→catlife | screen: [餐桌 9 / 9 張 多一張桌子，同時就能多接待一組客人。其中 6 張是四人卡座。 9 張是 JILL 的極限。想接待更→貓咪生活 買給牠們的。誰會用、怎麼用，牠們自己決定。用過的會記在相簿裡。 基本一個角落就夠了的東西。 紙箱 已擺好 就是] [組。 裝好了 門口花箱 兩個花箱，門口有了顏色。客流 +2%。 裝好了 門口串燈 沿著屋簷掛一排小燈，天黑以後整條街最溫→個位子，寶寶和包包不用再搶。 側廳的大窗一階一階加上去，前一階會留著。 窗邊貓家具 多貓觀景平台 窗邊貓架 → 軟墊窗台]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	home	廚房設備	tab	kitchen	78x32	shopTab home→kitchen | screen: [餐桌 9 / 9 張 多一張桌子，同時就能多接待一組客人。其中 6 張是四人卡座。 9 張是 JILL 的極限。想接待更→爐灶 LV5 7 口爐・加熱速度 ×1.55（擴建後的大爐） 已達最高等級 平底鍋 LV5 煎類料理速度 +32%・Pe] [的家具 放在 Lounge 裡的東西。 Lounge 大電視 拱門和吧台之間的牆邊放一台大電視。有比賽的晚上（大約一個禮→的客人。烤爐要有人顧——廚師可以再多聘 1 位，在「工作分配」把一位廚師排到「披薩烤爐」；沒有人顧的晚上，Jill 自己]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	home	菜單研發	tab	menu	78x32	shopTab home→menu | screen: [餐桌 9 / 9 張 多一張桌子，同時就能多接待一組客人。其中 6 張是四人卡座。 9 張是 JILL 的極限。想接待更→料理研發 每種食材都標著它的角色和味道。選 2–3 種試做（每次 $150）：組合對了就是新料理；方向對了會累積研究進度] [/→星。 黃金蛋炒飯 ★★★ 目前售價 $155 已滿星 拿鐵咖啡 ★★★ 目前售價 $115 已滿星 番茄義大利麵 ★★★] [張 陽傘下的雙人桌。下雨的日子沒有人想坐外面。 人行道放不下更多了 店裡的樣子 地板、牆和吧台的顏色。買過的隨時可以換回→種食材，主角是「披薩麵團」 需要先購買披薩	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	home	員工	tab	staff	52x32	shopTab home→staff | screen: [餐桌 9 / 9 張 多一張桌子，同時就能多接待一組客人。其中 6 張是四人卡座。 9 張是 JILL 的極限。想接待更→餐廳員工：廚師 6/6・服務生 6/6・清潔員 2/2・Lounge 員工 5/5・每日薪資 $29,360。廚師、服務] [/→道 小林師傅 LV5 × ＋ 加人 冷盤台 1/2・今天] [張 陽傘下的雙人桌。下雨的日子沒有人想坐外面。 人行道放不下更多了 店裡的樣子 地板、牆和吧台的顏色。買過的隨時可以換回→道 Marco LV5 × ＋ 加人 咖啡吧 2/4・今天 3 道 阿德師傅 LV5 × 阿珠姐 LV5	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	home	招牌菜	tab	sig	65x32	shopTab home→sig | screen: [餐桌 9 / 9 張 多一張桌子，同時就能多接待一組客人。其中 6 張是四人卡座。 9 張是 JILL 的極限。想接待更→★ CHEF JILL'S SIGNATURE ★ Jill's 檸檬奶油干貝 $940 · 奶油薯泥・干貝・檸檬奶油・]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	home	原本的樣子 已擁有	theme	classic	106x101	screen: [→現在 溫暖木頭] [溫暖木頭 現在→] | S: theme	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	home	溫暖木頭 現在	theme	wood	106x101	NOTHING VISIBLE	目前使用中的主題（預期無變化）
+升級餐廳（商店）	day74→Day 74 打烊後	home	奶油白 $2,500	theme	cream	106x101	money 208704→206204 (-2500) | toast: 奶油白：換好了 | screen: [$208,704→$206,204] [→已擁有 奶油白] [奶油白 $2,500→] | S: money,theme,themes	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	home	夜色 $3,500	theme	evening	106x99	money 208704→205204 (-3500) | toast: 夜色：換好了 | screen: [$208,704→$205,204] [現在→已擁有] [$3,500→現在] | S: money,theme,themes	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	home	淡淡的綠 $3,000	theme	sage	106x99	money 208704→205704 (-3000) | toast: 淡淡的綠：換好了 | screen: [$208,704→$205,704] [現在→已擁有] [$3,000→現在] | S: money,theme,themes	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	home	簡單的灰 $3,000	theme	modern	106x99	money 208704→205704 (-3000) | toast: 簡單的灰：換好了 | screen: [$208,704→$205,704] [現在→已擁有] [$3,000→現在] | S: money,theme,themes	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	home	購買 $200,000	buyLgFurn	tv	116x31	money 208704→8704 (-200000) | reveal: 裝好了 Lounge 大電視 電視裝好了。有比賽的晚上會開。 Jill：「先說好，不准太吵。」 去看看 › 繼續買東西 | S: money,newRooms,lgFurn	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	home	換上這一套	seasonUse	spring	85x31	screen: [→擺著] [換上這一套→收起來] [擺著→] | S: seasonOn,seasonDay	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	home	換上這一套	seasonUse	summer	85x31	screen: [→擺著] [→收起來 秋：楓葉 每張桌子一枝紅楓。] [秋：楓葉 擺著 每張桌子一枝紅楓。 收起來→] | S: seasonOn,seasonDay	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	home	收起來	seasonUse		59x31	screen: [38：客人耐心與滿意度都會提升。買完上方就能看到店裡變化。→37：客人耐心與滿意度都會提升。買完上方就能看到店裡變化。] [擺著→] [收起來→換上這一套] | S: seasonOn	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	home	購買 $30,000	buySeason	winter	107x31	money 208704→178704 (-30000) | toast: 冬：松枝與紅果：擺上了。 | screen: [$208,704→$178,704] [→每張桌子一枝紅楓。 換上這一套 冬：松枝與紅果] [每張桌子一枝紅楓。→每張桌子一小束松枝和紅果。] | S: money,seasons,seasonOn,seasonDay	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	home	換顏色	extStyle	awning	59x31	screen: [深藍白→紅白] | S: ext	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	home	準備 DAY 75	nextDay		358x51	phase shop→prep | main shop→prep | day 74→75 | dlg: 晴天。客人會多，桌子先擦一遍。熟客差不多這個時間會來。 | screen: [74 · 打烊後 升級 Jill 的餐廳→75 · 開店前 JILL] [目前現金 $208,704 評分 4.5 明日預估基本備料 約 $24,542 建議保留 約 $28,323 家具與佈置→晴朗 · 預計約 102 位客人 適合出門吃晚餐的好天氣。 店裡最近很紅，人潮會多一些。 今天可能要多準備：Jill's] [貓咪生活 廚房設備 菜單研發 員工→大家在談：甜點 今天可以發 2 則 › 今日事件：今天是情人	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	works	開工 $120,000	buyProject	pizzaoven	116x31	money 208704→88704 (-120000) | reveal: 完工 披薩烤爐 烤爐點起來了。第一個晚上，整間廚房都是烤餅皮的味道。 Jill：「……先烤一個我們自己吃。」 阿拓：「我來顧。」 現在可以 菜單研發：酒吧披薩 廚師 +1（顧烤爐） 去看看 › 繼續買東西 | S: money,rooms,newRooms,reveal	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	works	排在明晚	cnPlan		72x31	toast: 明晚是主廚之夜。 | screen: [排在明晚→已排：DAY 75（松露薯條、Jill's 檸檬奶油干貝、Jill's 莓果奶酪） 取消] | S: cn	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	social	發這則	jillPost	cats:p73_lap_ybpimb	59x31	toast: Jill 發了一則：樾樾跳上了 Jill 的膝蓋。 | screen: [這幾天大家在談：🍰 甜點（Jill→這幾天大家在談：🐈 貓咪（Jill] [76）→77）] [膝上的重量→沙發那一桌] | S: dayLog,story,social	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	social	看更早的貼文（共 40 則）	postsAll		334x31	screen: [最近的貼文→所有貼文] [看更早的貼文（共 40 則）→佳佳 🍝 海膽燉飯，推。 ♥ 16 DAY 73 Amy 🍸 吃完可以留下來坐。 ♥ 14 DAY 73 Jill's ]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	kitchen	開工 $120,000	buyProject	pizzaoven	116x31	money 208704→88704 (-120000) | reveal: 完工 披薩烤爐 烤爐點起來了。第一個晚上，整間廚房都是烤餅皮的味道。 Jill：「……先烤一個我們自己吃。」 阿拓：「我來顧。」 現在可以 菜單研發：酒吧披薩 廚師 +1（顧烤爐） 去看看 › 繼續買東西 | S: money,rooms,newRooms,reveal	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	kitchen	停止合作	contractEnd	farm	72x31	toast: 停止合作了。 | screen: [合作中→] [停止合作→簽約 $40,000] | S: contracts	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	kitchen	停止合作	contractEnd	port	72x31	toast: 停止合作了。 | screen: [合作中→] [$5,400，扣掉契作費→$5,180，扣掉契作費] [$4,000。 停止合作→$3,780。 簽約 $60,000] | S: contracts	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	kitchen	簽約 $60,000	contractSign	ranch	107x31	money 208704→148704 (-60000) | toast: 牧場直送：簽好了，明天開始送。 | screen: [$208,704→$148,704] [→合作中] [$8,190，扣掉契作費→$8,150，扣掉契作費] | S: money,contracts	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	試做 $150	labTry		85x31	DISABLED ctx: 料理研發 每種食材都標著它的角色和味道。選 2–3 種試做（每次 $150）：組合對了就是新料理；方向對了會累積研究進度，三次就能完成；不對也會告訴你為什麼。 普通試作品 可以吃，但還不像一道能上菜單的料理。 義大利麵比較適合烤箱的料理，換一種配料或醬汁試試。 主體 雞蛋 $ 白飯 $ 義大利麵 $ 牛肉排 $$ 薯條	disabled（見 ctx 有沒有寫原因）
+升級餐廳（商店）	day74→Day 74 打烊後	menu	雞蛋 $	labPick	egg	79x32	screen: [點食材看它的特性；選 2–3 種再試做。主角＋配料或醬汁，是最常見的組合。→雞蛋 主體 清爽↑ 濃郁↑ 口感↑ · $ 整體味道：清爽↑ 濃郁↑ 口感↑ 可能適合：爐台 · 主餐] [$150還沒選→$150已選 1/3]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	白飯 $	labPick	rice	79x32	screen: [整體味道：清爽↑→白飯 主體 清爽↑ 口感↑↑ · $ 相性：雞蛋×白飯 很好 整體味道：清爽↑↑] [口感↑→口感↑↑↑] [1/3→2/3]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	義大利麵 $	labPick	noodle	105x32	screen: [→義大利麵 主體 清爽↑ 口感↑↑ · $] [很好→很好雞蛋×義大利麵 不合白飯×義大利麵 不合] [2/3→3/3]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	牛肉排 $$	labPick	patty	99x32	toast: 最多選 3 種食材	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	薯條 $	labPick	potato	79x32	NOTHING VISIBLE	同一個「最多選 3 種食材」toast 還在畫面上，不重複（非死按鈕）
+升級餐廳（商店）	day74→Day 74 打烊後	menu	南瓜塊 $	labPick	pumpkin	92x32	toast: 最多選 3 種食材	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	時蔬 $	labPick	vegmix	79x32	NOTHING VISIBLE (but S changed) | S: gearUse,gearN	同一個「最多選 3 種食材」toast 還在畫面上，不重複（非死按鈕）
+升級餐廳（商店）	day74→Day 74 打烊後	menu	鴨胸 $$$	labPick	duck	93x32	screen: [點食材看它的特性；選 2–3 種再試做。主角＋配料或醬汁，是最常見的組合。→鴨胸 主體 濃郁↑↑↑ 香氣↑ 口感↑↑ · $$$ 整體味道：濃郁↑↑↑ 香氣↑ 口感↑↑ 可能適合：爐台 · 主餐] [$150還沒選→$150已選 1/3]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	雞腿 $$	labPick	chicken	86x32	screen: [整體味道：濃郁↑↑↑→雞腿 主體 濃郁↑↑] [可能適合：爐台→· $$ 相性：鴨胸×雞腿 不合 整體味道：濃郁↑↑↑ 香氣↑↑ 口感↑↑↑ 可能適合：爐台／烤箱] [1/3→2/3]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	肋眼 $$$	labPick	steak	93x32	screen: [→肋眼 主體 濃郁↑↑↑ 香氣↑ 口感↑↑↑ · $$$] [→不合鴨胸×肋眼 不合雞腿×肋眼] [2/3→3/3]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	鮭魚 $$$	labPick	salmon	93x32	toast: 最多選 3 種食材	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	燉飯米 $$	labPick	arborio	99x32	NOTHING VISIBLE	同一個「最多選 3 種食材」toast 還在畫面上，不重複（非死按鈕）
+升級餐廳（商店）	day74→Day 74 打烊後	menu	生火腿 $$$	labPick	prosciutto	106x32	toast: 最多選 3 種食材	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	鮮蝦 $$	labPick	shrimp	86x32	NOTHING VISIBLE (but S changed) | S: gearUse,gearN	同一個「最多選 3 種食材」toast 還在畫面上，不重複（非死按鈕）
+升級餐廳（商店）	day74→Day 74 打烊後	menu	漢堡麵包 $	labPick	bun	105x32	screen: [點食材看它的特性；選 2–3 種再試做。主角＋配料或醬汁，是最常見的組合。→漢堡麵包 配料 濃郁↑ 口感↑↑ · $ 整體味道：濃郁↑ 口感↑↑ 可能適合：爐台 · 主餐] [$150還沒選→$150已選 1/3]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	起司片 $	labPick	cheese	92x32	screen: [整體味道：濃郁↑ 口感↑↑ 可能適合：爐台 · 主餐→起司片 配料 濃郁↑↑↑ 香氣↑ 口感↑ · $ 相性：漢堡麵包×起司片 很好 整體味道：濃郁↑↑↑ 香氣↑ 口感↑↑↑] [1/3→2/3]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	蘆筍 $$	labPick	asparagus	86x32	screen: [→蘆筍 配料 清爽↑↑ 香氣↑ 口感↑↑ · $$] [很好 整體味道：濃郁↑↑↑→很好漢堡麵包×蘆筍 可以起司片×蘆筍 可以 整體味道：清爽↑ 濃郁↑↑] [前菜→主餐]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	無花果 $$	labPick	fig	99x32	toast: 最多選 3 種食材	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	蒜片 $	labPick	garlic	79x32	NOTHING VISIBLE	同一個「最多選 3 種食材」toast 還在畫面上，不重複（非死按鈕）
+升級餐廳（商店）	day74→Day 74 打烊後	menu	鹽與胡椒 $	labPick	salt	105x32	toast: 最多選 3 種食材	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	橄欖油 $	labPick	oil	92x32	NOTHING VISIBLE (but S changed) | S: gearUse,gearN	同一個「最多選 3 種食材」toast 還在畫面上，不重複（非死按鈕）
+升級餐廳（商店）	day74→Day 74 打烊後	menu	香草鹽 $	labPick	herbs	92x32	screen: [點食材看它的特性；選 2–3 種再試做。主角＋配料或醬汁，是最常見的組合。→香草鹽 調味 清爽↑ 香氣↑↑↑ · $ 整體味道：清爽↑ 香氣↑↑↑ 可能適合：烤箱 · 主餐] [$150還沒選→$150已選 1/3]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	番茄醬汁 $	labPick	tomato	105x32	screen: [整體味道：清爽↑→番茄醬汁 醬汁 清爽↑↑ 濃郁↑ 香氣↑ · $ 相性：香草鹽×番茄醬汁 不合 整體味道：清爽↑↑↑ 濃郁↑] [可能適合：烤箱→可能適合：披薩烤爐／烤箱] [1/3→2/3]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	高湯 $	labPick	stock	79x32	screen: [→高湯 醬汁 濃郁↑↑ 香氣↑↑ · $] [→不合香草鹽×高湯 不合番茄醬汁×高湯] [整體味道：清爽↑↑↑ 濃郁↑→整體味道：清爽↑↑ 濃郁↑↑]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	鮮奶油 $	labPick	cream	92x32	toast: 最多選 3 種食材	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	奶油 $	labPick	butter	79x32	NOTHING VISIBLE	同一個「最多選 3 種食材」toast 還在畫面上，不重複（非死按鈕）
+升級餐廳（商店）	day74→Day 74 打烊後	menu	橙醬 $$	labPick	orange	86x32	toast: 最多選 3 種食材	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	白酒 $$	labPick	wine	86x32	NOTHING VISIBLE (but S changed) | S: gearUse,gearN	同一個「最多選 3 種食材」toast 還在畫面上，不重複（非死按鈕）
+升級餐廳（商店）	day74→Day 74 打烊後	menu	巴薩米克醋 $$	labPick	balsamic	125x32	screen: [點食材看它的特性；選 2–3 種再試做。主角＋配料或醬汁，是最常見的組合。→巴薩米克醋 醬汁 清爽↑↑ 香氣↑↑ · $$ 整體味道：清爽↑↑ 香氣↑↑ 可能適合：冷盤台 · 前菜] [$150還沒選→$150已選 1/3]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	咖啡豆 $	labPick	beans	92x32	screen: [→咖啡豆 飲品基底 濃郁↑↑ 香氣↑↑↑ · $ 相性：巴薩米克醋×咖啡豆 不合] [香氣↑↑ 可能適合：冷盤台→濃郁↑↑ 香氣↑↑↑ 可能適合：冷盤台／咖啡吧] [1/3→2/3]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	紅茶葉 $	labPick	tea	92x32	screen: [→紅茶葉 飲品基底 清爽↑↑ 香氣↑↑ · $] [→不合巴薩米克醋×紅茶葉 不合咖啡豆×紅茶葉] [濃郁↑↑→濃郁↑]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	氣泡水 $	labPick	soda	92x32	toast: 最多選 3 種食材	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	牛奶 $	labPick	milk	79x32	NOTHING VISIBLE	同一個「最多選 3 種食材」toast 還在畫面上，不重複（非死按鈕）
+升級餐廳（商店）	day74→Day 74 打烊後	menu	檸檬片 $	labPick	lemon	92x32	toast: 最多選 3 種食材	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	冰塊 $	labPick	ice	79x32	NOTHING VISIBLE (but S changed) | S: gearUse,gearN	同一個「最多選 3 種食材」toast 還在畫面上，不重複（非死按鈕）
+升級餐廳（商店）	day74→Day 74 打烊後	menu	水果片 $	labPick	fruit	92x32	screen: [點食材看它的特性；選 2–3 種再試做。主角＋配料或醬汁，是最常見的組合。→水果片 飲品配料 清爽↑↑ 香氣↑↑ 口感↑ · $ 整體味道：清爽↑↑ 香氣↑↑ 口感↑ 可能適合：咖啡吧 · 飲料] [$150還沒選→$150已選 1/3]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	布丁液 $	labPick	custard	92x32	screen: [→布丁液 甜點基底 濃郁↑↑ 香氣↑ 口感↑↑ · $ 相性：水果片×布丁液 不合] [香氣↑↑ 口感↑ 可能適合：咖啡吧→濃郁↑↑ 香氣↑↑↑ 口感↑↑↑ 可能適合：咖啡吧／冷盤台] [1/3→2/3]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	手指餅乾 $	labPick	ladyfinger	105x32	screen: [→手指餅乾 甜點基底 濃郁↑ 香氣↑ 口感↑↑ · $] [→不合水果片×手指餅乾 不合布丁液×手指餅乾] [整體味道：清爽↑↑→整體味道：清爽↑]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	乳酪糊 $$	labPick	cheesebatter	99x32	toast: 最多選 3 種食材	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	蛋白霜 $	labPick	whites	92x32	NOTHING VISIBLE	同一個「最多選 3 種食材」toast 還在畫面上，不重複（非死按鈕）
+升級餐廳（商店）	day74→Day 74 打烊後	menu	焦糖 $	labPick	caramel	79x32	toast: 最多選 3 種食材	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	馬斯卡彭 $$	labPick	mascarpone	112x32	NOTHING VISIBLE (but S changed) | S: gearUse,gearN	同一個「最多選 3 種食材」toast 還在畫面上，不重複（非死按鈕）
+升級餐廳（商店）	day74→Day 74 打烊後	menu	可可粉 $	labPick	cocoa	92x32	screen: [點食材看它的特性；選 2–3 種再試做。主角＋配料或醬汁，是最常見的組合。→可可粉 甜點配料 濃郁↑ 香氣↑↑↑ · $ 整體味道：濃郁↑ 香氣↑↑↑ 可能適合：冷盤台 · 甜點] [$150還沒選→$150已選 1/3]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	莓果 $	labPick	berries	79x32	screen: [整體味道：濃郁↑→莓果 甜點配料 清爽↑↑ 香氣↑↑ 口感↑ · $ 相性：可可粉×莓果 可以 整體味道：清爽↑↑ 濃郁↑] [→口感↑] [1/3→2/3]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	menu	糖粉 $	labPick	sugar	79x32	screen: [→糖粉 甜點配料 濃郁↑ 香氣↑ · $] [→可以可可粉×糖粉 可以莓果×糖粉] [整體味道：清爽↑↑→整體味道：清爽↑]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRm	cmujzynxy994	24x24	toast: Hugo 離開爐台，待命中 | screen: [3/7・今天→2/7・今天] [Hugo LV5 ×→] [→待命 沒有安排，薪水照付 Hugo 廚師] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRm	cmun0rulo108	24x24	toast: 阿勇 離開爐台，待命中 | screen: [3/7・今天→2/7・今天] [LV5 × 阿勇→] [→待命 沒有安排，薪水照付 阿勇 廚師] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRm	cmuqa8ed9818	24x24	toast: 阿拓 離開爐台，待命中 | screen: [3/7・今天→2/7・今天] [LV5 × 阿拓→] [→待命 沒有安排，薪水照付 阿拓 廚師] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	＋ 加人	bdOpen		70x30	screen: [＋ 加人→收起 阿德師傅 從咖啡吧移過來 Marco 從冷盤台移過來 小林師傅 從烤箱移過來 阿珠姐 從咖啡吧移過來]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRm	cmuir5rsn47	24x24	toast: 小林師傅 離開烤箱，待命中 | screen: [收起 阿德師傅 從咖啡吧移過來 Marco 從冷盤台移過來 小林師傅 從烤箱移過來 阿珠姐 從咖啡吧移過來→＋ 加人] [1/2・今天→0/2・今天] [小林師傅 LV5 ×→] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRm	cmuioxn5652	24x24	toast: Marco 離開冷盤台，待命中 | screen: [收起 阿德師傅 從咖啡吧移過來 Marco 從冷盤台移過來 阿珠姐 從咖啡吧移過來 Hugo 從爐台移過來 阿勇 從爐台→＋ 加人] [1/2・今天→0/2・今天] [Marco LV5 ×→] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRm	cmuije1ik139	24x24	toast: 阿德師傅 離開咖啡吧，待命中 | screen: [收起 阿德師傅 從咖啡吧移過來 小林師傅 從烤箱移過來 阿珠姐 從咖啡吧移過來 Hugo 從爐台移過來 阿勇 從爐台移過→＋ 加人] [2/4・今天→1/4・今天] [阿德師傅 LV5 ×→] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRm	cmuivk53067	24x24	toast: 阿珠姐 離開咖啡吧，待命中 | screen: [2/4・今天→1/4・今天] [LV5 × 阿珠姐→] [→待命 沒有安排，薪水照付 阿珠姐 廚師] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRm	cmupdy1ix96	24x24	toast: Evan 離開Lounge 吧台，待命中 | screen: [收起 Marco 從冷盤台移過來 小林師傅 從烤箱移過來 Hugo 從爐台移過來 阿勇 從爐台移過來 阿拓 從爐台移過來→＋ 加人] [2/2・今晚開放 Evan LV5 ×→1/2・今晚開放] [已滿→＋ 加人] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRm	cmupe3zxq227	24x24	toast: 沈晴 離開Lounge 吧台，待命中 | screen: [2/2・今晚開放→1/2・今晚開放] [沈晴 LV5 × 已滿→＋ 加人] [→待命 沒有安排，薪水照付 沈晴 調酒師] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRmD	cmujyhgtx171/seat	24x24	screen: [5→4] [Kai LV5 ×→] [Kai 帶位＋點餐 反應 0.5 秒→] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRmD	cmujzz8d7273/seat	24x24	screen: [5→4] [LV5 × 阿哲→] [阿哲 全部都做・Lounge 反應 0.5 秒→] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRmD	cmuqa8fo0621/seat	24x24	screen: [5→4] [LV5 × 安安→] [安安 帶位＋點餐・Lounge 反應 0.5 秒→] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRmD	cmuqb7vtw884/seat	24x24	screen: [5→4] [LV5 × Momo→] [Momo 帶位＋點餐＋上菜＋結帳・Lounge 反應 0.5 秒→] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRmD	cmuqb82m4269/seat	24x24	screen: [5→4] [LV5 × 小威→] [帶位＋點餐＋上菜＋結帳→點餐＋上菜＋結帳] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	＋ 加人	bdOpen	seat	70x30	screen: [＋ 加人→收起 小茉 Nina]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRmD	cmujyhgtx171/order	24x24	screen: [收起 小茉 Nina→＋ 加人] [5→4] [Kai LV5 ×→] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRmD	cmujzz8d7273/order	24x24	screen: [5→4] [LV5 × 阿哲→] [阿哲 全部都做・Lounge 反應 0.5 秒→] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRmD	cmuqa8fo0621/order	24x24	screen: [5→4] [LV5 × 安安→] [安安 帶位＋點餐・Lounge 反應 0.5 秒→] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRmD	cmuqb7vtw884/order	24x24	screen: [5→4] [LV5 × Momo→] [Momo 帶位＋點餐＋上菜＋結帳・Lounge 反應 0.5 秒→] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRmD	cmuqb82m4269/order	24x24	screen: [5→4] [LV5 × 小威→] [帶位＋點餐＋上菜＋結帳→帶位＋上菜＋結帳] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	＋ 加人	bdOpen	order	70x30	screen: [＋ 加人→收起 小茉 Nina]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRmD	cmuikqc4s442/serve	24x24	screen: [收起 小茉 Nina→＋ 加人] [5→4] [小茉 LV5 ×→] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRmD	cmujyiynf163/serve	24x24	screen: [5→4] [LV5 × Nina→] [上菜＋結帳＋收桌→結帳＋收桌] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRmD	cmujzz8d7273/serve	24x24	screen: [5→4] [LV5 × 阿哲→] [全部都做・Lounge→帶位＋點餐＋結帳＋收桌・Lounge] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRmD	cmuqb7vtw884/serve	24x24	screen: [5→4] [LV5 × Momo→] [帶位＋點餐＋上菜＋結帳・Lounge→帶位＋點餐＋結帳・Lounge] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRmD	cmuqb82m4269/serve	24x24	screen: [5→4] [LV5 × 小威→] [帶位＋點餐＋上菜＋結帳→帶位＋點餐＋結帳] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	＋ 加人	bdOpen	serve	70x30	screen: [＋ 加人→收起 Kai 安安]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRmD	cmuikqc4s442/check	24x24	screen: [收起 Kai 安安→＋ 加人] [5→4] [小茉 LV5 ×→] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRmD	cmujyiynf163/check	24x24	screen: [5→4] [LV5 × Nina→] [上菜＋結帳＋收桌→上菜＋收桌] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRmD	cmujzz8d7273/check	24x24	screen: [5→4] [LV5 × 阿哲→] [全部都做・Lounge→帶位＋點餐＋上菜＋收桌・Lounge] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRmD	cmuqb7vtw884/check	24x24	screen: [5→4] [LV5 × Momo→] [帶位＋點餐＋上菜＋結帳・Lounge→帶位＋點餐＋上菜・Lounge] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRmD	cmuqb82m4269/check	24x24	screen: [5→4] [LV5 × 小威→] [帶位＋點餐＋上菜＋結帳→帶位＋點餐＋上菜] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	＋ 加人	bdOpen	check	70x30	screen: [＋ 加人→收起 Kai 安安]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRmD	cmujyiynf163/clean	24x24	screen: [收起 Kai 安安→＋ 加人] [5→4] [Nina LV5 ×→] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRmD	cmujzz8d7273/clean	24x24	screen: [5→4] [阿哲 LV5 ×→] [全部都做・Lounge→帶位＋點餐＋上菜＋結帳・Lounge] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	＋ 加人	bdOpen	clean	70x30	screen: [＋ 加人→收起 小茉 Kai 安安 Momo 小威]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRmD	cmujzz8d7273/lounge	24x24	screen: [收起 小茉 Kai 安安 Momo 小威→＋ 加人] [3→2] [阿哲 LV5 ×→] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRmD	cmuqa8fo0621/lounge	24x24	screen: [3→2] [LV5 × 安安→] [帶位＋點餐・Lounge→帶位＋點餐] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	×	bdRmD	cmuqb7vtw884/lounge	24x24	screen: [3→2] [LV5 × Momo→] [帶位＋點餐＋上菜＋結帳・Lounge→帶位＋點餐＋上菜＋結帳] | S: crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	＋ 加人	bdOpen	lounge	70x30	screen: [＋ 加人→收起 小茉 Kai Nina 小威]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	上品酒課 $12,000	wineCourse	cmujyhgtx171	133x31	money 208704→196704 (-12000) | toast: Kai 上完品酒課了。 | screen: [$208,704→$196,704] [以前就在）・熟悉：主廳、側廳・酒：還不熟→以前就在）・熟悉：主廳、側廳・酒：自在] [上品酒課 $12,000→] | S: money,crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	staff	上品酒課 $12,000	wineCourse	cmuqa8fo0621	133x31	money 208704→196704 (-12000) | toast: 安安 上完品酒課了。 | screen: [$208,704→$196,704] [天・熟悉：主廳、側廳、Lounge・酒：還不熟→天・熟悉：主廳、側廳、Lounge・酒：自在] [上品酒課 $12,000→] | S: money,crew	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	sig	重新設計 $800	sigOpen		111x31	sub None→sig | screen: [DAY 74 · 打烊後 升級 Jill 的餐廳 看店裡 ? 目前現金 $208,704 評分 4.5 明日預估基本備料→JILL'S SIGNATURE DISH 設計招牌菜 取消] [$940→售價 $610] [奶油薯泥・干貝・檸檬奶油・烤蔬菜 第三版 · 食用花與金箔 招牌菜永遠在菜單最上方，有些客人會專程為它而來。賣得夠多，J→在爐台用平底鍋煎，看準時機起鍋 主食 香料米飯+40 奶油薯泥+50 手工寬麵+60 酸種麵包+40 蛋白質 鴨胸+16]	有反應
+升級餐廳（商店）	day74→Day 74 打烊後	sig	重新設計 $800	sigdOpen		111x31	sub None→sig | screen: [DAY 74 · 打烊後 升級 Jill 的餐廳 看店裡 ? 目前現金 $208,704 評分 4.5 明日預估基本備料→] [★ Jill's 檸檬奶油干貝 $940 · 奶油薯泥・干貝・檸檬奶油・烤蔬菜 第三版 · 食用花與金箔 招牌菜永遠在菜→DESSERT 設計招牌甜點 取消] [$360→售價 $320]	有反應
+開店前	day74→Day 75 開店前		補到建議 7	stockTo	sug/soup	78x28	DISABLED ctx: 南瓜濃湯 ★★★ 前菜 · LV5 $185 · 成本 $30 · 3 步驟・南瓜塊、高湯 → 熬煮 → 加鮮奶油 售價 − $185 ＋ 庫存 − 8 份 ＋ 補到建議 7 補滿 合理・客人照常點	disabled（見 ctx 有沒有寫原因）
+開店前	day74→Day 75 開店前		補到建議 10	stockTo	sug/croquette	86x28	DISABLED ctx: 起司可樂餅 ★★★ 前菜 · LV3 · 酒吧小點，不佔名額 $210 · 成本 $44 · 3 步驟・奶油薯泥、起司片 → 捏成型 → 炸到金黃 售價 − $210 ＋ 庫存 − 13 份 ＋ 補到建議 10 補滿 合理・客人照常點	disabled（見 ctx 有沒有寫原因）
+開店前	day74→Day 75 開店前		補到建議 11	stockTo	sug/cheeseplate	86x28	DISABLED ctx: 起司拼盤 ★★★ 前菜 · LV5 · 酒吧小點，不佔名額 $340 · 成本 $96 · 2 步驟・起司片、無花果、生火腿 → 淋蜂蜜 售價 − $340 ＋ 庫存 − 11 份 ＋ 補到建議 11 補滿 合理・客人照常點	disabled（見 ctx 有沒有寫原因）
+開店前	day74→Day 75 開店前		補到建議 11	stockTo	sug/mushroom	86x28	DISABLED ctx: 蒜香蘑菇 ★★★ 前菜 · LV5 · 酒吧小點，不佔名額 $220 · 成本 $48 · 3 步驟・時蔬、蒜片 → 倒油 → 炒香 售價 − $220 ＋ 庫存 − 11 份 ＋ 補到建議 11 補滿 合理・客人照常點	disabled（見 ctx 有沒有寫原因）
+開店前	day74→Day 75 開店前		−	stock	wings	30x30	DISABLED ctx: 水牛城雞翅 ★ 前菜 · LV1 · 酒吧小點，不佔名額 $220 · 成本 $64 · 3 步驟・雞翅 → 炸到酥脆 → 裹水牛城辣醬 售價 − $220 ＋ 庫存 − 0 份 ＋ 補到建議 12 補滿 合理・客人照常點 沒有備料	disabled（見 ctx 有沒有寫原因）
+開店前	day74→Day 75 開店前		−	stock	cheesestick	30x30	DISABLED ctx: 起司條 ★ 前菜 · LV1 · 酒吧小點，不佔名額 $170 · 成本 $46 · 2 步驟・起司條 → 炸到金黃 售價 − $170 ＋ 庫存 − 0 份 ＋ 補到建議 12 補滿 合理・客人照常點 沒有備料	disabled（見 ctx 有沒有寫原因）
+開店前	day74→Day 75 開店前		−	stock	oyster	30x30	DISABLED ctx: 生蠔 ★ 前菜 · LV1 · 酒吧小點，不佔名額 $360 · 成本 $150 · 4 步驟・冰塊 → 開生蠔 → 生蠔 → 擠檸檬 售價 − $360 ＋ 庫存 − 0 份 ＋ 補到建議 12 補滿 合理・客人照常點 沒有備料	disabled（見 ctx 有沒有寫原因）
+開店前	day74→Day 75 開店前		−	stock	knuckle	30x30	DISABLED ctx: 德國豬腳 ★ 前菜 · LV1 · 酒吧小點，不佔名額 $520 · 成本 $170 · 3 步驟・豬腳 → 烤到皮脆 → 德國酸菜、芥末醬 售價 − $520 ＋ 庫存 − 0 份 ＋ 補到建議 12 補滿 合理・客人照常點 沒有備料	disabled（見 ctx 有沒有寫原因）
+開店前	day74→Day 75 開店前		看店裡	peek		53x34	peek: 回到選單 › | tabs: 店門口 主廳 側廳 Lounge 廚房 房間 | screenHidden False→True | screen: [DAY 75 · 開店前 JILL 看店裡 ? 晴朗 · 預計約 102 位客人 適合出門吃晚餐的好天氣。 店裡最近很紅→]	有反應
+開店前	day74→Day 75 開店前		?	guide		34x34	sub None→guide | screen: [DAY 75 · 開店前 JILL 看店裡 ? 晴朗 · 預計約 102 位客人 適合出門吃晚餐的好天氣。 店裡最近很紅→JILL'S KITCHEN 小小店主手冊 關閉 點一張卡片展開。 🍳 開店與料理 每天 17:00 開店、21:30 ] [大家在談：甜點 今天可以發 2 則→大家在談什麼、Jill 要發什麼、要不要花錢讓更多人知道。都是真的發生過的事。] [今日事件：今天是情人節 情侶變多，甜點特別受歡迎。 Jill's Kitchen 昨晚突然爆紅！評論家的文章被瘋狂轉發。→💾 存檔與備份 進度都在這台裝置的瀏覽器裡。換手機前，先備	有反應
+開店前	day74→Day 75 開店前		餐廳日誌	book		34x34	sub None→book | bookTab reviews→front | screen: [→JILL'S KITCHEN JOURNAL 餐廳日誌 關閉 總覽 故事 餐廳 社群 評價 熟客 VIP 話語 相簿 店] [75→74 「南瓜濃湯完美。店裡的燈光跟音樂剛剛好。」 Sam 與 Lena] [開店前 JILL 看店裡 ? 晴朗→DAY 74 熟客留言 熟客 › 王太太 「吃了 Jill's 莓果奶酪，今天也算是過去了。」 DAY 74 Leo 「]	有反應
+開店前	day74→Day 75 開店前		設定	settings		34x34	sub None→settings | screen: [DAY→設定・存檔 背景音樂 音效 ✓ 本機自動儲存 最後儲存：DAY] [開店前 JILL 看店裡 ? 晴朗 · 預計約 102 位客人 適合出門吃晚餐的好天氣。 店裡最近很紅，人潮會多一些。 →打烊後 每天打烊、購買升級後都會自動存檔。 存檔 備份與移轉 換手機、換瀏覽器、以防萬一：把進度存成一個檔案，之後再讀回]	有反應
+開店前	day74→Day 75 開店前		＋ 焦糖布丁	menuAdd	pudding	86x28	toast: 焦糖布丁 加入今日菜單了，記得備料 | screen: [莓果奶酪、舒芙蕾、巴斯克乳酪蛋糕、抹茶舒芙蕾→莓果奶酪、舒芙蕾、巴斯克乳酪蛋糕、抹茶舒芙蕾、焦糖布丁] [＋ 焦糖布丁→] [→焦糖布丁] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		＋ 提拉米蘇	menuAdd	tiramisu	86x28	toast: 提拉米蘇 加入今日菜單了，記得備料 | screen: [莓果奶酪、舒芙蕾、巴斯克乳酪蛋糕、抹茶舒芙蕾→莓果奶酪、舒芙蕾、巴斯克乳酪蛋糕、抹茶舒芙蕾、提拉米蘇] [＋ 提拉米蘇→] [→提拉米蘇] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		社群與宣傳 大家在談：甜點 今天可以發 2 則 ›	bookSocial		358x32	sub None→book | bookTab reviews→social | screen: [→JILL'S KITCHEN JOURNAL 餐廳日誌 關閉 總覽 故事 餐廳 社群 評價 熟客 VIP 話語 相簿 店] [75 · 開店前 JILL 看店裡 ? 晴朗 · 預計約 102 位客人 適合出門吃晚餐的好天氣。 店裡最近很紅，人潮會→76） Jill 今天要發什麼？] [Kitchen 昨晚突然爆紅！評論家的文章被瘋狂轉發。 在地宣傳結束了。16 位客人第一次來、16 組是看到宣傳來的、活→Signature Jill's 檸檬奶油干貝，還是那一道。 發這則 店裡的一天 沙發那一	有反應
+開店前	day74→Day 75 開店前		Jill's 檸檬奶油干貝	reco	signature	134x34	screen: [→⭐] [還沒選。→今日推薦：Jill's 檸檬奶油干貝，預估約 32 份。] | S: today	有反應
+開店前	day74→Day 75 開店前		Jill's 莓果奶酪	reco	sigdessert	108x34	screen: [→⭐] [還沒選。→今日推薦：Jill's 莓果奶酪，預估約 30 份。] | S: today	有反應
+開店前	day74→Day 75 開店前		舒芙蕾	reco	souffle	61x34	screen: [→⭐] [還沒選。→今日推薦：舒芙蕾，預估約 19 份。] | S: today	有反應
+開店前	day74→Day 75 開店前		巴斯克乳酪蛋糕	reco	basque	113x34	screen: [→⭐] [還沒選。→今日推薦：巴斯克乳酪蛋糕，預估約 16 份。] | S: today	有反應
+開店前	day74→Day 75 開店前		莓果蘇打	reco	fruitsoda	74x34	screen: [→⭐] [還沒選。→今日推薦：莓果蘇打，預估約 42 份。] | S: today	有反應
+開店前	day74→Day 75 開店前		拿鐵咖啡	reco	coffee	74x34	screen: [→⭐] [還沒選。→今日推薦：拿鐵咖啡，預估約 44 份。] | S: today	有反應
+開店前	day74→Day 75 開店前		松露薯條	reco	fries	74x34	screen: [→⭐] [還沒選。→今日推薦：松露薯條，預估約 6 份。] | S: today	有反應
+開店前	day74→Day 75 開店前		海鮮義大利麵	reco	seafood	100x34	screen: [→⭐] [還沒選。→今日推薦：海鮮義大利麵，預估約 19 份。] | S: today	有反應
+開店前	day74→Day 75 開店前		香煎鴨胸	reco	duck	74x34	screen: [→⭐] [還沒選。→今日推薦：香煎鴨胸，預估約 28 份。] | S: today	有反應
+開店前	day74→Day 75 開店前		松露燉飯	reco	risotto	74x34	screen: [→⭐] [還沒選。→今日推薦：松露燉飯，預估約 19 份。] | S: today	有反應
+開店前	day74→Day 75 開店前		乾式熟成肋眼	reco	steak_x	100x34	screen: [→⭐] [還沒選。→今日推薦：乾式熟成肋眼，預估約 20 份。] | S: today	有反應
+開店前	day74→Day 75 開店前		海膽燉飯	reco	risotto_x	74x34	screen: [→⭐] [還沒選。→今日推薦：海膽燉飯，預估約 20 份。] | S: today	有反應
+開店前	day74→Day 75 開店前		松露蘑菇牛肉堡	reco	burger_x	113x34	screen: [→⭐] [還沒選。→今日推薦：松露蘑菇牛肉堡，預估約 21 份。] | S: today	有反應
+開店前	day74→Day 75 開店前		布拉塔番茄麵	reco	pasta_x	100x34	screen: [→⭐] [還沒選。→今日推薦：布拉塔番茄麵，預估約 18 份。] | S: today	有反應
+開店前	day74→Day 75 開店前		抹茶舒芙蕾	reco	souffle_x	87x34	screen: [→⭐] [還沒選。→今日推薦：抹茶舒芙蕾，預估約 25 份。] | S: today	有反應
+開店前	day74→Day 75 開店前		櫻桃鴨胸	reco	duck_x	74x34	screen: [→⭐] [還沒選。→今日推薦：櫻桃鴨胸，預估約 27 份。] | S: today	有反應
+開店前	day74→Day 75 開店前		炸雞塊	reco	bites	61x34	screen: [→⭐] [還沒選。→今日推薦：炸雞塊，預估約 1 份。] | S: today	有反應
+開店前	day74→Day 75 開店前		南瓜濃湯	reco	soup	74x34	screen: [→⭐] [還沒選。→今日推薦：南瓜濃湯，預估約 8 份。] | S: today	有反應
+開店前	day74→Day 75 開店前		起司拼盤	reco	cheeseplate	74x34	screen: [→⭐] [還沒選。→今日推薦：起司拼盤，預估約 1 份。] | S: today	有反應
+開店前	day74→Day 75 開店前		蒜香蘑菇	reco	mushroom	74x34	screen: [→⭐] [還沒選。→今日推薦：蒜香蘑菇，預估約 1 份。] | S: today	有反應
+開店前	day74→Day 75 開店前		炙烤肋眼牛排	reco	steak	100x34	screen: [→⭐] [還沒選。→今日推薦：炙烤肋眼牛排，預估約 19 份。] | S: today	有反應
+開店前	day74→Day 75 開店前		檸檬氣泡水	reco	sparkling	87x34	screen: [→⭐] [還沒選。→今日推薦：檸檬氣泡水，預估約 33 份。] | S: today	有反應
+開店前	day74→Day 75 開店前		起司可樂餅	reco	croquette	87x34	screen: [→⭐] [還沒選。→今日推薦：起司可樂餅，預估約 1 份。] | S: today	有反應
+開店前	day74→Day 75 開店前		水牛城雞翅	reco	wings	87x34	screen: [→⭐] [還沒選。→今日推薦：水牛城雞翅，預估約 1 份。] | S: today	有反應
+開店前	day74→Day 75 開店前		起司條	reco	cheesestick	61x34	screen: [→⭐] [還沒選。→今日推薦：起司條，預估約 1 份。] | S: today	有反應
+開店前	day74→Day 75 開店前		生蠔	reco	oyster	48x34	screen: [→⭐] [還沒選。→今日推薦：生蠔，預估約 1 份。] | S: today	有反應
+開店前	day74→Day 75 開店前		德國豬腳	reco	knuckle	74x34	screen: [→⭐] [還沒選。→今日推薦：德國豬腳，預估約 1 份。] | S: today	有反應
+開店前	day74→Day 75 開店前		✓ 主餐＋飲料 點主餐的客人更常加一杯（飲料 −10%） 累計賣出 2567 份・$270,610	setT	drink	334x68	screen: [✓→] | S: sets	有反應
+開店前	day74→Day 75 開店前		✓ 主餐＋甜點 點主餐的客人更常加甜點（甜點 −10%） 累計賣出 1463 份・$395,165	setT	dessert	334x68	screen: [✓→] | S: sets	有反應
+開店前	day74→Day 75 開店前		主餐＋飲料＋甜點 全套：飲料和甜點都更常被加點（各 −15%）	setT	full	334x53	screen: [✓→] [✓→] [→✓] | S: sets	有反應
+開店前	day74→Day 75 開店前		🎲 隨機選菜單	menuRandom		105x31	toast: 菜單隨機排好了（20 道），記得備料 | screen: [莓果奶酪、舒芙蕾、巴斯克乳酪蛋糕、抹茶舒芙蕾→莓果奶酪、舒芙蕾、抹茶舒芙蕾、提拉米蘇、焦糖布丁] [焦糖布丁 ＋ 提拉米蘇→巴斯克乳酪蛋糕 菜單已滿（20 道）——點一道，選要換掉哪一道。] [→香煎鴨胸 生火腿沙拉] | S: menu,price,today,menuSince	有反應
+開店前	day74→Day 75 開店前		−	stock	signature	34x34	money 208704→209132 (+428) | screen: [3→1] [3→1] [159/400→157/400] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		＋	stock	signature	34x34	money 208704→208276 (-428) | screen: [3→5] [3→5] [159/400→161/400] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		−	stock	sigdessert	34x34	money 208704→208934 (+230) | screen: [2→0] [2→0] [159/400→157/400] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		＋	stock	sigdessert	34x34	money 208704→208474 (-230) | screen: [2→4] [2→4] [159/400→161/400] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		加入菜單	toggle	friedrice	46x28	screen: [→黃金蛋炒飯] [17/20→18/20] [→售價 − $155 ＋ 庫存 − 0 份 ＋ 補到建議 8 補滿 合理・客人照常點 沒有備料] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		從菜單移除	toggle	coffee	46x28	screen: [拿鐵咖啡→] [17/20→16/20] [售價 − $115 ＋ 庫存 −→冰箱裡還有] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		−	price	coffee	30x30	screen: [$115→$105] [$115→$105 -10%] [合理・客人照常點→略低・點的人約 +16%、滿意度 +2、小費略少] | S: price	有反應
+開店前	day74→Day 75 開店前		＋	price	coffee	30x30	screen: [$115→$130] [$115→$130 +10%] [合理・客人照常點→偏高・點的人約 -13%、滿意度 -6] | S: price	有反應
+開店前	day74→Day 75 開店前		−	stock	coffee	30x30	money 208704→208722 (+18) | screen: [2→1] [159/400→158/400] [$26,773→$26,791] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		＋	stock	coffee	30x30	money 208704→208686 (-18) | screen: [2→3] [159/400→160/400] [$26,773→$26,755] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補到建議 37	stockTo	sug/coffee	86x28	money 208704→208074 (-630) | screen: [2→37] [159/400→194/400] [$26,773→$26,143] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補滿	stockTo	max/coffee	42x28	money 208704→204366 (-4338) | screen: [2→243] [159/400→400/400] [$26,773→$26,143] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		加入菜單	toggle	pasta	46x28	screen: [→番茄義大利麵] [17/20→18/20] [37→36] | S: menu,price,today,menuSince	有反應
+開店前	day74→Day 75 開店前		加入菜單	toggle	salad	46x28	screen: [→田園沙拉] [17/20→18/20] [37→36] | S: menu,today,menuSince	有反應
+開店前	day74→Day 75 開店前		加入菜單	toggle	burger	46x28	screen: [→經典牛肉漢堡] [17/20→18/20] [37→36] | S: menu,price,today,menuSince	有反應
+開店前	day74→Day 75 開店前		從菜單移除	toggle	soup	46x28	screen: [南瓜濃湯→] [17/20→16/20] [37→38] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		−	price	soup	30x30	screen: [$185→$165] [$185→$165 -10%] [合理・客人照常點→略低・點的人約 +25%、滿意度 +2、小費略少] | S: price	有反應
+開店前	day74→Day 75 開店前		＋	price	soup	30x30	screen: [$185→$200] [$185→$200 +10%] [合理・客人照常點→偏高・點的人約 -19%、滿意度 -6] | S: price	有反應
+開店前	day74→Day 75 開店前		−	stock	soup	30x30	money 208704→208734 (+30) | screen: [8→7] [159/400→158/400] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		＋	stock	soup	30x30	money 208704→208674 (-30) | screen: [8→9] [159/400→160/400] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補滿	stockTo	max/soup	42x28	money 208704→201474 (-7230) | screen: [8→249] [159/400→400/400] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		加入菜單	toggle	pudding	46x28	screen: [莓果奶酪、舒芙蕾、巴斯克乳酪蛋糕、抹茶舒芙蕾→莓果奶酪、舒芙蕾、巴斯克乳酪蛋糕、抹茶舒芙蕾、焦糖布丁] [＋ 焦糖布丁→] [→焦糖布丁] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		從菜單移除	toggle	steak	46x28	screen: [炙烤肋眼牛排→] [17/20→16/20] [37→39] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		−	price	steak	30x30	screen: [$730→$655] [$730→$655 -10%] [合理・客人照常點→略低・點的人約 +24%、滿意度 +2、小費略少] | S: price	有反應
+開店前	day74→Day 75 開店前		＋	price	steak	30x30	screen: [$730→$805] [$730→$805 +10%] [合理・客人照常點→偏高・點的人約 -18%、滿意度 -6] | S: price	有反應
+開店前	day74→Day 75 開店前		−	stock	steak	30x30	money 208704→208894 (+190) | screen: [10→9] [159/400→158/400] [$26,773→$26,963] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		＋	stock	steak	30x30	money 208704→208514 (-190) | screen: [10→11] [159/400→160/400] [$26,773→$26,583] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補到建議 13	stockTo	sug/steak	86x28	money 208704→208134 (-570) | screen: [10→13] [159/400→162/400] [$26,773→$26,203] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補滿	stockTo	max/steak	42x28	money 208704→162914 (-45790) | screen: [10→251] [159/400→400/400] [$26,773→$26,203] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		從菜單移除	toggle	sparkling	46x28	screen: [檸檬氣泡水→] [17/20→16/20] [37→44] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		−	price	sparkling	30x30	screen: [$80→$70] [$80→$70 -10%] [合理・客人照常點→略低・點的人約 +20%、滿意度 +2、小費略少] | S: price	有反應
+開店前	day74→Day 75 開店前		＋	price	sparkling	30x30	screen: [$80→$85] [$80→$85 +10%] [合理・客人照常點→偏高・點的人約 -16%、滿意度 -6] | S: price	有反應
+開店前	day74→Day 75 開店前		−	stock	sparkling	30x30	money 208704→208712 (+8) | screen: [8→7] [159/400→158/400] [$26,773→$26,781] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		＋	stock	sparkling	30x30	money 208704→208696 (-8) | screen: [8→9] [159/400→160/400] [$26,773→$26,765] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補到建議 21	stockTo	sug/sparkling	86x28	money 208704→208600 (-104) | screen: [8→21] [159/400→172/400] [$26,773→$26,669] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補滿	stockTo	max/sparkling	42x28	money 208704→206776 (-1928) | screen: [8→249] [159/400→400/400] [$26,773→$26,669] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		加入菜單	toggle	blacktea	46x28	screen: [→錫蘭檸檬紅茶] [17/20→18/20] [37→33] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		加入菜單	toggle	tiramisu	46x28	screen: [莓果奶酪、舒芙蕾、巴斯克乳酪蛋糕、抹茶舒芙蕾→莓果奶酪、舒芙蕾、巴斯克乳酪蛋糕、抹茶舒芙蕾、提拉米蘇] [＋ 提拉米蘇→] [→提拉米蘇] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		從菜單移除	toggle	fruitsoda	46x28	screen: [莓果蘇打→] [17/20→16/20] [37→44] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		−	price	fruitsoda	30x30	screen: [$155→$140] [$155→$140 -10%] [合理・客人照常點→略低・點的人約 +16%、滿意度 +2、小費略少] | S: price	有反應
+開店前	day74→Day 75 開店前		＋	price	fruitsoda	30x30	screen: [$155→$170] [$155→$170 +10%] [合理・客人照常點→偏高・點的人約 -13%、滿意度 -6] | S: price	有反應
+開店前	day74→Day 75 開店前		−	stock	fruitsoda	30x30	money 208704→208728 (+24) | screen: [16→15] [159/400→158/400] [$26,773→$26,797] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		＋	stock	fruitsoda	30x30	money 208704→208680 (-24) | screen: [16→17] [159/400→160/400] [$26,773→$26,749] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補到建議 31	stockTo	sug/fruitsoda	86x28	money 208704→208344 (-360) | screen: [16→31] [159/400→174/400] [$26,773→$26,413] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補滿	stockTo	max/fruitsoda	42x28	money 208704→202920 (-5784) | screen: [16→257] [159/400→400/400] [$26,773→$26,413] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		從菜單移除	toggle	basque	46x28	screen: [莓果奶酪、舒芙蕾、巴斯克乳酪蛋糕、抹茶舒芙蕾→莓果奶酪、舒芙蕾、抹茶舒芙蕾] [→＋ 巴斯克乳酪蛋糕] [巴斯克乳酪蛋糕→] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		−	price	basque	30x30	screen: [$220→$200] [$220→$200 -10%] [合理・客人照常點→略低・點的人約 +22%、滿意度 +2、小費略少] | S: price	有反應
+開店前	day74→Day 75 開店前		＋	price	basque	30x30	screen: [$220→$245] [$220→$245 +10%] [合理・客人照常點→偏高・點的人約 -17%、滿意度 -6] | S: price	有反應
+開店前	day74→Day 75 開店前		−	stock	basque	30x30	money 208704→208746 (+42) | screen: [7→6] [159/400→158/400] [$26,773→$26,815] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		＋	stock	basque	30x30	money 208704→208662 (-42) | screen: [7→8] [159/400→160/400] [$26,773→$26,731] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補到建議 12	stockTo	sug/basque	86x28	money 208704→208494 (-210) | screen: [7→12] [159/400→164/400] [$26,773→$26,563] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補滿	stockTo	max/basque	42x28	money 208704→198582 (-10122) | screen: [7→248] [159/400→400/400] [$26,773→$26,563] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		加入菜單	toggle	chicken	46x28	screen: [→香草烤雞] [17/20→18/20] [37→38] | S: menu,today,menuSince	有反應
+開店前	day74→Day 75 開店前		加入菜單	toggle	prosciutto	46x28	screen: [→生火腿沙拉] [17/20→18/20] [7→6] | S: menu,today,menuSince	有反應
+開店前	day74→Day 75 開店前		加入菜單	toggle	veg	46x28	screen: [→香料烤蔬菜] [17/20→18/20] [7→6] | S: menu,today,menuSince	有反應
+開店前	day74→Day 75 開店前		從菜單移除	toggle	fries	46x28	screen: [松露薯條→] [17/20→16/20] [37→36] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		−	price	fries	30x30	screen: [$195→$175] [$195→$175 -10%] [合理・客人照常點→略低・點的人約 +24%、滿意度 +2、小費略少] | S: price	有反應
+開店前	day74→Day 75 開店前		＋	price	fries	30x30	screen: [$195→$215] [$195→$215 +10%] [合理・客人照常點→偏高・點的人約 -18%、滿意度 -6] | S: price	有反應
+開店前	day74→Day 75 開店前		−	stock	fries	30x30	money 208704→208746 (+42) | screen: [4→3] [159/400→158/400] [$26,773→$26,815] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		＋	stock	fries	30x30	money 208704→208662 (-42) | screen: [4→5] [159/400→160/400] [$26,773→$26,731] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補到建議 9	stockTo	sug/fries	78x28	money 208704→208494 (-210) | screen: [4→9] [159/400→164/400] [$26,773→$26,563] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補滿	stockTo	max/fries	42x28	money 208704→198582 (-10122) | screen: [4→245] [159/400→400/400] [$26,773→$26,563] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		從菜單移除	toggle	souffle	46x28	screen: [莓果奶酪、舒芙蕾、巴斯克乳酪蛋糕、抹茶舒芙蕾→莓果奶酪、巴斯克乳酪蛋糕、抹茶舒芙蕾] [→＋ 舒芙蕾] [舒芙蕾→] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		−	price	souffle	30x30	screen: [$310→$280] [$310→$280 -10%] [合理・客人照常點→略低・點的人約 +20%、滿意度 +2、小費略少] | S: price	有反應
+開店前	day74→Day 75 開店前		＋	price	souffle	30x30	screen: [$310→$345] [$310→$345 +10%] [合理・客人照常點→偏高・點的人約 -16%、滿意度 -6] | S: price	有反應
+開店前	day74→Day 75 開店前		−	stock	souffle	30x30	money 208704→208764 (+60) | screen: [4→3] [159/400→158/400] [$26,773→$26,833] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		＋	stock	souffle	30x30	money 208704→208644 (-60) | screen: [4→5] [159/400→160/400] [$26,773→$26,713] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補到建議 17	stockTo	sug/souffle	86x28	money 208704→207924 (-780) | screen: [4→17] [159/400→172/400] [$26,773→$25,993] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補滿	stockTo	max/souffle	42x28	money 208704→194244 (-14460) | screen: [4→245] [159/400→400/400] [$26,773→$25,993] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		加入菜單	toggle	salmon	46x28	screen: [→香烤鮭魚] [17/20→18/20] [37→38] | S: menu,today,menuSince	有反應
+開店前	day74→Day 75 開店前		從菜單移除	toggle	seafood	46x28	screen: [海鮮義大利麵→] [17/20→16/20] [37→36] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		−	price	seafood	30x30	screen: [$535→$480] [$535→$480 -10%] [合理・客人照常點→略低・點的人約 +25%、滿意度 +2、小費略少] | S: price	有反應
+開店前	day74→Day 75 開店前		＋	price	seafood	30x30	screen: [$535→$585] [$535→$585 +10%] [合理・客人照常點→偏高・點的人約 -19%、滿意度 -6] | S: price	有反應
+開店前	day74→Day 75 開店前		−	stock	seafood	30x30	money 208704→208834 (+130) | screen: [3→2] [159/400→158/400] [$26,773→$26,903] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		＋	stock	seafood	30x30	money 208704→208574 (-130) | screen: [3→4] [159/400→160/400] [$26,773→$26,643] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補到建議 13	stockTo	sug/seafood	86x28	money 208704→207404 (-1300) | screen: [3→13] [159/400→169/400] [$26,773→$25,473] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補滿	stockTo	max/seafood	42x28	money 208704→177374 (-31330) | screen: [3→244] [159/400→400/400] [$26,773→$25,473] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		從菜單移除	toggle	duck	46x28	screen: [香煎鴨胸→] [17/20→16/20] [37→39] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		−	price	duck	30x30	screen: [$625→$560] [$625→$560 -10%] [合理・客人照常點→略低・點的人約 +25%、滿意度 +2、小費略少] | S: price	有反應
+開店前	day74→Day 75 開店前		＋	price	duck	30x30	screen: [$625→$685] [$625→$685 +10%] [合理・客人照常點→偏高・點的人約 -18%、滿意度 -6] | S: price	有反應
+開店前	day74→Day 75 開店前		−	stock	duck	30x30	money 208704→208864 (+160) | screen: [3→2] [159/400→158/400] [$26,773→$26,933] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		＋	stock	duck	30x30	money 208704→208544 (-160) | screen: [3→4] [159/400→160/400] [$26,773→$26,613] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補到建議 13	stockTo	sug/duck	86x28	money 208704→207104 (-1600) | screen: [3→13] [159/400→169/400] [$26,773→$25,173] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補滿	stockTo	max/duck	42x28	money 208704→170144 (-38560) | screen: [3→244] [159/400→400/400] [$26,773→$25,173] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		從菜單移除	toggle	risotto	46x28	screen: [松露燉飯→] [17/20→16/20] [37→39] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		−	price	risotto	30x30	screen: [$570→$515] [$570→$515 -10%] [合理・客人照常點→略低・點的人約 +25%、滿意度 +2、小費略少] | S: price	有反應
+開店前	day74→Day 75 開店前		＋	price	risotto	30x30	screen: [$570→$630] [$570→$630 +10%] [合理・客人照常點→偏高・點的人約 -19%、滿意度 -6] | S: price	有反應
+開店前	day74→Day 75 開店前		−	stock	risotto	30x30	money 208704→208854 (+150) | screen: [7→6] [159/400→158/400] [$26,773→$26,923] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		＋	stock	risotto	30x30	money 208704→208554 (-150) | screen: [7→8] [159/400→160/400] [$26,773→$26,623] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補到建議 11	stockTo	sug/risotto	86x28	money 208704→208104 (-600) | screen: [7→11] [159/400→163/400] [$26,773→$26,173] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補滿	stockTo	max/risotto	42x28	money 208704→172554 (-36150) | screen: [7→248] [159/400→400/400] [$26,773→$26,173] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		加入菜單	toggle	friedrice_x	46x28	screen: [→蟹肉蛋炒飯] [17/20→18/20] [7→6] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		從菜單移除	toggle	risotto_x	46x28	screen: [海膽燉飯→] [17/20→16/20] [7→8] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		−	price	risotto_x	30x30	screen: [$900→$810] [$900→$810 -10%] [合理・客人照常點→略低・點的人約 +24%、滿意度 +2、小費略少] | S: price	有反應
+開店前	day74→Day 75 開店前		＋	price	risotto_x	30x30	screen: [$900→$990] [$900→$990 +10%] [合理・客人照常點→偏高・點的人約 -18%、滿意度 -6] | S: price	有反應
+開店前	day74→Day 75 開店前		−	stock	risotto_x	30x30	money 208704→208929 (+225) | screen: [4→3] [159/400→158/400] [$26,773→$26,998] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		＋	stock	risotto_x	30x30	money 208704→208479 (-225) | screen: [4→5] [159/400→160/400] [$26,773→$26,548] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補到建議 14	stockTo	sug/risotto_x	86x28	money 208704→206454 (-2250) | screen: [4→14] [159/400→169/400] [$26,773→$24,523] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補滿	stockTo	max/risotto_x	42x28	money 208704→154479 (-54225) | screen: [4→245] [159/400→400/400] [$26,773→$24,523] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		從菜單移除	toggle	steak_x	46x28	screen: [乾式熟成肋眼→] [17/20→16/20] [7→9] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		−	price	steak_x	30x30	screen: [$1,095→$985] [$1,095→$985 -10%] [合理・客人照常點→略低・點的人約 +23%、滿意度 +2、小費略少] | S: price	有反應
+開店前	day74→Day 75 開店前		＋	price	steak_x	30x30	screen: [$1,095→$1,205] [$1,095→$1,205 +10%] [合理・客人照常點→偏高・點的人約 -17%、滿意度 -6] | S: price	有反應
+開店前	day74→Day 75 開店前		−	stock	steak_x	30x30	money 208704→208994 (+290) | screen: [3→2] [159/400→158/400] [$26,773→$27,063] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		＋	stock	steak_x	30x30	money 208704→208414 (-290) | screen: [3→4] [159/400→160/400] [$26,773→$26,483] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補到建議 19	stockTo	sug/steak_x	86x28	money 208704→204064 (-4640) | screen: [3→19] [159/400→175/400] [$26,773→$22,133] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補滿	stockTo	max/steak_x	42x28	money 208704→138814 (-69890) | screen: [3→244] [159/400→400/400] [$26,773→$22,133] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		從菜單移除	toggle	burger_x	46x28	screen: [松露蘑菇牛肉堡→] [17/20→16/20] [37→39] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		−	price	burger_x	30x30	screen: [$405→$365] [$405→$365 -10%] [合理・客人照常點→略低・點的人約 +26%、滿意度 +2、小費略少] | S: price	有反應
+開店前	day74→Day 75 開店前		＋	price	burger_x	30x30	screen: [$405→$450] [$405→$450 +10%] [合理・客人照常點→偏高・點的人約 -19%、滿意度 -6] | S: price	有反應
+開店前	day74→Day 75 開店前		−	stock	burger_x	30x30	money 208704→208802 (+98) | screen: [3→2] [159/400→158/400] [$26,773→$26,871] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		＋	stock	burger_x	30x30	money 208704→208606 (-98) | screen: [3→4] [159/400→160/400] [$26,773→$26,675] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補到建議 16	stockTo	sug/burger_x	86x28	money 208704→207430 (-1274) | screen: [3→16] [159/400→172/400] [$26,773→$25,499] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補滿	stockTo	max/burger_x	42x28	money 208704→185086 (-23618) | screen: [3→244] [159/400→400/400] [$26,773→$25,499] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		從菜單移除	toggle	pasta_x	46x28	screen: [布拉塔番茄麵→] [17/20→16/20] [7→6] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		−	price	pasta_x	30x30	screen: [$365→$330] [$365→$330 -10%] [合理・客人照常點→略低・點的人約 +27%、滿意度 +2、小費略少] | S: price	有反應
+開店前	day74→Day 75 開店前		＋	price	pasta_x	30x30	screen: [$365→$400] [$365→$400 +10%] [合理・客人照常點→偏高・點的人約 -20%、滿意度 -6] | S: price	有反應
+開店前	day74→Day 75 開店前		−	stock	pasta_x	30x30	money 208704→208786 (+82) | screen: [7→6] [159/400→158/400] [$26,773→$26,855] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		＋	stock	pasta_x	30x30	money 208704→208622 (-82) | screen: [7→8] [159/400→160/400] [$26,773→$26,691] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補到建議 9	stockTo	sug/pasta_x	78x28	money 208704→208540 (-164) | screen: [7→9] [159/400→161/400] [$26,773→$26,609] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補滿	stockTo	max/pasta_x	42x28	money 208704→188942 (-19762) | screen: [7→248] [159/400→400/400] [$26,773→$26,609] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		加入菜單	toggle	soup_x	46x28	screen: [→松露南瓜濃湯] [17/20→18/20] [37→34] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		從菜單移除	toggle	duck_x	46x28	screen: [櫻桃鴨胸→] [17/20→16/20] [7→9] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		−	price	duck_x	30x30	screen: [$885→$795] [$885→$795 -10%] [合理・客人照常點→略低・點的人約 +24%、滿意度 +2、小費略少] | S: price	有反應
+開店前	day74→Day 75 開店前		＋	price	duck_x	30x30	screen: [$885→$970] [$885→$970 +10%] [合理・客人照常點→偏高・點的人約 -18%、滿意度 -6] | S: price	有反應
+開店前	day74→Day 75 開店前		−	stock	duck_x	30x30	money 208704→208934 (+230) | screen: [11→10] [159/400→158/400] [$26,773→$27,003] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		＋	stock	duck_x	30x30	money 208704→208474 (-230) | screen: [11→12] [159/400→160/400] [$26,773→$26,543] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補到建議 13	stockTo	sug/duck_x	86x28	money 208704→208244 (-460) | screen: [11→13] [159/400→161/400] [$26,773→$26,313] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補滿	stockTo	max/duck_x	42x28	money 208704→153274 (-55430) | screen: [11→252] [159/400→400/400] [$26,773→$26,313] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		從菜單移除	toggle	souffle_x	46x28	screen: [莓果奶酪、舒芙蕾、巴斯克乳酪蛋糕、抹茶舒芙蕾→莓果奶酪、舒芙蕾、巴斯克乳酪蛋糕] [→＋ 抹茶舒芙蕾] [抹茶舒芙蕾→] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		−	price	souffle_x	30x30	screen: [$440→$400] [$440→$400 -10%] [合理・客人照常點→略低・點的人約 +19%、滿意度 +2、小費略少] | S: price	有反應
+開店前	day74→Day 75 開店前		＋	price	souffle_x	30x30	screen: [$440→$485] [$440→$485 +10%] [合理・客人照常點→偏高・點的人約 -15%、滿意度 -6] | S: price	有反應
+開店前	day74→Day 75 開店前		−	stock	souffle_x	30x30	money 208704→208792 (+88) | screen: [10→9] [159/400→158/400] [$26,773→$26,861] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		＋	stock	souffle_x	30x30	money 208704→208616 (-88) | screen: [10→11] [159/400→160/400] [$26,773→$26,685] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補到建議 14	stockTo	sug/souffle_x	86x28	money 208704→208352 (-352) | screen: [10→14] [159/400→163/400] [$26,773→$26,421] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補滿	stockTo	max/souffle_x	42x28	money 208704→187496 (-21208) | screen: [10→251] [159/400→400/400] [$26,773→$26,421] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		從菜單移除	toggle	bites	46x28	screen: [炸雞塊→] [→7 道（共] [道（不佔名額）→道，不佔名額）] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		−	price	bites	30x30	screen: [$235→$210] [$235→$210 -10%] [合理・客人照常點→略低・點的人約 +24%、滿意度 +2、小費略少] | S: price	有反應
+開店前	day74→Day 75 開店前		＋	price	bites	30x30	screen: [$235→$255] [$235→$255 +10%] [合理・客人照常點→偏高・點的人約 -18%、滿意度 -6] | S: price	有反應
+開店前	day74→Day 75 開店前		−	stock	bites	30x30	money 208704→208756 (+52) | screen: [9→8] [159/400→158/400] [$26,773→$26,825] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		＋	stock	bites	30x30	money 208704→208652 (-52) | screen: [9→10] [159/400→160/400] [$26,773→$26,721] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補到建議 11	stockTo	sug/bites	86x28	money 208704→208600 (-104) | screen: [9→11] [159/400→161/400] [$26,773→$26,669] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補滿	stockTo	max/bites	42x28	money 208704→196172 (-12532) | screen: [9→250] [159/400→400/400] [$26,773→$26,669] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		從菜單移除	toggle	croquette	46x28	screen: [起司可樂餅→] [→7 道（共] [道（不佔名額）→道，不佔名額）] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		−	price	croquette	30x30	screen: [$210→$185] [$210→$185 -10%] [合理・客人照常點→略低・點的人約 +25%、滿意度 +2、小費略少] | S: price	有反應
+開店前	day74→Day 75 開店前		＋	price	croquette	30x30	screen: [$210→$230] [$210→$230 +10%] [合理・客人照常點→偏高・點的人約 -18%、滿意度 -6] | S: price	有反應
+開店前	day74→Day 75 開店前		−	stock	croquette	30x30	money 208704→208748 (+44) | screen: [13→12] [159/400→158/400] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		＋	stock	croquette	30x30	money 208704→208660 (-44) | screen: [13→14] [159/400→160/400] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補滿	stockTo	max/croquette	42x28	money 208704→198100 (-10604) | screen: [13→254] [159/400→400/400] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		從菜單移除	toggle	cheeseplate	46x28	screen: [起司拼盤→] [→7 道（共] [道（不佔名額）→道，不佔名額）] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		−	price	cheeseplate	30x30	screen: [$340→$305] [$340→$305 -10%] [合理・客人照常點→略低・點的人約 +24%、滿意度 +2、小費略少] | S: price	有反應
+開店前	day74→Day 75 開店前		＋	price	cheeseplate	30x30	screen: [$340→$370] [$340→$370 +10%] [合理・客人照常點→偏高・點的人約 -18%、滿意度 -6] | S: price	有反應
+開店前	day74→Day 75 開店前		−	stock	cheeseplate	30x30	money 208704→208800 (+96) | screen: [11→10] [159/400→158/400] [$26,773→$26,869] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		＋	stock	cheeseplate	30x30	money 208704→208608 (-96) | screen: [11→12] [159/400→160/400] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補滿	stockTo	max/cheeseplate	42x28	money 208704→185568 (-23136) | screen: [11→252] [159/400→400/400] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		從菜單移除	toggle	mushroom	46x28	screen: [蒜香蘑菇→] [→7 道（共] [道（不佔名額）→道，不佔名額）] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		−	price	mushroom	30x30	screen: [$220→$200] [$220→$200 -10%] [合理・客人照常點→略低・點的人約 +25%、滿意度 +2、小費略少] | S: price	有反應
+開店前	day74→Day 75 開店前		＋	price	mushroom	30x30	screen: [$220→$245] [$220→$245 +10%] [合理・客人照常點→偏高・點的人約 -18%、滿意度 -6] | S: price	有反應
+開店前	day74→Day 75 開店前		−	stock	mushroom	30x30	money 208704→208752 (+48) | screen: [11→10] [159/400→158/400] [$26,773→$26,821] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		＋	stock	mushroom	30x30	money 208704→208656 (-48) | screen: [11→12] [159/400→160/400] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補滿	stockTo	max/mushroom	42x28	money 208704→197136 (-11568) | screen: [11→252] [159/400→400/400] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		從菜單移除	toggle	wings	46x28	screen: [水牛城雞翅→] [→7 道（共] [道（不佔名額）→道，不佔名額）] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		−	price	wings	30x30	screen: [$220→$200] [$220→$200 -10%] [合理・客人照常點→略低・點的人約 +25%、滿意度 +2、小費略少] | S: price	有反應
+開店前	day74→Day 75 開店前		＋	price	wings	30x30	screen: [$220→$240] [$220→$240 +10%] [合理・客人照常點→偏高・點的人約 -18%、滿意度 -6] | S: price	有反應
+開店前	day74→Day 75 開店前		＋	stock	wings	30x30	money 208704→208640 (-64) | screen: [0→1] [沒有備料→] [159/400→160/400] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補到建議 12	stockTo	sug/wings	86x28	money 208704→207936 (-768) | screen: [0 份 ＋ 補到建議→] [補滿 合理・客人照常點 沒有備料→份 ＋ 補到建議 12 補滿 合理・客人照常點] [159/400→171/400] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補滿	stockTo	max/wings	42x28	money 208704→193280 (-15424) | screen: [0→241] [沒有備料→] [159/400→400/400] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		從菜單移除	toggle	cheesestick	46x28	screen: [起司條→] [→7 道（共] [道（不佔名額）→道，不佔名額）] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		−	price	cheesestick	30x30	screen: [$170→$155] [$170→$155 -10%] [合理・客人照常點→略低・點的人約 +26%、滿意度 +2、小費略少] | S: price	有反應
+開店前	day74→Day 75 開店前		＋	price	cheesestick	30x30	screen: [$170→$185] [$170→$185 +10%] [合理・客人照常點→偏高・點的人約 -19%、滿意度 -6] | S: price	有反應
+開店前	day74→Day 75 開店前		＋	stock	cheesestick	30x30	money 208704→208658 (-46) | screen: [0→1] [沒有備料→] [159/400→160/400] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補到建議 12	stockTo	sug/cheesestick	86x28	money 208704→208152 (-552) | screen: [0 份 ＋ 補到建議→] [補滿 合理・客人照常點 沒有備料→份 ＋ 補到建議 12 補滿 合理・客人照常點] [159/400→171/400] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補滿	stockTo	max/cheesestick	42x28	money 208704→197618 (-11086) | screen: [0→241] [沒有備料→] [159/400→400/400] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		從菜單移除	toggle	oyster	46x28	screen: [生蠔→] [→7 道（共] [道（不佔名額）→道，不佔名額）] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		−	price	oyster	30x30	screen: [$360→$325] [$360→$325 -10%] [合理・客人照常點→略低・點的人約 +24%、滿意度 +2、小費略少] | S: price	有反應
+開店前	day74→Day 75 開店前		＋	price	oyster	30x30	screen: [$360→$395] [$360→$395 +10%] [合理・客人照常點→偏高・點的人約 -18%、滿意度 -6] | S: price	有反應
+開店前	day74→Day 75 開店前		＋	stock	oyster	30x30	money 208704→208554 (-150) | screen: [0→1] [沒有備料→] [159/400→160/400] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補到建議 12	stockTo	sug/oyster	86x28	money 208704→206904 (-1800) | screen: [0 份 ＋ 補到建議→] [補滿 合理・客人照常點 沒有備料→份 ＋ 補到建議 12 補滿 合理・客人照常點] [159/400→171/400] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補滿	stockTo	max/oyster	42x28	money 208704→172554 (-36150) | screen: [0→241] [沒有備料→] [159/400→400/400] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		從菜單移除	toggle	knuckle	46x28	screen: [德國豬腳→] [→7 道（共] [道（不佔名額）→道，不佔名額）] | S: menu,today	有反應
+開店前	day74→Day 75 開店前		−	price	knuckle	30x30	screen: [$520→$470] [$520→$470 -10%] [合理・客人照常點→略低・點的人約 +23%、滿意度 +2、小費略少] | S: price	有反應
+開店前	day74→Day 75 開店前		＋	price	knuckle	30x30	screen: [$520→$570] [$520→$570 +10%] [合理・客人照常點→偏高・點的人約 -17%、滿意度 -6] | S: price	有反應
+開店前	day74→Day 75 開店前		＋	stock	knuckle	30x30	money 208704→208534 (-170) | screen: [0→1] [沒有備料→] [159/400→160/400] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補到建議 12	stockTo	sug/knuckle	86x28	money 208704→206664 (-2040) | screen: [0 份 ＋ 補到建議→] [補滿 合理・客人照常點 沒有備料→份 ＋ 補到建議 12 補滿 合理・客人照常點] [159/400→171/400] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		補滿	stockTo	max/knuckle	42x28	money 208704→167734 (-40970) | screen: [0→241] [沒有備料→] [159/400→400/400] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		今晚不倒	wineT	w_spark	46x28	screen: [11→10] | S: wineOff	有反應
+開店前	day74→Day 75 開店前		今晚不倒	wineT	w_white	46x28	screen: [11→10] | S: wineOff	有反應
+開店前	day74→Day 75 開店前		今晚不倒	wineT	w_lred	46x28	screen: [11→10] | S: wineOff	有反應
+開店前	day74→Day 75 開店前		今晚不倒	wineT	w_fwhite	46x28	screen: [11→10] | S: wineOff	有反應
+開店前	day74→Day 75 開店前		今晚不倒	wineT	w_fred	46x28	screen: [11→10] | S: wineOff	有反應
+開店前	day74→Day 75 開店前		今晚不倒	wineT	w_rose	46x28	screen: [11→10] | S: wineOff	有反應
+開店前	day74→Day 75 開店前		今晚不倒	wineT	w_orange	46x28	screen: [11→10] | S: wineOff	有反應
+開店前	day74→Day 75 開店前		今晚不倒	wineT	w_pinot	46x28	screen: [11→10] | S: wineOff	有反應
+開店前	day74→Day 75 開店前		今晚不倒	wineT	w_house	46x28	screen: [11→10] | S: wineOff	有反應
+開店前	day74→Day 75 開店前		今晚不倒	wineT	w_cham	46x28	screen: [11→10] | S: wineOff	有反應
+開店前	day74→Day 75 開店前		今晚不倒	wineT	w_old	46x28	screen: [11→10] | S: wineOff	有反應
+開店前	day74→Day 75 開店前		一鍵補到建議量 $26,773	restock		358x31	money 208704→182611 (-26093) | screen: [3→23] [3→23] [2→17] | S: money,stock,todayCost	有反應
+開店前	day74→Day 75 開店前		‹ 返回升級餐廳	backShop		358x31	phase prep→shop | main prep→shop | screen: [JILL→升級 Jill 的餐廳] [晴朗 · 預計約 102 位客人 適合出門吃晚餐的好天氣。 店裡最近很紅，人潮會多一些。 今天可能要多準備：Jill's→目前現金 $208,704 評分 4.5 今天預估基本備料 約 $26,773 建議保留 約 $30,889 家具與佈置] [今晚就買得起 社群與宣傳 大家在談：甜點 今天可以發 2 則→在廚房後牆、排煙罩旁邊砌一座磚造的披薩烤爐，底下是石板：可以在「菜單研發」研發酒吧披薩，給 Lounge 的客人。烤爐要] | S: life,story	有反應
+開店前	day74→Day 75 開店前		開始營業	start		358x51	screen: [→水牛城雞翅、起司條、生蠔、德國豬腳 沒有備料，客人點了要臨時叫貨（1.5 倍價、要等）。再按一次直接開店。]	有反應
+餐廳日誌	day92（從標題）	front	關閉	closeSub		46x31	sub book→None | screen: [→Jill 主廚的餐廳] [JOURNAL 餐廳日誌 關閉 總覽 故事 餐廳 社群 評價 熟客 VIP 話語 相簿 店貓 成就 熟練度 4.7 10→A Restaurant by Chef Jill OPEN FOR DINNER 繼續：DAY] [18:05 「合照」 Eric想跟 Jill 合照。 DAY 92→$1,179,146]	有反應
+餐廳日誌	day92（從標題）	front	總覽	btab	front	52x32	NOTHING VISIBLE	已在這個分頁（預期無變化）
+餐廳日誌	day92（從標題）	front	故事	btab	story	52x32	bookTab front→story | screen: [4.7 100 則評價 · 開業 92 天 · 9072 位客人 最近的評價 全部 › 「南瓜濃湯上桌的時候整桌都停下來→店裡真的發生過的事，一段一段記下來。沒有任務，也不用做什麼——下一段什麼時候發生，要看他們自己。點一段可以看那天的經過。] [「吃了黑皮諾，今天也算是過去了。」 DAY 92→& Mia 「慢慢變得不一樣」 5 / 8 個故事片段 1.DAY 65「開始記得彼此」 2.DAY 66「同一個晚上」] [「吃了炙烤肋眼牛排，今天也算是過去了。」 DAY 92→「兩個人，不是一組」 2 / 2 個故事片段 1.DAY 	有反應
+餐廳日誌	day92（從標題）	front	餐廳	btab	rest	52x32	bookTab front→rest | screen: [4.7 100 則評價→評分走勢 最近 14 天 3 4 5 DAY 92 4.71 ↑0.01 料理品質 262 道 Perfect（262 ] [→55 次 DAY 92 員工與開銷 阿德師傅 廚師 LV5・咖啡吧 日薪 $1,690 小茉 服務生 LV5・帶位＋點餐] [天 · 9072→天・9072]	有反應
+餐廳日誌	day92（從標題）	front	社群	btab	social	52x32	bookTab front→social | screen: [4.7 100 則評價 · 開業 92 天 · 9072 位客人 最近的評價 全部 › 「南瓜濃湯上桌的時候整桌都停下來→社群 客人自己會發；Jill 偶爾也發一則——只能是真的發生過的事。發了以後幾天，會有人為了那件事來。 最近大家在說 🍝] [「香烤鮭魚的火候剛剛好，這種店不多了。佈置得像朋友家。這家店會在我的名單上很久。」 吳小姐 ·→Ben 與 Lily 🍝 南瓜濃湯，推。 ♥ 8] [熟客留言 熟客 › Sophie 「吃了黑皮諾，今天也算是過去了。」→張經理 🍝 香草烤雞，推。 ♥ 8]	有反應
+餐廳日誌	day92（從標題）	front	評價	btab	reviews	52x32	bookTab front→reviews | screen: [則評價 · 開業 92 天 · 9072 位客人 最近的評價 全部 ›→則評論 · 最近 40 則計入評分 最近大家在說 🍝 料理 24 ✨ 氣氛 8 ⭐ 招牌菜 7 🍷 酒 6 最近 25 ] [熟客留言 熟客 › Sophie 「吃了黑皮諾，今天也算是過去了。」 DAY 92 王太太 「吃了炙烤肋眼牛排，今天也算→「Jill 主廚的Jill's 檸檬奶油干貝，每一口都被好好照顧。甜點是] [合照。 DAY 92 · 17:26 「不怕生」 柔柔在陌生客人旁邊待得很自在。 五隻店貓 店貓 › 樾樾 小齁 包包 →自己想的，吃得	有反應
+餐廳日誌	day92（從標題）	front	熟客	btab	regulars	52x32	bookTab front→regulars | screen: [4.7→來過兩次會開始眼熟，4 次成為熟客，12 次成為 Jill 的老客人。回頭客累計：1914 /] [則評價 · 開業 92 天 · 9072 位客人 最近的評價 全部 › 「南瓜濃湯上桌的時候整桌都停下來了。店裡的燈光跟→陳伯伯 Jill 的老客人 住在附近的退休老師，每天散步都會經過。 來店 44 次 ・老位子 T4・最愛 黃金蛋炒飯・最] [→一口自己的菜。 DAY 91 搬家了，還是會來。 DAY 88 在店裡遇到小林，原來認識。 DAY 81 第 25 次來]	有反應
+餐廳日誌	day92（從標題）	front	VIP	btab	vip	50x32	bookTab front→vip | screen: [4.7 100 則評價 · 開業 92 天 · 9072 位客人 最近的評價 全部 › 「南瓜濃湯上桌的時候整桌都停下來→來 5 次的客人有 VIP 卡：餐廳、Lounge 都九折，吃完晚餐再去 Lounge 八折。來 10 次換成八折卡：都] [「吃了黑皮諾，今天也算是過去了。」 DAY 92→VIP 八折 來店 55 次 Dylan VIP 八折 來店 52 次] [「吃了炙烤肋眼牛排，今天也算是過去了。」 DAY 92→VIP 八折 來店 47 次 陳伯伯 VIP 八折 來店 44 次]	有反應
+餐廳日誌	day92（從標題）	front	話語	btab	talk	52x32	bookTab front→talk | screen: [4.7 100 則評價 · 開業 92 天 · 9072 位客人 最近的評價 全部 › 「南瓜濃湯上桌的時候整桌都停下來→] [「香烤鮭魚的火候剛剛好，這種店不多了。佈置得像朋友家。這家店會在我的名單上很久。」→店裡說過的話（107 句）。營業中按左上角的 💬 也看得到。 22:32 打烊後阿拓又放了一盤在晴旁邊。「多的。」 22] [· DAY 92 熟客留言 熟客 ›→「先點這些，不夠再加。」 19:36 林予安 「八點半比較吵。」 19:35 周董 「這個要拍一下。」 19:30 Be]	有反應
+餐廳日誌	day92（從標題）	front	相簿	btab	mem	52x32	bookTab front→mem | screen: [4.7 100 則評價 · 開業→店裡的日常，剛好被看到的時候會留下一張。第一次的畫面會珍藏起來，其他的會慢慢換新。 第 1 週 DAY 1–7 DAY ] [天 · 9072 位客人 最近的評價 全部 › 「南瓜濃湯上桌的時候整桌都停下來了。店裡的燈光跟音樂剛剛好。要把這家店藏→最多客人的一天：175 位。] [「香烤鮭魚的火候剛剛好，這種店不多了。佈置得像朋友家。這家店會在我的名單上很久。」 吳小姐 ·→打烊後，Ken 帶來三瓶樣酒，配著招牌菜試。Jill 把酒取名叫「晚餐之後」。]	有反應
+餐廳日誌	day92（從標題）	front	店貓	btab	cats	52x32	bookTab front→cats | screen: [4.7 100 則評價 · 開業 92 天 · 9072 位客人 最近的評價 全部 › 「南瓜濃湯上桌的時候整桌都停下來→住在店裡的五隻貓。名字可以直接改。 男生 棕色虎斑，臉上的虎斑比較多，白肚子、白襪子。 最常待的地方：藤籃（6 次） 女]	有反應
+餐廳日誌	day92（從標題）	front	成就	btab	ach	52x32	bookTab front→ach | screen: [4.7 100 則評價 · 開業 92 天 · 9072 位客人 最近的評價 全部 › 「南瓜濃湯上桌的時候整桌都停下來→] [全部 ›→已解鎖。有些成就不會先告訴你是什麼。 早期 10/13 First Perfect 做出第一道 Perfect 料理 ·] [→兩位熟客在店裡認出了彼此 · DAY 35]	有反應
+餐廳日誌	day92（從標題）	front	熟練度	btab	mastery	65x32	bookTab front→mastery | screen: [4.7 100 則評價 · 開業 92 天 · 9072 位客人 最近的評價 全部 › 「南瓜濃湯上桌的時候整桌都停下來→] [合照。 DAY 92 · 17:26 「不怕生」 柔柔在陌生客人旁邊待得很自在。 五隻店貓 店貓 › 樾樾 小齁 包包 →越常做一道菜，就做得越快，Perfect 判定也越寬。 黃金蛋炒飯 LV5 3 步驟 拿鐵咖啡 LV5 3 步驟 番茄義]	有反應
+餐廳日誌	day92（從標題）	front	全部 ›	btab	reviews	51x23	bookTab front→reviews | screen: [則評價 · 開業 92 天 · 9072 位客人 最近的評價 全部 ›→則評論 · 最近 40 則計入評分 最近大家在說 🍝 料理 24 ✨ 氣氛 8 ⭐ 招牌菜 7 🍷 酒 6 最近 25 ] [熟客留言 熟客 › Sophie 「吃了黑皮諾，今天也算是過去了。」 DAY 92 王太太 「吃了炙烤肋眼牛排，今天也算→「Jill 主廚的Jill's 檸檬奶油干貝，每一口都被好好照顧。甜點是] [合照。 DAY 92 · 17:26 「不怕生」 柔柔在陌生客人旁邊待得很自在。 五隻店貓 店貓 › 樾樾 小齁 包包 →自己想的，吃得	有反應
+餐廳日誌	day92（從標題）	front	熟客 ›	btab	regulars	51x23	bookTab front→regulars | screen: [4.7→來過兩次會開始眼熟，4 次成為熟客，12 次成為 Jill 的老客人。回頭客累計：1914 /] [則評價 · 開業 92 天 · 9072 位客人 最近的評價 全部 › 「南瓜濃湯上桌的時候整桌都停下來了。店裡的燈光跟→陳伯伯 Jill 的老客人 住在附近的退休老師，每天散步都會經過。 來店 44 次 ・老位子 T4・最愛 黃金蛋炒飯・最] [→一口自己的菜。 DAY 91 搬家了，還是會來。 DAY 88 在店裡遇到小林，原來認識。 DAY 81 第 25 次來]	有反應
+餐廳日誌	day92（從標題）	front	相簿 ›	btab	mem	51x23	bookTab front→mem | screen: [4.7 100 則評價 · 開業→店裡的日常，剛好被看到的時候會留下一張。第一次的畫面會珍藏起來，其他的會慢慢換新。 第 1 週 DAY 1–7 DAY ] [天 · 9072 位客人 最近的評價 全部 › 「南瓜濃湯上桌的時候整桌都停下來了。店裡的燈光跟音樂剛剛好。要把這家店藏→最多客人的一天：175 位。] [「香烤鮭魚的火候剛剛好，這種店不多了。佈置得像朋友家。這家店會在我的名單上很久。」 吳小姐 ·→打烊後，Ken 帶來三瓶樣酒，配著招牌菜試。Jill 把酒取名叫「晚餐之後」。]	有反應
+餐廳日誌	day92（從標題）	front	DAY 92 · 18:05 「合照」 Eric想跟 Jill 合照。	photo	p92_selfie_rggel9	176x203	lightbox: ✕ DAY 92 · 18:05 「合照」 Eric想跟 Jill 合照。 ‹ 237 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	front	DAY 92 · 17:26 「不怕生」 柔柔在陌生客人旁邊待得很自在。	photo	p92_greeter_pp3hpv	171x198	lightbox: ✕ DAY 92 · 17:26 「不怕生」 柔柔在陌生客人旁邊待得很自在。 ‹ 236 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	front	店貓 ›	btab	cats	51x23	bookTab front→cats | screen: [4.7 100 則評價 · 開業 92 天 · 9072 位客人 最近的評價 全部 › 「南瓜濃湯上桌的時候整桌都停下來→住在店裡的五隻貓。名字可以直接改。 男生 棕色虎斑，臉上的虎斑比較多，白肚子、白襪子。 最常待的地方：藤籃（6 次） 女]	有反應
+餐廳日誌	day92（從標題）	front	全部 ›	btab	ach	51x23	bookTab front→ach | screen: [4.7 100 則評價 · 開業 92 天 · 9072 位客人 最近的評價 全部 › 「南瓜濃湯上桌的時候整桌都停下來→] [全部 ›→已解鎖。有些成就不會先告訴你是什麼。 早期 10/13 First Perfect 做出第一道 Perfect 料理 ·] [→兩位熟客在店裡認出了彼此 · DAY 35]	有反應
+餐廳日誌	day92（從標題）	story	看插圖	illus	up_cats	59x33	dlg: 側廳樓梯的門沒關好，柔柔和小齁跑上了二樓。那一晚，最後是在樓上找到牠們的。 | S: dayLog	有反應
+餐廳日誌	day92（從標題）	story		illus	ya_first	56x27	TAP FAILED: TimeoutError('Locator.tap: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator("#screen [data-act=\\"illus\\"][data-k=\\"ya_first\\"]").first\n    - locator resolved to <button data-act="illu | NOTHING VISIBLE	測試工具：按鈕在收起的故事列裡（展開後實按正常，見 story_illus/log.txt）
+餐廳日誌	day92（從標題）	story		illus	ya_trial	56x27	TAP FAILED: TimeoutError('Locator.tap: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator("#screen [data-act=\\"illus\\"][data-k=\\"ya_trial\\"]").first\n    - locator resolved to <button data-act="illu | NOTHING VISIBLE	測試工具：按鈕在收起的故事列裡（展開後實按正常，見 story_illus/log.txt）
+餐廳日誌	day92（從標題）	story		illus	ya_join	56x27	TAP FAILED: TimeoutError('Locator.tap: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator("#screen [data-act=\\"illus\\"][data-k=\\"ya_join\\"]").first\n    - locator resolved to <button data-act="illus | NOTHING VISIBLE (but S changed) | S: gearUse,dayLog,gearN	測試工具：按鈕在收起的故事列裡（展開後實按正常，見 story_illus/log.txt）
+餐廳日誌	day92（從標題）	story		illus	ken_t1	56x27	TAP FAILED: TimeoutError('Locator.tap: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator("#screen [data-act=\\"illus\\"][data-k=\\"ken_t1\\"]").first\n    - locator resolved to <button data-k="ken_t1"  | NOTHING VISIBLE	測試工具：按鈕在收起的故事列裡（展開後實按正常，見 story_illus/log.txt）
+餐廳日誌	day92（從標題）	story		illus	ken_t2	56x27	TAP FAILED: TimeoutError('Locator.tap: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator("#screen [data-act=\\"illus\\"][data-k=\\"ken_t2\\"]").first\n    - locator resolved to <button data-k="ken_t2"  | NOTHING VISIBLE	測試工具：按鈕在收起的故事列裡（展開後實按正常，見 story_illus/log.txt）
+餐廳日誌	day92（從標題）	story		illus	ken_t3	56x27	TAP FAILED: TimeoutError('Locator.tap: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator("#screen [data-act=\\"illus\\"][data-k=\\"ken_t3\\"]").first\n    - locator resolved to <button data-k="ken_t3"  | NOTHING VISIBLE (but S changed) | S: gearUse,dayLog,gearN	測試工具：按鈕在收起的故事列裡（展開後實按正常，見 story_illus/log.txt）
+餐廳日誌	day92（從標題）	story		illus	lin_guest	56x27	TAP FAILED: TimeoutError('Locator.tap: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator("#screen [data-act=\\"illus\\"][data-k=\\"lin_guest\\"]").first\n    - locator resolved to <button data-act="ill | NOTHING VISIBLE	測試工具：按鈕在收起的故事列裡（展開後實按正常，見 story_illus/log.txt）
+餐廳日誌	day92（從標題）	story		illus	yj_intro	56x27	TAP FAILED: TimeoutError('Locator.tap: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator("#screen [data-act=\\"illus\\"][data-k=\\"yj_intro\\"]").first\n    - locator resolved to <button data-act="illu | NOTHING VISIBLE	測試工具：按鈕在收起的故事列裡（展開後實按正常，見 story_illus/log.txt）
+餐廳日誌	day92（從標題）	story		illus	yj_key	56x27	TAP FAILED: TimeoutError('Locator.tap: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator("#screen [data-act=\\"illus\\"][data-k=\\"yj_key\\"]").first\n    - locator resolved to <button data-k="yj_key"  | NOTHING VISIBLE (but S changed) | S: gearUse,dayLog,gearN	測試工具：按鈕在收起的故事列裡（展開後實按正常，見 story_illus/log.txt）
+餐廳日誌	day92（從標題）	story		illus	wall_leak	56x27	TAP FAILED: TimeoutError('Locator.tap: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator("#screen [data-act=\\"illus\\"][data-k=\\"wall_leak\\"]").first\n    - locator resolved to <button data-act="ill | NOTHING VISIBLE	測試工具：按鈕在收起的故事列裡（展開後實按正常，見 story_illus/log.txt）
+餐廳日誌	day92（從標題）	story		illus	wall_settled	56x27	TAP FAILED: TimeoutError('Locator.tap: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator("#screen [data-act=\\"illus\\"][data-k=\\"wall_settled\\"]").first\n    - locator resolved to <button data-act=" | NOTHING VISIBLE	測試工具：按鈕在收起的故事列裡（展開後實按正常，見 story_illus/log.txt）
+餐廳日誌	day92（從標題）	story	關閉日誌	closeSub		358x51	sub book→None | screen: [→Jill 主廚的餐廳] [JOURNAL→A Restaurant by Chef Jill OPEN FOR DINNER 繼續：DAY 92 · $1,179] [關閉 總覽 故事 餐廳 社群 評價 熟客 VIP 話語 相簿 店貓 成就 熟練度 店裡真的發生過的事，一段一段記下來。沒→設定・存檔] | S: gearUse,dayLog,gearN	有反應
+餐廳日誌	day92（從標題）	social	發這則	jillPost	dessert	59x31	toast: Jill 發了一則：Jill's 莓果奶酪：Jill 自己想的第二道。 | screen: [這幾天大家在談：✨ 氣氛（Jill→這幾天大家在談：🍰 甜點（Jill] [94）→95）] [第二道招牌→店裡的一天 合照 發這則 最近的貼文 讚會一直慢慢多 Jill's Kitchen 🍰] | S: dayLog,story,social	有反應
+餐廳日誌	day92（從標題）	social	發這則	jillPost	cats:p91_tunnel_c2ryar	59x31	toast: Jill 發了一則：小齁從隧道另一頭衝出來。 | screen: [這幾天大家在談：✨ 氣氛（Jill→這幾天大家在談：🐈 貓咪（Jill] [94）→95）] [隧道的另一頭→合照] | S: dayLog,story,social	有反應
+餐廳日誌	day92（從標題）	social	看更早的貼文（共 40 則）	postsAll		358x31	screen: [最近的貼文→所有貼文] [看更早的貼文（共 40 則）→Madame Lin 與朋友 🍷 有酒可以配了。 ♥ 13 DAY 91 張經理 🚪 側廳好坐。 ♥ 16 DAY 91]	有反應
+餐廳日誌	day92（從標題）	social	開始 $6,000	campaign	local	99x31	money 1179146→1173146 (-6000) | toast: 在地宣傳明天開始，一共三天。 | screen: [附近的人知道這裡：多一些第一次來的家庭、一個人吃飯的人。能不能回來，看那一頓。 開始 $6,000 料理宣傳 宣傳一道菜→明天開始 DAY 93–95。開始以後，看到宣傳來的客人會在票券名字旁有 📱。] | S: money,dayLog,social	有反應
+餐廳日誌	day92（從標題）	social	開始 $9,000	campaign	dish	99x31	money 1179146→1170146 (-9000) | toast: 料理宣傳明天開始，一共三天。 | screen: [在地宣傳 附近的人知道這裡：多一些第一次來的家庭、一個人吃飯的人。能不能回來，看那一頓。 開始 $6,000 料理宣傳 →料理宣傳：Jill's] [Jill's 莓果奶酪 舒芙蕾 巴斯克乳酪蛋糕 莓果蘇打 拿鐵咖啡 松露薯條 香煎鴨胸 松露燉飯 乾式熟成肋眼 海膽燉飯→明天開始 DAY 93–95。開始以後，看到宣傳來的客人會在票券名字旁有 📱。] | S: money,dayLog,social	有反應
+餐廳日誌	day92（從標題）	social	開始 $9,000	campaign	side	99x31	money 1179146→1170146 (-9000) | toast: 側廳／聚餐明天開始，一共三天。 | screen: [在地宣傳 附近的人知道這裡：多一些第一次來的家庭、一個人吃飯的人。能不能回來，看那一頓。 開始 $6,000 料理宣傳 →] [讓人知道後面有一間可以坐一桌人的側廳：聚餐、家庭、坐得久的桌。 開始 $9,000 店貓／生活感 讓人知道店裡有五隻貓：→明天開始 DAY 93–95。開始以後，看到宣傳來的客人會在票券名字旁有 📱。] | S: money,dayLog,social	有反應
+餐廳日誌	day92（從標題）	social	開始 $7,000	campaign	cats	99x31	money 1179146→1172146 (-7000) | toast: 店貓／生活感明天開始，一共三天。 | screen: [在地宣傳 附近的人知道這裡：多一些第一次來的家庭、一個人吃飯的人。能不能回來，看那一頓。 開始 $6,000 料理宣傳 →] [讓人知道店裡有五隻貓：好奇的第一次客人、愛貓的人、拍照的人。貓不會因此上班。 開始 $7,000 晚餐／酒單 晚餐與酒：→明天開始 DAY 93–95。開始以後，看到宣傳來的客人會在票券名字旁有 📱。] | S: money,dayLog,social	有反應
+餐廳日誌	day92（從標題）	social	開始 $12,000	campaign	wine	107x31	money 1179146→1167146 (-12000) | toast: 晚餐／酒單明天開始，一共三天。 | screen: [在地宣傳 附近的人知道這裡：多一些第一次來的家庭、一個人吃飯的人。能不能回來，看那一頓。 開始 $6,000 料理宣傳 →] [晚餐與酒：想配一杯的人、吃完想再坐一下的人。 開始 $12,000→明天開始 DAY 93–95。開始以後，看到宣傳來的客人會在票券名字旁有 📱。] | S: money,dayLog,social	有反應
+餐廳日誌	day92（從標題）	mem	DAY 1 「第一天」	photo	p1_first	175x170	lightbox: ✕ DAY 1 「第一天」 ‹ 1 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 1 「最佳座位」 珍藏	photo	p1_best_wa741d	171x165	lightbox: ✕ DAY 1 「最佳座位」 珍藏 ‹ 2 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 1 「今天也在附近」 珍藏	photo	p1_nearby_j076q3	175x170	lightbox: ✕ DAY 1 「今天也在附近」 珍藏 ‹ 3 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 1 「Jill 左右各一隻」 珍藏	photo	p1_sides_q4elcy	175x170	lightbox: ✕ DAY 1 「Jill 左右各一隻」 珍藏 ‹ 4 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 1 「睡神」 珍藏	photo	p1_sleepgod_6f0w2n	171x165	lightbox: ✕ DAY 1 「睡神」 珍藏 ‹ 5 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 1 「今天大家都在」 珍藏	photo	p1_everyone_4eo68p	175x170	lightbox: ✕ DAY 1 「今天大家都在」 珍藏 ‹ 6 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 1 「三貓午睡」 珍藏	photo	p1_nap3_t0b580	175x170	lightbox: ✕ DAY 1 「三貓午睡」 珍藏 ‹ 7 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 1 「今晚的沙發」 珍藏	photo	p1_sofa_5o43g6	171x165	lightbox: ✕ DAY 1 「今晚的沙發」 珍藏 ‹ 8 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 2 「沙發客滿」 珍藏	photo	p2_sofafull_q8hme0	175x170	lightbox: ✕ DAY 2 「沙發客滿」 珍藏 ‹ 9 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 3 「白等了」 珍藏	photo	p3_waited_mt097o	175x170	lightbox: ✕ DAY 3 「白等了」 珍藏 ‹ 10 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 3 · 21:34 「膝上的重量」 小齁跳上了 Jill 的膝蓋。 珍藏	photo	p3_lap_wnyolq	171x183	lightbox: ✕ DAY 3 · 21:34 「膝上的重量」 小齁跳上了 Jill 的膝蓋。 珍藏 ‹ 11 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 4 · 17:19 「被拍了」 客人拿起手機，拍了寶寶一張。 珍藏	photo	p4_photo_epos3c	176x187	lightbox: ✕ DAY 4 · 17:19 「被拍了」 客人拿起手機，拍了寶寶一張。 珍藏 ‹ 12 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 6 · 18:42 「埋伏成功」 柔柔從角落跳出來，寶寶嚇了一跳。 珍藏	photo	p6_ambush_6r14j8	176x203	lightbox: ✕ DAY 6 · 18:42 「埋伏成功」 柔柔從角落跳出來，寶寶嚇了一跳。 珍藏 ‹ 13 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 6 · 18:42 「妳到底在幹嘛」 寶寶看著柔柔，看不懂。 珍藏	photo	p6_what_qxregp	171x198	lightbox: ✕ DAY 6 · 18:42 「妳到底在幹嘛」 寶寶看著柔柔，看不懂。 珍藏 ‹ 14 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 7 · 20:25 「突然開賽」 樾樾跟包包突然繞著店裡跑起來。 珍藏	photo	p7_race_m55kg1	176x203	lightbox: ✕ DAY 7 · 20:25 「突然開賽」 樾樾跟包包突然繞著店裡跑起來。 珍藏 ‹ 15 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 8 · 17:29 「最佳座位」 寶寶找到了看得見全店的位子。	photo	p8_best_fzh1go	176x187	lightbox: ✕ DAY 8 · 17:29 「最佳座位」 寶寶找到了看得見全店的位子。 ‹ 16 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 8 · 17:31 「被拍了」 客人拿起手機，拍了寶寶一張。	photo	p8_photo_t7aeup	171x183	lightbox: ✕ DAY 8 · 17:31 「被拍了」 客人拿起手機，拍了寶寶一張。 ‹ 17 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 9 「三貓午睡」 三隻貓睡成一團。	photo	p9_nap3_ha8hn4	176x203	lightbox: ✕ DAY 9 「三貓午睡」 三隻貓睡成一團。 ‹ 18 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 9 · 17:14 「偷閒」 店裡沒事，Jill 在沙發上坐了一下。 珍藏	photo	p9_rest_w8b2jh	176x203	lightbox: ✕ DAY 9 · 17:14 「偷閒」 店裡沒事，Jill 在沙發上坐了一下。 珍藏 ‹ 19 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 9 · 18:37 「今天也在附近」 樾樾坐在 Jill 腳邊。	photo	p9_nearby_xgzor8	171x198	lightbox: ✕ DAY 9 · 18:37 「今天也在附近」 樾樾坐在 Jill 腳邊。 ‹ 20 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 10 「今天大家都在」 五隻貓難得同時出現在一個畫面裡。	photo	p10_everyone_q7y0st	176x203	lightbox: ✕ DAY 10 「今天大家都在」 五隻貓難得同時出現在一個畫面裡。 ‹ 21 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 10 「Jill 左右各一隻」 樾樾跟小齁一左一右。	photo	p10_sides_cn7bli	176x187	lightbox: ✕ DAY 10 「Jill 左右各一隻」 樾樾跟小齁一左一右。 ‹ 22 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 11 「最佳座位」 寶寶找到了看得見全店的位子。	photo	p11_best_jpe3s5	171x183	lightbox: ✕ DAY 11 「最佳座位」 寶寶找到了看得見全店的位子。 ‹ 23 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 11 · 17:26 「被拍了」 客人拿起手機，拍了寶寶一張。	photo	p11_photo_9a4aua	176x187	lightbox: ✕ DAY 11 · 17:26 「被拍了」 客人拿起手機，拍了寶寶一張。 ‹ 24 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 12 「三貓午睡」 三隻貓睡成一團。	photo	p12_nap3_hpb1hi	176x187	lightbox: ✕ DAY 12 「三貓午睡」 三隻貓睡成一團。 ‹ 25 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 12 · 21:31 「膝上的重量」 樾樾跳上了 Jill 的膝蓋。	photo	p12_lap_zlhp7j	171x183	lightbox: ✕ DAY 12 · 21:31 「膝上的重量」 樾樾跳上了 Jill 的膝蓋。 ‹ 26 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 13 · 17:20 「睡神」 店裡再吵，包包都照睡不誤。	photo	p13_sleepgod_vy1doc	176x187	lightbox: ✕ DAY 13 · 17:20 「睡神」 店裡再吵，包包都照睡不誤。 ‹ 27 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 13 · 17:21 「偷閒」 店裡沒事，Jill 在沙發上坐了一下。	photo	p13_rest_z4w10g	176x203	lightbox: ✕ DAY 13 · 17:21 「偷閒」 店裡沒事，Jill 在沙發上坐了一下。 ‹ 28 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 14 「最佳座位」 寶寶找到了看得見全店的位子。	photo	p14_best_xm68yx	171x198	lightbox: ✕ DAY 14 「最佳座位」 寶寶找到了看得見全店的位子。 ‹ 29 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 14 · 17:39 「今天也在附近」 樾樾坐在 Jill 腳邊。	photo	p14_nearby_e7plpz	176x187	lightbox: ✕ DAY 14 · 17:39 「今天也在附近」 樾樾坐在 Jill 腳邊。 ‹ 30 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 14 · 18:16 「摸一下」 Jill 蹲下來摸了摸小齁。 珍藏	photo	p14_pet_2mfwat	176x187	lightbox: ✕ DAY 14 · 18:16 「摸一下」 Jill 蹲下來摸了摸小齁。 珍藏 ‹ 31 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 15 「三貓午睡」 三隻貓睡成一團。	photo	p15_nap3_dhkzd1	171x198	lightbox: ✕ DAY 15 「三貓午睡」 三隻貓睡成一團。 ‹ 32 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 15 「今天大家都在」 五隻貓難得同時出現在一個畫面裡。	photo	p15_everyone_1iflyk	176x203	lightbox: ✕ DAY 15 「今天大家都在」 五隻貓難得同時出現在一個畫面裡。 ‹ 33 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 16 · 17:15 「偷閒」 店裡沒事，Jill 在沙發上坐了一下。	photo	p16_rest_sno2wn	176x203	lightbox: ✕ DAY 16 · 17:15 「偷閒」 店裡沒事，Jill 在沙發上坐了一下。 ‹ 34 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 16 · 17:28 「睡神」 店裡再吵，包包都照睡不誤。	photo	p16_sleepgod_qhagl5	171x198	lightbox: ✕ DAY 16 · 17:28 「睡神」 店裡再吵，包包都照睡不誤。 ‹ 35 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 17 · 18:23 「摸一下」 Jill 蹲下來摸了摸樾樾。	photo	p17_pet_iagcc2	176x187	lightbox: ✕ DAY 17 · 18:23 「摸一下」 Jill 蹲下來摸了摸樾樾。 ‹ 36 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 17 · 19:13 「最佳座位」 寶寶找到了看得見全店的位子。	photo	p17_best_3bla0e	176x187	lightbox: ✕ DAY 17 · 19:13 「最佳座位」 寶寶找到了看得見全店的位子。 ‹ 37 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 18 「三貓午睡」 三隻貓睡成一團。	photo	p18_nap3_51sw8a	171x198	lightbox: ✕ DAY 18 「三貓午睡」 三隻貓睡成一團。 ‹ 38 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 18 「今天大家都在」 五隻貓難得同時出現在一個畫面裡。	photo	p18_everyone_1rkqbm	176x203	lightbox: ✕ DAY 18 「今天大家都在」 五隻貓難得同時出現在一個畫面裡。 ‹ 39 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 19 · 17:13 「被拍了」 客人拿起手機，拍了寶寶一張。	photo	p19_photo_tkbjay	176x203	lightbox: ✕ DAY 19 · 17:13 「被拍了」 客人拿起手機，拍了寶寶一張。 ‹ 40 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 19 · 17:14 「偷閒」 店裡沒事，Jill 在沙發上坐了一下。	photo	p19_rest_ok8w83	171x198	lightbox: ✕ DAY 19 · 17:14 「偷閒」 店裡沒事，Jill 在沙發上坐了一下。 ‹ 41 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 20 「今天也在附近」 樾樾坐在 Jill 腳邊。	photo	p20_nearby_l2s4xb	176x203	lightbox: ✕ DAY 20 「今天也在附近」 樾樾坐在 Jill 腳邊。 ‹ 42 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 20 「突然開賽」 樾樾跟包包突然繞著店裡跑起來。	photo	p20_race_8og4o0	176x203	lightbox: ✕ DAY 20 「突然開賽」 樾樾跟包包突然繞著店裡跑起來。 ‹ 43 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 21 「最佳座位」 寶寶找到了看得見全店的位子。	photo	p21_best_6qiwtu	171x183	lightbox: ✕ DAY 21 「最佳座位」 寶寶找到了看得見全店的位子。 ‹ 44 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 21 「三貓午睡」 三隻貓睡成一團。	photo	p21_nap3_oeadqc	176x187	lightbox: ✕ DAY 21 「三貓午睡」 三隻貓睡成一團。 ‹ 45 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 22 · 17:13 「偷閒」 店裡沒事，Jill 在沙發上坐了一下。	photo	p22_rest_ds412p	176x203	lightbox: ✕ DAY 22 · 17:13 「偷閒」 店裡沒事，Jill 在沙發上坐了一下。 ‹ 46 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 22 · 17:23 「睡神」 店裡再吵，包包都照睡不誤。	photo	p22_sleepgod_542esp	171x198	lightbox: ✕ DAY 22 · 17:23 「睡神」 店裡再吵，包包都照睡不誤。 ‹ 47 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 22 · 20:20 「不怕生」 柔柔在陌生客人旁邊待得很自在。 珍藏	photo	p22_greeter_ovihbz	176x203	lightbox: ✕ DAY 22 · 20:20 「不怕生」 柔柔在陌生客人旁邊待得很自在。 珍藏 ‹ 48 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 23 「今天也在附近」 樾樾坐在 Jill 腳邊。	photo	p23_nearby_k5od3x	176x203	lightbox: ✕ DAY 23 「今天也在附近」 樾樾坐在 Jill 腳邊。 ‹ 49 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 23 · 17:47 「被拍了」 客人拿起手機，拍了寶寶一張。	photo	p23_photo_kzemls	171x198	lightbox: ✕ DAY 23 · 17:47 「被拍了」 客人拿起手機，拍了寶寶一張。 ‹ 50 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 23 · 21:38 「各自安靜」 Jill 在看書，包包、柔柔在旁邊各睡各的。 珍藏	photo	p23_reading_4cqvqo	176x203	lightbox: ✕ DAY 23 · 21:38 「各自安靜」 Jill 在看書，包包、柔柔在旁邊各睡各的。 珍藏 ‹ 51 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 23 · 21:38 「打烊後」 店關了，燈還亮著。 珍藏	photo	p23_quiet_el97ps	176x187	lightbox: ✕ DAY 23 · 21:38 「打烊後」 店關了，燈還亮著。 珍藏 ‹ 52 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 24 · 17:16 「膝上的重量」 樾樾跳上了 Jill 的膝蓋。	photo	p24_lap_uow046	171x183	lightbox: ✕ DAY 24 · 17:16 「膝上的重量」 樾樾跳上了 Jill 的膝蓋。 ‹ 53 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 24 · 17:55 「怎麼睡在這」 柔柔睡在一個奇怪的地方。 珍藏	photo	p24_oddspot_mwr9ql	176x187	lightbox: ✕ DAY 24 · 17:55 「怎麼睡在這」 柔柔睡在一個奇怪的地方。 珍藏 ‹ 54 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 24 · 19:11 「最佳座位」 寶寶找到了看得見全店的位子。	photo	p24_best_is3wj6	176x187	lightbox: ✕ DAY 24 · 19:11 「最佳座位」 寶寶找到了看得見全店的位子。 ‹ 55 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 24 · 21:17 「玩起來了」 小齁跟寶寶玩起來了。 珍藏	photo	p24_play_kxrtan	171x183	lightbox: ✕ DAY 24 · 21:17 「玩起來了」 小齁跟寶寶玩起來了。 珍藏 ‹ 56 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 25 · 17:20 「睡神」 店裡再吵，包包都照睡不誤。	photo	p25_sleepgod_j7z4ke	176x187	lightbox: ✕ DAY 25 · 17:20 「睡神」 店裡再吵，包包都照睡不誤。 ‹ 57 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 25 · 17:20 「不怕生」 柔柔在陌生客人旁邊待得很自在。	photo	p25_greeter_iu34gc	176x203	lightbox: ✕ DAY 25 · 17:20 「不怕生」 柔柔在陌生客人旁邊待得很自在。 ‹ 58 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 25 · 20:11 「又見面了」 Mia跟柔柔又見面了。 珍藏	photo	p25_oldfriends_zr1ck2	171x198	lightbox: ✕ DAY 25 · 20:11 「又見面了」 Mia跟柔柔又見面了。 珍藏 ‹ 59 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 26 · 17:18 「突然開賽」 樾樾跟包包突然繞著店裡跑起來。	photo	p26_race_uyrg50	176x203	lightbox: ✕ DAY 26 · 17:18 「突然開賽」 樾樾跟包包突然繞著店裡跑起來。 ‹ 60 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 26 · 18:34 「三貓午睡」 三隻貓睡成一團。	photo	p26_nap3_4vuc2x	176x203	lightbox: ✕ DAY 26 · 18:34 「三貓午睡」 三隻貓睡成一團。 ‹ 61 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 27 「今天大家都在」 五隻貓難得同時出現在一個畫面裡。	photo	p27_everyone_ot451q	171x198	lightbox: ✕ DAY 27 「今天大家都在」 五隻貓難得同時出現在一個畫面裡。 ‹ 62 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 27 · 17:13 「偷閒」 店裡沒事，Jill 在沙發上坐了一下。	photo	p27_rest_66ykbv	176x203	lightbox: ✕ DAY 27 · 17:13 「偷閒」 店裡沒事，Jill 在沙發上坐了一下。 ‹ 63 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 27 · 19:59 「下雨天」 外面在下雨，包包睡得更沉了。 珍藏	photo	p27_rainday_9eqsj8	176x187	lightbox: ✕ DAY 27 · 19:59 「下雨天」 外面在下雨，包包睡得更沉了。 珍藏 ‹ 64 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 28 · 17:12 「被拍了」 客人拿起手機，拍了寶寶一張。 珍藏	photo	p28_photo_oikovo	171x183	lightbox: ✕ DAY 28 · 17:12 「被拍了」 客人拿起手機，拍了寶寶一張。 珍藏 ‹ 65 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 28 · 17:19 「最佳座位」 寶寶找到了看得見全店的位子。	photo	p28_best_gn25is	176x187	lightbox: ✕ DAY 28 · 17:19 「最佳座位」 寶寶找到了看得見全店的位子。 ‹ 66 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 28 · 17:20 「牠自己找到的」 小齁第一次用了紙箱。 珍藏	photo	p28_newspot_wfkk4q	176x187	lightbox: ✕ DAY 28 · 17:20 「牠自己找到的」 小齁第一次用了紙箱。 珍藏 ‹ 67 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 28 · 17:20 「紙箱裡有東西」 小齁在紙箱裡，只露出頭。 珍藏	photo	p28_boxcat_9xh2e0	171x183	lightbox: ✕ DAY 28 · 17:20 「紙箱裡有東西」 小齁在紙箱裡，只露出頭。 珍藏 ‹ 68 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 29 「三貓午睡」 三隻貓睡成一團。	photo	p29_nap3_7zjzkz	176x203	lightbox: ✕ DAY 29 「三貓午睡」 三隻貓睡成一團。 ‹ 69 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 29 · 17:21 「小朋友與貓」 小朋友盯著樾樾看了很久，飯都忘了吃。 珍藏	photo	p29_kidcat_inrx5a	176x203	lightbox: ✕ DAY 29 · 17:21 「小朋友與貓」 小朋友盯著樾樾看了很久，飯都忘了吃。 珍藏 ‹ 70 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 29 · 17:23 「睡神」 店裡再吵，包包都照睡不誤。	photo	p29_sleepgod_2vef1m	171x183	lightbox: ✕ DAY 29 · 17:23 「睡神」 店裡再吵，包包都照睡不誤。 ‹ 71 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 30 「今天也在附近」 樾樾坐在 Jill 腳邊。	photo	p30_nearby_b2fvf1	176x187	lightbox: ✕ DAY 30 「今天也在附近」 樾樾坐在 Jill 腳邊。 ‹ 72 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 30 · 21:33 「Jill 左右各一隻」 樾樾跟小齁一左一右。	photo	p30_sides_ffb3ax	176x203	lightbox: ✕ DAY 30 · 21:33 「Jill 左右各一隻」 樾樾跟小齁一左一右。 ‹ 73 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 30 · 18:35 「第一道特製版」 第一盤蟹肉蛋炒飯從出菜口出去了。 珍藏	photo	p30_firstspecial_owd7mq	171x198	lightbox: ✕ DAY 30 · 18:35 「第一道特製版」 第一盤蟹肉蛋炒飯從出菜口出去了。 珍藏 ‹ 74 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 30 · 19:02 「靠著柔柔」 樾樾靠著柔柔睡著了。 珍藏	photo	p30_pressed_b59zaj	176x187	lightbox: ✕ DAY 30 · 19:02 「靠著柔柔」 樾樾靠著柔柔睡著了。 珍藏 ‹ 75 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 31 · 17:14 「最佳座位」 寶寶找到了看得見全店的位子。	photo	p31_best_c6rj6r	176x187	lightbox: ✕ DAY 31 · 17:14 「最佳座位」 寶寶找到了看得見全店的位子。 ‹ 76 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 31 · 17:16 「偷閒」 店裡沒事，Jill 在沙發上坐了一下。	photo	p31_rest_1ne0w0	171x198	lightbox: ✕ DAY 31 · 17:16 「偷閒」 店裡沒事，Jill 在沙發上坐了一下。 ‹ 77 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 31 · 19:06 「先拍再吃」 蟹肉蛋炒飯上桌，客人先拍了一張。 珍藏	photo	p31_dishphoto_ymq8gs	176x203	lightbox: ✕ DAY 31 · 19:06 「先拍再吃」 蟹肉蛋炒飯上桌，客人先拍了一張。 珍藏 ‹ 78 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 31 · 19:14 「這個請你」 Jill 請了王先生與王太太一份提拉米蘇。 珍藏	photo	p31_treat_m0qhq5	176x203	lightbox: ✕ DAY 31 · 19:14 「這個請你」 Jill 請了王先生與王太太一份提拉米蘇。 珍藏 ‹ 79 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 32 「三貓午睡」 三隻貓睡成一團。	photo	p32_nap3_f364on	171x198	lightbox: ✕ DAY 32 「三貓午睡」 三隻貓睡成一團。 ‹ 80 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 32 「今天大家都在」 五隻貓難得同時出現在一個畫面裡。	photo	p32_everyone_vj5g6s	176x203	lightbox: ✕ DAY 32 「今天大家都在」 五隻貓難得同時出現在一個畫面裡。 ‹ 81 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 32 · 19:07 「今天不是一個人」 Mia今天帶了人來。 珍藏	photo	p32_company_sh4qex	176x203	lightbox: ✕ DAY 32 · 19:07 「今天不是一個人」 Mia今天帶了人來。 珍藏 ‹ 82 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 33 · 17:51 「睡神」 店裡再吵，包包都照睡不誤。	photo	p33_sleepgod_eesd3i	171x183	lightbox: ✕ DAY 33 · 17:51 「睡神」 店裡再吵，包包都照睡不誤。 ‹ 83 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 33 · 17:51 「膝上的重量」 樾樾跳上了 Jill 的膝蓋。	photo	p33_lap_2jv7in	176x187	lightbox: ✕ DAY 33 · 17:51 「膝上的重量」 樾樾跳上了 Jill 的膝蓋。 ‹ 84 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 33 · 20:17 「合照」 Mr. Hart想跟 Jill 合照。 珍藏	photo	p33_selfie_qd6jl4	176x187	lightbox: ✕ DAY 33 · 20:17 「合照」 Mr. Hart想跟 Jill 合照。 珍藏 ‹ 85 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 33 · 20:23 「經過的時候」 Jill 在 Dylan 的桌邊站了一下。 珍藏	photo	p33_pause_f6ad8l	171x183	lightbox: ✕ DAY 33 · 20:23 「經過的時候」 Jill 在 Dylan 的桌邊站了一下。 珍藏 ‹ 86 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 34 「最佳座位」 寶寶找到了看得見全店的位子。	photo	p34_best_i7wqv3	176x203	lightbox: ✕ DAY 34 「最佳座位」 寶寶找到了看得見全店的位子。 ‹ 87 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 34 · 17:15 「偷閒」 店裡沒事，Jill 在沙發上坐了一下。	photo	p34_rest_27qe78	176x203	lightbox: ✕ DAY 34 · 17:15 「偷閒」 店裡沒事，Jill 在沙發上坐了一下。 ‹ 88 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 35 · 17:15 「被拍了」 客人拿起手機，拍了柔柔一張。	photo	p35_photo_vzxx3r	171x198	lightbox: ✕ DAY 35 · 17:15 「被拍了」 客人拿起手機，拍了柔柔一張。 ‹ 89 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 35 · 18:12 「啃草的時間」 小齁啃了兩口貓草，然後在旁邊翻肚子。 珍藏	photo	p35_grass_c3hi21	176x203	lightbox: ✕ DAY 35 · 18:12 「啃草的時間」 小齁啃了兩口貓草，然後在旁邊翻肚子。 珍藏 ‹ 90 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 35 · 18:26 「小朋友與貓」 小朋友盯著寶寶看了很久，飯都忘了吃。	photo	p35_kidcat_cxiehm	176x203	lightbox: ✕ DAY 35 · 18:26 「小朋友與貓」 小朋友盯著寶寶看了很久，飯都忘了吃。 ‹ 91 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 35 · 20:20 「在店裡遇到」 Mia跟小林在店裡打了招呼，原來認識。 珍藏	photo	p35_neighbors_nne8wo	171x198	lightbox: ✕ DAY 35 · 20:20 「在店裡遇到」 Mia跟小林在店裡打了招呼，原來認識。 珍藏 ‹ 92 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 36 「三貓午睡」 三隻貓睡成一團。	photo	p36_nap3_pv0wud	176x203	lightbox: ✕ DAY 36 「三貓午睡」 三隻貓睡成一團。 ‹ 93 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 36 「今天大家都在」 五隻貓難得同時出現在一個畫面裡。	photo	p36_everyone_v05gpf	176x203	lightbox: ✕ DAY 36 「今天大家都在」 五隻貓難得同時出現在一個畫面裡。 ‹ 94 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 37 · 17:14 「偷閒」 店裡沒事，Jill 在沙發上坐了一下。	photo	p37_rest_q8ws26	171x198	lightbox: ✕ DAY 37 · 17:14 「偷閒」 店裡沒事，Jill 在沙發上坐了一下。 ‹ 95 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 37 · 17:18 「膝上的重量」 樾樾跳上了 Jill 的膝蓋。	photo	p37_lap_7ygq0q	176x203	lightbox: ✕ DAY 37 · 17:18 「膝上的重量」 樾樾跳上了 Jill 的膝蓋。 ‹ 96 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 38 · 21:31 「最佳座位」 寶寶找到了看得見全店的位子。	photo	p38_best_ypc40l	176x187	lightbox: ✕ DAY 38 · 21:31 「最佳座位」 寶寶找到了看得見全店的位子。 ‹ 97 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 38 · 17:16 「被拍了」 客人拿起手機，拍了樾樾一張。	photo	p38_photo_rkwwbb	171x183	lightbox: ✕ DAY 38 · 17:16 「被拍了」 客人拿起手機，拍了樾樾一張。 ‹ 98 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 38 · 18:39 「紀念日」 王先生與王太太的紀念日，Jill 請了甜點。 珍藏	photo	p38_anniversary_1kxxmz	176x203	lightbox: ✕ DAY 38 · 18:39 「紀念日」 王先生與王太太的紀念日，Jill 請了甜點。 珍藏 ‹ 99 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 39 「三貓午睡」 三隻貓睡成一團。	photo	p39_nap3_x9e51b	176x203	lightbox: ✕ DAY 39 「三貓午睡」 三隻貓睡成一團。 ‹ 100 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 39 「今天大家都在」 五隻貓難得同時出現在一個畫面裡。	photo	p39_everyone_9b6m52	171x198	lightbox: ✕ DAY 39 「今天大家都在」 五隻貓難得同時出現在一個畫面裡。 ‹ 101 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 40 · 17:03 「摸一下」 Jill 蹲下來摸了摸柔柔。	photo	p40_pet_toslij	176x203	lightbox: ✕ DAY 40 · 17:03 「摸一下」 Jill 蹲下來摸了摸柔柔。 ‹ 102 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 40 · 17:11 「不怕生」 柔柔在陌生客人旁邊待得很自在。	photo	p40_greeter_ixow9z	176x203	lightbox: ✕ DAY 40 · 17:11 「不怕生」 柔柔在陌生客人旁邊待得很自在。 ‹ 103 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 41 · 17:22 「最佳座位」 寶寶找到了看得見全店的位子。	photo	p41_best_ccfdrh	171x198	lightbox: ✕ DAY 41 · 17:22 「最佳座位」 寶寶找到了看得見全店的位子。 ‹ 104 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 41 · 17:26 「睡神」 店裡再吵，包包都照睡不誤。	photo	p41_sleepgod_m8eayq	176x187	lightbox: ✕ DAY 41 · 17:26 「睡神」 店裡再吵，包包都照睡不誤。 ‹ 105 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 42 「三貓午睡」 三隻貓睡成一團。	photo	p42_nap3_fe7otl	176x187	lightbox: ✕ DAY 42 「三貓午睡」 三隻貓睡成一團。 ‹ 106 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 42 · 17:14 「偷閒」 店裡沒事，Jill 在沙發上坐了一下。	photo	p42_rest_vtec0a	171x198	lightbox: ✕ DAY 42 · 17:14 「偷閒」 店裡沒事，Jill 在沙發上坐了一下。 ‹ 107 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 43 · 17:25 「被拍了」 客人拿起手機，拍了柔柔一張。	photo	p43_photo_yvsex1	176x187	lightbox: ✕ DAY 43 · 17:25 「被拍了」 客人拿起手機，拍了柔柔一張。 ‹ 108 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 43 · 17:33 「膝上的重量」 小齁跳上了 Jill 的膝蓋。	photo	p43_lap_9e1t8j	176x187	lightbox: ✕ DAY 43 · 17:33 「膝上的重量」 小齁跳上了 Jill 的膝蓋。 ‹ 109 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 44 · 17:24 「睡神」 店裡再吵，包包都照睡不誤。	photo	p44_sleepgod_bc9zw6	171x183	lightbox: ✕ DAY 44 · 17:24 「睡神」 店裡再吵，包包都照睡不誤。 ‹ 110 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 44 · 18:25 「最佳座位」 寶寶找到了看得見全店的位子。	photo	p44_best_e45s8c	176x187	lightbox: ✕ DAY 44 · 18:25 「最佳座位」 寶寶找到了看得見全店的位子。 ‹ 111 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 45 · 17:12 「偷閒」 店裡沒事，Jill 在沙發上坐了一下。	photo	p45_rest_c4nhzk	176x203	lightbox: ✕ DAY 45 · 17:12 「偷閒」 店裡沒事，Jill 在沙發上坐了一下。 ‹ 112 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 45 · 17:13 「三貓午睡」 三隻貓睡成一團。	photo	p45_nap3_k8vfgb	171x198	lightbox: ✕ DAY 45 · 17:13 「三貓午睡」 三隻貓睡成一團。 ‹ 113 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 46 · 17:13 「今天也在附近」 樾樾坐在 Jill 腳邊。	photo	p46_nearby_u14kh5	176x187	lightbox: ✕ DAY 46 · 17:13 「今天也在附近」 樾樾坐在 Jill 腳邊。 ‹ 114 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 46 · 17:36 「膝上的重量」 樾樾跳上了 Jill 的膝蓋。	photo	p46_lap_axxuc2	176x187	lightbox: ✕ DAY 46 · 17:36 「膝上的重量」 樾樾跳上了 Jill 的膝蓋。 ‹ 115 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 47 「最佳座位」 寶寶找到了看得見全店的位子。	photo	p47_best_zlbco4	171x183	lightbox: ✕ DAY 47 「最佳座位」 寶寶找到了看得見全店的位子。 ‹ 116 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 47 · 17:29 「被拍了」 客人拿起手機，拍了柔柔一張。	photo	p47_photo_n5u8zx	176x187	lightbox: ✕ DAY 47 · 17:29 「被拍了」 客人拿起手機，拍了柔柔一張。 ‹ 117 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 47 · 20:21 「一起擠軟墊」 小齁跟寶寶擠在同一塊軟墊上。 珍藏	photo	p47_cushion_tyn8jy	176x203	lightbox: ✕ DAY 47 · 20:21 「一起擠軟墊」 小齁跟寶寶擠在同一塊軟墊上。 珍藏 ‹ 118 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 48 「今天大家都在」 五隻貓難得同時出現在一個畫面裡。	photo	p48_everyone_82pv3z	171x198	lightbox: ✕ DAY 48 「今天大家都在」 五隻貓難得同時出現在一個畫面裡。 ‹ 119 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 48 「三貓午睡」 三隻貓睡成一團。	photo	p48_nap3_pc12kq	176x203	lightbox: ✕ DAY 48 「三貓午睡」 三隻貓睡成一團。 ‹ 120 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 48 · 21:30 「他們好像認識」 小齁對 Dylan 的態度，不像對陌生人。 珍藏	photo	p48_dylancat_qxlh9u	176x203	lightbox: ✕ DAY 48 · 21:30 「他們好像認識」 小齁對 Dylan 的態度，不像對陌生人。 珍藏 ‹ 121 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 49 · 17:29 「睡神」 店裡再吵，包包都照睡不誤。	photo	p49_sleepgod_78y5fa	171x198	lightbox: ✕ DAY 49 · 17:29 「睡神」 店裡再吵，包包都照睡不誤。 ‹ 122 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 49 · 17:31 「偷閒」 店裡沒事，Jill 在沙發上坐了一下。	photo	p49_rest_xwa046	176x203	lightbox: ✕ DAY 49 · 17:31 「偷閒」 店裡沒事，Jill 在沙發上坐了一下。 ‹ 123 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 50 · 21:32 「白等了」 柔柔埋伏了半天，什麼都沒等到。	photo	p50_waited_mq5wm2	176x203	lightbox: ✕ DAY 50 · 21:32 「白等了」 柔柔埋伏了半天，什麼都沒等到。 ‹ 124 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 50 · 17:17 「最佳座位」 寶寶找到了看得見全店的位子。	photo	p50_best_da9fgz	171x198	lightbox: ✕ DAY 50 · 17:17 「最佳座位」 寶寶找到了看得見全店的位子。 ‹ 125 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 51 「啃草的時間」 小齁啃了兩口貓草，然後在旁邊翻肚子。	photo	p51_grass_qaokr6	176x203	lightbox: ✕ DAY 51 「啃草的時間」 小齁啃了兩口貓草，然後在旁邊翻肚子。 ‹ 126 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 51 · 17:21 「下雨天」 外面在下雨，包包睡得更沉了。	photo	p51_rainday_zl23co	176x203	lightbox: ✕ DAY 51 · 17:21 「下雨天」 外面在下雨，包包睡得更沉了。 ‹ 127 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 52 「三貓午睡」 三隻貓睡成一團。	photo	p52_nap3_qjabf7	171x183	lightbox: ✕ DAY 52 「三貓午睡」 三隻貓睡成一團。 ‹ 128 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 52 「今天也在附近」 樾樾坐在 Jill 腳邊。	photo	p52_nearby_0kaoqr	176x187	lightbox: ✕ DAY 52 「今天也在附近」 樾樾坐在 Jill 腳邊。 ‹ 129 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 52 · 21:30 「好像真的開起來了」 打烊後還亮著燈的餐廳。 故事	photo	p52_story:opened_up_1ndn98	176x187	lightbox: ✕ DAY 52 · 21:30 「好像真的開起來了」 打烊後還亮著燈的餐廳。 故事 ‹ 130 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 53 「紙箱裡有東西」 柔柔在紙箱裡，只露出頭。	photo	p53_boxcat_9uxgly	171x183	lightbox: ✕ DAY 53 「紙箱裡有東西」 柔柔在紙箱裡，只露出頭。 ‹ 131 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 53 · 17:03 「最佳座位」 寶寶找到了看得見全店的位子。	photo	p53_best_10kztd	176x203	lightbox: ✕ DAY 53 · 17:03 「最佳座位」 寶寶找到了看得見全店的位子。 ‹ 132 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 54 · 17:19 「偷閒」 店裡沒事，Jill 在沙發上坐了一下。	photo	p54_rest_tv70rm	176x203	lightbox: ✕ DAY 54 · 17:19 「偷閒」 店裡沒事，Jill 在沙發上坐了一下。 ‹ 133 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	關閉	closeSub		46x31	sub book→None | screen: [→Jill 主廚的餐廳] [JOURNAL 餐廳日誌 關閉 總覽 故事 餐廳 社群 評價 熟客 VIP 話語 相簿 店貓 成就 熟練度 店裡的日常，→A Restaurant by Chef] [的膝蓋。 珍藏 DAY 4 · 17:19 「被拍了」 客人拿起手機，拍了寶寶一張。 珍藏 DAY 6 · 18:42 →OPEN FOR DINNER 繼續：DAY]	有反應
+餐廳日誌	day92（從標題）	mem	總覽	btab	front	52x32	bookTab mem→front | screen: [店裡的日常，剛好被看到的時候會留下一張。第一次的畫面會珍藏起來，其他的會慢慢換新。 第 1 週→4.7 100 則評價 · 開業 92 天 · 9072 位客人 最近的評價 全部 › 「南瓜濃湯上桌的時候整桌都停下來] [1–7→92 「香烤鮭魚的火候剛剛好，這種店不多了。佈置得像朋友家。這家店會在我的名單上很久。」 吳小姐 ·] [1 開店。第一天。→92 熟客留言 熟客 › Sophie 「吃了黑皮諾，今天也算是過去了。」]	有反應
+餐廳日誌	day92（從標題）	mem	故事	btab	story	52x32	bookTab mem→story | screen: [店裡的日常，剛好被看到的時候會留下一張。第一次的畫面會珍藏起來，其他的會慢慢換新。 第 1 週 DAY 1–7 DAY →店裡真的發生過的事，一段一段記下來。沒有任務，也不用做什麼——下一段什麼時候發生，要看他們自己。點一段可以看那天的經過。] [「白等了」 珍藏 DAY→晚餐之後 ✓ 1.DAY 51「妳真的不賣酒？」 2.DAY 51吃完飯，去隔壁 3.DAY 52這道要配什麼 4.DA] [· 21:34 「膝上的重量」 小齁跳上了 Jill 的膝蓋。 珍藏 DAY→/ 3 個故事片段 1.更早以前「升職了，今天不趕。」 2.DA	有反應
+餐廳日誌	day92（從標題）	mem	餐廳	btab	rest	52x32	bookTab mem→rest | screen: [店裡的日常，剛好被看到的時候會留下一張。第一次的畫面會珍藏起來，其他的會慢慢換新。 第→評分走勢 最近 14 天 3 4 5 DAY 92 4.71 ↑0.01 料理品質 262 道 Perfect（262 ] [週 DAY 1–7 DAY→則留下兩顆星）・料理品質 209 道 Perfect（209 道裡的 100%） DAY 90 4.75 ↑0.03 客] [開店。第一天。 DAY 1 「第一天」 DAY 1 「最佳座位」 珍藏 DAY 1 「今天也在附近」 珍藏 DAY 1 →則留下兩顆星）・料理品質 247 道 Perfect（	有反應
+餐廳日誌	day92（從標題）	mem	社群	btab	social	52x32	bookTab mem→social | screen: [店裡的日常，剛好被看到的時候會留下一張。第一次的畫面會珍藏起來，其他的會慢慢換新。 第 1 週→社群 客人自己會發；Jill 偶爾也發一則——只能是真的發生過的事。發了以後幾天，會有人為了那件事來。 最近大家在說 🍝] [1–7→94） Jill 今天要發什麼？ 第二道招牌 Jill's 莓果奶酪：Jill 自己想的第二道。 發這則 店裡的一天 隧] [1 開店。第一天。→92 Ben 與 Lily 🍝 南瓜濃湯，推。 ♥ 8]	有反應
+餐廳日誌	day92（從標題）	mem	評價	btab	reviews	52x32	bookTab mem→reviews | screen: [店裡的日常，剛好被看到的時候會留下一張。第一次的畫面會珍藏起來，其他的會慢慢換新。 第 1 週 DAY 1–7 DAY →4.7 100 則評論 · 最近 40 則計入評分 最近大家在說 🍝 料理 24 ✨ 氣氛 8 ⭐ 招牌菜 7 🍷 酒 ] [左右各一隻」 珍藏 DAY 1 「睡神」 珍藏 DAY 1 「今天大家都在」 珍藏 DAY 1 「三貓午睡」 珍藏 DA→主廚的Jill's 檸檬奶油干貝，每一口都被好好照顧。甜點是] [的膝蓋。 珍藏 DAY 4 · 17:19 「被拍了」 客人拿起手機，拍了寶寶一張。 珍藏 DAY 6	有反應
+餐廳日誌	day92（從標題）	mem	熟客	btab	regulars	52x32	bookTab mem→regulars | screen: [店裡的日常，剛好被看到的時候會留下一張。第一次的畫面會珍藏起來，其他的會慢慢換新。 第 1 週 DAY 1–7 DAY →來過兩次會開始眼熟，4 次成為熟客，12 次成為 Jill 的老客人。回頭客累計：1914 / 100 陳伯伯 Jill] [· 17:20 「睡神」 店裡再吵，包包都照睡不誤。 DAY→次來，Jill 請了 Jill's 莓果奶酪。 DAY 73 「吃了提拉米蘇，今天也算是過去了。」 DAY 90 「看了] [· 17:20 「不怕生」 柔柔在陌生客人旁邊待得很自在。 DAY 25 · 20:11 「又見面了	有反應
+餐廳日誌	day92（從標題）	mem	VIP	btab	vip	50x32	bookTab mem→vip | screen: [店裡的日常，剛好被看到的時候會留下一張。第一次的畫面會珍藏起來，其他的會慢慢換新。 第 1 週 DAY 1–7 DAY →來 5 次的客人有 VIP 卡：餐廳、Lounge 都九折，吃完晚餐再去 Lounge 八折。來] [「今天大家都在」 五隻貓難得同時出現在一個畫面裡。 DAY 10 「Jill 左右各一隻」 樾樾跟小齁一左一右。 DAY→次換成八折卡：都八折，吃完再去 Lounge 七折。沒有卡的客人，吃完晚餐再去 Lounge 也是八折。 Sophie ] [的桌邊站了一下。 珍藏 DAY 34 「最佳座位」 寶寶找到了看得見全店的	有反應
+餐廳日誌	day92（從標題）	mem	話語	btab	talk	52x32	bookTab mem→talk | screen: [店裡的日常，剛好被看到的時候會留下一張。第一次的畫面會珍藏起來，其他的會慢慢換新。 第 1 週→] [1–7 DAY 1 開店。第一天。 DAY 1 「第一天」 DAY 1 「最佳座位」 珍藏 DAY 1 「今天也在附近」→92 店裡說過的話（107 句）。營業中按左上角的 💬 也看得到。 22:32 打烊後阿拓又放了一盤在晴旁邊。「多的。」] [「又見面了」 Mia跟柔柔又見面了。 珍藏 DAY 26 · 17:18 「突然開賽」 樾樾跟包包突然繞著店裡跑起來。 →Emma 「牠是店裡的貓嗎？」 20:11 Jill's 莓果奶酪賣完了	有反應
+餐廳日誌	day92（從標題）	mem	相簿	btab	mem	52x32	NOTHING VISIBLE	已在這個分頁（預期無變化）
+餐廳日誌	day92（從標題）	mem	店貓	btab	cats	52x32	bookTab mem→cats | screen: [店裡的日常，剛好被看到的時候會留下一張。第一次的畫面會珍藏起來，其他的會慢慢換新。 第 1 週 DAY 1–7 DAY →住在店裡的五隻貓。名字可以直接改。 男生 棕色虎斑，臉上的虎斑比較多，白肚子、白襪子。 最常待的地方：藤籃（6 次） 女]	有反應
+餐廳日誌	day92（從標題）	mem	成就	btab	ach	52x32	bookTab mem→ach | screen: [店裡的日常，剛好被看到的時候會留下一張。第一次的畫面會珍藏起來，其他的會慢慢換新。 第→72 / 78 已解鎖。有些成就不會先告訴你是什麼。 早期 10/13 First Perfect 做出第一道 Perf] [週 DAY 1–7→Dinner Rush 一天內服務 10 位客人 ·] [開店。第一天。→Jill's On Fire 第一次進入 Rush Mode ·]	有反應
+餐廳日誌	day92（從標題）	mem	熟練度	btab	mastery	65x32	bookTab mem→mastery | screen: [店裡的日常，剛好被看到的時候會留下一張。第一次的畫面會珍藏起來，其他的會慢慢換新。 第 1 週 DAY 1–7 DAY →Jill 越常做一道菜，就做得越快，Perfect 判定也越寬。 黃金蛋炒飯 LV5 3 步驟 拿鐵咖啡 LV5 3 步] [「沙發客滿」 珍藏 DAY→步驟 錫蘭檸檬紅茶 LV5] [「白等了」 珍藏 DAY→步驟 提拉米蘇 LV5]	有反應
+餐廳日誌	day92（從標題）	mem	DAY 1 「第一天」	photo	p1_first	175x170	lightbox: ✕ DAY 1 「第一天」 ‹ 1 / 237 ♡ 珍藏 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 1 「最佳座位」 珍藏	photo	p1_best_wa741d	171x165	lightbox: ✕ DAY 1 「最佳座位」 珍藏 ‹ 2 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 1 「今天也在附近」 珍藏	photo	p1_nearby_j076q3	175x170	lightbox: ✕ DAY 1 「今天也在附近」 珍藏 ‹ 3 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 1 「Jill 左右各一隻」 珍藏	photo	p1_sides_q4elcy	175x170	lightbox: ✕ DAY 1 「Jill 左右各一隻」 珍藏 ‹ 4 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 1 「睡神」 珍藏	photo	p1_sleepgod_6f0w2n	171x165	lightbox: ✕ DAY 1 「睡神」 珍藏 ‹ 5 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	DAY 1 「今天大家都在」 珍藏	photo	p1_everyone_4eo68p	175x170	lightbox: ✕ DAY 1 「今天大家都在」 珍藏 ‹ 6 / 237 ♥ 珍藏中 ›	有反應
+餐廳日誌	day92（從標題）	mem	關閉日誌	closeSub		358x51	sub book→None | screen: [→Jill 主廚的餐廳] [JOURNAL 餐廳日誌 關閉 總覽 故事 餐廳 社群 評價 熟客 VIP 話語 相簿 店貓 成就 熟練度 店裡的日常，→A Restaurant by Chef] [的膝蓋。 珍藏 DAY 4 · 17:19 「被拍了」 客人拿起手機，拍了寶寶一張。 珍藏 DAY 6 · 18:42 →OPEN FOR DINNER 繼續：DAY]	有反應
+第二層	day92	reveal_buySR_revealPeek	buy	[data-act=buySR][data-k="2"]			money 1179146→1109146 (-70000) | reveal: 訂好了 員工休息室 II《開始像他們的地方》 置物櫃寫上了名字，杯子一個一個不一樣了，中間多了一張撞球台。——明天就在。 Jill：「嗯。」 去看看 › 繼續買東西 | S: money,up	有反應
+第二層	day92	reveal_buySR_revealPeek	revealPeek	#reveal [data-act=revealPeek]			peek: 回到選單 › | tabs: 店門口 主廳 側廳 二樓 員工休息室 Lounge 廚房 房間 | screenHidden False→True | banner: 員工休息室 明天就在。 | screen: [DAY 92 · 打烊後 升級 Jill 的餐廳 看店裡 ? 目前現金 $1,179,146 評分 4.7 明日預估基本→]	有反應
+第二層	day92	reveal_buySR_revealPeek	pill back	PAGE:#peekPill			screenHidden True→False | screen: [→DAY 92 · 打烊後 升級 Jill 的餐廳 看店裡 ? 目前現金 $1,109,146 評分 4.7 明日預估基本]	有反應
+第二層	day92	reveal_buySR_revealClose	buy	[data-act=buySR][data-k="2"]			money 1179146→1109146 (-70000) | reveal: 訂好了 員工休息室 II《開始像他們的地方》 置物櫃寫上了名字，杯子一個一個不一樣了，中間多了一張撞球台。——明天就在。 Jill：「嗯。」 去看看 › 繼續買東西 | S: money,up	有反應
+第二層	day92	reveal_buySR_revealClose	revealClose	#reveal [data-act=revealClose]			screen: [$1,179,146→$1,109,146] [→明天完工] [訂購 $70,000→]	有反應
+第二層	day92	reveal_buyLgFurn_revealPeek	buy	[data-act=buyLgFurn]			money 1179146→1029146 (-150000) | reveal: 裝好了 電視音響系統 喇叭接好了。轉播的時候整間 Lounge 都聽得到。 Jill：「……好像太好聽了。」 去看看 › 繼續買東西 | S: money,newRooms,lgFurn	有反應
+第二層	day92	reveal_buyLgFurn_revealPeek	revealPeek	#reveal [data-act=revealPeek]			peek: 回到選單 › | tabs: 店門口 主廳 側廳 二樓 休息室 Lounge 廚房 房間 | screenHidden False→True | banner: 電視音響系統 喇叭接好了。轉播的時候整間 Lounge 都聽得到。 | screen: [DAY 92 · 打烊後 升級 Jill 的餐廳 看店裡 ? 目前現金 $1,179,146 評分 4.7 明日預估基本→]	有反應
+第二層	day92	reveal_buyLgFurn_revealPeek	pill back	PAGE:#peekPill			screenHidden True→False | screen: [→DAY 92 · 打烊後 升級 Jill 的餐廳 看店裡 ? 目前現金 $1,029,146 評分 4.7 明日預估基本]	有反應
+第二層	day92	reveal_buyLgFurn_revealClose	buy	[data-act=buyLgFurn]			money 1179146→1029146 (-150000) | reveal: 裝好了 電視音響系統 喇叭接好了。轉播的時候整間 Lounge 都聽得到。 Jill：「……好像太好聽了。」 去看看 › 繼續買東西 | S: money,newRooms,lgFurn	有反應
+第二層	day92	reveal_buyLgFurn_revealClose	revealClose	#reveal [data-act=revealClose]			screen: [$1,179,146→$1,029,146] [→已擁有] [購買 $150,000→已擁有]	有反應
+第二層	day92	upLook	open	[data-act=upLook]			peek: 回到店舖工程 › | tabs: 二樓 休息室 | screenHidden False→True | screen: [DAY 92 · 打烊後 升級 Jill 的餐廳 看店裡 ? 目前現金 $1,179,146 評分 4.7 明日預估基本→]	有反應
+第二層	day92	upLook	tab staff	#roomTabs [data-room=staff]			tabs: 二樓 員工休息室	有反應
+第二層	day92	upLook	tab up	#roomTabs [data-room=up]			tabs: 二樓 休息室	有反應
+第二層	day92	upLook	pill back	PAGE:#peekPill			screenHidden True→False | screen: [→DAY 92 · 打烊後 升級 Jill 的餐廳 看店裡 ? 目前現金 $1,179,146 評分 4.7 明日預估基本]	有反應
+第二層	day92	upPlan	open	[data-act=upPlanBig]			upPlanBig: 二樓平面圖 第 85 天 租下整層 · 第 85 天 員工休息室 關閉	有反應
+第二層	day92	upPlan	tap to close	PAGE:#upPlanBig			NOTHING VISIBLE	關閉了（舊的判讀程式看不到「關閉」；見截圖）
+第二層	day92	peek	open 看店裡	[data-act=peek]			peek: 回到選單 › | tabs: 店門口 主廳 側廳 二樓 休息室 Lounge 廚房 房間 | screenHidden False→True | screen: [DAY 92 · 打烊後 升級 Jill 的餐廳 看店裡 ? 目前現金 $1,179,146 評分 4.7 明日預估基本→]	有反應
+第二層	day92	peek	tab front	#roomTabs [data-room=front]			NOTHING VISIBLE	房間畫面有換（畫布；見截圖 sweep2_d92/peek_tab_*.png）
+第二層	day92	peek	tab main	#roomTabs [data-room=main]			NOTHING VISIBLE	房間畫面有換（畫布；見截圖 sweep2_d92/peek_tab_*.png）
+第二層	day92	peek	tab side	#roomTabs [data-room=side]			NOTHING VISIBLE	房間畫面有換（畫布；見截圖 sweep2_d92/peek_tab_*.png）
+第二層	day92	peek	tab up	#roomTabs [data-room=up]			NOTHING VISIBLE	房間畫面有換（畫布；見截圖 sweep2_d92/peek_tab_*.png）
+第二層	day92	peek	tab staff	#roomTabs [data-room=staff]			tabs: 店門口 主廳 側廳 二樓 員工休息室 Lounge 廚房 房間	有反應
+第二層	day92	peek	tab lounge	#roomTabs [data-room=lounge]			tabs: 店門口 主廳 側廳 二樓 休息室 Lounge 廚房 房間	有反應
+第二層	day92	peek	tab kitchen	#roomTabs [data-room=kitchen]			NOTHING VISIBLE	房間畫面有換（畫布；見截圖 sweep2_d92/peek_tab_*.png）
+第二層	day92	peek	tab home	#roomTabs [data-room=home]			tabs: 店門口 主廳 側廳 二樓 休息室 Lounge 廚房 Jill 的房間	有反應
+第二層	day92	peek	pill back	PAGE:#peekPill			screenHidden True→False | screen: [→DAY 92 · 打烊後 升級 Jill 的餐廳 看店裡 ? 目前現金 $1,179,146 評分 4.7 明日預估基本]	有反應
+第二層	day92	board	open chooser 0	[data-act=bdOpen]			screen: [＋ 加人→收起 阿德師傅 從咖啡吧移過來 Marco 從冷盤台移過來 小林師傅 從烤箱移過來 阿珠姐 從咖啡吧移過來 老周師傅 從]	有反應
+第二層	day92	board	bdAdd first option of chooser 0	[data-act=bdAdd]			toast: 阿德師傅：咖啡吧 → 爐台 | screen: [3/7・今天→4/7・今天] [→阿德師傅 LV5 ×] [收起 阿德師傅 從咖啡吧移過來 Marco 從冷盤台移過來 小林師傅 從烤箱移過來 阿珠姐 從咖啡吧移過來 老周師傅 從→＋ 加人] | S: crew	有反應
+第二層	day92	board	open chooser 1	[data-act=bdOpen]			screen: [＋ 加人→收起 阿德師傅 從咖啡吧移過來 Marco 從冷盤台移過來 阿珠姐 從咖啡吧移過來 Hugo 從爐台移過來 阿勇 從爐台]	有反應
+第二層	day92	board	bdAdd first option of chooser 1	[data-act=bdAdd]			toast: 阿德師傅：咖啡吧 → 烤箱 | screen: [1/2・今天→2/2・今天] [→阿德師傅 LV5 ×] [收起 阿德師傅 從咖啡吧移過來 Marco 從冷盤台移過來 阿珠姐 從咖啡吧移過來 Hugo 從爐台移過來 阿勇 從爐台→已滿] | S: crew	有反應
+第二層	day92	board	open chooser 2	[data-act=bdOpen]			screen: [＋ 加人→收起 阿德師傅 從咖啡吧移過來 小林師傅 從烤箱移過來 阿珠姐 從咖啡吧移過來 Hugo 從爐台移過來 阿勇 從爐台移過]	有反應
+第二層	day92	board	bdAdd first option of chooser 2	[data-act=bdAdd]			toast: 阿德師傅：咖啡吧 → 冷盤台 | screen: [1/2・今天→2/2・今天] [→阿德師傅 LV5 ×] [收起 阿德師傅 從咖啡吧移過來 小林師傅 從烤箱移過來 阿珠姐 從咖啡吧移過來 Hugo 從爐台移過來 阿勇 從爐台移過→已滿] | S: crew	有反應
+第二層	day92	board	open chooser 3	[data-act=bdOpen]			screen: [＋ 加人→收起 Marco 從冷盤台移過來 小林師傅 從烤箱移過來 Hugo 從爐台移過來 阿勇 從爐台移過來 阿拓 從爐台移過來]	有反應
+第二層	day92	board	bdAdd first option of chooser 3	[data-act=bdAdd]			toast: Marco：冷盤台 → 咖啡吧 | screen: [1/2・今天→0/2・今天] [Marco LV5 ×→] [2/4・今天→3/4・今天] | S: crew	有反應
+第二層	day92	board	open chooser 4	[data-act=bdOpen]			screen: [＋ 加人→收起 小茉 Nina]	有反應
+第二層	day92	board	bdAddD first option of chooser 4	[data-act=bdAddD]			screen: [5→6] [→小茉 LV5 ×] [收起 小茉 Nina→＋ 加人] | S: crew	有反應
+第二層	day92	board	open chooser 5	[data-act=bdOpen]			screen: [＋ 加人→收起 小茉 Nina]	有反應
+第二層	day92	board	bdAddD first option of chooser 5	[data-act=bdAddD]			screen: [5→6] [→小茉 LV5 ×] [收起 小茉 Nina→＋ 加人] | S: crew	有反應
+第二層	day92	board	open chooser 6	[data-act=bdOpen]			screen: [＋ 加人→收起 Kai 安安]	有反應
+第二層	day92	board	bdAddD first option of chooser 6	[data-act=bdAddD]			screen: [5→6] [→Kai LV5 ×] [收起 Kai 安安→＋ 加人] | S: crew	有反應
+第二層	day92	board	open chooser 7	[data-act=bdOpen]			screen: [＋ 加人→收起 Kai 安安]	有反應
+第二層	day92	board	bdAddD first option of chooser 7	[data-act=bdAddD]			screen: [5→6] [→Kai LV5 ×] [收起 Kai 安安→＋ 加人] | S: crew	有反應
+第二層	day92	board	open chooser 8	[data-act=bdOpen]			screen: [＋ 加人→收起 小茉 Kai 安安 Momo 小威]	有反應
+第二層	day92	board	bdAddD first option of chooser 8	[data-act=bdAddD]			screen: [5→6] [→小茉 LV5 ×] [收起 小茉 Kai 安安 Momo 小威→＋ 加人] | S: crew	有反應
+第二層	day92	board	open chooser 9	[data-act=bdOpen]			screen: [＋ 加人→收起 小茉 Kai Nina 小威]	有反應
+第二層	day92	board	bdAddD first option of chooser 9	[data-act=bdAddD]			screen: [3→4] [→小茉 LV5 ×] [收起 小茉 Kai Nina 小威→＋ 加人] | S: crew	有反應
+第二層	day92	lab	pick 雞蛋	[data-act=labPick][data-k="egg"]			screen: [點食材看它的特性；選 2–3 種再試做。主角＋配料或醬汁，是最常見的組合。→雞蛋 主體 清爽↑ 濃郁↑ 口感↑ · $ 整體味道：清爽↑ 濃郁↑ 口感↑ 可能適合：爐台 · 主餐] [$150還沒選→$150已選 1/3]	有反應
+第二層	day92	lab	pick 白飯	[data-act=labPick][data-k="rice"]			screen: [整體味道：清爽↑→白飯 主體 清爽↑ 口感↑↑ · $ 相性：雞蛋×白飯 很好 整體味道：清爽↑↑] [口感↑→口感↑↑↑] [1/3→2/3]	有反應
+第二層	day92	lab	試做	[data-act=labTry]			money 1179146→1178996 (-150) | screen: [$1,179,146→$1,178,996] [可以吃，但還不像一道能上菜單的料理。 義大利麵比較適合烤箱的料理，換一種配料或醬汁試試。→兩種主體打架：雞蛋跟白飯都想當主角。 雞蛋跟白飯的相性很好，往這個方向再想想。] [雞蛋 主體 清爽↑ 濃郁↑ 口感↑ · $ 白飯 主體 清爽↑ 口感↑↑ · $ 相性：雞蛋×白飯 很好 整體味道：清爽→點食材看它的特性；選 2–3 種再試做。主角＋配料或醬汁，是最常見的組合。] | S: money,labLast	有反應
+第二層	day92	lab	unpick: tap 雞蛋 again	[data-act=labPick][data-k="egg"]			screen: [點食材看它的特性；選 2–3 種再試做。主角＋配料或醬汁，是最常見的組合。→雞蛋 主體 清爽↑ 濃郁↑ 口感↑ · $ 整體味道：清爽↑ 濃郁↑ 口感↑ 可能適合：爐台 · 主餐] [$150還沒選→$150已選 1/3]	有反應
+第二層	day92	sig	open editor	[data-act=sigOpen]			sub None→sig | screen: [DAY 92 · 打烊後 升級 Jill 的餐廳 看店裡 ? 目前現金 $1,179,146 評分 4.7 明日預估基本→JILL'S SIGNATURE DISH 設計招牌菜 取消] [$940→售價 $610] [奶油薯泥・干貝・檸檬奶油・烤蔬菜 第三版 · 食用花與金箔 招牌菜永遠在菜單最上方，有些客人會專程為它而來。賣得夠多，J→在爐台用平底鍋煎，看準時機起鍋 主食 香料米飯+40 奶油薯泥+50 手工寬麵+60 酸種麵包+40 蛋白質 鴨胸+16]	有反應
+第二層	day92	sig	pick 香料米飯+40	[data-act="sigPick"][data-k="rice"]			screen: [$610→$600]	有反應
+第二層	day92	sig	pick 奶油薯泥+50	[data-act="sigPick"][data-k="mash"]			screen: [$600→$610]	有反應
+第二層	day92	sig	pick 手工寬麵+60	[data-act="sigPick"][data-k="pasta"]			screen: [$610→$620]	有反應
+第二層	day92	sig	pick 酸種麵包+40	[data-act="sigPick"][data-k="bread"]			screen: [$620→$600]	有反應
+第二層	day92	sig	pick 鴨胸+160	[data-act="sigPick"][data-k="duck"]			screen: [檸檬奶油干貝→檸檬奶油鴨胸] [$600→$580]	有反應
+第二層	day92	sig	pick 和牛+220	[data-act="sigPick"][data-k="beef"]			screen: [檸檬奶油鴨胸→檸檬奶油和牛] [$580→$640]	有反應
+第二層	day92	sig	make (sigMake)	[data-act=sigMake]			money 1179146→1178346 (-800) | sub sig→None | screen: [JILL'S SIGNATURE DISH 設計招牌菜 取消→DAY 92 · 打烊後 升級 Jill 的餐廳 看店裡 ? 目前現金 $1,178,346 評分 4.7 明日預估基本] [售價 $640→$985] [在爐台用平底鍋煎，看準時機起鍋 主食 香料米飯+40 奶油薯泥+50 手工寬麵+60 酸種麵包+40 蛋白質 鴨胸+16→酸種麵包・和牛・檸檬奶油・烤蔬菜 第三版 · 食用花與金箔 招牌菜永遠在菜單最上方，有些客人會專程為它而來。賣得夠多，J] | S: money,si	有反應
+第二層	day92	sig	open editor again	[data-act=sigOpen]			sub None→sig | screen: [DAY 92 · 打烊後 升級 Jill 的餐廳 看店裡 ? 目前現金 $1,179,146 評分 4.7 明日預估基本→JILL'S SIGNATURE DISH 設計招牌菜 取消] [$940→售價 $610] [奶油薯泥・干貝・檸檬奶油・烤蔬菜 第三版 · 食用花與金箔 招牌菜永遠在菜單最上方，有些客人會專程為它而來。賣得夠多，J→在爐台用平底鍋煎，看準時機起鍋 主食 香料米飯+40 奶油薯泥+50 手工寬麵+60 酸種麵包+40 蛋白質 鴨胸+16]	有反應
+第二層	day92	sig	cancel (closeSub)	[data-act=closeSub]			sub sig→None | screen: [JILL'S SIGNATURE DISH 設計招牌菜 取消→DAY 92 · 打烊後 升級 Jill 的餐廳 看店裡 ? 目前現金 $1,179,146 評分 4.7 明日預估基本] [售價 $610→$940] [在爐台用平底鍋煎，看準時機起鍋 主食 香料米飯+40 奶油薯泥+50 手工寬麵+60 酸種麵包+40 蛋白質 鴨胸+16→奶油薯泥・干貝・檸檬奶油・烤蔬菜 第三版 · 食用花與金箔 招牌菜永遠在菜單最上方，有些客人會專程為它而來。賣得夠多，J]	有反應
+第二層	day92	settings	open	[data-act=settings]			sub None→settings | screen: [DAY→設定・存檔 背景音樂 音效 ✓ 本機自動儲存 最後儲存：DAY] [升級 Jill 的餐廳 看店裡 ? 目前現金 $1,179,146 評分 4.7 明日預估基本備料 約 $23,699 →每天打烊、購買升級後都會自動存檔。 存檔 備份與移轉 換手機、換瀏覽器、以防萬一：把進度存成一個檔案，之後再讀回來。 備]	有反應
+第二層	day92	settings	music	[data-act=music]			NOTHING VISIBLE (but S changed) | S: music	開關有變（截圖 settings_music.png）
+第二層	day92	settings	sfx	[data-act=sfx]			NOTHING VISIBLE (but S changed) | S: sfx	開關有變（截圖 settings_music.png）
+第二層	day92	settings	save	[data-act=save]			toast: 已存檔（DAY 92 · 打烊後）	有反應
+第二層	day92	settings	copyBackup	[data-act=copyBackup]			toast: 備份文字已複製，貼到備忘錄或訊息裡留著；之後用「貼上備份文字恢復」讀回來	有反應
+第二層	day92	settings	pasteBackup	[data-act=pasteBackup]			screen: [→把之前「複製備份文字」貼在這裡，再按恢復。 取消 從貼上的文字恢復]	有反應
+第二層	day92	settings	pasteCancel	[data-act=pasteCancel]			screen: [把之前「複製備份文字」貼在這裡，再按恢復。 取消 從貼上的文字恢復→]	有反應
+第二層	day92	settings	pasteBackup	[data-act=pasteBackup]			screen: [→把之前「複製備份文字」貼在這裡，再按恢復。 取消 從貼上的文字恢復]	有反應
+第二層	day92	settings	pasteGo	[data-act=pasteGo]			toast: 還沒有貼上任何內容 | screen: [把之前「複製備份文字」貼在這裡，再按恢復。 取消 從貼上的文字恢復→]	有反應
+第二層	day92	settings	reset1	[data-act=reset1]			screen: [重置遊戲→確定要重置嗎？Day、金錢、升級、熟客、成就都會消失，無法復原。 取消 我確定，重置]	有反應
+第二層	day92	settings	resetNo	[data-act=resetNo]			screen: [確定要重置嗎？Day、金錢、升級、熟客、成就都會消失，無法復原。 取消 我確定，重置→重置遊戲]	有反應
+第二層	day92	settings	load (回到上次存檔)	[data-act=load]			phase shop→title | sub settings→None | main shop→title | toast: 已讀取：DAY 92 | screen: [設定・存檔 背景音樂 音效 ✓ 本機自動儲存 最後儲存：DAY→Jill 主廚的餐廳 JILL'S KITCHEN A Restaurant by Chef Jill OPEN FOR] [打烊後 每天打烊、購買升級後都會自動存檔。 存檔 備份與移轉 換手機、換瀏覽器、以防萬一：把進度存成一個檔案，之後再讀回→$1,179,146 · JILL 店主手冊 餐廳日誌 設定・存檔] | S: gearUse,dayLog,gea	有反應
+第二層	day92	settings	open again	[data-act=settings]			sub None→settings | screen: [DAY→設定・存檔 背景音樂 音效 ✓ 本機自動儲存 最後儲存：DAY] [升級 Jill 的餐廳 看店裡 ? 目前現金 $1,179,146 評分 4.7 明日預估基本備料 約 $23,699 →每天打烊、購買升級後都會自動存檔。 存檔 備份與移轉 換手機、換瀏覽器、以防萬一：把進度存成一個檔案，之後再讀回來。 備]	有反應
+第二層	day92	settings	close	[data-act=closeSub]			sub settings→None | screen: [設定・存檔 背景音樂 音效 ✓ 本機自動儲存 最後儲存：DAY→DAY] [每天打烊、購買升級後都會自動存檔。 存檔 備份與移轉 換手機、換瀏覽器、以防萬一：把進度存成一個檔案，之後再讀回來。 備→升級 Jill 的餐廳 看店裡 ? 目前現金 $1,179,146 評分 4.7 明日預估基本備料 約 $23,699 ]	有反應
+第二層	day92	settings	open for reset	[data-act=settings]			sub None→settings | screen: [DAY→設定・存檔 背景音樂 音效 ✓ 本機自動儲存 最後儲存：DAY] [升級 Jill 的餐廳 看店裡 ? 目前現金 $1,179,146 評分 4.7 明日預估基本備料 約 $23,699 →每天打烊、購買升級後都會自動存檔。 存檔 備份與移轉 換手機、換瀏覽器、以防萬一：把進度存成一個檔案，之後再讀回來。 備]	有反應
+第二層	day92	settings	reset1	[data-act=reset1]			screen: [重置遊戲→確定要重置嗎？Day、金錢、升級、熟客、成就都會消失，無法復原。 取消 我確定，重置]	有反應
+第二層	day92	settings	reset2 (我確定，重置)	[data-act=reset2]			money 1179146→500 (-1178646) | phase shop→title | sub settings→None | main shop→title | day 92→1 | toast: 已重置，一切重新開始 | screen: [→Jill 主廚的餐廳 JILL'S KITCHEN A Restaurant by Chef Jill OPEN FOR] [背景音樂 音效 ✓ 本機自動儲存 最後儲存：DAY 92 · 打烊後 每天打烊、購買升級後都會自動存檔。 存檔 備份與移→] | S: day,phase,money,lifetime,level,eq,tables	有反應
+第二層	day92	settings	HUD pause button outside service	PAGE:#hPause			TAP FAILED: TimeoutError('Locator.tap: Timeout 5000ms exceeded.\nCall log:\n  - waiting for locator("#hPause").first\n    - locator resolved to <button id="hPause" aria-label="暫停" class="icon-btn">…</button>\n  - | NOTHING VISIBLE	★ 被選單蓋住，按不到（見 hud/log.txt）
+第二層	day92	guide	open	[data-act=guide]			sub None→guide | screen: [DAY 92 · 打烊後 升級→JILL'S KITCHEN 小小店主手冊 關閉 點一張卡片展開。 🍳 開店與料理 每天 17:00 開店、21:30 ] [的餐廳 看店裡 ? 目前現金 $1,179,146 評分 4.7 明日預估基本備料 約 $23,699 建議保留 約 $→在出菜口倒好、端過去 「酒水成本」照杯算，結算也另外列「晚餐桌上配的酒」。 Lounge 開了以後，晚餐桌上的酒改由調酒] [貓咪生活 廚房設備 菜單研發 員工 招牌菜 爐灶 LV5 7 口爐・加熱速度 ×1.55（擴建後的大爐） 已達最高等級 →大家在談什麼、Jil	有反應
+第二層	day92	guide	card 0 (open=True)	PAGE:details.gcard > summary			screen: [房間 票券列下面的分頁：店門口・主廳・側廳・二樓・休息室・Lounge・廚房・房間（新的房間蓋好以後會加進來） 也可以用→]	有反應
+第二層	day92	guide	card 1 (open=False)	PAGE:details.gcard > summary			screen: [→建議備料 每道菜的建議量＝預估銷量＋一點緩衝（賣得多的緩衝多一點，比例上小一點）。 「一鍵補到建議量」或每道菜自己調。 ]	有反應
+第二層	day92	guide	card 2 (open=False)	PAGE:details.gcard > summary			screen: [→工作分配 每個工作站和每項外場工作各一列（有 Lounge 以後多「Lounge 吧台」「Lounge 外場」），直接看]	有反應
+第二層	day92	guide	card 3 (open=False)	PAGE:details.gcard > summary			screen: [→招待（你的） 營業中每張票券右上有「招待」：Jill 有空會端一杯飲料（或一份甜點）過去，算店裡請的，扣一份庫存。 一天]	有反應
+第二層	day92	guide	card 4 (open=False)	PAGE:details.gcard > summary			screen: [→家具與佈置 主廳最多 9 張桌 側廳最多 9 張，「側廳卡座」把整排換成卡座 露天桌 1–3 張。 還有店裡的植物、燈、]	有反應
+第二層	day92	guide	card 5 (open=False)	PAGE:details.gcard > summary			screen: [→結算 營業額、食材成本、酒水成本、薪資、租金、食材契作、鋼琴演奏、品酒之夜分潤、小費、任務獎勵，最後是今日淨利。 淨利下]	有反應
+第二層	day92	guide	card 6 (open=False)	PAGE:details.gcard > summary			screen: [→招牌菜 從主食、蛋白質、醬汁、配菜組一道（$3,000，改配方 $800）。 永遠在菜單最上方，客人會專程為它來（客流 ]	有反應
+第二層	day92	guide	card 7 (open=False)	PAGE:details.gcard > summary			screen: [→怎麼來的 店門口右邊是 Madame Lin 開了很多年的酒吧，開店那天她就是鄰居 Jill 一開始不賣酒——想喝酒，隔]	有反應
+第二層	day92	guide	card 8 (open=False)	PAGE:details.gcard > summary			screen: [→怎麼來的 二樓的房間都不是升級選單裡冒出來的。 店裡的人連坐下來的地方都沒有，打烊後 Jill 自己看見了（《大家待的地]	有反應
+第二層	day92	guide	card 9 (open=False)	PAGE:details.gcard > summary			screen: [→怎麼進去 房間分頁的最後一個「房間」（點開寫著「Jill 的房間」）。 也可以在廚房點右手邊那扇淺木門（寫著「房間 ›」]	有反應
+第二層	day92	guide	card 10 (open=False)	PAGE:details.gcard > summary			screen: [→個性 樾樾黏 Jill、怕生，大部分時間在 Jill 的房間 小齁愛玩也黏人 寶寶天生明星，總坐在好看的位子 柔柔有點傻]	有反應
+第二層	day92	guide	card 11 (open=False)	PAGE:details.gcard > summary			screen: [→怎麼選 先選一個主角（主體／飲品基底／甜點基底），再配配料、調味或醬汁。 選好會先看到相性、整體味道、可能適合哪個工作站]	有反應
+第二層	day92	guide	card 12 (open=False)	PAGE:details.gcard > summary			screen: [→在哪裡 開店前和商店在右上的書本 營業中在暫停選單的「餐廳日誌」 結算畫面右上也有。 故事 見下面「故事」那一節。 餐廳]	有反應
+第二層	day92	guide	card 13 (open=False)	PAGE:details.gcard > summary			screen: [→兩個部分 「餐廳故事」是這間店自己的故事，一章一章往前 「人物／關係支線」是店裡的人和他們之間的故事。 一段一段 每個故]	有反應
+第二層	day92	guide	card 14 (open=False)	PAGE:details.gcard > summary			screen: [→在哪裡 第 6 天起：開店前的畫面有一行「社群與宣傳」，點了直接打開 商店的「社群與宣傳」分頁（在「店舖工程」旁邊） 日]	有反應
+第二層	day92	guide	card 15 (open=False)	PAGE:details.gcard > summary			screen: [→自動存檔 每天打烊、每次購買，還有營業中每 20 秒、暫停、切到別的 App 時，都會存下當下的店內狀況。 下次打開可以]	有反應
+第二層	day92	guide	知道了	.footer [data-act=closeSub]			sub guide→None | screen: [JILL'S KITCHEN 小小店主手冊 關閉 點一張卡片展開。 🍳 開店與料理 每天 17:00 開店、21:30 →DAY 92 · 打烊後 升級] [與員工 商店的「員工」分頁：先是「工作分配」看板，再是每個人；最下面是招募（餐廳員工）和 Lounge 名單。 › 工作→的餐廳 看店裡 ? 目前現金 $1,179,146 評分 4.7 明日預估基本備料 約 $23,699 建議保留 約 $] [等級、日薪、訓練升級 最下面是招募。 請了就是店裡的人，沒有解雇。 員工分兩個名單，名額各算各的、互不佔用。 餐廳員工分→招牌菜 爐灶]	有反應
+第二層	day92	album	open journal	[data-act=book]			sub None→book | bookTab reviews→front | screen: [→JILL'S KITCHEN JOURNAL 餐廳日誌 關閉 總覽 故事 餐廳 社群 評價 熟客 VIP 話語 相簿 店] [打烊後 升級→18:05 「合照」 Eric想跟] [的餐廳 看店裡 ? 目前現金 $1,179,146 評分 4.7 明日預估基本備料 約 $23,699 建議保留 約 $→合照。]	有反應
+第二層	day92	album	tab 相簿	[data-act=btab][data-k="mem"]			bookTab front→mem | screen: [4.7 100 則評價 · 開業→店裡的日常，剛好被看到的時候會留下一張。第一次的畫面會珍藏起來，其他的會慢慢換新。 第 1 週 DAY 1–7 DAY ] [天 · 9072 位客人 最近的評價 全部 › 「南瓜濃湯上桌的時候整桌都停下來了。店裡的燈光跟音樂剛剛好。要把這家店藏→最多客人的一天：175 位。] [「香烤鮭魚的火候剛剛好，這種店不多了。佈置得像朋友家。這家店會在我的名單上很久。」 吳小姐 ·→打烊後，Ken 帶來三瓶樣酒，配著招牌菜試。Jill 把酒取名叫「晚餐之後」。]	有反應
+第二層	day92	album	open first photo	[data-act=photo]			lightbox: ✕ DAY 1 「第一天」 ‹ 1 / 237 ♡ 珍藏 ›	有反應
+第二層	day92	album	lightbox next	PAGE:#lightbox button[data-lb=next]			lightbox: ✕ DAY 1 「最佳座位」 珍藏 ‹ 2 / 237 ♥ 珍藏中 ›	有反應
+第二層	day92	album	lightbox prev	PAGE:#lightbox button[data-lb=prev]			lightbox: ✕ DAY 1 「第一天」 ‹ 1 / 237 ♡ 珍藏 ›	有反應
+第二層	day92	album	lightbox keep	PAGE:#lightbox button[data-lb=keep]			lightbox: ✕ DAY 1 「第一天」 珍藏 ‹ 1 / 237 ♥ 珍藏中 › | screen: [→珍藏] | S: album	有反應
+第二層	day92	album	lightbox keep	PAGE:#lightbox button[data-lb=keep]			lightbox: ✕ DAY 1 「第一天」 ‹ 1 / 237 ♡ 珍藏 › | screen: [珍藏→] | S: album	有反應
+第二層	day92	album	lightbox close	PAGE:#lightbox button[data-lb=close]			NOTHING VISIBLE	關閉了（舊的判讀程式看不到「關閉」；見截圖）
+第二層	day74→Day 74 打烊後	reveal_buyProject_revealPeek	buy	[data-act=buyProject][data-k="pizzaoven"]			money 208704→88704 (-120000) | reveal: 完工 披薩烤爐 烤爐點起來了。第一個晚上，整間廚房都是烤餅皮的味道。 Jill：「……先烤一個我們自己吃。」 阿拓：「我來顧。」 現在可以 菜單研發：酒吧披薩 廚師 +1（顧烤爐） 去看看 › 繼續買東西 | S: money,rooms,newRooms,reveal	有反應
+第二層	day74→Day 74 打烊後	reveal_buyProject_revealPeek	revealPeek	#reveal [data-act=revealPeek]			reveal closed | peek: 回到選單 › | tabs: 店門口 主廳 側廳 Lounge 廚房 房間 | room main→kitchen | screenHidden False→True | banner: 披薩烤爐 烤爐點起來了。第一個晚上，整間廚房都是烤餅皮的味道。 | screen: [DAY 74 · 打烊後 升級 Jill 的餐廳 看店裡 ? 目前現金 $208,704 評分 4.5 明日預估基本備料→]	有反應
+第二層	day74→Day 74 打烊後	reveal_buyProject_revealPeek	pill back	PAGE:#peekPill			peek closed | tabs closed | screenHidden True→False | screen: [→DAY 74 · 打烊後 升級 Jill 的餐廳 看店裡 ? 目前現金 $88,704 評分 4.5 明日預估基本備料 ]	有反應
+第二層	day74→Day 74 打烊後	reveal_buyProject_revealClose	buy	[data-act=buyProject][data-k="pizzaoven"]			money 208704→88704 (-120000) | reveal: 完工 披薩烤爐 烤爐點起來了。第一個晚上，整間廚房都是烤餅皮的味道。 Jill：「……先烤一個我們自己吃。」 阿拓：「我來顧。」 現在可以 菜單研發：酒吧披薩 廚師 +1（顧烤爐） 去看看 › 繼續買東西 | S: money,rooms,newRooms,reveal	有反應
+第二層	day74→Day 74 打烊後	reveal_buyProject_revealClose	revealClose	#reveal [data-act=revealClose]			reveal closed | screen: [$208,704→$88,704] [在廚房後牆、排煙罩旁邊砌一座磚造的披薩烤爐，底下是石板：可以在「菜單研發」研發酒吧披薩，給 Lounge 的客人。烤爐要→已完工 烤爐點起來了。第一個晚上，整間廚房都是烤餅皮的味道。]	有反應
+第二層	day74→Day 74 打烊後	reveal_buyLgFurn_revealPeek	buy	[data-act=buyLgFurn]			money 208704→8704 (-200000) | reveal: 裝好了 Lounge 大電視 電視裝好了。有比賽的晚上會開。 Jill：「先說好，不准太吵。」 去看看 › 繼續買東西 | S: money,newRooms,lgFurn	有反應
+第二層	day74→Day 74 打烊後	reveal_buyLgFurn_revealPeek	revealPeek	#reveal [data-act=revealPeek]			reveal closed | peek: 回到選單 › | tabs: 店門口 主廳 側廳 Lounge 廚房 房間 | room main→lounge | screenHidden False→True | banner: Lounge 大電視 電視裝好了。有比賽的晚上會開。 | screen: [DAY 74 · 打烊後 升級 Jill 的餐廳 看店裡 ? 目前現金 $208,704 評分 4.5 明日預估基本備料→]	有反應
+第二層	day74→Day 74 打烊後	reveal_buyLgFurn_revealPeek	pill back	PAGE:#peekPill			peek closed | tabs closed | screenHidden True→False | screen: [→DAY 74 · 打烊後 升級 Jill 的餐廳 看店裡 ? 目前現金 $8,704 評分 4.5 明日預估基本備料 約]	有反應
+第二層	day74→Day 74 打烊後	reveal_buyLgFurn_revealClose	buy	[data-act=buyLgFurn]			money 208704→8704 (-200000) | reveal: 裝好了 Lounge 大電視 電視裝好了。有比賽的晚上會開。 Jill：「先說好，不准太吵。」 去看看 › 繼續買東西 | S: money,newRooms,lgFurn	有反應
+第二層	day74→Day 74 打烊後	reveal_buyLgFurn_revealClose	revealClose	#reveal [data-act=revealClose]			reveal closed | toast: ⚠ 現金 $8,704，可能不足以完成明天的建議備料（約 $24,542） | screen: [$208,704→$8,704] [→⚠ 現在的現金可能不夠完成建議備料，明日可以少備一點或臨時叫貨] [→已擁有]	有反應
+第二層	day74→Day 74 打烊後	reveal_cnPlan_revealPeek	buy	[data-act=cnPlan]			toast: 明晚是主廚之夜。 | screen: [排在明晚→已排：DAY 75（松露薯條、Jill's 檸檬奶油干貝、Jill's 莓果奶酪） 取消] | S: cn	有反應
+第二層	day74→Day 74 打烊後	reveal_cnPlan_revealPeek	revealPeek	#reveal [data-act=revealPeek]			TAP FAILED: TimeoutError('Locator.scroll_into_view_if_needed: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator("#reveal [data-act=revealPeek]").first\n') | NOTHING VISIBLE | only the room picture changed (canvas)	主廚之夜沒有完工卡（預期）
+第二層	day74→Day 74 打烊後	reveal_cnPlan_revealClose	buy	[data-act=cnPlan]			toast: 明晚是主廚之夜。 | screen: [排在明晚→已排：DAY 75（松露薯條、Jill's 檸檬奶油干貝、Jill's 莓果奶酪） 取消] | S: cn	有反應
+第二層	day74→Day 74 打烊後	reveal_cnPlan_revealClose	revealClose	#reveal [data-act=revealClose]			TAP FAILED: TimeoutError('Locator.scroll_into_view_if_needed: Timeout 3000ms exceeded.\nCall log:\n  - waiting for locator("#reveal [data-act=revealClose]").first\n') | NOTHING VISIBLE | only the room picture changed (canvas)	主廚之夜沒有完工卡（預期）
+第二層	day74→Day 74 打烊後	board	open chooser 0	[data-act=bdOpen]			screen: [＋ 加人→收起 阿德師傅 從咖啡吧移過來 Marco 從冷盤台移過來 小林師傅 從烤箱移過來 阿珠姐 從咖啡吧移過來]	有反應
+第二層	day74→Day 74 打烊後	board	bdAdd first option of chooser 0	[data-act=bdAdd]			toast: 阿德師傅：咖啡吧 → 爐台 | screen: [3/7・今天→4/7・今天] [→阿德師傅 LV5 ×] [收起 阿德師傅 從咖啡吧移過來 Marco 從冷盤台移過來 小林師傅 從烤箱移過來 阿珠姐 從咖啡吧移過來→＋ 加人] | S: crew	有反應
+第二層	day74→Day 74 打烊後	board	open chooser 1	[data-act=bdOpen]			screen: [＋ 加人→收起 阿德師傅 從咖啡吧移過來 Marco 從冷盤台移過來 阿珠姐 從咖啡吧移過來 Hugo 從爐台移過來 阿勇 從爐台]	有反應
+第二層	day74→Day 74 打烊後	board	bdAdd first option of chooser 1	[data-act=bdAdd]			toast: 阿德師傅：咖啡吧 → 烤箱 | screen: [1/2・今天→2/2・今天] [→阿德師傅 LV5 ×] [收起 阿德師傅 從咖啡吧移過來 Marco 從冷盤台移過來 阿珠姐 從咖啡吧移過來 Hugo 從爐台移過來 阿勇 從爐台→已滿] | S: crew	有反應
+第二層	day74→Day 74 打烊後	board	open chooser 2	[data-act=bdOpen]			screen: [＋ 加人→收起 阿德師傅 從咖啡吧移過來 小林師傅 從烤箱移過來 阿珠姐 從咖啡吧移過來 Hugo 從爐台移過來 阿勇 從爐台移過]	有反應
+第二層	day74→Day 74 打烊後	board	bdAdd first option of chooser 2	[data-act=bdAdd]			toast: 阿德師傅：咖啡吧 → 冷盤台 | screen: [1/2・今天 3 道 Marco LV5 × 收起 阿德師傅 從咖啡吧移過來 小林師傅 從烤箱移過來 阿珠姐 從咖啡吧移→2/2・今天] [→Marco LV5 × 已滿 咖啡吧 1/4・今天 3 道] [阿德師傅 咖啡吧 每步 0.6 秒・品質 100→] | S: crew	有反應
+第二層	day74→Day 74 打烊後	board	open chooser 3	[data-act=bdOpen]			screen: [＋ 加人→收起 Marco 從冷盤台移過來 小林師傅 從烤箱移過來 Hugo 從爐台移過來 阿勇 從爐台移過來 阿拓 從爐台移過來]	有反應
+第二層	day74→Day 74 打烊後	board	bdAdd first option of chooser 3	[data-act=bdAdd]			toast: Marco：冷盤台 → 咖啡吧 | screen: [1/2・今天→0/2・今天] [Marco LV5 ×→] [2/4・今天→3/4・今天] | S: crew	有反應
+第二層	day74→Day 74 打烊後	board	open chooser 4	[data-act=bdOpen]			screen: [＋ 加人→收起 小茉 Nina]	有反應
+第二層	day74→Day 74 打烊後	board	bdAddD first option of chooser 4	[data-act=bdAddD]			screen: [5→6] [→小茉 LV5 ×] [收起 小茉 Nina→＋ 加人] | S: crew	有反應
+第二層	day74→Day 74 打烊後	board	open chooser 5	[data-act=bdOpen]			screen: [＋ 加人→收起 小茉 Nina]	有反應
+第二層	day74→Day 74 打烊後	board	bdAddD first option of chooser 5	[data-act=bdAddD]			screen: [5→6] [→小茉 LV5 ×] [收起 小茉 Nina→＋ 加人] | S: crew	有反應
+第二層	day74→Day 74 打烊後	board	open chooser 6	[data-act=bdOpen]			screen: [＋ 加人→收起 Kai 安安]	有反應
+第二層	day74→Day 74 打烊後	board	bdAddD first option of chooser 6	[data-act=bdAddD]			screen: [5→6] [→Kai LV5 ×] [收起 Kai 安安→＋ 加人] | S: crew	有反應
+第二層	day74→Day 74 打烊後	board	open chooser 7	[data-act=bdOpen]			screen: [＋ 加人→收起 Kai 安安]	有反應
+第二層	day74→Day 74 打烊後	board	bdAddD first option of chooser 7	[data-act=bdAddD]			screen: [5→6] [→Kai LV5 ×] [收起 Kai 安安→＋ 加人] | S: crew	有反應
+第二層	day74→Day 74 打烊後	board	open chooser 8	[data-act=bdOpen]			screen: [＋ 加人→收起 小茉 Kai 安安 Momo 小威]	有反應
+第二層	day74→Day 74 打烊後	board	bdAddD first option of chooser 8	[data-act=bdAddD]			screen: [5→6] [→小茉 LV5 ×] [收起 小茉 Kai 安安 Momo 小威→＋ 加人] | S: crew	有反應
+第二層	day74→Day 74 打烊後	board	open chooser 9	[data-act=bdOpen]			screen: [＋ 加人→收起 小茉 Kai Nina 小威]	有反應
+第二層	day74→Day 74 打烊後	board	bdAddD first option of chooser 9	[data-act=bdAddD]			screen: [3→4] [→小茉 LV5 ×] [收起 小茉 Kai Nina 小威→＋ 加人] | S: crew	有反應
+第二層	day74→Day 74 打烊後	lab	pick 雞蛋	[data-act=labPick][data-k="egg"]			screen: [點食材看它的特性；選 2–3 種再試做。主角＋配料或醬汁，是最常見的組合。→雞蛋 主體 清爽↑ 濃郁↑ 口感↑ · $ 整體味道：清爽↑ 濃郁↑ 口感↑ 可能適合：爐台 · 主餐] [$150還沒選→$150已選 1/3]	有反應
+第二層	day74→Day 74 打烊後	lab	pick 白飯	[data-act=labPick][data-k="rice"]			screen: [整體味道：清爽↑→白飯 主體 清爽↑ 口感↑↑ · $ 相性：雞蛋×白飯 很好 整體味道：清爽↑↑] [口感↑→口感↑↑↑] [1/3→2/3]	有反應
+第二層	day74→Day 74 打烊後	lab	試做	[data-act=labTry]			money 208704→208554 (-150) | screen: [$208,704→$208,554] [可以吃，但還不像一道能上菜單的料理。 義大利麵比較適合烤箱的料理，換一種配料或醬汁試試。→兩種主體打架：雞蛋跟白飯都想當主角。 雞蛋跟白飯的相性很好，往這個方向再想想。] [雞蛋 主體 清爽↑ 濃郁↑ 口感↑ · $ 白飯 主體 清爽↑ 口感↑↑ · $ 相性：雞蛋×白飯 很好 整體味道：清爽→點食材看它的特性；選 2–3 種再試做。主角＋配料或醬汁，是最常見的組合。] | S: money,labLast	有反應
+第二層	day74→Day 74 打烊後	lab	unpick: tap 雞蛋 again	[data-act=labPick][data-k="egg"]			screen: [點食材看它的特性；選 2–3 種再試做。主角＋配料或醬汁，是最常見的組合。→雞蛋 主體 清爽↑ 濃郁↑ 口感↑ · $ 整體味道：清爽↑ 濃郁↑ 口感↑ 可能適合：爐台 · 主餐] [$150還沒選→$150已選 1/3]	有反應
+第二層	day74→Day 74 打烊後	sig	open editor	[data-act=sigOpen]			sub None→sig | screen: [DAY 74 · 打烊後 升級 Jill 的餐廳 看店裡 ? 目前現金 $208,704 評分 4.5 明日預估基本備料→JILL'S SIGNATURE DISH 設計招牌菜 取消] [$940→售價 $610] [奶油薯泥・干貝・檸檬奶油・烤蔬菜 第三版 · 食用花與金箔 招牌菜永遠在菜單最上方，有些客人會專程為它而來。賣得夠多，J→在爐台用平底鍋煎，看準時機起鍋 主食 香料米飯+40 奶油薯泥+50 手工寬麵+60 酸種麵包+40 蛋白質 鴨胸+16]	有反應
+第二層	day74→Day 74 打烊後	sig	pick 香料米飯+40	[data-act="sigPick"][data-k="rice"]			screen: [$610→$600]	有反應
+第二層	day74→Day 74 打烊後	sig	pick 奶油薯泥+50	[data-act="sigPick"][data-k="mash"]			screen: [$600→$610]	有反應
+第二層	day74→Day 74 打烊後	sig	pick 手工寬麵+60	[data-act="sigPick"][data-k="pasta"]			screen: [$610→$620]	有反應
+第二層	day74→Day 74 打烊後	sig	pick 酸種麵包+40	[data-act="sigPick"][data-k="bread"]			screen: [$620→$600]	有反應
+第二層	day74→Day 74 打烊後	sig	pick 鴨胸+160	[data-act="sigPick"][data-k="duck"]			screen: [檸檬奶油干貝→檸檬奶油鴨胸] [$600→$580]	有反應
+第二層	day74→Day 74 打烊後	sig	pick 和牛+220	[data-act="sigPick"][data-k="beef"]			screen: [檸檬奶油鴨胸→檸檬奶油和牛] [$580→$640]	有反應
+第二層	day74→Day 74 打烊後	sig	make (sigMake)	[data-act=sigMake]			money 208704→207904 (-800) | sub sig→None | screen: [JILL'S SIGNATURE DISH 設計招牌菜 取消→DAY 74 · 打烊後 升級 Jill 的餐廳 看店裡 ? 目前現金 $207,904 評分 4.5 明日預估基本備料] [售價 $640→$985] [在爐台用平底鍋煎，看準時機起鍋 主食 香料米飯+40 奶油薯泥+50 手工寬麵+60 酸種麵包+40 蛋白質 鴨胸+16→酸種麵包・和牛・檸檬奶油・烤蔬菜 第三版 · 食用花與金箔 招牌菜永遠在菜單最上方，有些客人會專程為它而來。賣得夠多，J] | S: money,sign	有反應
+第二層	day74→Day 74 打烊後	sig	open editor again	[data-act=sigOpen]			sub None→sig | screen: [DAY 74 · 打烊後 升級 Jill 的餐廳 看店裡 ? 目前現金 $208,704 評分 4.5 明日預估基本備料→JILL'S SIGNATURE DISH 設計招牌菜 取消] [$940→售價 $610] [奶油薯泥・干貝・檸檬奶油・烤蔬菜 第三版 · 食用花與金箔 招牌菜永遠在菜單最上方，有些客人會專程為它而來。賣得夠多，J→在爐台用平底鍋煎，看準時機起鍋 主食 香料米飯+40 奶油薯泥+50 手工寬麵+60 酸種麵包+40 蛋白質 鴨胸+16]	有反應
+第二層	day74→Day 74 打烊後	sig	cancel (closeSub)	[data-act=closeSub]			sub sig→None | screen: [JILL'S SIGNATURE DISH 設計招牌菜 取消→DAY 74 · 打烊後 升級 Jill 的餐廳 看店裡 ? 目前現金 $208,704 評分 4.5 明日預估基本備料] [售價 $610→$940] [在爐台用平底鍋煎，看準時機起鍋 主食 香料米飯+40 奶油薯泥+50 手工寬麵+60 酸種麵包+40 蛋白質 鴨胸+16→奶油薯泥・干貝・檸檬奶油・烤蔬菜 第三版 · 食用花與金箔 招牌菜永遠在菜單最上方，有些客人會專程為它而來。賣得夠多，J]	有反應
+餐廳日誌 › 故事（先點開那一列）	day92	1.DAY 76「她一直看那台鋼琴」	看插圖	illus	ya_first	56x27	dlg: 第一次來的那位客人，一直看著那台沒有人彈的鋼琴。 | S: dayLog	有反應（圖跳出、讀完回到日誌）
+餐廳日誌 › 故事（先點開那一列）	day92	4.DAY 87「彈得真好。」	看插圖	illus	ya_trial	56x27	dlg: 予安第一次在 Lounge 彈琴。王太太走過來說：「彈得真好。」 | S: dayLog	有反應（圖跳出、讀完回到日誌）
+餐廳日誌 › 故事（先點開那一列）	day92	5.DAY 87「星期幾？」	看插圖	illus	ya_join	56x27	dlg: 「下週還有空嗎？」「星期幾？」 | S: dayLog	有反應（圖跳出、讀完回到日誌）
+餐廳日誌 › 故事（先點開那一列）	day92	2.DAY 78「第一次品酒之夜」	看插圖	illus	ken_t1	56x27	dlg: 第一次品酒之夜。Ken 站在吧台後面，吧台前坐滿了。 | S: dayLog	有反應（圖跳出、讀完回到日誌）
+餐廳日誌 › 故事（先點開那一列）	day92	3.DAY 83「下次換一支。」	看插圖	illus	ken_t2	56x27	dlg: 第二次品酒之夜。人多了，Ken 走出吧台，在客人之間講酒；Evan 在吧台後面倒酒。 | S: dayLog	有反應（圖跳出、讀完回到日誌）
+餐廳日誌 › 故事（先點開那一列）	day92	4.DAY 88「老樣子」	看插圖	illus	ken_t3	56x27	dlg: 第三次品酒之夜。整個 Lounge 都在品酒，Ken 坐在客人中間；Jill 和 Evan 在吧台後面。 | S: dayLog	有反應（圖跳出、讀完回到日誌）
+餐廳日誌 › 故事（先點開那一列）	day92	13.DAY 81「你選。」	看插圖	illus	lin_guest	56x27	dlg: Madame Lin 坐在吧台這一邊。「你選。」 | S: dayLog	有反應（圖跳出、讀完回到日誌）
+餐廳日誌 › 故事（先點開那一列）	day92	1.DAY 54「吃飯啊」	看插圖	illus	yj_intro	56x27	dlg: 怡君第一次來店裡吃飯。 | S: dayLog	有反應（圖跳出、讀完回到日誌）
+餐廳日誌 › 故事（先點開那一列）	day92	6.DAY 63「備用鑰匙」	看插圖	illus	yj_key	56x27	dlg: 怡君的新家。下次來，不用在樓下等了。 | S: dayLog	有反應（圖跳出、讀完回到日誌）
+餐廳日誌 › 故事（先點開那一列）	day92	3.DAY 69「那面牆」	看插圖	illus	wall_leak	56x27	dlg: 下過雨以後，同一面牆。 | S: dayLog	有反應（圖跳出、讀完回到日誌）
+餐廳日誌 › 故事（先點開那一列）	day92	9.DAY 84「一項一項談」	看插圖	illus	wall_settled	56x27	dlg: 走出調解室。 | S: dayLog	有反應（圖跳出、讀完回到日誌）
+開店前（第二層）	day52→Day 53	menu full: tap ＋ weather dish	menu full: tap ＋ weather dish	[data-act=menuAdd]			screen: [菜單已滿（20 道）——點一道，選要換掉哪一道。→菜單已滿，要換掉哪一道？ 換成 提拉米蘇 取消 南瓜濃湯 預估 4 份・冰箱 4 換掉 巴斯克乳酪蛋糕 預估 5 份・冰]	有反應
+開店前（第二層）	day52→Day 53	chooser: 換掉 the first row	chooser: 換掉 the first row	[data-act=menuSwapDo]			toast: 南瓜濃湯 換成 提拉米蘇，記得備料 | screen: [莓果奶酪、舒芙蕾、巴斯克乳酪蛋糕、焦糖布丁、抹茶舒芙蕾 今天的天氣也適合，但不在今天的菜單上： ＋ 提拉米蘇 菜單已滿，→莓果奶酪、舒芙蕾、巴斯克乳酪蛋糕、焦糖布丁、抹茶舒芙蕾、提拉米蘇] [南瓜濃湯→提拉米蘇] [20→24] | S: menu,today	有反應
+開店前（第二層）	day52→Day 53	menu full again: tap ＋	menu full again: tap ＋	[data-act=menuAdd]			screen: [菜單已滿（20 道）——點一道，選要換掉哪一道。→菜單已滿，要換掉哪一道？ 換成 提拉米蘇 取消 南瓜濃湯 預估 4 份・冰箱 4 換掉 巴斯克乳酪蛋糕 預估 5 份・冰]	有反應
+開店前（第二層）	day52→Day 53	chooser: 取消	chooser: 取消	[data-act=menuSwapNo]			screen: [菜單已滿，要換掉哪一道？ 換成 提拉米蘇 取消 南瓜濃湯 預估 4 份・冰箱 4 換掉 巴斯克乳酪蛋糕 預估 5 份・冰→菜單已滿（20 道）——點一道，選要換掉哪一道。]	有反應
+開店前（第二層）	day52→Day 53	toggle off souffle	toggle off souffle	[data-act=toggle][data-d="souffle"]			screen: [莓果奶酪、舒芙蕾、巴斯克乳酪蛋糕、焦糖布丁、抹茶舒芙蕾→莓果奶酪、巴斯克乳酪蛋糕、焦糖布丁、抹茶舒芙蕾] [菜單已滿（20 道）——點一道，選要換掉哪一道。→＋ 舒芙蕾] [舒芙蕾→] | S: menu,today	有反應
+開店前（第二層）	day52→Day 53	discardAsk	discardAsk	[data-act=discardAsk]			screen: [$14,492退掉不在菜單上的庫存（8 份）→$14,492確定退掉這 8 份？（再按一次）]	有反應
+開店前（第二層）	day52→Day 53	discardAll	discardAll	[data-act=discardAll]			money 173060→173495 (+435) | toast: 退掉了不在菜單上的庫存 | screen: [冰箱裡還有 3 份，佔著位子 退掉（退 $135）→] [冰箱裡還有 5 份，佔著位子 退掉（退 $300）→] [106/260→98/260] | S: money,stock,todayCost	有反應
+結算	day92→Day 93	peek	看店裡	peek	None		peek: 回到選單 › | tabs: 店門口 主廳 側廳 二樓 休息室 Lounge 廚房 房間 | screenHidden False→True | screen: [今日結算 DAY 93 看店裡 營業額 $123,120 食材成本 -$23,670 酒水成本 -$7,155 薪資 -→]	有反應
+結算	day92→Day 93	book	book	book	None		sub None→book | bookTab reviews→front | screen: [今日結算→JILL'S KITCHEN JOURNAL 餐廳日誌 關閉 總覽 故事 餐廳 社群 評價 熟客 VIP 話語 相簿 店] [看店裡 營業額 $123,120 食材成本 -$23,670 酒水成本 -$7,155 薪資 -$31,050 租金 主→] [「香煎鴨胸吃到最後一口還在點頭。主菜旁邊有一杯酒，就完整了。」 Chloe 晚上升級餐廳→· DAY 93 熟客留言 熟客 › 陳伯伯 「	有反應
+結算	day92→Day 93	album	看今天的照片 ›	album	None		sub None→book | bookTab front→mem | screen: [今日結算→JILL'S KITCHEN JOURNAL 餐廳日誌 關閉 總覽 故事 餐廳 社群 評價 熟客 VIP 話語 相簿 店] [看店裡 營業額 $123,120 食材成本 -$23,670 酒水成本 -$7,155 薪資 -$31,050 租金 主→Mia第 40 次來，Jill 請了] [檸檬奶油干貝 15 份 $13,720 剩 5 乾式熟成肋眼 15 份 $17,155 賣完・估計少賣 1 錫	有反應
+結算	day92→Day 93	toShop	toShop	toShop			phase summary→shop | main summary→shop | screen: [今日結算→] [→· 打烊後 升級 Jill 的餐廳] [營業額 $123,120 食材成本 -$23,670 酒水成本 -$7,155 薪資 -$31,050 租金 主廳 $2→? 目前現金 $1,278,127 評分 4.7 明日預估基本備料 約 $24,277 建議保留 約 $28,019 家]	有反應
+HUD（title）	day92	title	暫停 II	#hPause		34x34	NOTHING VISIBLE | only the room picture changed (canvas)	★ 按不到（被選單／標題蓋住）
+HUD（title）	day92	title	時鐘	#hClock			NOTHING VISIBLE | only the room picture changed (canvas)	營業外本來就不是按鈕
+HUD（shop）	day92	shop	暫停 II	#hPause		34x34	NOTHING VISIBLE | only the room picture changed (canvas)	★ 按不到（被選單／標題蓋住）
+HUD（shop）	day92	shop	時鐘	#hClock			NOTHING VISIBLE | only the room picture changed (canvas)	營業外本來就不是按鈕
+HUD（prep）	day92	prep	暫停 II	#hPause		34x34	NOTHING VISIBLE | only the room picture changed (canvas)	★ 按不到（被選單／標題蓋住）
+HUD（prep）	day92	prep	時鐘	#hClock			NOTHING VISIBLE | only the room picture changed (canvas)	營業外本來就不是按鈕
+開店前（重現）	day74→Day 75	補滿 coffee	補滿 coffee	stockTo/restock/stock			money 208704→204366 (-4338) | screen: [2→243] [159/400→400/400] [$26,773→$26,143] | S: money,stock,todayCost	有反應
+開店前（重現）	day74→Day 75	補到建議量 after 補滿	補到建議量 after 補滿	stockTo/restock/stock			NOTHING VISIBLE	★ 冰箱滿時「一鍵補到建議量」無任何反應
+開店前（重現）	day74→Day 75	one − on 拿鐵咖啡	one − on 拿鐵咖啡	stockTo/restock/stock			money 204366→204384 (+18) | screen: [243→242] [400/400→399/400] | S: money,stock,todayCost	有反應

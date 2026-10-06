@@ -1,7 +1,7 @@
 # Jill's Kitchen — 目前狀態（暫時的，會一直更新）
 
 這份只放「現在」的狀態：branch、版本、待辦、待確認。永久的設計規則在 `docs/PROJECT_MEMORY.md`，不要寫到這裡；這裡的內容過時了就
-直接改掉或刪掉。最後更新：2026-10-04，v2.4 rc8.5 發布之後。
+直接改掉或刪掉。最後更新：2026-10-06，全面 Audit 與例行 QA 合回 `main` 之後（遊戲還是 rc8.5，沒有發布）。
 
 ## Repo 與 branch
 
@@ -10,7 +10,9 @@
   `main` 上只有文件與紀錄。從 v2.2.1 起的完整開發歷史都在 `main` 上。
 - 還沒做完的遊戲功能，另外開短期的 `feature/…` 或 `wip/…` branch；做完、測試通過才回到 `main`，發布的 commit 一定在 `main` 上。
   文件與紀錄可以直接在 `main`。不要讓工作 branch 跟 `main` 長期並行。
-- GitHub 上的 branch：`main`、`archive/rc7.6-import-main`，和 rc8.5 的工作 branch `feature/fewer-lines`（已合回 `main`，內容都在 `main` 裡，可以在 GitHub 網頁刪掉）。
+- GitHub 上的 branch：`main`、`archive/rc7.6-import-main`、`feature/fewer-lines`（rc8.5，已合回 `main`，可以在 GitHub 網頁刪掉）、
+  `feature/dylan-room`（Dylan 在房間的名字，還沒合回、還沒發布）、`feature/lounge-decided`（《看看》後直接決定接隔壁、Lounge I 的新條件；
+  還沒合回、還沒發布）、`qa/audit-2026-10-06`（全面 Audit 與例行 QA；2026-10-06 使用者同意合回 `main`，已合回，可以在 GitHub 網頁刪掉）。
 - 已刪除（玩家 2026-10-04 在 GitHub 網頁刪掉）：`feature/ken-tasting-pictures`（81cbe46，rc8.4 已合回 `main`）、`wip/lin`（舊的開發
   branch 名稱；最後指向的 b87b77b 在 `main` 裡）、`claude/jills-kitchen-github-setup-4x7483`（8ca784b，接在舊的匯入 commit 後面改網址；
   同樣的改動在主線的 ec985d1）。三條的內容都已經在 `main` 或不需要了。
@@ -57,6 +59,9 @@
   `v24_lounge_decided_at_the_viewing_no_card_and_lounge_one_is_80000`）。新玩家時間表（三個種子，
   沒送錢、沒改經濟）：《看看》Day 36–37、她最後一晚 Day 44、存到 $80,000 Day 60–66、Lounge 開幕 Day 63–69（原本 $120,000 是 Day 80）；
   `docs/evidence/lounge_decided_2026-10-06/`。使用者說「發布」時：合回 `main` → 完整回歸 → 發布。
+- **2026-10-06 全面 Audit 與例行 QA**（已合回 `main`，使用者 2026-10-06「Audit 這套 QA 工具和測試我同意合回 main」；沒有改遊戲、沒有發布）：報告 `docs/audit/2026-10-06/README.md`；
+  例行 QA `python3 tests/run_tests.py --qa`（`docs/QA.md`）；全面 Audit 的做法 `docs/audit/PLAYBOOK.md`。Audit 找到、還沒修的問題，
+  每一條都已經有測試在等（`tests/qa_known_open.json`）。
 
 ### 進行中／等待玩家素材
 
@@ -64,6 +69,9 @@
 
 ## 測試
 
+- **例行 QA**（2026-10-06 起）：`python3 tests/run_tests.py --qa`，`tests/qa_tests.py` 的 `qa_` 測試，用 `tests/player.py` 真的點畫面、
+  故事面板開著。每次改完遊戲跑；完整回歸也包含它們。已知未修的問題列在 `tests/qa_known_open.json`（失敗顯示 OPEN、不算失敗；修好時
+  顯示 FIXED，要把那一條拿掉）。
 - 247 個測試（`tests/run_tests.py` 95、`tests/v23_tests.py` 30、`tests/v24_tests.py` 122；`feature/lounge-decided` 上 v24 多一個，248；`python3 tests/run_tests.py` 全跑，`-k a,b,c`
   跑指定的）。最近一次完整回歸：rc8.5 的 bded558 上 247/247（`docs/evidence/v24_rc8_5/regression/`）。
 - 已知會在單一 seed 上偶爾落差的機率性測試，都在測試註解裡寫了量過的分布（例：`lounge_i_content_bar_food…`、
@@ -71,6 +79,8 @@
 
 ## 待辦／待確認
 
+- **2026-10-06 Audit 的結果**（`docs/audit/2026-10-06/README.md`）：十件最重要的事、接下來最值得做的 3–5 件、以及最後一段「需要使用者決定」
+  的 20 個問題，都等使用者看過再動。Audit 本身沒有改遊戲。
 - ~~營業中存檔、「繼續營業」在特別的晚上會變成空店~~：rc8.3 已修（`rc83_a_special_evening_comes_back_with_its_room`）。原本的說明：存檔時有人在
   `piano`（予安彈琴）、`toHost`／`host`（Ken 主持品酒夜）這些狀態，`restoreService` 的 `G_STATES` 不認得，整個還原失敗，
   退回「同一時間、店是空的」；主廚之夜的 `R.cn`、品酒夜的 `R.kt`、予安的 `R.ya` 也不會還原。存檔本身沒有壞，只是那一晚

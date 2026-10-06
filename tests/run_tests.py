@@ -312,6 +312,14 @@ def check(cond, msg):
     if not cond:
         raise AssertionError(msg)
 
+class SetupFailed(AssertionError):
+    """the test never reached the case it is about (a save, a screen, a button that should be there was not) — for a
+    known-open test that is a broken test, not the finding still being open"""
+
+def setup_check(cond, msg):
+    if not cond:
+        raise SetupFailed('setup: ' + msg)
+
 @test
 def single_file_in_sync(b, port, target):
     import subprocess
@@ -3899,19 +3907,28 @@ def named_guests_keep_one_face_and_the_staff_have_theirs(b, port, target):
 import v23_tests  # noqa: E402,F401
 # v2.4: Staff Lives foundations and stories (tests/v24_tests.py)
 import v24_tests  # noqa: E402,F401
+import qa_tests  # noqa: E402,F401   (the routine QA, docs/QA.md: `--qa` runs only these)
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--target', choices=['index', 'single'], default='index')
     ap.add_argument('--record', action='store_true')
     ap.add_argument('-k', default='')
+    ap.add_argument('--qa', action='store_true', help='the routine QA only: the qa_ tests (docs/QA.md)')
     a = ap.parse_args()
+    # Known-open (docs/QA.md): a QA test written for a bug found but not fixed yet. Its failure is reported as OPEN and does
+    # not fail the run; when it passes, the run fails until the entry is removed — the fix's own regression test from then on.
+    known = json.load(open(os.path.join(ROOT, 'tests', 'qa_known_open.json'), encoding='utf-8')) if os.path.exists(os.path.join(ROOT, 'tests', 'qa_known_open.json')) else {}
+    def chosen(fn):
+        if a.qa and not fn.__name__.startswith('qa_'):
+            return False
+        return not a.k or any(k and k in fn.__name__ for k in a.k.split(','))
     srv, port = start_server()
-    failed = 0
+    failed = 0; still_open = []
     with sync_playwright() as p:
         b = p.chromium.launch()
         for fn in TESTS:
-            if a.k and not any(k and k in fn.__name__ for k in a.k.split(',')):
+            if not chosen(fn):
                 continue
             t0 = time.time()
             try:
@@ -3919,16 +3936,25 @@ def main():
                     fn(b, port, a.target, record=a.record)
                 else:
                     fn(b, port, a.target)
-                print(f'PASS  {fn.__name__}  ({time.time()-t0:.1f}s)')
+                if fn.__name__ in known:
+                    failed += 1
+                    print(f'FIXED {fn.__name__}  ({time.time()-t0:.1f}s)\n      known-open {known[fn.__name__].get("finding")} passes now: remove it from tests/qa_known_open.json (it is the fix\'s regression test from now on)')
+                else:
+                    print(f'PASS  {fn.__name__}  ({time.time()-t0:.1f}s)')
             except Exception as e:
-                failed += 1
-                print(f'FAIL  {fn.__name__}  ({time.time()-t0:.1f}s)\n      {e}')
-                if os.environ.get('JK_TRACE'):
-                    traceback.print_exc()
+                # OPEN only when the finding's own check fails; a setup that did not reach the case, or a crash, is a FAIL
+                if fn.__name__ in known and isinstance(e, AssertionError) and not isinstance(e, SetupFailed):
+                    still_open.append(fn.__name__)
+                    print(f'OPEN  {fn.__name__}  ({time.time()-t0:.1f}s)  known: {known[fn.__name__].get("finding")} {known[fn.__name__].get("what", "")}\n      {str(e)[:300]}')
+                else:
+                    failed += 1
+                    print(f'FAIL  {fn.__name__}  ({time.time()-t0:.1f}s)\n      {e}')
+                    if os.environ.get('JK_TRACE'):
+                        traceback.print_exc()
         b.close()
     srv.shutdown()
-    ran = [f for f in TESTS if not a.k or any(k and k in f.__name__ for k in a.k.split(','))]
-    print(f'\n{len(ran)-failed} passed, {failed} failed')
+    ran = [f for f in TESTS if chosen(f)]
+    print(f'\n{len(ran)-failed-len(still_open)} passed, {failed} failed' + (f', {len(still_open)} known-open (tests/qa_known_open.json)' if still_open else ''))
     sys.exit(1 if failed else 0)
 
 if __name__ == '__main__':

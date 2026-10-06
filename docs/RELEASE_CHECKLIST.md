@@ -85,6 +85,10 @@ For each player-facing feature, report:
 
 Never promote T to O.
 
+Since 2026-10-06 (CLAUDE.md, the user): four levels, never merged — 程式寫了 (I); 測試／模擬確認了 (T); 正常遊玩實際看得到
+(in ordinary play, without a test's setup: where it happens and how often a player meets it — `tools/qa/life_visibility.py`
+measures it); 使用者已經在 iPhone 上親自確認 (O).
+
 - Mark O as observed only after the player confirms it.
 - Phone screenshots are evidence for T, not for O.
 - Never claim an iPhone observation.
@@ -108,6 +112,8 @@ published at 21:12 on targeted checks alone, and its backup box froze the player
 
 
 How testing runs between releases (the player's 05:42 strategy, `docs/v24/testing_strategy_0542_2026-10-02.txt`):
+- The routine QA after every change: `python3 tests/run_tests.py --qa` (`docs/QA.md`: the day by taps, every shop button,
+  the player's checkpoints, the three phone widths, the known-open list). It is not the release gate; the full run is.
 - After each change, run what it can affect first: its own tests, the tests of what depends on it, the closest real
   save, and the screenshots if the player sees it (`python3 tests/run_tests.py -k name1,name2`). Widen to the
   integration tests when the change is in a shared system (staff pools, the scheduler, the economy, saves).
@@ -118,6 +124,8 @@ How testing runs between releases (the player's 05:42 strategy, `docs/v24/testin
 - I / T / O stay apart: a passing test or a scripted run on a real save is TESTED, never OBSERVED.
 
 - [ ] Full regression: `python3 tests/run_tests.py`.
+  - It includes the routine QA. The known-open tests (`tests/qa_known_open.json`) print OPEN and do not fail it; none
+    may print FIXED — a fix removes its entry in the same commit, and from then on the test guards the fix.
   - It takes about 65 minutes; run it in the background with a log (in a clean worktree of the commit, so the work
     tree can keep moving).
   - Re-record goldens (`--record`) only for a change that legitimately moves them, and say which and why.
