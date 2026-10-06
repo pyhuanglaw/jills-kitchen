@@ -75,13 +75,23 @@
   顯示 FIXED，要把那一條拿掉）。
 - 247 個測試（`tests/run_tests.py` 95、`tests/v23_tests.py` 30、`tests/v24_tests.py` 122；`python3 tests/run_tests.py` 全跑，`-k a,b,c`
   跑指定的）。最近一次完整回歸：rc8.5 的 bded558 上 247/247（`docs/evidence/v24_rc8_5/regression/`）。
+- **`fix/audit-narrative-2026-10-06` 的完整回歸**：d0fd661 上 **292/292**（2026-10-06 23:05 UTC；其中 46 個是例行 QA 的 `qa_` 測試，
+  `tests/qa_known_open.json` 是空的）。在固定在 d0fd661 的另一個 worktree 跑，跑的時候程式沒有在改。紀錄：
+  `docs/evidence/fix_audit_2026-10-06/regression/`。
+- **這一批的測試版**（給使用者在手機上試，不是發布）：https://claude.ai/artifact/BzGu1nFBVEqDt72Fad1sHP （「Jill's Kitchen 測試版」，
+  私人連結，Version 2，遊戲內容＝ d0fd661）。
+  - 存檔跟正式版分開。要用自己的進度：正式版「設定・存檔」→「備份到檔案」，再到測試版「從備份檔恢復」。
+  - 跟正式版一樣可以「備份到檔案」（Version 2 加上了下載的權限；Version 1 沒有）。
+  - 正式網址沒有動，還是 rc8.5。
 - 已知會在單一 seed 上偶爾落差的機率性測試，都在測試註解裡寫了量過的分布（例：`lounge_i_content_bar_food…`、
   `v24_rc6_new_things_are_talked_about`）。
 
 ## 待辦／待確認
 
 - **2026-10-06 Audit 的結果**（`docs/audit/2026-10-06/README.md`）：十件最重要的事、接下來最值得做的 3–5 件、以及最後一段「需要使用者決定」
-  的 20 個問題，都等使用者看過再動。Audit 本身沒有改遊戲。
+  的 24 個問題（第 19、20 條已決定），都等使用者看過再動。Audit 本身沒有改遊戲。
+- **修 bug 時看到、等使用者決定的事**：`docs/audit/2026-10-06/DECISIONS.md`（料理 prototype 6 條、這一批 3 條、故事與文字 16 條）。
+  使用者回答之前，遊戲維持現在的樣子。
 - ~~營業中存檔、「繼續營業」在特別的晚上會變成空店~~：rc8.3 已修（`rc83_a_special_evening_comes_back_with_its_room`）。原本的說明：存檔時有人在
   `piano`（予安彈琴）、`toHost`／`host`（Ken 主持品酒夜）這些狀態，`restoreService` 的 `G_STATES` 不認得，整個還原失敗，
   退回「同一時間、店是空的」；主廚之夜的 `R.cn`、品酒夜的 `R.kt`、予安的 `R.ya` 也不會還原。存檔本身沒有壞，只是那一晚
