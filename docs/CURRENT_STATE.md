@@ -56,8 +56,10 @@
   什麼（「需要餐廳評分 4.0（目前 X）」、「還差 $X」），夠了就能按「簽約・開工 $50,000」。她最後一晚之前簽，簽約前一晚就是她的最後一晚；
   沒簽的話她照常做到最後一晚，結束時提醒一次簽約在哪裡。Lounge II／III 不變。舊存檔：「再想想」、卡片沒回答、《看看》和卡片之間存的檔
   都當作已決定（`linDecMig`）；已付 $120,000 的不重收、已開幕的不動。相關 29 個測試通過，含 `v24_lounge_one_after_the_viewing_rating_four_
-  and_50000_no_wait_for_her_last_night` 和例行 QA 的 `qa_lounge_one_signs_before_her_last_night`。新玩家時間表（$50,000）重跑中。
-  開幕後收銀機停在 $0 的平衡問題：使用者要先看分析和方案，正式經濟沒改。使用者說「發布」時：合回 `main` → 完整回歸 → 發布。
+  and_50000_no_wait_for_her_last_night` 和例行 QA 的 `qa_lounge_one_signs_before_her_last_night`；例行 QA 11 過、17 個已知未修。
+  新玩家時間表（`docs/evidence/lounge_decided_2026-10-06/50000/`）：規則照現在，模擬玩家第 32–34 天買側廳後評分掉到 2–3.7、110 天內
+  沒開 Lounge；假設評分不擋，第 48–49 天付錢、第 51–52 天開幕，依賴 Lounge 的故事比 $80,000 早 12–17 天。開幕後收銀機停在 $0 的平衡
+  問題：方案比較在 `options.md`，等使用者選，正式經濟沒改。評分 4.0 會卡住評分掉下去的玩家：等使用者決定。使用者說「發布」時：合回 `main` → 完整回歸 → 發布。
 - **2026-10-06 全面 Audit 與例行 QA**（已合回 `main`，使用者 2026-10-06「Audit 這套 QA 工具和測試我同意合回 main」；沒有改遊戲、沒有發布）：報告 `docs/audit/2026-10-06/README.md`；
   例行 QA `python3 tests/run_tests.py --qa`（`docs/QA.md`）；全面 Audit 的做法 `docs/audit/PLAYBOOK.md`。Audit 找到、還沒修的問題，
   每一條都已經有測試在等（`tests/qa_known_open.json`）。
