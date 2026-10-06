@@ -1154,3 +1154,24 @@ def qa_the_savings_goals_are_in_tonights_shop(b, port, target):
         check(not bad, '; '.join(bad[:8]))
     finally:
         p.close()
+
+
+@test
+def qa_a_guest_who_moves_to_the_lounge_is_counted_once(b, port, target):
+    """Found while reading the Lounge's books (2026-10-06): a party that has dinner and then goes to The Lounge for a
+    glass paid twice, as it should (dinner, then the tab) — but was also counted twice as guests, so the summary's
+    客人數 (and the lifetime count) grew by every after-dinner move. One visit, one count."""
+    p = Player(b, port, target, save=LATE)
+    try:
+        _to_service_from_late(p)
+        setup_check(p.ev("loungeLv()>0&&loungeOpenTonight()"), 'the Lounge is not open tonight on this save')
+        install_bot(p.g); p.ev("__botUntil('R.groups.some(q=>q.table!=null&&!R.tables[q.table].lounge&&q.ticket&&q.state!==\\'leave\\'&&!q.reg&&!namedId(q))',30000,1/30)")
+        r = json.loads(p.ev("""JSON.stringify((()=>{const g=R.groups.find(q=>q.table!=null&&!R.tables[q.table].lounge&&q.ticket&&q.state!=='leave'&&!q.reg&&!namedId(q));if(!g)return null;
+          for(const it of g.ticket.items){it.st='served';it.q=it.q||'G';it.picked=true}g.state='check';const n0=R.st.guests,k0=R.st.groups,m0=S.money;collect(g);const ls=loungeSeatFor(g);if(!ls)return{noSeat:1};moveToLounge(g,ls);
+          g.ticket={id:R.tkid++,no:1,g,lounge:1,items:[{d:'w_white',st:'served',q:'G',want:0,picked:true,lbar:1}],t0:R.t};R.tickets.push(g.ticket);g.state='check';const m1=S.money;collect(g,{tab:true});
+          return{size:g.size,guests:R.st.guests-n0,groups:R.st.groups-k0,dinner:m1-m0,tab:S.money-m1,m0,m1,m2:S.money,n0,g0:R.st.guests}})())"""))
+        setup_check(r and not r.get('noSeat'), f'no dinner party to move: {r}')
+        check((r.get('dinner') or 0) > 0 and (r.get('tab') or 0) > 0, f'both bills are paid: {r}')
+        check(r['guests'] == r['size'] and r['groups'] == 1, f'one visit counted {r["guests"]} guests / {r["groups"]} groups for a party of {r["size"]}')
+    finally:
+        p.close()
