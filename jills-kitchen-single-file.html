@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Jill's Kitchen 2.3</title>
+<title>Jill's Kitchen</title>
 <meta name="theme-color" content="#1E2B2F">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -2401,7 +2401,7 @@ function applyGates(){try{if(S.loungeProj&&S.loungeProj.state==='signing'&&!fact
  if(S.news24c==null){if(S.day<=1||!poolCrew('restaurant').length)S.news24c=-1;else{S.news24c=S.day;const over=CAP_ROLES.filter(r=>roleCrew(r).length>roleCap(r));S.news.push(`<b>餐廳的名額分成三種。</b>廚師、服務生、清潔員各有自己的名額，不能互相借：廚師的名額只能聘廚師。擴建和每一個工程都寫著多哪一種。現在 ${CAP_ROLES.map(r=>`${ROLES[r].n} ${roleCrew(r).length}/${roleCap(r)}`).join('、')}${over.length?`；${over.map(r=>ROLES[r].n).join('、')}比名額多，大家都留著`:''}。${loungeLv()?'Lounge 的名單照舊。':''}`)}}   /* rc8 §21: told once to a save that was already going; nobody moves, nobody leaves */
  while(S.gate<S.day){S.gate++;const D=S.gate;
  if(D===2){unlockDish('coffee');S.eq.bar=Math.max(1,S.eq.bar);S.news.push('<b>新料理解鎖：拿鐵咖啡</b>。咖啡吧開張了，客人會加點飲料。');if(fact('xq_helper')&&xqHelperMode())S.news.push('昨晚快打烊時來幫忙收店的是<b>秀琴阿姨</b>，Jill 認識很久的阿姨。她不是員工，很多晚上會順路來；之後請清潔員，第一位就是她。')}
- if(D===3){if(S.eq.stove<2){S.eq.stove=2}unlockDish('pasta');S.news.push('<b>第二口爐子到貨！</b>同時可以做兩道熱菜。<br><b>新料理：番茄義大利麵</b>（先煮麵，再加醬）。<br>從今天開始要自己<b>備料</b>。')}   /* audit WS1-06: stocking was open from Day 1 and prices from Day 2 — what Day 3 changes is that the fridge is no longer filled for you */
+ if(D===3){/* audit WS1-08: the second burner comes on Day 3 for everyone — one bought in the shop the evening before is paid back */const had=S.eq.stove>=2,back=had?EQUIP.find(x=>x.k==='stove').cost[1]:0;if(S.eq.stove<2){S.eq.stove=2}if(back){S.money+=back}unlockDish('pasta');S.news.push(`<b>第二口爐子到貨！</b>同時可以做兩道熱菜。${back?`你昨天已經自己買了一台，那 ${fmt(back)} 退回來了。`:''}<br><b>新料理：番茄義大利麵</b>（先煮麵，再加醬）。<br>從今天開始要自己<b>備料</b>。`)}   /* audit WS1-06: stocking was open from Day 1 and prices from Day 2 — what Day 3 changes is that the fridge is no longer filled for you */
  if(D===4){S.eq.prep=1;unlockDish('salad');S.news.push('<b>冷盤台啟用：田園沙拉</b>（Jill 切菜的時候，可以先去忙別的）。<br>今晚 19:00 會有第一次 <b>Rush Hour</b>，做好準備！')}
  if(D===5)S.news.push('昨晚開始可以<b>裝潢與擴建</b>了。菜單研發也有更多選擇。')
  if(D===6)S.news.push('聽說<b>神秘美食評論家</b>最近會在城裡出沒…')
@@ -9432,7 +9432,8 @@ function resumeCheckpoint(){const cp=S.checkpoint;if(!cp||cp.day!==S.day){goMain
  catch(e){console.warn('[checkpoint] could not restore fully:',e&&e.message);
   /* the safe fallback: reopen at the same clock with today's numbers, the room starts empty */
   startService({resume:true});R.t=cp.at;R.rushShown=R.t>=R.rushT0;if(cp.snap&&cp.snap.misc){if(cp.snap.misc.st)R.st=cp.snap.misc.st;if(cp.snap.misc.sched)R.sched=cp.snap.misc.sched;if(cp.snap.misc.si!=null)R.si=cp.snap.misc.si}
-  toast(`今天的店內狀況無法完整還原，從 ${cp.clock} 重新開店（今天的營收與客人數都保留，店裡的客人會重新入座）`)}
+  /* audit WS9-04: it said 「店裡的客人會重新入座」 — they are not brought back; and the explaining toast was pushed off at once */
+  banner('繼續營業',`DAY ${S.day} · 從 ${cp.clock} 重新開店`,'');toast(`今天的店內狀況無法完整還原：從 ${cp.clock} 重新開店。今天的營收與客人數都保留，當時店裡的客人沒辦法接回來。`,'q')}
  if(cp.panel)try{shReplay(cp.panel)}catch(e){console.warn('[story] replay',e)}   /* the story that was on screen when the app went away */
  /* audit W3-01: the evening just brought back is the new checkpoint at once — it used to be cleared here, and an evening
     that began closing before the next one (every 20 s; none is taken while closing) was lost when the player left again:
@@ -10876,9 +10877,9 @@ function showShop(){phase='shop';mainScreen='shop';R=null;rdAutoUnlock();IDLE=ma
 
 let sigDraft=null,sigKind='m';   /* 'm' the main signature, 'd' the dessert (v2.2.1 #16) — one designer, two tables */
 function sigT(){return sigKind==='d'?{T:SIGD,N:SIGD_CAT_N,id:'sigdessert',key:'sigDessert',base:150,eyebrow:"Jill's Signature Dessert",title:'設計招牌甜點',st:"★ JILL'S SIGNATURE DESSERT ★",how:'在冷盤台冷作擺盤：底、奶餡、水果、點綴',make:4000,mk:'研發招牌甜點 $4,000'}:{T:SIG,N:SIG_CAT_N,id:'signature',key:'signature',base:320,eyebrow:"Jill's Signature Dish",title:'設計招牌菜',st:"★ CHEF JILL'S SIGNATURE ★",how:'在爐台用平底鍋煎，看準時機起鍋',make:3000,mk:'研發招牌菜 $3,000'}}
-function showSig(){sub='sig';const d=sigDraft;const K=sigT();const old=S[K.key];S[K.key]=d;DCACHE.clear();const url=dishCanvas(K.id,'P',220,S.decor.ware>0);S[K.key]=old;DCACHE.clear();const price=K.base+Object.keys(K.T).reduce((a,k)=>a+K.T[k][d[k]].p,0);const has=!!S[K.key];
+function showSig(){sub='sig';const d=sigDraft;const K=sigT();const old=S[K.key];S[K.key]=d;DCACHE.clear();const url=dishCanvas(K.id,'P',220,S.decor.ware>0);S[K.key]=old;DCACHE.clear();const price=K.base+Object.keys(K.T).reduce((a,k)=>a+K.T[k][d[k]].p,0);/* audit WS2-11: the price the menu will charge for this recipe — with its level, its stars and the player's own price (it said the recipe's base: $610 for a $940 dish) */let shown=price;{const o=S[K.key];S[K.key]=d;try{shown=priceOf(K.id)}catch(e){}finally{S[K.key]=o}}const has=!!S[K.key];
  show(`<div class="sheet tall"><div class="sh-top"><div class="ttl"><div class="eyebrow">${K.eyebrow}</div><h2>${K.title}</h2></div><button class="btn sm" data-act="closeSub">取消</button></div>
-  <div class="sigprev"><canvas id="sigCv" width="220" height="220"></canvas><div><div class="eyebrow">${K.st}</div><div style="font-family:var(--disp);font-size:19px;margin:4px 0">${d.name}</div><div class="muted" style="font-size:12.5px">售價 ${fmt(price)} · ${K.how}</div></div></div>
+  <div class="sigprev"><canvas id="sigCv" width="220" height="220"></canvas><div><div class="eyebrow">${K.st}</div><div style="font-family:var(--disp);font-size:19px;margin:4px 0">${d.name}</div><div class="muted" style="font-size:12.5px">售價 ${fmt(shown)} · ${K.how}</div></div></div>
   ${Object.keys(K.T).map(cat=>`<h3>${K.N[cat]}</h3><div class="opts">${Object.keys(K.T[cat]).map(k=>`<button class="${d[cat]===k?'on':''}" data-act="sigPick" data-c="${cat}" data-k="${k}">${K.T[cat][k].n}<small>+${K.T[cat][k].p}</small></button>`).join('')}</div>`).join('')}
   <h3>${sigKind==='d'?'甜點名':'菜名'}</h3><input class="txt" id="sigName" maxlength="18" value="${d.name.replace(/"/g,'&quot;')}">
   <div class="footer"><button class="btn primary big" data-act="sigMake" ${S.money>=(has?800:K.make)?'':'disabled'}>${has?'更新配方 $800':K.mk}</button></div></div>`);

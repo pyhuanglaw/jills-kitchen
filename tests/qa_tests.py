@@ -842,6 +842,53 @@ def qa_no_text_copy_backup(b, port, target):
 
 
 @test
+def qa_the_second_burner_bought_on_day_two_is_paid_back(b, port, target):
+    """Audit WS1-08: Day 2's shop sells the 2-burner stove for $900; on Day 3 the game gives every shop its second burner
+    and said 「第二口爐子到貨！」 — the $900 was simply lost. Bought by a tap in Day 2's shop, it is paid back on Day 3 and
+    the morning says so; a shop that did not buy it gets the burner as before, no money."""
+    for buy in (True, False):
+        p = Player(b, port, target)
+        try:
+            p.tap('[data-act=open]'); p.settle()
+            p.ev("S.day=2;S.money=5000;S.phase='shop';showShop();shopTab='kitchen';showShop()"); p.settle()
+            if buy:
+                setup_check(p.ev("!!document.querySelector('#screen [data-act=buyEq][data-k=stove]')"), 'no stove upgrade in the Day 2 shop')
+                p.tap('#screen [data-act=buyEq][data-k=stove]'); p.settle()
+                check(p.ev("S.eq.stove") == 2 and p.ev("S.money") == 4100, f'bought: {p.ev("S.eq.stove")} {p.ev("S.money")}')
+            m0 = p.ev("S.money")
+            p.tap('#screen [data-act=nextDay]'); p.settle()
+            check(p.ev("S.day") == 3 and p.ev("S.eq.stove") == 2, 'Day 3, two burners')
+            news = p.ev("S.news.join(' ')")
+            if buy:
+                check(p.ev("S.money") == m0 + 900 and '那 $900 退回來了' in news, f'paid back: {p.ev("S.money")} vs {m0}; {news[:120]}')
+            else:
+                check(p.ev("S.money") == m0 and '退回來' not in news, f'nothing to pay back: {p.ev("S.money")} vs {m0}')
+        finally:
+            p.close()
+
+
+@test
+def qa_the_signature_editor_shows_the_menus_price(b, port, target):
+    """Audit WS2-11: 「重新設計」 opened the editor on the dish as it is and said 「售價 $610」 while the shop and the menu said
+    $940 — the editor showed the recipe's base, without its stars and the player's own price. The editor, opened by a tap
+    on the player's late save, shows the price the menu charges for the same recipe."""
+    p = Player(b, port, target, save=LATE)
+    try:
+        p.tap('#screen [data-act=open]'); p.settle()
+        setup_check(p.ev("!!S.signature"), 'the save has no signature dish')
+        if p.ev("phase") != 'shop':
+            p.ev("showShop()"); p.settle()
+        p.ev("shopTab='sig';showShop()"); p.settle()
+        setup_check(p.ev("!!document.querySelector('#screen [data-act=sigOpen]')"), 'no 重新設計 in the shop')
+        p.tap('#screen [data-act=sigOpen]'); p.settle()
+        menu = p.ev("fmt(priceOf('signature'))")
+        txt = p.text('#screen')
+        check(f'售價 {menu}' in txt, f'the editor says the menu\'s price {menu}: {txt[:160]!r}')
+    finally:
+        p.close()
+
+
+@test
 def qa_every_level_named_in_the_text_exists(b, port, target):
     """Known-open (WS5-04): the signature dessert's lock and the manual say 「需要擴建到 Jill's Kitchen」 — there is no such
     level (Little Kitchen → Bistro → Restaurant → Fine Dining → JILL); the dessert needs Jill's Restaurant. Every

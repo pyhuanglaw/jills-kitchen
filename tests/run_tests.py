@@ -1274,7 +1274,8 @@ def service_checkpoint_resumes_the_day(b, port, target):
     g.ev("R.groups[0].state='teleporting';checkpointSave('manual')")   # (a reload also refreshes the checkpoint from the live day)
     g.reload(); install_bot(g); g.click('[data-act=open]')
     check(g.ev("phase") == 'service' and g.ev("R.t") > 19 and g.ev("R.groups.length") == 0, 'fallback should reopen at the checkpoint clock with an empty room')
-    check(g.page.locator('#toasts').inner_text().find('無法完整還原') >= 0, 'the fallback must tell the player')
+    tt = g.page.locator('#toasts').inner_text()
+    check(tt.find('無法完整還原') >= 0 and '沒辦法接回來' in tt and '重新入座' not in tt, f'the fallback must tell the player, truly (audit WS9-04: it promised the guests would be seated again): {tt!r}')
     check(not g.errors, g.errors)
     g.close()
 
