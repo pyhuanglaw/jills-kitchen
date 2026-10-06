@@ -1,9 +1,4 @@
 {
-  "qa_a_held_story_survives_leaving_the_app": {
-    "finding": "WS9-01／W3-06",
-    "since": "2026-10-06",
-    "what": "故事停住店時離開 App，回來那段只剩看過的幾句、不會再演"
-  },
   "qa_leaving_while_closing_after_a_resume_keeps_the_day": {
     "finding": "W3-01",
     "since": "2026-10-06",
@@ -48,16 +43,6 @@
     "finding": "WS1-04",
     "since": "2026-10-06",
     "what": "桌上泡泡的愛心還給每位回頭客和熟客（使用者選了 B：只給 Sophie 和 Mia）"
-  },
-  "qa_the_album_counts_all_five_cats": {
-    "finding": "WS1-03／WS7-02／N01",
-    "since": "2026-10-06",
-    "what": "相簿「今天。」寫「1 隻貓都在」"
-  },
-  "qa_photos_of_jills_room_are_taken_in_her_room": {
-    "finding": "WS7-01",
-    "since": "2026-10-06",
-    "what": "Jill 房間沙發的那幾種照片拍成主廳"
   },
   "qa_a_new_game_gets_no_old_version_notes": {
     "finding": "WS1-06",

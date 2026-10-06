@@ -349,9 +349,10 @@ def qa_a_checkpoint_survives_a_new_table_count(b, port, target):
 
 @test
 def qa_a_held_story_survives_leaving_the_app(b, port, target):
-    """Known-open (WS9-01, W3-06): a story holding the restaurant, the player leaves the app after its first line (or
-    Safari drops the tab) and comes back with 繼續營業 — the story must not be lost: it plays again, or the journal keeps
-    all of its lines. Today it is marked as happened and its page keeps the lines already read."""
+    """WS9-01, W3-06 (fixed 2026-10-06): a story holding the restaurant, the player leaves the app after its first line
+    (or Safari drops the tab) and comes back with 繼續營業 — the story is not lost: the lines not yet read are on screen
+    again (the restaurant held until they are read) and its page keeps all of its lines. It used to be marked as
+    happened with its page keeping only the lines already read."""
     def run(leave):
         p = Player(b, port, target, save=MID, checkpoint=False)
         try:
@@ -373,15 +374,18 @@ def qa_a_held_story_survives_leaving_the_app(b, port, target):
                 p.ev("Object.defineProperty(document,'hidden',{value:true,configurable:true});document.dispatchEvent(new Event('visibilitychange'))")
                 p.reload(background=False)
                 p.tap('#screen [data-act=open]'); p.frames(30)
-                p.settle()
+                held = p.ev("!!DLG&&!!DLG.hold&&phase==='service'")
+                again = p.settle()
+                return int(p.ev("JSON.stringify(((story().beatLines||{}).qt_1||[]).length)")), held, len(again)
             else:
                 p.read_dialog()
-            return p.ev("JSON.stringify(((story().beatLines||{}).qt_1||[]).length)")
+            return int(p.ev("JSON.stringify(((story().beatLines||{}).qt_1||[]).length)")), True, 0
         finally:
             p.close()
-    whole = int(run(False)); after = int(run(True))
+    whole = run(False)[0]; after, held, again = run(True)
     check(whole >= 3, f'the control run kept {whole} lines')
-    check(after >= whole, f'after leaving the app the story keeps {after} of its {whole} lines and does not play again')
+    check(after >= whole, f'after leaving the app the story keeps {after} of its {whole} lines')
+    check(held and again >= whole - 1, f'after 繼續營業 the rest of the story is not on screen again (held {held}, {again} lines read, {whole} in all)')
 
 
 @test
@@ -634,11 +638,14 @@ def qa_table_hearts_only_for_sophie_and_mia(b, port, target):
 
 @test
 def qa_the_album_counts_all_five_cats(b, port, target):
-    """Known-open (WS1-03, WS7-02, N01): the album's last card 「今天。」 says 「1 隻貓都在」 — it counts the cats in the
-    dining room at that moment. The five cats are always there (PROJECT_MEMORY §4)."""
+    """WS1-03, WS7-02, N01 (fixed 2026-10-06): the album's last card 「今天。」 said 「1 隻貓都在」 — it counted the cats in
+    the dining room at that moment. The five cats are always there (PROJECT_MEMORY §4): two of them in Jill's room
+    while the card is read, it still says five."""
     p = Player(b, port, target, save=LATE)
     try:
-        p.tap('#screen [data-act=open]'); p.tap('#screen [data-act=book]'); p.tap('#screen .tabs [data-act=btab][data-k=mem]')
+        p.tap('#screen [data-act=open]')
+        p.ev("for(const id of ['tora','mei'])homeCatIn(catBy(id))")
+        p.tap('#screen [data-act=book]'); p.tap('#screen .tabs [data-act=btab][data-k=mem]')
         txt = p.text('#screen')
         m = re.search(r'(\d+) 隻貓都在', txt)
         check(m, 'no 「今天。」 card with the cats')
@@ -649,9 +656,10 @@ def qa_the_album_counts_all_five_cats(b, port, target):
 
 @test
 def qa_photos_of_jills_room_are_taken_in_her_room(b, port, target):
-    """Known-open (WS7-01): 「膝上的重量」 (and the sofa's other pictures) show the dining room — the photo is queued
-    without its room, so the camera takes whatever room is on screen, and the true picture can never be taken. Jill on
-    her sofa with a cat on her lap, the dining room on screen: the lap photo must belong to Jill's room."""
+    """WS7-01 (fixed 2026-10-06): 「膝上的重量」 (and the sofa's other pictures) showed the dining room — the photo was
+    queued without its room, so the camera took whatever room was on screen. Jill on her sofa with a cat on her lap: the
+    sofa's photos belong to Jill's room; Jill reading with two cats asleep in her room: 「各自安靜」 is hers too and names
+    those two (not cats asleep in the dining room)."""
     p = Player(b, port, target, save=LATE)
     try:
         p.tap('#screen [data-act=open]')
@@ -662,6 +670,14 @@ def qa_photos_of_jills_room_are_taken_in_her_room(b, port, target):
         rows = [x for x in json.loads(q) if x['id'] in ('lap', 'sofa', 'sofafull', 'dylan')]
         check(rows, f'no sofa photo was queued: {q}')
         check(all(x['room'] == 'home' for x in rows), f'the sofa photos are queued for {rows}')
+        rd = json.loads(p.ev("""JSON.stringify((()=>{MEMQ.length=0;const aa=albumAllows;albumAllows=()=>true;const L=LIFE.jill;L.act='read';L.sinceSit=13;
+          for(const c of CATS){c.sofa=null;c.sofaOn=false}const two=['ban','snow'].map(catBy);for(const c of two){homeCatIn(c);c.homeSleep=true}
+          for(const c of CATS.filter(c=>!two.includes(c))){c.away=null;c.hidden=false;c.homeSleep=false;c.st='sleep'}
+          try{memChecks()}finally{albumAllows=aa}return MEMQ.filter(m=>m.id==='reading').map(m=>({room:m.room,cats:m.info.cats}))})())"""))
+        check(rd, 'no 「各自安靜」 photo was queued with Jill reading and two cats asleep in her room')
+        names = p.ev("JSON.stringify(['ban','snow'].map(id=>catName(CAT_DEF.find(c=>c.id===id))))")
+        check(all(x['room'] == 'home' for x in rd), f'「各自安靜」 is queued for {rd}')
+        check(all(set(x['cats'].split('、')) == set(json.loads(names)) for x in rd), f'「各自安靜」 names {rd}, not the cats asleep in her room {names}')
     finally:
         p.close()
 
