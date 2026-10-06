@@ -247,7 +247,7 @@ def the_lounge_has_an_origin_ken_wine_a_tasting_and_a_project_that_never_disappe
     the guests who come back to it walk over next door after dinner; after the tasting Jill keeps a few wines for dinner
     (pairing_start, as Ken pays) and there is no after-close Lounge idea; the project is 「隔壁」, decided by seeing the
     place (the Madame Lin line — its own test). 2026-10-06 (the user): 《看看》 settles it — no 「接下隔壁／再想想」 card;
-    the works page has the project; Lounge I costs $80,000."""
+    the works page has the project; Lounge I is a rating of 4.0 and $50,000 (no wait for her last night)."""
     g = Game(b, port, target, seed=46, manual=True, viewport={'width': 390, 'height': 844})
     load_fixture(g, 'player_day46.json'); g.click('[data-act=openFresh]'); g.page.wait_for_timeout(120)
     g.ev("S.money+=200000;autoStock()"); start_day(g); g.ev("for(let i=0;i<3;i++)__tick(1000/30)")
@@ -300,7 +300,7 @@ def the_lounge_has_an_origin_ken_wine_a_tasting_and_a_project_that_never_disappe
     check(not g.ev("!!document.querySelector('[data-act=linTake],[data-act=loungeGo]')") and not g.ev("!!document.querySelector('[data-act=buyLounge][data-k=\"1\"]')") and 'Lounge I' in t and '再想想' not in t and '還在這裡' not in t,
           f'the project is in the shop, decided — no 「接下隔壁」 button, no 「再想想」 (rc8: Lounge I is never bought outright — 簽約・開工 after her last night): {t[:160]!r}')
     m0 = g.ev("S.money"); g.ev("buyLounge(1)"); g.page.wait_for_timeout(50)   # the test builds it directly (in play: 《看看》 → 簽約・開工 → 《簽約》 → two days; v24_rc8_the_signing_*)
-    check(g.ev("loungeLv()") == 1 and g.ev("S.money") == m0 - 80000 and g.ev("S.newRooms.lounge") == g.ev("S.day") and g.ev("!!S.achievements.lounge1"), 'Lounge I built ($80,000 — the user, 2026-10-06)')
+    check(g.ev("loungeLv()") == 1 and g.ev("S.money") == m0 - 50000 and g.ev("S.newRooms.lounge") == g.ev("S.day") and g.ev("!!S.achievements.lounge1"), 'Lounge I built ($50,000 — the user, 2026-10-06)')
     check(g.ev("!loungeArcOpen()"), 'the origin arc is closed by the project')
     g.ev("save()"); g.reload(); check(g.ev("loungeLv()") == 1 and g.ev("!!fact('tasting_night')") and g.ev("evDone('ken_wine_q')"), 'all of it survives a reload')
     check(not g.errors, g.errors[:3]); g.close()
@@ -881,7 +881,7 @@ def followup_the_manual_describes_the_current_game(b, port, target):
                  '分成廚師、服務生、清潔員三種', '廚師的名額只能聘廚師', '寫在擴建的卡片上', '它本來是隔壁 Madame Lin 開了很多年的酒吧', '想喝酒，隔壁就有', '晚餐桌上就有配菜的酒', 'Jill 看過隔壁，就決定接下來', '「店舖工程」按「簽約・開工」', '調酒師在 L 裡面，靠牆那一頭留了進出的口']:
         check(need in txt, f'the manual mentions {need}')
     for stale in [# 2026-10-06 (the user): 《看看》 settles it — no 「再想想」
-                  '自己決定要不要接', '再想想',
+                  '自己決定要不要接', '再想想', '等她最後一晚過了', "店要先擴建到 Jill's Fine Dining",
                   '暫停選單和設定裡都有【儲存目前進度】', '把杯子交給吧台的客人；桌位由有', '上方的分頁', '畫面上方會跳一個小通知', '打烊後或開店前，商店的「社群與宣傳」分頁（第 6 天起）。', '下一段寫著', '窗邊（貓架、睡墊）', '牠會在門邊趴著等主人',
                   '人數上限跟擴建、後場整理區、側廳、廚房擴建、廚房二期、Lounge 有關', '有 Lounge 以後才能招募', '第二位調酒師',
                   # v2.4 rc6: the rc5 line that said the staff list's number came only from the ground floor

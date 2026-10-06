@@ -50,15 +50,14 @@
   分頁那一排不會再超出畫面；帽子照玩家 10/3 的話一直戴著。相關測試通過（`rc86_dylan_is_named_in_their_room` 等）。玩家說「發布」時：
   合回 `main` → 完整回歸 → 發布。
 
-- **《看看》結束時 Jill 就決定接隔壁；Lounge I $80,000**（branch `feature/lounge-decided`，從 `main` 3a5fb15 開出，還沒合回 `main`、
-  還沒跑完整回歸）：使用者 2026-10-06「《看看》結束時，劇情上直接確定 Jill 要接 Madame Lin 的店」「把 Lounge I「簽約・開工」價格由
-  $120,000 調整為 $80,000」。玩家會看到：《看看》最後一句是「隔壁，Jill 決定接下來。簽約和改裝在「升級餐廳 › 店舖工程」。」，不再跳
-  「接下隔壁／再想想」卡片；當天店舖工程就有 Lounge，卡片依序顯示「Madame Lin 做到 Day N」→（她最後一晚後）「需要擴建到 Jill's Fine
-  Dining」或「簽約・開工 $80,000」＋還差多少。Lounge II／III 價格不變。舊存檔（選過「再想想」、卡片沒回答、在《看看》和卡片之間存的檔）
-  讀檔時當作《看看》那天決定接（`linDecMig`），工程頁直接是「簽約・開工」。隔壁／Lounge／手冊相關的 28 個測試通過（含新測試
-  `v24_lounge_decided_at_the_viewing_no_card_and_lounge_one_is_80000`）。新玩家時間表（三個種子，
-  沒送錢、沒改經濟）：《看看》Day 36–37、她最後一晚 Day 44、存到 $80,000 Day 60–66、Lounge 開幕 Day 63–69（原本 $120,000 是 Day 80）；
-  `docs/evidence/lounge_decided_2026-10-06/`。使用者說「發布」時：合回 `main` → 完整回歸 → 發布。
+- **Lounge I：《看看》後 Jill 就決定接；條件是評分 4.0＋$50,000，不等 Madame Lin 的最後一晚**（branch `feature/lounge-decided`，
+  還沒合回 `main`、還沒跑完整回歸、沒有發布）：使用者 2026-10-06 的最終規則（PROJECT_MEMORY §6 第 6 條）。玩家會看到：《看看》最後一句
+  「隔壁，Jill 決定接下來。簽約和改裝在「升級餐廳 › 店舖工程」。」，沒有「接下隔壁／再想想」；當天店舖工程就有 Lounge I，卡片只寫還缺
+  什麼（「需要餐廳評分 4.0（目前 X）」、「還差 $X」），夠了就能按「簽約・開工 $50,000」。她最後一晚之前簽，簽約前一晚就是她的最後一晚；
+  沒簽的話她照常做到最後一晚，結束時提醒一次簽約在哪裡。Lounge II／III 不變。舊存檔：「再想想」、卡片沒回答、《看看》和卡片之間存的檔
+  都當作已決定（`linDecMig`）；已付 $120,000 的不重收、已開幕的不動。相關 29 個測試通過，含 `v24_lounge_one_after_the_viewing_rating_four_
+  and_50000_no_wait_for_her_last_night` 和例行 QA 的 `qa_lounge_one_signs_before_her_last_night`。新玩家時間表（$50,000）重跑中。
+  開幕後收銀機停在 $0 的平衡問題：使用者要先看分析和方案，正式經濟沒改。使用者說「發布」時：合回 `main` → 完整回歸 → 發布。
 - **2026-10-06 全面 Audit 與例行 QA**（已合回 `main`，使用者 2026-10-06「Audit 這套 QA 工具和測試我同意合回 main」；沒有改遊戲、沒有發布）：報告 `docs/audit/2026-10-06/README.md`；
   例行 QA `python3 tests/run_tests.py --qa`（`docs/QA.md`）；全面 Audit 的做法 `docs/audit/PLAYBOOK.md`。Audit 找到、還沒修的問題，
   每一條都已經有測試在等（`tests/qa_known_open.json`）。

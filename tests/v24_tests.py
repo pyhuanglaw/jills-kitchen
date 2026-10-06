@@ -4843,15 +4843,16 @@ def v24_rc8_the_restaurants_three_lists_and_the_lounges_one(b, port, target):
 
 
 _LIN_TAKEN = """const st=story();const d=S.day;const set=(k,dd)=>st.facts[k]={d:dd,n:1,l:dd};
- for(const k of ['tasting_night','pairing_wine'])set(k,d-20);set('lin_retiring',d-13);linS().last=d-1;set('ken_where',d-12);set('jd_want',d-11);set('dylan_book',d-8);set('lin_viewing',d-7);set('lounge_project',d-7);set('lin_take',d-7);
+ for(const k of ['tasting_night','pairing_wine'])set(k,d-20);set('lin_retiring',d-13);linS().last=d+5;set('ken_where',d-12);set('jd_want',d-11);set('dylan_book',d-8);set('lin_viewing',d-7);set('lounge_project',d-7);set('lin_take',d-7);
  for(const k of ['pairing_start','lin_retire','ken_where','jd_want','dylan_book','lin_viewing'])Object.assign(evState(k),{n:1,d:d-7});
- S.loungeProj={revealed:d-7,state:'planned',at:d-7};S.money+=300000;S.level=Math.max(S.level,4)"""
+ S.loungeProj={revealed:d-7,state:'planned',at:d-7};S.money+=300000"""   # her last night still ahead (2026-10-06: no wait for it)
 
 
 @test
 def v24_rc8_the_signing_the_work_and_the_opening(b, port, target):
     """The player's brief of 2026-10-02 19:19 §12–§16, on the Day 52 save with the line's earlier beats as facts: the
-    works page waits for her last night, then 簽約・開工 takes the money; the next opening is 《簽約》 in her bar — the
+    works page does not wait for her last night (the user, 2026-10-06): with it still ahead 簽約・開工 takes $50,000 and
+    that evening is her last (her bar closed, no countdown left); the next opening is 《簽約》 in her bar — the
     contract, the pen, the keys, 「那就這樣。」「嗯。」, she hands Jill the keys, and Evan meets Dylan (before the reveal
     「Evan，這 Jill 老公。」 with 「先生」 on the panel; after it 「Evan，這 Dylan。」「Jill 老公。」). Only Evan learns anything
     (the reveal is untouched). Two days of work, papered over; then the morning card 「開幕 · The Lounge」 (no story note over
@@ -4864,10 +4865,11 @@ def v24_rc8_the_signing_the_work_and_the_opening(b, port, target):
         dy0 = g.ev("JSON.stringify([S.dylan.stage,S.dylan.reveal])")
         g.ev("showShop();shopTab='works';showShop()"); g.page.wait_for_timeout(60)
         card = g.ev("(document.querySelector('#screen .lin-card')||{}).innerText||''")
-        check('她最後一晚以後簽約' in card and not g.ev("!!document.querySelector('#screen [data-act=linSign]')"), f'before her last night: no signing ({card[-60:]!r})')
-        g.ev("factSet('lin_closed');showShop()"); g.page.wait_for_timeout(60)
+        check(g.ev("linLast()") > g.ev("S.day") and not g.ev("!!fact('lin_closed')") and '最後一晚' not in card and 'Madame Lin 做到' not in card
+              and g.ev("!document.querySelector('#screen .lin-card [data-act=linSign]').disabled"), f'her last night still ahead, and 簽約・開工 is there to press: {card[-60:]!r}')
         m0 = g.ev("S.money"); g.click('#screen [data-act=linSign]'); g.page.wait_for_timeout(60)
-        check(m0 - g.ev("S.money") == 80000 and g.ev("S.loungeProj.state") == 'signing' and '明天開店前，Jill 去隔壁簽約' in g.ev("document.querySelector('#screen .lin-card').innerText"), 'paid: the signing is the next opening')
+        check(m0 - g.ev("S.money") == 50000 and g.ev("S.loungeProj.state") == 'signing' and '明天開店前，Jill 去隔壁簽約' in g.ev("document.querySelector('#screen .lin-card').innerText"), 'paid $50,000: the signing is the next opening')
+        check(g.ev("fact('lin_closed')&&fact('lin_closed').d") == g.ev("S.day") and g.ev("barState()") == 'closed' and g.ev("linNewsHTML()") == '', 'signed before her last night: tonight was her last — her bar closed, no countdown left')
         g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(120)
         g.ev("autoStock();window.__noScenes=false;window.__holds=true"); start_day(g); install_bot(g); g.ev("for(let i=0;i<3;i++)__tick(1000/30)")
         check(g.ev("!!(DLG&&DLG.sh&&DLG.sh.k==='lin_sign')") and g.ev("room") == 'lounge' and g.ev("BARV") == 1, 'the morning: 《簽約》 held, in her bar')
@@ -4992,83 +4994,118 @@ _LIN_TO_THE_VIEWING = """const st=story();for(const k of ['tasting_night','pairi
 
 
 @test
-def v24_lounge_decided_at_the_viewing_no_card_and_lounge_one_is_80000(b, port, target):
-    """The user, 2026-10-06: 《看看》 is not a visit after which the player decides whether Jill takes the bar — the room
-    talk and Dylan's book have been her deciding; at the end of 《看看》 the story has decided. No 「接下隔壁／再想想」
-    card and no 「再想想」 to come back to: the day 《看看》 plays, 升級餐廳 › 店舖工程 has the Lounge, and the works page
-    carries the rest — her last night, the level, the money, 簽約・開工 — at $80,000 (Lounge II and III as they were).
-    Saves from before (a 「再想想」, a card nobody answered, a save made between 《看看》 and that night's card) are given
-    the decision when read; the works page offers 簽約・開工 once her bar has closed — nothing to find first, nothing stuck."""
+def v24_lounge_one_after_the_viewing_rating_four_and_50000_no_wait_for_her_last_night(b, port, target):
+    """The user, 2026-10-06: 《看看》 is where Jill decides — no 「接下隔壁／再想想」 card, nothing to come back to; the same
+    day 升級餐廳 › 店舖工程 has Lounge I, and it needs three things only: 《看看》, a rating of 4.0 (as the HUD shows it) and
+    $50,000. Her last night is her story, never a wait: with it still ahead the player signs, and the evening before the
+    signing is her last (her bar closed, the keys the next morning, nothing left to fire on the old date); not signed,
+    her last night comes as it always did and one line says where the signing is — a reminder, not an unlock. What is
+    missing is said on the card (the rating, the money). Lounge II $160,000 and III $220,000 as they were. Saves from
+    before — a 「再想想」, a card nobody answered, a save between 《看看》 and that night's card, one waiting for her last
+    night — can all sign; one that had paid $120,000 is not charged again, a built Lounge is left as it is."""
     g = Game(b, port, target, seed=8761, manual=True, viewport={'width': 390, 'height': 844})
     load_save(g, 'player_day52.json'); g.ev(_LIN_TO_THE_VIEWING)
-    check(g.ev("JSON.stringify(LOUNGE_PROJ.map(p=>p.cost))") == '[80000,160000,220000]', 'Lounge I $80,000; II and III as they were')
+    check(g.ev("JSON.stringify([LOUNGE_PROJ.map(p=>p.cost),LOUNGE_PROJ.map(p=>p.need),LOUNGE_PROJ[0].rate])") == '[[50000,160000,220000],[0,4,5],4]', 'Lounge I: rating 4.0 and $50,000; II and III as they were')
     if g.ev("phase") == 'shop': g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(200)
     g.ev("window.__notes=[];const __nl=noteLine;noteLine=function(t){__notes.push(t);return __nl.apply(this,arguments)}")
     g.ev("autoStock();window.__noScenes=false;window.__holds=true"); start_day(g); install_bot(g); g.ev("for(let i=0;i<3;i++)__tick(1000/30)")
     check(g.ev("DLG&&DLG.sh&&DLG.sh.k") == 'lin_viewing', '《看看》, before opening')
     lines = _dlg_lines(g, 60); d = g.ev("S.day")
-    check('Jill：我可以看看嗎？' in lines and not any('接下隔壁' in l or '再想想' in l for l in lines), f'the scene as it was: {lines}')
+    check('Jill：我可以看看嗎？' in lines and 'Jill：我還沒決定。' in lines and not any('接下隔壁' in l or '再想想' in l for l in lines), f'the scene as it was (「我還沒決定。」 kept): {lines}')
     st = json.loads(g.ev("JSON.stringify({sub,modal:!!document.querySelector('#screen:not([hidden]) .modal'),proj:fact('lounge_project')&&fact('lounge_project').d,take:fact('lin_take')&&fact('lin_take').d,state:S.loungeProj&&S.loungeProj.state,notes:__notes,dlg:!!DLG,bar:barState()})"))
-    check(st['proj'] == d and st['take'] == d and st['state'] == 'planned' and not st['sub'] and not st['modal'] and not st['dlg'] and st['bar'] == 'lin', f'at the end of 《看看》 Jill has decided — no card; her bar stays open to her last night: {st}')
-    check(any('Jill 決定接下來' in n and '店舖工程' in n for n in st['notes']) and 'Jill 決定接下來' in lines[-1], f'one line says so, and where it goes on — the scene\'s last line: {st["notes"]} {lines[-2:]}')
-    # the evening plays (another story's scene tonight is tapped through, as a player would); the shop, as the player opens it
+    check(st['proj'] == d and st['take'] == d and st['state'] == 'planned' and not st['sub'] and not st['modal'] and not st['dlg'] and st['bar'] == 'lin', f'at the end of 《看看》 Jill has decided — no card; her bar is still open: {st}')
+    check(any('Jill 決定接下來' in n and '店舖工程' in n for n in st['notes']) and 'Jill 決定接下來' in lines[-1], f'the scene\'s last line says so, and where it goes on: {lines[-2:]}')
+    # the evening (another story's scene tapped through, as a player would); the shop the same day, her last night still ahead
     g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;window.__noScenes=true;window.__holds=false"); g.ev("__botUntil('phase!==\"service\"',200000,1/30)")
     g.ev("for(let i=0;i<80&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}")
     check(not g.ev("sub==='loungeproj'") and not g.ev("!!document.querySelector('[data-act=loungeGo],[data-act=linTake]')"), 'no card that night either')
     g.click('[data-act=toShop]'); g.page.wait_for_timeout(80); g.click('#screen [data-act=tab][data-k=works]'); g.page.wait_for_timeout(80)
-    card = g.ev("(document.querySelector('#screen .lin-card')||{}).innerText||''"); txt = g.ev("document.querySelector('#screen').innerText")
-    check(f'Madame Lin 做到 Day {g.ev("linLast()")}' in card and '她最後一晚以後簽約' in card and not g.ev("!!document.querySelector('#screen [data-act=linSign]')"), f'the works page has the Lounge the same day; it waits for her last night: {card[-80:]!r}')
-    check('再想想' not in txt and '還在這裡' not in txt and 'Jill 決定接' in txt and not g.ev("[...document.querySelectorAll('#screen button')].some(x=>/接下隔壁/.test(x.textContent))"), 'decided — no 「接下隔壁」 button, no 「再想想」')
-    # her last night: the bar closes, and a line says where the signing is
-    g.ev("linS().last=S.day+1"); g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(150)
-    g.ev("__notes.length=0;autoStock()"); start_day(g); install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;window.__noScenes=true"); g.ev("__botUntil('phase!==\"service\"',200000,1/30)")
-    g.ev("for(let i=0;i<80&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}")
-    st = json.loads(g.ev("JSON.stringify({closed:fact('lin_closed')&&fact('lin_closed').d,day:S.day,notes:__notes,bar:barState()})"))
-    check(st['closed'] == st['day'] and st['bar'] == 'closed' and any('隔壁的門關上了' in n and '簽約・開工' in n for n in st['notes']), f'her last night closes the bar; one line says the signing is on the works page: {st}')
-    # the level, then the money, then 簽約・開工 at $80,000
-    g.click('[data-act=toShop]'); g.page.wait_for_timeout(80); g.click('#screen [data-act=tab][data-k=works]'); g.page.wait_for_timeout(80)
-    g.ev("S.level=3;showShop()"); g.page.wait_for_timeout(40)
-    card = g.ev("document.querySelector('#screen .lin-card').innerText")
-    check("需要擴建到 Jill's Fine Dining" in card and not g.ev("!!document.querySelector('#screen [data-act=linSign]')"), f'before the level: what it needs, in the card: {card[-60:]!r}')
-    g.ev("S.level=4;S.money=79999;showShop()"); g.page.wait_for_timeout(40)
-    card = g.ev("document.querySelector('#screen .lin-card').innerText")
-    check(g.ev("document.querySelector('#screen .lin-card [data-act=linSign]').disabled") is True and '簽約・開工 $80,000' in card and '還差 $1' in card, f'the level reached: 簽約・開工 $80,000, and what is still missing: {card[-80:]!r}')
-    g.ev("S.money=80000;showShop()"); g.page.wait_for_timeout(40)
+    CARD = "(document.querySelector('#screen .lin-card')||{}).innerText||''"; DIS = "document.querySelector('#screen .lin-card [data-act=linSign]').disabled"
+    card = g.ev(CARD); txt = g.ev("document.querySelector('#screen').innerText")
+    check(g.ev("linLast()") > g.ev("S.day") and '簽約・開工 $50,000' in card and '最後一晚' not in card and 'Madame Lin 做到' not in card and 'Fine Dining' not in card,
+          f'the same day: 簽約・開工 $50,000, nothing about her last night or a level: {card[-90:]!r}')
+    check('再想想' not in txt and '還在這裡' not in txt and 'Jill 決定接' in txt and not g.ev("[...document.querySelectorAll('#screen button')].some(x=>/接下隔壁/.test(x.textContent))"), 'decided — no 「接下隔壁」, no 「再想想」')
+    # what is missing, on the card: the rating (as the HUD shows it), then the money
+    g.ev("window.__rate=3.8;rating=function(){return window.__rate};S.money=30000;showShop()"); g.page.wait_for_timeout(40); card = g.ev(CARD)
+    check(g.ev(DIS) is True and '需要餐廳評分 4.0（目前 3.8）' in card and '還差 $20,000' in card, f'below 4.0 and short of money: both said: {card[-80:]!r}')
+    g.ev("__rate=3.96;S.money=60000;showShop()"); g.page.wait_for_timeout(40); card = g.ev(CARD)
+    check(g.ev(DIS) is False and '需要餐廳評分' not in card and g.ev("rating().toFixed(1)") == '4.0', f'a rating the HUD shows as 4.0 is 4.0: {card[-60:]!r}')
+    g.ev("__rate=4.2;S.money=49999;showShop()"); g.page.wait_for_timeout(40); card = g.ev(CARD)
+    check(g.ev(DIS) is True and '還差 $1' in card and '需要餐廳評分' not in card, f'4.0 or more, $1 short: only the money is said: {card[-60:]!r}')
+    # THE REGRESSION (the user, 2026-10-06): her last night still ahead + 《看看》 + 4.0 + $50,000 → the signing goes through
+    g.ev("S.money=50000;showShop()"); g.page.wait_for_timeout(40)
+    old_last = g.ev("linLast()")
+    check(old_last > g.ev("S.day") and not g.ev("!!fact('lin_closed')") and g.ev(DIS) is False, 'her last night has not come, and 簽約・開工 can be pressed')
     g.click('#screen .lin-card [data-act=linSign]'); g.page.wait_for_timeout(60)
-    check(g.ev("S.money") == 0 and g.ev("S.loungeProj.state") == 'signing' and '明天開店前，Jill 去隔壁簽約' in g.ev("document.querySelector('#screen .lin-card').innerText"), 'paid $80,000: the signing is the next opening')
-    guide = g.ev("GUIDE.find(x=>/Lounge/.test(x.h)).pts.find(p=>p[0]==='怎麼來的')[1]")
-    check('Jill 看過隔壁，就決定接下來' in guide and '簽約・開工' in guide and '再想想' not in guide and '要不要接' not in guide, f'the manual says it the same way: {guide}')
+    st = json.loads(g.ev("JSON.stringify({money:S.money,state:S.loungeProj.state,closed:fact('lin_closed')&&fact('lin_closed').d,day:S.day,bar:barState(),news:linNewsHTML(),early:linS().early,card:document.querySelector('#screen .lin-card').innerText,note:STORY_LINES.find(L=>L.k==='nextdoor').beats.find(b=>b[0]==='lin_closed')[2].note()})"))
+    check(st['money'] == 0 and st['state'] == 'signing' and '明天開店前，Jill 去隔壁簽約' in st['card'], f'paid $50,000; the signing is the next opening: {st}')
+    check(st['closed'] == st['day'] and st['bar'] == 'closed' and st['news'] == '' and st['early'] == 1 and st['note'].startswith('Jill 簽約的前一晚'), f'that evening was her last — her bar closed, no countdown, the story page says why: {st}')
+    g.ev("__rate=4.2")
+    g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(120)
+    g.ev("autoStock();window.__noScenes=false;window.__holds=true"); start_day(g); install_bot(g); g.ev("for(let i=0;i<3;i++)__tick(1000/30)")
+    check(g.ev("DLG&&DLG.sh&&DLG.sh.k") == 'lin_sign', 'the next morning: 《簽約》')
+    _dlg_lines(g, 40)
+    check(g.ev("!!fact('lin_signed')") and g.ev("barState()") == 'reno' and g.ev("S.loungeProj.open") == g.ev("S.day") + 2, 'signed; two days of work')
+    g.ev(f"S.day={old_last}+1")
+    check(not g.ev("STORY_EV.find(e=>e.k==='lin_last').when({})"), 'the night that was to be her last passes: nothing fires (no reminder after a signing)')
     check(not g.errors, g.errors[:3]); g.close()
-    # saves from before: a 「再想想」, a card nobody answered, a save made between 《看看》 and that night's card — and one that had taken it
+    # not signed: her last night comes as it always did, then one reminder — and the signing was open all along
+    g = Game(b, port, target, seed=8764, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day52.json'); g.ev(_LIN_TO_THE_VIEWING)
+    g.ev("const st=story();for(const k of ['lin_viewing'])st.facts[k]={d:S.day-1,n:1,l:S.day-1};evState('lin_viewing').n=1;linDecided();linS().last=S.day+1;S.money=20000")
+    g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(150)
+    g.ev("window.__notes=[];const __nl=noteLine;noteLine=function(t){__notes.push(t);return __nl.apply(this,arguments)}")
+    g.ev("autoStock()"); start_day(g); install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;window.__noScenes=true"); g.ev("__botUntil('phase!==\"service\"',200000,1/30)")
+    g.ev("for(let i=0;i<80&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}")
+    st = json.loads(g.ev("JSON.stringify({closed:fact('lin_closed')&&fact('lin_closed').d,day:S.day,last:linLast(),notes:__notes,early:!!linS().early,note:STORY_LINES.find(L=>L.k==='nextdoor').beats.find(b=>b[0]==='lin_closed')[2].note()})"))
+    check(st['closed'] == st['day'] == st['last'] and not st['early'] and st['note'].startswith('Madame Lin 做到月底'), f'her last night, as it always was: {st}')
+    check([n for n in st['notes'] if '隔壁的門關上了' in n] == ['隔壁的門關上了。簽約・開工在「升級餐廳 › 店舖工程」。'], f'one reminder, after her last night: {st["notes"]}')
+    check(not g.errors, g.errors[:3]); g.close()
+    # saves from before: a 「再想想」, a card nobody answered, a save between 《看看》 and that night's card, one that had taken
+    # it, one still waiting for her last night — all sign; one that had paid $120,000 is not charged again
     base = json.load(open(os.path.join(ROOT, 'tests', 'saves', 'player_day52.json'), encoding='utf-8')); base = base.get('save', base); D = base['day']
-    for kind in ('deferred', 'unanswered', 'mid', 'planned'):
+    for kind in ('deferred', 'unanswered', 'mid', 'planned', 'waiting', 'paid120k'):
         raw = json.loads(json.dumps(base)); raw['linMig'] = 1   # an rc8.x save: only the new step runs
         F = raw['story']['facts']; E = raw['story'].setdefault('ev', {}); f = lambda dd: {'d': dd, 'n': 1, 'l': dd}
         F['lin_hello'] = {'d': 0, 'n': 1, 'l': 0, 'retro': 1}
         for k in ('tasting_night', 'pairing_wine'): F[k] = f(D - 20)
-        F['lin_retiring'] = f(D - 13); F['ken_where'] = f(D - 12); F['jd_want'] = f(D - 11); F['dylan_book'] = f(D - 8); F['lin_viewing'] = f(D - 6); F['lin_closed'] = f(D - 1)
-        for k in ('pairing_start', 'lin_retire', 'ken_where', 'jd_want', 'dylan_book', 'lin_viewing', 'lin_last'): E[k] = {'n': 1, 'd': D - 6, 'miss': 0}
-        raw['story']['lin'] = {'last': D - 1}; raw['money'] = 500000
+        F['lin_retiring'] = f(D - 13); F['ken_where'] = f(D - 12); F['jd_want'] = f(D - 11); F['dylan_book'] = f(D - 8); F['lin_viewing'] = f(D - 6)
+        for k in ('pairing_start', 'lin_retire', 'ken_where', 'jd_want', 'dylan_book', 'lin_viewing'): E[k] = {'n': 1, 'd': D - 6, 'miss': 0}
+        raw['story']['lin'] = {'last': D + 4} if kind == 'waiting' else {'last': D - 1}; raw['money'] = 500000
+        if kind != 'waiting': F['lin_closed'] = f(D - 1); E['lin_last'] = {'n': 1, 'd': D - 1, 'miss': 0}
         if kind != 'mid':
             F['lounge_project'] = f(D - 6); E['lin_decide'] = {'n': 1, 'd': D - 6, 'miss': 0}
             raw['loungeProj'] = {'revealed': D - 6} if kind == 'unanswered' else {'revealed': D - 6, 'state': kind, 'at': D - 6}
-        if kind == 'planned': F['lin_take'] = f(D - 6)
+        if kind in ('planned', 'waiting', 'paid120k'): F['lin_take'] = f(D - 6)
+        if kind == 'waiting': raw['loungeProj']['state'] = 'planned'
+        if kind == 'paid120k': raw['loungeProj'].update(state='signing', paid=D, paidPrep=0); raw['money'] = 500000 - 120000
         g = Game(b, port, target, seed=8762, manual=True, viewport={'width': 390, 'height': 844})
         g.ev("phase='title';R=null;localStorage.setItem(KEY,JSON.stringify(%s))" % json.dumps(raw, ensure_ascii=False)); g.reload(); g.page.wait_for_timeout(150)
         g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(150)
-        st = json.loads(g.ev("JSON.stringify({take:fact('lin_take'),proj:fact('lounge_project'),state:S.loungeProj&&S.loungeProj.state,mig:S.linDecMig,facts:Object.keys(story().facts)})"))
-        check(st['take'] and st['take']['d'] == D - 6 and not st['take'].get('retro') and st['proj'] and st['state'] == 'planned' and st['mig'] == 1, f'{kind}: read as decided at 《看看》 (Day {D - 6}): {st}')
+        st = json.loads(g.ev("JSON.stringify({take:fact('lin_take'),proj:fact('lounge_project'),state:S.loungeProj&&S.loungeProj.state,mig:S.linDecMig,money:S.money,facts:Object.keys(story().facts),rate:+rating().toFixed(1)})"))
+        check(st['take'] and st['take']['d'] == D - 6 and not st['take'].get('retro') and st['proj'] and st['mig'] == 1 and st['rate'] >= 4.0, f'{kind}: read as decided at 《看看》 (Day {D - 6}): {st}')
         added = sorted(k for k in set(st['facts']) - set(F) if k.startswith(('lin_', 'lounge_', 'pairing_', 'evan_')))
-        check(added == {'planned': [], 'mid': ['lin_take', 'lounge_project']}.get(kind, ['lin_take']), f'{kind}: nothing else of the line added: {added}')
+        check(added == {'planned': [], 'waiting': [], 'paid120k': [], 'mid': ['lin_take', 'lounge_project']}.get(kind, ['lin_take']), f'{kind}: nothing else of the line added: {added}')
         g.ev("showShop();shopTab='works';showShop()"); g.page.wait_for_timeout(60)
         txt = g.ev("document.querySelector('#screen').innerText")
-        check(g.ev("!!document.querySelector('#screen .lin-card [data-act=linSign]')") and '再想想' not in txt and '還在這裡' not in txt and not g.ev("!!document.querySelector('[data-act=linTake],[data-act=loungeGo]')"), f'{kind}: the works page offers 簽約・開工 — nothing to press first')
-        m0 = g.ev("S.money"); g.click('#screen .lin-card [data-act=linSign]'); g.page.wait_for_timeout(60)
-        check(m0 - g.ev("S.money") == 80000 and g.ev("S.loungeProj.state") == 'signing', f'{kind}: signed for $80,000')
+        check('再想想' not in txt and '還在這裡' not in txt and '最後一晚以後' not in txt and not g.ev("!!document.querySelector('[data-act=linTake],[data-act=loungeGo]')"), f'{kind}: nothing of the old flow on the works page')
+        if kind == 'paid120k':
+            check(st['money'] == 380000 and st['state'] == 'signing' and not g.ev("linSignPay()") and g.ev("S.money") == 380000 and '開店前，Jill 去隔壁簽約' in g.ev(CARD), f'{kind}: paid at $120,000 — not charged again, the signing goes ahead: {st}')
+        else:
+            check(st['state'] == 'planned' and g.ev(DIS) is False, f'{kind}: 簽約・開工 can be pressed now: {st}')
+            m0 = g.ev("S.money"); g.click('#screen .lin-card [data-act=linSign]'); g.page.wait_for_timeout(60)
+            check(m0 - g.ev("S.money") == 50000 and g.ev("S.loungeProj.state") == 'signing' and g.ev("!!fact('lin_closed')"), f'{kind}: signed for $50,000')
         check(not g.errors, g.errors[:3]); g.close()
+    # a save with The Lounge built at $120,000: left as it is — no money back, nothing to pay, nothing replayed
+    g = Game(b, port, target, seed=8765, manual=True, viewport={'width': 390, 'height': 844})
+    raw = load_save(g, 'player_day61.json')
+    check(g.ev("S.money") == raw['money'] and g.ev("loungeLv()") == raw['rooms']['lounge'] and not g.ev("linSignPay()") and g.ev("S.money") == raw['money'], 'a built Lounge: the money as it was, nothing to pay again')
+    g.close()
     g = Game(b, port, target, seed=8763, manual=True, viewport={'width': 390, 'height': 844})
     g.click('[data-act=open]'); g.page.wait_for_timeout(100)
-    check(g.ev("S.linDecMig") == 1, 'a new game: nothing to migrate')
+    guide = g.ev("GUIDE.find(x=>/Lounge/.test(x.h)).pts.find(p=>p[0]==='怎麼來的')[1]")
+    check(g.ev("S.linDecMig") == 1 and 'Jill 看過隔壁，就決定接下來' in guide and '評分到 4.0' in guide and '$50,000' in guide and '不用等 Madame Lin 的最後一晚' in guide
+          and not any(w in guide for w in ('再想想', '要不要接', '等她最後一晚過了', 'Fine Dining', '80,000', '120,000')), f'a new game: nothing to migrate; the manual says the same: {guide}')
     g.close()
 
 

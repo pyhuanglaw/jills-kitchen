@@ -279,7 +279,7 @@ function linMig(o){if(!o||o.linMig)return o;o.linMig=1;const st=o.story=o.story&
 /* 2026-10-06 (the user): 《看看》 settles it — Jill takes the bar next door; the 「接下隔壁／再想想」 card is gone. A save
    from before that keeps its story and is given the decision: a 「再想想」 (or a card nobody answered) is the plan now,
    and a save made between 《看看》 and that night's card gets the plan it would have had — the works page is where
-   it goes on (her last night, the level, the money, 簽約・開工). Once per save; literals only, like linMig. */
+   it goes on (the rating, the money, 簽約・開工 — never her last night). Once per save; literals only, like linMig. */
 function linDecMig(o){if(!o||o.linDecMig)return o;o.linDecMig=1;const F=o.story&&o.story.facts;if(!F||((o.rooms&&o.rooms.lounge)||0)>0)return o;
  const w=F.lin_viewing||F.lounge_project;if(!w)return o;const P=o.loungeProj=o.loungeProj||{revealed:w.d||o.day||1};const d=w.retro?0:(w.d||P.revealed||o.day||1);
  if(!F.lounge_project)F.lounge_project={d,n:1,l:d};if(!F.lin_take)F.lin_take=w.retro?{d:0,n:1,l:0,retro:1}:{d,n:1,l:d};
@@ -480,7 +480,7 @@ function goalLadder(){const out=[];const money=S.money;const add=(n,cost,where)=
  if(projOn('side')){const n=S.sideBooths|0;if(n<2&&(S.sideTables||0)>=(n+2)*3)add('側廳卡座：'+SIDE_ROWS[n],SIDE_BOOTH_COST[n],'家具與佈置')}
  for(const E of EQUIP){const lv=S.eq[E.k]||0;if(lv<5)add(E.n+(lv?' LV'+(lv+1):''),E.cost[lv],'廚房設備')}
  for(const o of OPS){const t=opsLv(o.k);if(o.tiers[t]!=null&&S.level>=o.lv&&(!o.need||o.need()))add(o.n,o.tiers[t],'店舖工程')}/* v2.3: only what can really be bought now (the Bar 小廚 waits for Lounge III) */
- {const Q=typeof loungeNext==='function'&&(fact('lounge_project')||loungeLv())?loungeNext():null;if(Q&&S.level>=Q.need)add(Q.n,Q.cost,'店舖工程')}
+ {const Q=typeof loungeNext==='function'&&(fact('lounge_project')||loungeLv())?loungeNext():null;if(Q&&(Q.rate?loungeRateOk():S.level>=Q.need))add(Q.n,Q.cost,'店舖工程')}
  for(const Dc of DECOR){const t=S.decor[Dc.k]||0;if(Dc.tiers[t]!=null&&S.level>=(Dc.tierLv?Dc.tierLv[t]:Dc.lv))add(Dc.n,Dc.tiers[t],'家具與佈置')}
  out.sort((a,b)=>a.cost-b.cost);const near=out.find(g=>g.left===0)||out[0];const mid=out.find(g=>g.left>0&&g.left<=Math.max(3000,money*.6))||out.find(g=>g.left>0);const far=out.slice().reverse().find(g=>g.left>0&&g!==mid)||null;
  const G=[near,mid,far].filter((g,i,a)=>g&&a.indexOf(g)===i);for(const g of out.slice().reverse()){if(G.length>=3)break;if(!G.includes(g))G.push(g)}return G}
@@ -2835,8 +2835,13 @@ function linSignScene(){const dy=dylanOut();const bx=LG.bar.x0,by=LG.bar.y;const
 /* the signing as it is kept: the facts, the work's two days, Evan has met Dylan (nobody else learns anything) */
 function linSigned(){const P=S.loungeProj=S.loungeProj||{revealed:S.day};factSet('lin_signed');factSet('evan_knows_dylan');P.state='reno';P.sign=S.day;P.open=S.day+LIN_RENO;relSet('n:'+LIN,'jill','spoke');save()}
 /* 簽約・開工 on the works page: after her last night; the money now, the signing at the next opening */
-function linSignPay(){const Q=LOUNGE_PROJ[0];const P=S.loungeProj=S.loungeProj||{revealed:S.day};if(loungeLv()||!fact('lin_take')||!fact('lin_closed')||fact('lin_signed')||P.state==='signing'||P.state==='reno'||S.money<Q.cost||S.level<Q.need)return false;
- S.money-=Q.cost;P.state='signing';P.paid=S.day;P.paidPrep=S.phase==='prep'?1:0;save();return true}
+function linSignPay(){const Q=LOUNGE_PROJ[0];const P=S.loungeProj=S.loungeProj||{revealed:S.day};if(loungeLv()||!fact('lin_take')||fact('lin_signed')||P.state==='signing'||P.state==='reno'||S.money<Q.cost||!loungeRateOk())return false;
+ S.money-=Q.cost;P.state='signing';P.paid=S.day;P.paidPrep=S.phase==='prep'?1:0;
+ /* the user, 2026-10-06: her last night is her story, not a lock. Signed before it, the evening before the signing was
+    her last (paid after the evening: tonight; paid before opening: last night) — her bar is closed from then on, and
+    the morning of the signing she hands over the keys; no countdown, no farewell to wait for */
+ if(!fact('lin_closed')){const L=linS();L.early=1;L.last=P.paidPrep?S.day-1:S.day;factSet('lin_closed');const f=fact('lin_closed');f.d=f.l=L.last}
+ save();return true}
 /* the work done: The Lounge opens — Evan stays on behind the bar (§16); shown on the morning it is ready */
 function loungeOpenDue(){const P=S.loungeProj;return !!P&&P.state==='reno'&&!loungeLv()&&S.day>=(P.open||0)}
 function loungeOpenNow(){const P=S.loungeProj;loungeBuild(1);P.open=S.day;P.at=S.day;P.rv=0;noteLine('隔壁現在叫 The Lounge。')}
@@ -2859,10 +2864,10 @@ STORY_EV.push(
   present:[{can:ctx=>ctx.at==='collect'&&!!ctx.g&&namedId(ctx.g)===KEN&&!ctx.again,run:ctx=>{factSet('pairing_wine');relSet('n:'+KEN,'jill','spoke');v24Scene([{who:'jill',text:'今晚那幾支，可以再幫我進嗎？'},{who:'named:'+KEN,text:'妳要賣？'},{who:'jill',text:'配菜的。'},{who:'named:'+KEN,text:'……只配菜？'},{who:'jill',text:'想喝酒，隔壁就有。'}],()=>noteLine('從明天起，晚餐桌上有配菜的酒：氣泡酒、清爽白酒、輕盈紅酒。'))}},
    {can:ctx=>ctx.at==='close'&&!(R&&R.groups.some(q=>!q.gone&&q.state!=='leave'&&namedId(q)===KEN)),run:()=>{factSet('pairing_wine');noteLine('收店的時候，Jill 把今晚那幾支酒的名字抄下來——配菜的。明天起，晚餐桌上有。')}}]},   /* rc8.2: Ken still at his table when the closing starts — his bill (paid in the closing) has the scene; the note only when he has gone */
  /* STORY 3 《做到月底》 (§7): an ordinary evening; she wants to retire — that is all */
- {k:'lin_retire',lane:'major',cls:'A',floor:2,at:['collect'],once:true,ic:'heart',note:()=>`Madame Lin 結帳的時候說：「我做到月底。」她想退休了。${linLast()?`隔壁開到 Day ${linLast()}。`:''}`,
+ {k:'lin_retire',lane:'major',cls:'A',floor:2,at:['collect'],once:true,ic:'heart',note:()=>'Madame Lin 結帳的時候說：「我做到月底。」她想退休了。',
   when:ctx=>!!ctx.g&&namedId(ctx.g)===LIN&&!ctx.again&&linRetireReady(),
   run:ctx=>{const L=linS();L.last=S.day+LIN_MONTH;L.said=S.day;factSet('lin_retiring');relSet('n:'+LIN,'jill','spoke');
-   v24Scene([{who:'',text:'Madame Lin 結完帳，跟平常一樣。'},{who:'named:'+LIN,text:'我做到月底。'},{who:'jill',text:'隔壁？'},{who:'named:'+LIN,text:'嗯。'},{who:'jill',text:'不做了？'},{who:'named:'+LIN,text:'退休。'},{who:'jill',text:'有人接嗎？'},{who:'named:'+LIN,text:'還沒有。'}],()=>noteLine(`隔壁 Madame Lin 的店，開到 Day ${L.last}。`))}},
+   v24Scene([{who:'',text:'Madame Lin 結完帳，跟平常一樣。'},{who:'named:'+LIN,text:'我做到月底。'},{who:'jill',text:'隔壁？'},{who:'named:'+LIN,text:'嗯。'},{who:'jill',text:'不做了？'},{who:'named:'+LIN,text:'退休。'},{who:'jill',text:'有人接嗎？'},{who:'named:'+LIN,text:'還沒有。'}])}},
  /* STORY 4 《不然吃完去哪？》 (§8): Ken minds his evening's other half going — not a Lounge, not a plan */
  {k:'ken_where',lane:'major',cls:'A',floor:2,at:['collect'],once:true,ic:'star',note:'Ken 聽說隔壁要收了：「最好有人接。」「不然吃完去哪？」',
   when:ctx=>!!ctx.g&&namedId(ctx.g)===KEN&&!ctx.again&&!!fact('lin_retiring')&&!fact('lounge_project')&&!loungeLv(),
@@ -2884,7 +2889,7 @@ STORY_EV.push(
   run:()=>{if(SCX){SCX.cap=32;SCX.stageRoom='front'}factSet('lin_viewing');linDecided();relSet('n:'+LIN,'jill','spoke');linViewingScene()}},
  /* §12: that night, Jill decides — herself */
  /* her last night: 「月底」 */
- {k:'lin_last',lane:'ambient',at:['dayend'],once:true,when:()=>!!linLast()&&S.day>=linLast()&&!fact('lin_closed'),run:()=>{factSet('lin_closed');if(fact('lin_take')&&!loungeLv())noteLine('隔壁的門關上了。簽約・開工在「升級餐廳 › 店舖工程」。')}},
+ {k:'lin_last',lane:'ambient',at:['dayend'],once:true,when:()=>!!linLast()&&S.day>=linLast()&&!fact('lin_closed'),run:()=>{factSet('lin_closed');if(fact('lin_take')&&!loungeLv())noteLine('隔壁的門關上了。簽約・開工在「升級餐廳 › 店舖工程」。')}},   /* the user, 2026-10-06: a reminder, not an unlock — signing never waited for this night (signed before it, it is the evening before the signing and this never fires) */
  /* STORY 7 《簽約》 (§13): the morning after Jill pays on the works page */
  {k:'lin_sign',lane:'major',cls:'A',floor:0,at:['daystart'],once:true,ic:'heart',note:()=>`簽約那天，${dylanOut()?'Dylan':'她先生'}陪 Jill 去隔壁。Madame Lin 把鑰匙交給她；Evan 第一次見到${dylanOut()?' Dylan':'他'}。`,
   when:()=>!loungeLv()&&!fact('lin_signed')&&!!S.loungeProj&&S.loungeProj.state==='signing',
@@ -2903,20 +2908,23 @@ function tastingDir(k){if(!R||!R.tasting)return;R.tasting.dir=k;factSet('tasting
 function tastingServe(g){if(!R||!R.tasting||!R.tasting.dir||!g||g.table==null||R.tasting.n>=8||g.tasted)return;if(Math.random()>.6)return;g.tasted=1;R.tasting.n++;const t=R.tables[g.table];addFloat(t.x,t.y-54,'一杯',"#E8C6A0",0,t.room);catCheer(g,.06);for(const id of storyIdsOf(g))factSet('tasted_'+id,true);
  if(R.tasting.n===3){memo('tasting',t.x,t.y-8,{g:g.name,subj:[{x:t.x-30,y:t.y},{x:t.x+30,y:t.y}],room:t.room})}
  if(Math.random()<.35&&canChat('tasting',40,3))quote(g,pickT(['這杯跟這道很搭。','今天有酒？','這樣吃比較像在過節。']))}
+/* the user, 2026-10-06: Lounge I is 《看看》 + 評分 4.0 + $50,000 — 「Lounge I 的定位是 content unlock，不應該因為高額資金門檻把大量
+   已完成內容一起延後」; the heavier steps stay with II ($160,000) and III ($220,000). Her last night is her story, never a wait. */
 const LOUNGE_PROJ=[
- {lv:1,n:'Lounge I — 小酒吧',cost:80000,need:4,d:'接下隔壁 Madame Lin 的店：簽約以後改裝兩天，就是 Jill’s Kitchen — The Lounge。吧台留在原來的位置，六個吧台位、三張小桌、一面放酒的牆；跟主廳不打通，菜從後場的廚房送過去。開了以後，吃完飯的人可以留下來，等位子的人可以先坐吧台。Evan 留下來當首席調酒師，開幕那天就在吧台後面，不用招募；Lounge 的人有自己的名單，沈晴（調酒師）可以再請，不佔餐廳的名額。',done:'吧台的燈亮了。牆上有酒，桌上有杯子，Evan 已經站在吧台後面——隔壁現在叫 The Lounge。',jill:'開門吧。',unlock:['Evan，首席調酒師（從今晚起就在吧台）','Lounge 名單：沈晴（員工 › Lounge 名單）','Lounge 外場（工作分配）','Lounge 的小食（菜單）']},
+ {lv:1,n:'Lounge I — 小酒吧',cost:50000,need:0,rate:4,d:'隔壁 Madame Lin 的店：簽約以後改裝兩天，就是 Jill’s Kitchen — The Lounge。吧台留在原來的位置，六個吧台位、三張小桌、一面放酒的牆；跟主廳不打通，菜從後場的廚房送過去。開了以後，吃完飯的人可以留下來，等位子的人可以先坐吧台。Evan 留下來當首席調酒師，開幕那天就在吧台後面，不用招募；Lounge 的人有自己的名單，沈晴（調酒師）可以再請，不佔餐廳的名額。',done:'吧台的燈亮了。牆上有酒，桌上有杯子，Evan 已經站在吧台後面——隔壁現在叫 The Lounge。',jill:'開門吧。',unlock:['Evan，首席調酒師（從今晚起就在吧台）','Lounge 名單：沈晴（員工 › Lounge 名單）','Lounge 外場（工作分配）','Lounge 的小食（菜單）']},
  {lv:2,n:'Lounge II — 酒吧沙發廳',cost:160000,need:4,d:'吧台加長、轉成 L 型（調酒師在 L 裡面，九個位子）；多一張小桌、一組四人沙發；一座有燈的酒櫃，酒單全開（五種）。Lounge 名單多三位：阿拓（Bar Food 料理員，在廚房）、安安（Lounge 外場）、許葳（Lounge 清潔）。',done:'吧台加長了，沙發進來了。酒櫃的燈在牆上亮著。',jill:'現在像個真的晚上了。',unlock:['Lounge 名單：阿拓、安安、許葳','四人沙發座','酒單五種']},
  {lv:3,n:'Lounge III — 安靜的角落',cost:220000,need:5,d:'最裡面隔出一個安靜的角落：兩張扶手椅、一盞落地燈；酒牆多一層；適合說話的位子。',done:'角落的燈亮了。有人會在那裡坐到很晚。',jill:'留一個地方給說話的人。',unlock:['安靜角落（兩位）','酒牆第三層']},
 ];
 function loungeNext(){const lv=loungeLv();return LOUNGE_PROJ.find(p=>p.lv===lv+1)||null}
-/* rc8 §12–§15: the card before The Lounge — her last night, the level, 簽約・開工, the work (2026-10-06: the story has
-   decided by then — no 「接下隔壁」, no 「再想想」) */
-function linWorksCard(money,btn){const Q=LOUNGE_PROJ[0],LP=S.loungeProj||{};const ok=S.level>=Q.need;let act='',bar=false;
+/* rc8 §12–§15, the user 2026-10-06: the card before The Lounge — after 《看看》 it needs only what it says: the rating
+   (4.0, read as the HUD shows it) and the money; then the signing and the work. No 「接下隔壁」, no 「再想想」, and no
+   waiting for her last night (signed before it, the evening before the signing is her last: linSignPay) */
+function loungeRateOk(){return +rating().toFixed(1)>=LOUNGE_PROJ[0].rate}
+function linWorksCard(money,btn){const Q=LOUNGE_PROJ[0],LP=S.loungeProj||{};const ok=loungeRateOk();let act='',bar=false;
  if(LP.state==='signing')act=`<span class="muted">${LP.paid===S.day&&!LP.paidPrep?'明天':'今天'}開店前，Jill 去隔壁簽約</span>`;
  else if(LP.state==='reno')act=`<span class="muted">改裝中・Day ${LP.open} 開幕</span>`;
- else if(!fact('lin_closed'))act=`<span class="muted">Madame Lin 做到 Day ${linLast()||S.day}；她最後一晚以後簽約</span>`;
- else if(!ok)act=`<span class="muted">需要擴建到 ${LEVELS[Q.need-1].n}</span>`;
- else{act=btn(Q.cost,'linSign','','簽約・開工')+(money<Q.cost?`<span class="muted" style="font-size:11.5px">還差 ${fmt(Q.cost-money)}</span>`:'');bar=money<Q.cost}
+ else{const why=[];if(!ok)why.push(`需要餐廳評分 ${Q.rate.toFixed(1)}（目前 ${rating().toFixed(1)}）`);if(money<Q.cost)why.push(`還差 ${fmt(Q.cost-money)}`);
+  act=(ok?btn(Q.cost,'linSign','','簽約・開工'):`<button class="btn sm" data-act="linSign" disabled>簽約・開工 ${fmt(Q.cost)}</button>`)+(why.length?`<span class="muted" style="font-size:11.5px">${why.join('・')}</span>`:'');bar=money<Q.cost}
  const pct=Math.min(100,Math.round(money/Q.cost*100));
  return`<div class="item lin-card"><img alt="" src="${iconURL('loungebar')}"><div class="nm">${Q.n}</div><div class="d">${Q.d}</div><div class="act">${act}</div>${bar?`<div class="gb"><i style="width:${pct}%"></i></div>`:''}</div>`}
 function secLounge(money,btn){const P=loungeNext();if(!fact('lounge_project')&&!loungeLv())return'';const LP=S.loungeProj||{};
@@ -4849,7 +4857,7 @@ const STORY_LINES=[
  /* rc8 (the player, 2026-10-02 19:19): the bar next door — from her present on Day 1 to Jill taking it on */
  {k:'nextdoor',who:'Madame Lin',names:['Madame Lin','Jill','品酒師 Ken','Dylan','Evan'],faces:()=>['named:Madame Lin','jill'].concat(fact('ken_where')?['named:品酒師 Ken']:[]).concat(fact('jd_want')&&dylanOut()?['dylan']:[]).concat(fact('lin_viewing')?['staff:Evan']:[]),title:()=>'隔壁',open:()=>BF('lin_hello')!=null||BF('lin_retire')!=null,more:()=>fact('lin_retiring')&&!fact('lin_take')?'隔壁還沒有人接。':fact('lin_take')&&!fact('lin_signed')&&!loungeLv()?'還沒簽約。':'',
   beats:[['lin_hello','「隔壁更不能空手。」',{illus:'lin_hello'}],['ken_wine_q','「妳真的不賣酒？」'],['pairing_start','配菜的酒'],['lin_retire','「我做到月底。」'],['ken_where','「不然吃完去哪？」'],['jd_want','「……我有點想接。」'],['dylan_book','一本不一樣的書',{illus:'dylan_book'}],['lin_viewing','看看',{illus:'lin_viewing'}],
-   ['lin_take','隔壁，她接',{hide:1,note:()=>'看過隔壁，Jill 決定接下來。'}],['lin_closed','隔壁的最後一晚',{hide:1,note:()=>'Madame Lin 做到月底。隔壁的門關上了。'}],
+   ['lin_take','隔壁，她接',{hide:1,note:()=>'看過隔壁，Jill 決定接下來。'}],['lin_closed','隔壁的最後一晚',{hide:1,note:()=>linS().early?'Jill 簽約的前一晚，是 Madame Lin 的最後一晚。隔壁的門關上了。':'Madame Lin 做到月底。隔壁的門關上了。'}],
    ['lin_sign','簽約',{illus:'lin_sign'}],['lounge_built_1','The Lounge',{hide:1,note:()=>'改裝兩天。隔壁現在叫 The Lounge，Evan 在吧台後面。'}],['lin_guest','「你選。」',{illus:'lin_guest'}]]},
  {k:'li',who:'老饕李先生',names:['老饕李先生','Jill','Sophie'],faces:['named:老饕李先生'],title:()=>'兩道走天下',open:()=>!!(BF('li_1')||BF('li_2')),more:'',
   beats:[['li_1','「靠這一道走天下？」',{can:()=>!S.sigDessert}],['li_sophie','「甜點還沒有。」',{can:()=>!S.sigDessert}],['li_2','「現在可以了。」']]},
@@ -7215,7 +7223,7 @@ function drawFrontRoom(c,now,dusk,V,X0,XW,TOP,list){const d=clamp(dusk,0,1);cons
    wooden shopfront, its name board, a brass lamp by the door, the window warm at night with bottles on a shelf behind a
    half curtain. After the signing it is papered over for the work. Then it is Jill's Kitchen — The Lounge: charcoal and
    brass letters, but the same door, the same window and the same iron bracket, with a new sign on it. */
-function barState(){if(loungeLv())return'lounge';if(fact('lin_signed'))return'reno';if(fact('lin_closed'))return'closed';if(S.loungeProj&&(S.loungeProj.revealed||S.loungeProj.state)&&!fact('lin_retiring'))return'reno';return'lin'}   /* closed: after her last night, before Jill signs; reno: from the signing (deciding to take it on is not signing — she keeps her bar open to the end of the month). The last test is a save whose Lounge project came before this story (Checkpoint C migrates it) */
+function barState(){if(loungeLv())return'lounge';if(fact('lin_signed'))return'reno';if(fact('lin_closed'))return'closed';if(S.loungeProj&&(S.loungeProj.revealed||S.loungeProj.state)&&!fact('lin_retiring'))return'reno';return'lin'}   /* closed: after her last night, before Jill signs; reno: from the signing (deciding to take it on is not signing — she keeps her bar open to the end of the month, or until Jill signs: then the evening before the signing was her last). The last test is a save whose Lounge project came before this story (Checkpoint C migrates it) */
 function drawBarFront(b,d,wet,st,T2){const x0=FR.barX,x1=FR.barX+190,dx=FR.ldoor.x;const closed=st==='closed';const lit=d>.35&&!closed;   /* closed: her bar after her last night — the same front, dark, the curtain drawn, a card on the door */
  /* the building above: plaster a little cooler than Jill's, a cornice, a window with a lace curtain and a plant (someone lives up there), a box for the air conditioner */
  b.fillStyle=mix('#D3CCC1','#2E2C36',d*.55);b.fillRect(x0,30,x1-x0,96);{const R3=rng(23);b.fillStyle='rgba(90,80,70,.08)';for(let i=0;i<220;i++)b.fillRect(x0+R3()*(x1-x0),30+R3()*94,1.2,1.2)}
@@ -9530,7 +9538,7 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
   ['誰來做','LV5 的廚師會接手這兩道。'],
   ['在哪裡看','商店的「招牌菜」分頁；日誌的「熟練度」也有它們。']]},
  {ic:'🍷',h:'Lounge：留下來的地方',sum:'主廳是吃飯，側廳是聚餐，Lounge 是留下來。它本來是隔壁 Madame Lin 開了很多年的酒吧，不是升級選單裡冒出來的。',pts:[
-  ['怎麼來的','店門口右邊是 Madame Lin 開了很多年的酒吧，開店那天她就是鄰居；Jill 一開始不賣酒——想喝酒，隔壁就有。品酒師 Ken 會問「妳真的不賣酒？」，之後晚餐桌上才有配菜的酒。過一陣子 Madame Lin 會說她做到月底。Jill 看過隔壁，就決定接下來。等她最後一晚過了，在「店舖工程」按「簽約・開工」（店要先擴建到 Jill\'s Fine Dining）；改裝兩天，The Lounge 就開幕，Evan 留下來。'],
+  ['怎麼來的','店門口右邊是 Madame Lin 開了很多年的酒吧，開店那天她就是鄰居；Jill 一開始不賣酒——想喝酒，隔壁就有。品酒師 Ken 會問「妳真的不賣酒？」，之後晚餐桌上才有配菜的酒。過一陣子 Madame Lin 會說她做到月底。Jill 看過隔壁，就決定接下來。之後只要餐廳評分到 4.0、手上有 $50,000，就能在「店舖工程」按「簽約・開工」，不用等 Madame Lin 的最後一晚；改裝兩天，The Lounge 就開幕，Evan 留下來。'],
   ['Lounge I／II／III','I：吧台六個位子（坐得開，不會肩碰肩）、三張小桌、一面酒牆（三種酒）。II：吧台加長、轉成 L 型——調酒師在 L 裡面，靠牆那一頭留了進出的口——九個位子（一樣坐得開）；多一張小桌、四人沙發、有燈的酒櫃（五種酒），Lounge 名單多阿拓、安安、許葳。III：最裡面一個安靜的角落。'],
   ['安安','來的時候就是 LV2，排在「Lounge 外場」：先顧 Lounge 的桌子，沒事才去主廳幫忙。Lounge 的小點在廚房做，從後場遞到 Lounge 吧台的那一頭，由她送過去。出菜口的「送菜」只送主廳、側廳的菜。'],
   ['要有調酒師','Lounge 蓋好那天，Evan 就在吧台後面；把吧台的人都移開的話，Lounge 那晚不開。調酒師倒酒、送酒。點單、結帳、送小食由「Lounge 外場」的服務生做，沒人負責時調酒師自己來。'],
