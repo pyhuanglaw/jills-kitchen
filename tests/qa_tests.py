@@ -790,6 +790,35 @@ def qa_a_new_game_gets_no_old_version_notes(b, port, target):
 
 
 @test
+def qa_the_first_two_days_say_the_stock_fills_itself(b, port, target):
+    """Audit WS5-10: on Day 1 the prep screen said 「沒有備料」 by every dish, the fridge 0/40 and 「一鍵補到建議量 $525」 with $500
+    in the till, and 開始營業 stopped once with a red warning — while the first two days fill the stock themselves when the
+    shop opens (startService → autoStock). The line that said so had stopped showing (feat().stock is always on). Now Day 1
+    and 2 say it, warn about nothing and open on the first tap, the stock filled; from Day 3 an empty dish is warned about
+    as before. By taps, on a phone."""
+    p = Player(b, port, target)
+    try:
+        p.tap('[data-act=open]'); p.settle()
+        check(p.state()['phase'] == 'prep' and p.ev("S.day") == 1, f'not at the Day 1 prep: {p.state()}')
+        txt = p.text('#screen')
+        check('前兩天開店時，Jill 會照建議量把每道菜的備料補好' in txt, 'Day 1: the prep screen says the stock fills itself')
+        check('沒有備料' not in txt, 'Day 1: no 「沒有備料」 by the dishes')
+        check(p.ev("menuList().every(d=>(S.stock[d]||0)===0)"), 'the fridge is empty before opening (the point of the line)')
+        warn = p.start_day(confirm=False)
+        check(warn is None and p.state()['phase'] == 'service', f'Day 1: 開始營業 opens on the first tap, no warning: {warn}')
+        check(p.ev("menuList().every(d=>(S.stock[d]||0)>0)"), f'the stock was filled at opening: {p.ev("JSON.stringify(S.stock)")}')
+        # Day 3: the player stocks; an empty dish is still worth one warning
+        p.ev("phase='prep';R=null;S.day=3;S.phase='prep';for(const d of menuList())S.stock[d]=0;showPrep()"); p.settle()
+        txt = p.text('#screen')
+        check('沒有備料' in txt and '前兩天開店時' not in txt, 'Day 3: an empty dish says so, and the first-days line is gone')
+        warn = p.start_day(confirm=False)
+        check(warn and '沒有備料' in warn and p.state()['phase'] == 'prep', f'Day 3: the first tap warns: {warn}')
+        check(not p.errors, p.errors[:3])
+    finally:
+        p.close()
+
+
+@test
 def qa_every_level_named_in_the_text_exists(b, port, target):
     """Known-open (WS5-04): the signature dessert's lock and the manual say 「需要擴建到 Jill's Kitchen」 — there is no such
     level (Little Kitchen → Bistro → Restaurant → Fine Dining → JILL); the dessert needs Jill's Restaurant. Every

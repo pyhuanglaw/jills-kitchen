@@ -36,7 +36,7 @@ def v24_back_of_house_is_a_work_area_and_keeps_its_two(b, port, target):
     check('休息' not in d and '整理區' in d and '廚師和服務生各可以再多聘 1 位' in d, f'work storage, +2 (rc8: a chef and a waiter): {d}')
     check(g.ev("ACH.find(a=>a.id==='room').d") == '後場有了整理區', 'the achievement says what it is now')
     man = g.ev("JSON.stringify(GUIDE)")
-    check('後場整理區' in man and '後場休息室' not in man, 'the manual uses the new name')
+    check('後場休息室' not in man, 'the manual never uses the old name (2026-10-06: the shop card says what the work area does, the manual no longer repeats it)')
     g.ev("S.money+=1;showShop();shopTab='works';showShop()"); g.page.wait_for_timeout(100)
     txt = g.ev("document.querySelector('#screen').innerText")
     check('後場整理區' in txt and '休息室' not in txt, 'the shop page uses the new name')
@@ -564,12 +564,12 @@ def v24_yijun_comes_early_in_a_fresh_game_and_meets_her_mother_at_closing(b, por
 @test
 def v24_manual_tutorial_and_news_cover_the_new_content(b, port, target):
     """The release checklist's manual audit, and the player's 15:11 request (說明書和一開始的教學都要到位): the manual
-    explains 秀琴阿姨 before and after the first cleaner, staff arriving late, the story illustrations and staff lives,
-    the renamed 後場整理區; a save that was already going gets one 2.4 note on its next prep screen (systems only —
+    says the first cleaner is 秀琴阿姨, that staff can arrive late (and are paid the day), where the story illustrations are
+    (rewritten 2026-10-06: what the screen shows — the cleaner's evenings, staff lives, the work area — left it); a save that was already going gets one 2.4 note on its next prep screen (systems only —
     nobody's story told in advance); a new game does not (Day 1's coach and Day 2's news introduce her instead)."""
     g = Game(b, port, target, seed=264, manual=True, viewport={'width': 390, 'height': 844})
     txt = g.ev("GUIDE.map(s=>s.h+' '+s.sum+' '+s.pts.map(p=>p.join(' ')).join(' ')).join('\\n')")
-    for need in ['秀琴阿姨', '快打烊時順路進來', '請第一位清潔員就是請她', '第一位清潔員是秀琴阿姨', '晚點到', '日薪照付', '看插圖', '店外的生活', '廚師不會離開廚房', '後場整理區']:
+    for need in ['秀琴阿姨', '請第一位清潔員就是請秀琴阿姨', '晚點到', '日薪照付', '看插圖']:
         check(need in txt, f'the manual mentions {need}')
     for stale in ['後場休息室', '吧台我擦']:
         check(stale not in txt, f'not in the manual: {stale}')
@@ -620,9 +620,9 @@ def rc8_the_manual_shows_a_space_once_the_shop_has_it(b, port, target):
     check('來店 5 次的客人拿到 VIP 卡：九折' in t and '來 10 次換成八折卡：八折' in t, 'the VIP card, from the first day, without the Lounge')
     check('小小店主手冊' in t and '五隻店貓' in t and 'Jill 的房間' in t, 'the rest of the manual is there')
     g.ev("S.rooms.side=1;showGuide()"); g.page.wait_for_timeout(50); t = g.ev(page)
-    check('側廳的大窗' in t and '店門口・主廳・側廳・廚房・房間' in t and '二樓' not in t, 'the side room comes with the side room')
+    check('店門口・主廳・側廳・廚房・房間' in t and '二樓' not in t, 'the side room comes with the side room')
     full = g.ev("GUIDE.map(s=>s.h+' '+s.sum+' '+s.pts.map(p=>p.join(' ')).join(' ')).join('\\n')")
-    check('Lounge：留下來的地方' in full and '員工休息室' in full and '天氣、Lounge、包廂、VIP 卡' in full, 'GUIDE keeps every word')
+    check('Lounge：留下來的地方' in full and '員工休息室' in full and '私人包廂' in full and '品酒之夜' in full, 'GUIDE keeps every word')
     stale = g.ev("""(()=>{const all=GUIDE.flatMap(g=>[g.sum,...g.pts.flatMap(([k,t])=>guideLines(t))]);const bad=GUIDE_WHEN.line.map(r=>r[0]).filter(w=>all.filter(l=>l.includes(w)).length!==1);
       for(const k in GUIDE_WHEN.pt){const [h,l]=k.split('|');if(!GUIDE.some(g=>g.h===h&&g.pts.some(p=>p[0]===l)))bad.push(k)}for(const k in GUIDE_WHEN.sec)if(!GUIDE.some(g=>g.h===k))bad.push(k);return bad})()""")
     check(stale == [], f'every gate still finds its words in GUIDE (an edited line would quietly stop being gated): {stale}')
@@ -633,7 +633,7 @@ def rc8_the_manual_shows_a_space_once_the_shop_has_it(b, port, target):
     check('Lounge：留下來的地方' in t and '吃完再去 Lounge 七折' in t and '配菜的酒' in t and '調酒師' in t, 'Day 81: the Lounge is in the manual')
     check('二樓' not in t and '包廂' not in t and '休息室' not in t, 'Day 81: the second floor is not hers yet, and not in the manual')
     g.ev("S.rooms.up=1;const o=srW();o.bought=o.done=S.day;showGuide()"); g.page.wait_for_timeout(50); t = g.ev(page)
-    check('二樓：休息室與包廂' in t and '二樓平面圖' in t and '員工休息室' in t and '誰會上去' in t and '私人包廂' not in t, 'the lease: the floor and its Staff Room (rc8 canon), not yet the Private Dining Room')
+    check('二樓' in g.ev("[...document.querySelectorAll('#screen summary b')].map(b=>b.textContent).join('|')") and '上二樓的樓梯門在側廳' in t and '員工休息室' in t and '私人包廂' not in t and '最低消費' not in t, 'the lease: the floor and its Staff Room (rc8 canon), not yet the Private Dining Room')
     g.ev("S.up.pd={done:S.day};showGuide()"); g.page.wait_for_timeout(50); t = g.ev(page)
     check('私人包廂' in t and '最低消費' in t, 'the Private Dining Room with its own story')
     check(not g.errors, g.errors[:3]); g.close()
@@ -3337,7 +3337,7 @@ def v24_rc7_2_the_random_menu(b, port, target):
     check('菜單隨機排好了' in g.ev("[...document.querySelectorAll('#toasts .toast')].map(t=>t.textContent).join('|')"), 'the tap says it is done')
     check(g.ev("phase") == 'prep' and g.ev("menuCount()") == want, 'still on the menu page, the menu full')
     man = g.ev("JSON.stringify(GUIDE)")
-    check('隨機選菜單' in man and '今日任務要賣的菜和宣傳中的菜會留著' in man, 'the manual says so')
+    check('今日任務要賣的那道' in g.ev("document.querySelector('.mrand').innerText"), 'the button says what it keeps (2026-10-06: the manual no longer repeats what the screen says)')
     # a new game: few dishes — all of them, at least one 主食
     g.ev("localStorage.removeItem(KEY)"); g.reload(); g.page.wait_for_timeout(150); g.click('[data-act=open]'); g.page.wait_for_timeout(150)
     n = json.loads(g.ev("(()=>{const p=menuRandom();return JSON.stringify({p,cap:menuCap(),pool:S.unlocked.filter(d=>!!DISHES[d]&&!DISHES[d].bar&&stationOk(d)).length,main:p.some(d=>['main','starter'].includes(DISH(d).cat))})})()"))
@@ -3525,7 +3525,7 @@ def v24_rc7_2_the_lounges_own_waiter_carries_its_bites(b, port, target):
     w2 = json.loads(g.ev(f"JSON.stringify((()=>{{const m=S.crew.find(m=>m.id==='{who2}');const w=m&&R.cw[m.id];return{{role:m&&m.role,room:w&&w.task?w.task.room:null,x:w&&w.task?Math.round(w.task.x):null}}}})())")) if who2 else {}
     check(who2 and w2.get('role') in ('bartender', 'waiter') and w2.get('room') == 'lounge', f'fetched from the end of the Lounge\'s bar: {who2} {w2}')
     man = g.ev("JSON.stringify(GUIDE)")
-    check('由她送過去' in man and '出菜口的「送菜」只送主廳、側廳的菜' in man, 'the manual says so')
+    check('由「Lounge 外場」送過去' in man and '出菜口的「送菜」只送主廳、側廳的菜' in man, 'the manual says so')
     check(not g.errors, g.errors[:3]); g.close()
 
 
@@ -3543,7 +3543,7 @@ def v24_rc7_2_no_firing_and_the_wages(b, port, target):
     check(w == [[304, 532, 832, 1224, 1690], [253, 443, 693, 1020, 1408], [190, 332, 520, 765, 1056], [405, 709, 1109, 1632, 2253]], f'the wages: {w}')
     check(f'每日薪資 {g.ev("fmt(crewWages())")}' in scr, 'the page shows the day\'s wages')
     man = g.ev("JSON.stringify(GUIDE)")
-    check('廚師 LV1 一天 $304、LV5 一天 $1,690' in man and '請了就是店裡的人，沒有解雇' in man and '訓練升級、解雇' not in man, 'the manual')
+    check('請了就是店裡的人，沒有解雇' in man and '訓練升級、解雇' not in man, 'the manual (2026-10-06: each card shows its own wage; the manual no longer lists them)')
     check(not g.errors, g.errors[:3]); g.close()
 
 

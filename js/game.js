@@ -9575,182 +9575,108 @@ function drawBagSparkle(c,now){const t=now-BAG_T;const base=.35+Math.sin(now*2)*
 /* rc8 (the player, 2026-10-03: 「每一項都一大坨 很難閱讀」): an entry reads as short lines — one sentence a line, split at 。 and ；
    outside 「」（）『』 */
 function guideLines(t){const out=[];let d=0,cur='';for(const ch of t){cur+=ch;if('「（『(['.includes(ch))d++;else if('」）』)]'.includes(ch))d=Math.max(0,d-1);else if((ch==='。'||ch==='；')&&d===0){out.push(cur);cur=''}}if(cur.trim())out.push(cur);return out}
-const GUIDE=[   /* the manual describes the game as it is. Audited every release (docs/RELEASE_CHECKLIST.md) — last: v2.4 rc8.5 (a picture always holds the service: 插圖, 店裡暫停中; the crew go up to the Staff Room in a service and are seen there: 員工休息室; the room phases' buttons work — no wording changed; the ticket's heart, the small talk, Rush Mode's end and the Lounge moves were never in the manual: checked, no change) — before: v2.4 rc8.4 (the tasting night is 品酒之夜 — its entry, 結算, 晚餐之後, and the summary's lines; Ken's first three nights each have a picture and an album photo, and 插圖 and 相簿 already say so: no change there) — before: v2.4 rc8.3 (the queue waits at the shopfront: 帶位; two litter cabinets and the bowls: 裡面有什麼; three pizzas: 酒吧披薩) — before: v2.4 rc8.2 (the manual shows only the spaces the shop has — GUIDE_WHEN, 「每個空間等他出現才出現在說明書吧」; 「VIP 卡」 and 「配菜的酒」 moved to sections every shop has; what Jill does in her room: Jill 的空檔, Jill 在房間; the Staff Room comes with the second floor: 二樓 section, 怎麼來的) — before: v2.4 rc8 (every entry as short lines, one sentence a line, the 29 longest rewritten short — 「每一項都一大坨 很難閱讀」; the cooks take a dish's first plate too, and a cook from another station covers one with no cook of its own: 做菜, 廚師, 誰來做 and the chef's card; Jill rests most of a staffed evening but hosts its opening and its end: Jill 的空檔, Jill 在房間; Madame Lin's bar next door, the signing and the works, The Lounge's opening and the three restaurant lists were written with Checkpoints B–C and checked again) — before: v2.4 rc7.7 (no change: the page no longer carries the 35 portraits the game never shows) — before: v2.4 rc7.6 (主廚之夜, booked out — the whole Lounge, plated at the bar, course by course; Ken's tasting night the whole Lounge, poured a round at a time; the bar's L from Lounge II, nine seats) — before: v2.4 rc7.5 (the album starts on the opening day; its limit said right: 240, not 30) — before: v2.4 rc7.4 (the pizza oven, one more cook, the bar pizza researched; each regular's and named guest's favourite dish and glass, learned in play, marked on the menu; the Lounge's Buffalo wings, cheese sticks, oysters and pork knuckle; the Lounge's TV and sound system, and the game nights) — before: v2.4 rc7.3 (Jill's room: the room tab and its doors, her rest and her evening there — the sofa or the edge of the bed —, the cats' home, petting in the room, the steals that never work, 寶寶 and the regulars, the posts' pictures and likes) — before: v2.4 rc7.2 (秀琴阿姨's $3,000 loans and the payback at the summary; her first evening held; the pass takes a tap; the heart for a regular who is one; the 招待 chip beside the name; a line with a face answers a touch; the log's ×; a regular's head at a busy table is the table; a story on the summary opens its page; no 解雇; 🎲 隨機選菜單; the wages (LV5 twice); the missing cats found and the open door held; Sophie's pad seen and marked; 晚餐後 Lounge 八折) — earlier: v2.4 rc7 (the day's money: the glasses' cost, the rent, the wages, 秀琴阿姨's loan, 予安's fee; Ken's tasting nights and 「晚餐之後」; the piano and 予安; Ken's and 予安's stories hold the restaurant; a line said on the way to a table; the story guests look like their portraits — earlier: v2.4 rc6 (the Staff Room, the Private Dining Room and its bookings, two more places on the restaurant's list; the stories that hold the restaurant, the day's stories on the summary, the Lounge's list and sales, the things to spend on, the Second Floor after the Lounge, the new places' photos, a day off)), 2026-10-02 */
- {ic:'🍳',h:'開店與料理',sum:'每天 17:00 開店、21:30 打烊。你是 Chef Jill，點餐廳裡的東西就能指揮她。',pts:[
-  ['房間','票券列下面的分頁：店門口・主廳・側廳・二樓（租下以後）・休息室・包廂（蓋好以後）・Lounge（蓋好以後）・廚房・房間；也可以用 ←→ 或數字鍵。亮著的分頁寫著那一間的全名。上二樓的樓梯門在側廳；新房間蓋好的那天，開店前會先帶你上二樓看一眼。Lounge 是隔壁的店，跟主廳不相通：在店門口點它的門進去。廚房是自己的一間，出菜口在那裡。'],
-  ['帶位','有空桌客人會自己進來坐；客滿時在店門口外面等，買了門口長椅就坐著等。想指定順序，點那組客人（在「店門口」）或點空桌。'],
-  ['誰在哪裡','訂單上的桌號或名字點一下，會切到那一桌的房間，那一桌亮一下。畫面下方誰說了一句話，點那句話就會找到他現在在哪；還在走向座位的路上說的話，會帶你到他要坐的那一桌。標示幾秒就消失。'],
-  ['點餐','桌上出現紅色「!」→ 點桌子，Jill 過去點餐。'],
-  ['做菜','切到廚房，點亮著「+」的設備，照料理台的指示一步一步做。有廚師的工作站他們會自己接；沒有廚師的工作站，其他廚師有空時會過去幫忙。'],
-  ['上菜','桌上出現銀色餐蓋 → 點桌子，Jill 去出菜口端菜。在廚房點出菜口，Jill 會把做好的菜都送出去。有服務生（LV2 起）他們會自己端。'],
-  ['配菜的酒','試酒的晚上以後，晚餐桌上就有配菜的酒：氣泡酒、清爽白酒、輕盈紅酒。客人點了，服務生或 Jill 在出菜口倒好、端過去；「酒水成本」照杯算，結算也另外列「晚餐桌上配的酒」。Lounge 開了以後，晚餐桌上的酒改由調酒師倒，酒單也更長。'],
-  ['收錢・收桌','出現金幣點桌子收錢；客人走後點桌子收乾淨才能接下一組。'],
-  ['料理台的幾種步驟','放食材（有些要照順序）／Jill 自己來（切、炒、打發，開始後她會做完）／等一下／看準時機（指針到金色區按）／按住放開（在金色區間放開）／撒幾下（數量對了按完成）。'],
-  ['把店開得順','連續好評出菜會累積 COMBO，連續 5 道 PERFECT 進入 JILL\'S ON FIRE。速度按鈕可以把整個店開快一點。'],
-  ['突發事件（第 3 天起）','奧客鬧事點桌子安撫；設備冒煙連點修理；小偷抱著食材跑，快點他；衛生檢查倒數時桌面要乾淨、料理不能燒焦。同一種事件不會連續兩天發生；配電盤升級後跳電變少、增容後不再跳電。']]},
- {ic:'🧊',h:'開店前：備料與菜單',sum:'建議量是一道一道算的；賣完的需求會記下來，明天不會反而建議更少。',pts:[
-  ['建議備料','每道菜的建議量＝預估銷量＋一點緩衝（賣得多的緩衝多一點，比例上小一點）。「一鍵補到建議量」或每道菜自己調。'],
-  ['冰箱裝不下','建議總量超過冰箱容量時，會先減每道菜的緩衝、把冰箱填滿，畫面上會說一聲。想多放：升級冰箱、蓋冷藏庫，後期還有走入式冷藏庫。'],
-  ['營業中補貨','庫存不夠時，庫存面板（左上「庫存」或廚房的冰箱）每道菜有「補滿」，一按就到（1.5 倍價，不會再問一次）。客人點到沒貨的菜，Jill 也會自動叫貨。'],
-  ['賣完了','賣完的菜會估計「少賣了幾份」，寫在結算裡，並算進明天的建議量。'],
-  ['隨機選菜單','「今日菜單」上面的「🎲 隨機選菜單」一按就照名額排好今天的菜：只排客人點得到的（有那個工作站）、至少一道主食、每一類盡量有一道；今日任務要賣的菜和宣傳中的菜會留著，再按一次就換一組。酒吧小點和招牌菜不動。排完記得備料。'],
-  ['天氣推薦','開店前會依天氣建議菜單外的一兩道菜。菜單滿了按它，會跳出「換掉哪一道」讓你選，不會自己換。'],
-  ['今日推薦','選一道當今天的推薦，客人點它的機率大增；招牌菜和招牌甜點也可以推。'],
-  ['套餐','主餐＋飲料、主餐＋甜點、全套：加點的機率變高，加點的那一份便宜一點。'],
-  ['售價','每道菜可以調價；客人有自己的預算與敏感度，太貴會有人抱怨。']]},
- {ic:'👩🏻‍🍳',h:'Jill 與員工',sum:'商店的「員工」分頁：先是「工作分配」看板，再是每個人；最下面是招募（餐廳員工）和 Lounge 名單。',pts:[
-  ['工作分配','每個工作站和每項外場工作各一列（有 Lounge 以後多「Lounge 吧台」「Lounge 外場」），直接看到誰在哪裡。點 × 把人移出，點 ＋ 從名單挑人加進來。開店前如果有站沒人而菜單需要它，備料畫面會提醒。'],
-  ['員工','等級、日薪、訓練升級；最下面是招募。請了就是店裡的人，沒有解雇。員工分兩個名單，名額各算各的、互不佔用。<b>餐廳員工</b>分成廚師、服務生、清潔員三種，各有自己的名額，不能互相借（廚師的名額只能聘廚師）；每次擴建多哪一種寫在擴建的卡片上（例：披薩烤爐廚師 +1、私人包廂 I 和 III 服務生各 +1；休息室不加名額）。<b>Lounge 名單</b>是固定的幾個人：Evan 在 Lounge I 蓋好那天就在吧台，不用聘；沈晴、阿拓、安安、許葳要聘。每個人的卡片寫著在店幾天、熟悉哪裡。'],
-  ['新來的人','頭幾班會問東西放哪，做久的人會回答；剛排到 Lounge 的服務生頭幾班慢一點，待久了反而比較快。'],
-  ['廚師','LV1 只做簡單的菜，LV3 起也會接手 Jill 做到一半的菜；LV5 才做招牌菜和招牌甜點。新菜也一樣：有廚師做得來，就不用 Jill 自己做。自己的工作站沒事的時候，廚師也會去沒有廚師的工作站幫忙，一次一道。'],
-  ['服務生','帶位、點餐、收桌；LV2 起端菜，LV3 起結帳。做哪些在工作分配裡點。'],
-  ['清潔員','客人走後自動收桌，比服務生快。第一位清潔員是秀琴阿姨。'],
-  ['秀琴阿姨','Jill 認識很久的阿姨。還沒有清潔員的時候，很多晚上她會在快打烊時順路進來，幫忙擦一擦、收一收，收完就回家——不收桌、不招呼客人，店裡的事還是要你來。請第一位清潔員就是請她：之後營業時間她也在，跟其他清潔員一樣收桌。'],
-  ['晚點到','員工也有自己的事，有時候會晚點到，偶爾也會請一天假（當天開店時會說）。還沒到、或沒來的那段時間，他負責的工作沒有人做，日薪照付；到了就照常上工。'],
-  ['調酒師','Lounge 名單上的 Evan 和沈晴。Evan 是首席調酒師，Lounge 蓋好那天就在吧台；沈晴從 Lounge I 起可以聘。站在吧台倒酒；主廳和側廳點的酒也是他們倒、服務生端。'],
-  ['Jill 的空檔','沒有急事時她會回房間坐一下（穿過廚房，房間在廚房後面）：看電子書、看電視、跟網友打一場手遊、跟先生聊兩句、跟貓待著。員工夠、廚師把菜都接走的晚上，她大半個晚上都能休息。工作一來她馬上起身——你點桌子，她也會立刻回來，只是要多走一段。剛開店和快打烊的時候她都在主廳，迎接第一批客人、送最後一批客人走。']]},
- {ic:'🎁',h:'招待與熟客',sum:'招待是店主的一個動作；熟客的心是關係。兩件事各自算，誰都不會因為變熟而少了什麼。',pts:[
-  ['招待（你的）','營業中每張票券右上有「招待」：Jill 有空會端一杯飲料（或一份甜點）過去，算店裡請的，扣一份庫存。一天兩桌，票券上寫著還剩幾桌。'],
-  ['票券上的字','招待＝現在可以；集點卡・請甜點／紀念日・請甜點＝這桌已經有東西要送過去了；已招待＝這桌今天請過了；招待 0/2＝今天的兩桌用完了；沒東西可請＝冰箱裡沒有飲料或甜點。'],
-  ['Jill 自己請','等太久的客人，她可能主動請一杯（熟客更常）；這也是一天兩桌，跟你的分開算。'],
-  ['集點卡與紀念日','熟客每第 5 次來，Jill 會請甜點；王先生王太太的結婚紀念日也是。這些是約定，不受任何限制。'],
-  ['VIP 卡','來店 5 次的客人拿到 VIP 卡：餐廳、Lounge 都九折，吃完晚餐再去 Lounge 八折。來 10 次換成八折卡：都八折，吃完再去 Lounge 七折。一桌照桌上最好的那張卡算；單子上的名字旁邊會寫幾折。日誌的「VIP」分頁是 VIP 名單：誰有卡、哪一張、哪天拿到的，還有誰再來一次就有。'],
-  ['熟客','來過 2 次眼熟、4 次熟客、12 次老客人；老客人耐心多一點。日誌的「熟客」有他們的老位子、常點的菜和留言；最下面的「店裡的人」列著有名字的客人。升職、換工作、畢業這種事只會發生一次，之後記在卡片上。有故事的客人樣子跟頭像一樣，遠遠就認得出來。'],  ['最愛的一道、一杯','每位熟客和有名字的客人，都有一道最愛的菜、一杯最愛的酒或飲料。沒有人會直接告訴你：點到時他會說出來。知道以後，日誌會寫「最愛」，菜單上那一道旁邊會標 ♥ 和他的名字；放上菜單那天他多半會點。隨機選菜單也會稍微偏向有人最愛的菜。'],
-
-  ['Dylan','常常在打烊前才來的那位。他不是員工，也不用你招待。你認識他以後，他來的時候日誌會記一行，他的卡片會顯示最近幾天來了沒（●來了・◐門口看了一眼・○沒來）。客滿時他會晚點再來，打烊前來不及就只在門口看一眼。']]},
- {ic:'🪑',h:'商店：家具、工程、營運',sum:'打烊後（開店前也可以）用今天賺的錢把店變成你要的樣子。錢買得到的都看得到。',pts:[
-  ['家具與佈置','主廳最多 9 張桌；側廳最多 9 張，「側廳卡座」把整排換成卡座；露天桌 1–3 張。還有店裡的植物、燈、畫、椅子，和門口的布置。'],
-  ['店舖工程','擴建店面（評分夠高才能擴建），還有戶外區、大出菜口、冷藏庫、廚房擴建、側廳；後期有走入式冷藏庫和廚房二期。Lounge 的企劃出現以後也在這裡（I → II → III）。Lounge 蓋好以後，樓上的事就會慢慢開始；故事走到那裡，這裡會多「二樓（整層）」，之後是「二樓的房間」。租下二樓以後有一張二樓平面圖；「看看整層」是整層現在的樣子。'],
-  ['營運升級','動線規劃、門口候位區、後場整理區、大菜單板。空調三級：熱天客人的耐心少扣。電力設施兩級：跳電變少，最後不再跳電。商用洗碗機：收桌快三成。Lounge III 以後的 Bar 小廚／油炸站。每一級都畫在牆上。'],
-  ['夢想工程','都是存錢目標，結算下面會告訴你還差多少。整面玻璃店面、主廳主燈、木樑天花板與吊扇、貓的空中走道、委託的一幅畫、乾式熟成櫃。有 Lounge II 以後還有 Lounge 的酒窖（可以研發老藤卡本內）和 Lounge 的鋼琴（之後由予安一個禮拜彈三晚）。'],
-  ['季節佈置','家具與佈置的最下面：春櫻、夏日、秋楓、冬天的松枝，每張桌子中間一小枝。買過的那一套隨時可以換上或收起來；擺著的時候氛圍 +1，換了客人會注意到。'],
-  ['食材契作','廚房設備的最下面：有機農場、漁港直送、牧場直送。簽約付一次簽約金，之後每天付契作費。合約裡那幾道菜賣貴一點也不會被嫌（+8%），點的人也變多（+10%）；進貨不會變便宜。卡片上會估算一天多賺多少，隨時可以停。'],
-  ['貓咪生活','紙箱、睡墊、藤籃、隧道、貓窩、貓草、大跳台。側廳的東西分兩區：窗邊和最裡面那面牆（隧道、藤籃、貓窩）。'],
-  ['側廳的大窗','從窗邊貓架開始，一階一階加上去：軟墊窗台、多層窗邊步道、窗邊吊床、多貓觀景平台。每一階窗上都多一樣東西；上不上去是牠們自己決定的，窗上同時最多三隻，會在不同高度之間跳來跳去。卡片上寫著誰用過。'],
-  ['廚房設備','爐台、烤箱、咖啡吧、冷盤台、冰箱、平底鍋。升級後更快、位子更多。設備升滿以後，最下面的「後場工程」還有：走入式冷藏庫（食材容量 +140 份）、廚房二期（第二台咖啡機，咖啡吧多兩個出杯位；服務生多兩位）；有 Lounge 以後還有披薩烤爐（可以研發酒吧披薩；廚師多一位，顧烤爐）。'],
-  ['先留一點錢','商店上方會顯示明天的基本備料大約要多少、建議保留多少。買太多不會擋你，但會提醒你。'],
-  ['存錢目標','開店前會寫一個存錢目標：只列現在真的買得到的東西，還差多少、大約幾天。'],
-  ['看店裡','商店和開店前畫面都有「看店裡」，看的時候可以切房間。']]},
- {ic:'💰',h:'每天的帳',sum:'營業額和小費在營業中進來；食材是開店前就付了；打烊以後付酒水、租金和薪水。',pts:[
-  ['結算','營業額、食材成本、酒水成本、薪資、租金、食材契作、鋼琴演奏、品酒之夜分潤、小費、任務獎勵，最後是今日淨利。淨利下面另外一項「今天的店」，一行一項：天氣、Lounge、包廂、VIP 卡、宣傳……。品酒之夜和主廚之夜那晚，Lounge 只寫那一行。'],
-  ['酒水成本','每倒一杯酒——在 Lounge 或晚餐桌上——就是那杯酒的進貨成本，大約售價的三成。酒不用備料，倒了才算。'],
-  ['租金','每天付，跟店的大小走：主廳每擴建一次就高一點；側廳、戶外區、廚房擴建、Lounge、二樓各有自己的一份。結算會一項一項列出來。剛開的小店一天 $300。'],
-  ['薪水','日薪跟等級走：剛來的時候最便宜，每升一級都多一截，LV5 是剛來時的五倍多（廚師 LV1 一天 $304、LV5 一天 $1,690）。'],
-  ['錢不夠的時候','收銀機不會變成負的，付到 $0 為止，不會欠到明天。開店頭十天，要是打烊時付完當天的開銷剩不到 $300，秀琴阿姨會借你 $3,000——每次不夠都會借。結算時錢超過 $20,000，就會把欠她的全部還掉。']]},
- {ic:'⭐',h:'招牌菜與招牌甜點',sum:'兩道只屬於 Jill 的東西，各自有自己的進程。',pts:[
-  ['招牌菜','從主食、蛋白質、醬汁、配菜組一道（$3,000，改配方 $800）。永遠在菜單最上方，客人會專程為它來（客流 +10%）。在爐台用平底鍋做。賣到 40 份換第二版（醬汁畫盤與嫩葉），110 份第三版（食用花與金箔），價格也高一點。'],
-  ['招牌甜點','有了招牌菜、擴建到 Jill\'s Restaurant、有冷盤台之後可以研發（$4,000，改配方 $800）：底、奶餡、水果、點綴四樣。排在招牌菜下面，為招牌菜來的客人多半會一起點。在冷盤台冷作擺盤。賣到 30 份換第二版（果泥畫盤與薄荷），80 份第三版（糖絲與金箔）。'],
-  ['誰來做','LV5 的廚師會接手這兩道。'],
-  ['在哪裡看','商店的「招牌菜」分頁；日誌的「熟練度」也有它們。']]},
- {ic:'🍷',h:'Lounge：留下來的地方',sum:'主廳是吃飯，側廳是聚餐，Lounge 是留下來。它本來是隔壁 Madame Lin 開了很多年的酒吧，不是升級選單裡冒出來的。',pts:[
-  ['怎麼來的','店門口右邊是 Madame Lin 開了很多年的酒吧，開店那天她就是鄰居；Jill 一開始不賣酒——想喝酒，隔壁就有。品酒師 Ken 會問「妳真的不賣酒？」，之後晚餐桌上才有配菜的酒。過一陣子 Madame Lin 會說她做到月底。Jill 看過隔壁以後自己決定要不要接，選「再想想」也不會不見。接了，等她最後一晚過了，在「店鋪工程」按「簽約・開工」；改裝兩天，The Lounge 就開幕，Evan 留下來。'],
-  ['Lounge I／II／III','I：吧台六個位子（坐得開，不會肩碰肩）、三張小桌、一面酒牆（三種酒）。II：吧台加長、轉成 L 型——調酒師在 L 裡面，靠牆那一頭留了進出的口——九個位子（一樣坐得開）；多一張小桌、四人沙發、有燈的酒櫃（五種酒），Lounge 名單多阿拓、安安、許葳。III：最裡面一個安靜的角落。'],
-  ['安安','來的時候就是 LV2，排在「Lounge 外場」：先顧 Lounge 的桌子，沒事才去主廳幫忙。Lounge 的小點在廚房做，從後場遞到 Lounge 吧台的那一頭，由她送過去。出菜口的「送菜」只送主廳、側廳的菜。'],
-  ['要有調酒師','Lounge 蓋好那天，Evan 就在吧台後面；把吧台的人都移開的話，Lounge 那晚不開。調酒師倒酒、送酒。點單、結帳、送小食由「Lounge 外場」的服務生做，沒人負責時調酒師自己來。'],
-  ['客人怎麼用','客滿的時候，等桌的人會先坐吧台喝一杯，位子好了再過去（帳是分開的，不會多算一次來店）；吃完飯的人有些會留下來再喝一杯；也有人晚一點專程來。主廳、側廳桌上的酒，從此由調酒師倒、服務生端。'],
-  ['晚餐後八折','在主廳或側廳吃完飯、再到 Lounge 坐的客人，Lounge 那一單打八折（酒和小點都算，每樣四捨五入到 $5）；知道有折扣，吃完留下來的人會多一點。結算「今天的店」的 Lounge 下面會寫「吃完留下 n 位・晚餐後折扣 −$…」。'],
-  ['Bar Food','炸雞塊、起司可樂餅、起司拼盤、水牛城雞翅、起司條（II 起多蒜香蘑菇、生蠔；III 起多德國豬腳）。在同一個廚房做，不佔菜單名額，備料在同一台冰箱。Lounge 生意好，廚房就忙。'],  ['酒吧披薩','後場工程的「披薩烤爐」（要先有 Lounge）蓋好以後，「菜單研發」可以研發三種披薩：酒吧披薩、瑪格麗特披薩、蘑菇白醬披薩，試做的食材多了「披薩麵團」。披薩是 Lounge 的小點，不佔菜單名額；兩個人以上、或來看球的客人比較常點。在「工作分配」把一位廚師排到「披薩烤爐」；烤爐沒有自己的廚師時，其他廚師有空會過去，沒有廚師才是 Jill 自己烤。'],  ['主廚之夜','Lounge II 以後、有了招牌菜，可以在「店舖工程」的 Lounge 那一段排主廚之夜，排在明晚；前一天的新聞會寫「明晚｜主廚之夜 · N 席」。主廚之夜是包場：那一晚整個 Lounge 都是主廚之夜的客人。三道是 Jill 最拿手的前菜、招牌菜、招牌甜點，每道配一杯，一道一道上。每位 $1,800（含酒）。一週最多一次，不跟品酒之夜同一晚。'],  ['電視與音響','「家具與佈置」最下面的「Lounge 的家具」：Lounge 大電視（$200,000），有比賽的晚上（大約一週兩晚）轉播，會多看球的客人，小點點得多。電視音響系統（$150,000，要先有電視）讓看球的人更多，沒有比賽的晚上放音樂。結算的 Lounge 下面會寫「有比賽轉播」。'],
-
-  ['酒單研發','「菜單研發」的最下面：粉紅氣泡酒、橘酒、黑皮諾、招牌調酒「晚安」、香檳、老藤卡本內（要有酒窖）。價錢和研發一道菜差不多，研發一次就能在 Lounge 倒。每一支都有配的菜或客人，那一桌更常配一杯、更常留下來。今晚倒的酒裡每多一支研發過的，留下來的人多一點（最多 +15%）。'],
-  ['今晚倒哪幾種','開店前，「今日菜單」下面有「Lounge 酒單」：每一種酒都可以開或關，至少留一種；Lounge 的客人只會點今晚有倒的。酒吧小點在上面的菜單裡，不佔菜單名額，名額旁邊會寫「＋ 酒吧小點 幾道（不佔名額）」。'],
-  ['品酒課','員工頁每位服務生的卡片上（有 Lounge 以後）：$12,000，上完對酒就「自在」了。外場懂酒的人多，主廳、側廳吃飯的客人更常點一杯。'],
-  ['Lounge 的人怎麼升級','Lounge 名單上的人是在店裡邊做邊學的：訓練升級一天最多一級，先讓他上一天班再說。'],
-  ['品酒之夜','Lounge 開了以後，Ken 會提議在 Lounge 辦品酒之夜（品酒會只有 Ken 辦）。那一晚整個 Lounge 都留給品酒的客人，酒照杯算。前三次 Ken 自己排；「晚餐之後」出來以後，開店前的新聞會問「品酒之夜｜今晚要辦嗎？」，按「今晚辦」就是今晚，也可以按「這次不辦」。一週最多一次，不跟主廚之夜同一晚。品酒的收入扣掉成本，三成是 Ken 的「品酒之夜分潤」——他本來說友情主持就好，是 Jill 堅持要給。'],
-  ['鋼琴與予安','鋼琴買來以後，一開始沒有人彈。過一陣子，一位常來 Lounge 的客人——予安——會成為固定的鋼琴師：一個禮拜彈三個晚上。那幾晚開店前的新聞會寫「今晚｜予安在 Lounge 彈琴」，吃完飯留下來的人比較多；每晚付她演奏費 $2,500，結算會列一行「鋼琴演奏」。她不彈的晚上，鋼琴就安靜地放著。'],
-  ['晚餐之後','Ken 辦過三次品酒之夜以後，會和 Jill 一起做一支酒：「晚餐之後」（JILL\'S KITCHEN × KEN），一支輕盈的紅酒，配 Jill 的招牌菜。酒進來以後就一直在 Lounge 的酒單上，一杯大約 $420；不用研發，也可以在「Lounge 酒單」關掉。'],
-  ['帳','結算的晚上會寫「Lounge 幾桌・營業額・吃完留下幾組」。營業額是 Lounge 那幾桌付的錢，不含小費，跟下面「Lounge 今天賣了什麼」的合計一樣；Lounge 的小費另外一行，晚餐桌上配的酒也另外一行。員工那一欄寫調酒師調了幾杯。']]},
- {ic:'🚪',h:'二樓：休息室與包廂',sum:'二樓整層租下來的時候，就一起隔出一間給店裡的人的員工休息室，其他地方先空著；給一桌人的包廂，是之後從店裡的日子裡長出來的。',pts:[
-  ['怎麼來的','二樓的房間都不是升級選單裡冒出來的。店裡的人連坐下來的地方都沒有，打烊後 Jill 自己看見了（《大家待的地方》），才打給房東；所以休息室是跟整層一起來的。之後有客人想要安靜、不被打擾的位子（《關上門以後》），包廂的企劃才會出現在「店舖工程 › 二樓的房間」，選「之後再說」也不會不見。'],
-  ['員工休息室','二樓的一間房，給店裡的人換班、等人、坐一下。營業中手上沒事的服務生、清潔員會輪流上去坐一會兒，切到「休息室」就看得到；打烊後廚房和吧台的人也會上去。I 就是完整的房間；II 多一張撞球台和每個人自己的東西；III 多一張按摩椅，是用久了的樣子。有些晚上打烊後會有人打一局撞球。這些都只是他們的日子：沒有分數，也不用管。二樓一次只做一件工程；休息室不是用餐區，不加座位，也不加員工名額。'],
-  ['誰會上去','早到的先上去坐一下；店裡不忙時，外場偶爾上去喘口氣；打烊後有人上去坐一下才回家。客人不會進去。不用你安排，也沒有要照顧的數值。'],
-  ['私人包廂','二樓臨街窗前最大的那一間，有一扇可以關上的門。I：4–6 位；II：4–8 位；III：4–10 位，最少都是 4 位。上一階用過一陣子才能升級。服務生名額 I 和 III 各 +1。'],
-  ['預約','訂位會自己進來，一個晚上最多一組，不用接電話也不用排。開店前的新聞會寫「今晚｜私人包廂｜已預約」、幾位、哪一種聚餐、最低消費。剛蓋好的頭一兩個晚上就會有人訂；之後不會每晚都有，II、III 會越來越常。有預約的晚上，包廂留給他們，就算還沒到也不會讓別人坐。'],
-  ['最低消費','訂位的時候就定了：照這麼多人、這種聚餐平常會點的菜和當天的價錢來算，訂在稍低一點（包廂越完整，越接近他們會吃的）；人越多越高。之後漲價、包廂升級、存檔重開，都不會改。預約的那一桌照常點菜、吃飯、結帳：吃得比最低消費多就照實算，少了就收最低消費——客人不會為了湊低消多點。'],
-  ['沒有預約的晚上','4 位以上、坐得下的客人可以直接坐包廂，照常算，沒有最低消費。熟客和 Lounge 的客人照舊坐他們的位子。結算的晚上會寫「包廂 幾組」；預約的那一桌吃得比最低消費少的話，也寫補足了多少。']]},
- {ic:'🛋️',h:'Jill 的房間',sum:'廚房後面那一間，是 Jill 自己住的房間——從第一天就在。不是工程，不用買，也沒有要照顧的數值。',pts:[
-  ['怎麼進去','房間分頁的最後一個「房間」（點開寫著「Jill 的房間」）。也可以在廚房點右手邊那扇淺木門（寫著「房間 ›」）；在房間裡點門口的「‹ 廚房」回到廚房。Jill 也是走那扇門；房間另外有一扇自己的門，通到後巷。'],
-  ['裡面有什麼','窗下那張燕麥色沙發、可以推過來推過去的電視、一張雙人床、一張堆滿書和講義的書桌、貓抓板、貓床、兩個收在淺木櫃裡的貓砂盆、放飼料和水的貓碗架，還有從主廳搬進來的那座貓跳台。主廳原本放沙發的地方空了出來，留給走道。'],
-  ['Jill 在房間','營業中沒事的時候，她會回房間坐一下（剛開店和快打烊的時候除外，那時她在主廳）；打烊後把出菜口擦一擦，就回房間。她會自己找事做：把電視推過來看、跟網友打手遊、跟書桌前的先生聊兩句、走到他背後看他在忙什麼、傳訊息給他、叫貓過來（牠們不一定來）。看電子書只在房間。沙發被貓佔滿的晚上，或她想換個地方的時候，她會坐在床邊看書。'],
-  ['貓的家','房間是五隻貓的家，不是關牠們的地方：營業中牠們一樣在店裡走來走去，也會自己回房間。樾樾幾乎都待在房間；柔柔愛在店裡晃，睡覺會回房間；小齁偶爾跑回房間喵一聲；包包在房間睡，也會在店裡最熱鬧的地方睡；寶寶喜歡房間，偶爾出來看看。打烊以後回房間的貓多一點，但不會一下子全部回去。'],
-  ['樾樾等 Jill','樾樾很怕生，客人走光了也不太敢出來。等他跟店裡的人熟了，打烊以後他會出來，在廚房門口等 Jill，再跟她一起回房間。']]},
- {ic:'🐈',h:'五隻店貓',sum:'樾樾、小齁、寶寶、柔柔、包包住在店裡。不用餵、不用照顧，牠們有自己的生活。',pts:[
-  ['個性','樾樾黏 Jill、怕生，大部分時間在 Jill 的房間；小齁愛玩也黏人；寶寶天生明星，總坐在好看的位子；柔柔有點傻，愛埋伏寶寶；包包很會睡。'],
-  ['點牠們','可以摸，但牠們不一定理你。點睡著的包包，他會睜一下眼、動動耳朵尾巴——然後繼續睡。在 Jill 的房間裡的貓也一樣可以摸。'],
-  ['偷吃（從來沒成功）','小齁看到炸物、寶寶看到牛排，偶爾會跳上客人的桌子想偷吃。不是每次，也從來沒成功：客人或 Jill 一句話，牠們就跳下去，盤子沒事。包包想吃雞腿，但大多只是坐在桌子底下抬頭看。'],
-  ['寶寶和熟客','寶寶偶爾會從房間出來，走到認得她的客人旁邊叫一聲「喵～」；對方通常當場融化。'],
-  ['客人也看貓','客人會轉頭看貓、微笑，有人會拿手機拍一張。等太久的客人，親人的貓有時會去陪一下。常來的客人會慢慢認得某一隻，叫得出名字。'],
-  ['牠們不出門','貓只在店裡，窗邊再熱鬧也是在窗戶裡面。二樓是店裡的以後，偶爾會有一隻上樓待一會兒，再自己下來。門口的狗是客人帶來的，有五種：博美、臘腸、米克斯、垂耳、黃金獵犬。買了狗狗休息角（門邊的小木屋），牠會在屋前等主人。'],
-  ['名字','在餐廳日誌的「店貓」可以直接改名字。']]},
- {ic:'🧪',h:'料理研發',sum:'每種食材都寫著它的角色和味道。用看得到的資訊推理，不是猜密碼。',pts:[
-  ['怎麼選','先選一個主角（主體／飲品基底／甜點基底），再配配料、調味或醬汁。選好會先看到相性、整體味道、可能適合哪個工作站。'],
-  ['試做的結果','大成功＝就是這道菜；成功料理＝多了一種食材也做出來了；有潛力＝方向對了，告訴你哪些是對的、還缺哪一種，累積三次研究進度就完成；普通試作品＝會說為什麼（缺少主體、味道太重、甜鹹混在一起…）。'],
-  ['相性','一起出現在菜單上的食材、或試做證明過的組合，會標「很好」。其他依角色判斷「可以」或「不合」。'],
-  ['急的話','每道菜也可以直接買食譜；做熟了還能升到 3 星。']]},
- {ic:'📖',h:'餐廳日誌',sum:'店的紀錄：總覽、故事、餐廳、社群、評價、熟客、話語、相簿、店貓、成就、熟練度。',pts:[
-  ['在哪裡','開店前和商店在右上的書本；營業中在暫停選單的「餐廳日誌」；結算畫面右上也有。'],
-  ['故事','見下面「故事」那一節。'],
-  ['餐廳','營業紀錄（單日最高營業額、最多客人、最高評分…），還有員工與開銷。'],
-  ['社群','最近大家在談什麼、Jill 可以發的貼文、宣傳。營業中只能看；發文和宣傳在開店前或打烊後。'],
-  ['評價','所有客人的評論；具名的常客會有他們的臉。神秘美食評論家的評論權重是三倍。評論寫的是客人那天真的遇到的事（等太久、賣完、一杯酒、Lounge、貓）；上面的「最近大家在說」是最近評論和貼文最常提到的。'],
-  ['話語','每天店裡說過的話，一句一句、按時間，誰說的就寫誰——一整天的都在。營業中點左上的 💬 也看得到，可以往下捲，右上的 × 關閉。'],
-  ['相簿','店裡的日常剛好被看到時，會留下一張照片。每種畫面的第一張會珍藏，其他最多留 240 張，舊的慢慢換新。相簿從開店那天開始，一直翻得回去；結算畫面的「看今天的照片」直接跳到今天。故事真的走到某一步時，會多一張故事照片，永久保存。新的地方也有自己的畫面，例如下班以後的一局撞球。'],
-  ['熟客','來過的熟客、老位子、最愛（知道以後）、常點的菜、留言與集點卡；最下面「店裡的人」是來過的有名字的客人。']]},
- {ic:'📜',h:'故事',sum:'店裡的人會慢慢認得彼此，有些關係會一段一段往前走，店自己也是。不是任務——只是記下來。',pts:[
-  ['兩個部分','「餐廳故事」是這間店自己的故事，一章一章往前；「人物／關係支線」是店裡的人和他們之間的故事。'],
-  ['一段一段','每個故事寫著一共幾段、看過幾段（●━○），每一段都有編號。看過的寫著是哪一天（太久以前、沒有記下日期的寫「更早以前」）；還沒看過的只寫「？？？」——什麼時候發生，要看他們自己，你不用做什麼。還沒開始的故事只會是一個「？？？」。'],
-  ['故事更新','有新的一段時，房間分頁下面會跳一個小通知；點它直接看那一段。'],
-  ['店裡暫停中','重要的故事在營業中發生時，店裡會整個停住：時間、訂單、客人的耐心都不動，上方寫著「店裡暫停中」。例如 Ken 的故事、予安和鋼琴的故事、戀愛的故事，還有每一段有插圖的。一句一句點著看，想看多久都可以；看完從停住的那一刻接著營業。其他小事照樣在店裡發生，不會停。'],
-  ['今天的故事','每日結算有一欄「今天的故事」：今天往前走了的每一段、發生了什麼，點「看故事頁」直接過去。'],
-  ['忙的時候錯過了','沒關係：每一段點開可以看那天的經過和當時說過的話（只收那一段自己的話，旁邊別人說的不算）。當天說過的所有話也都在「話語」。'],
-  ['朋友和戀人','有些是友情（例如 Ken 和 Monsieur 杜，總是談不攏的兩個人），有些慢慢變成別的——你看得出來的時候就是了。'],
-  ['留下來的東西','有些故事會在店裡留下東西（一塊小貓墊、一盆植物），和一張故事照片。'],
-  ['插圖','有幾段故事有一張插圖，跟那段對話一起出現。營業中跳出插圖時，店裡會停住，點完才繼續。看過以後，故事裡那一段有「看插圖」，可以再打開。'],
-  ['店外的生活','員工也有店外的生活：家人、搬家這些事。有些會一段一段發生在店裡——誰晚點到、誰走到熟客桌邊多聊了幾句（說完就回去工作，廚師不會離開廚房）。']]},
- {ic:'📣',h:'社群與宣傳',sum:'大家在談什麼、Jill 要發什麼、要不要花錢讓更多人知道。都是真的發生過的事。',pts:[
-  ['在哪裡','第 6 天起：開店前的畫面有一行「社群與宣傳」，點了直接打開；商店的「社群與宣傳」分頁（在「店舖工程」旁邊）；日誌的「社群」也看得到——營業中只能看，發文和宣傳在開店前或打烊後。'],
-  ['客人的貼文','客人只會寫他們那天真的遇到的：看到哪隻貓、吃了哪道菜、坐在哪裡。'],
-  ['照片和讚','每一則貼文都有它的照片：Jill 發的是她選的那張相簿照片，客人發的是他拍的東西——那道菜、那隻貓、吧台的燈。讚會一直慢慢多，舊的貼文也是：貓的最多，Momo 很多，Jill 的要看店有多紅，一般客人幾個。最近的六則在上面，「看更早的貼文」可以全部看。'],
-  ['Jill 的貼文','每天最多三個候選，都是這幾天真的發生的事（新菜、新的一間、相簿裡的一張照片）；發了以後三天，會有人為了那件事來，那道菜點的人也會變多。'],
-  ['宣傳','選現在想讓誰知道 Jill\'s Kitchen，持續三天：在地、料理、側廳／聚餐、店貓、晚餐／酒單（有 Lounge 以後）。開店前買的當天開始，打烊後買的隔天開始。'],
-  ['看得出來','看到宣傳來的客人，票券上名字旁有 📱，有些人會說他們是為了什麼來的；結算的標籤會寫今天有幾組；宣傳結束後的新聞列出這三天真正的數字。'],
-  ['不是買熟客','宣傳只把人第一次帶進來。會不會再來，看那一頓。']]},
- {ic:'💾',h:'存檔與備份',sum:'進度都在這台裝置的瀏覽器裡。換手機前，先備份成一個檔案。',pts:[
-  ['自動存檔','每天打烊、每次購買，還有營業中每 20 秒、暫停、切到別的 App 時，都會存下當下的店內狀況。下次打開可以從那個時間點繼續。'],
-  ['手動存檔','營業中：暫停 → 設定・存檔・備份，裡面有【儲存目前進度】，上面寫著最後儲存的時間。'],
-  ['備份到檔案','設定 → 備份到檔案，會下載一個 .json。從備份檔恢復時會先檢查檔案，確認沒問題才覆蓋現在的進度。也可以複製／貼上備份文字。'],
-  ['舊存檔','主廳超過 9 張桌的舊存檔載入時，多的桌子會搬到側廳（側廳放不下就按原價退還），打烊後的新聞會說明。'],
-  ['清除瀏覽器資料','會連存檔一起清掉。備份檔留著就不怕。']]}];
-/* rc8 (the player, 2026-10-03: 「每個空間等他出現才出現在說明書吧」 — the manual of an 80-day save had all of them, and a new
-   shop's had them too): the manual shows a space once the shop has met it. A section, an entry or one line about a room
-   the shop does not have yet is left out when the manual opens, and a line can lose only the words about that room.
-   GUIDE keeps every word (the release audit and the tests read all of it); this is only what the page shows today. */
-function guideHas(){const F=k=>!!fact(k),L=loungeLv()>0,up=upTaken();return{side:projOn('side'),ter:projOn('terrace'),kext:projOn('kext'),L,LP:L||F('lounge_project'),wine:L||F('pairing_wine'),UPA:up||F('up_ask'),up,sr:up&&(F('sr_story')||srOn()),pd:up&&(F('pd_story')||pdOn()),srB:srBuilt(),pdB:pdBuilt()}}
+const GUIDE=[   /* the manual describes the game as it is. Audited every release (docs/RELEASE_CHECKLIST.md) — last: v2.4 rc8 audit 2026-10-06, rewritten from docs/audit/2026-10-06/ws5_manual.md: the first card is how a day is played; only what the screen does not tell and a player needs to know stays (what the screen already says, how the game was built, old saves and stories still to come left it); a space, and a story's own entry, comes into it when it is there */
+ {ic:"🍳",h:"一天怎麼玩",sum:"第一次玩，先看這一張。",pts:[
+  ["一天","開店前選今天的菜單、備料 → 17:00 開店 → 21:30 打烊，客人吃完就結算 → 用今天賺的錢在商店買東西 → 準備下一天。前兩天開店時，遊戲會自動幫你補好備料（照價付）。"],
+  ["營業中","客人會自己找空桌坐。桌上出現紅色「!」：點桌子點餐。到廚房點訂單上的菜（或亮著「+」的設備）開始做，照料理台上的指示做完。桌上出現銀色餐蓋：點桌子把菜端過去。出現金幣：點桌子收錢；客人走了再點一次收桌。"],
+  ["員工","請了廚師、服務生、清潔員，他們會自己接工作。Jill 有空時會回房間坐一下，你點桌子她就回來。"],
+  ["故事","重要的故事發生時，店裡會整個停住；一句一句點著看完，店才接著營業。錯過的都在「餐廳日誌」。"],
+  ["暫停","營業中點右上的「II」：調營業速度、看日誌、存檔備份、提早打烊。"],
+  ["換手機以前","進度只存在這台裝置的瀏覽器裡：設定 → 備份到檔案。"],
+ ]},
+ {ic:"🍽️",h:"營業中",sum:"畫面上看不出來、但很好用的事。",pts:[
+  ["房間","票券列下面的分頁是店裡的每一間：店門口・主廳・側廳・二樓（租下以後）・休息室・包廂（蓋好以後）・Lounge（蓋好以後）・廚房・房間。Lounge 是隔壁的店，在店門口點它的門進去。上二樓的樓梯門在側廳。"],
+  ["帶位","有空桌客人會自己坐；想指定順序，點那組客人（在「店門口」），再點空桌。"],
+  ["找人","點訂單上的桌號或名字，會切到那一桌。畫面下方誰說了一句話，點那句話就找得到他。"],
+  ["出菜口","在廚房點出菜口，Jill 會把做好的菜都送出去。服務生 LV2 起會自己端，LV3 起會結帳。"],
+  ["庫存不夠","左上「庫存」或廚房的冰箱：每道菜有「補滿」，一按就到（1.5 倍價）。客人點到沒貨的菜，Jill 也會自動叫貨。"],
+  ["配菜的酒","晚餐桌上的酒不用備料：倒一杯算一杯的成本，大約售價的三成。客人點了，服務生或 Jill 在出菜口倒好端過去。Lounge 開了以後由調酒師倒。"],
+  ["招待","每張票券右上的「招待」：Jill 有空會端一杯飲料或一份甜點過去，算店裡請的。一天兩桌。"],
+  ["今日任務","每天幾個小目標，開店前就看得到；營業中點上方的「今日任務」看進度，做到了結算有獎金。"],
+  ["評分 ★","上方的 ★ 是最近客人評價的平均：越高客人越多。擴建到 Jill's Restaurant 起，每一次擴建都要評分夠。"],
+ ]},
+ {ic:"🧊",h:"開店前",sum:"今天賣什麼、準備多少。",pts:[
+  ["備料","「一鍵補到建議量」照預估把每道菜補好，也可以每道自己調。冰箱裝不下時會先少放一點，畫面上會說。"],
+  ["售價","每道菜可以調價；客人有自己的預算，太貴會有人抱怨。"],
+  ["工作站沒人","菜單需要的工作站今天沒人顧，開店前會提醒；在商店「員工」最上面的「工作分配」調整。"],
+ ]},
+ {ic:"🛒",h:"打烊以後",sum:"結算、商店，店怎麼長大。",pts:[
+  ["商店分頁","一開始只有「家具與佈置」：第 2 天多廚房設備、菜單研發；第 3 天店舖工程；第 4 天貓咪生活、員工；第 6 天社群與宣傳；第 7 天招牌菜。灰色的分頁點了會說哪天開。"],
+  ["擴建","在「店舖工程」：Jill's Bistro（第 4 天打烊後，$5,000）→ Jill's Restaurant（評分 3.9，$16,000）→ Jill's Fine Dining（4.3，$40,000）→ JILL（4.6，$90,000）。每擴建一次，桌位、菜單、員工名額都會多。"],
+  ["員工","請了就是店裡的人，沒有解雇。<b>餐廳員工</b>分成廚師、服務生、清潔員，各有自己的名額，不能互相借；擴建或工程多哪一種，卡片上寫著。<b>Lounge 名單</b>另外算，跟餐廳員工互不佔用。"],
+  ["廚師","LV1 只做簡單的菜，LV3 起會接手 Jill 做到一半的菜，LV5 才做招牌菜和招牌甜點。"],
+  ["晚點到","員工偶爾會晚點到，或請一天假（開店時會說）；沒到的那段時間，他的工作沒人做，日薪照付。"],
+  ["清潔員","請第一位清潔員就是請秀琴阿姨。"],
+  ["租金","每天付，跟店的大小走；新的空間各有自己的一份，結算會一項一項列出來。"],
+  ["錢不夠的時候","收銀機不會變成負的。開店頭十天，打烊時付完開銷剩不到 $300，秀琴阿姨會借你 $3,000；結算時錢超過 $20,000 就會還她。"],
+  ["招牌菜","第 7 天起、擴建到 Jill's Bistro 以後可以研發（$3,000）：永遠在菜單最上方，客人會專程為它來。賣得越多，盤子越講究，價格也高一點。"],
+  ["招牌甜點","有了招牌菜、擴建到 Jill's Restaurant、有冷盤台以後可以研發（$4,000）。"],
+  ["食譜","研發猜不出來的話，每道菜也可以直接買食譜；做熟了還能升到 3 星。"],
+ ]},
+ {ic:"🎁",h:"熟客",sum:"常來的人，會慢慢認得。",pts:[
+  ["熟客","來過 2 次眼熟、4 次熟客、12 次老客人；老客人耐心多一點。日誌的「熟客」有他們的老位子和常點的菜。"],
+  ["最愛","每位熟客都有一道最愛的菜、一杯最愛的酒或飲料，點到時他會說；知道以後，菜單上那一道旁邊會標 ♥。"],
+  ["VIP 卡","來店 5 次的客人拿到 VIP 卡：餐廳、Lounge 都九折，吃完晚餐再去 Lounge 八折。來 10 次換成八折卡：都八折，吃完再去 Lounge 七折。一桌照桌上最好的那張卡算。"],
+ ]},
+ {ic:"🍷",h:"Lounge：留下來的地方",sum:"隔壁的酒吧：吃完飯，留下來喝一杯的地方。",pts:[
+  ["要有調酒師","吧台要有人，Lounge 那晚才會開；把吧台的人都移開就不開。主廳、側廳點的酒也是調酒師倒。"],
+  ["Lounge 的人","Evan 在 Lounge 蓋好那天就在吧台，沈晴可以聘。Lounge II 起多阿拓、安安、許葳。他們一天最多訓練一級。"],
+  ["晚餐後八折","在主廳或側廳吃完、再到 Lounge 坐的客人，Lounge 那一單打八折；知道有折扣，留下來的人多一點。"],
+  ["小點","酒吧小點在同一個廚房做、用同一台冰箱，不佔菜單名額；做好由「Lounge 外場」送過去，出菜口的「送菜」只送主廳、側廳的菜。"],
+  ["今晚的酒單","開店前「今日菜單」下面的「Lounge 酒單」：每一種酒可以開或關，客人只點今晚有倒的。研發過的酒越多，留下來的人越多。"],
+  ["主廚之夜","在「店舖工程」的 Lounge 那一段排在明晚：整個 Lounge 包場，三道菜各配一杯，每位 $1,800。一週最多一次。"],
+  ["品酒之夜","Ken 辦的晚上，整個 Lounge 留給品酒的客人。一週最多一次，不跟主廚之夜同一晚。收入扣掉成本，三成是 Ken 的分潤。"],
+  ["鋼琴","予安一個禮拜彈三晚，那幾晚留下來的人比較多；每晚付她演奏費 $2,500。"],
+  ["Lounge 的帳","結算寫「Lounge 幾桌・營業額・吃完留下幾組」；Lounge 的小費、晚餐桌上配的酒各另外一行。"],
+ ]},
+ {ic:"🚪",h:"二樓",sum:"整層租下來以後，店裡多出來的地方。",pts:[
+  ["員工休息室","給店裡的人坐一下的地方：不是用餐區，不加座位，也不加名額。誰上去不用你安排。"],
+  ["私人包廂","臨街那間有門的房間，給 4 位以上的一桌。訂位會自己進來（一晚最多一組），開店前的新聞會寫「今晚｜私人包廂｜已預約」；有預約時包廂留給他們。"],
+  ["最低消費","預約的那一桌吃得比最低消費少，就收最低消費；吃得多就照實算。沒有預約的晚上，4 位以上的客人可以直接坐，沒有最低消費。"],
+  ["工程","二樓一次只做一件工程。"],
+ ]},
+ {ic:"🛋️",h:"Jill 的房間",sum:"廚房後面那一間，Jill 住的地方。",pts:[
+  ["怎麼進去","房間分頁的最後一個；或在廚房點右手邊那扇淺木門。在房間點門口的「‹ 廚房」回去。"],
+ ]},
+ {ic:"🐈",h:"五隻店貓",sum:"樾樾、小齁、寶寶、柔柔、包包。不用餵、不用照顧，牠們有自己的生活。",pts:[
+  ["點牠們","可以摸，牠們不一定理你；房間裡的貓也一樣。"],
+  ["名字","在日誌的「店貓」可以改名字。"],
+ ]},
+ {ic:"📖",h:"日誌與故事",sum:"店的紀錄、故事和照片都在這裡。",pts:[
+  ["在哪裡","開店前和商店在右上的書本；營業中在暫停選單；結算畫面右上也有。"],
+  ["話語","一整天店裡說過的話，誰說的就寫誰；營業中點左上的 💬 也看得到。"],
+  ["故事","每個故事寫著一共幾段、看過幾段；還沒看過的寫「？？？」——什麼時候發生要看他們自己，你不用做什麼。"],
+  ["故事更新","有新的一段時，房間分頁下面會跳一個小通知，點它直接看那一段。"],
+  ["錯過了","每一段點開，可以再看那天的經過和當時說過的話；有插圖的段落可以「看插圖」。"],
+  ["留下來的東西","有些故事會在店裡留下一樣東西，相簿也會多一張故事照片。"],
+ ]},
+ {ic:"📣",h:"社群與宣傳",sum:"大家在談什麼、Jill 要發什麼、要不要花錢讓更多人知道。",pts:[
+  ["在哪裡","開店前畫面的「社群與宣傳」、商店的分頁、日誌的「社群」。營業中只能看；發文和宣傳在開店前或打烊後。"],
+  ["發文","Jill 每天最多有三則可以發；發了以後三天，會有人為那件事來，那道菜點的人也會變多。"],
+  ["宣傳","選一群想讓他們知道的人，持續三天：開店前買的當天開始，打烊後買的隔天開始。宣傳只把人第一次帶進來，會不會再來，看那一頓。"],
+ ]},
+ {ic:"💾",h:"存檔與備份",sum:"進度都在這台裝置的瀏覽器裡。",pts:[
+  ["自動存檔","每天打烊、每次購買，營業中每 20 秒、暫停、切到別的 App 時都會存；下次打開，從那個時間點繼續。"],
+  ["手動存檔","營業中：暫停 → 設定・存檔・備份 →【儲存目前進度】。"],
+  ["備份到檔案","設定 → 備份到檔案，會下載一個 .json；恢復時會先檢查檔案，沒問題才覆蓋。也可以複製／貼上備份文字。"],
+  ["清除瀏覽器資料","會連存檔一起清掉。備份檔留著就不怕。"],
+ ]},
+];
+function guideHas(){const F=k=>!!fact(k),L=loungeLv()>0,up=upTaken();return{side:projOn('side'),ter:projOn('terrace'),kext:projOn('kext'),L,L2:loungeLv()>=2,sig:!!S.signature,kt:F('ken_t1'),ya:F('ya_join'),social:shopDay()>=6,wine:L||F('pairing_wine'),up,sr:up&&(F('sr_story')||srOn()),pd:up&&(F('pd_story')||pdOn()),srB:srBuilt(),pdB:pdBuilt()}}
 const GUIDE_WHEN={
- sec:{'Lounge：留下來的地方':h=>h.LP,'二樓：休息室與包廂':h=>h.up},
- pt:{'開店與料理|配菜的酒':h=>h.wine,'Jill 與員工|調酒師':h=>h.L,'商店：家具、工程、營運|側廳的大窗':h=>h.side,'每天的帳|酒水成本':h=>h.wine,
-  '二樓：休息室與包廂|員工休息室':h=>h.sr,'二樓：休息室與包廂|誰會上去':h=>h.sr,'二樓：休息室與包廂|私人包廂':h=>h.pd,'二樓：休息室與包廂|預約':h=>h.pd,
-  '二樓：休息室與包廂|最低消費':h=>h.pd,'二樓：休息室與包廂|沒有預約的晚上':h=>h.pd},
+ /* audit WS5-02 (2026-10-06): a space's card comes when the space is there (the Lounge's when it is built, not when its
+    project appears); a story's own entry when the story has happened (品酒之夜, 予安) */
+ sec:{'Lounge：留下來的地方':h=>h.L,'二樓':h=>h.up,'社群與宣傳':h=>h.social},
+ pt:{'營業中|配菜的酒':h=>h.wine,'Lounge：留下來的地方|主廚之夜':h=>h.L2&&h.sig,'Lounge：留下來的地方|品酒之夜':h=>h.kt,'Lounge：留下來的地方|鋼琴':h=>h.ya,
+  '二樓|員工休息室':h=>h.sr,'二樓|私人包廂':h=>h.pd,'二樓|最低消費':h=>h.pd},
  /* [words in the line, when they stay, what they become otherwise (none: the line goes; a function's null: the line goes)] */
  line:[
   ['店門口・主廳・側廳・二樓（租下以後）・休息室・包廂（蓋好以後）・Lounge（蓋好以後）・廚房・房間',h=>h.side&&h.up&&h.srB&&h.pdB&&h.L,h=>[['店門口',1],['主廳',1],['側廳',h.side],['二樓',h.up],['休息室',h.srB],['包廂',h.pdB],['Lounge',h.L],['廚房',1],['房間',1]].filter(x=>x[1]).map(x=>x[0]).join('・')+'（新的房間蓋好以後會加進來）'],
-  ['上二樓的樓梯門在側廳',h=>h.up],['開店前會先帶你上二樓看一眼',h=>h.up],['Lounge 是隔壁的店，跟主廳不相通',h=>h.L],
-  ['Lounge 開了以後，晚餐桌上的酒改由調酒師倒',h=>h.L],
-  ['（有 Lounge 以後多「Lounge 吧台」「Lounge 外場」）',h=>h.L,''],['和 Lounge 名單',h=>h.L,''],
-  ['員工分兩個名單，名額各算各的、互不佔用',h=>h.L],['（例：披薩烤爐廚師 +1、私人包廂 I 和 III 服務生各 +1；休息室不加名額）',h=>h.L&&h.pd,'（例：側廳服務生 +2）'],
-  ['<b>Lounge 名單</b>是固定的幾個人',h=>h.L],['沈晴、阿拓、安安、許葳要聘',h=>h.L],['剛排到 Lounge 的服務生頭幾班慢一點',h=>h.L],
-  ['酒吧小點和招牌菜不動',h=>h.L,'招牌菜不動'],
+  ['Lounge 是隔壁的店，在店門口點它的門進去',h=>h.L],['上二樓的樓梯門在側廳',h=>h.up],
+  ['Lounge 開了以後由調酒師倒',h=>h.L],
+  ['<b>Lounge 名單</b>另外算，跟餐廳員工互不佔用',h=>h.L],
   ['餐廳、Lounge 都九折，吃完晚餐再去 Lounge 八折',h=>h.L,'九折'],['都八折，吃完再去 Lounge 七折',h=>h.L,'八折'],
-  ['側廳最多 9 張，「側廳卡座」把整排換成卡座',h=>h.side],['露天桌 1–3 張',h=>h.ter],
-  ['Lounge 的企劃出現以後也在這裡',h=>h.LP],['Lounge 蓋好以後，樓上的事就會慢慢開始',h=>h.UPA],['這裡會多「二樓（整層）」',h=>h.UPA],
-  ['租下二樓以後有一張二樓平面圖',h=>h.up],['「看看整層」是整層現在的樣子',h=>h.up],
-  ['Lounge III 以後的 Bar 小廚／油炸站',h=>h.L],['有 Lounge II 以後還有 Lounge 的酒窖',h=>h.L],['側廳的東西分兩區',h=>h.side],['有 Lounge 以後還有披薩烤爐',h=>h.L],
-  ['酒水成本、薪資',h=>h.wine,'薪資'],['鋼琴演奏、品酒之夜分潤、',h=>h.L,''],['天氣、Lounge、',h=>h.L,'天氣、'],['、包廂、VIP',h=>h.pd,'、VIP'],
-  ['品酒之夜和主廚之夜那晚，Lounge 只寫那一行',h=>h.L],['——在 Lounge 或晚餐桌上——',h=>h.L,'——在晚餐桌上——'],
-  ['側廳、戶外區、廚房擴建、Lounge、二樓各有自己的一份',h=>h.side&&h.ter&&h.kext&&h.L&&h.up,h=>{const n=[['側廳',h.side],['戶外區',h.ter],['廚房擴建',h.kext],['Lounge',h.L],['二樓',h.up]].filter(x=>x[1]).map(x=>x[0]);return n.length?n.join('、')+(/[A-Za-z]$/.test(n[n.length-1])?' ':'')+(n.length>1?'各有':'有')+'自己的一份':null}],
-  ['之後有客人想要安靜、不被打擾的位子',h=>h.pd],
-  ['二樓是店裡的以後',h=>h.up],['、Lounge、貓',h=>h.L,'、貓'],['予安和鋼琴的故事、',h=>h.L,''],
-  ['付酒水、租金',h=>h.wine,'付租金'],['，例如下班以後的一局撞球',h=>h.srB,''],
-  ['、側廳／聚餐',h=>h.side,''],['、晚餐／酒單（有 Lounge 以後）',h=>h.L,'']]};
+  ['Lounge II 起多阿拓、安安、許葳',h=>h.L2]]};
 function guideCut(t,h){for(const [w,ok,to] of GUIDE_WHEN.line){if(t==null)break;if(!t.includes(w)||ok(h))continue;if(to===undefined)return null;const r=typeof to==='function'?to(h):to;t=r==null?null:t.replace(w,r)}return t}
 function guideView(){const full=()=>GUIDE.map(g=>({ic:g.ic,h:g.h,sum:g.sum,pts:g.pts.map(([k,t])=>[k,guideLines(t)])}));let h;try{h=guideHas()}catch(e){return full()}
  const out=[];for(const g of GUIDE){const sw=GUIDE_WHEN.sec[g.h];if(sw&&!sw(h))continue;const pts=[];
@@ -9759,7 +9685,7 @@ function guideView(){const full=()=>GUIDE.map(g=>({ic:g.ic,h:g.h,sum:g.sum,pts:g
  return out}
 function showGuide(){sub='guide';show(`<div class="sheet tall"><div class="sh-top"><div class="ttl"><div class="eyebrow">JILL'S KITCHEN</div><h2>小小店主手冊</h2></div><button class="btn sm" data-act="closeSub">關閉</button></div>
  <p class="muted" style="font-size:12.5px;margin:0 0 10px">點一張卡片展開。</p>
- <div class="guide2">${guideView().map((g,i)=>`<details class="gcard" ${i===0?'open':''}><summary><span class="gic">${g.ic}</span><span class="gh"><b>${g.h}</b><small>${g.sum}</small></span><span class="gchev">›</span></summary><div class="gbody">${g.pts.map(([k,L])=>{return`<div class="gpt"><b>${k}</b><span${L.length>1?' class="ml"':''}>${L.map(l=>`<i>${L.length>1?l.replace(/；$/,''):l}</i>`).join('')}</span></div>`}).join('')}</div></details>`).join('')}</div>
+ <div class="guide2">${guideView().map((g,i)=>`<details class="gcard" ${i===0?'open':''}><summary><span class="gic">${g.ic}</span><span class="gh"><b>${g.h}</b><small>${g.sum}</small></span><span class="gchev">›</span></summary><div class="gbody">${g.pts.map(([k,L])=>{return`<div class="gpt"><b>${k}</b><span${L.length>1?' class="ml"':''}>${L.map(l=>`<i>${l.replace(/；$/,L.length>1?'':'。')}</i>`).join('')}</span></div>`}).join('')}</div></details>`).join('')}</div>
  <div class="footer"><button class="btn primary big" data-act="closeSub">知道了</button></div></div>`)}
 
 /* ================= input ================= */
@@ -9911,7 +9837,7 @@ function showPrep(){try{barMenuMig()}catch(e){console.warn('[bar]',e)}try{firstP
   return`<div class="menu-row ${on?'':'off'}"><img alt="" src="${dishURL(d,'P')}"><div class="nm">${D.n}<span class="stars">${'★'.repeat(starOf(d))}</span>${lov.length?`<span class="love" title="熟客的最愛">♥ ${lov.map(loveName).join('、')}</span>`:''}<small>${CAT_N[D.cat]} · LV${lv}${D.bar?' · 酒吧小點，不佔名額':''}</small></div><button class="tog ${on?'on':''}" data-act="toggle" data-d="${d}" aria-label="${on?'從菜單移除':'加入菜單'}"></button>
   <div class="meta">${fmt(priceOf(d))} · 成本 ${fmt(costOf(d))} · ${D.steps.length} 步驟・${mechN(d)}${stationOk(d)?'':` · <b style="color:var(--tomato)">缺少${ST_N[D.st]}，客人不會點</b>`}</div>
   ${!on&&F.stock&&st>0?`<div class="ctl offstock"><span>冰箱裡還有 ${st} 份，佔著位子</span><button class="btn sm" data-act="stock" data-d="${d}" data-v="-99">退掉（退 ${fmt(st*costOf(d))}）</button></div>`:''}
-  ${on&&(F.prices||F.stock)?`<div class="ctl">${F.prices?`<span class="step"><label>售價</label><button data-act="price" data-d="${d}" data-v="-1" aria-label="降價">−</button><span>${fmt(priceOf(d))}${m!==1?` <small>${m>1?'+':''}${Math.round((m-1)*100)}%</small>`:''}</span><button data-act="price" data-d="${d}" data-v="1" aria-label="漲價">＋</button></span>`:''}${F.stock?(()=>{const sg=sug[d]||0;const q1=stockQuote(d,1);return`<span class="step stk"><label>庫存</label><button data-act="stock" data-d="${d}" data-v="-1" aria-label="退一份" ${st>0?'':'disabled'}>−</button><span>${st} 份</span><button data-act="stock" data-d="${d}" data-v="1" aria-label="進一份" ${q1.n>0?'':'disabled'}>＋</button></span><span class="stkq"><button class="mini" data-act="stockTo" data-d="${d}" data-k="sug" ${st<sg&&q1.n>0?'':'disabled'}>補到建議 ${sg}</button><button class="mini" data-act="stockTo" data-d="${d}" data-k="max" ${q1.n>0?'':'disabled'}>補滿</button></span>`})():''}${F.prices?priceFeelHTML(d):''}${F.stock&&st===0?'<span class="warnpill">沒有備料</span>':''}</div>`:''}</div>`}).join('');
+  ${on&&(F.prices||F.stock)?`<div class="ctl">${F.prices?`<span class="step"><label>售價</label><button data-act="price" data-d="${d}" data-v="-1" aria-label="降價">−</button><span>${fmt(priceOf(d))}${m!==1?` <small>${m>1?'+':''}${Math.round((m-1)*100)}%</small>`:''}</span><button data-act="price" data-d="${d}" data-v="1" aria-label="漲價">＋</button></span>`:''}${F.stock?(()=>{const sg=sug[d]||0;const q1=stockQuote(d,1);return`<span class="step stk"><label>庫存</label><button data-act="stock" data-d="${d}" data-v="-1" aria-label="退一份" ${st>0?'':'disabled'}>−</button><span>${st} 份</span><button data-act="stock" data-d="${d}" data-v="1" aria-label="進一份" ${q1.n>0?'':'disabled'}>＋</button></span><span class="stkq"><button class="mini" data-act="stockTo" data-d="${d}" data-k="sug" ${st<sg&&q1.n>0?'':'disabled'}>補到建議 ${sg}</button><button class="mini" data-act="stockTo" data-d="${d}" data-k="max" ${q1.n>0?'':'disabled'}>補滿</button></span>`})():''}${F.prices?priceFeelHTML(d):''}${F.stock&&st===0&&S.day>2?'<span class="warnpill">沒有備料</span>':''}</div>`:''}</div>`}).join('');
  const sig=S.signature?`<div class="sig"><img alt="" src="${dishURL('signature','P')}"><div><div class="st">★ CHEF JILL'S SIGNATURE ★</div><b>${S.signature.name}</b><small>${fmt(priceOf('signature'))} · 庫存 ${S.stock.signature||0} 份 · 永遠在菜單最上方</small>${F.stock?`<div style="margin-top:6px" class="step"><button data-act="stock" data-d="signature" data-v="-2" style="color:var(--cream)">−</button><span style="color:var(--cream)">${S.stock.signature||0} 份</span><button data-act="stock" data-d="signature" data-v="2" style="color:var(--cream)">＋</button></div>`:''}</div></div>${S.sigDessert?`<div class="sig sigd"><img alt="" src="${dishURL('sigdessert','P')}"><div><div class="st">★ JILL'S SIGNATURE DESSERT ★</div><b>${S.sigDessert.name}</b><small>${fmt(priceOf('sigdessert'))} · 庫存 ${S.stock.sigdessert||0} 份 · 排在招牌菜下面</small>${F.stock?`<div style="margin-top:6px" class="step"><button data-act="stock" data-d="sigdessert" data-v="-2" style="color:var(--cream)">−</button><span style="color:var(--cream)">${S.stock.sigdessert||0} 份</span><button data-act="stock" data-d="sigdessert" data-v="2" style="color:var(--cream)">＋</button></div>`:''}</div></div>`:''}`:'';
  show(`<div class="sheet tall"><div class="sh-top"><div class="ttl"><div class="eyebrow">DAY ${S.day} · 開店前</div><h2>${LV().n}</h2></div>${topIcons()}</div>
   <div class="card today"><div class="wx">${SVG[W.ic||T.weather]||SVG.sun}</div><div><b>${W.n} · 預計約 ${T.people} 位客人</b><p>${W.d}${S.buzz>1?' 店裡最近很紅，人潮會多一些。':''}${(()=>{const c=campaign();if(!c)return'';const C=CAMPS.find(x=>x.k===c.k);return`<br>📱 ${C.n}${c.dish?`（${dishName(c.dish)}）`:''}進行中，到 DAY ${c.until}${c.dish?'——那道菜備多一點。':'。'}`})()}${(()=>{const w=(S.crew||[]).filter(m=>m.role==='waiter').length;const NT=tablesTotal();return NT>w*6+8?`<br><b style="color:#B8432C">⚠ ${NT} 張桌、${w} 位服務生：桌數比服務生顧得來的多，客人會等太久。</b>`:''})()}</p>${(()=>{const h=wxHints();return h.length?`<p class="hint">今天可能要多準備：<b>${h.map(dishName).join('、')}</b></p>`:''})()}${(()=>{const off=wxOffMenu();if(!off.length)return'';const full=menuCount()>=menuCap();return`<p class="hint">今天的天氣也適合，但不在今天的菜單上：</p><div class="wxadd">${off.map(d=>`<button class="mini ${menuSwap===d?'on':''}" data-act="menuAdd" data-d="${d}">＋ ${dishName(d)}</button>`).join('')}</div>${full&&!menuSwap?`<p class="small muted">菜單已滿（${menuCap()} 道）——點一道，選要換掉哪一道。</p>`:''}${menuSwapHTML()}`})()}</div></div>
@@ -9927,8 +9853,8 @@ function showPrep(){try{barMenuMig()}catch(e){console.warn('[bar]',e)}try{firstP
    <p class="small">${reco?`今日推薦：<b>${dishName(reco)}</b>，預估約 ${Math.max(1,Math.round(exp[reco]||0))} 份。`:'還沒選。'}${dt?` 今日任務要賣 ${dt.n} 份${dishName(dt.d)}${reco===dt.d?'，就是這道。':`（預估約 ${Math.max(1,Math.round(exp[dt.d]||0))} 份）——推薦它會比較容易。`}`:''}</p></div>`})()}
   ${F.prices&&menuList().some(d=>DISH(d).cat==='drink'||DISH(d).cat==='dessert')?`<h3>套餐</h3><div class="card sets"><p class="d">要不要推套餐？點主餐的客人會更常加點；加點的那一份便宜一點。單點照常。</p>${Object.keys(SETS).map(k=>`<button class="setb ${setOn(k)?'on':''}" data-act="setT" data-k="${k}"><b>${setOn(k)?'✓ ':''}${SETS[k].n}</b><small>${SETS[k].d}${(S.setHist&&S.setHist[k]&&S.setHist[k].n)?`<br>累計賣出 ${S.setHist[k].n} 份・${fmt(S.setHist[k].rev)}`:''}</small></button>`).join('')}</div>`:''}
   <h3>今日菜單 <small>${menuN}/${menuCap()} 道${S.signature?' ＋ 招牌菜':''}${S.sigDessert?' ＋ 招牌甜點':''}${(()=>{const n=S.menu.filter(d=>DISHES[d]&&DISHES[d].bar&&S.unlocked.includes(d)).length;const all=Object.keys(DISHES).filter(d=>DISHES[d].bar&&S.unlocked.includes(d)).length;/* v2.4 rc7 (the player, 14:47 「酒吧小點是3種 但應該是4種?」): how many are on tonight, of how many there are */return all&&loungeLv()?` ＋ 酒吧小點 ${n} 道${n<all?`（共 ${all} 道，不佔名額）`:'（不佔名額）'}`:''})()}</small></h3>
-  <div class="mrand"><button class="btn sm" data-act="menuRandom">🎲 隨機選菜單</button><small>照名額隨機排今天的菜；今日任務要賣的那道會留著。再按一次換一組。</small></div>
-  ${sig}<div class="card">${rows||'<p class="muted">還沒有料理</p>'}</div>
+  <div class="mrand"><button class="btn sm" data-act="menuRandom">🎲 隨機選菜單</button><small>照名額隨機排今天的菜；今日任務要賣的那道${(()=>{const c=campaign();return c&&c.dish?`和宣傳中的${dishName(c.dish)}`:''})()}會留著。再按一次換一組。</small></div>
+  ${F.stock&&S.day<=2?`<p class="small autostk" style="margin:4px 2px 8px">前兩天開店時，Jill 會照建議量把每道菜的備料補好（照價付）；想自己調也可以。</p>`:''}${sig}<div class="card">${rows||'<p class="muted">還沒有料理</p>'}</div>
   ${wineTonightHTML()}
   ${F.stock?`<div class="cap"><span>冰箱</span><div class="capbar"><i style="width:${tot/cap*100}%"></i></div><span>${tot}/${cap}</span></div>${S.today&&S.today.sugCapped?`<p class="small" style="margin:4px 2px 6px">冰箱裝不下今天的預估需求（約 ${S.today.sugCapped} 份，容量 ${cap}），建議量已按容量縮減，熱門菜可能提早賣完；升級冰箱或冷藏庫可以多放。</p>`:''}<button class="btn sm" data-act="restock" ${restockCost>0?'':'disabled'} style="width:100%">一鍵補到建議量 ${restockCost>0?fmt(restockCost):'（已足夠）'}</button>${(()=>{const off=unlocked.filter(d=>!S.menu.includes(d)&&(S.stock[d]||0)>0);if(!off.length)return'';const n=off.reduce((a,d)=>a+S.stock[d],0);return`<button class="btn sm" data-act="${discardArmed?'discardAll':'discardAsk'}" style="width:100%;margin-top:6px">${discardArmed?`確定退掉這 ${n} 份？（再按一次）`:`退掉不在菜單上的庫存（${n} 份）`}</button>`})()}`:`<p class="muted" style="font-size:12.5px;margin:8px 2px 0">前兩天會自動備料。第 3 天開始可以自己進貨、調整售價。</p>`}
   ${S.day>=2?`<button class="btn sm" data-act="backShop" style="width:100%;margin-top:10px">‹ 返回升級餐廳</button>`:''}
@@ -10249,7 +10175,7 @@ function doAct0(a,d,k,b){
  case'stock':{const want=+b.dataset.v;const ok=buyStock(d,want);const q=buyStock.last||{};if(!ok)toast(stockFailText(d,q),'warn');else{sfx.tap();if(want>0&&q.n<want)toast(`只進了 ${q.n} 份：${q.why==='cap'?'冰箱空間不足':'錢不夠再多'}`)}save();keepScroll(showPrep,`.menu-row [data-act=toggle][data-d="${d}"]`);break}
  case'stockTo':{/* v2.2: to the suggested amount, or 補滿 (as many as the fridge and the money allow) */const mode=b.dataset.k;const cur=S.stock[d]||0;const want=mode==='max'?999:Math.max(0,(suggestStock()[d]||0)-cur);if(want<=0){toast(mode==='max'?'冰箱已經放不下了':'已經達到建議量');break}const ok=buyStock(d,want);const q=buyStock.last||{};if(!ok)toast(stockFailText(d,q),'warn');else{sfx.buy();if(mode!=='max'&&q.n<want)toast(`只進了 ${q.n} 份：${q.why==='cap'?'冰箱空間不足':'錢不夠再多'}`)}save();keepScroll(showPrep,`.menu-row [data-act=toggle][data-d="${d}"]`);break}
  case'restock':{const sug=suggestStock();for(const x in sug){const need=sug[x]-(S.stock[x]||0);if(need>0)buyStock(x,need)}sfx.buy();save();keepScroll(showPrep);break}
- case'start':{const empty=menuList().filter(x=>(S.stock[x]||0)===0);if(feat().stock&&empty.length&&!startWarned){startWarned=true;$('#startWarn').innerHTML=`<div class="inline-warn">${empty.map(x=>DISH(x).n).join('、')} 沒有備料，客人點了要臨時叫貨（1.5 倍價、要等）。再按一次直接開店。</div>`;break}startWarned=false;clearCheckpoint();save();startService();break}
+ case'start':{const empty=menuList().filter(x=>(S.stock[x]||0)===0);if(feat().stock&&S.day>2&&empty.length&&!startWarned){startWarned=true;$('#startWarn').innerHTML=`<div class="inline-warn">${empty.map(x=>DISH(x).n).join('、')} 沒有備料，客人點了要臨時叫貨（1.5 倍價、要等）。再按一次直接開店。</div>`;break}startWarned=false;clearCheckpoint();save();startService();break}
  case'toShop':showShop();break;
  case'backShop':showShop();break;
  case'toPrep':showPrep();break;
