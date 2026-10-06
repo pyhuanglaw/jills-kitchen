@@ -943,3 +943,103 @@ def qa_the_summarys_tomorrow_matches_the_shop(b, port, target):
             check(k == first.get(tab), f'「{word}」 is announced for Day {k} but its tab opens on evening {first.get(tab)}')
     finally:
         p.close()
+
+
+# ---------------------------------------------------------------- one exchange at a time (audit 2026-10-06: fixed)
+
+def _said_order(p, js_setup, seconds=14, read_panels=False):
+    """run the setup in a service, let the room go on for a while (reading any panel like a player), and return every
+    line shown, in order, with whether a story panel was open at that moment"""
+    p.ev("""(()=>{window.__said=[];const l0=logLine;window.__l0=l0;logLine=function(w,t,k){__said.push({t:String(t),dlg:!!DLG});return l0.apply(this,arguments)}})()""")
+    p.ev(js_setup)
+    for _ in range(int(seconds)):
+        if read_panels and p.ev("!!DLG"):
+            p.read_dialog()
+        p.frames(30)
+    out = json.loads(p.ev("JSON.stringify(window.__said)"))
+    p.ev("logLine=window.__l0")
+    return out
+
+
+@test
+def qa_one_exchange_at_a_time(b, port, target):
+    """N04, N16: exchanges overlapped and a question was answered by someone else's line (「Mia，今天想吃什麼？」 →
+    「第二層左邊。」); the narration 「阿珠姐 連頭都沒回。」 came before Jill's question. Two exchanges set going at the same
+    moment are said one after the other, each question followed by its own answer."""
+    p = Player(b, port, target, save=LATE)
+    try:
+        _to_service_from_late(p)
+        p.ev("window.__noScenes=true")   # the room's own lines, no panels in this one
+        said = _said_order(p, """(()=>{shStart('t_one',false,null,()=>{JILL_SAY('問一？',400);later(()=>noteLine('答一。'),1600)});
+            shStart('t_two',false,null,()=>{JILL_SAY('問二？',300);later(()=>noteLine('答二。'),1500)})})()""")
+        seq = [x['t'] for x in said if re.search(r'[問答][一二]', x['t'])]
+        check(seq == ['問一？', '答一。', '問二？', '答二。'], f'the two exchanges came out as {seq}')
+        said = _said_order(p, """(()=>{const vet=veteranCook();if(!vet){window.__novet=1;return}const E=STORY_EV.find(e=>e.k==='veteran_knows');shStart('veteran_knows',false,null,()=>E.run({}))})()""", seconds=6)
+        if not p.ev("!!window.__novet"):
+            seq = [x['t'] for x in said]
+            q = next((i for i, t in enumerate(seq) if t in ('那個⋯⋯放哪？', '鹽呢？')), None)
+            n = next((i for i, t in enumerate(seq) if '連頭都沒回' in t), None)
+            check(q is not None and n is not None and n > q, f'the veteran’s narration before the question: {seq}')
+    finally:
+        p.close()
+
+
+@test
+def qa_room_lines_wait_for_the_story_panel(b, port, target):
+    """W3-02: a story's panel holds the restaurant, but the room's lines went on underneath on the wall clock — Ken and 杜's
+    「這支太甜了。」 was said under the photo and gone when it closed. The room's exchanges wait with the rest of the room."""
+    p = Player(b, port, target, save=LATE)
+    try:
+        _to_service_from_late(p)
+        p.ev("window.__noScenes=false;window.__holds=true")
+        said = _said_order(p, """(()=>{shStart('kd_photo',true,null,()=>{noteLine('面板一。');noteLine('面板二。')});
+            JILL_SAY('房間裡的話。',700);later(()=>noteLine('房間裡的回答。'),1900)})()""", seconds=8)
+        under = [x['t'] for x in said if x['dlg'] and '房間裡' in x['t']]
+        check(not under, f'room lines said under the story panel: {under}')
+        p.read_dialog(); p.frames(30 * 6)
+        after = json.loads(p.ev("JSON.stringify(window.__said?__said.map(x=>x.t):[])"))
+        log = p.ev("JSON.stringify((R.log||[]).map(x=>x.t))")
+        check('房間裡的話。' in log and '房間裡的回答。' in log, f'the room’s lines were lost, not kept for after the panel: {log[-300:]}')
+    finally:
+        p.close()
+
+
+@test
+def qa_two_stories_do_not_share_a_panel(b, port, target):
+    """N10: two stories due together read as one panel — the second opened in the same tap that closed the first
+    (《多的。》's last line, then 「樓上真的一直都空著喔？」). After the first closes the room is seen for a moment."""
+    p = Player(b, port, target, save=LATE)
+    try:
+        _to_service_from_late(p)
+        p.ev("window.__noScenes=false;window.__holds=true")
+        p.ev("shStart('t_first',true,null,()=>{noteLine('甲一。');noteLine('甲二。')});shStart('t_second',true,null,()=>{noteLine('乙一。')})")
+        check(p.ev("!!DLG&&DLG.sh&&DLG.sh.k==='t_first'"), 'the first story is not on screen')
+        for _ in range(10):
+            if not p.ev("!!DLG&&DLG.sh&&DLG.sh.k==='t_first'"):
+                break
+            p.frames(12); p.tap('#dlg'); p.frames(1)
+        check(not p.ev("!!DLG"), 'the second story opened in the same tap that closed the first')
+        p.frames(30 * 3)
+        check(p.ev("!!DLG&&DLG.sh&&DLG.sh.k==='t_second'"), 'the second story never came')
+    finally:
+        p.close()
+
+
+@test
+def qa_a_story_photo_comes_after_its_lines(b, port, target):
+    """N10: the album's 「還是沒有同意」 came before the words it records (the photo was taken when the beat began, its lines
+    still on their way). PROJECT_MEMORY §9: 事件還沒發生不能先有照片."""
+    p = Player(b, port, target, save=LATE)
+    try:
+        _to_service_from_late(p)
+        p.ev("window.__noScenes=false;window.__holds=true")
+        key = p.ev("Object.keys(STORY_PHOTOS).find(k=>!story().photos[k]&&(STORY_PHOTOS[k].art||STORY_PHOTOS[k].stage))||''")
+        check(key, 'every story photo is already in this album')
+        p.ev(f"shStart('kd_photo',true,null,()=>{{JILL_SAY('先說的一句。',700);JILL_SAY('後說的一句。',2200);storyPhoto('{key}',{{}})}})")
+        lines = p.read_dialog()
+        i_last = next((i for i, l in enumerate(lines) if '後說的一句' in l), None)
+        i_photo = next((i for i, l in enumerate(lines) if '相簿' in l), None)
+        check(i_last is not None and i_photo is not None, f'the panel read {lines}')
+        check(i_photo > i_last, f'the photo came before the lines it records: {lines}')
+    finally:
+        p.close()
