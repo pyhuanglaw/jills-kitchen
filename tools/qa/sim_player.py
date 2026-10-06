@@ -506,11 +506,12 @@ class NormalPlayer(PlayerBase):
         herself); a waiter below LV3 when guests wait (the card: LV2 起會上菜，LV3 起會結帳); anyone when guests wait and
         it is affordable; and, with plenty in the till, everyone towards LV5 (faster, and a cook's dishes Perfect)"""
         rich = self.money() > self.reserve() + 40000
+        refused = set()   # a card whose press changed nothing (「今天已經訓練過了」 — the Lounge's people learn one level a day): not again tonight
         for _ in range(8):
             st = self.s.staff()
             cand = []
             for c in st['crew']:
-                if not c['up'] or c['up']['dis']:
+                if not c['up'] or c['up']['dis'] or c['up']['k'] in refused:
                     continue
                 locked = [x for x in c['lock'] if any(n and n in x for n in self.menu_names)]
                 if locked:
@@ -527,8 +528,11 @@ class NormalPlayer(PlayerBase):
             _, c, saw, why = cand[0]
             if not self.can(c['up']['price']):
                 break
+            m0 = self.money()
             if not self.press('crewUp', k=c['up']['k'], saw=saw, why=why, label=c['up']['text'], tab='staff'):
                 break
+            if self.money() == m0:
+                refused.add(c['up']['k'])
 
     def capacity(self, sig):
         """guests turned away or waiting too long, and no free place left to hire into: more tables (up to the cap the
