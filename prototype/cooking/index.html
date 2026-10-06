@@ -182,7 +182,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .mode button small{display:block;font-weight:600;font-size:11.5px;color:rgba(247,237,220,.7);margin-top:3px;line-height:1.4}
 .mode button.on{box-shadow:inset 0 0 0 2px var(--gold);background:rgba(201,154,69,.16)}
 .picks{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:12px 0;max-width:520px}
-.picks.two{grid-template-columns:1fr 1fr}
+.picks.two{grid-template-columns:repeat(auto-fill,minmax(110px,1fr))}
 .pk{display:grid;grid-template-columns:30px 1fr;grid-template-rows:auto auto;column-gap:8px;align-items:center;text-align:left;padding:9px 10px;border-radius:12px;background:var(--night2);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
 .picks.two .pk{grid-template-columns:1fr}
 .pk span{grid-row:1/3;font-size:24px}
@@ -325,16 +325,16 @@ const NIGHTS=[
 /* night 5: the stations follow the dishes — each dish brings its own work */
 const DISH_ST={friedrice:['wok'],pasta:['pot','pan'],coffee:['coffee'],chicken:['oven'],burger:['pan','oven','asm'],pudding:['chill'],pizza:['pzbench','pzoven','board']};
 function freeNight(sel){const N=NIGHTS[4];const st=new Set(['pantry','shelf','trash']);sel.dishes.forEach(d=>DISH_ST[d].forEach(x=>st.add(x)));
-  N.st=ORDER.filter(x=>st.has(x));N.dishes={};sel.dishes.forEach(d=>N.dishes[d]=d==='pudding'?1.6:2);N.cooks=sel.cook?[{n:'阿德',line:['wok','pot','pan']}]:[];N.barista=sel.barista&&sel.dishes.includes('coffee')?'沈晴':null;
+  N.st=ORDER.filter(x=>st.has(x));N.dishes={};sel.dishes.forEach(d=>N.dishes[d]=d==='pudding'?1.6:2);N.cooks=[sel.cook?{n:'阿德',line:['wok','pot','pan']}:null,sel.cook2?{n:'Marco',line:['oven','asm']}:null].filter(Boolean);N.barista=sel.barista&&sel.dishes.includes('coffee')?'沈晴':null;
   const n=sel.dishes.length;N.gap=[16-n,10.5-n*.6];N.waiters=n>=4?['小茉','Kai','Nina']:['小茉','Kai'];return N}
-function chooseMenu(){const el=$('#lineChoice');el.hidden=false;const pick=new Set(store.get('freeMenu',['friedrice','pasta','burger','pizza']));let cook=store.get('freeCook',true),bar=store.get('freeBar',false);
+function chooseMenu(){const el=$('#lineChoice');el.hidden=false;const pick=new Set(store.get('freeMenu',['friedrice','pasta','burger','pizza']));let cook=store.get('freeCook',true),cook2=store.get('freeCook2',false),bar=store.get('freeBar',false);
   const draw=()=>{el.innerHTML=`<div class="eyebrow">第 5 晚 · 你的菜單</div><h1>今晚賣什麼？</h1><p>選 3–5 道。每一道菜會把它用的設備帶進廚房；選的越多，同時要顧的就越多。</p>
    <div class="picks">${Object.keys(DISH).map(d=>`<button class="pk ${pick.has(d)?'on':''}" data-pk="${d}"><span>${K[d].ic}</span><b>${K[d].n}</b><small>${pathHTML(DISH[d].path)}</small></button>`).join('')}</div>
-   <div class="picks two"><button class="pk ${cook?'on':''}" data-opt="cook"><b>阿德師傅</b><small>顧一條線，開店前選</small></button><button class="pk ${bar?'on':''}" data-opt="bar"><b>沈晴</b><small>咖啡整條交給她</small></button></div>
+   <div class="picks two"><button class="pk ${cook?'on':''}" data-opt="cook"><b>阿德師傅</b><small>顧一條線，開店前選</small></button><button class="pk ${cook2?'on':''}" data-opt="cook2"><b>Marco</b><small>第二位廚師，顧另一條線</small></button><button class="pk ${bar?'on':''}" data-opt="bar"><b>沈晴</b><small>咖啡整條交給她</small></button></div>
    <div class="row"><button class="btn pri" id="goFree" ${pick.size<3||pick.size>5?'disabled':''}>開店（${pick.size} 道）</button><button class="btn" data-menu="1">回選單</button></div>`;
    el.querySelectorAll('[data-pk]').forEach(b=>b.onclick=()=>{const d=b.dataset.pk;if(pick.has(d))pick.delete(d);else if(pick.size<5)pick.add(d);draw()});
-   el.querySelectorAll('[data-opt]').forEach(b=>b.onclick=()=>{if(b.dataset.opt==='cook')cook=!cook;else bar=!bar;draw()});
-   $('#goFree').onclick=()=>{if(pick.size<3||pick.size>5)return;store.set('freeMenu',[...pick]);store.set('freeCook',cook);store.set('freeBar',bar);el.hidden=true;freeNight({dishes:[...pick],cook,barista:bar});startNight(5)}};
+   el.querySelectorAll('[data-opt]').forEach(b=>b.onclick=()=>{const o=b.dataset.opt;if(o==='cook')cook=!cook;else if(o==='cook2')cook2=!cook2;else bar=!bar;draw()});
+   $('#goFree').onclick=()=>{if(pick.size<3||pick.size>5)return;store.set('freeMenu',[...pick]);store.set('freeCook',cook);store.set('freeCook2',cook2);store.set('freeBar',bar);el.hidden=true;freeNight({dishes:[...pick],cook,cook2,barista:bar});startNight(5)}};
   draw()}
 
 /* ---------------------------------------------------------------- state */
@@ -357,17 +357,20 @@ function newGame(k,opt){
   $('#hNight').textContent=`第 ${k} 晚`;$('#hTitle').textContent=N.n;
   hint(null);
   if(G.tut)tutTicket();
-  if(G.staff.some(s=>s.role==='cook')&&!opt.line)chooseLine();else if(opt.line)G.staff.filter(s=>s.role==='cook').forEach(s=>{s.line=LINES[opt.line].st});
+  if(G.staff.some(s=>s.role==='cook')&&!opt.line&&!opt.lines)chooseLine();else if(opt.lines)G.staff.filter(s=>s.role==='cook').forEach((s,i)=>{const k=opt.lines[i];s.line=k?LINES[k].st.filter(x=>G.N.st.includes(x)):[];s.lineK=k});else if(opt.line)G.staff.filter(s=>s.role==='cook').forEach(s=>{s.line=LINES[opt.line].st});
 }
 /* multi-cook handling, made a decision: a cook keeps one line (a few stations) — which one is the player's call for the
    night's menu; he lands and carries on it, never starts anything */
 const LINES={stove:{n:'爐台',st:['wok','pot','pan'],d:'炒鍋、湯鍋、平底鍋：好了的炒飯、麵、肉排，他拿去下一站或盤子'},
   oven:{n:'烤箱和組裝台',st:['oven','asm'],d:'烤雞、麵包、組好的漢堡：他拿去組裝台或盤子'},
   pizza:{n:'披薩線',st:['pzbench','pzoven','board'],d:'鋪好料的、烤好的、切好的披薩：他一站一站送，窯裡的不會焦'}};
-function chooseLine(){paused=true;const el=$('#lineChoice');el.hidden=false;const opts=Object.keys(LINES).filter(k=>LINES[k].st.some(x=>G.N.st.includes(x)));
-  el.innerHTML=`<div class="eyebrow">第 ${G.k} 晚 · 開店前</div><h1>阿德師傅今晚顧哪一條線？</h1><p>他只收、只送：顧的那幾個設備上好了的東西，他會拿去下一站或盤子，焦了的丟掉。他不會自己下鍋——先做什麼還是你。</p>
-   <div class="nights">${opts.map(k=>`<button class="night" data-line="${k}"><b>${LINES[k].n}</b><span>${LINES[k].d}</span></button>`).join('')}</div>`;
-  el.querySelectorAll('[data-line]').forEach(b=>b.addEventListener('click',()=>{const L=LINES[b.dataset.line];G.staff.filter(s=>s.role==='cook').forEach(s=>{s.line=L.st.filter(x=>G.N.st.includes(x));const c=stCenter(L.st[0]);s.hx=Math.max(24,Math.min(336,c.x));s.hy=454;s.x=s.hx;s.y=s.hy});G.cookLine=b.dataset.line;el.hidden=true;paused=false;hint(null)}))}
+function chooseLine(){paused=true;const el=$('#lineChoice');el.hidden=false;const cooks=G.staff.filter(s=>s.role==='cook');const taken=[];
+  const ask=ci=>{const c=cooks[ci];const opts=Object.keys(LINES).filter(k=>!taken.includes(k)&&LINES[k].st.some(x=>G.N.st.includes(x)));
+   el.innerHTML=`<div class="eyebrow">第 ${G.k} 晚 · 開店前${cooks.length>1?` · 第 ${ci+1} 位廚師`:''}</div><h1>${c.n==='阿德'?'阿德師傅':c.n}今晚顧哪一條線？</h1><p>${ci===0?'他只收、只送：顧的那幾個設備上好了的東西，他會拿去下一站或盤子，焦了的丟掉。他不會自己下鍋——先做什麼還是你。':'兩個人各顧一條線，不會搶同一個設備；你先動手拿的，他們就讓給你。'}</p>
+    <div class="nights">${opts.map(k=>`<button class="night" data-line="${k}"><b>${LINES[k].n}</b><span>${LINES[k].d}</span></button>`).join('')}</div>`;
+   el.querySelectorAll('[data-line]').forEach(b=>b.addEventListener('click',()=>{const k=b.dataset.line,L=LINES[k];taken.push(k);c.line=L.st.filter(x=>G.N.st.includes(x));const cc=stCenter(L.st.find(x=>G.N.st.includes(x))||L.st[0]);c.hx=Math.max(24,Math.min(336,cc.x));c.hy=454;c.x=c.hx;c.y=c.hy;c.lineK=k;
+    if(ci+1<cooks.length&&Object.keys(LINES).some(x=>!taken.includes(x)&&LINES[x].st.some(y=>G.N.st.includes(y))))ask(ci+1);else{cooks.slice(ci+1).forEach(o=>{o.line=[]});G.cookLine=taken[0];G.cookLines=taken.slice();el.hidden=true;paused=false;hint(null)}}))};
+  ask(0)}
 function genSched(N,R){
   const out=[],end=N.dur*.86;let t=N.tut?2:3;
   const names=Object.keys(N.dishes),wsum=names.reduce((a,d)=>a+N.dishes[d],0);
@@ -838,7 +841,7 @@ function endNight(){
     <div>平均同時在煮</div><div>${(S.conc/Math.max(1,S.concT)).toFixed(1)} 樣（最多 ${S.peak||0} 樣）</div>
     <div>你搬動食物</div><div>${S.moves} 次（每分鐘 ${(S.moves/Math.max(.1,mins)).toFixed(0)}）</div>
     <div>連續從同一個地方拿</div><div>${S.moves?Math.round(S.same/S.moves*100):0}%</div>
-    ${G.staff.some(s=>s.role!=='waiter')?`<div>員工幫你搬${G.cookLine?`（阿德顧${LINES[G.cookLine].n}）`:''}</div><div>${S.staff} 次</div>`:''}
+    ${G.staff.some(s=>s.role!=='waiter')?`<div>員工幫你搬${G.cookLines&&G.cookLines.length?`（${G.staff.filter(s=>s.role==='cook'&&s.lineK).map(s=>`${s.n}顧${LINES[s.lineK].n}`).join('、')}）`:''}</div><div>${S.staff} 次</div>`:''}
    </div>
    <div class="row">${G.k<NIGHTS.length?`<button class="btn pri" data-go="${G.k+1}">下一晚：${NIGHTS[G.k].n}</button>`:''}<button class="btn" data-go="${G.k}">再玩一次</button><button class="btn" data-menu="1">選單</button></div>`;
   window.__cookLast={k:G.k,...S,q,stars,mins};
