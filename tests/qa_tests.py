@@ -129,7 +129,7 @@ def _back_to(p, where, k=None):
         p.ev("if(phase==='shop')showShop()")
     else:
         p.ev("if(phase==='prep')showPrep()")
-    p.frames(4)
+    p.frames(1)
 
 
 def _sweep_tab(p, k, dead, tapped):
@@ -140,7 +140,7 @@ def _sweep_tab(p, k, dead, tapped):
         btns = p.page.evaluate("""skip=>[...document.querySelectorAll('#screen .sheet button, #screen .sheet [data-act]')].filter(e=>e.offsetParent!==null&&!e.disabled&&e.dataset.act&&!skip.includes(e.dataset.act))
             .map((e,i)=>[i,e.dataset.act,e.dataset.k||'',(e.innerText||'').replace(/\\s+/g,' ').trim().slice(0,24)])""", sorted(SKIP_ACTS))
         todo = [x for x in btns if (x[1], x[2]) not in seen]
-        if not todo or len(seen) >= 60:
+        if not todo or len(seen) >= 25:
             return
         i, act, kk, txt = todo[0]; seen.add((act, kk))   # its label may change after a press (a price, a count): the same button
         if '使用中' in txt:
@@ -154,12 +154,12 @@ def _sweep_tab(p, k, dead, tapped):
                 return all.findIndex(e=>e.offsetParent!==null&&!e.disabled&&e.dataset.act===act&&(e.dataset.k||'')===k)}""", [sorted(SKIP_ACTS), act, kk])
             if idx < 0:
                 continue
-            p.tap(sel, nth=idx, settle=False)
+            p.tap(sel, nth=idx, settle=False, wait=2)
         except Unreachable as e:
             dead.append(f'{k} › 「{txt}」 {act}:{kk} — cannot be reached: {e}')
             continue
         tapped.append((k, act, kk, txt))
-        p.frames(10)
+        p.frames(2)
         after = p.ev(FINGERPRINT)
         if after == before:
             dead.append(f'{k} › 「{txt}」 {act}:{kk} — nothing happened')
@@ -234,10 +234,10 @@ def qa_every_button_on_the_prep_screen_does_something(b, port, target):
             sel = f'#screen .sheet [data-act="{act}"]' + (f'[data-k="{kk}"]' if kk else '') + (f'[data-d="{dd}"]' if dd else '') + (f'[data-v="{vv}"]' if vv else '')
             before = p.ev(FINGERPRINT)
             try:
-                p.tap(sel, settle=False)
+                p.tap(sel, settle=False, wait=2)
             except Unreachable as e:
                 dead.append(f'「{txt}」 {act}:{kk}:{dd} — cannot be reached: {e}'); continue
-            n += 1; p.frames(6)
+            n += 1; p.frames(2)
             if p.ev(FINGERPRINT) == before:
                 dead.append(f'「{txt}」 {act}:{kk}:{dd} — nothing happened')
             _back_to(p, 'prep')

@@ -135,8 +135,9 @@ class Player:
             raise Unreachable(info['err'])
         return info['x'], info['y']
 
-    def tap(self, sel, nth=0, text=None, settle=True):
-        """a real tap (finger) or click (mouse) on what the selector finds — only if a player could reach it"""
+    def tap(self, sel, nth=0, text=None, settle=True, wait=6):
+        """a real tap (finger) or click (mouse) on what the selector finds — only if a player could reach it; then `wait`
+        frames for the game to answer"""
         if settle and sel != '#dlg':
             self.settle()
         x, y = self.reach(self._locate(sel, nth, text))
@@ -144,7 +145,7 @@ class Player:
             self.page.touchscreen.tap(x, y)
         else:
             self.page.mouse.move(x, y); self.page.mouse.down(); self.page.mouse.up()
-        self.frames(6)
+        self.frames(wait)
 
     def tap_text(self, text, within='body'):
         """the first button (or [data-act] element) whose visible text contains `text`"""
