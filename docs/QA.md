@@ -29,27 +29,8 @@
 **修好的那一天它會顯示 `FIXED` 並讓整套失敗**，提醒把那一條從清單拿掉——從那以後它就是那個修正的回歸測試，同樣的問題不會再回來。
 只有「問題本身那一條檢查」失敗才算 `OPEN`；測試連那個情況都沒準備到（`setup_check`，例如存檔裡找不到那顆按鈕）或測試自己
 壞掉，一律是 `FAIL`——不然壞掉的測試會一直假裝成「還沒修」。
-目前的清單：
-
-| 測試 | 問題 |
-|---|---|
-| `qa_a_held_story_survives_leaving_the_app` | 故事停住店時離開 App，回來那段只剩看過的幾句 |
-| `qa_leaving_while_closing_after_a_resume_keeps_the_day` | 繼續營業後在收店時離開，那一天不見 |
-| `qa_a_checkpoint_survives_a_new_table_count` | 改過桌數以後，舊的營業中存檔接回變空店 |
-| `qa_every_tab_reaches_by_mouse_in_a_small_window` | 電腦版小視窗，滑鼠到不了「員工」「招牌菜」 |
-| `qa_the_selected_tab_is_on_screen` | 商店選中的分頁在畫面外 |
-| `qa_the_pause_button_works_outside_the_service` | 開店前、商店的「II」按不到 |
-| `qa_a_drink_on_a_ticket_reads_right` | 點單上點酒跳「undefined都在忙！」 |
-| `qa_waiting_staff_do_not_stand_on_one_spot` | 閒著的員工疊在同一點 |
-| `qa_the_inspection_money_is_in_the_summary` | 衛生檢查的錢不在結算 |
-| `qa_table_hearts_only_for_sophie_and_mia` | 桌上的愛心還給所有回頭客 |
-| `qa_the_album_counts_all_five_cats` | 相簿寫「1 隻貓都在」 |
-| `qa_photos_of_jills_room_are_taken_in_her_room` | Jill 房間的照片拍成主廳 |
-| `qa_a_favourite_is_missed_only_when_it_is_off_the_menu` | 熟客說「今天沒有」其實有 |
-| `qa_a_new_game_gets_no_old_version_notes` | 新遊戲看到舊存檔的版本公告 |
-| `qa_every_level_named_in_the_text_exists` | 「擴建到 Jill's Kitchen」沒有這一級 |
-| `qa_restock_says_why_it_cannot` | 「補滿」塞滿冰箱後，「一鍵補到建議量」按了沒反應也不說為什麼 |
-| `qa_a_review_talks_about_the_food_not_the_glass` | 評論把配餐的酒當成菜寫（「氣泡酒的火候剛剛好」） |
+目前的清單：**空的**（2026-10-06：Audit 列的 17 條在 branch `fix/audit-narrative-2026-10-06` 全部修好，每一條都成了那個修正的
+回歸測試；修了什麼見 `docs/audit/2026-10-06/FIXES.md`）。下一次 Audit 找到、當下沒修的，再照上面的規則加進去。
 
 **修 bug 的規矩**：修正時附上能防止它再發生的測試。如果它已經在已知未修清單裡，修好、讓測試通過、把那一條拿掉；
 如果是新發現的、能自動驗的問題，先寫測試（會失敗），再修。

@@ -10483,7 +10483,7 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
  {ic:"💾",h:"存檔與備份",sum:"進度都在這台裝置的瀏覽器裡。",pts:[
   ["自動存檔","每天打烊、每次購買，營業中每 20 秒、暫停、切到別的 App 時都會存；下次打開，從那個時間點繼續。"],
   ["手動存檔","營業中：暫停 → 設定・存檔・備份 →【儲存目前進度】。"],
-  ["備份到檔案","設定 → 備份到檔案，會下載一個 .json；恢復時會先檢查檔案，沒問題才覆蓋。也可以複製／貼上備份文字。"],
+  ["備份到檔案","設定 → 備份到檔案，會下載一個 .json；恢復時會先檢查檔案，沒問題才覆蓋。"],
   ["清除瀏覽器資料","會連存檔一起清掉。備份檔留著就不怕。"],
  ]},
 ];
@@ -10970,7 +10970,7 @@ function saveCardHTML(){const cp=S.checkpoint&&S.checkpoint.day===S.day?S.checkp
  ${phase==='service'&&R&&R.closing==null?`<p class="small">營業中每 20 秒、暫停時、切到別的 App 時都會存下目前的店內狀況（客人、訂單、爐上的菜、Jill 和員工）。下次開啟可以從這個時間點繼續。</p><button class="btn" style="width:100%;margin-top:8px" data-act="save">儲存目前進度</button>`:`<p class="small">每天打烊、購買升級後都會自動存檔${cp?`；今天營業到一半的進度（${cp.clock}）也還在`:''}。</p><button class="btn" style="width:100%;margin-top:8px" data-act="save">存檔</button>`}</div>
  <div class="card" style="margin-top:10px"><div class="setrow"><span><b>備份與移轉</b></span></div><p class="small">換手機、換瀏覽器、以防萬一：把進度存成一個檔案，之後再讀回來。</p>
  <div class="row" style="margin-top:8px"><button class="btn" style="flex:1" data-act="export">備份到檔案</button><button class="btn" style="flex:1" data-act="import">從備份檔恢復</button></div>
- <div class="row" style="margin-top:8px"><button class="btn sm" style="flex:1" data-act="copyBackup">複製備份文字</button><button class="btn sm" style="flex:1" data-act="pasteBackup">貼上備份文字恢復</button></div></div>`}
+ <div class="row" style="margin-top:8px"><button class="btn sm" style="flex:1" data-act="pasteBackup">貼上以前的備份文字恢復</button></div></div>`}   /* audit WS2-14: no 「複製備份文字」 — the user, 2026-10-02: 「按複製直接當機」「不能用文字方式這樣只會當機」; PROJECT_MEMORY §10: 不要再用「文字框複製」做備份. A text saved before still comes back */
 function showPause(){sub='pause';show(`<div class="modal"><h2>暫停中</h2><p>DAY ${S.day} · ${clockStr()} · 目前營業額 ${fmt(R?R.st.rev:0)}</p>
  <div class="stack"><button class="btn primary big" data-act="resume">繼續營業</button></div>
  <div class="card" style="margin-top:10px"><div class="setrow"><span>營業速度</span><span class="seg">${SPEEDS.map(v=>`<button class="${simSpeed()===v?'on':''}" data-act="speed" data-k="${v}">${v}×</button>`).join('')}</span></div><p class="small" style="margin:6px 0 0">慢一點可以好好看菜和店裡的動靜；快一點是等菜的時候用。點上方的時間也可以切換。</p></div>

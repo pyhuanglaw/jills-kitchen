@@ -1260,7 +1260,9 @@ def service_checkpoint_resumes_the_day(b, port, target):
     check(g.ev("phase") == 'service' and g.ev("!paused"), 'did not resume into service')
     after = g.ev(r"""JSON.stringify({t:+R.t.toFixed(2),groups:R.groups.filter(q=>!q.gone).map(q=>[q.id,q.state,q.table,q.x|0,q.y|0,q.ticket?q.ticket.id:null]),tickets:R.tickets.map(k=>[k.id,k.g.id,k.items.map(i=>i.d+':'+i.st)]),jobs:R.slots.map(s=>s.job?[s.job.d,s.job.si,s.job.step&&s.job.step.t,s.job.tk.id]:null),jill:[R.jill.x|0,R.jill.y|0,R.jill.q.slice(),R.jill.carry.length],cw:Object.keys(R.cw).map(k=>[k,R.cw[k].x|0,R.cw[k].y|0,R.cw[k].task?R.cw[k].task.k:null]),st:R.st.rev+'/'+R.st.tips+'/'+R.st.guests,money:S.money,tables:R.tables.map(t=>[t.group?t.group.id:null,t.dirty])})""")
     check(before == after, 'the restored day differs from the checkpoint:\n' + before + '\n' + after)
-    check(g.ev("S.checkpoint") is None, 'the checkpoint should be consumed on resume')
+    # audit W3-01: the old checkpoint is consumed and the evening it brought back is saved at once as the new one (an evening
+    # that began closing before the next periodic checkpoint was lost when the player left again)
+    check(g.ev("!!S.checkpoint&&S.checkpoint.why==='resume'&&Math.abs(S.checkpoint.at-R.t)<.5"), 'after a resume the checkpoint is the resumed evening, taken at once: ' + str(g.ev("S.checkpoint&&[S.checkpoint.why,S.checkpoint.at,R.t]")))
     # the day goes on: render a few seconds, then finish it with the bot; no errors, a summary at the end
     g.ev("__play(120,0)"); check(not g.errors, f'errors after the resume: {g.errors[:2]}')
     play_day(g); check(g.ev("phase") == 'summary', 'the resumed day did not finish')

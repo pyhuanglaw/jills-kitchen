@@ -822,6 +822,26 @@ def qa_the_first_two_days_say_the_stock_fills_itself(b, port, target):
 
 
 @test
+def qa_no_text_copy_backup(b, port, target):
+    """Audit WS2-14: 設定・存檔 had 「複製備份文字」, the button the user reported 2026-10-02 (「按複製直接當機 離開瀏覽器前一秒出現字
+    再進去黑畫面」「不能用文字方式這樣只會當機」); PROJECT_MEMORY §10: 不要再用「文字框複製」做備份. Settings, opened by a tap:
+    the file backup and its restore are there, no copy-text button; a text saved before can still be pasted back; the
+    manual does not offer the text either."""
+    p = Player(b, port, target)
+    try:
+        p.tap('[data-act=open]'); p.settle()
+        p.tap('#hPause'); p.settle()
+        txt = p.text('#screen')
+        check(p.ev("sub") == 'settings', f'the settings did not open: {p.ev("sub")}')
+        check('備份到檔案' in txt and '從備份檔恢復' in txt, 'the file backup is there')
+        check('複製備份文字' not in txt and not p.ev("!!document.querySelector('[data-act=copyBackup]')"), 'no copy-text button')
+        check(p.ev("!!document.querySelector('[data-act=pasteBackup]')"), 'a text saved before can still be pasted back')
+        check('備份文字' not in p.ev("JSON.stringify(GUIDE)"), 'the manual does not offer a text backup')
+    finally:
+        p.close()
+
+
+@test
 def qa_every_level_named_in_the_text_exists(b, port, target):
     """Known-open (WS5-04): the signature dessert's lock and the manual say 「需要擴建到 Jill's Kitchen」 — there is no such
     level (Little Kitchen → Bistro → Restaurant → Fine Dining → JILL); the dessert needs Jill's Restaurant. Every

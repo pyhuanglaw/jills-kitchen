@@ -1,7 +1,7 @@
 # Jill's Kitchen — 目前狀態（暫時的，會一直更新）
 
 這份只放「現在」的狀態：branch、版本、待辦、待確認。永久的設計規則在 `docs/PROJECT_MEMORY.md`，不要寫到這裡；這裡的內容過時了就
-直接改掉或刪掉。最後更新：2026-10-06，全面 Audit 與例行 QA 合回 `main` 之後（遊戲還是 rc8.5，沒有發布）。
+直接改掉或刪掉。最後更新：2026-10-06 晚上，Audit 修正 branch 收尾、料理 prototype 第一輪（遊戲還是 rc8.5，沒有發布）。
 
 ## Repo 與 branch
 
@@ -12,7 +12,10 @@
   文件與紀錄可以直接在 `main`。不要讓工作 branch 跟 `main` 長期並行。
 - GitHub 上的 branch：`main`、`archive/rc7.6-import-main`、`feature/fewer-lines`（rc8.5，已合回 `main`，可以在 GitHub 網頁刪掉）、
   `feature/dylan-room`（Dylan 在房間的名字，還沒合回、還沒發布）、`feature/lounge-decided`（《看看》後直接決定接隔壁、Lounge I 的新條件；
-  還沒合回、還沒發布）、`qa/audit-2026-10-06`（全面 Audit 與例行 QA；2026-10-06 使用者同意合回 `main`，已合回，可以在 GitHub 網頁刪掉）。
+  還沒合回、還沒發布）、`qa/audit-2026-10-06`（全面 Audit 與例行 QA；2026-10-06 使用者同意合回 `main`，已合回，可以在 GitHub 網頁刪掉）、
+  `fix/audit-narrative-2026-10-06`（Audit 之後的修正：17 個已知未修全部修好、電腦版分頁、手冊重寫；從 `main` adc1fcd 開出，還沒合回、
+  還沒發布，見下面「已完成、尚未發布」）、`proto/cooking-flow`（料理流程的獨立試玩頁 `prototype/cooking/`，不動遊戲本體；使用者玩過、
+  決定方向之前不合回）。
 - 已刪除（玩家 2026-10-04 在 GitHub 網頁刪掉）：`feature/ken-tasting-pictures`（81cbe46，rc8.4 已合回 `main`）、`wip/lin`（舊的開發
   branch 名稱；最後指向的 b87b77b 在 `main` 裡）、`claude/jills-kitchen-github-setup-4x7483`（8ca784b，接在舊的匯入 commit 後面改網址；
   同樣的改動在主線的 ec985d1）。三條的內容都已經在 `main` 或不需要了。
@@ -44,6 +47,13 @@
 ## 尚未發布的工作
 
 ### 已完成、尚未發布
+
+- **Audit 之後的修正**（branch `fix/audit-narrative-2026-10-06`，還沒合回 `main`、還沒發布）：玩家看得到的改變與四層狀態在
+  `docs/audit/2026-10-06/FIXES.md`。電腦版分頁（使用者的 blocker）、對話一次一組、存檔與「繼續營業」、結算、手冊重寫、第一天備料、
+  拿掉「複製備份文字」等；`tests/qa_known_open.json` 從 17 條變成空的。完整回歸與測試版連結見下面「測試」。使用者說「發布」時：
+  合回 `main` → 完整回歸 → 發布。
+- **料理流程 prototype**（branch `proto/cooking-flow`，`prototype/cooking/`）：獨立試玩頁，不是遊戲本體。設計結論
+  `prototype/cooking/DESIGN.md`；私人連結 https://claude.ai/artifact/EBzi6qETraguAApvettBFe 。等使用者玩過再決定要不要、怎麼放進遊戲。
 
 - **Dylan 在房間裡的名字**（branch `feature/dylan-room`，還沒合回 `main`、還沒跑完整回歸）：玩家 2026-10-05「Dylan已經揭露但在房間還是沒寫Dylan」。
   揭曉後他頭上的名牌寫 Dylan（揭曉前「先生」）、房間分頁寫「Jill 和 Dylan 的房間」（放不下時「Jill & Dylan」、再放不下「房間」），
