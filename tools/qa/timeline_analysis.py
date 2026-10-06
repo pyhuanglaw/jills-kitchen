@@ -109,7 +109,7 @@ def room_week(rows, d0, d1):
         '餐廳員工薪水': avg(lambda r: (r.get('wagePools') or {}).get('restaurant')), 'Lounge 員工薪水': avg(lambda r: (r.get('wagePools') or {}).get('lounge') or 0),
         '主廳／餐廳租金': avg(rent_main), 'Lounge 租金': avg(rent_lg), 'Ken 的費用': avg(lambda r: r['sum'].get('ken') or 0),
         '每日淨額': avg(lambda r: r['sum']['net']), '每日收店現金': avg(lambda r: r['money']),
-        '沒等到的客人': avg(lambda r: r['sum'].get('lost') or 0), '生氣離開（組）': avg(lambda r: (r['econ'].get('left') or {}).get('angry') or 0),
+        '沒等到的客人': avg(lambda r: r['sum'].get('lost') or 0), '生氣離開（人）': avg(lambda r: (r['econ'].get('left') or {}).get('angry') or 0),
         '出餐數': avg(lambda r: r['econ'].get('served')), '平均等待（秒）': avg(waits),
     }
 

@@ -21,6 +21,8 @@ no-op to keep an old seed's days; decide when to save from fact()/S/LOUNGE_PROJ.
   python3 tools/qa/new_game_timeline.py [--days 110] [--seed 300] [--policy normal] [--service human]
                                         [--after-opening 32] [--json out.json] [--log out_log.txt] [--what-if JS]
 
+--save FILE: start from a save (one of tests/saves, the user's own, or one this tool wrote) instead of Day 1.
+--dump-save-at N --dump-save FILE: write the game's save at the end of Day N's evening (to start what-if runs there).
 --what-if JS: a balance question asked of the simulation only (the snippet runs in the game before Day 1, e.g.
 "RENT.lounge=1000"); never the game's files. It changes the game, not the player.
 The environment: each morning Math.random is seeded from (seed, day) so a day's luck does not depend on how many taps
@@ -30,7 +32,7 @@ import sys, os, json, time, argparse
 ROOT = os.environ.get('JK_ROOT') or os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.join(ROOT, 'tests')); sys.path.insert(0, os.path.join(ROOT, 'tools', 'qa'))
 import run_tests as rt
-from player import Player
+from player import Player, SAVE_KEY
 import sim_player as sp
 from playwright.sync_api import sync_playwright
 
@@ -46,7 +48,7 @@ def run(A):
     rows, out = [], {'args': vars(A), 'policy': sp.POLICIES[A.policy].label, 'service': sp.SERVICE_LABELS[A.service]}
     with sync_playwright() as pw:
         srv, port = rt.start_server(); b = pw.chromium.launch()
-        p = Player(b, port, 'index', save=None, W=A.width, H=844, seed=A.seed, touch=True, scenes=True)
+        p = Player(b, port, 'index', save=A.save, W=A.width, H=844, seed=A.seed, touch=True, scenes=True)
         g = p.g
         screen, hands, log = sp.Screen(p.page), sp.Hands(p), sp.Log()
         player = sp.POLICIES[A.policy](screen, hands, log)
@@ -58,9 +60,16 @@ def run(A):
         if A.what_if:
             g.ev(A.what_if); print('WHAT-IF (the game, in this simulation only):', A.what_if, flush=True)
         print(f'PLAYER: {player.label}  |  SERVICE: {sp.SERVICE_LABELS[A.service]}', flush=True)
-        player.settle(); hands.tap('open'); player.settle()
+        player.settle(); hands.tap('open'); k0 = player.settle()
+        if k0 == 'summary':      # a save made at the summary or in the shop: that evening is over, the next day is played
+            player.to_shop(); k0 = player.settle()
+        if k0 == 'shop':
+            player.next_day(); player.settle()
+        day0 = screen.hud()['day'] if A.save else 1
+        if A.save:
+            print(f'FROM SAVE {A.save}: Day {day0}', flush=True)
         opened_at = None
-        for day in range(1, A.days + 1):
+        for day in range(day0, day0 + A.days):
             p.page.evaluate(SEED_JS % (A.seed * 1000 + day))
             k = player.settle()
             if k != 'prep':
@@ -101,6 +110,10 @@ def run(A):
                     print('   ' + sp.Log.line(d), flush=True)
             if rec['lounge'] and opened_at is None:
                 opened_at = day
+            if A.dump_at == day and A.dump_save:   # the game's own save at the end of this evening (harness: not the player)
+                raw = p.page.evaluate("k=>localStorage.getItem(k)", SAVE_KEY)
+                open(A.dump_save, 'w', encoding='utf-8').write(raw or '')
+                print(f'SAVE after Day {day} -> {A.dump_save}', flush=True)
             if opened_at and day >= opened_at + A.after_opening:
                 break
             player.next_day()
@@ -153,4 +166,6 @@ if __name__ == '__main__':
     ap.add_argument('--policy', default='normal', choices=sorted(sp.POLICIES)); ap.add_argument('--service', default='human', choices=sorted(sp.SERVICE_LABELS))
     ap.add_argument('--after-opening', dest='after_opening', type=int, default=32); ap.add_argument('--width', type=int, default=390)
     ap.add_argument('--json', default=None); ap.add_argument('--log', default=None); ap.add_argument('--what-if', dest='what_if', default='')
+    ap.add_argument('--save', default=None, help='start from a save (a file in tests/saves, or a path) instead of a new game; --days counts from its next day')
+    ap.add_argument('--dump-save-at', dest='dump_at', type=int, default=None); ap.add_argument('--dump-save', dest='dump_save', default=None)
     run(ap.parse_args())
