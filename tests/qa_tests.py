@@ -714,19 +714,28 @@ def qa_a_favourite_is_missed_only_when_it_is_off_the_menu(b, port, target):
 
 @test
 def qa_a_review_talks_about_the_food_not_the_glass(b, port, target):
-    """Known-open (WS6-06): a review names the first thing served — often the glass of wine poured with the dinner — as
-    the dish: 「氣泡酒的火候剛剛好」「黑皮諾好吃，盤子乾淨得像沒用過」 (6–10 of the last 100 reviews in the user's Day 86–92
-    saves). A dinner with a glass first and a dish after: the review speaks of the dish."""
+    """WS6-06 (fixed 2026-10-06): a review named the glass as the dish — 「氣泡酒的火候剛剛好」「黑皮諾好吃，盤子乾淨得像沒用
+    過」 (6–10 of the last 100 reviews in the user's Day 86–92 saves; mostly guests who only had a glass in the Lounge).
+    A dinner with a glass and a dish: the review speaks of the dish. A Lounge guest with only a glass: no review line
+    names the glass as food. The signature named 「Jill's …」 is never 「Jill 主廚的Jill's …」. No bench before it is bought."""
     p = Player(b, port, target, save=LATE)
     try:
         _to_service_from_late(p)
-        out = json.loads(p.ev("""JSON.stringify((()=>{const w=Object.keys(WINES)[0];const food=menuList().find(d=>DISH(d)&&DISH(d).cat==='main');const said=[];
+        out = json.loads(p.ev("""JSON.stringify((()=>{const w=Object.keys(WINES)[0];const food=menuList().find(d=>DISH(d)&&DISH(d).cat==='main'&&d!=='signature');const said=[],lg=[],sig=[];const r0=Math.random;
           for(let i=0;i<12;i++){const g={name:'T',size:2,type:'couple',cats:[],ticket:{items:[{d:w,st:'served',lbar:true},{d:food,st:'served'}]},table:null};
             const r=addReview(g,5);if(r)said.push(r.txt)}   /* the journal keeps 80: count what is returned, not the list's length */
-          return {wine:dishName(w),food:dishName(food),said}})())"""))
+          for(let i=0;i<20;i++){const g={name:'L',size:1,type:'couple',cats:[],lg:{why:'direct'},ticket:{lounge:1,items:[{d:w,st:'served',lbar:1}]},table:null};const r=addReview(g,4+(i%2));if(r)lg.push(r.txt)}
+          const s0=S.signature;if(s0){for(let i=0;i<30;i++){Math.random=(()=>{let k=i*7+1;return()=>((k=k*48271%2147483647)/2147483647)})();const g={name:'S',size:1,type:'gourmet',cats:[],ticket:{items:[{d:'signature',st:'served'}]},table:null};const r=addReview(g,5);if(r)sig.push(r.txt)}Math.random=r0}
+          const bench=extOn('bench');const ext0=S.ext.bench;S.ext.bench=0;const left=[];for(let i=0;i<60;i++){const g={name:'W',size:2,type:'couple',cats:[],ticket:null,table:null};const r=addReview(g,1,null,{left:true,wait:true});if(r)left.push(r.txt)}S.ext.bench=ext0;
+          return {wine:dishName(w),food:dishName(food),said,lg,sig,left,signame:s0?dishName('signature'):null}})())"""))
         named = [t for t in out['said'] if out['wine'] in t]
         check(out['said'], 'no review was written')
         check(not named, f'the review names the glass ({out["wine"]}) as the dish: {named[:2]}')
+        food_words = re.compile(r'好吃|火候|盤子|吃到最後一口|上桌|熱騰騰|擺盤|份量')
+        lg_bad = [t for t in out['lg'] if out['wine'] in t and food_words.search(t)]
+        check(not lg_bad, f'a Lounge guest\'s glass reviewed as food: {lg_bad[:2]}')
+        check(not [t for t in out['sig'] if 'Jill 主廚的Jill' in t], f'「Jill 主廚的Jill\'s…」: {[t for t in out["sig"] if "Jill 主廚的Jill" in t][:1]}')
+        check(not [t for t in out['left'] if '長椅' in t], f'a bench in a review with no bench bought: {[t for t in out["left"] if "長椅" in t][:1]}')
     finally:
         p.close()
 
@@ -776,5 +785,161 @@ def qa_stories_wait_for_stories_not_for_dates(b, port, target):
         rows = p.ev(r"""JSON.stringify(STORY_EV.map(E=>({k:E.k,w:String(E.when||'')})).filter(x=>/(?:S\.day|shopDay\(\))\s*(?:>=|>|<=|<|===)\s*\d/.test(x.w)).map(x=>x.k))""")
         found = set(json.loads(rows))
         check(not (found - allowed), f'story beats waiting for a calendar day: {sorted(found - allowed)}')
+    finally:
+        p.close()
+
+
+# ---------------------------------------------------------------- the world and its people (audit 2026-10-06: fixed)
+
+@test
+def qa_who_is_still_there_at_closing(b, port, target):
+    """N06: 「品酒師 Ken 和 Monsieur 杜 一起走了。」 at 21:21, then at closing 「打烊後，Ken 沒有走。…」 — the beat asked only
+    whether he came today. Now a closing beat needs the person still there (here, or gone only after the doors closed and
+    not with someone); on the samples night Ken stays till the doors close; on 予安's nights she stays till then too."""
+    p = Player(b, port, target, save=LATE)
+    try:
+        _to_service_from_late(p)
+        r = json.loads(p.ev("""JSON.stringify((()=>{const E=STORY_EV.find(e=>e.k==='ken_samples');factSet('ken_collab');delete story().facts.ken_samples;kenS().samples=S.day;
+          const kq=kenQuiet,kn=kenNightToday;kenQuiet=()=>true;kenNightToday=()=>false;const out={};
+          for(const g of R.groups.filter(g=>storyIdsOf(g).includes(KEN_ID)))R.groups.splice(R.groups.indexOf(g),1);
+          namedHist(KEN).seen=S.day;R.leftAt={};R.leftAt[KEN_ID]={t:R.t,closed:false,together:true};R.leftTog={};R.leftTog[KEN_ID]=1;out.leftWithDu=E.when({});
+          R.leftAt[KEN_ID]={t:R.t,closed:false,together:false};R.leftTog={};out.leftEarly=E.when({});
+          R.leftAt[KEN_ID]={t:R.t,closed:true,together:false};out.stayedToClose=E.when({});
+          const g={named:KEN,table:0,timer:0,size:1};const c0=R.closed;R.closed=false;out.lingers=storyLinger(g)&&g.timer>0;R.closed=true;out.leavesAtClose=!storyLinger({named:KEN,table:0,timer:0,size:1});R.closed=c0;
+          kenQuiet=kq;kenNightToday=kn;
+          const Y={g:{named:YA,size:1},on:1,t0:R.t,trial:0,done:0};R.ya=Y;const t0=R.t;R.t=R.dur*.95;R.closed=false;yaUpd(.05);out.yaAt95=!Y.done;R.closed=true;yaUpd(.05);out.yaAtClose=!!Y.done;R.t=t0;R.closed=c0;R.ya=null;
+          return out})())"""))
+        check(not r['leftWithDu'], 'the samples beat would play after Ken left with 杜')
+        check(not r['leftEarly'], 'the samples beat would play after Ken left before closing')
+        check(r['stayedToClose'], 'the samples beat would not play with Ken there to the end')
+        check(r['lingers'] and r['leavesAtClose'], f'Ken does not stay till the doors close on the samples night: {r}')
+        check(r['yaAt95'] and r['yaAtClose'], f'予安 leaves before the doors close on her night: {r}')
+    finally:
+        p.close()
+
+
+@test
+def qa_named_people_do_not_speak_a_strangers_lines(b, port, target):
+    """N03: Dylan after fifteen signature dishes said 「這就是招牌菜？」; 周董 said 「把你們最好的端上來吧。」 a moment before his
+    own 「隨便。」; Madame Lin's 「你選。」 was followed by her ordering 「氣泡酒，一杯。」. The serving lines and the VIP's order are
+    a stranger's: Dylan, a regular, a named guest never say them; a stranger still does."""
+    p = Player(b, port, target, save=LATE)
+    try:
+        _to_service_from_late(p)
+        install_bot(p.g); p.ev(LAZY_ACTOR); p.ev("window.__act=window.__actLazy")
+        for _ in range(240):   # until strangers sit with their orders
+            if p.ev("R.groups.filter(g=>g.ticket&&g.table!=null&&!g.reg&&!namedId(g)&&g.ticket.items.length).length>=1"):
+                break
+            p.settle(); p.ev("for(let i=0;i<30;i++){__act();__tick(1000/30)}")
+        r = json.loads(p.ev("""JSON.stringify((()=>{const said=[];const q0=quote0;quote0=function(g,t,o){said.push([g.__k,t]);return q0.apply(this,arguments)};const r0=Math.random;Math.random=()=>0;
+          const ok=[];try{const base=R.groups.filter(g=>g.ticket&&g.table!=null&&!g.reg&&!namedId(g)&&g.ticket.items.length);if(base.length<1)return {err:'no anonymous seated group'};
+           const mk=(k,f)=>{const g0=base[0];const g=Object.assign({},g0,{__k:k,servedTick:1,ticket:Object.assign({},g0.ticket,{items:g0.ticket.items.map(i=>Object.assign({},i,{st:'ready'}))})});f(g);return g};
+           for(const [k,f] of [['dylan',g=>{g.reg='dylan'}],['regular',g=>{g.reg='sophie';g.regs=['sophie']}],['named',g=>{g.named='周董';g.type='vip'}],['stranger',g=>{}]]){
+            const g=mk(k,f);R.cds={};R.saidT={};R.chatN=0;R.chatAt=null;S.chatSeen={};
+            try{serveItems(g,g.ticket.items.map(it=>({it})))}catch(e){said.push([k,'ERR '+e.message])}
+            if(k==='named'||k==='stranger'){const v=mk(k+'-order',g=>{f(g);g.type='vip';g.state='order';g.ticket=null});R.cds={};R.saidT={};try{createTicket(v)}catch(e){}}}}
+          finally{quote0=q0;Math.random=r0}return {said}})())"""))
+        check('err' not in r, r.get('err', ''))
+        by = {}
+        for k, t in r['said']:
+            by.setdefault(k, []).append(t)
+        strangers_lines = re.compile(r'這就是招牌菜|招牌菜長這樣|終於吃到了|專程來吃|這是 Jill 親手做的嗎|長這樣|就是這個|這個要拍一下|比照片還好看|跟一般的差在哪|招牌甜點|自己想的|留了肚子|拍一張再吃|我要那個|擺盤好美|把你們最好的|今天有什麼特別的|招牌的都上一份|不用看菜單|今天才有的|來了來了|看起來好好吃|份量剛好|聞起來好香|先拍照')
+        for k in ('dylan', 'regular', 'named', 'named-order'):
+            bad = [t for t in by.get(k, []) if strangers_lines.search(t)]
+            check(not bad, f'{k} said a stranger’s line: {bad[:2]}')
+        check(any(strangers_lines.search(t) for t in by.get('stranger', []) + by.get('stranger-order', [])), f'a stranger no longer says them either: {by}')
+    finally:
+        p.close()
+
+
+@test
+def qa_after_the_reveal_dylan_is_not_a_stranger(b, port, target):
+    """N07: Day 95 (26 days after the reveal) Mia: 「那個人跟老闆娘很熟的樣子。」; the user's Day 72 save, 小林: 「那位先生又
+    來了。」. After the reveal no regular notices him as a stranger and no clue is counted; before it they still do."""
+    p = Player(b, port, target, save=LATE_CP)
+    try:
+        p.tap('#screen [data-act=open]'); p.frames(10)
+        r = json.loads(p.ev("""JSON.stringify((()=>{const said=[];const q0=quote;quote=function(g,t,o){if(g&&g.id===9002)said.push(t);return q0.apply(this,arguments)};const r0=Math.random;Math.random=()=>0;
+          const tb=R.tables.find(t=>!t.group)||R.tables[0];const dg={id:9001,reg:'dylan',table:tb.i,state:'eat',size:1,looks:[],x:tb.x,y:tb.y};R.groups.push(dg);
+          const reg=Object.keys(S.regulars).find(k=>k!=='dylan'&&!(REG_BY[k]&&REG_BY[k].pair)&&(S.regulars[k]||0)>=4);const g={id:9002,reg,regs:[reg],table:tb.i,size:1,state:'reading'};
+          const out={reg};try{for(const stage of [S.dylan.stage,2]){S.dylan.stage=stage;const n0=S.dylan.clues.noticed||0;const s0=said.length;for(let i=0;i<20;i++){S.dylan.noticedDay=-9;regularsNoticeDylan(g);__tick(2500)}out['stage'+stage]={clues:(S.dylan.clues.noticed||0)-n0,lines:said.length-s0}}}
+          finally{quote=q0;Math.random=r0;R.groups.splice(R.groups.indexOf(dg),1)}return out})())"""))
+        after = [v for k, v in r.items() if k.startswith('stage') and k != 'stage2']
+        check(after and after[0]['clues'] == 0 and after[0]['lines'] == 0, f'after the reveal a regular still notices him as a stranger: {r}')
+        check(r['stage2']['clues'] > 0, f'before the reveal (control) nobody notices him: {r}')
+    finally:
+        p.close()
+
+
+@test
+def qa_the_days_text_matches_the_day(b, port, target):
+    """N13, WS2-07, N16, WS1-11, WS1-12: Day 90's 「店慶」 said 「開店滿十天的日子」; Valentine's morning said 「今天今天是情人
+    節。」; a VIP booking's morning said 「今天沒什麼特別的」; a new game's summary and journal said 「擴建到 Jill's Bistro 的
+    門檻 0.0」; the first tutorial card sat guests on a bench Day 1 does not have."""
+    p = Player(b, port, target)
+    try:
+        r = json.loads(p.ev("""JSON.stringify((()=>{const out={};out.cel=EVENTS.celebrate.d;const d0=S.stats.days;S.stats.days=89;out.cel90=EVENTS.celebrate.d;S.stats.days=d0;
+          out.names=Object.values(EVENTS).map(E=>E.n);const T0=S.today;const m=[];for(const ev of ['valentine','vip','celebrate']){for(const w of ['cloud','sun']){S.today=Object.assign({},T0||{},{weather:w,event:ev,day:S.day});for(let i=0;i<20;i++)m.push(morningLine())}}S.today=T0;out.morning=m;
+          out.coach=(typeof COACH!=='undefined'?COACH:[]).map(c=>typeof c==='string'?c:JSON.stringify(c)).join('|');return out})())"""))
+        check('十天' not in r['cel90'] and '90' in r['cel90'], f'Day 90’s anniversary reads: {r["cel90"]}')
+        check(not [n for n in r['names'] if n.startswith('今天')], f'an event named 「今天…」: {[n for n in r["names"] if n.startswith("今天")]}')
+        check(not [t for t in r['morning'] if '今天今天' in t or '沒什麼特別' in t or '普通的一天' in t], f'mornings with an event: {[t for t in r["morning"] if "今天今天" in t or "沒什麼特別" in t][:2]}')
+        check(all(any(n in t for n in ('情人節', 'VIP', '店慶')) for t in r['morning']), 'a morning with an event does not say it')
+        check('長椅' not in r['coach'], 'the first tutorial card sits guests on a bench Day 1 does not have')
+        p.tap('[data-act=open]'); p.settle(); p.ev("autoStock()"); p.start_day()
+        install_bot(p.g); p.ev("__bot(60000,1/30)"); p.ev("while(DLG)dlgNext()")
+        check(not re.search(r'(門檻|需要) 0\.0', p.text('#screen')), 'the Day 1 summary shows a 0.0 rating gate')
+    finally:
+        p.close()
+
+
+@test
+def qa_continuing_the_day_does_not_replay_its_opening(b, port, target):
+    """N16 (WS2-01's save): 繼續營業 at 22:08 fell back to reopening the room (the table count had changed) and replayed the
+    evening's start — 「那天下午…」, 「OPEN FOR DINNER」 — and then 「RUSH HOUR 晚餐尖峰時段開始！」 at 22:08."""
+    p = Player(b, port, target, save='player_day68_1033.json')
+    try:
+        p.capture_on()
+        p.tap('#screen [data-act=open]'); p.frames(60)
+        caps = p.captured()
+        banners = [c['t'] for c in caps if c['k'] == 'banner']
+        check(not [t for t in banners if 'RUSH' in t or 'OPEN FOR DINNER' in t], f'banners after 繼續營業: {banners}')
+        check(p.state()['phase'] == 'service', f'not back in the service: {p.state()}')
+    finally:
+        p.close()
+
+
+@test
+def qa_regulars_do_not_repeat_a_line_within_the_week(b, port, target):
+    """N14: 小林's 「今天加班，還好還開著。」 four times in seven days (rc8.5 had promised a regular says the same line at most
+    once a week; the rule lived only in the order's line). Every regular's everyday line goes through the same week."""
+    p = Player(b, port, target, save=LATE)
+    try:
+        _to_service_from_late(p)
+        r = json.loads(p.ev("""JSON.stringify((()=>{const said=[];const q0=quote;quote=function(g,t,o){said.push([S.day,t]);return true};const d0=S.day;const g=R.groups.find(x=>x.reg)||{reg:'koba',regs:['koba']};
+          try{for(const d of [d0,d0+2,d0+4,d0+8]){S.day=d;regSay(g,'今天加班，還好還開著。')}}finally{quote=q0;S.day=d0}return said})())"""))
+        days = [d for d, t in r]
+        check(len(days) == 2 and days[1] - days[0] >= 7, f'said on days {days} (at most once a week)')
+    finally:
+        p.close()
+
+
+@test
+def qa_the_summarys_tomorrow_matches_the_shop(b, port, target):
+    """WS1-09: the summary's 「明天：…」 said decor and expansion, the staff and the signature dish a day after the shop
+    already had them. Each is announced for the evening its tab opens."""
+    p = Player(b, port, target)
+    try:
+        r = json.loads(p.ev("""JSON.stringify((()=>{const out=[];const d0=S.day,p0=S.phase,ph0=phase;try{for(let K=2;K<=9;K++){const note=nextDayNote(K);S.day=K;S.phase='shop';phase='shop';const on=shopTabs().filter(t=>t.on).map(t=>t.k);
+          out.push({K,note,on})}}finally{S.day=d0;S.phase=p0;phase=ph0}return out})())"""))
+        first = {}
+        for x in r:
+            for k in x['on']:
+                first.setdefault(k, x['K'])
+        notes = {x['K']: x['note'] for x in r}
+        where = {'員工': 'staff', '招牌菜': 'sig'}
+        for word, tab in where.items():
+            k = next((K for K, n in notes.items() if word in n), None)
+            check(k == first.get(tab), f'「{word}」 is announced for Day {k} but its tab opens on evening {first.get(tab)}')
     finally:
         p.close()
