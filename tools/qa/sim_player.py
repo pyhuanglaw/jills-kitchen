@@ -51,7 +51,7 @@ JS_TEXT = "(sel=>{" + _VIS + "const e=document.querySelector(sel);return vis(e)?
 JS_BUTTONS = "(scope=>{" + _VIS + r"""const out=[];const all=[...document.querySelectorAll(scope+' [data-act]')].filter(vis);
  all.forEach((e,i)=>{const it=e.closest('.item,.menu-row');const nm=it&&it.querySelector('.nm');const d=it&&it.querySelector('.d');const lk=it&&it.querySelector('.lock,.act .muted');
   const st=nm&&nm.querySelector('.stars');let stars=null;if(st){const grey=[...st.querySelectorAll('span')].reduce((a,s)=>a+(s.textContent.match(/★/g)||[]).length,0);stars=(st.textContent.match(/★/g)||[]).length-grey}
-  out.push({act:e.dataset.act,k:e.dataset.k??null,d:e.dataset.d??null,v:e.dataset.v??null,text:clean(e.innerText),dis:!!e.disabled,
+  out.push({act:e.dataset.act,k:e.dataset.k??null,d:e.dataset.d??null,v:e.dataset.v??null,text:clean(e.innerText),dis:!!e.disabled||e.getAttribute('aria-disabled')==='true',
    card:it?{nm:clean(nm&&nm.innerText),d:clean(d&&d.innerText),lock:clean(lk&&lk.innerText),stars,done:it.classList.contains('done'),on:it.classList.contains('menu-row')?!it.classList.contains('off'):null}:null})});return out})"""
 JS_SUMMARY = "(()=>{" + _VIS + r"""const sc=document.querySelector('#screen');if(!vis(sc))return null;
  const money=s=>parseInt(String(s).replace(/[^0-9]/g,''))||0;const L={};
@@ -76,7 +76,7 @@ JS_PREP = "(()=>{" + _VIS + r"""const sc=document.querySelector('#screen');if(!v
   warn,expect:exp?+exp[1]:null,tablesWarn:/客人會等太久/.test(tx),notes:[...sc.querySelectorAll('.inline-warn,.warnline,.news li')].map(e=>clean(e.innerText)).slice(0,8)}})()"""
 JS_SHOP_TOP = "(()=>{" + _VIS + r"""const sc=document.querySelector('#screen');if(!vis(sc))return null;const tx=sc.innerText;const m=re=>{const x=tx.match(re);return x?parseInt(x[1].replace(/,/g,'')):null};
  return {cash:m(/目前現金\s*\$([\d,]+)/),need:m(/預估基本備料 約 \$([\d,]+)/),keep:m(/建議保留 約 \$([\d,]+)/),low:/現在的現金可能不夠/.test(tx),
-  tabs:[...sc.querySelectorAll('[data-act=tab]')].filter(vis).map(e=>({k:e.dataset.k,text:clean(e.innerText),dis:!!e.disabled,on:e.classList.contains('on')}))}})()"""
+  tabs:[...sc.querySelectorAll('[data-act=tab]')].filter(vis).map(e=>({k:e.dataset.k,text:clean(e.innerText),dis:!!e.disabled||e.getAttribute('aria-disabled')==='true',on:e.classList.contains('on')}))}})()"""
 JS_STAFF = "(()=>{" + _VIS + r"""const sc=document.querySelector('#screen');if(!vis(sc))return null;const money=s=>parseInt(String(s).replace(/[^0-9]/g,''))||0;
  const cl=clean((sc.querySelector('.capline')||{}).innerText);const roles={};for(const x of cl.matchAll(/(廚師|服務生|清潔員|Lounge 員工)\s*(\d+)\/(\d+)/g))roles[x[1]]={n:+x[2],cap:+x[3]};
  const wages=money((cl.match(/每日薪資 \$[\d,]+/)||['0'])[0]);
