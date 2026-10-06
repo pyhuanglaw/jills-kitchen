@@ -10155,7 +10155,7 @@ function doAct0(a,d,k,b){
  case'upGo':upGo(k);break;
  case'buyUp':{if(buyUp()){sfx.buy()}break}
  case'buySR':{if(buyRoomPhase('sr',+k))sfx.buy();break}case'buyPD':{if(buyRoomPhase('pd',+k))sfx.buy();break}case'roomGo':roomGo(k);break;   /* v2.4 rc6 */
- case'buyLounge':{if(buyLounge(+k)){sfx.buy()}break}
+ case'buyLounge':{if(+k>1&&buyLounge(+k)){sfx.buy()}break}   /* II and III are bought here; Lounge I only by 簽約・開工 (《看看》, 4.0, the money) — no button builds it around the story */
  case'cnPlan':{if(cnPlan()){sfx.buy();toast('明晚是主廚之夜。');keepScroll(showShop,'.cn-card')}break}   /* rc7.6 */
  case'ktHold':{if(ktHold()){sfx.tap();toast('今晚是品酒之夜。');keepScroll(showPrep,'.kt-ask')}break}   /* rc7.6 (08:51) */
  case'ktCancel':{if(ktCancel()){sfx.tap();toast('品酒之夜這次不辦。');keepScroll(showPrep,'.kt-ask')}break}

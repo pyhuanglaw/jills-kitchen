@@ -5032,6 +5032,9 @@ def v24_lounge_one_after_the_viewing_rating_four_and_50000_no_wait_for_her_last_
     check(g.ev(DIS) is False and '需要餐廳評分' not in card and g.ev("rating().toFixed(1)") == '4.0', f'a rating the HUD shows as 4.0 is 4.0: {card[-60:]!r}')
     g.ev("__rate=4.2;S.money=49999;showShop()"); g.page.wait_for_timeout(40); card = g.ev(CARD)
     check(g.ev(DIS) is True and '還差 $1' in card and '需要餐廳評分' not in card, f'4.0 or more, $1 short: only the money is said: {card[-60:]!r}')
+    # no way around the story: an act 「buyLounge 1」 (no such button in the game; a stale one, a script) builds nothing
+    g.ev("S.money=500000;(()=>{const el=document.createElement('button');el.dataset.act='buyLounge';el.dataset.k='1';$('#screen').appendChild(el);el.click();el.remove()})()")
+    check(g.ev("loungeLv()") == 0 and g.ev("S.money") == 500000 and g.ev("S.loungeProj.state") == 'planned', 'Lounge I is never bought around 簽約・開工')
     # THE REGRESSION (the user, 2026-10-06): her last night still ahead + 《看看》 + 4.0 + $50,000 → the signing goes through
     g.ev("S.money=50000;showShop()"); g.page.wait_for_timeout(40)
     old_last = g.ev("linLast()")
