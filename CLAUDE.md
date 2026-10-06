@@ -25,6 +25,8 @@
 - **I / T / O 分開報告**：測試通過不等於玩家在 iPhone 上看得到。2026-10-06 起分成四層（程式寫了、測試／模擬確認了、正常遊玩看得到、
   玩家在 iPhone 上確認了），見下面「跟使用者的溝通方式」。
 - **改到遊戲基本架構（不只劇情）就檢查店主手冊**（`GUIDE`），每一項要短、好讀。
+- **改完遊戲先跑例行 QA**：`python3 tests/run_tests.py --qa`（`docs/QA.md`）。它已經自動檢查的事不要再花 AI 重新玩一次；修 bug 附上
+  防止它再發生的測試。隔一段時間的全面 Audit 照 `docs/audit/PLAYBOOK.md`（上一次：`docs/audit/2026-10-06/`）。
 - **報告 ≠ 停下**：回報後繼續已定義的工作，除非遇到 canon 衝突、存檔風險，或需要玩家做的產品決策。
 - 玩家說「這個是 hard canon，寫進 project memory」時，更新 `docs/PROJECT_MEMORY.md` 對應的段落，附上日期和原話，然後 commit。
 
