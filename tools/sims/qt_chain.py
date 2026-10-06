@@ -1,7 +1,7 @@
 """晴 × 阿拓 after work (the player's brief of 2026-10-03), the same way as lin_chain.py: a save played forward day by day by the lazy bot. Each day prints
 the line's beats that happened, who walked next door after dinner, the pairing glasses poured with dinner, Madame Lin's
-and Ken's visits, and the day's major beats. The tasting's choice and the 「隔壁」 decision are answered as a player
-might (food; 接下隔壁).
+and Ken's visits, and the day's major beats. The tasting's choice is answered as a player might (food); 「隔壁」 is the
+story's (2026-10-06: 《看看》 decides it — no card).
 
   python3 tools/sims/lin_chain.py SAVE DAYS [SEEDBASE=8200] [SETUP_JS]
   SHOTS=dir: the scenes play (held, as a player sees them) and a screenshot is taken of the lines named in WANT
@@ -23,7 +23,7 @@ RNG = "Math.random=(function(){let a=%d;return function(){a|=0;a=a+0x6D2B79F5|0;
 KEYS = ['qt_3', 'ya_1', 'ya_2', 'ya_3', 'ya_join', 'qt_drink', 'qx_pay', 'qt_late', 'qt_often', 'ya_sees_qt', 'qt_ya', 'dylan_knows_qt', 'qt_said']
 KEYS_LIN = ['lin_hello', 'ken_wine_q', 'ken_pairing', 'lounge_idea', 'tasting_night', 'pairing_wine', 'lin_retiring', 'ken_where', 'jd_want', 'dylan_book', 'lin_viewing', 'lounge_project', 'lin_take', 'lin_closed', 'lin_signed', 'evan_knows_dylan', 'lounge_built_1', 'lin_guest']
 EVS = ['qt_drink', 'qt_late', 'qt_often', 'qt_ya', 'qt_said', 'qx_home']
-EVS_LIN = ['ken_tasting', 'tasting_start', 'pairing_start', 'lin_retire', 'ken_where', 'jd_want', 'dylan_book', 'lin_viewing', 'lin_decide', 'lin_last', 'lin_sign', 'lin_guest']
+EVS_LIN = ['ken_tasting', 'tasting_start', 'pairing_start', 'lin_retire', 'ken_where', 'jd_want', 'dylan_book', 'lin_viewing', 'lin_last', 'lin_sign', 'lin_guest']
 UNTIL = os.environ.get('UNTIL', 'decide')   # decide (Jill's decision and her last night) | open (the signing, the work, the opening) | guest (Madame Lin at The Lounge)
 
 
@@ -83,18 +83,13 @@ def main():
             day = g.ev("S.day")
             for _ in range(2000):
                 if g.ev("sub==='tasting'"): g.ev("tastingDir('food')")
-                if g.ev("sub==='loungeproj'"):
-                    if SHOTS and ('lin_decide', 'modal') not in SEEN:
-                        SEEN[('lin_decide', 'modal')] = 1; g.page.wait_for_timeout(150); g.page.screenshot(path=os.path.join(SHOTS, f'lin_decide_1_day{day}.png')); print(f'   shot lin_decide_1_day{day}.png', flush=True)
-                    g.ev("loungeGo('plan')")
                 if SHOTS: held(g, day)
                 g.ev("for(let i=0;i<20&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}")
-                n = g.ev("__botUntil(\"sub==='loungeproj'||sub==='tasting'||!!(typeof DLG!=='undefined'&&DLG)||(R.closing!=null&&!storyDay().eve)\",150,1/30)")
+                n = g.ev("__botUntil(\"sub==='tasting'||!!(typeof DLG!=='undefined'&&DLG)||(R.closing!=null&&!storyDay().eve)\",150,1/30)")
                 if g.ev("!!R&&R.closing!=null&&!storyDay().eve"): g.ev("lifeEnsureEvening()")   # the main loop's evening, which the bot does not run
                 if g.ev("phase") != 'service' or not g.ev("!!R"): break
-                if n < 150 and not g.ev("paused||sub==='loungeproj'||sub==='tasting'||!!(typeof DLG!=='undefined'&&DLG)"): break
+                if n < 150 and not g.ev("paused||sub==='tasting'||!!(typeof DLG!=='undefined'&&DLG)"): break
             if g.ev("phase") == 'service': g.ev("__bot(60000,1/30)")
-            if g.ev("sub==='loungeproj'"): g.ev("loungeGo('plan')")
             if g.ev("!!(typeof DLG!=='undefined'&&DLG)"):
                 if SHOTS: held(g, day)
                 g.ev("for(let i=0;i<80&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}")

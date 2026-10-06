@@ -48,7 +48,7 @@ def floor_taken(g, lease_back):
 
 SIM_DAY = r"""window.__simDay=function(steps,dt){let n=0;for(;n<steps;n++){if(!(phase==='service'&&R))break;
  if(sub==='roomoffer'){const b=document.querySelector('#screen [data-act=roomGo]');const k=b?b.dataset.k.split('|')[0]:'?';__rm.offers.push(k);if(b)roomGo(k+'|plan');else{hideScreen();paused=false}}
- if(sub==='upproj'){__rm.offers.push('up');upGo('plan')}if(sub==='loungeproj'){__rm.offers.push('lounge');loungeGo('plan')}
+ if(sub==='upproj'){__rm.offers.push('up');upGo('plan')}if(!__rm.offers.includes('lounge')&&fact('lounge_project')&&fact('lounge_project').d===S.day)__rm.offers.push('lounge')   /* 2026-10-06: no card — 《看看》 decides it, that day */
  if(typeof DLG!=='undefined'&&DLG)dlgNext();
  __act();update(dt);updateCats(dt,0);if(!R)break;
  const m=srPeople().length;if(m>__rm.most)__rm.most=m;__rm.brk=R.srBreaks||0;__rm.cat=R.srCat?1:0;__rm.early=R.srEarly?1:0;

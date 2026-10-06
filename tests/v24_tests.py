@@ -4581,7 +4581,8 @@ def _dlg_lines(g, cap=40):
 
 def _lin_play_days(g, days, stop=None):
     """the lazy bot through whole days, the scenes unseen, the main loop's evening run at closing (the bot does not), the
-    player's two answers given (the tasting: food; next door: 接下隔壁); a dict of what each day did"""
+    player's one answer given (the tasting: food; next door is the story's — 《看看》 decides it, 2026-10-06); a dict of
+    what each day did"""
     log = []
     for _ in range(days):
         for _k in range(3):
@@ -4595,14 +4596,12 @@ def _lin_play_days(g, days, stop=None):
         day = g.ev("S.day")
         for _i in range(2500):
             if g.ev("sub==='tasting'"): g.ev("tastingDir('food')")
-            if g.ev("sub==='loungeproj'"): g.ev("loungeGo('plan')")
             g.ev("for(let i=0;i<20&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}")
-            n = g.ev("__botUntil(\"sub==='loungeproj'||sub==='tasting'||!!(typeof DLG!=='undefined'&&DLG)||(R.closing!=null&&!storyDay().eve)\",150,1/30)")
+            n = g.ev("__botUntil(\"sub==='tasting'||!!(typeof DLG!=='undefined'&&DLG)||(R.closing!=null&&!storyDay().eve)\",150,1/30)")
             if g.ev("!!R&&R.closing!=null&&!storyDay().eve"): g.ev("lifeEnsureEvening()")
             if g.ev("phase") != 'service' or not g.ev("!!R"): break
-            if n < 150 and not g.ev("paused||sub==='loungeproj'||sub==='tasting'||!!(typeof DLG!=='undefined'&&DLG)"): break
+            if n < 150 and not g.ev("paused||sub==='tasting'||!!(typeof DLG!=='undefined'&&DLG)"): break
         if g.ev("phase") == 'service': g.ev("__bot(60000,1/30)")
-        if g.ev("sub==='loungeproj'"): g.ev("loungeGo('plan')")
         log.append(json.loads(g.ev("JSON.stringify({d:S.day,bar:barState(),din:S.lastSummary&&S.lastSummary.dinWine?S.lastSummary.dinWine.reduce((a,x)=>a+x.n,0):0,wineCost:S.lastSummary&&S.lastSummary.wine||0})")) | {'news': news})
         if stop and g.ev(stop): break
     return log
@@ -4642,13 +4641,14 @@ def v24_rc8_madame_lin_next_door_on_day_one(b, port, target):
 @test
 def v24_rc8_the_bar_next_door_from_kens_question_to_jills_decision(b, port, target):
     """§4–§12 on the player's Day 52 save (Ken has asked, no tasting yet, Dylan not revealed), played day by day (the
-    scenes unseen; food; 接下隔壁): the tasting, and as Ken pays Jill keeps the pairing wines (「想喝酒，隔壁就有。」) —
+    scenes unseen; food): the tasting, and as Ken pays Jill keeps the pairing wines (「想喝酒，隔壁就有。」) —
     poured with dinner from then on, before any Lounge (at the pass, by the floor; in the wine cost and the summary);
     meanwhile Madame Lin's bar is open next door and guests walk over after dinner; a week or more of that, then
     「我做到月底。」 — her last night twelve days on, in the news before opening; Ken: 「不然吃完去哪？」; that night or later,
     in their room, 「……我有點想接。」 — before Dylan's reveal he is 「先生」, with no name; the book two days or more after;
-    the viewing the next morning or later, one scene (the place, the kitchen behind it, Evan; nobody mentions Dylan);
-    Jill decides that evening; Madame Lin's last night closes the bar. Nothing reveals Dylan."""
+    the viewing the next morning or later, one scene (the place, the kitchen behind it, Evan; nobody mentions Dylan) —
+    and with it Jill has decided (2026-10-06: no card, the project is on the works page that day); Madame Lin's last
+    night closes the bar. Nothing reveals Dylan."""
     g = Game(b, port, target, seed=8200, manual=True, viewport={'width': 390, 'height': 844})
     load_save(g, 'player_day52.json')
     check(g.ev("!!fact('ken_wine_q')") and not g.ev("!!fact('tasting_night')") and g.ev("S.dylan.stage") == 2 and g.ev("barState()") == 'lin', 'the save: Ken has asked; no tasting yet; Dylan not revealed; her bar open')
@@ -4656,12 +4656,12 @@ def v24_rc8_the_bar_next_door_from_kens_question_to_jills_decision(b, port, targ
     g.ev("window.__din=[];const __sv=serveItems;serveItems=function(q,list){for(const c of list||[]){const it=c.it;if(it&&DISH(it.d)&&DISH(it.d).wine){const m=(S.crew||[]).find(m=>{const w=R.cw&&R.cw[m.id];return w&&w.carry&&w.carry.includes(it)});__din.push({d:S.day,dinw:!!it.dinw,lbar:!!it.lbar,by:m?m.role:'jill',room:(R.tables[q.table]||{}).room||'main'})}}return __sv.apply(this,arguments)}")
     log = _lin_play_days(g, 34, stop="!!fact('lin_closed')&&!!fact('lounge_project')")
     F = json.loads(g.ev("JSON.stringify(Object.fromEntries(['tasting_night','pairing_wine','lin_retiring','ken_where','jd_want','dylan_book','lin_viewing','lounge_project','lin_take','lin_closed'].map(k=>[k,fact(k)?fact(k).d:null])))"))
-    E = json.loads(g.ev("JSON.stringify(Object.fromEntries(['ken_tasting','pairing_start','lin_retire','ken_where','jd_want','dylan_book','lin_viewing','lin_decide','lin_last','lounge_reveal'].map(k=>[k,evState(k).d||null])))"))
+    E = json.loads(g.ev("JSON.stringify(Object.fromEntries(['ken_tasting','pairing_start','lin_retire','ken_where','jd_want','dylan_book','lin_viewing','lin_last','lounge_reveal'].map(k=>[k,evState(k).d||null])))"))
     check(all(F[k] for k in F) and not E['lounge_reveal'], f'every step happened, and no after-close Lounge idea: {F} {E}')
     check(F['tasting_night'] == F['pairing_wine'] == E['pairing_start'], f'the wines kept the night of the tasting: {F} {E}')
     check(F['lin_retiring'] - F['pairing_wine'] >= 7, f'a week or more of that life before 「我做到月底」: {F}')
     check(F['lin_retiring'] <= F['ken_where'] <= F['jd_want'] and F['jd_want'] > F['lin_retiring'], f'Ken minds it after she says it; Jill tells Dylan after: {F}')
-    check(F['dylan_book'] - F['jd_want'] >= 2 and F['lin_viewing'] > F['dylan_book'] and F['lounge_project'] == F['lin_take'] >= F['lin_viewing'], f'the book days after she told him; the viewing after the book; then her decision: {F}')
+    check(F['dylan_book'] - F['jd_want'] >= 2 and F['lin_viewing'] > F['dylan_book'] and F['lounge_project'] == F['lin_take'] == F['lin_viewing'], f'the book days after she told him; the viewing after the book; her decision with it (no card): {F}')
     check(F['lin_closed'] == F['lin_retiring'] + 12 and g.ev("linLast()") == F['lin_closed'], f'「月底」: twelve days on, her last night: {F}')
     news = [x for x in log if x['news']]
     check(any('最後一晚' in x['news'] and x['d'] == F['lin_closed'] for x in news) and all(x['d'] >= F['lin_closed'] - 3 for x in news), f'the news before opening counts down her last nights: {news}')
@@ -4772,7 +4772,7 @@ def v24_rc8_mature_saves_hear_nothing_new_from_next_door(b, port, target):
         to_service(g)
         g.ev("window.__dw=0;const __sv=serveItems;serveItems=function(q,list){for(const c of list||[])if(c.it&&c.it.dinw)__dw++;return __sv.apply(this,arguments)}")
         g.ev("__botUntil('phase!==\"service\"',200000,1/30)")
-        new = json.loads(g.ev("JSON.stringify(story().trace.filter(t=>t.d===S.day&&['lin_hello','pairing_start','lin_retire','ken_where','jd_want','dylan_book','lin_viewing','lin_decide','lin_last','lin_sign'].includes(t.k)).map(t=>t.k))"))
+        new = json.loads(g.ev("JSON.stringify(story().trace.filter(t=>t.d===S.day&&['lin_hello','pairing_start','lin_retire','ken_where','jd_want','dylan_book','lin_viewing','lin_last','lin_sign'].includes(t.k)).map(t=>t.k))"))
         check(not new and g.ev("barState()") == 'lounge' and g.ev("__dw") == 0, f'{name}: nothing new fires (Checkpoint C gave the line to the save as history); The Lounge; no pass-poured glasses: {new}')
         check(not g.errors, g.errors[:3]); g.close()
 
@@ -4844,7 +4844,7 @@ def v24_rc8_the_restaurants_three_lists_and_the_lounges_one(b, port, target):
 
 _LIN_TAKEN = """const st=story();const d=S.day;const set=(k,dd)=>st.facts[k]={d:dd,n:1,l:dd};
  for(const k of ['tasting_night','pairing_wine'])set(k,d-20);set('lin_retiring',d-13);linS().last=d-1;set('ken_where',d-12);set('jd_want',d-11);set('dylan_book',d-8);set('lin_viewing',d-7);set('lounge_project',d-7);set('lin_take',d-7);
- for(const k of ['pairing_start','lin_retire','ken_where','jd_want','dylan_book','lin_viewing','lin_decide'])Object.assign(evState(k),{n:1,d:d-7});
+ for(const k of ['pairing_start','lin_retire','ken_where','jd_want','dylan_book','lin_viewing'])Object.assign(evState(k),{n:1,d:d-7});
  S.loungeProj={revealed:d-7,state:'planned',at:d-7};S.money+=300000;S.level=Math.max(S.level,4)"""
 
 
@@ -4867,7 +4867,7 @@ def v24_rc8_the_signing_the_work_and_the_opening(b, port, target):
         check('她最後一晚以後簽約' in card and not g.ev("!!document.querySelector('#screen [data-act=linSign]')"), f'before her last night: no signing ({card[-60:]!r})')
         g.ev("factSet('lin_closed');showShop()"); g.page.wait_for_timeout(60)
         m0 = g.ev("S.money"); g.click('#screen [data-act=linSign]'); g.page.wait_for_timeout(60)
-        check(m0 - g.ev("S.money") == 120000 and g.ev("S.loungeProj.state") == 'signing' and '明天開店前，Jill 去隔壁簽約' in g.ev("document.querySelector('#screen .lin-card').innerText"), 'paid: the signing is the next opening')
+        check(m0 - g.ev("S.money") == 80000 and g.ev("S.loungeProj.state") == 'signing' and '明天開店前，Jill 去隔壁簽約' in g.ev("document.querySelector('#screen .lin-card').innerText"), 'paid: the signing is the next opening')
         g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(120)
         g.ev("autoStock();window.__noScenes=false;window.__holds=true"); start_day(g); install_bot(g); g.ev("for(let i=0;i<3;i++)__tick(1000/30)")
         check(g.ev("!!(DLG&&DLG.sh&&DLG.sh.k==='lin_sign')") and g.ev("room") == 'lounge' and g.ev("BARV") == 1, 'the morning: 《簽約》 held, in her bar')
@@ -4936,7 +4936,7 @@ def v24_rc8_mature_saves_get_the_line_as_history(b, port, target):
     """§23: a save from before the Madame Lin line keeps everything it has and is given the line as history — facts and
     finished beats marked retro, 「更早以前」 on the story page, never played, never announced. With The Lounge (the
     player's Day 61 and Day 74): the whole line to the signing. With the project but no Lounge: up to her last night (簽約・
-    開工 is next; a 「再想想」 stays one). After the tasting: the pairing wines. Past Day 1: she brought the bell. A new
+    開工 is next — since 2026-10-06 for a 「再想想」 too: the story has decided). After the tasting: the pairing wines. Past Day 1: she brought the bell. A new
     game is this version's and is left alone."""
     LINE = ['lin_hello', 'pairing_wine', 'lin_retiring', 'ken_where', 'jd_want', 'dylan_book', 'lin_viewing', 'lin_take', 'lin_closed', 'lin_signed', 'evan_knows_dylan']
     for name in ('player_day61.json', 'player_day74_1508.json'):
@@ -4946,7 +4946,7 @@ def v24_rc8_mature_saves_get_the_line_as_history(b, port, target):
         check(all(F.get(k) == v for k, v in F0.items()), f'{name}: every fact it had, as it was')
         added = sorted(set(F) - set(F0))
         check(set(LINE) <= set(added) and all(F[k]['d'] == 0 and F[k].get('retro') == 1 for k in LINE) and not any(F[k].get('retro') for k in added if k not in LINE), f'{name}: the line, as history (and nothing else made retro): {added}')
-        check(g.ev("['lin_hello','pairing_start','lin_retire','ken_where','jd_want','dylan_book','lin_viewing','lin_decide','lin_last','lin_sign'].every(k=>evState(k).n===1&&evState(k).retro===1)") is True, f'{name}: its beats done (retro)')
+        check(g.ev("['lin_hello','pairing_start','lin_retire','ken_where','jd_want','dylan_book','lin_viewing','lin_last','lin_sign'].every(k=>evState(k).n===1&&evState(k).retro===1)") is True, f'{name}: its beats done (retro)')
         check(g.ev("loungeLv()") == raw['rooms']['lounge'] and sorted(g.ev("S.crew.map(m=>m.name)")) == sorted(m['name'] for m in raw['crew']) and g.ev("S.dylan.stage") == raw['dylan']['stage'], f'{name}: The Lounge, the crew, Dylan as they were')
         check(g.ev("propOn('linbell')") is True and g.ev("barState()") == 'lounge' and not g.ev("fact('lin_guest')"), f'{name}: the bell on the door; Madame Lin as a guest is still ahead')
         g.ev("storyProgressCheck()"); g.page.wait_for_timeout(60)
@@ -4955,17 +4955,17 @@ def v24_rc8_mature_saves_get_the_line_as_history(b, port, target):
         txt = g.ev("document.querySelector('#screen').innerText")
         check('隔壁' in txt and '更早以前' in txt and 'DAY ' + str(raw['day']) not in txt.split('隔壁', 1)[-1][:400], f'{name}: the story page — 「更早以前」')
         check(not g.errors, g.errors[:3]); g.close()
-    # the project but no Lounge yet: up to her last night; then 簽約・開工 (planned) or 接下隔壁 (再想想)
-    for state, act in (('planned', 'linSign'), ('deferred', 'linTake')):
+    # the project but no Lounge yet: up to her last night; then 簽約・開工 — a 「再想想」 or an unanswered card too (2026-10-06)
+    for state, act in (('planned', 'linSign'), ('deferred', 'linSign'), (None, 'linSign')):
         g = Game(b, port, target, seed=8732, manual=True, viewport={'width': 390, 'height': 844})
         raw = json.load(open(os.path.join(ROOT, 'tests', 'saves', 'player_day61.json'), encoding='utf-8')); raw = raw.get('save', raw)
-        raw['rooms']['lounge'] = 0; raw['crew'] = [m for m in raw['crew'] if m['name'] not in ('Evan', '沈晴')]; raw['loungeProj'] = {'revealed': 57, 'state': state, 'at': 57}; raw['money'] = 500000
+        raw['rooms']['lounge'] = 0; raw['crew'] = [m for m in raw['crew'] if m['name'] not in ('Evan', '沈晴')]; raw['loungeProj'] = {'revealed': 57, 'state': state, 'at': 57} if state else {'revealed': 57}; raw['money'] = 500000
         g.ev("phase='title';R=null;localStorage.setItem(KEY,JSON.stringify(%s))" % json.dumps(raw, ensure_ascii=False)); g.reload(); g.page.wait_for_timeout(150)
         g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(150)
-        check(g.ev("['lin_retiring','lin_viewing','lin_closed'].every(k=>fact(k)&&fact(k).retro===1)&&!fact('lin_signed')") is True and bool(g.ev("!!fact('lin_take')")) == (state == 'planned'), f'{state}: up to her last night')
+        check(g.ev("['lin_retiring','lin_viewing','lin_closed','lin_take'].every(k=>fact(k)&&fact(k).retro===1)&&!fact('lin_signed')") is True and g.ev("S.loungeProj.state") == 'planned', f'{state}: up to her last night, and Jill has decided')
         check(g.ev("barState()") == 'closed', f'{state}: her bar is closed, not yet Jill\'s')
         g.ev("showShop();shopTab='works';showShop()"); g.page.wait_for_timeout(60)
-        check(g.ev(f"!!document.querySelector('#screen .lin-card [data-act={act}]')") is True, f'{state}: the works page offers {act}')
+        check(g.ev(f"!!document.querySelector('#screen .lin-card [data-act={act}]')") is True and '再想想' not in g.ev("document.querySelector('#screen').innerText"), f'{state}: the works page offers {act}, and no 「再想想」')
         check(not g.errors, g.errors[:3]); g.close()
     # after the tasting, before any project: the pairing wines from the tasting's day; the rest of the line still ahead
     g = Game(b, port, target, seed=8733, manual=True, viewport={'width': 390, 'height': 844})
@@ -4985,6 +4985,90 @@ def v24_rc8_mature_saves_get_the_line_as_history(b, port, target):
     g = Game(b, port, target, seed=8735, manual=True, viewport={'width': 390, 'height': 844})
     g.click('[data-act=open]'); g.page.wait_for_timeout(100)
     check(g.ev("S.linMig") == 1 and not g.ev("Object.values(story().facts).some(f=>f.retro)"), 'a new game: nothing retro')
+    g.close()
+
+
+_LIN_TO_THE_VIEWING = """const st=story();for(const k of ['tasting_night','pairing_wine'])st.facts[k]={d:S.day-12,n:1,l:S.day-12};st.facts.lin_retiring={d:S.day-6,n:1,l:S.day-6};linS().last=S.day+6;for(const k of ['ken_where','jd_want'])st.facts[k]={d:S.day-4,n:1,l:S.day-4};st.facts.dylan_book={d:S.day-1,n:1,l:S.day-1};for(const k of ['pairing_start','lin_retire','ken_where','jd_want','dylan_book'])evState(k).n=1"""
+
+
+@test
+def v24_lounge_decided_at_the_viewing_no_card_and_lounge_one_is_80000(b, port, target):
+    """The user, 2026-10-06: 《看看》 is not a visit after which the player decides whether Jill takes the bar — the room
+    talk and Dylan's book have been her deciding; at the end of 《看看》 the story has decided. No 「接下隔壁／再想想」
+    card and no 「再想想」 to come back to: the day 《看看》 plays, 升級餐廳 › 店舖工程 has the Lounge, and the works page
+    carries the rest — her last night, the level, the money, 簽約・開工 — at $80,000 (Lounge II and III as they were).
+    Saves from before (a 「再想想」, a card nobody answered, a save made between 《看看》 and that night's card) are given
+    the decision when read; the works page offers 簽約・開工 once her bar has closed — nothing to find first, nothing stuck."""
+    g = Game(b, port, target, seed=8761, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day52.json'); g.ev(_LIN_TO_THE_VIEWING)
+    check(g.ev("JSON.stringify(LOUNGE_PROJ.map(p=>p.cost))") == '[80000,160000,220000]', 'Lounge I $80,000; II and III as they were')
+    if g.ev("phase") == 'shop': g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(200)
+    g.ev("window.__notes=[];const __nl=noteLine;noteLine=function(t){__notes.push(t);return __nl.apply(this,arguments)}")
+    g.ev("autoStock();window.__noScenes=false;window.__holds=true"); start_day(g); install_bot(g); g.ev("for(let i=0;i<3;i++)__tick(1000/30)")
+    check(g.ev("DLG&&DLG.sh&&DLG.sh.k") == 'lin_viewing', '《看看》, before opening')
+    lines = _dlg_lines(g, 60); d = g.ev("S.day")
+    check('Jill：我可以看看嗎？' in lines and not any('接下隔壁' in l or '再想想' in l for l in lines), f'the scene as it was: {lines}')
+    st = json.loads(g.ev("JSON.stringify({sub,modal:!!document.querySelector('#screen:not([hidden]) .modal'),proj:fact('lounge_project')&&fact('lounge_project').d,take:fact('lin_take')&&fact('lin_take').d,state:S.loungeProj&&S.loungeProj.state,notes:__notes,dlg:!!DLG,bar:barState()})"))
+    check(st['proj'] == d and st['take'] == d and st['state'] == 'planned' and not st['sub'] and not st['modal'] and not st['dlg'] and st['bar'] == 'lin', f'at the end of 《看看》 Jill has decided — no card; her bar stays open to her last night: {st}')
+    check(any('Jill 決定接下來' in n and '店舖工程' in n for n in st['notes']) and 'Jill 決定接下來' in lines[-1], f'one line says so, and where it goes on — the scene\'s last line: {st["notes"]} {lines[-2:]}')
+    # the evening plays (another story's scene tonight is tapped through, as a player would); the shop, as the player opens it
+    g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;window.__noScenes=true;window.__holds=false"); g.ev("__botUntil('phase!==\"service\"',200000,1/30)")
+    g.ev("for(let i=0;i<80&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}")
+    check(not g.ev("sub==='loungeproj'") and not g.ev("!!document.querySelector('[data-act=loungeGo],[data-act=linTake]')"), 'no card that night either')
+    g.click('[data-act=toShop]'); g.page.wait_for_timeout(80); g.click('#screen [data-act=tab][data-k=works]'); g.page.wait_for_timeout(80)
+    card = g.ev("(document.querySelector('#screen .lin-card')||{}).innerText||''"); txt = g.ev("document.querySelector('#screen').innerText")
+    check(f'Madame Lin 做到 Day {g.ev("linLast()")}' in card and '她最後一晚以後簽約' in card and not g.ev("!!document.querySelector('#screen [data-act=linSign]')"), f'the works page has the Lounge the same day; it waits for her last night: {card[-80:]!r}')
+    check('再想想' not in txt and '還在這裡' not in txt and 'Jill 決定接' in txt and not g.ev("[...document.querySelectorAll('#screen button')].some(x=>/接下隔壁/.test(x.textContent))"), 'decided — no 「接下隔壁」 button, no 「再想想」')
+    # her last night: the bar closes, and a line says where the signing is
+    g.ev("linS().last=S.day+1"); g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(150)
+    g.ev("__notes.length=0;autoStock()"); start_day(g); install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;window.__noScenes=true"); g.ev("__botUntil('phase!==\"service\"',200000,1/30)")
+    g.ev("for(let i=0;i<80&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}")
+    st = json.loads(g.ev("JSON.stringify({closed:fact('lin_closed')&&fact('lin_closed').d,day:S.day,notes:__notes,bar:barState()})"))
+    check(st['closed'] == st['day'] and st['bar'] == 'closed' and any('隔壁的門關上了' in n and '簽約・開工' in n for n in st['notes']), f'her last night closes the bar; one line says the signing is on the works page: {st}')
+    # the level, then the money, then 簽約・開工 at $80,000
+    g.click('[data-act=toShop]'); g.page.wait_for_timeout(80); g.click('#screen [data-act=tab][data-k=works]'); g.page.wait_for_timeout(80)
+    g.ev("S.level=3;showShop()"); g.page.wait_for_timeout(40)
+    card = g.ev("document.querySelector('#screen .lin-card').innerText")
+    check("需要擴建到 Jill's Fine Dining" in card and not g.ev("!!document.querySelector('#screen [data-act=linSign]')"), f'before the level: what it needs, in the card: {card[-60:]!r}')
+    g.ev("S.level=4;S.money=79999;showShop()"); g.page.wait_for_timeout(40)
+    card = g.ev("document.querySelector('#screen .lin-card').innerText")
+    check(g.ev("document.querySelector('#screen .lin-card [data-act=linSign]').disabled") is True and '簽約・開工 $80,000' in card and '還差 $1' in card, f'the level reached: 簽約・開工 $80,000, and what is still missing: {card[-80:]!r}')
+    g.ev("S.money=80000;showShop()"); g.page.wait_for_timeout(40)
+    g.click('#screen .lin-card [data-act=linSign]'); g.page.wait_for_timeout(60)
+    check(g.ev("S.money") == 0 and g.ev("S.loungeProj.state") == 'signing' and '明天開店前，Jill 去隔壁簽約' in g.ev("document.querySelector('#screen .lin-card').innerText"), 'paid $80,000: the signing is the next opening')
+    guide = g.ev("GUIDE.find(x=>/Lounge/.test(x.h)).pts.find(p=>p[0]==='怎麼來的')[1]")
+    check('Jill 看過隔壁，就決定接下來' in guide and '簽約・開工' in guide and '再想想' not in guide and '要不要接' not in guide, f'the manual says it the same way: {guide}')
+    check(not g.errors, g.errors[:3]); g.close()
+    # saves from before: a 「再想想」, a card nobody answered, a save made between 《看看》 and that night's card — and one that had taken it
+    base = json.load(open(os.path.join(ROOT, 'tests', 'saves', 'player_day52.json'), encoding='utf-8')); base = base.get('save', base); D = base['day']
+    for kind in ('deferred', 'unanswered', 'mid', 'planned'):
+        raw = json.loads(json.dumps(base)); raw['linMig'] = 1   # an rc8.x save: only the new step runs
+        F = raw['story']['facts']; E = raw['story'].setdefault('ev', {}); f = lambda dd: {'d': dd, 'n': 1, 'l': dd}
+        F['lin_hello'] = {'d': 0, 'n': 1, 'l': 0, 'retro': 1}
+        for k in ('tasting_night', 'pairing_wine'): F[k] = f(D - 20)
+        F['lin_retiring'] = f(D - 13); F['ken_where'] = f(D - 12); F['jd_want'] = f(D - 11); F['dylan_book'] = f(D - 8); F['lin_viewing'] = f(D - 6); F['lin_closed'] = f(D - 1)
+        for k in ('pairing_start', 'lin_retire', 'ken_where', 'jd_want', 'dylan_book', 'lin_viewing', 'lin_last'): E[k] = {'n': 1, 'd': D - 6, 'miss': 0}
+        raw['story']['lin'] = {'last': D - 1}; raw['money'] = 500000
+        if kind != 'mid':
+            F['lounge_project'] = f(D - 6); E['lin_decide'] = {'n': 1, 'd': D - 6, 'miss': 0}
+            raw['loungeProj'] = {'revealed': D - 6} if kind == 'unanswered' else {'revealed': D - 6, 'state': kind, 'at': D - 6}
+        if kind == 'planned': F['lin_take'] = f(D - 6)
+        g = Game(b, port, target, seed=8762, manual=True, viewport={'width': 390, 'height': 844})
+        g.ev("phase='title';R=null;localStorage.setItem(KEY,JSON.stringify(%s))" % json.dumps(raw, ensure_ascii=False)); g.reload(); g.page.wait_for_timeout(150)
+        g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(150)
+        st = json.loads(g.ev("JSON.stringify({take:fact('lin_take'),proj:fact('lounge_project'),state:S.loungeProj&&S.loungeProj.state,mig:S.linDecMig,facts:Object.keys(story().facts)})"))
+        check(st['take'] and st['take']['d'] == D - 6 and not st['take'].get('retro') and st['proj'] and st['state'] == 'planned' and st['mig'] == 1, f'{kind}: read as decided at 《看看》 (Day {D - 6}): {st}')
+        added = sorted(k for k in set(st['facts']) - set(F) if k.startswith(('lin_', 'lounge_', 'pairing_', 'evan_')))
+        check(added == {'planned': [], 'mid': ['lin_take', 'lounge_project']}.get(kind, ['lin_take']), f'{kind}: nothing else of the line added: {added}')
+        g.ev("showShop();shopTab='works';showShop()"); g.page.wait_for_timeout(60)
+        txt = g.ev("document.querySelector('#screen').innerText")
+        check(g.ev("!!document.querySelector('#screen .lin-card [data-act=linSign]')") and '再想想' not in txt and '還在這裡' not in txt and not g.ev("!!document.querySelector('[data-act=linTake],[data-act=loungeGo]')"), f'{kind}: the works page offers 簽約・開工 — nothing to press first')
+        m0 = g.ev("S.money"); g.click('#screen .lin-card [data-act=linSign]'); g.page.wait_for_timeout(60)
+        check(m0 - g.ev("S.money") == 80000 and g.ev("S.loungeProj.state") == 'signing', f'{kind}: signed for $80,000')
+        check(not g.errors, g.errors[:3]); g.close()
+    g = Game(b, port, target, seed=8763, manual=True, viewport={'width': 390, 'height': 844})
+    g.click('[data-act=open]'); g.page.wait_for_timeout(100)
+    check(g.ev("S.linDecMig") == 1, 'a new game: nothing to migrate')
     g.close()
 
 

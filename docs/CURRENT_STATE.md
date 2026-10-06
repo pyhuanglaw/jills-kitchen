@@ -48,13 +48,22 @@
   分頁那一排不會再超出畫面；帽子照玩家 10/3 的話一直戴著。相關測試通過（`rc86_dylan_is_named_in_their_room` 等）。玩家說「發布」時：
   合回 `main` → 完整回歸 → 發布。
 
+- **《看看》結束時 Jill 就決定接隔壁；Lounge I $80,000**（branch `feature/lounge-decided`，從 `main` 3a5fb15 開出，還沒合回 `main`、
+  還沒跑完整回歸）：使用者 2026-10-06「《看看》結束時，劇情上直接確定 Jill 要接 Madame Lin 的店」「把 Lounge I「簽約・開工」價格由
+  $120,000 調整為 $80,000」。玩家會看到：《看看》最後一句是「隔壁，Jill 決定接下來。簽約和改裝在「升級餐廳 › 店舖工程」。」，不再跳
+  「接下隔壁／再想想」卡片；當天店舖工程就有 Lounge，卡片依序顯示「Madame Lin 做到 Day N」→（她最後一晚後）「需要擴建到 Jill's Fine
+  Dining」或「簽約・開工 $80,000」＋還差多少。Lounge II／III 價格不變。舊存檔（選過「再想想」、卡片沒回答、在《看看》和卡片之間存的檔）
+  讀檔時當作《看看》那天決定接（`linDecMig`），工程頁直接是「簽約・開工」。相關測試通過（新測試
+  `v24_lounge_decided_at_the_viewing_no_card_and_lounge_one_is_80000`，以及隔壁／Lounge／手冊相關的 28 個）。使用者說「發布」時：合回
+  `main` → 完整回歸 → 發布。
+
 ### 進行中／等待玩家素材
 
 - 沒有。品酒之夜的三張圖已在 rc8.4 發布。
 
 ## 測試
 
-- 247 個測試（`tests/run_tests.py` 95、`tests/v23_tests.py` 30、`tests/v24_tests.py` 122；`python3 tests/run_tests.py` 全跑，`-k a,b,c`
+- 247 個測試（`tests/run_tests.py` 95、`tests/v23_tests.py` 30、`tests/v24_tests.py` 122；`feature/lounge-decided` 上 v24 多一個，248；`python3 tests/run_tests.py` 全跑，`-k a,b,c`
   跑指定的）。最近一次完整回歸：rc8.5 的 bded558 上 247/247（`docs/evidence/v24_rc8_5/regression/`）。
 - 已知會在單一 seed 上偶爾落差的機率性測試，都在測試註解裡寫了量過的分布（例：`lounge_i_content_bar_food…`、
   `v24_rc6_new_things_are_talked_about`）。
