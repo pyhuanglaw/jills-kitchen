@@ -1255,19 +1255,22 @@ const SIDE_TABLE_COST=[1500,2200,3000,4000,5200,6500,8000,9500,11000],FRONT_TABL
 const SIDE_BOOTH_COST=[18000,24000],SIDE_ROWS=['中間那排','前面那排'],SIDE_BOOTH_DONE=['中間那排的雙人桌搬走了，換上跟後牆那排一樣的卡座。','前面那排也換好了。三排卡座，九張桌子一個樣子。'];
 function sideBoothRows(){return 1+Math.min(2,Math.max(0,(S.sideBooths|0)))}
 /* what to save for next: one thing within reach, one a few days away, one to dream about */
-function goalLadder(){const out=[];const money=S.money;const add=(n,cost,where)=>{if(cost==null)return;out.push({n,cost,where,left:Math.max(0,cost-money)})};
+/* audit WS1-07 (2026-10-06): a goal is something tonight's shop really sells — its tab open, the item on it (Day 1 said
+   「咖啡機 現在就買得起」 under a tab still grey; Day 2 the 門口花箱, Day 3 the 擴建, both not in the shop until later) */
+function goalLadder(){const out=[];const money=S.money;const D=shopDay();const tabOn=n=>{const t=shopTabs().find(x=>x.n===n);return !t||t.on};
+ const add=(n,cost,where,ok)=>{if(cost==null||ok===false||!tabOn(where))return;out.push({n,cost,where,left:Math.max(0,cost-money)})};
  for(const P of ALL_PROJECTS())if(!projOn(P.k)&&S.level>=P.lv&&projNeedOk(P))add(P.n,P.cost,KITCHEN_WORKS.includes(P)?'廚房設備':'店舖工程');
- for(const E of EXTERIOR)if(!extOn(E.k)&&S.level>=E.lv)add(E.n,E.cost,'家具與佈置');
+ for(const E of EXTERIOR)if(!extOn(E.k)&&S.level>=E.lv)add(E.n,E.cost,'家具與佈置',D>=3);
  for(const G of CATGEAR)if(!gearOn(G.k)&&!G.story&&!G.line&&G.k!=='perch'&&(!G.need||projOn(G.need))&&S.level>=(G.lv||1))add(G.n,G.cost,'貓咪生活');
  {const W=WIN_TIERS[winTier()];if(W&&projOn('side')&&S.level>=W.lv)add('窗邊貓家具：'+W.n,W.cost,'貓咪生活')}
- const nl=LEVELS[S.level];if(nl)add('擴建：'+nl.n,nl.cost,'店舖工程');
+ const nl=LEVELS[S.level];if(nl)add('擴建：'+nl.n,nl.cost,'店舖工程',!(D<4&&S.level===1));
  if(S.tables<tableCap())add('餐桌',TABLE_COST[S.tables],'家具與佈置');
  if(projOn('side')&&(S.sideTables||0)<SIDE_MAX)add('側廳桌',SIDE_TABLE_COST[S.sideTables||0],'家具與佈置');
  if(projOn('side')){const n=S.sideBooths|0;if(n<2&&(S.sideTables||0)>=(n+2)*3)add('側廳卡座：'+SIDE_ROWS[n],SIDE_BOOTH_COST[n],'家具與佈置')}
- for(const E of EQUIP){const lv=S.eq[E.k]||0;if(lv<5)add(E.n+(lv?' LV'+(lv+1):''),E.cost[lv],'廚房設備')}
+ for(const E of EQUIP){const lv=S.eq[E.k]||0;if(lv<5)add(E.n+(lv?' LV'+(lv+1):''),E.cost[lv],'廚房設備',!(E.k==='oven'&&lv===0&&D<3))}   /* the oven comes on Day 3, as the kitchen tab says */
  for(const o of OPS){const t=opsLv(o.k);if(o.tiers[t]!=null&&S.level>=o.lv&&(!o.need||o.need()))add(o.n,o.tiers[t],'店舖工程')}/* v2.3: only what can really be bought now (the Bar 小廚 waits for Lounge III) */
  {const Q=typeof loungeNext==='function'&&(fact('lounge_project')||loungeLv())?loungeNext():null;if(Q&&S.level>=Q.need)add(Q.n,Q.cost,'店舖工程')}
- for(const Dc of DECOR){const t=S.decor[Dc.k]||0;if(Dc.tiers[t]!=null&&S.level>=(Dc.tierLv?Dc.tierLv[t]:Dc.lv))add(Dc.n,Dc.tiers[t],'家具與佈置')}
+ for(const Dc of DECOR){const t=S.decor[Dc.k]||0;if(Dc.tiers[t]!=null&&S.level>=(Dc.tierLv?Dc.tierLv[t]:Dc.lv))add(Dc.n,Dc.tiers[t],'家具與佈置',D>=4)}
  out.sort((a,b)=>a.cost-b.cost);const near=out.find(g=>g.left===0)||out[0];const mid=out.find(g=>g.left>0&&g.left<=Math.max(3000,money*.6))||out.find(g=>g.left>0);const far=out.slice().reverse().find(g=>g.left>0&&g!==mid)||null;
  const G=[near,mid,far].filter((g,i,a)=>g&&a.indexOf(g)===i);for(const g of out.slice().reverse()){if(G.length>=3)break;if(!G.includes(g))G.push(g)}return G}
 function goalLadderHTML(){const G=goalLadder();if(!G.length)return'';const avg=S.lastSummary?Math.max(1,S.lastSummary.net):1000;
@@ -2443,7 +2446,7 @@ function autoStock(){const sug=suggestStock();for(const d in sug){const need=sug
 /* o.resume (audit N16, 2026-10-06): the fallback of 繼續營業 reopens the room at the clock it stopped — it is not the evening's
    start again: no opening banner, no daystart story (「那天下午…」), no first-days stocking, no tutorial, and the rush already
    announced if its time has passed (「RUSH HOUR」 came at 22:08) */
-function startService(o){o=o||{};lifeReset();streetReset();dylanStageCheck();bg=null;lastEv=null;if(UPV||UPRV)upViewClose();{const pp=$('#peekPill');pp.hidden=true;pp.textContent='回到選單 ›'}/* v2.4 rc6 (10:00): never into a service */if(room==='up')room='main';
+function startService(o){o=o||{};SH_PEND.clear();/* a beat that was waiting for the floor when the last service ended (or the app closed) is still to come (audit N04) */lifeReset();streetReset();dylanStageCheck();bg=null;lastEv=null;if(UPV||UPRV)upViewClose();{const pp=$('#peekPill');pp.hidden=true;pp.textContent='回到選單 ›'}/* v2.4 rc6 (10:00): never into a service */if(room==='up')room='main';
  if(!o.resume&&S.money<150&&stockTotal()<5){S.money+=300;toast('Jill 翻出了抽屜裡的應急金 $300')}
  if(!o.resume&&S.day<=2)autoStock();S.news=[];
  const T=S.today,dur=dayDur(S.day);
@@ -2655,8 +2658,8 @@ function shFire(cx,T){const i=cx.timers.indexOf(T);if(i<0)return;cx.timers.splic
 function shRun(cx,f){const prev=SCX;SCX=cx;try{return f()}catch(e){console.warn('[story]',cx.k,e)}finally{SCX=prev}}
 function shFlushOne(cx){if(!cx.timers.length)return false;let T=cx.timers[0];for(const x of cx.timers)if(x.due<T.due)T=x;window.clearTimeout(T.id);shFire(cx,T);return true}
 function shCtx(k,authored,g){return{k,authored:!!authored,g:g||null,q:[],timers:[],rec:null,recK:null,open:false}}
-function shStart(k,authored,g,fn){const cx=shCtx(k,authored,g);if(R&&phase==='service'&&!window.__fastSay&&floorBusy()&&!TALK){svcAt(R.floorUntil-R.t+.05,()=>shStartNow(cx,fn));return cx}return shStartNow(cx,fn)}   /* the floor (audit N04): a beat that comes due while an exchange is being said waits for its last line — a panel never cuts one in half */
-function shStartNow(cx,fn){if(cx.authored&&shOn()){shRun(cx,fn);while(!cx.q.length&&shFlushOne(cx)){}return cx}talk(()=>shRun(cx,fn));return cx}   /* the beat begins now, not when its first timer would have come; a beat in the room is one exchange */
+function shStart(k,authored,g,fn,now){const cx=shCtx(k,authored,g);if(!now&&R&&phase==='service'&&!window.__fastSay&&floorBusy()&&!TALK){svcAt(R.floorUntil-R.t+.05,()=>shStartNow(cx,fn));return cx}return shStartNow(cx,fn,now)}   /* the floor (audit N04): a beat that comes due while an exchange is being said waits for its last line — a panel never cuts one in half */
+function shStartNow(cx,fn,now){if(cx.authored&&shOn()){shRun(cx,fn);while(!cx.q.length&&shFlushOne(cx)){}return cx}talk(()=>shRun(cx,fn),now);return cx}   /* the beat begins now, not when its first timer would have come; a beat in the room is one exchange */
 function shOn(){return !!S&&phase!=='title'&&(!window.__noScenes||!!window.__holds)}
 /* what an authored beat says goes to its panel (true: the caller shows nothing in the room); every beat's own lines,
    held or not, are what its story page keeps */
@@ -3172,7 +3175,11 @@ function majorOwe(){const st=story();if(st.owe&&st.owe.d===S.day)return;let best
  for(const E of STORY_EV){if(E.lane!=='major')continue;const s=evState(E.k);if(!(s.miss>=1)||last[E.k]===S.day-1)continue;let ok=null;try{ok=storyEligible(E,{at:(E.at||[])[0]})}catch(e){ok=null}if(!ok)continue;if(s.miss>bm){best=E;bm=s.miss}}
  st.owe=best?{d:S.day,k:best.k}:null;if(best){st.oweLast=Object.assign({},last,{[best.k]:S.day})}}
 function majorOwed(){const o=S.story&&S.story.owe;return o&&o.d===S.day&&evState(o.k).last!==S.day?o.k:null}
-function storyEligible(E,ctx){const s=evState(E.k);if(E.once&&s.n)return null;const cd=E.cd==null?1:E.cd;if(s.last!=null&&S.day-s.last<cd)return null;let ok=false;try{ok=!!E.when(ctx)}catch(e){ok=false}if(!ok)return null;
+/* audit N04 (2026-10-06): a beat chosen while an exchange is being said waits for the floor (shStart) — and is not done until
+   it runs: what it records (a visit count, a fact) is there when the next beat asks, and a beat whose wait never ended
+   (the app closed) is still to come. While it waits it is not chosen again. */
+const SH_PEND=new Set();
+function storyEligible(E,ctx){if(SH_PEND.has(E.k))return null;const s=evState(E.k);if(E.once&&s.n)return null;const cd=E.cd==null?1:E.cd;if(s.last!=null&&S.day-s.last<cd)return null;let ok=false;try{ok=!!E.when(ctx)}catch(e){ok=false}if(!ok)return null;
  const list=E.present||[{run:E.run}];for(const p of list){let can=true;try{can=!p.can||!!p.can(ctx)}catch(e){can=false}if(can)return p}return false}   /* false: eligible but no way to present it today */
 function storyTick(at,ctx){if(!S||phase==='title')return null;if(at==='close'&&typeof upNight==='function'&&upNight())return null;/* v2.4 P2: that closing is the search */ctx=ctx||{};ctx.at=at;const day=storyDay();if(at==='daystart')try{v24Day()}catch(e){console.warn('[v24]',e)}if(at==='daystart')try{majorOwe()}catch(e){console.warn('[owe]',e)}let fired=null;const res=v24Held(at);const owed=majorOwed();
  const pos=storyPos(at);
@@ -3185,7 +3192,8 @@ function storyTick(at,ctx){if(!S||phase==='title')return null;if(at==='close'&&t
   if(lane==='major'&&cands.length&&(owed||res)){const want=[];if(owed)want.push(owed);for(const k of res||[])if(!want.includes(k))want.push(k);
    if(LANE_CAP.major-(day.major||0)<=want.length){const keep=cands.filter(o=>want.includes(o.E.k)||o.E.floor===0);/* floor 0: a beat that has only this day (Dylan on Valentine's) never waits */for(const o of cands)if(!keep.includes(o))storyMiss(o.E,day);cands=keep}}
   if(!cands.length)continue;const c=wpick(cands,x=>x.w);if(!c)continue;for(const o of cands)if(o!==c)storyMiss(o.E,day);
-  const s=evState(c.E.k);s.n++;s.last=S.day;if(!s.d)s.d=S.day;s.miss=0;day.seen[c.E.k]=1;if(lane!=='ambient'){day[lane]=(day[lane]||0)+1;if(pos!=null)(day.lp=day.lp||{})[lane]=pos}storyTrace({at,k:c.E.k,lane});shStart(c.E.k,shAuthored(c.E),ctx.g,()=>c.pv.run(ctx));fired=fired||c.E.k}
+  const k=c.E.k;day.seen[k]=1;if(lane!=='ambient'){day[lane]=(day[lane]||0)+1;if(pos!=null)(day.lp=day.lp||{})[lane]=pos}storyTrace({at,k,lane});
+  SH_PEND.add(k);shStart(k,shAuthored(c.E),ctx.g,()=>{SH_PEND.delete(k);const s=evState(k);s.n++;s.last=S.day;if(!s.d)s.d=S.day;s.miss=0;return c.pv.run(ctx)},at==='daystart');fired=fired||k}   /* the day's own beats (daystart: who is off, who is coming, the tasting) are the day as it begins — never kept waiting */
  try{storyProgressCheck()}catch(e){console.warn('[story]',e)}return fired}
 /* what a story event leaves in the journal's week timeline (read by storyEvents) */
 function storyNotes(){const out=[];const E=story().ev;for(const S0 of STORY_EV)if(S0.note&&E[S0.k]&&E[S0.k].n){const t=cjkSp((typeof S0.note==='function'?S0.note(E[S0.k]):S0.note)||'');if(t)out.push({day:E[S0.k].d,t,ic:S0.ic||'heart'})}return out}
@@ -3195,7 +3203,12 @@ function storyArtSrc(key){const A=window.STORY_ART;return A&&A[key]||null}
 /* audit N10 (2026-10-06): a story's photo is taken after the lines it shows — called in a beat whose words are still on their
    way (its own timers), it waits behind them, so the album's 「還是沒有同意」 is not on the page before 「我還是不同意。」
    (PROJECT_MEMORY §9: 事件還沒發生不能先有照片) */
-function storyPhoto(key,info){const cx=SCX;if(cx&&!(info&&info.__after)&&cx.timers&&cx.timers.length&&!story().photos[key]){const due=Math.max(...cx.timers.map(T=>T.due))-performance.now();setTimeout(()=>storyPhoto(key,Object.assign({},info||{},{__after:1})),Math.max(0,due)+300);return true}
+function storyPhoto(key,info){const cx=SCX;
+ /* audit N10: after the lines its beat still has to say — in the room they are on the service's clock (a closing's
+    「欸，你看。」…「不要問。」 came after its picture). (The tests' say-it-now mode, __fastSay, holds nothing.) */
+ if(window.__fastSay)info=Object.assign({},info||{},{__after:1});
+ if(cx&&!(info&&info.__after)&&R&&R.talkq&&!story().photos[key]){const lt=R.talkq.filter(x=>x.cx===cx).reduce((m,x)=>Math.max(m,x.t),-1);if(lt>=0){svcAt(lt-R.t+.3,()=>shRun(cx,()=>storyPhoto(key,Object.assign({},info||{},{__after:1}))),cx);return true}}
+ if(cx&&!(info&&info.__after)&&cx.timers&&cx.timers.length&&!story().photos[key]){const due=Math.max(...cx.timers.map(T=>T.due))-performance.now();setTimeout(()=>storyPhoto(key,Object.assign({},info||{},{__after:1})),Math.max(0,due)+300);return true}
  const st=story();if(st.photos[key])return false;const P=STORY_PHOTOS[key];if(!P)return false;let img=P.art?storyArtSrc(P.art):null;if(!img&&P.stage){try{const cv=mkCanvas(360,270);P.stage(cv.getContext('2d'),info||{});img=cv.toDataURL('image/jpeg',.8)}catch(e){img=null}}if(!img){/* v2.3 Phase 9: no art yet — the milestone is kept in a slot; the picture joins the album when the art arrives */const PP=storyPhotoPending();if(!PP[key])PP[key]={day:S.day,info:info||{}};return false}
  st.photos[key]=S.day;const p=albumAdd('story:'+key,img,Object.assign({cap:P.cap,txt:typeof P.txt==='function'?P.txt(info||{}):P.txt},info||{}));p.story=1;p.keep=true;FLASH=null;sfx.shutter();const L={who:'',name:'',text:`相簿多了一張：「${P.cap}」`,photo:img,cap:P.cap};
  if(!shGrab(L)&&!(P.art&&shOn()&&scene([L],null,{modal:true})))noteRaw(L.text);save();return true}   /* rc8.5: the player's picture is shown, not only named — and it holds a service (dlgShow) */
@@ -3819,17 +3832,17 @@ function stillHere(id){if(!R)return false;if(presentId(id))return true;const L=(
 const FLOOR_GAP=1.2;   /* service-clock seconds of quiet after an exchange's last line */
 let TALK=null;         /* the exchange being set going right now: {max} — when its last line comes */
 function floorBusy(){return !!(R&&phase==='service'&&R.floorUntil!=null&&R.t<R.floorUntil)}
-function svcAt(sec,fn){if(!R)return;const q=R.talkq=R.talkq||[];q.push({t:R.t+sec,n:(R.talkN=(R.talkN||0)+1),fn})}
+function svcAt(sec,fn,cx){if(!R)return;const q=R.talkq=R.talkq||[];q.push({t:R.t+sec,n:(R.talkN=(R.talkN||0)+1),fn,cx:cx||null})}
 function talkUpd(){const q=R.talkq;if(!q||!q.length)return;const due=q.filter(x=>R.t>=x.t);if(!due.length)return;R.talkq=q.filter(x=>R.t<x.t);due.sort((a,b)=>a.t-b.t||a.n-b.n);for(const x of due){try{x.fn()}catch(e){console.warn('[talk]',e)}}}
 function floorFlush(){if(!R)return;R.floorUntil=null;for(let i=0;i<6&&R.talkq&&R.talkq.length;i++){const q=R.talkq;R.talkq=[];for(const x of q.sort((a,b)=>a.t-b.t||a.n-b.n)){try{x.fn()}catch(e){console.warn('[talk]',e)}}}}   /* the evening ends: what was still waiting to be said is said (or finds nobody) */
 /* a line of the room, ms from now (at 1×, as the game's lines were written); fast: the tests' __fastSay says it at once */
 function speakLater(fn,ms,fast){if(fast&&window.__fastSay){fn();return}const cx=SCX;
  if(!R||phase!=='service'||(cx&&cx.authored&&shOn())){setTimeout(fn,ms);return}   /* before opening, after the service, or a held beat: its panel brings its lines as they are read */
- const sec=Math.max(0,+ms||0)/1000*simSpeed();svcAt(sec,cx?()=>shRun(cx,fn):fn);
+ const sec=Math.max(0,+ms||0)/1000*simSpeed();svcAt(sec,cx?()=>shRun(cx,fn):fn,cx);
  if(TALK)TALK.max=Math.max(TALK.max,sec);else R.floorUntil=Math.max(R.floorUntil||0,R.t+sec+FLOOR_GAP)}
 /* an exchange: now if the floor is free, else after the one being said */
-function talk(fn){if(!R||phase!=='service'||window.__fastSay||(SCX&&SCX.authored&&shOn())){fn();return}
- if(floorBusy()&&!TALK){svcAt(R.floorUntil-R.t+.05,()=>talk(fn));return}
+function talk(fn,now){if(!R||phase!=='service'||window.__fastSay||(SCX&&SCX.authored&&shOn())){fn();return}
+ if(!now&&floorBusy()&&!TALK){svcAt(R.floorUntil-R.t+.05,()=>talk(fn));return}
  if(TALK){fn();return}   /* inside an exchange already: one exchange */
  TALK={max:0};try{fn()}finally{const T=TALK;TALK=null;if(R)R.floorUntil=R.t+T.max+FLOOR_GAP}}
 function later(fn,ms){speakLater(fn,ms,true)}   /* tests read the lines at once (__fastSay) */
@@ -9002,7 +9015,13 @@ function memFrame(m){const pts=[{x:m.x,y:m.y}].concat((m.info&&m.info.subj)||[])
  let x0=Math.min(...pts.map(p=>p.x-18)),x1=Math.max(...pts.map(p=>p.x+18)),y0=Math.min(...pts.map(p=>p.y-34)),y1=Math.max(...pts.map(p=>p.y+10));
  let w=Math.max(150,x1-x0),h=Math.max(112,y1-y0);if(w/h>4/3)h=w*3/4;else w=h*4/3;const cx=(x0+x1)/2,cy=(y0+y1)/2-2;
  const W=SV.w/SV.s,H=SV.h/SV.s;w=Math.min(w,W);h=Math.min(h,H);let fx=cx-w/2,fy=cy-h/2;fx=clamp(fx,-SV.ox/SV.s,W-SV.ox/SV.s-w);fy=clamp(fy,-SV.oy/SV.s,H-SV.oy/SV.s-h);return{x:fx,y:fy,w,h}}
-function flushMem(){if(!MEMQ.length)return;for(const m of MEMQ.splice(0)){if(m.room!==room)continue;/* the camera only sees the room on screen */try{const f=memFrame(m);const sx=(SV.ox+f.x*SV.s)*DPR,sy=(SV.oy+f.y*SV.s)*DPR,sw=f.w*SV.s*DPR,sh=f.h*SV.s*DPR;const cv=mkCanvas(360,270),c=cv.getContext('2d');c.drawImage(sc,sx,sy,sw,sh,0,0,360,270);albumAdd(m.id,cv.toDataURL('image/jpeg',.68),m.info);S.mem=S.mem||{};if(!S.mem[m.id])S.mem[m.id]={day:S.day};FLASH={x:m.x,y:m.y,t:0};sfx.shutter();save()}catch(e){}}}
+/* audit WS7-01 (2026-10-06): a picture is of the room it happened in. The room on screen is copied as it is; another room
+   (Jill on her sofa while the player looks at the dining room) is drawn for the camera the way the first photo is
+   (firstPhotoSnap: that room, a fixed random stream so the game's own is untouched), then the screen comes back */
+function flushMem(){if(!MEMQ.length)return;for(const m of MEMQ.splice(0)){const other=m.room!==room;const room0=room,M=Math.random;
+  try{if(other){if(!roomOpen(m.room))continue;room=m.room;SNAP=true;Math.random=rng(29);drawScene(performance.now()/1000)}
+   const f=memFrame(m);const sx=(SV.ox+f.x*SV.s)*DPR,sy=(SV.oy+f.y*SV.s)*DPR,sw=f.w*SV.s*DPR,sh=f.h*SV.s*DPR;const cv=mkCanvas(360,270),c=cv.getContext('2d');c.drawImage(sc,sx,sy,sw,sh,0,0,360,270);albumAdd(m.id,cv.toDataURL('image/jpeg',.68),m.info);S.mem=S.mem||{};if(!S.mem[m.id])S.mem[m.id]={day:S.day};if(!other){FLASH={x:m.x,y:m.y,t:0};sfx.shutter()}save()}
+  catch(e){}finally{if(other){SNAP=false;Math.random=M;room=room0;forceDraw=true}}}}
 const SPACE_PHOTO={side:[()=>S.newRooms&&S.newRooms.side,'側廳'],front:[()=>S.newRooms&&S.newRooms.terrace,'戶外的位子'],lounge:[()=>S.newRooms&&S.newRooms.lounge,'The Lounge'],up:[()=>S.newRooms&&S.newRooms.up,'二樓'],staff:[()=>srBuilt()?srOf().done:null,'員工休息室'],pdr:[()=>pdBuilt()?pdOf().done:null,'包廂']};   /* the day each was finished, as the shop's other firsts read it (NOVELTY) */
 function spacePhotoCheck(){if(!R||phase!=='service')return;const P=SPACE_PHOTO[room];if(!P)return;const d=P[0]();if(d==null||S.day<d||S.day-d>4)return;const done=S.spacePhoto=S.spacePhoto||{};if(done[room])return;done[room]=S.day;memo('newspace',200,LH*.55,{room,a:P[1],always:true,subj:[{x:70,y:150},{x:330,y:FB-30}]})}
 function memChecks(){if(!CATS)return;try{spacePhotoCheck()}catch(e){}const T=catBy('tora'),H=catBy('ban'),B=catBy('mei'),Bb=catBy('snow');

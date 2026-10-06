@@ -75,6 +75,11 @@ def init_script(seed=None, manual=False, audio=False):
           for(;;){let k=-1;for(let i=0;i<timers.length;i++)if(timers[i].at<=end&&(k<0||timers[i].at<timers[k].at))k=i;if(k<0)break;
             const t=timers.splice(k,1)[0];now=Math.max(now,t.at);t.fn.apply(null,t.a)}
           now=end;const q=__rafQ.splice(0);for(const cb of q){__stats.rafOut--;cb(now)}};
+        // the clock and the timers only, no frame (what __talkFor moves with the talk)
+        window.__advance=function(ms){const end=now+ms;
+          for(;;){let k=-1;for(let i=0;i<timers.length;i++)if(timers[i].at<=end&&(k<0||timers[i].at<timers[k].at))k=i;if(k<0)break;
+            const t=timers.splice(k,1)[0];now=Math.max(now,t.at);t.fn.apply(null,t.a)}
+          now=end};
       }
     })();""" % ('true' if manual else 'false'))
     return '\n'.join(parts)
@@ -101,6 +106,7 @@ class Game:
         self.url = f'http://127.0.0.1:{port}/{page}'
         self.page.goto(self.url)
         self.page.wait_for_function('typeof window.__jk==="function"')
+        self.ev(HELPERS)
 
     def ev(self, code):
         return self.page.evaluate('c=>window.__jk(c)', code)
@@ -115,9 +121,26 @@ class Game:
     def reload(self):
         self.page.reload()
         self.page.wait_for_function('typeof window.__jk==="function"')
+        self.ev(HELPERS)
 
     def close(self):
         self.ctx.close()
+
+# Evaluated in every Game, inside the game's closure (through __jk): helpers any test may need without the bot.
+HELPERS = r"""
+// audit N04 (2026-10-06): what people say during the service runs on the service's clock (R.talkq), not on the page's
+// timers — it waits while the game waits, one exchange at a time. A test that lets "a few seconds" pass with one long
+// __tick(ms) (one frame: the timers fire, the service barely moves) lets the lines due in those seconds be said with
+// __talkFor(sec): the talk and the page's timers move on together, step by step (a line's photo, a toast's fade), and
+// nothing else of the service moves — what one long __tick did before. (A test that runs the service — __play, __bot —
+// needs neither: the lines come with it.)
+window.__talkFor = function(sec){ if (!(sec>0)) return 0; let n=0; const step=0.05;
+  for (let s=0; s<sec-1e-9; s+=step){
+    if (R){ for (const x of (R.talkq||[])) x.t-=step; if (R.floorUntil!=null) R.floorUntil-=step;
+      const k=(R.talkq||[]).length; talkUpd(); n+=Math.max(0,k-(R.talkq||[]).length); }
+    if (typeof __advance==='function') __advance(step*1000); }
+  return n; };
+"""
 
 # In-page bot: plays the service perfectly and deterministically.
 BOT = r"""
@@ -750,6 +773,7 @@ def jill_evening_life(b, port, target):
         acts = set(x['jill']['act'] for x in samples if x['jill']['on'])
         seated_rooms = set(x['jill']['room'] for x in samples if x['jill']['on'] or x['jill']['bed'])
         nights.append({'seed': seed, 'plan': samples[-1]['plan'], 'rooms': seated_rooms, 'sat': any(x['jill']['on'] for x in samples),
+                       'bedNight': g.ev("!!(LIFE.jill&&LIFE.jill.preferBed)"),
                        'legs': max(x['jill']['legs'] for x in samples), 'acts': acts,
                        'tv': any(x['tv']['on'] for x in samples), 'tvmoved': any(x['tv']['at'] in ('use', 'moving') for x in samples),
                        'endSeated': samples[-1]['jill']['on'] or samples[-1]['jill']['bed'] or samples[-1]['plan'] == 'table'   # rc7.3: or on the edge of the bed, in her room
@@ -757,7 +781,14 @@ def jill_evening_life(b, port, target):
                        'cats': max(sum(1 for c in x['cats'] if c['on']) for x in samples)})
         g.close()
     sat = [n for n in nights if n['sat']]
-    check(len(sat) >= 8, f'Jill used the sofa on only {len(sat)}/12 nights: {nights}')
+    # About one evening in seven she means to sit on the edge of her bed (preferBed, a 15% coin when the closing starts —
+    # rc7.3); every other evening she means the sofa. The check is on those evenings: she gets there (a cat may have
+    # taken the seat — once is allowed). It was 「8 of 12 on the sofa」, which counted the coin: audit N04 (2026-10-06)
+    # moved the random numbers of these twelve Day 1s and the coin came up on five of them (40, 42, 44, 47, 50) — on all
+    # 72 evenings compared, every evening on the bed was a coin evening, and she got home and sat down as early as before.
+    meant = [n for n in nights if not n['bedNight']]
+    check(len(meant) >= 6, f'Jill meant the sofa on only {len(meant)}/12 nights (the bed should be the odd evening): {nights}')
+    check(sum(1 for n in meant if n['sat']) >= len(meant) - 1, f'on the evenings she meant the sofa she got there on only {sum(1 for n in meant if n["sat"])}/{len(meant)}: {nights}')
     check(sum(1 for n in sat if n['legs'] >= .95) >= len(sat) // 2, f'legs stretched on too few nights: {[n["legs"] for n in sat]}')
     check(all(n['endSeated'] for n in nights), f'someone is stuck standing at the end of the evening: {[n for n in nights if not n["endSeated"]]}')
     # rc7.3 (18:53 §5–§6): wherever she sits down for the evening — the sofa or the edge of the bed — it is in her room, never a dining table
@@ -2118,7 +2149,11 @@ def purchases_change_the_place(b, port, target):
     g.ev("doAct('nextDay',null,null,null)"); g.ev("S.today.weather='sun'"); start_day(g); install_bot(g); g.ev("R.weather='sun'")   # (nobody sits outside in the rain)
     check(g.ev("R.tables.filter(t=>t.room==='side').length===3 && R.tables.filter(t=>t.room==='front').length===2 && R.slots.filter(s=>s.type==='stove').length===6"), 'the new tables and burners are not in the run state')
     check(g.ev("$('#roomTabs').innerText.includes('NEW')"), 'the new room should be marked NEW on its tab')
-    g.ev("__tick(3000)")
+    # audit N04 (2026-10-06): what people say runs on the service's clock (it waits while the game waits), so the service has
+    # to run for it — one long __tick is one frame; the timers alone used to carry the line
+    for i in range(20):
+        g.page.evaluate('()=>window.__play(15,0)')
+        if g.ev("(R.log||[]).some(l=>l.t.includes('第一天'))"): break
     check(g.ev("(R.log||[]).some(l=>l.t.includes('第一天'))"), 'Jill did not mention the new room on its first day')
     # guests find the new tables; waiters serve there; nothing walks through walls
     seen = {'side': False, 'front': False}
@@ -2176,7 +2211,9 @@ def goal_ladder_and_dylan_scenes(b, port, target):
     played = g.ev("(()=>{const q=R.groups.find(x=>x.reg==='dylan');return dylanScene(q)&&JSON.stringify(S.dylan.seen)})()")
     check(played and played != '{}', f'no Dylan scene was available with the side room open: {played}')
     check(g.ev("(()=>{const q=R.groups.find(x=>x.reg==='dylan');return dylanScene(q)===true&&Object.keys(S.dylan.seen).length===2})()"), 'a second, different scene should follow')
-    g.ev("__tick(6000)")
+    for i in range(40):   # audit N04: the scenes' lines on the service's clock (the second waits for the first to be said)
+        g.page.evaluate('()=>window.__play(15,0)')
+        if g.ev("(R.log||[]).some(l=>l.w==='Dylan'&&l.k==='d')"): break
     check(g.ev("(R.log||[]).some(l=>l.w==='Dylan'&&l.k==='d')"), 'the scene did not reach the log (v2.2.1 #20: each line under the player-facing name)')
     check(not g.errors, g.errors)
     g.close()
@@ -2225,7 +2262,10 @@ def the_street_has_passers_by_and_some_walk_in(b, port, target):
     start_day(g); install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;")
     check(g.ev("typeof STREET==='object' && STREET.ppl.length===0"), 'the street should start empty at opening')
     seen = {'walk': 0, 'look': 0, 'veh': 0}
-    for i in range(90):
+    # up to two minutes of the service (it stops as soon as all three were seen): with these four street pieces about one
+    # passer-by in three stops, and one a minute walks by — a minute with nobody stopping is the day's luck (audit N04's
+    # dialogue clock moved this seed's luck: no looker in the first 60 s)
+    for i in range(180):
         g.page.evaluate('()=>window.__play(20,0)')
         if g.ev("phase") != 'service': break
         st = json.loads(g.ev("JSON.stringify({n:STREET.ppl.length,look:STREET.ppl.filter(w=>w.st==='look').length,veh:!!STREET.veh,walkins:R.st.walkins||0})"))
@@ -2707,7 +2747,7 @@ def dylan_is_a_presence_not_a_story_trigger(b, port, target):
     def held_visit(busy):
         g.ev(r"""(()=>{R.groups=R.groups.filter(q=>q.reg!=='dylan');const t=R.tables[0];t.group=null;const q={id:R.gid++,type:'regular',reg:'dylan',size:1,looks:DYLAN.looks,name:'Dylan',state:'wait',table:0,pat:1,room:'main',troom:'main',x:t.x,y:t.y,tx:t.x,ty:t.y,timer:0,ticket:null,seed:1,mood:'ok'};t.group=q;R.groups.push(q);q.ticket={id:R.tkid++,no:1,g:q,items:[{d:'coffee',st:'pending',q:null,want:0}],t0:R.t-10};R.tickets.push(q.ticket);R.log=[];window.__dq=q;return 1})()""")
         g.ev("R.jill.cur=%s;R.jill.moving=%s;R.jill.q=[];" % (('{step:"table",t:0}' if busy else 'null'), 'true' if busy else 'false'))
-        g.ev("(()=>{for(let i=0;i<1800;i++){if(R.jill.moving)R.jill.moving=true;dylanGuestUpd(__dq,1/30)}__tick(5000)})()")
+        g.ev("(()=>{for(let i=0;i<1800;i++){if(R.jill.moving)R.jill.moving=true;dylanGuestUpd(__dq,1/30)}__tick(5000);__talkFor(5)})()")
         return g.ev("JSON.stringify({said:!!__dq.said,quiet:!!__dq.quiet,lines:(R.log||[]).filter(l=>l.k==='d'||l.k==='reg').map(l=>l.t)})")
     busy = json.loads(held_visit(True)); idle = json.loads(held_visit(False))
     check(busy['said'] or busy['quiet'], f'with Jill busy he still says something within a minute: {busy}')
@@ -2986,7 +3026,7 @@ def u_v_world_memory_and_regulars_speak_with_their_faces(b, port, target):
     check(g.ev("worldMemoryLine(__rq,true)"), 'the memory fires (forced past the chance)')
     k = json.loads(g.ev("JSON.stringify(Object.keys(S.worldMem))"))
     check(len(k) == 1 and k[0] in ('side', 'storm') and g.ev("S.worldMem['%s']" % k[0]) == g.ev("S.day") and g.ev("S.worldMemDay") == g.ev("S.day"), f'one memory, marked with the day: {k}')
-    g.ev("__tick(1500)"); g.page.wait_for_timeout(1600)
+    g.ev("__tick(1500);__talkFor(1.5)"); g.page.wait_for_timeout(1600)
     check(g.ev("$('#plines').querySelectorAll('.pline.right img').length") >= 1 and g.ev("$('#plines').textContent.includes('陳伯伯')"), 'the line is a portrait card with his face')
     check(not g.ev("$('#toasts').textContent.includes('陳伯伯')"), 'not a toast')
     line = g.ev("(R.log.find(l=>l.w==='陳伯伯')||{}).t")
@@ -3000,19 +3040,19 @@ def u_v_world_memory_and_regulars_speak_with_their_faces(b, port, target):
     g.ev(r"""(()=>{const t=R.tables[1];if(t.group){R.groups=R.groups.filter(q=>q!==t.group)}t.group=null;t.dirty=false;const q={id:R.gid++,type:'couple',reg:'wang',regs:['wang','wangwife'],size:2,looks:REG_BY.wang.looks.concat(REG_BY.wangwife.looks),name:pairName(['wang','wangwife']),state:'queue',table:null,pat:1,room:'main',troom:'main',x:DOOR.x,y:DOOR.y,tx:DOOR.x,ty:DOOR.y,timer:0,ticket:null,seed:1,mood:'ok'};R.groups.push(q);window.__rq=q;return q})()""")
     check(g.ev("__rq.name") == '王先生與王太太' and json.loads(g.ev("JSON.stringify(regsOf(__rq))")) == ['wang', 'wangwife'], 'the table holds two regulars')
     check(json.loads(g.ev("JSON.stringify(worldMemCands(__rq).map(M=>M.k))")) == ['ceiling'], 'the couple remember the ceiling')
-    check(g.ev("worldMemoryLine(__rq,true)"), 'the couple remember'); g.ev("__tick(1500)"); g.page.wait_for_timeout(1600)
+    check(g.ev("worldMemoryLine(__rq,true)"), 'the couple remember'); g.ev("__tick(1500);__talkFor(1.5)"); g.page.wait_for_timeout(1600)
     check(g.ev("$('#plines').textContent.includes('王先生')") or g.ev("$('#plines').textContent.includes('王太太')"), 'one of the two speaks')
     check(g.ev("$('#plines .pline:last-child img').length>0") or g.ev("$('#plines .pline:last-child').querySelectorAll('img').length") == 2, 'both faces on the card (the speaker lit, the other dimmed)')
     g.ev("S.worldMem={};S.worldMemDay=0;S.newRooms.ceiling=0;S.newRooms.glass=S.day-5;$('#plines').innerHTML=''")
-    check(g.ev("worldMemoryLine(__rq,true)"), 'the glass memory fires'); g.ev("__tick(1500)"); g.page.wait_for_timeout(1600)
+    check(g.ev("worldMemoryLine(__rq,true)"), 'the glass memory fires'); g.ev("__tick(1500);__talkFor(1.5)"); g.page.wait_for_timeout(1600)
     check(g.ev("$('#plines .pline:last-child .pl-t b').textContent") == '王太太' and g.ev("regMem('wangwife').facts[0].txt.startsWith('「')") and not g.ev("regMem('wang').facts.some(f=>/玻璃|亮亮/.test(f.txt))"), 'the glass front line is hers, in her own history only')
     # a line she does not have goes to him only when she is not there
     g.ev("S.worldMem={};S.worldMemDay=0;S.newRooms.glass=0;S.records.guestsDay={v:80,d:S.day-4};__rq.regs=['wang'];__rq.size=1;$('#plines').innerHTML=''")
-    check(g.ev("worldMemoryLine(__rq,true)"), 'his memory'); g.ev("__tick(1500)"); g.page.wait_for_timeout(1600)
+    check(g.ev("worldMemoryLine(__rq,true)"), 'his memory'); g.ev("__tick(1500);__talkFor(1.5)"); g.page.wait_for_timeout(1600)
     check(g.ev("$('#plines .pline:last-child .pl-t b').textContent") == '王先生' and g.ev("$('#plines .pline:last-child').querySelectorAll('img').length") == 1, 'alone: his face only')
     g.ev("__rq.regs=['wang','wangwife'];__rq.size=2")
     # the seat moment of a regular goes through the same card; a plain guest is still a toast
-    g.ev("$('#plines').innerHTML='';$('#toasts').innerHTML='';R.chatAt=null;R.chatN=0;S.chatSeen={};quote(__rq,'今天也來了。');quote({name:'客人',type:'office'},'好吃。')")   # rc8.5: the small-talk budget cleared, as at the start of an evening
+    g.ev("$('#plines').innerHTML='';$('#toasts').innerHTML='';R.chatAt=null;R.chatN=0;S.chatSeen={};quote(__rq,'今天也來了。');__talkFor(1.5);quote({name:'客人',type:'office'},'好吃。')")   # rc8.5: the small-talk budget cleared, as at the start of an evening; audit N04: a stranger's small talk waits until the regular's line has been said (the floor)
     check(g.ev("$('#plines').querySelectorAll('.pline').length") == 1 and g.ev("$('#toasts').textContent.includes('客人')"), 'regular → card, guest → toast')
     # V: the regulars page shows the supplied faces once known; the unknown keep the silhouette
     g.ev("S.regulars.sophie=0;bookTab='regulars';showBook()"); g.page.wait_for_timeout(50)
@@ -3245,19 +3285,21 @@ def speech_log_logs_each_spoken_line_once(b, port, target):
       S.dylan.seen={};S.rooms.side=1;S.sideTables=S.sideTables||2;R.log=[];window.__q=q;return 1})()""")
     ok = g.ev("(()=>{const sc=DYLAN_SCENES.find(s=>s.k==='side');S.dylan.seen={};for(const s of DYLAN_SCENES)if(s.k!=='side')S.dylan.seen[s.k]=1;return dylanScene(window.__q)})()")
     check(ok, 'the side-hall scene should play')
-    g.ev("(()=>{for(let i=0;i<40;i++)__tick(150)})()")   # the lines are said 1.5 s apart (virtual time)
+    g.ev("(()=>{for(let i=0;i<40;i++){__tick(150);__talkFor(.1)}})()")   # the lines are said 1.5 s apart (virtual time; a frame moves the service 0.05 s, the talk the rest — audit N04)
     log = json.loads(g.ev("JSON.stringify(R.log)"))
     check(len(log) >= 3, f'the exchange should be in the log: {log}')
     for e in log:
         check(' / ' not in e['t'], f'no raw script delimiter in the log: {e}')
         check(e['w'] not in ('dylan', 'jill') and e['k'] != 'reg', f'no internal id or kind in the log: {e}')
-    said = [(e['w'], e['t']) for e in log if e['k'] in ('d', 'j')]
+    # (Jill's own first-day line about the kitchen comes first: it was due at 2.5 s and had the floor, and the scene waited
+    #  for it — audit N04; before, it cut into the middle of the scene)
+    said = [(e['w'], e['t']) for e in log if e['k'] in ('d', 'j') and e['t'] != '廚房變大了，今天可以多做一點。']
     names = [w for w, _ in said]
     check(names[0] == 'Dylan' and 'Jill' in names, f'the speakers keep their player-facing names in spoken order: {said}')
     texts = [t for _, t in said]
     check(len(texts) == len(set(texts)), f'each line once: {texts}')
     # the construction first-day note is an event line
-    g.ev("(()=>{for(let i=0;i<20;i++)__tick(150)})()")
+    g.ev("(()=>{for(let i=0;i<20;i++){__tick(150);__talkFor(.1)}})()")
     first = [e for e in log + json.loads(g.ev("JSON.stringify(R.log)")) if '第一天' in e['t']]
     check(first and all(e['k'] == 'e' and e['w'] == '' for e in first), f'the first-day note is an event, not a line by "jill": {first}')
     # the row layout: a long line wraps inside a full-width row, never a narrow column

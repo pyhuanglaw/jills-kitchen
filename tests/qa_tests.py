@@ -678,6 +678,11 @@ def qa_photos_of_jills_room_are_taken_in_her_room(b, port, target):
         names = p.ev("JSON.stringify(['ban','snow'].map(id=>catName(CAT_DEF.find(c=>c.id===id))))")
         check(all(x['room'] == 'home' for x in rd), f'「各自安靜」 is queued for {rd}')
         check(all(set(x['cats'].split('、')) == set(json.loads(names)) for x in rd), f'「各自安靜」 names {rd}, not the cats asleep in her room {names}')
+        # the player is looking at the dining room when it is taken: the picture is still of her room (drawn for the
+        # camera), it is not lost, and the screen stays where the player was
+        took = json.loads(p.ev("""JSON.stringify((()=>{room='main';const ds=drawScene;const drawn=[];drawScene=function(t){if(SNAP)drawn.push(room);return ds.apply(this,arguments)};
+          const n0=albumList().length;try{flushMem()}finally{drawScene=ds}return{added:albumList().length-n0,drawn,room}})())"""))
+        check(took['added'] >= 1 and took['drawn'] and set(took['drawn']) == {'home'} and took['room'] == 'main', f'taken while the dining room was on screen: {took}')
     finally:
         p.close()
 
@@ -1072,3 +1077,80 @@ def qa_lines_with_a_face_do_not_cover_toasts(b, port, target):
         finally:
             p.close()
     check(not bad, f'a face line lies on a toast at {bad}')
+
+
+@test
+def qa_a_story_waiting_its_turn_is_not_done_yet(b, port, target):
+    """N04 follow-up (2026-10-06): a story beat chosen while an exchange is being said waits for its turn — and until it
+    has been said it is not done. Before, it was marked done when chosen: Sophie × 寶寶's 「今天那隻呢？」 then counted her
+    visits from zero, and the next beat (寶寶 at her table, two visits later) could come the same evening; a beat whose
+    turn never came (the app closed) was lost. And a picture taken in the room waits for its beat's lines (N10)."""
+    import v23_tests as v23
+    g = _rt.Game(b, port, target, seed=39, manual=True, viewport={'width': 390, 'height': 844})
+    try:
+        v23.load_fixture(g, 'player_day39.json'); g.click('[data-act=openFresh]'); g.page.wait_for_timeout(120)
+        g.ev("S.money+=20000;autoStock()"); _rt.start_day(g); g.ev("for(let i=0;i<3;i++)__tick(1000/30)")
+        g.ev("Object.assign(evState('sophie_mei_1'),{n:1,d:S.day-6,last:S.day-6,v:(S.regulars.sophie||0)-3})")   # beat 1, three visits ago
+        g.ev("R.groups.slice().forEach(q=>leaveGroup(q,'ok'));R.groups.length=0;for(const t of R.tables){t.group=null;t.dirty=false}")
+        g.ev("talk(()=>{JILL_SAY('湯好了。',300);JILL_SAY('誰要先？',2600)})")   # an exchange being said when she sits down
+        ti = g.ev(v23.SEAT_SOPHIE)
+        setup_check(ti is not None, 'Sophie seated')
+        st = g.ev("({chosen:story().trace.slice(-1)[0].k,done:evDone('sophie_mei_2'),since:sophieVisitsSince('sophie_mei_2')})")
+        setup_check(st['chosen'] == 'sophie_mei_2', f'「今天那隻呢？」 was not chosen: {st}')
+        check(not st['done'] and st['since'] == -1, f'「今天那隻呢？」 waits its turn and is not done yet: {st}')
+        # 寶寶 comes to her table and looks while it waits: the next beat must not come
+        g.ev("(()=>{const c=catBy('mei');const t=R.tables[%d];c.hidden=false;c.perch=-1;c.sofa=null;c.st='rest';c.x=t.x+30;c.y=t.y+14})()" % ti)
+        g.ev("catEv(R.groups.find(q=>q.reg==='sophie'),'look',catBy('mei'))")
+        check(not g.ev("evDone('sophie_mei_3')"), 'the next beat came while the one before it was still waiting')
+        g.ev("__talkFor(12)")
+        done = g.ev("({done:evDone('sophie_mei_2'),since:sophieVisitsSince('sophie_mei_2'),said:(R.log||[]).some(l=>/今天那隻呢/.test(l.t))})")
+        check(done['done'] and done['since'] == 0 and done['said'], f'after the exchange, her question — and her visits counted from now: {done}')
+        g.ev("catEv(R.groups.find(q=>q.reg==='sophie'),'look',catBy('mei'))")
+        check(not g.ev("evDone('sophie_mei_3')"), 'the next beat came on the same evening')
+        # the app closes while a beat waits its turn: it is not lost
+        g.ev("R.groups.slice().forEach(q=>leaveGroup(q,'ok'));R.groups.length=0;for(const t of R.tables){t.group=null;t.dirty=false}")
+        g.ev("Object.assign(evState('sophie_mei_2'),{n:0,miss:0});for(const k of ['v','last','d'])delete evState('sophie_mei_2')[k];delete storyDay().seen.sophie_mei_2;storyDay().minor=0;storyDay().lp={};(()=>{const c=catBy('mei');c.x=40;c.y=FB-12})()")
+        g.ev("talk(()=>{JILL_SAY('湯好了。',300);JILL_SAY('誰要先？',2600)})"); g.ev(v23.SEAT_SOPHIE)
+        setup_check(g.ev("story().trace.slice(-1)[0].k==='sophie_mei_2'&&story().trace.length>1"), 'the beat was not chosen this time: ' + g.ev("JSON.stringify({s2:evState('sophie_mei_2'),day:storyDay(),trace:story().trace.slice(-3)})"))
+        g.ev("checkpointSave('hidden')"); g.reload()
+        check(g.ev("evState('sophie_mei_2').n") == 0, 'a beat whose turn never came was saved as done (lost)')
+        # a picture taken in the room comes after its beat's lines
+        g.ev("startService({resume:true})")
+        key = g.ev("Object.keys(STORY_PHOTOS).find(k=>!story().photos[k]&&(STORY_PHOTOS[k].art||STORY_PHOTOS[k].stage))||''")
+        setup_check(key, 'every story photo is already in this album')
+        g.ev("window.__fastSay=0;R.floorUntil=null")
+        g.ev(f"shStart('qa_room_photo',false,null,()=>{{JILL_SAY('先說的一句。',700);JILL_SAY('後說的一句。',2200);storyPhoto('{key}',{{}})}})")
+        check(not g.ev(f"!!story().photos['{key}']"), 'the picture was taken before its lines were said')
+        g.ev("__talkFor(10)")
+        check(g.ev(f"!!story().photos['{key}']") and g.ev("(R.log||[]).some(l=>/後說的一句/.test(l.t))"), 'the lines, then the picture')
+        check(not g.errors, f'page errors: {g.errors[:3]}')
+    finally:
+        g.close()
+
+
+@test
+def qa_the_savings_goals_are_in_tonights_shop(b, port, target):
+    """WS1-07: the summary's 「存錢的目標」 said 「現在就買得起」 about what the shop did not sell yet — Day 1 the 咖啡機 under
+    a grey 廚房設備 tab, Day 2 the 門口花箱 (the street pieces come on Day 3), Day 3 the 擴建 (「第 4 天打烊後開放擴建」).
+    For the first nine evenings of a new game, every goal is on a tab that is open that evening, and the tab, opened,
+    shows it with a price to press."""
+    p = Player(b, port, target)
+    try:
+        bad = []
+        for K in range(1, 10):
+            p.ev(f"S.day={K};S.phase='summary';phase='summary';S.money=Math.max(S.money,6000)")
+            goals = json.loads(p.ev("JSON.stringify(goalLadder().map(g=>({n:g.n,where:g.where,left:g.left})))"))
+            tabs = {t['n']: t for t in json.loads(p.ev("JSON.stringify(shopTabs())"))}
+            for gl in goals:
+                t = tabs.get(gl['where'])
+                if not t or not t['on']:
+                    bad.append(f"Day {K}: 「{gl['n']}」 on 「{gl['where']}」, a tab not open that evening"); continue
+                p.ev(f"S.phase='shop';phase='shop';shopTab={json.dumps(t['k'])};showShop()")
+                name = re.sub(r' LV\d+$', '', gl['n']).split('：')[-1]
+                shown = p.ev(f"""(()=>{{const sc=document.querySelector('#screen');for(const it of sc.querySelectorAll('.item')){{const nm=(it.querySelector('.nm')||{{}}).textContent||'';if(nm.includes({json.dumps(name)})&&it.querySelector('[data-act]:not([disabled])'))return true}}return false}})()""")
+                if not shown:
+                    bad.append(f"Day {K}: 「{gl['n']}」 is not for sale on 「{gl['where']}」 that evening")
+                p.ev("S.phase='summary';phase='summary';hideScreen()")
+        check(not bad, '; '.join(bad[:8]))
+    finally:
+        p.close()

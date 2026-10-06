@@ -819,7 +819,9 @@ def rc83_small_things_from_the_players_evenings(b, port, target):
     load_save(g, 'player_day89_2320.json')
     to_service(g)
     g.ev("S.regulars.sophie=Math.max(S.regulars.sophie||0,5);S.loveMiss={};Math.random=()=>0")
-    said = g.ev("(()=>{spawn({t:R.t,type:'office',size:1,reg:'sophie'});const s=R.groups[R.groups.length-1];const tk={items:[{d:'coffee'}]};const a=loveOrdered(s,tk);const b=loveOrdered(s,tk);S.day+=6;const c=loveOrdered(s,tk);S.day-=6;return[a,b,c]})()")
+    # (audit N02, 2026-10-06: she says it only when her favourite really is not on — here it has sold out tonight; with it on
+    #  the menu she says nothing, qa_a_favourite_is_missed_only_when_it_is_off_the_menu)
+    said = g.ev("(()=>{spawn({t:R.t,type:'office',size:1,reg:'sophie'});const s=R.groups[R.groups.length-1];for(const id of loveIdsOf(s)){const d=LOVES[id].d;for(const x of menuList())if(x===d||baseOf(x)===baseOf(d))S.stock[x]=0}const tk={items:[{d:'coffee'}]};const a=loveOrdered(s,tk);const b=loveOrdered(s,tk);S.day+=6;const c=loveOrdered(s,tk);S.day-=6;return[a,b,c]})()")
     check(said == [True, False, True], f'said once, not the next time, said again six days on: {said}')
     check(g.ev("!!(HM.litter2&&HM.bowls)&&homeItems.toString().includes('drawHomeLitter(c,HM.litter2)')&&homeItems.toString().includes('drawHomeBowls(c)')"), 'two litter cabinets and the bowls in the room')
     g.ev("setRoom('home');forceDraw=true"); g.ev("for(let i=0;i<6;i++)__tick(1000/30)"); g.ev("setRoom('main')")
@@ -2071,6 +2073,11 @@ def v24_rc6_an_authored_beat_holds_the_service_until_it_is_read(b, port, target)
     # nothing else of the stories tonight (the day's budget spent), and what was already said in the room finished — then
     # the panel is on, as it is in play
     g.ev("const d=storyDay();d.major=9;d.minor=9;d.v24=9"); _frames(g, 300)
+    # (audit N04, 2026-10-06: a panel waits for the line being said in the room — it never cuts an exchange in half; the
+    #  beat is fired when nobody is in the middle of one, so 「at once」 is what it means here)
+    for _ in range(40):
+        if g.ev("!floorBusy()&&!(R.talkq||[]).length"): break
+        _frames(g, 15)
     g.ev("window.__holds=true;delete story().ev.qt_1;delete story().facts.qt_1;delete (story().beatLines||{}).qt_1;storyDay().minor=0;storyDay().lp={};"
          "const E=STORY_EV.find(e=>e.k==='qt_1');E.__w=E.when;E.when=()=>true;room='kitchen';renderRoomTabs(true)")
     before = json.loads(g.ev(HOLD_SNAP))
@@ -2516,8 +2523,8 @@ def v24_rc6_qing_and_tuo_move_on(b, port, target):
     check(d_off is not None and d_off - 72 <= 12, f'a day off comes within days: Day {d_off}')
     g.ev(f"S.day={d_off};story().away=null;storyDay();storyTick('daystart',{{}})")
     away = json.loads(g.ev("JSON.stringify({f:!!fact('tuo_off'),t:!!tuoOn(),q:!!qingOn(),here:crewHere(crewByName('阿拓')),lbl:crewAwayOf(crewByName('阿拓'))})"))
-    check(away['f'] and not away['t'] and away['q'] and away['here'] is False, f'阿拓 is off today (晴 in): {away}')
-    g.ev("const q=R.groups.find(x=>x.table!=null)||null;const t=R.tables.find(t=>t.lounge&&!t.group);window.__tk={id:R.tkid++,no:1,g:q,lounge:1,items:[{d:'bites',st:'pending',q:null,want:0,picked:false,set:null}],t0:R.t};storyTick('order',{g:q,tk:__tk})")
+    check(away['f'] and not away['t'] and away['q'] and away['here'] is False, f'阿拓 is off today (晴 in): {away} ' + g.ev("JSON.stringify({q:!!qingOn(),t:!!tuoOn(),h:!!hugoOn(),qt3:fact('qt_3'),day:S.day,abs:fact('qt_absence'),coin:dayCoin('tuooff|'+S.day),pend:[...SH_PEND],st:evState('tuo_off'),sd:storyDay(),tr:story().trace.slice(-4)})"))
+    g.ev("const q=R.groups.find(x=>x.table!=null)||null;const t=R.tables.find(t=>t.lounge&&!t.group);window.__tk={id:R.tkid++,no:1,g:q,lounge:1,items:[{d:'bites',st:'pending',q:null,want:0,picked:false,set:null}],t0:R.t};storyTick('order',{g:q,tk:__tk});__talkFor(12)")   # (audit N04: after the line being said)
     check(g.ev("!!fact('qt_absence')"), 'the absence: 「今天炸物怎麼怪怪的？」')
     # the pace: four evenings together for qt_2, two days for 「多的。」, the photo after two repeats and the absence
     E = json.loads(g.ev("JSON.stringify(Object.fromEntries(['qt_2','qt_3','qt_extra','qt_photo'].map(k=>[k,String(STORY_EV.find(e=>e.k===k).when)])))"))
@@ -2979,7 +2986,10 @@ def v24_rc7_the_wine_and_monsieur_du(b, port, target):
     to_service(g)
     g.ev("window.__fastSay=1")
     g.ev("__botUntil('R.t>=R.dur*.2',90000,1/30)")
-    g.ev("(story().named[KEN]=story().named[KEN]||{v:0,dishes:{}}).seen=S.day;const d=storyDay();d.major=0;d.lp={};d.seen={};storyTick('close',{})")
+    # (audit N06, 2026-10-06: the samples are handed over by Ken himself — he is at his table when the closing begins; a
+    #  visit earlier in the evening, gone by then, is not enough)
+    g.ev("let q=R.groups.find(x=>x.name===KEN&&!x.gone&&x.state!=='leave');if(!q){spawn({t:R.t,type:'gourmet',size:1,name:KEN,tries:1});q=R.groups.find(x=>x.name===KEN&&!x.gone)}if(q.table==null){const t=R.tables.find(t=>!t.lounge&&!t.group);t.dirty=false;seatGroup(q,t)}q.state='eat';q.moving=false;(story().named[KEN]=story().named[KEN]||{v:0,dishes:{}}).seen=S.day")
+    g.ev("const d=storyDay();d.major=0;d.lp={};d.seen={};storyTick('close',{})")
     pg = ' / '.join(x['t'] for x in json.loads(g.ev("JSON.stringify((story().beatLines||{}).ken_samples||[])")))
     check(g.ev("!!fact('ken_samples')") and '叫「晚餐之後」。' in pg and '吃完飯以後，還有地方可以坐。' in pg and '這裡就是這樣開始的' not in pg and g.ev("kenS().wineD") == g.ev("S.day") + 5, f'after closing: the samples, the name: {pg}')
     # the next day (one Ken scene a day). rc7.3 release: the day's major slot is a weighted draw among the beats due that
@@ -4702,9 +4712,9 @@ def v24_rc8_the_bar_next_door_scenes_are_staged_where_they_happen(b, port, targe
     g.ev("const st=story();for(const k of ['tasting_night','pairing_wine'])st.facts[k]={d:S.day-12,n:1,l:S.day-12};st.facts.lin_retiring={d:S.day-3,n:1,l:S.day-3};linS().last=S.day+9;st.facts.ken_where={d:S.day-1,n:1,l:S.day-1};for(const k of ['pairing_start','lin_retire','ken_where'])evState(k).n=1")
     to_service(g); g.ev("window.__noScenes=false;window.__holds=true;R.sched=R.sched.filter(o=>o.reg!=='dylan')")
     g.ev("__botUntil('R.closing!=null',200000,1/30)"); g.ev("lifeEnsureEvening()"); g.ev("for(let i=0;i<3;i++)__tick(1000/30)")
-    for _ in range(40):   # another story's scene may come first tonight (its panel waits its turn)
-        if g.ev("!!(DLG&&DLG.sh&&DLG.sh.k==='jd_want')") or not g.ev("!!DLG"): break
-        g.ev("__tick(400);dlgNext()"); g.ev("__tick(1000/30)")
+    for _ in range(60):   # another story's scene may come first tonight (its panel waits its turn); audit N04: a panel also waits for the line being said in the room
+        if g.ev("!!(DLG&&DLG.sh&&DLG.sh.k==='jd_want')") or not g.ev("!!DLG||SH_PEND.size>0||(R&&(R.talkq||[]).length>0)"): break
+        g.ev("if(DLG){__tick(400);dlgNext()}else __talkFor(.5)"); g.ev("__tick(1000/30)")
     s1 = json.loads(g.ev("JSON.stringify({k:DLG&&DLG.sh&&DLG.sh.k,room,on:LIFE.jill.on,jroom:LIFE.jill.room,desk:!!homeDylanAtDesk(),off:!!HOME_DY.off})"))
     check(s1['k'] == 'jd_want' and s1['room'] == 'home' and s1['on'] and s1['jroom'] == 'home' and s1['desk'] and not s1['off'], f'after closing, their room: Jill on the sofa, Dylan at his desk with his headphones on: {s1}')
     seen = []
@@ -4728,9 +4738,9 @@ def v24_rc8_the_bar_next_door_scenes_are_staged_where_they_happen(b, port, targe
     g.ev("S.dylan.stage=3;S.dylan.reveal=S.day-6;const st=story();for(const k of ['tasting_night','pairing_wine'])st.facts[k]={d:S.day-12,n:1,l:S.day-12};st.facts.lin_retiring={d:S.day-4,n:1,l:S.day-4};linS().last=S.day+8;st.facts.ken_where={d:S.day-3,n:1,l:S.day-3};st.facts.jd_want={d:S.day-3,n:1,l:S.day-3};for(const k of ['pairing_start','lin_retire','ken_where','jd_want'])evState(k).n=1")
     to_service(g); g.ev("window.__noScenes=false;window.__holds=true;R.sched=R.sched.filter(o=>o.reg!=='dylan')")
     g.ev("__botUntil('R.closing!=null',200000,1/30)"); g.ev("lifeEnsureEvening()"); g.ev("for(let i=0;i<3;i++)__tick(1000/30)")
-    for _ in range(40):
-        if g.ev("!!(DLG&&DLG.sh&&DLG.sh.k==='dylan_book')") or not g.ev("!!DLG"): break
-        g.ev("__tick(400);dlgNext()"); g.ev("__tick(1000/30)")
+    for _ in range(60):   # (audit N04: the panel waits for the line being said in the room)
+        if g.ev("!!(DLG&&DLG.sh&&DLG.sh.k==='dylan_book')") or not g.ev("!!DLG||SH_PEND.size>0||(R&&(R.talkq||[]).length>0)"): break
+        g.ev("if(DLG){__tick(400);dlgNext()}else __talkFor(.5)"); g.ev("__tick(1000/30)")
     check(g.ev("DLG&&DLG.sh&&DLG.sh.k") == 'dylan_book' and g.ev("room") == 'home', 'the book, in the room')
     lines = _dlg_lines(g)
     check('Dylan：看看。' in lines and '先生：看看。' not in lines, f'after the reveal: Dylan: {lines}')
@@ -4915,7 +4925,7 @@ def v24_rc8_madame_lin_comes_back_as_a_guest(b, port, target):
     g.ev("__botUntil('R.t>=R.dur*.3',200000,1/30)")
     g.ev("(()=>{const v=v24();v.res={d:S.day,k:['lin_guest']}})();R.sched.splice(R.si,0,{t:R.t+2,type:'vip',size:1,name:'Madame Lin',story:1,lounge:1,lgRetry:1,tries:1});window.__noScenes=false;window.__holds=true")
     for _ in range(12):
-        g.ev("__botUntil(\"!!(typeof DLG!=='undefined'&&DLG)||R.groups.some(q=>namedId(q)==='Madame Lin')\",900,1/30)")
+        g.ev("__botUntil(\"!!(typeof DLG!=='undefined'&&DLG)||(R.groups.some(q=>namedId(q)==='Madame Lin')&&!SH_PEND.size&&!(R.talkq||[]).length)\",900,1/30)")   # (audit N04: her panel waits for the line being said)
         if g.ev("!!DLG") and g.ev("DLG.sh?DLG.sh.k:''") != 'lin_guest':
             g.ev("for(let i=0;i<40&&DLG&&!(DLG.sh&&DLG.sh.k==='lin_guest');i++){__tick(400);dlgNext()}"); continue
         break
