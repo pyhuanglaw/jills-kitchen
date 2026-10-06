@@ -1,0 +1,814 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Jill's Kitchen 料理流程</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: one portrait kitchen (stations on the back counter, pantry and ovens in the middle, the warm shelf in front),
+   the pass with one tray per table along the bottom, nearest the thumb. Jill's Kitchen's own night palette
+   (css/style.css of the game): a single dark look, every colour set here. */
+:root{
+  --night:#1E2B2F;--night2:#27383D;--night3:#314449;--floor:#2a3a3e;
+  --brass:#C99A45;--brass2:#E6C27A;--cream:#F7EDDC;--paper:#FFF8EC;--ink:#2E2019;--ink2:#6B5647;
+  --tomato:#D4553A;--sage:#5E8F4E;--sage2:#8DC27A;--gold:#F4C44E;--steel:#5D676B;--steel2:#8a969a;--smoke:#4a4a4a;
+  --disp:'Young Serif',Georgia,'Noto Serif TC','Songti TC',serif;
+  --ui:'Figtree','PingFang TC','Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--night);color:var(--cream);font-family:var(--ui);font-size:14px;overflow:hidden;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+#app{height:100%;max-width:560px;margin:0 auto;display:flex;flex-direction:column;position:relative;overflow:hidden;background:var(--night)}
+
+/* top bar */
+#hud{display:flex;align-items:center;gap:8px;padding:8px 12px 6px;font-variant-numeric:tabular-nums;flex:0 0 auto;
+  background:linear-gradient(#162124,var(--night));border-bottom:1px solid rgba(201,154,69,.35)}
+#hud .nt{display:flex;flex-direction:column;line-height:1.05;min-width:0}
+#hud .nt small{font-size:9.5px;letter-spacing:.14em;color:var(--brass2);font-weight:800}
+#hud .nt b{font-family:var(--disp);font-weight:400;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#hud .sp{flex:1}
+#hud .clock{font-weight:800;font-size:15px;padding:4px 8px;border-radius:8px;background:rgba(255,255,255,.07)}
+#hud .money{font-weight:800;color:var(--gold);font-size:14px}
+#hud .hb{min-width:36px;height:32px;border-radius:9px;background:rgba(255,255,255,.08);font-weight:800;font-size:13px;padding:0 8px}
+#hud .hb.on{background:rgba(230,194,122,.25);color:var(--gold)}
+
+/* the one line of guidance */
+#hint{flex:0 0 auto;min-height:44px;padding:7px 14px;font-size:13.5px;line-height:1.4;color:var(--paper);display:block;
+  background:rgba(201,154,69,.12);border-bottom:1px solid rgba(201,154,69,.18)}
+#hint.quiet{color:rgba(247,237,220,.62);background:transparent}
+#hint b{color:var(--gold)}
+
+#wrap{flex:1 1 auto;position:relative;min-height:0}
+#stage{position:absolute;top:0;left:0;width:360px;height:630px;transform-origin:0 0;touch-action:none}
+
+/* the kitchen floor and counters */
+#floor{position:absolute;left:0;top:0;width:360px;height:470px;border-radius:14px;
+  background:repeating-linear-gradient(45deg,#2c3c40 0 10px,#29393d 10px 20px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.04)}
+.st{position:absolute;border-radius:12px;background:#3b4a4e;box-shadow:0 2px 0 rgba(0,0,0,.35),inset 0 0 0 1px rgba(255,255,255,.07);transition:box-shadow .15s,opacity .2s,filter .2s}
+.st .lb{position:absolute;left:0;right:0;bottom:4px;text-align:center;font-size:10.5px;font-weight:800;letter-spacing:.06em;color:rgba(247,237,220,.82);pointer-events:none}
+.st .lb i{font-style:normal;display:inline-block;min-width:16px;height:16px;line-height:16px;border-radius:5px;margin-right:4px;color:#1d1410;font-size:10px}
+.st .sl{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;pointer-events:none}
+.st.ghost{background:transparent;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.07);border:0}
+.st.ghost>*,.st.ghost::before,.st.ghost::after{display:none}
+.st.ghost{box-shadow:inset 0 0 0 1px rgba(255,255,255,.045)}
+.st.new::after{content:'新';position:absolute;top:-7px;right:-5px;background:var(--tomato);color:#fff;font-size:10px;font-weight:800;border-radius:6px;padding:1px 5px}
+/* station looks: readable without the words */
+.st-wok,.st-pot,.st-pan{background:linear-gradient(#56636a,#46535a)}
+.st-wok .sl{width:58px;height:58px;margin:-29px 0 0 -29px;background:radial-gradient(circle at 50% 45%,#2b2b2b 0 52%,#1b1b1b 53% 60%,transparent 61%),radial-gradient(circle,#c25a2a33 0 70%,transparent 71%)}
+.st-wok .sl::after{content:'';position:absolute;right:-14px;top:24px;width:16px;height:6px;border-radius:3px;background:#1b1b1b}
+.st-pot .sl{width:42px;height:42px;margin:-21px 0 0 -21px;background:radial-gradient(circle,#7fb3c9 0 52%,#c9d3d6 53% 66%,#9aa6aa 67% 72%,transparent 73%)}
+.st-pan .sl{width:44px;height:44px;margin:-22px 0 0 -22px;background:radial-gradient(circle,#2a2a2a 0 58%,#151515 59% 66%,transparent 67%)}
+.st-pan .sl::after{content:'';position:absolute;left:18px;top:40px;width:7px;height:14px;border-radius:3px;background:#151515}
+.st-coffee{background:linear-gradient(#8f4c34,#6e3a28)}
+.st-coffee .sl{background:radial-gradient(circle,#f3eadb 0 40%,#d8c7aa 41% 52%,transparent 53%)}
+.st-coffee::before{content:'';position:absolute;left:10px;right:10px;top:8px;height:14px;border-radius:6px;background:linear-gradient(#d9b46b,#a77d36)}
+.st-oven{background:linear-gradient(#4b4140,#3a3130)}
+.st-oven::before{content:'';position:absolute;left:8px;right:8px;top:14px;bottom:26px;border-radius:8px;background:#1d1716;box-shadow:inset 0 0 0 2px #77685f}
+.st-oven.hot::before{background:radial-gradient(ellipse at 50% 70%,#e0742c88,#2a1a12 70%)}
+.st-oven .sl{background:radial-gradient(circle,#5a4a40 0 60%,transparent 61%)}
+.st-asm{background:linear-gradient(#b48c58,#9a7546)}
+.st-asm .sl{background:radial-gradient(circle,#f6efe4 0 58%,#e1d6c4 59% 66%,transparent 67%)}
+.st-asm::before{content:'＋';position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);font-weight:800;color:#5a3f20;font-size:14px}
+.st-chill{background:linear-gradient(#a9cfdc,#86b5c6)}
+.st-chill .lb{color:#16353f}
+.st-chill .sl{background:radial-gradient(circle,#fff 0 46%,#d9e9ee 47% 60%,transparent 61%)}
+.st-pzbench{background:linear-gradient(#ddd4c8,#c7bcae)}
+.st-pzbench .lb{color:#3a3029}
+.st-pzbench .sl{width:50px;height:50px;margin:-25px 0 0 -25px;background:radial-gradient(circle,#efe2c9 0 60%,transparent 61%)}
+.st-pzoven{background:radial-gradient(ellipse at 50% 100%,#3a1a12 0 30%,transparent 31%),linear-gradient(#b9573a,#8e3d26)}
+.st-pzoven .sl{width:50px;height:50px;margin:-25px 0 0 -25px;background:radial-gradient(circle,#2a120b 0 58%,#f07a3a 59% 63%,transparent 64%)}
+.st-board{background:linear-gradient(#c49461,#a87b4a)}
+.st-board .lb{color:#3a2412}
+.st-board .sl{background:radial-gradient(circle,#e5c393 0 62%,transparent 63%)}
+.st-shelf{background:linear-gradient(#5e5e58,#4c4c47)}
+.st-shelf::before{content:'';position:absolute;left:6px;right:6px;top:4px;height:10px;border-radius:5px;background:linear-gradient(90deg,#ffb35b55,#ffcf7a99,#ffb35b55);filter:blur(1px)}
+.st-shelf .sl{background:radial-gradient(circle,#7d7d75 0 60%,transparent 61%)}
+.st-trash{background:linear-gradient(#4f5a5e,#3c4649)}
+.st-trash::before{content:'';position:absolute;left:50%;top:40%;width:26px;height:30px;transform:translate(-50%,-50%);border-radius:3px 3px 6px 6px;background:#262e31;box-shadow:0 -6px 0 -2px #1d2426}
+.st-pantry{background:linear-gradient(#cfd8db,#aebabe)}
+.st-pantry .lb{display:none}
+.st-pantry::before{content:'食材冰箱';position:absolute;left:8px;top:-1px;font-size:8px;letter-spacing:.12em;font-weight:800;color:#5b6b70}
+.bin{position:absolute;width:44px;height:34px;margin:-17px 0 0 -22px;border-radius:9px;background:#f5f2ea;box-shadow:inset 0 -3px 0 rgba(0,0,0,.12),0 1px 0 rgba(0,0,0,.25);
+  display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;transition:transform .12s,box-shadow .12s}
+.bin small{position:absolute;top:35px;left:-8px;right:-8px;text-align:center;font-size:8.5px;font-weight:800;color:#24343a;white-space:nowrap;overflow:hidden;text-overflow:clip}
+
+/* selection and where it may go */
+.ok{box-shadow:0 0 0 3px var(--sage2),0 0 16px rgba(141,194,122,.55)!important}
+.dim{filter:saturate(.55) brightness(.72)}
+.sel{transform:translateY(-3px) scale(1.08);box-shadow:0 0 0 3px var(--gold),0 6px 14px rgba(0,0,0,.4)!important;z-index:5}
+.hl{animation:hl 1.1s ease-in-out infinite}
+@keyframes hl{0%,100%{box-shadow:0 0 0 2px rgba(244,196,78,.95),0 0 0 6px rgba(244,196,78,.25)}50%{box-shadow:0 0 0 2px rgba(244,196,78,.95),0 0 0 11px rgba(244,196,78,.0)}}
+.shake{animation:shake .32s}
+@keyframes shake{25%{translate:-4px 0}75%{translate:4px 0}}
+
+/* food */
+.it{position:absolute;left:0;top:0;width:44px;height:44px;border-radius:50%;cursor:pointer;transition:transform .22s cubic-bezier(.3,.7,.3,1);z-index:3}
+.it.carried{transition:none}
+.it .sec{position:absolute;left:50%;top:-12px;transform:translateX(-50%);font-size:9.5px;font-weight:800;color:var(--paper);background:rgba(20,28,30,.78);border-radius:5px;padding:0 4px;line-height:13px;pointer-events:none;font-variant-numeric:tabular-nums;white-space:nowrap}
+.it svg{position:absolute;inset:0;overflow:visible;pointer-events:none}
+.it .ic{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:24px;line-height:1;pointer-events:none}
+.it.plate .ic::before{content:'';position:absolute;width:34px;height:34px;border-radius:50%;background:#f8f3ea;box-shadow:inset 0 0 0 2px #e4dccd;z-index:-1}
+.it.raw .ic{filter:saturate(.35) brightness(1.05)}
+.it.k-patty_c .ic,.it.k-bun_t .ic{filter:sepia(.55) saturate(1.4) brightness(.82)}
+.it.k-chicken_r .ic{filter:hue-rotate(-20deg) saturate(.4) brightness(1.25)}
+.it.burnt .ic{filter:grayscale(1) brightness(.35)}
+.it .nx{position:absolute;right:-6px;top:-6px;height:17px;min-width:17px;padding:0 4px;border-radius:6px;font-size:10px;font-weight:800;line-height:17px;color:#1d1410;pointer-events:none;box-shadow:0 1px 2px rgba(0,0,0,.4)}
+.it .bell{position:absolute;left:-8px;top:-10px;font-size:14px;pointer-events:none;animation:bell .5s ease-in-out 3}
+@keyframes bell{50%{transform:rotate(-18deg) scale(1.15)}}
+.it.burnt::after{content:'💨';position:absolute;left:14px;top:-16px;font-size:14px;animation:puff 1.4s ease-out infinite;pointer-events:none}
+@keyframes puff{0%{opacity:0;transform:translateY(6px)}40%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
+.it.over .ring-fg{animation:blink .5s steps(2) infinite}
+@keyframes blink{50%{opacity:.35}}
+
+/* the pass */
+#passbar{position:absolute;left:0;top:474px;width:360px;height:156px;border-radius:14px;background:linear-gradient(#5b4a35,#4a3b2a);box-shadow:inset 0 2px 0 rgba(255,255,255,.08)}
+#passbar .lamp{position:absolute;left:10px;right:10px;top:4px;height:8px;border-radius:4px;background:linear-gradient(90deg,#ffb35b33,#ffcf7a88,#ffb35b33);filter:blur(1px)}
+#passbar .pl{position:absolute;right:10px;top:14px;font-size:10px;font-weight:800;letter-spacing:.1em;color:rgba(247,237,220,.55)}
+#door{position:absolute;right:8px;top:478px;font-size:10px;color:rgba(247,237,220,.7);font-weight:800}
+.tray{position:absolute;top:484px;width:67px;height:138px;border-radius:10px;background:#efe5d3;color:var(--ink);transition:left .3s ease,opacity .3s,transform .3s;box-shadow:0 2px 0 rgba(0,0,0,.3);cursor:pointer}
+.tray .tno{position:absolute;left:6px;top:9px;font-weight:800;font-size:11px}
+.tray .tno small{font-weight:600;color:var(--ink2);font-size:9px;margin-left:2px}
+.tray .pat{position:absolute;left:5px;right:5px;top:3px;height:4px;border-radius:2px;background:#d8ccb7;overflow:hidden}
+.tray .pat i{display:block;height:100%;background:var(--sage);border-radius:2px;width:100%}
+.tray .pat i.mid{background:#d9a13a}.tray .pat i.low{background:var(--tomato)}
+.tray .ds{position:absolute;left:4px;width:59px;height:31px}
+.tray .ds .gh{position:absolute;left:0;top:2px;width:28px;height:28px;border-radius:50%;background:#e2d6c1;display:flex;align-items:center;justify-content:center;font-size:15px;filter:grayscale(.9) opacity(.55)}
+.tray .ds .pth{position:absolute;left:29px;top:3px;right:-3px;height:26px;display:flex;gap:1px;align-items:center;font-size:7px;color:var(--ink2);line-height:1}
+.tray .ds .pth i{font-style:normal;display:inline-block;width:10px;height:12px;line-height:12px;text-align:center;border-radius:3px;font-size:7.5px;font-weight:800;color:#1d1410;flex:0 0 auto}
+.tray .ds .pth .par{display:flex;flex-direction:column;gap:1px}
+.tray .ds.filled .gh{filter:none;opacity:0}
+.tray.done{background:#f6edc8;box-shadow:0 0 0 2px var(--gold),0 2px 0 rgba(0,0,0,.3)}
+.tray.done .tno::after{content:' 🔔';font-size:10px}
+.tray.gone{opacity:0;transform:translateY(30px)}
+.tray.ok{box-shadow:0 0 0 3px var(--sage2),0 0 16px rgba(141,194,122,.55)!important}
+#queue{position:absolute;left:8px;top:458px;font-size:10px;font-weight:800;color:var(--gold)}
+
+/* people */
+.pp{position:absolute;left:0;top:0;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:800;color:#1d1410;
+  box-shadow:0 2px 3px rgba(0,0,0,.45),inset 0 0 0 2px rgba(255,255,255,.55);z-index:4;pointer-events:none;transition:opacity .3s}
+.pp.cook{background:#f2f2ee}.pp.cook::before{content:'';position:absolute;top:-9px;left:6px;width:18px;height:11px;border-radius:7px 7px 2px 2px;background:#fff;box-shadow:0 0 0 1px #ccc}
+.pp.waiter{background:#e6c27a}.pp.barista{background:#9fc8b8}
+.pp .nm{position:absolute;top:30px;left:50%;transform:translateX(-50%);font-size:9px;white-space:nowrap;color:var(--cream);text-shadow:0 1px 2px #000}
+.pp.out{opacity:0}
+
+/* pops */
+.pop{position:absolute;font-weight:800;font-size:12px;pointer-events:none;z-index:9;animation:pop 1.3s ease-out forwards;white-space:nowrap;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+@keyframes pop{0%{opacity:0;transform:translateY(4px)}15%{opacity:1}100%{opacity:0;transform:translateY(-26px)}}
+.drag{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;font-size:26px;display:flex;align-items:center;justify-content:center;z-index:20;pointer-events:none;filter:drop-shadow(0 6px 6px rgba(0,0,0,.5))}
+
+/* overlays */
+.ov{position:absolute;inset:0;z-index:50;background:rgba(18,26,28,.94);display:flex;flex-direction:column;overflow-y:auto;padding:22px 18px calc(22px + env(safe-area-inset-bottom,0px))}
+.ov h1{font-family:var(--disp);font-weight:400;font-size:26px;margin:4px 0 2px;text-wrap:balance}
+.ov .eyebrow{font-size:10.5px;letter-spacing:.18em;color:var(--brass2);font-weight:800}
+.ov p{line-height:1.55;color:rgba(247,237,220,.86);margin:8px 0;max-width:62ch}
+.nights{display:grid;gap:10px;margin:14px 0}
+.night{display:block;text-align:left;padding:13px 14px;border-radius:12px;background:var(--night2);box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
+.night b{font-family:var(--disp);font-weight:400;font-size:17px;display:block}
+.night span{font-size:12.5px;color:rgba(247,237,220,.75);line-height:1.45;display:block;margin-top:3px}
+.night em{font-style:normal;font-size:11px;color:var(--gold);font-weight:800}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 18px;border-radius:12px;font-weight:800;background:var(--night3)}
+.btn.pri{background:var(--brass);color:#1d1410}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.stats{display:grid;grid-template-columns:1fr auto;gap:6px 14px;margin:12px 0;font-variant-numeric:tabular-nums;max-width:420px}
+.stats div:nth-child(even){text-align:right;font-weight:800}
+.stats .hd{grid-column:1/-1;font-size:10.5px;letter-spacing:.14em;color:var(--brass2);font-weight:800;margin-top:8px}
+.how{font-size:13px;color:rgba(247,237,220,.78);line-height:1.6;margin:6px 0 0;padding-left:18px}
+.small{font-size:12px;color:rgba(247,237,220,.6)}
+@media (prefers-reduced-motion:reduce){.it,.tray{transition:none}.hl,.it .bell,.it.burnt::after,.it.over .ring-fg{animation:none}}
+</style>
+
+<div id="app">
+  <header id="hud">
+    <div class="nt"><small id="hNight">第 1 晚</small><b id="hTitle">一個人的廚房</b></div>
+    <div class="sp"></div>
+    <div class="clock" id="hClock">17:00</div>
+    <div class="money" id="hMoney">$0</div>
+    <button class="hb" id="hSpeed" aria-label="遊戲速度">1×</button>
+    <button class="hb" id="hPause" aria-label="暫停">II</button>
+  </header>
+  <div id="hint" class="quiet">點食材 → 點設備。好了以後點它 → 點下一站或盤子。</div>
+  <div id="wrap"><div id="stage">
+    <div id="floor"></div>
+    <div id="passbar"><div class="lamp"></div><div class="pl">出菜口 PASS</div></div>
+    <div id="queue"></div>
+  </div></div>
+
+  <div class="ov" id="menu">
+    <div class="eyebrow">JILL'S KITCHEN · 料理流程 PROTOTYPE</div>
+    <h1>今晚的廚房</h1>
+    <p>每個設備自己會煮。你要做的，是決定先下什麼、好了以後拿去哪一站、哪一桌先出。</p>
+    <ul class="how">
+      <li>點<b>食材</b>（或單子上的菜），再點<b>設備</b>：它就開始煮。</li>
+      <li>好了會響，綠圈。點它，再點<b>下一站</b>或下面那桌的<b>盤子</b>。也可以直接拖過去。</li>
+      <li>同一桌的菜到齊，服務生就從出菜口端走。</li>
+    </ul>
+    <div class="nights" id="nightList"></div>
+    <p class="small">建議從第 1 晚依序玩：每一晚只多一、兩件新的事。教學提示每件事只出現一次；<button id="resetTut" style="text-decoration:underline;color:var(--gold)">重新顯示教學</button>。</p>
+  </div>
+  <div class="ov" id="sum" hidden></div>
+</div>
+
+<script>
+(()=>{'use strict';
+const W=360,H=630;
+const $=(s,r=document)=>r.querySelector(s);
+const mk=(tag,cls,html)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const store={get(k,d){try{const v=localStorage.getItem('jkcook.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('jkcook.'+k,JSON.stringify(v))}catch(e){}}};
+function rngOf(seed){let a=seed>>>0;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+
+/* ---------------------------------------------------------------- the kitchen */
+const ST={
+  wok:    {n:'炒鍋',  c:'炒',slots:1,x:6,  y:6,  w:78, h:96, col:'#e09a5f'},
+  pot:    {n:'湯鍋',  c:'煮',slots:2,x:88, y:6,  w:96, h:96, col:'#8cc3d8'},
+  pan:    {n:'平底鍋',c:'煎',slots:2,x:188,y:6,  w:96, h:96, col:'#e0875a'},
+  coffee: {n:'咖啡機',c:'咖',slots:1,x:288,y:6,  w:66, h:96, col:'#d6a07a'},
+  pantry: {n:'食材',  c:'', slots:0,x:6,  y:108,w:348,h:60},
+  asm:    {n:'組裝台',c:'組',slots:2,x:6,  y:174,w:96, h:90, col:'#e6c27a'},
+  oven:   {n:'烤箱',  c:'烤',slots:2,x:108,y:174,w:120,h:90, col:'#f0a54a'},
+  chill:  {n:'冷藏櫃',c:'冰',slots:3,x:234,y:174,w:120,h:90, col:'#bfe3ef'},
+  pzbench:{n:'披薩檯',c:'鋪',slots:1,x:6,  y:270,w:96, h:90, col:'#e8dfd2'},
+  pzoven: {n:'披薩窯',c:'窯',slots:1,x:108,y:270,w:120,h:90, col:'#f07a52'},
+  board:  {n:'砧板',  c:'切',slots:1,x:234,y:270,w:120,h:90, col:'#d9a873'},
+  shelf:  {n:'暫放台',c:'放',slots:4,x:6,  y:366,w:252,h:70, col:'#e6c27a'},
+  trash:  {n:'垃圾桶',c:'', slots:0,x:264,y:366,w:90, h:70},
+};
+const ORDER=['wok','pot','pan','coffee','pantry','asm','oven','chill','pzbench','pzoven','board','shelf','trash'];
+const CH2ST={};for(const k in ST)if(ST[k].c)CH2ST[ST[k].c]=k;
+
+/* what a thing is, raw to plated */
+const K={
+  rice:{n:'白飯和蛋',ic:'🍚',raw:1},          friedrice:{n:'黃金蛋炒飯',ic:'🍛',fin:1},
+  noodle:{n:'義大利麵條',ic:'🍝',raw:1},       noodle_c:{n:'煮好的麵',ic:'🍜'}, pasta:{n:'番茄義大利麵',ic:'🍝',fin:1},
+  beans:{n:'咖啡豆',ic:'🫘',raw:1},            coffee:{n:'拿鐵咖啡',ic:'☕',fin:1},
+  chicken_r:{n:'生雞',ic:'🍗',raw:1},          chicken:{n:'香草烤雞',ic:'🍗',fin:1},
+  patty:{n:'牛肉排',ic:'🥩',raw:1},            patty_c:{n:'煎好的肉排',ic:'🥩'},
+  bun:{n:'漢堡麵包',ic:'🍞',raw:1},            bun_t:{n:'烤好的麵包',ic:'🍞'}, burger:{n:'經典牛肉漢堡',ic:'🍔',fin:1},
+  custard:{n:'布丁液',ic:'🥛',raw:1},          pudding:{n:'焦糖布丁',ic:'🍮',fin:1,cold:1},
+  dough:{n:'披薩麵團',ic:'🫓',raw:1},          pz_raw:{n:'鋪好料的披薩',ic:'🫓'}, pz_baked:{n:'烤好的披薩',ic:'🍕'}, pizza:{n:'瑪格麗特披薩',ic:'🍕',fin:1},
+};
+/* a station does one thing to one thing, by itself: t to cook; then `safe` seconds at its best; then `bad` seconds
+   going off (burn:1 ends burnt, otherwise it stays at half) */
+const PR={
+  'rice@wok':      {o:'friedrice',t:12, safe:5,  bad:8, burn:1},
+  'noodle@pot':    {o:'noodle_c', t:14, safe:10, bad:10},
+  'noodle_c@pan':  {o:'pasta',    t:6,  safe:5,  bad:8, burn:1},
+  'beans@coffee':  {o:'coffee',   t:8,  safe:15, bad:20},
+  'chicken_r@oven':{o:'chicken',  t:35, safe:15, bad:15},
+  'bun@oven':      {o:'bun_t',    t:8,  safe:10, bad:10, burn:1},
+  'patty@pan':     {o:'patty_c',  t:15, safe:5,  bad:8, burn:1},
+  'custard@chill': {o:'pudding',  t:40, safe:1e9,bad:1},
+  'dough@pzbench': {o:'pz_raw',   t:4,  safe:1e9,bad:1},
+  'pz_raw@pzoven': {o:'pz_baked', t:10, safe:3,  bad:5, burn:1},
+  'pz_baked@board':{o:'pizza',    t:3,  safe:1e9,bad:1},
+};
+const ASM={burger:{needs:['patty_c','bun_t'],t:3}};
+const DISH={
+  friedrice:{start:['rice'],path:'炒',price:120},
+  pasta:{start:['noodle'],path:'煮→煎',price:160},
+  coffee:{start:['beans'],path:'咖',price:90},
+  chicken:{start:['chicken_r'],path:'烤',price:280},
+  burger:{start:['patty','bun'],path:'煎＋烤→組',price:190},
+  pudding:{start:['custard'],path:'冰',price:120},
+  pizza:{start:['dough'],path:'鋪→窯→切',price:260},
+};
+const GRACE=18,DECAY=1.2;   // a plate (or a thing set down) keeps its best for 14 s, then loses 1.6 a second down to 40
+function nextStOf(k){for(const key in PR){const [a,b]=key.split('@');if(a===k)return b}for(const r in ASM)if(ASM[r].needs.includes(k))return 'asm';return null}
+function chainTime(k){let t=0,cur=k,guard=0;while(guard++<8){const s=nextStOf(cur);if(!s||s==='asm')break;const p=PR[cur+'@'+s];t+=p.t+1.2;cur=p.o}return {t,end:cur}}
+function dishTime(d){const D=DISH[d];let m=0;for(const s of D.start)m=Math.max(m,chainTime(s).t);if(ASM[d])m+=ASM[d].t+1.2;return m}
+function chip(ch){return `<i style="background:${ST[CH2ST[ch]].col}">${ch}</i>`}
+function pathHTML(path){const steps=path.split('→');return steps.map(st=>st.includes('＋')?`<span class="par">${st.split('＋').map(chip).join('')}</span>`:chip(st)).join('')}
+
+/* ---------------------------------------------------------------- the nights */
+const NIGHTS=[
+  {k:1,n:'一個人的廚房',d:'炒鍋、湯鍋、平底鍋、咖啡機。學會「放上去、它自己煮、好了拿去下一站」。',dur:300,
+   st:['wok','pot','pan','coffee','pantry','shelf','trash'],dishes:{friedrice:3,pasta:3,coffee:2},
+   size:[.4,.45,.15],gap:[22,11.5],waiters:['小茉'],cooks:[],tut:1},
+  {k:2,n:'烤箱與漢堡',d:'烤箱很慢但不會焦，一次放兩樣。漢堡要兩樣東西：肉排和麵包，組起來才是一份。',dur:300,
+   st:['wok','pot','pan','coffee','pantry','asm','oven','shelf','trash'],dishes:{friedrice:2,pasta:2,coffee:2,chicken:2.4,burger:2.6},
+   size:[.35,.45,.2],gap:[22,13],waiters:['小茉','Kai'],cooks:[]},
+  {k:3,n:'第一位廚師',d:'阿德師傅顧爐台：炒鍋、湯鍋、平底鍋上好了的東西，他會拿去下一站或盤子。你可以接更多桌。布丁可以先做起來放著。',dur:300,
+   st:['wok','pot','pan','coffee','pantry','asm','oven','chill','shelf','trash'],dishes:{friedrice:2.2,pasta:2.2,coffee:2,chicken:2,burger:2.2,pudding:2},
+   size:[.25,.5,.25],gap:[18,10.5],waiters:['小茉','Kai'],cooks:[{n:'阿德',line:['wok','pot','pan']}]},
+  {k:4,n:'披薩窯',d:'披薩要過三站：鋪料、窯烤（很燙、很快）、切。沈晴接手咖啡。廚房更大，單更多。',dur:300,
+   st:['wok','pot','pan','coffee','pantry','asm','oven','chill','pzbench','pzoven','board','shelf','trash'],dishes:{friedrice:1.8,pasta:1.8,coffee:2,chicken:1.8,burger:2,pudding:1.6,pizza:2.8},
+   size:[.2,.5,.3],gap:[16,9.5],waiters:['小茉','Kai','Nina'],cooks:[{n:'阿德',line:['wok','pot','pan']}],barista:'沈晴'},
+];
+
+/* ---------------------------------------------------------------- state */
+let G=null,stage,scale=1,speed=1,paused=false,muted=false;
+const seen=new Set(store.get('seen',[]));
+function newGame(k,opt){
+  opt=opt||{};
+  const N=NIGHTS[k-1];
+  G={k,N,t:0,R:rngOf((opt.seed||7)+k*101),items:new Map(),nid:1,slots:{},tickets:[],tno:0,done:[],sched:[],si:0,door:0,
+     tut:N.tut&&!opt.noTut?{step:0}:null,freeAt:N.tut&&!opt.noTut?null:0,
+     st:{served:0,left:0,burnt:0,rev:0,tips:0,q:0,qn:0,stars:0,moves:0,same:0,lastSrc:null,conc:0,concT:0,staff:0,taps:0,wait:0},
+     sel:null,ended:false,staff:[],asm:null,log:[]};
+  for(const id of N.st)G.slots[id]=Array(ST[id].slots).fill(null);
+  G.sched=genSched(N,G.R);
+  build();
+  for(const nm of N.waiters)G.staff.push({role:'waiter',n:nm,x:344,y:612,state:'idle',el:null});
+  for(const c of N.cooks)G.staff.push({role:'cook',n:c.n,line:c.line,x:60,y:454,hx:60,hy:454,state:'idle',el:null});
+  if(N.barista)G.staff.push({role:'barista',n:N.barista,x:322,y:452,hx:322,hy:452,state:'idle',el:null});
+  G.staff.forEach((s,i)=>{s.el=mk('div','pp '+s.role,`${s.n.slice(0,2)}<span class="nm">${s.n}</span>`);stage.appendChild(s.el);if(s.role==='waiter'){s.hx=344-i*30;s.hy=600;s.x=s.hx;s.y=s.hy}});
+  $('#hNight').textContent=`第 ${k} 晚`;$('#hTitle').textContent=N.n;
+  hint(null);
+  if(G.tut)tutTicket();
+}
+function genSched(N,R){
+  const out=[],end=N.dur*.86;let t=N.tut?2:3;
+  const names=Object.keys(N.dishes),wsum=names.reduce((a,d)=>a+N.dishes[d],0);
+  const pick=()=>{let r=R()*wsum;for(const d of names){r-=N.dishes[d];if(r<=0)return d}return names[0]};
+  while(t<end){
+    const ph=t/N.dur,[g0,g1]=N.gap;
+    const g=ph<.18?g0:ph<.5?g0+(g1-g0)*(ph-.18)/.32:ph<.76?g1:g1+(g0-g1)*(ph-.76)/.24;
+    const r=R();const n=r<N.size[0]?1:r<N.size[0]+N.size[1]?2:3;
+    const dishes=[];for(let i=0;i<n;i++)dishes.push(pick());
+    out.push({at:t,dishes});
+    t+=g*(.7+.6*R());
+  }
+  return out;
+}
+
+/* ---------------------------------------------------------------- building the room */
+const SEL={};   // element refs
+function build(){
+  stage.querySelectorAll('.st,.it,.tray,.pp,.pop,.drag').forEach(e=>e.remove());
+  for(const id of ORDER){
+    const s=ST[id],on=G.N.st.includes(id);
+    const e=mk('div','st st-'+id+(on?'':' ghost'));e.style.cssText=`left:${s.x}px;top:${s.y}px;width:${s.w}px;height:${s.h}px`;
+    if(on){
+      e.dataset.st=id;
+      e.innerHTML=`<div class="lb">${s.c?`<i style="background:${s.col}">${s.c}</i>`:''}${s.n}</div>`;
+      for(let i=0;i<s.slots;i++){const p=slotXY(id,i),sl=mk('div','sl');sl.style.left=(p.x-s.x)+'px';sl.style.top=(p.y-s.y)+'px';e.appendChild(sl)}
+      if(id==='pantry')pantryBins(e);
+      const prev=NIGHTS[G.k-2];if(prev&&!prev.st.includes(id))e.classList.add('new');
+    }
+    stage.appendChild(e);SEL['st_'+id]=e;
+  }
+}
+function rawsOf(N){const r=[];for(const d in N.dishes)for(const s of DISH[d].start)if(!r.includes(s))r.push(s);return r}
+function binXY(i,n){const s=ST.pantry,step=Math.min(56,(s.w-12)/Math.max(n,1));const x0=s.x+6+step/2+((s.w-12)-step*n)/2;return{x:x0+i*step,y:s.y+24}}
+function pantryBins(e){
+  const raws=rawsOf(G.N);
+  raws.forEach((k,i)=>{const p=binXY(i,raws.length),b=mk('div','bin',`${K[k].ic}<small>${K[k].n}</small>`);b.dataset.bin=k;b.style.left=(p.x-ST.pantry.x)+'px';b.style.top=(p.y-ST.pantry.y)+'px';
+    e.appendChild(b);SEL['bin_'+k]=b});
+}
+function slotXY(id,i){const s=ST[id];if(id==='shelf')return{x:s.x+36+i*60,y:s.y+33};if(id==='wok')return{x:s.x+s.w/2-4,y:s.y+46};
+  return{x:s.x+s.w*(i+1)/(s.slots+1),y:s.y+s.h*.46}}
+function trayX(i){return 4+i*71}
+function dsXY(tk,j){return{x:trayX(tk.idx)+4+15.5,y:484+30+j*35+15.5}}
+
+/* ---------------------------------------------------------------- tickets */
+function addTicket(dishes,tut,arrived){
+  if(G.tickets.filter(t=>!t.gone).length>=5){G.door++;G.pending=(G.pending||[]);G.pending.push({dishes,at:G.t});return null}
+  const no=++G.tno;
+  const ideal=Math.max(...dishes.map(dishTime))+2.5*dishes.length;
+  const tk={id:'t'+no,no,dishes,fill:dishes.map(()=>null),w:arrived!=null?G.t-arrived:0,pat:tut?999:Math.round(40+ideal*1.8+8*(dishes.length-1)),done:false,gone:false,idx:0,el:null,born:G.t,tut:!!tut};
+  const e=mk('div','tray');e.dataset.tray=tk.id;
+  e.innerHTML=`<div class="pat"><i></i></div><div class="tno">${no} 號桌</div>`+dishes.map((d,j)=>`<div class="ds" data-ds="${j}" style="top:${30+j*35}px"><div class="gh">${K[d].ic}</div><div class="pth">${pathHTML(DISH[d].path)}</div></div>`).join('');
+  tk.el=e;stage.appendChild(e);G.tickets.push(tk);layoutTrays();
+  tk.el.style.left=trayX(tk.idx)+'px';
+  sfx('order');
+  return tk;
+}
+function layoutTrays(){let i=0;for(const t of G.tickets){if(t.gone)continue;t.idx=i++;if(t.el)t.el.style.left=trayX(t.idx)+'px'}}
+function ticketOf(id){return G.tickets.find(t=>t.id===id)}
+function needSlot(tk,k){if(tk.done||tk.gone)return -1;for(let j=0;j<tk.dishes.length;j++)if(tk.dishes[j]===k&&!tk.fill[j])return j;return -1}
+
+/* ---------------------------------------------------------------- things */
+function newItem(k,at){const it={id:'i'+(G.nid++),k,ph:'hold',p:0,pr:null,q:100,q0:100,dt:0,ot:0,ht:0,at:null,el:null,res:null};G.items.set(it.id,it);
+  const e=mk('div','it');e.dataset.it=it.id;e.innerHTML=`<svg viewBox="-22 -22 44 44"><circle r="20" fill="none" stroke="rgba(0,0,0,.28)" stroke-width="4"/><circle class="ring-fg" r="20" fill="none" stroke-width="4" stroke-linecap="round" transform="rotate(-90)" stroke-dasharray="125.66" stroke-dashoffset="125.66"/></svg><span class="ic">${K[k].ic}</span>`;
+  it.el=e;stage.appendChild(e);if(at)put(it,at,true);return it}
+function delItem(it){G.items.delete(it.id);free(it);if(it.el)it.el.remove();if(G.sel&&G.sel.type==='item'&&G.sel.id===it.id)setSel(null)}
+function free(it){const a=it.at;if(!a)return;if(a.st&&G.slots[a.st]&&G.slots[a.st][a.i]===it.id)G.slots[a.st][a.i]=null;if(a.tray){const tk=ticketOf(a.tray);if(tk&&tk.fill[a.j]===it.id)tk.fill[a.j]=null;if(tk&&tk.el){const ds=tk.el.querySelector(`[data-ds="${a.j}"]`);if(ds)ds.classList.remove('filled')}}it.at=null}
+function freeSlot(st){const a=G.slots[st];if(!a)return -1;return a.indexOf(null)}
+/* set a thing down somewhere: a station (it starts on what that station does), a tray, a pair of hands */
+function put(it,at,fresh){
+  free(it);it.at=at;it.res=null;
+  if(at.st){G.slots[at.st][at.i]=it.id;const pr=PR[it.k+'@'+at.st];
+    if(pr){it.ph='cook';it.pr=pr;it.p=0;it.dt=0;it.ot=0}else{it.ph=it.ph==='burnt'?'burnt':'hold';it.ht=0}
+    if(at.st==='asm')tryAsm()}
+  else if(at.tray){const tk=ticketOf(at.tray);tk.fill[at.j]=it.id;(tk.fillT=tk.fillT||[])[at.j]=G.t;it.ph='plated';it.ht=0;const ds=tk.el.querySelector(`[data-ds="${at.j}"]`);if(ds)ds.classList.add('filled');checkTray(tk)}
+  else if(at.carry){it.ph=it.ph==='burnt'?'burnt':'hold'}
+}
+function tryAsm(){
+  if(G.asm)return;const ids=G.slots.asm||[];
+  for(const r in ASM){const need=ASM[r].needs.slice(),use=[];
+    for(const id of ids){if(!id)continue;const it=G.items.get(id);const j=need.indexOf(it.k);if(j>=0&&it.ph!=='burnt'){need.splice(j,1);use.push(it)}}
+    if(!need.length){G.asm={r,p:0,use};use.forEach(it=>{it.ph='asm'});return}}
+}
+
+/* ---------------------------------------------------------------- moves (the player's and the staff's) */
+function canGo(src,dest){   // src: {bin:k}|{it}; dest: {st}|{tray,j}
+  const k=src.bin||src.it.k;
+  if(src.it&&src.it.ph==='cook'||src.it&&src.it.ph==='asm')return false;
+  if(dest.st==='trash')return !!src.it;
+  if(src.it&&src.it.ph==='burnt')return false;
+  if(dest.st){
+    if(src.it&&src.it.at&&src.it.at.st===dest.st)return false;
+    if(freeSlot(dest.st)<0)return false;
+    if(dest.st==='shelf')return !!src.it;
+    if(dest.st==='asm'){if(src.bin)return false;for(const r in ASM)if(ASM[r].needs.includes(k)){const has=(G.slots.asm||[]).some(id=>id&&G.items.get(id).k===k);return !has&&!G.asm}return false}
+    return !!PR[k+'@'+dest.st];
+  }
+  if(dest.tray){const tk=ticketOf(dest.tray);if(!tk||src.bin)return false;return K[k].fin&&needSlot(tk,k)>=0}
+  return false;
+}
+function targets(src){const st=new Set(),tr=new Set();for(const id of G.N.st){if(id==='pantry')continue;if(canGo(src,{st:id}))st.add(id)}for(const tk of G.tickets)if(canGo(src,{tray:tk.id}))tr.add(tk.id);return{st,tr}}
+function move(src,dest,who){
+  if(!canGo(src,dest))return false;
+  if(dest.st==='trash'){const it=src.it;if(it.ph==='burnt'){G.st.burnt++}popAt(slotPosOf(it),'丟掉了','#bbb');delItem(it);sfx('trash');return true}
+  let it=src.it;const from=it&&it.at&&it.at.st;
+  if(dest.st){const i=freeSlot(dest.st);if(!it){it=newItem(src.bin,null);const b=SEL['bin_'+src.bin];if(b){const p=binPos(src.bin);place(it.el,p.x,p.y,true)}}
+    put(it,{st:dest.st,i});sfx('put')}
+  else if(dest.tray){const tk=ticketOf(dest.tray);put(it,{tray:tk.id,j:needSlot(tk,it.k)});sfx('plate')}
+  if(!who){const s=src.bin?'pantry':from||'tray';G.st.moves++;if(G.st.lastSrc===s)G.st.same++;G.st.lastSrc=s;G.log.push([+G.t.toFixed(1),src.bin||it.k,s,dest.st||'tray'])}else G.st.staff++;
+  return true;
+}
+function binPos(k){const raws=rawsOf(G.N);return binXY(raws.indexOf(k),raws.length)}
+function slotPosOf(it){const a=it.at;if(!a)return{x:it._x||180,y:it._y||300};if(a.st)return slotXY(a.st,a.i);if(a.tray){const tk=ticketOf(a.tray);return tk?dsXY(tk,a.j):{x:180,y:560}}if(a.carry)return{x:a.carry.x,y:a.carry.y-20};return{x:180,y:300}}
+
+/* ---------------------------------------------------------------- the trays leave */
+function checkTray(tk){if(tk.fill.every(Boolean)&&!tk.done){tk.done=true;tk.el.classList.add('done');sfx('bell');tutEvent('trayDone',tk)}}
+function pickTray(tk){
+  const its=tk.fill.map(id=>G.items.get(id)).filter(Boolean);
+  const q=its.reduce((a,it)=>a+it.q,0)/its.length;
+  const base=tk.dishes.reduce((a,d)=>a+DISH[d].price,0);
+  const rev=Math.round(base*(.55+.45*q/100));
+  const fast=clamp(1-tk.w/tk.pat,0,1);const tip=tk.tut?Math.round(base*.15):Math.round(base*.25*fast*(q/100));
+  const ft=tk.fillT||[];const sync=tk.dishes.length>1&&ft.length===tk.dishes.length&&Math.max(...ft)-Math.min(...ft)<=6;
+  const bonus=sync?Math.round(base*.15):0;if(sync)G.st.sync=(G.st.sync||0)+1;
+  const stars=q>=88&&fast>.45?5:q>=75&&fast>.25?4:q>=60?3:2;
+  G.st.served++;G.st.rev+=rev;G.st.tips+=tip+bonus;G.st.q+=q;G.st.qn++;G.st.stars+=stars;G.st.wait+=tk.w;
+  its.forEach(delItem);
+  const p={x:trayX(tk.idx)+33,y:500};popAt(p,`+$${rev+tip+bonus}`,'#F4C44E');if(sync)popAt({x:p.x,y:p.y-16},'一起上桌 ✨','#9fe08a');popAt({x:p.x,y:p.y+16},'★'.repeat(stars),'#F4C44E');
+  tk.gone=true;tk.el.classList.add('gone');setTimeout(()=>tk.el&&tk.el.remove(),400);G.tickets=G.tickets.filter(t=>t!==tk);layoutTrays();sfx('coin');
+  tutEvent('served',tk);
+  if(G.pending&&G.pending.length){const d=G.pending.shift();G.door--;addTicket(d.dishes,0,d.at)}
+}
+function leave(tk){
+  tk.fill.forEach(id=>{const it=G.items.get(id);if(it)delItem(it)});
+  G.st.left++;popAt({x:trayX(tk.idx)+33,y:520},'等太久，走了','#ff9b85');
+  tk.gone=true;tk.el.classList.add('gone');setTimeout(()=>tk.el&&tk.el.remove(),400);G.tickets=G.tickets.filter(t=>t!==tk);layoutTrays();sfx('sad');
+  if(G.pending&&G.pending.length){const d=G.pending.shift();G.door--;addTicket(d.dishes,0,d.at)}
+}
+
+/* ---------------------------------------------------------------- staff */
+function walk(s,x,y,dt,sp){const dx=x-s.x,dy=y-s.y,d=Math.hypot(dx,dy);if(d<=sp*dt){s.x=x;s.y=y;return true}s.x+=dx/d*sp*dt;s.y+=dy/d*sp*dt;return false}
+function stCenter(id){const s=ST[id];return{x:s.x+s.w/2,y:s.y+s.h+10}}
+function staffTick(s,dt){
+  if(s.role==='waiter'){
+    if(s.state==='idle'){const tk=G.tickets.find(t=>t.done&&!t.claimed);if(tk){tk.claimed=s;s.tk=tk;s.state='go'}else walk(s,s.hx,s.hy,dt,160)}
+    else if(s.state==='go'){if(!G.tickets.includes(s.tk)){s.state='idle';return}if(walk(s,trayX(s.tk.idx)+33,606,dt,190)){s.state='take';s.w=.35}}
+    else if(s.state==='take'){s.w-=dt;if(s.w<=0){if(G.tickets.includes(s.tk))pickTray(s.tk);s.state='out'}}
+    else if(s.state==='out'){if(walk(s,372,606,dt,190)){s.x=372;s.state='back'}}
+    else if(s.state==='back'){if(walk(s,s.hx,s.hy,dt,160))s.state='idle'}
+    return;
+  }
+  if(s.role==='cook'){
+    if(s.state==='idle'){
+      // the thing on his line closest to going off: done ones first; burnt ones to the bin
+      let best=null,bs=1e9;
+      for(const id of s.line){for(const iid of (G.slots[id]||[])){if(!iid)continue;const it=G.items.get(iid);if(it.res)continue;
+        let sc=1e9;if(it.ph==='burnt')sc=50;else if(it.ph==='over')sc=-10;else if(it.ph==='done')sc=it.pr.safe-it.dt;else if(it.ph==='cook'&&it.pr.t-it.p<1.2)sc=20+(it.pr.t-it.p);else continue;
+        if(sc<bs){bs=sc;best=it}}}
+      if(best){best.res=s;s.it=best;s.state='go'}else walk(s,s.hx,s.hy,dt,120);
+    }else if(s.state==='go'){
+      const it=s.it;if(!G.items.has(it.id)||it.res!==s||!it.at||!it.at.st){s.state='idle';return}
+      const c=stCenter(it.at.st);if(walk(s,c.x,Math.min(c.y,ST[it.at.st].y+ST[it.at.st].h+6),dt,150)){if(it.ph==='cook')return;s.state='pick';s.w=.25}
+    }else if(s.state==='pick'){
+      s.w-=dt;if(s.w>0)return;const it=s.it;if(!G.items.has(it.id)||it.res!==s){s.state='idle';return}
+      if(it.ph==='cook'){s.state='go';return}
+      free(it);put(it,{carry:s});it.res=s;it.el.classList.add('carried');s.state='carry';s.dest=null;
+    }else if(s.state==='carry'){
+      const it=s.it;
+      if(!s.dest){s.dest=cookDest(it);if(!s.dest){s.wait=(s.wait||0)+dt;if(s.wait>1){s.wait=0}return}}
+      const d=s.dest,p=d.st?stCenter(d.st):{x:trayX(ticketOf(d.tray)?ticketOf(d.tray).idx:0)+33,y:470};
+      if(d.tray&&!ticketOf(d.tray)){s.dest=null;return}
+      if(walk(s,p.x,d.st?Math.min(p.y,ST[d.st].y+ST[d.st].h+6):p.y,dt,150)){
+        it.el.classList.remove('carried');
+        if(canGo({it},d)){if(d.st==='trash'){G.st.staff++;popAt(stCenter('trash'),'丟掉了','#bbb');if(it.ph==='burnt')G.st.burnt++;delItem(it)}else{move({it},d,s)}s.state='idle';s.it=null}
+        else{it.el.classList.add('carried');s.dest=null}
+      }
+    }
+    return;
+  }
+  if(s.role==='barista'){
+    const need=G.tickets.reduce((a,t)=>a+t.dishes.filter((d,j)=>d==='coffee'&&!t.fill[j]).length,0);
+    const have=[...G.items.values()].filter(it=>(it.k==='coffee'||it.k==='beans')&&!(it.at&&it.at.tray)).length;
+    if(s.state==='idle'){
+      const ready=[...G.items.values()].find(it=>it.k==='coffee'&&it.at&&it.at.st==='coffee'&&(it.ph==='done'||it.ph==='over')&&!it.res);
+      if(ready){ready.res=s;s.it=ready;s.state='go'}
+      else if(need>have&&freeSlot('coffee')>=0){s.state='beans'}
+      else walk(s,s.hx,s.hy,dt,120);
+    }else if(s.state==='beans'){const b=binPos('beans');if(walk(s,b.x,ST.pantry.y+ST.pantry.h+8,dt,150)){s.state='brew'}}
+    else if(s.state==='brew'){const c=stCenter('coffee');if(walk(s,c.x,ST.coffee.y+ST.coffee.h+6,dt,150)){if(freeSlot('coffee')>=0){move({bin:'beans'},{st:'coffee'},s)}s.state='idle'}}
+    else if(s.state==='go'){const it=s.it;if(!G.items.has(it.id)||it.res!==s||!it.at||!it.at.st){s.state='idle';return}const c=stCenter('coffee');if(walk(s,c.x,ST.coffee.y+ST.coffee.h+6,dt,150)){free(it);put(it,{carry:s});it.res=s;it.el.classList.add('carried');s.state='carry'}}
+    else if(s.state==='carry'){const it=s.it;const tk=G.tickets.find(t=>needSlot(t,'coffee')>=0);
+      if(!tk){const sh=freeSlot('shelf');if(sh>=0){const c=stCenter('shelf');if(walk(s,c.x,ST.shelf.y+ST.shelf.h+6,dt,150)){it.el.classList.remove('carried');move({it},{st:'shelf'},s);s.state='idle'}}return}
+      if(walk(s,trayX(tk.idx)+33,470,dt,150)){it.el.classList.remove('carried');move({it},{tray:tk.id},s);s.state='idle'}}
+  }
+}
+function cookDest(it){
+  if(it.ph==='burnt')return{st:'trash'};
+  const nx=nextStOf(it.k);
+  if(nx&&canGo({it},{st:nx}))return{st:nx};
+  if(K[it.k].fin){const tk=G.tickets.filter(t=>needSlot(t,it.k)>=0).sort((a,b)=>(b.w/b.pat)-(a.w/a.pat))[0];if(tk)return{tray:tk.id}}
+  if(canGo({it},{st:'shelf'}))return{st:'shelf'};
+  return null;
+}
+
+/* ---------------------------------------------------------------- the clock */
+function update(dt){
+  if(!G||G.ended)return;
+  G.t+=dt;
+  // new tables
+  if(G.freeAt!=null){while(G.si<G.sched.length&&G.t-G.freeAt>=G.sched[G.si].at){if(G.t<G.N.dur*.9)addTicket(G.sched[G.si].dishes);G.si++}}
+  let conc=0;
+  for(const it of [...G.items.values()]){
+    if(it.ph==='cook'){conc++;it.p+=dt;if(it.p>=it.pr.t){it.k=it.pr.o;it.ph='done';it.dt=0;it.q0=it.q;it.fresh=1.6;sfx('ding');tutEvent('done',it)}}
+    else if(it.ph==='done'){it.dt+=dt;if(it.dt>=it.pr.safe){it.ph='over';it.ot=0;it.q0=it.q;sfx('warn');tutEvent('over',it)}}
+    else if(it.ph==='over'){it.ot+=dt;const f=Math.min(1,it.ot/it.pr.bad);if(it.pr.burn){it.q=Math.max(0,it.q0-(it.q0-15)*f);if(f>=1){it.ph='burnt';it.q=0;sfx('burnt');tutEvent('burnt',it)}}else it.q=Math.max(50,it.q0-(it.q0-50)*f)}
+    else if(it.ph==='hold'||it.ph==='plated'){it.ht+=dt;if(!K[it.k].cold&&it.ht>GRACE)it.q=Math.max(40,it.q-DECAY*dt)}
+    if(it.fresh)it.fresh=Math.max(0,it.fresh-dt);
+  }
+  if(G.asm){G.asm.p+=dt;conc++;if(G.asm.p>=ASM[G.asm.r].t){const r=G.asm.r,use=G.asm.use;G.asm=null;const q=use.reduce((a,it)=>a+it.q,0)/use.length;use.forEach(delItem);const it=newItem(r,null);it.q=q;const p=slotXY('asm',0);place(it.el,p.x,p.y,true);put(it,{st:'asm',i:0});it.ph='done';it.pr={safe:1e9,bad:1};it.dt=0;it.fresh=1.6;sfx('ding');tutEvent('asmDone',it)}}
+  G.st.conc+=conc*dt;G.st.concT+=dt;
+  for(const tk of [...G.tickets]){if(tk.done||tk.gone)continue;tk.w+=dt;if(!tk.tut&&tk.w>=tk.pat)leave(tk)}
+  if(G.pending&&G.pending.length){const keep=[];for(const p of G.pending){if(G.t-p.at>90){G.door--;G.st.left++;popAt({x:300,y:462},'門口的客人走了','#ff9b85')}else keep.push(p)}G.pending=keep}
+  for(const s of G.staff)staffTick(s,dt);
+  tutTick();
+  if(G.t>=G.N.dur&&!G.tickets.length&&!(G.pending&&G.pending.length)||G.t>=G.N.dur+50)endNight();
+}
+
+/* ---------------------------------------------------------------- drawing */
+function place(e,x,y,inst,sc){const tf=`translate(${x-22}px,${y-22}px)`+(sc&&sc!==1?` scale(${sc})`:'');if(inst){e.style.transition='none';e.style.transform=tf;void e.offsetWidth;e.style.transition=''}else e.style.transform=tf}
+function render(){
+  if(!G)return;
+  const sel=G.sel;
+  for(const it of G.items.values()){
+    const e=it.el;const p=slotPosOf(it);
+    const sc=it.at&&it.at.tray?.66:1;
+    if(it.at&&it.at.carry)e.style.transform=`translate(${p.x-22}px,${p.y-22}px)`;
+    else if(e._px!==p.x||e._py!==p.y||e._sc!==sc){place(e,p.x,p.y,false,sc);e._px=p.x;e._py=p.y;e._sc=sc}
+    const fg=e.children[0].children[1];let frac=1,col='#8DC27A';
+    if(it.ph==='cook'){frac=it.p/it.pr.t;col='#E6C27A'}
+    else if(it.ph==='done'){frac=it.pr.safe>1e8?1:1-it.dt/it.pr.safe;col='#8DC27A';if(it.pr.safe>1e8)frac=1}
+    else if(it.ph==='over'){frac=1-it.ot/it.pr.bad;col=it.pr.burn?'#D4553A':'#d9a13a'}
+    else if(it.ph==='burnt'){frac=0}
+    else if(it.ph==='asm'){frac=G.asm?G.asm.p/ASM[G.asm.r].t:1;col='#E6C27A'}
+    else{frac=K[it.k].cold?1:it.ht<GRACE?1-it.ht/GRACE*.15:Math.max(0,(it.q-40)/60)*.85;col=it.q>80?'#8DC27A':'#d9a13a'}
+    fg.setAttribute('stroke',col);fg.setAttribute('stroke-dashoffset',(125.66*(1-clamp(frac,0,1))).toFixed(1));
+    const cls=['it','k-'+it.k];if(it.ph==='cook'&&K[(it.pr&&Object.keys(PR).find(x=>PR[x]===it.pr)||'').split('@')[0]]?.raw)cls.push('raw');
+    if(it.ph==='burnt')cls.push('burnt');if(it.ph==='over')cls.push('over');if(K[it.k].fin&&it.ph!=='cook')cls.push('plate');if(it.at&&it.at.carry)cls.push('carried');if(it.at&&it.at.tray)cls.push('ontray');
+    if(sel&&sel.type==='item'&&sel.id===it.id)cls.push('sel');
+    const c=cls.join(' ');if(e._c!==c){e.className=c;e._c=c}
+    const ic=K[it.k].ic;const icEl=e.children[1];if(icEl.textContent!==ic)icEl.textContent=ic;
+    // the next place, on the thing itself
+    let nx='';if(it.ph!=='cook'&&it.ph!=='burnt'&&it.ph!=='asm'&&!K[it.k].fin){const n=nextStOf(it.k);if(n&&!(it.at&&it.at.st===n))nx=ST[n].c;else if(n==='asm'){for(const r in ASM)if(ASM[r].needs.includes(it.k)){const o=ASM[r].needs.find(x=>x!==it.k);nx='＋'+K[o].ic}}}
+    if(e._nx!==nx){e._nx=nx;let b=e.querySelector('.nx');if(nx){if(!b){b=mk('span','nx');e.appendChild(b)}const wait=nx[0]==='＋';b.textContent=wait?nx:'→'+nx;b.style.background=wait?'#f3ead8':ST[CH2ST[nx]].col}else if(b)b.remove()}
+    let sec='';if(it.ph==='cook')sec=Math.ceil(it.pr.t-it.p)+'s';else if(it.ph==='asm'&&G.asm)sec=Math.ceil(ASM[G.asm.r].t-G.asm.p)+'s';else if(it.ph==='over'&&it.pr.burn)sec='快焦了';
+    if(e._sec!==sec){e._sec=sec;let sb=e.querySelector('.sec');if(sec){if(!sb){sb=mk('span','sec');e.appendChild(sb)}sb.textContent=sec}else if(sb)sb.remove()}
+    const bell=it.fresh>0;if(e._bell!==bell){e._bell=bell;let b=e.querySelector('.bell');if(bell&&!b)e.appendChild(mk('span','bell','🔔'));else if(!bell&&b)b.remove()}
+  }
+  for(const tk of G.tickets){const i=tk.el.querySelector('.pat i');const f=tk.tut?1:clamp(1-tk.w/tk.pat,0,1);i.style.width=(f*100).toFixed(1)+'%';i.className=f<.25?'low':f<.5?'mid':''}
+  for(const s of G.staff){s.el.style.transform=`translate(${s.x}px,${s.y}px)`;s.el.classList.toggle('out',s.role==='waiter'&&s.x>=366)}
+  $('#queue').textContent=G.door>0?`門口還有 ${G.door} 組在等`:'';
+  const ct=Math.min(1,G.t/G.N.dur);const mins=17*60+Math.round(ct*270);$('#hClock').textContent=`${Math.floor(mins/60)}:${String(mins%60).padStart(2,'0')}`;
+  $('#hMoney').textContent='$'+(G.st.rev+G.st.tips).toLocaleString();
+  const so=$('#st_oven');
+  if(SEL.st_oven)SEL.st_oven.classList.toggle('hot',(G.slots.oven||[]).some(id=>id&&G.items.get(id).ph==='cook'));
+}
+
+/* ---------------------------------------------------------------- choosing and putting down */
+function setSel(s){
+  G.sel=s;
+  stage.querySelectorAll('.ok,.dim,.sel').forEach(e=>e.classList.remove('ok','dim','sel'));
+  if(!s){return}
+  const src=s.type==='bin'?{bin:s.k}:{it:G.items.get(s.id)};
+  if(s.type==='bin')SEL['bin_'+s.k].classList.add('sel');
+  const T=targets(src);
+  for(const id of G.N.st){const e=SEL['st_'+id];if(id==='pantry')continue;if(T.st.has(id))e.classList.add('ok');else e.classList.add('dim')}
+  for(const tk of G.tickets){if(T.tr.has(tk.id))tk.el.classList.add('ok')}
+  render();
+}
+function hitOf(t){
+  if(!t||!t.closest)return null;
+  const it=t.closest('[data-it]');if(it)return{type:'item',id:it.dataset.it};
+  const b=t.closest('[data-bin]');if(b)return{type:'bin',k:b.dataset.bin};
+  const tr=t.closest('[data-tray]');if(tr){const ds=t.closest('[data-ds]');return{type:'tray',id:tr.dataset.tray,j:ds?+ds.dataset.ds:null}}
+  const st=t.closest('[data-st]');if(st)return{type:'st',id:st.dataset.st};
+  return null;
+}
+function srcOf(s){return s.type==='bin'?{bin:s.k}:{it:G.items.get(s.id)}}
+function destOf(h){
+  if(!h)return null;
+  if(h.type==='st')return{st:h.id};
+  if(h.type==='tray')return{tray:h.id};
+  if(h.type==='item'){const it=G.items.get(h.id);if(!it||!it.at)return null;if(it.at.st)return{st:it.at.st};if(it.at.tray)return{tray:it.at.tray}}
+  return null;
+}
+function selectable(h){if(!h)return false;if(h.type==='bin')return true;if(h.type==='item'){const it=G.items.get(h.id);return it&&it.ph!=='cook'&&it.ph!=='asm'&&!(it.at&&it.at.carry)}return false}
+function tap(h){
+  if(!G||G.ended)return;G.st.taps++;
+  if(G.sel){
+    const src=srcOf(G.sel);if(G.sel.type==='item'&&!src.it){setSel(null);return}
+    if(h&&h.type===G.sel.type&&(h.id||h.k)===(G.sel.id||G.sel.k)){setSel(null);return}
+    const d=destOf(h);
+    if(d&&canGo(src,d)){move(src,d);setSel(null);tutEvent('moved');return}
+    if(selectable(h)){setSel(h);tutEvent('selected',h);return}
+    if(h&&h.type==='tray'&&h.j!=null&&!(src.it&&src.it.at&&src.it.at.tray)){const tk=ticketOf(h.id);if(tk){setSel(null);return pull(tk,h.j)}}
+    if(h){nope(h,src)}else setSel(null);
+    return;
+  }
+  if(selectable(h)){setSel(h);tutEvent('selected',h);return}
+  if(h&&h.type==='tray'&&h.j!=null){const tk=ticketOf(h.id);if(tk)pull(tk,h.j);return}
+  if(h&&h.type==='st'){const e=SEL['st_'+h.id];if(e){e.classList.remove('shake');void e.offsetWidth;e.classList.add('shake')}}
+}
+/* a dish on a ticket, tapped: its first ingredient, in hand (the one still missing for that dish) */
+function pull(tk,j){
+  const d=tk.dishes[j];if(tk.fill[j])return;
+  // a finished one already waiting somewhere: pick that up instead
+  for(const it of G.items.values())if(it.k===d&&it.ph!=='cook'&&it.ph!=='burnt'&&it.ph!=='asm'&&!(it.at&&(it.at.tray||it.at.carry))){setSel({type:'item',id:it.id});tutEvent('selected');return}
+  const starts=DISH[d].start;let k=starts[0];
+  if(starts.length>1){const cnt=s=>[...G.items.values()].filter(it=>it.k===s||chainEnd(it.k)===chainEnd(s)).length;k=starts.slice().sort((a,b)=>cnt(a)-cnt(b))[0]}
+  setSel({type:'bin',k});tutEvent('selected',{type:'bin',k});
+}
+function chainEnd(k){let cur=k,g=0;while(g++<8){const s=nextStOf(cur);if(!s||s==='asm')break;cur=PR[cur+'@'+s].o}return cur}
+function nope(h,src){
+  const d=destOf(h);let why='';const k=src.bin||src.it.k;
+  if(d&&d.st){const nx=src.it?nextStOf(k):(()=>{for(const key in PR)if(key.startsWith(k+'@'))return key.split('@')[1]})();
+    if(freeSlot(d.st)<0&&(PR[k+'@'+d.st]||d.st==='shelf'))why=`${ST[d.st].n}滿了`;
+    else if(nx)why=`${K[k].n}要去${ST[nx].n}`;else if(K[k].fin)why=`${K[k].n}好了，放到下面那桌的盤子`;}
+  else if(d&&d.tray){why=src.bin?'先煮好才能上盤':K[k].fin?'這桌沒點這道':`${K[k].n}還要去${ST[nextStOf(k)]?ST[nextStOf(k)].n:'下一站'}`}
+  if(why)flashHint(why);
+  const e=h.type==='st'?SEL['st_'+h.id]:h.type==='tray'?(ticketOf(h.id)||{}).el:null;if(e){e.classList.remove('shake');void e.offsetWidth;e.classList.add('shake')}
+}
+
+/* ---------------------------------------------------------------- pointer: tap, or press-and-drag */
+let down=null,dragEl=null;
+function lp(e){const r=stage.getBoundingClientRect();return{x:(e.clientX-r.left)/scale,y:(e.clientY-r.top)/scale}}
+function onDown(e){if(!G||G.ended||paused)return;audioInit();const h=hitOf(e.target);down={h,x:e.clientX,y:e.clientY,drag:false,id:e.pointerId};}
+function onMove(e){
+  if(!down||down.id!==e.pointerId)return;
+  if(!down.drag&&Math.hypot(e.clientX-down.x,e.clientY-down.y)>10&&selectable(down.h)){down.drag=true;setSel(down.h);
+    const ic=down.h.type==='bin'?K[down.h.k].ic:K[G.items.get(down.h.id).k].ic;dragEl=mk('div','drag',ic);stage.appendChild(dragEl)}
+  if(down.drag){const p=lp(e);dragEl.style.left=p.x+'px';dragEl.style.top=p.y+'px';e.preventDefault()}
+}
+function onUp(e){
+  if(!down||down.id!==e.pointerId)return;const d=down;down=null;
+  if(d.drag){if(dragEl){dragEl.remove();dragEl=null}const t=document.elementFromPoint(e.clientX,e.clientY);const h=hitOf(t);
+    const src=srcOf(G.sel||d.h);const dest=destOf(h);
+    if(dest&&canGo(src,dest)){move(src,dest);G.st.taps++;tutEvent('moved')}else if(h)nope(h,src);
+    setSel(null);return}
+  tap(d.h);
+}
+
+/* ---------------------------------------------------------------- the tutorial: each new thing once, by hand, when it first happens */
+let beat=null,hintTimer=0;
+const B={
+  take:{txt:'第一張單：<b>黃金蛋炒飯</b>。點冰箱裡的 🍚（或單子上的 🍛），再點<b>炒鍋</b>。',hl:()=>['bin_rice','st_wok',trayEl(1)]},
+  wait:{txt:'炒鍋自己會炒。黃色的圈是進度，好了會響一聲、變綠。這段時間你可以去做別的事。',hl:()=>['st_wok']},
+  serve:{txt:'好了！點炒鍋上的 🍛，再點下面 <b>1 號桌的盤子</b>（也可以直接拖過去）。',hl:()=>['st_wok',trayEl(1)]},
+  out:{txt:'一桌的菜到齊，服務生<b>小茉</b>就會從出菜口端走。',hl:()=>[],min:3.2},
+  two:{txt:'<b>番茄義大利麵</b>要走兩站：先<b>湯鍋</b>煮麵，再進<b>平底鍋</b>拌醬。單子上「煮›煎」就是它的路線。',hl:()=>['bin_noodle','st_pot',trayEl(2)]},
+  two2:{txt:'麵煮好了。上面的「→煎」是它的下一站：拿去<b>平底鍋</b>。',hl:()=>['st_pot','st_pan']},
+  fill:{txt:'兩樣一起來。先讓炒飯下鍋；它在炒的時候，去把<b>咖啡</b>放上咖啡機。',hl:()=>['bin_rice','st_wok','bin_beans','st_coffee']},
+  together:{txt:'同一桌要到齊才會出菜。先好的放在盤子上會慢慢變涼（圈變黃）；幾道菜在 6 秒內一起上盤，小費會多一點。',hl:()=>[],min:5},
+  free:{txt:'接下來客人會越來越多。不用守著一個爐子：看整間廚房——誰快好了、哪裡空著、哪一桌最急。',hl:()=>[],min:6},
+  over:{txt:'炒鍋、平底鍋上好了的東西放著不拿，會開始焦（紅圈）。拿去盤子或下一站；沒地方放就先放<b>暫放台</b>。',hl:()=>['st_shelf'],min:4},
+  burnt:{txt:'焦掉了。點它，再點<b>垃圾桶</b>，重做一份。',hl:()=>['st_trash'],min:3},
+  oven:{txt:'<b>香草烤雞</b>進烤箱要 35 秒，但烤箱不會焦，一次放兩樣。慢的先下，等的時間去做別的。',hl:()=>['bin_chicken_r','st_oven']},
+  asm:{txt:'<b>經典牛肉漢堡</b>是兩樣東西：肉排在<b>平底鍋</b>煎、麵包進<b>烤箱</b>烤。兩樣都好了放上<b>組裝台</b>，自己會組起來。',hl:()=>['bin_patty','bin_bun','st_asm']},
+  cook:{txt:'今天有<b>阿德師傅</b>顧爐台：炒鍋、湯鍋、平底鍋上好了的東西，他會拿去下一站或盤子上。你只要決定先下什麼。',hl:()=>['st_wok','st_pot','st_pan'],min:7},
+  ahead:{txt:'<b>焦糖布丁</b>要冷藏 40 秒，可以先做起來放著不會壞。有空的時候先冰幾個，客人點了直接拿。',hl:()=>['bin_custard','st_chill'],min:6},
+  pizza:{txt:'<b>瑪格麗特披薩</b>走三站：<b>披薩檯</b>鋪料 → <b>披薩窯</b>（10 秒就好，好了很快會焦）→ <b>砧板</b>切片。',hl:()=>['bin_dough','st_pzbench','st_pzoven','st_board']},
+  barista:{txt:'<b>沈晴</b>今天負責咖啡：單上有咖啡，她會自己煮好、端上盤子。',hl:()=>['st_coffee'],min:6},
+};
+function trayEl(no){const tk=G.tickets.find(t=>t.no===no);return tk?tk.el:null}
+function showBeat(id){if(seen.has(id)&&!(G.tut&&['take','wait','serve','out','two','two2','fill'].includes(id)&&!G.tutDone))return false;
+  seen.add(id);store.set('seen',[...seen]);beat={id,...B[id],t0:G.t};hint(B[id].txt);hl(B[id].hl());return true}
+function endBeat(){beat=null;hl([]);hint(null)}
+function hl(list){stage.querySelectorAll('.hl').forEach(e=>e.classList.remove('hl'));for(const x of list){const e=typeof x==='string'?SEL[x]:x;if(e)e.classList.add('hl')}}
+function tutTicket(){const step=G.tut.step;if(step===0)addTicket(['friedrice'],1);else if(step===1)addTicket(['pasta'],1);else if(step===2)addTicket(['friedrice','coffee'],1)}
+function tutEvent(ev,x){
+  if(!G)return;
+  if(ev==='served'&&G.tut&&!G.tutDone&&x.tut){G.tut.step++;if(G.tut.step<3)setTimeout(()=>{if(G&&!G.ended)tutTicket()},900);else{G.tutDone=true;G.freeAt=G.t+3;setTimeout(()=>{if(G&&!G.ended&&!beat)showBeat('free')},400)}}
+  if(ev==='over'&&ST[x.at&&x.at.st]&&x.pr.burn)queueBeat('over');
+  if(ev==='burnt')queueBeat('burnt');
+}
+let beatQ=[];function queueBeat(id){if(!seen.has(id)&&!beatQ.includes(id))beatQ.push(id)}
+function tutTick(){
+  if(beat){const id=beat.id,el=G.t-beat.t0;let done=false;
+    if(id==='take')done=[...G.items.values()].some(it=>it.at&&it.at.st==='wok');
+    else if(id==='wait')done=[...G.items.values()].some(it=>it.k==='friedrice');
+    else if(id==='serve')done=G.tickets.some(t=>t.no===1&&t.done)||!G.tickets.some(t=>t.no===1);
+    else if(id==='two')done=[...G.items.values()].some(it=>it.at&&it.at.st==='pot');
+    else if(id==='two2')done=[...G.items.values()].some(it=>it.at&&it.at.st==='pan'&&(it.k==='noodle_c'||it.k==='pasta'));
+    else if(id==='fill')done=[...G.items.values()].some(it=>it.at&&it.at.st==='coffee')&&[...G.items.values()].some(it=>it.at&&it.at.st==='wok');
+    else if(id==='oven')done=[...G.items.values()].some(it=>it.at&&it.at.st==='oven'&&(it.k==='chicken_r'||it.k==='chicken'));
+    else if(id==='asm')done=!!G.asm||[...G.items.values()].some(it=>it.k==='burger');
+    else if(id==='ahead')done=el>=(beat.min||0)&&[...G.items.values()].some(it=>it.at&&it.at.st==='chill');
+    else if(id==='pizza')done=[...G.items.values()].some(it=>it.k==='pizza'||it.k==='pz_baked')||el>24;
+    else if(id==='over'||id==='burnt')done=el>=(beat.min||3)&&![...G.items.values()].some(it=>it.ph==='over'||it.ph==='burnt');
+    else done=el>=(beat.min||4);
+    if(id==='ahead'&&el>16)done=true;
+    if(done)endBeat();else return;
+  }
+  // what to say next
+  const its=[...G.items.values()];
+  if(G.tut&&!G.tutDone){
+    const s=G.tut.step;
+    if(s===0){if(!its.some(it=>it.at&&it.at.st==='wok'||it.k==='friedrice'))return showBeat('take');if(its.some(it=>it.at&&it.at.st==='wok'&&it.ph==='cook'))return showBeat('wait');if(its.some(it=>it.k==='friedrice'&&it.at&&it.at.st))return showBeat('serve')}
+    if(s===0&&G.tickets.some(t=>t.no===1&&t.done))return showBeat('out');
+    if(s===1){if(!its.some(it=>it.at&&(it.at.st==='pot'||it.at.st==='pan')||it.k==='pasta'))return showBeat('two');if(its.some(it=>it.k==='noodle_c'&&(it.ph==='done'||it.ph==='over'||it.ph==='hold')))return showBeat('two2')}
+    if(s===2&&G.tickets.some(t=>t.no===3)&&!its.some(it=>it.at&&it.at.st==='coffee'))return showBeat('fill');
+  }
+  if(beatQ.length){const id=beatQ.shift();if(showBeat(id))return}
+  if(G.tickets.some(t=>t.dishes.includes('chicken')))if(showBeat('oven'))return;
+  if(G.tickets.some(t=>t.dishes.includes('burger')))if(showBeat('asm'))return;
+  if(G.N.cooks.length&&G.t>1.5)if(showBeat('cook'))return;
+  if(G.N.st.includes('chill')&&G.t>3)if(showBeat('ahead'))return;
+  if(G.tickets.some(t=>t.dishes.includes('pizza')))if(showBeat('pizza'))return;
+  if(G.N.barista&&G.t>2)if(showBeat('barista'))return;
+  if(G.tickets.some(t=>!t.done&&t.fill.some(Boolean)&&t.dishes.length>1&&t.fill.some(x=>!x)))if(showBeat('together'))return;
+}
+function hint(txt){const h=$('#hint');if(txt){h.innerHTML=txt;h.classList.remove('quiet')}else{h.innerHTML=G&&G.k===1&&G.t<120?'點食材 → 點設備。好了以後點它 → 點下一站或盤子。':'';h.classList.add('quiet')}}
+function flashHint(t){if(beat)return;const h=$('#hint');h.innerHTML=t;h.classList.remove('quiet');clearTimeout(hintTimer);hintTimer=setTimeout(()=>{if(!beat)hint(null)},1800)}
+function popAt(p,txt,col){const e=mk('div','pop',txt);e.style.left=(p.x-20)+'px';e.style.top=(p.y-30)+'px';e.style.color=col||'#fff';stage.appendChild(e);setTimeout(()=>e.remove(),1300)}
+
+/* ---------------------------------------------------------------- the end of the night */
+function endNight(){
+  if(G.ended)return;G.ended=true;setSel(null);hl([]);
+  for(const tk of G.tickets)if(!tk.done)G.st.left++;
+  const S=G.st,q=S.qn?S.q/S.qn:0,stars=S.qn?S.stars/S.qn:0;
+  const best=store.get('best',{});const prev=best[G.k];if(!prev||S.rev+S.tips>prev)best[G.k]=S.rev+S.tips;store.set('best',best);
+  const mins=G.t/60;
+  const el=$('#sum');el.hidden=false;
+  el.innerHTML=`<div class="eyebrow">第 ${G.k} 晚 · 打烊</div><h1>${G.N.n}</h1>
+   <div class="stats">
+    <div>出菜</div><div>${S.served} 桌</div>
+    <div>等太久離開</div><div>${S.left} 桌</div>
+    <div>平均品質</div><div>${q.toFixed(0)}</div>
+    <div>評價</div><div>${stars?stars.toFixed(1)+' ★':'—'}</div>
+    <div>焦掉</div><div>${S.burnt} 份</div>
+    <div>一桌一起上桌</div><div>${S.sync||0} 桌</div>
+    <div>營業額＋小費</div><div>$${(S.rev+S.tips).toLocaleString()}</div>
+    <div class="hd">廚房的節奏</div>
+    <div>平均同時在煮</div><div>${(S.conc/Math.max(1,S.concT)).toFixed(1)} 樣</div>
+    <div>你搬動食物</div><div>${S.moves} 次（每分鐘 ${(S.moves/Math.max(.1,mins)).toFixed(0)}）</div>
+    <div>連續從同一個地方拿</div><div>${S.moves?Math.round(S.same/S.moves*100):0}%</div>
+    ${G.staff.some(s=>s.role!=='waiter')?`<div>員工幫你搬</div><div>${S.staff} 次</div>`:''}
+   </div>
+   <div class="row">${G.k<NIGHTS.length?`<button class="btn pri" data-go="${G.k+1}">下一晚：${NIGHTS[G.k].n}</button>`:''}<button class="btn" data-go="${G.k}">再玩一次</button><button class="btn" data-menu="1">選單</button></div>`;
+  window.__cookLast={k:G.k,...S,q,stars,mins};
+}
+
+/* ---------------------------------------------------------------- sound: tiny, only after a tap */
+let AC=null;function audioInit(){if(AC||muted)return;try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){AC=null}}
+function tone(f,d,type,vol,f2){if(!AC||muted)return;try{const o=AC.createOscillator(),g=AC.createGain();o.type=type||'sine';o.frequency.setValueAtTime(f,AC.currentTime);if(f2)o.frequency.exponentialRampToValueAtTime(f2,AC.currentTime+d);g.gain.setValueAtTime(vol||.06,AC.currentTime);g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+d)}catch(e){}}
+function sfx(k){if(speed>2)return;if(k==='ding')tone(988,.18,'sine',.05,740);else if(k==='bell'){tone(1318,.5,'triangle',.05);setTimeout(()=>tone(1760,.4,'triangle',.035),90)}else if(k==='coin'){tone(1046,.08,'square',.025);setTimeout(()=>tone(1568,.12,'square',.025),70)}
+  else if(k==='warn')tone(440,.09,'square',.03);else if(k==='burnt')tone(150,.35,'sawtooth',.04,80);else if(k==='put')tone(330,.06,'sine',.05);else if(k==='plate')tone(660,.07,'triangle',.05);else if(k==='order')tone(784,.09,'sine',.035);else if(k==='sad')tone(300,.3,'sine',.04,200);else if(k==='trash')tone(200,.1,'sine',.04)}
+
+/* ---------------------------------------------------------------- the frame */
+let last=0;
+function frame(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;if(G&&!paused&&!G.ended){let left=dt*speed;while(left>0){const s=Math.min(.05,left);update(s);left-=s}}render();requestAnimationFrame(frame)}
+function fit(){const w=$('#wrap');const s=Math.min(w.clientWidth/W,w.clientHeight/H);scale=s;stage.style.transform=`translate(${(w.clientWidth-W*s)/2}px,${Math.max(0,(w.clientHeight-H*s)/2)}px) scale(${s})`}
+
+/* ---------------------------------------------------------------- menu */
+function menu(){
+  $('#menu').hidden=false;$('#sum').hidden=true;
+  const best=store.get('best',{});
+  $('#nightList').innerHTML=NIGHTS.map(n=>`<button class="night" data-go="${n.k}"><em>第 ${n.k} 晚${best[n.k]?` · 最好 $${best[n.k].toLocaleString()}`:''}</em><b>${n.n}</b><span>${n.d}</span></button>`).join('');
+}
+function start(k){$('#menu').hidden=true;$('#sum').hidden=true;paused=false;$('#hPause').textContent='II';newGame(k);fit()}
+document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){audioInit();start(+g.dataset.go);return}if(e.target.closest('[data-menu]'))menu()});
+$('#resetTut').addEventListener('click',()=>{seen.clear();store.set('seen',[]);flash('教學提示會重新出現')});
+function flash(t){const b=$('#resetTut');const o=b.textContent;b.textContent=t;setTimeout(()=>b.textContent=o,1400)}
+$('#hSpeed').addEventListener('click',()=>{speed=speed===1?2:1;$('#hSpeed').textContent=speed+'×';$('#hSpeed').classList.toggle('on',speed>1)});
+$('#hPause').addEventListener('click',()=>{if(!G)return;paused=!paused;$('#hPause').textContent=paused?'▶':'II';if(paused){const el=$('#sum');el.hidden=false;el.innerHTML=`<div class="eyebrow">暫停</div><h1>${G.N.n}</h1><p>點「繼續」回到廚房。</p><div class="row"><button class="btn pri" id="resume">繼續</button><button class="btn" data-go="${G.k}">重來這一晚</button><button class="btn" data-menu="1">選單</button></div>`;$('#resume').onclick=()=>{paused=false;el.hidden=true;$('#hPause').textContent='II'}}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&G&&!G.ended&&!paused)$('#hPause').click()});
+
+stage=$('#stage');
+stage.addEventListener('pointerdown',onDown);
+window.addEventListener('pointermove',onMove,{passive:false});
+window.addEventListener('pointerup',onUp);
+window.addEventListener('pointercancel',()=>{if(dragEl){dragEl.remove();dragEl=null}down=null});
+window.addEventListener('resize',fit);
+fit();menu();requestAnimationFrame(frame);
+
+/* for the play-testing scripts (tools in this folder): the state, and the same moves a tap makes */
+window.__cook={get G(){return G},start:(k,o)=>{$('#menu').hidden=true;$('#sum').hidden=true;newGame(k,o);fit()},
+  setSpeed:v=>{speed=v},move:(src,dest)=>{if(src.it&&typeof src.it==='string')src={it:G.items.get(src.it)};const ok=move(src,dest);if(ok)tutEvent('moved');return ok},
+  canGo:(src,dest)=>{if(src.it&&typeof src.it==='string')src={it:G.items.get(src.it)};return canGo(src,dest)},
+  step:(sec)=>{let left=sec;while(left>0){const s=Math.min(.05,left);update(s);left-=s}render()},pause:v=>{paused=v},
+  seen,nightDefs:NIGHTS,nextStOf,DISH,PR,ASM,K};
+})();
+</script>
