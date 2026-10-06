@@ -1,0 +1,47 @@
+PASS  qa_merged_room_tabs_cushion_light_and_social_entrances  (2.9s)
+PASS  qa_a_late_day_by_taps_from_prep_to_the_next_prep  (148.6s)
+PASS  qa_a_new_game_first_day_by_taps  (5.3s)
+PASS  qa_every_button_in_the_shop_does_something  (44.2s)
+PASS  qa_every_button_on_the_prep_screen_does_something  (91.9s)
+OPEN  qa_restock_says_why_it_cannot  (1.8s)  known: WS2-04 「補滿」把冰箱塞給一道菜後，「一鍵補到建議量」按了沒反應也沒說為什麼
+      一鍵補到建議量 with a full fridge: ['signature', 'sigdessert', 'souffle', 'basque', 'fruitsoda', 'fries', 'duck', 'risotto', 'steak_x', 'risotto_x', 'burger_x', 'souffle_x', 'duck_x', 'soup', 'steak', 'sparkling', 'pudding', 'blacktea', 'tiramisu', 'pizza', 'salmon', 'chicken'] stay short and nothing says 
+PASS  qa_the_private_dining_room_is_bought_by_a_tap  (1.1s)
+PASS  qa_the_players_checkpoints_resume  (100.2s)
+OPEN  qa_a_checkpoint_survives_a_new_table_count  (1.0s)  known: WS2-01 改過桌數以後，舊的營業中存檔接回變空店
+      1/31 groups after 繼續營業; ['今天的店內狀況無法完整還原，從 20:00 重新開店（今天的營收與客人數都保留，店裡的客人會重新入座）']
+OPEN  qa_a_held_story_survives_leaving_the_app  (71.0s)  known: WS9-01／W3-06 故事停住店時離開 App，回來那段只剩看過的幾句、不會再演
+      after leaving the app the story keeps 2 of its 5 lines and does not play again
+OPEN  qa_leaving_while_closing_after_a_resume_keeps_the_day  (87.9s)  known: W3-01 繼續營業後在收店時離開，那一天不見（錢留著、結算沒發生）
+      the day is gone: day 89, no checkpoint, the title offers "Jill 主廚的餐廳\nJILL'S KITCHEN\nA Restaurant by Chef Jill\nOPEN FOR DINNER\n繼續：DAY 89 · "
+PASS  qa_the_screens_fit_375_390_430  (98.6s)
+PASS  qa_every_tab_reaches_by_finger  (10.9s)
+OPEN  qa_every_tab_reaches_by_mouse_in_a_small_window  (2.2s)  known: 使用者 2026-10-04、10-06 電腦版小視窗：滑鼠到不了「員工」「招牌菜」和日誌最後幾個分頁
+      a mouse cannot reach: 899×800 shop › staff, 899×800 shop › sig, 899×800 journal › cats, 899×800 journal › ach, 899×800 journal › mastery, 1280×540 shop › staff, 1280×540 shop › sig, 1280×540 journal › cats, 1280×540 journal › ach, 1280×540 journal › mastery
+OPEN  qa_the_selected_tab_is_on_screen  (2.5s)  known: W3-11／WS2-06 商店打開時選中的分頁在畫面外；選了右邊的分頁，分頁列又跳回最左
+      375px: the shop opens on 「廚房設備」 off the screen | 375px: after choosing 「招牌菜」 the strip hides it | 390px: the shop opens on 「廚房設備」 off the screen | 390px: after choosing 「招牌菜」 the strip hides it | 430px: the shop opens on 「廚房設備」 off the screen | 430px: after choosing 「招牌菜」 the strip hides it
+OPEN  qa_the_pause_button_works_outside_the_service  (1.3s)  known: WS2-03 開店前、商店畫面右上的「II」被選單蓋住，按不到
+      shop: covered by #screen | prep: covered by #screen
+OPEN  qa_a_drink_on_a_ticket_reads_right  (13.1s)  known: W3-04 點單上點一杯酒跳「undefined都在忙！」
+      ['undefined都在忙！', 'undefined都在忙！', 'undefined都在忙！']
+OPEN  qa_waiting_staff_do_not_stand_on_one_spot  (44.1s)  known: W3-05／WS2-02 閒著的服務生、清潔員疊在同一點，名牌疊在一起
+      21 pairs of idle staff on the same spot
+OPEN  qa_the_inspection_money_is_in_the_summary  (141.8s)  known: WS1-02 衛生檢查的 ±$300 進了收銀機但不在結算
+      the till 1281061 and the summary 1280761 differ by 300
+OPEN  qa_table_hearts_only_for_sophie_and_mia  (65.3s)  known: WS1-04 桌上泡泡的愛心還給每位回頭客和熟客（使用者選了 B：只給 Sophie 和 Mia）
+      45 seconds with pink hearts over the room and neither Sophie nor Mia there
+OPEN  qa_the_album_counts_all_five_cats  (1.1s)  known: WS1-03／WS7-02／N01 相簿「今天。」寫「1 隻貓都在」
+      the album says 「3 隻貓都在」
+OPEN  qa_photos_of_jills_room_are_taken_in_her_room  (0.6s)  known: WS7-01 Jill 房間沙發的那幾種照片拍成主廳
+      the sofa photos are queued for [{'id': 'sofa', 'room': 'main'}, {'id': 'lap', 'room': 'main'}]
+OPEN  qa_a_favourite_is_missed_only_when_it_is_off_the_menu  (1.7s)  known: N02 熟客說「今天沒有○○」，其實那道菜在菜單上、也有貨
+      said with the dish on the menu and in the fridge: ['今天沒有提拉米蘇啊……', '香煎鴨胸今天沒有喔？那我看看別的。', '沒有炙烤肋眼牛排，好可惜。']
+OPEN  qa_a_review_talks_about_the_food_not_the_glass  (1.8s)  known: WS6-06 評論把配餐的酒當成菜寫：「氣泡酒的火候剛剛好」
+      the review names the glass (氣泡酒) as the dish: ['氣泡酒好吃到我安靜了三秒。', 'Jill 主廚的氣泡酒，每一口都被好好照顧。']
+OPEN  qa_a_new_game_gets_no_old_version_notes  (3.0s)  known: WS1-06 新遊戲第 3 天看到給舊存檔的版本公告「2.0：」「2.1：」
+      the Day 3 prep shows the version notes for old saves
+OPEN  qa_every_level_named_in_the_text_exists  (0.0s)  known: WS5-04 招牌甜點寫「需要擴建到 Jill's Kitchen」，沒有這一級
+      the text names levels that do not exist: ["Jill's Kitchen"] (the levels: ["Jill's Little Kitchen", "Jill's Bistro", "Jill's Restaurant", "Jill's Fine Dining", 'JILL'])
+PASS  qa_stories_wait_for_stories_not_for_dates  (0.3s)
+
+10 passed, 0 failed, 17 known-open (tests/qa_known_open.json)
+exit 0

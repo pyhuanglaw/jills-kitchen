@@ -1,0 +1,248 @@
+name	primary	secondary	catches
+single_file_in_sync	STAT		單檔版（發布用的那份）跟原始碼不同步
+new_game_starts	UI	INT	新遊戲打不開、OPEN FOR DINNER／開店按鈕失效
+main_loop_single_instance	INV	UI	遊戲迴圈或音樂計時器重複（加速、耗電）
+listeners_do_not_accumulate	INV	BOT,UI	兩天後事件監聽器累積（記憶體洩漏）；暫停→立即打烊→結算→下一天的按鈕
+customer_full_flow_and_economy	BOT	INV	一天結束後錢算錯（營收、小費、薪資、租金、食材）
+close_shop_early	BOT	UI	提早打烊時已入座的客人沒被服務
+cooking_every_recipe	INV	INT	某道菜照步驟做卻拿不到 PERFECT（食譜卡住）
+five_cats_initialise	INT		五隻貓的 id、名字、座標不對
+cat_ai_keeps_running	BOT	INV	貓卡住不動、佔位表錯亂、包包不是最愛睡
+save_and_load_roundtrip	UI	INT	重新整理後進度不見；設定裡的存檔／讀檔／重置（兩次確認）
+old_saves_load	INT	BOT,UI	v13/v16/v18/legacy 舊存檔欄位遺失；舊照片進相簿
+unreadable_save_is_kept	INT	UI	讀不懂的存檔被覆蓋掉
+cat_personality_fingerprint	GOLD		貓的行為有任何改變（變化偵測器）
+ui_basics	UI	INV	手冊、日誌分頁、看店裡、暫停／繼續、升級餐廳分頁、下一天按鈕把狀態弄壞
+touch_controls	UI	INT	畫布點擊判定（店門口的客人、爐台、托盤食材、關閉、摸貓、冰箱）；用滑鼠不是觸控
+sofa_geometry	INV	INT	沙發上貓、Jill、Dylan 重疊或掉出座墊
+jill_evening_life	BOT	INV	打烊後 Jill 卡住、不坐沙發、不看電視；生活不變條件
+cats_use_sofa_by_personality	BOT		五隻貓在沙發上的個性（統計）
+dylan_stays_a_quiet_regular_early_on	BOT	INT,UI,STAT	揭露前出現戀愛字眼或 Dylan 打烊後留下
+dylan_hidden_reveal	BOT	INT,UI	揭露的經過、日誌寫「Jill 的先生」、之後坐她旁邊
+long_play_is_stable	BOT	UI,INV	十天後監聽器、評論、存檔大小累積
+cooking_flow_families	INV	INT	食譜操作次數 2–5、五種家族形狀、晚翻面的寬容
+kitchen_staff_ladder	INT		廚師等級能做哪些菜、接手規則
+waiter_serves_ready_food	BOT	INT	LV2 服務生不會把出菜口的菜端上桌
+waiting_bench	INV	BOT,INT	候位：店門口長椅幾何、誰坐誰站、先來先坐、客人瞬移、Dylan 照順序排
+dylan_pays_tidies_and_is_not_staff	INT		Dylan 付一樣的錢、小費多一點、自己收桌、不出現在員工系統
+world_stays_visible_across_days	BOT	INT,INV	十天中某天畫面變黑（Day 5 員工 id 讓畫圖丟例外那種）、畫布狀態洩漏；商店購買用假按鈕
+v16_save_continues_in_v17	INT	UI,BOT	V16 存檔接著玩；備份下載→讀取（真的按 export/import/importYes）
+service_checkpoint_resumes_the_day	INT	UI	普通營業日中途存檔→重新整理→「繼續營業」接回同一刻；壞掉的 checkpoint 退回空店並提示
+daylight_returns_every_morning	BOT	INV	前一晚的暗色帶到隔天、背景快取被清掉不重畫
+jill_rests_when_staff_cover_the_floor	BOT	INT	Jill 有人顧店時休息、一個人時不坐；說明寫「點桌子她就起身」「點睡著的包包」，其實是直接呼叫 endRest()、tapCat()；種子 7→16（rc8.5）
+research_is_solvable_from_visible_info	INT	INV	料理研發只看畫面資訊解不出來；用假按鈕按 labTry
+album_notes_and_journal	INT	BOT	相簿規則：冷卻、一般照片上限（比對 albumCap()；說明還寫 30 張，rc7.5 起是 240）、珍藏不被擠掉、舊 S.mem 搬家；日誌頁用假按鈕開
+tables_need_clearing_after_checkout	INT		結帳後桌子要收、誰結帳都一樣、Dylan 自己收
+demand_recommendation_staff_v181	INT	UI	推薦菜、招牌菜比例、任務量、LV5 招牌、點單列過長可捲動（真的按 #tkMore）
+album_store_and_viewer_v181	INT	UI,BOT	照片存 IndexedDB、重新整理後還在、看照片（真的點拍立得、下一張、珍藏、關閉）、備份帶照片、V18 存檔搬家
+hold_recipes_never_lock_the_game	UI	INT	長按量表的菜讓遊戲凍結（V18.2 iPhone 實機 bug）；真的用滑鼠按住托盤上的按鈕
+frame_loop_survives_a_draw_error	INT		畫圖丟例外後主迴圈死掉
+tickets_keep_the_guest_v182	INT		點單擠滿時客人名字、頭像被藏起來
+dylan_is_present_v182	INT		Dylan 來店頻率、客滿改時間再來
+regulars_have_lives_v182	INT		熟客送禮、日誌記住、照片；「兩位熟客認識」那一個斷言永遠成立（met or True）
+weather_days_and_stock_v182	INT		天氣影響需求、建議備料跟天氣
+rating_story_records_and_panels_v182	UI	BOT,INT	營業中庫存 chip、緊急叫貨、對話紀錄面板（真的點）；結算評分卡；「隱藏成就有遮」的檢查永遠成立（is not None）
+economy_ops_duties_and_prices_v182	INT		薪資等級、營運升級、服務生職責、價格提示、套餐；購買用假按鈕
+achievements_and_hold_variation_v182	STAT	INT	有成就沒有任何程式會頒發；量表區間每天微動
+save_backup_and_restore	UI	INT	備份檔下載、讀取前確認、壞檔不覆蓋、舊存檔檔案也會 migration、claude.ai 下載路徑
+golden_scenario	GOLD	BOT,UI	三天固定種子的結果（錢、評論、貓）有任何改變
+golden_frames	GOLD	BOT,UI	兩天逐幀像素雜湊、DOM、10 張截圖有任何改變
+mature_save_loads_into_2_0	INT	BOT	Day 25 的 2.0 前存檔讀進來欄位補齊、桌數退費、一整天不出錯
+kitchen_cooks_walk_the_line_and_plate	BOT	INV	廚師會走動、在出菜口擺盤、不會互卡
+purchases_change_the_place	INT	BOT	店舖工程每一項的效果、揭幕卡、新房間 NEW；購買用 doAct
+cats_use_their_things_and_stay_inside	BOT	INV	貓會用買的東西、不出門
+goal_ladder_and_dylan_scenes	INT		結算的三個目標、Dylan 里程碑場景進對話紀錄
+specials_are_a_finer_version_of_a_mastered_dish	INT	BOT,UI	特製版研發、價格、上菜單、廚師會做
+the_street_has_passers_by_and_some_walk_in	BOT	INT	街上有行人、路人進店替換下一組客人
+a1_failed_restock_changes_nothing_and_the_suggestion_holds_still	UI	INT	錢不夠時按 + 不扣錢、建議數字不跳（觸控點擊；按鈕不可按時改用 doAct）
+a2_the_game_never_buys_stock_for_the_player_and_money_never_goes_negative	BOT	INV	營業中自動叫貨、錢變負數
+a3_the_pause_menu_is_reachable_on_a_short_phone_and_every_way_out_works	UI	INT	375×553、390×664 暫停選單點不到「繼續營業」、每個選項都回得去
+a4_the_album_opens_without_a_render_storm_and_progress_survives_a_kill	UI	INT	74 張照片的相簿開啟時重畫上千次（凍結）、分頁點不到；購買後被殺掉還在
+a5_money_is_one_number_everywhere_after_the_side_hall	UI	INT,BOT	買側廳後 HUD 的錢沒更新；結算畫面 HUD 少扣薪資
+b_staff_are_grouped_by_job	UI	INT	員工頁分組；工作分配板的 ×
+c_restock_shortcuts_respect_both_the_fridge_and_the_money	UI	INT	補到建議／補滿算錯錢或超過冰箱（觸控點擊）
+d_service_speed_scales_the_whole_simulation_and_keeps_hand_timing_fair	INT		營業速度 0.75–2× 的時間比例、手動量表不超過 1.5×
+e_rating_card_is_structured_and_records_are_chips	INT		結算評分卡的結構
+o_toggling_a_dish_keeps_the_scroll_position	UI		開關菜色時清單跳回頂端（觸控點擊，390×664）
+a4b_a_mid_service_checkpoint_is_consistent_and_the_day_finishes_after_it	INT	UI,BOT	切到背景寫 checkpoint、重新整理接回、錢和庫存一致、當天能結束
+f_reviews_name_only_the_cats_the_table_actually_met	INT	INV	評論提到沒遇到的貓、或說貓在服務客人
+g_lines_and_reviews_do_not_repeat_themselves	INT		台詞池循環、評論重複
+dylan_is_a_presence_not_a_story_trigger	INT		Dylan 出現頻率、客滿重試、每次來說一句、線索、揭露條件
+h_i_k_t_shop_rooms_decoration_pass_and_dreams	INT	UI	商店分頁順序、所有可買的東西在畫面上有 data-act（但不含二樓房間）、裝潢畫出來、夢想工程
+j_cat_furniture_comes_in_tiers_and_the_grass_pot_is_used	UI	BOT,INT	貓咪生活分三級、貓草盆會被用（真的按購買）
+l_m_n_hospitality_set_sales_and_the_weather_suggestion	UI	INT	集點卡、招待（真的點 [data-treat]）、套餐銷售、天氣菜一鍵加入、菜單滿時按鈕停用
+q_portraits_are_one_system_with_a_fallback_and_fit_a_phone	INT	UI	對話面板頭像位置（375×553、390×664，觸控，故事面板開）
+q_plus_world_sprites_keep_jill_and_dylan_their_own	INV	INT	路人、員工撞到 Jill／Dylan 的髮型和衣服
+u_v_world_memory_and_regulars_speak_with_their_faces	INT		熟客提起店裡發生過的事、頭像卡片
+w_the_album_is_a_living_history	INT		相簿依週排列、沒有紀念式字眼
+x_a_desktop_window_is_used_and_the_mouse_and_keyboard_work	UI	INT	電腦版寬視窗版面、游標、鍵盤（1440×900、1000×700）
+z_regression_rooms_kitchen_construction_and_staff_assignment	UI	INT,BOT	房間切換（鍵盤、點拱門）、工程付一次、服務生職責（真的點板子）
+wangs_are_two_people_who_usually_come_together	INT		王先生、王太太是兩個人
+speech_log_logs_each_spoken_line_once	INT		對話紀錄重複寫、出現內部 id
+portrait_crops_isolate_each_figure	STAT		頭像圖裁到旁邊人物
+restock_during_service_is_one_tap_with_immediate_feedback	UI	INT	營業中補貨要按兩次（真的點）
+restaurant_records_are_readable_in_the_journal	INV	INT	日誌紀錄文字對比不足
+workstation_assignment_is_explicit_with_capacities_and_swaps	UI	INT	工作分配板的 ×、＋、已滿、待命、開店前警告（真的點）
+album_has_two_entries_history_from_the_start_and_todays_photos_from_the_summary	INT		「看最新相片」捲到最新一張
+weather_dish_replaces_a_chosen_dish_when_the_menu_is_full	UI		菜單滿時加天氣菜→選一道替換（真的點；菜單上限）
+main_and_side_hall_are_one_layout_system	INT	UI	主廳、側廳 3×3、超過的桌子搬家或退費；看店裡的房間分頁（真的點）
+outdoor_area_is_a_project_and_its_tables_are_furniture_and_the_dog_rests_outside	INT	BOT	戶外區、露天桌、狗狗休息角；購買用 doAct
+hospitality_stays_with_a_guest_from_stranger_to_regular	INT		招待額度三種、愛心只給 Sophie／Mia
+the_players_saves_load_through_a_real_reload	INT	UI	玩家 Day 30/33/35 存檔重新整理後變成 Day 1
+infrastructure_you_can_see_and_a_calmer_incident_calendar	INT		空調、電力、洗碗機三條線；事件不連兩天；購買用 doAct
+dylan_leaves_a_trace_and_never_vanishes_at_a_closed_door	INT		打烊後才重試的 Dylan 消失；揭露後「Dylan 回來吃飯了。」
+stock_suggestion_follows_each_dish_and_counts_the_demand_it_missed	INT		每道菜的建議量、冰箱裝不下、賣完的需求有算
+a_second_signature_the_dessert_with_its_own_progression	INT	UI	招牌甜點設計、價格、上菜單、做到出菜（真的點設計器）
+named_guests_keep_one_face_and_the_staff_have_theirs	INT		有名字的客人每次同一張臉、員工都有頭像
+story_foundation_facts_lanes_overdue_and_reload	INT		故事排程（每天名額、錯過加權、只發一次）、重新整理後保留；用測試自己的假事件
+story_state_is_empty_on_old_saves_and_stable_over_reloads	INT		舊存檔（Day 30–46）讀進來不會捏造故事、兩次重新整理不變
+a_day_with_the_hooks_writes_copresence_named_history_and_nothing_twice	BOT	INV	Day 39 一天：同一天不重複計算同桌、有名字的客人一晚一次、故事名額不超過
+sophie_and_baobao_the_arc_runs_on_real_conditions_and_leaves_a_pad_a_fact_and_a_story_photo	INT		Sophie × 寶寶 四段（條件用程式強制）、小貓墊、照片一次、重新整理後保留
+the_lounge_is_the_same_restaurant_one_guest_one_visit_one_tab	BOT	INT	Lounge 客人同一個人、熟客一天算一次、酒不進廚房；說明寫了「checkpoint 還原 Lounge 座位」但完全沒有檢查
+a_lounge_guest_pays_once_per_phase_and_a_review_only_for_the_visit	INT		Lounge 客人付兩次錢但只算一次來店、一則評論
+the_lounge_has_an_origin_ken_wine_a_tasting_and_a_project_that_never_disappears	INT		Ken 的酒、品酒、隔壁的工程（Lounge 用 buyLounge(1) 直接蓋）；「the arc is open」的後半（R.sched.length>=0）永遠成立
+lounge_i_content_bar_food_in_the_kitchen_wine_at_dinner_the_cast_by_name	BOT	INT	酒吧小點進同一個廚房、不佔菜單名額、Evan／沈晴；種子換過三次（51→52→51→53）
+staff_learn_places_coarsely_and_veterans_stay_useful	BOT	INT	員工熟悉度、阿拓、Lounge III 的 pantry；雇用和購買用假按鈕
+phase7_the_arcs_run_on_real_history_and_leave_it_changed	INT		各條支線（Sophie×Mia、Ken×杜、晴×阿拓、周董、Madame Lin…）的觸發條件；故事面板關著
+phase8_reviews_say_what_happened_posts_amplify_it_and_a_campaign_is_counted	INT		評論主題對得上內容、社群貼文、宣傳活動計數
+phase9_the_restaurant_remembers_milestones_slots_and_small_crossovers	INT		缺圖的故事照片等圖、停電玩笑、情人節、里程碑
+followup_story_progress_is_visible_retrievable_and_honest	INT	UI	故事頁沒有內部名稱、故事更新提示（真的點）、揭露前不洩密
+followup_a_busy_service_keeps_every_line_and_the_journal_is_reachable	INT	UI	對話紀錄 520 句全留、可捲動、× 才關（真的點）
+followup_a_campaign_is_felt_in_the_room	INT		宣傳帶來的客人行為、點單 📱
+followup_the_manual_describes_the_current_game	STAT		店主手冊缺某些字句或還留舊字句（只比對字串，沒有比對遊戲行為）
+qa_merged_room_tabs_cushion_light_and_social_entrances	UI	INT	房間分頁在點單列下面、兩隻貓同一軟墊、社群入口（真的點）
+dylan_dialogue_revisions_2026_10_01	STAT	INT	Dylan 舊台詞已刪、新台詞存在、四句對話講完
+regulars_remember_their_life_not_replay_it	INT	STAT	熟客的人生事件只發生一次、不當口頭禪
+story_page_counts_only_real_beats_numbered_with_unseen_stages	INT		故事頁只算真的片段、編號、未看到的「？？？」（Day 52）
+every_player_save_migrates_plays_a_day_and_keeps_its_story	BOT	INT	每一份玩家存檔（目前 29 份，自動全部納入）開得起來、玩一天、重新整理後故事不變；用 openFresh 跳過「繼續營業」
+journal_social_page_opens_the_same_day_as_the_shops	INT		日誌的社群頁第 6 天才出現
+story_photos_show_the_current_art_not_an_old_copy	INT		故事照片顯示新圖不是舊副本
+regular_card_says_her_for_sophie_and_mia	INT		熟客卡片的「她／他」
+journal_pages_never_show_undefined	INV	INT	日誌每一頁沒有 undefined／NaN（三個存檔）
+kitchen_works_walk_in_and_a_second_coffee_machine	UI	INT	走入式冷藏庫、廚房二期（真的按購買）、條件不足買不到；有一個 ||true 的空斷言
+dogs_five_kinds_and_the_house_by_the_door	INT	BOT	五種狗、狗屋位置、狗不進店
+side_room_booths_one_row_at_a_time	UI	INT	側廳卡座一排一排換（第一排真的按）；有一個 or True 的空斷言
+window_line_cats_stay_inside_and_in_sight	INV	INT,BOT	窗邊貓架的位置在 375×667、390×844、430×932 都不被 HUD 擋住；貓不出門
+guest_book_notes_drinks_the_usual_and_spacing	INT		熟客筆記「喝」不是「吃」、一如往常、中英文間空格
+v24_back_of_house_is_a_work_area_and_keeps_its_two	INT	STAT	後場整理區改名後名額與存檔不變、廚房畫出置物架
+v24_legacy_tenure_is_a_class_not_the_days_since_v23	INT		舊員工年資顯示為等級不是天數；新人「今天剛來」；雇用用假按鈕
+v24_story_presence_for_one_day	BOT	INT	故事讓某人今天沒來／晚到／早退只限一天、照付薪水
+v24_walk_over_is_a_floor_walk_and_never_a_cook	INT	BOT	秀琴阿姨走到桌邊才開始對話、廚師不會走過去
+v24_eras_open_in_order_and_dormant_ones_never_reverse	INT		故事時代的開啟順序、休眠不倒退
+v24_illustrations_show_with_the_scene_and_reopen	INT		插圖在對話面板上、缺圖時的替代、可重看；並確認「面板關掉時插圖仍算看過」
+v24_names_staff_and_outside_cast_are_not_random_guests	INT		員工與故事人物的名字不會被隨機路人用
+v24_saves_load_and_nothing_fires_on_load	INT	BOT	每一份玩家存檔讀進來錢、員工、升級不變，不捏造 v2.4 故事（自動納入全部存檔）
+v24_stage_gates_follow_the_chronology_and_their_own_gaps	INT		每一段故事只等自己的間隔
+v24_yijun_comes_to_eat_and_her_mother_walks_over	BOT	INT	怡君第一次來只在秀琴阿姨在時發生；「插圖有出現」只是紀錄（面板關著）
+v24_the_wall_is_written_to_the_rules	STAT		《那面牆》台詞照規則寫（讀程式文字）
+v24_day52_save_plays_the_stories_in_order_over_forty_days	BOT	GOLD	Day 52 存檔 40 天：故事順序、每天主要故事不超過兩個、玩家的節奏目標；種子基數換過三次（7000→7400→7600→7000），註解說只有七分之四的種子達到全部目標；面板關著
+v24_xiuqin_is_there_from_day_one_and_is_not_free_labour	BOT	INV	秀琴阿姨 Day 1 出現、不幫忙做事（有無她兩次結果相同）
+v24_xiuqin_goes_home_a_while_into_the_closing	BOT	INT	秀琴阿姨打烊後一陣子回家
+v24_the_first_cleaner_hired_is_her_and_keeps_what_she_knows	INT	BOT	第一位清潔員就是秀琴阿姨、沒有解雇；雇用用假按鈕
+v24_yijun_comes_early_in_a_fresh_game_and_meets_her_mother_at_closing	BOT	INT	新遊戲第二週內怡君見到媽媽；14 天的流程（補貨、雇用用假按鈕）
+v24_manual_tutorial_and_news_cover_the_new_content	STAT	INT	手冊字句、GUIDE 戳記、2.4 更新說明只出現一次
+rc8_the_manual_shows_a_space_once_the_shop_has_it	INT	STAT	手冊只顯示店裡已有的空間（新遊戲、Day 81）
+rc8_jill_has_things_to_do_in_her_room	INT		Jill 在房間打手遊、推電視、聊天；被叫起時不留半套（不檢查名字）
+rc8_a_booked_out_lounge_never_shares_its_evening_with_the_trial	INT	BOT	主廚之夜包場和予安試彈不撞在同一晚（Day 87）
+rc8_duode_has_no_picture	INT		「多的」沒有照片
+rc83_a_special_evening_comes_back_with_its_room	UI	INT	Day 87 特別晚上的「繼續營業」接回整間店（rc8.3 修的 bug；真的按「繼續營業」）
+rc83_the_queue_waits_at_the_shopfront	INT	BOT	候位在店門口；點客人入座用 roomTap() 函式
+rc83_three_pizzas	INT		三種披薩、Lounge 點披薩的比例
+rc83_small_things_from_the_players_evenings	INT	STAT	香煎鴨胸 6 天說一次、沒有 PERFECT 橫幅（讀原始碼）、貓砂盆、Sophie／Mia 隔壁桌
+rc83_a_new_space_has_its_first_photo	INT		新空間第一次被看到時拍一張
+rc84_kens_three_nights_three_pictures	INT		品酒之夜三張圖、相簿、缺圖不顯示
+rc85_a_picture_always_holds_the_service	INT	INV	有插圖的面板一定讓店停住（直接呼叫 scene／storyPhoto／illusOpen；面板開著）
+rc85_the_rooms_upstairs_are_bought_by_their_buttons	UI	STAT	休息室 II 的按鈕真的按得下去；商店按鈕沒有怪屬性（Day 92；包廂按鈕沒有被按）
+rc85_the_crew_go_up_to_the_staff_room_in_a_busy_evening	BOT		忙碌的一晚員工會上休息室（Day 92，一個種子；看內部狀態不看畫面）
+rc85_small_talk_is_rare_and_makes_sense	BOT	STAT	一晚路人閒聊 ≤10 句、跳出的訊息 ≤45（Day 83，一個種子）
+v24_the_day_is_held_for_the_beat_its_people_came_for	INT		每天兩個主要故事名額的保留規則
+v24_restaurant_and_lounge_staff_are_two_pools_that_never_share_places	INT		餐廳與 Lounge 兩個員工名單互不佔用；雇用用假按鈕
+v24_an_old_shared_cap_save_keeps_everyone_and_waits	INT		舊的共用名額存檔沒人被解雇
+v24_a_guest_who_came_for_the_signature_says_so_rarely_and_in_different_words	INT		為招牌菜來的客人很少說、說法不同
+v24_the_signature_steppers_stay_on_their_own_line	INV	INT	開店前招牌菜的 −／＋ 不跟著數字跳動
+v24_the_second_floor_is_a_story_before_it_is_a_room	INT		二樓故事的開啟條件
+v24_the_night_of_the_missing_cats	BOT	INT	貓不見的那一晚：搜尋、找到、門關好
+v24_the_night_cut_short_is_not_counted_and_comes_again	BOT	INT	那一晚被提早結束不算數、之後還會來；說明寫了「晚上重新整理照常演」但測試沒有重新整理
+v24_jill_calls_the_landlord_and_the_whole_floor_is_hers	INT	BOT,UI	打給房東、租下二樓（用 buyUp() 直接買，沒按按鈕）
+v24_rc6_the_staff_room_comes_from_a_need_and_grows_in_place	INT		休息室跟二樓一起來、II／III 原地升級（buyRoomPhase 直接呼叫；用測試自己的假格式化函式檢查 HTML）
+v24_rc6_the_staff_room_is_used_and_the_pools_stay_apart	BOT	INT	打烊後員工上休息室、名單不變
+v24_rc6_private_dining_reservations_follow_the_rules	INT		包廂預約規則、低消、重新整理不變
+v24_rc6_private_dining_bookings_are_seen_and_grow_with_the_room	INT		包廂 60 晚預約頻率
+v24_rc6_two_more_restaurant_places_and_the_lounge_unchanged	INT	UI	包廂 I／III 各加一個名額；真的按「聘請」
+v24_rc6_private_dining_story_needs_two_tables_and_a_lived_in_staff_room	INT		《關上門以後》的條件；包廂第一階段按鈕只用假格式化函式檢查
+v24_rc6_the_floor_and_its_rooms_are_tabs	UI	INT	二樓、休息室、包廂分頁（真的點）；每份存檔讀進來不捏造房間（自動納入全部存檔）
+v24_rc6_the_floor_is_shown_when_it_changes	UI	INT	店舖工程看二樓、完工那天早上的揭幕（真的點）；購買用 buyRoomPhase
+v24_rc6_the_staff_room_has_a_way_to_every_seat	INV		休息室每個座位都走得到（三種寬度）
+v24_rc6_the_floor_plan_grows_with_the_building	INT	UI	二樓平面圖隨工程變化、點開放大
+v24_rc6_the_staff_room_plays_a_frame_and_dozes	BOT	INT	休息室撞球、按摩椅睡著
+v24_rc6_a_name_finds_its_person_and_a_person_its_name	UI	BOT	點單→桌子、台詞→人、人→名牌（真的點）
+v24_rc6_cats_visit_the_rooms_and_leave	INT	BOT	貓去包廂、休息室再回來
+v24_rc6_bar_bites_take_no_menu_slot	UI		菜單上限 20 時酒吧小點不佔名額；滿了按開關說「菜單已滿」（玩家 Day 61 存檔，真的點）
+v24_rc6_no_empty_sheet_over_a_service	UI	INT	營業中出現空白遮罩、什麼都點不到（真的點）
+v24_rc6_anan_works_the_lounge_first	INT	BOT	安安的 Lounge 職務恢復；雇用用 doAct
+v24_rc6_an_authored_beat_holds_the_service_until_it_is_read	UI	INT	劇情面板讓店停住、一次點一句、切到背景再回來（真的點 #dlg；故事用 storyTick 觸發）
+v24_rc6_story_pages_keep_only_their_own_lines	INT		故事頁只留那一段自己的台詞
+v24_rc6_sophie_and_mia_begin	BOT		Sophie 和 Mia 五天內開始
+v24_rc6_a_finished_lounge_opens_the_floor_in_a_mature_save	BOT		Day 67 存檔二樓故事依序開始
+v24_rc6_new_things_are_talked_about	BOT		新東西頭幾天有人談、九天後沒有（三個種子）
+v24_rc6_more_to_spend_on	INT	BOT	酒研發、夢想工程、季節佈置、契作、酒課、Lounge 訓練（全部用假按鈕購買）
+v24_rc6_new_places_have_their_photos	BOT	INT	Lounge 等新空間有照片
+v24_rc6_the_open_floor_keeps_its_ways	INV	BOT	二樓走道不穿牆
+v24_rc6_a_booked_party_comes_eats_and_pays	BOT		包廂預約客人來、吃、付錢、結算寫出來；新聞在 390 寬不被切
+v24_rc6_the_private_dining_room_minimum_service_and_long_table	INT	INV	包廂低消、長桌、服務順序
+v24_rc6_qing_and_tuo_move_on	INT	BOT	晴 × 阿拓卡住的修正（Day 71）
+v24_rc6_a_regulars_dated_beat_keeps_its_day	INT		熟客故事保留日期
+v24_rc6_the_morning_reports	INT	BOT	路人的話一天一次、制服、畫面更新頻率、結算的故事與 Lounge 銷售
+v24_rc6_stalled_lines_move_on	INT	BOT	Ken × 杜等卡住的支線會動
+v24_rc7_the_money	BOT	INT	酒水成本、租金、薪資、秀琴阿姨借錢與還錢、Lounge 數字對得上
+v24_rc7_madame_lin_says_which_corner	INT		舊故事頁台詞的遷移
+v24_rc7_the_landlord_goes_up	INT		房東上樓那段的台詞（面板開著，直接 run）
+v24_rc7_a_line_finds_its_table	UI	BOT	點有頭像的台詞會跳到那一桌（真的點）
+v24_rc7_ken_comes_back_and_proposes_a_tasting	BOT	INT	Ken 回來提議品酒
+v24_rc7_ken_hosts_his_tasting_nights	BOT	INT	三次品酒之夜、第一晚面板停住店（dlgNext 函式翻頁）、重新整理後次數不變
+v24_rc7_the_wine_and_monsieur_du	BOT	INT	「晚餐之後」與杜
+v24_rc7_yuan_comes_to_play_the_piano	BOT	INT	予安彈琴的整條線
+v24_rc7_story_guests_have_their_own_faces	INV		1500 個路人不會撞到故事人物的髮型與配件
+v24_rc7_2_xiuqin_first_evening_holds_the_service	BOT		秀琴阿姨第一晚的面板停住店（dlgNext 函式翻頁）
+v24_rc7_2_a_tap_on_the_pass_sends_the_plates	INT		點出菜口送菜（用 roomTap()／servePass() 函式，沒有真的點）
+v24_rc7_2_the_heart_and_the_treat_chip_on_a_ticket	INT	INV	點單愛心只給 Sophie／Mia、招待 chip 不蓋住名字
+v24_rc7_2_a_named_guests_line_answers_a_touch	UI	BOT	觸控點有頭像的台詞會跳到那一桌（真的觸控）
+v24_rc7_2_a_regulars_head_at_a_busy_table_and_the_log_closes	UI	BOT	點到熟客頭時先做桌子的事；對話紀錄的 × 按得下去（真的點）
+v24_rc7_2_a_story_on_the_summary_opens_its_page	UI	BOT	結算的故事列點下去打開那一段（真的點）
+v24_rc7_2_the_random_menu	INT	UI	隨機選菜單
+v24_rc7_2_the_missing_cats_stop_the_evening	BOT	INT	發現貓不見時的面板停住店（dlgNext 函式）
+v24_rc7_2_sophies_pad_seen_and_marked	INT		Sophie 的小貓墊先讓玩家看到、店裡標示兩天
+v24_rc7_2_vip_cards_and_the_lounge_after_dinner	INT		VIP 卡折扣、帳單逐項計算
+v24_rc7_2_the_lounges_own_waiter_carries_its_bites	INT	BOT	Lounge 的菜由安安送
+v24_rc7_2_no_firing_and_the_wages	INT	STAT	沒有解雇、薪資表
+v24_rc73_jills_room_is_there_from_day_one	INT	STAT	Jill 的房間第一天就在、分頁名稱（讀程式碼字串）
+v24_rc73_the_evening_is_in_her_room	BOT		打烊後的晚上在她房間
+v24_rc73_the_cats_live_between_the_room_and_the_restaurant	BOT		貓在房間與餐廳之間（統計）
+v24_rc73_the_cats_try_their_luck_and_never_get_it	INT	BOT	貓跳上桌偷吃永遠不成功
+v24_rc73_posts_carry_their_picture_and_likes_that_keep_coming	UI	INT	社群貼文有照片和讚（真的點日誌的社群分頁）
+v24_rc73_tora_waits_for_jill_after_closing	BOT		樾樾打烊後等 Jill（三個種子取多數）
+v24_rc74_favourites_learned_in_play_and_marked_on_the_menu	INT	BOT	熟客最愛的菜、菜單上的「♥ 陳伯伯」
+v24_rc74_the_lounges_new_bites	BOT	INT	Lounge 新增四種小點
+v24_rc74_the_lounge_tv_and_its_sound	INT	BOT	Lounge 電視與音響（購買用 doAct）、比賽夜
+v24_rc75_the_pizza_oven_one_more_cook_and_the_bar_pizza	INT	BOT	披薩烤爐、多一位廚師、酒吧披薩研發
+v25_first_photo_day_one_dylan_takes_one_of_jills_cameras	BOT	INT	第一天的第一張照片、揭露前叫「Jill 先生」不露臉
+v25_first_photo_a_mature_save_gets_day_one_as_history	INT	UI	舊存檔補上第一天的照片當歷史
+v24_rc76_the_bar_turns_into_an_l	INV	BOT	Lounge II 的 L 型吧台、九個座位
+v24_rc76_dylan_at_home_keeps_his_hood_up	INT		Dylan 在家的樣子
+v24_rc76_after_the_wine_the_tasting_night_is_the_players	UI	BOT	開店前問「今晚要辦嗎」（真的點今晚辦／這次不辦）
+v24_rc76_the_chefs_night	BOT	INT	主廚之夜（面板開著，dlgNext 函式）
+v24_rc77_the_page_carries_only_the_portraits_the_game_shows	STAT		頁面只帶遊戲會用到的頭像；並數程式裡 portraitData( 出現 9 次
+v24_rc77_evan_is_behind_the_bar_from_the_first_night	INT		Evan 從 Lounge 第一晚就在吧台
+v24_rc77_the_lounge_pours_kens_rounds	BOT		品酒之夜由 Lounge 的人倒酒
+v24_rc77_kens_share_of_a_tasting_night	BOT	UI	品酒之夜分潤
+v24_rc8_the_lounge_is_the_shop_next_door	BOT	INT	Lounge 是隔壁的店、員工走後門
+v24_rc8_madame_lin_next_door_on_day_one	BOT	UI	Day 1《隔壁》面板（新遊戲）
+v24_rc8_the_bar_next_door_from_kens_question_to_jills_decision	BOT		Day 52 起 34 天的 Madame Lin 線（面板關著）
+v24_rc8_the_bar_next_door_scenes_are_staged_where_they_happen	BOT	INT	Madame Lin 線的場景在發生的房間（面板開著，dlgNext 函式）
+v24_rc8_mature_saves_hear_nothing_new_from_next_door	BOT		舊存檔不會突然聽到隔壁的故事
+v24_rc8_the_restaurants_three_lists_and_the_lounges_one	INT		廚師／服務生／清潔員三個名單；雇用用假按鈕；全部存檔都不超額（自動納入全部存檔）
+v24_rc8_the_signing_the_work_and_the_opening	UI	BOT	簽約、施工、開幕（真的按簽約、下一天、揭幕）
+v24_rc8_madame_lin_comes_back_as_a_guest	BOT	INT	Madame Lin 以客人身分回來
+v24_rc8_mature_saves_get_the_line_as_history	INT		舊存檔把 Madame Lin 線當歷史
+v24_rc8_the_bell_rings_when_the_door_opens	BOT	INT	門鈴
+v24_rc8_qing_tuo_after_work_five_scenes	BOT	INT	晴 × 阿拓下班後五段（面板開著；換日用 doAct）
