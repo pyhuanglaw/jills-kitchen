@@ -140,8 +140,9 @@ def sim_player_plays_three_days_by_taps(b, port, target):
             for _ in range(600):
                 if obs.phase() != 'service':
                     break
-                if g.ev("__runService(300,'human')")['dlg']:
-                    pl.read_panels()
+                r = g.ev("__runService(300,'human')")
+                if r['dlg'] or r['paused']:
+                    pl.settle()
             check(pl.settle() == 'summary', f'Day {day}: the service did not end at the summary')
             sm = pl.summary()
             check(sm and sm['guests'] > 0 and sm['r1'] is not None, f'Day {day}: the summary was not read: {sm}')
@@ -152,5 +153,37 @@ def sim_player_plays_three_days_by_taps(b, port, target):
         check(not [r for r in log.rows if r['kind'] == 'skip' and '按不下去' in r['why'] and r['pressed'] and '補到建議量' in r['pressed']], 'a restock press found no button')
         check(not g.errors, f'page errors: {g.errors[:3]}')
         check(g.ev("__svc.err||0") == 0, f'the service hands threw: {g.ev("__svc.last")}')
+    finally:
+        p.close()
+
+
+@test
+def sim_player_answers_a_window_that_stops_the_day(b, port, target):
+    """A window that stops the service and asks (試酒的晚上: 跟著菜走／跟著人走; 新企劃: 開始規劃／之後再說) is read and
+    answered by a tap on one of its buttons, and the day goes on. (Until 2026-10-06 the simulator only read story panels:
+    seed 301 stood forever on Day 52's tasting night, the service paused under 「今晚的酒要往哪邊走？」.)"""
+    p = Player(b, port, target, save=None, W=390, seed=301, touch=True, scenes=True)
+    try:
+        g = p.g
+        scr, hands, log = sp.Screen(p.page), sp.Hands(p), sp.Log()
+        pl = sp.NormalPlayer(scr, hands, log)
+        _rt.install_bot(g); g.ev(_rt.LAZY_ACTOR); g.ev(sp.HUMAN_JS % dict(sp.HUMAN_DEFAULT, seed=1)); g.ev(sp.SERVICE_JS)
+        pl.settle(); hands.tap('open'); pl.settle()
+        pl.prep(1); pl.open_shop()
+        g.ev("__runService(90,'human')"); pl.settle()
+        for setup, act in (("R.tasting=R.tasting||{n:0};tastingChoice()", 'tastingDir'), ("roomOffer('sr')", 'roomGo')):
+            g.ev(setup)   # the test puts the window up (setup); the player only sees and taps
+            r = g.ev("__runService(30,'human')")
+            check(r['paused'] and r['i'] == 0, f'{act}: the service did not stop under the window: {r}')
+            check(scr.kind() == 'modal', f'{act}: the player does not see the window: {scr.kind()}')
+            check(pl.settle() == 'service', f'{act}: after answering, the screen is {scr.kind()}')
+            row = log.rows[-1]
+            check(row['kind'] == 'screen' and row['pressed'] and row['why'], f'{act}: no log line for the answer: {row}')
+            r = g.ev("__runService(30,'human')")
+            check(not r['paused'] and r['i'] == 30, f'{act}: the day did not go on: {r}')
+        check(g.ev("R.tasting.dir") == 'food', 'the tasting night: the first answer is the first button (跟著菜走)')
+        check(g.ev("S.sr&&S.sr.plan||(typeof srW==='function'&&srW().plan)") == 'plan', 'the new room was not planned')
+        check(not pl.unknown, f'a window the player did not know: {pl.unknown}')
+        check(not g.errors, f'page errors: {g.errors[:3]}')
     finally:
         p.close()

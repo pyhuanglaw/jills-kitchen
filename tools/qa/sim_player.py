@@ -43,6 +43,7 @@ JS_KIND = "(()=>{" + _VIS + r"""const q=s=>document.querySelector(s);
  if(vis(q('#dlg')))return 'dialog';if(vis(q('#reveal')))return 'reveal';
  if(vis(q('#screen [data-act=open]')))return 'title';if(vis(q('#screen [data-act=toShop]')))return 'summary';
  if(vis(q('#screen [data-act=nextDay]')))return 'shop';if(vis(q('#screen [data-act=start]')))return 'prep';
+ if(vis(q('#screen .modal')))return 'modal';
  const c=clean((q('#hClock')||{}).textContent);if(/^\d\d:\d\d/.test(c))return 'service';return 'other'})()"""
 JS_HUD = "(()=>{" + _VIS + r"""const t=s=>clean((document.querySelector(s)||{}).textContent);
  return {day:parseInt(t('#hDay'))||0,clock:t('#hClock'),rate:parseFloat(t('#hRate')),money:parseInt(t('#hMoney').replace(/[^0-9]/g,''))||0}})()"""
@@ -89,7 +90,10 @@ JS_STAFF = "(()=>{" + _VIS + r"""const sc=document.querySelector('#screen');if(!
 JS_PANEL = "(()=>{" + _VIS + r"""const d=document.querySelector('#dlg');if(!vis(d))return null;return {who:clean((d.querySelector('.dlg-name')||{}).innerText),text:clean((d.querySelector('.dlg-text')||{}).innerText),next:clean((d.querySelector('.dlg-next')||{}).innerText)}})()"""
 JS_TOASTS = "(()=>{" + _VIS + "return [...document.querySelectorAll('#toasts > *')].filter(vis).map(e=>clean(e.innerText)).slice(-4)})()"
 JS_REVEAL = "(()=>{" + _VIS + "const r=document.querySelector('#reveal');if(!vis(r))return null;return {text:clean(r.innerText).slice(0,200),btns:[...r.querySelectorAll('[data-act]')].filter(vis).map(b=>({act:b.dataset.act,text:clean(b.innerText)}))}})()"
-PLAYER_JS = [JS_KIND, JS_HUD, JS_TEXT, JS_BUTTONS, JS_SUMMARY, JS_PREP, JS_SHOP_TOP, JS_STAFF, JS_PANEL, JS_TOASTS, JS_REVEAL]
+# a window that stops the day and asks (試酒的晚上, 新企劃 …): its words and its buttons
+JS_MODAL = "(()=>{" + _VIS + r"""const m=document.querySelector('#screen .modal');if(!vis(m))return null;const t=s=>clean((m.querySelector(s)||{}).innerText);
+ return {eyebrow:t('.eyebrow'),title:t('h2'),text:t('p'),btns:[...m.querySelectorAll('[data-act]')].filter(vis).map(b=>({act:b.dataset.act,k:b.dataset.k??null,text:clean(b.innerText),primary:b.classList.contains('primary'),dis:!!b.disabled}))}})()"""
+PLAYER_JS = [JS_KIND, JS_HUD, JS_TEXT, JS_BUTTONS, JS_SUMMARY, JS_PREP, JS_SHOP_TOP, JS_STAFF, JS_PANEL, JS_TOASTS, JS_REVEAL, JS_MODAL]
 
 SHOP_TABS = {'home': '家具與佈置', 'works': '店舖工程', 'social': '社群與宣傳', 'catlife': '貓咪生活', 'kitchen': '廚房設備', 'menu': '菜單研發', 'staff': '員工', 'sig': '招牌菜'}
 
@@ -139,6 +143,9 @@ class Screen:
 
     def reveal(self):
         return self.page.evaluate(JS_REVEAL)
+
+    def modal(self):
+        return self.page.evaluate(JS_MODAL)
 
 
 class Hands:
@@ -235,6 +242,33 @@ class PlayerBase:
         self.h.tap(b['act'], scope='#reveal')
         return True
 
+    def answer_modal(self):
+        """a window that stops the day and asks: read it, answer it from what it says"""
+        m = self.s.modal()
+        if not m or not m['btns']:
+            return False
+        saw = f"{m['eyebrow']}《{m['title']}》：{m['text'][:70]}"
+        opts = [b for b in m['btns'] if not b['dis']]
+        acts = {b['act'] for b in opts}
+        if acts & {'roomGo', 'upGo'}:
+            # 開始規劃 只是把它列進「店舖工程」，按鈕寫著不花錢；之後再說 也找得到 — a person who wants to see what comes plans it
+            b = next((x for x in opts if str(x['k']).endswith('plan')), opts[0])
+            why = '按鈕寫著「開始規劃」只是列進店舖工程、現在不花錢，想看看接下來會怎樣'
+        elif 'tastingDir' in acts:
+            # 「沒有標準答案」: nothing on the screen makes one better; a person tries the other one the next time
+            last = getattr(self, 'tasting_last', None)
+            b = next((x for x in opts if x['k'] != last), opts[0]) if last else opts[0]
+            self.tasting_last = b['k']
+            why = '畫面寫著「沒有標準答案」' + ('；上次選了另一個，這次換一個試試' if last else '；第一次，先選第一個')
+        else:
+            b = next((x for x in opts if x['primary']), opts[0])
+            why = '沒處理過的視窗：按主要的那個按鈕'
+            self.unknown.append(saw)
+        self.log.add(self.day, saw, why, b['text'], kind='screen')
+        self.h.tap(b['act'], k=b['k'])
+        self.h.wait(6)
+        return True
+
     def settle(self):
         """whatever stands between the player and the screen they were on"""
         for _ in range(12):
@@ -243,6 +277,9 @@ class PlayerBase:
                 self.read_panels()
             elif k == 'reveal':
                 if not self.close_reveal():
+                    break
+            elif k == 'modal':
+                if not self.answer_modal():
                     break
             else:
                 return k
@@ -668,8 +705,8 @@ SERVICE_JS = r"""(()=>{if(window.__svc)return 'already';
   if(phase==='service'&&R&&!paused&&!(DLG&&DLG.hold)){update(sdt)}
   if((++__svc.n)%4===0){try{if(phase==='service'&&R){renderTickets();hud()}}catch(e){}}};
  window.__runService=function(n,who){const dt=1/30;let i=0;const act=who==='perfect'?window.__act:who==='staff'?window.__actLazy:window.__actHuman;
-  for(;i<n;i++){if(phase!=='service'||!R)break;if(DLG)break;if(!R.closed||R.groups.length||R.closing==null){try{act(dt)}catch(e){__svc.err=(__svc.err||0)+1;__svc.last=String(e&&e.stack||e).slice(0,300)}}
-   __frame(dt);if(window.__econSample&&__svc.n%30===0)__econSample();if(DLG)break}return {i,phase,dlg:!!DLG}};
+  for(;i<n;i++){if(phase!=='service'||!R)break;if(DLG||paused)break;if(!R.closed||R.groups.length||R.closing==null){try{act(dt)}catch(e){__svc.err=(__svc.err||0)+1;__svc.last=String(e&&e.stack||e).slice(0,300)}}
+   __frame(dt);if(window.__econSample&&__svc.n%30===0)__econSample();if(DLG||paused)break}return {i,phase,dlg:!!DLG,paused:!!paused}};
  return 'installed'})()"""
 
 # 一般玩家節奏: assumptions, written down (see the module docstring)

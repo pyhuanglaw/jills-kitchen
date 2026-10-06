@@ -72,10 +72,13 @@ def run(A):
                 if obs.phase() != 'service':
                     break
                 r = g.ev(f"__runService(300,'{A.service}')")
-                if r['dlg']:
-                    player.read_panels()
+                if r['dlg'] or r.get('paused'):
+                    player.settle()      # a story's panel, or a window that stops the day and asks (試酒的晚上, 新企劃)
             else:
-                print(f'Day {day}: the service did not end', flush=True); break
+                diag = g.ev("""JSON.stringify({phase,paused,sub,dlg:typeof DLG!=='undefined'&&DLG?{hold:!!DLG.hold,sh:DLG.sh?DLG.sh.k:null,i:DLG.i,n:DLG.lines&&DLG.lines.length,line:DLG.lines&&DLG.lines[DLG.i]&&DLG.lines[DLG.i].text}:null,
+                  dlgEl:(()=>{const e=document.querySelector('#dlg');return e?{hidden:e.hidden,cls:e.className}:null})(),R:R?{t:+R.t.toFixed(1),dur:R.dur,closed:R.closed,closing:R.closing,ended:R.ended,groups:R.groups.length,states:R.groups.map(g=>g.state).slice(0,12)}:null,
+                  wait:(typeof SH_WAIT!=='undefined')?SH_WAIT.length:null,svc:window.__svc||null})""")
+                print(f'Day {day}: the service did not end — {diag}', flush=True); out['stuck'] = {'day': day, 'diag': diag}; break
             k = player.settle()
             if k != 'summary':
                 print(f'Day {day}: expected the summary, the screen is {k!r}', flush=True); break
