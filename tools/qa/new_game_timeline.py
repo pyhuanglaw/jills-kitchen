@@ -110,7 +110,7 @@ def run(A):
                     print('   ' + sp.Log.line(d), flush=True)
             if rec['lounge'] and opened_at is None:
                 opened_at = day
-            if A.dump_at == day and A.dump_save:   # the game's own save at the end of this evening (harness: not the player)
+            if A.dump_save and (A.dump_at == day or (A.dump_when and g.ev(A.dump_when))):   # the game's own save at the end of this evening (harness: not the player)
                 raw = p.page.evaluate("k=>localStorage.getItem(k)", SAVE_KEY)
                 open(A.dump_save, 'w', encoding='utf-8').write(raw or '')
                 print(f'SAVE after Day {day} -> {A.dump_save}', flush=True)
@@ -168,4 +168,5 @@ if __name__ == '__main__':
     ap.add_argument('--json', default=None); ap.add_argument('--log', default=None); ap.add_argument('--what-if', dest='what_if', default='')
     ap.add_argument('--save', default=None, help='start from a save (a file in tests/saves, or a path) instead of a new game; --days counts from its next day')
     ap.add_argument('--dump-save-at', dest='dump_at', type=int, default=None); ap.add_argument('--dump-save', dest='dump_save', default=None)
+    ap.add_argument('--dump-when', dest='dump_when', default=None, help="JS read in the game each evening; true: write the save (e.g. the evening before the Lounge opens)")
     run(ap.parse_args())
