@@ -1043,3 +1043,32 @@ def qa_a_story_photo_comes_after_its_lines(b, port, target):
         check(i_photo > i_last, f'the photo came before the lines it records: {lines}')
     finally:
         p.close()
+
+
+@test
+def qa_lines_with_a_face_do_not_cover_toasts(b, port, target):
+    """WS1-10, W3-10: a line with a face covered the toasts — on Day 1's first photo the husband's 「拍妳。」「嗯。」 were
+    under Jill's lines; with two toasts the upper one was covered. At 390 and 375, with and without the tutorial card,
+    no face line lies on a toast."""
+    OVER = """(()=>{const T=[...document.querySelectorAll('#toasts .toast')].filter(e=>e.offsetParent!==null||getComputedStyle(e).position==='fixed').map(e=>e.getBoundingClientRect());
+      const P=[...document.querySelectorAll('#plines .pline')].map(e=>e.getBoundingClientRect());return T.length>0&&P.length>0&&T.some(a=>P.some(q=>a.left<q.right&&q.left<a.right&&a.top<q.bottom&&q.top<a.bottom))})()"""
+    bad = []
+    for W in (390, 375):
+        p = Player(b, port, target, save=LATE, W=W)
+        try:
+            _to_service_from_late(p)
+            p.ev("toast('<b>甲</b>：「一句話」','q');toast('<b>乙</b>：「另一句話，長一點的那種」','q');portraitLine('jill','丙。',{})"); p.frames(3)
+            if p.ev(OVER):
+                bad.append(f'{W}px')
+        finally:
+            p.close()
+        p = Player(b, port, target, W=W)
+        try:
+            p.tap('[data-act=open]'); p.settle(); p.start_day(); p.frames(30)
+            p.ev("toast('<b>Jill 先生</b>：「拍妳。」','q');portraitLine('jill','我根本沒在看。',{})"); p.frames(3)
+            if p.ev(OVER):
+                coach = 'up' if p.ev("!document.querySelector('#coach').hidden") else 'down'
+                bad.append(f'{W}px Day 1 (tutorial card {coach})')
+        finally:
+            p.close()
+    check(not bad, f'a face line lies on a toast at {bad}')
