@@ -107,7 +107,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 @keyframes shake{25%{translate:-4px 0}75%{translate:4px 0}}
 
 /* food */
-.it{position:absolute;left:0;top:0;width:44px;height:44px;border-radius:50%;cursor:pointer;transition:transform .22s cubic-bezier(.3,.7,.3,1);z-index:3}
+.it{position:absolute;left:0;top:0;width:44px;height:44px;border-radius:50%;cursor:pointer;transition:transform .34s cubic-bezier(.3,.7,.25,1.15);z-index:3}
 .it.carried{transition:none}
 .it .sec{position:absolute;left:50%;top:-12px;transform:translateX(-50%);font-size:9.5px;font-weight:800;color:var(--paper);background:rgba(20,28,30,.78);border-radius:5px;padding:0 4px;line-height:13px;pointer-events:none;font-variant-numeric:tabular-nums;white-space:nowrap}
 .it svg{position:absolute;inset:0;overflow:visible;pointer-events:none}
@@ -191,7 +191,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
     <button class="hb" id="hSpeed" aria-label="遊戲速度">1×</button>
     <button class="hb" id="hPause" aria-label="暫停">II</button>
   </header>
-  <div id="hint" class="quiet">點食材 → 點設備。好了以後點它 → 點下一站或盤子。</div>
+  <div id="hint" class="quiet">點單子上的菜就下鍋；好了點它，它會去下一站或上盤。</div>
   <div id="wrap"><div id="stage">
     <div id="floor"></div>
     <div id="passbar"><div class="lamp"></div><div class="pl">出菜口 PASS</div></div>
@@ -203,8 +203,9 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
     <h1>今晚的廚房</h1>
     <p>每個設備自己會煮。你要做的，是決定先下什麼、好了以後拿去哪一站、哪一桌先出。</p>
     <ul class="how">
-      <li>點<b>食材</b>（或單子上的菜），再點<b>設備</b>：它就開始煮。</li>
-      <li>好了會響，綠圈。點它，再點<b>下一站</b>或下面那桌的<b>盤子</b>。也可以直接拖過去。</li>
+      <li>點下面<b>單子上的菜</b>（或冰箱的食材）：它會自己下鍋、自己煮。</li>
+      <li>好了會響、圈變綠：點它，它會去<b>下一站</b>，或上那一桌的<b>盤子</b>。兩桌都要的時候，再點你要給的那一桌。</li>
+      <li>想放別的地方（暫放台、垃圾桶），就直接拖過去。</li>
       <li>同一桌的菜到齊，服務生就從出菜口端走。</li>
     </ul>
     <div class="nights" id="nightList"></div>
@@ -616,6 +617,28 @@ function destOf(h){
   return null;
 }
 function selectable(h){if(!h)return false;if(h.type==='bin')return true;if(h.type==='item'){const it=G.items.get(h.id);return it&&it.ph!=='cook'&&it.ph!=='asm'&&!(it.at&&it.at.carry)}return false}
+function firstSt(k){for(const key in PR){const [a,b]=key.split('@');if(a===k)return b}return null}
+/* iteration 2 (playing v1: two taps for a move that has only one place to go is busywork, not a decision): a tap does
+   the obvious thing — an ingredient (or a dish on a ticket) goes onto its station, a finished thing goes to its next
+   station or to the one table waiting for it. Where there is a choice (two tables want it, the next station is full)
+   the tap picks it up instead and the places it can go light up; a drag can put anything anywhere. */
+function quick(h){
+  if(!h)return false;
+  if(h.type==='bin'){const st=firstSt(h.k);if(st&&canGo({bin:h.k},{st})){move({bin:h.k},{st});return true}if(st)flashHint(`${ST[st].n}滿了：等它空出來，或先把好了的拿走`);return false}
+  if(h.type==='item'){const it=G.items.get(h.id);if(!it||!selectable(h))return false;
+    const nx=nextStOf(it.k);if(nx&&!(it.at&&it.at.st===nx)&&!(it.at&&it.at.tray)){if(canGo({it},{st:nx})){move({it},{st:nx});return true}flashHint(`${ST[nx].n}滿了`);return false}
+    if(K[it.k].fin&&!(it.at&&it.at.tray)){const trs=G.tickets.filter(t=>canGo({it},{tray:t.id}));if(trs.length===1){move({it},{tray:trs[0].id});return true}}
+    return false}
+  if(h.type==='tray'&&h.j!=null){const tk=ticketOf(h.id);if(!tk||tk.fill[h.j])return false;const d=tk.dishes[h.j];
+    // a finished one waiting somewhere: to this table
+    for(const it of G.items.values())if(it.k===d&&!['cook','burnt','asm'].includes(it.ph)&&!(it.at&&(it.at.tray||it.at.carry))&&!it.res){move({it},{tray:tk.id});return true}
+    // else start the part of it that is least on its way
+    const starts=DISH[d].start;const cnt=s=>[...G.items.values()].filter(it=>!(it.at&&it.at.tray)&&(it.k===s||chainEnd(it.k)===chainEnd(s))).length;
+    const k=starts.slice().sort((a,b)=>cnt(a)-cnt(b))[0];const st=firstSt(k);
+    if(st&&canGo({bin:k},{st})){move({bin:k},{st});return true}
+    setSel({type:'bin',k});flashHint(`${ST[st].n}滿了：等它空出來`);return true}
+  return false;
+}
 function tap(h){
   if(!G||G.ended)return;G.st.taps++;
   if(G.sel){
@@ -628,6 +651,7 @@ function tap(h){
     if(h){nope(h,src)}else setSel(null);
     return;
   }
+  if(quick(h)){tutEvent('moved');return}
   if(selectable(h)){setSel(h);tutEvent('selected',h);return}
   if(h&&h.type==='tray'&&h.j!=null){const tk=ticketOf(h.id);if(tk)pull(tk,h.j);return}
   if(h&&h.type==='st'){const e=SEL['st_'+h.id];if(e){e.classList.remove('shake');void e.offsetWidth;e.classList.add('shake')}}
@@ -674,17 +698,17 @@ function onUp(e){
 /* ---------------------------------------------------------------- the tutorial: each new thing once, by hand, when it first happens */
 let beat=null,hintTimer=0;
 const B={
-  take:{txt:'第一張單：<b>黃金蛋炒飯</b>。點冰箱裡的 🍚（或單子上的 🍛），再點<b>炒鍋</b>。',hl:()=>['bin_rice','st_wok',trayEl(1)]},
+  take:{txt:'第一張單：<b>黃金蛋炒飯</b>。點下面單子上的 🍛（或冰箱裡的 🍚）：它會自己下<b>炒鍋</b>。',hl:()=>['bin_rice','st_wok',trayEl(1)]},
   wait:{txt:'炒鍋自己會炒。黃色的圈是進度，好了會響一聲、變綠。這段時間你可以去做別的事。',hl:()=>['st_wok']},
-  serve:{txt:'好了！點炒鍋上的 🍛，再點下面 <b>1 號桌的盤子</b>（也可以直接拖過去）。',hl:()=>['st_wok',trayEl(1)]},
+  serve:{txt:'好了！點炒鍋上的 🍛：它會上 <b>1 號桌的盤子</b>。',hl:()=>['st_wok',trayEl(1)]},
   out:{txt:'一桌的菜到齊，服務生<b>小茉</b>就會從出菜口端走。',hl:()=>[],min:3.2},
-  two:{txt:'<b>番茄義大利麵</b>要走兩站：先<b>湯鍋</b>煮麵，再進<b>平底鍋</b>拌醬。單子上「煮›煎」就是它的路線。',hl:()=>['bin_noodle','st_pot',trayEl(2)]},
-  two2:{txt:'麵煮好了。上面的「→煎」是它的下一站：拿去<b>平底鍋</b>。',hl:()=>['st_pot','st_pan']},
-  fill:{txt:'兩樣一起來。先讓炒飯下鍋；它在炒的時候，去把<b>咖啡</b>放上咖啡機。',hl:()=>['bin_rice','st_wok','bin_beans','st_coffee']},
+  two:{txt:'<b>番茄義大利麵</b>要走兩站：先<b>湯鍋</b>煮麵，再進<b>平底鍋</b>拌醬。單子上「煮」「煎」兩格就是它的路線。點單子上的 🍝 開始。',hl:()=>['bin_noodle','st_pot',trayEl(2)]},
+  two2:{txt:'麵煮好了，上面寫著「→煎」。點它：它會進<b>平底鍋</b>。',hl:()=>['st_pot','st_pan']},
+  fill:{txt:'兩樣一起來。先讓炒飯下鍋；它在炒的時候，點<b>咖啡</b>，咖啡機會自己煮。',hl:()=>['bin_rice','st_wok','bin_beans','st_coffee']},
   together:{txt:'同一桌要到齊才會出菜。先好的放在盤子上會慢慢變涼（圈變黃）；幾道菜在 6 秒內一起上盤，小費會多一點。',hl:()=>[],min:5},
   free:{txt:'接下來客人會越來越多。不用守著一個爐子：看整間廚房——誰快好了、哪裡空著、哪一桌最急。',hl:()=>[],min:6},
-  over:{txt:'炒鍋、平底鍋上好了的東西放著不拿，會開始焦（紅圈）。拿去盤子或下一站；沒地方放就先放<b>暫放台</b>。',hl:()=>['st_shelf'],min:4},
-  burnt:{txt:'焦掉了。點它，再點<b>垃圾桶</b>，重做一份。',hl:()=>['st_trash'],min:3},
+  over:{txt:'炒鍋、平底鍋上好了的東西放著不拿，會開始焦（紅圈）。點它送走；沒地方放，就把它<b>拖到暫放台</b>。',hl:()=>['st_shelf'],min:4},
+  burnt:{txt:'焦掉了。把它拖到<b>垃圾桶</b>（或點它、再點垃圾桶），重做一份。',hl:()=>['st_trash'],min:3},
   oven:{txt:'<b>香草烤雞</b>進烤箱要 35 秒，但烤箱不會焦，一次放兩樣。慢的先下，等的時間去做別的。',hl:()=>['bin_chicken_r','st_oven']},
   asm:{txt:'<b>經典牛肉漢堡</b>是兩樣東西：肉排在<b>平底鍋</b>煎、麵包進<b>烤箱</b>烤。兩樣都好了放上<b>組裝台</b>，自己會組起來。',hl:()=>['bin_patty','bin_bun','st_asm']},
   cook:{txt:'今天有<b>阿德師傅</b>顧爐台：炒鍋、湯鍋、平底鍋上好了的東西，他會拿去下一站或盤子上。你只要決定先下什麼。',hl:()=>['st_wok','st_pot','st_pan'],min:7},
@@ -700,7 +724,7 @@ function hl(list){stage.querySelectorAll('.hl').forEach(e=>e.classList.remove('h
 function tutTicket(){const step=G.tut.step;if(step===0)addTicket(['friedrice'],1);else if(step===1)addTicket(['pasta'],1);else if(step===2)addTicket(['friedrice','coffee'],1)}
 function tutEvent(ev,x){
   if(!G)return;
-  if(ev==='served'&&G.tut&&!G.tutDone&&x.tut){G.tut.step++;if(G.tut.step<3)setTimeout(()=>{if(G&&!G.ended)tutTicket()},900);else{G.tutDone=true;G.freeAt=G.t+3;setTimeout(()=>{if(G&&!G.ended&&!beat)showBeat('free')},400)}}
+  if(ev==='served'&&G.tut&&!G.tutDone&&x.tut){G.tut.step++;if(G.tut.step<3)setTimeout(()=>{if(G&&!G.ended)tutTicket()},900);else{G.tutDone=true;G.freeAt=G.t+3;queueBeat('free')}}
   if(ev==='over'&&ST[x.at&&x.at.st]&&x.pr.burn)queueBeat('over');
   if(ev==='burnt')queueBeat('burnt');
 }
@@ -712,7 +736,7 @@ function tutTick(){
     else if(id==='serve')done=G.tickets.some(t=>t.no===1&&t.done)||!G.tickets.some(t=>t.no===1);
     else if(id==='two')done=[...G.items.values()].some(it=>it.at&&it.at.st==='pot');
     else if(id==='two2')done=[...G.items.values()].some(it=>it.at&&it.at.st==='pan'&&(it.k==='noodle_c'||it.k==='pasta'));
-    else if(id==='fill')done=[...G.items.values()].some(it=>it.at&&it.at.st==='coffee')&&[...G.items.values()].some(it=>it.at&&it.at.st==='wok');
+    else if(id==='fill'){const t3=G.tickets.find(t=>t.no===3);const has=ks=>[...G.items.values()].some(it=>ks.includes(it.k));done=!t3||G.tutDone||(has(['beans','coffee'])&&has(['rice','friedrice']))}
     else if(id==='oven')done=[...G.items.values()].some(it=>it.at&&it.at.st==='oven'&&(it.k==='chicken_r'||it.k==='chicken'));
     else if(id==='asm')done=!!G.asm||[...G.items.values()].some(it=>it.k==='burger');
     else if(id==='ahead')done=el>=(beat.min||0)&&[...G.items.values()].some(it=>it.at&&it.at.st==='chill');
@@ -729,7 +753,7 @@ function tutTick(){
     if(s===0){if(!its.some(it=>it.at&&it.at.st==='wok'||it.k==='friedrice'))return showBeat('take');if(its.some(it=>it.at&&it.at.st==='wok'&&it.ph==='cook'))return showBeat('wait');if(its.some(it=>it.k==='friedrice'&&it.at&&it.at.st))return showBeat('serve')}
     if(s===0&&G.tickets.some(t=>t.no===1&&t.done))return showBeat('out');
     if(s===1){if(!its.some(it=>it.at&&(it.at.st==='pot'||it.at.st==='pan')||it.k==='pasta'))return showBeat('two');if(its.some(it=>it.k==='noodle_c'&&(it.ph==='done'||it.ph==='over'||it.ph==='hold')))return showBeat('two2')}
-    if(s===2&&G.tickets.some(t=>t.no===3)&&!its.some(it=>it.at&&it.at.st==='coffee'))return showBeat('fill');
+    if(s===2){const t3=G.tickets.find(t=>t.no===3);if(t3&&!t3.fill.some(Boolean)&&!its.some(it=>['beans','coffee','rice','friedrice'].includes(it.k)))return showBeat('fill')}
   }
   if(beatQ.length){const id=beatQ.shift();if(showBeat(id))return}
   if(G.tickets.some(t=>t.dishes.includes('chicken')))if(showBeat('oven'))return;
@@ -740,7 +764,7 @@ function tutTick(){
   if(G.N.barista&&G.t>2)if(showBeat('barista'))return;
   if(G.tickets.some(t=>!t.done&&t.fill.some(Boolean)&&t.dishes.length>1&&t.fill.some(x=>!x)))if(showBeat('together'))return;
 }
-function hint(txt){const h=$('#hint');if(txt){h.innerHTML=txt;h.classList.remove('quiet')}else{h.innerHTML=G&&G.k===1&&G.t<120?'點食材 → 點設備。好了以後點它 → 點下一站或盤子。':'';h.classList.add('quiet')}}
+function hint(txt){const h=$('#hint');if(txt){h.innerHTML=txt;h.classList.remove('quiet')}else{h.innerHTML=G&&G.k===1&&G.t<120?'點單子上的菜就下鍋；好了點它，它會去下一站或上盤。兩桌都要的時候，再點你要給的那一桌。':'';h.classList.add('quiet')}}
 function flashHint(t){if(beat)return;const h=$('#hint');h.innerHTML=t;h.classList.remove('quiet');clearTimeout(hintTimer);hintTimer=setTimeout(()=>{if(!beat)hint(null)},1800)}
 function popAt(p,txt,col){const e=mk('div','pop',txt);e.style.left=(p.x-20)+'px';e.style.top=(p.y-30)+'px';e.style.color=col||'#fff';stage.appendChild(e);setTimeout(()=>e.remove(),1300)}
 
