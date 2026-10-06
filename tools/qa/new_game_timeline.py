@@ -71,9 +71,11 @@ def main():
             for a, kv in EARLY.get(day, []): act(a, **kv)
             if day >= 15:
                 # a person takes what the story offers first, then grows the restaurant only with money to spare
+                # …and once the story offers a place (Madame Lin's bar, the second floor), saves up for it first
+                saving = g.ev("(fact('lounge_project')&&!loungeLv())||(fact('up_ask')&&!(S.rooms&&S.rooms.up))")
                 for a, kv in GROW:
                     story = a in ('linTake', 'linSign', 'buyLounge', 'buyUp', 'buySR', 'buyPD')
-                    if story or g.ev("S.money") > RESERVE: act(a, **kv)
+                    if story or (not saving and g.ev("S.money") > RESERVE): act(a, **kv)
             g.click('[data-act=nextDay]'); g.ev("__tick(100)")
         first = {}
         for r in rows:

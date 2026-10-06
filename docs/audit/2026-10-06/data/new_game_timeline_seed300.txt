@@ -1,0 +1,114 @@
+Day   1 lv1 crew  0 $    2069 dylan {'stage': 0, 'reveal': None, 'v': 0, 'stay': 0, 'clues': 0, 'sofa': 0} lounge 0 up 0 sr 0 pd 0 | m:lin_hello
+Day   2 lv1 crew  0 $    6320 dylan {'stage': 0, 'reveal': None, 'v': 0, 'stay': 0, 'clues': 0, 'sofa': 0} lounge 0 up 0 sr 0 pd 0 | 
+Day   3 lv1 crew  0 $    9912 dylan {'stage': 0, 'reveal': None, 'v': 1, 'stay': 0, 'clues': 1, 'sofa': 0} lounge 0 up 0 sr 0 pd 0 | 
+Day   4 lv1 crew  1 $   12868 dylan {'stage': 0, 'reveal': None, 'v': 1, 'stay': 0, 'clues': 1, 'sofa': 1} lounge 0 up 0 sr 0 pd 0 | a:first_shift
+Day   5 lv1 crew  1 $   17958 dylan {'stage': 0, 'reveal': None, 'v': 2, 'stay': 1, 'clues': 4, 'sofa': 1} lounge 0 up 0 sr 0 pd 0 | m:dylan_valentine a:recognize a:lin_seen m:ken_wine_q a:lounge_idea
+Day   6 lv2 crew  1 $   17505 dylan {'stage': 0, 'reveal': None, 'v': 3, 'stay': 1, 'clues': 4, 'sofa': 2} lounge 0 up 0 sr 0 pd 0 | 
+Day   7 lv2 crew  1 $   22428 dylan {'stage': 1, 'reveal': None, 'v': 4, 'stay': 1, 'clues': 5, 'sofa': 2} lounge 0 up 0 sr 0 pd 0 | m:lin_sees a:recognize a:lin_seen m:ken_pairing
+Day   8 lv2 crew  1 $   27070 dylan {'stage': 1, 'reveal': None, 'v': 4, 'stay': 1, 'clues': 5, 'sofa': 3} lounge 0 up 0 sr 0 pd 0 | a:lin_seen m:yj_meet
+Day   9 lv2 crew  2 $   29325 dylan {'stage': 1, 'reveal': None, 'v': 5, 'stay': 1, 'clues': 5, 'sofa': 4} lounge 0 up 0 sr 0 pd 0 | a:first_shift a:recognize m:ken_pairing v:yj_look
+Day  10 lv2 crew  2 $   33354 dylan {'stage': 1, 'reveal': None, 'v': 5, 'stay': 1, 'clues': 5, 'sofa': 5} lounge 0 up 0 sr 0 pd 0 | a:lounge_idea
+Day  11 lv2 crew  2 $   38613 dylan {'stage': 1, 'reveal': None, 'v': 5, 'stay': 1, 'clues': 5, 'sofa': 6} lounge 0 up 0 sr 0 pd 0 | a:recognize m:ken_pairing m:yj_three
+Day  12 lv3 crew  2 $   27286 dylan {'stage': 1, 'reveal': None, 'v': 5, 'stay': 1, 'clues': 5, 'sofa': 7} lounge 0 up 0 sr 0 pd 0 | a:lin_seen v:yj_chose
+Day  13 lv3 crew  2 $   31842 dylan {'stage': 1, 'reveal': None, 'v': 6, 'stay': 2, 'clues': 5, 'sofa': 8} lounge 0 up 0 sr 0 pd 0 | m:dylan_valentine a:recognize a:lounge_idea
+Day  14 lv3 crew  2 $   35681 dylan {'stage': 2, 'reveal': None, 'v': 6, 'stay': 2, 'clues': 5, 'sofa': 9} lounge 0 up 0 sr 0 pd 0 | v:yj_move
+Day  15 lv3 crew  2 $   40039 dylan {'stage': 2, 'reveal': None, 'v': 6, 'stay': 2, 'clues': 5, 'sofa': 10} lounge 0 up 0 sr 0 pd 0 | a:recognize a:cat_known
+Day  16 lv3 crew  2 $   43860 dylan {'stage': 2, 'reveal': None, 'v': 6, 'stay': 2, 'clues': 5, 'sofa': 11} lounge 0 up 0 sr 0 pd 0 | m:yj_key a:yj_key_seen
+Day  17 lv3 crew  2 $   48463 dylan {'stage': 2, 'reveal': None, 'v': 7, 'stay': 2, 'clues': 5, 'sofa': 11} lounge 0 up 0 sr 0 pd 0 | a:cat_known a:recognize
+Day  18 lv3 crew  2 $   52741 dylan {'stage': 2, 'reveal': None, 'v': 8, 'stay': 2, 'clues': 6, 'sofa': 11} lounge 0 up 0 sr 0 pd 0 | a:lin_same a:lin_seen
+Day  19 lv3 crew  2 $   57880 dylan {'stage': 2, 'reveal': None, 'v': 8, 'stay': 2, 'clues': 6, 'sofa': 12} lounge 0 up 0 sr 0 pd 0 | a:cat_known a:veteran_knows a:recognize
+Day  20 lv3 crew  2 $   61940 dylan {'stage': 2, 'reveal': None, 'v': 8, 'stay': 2, 'clues': 6, 'sofa': 13} lounge 0 up 0 sr 0 pd 0 | m:inspector_dinner a:lin_seen
+Day  21 lv3 crew  2 $   67066 dylan {'stage': 2, 'reveal': None, 'v': 8, 'stay': 2, 'clues': 6, 'sofa': 14} lounge 0 up 0 sr 0 pd 0 | a:cat_known a:recognize a:lin_seen m:critic_back
+Day  22 lv3 crew  2 $   72071 dylan {'stage': 2, 'reveal': None, 'v': 8, 'stay': 2, 'clues': 7, 'sofa': 15} lounge 0 up 0 sr 0 pd 0 | a:veteran_knows
+Day  23 lv3 crew  2 $   76683 dylan {'stage': 2, 'reveal': None, 'v': 8, 'stay': 2, 'clues': 7, 'sofa': 16} lounge 0 up 0 sr 0 pd 0 | a:recognize a:cat_known a:lin_same
+Day  24 lv3 crew  2 $   80097 dylan {'stage': 2, 'reveal': None, 'v': 8, 'stay': 2, 'clues': 7, 'sofa': 17} lounge 0 up 0 sr 0 pd 0 | m:sophie_mei_1 m:lin_gift a:lin_seen
+Day  25 lv4 crew  2 $   45862 dylan {'stage': 2, 'reveal': None, 'v': 8, 'stay': 2, 'clues': 7, 'sofa': 18} lounge 0 up 0 sr 0 pd 0 | m:ken_tasting a:veteran_knows a:cat_known m:tasting_start m:pairing_start m:sm_a a:recognize
+Day  26 lv4 crew  2 $   51006 dylan {'stage': 2, 'reveal': None, 'v': 8, 'stay': 2, 'clues': 7, 'sofa': 19} lounge 0 up 0 sr 0 pd 0 | a:lin_same a:lin_seen
+Day  27 lv4 crew  2 $   57891 dylan {'stage': 2, 'reveal': None, 'v': 8, 'stay': 2, 'clues': 7, 'sofa': 20} lounge 0 up 0 sr 0 pd 0 | a:cat_known a:recognize m:dylan_valentine
+Day  28 lv4 crew  2 $   62500 dylan {'stage': 2, 'reveal': None, 'v': 8, 'stay': 2, 'clues': 7, 'sofa': 20} lounge 0 up 0 sr 0 pd 0 | a:veteran_knows m:wang_anniv_photo
+Day  29 lv4 crew  2 $   68394 dylan {'stage': 2, 'reveal': None, 'v': 8, 'stay': 2, 'clues': 7, 'sofa': 21} lounge 0 up 0 sr 0 pd 0 | a:recognize m:koba_drink a:cat_known
+Day  30 lv4 crew  2 $   72516 dylan {'stage': 2, 'reveal': None, 'v': 9, 'stay': 2, 'clues': 7, 'sofa': 22} lounge 0 up 0 sr 0 pd 0 | a:zhou_random
+Day  31 lv4 crew  2 $   78396 dylan {'stage': 2, 'reveal': None, 'v': 9, 'stay': 2, 'clues': 7, 'sofa': 23} lounge 0 up 0 sr 0 pd 0 | a:veteran_knows a:recognize m:sm_b a:lin_same
+Day  32 lv4 crew  2 $   85740 dylan {'stage': 2, 'reveal': None, 'v': 9, 'stay': 2, 'clues': 7, 'sofa': 24} lounge 0 up 0 sr 0 pd 0 | a:cat_known m:sophie_mei_2 m:lin_retire a:lin_seen
+Day  33 lv4 crew  2 $   26750 dylan {'stage': 2, 'reveal': None, 'v': 9, 'stay': 2, 'clues': 7, 'sofa': 25} lounge 0 up 0 sr 0 pd 0 | a:koba_not_today a:recognize m:zhou_seat a:zhou_random a:lounge_idea m:ken_where
+Day  34 lv4 crew  2 $   29393 dylan {'stage': 2, 'reveal': None, 'v': 9, 'stay': 2, 'clues': 7, 'sofa': 25} lounge 0 up 0 sr 0 pd 0 | a:veteran_knows a:cat_known m:lin_sees m:dylan_valentine m:jd_want
+Day  35 lv4 crew  2 $   29023 dylan {'stage': 2, 'reveal': None, 'v': 9, 'stay': 2, 'clues': 7, 'sofa': 26} lounge 0 up 0 sr 0 pd 0 | a:recognize a:mia_early
+Day  36 lv4 crew  2 $   28749 dylan {'stage': 2, 'reveal': None, 'v': 9, 'stay': 2, 'clues': 7, 'sofa': 26} lounge 0 up 0 sr 0 pd 0 | a:cat_known a:lin_same a:lin_seen m:dylan_book
+Day  37 lv4 crew  2 $   30624 dylan {'stage': 2, 'reveal': None, 'v': 9, 'stay': 2, 'clues': 7, 'sofa': 28} lounge 0 up 0 sr 0 pd 0 | m:lin_viewing a:veteran_knows a:recognize m:wang_solo m:chen_tora m:lin_decide
+Day  38 lv4 crew  2 $   33569 dylan {'stage': 2, 'reveal': None, 'v': 10, 'stay': 2, 'clues': 7, 'sofa': 29} lounge 0 up 0 sr 0 pd 0 | a:cat_known a:lin_seen
+Day  39 lv4 crew  2 $   33431 dylan {'stage': 2, 'reveal': None, 'v': 10, 'stay': 2, 'clues': 7, 'sofa': 30} lounge 0 up 0 sr 0 pd 0 | a:recognize
+Day  40 lv4 crew  2 $   36700 dylan {'stage': 2, 'reveal': None, 'v': 11, 'stay': 2, 'clues': 8, 'sofa': 31} lounge 0 up 0 sr 0 pd 0 | a:cat_known a:veteran_knows a:lin_seen
+Day  41 lv4 crew  2 $   36968 dylan {'stage': 2, 'reveal': None, 'v': 11, 'stay': 2, 'clues': 8, 'sofa': 32} lounge 0 up 0 sr 0 pd 0 | a:recognize a:zhou_random
+Day  42 lv4 crew  2 $   39231 dylan {'stage': 2, 'reveal': None, 'v': 11, 'stay': 2, 'clues': 8, 'sofa': 33} lounge 0 up 0 sr 0 pd 0 | a:cat_known
+Day  43 lv4 crew  2 $   40042 dylan {'stage': 2, 'reveal': None, 'v': 12, 'stay': 3, 'clues': 8, 'sofa': 34} lounge 0 up 0 sr 0 pd 0 | a:veteran_knows a:recognize
+Day  44 lv4 crew  2 $   45091 dylan {'stage': 2, 'reveal': None, 'v': 12, 'stay': 3, 'clues': 8, 'sofa': 35} lounge 0 up 0 sr 0 pd 0 | a:cat_known a:lin_last
+Day  45 lv4 crew  2 $   47538 dylan {'stage': 2, 'reveal': None, 'v': 13, 'stay': 4, 'clues': 9, 'sofa': 36} lounge 0 up 0 sr 0 pd 0 | a:lin_same a:recognize a:lin_seen
+Day  46 lv4 crew  2 $   47187 dylan {'stage': 2, 'reveal': None, 'v': 13, 'stay': 4, 'clues': 9, 'sofa': 37} lounge 0 up 0 sr 0 pd 0 | a:cat_known a:veteran_knows a:zhou_random
+Day  47 lv4 crew  2 $   49553 dylan {'stage': 2, 'reveal': None, 'v': 14, 'stay': 5, 'clues': 10, 'sofa': 37} lounge 0 up 0 sr 0 pd 0 | a:recognize a:koba_not_today
+Day  48 lv4 crew  2 $   49958 dylan {'stage': 2, 'reveal': None, 'v': 15, 'stay': 6, 'clues': 10, 'sofa': 37} lounge 0 up 0 sr 0 pd 0 | a:cat_known a:lin_seen
+Day  49 lv4 crew  2 $   54093 dylan {'stage': 2, 'reveal': None, 'v': 15, 'stay': 6, 'clues': 10, 'sofa': 38} lounge 0 up 0 sr 0 pd 0 | a:veteran_knows a:recognize
+Day  50 lv4 crew  2 $   56859 dylan {'stage': 2, 'reveal': None, 'v': 16, 'stay': 6, 'clues': 10, 'sofa': 38} lounge 0 up 0 sr 0 pd 0 | a:cat_known a:lin_same a:lin_seen
+Day  51 lv4 crew  2 $   56189 dylan {'stage': 2, 'reveal': None, 'v': 16, 'stay': 6, 'clues': 10, 'sofa': 39} lounge 0 up 0 sr 0 pd 0 | a:recognize
+Day  52 lv4 crew  2 $   59112 dylan {'stage': 2, 'reveal': None, 'v': 17, 'stay': 7, 'clues': 10, 'sofa': 40} lounge 0 up 0 sr 0 pd 0 | a:veteran_knows a:cat_known
+Day  53 lv4 crew  2 $   60437 dylan {'stage': 2, 'reveal': None, 'v': 17, 'stay': 7, 'clues': 10, 'sofa': 41} lounge 0 up 0 sr 0 pd 0 | a:recognize a:zhou_random
+Day  54 lv4 crew  2 $   65565 dylan {'stage': 2, 'reveal': None, 'v': 18, 'stay': 8, 'clues': 10, 'sofa': 42} lounge 0 up 0 sr 0 pd 0 | a:cat_known m:dylan_valentine
+Day  55 lv4 crew  2 $   71506 dylan {'stage': 2, 'reveal': None, 'v': 18, 'stay': 8, 'clues': 10, 'sofa': 42} lounge 0 up 0 sr 0 pd 0 | a:koba_not_today a:veteran_knows a:recognize a:lin_seen
+Day  56 lv4 crew  2 $   73692 dylan {'stage': 2, 'reveal': None, 'v': 19, 'stay': 8, 'clues': 10, 'sofa': 43} lounge 0 up 0 sr 0 pd 0 | a:cat_known
+Day  57 lv4 crew  2 $   75729 dylan {'stage': 3, 'reveal': 57, 'v': 20, 'stay': 9, 'clues': 11, 'sofa': 44} lounge 0 up 0 sr 0 pd 0 | a:recognize m:wang_dylan_1
+Day  58 lv4 crew  2 $   80768 dylan {'stage': 3, 'reveal': 57, 'v': 20, 'stay': 9, 'clues': 11, 'sofa': 45} lounge 0 up 0 sr 0 pd 0 | a:cat_known a:veteran_knows a:lin_seen
+Day  59 lv4 crew  2 $   81927 dylan {'stage': 3, 'reveal': 57, 'v': 21, 'stay': 10, 'clues': 11, 'sofa': 46} lounge 0 up 0 sr 0 pd 0 | a:recognize
+Day  60 lv4 crew  2 $   81829 dylan {'stage': 3, 'reveal': 57, 'v': 21, 'stay': 10, 'clues': 11, 'sofa': 47} lounge 0 up 0 sr 0 pd 0 | a:cat_known m:sm_c
+Day  61 lv4 crew  2 $   83436 dylan {'stage': 3, 'reveal': 57, 'v': 21, 'stay': 10, 'clues': 11, 'sofa': 48} lounge 0 up 0 sr 0 pd 0 | a:veteran_knows a:recognize
+Day  62 lv4 crew  2 $   84609 dylan {'stage': 3, 'reveal': 57, 'v': 21, 'stay': 10, 'clues': 11, 'sofa': 49} lounge 0 up 0 sr 0 pd 0 | a:cat_known a:lin_seen
+Day  63 lv4 crew  2 $   85593 dylan {'stage': 3, 'reveal': 57, 'v': 22, 'stay': 10, 'clues': 11, 'sofa': 50} lounge 0 up 0 sr 0 pd 0 | m:sm_d a:recognize
+Day  64 lv4 crew  2 $   85456 dylan {'stage': 3, 'reveal': 57, 'v': 22, 'stay': 10, 'clues': 11, 'sofa': 51} lounge 0 up 0 sr 0 pd 0 | a:veteran_knows a:cat_known a:zhou_random
+Day  65 lv4 crew  2 $   86377 dylan {'stage': 3, 'reveal': 57, 'v': 23, 'stay': 11, 'clues': 11, 'sofa': 52} lounge 0 up 0 sr 0 pd 0 | a:recognize
+Day  66 lv4 crew  2 $   86632 dylan {'stage': 3, 'reveal': 57, 'v': 23, 'stay': 11, 'clues': 11, 'sofa': 53} lounge 0 up 0 sr 0 pd 0 | a:cat_known
+Day  67 lv4 crew  2 $   88198 dylan {'stage': 3, 'reveal': 57, 'v': 24, 'stay': 11, 'clues': 11, 'sofa': 54} lounge 0 up 0 sr 0 pd 0 | a:veteran_knows a:recognize
+Day  68 lv4 crew  2 $   91448 dylan {'stage': 3, 'reveal': 57, 'v': 24, 'stay': 11, 'clues': 11, 'sofa': 55} lounge 0 up 0 sr 0 pd 0 | a:cat_known
+Day  69 lv4 crew  2 $   92706 dylan {'stage': 3, 'reveal': 57, 'v': 24, 'stay': 11, 'clues': 11, 'sofa': 56} lounge 0 up 0 sr 0 pd 0 | a:recognize m:dylan_notices a:xq_sm_talk
+Day  70 lv4 crew  2 $   93532 dylan {'stage': 3, 'reveal': 57, 'v': 24, 'stay': 11, 'clues': 11, 'sofa': 57} lounge 0 up 0 sr 0 pd 0 | a:veteran_knows a:cat_known a:zhou_random
+Day  71 lv4 crew  2 $   96875 dylan {'stage': 3, 'reveal': 57, 'v': 25, 'stay': 11, 'clues': 11, 'sofa': 58} lounge 0 up 0 sr 0 pd 0 | a:recognize m:wang_dylan_2
+Day  72 lv4 crew  2 $  100497 dylan {'stage': 3, 'reveal': 57, 'v': 25, 'stay': 11, 'clues': 11, 'sofa': 59} lounge 0 up 0 sr 0 pd 0 | a:cat_known a:lin_same a:lin_seen a:koba_not_today
+Day  73 lv4 crew  2 $  104747 dylan {'stage': 3, 'reveal': 57, 'v': 26, 'stay': 11, 'clues': 11, 'sofa': 60} lounge 0 up 0 sr 0 pd 0 | a:veteran_knows a:recognize
+Day  74 lv4 crew  2 $  106889 dylan {'stage': 3, 'reveal': 57, 'v': 26, 'stay': 11, 'clues': 11, 'sofa': 61} lounge 0 up 0 sr 0 pd 0 | a:cat_known m:sophie_mei_3
+Day  75 lv4 crew  2 $  113496 dylan {'stage': 3, 'reveal': 57, 'v': 26, 'stay': 11, 'clues': 11, 'sofa': 62} lounge 0 up 0 sr 0 pd 0 | a:recognize a:lin_seen m:dylan_valentine
+Day  76 lv4 crew  2 $  117906 dylan {'stage': 3, 'reveal': 57, 'v': 26, 'stay': 11, 'clues': 11, 'sofa': 63} lounge 0 up 0 sr 0 pd 0 | a:veteran_knows a:cat_known
+Day  77 lv4 crew  2 $  124074 dylan {'stage': 3, 'reveal': 57, 'v': 26, 'stay': 11, 'clues': 11, 'sofa': 64} lounge 0 up 0 sr 0 pd 0 | a:lin_same a:recognize m:sm_e m:sophie_mei_4
+Day  78 lv4 crew  2 $   10493 dylan {'stage': 3, 'reveal': 57, 'v': 27, 'stay': 12, 'clues': 11, 'sofa': 64} lounge 0 up 0 sr 0 pd 0 | m:lin_sign a:cat_known a:lin_seen
+Day  79 lv4 crew  2 $   12917 dylan {'stage': 3, 'reveal': 57, 'v': 27, 'stay': 12, 'clues': 11, 'sofa': 65} lounge 0 up 0 sr 0 pd 0 | a:veteran_knows a:recognize
+Day  80 lv4 crew  3 $    7195 dylan {'stage': 3, 'reveal': 57, 'v': 27, 'stay': 12, 'clues': 11, 'sofa': 66} lounge 1 up 0 sr 0 pd 0 | a:cat_known m:lounge_first_night a:kd_argue
+Day  81 lv4 crew  3 $    5443 dylan {'stage': 3, 'reveal': 57, 'v': 27, 'stay': 12, 'clues': 11, 'sofa': 67} lounge 1 up 0 sr 0 pd 0 | a:recognize a:lin_same
+Day  82 lv4 crew  3 $    3569 dylan {'stage': 3, 'reveal': 57, 'v': 27, 'stay': 12, 'clues': 11, 'sofa': 68} lounge 1 up 0 sr 0 pd 0 | a:veteran_knows a:cat_known a:sp_box
+Day  83 lv4 crew  3 $     966 dylan {'stage': 3, 'reveal': 57, 'v': 28, 'stay': 12, 'clues': 11, 'sofa': 69} lounge 1 up 0 sr 0 pd 0 | a:recognize m:ken_lounge m:kd_evan_1 m:kd_usual
+Day  84 lv4 crew  3 $       0 dylan {'stage': 3, 'reveal': 57, 'v': 29, 'stay': 12, 'clues': 11, 'sofa': 70} lounge 1 up 0 sr 0 pd 0 | a:cat_known a:zhou_random
+Day  85 lv4 crew  3 $       0 dylan {'stage': 3, 'reveal': 57, 'v': 29, 'stay': 12, 'clues': 11, 'sofa': 71} lounge 1 up 0 sr 0 pd 0 | a:veteran_knows a:recognize m:lin_guest a:lin_seen a:kd_argue a:kd_order_together a:xq_sm_talk
+Day  86 lv4 crew  3 $       0 dylan {'stage': 3, 'reveal': 57, 'v': 29, 'stay': 12, 'clues': 11, 'sofa': 72} lounge 1 up 0 sr 0 pd 0 | a:cat_known m:ken_propose
+Day  87 lv4 crew  3 $       0 dylan {'stage': 3, 'reveal': 57, 'v': 29, 'stay': 12, 'clues': 11, 'sofa': 72} lounge 1 up 0 sr 0 pd 0 | a:recognize m:dylan_valentine
+Day  88 lv4 crew  3 $    2217 dylan {'stage': 3, 'reveal': 57, 'v': 29, 'stay': 12, 'clues': 11, 'sofa': 73} lounge 1 up 0 sr 0 pd 0 | a:veteran_knows a:cat_known m:kd_coaster
+Day  89 lv4 crew  3 $    1657 dylan {'stage': 3, 'reveal': 57, 'v': 29, 'stay': 12, 'clues': 11, 'sofa': 74} lounge 1 up 0 sr 0 pd 0 | m:kt_night a:recognize a:lin_same m:dylan_valentine
+Day  90 lv4 crew  3 $      94 dylan {'stage': 3, 'reveal': 57, 'v': 29, 'stay': 12, 'clues': 11, 'sofa': 75} lounge 1 up 0 sr 0 pd 0 | a:cat_known a:kd_argue m:kd_photo
+Day  91 lv4 crew  3 $       0 dylan {'stage': 3, 'reveal': 57, 'v': 29, 'stay': 12, 'clues': 11, 'sofa': 76} lounge 1 up 0 sr 0 pd 0 | a:veteran_knows a:recognize
+Day  92 lv4 crew  3 $       0 dylan {'stage': 3, 'reveal': 57, 'v': 30, 'stay': 12, 'clues': 11, 'sofa': 76} lounge 1 up 0 sr 0 pd 0 | a:cat_known a:lin_same m:qt_drink m:qx_pay m:evan_origin a:kd_order_together
+Day  93 lv4 crew  3 $       0 dylan {'stage': 3, 'reveal': 57, 'v': 30, 'stay': 12, 'clues': 11, 'sofa': 77} lounge 1 up 0 sr 0 pd 0 | a:recognize
+Day  94 lv4 crew  3 $     971 dylan {'stage': 3, 'reveal': 57, 'v': 30, 'stay': 12, 'clues': 11, 'sofa': 78} lounge 1 up 0 sr 0 pd 0 | m:kt_night a:cat_known a:veteran_knows
+Day  95 lv4 crew  3 $       0 dylan {'stage': 3, 'reveal': 57, 'v': 30, 'stay': 12, 'clues': 11, 'sofa': 79} lounge 1 up 0 sr 0 pd 0 | a:kx_heard a:lin_seen a:recognize
+Day  96 lv4 crew  3 $       0 dylan {'stage': 3, 'reveal': 57, 'v': 31, 'stay': 12, 'clues': 11, 'sofa': 80} lounge 1 up 0 sr 0 pd 0 | a:cat_known a:qx_dylan
+Day  97 lv4 crew  3 $       0 dylan {'stage': 3, 'reveal': 57, 'v': 31, 'stay': 12, 'clues': 11, 'sofa': 80} lounge 1 up 0 sr 0 pd 0 | a:veteran_knows a:recognize
+Day  98 lv4 crew  3 $       0 dylan {'stage': 3, 'reveal': 57, 'v': 32, 'stay': 12, 'clues': 11, 'sofa': 81} lounge 1 up 0 sr 0 pd 0 | a:cat_known a:lin_seen a:qx_dylan m:kd_absence
+Day  99 lv4 crew  3 $    8478 dylan {'stage': 3, 'reveal': 57, 'v': 32, 'stay': 12, 'clues': 11, 'sofa': 82} lounge 1 up 0 sr 0 pd 0 | m:kt_night a:recognize
+Day 100 lv4 crew  3 $    4957 dylan {'stage': 3, 'reveal': 57, 'v': 33, 'stay': 12, 'clues': 11, 'sofa': 83} lounge 1 up 0 sr 0 pd 0 | a:veteran_knows a:cat_known a:qx_dylan m:kd_photo2 a:kd_argue a:kx_heard a:kd_order_together
+Day 101 lv4 crew  3 $    2797 dylan {'stage': 3, 'reveal': 57, 'v': 33, 'stay': 12, 'clues': 11, 'sofa': 84} lounge 1 up 0 sr 0 pd 0 | a:recognize a:qx_dylan
+Day 102 lv4 crew  3 $    1792 dylan {'stage': 3, 'reveal': 57, 'v': 33, 'stay': 12, 'clues': 11, 'sofa': 84} lounge 1 up 0 sr 0 pd 0 | a:cat_known a:lin_seen
+Day 103 lv4 crew  3 $     792 dylan {'stage': 3, 'reveal': 57, 'v': 33, 'stay': 12, 'clues': 11, 'sofa': 85} lounge 1 up 0 sr 0 pd 0 | a:recognize a:veteran_knows m:ken_samples
+Day 104 lv4 crew  3 $    3187 dylan {'stage': 3, 'reveal': 57, 'v': 34, 'stay': 12, 'clues': 11, 'sofa': 86} lounge 1 up 0 sr 0 pd 0 | a:zhou_random a:cat_known a:qx_dylan
+Day 105 lv4 crew  3 $       0 dylan {'stage': 3, 'reveal': 57, 'v': 34, 'stay': 12, 'clues': 11, 'sofa': 86} lounge 1 up 0 sr 0 pd 0 | a:recognize a:lin_same a:kx_heard
+Day 106 lv4 crew  3 $       0 dylan {'stage': 3, 'reveal': 57, 'v': 34, 'stay': 12, 'clues': 11, 'sofa': 87} lounge 1 up 0 sr 0 pd 0 | a:veteran_knows a:cat_known
+Day 107 lv4 crew  3 $       0 dylan {'stage': 3, 'reveal': 57, 'v': 34, 'stay': 12, 'clues': 11, 'sofa': 87} lounge 1 up 0 sr 0 pd 0 | a:recognize a:qx_dylan
+Day 108 lv4 crew  3 $       0 dylan {'stage': 3, 'reveal': 57, 'v': 34, 'stay': 12, 'clues': 11, 'sofa': 88} lounge 1 up 0 sr 0 pd 0 | m:ken_wine a:lin_same a:cat_known
+Day 109 lv4 crew  3 $       0 dylan {'stage': 3, 'reveal': 57, 'v': 34, 'stay': 12, 'clues': 11, 'sofa': 89} lounge 1 up 0 sr 0 pd 0 | a:recognize a:veteran_knows
+Day 110 lv4 crew  3 $       0 dylan {'stage': 3, 'reveal': 57, 'v': 34, 'stay': 12, 'clues': 11, 'sofa': 90} lounge 1 up 0 sr 0 pd 0 | a:cat_known a:kx_heard a:kd_order_together a:kd_argue a:lin_seen
+
+FIRST DAY OF EACH BEAT: {"lin_hello": 1, "first_shift": 4, "dylan_valentine": 5, "recognize": 5, "lin_seen": 5, "ken_wine_q": 5, "lounge_idea": 5, "lin_sees": 7, "ken_pairing": 7, "yj_meet": 8, "yj_look": 9, "yj_three": 11, "yj_chose": 12, "yj_move": 14, "cat_known": 15, "yj_key": 16, "yj_key_seen": 16, "lin_same": 18, "veteran_knows": 19, "inspector_dinner": 20, "critic_back": 21, "sophie_mei_1": 24, "lin_gift": 24, "ken_tasting": 25, "tasting_start": 25, "pairing_start": 25, "sm_a": 25, "wang_anniv_photo": 28, "koba_drink": 29, "zhou_random": 30, "sm_b": 31, "sophie_mei_2": 32, "lin_retire": 32, "koba_not_today": 33, "zhou_seat": 33, "ken_where": 33, "jd_want": 34, "mia_early": 35, "dylan_book": 36, "lin_viewing": 37, "wang_solo": 37, "chen_tora": 37, "lin_decide": 37, "lin_last": 44, "wang_dylan_1": 57, "sm_c": 60, "sm_d": 63, "dylan_notices": 69, "xq_sm_talk": 69, "wang_dylan_2": 71, "sophie_mei_3": 74, "sm_e": 77, "sophie_mei_4": 77, "lin_sign": 78, "lounge_first_night": 80, "kd_argue": 80, "sp_box": 82, "ken_lounge": 83, "kd_evan_1": 83, "kd_usual": 83, "lin_guest": 85, "kd_order_together": 85, "ken_propose": 86, "kd_coaster": 88, "kt_night": 89, "kd_photo": 90, "qt_drink": 92, "qx_pay": 92, "evan_origin": 92, "kx_heard": 95, "qx_dylan": 96, "kd_absence": 98, "kd_photo2": 100, "ken_samples": 103, "ken_wine": 108}
+page errors: []
+110 days in 812s

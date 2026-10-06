@@ -108,8 +108,9 @@ def qa_a_new_game_first_day_by_taps(b, port, target):
 
 # ---------------------------------------------------------------- every button does something (guard)
 
+# what a press can change, seen by the player or kept in the save — not the save's own time stamp (every save() writes one)
 FINGERPRINT = """JSON.stringify([S.money,phase,sub||'',typeof shopTab!=='undefined'?shopTab:'',window.__toastN||0,
-  (()=>{let h=0;const s=JSON.stringify(S);for(let i=0;i<s.length;i+=7)h=(h*31+s.charCodeAt(i))|0;return h})(),
+  (()=>{let h=0;const s=JSON.stringify(S,(k,v)=>k==='savedAt'||k==='savedLabel'?undefined:v);for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0;return h})(),
   (()=>{const e=document.querySelector('#screen');return e?e.innerHTML.length:0})(),
   [...document.querySelectorAll('#reveal,#dlg')].map(e=>e.hidden?0:1).join('')])"""
 SKIP_ACTS = {'tab', 'closeSub', 'nextDay', 'peek', 'guide', 'book', 'settings', 'reset', 'resetNo'}
@@ -119,6 +120,8 @@ def _back_to(p, where, k=None):
     """put away whatever a press opened (a story panel, a reveal card, a sub-screen, a peek at the room) and come back to the
     shop (on tab k) or the prep screen — the way the player closes it, done directly so the sweep can go on"""
     p.settle()
+    # a question the press asked (換掉哪一道？ / are you sure?): the player answers no
+    p.ev("for(const a of ['menuSwapNo','resetNo','importNo','pasteCancel','cnCancel','ktCancel']){const e=[...document.querySelectorAll('[data-act='+a+']')].find(e=>e.offsetParent!==null);if(e)e.click()}")
     p.ev("try{if(typeof hideReveal==='function')hideReveal()}catch(e){};if(sub&&sub!=='pause'){sub=null}")
     if where == 'shop':
         if k:
@@ -164,25 +167,44 @@ def _sweep_tab(p, k, dead, tapped):
         _back_to(p, 'shop', k)
 
 
+def _new_game_shop(b, port, target, days=7):
+    """a new game played quickly to the shop after Day `days` (the fast bot serves; the fridge stocked as the game does on
+    Days 1–2) — a shop with almost everything still to buy"""
+    p = Player(b, port, target)
+    p.tap('[data-act=open]'); p.settle()
+    for _ in range(days):
+        p.ev("autoStock()"); p.start_day()
+        install_bot(p.g); p.ev("__bot(60000,1/30)"); p.ev("while(typeof DLG!=='undefined'&&DLG)dlgNext()")
+        p.ev("if(phase==='summary')showShop()")
+        if p.state()['day'] < days:
+            p.tap('#screen [data-act=nextDay]'); p.settle()
+    return p
+
+
 @test
 def qa_every_button_in_the_shop_does_something(b, port, target):
     """The rc6–rc8.5 lesson: the upstairs rooms' 訂購／動工 did nothing for months because every test called the purchase
-    function instead of pressing the button. Here every enabled button in every tab of the shop, on the late save, is
-    pressed by a finger, and something must happen (the money, the save, the sheet, a toast or a card)."""
-    p = Player(b, port, target, save=LATE)
+    function instead of pressing the button. Every enabled button in every tab of the shop is pressed by a finger, and
+    something must happen (the money, the save, the sheet, a toast or a card) — in a young restaurant's shop (Day 7: almost
+    everything still to buy) and in the late save's (Day 92: the rooms upstairs, the Lounge's furniture)."""
     dead, tapped = [], []
-    try:
-        p.tap('#screen [data-act=open]')
-        check(p.state()['phase'] == 'shop', f'the Day 92 save did not open in the shop: {p.state()}')
-        p.ev("S.money=Math.max(S.money,5e6)")   # enough to buy anything offered, so a refusal is never the reason
-        tabs = p.page.evaluate("()=>[...document.querySelectorAll('#screen .tabs [data-act=tab]')].filter(e=>!e.disabled).map(e=>e.dataset.k)")
-        for k in tabs:
-            _sweep_tab(p, k, dead, tapped)
-        check(len(tapped) >= 40, f'only {len(tapped)} buttons were pressed — the sweep did not see the shop')
-        check(not dead, f'{len(dead)} of {len(tapped)} buttons: ' + ' / '.join(dead[:8]))
-        check(not p.errors, p.errors[:3])
-    finally:
-        p.close()
+    for where in ('day7', 'day92'):
+        p = _new_game_shop(b, port, target) if where == 'day7' else Player(b, port, target, save=LATE)
+        try:
+            if where == 'day92':
+                p.tap('#screen [data-act=open]')
+            check(p.state()['phase'] == 'shop', f'{where}: not in the shop: {p.state()}')
+            p.ev("S.money=Math.max(S.money,5e6)")   # enough to buy anything offered, so a refusal is never the reason
+            tabs = p.page.evaluate("()=>[...document.querySelectorAll('#screen .tabs [data-act=tab]')].filter(e=>!e.disabled).map(e=>e.dataset.k)")
+            n0, d0 = len(tapped), len(dead)
+            for k in tabs:
+                _sweep_tab(p, k, dead, tapped)
+            dead[d0:] = [f'{where} › {x}' for x in dead[d0:]]
+            check(len(tapped) - n0 >= 15, f'{where}: only {len(tapped) - n0} buttons were pressed — the sweep did not see the shop')
+            check(not p.errors, p.errors[:3])
+        finally:
+            p.close()
+    check(not dead, f'{len(dead)} of {len(tapped)} buttons: ' + ' / '.join(dead[:8]))
 
 
 PREP_SKIP = SKIP_ACTS | {'start', 'toShop', 'discardAll', 'discardAsk', 'restock'}   # restock: pressed first, on its own
@@ -649,6 +671,25 @@ def qa_a_favourite_is_missed_only_when_it_is_off_the_menu(b, port, target):
         wrong = [t for t in said if any(n and n in t for n in menu_names) and ('沒有' in t)]
         check(said, 'no favourite line was tried (no regular has a favourite on this menu)')
         check(not wrong, f'said with the dish on the menu and in the fridge: {wrong[:3]}')
+    finally:
+        p.close()
+
+
+@test
+def qa_a_review_talks_about_the_food_not_the_glass(b, port, target):
+    """Known-open (WS6-06): a review names the first thing served — often the glass of wine poured with the dinner — as
+    the dish: 「氣泡酒的火候剛剛好」「黑皮諾好吃，盤子乾淨得像沒用過」 (6–10 of the last 100 reviews in the user's Day 86–92
+    saves). A dinner with a glass first and a dish after: the review speaks of the dish."""
+    p = Player(b, port, target, save=LATE)
+    try:
+        _to_service_from_late(p)
+        out = json.loads(p.ev("""JSON.stringify((()=>{const w=Object.keys(WINES)[0];const food=menuList().find(d=>DISH(d)&&DISH(d).cat==='main');const said=[];
+          for(let i=0;i<12;i++){const g={name:'T',size:2,type:'couple',cats:[],ticket:{items:[{d:w,st:'served',lbar:true},{d:food,st:'served'}]},table:null};
+            const r=addReview(g,5);if(r)said.push(r.txt)}   /* the journal keeps 80: count what is returned, not the list's length */
+          return {wine:dishName(w),food:dishName(food),said}})())"""))
+        named = [t for t in out['said'] if out['wine'] in t]
+        check(out['said'], 'no review was written')
+        check(not named, f'the review names the glass ({out["wine"]}) as the dish: {named[:2]}')
     finally:
         p.close()
 
