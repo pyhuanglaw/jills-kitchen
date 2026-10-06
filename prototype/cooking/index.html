@@ -181,6 +181,17 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .mode button{text-align:left;padding:10px 12px;border-radius:12px;background:var(--night2);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);font-weight:800}
 .mode button small{display:block;font-weight:600;font-size:11.5px;color:rgba(247,237,220,.7);margin-top:3px;line-height:1.4}
 .mode button.on{box-shadow:inset 0 0 0 2px var(--gold);background:rgba(201,154,69,.16)}
+.picks{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:12px 0;max-width:520px}
+.picks.two{grid-template-columns:1fr 1fr}
+.pk{display:grid;grid-template-columns:30px 1fr;grid-template-rows:auto auto;column-gap:8px;align-items:center;text-align:left;padding:9px 10px;border-radius:12px;background:var(--night2);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.picks.two .pk{grid-template-columns:1fr}
+.pk span{grid-row:1/3;font-size:24px}
+.pk b{font-weight:800;font-size:13.5px}
+.pk small{font-size:11px;color:rgba(247,237,220,.7);display:flex;gap:2px;align-items:center}
+.pk small i{font-style:normal;display:inline-block;min-width:13px;height:14px;line-height:14px;text-align:center;border-radius:3px;font-size:9px;font-weight:800;color:#1d1410;padding:0 1px}
+.pk small .par{display:inline-flex;flex-direction:column;gap:1px}
+.pk.on{box-shadow:inset 0 0 0 2px var(--gold);background:rgba(201,154,69,.16)}
+.btn:disabled{opacity:.45}
 .how{font-size:13px;color:rgba(247,237,220,.78);line-height:1.6;margin:6px 0 0;padding-left:18px}
 .small{font-size:12px;color:rgba(247,237,220,.6)}
 @media (prefers-reduced-motion:reduce){.it,.tray{transition:none}.hl,.it .bell,.it.burnt::after,.it.over .ring-fg{animation:none}}
@@ -308,7 +319,23 @@ const NIGHTS=[
   {k:4,n:'披薩窯',d:'披薩要過三站：鋪料、窯烤（很燙、很快）、切。沈晴接手咖啡。廚房更大，單更多。',dur:300,
    st:['wok','pot','pan','coffee','pantry','asm','oven','chill','pzbench','pzoven','board','shelf','trash'],dishes:{friedrice:1.8,pasta:1.8,coffee:2,chicken:1.8,burger:2,pudding:1.6,pizza:2.8},
    size:[.2,.5,.3],gap:[16,9.5],waiters:['小茉','Kai','Nina'],cooks:[{n:'阿德',line:['wok','pot','pan']}],barista:'沈晴'},
+  {k:5,n:'你的菜單',d:'自己選今晚的 3–5 道菜和要不要員工：廚房只放這些菜用得到的設備。試試看加一道菜，你的廚房多了什麼要排。',dur:300,
+   st:[],dishes:{},size:[.3,.48,.22],gap:[14,8.5],waiters:['小茉','Kai'],cooks:[],free:1},
 ];
+/* night 5: the stations follow the dishes — each dish brings its own work */
+const DISH_ST={friedrice:['wok'],pasta:['pot','pan'],coffee:['coffee'],chicken:['oven'],burger:['pan','oven','asm'],pudding:['chill'],pizza:['pzbench','pzoven','board']};
+function freeNight(sel){const N=NIGHTS[4];const st=new Set(['pantry','shelf','trash']);sel.dishes.forEach(d=>DISH_ST[d].forEach(x=>st.add(x)));
+  N.st=ORDER.filter(x=>st.has(x));N.dishes={};sel.dishes.forEach(d=>N.dishes[d]=d==='pudding'?1.6:2);N.cooks=sel.cook?[{n:'阿德',line:['wok','pot','pan']}]:[];N.barista=sel.barista&&sel.dishes.includes('coffee')?'沈晴':null;
+  const n=sel.dishes.length;N.gap=[16-n,10.5-n*.6];N.waiters=n>=4?['小茉','Kai','Nina']:['小茉','Kai'];return N}
+function chooseMenu(){const el=$('#lineChoice');el.hidden=false;const pick=new Set(store.get('freeMenu',['friedrice','pasta','burger','pizza']));let cook=store.get('freeCook',true),bar=store.get('freeBar',false);
+  const draw=()=>{el.innerHTML=`<div class="eyebrow">第 5 晚 · 你的菜單</div><h1>今晚賣什麼？</h1><p>選 3–5 道。每一道菜會把它用的設備帶進廚房；選的越多，同時要顧的就越多。</p>
+   <div class="picks">${Object.keys(DISH).map(d=>`<button class="pk ${pick.has(d)?'on':''}" data-pk="${d}"><span>${K[d].ic}</span><b>${K[d].n}</b><small>${pathHTML(DISH[d].path)}</small></button>`).join('')}</div>
+   <div class="picks two"><button class="pk ${cook?'on':''}" data-opt="cook"><b>阿德師傅</b><small>顧一條線，開店前選</small></button><button class="pk ${bar?'on':''}" data-opt="bar"><b>沈晴</b><small>咖啡整條交給她</small></button></div>
+   <div class="row"><button class="btn pri" id="goFree" ${pick.size<3||pick.size>5?'disabled':''}>開店（${pick.size} 道）</button><button class="btn" data-menu="1">回選單</button></div>`;
+   el.querySelectorAll('[data-pk]').forEach(b=>b.onclick=()=>{const d=b.dataset.pk;if(pick.has(d))pick.delete(d);else if(pick.size<5)pick.add(d);draw()});
+   el.querySelectorAll('[data-opt]').forEach(b=>b.onclick=()=>{if(b.dataset.opt==='cook')cook=!cook;else bar=!bar;draw()});
+   $('#goFree').onclick=()=>{if(pick.size<3||pick.size>5)return;store.set('freeMenu',[...pick]);store.set('freeCook',cook);store.set('freeBar',bar);el.hidden=true;freeNight({dishes:[...pick],cook,barista:bar});startNight(5)}};
+  draw()}
 
 /* ---------------------------------------------------------------- state */
 let G=null,stage,scale=1,speed=1,paused=false,muted=false;
@@ -337,10 +364,10 @@ function newGame(k,opt){
 const LINES={stove:{n:'爐台',st:['wok','pot','pan'],d:'炒鍋、湯鍋、平底鍋：好了的炒飯、麵、肉排，他拿去下一站或盤子'},
   oven:{n:'烤箱和組裝台',st:['oven','asm'],d:'烤雞、麵包、組好的漢堡：他拿去組裝台或盤子'},
   pizza:{n:'披薩線',st:['pzbench','pzoven','board'],d:'鋪好料的、烤好的、切好的披薩：他一站一站送，窯裡的不會焦'}};
-function chooseLine(){paused=true;const el=$('#lineChoice');el.hidden=false;const opts=Object.keys(LINES).filter(k=>LINES[k].st.every(x=>G.N.st.includes(x)));
+function chooseLine(){paused=true;const el=$('#lineChoice');el.hidden=false;const opts=Object.keys(LINES).filter(k=>LINES[k].st.some(x=>G.N.st.includes(x)));
   el.innerHTML=`<div class="eyebrow">第 ${G.k} 晚 · 開店前</div><h1>阿德師傅今晚顧哪一條線？</h1><p>他只收、只送：顧的那幾個設備上好了的東西，他會拿去下一站或盤子，焦了的丟掉。他不會自己下鍋——先做什麼還是你。</p>
    <div class="nights">${opts.map(k=>`<button class="night" data-line="${k}"><b>${LINES[k].n}</b><span>${LINES[k].d}</span></button>`).join('')}</div>`;
-  el.querySelectorAll('[data-line]').forEach(b=>b.addEventListener('click',()=>{const L=LINES[b.dataset.line];G.staff.filter(s=>s.role==='cook').forEach(s=>{s.line=L.st;const c=stCenter(L.st[0]);s.hx=Math.max(24,Math.min(336,c.x));s.hy=454;s.x=s.hx;s.y=s.hy});G.cookLine=b.dataset.line;el.hidden=true;paused=false;hint(null)}))}
+  el.querySelectorAll('[data-line]').forEach(b=>b.addEventListener('click',()=>{const L=LINES[b.dataset.line];G.staff.filter(s=>s.role==='cook').forEach(s=>{s.line=L.st.filter(x=>G.N.st.includes(x));const c=stCenter(L.st[0]);s.hx=Math.max(24,Math.min(336,c.x));s.hy=454;s.x=s.hx;s.y=s.hy});G.cookLine=b.dataset.line;el.hidden=true;paused=false;hint(null)}))}
 function genSched(N,R){
   const out=[],end=N.dur*.86;let t=N.tut?2:3;
   const names=Object.keys(N.dishes),wsum=names.reduce((a,d)=>a+N.dishes[d],0);
@@ -835,7 +862,8 @@ function menu(){
   const best=store.get('best',{});
   $('#nightList').innerHTML=NIGHTS.map(n=>`<button class="night" data-go="${n.k}"><em>第 ${n.k} 晚${best[n.k]?` · 最好 $${best[n.k].toLocaleString()}`:''}</em><b>${n.n}</b><span>${n.d}</span></button>`).join('');
 }
-function start(k){$('#menu').hidden=true;$('#sum').hidden=true;paused=false;$('#hPause').textContent='II';newGame(k);fit()}
+function startNight(k){$('#menu').hidden=true;$('#sum').hidden=true;paused=false;$('#hPause').textContent='II';newGame(k);fit()}
+function start(k){if(NIGHTS[k-1].free&&!$('#lineChoice').dataset.fromFree){$('#menu').hidden=true;$('#sum').hidden=true;chooseMenu();return}startNight(k)}
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){audioInit();start(+g.dataset.go);return}if(e.target.closest('[data-menu]'))menu()});
 function modeUI(){$('#modeQuick').classList.toggle('on',QUICK);$('#modeHand').classList.toggle('on',!QUICK);
   $('#how1').innerHTML=QUICK?'點下面<b>單子上的菜</b>（或冰箱的食材）：它會自己下鍋、自己煮。':'點<b>冰箱的食材</b>（或單子上的菜），再點<b>設備</b>：它就開始自己煮。';
@@ -860,6 +888,6 @@ window.__cook={get G(){return G},start:(k,o)=>{$('#menu').hidden=true;$('#sum').
   setSpeed:v=>{speed=v},move:(src,dest)=>{if(src.it&&typeof src.it==='string')src={it:G.items.get(src.it)};const ok=move(src,dest);if(ok)tutEvent('moved');return ok},
   canGo:(src,dest)=>{if(src.it&&typeof src.it==='string')src={it:G.items.get(src.it)};return canGo(src,dest)},
   step:(sec)=>{let left=sec;while(left>0){const s=Math.min(.05,left);update(s);left-=s}render()},pause:v=>{paused=v},
-  seen,nightDefs:NIGHTS,nextStOf,DISH,PR,ASM,K};
+  seen,nightDefs:NIGHTS,nextStOf,DISH,PR,ASM,K,freeNight};
 })();
 </script>

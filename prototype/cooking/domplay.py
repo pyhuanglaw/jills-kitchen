@@ -37,6 +37,7 @@ with sync_playwright() as pw:
     pg.goto('file://' + os.path.join(HERE, 'index.html')); pg.wait_for_timeout(300)
     if not A.tut: pg.evaluate("try{localStorage.setItem('jkcook.seen',JSON.stringify(['take','wait','serve','out','two','two2','fill','together','free','over','burnt','oven','asm','cook','ahead','pizza','barista']))}catch(e){}")
     pg.click(f'[data-go="{A.night}"]'); pg.wait_for_timeout(200)
+    if pg.locator('[data-line]').count(): pg.click('[data-line]'); pg.wait_for_timeout(100)
     pg.evaluate(f"__cook.setSpeed({A.speed})")
     t0 = time.time(); moves = fails = drags = 0; log = []; shot_i = 0
     rnd = random.Random(3)
