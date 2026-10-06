@@ -53,8 +53,8 @@
   $120,000 調整為 $80,000」。玩家會看到：《看看》最後一句是「隔壁，Jill 決定接下來。簽約和改裝在「升級餐廳 › 店舖工程」。」，不再跳
   「接下隔壁／再想想」卡片；當天店舖工程就有 Lounge，卡片依序顯示「Madame Lin 做到 Day N」→（她最後一晚後）「需要擴建到 Jill's Fine
   Dining」或「簽約・開工 $80,000」＋還差多少。Lounge II／III 價格不變。舊存檔（選過「再想想」、卡片沒回答、在《看看》和卡片之間存的檔）
-  讀檔時當作《看看》那天決定接（`linDecMig`），工程頁直接是「簽約・開工」。相關測試通過（新測試
-  `v24_lounge_decided_at_the_viewing_no_card_and_lounge_one_is_80000`，以及隔壁／Lounge／手冊相關的 28 個）。新玩家時間表（三個種子，
+  讀檔時當作《看看》那天決定接（`linDecMig`），工程頁直接是「簽約・開工」。隔壁／Lounge／手冊相關的 28 個測試通過（含新測試
+  `v24_lounge_decided_at_the_viewing_no_card_and_lounge_one_is_80000`）。新玩家時間表（三個種子，
   沒送錢、沒改經濟）：《看看》Day 36–37、她最後一晚 Day 44、存到 $80,000 Day 60–66、Lounge 開幕 Day 63–69（原本 $120,000 是 Day 80）；
   `docs/evidence/lounge_decided_2026-10-06/`。使用者說「發布」時：合回 `main` → 完整回歸 → 發布。
 
