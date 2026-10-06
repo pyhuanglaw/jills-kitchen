@@ -670,20 +670,28 @@ def qa_photos_of_jills_room_are_taken_in_her_room(b, port, target):
 
 @test
 def qa_a_favourite_is_missed_only_when_it_is_off_the_menu(b, port, target):
-    """Known-open (N02): a regular whose favourite IS on today's menu and in the fridge says 「香煎鴨胸今天沒有喔？那我看看
-    別的。」 because the line looks at the order, not the menu (Sophie, Mia, 小林 in one week; the user, rc8.3:
-    「Sophie連續兩天說沒有香煎鴨胸很白癡」)."""
+    """N02 (fixed 2026-10-06): a regular whose favourite IS on today's menu and in the fridge said 「香煎鴨胸今天沒有喔？那我
+    看看別的。」 because the line looked at the order, not the menu (Sophie, Mia, 小林 in one week; the user, rc8.3:
+    「Sophie連續兩天說沒有香煎鴨胸很白癡」) — and in the Lounge, whose list is the bar's, about the dinner dish. Every
+    favourite the restaurant has: on the menu (and in the fridge) nobody says it is not on, in the Lounge nobody says it,
+    taken off the menu it is said (the line still exists where it is true)."""
     p = Player(b, port, target, save=LATE)
     try:
         _to_service_from_late(p)
-        said = p.ev("""(()=>{const out=[];const q0=quote;quote=function(g,t,o){out.push(t);return true};const r0=Math.random;Math.random=()=>0;
-          try{for(const id of Object.keys(LOVES)){const L=LOVES[id];const d=L.d;if(!menuList().includes(d))continue;S.stock[d]=Math.max(5,S.stock[d]||0);
-            S.regulars[id]=Math.max(4,S.regulars[id]||0);S.loveMiss={};R.loveSaid=0;const other=menuList().find(x=>x!==d&&DISH(x).cat==='main')||menuList().find(x=>x!==d);
-            loveOrdered({reg:id,regs:[id],size:1,name:id},{items:[{d:other}]})}}finally{quote=q0;Math.random=r0}return out})()""")
+        out = json.loads(p.ev("""JSON.stringify((()=>{const out={on:[],off:[],lounge:[]};let cur='on';const q0=quote;quote=function(g,t,o){out[cur].push(t);return true};const r0=Math.random;Math.random=()=>0;
+          const menu0=S.menu.slice();const w=Object.keys(WINES)[0];
+          try{for(const id of Object.keys(LOVES)){const L=LOVES[id];const d=L.d;if(!S.unlocked.includes(d)||!S.menu.includes(d))continue;
+            S.regulars[id]=Math.max(4,S.regulars[id]||0);S.stock[d]=Math.max(5,S.stock[d]||0);const g={reg:id,regs:[id],size:1,name:id};
+            const other=menuList().find(x=>x!==d&&baseOf(x)!==d&&DISH(x).cat==='main')||menuList().find(x=>x!==d);
+            const ask=(k,tk)=>{cur=k;S.loveMiss={};R.loveSaid=0;loveOrdered(g,tk)};
+            ask('on',{items:[{d:other}]});ask('lounge',{lounge:1,items:[{d:w,lbar:1}]});
+            S.menu=S.menu.filter(x=>x!==d&&baseOf(x)!==d);ask('off',{items:[{d:other}]});S.menu=menu0.slice()}}
+          finally{quote=q0;Math.random=r0;S.menu=menu0}return out})())"""))
         menu_names = p.ev("menuList().map(dishName)")
-        wrong = [t for t in said if any(n and n in t for n in menu_names) and ('沒有' in t)]
-        check(said, 'no favourite line was tried (no regular has a favourite on this menu)')
+        wrong = [t for t in out['on'] if '沒有' in t and any(n and n in t for n in menu_names)]
+        check(out['off'], 'no favourite was ever missed, even off the menu (the test did not reach the line)')
         check(not wrong, f'said with the dish on the menu and in the fridge: {wrong[:3]}')
+        check(not [t for t in out['lounge'] if '沒有' in t], f'said in the Lounge about the dinner dish: {out["lounge"][:3]}')
     finally:
         p.close()
 

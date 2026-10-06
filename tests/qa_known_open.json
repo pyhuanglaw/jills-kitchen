@@ -59,11 +59,6 @@
     "since": "2026-10-06",
     "what": "Jill 房間沙發的那幾種照片拍成主廳"
   },
-  "qa_a_favourite_is_missed_only_when_it_is_off_the_menu": {
-    "finding": "N02",
-    "since": "2026-10-06",
-    "what": "熟客說「今天沒有○○」，其實那道菜在菜單上、也有貨"
-  },
   "qa_a_new_game_gets_no_old_version_notes": {
     "finding": "WS1-06",
     "since": "2026-10-06",
