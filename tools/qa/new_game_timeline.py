@@ -11,7 +11,12 @@ conditions; at the end the first day of every beat. Report, not a test: one seed
 With the bar next door on the works page, each day also prints what its card says (her last night, the level, the money,
 簽約・開工), and at the end the days of 《看看》, her last night, the money for Lounge I, the signing and the opening.
 
-  python3 tools/qa/new_game_timeline.py [--days 100] [--seed 300] [--reserve 80000] [--json out.json]
+  python3 tools/qa/new_game_timeline.py [--days 100] [--seed 300] [--reserve 80000] [--json out.json] [--what-if JS]
+
+At the end: the Lounge's days (《看看》, the rating 4.0, the first day with the money, paid, 《簽約》, the opening), the seven
+days after the opening (the till and the day's money in and out), and the first day of each line that needs The Lounge.
+--what-if JS: a balance question asked of the simulation only — the snippet runs in the page before Day 1 (e.g.
+"RENT.lounge=1000"); it never changes the game's files. Leave it out for the game as it is.
 """
 import sys, os, json, time, argparse
 ROOT = os.environ.get('JK_ROOT') or os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -19,7 +24,7 @@ sys.path.insert(0, os.path.join(ROOT, 'tests'))
 import run_tests as rt
 from playwright.sync_api import sync_playwright
 ap = argparse.ArgumentParser(); ap.add_argument('--days', type=int, default=70); ap.add_argument('--seed', type=int, default=300); ap.add_argument('--json', default=None)
-ap.add_argument('--reserve', type=int, default=80000)
+ap.add_argument('--reserve', type=int, default=80000); ap.add_argument('--what-if', dest='what_if', default='')
 A = ap.parse_args()
 RESERVE = A.reserve
 SEED = "Math.random=(function(){let a=%d;return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}})()"
@@ -42,6 +47,8 @@ def main():
             g.ev(f"(()=>{{const el=document.createElement('button');el.dataset.act='{a}';{ds}$('#screen').appendChild(el);el.click();el.remove()}})()")
             g.ev("__tick(30);if(typeof hideReveal==='function')try{hideReveal()}catch(e){};for(let i=0;i<80&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}")
         g.click('[data-act=open]'); g.ev("window.__fastSay=1")
+        if A.what_if: g.ev(A.what_if); print('WHAT-IF (the simulation only):', A.what_if, flush=True)
+        paid_day = None
         g.ev("window.__notes=[];const __nl=noteLine;noteLine=function(t){__notes.push({d:S.day,t});return __nl.apply(this,arguments)}")
         for day in range(1, A.days + 1):
             g.ev("for(let i=0;i<80&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}")
@@ -65,14 +72,14 @@ def main():
             info = json.loads(g.ev("""JSON.stringify({day:S.day,money:S.money,lv:S.level,crew:(S.crew||[]).length,
                dy:S.dylan?{stage:S.dylan.stage,reveal:S.dylan.reveal||null,v:S.regulars.dylan||0,stay:S.dylan.stay||0,clues:Object.keys(S.dylan.clues||{}).filter(k=>S.dylan.clues[k]>0).length,sofa:(S.life&&S.life.sofa)||0}:null,
                beats:(story().trace||[]).filter(t=>t.d===S.day).map(t=>t.lane[0]+':'+t.k),
-               lounge:typeof loungeLv==='function'?loungeLv():0,up:!!(S.rooms&&S.rooms.up),sr:typeof srStage==='function'?srStage():0,pd:typeof pdStage==='function'?pdStage():0,
+               rate:+rating().toFixed(2),rate1:+rating().toFixed(1),lounge:typeof loungeLv==='function'?loungeLv():0,up:!!(S.rooms&&S.rooms.up),sr:typeof srStage==='function'?srStage():0,pd:typeof pdStage==='function'?pdStage():0,
                sum:(L=>L?{rev:L.rev,tips:L.tips,bonus:L.bonus,cost:L.cost,wages:L.wages,rent:L.rent,wine:L.wine,cfee:L.cfee,loan:L.loan,net:L.net,guests:L.guests,lost:L.lost,lg:L.lg?{tabs:L.lg.tabs,rev:L.lg.rev}:null}:null)(S.lastSummary),
                lin:typeof linWorksCard==='function'&&fact('lounge_project')&&!loungeLv()?{state:(S.loungeProj||{}).state||null,cost:LOUNGE_PROJ[0].cost,
                  card:linWorksCard(S.money,(c,a,e,l)=>(l||'')+' '+fmt(c)+(S.money>=c?'':'（不夠）')).replace(/.*<div class="act">/,'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim()}:null})"""))
             rows.append(info)
             sm = info.get('sum') or {}
             day_money = f"淨 {sm.get('net', 0):+} (收 {sm.get('rev', 0)}+{sm.get('tips', 0)}，貨 {sm.get('cost', 0)}，薪 {sm.get('wages', 0)}，租 {sm.get('rent', 0)}，酒 {sm.get('wine', 0)}" + (f"，Lounge {sm['lg']['tabs']} 桌 {sm['lg']['rev']}" if sm.get('lg') else '') + ")"
-            print(f"Day {info['day']:3d} lv{info['lv']} crew {info['crew']:2d} ${info['money']:>8} {day_money} dylan {info['dy']} lounge {info['lounge']} up {int(info['up'])} sr {info['sr']} pd {info['pd']} | {' '.join(info['beats'])}" + (f" | 工程頁：{info['lin']['card']}" if info.get('lin') else ''), flush=True)
+            print(f"Day {info['day']:3d} lv{info['lv']} ★{info['rate1']} crew {info['crew']:2d} ${info['money']:>8} {day_money} dylan {info['dy']} lounge {info['lounge']} up {int(info['up'])} sr {info['sr']} pd {info['pd']} | {' '.join(info['beats'])}" + (f" | 工程頁：{info['lin']['card']}" if info.get('lin') else ''), flush=True)
             # a person reads the summary and shops for a while: the evening goes on behind the card (Jill's sofa, Dylan)
             g.ev("for(let i=0;i<40*30;i++)__tick(1000/30)")
             if g.ev("phase") == 'summary': g.click('[data-act=toShop]')
@@ -85,6 +92,7 @@ def main():
                 for a, kv in GROW:
                     story = a in ('linTake', 'linSign', 'buyLounge', 'buyUp', 'buySR', 'buyPD')
                     if story or (not saving and g.ev("S.money") > RESERVE): act(a, **kv)
+            if paid_day is None and g.ev("!!S.loungeProj&&S.loungeProj.state==='signing'"): paid_day = day
             g.click('[data-act=nextDay]'); g.ev("__tick(100)")
         first = {}
         for r in rows:
@@ -95,14 +103,37 @@ def main():
         proj = next((r['day'] for r in rows if r.get('lin')), None)
         cost = next((r['lin']['cost'] for r in rows if r.get('lin')), None)
         rich = next((r['day'] for r in rows if proj and r['day'] >= proj and cost and r['money'] >= cost and not r['lounge']), None)
+        opened = next((r['day'] for r in rows if r['lounge']), None)
         lounge = {'看看': first.get('lin_viewing'), '工程頁有 Lounge': proj, '最後一晚': first.get('lin_last'), '等級 4': next((r['day'] for r in rows if r['lv'] >= 4), None),
-                  f'存到 ${cost:,}' if cost else '存到': rich,   # paid in the shop that evening; 《簽約》 is the next opening
-                  '《簽約》': first.get('lin_sign'), 'The Lounge 開幕': next((r['day'] for r in rows if r['lounge']), None)}
+                  '評分 4.0': next((r['day'] for r in rows if r.get('rate1', 0) >= 4.0), None),
+                  f'第一次有 ${cost:,}' if cost else '第一次有': next((r['day'] for r in rows if cost and r['money'] >= cost), None),
+                  f'《看看》後第一次有 ${cost:,}' if cost else '存到': rich,
+                  '付錢（簽約・開工）': paid_day, '《簽約》': first.get('lin_sign'), 'The Lounge 開幕': opened}
+        rate_on = lambda d: next((r['rate1'] for r in rows if r['day'] == d), None)
+        span = [r['rate1'] for r in rows if proj and r['day'] >= proj and (not opened or r['day'] <= opened)]
+        # the rating moves with the last reviews: the first days' few reviews make Day 1 read high, so what matters is
+        # where it is when the money is there
+        lounge.update({'《看看》那天評分': rate_on(first.get('lin_viewing')), '付錢那天評分': rate_on(paid_day), '《看看》到開幕最低評分': min(span) if span else None})
         print('THE LOUNGE:', json.dumps(lounge, ensure_ascii=False))
+        after = [{'day': r['day'], 'money': r['money'], **{k: (r.get('sum') or {}).get(k) for k in ('net', 'rev', 'tips', 'cost', 'wages', 'rent', 'wine')},
+                  'lounge_tabs': ((r.get('sum') or {}).get('lg') or {}).get('tabs'), 'lounge_rev': ((r.get('sum') or {}).get('lg') or {}).get('rev')}
+                 for r in rows if opened and opened - 1 <= r['day'] <= opened + 7]
+        print('AROUND THE OPENING (the day before, the opening day, seven more):')
+        for x in after:
+            print(f"  Day {x['day']:3d} ${x['money']:>7}  淨 {x['net'] or 0:+6}  收 {(x['rev'] or 0) + (x['tips'] or 0):>6}（Lounge {x['lounge_tabs'] or 0} 桌 {x['lounge_rev'] or 0}）  貨 {x['cost'] or 0:>5}  薪 {x['wages'] or 0:>5}  租 {x['rent'] or 0:>5}  酒 {x['wine'] or 0:>5}")
+        LINES = [('Lounge 第一晚（Ken 和杜）', 'lounge_first_night'), ('Ken 第一次坐進 Lounge', 'ken_lounge'), ('Ken 提議品酒', 'ken_propose'),
+                 ('第一次品酒之夜', 'ken_t1'), ('第二次品酒之夜', 'ken_t2'), ('第三次品酒之夜', 'ken_t3'), ('Ken：做一支我們自己的', 'ken_collab'),
+                 ('樣酒', 'ken_samples'), ('「晚餐之後」上酒單', 'ken_wine'), ('Ken 和杜：固定的位子', 'kd_usual'), ('Evan：「杜來了嗎？」', 'kd_evan_1'),
+                 ('Madame Lin 來當客人', 'lin_guest'), ('晴 × 阿拓 開始', 'qt_1'), ('晴 × 阿拓：今天喝？', 'qt_drink'), ('晴 × 阿拓：講完', 'qt_said'),
+                 ('予安 開始', 'ya_1'), ('予安：「星期幾？」', 'ya_join')]
+        lines = {n: first.get(k) for n, k in LINES}
+        lines.update({'Lounge II': next((r['day'] for r in rows if r['lounge'] >= 2), None), 'Lounge III': next((r['day'] for r in rows if r['lounge'] >= 3), None),
+                      '二樓': next((r['day'] for r in rows if r['up']), None)})
+        print('THE LINES THAT NEED THE LOUNGE (first day):', json.dumps(lines, ensure_ascii=False))
         notes = [n for n in json.loads(g.ev("JSON.stringify(__notes)")) if any(w in n['t'] for w in ('隔壁', 'Lounge', '簽約'))]
         print('LINES ABOUT IT:', json.dumps(notes, ensure_ascii=False))
         print('page errors:', g.errors[:5])
-        if A.json: json.dump({'rows': rows, 'first': first, 'lounge': lounge, 'notes': notes, 'errors': g.errors[:20]}, open(A.json, 'w'), ensure_ascii=False, indent=1)
+        if A.json: json.dump({'rows': rows, 'first': first, 'lounge': lounge, 'after': after, 'lines': lines, 'what_if': A.what_if, 'notes': notes, 'errors': g.errors[:20]}, open(A.json, 'w'), ensure_ascii=False, indent=1)
         g.close(); b.close(); srv.shutdown()
     print(f'{A.days} days in {time.time()-t0:.0f}s')
 if __name__ == '__main__':
