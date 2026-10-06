@@ -75,6 +75,11 @@ def init_script(seed=None, manual=False, audio=False):
           for(;;){let k=-1;for(let i=0;i<timers.length;i++)if(timers[i].at<=end&&(k<0||timers[i].at<timers[k].at))k=i;if(k<0)break;
             const t=timers.splice(k,1)[0];now=Math.max(now,t.at);t.fn.apply(null,t.a)}
           now=end;const q=__rafQ.splice(0);for(const cb of q){__stats.rafOut--;cb(now)}};
+        // the clock and the game's timers only, no frame drawn (tools/qa/sim_player.py steps the game's own loop itself)
+        window.__advance=function(ms){const end=now+ms;
+          for(;;){let k=-1;for(let i=0;i<timers.length;i++)if(timers[i].at<=end&&(k<0||timers[i].at<timers[k].at))k=i;if(k<0)break;
+            const t=timers.splice(k,1)[0];now=Math.max(now,t.at);t.fn.apply(null,t.a)}
+          now=end};
       }
     })();""" % ('true' if manual else 'false'))
     return '\n'.join(parts)
@@ -3908,6 +3913,7 @@ import v23_tests  # noqa: E402,F401
 # v2.4: Staff Lives foundations and stories (tests/v24_tests.py)
 import v24_tests  # noqa: E402,F401
 import qa_tests  # noqa: E402,F401   (the routine QA, docs/QA.md: `--qa` runs only these)
+import sim_player_tests  # noqa: E402,F401   (the simulated player's own tests: tools/qa/sim_player.py)
 
 def main():
     ap = argparse.ArgumentParser()
