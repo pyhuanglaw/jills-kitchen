@@ -17,6 +17,8 @@ At the end: the Lounge's days (《看看》, the rating 4.0, the first day with 
 days after the opening (the till and the day's money in and out), and the first day of each line that needs The Lounge.
 --what-if JS: a balance question asked of the simulation only — the snippet runs in the page before Day 1 (e.g.
 "RENT.lounge=1000"); it never changes the game's files. Leave it out for the game as it is.
+--lounge-buffer N: another what-if, of the player — Lounge I is signed only with N more than its price in the till
+(a player who heeds a warning about the days after). Leave it out for the player of every other run.
 """
 import sys, os, json, time, argparse
 ROOT = os.environ.get('JK_ROOT') or os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -24,7 +26,7 @@ sys.path.insert(0, os.path.join(ROOT, 'tests'))
 import run_tests as rt
 from playwright.sync_api import sync_playwright
 ap = argparse.ArgumentParser(); ap.add_argument('--days', type=int, default=70); ap.add_argument('--seed', type=int, default=300); ap.add_argument('--json', default=None)
-ap.add_argument('--reserve', type=int, default=80000); ap.add_argument('--what-if', dest='what_if', default='')
+ap.add_argument('--reserve', type=int, default=80000); ap.add_argument('--what-if', dest='what_if', default=''); ap.add_argument('--lounge-buffer', dest='buffer', type=int, default=0)
 A = ap.parse_args()
 RESERVE = A.reserve
 SEED = "Math.random=(function(){let a=%d;return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}})()"
@@ -34,7 +36,9 @@ GROW = [('expand', {}), ('buyProject', {'k': 'side'}), ('buyProject', {'k': 'kex
         ('hire', {'k': 'chef'}), ('hire', {'k': 'cleaner'}), ('buyTable', {}), ('buySideTable', {}), ('buyEq', {'k': 'bar'}), ('buyEq', {'k': 'oven'}),
         # the story's offers, taken when there (each a no-op otherwise; 'linTake' is rc8.5's 「接下隔壁」 — since 2026-10-06
         # 《看看》 decides it and the button is gone)
-        ('linTake', {}), ('linSign', {}), ('buyLounge', {'k': '1'}), ('buyLounge', {'k': '2'}), ('buyLounge', {'k': '3'}),
+        # Lounge I is 簽約・開工 (linSign): the game has no button 「buyLounge 1」 (pressing one built Lounge I around the story
+        # once its level requirement went, 2026-10-06 — the game now refuses it too)
+        ('linTake', {}), ('linSign', {}), ('buyLounge', {'k': '2'}), ('buyLounge', {'k': '3'}),
         ('buyUp', {}), ('buySR', {'k': '2'}), ('buySR', {'k': '3'}), ('buyPD', {'k': '1'}), ('buyPD', {'k': '2'}), ('buyPD', {'k': '3'})]
 def main():
     t0 = time.time(); rows = []
@@ -48,6 +52,7 @@ def main():
             g.ev("__tick(30);if(typeof hideReveal==='function')try{hideReveal()}catch(e){};for(let i=0;i<80&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}")
         g.click('[data-act=open]'); g.ev("window.__fastSay=1")
         if A.what_if: g.ev(A.what_if); print('WHAT-IF (the simulation only):', A.what_if, flush=True)
+        if A.buffer: print(f'WHAT-IF (the player): Lounge I only with ${A.buffer:,} more than its price', flush=True)
         paid_day = None
         g.ev("window.__notes=[];const __nl=noteLine;noteLine=function(t){__notes.push({d:S.day,t});return __nl.apply(this,arguments)}")
         for day in range(1, A.days + 1):
@@ -90,6 +95,7 @@ def main():
                 # …and once the story offers a place (Madame Lin's bar, the second floor), saves up for it first
                 saving = g.ev("(fact('lounge_project')&&!loungeLv())||(fact('up_ask')&&!(S.rooms&&S.rooms.up))")
                 for a, kv in GROW:
+                    if a == 'linSign' and A.buffer and g.ev("S.money") < g.ev("LOUNGE_PROJ[0].cost") + A.buffer: continue
                     story = a in ('linTake', 'linSign', 'buyLounge', 'buyUp', 'buySR', 'buyPD')
                     if story or (not saving and g.ev("S.money") > RESERVE): act(a, **kv)
             if paid_day is None and g.ev("!!S.loungeProj&&S.loungeProj.state==='signing'"): paid_day = day
@@ -133,7 +139,7 @@ def main():
         notes = [n for n in json.loads(g.ev("JSON.stringify(__notes)")) if any(w in n['t'] for w in ('隔壁', 'Lounge', '簽約'))]
         print('LINES ABOUT IT:', json.dumps(notes, ensure_ascii=False))
         print('page errors:', g.errors[:5])
-        if A.json: json.dump({'rows': rows, 'first': first, 'lounge': lounge, 'after': after, 'lines': lines, 'what_if': A.what_if, 'notes': notes, 'errors': g.errors[:20]}, open(A.json, 'w'), ensure_ascii=False, indent=1)
+        if A.json: json.dump({'rows': rows, 'first': first, 'lounge': lounge, 'after': after, 'lines': lines, 'what_if': A.what_if, 'buffer': A.buffer, 'notes': notes, 'errors': g.errors[:20]}, open(A.json, 'w'), ensure_ascii=False, indent=1)
         g.close(); b.close(); srv.shutdown()
     print(f'{A.days} days in {time.time()-t0:.0f}s')
 if __name__ == '__main__':
