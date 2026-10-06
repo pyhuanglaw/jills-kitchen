@@ -2,7 +2,7 @@
    at once), looks after the kitchen in the order a careful player would. It plays through window.__cook (the same
    moves a tap makes), in game time, so a whole night takes a second. Used by playtest.py; not loaded by the page. */
 window.__botRun=function(k,opt){
-  opt=opt||{};const C=window.__cook;C.pause(true);C.start(k,opt.lines?{seed:opt.seed||7,noTut:opt.noTut,lines:opt.lines}:{seed:opt.seed||7,noTut:opt.noTut,line:opt.line||'stove'});
+  opt=opt||{};const C=window.__cook;C.pause(true);C.start(k,opt.lines?{seed:opt.seed||7,noTut:opt.noTut,lines:opt.lines,busy:!!opt.busy}:{seed:opt.seed||7,noTut:opt.noTut,line:opt.line||'stove',busy:!!opt.busy});
   if(opt.noCook){C.G.staff=C.G.staff.filter(s=>s.role==='waiter');C.G.staff.forEach(()=>{});document.querySelectorAll('.pp.cook,.pp.barista').forEach(e=>e.remove())}
   const G=()=>C.G,react=opt.react||.8,its=()=>[...G().items.values()];
   let next=0,acts=0;const log=[];

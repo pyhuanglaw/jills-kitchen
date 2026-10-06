@@ -42,8 +42,9 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
   background:rgba(201,154,69,.12);border-bottom:1px solid rgba(201,154,69,.18)}
 #hint.quiet{color:rgba(247,237,220,.62);background:transparent}
 #hint b{color:var(--gold)}
+#hint .lg{display:inline-flex;align-items:baseline;gap:1px;margin-right:9px;white-space:nowrap}#hint .lg small{font-size:11px;font-weight:800;color:rgba(247,237,220,.7);font-variant-numeric:tabular-nums}
 
-#wrap{flex:1 1 auto;position:relative;min-height:0}
+#wrap{flex:1 1 auto;position:relative;min-height:0;padding-bottom:env(safe-area-inset-bottom,0px)}
 #stage{position:absolute;top:0;left:0;width:360px;height:630px;transform-origin:0 0;touch-action:none}
 
 /* the kitchen floor and counters */
@@ -109,11 +110,13 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 /* food */
 .it{position:absolute;left:0;top:0;width:44px;height:44px;border-radius:50%;cursor:pointer;transition:transform .34s cubic-bezier(.3,.7,.25,1.15);z-index:3}
 .it.carried{transition:none}
+.it.busy{pointer-events:none}   /* cooking or being put together: nothing to pick up, and a tap goes to what is under it (the bin it just left) */
 .it .sec{position:absolute;left:50%;top:-12px;transform:translateX(-50%);font-size:9.5px;font-weight:800;color:var(--paper);background:rgba(20,28,30,.78);border-radius:5px;padding:0 4px;line-height:13px;pointer-events:none;font-variant-numeric:tabular-nums;white-space:nowrap}
 .it svg{position:absolute;inset:0;overflow:visible;pointer-events:none}
 .it .ic{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:24px;line-height:1;pointer-events:none}
 .it.plate .ic::before{content:'';position:absolute;width:34px;height:34px;border-radius:50%;background:#f8f3ea;box-shadow:inset 0 0 0 2px #e4dccd;z-index:-1}
 .it.raw .ic{filter:saturate(.35) brightness(1.05)}
+.it.k-coffee.plate .ic::before{background:#a8714a;box-shadow:inset 0 0 0 2px #8a5a38}   /* a white cup on a white plate could not be seen */
 .it.k-patty_c .ic,.it.k-bun_t .ic{filter:sepia(.55) saturate(1.4) brightness(.82)}
 .it.k-chicken_r .ic{filter:hue-rotate(-20deg) saturate(.4) brightness(1.25)}
 .it.burnt .ic{filter:grayscale(1) brightness(.35)}
@@ -128,7 +131,8 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 /* the pass */
 #passbar{position:absolute;left:0;top:474px;width:360px;height:156px;border-radius:14px;background:linear-gradient(#5b4a35,#4a3b2a);box-shadow:inset 0 2px 0 rgba(255,255,255,.08)}
 #passbar .lamp{position:absolute;left:10px;right:10px;top:4px;height:8px;border-radius:4px;background:linear-gradient(90deg,#ffb35b33,#ffcf7a88,#ffb35b33);filter:blur(1px)}
-#passbar .pl{position:absolute;right:10px;top:14px;font-size:10px;font-weight:800;letter-spacing:.1em;color:rgba(247,237,220,.55)}
+#passbar .pl{position:absolute;right:10px;top:14px;font-size:10px;font-weight:800;letter-spacing:.1em;color:rgba(247,237,220,.55);transition:opacity .2s}
+#passbar.full .pl{opacity:0}
 #door{position:absolute;right:8px;top:478px;font-size:10px;color:rgba(247,237,220,.7);font-weight:800}
 .tray{position:absolute;top:484px;width:67px;height:138px;border-radius:10px;background:#efe5d3;color:var(--ink);transition:left .3s ease,opacity .3s,transform .3s;box-shadow:0 2px 0 rgba(0,0,0,.3);cursor:pointer}
 .tray .tno{position:absolute;left:6px;top:9px;font-weight:800;font-size:11px}
@@ -138,8 +142,9 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .tray .pat i.mid{background:#d9a13a}.tray .pat i.low{background:var(--tomato)}
 .tray .ds{position:absolute;left:4px;width:59px;height:31px}
 .tray .ds .gh{position:absolute;left:0;top:2px;width:28px;height:28px;border-radius:50%;background:#e2d6c1;display:flex;align-items:center;justify-content:center;font-size:15px;filter:grayscale(.9) opacity(.55)}
-.tray .ds .pth{position:absolute;left:29px;top:3px;right:-3px;height:26px;display:flex;gap:1px;align-items:center;font-size:7px;color:var(--ink2);line-height:1}
-.tray .ds .pth i{font-style:normal;display:inline-block;width:10px;height:12px;line-height:12px;text-align:center;border-radius:3px;font-size:7.5px;font-weight:800;color:#1d1410;flex:0 0 auto}
+.tray .ds .gh.g-coffee{background:#9c8672;filter:grayscale(.6) opacity(.7)}
+.tray .ds .pth{position:absolute;left:29px;top:2px;right:-5px;height:28px;display:flex;gap:1px;align-items:center;font-size:7px;color:var(--ink2);line-height:1}
+.tray .ds .pth i{font-style:normal;display:inline-block;width:11px;height:13px;line-height:13px;text-align:center;border-radius:3px;font-size:9px;font-weight:800;color:#1d1410;flex:0 0 auto}
 .tray .ds .pth .par{display:flex;flex-direction:column;gap:1px}
 .tray .ds.filled .gh{filter:none;opacity:0}
 .tray.done{background:#f6edc8;box-shadow:0 0 0 2px var(--gold),0 2px 0 rgba(0,0,0,.3)}
@@ -157,8 +162,10 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .pp.out{opacity:0}
 
 /* pops */
-.pop{position:absolute;font-weight:800;font-size:12px;pointer-events:none;z-index:9;animation:pop 1.3s ease-out forwards;white-space:nowrap;text-shadow:0 1px 2px rgba(0,0,0,.6)}
-@keyframes pop{0%{opacity:0;transform:translateY(4px)}15%{opacity:1}100%{opacity:0;transform:translateY(-26px)}}
+.pop{position:absolute;font-weight:800;font-size:12px;line-height:15px;pointer-events:none;z-index:9;animation:pop 1.3s ease-out forwards;white-space:nowrap;text-align:center;
+  padding:2px 7px;border-radius:9px;background:rgba(20,28,30,.92);box-shadow:0 2px 6px rgba(0,0,0,.35);transform:translateX(-50%)}
+.pop i{font-style:normal;display:block;font-size:10.5px;letter-spacing:1px}
+@keyframes pop{0%{opacity:0;transform:translate(-50%,4px)}15%{opacity:1}100%{opacity:0;transform:translate(-50%,-26px)}}
 .drag{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;font-size:26px;display:flex;align-items:center;justify-content:center;z-index:20;pointer-events:none;filter:drop-shadow(0 6px 6px rgba(0,0,0,.5))}
 
 /* overlays */
@@ -194,6 +201,10 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .btn:disabled{opacity:.45}
 .how{font-size:13px;color:rgba(247,237,220,.78);line-height:1.6;margin:6px 0 0;padding-left:18px}
 .small{font-size:12px;color:rgba(247,237,220,.6)}
+.about{margin:14px 0 4px;max-width:62ch;border-radius:12px;background:var(--night2);box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
+.about summary{cursor:pointer;padding:11px 14px;font-weight:800;list-style:none}.about summary::-webkit-details-marker{display:none}
+.about summary::after{content:'＋';float:right;color:var(--gold)}.about[open] summary::after{content:'－'}
+.about div{padding:0 14px 12px;font-size:13px;line-height:1.6;color:rgba(247,237,220,.84)}.about ol{margin:4px 0 6px;padding-left:20px}.about b{color:var(--gold)}
 @media (prefers-reduced-motion:reduce){.it,.tray{transition:none}.hl,.it .bell,.it.burnt::after,.it.over .ring-fg{animation:none}}
 </style>
 
@@ -227,7 +238,19 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
       <button id="modeQuick" class="on">一下送到<small>只有一個地方能去時，點一下就送過去</small></button>
       <button id="modeHand">自己放<small>每一步都點起來，再點要放的設備或盤子</small></button>
     </div>
+    <div class="mode" role="group" aria-label="客人">
+      <button id="busyN" class="on">客人：正常<small>第一次玩用這個</small></button>
+      <button id="busyY">客人：多一點<small>來得更密（大約多三成）。想感覺員工差多少時試試</small></button>
+    </div>
     <div class="nights" id="nightList"></div>
+    <details class="about"><summary>這一頁在試什麼</summary><div>
+      <p style="margin:4px 0">試的是：<b>每個設備的操作都很簡單，難的是同時排好整間廚房</b>。放上去它自己煮；你決定先下什麼、好了送去哪、哪一桌先出。</p>
+      <p style="margin:4px 0">每一道新菜帶進來的是<b>一種新的工作</b>（兩站接力、很慢的烤箱、兩樣組起來、可以先做的甜點、三站的披薩），不是多一個名字和價錢。新的事第一次出現時才教。</p>
+      <p style="margin:4px 0">員工<b>接手手工、不接手決定</b>：廚師顧一條線，把好了的東西送到下一站或盤子；先做什麼一直是你。人越多，同一個晚上接得越多。</p>
+      <p style="margin:8px 0 2px">想請你決定的：</p>
+      <ol><li>「一下送到」會不會太自動？（也玩玩「自己放」）</li><li>焦掉要多嚴格？</li><li>Jill 要不要出現在廚房裡？</li><li>廚師要不要照你排好的順序自己下鍋？</li><li>第 3、4 晚要不要更忙？（「客人：多一點」可以試）</li></ol>
+      <p class="small" style="margin:4px 0 0">這是獨立的試玩頁，正式遊戲沒有任何改變。</p>
+    </div></details>
     <p class="small">建議從第 1 晚依序玩：每一晚只多一、兩件新的事。教學提示每件事只出現一次；<button id="resetTut" style="text-decoration:underline;color:var(--gold)">重新顯示教學</button>。</p>
   </div>
   <div class="ov" id="sum" hidden></div>
@@ -348,13 +371,13 @@ function newGame(k,opt){
      st:{served:0,left:0,burnt:0,rev:0,tips:0,q:0,qn:0,stars:0,moves:0,same:0,lastSrc:null,conc:0,concT:0,staff:0,taps:0,wait:0},
      sel:null,ended:false,staff:[],asm:null,log:[]};
   for(const id of N.st)G.slots[id]=Array(ST[id].slots).fill(null);
-  G.sched=genSched(N,G.R);
+  G.busy=opt.busy!=null?!!opt.busy:BUSY;G.sched=genSched(N,G.R,G.busy?.75:1);
   build();
   for(const nm of N.waiters)G.staff.push({role:'waiter',n:nm,x:344,y:612,state:'idle',el:null});
   for(const c of N.cooks)G.staff.push({role:'cook',n:c.n,line:c.line,x:60,y:454,hx:60,hy:454,state:'idle',el:null});
   if(N.barista)G.staff.push({role:'barista',n:N.barista,x:322,y:452,hx:322,hy:452,state:'idle',el:null});
   G.staff.forEach((s,i)=>{s.el=mk('div','pp '+s.role,`${s.n.slice(0,2)}<span class="nm">${s.n}</span>`);stage.appendChild(s.el);if(s.role==='waiter'){s.hx=334-i*30;s.hy=600;s.x=s.hx;s.y=s.hy}});
-  $('#hNight').textContent=`第 ${k} 晚`;$('#hTitle').textContent=N.n;
+  $('#hNight').textContent=`第 ${k} 晚${G.busy?' · 客人多':''}`;$('#hTitle').textContent=N.n;
   hint(null);
   if(G.tut)tutTicket();
   if(G.staff.some(s=>s.role==='cook')&&!opt.line&&!opt.lines)chooseLine();else if(opt.lines)G.staff.filter(s=>s.role==='cook').forEach((s,i)=>{const k=opt.lines[i];s.line=k?LINES[k].st.filter(x=>G.N.st.includes(x)):[];s.lineK=k});else if(opt.line)G.staff.filter(s=>s.role==='cook').forEach(s=>{s.line=LINES[opt.line].st});
@@ -371,7 +394,7 @@ function chooseLine(){paused=true;const el=$('#lineChoice');el.hidden=false;cons
    el.querySelectorAll('[data-line]').forEach(b=>b.addEventListener('click',()=>{const k=b.dataset.line,L=LINES[k];taken.push(k);c.line=L.st.filter(x=>G.N.st.includes(x));const cc=stCenter(L.st.find(x=>G.N.st.includes(x))||L.st[0]);c.hx=Math.max(24,Math.min(336,cc.x));c.hy=454;c.x=c.hx;c.y=c.hy;c.lineK=k;
     if(ci+1<cooks.length&&Object.keys(LINES).some(x=>!taken.includes(x)&&LINES[x].st.some(y=>G.N.st.includes(y))))ask(ci+1);else{cooks.slice(ci+1).forEach(o=>{o.line=[]});G.cookLine=taken[0];G.cookLines=taken.slice();el.hidden=true;paused=false;hint(null)}}))};
   ask(0)}
-function genSched(N,R){
+function genSched(N,R,gm){gm=gm||1;
   const out=[],end=N.dur*.86;let t=N.tut?2:3;
   const names=Object.keys(N.dishes),wsum=names.reduce((a,d)=>a+N.dishes[d],0);
   const pick=()=>{let r=R()*wsum;for(const d of names){r-=N.dishes[d];if(r<=0)return d}return names[0]};
@@ -381,7 +404,7 @@ function genSched(N,R){
     const r=R();const n=r<N.size[0]?1:r<N.size[0]+N.size[1]?2:3;
     const dishes=[];for(let i=0;i<n;i++)dishes.push(pick());
     out.push({at:t,dishes});
-    t+=g*(.7+.6*R());
+    t+=g*gm*(.7+.6*R());
   }
   return out;
 }
@@ -422,13 +445,13 @@ function addTicket(dishes,tut,arrived){
   const ideal=Math.max(...dishes.map(dishTime))+2.5*dishes.length;
   const tk={id:'t'+no,no,dishes,fill:dishes.map(()=>null),w:arrived!=null?G.t-arrived:0,pat:tut?999:Math.round(40+ideal*1.8+8*(dishes.length-1)),done:false,gone:false,idx:0,el:null,born:G.t,tut:!!tut};
   const e=mk('div','tray');e.dataset.tray=tk.id;
-  e.innerHTML=`<div class="pat"><i></i></div><div class="tno">${no} 號桌</div>`+dishes.map((d,j)=>`<div class="ds" data-ds="${j}" style="top:${30+j*35}px"><div class="gh">${K[d].ic}</div><div class="pth">${pathHTML(DISH[d].path)}</div></div>`).join('');
+  e.innerHTML=`<div class="pat"><i></i></div><div class="tno">${no} 號桌</div>`+dishes.map((d,j)=>`<div class="ds" data-ds="${j}" style="top:${30+j*35}px"><div class="gh g-${d}">${K[d].ic}</div><div class="pth">${pathHTML(DISH[d].path)}</div></div>`).join('');
   tk.el=e;stage.appendChild(e);G.tickets.push(tk);layoutTrays();
   tk.el.style.left=trayX(tk.idx)+'px';
   sfx('order');
   return tk;
 }
-function layoutTrays(){let i=0;for(const t of G.tickets){if(t.gone)continue;t.idx=i++;if(t.el)t.el.style.left=trayX(t.idx)+'px'}}
+function layoutTrays(){let i=0;for(const t of G.tickets){if(t.gone)continue;t.idx=i++;if(t.el)t.el.style.left=trayX(t.idx)+'px'}$('#passbar').classList.toggle('full',i>=4)}
 function ticketOf(id){return G.tickets.find(t=>t.id===id)}
 function needSlot(tk,k){if(tk.done||tk.gone)return -1;for(let j=0;j<tk.dishes.length;j++)if(tk.dishes[j]===k&&!tk.fill[j])return j;return -1}
 
@@ -498,7 +521,7 @@ function pickTray(tk){
   const stars=q>=88&&fast>.45?5:q>=75&&fast>.25?4:q>=60?3:2;
   G.st.served++;G.st.rev+=rev;G.st.tips+=tip+bonus;G.st.q+=q;G.st.qn++;G.st.stars+=stars;G.st.wait+=tk.w;
   its.forEach(delItem);
-  const p={x:trayX(tk.idx)+33,y:500};popAt(p,`+$${rev+tip+bonus}`,'#F4C44E');if(sync)popAt({x:p.x,y:p.y-16},'一起上桌 ✨','#9fe08a');popAt({x:p.x,y:p.y+16},'★'.repeat(stars),'#F4C44E');
+  popAt({x:trayX(tk.idx)+33,y:512},`+$${rev+tip+bonus}${sync?'<i style="color:#9fe08a;letter-spacing:0">一起上桌 ✨</i>':''}<i>${'★'.repeat(stars)}</i>`,'#F4C44E',sync?3:2);
   tk.gone=true;tk.el.classList.add('gone');setTimeout(()=>tk.el&&tk.el.remove(),400);G.tickets=G.tickets.filter(t=>t!==tk);layoutTrays();sfx('coin');
   tutEvent('served',tk);
   if(G.pending&&G.pending.length){const d=G.pending.shift();G.door--;addTicket(d.dishes,0,d.at)}
@@ -617,7 +640,7 @@ function render(){
     else{frac=K[it.k].cold?1:it.ht<GRACE?1-it.ht/GRACE*.15:Math.max(0,(it.q-40)/60)*.85;col=it.q>80?'#8DC27A':'#d9a13a'}
     fg.setAttribute('stroke',col);fg.setAttribute('stroke-dashoffset',(125.66*(1-clamp(frac,0,1))).toFixed(1));
     const cls=['it','k-'+it.k];if(it.ph==='cook'&&K[(it.pr&&Object.keys(PR).find(x=>PR[x]===it.pr)||'').split('@')[0]]?.raw)cls.push('raw');
-    if(it.ph==='burnt')cls.push('burnt');if(it.ph==='over')cls.push('over');if(K[it.k].fin&&it.ph!=='cook')cls.push('plate');if(it.at&&it.at.carry)cls.push('carried');if(it.at&&it.at.tray)cls.push('ontray');
+    if(it.ph==='cook'||it.ph==='asm')cls.push('busy');if(it.ph==='burnt')cls.push('burnt');if(it.ph==='over')cls.push('over');if(K[it.k].fin&&it.ph!=='cook')cls.push('plate');if(it.at&&it.at.carry)cls.push('carried');if(it.at&&it.at.tray)cls.push('ontray');
     if(sel&&sel.type==='item'&&sel.id===it.id)cls.push('sel');
     const c=cls.join(' ');if(e._c!==c){e.className=c;e._c=c}
     const ic=K[it.k].ic;const icEl=e.children[1];if(icEl.textContent!==ic)icEl.textContent=ic;
@@ -671,22 +694,22 @@ function firstSt(k){for(const key in PR){const [a,b]=key.split('@');if(a===k)ret
    the obvious thing — an ingredient (or a dish on a ticket) goes onto its station, a finished thing goes to its next
    station or to the one table waiting for it. Where there is a choice (two tables want it, the next station is full)
    the tap picks it up instead and the places it can go light up; a drag can put anything anywhere. */
-let QUICK=store.get('quick',true);
+let QUICK=store.get('quick',true),BUSY=store.get('busy',false);
 function quick(h){
   if(!h||!QUICK)return false;
-  if(h.type==='bin'){const st=firstSt(h.k);if(st&&canGo({bin:h.k},{st})){move({bin:h.k},{st});return true}if(st)flashHint(`${ST[st].n}滿了：等它空出來，或先把好了的拿走`);return false}
+  if(h.type==='bin'){const st=firstSt(h.k);if(st&&canGo({bin:h.k},{st})){move({bin:h.k},{st});return 'moved'}if(st){flashHint(`${ST[st].n}滿了：等它空出來，或先把好了的拿走`);shakeSt(st);return 'said'}return false}
   if(h.type==='item'){const it=G.items.get(h.id);if(!it||!selectable(h))return false;
-    const nx=nextStOf(it.k);if(nx&&!(it.at&&it.at.st===nx)&&!(it.at&&it.at.tray)){if(canGo({it},{st:nx})){move({it},{st:nx});return true}flashHint(`${ST[nx].n}滿了`);return false}
-    if(K[it.k].fin&&!(it.at&&it.at.tray)){const trs=G.tickets.filter(t=>canGo({it},{tray:t.id}));if(trs.length===1){move({it},{tray:trs[0].id});return true}}
+    const nx=nextStOf(it.k);if(nx&&!(it.at&&it.at.st===nx)&&!(it.at&&it.at.tray)){if(canGo({it},{st:nx})){move({it},{st:nx});return 'moved'}flashHint(`${ST[nx].n}滿了`);return false}
+    if(K[it.k].fin&&!(it.at&&it.at.tray)){const trs=G.tickets.filter(t=>canGo({it},{tray:t.id}));if(trs.length===1){move({it},{tray:trs[0].id});return 'moved'}}
     return false}
   if(h.type==='tray'&&h.j!=null){const tk=ticketOf(h.id);if(!tk||tk.fill[h.j])return false;const d=tk.dishes[h.j];
     // a finished one waiting somewhere: to this table
-    for(const it of G.items.values())if(it.k===d&&!['cook','burnt','asm'].includes(it.ph)&&!(it.at&&(it.at.tray||it.at.carry))&&!it.res){move({it},{tray:tk.id});return true}
-    // else start the part of it that is least on its way
-    const starts=DISH[d].start;const cnt=s=>[...G.items.values()].filter(it=>!(it.at&&it.at.tray)&&(it.k===s||chainEnd(it.k)===chainEnd(s))).length;
-    const k=starts.slice().sort((a,b)=>cnt(a)-cnt(b))[0];const st=firstSt(k);
-    if(st&&canGo({bin:k},{st})){move({bin:k},{st});return true}
-    setSel({type:'bin',k});flashHint(`${ST[st].n}滿了：等它空出來`);return true}
+    for(const it of G.items.values())if(it.k===d&&!['cook','burnt','asm'].includes(it.ph)&&!(it.at&&(it.at.tray||it.at.carry))&&!it.res){move({it},{tray:tk.id});return 'moved'}
+    // else start the part of it that is least on its way — unless there is already one on its way for every table that wants it
+    const need=neededOf(d),starts=DISH[d].start.filter(x=>onWay(d,x)<need).sort((a,b)=>onWay(d,a)-onWay(d,b));
+    if(!starts.length){flashHint(`${K[d].n}已經在做了：好了再點它`);for(const it of G.items.values())if(!(it.at&&it.at.tray)&&it.ph!=='burnt'&&(it.k===d||DISH[d].start.some(x=>chainKinds(x).includes(it.k))))popAt(slotPosOf(it),'在這裡','#9fe08a');return 'said'}
+    for(const k of starts){const st=firstSt(k);if(st&&canGo({bin:k},{st})){move({bin:k},{st});return 'moved'}}
+    const st=firstSt(starts[0]);flashHint(`${ST[st].n}滿了：等它空出來`);shakeSt(st);return 'said'}
   return false;
 }
 function tap(h){
@@ -701,7 +724,8 @@ function tap(h){
     if(h){nope(h,src)}else setSel(null);
     return;
   }
-  if(quick(h)){tutEvent('moved');return}
+  if(h&&h.type==='tray'&&h.j==null){const tk=ticketOf(h.id);if(tk){const open=tk.dishes.map((d,j)=>j).filter(j=>!tk.fill[j]);if(open.length===1)h={...h,j:open[0]};else if(open.length>1){flashHint('點單子上要做的那一道菜');const e=tk.el;e.classList.remove('shake');void e.offsetWidth;e.classList.add('shake');return}}}
+  const q=quick(h);if(q){if(q==='moved')tutEvent('moved');return}
   if(selectable(h)){setSel(h);tutEvent('selected',h);return}
   if(h&&h.type==='tray'&&h.j!=null){const tk=ticketOf(h.id);if(tk)pull(tk,h.j);return}
   if(h&&h.type==='st'){const e=SEL['st_'+h.id];if(e){e.classList.remove('shake');void e.offsetWidth;e.classList.add('shake')}}
@@ -715,6 +739,11 @@ function pull(tk,j){
   if(starts.length>1){const cnt=s=>[...G.items.values()].filter(it=>it.k===s||chainEnd(it.k)===chainEnd(s)).length;k=starts.slice().sort((a,b)=>cnt(a)-cnt(b))[0]}
   setSel({type:'bin',k});tutEvent('selected',{type:'bin',k});
 }
+/* how many of dish d the open tables still want, and how many are on their way from start s (not burnt, not plated) */
+function neededOf(d){return G.tickets.reduce((a,t)=>a+(t.done||t.gone?0:t.dishes.filter((x,j)=>x===d&&!t.fill[j]).length),0)}
+function chainKinds(s){const out=[s];let cur=s,n=0;while(n++<8){const st=nextStOf(cur);if(!st||st==='asm')break;cur=PR[cur+'@'+st].o;out.push(cur)}return out}
+function onWay(d,s){const ks=chainKinds(s);let n=0;for(const it of G.items.values())if(!(it.at&&it.at.tray)&&it.ph!=='burnt'&&(it.k===d||ks.includes(it.k)))n++;return n}
+function shakeSt(id){const e=SEL['st_'+id];if(e){e.classList.remove('shake');void e.offsetWidth;e.classList.add('shake')}}
 function chainEnd(k){let cur=k,g=0;while(g++<8){const s=nextStOf(cur);if(!s||s==='asm')break;cur=PR[cur+'@'+s].o}return cur}
 function nope(h,src){
   const d=destOf(h);let why='';const k=src.bin||src.it.k;
@@ -816,19 +845,24 @@ function tutTick(){
   if(G.N.barista&&G.t>2)if(showBeat('barista'))return;
   if(G.tickets.some(t=>!t.done&&t.fill.some(Boolean)&&t.dishes.length>1&&t.fill.some(x=>!x)))if(showBeat('together'))return;
 }
-function hint(txt){const h=$('#hint');if(txt){h.innerHTML=txt;h.classList.remove('quiet')}else{h.innerHTML=G&&G.k===1&&G.t<120?'點單子上的菜就下鍋；好了點它，它會去下一站或上盤。兩桌都要的時候，再點你要給的那一桌。':'';h.classList.add('quiet')}}
+function legend(){return '今晚 '+Object.keys(G.N.dishes).sort((a,b)=>dishTime(b)-dishTime(a)).map(d=>`<span class="lg">${K[d].ic}<small>${Math.round(dishTime(d))}s</small></span>`).join('')}
+function hint(txt){const h=$('#hint');if(txt){h.innerHTML=txt;h.classList.remove('quiet')}else{h.innerHTML=!G?'':G.k===1&&G.t<120?'點單子上的菜就下鍋；好了點它，它會去下一站或上盤。兩桌都要的時候，再點你要給的那一桌。':legend();h.classList.add('quiet')}}
 function flashHint(t){if(beat)return;const h=$('#hint');h.innerHTML=t;h.classList.remove('quiet');clearTimeout(hintTimer);hintTimer=setTimeout(()=>{if(!beat)hint(null)},1800)}
-function popAt(p,txt,col){const e=mk('div','pop',txt);e.style.left=(p.x-20)+'px';e.style.top=(p.y-30)+'px';e.style.color=col||'#fff';stage.appendChild(e);setTimeout(()=>e.remove(),1300)}
+/* a pop never lands on one still showing (two tables served a moment apart, at the same place on the pass): it goes above it */
+let pops=[];
+function popAt(p,txt,col,lines){const e=mk('div','pop',txt);let y=p.y-30;const h=15*(lines||1)+4,now=performance.now();pops=pops.filter(o=>now-o.t<1300);
+  for(let g=0;g<6&&pops.some(o=>Math.abs(o.x-p.x)<56&&y<o.y+o.h&&o.y<y+h);g++){const o=pops.filter(o=>Math.abs(o.x-p.x)<56&&y<o.y+o.h&&o.y<y+h).sort((a,b)=>a.y-b.y)[0];y=o.y-h-2}
+  pops.push({x:p.x,y,h,t:now});e.style.left=p.x+'px';e.style.top=y+'px';e.style.color=col||'#fff';stage.appendChild(e);setTimeout(()=>e.remove(),1300)}
 
 /* ---------------------------------------------------------------- the end of the night */
 function endNight(){
   if(G.ended)return;G.ended=true;setSel(null);hl([]);
   for(const tk of G.tickets)if(!tk.done)G.st.left++;
   const S=G.st,q=S.qn?S.q/S.qn:0,stars=S.qn?S.stars/S.qn:0;
-  const best=store.get('best',{});const prev=best[G.k];if(!prev||S.rev+S.tips>prev)best[G.k]=S.rev+S.tips;store.set('best',best);
+  const best=store.get('best',{}),bk=G.k+(G.busy?'b':'');const prev=best[bk];if(!prev||S.rev+S.tips>prev)best[bk]=S.rev+S.tips;store.set('best',best);
   const mins=G.t/60;
   const el=$('#sum');el.hidden=false;
-  el.innerHTML=`<div class="eyebrow">第 ${G.k} 晚 · 打烊</div><h1>${G.N.n}</h1>
+  el.innerHTML=`<div class="eyebrow">第 ${G.k} 晚${G.busy?' · 客人多一點':''} · 打烊</div><h1>${G.N.n}</h1>
    <div class="stats">
     <div>出菜</div><div>${S.served} 桌</div>
     <div>等太久離開</div><div>${S.left} 桌</div>
@@ -857,13 +891,14 @@ function sfx(k,st){if(speed>2)return;if(k==='ding')tone(DING[st]||988,.2,'sine',
 /* ---------------------------------------------------------------- the frame */
 let last=0;
 function frame(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;if(G&&!paused&&!G.ended){let left=dt*speed;while(left>0){const s=Math.min(.05,left);update(s);left-=s}}render();requestAnimationFrame(frame)}
-function fit(){const w=$('#wrap');const s=Math.min(w.clientWidth/W,w.clientHeight/H);scale=s;stage.style.transform=`translate(${(w.clientWidth-W*s)/2}px,${Math.max(0,(w.clientHeight-H*s)/2)}px) scale(${s})`}
+function fit(){const w=$('#wrap');const hh=w.clientHeight-(parseFloat(getComputedStyle(w).paddingBottom)||0);const s=Math.min(w.clientWidth/W,hh/H);scale=s;stage.style.transform=`translate(${(w.clientWidth-W*s)/2}px,${Math.max(0,(hh-H*s)/2)}px) scale(${s})`}
 
 /* ---------------------------------------------------------------- menu */
 function menu(){
   $('#menu').hidden=false;$('#sum').hidden=true;
   const best=store.get('best',{});
-  $('#nightList').innerHTML=NIGHTS.map(n=>`<button class="night" data-go="${n.k}"><em>第 ${n.k} 晚${best[n.k]?` · 最好 $${best[n.k].toLocaleString()}`:''}</em><b>${n.n}</b><span>${n.d}</span></button>`).join('');
+  const bk=k=>k+(BUSY?'b':'');
+  $('#nightList').innerHTML=NIGHTS.map(n=>`<button class="night" data-go="${n.k}"><em>第 ${n.k} 晚${best[bk(n.k)]?` · 最好 $${best[bk(n.k)].toLocaleString()}`:''}</em><b>${n.n}</b><span>${n.d}</span></button>`).join('');
 }
 function startNight(k){$('#menu').hidden=true;$('#sum').hidden=true;paused=false;$('#hPause').textContent='II';newGame(k);fit()}
 function start(k){if(NIGHTS[k-1].free&&!$('#lineChoice').dataset.fromFree){$('#menu').hidden=true;$('#sum').hidden=true;chooseMenu();return}startNight(k)}
@@ -872,6 +907,8 @@ function modeUI(){$('#modeQuick').classList.toggle('on',QUICK);$('#modeHand').cl
   $('#how1').innerHTML=QUICK?'點下面<b>單子上的菜</b>（或冰箱的食材）：它會自己下鍋、自己煮。':'點<b>冰箱的食材</b>（或單子上的菜），再點<b>設備</b>：它就開始自己煮。';
   $('#how2').innerHTML=QUICK?'好了會響、圈變綠：點它，它會去<b>下一站</b>，或上那一桌的<b>盤子</b>。兩桌都要的時候，再點你要給的那一桌。':'好了會響、圈變綠：點它，再點<b>下一站</b>，或那一桌的<b>盤子</b>。也可以直接拖過去。'}modeUI();
 $('#modeQuick').addEventListener('click',()=>{QUICK=true;store.set('quick',true);modeUI()});$('#modeHand').addEventListener('click',()=>{QUICK=false;store.set('quick',false);modeUI()});
+function busyUI(){$('#busyN').classList.toggle('on',!BUSY);$('#busyY').classList.toggle('on',BUSY)}busyUI();
+$('#busyN').addEventListener('click',()=>{BUSY=false;store.set('busy',false);busyUI();menu()});$('#busyY').addEventListener('click',()=>{BUSY=true;store.set('busy',true);busyUI();menu()});
 $('#resetTut').addEventListener('click',()=>{seen.clear();store.set('seen',[]);flash('教學提示會重新出現')});
 function flash(t){const b=$('#resetTut');const o=b.textContent;b.textContent=t;setTimeout(()=>b.textContent=o,1400)}
 $('#hSpeed').addEventListener('click',()=>{speed=speed===1?2:1;$('#hSpeed').textContent=speed+'×';$('#hSpeed').classList.toggle('on',speed>1)});
@@ -891,6 +928,6 @@ window.__cook={get G(){return G},start:(k,o)=>{$('#menu').hidden=true;$('#sum').
   setSpeed:v=>{speed=v},move:(src,dest)=>{if(src.it&&typeof src.it==='string')src={it:G.items.get(src.it)};const ok=move(src,dest);if(ok)tutEvent('moved');return ok},
   canGo:(src,dest)=>{if(src.it&&typeof src.it==='string')src={it:G.items.get(src.it)};return canGo(src,dest)},
   step:(sec)=>{let left=sec;while(left>0){const s=Math.min(.05,left);update(s);left-=s}render()},pause:v=>{paused=v},
-  seen,nightDefs:NIGHTS,nextStOf,DISH,PR,ASM,K,freeNight};
+  seen,nightDefs:NIGHTS,nextStOf,DISH,PR,ASM,K,freeNight,popAt,tap:h=>tap(h)};
 })();
 </script>
