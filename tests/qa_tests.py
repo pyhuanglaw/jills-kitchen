@@ -115,8 +115,22 @@ FINGERPRINT = """JSON.stringify([S.money,phase,sub||'',typeof shopTab!=='undefin
 SKIP_ACTS = {'tab', 'closeSub', 'nextDay', 'peek', 'guide', 'book', 'settings', 'reset', 'resetNo'}
 
 
+def _back_to(p, where, k=None):
+    """put away whatever a press opened (a story panel, a reveal card, a sub-screen, a peek at the room) and come back to the
+    shop (on tab k) or the prep screen — the way the player closes it, done directly so the sweep can go on"""
+    p.settle()
+    p.ev("try{if(typeof hideReveal==='function')hideReveal()}catch(e){};if(sub&&sub!=='pause'){sub=null}")
+    if where == 'shop':
+        if k:
+            p.ev(f"shopTab='{k}'")
+        p.ev("if(phase==='shop')showShop()")
+    else:
+        p.ev("if(phase==='prep')showPrep()")
+    p.frames(4)
+
+
 def _sweep_tab(p, k, dead, tapped):
-    p.tap(f'#screen .tabs [data-act=tab][data-k={k}]')
+    _back_to(p, 'shop', k)
     p.ev("if(!window.__toastWrap){window.__toastWrap=1;window.__toastN=0;const t0=toast;toast=function(){__toastN++;return t0.apply(this,arguments)}}")
     seen = set()
     for _ in range(400):
@@ -147,12 +161,7 @@ def _sweep_tab(p, k, dead, tapped):
         if after == before:
             dead.append(f'{k} › 「{txt}」 {act}:{kk} — nothing happened')
         # whatever opened (a reveal card, a sub-screen, a story panel): put it away, back on this tab
-        p.settle()
-        p.ev("try{if(typeof hideReveal==='function')hideReveal()}catch(e){};if(sub&&sub!=='pause'){sub=null;showShop()}")
-        if p.ev("phase") != 'shop':
-            p.ev("showShop()")
-        if p.ev("shopTab") != k:
-            p.ev(f"shopTab='{k}';showShop()")
+        _back_to(p, 'shop', k)
 
 
 @test
@@ -195,12 +204,12 @@ def qa_every_button_on_the_prep_screen_does_something(b, port, target):
         seen, n = set(), 0
         for _ in range(500):
             btns = p.page.evaluate("""skip=>[...document.querySelectorAll('#screen .sheet button, #screen .sheet [data-act]')].filter(e=>e.offsetParent!==null&&!e.disabled&&e.dataset.act&&!skip.includes(e.dataset.act))
-                .map(e=>[e.dataset.act,e.dataset.k||'',e.dataset.d||'',(e.innerText||'').replace(/\\s+/g,' ').trim().slice(0,24)])""", sorted(PREP_SKIP))
+                .map(e=>[e.dataset.act,e.dataset.k||'',e.dataset.d||'',e.dataset.v||'',(e.innerText||'').replace(/\\s+/g,' ').trim().slice(0,24)])""", sorted(PREP_SKIP))
             todo = [x for x in btns if tuple(x) not in seen]
             if not todo:
                 break
-            act, kk, dd, txt = todo[0]; seen.add((act, kk, dd, txt))
-            sel = f'#screen .sheet [data-act="{act}"]' + (f'[data-k="{kk}"]' if kk else '') + (f'[data-d="{dd}"]' if dd else '')
+            act, kk, dd, vv, txt = todo[0]; seen.add((act, kk, dd, vv, txt))
+            sel = f'#screen .sheet [data-act="{act}"]' + (f'[data-k="{kk}"]' if kk else '') + (f'[data-d="{dd}"]' if dd else '') + (f'[data-v="{vv}"]' if vv else '')
             before = p.ev(FINGERPRINT)
             try:
                 p.tap(sel, settle=False)
@@ -209,9 +218,9 @@ def qa_every_button_on_the_prep_screen_does_something(b, port, target):
             n += 1; p.frames(6)
             if p.ev(FINGERPRINT) == before:
                 dead.append(f'「{txt}」 {act}:{kk}:{dd} — nothing happened')
-            p.settle(); p.ev("if(sub&&sub!=='pause'){sub=null};if(phase==='prep'&&!document.querySelector('#screen .sheet'))showPrep()")
+            _back_to(p, 'prep')
+        check(not dead, f'{len(dead)} of {n + len(dead)}: ' + ' / '.join(dead[:8]))
         check(n >= 20, f'only {n} buttons were pressed on the prep screen')
-        check(not dead, f'{len(dead)} of {n}: ' + ' / '.join(dead[:8]))
         check(not p.errors, p.errors[:3])
     finally:
         p.close()
@@ -225,7 +234,8 @@ def qa_restock_says_why_it_cannot(b, port, target):
     try:
         p.tap('#screen [data-act=open]'); p.tap('#screen [data-act=nextDay]'); p.settle()
         p.ev("if(!window.__toastWrap){window.__toastWrap=1;window.__toastN=0;const t0=toast;toast=function(){__toastN++;return t0.apply(this,arguments)}}")
-        d = p.ev("menuList()[0]")
+        d = p.ev("(document.querySelector('#screen [data-act=stockTo][data-k=max]')||{dataset:{}}).dataset.d")
+        check(d, 'no 補滿 button on the prep screen')
         p.tap(f'#screen [data-act=stockTo][data-k=max][data-d="{d}"]')
         check(p.ev("stockTotal()>=fridgeCap()"), 'the fridge is not full after 補滿')
         before = p.ev(FINGERPRINT); p.tap('#screen [data-act=restock]')
