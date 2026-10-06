@@ -139,10 +139,10 @@ def _sweep_tab(p, k, dead, tapped):
     for _ in range(400):
         btns = p.page.evaluate("""skip=>[...document.querySelectorAll('#screen .sheet button, #screen .sheet [data-act]')].filter(e=>e.offsetParent!==null&&!e.disabled&&e.dataset.act&&!skip.includes(e.dataset.act))
             .map((e,i)=>[i,e.dataset.act,e.dataset.k||'',(e.innerText||'').replace(/\\s+/g,' ').trim().slice(0,24)])""", sorted(SKIP_ACTS))
-        todo = [x for x in btns if (x[1], x[2], x[3]) not in seen]
-        if not todo:
+        todo = [x for x in btns if (x[1], x[2]) not in seen]
+        if not todo or len(seen) >= 60:
             return
-        i, act, kk, txt = todo[0]; seen.add((act, kk, txt))
+        i, act, kk, txt = todo[0]; seen.add((act, kk))   # its label may change after a press (a price, a count): the same button
         if '使用中' in txt:
             continue
         before = p.ev(FINGERPRINT)
@@ -150,8 +150,8 @@ def _sweep_tab(p, k, dead, tapped):
         loc = p.page.locator(sel).filter(has_text=txt) if txt else None
         try:
             # find this very button again (the sheet may have re-rendered): by its act, key and text
-            idx = p.page.evaluate("""([skip,act,k,txt])=>{const all=[...document.querySelectorAll('#screen .sheet button, #screen .sheet [data-act]')];
-                return all.findIndex(e=>e.offsetParent!==null&&!e.disabled&&e.dataset.act===act&&(e.dataset.k||'')===k&&(e.innerText||'').replace(/\\s+/g,' ').trim().slice(0,24)===txt)}""", [sorted(SKIP_ACTS), act, kk, txt])
+            idx = p.page.evaluate("""([skip,act,k])=>{const all=[...document.querySelectorAll('#screen .sheet button, #screen .sheet [data-act]')];
+                return all.findIndex(e=>e.offsetParent!==null&&!e.disabled&&e.dataset.act===act&&(e.dataset.k||'')===k)}""", [sorted(SKIP_ACTS), act, kk])
             if idx < 0:
                 continue
             p.tap(sel, nth=idx, settle=False)
@@ -227,10 +227,10 @@ def qa_every_button_on_the_prep_screen_does_something(b, port, target):
         for _ in range(500):
             btns = p.page.evaluate("""skip=>[...document.querySelectorAll('#screen .sheet button, #screen .sheet [data-act]')].filter(e=>e.offsetParent!==null&&!e.disabled&&e.dataset.act&&!skip.includes(e.dataset.act))
                 .map(e=>[e.dataset.act,e.dataset.k||'',e.dataset.d||'',e.dataset.v||'',(e.innerText||'').replace(/\\s+/g,' ').trim().slice(0,24)])""", sorted(PREP_SKIP))
-            todo = [x for x in btns if tuple(x) not in seen]
-            if not todo:
+            todo = [x for x in btns if tuple(x[:4]) not in seen]
+            if not todo or len(seen) >= 320:
                 break
-            act, kk, dd, vv, txt = todo[0]; seen.add((act, kk, dd, vv, txt))
+            act, kk, dd, vv, txt = todo[0]; seen.add((act, kk, dd, vv))   # 「補到建議 25」 becomes 「補到建議 0」: the same button
             sel = f'#screen .sheet [data-act="{act}"]' + (f'[data-k="{kk}"]' if kk else '') + (f'[data-d="{dd}"]' if dd else '') + (f'[data-v="{vv}"]' if vv else '')
             before = p.ev(FINGERPRINT)
             try:
