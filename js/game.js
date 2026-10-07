@@ -2909,10 +2909,10 @@ function tastingServe(g){if(!R||!R.tasting||!R.tasting.dir||!g||g.table==null||R
  if(R.tasting.n===3){memo('tasting',t.x,t.y-8,{g:g.name,subj:[{x:t.x-30,y:t.y},{x:t.x+30,y:t.y}],room:t.room})}
  if(Math.random()<.35&&canChat('tasting',40,3))quote(g,pickT(['這杯跟這道很搭。','今天有酒？','這樣吃比較像在過節。']))}
 /* the user, 2026-10-06: Lounge I is 《看看》 + 評分 4.0 + $50,000 — 「Lounge I 的定位是 content unlock，不應該因為高額資金門檻把大量
-   已完成內容一起延後」; the heavier steps are II ($80,000; Fine Dining, a room of the business) and III ($150,000; no level of its own — the user, 2026-10-07). Her last night is her story, never a wait. */
+   已完成內容一起延後」; the heavier steps are II ($80,000) and III ($150,000) — no level for either (the user, 2026-10-07: rooms of the business, never a story's door). Her last night is her story, never a wait. */
 const LOUNGE_PROJ=[
  {lv:1,n:'Lounge I — 小酒吧',cost:50000,need:0,d:'隔壁 Madame Lin 的店：簽約以後改裝兩天，就是 Jill’s Kitchen — The Lounge。吧台留在原來的位置，六個吧台位、三張小桌、一面放酒的牆；跟主廳不打通，菜從後場的廚房送過去。開了以後，吃完飯的人可以留下來，等位子的人可以先坐吧台。Evan 留下來當首席調酒師，開幕那天就在吧台後面，不用招募；Lounge 的人有自己的名單，沈晴（調酒師）、阿拓（Bar Food 料理員，在廚房）可以再請，不佔餐廳的名額。',done:'吧台的燈亮了。牆上有酒，桌上有杯子，Evan 已經站在吧台後面——隔壁現在叫 The Lounge。',jill:'開門吧。',unlock:['Evan，首席調酒師（從今晚起就在吧台）','Lounge 名單：沈晴、阿拓（員工 › Lounge 名單）','Lounge 外場（工作分配）','Lounge 的小食（菜單）']},
- {lv:2,n:'Lounge II — 酒吧沙發廳',cost:80000,need:4,d:'吧台加長、轉成 L 型（調酒師在 L 裡面，九個位子）；多一張小桌、一組四人沙發；一座有燈的酒櫃，酒單全開（五種）。Lounge 名單多兩位：安安（Lounge 外場）、許葳（Lounge 清潔）。',done:'吧台加長了，沙發進來了。酒櫃的燈在牆上亮著。',jill:'現在像個真的晚上了。',unlock:['Lounge 名單：安安、許葳','四人沙發座','酒單五種']},
+ {lv:2,n:'Lounge II — 酒吧沙發廳',cost:80000,need:0,d:'吧台加長、轉成 L 型（調酒師在 L 裡面，九個位子）；多一張小桌、一組四人沙發；一座有燈的酒櫃，酒單全開（五種）。Lounge 名單多兩位：安安（Lounge 外場）、許葳（Lounge 清潔）。',done:'吧台加長了，沙發進來了。酒櫃的燈在牆上亮著。',jill:'現在像個真的晚上了。',unlock:['Lounge 名單：安安、許葳','四人沙發座','酒單五種']},
  {lv:3,n:'Lounge III — 安靜的角落',cost:150000,need:0,d:'最裡面隔出一個安靜的角落：兩張扶手椅、一盞落地燈；酒牆多一層；適合說話的位子。',done:'角落的燈亮了。有人會在那裡坐到很晚。',jill:'留一個地方給說話的人。',unlock:['安靜角落（兩位）','酒牆第三層']},
 ];
 function loungeNext(){const lv=loungeLv();return LOUNGE_PROJ.find(p=>p.lv===lv+1)||null}
@@ -4525,7 +4525,7 @@ function upCustToday(){return UP_CUST.some(k=>{const f=fact(k);return f&&f.d===S
 function spOK(){let last=-99;for(const k of UP_STAFF){const f=fact(k);if(f)last=Math.max(last,f.d)}return S.day-last>=2}   /* the crew's moments come days apart */
 /* everything that has to have happened before Jill picks up the phone (§19: building awareness, the floor seen, two
    kinds of pressure from each side, a restaurant and a till that make it plausible) — not every possible event */
-function upAskReady(){return !!fact('up_hint')&&!!fact('up_inspect')&&!!fact('up_cats')&&upKinds(UP_STAFF)>=2&&upKinds(UP_CUST)>=2&&upCan()&&S.money>=120000}
+function upAskReady(){return !!fact('up_hint')&&!!fact('up_inspect')&&!!fact('up_cats')&&upKinds(UP_STAFF)>=2&&upKinds(UP_CUST)>=2&&upCan()}   /* the user, 2026-10-07: the call never waits for money (it waited for $120,000) — story first, then the project, then the player's money decision */
 
 /* ---- the cats and the stairs. States: 'upwalk' (across the dining room to the side arch), 'upgo' (a moment by the
    stair door in the side room), 'up' (upstairs at ax, ay; walking while upTo is set), 'updown' (back at the stair door,
@@ -4686,12 +4686,12 @@ function upAskUpd(dt){const A=R.upAsk;A.t+=dt;const J=R.jill;
 /* rc8 (the player, 2026-10-03: 「玩家第一次正式取得／解鎖二樓時，Staff Room 就必須已經存在並可見……不能先出現一個完全空的二樓，再過幾天
    才蓋 Staff Room」): the lease's works partition the Staff Room off too — it is there the day the floor is Jill's; the
    rest of the floor stays open. The price is the two it replaces (the floor 350,000 + the room's first phase 160,000). */
-const UP_PROJ={k:'up',n:'二樓（整層）',cost:510000,room:'up',d:'把房東那邊空著的二樓整層租下來：打掃、地板和牆面整理、電力、燈、冷氣、樓梯扶手，再在左手邊靠後面隔出一間給店裡的人的員工休息室——有門、沙發、長桌、置物櫃和小廚房。其他地方先空著。不是用餐區，不會多座位。',done:'整層打掃乾淨了，燈和冷氣都接好了，樓梯加了扶手。左邊靠後面多了一面牆、一扇淺色的門：員工休息室。其他地方還空著。',jill:'先這樣。',unlock:['二樓（自己的分頁；店舖工程裡有整層的平面圖）','員工休息室（自己的分頁）','樓梯門在側廳']};
+const UP_PROJ={k:'up',n:'二樓整層・初期工程',cost:160000,room:'up',d:'房東那邊空著的二樓，整層租下來，先做初期工程：打掃、地板和牆面整理、電力、燈、冷氣、樓梯扶手，再在左手邊靠後面隔出一間給店裡的人的員工休息室——有門、沙發、長桌、置物櫃和小廚房。其他地方先空著。不是用餐區，不會多座位。',done:'整層打掃乾淨了，燈和冷氣都接好了，樓梯加了扶手。左邊靠後面多了一面牆、一扇淺色的門：員工休息室。其他地方還空著。',jill:'先這樣。',unlock:['二樓（自己的分頁；店舖工程裡有整層的平面圖）','員工休息室（自己的分頁）','樓梯門在側廳']};
 function upProjectReveal(){S.upProj=S.upProj||{revealed:S.day};paused=!!R;sub='upproj';
  show(`<div class="modal"><div class="eyebrow">新企劃</div><h2>二樓（整層）</h2><p>房東說可以，整層。打掃、地板、牆、電、燈、冷氣、樓梯扶手，再隔出一間給大家的休息室；其他地方先空著，要拿來做什麼，之後再說。也不急。</p><div class="stack"><button class="btn primary" data-act="upGo" data-k="plan">開始規劃 <small>會出現在「店鋪工程」，存夠了就租下來</small></button><button class="btn" data-act="upGo" data-k="later">之後再說 <small>不會不見——工程頁隨時找得到</small></button></div></div>`,'dim')}
 function upGo(k){S.upProj=S.upProj||{revealed:S.day};S.upProj.state=k==='plan'?'planned':'deferred';S.upProj.at=S.day;hideScreen();sub=null;if(R)paused=false;noteLine(k==='plan'?'二樓列進了店鋪工程。':'二樓先放著。工程頁裡隨時找得到。');save()}
 function secUp(money,btn){const on=upTaken();if(!fact('up_ask')&&!on)return'';const Q=UP_PROJ;const pct=Math.min(100,Math.round(money/Q.cost*100));
- return`<div class="nm" style="font-weight:800;font-size:15px;margin:14px 0 2px">二樓</div><p class="muted" style="font-size:12px;margin:0 0 6px">${on?'整層都是店裡的了。':S.upProj&&S.upProj.state==='deferred'?'之後再說過的那件事——還在這裡。':'房東說：「整層？」Jill 說：「整層。」'}</p>${on?upPlanCard()+`<button class="goalline linkline" data-act="upLook" style="margin:0 0 8px"><span>二樓</span><b>${srOn()||pdOn()?'看看整層現在的樣子':'看看整層'}</b><small>›</small></button>`:''}<div class="item ${on?'done':''}"><img alt="" src="${iconURL('upfloor')}"><div class="nm">${Q.n} ${on?'<span class="tier t1">已完工</span>':''}</div><div class="d">${on?Q.done:Q.d}</div>${on?'':`<div class="act">${btn(Q.cost,'buyUp','','租下來')}${money<Q.cost?`<span class="muted" style="font-size:11.5px">還差 ${fmt(Q.cost-money)}</span>`:''}</div>${money<Q.cost?`<div class="gb"><i style="width:${pct}%"></i></div>`:''}`}</div>`}
+ return`<div class="nm" style="font-weight:800;font-size:15px;margin:14px 0 2px">二樓</div><p class="muted" style="font-size:12px;margin:0 0 6px">${on?'整層都是店裡的了。':S.upProj&&S.upProj.state==='deferred'?'之後再說過的那件事——還在這裡。':'房東說：「整層？」Jill 說：「整層。」'}</p>${on?upPlanCard()+`<button class="goalline linkline" data-act="upLook" style="margin:0 0 8px"><span>二樓</span><b>${srOn()||pdOn()?'看看整層現在的樣子':'看看整層'}</b><small>›</small></button>`:''}<div class="item ${on?'done':''}"><img alt="" src="${iconURL('upfloor')}"><div class="nm">${Q.n} ${on?'<span class="tier t1">已完工</span>':''}</div><div class="d">${on?Q.done:Q.d}</div>${on?'':`<div class="d" style="margin-top:3px">工程費付一次；<b>租金 +${fmt(RENT.up)}／日</b>，從開工那天起在結算裡扣。</div>`}${on?'':`<div class="act">${btn(Q.cost,'buyUp','','開工')}${money<Q.cost?`<span class="muted" style="font-size:11.5px">還差 ${fmt(Q.cost-money)}</span>`:''}</div>${money<Q.cost?`<div class="gb"><i style="width:${pct}%"></i></div>`:''}`}</div>`}
 /* the furniture comes up over the first week, in the order it would (the table first, the cats' things last); the
    crew's traces once they have started going up */
 function buyUp(){if(upTaken()||!fact('up_ask')||S.money<UP_PROJ.cost)return false;S.money-=UP_PROJ.cost;S.rooms.up=1;S.newRooms=S.newRooms||{};S.newRooms.up=S.day;const u=upS(),L=S.day;u.lease=L;

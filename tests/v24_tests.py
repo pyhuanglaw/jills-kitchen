@@ -1330,10 +1330,9 @@ def v24_jill_calls_the_landlord_and_the_whole_floor_is_hers(b, port, target):
     check(g.ev("due('up_ask','sr_story',1,'up')") is False, 'no call before 《大家待的地方》')
     _upf(g, 'sr_story', 0)
     check(g.ev("due('up_ask','sr_story',1,'up')") is False, 'not the same day')
-    _upf(g, 'sr_story', 1); g.ev("S.money=50000")
-    check(g.ev("upAskReady()") is False, 'not with an empty till')
+    _upf(g, 'sr_story', 1); g.ev("S.money=0")
+    check(g.ev("due('up_ask','sr_story',1,'up')&&upAskReady()") is True, 'ready — with an empty till too: the call never waits for money (the user, 2026-10-07; it waited for $120,000)')
     g.ev("S.money=420000")
-    check(g.ev("due('up_ask','sr_story',1,'up')&&upAskReady()") is True, 'ready')
     to_service(g)
     g.ev("__botUntil('R.closing!=null',90000,1/30)")
     for _ in range(600):
@@ -1348,7 +1347,7 @@ def v24_jill_calls_the_landlord_and_the_whole_floor_is_hers(b, port, target):
         g.ev("for(let i=0;i<30;i++)__tick(1000/30)")
     g.ev("save()"); g.reload(); g.page.wait_for_timeout(150)
     g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(150)
-    check(g.ev("!!fact('up_ask')&&!S.rooms.up&&secUp(1e9,()=>'X').includes('二樓（整層）')") is True, 'kept across a reload, and in 店舖工程')
+    check(g.ev("!!fact('up_ask')&&!S.rooms.up&&secUp(1e9,()=>'X').includes('二樓整層・初期工程')") is True, 'kept across a reload, and in 店舖工程')
     caps0 = g.ev("[restaurantCap(),loungeCap(),tablesTotal()]")
     g.ev("S.money=Math.max(S.money,600000)")
     check(g.ev("buyUp()") is True, 'bought')
@@ -1413,7 +1412,10 @@ def v24_rc6_the_staff_room_comes_from_a_need_and_grows_in_place(b, port, target)
     check(g.ev("srStoryReady()") is False and g.ev("due('up_ask','sr_story',1,'up')") is True, 'after it, the call')
     _upf(g, 'up_ask', 1)
     g.ev("S.money=600000")
-    check(g.ev("UP_PROJ.cost") == 510000 and '員工休息室' in g.ev("UP_PROJ.d") and '員工休息室' in g.ev("UP_PROJ.done"), 'the lease says what it gives')
+    check(g.ev("UP_PROJ.cost") == 160000 and '員工休息室' in g.ev("UP_PROJ.d") and '員工休息室' in g.ev("UP_PROJ.done"), 'the lease says what it gives')
+    card = g.ev("secUp(1e9,(c,a,e,l)=>`[${l} ${fmt(c)}]`).replace(/<[^>]+>/g,'')")
+    check('二樓整層・初期工程' in card and '[開工 $160,000]' in card and '租金 +$4,000／日' in card and '工程費付一次' in card and '[租下來' not in card,
+          f'the user, 2026-10-07: the initial works once ($160,000, was $510,000), the rent each day ($4,000) — the card says which is which: {card[-160:]!r}')
     d0 = g.ev("S.day")
     check(g.ev("buyUp()") is True, 'leased')
     g.ev("hideReveal()")
@@ -5022,7 +5024,7 @@ _LIN_TO_THE_VIEWING = """const st=story();for(const k of ['tasting_night','pairi
 @test
 def v24_story_first_the_doors_of_the_stories_open_with_story_keys(b, port, target):
     """The user, 2026-10-07 (version A; PROJECT_MEMORY §0 and §6): 「故事的門，用故事的鑰匙開；空間與豪華升級的門，用錢開。」
-    Lounge II $80,000 (Fine Dining: a room of the business), Lounge III $150,000 (no level of its own). 阿拓 is on the
+    Lounge II $80,000 and Lounge III $150,000, no level for either (rooms of the business). 阿拓 is on the
     Lounge I roster, so 晴 × 阿拓 needs The Lounge and the two of them at work there — never Lounge II. The piano is
     $100,000 from the day The Lounge opens, at any level, on the Lounge's own page (not among the late dream works, and
     never twice), and 予安's story waits for the piano alone (three days, as it always did). The floor upstairs and the
@@ -5046,7 +5048,7 @@ def v24_story_first_the_doors_of_the_stories_open_with_story_keys(b, port, targe
       yaFirst();const d0=S.day;S.day=d0+2;out.ya_d2=yaDue('ya_1');S.day=d0+3;out.ya_d3=yaDue('ya_1');S.day=d0;
       S.rooms.side=1;const c0=S.crew;S.crew=c0.concat([1,2,3,4,5].map(i=>({name:'x'+i,role:'waiter'})));out.upCan=upCan();S.crew=c0;
       out.noLevel=[upCan,srStoryReady].map(f=>!/S\\.level/.test(String(f)));return out})())""")))
-    check(r['proj'] == [[50000, 80000, 150000], [0, 4, 0]], f'Lounge I $50,000; II $80,000 at Fine Dining; III $150,000, no level: {r["proj"]}')
+    check(r['proj'] == [[50000, 80000, 150000], [0, 0, 0]], f'Lounge I $50,000; II $80,000; III $150,000 — no level for any: {r["proj"]}')
     check(r['piano'] == [100000, 1, 1] and r['pianoGoal0'] == 0, f'the piano: $100,000, any level, The Lounge first — not on sale before it: {r}')
     check(r['roster1'] == ['Evan', '沈晴', '阿拓'] and r['cap1'] == 3 and r['lounge'] == sorted(['Evan', '沈晴', '阿拓']), f'Lounge I: Evan, 沈晴 and 阿拓: {r}')
     check(r['qt1'] is True, f'晴 × 阿拓 can begin at Lounge I, level 1, 3.0 — the two of them at work: {r}')
@@ -5062,13 +5064,13 @@ def v24_lounge_one_after_the_viewing_and_50000_no_wait_for_her_last_night(b, por
     level, no rating. Her last night is her story, never a wait: with it still ahead the player signs, and the evening before the
     signing is her last (her bar closed, the keys the next morning, nothing left to fire on the old date); not signed,
     her last night comes as it always did and one line says where the signing is — a reminder, not an unlock. What is
-    missing is said on the card (the money, nothing else). Lounge II $80,000 (Fine Dining) and III $150,000 (no level of its
-    own) — the user, 2026-10-07. Saves from
+    missing is said on the card (the money, nothing else). Lounge II $80,000 and III $150,000, no level for either — the
+    user, 2026-10-07. Saves from
     before — a 「再想想」, a card nobody answered, a save between 《看看》 and that night's card, one waiting for her last
     night — can all sign; one that had paid $120,000 is not charged again, a built Lounge is left as it is."""
     g = Game(b, port, target, seed=8761, manual=True, viewport={'width': 390, 'height': 844})
     load_save(g, 'player_day52.json'); g.ev(_LIN_TO_THE_VIEWING)
-    check(g.ev("JSON.stringify([LOUNGE_PROJ.map(p=>p.cost),LOUNGE_PROJ.map(p=>p.need),'rate' in LOUNGE_PROJ[0]])") == '[[50000,80000,150000],[0,4,0],false]', 'Lounge I: $50,000, no level, no rating; II $80,000 (Fine Dining); III $150,000')
+    check(g.ev("JSON.stringify([LOUNGE_PROJ.map(p=>p.cost),LOUNGE_PROJ.map(p=>p.need),'rate' in LOUNGE_PROJ[0]])") == '[[50000,80000,150000],[0,0,0],false]', 'Lounge I: $50,000, no level, no rating; II $80,000; III $150,000 — no level for any')
     if g.ev("phase") == 'shop': g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(200)
     g.ev("window.__notes=[];const __nl=noteLine;noteLine=function(t){__notes.push(t);return __nl.apply(this,arguments)}")
     g.ev("autoStock();window.__noScenes=false;window.__holds=true"); start_day(g); install_bot(g); g.ev("for(let i=0;i<3;i++)__tick(1000/30)")
