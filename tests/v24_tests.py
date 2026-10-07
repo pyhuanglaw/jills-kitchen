@@ -4639,6 +4639,28 @@ def v24_rc8_madame_lin_next_door_on_day_one(b, port, target):
 
 
 @test
+def v24_the_tasting_night_waits_for_the_rating_not_fine_dining(b, port, target):
+    """The user, 2026-10-07 (PROJECT_MEMORY §6): Ken's tasting night asks for the rating Lounge I asks for (4.0, as the HUD
+    shows it), not Jill's Fine Dining — S.level>=4 (v2.3, 421dd42, never the user's) held a normal player's Lounge to
+    Day 66–84. With Ken's history in place: at level 3 and a rating of 4.0 the night may come; under 4.0 it does not, even
+    at level 5. The journal's 「晚餐之後」 shows on the same condition, and once it has shown a dip of the rating does not
+    hide it again."""
+    g = Game(b, port, target, seed=8301, manual=True)
+    g.click('[data-act=open]'); g.page.wait_for_timeout(100)
+    r = json.loads(g.ev("""JSON.stringify((()=>{const E=STORY_EV.find(e=>e.k==='ken_tasting');const C=()=>restChapters().find(c=>c.t==='晚餐之後');
+      const rate=s=>{S.reviews=Array.from({length:120},()=>({s,w:1}))};const out={};
+      out.before=C().showIf();
+      factSet('ken_wine_q');factSet('ken_pairing');factSet('ken_pairing');factSet('lounge_idea');factSet('lounge_idea');story().named[KEN]={v:5,last:S.day-1,dishes:{steak:3}};
+      S.level=3;rate(5);out.l3_good={rating:+rating().toFixed(1),when:!!E.when({})};
+      S.level=5;rate(3);out.l5_low={rating:+rating().toFixed(1),when:!!E.when({})};
+      S.level=3;rate(5);out.shown=C().showIf();applyGates();rate(3);out.after_dip=C().showIf();return out})())"""))
+    check(r['before'] is False, f'a new game does not show 「晚餐之後」 before the rating reaches 4.0: {r}')
+    check(r['l3_good']['rating'] >= 4.0 and r['l3_good']['when'], f'level 3, rating 4.0+: the tasting night may come: {r}')
+    check(r['l5_low']['rating'] < 4.0 and not r['l5_low']['when'], f'under 4.0 it does not, even at level 5: {r}')
+    check(r['shown'] and r['after_dip'], f'「晚餐之後」 shows with the rating, and stays after a dip: {r}')
+
+
+@test
 def v24_rc8_the_bar_next_door_from_kens_question_to_jills_decision(b, port, target):
     """§4–§12 on the player's Day 52 save (Ken has asked, no tasting yet, Dylan not revealed), played day by day (the
     scenes unseen; food): the tasting, and as Ken pays Jill keeps the pairing wines (「想喝酒，隔壁就有。」) —
