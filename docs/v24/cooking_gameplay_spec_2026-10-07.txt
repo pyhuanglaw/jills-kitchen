@@ -1,0 +1,1511 @@
+使用者 2026-10-07 23:36 UTC 的原話：正式 Cooking Gameplay 的規格（第一階段只做 A–F 的盤點與提案）。逐字保存（docs/RELEASE_CHECKLIST.md §1）。這份是這次料理系統重構的 canon；跟舊的料理 prototype（branch proto/cooking-flow）衝突的地方以這份為準。
+
+你現在要為《Jill’s Kitchen》重新設計並實作正式 Cooking Gameplay。
+
+這不是在現有遊戲旁邊新增一個料理小遊戲，也不是重新設計廚房。
+
+請以目前 main 的正式遊戲、現有廚房畫面、現有員工系統、現有料理資料、現有存檔相容性為基礎，重構料理互動。
+
+這次的核心目標是：
+
+讓玩家感覺自己真的在一間會運作的廚房裡做菜、調度員工，但操作必須非常簡單、寬容，而且不能破壞 Jill’s Kitchen 原本悠閒的餐廳經營節奏。
+
+⸻
+
+0. 先不要直接改 code
+
+第一階段請先 audit 現在 main：
+
+1. DISHES 全部正式料理
+2. Lounge food / pizza / signature dishes / specials
+3. drawKitchenRoom
+4. 現有 kitchen stations 與座標
+5. stepSpot
+6. chefBeat
+7. chefCan
+8. chefHandles
+9. crewUpd
+10. stoveSlots
+11. kitchen expansion
+12. Pass / plating
+13. 現有廚師 roster、等級、招募／解鎖順序
+14. 現有料理 XP、員工 XP／level、存檔相關欄位
+15. 所有依賴料理 step type 的測試與 simulator
+
+先把現況列清楚，再依下列 canon 實作。
+
+不要因為舊 architecture 與新規格衝突，就保留舊玩法。
+
+以下新 Cooking System 規格優先。
+
+但不要破壞已發布 save compatibility；需要 migration 就寫 migration。
+
+⸻
+
+1. 最重要的產品原則
+
+Cooking Gameplay 的核心不是反應速度，也不是記食譜。
+
+核心是：
+
+玩家在一間真的會運作的廚房裡，看著料理在不同工作區之間流動，自己決定什麼時候介入、誰處理什麼、哪一道先做。
+
+一句話：
+
+菜色很多，工作流程很少。
+
+另一句：
+
+員工負責 throughput，玩家負責 orchestration。
+
+玩家玩得好，結果應該是：
+
+* 廚房更順
+* 訂單完成更快
+* 多個工作區漂亮地同時運作
+* 看起來像一間成熟餐廳
+
+而不是：
+
+* 不夠快就燒焦
+* 少按一下就失敗
+* 記錯流程就報廢
+* 20 個客人就要手動做 20 份料理
+
+⸻
+
+2. 原廚房是 HARD CONSTRAINT
+
+目前正式版廚房的視覺設計是最高優先 reference。
+
+不要：
+
+* 重畫另一間廚房
+* 做獨立 cooking scene
+* 做 Overcooked-style floor grid
+* 加巨大 station icon
+* 加巨大 CHOP / COOK / PLATE button
+* 到處放 progress circle
+* 把現有漂亮廚房變成 arcade UI
+* 為每一道菜新增專屬設備
+* 為玩法把現在的 sink、fridge、cold room、counter 等漂亮細節刪掉
+
+目前 V20 已經有：
+
+* continuous kitchen line
+* sink
+* prep boards
+* range / multiple burners
+* under-counter oven
+* coffee machine
+* Pass + heat lamps + ticket rail
+* fridge / cold room
+* cooks as physical actors
+* food rendered physically on boards / pans / oven / machine
+* cooks walking to actual stations
+* multiple cooks using burners in parallel
+* plating at Pass
+
+這些全部是資產。
+
+沿用，不要推倒。
+
+⸻
+
+3. 視覺區域很多，但 Gameplay Station 只有 4+1
+
+玩家真正需要理解的料理工作區只有：
+
+A. PREP｜備料／冷盤
+
+使用目前 prep boards。
+
+包含：
+
+* 切
+* 拌
+* 組合
+* 沙拉
+* 冷盤
+* 甜點前處理
+* 肉類簡單前處理
+* 披薩組裝
+* 其他不值得獨立成 station 的 preparation
+
+⸻
+
+B. HOT｜熱區
+
+使用目前 range / burners。
+
+統一包含：
+
+* 煎
+* 炒
+* 煮
+* 燉
+* 炸
+
+不要為：
+
+* 炸鍋
+* 燉鍋
+* 義大利麵
+* 牛排
+
+另外創造新的 gameplay station。
+
+它們視覺上可以用不同 vessel / pan / pot 表現，但 gameplay 都屬於 HOT。
+
+⸻
+
+C. OVEN｜烤製
+
+使用目前 oven。
+
+包含：
+
+* 烤雞
+* 鮭魚
+* 烤蔬菜
+* 烤甜點
+* 舒芙蕾
+* 其他 oven dishes
+
+Lounge pizza 若目前已有 dedicated pizza oven，保留它的世界／視覺存在；workflow 邏輯仍屬於「烤製」family，不需要因此發明一整套新 interaction grammar。
+
+⸻
+
+D. DRINK｜飲料
+
+沿用目前 coffee / drink system 的實體區域。
+
+包含：
+
+* coffee
+* tea
+* soda
+* restaurant drinks
+
+Lounge bartender 的正式調酒職能仍然獨立存在，不要因為 Cooking System 重構而把 Evan／沈晴的 Lounge 職能吃掉。
+
+⸻
+
+E. PLATING｜裝盤
+
+這是唯一允許新增的通用 gameplay function。
+
+但是：
+
+優先不要新增一張獨立家具。
+
+目前已經有 Pass，而且 chef finished dish 已經存在 plating phase。
+
+請先研究能不能把：
+
+Pass 的 kitchen side = PLATING station
+
+讓料理在 Pass 廚房側完成：
+
+* 切片
+* 加醬
+* garnish
+* 最後整理
+* 出餐
+
+視覺上如果需要，可以在現有 Pass 增加非常自然的小細節：
+
+* plates
+* small board
+* sauce bottles
+* garnish containers
+
+但不要改變整體 kitchen composition。
+
+⸻
+
+4. Sink / fridge / cold room 等不是正式 Cooking Step
+
+這點非常重要。
+
+它們可以：
+
+* 留在畫面
+* 被角色走近
+* 有 animation
+* 有 stock function
+* 有世界感
+* 有 upgrade function
+
+但玩家不應該把它們理解成料理流程中的額外 station。
+
+例如義大利麵不要變成：
+
+HOT → SINK → HOT → PLATING
+
+如果料理過程合理上需要瀝乾：
+
+Jill／廚師可以在 HOT step 的內部 animation 自己去 sink。
+
+玩家認知仍然只是：
+
+HOT → PLATING
+
+視覺世界可以複雜；玩家需要理解的玩法文法必須很少。
+
+⸻
+
+5. 每一道菜最多 3 Steps
+
+這是 HARD RULE。
+
+普通／初期料理
+
+原則上：
+
+2 Steps
+
+例如：
+
+黃金蛋炒飯
+HOT → PLATING
+
+田園沙拉
+PREP → PLATING
+
+南瓜濃湯
+HOT → PLATING
+
+炸雞
+HOT → PLATING
+
+拿鐵
+DRINK → 出杯
+
+檸檬氣泡水
+DRINK → 出杯
+
+⸻
+
+比較完整的主菜
+
+最多：
+
+3 Steps
+
+例如：
+
+牛排
+PREP → HOT → PLATING
+
+鴨胸
+PREP → HOT → PLATING
+
+鮭魚
+PREP → OVEN → PLATING
+
+烤雞
+PREP → OVEN → PLATING
+
+披薩
+PREP → OVEN/PIZZA OVEN → PLATING
+
+舒芙蕾
+PREP → OVEN → PLATING
+
+⸻
+
+6. 「等待」不是 Step
+
+這是 HARD RULE。
+
+如果：
+
+牛排 = PREP → HOT → PLATING
+
+HOT 裡面可以包含：
+
+* 下鍋
+* sear
+* 自動翻面
+* butter baste
+* 起鍋
+
+但玩家認知只有：
+
+HOT
+
+不要把：
+
+* 等待
+* 翻面
+* 起鍋
+* 加一次料
+* 撒鹽
+* 瀝乾
+
+偷偷算成額外玩家操作。
+
+也就是：
+
+三個 steps 不是「表面上三個按鈕、實際六次操作」。
+
+一個 step 是一整段 Jill／廚師可以自然完成的料理工作。
+
+⸻
+
+7. 大多數料理應該只有 2 Steps
+
+不要把「最多三步」理解成「所有後期菜都應該三步」。
+
+真正需要明顯 preparation + cooking + plating 的菜才三步。
+
+很多菜即使後期解鎖，仍然可以只有：
+
+HOT → PLATING
+
+或：
+
+PREP → PLATING
+
+料理的高級感可以來自：
+
+* animation
+* vessel
+* ingredient art
+* cook time
+* plating art
+* price
+* ingredient cost
+* customer reaction
+
+不需要靠增加操作步驟證明它比較高級。
+
+⸻
+
+8. 不做 Reaction QTE
+
+不要再以：
+
+* PERFECT timing window
+* GOOD timing
+* 快速翻面
+* 秒數抓準
+* 長按量表
+* tap spam
+
+作為料理核心。
+
+舊 sZ / sH / sD 等 interaction 如果與新設計衝突，請重新整理，而不是硬塞回新系統。
+
+料理完成後：
+
+可以等玩家。
+
+不應因玩家晚 2–3 秒操作就燒焦。
+
+如果真的保留 forgotten-food consequence：
+
+必須非常寬容，而且不是主要玩法。
+
+玩家可以：
+
+* 看一下貓
+* 去主廳
+* 處理別張單
+* 回來再處理
+
+遊戲不能因此懲罰他。
+
+⸻
+
+9. Station congestion 只影響效率，不造成失敗
+
+如果 PLATING 正忙：
+
+做好的牛排可以：
+
+* 留在原 station 等
+* 進入非常小的 ready queue
+* 或由系統合理暫放
+
+不要：
+
+* 報廢
+* 阻塞整間廚房
+* 讓玩家進入無法挽救的 deadlock
+
+同理 HOT / OVEN / PREP。
+
+安排得好 = 快。
+
+安排普通 = 慢一點，但一樣能正常營業。
+
+⸻
+
+10. 玩家不控制 Jill 走路
+
+Jill 仍然是 Jill。
+
+玩家不是 WASD 控制角色。
+
+玩家操作代表：
+
+* 指定一道工作
+* 指定一道料理進下一 station
+* Jill／員工接手
+* 角色自己走過去
+* 自己完成該 step 的內部動作
+
+不要把遊戲改成角色移動操作。
+
+⸻
+
+11. 玩家與員工不是兩套模式
+
+不要做：
+
+AUTO ON / OFF
+
+不要做：
+
+MANUAL MODE / STAFF MODE
+
+玩家和員工永遠在同一間廚房、同一批 tickets、同一組 stations 上工作。
+
+規則是：
+
+沒有人接的工作 → 合適員工可以接。
+
+玩家點某工作 → Jill／玩家優先介入。
+
+玩家不再處理 → 合適員工可以自然接回去。
+
+玩家碰過一道菜，不代表從此必須自己做到最後。
+
+員工做了一半，也不代表玩家不能接手。
+
+這必須是 seamless handoff。
+
+⸻
+
+12. 玩家管理的是 Workflow / Batch，不是每一盤
+
+這是非常重要的 throughput rule。
+
+不要實作成：
+
+20 位客人 = 20 份料理 = 玩家手動跑 20 次完整流程。
+
+同一道料理同時有多份訂單時，允許合理 batching。
+
+例如：
+
+三桌點黃金蛋炒飯：
+
+黃金蛋炒飯 ×3
+
+可以作為一個 batch 使用 HOT。
+
+完成後在 PLATING / Pass 分成三份。
+
+Batch size 可以受：
+
+* station capacity
+* cookware
+* employee skill
+* upgrades
+
+影響。
+
+但不要一開始做得太複雜。
+
+核心目的只是：
+
+客人數增加，不應線性增加玩家點擊次數。
+
+⸻
+
+13. 畫面同時只應有少數 meaningful work nodes
+
+即使成熟餐廳同時服務 20–30 位客人：
+
+玩家真正需要關注的 active work 不應該變成 20–30 個。
+
+目標：
+
+大約 3–6 個有意義的 active work nodes。
+
+例如：
+
+HOT：炒飯 ×3
+HOT：牛排 ×2
+OVEN：烤雞 ×2
+PREP：沙拉 ×3
+PLATING：2 dishes ready
+
+玩家看到的是廚房 workload。
+
+不是 12 個獨立 microscopic chores。
+
+⸻
+
+14. Station capacity 才是主要的輕度策略
+
+現有 range 已有 multiple burners：
+
+* 早期 2 / 3
+* upgrade 後更多
+* kitchen expansion 可到 6
+
+保留這個價值。
+
+多個廚師可以同時使用不同 burner。
+
+不要做：
+
+「HOT station 有一個廚師，所以其他人不能使用。」
+
+Station 有 capacity。
+
+員工是會流動的人。
+
+這是兩個不同概念。
+
+⸻
+
+15. 廚師系統重構：Station Proficiency
+
+目前 chefCan 主要以：
+
+* Jill 是否做過
+* dish difficulty
+* chef level
+
+決定能不能做。
+
+新系統請加入：
+
+Station Proficiency
+
+一般餐廳廚師真正需要 cover 的技能只有四種：
+
+* HOT
+* PREP
+* OVEN
+* PLATING
+
+DRINK 不納入一般 chef 的主要技能樹，以免太雜。
+
+⸻
+
+16. 每個廚師必須不同，但不能有廢角
+
+設計原則：
+
+每位廚師有：
+
+1 個核心專長
++
+1 個主要次專長
++
+升級後逐漸能 cover 其他區域
+
+但是：
+
+個人永遠不應變成 Jill 那樣四區全滿。
+
+Jill 是唯一真正全能：
+
+HOT ★★★
+PREP ★★★
+OVEN ★★★
+PLATING ★★★
+
+她的限制是：
+
+一次只能在一個地方。
+
+⸻
+
+17. 整個 roster 必須完整 cover 四區
+
+請先讀出目前 main 所有正式餐廳廚師：
+
+* 阿德師傅
+* Marco
+* 小林師傅
+* 阿珠姐
+* Hugo
+* 阿勇
+* 老周師傅
+* 小魏
+
+如果 main 的正式 roster 與這份名單不同，以 repo truth 為準並回報差異，不要偷偷新增／刪除角色。
+
+在完整 roster 中：
+
+每一區至少要有 2 位核心專家。
+
+理想結構：
+
+HOT 核心專家 ×2
+PREP 核心專家 ×2
+OVEN 核心專家 ×2
+PLATING 核心專家 ×2
+
+讓 roster 整體完整 cover。
+
+⸻
+
+18. 建議初始角色定位
+
+這是設計方向，不要在沒查現有角色 progression 的情況下盲目硬寫。
+
+先對照：
+
+* 現有招募順序
+* 等級
+* 人物設定
+* unlock timing
+* 現有 duties
+
+再微調。
+
+建議骨架：
+
+阿德師傅
+
+核心：HOT ★★★
+次專長：PREP ★★
+後期補：PLATING ★
+
+定位：火口型。
+
+Marco
+
+核心：OVEN ★★★
+次專長：PREP ★★
+後期補：HOT ★
+
+定位：烘烤型。
+
+小林師傅
+
+核心：PLATING ★★★
+次專長：HOT ★★
+後期補：PREP ★
+
+定位：收尾／節奏型。
+
+阿珠姐
+
+核心：PREP ★★★
+次專長：PLATING ★★
+後期補：OVEN ★
+
+定位：前置型。
+
+Hugo
+
+核心：HOT ★★★
+次專長：OVEN ★★
+後期補：PLATING ★
+
+定位：熱廚型。
+
+阿勇
+
+核心：PREP ★★★
+次專長：HOT ★★
+後期補：OVEN ★
+
+定位：萬用前置。
+
+老周師傅
+
+核心：OVEN ★★★
+次專長：PLATING ★★
+後期補：PREP ★
+
+定位：穩定烤製／慢工型。
+
+小魏
+
+核心：PLATING ★★★
+次專長：PREP ★★
+後期補：HOT ★
+
+定位：流程／收尾型。
+
+⸻
+
+19. 但是要驗證「實際招募順序」的 coverage
+
+不要只看完整 roster 很漂亮。
+
+必須檢查：
+
+Early Game
+Mid Game
+Late Game
+
+玩家實際可能擁有的廚師組合。
+
+HARD RULE：
+
+正常 progression 下，早期可取得的 2–3 位廚師就應該能 cover 四個區域。
+
+不一定都是專家。
+
+例如某區只有 ★ 也沒關係。
+
+但是不能：
+
+玩家前期三個人全部 HOT，結果 OVEN 完全沒人能做。
+
+如果目前招募順序造成這種問題：
+
+優先調整 proficiency distribution。
+
+不要為了 Cooking System 隨便重寫人物故事或大幅改招募時間。
+
+⸻
+
+20. Proficiency 不只是速度倍率
+
+不要做成：
+
+★★★ = +30% speed
+★★ = +20%
+★ = +10%
+
+這太沒有感覺。
+
+Proficiency 更應該代表：
+
+★｜會做
+
+* 可以處理這區
+* 比較慢
+* 不太主動跨區接
+* 複雜 workload 時需要較多調度
+
+★★｜熟練
+
+* 正常效率
+* 會主動接該區工作
+* 能穩定處理完整 2–3 step workflow 中的該 station
+* 可以自然 cover 同事
+
+★★★｜專長
+
+* 高優先理解該區 queue
+* 擅長 batching
+* 擅長利用空 capacity
+* 自己處理 routine workload
+* 玩家幾乎不需要照看這區
+* 可以有適度效率優勢，但不要只有速度差異
+
+玩家應該感覺：
+
+「Marco 顧烤箱，我可以放心。」
+
+而不是：
+
+「Marco 後台乘數是 1.23。」
+
+⸻
+
+21. 升級會擴張擅長區域，但角色不能同質化
+
+升級應該讓：
+
+* 次專長變強
+* 開始 cover 新區域
+* AI decision 更成熟
+* 玩家 attention cost 降低
+
+但不要：
+
+LV5 所有人四區 ★★★。
+
+每個角色應有自己的 growth shape。
+
+例如阿德：
+
+LV1
+HOT ★★★
+
+LV2
+HOT ★★★
+PREP ★
+
+LV3
+HOT ★★★
+PREP ★★
+
+LV4
+HOT ★★★
+PREP ★★
+PLATING ★
+
+LV5
+HOT ★★★
+PREP ★★
+PLATING ★★
+
+他仍然是阿德。
+
+Marco 即使 LV5，也應該仍然明顯是 OVEN / PREP 型。
+
+⸻
+
+22. 可以有有限度的升級選擇
+
+如果現有 employee upgrade architecture 容許，可以考慮：
+
+角色在特定 level 有兩個符合其人物定位的成長方向。
+
+例如：
+
+Marco：
+
+A. 深化 OVEN
+或
+B. 擴張 HOT
+
+但不要讓玩家自由選四區。
+
+否則最後所有角色都會被 min-max 成同一種 build。
+
+如果這會大幅增加 implementation complexity，第一版可以先做 deterministic growth path。
+
+先把核心 cooking loop 做好，比技能樹重要。
+
+⸻
+
+23. AI 派工原則
+
+員工選工作時，優先考慮：
+
+1. 是否有能力處理
+2. station 是否有 capacity
+3. 自己的 proficiency
+4. ticket 等待時間
+5. batch opportunity
+6. 是否已經有人處理
+7. 是否會造成不必要 station congestion
+8. 是否有更適合的同事空閒
+
+例如：
+
+阿德 HOT ★★★
+Marco OVEN ★★★
+
+同時有：
+
+牛排等 HOT
+鮭魚等 OVEN
+
+正常應該：
+
+阿德 → 牛排
+Marco → 鮭魚
+
+不要兩個人因為 queue order 都跑去 HOT。
+
+但 AI 不需要完美。
+
+玩家的價值之一就是：
+
+看見 AI 的一般安排，偶爾做更好的 orchestration。
+
+⸻
+
+24. 玩家介入方式必須非常直覺
+
+沒有選 ticket 時：
+
+原廚房看起來幾乎就是現在的原廚房。
+
+不要讓所有 station 永遠發光。
+
+玩家選一張 ticket / dish 後：
+
+只對它目前合法的 station 給非常輕的 cue：
+
+* subtle outline
+* warm edge glow
+* hover/touch feedback
+* cursor change
+
+不要：
+
+* 大箭頭
+* 紅色警告
+* 巨大按鈕
+* 地板格子
+* 手遊式 bouncing icon
+
+玩家點合法 station：
+
+代表：
+
+請 Jill／合適角色處理這一道的下一個 workflow step。
+
+⸻
+
+25. Food 必須存在於廚房裡
+
+這是現有 V20 已經做得很好的地方，請保留並加強。
+
+料理在哪一站：
+
+食物就應該盡量真的在哪裡。
+
+例如：
+
+PREP
+→ ingredients / tray on board
+
+HOT
+→ pan / pot / food on burner
+
+OVEN
+→ tray / dish visible in oven
+
+PLATING
+→ plate at Pass
+
+不要主要靠 floating UI 告訴玩家料理在哪。
+
+廚房本身就是 UI。
+
+⸻
+
+26. Difficulty philosophy
+
+這不是困難料理遊戲。
+
+HARD RULE：
+
+沒有反應速度要求。
+
+沒有因為幾秒沒按就失敗。
+
+沒有因為 station 塞住就 deadlock。
+
+沒有因為忘記食譜就懲罰。
+
+不要求玩家背流程。
+
+Ticket / dish UI 永遠可以簡單顯示：
+
+牛排
+PREP → HOT → PLATING
+
+目前：
+
+✓ PREP
+→ HOT
+○ PLATING
+
+玩家永遠知道下一步。
+
+⸻
+
+27. 玩家忙不過來時，員工就是 safety net
+
+玩家想自己玩：
+
+可以。
+
+玩家只想做一道招牌菜：
+
+可以。
+
+玩家今天懶：
+
+員工照樣讓餐廳運作。
+
+玩家做到一半跑去看貓：
+
+員工可以接手。
+
+玩家突然看到重要桌想自己處理：
+
+可以從員工手上在合理節點接回來。
+
+所以：
+
+料理 gameplay 的參與程度是 fluid 的。
+
+不是模式切換。
+
+⸻
+
+28. Early / Mid / Late Game 體驗
+
+Early Game
+
+Jill 幾乎自己做。
+
+料理主要 2 steps。
+
+客量低。
+
+玩家自然學會：
+
+* 選 ticket
+* 點 station
+* 等料理工作
+* 去做別的
+* 回來／下一 station
+* Pass
+
+⸻
+
+Mid Game
+
+開始有幾位廚師。
+
+玩家開始體會：
+
+* station capacity
+* 同時跑幾道菜
+* batch
+* 員工專長
+* 哪一道交給誰
+
+但仍然不需要高速操作。
+
+⸻
+
+Late Game
+
+成熟餐廳大量客人。
+
+Routine dishes 大部分由員工處理。
+
+玩家主要做：
+
+* scheduling
+* bottleneck handling
+* important dishes
+* signature dishes
+* rush
+* large batches
+* 想親自做的料理
+
+後期的 fantasy 是：
+
+我建立了一間真的會自己運轉的成熟廚房。
+
+不是：
+
+我現在要手動點 27 盤菜。
+
+⸻
+
+29. Signature dishes
+
+招牌主菜與招牌甜點可以保留 Jill 比較重要的參與感。
+
+但仍然遵守：
+
+最多 3 steps。
+
+不要因為是 signature dish 就突然變 6–8 steps。
+
+它的特殊性應來自：
+
+* Jill 優先／必須參與某一關鍵 step
+* presentation
+* ingredients
+* customer reaction
+* story meaning
+
+而不是操作複雜度。
+
+⸻
+
+30. Specials
+
+Special version 原則上：
+
+繼承 base dish workflow。
+
+不要因為 Special 又創一套 station flow。
+
+差異主要放在：
+
+* final plating
+* garnish
+* ingredient variant
+* visual
+* value
+* reaction
+
+⸻
+
+31. 正式菜單 workflow
+
+請 audit 現有全部 DISHES 後，依上述原則建立完整 table。
+
+目前已知正式餐廳 base dishes 包括：
+
+1. 黃金蛋炒飯
+2. 拿鐵咖啡
+3. 番茄義大利麵
+4. 田園沙拉
+5. 經典牛肉漢堡
+6. 錫蘭檸檬紅茶
+7. 檸檬氣泡水
+8. 南瓜濃湯
+9. 焦糖布丁
+10. 松露薯條
+11. 莓果蘇打
+12. 香料烤蔬菜
+13. 提拉米蘇
+14. 香草烤雞
+15. 炙烤肋眼牛排
+16. 巴斯克乳酪蛋糕
+17. 生火腿沙拉
+18. 香烤鮭魚
+19. 海鮮義大利麵
+20. 香煎鴨胸
+21. 松露燉飯
+22. 舒芙蕾
+
+Lounge food 已知包括：
+
+* 炸雞塊
+* 起司可樂餅
+* 起司拼盤
+* 蒜香蘑菇
+* 水牛城雞翅
+* 起司條
+* 生蠔
+* 德國豬腳
+* 酒吧披薩
+
+另有：
+
+* signature main
+* signature dessert
+* mastered dish specials
+
+請以 main repo truth 為準。
+
+若目前正式資料與上述不同：
+
+回報差異，不要偷偷改 canon。
+
+⸻
+
+32. Workflow assignment 原則
+
+不要追求每一道菜獨特。
+
+反而應該故意大量重複。
+
+例如：
+
+牛排
+PREP → HOT → PLATING
+
+鴨胸
+PREP → HOT → PLATING
+
+漢堡
+PREP → HOT → PLATING
+
+它們玩法文法相同。
+
+差異由：
+
+* food art
+* vessel
+* animation
+* duration
+* ingredient
+* plating
+* sound
+
+表現。
+
+同理：
+
+烤雞
+PREP → OVEN → PLATING
+
+鮭魚
+PREP → OVEN → PLATING
+
+舒芙蕾
+PREP → OVEN → PLATING
+
+玩家學的是：
+
+廚房。
+
+不是背 30 個 minigames。
+
+⸻
+
+33. 黃金蛋炒飯作為第一個 Prototype
+
+不要一次把所有料理改完才給我看。
+
+第一個 playable prototype：
+
+只做黃金蛋炒飯。
+
+使用：
+
+現在正式遊戲原本的廚房。
+
+流程：
+
+HOT → PLATING
+
+需求：
+
+1. 玩家選黃金蛋炒飯 ticket
+2. 合法 HOT burner subtle cue
+3. 點 burner
+4. Jill 自己走過去
+5. 鍋裡真的看到炒飯
+6. Jill 自己完成炒製 animation
+7. 不需要翻面／QTE／連點
+8. 完成後進入 ready state
+9. PLATING / Pass subtle cue
+10. 玩家可自己送去 plating
+11. 如果有合適員工，也可以由員工接手
+12. 完成後正常進既有 serving flow
+
+⸻
+
+34. Prototype 必須測 batching
+
+不要只測一盤。
+
+至少再測：
+
+黃金蛋炒飯 ×3
+
+確認：
+
+* 不需要玩家重複完整操作三次
+* batch visually understandable
+* 一個 burner / cookware 可以合理代表 batch
+* 完成後產生正確份數
+* serving / revenue / XP / stock 不被破壞
+
+⸻
+
+35. Prototype 必須測員工 handoff
+
+至少測：
+
+A.
+玩家開始 HOT
+→ 員工完成／plating
+
+B.
+員工開始 HOT
+→ 玩家在下一 workflow step 接手
+
+C.
+玩家完全不碰
+→ 員工可以正常完成
+
+D.
+玩家全程自己做
+→ 正常完成
+
+四種都必須是同一套 workflow。
+
+不要寫四套 special-case logic。
+
+⸻
+
+36. Prototype 必須測 4–6 份 concurrent workload
+
+我不只想知道：
+
+「炒飯做不做得出來。」
+
+我想知道：
+
+這套系統第一次玩會不會太難。
+
+所以 prototype 第二階段請用少量暫時 workflow mapping，測：
+
+約 4 桌／5–6 份料理同時進來。
+
+Acceptance：
+
+* 第一次看畫面就大致知道哪裡能按
+* 不需要教學文字牆
+* 不需要記食譜
+* 不會因為慢幾秒就失敗
+* 不會滿畫面 alert
+* 不會需要 frantic clicking
+* 員工能自然分擔
+* 玩家可以只介入 1–2 個重要決策
+* 廚房仍然漂亮
+* 五隻貓／餐廳世界仍然存在
+* 玩家有「整間廚房在運轉」的感覺
+
+如果測試結果需要玩家「熟悉之後才不會亂」：
+
+視為 UX 失敗。
+
+不要用「熟悉後就會了」合理化。
+
+⸻
+
+37. 不要立刻發布
+
+這次 Cooking System 是核心玩法重構。
+
+流程：
+
+1. audit
+2. architecture proposal
+3. 黃金蛋炒飯 prototype
+4. screenshot / playable evidence
+5. batching test
+6. employee handoff test
+7. small concurrent workload test
+8. 我確認方向
+9. 才擴充所有料理
+10. full regression
+11. 才考慮 merge / release
+
+不要直接：
+
+* merge main
+* 發布
+* 改所有料理
+* 一口氣 migration 全系統
+
+⸻
+
+38. 第一階段請回報給我的東西
+
+現在先不要大改。
+
+請先回報：
+
+A. Current Kitchen Audit
+
+列出現在所有實際 kitchen interactive zones，以及：
+
+* 哪些保留為 gameplay station
+* 哪些只保留為 visual/world interaction
+* 是否真的需要新增任何 furniture
+* Pass 如何改成 plating
+
+B. Current Chef Audit
+
+列出所有正式餐廳廚師：
+
+* 現有 level system
+* unlock / hire order
+* current duty logic
+* current chefCan / chefHandles behavior
+
+C. Proposed Proficiency Matrix
+
+為所有現有廚師排：
+
+HOT / PREP / OVEN / PLATING
+
+並檢查：
+
+* full roster coverage
+* early-game coverage
+* mid-game coverage
+* late-game coverage
+
+D. Recipe Workflow Matrix
+
+列出所有正式料理：
+
+Dish | Step 1 | Step 2 | Step 3 | Batchable | Notes
+
+HARD RULE：
+
+* 2 steps 優先
+* 3 steps 少數
+* 0 dishes > 3 steps
+
+E. Migration / Architecture Plan
+
+說明：
+
+* 舊 steps 如何轉換
+* 舊 save 如何相容
+* dish XP 如何保留
+* employee level 如何保留
+* tests 哪些要重寫
+* 哪些現有系統可以直接沿用
+
+F. Prototype implementation plan
+
+只針對：
+
+黃金蛋炒飯
+
+說明最小改動範圍。
+
+⸻
+
+39. 最後再確認一次不要做的東西
+
+不要：
+
+* 新料理場景
+* colored grid
+* arcade HUD
+* QTE
+* tap spam
+* frantic countdown
+* reaction timing
+* 每道菜獨特 minigame
+* 每道菜新增設備
+* 20 客 = 20 套手動操作
+* AUTO toggle
+* 廚師一人綁死一站
+* LV5 所有人變一樣
+* 玩家控制 Jill 走路
+* station congestion 導致失敗
+* 為了 gameplay 犧牲現在正式廚房的美術
+* 在我看 prototype 前直接發布
+
+我們要的是：
+
+一間原本就很漂亮的 Jill’s Kitchen，現在終於真的開始像一間廚房一樣運作。
+
+料理很容易理解。
+
+員工各自有專長。
+
+升級會讓他們逐漸能 cover 更多區域。
+
+整個 roster 最終完整 cover 所有工作區。
+
+大量客人由 batching + staff throughput 消化。
+
+玩家可以介入，但不需要一直介入。
+
+單一道菜很簡單。
+
+真正的樂趣是看整間廚房同時運轉，偶爾做一個漂亮的調度決定。
+
+先完成 A–F audit / proposal。
+
+不要先實作整套。
