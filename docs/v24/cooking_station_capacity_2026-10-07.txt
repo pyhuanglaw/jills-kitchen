@@ -1,0 +1,899 @@
+使用者 2026-10-07 23:42 UTC 的原話：Station Capacity 與現有廚房升級整合（HARD RULE）。逐字保存（docs/RELEASE_CHECKLIST.md §1）。補充同一天的料理規格（cooking_gameplay_spec_2026-10-07.txt）與 workflow canon（cooking_workflow_canon_2026-10-07.txt）。
+
+新增 HARD RULE：Station Capacity 與現有廚房升級整合
+
+請不要另外重新設計一間「Cooking Gameplay Kitchen」。
+
+先 audit main 現有：
+
+* stove / range
+* prep / cold station
+* oven
+* coffee / drink station
+* Pass
+* pizza oven
+* 廚房擴建
+* 廚房二期
+* 各設備 LV1–LV5
+* station slot calculation
+* kitchen staff physical capacity
+
+我們的新 Cooking System 必須優先利用這套既有 progression。
+
+目前 repo 已知已有：
+
+* 爐灶可隨升級增加工作位，廚房擴建後成為六口大爐
+* oven 由 1 → 2 烤位
+* cold / prep 由 1 → 2 工作位
+* drink 由 1 → 2 出杯位
+* 廚房二期讓 drink 2 → 4
+* 廚房擴建增加後場空間與可容納人員
+* dedicated pizza oven
+* Pass 已有實際廚房位置與 heat lamps
+
+不要把這些丟掉重做。
+
+⸻
+
+Station Capacity Canon
+
+新 Cooking System 的 station capacity target：
+
+Station	Early	Mid	Mature Max
+PREP	1	2	3
+HOT	2	4	6
+OVEN	1	2	3
+DRINK	1	2	4
+PLATING	1	2	3
+PIZZA OVEN	1	1	1
+
+這些是目前產品 target。
+
+實作前用 simulation 驗證，但：
+
+不要自行把 mature capacity 大幅提高。
+
+如果 simulation 顯示瓶頸，先檢查：
+
+* batching 是否正確
+* staff 是否真的 parallel work
+* station occupation time 是否過長
+* PLATING 是否錯誤地變成長工序
+* drink 是否把不應該的工作算進去
+
+而不是第一反應就把 station 加到 8、10、12 格。
+
+⸻
+
+1. HOT：2 → 4 → 6
+
+HOT 是廚房主要 throughput station。
+
+我們的新 workflow 中大量料理使用 HOT：
+
+* 黃金蛋炒飯
+* 番茄義大利麵
+* 南瓜濃湯
+* 松露燉飯
+* 漢堡
+* 牛排
+* 海鮮義大利麵
+* 鴨胸
+* 炸雞塊
+* 可樂餅
+* 蒜香蘑菇
+* 水牛城雞翅
+* 起司條
+* Signature Main
+
+因此 HOT 必須是容量最大的 station。
+
+Early
+
+2 slots
+
+小餐廳時可以同時：
+
+炒飯 + 義大利麵
+
+或：
+
+炒飯 batch + 湯
+
+玩家開始感受到選擇，但不會立即塞死。
+
+Mid
+
+4 slots
+
+讓員工加入後，可以真正 parallel work。
+
+例如：
+
+* 阿德：炒飯 ×3
+* Jill：牛排 ×2
+* Marco：義大利麵
+* 一鍋濃湯
+
+四個 work nodes 同時存在。
+
+Mature
+
+6 slots
+
+直接利用目前 repo 已存在的六口大爐／廚房擴建視覺。
+
+不要再增加第七、第八個 HOT slot。
+
+六口就是 mature kitchen 的視覺與 gameplay 上限。
+
+HOT 的後期 throughput 再提升，應該主要來自：
+
+* staff skill
+* batch size
+* cooking speed
+* orchestration
+
+不是無限增加爐口。
+
+⸻
+
+2. PREP：1 → 2 → 3
+
+目前 repo 已有 cold/prep：
+
+冰箱升級後：
+
+1 → 2 塊砧板。
+
+保留這個 progression。
+
+但是新 workflow 後期有不少 3-step dishes 先經 PREP，因此 mature kitchen 最後增加：
+
+第三個 PREP position。
+
+不需要第四個。
+
+原因：
+
+PREP 通常比 HOT occupation 短。
+
+而且大量 2-step dishes根本不經 PREP。
+
+因此：
+
+Early = 1
+Mid = 2
+Mature = 3
+
+第三個位置應該優先透過：
+
+現有廚房擴建／後場工程的視覺空間
+
+自然加入。
+
+不要為此蓋一間新的 prep room。
+
+不要新增另一種 station。
+
+可以只是現有 prep counter 延伸後，多出第三個可工作的 board / position。
+
+⸻
+
+3. OVEN：1 → 2 → 3
+
+目前 repo：
+
+LV early = 1 烤位
+LV3+ = 雙門烤箱 = 2 烤位
+
+這個 progression 保留。
+
+但新 workflow 中：
+
+* 松露薯條
+* 烤蔬菜
+* 烤雞
+* 巴斯克
+* 鮭魚
+* 舒芙蕾
+* 德國豬腳
+
+都會占用 OVEN。
+
+而且 oven dishes 的 occupation time 通常比 PREP / PLATING 長。
+
+因此 mature kitchen 最終允許：
+
+3 concurrent oven work nodes。
+
+但是：
+
+不要直接畫三台大烤箱。
+
+優先看現有 kitchen art 能否：
+
+* 雙門烤箱 = 2
+* 廚房後期升級增加一個額外 oven compartment / small second oven = +1
+
+保持視覺合理。
+
+不要做 4。
+
+過去 repo 的 Day 52 simulation 曾顯示 oven 約半閒，因此第三格必須是 mature / late upgrade，而不是早早送給玩家。
+
+⸻
+
+4. DRINK：1 → 2 → 4
+
+這條幾乎完全保留 repo 現況。
+
+Early：
+
+1
+
+升級：
+
+2
+
+廚房二期／第二台咖啡機：
+
+4
+
+不要改成 3。
+
+因為現有視覺本身就是：
+
+第一台雙沖煮頭 = 2
+第二台雙沖煮頭 = 再 +2
+
+而且舊 Day 52 mature simulation 已經實際發現：
+
+2 個 drink slots 約 40–50% service time 都同時忙碌，而且會持續有人等待。
+
+所以：
+
+2 → 4 有既有 gameplay evidence 支持。
+
+保留。
+
+所有：
+
+* 咖啡
+* 紅茶
+* 氣泡水
+* 莓果蘇打
+
+共用 DRINK capacity。
+
+⸻
+
+5. PLATING：1 → 2 → 3
+
+這是新 Cooking System 最需要正式建立 capacity 的地方。
+
+但是：
+
+不要另外塞一張巨大的新桌子進廚房。
+
+優先使用現在的 Pass。
+
+現在 repo 已經有：
+
+* Pass
+* heat lamps
+* plate positions
+* pickup side
+* 廚房與 dining room 的出菜關係
+
+因此：
+
+PLATING station = kitchen side of Pass。
+
+不是新的房間。
+
+也不是另一個 arcade station。
+
+⸻
+
+Early
+
+Pass 只有：
+
+1 active plating position
+
+玩家／Jill 一次處理一個 finishing work node。
+
+⸻
+
+Mid
+
+升級／出菜口改善：
+
+2 active plating positions
+
+兩個廚師可以同時 finishing。
+
+⸻
+
+Mature
+
+Pass 擴充：
+
+3 active plating positions
+
+這是上限。
+
+現有 Pass art 已經有多個 plate positions / heat lamp visual，可以優先利用它們。
+
+請 audit 現有 Pass drawing 與 upgrade history，看是否能直接把這三個視覺 plate positions 變成真正的 gameplay capacity。
+
+⸻
+
+6. PLATING 不得成為另一個 HOT
+
+雖然幾乎所有 food workflow 都會經過 PLATING：
+
+PLATING occupation time 必須短。
+
+例如：
+
+HOT：
+
+6–12 秒 gameplay-equivalent work
+
+PLATING：
+
+2–4 秒 gameplay-equivalent work
+
+具體時間請用 prototype simulation 調整。
+
+核心比例：
+
+PLATING 明顯短於主要 cooking step。
+
+否則所有料理最後匯流到 Pass，3 格也一定塞爆。
+
+我們要的是：
+
+短暫 bottleneck / sequencing decision。
+
+不是：
+
+所有菜永遠卡在裝盤。
+
+⸻
+
+7. Pizza Oven 永遠只有 1
+
+酒吧披薩：
+
+PREP → PIZZA OVEN → PLATING
+
+dedicated pizza oven：
+
+capacity = 1
+
+不升到 2。
+
+它是特殊設備 identity，不是主要 throughput backbone。
+
+如果同時兩個 pizza batch：
+
+第二個等待。
+
+這是合理的小型特殊瓶頸。
+
+⸻
+
+8. Batch 占一個 Slot，不按份數占 Slot
+
+這是 HARD RULE。
+
+例如：
+
+黃金蛋炒飯 ×3
+
+在 HOT：
+
+占：
+
+1 HOT slot
+
+不是 3。
+
+牛排 ×2
+
+如果同一 batch：
+
+占：
+
+1 HOT slot
+
+不是 2。
+
+Station capacity 計算的是：
+
+concurrent work nodes / batches
+
+不是 plates。
+
+因此成熟六口爐：
+
+最多同時處理六個 HOT work nodes。
+
+每個 node 本身可以是：
+
+×1
+×2
+×3
+
+依 recipe / batch limit 決定。
+
+⸻
+
+9. Batch Size 本身可以成為 progression
+
+不要只用 station count 提升 throughput。
+
+例如：
+
+Early：
+
+同一道料理 batch max ×2
+
+Mid：
+
+max ×3
+
+Mature staff / station mastery：
+
+某些適合 batch 的料理 max ×4
+
+但是不要所有料理都一樣。
+
+合理 batch：
+
+* 炒飯
+* pasta
+* soup
+* risotto
+* fries
+* fried bites
+* drinks
+
+較小 batch：
+
+* steak
+* duck
+* salmon
+* soufflé
+* signature dishes
+
+請先在 prototype architecture 留 batch-size capability。
+
+具體每道菜 max batch 可以在 station prototype 穩定後再定。
+
+⸻
+
+10. Station Capacity 與員工數量是兩個不同限制
+
+非常重要。
+
+有：
+
+6 HOT slots
+
+不代表：
+
+一個廚師可以同時操作六鍋。
+
+Station capacity 是：
+
+廚房物理上可以同時存在多少 work nodes。
+
+Staff capacity 是：
+
+目前有多少人可以實際推進它們。
+
+例如：
+
+6 HOT slots
+但只有 Jill + 阿德兩個可做 HOT
+
+則可能：
+
+2 個正在 active work
+2 個 passive cooking / waiting
+2 個空
+
+這是正常的。
+
+反過來：
+
+有 4 個 HOT-skilled chefs
+但只有 2 HOT slots
+
+則：
+
+兩個人在做
+兩個人必須做別區或等待。
+
+這才讓：
+
+設備升級與員工升級兩者都有價值。
+
+⸻
+
+11. 員工升級不能增加 Station Slot
+
+員工升級增加：
+
+* 可工作的 station family
+* work speed
+* batch capability
+* autonomous continuation
+* reliability / quality
+
+但：
+
+不增加物理 station capacity。
+
+不能：
+
+阿德 LV5 → +1 burner
+
+那會把兩套 progression 混在一起。
+
+設備決定空間。
+
+員工決定人能做什麼。
+
+⸻
+
+12. Station Upgrade 必須肉眼看得到
+
+沿用 Jill’s Kitchen 原則：
+
+capacity 增加必須有 visual change。
+
+例如：
+
+HOT 2 → 4
+→ 爐灶真的變大／更多 burner
+
+HOT 4 → 6
+→ 現有廚房擴建六口大爐
+
+PREP 1 → 2
+→ counter 上真的有第二塊 board / work position
+
+PREP 2 → 3
+→ expanded prep counter 多一個 position
+
+OVEN 1 → 2
+→ 雙門 oven
+
+OVEN 2 → 3
+→ late kitchen work 增加額外 compartment
+
+DRINK 1 → 2
+→ double-head capability
+
+DRINK 2 → 4
+→ repo 已有第二台 coffee machine
+
+PLATING 1 → 2 → 3
+→ Pass 上可工作的 plate positions / heat-lamp positions 增加
+
+不要只是 shop card 寫：
+
+「容量 +1」
+
+畫面卻完全一樣。
+
+⸻
+
+13. 不要把所有 Station 同時升級
+
+Capacity progression 必須跟 restaurant growth 錯開。
+
+玩家應該有一段時間感受到：
+
+「最近飲料有點塞。」
+
+然後買第二個 drink slot。
+
+後來：
+
+「現在爐台才是瓶頸。」
+
+再擴爐台。
+
+這才有 restaurant management 感。
+
+不要每升 Restaurant Level：
+
+所有 station +1。
+
+那只是數值膨脹。
+
+⸻
+
+14. 新 Workflow 下重新做 Bottleneck Simulation
+
+舊 simulation 只能當 evidence，不能直接當新系統答案。
+
+因為 recipe flow 已經改變。
+
+請在 prototype architecture 完成後建立 station telemetry：
+
+每個 station 每晚至少記：
+
+* capacity
+* occupied time
+* active work time
+* passive occupation time
+* queue length average
+* queue length peak
+* longest wait
+* number of batches
+* number of portions
+* employee idle time caused by no station
+* station idle time caused by no qualified employee
+
+我們真正要分辨：
+
+設備不足
+
+station queue 高 + qualified employee idle
+
+→ station capacity 可能不足。
+
+員工不足
+
+station idle + work waiting + no qualified employee
+
+→ staff coverage 不足。
+
+玩家 orchestration 問題
+
+設備與員工都有，但 work node 長時間 ready / waiting。
+
+→ 這是 gameplay。
+
+不要把第三種自動當成 balance bug。
+
+⸻
+
+15. Capacity Balance Target
+
+正常成熟餐廳：
+
+不要追求 0 queue。
+
+那會沒有 gameplay。
+
+理想是：
+
+主要 station 在 rush 時偶爾滿。
+
+玩家會看到：
+
+HOT 5/6
+
+然後想：
+
+我是不是先不要把這道牛排送進去？
+
+但不應長時間：
+
+HOT 6/6 + 8 batches waiting
+
+那會變成塞車模擬器。
+
+大致 target：
+
+普通時段：
+station utilization 約 40–70%
+
+Rush：
+主要 station 可短時間 70–100%
+
+但長時間 100% 且 queue 持續增長：
+
+視為 capacity / timing / batching balance 問題。
+
+這些數字先作 simulation target，不是死規則。
+
+⸻
+
+16. Mature Kitchen 不應超過玩家能理解的工作量
+
+即使 physical capacity 最後是：
+
+PREP 3
+HOT 6
+OVEN 3
+DRINK 4
+PLATING 3
+PIZZA 1
+
+也不代表畫面上要同時有：
+
+20 個需要玩家處理的 active prompts。
+
+員工會吸收大部分 routine throughput。
+
+玩家畫面仍以：
+
+約 3–6 個 meaningful decisions
+
+為目標。
+
+這再次回到：
+
+員工負責 throughput。
+
+玩家負責 orchestration。
+
+Physical capacity 可以很大。
+
+Cognitive capacity 不可以跟著變大。
+
+⸻
+
+17. 請特別 Audit 現有 Pass
+
+這次除了黃金蛋炒飯 prototype，請先額外 audit：
+
+現有 Pass 是否可以直接承擔 PLATING station。
+
+檢查：
+
+* 現有 plate positions
+* heat lamps
+* pickup logic
+* waiter pickup
+* Lounge food routing
+* Main Hall / Side Hall routing
+* staff pathfinding
+* Pass upgrade / width history
+* kitchen art space
+
+優先方案：
+
+不要新增獨立 plating table。
+
+如果現有 Pass 能做到：
+
+1 → 2 → 3 plating positions
+
+就直接使用 Pass。
+
+只有在實際 geometry 完全放不下時，才回報我。
+
+不要自行新增大型工作檯。
+
+⸻
+
+18. Prototype Capacity Test
+
+第一個黃金蛋炒飯 prototype 不只測：
+
+HOT → PLATING
+
+還要測 capacity。
+
+至少做：
+
+Case A
+
+HOT capacity 2
+
+炒飯 A
+炒飯 B
+
+同時進 HOT。
+
+兩者都能工作。
+
+Case B
+
+第三個不同 batch 進來
+
+HOT 2/2。
+
+第三 batch：
+
+安全等待。
+
+UI 清楚顯示：
+
+下一步：熱區 · 目前忙碌
+
+不能失敗。
+
+Case C
+
+其中一個 HOT slot 空出
+
+等待 batch 自己變成：
+
+HOT 可進行
+
+但不要強制自動進站，除非已指派給員工。
+
+Case D
+
+炒飯 ×3 batch
+
+只占：
+
+1 HOT slot。
+
+Case E
+
+PLATING capacity 1
+
+兩個 HOT batches 同時完成。
+
+一個進 PLATING。
+
+另一個：
+
+安全等待。
+
+不燒焦、不掉品質、不催玩家。
+
+Case F
+
+員工接手等待中的 batch
+
+如果員工 qualified 且 station 空出：
+
+員工可以自然接手。
+
+⸻
+
+19. 現階段不要實作全部 Capacity Upgrade
+
+Prototype 只需要建立：
+
+generic station capacity architecture
+
+並用：
+
+HOT = 2
+PLATING = 1
+
+驗證。
+
+但是 architecture 必須可以之後 data-driven 設定：
+
+PREP 1/2/3
+HOT 2/4/6
+OVEN 1/2/3
+DRINK 1/2/4
+PLATING 1/2/3
+PIZZA 1
+
+不要 hard-code 一堆 dish-specific capacity exceptions。
+
+⸻
+
+最後請記住：
+
+工作站容量不是為了限制玩家，而是為了製造「我要把下一批工作放哪裡」的決策。
+
+如果容量太小：
+
+玩家一直排隊，煩。
+
+如果容量太大：
+
+所有東西都能同時丟進去，沒有決策。
+
+我們要的是：
+
+大部分時間有空間，rush 時需要安排。
