@@ -822,6 +822,56 @@ def qa_the_first_two_days_say_the_stock_fills_itself(b, port, target):
 
 
 @test
+def qa_the_stock_rule_is_said_the_way_it_works(b, port, target):
+    """Audit WS1-05 / README #7 (fixed 2026-10-07): what happens to a dish with nothing in the fridge was said four ways,
+    and from Day 3 the start warning said the opposite of the game: 「沒有備料，客人點了要臨時叫貨（1.5 倍價、要等）」 —
+    while from Day 3 such a dish cannot be ordered at all and nobody orders it for you (the audit's new player believed
+    it, opened with an empty fridge and lost every table). The manual said 「客人點到沒貨的菜，Jill 也會自動叫貨」; the
+    fridge said 「店不會自己花錢叫貨」 on Day 1, when Jill does. Day 1 and Day 3, by taps (the stock chip, 開始營業): the
+    fridge panel, the start warning, the sold-out notice and the manual say what the game then does."""
+    p = Player(b, port, target)
+    try:
+        p.tap('[data-act=open]'); p.settle()
+        p.start_day(confirm=False)
+        check(p.state()['phase'] == 'service', f'Day 1 did not open: {p.state()}')
+        p.tap('#stockChip'); p.settle()
+        note = p.text('#stockPanel')
+        check('Jill 會自己臨時叫貨' in note and '店不會自己花錢叫貨' not in note, f'Day 1, the fridge panel: {note[-90:]}')
+        d = p.ev("menuList()[0]")
+        r = json.loads(p.ev(f"JSON.stringify((()=>{{const m00=S.money;S.stock['{d}']=0;S.money=500;const m0=S.money;const it={{d:'{d}'}};const ok=takeStock(it);const paid=m0-S.money;S.money=0;const it2={{d:'{d}'}};const ok2=takeStock(it2);S.money=m00;return{{ok,st:it.st,paid,ok2,st2:it2.st}}}})())"))
+        check(r['ok'] and r['st'] == 'order' and r['paid'] > 0, f'Day 1: a dish with nothing left is ordered on the spot, as the panel says: {r}')
+        check(not r['ok2'] and r['st2'] == 'cancel' and '錢夠的話' in note, f'Day 1 with an empty till: not ordered — and the panel says 「錢夠的話」: {r}')
+        p.capture_on()
+        p.ev("R.stockNote={};stockWatch()")
+        sold = [c['t'] for c in p.captured() if c['k'].startswith('toast') and '賣完了' in c['t']]
+        check(sold and all('錢夠的話 Jill 會臨時叫貨' in t for t in sold), f'Day 1, the sold-out notice: {sold[:1]}')
+        # Day 3, before opening, a dish with nothing in the fridge
+        p.ev("phase='prep';R=null;S.day=3;S.phase='prep';unlockDish('pasta');if(!S.menu.includes('pasta'))S.menu.push('pasta');const m=menuList();for(const x of m)S.stock[x]=30;S.stock.friedrice=0;showPrep()"); p.settle()
+        warn = p.start_day(confirm=False)
+        check(warn and '點不到' in warn and '1.5 倍價' not in warn and '要等' not in warn, f'Day 3, the start warning: {warn}')
+        p.tap('[data-act=start]'); p.settle()
+        check(p.state()['phase'] == 'service', f'the second tap did not open: {p.state()}')
+        r = json.loads(p.ev("""JSON.stringify((()=>{const zero=menuList().filter(x=>(S.stock[x]||0)===0);const asked=new Set();
+          const ty=Object.keys(TYPES);for(let i=0;i<80;i++){const g={type:ty[i%ty.length],size:1+i%4,name:'T',cats:[]};for(const x of orderItems(g))asked.add(x)}
+          const m0=S.money;const it={d:zero[0]};const ok=takeStock(it);return{zero,asked:[...asked],ok,st:it.st,paid:m0-S.money}})())"""))
+        check(r['asked'] and not set(r['asked']) & set(r['zero']), f'Day 3: a dish with nothing in the fridge was ordered: {set(r["asked"]) & set(r["zero"])} (asked {r["asked"][:6]}, empty {r["zero"]})')
+        check(not r['ok'] and r['st'] == 'cancel' and r['paid'] == 0, f'Day 3: nobody orders it for you, nothing is paid: {r}')
+        p.tap('#stockChip'); p.settle()
+        note = p.text('#stockPanel')
+        check('賣完的菜客人點不到' in note and 'Jill 會自己臨時叫貨' not in note, f'Day 3, the fridge panel: {note[-90:]}')
+        p.ev("__cap.length=0;R.stockNote={};stockWatch()")
+        sold = [c['t'] for c in p.captured() if c['k'].startswith('toast') and '賣完了' in c['t']]
+        check(sold and all('點不到' in t and 'Jill 會臨時叫貨' not in t for t in sold), f'Day 3, the sold-out notice: {sold[:1]}')
+        p.ev("showGuide()"); p.settle()
+        p.page.locator('.gcard summary', has_text='營業中').first.click(); p.settle()   # the card a player opens
+        guide = p.text('#screen')
+        check('Jill 也會自動叫貨' not in guide and '賣完的菜客人點不到' in guide and '只有前兩天，錢夠的話' in guide, 'the manual says the rule as the game plays it')
+        check(not p.errors, p.errors[:3])
+    finally:
+        p.close()
+
+
+@test
 def qa_no_text_copy_backup(b, port, target):
     """Audit WS2-14: 設定・存檔 had 「複製備份文字」, the button the user reported 2026-10-02 (「按複製直接當機 離開瀏覽器前一秒出現字
     再進去黑畫面」「不能用文字方式這樣只會當機」); PROJECT_MEMORY §10: 不要再用「文字框複製」做備份. Settings, opened by a tap:
@@ -1171,6 +1221,113 @@ def qa_a_story_photo_comes_after_its_lines(b, port, target):
         i_photo = next((i for i, l in enumerate(lines) if '相簿' in l), None)
         check(i_last is not None and i_photo is not None, f'the panel read {lines}')
         check(i_photo > i_last, f'the photo came before the lines it records: {lines}')
+    finally:
+        p.close()
+
+
+@test
+def qa_a_long_scene_is_kept_whole_on_its_page(b, port, target):
+    """N08 (fixed 2026-10-06; its test 2026-10-07): a written scene longer than twelve lines lost its end on the story
+    page — 《那面牆》's mediation (21 lines) stopped at 「金額的部分呢？」, so 「我接受。」 was never on it. The cap is for the
+    chatter a beat's timers bring, not for the scene's own lines. In a service, the mediation read through by taps: every
+    line of it is on its page."""
+    p = Player(b, port, target, save=MID, checkpoint=False)
+    try:
+        _to_service_from_late(p)
+        p.ev("""(()=>{const st=story();delete st.ev.wall_mediation;if(st.facts)delete st.facts.wall_mediation;if(st.beatLines)delete st.beatLines.wall_mediation;
+          const E=STORY_EV.find(e=>e.k==='wall_mediation');shStart('wall_mediation',shAuthored(E),null,()=>E.run({}),true)})()""")
+        read = p.read_dialog()
+        kept = [x['t'] for x in json.loads(p.ev("JSON.stringify((story().beatLines||{}).wall_mediation||[])"))]
+        check(len(read) >= 21, f'the mediation was not shown whole: {len(read)} lines read')
+        check(len(kept) >= 21 and '我接受。' in kept and kept[20] == '嗯。剩下的是修牆。', f'its page keeps {len(kept)} lines, the last 「{kept[-1] if kept else ""}」')
+        check(not p.errors, p.errors[:3])
+    finally:
+        p.close()
+
+
+@test
+def qa_a_late_save_reads_true(b, port, target):
+    """The user's Day 92 save as a player opens it (2026-10-07; the fixes are of 2026-10-06, the old-page repair of 10-07):
+    - N08 / WS9-01: story pages cut part-way through a written scene before the fix are whole again — 《那面牆》's
+      mediation (12 of 21 lines, ending 「金額的部分呢？」), the photos of the wall (6 lines, ending 「可以放大嗎？」); a
+      second load changes nothing more.
+    - N15: no 「Ken 的品酒夜」 / 「品酒夜」 on the pages (the nights are 品酒之夜); 「妳不是在問炸物？」 is credited to the cook
+      who said it (阿德師傅), not Hugo.
+    - N05: a story notice and the summary's stories name the story (「X 的故事」) and show each beat's title as written:
+      not 「Madame Lin「妳真的不賣酒？」」 (Ken's words under her name), not a description put in quotes.
+    - W3-16: a week of one day reads 「DAY 92」, not 「DAY 92–92」.
+    - WS2-08: the Lounge's snacks news no longer says 「每道新菜的第一份還是 Jill 親自做」 (rc8 retired that rule).
+    - W3-13: the next morning's line is filed under the new day, as 開店前 — not in the day before as 打烊後."""
+    p = Player(b, port, target, save=LATE)
+    try:
+        pages = json.loads(p.ev("JSON.stringify(story().beatLines)"))
+        med = [x['t'] for x in pages.get('wall_mediation', [])]
+        ph = [x['t'] for x in pages.get('wall_photos', [])]
+        check(len(med) == 21 and med[11] == '金額的部分呢？' and med[-1] == '嗯。剩下的是修牆。' and '我接受。' in med, f'N08: the mediation page has {len(med)} lines, ending 「{med[-1] if med else ""}」')
+        check(len(ph) > 6 and ph[5] == '可以放大嗎？' and '差很多。' in ph, f'N08: the photos of the wall have {len(ph)} lines, ending 「{ph[-1] if ph else ""}」')
+        p.reload(background=False)
+        again = json.loads(p.ev("JSON.stringify(story().beatLines)"))
+        check(again == pages, 'N08: a second load changed the pages again')
+        p.tap('#screen [data-act=open]'); p.settle()
+        p.ev("showBook()"); p.settle()
+        p.tap('[data-act=btab][data-k=story]'); p.settle()
+        story_txt = p.ev("storyPageHTML()")
+        check('Ken 的品酒夜' not in story_txt and not re.search(r'(?<!之)品酒夜', story_txt), 'N15: the pages still say 「品酒夜」')
+        check('阿德師傅：「妳不是在問炸物？」' in story_txt and 'Hugo：「妳不是在問炸物？」' not in story_txt, 'N15: 「妳不是在問炸物？」 is not credited to the cook who said it')
+        bad = json.loads(p.ev("""JSON.stringify((()=>{const bad=[];for(const L of STORY_LINES){let P=null;try{if(!L.open())continue;P=lineProgress(L)}catch(e){continue}
+            for(const x of P.done.slice(0,3)){storyNoteShow.pending=null;storyNoteShow({k:L.k,who:lineWho(L),t:x.t,n:1,total:2});const el=document.querySelector('#storyNote');
+              const b=el.querySelector('b').textContent,s=(el.querySelector('span')||{}).textContent||'';if(!/的故事$/.test(b)||s!==String(x.t))bad.push(b+' | '+s+' | '+x.t)}}
+            for(let D=S.day;D>S.day-8;D--){const box=document.createElement('div');box.innerHTML=storyTodayHTML(D);for(const r of box.querySelectorAll('.st-row')){if(String(r.dataset.k).startsWith('ch'))continue;
+              const b=r.querySelector('b').textContent;if(!/的故事$/.test(b))bad.push('summary: '+b)}}return bad})())"""))
+        check(not bad, f'N05: a story named as its speaker, or a title not as written: {bad[:3]}')
+        p.ev("clearTimeout(storyNoteShow.t);document.querySelector('#storyNote').hidden=true")   # the notices this check showed
+        p.tap('[data-act=btab][data-k=mem]'); p.settle()
+        album = p.text('#screen')
+        same = [m.group(0) for m in re.finditer(r'DAY (\d+)–(\d+)', album) if m.group(1) == m.group(2)]
+        check('DAY ' in album and not same, f'W3-16: {same[:2]}')
+        news = p.ev("(()=>{S.unlocked=S.unlocked.filter(d=>d!==barDishes()[0]);S.news=[];barMenuMig();return S.news.join(' ')})()")
+        check('小點' in news and '親自做' not in news, f'WS2-08: {news[:120]}')
+        p.ev("S.news=[]")
+        p.tap('[data-act=closeSub]'); p.settle()
+        # W3-13: to the next day; the morning's line, read like a player, is filed under that day
+        n_before = p.ev("(S.dayLog||[]).length")
+        p.tap('#screen [data-act=nextDay]')
+        morning = p.settle()
+        r = json.loads(p.ev("JSON.stringify({day:S.day,n:(S.dayLog||[]).length,pre:S.preLog})"))
+        check(morning, 'W3-13: no morning line at the prep (the test did not reach the case)')
+        check(r['n'] == n_before, f'W3-13: the morning went into the day before ({r["n"] - n_before} lines)')
+        pre = (r['pre'] or {}).get('L') or []
+        check(r['pre'] and r['pre']['d'] == r['day'] and pre and all(x['c'] == '開店前' for x in pre), f'W3-13: the morning is not kept as 開店前 of Day {r["day"]}: {r["pre"]}')
+        p.restock(); p.start_day()
+        first = json.loads(p.ev(f"JSON.stringify(R.log.slice(0,{len(pre)}))"))
+        check([x['t'] for x in first] == [x['t'] for x in pre], f'W3-13: the day\'s log does not begin with its morning: {first[:2]}')
+        check(not p.errors, p.errors[:3])
+    finally:
+        p.close()
+
+
+@test
+def qa_a_chapter_is_listed_only_where_it_is_shown(b, port, target):
+    """N09 (fixed 2026-10-06; its test 2026-10-07): a new game's Day 5 summary listed 「晚餐之後」 (two lines) while the
+    story page did not show that chapter yet, and the page numbered its chapters by their place in the list
+    (CHAPTER 2, then CHAPTER 4). One rule now decides whether a chapter is shown, everywhere; chapters are numbered
+    as shown. A new game: before the shop's level 4 the chapter is not in the summary and the numbers have no gap; at
+    level 4 it is in both."""
+    p = Player(b, port, target)
+    try:
+        p.tap('[data-act=open]'); p.settle()
+        q = """JSON.stringify((()=>{const page=storyPageHTML();return{today:storyToday(S.day).map(x=>x.who),nums:[...page.matchAll(/CHAPTER (\\d+)/g)].map(m=>+m[1]),
+          hidden:restChapters().filter(C=>C.showIf&&!C.showIf()).map(C=>C.t),onPage:page.includes('晚餐之後')}})())"""
+        p.ev("S.level=1;factSet('ken_wine_q')")
+        r = json.loads(p.ev(q))
+        check('晚餐之後' in r['hidden'], f'setup: 晚餐之後 should not be shown before level 4: {r}')
+        check('晚餐之後' not in r['today'] and not r['onPage'], f'the summary lists a chapter the page does not show: {r["today"]}')
+        check(r['nums'] == list(range(1, len(r['nums']) + 1)), f'the chapters are numbered with a gap: {r["nums"]}')
+        p.ev("S.level=4")
+        r = json.loads(p.ev(q))
+        check('晚餐之後' in r['today'] and r['onPage'], f'at level 4 the chapter is on the page and in the summary: {r}')
+        check(r['nums'] == list(range(1, len(r['nums']) + 1)), f'the chapters are numbered with a gap: {r["nums"]}')
+        check(not p.errors, p.errors[:3])
     finally:
         p.close()
 
