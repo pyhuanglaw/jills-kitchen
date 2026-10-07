@@ -1,0 +1,1379 @@
+使用者 2026-10-07 晚上睡前的原話（逐字保存，docs/RELEASE_CHECKLIST.md §1）：先發布 Dylan 的房間，再整晚繼續 Cooking System；工作順序、Milestone 0–10、不在線時的原則、不要只做炒飯、看圖不停工、防災條款。時間是 UTC。
+
+===== 使用者 2026-10-07 23:44 UTC =====
+先暫停 Cooking System 的實作。
+
+我剛重新確認 GitHub：feature/dylan-room 還有一個已經完成、但沒有進入目前 main / rc8.7 的功能。請先把這件已完成的工作處理完並發布，再開始料理大改。
+
+目標：
+
+把 feature/dylan-room 已完成的玩家可見修改，乾淨地帶到目前最新 main：
+
+* Dylan 揭曉後，房間名牌顯示 Dylan
+* 房間分頁顯示「Jill 和 Dylan 的房間」
+* 保留原本這個 branch 已經寫好的相關測試與行為
+
+但注意：
+
+feature/dylan-room 現在已經落後 main 很多 commits，所以不要直接用舊 branch 覆蓋目前 main，也不要把 rc8.7 之後的內容倒退。
+
+請以目前最新 main / rc8.7 為 base，把 Dylan Room 這個獨立功能移植進來；必要時 cherry-pick / 手動重套都可以，以最後 diff 最乾淨、風險最低為準。
+
+HARD RULE：
+
+1. 不要碰 Cooking Gameplay。
+2. 不要合併 proto/cooking-flow。
+3. 不要改今天剛寫進 feature/cooking-gameplay 的 Cooking 規格。
+4. 不要順便重構其他系統。
+5. 不要改故事 canon。
+6. 不要重新設計 Dylan Room；沿用已經完成、先前確認過的版本。
+7. 確認舊存檔在 Dylan 揭曉前／揭曉後都正常。
+8. single-file 必須同步。
+9. 跑完整 regression。
+10. 如果完整 regression 無阻斷，直接走發布流程，不需要再停下來問我要不要發布。
+
+發布完成後請回報：
+
+* 最終 main commit
+* regression 結果
+* 發布 Version
+* 正式 artifact / playable link
+* Dylan Room 實際玩家看到的結果
+* 是否有任何已知未修問題
+
+這一版的目的只有：
+
+把已經做好但被擱著的 Dylan Room 正式送進遊戲。
+
+發布完成後先停下來回報，不要自行開始 Cooking implementation。
+
+另外，「太太手機不用登入就能匯出存檔」目前仍視為獨立未完成／待手機實測事項；這次不要為了它阻擋 Dylan Room 發布，也不要假裝它已經解決。
+
+===== 使用者 2026-10-07 23:47 UTC =====
+另外修正我上一則最後的工作安排：
+
+Dylan Room 發布完成後，不要停下來等我，也不要只回報後結束工作。
+
+我接下來會去睡覺，大約 8–9 小時。這段期間你可以持續工作。
+
+工作順序如下：
+
+第一階段：先完成並發布 Dylan Room
+
+* 依上一則要求，以目前最新 main / rc8.7 為 base，把已完成的 Dylan Room 功能安全移植進來。
+* 跑完整 regression。
+* 無阻斷就直接發布。
+* 留下完整發布紀錄。
+* 發布完成後不要等我回覆。
+
+然後立刻進入：
+
+第二階段：繼續 feature/cooking-gameplay 的 Cooking System / 廚房重構。
+
+今天我們已經確認的 Cooking Gameplay 規格文件就是產品 canon。
+
+請完整閱讀目前 feature/cooking-gameplay 中今天新增的 Cooking 規格文件，再開始 implementation。
+
+⸻
+
+我睡覺期間的總原則
+
+你不是只能做到一個 checkpoint 就停。
+
+在沒有真正需要我做產品決策的情況下：
+
+持續做、持續測、持續修、持續往下一個 milestone 前進。
+
+如果一個 milestone 完成：
+
+→ 跑測試
+→ 記錄結果
+→ 繼續下一個 milestone
+
+不要每完成一小段就停下來問：
+
+「要不要繼續？」
+
+答案預設就是：
+
+繼續。
+
+⸻
+
+但是產品 Canon 不得自行修改
+
+我不在線 ≠ 你可以自行重新設計系統。
+
+今天已經決定的內容全部視為 HARD CANON，包括：
+
+* 使用原本 Jill’s Kitchen 漂亮的廚房
+* 不做方格工作站
+* 不做 arcade / Overcooked 視覺
+* 原本廚房物件就是 station
+* 料理最多 3 steps
+* 大部分料理只有 2 steps
+* 每一道料理的 workflow 已經逐一道指定
+* 不讓玩家背 recipe
+* 每一步完成後永久顯示下一步
+* selected dish 有 directional arrow / station cue
+* station 滿了就安全等待
+* 沒有燒焦倒數／反應速度懲罰
+* batching
+* batch 占一個 station slot，不按 plate 數量占 slot
+* 員工負責 throughput
+* 玩家負責 orchestration
+* 員工可以接手玩家流程
+* 玩家可以介入員工流程
+* PREP / HOT / OVEN / DRINK / PLATING 的 station grammar
+* PLATING 優先整合現有 Pass
+* HOT 優先沿用現有六口大爐 progression
+* station capacity progression
+* 員工 station proficiency
+* 員工升級逐漸增加擅長區域，但不同員工仍保留自己的核心專長
+* 所有員工的專長組合最後必須能 cover 整個廚房
+* 不增加無必要的新 station
+* sink / fridge 等可以存在並有動畫，但不是玩家 recipe node
+* Mature kitchen 仍只讓玩家面對約 3–6 個 meaningful decisions
+
+如果 technical implementation 與 canon 衝突：
+
+不要偷偷改 canon 來配合 code。
+
+先記錄 technical conflict。
+
+如果有不違反 canon 的合理工程解法，自己解決。
+
+⸻
+
+遇到需要我決定的事情，不要整晚卡住
+
+如果遇到真正的產品岔路，例如：
+
+A / B 都合理，而且會造成明顯不同的玩家體驗，
+
+你不能確定我會選哪一個：
+
+1. 不要猜我的偏好。
+2. 不要永久 commit 一個武斷的新 canon。
+3. 把問題寫進工作紀錄，列出 A / B 與你的建議。
+4. 採用最保守、最容易 rollback、最不改變現有遊戲的暫時方案；如果連暫時方案都可能污染架構，就先不做該部分。
+5. 跳去做其他不受這個問題影響的工作。
+
+不要因為一個問題就停止整個 Cooking project。
+
+我醒來再決定那個問題。
+
+⸻
+
+Cooking 開發順序
+
+Milestone 0 — Audit
+
+先完整 audit 最新 main：
+
+* 原廚房 geometry
+* range / burner
+* prep boards
+* oven
+* coffee / drink
+* Pass
+* pizza oven
+* equipment upgrades
+* kitchen expansion
+* chef movement
+* chefBeat
+* chefHandles
+* crewUpd
+* current recipe state machine
+* dish rendering
+* station interaction
+* stock
+* serving
+* waiter pickup
+* Lounge routing
+* save migration
+* existing tests
+
+確認今天規格與實際 code 的 mapping。
+
+如果今天規格中的某個 repo assumption 不正確：
+
+記錄。
+
+不要自行改產品設計。
+
+⸻
+
+Milestone 1 — Generic Workflow Architecture
+
+建立 data-driven workflow：
+
+例如：
+
+HOT → PLATING
+
+PREP → HOT → PLATING
+
+PREP → OVEN → PLATING
+
+DRINK → SERVE
+
+不要先 hard-code 31 道不同邏輯。
+
+建立共用：
+
+* workflow state
+* current step
+* next step
+* station family
+* assignment
+* waiting
+* batch
+* station capacity
+* employee takeover
+* player takeover
+* guidance state
+
+保存與 migration 要一起考慮。
+
+⸻
+
+Milestone 2 — 黃金蛋炒飯 Prototype
+
+只先讓：
+
+黃金蛋炒飯
+
+真正使用：
+
+HOT → PLATING
+
+而且必須在：
+
+原本正式 Jill’s Kitchen 廚房
+
+裡完成。
+
+不要使用舊 proto/cooking-flow 的方格畫面。
+
+不要把 prototype 做成另一個 scene。
+
+⸻
+
+黃金蛋炒飯必須驗證
+
+HOT
+
+玩家選炒飯。
+
+UI 顯示：
+
+● 熱區 → ○ 裝盤
+
+合法 burner 有 subtle cue。
+
+選中料理時有 directional guidance。
+
+玩家指定後 Jill／員工走到實際 burner。
+
+鍋裡真的看到炒飯料理。
+
+HOT 過程自動完成。
+
+不需要玩家中途：
+
+* 翻
+* 攪
+* 加料
+* QTE
+
+⸻
+
+HOT 完成
+
+立即：
+
+✓ 熱區 → ● 裝盤
+
+顯示：
+
+下一步：裝盤
+
+並以 directional cue 指向實際 Pass / PLATING。
+
+如果玩家不做：
+
+安全等待。
+
+⸻
+
+PLATING
+
+使用現有 Pass 的廚房側。
+
+不要先新增大型 plating table。
+
+角色真的移動到 Pass。
+
+盤子／食物真的出現在 Pass。
+
+完成後進入既有 serving flow。
+
+⸻
+
+Milestone 3 — Guidance
+
+Guidance 不是一次性 tutorial。
+
+必須永久存在。
+
+任何 active work node：
+
+玩家都能知道：
+
+* 這是什麼菜
+* 幾份
+* 現在在哪一步
+* 下一步去哪
+* 是否有人正在做
+* station 是否忙碌
+
+選中料理：
+
+實際合法 station 有 cue。
+
+如果 station full：
+
+顯示：
+
+下一步：熱區 · 目前忙碌
+
+而不是 error。
+
+一有位置：
+
+自然變成可進行。
+
+不要讓玩家背食譜。
+
+⸻
+
+Milestone 4 — Capacity
+
+Prototype 先實作：
+
+HOT = 2
+PLATING = 1
+
+驗證：
+
+* 兩個 HOT work nodes 可以同時存在
+* 第三個安全等待
+* slot 空出後能繼續
+* 兩個菜同時完成但 PLATING 只有 1 時，另一個安全等待
+* 員工可以接等待中的工作
+
+建立 generic capacity architecture。
+
+未來 target：
+
+PREP 1 → 2 → 3
+
+HOT 2 → 4 → 6
+
+OVEN 1 → 2，只有 simulation 證明後期真的需要才考慮 3
+
+DRINK 1 → 2 → 4
+
+PLATING 1 → 2 → 3
+
+PIZZA OVEN 1
+
+不要為了湊表格自行加設備。
+
+⸻
+
+Milestone 5 — Batch
+
+至少驗證：
+
+黃金蛋炒飯 ×3
+
+是一個 work node。
+
+HOT occupation：
+
+1 slot
+
+不是 3。
+
+完成後：
+
+黃金蛋炒飯 ×3
+✓ HOT → ● PLATING
+
+仍然是一個 coherent batch。
+
+最後再拆成 serving portions。
+
+⸻
+
+Milestone 6 — Player / Employee Seamless Handoff
+
+驗證四種情況：
+
+A
+
+玩家從頭做到尾。
+
+B
+
+員工從頭做到尾。
+
+C
+
+玩家做 HOT，員工接 PLATING。
+
+D
+
+員工做 HOT，玩家接 PLATING。
+
+不能有獨立 AUTO mode。
+
+同一套 workflow state machine 解決。
+
+⸻
+
+Milestone 7 — Employee Proficiency Architecture
+
+Generic chef proficiency 只有：
+
+* HOT
+* PREP
+* OVEN
+* PLATING
+
+不要把 DRINK 放進一般 chef skill tree。
+
+每個 chef：
+
+* 有永久 core specialty
+* 有 secondary tendency
+* 升級逐漸增加可 cover 區域
+* 可以跨區支援
+* 高等級仍不能全部變成完全相同
+
+請 audit 現有正式 chef roster。
+
+設計一份：
+
+chef | core | secondary | upgrade coverage
+
+要求：
+
+整個正式員工 roster 合起來，最後必須完整 cover HOT / PREP / OVEN / PLATING，而且分布不能出現明顯單點缺口。
+
+先做 architecture 與 proposal。
+
+如果某個角色到底應該擅長 HOT 還是 OVEN 屬於產品角色設定選擇，而且今天沒有 canon：
+
+不要替我永久決定。
+
+把 proposal 留給我醒來確認。
+
+但 generic system 可以繼續做。
+
+⸻
+
+Milestone 8 — Expand Recipe Families
+
+只有前面 prototype 穩定後才開始。
+
+按照今天已經寫死的 workflow table，把料理逐步接上。
+
+不要重新設計流程。
+
+優先每種 family 各選一道：
+
+* HOT → PLATING
+* PREP → PLATING
+* PREP → HOT → PLATING
+* PREP → OVEN → PLATING
+* DRINK → SERVE
+
+確認 generic architecture 真的通用。
+
+再批次接剩餘料理。
+
+⸻
+
+Milestone 9 — Existing Upgrade Integration
+
+把 station capacity 與現有 equipment progression 整合。
+
+優先 reuse：
+
+* 現有 range
+* 六口大爐
+* prep counter
+* oven
+* coffee machine
+* kitchen expansion
+* Pass
+* pizza oven
+
+任何 capacity upgrade：
+
+畫面必須看得出實際空間增加。
+
+不要只是數字 +1。
+
+不要破壞原本漂亮廚房。
+
+⸻
+
+Milestone 10 — Simulation / Balance
+
+在 generic system 穩定後才跑。
+
+Telemetry 至少包括：
+
+* station utilization
+* queue average
+* queue peak
+* longest wait
+* active vs passive occupation
+* batches
+* portions
+* employee idle because station unavailable
+* station idle because qualified employee unavailable
+
+不要追求 zero queue。
+
+正常：
+
+40–70% utilization
+
+rush：
+
+可以短暫 70–100%
+
+長時間 100% 且 queue 持續增加才算 balance problem。
+
+⸻
+
+每個 Milestone 的工作方式
+
+每完成一個 milestone：
+
+1. 跑 targeted tests。
+2. 修 regression。
+3. 留 commit。
+4. 記錄結果。
+5. 如果沒有 blocker，直接繼續下一個 milestone。
+
+不要等我。
+
+⸻
+
+Regression 原則
+
+Cooking System 是核心系統，不能只測新功能。
+
+持續確認：
+
+* 舊存檔 migration
+* service loop
+* customer orders
+* stock
+* money
+* XP
+* staff
+* waiter pickup
+* cats
+* Main Hall
+* Side Hall
+* Lounge
+* Second Floor
+* story
+* Life Album
+* save / restore
+* single-file build
+
+不要等到八小時後才第一次跑 regression。
+
+每個重要 architecture change 都要逐步測。
+
+⸻
+
+Git 原則
+
+Cooking work 留在：
+
+feature/cooking-gameplay
+
+不要直接把未完成 Cooking merge 到 main。
+
+Dylan Room 發布後：
+
+先同步最新 main 到 Cooking branch，再繼續。
+
+Cooking 可以在 branch 上做很多 commits。
+
+我睡覺期間不要自行發布 Cooking System 正式版。
+
+因為這是大型玩法改造，我醒來需要先看實際效果。
+
+但是：
+
+你可以把 branch 做到非常完整。
+
+可以跑完整 regression。
+
+可以產生 private test build / screenshot / QA evidence。
+
+就是不要把未經我看過的新 Cooking Gameplay 正式發布給玩家。
+
+⸻
+
+我醒來時希望看到的不是一句「等你確認」
+
+希望看到：
+
+1. Dylan Room 已正式發布的結果。
+2. Cooking branch 到了哪個 milestone。
+3. 原廚房中的實際 prototype 截圖。
+4. 黃金蛋炒飯完整 HOT → PLATING 是否能玩。
+5. guidance 實際長什麼樣。
+6. station capacity 是否正常。
+7. batching 是否正常。
+8. player / employee handoff 是否正常。
+9. 已經接了哪些 recipe families。
+10. regression 結果。
+11. simulation / telemetry（如果已經做到）。
+12. 所有你暫時跳過、需要我決定的產品問題。
+
+如果 8–9 小時足夠做到更多：
+
+繼續做更多。
+
+不要因為原本列出的 milestone 做完就提早停。
+
+可以繼續：
+
+* polish
+* regression
+* edge cases
+* save migration
+* visual consistency
+* touch/mobile interaction
+* staff AI
+* recipe-family coverage
+* capacity balance
+* QA evidence
+
+直到我回來。
+
+⸻
+
+最重要的工作原則：
+
+已經決定的產品設計，不要重新討論；可以自行解決的工程問題，不要等我；真正需要我選擇的產品問題，記下來並繞過它繼續做其他部分。
+
+我現在去睡覺。
+
+Dylan Room 發布完就直接回到 Cooking System，持續往前做。
+補充一個非常重要的修正：
+
+今晚的 Cooking 工作不是只做黃金蛋炒飯。
+
+黃金蛋炒飯只是第一個 implementation checkpoint，用來證明新的 workflow architecture 在原本 Jill’s Kitchen 廚房裡真的成立。
+
+正確順序是：
+
+黃金蛋炒飯驗證成功 → 不要停 → 繼續把完整 Cooking System 做下去。
+
+不要把「先做炒飯 prototype」理解成：
+
+今晚只准改一道菜。
+
+它真正的意思是：
+
+不要在 architecture 尚未被實際驗證以前，一口氣錯誤地改完所有料理。
+
+一旦黃金蛋炒飯的：
+
+HOT → PLATING
+
+已經證明以下事情成立：
+
+* 原本漂亮廚房完整保留
+* workflow state 正常
+* station assignment 正常
+* guidance 正常
+* next-step arrow / cue 正常
+* capacity 正常
+* safe waiting 正常
+* batching 正常
+* player / employee handoff 正常
+* Pass plating 正常
+* serving 正常
+* save / reload 正常
+
+就立刻繼續。
+
+⸻
+
+今晚真正的 Cooking 目標
+
+如果工程進度允許：
+
+把今天已經指定 workflow 的所有正式料理全部接進新系統。
+
+不是一道。
+
+不是五道。
+
+是所有已經有明確 canon workflow 的料理。
+
+包含：
+
+Restaurant 22 dishes
+
+1. 黃金蛋炒飯 — HOT → PLATING
+2. 拿鐵咖啡 — DRINK → SERVE
+3. 番茄義大利麵 — HOT → PLATING
+4. 田園沙拉 — PREP → PLATING
+5. 經典牛肉漢堡 — PREP → HOT → PLATING
+6. 錫蘭檸檬紅茶 — DRINK → SERVE
+7. 檸檬氣泡水 — DRINK → SERVE
+8. 南瓜濃湯 — HOT → PLATING
+9. 焦糖布丁 — PREP → PLATING
+10. 松露薯條 — OVEN → PLATING
+11. 莓果蘇打 — DRINK → SERVE
+12. 香料烤蔬菜 — PREP → OVEN → PLATING
+13. 提拉米蘇 — PREP → PLATING
+14. 香草烤雞 — PREP → OVEN → PLATING
+15. 炙烤肋眼牛排 — PREP → HOT → PLATING
+16. 巴斯克乳酪蛋糕 — PREP → OVEN → PLATING
+17. 生火腿沙拉 — PREP → PLATING
+18. 香烤鮭魚 — PREP → OVEN → PLATING
+19. 海鮮義大利麵 — PREP → HOT → PLATING
+20. 香煎鴨胸 — PREP → HOT → PLATING
+21. 松露燉飯 — HOT → PLATING
+22. 舒芙蕾 — PREP → OVEN → PLATING
+
+Lounge Food
+
+23. 炸雞塊 — HOT → PLATING
+24. 起司可樂餅 — PREP → HOT → PLATING
+25. 起司拼盤 — PREP → PLATING
+26. 蒜香蘑菇 — HOT → PLATING
+27. 水牛城雞翅 — HOT → PLATING
+28. 起司條 — HOT → PLATING
+29. 生蠔 — PREP → PLATING
+30. 德國豬腳 — PREP → OVEN → PLATING
+31. 酒吧披薩 — PREP → PIZZA OVEN → PLATING
+
+以及：
+
+Signature Main
+
+PREP → HOT → PLATING
+
+Signature Dessert
+
+PREP → PLATING
+
+Specials
+
+完全繼承 base dish workflow。
+
+⸻
+
+實作方式不是「一道一道寫 31 套」
+
+先證明炒飯。
+
+然後優先證明每個 workflow family：
+
+* HOT → PLATING
+* PREP → PLATING
+* PREP → HOT → PLATING
+* OVEN → PLATING
+* PREP → OVEN → PLATING
+* DRINK → SERVE
+* PREP → PIZZA OVEN → PLATING
+
+每個 family 至少一個 representative dish 通過後：
+
+直接把同 family 的其他料理 data-driven 接上。
+
+不要把 31 道菜寫成 31 套 state machine。
+
+⸻
+
+所有料理都要有永久 Guidance
+
+不是只有炒飯有箭頭。
+
+每一道料理都必須：
+
+開始後顯示完整 workflow。
+
+例如：
+
+香煎鴨胸
+
+● PREP → ○ HOT → ○ PLATING
+
+PREP 完成：
+
+✓ PREP → ● HOT → ○ PLATING
+
+並指出實際 HOT station。
+
+HOT 完成：
+
+✓ PREP → ✓ HOT → ● PLATING
+
+並指出 Pass。
+
+這套 guidance 是 generic system。
+
+31 道料理全部使用。
+
+⸻
+
+所有料理都要遵守 Capacity
+
+任何料理進入 station 都必須使用同一套 slot architecture。
+
+不是只有炒飯測 capacity。
+
+例如：
+
+牛排在 HOT
+燉飯在 HOT
+炒飯 ×3 在 HOT
+義大利麵在 HOT
+
+它們都是 HOT work nodes。
+
+HOT capacity 滿：
+
+下一道安全等待。
+
+同樣：
+
+PREP、OVEN、DRINK、PLATING 都要真正有 capacity。
+
+⸻
+
+今晚不要因為「Prototype 完成」就停止 Cooking
+
+黃金蛋炒飯完成：
+
+不是今晚 Cooking 任務完成。
+
+它只代表：
+
+architecture 可以開始擴展。
+
+繼續做到時間用完或遇到真正不可繞過的 blocker。
+
+如果八九個小時內可以完成全部料理：
+
+就完成全部料理。
+
+如果全部料理完成：
+
+繼續做：
+
+* employee proficiency
+* station capacity upgrades
+* existing equipment progression integration
+* batching balance
+* staff AI
+* mobile/touch UX
+* visual polish
+* save migration
+* simulation
+* regression
+* edge cases
+
+不要提早停。
+
+⸻
+
+我醒來理想狀態
+
+不是：
+
+「黃金蛋炒飯 prototype 做好了，等你確認再做其他菜。」
+
+而是：
+
+「炒飯先驗證 architecture；之後七個 workflow families 都驗證完成；Restaurant 22 道、Lounge 9 道、Signature、Specials 已經接入多少；員工、容量與升級做到哪；完整 regression 結果如下。」
+
+如果技術上沒有 blocker：
+
+目標就是盡可能把整套 Cooking System 做到接近完成，而不是交一個單菜 prototype。
+
+唯一仍然不做的是：
+
+不要在我睡覺期間把 Cooking System 正式發布到玩家版。
+
+branch 可以一直做。
+
+private build 可以做。
+
+測試可以一直跑。
+
+所有料理可以全部改。
+
+只是最後正式 release 等我醒來實際看過新版 Cooking Gameplay。
+
+===== 使用者 2026-10-07 23:48 UTC =====
+我睡覺期間不要因為需要截圖確認視覺就停止工程。視覺若有不確定，採最保守、最接近目前正式版廚房的方案繼續；保留可回退的 commit，等我醒來再調整。不要因為等我看圖而停止後續 architecture、recipe migration、AI、capacity、tests 或 simulation
+
+===== 使用者 2026-10-07 23:52 UTC =====
+睡前最後補一則。這不是增加 scope，而是避免我明天醒來看到一個「技術上完成，但整個遊戲被改得不像 Jill’s Kitchen」的版本。
+
+請把下面視為今晚 Cooking implementation 的防災條款。
+
+1. 最大原則：不要破壞現在已經好的東西
+
+這次是：
+
+把新的料理玩法放進現在的 Jill’s Kitchen。
+
+不是：
+
+為了新的料理玩法重新做一個 Jill’s Kitchen。
+
+目前正式版廚房的：
+
+* 格局
+* 美術
+* 比例
+* 色調
+* counter
+* range
+* oven
+* prep area
+* coffee area
+* Pass
+* heat lamps
+* 小物件
+* 人物比例
+* 空間感
+* animation 氣質
+
+全部優先保留。
+
+如果 gameplay architecture 與現有漂亮廚房發生衝突：
+
+優先修改 gameplay implementation，不要修改廚房來遷就 gameplay。
+
+⸻
+
+2. 不准再出現舊 prototype 的視覺語言
+
+今晚任何玩家可見成果都不要出現：
+
+* 方格 station
+* 彩色地板區
+* 巨大的 HOT / PREP / PLATING 按鈕
+* 巨大的 CHOP / COOK / SERVE
+* 大型 progress circle
+* arcade HUD
+* Overcooked 式工作站 icon
+* 滿畫面的箭頭
+* 同時五六個箭頭亂飛
+* 廉價手遊式跳動黃箭頭
+* 紅色 FAIL
+* 倒數壓迫
+* station 上永遠發光的巨大框
+
+Guidance 要像原本遊戲的一部分。
+
+Passive guidance 安靜；selected dish 才明顯。
+
+⸻
+
+3. 不要把 debug UI / placeholder 當成最後 UI
+
+開發時可以使用 debug overlay。
+
+但給我看的 private build / screenshot：
+
+必須是玩家會看到的 UI。
+
+如果某個 UI 還只是 debug / placeholder：
+
+清楚標記。
+
+不要因為功能能跑，就把工程測試畫面包成「新版料理完成」。
+
+⸻
+
+4. 不要為了新 architecture 把原本料理動畫變少
+
+新 workflow 是：
+
+減少玩家操作步驟。
+
+不是：
+
+減少 Jill 實際做菜的細節。
+
+例如：
+
+牛排玩家只需要：
+
+PREP → HOT → PLATING
+
+但 Jill 在 HOT 裡仍然可以：
+
+* 放入鍋中
+* 煎
+* 翻面
+* 等待
+* 起鍋
+
+這些可以是自動 animation。
+
+義大利麵玩家可以只操作：
+
+HOT → PLATING
+
+但畫面仍然可以看到鍋、蒸氣、瀝乾或醬汁相關動作。
+
+玩家少按 ≠ Jill 少做。
+
+如果舊版已有漂亮的料理 animation，優先保留／重用。
+
+⸻
+
+5. 不要讓料理 UI 蓋住餐廳
+
+我希望玩家是在看 Jill’s Kitchen 做菜，不是在看 dashboard。
+
+Active ticket 只放真正必要資訊：
+
+* dish
+* quantity
+* workflow
+* current step
+* next step
+* handler
+
+不要順便加入：
+
+* 秒數
+* efficiency %
+* quality %
+* recipe ingredient checklist
+* staff stats
+* XP meter
+* combo
+* score
+* star rating
+* 多餘數值
+
+除非既有正式版本來就需要。
+
+⸻
+
+6. 不准為了「好玩」偷偷增加懲罰
+
+今晚不要自行加入：
+
+* 燒焦
+* 過期
+* 品質下降
+* 客人生氣倒數
+* miss timing
+* combo
+* perfect timing
+* QTE
+* 快速連點
+* 拖曳精準度
+* 做錯步驟失敗
+* 玩家沒點就毀掉料理
+
+如果料理完成一步：
+
+安全等待。
+
+難度來自：
+
+同時有很多合理事情可以做，而不是不快點做就死。
+
+⸻
+
+7. 不准讓員工把玩家趕出遊戲
+
+員工 AI 做好之後一定要實際檢查：
+
+成熟員工很多時，玩家仍然有 meaningful decisions。
+
+不要出現：
+
+一開店所有員工自己全部做完，玩家只能看。
+
+也不要另一個極端：
+
+30 個客人 = 玩家手動處理 30 份料理。
+
+目標仍然是：
+
+員工負責 throughput，玩家負責 orchestration。
+
+⸻
+
+8. 不准為了讓玩家有事做而故意把員工變笨
+
+不要用：
+
+* 故意站著不做
+* 明明會做卻不接
+* 無意義等待
+* 隨機犯錯
+
+來製造 gameplay。
+
+玩家的決策應該來自：
+
+* priority
+* capacity
+* batching
+* specialization
+* station availability
+* 是否自己介入
+
+而不是 babysit 笨 AI。
+
+⸻
+
+9. 不要偷偷改今天沒有要求改的系統
+
+Cooking implementation 不應順便重新 balance：
+
+* 菜價
+* 客人數
+* 客人耐心
+* 收入
+* 店租
+* 員工薪水
+* 故事條件
+* Lounge progression
+* Second Floor
+* Private Dining
+* 貓
+* Life Album
+* relationship
+* restaurant level
+
+如果 simulation 顯示未來可能需要調：
+
+記錄問題。
+
+不要今晚順手改掉。
+
+⸻
+
+10. 不要為了測試通過而修改測試標準
+
+如果舊 regression 因 Cooking change 失敗：
+
+先判斷：
+
+A. 舊測試真的因新 canon 應該更新
+
+還是
+
+B. 新 implementation 把舊功能弄壞。
+
+不要看到紅燈就直接改 test。
+
+任何因新 Cooking canon 而必須修改的既有 test：
+
+在工作紀錄列出：
+
+* test 名稱
+* 原本驗證什麼
+* 為什麼舊 expectation 已不成立
+* 新 expectation 是什麼
+
+⸻
+
+11. Save migration 是硬要求
+
+不要只測 fresh game。
+
+至少要確認：
+
+* 新遊戲
+* 早期舊存檔
+* 中期舊存檔
+* Day 92 類型的成熟舊存檔
+
+都能進新版。
+
+舊存檔若剛好存在舊 cooking transient state：
+
+要有安全 migration / fallback。
+
+寧可把進行中的舊料理安全 reset 回可重新製作狀態，也不要讓整份存檔壞掉。
+
+永久 progression 不可以丟。
+
+⸻
+
+12. 每個重大 milestone 都留可回退點
+
+M1 architecture
+M2 first playable dish
+M3 guidance
+M4 capacity
+M5 batching
+M6 handoff
+M7 staff proficiency
+recipe migration
+equipment integration
+
+盡量保持清楚的 commits。
+
+不要最後八小時全部揉成一個巨大 commit。
+
+如果後面某個方向明天我不喜歡：
+
+我要能保留前面已經成功的部分。
+
+⸻
+
+13. 不要為了「完成 31 道」犧牲 generic architecture
+
+31 道全部接上很好。
+
+但如果選擇是：
+
+A. 31/31 都勉強能跑，但每一道有特殊 hack
+
+或
+
+B. 20/31 已經完整使用同一套乾淨 generic system，剩下 11 道只是尚未 migration
+
+選 B。
+
+不要為了報表上的「31/31」製造未來很難維護的特殊案例。
+
+⸻
+
+14. 任何 dish-specific exception 都要有理由
+
+如果某一道不能使用今天指定的 workflow：
+
+不要自己改 workflow。
+
+先記錄：
+
+* dish
+* canon workflow
+* technical conflict
+* 為什麼 generic architecture 無法處理
+* 建議解法
+
+然後繼續其他菜。
+
+⸻
+
+15. 明天給我的截圖要能讓我一眼判斷有沒有做歪
+
+至少保留：
+
+A
+
+原本正式版廚房的對照畫面。
+
+B
+
+新版 Cooking、沒有選中任何 dish 的畫面。
+
+我要確認平常狀態仍然像原本 Jill’s Kitchen。
+
+C
+
+選中一道料理後的畫面。
+
+我要看 workflow + next step + station cue。
+
+D
+
+多道料理同時進行。
+
+我要看畫面有沒有爆炸。
+
+E
+
+員工與 Jill 同時工作。
+
+我要看這是不是一間活著的廚房。
+
+F
+
+station full / waiting。
+
+我要確認它是安靜等待，不是錯誤警告。
+
+⸻
+
+16. 最重要的自我驗收問題
+
+每做完一個玩家可見版本，自己看一次畫面並問：
+
+如果不知道今天改了 Cooking，第一眼還會不會覺得這就是原本那間 Jill’s Kitchen？
+
+如果答案不是明確的「會」：
+
+先不要往上堆更多 UI。
+
+修到它仍然是 Jill’s Kitchen。
+
+第二個問題：
+
+第一次玩的玩家，點任何正在做的料理，能不能在 2 秒內知道下一步去哪裡，而完全不需要背 recipe？
+
+如果不能：
+
+Guidance 還沒完成。
+
+第三個問題：
+
+如果玩家現在什麼都不按 20 秒，會不會因為遊戲懲罰而焦慮？
+
+如果會：
+
+做錯方向了。
+
+第四個問題：
+
+如果玩家願意認真操作，他有沒有真的可以改善廚房運作的決策？
+
+如果沒有：
+
+員工自動化做過頭了。
+
+⸻
+
+今晚寧可：
+
+完成度 80%，但它仍然漂亮、乾淨、可維護，而且明天可以繼續。
+
+不要：
+
+完成度號稱 100%，但我醒來第一眼想叫你全部 revert。
+
+除此之外照原計畫持續工作，不需要回覆這則確認，也不要因此停下目前 Dylan Room 的測試／發布流程。
