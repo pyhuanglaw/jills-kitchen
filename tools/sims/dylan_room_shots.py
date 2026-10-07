@@ -1,5 +1,5 @@
-"""rc8.6 (the player, 2026-10-05: 「Dylan已經揭露但在房間還是沒寫Dylan」): their room on the player's Day 89 save (he is out since
-Day 69) — the tab's full name, his name over him at his desk and on the sofa, the hood down — and, for the other side of
+"""rc8.8 (the player, 2026-10-05: 「Dylan已經揭露但在房間還是沒寫Dylan」): their room on the player's Day 89 save (he is out since
+Day 69) — the tab's full name, his name over him at his desk and on the sofa, the hood up — and, for the other side of
 the reveal, a fresh game's room (「先生」, the hood up).   python3 tools/sims/dylan_room_shots.py OUT_DIR"""
 import sys, os, json
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))); sys.path.insert(0, os.path.join(ROOT, 'tests'))
