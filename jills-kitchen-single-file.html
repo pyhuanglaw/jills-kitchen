@@ -10543,7 +10543,7 @@ const GUIDE_WHEN={
   ['Lounge 開了以後由調酒師倒',h=>h.L],
   ['<b>Lounge 名單</b>另外算，跟餐廳員工互不佔用',h=>h.L],
   ['餐廳、Lounge 都九折，吃完晚餐再去 Lounge 八折',h=>h.L,'九折'],['都八折，吃完再去 Lounge 七折',h=>h.L,'八折'],
-  ['Lounge II 起多阿拓、安安、許葳',h=>h.L2]]};
+  ['Lounge II 起多安安、許葳',h=>h.L2]]};
 function guideCut(t,h){for(const [w,ok,to] of GUIDE_WHEN.line){if(t==null)break;if(!t.includes(w)||ok(h))continue;if(to===undefined)return null;const r=typeof to==='function'?to(h):to;t=r==null?null:t.replace(w,r)}return t}
 function guideView(){const full=()=>GUIDE.map(g=>({ic:g.ic,h:g.h,sum:g.sum,pts:g.pts.map(([k,t])=>[k,guideLines(t)])}));let h;try{h=guideHas()}catch(e){return full()}
  const out=[];for(const g of GUIDE){const sw=GUIDE_WHEN.sec[g.h];if(sw&&!sw(h))continue;const pts=[];
