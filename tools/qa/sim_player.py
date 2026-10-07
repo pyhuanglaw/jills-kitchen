@@ -41,10 +41,13 @@ _VIS = ("const vis=e=>!!e&&!e.hidden&&e.getClientRects().length>0&&getComputedSt
         "&&(e.offsetParent!==null||getComputedStyle(e).position==='fixed');const clean=s=>String(s||'').replace(/\\s+/g,' ').trim();")
 JS_KIND = "(()=>{" + _VIS + r"""const q=s=>document.querySelector(s);
  if(vis(q('#dlg')))return 'dialog';if(vis(q('#reveal')))return 'reveal';
+ if([...document.querySelectorAll('[data-uprv]')].some(vis))return 'roomcard';
  if(vis(q('#screen [data-act=open]')))return 'title';if(vis(q('#screen [data-act=toShop]')))return 'summary';
  if(vis(q('#screen [data-act=nextDay]')))return 'shop';if(vis(q('#screen [data-act=start]')))return 'prep';
  if(vis(q('#screen .modal')))return 'modal';
- const c=clean((q('#hClock')||{}).textContent);if(/^\d\d:\d\d/.test(c))return 'service';return 'other'})()"""
+ const c=clean((q('#hClock')||{}).textContent);if(/^\d\d:\d\d/.test(c))return 'service';
+ const sc=q('#screen');if(sc&&!vis(sc)&&/^(開店前|打烊後)/.test(c))return [...document.querySelectorAll('button.pill')].some(b=>vis(b)&&/^回到/.test(clean(b.textContent)))?'roomview':'roomshow';
+ return 'other'})()"""
 JS_HUD = "(()=>{" + _VIS + r"""const t=s=>clean((document.querySelector(s)||{}).textContent);
  return {day:parseInt(t('#hDay'))||0,clock:t('#hClock'),rate:parseFloat(t('#hRate')),money:parseInt(t('#hMoney').replace(/[^0-9]/g,''))||0}})()"""
 JS_TEXT = "(sel=>{" + _VIS + "const e=document.querySelector(sel);return vis(e)?e.innerText:''})"
@@ -93,7 +96,12 @@ JS_REVEAL = "(()=>{" + _VIS + "const r=document.querySelector('#reveal');if(!vis
 # a window that stops the day and asks (試酒的晚上, 新企劃 …): its words and its buttons
 JS_MODAL = "(()=>{" + _VIS + r"""const m=document.querySelector('#screen .modal');if(!vis(m))return null;const t=s=>clean((m.querySelector(s)||{}).innerText);
  return {eyebrow:t('.eyebrow'),title:t('h2'),text:t('p'),btns:[...m.querySelectorAll('[data-act]')].filter(vis).map(b=>({act:b.dataset.act,k:b.dataset.k??null,text:clean(b.innerText),primary:b.classList.contains('primary'),dis:!!b.disabled}))}})()"""
-PLAYER_JS = [JS_KIND, JS_HUD, JS_TEXT, JS_BUTTONS, JS_SUMMARY, JS_PREP, JS_SHOP_TOP, JS_STAFF, JS_PANEL, JS_TOASTS, JS_REVEAL, JS_MODAL]
+# a new space's completion card over its room (完工 · 二樓的休息室／包廂 …): its words and its buttons (data-uprv)
+JS_ROOMCARD = "(()=>{" + _VIS + r"""const bs=[...document.querySelectorAll('[data-uprv]')].filter(vis);if(!bs.length)return null;const card=bs[0].closest('[id]')||bs[0].parentElement;
+ return {text:clean(card.innerText).slice(0,200),btns:bs.map(b=>({k:b.dataset.uprv,text:clean(b.innerText)}))}})()"""
+# the pills that lead back from a room being looked at (「回到開店準備 ›」「回到店舖工程 ›」「回到選單 ›」): their places among the pills
+JS_BACKPILLS = "(()=>{" + _VIS + r"""return [...document.querySelectorAll('button.pill')].map((b,i)=>({i,text:clean(b.textContent),vis:vis(b)})).filter(b=>b.vis&&/^回到/.test(b.text))})()"""
+PLAYER_JS = [JS_ROOMCARD, JS_BACKPILLS, JS_KIND, JS_HUD, JS_TEXT, JS_BUTTONS, JS_SUMMARY, JS_PREP, JS_SHOP_TOP, JS_STAFF, JS_PANEL, JS_TOASTS, JS_REVEAL, JS_MODAL]
 
 SHOP_TABS = {'home': '家具與佈置', 'works': '店舖工程', 'social': '社群與宣傳', 'catlife': '貓咪生活', 'kitchen': '廚房設備', 'menu': '菜單研發', 'staff': '員工', 'sig': '招牌菜'}
 
@@ -147,6 +155,12 @@ class Screen:
     def modal(self):
         return self.page.evaluate(JS_MODAL)
 
+    def room_card(self):
+        return self.page.evaluate(JS_ROOMCARD)
+
+    def back_pills(self):
+        return self.page.evaluate(JS_BACKPILLS)
+
 
 class Hands:
     """real taps: the control is found on the screen, brought where a finger can reach it (a swipe of the list it is in),
@@ -157,6 +171,11 @@ class Hands:
 
     def wait(self, frames):
         self.p.frames(frames)
+
+    def wait_real(self, ms):
+        """a moment of real time with the screen running (a room being shown moves by the clock, not by the frames)"""
+        self.page.wait_for_timeout(ms)
+        self.p.frames(3)
 
     def tap_sel(self, sel, nth=0):
         loc = self.page.locator(sel).nth(nth)
@@ -281,9 +300,59 @@ class PlayerBase:
             elif k == 'modal':
                 if not self.answer_modal():
                     break
+            elif k == 'roomshow':
+                if not self.watch_room_show():
+                    break
+            elif k == 'roomcard':
+                if not self.close_room_card():
+                    break
+            elif k == 'roomview':
+                if not self.back_from_room():
+                    break
             else:
                 return k
         return self.s.kind()
+
+    # ---- a new space shown on its first day (the panel put away, the room on screen, then its card)
+    def watch_room_show(self, seconds=8):
+        """outside a service the panel is put away and a room is on screen with nothing to tap yet: the game is showing a
+        space (a room just finished). Watch it: its card comes by itself; after a while, a tap on the room skips to it, as
+        a player may do. Never read as stuck while that is what the screen is."""
+        self.log.add(self.day, '畫面切到一個空間，平常的面板暫時收起來（空間完工展示）', '看著，等它的卡片', kind='screen')
+        tapped = False
+        for i in range(int(seconds / 0.4)):
+            self.h.wait_real(400)
+            if self.s.kind() != 'roomshow':
+                return True
+            if not tapped and i >= int(5 / 0.4):
+                tapped = True
+                try:
+                    self.h.tap_sel('#scene')
+                    self.log.add(self.day, '展示還在播', '點一下畫面，跳到卡片', kind='screen')
+                except Exception:
+                    pass
+        return self.s.kind() != 'roomshow'
+
+    def close_room_card(self):
+        """the space's completion card: read it, take its way back to what the day was doing (開店準備), not the visit"""
+        c = self.s.room_card()
+        if not c or not c['btns']:
+            return False
+        b = next((x for x in c['btns'] if x['text'].startswith('回到')), c['btns'][-1])
+        self.log.add(self.day, f"空間完工卡片：{c['text'][:70]}", '看過了，回到原本要做的事', b['text'], kind='screen')
+        self.h.tap_sel(f'[data-uprv="{b["k"]}"]')
+        self.h.wait_real(300)
+        return True
+
+    def back_from_room(self):
+        """a room being looked at, its pill back (「回到開店準備 ›」…): tap it"""
+        pills = self.s.back_pills()
+        if not pills:
+            return False
+        self.log.add(self.day, f"在看一個空間，畫面上有「{pills[0]['text']}」", '回去', pills[0]['text'], kind='screen')
+        self.h.tap_sel('button.pill', pills[0]['i'])
+        self.h.wait_real(300)
+        return True
 
     def money(self):
         return self.s.hud()['money']
@@ -322,6 +391,8 @@ class PlayerBase:
     def prep(self, day):
         self.day = day
         self.settle()
+        self.h.wait_real(900)    # a moment on the morning's screen: a space finished today is shown now (after the panels)
+        self.settle()
         self.prep_menu()
         self.prep_asks()
         self.restock()
@@ -344,14 +415,20 @@ class PlayerBase:
         self.press('restock', saw=f"開店前：{r['text']}，現金 ${hud['money']:,}，冰箱 {p['fridge']}", why='每天開店前先補到建議量', label=r['text'])
 
     def open_shop(self):
-        """開始營業 — a warning under the button is read; a second press opens anyway (as the warning invites)"""
-        self.settle()
-        self.press('start', saw='開店前畫面', why='準備好了，開始營業', label='開始營業')
-        if self.s.kind() == 'prep':
-            w = self.s.prep()['warn']
-            self.log.add(self.day, f'開店按鈕下的提醒：「{w[:80]}」', '提醒讀過了；照它說的再按一次開店', kind='screen')
-            self.h.tap('start')
-        self.settle()
+        """開始營業 — a warning under the button is read; a second press opens anyway (as the warning invites). A space shown
+        over the prep screen in between (the button put away with the panel) is watched, closed, and the button pressed again."""
+        for _ in range(3):
+            if self.settle() != 'prep':
+                break
+            self.press('start', saw='開店前畫面', why='準備好了，開始營業', label='開始營業')
+            if self.s.kind() == 'prep':
+                p = self.s.prep()
+                if p is None:
+                    continue
+                self.log.add(self.day, f"開店按鈕下的提醒：「{p['warn'][:80]}」", '提醒讀過了；照它說的再按一次開店', kind='screen')
+                self.h.tap('start')
+            if self.settle() != 'prep':
+                break
 
     def summary(self):
         self.settle()

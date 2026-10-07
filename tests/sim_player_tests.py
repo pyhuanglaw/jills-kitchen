@@ -187,3 +187,32 @@ def sim_player_answers_a_window_that_stops_the_day(b, port, target):
         check(not g.errors, f'page errors: {g.errors[:3]}')
     finally:
         p.close()
+
+
+@test
+def sim_player_waits_out_a_space_shown_on_its_first_day(b, port, target):
+    """The morning a space finishes (here the Private Dining Room, bought the evening before on the player's Day 92 save),
+    the game puts the prep panel away, shows the room and then its 完工 card (進去看看 › / 回到開店準備). The simulated
+    player reads that from the screen alone — the panel gone outside a service, a card with its buttons, a 「回到…」 pill —
+    watches it (or taps the room to skip to the card, as a player may), takes 回到開店準備 and opens the restaurant. The
+    three seeds of 2026-10-07 stopped here: the player knew no such screen (QA 2026-10-07)."""
+    p = Player(b, port, target, save='player_day92_2105.json', W=390, seed=93, touch=True, scenes=True)
+    try:
+        g = p.g
+        scr, hands, log = sp.Screen(p.page), sp.Hands(p), sp.Log()
+        pl = sp.NormalPlayer(scr, hands, log); obs = sp.Observer(g)
+        _rt.install_bot(g); g.ev(_rt.LAZY_ACTOR); g.ev(sp.HUMAN_JS % dict(sp.HUMAN_DEFAULT, seed=1)); g.ev(sp.SERVICE_JS); obs.install()
+        pl.settle(); hands.tap('open')
+        check(pl.settle() == 'shop', 'the save opens in the evening shop')
+        # the setup (the harness, not the player): the room's story behind it, bought as the shop's button does
+        g.ev("for(const k of ['pd_yj','pd_other','pd_story'])if(!fact(k))factSet(k);S.money=Math.max(S.money,600000);doAct('buyPD',null,'1');try{hideReveal()}catch(e){}")
+        check(g.ev("pdOf().done") == g.ev("S.day") + 1, 'Private Dining I is done tomorrow')
+        pl.next_day()
+        pl.prep(g.ev("S.day")); pl.open_shop()
+        check(obs.phase() == 'service', f'the restaurant opened: {obs.phase()!r}, the screen {scr.kind()!r}')
+        rows = [r for r in log.rows if r['saw'].startswith('空間完工卡片')]
+        check(len(rows) == 1 and rows[0]['pressed'].startswith('回到開店準備') and '私人包廂' in rows[0]['saw'], f'the card was read and closed the way back: {rows}')
+        check(not [r for r in log.rows if r['kind'] == 'skip' and r['pressed'] and '開始營業' in r['pressed']] or obs.phase() == 'service', 'a press on a put-away start button left the day unopened')
+        check(not g.errors, f'page errors: {g.errors[:3]}')
+    finally:
+        p.close()
