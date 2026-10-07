@@ -82,9 +82,9 @@
     看故事頁的 16 個測試在 0e41527 重跑全部通過。
   - 都在固定在那個 commit 的另一個 worktree 跑，跑的時候程式沒有在改。紀錄：`docs/evidence/fix_audit_2026-10-06/regression/`。
 - **這一批的測試版**（給使用者在手機上試，不是發布）：https://claude.ai/artifact/BzGu1nFBVEqDt72Fad1sHP （「Jill's Kitchen 測試版」，
-  私人連結，Version 2，遊戲內容＝ d0fd661）。
+  私人連結，Version 3，遊戲內容＝ 0e41527，2026-10-07）。
   - 存檔跟正式版分開。要用自己的進度：正式版「設定・存檔」→「備份到檔案」，再到測試版「從備份檔恢復」。
-  - 跟正式版一樣可以「備份到檔案」（Version 2 加上了下載的權限；Version 1 沒有）。
+  - 跟正式版一樣可以「備份到檔案」（Version 2 起有下載的權限；Version 1 沒有）。
   - 正式網址沒有動，還是 rc8.5。
 - 已知會在單一 seed 上偶爾落差的機率性測試，都在測試註解裡寫了量過的分布（例：`lounge_i_content_bar_food…`、
   `v24_rc6_new_things_are_talked_about`）。
