@@ -1,7 +1,7 @@
 # Jill's Kitchen — 目前狀態（暫時的，會一直更新）
 
 這份只放「現在」的狀態：branch、版本、待辦、待確認。永久的設計規則在 `docs/PROJECT_MEMORY.md`，不要寫到這裡；這裡的內容過時了就
-直接改掉或刪掉。最後更新：2026-10-06 晚上，Audit 修正 branch 收尾、料理 prototype 第一輪（遊戲還是 rc8.5，沒有發布）。
+直接改掉或刪掉。最後更新：2026-10-07 早上，Audit 修正 branch 補修（遊戲還是 rc8.5，沒有發布）。
 
 ## Repo 與 branch
 
@@ -75,9 +75,12 @@
   顯示 FIXED，要把那一條拿掉）。
 - 247 個測試（`tests/run_tests.py` 95、`tests/v23_tests.py` 30、`tests/v24_tests.py` 122；`python3 tests/run_tests.py` 全跑，`-k a,b,c`
   跑指定的）。最近一次完整回歸：rc8.5 的 bded558 上 247/247（`docs/evidence/v24_rc8_5/regression/`）。
-- **`fix/audit-narrative-2026-10-06` 的完整回歸**：d0fd661 上 **292/292**（2026-10-06 23:05 UTC；其中 46 個是例行 QA 的 `qa_` 測試，
-  `tests/qa_known_open.json` 是空的）。在固定在 d0fd661 的另一個 worktree 跑，跑的時候程式沒有在改。紀錄：
-  `docs/evidence/fix_audit_2026-10-06/regression/`。
+- **`fix/audit-narrative-2026-10-06` 的完整回歸**：
+  - d0fd661 上 **292/292**（2026-10-06 23:05 UTC；其中 46 個是例行 QA 的 `qa_` 測試，`tests/qa_known_open.json` 是空的）。
+  - 2026-10-07 補修（第 3 天起「沒有備料的菜」的說法、舊存檔被截斷的故事頁、日誌修正的測試）之後：292e654 上 **295/296**。唯一失敗的
+    `every_player_save_migrates_plays_a_day_and_keeps_its_story` 抓到 Day 67 存檔的頁面要讀第二次才補齊，在 0e41527 修好；讀存檔、
+    看故事頁的 16 個測試在 0e41527 重跑全部通過。
+  - 都在固定在那個 commit 的另一個 worktree 跑，跑的時候程式沒有在改。紀錄：`docs/evidence/fix_audit_2026-10-06/regression/`。
 - **這一批的測試版**（給使用者在手機上試，不是發布）：https://claude.ai/artifact/BzGu1nFBVEqDt72Fad1sHP （「Jill's Kitchen 測試版」，
   私人連結，Version 2，遊戲內容＝ d0fd661）。
   - 存檔跟正式版分開。要用自己的進度：正式版「設定・存檔」→「備份到檔案」，再到測試版「從備份檔恢復」。
