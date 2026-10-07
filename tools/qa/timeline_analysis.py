@@ -56,7 +56,7 @@ def timeline(o):
     first_wait_hire = next(iter(hires(log, lambda d: any(w in (d['why'] or '') for w in WAITS))), None)
     first_hire = next(iter(hires(log)), None)
     m50 = first(rows, lambda r: r['money'] >= 50000)
-    all3 = first(rows, lambda r: view and r['day'] >= view and r['rate1'] >= 4.0 and r['money'] >= 50000)
+    all3 = first(rows, lambda r: view and r['day'] >= view and r['money'] >= 50000)   # the user, 2026-10-07: 《看看》 + $50,000, nothing else
     paid = first(rows, lambda r: (r.get('proj') or {}).get('state') in ('signing', 'reno', 'built'))
     pd = day_of(paid)
     sign_press = next((d for d in log if d['kind'] == 'decide' and d['pressed'] and '簽約' in d['pressed'] and d.get('cost')), None)
@@ -139,7 +139,7 @@ def report(files):
              ('第一次評分 ≥4.0', t['r40']), ('之後到 Lounge 前最低評分（Day, 分數）', t['low']), ('最低時的扣分理由', '；'.join(t['why_low']) or '—'),
              ('回到 4.0', t['back40']), ('第一次聘人', t['first_hire'] and f"Day {t['first_hire'][0]} {t['first_hire'][1]}"),
              ('第一次因等待而聘人', t['first_wait_hire'] and f"Day {t['first_wait_hire'][0]} {t['first_wait_hire'][1]}（{t['first_wait_hire'][2][:60]}）"),
-             ('第一次自然有 $50,000', t['m50']), ('三個條件同時成立', t['all3']), ('按下 簽約・開工', t['sign_press']), ('Madame Lin 最後一晚', t['last_night']),
+             ('第一次自然有 $50,000', t['m50']), ('《看看》之後第一次有 $50,000（可以簽約）', t['all3']), ('按下 簽約・開工', t['sign_press']), ('Madame Lin 最後一晚', t['last_night']),
              ('《簽約》', t['lin_sign']), ('The Lounge 開幕', t['opened']), ('開幕時餐廳等級', t['level_open']), ('開幕時員工', t['roles_open']),
              ('開幕時最貴的六道菜', '、'.join(f'{d} ${p}' for d, p in t['top_dishes'])), ('開幕前研發的酒', '、'.join(f'Day {d} {p}' for d, p in t['wines_dev']) or '—'),
              ('開幕時酒單支數', t['wines_n_open']), ('開幕當天／7 天後／14 天後收店現金', t['cash'] and ' / '.join(fmt(v) for v in t['cash'].values()))]

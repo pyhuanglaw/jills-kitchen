@@ -305,7 +305,7 @@ _AFTER_THE_VIEWING = """const st=story();const d=S.day;const set=(k,dd)=>st.fact
 
 @test
 def qa_lounge_one_signs_before_her_last_night(b, port, target):
-    """The user, 2026-10-06: Lounge I is 《看看》 + a rating of 4.0 + $50,000 — her last night is her story, never a wait.
+    """The user, 2026-10-06/07: Lounge I is 《看看》 + $50,000 — her last night is her story, never a wait.
     The Day 52 save (rating 4.3, $173,060), 《看看》 behind it and her last night five days ahead: the player opens 店舖工程,
     taps 簽約・開工 — $50,000 goes and the signing is the next opening; the next morning 《簽約》 is read through and the
     work begins."""
@@ -313,11 +313,11 @@ def qa_lounge_one_signs_before_her_last_night(b, port, target):
     try:
         p.tap('#screen [data-act=open]')
         p.ev(_AFTER_THE_VIEWING); p.frames(2)
-        setup_check(p.state()['phase'] == 'shop' and p.ev("+rating().toFixed(1)>=4&&S.money>=50000&&linLast()>S.day&&!fact('lin_closed')") is True,
-                    f'the case: in the shop, rating 4.0+, $50,000+, her last night ahead: {p.state()}')
+        setup_check(p.state()['phase'] == 'shop' and p.ev("S.money>=50000&&linLast()>S.day&&!fact('lin_closed')") is True,
+                    f'the case: in the shop, $50,000+, her last night ahead: {p.state()}')
         p.tap('#screen [data-act=tab][data-k=works]')
         card = p.text('#screen .lin-card')
-        check('最後一晚' not in card and 'Madame Lin 做到' not in card and '簽約・開工 $50,000' in card, f'the card waits for nothing but 4.0 and the money: {card[-80:]!r}')
+        check('最後一晚' not in card and 'Madame Lin 做到' not in card and '簽約・開工 $50,000' in card, f'the card waits for nothing but the money: {card[-80:]!r}')
         m0 = p.state()['money']
         p.tap('#screen .lin-card [data-act=linSign]')
         check(m0 - p.state()['money'] == 50000 and p.ev("S.loungeProj.state") == 'signing', f'簽約・開工 by a tap: {m0} → {p.state()["money"]}')

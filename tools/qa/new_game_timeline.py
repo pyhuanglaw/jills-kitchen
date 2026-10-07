@@ -146,9 +146,9 @@ def report(out):
     view = beats.get('lin_viewing')
     paid = first(rows, lambda r: (r.get('proj') or {}).get('state') in ('signing', 'reno', 'built'))
     opened = first(rows, lambda r: r['lounge'])
-    L = {'《看看》': view, '當下評分第一次 ≥4.0（《看看》之後）': first(rows, lambda r: view and r['day'] >= view and r['rate1'] >= 4.0),
+    L = {'《看看》': view,
          f'第一次自然有 ${cost:,}': first(rows, lambda r: r['money'] >= cost),
-         '三個條件同時成立（《看看》、評分 4.0、錢）': first(rows, lambda r: view and r['day'] >= view and r['rate1'] >= 4.0 and r['money'] >= cost),
+         f'兩個條件同時成立（《看看》、${cost:,}）': first(rows, lambda r: view and r['day'] >= view and r['money'] >= cost),
          '付錢（簽約・開工）': paid, 'Madame Lin 最後一晚': beats.get('lin_last'), '《簽約》': beats.get('lin_sign'), 'The Lounge 開幕': opened}
     print('\nTHE LOUNGE:', json.dumps(L, ensure_ascii=False))
     print('FIRST DAY OF EACH BEAT:', json.dumps(beats, ensure_ascii=False))

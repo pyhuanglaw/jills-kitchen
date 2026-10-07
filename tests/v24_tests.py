@@ -4639,25 +4639,26 @@ def v24_rc8_madame_lin_next_door_on_day_one(b, port, target):
 
 
 @test
-def v24_the_tasting_night_waits_for_the_rating_not_fine_dining(b, port, target):
-    """The user, 2026-10-07 (PROJECT_MEMORY §6): Ken's tasting night asks for the rating Lounge I asks for (4.0, as the HUD
-    shows it), not Jill's Fine Dining — S.level>=4 (v2.3, 421dd42, never the user's) held a normal player's Lounge to
-    Day 66–84. With Ken's history in place: at level 3 and a rating of 4.0 the night may come; under 4.0 it does not, even
-    at level 5. The journal's 「晚餐之後」 shows on the same condition, and once it has shown a dip of the rating does not
-    hide it again."""
+def v24_the_tasting_night_comes_from_kens_story_alone(b, port, target):
+    """The user, 2026-10-07 (PROJECT_MEMORY §6): Ken's tasting night has no Fine Dining, no restaurant level and no rating
+    gate — it comes from Ken's own story: his visits, a main he ate (ken_wine_q), the pairing talk and the idea next door.
+    (S.level>=4 was v2.3's, 421dd42; the rating 4.0 one morning's, a8c6abd; neither was the user's.) With Ken's story in
+    place the night may come at level 1 and a rating of 3.0; one pairing talk short, it does not, even at level 5 and 4.5+.
+    The journal's 「晚餐之後」 has no condition of its own: on the page from a new game as 「？？？」, its title once Ken asks."""
     g = Game(b, port, target, seed=8301, manual=True)
     g.click('[data-act=open]'); g.page.wait_for_timeout(100)
     r = json.loads(g.ev("""JSON.stringify((()=>{const E=STORY_EV.find(e=>e.k==='ken_tasting');const C=()=>restChapters().find(c=>c.t==='晚餐之後');
       const rate=s=>{S.reviews=Array.from({length:120},()=>({s,w:1}))};const out={};
-      out.before=C().showIf();
-      factSet('ken_wine_q');factSet('ken_pairing');factSet('ken_pairing');factSet('lounge_idea');factSet('lounge_idea');story().named[KEN]={v:5,last:S.day-1,dishes:{steak:3}};
-      S.level=3;rate(5);out.l3_good={rating:+rating().toFixed(1),when:!!E.when({})};
-      S.level=5;rate(3);out.l5_low={rating:+rating().toFixed(1),when:!!E.when({})};
-      S.level=3;rate(5);out.shown=C().showIf();applyGates();rate(3);out.after_dip=C().showIf();return out})())"""))
-    check(r['before'] is False, f'a new game does not show 「晚餐之後」 before the rating reaches 4.0: {r}')
-    check(r['l3_good']['rating'] >= 4.0 and r['l3_good']['when'], f'level 3, rating 4.0+: the tasting night may come: {r}')
-    check(r['l5_low']['rating'] < 4.0 and not r['l5_low']['when'], f'under 4.0 it does not, even at level 5: {r}')
-    check(r['shown'] and r['after_dip'], f'「晚餐之後」 shows with the rating, and stays after a dip: {r}')
+      out.no_cond=!C().showIf;out.hid_new=!!C().hidden();
+      factSet('ken_wine_q');factSet('ken_pairing');factSet('lounge_idea');factSet('lounge_idea');story().named[KEN]={v:5,last:S.day-1,dishes:{steak:3}};
+      S.level=5;rate(5);out.short={level:S.level,rating:+rating().toFixed(1),when:!!E.when({})};
+      factSet('ken_pairing');
+      S.level=1;rate(3);out.low={level:S.level,rating:+rating().toFixed(1),when:!!E.when({})};
+      out.hid_asked=!!C().hidden();return out})())"""))
+    check(r['no_cond'] and r['hid_new'], f'「晚餐之後」 has no condition of its own; 「？？？」 before Ken asks: {r}')
+    check(r['short']['level'] == 5 and r['short']['rating'] >= 4.5 and not r['short']['when'], f'one pairing talk short: no night, even at level 5 and a rating of 4.5+: {r}')
+    check(r['low']['level'] == 1 and r['low']['rating'] <= 3.1 and r['low']['when'], f"Ken's story in place: the night may come at level 1 and 3.0: {r}")
+    check(not r['hid_asked'], f'its title once Ken has asked: {r}')
 
 
 @test
@@ -5016,18 +5017,18 @@ _LIN_TO_THE_VIEWING = """const st=story();for(const k of ['tasting_night','pairi
 
 
 @test
-def v24_lounge_one_after_the_viewing_rating_four_and_50000_no_wait_for_her_last_night(b, port, target):
+def v24_lounge_one_after_the_viewing_and_50000_no_wait_for_her_last_night(b, port, target):
     """The user, 2026-10-06: 《看看》 is where Jill decides — no 「接下隔壁／再想想」 card, nothing to come back to; the same
-    day 升級餐廳 › 店舖工程 has Lounge I, and it needs three things only: 《看看》, a rating of 4.0 (as the HUD shows it) and
-    $50,000. Her last night is her story, never a wait: with it still ahead the player signs, and the evening before the
+    day 升級餐廳 › 店舖工程 has Lounge I, and (the user, 2026-10-07) it needs two things only: 《看看》 and $50,000 — no
+    level, no rating. Her last night is her story, never a wait: with it still ahead the player signs, and the evening before the
     signing is her last (her bar closed, the keys the next morning, nothing left to fire on the old date); not signed,
     her last night comes as it always did and one line says where the signing is — a reminder, not an unlock. What is
-    missing is said on the card (the rating, the money). Lounge II $160,000 and III $220,000 as they were. Saves from
+    missing is said on the card (the money, nothing else). Lounge II $160,000 and III $220,000 as they were. Saves from
     before — a 「再想想」, a card nobody answered, a save between 《看看》 and that night's card, one waiting for her last
     night — can all sign; one that had paid $120,000 is not charged again, a built Lounge is left as it is."""
     g = Game(b, port, target, seed=8761, manual=True, viewport={'width': 390, 'height': 844})
     load_save(g, 'player_day52.json'); g.ev(_LIN_TO_THE_VIEWING)
-    check(g.ev("JSON.stringify([LOUNGE_PROJ.map(p=>p.cost),LOUNGE_PROJ.map(p=>p.need),LOUNGE_PROJ[0].rate])") == '[[50000,160000,220000],[0,4,5],4]', 'Lounge I: rating 4.0 and $50,000; II and III as they were')
+    check(g.ev("JSON.stringify([LOUNGE_PROJ.map(p=>p.cost),LOUNGE_PROJ.map(p=>p.need),'rate' in LOUNGE_PROJ[0]])") == '[[50000,160000,220000],[0,4,5],false]', 'Lounge I: $50,000, no level, no rating; II and III as they were')
     if g.ev("phase") == 'shop': g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(200)
     g.ev("window.__notes=[];const __nl=noteLine;noteLine=function(t){__notes.push(t);return __nl.apply(this,arguments)}")
     g.ev("autoStock();window.__noScenes=false;window.__holds=true"); start_day(g); install_bot(g); g.ev("for(let i=0;i<3;i++)__tick(1000/30)")
@@ -5047,17 +5048,18 @@ def v24_lounge_one_after_the_viewing_rating_four_and_50000_no_wait_for_her_last_
     check(g.ev("linLast()") > g.ev("S.day") and '簽約・開工 $50,000' in card and '最後一晚' not in card and 'Madame Lin 做到' not in card and 'Fine Dining' not in card,
           f'the same day: 簽約・開工 $50,000, nothing about her last night or a level: {card[-90:]!r}')
     check('再想想' not in txt and '還在這裡' not in txt and 'Jill 決定接' in txt and not g.ev("[...document.querySelectorAll('#screen button')].some(x=>/接下隔壁/.test(x.textContent))"), 'decided — no 「接下隔壁」, no 「再想想」')
-    # what is missing, on the card: the rating (as the HUD shows it), then the money
-    g.ev("window.__rate=3.8;rating=function(){return window.__rate};S.money=30000;showShop()"); g.page.wait_for_timeout(40); card = g.ev(CARD)
-    check(g.ev(DIS) is True and '需要餐廳評分 4.0（目前 3.8）' in card and '還差 $20,000' in card, f'below 4.0 and short of money: both said: {card[-80:]!r}')
-    g.ev("__rate=3.96;S.money=60000;showShop()"); g.page.wait_for_timeout(40); card = g.ev(CARD)
-    check(g.ev(DIS) is False and '需要餐廳評分' not in card and g.ev("rating().toFixed(1)") == '4.0', f'a rating the HUD shows as 4.0 is 4.0: {card[-60:]!r}')
-    g.ev("__rate=4.2;S.money=49999;showShop()"); g.page.wait_for_timeout(40); card = g.ev(CARD)
-    check(g.ev(DIS) is True and '還差 $1' in card and '需要餐廳評分' not in card, f'4.0 or more, $1 short: only the money is said: {card[-60:]!r}')
+    # what is missing, on the card: the money, nothing else — a rating of 3.0 and a level-1 restaurant change nothing
+    g.ev("window.__rate=3.0;rating=function(){return window.__rate};window.__lv0=S.level;S.level=1;S.money=30000;showShop()"); g.page.wait_for_timeout(40); card = g.ev(CARD)
+    check(g.ev(DIS) is True and '還差 $20,000' in card and '評分' not in card and '擴建' not in card, f'short of money: only the money is said: {card[-80:]!r}')
+    g.ev("S.money=60000;showShop()"); g.page.wait_for_timeout(40); card = g.ev(CARD)
+    check(g.ev(DIS) is False and '評分' not in card, f'3.0, level 1, $60,000: 簽約・開工 can be pressed: {card[-60:]!r}')
+    g.ev("S.money=49999;showShop()"); g.page.wait_for_timeout(40); card = g.ev(CARD)
+    check(g.ev(DIS) is True and '還差 $1' in card, f'$1 short: {card[-60:]!r}')
     # no way around the story: an act 「buyLounge 1」 (no such button in the game; a stale one, a script) builds nothing
     g.ev("S.money=500000;(()=>{const el=document.createElement('button');el.dataset.act='buyLounge';el.dataset.k='1';$('#screen').appendChild(el);el.click();el.remove()})()")
     check(g.ev("loungeLv()") == 0 and g.ev("S.money") == 500000 and g.ev("S.loungeProj.state") == 'planned', 'Lounge I is never bought around 簽約・開工')
-    # THE REGRESSION (the user, 2026-10-06): her last night still ahead + 《看看》 + 4.0 + $50,000 → the signing goes through
+    # THE REGRESSION (the user, 2026-10-06/07): her last night still ahead + 《看看》 + $50,000 → the signing goes through,
+    # at a rating of 3.0 and level 1
     g.ev("S.money=50000;showShop()"); g.page.wait_for_timeout(40)
     old_last = g.ev("linLast()")
     check(old_last > g.ev("S.day") and not g.ev("!!fact('lin_closed')") and g.ev(DIS) is False, 'her last night has not come, and 簽約・開工 can be pressed')
@@ -5065,7 +5067,7 @@ def v24_lounge_one_after_the_viewing_rating_four_and_50000_no_wait_for_her_last_
     st = json.loads(g.ev("JSON.stringify({money:S.money,state:S.loungeProj.state,closed:fact('lin_closed')&&fact('lin_closed').d,day:S.day,bar:barState(),news:linNewsHTML(),early:linS().early,card:document.querySelector('#screen .lin-card').innerText,note:STORY_LINES.find(L=>L.k==='nextdoor').beats.find(b=>b[0]==='lin_closed')[2].note()})"))
     check(st['money'] == 0 and st['state'] == 'signing' and '明天開店前，Jill 去隔壁簽約' in st['card'], f'paid $50,000; the signing is the next opening: {st}')
     check(st['closed'] == st['day'] and st['bar'] == 'closed' and st['news'] == '' and st['early'] == 1 and st['note'].startswith('Jill 簽約的前一晚'), f'that evening was her last — her bar closed, no countdown, the story page says why: {st}')
-    g.ev("__rate=4.2")
+    g.ev("__rate=4.2;S.level=__lv0")
     g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(120)
     g.ev("autoStock();window.__noScenes=false;window.__holds=true"); start_day(g); install_bot(g); g.ev("for(let i=0;i<3;i++)__tick(1000/30)")
     check(g.ev("DLG&&DLG.sh&&DLG.sh.k") == 'lin_sign', 'the next morning: 《簽約》')
@@ -5108,7 +5110,7 @@ def v24_lounge_one_after_the_viewing_rating_four_and_50000_no_wait_for_her_last_
         g.ev("phase='title';R=null;localStorage.setItem(KEY,JSON.stringify(%s))" % json.dumps(raw, ensure_ascii=False)); g.reload(); g.page.wait_for_timeout(150)
         g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(150)
         st = json.loads(g.ev("JSON.stringify({take:fact('lin_take'),proj:fact('lounge_project'),state:S.loungeProj&&S.loungeProj.state,mig:S.linDecMig,money:S.money,facts:Object.keys(story().facts),rate:+rating().toFixed(1)})"))
-        check(st['take'] and st['take']['d'] == D - 6 and not st['take'].get('retro') and st['proj'] and st['mig'] == 1 and st['rate'] >= 4.0, f'{kind}: read as decided at 《看看》 (Day {D - 6}): {st}')
+        check(st['take'] and st['take']['d'] == D - 6 and not st['take'].get('retro') and st['proj'] and st['mig'] == 1, f'{kind}: read as decided at 《看看》 (Day {D - 6}): {st}')
         added = sorted(k for k in set(st['facts']) - set(F) if k.startswith(('lin_', 'lounge_', 'pairing_', 'evan_')))
         check(added == {'planned': [], 'waiting': [], 'paid120k': [], 'mid': ['lin_take', 'lounge_project']}.get(kind, ['lin_take']), f'{kind}: nothing else of the line added: {added}')
         g.ev("showShop();shopTab='works';showShop()"); g.page.wait_for_timeout(60)
@@ -5129,7 +5131,7 @@ def v24_lounge_one_after_the_viewing_rating_four_and_50000_no_wait_for_her_last_
     g = Game(b, port, target, seed=8763, manual=True, viewport={'width': 390, 'height': 844})
     g.click('[data-act=open]'); g.page.wait_for_timeout(100)
     guide = g.ev("GUIDE.find(x=>/Lounge/.test(x.h)).pts.find(p=>p[0]==='怎麼來的')[1]")
-    check(g.ev("S.linDecMig") == 1 and 'Jill 看過隔壁，就決定接下來' in guide and '評分到 4.0' in guide and '$50,000' in guide and '不用等 Madame Lin 的最後一晚' in guide
+    check(g.ev("S.linDecMig") == 1 and 'Jill 看過隔壁，就決定接下來' in guide and '評分' not in guide and '$50,000' in guide and '不用等 Madame Lin 的最後一晚' in guide
           and not any(w in guide for w in ('再想想', '要不要接', '等她最後一晚過了', 'Fine Dining', '80,000', '120,000')), f'a new game: nothing to migrate; the manual says the same: {guide}')
     g.close()
 
