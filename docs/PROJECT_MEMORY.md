@@ -76,6 +76,16 @@ commit/push；publish 只依玩家的發布指示（見 §10）。
 誰以前用過？為什麼現在需要？這個習慣怎麼形成？今天看似普通的事，是從哪一次第一次開始變成日常？
 要追求的體驗：「我記得這裡以前不是這樣。」
 
+**故事的門，用故事的鑰匙開；空間與豪華升級的門，用錢開。**（使用者 2026-10-07，永久設計規則，版本 A「故事優先」）
+- Major character／major story arc／人物關係，原則上**不得**以 Fine Dining、JILL、restaurant level、rating 或昂貴的 optional
+  project 作 prerequisite，**除非有直接、可解釋的世界觀或物理因果**（例：沒有鋼琴就沒有予安來 Lounge 彈琴；樓梯在側廳，沒有側廳
+  就上不了二樓；《你喜歡予安？》予安本人在場景裡）。
+- 不要用新的 Day X、rating、level 或其他 arbitrary gate 取代被移除的 gate。玩家可以因為自己的花錢選擇晚買東西；遊戲不要另外擋。
+- Fine Dining／JILL 繼續存在，是「經營成就／豪華成長」：可以控制菜色、設備、收益、容量、裝潢、豪華 optional projects。
+- 昂貴的 dream works（酒窖、昂貴裝潢……）照樣很貴，讓後期有錢的玩家有地方花錢；但不得成為重要人物故事的門票。
+- 使用者原話：「重要人物、人物關係、major story arc，不得因為玩家賺錢較慢，而被昂貴的 optional project、Fine Dining、JILL、
+  restaurant level 或 rating 長期鎖住。」「只有存在直接世界觀／物理因果時，設備或空間才可以成為故事 prerequisite。」
+
 ---
 
 ## 2. Story scheduler（`storyTick`、`LANE_CAP`、`LANE_GAP`，`js/game.js`）
@@ -224,6 +234,11 @@ Madame Lin：Day 1 之前就是隔壁 neighborhood bar 的老闆。不是房東�
      S.level>=4 是後來實作加入，而不是我的 canon，就不要讓它從故事入口偷偷把 Fine Dining 條件加回來。」「Ken 試酒之夜也不要有 Fine
      Dining、Restaurant level 或 rating gate。它只依照原本真正有敘事意義的條件前進：Ken 的實際來訪歷史、吃過適合的菜、前置
      wine/pairing facts，以及合理的故事間隔。」
+   - **版本 A（使用者 2026-10-07，同一天稍後）**：Lounge II $80,000（Fine Dining 保留：它是經營／空間升級，不是任何人物故事的
+     條件）；Lounge III $150,000，不要 JILL（它自己沒有等級條件，排在 Lounge II 之後）；Lounge 的鋼琴 $100,000，Lounge I 開幕後就能買
+     （賣在「店舖工程 › Lounge」，不再是要 Fine Dining 才出現的「夢想工程」），沒有 Lounge II、等級或評分條件；予安只等鋼琴。
+     二樓和《大家待的地方》不要 JILL（原本 rc5 的 `S.level>=5`），側廳（樓梯）、員工人數、Lounge I 已開幕和它們自己的故事條件保留。
+     酒窖等其他 dream works 照舊又貴又晚。
    - **設計原則**（使用者 2026-10-07，看過三個 seed：《看看》之後條件成立了，又空等 16–23 天才簽）：「人物故事決定一個機會何時出現；
      錢決定玩家何時有能力把機會變成實際空間。」「如果玩家自己選擇先把 $50,000 花在廚房、側廳或 Fine Dining，那是玩家自己的經營選擇，
      可以因此晚開 Lounge；但遊戲本身不要再用 rating 或 Fine Dining 阻止他。」「目標不是強迫 Lounge 在固定日期開，而是讓正常玩家大約在
@@ -269,7 +284,10 @@ Madame Lin：Day 1 之前就是隔壁 neighborhood bar 的老闆。不是房東�
 
 ## 7. 晴 × 阿拓（rc8，已實作；原始 brief：`docs/v24/qing_tuo_after_work_brief_2026-10-03.txt`；報告：`docs/V24_RC8_QING_TUO_REPORT.md`）
 
-五幕都是 held scene（暫停餐廳，點一下往下走），在 The Lounge。**沒有第六幕。** 這條線在 **Dylan 揭曉之後**才開始（2026-10-03：
+五幕都是 held scene（暫停餐廳，點一下往下走），在 The Lounge。**沒有第六幕。** **條件（使用者 2026-10-07，版本 A）：Lounge I 開幕，
+晴和阿拓都在 Lounge 工作**——阿拓在 Lounge I 的名單上（原本要 Lounge II）；之後照兩人實際一起工作的時間、前面的事件和故事間隔走。
+後三幕（《最近比較常》《你喜歡予安？》《講完》）予安本人在場景裡，所以要她已經加入、那晚有彈——這是故事本身的條件，保留；她只
+需要 Lounge 有鋼琴（$100,000，Lounge I 開幕後就能買，沒有等級條件）。 這條線在 **Dylan 揭曉之後**才開始（2026-10-03：
 「DYLAN揭曉才進那個劇情阿……而且有告白劇情一定要有圖」）：五張圖都有，四張看得到 Dylan 的臉。
 1. **《今天喝？》**：Dylan 第一次到 Lounge 喝酒；Evan 在簽約時已認識他。「今天喝？」「嗯。」「稀奇。」……
    **禁止舊稿**：「第一次來這邊吧？」「我倒是聽過你。」

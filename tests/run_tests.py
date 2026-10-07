@@ -2784,7 +2784,7 @@ def h_i_k_t_shop_rooms_decoration_pass_and_dreams(b, port, target):
     check([d for d in dreams if d in ('glass', 'ceiling', 'catwalk')] == ['glass', 'ceiling', 'catwalk'], f'three dreams on the works page: {dreams}')
     dk = {d['k']: [d['cost'], d['horizon']] for d in json.loads(g.ev("JSON.stringify(DREAMS.map(d=>({k:d.k,cost:d.cost,horizon:d.horizon})))"))}
     check([dk.get(k) for k in ('glass', 'chandelier', 'ceiling', 'catwalk')] == [[100000, '近'], [120000, '中'], [180000, '中'], [300000, '遠']], f'the four dreams at 100k / 120k / 180k / 300k (v2.2.1 J added the main light): {dk}')
-    check({k: dk.get(k) for k in ('painting', 'dryage', 'cellar', 'piano')} == {'painting': [90000, '近'], 'dryage': [140000, '中'], 'cellar': [160000, '中'], 'piano': [240000, '遠']}, f'v2.4 rc6 (10:21, 10:40): and four more — the painting, the dry-ageing cabinet, the Lounge\'s cellar and piano: {dk}')
+    check({k: dk.get(k) for k in ('painting', 'dryage', 'cellar', 'piano')} == {'painting': [90000, '近'], 'dryage': [140000, '中'], 'cellar': [160000, '中'], 'piano': [100000, '遠']}, f'v2.4 rc6 (10:21, 10:40): and four more — the painting, the dry-ageing cabinet, the Lounge\'s cellar and piano (the piano $100,000 from 2026-10-07, sold on the Lounge\'s page): {dk}')
     amb0 = g.ev("ambience()")
     g.click('[data-act=buyProject][data-k=ceiling]'); g.page.wait_for_timeout(100); g.ev("hideReveal()")
     check(g.ev("projOn('ceiling')") and g.ev("S.money") == 400000 - 180000 and g.ev("ambience()") == amb0 + 3, 'the ceiling is bought, paid and felt')

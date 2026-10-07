@@ -1082,7 +1082,7 @@ def v24_restaurant_and_lounge_staff_are_two_pools_that_never_share_places(b, por
     g.ev("S.rooms.up=1;S.rooms.lounge=3")
     check(g.ev("restaurantCap()") == r0 + 2 and g.ev("loungeCap()") == l0, 'the second floor and Lounge III add no places at all (nothing mechanical; no new names)')
     g.ev("S.rooms.lounge=1")
-    check(g.ev("loungeCap()") == 2 and g.ev("restaurantCap()") == r0 + 2, 'Lounge I alone: two Lounge places; the restaurant unchanged')
+    check(g.ev("loungeCap()") == 3 and g.ev("restaurantCap()") == r0 + 2, 'Lounge I alone: three Lounge places (Evan, 沈晴, 阿拓 — the user, 2026-10-07); the restaurant unchanged')
     g.ev("S.rooms.lounge=2;delete S.rooms.up;delete S.rooms.kitchen2")
     # where they work is the board's: a restaurant server on the Lounge floor stays restaurant staff; 安安 works both
     g.ev("(()=>{const m=S.crew.find(m=>m.name==='Nina');m.duties=Object.assign({},waiterDuties(m),{lounge:true})})()")
@@ -1211,6 +1211,7 @@ def v24_the_second_floor_is_a_story_before_it_is_a_room(b, port, target):
     g.ev("for(const k of ['yj_meet','yj_key','wall_worry','wall_settle'])delete story().facts[k]")
     g.ev(UP_DONE_BEFORE)
     check(g.ev("eraOpen('up')") is True and g.ev("upCan()") is True, 'the Lounge finished: open, with the side room and a crew of twelve')
+    check(g.ev("(()=>{const l=S.level;S.level=2;const r=upCan();S.level=l;return r})()") is True, 'no level asked (the user, 2026-10-07: JILL was rc5\'s): a Bistro with the side room and a crew')
     g.ev("for(const k of Object.keys(story().facts))if(/^(yj_|wall_|xq_oh)/.test(k))delete story().facts[k]")
     check(g.ev("eraOpen('up')") is True and g.ev("due('up_hint',null,0,'up')") is True, "and nothing of 怡君's or the wall's needed")
     g.ev("const s0=S.rooms.side;S.rooms.side=0;window.__c=upCan();S.rooms.side=s0")
@@ -1404,6 +1405,7 @@ def v24_rc6_the_staff_room_comes_from_a_need_and_grows_in_place(b, port, target)
     g.ev("(()=>{S.rooms.up=0;delete S.up;for(const k of['up_lease','up_use','up_ask','sr_story'])delete story().facts[k];if(!loungeLv())S.rooms.lounge=1})()")   # the floor's era follows the Lounge
     check(g.ev("upTaken()") is False and g.ev("eraOpen('up')") is True, 'the floor\'s era, the floor not taken')
     check(g.ev("upKinds(SP_KINDS)") == 2 and g.ev("srStoryReady()") is True, 'two kinds of the want (the box, the seat): 《大家待的地方》 is ready, before the lease')
+    check(g.ev("(()=>{const l=S.level;S.level=2;const r=srStoryReady();S.level=l;return r})()") is True, 'no level asked (the user, 2026-10-07)')
     g.ev("story().facts.yj_meet=null;delete story().facts.yj_meet")
     check(g.ev("srStoryReady()") is True, "nothing of 怡君's needed (the player's 10:25)")
     check(g.ev("due('up_ask','sr_story',1,'up')") is False, 'no call to the landlord before it')
@@ -5016,6 +5018,43 @@ def v24_rc8_mature_saves_get_the_line_as_history(b, port, target):
 _LIN_TO_THE_VIEWING = """const st=story();for(const k of ['tasting_night','pairing_wine'])st.facts[k]={d:S.day-12,n:1,l:S.day-12};st.facts.lin_retiring={d:S.day-6,n:1,l:S.day-6};linS().last=S.day+6;for(const k of ['ken_where','jd_want'])st.facts[k]={d:S.day-4,n:1,l:S.day-4};st.facts.dylan_book={d:S.day-1,n:1,l:S.day-1};for(const k of ['pairing_start','lin_retire','ken_where','jd_want','dylan_book'])evState(k).n=1"""
 
 
+
+@test
+def v24_story_first_the_doors_of_the_stories_open_with_story_keys(b, port, target):
+    """The user, 2026-10-07 (version A; PROJECT_MEMORY §0 and §6): 「故事的門，用故事的鑰匙開；空間與豪華升級的門，用錢開。」
+    Lounge II $80,000 (Fine Dining: a room of the business), Lounge III $150,000 (no level of its own). 阿拓 is on the
+    Lounge I roster, so 晴 × 阿拓 needs The Lounge and the two of them at work there — never Lounge II. The piano is
+    $100,000 from the day The Lounge opens, at any level, on the Lounge's own page (not among the late dream works, and
+    never twice), and 予安's story waits for the piano alone (three days, as it always did). The floor upstairs and the
+    Staff Room's story ask for no level: the side room (the stairs) and a crew stay. All on a level-1 restaurant at 3.0."""
+    g = Game(b, port, target, seed=8771, manual=True, viewport={'width': 390, 'height': 844})
+    g.click('[data-act=open]'); g.page.wait_for_timeout(100)
+    PIANO = "((document.querySelector('#screen')||{}).innerText||'').split('Lounge 的鋼琴').length-1"   # before opening the shop says 「打烊後可以開始」 instead of a button
+    r = json.loads(g.ev("""JSON.stringify((()=>{const out={};rating=function(){return 3.0};S.level=1;S.money=1e6;S.day=30;phase='shop';   /* a day the works tab is open */
+      out.proj=[LOUNGE_PROJ.map(p=>p.cost),LOUNGE_PROJ.map(p=>p.need)];
+      const PN=DREAMS.find(d=>d.k==='piano');out.piano=[PN.cost,PN.lv,PN.needLounge];return out})())"""))
+    g.ev("doAct('tab',null,'works')"); g.page.wait_for_timeout(120); r['pianoGoal0'] = g.ev(PIANO)
+    r.update(json.loads(g.ev("""JSON.stringify((()=>{const out={};loungeBuild(1);try{hideReveal()}catch(e){}
+      out.roster1=loungeRosterOpen().map(x=>x.name);out.cap1=loungeCap();
+      for(const n of ['沈晴','阿拓'])doAct('hireLounge',null,n);
+      out.lounge=poolCrew('lounge').map(m=>m.name).sort();
+      const q1=STORY_EV.find(e=>e.k==='qt_1');out.qt1=!!q1.when({tk:{lounge:true,items:[{d:'friedrice'}]}});return out})())""")))
+    g.ev("doAct('tab',null,'works')"); g.page.wait_for_timeout(120); r['pianoCards'] = g.ev(PIANO)
+    g.ev("S.level=5;doAct('tab',null,'works')"); g.page.wait_for_timeout(120); r['pianoCards5'] = g.ev(PIANO)
+    r.update(json.loads(g.ev("""JSON.stringify((()=>{const out={};S.level=1;
+      const m0=S.money;doAct('buyProject',null,'piano');out.paid=m0-S.money;out.pianoOn=!!projOn('piano');try{hideReveal()}catch(e){}
+      yaFirst();const d0=S.day;S.day=d0+2;out.ya_d2=yaDue('ya_1');S.day=d0+3;out.ya_d3=yaDue('ya_1');S.day=d0;
+      S.rooms.side=1;const c0=S.crew;S.crew=c0.concat([1,2,3,4,5].map(i=>({name:'x'+i,role:'waiter'})));out.upCan=upCan();S.crew=c0;
+      out.noLevel=[upCan,srStoryReady].map(f=>!/S\\.level/.test(String(f)));return out})())""")))
+    check(r['proj'] == [[50000, 80000, 150000], [0, 4, 0]], f'Lounge I $50,000; II $80,000 at Fine Dining; III $150,000, no level: {r["proj"]}')
+    check(r['piano'] == [100000, 1, 1] and r['pianoGoal0'] == 0, f'the piano: $100,000, any level, The Lounge first — not on sale before it: {r}')
+    check(r['roster1'] == ['Evan', '沈晴', '阿拓'] and r['cap1'] == 3 and r['lounge'] == sorted(['Evan', '沈晴', '阿拓']), f'Lounge I: Evan, 沈晴 and 阿拓: {r}')
+    check(r['qt1'] is True, f'晴 × 阿拓 can begin at Lounge I, level 1, 3.0 — the two of them at work: {r}')
+    check(r['pianoCards'] == 1 and r['pianoCards5'] == 1 and r['paid'] == 100000 and r['pianoOn'], f'the piano on the Lounge page at level 1, once at level 5 too; bought for $100,000: {r}')
+    check(r['ya_d2'] is False and r['ya_d3'] is True, f"予安: three days after the piano, as before — nothing else asked: {r}")
+    check(r['upCan'] is True and all(r['noLevel']), f'the floor upstairs and the Staff Room\'s story: no level (a level-1 restaurant with the side room and a crew): {r}')
+    check(not g.errors, g.errors[:3]); g.close()
+
 @test
 def v24_lounge_one_after_the_viewing_and_50000_no_wait_for_her_last_night(b, port, target):
     """The user, 2026-10-06: 《看看》 is where Jill decides — no 「接下隔壁／再想想」 card, nothing to come back to; the same
@@ -5023,12 +5062,13 @@ def v24_lounge_one_after_the_viewing_and_50000_no_wait_for_her_last_night(b, por
     level, no rating. Her last night is her story, never a wait: with it still ahead the player signs, and the evening before the
     signing is her last (her bar closed, the keys the next morning, nothing left to fire on the old date); not signed,
     her last night comes as it always did and one line says where the signing is — a reminder, not an unlock. What is
-    missing is said on the card (the money, nothing else). Lounge II $160,000 and III $220,000 as they were. Saves from
+    missing is said on the card (the money, nothing else). Lounge II $80,000 (Fine Dining) and III $150,000 (no level of its
+    own) — the user, 2026-10-07. Saves from
     before — a 「再想想」, a card nobody answered, a save between 《看看》 and that night's card, one waiting for her last
     night — can all sign; one that had paid $120,000 is not charged again, a built Lounge is left as it is."""
     g = Game(b, port, target, seed=8761, manual=True, viewport={'width': 390, 'height': 844})
     load_save(g, 'player_day52.json'); g.ev(_LIN_TO_THE_VIEWING)
-    check(g.ev("JSON.stringify([LOUNGE_PROJ.map(p=>p.cost),LOUNGE_PROJ.map(p=>p.need),'rate' in LOUNGE_PROJ[0]])") == '[[50000,160000,220000],[0,4,5],false]', 'Lounge I: $50,000, no level, no rating; II and III as they were')
+    check(g.ev("JSON.stringify([LOUNGE_PROJ.map(p=>p.cost),LOUNGE_PROJ.map(p=>p.need),'rate' in LOUNGE_PROJ[0]])") == '[[50000,80000,150000],[0,4,0],false]', 'Lounge I: $50,000, no level, no rating; II $80,000 (Fine Dining); III $150,000')
     if g.ev("phase") == 'shop': g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(200)
     g.ev("window.__notes=[];const __nl=noteLine;noteLine=function(t){__notes.push(t);return __nl.apply(this,arguments)}")
     g.ev("autoStock();window.__noScenes=false;window.__holds=true"); start_day(g); install_bot(g); g.ev("for(let i=0;i<3;i++)__tick(1000/30)")
