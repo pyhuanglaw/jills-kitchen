@@ -1,21 +1,21 @@
 # Jill's Kitchen — 目前狀態（暫時的，會一直更新）
 
 這份只放「現在」的狀態：branch、版本、待辦、待確認。永久的設計規則在 `docs/PROJECT_MEMORY.md`，不要寫到這裡；這裡的內容過時了就
-直接改掉或刪掉。最後更新：2026-10-07 早上，Audit 修正 branch 補修（遊戲還是 rc8.5，沒有發布）。
+直接改掉或刪掉。最後更新：2026-10-07 中午，v2.4 rc8.6 發布（Version 8，Audit 之後的修正）。
 
 ## Repo 與 branch
 
 - GitHub：`pyhuanglaw/jills-kitchen`，預設 branch 是 `main`。
-- **`main` ＝ Jill's Kitchen 的正式主線**：目前的、穩定的、發布出去的版本都在這裡。最新正式版是 bded558（v2.4 rc8.5），之後
+- **`main` ＝ Jill's Kitchen 的正式主線**：目前的、穩定的、發布出去的版本都在這裡。最新正式版是 023b17c（v2.4 rc8.6），之後
   `main` 上只有文件與紀錄。從 v2.2.1 起的完整開發歷史都在 `main` 上。
 - 還沒做完的遊戲功能，另外開短期的 `feature/…` 或 `wip/…` branch；做完、測試通過才回到 `main`，發布的 commit 一定在 `main` 上。
   文件與紀錄可以直接在 `main`。不要讓工作 branch 跟 `main` 長期並行。
 - GitHub 上的 branch：`main`、`archive/rc7.6-import-main`、`feature/fewer-lines`（rc8.5，已合回 `main`，可以在 GitHub 網頁刪掉）、
-  `feature/dylan-room`（Dylan 在房間的名字，還沒合回、還沒發布）、`feature/lounge-decided`（《看看》後直接決定接隔壁、Lounge I 的新條件；
-  還沒合回、還沒發布）、`qa/audit-2026-10-06`（全面 Audit 與例行 QA；2026-10-06 使用者同意合回 `main`，已合回，可以在 GitHub 網頁刪掉）、
-  `fix/audit-narrative-2026-10-06`（Audit 之後的修正：17 個已知未修全部修好、電腦版分頁、手冊重寫；從 `main` adc1fcd 開出，還沒合回、
-  還沒發布，見下面「已完成、尚未發布」）、`proto/cooking-flow`（料理流程的獨立試玩頁 `prototype/cooking/`，不動遊戲本體；使用者玩過、
-  決定方向之前不合回）。
+  `feature/dylan-room`（Dylan 在房間的名字，還沒合回、還沒發布）、`feature/lounge-decided`（《看看》後直接決定接隔壁、Lounge I 的新條件、
+  試酒之夜改看評分 4.0；還沒合回、還沒發布，見下面「進行中」）、`qa/audit-2026-10-06`（全面 Audit 與例行 QA；2026-10-06 使用者同意合回
+  `main`，已合回，可以在 GitHub 網頁刪掉）、`fix/audit-narrative-2026-10-06`（Audit 之後的修正；2026-10-07 快轉合回 `main` 並發布成
+  rc8.6，可以在 GitHub 網頁刪掉）、`proto/cooking-flow`（料理流程的獨立試玩頁 `prototype/cooking/`，不動遊戲本體；使用者 2026-10-07：
+  不合併、不發布、現在不做）。
 - 已刪除（玩家 2026-10-04 在 GitHub 網頁刪掉）：`feature/ken-tasting-pictures`（81cbe46，rc8.4 已合回 `main`）、`wip/lin`（舊的開發
   branch 名稱；最後指向的 b87b77b 在 `main` 裡）、`claude/jills-kitchen-github-setup-4x7483`（8ca784b，接在舊的匯入 commit 後面改網址；
   同樣的改動在主線的 ec985d1）。三條的內容都已經在 `main` 或不需要了。
@@ -29,11 +29,13 @@
 
 ## 已發布
 
-- **v2.4 rc8.5**，2026-10-04，發布到 **https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA**（**Version 7**，id 1791128420-4d10）。
-  遊戲內容＝ commit bded558（tag `v2.4-rc8.5`，只在本機）。報告：`docs/V24_RC8_5_REPORT.md`。Gate：bded558 上 247/247；讀回與
-  live_check 通過（`docs/evidence/v24_rc8_5/`）。內容：玩家的圖跳出時店一定停住；營業中員工會上休息室（以前在忙的店裡幾乎不會）；
-  二樓房間的訂購／動工按鈕修好（從 rc6 起按了沒反應，包廂也一直蓋不起來）；點單的愛心只給 Sophie 和 Mia；路人閒聊少很多、
-  同一句一週不重複、沒頭沒尾的句子改寫（Ken 和杜的「果味」）。
+- **v2.4 rc8.6**，2026-10-07，發布到 **https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA**（**Version 8**，id 1791369869-f9ed）。
+  遊戲內容＝ commit 023b17c（tag `v2.4-rc8.6`）。報告：`docs/V24_RC8_6_REPORT.md`。Gate：023b17c 上完整回歸 296/296；讀回與
+  live_check 通過（`docs/evidence/v24_rc8_6/`）。內容：2026-10-06 Audit 之後的修正（`docs/audit/2026-10-06/FIXES.md`）——電腦版分頁、
+  對話一次一組照營業時鐘走、Ken 和杜／Dylan／熟客說的話對得上、存檔與「繼續營業」接得回來、日誌長場景整段留著（舊存檔讀檔補齊）、
+  相簿數五隻貓、結算的錢、手冊重寫、備料規則一種說法、拿掉「複製備份文字」。17 個已知未修全部修好。
+- v2.4 rc8.5（Version 7，bded558；報告 `docs/V24_RC8_5_REPORT.md`）：玩家的圖跳出時店一定停住；營業中員工會上休息室；二樓房間的
+  訂購／動工按鈕修好；點單的愛心只給 Sophie 和 Mia；路人閒聊少很多。
 - v2.4 rc8.4（Version 6，922223b；報告 `docs/V24_RC8_4_REPORT.md`）：Ken 前三次品酒之夜各一張圖和相簿照片；名稱改成「品酒之夜」。
 - v2.4 rc8.3（Version 5，e797665；報告 `docs/V24_RC8_3_REPORT.md`）：候位到店門口、三種披薩、房間的貓砂盆與碗架、寶寶靠著 Jill／
   柔柔睡腳上、拿掉 PERFECT 橫幅、Sophie 和 Mia 坐隔壁桌、杯墊那段的旁白、香煎鴨胸 6 天說一次、品酒之夜的分帳與開場、猜酒、
@@ -48,12 +50,8 @@
 
 ### 已完成、尚未發布
 
-- **Audit 之後的修正**（branch `fix/audit-narrative-2026-10-06`，還沒合回 `main`、還沒發布）：玩家看得到的改變與四層狀態在
-  `docs/audit/2026-10-06/FIXES.md`。電腦版分頁（使用者的 blocker）、對話一次一組、存檔與「繼續營業」、結算、手冊重寫、第一天備料、
-  拿掉「複製備份文字」等；`tests/qa_known_open.json` 從 17 條變成空的。完整回歸與測試版連結見下面「測試」。使用者說「發布」時：
-  合回 `main` → 完整回歸 → 發布。
-- **料理流程 prototype**（branch `proto/cooking-flow`，`prototype/cooking/`）：獨立試玩頁，不是遊戲本體。設計結論
-  `prototype/cooking/DESIGN.md`；私人連結 https://claude.ai/artifact/EBzi6qETraguAApvettBFe 。等使用者玩過再決定要不要、怎麼放進遊戲。
+- **料理流程 prototype**（branch `proto/cooking-flow`，`prototype/cooking/`）：獨立試玩頁，不是遊戲本體。使用者 2026-10-07：不合併、
+  不發布、現在不要再做；之後重新開始時，以正式遊戲原本的廚房畫面為底，不重新設計美術。私人連結 https://claude.ai/artifact/EBzi6qETraguAApvettBFe 。
 
 - **Dylan 在房間裡的名字**（branch `feature/dylan-room`，還沒合回 `main`、還沒跑完整回歸）：玩家 2026-10-05「Dylan已經揭露但在房間還是沒寫Dylan」。
   揭曉後他頭上的名牌寫 Dylan（揭曉前「先生」）、房間分頁寫「Jill 和 Dylan 的房間」（放不下時「Jill & Dylan」、再放不下「房間」），
@@ -66,26 +64,20 @@
 
 ### 進行中／等待玩家素材
 
-- 沒有。品酒之夜的三張圖已在 rc8.4 發布。
+- **Lounge 的開店條件**（branch `feature/lounge-decided`，a8c6abd，還沒合回、還沒發布）：使用者 2026-10-07 選 C——Ken 的試酒之夜從
+  「升到 Fine Dining（S.level≥4）」改成「評分 4.0」，日誌「晚餐之後」章節照同樣的邏輯顯示。正常玩家 seed 300／301／302 的模擬在跑，
+  看 Lounge 會不會提早開、開了以後錢會不會出問題。跟 `main` 在 `game.js` 有 2 處小衝突。沒有使用者確認不合回、不發布。
+- 品酒之夜的三張圖已在 rc8.4 發布。
 
 ## 測試
 
 - **例行 QA**（2026-10-06 起）：`python3 tests/run_tests.py --qa`，`tests/qa_tests.py` 的 `qa_` 測試，用 `tests/player.py` 真的點畫面、
   故事面板開著。每次改完遊戲跑；完整回歸也包含它們。已知未修的問題列在 `tests/qa_known_open.json`（失敗顯示 OPEN、不算失敗；修好時
   顯示 FIXED，要把那一條拿掉）。
-- 247 個測試（`tests/run_tests.py` 95、`tests/v23_tests.py` 30、`tests/v24_tests.py` 122；`python3 tests/run_tests.py` 全跑，`-k a,b,c`
-  跑指定的）。最近一次完整回歸：rc8.5 的 bded558 上 247/247（`docs/evidence/v24_rc8_5/regression/`）。
-- **`fix/audit-narrative-2026-10-06` 的完整回歸**：
-  - d0fd661 上 **292/292**（2026-10-06 23:05 UTC；其中 46 個是例行 QA 的 `qa_` 測試，`tests/qa_known_open.json` 是空的）。
-  - 2026-10-07 補修（第 3 天起「沒有備料的菜」的說法、舊存檔被截斷的故事頁、日誌修正的測試）之後：292e654 上 **295/296**。唯一失敗的
-    `every_player_save_migrates_plays_a_day_and_keeps_its_story` 抓到 Day 67 存檔的頁面要讀第二次才補齊，在 0e41527 修好；讀存檔、
-    看故事頁的 16 個測試在 0e41527 重跑全部通過。
-  - 都在固定在那個 commit 的另一個 worktree 跑，跑的時候程式沒有在改。紀錄：`docs/evidence/fix_audit_2026-10-06/regression/`。
-- **這一批的測試版**（給使用者在手機上試，不是發布）：https://claude.ai/artifact/BzGu1nFBVEqDt72Fad1sHP （「Jill's Kitchen 測試版」，
-  私人連結，Version 3，遊戲內容＝ 0e41527，2026-10-07）。
-  - 存檔跟正式版分開。要用自己的進度：正式版「設定・存檔」→「備份到檔案」，再到測試版「從備份檔恢復」。
-  - 跟正式版一樣可以「備份到檔案」（Version 2 起有下載的權限；Version 1 沒有）。
-  - 正式網址沒有動，還是 rc8.5。
+- 296 個測試（其中 50 個是例行 QA 的 `qa_` 測試；`python3 tests/run_tests.py` 全跑，`-k a,b,c` 跑指定的）。最近一次完整回歸：
+  rc8.6 的 023b17c 上 296/296（2026-10-07，在固定在那個 commit 的另一個 worktree 分三份跑；`docs/evidence/v24_rc8_6/regression/`）。
+  這一批中途的紀錄（292e654 的 295/296 與 0e41527 的補跑）在 `docs/evidence/fix_audit_2026-10-06/regression/`。
+- 這一批的私人測試版（https://claude.ai/artifact/BzGu1nFBVEqDt72Fad1sHP ，Version 3，0e41527）已經被正式版 rc8.6 取代，不用再開。
 - 已知會在單一 seed 上偶爾落差的機率性測試，都在測試註解裡寫了量過的分布（例：`lounge_i_content_bar_food…`、
   `v24_rc6_new_things_are_talked_about`）。
 
