@@ -5102,15 +5102,18 @@ var STORY_READY=false;
 function beatLinesMig(o){const st=o&&o.story;if(!st||!st.beatLines)return o;
  {/* v2.4 rc7 (14:55): Madame Lin's gift as it is written now, for a page that kept rc6's words */const L=st.beatLines.lin_gift;if(Array.isArray(L)&&L.some(x=>x&&x.t==='……妳每次到底都在看哪裡？'))st.beatLines.lin_gift=[{t:'Madame Lin 結完帳，從椅子旁邊拿起一盆植物，放到 Jill 面前。'},{w:'Jill',t:'今天怎麼帶東西？'},{w:'Madame Lin',t:'側廳門口旁邊那個角落，空很久了。'},{w:'Madame Lin',t:'放一盆綠的，客人坐下來，眼睛才有地方休息。'},{w:'Jill',t:'……我天天在這裡，都沒注意到。'},{w:'Madame Lin',t:'就是因為天天在。'}]}
  {/* rc7 (15:40), rc7.2 (22:14): the landlord's afternoon as it is written now — a page that kept rc6's words (「我可以一起上去嗎？」) or rc7's (「要上來看嗎？」) */const L=st.beatLines.up_inspect;if(Array.isArray(L)&&L.some(x=>x&&(x.t==='我可以一起上去嗎？'||x.t==='要上來看嗎？'))){const D=CAT_DEF.find(x=>x.id==='mei');const nm=(o.catNames&&o.catNames.mei)||(D&&D.n)||'貓';st.beatLines.up_inspect=upInspectLines(nm).map(l=>{const w=whoLabel(l.who||'');return w?{w,t:l.text}:{t:l.text}})}}
+ {/* audit N15 (2026-10-06): the tasting nights are 品酒之夜 (PROJECT_MEMORY §6) — pages written before the rename keep 「Ken 的品酒夜」「品酒夜」 */for(const k in st.beatLines){const arr=st.beatLines[k];if(Array.isArray(arr))for(const x of arr)if(x&&typeof x.t==='string'&&x.t.includes('品酒夜'))x.t=x.t.replace(/Ken 的品酒夜/g,'品酒之夜').replace(/品酒夜/g,'品酒之夜')}}
+ if(!st.blMig){st.blMig=1;
+  for(const k in st.beatLines){const arr=st.beatLines[k];if(!Array.isArray(arr)||!arr.length)continue;const src=beatSrcOf(k);if(!src)continue;const ok=arr.map(x=>beatLineOk(src,x&&x.t));if(ok.some(Boolean)&&!ok.every(Boolean))st.beatLines[k]=arr.filter((x,i)=>ok[i])}}
  {/* audit N08 / WS9-01 (2026-10-07): a page kept before 2026-10-06 can stop part-way through its scene — the old 12-line
      cap (《那面牆》's mediation: 12 of 21 lines, ending 「金額的部分呢？」) or the app closed while the scene was on screen
      (the photos of the wall: 6 lines, ending 「可以放大嗎？」). Where the beat's scene is written out line by line (every
-     line a fixed text) and the page is exactly its beginning, the page gets the rest of the scene. Nothing else changes. */
+     line a fixed text) and the page is exactly its beginning, the page gets the rest of the scene. Nothing else changes.
+     Last, after the one-time cleanup above (a page with lines from elsewhere is its beginning only once they are gone):
+     the first load gives what every later load gives. */
   for(const k in st.beatLines){const arr=st.beatLines[k];if(!Array.isArray(arr)||!arr.length)continue;let full=null;try{full=sceneLinesOf(k)}catch(e){full=null}
    if(full&&arr.length<full.length&&arr.every((x,i)=>x&&x.t===full[i].t))st.beatLines[k]=arr.concat(full.slice(arr.length))}}
- {/* audit N15 (2026-10-06): the tasting nights are 品酒之夜 (PROJECT_MEMORY §6) — pages written before the rename keep 「Ken 的品酒夜」「品酒夜」 */for(const k in st.beatLines){const arr=st.beatLines[k];if(Array.isArray(arr))for(const x of arr)if(x&&typeof x.t==='string'&&x.t.includes('品酒夜'))x.t=x.t.replace(/Ken 的品酒夜/g,'品酒之夜').replace(/品酒夜/g,'品酒之夜')}}
- if(st.blMig)return o;st.blMig=1;
- for(const k in st.beatLines){const arr=st.beatLines[k];if(!Array.isArray(arr)||!arr.length)continue;const src=beatSrcOf(k);if(!src)continue;const ok=arr.map(x=>beatLineOk(src,x&&x.t));if(ok.some(Boolean)&&!ok.every(Boolean))st.beatLines[k]=arr.filter((x,i)=>ok[i])}return o}
+ return o}
 function beatNote(k){const E=STORY_EV.find(x=>x.k===k);if(!E||!E.note)return'';try{return cjkSp(typeof E.note==='function'?E.note(evState(k))||'':E.note)}catch(e){return''}}   /* 「Dylan 的」 (audit N16) */
 for(const L of STORY_LINES)for(const b of L.beats){const s0=b[0];const ks=Array.isArray(s0)?s0.slice():typeof s0==='string'?[s0]:[];if(b[2]&&b[2].key)ks.push(b[2].key);for(const k of ks)BEAT_LINE[k]=L}
 /* ---- hospitality: something on the house. Three separate things that used to share one counter (v2.2.1 I-13 / Day 35 #1):
