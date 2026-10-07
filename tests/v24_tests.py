@@ -5042,6 +5042,7 @@ def v24_story_first_the_doors_of_the_stories_open_with_story_keys(b, port, targe
       out.lounge=poolCrew('lounge').map(m=>m.name).sort();
       const q1=STORY_EV.find(e=>e.k==='qt_1');out.qt1=!!q1.when({tk:{lounge:true,items:[{d:'friedrice'}]}});return out})())""")))
     g.ev("doAct('tab',null,'works')"); g.page.wait_for_timeout(120); r['pianoCards'] = g.ev(PIANO)
+    r['pianoFar'] = g.ev("((document.querySelector('#screen')||{}).innerText||'').includes('Lounge 的鋼琴 遠程')")
     g.ev("S.level=5;doAct('tab',null,'works')"); g.page.wait_for_timeout(120); r['pianoCards5'] = g.ev(PIANO)
     r.update(json.loads(g.ev("""JSON.stringify((()=>{const out={};S.level=1;
       const m0=S.money;doAct('buyProject',null,'piano');out.paid=m0-S.money;out.pianoOn=!!projOn('piano');try{hideReveal()}catch(e){}
@@ -5053,6 +5054,7 @@ def v24_story_first_the_doors_of_the_stories_open_with_story_keys(b, port, targe
     check(r['roster1'] == ['Evan', '沈晴', '阿拓'] and r['cap1'] == 3 and r['lounge'] == sorted(['Evan', '沈晴', '阿拓']), f'Lounge I: Evan, 沈晴 and 阿拓: {r}')
     check(r['qt1'] is True, f'晴 × 阿拓 can begin at Lounge I, level 1, 3.0 — the two of them at work: {r}')
     check(r['pianoCards'] == 1 and r['pianoCards5'] == 1 and r['paid'] == 100000 and r['pianoOn'], f'the piano on the Lounge page at level 1, once at level 5 too; bought for $100,000: {r}')
+    check(r['pianoFar'] is False, f'no 「遠程」 on the piano (the user, 2026-10-07: an ordinary Lounge improvement, not a late dream): {r}')
     check(r['ya_d2'] is False and r['ya_d3'] is True, f"予安: three days after the piano, as before — nothing else asked: {r}")
     check(r['upCan'] is True and all(r['noLevel']), f'the floor upstairs and the Staff Room\'s story: no level (a level-1 restaurant with the side room and a crew): {r}')
     check(not g.errors, g.errors[:3]); g.close()
