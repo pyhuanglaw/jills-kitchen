@@ -24,7 +24,7 @@
 - 2026-10-04 的整理：`main` 從 d0947ea 強制改指到 b865d3c（舊的保存在 `archive/rc7.6-import-main`）。要復原：
   `git push --force-with-lease=refs/heads/main:<目前的 main> origin d0947ead2c18167ab3955fef51478a9168f5b8fd:refs/heads/main`。
 - 本機的 `bundle` remote 是原開發 session 的備份 bundle，只是還原來源，不推送。
-- 版本 tag（`v2.4-rc8` 到 `v2.4-rc8.5` 等）只在本機：推 tag 到 GitHub 時連線會被中斷。各版的 commit 寫在它的發布報告裡。
+- 版本 tag（`v2.4-rc8` 到 `v2.4-rc8.6` 等）只在本機：推 tag 到 GitHub 時連線會被中斷（2026-10-07 rc8.6 再試一次，一樣）。各版的 commit 寫在它的發布報告裡。
 - 舊版本（玩家 2026-10-03 給的 v2.2.1、v2.4 rc4，以及其他每一版）怎麼查：`docs/OLD_VERSIONS.md`。
 
 ## 已發布
