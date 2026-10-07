@@ -44,6 +44,7 @@ LINES = [('Lounge 第一晚（Ken 和杜）', 'lounge_first_night'), ('Ken 第�
 
 
 def run(A):
+    PROBES = json.load(open(A.probe, encoding='utf-8')) if A.probe else None
     t0 = time.time()
     rows, out = [], {'args': vars(A), 'policy': sp.POLICIES[A.policy].label, 'service': sp.SERVICE_LABELS[A.service]}
     with sync_playwright() as pw:
@@ -93,6 +94,8 @@ def run(A):
                 print(f'Day {day}: expected the summary, the screen is {k!r}', flush=True); break
             sm = player.summary()
             rec = obs.day(); rec['hud'] = screen.hud(); rec['seen'] = {k2: sm.get(k2) for k2 in ('r0', 'r1', 'arrow', 'minus', 'plus', 'guests', 'lost', 'sat')}
+            if PROBES:   # the observer (B), not the player: what the game holds this evening, read at the summary
+                rec['probe'] = json.loads(g.ev("JSON.stringify((P=>{const o={};for(const k in P){try{o[k]=eval(P[k])}catch(e){o[k]='ERR '+e.message}}return o})(%s))" % json.dumps(PROBES, ensure_ascii=False)))
             rows.append(rec)
             hands.wait(40 * 30); player.settle()     # reads the summary for a while; the evening goes on behind the card
             player.to_shop()
@@ -118,6 +121,7 @@ def run(A):
                 break
             player.next_day()
         out['rows'] = rows; out['log'] = log.rows; out['notes'] = obs.notes(); out['errors'] = g.errors[:30]
+        out['final'] = json.loads(g.ev("JSON.stringify({day:S.day,facts:Object.fromEntries(Object.entries(story().facts||{}).map(([k,v])=>[k,v&&v.d])),newRooms:S.newRooms||{},crew:(S.crew||[]).map(m=>[m.name,m.role,m.since])})"))
         report(out)
         if A.json:
             json.dump(out, open(A.json, 'w'), ensure_ascii=False, indent=1)
@@ -168,5 +172,6 @@ if __name__ == '__main__':
     ap.add_argument('--json', default=None); ap.add_argument('--log', default=None); ap.add_argument('--what-if', dest='what_if', default='')
     ap.add_argument('--save', default=None, help='start from a save (a file in tests/saves, or a path) instead of a new game; --days counts from its next day')
     ap.add_argument('--dump-save-at', dest='dump_at', type=int, default=None); ap.add_argument('--dump-save', dest='dump_save', default=None)
+    ap.add_argument('--probe', default=None, help='a JSON file {name: JS expression}, read in the game each evening at the summary (the observer) and kept in the day record')
     ap.add_argument('--dump-when', dest='dump_when', default=None, help="JS read in the game each evening; true: write the save (e.g. the evening before the Lounge opens)")
     run(ap.parse_args())
