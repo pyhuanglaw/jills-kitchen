@@ -1,0 +1,1462 @@
+使用者 2026-10-07 23:39 UTC 的原話：料理 Workflow 是產品 canon（31 道菜、招牌主菜、招牌甜點、Special、六種 family），以及「玩家永遠不需要背下一步」的永久提示規則。逐字保存（docs/RELEASE_CHECKLIST.md §1）。補充同一天 23:36 的規格（docs/v24/cooking_gameplay_spec_2026-10-07.txt）；兩份衝突時以這份為準。
+
+【重要修正：料理 Workflow 不由你規劃】
+
+前面要求你產出 Recipe Workflow Matrix 的部分修改如下。
+
+你仍然要 audit main 中所有正式料理，確認：
+
+* dish id
+* dish name
+* category
+* unlock
+* 現有 station
+* 現有 step data
+* signature / special / Lounge 關係
+
+但是：
+
+你不負責決定新料理流程。
+
+以下 Workflow Table 是產品 canon。
+
+除非 repo 中發現：
+
+1. 菜色名稱／存在狀態與本表不一致；
+2. 某道菜已被正式刪除或取代；
+3. 有我沒有列到的正式可點料理；
+
+否則不要自行修改 Step 1 / Step 2 / Step 3。
+
+如果發現上述差異：
+
+先回報，不要自己補設計。
+
+⸻
+
+正式 Cooking Workflow Canon
+
+全系統只有五種玩家可理解的工作區：
+
+* PREP = 備料／冷盤
+* HOT = 煎、炒、煮、燉、炸
+* OVEN = 烤製
+* DRINK = 飲料製作
+* PLATING = 裝盤／最後完成，原則上整合現有 Pass 廚房側
+
+其中：
+
+等待不是 Step。
+
+翻面不是 Step。
+
+起鍋不是 Step。
+
+瀝乾不是 Step。
+
+加高湯不是 Step。
+
+撒鹽、蔥花、羅勒、糖粉、醬汁、garnish 不應單獨成 Step。
+
+它們都是該工作區內部的 character animation / food animation / finishing animation。
+
+⸻
+
+A. 正式餐廳 22 道 Base Dishes
+
+1. 黃金蛋炒飯
+
+HOT → PLATING
+
+HOT 內部表演：
+Jill／廚師下鍋、炒飯、蛋、調味、翻炒。
+
+PLATING：
+盛盤、蔥花等 finishing。
+
+玩家只有 2 steps。
+
+這是第一個 prototype dish。
+
+⸻
+
+2. 拿鐵咖啡
+
+DRINK → SERVE
+
+DRINK 內部：
+磨豆／萃取／奶泡／倒入。
+
+不要保留長按量表。
+
+第二步是自然出杯／放到 pickup，不使用一般料理的 plating 工作檯。
+
+玩家只有 2 steps。
+
+⸻
+
+3. 番茄義大利麵
+
+HOT → PLATING
+
+不要做：
+
+煮麵 → 水槽瀝乾 → 炒醬 → 裝盤
+
+全部烹調細節收進 HOT。
+
+HOT 內部可以讓角色在動畫上：
+
+煮麵 → 自己瀝乾 → 番茄醬拌製。
+
+但玩家只認知一個 HOT 工作階段。
+
+⸻
+
+4. 田園沙拉
+
+PREP → PLATING
+
+PREP：
+切菜、混合蔬菜。
+
+PLATING：
+擺盤、dressing、最後 garnish。
+
+2 steps。
+
+⸻
+
+5. 經典牛肉漢堡
+
+PREP → HOT → PLATING
+
+PREP：
+肉排／麵包／配料準備。
+
+HOT：
+煎肉排，翻面屬於內部動畫。
+
+PLATING：
+組裝漢堡、起司、蔬菜、完成。
+
+3 steps。
+
+⸻
+
+6. 錫蘭檸檬紅茶
+
+DRINK → SERVE
+
+DRINK：
+泡茶、檸檬、冰塊等全部包含。
+
+不要做泡茶 timing minigame。
+
+2 steps。
+
+⸻
+
+7. 檸檬氣泡水
+
+DRINK → SERVE
+
+DRINK：
+冰塊、檸檬、氣泡水。
+
+2 steps。
+
+這應該是全遊戲最簡單的一類飲料之一。
+
+⸻
+
+8. 南瓜濃湯
+
+HOT → PLATING
+
+HOT：
+南瓜、湯底、燉煮、攪拌、奶油全部是一個工作階段。
+
+不要讓玩家中途回來「加一次料」。
+
+PLATING：
+盛湯、南瓜籽／奶油等 finishing。
+
+2 steps。
+
+⸻
+
+9. 焦糖布丁
+
+PREP → PLATING
+
+不要為布丁另外增加甜點設備。
+
+PREP：
+布丁本體、冷製／既有製作過程全部抽象在這一步。
+
+PLATING：
+脫模／焦糖／裝飾。
+
+2 steps。
+
+⸻
+
+10. 松露薯條
+
+OVEN → PLATING
+
+為了保持 workflow 簡單，第一階段不需要 PREP。
+
+OVEN：
+薯條進烤箱／既有熱製程。
+
+PLATING：
+鹽、松露調味、盛裝。
+
+2 steps。
+
+如果 repo 現在把它表現成其他加熱方式，不要因此增加新 station；仍遵循 OVEN → PLATING。
+
+⸻
+
+11. 莓果蘇打
+
+DRINK → SERVE
+
+DRINK：
+莓果、冰塊、糖漿、氣泡水。
+
+2 steps。
+
+⸻
+
+12. 香料烤蔬菜
+
+PREP → OVEN → PLATING
+
+PREP：
+切蔬菜、油、香料。
+
+OVEN：
+烤製。
+
+PLATING：
+盛盤與 finishing。
+
+3 steps。
+
+⸻
+
+13. 提拉米蘇
+
+PREP → PLATING
+
+PREP：
+手指餅乾、咖啡、mascarpone、冷製等全部收進這一步。
+
+PLATING：
+可可粉／最後整理。
+
+2 steps。
+
+⸻
+
+14. 香草烤雞
+
+PREP → OVEN → PLATING
+
+PREP：
+雞肉、香草、調味。
+
+OVEN：
+烤製。
+
+PLATING：
+切／整理／檸檬與 garnish。
+
+3 steps。
+
+⸻
+
+15. 炙烤肋眼牛排
+
+PREP → HOT → PLATING
+
+PREP：
+牛排準備、調味。
+
+HOT：
+煎製、翻面、奶油澆淋、熟度控制全部由角色自己完成。
+
+PLATING：
+靜置、切片／整塊擺盤、醬汁、配菜。
+
+3 steps。
+
+不要做 reaction timing。
+
+牛排的高級感來自 animation、時間、食物畫面與 plating，不是操作次數。
+
+⸻
+
+16. 巴斯克乳酪蛋糕
+
+PREP → OVEN → PLATING
+
+PREP：
+麵糊／模具準備。
+
+OVEN：
+烘烤。
+
+PLATING：
+切片、莓果／最後裝飾。
+
+3 steps。
+
+⸻
+
+17. 生火腿沙拉
+
+PREP → PLATING
+
+PREP：
+生火腿、蔬菜、無花果等組合。
+
+PLATING：
+balsamic、parmesan、最後整理。
+
+2 steps。
+
+不要因為是後期料理硬湊第三步。
+
+⸻
+
+18. 香烤鮭魚
+
+PREP → OVEN → PLATING
+
+PREP：
+鮭魚、配菜、調味。
+
+OVEN：
+烤製。
+
+PLATING：
+檸檬、醬汁、最後整理。
+
+3 steps。
+
+⸻
+
+19. 海鮮義大利麵
+
+PREP → HOT → PLATING
+
+PREP：
+海鮮與其他材料準備。
+
+HOT：
+煮麵＋海鮮烹調＋混合全部是一個 HOT 階段。
+
+角色 animation 可以呈現不同鍋具或 burner 行為，但：
+
+不要要求玩家操作兩個爐口才能完成一盤海鮮義大利麵。
+
+PLATING：
+香草／最後整理。
+
+3 steps。
+
+它可以視覺上比番茄義大利麵豐富，但不能因此變成複雜 puzzle。
+
+⸻
+
+20. 香煎鴨胸
+
+PREP → HOT → PLATING
+
+PREP：
+鴨皮劃刀、調味。
+
+HOT：
+皮面煎製、翻面、完成。
+
+PLATING：
+靜置、切片、橙醬／配菜。
+
+3 steps。
+
+⸻
+
+21. 松露燉飯
+
+HOT → PLATING
+
+這裡刻意只有 2 steps。
+
+HOT：
+米、酒、高湯、燉煮、攪拌、收汁全部是一個長一點的 HOT 工作階段。
+
+不要讓玩家中途回來加高湯。
+
+PLATING：
+parmesan、松露、最後整理。
+
+2 steps。
+
+它的特色是：
+
+HOT station occupation time 比炒飯長。
+
+不是操作比較多。
+
+⸻
+
+22. 舒芙蕾
+
+PREP → OVEN → PLATING
+
+PREP：
+打發、混合、入模。
+
+OVEN：
+烘烤。
+
+PLATING：
+糖粉／最後裝飾。
+
+3 steps。
+
+不要做 timing QTE。
+
+⸻
+
+B. Lounge Food
+
+Lounge food 也使用相同 Cooking Grammar。
+
+不要為 Lounge bar food 發明第二套料理玩法。
+
+⸻
+
+23. 炸雞塊
+
+HOT → PLATING
+
+HOT：
+炸製全部自動包含。
+
+PLATING：
+調味／醬料／盛裝。
+
+2 steps。
+
+⸻
+
+24. 起司可樂餅
+
+PREP → HOT → PLATING
+
+PREP：
+內餡、起司、塑形／裹粉。
+
+HOT：
+炸製。
+
+PLATING：
+盛裝／醬料。
+
+3 steps。
+
+⸻
+
+25. 起司拼盤
+
+PREP → PLATING
+
+PREP：
+起司、生火腿、無花果等準備。
+
+PLATING：
+排列、蜂蜜／最後整理。
+
+2 steps。
+
+⸻
+
+26. 蒜香蘑菇
+
+HOT → PLATING
+
+HOT：
+蘑菇、蒜、油、煎炒。
+
+PLATING：
+調味／盛盤。
+
+2 steps。
+
+⸻
+
+27. 水牛城雞翅
+
+HOT → PLATING
+
+不要做：
+
+PREP → HOT → PREP → PLATING。
+
+HOT：
+炸／烹調。
+
+PLATING：
+拌 Buffalo sauce、芹菜、blue cheese 等 finishing 全部包含在 PLATING。
+
+2 steps。
+
+⸻
+
+28. 起司條
+
+HOT → PLATING
+
+HOT：
+炸製。
+
+PLATING：
+盛裝＋番茄 dip。
+
+2 steps。
+
+⸻
+
+29. 生蠔
+
+PREP → PLATING
+
+PREP：
+開蠔、碎冰等 preparation。
+
+PLATING：
+排列、檸檬／最後整理。
+
+2 steps。
+
+⸻
+
+30. 德國豬腳
+
+PREP → OVEN → PLATING
+
+PREP：
+豬腳調味／準備。
+
+OVEN：
+長時間烤製。
+
+PLATING：
+酸菜、芥末、切／整體呈現。
+
+3 steps。
+
+⸻
+
+31. 酒吧披薩
+
+PREP → PIZZA OVEN → PLATING
+
+這是唯一保留 dedicated pizza oven identity 的料理。
+
+但在系統 architecture 上：
+
+PIZZA OVEN 屬於 OVEN family。
+
+PREP：
+麵糰、醬、起司、配料。
+
+PIZZA OVEN：
+烘烤。
+
+PLATING：
+切片、oregano／完成。
+
+3 steps。
+
+不要因為有 dedicated pizza oven 就新增另一套操作規則。
+
+⸻
+
+C. Jill’s Signature Main
+
+玩家可以改食材與名稱，但 workflow 固定。
+
+PREP → HOT → PLATING
+
+PREP：
+玩家選擇的主蛋白／配料 preparation。
+
+HOT：
+主要烹調。
+
+PLATING：
+玩家選擇的 base / side / sauce 與 finishing。
+
+不論玩家怎麼設計招牌菜：
+
+永遠最多 3 steps。
+
+不要讓不同 signature ingredient combination 產生不同操作數量。
+
+Signature 的特殊性來自：
+
+* Jill 的參與
+* 食材選擇
+* 命名
+* presentation
+* 客人反應
+* progression
+
+不是 minigame complexity。
+
+⸻
+
+D. Jill’s Signature Dessert
+
+目前 repo 中 Signature Dessert 是冷盤台四個組成操作：
+
+* base
+* cream
+* fruit
+* finish
+
+這次正式改成：
+
+PREP → PLATING
+
+PREP 內部完成：
+
+* base
+* cream
+* fruit 的主要組合
+
+PLATING 完成：
+
+* finish
+* decoration
+* final presentation
+
+玩家仍然可以在設計器選：
+
+* base
+* cream
+* fruit
+* finish
+
+設計選項保留，不代表營業時要按四次。
+
+這兩件事情要分開。
+
+Signature Dessert 仍然只有 2 gameplay steps。
+
+⸻
+
+E. Mastered Dish Specials
+
+所有 Special / mastered variant：
+
+完全繼承 base dish workflow。
+
+例如：
+
+牛排 Special
+
+仍然：
+
+PREP → HOT → PLATING
+
+炒飯 Special
+
+仍然：
+
+HOT → PLATING
+
+Special 不允許：
+
+* 多一個 station
+* 多一個 step
+* 新 minigame
+
+差異放在：
+
+* ingredient
+* plating
+* garnish
+* visual
+* price/value
+* customer reaction
+
+⸻
+
+F. Workflow Family 最終只有這幾種
+
+實作時不要又長出更多 recipe grammar。
+
+正式 family 基本上只有：
+
+2-Step Hot
+
+HOT → PLATING
+
+例：
+炒飯、番茄義大利麵、南瓜濃湯、松露燉飯、炸雞、蒜香蘑菇、水牛城雞翅、起司條。
+
+2-Step Cold
+
+PREP → PLATING
+
+例：
+沙拉、布丁、提拉米蘇、生火腿沙拉、起司拼盤、生蠔、Signature Dessert。
+
+2-Step Drink
+
+DRINK → SERVE
+
+例：
+拿鐵、紅茶、氣泡水、莓果蘇打。
+
+2-Step Oven
+
+OVEN → PLATING
+
+例：
+松露薯條。
+
+3-Step Hot
+
+PREP → HOT → PLATING
+
+例：
+漢堡、牛排、海鮮義大利麵、鴨胸、可樂餅、Signature Main。
+
+3-Step Oven
+
+PREP → OVEN → PLATING
+
+例：
+烤蔬菜、烤雞、巴斯克、鮭魚、舒芙蕾、德國豬腳、披薩。
+
+不要再增加 recipe family，除非先取得我的同意。
+
+⸻
+
+G. 這些 workflow 是 Canon，不是 Proposal
+
+因此你第一階段的 Recipe Workflow Matrix 不再是：
+
+「請你規劃每道菜。」
+
+而是：
+
+請你把 repo 中的正式 dish id 對應到上述指定 workflow，檢查是否有遺漏／衝突。
+
+你的回報格式：
+
+repo dish id | dish name | current workflow | required new workflow | implementation impact
+
+如果完全一致：
+
+直接標記。
+
+如果不一致：
+
+說明 technical impact。
+
+如果發現 repo 有本表沒有的正式料理：
+
+列出來等我決定。
+
+不要自己替它設計 workflow。
+
+⸻
+
+H. 一個非常重要的設計理由
+
+不要嘗試讓：
+
+「越後期的料理 = steps 越多。」
+
+這不是本遊戲的 progression。
+
+後期 complexity 來自：
+
+* 同時更多 tickets
+* station occupation
+* 不同 station 並行
+* batching
+* employee proficiency
+* orchestration
+
+不是單一道菜越來越麻煩。
+
+因此：
+
+松露燉飯是後期料理，也可以只有：
+
+HOT → PLATING。
+
+番茄義大利麵也可以只有：
+
+HOT → PLATING。
+
+這不是內容不足。
+
+這是刻意設計。
+
+⸻
+
+I. 玩家真正需要學會的不是 31 道食譜
+
+理想狀況是：
+
+玩家玩過幾天之後，只知道：
+
+「這個要先備料。」
+「這個直接上爐。」
+「這個要進烤箱。」
+「飲料去飲料區。」
+「最後拿去裝盤。」
+
+而不是：
+
+「海鮮義大利麵第三步是什麼？」
+
+如果玩家需要記住每道料理的操作：
+
+系統設計失敗。
+
+Ticket 必須直接顯示 workflow。
+
+例如：
+
+炙烤肋眼牛排
+PREP → HOT → PLATING
+
+現在 HOT：
+
+✓ PREP → ● HOT → ○ PLATING
+
+不要求記憶。
+
+⸻
+
+J. Prototype 仍然只先做黃金蛋炒飯
+
+即使現在所有料理 workflow 都已經指定：
+
+仍然不要一次改全部。
+
+第一版只實作：
+
+黃金蛋炒飯
+HOT → PLATING
+
+目的不是驗證食譜。
+
+目的是驗證：
+
+1. 原廚房美術完全保住。
+2. 玩家能從 ticket 選炒飯。
+3. 合法 burner subtle cue。
+4. Jill 自己走到 HOT。
+5. 鍋中真的有炒飯。
+6. HOT 是一整段工作，不要求中途點擊。
+7. 完成後料理安全等待。
+8. PLATING / Pass 成為下一個自然目的地。
+9. 玩家可以做第二步。
+10. 員工可以接第二步。
+11. 員工可以自己做整道。
+12. 玩家可以從員工手上接下一步。
+13. 炒飯 ×3 batching 正常。
+14. 原 serving / stock / XP / revenue 正常。
+15. 不發布。
+
+這個 prototype 通過後，才把上面已經指定好的 workflow 批次套用到其餘料理。
+
+⸻
+
+K. 不要再問我要每一道菜怎麼切
+
+這份表就是答案。
+
+你的工作是：
+
+把這個產品設計安全、漂亮、相容地實現在現有 Jill’s Kitchen。
+
+如果 technical architecture 讓某一道指定 workflow 難以實現：
+
+回報 technical conflict。
+
+不要自行把它改成第四步，也不要自行發明新 station。
+
+先完成 current audit + workflow mapping + 黃金蛋炒飯最小 prototype plan，再開始 prototype。
+新增 HARD RULE：玩家永遠不需要背下一步
+
+Cooking System 不可以建立在玩家記住食譜流程的前提上。
+
+即使玩家已經玩到 Day 100、做過這道菜 50 次，系統仍然必須在每一個 workflow step 完成後，清楚告訴玩家：
+
+「這道菜下一步去哪裡。」
+
+這不是只在新手期出現的 Tutorial。
+
+這是 Cooking Gameplay 永久存在的核心 UI。
+
+⸻
+
+1. 每一道正在料理的菜，永遠顯示完整 Workflow
+
+例如牛排：
+
+備料 → 熱區 → 裝盤
+
+如果目前正在備料：
+
+● 備料 → ○ 熱區 → ○ 裝盤
+
+備料完成：
+
+✓ 備料 → ● 熱區 → ○ 裝盤
+
+熱區完成：
+
+✓ 備料 → ✓ 熱區 → ● 裝盤
+
+不要只顯示：
+
+「牛排 67%」
+
+因為百分比不能告訴玩家：
+
+現在要去哪裡。
+
+⸻
+
+2. Step 完成時，立即告訴玩家下一步
+
+例如：
+
+玩家正在做：
+
+炙烤肋眼牛排
+
+PREP 完成的瞬間：
+
+料理本身／ticket 應該自然更新成：
+
+下一步：熱區
+
+同時：
+
+從目前料理位置到合法 HOT station，出現清楚但漂亮的 directional cue。
+
+玩家不需要打開說明。
+
+不需要點 recipe book。
+
+不需要回想食譜。
+
+遊戲直接回答：
+
+下一步在那裡。
+
+⸻
+
+3. 要有空間上的箭頭／方向提示
+
+這是必要功能。
+
+但是不要做成廉價手機遊戲的：
+
+* 巨大黃色箭頭
+* 不停跳動
+* 閃爍紅框
+* 全畫面教學遮罩
+* 「請點擊這裡！！！」
+
+應該融入原本 Jill’s Kitchen 的視覺。
+
+例如：
+
+料理完成 PREP 後：
+
+料理 → HOT
+
+可以從料理所在位置出現一條短暫、柔和的 directional trail / arrow。
+
+箭頭指向：
+
+實際可以使用的 HOT station。
+
+同時合法 HOT station 有：
+
+* subtle warm outline
+* 很輕的呼吸亮度
+* hover / touch feedback
+
+所以玩家即使完全沒看文字，也知道：
+
+喔，這盤現在要拿去那邊。
+
+⸻
+
+4. 指的是「可用的實際位置」，不是抽象 station icon
+
+例如牛排下一步是 HOT。
+
+不要只在 UI 上顯示：
+
+🔥 HOT
+
+而是要讓玩家知道：
+
+廚房裡哪一個地方就是 HOT。
+
+如果現在有三個 burner：
+
+箭頭／highlight 可以指向：
+
+* 可使用的 burner
+* 或 HOT zone 整體，再讓玩家選 burner
+
+如果其中兩個已經占用：
+
+優先 cue：
+
+目前真的可以使用的那一個。
+
+這會讓教學與 station capacity 本身整合。
+
+⸻
+
+5. 如果下一個 Station 暫時滿了，也要說清楚
+
+例如：
+
+牛排完成 PREP。
+
+下一步 HOT。
+
+但是所有 burner 都滿了。
+
+不要讓箭頭消失，讓玩家以為自己做錯。
+
+應顯示：
+
+下一步：熱區 · 目前忙碌
+
+料理進入安全等待。
+
+HOT station 仍可以有較弱的 cue，讓玩家知道：
+
+我要去那裡，只是現在沒位置。
+
+一有 burner 空出來：
+
+cue 自然變成：
+
+可進行
+
+不要用紅色 FAIL / ERROR。
+
+這只是廚房忙，不是玩家犯錯。
+
+⸻
+
+6. 料理完成一個 Step 後，提示應該立即接續
+
+不要：
+
+Step 完成
+→ 所有 UI 消失
+→ 玩家自己找下一步
+→ 點 ticket
+→ 才知道去哪
+
+正確節奏：
+
+Step 完成
+→ food visual 進 ready-for-next-step state
+→ workflow 自動更新
+→ 顯示「下一步：___」
+→ directional cue 指向下一 station
+→ 玩家可以立刻操作
+
+整個過程不能有認知斷裂。
+
+⸻
+
+7. 但提示不能逼玩家立刻做
+
+這點同樣重要。
+
+箭頭的意思是：
+
+「下一步在這裡。」
+
+不是：
+
+「現在立刻給我按這裡。」
+
+玩家可以：
+
+* 先處理另一鍋
+* 去看另一張 ticket
+* 讓員工接手
+* 去主廳
+* 看一下貓
+* 過一會再回來
+
+料理安全等待。
+
+提示仍然存在，但不要：
+
+* 越閃越快
+* 變紅
+* 倒數
+* 播警告音
+* 製造焦慮
+
+⸻
+
+8. 員工接手時，同一套提示仍成立
+
+例如：
+
+牛排：
+
+✓ PREP → ● HOT → ○ PLATING
+
+玩家看到下一步 HOT。
+
+如果這時阿德自己接手：
+
+workflow 變成：
+
+✓ PREP → ● HOT（阿德） → ○ PLATING
+
+HOT station 的 directional cue 可以自然淡出，因為這件工作已經有人處理。
+
+等阿德完成：
+
+立刻變成：
+
+✓ PREP → ✓ HOT → ● PLATING
+
+並指向 Pass / PLATING。
+
+如果玩家不碰：
+
+合適員工仍可繼續接 PLATING。
+
+所以 guidance system 與 staff system 必須共用同一個 workflow state。
+
+不要寫兩套 UI。
+
+⸻
+
+9. Batch 也使用完全相同的提示
+
+例如：
+
+黃金蛋炒飯 ×3
+
+顯示：
+
+● HOT → ○ PLATING
+
+HOT 完成：
+
+黃金蛋炒飯 ×3
+✓ HOT → ● PLATING
+
+並指向 PLATING / Pass。
+
+不要因為 ×3 就出現三支箭頭、三張提示、三個相同 workflow。
+
+Batch 是一個 work node。
+
+⸻
+
+10. Ticket 本身就是永久的小型 Recipe Guide
+
+每張 active cooking ticket 至少要讓玩家看到：
+
+料理名稱
+
+份數
+
+完整 workflow
+
+目前所在 step
+
+下一步
+
+目前由誰處理（如果有人）
+
+例如：
+
+炙烤肋眼牛排 ×2
+
+✓ 備料 → ● 熱區 → ○ 裝盤
+
+阿德正在處理
+
+或：
+
+炙烤肋眼牛排 ×2
+
+✓ 備料 → ● 熱區 → ○ 裝盤
+
+下一步：熱區
+目前忙碌
+
+不要塞：
+
+* 秒數
+* 大量 stats
+* recipe text
+* ingredient checklist
+* quality meter
+
+玩家最需要知道的只有：
+
+它現在在哪、下一步去哪、有人在做嗎。
+
+⸻
+
+11. 選中 Ticket 時，Guidance 加強
+
+平常不要讓整個廚房到處都是箭頭。
+
+否則同時五道菜會變成交通號誌。
+
+分兩層：
+
+Passive Guidance
+
+沒有選中料理時：
+
+ticket 上永遠看得到 workflow 與 next step。
+
+料理本身可以有非常輕的 ready indicator。
+
+⸻
+
+Focused Guidance
+
+玩家點選某一道 ticket / batch：
+
+立刻：
+
+1. 該料理視覺被輕微 highlight
+2. workflow 更清楚
+3. 顯示「下一步：HOT」
+4. 廚房中的合法 HOT station highlight
+5. directional arrow / trail 指向該區
+6. 不合法 station 不需要反應
+
+因此：
+
+箭頭主要服務「目前選中的料理」。
+
+不要五道菜同時五支箭頭亂飛。
+
+⸻
+
+12. 第一次使用某 Station 可以多一點文字，但之後仍保留基本提示
+
+例如玩家第一次完成炒飯 HOT：
+
+可以出現一次比較完整的小提示：
+
+炒好了。接下來送到出餐口裝盤。
+
+＋ directional arrow → Pass。
+
+但之後即使不再出完整句子：
+
+仍然永遠有：
+
+✓ 熱區 → ● 裝盤
+
+下一步：裝盤
+
+＋選中時的 directional cue。
+
+也就是：
+
+Tutorial 文案可以逐漸退場。
+
+Gameplay guidance 永遠不能退場。
+
+⸻
+
+13. 不要用「玩家已經學會了」作為移除提示的理由
+
+這是 HARD RULE。
+
+不要做：
+
+Day 1–3 有箭頭
+Day 4 後沒有。
+
+不要做：
+
+一道菜做過 5 次後取消 workflow。
+
+不要做：
+
+Mastery LV3 後隱藏提示。
+
+不要做：
+
+「進階玩家應該記得」。
+
+Jill’s Kitchen 的料理樂趣不是考記憶。
+
+就算玩家半年沒開遊戲，回來第一盤牛排仍然應該一眼知道：
+
+PREP → HOT → PLATING
+
+而且做完 PREP 後，遊戲直接指出 HOT 在哪裡。
+
+⸻
+
+14. Guidance 也是降低難度的核心機制
+
+這一點請不要把它當 polish。
+
+它直接決定 Cooking System 難不難。
+
+我們允許同時存在 3–6 個 meaningful work nodes，是因為玩家不用把這些資訊記在腦中。
+
+遊戲替玩家保存 external memory：
+
+炒飯 → 等裝盤
+
+牛排 → 正在熱區
+
+鮭魚 → 下一步烤箱
+
+沙拉 → 正在備料
+
+玩家真正需要思考的是：
+
+「我現在先處理哪一個？」
+
+而不是：
+
+「靠，我忘記鮭魚下一步要去哪。」
+
+前者是我們要的 orchestration。
+
+後者是無聊的 cognitive load。
+
+⸻
+
+15. Prototype Acceptance 加入 Guidance Test
+
+黃金蛋炒飯 prototype：
+
+HOT → PLATING
+
+必須驗證完整 guidance：
+
+開始時：
+
+黃金蛋炒飯 ×1
+● 熱區 → ○ 裝盤
+
+選中後：
+→ 合法 burner cue
+
+HOT 完成：
+
+黃金蛋炒飯 ×1
+✓ 熱區 → ● 裝盤
+
+立即：
+→ 顯示「下一步：裝盤」
+→ directional cue 指向 Pass / plating area
+
+玩家不操作：
+→ 不失敗
+→ cue 保留
+→ 員工可以接手
+
+員工接手：
+→ UI 顯示員工正在處理
+→ cue 自然降低
+
+完成：
+✓ 熱區 → ✓ 裝盤
+
+然後正常進 serving flow。
+
+⸻
+
+16. Concurrent Test 特別檢查「不用記」
+
+之後測 4–6 個 concurrent work nodes 時：
+
+請故意讓它們處於不同階段，例如：
+
+炒飯 ×3
+✓ HOT → ● PLATING
+
+牛排 ×2
+✓ PREP → ● HOT → ○ PLATING
+
+鮭魚 ×1
+✓ PREP → ● OVEN → ○ PLATING
+
+沙拉 ×2
+● PREP → ○ PLATING
+
+測試者不看任何 recipe book。
+
+只看目前遊戲畫面。
+
+Acceptance：
+
+任何一道料理被點選後，2 秒內應該可以知道它下一步去哪。
+
+如果需要：
+
+* 回想
+* 猜
+* 打開說明
+* 點很多層 UI
+* 記住 recipe
+
+則 Guidance UX 不合格。
+
+⸻
+
+Cooking System 的 UI 原則最後濃縮成一句：
+
+遊戲負責記住流程，玩家只負責做決定。
+
+玩家永遠知道：
+
+這道菜現在在哪裡。
+
+下一步要去哪裡。
+
+那個地方在廚房哪裡。
+
+但是：
+
+什麼時候送過去、要不要自己做、要不要交給員工、哪一道先處理——才是玩家玩的部分。
