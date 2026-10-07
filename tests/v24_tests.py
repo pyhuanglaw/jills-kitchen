@@ -5198,9 +5198,11 @@ def v24_lounge_one_after_the_viewing_and_50000_no_wait_for_her_last_night(b, por
     g.close()
     g = Game(b, port, target, seed=8763, manual=True, viewport={'width': 390, 'height': 844})
     g.click('[data-act=open]'); g.page.wait_for_timeout(100)
-    guide = g.ev("GUIDE.find(x=>/Lounge/.test(x.h)).pts.find(p=>p[0]==='怎麼來的')[1]")
-    check(g.ev("S.linDecMig") == 1 and 'Jill 看過隔壁，就決定接下來' in guide and '評分' not in guide and '$50,000' in guide and '不用等 Madame Lin 的最後一晚' in guide
-          and not any(w in guide for w in ('再想想', '要不要接', '等她最後一晚過了', 'Fine Dining', '80,000', '120,000')), f'a new game: nothing to migrate; the manual says the same: {guide}')
+    # the manual (rewritten 2026-10-06, rc8.6): no 「怎麼來的」 any more — the Lounge's card comes with the Lounge, and the
+    # works card says what Lounge I takes; nothing in the card names an old condition
+    guide = g.ev("(()=>{const C=GUIDE.find(x=>/Lounge/.test(x.h));return C.sum+' '+C.pts.map(p=>p.join(' ')).join(' ')})()")
+    check(g.ev("S.linDecMig") == 1 and 'Lounge 的人' in guide and not any(w in guide for w in ('再想想', '要不要接', '等她最後一晚過了', 'Fine Dining', '評分', '80,000', '120,000')),
+          f'a new game: nothing to migrate; the manual names no old condition: {guide}')
     g.close()
 
 

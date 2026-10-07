@@ -1343,21 +1343,22 @@ def qa_a_chapter_is_listed_only_where_it_is_shown(b, port, target):
     """N09 (fixed 2026-10-06; its test 2026-10-07): a new game's Day 5 summary listed 「晚餐之後」 (two lines) while the
     story page did not show that chapter yet, and the page numbered its chapters by their place in the list
     (CHAPTER 2, then CHAPTER 4). One rule now decides whether a chapter is shown, everywhere; chapters are numbered
-    as shown. A new game: before the shop's level 4 the chapter is not in the summary and the numbers have no gap; at
-    level 4 it is in both."""
+    as shown. 「晚餐之後」 has no rule of its own any more (the user, 2026-10-07: no hidden level-4 gate), so the case is
+    「樓上」: 房東的二樓 (up_inspect) comes before the chapter shows (with the cats upstairs, up_cats). A new game with that
+    beat today: the chapter is not in the summary and the numbers have no gap; once it shows it is in both."""
     p = Player(b, port, target)
     try:
         p.tap('[data-act=open]'); p.settle()
         q = """JSON.stringify((()=>{const page=storyPageHTML();return{today:storyToday(S.day).map(x=>x.who),nums:[...page.matchAll(/CHAPTER (\\d+)/g)].map(m=>+m[1]),
-          hidden:restChapters().filter(C=>C.showIf&&!C.showIf()).map(C=>C.t),onPage:page.includes('晚餐之後')}})())"""
-        p.ev("S.level=1;factSet('ken_wine_q')")
+          hidden:restChapters().filter(C=>C.showIf&&!C.showIf()).map(C=>C.t),onPage:page.includes('<b>樓上</b>')}})())"""
+        p.ev("factSet('up_inspect')")
         r = json.loads(p.ev(q))
-        check('晚餐之後' in r['hidden'], f'setup: 晚餐之後 should not be shown before level 4: {r}')
-        check('晚餐之後' not in r['today'] and not r['onPage'], f'the summary lists a chapter the page does not show: {r["today"]}')
+        check('樓上' in r['hidden'], f'setup: 樓上 should not be shown before the cats upstairs: {r}')
+        check('樓上' not in r['today'] and not r['onPage'], f'the summary lists a chapter the page does not show: {r["today"]}')
         check(r['nums'] == list(range(1, len(r['nums']) + 1)), f'the chapters are numbered with a gap: {r["nums"]}')
-        p.ev("S.level=4")
+        p.ev("factSet('up_cats')")
         r = json.loads(p.ev(q))
-        check('晚餐之後' in r['today'] and r['onPage'], f'at level 4 the chapter is on the page and in the summary: {r}')
+        check('樓上' in r['today'] and r['onPage'], f'once 樓上 shows, the chapter is on the page and in the summary: {r}')
         check(r['nums'] == list(range(1, len(r['nums']) + 1)), f'the chapters are numbered with a gap: {r["nums"]}')
         check(not p.errors, p.errors[:3])
     finally:
