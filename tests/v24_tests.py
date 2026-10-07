@@ -36,7 +36,7 @@ def v24_back_of_house_is_a_work_area_and_keeps_its_two(b, port, target):
     check('休息' not in d and '整理區' in d and '廚師和服務生各可以再多聘 1 位' in d, f'work storage, +2 (rc8: a chef and a waiter): {d}')
     check(g.ev("ACH.find(a=>a.id==='room').d") == '後場有了整理區', 'the achievement says what it is now')
     man = g.ev("JSON.stringify(GUIDE)")
-    check('後場整理區' in man and '後場休息室' not in man, 'the manual uses the new name')
+    check('後場休息室' not in man, 'the manual never uses the old name (2026-10-06: the shop card says what the work area does, the manual no longer repeats it)')
     g.ev("S.money+=1;showShop();shopTab='works';showShop()"); g.page.wait_for_timeout(100)
     txt = g.ev("document.querySelector('#screen').innerText")
     check('後場整理區' in txt and '休息室' not in txt, 'the shop page uses the new name')
@@ -564,12 +564,12 @@ def v24_yijun_comes_early_in_a_fresh_game_and_meets_her_mother_at_closing(b, por
 @test
 def v24_manual_tutorial_and_news_cover_the_new_content(b, port, target):
     """The release checklist's manual audit, and the player's 15:11 request (說明書和一開始的教學都要到位): the manual
-    explains 秀琴阿姨 before and after the first cleaner, staff arriving late, the story illustrations and staff lives,
-    the renamed 後場整理區; a save that was already going gets one 2.4 note on its next prep screen (systems only —
+    says the first cleaner is 秀琴阿姨, that staff can arrive late (and are paid the day), where the story illustrations are
+    (rewritten 2026-10-06: what the screen shows — the cleaner's evenings, staff lives, the work area — left it); a save that was already going gets one 2.4 note on its next prep screen (systems only —
     nobody's story told in advance); a new game does not (Day 1's coach and Day 2's news introduce her instead)."""
     g = Game(b, port, target, seed=264, manual=True, viewport={'width': 390, 'height': 844})
     txt = g.ev("GUIDE.map(s=>s.h+' '+s.sum+' '+s.pts.map(p=>p.join(' ')).join(' ')).join('\\n')")
-    for need in ['秀琴阿姨', '快打烊時順路進來', '請第一位清潔員就是請她', '第一位清潔員是秀琴阿姨', '晚點到', '日薪照付', '看插圖', '店外的生活', '廚師不會離開廚房', '後場整理區']:
+    for need in ['秀琴阿姨', '請第一位清潔員就是請秀琴阿姨', '晚點到', '日薪照付', '看插圖']:
         check(need in txt, f'the manual mentions {need}')
     for stale in ['後場休息室', '吧台我擦']:
         check(stale not in txt, f'not in the manual: {stale}')
@@ -620,9 +620,9 @@ def rc8_the_manual_shows_a_space_once_the_shop_has_it(b, port, target):
     check('來店 5 次的客人拿到 VIP 卡：九折' in t and '來 10 次換成八折卡：八折' in t, 'the VIP card, from the first day, without the Lounge')
     check('小小店主手冊' in t and '五隻店貓' in t and 'Jill 的房間' in t, 'the rest of the manual is there')
     g.ev("S.rooms.side=1;showGuide()"); g.page.wait_for_timeout(50); t = g.ev(page)
-    check('側廳的大窗' in t and '店門口・主廳・側廳・廚房・房間' in t and '二樓' not in t, 'the side room comes with the side room')
+    check('店門口・主廳・側廳・廚房・房間' in t and '二樓' not in t, 'the side room comes with the side room')
     full = g.ev("GUIDE.map(s=>s.h+' '+s.sum+' '+s.pts.map(p=>p.join(' ')).join(' ')).join('\\n')")
-    check('Lounge：留下來的地方' in full and '員工休息室' in full and '天氣、Lounge、包廂、VIP 卡' in full, 'GUIDE keeps every word')
+    check('Lounge：留下來的地方' in full and '員工休息室' in full and '私人包廂' in full and '品酒之夜' in full, 'GUIDE keeps every word')
     stale = g.ev("""(()=>{const all=GUIDE.flatMap(g=>[g.sum,...g.pts.flatMap(([k,t])=>guideLines(t))]);const bad=GUIDE_WHEN.line.map(r=>r[0]).filter(w=>all.filter(l=>l.includes(w)).length!==1);
       for(const k in GUIDE_WHEN.pt){const [h,l]=k.split('|');if(!GUIDE.some(g=>g.h===h&&g.pts.some(p=>p[0]===l)))bad.push(k)}for(const k in GUIDE_WHEN.sec)if(!GUIDE.some(g=>g.h===k))bad.push(k);return bad})()""")
     check(stale == [], f'every gate still finds its words in GUIDE (an edited line would quietly stop being gated): {stale}')
@@ -633,7 +633,7 @@ def rc8_the_manual_shows_a_space_once_the_shop_has_it(b, port, target):
     check('Lounge：留下來的地方' in t and '吃完再去 Lounge 七折' in t and '配菜的酒' in t and '調酒師' in t, 'Day 81: the Lounge is in the manual')
     check('二樓' not in t and '包廂' not in t and '休息室' not in t, 'Day 81: the second floor is not hers yet, and not in the manual')
     g.ev("S.rooms.up=1;const o=srW();o.bought=o.done=S.day;showGuide()"); g.page.wait_for_timeout(50); t = g.ev(page)
-    check('二樓：休息室與包廂' in t and '二樓平面圖' in t and '員工休息室' in t and '誰會上去' in t and '私人包廂' not in t, 'the lease: the floor and its Staff Room (rc8 canon), not yet the Private Dining Room')
+    check('二樓' in g.ev("[...document.querySelectorAll('#screen summary b')].map(b=>b.textContent).join('|')") and '上二樓的樓梯門在側廳' in t and '員工休息室' in t and '私人包廂' not in t and '最低消費' not in t, 'the lease: the floor and its Staff Room (rc8 canon), not yet the Private Dining Room')
     g.ev("S.up.pd={done:S.day};showGuide()"); g.page.wait_for_timeout(50); t = g.ev(page)
     check('私人包廂' in t and '最低消費' in t, 'the Private Dining Room with its own story')
     check(not g.errors, g.errors[:3]); g.close()
@@ -819,7 +819,9 @@ def rc83_small_things_from_the_players_evenings(b, port, target):
     load_save(g, 'player_day89_2320.json')
     to_service(g)
     g.ev("S.regulars.sophie=Math.max(S.regulars.sophie||0,5);S.loveMiss={};Math.random=()=>0")
-    said = g.ev("(()=>{spawn({t:R.t,type:'office',size:1,reg:'sophie'});const s=R.groups[R.groups.length-1];const tk={items:[{d:'coffee'}]};const a=loveOrdered(s,tk);const b=loveOrdered(s,tk);S.day+=6;const c=loveOrdered(s,tk);S.day-=6;return[a,b,c]})()")
+    # (audit N02, 2026-10-06: she says it only when her favourite really is not on — here it has sold out tonight; with it on
+    #  the menu she says nothing, qa_a_favourite_is_missed_only_when_it_is_off_the_menu)
+    said = g.ev("(()=>{spawn({t:R.t,type:'office',size:1,reg:'sophie'});const s=R.groups[R.groups.length-1];for(const id of loveIdsOf(s)){const d=LOVES[id].d;for(const x of menuList())if(x===d||baseOf(x)===baseOf(d))S.stock[x]=0}const tk={items:[{d:'coffee'}]};const a=loveOrdered(s,tk);const b=loveOrdered(s,tk);S.day+=6;const c=loveOrdered(s,tk);S.day-=6;return[a,b,c]})()")
     check(said == [True, False, True], f'said once, not the next time, said again six days on: {said}')
     check(g.ev("!!(HM.litter2&&HM.bowls)&&homeItems.toString().includes('drawHomeLitter(c,HM.litter2)')&&homeItems.toString().includes('drawHomeBowls(c)')"), 'two litter cabinets and the bowls in the room')
     g.ev("setRoom('home');forceDraw=true"); g.ev("for(let i=0;i<6;i++)__tick(1000/30)"); g.ev("setRoom('main')")
@@ -1003,7 +1005,18 @@ def rc85_small_talk_is_rare_and_makes_sense(b, port, target):
     check(not any('Rush Mode 結束' in t for t in texts), 'the end of Rush Mode is no news')
     check(sum('VIP 貴賓到了' in t for t in texts) <= 1, 'the VIPs: the first of the evening')
     check(not any('換到 Lounge 坐' in t or '再喝一杯' in t or '從 Lounge 過去' in t for t in texts), 'the Lounge moves are in the log, not over the room')
-    check(len(pops) <= 45, f'what pops up in an evening: {len(pops)} (93 before)')
+    # what pops up (toasts and lines with a face): about half of before (93 an evening on this save before rc8.5). One seed is a
+    # coin flip at a fixed number — measured 2026-10-06 over 12 seeds of this evening: 510d66f mean 45.1 (37–55), eca3bb3 mean
+    # 46.7 (38–59), the same distribution — so four evenings, their mean
+    counts = [len(pops)]
+    for sd in (8302, 8303, 8304):
+        h = Game(b, port, target, seed=sd, manual=True, viewport={'width': 390, 'height': 844})
+        load_save(h, 'player_day83_2218.json'); h.ev("for(let i=0;i<30;i++){if(typeof DLG!=='undefined'&&DLG)dlgNext()}"); to_service(h)
+        h.ev("window.__pop=[];const t0=toast;toast=function(){if(R)__pop.push(1);return t0.apply(this,arguments)};const p0=portraitLine;portraitLine=function(){const r=p0.apply(this,arguments);if(r&&R)__pop.push(1);return r}")
+        while h.ev("phase==='service'&&!!R"):
+            h.ev("__botUntil('false',90,1/30)"); h.page.wait_for_timeout(5)
+        counts.append(h.ev("window.__pop.length")); h.close()
+    check(sum(counts) / len(counts) <= 55 and max(counts) <= 70, f'what pops up in an evening: {counts} (93 before)')
     kd = g.ev("String(STORY_EV.find(e=>e.k==='kd_argue').run)")
     check('那是果香，不是糖。' in kd and "'那是果味。'" not in kd and g.ev("STORY_EV.find(e=>e.k==='kd_argue').cd") == 5, 'Ken and 杜 say what they argue about, every five days at most')
     check(not g.errors, g.errors[:3]); g.close()
@@ -2075,6 +2088,11 @@ def v24_rc6_an_authored_beat_holds_the_service_until_it_is_read(b, port, target)
     # nothing else of the stories tonight (the day's budget spent), and what was already said in the room finished — then
     # the panel is on, as it is in play
     g.ev("const d=storyDay();d.major=9;d.minor=9;d.v24=9"); _frames(g, 300)
+    # (audit N04, 2026-10-06: a panel waits for the line being said in the room — it never cuts an exchange in half; the
+    #  beat is fired when nobody is in the middle of one, so 「at once」 is what it means here)
+    for _ in range(40):
+        if g.ev("!floorBusy()&&!(R.talkq||[]).length"): break
+        _frames(g, 15)
     g.ev("window.__holds=true;delete story().ev.qt_1;delete story().facts.qt_1;delete (story().beatLines||{}).qt_1;storyDay().minor=0;storyDay().lp={};"
          "const E=STORY_EV.find(e=>e.k==='qt_1');E.__w=E.when;E.when=()=>true;room='kitchen';renderRoomTabs(true)")
     before = json.loads(g.ev(HOLD_SNAP))
@@ -2176,8 +2194,11 @@ def v24_rc6_story_pages_keep_only_their_own_lines(b, port, target):
     g.ev("__botUntil('R.t>=R.dur*.3',90000,1/30)")
     r = json.loads(g.ev("""JSON.stringify((()=>{const gs=R.groups.filter(q=>q.table!=null&&q.state!=='leave');if(gs.length<2)return{skip:1};const m=gs[0],s0=gs[1];
       const E=STORY_EV.find(e=>e.k==='sm_a');shStart('sm_a',false,null,()=>{sayG(m,'妳也常來？',600);sayG(s0,'……妳不是也一樣。',2200)});jillSay('哪隻？');return{ok:1}})())"""))
-    _frames(g, 120)
-    kept = json.loads(g.ev("JSON.stringify((story().beatLines||{}).sm_a||null)"))
+    # the room speaks one exchange at a time on the service clock (audit N04): the beat's second line may wait for the floor
+    for _ in range(12):
+        _frames(g, 60)
+        kept = json.loads(g.ev("JSON.stringify((story().beatLines||{}).sm_a||null)"))
+        if r.get('skip') or (kept and len(kept) >= 2): break
     check(r.get('skip') or [x['t'] for x in kept] == ['妳也常來？', '……妳不是也一樣。'], f'only the beat\'s own: {kept}')
     check(not g.errors, g.errors[:3]); g.close()
 
@@ -2520,8 +2541,8 @@ def v24_rc6_qing_and_tuo_move_on(b, port, target):
     check(d_off is not None and d_off - 72 <= 12, f'a day off comes within days: Day {d_off}')
     g.ev(f"S.day={d_off};story().away=null;storyDay();storyTick('daystart',{{}})")
     away = json.loads(g.ev("JSON.stringify({f:!!fact('tuo_off'),t:!!tuoOn(),q:!!qingOn(),here:crewHere(crewByName('阿拓')),lbl:crewAwayOf(crewByName('阿拓'))})"))
-    check(away['f'] and not away['t'] and away['q'] and away['here'] is False, f'阿拓 is off today (晴 in): {away}')
-    g.ev("const q=R.groups.find(x=>x.table!=null)||null;const t=R.tables.find(t=>t.lounge&&!t.group);window.__tk={id:R.tkid++,no:1,g:q,lounge:1,items:[{d:'bites',st:'pending',q:null,want:0,picked:false,set:null}],t0:R.t};storyTick('order',{g:q,tk:__tk})")
+    check(away['f'] and not away['t'] and away['q'] and away['here'] is False, f'阿拓 is off today (晴 in): {away} ' + g.ev("JSON.stringify({q:!!qingOn(),t:!!tuoOn(),h:!!hugoOn(),qt3:fact('qt_3'),day:S.day,abs:fact('qt_absence'),coin:dayCoin('tuooff|'+S.day),pend:[...SH_PEND],st:evState('tuo_off'),sd:storyDay(),tr:story().trace.slice(-4)})"))
+    g.ev("const q=R.groups.find(x=>x.table!=null)||null;const t=R.tables.find(t=>t.lounge&&!t.group);window.__tk={id:R.tkid++,no:1,g:q,lounge:1,items:[{d:'bites',st:'pending',q:null,want:0,picked:false,set:null}],t0:R.t};storyTick('order',{g:q,tk:__tk});__talkFor(12)")   # (audit N04: after the line being said)
     check(g.ev("!!fact('qt_absence')"), 'the absence: 「今天炸物怎麼怪怪的？」')
     # the pace: four evenings together for qt_2, two days for 「多的。」, the photo after two repeats and the absence
     E = json.loads(g.ev("JSON.stringify(Object.fromEntries(['qt_2','qt_3','qt_extra','qt_photo'].map(k=>[k,String(STORY_EV.find(e=>e.k===k).when)])))"))
@@ -2655,7 +2676,7 @@ def v24_rc7_the_money(b, port, target):
     to_service(g); play_day(g)
     s = json.loads(g.ev("JSON.stringify(S.lastSummary)"))
     check(s['wine'] > 0 and s['rent'] == rent['r'] and s['wages'] == w['all'], f'on the ledger: wine {s["wine"]}, rent {s["rent"]}, wages {s["wages"]}')
-    check(s['net'] == s['rev'] + s['tips'] + s['bonus'] - s['cost'] - s['wages'] - (s['cfee'] or 0) - s['rent'] - s['wine'], 'the net counts them')
+    check(s['net'] == s['rev'] + s['tips'] + s['bonus'] + (s.get('insp') or 0) - s['cost'] - s['wages'] - (s['cfee'] or 0) - s['rent'] - s['wine'], 'the net counts them')
     lg = s['lg']; tot = sum(x['rev'] for x in s['lgSales'])
     check(lg['rev'] == tot and lg['tip'] > 0 and all(x['d'].startswith('w_') or g.ev(f"!!(DISHES['{x['d']}']&&DISHES['{x['d']}'].bar)") for x in s['lgSales']), f'the Lounge: {lg["rev"]} = its list\'s total {tot}; tips {lg["tip"]} apart')
     din = s.get('dinWine') or []
@@ -2983,7 +3004,10 @@ def v24_rc7_the_wine_and_monsieur_du(b, port, target):
     to_service(g)
     g.ev("window.__fastSay=1")
     g.ev("__botUntil('R.t>=R.dur*.2',90000,1/30)")
-    g.ev("(story().named[KEN]=story().named[KEN]||{v:0,dishes:{}}).seen=S.day;const d=storyDay();d.major=0;d.lp={};d.seen={};storyTick('close',{})")
+    # (audit N06, 2026-10-06: the samples are handed over by Ken himself — he is at his table when the closing begins; a
+    #  visit earlier in the evening, gone by then, is not enough)
+    g.ev("let q=R.groups.find(x=>x.name===KEN&&!x.gone&&x.state!=='leave');if(!q){spawn({t:R.t,type:'gourmet',size:1,name:KEN,tries:1});q=R.groups.find(x=>x.name===KEN&&!x.gone)}if(q.table==null){const t=R.tables.find(t=>!t.lounge&&!t.group);t.dirty=false;seatGroup(q,t)}q.state='eat';q.moving=false;(story().named[KEN]=story().named[KEN]||{v:0,dishes:{}}).seen=S.day")
+    g.ev("const d=storyDay();d.major=0;d.lp={};d.seen={};storyTick('close',{})")
     pg = ' / '.join(x['t'] for x in json.loads(g.ev("JSON.stringify((story().beatLines||{}).ken_samples||[])")))
     check(g.ev("!!fact('ken_samples')") and '叫「晚餐之後」。' in pg and '吃完飯以後，還有地方可以坐。' in pg and '這裡就是這樣開始的' not in pg and g.ev("kenS().wineD") == g.ev("S.day") + 5, f'after closing: the samples, the name: {pg}')
     # the next day (one Ken scene a day). rc7.3 release: the day's major slot is a weighted draw among the beats due that
@@ -3102,7 +3126,7 @@ def v24_rc7_yuan_comes_to_play_the_piano(b, port, target):
     g.ev("__botUntil('R.ya&&R.ya.on',60000,1/30)")
     check(g.ev("!!yaAtPiano()") and g.ev("R.st.piano") == 2500, 'she plays; her fee for the night')
     g.ev("__botUntil('phase!==\\'service\\'',90000,1/30)")
-    s = json.loads(g.ev("JSON.stringify({piano:S.lastSummary.piano,net:S.lastSummary.net,calc:S.lastSummary.rev+S.lastSummary.tips+S.lastSummary.bonus-S.lastSummary.cost-S.lastSummary.wages-S.lastSummary.cfee-S.lastSummary.rent-S.lastSummary.wine-S.lastSummary.piano})"))
+    s = json.loads(g.ev("JSON.stringify({piano:S.lastSummary.piano,net:S.lastSummary.net,calc:S.lastSummary.rev+S.lastSummary.tips+S.lastSummary.bonus+(S.lastSummary.insp||0)-S.lastSummary.cost-S.lastSummary.wages-S.lastSummary.cfee-S.lastSummary.rent-S.lastSummary.wine-S.lastSummary.piano})"))
     check(s['piano'] == 2500 and s['net'] == s['calc'], f'the fee is on the night\'s accounts: {s}')
     check('鋼琴演奏' in g.ev("$('#screen').innerText"), 'the summary says so')
     check(g.ev("yaNight(S.day+1)") is False, 'not every night')
@@ -3331,7 +3355,7 @@ def v24_rc7_2_the_random_menu(b, port, target):
     check('菜單隨機排好了' in g.ev("[...document.querySelectorAll('#toasts .toast')].map(t=>t.textContent).join('|')"), 'the tap says it is done')
     check(g.ev("phase") == 'prep' and g.ev("menuCount()") == want, 'still on the menu page, the menu full')
     man = g.ev("JSON.stringify(GUIDE)")
-    check('隨機選菜單' in man and '今日任務要賣的菜和宣傳中的菜會留著' in man, 'the manual says so')
+    check('今日任務要賣的那道' in g.ev("document.querySelector('.mrand').innerText"), 'the button says what it keeps (2026-10-06: the manual no longer repeats what the screen says)')
     # a new game: few dishes — all of them, at least one 主食
     g.ev("localStorage.removeItem(KEY)"); g.reload(); g.page.wait_for_timeout(150); g.click('[data-act=open]'); g.page.wait_for_timeout(150)
     n = json.loads(g.ev("(()=>{const p=menuRandom();return JSON.stringify({p,cap:menuCap(),pool:S.unlocked.filter(d=>!!DISHES[d]&&!DISHES[d].bar&&stationOk(d)).length,main:p.some(d=>['main','starter'].includes(DISH(d).cat))})})()"))
@@ -3519,7 +3543,7 @@ def v24_rc7_2_the_lounges_own_waiter_carries_its_bites(b, port, target):
     w2 = json.loads(g.ev(f"JSON.stringify((()=>{{const m=S.crew.find(m=>m.id==='{who2}');const w=m&&R.cw[m.id];return{{role:m&&m.role,room:w&&w.task?w.task.room:null,x:w&&w.task?Math.round(w.task.x):null}}}})())")) if who2 else {}
     check(who2 and w2.get('role') in ('bartender', 'waiter') and w2.get('room') == 'lounge', f'fetched from the end of the Lounge\'s bar: {who2} {w2}')
     man = g.ev("JSON.stringify(GUIDE)")
-    check('由她送過去' in man and '出菜口的「送菜」只送主廳、側廳的菜' in man, 'the manual says so')
+    check('由「Lounge 外場」送過去' in man and '出菜口的「送菜」只送主廳、側廳的菜' in man, 'the manual says so')
     check(not g.errors, g.errors[:3]); g.close()
 
 
@@ -3537,7 +3561,7 @@ def v24_rc7_2_no_firing_and_the_wages(b, port, target):
     check(w == [[304, 532, 832, 1224, 1690], [253, 443, 693, 1020, 1408], [190, 332, 520, 765, 1056], [405, 709, 1109, 1632, 2253]], f'the wages: {w}')
     check(f'每日薪資 {g.ev("fmt(crewWages())")}' in scr, 'the page shows the day\'s wages')
     man = g.ev("JSON.stringify(GUIDE)")
-    check('廚師 LV1 一天 $304、LV5 一天 $1,690' in man and '請了就是店裡的人，沒有解雇' in man and '訓練升級、解雇' not in man, 'the manual')
+    check('請了就是店裡的人，沒有解雇' in man and '訓練升級、解雇' not in man, 'the manual (2026-10-06: each card shows its own wage; the manual no longer lists them)')
     check(not g.errors, g.errors[:3]); g.close()
 
 
@@ -4729,9 +4753,9 @@ def v24_rc8_the_bar_next_door_scenes_are_staged_where_they_happen(b, port, targe
     g.ev("const st=story();for(const k of ['tasting_night','pairing_wine'])st.facts[k]={d:S.day-12,n:1,l:S.day-12};st.facts.lin_retiring={d:S.day-3,n:1,l:S.day-3};linS().last=S.day+9;st.facts.ken_where={d:S.day-1,n:1,l:S.day-1};for(const k of ['pairing_start','lin_retire','ken_where'])evState(k).n=1")
     to_service(g); g.ev("window.__noScenes=false;window.__holds=true;R.sched=R.sched.filter(o=>o.reg!=='dylan')")
     g.ev("__botUntil('R.closing!=null',200000,1/30)"); g.ev("lifeEnsureEvening()"); g.ev("for(let i=0;i<3;i++)__tick(1000/30)")
-    for _ in range(40):   # another story's scene may come first tonight (its panel waits its turn)
-        if g.ev("!!(DLG&&DLG.sh&&DLG.sh.k==='jd_want')") or not g.ev("!!DLG"): break
-        g.ev("__tick(400);dlgNext()"); g.ev("__tick(1000/30)")
+    for _ in range(60):   # another story's scene may come first tonight (its panel waits its turn); audit N04: a panel also waits for the line being said in the room
+        if g.ev("!!(DLG&&DLG.sh&&DLG.sh.k==='jd_want')") or not g.ev("!!DLG||SH_PEND.size>0||(R&&(R.talkq||[]).length>0)"): break
+        g.ev("if(DLG){__tick(400);dlgNext()}else __talkFor(.5)"); g.ev("__tick(1000/30)")
     s1 = json.loads(g.ev("JSON.stringify({k:DLG&&DLG.sh&&DLG.sh.k,room,on:LIFE.jill.on,jroom:LIFE.jill.room,desk:!!homeDylanAtDesk(),off:!!HOME_DY.off})"))
     check(s1['k'] == 'jd_want' and s1['room'] == 'home' and s1['on'] and s1['jroom'] == 'home' and s1['desk'] and not s1['off'], f'after closing, their room: Jill on the sofa, Dylan at his desk with his headphones on: {s1}')
     seen = []
@@ -4755,9 +4779,9 @@ def v24_rc8_the_bar_next_door_scenes_are_staged_where_they_happen(b, port, targe
     g.ev("S.dylan.stage=3;S.dylan.reveal=S.day-6;const st=story();for(const k of ['tasting_night','pairing_wine'])st.facts[k]={d:S.day-12,n:1,l:S.day-12};st.facts.lin_retiring={d:S.day-4,n:1,l:S.day-4};linS().last=S.day+8;st.facts.ken_where={d:S.day-3,n:1,l:S.day-3};st.facts.jd_want={d:S.day-3,n:1,l:S.day-3};for(const k of ['pairing_start','lin_retire','ken_where','jd_want'])evState(k).n=1")
     to_service(g); g.ev("window.__noScenes=false;window.__holds=true;R.sched=R.sched.filter(o=>o.reg!=='dylan')")
     g.ev("__botUntil('R.closing!=null',200000,1/30)"); g.ev("lifeEnsureEvening()"); g.ev("for(let i=0;i<3;i++)__tick(1000/30)")
-    for _ in range(40):
-        if g.ev("!!(DLG&&DLG.sh&&DLG.sh.k==='dylan_book')") or not g.ev("!!DLG"): break
-        g.ev("__tick(400);dlgNext()"); g.ev("__tick(1000/30)")
+    for _ in range(60):   # (audit N04: the panel waits for the line being said in the room)
+        if g.ev("!!(DLG&&DLG.sh&&DLG.sh.k==='dylan_book')") or not g.ev("!!DLG||SH_PEND.size>0||(R&&(R.talkq||[]).length>0)"): break
+        g.ev("if(DLG){__tick(400);dlgNext()}else __talkFor(.5)"); g.ev("__tick(1000/30)")
     check(g.ev("DLG&&DLG.sh&&DLG.sh.k") == 'dylan_book' and g.ev("room") == 'home', 'the book, in the room')
     lines = _dlg_lines(g)
     check('Dylan：看看。' in lines and '先生：看看。' not in lines, f'after the reveal: Dylan: {lines}')
@@ -4944,7 +4968,7 @@ def v24_rc8_madame_lin_comes_back_as_a_guest(b, port, target):
     g.ev("__botUntil('R.t>=R.dur*.3',200000,1/30)")
     g.ev("(()=>{const v=v24();v.res={d:S.day,k:['lin_guest']}})();R.sched.splice(R.si,0,{t:R.t+2,type:'vip',size:1,name:'Madame Lin',story:1,lounge:1,lgRetry:1,tries:1});window.__noScenes=false;window.__holds=true")
     for _ in range(12):
-        g.ev("__botUntil(\"!!(typeof DLG!=='undefined'&&DLG)||R.groups.some(q=>namedId(q)==='Madame Lin')\",900,1/30)")
+        g.ev("__botUntil(\"!!(typeof DLG!=='undefined'&&DLG)||(R.groups.some(q=>namedId(q)==='Madame Lin')&&!SH_PEND.size&&!(R.talkq||[]).length)\",900,1/30)")   # (audit N04: her panel waits for the line being said)
         if g.ev("!!DLG") and g.ev("DLG.sh?DLG.sh.k:''") != 'lin_guest':
             g.ev("for(let i=0;i<40&&DLG&&!(DLG.sh&&DLG.sh.k==='lin_guest');i++){__tick(400);dlgNext()}"); continue
         break

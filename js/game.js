@@ -101,7 +101,10 @@ const SPECIALS={
 };
 for(const base in SPECIALS){const sp=SPECIALS[base],B=DISHES[base];DISHES[sp.id]=Object.assign({},B,{n:sp.n,price:sp.price,cost:sp.cost,rd:0,special:base,fin:(B.fin||[]).concat([sp.top]),pop:(B.pop||1)*1.1,lv:Math.max(B.lv,3),truffle:sp.truffle||B.truffle})}
 function baseOf(d){const D=DISHES[d];return D&&D.special?D.special:d}
-const ST_N={stove:'爐台',oven:'烤箱',bar:'咖啡吧',prep:'冷盤台',pizza:'披薩烤爐'};
+/* audit WS6-06 (2026-10-06): a glass (wine, a cocktail, a coffee, a soda) is drunk, not eaten — the lines and reviews about
+   a plate (火候、擺盤、吃到最後一口) are about the first food served, never about the glass */
+function isGlass(d){const D=DISH(d);return !!D&&(!!D.wine||D.cat==='drink')}
+const ST_N={stove:'爐台',oven:'烤箱',bar:'咖啡吧',prep:'冷盤台',pizza:'披薩烤爐',lbar:'Lounge 吧台'};   /* lbar (audit W3-04): a glass waiting on a ticket said 「undefined都在忙！」 */
 const ING={egg:{n:'雞蛋',k:'egg'},rice:{n:'白飯',k:'bowl',c:'#FBF6E6'},scallion:{n:'蔥花',k:'bits',c:'#5FA640'},soy:{n:'醬油',k:'bottle',c:'#3A1E10'},
  noodle:{n:'義大利麵',k:'noodle'},tomato:{n:'番茄醬汁',k:'bowl',c:'#C8321E'},basil:{n:'羅勒葉',k:'leaf',c:'#3F8B3A'},parmesan:{n:'起司粉',k:'bowl',c:'#FFF1C2'},
  garlic:{n:'蒜片',k:'bits',c:'#EDE0C0'},shrimp:{n:'鮮蝦',k:'shrimp'},mussel:{n:'淡菜',k:'mussel'},parsley:{n:'巴西里',k:'leaf',c:'#4E9A3A'},
@@ -469,19 +472,22 @@ const SIDE_TABLE_COST=[1500,2200,3000,4000,5200,6500,8000,9500,11000],FRONT_TABL
 const SIDE_BOOTH_COST=[18000,24000],SIDE_ROWS=['中間那排','前面那排'],SIDE_BOOTH_DONE=['中間那排的雙人桌搬走了，換上跟後牆那排一樣的卡座。','前面那排也換好了。三排卡座，九張桌子一個樣子。'];
 function sideBoothRows(){return 1+Math.min(2,Math.max(0,(S.sideBooths|0)))}
 /* what to save for next: one thing within reach, one a few days away, one to dream about */
-function goalLadder(){const out=[];const money=S.money;const add=(n,cost,where)=>{if(cost==null)return;out.push({n,cost,where,left:Math.max(0,cost-money)})};
+/* audit WS1-07 (2026-10-06): a goal is something tonight's shop really sells — its tab open, the item on it (Day 1 said
+   「咖啡機 現在就買得起」 under a tab still grey; Day 2 the 門口花箱, Day 3 the 擴建, both not in the shop until later) */
+function goalLadder(){const out=[];const money=S.money;const D=shopDay();const tabOn=n=>{const t=shopTabs().find(x=>x.n===n);return !t||t.on};
+ const add=(n,cost,where,ok)=>{if(cost==null||ok===false||!tabOn(where))return;out.push({n,cost,where,left:Math.max(0,cost-money)})};
  for(const P of ALL_PROJECTS())if(!projOn(P.k)&&S.level>=P.lv&&projNeedOk(P))add(P.n,P.cost,KITCHEN_WORKS.includes(P)?'廚房設備':'店舖工程');
- for(const E of EXTERIOR)if(!extOn(E.k)&&S.level>=E.lv)add(E.n,E.cost,'家具與佈置');
+ for(const E of EXTERIOR)if(!extOn(E.k)&&S.level>=E.lv)add(E.n,E.cost,'家具與佈置',D>=3);
  for(const G of CATGEAR)if(!gearOn(G.k)&&!G.story&&!G.line&&G.k!=='perch'&&(!G.need||projOn(G.need))&&S.level>=(G.lv||1))add(G.n,G.cost,'貓咪生活');
  {const W=WIN_TIERS[winTier()];if(W&&projOn('side')&&S.level>=W.lv)add('窗邊貓家具：'+W.n,W.cost,'貓咪生活')}
- const nl=LEVELS[S.level];if(nl)add('擴建：'+nl.n,nl.cost,'店舖工程');
+ const nl=LEVELS[S.level];if(nl)add('擴建：'+nl.n,nl.cost,'店舖工程',!(D<4&&S.level===1));
  if(S.tables<tableCap())add('餐桌',TABLE_COST[S.tables],'家具與佈置');
  if(projOn('side')&&(S.sideTables||0)<SIDE_MAX)add('側廳桌',SIDE_TABLE_COST[S.sideTables||0],'家具與佈置');
  if(projOn('side')){const n=S.sideBooths|0;if(n<2&&(S.sideTables||0)>=(n+2)*3)add('側廳卡座：'+SIDE_ROWS[n],SIDE_BOOTH_COST[n],'家具與佈置')}
- for(const E of EQUIP){const lv=S.eq[E.k]||0;if(lv<5)add(E.n+(lv?' LV'+(lv+1):''),E.cost[lv],'廚房設備')}
+ for(const E of EQUIP){const lv=S.eq[E.k]||0;if(lv<5)add(E.n+(lv?' LV'+(lv+1):''),E.cost[lv],'廚房設備',!(E.k==='oven'&&lv===0&&D<3))}   /* the oven comes on Day 3, as the kitchen tab says */
  for(const o of OPS){const t=opsLv(o.k);if(o.tiers[t]!=null&&S.level>=o.lv&&(!o.need||o.need()))add(o.n,o.tiers[t],'店舖工程')}/* v2.3: only what can really be bought now (the Bar 小廚 waits for Lounge III) */
  {const Q=typeof loungeNext==='function'&&(fact('lounge_project')||loungeLv())?loungeNext():null;if(Q&&S.level>=Q.need)add(Q.n,Q.cost,'店舖工程')}
- for(const Dc of DECOR){const t=S.decor[Dc.k]||0;if(Dc.tiers[t]!=null&&S.level>=(Dc.tierLv?Dc.tierLv[t]:Dc.lv))add(Dc.n,Dc.tiers[t],'家具與佈置')}
+ for(const Dc of DECOR){const t=S.decor[Dc.k]||0;if(Dc.tiers[t]!=null&&S.level>=(Dc.tierLv?Dc.tierLv[t]:Dc.lv))add(Dc.n,Dc.tiers[t],'家具與佈置',D>=4)}
  out.sort((a,b)=>a.cost-b.cost);const near=out.find(g=>g.left===0)||out[0];const mid=out.find(g=>g.left>0&&g.left<=Math.max(3000,money*.6))||out.find(g=>g.left>0);const far=out.slice().reverse().find(g=>g.left>0&&g!==mid)||null;
  const G=[near,mid,far].filter((g,i,a)=>g&&a.indexOf(g)===i);for(const g of out.slice().reverse()){if(G.length>=3)break;if(!G.includes(g))G.push(g)}return G}
 function goalLadderHTML(){const G=goalLadder();if(!G.length)return'';const avg=S.lastSummary?Math.max(1,S.lastSummary.net):1000;
@@ -538,7 +544,7 @@ const EVENTS={
  company:{n:'附近公司聚餐',d:'晚餐客流 +30%，上班族特別多。',m:1.3},
  truffle:{n:'松露價格上漲',d:'松露料理的食材成本 ×1.5。',need:()=>S.unlocked.some(d=>DISH(d)&&DISH(d).truffle)},
  blogger:{n:'美食部落客來訪',d:'服務得好，明天可能會爆紅。'},
- valentine:{n:'今天是情人節',d:'情侶變多，甜點特別受歡迎。',m:1.12},
+ valentine:{n:'情人節',d:'情侶變多，甜點特別受歡迎。',m:1.12},
  concert:{n:'附近演唱會散場',d:'20:30 左右會湧進一波客人。',m:1.08},
  students:{n:'一群學生要來',d:'某個時段會一口氣來很多學生。'},
  vip:{n:'VIP 預約',d:'19:00 有 VIP 貴賓到訪，消費高、要求也高。'},
@@ -546,7 +552,7 @@ const EVENTS={
  datenight:{n:'約會之夜',d:'今晚情侶特別多、來得比較晚，甜點和飲料一起點的機率高。',m:1.05,mix:{couple:2.2},dem:{dessert:1.5,drink:1.2},late:true},
  market:{n:'附近的市集',d:'街上有市集，早一點就會有人進來；學生和上班族都多。',m:1.12,mix:{student:1.5,office:1.3},early:true},
  fresh:{n:'漁獲新鮮',d:'今天海鮮進貨便宜又新鮮：海鮮類料理成本 ×0.7，客人也更想點。',costMul:{seafood:.7,salmon:.7},dem:{seafood:1.4,salmon:1.4},need:()=>S.unlocked.includes('seafood')||S.unlocked.includes('salmon')},
- celebrate:{n:'店慶',d:'開店滿十天的日子。熟客都會想來，客人也比平常多一點。',m:1.15,regs:1},
+ celebrate:{n:'店慶',get d(){return`開店滿 ${((S&&S.stats&&S.stats.days)||0)+1} 天的日子。熟客都會想來，客人也比平常多一點。`},m:1.15,regs:1},   /* audit N13: it comes every ten days (planToday) — Day 90 is not 「開店滿十天」 */
 };
 const RV={
  5:['Jill 主廚的{d}真的太厲害了。','{d}完美。我要把這家店藏起來不告訴別人。','燈光、音樂、{d}，今晚被 Jill 治癒了。','Chef Jill 是天才，這句不是誇飾。','每一口都像被好好照顧。一定會再來。','我在{d}前安靜了三秒，然後吃光了。'],
@@ -586,7 +592,7 @@ const ACH=[
 function MEMS_FIRST(p){const A=albumList();return A.find(x=>x.kind===p.kind)===p}
 const ACH_BY_MEMO={everyone:'everyone',lap:'lap',play:'play',swat:'play',rest:'jillrest',pause:'pause',dylancat:'dylancat',bagcat:'bagcat',oddspot:'oddspot',sleepgod:'sleepgod',anniversary:'anniv',neighbors:'neighbors',company:'company',gift:'gift'};
 const COACH=[
- '客人來了！有空桌的話他們會自己入座；客滿時會先在門口的長椅坐一下，等桌子空出來。',
+ '客人來了！有空桌的話他們會自己入座；客滿時會先在店門口外面等，等桌子空出來。',   /* audit WS1-12: Day 1 has no bench (it is bought later) — the manual's own words */
  '客人在看菜單。等桌上出現「!」，點那張桌子幫他們點餐。',
  '訂單來了！點上方訂單條裡的炒飯（或到廚房點爐台），開始做菜。',
  '照著料理台做：先點「雞蛋」、再點「白飯」下鍋，Jill 會自己翻炒。翻炒完記得回來淋醬油。',
@@ -1597,6 +1603,7 @@ let R=null,IDLE=null,phase='title',paused=false,mainScreen='title',sub=null;
 
 /* ================= planning a day ================= */
 function applyGates(){try{if(S.loungeProj&&S.loungeProj.state==='signing'&&!fact('lin_signed')&&S.day>=(S.loungeProj.paid||0)+3)linSigned();if(loungeOpenDue())loungeOpenNow()}catch(e){console.warn('[lounge open]',e)}if(S.sigdEvoNews&&S.sigDessert){const lv=S.sigdEvoNews;S.sigdEvoNews=0;S.news.push(`<b>招牌甜點升級了。</b>${S.sigDessert.name}賣到 ${lv===3?SIGD_EVO[2]:SIGD_EVO[1]} 份，${lv===3?'Jill 在上面拉了一層糖絲，點了金箔。':'Jill 在盤邊畫了一道果泥，放了一片薄荷。'}`)}if(S.sigEvoNews&&S.signature){const lv=S.sigEvoNews;S.sigEvoNews=0;S.news.push(`<b>招牌菜升級了。</b>${S.signature.name}賣到 ${lv===3?SIG_EVO[2]:SIG_EVO[1]} 份，Jill 把盤子重新做過：${lv===3?'食用花與金箔':'醬汁畫盤與一撮嫩葉'}，價格高 $${(lv-1)*30}。`)}
+ if(S.day<=1){if(S.news21==null)S.news21=-1;if(S.news20==null)S.news20=-1}   /* audit WS1-06: the 2.0 / 2.1 notes are for saves from those versions, not a new restaurant */
  if(!S.news21&&S.day>=3){S.news21=S.day;S.news.push('<b>2.1：食物與日常。</b>做熟的菜（熟練度 LV3）可以在<b>菜單研發</b>研發成<b>特製版</b>；招牌菜賣得多會換盤；街上有人經過、有人在門口看菜單就進來；帶小孩的家庭、雨天的傘、廚房裡的空檔。')}
  if(!S.news20&&S.day>=3){S.news20=S.day;S.news.push('<b>2.0：店可以變大了。</b>主廳上方可以切到<b>店門口</b>和<b>廚房</b>（廚師真的在裡面煮）。打烊後商店裡多了<b>工程</b>（戶外區、大出菜口、冷藏庫、廚房擴建、側廳）和<b>貓的東西</b>；結算會告訴你下一個存錢的目標。')}
  if(S.news24==null){if(S.day<=1)S.news24=-1;else{S.news24=S.day;S.news.push(`<b>2.4：店裡的人，店外的生活。</b>員工有時候會因為自己的事晚點到（當天開店時會說）。幾段故事有一張插圖，看過以後在日誌「故事」的那一段可以再打開。${opsLv('room')?'營運升級的「後場休息室」現在叫<b>後場整理區</b>：廚房門邊的層架和掛鉤，一樣多兩位員工（廚師、服務生各一位）。':''}${xqHelperMode()?'Jill 認識很久的<b>秀琴阿姨</b>，很多晚上會在快打烊時順路來幫忙收一收；請第一位清潔員，就是請她。':''}`)}}   /* v2.4: for a save that was already going — the systems only; nobody's story is told in advance */
@@ -1604,7 +1611,7 @@ function applyGates(){try{if(S.loungeProj&&S.loungeProj.state==='signing'&&!fact
  if(S.news24c==null){if(S.day<=1||!poolCrew('restaurant').length)S.news24c=-1;else{S.news24c=S.day;const over=CAP_ROLES.filter(r=>roleCrew(r).length>roleCap(r));S.news.push(`<b>餐廳的名額分成三種。</b>廚師、服務生、清潔員各有自己的名額，不能互相借：廚師的名額只能聘廚師。擴建和每一個工程都寫著多哪一種。現在 ${CAP_ROLES.map(r=>`${ROLES[r].n} ${roleCrew(r).length}/${roleCap(r)}`).join('、')}${over.length?`；${over.map(r=>ROLES[r].n).join('、')}比名額多，大家都留著`:''}。${loungeLv()?'Lounge 的名單照舊。':''}`)}}   /* rc8 §21: told once to a save that was already going; nobody moves, nobody leaves */
  while(S.gate<S.day){S.gate++;const D=S.gate;
  if(D===2){unlockDish('coffee');S.eq.bar=Math.max(1,S.eq.bar);S.news.push('<b>新料理解鎖：拿鐵咖啡</b>。咖啡吧開張了，客人會加點飲料。');if(fact('xq_helper')&&xqHelperMode())S.news.push('昨晚快打烊時來幫忙收店的是<b>秀琴阿姨</b>，Jill 認識很久的阿姨。她不是員工，很多晚上會順路來；之後請清潔員，第一位就是她。')}
- if(D===3){if(S.eq.stove<2){S.eq.stove=2}unlockDish('pasta');S.news.push('<b>第二口爐子到貨！</b>同時可以做兩道熱菜。<br><b>新料理：番茄義大利麵</b>（先煮麵，再加醬）。<br>從今天開始可以自己<b>備料</b>與<b>調整售價</b>。')}
+ if(D===3){/* audit WS1-08: the second burner comes on Day 3 for everyone — one bought in the shop the evening before is paid back */const had=S.eq.stove>=2,back=had?EQUIP.find(x=>x.k==='stove').cost[1]:0;if(S.eq.stove<2){S.eq.stove=2}if(back){S.money+=back}unlockDish('pasta');S.news.push(`<b>第二口爐子到貨！</b>同時可以做兩道熱菜。${back?`你昨天已經自己買了一台，那 ${fmt(back)} 退回來了。`:''}<br><b>新料理：番茄義大利麵</b>（先煮麵，再加醬）。<br>從今天開始要自己<b>備料</b>。`)}   /* audit WS1-06: stocking was open from Day 1 and prices from Day 2 — what Day 3 changes is that the fridge is no longer filled for you */
  if(D===4){S.eq.prep=1;unlockDish('salad');S.news.push('<b>冷盤台啟用：田園沙拉</b>（Jill 切菜的時候，可以先去忙別的）。<br>今晚 19:00 會有第一次 <b>Rush Hour</b>，做好準備！')}
  if(D===5)S.news.push('昨晚開始可以<b>裝潢與擴建</b>了。菜單研發也有更多選擇。')
  if(D===6)S.news.push('聽說<b>神秘美食評論家</b>最近會在城裡出沒…')
@@ -1653,19 +1660,22 @@ function stockFailText(d,q){return q.why==='cap'?`冰箱空間不足（還能放
 function autoStock(){const sug=suggestStock();for(const d in sug){const need=sug[d]-(S.stock[d]||0);if(need>0)buyStock(d,need)}}
 
 /* ================= service ================= */
-function startService(){lifeReset();streetReset();dylanStageCheck();bg=null;lastEv=null;if(UPV||UPRV)upViewClose();{const pp=$('#peekPill');pp.hidden=true;pp.textContent='回到選單 ›'}/* v2.4 rc6 (10:00): never into a service */if(room==='up')room='main';
- if(S.money<150&&stockTotal()<5){S.money+=300;toast('Jill 翻出了抽屜裡的應急金 $300')}
- if(S.day<=2)autoStock();S.news=[];
+/* o.resume (audit N16, 2026-10-06): the fallback of 繼續營業 reopens the room at the clock it stopped — it is not the evening's
+   start again: no opening banner, no daystart story (「那天下午…」), no first-days stocking, no tutorial, and the rush already
+   announced if its time has passed (「RUSH HOUR」 came at 22:08) */
+function startService(o){o=o||{};SH_PEND.clear();/* a beat that was waiting for the floor when the last service ended (or the app closed) is still to come (audit N04) */lifeReset();streetReset();dylanStageCheck();bg=null;lastEv=null;if(UPV||UPRV)upViewClose();{const pp=$('#peekPill');pp.hidden=true;pp.textContent='回到選單 ›'}/* v2.4 rc6 (10:00): never into a service */if(room==='up')room='main';
+ if(!o.resume&&S.money<150&&stockTotal()<5){S.money+=300;toast('Jill 翻出了抽屜裡的應急金 $300')}
+ if(!o.resume&&jillStocks())autoStock();S.news=[];
  const T=S.today,dur=dayDur(S.day);
  R={t:0,dur,tables:buildTables(),slots:buildSlots(),groups:[],tickets:[],sched:[],si:0,closed:false,ended:false,
   jill:{x:PASS.x,y:PASS.y,tx:null,ty:null,q:[],cur:null,busy:0,carry:[],idle:0,face:1,step:0,room:'main',troom:'main',bk:1},
   combo:0,maxCombo:0,streak:0,fire:0,fireCount:0,floats:[],parts:[],tv:1,gid:1,tkid:1,
   st:{rev:0,tips:0,guests:0,groups:0,perfect:0,q:{P:0,G:0,O:0,B:0},sats:[],dish:{},angry:0,lost:0,reviews:[],critic:null,blogger:null,treats:0,jtreats:0,ptreats:0},
-  rush:feat().rush,rushT0:dur*120/270,rushT1:dur*180/270,rushShown:false,weather:T.weather,event:T.event,coach:(S.day===1&&!S.tut)?0:-1,taskDone:{},lastSpawn:0,idleT:0,focus:0,focusLock:0,holdSlot:null,inc:planIncidents(dur),cw:{},thief:null,insp:null,chaser:null};
- R.sched=buildSchedule(dur);R.log=[];logNew=0;phase='service';try{cnDayStart()}catch(e){console.warn('[cn]',e)}/* rc7.6 */storyTick('daystart',{});/* v2.3 */paused=false;room=STAGE&&roomOpen(STAGE.room)?STAGE.room:'main';/* rc8: a scene staged before opening (the viewing next door) keeps its room */hideScreen();layoutAll();renderTickets();renderTasks();hud(true);logChip();stockChip();renderRoomTabs(true);
- if(S.reveal&&S.reveal.day<S.day){const P=PROJECTS.concat(KITCHEN_WORKS).find(x=>x.k===S.reveal.k);S.reveal=null;if(P){setTimeout(()=>{if(R&&phase==='service'){jillSay(P.k==='side'?'今天側廳也開放了。':P.k==='terrace'?'外面的桌子也可以坐。':P.k==='kext'?'廚房變大了，今天可以多做一點。':P.k==='cooler'?'冷藏庫今天開始用。':P.k==='walkin'?'今天開始，冷藏室走得進去了。':P.k==='kitchen2'?'今天兩台咖啡機一起開。':P.k==='pizzaoven'?'烤爐熱好了。':'出菜口變寬了。');logLine('',P.n+'：第一天。','e')}},2500)}}
- if(loungeLv()&&!loungeStaffed())setTimeout(()=>{if(R&&phase==='service')noteLine('Lounge 今晚沒有調酒師，不開放。')},1800);   /* v2.3 */
- banner("OPEN FOR DINNER",LV().n+' 開始營業','');audioInit();sfx.door();
+  rush:feat().rush,rushT0:dur*120/270,rushT1:dur*180/270,rushShown:false,weather:T.weather,event:T.event,coach:(S.day===1&&!S.tut&&!o.resume)?0:-1,taskDone:{},lastSpawn:0,idleT:0,focus:0,focusLock:0,holdSlot:null,inc:planIncidents(dur),cw:{},thief:null,insp:null,chaser:null};
+ R.sched=buildSchedule(dur);R.log=o.resume?[]:(S.preLog&&S.preLog.d===S.day?S.preLog.L.slice():[]);S.preLog=null;logNew=0;phase='service';if(!o.resume){try{cnDayStart()}catch(e){console.warn('[cn]',e)}/* rc7.6 */storyTick('daystart',{})}/* v2.3 */paused=false;room=STAGE&&roomOpen(STAGE.room)?STAGE.room:'main';/* rc8: a scene staged before opening (the viewing next door) keeps its room */hideScreen();layoutAll();renderTickets();renderTasks();hud(true);logChip();stockChip();renderRoomTabs(true);
+ if(!o.resume&&S.reveal&&S.reveal.day<S.day){const P=PROJECTS.concat(KITCHEN_WORKS).find(x=>x.k===S.reveal.k);S.reveal=null;if(P){speakLater(()=>{if(R&&phase==='service'){jillSay(P.k==='side'?'今天側廳也開放了。':P.k==='terrace'?'外面的桌子也可以坐。':P.k==='kext'?'廚房變大了，今天可以多做一點。':P.k==='cooler'?'冷藏庫今天開始用。':P.k==='walkin'?'今天開始，冷藏室走得進去了。':P.k==='kitchen2'?'今天兩台咖啡機一起開。':P.k==='pizzaoven'?'烤爐熱好了。':'出菜口變寬了。');logLine('',P.n+'：第一天。','e')}},2500)}}
+ if(!o.resume&&loungeLv()&&!loungeStaffed())speakLater(()=>{if(R&&phase==='service')noteLine('Lounge 今晚沒有調酒師，不開放。')},1800);   /* v2.3 */
+ if(!o.resume){banner("OPEN FOR DINNER",LV().n+' 開始營業','');sfx.door()}audioInit();
 }
 function buildSchedule(dur){const T=S.today,n=T.groups,out=[];
  const E=EVENTS[T.event]||{};const dens=x=>{let v=.55+.9*Math.exp(-Math.pow((x-.5)/.16,2));if(S.day>=4)v+=.9*Math.exp(-Math.pow((x-.55)/.08,2));if(x<.06)v*=.3;if(T.weather==='storm'&&x<.45)v*=.6;if(E.late&&x<.4)v*=.55;if(E.early&&x<.4)v*=1.5;return v};
@@ -1725,7 +1735,7 @@ function spawn(o){if(R.closed)return;if(o.pdWalk&&(!pdBuilt()||pdHeld()||pdOccup
  if(queued().length>=queueMax()||(!freeTableFor(g)&&!pickSpot(g))){if(o.story&&(o.tries||0)<3){/* v2.4: someone a story is waiting for comes back a little later rather than missing the day (the retry time is the schedule's own hash, not the day's random stream) */const dl=25+hash('v24rt|'+S.day+'|'+(o.name||o.reg)+'|'+(o.tries||0))%30;if(R.t+dl<R.dur*.85){const o2=Object.assign({},o,{t:R.t+dl,tries:(o.tries||0)+1});let j=R.si+1;while(j<R.sched.length&&R.sched[j].t<=o2.t)j++;R.sched.splice(j,0,o2);return}}if(g.reg==='dylan'){/* v2.2: the room is full — he has time, he comes back later (no queue jumping, no seat taken from anyone); after that, a look in from the door */const dl=rand(28,55);if((o.tries||0)<4&&R.t+dl<R.dur*.92){/* v2.2.1 K: a retry that would land after closing is not scheduled — it used to vanish at the door of a closed shop with no note */R.sched.splice(R.si+1,0,Object.assign({},o,{t:R.t+dl,tries:(o.tries||0)+1,back:true}));schedTailSort(R.si+1);return}R.st.lost+=size;dylanTrace({door:1,tries:(o.tries||0)});if((S.regulars.dylan||0)>=3&&!R.dylanDoor){R.dylanDoor=1;noteLine(S.dylan.stage>=3?'Dylan 在門口看了一眼，人太多，先回房間了。':'Dylan 在門口看了一眼，人太多，先走了。');S.dylan.doorDays=(S.dylan.doorDays||0)+1}return}if(g.reg){S.regMiss=S.regMiss||{};S.regMiss[g.reg]=S.day}R.st.lost+=size;R.lostRun=(R.lostRun||0)+1;if(!R.lostToastT||R.t-R.lostToastT>40){const n=R.lostRun;R.lostRun=0;R.lostToastT=R.t;toast(n>1?`${g.name} 和另外 ${n-1} 組看到客滿，失望地走了…`:`${g.name} 看到客滿，失望地走了…`)}return}
  if(o.fromStreet){g.x=o.fromStreet.x;g.y=o.fromStreet.y;g.walkIn=1}if(o.lgRetry&&o.lounge&&loungeOpenTonight()&&!loungeSeatFor(g)&&(o.tries||0)<5){/* rc8: Madame Lin came for The Lounge, not for dinner — a full bar, and she comes back a little later (the retry's hour is the schedule's own hash) */const dl=15+hash('lgrt|'+S.day+'|'+(o.tries||0))%20;if(R.t+dl<R.dur*.85){const o2=Object.assign({},o,{t:R.t+dl,tries:(o.tries||0)+1});let j=R.si+1;while(j<R.sched.length&&R.sched[j].t<=o2.t)j++;R.sched.splice(j,0,o2);return}}R.groups.push(g);R.lastSpawn=R.t;campaignSpawn(g,o);if(o.lounge){const ls=loungeSeatFor(g);if(ls){loungeSeat(g,ls,'direct');sfx.door();return}}/* (a Lounge guest who found no seat there queues like anyone) */requeue();if(!propOn('linbell'))sfx.door();/* rc8: with her bell on the door, the door itself rings as they come in (bellRing in stepTo) */if(g.reg==='dylan'){S.dylan.last=S.day;if(!S.dylan.first)S.dylan.first=S.day;if(o.back)g.back=true;dylanTrace({c:1,at:Math.round(R.t),back:o.back?1:0});if(S.dylan.stage>=3)logLine('',o.back?'Dylan 又回來了。':'Dylan 回來吃飯了。','e')}   /* rc7.3: he lives here (18:53 §16) — out and back, not 「來了」 */
  if(g.type==='vip'&&!R.vipSaid){R.vipSaid=1;toast('VIP 貴賓到了！消費高，要求也高。')}   /* rc8.5: the first of the evening (five an evening) */if(g.type==='family')R.st.families=(R.st.families||0)+1;
- if(g.type==='blogger'){toast('美食部落客走進來了，手機已經拿出來了。');setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,pickT(['先拍一張。','燈光不錯，照片會好看。','今天要吃什麼好呢。']))},900)}
+ if(g.type==='blogger'){toast('美食部落客走進來了，手機已經拿出來了。');speakLater(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,pickT(['先拍一張。','燈光不錯，照片會好看。','今天要吃什麼好呢。']))},900)}
  if(g.forSig&&!namedId(g)&&!g.reg&&canChat('forsig',150,4))later(()=>{if(R&&phase==='service'&&R.groups.includes(g)&&!g.gone)quote(g,pickH(forSigLines(),'fs|'+S.day+'|'+g.id))},700);   /* v2.4 rc5 (the player, 18:32 「一堆npc一直重複是為了Jill招牌菜來的」): one of tonight's guests who came for it may say so — different words, the dish by its name, not every one of them and never a named guest in someone else's words */
  coach(0)}
 /* what a guest who came for the signature says at the door (pickT keeps the same sentence from coming back soon) */
@@ -1745,7 +1755,7 @@ function updGroup(g,dt){
  if(g.state==='reading'){g.timer-=dt;if(g.timer<=0){g.state='order';sfx.bubble()}}
  if(g.state==='eat'){g.timer-=dt;if(g.timer<=0&&!storyLinger(g)){g.state='check';g.ate=1;sfx.bubble()}}}
 function seatGroup(g,t){t.group=g;t.dirty=false;g.table=t.i;if(t.pdr)pdSeated(g,t);if(g.reg==='dylan')dylanTrace({r:t.room||'main'});g.state='toTable';g.troom=t.room||'main';g.tx=t.x;g.ty=t.y+8;   /* v2.4 rc6: the long table — they come to its near end */g.pat=Math.min(1,g.pat+.1);requeue();sfx.tap();jillGreet(g,t);if(projOn('side')&&R.tables.some(q=>q.room==='side')&&R.tables.every(q=>q.room==='front'||q.group))ach('sideful');
- if(g.reg&&g.reg!=='dylan'){for(const id of regsOf(g)){const m=regMem(id);m.seats[t.i]=(m.seats[t.i]||0)+1}const v=S.regulars[g.reg]||0;/* v2.2 L: Jill's Card — every fifth visit, something on the house; visits are the only stamp */if((v+1)%5===0&&v>0&&!g.treat){g.treat='dessert';g.card=true}if(usualTable(g.reg)===t.i&&v>=4&&Math.random()<.25&&canChat('seat'+g.reg,300,3))setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,pickT(['老位子。','還是這裡好。','這個位子看得到貓。']))},500);
+ if(g.reg&&g.reg!=='dylan'){for(const id of regsOf(g)){const m=regMem(id);m.seats[t.i]=(m.seats[t.i]||0)+1}const v=S.regulars[g.reg]||0;/* v2.2 L: Jill's Card — every fifth visit, something on the house; visits are the only stamp */if((v+1)%5===0&&v>0&&!g.treat){g.treat='dessert';g.card=true}if(usualTable(g.reg)===t.i&&v>=4&&Math.random()<.25&&canChat('seat'+g.reg,300,3))speakLater(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,pickT(['老位子。','還是這裡好。','這個位子看得到貓。']))},500);
   const ud=usualDish(g.reg);if(ud&&v>=4&&!g.moment&&Math.random()<.5)g.usual=ud;regSeatMoment(g,t);regMeet(g);regularsNoticeDylan(g)}
  storySeatHook(g,t);storyCopresence(g);storyTick('seat',{g,t});   /* v2.3 */
  if(!g.reg)seatLine(g);coach(1)}
@@ -1781,17 +1791,17 @@ const NOVELTY=[
  {k:'season',d:()=>seasonOn()?S.seasonDay:null,get away(){return{spring:['桌上的櫻花好可愛。','有櫻花耶。'],summer:['桌上有向日葵耶。','好有夏天的感覺。'],autumn:['桌上有楓葉。','秋天了。'],winter:['松枝的味道好香。','桌上那個紅色的小果子是真的嗎？']}[seasonOn()]||[]}}];
 function noveltyPools(t){const out=[];const rm=t?(t.room||'main'):'main';for(const T of NOVELTY){let d=null;try{d=T.d()}catch(e){d=null}if(!d)continue;const a=S.day-d;if(a<0||a>6)continue;const lines=T.in===rm&&T.here?T.here:T.away;if(!lines||!lines.length)continue;out.push({k:'nov:'+T.k,w:a<=1?1.2:a<=3?.7:.35,lines})}return out}
 function seatLine(g){const W=R.weather;const pools=[];const t=g.table!=null?R.tables[g.table]:null;if(t&&t.room==='side')pools.push(['side',(S.newRooms&&S.day-(S.newRooms.side||0)<=3)?.9:.35]);if(t&&t.room==='front')pools.push(['front',.6]);if(g.ret&&S.newRooms&&Object.values(S.newRooms).some(d=>d&&S.day-d<=2))pools.push(['grew',.7]);if(g.ret)pools.push(['ret',.5]);if(SEAT_LINES[W])pools.push([W,.45]);const nov=noveltyPools(t);for(const N of nov)pools.push([N.k,N.w]);if(queued().length>=3)pools.push(['crowd',.3]);pools.push(['any',.35]);
- const k=wpick(pools,p=>p[1])[0];const N=nov.find(x=>x.k===k);const p=N?.45:k==='ret'?.4:k==='any'?.14:.3;if(Math.random()<p&&canChat('seat',18,4))quote(g,pickT(N?N.lines:k==='any'&&namedId(g)?SEAT_KNOWN:SEAT_LINES[k]),N?{nov:1}:undefined);
+ const k=wpick(pools,p=>p[1])[0];const N=nov.find(x=>x.k===k);const p=N?.45:k==='ret'?.4:k==='any'?.14:.3;if(Math.random()<p&&canChat('seat',18,4))quote(g,pickT(N?N.lines:k==='any'&&namedId(g)&&(namedHist(namedId(g)).v||0)>0?SEAT_KNOWN:SEAT_LINES[k]),N?{nov:1}:undefined);
  else if(g.ret&&!g.reg&&Math.random()<.3&&chatOK()&&canChat('jillret',60,4)){const J=R.jill;if(!J.cur&&!J.q.length&&!J.rest){chatSaid();jillSay(pickT(['又來了，歡迎。','歡迎回來。','今天想吃什麼？']))}}}
 /* now and then someone in the room says something that fits: about the food at the next table, a new dish, a cat,
    the wait; Jill asks a table how it was when she has a moment. One line at a time, with long gaps. */
 function ambientTick(dt){if(!R||R.closing!=null)return;R.ambT=(R.ambT||0)+dt;if(R.ambT<1.2)return;R.ambT=0;const c=[];const add=(k,w,f)=>c.push({k,w,f});const J=R.jill;const free=!J.cur&&!J.q.length&&!J.rest&&!J.visit;
  for(const g of R.groups){if(g.table==null||g.reg==='dylan')continue;const t=R.tables[g.table];
-  if(g.state==='reading'&&!g.reg){const nb=R.groups.find(o=>o!==g&&o.table!=null&&o.state==='eat'&&o.ticket&&Math.hypot(R.tables[o.table].x-t.x,R.tables[o.table].y-t.y)<110);
+  if(g.state==='reading'&&anonG(g)){const nb=R.groups.find(o=>o!==g&&o.table!=null&&o.state==='eat'&&o.ticket&&Math.hypot(R.tables[o.table].x-t.x,R.tables[o.table].y-t.y)<110);
    if(nb&&!g.askedNb)add('nexttable',1,()=>{g.askedNb=1;const it=nb.ticket.items.find(i=>i.st==='served');if(!it)return;quote(g,pickT(['隔壁桌那個是什麼？','他們那桌吃的看起來不錯。','那個好像很好吃。']));if(Math.random()<.5)g.wantDish=it.d});
    const nd=menuList().find(d=>S.menuSince&&S.menuSince[d]>=S.day-2&&stationOk(d));if(nd&&!g.askedNew)add('newdish',.8,()=>{g.askedNew=1;quote(g,pickT([`${dishName(nd)}是新的？`,'菜單上有新東西。','這道以前沒看過。']));if(Math.random()<.45)g.wantDish=nd})}
-  if(['reading','wait'].includes(g.state)&&!g.askedCat&&!g.reg){const k=CATS&&CATS.find(k=>!k.hidden&&Math.hypot(k.x-t.x,k.y-t.y)<90);if(k)add('askcat',.9,()=>{g.askedCat=1;catEv(g,'ask',k);const asked=quote(g,pickT(['這隻貓叫什麼名字？','牠是店裡的貓嗎？','可以摸嗎？','牠都不怕人耶。','那隻貓好可愛。','牠平常都睡哪裡？']));if(asked&&free&&J.calm>1)setTimeout(()=>{if(R&&phase==='service')jillSay(pickT([`${catName(k.def)}。`,`叫${catName(k.def)}，不怕人。`,`${catName(k.def)}。牠自己會過去。`]))},1300)})}
-  if(g.state==='eat'&&!g.checked&&g.ticket&&free&&Math.hypot(J.x-t.x,J.y-t.y)<70&&chatOK())add('check',1.2,()=>{g.checked=1;chatSaid();jillSay(pickT(['還可以嗎？','味道還好嗎？','還合口味嗎？']));const it=g.ticket.items.find(i=>i.st==='served');const q=it&&it.q;setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,q==='P'?pick(['很好吃。','太好吃了。','這個我喜歡。','好吃，真的。','下次還要點這個。','比想像中還好吃。','剛剛好，謝謝。']):q==='O'?pick(['還可以。','有一點鹹。','普通。','嗯……還好。','跟上次不太一樣。']):q==='B'?pick(['有點焦…','下次再來試試。','今天好像有點焦。']):pick(['不錯。','好吃。','嗯，可以。','還不錯喔。','味道很好。','可以，謝謝。']),{keep:1})},1400)});   /* the answer belongs to her question's turn */
+  if(['reading','wait'].includes(g.state)&&!g.askedCat&&anonG(g)){const k=CATS&&CATS.find(k=>!k.hidden&&Math.hypot(k.x-t.x,k.y-t.y)<90);if(k)add('askcat',.9,()=>{g.askedCat=1;catEv(g,'ask',k);const asked=quote(g,pickT(['這隻貓叫什麼名字？','牠是店裡的貓嗎？','可以摸嗎？','牠都不怕人耶。','那隻貓好可愛。','牠平常都睡哪裡？']));if(asked&&free&&J.calm>1)speakLater(()=>{if(R&&phase==='service')jillSay(pickT([`${catName(k.def)}。`,`叫${catName(k.def)}，不怕人。`,`${catName(k.def)}。牠自己會過去。`]))},1300)})}
+  if(g.state==='eat'&&!g.checked&&g.ticket&&free&&Math.hypot(J.x-t.x,J.y-t.y)<70&&chatOK())add('check',1.2,()=>{g.checked=1;chatSaid();talk(()=>{jillSay(pickT(['還可以嗎？','味道還好嗎？','還合口味嗎？']));const it=g.ticket.items.find(i=>i.st==='served'&&!isGlass(i.d))||g.ticket.items.find(i=>i.st==='served');const q=it&&it.q;speakLater(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,q==='P'?pick(['很好吃。','太好吃了。','這個我喜歡。','好吃，真的。','下次還要點這個。','比想像中還好吃。','剛剛好，謝謝。']):q==='O'?pick(['還可以。','有一點鹹。','普通。','嗯……還好。','跟上次不太一樣。']):q==='B'?pick(['有點焦…','下次再來試試。','今天好像有點焦。']):pick(['不錯。','好吃。','嗯，可以。','還不錯喔。','味道很好。','可以，謝謝。']),{keep:1})},1400)})});   /* the answer belongs to her question's turn (one exchange: the floor) */
   if(g.reg==='chen'&&!g.saidTora){const T2=catBy('tora');if(T2&&!T2.hidden&&familiar(g)&&Math.hypot(T2.x-t.x,T2.y-t.y)<90)add('chentora',1,()=>{g.saidTora=1;quote(g,pickT(['那隻虎斑今天沒躲我。','虎斑那隻，以前看到我就走。']),{keep:1})})}
   if(g.reg==='koba'&&!g.saidBan){const H=catBy('ban');if(H&&!H.hidden&&Math.hypot(H.x-t.x,H.y-t.y)<60)add('kobaban',.8,()=>{g.saidBan=1;quote(g,'這隻貓每次都來看我吃飯。',{keep:1})})}}
  if(!c.length)return;const pk=wpick(c,o=>o.w);const gap={nexttable:70,newdish:90,askcat:80,check:50,chentora:400,kobaban:400}[pk.k]||60;if(canChat(pk.k,gap,7))pk.f()}
@@ -1802,15 +1812,18 @@ function freeTableFor(g){const pdOK=pdTableFor(g);const ts=R.tables.filter(t=>!t
  if(g.reg==='dylan'&&ts.length){/* a seat that sees Jill at the pass but is not in her way: the free dining-room table farthest from the kitchen; now and then the side room, once there is one */const sd=ts.filter(t=>t.room==='side');if(sd.length&&(g.wantSide||(g.wantSide==null&&(g.wantSide=Math.random()<.35))))return sd[0];const m=ts.filter(t=>t.room==='main');return (m.length?m:ts).slice().sort((a,b)=>(a.seats-b.seats)||(Math.hypot(b.x-PASS.x,b.y-PASS.y)-Math.hypot(a.x-PASS.x,a.y-PASS.y)))[0]}
  if(ts.length){/* the dining room fills first; outdoor tables only in fair weather */const wx=R.weather;const ok=ts.filter(t=>!t.out||(wx!=='rain'&&wx!=='storm'));const pool=ok.length?ok:ts.filter(t=>!t.out);if(!pool.length)return null;const m=pool.filter(t=>t.room==='main');if(m.length&&Math.random()<.7)return m[0];return pool[0]}
  return ts[0]}
-function leaveGroup(g,mood){const t=g.table!=null?R.tables[g.table]:null;if(t&&t.group===g)t.group=null;g.state='leave';g.mood=mood||'ok';sendOut(g);
+function leaveGroup(g,mood){if(R){R.leftAt=R.leftAt||{};for(const id of storyIdsOf(g))R.leftAt[id]={t:R.t,closed:!!R.closed,together:!!g.leaveWith}}const t=g.table!=null?R.tables[g.table]:null;if(t&&t.group===g)t.group=null;g.state='leave';g.mood=mood||'ok';sendOut(g);
  if(g.ticket){const tk=g.ticket;for(const s of R.slots)if(s.job&&s.job.tk===tk)s.job=null;for(const it of tk.items)if(it.st==='pending')S.stock[it.d]=(S.stock[it.d]||0)+1;R.tickets=R.tickets.filter(x=>x!==tk);R.jill.carry=R.jill.carry.filter(c=>c.tk!==tk);R.tv++;g.ticket=null}}
-function angryLeave(g){if(g.state==='queue'||g.state==='arrive'){R.st.lost+=g.size;toast(`${g.name} 等太久，離開了`);g.state='leave';sendOut(g);g.mood='sad';requeue();if(Math.random()<.35)addReview(g,2,pickT(['在門口的長椅上等到跟隔壁的陌生人變朋友。','等到腳痠，下次早點來。','客滿，沒等到位子。']),{wait:true,left:true});return}
+function angryLeave(g){if(g.state==='queue'||g.state==='arrive'){R.st.lost+=g.size;toast(`${g.name} 等太久，離開了`);g.state='leave';sendOut(g);g.mood='sad';requeue();if(Math.random()<.35)addReview(g,2,pickT(['在門口的長椅上等到跟隔壁的陌生人變朋友。','等到腳痠，下次早點來。','客滿，沒等到位子。'].filter(x=>extOn('bench')||!x.includes('長椅'))),{wait:true,left:true});return}
  const t=R.tables[g.table];const served=g.ticket?g.ticket.items.some(i=>i.st==='served'):false;R.st.angry++;if(R.combo>=3)toast('COMBO 中斷');R.combo=0;R.streak=0;sfx.angry();
  addFloat(t.x,t.y-50,'生氣離開','#E0654A',1,t.room);toast(`${g.name} 生氣地離開了…`);if(!g.counted)addReview(g,1,null,{wait:true,left:true});/* v2.3: one review per visit */leaveGroup(g,'angry');if(served){t.dirty=true}}
 /* ---- the day's talk: every line anyone says is kept, so a bubble missed during the rush can be read later ---- */
 let logNew=0;
-function dayLog(){if(R)return R.log=R.log||[];S.dayLog=S.dayLog||[];return S.dayLog}
-function logLine(who,txt,kind){const L=dayLog();const last=L[L.length-1];if(last&&last.w===who&&last.t===txt)return;/* the same line twice in a row is one line */L.push({c:R?clockStr():'打烊後',w:who,t:txt,k:kind||'g'});if(L.length>900)L.splice(0,L.length-900);try{storyCapLine(who,txt,kind||'g')}catch(e){}logNew++;logChip();if(R&&!$('#logPanel').hidden)renderLog()}   /* v2.3 QA: the whole day is kept (a heavy service is 300–600 lines) */
+/* audit W3-13 (2026-10-06): outside a service the lines belong to a day too — after closing to that day's log (打烊後), and
+   once the next day has begun (the morning's line at the prep screen) to that new day, kept as 開店前 until its service
+   starts; it used to be filed in the day before, stamped 打烊後 */
+function dayLog(){if(R)return R.log=R.log||[];if(S.dayLogDay!=null&&S.day>S.dayLogDay){const P=S.preLog=S.preLog&&S.preLog.d===S.day?S.preLog:{d:S.day,L:[]};return P.L}S.dayLog=S.dayLog||[];return S.dayLog}
+function logLine(who,txt,kind){const L=dayLog();const last=L[L.length-1];if(last&&last.w===who&&last.t===txt)return;/* the same line twice in a row is one line */L.push({c:R?clockStr():S.dayLogDay!=null&&S.day>S.dayLogDay?'開店前':'打烊後',w:who,t:txt,k:kind||'g'});if(L.length>900)L.splice(0,L.length-900);try{storyCapLine(who,txt,kind||'g')}catch(e){}logNew++;logChip();if(R&&!$('#logPanel').hidden)renderLog()}   /* v2.3 QA: the whole day is kept (a heavy service is 300–600 lines) */
 function logChip(){const ch=$('#logChip');if(!ch)return;const show=phase==='service'&&!!R;ch.hidden=!show;if(show)$('#logN').textContent=logNew>99?'99+':String(logNew)}
 /* a global pace for ambient talk: one line at a time, and each kind of remark keeps its own distance */
 function canChat(key,gap,min){if(!R)return false;R.cds=R.cds||{};const now=R.t;if(now-(R.cds._any||-99)<(min==null?7:min))return false;if(now-(R.cds[key]||-999)<gap)return false;R.cds[key]=now;R.cds._any=now;return true}
@@ -1820,7 +1833,7 @@ function canChat(key,gap,min){if(!R)return false;R.cds=R.cds||{};const now=R.t;i
 /* v2.4 rc6 (the player, 09:39): what guests say in passing is said once a day at most — the same words from a second
    guest, or from the same one again, are left unsaid (a story's line or a regular's own, given with who, never is).
    Returns whether the line was said, for whoever answers it. */
-function quote(g,txt,o){if(!txt)return false;if(R&&!(o&&(o.who||o.keep))){R.saidT=R.saidT||{};if(R.saidT[txt]&&!SCX)return false;const small=!g.reg&&!namedId(g)&&!(o&&o.nov);if(small&&!chatOK(txt))return false;R.saidT[txt]=1;if(small)chatSaid(txt)}quote0(g,txt,o);return true}   /* rc8.5: the budget is for the guests with no name and no story (Dylan, the regulars and the named are people); what is new and what a campaign brought (o.nov) are news, not small talk */
+function quote(g,txt,o){if(!txt)return false;if(R&&!(o&&(o.who||o.keep))){R.saidT=R.saidT||{};if(R.saidT[txt]&&!SCX)return false;const small=anonG(g)&&!(o&&o.nov);if(small&&!chatOK(txt))return false;R.saidT[txt]=1;if(small)chatSaid(txt)}quote0(g,txt,o);return true}   /* rc8.5: the budget is for the guests with no name and no story (Dylan, the regulars and the named are people); what is new and what a campaign brought (o.nov) are news, not small talk */
 /* rc8.5 (the player, 2026-10-04: 「跳出的對話有些太重複沒有意義 又太頻繁 一些不重要的npc沒有劇情的對話可以少一點」; measured on the
    player's Day 83 save: ~40 lines of passing talk an evening, docs/evidence/v24_rc8_5/lines/): the restaurant's own small talk —
    what a guest says in passing, a waiter's 「請慢用」, Jill asking a table how it was — shares one budget an evening: one at a
@@ -1828,10 +1841,14 @@ function quote(g,txt,o){if(!txt)return false;if(R&&!(o&&(o.who||o.keep))){R.said
    lines (SCX), Dylan's, a regular's or a named guest's, what is new in the restaurant and what the player's campaign brought
    in, and what the player needs to know are not part of it. Not said is not logged. */
 const CHAT_GAP=.05,CHAT_MAX=10,CHAT_DAYS=7;
-function chatOK(txt){if(!R||phase!=='service'||SCX)return true;if((R.chatN||0)>=CHAT_MAX)return false;if(R.chatAt!=null&&R.t-R.chatAt<R.dur*CHAT_GAP)return false;if(txt){const M=S.chatSeen||{};if(M[txt]!=null&&S.day-M[txt]<CHAT_DAYS)return false}return true}
+function chatOK(txt){if(!R||phase!=='service'||SCX)return true;if(floorBusy()||TALK)return false;   /* small talk keeps out of an exchange (the floor) */if((R.chatN||0)>=CHAT_MAX)return false;if(R.chatAt!=null&&R.t-R.chatAt<R.dur*CHAT_GAP)return false;if(txt){const M=S.chatSeen||{};if(M[txt]!=null&&S.day-M[txt]<CHAT_DAYS)return false}return true}
+/* audit N14 (2026-10-06): a regular's everyday words are not said again within the week (CHAT_DAYS) — the rule lived in one
+   place (the order), so 小林's 「今天加班，還好還開著。」 came four times in seven days through his evening's moment */
+function regSaid(txt){const M=S.chatSeen||{};return M[txt]!=null&&S.day-M[txt]<CHAT_DAYS}
+function regSay(g,txt,o){if(!txt||regSaid(txt))return false;const r=quote(g,txt,o);if(r!==false)(S.chatSeen=S.chatSeen||{})[txt]=S.day;return r}
 function chatSaid(txt){if(!R||phase!=='service'||SCX)return;R.chatN=(R.chatN||0)+1;R.chatAt=R.t;if(txt){const M=S.chatSeen=S.chatSeen||{};M[txt]=S.day;for(const k in M)if(S.day-M[k]>=CHAT_DAYS)delete M[k]}}
 function staffBark(m,txt,g){if(!chatOK(txt))return;chatSaid(txt);staffSay(m,txt,undefined,g)}
-function quote0(g,txt,o){o=o||{};const who=g.reg&&g.reg!=='dylan'?speakerOf(g,o):g.reg;const name=who&&REG_BY[who]?REG_BY[who].n:(namedId(g)||g.name);if(shGrab({who:who||(namedId(g)?'named:'+namedId(g):''),name,text:txt,tone:o.tone}))return;logLine(name,txt,g.reg==='dylan'?'d':'g');
+function quote0(g,txt,o){o=o||{};txt=cjkSp(txt);   /* audit N16: 「吃 Jill's…」, not 「吃Jill's」 */const who=g.reg&&g.reg!=='dylan'?speakerOf(g,o):g.reg;const name=who&&REG_BY[who]?REG_BY[who].n:(namedId(g)||g.name);if(shGrab({who:who||(namedId(g)?'named:'+namedId(g):''),name,text:txt,tone:o.tone}))return;logLine(name,txt,g.reg==='dylan'?'d':'g');
  const sk=who&&regsOf(g).includes(who)?regsOf(g).indexOf(who):0;try{idSpeak(g,sk)}catch(e){}   /* v2.4 rc6 (07:09): who is speaking, for a moment, if they are in the room you look at */
  if(g.reg==='dylan'){g.tagT=R?R.t+2.6:0;if(portraitLine('dylan',txt,{tone:dylanTone(txt),with:'jill',withTone:'default',g,k:0}))return}
  else if(who){const other=regsOf(g).find(x=>x!==who);if(portraitLine(who,txt,{with:o.with||other||null,tone:o.tone,g,k:sk}))return}else if(namedId(g)&&portraitLine('named:'+namedId(g),txt,{with:o.with||null,tone:o.tone,g,k:0}))return;toast(`<b>${namedId(g)||name}</b>：「${txt}」`,'q',{g,k:sk})}
@@ -1858,14 +1875,15 @@ function shFire(cx,T){const i=cx.timers.indexOf(T);if(i<0)return;cx.timers.splic
 function shRun(cx,f){const prev=SCX;SCX=cx;try{return f()}catch(e){console.warn('[story]',cx.k,e)}finally{SCX=prev}}
 function shFlushOne(cx){if(!cx.timers.length)return false;let T=cx.timers[0];for(const x of cx.timers)if(x.due<T.due)T=x;window.clearTimeout(T.id);shFire(cx,T);return true}
 function shCtx(k,authored,g){return{k,authored:!!authored,g:g||null,q:[],timers:[],rec:null,recK:null,open:false}}
-function shStart(k,authored,g,fn){const cx=shCtx(k,authored,g);shRun(cx,fn);if(cx.authored&&shOn())while(!cx.q.length&&shFlushOne(cx)){}return cx}   /* the beat begins now, not when its first timer would have come */
+function shStart(k,authored,g,fn,now){const cx=shCtx(k,authored,g);if(!now&&R&&phase==='service'&&!window.__fastSay&&floorBusy()&&!TALK){svcAt(R.floorUntil-R.t+.05,()=>shStartNow(cx,fn));return cx}return shStartNow(cx,fn,now)}   /* the floor (audit N04): a beat that comes due while an exchange is being said waits for its last line — a panel never cuts one in half */
+function shStartNow(cx,fn,now){if(cx.authored&&shOn()){shRun(cx,fn);while(!cx.q.length&&shFlushOne(cx)){}return cx}talk(()=>shRun(cx,fn),now);return cx}   /* the beat begins now, not when its first timer would have come; a beat in the room is one exchange */
 function shOn(){return !!S&&phase!=='title'&&(!window.__noScenes||!!window.__holds)}
 /* what an authored beat says goes to its panel (true: the caller shows nothing in the room); every beat's own lines,
    held or not, are what its story page keeps */
 function shGrab(L){const cx=SCX;if(!cx)return false;shRec(cx,L);if(!cx.authored||!shOn())return false;cx.q.push(L);shShow(cx);return true}
-function shRec(cx,L){const k=cx.rec||(BEAT_LINE[cx.k]?cx.k:null);if(!k||!L||!L.text)return;const st=story();st.beatLines=st.beatLines||{};
+function shRec(cx,L,whole){const k=cx.rec||(BEAT_LINE[cx.k]?cx.k:null);if(!k||!L||!L.text)return;const st=story();st.beatLines=st.beatLines||{};
  if(cx.recK!==k){cx.recK=k;cx.recOn=!(st.beatLines[k]&&st.beatLines[k].length);if(cx.recOn)st.beatLines[k]=[]}   /* the first time is the one kept */
- const arr=st.beatLines[k];if(cx.recOn&&arr&&arr.length<(cx.cap||12))arr.push(L.name?{w:L.name,t:L.text}:{t:L.text})}   /* rc7: a tasting night's page holds its start and its end (cap 20) */
+ const arr=st.beatLines[k];if(cx.recOn&&arr&&(whole||arr.length<(cx.cap||12)))arr.push(L.name?{w:L.name,t:L.text}:{t:L.text})}   /* whole (audit N08): a scene's own written lines are all kept — the cap is for the chatter its timers bring (《那面牆》's mediation stopped at 「金額的部分呢？」, line 12 of 21) */   /* rc7: a tasting night's page holds its start and its end (cap 20) */
 function shTitle(cx){const L=BEAT_LINE[cx.rec||cx.k];try{return L?lineWho(L):''}catch(e){return''}}
 function shShow(cx){if(DLG&&DLG.sh===cx){if(DLG.wait){DLG.wait=false;DLG.i++;DLG.shownAt=performance.now();dlgShow()}else{const nx=document.querySelector('#dlg .dlg-next');if(nx&&DLG.i<DLG.lines.length-1)nx.textContent='點一下繼續 ›'}return}   /* rc7: a line arriving under the one on screen — the button says there is more */
  if(DLG||cx.open){if(!SH_WAIT.includes(cx))SH_WAIT.push(cx);return}
@@ -1877,7 +1895,25 @@ function shShow(cx){if(DLG&&DLG.sh===cx){if(DLG.wait){DLG.wait=false;DLG.i++;DLG
  el.className='';forceDraw=true;dlgShow()}
 function shClose(){const d=DLG;if(!d||!d.sh)return;const cx=d.sh;DLG=null;cx.open=false;cx.q=[];const el=$('#dlg');el.hidden=true;el.className='';
  if(R&&phase==='service'&&cx.room0&&room!==cx.room0&&roomOpen(cx.room0)){room=cx.room0;renderRoomTabs(true)}forceDraw=true;
- shNextWaiting()}
+ shNextSoon()}
+/* audit N10 (2026-10-06): the next story waiting for the panel comes after a moment of the room — two stories read as one
+   panel when the second opened in the same tap that closed the first (《多的。》's last line, then 「樓上真的一直都空著喔？」) */
+function shNextSoon(){if(!SH_WAIT.length){shNextWaiting();return}if(R&&phase==='service')svcAt(1,()=>shNextWaiting());else window.setTimeout(()=>shNextWaiting(),900)}
+/* audit WS9-01／W3-06 (2026-10-06): the app goes to the background (or Safari drops the tab) while a story's panel is open.
+   A checkpoint saved then keeps the story instead of losing its end: what the beat still had to say comes now (its own
+   timers, as a tap would bring them), so every line reaches its page; what an unread line was to do when passed is done
+   (a prop hung, a fact set); and the lines not yet read go into the checkpoint, to be read when the day is continued
+   (shReplay, in resumeCheckpoint). Before this the beat was already marked as happened, its page kept only the lines
+   read, and the rest were never told. */
+function shPersist(){const d=DLG;if(!d||!d.lines)return null;
+ if(d.sh){const cx=d.sh;let n=0;while(shFlushOne(cx)&&n++<200){}
+  for(let i=d.i;i<d.lines.length;i++){const L=d.lines[i];if(L&&L.after){const f=L.after;L.after=null;shRun(cx,f);n=0;while(shFlushOne(cx)&&n++<200){}}}}
+ else if(d.onDone){const f=d.onDone;d.onDone=null;try{f()}catch(e){console.warn('[story]',e)}}
+ const plain=L=>{const o={};for(const k of['who','name','text','tone','illus','photo','cap'])if(L[k]!=null&&typeof L[k]!=='function')o[k]=L[k];return o};
+ const lines=d.lines.slice(d.i).filter(L=>L&&L.text).map(plain);
+ return lines.length?{k:d.sh?d.sh.k:null,illus:d.illus||null,lines}:null}
+function shReplay(P){if(!P||!P.lines||!P.lines.length)return false;const cx=shCtx(P.k||'replay',true,null);cx.replay=1;cx.q=P.lines.map(L=>Object.assign({},L));
+ if(P.illus&&cx.q[0].illus===undefined)cx.q[0].illus=P.illus;shShow(cx);return true}
 function shNextWaiting(){if(DLG)return;const nx=SH_WAIT.shift();if(!nx){if(storyNoteShow.pending){const n=storyNoteShow.pending;storyNoteShow.pending=null;window.setTimeout(()=>storyNoteShow(n),300)}return}
  if(nx.scene){scene(...nx.scene);return}if(nx.q.length)shShow(nx);else shNextWaiting()}
 /* Which stories hold the restaurant (the player's 11:06 「Sophie和Mia的暫停 漏水案的暫停 會觸發二樓的事件暫停 戀愛事件暫停
@@ -1926,14 +1962,19 @@ function loveIdsOf(g){const out=[];for(const id of(g.reg&&g.reg!=='dylan'?regsOf
 function loveWineOf(g,list){const id=loveIdOf(g);if(!id||id==='品酒師 Ken'||id==='Monsieur 杜')return null;const w=LOVES[id].g;return w&&DISH(w)&&DISH(w).wine&&list.includes(w)?w:null}
 /* at the order: the first time (or now and then after) they say so; when it is not on, sometimes they say that */
 function loveDishName(d){return dishName(d)||(DISHES[d]&&DISHES[d].n)||''}   /* '' for the signature before there is one */
+/* audit N02 (2026-10-06): what a guest can really order tonight — on today's menu (the dish or its special version), its station
+   in the kitchen, and from Day 3 (the fridge is the player's) some of it left. 「今天沒有○○」 is said only when this is false:
+   it looked at the ticket alone, so a guest who did not happen to order her favourite (or sat in the Lounge, whose list
+   is the bar's) said it was not on while it was on the menu and in the fridge (Sophie's duck, Mia's tiramisu, 小林's burger). */
+function dishOnOffer(d){const b=baseOf(d);return menuList().some(x=>(x===b||baseOf(x)===b)&&stationOk(x)&&(jillStocks()||(S.stock[x]||0)>0))}
 function loveOrdered(g,tk){const ids=loveIdsOf(g);if(!ids.length)return false;const has=x=>tk.items.some(i=>i.d===x||baseOf(i.d)===x);const who=id=>REG_BY[id]?{who:id}:undefined;
  /* rc8.5 (2026-10-04, three regulars in one evening each saying it): a favourite already known is said once an evening at most */const once=()=>{if(!R)return true;if(R.loveSaid===S.day)return false;R.loveSaid=S.day;return true};
  for(const id of ids){const L=LOVES[id];if(has(L.d)){const first=loveLearn(id,'d');if(first||(Math.random()<.3&&once())){quote(g,pickT(LOVE_HIT).replace('{d}',dishName(L.d)),who(id));return true}}}
- for(const id of ids){const L=LOVES[id];if(has(L.d)||(REG_BY[id]&&(S.regulars[id]||0)<2)||!loveDishName(L.d))continue;const M=S.loveMiss=S.loveMiss||{};if(M[id]!=null&&S.day-M[id]<LOVE_MISS_GAP)continue;/* rc8.3 (the player: 「Sophie連續兩天說沒有香煎鴨胸很白癡」): once, then not for a while */if(Math.random()<.35&&once()){const have=S.unlocked.includes(baseOf(L.d))||(L.d==='signature'&&S.signature);quote(g,pickT(have?LOVE_MISS:LOVE_WISH).replace('{d}',loveDishName(L.d)),who(id));loveLearn(id,'d');M[id]=S.day;return true}}   /* rc7.4: a favourite with no name yet (Ken's: Jill's signature, before there is one) is not missed aloud */   /* the dish matters more for the menu than the glass */
+ if(!tk.lounge)for(const id of ids){const L=LOVES[id];if(has(L.d)||dishOnOffer(L.d)||(REG_BY[id]&&(S.regulars[id]||0)<2)||!loveDishName(L.d))continue;const M=S.loveMiss=S.loveMiss||{};if(M[id]!=null&&S.day-M[id]<LOVE_MISS_GAP)continue;/* rc8.3 (the player: 「Sophie連續兩天說沒有香煎鴨胸很白癡」): once, then not for a while */if(Math.random()<.35&&once()){const have=S.unlocked.includes(baseOf(L.d))||(L.d==='signature'&&S.signature);quote(g,pickT(have?LOVE_MISS:LOVE_WISH).replace('{d}',loveDishName(L.d)),who(id));loveLearn(id,'d');M[id]=S.day;return true}}   /* rc7.4: a favourite with no name yet (Ken's: Jill's signature, before there is one) is not missed aloud */   /* the dish matters more for the menu than the glass */
  for(const id of ids){const L=LOVES[id];if(L.g&&has(L.g)&&loveLearn(id,'g')){quote(g,pickT(LOVE_HIT_G).replace('{g}',dishName(L.g)),who(id));return true}}
  return false}
 function orderItems(g,est){/* v2.2: a sold-out dish is not on offer (est = the demand estimate, which ignores the fridge; on the two
-   auto-provisioning days the tutorial still lets Jill order a missing unit herself, so nothing is filtered there) */const ms0=menuList().filter(d=>stationOk(d)&&!(DISHES[d]&&DISHES[d].bar));const ms=est||S.day<=2?ms0:ms0.filter(d=>(S.stock[d]||0)>0);const T=TYPES[g.type];const W=R?R.weather:(S.today?S.today.weather:'sun');
+   auto-provisioning days the tutorial still lets Jill order a missing unit herself, so nothing is filtered there) */const ms0=menuList().filter(d=>stationOk(d)&&!(DISHES[d]&&DISHES[d].bar));const ms=est||jillStocks()?ms0:ms0.filter(d=>(S.stock[d]||0)>0);const T=TYPES[g.type];const W=R?R.weather:(S.today?S.today.weather:'sun');
  const wf=d=>demandW(d,T);const reco=recoDish();
  const foods=()=>ms.filter(d=>DISH(d).cat!=='drink'&&DISH(d).cat!=='dessert');const drinks=()=>ms.filter(d=>DISH(d).cat==='drink');const des=()=>ms.filter(d=>DISH(d).cat==='dessert');
  const items=[];const cap=g.size===1?3:g.size===2?4:g.size>=5?Math.min(12,g.size+2):5;   /* v2.4 rc6: a party of five to ten (the Private Dining Room) orders as people do — a dish each, a drink or a dessert here and there — up to twelve on one ticket */const reg=g.reg?REG_BY[g.reg]:null;
@@ -1958,22 +1999,22 @@ function orderItems(g,est){/* v2.2: a sold-out dish is not on offer (est = the d
   const hasMain=!!d&&DISH(d).cat==='main';const pd=(g.reg==='dylan'?.7:(T.pD||.35))*(W==='hot'?1.5:W==='rain'||W==='storm'?1.2:1)*(reco&&DISH(reco).cat==='drink'?1.25:1)*(hasMain&&setFor('drink')?1.6:1);const dr=drinks();{const lg=loveIdOf(g,k)&&LOVES[loveIdOf(g,k)].g;const hasL=!!lg&&dr.includes(lg);if(dr.length&&(Math.random()<(hasL?Math.min(.9,pd*1.6):pd)||!d))items.push(hasL?lg:wpick(dr,wf))}
   const ds=des();if(ds.length&&Math.random()<(T.pS||.2)*(reco&&DISH(reco).cat==='dessert'?1.4:1)*(g.celebrate?2.2:1)*(g.broke||g.rushed||g.quick?.2:1)*(hasMain&&setFor('dessert')?1.7:1))items.push((g.forSig||g.wantSig)&&ds.includes('sigdessert')&&Math.random()<.7?'sigdessert':wpick(ds,wf))}
 {const lw=(typeof dinWineTonight==='function')&&dinWineTonight()&&!est&&wineList().length&&items.some(d=>DISH(d).cat==='main');const pw=({couple:.35,gourmet:.4,vip:.45,office:.18,regular:.22,family:.05,student:.08}[g.type]||.15)*((()=>{const c=campaign();return c&&c.k==='wine'?1.7:1})())*wineFloorBoost();const nn=namedId(g);const pr=lw&&!nn&&wineDevPoured()?winePairFor(g,items):null;/* v2.4 rc6 (11:49) */const lgW=lw?loveWineOf(g,wineList()):null;/* rc7.4: a glass they love, poured tonight */if(lw&&(lgW||nn==='品酒師 Ken'||nn==='Monsieur 杜'||Math.random()<pw*(pr?1.4:1)))items.push(lgW||(pr&&Math.random()<.7?pr:loungeOrder({size:1,type:g.type,name:g.name,reg:g.reg})[0]))}/* v2.3 */
- let out=items.filter(Boolean);if(g.size>=5){/* v2.4 rc6: a big table keeps everyone's dish; the extras are what the ticket has room for */const main=d=>DISH(d)&&DISH(d).cat!=='drink'&&DISH(d).cat!=='dessert'&&!DISH(d).wine;out=out.filter(main).concat(out.filter(d=>!main(d)))}{const wi=out.findIndex(d=>DISH(d)&&DISH(d).wine);const w=wi>=0?out.splice(wi,1)[0]:null;out=out.slice(0,cap);if(w)out.push(w)}/* v2.3 fix: the dinner glass was rolled, then cut by the ticket cap most of the time */if(!est&&S.day>2){const used={};out=out.filter(d=>{if(DISH(d).wine)return true;used[d]=(used[d]||0)+1;return used[d]<=(S.stock[d]||0)})}if(g.share){/* one dessert, two forks */let seen=false;return out.filter(d=>{if(DISH(d).cat!=='dessert')return true;if(seen)return false;seen=true;return true})}return out}
+ let out=items.filter(Boolean);if(g.size>=5){/* v2.4 rc6: a big table keeps everyone's dish; the extras are what the ticket has room for */const main=d=>DISH(d)&&DISH(d).cat!=='drink'&&DISH(d).cat!=='dessert'&&!DISH(d).wine;out=out.filter(main).concat(out.filter(d=>!main(d)))}{const wi=out.findIndex(d=>DISH(d)&&DISH(d).wine);const w=wi>=0?out.splice(wi,1)[0]:null;out=out.slice(0,cap);if(w)out.push(w)}/* v2.3 fix: the dinner glass was rolled, then cut by the ticket cap most of the time */if(!est&&!jillStocks()){const used={};out=out.filter(d=>{if(DISH(d).wine)return true;used[d]=(used[d]||0)+1;return used[d]<=(S.stock[d]||0)})}if(g.share){/* one dessert, two forks */let seen=false;return out.filter(d=>{if(DISH(d).cat!=='dessert')return true;if(seen)return false;seen=true;return true})}return out}
 /* expected sales per dish for a day like today: the guest mix and the ordering rules themselves, sampled */
 function expectDemand(groups,n,est){const out={};const G=S.today?S.today.groups:groups||10;const N=n||60;
  for(let i=0;i<N;i++){const o=rollGuest();const g={type:o.type,size:o.size,reg:null,forSig:o.forSig};for(const d of orderItems(g,true))out[d]=(out[d]||0)+1}
  for(const d in out)out[d]=out[d]*G/N;return out}
 function createTicket(g){const t=R.tables[g.table];if(t&&t.lounge){/* v2.3: a Lounge order — glasses from the bar, nothing from the fridge */const w=loungeOrder(g);if(!w.length){leaveGroup(g,'sad');return}const tk={id:R.tkid++,no:t.i+1,g,lounge:1,cn:g.cn?1:undefined,items:w.map(d=>({d,st:'pending',q:null,want:0,picked:false,set:null,lbar:DISH(d).wine?1:undefined})),t0:R.t};if(g.cn){/* rc7.6: the portions set aside this morning — their cost on the day, nothing from the fridge */for(const it of tk.items)if(!it.lbar){const c=costOf(it.d);S.money-=c;S.todayCost+=c}/* course by course (「一道一道上」): the portions were made in the morning — at night each course is plated behind the bar (cnp: 'plate', a moment, then ready at the L's end, never through the kitchen's stations), the second and third when the one before is eaten; each course's glass is poured when its plate is up and goes out with it (cnw) */if(g.cnCo)tk.items.forEach((it,i)=>{it.course=g.cnCo[i]||0;if(it.lbar){it.cnw=1;it.lbar=undefined}else it.cnp=1;if(it.course>0)it.st='later';else if(it.cnw)it.st='pour';else{it.st='plate';it.at=R.t+cnPlateT(g)}})}else for(const it of tk.items)if(!it.lbar&&!takeStock(it))g.short=true;if(g.tasting&&R.kt&&!R.kt.end)for(const it of tk.items)if(it.lbar&&R.kt.wines.includes(it.d)){/* rc7.6: tonight's three are Ken's to pour — a round at a time, at every seat (kenRounds), not the bartenders' */it.ktw=1;it.lbar=undefined;it.st='round';it.round=R.kt.wines.indexOf(it.d);tk.kt=1}
- tk.items=tk.items.filter(it=>it.st!=='cancel');g.ticket=tk;g.state='wait';g.pat=Math.min(1,g.pat+.12);R.tickets.push(tk);R.tv++;sfx.ticket();storyTick('order',{g,tk});try{campaignOrderLine(g,tk)}catch(e){}try{loveOrdered(g,tk)}catch(e){}return}
+ tk.items=tk.items.filter(it=>it.st!=='cancel');g.ticket=tk;g.state='wait';g.pat=Math.min(1,g.pat+.12);R.tickets.push(tk);R.tv++;sfx.ticket();storyTick('order',{g,tk});try{campaignOrderLine(g,tk)}catch(e){}if(!g.chose)try{loveOrdered(g,tk)}catch(e){}return}
  let items=orderItems(g);if(!items.length&&isYJ(g)){/* v2.4: 秀琴阿姨's daughter is not sent away hungry when the fridge is empty — Jill orders in one portion for her (the opening days' emergency order, 1.5×) */items=orderItems(g,true).slice(0,1);g.yjKept=items.length?1:0}
- if(S.day>2&&menuList().some(d=>stationOk(d)&&(S.stock[d]||0)<=0)){/* v2.2.1: what this table would have ordered with a full fridge — the demand that hit an empty shelf goes into the sales history and the summary, so a sold-out dish is not recommended lower tomorrow */R.st.unmet=R.st.unmet||{};for(const d of orderItems(g,true))if((S.stock[d]||0)<=0)R.st.unmet[d]=(R.st.unmet[d]||0)+1}
+ if(!jillStocks()&&menuList().some(d=>stationOk(d)&&(S.stock[d]||0)<=0)){/* v2.2.1: what this table would have ordered with a full fridge — the demand that hit an empty shelf goes into the sales history and the summary, so a sold-out dish is not recommended lower tomorrow */R.st.unmet=R.st.unmet||{};for(const d of orderItems(g,true))if((S.stock[d]||0)<=0)R.st.unmet[d]=(R.st.unmet[d]||0)+1}
  if(!items.length){/* nothing they wanted is left in the fridge */R.st.soldOutLeft=(R.st.soldOutLeft||0)+g.size;if(canChat('soldout',30,3))quote(g,pickT(['想吃的都賣完了。','沒東西可以點了？','下次早點來。']));noteLine(`${g.name} 想點的都賣完了，走了。`);leaveGroup(g,'sad');return}
  g.dd=items.slice();   /* v2.4 rc6 (11:49): what they had, for what goes with it later */
  const hasMain=items.some(d=>DISH(d).cat==='main');const tk={id:R.tkid++,no:t.i+1,g,items:items.map(d=>{const cat=DISH(d).cat;const set=hasMain&&(cat==='drink'||cat==='dessert')&&setFor(cat)||null;return{d,st:'pending',q:null,want:d==='steak'?wpick([0,1,2,3],k=>[.2,.35,.3,.15][k]):0,picked:false,set,lbar:cat==='wine'&&loungeLv()?1:undefined,dinw:cat==='wine'&&!loungeLv()?1:undefined,kept:g.yjKept?1:undefined}}),t0:R.t};for(const it of tk.items)if(it.dinw){it.st='ready';it.q='G'}   /* rc8: before the Lounge a pairing glass is poured at the pass at once */
- if(g.reg&&g.reg!=='dylan'){const ids=regsOf(g);tk.items.forEach((it,i)=>{const m=regMem(ids[Math.min(i,ids.length-1)]||g.reg);m.orders[it.d]=(m.orders[it.d]||0)+1});if(g.share&&tk.items.some(i=>DISH(i.d).cat==='dessert')&&Math.random()<.5)setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,'一份甜點，兩支叉子。')},800)}
+ if(g.reg&&g.reg!=='dylan'){const ids=regsOf(g);tk.items.forEach((it,i)=>{const m=regMem(ids[Math.min(i,ids.length-1)]||g.reg);m.orders[it.d]=(m.orders[it.d]||0)+1});if(g.share&&tk.items.some(i=>DISH(i.d).cat==='dessert')&&Math.random()<.5)speakLater(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,'一份甜點，兩支叉子。')},800)}
  for(const it of tk.items)if(!it.lbar&&!it.dinw&&!takeStock(it))g.short=true;tk.items=tk.items.filter(it=>it.st!=='cancel');if(tk.items.some(it=>it.st==='order')){toast(`食材不夠！Jill 緊急叫貨中（1.5 倍價），${g.name} 要多等一下`);g.pat=Math.min(1,g.pat+.1)}stockWatch();
  g.ticket=tk;g.state='wait';g.pat=Math.min(1,g.pat+.12);R.tickets.push(tk);R.tv++;sfx.ticket();campaignOrder(tk);try{campaignOrderLine(g,tk)}catch(e){}{const tp=socialTopic();if(tp&&tp.k==='food'&&tp.dish&&tk.items.some(i=>i.d===tp.dish)&&Math.random()<.3&&canChat('topic',90,4)){const dn=dishName(tp.dish);quote(g,pickT([`${dn}，網路上那個？`,`我看到有人發${dn}的照片。`,`聽說${dn}很好吃。`]))}}/* v2.3; rc8.5: the dish named — 「是不是那一道？」 said nothing on its own */
- if(g.reg==='dylan'){dylanOrdered(g,tk)}else if(loveOrdered(g,tk)){/* rc7.4: said what they love (or missed it) */}else if(g.reg){const who=speakerOf(g);const v=S.regulars[who]||0;const tier=Math.floor(regTier(v));/* not every visit: a line when they are still new, then only now and then */if(tier===0?Math.random()<.5:Math.random()<.35){const t=regTalk(who,tier);const M=S.chatSeen||{};if(t&&!(M[t]!=null&&S.day-M[t]<CHAT_DAYS)){quote(g,t,{who});(S.chatSeen=S.chatSeen||{})[t]=S.day}}   /* rc8.5: a regular's everyday words, not again within the week (「Jill，今天的醬汁我想再試一次。」 two days apart) */}else if(g.type==='vip')quote(g,pickH(VIP_ORDER,'vip|'+S.day+'|'+g.id));else if(Math.random()<.12)quote(g,pickT(namedId(g)?ORDER_KNOWN:ORDER_NEW));
+ if(g.reg==='dylan'){dylanOrdered(g,tk)}else if(loveOrdered(g,tk)){/* rc7.4: said what they love (or missed it) */}else if(g.reg){const who=speakerOf(g);const v=S.regulars[who]||0;const tier=Math.floor(regTier(v));/* not every visit: a line when they are still new, then only now and then */if(tier===0?Math.random()<.5:Math.random()<.35){const t=regTalk(who,tier);const M=S.chatSeen||{};if(t&&!(M[t]!=null&&S.day-M[t]<CHAT_DAYS)){quote(g,t,{who});(S.chatSeen=S.chatSeen||{})[t]=S.day}}   /* rc8.5: a regular's everyday words, not again within the week (「Jill，今天的醬汁我想再試一次。」 two days apart) */}else if(g.type==='vip'&&anonG(g))quote(g,pickH(VIP_ORDER,'vip|'+S.day+'|'+g.id));else if(!g.zhouUsual&&Math.random()<.12){const nn=namedId(g);quote(g,pickT(nn&&(namedHist(nn).v||0)>0?ORDER_KNOWN:ORDER_NEW))}   /* audit N03: a named guest is 「known」 once she has been here before, not on her first evening; 周董's own 「隨便」 is his order */
  storyTick('order',{g,tk});   /* v2.3 */
  coach(2)}
 /* v2.4 rc6 (09:39): the VIPs order in their own words, not one sentence for all of them; a named guest who has been here
@@ -2054,10 +2095,11 @@ function serveItems(g,list){const t=R.tables[g.table];let best=null;
   R.st.dish[it.d]=(R.st.dish[it.d]||0)+1;if(it.q==='P')best='P';
   {/* v2.4 rc7 (the player, 14:39 「阿lounge不用進貨成本?」): a glass poured is a glass bought — its cost goes on the day's 酒水成本, in the Lounge or with dinner */const D0=DISH(it.d);if(D0&&D0.wine&&D0.cost)R.st.wineCost=(R.st.wineCost||0)+D0.cost}}
  sfx.serve();if(best==='P')burst('scene',{x:t.x,y:t.y-14,room:t.room},'#FFE38A');
- if(list.some(c0=>c0.it.d==='signature')&&Math.random()<.25&&canChat('sig',120,4))quote(g,pickT(['這就是招牌菜？','招牌菜長這樣。','終於吃到了。','專程來吃這道的。']));else if(list.some(c0=>c0.it.d==='sigdessert')&&Math.random()<.25&&canChat('sigd',120,4))quote(g,pickT(['招牌甜點。','這個是 Jill 自己想的？','留了肚子給它。','拍一張再吃。']));
+ if(!anonG(g)){}   /* audit N03: Dylan, a regular, a named guest have their own words; these are a stranger's */
+ else if(list.some(c0=>c0.it.d==='signature')&&Math.random()<.25&&canChat('sig',120,4))quote(g,pickT(['這就是招牌菜？','招牌菜長這樣。','終於吃到了。','專程來吃這道的。']));else if(list.some(c0=>c0.it.d==='sigdessert')&&Math.random()<.25&&canChat('sigd',120,4))quote(g,pickT(['招牌甜點。','這個是 Jill 自己想的？','留了肚子給它。','拍一張再吃。']));
  else if(list.some(c0=>DISH(c0.it.d)&&DISH(c0.it.d).special)&&Math.random()<.3&&canChat('special',60,4)){const sd=list.find(c0=>DISH(c0.it.d)&&DISH(c0.it.d).special).it.d;const sp=SPECIALS[DISHES[sd].special];quote(g,pickT([`${sp.n}，就是這個。`,`${sp.n}長這樣。`,'這個要拍一下。','比照片還好看。','上面那個是'+ING[sp.top].n+'？',`${sp.n}跟一般的差在哪？`]));if(!g.photo&&!g.shot&&Math.random()<.5){g.photo=true;g.shot=true;g.photoT0=R.t+1.2;g.dishShot=sp.n}}
  else if(g.type==='family'&&Math.random()<.3&&canChat('family',60,4))quote(g,pickT(['我要那個！','先吃飯，貓等一下再看。','這家的貓不怕人耶。','媽媽，牠在看我！']));
- else if(Math.random()<.12&&canChat('served',25,4)){const it0=list[0]&&list[0].it;const dn=it0?dishName(it0.d):'';const byJ=it0&&it0.byJill;quote(g,pickT(['這是 Jill 親手做的嗎？','哇，Jill 主廚的擺盤好美。','聞起來好香…','先拍照，等我一下！','來了來了。','看起來好好吃。','份量剛好。'].concat(dn?[`${dn}來了。`,`${dn}長這樣啊。`,`我的${dn}！`]:[],byJ?['剛剛是 Jill 自己端過來的。']:[],it0&&it0.q==='P'?['這盤擺得也太好看。']:[])))}
+ else if(Math.random()<.12&&canChat('served',25,4)){const f0=list.find(c0=>c0.it&&!isGlass(c0.it.d));const it0=f0&&f0.it;const dn=it0?dishName(it0.d):'';const byJ=it0&&it0.byJill;quote(g,pickT((it0?['這是 Jill 親手做的嗎？','哇，Jill 主廚的擺盤好美。','聞起來好香…','先拍照，等我一下！','來了來了。','看起來好好吃。','份量剛好。']:['來了來了。','謝謝。']).concat(dn?[`${dn}來了。`,`${dn}長這樣啊。`,`我的${dn}！`]:[],byJ?['剛剛是 Jill 自己端過來的。']:[],it0&&it0.q==='P'?['這盤擺得也太好看。']:[])))}   /* audit WS6-06: the plate's words for a plate — a glass alone is just 「來了」 */
  checkAllServed(g);if(R.tasting)tastingServe(g);/* v2.3 */if(!g.servedTick){g.servedTick=1;storyTick('served',{g,t,list})}/* v2.4: the food is on the table */R.tv++;coach(5)}
 /* ---- v2.2 F+G: a review is composed from the visit ----
    The dish and how it came out, then one thing they noticed (a cat they met, by name and doing what it was doing;
@@ -2097,19 +2139,24 @@ function catReviewLine(g,stars){const evs=(g.cats||[]).slice();if(!evs.length)re
  else{const Pp=RV_CATS[e.k];if(!Pp)return null;pool=stars>=4?Pp.hi:stars===3?(Pp.mid||Pp.hi):(Pp.lo||Pp.mid||Pp.hi)}
  return{t:pickT(pool).replace(/\{c\}/g,nm),ev:e}}
 function reviewText(g,stars,ctx){const c=ctx||{};const st=Math.max(1,Math.min(5,stars|0));const D=RV_DET;const dets=[];const add=(pool,w)=>{if(pool&&pool.length)dets.push({pool,w})};
+ /* audit WS6-06／WS1-12 (2026-10-06): only the lines that are true of this guest — a dish named only when there was one; a cold
+    plate is not 「火候剛剛好」「熱騰騰」「已經涼了」; the bench at the door only once it is there */
+ const cold=!!c.dst&&!['stove','oven','pizza'].includes(c.dst);const ok=x=>(!!c.dn||!x.includes('{d}'))&&(!cold||!/火候|熱騰騰|涼了/.test(x))&&(extOn('bench')||!x.includes('長椅'));
+ const P=pool=>{const f=(pool||[]).filter(ok);return f.length?f:null};
  if(c.wine)add(D.wine[st],c.wineFan?4:2);if(c.lounge)add(D.lounge[st],c.wineFan?3:1.5);if(c.dessert)add(D.dessert[st],1.2);if(c.nocat)add(D.nocat[st],3);if(c.sideFan)add(D.side[st],3);/* v2.3 */if(c.wait)add(D.wait[st],st<=3?4:2);if(c.price)add(D.price[st],3);if(c.short)add(D.short[st],3);if(c.sig)add(D.sig[st],2);if(c.jill)add(D.jill[st],2);if(c.treat)add(D.treat[st],3);if(c.decor)add(D.decor[st],1);if(c.room==='front')add(D.terrace[st],1.5);if(c.room==='side')add(D.side[st],1.2);if(c.family)add(D.family[st],1.5);if(c.weather&&D.wx[c.weather]&&Math.random()<.4)add(wxLines(c.weather,st),1);
  const cat=c.cat?catReviewLine(g,st):null;reviewText.last={cat:null};const stale=pool=>pool.every(x=>saidRecently(x));
  for(let tries=0;;tries++){let t,usedCat=false,usedKey=null;
-  if(c.left){t=pickT(D.left[st]||D.left[2]);if(cat&&Math.random()<.3){t+=cat.t;usedCat=true}}
-  else if(!cat&&!dets.length&&Math.random()<.5)t=pickT(RV[st]);/* the old one-liners still speak when there is nothing specific to say */
-  else{t=pickT(RV_OPEN[st]);let d=null;if(cat&&(!dets.length||Math.random()<.6)){d=cat.t;usedCat=true}else if(dets.length){const w=wpick(dets,x=>x.w);/* a detail whose every line was used lately is left out half the time rather than repeated */d=w&&!(stale(w.pool)&&Math.random()<.5)?pickT(w.pool):null;if(d&&w)usedKey=Object.keys(D).find(k=>D[k]&&typeof D[k]==='object'&&Object.values(D[k]).includes(w.pool))||'wx'}if(d)t+=d;if(Math.random()<(st>=4?.45:.3))t+=pickT(RV_CLOSE[st])}
+  if(c.left){t=pickT(P(D.left[st]||D.left[2])||D.left[st]||D.left[2]);if(cat&&Math.random()<.3){t+=cat.t;usedCat=true}}
+  else if(!cat&&!dets.length&&Math.random()<.5)t=pickT(P(RV[st])||RV[st]);/* the old one-liners still speak when there is nothing specific to say */
+  else{const op=P(RV_OPEN[st]);t=op?pickT(op):c.dn?pickT(RV_OPEN[st]):'';let d=null;if(cat&&(!dets.length||Math.random()<.6)){d=cat.t;usedCat=true}else if(dets.length){const w=wpick(dets,x=>x.w);/* a detail whose every line was used lately is left out half the time rather than repeated */d=w&&!(stale(w.pool)&&Math.random()<.5)?pickT(w.pool):null;if(d&&w)usedKey=Object.keys(D).find(k=>D[k]&&typeof D[k]==='object'&&Object.values(D[k]).includes(w.pool))||'wx'}if(d)t+=d;if(Math.random()<(st>=4?.45:.3))t+=pickT(RV_CLOSE[st])}
+  if(!t)t=pickT(P(RV[st])||RV[st]);if(/Jill/.test(c.dn||''))t=t.replace(/Jill 主廚的\{d\}/g,'{d}');   /* the signature's own name already says Jill's */
   t=t.replace(/\{d\}/g,c.dn||'料理');if(tries>=4||!S.reviews.some(r=>r.txt===t)){reviewText.last={cat:usedCat&&cat?cat.ev:null,key:usedKey};return t}}}
 /* v2.2.1 J: a hot day's review mentions the air conditioning only when there is some, and the better it is, the more they say */
 function wxLines(w,st){const D=RV_DET.wx[w];const base=(D&&D[st])||[];if(w!=='hot')return base;const ac=opsLv('ac');const out=base.filter(t=>!t.includes('冷氣'));if(st>=4&&ac>=1)out.push('熱天躲進來吹冷氣，順便吃了一頓。');if(st>=4&&ac>=2)out.push('冷氣剛剛好，不會冷到要穿外套。','店裡的冷氣很安靜，聊天不用提高音量。');if(st>=4&&ac>=3)out.push('側廳和主廳一樣涼，坐哪裡都舒服。');if(st<=3&&ac===0)out.push('天氣熱，店裡也悶。');return out.length?out:base}
-function addReview(g,stars,txt,ctx){const top=g.ticket?g.ticket.items.find(i=>i.st==='served')||g.ticket.items[0]:null;const dn=top?dishName(top.d):'料理';const c=Object.assign({},ctx||{},{dn});
+function addReview(g,stars,txt,ctx){const its=g.ticket?g.ticket.items:[];const top=its.find(i=>i.st==='served'&&!isGlass(i.d))||its.find(i=>!isGlass(i.d))||null;const dn=top?dishName(top.d):null;const c=Object.assign({},ctx||{},{dn,dst:top&&DISH(top.d)?DISH(top.d).st:null});   /* audit WS6-06 (2026-10-06): the dish a review talks about is the food — never the glass (「氣泡酒的火候剛剛好」); a guest who only had glasses (the Lounge) gets no dish line at all */
  if(!txt){c.cat=!!(g.cats&&g.cats.length);c.short=!!(c.short||g.short);c.room=g.table!=null&&R.tables[g.table]?R.tables[g.table].room:null;c.family=g.type==='family';c.jill=!!(g.ticket&&g.ticket.items.some(i=>i.st==='served'&&i.byJill));/* v2.3: the glass, the Lounge, the dessert */c.wine=!!(g.ticket&&g.ticket.items.some(i=>i.st==='served'&&(i.lbar||i.dinw)));c.lounge=!!g.lg;/* the campaign guest */c.nocat=!!(g.catfan&&!(g.cats&&g.cats.length));if(g.wantMissed)c.short=true;c.sideFan=!!(g.wantSide&&c.room==='side');c.wineFan=g.via==='camp'&&!!(c.wine||c.lounge);c.dessert=!!(g.ticket&&g.ticket.items.some(i=>i.st==='served'&&DISH(i.d)&&DISH(i.d).cat==='dessert'))}
  let rec=null;if(!txt){rec=reviewRecovery(g,stars,c);if(rec)txt=rec}
- reviewText.last=null;const t=(txt||reviewText(g,stars,c)).replace(/\{d\}/g,dn);const tags=[];if(c.wait)tags.push('wait');if(c.left)tags.push('left');if(c.price)tags.push('price');if(c.q)tags.push('q');if(reviewText.last&&reviewText.last.cat)tags.push('cat');if(c.sig)tags.push('sig');if(c.treat)tags.push('treat');if(c.short)tags.push('short');if(rec)tags.push('recovery');
+ reviewText.last=null;const t=(txt||reviewText(g,stars,c)).replace(/\{d\}/g,dn||'料理');const tags=[];if(c.wait)tags.push('wait');if(c.left)tags.push('left');if(c.price)tags.push('price');if(c.q)tags.push('q');if(reviewText.last&&reviewText.last.cat)tags.push('cat');if(c.sig)tags.push('sig');if(c.treat)tags.push('treat');if(c.short)tags.push('short');if(rec)tags.push('recovery');
  const topics=[];{const key=reviewText.last&&reviewText.last.key;if(key&&TAG_TOPIC[key])topics.push(TAG_TOPIC[key]);if(dn&&t.includes(dn)&&!topics.includes('food'))topics.push(dn===dishName('signature')?'signature':dn===(S.sigDessert&&dishName('sigdessert'))?'dessert':'food');for(const tg of tags)if(TAG_TOPIC[tg]&&!topics.includes(TAG_TOPIC[tg]))topics.push(TAG_TOPIC[tg])}/* v2.3: what the text is about */
  const r={s:stars,txt:t,name:regsOf(g).length>1?REG_BY[speakerOf(g)].n:(namedId(g)||g.name),day:S.day,w:g.type==='critic'?3:1,critic:g.type==='critic',tags,topics};if(reviewText.last&&reviewText.last.cat)r.cat=reviewText.last.cat.id;S.reviews.push(r);if(S.reviews.length>80)S.reviews.shift();R.st.reviews.push(r);if(!txt||rec){reviewRemember(g,stars,c);try{guestPost(g,stars,c)}catch(e){console.warn('[social]',e)}}/* v2.3 */return r}
 function collect(g,o){o=o||{};const again=!!(o.tab||g.counted);/* v2.3: a Lounge tab, or a second phase of one visit — money, no second visit, no second review */const T=TYPES[g.type];const items=g.ticket.items.filter(i=>i.st==='served');let rev=0,qs=0,pen=0,bon=0;if(g.table!=null&&R.tables[g.table]&&R.tables[g.table].room==='front'&&items.length)ach('terrace');
@@ -2121,7 +2168,7 @@ function collect(g,o){o=o||{};const again=!!(o.tab||g.counted);/* v2.3: a Lounge
  const n=Math.max(1,items.length),qa=qs/n;let sat=qa*T.qw+g.pat*100*(1-T.qw);sat-=(pen/n)*80*T.sens;sat+=(bon/n)*30*T.sens;sat+=Math.min(12,ambience()*1.1);sat+=items.reduce((a,it)=>a+starOf(it.d)-1,0)/n*4;if(g.catJoy)sat+=5;if(g.reg)sat+=4;{const ids=loveIdsOf(g);if(ids.some(id=>items.some(i=>baseOf(i.d)===LOVES[id].d||i.d===LOVES[id].g)))sat+=6}/* rc7.4: what they love */if(g.compl)sat+=g.compl;if(g.strict&&items.some(i=>i.q==='O'||i.q==='B'))sat-=12;if(g.forSig&&items.some(i=>i.d==='signature'))sat+=6;if(items.some(i=>i.d==='signature'&&i.byJill))sat+=3;sat=clamp(sat,0,100);
  let tip=rev*T.tip*Math.pow(sat/80,2)*(R.fire>0?1.5:1)*(1+.04*Math.min(R.combo,10))*(S.decor.ware?1.15:1)*(g.celebrate||g.anniv?1.8:1);if(sat<40)tip=0;if(g.reg==='dylan'&&sat>=40)tip*=1.35;if(cn){rev=CN_PRICE*g.size;tip=rev*T.tip*Math.pow(sat/80,2)*(sat<40?0:1)}/* rc7.6: the night's price, its tip on it */rev=Math.round(rev);tip=Math.round(tip);rev=pdBill(g,rev);   /* v2.4 rc6: a booking's minimum spend is the floor of the bill */
  if(g.type==='couple')R.st.couples=(R.st.couples||0)+1;
- S.money+=rev+tip;S.lifetime+=rev+tip;R.st.rev+=rev;R.st.tips+=tip;R.st.guests+=g.size;R.st.groups++;R.st.sats.push(sat);R.st.pats=R.st.pats||[];R.st.pats.push(g.pat);if(pen>0)R.st.pricey=(R.st.pricey||0)+1;if(g.catJoy)R.st.catJoy=(R.st.catJoy||0)+1;if(items.some(i=>i.d==='signature'))R.st.sig=(R.st.sig||0)+items.filter(i=>i.d==='signature').length;if(items.some(i=>i.d==='sigdessert'))R.st.sigd=(R.st.sigd||0)+items.filter(i=>i.d==='sigdessert').length;
+ S.money+=rev+tip;S.lifetime+=rev+tip;R.st.rev+=rev;R.st.tips+=tip;if(!again){R.st.guests+=g.size;R.st.groups++}/* a Lounge tab after dinner (or dinner after waiting in the Lounge) is the same people's one visit — counted once (the summary's 客人數) */R.st.sats.push(sat);R.st.pats=R.st.pats||[];R.st.pats.push(g.pat);if(pen>0)R.st.pricey=(R.st.pricey||0)+1;if(g.catJoy)R.st.catJoy=(R.st.catJoy||0)+1;if(items.some(i=>i.d==='signature'))R.st.sig=(R.st.sig||0)+items.filter(i=>i.d==='signature').length;if(items.some(i=>i.d==='sigdessert'))R.st.sigd=(R.st.sigd||0)+items.filter(i=>i.d==='sigdessert').length;
  const t=R.tables[g.table];addFloat(t.x,t.y-42,'+'+fmt(rev)+(rate<1?' '+RATE_N[rate]:''),'#FFE38A',1,t.room);if(tip>0)addFloat(t.x+6,t.y-58,'小費 +'+fmt(tip),'#BFE3A8',0,t.room);sfx.cash();burst('coins',{x:t.x,y:t.y-20,room:t.room},'#F4C44E');
  const stars=sat>=86?5:sat>=70?4:sat>=54?3:sat>=36?2:1;if(cn){const c=R.st.cn=R.st.cn||{n:0,rev:0,tip:0};c.n+=g.size;c.rev+=rev;c.tip+=tip}else if(g.ticket&&g.ticket.lounge){R.st.lgRev=(R.st.lgRev||0)+rev;R.st.lgTip=(R.st.lgTip||0)+tip;R.st.lgTabs=(R.st.lgTabs||0)+1}
  if(!cn&&g.tasting&&R.kt&&R.kt.guests.includes(g)){/* rc7.7 (the player, 10:10): Ken's share — what a tasting night's guests paid for the glasses and the bites (not the tips), less what those cost */const k=R.st.kt=R.st.kt||{n:0,rev:0,cost:0};k.n+=g.size;k.rev+=rev;for(const it of items){const D=DISH(it.d);k.cost+=D&&D.wine?(D.cost||0):costOf(it.d)}}   /* v2.4 rc7: the takings and the tips apart, as in the day's ledger */
@@ -2135,7 +2182,7 @@ function collect(g,o){o=o||{};const again=!!(o.tab||g.counted);/* v2.3: a Lounge
  if(!again)vipCheck(g);
  if(!again&&(g.ret||(g.reg&&(S.regulars[g.reg]||0)>1))){S.returning+=g.size;if(S.returning>=100)ach('loves')}
  if(S.lifetime>=1e6)ach('million');
- if(g.reg!=='dylan'){if(sat>=86&&Math.random()<.22&&canChat('thanks',35,4)){const top=items[0];const dn=top?dishName(top.d):'';const cev=(g.cats||[])[0];const cnm=cev&&catBy(cev.id)?catName(catBy(cev.id).def):null;quote(g,pickT(['很好吃，謝謝。','下次帶朋友來。','老闆娘手藝真好。','會再來。','謝謝招待。'].concat(dn?[`${dn}很好吃，謝謝。`,`下次還要點${dn}。`]:[],cnm?[`${cnm}好可愛。`,`跟${cnm}說再見。`]:[],g.treated?['謝謝招待，下次一定再來。']:[])))}else if(g.pat<.35&&sat>=70&&Math.random()<.3&&canChat('waitok',70,4))quote(g,pickT(['等有點久，不過值得。','人真的很多，還好有等。']));else if(sat<45&&Math.random()<.25&&canChat('meh',70,4))quote(g,pickT(['等太久了。','有點貴。','普通。','下次再看看。']))}
+ if(g.reg!=='dylan'){if(sat>=86&&Math.random()<.22&&canChat('thanks',35,4)){const top=items.find(i=>!isGlass(i.d));const dn=top?dishName(top.d):'';   /* the dish they thank for, not the glass (audit WS6-06: 「招牌調酒「晚安」很好吃，謝謝。」) */const cev=(g.cats||[])[0];const cnm=cev&&catBy(cev.id)?catName(catBy(cev.id).def):null;quote(g,pickT(['很好吃，謝謝。','下次帶朋友來。','老闆娘手藝真好。','會再來。','謝謝招待。'].concat(dn?[`${dn}很好吃，謝謝。`,`下次還要點${dn}。`]:[],cnm?[`${cnm}好可愛。`,`跟${cnm}說再見。`]:[],g.treated?['謝謝招待，下次一定再來。']:[])))}else if(g.pat<.35&&sat>=70&&Math.random()<.3&&canChat('waitok',70,4))quote(g,pickT(['等有點久，不過值得。','人真的很多，還好有等。']));else if(sat<45&&Math.random()<.25&&canChat('meh',70,4))quote(g,pickT(['等太久了。','有點貴。','普通。','下次再看看。']))}
  if(!again&&!t.lounge&&barState()==='lin')g.toBar=dayCoin('bar|'+S.day+'|'+g.id)%100<barNextP(g)*100?1:0;   /* rc8 (19:19 §6): dinner here, a drink next door */
  storyTick('collect',{g,t,sat,items,stars,again});   /* v2.3 */
  if(o.stay){g.ticket&&(R.tickets=R.tickets.filter(x=>x!==g.ticket),R.tv++);g.ticket=null;return}
@@ -2192,7 +2239,7 @@ const WORLD_MEM=[
 function worldMemCands(g){const ids=regsOf(g);return WORLD_MEM.filter(M=>{if(S.worldMem[M.k])return false;const d0=M.src();if(!d0)return false;const gap=S.day-d0;return gap>=M.min&&gap<=M.max&&M.who.some(w=>ids.includes(w))})}
 function worldMemoryLine(g,force){if(!R||!g.reg||g.reg==='dylan')return false;S.worldMem=S.worldMem||{};if(!regsOf(g).some(id=>(S.regulars[id]||0)>=2))return false;if((S.worldMemDay||0)===S.day)return false;/* one a day at most */
  const cands=worldMemCands(g);if(!cands.length)return false;if(!force&&Math.random()>.35)return false;
- const M=pick(cands);S.worldMem[M.k]=S.day;S.worldMemDay=S.day;const txt=M.line();const who=pick(regsOf(g).filter(id=>M.who.includes(id)&&(S.regulars[id]||0)>=2))||regsOf(g).find(id=>M.who.includes(id));setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g)){quote(g,txt,{who});regFact(who,`「${txt}」`)}},1400);return true}
+ const M=pick(cands);S.worldMem[M.k]=S.day;S.worldMemDay=S.day;const txt=M.line();const who=pick(regsOf(g).filter(id=>M.who.includes(id)&&(S.regulars[id]||0)>=2))||regsOf(g).find(id=>M.who.includes(id));speakLater(()=>{if(R&&phase==='service'&&R.groups.includes(g)){quote(g,txt,{who});regFact(who,`「${txt}」`)}},1400);return true}
 /* v2.2 V: a regular's row in the book shows the supplied face once they are known; the sprite render stays the fallback */
 function regFaceHTML(id,met,fallback){const p=met?portraitOf(id):null;return p?`<img class="face" alt="" src="${p.src}">`:`<img alt="" src="${fallback}">`}
 /* v2.3 late game (#39): a space where Chinese meets a Latin word — 「Jill 請了 Jill's 招牌…」, not 「請了Jill's」 */
@@ -2250,7 +2297,7 @@ function regOnceDay(id,flag,txt){const m=regMem(id);const v=m.flags[flag];if(!v)
 /* the notes that date an old save's flags (小林's promotion and new job, Leo's plant, job hunt and graduation) */
 const REG_FLAG_TXT={promo:'升職那天，難得吃了一頓慢的。',newjob:'換了工作，離得遠了。',grad:'畢業了，第一份薪水來這裡吃了一頓。',jobhunt:'快畢業了，在找工作。',plant:'送了一盆多肉，放在窗邊。'};
 /* the first words of a visit, when they sit down */
-function regSeatMoment(g,t){const id=g.reg;if(!id||id==='dylan')return;const k=g.moment;const m=regMem(id);const say=(txt,d)=>setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,txt)},d||600);worldMemoryLine(g);
+function regSeatMoment(g,t){const id=g.reg;if(!id||id==='dylan')return;const k=g.moment;const m=regMem(id);const say=(txt,d)=>{if(regSaid(txt))return;speakLater(()=>{if(R&&phase==='service'&&R.groups.includes(g))regSay(g,txt)},d||600)};worldMemoryLine(g);
  if(g.comp==='friend'){say(pick(['今天帶老朋友來。','以前教書的同事，退休了才有空。']));m.flags.friendDay=S.day;regFact(id,'帶了一位老朋友來。');g.memoAt='seat'}
  if(g.comp==='coworker'){say(m.flags.coworkerDay?'今天有伴，不用一個人吃。':pick(['同事一直問我都吃哪裡，帶她來了。','今天有伴，不用一個人吃。']));/* the first time she brings someone is the first time */m.flags.coworkerDay=S.day;regFact(id,'帶了同事來。');g.memoAt='seat'}
  if(g.comp==='classmates'){say(pick(['同學說想來看貓。','跟同學一起，今天可以點多一點。']));m.flags.classDay=S.day;regFact(id,'帶了同學來看貓。');g.memoAt='seat';for(let i=0;i<g.size;i++)g.wantShot=true}
@@ -2275,24 +2322,24 @@ function regSeatMoment(g,t){const id=g.reg;if(!id||id==='dylan')return;const k=g
  if(k==='share'){g.share=true}
  if(k==='anniv'){storyCapStart('wang_anniv');say('今天是我們的結婚紀念日。');g.anniv=true;g.treat='dessert';m.flags.anniv=S.day;regFactG(g,'結婚紀念日是在這裡過的。')}
  if(['oranges','veg','drawing','plant','flowers'].includes(k))g.gift=k;
- if(g.memoAt==='seat')setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g)&&g.table!=null){const tb=R.tables[g.table];memo('company',tb.x,tb.y-6,{g:g.name,subj:[{x:tb.x-24,y:tb.y},{x:tb.x+24,y:tb.y}]})}},2500)}
+ if(g.memoAt==='seat')speakLater(()=>{if(R&&phase==='service'&&R.groups.includes(g)&&g.table!=null){const tb=R.tables[g.table];memo('company',tb.x,tb.y-6,{g:g.name,room:tb.room||'main',subj:[{x:tb.x-24,y:tb.y},{x:tb.x+24,y:tb.y}]})}},2500)}
 /* the gift is handed over when Jill comes to the table (a waiter taking the order leaves it for the checkout) */
 function regGift(g,t){const k=g.gift;if(!k)return;g.gift=null;const id=g.reg;const m=regMem(id);if(k==='plant'&&!m.flags.plant)storyCapStart('leo_plant');
  const lines={oranges:['鄰居送太多橘子，我一個人吃不完，拿一些來。','橘子，朋友種的，太多了。'],veg:['朋友田裡的菜，太多了，分妳一些。','菜園今年收太好，拿來給店裡。'],drawing:['幫店裡畫了個小東西，貼在牆上好嗎？','畫了一張，放店裡吧。'],plant:['宿舍的多肉長太多，分店裡一盆。','這盆放窗邊剛好。'],flowers:['太太種的花，開太多了。','花園裡剪的，放店裡好看。']};
- quote(g,pickT(lines[k]));setTimeout(()=>{if(R&&phase==='service')jillSay(pickT(['謝謝，我放這裡。','太好了，謝謝你。','這怎麼好意思。']))},1500);
+ quote(g,pickT(lines[k]));speakLater(()=>{if(R&&phase==='service')jillSay(pickT(['謝謝，我放這裡。','太好了，謝謝你。','這怎麼好意思。']))},1500);
  if(k==='oranges'){propSet('oranges');regFact(id,'拿了一袋橘子來。')}
  if(k==='veg'){m.flags.vegDay=S.day;if(S.unlocked.includes('salad')&&stockTotal()+2<=fridgeCap()){S.stock.salad=(S.stock.salad||0)+2;noteLine('田園沙拉的料多了 2 份')}regFact(id,'帶了自己種的菜來。')}
  if(k==='drawing'){propSet('drawing');m.flags.drawing=S.day;regFact(id,'畫了一張小圖，貼在牆上。')}
  if(k==='plant'){propSet('plant');m.flags.plant=S.day;regFact(id,'送了一盆多肉，放在窗邊。')}
  if(k==='flowers'){propSet('flowers');regFactG(g,'帶了自己種的花來。')}
- memo('gift',t.x,t.y-6,{g:g.name,subj:[{x:R.jill.x,y:R.jill.y}]});ach('gift')}
+ memo('gift',t.x,t.y-6,{g:g.name,room:t.room||'main',subj:[{x:R.jill.x,y:R.jill.y}]});ach('gift')}
 /* two regulars in the room at once, who happen to know each other. Sparingly: once in a while, one pair at a time. */
 const REG_PAIRS=[['chen','wang',['王先生，好久不見。','陳老師！'],1],['mia','koba',['你也在這棟上班？','三樓。你是樓上那間？'],1],['sophie','leo',['學生，點那道，不會錯。','好、好，那道。']]];   /* 1 = a discovery (they find out they know each other): once; the last is a habit */
 function regMeet(g){if(!g.reg||g.reg==='dylan')return;const mine=regsOf(g);for(const [a,b,lines,once] of REG_PAIRS){if(!mine.includes(a)&&!mine.includes(b))continue;if(once&&regPairMet(a,b))continue;const want=mine.includes(a)?b:a;const other=R.groups.find(o=>o!==g&&regsOf(o).includes(want)&&o.table!=null&&['reading','order','wait','eat'].includes(o.state));if(!other)continue;
   const va=S.regulars[a]||0,vb=S.regulars[b]||0;if(regTier(va)<.5||regTier(vb)<.5)continue;if(!regGate(a,'meet_'+b,5))continue;if(Math.random()>.7)continue;
-  const A=mine.includes(a)?g:other,B=mine.includes(a)?other:g;setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(A))quote(A,lines[0],{who:a})},900);setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(B))quote(B,lines[1],{who:b})},2400);
+  const A=mine.includes(a)?g:other,B=mine.includes(a)?other:g;speakLater(()=>{if(R&&phase==='service'&&R.groups.includes(A))quote(A,lines[0],{who:a})},900);speakLater(()=>{if(R&&phase==='service'&&R.groups.includes(B))quote(B,lines[1],{who:b})},2400);
   if(a==='sophie'&&B.state==='reading')B.wantDish=REG_BY.sophie.fav.find(f=>menuList().includes(f))||null;
-  const ta=R.tables[A.table],tb=R.tables[B.table];setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(A)&&R.groups.includes(B))memo('neighbors',(ta.x+tb.x)/2,(ta.y+tb.y)/2-6,{a:A.name,b:B.name,subj:[ta,tb]})},1200);
+  const ta=R.tables[A.table],tb=R.tables[B.table];speakLater(()=>{if(R&&phase==='service'&&R.groups.includes(A)&&R.groups.includes(B)&&(ta.room||'main')===(tb.room||'main'))memo('neighbors',(ta.x+tb.x)/2,(ta.y+tb.y)/2-6,{a:A.name,b:B.name,room:ta.room||'main',subj:[ta,tb]})},1200);
   regFact(a,`在店裡遇到${REG_BY[b].n}，原來認識。`);regFact(b,`在店裡遇到${REG_BY[a].n}，原來認識。`);relSet(a,b,'spoke');/* v2.3 */relSet(a,b,'metHere');return}}
 function regPairMet(a,b){return!!(relN(a,b,'metHere')||relN(a,b,'spoke')||(regMem(a).facts||[]).some(f=>f.txt===`在店裡遇到${REG_BY[b].n}，原來認識。`)||(regMem(b).facts||[]).some(f=>f.txt===`在店裡遇到${REG_BY[a].n}，原來認識。`))}
 /* ================= v2.3: the story foundation =================
@@ -2345,7 +2392,11 @@ function majorOwe(){const st=story();if(st.owe&&st.owe.d===S.day)return;let best
  for(const E of STORY_EV){if(E.lane!=='major')continue;const s=evState(E.k);if(!(s.miss>=1)||last[E.k]===S.day-1)continue;let ok=null;try{ok=storyEligible(E,{at:(E.at||[])[0]})}catch(e){ok=null}if(!ok)continue;if(s.miss>bm){best=E;bm=s.miss}}
  st.owe=best?{d:S.day,k:best.k}:null;if(best){st.oweLast=Object.assign({},last,{[best.k]:S.day})}}
 function majorOwed(){const o=S.story&&S.story.owe;return o&&o.d===S.day&&evState(o.k).last!==S.day?o.k:null}
-function storyEligible(E,ctx){const s=evState(E.k);if(E.once&&s.n)return null;const cd=E.cd==null?1:E.cd;if(s.last!=null&&S.day-s.last<cd)return null;let ok=false;try{ok=!!E.when(ctx)}catch(e){ok=false}if(!ok)return null;
+/* audit N04 (2026-10-06): a beat chosen while an exchange is being said waits for the floor (shStart) — and is not done until
+   it runs: what it records (a visit count, a fact) is there when the next beat asks, and a beat whose wait never ended
+   (the app closed) is still to come. While it waits it is not chosen again. */
+const SH_PEND=new Set();
+function storyEligible(E,ctx){if(SH_PEND.has(E.k))return null;const s=evState(E.k);if(E.once&&s.n)return null;const cd=E.cd==null?1:E.cd;if(s.last!=null&&S.day-s.last<cd)return null;let ok=false;try{ok=!!E.when(ctx)}catch(e){ok=false}if(!ok)return null;
  const list=E.present||[{run:E.run}];for(const p of list){let can=true;try{can=!p.can||!!p.can(ctx)}catch(e){can=false}if(can)return p}return false}   /* false: eligible but no way to present it today */
 function storyTick(at,ctx){if(!S||phase==='title')return null;if(at==='close'&&typeof upNight==='function'&&upNight())return null;/* v2.4 P2: that closing is the search */ctx=ctx||{};ctx.at=at;const day=storyDay();if(at==='daystart')try{v24Day()}catch(e){console.warn('[v24]',e)}if(at==='daystart')try{majorOwe()}catch(e){console.warn('[owe]',e)}let fired=null;const res=v24Held(at);const owed=majorOwed();
  const pos=storyPos(at);
@@ -2358,18 +2409,33 @@ function storyTick(at,ctx){if(!S||phase==='title')return null;if(at==='close'&&t
   if(lane==='major'&&cands.length&&(owed||res)){const want=[];if(owed)want.push(owed);for(const k of res||[])if(!want.includes(k))want.push(k);
    if(LANE_CAP.major-(day.major||0)<=want.length){const keep=cands.filter(o=>want.includes(o.E.k)||o.E.floor===0);/* floor 0: a beat that has only this day (Dylan on Valentine's) never waits */for(const o of cands)if(!keep.includes(o))storyMiss(o.E,day);cands=keep}}
   if(!cands.length)continue;const c=wpick(cands,x=>x.w);if(!c)continue;for(const o of cands)if(o!==c)storyMiss(o.E,day);
-  const s=evState(c.E.k);s.n++;s.last=S.day;if(!s.d)s.d=S.day;s.miss=0;day.seen[c.E.k]=1;if(lane!=='ambient'){day[lane]=(day[lane]||0)+1;if(pos!=null)(day.lp=day.lp||{})[lane]=pos}storyTrace({at,k:c.E.k,lane});shStart(c.E.k,shAuthored(c.E),ctx.g,()=>c.pv.run(ctx));fired=fired||c.E.k}
+  const k=c.E.k;day.seen[k]=1;if(lane!=='ambient'){day[lane]=(day[lane]||0)+1;if(pos!=null)(day.lp=day.lp||{})[lane]=pos}storyTrace({at,k,lane});
+  SH_PEND.add(k);shStart(k,shAuthored(c.E),ctx.g,()=>{SH_PEND.delete(k);const s=evState(k);s.n++;s.last=S.day;if(!s.d)s.d=S.day;s.miss=0;return c.pv.run(ctx)},at==='daystart');fired=fired||k}   /* the day's own beats (daystart: who is off, who is coming, the tasting) are the day as it begins — never kept waiting */
  try{storyProgressCheck()}catch(e){console.warn('[story]',e)}return fired}
 /* what a story event leaves in the journal's week timeline (read by storyEvents) */
-function storyNotes(){const out=[];const E=story().ev;for(const S0 of STORY_EV)if(S0.note&&E[S0.k]&&E[S0.k].n){const t=typeof S0.note==='function'?S0.note(E[S0.k]):S0.note;if(t)out.push({day:E[S0.k].d,t,ic:S0.ic||'heart'})}return out}
+function storyNotes(){const out=[];const E=story().ev;for(const S0 of STORY_EV)if(S0.note&&E[S0.k]&&E[S0.k].n){const t=cjkSp((typeof S0.note==='function'?S0.note(E[S0.k]):S0.note)||'');if(t)out.push({day:E[S0.k].d,t,ic:S0.ic||'heart'})}return out}
 /* ---- Story Photos: an authored picture in the album, unlocked once, by a story consequence only ---- */
 const STORY_PHOTOS={};   /* key -> {cap, txt, art (a key of window.STORY_ART) or stage (a function drawing a 360x270 canvas), who:[ids]} */
 function storyArtSrc(key){const A=window.STORY_ART;return A&&A[key]||null}
-function storyPhoto(key,info){const st=story();if(st.photos[key])return false;const P=STORY_PHOTOS[key];if(!P)return false;let img=P.art?storyArtSrc(P.art):null;if(!img&&P.stage){try{const cv=mkCanvas(360,270);P.stage(cv.getContext('2d'),info||{});img=cv.toDataURL('image/jpeg',.8)}catch(e){img=null}}if(!img){/* v2.3 Phase 9: no art yet — the milestone is kept in a slot; the picture joins the album when the art arrives */const PP=storyPhotoPending();if(!PP[key])PP[key]={day:S.day,info:info||{}};return false}
+/* audit N10 (2026-10-06): a story's photo is taken after the lines it shows — called in a beat whose words are still on their
+   way (its own timers), it waits behind them, so the album's 「還是沒有同意」 is not on the page before 「我還是不同意。」
+   (PROJECT_MEMORY §9: 事件還沒發生不能先有照片) */
+function storyPhoto(key,info){const cx=SCX;
+ /* audit N10: after the lines its beat still has to say — in the room they are on the service's clock (a closing's
+    「欸，你看。」…「不要問。」 came after its picture). (The tests' say-it-now mode, __fastSay, holds nothing.) */
+ if(window.__fastSay)info=Object.assign({},info||{},{__after:1});
+ if(cx&&!(info&&info.__after)&&R&&R.talkq&&!story().photos[key]){const lt=R.talkq.filter(x=>x.cx===cx).reduce((m,x)=>Math.max(m,x.t),-1);if(lt>=0){svcAt(lt-R.t+.3,()=>shRun(cx,()=>storyPhoto(key,Object.assign({},info||{},{__after:1}))),cx);return true}}
+ if(cx&&!(info&&info.__after)&&cx.timers&&cx.timers.length&&!story().photos[key]){const due=Math.max(...cx.timers.map(T=>T.due))-performance.now();setTimeout(()=>storyPhoto(key,Object.assign({},info||{},{__after:1})),Math.max(0,due)+300);return true}
+ const st=story();if(st.photos[key])return false;const P=STORY_PHOTOS[key];if(!P)return false;let img=P.art?storyArtSrc(P.art):null;if(!img&&P.stage){try{const cv=mkCanvas(360,270);P.stage(cv.getContext('2d'),info||{});img=cv.toDataURL('image/jpeg',.8)}catch(e){img=null}}if(!img){/* v2.3 Phase 9: no art yet — the milestone is kept in a slot; the picture joins the album when the art arrives */const PP=storyPhotoPending();if(!PP[key])PP[key]={day:S.day,info:info||{}};return false}
  st.photos[key]=S.day;const p=albumAdd('story:'+key,img,Object.assign({cap:P.cap,txt:typeof P.txt==='function'?P.txt(info||{}):P.txt},info||{}));p.story=1;p.keep=true;FLASH=null;sfx.shutter();const L={who:'',name:'',text:`相簿多了一張：「${P.cap}」`,photo:img,cap:P.cap};
  if(!shGrab(L)&&!(P.art&&shOn()&&scene([L],null,{modal:true})))noteRaw(L.text);save();return true}   /* rc8.5: the player's picture is shown, not only named — and it holds a service (dlgShow) */
 /* ---- named guests (Ken, Monsieur 杜, 周董 …) have a history from now on: visits, the last day, what they ate ---- */
-function namedId(g){return g?(g.named||(!g.reg&&g.size===1&&NAMED[g.name]?g.name:null)):null}   /* the person, with or without company */
+function namedId(g){return g?(g.named||(!g.reg&&g.size===1&&NAMED[g.name]?g.name:null)):null}
+/* audit N03 (2026-10-06): an anonymous guest — not a regular, not Dylan, not a named guest. The everyday line pools (the
+   serving lines, the VIP's order, the neighbour's dish, the cat questions…) are written for strangers: a named guest or
+   Dylan saying them reads like someone who has never been here (Dylan's 「這就是招牌菜？」 after fifteen of them, 周董's
+   「把你們最好的端上來吧。」 a moment before his own 「隨便。」). One test, used by every such pool. */
+function anonG(g){return !!g&&!g.reg&&!namedId(g)}   /* the person, with or without company */
 function namedHist(name){const N=story().named;return N[name]=N[name]||{v:0,last:0,dishes:{}}}
 function storyIdsOf(g){if(!g)return[];const ids=regsOf(g).slice();const n=namedId(g);if(n)ids.push('n:'+n);return ids}
 /* co-presence: everyone seated who has an identity, once a day per pair — written at a seating, so at most the few people in the room */
@@ -2387,8 +2453,8 @@ function storyCatPull(c){if(!R||phase!=='service'||c.def.id!=='mei')return null;
  if(evDone('sophie_mei_2')&&!evDone('sophie_mei_3')&&sophieVisitsSince('sophie_mei_2')>=2)return{g,w:2.6};
  /* after the pad: a small pull now and then, so the later glances happen at all */
  if(gearOn('sophiepad')&&Math.random()<.5)return{g,w:.9};return null}
-const SOPHIE_SAY=(g,txt,ms)=>setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,txt)},ms||500);
-const JILL_SAY=(txt,ms,o)=>(window.__fastSay?(f=>f()):(f=>setTimeout(f,ms||1600)))(()=>{if(R&&phase==='service')jillSay(txt,o||{})});
+const SOPHIE_SAY=(g,txt,ms)=>speakLater(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,txt)},ms||500);
+const JILL_SAY=(txt,ms,o)=>speakLater(()=>{if(R&&phase==='service')jillSay(txt,o||{})},ms||1600,true);
 STORY_EV.push(
  {k:'sophie_mei_1',lane:'minor',cls:'B',at:['cat'],once:true,note:'Sophie 第一次來，叫寶寶不要靠她的包。',
   when:ctx=>ctx.g&&ctx.g.reg==='sophie'&&ctx.c&&ctx.c.def.id==='mei'&&ctx.g.table!=null&&(S.regulars.sophie||0)>=1,
@@ -2426,7 +2492,7 @@ STORY_EV.push({k:'recognize',lane:'ambient',cd:2,at:['seat'],
  w:()=>.6,
  run:ctx=>{const g=ctx.g;let best=null;for(const o of seatedKnown()){if(o===g)continue;for(const a of storyIdsOf(g))for(const b of storyIdsOf(o)){const f=famOf(a,b);if(a!==b&&f>=1&&!(REG_BY[a]&&REG_BY[a].pair===b)&&(!best||f>best.f))best={a,b,f,o}}}if(!best)return;
   const nm=id=>id.startsWith('n:')?id.slice(2):REG_BY[id]?REG_BY[id].n:id;const line=pickT(RECOG_LINES[best.f]||RECOG_LINES[1]);
-  if(line.startsWith('「')){setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,line.replace(/^「|」$/g,''),{who:REG_BY[best.a]?best.a:undefined})},700);relSet(best.a,best.b,'greeted',true)}else{noteLine(`${nm(best.a)}朝${nm(best.b)}${line}`);relSet(best.a,best.b,'noticed',true)}}});
+  if(line.startsWith('「')){speakLater(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,line.replace(/^「|」$/g,''),{who:REG_BY[best.a]?best.a:undefined})},700);relSet(best.a,best.b,'greeted',true)}else{noteLine(`${nm(best.a)}朝${nm(best.b)}${line}`);relSet(best.a,best.b,'noticed',true)}}});
 /* ================= v2.3 Phase 3: the Lounge — the same restaurant, later in the evening =================
    A fifth room (S.rooms.lounge = 1/2/3) reached through an arch on the main hall's back wall. Its seats are tables in
    R.tables with room:'lounge' (a bar stool is a one-seat table of kind 'bar'), never given to dining groups; a group is
@@ -2727,7 +2793,7 @@ function kenHist(){return story().named[KEN]||{v:0,dishes:{}}}
 function kenAteMain(){const d=kenHist().dishes;return Object.keys(d).some(k=>{const D=DISH(k);return D&&D.cat==='main'})}
 function kenSince(k){const s=evState(k);return s.n?kenHist().v-(s.v||0):-1}
 function loungeArcOpen(){return fact('ken_wine_q')&&!fact('lounge_project')}
-const KEN_SAY=(g,txt,ms)=>setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,txt)},ms||400);
+const KEN_SAY=(g,txt,ms)=>speakLater(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,txt)},ms||400);
 STORY_EV.push(
  /* BEAT 1 — Ken notices the absence (his third paid visit or later, having eaten a main) */
  {k:'ken_wine_q',lane:'minor',cls:'A',floor:2,at:['collect'],once:true,ic:'star',note:'Ken 問：「妳真的不賣酒？」Jill 說隔壁就有。',
@@ -2736,7 +2802,7 @@ STORY_EV.push(
  /* BEAT 2/3 — pairing talk keeps coming back (up to three times, days apart); with 杜 in the room it becomes their argument, once */
  {k:'ken_pairing',lane:'minor',cls:'A',floor:3,cd:2,at:['order'],
   when:ctx=>loungeArcOpen()&&ctx.g&&namedId(ctx.g)===KEN&&ctx.tk&&!ctx.tk.lounge&&evState('ken_wine_q').last<S.day&&factN('ken_pairing')<3,
-  present:[{can:()=>!!duAt()&&!fact('ken_du_argue'),run:ctx=>{const g=ctx.g,d=duAt();KEN_SAY(g,'這一道如果配——',300);setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(d))quote(d,'不要。')},1700);KEN_SAY(g,'我還沒講。',3000);setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(d))quote(d,'我知道你要講什麼。')},4300);JILL_SAY('你們兩個可以先讓我把餐廳開完嗎？',5900);factSet('ken_pairing');factSet('ken_du_argue');relSet('n:'+KEN,'n:'+DU,'argued');relSet('n:'+KEN,'n:'+DU,'spoke')}},
+  present:[{can:()=>!!duAt()&&!fact('ken_du_argue'),run:ctx=>{const g=ctx.g,d=duAt();KEN_SAY(g,'這一道如果配——',300);speakLater(()=>{if(R&&phase==='service'&&R.groups.includes(d))quote(d,'不要。')},1700);KEN_SAY(g,'我還沒講。',3000);speakLater(()=>{if(R&&phase==='service'&&R.groups.includes(d))quote(d,'我知道你要講什麼。')},4300);JILL_SAY('你們兩個可以先讓我把餐廳開完嗎？',5900);factSet('ken_pairing');factSet('ken_du_argue');relSet('n:'+KEN,'n:'+DU,'argued');relSet('n:'+KEN,'n:'+DU,'spoke')}},
    {run:ctx=>{const g=ctx.g;const main=ctx.tk.items.find(i=>DISH(i.d).cat==='main');const dn=main?dishName(main.d):'這道';KEN_SAY(g,!factN('ken_pairing')?'這個沒有酒有點可惜。':pickT([`${dn}要是有一杯輕一點的紅酒，就完整了。`,`妳這裡的${dn}，配氣泡酒會很好。`,'我不是在推銷，我只是覺得可惜。']),300);JILL_SAY(pickT(['你又來了。','先吃。','……我記著。']),1900,{with:'named:'+KEN});factSet('ken_pairing');relSet('n:'+KEN,'jill','spoke')}}]},
  /* BEAT 3 — the idea returns without Ken: someone lingers, someone asks for one more drink (sparse) */
  {k:'lounge_idea',lane:'ambient',cd:3,at:['collect'],   /* rc8 (19:19 §6): dinner here, then next door — the neighbourhood's habit, seen (the guest walks over) */
@@ -2745,7 +2811,7 @@ STORY_EV.push(
  /* BEAT 4 — the tasting evening: one authored night. Decided at the day's start; Ken is on the schedule; the choice is the player's */
  {k:'ken_tasting',lane:'major',cls:'A',floor:1,at:['daystart'],once:true,ic:'star',note:'那一晚，Ken 幫忙選了幾瓶酒——第一次有酒配菜。',
   when:()=>loungeArcOpen()&&factN('ken_pairing')>=2&&factN('lounge_idea')>=2&&kenHist().v>=4,   /* the user, 2026-10-07 (PROJECT_MEMORY §6): no Fine Dining, no restaurant level, no rating — the night comes from Ken's own story: his visits, a main he ate (ken_wine_q), the pairing talk and the idea next door, each on its own later day. S.level>=4 was v2.3's (421dd42), the rating 4.0 one morning's (a8c6abd); neither was the user's */
-  run:()=>{R.tasting={dir:null,n:0};R.sched.push({t:R.dur*.3,type:'gourmet',size:1,name:KEN,tasting:1});R.sched.sort((a,b)=>a.t-b.t);S.news=S.news||[];factSet('tasting_night');setTimeout(()=>{if(R&&phase==='service')noteLine('今晚是試酒的晚上：Ken 說他會早一點來。')},2600)}},
+  run:()=>{R.tasting={dir:null,n:0};R.sched.push({t:R.dur*.3,type:'gourmet',size:1,name:KEN,tasting:1});R.sched.sort((a,b)=>a.t-b.t);S.news=S.news||[];factSet('tasting_night');speakLater(()=>{if(R&&phase==='service')noteLine('今晚是試酒的晚上：Ken 說他會早一點來。')},2600)}},
  /* the tasting itself, when Ken sits down that night */
  {k:'tasting_start',lane:'minor',cls:'A',floor:0,at:['seat'],once:true,
   when:ctx=>R.tasting&&!R.tasting.on&&ctx.g&&namedId(ctx.g)===KEN,
@@ -2897,7 +2963,7 @@ STORY_EV.push(
  /* §17: Madame Lin, retired, on the other side of the bar */
  {k:'lin_guest',lane:'major',cls:'A',floor:2,at:['lounge'],once:true,ic:'heart',note:'Madame Lin 第一次以客人的身分坐進 The Lounge。「坐哪？」「隨便。」「喝什麼？」「你選。」',
   when:ctx=>!!ctx.g&&namedId(ctx.g)===LIN&&ctx.why==='direct'&&loungeLv()>0&&!!fact('lin_closed')&&!!evanOn()&&!fact('lin_guest')&&!kenNightToday()&&!cnTonight(),
-  run:ctx=>{if(SCX){SCX.cap=16;SCX.stageRoom='lounge'}factSet('lin_guest');relSet('n:'+LIN,'jill','spoke');linGuestScene(ctx.g)}}
+  run:ctx=>{if(SCX){SCX.cap=16;SCX.stageRoom='lounge'}factSet('lin_guest');relSet('n:'+LIN,'jill','spoke');if(ctx.g)ctx.g.chose=1;linGuestScene(ctx.g)}}   /* g.chose (audit N03): 「你選。」 — Evan chooses; she does not then order her own glass aloud */
 );
 /* the news before opening: her last nights */
 function linNewsHTML(){const d=linLast();if(!d||fact('lin_closed')||loungeLv())return'';const left=d-S.day;if(left>3||left<0)return'';return`<div class="event kent quiet"><b>${left?`隔壁｜Madame Lin 的店再開 ${left} 晚`:'今晚｜隔壁 Madame Lin 的店，最後一晚'}</b><span>${left?'她做到月底。':'明天起，隔壁的門會關著。'}</span></div>`}
@@ -2957,7 +3023,7 @@ function tenureLine(m){if(crewLegacy(m))return`${tenure(m)}（v2.3 以前就在�
 /* a first Lounge shift is slower, and someone asks where table three is — once; a veteran answers a newcomer, once */
 function loungeShiftMul(m){if(m.role!=='waiter')return 1;const f=famOfArea(m,'lounge');return f>=10?.92:f>=3?1:1.25}
 function firstShiftLine(m,t){if(!R||!t||!t.lounge||m.role!=='waiter'||famOfArea(m,'lounge')>=3||m.askedLg)return;m.askedLg=1;const vet=(S.crew||[]).find(q=>q!==m&&q.role==='waiter'&&famOfArea(q,'lounge')>=10)||(S.crew||[]).find(q=>q.role==='bartender'&&q.duty==='lbar');
- staffSay(m,pickT(['這杯是哪桌？','三號是哪邊？','Lounge 的三號在哪？']),undefined,t.group||undefined);if(vet)setTimeout(()=>{if(R&&phase==='service')staffSay(vet,famOfArea(vet,'lounge')>=10?'靠牆第二桌。':'三號。',undefined,t.group||undefined)},1600);relSet('s:'+m.id,vet?'s:'+vet.id:'jill','helped');if(vet)relSet('s:'+vet.id,'s:'+m.id,'helpedBy')}
+ staffSay(m,pickT(['這杯是哪桌？','三號是哪邊？','Lounge 的三號在哪？']),undefined,t.group||undefined);if(vet)speakLater(()=>{if(R&&phase==='service')staffSay(vet,famOfArea(vet,'lounge')>=10?'靠牆第二桌。':'三號。',undefined,t.group||undefined)},1600);relSet('s:'+m.id,vet?'s:'+vet.id:'jill','helped');if(vet)relSet('s:'+vet.id,'s:'+m.id,'helpedBy')}
 /* 阿拓's hand: bar food, faster and surer; the pantry's fryer gives every chef a little of it */
 function barCookMul(m,d){const D=DISH(d);if(!D||!D.bar)return 1;let k=1;if(m&&m.name==='阿拓')k*=.7;if(opsLv('pantry'))k*=.8;return k}
 /* ================= v2.3 Phase 7: people who know each other — the authored arcs, on the foundation =================
@@ -2972,7 +3038,34 @@ function whoName(id){if(!id)return'';if(id==='jill')return'Jill';if(id==='dylan'
 const SEATED_ST=['toTable','reading','order','wait','eat','check'];   /* toTable: just seated, walking over — already at the table for every purpose here */
 function seatedId(id){return R&&R.groups.find(g=>g.table!=null&&!g.gone&&SEATED_ST.includes(g.state)&&storyIdsOf(g).includes(id))||null}
 function presentId(id){return R&&R.groups.find(g=>!g.gone&&g.state!=='leave'&&storyIdsOf(g).includes(id))||null}
-function later(fn,ms){if(window.__fastSay){fn();return}setTimeout(fn,ms)}   /* tests read the lines at once */
+/* audit N06 (2026-10-06): who is still in the restaurant when it closes — here now, or gone only after the doors closed and
+   not with someone (「…一起走了。」). 「打烊後，Ken 沒有走。」 asked only whether he came today, so it followed 「品酒師 Ken 和
+   Monsieur 杜 一起走了。」 by an hour. */
+function stillHere(id){if(!R)return false;if(presentId(id))return true;const L=(R.leftAt||{})[id];return !!(L&&L.closed&&!L.together&&!(R.leftTog&&R.leftTog[id]))}
+/* ================= the floor (audit N04, W3-02; 2026-10-06) =================
+   The room's speech runs on the service clock: a story's panel or the pause sheet holds it with the rest of the room (it
+   went on underneath, unseen — Ken and 杜's 「這支太甜了。」 under the photo). And one exchange speaks at a time: an exchange
+   is what one moment sets going — a beat's code, Jill's greeting and its answer, 「還可以嗎？」 and the reply, a treat and
+   its thanks. One that begins while another is still being said waits for that one's last line, so a question is answered
+   by its own answer (「Mia，今天想吃什麼？」 was answered 「第二層左邊。」, another exchange's). Small talk is left out while
+   the floor is taken. Before opening and after the service the wall clock is kept (nobody else is talking then). */
+const FLOOR_GAP=1.2;   /* service-clock seconds of quiet after an exchange's last line */
+let TALK=null;         /* the exchange being set going right now: {max} — when its last line comes */
+function floorBusy(){return !!(R&&phase==='service'&&R.floorUntil!=null&&R.t<R.floorUntil)}
+function svcAt(sec,fn,cx){if(!R)return;const q=R.talkq=R.talkq||[];q.push({t:R.t+sec,n:(R.talkN=(R.talkN||0)+1),fn,cx:cx||null})}
+function talkUpd(){const q=R.talkq;if(!q||!q.length)return;const due=q.filter(x=>R.t>=x.t);if(!due.length)return;R.talkq=q.filter(x=>R.t<x.t);due.sort((a,b)=>a.t-b.t||a.n-b.n);for(const x of due){try{x.fn()}catch(e){console.warn('[talk]',e)}}}
+function floorFlush(){if(!R)return;R.floorUntil=null;for(let i=0;i<6&&R.talkq&&R.talkq.length;i++){const q=R.talkq;R.talkq=[];for(const x of q.sort((a,b)=>a.t-b.t||a.n-b.n)){try{x.fn()}catch(e){console.warn('[talk]',e)}}}}   /* the evening ends: what was still waiting to be said is said (or finds nobody) */
+/* a line of the room, ms from now (at 1×, as the game's lines were written); fast: the tests' __fastSay says it at once */
+function speakLater(fn,ms,fast){if(fast&&window.__fastSay){fn();return}const cx=SCX;
+ if(!R||phase!=='service'||(cx&&cx.authored&&shOn())){setTimeout(fn,ms);return}   /* before opening, after the service, or a held beat: its panel brings its lines as they are read */
+ const sec=Math.max(0,+ms||0)/1000*simSpeed();svcAt(sec,cx?()=>shRun(cx,fn):fn,cx);
+ if(TALK)TALK.max=Math.max(TALK.max,sec);else R.floorUntil=Math.max(R.floorUntil||0,R.t+sec+FLOOR_GAP)}
+/* an exchange: now if the floor is free, else after the one being said */
+function talk(fn,now){if(!R||phase!=='service'||window.__fastSay||(SCX&&SCX.authored&&shOn())){fn();return}
+ if(!now&&floorBusy()&&!TALK){svcAt(R.floorUntil-R.t+.05,()=>talk(fn));return}
+ if(TALK){fn();return}   /* inside an exchange already: one exchange */
+ TALK={max:0};try{fn()}finally{const T=TALK;TALK=null;if(R)R.floorUntil=R.t+T.max+FLOOR_GAP}}
+function later(fn,ms){speakLater(fn,ms,true)}   /* tests read the lines at once (__fastSay) */
 function sayG(g,txt,ms,o){later(()=>{if(R&&phase==='service'&&R.groups.includes(g)&&!g.gone)quote(g,txt,o)},ms||400)}
 function sayS(m,txt,ms,tone){later(()=>{if(R&&phase==='service'&&m&&(S.crew||[]).includes(m)&&crewHere(m))staffSay(m,txt,tone)},ms||400)}
 /* ---- the romance whitelist: the only pairs whose history may ever be read as more than friendship ---- */
@@ -3000,16 +3093,16 @@ function storyNearStool(g,free){const p=pairFor(g);if(!p||!p.P.near())return nul
 function holdStoolFor(g,t){if(!t||t.kind!=='bar'||!R)return;const p=pairFor(g);if(!p||!p.P.near()||!fact('sm_c')&&p.P.a==='sophie')return;if(p.P.a===KEN_ID&&!fact('kd_usual')&&!kdNightNow())return;if(seatedId(p.other))return;const n=loungeTables().find(q=>q.kind==='bar'&&!q.group&&!q.dirty&&!q.claim&&!q.hold&&Math.abs(q.x-t.x)<34&&q!==t);if(!n)return;n.hold=p.other;n.holdBy=p.me;n.holdOf=t;factSet('held_'+p.me,true)}
 /* ---- waiting: the meal is over, the partner is on the schedule for later — she stays (once), and only if the partner is really coming ---- */
 function partnerLater(id){if(!R||R.closed)return null;for(let i=R.si;i<R.sched.length;i++){const o=R.sched[i];const oid=o.reg?o.reg:o.name&&NAMED[o.name]?'n:'+o.name:null;if(oid===id&&o.t-R.t<110)return o}return null}
-function storyLinger(g){if(!R||g.lingered||g.table==null)return false;if(yjWaitsForMom(g))return true;if(R.closed)return false;if(namedId(g)==='周董'&&!g.zhouStay){const t0=R.tables[g.table];const c=catBy('snow');if(c&&!c.hidden&&(c.st==='sleep'||c.st==='bed')&&(t0.room||'main')==='main'&&Math.hypot(c.x-t0.x,c.y-t0.y)<100){g.zhouStay=1;g.timer=25;JILL_SAY('你不是有事？',600,{with:'named:周董'});sayG(g,'牠在睡。',2000);g.lookT=R.t+3;g.lookCat=c;relSet('n:周董','snow','stayedFor');regFactNamed('周董',`${catName(c.def)}在旁邊睡著，他就沒走。`);return true}}const p=pairFor(g);if(!p||!p.P.linger())return false;if(seatedId(p.other)||presentId(p.other))return false;const o=partnerLater(p.other);if(!o)return false;g.lingered=1;g.lingerFor=p.other;g.timer=Math.max(8,Math.min(120,o.t-R.t+20));
+function storyLinger(g){if(!R||g.lingered||g.table==null)return false;if(yjWaitsForMom(g))return true;if(R.closed)return false;if(namedId(g)===KEN&&kenSamplesDue()&&!kenNightToday()){g.timer=20;return true}   /* the samples night (audit N06): he has the three bottles with him — he stays till the doors close */if(namedId(g)==='周董'&&!g.zhouStay){const t0=R.tables[g.table];const c=catBy('snow');if(c&&!c.hidden&&(c.st==='sleep'||c.st==='bed')&&(t0.room||'main')==='main'&&Math.hypot(c.x-t0.x,c.y-t0.y)<100){g.zhouStay=1;g.timer=25;JILL_SAY('你不是有事？',600,{with:'named:周董'});sayG(g,'牠在睡。',2000);g.lookT=R.t+3;g.lookCat=c;relSet('n:周董','snow','stayedFor');regFactNamed('周董',`${catName(c.def)}在旁邊睡著，他就沒走。`);return true}}const p=pairFor(g);if(!p||!p.P.linger())return false;if(seatedId(p.other)||presentId(p.other))return false;const o=partnerLater(p.other);if(!o)return false;g.lingered=1;g.lingerFor=p.other;g.timer=Math.max(8,Math.min(120,o.t-R.t+20));
  const t=R.tables[g.table];const bt=t.lounge?(S.crew||[]).find(m=>m.role==='bartender'&&m.duty==='lbar'):null;
  if(bt){sayS(bt,'還要什麼嗎？',600);sayG(g,'不用。',2100)}else if(Math.random()<.6){JILL_SAY('還要什麼嗎？',600);sayG(g,'不用。',2100)}
  noteLine(`${g.name} 吃完了，還坐著。`);return true}
 function lingerMet(g){/* the partner sat down: whoever was staying for them has waited */if(!R)return;for(const id of storyIdsOf(g)){for(const o of R.groups){if(o===g||o.gone||o.lingerFor!==id||o.table==null)continue;o.lingerFor=null;o.timer=Math.max(o.timer||0,30);const me=storyIdsOf(o).find(x=>pairOf(x)&&pairOf(x).other===id);if(!me)continue;relSet(me,id,'waitedFor');factSet('waited_'+me);const t=R.tables[o.table];const bt=t.lounge?(S.crew||[]).find(m=>m.role==='bartender'&&m.duty==='lbar'):null;if(bt){noteLine(`${bt.name} 看了一眼，什麼都沒說。`);relSet('s:'+bt.id,me,'sawWait')}else noteLine(`${whoName(me)} 等的人來了。`)}}}
 /* ---- leaving together: only when both are really at the end of the evening ---- */
-function storyLeaveTogether(g){if(!R||g.leaveWith)return;const p=pairFor(g);if(!p||!p.P.leave())return;const o=seatedId(p.other);if(!o||o===g||o.counted&&o.state==='leave')return;const a=p.me,b=p.other;
+function storyLeaveTogether(g){if(!R||g.leaveWith)return;const p=pairFor(g);if(!p||!p.P.leave())return;if((p.me===KEN_ID||p.other===KEN_ID)&&kenSamplesDue()&&!kenNightToday())return;   /* not on the samples night: Ken stays */const o=seatedId(p.other);if(!o||o===g||o.counted&&o.state==='leave')return;const a=p.me,b=p.other;
  if(o.state==='check'){o.leaveWith=a;collect(o,{});leftTogether(a,b,g,o)}
  else if(o.state==='eat'&&o.timer<40){o.timer=Math.min(o.timer,1.5);R.pairLeave={a,b,t:R.t,g}}}
-function leftTogether(a,b,g,o){relSet(a,b,'leftTogether');const first=!fact('left_'+pairKey(a,b));factSet('left_'+pairKey(a,b));noteLine(`${whoName(a)} 和 ${whoName(b)} 一起走了。`);
+function leftTogether(a,b,g,o){if(R){R.leftTog=R.leftTog||{};R.leftTog[a]=1;R.leftTog[b]=1}relSet(a,b,'leftTogether');const first=!fact('left_'+pairKey(a,b));factSet('left_'+pairKey(a,b));noteLine(`${whoName(a)} 和 ${whoName(b)} 一起走了。`);
  if(first&&romancePair(a,b))memo('together',DOOR.x+30,DOOR.y+10,{a:whoName(a),b:whoName(b),subj:[g,o],room:'main'});else if(Math.random()<.3)memo('together',DOOR.x+30,DOOR.y+10,{a:whoName(a),b:whoName(b),subj:[g,o],room:'main'});
  if(romancePair(a,b)&&fact('sm_h')&&!story().photos.sophie_mia_leave)storyPhoto('sophie_mia_leave',{a:whoName(a),b:whoName(b)});storyTick('leave',{g,o,a,b})}
 function pairLeaveCheck(g){const pl=R&&R.pairLeave;if(!pl)return;if(R.t-pl.t>45){R.pairLeave=null;return}if(storyIdsOf(g).includes(pl.b)){R.pairLeave=null;leftTogether(pl.a,pl.b,pl.g,g)}}
@@ -3055,7 +3148,7 @@ STORY_EV.push(
    {can:ctx=>ctx.t&&(()=>{const s=seatedId('sophie');return s&&(R.tables[s.table].room||'main')===(ctx.t.room||'main')})(),run:ctx=>{noteLine('Mia 進來的時候，Sophie 把包從對面的椅子上拿下來，放到腳邊。');relSet('sophie','mia','madeSpace');factSet('sm_d');regFact('sophie','Mia 進來的時候，她把包從椅子上拿下來。')}}]},
  {k:'sm_e',lane:'minor',cls:'A',floor:3,at:['collect'],once:true,note:'Mia 問要不要吃一口；Sophie 說不要，後來還是吃了。',
   when:ctx=>ctx.g&&['sophie','mia'].includes(ctx.g.reg)&&fact('sm_d')&&S.day-fact('sm_d').d>=1&&(ctx.items||[]).length>0&&(()=>{const o=seatedId(ctx.g.reg==='sophie'?'mia':'sophie');return o&&o.table!=null&&ctx.t&&Math.hypot(R.tables[o.table].x-ctx.t.x,R.tables[o.table].y-ctx.t.y)<130})(),
-  run:ctx=>{const m=seatedId('mia'),s=seatedId('sophie');if(!m||!s)return;const it=(m.ticket&&m.ticket.items.find(i=>i.st==='served'&&DISH(i.d)&&DISH(i.d).cat!=='drink'))||(ctx.items||[]).find(i=>DISH(i.d)&&DISH(i.d).cat!=='drink');const dn=it?dishName(it.d):'這個';sayG(m,'要不要吃這個？',600);sayG(s,'不要。',2000);setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(s))noteLine(`Sophie 後來還是吃了一口${dn}。`)},6500);relSet('sophie','mia','sharedFood');factSet('sm_e');regFact('mia','分了 Sophie 一口自己的菜。')}},
+  run:ctx=>{const m=seatedId('mia'),s=seatedId('sophie');if(!m||!s)return;const it=(m.ticket&&m.ticket.items.find(i=>i.st==='served'&&DISH(i.d)&&!isGlass(i.d)))||(ctx.items||[]).find(i=>DISH(i.d)&&!isGlass(i.d));const dn=it?dishName(it.d):'這個';sayG(m,'要不要吃這個？',600);sayG(s,'不要。',2000);speakLater(()=>{if(R&&phase==='service'&&R.groups.includes(s))noteLine(`Sophie 後來還是吃了一口${dn}。`)},6500);relSet('sophie','mia','sharedFood');factSet('sm_e');regFact('mia','分了 Sophie 一口自己的菜。')}},
  /* F is not an event: storyLinger() keeps Sophie at the table when Mia is on the way (once sm_e), lingerMet() writes waitedFor. The fact sm_f is the first time it happened. */
  {k:'sm_f',lane:'minor',cls:'B',at:['seat'],once:true,note:'Sophie 吃完了沒有走——她在等 Mia。',
   when:ctx=>ctx.g&&ctx.g.reg==='mia'&&relN('sophie','mia','waitedFor')>=1,
@@ -3125,9 +3218,9 @@ STORY_EV.push(
   run:()=>{const q=qingOn(),t=tuoOn();const lines=[{who:'staff:沈晴',text:'什麼？'},{who:'staff:阿拓',text:'多的。'},{who:'staff:沈晴',text:'你明明就是特別做的。'},{who:'staff:阿拓',text:'多的。'}];const done=()=>{relSet('s:'+q.id,'s:'+t.id,'gesture');relSet('s:'+q.id,'s:'+t.id,'sharedFood');factSet('qt_3');noteLine('打烊後，阿拓在晴旁邊放了一小盤，說是多的。')};scene(lines,done)/* scene() runs the callback itself when it cannot show */}},
  {k:'qt_extra',lane:'ambient',cd:4,at:['close'],when:()=>qingOn()&&tuoOn()&&fact('qt_3')&&S.day-fact('qt_3').d>=3&&factN('qt_extra')<6&&!storyDay().qa&&Math.random()<.5,   /* rc8: not on an evening one of the after-work scenes has */
   run:()=>{const q=qingOn(),t=tuoOn();noteLine(pickT(['打烊後阿拓又放了一盤在晴旁邊。「多的。」','晴今天沒問，直接把那盤拿走了。阿拓沒說話。','阿拓：「多的。」晴：「你每天都多。」']));relSet('s:'+q.id,'s:'+t.id,'gesture');factSet('qt_extra')}},
- {k:'qt_absence',lane:'minor',cls:'B',at:['order'],once:true,note:'阿拓不在的那天，晴問：「今天炸物怎麼怪怪的？」Hugo：「妳不是在問炸物？」',
+ {k:'qt_absence',lane:'minor',cls:'B',at:['order'],once:true,note:()=>{const F=(story().facts||{}).qt_absence||{};const L=((story().beatLines||{}).qt_absence||[]).find(x=>x&&x.t==='妳不是在問炸物？');return`阿拓不在的那天，晴問：「今天炸物怎麼怪怪的？」${F.chef||(L&&L.w)||'Hugo'}：「妳不是在問炸物？」`},   /* audit N15: the cook who answered (hugoOn — 阿德師傅 in the user's crew), not always 「Hugo」 */
   when:ctx=>qingOn()&&!tuoOn()&&fact('qt_3')&&hugoOn()&&ctx.tk&&ctx.tk.lounge&&ctx.tk.items.some(i=>!i.lbar),
-  run:()=>{const q=qingOn(),h=hugoOn();sayS(q,'今天炸物怎麼怪怪的？',1500);sayS(h,'一樣的做法。',3000);sayS(q,'喔。',4300);sayS(q,'……阿拓今天沒來？',6200);sayS(h,'妳不是在問炸物？',7700);relSet('s:'+q.id,'s:'+h.id,'spoke');factSet('qt_absence');const F=story().facts;F.qt_absence.who='s:'+q.id}},
+  run:()=>{const q=qingOn(),h=hugoOn();sayS(q,'今天炸物怎麼怪怪的？',1500);sayS(h,'一樣的做法。',3000);sayS(q,'喔。',4300);sayS(q,'……阿拓今天沒來？',6200);sayS(h,'妳不是在問炸物？',7700);relSet('s:'+q.id,'s:'+h.id,'spoke');factSet('qt_absence');const F=story().facts;F.qt_absence.who='s:'+q.id;F.qt_absence.chef=h.name}},
  {k:'tuo_off',lane:'ambient',cd:6,at:['daystart'],note:'阿拓今天請假。',   /* not a story step of its own (no slot taken from the day's stories); again some days later if 晴 did not notice that day */
   when:()=>qingOn()&&tuoOn()&&hugoOn()&&fact('qt_3')&&S.day-fact('qt_3').d>=3&&!fact('qt_absence')&&dayCoin('tuooff|'+S.day)<40,
   run:()=>{const t=tuoOn();setCrewAway(t,'off');noteLine('阿拓今天請假。');factSet('tuo_off')}},
@@ -3433,7 +3526,7 @@ STORY_EV.push(
  {k:'first_shift',lane:'ambient',cd:0,at:['order','collect'],when:ctx=>(S.crew||[]).some(m=>m.days===0&&!m.askedFirst&&(m.role==='waiter'||m.role==='chef')),/* days===0: hired in v2.3, first shift; the old crew (no count) were never new to us */
   run:()=>{const m=(S.crew||[]).find(m=>m.days===0&&!m.askedFirst&&(m.role==='waiter'||m.role==='chef'));if(!m)return;m.askedFirst=1;const pool=(S.crew||[]).filter(q=>q!==m&&q.role===m.role&&crewHere(q)&&(crewLegacy(q)?tenureAtLeast(q,'熟手'):(q.days||0)>=10));const vet=(m.role==='chef'&&pool.find(q=>q.name==='阿珠姐'))||mostSenior(pool);/* v2.4 A2: 《第二層左邊》 is 阿珠姐's when she is in */const q=m.role==='chef'?pickT(['湯匙放哪？','冰箱第幾層是蔬菜？']):pickT(['三號桌是哪一桌？','水杯在哪？']);sayS(m,q,600);if(vet){sayS(vet,m.role==='chef'?'第二層左邊。':pickT(['靠窗那桌。','吧台下面。']),2000);relSet('s:'+vet.id,'s:'+m.id,'helped')}else JILL_SAY(m.role==='chef'?'第二層左邊。':'我帶你去。',2000);relSet('s:'+m.id,vet?'s:'+vet.id:'jill','helpedBy')}},
  {k:'veteran_knows',lane:'ambient',cd:3,at:['order'],when:()=>R&&R.rush&&!!veteranCook()&&Math.random()<.35,
-  run:()=>{const vet=veteranCook();if(!vet)return;JILL_SAY(pickT(['那個⋯⋯放哪？','鹽呢？']),400);sayS(vet,pickT(['第二層左邊。','妳手邊。']),1600);noteLine(`${vet.name} 連頭都沒回。`);relSet('s:'+vet.id,'jill','knowsPlace',true)}},
+  run:()=>{const vet=veteranCook();if(!vet)return;JILL_SAY(pickT(['那個⋯⋯放哪？','鹽呢？']),400);sayS(vet,pickT(['第二層左邊。','妳手邊。']),1600);later(()=>noteLine(`${vet.name} 連頭都沒回。`),2300);   /* audit N16: after the answer it describes, not before Jill's question */relSet('s:'+vet.id,'jill','knowsPlace',true)}},
  /* a regular who was here for the blackout, after the power is fixed */
  {k:'power_memory',lane:'ambient',cd:2,at:['seat'],when:ctx=>ctx.g&&opsLv('power')>=1&&storyIdsOf(ctx.g).some(id=>fact('saw_power_'+id)&&!relN(id,'jill','powerJoke')),
   run:ctx=>{const g=ctx.g;const id=storyIdsOf(g).find(id=>fact('saw_power_'+id)&&!relN(id,'jill','powerJoke'));sayG(g,'最近沒再停電了吧？',900,{who:REG_BY[id]?id:undefined});JILL_SAY('不要講。',2400);relSet(id,'jill','powerJoke')}},
@@ -3613,7 +3706,7 @@ function qaBooked(){return kenNightToday()||cnTonight()||!!(R&&(R.kt||R.cn))}   
 function qaHome(){const H=qaS().home;return H&&S.day>=H.d&&S.day<H.back?H:null}   /* 沈晴 at her parents' */
 function qaEve(){return loungeOpenTonight()&&!qaBooked()&&!!evanOn()}   /* Dylan's evenings at the bar (《今天喝？》): not a booked-out night, the room is the event's */
 function qaClose(){return loungeOpenTonight()&&!!evanOn()}   /* after closing (the player, 2026-10-03: 「包場夜打烊後店員還是可以留下的吧 只要看你需要的店員那天有沒有上班」): any night The Lounge was open, Evan in; each scene checks its own people */   /* an ordinary night at The Lounge */
-function qaYa(){return !!fact('ya_join')&&yaNight()}   /* 予安 played tonight: she is still there at closing */
+function qaYa(){return !!fact('ya_join')&&yaNight()&&stillHere('n:'+YA)}   /* 予安 played tonight: she is still there at closing */
 /* rc8 (the player, 2026-10-03: 「DYLAN揭曉才進那個劇情阿……而且有告白劇情一定要有圖」): the line starts after the reveal — its pictures show Dylan's face */
 function qa1Due(){const d0=loungeDoneDay();return d0!=null&&!fact('qt_drink')&&!!fact('evan_knows_dylan')&&dylanOut()&&S.day>=d0+10&&qaEve()}
 /* the people of one evening: Evan behind the bar, the rest on the guests' side of it; the piano's bench and its side */
@@ -4119,7 +4212,7 @@ STORY_EV.push(
   run:ctx=>kenCollab(ctx)},
  /* three bottles without labels, tasted against Jill's signature, after closing */
  {k:'ken_samples',lane:'major',cls:'A',floor:2,at:['close'],once:true,ic:'star',note:'打烊後，Ken 帶來三瓶樣酒，配著招牌菜試。Jill 把酒取名叫「晚餐之後」。',
-  when:()=>kenSamplesDue()&&(namedHist(KEN).seen===S.day)&&!kenNightToday()&&kenQuiet(),
+  when:()=>kenSamplesDue()&&stillHere(KEN_ID)&&!kenNightToday()&&kenQuiet(),
   run:()=>{factSet('ken_samples');kenS().wineD=S.day+5;const sn=kenSigName();
    noteLine('打烊後，Ken 沒有走。他從袋子裡拿出三瓶沒有酒標的酒，一字排開。');KEN_SAY_N('同一間酒莊，三個方向。配妳的招牌試。',600,'talk');
    later(()=>noteLine(`Jill 端出一盤${sn}，三個杯子各倒一點。`),1900);JILL_SAY('第一支太重，菜都被蓋過去了。',3200,{with:'named:'+KEN});KEN_SAY_N('第三支呢？',4500,'taste');JILL_SAY('第三支……吃完會想再喝一口。',5800,{with:'named:'+KEN});
@@ -4189,10 +4282,10 @@ function yaUpd(dt){const Y=R&&R.ya;if(!Y||!Y.g||Y.done)return;const g=Y.g;
   if(!Y.r1&&p>.015){Y.r1=1;noteLine('靠近鋼琴的那一桌，原本在聊天的客人慢慢小聲了。')}
   if(!Y.r2&&p>.03){Y.r2=1;noteLine('吧台有一位客人放下酒杯，聽了一小段。')}
   if(!Y.r3&&p>.045){Y.r3=1;noteLine('Lounge 裡有人轉過頭，看了鋼琴好一會兒。')}
-  if(!Y.clap&&p>.065&&(yaRoomFull()||p>.3)){Y.clap=1;Y.n0=loungeTables().filter(t=>t.group).length;yaTrialClap()}   /* rc8: a room to clap (the picture's), or late enough that it is the room there is */
-  if(Y.clap&&!Y.ask&&((p>.16&&loungeTables().filter(t=>t.group).length<=Y.n0-2)||p>.24||R.t>R.dur*.86||R.closed)){Y.ask=1;yaJoinAsk()}}
+  if(!Y.clap&&p>.065&&(yaRoomFull()||p>.3)){Y.clap=1;Y.clapT=R.t;Y.n0=loungeTables().filter(t=>t.group).length;yaTrialClap()}   /* rc8: a room to clap (the picture's), or late enough that it is the room there is */
+  if(Y.clap&&!Y.ask&&!DLG&&R.t-(Y.clapT!=null?Y.clapT:-1e9)>=R.dur*.03&&((p>.16&&loungeTables().filter(t=>t.group).length<=Y.n0-2)||p>.24||R.t>R.dur*.86||R.closed)){Y.ask=1;yaJoinAsk()}}   /* audit N10: the ask comes a while after the applause, once its panel is read — both used to fire in one frame and read as one panel */
  else if(!Y.said&&p>.3&&loungeTables().filter(t=>t.group).length>=6&&dayCoin('yan|'+S.day)<35){Y.said=1;const b=evanOn()||qingOn();yaSayG(g,'八點半比較吵。',300);if(b){sayS(b,'那換一首？',1700);yaSayG(g,'換一首。',3100)}}
- if((R.closed||R.t>R.dur*.9)&&(!Y.trial||Y.ask))yaLeave()}
+ if((R.closed||(Y.trial&&R.t>R.dur*.9))&&(!Y.trial||Y.ask))yaLeave()}   /* audit N06: on the nights she plays she is there until the doors close — the closing's lines (「收店了。予安把琴蓋闔上。」, qaYa) say so; she used to leave at 0.9 of the evening */
 function yaLeave(){const Y=R.ya;if(!Y||Y.done)return;Y.done=1;const g=Y.g;if(!Y.trial&&dayCoin('yaf|'+S.day)<25)noteLine('予安彈完，在吧台點了一份小食才走。');if(g&&!g.gone&&R.groups.includes(g))leaveGroup(g,'ok')}
 /* the trial: three scenes held, her playing in the room between them */
 function yaTrialOpen(){const g=R.ya.g;{const d=storyDay();d.major=(d.major||0)+1}/* the evening's story: one of the day's two */kenScene('ya_trial',yaNear(),()=>{factSet('ya_trial');yaNote('予安來了。這次她沒有點酒，直接走到鋼琴前面。');JILL_SAY('現在？',600,{with:'named:'+YA});yaSayG(g,'現在。',1900);later(()=>noteLine('她把琴蓋打開，試了幾個音，然後開始彈。'),3200)})}
@@ -4882,6 +4975,11 @@ function beatKey(b){const s0=b[0];if(typeof s0==='string')return s0;if(Array.isA
 function beatId(b){const s0=b[0];return typeof s0==='string'?s0:Array.isArray(s0)?s0.join('+'):(b[2]&&b[2].key)||b[1]}
 function lineProgress(L){const bs=lineBeats(L);const done=bs.map(b=>({t:b[1],d:beatDay(b),k:beatKey(b),id:beatId(b),note:b[2]&&b[2].note,illus:b[2]&&b[2].illus})).filter(x=>x.d!=null);return{done,total:bs.length+(L.k==='dylan'&&!dylanOut()?1:0)}}
 function lineWho(L){return typeof L.who==='function'?L.who():L.who}
+/* audit N05 (2026-10-06): a beat's title is shown as it is written — a quote keeps its 「」, a description has none — and the
+   story is named as a story, not as the speaker: 「Madame Lin「妳真的不賣酒？」」 (Ken's line) read as hers, and 「開店」 or
+   「三瓶沒有酒標的酒」 read as someone's words */
+function beatTitleHTML(t){return String(t==null?'':t)}
+function storyLabel(who){const w=String(who||'');return !w||/故事$/.test(w)?w:`${w} 的故事`}
 /* the restaurant's own story: chapters read from what the restaurant really became */
 function restChapters(){const achD=achReal;/* v2.3 follow-up: a beat's day from the game's own records where it kept one (achievements, the side hall's day, the first expansion when it was the only one); otherwise 更早以前 */
  const has=(ok,d)=>ok?(d==null?0:d):null;
@@ -4901,10 +4999,13 @@ function restChapters(){const achD=achReal;/* v2.3 follow-up: a beat's day from 
 let storyFocus=null;
 function storyFace(id){try{if(id.startsWith('cat:')){const C=CAT_DEF.find(x=>x.id===id.slice(4));return C?catPortraitURL(C):''}const p=portraitOf(id);if(p)return p.src;if(REG_BY[id])return portraitURL(REG_BY[id].looks,'reg'+id);if(id==='dylan')return portraitURL(DYLAN.looks,'regdylan')}catch(e){}return''}
 function dotsHTML(n,t){let s='';for(let i=0;i<t;i++)s+=`<i class="${i<n?'on':''}"></i>`;return`<span class="sdots">${s}</span>`}
+/* audit N09 (2026-10-06): one rule for whether a chapter is on the page — the summary listed 「晚餐之後」 on a new game's Day 5
+   while the page did not show it, and numbered the chapters by their place in the list (CHAPTER 2, then 4) */
+function chapterShown(C){return !(C.showIf&&!C.showIf())}
 function storyPageHTML(){let h=`<p class="muted" style="font-size:12.5px;margin:0 0 8px">店裡真的發生過的事，一段一段記下來。沒有任務，也不用做什麼——下一段什麼時候發生，要看他們自己。點一段可以看那天的經過。</p>`;
  h+=`<div class="nm" style="font-weight:800;font-size:15px;margin:6px 0 6px">餐廳故事</div><div class="card schap">`;
- for(const [i,C] of restChapters().entries()){if(C.showIf&&!C.showIf())continue;const hid=C.hidden&&C.hidden();const done=C.beats.filter(b=>b[1]!=null);const n=done.length;const all=n===C.beats.length;
-  h+=`<div class="chap ${all?'done':''} ${storyFocus==='ch'+i?'focus':''}" id="sl-ch${i}"><div class="ch-h"><small>CHAPTER ${i+1}</small><b>${hid?(C.tease==='？？？？？'?'？？？？？':'？？？'):C.t}</b>${all?'<span class="ok">✓</span>':''}</div>`;
+ let no=0;for(const [i,C] of restChapters().entries()){if(!chapterShown(C))continue;no++;const hid=C.hidden&&C.hidden();const done=C.beats.filter(b=>b[1]!=null);const n=done.length;const all=n===C.beats.length;
+  h+=`<div class="chap ${all?'done':''} ${storyFocus==='ch'+i?'focus':''}" id="sl-ch${i}"><div class="ch-h"><small>CHAPTER ${no}</small><b>${hid?(C.tease==='？？？？？'?'？？？？？':'？？？'):C.t}</b>${all?'<span class="ok">✓</span>':''}</div>`;
   if(hid){h+=`<p class="muted" style="margin:2px 0 0;font-size:12.5px">${C.tease}</p>`}
   else{h+=dotsHTML(n,C.beats.length)+`<div class="ch-b">${histOrder(done,b=>b[1]).map((b,j)=>`<div class="sb"><span class="no">${j+1}.</span><span class="d">${b[1]>0?'DAY '+b[1]:'更早以前'}</span>${b[0]}${b[2]&&b[2].illus&&(story().illus||{})[b[2].illus]?`<button class="btn sm sb-ill" data-act="illus" data-k="${b[2].illus}">看插圖</button>`:''}</div>`).join('')}${unseenRowsHTML(n,C.beats.length)}</div>`}
   h+=`</div>`}
@@ -4923,13 +5024,13 @@ function histOrder(done,dayOf){let last=0;const k=done.map((x,i)=>{const d=dayOf
 /* the stages not seen yet: only their number */
 function unseenRowsHTML(n,total){let h='';for(let i=n+1;i<=total;i++)h+=`<div class="sb un"><span class="no">${i}.</span>？？？</div>`;return h}
 /* one beat: its number, day and name; tap to see what happened and what was said (kept from the moment itself) */
-function beatRowHTML(x,i){const note=x.note?(()=>{try{return x.note()||''}catch(e){return''}})():x.k?beatNote(x.k):'';const lines=(x.k&&story().beatLines&&story().beatLines[x.k])||[];const head=`<span class="no">${i}.</span><span class="d">${x.d>0?'DAY '+x.d:'更早以前'}</span>「${x.t.replace(/^「|」$/g,'')}」`;
+function beatRowHTML(x,i){const note=x.note?(()=>{try{return x.note()||''}catch(e){return''}})():x.k?beatNote(x.k):'';const lines=(x.k&&story().beatLines&&story().beatLines[x.k])||[];const head=`<span class="no">${i}.</span><span class="d">${x.d>0?'DAY '+x.d:'更早以前'}</span>${beatTitleHTML(x.t)}`;
  const ill=x.illus&&(story().illus||{})[x.illus]?`<button class="btn sm sb-ill" data-act="illus" data-k="${x.illus}">看插圖</button>`:'';   /* v2.4: the beat's illustration, once it has been shown */
  if(!note&&!lines.length&&!ill)return`<div class="sb">${head}</div>`;
  return`<details class="sb"><summary>${head}</summary>${ill}${note?`<p class="sn">${note}</p>`:''}${lines.length?`<div class="sq">${lines.map(l=>l.w?`<div><b>${l.w}</b>「${l.t}」</div>`:`<div class="e">${l.t}</div>`).join('')}</div>`:''}</details>`}
 /* ---- story updates: once per new beat, never for ambient repeats ---- */
 function storyLineSeen(){const st=story();st.lineSeen=st.lineSeen||{};return st.lineSeen}
-function restDone(){const out=[];restChapters().forEach((C,ci)=>{if((C.showIf&&!C.showIf())||(C.hidden&&C.hidden()))return;for(const b of C.beats)if(b[1]!=null)out.push({id:ci+':'+b[0],t:b[0],d:b[1],C})});return out}
+function restDone(){const out=[];restChapters().forEach((C,ci)=>{if(!chapterShown(C)||(C.hidden&&C.hidden()))return;for(const b of C.beats)if(b[1]!=null)out.push({id:ci+':'+b[0],t:b[0],d:b[1],C})});return out}
 /* what the player has been told is kept per line as the beats' ids. A line seen for the first time (or an older save's
    count) is taken in silently; a beat is announced only the day it happens — a change in what counts never
    announces the past. */
@@ -4940,7 +5041,7 @@ function storyProgressCheck(){if(!S||!S.story)return;const seen=storyLineSeen();
  {const D=restDone();const was=seen._rest;if(!Array.isArray(was))seen._rest=D.map(x=>x.id);else{const nw=D.filter(x=>!was.includes(x.id));if(nw.length){seen._rest=was.concat(nw.map(x=>x.id));const last=nw.filter(x=>fresh(x.d)).sort((a,b)=>b.d-a.d)[0];
   if(last&&!note)note={k:'_rest',who:'餐廳故事',t:last.t,n:last.C.beats.filter(b=>b[1]!=null).length,total:last.C.beats.length}}}}
  if(note)storyNoteShow(note)}
-function storyNoteShow(n){const el=$('#storyNote');if(!el)return;if(DLG||(()=>{const r=$('#reveal');return!!r&&!r.hidden})()){storyNoteShow.pending=n;return}   /* rc8: nor over a works card (The Lounge's opening morning) — it shows when the card closes */storyNoteShow.last=n;/* v2.4: never over a scene (or its illustration) — it shows when the scene closes */el.innerHTML=`<small>故事更新</small><b>${n.who}</b>${n.t?`<span>「${n.t.replace(/^「|」$/g,'')}」</span>`:''}${n.total?`<em>${n.n} / ${n.total}</em>`:''}`;el.dataset.k=n.k;{/* under the room tabs (they sit under the ticket rail) — never over them */const rt=$('#roomTabs'),ref=phase==='service'?(rt&&!rt.hidden?rt:ticketsEl):null;el.style.top=ref?Math.round(ref.getBoundingClientRect().bottom+6)+'px':''}el.hidden=false;el.classList.remove('go');void el.offsetWidth;el.classList.add('go');clearTimeout(storyNoteShow.t);storyNoteShow.t=setTimeout(()=>{el.hidden=true},7000)}
+function storyNoteShow(n){const el=$('#storyNote');if(!el)return;if(DLG||(()=>{const r=$('#reveal');return!!r&&!r.hidden})()){storyNoteShow.pending=n;return}   /* rc8: nor over a works card (The Lounge's opening morning) — it shows when the card closes */storyNoteShow.last=n;/* v2.4: never over a scene (or its illustration) — it shows when the scene closes */el.innerHTML=`<small>故事更新</small><b>${storyLabel(n.who)}</b>${n.t?`<span>${beatTitleHTML(n.t)}</span>`:''}${n.total?`<em>${n.n} / ${n.total}</em>`:''}`;el.dataset.k=n.k;{/* under the room tabs (they sit under the ticket rail) — never over them */const rt=$('#roomTabs'),ref=phase==='service'?(rt&&!rt.hidden?rt:ticketsEl):null;el.style.top=ref?Math.round(ref.getBoundingClientRect().bottom+6)+'px':''}el.hidden=false;el.classList.remove('go');void el.offsetWidth;el.classList.add('go');clearTimeout(storyNoteShow.t);storyNoteShow.t=setTimeout(()=>{el.hidden=true},7000)}
 let bookFromNote=false;
 function openStory(k){storyFocus=k&&k!=='_rest'?k:null;bookTab='story';const el=$('#storyNote');if(el)el.hidden=true;if(phase==='service'&&R){paused=true;bookFromNote=true}showBook();setTimeout(()=>{const t=storyFocus&&document.getElementById('sl-'+storyFocus);if(t)t.scrollIntoView({block:'center'})},60)}
 /* ================= v2.3 follow-up: a campaign you can feel =================
@@ -4994,6 +5095,17 @@ function storyCapLine(who,txt,kind){return;const C=STORY_CAP;if(!C)return;const 
 function beatSrcOf(k){const out=[];for(const E of STORY_EV){const src=String(E.run||'')+(E.present||[]).map(p=>String(p.run||'')).join('');if(E.k===k||src.includes(`factSet('${k}'`)||src.includes(`v24Cap('${k}'`))out.push(src)}
  if(k.startsWith('dy_')&&typeof DYLAN_SCENES!=='undefined'){const sc=DYLAN_SCENES.find(x=>'dy_'+x.k===k);if(sc)out.push(JSON.stringify(sc.lines))}
  if(k==='meal_box'||k==='meal_two')out.push(String(staffMealStory));if(k==='yj_move')out.push(String(xqHelperChat));if(k==='up_ask')out.push(String(upAskUpd));if(k==='up_inspect')out.push(String(upInspectLines));return out.join('\n')}
+/* a beat's scene as its page keeps it, read from the code that plays it — only when that scene is written out line by line
+   ({who:'…',text:'…'} each, nothing computed); null otherwise (a name, a count or a choice in it: the page is left alone) */
+function sceneLinesOf(k){const E=STORY_EV.find(x=>x.k===k);const srcs=[];if(E)srcs.push(String(E.run||'')+(E.present||[]).map(p=>String(p.run||'')).join(''));
+ for(const X of STORY_EV){if(X===E)continue;const s=String(X.run||'')+(X.present||[]).map(p=>String(p.run||'')).join('');if(s.includes(`factSet('${k}'`)||s.includes(`v24Cap('${k}'`))srcs.push(s)}
+ for(const src of srcs){let at=0;if(!(E&&src===srcs[0])){const f=[`v24Cap('${k}'`,`factSet('${k}'`].map(x=>src.indexOf(x)).filter(i=>i>=0);if(!f.length)continue;at=Math.min(...f)}
+  const m=/(?:v24Scene|scene)\(\[/.exec(src.slice(at));if(!m)continue;const j=at+m.index+m[0].length-1;let d=0,q=false,e=j;
+  for(;e<src.length;e++){const c=src[e];if(q){if(c==='\\'){e++;continue}if(c==="'")q=false;continue}if(c==="'"){q=true;continue}if(c==='[')d++;else if(c===']'){d--;if(!d)break}}
+  const body=src.slice(j+1,e);if(body.replace(/\{[^{}]*\}/g,'').replace(/[\s,]/g,''))return null;   /* nothing but {…} between the brackets */
+  const out=[];for(const o of body.matchAll(/\{([^{}]*)\}/g)){if(o[1].replace(/\w+\s*:\s*('(?:[^'\\]|\\.)*'|true|false|\d+)/g,'').replace(/[\s,]/g,''))return null;const L={};for(const p of o[1].matchAll(/(\w+)\s*:\s*'((?:[^'\\]|\\.)*)'/g))L[p[1]]=p[2].replace(/\\'/g,"'");if(!L.text)return null;const w=L.name||whoLabel(L.who||'');out.push(w?{w,t:L.text}:{t:L.text})}
+  return out.length?out:null}
+ return null}
 function beatLineOk(src,t){if(!t)return false;if(src.includes(t))return true;
  for(const m of src.matchAll(/`([^`]*)`/g)){const parts=m[1].split(/\$\{[^}]*\}/);if(parts.length<2)continue;if(new RegExp('^'+parts.map(p=>p.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('.*')+'$').test(t))return true}
  const lits=[...src.matchAll(/'([^'\\\n]*)'/g)].map(m=>m[1]).filter(Boolean);return lits.some(a=>a.length>=2&&t.startsWith(a)&&lits.some(b=>t.length>a.length&&t.endsWith(b)))}
@@ -5001,9 +5113,19 @@ var STORY_READY=false;
 function beatLinesMig(o){const st=o&&o.story;if(!st||!st.beatLines)return o;
  {/* v2.4 rc7 (14:55): Madame Lin's gift as it is written now, for a page that kept rc6's words */const L=st.beatLines.lin_gift;if(Array.isArray(L)&&L.some(x=>x&&x.t==='……妳每次到底都在看哪裡？'))st.beatLines.lin_gift=[{t:'Madame Lin 結完帳，從椅子旁邊拿起一盆植物，放到 Jill 面前。'},{w:'Jill',t:'今天怎麼帶東西？'},{w:'Madame Lin',t:'側廳門口旁邊那個角落，空很久了。'},{w:'Madame Lin',t:'放一盆綠的，客人坐下來，眼睛才有地方休息。'},{w:'Jill',t:'……我天天在這裡，都沒注意到。'},{w:'Madame Lin',t:'就是因為天天在。'}]}
  {/* rc7 (15:40), rc7.2 (22:14): the landlord's afternoon as it is written now — a page that kept rc6's words (「我可以一起上去嗎？」) or rc7's (「要上來看嗎？」) */const L=st.beatLines.up_inspect;if(Array.isArray(L)&&L.some(x=>x&&(x.t==='我可以一起上去嗎？'||x.t==='要上來看嗎？'))){const D=CAT_DEF.find(x=>x.id==='mei');const nm=(o.catNames&&o.catNames.mei)||(D&&D.n)||'貓';st.beatLines.up_inspect=upInspectLines(nm).map(l=>{const w=whoLabel(l.who||'');return w?{w,t:l.text}:{t:l.text}})}}
- if(st.blMig)return o;st.blMig=1;
- for(const k in st.beatLines){const arr=st.beatLines[k];if(!Array.isArray(arr)||!arr.length)continue;const src=beatSrcOf(k);if(!src)continue;const ok=arr.map(x=>beatLineOk(src,x&&x.t));if(ok.some(Boolean)&&!ok.every(Boolean))st.beatLines[k]=arr.filter((x,i)=>ok[i])}return o}
-function beatNote(k){const E=STORY_EV.find(x=>x.k===k);if(!E||!E.note)return'';try{return typeof E.note==='function'?E.note(evState(k))||'':E.note}catch(e){return''}}
+ {/* audit N15 (2026-10-06): the tasting nights are 品酒之夜 (PROJECT_MEMORY §6) — pages written before the rename keep 「Ken 的品酒夜」「品酒夜」 */for(const k in st.beatLines){const arr=st.beatLines[k];if(Array.isArray(arr))for(const x of arr)if(x&&typeof x.t==='string'&&x.t.includes('品酒夜'))x.t=x.t.replace(/Ken 的品酒夜/g,'品酒之夜').replace(/品酒夜/g,'品酒之夜')}}
+ if(!st.blMig){st.blMig=1;
+  for(const k in st.beatLines){const arr=st.beatLines[k];if(!Array.isArray(arr)||!arr.length)continue;const src=beatSrcOf(k);if(!src)continue;const ok=arr.map(x=>beatLineOk(src,x&&x.t));if(ok.some(Boolean)&&!ok.every(Boolean))st.beatLines[k]=arr.filter((x,i)=>ok[i])}}
+ {/* audit N08 / WS9-01 (2026-10-07): a page kept before 2026-10-06 can stop part-way through its scene — the old 12-line
+     cap (《那面牆》's mediation: 12 of 21 lines, ending 「金額的部分呢？」) or the app closed while the scene was on screen
+     (the photos of the wall: 6 lines, ending 「可以放大嗎？」). Where the beat's scene is written out line by line (every
+     line a fixed text) and the page is exactly its beginning, the page gets the rest of the scene. Nothing else changes.
+     Last, after the one-time cleanup above (a page with lines from elsewhere is its beginning only once they are gone):
+     the first load gives what every later load gives. */
+  for(const k in st.beatLines){const arr=st.beatLines[k];if(!Array.isArray(arr)||!arr.length)continue;let full=null;try{full=sceneLinesOf(k)}catch(e){full=null}
+   if(full&&arr.length<full.length&&arr.every((x,i)=>x&&x.t===full[i].t))st.beatLines[k]=arr.concat(full.slice(arr.length))}}
+ return o}
+function beatNote(k){const E=STORY_EV.find(x=>x.k===k);if(!E||!E.note)return'';try{return cjkSp(typeof E.note==='function'?E.note(evState(k))||'':E.note)}catch(e){return''}}   /* 「Dylan 的」 (audit N16) */
 for(const L of STORY_LINES)for(const b of L.beats){const s0=b[0];const ks=Array.isArray(s0)?s0.slice():typeof s0==='string'?[s0]:[];if(b[2]&&b[2].key)ks.push(b[2].key);for(const k of ks)BEAT_LINE[k]=L}
 /* ---- hospitality: something on the house. Three separate things that used to share one counter (v2.2.1 I-13 / Day 35 #1):
    (1) an OCCASION — Jill's Card (every fifth visit of a regular), an anniversary, the columnist's friend: g.treat is set when
@@ -5023,8 +5145,8 @@ function treatWanted(g){if(!R||g.treated||g.table==null)return null;const t=R.ta
 function treatGo(g,kind){const d=treatPick(kind);if(!d)return false;const J=R.jill;const t=R.tables[g.table];const of=treatKindOf(g);g.treated=true;g.treat=null;R.st.treats=(R.st.treats||0)+1;if(of==='player')R.st.ptreats=(R.st.ptreats||0)+1;else if(of==='patience'){R.st.jtreats=(R.st.jtreats||0)+1;R.treatT=R.t+120}S.stock[d]--;
  J.visit={g,t0:t,phase:'go',kind:'treat',d,of};J.troom=t.room||'main';J.tx=t.x+(t.x<200?30:-30);J.ty=t.y+20;J.idle=0;return true}
 function treatArrive(V){const g=V.g,t=V.t0;if(!R.groups.includes(g)||t.group!==g)return;t.plates.push({d:V.d,q:'P',want:0,treat:true});g.compl=(g.compl||0)+8;g.pat=Math.min(1,g.pat+.15);sfx.serve();
- const txt=g.anniv?'這個請你們，紀念日快樂。':g.writer?'這杯請你們，慢慢喝。':g.card?pickT(['第五次了，這個請你。','集點卡滿了。這個店裡請。','來了這麼多次，這個算我的。']):g.byPlayer?pickT(['這個請你。','這杯算店裡的。','慢慢吃，這個請你。']):pickT(['今天等有點久，這杯算我的。','這個請你，等久了。']);jillSay(txt);setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,pickT(['謝謝！','怎麼好意思。','Jill，謝謝。']))},1500);
- memo(g.anniv?'anniversary':'treat',t.x,t.y-6,{g:g.name,d:dishName(V.d),subj:[{x:R.jill.x,y:R.jill.y}]});if(g.reg&&g.reg!=='dylan')regFact(g.reg,g.anniv?'紀念日那天，Jill 請了甜點。':g.card?`第 ${S.regulars[g.reg]+1} 次來，Jill 請了${dishName(V.d)}。`:`Jill 請過一杯${dishName(V.d)}。`);ach('treat');if(g.card)ach('card');logLine('',`Jill 請了 ${g.name} 一份${dishName(V.d)}`,'e')}
+ const txt=g.anniv?'這個請你們，紀念日快樂。':g.writer?'這杯請你們，慢慢喝。':g.card?pickT(['第五次了，這個請你。','集點卡滿了。這個店裡請。','來了這麼多次，這個算我的。']):g.byPlayer?pickT(['這個請你。','這杯算店裡的。','慢慢吃，這個請你。']):pickT(['今天等有點久，這杯算我的。','這個請你，等久了。']);talk(()=>{if(!R.groups.includes(g))return;jillSay(txt);speakLater(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,pickT(['謝謝！','怎麼好意思。','Jill，謝謝。']))},1500)});
+ memo(g.anniv?'anniversary':'treat',t.x,t.y-6,{g:g.name,d:dishName(V.d),room:t.room||'main',subj:[{x:R.jill.x,y:R.jill.y}]});if(g.reg&&g.reg!=='dylan')regFact(g.reg,g.anniv?'紀念日那天，Jill 請了甜點。':g.card?`第 ${S.regulars[g.reg]+1} 次來，Jill 請了${dishName(V.d)}。`:`Jill 請過一杯${dishName(V.d)}。`);ach('treat');if(g.card)ach('card');logLine('',`Jill 請了 ${g.name} 一份${dishName(V.d)}`,'e')}
 /* a trip that gets interrupted before it arrives puts the treat back in the fridge, and the use back in its counter */
 function cancelVisit(){const J=R&&R.jill;if(!J||!J.visit)return;const V=J.visit;if(V.kind==='treat'&&V.phase==='go'){S.stock[V.d]=(S.stock[V.d]||0)+1;V.g.treated=false;R.st.treats=Math.max(0,(R.st.treats||0)-1);if(V.of==='player')R.st.ptreats=Math.max(0,(R.st.ptreats||0)-1);else if(V.of==='patience')R.st.jtreats=Math.max(0,(R.st.jtreats||0)-1);if(V.of==='player'){V.g.treat='drink'}else if(V.of==='occasion'){V.g.treat=V.g.anniv||V.g.card?'dessert':'drink'}}J.visit=null}
 /* Jill looks for someone to treat when she has a moment */
@@ -5048,7 +5170,7 @@ function dishName(d){const D=DISH(d);return D?(d==='signature'&&S.signature?S.si
    a long wait, two words with Jill. Newest first in the journal; capped so the save stays small. */
 function regularNote(g){if(!R||!g.reg||g.reg==='dylan')return;const who=speakerOf(g);const v=S.regulars[who]||0;if(v<4||Math.random()>.32)return;S.notes=S.notes||[];if(S.notes.some(n=>regsOf(g).includes(n.reg)&&S.day-n.day<2))return;
  const items=g.ticket?g.ticket.items.filter(i=>i.st==='served'):[];const it=items.length?pick(items):null;const dn=it?dishName(it.d):'';const q=it?it.q:null;const cat=g.lookCat?catName(g.lookCat.def):null;const pool=[];
- /* v2.3 late game (#39): a drink is drunk (喝了, 好喝); 「一如往常」 only for the dish this person always orders */const dr=it&&DISH(it.d)&&DISH(it.d).cat==='drink',eat=dr?'喝':'吃';const fav=(()=>{const m=regMem(who);let best=null,bn=2;for(const k in m.orders)if(m.orders[k]>bn){bn=m.orders[k];best=k}return best})();
+ /* v2.3 late game (#39): a drink is drunk (喝了, 好喝); 「一如往常」 only for the dish this person always orders */const dr=it&&isGlass(it.d),eat=dr?'喝':'吃';   /* a wine too (audit WS6-06) */const fav=(()=>{const m=regMem(who);let best=null,bn=2;for(const k in m.orders)if(m.orders[k]>bn){bn=m.orders[k];best=k}return best})();
  if(dn&&(q==='P'||q==='G'))pool.push(`今天的${dn}還是很好${eat}。`,...(it.d===fav?[`${dn}，一如往常。`]:[]),`${eat}了${dn}，今天也算是過去了。`);
  if(dn&&q==='O')pool.push(`${dn}好像跟上次不太一樣，但還是${eat}完了。`);
  if(dn&&q==='B')pool.push(`今天的${dn}有點失常，下次再給它一次機會。`);
@@ -5059,14 +5181,14 @@ function regularNote(g){if(!R||!g.reg||g.reg==='dylan')return;const who=speakerO
  S.notes.unshift({day:S.day,reg:who,txt:cjkSp(pickT(pool))});if(S.notes.length>40)S.notes.length=40}
 function jillFarewell(g){if(!R||!g.reg||g.reg==='dylan'||g.chat||(R.chatT||0)>R.t)return;const v=S.regulars[g.reg]||0;const tier=Math.floor(regTier(v));if(!tier||Math.random()>(tier===2?.45:.3))return;
  const items=g.ticket?g.ticket.items.filter(i=>i.st==='served'):[];const it=items.length?pick(items):null;const dn=it?dishName(it.d):'';const good=it&&(it.q==='P'||it.q==='G');
- const dr=it&&DISH(it.d)&&DISH(it.d).cat==='drink';const gl=cjkSp(dn?(good?pick([`今天的${dn}還是很好${dr?'喝':'吃'}。`,`${dn}，明天還想${dr?'喝':'吃'}。`,`${dn}跟上次一樣好。`]):pick([`今天的${dn}，嗯，還可以。`,`${dn}下次再來試一次。`])):pick(['今天也謝謝妳。','明天見。']));
+ const dr=it&&isGlass(it.d);const gl=cjkSp(dn?(good?pick([`今天的${dn}還是很好${dr?'喝':'吃'}。`,`${dn}，明天還想${dr?'喝':'吃'}。`,`${dn}跟上次一樣好。`]):pick([`今天的${dn}，嗯，還可以。`,`${dn}下次再來試一次。`])):pick(['今天也謝謝妳。','明天見。']));
  const jl=tier===2?pick(['慢走，明天見。','路上小心。','下次來，貓會記得你的。']):pick(['謝謝，慢走。','明天見！','謝謝光臨，路上小心。']);
- g.chat=true;R.chatT=R.t+40;quote(g,gl);setTimeout(()=>{if(R&&phase==='service'&&!paused)jillSay(jl)},1400)}
+ g.chat=true;R.chatT=R.t+40;talk(()=>{quote(g,gl);speakLater(()=>{if(R&&phase==='service'&&!paused)jillSay(jl)},1400)})}
 function jillGreet(g,t){if(!R)return;const J=R.jill;if(g.reg==='dylan'){if(!J.cur&&!J.rest&&Math.random()<.7){J.lookAt={x:t.x,y:t.y,t:rand(1.2,2)};if(S.dylan.stage>=1)J.nod=.7}return}const free=!J.cur&&!J.q.length&&!J.rest&&!J.pet&&(J.calm||0)>.8;if(!free)return;
  const v=g.reg?(S.regulars[g.reg]||0):0;const tier=Math.floor(regTier(v));
  /* a look and a nod for everyone she has time for; a word for people she knows */
  if(Math.random()<(g.reg?.9:.45)){J.lookAt={x:t.x,y:t.y,t:rand(1,1.6)};J.nod=.7}
- if(g.reg&&tier>0&&!g.chat&&(R.chatT||0)<R.t&&Math.random()<(tier===2?.55:.4)){const ids=regsOf(g);const key=ids.length>1?'wangs':g.reg;const L=REG_CHAT[key];const pr=L&&L[tier-1]?pick(L[tier-1]):null;if(pr){g.chat=true;R.chatT=R.t+40;const who=pr[2]&&ids.includes(pr[2])?pr[2]:speakerOf(g);jillSay(pr[0],{with:who});setTimeout(()=>{if(R&&phase==='service'&&!paused&&R.groups.includes(g))quote(g,pr[1],{who,with:'jill'})},1500)}}}
+ if(g.reg&&tier>0&&!g.chat&&(R.chatT||0)<R.t&&Math.random()<(tier===2?.55:.4)){const ids=regsOf(g);const key=ids.length>1?'wangs':g.reg;const L=REG_CHAT[key];const pr=L&&L[tier-1]?pick(L[tier-1]):null;if(pr){g.chat=true;R.chatT=R.t+40;const who=pr[2]&&ids.includes(pr[2])?pr[2]:speakerOf(g);talk(()=>{if(!R.groups.includes(g))return;jillSay(pr[0],{with:who});speakLater(()=>{if(R&&phase==='service'&&!paused&&R.groups.includes(g))quote(g,pr[1],{who,with:'jill'})},1500)})}}}
 function jillTargets(i){const J=R.jill;return J.q.includes(i)||(J.cur&&J.cur.t===i)}
 function tableActionable(t){const g=t.group;if(!g)return t.dirty;if(g.rowdy)return true;if(g.state==='order'||g.state==='check')return true;if(g.state==='wait'&&g.ticket&&g.ticket.items.some(it=>it.st==='ready'))return true;return false}
 function planAct(){const J=R.jill,t=R.tables[J.cur.t],g=t.group;const tk=g&&g.ticket;const atPass=!!tk&&!tk.cn&&tk.items.some(it=>it.st==='ready'&&!it.picked&&!it.ktp),atBar=!!tk&&tk.items.some(it=>it.st==='ready'&&!it.picked&&(tk.cn||it.ktp));
@@ -5075,12 +5197,12 @@ function planAct(){const J=R.jill,t=R.tables[J.cur.t],g=t.group;const tk=g&&g.ti
 function arriveAct(){const J=R.jill;if(J.restTo){J.restTo=false;J.sit=true;J.face=1;return}
  if(J.fp&&!J.cur&&J.fp.phase==='go'){J.fp.phase='stand';J.fp.t=.9;J.face=-1;J.lookAt={x:J.x-8,y:J.y-30,t:1.4,down:true};return}   /* rc7.5: on her way to the window with the herbs, a look at them */
  if(J.fp&&!J.cur&&J.fp.phase==='sill'){J.fp.phase='place';J.fp.t=.8;J.face=-1;J.lookAt={x:FP_SILL.x-12,y:FP_SILL.y-28,t:.8};return}   /* and onto the sill */
- if(J.visit&&J.visit.phase==='go'&&J.visit.kind==='selfie'){const V=J.visit;V.phase='stand';V.t=rand(2,3);const t=V.t0,g=V.g;J.face=t.x>=J.x?1:-1;J.lookAt={x:t.x,y:t.y-8,t:V.t};if(R.groups.includes(g)){jillSay(pickT(['好啊。','來。','貓也要一起嗎？']));g.pat=Math.min(1,g.pat+.1);memo('selfie',t.x,t.y-6,{g:g.name,subj:[{x:J.x,y:J.y}]})}return}
+ if(J.visit&&J.visit.phase==='go'&&J.visit.kind==='selfie'){const V=J.visit;V.phase='stand';V.t=rand(2,3);const t=V.t0,g=V.g;J.face=t.x>=J.x?1:-1;J.lookAt={x:t.x,y:t.y-8,t:V.t};if(R.groups.includes(g)){jillSay(pickT(['好啊。','來。','貓也要一起嗎？']));g.pat=Math.min(1,g.pat+.1);memo('selfie',t.x,t.y-6,{g:g.name,room:t.room||'main',subj:[{x:J.x,y:J.y}]})}return}
  if(J.visit&&J.visit.phase==='go'&&J.visit.kind==='treat'){const V=J.visit;V.phase='stand';V.t=rand(1.4,2.2);const t=V.t0;J.face=t.x>=J.x?1:-1;J.lookAt={x:t.x,y:t.y-8,t:V.t};treatArrive(V);return}
  if(J.visit&&J.visit.phase==='go'){const V=J.visit;V.phase='stand';V.t=rand(2.2,3.6);const t=V.t0,g=V.g;J.face=t.x>=J.x?1:-1;J.lookAt={x:t.x,y:t.y-8,t:V.t};
-  if(R.groups.includes(g)){memo('pause',t.x,t.y,{subj:[{x:J.x,y:J.y}]});const st=S.dylan.stage;const r=Math.random();
+  if(R.groups.includes(g)){memo('pause',t.x,t.y,{room:t.room||'main',subj:[{x:J.x,y:J.y}]});const st=S.dylan.stage;const r=Math.random();
    if(r<.4&&!g.said){g.said=1;setTimeout(()=>{if(R&&phase==='service')dylanAct(g)},500)}
-   else if(r<.75){const pr=st>=3?pick([['吃慢一點。','嗯。'],['今天很多人。','看得出來。'],['貓都在。','我知道。']]):pick([['還可以嗎？','很好吃。'],['今天人很多。','我不急。'],[null,'老闆娘，妳很忙。']]);setTimeout(()=>{if(!R||phase!=='service')return;if(pr[0])jillSay(pr[0]);setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,pr[1])},pr[0]?1400:0)},400)}}
+   else if(r<.75){const pr=st>=3?pick([['吃慢一點。','嗯。'],['今天很多人。','看得出來。'],['貓都在。','我知道。']]):pick([['還可以嗎？','很好吃。'],['今天人很多。','我不急。'],[null,'老闆娘，妳很忙。']]);setTimeout(()=>{if(!R||phase!=='service')return;if(pr[0])jillSay(pr[0]);speakLater(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,pr[1])},pr[0]?1400:0)},400)}}
   return}
  if(J.rest==='go'){const L=LIFE.jill;if(!L.reserved||!L.pos){J.rest=null;return}J.visit=null;J.rest='sit';J.sofa=true;memo('rest',JPOS[L.pos].x,SOFA.jy,{subj:sofaCats(),rush:!!(R.fireCount&&R.t-(R.fireEnd||-99)<60),room:'home'});L.room='home';L.troom='home';L.x=JPOS[L.pos].x;L.y=SOFA.jy;L.on=true;L.reserved=false;L.act='idle';L.t=rand(4,9);L.last=null;L.sinceSit=0;L.legs=0;L.legTarget=0;L.gazeT=0;L.flip=0;L.settleT=rand(20,40);L.bobT=.5;J.face=L.face;J.x=L.x;J.y=SOFA.front+10;return}
  if(!J.cur)return;const t=R.tables[J.cur.t];
@@ -5089,11 +5211,11 @@ function arriveAct(){const J=R.jill;if(J.restTo){J.restTo=false;J.sit=true;J.fac
    and clearing it is the next trip (tap again, or a cleaner) — the same rule whoever takes the money */
  const clearing=!t.group&&t.dirty;
  if(g&&g.rowdy){g.rowdy=0;ach('rowdy');g.pat=Math.min(1,g.pat+.25);busy=1.1;quote(g,'好啦好啦…看在 Jill 的面子上。');addFloat(t.x,t.y-50,'安撫成功','#9ED08A',1,t.room);sfx.good()}
- if(g&&g.state==='order'&&g.usual&&!g.usualSaid){g.usualSaid=1;ach('usual');jillSay('老樣子？');setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,pickT(['老樣子。','嗯，老樣子。','妳記得。']))},1200);if(g.reg)regFact(g.reg,`常點${dishName(g.usual)}，Jill 記得。`)}
+ if(g&&g.state==='order'&&g.usual&&!g.usualSaid){g.usualSaid=1;ach('usual');jillSay('老樣子？');speakLater(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,pickT(['老樣子。','嗯，老樣子。','妳記得。']))},1200);if(g.reg)regFact(g.reg,`常點${dishName(g.usual)}，Jill 記得。`)}
  if(g&&g.state==='order'){createTicket(g);busy=.7}
  if(g&&g.gift&&['order','wait','eat','check'].includes(g.state)&&J.cur.step==='table')regGift(g,t);
  if(g&&g.ticket&&J.carry.length){const mine=J.carry.filter(c=>c.tk===g.ticket);if(mine.length){serveItems(g,mine);J.carry=J.carry.filter(c=>c.tk!==g.ticket);busy=Math.max(busy,.4)}}
- if(g&&g.reg==='dylan'&&!g.said&&(J.cur.step==='table')&&(g.state==='check'||(g.ticket&&g.ticket.items.some(i=>i.st==='served')))&&Math.random()<.6){g.said=1;setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g)){if(g.back&&Math.random()<.5)quote(g,'剛才太滿了，繞了一圈再回來。');else if(Math.random()<.55)dylanAct(g);else quote(g,dylanLine())}},600)}
+ if(g&&g.reg==='dylan'&&!g.said&&(J.cur.step==='table')&&(g.state==='check'||(g.ticket&&g.ticket.items.some(i=>i.st==='served')))&&Math.random()<.6){g.said=1;speakLater(()=>{if(R&&phase==='service'&&R.groups.includes(g)){if(g.back&&Math.random()<.5)quote(g,'剛才太滿了，繞了一圈再回來。');else if(Math.random()<.55)dylanAct(g);else quote(g,dylanLine())}},600)}
  if(g&&g.state==='check'){if(g.gift)regGift(g,t);jillFarewell(g);regularNote(g);collect(g);busy=Math.max(busy,.5)}
  if(clearing&&!t.group&&t.dirty){t.dirty=false;t.plates=[];t.busT=0;busy=Math.max(busy,opsLv('dish')?.35:.55);sfx.clear();coach(7)}
  J.carry=J.carry.filter(c=>R.tickets.includes(c.tk));J.busy=busy||.08;J.cur.done=true}
@@ -5232,7 +5354,7 @@ function tapTable(t){const g=t.group;if(R.jill.visit&&!jillTargets(t.i))cancelVi
 function staffUpd(dt){crewUpd(dt);incUpd(dt);stockArrive()}
 
 /* ---- main update ---- */
-function update(dt){R.t+=dt;if(R.v24q&&R.v24q.length)v24Upd();
+function update(dt){R.t+=dt;if(R.v24q&&R.v24q.length)v24Upd();if(R.talkq&&R.talkq.length)talkUpd();
  if(R.fire>0){R.fire-=dt;if(R.fire<=0){R.fire=0}}   /* rc8.5: its end is no news (16 an evening) */
  if(!R.closed&&R.t<R.dur*.96){const free=R.tables.some(t=>!t.group&&!t.dirty)&&queued().length===0;const quiet=R.groups.length===0&&!R.slots.some(x=>x.job);R.idleT=quiet?R.idleT+dt:0;const gap=R.t-R.lastSpawn;const maxGap=S.day<=2?9:S.day<=5?7:5.5;
   if(free&&(gap>maxGap||R.idleT>2)){R.idleT=0;const j=R.sched.findIndex((o,i)=>i>=R.si&&!o.hold);/* v2.4: a visit whose hour matters (hold) is not pulled forward; the next one after it is */if(j>=0){if(j>R.si)R.sched.splice(R.si,0,R.sched.splice(j,1)[0]);R.sched[R.si].t=R.t}else spawn(Object.assign({t:R.t},rollGuest()))}}
@@ -5252,7 +5374,7 @@ function update(dt){R.t+=dt;if(R.v24q&&R.v24q.length)v24Upd();
 function startClosing(){R.closing=0;hideCombo();try{if(R.kt&&!R.kt.end)kenNightClose()}catch(e){console.warn('[ken]',e)}/* rc7 */storyTick('close',{});try{srClosingPlan()}catch(e){console.warn('[sr]',e)}/* v2.3 */const J=R.jill;J.q=[];J.cur=null;J.carry=[];if(J.rest)endRest();lifePlan();   /* rc8: resting in her room when the closing comes, she gets up and closes the shop — with a crew that has the evening she rests most of it now, and the closing is hers (the pass wiped, 樾樾 waiting at the kitchen door, rc7.3); before, she stayed on the sofa */
  if(LIFE.plan==='sofa'){J.tx=null;J.ty=null;J.restTo=false;J.moving=false;const L=LIFE.jill;L.x=J.x;L.y=J.y;L.face=J.face;L.room=J.room||'main';L.troom=L.room;/* first the pass gets wiped down; then the sofa */L.wrapT=rand(4,6.5);if(L.room!=='main'||Math.hypot(J.x-PASS.x,J.y-PASS.y)>4){L.act='standing';jillWalk(L,PASS.x,PASS.y,'wrap','main')}else L.act='wrap'}
  else{const t=R.tables[0];J.troom='main';J.tx=t.x-25;J.ty=t.y+2;J.restTo=true}$('#closePill').hidden=false;try{toraAtClosing()}catch(e){console.warn('[tora]',e)}if(CATS)for(const c of CATS){if(c.hidden||['jump','walk','race','dash','bed'].includes(c.st))continue;c.t=Math.min(c.t||0,c.def.id==='tora'?.4:c.def.id==='ban'?rand(1.5,3):rand(2,8))}}
-function finishClosing(){if(!R||R.ended)return;R.ended=true;$('#closePill').hidden=true;endDay()}
+function finishClosing(){if(!R||R.ended)return;floorFlush();R.ended=true;$('#closePill').hidden=true;endDay()}
 /* Why the stars went where they went today, in the player's words. Each cause carries a sign and a weight so the
    summary can show the ones that mattered. Computed from what happened, not from the formula's decimals. */
 /* v2.2: the rating's story as structured factors — a label, the number that matters, one supporting line — so the
@@ -5280,7 +5402,7 @@ function recordsHTML(){const Rc=S.records||{};const rows=Object.keys(REC_N).filt
  return rows.length?`<div class="card reclist">${rows.join('')}</div>`:'<p class="muted">開店幾天後，這裡會留下紀錄。</p>'}
 function ratingHistHTML(){const H=(S.rhist||[]).slice(-14);if(!H.length)return'<p class="muted">還沒有紀錄。</p>';const W=300,Hh=70;const xs=i=>10+i*(W-20)/Math.max(1,H.length-1);const ys=r=>Hh-6-(clamp(r,2.5,5)-2.5)/2.5*(Hh-14);
  const path=H.map((h,i)=>(i?'L':'M')+xs(i).toFixed(1)+' '+ys(h.r).toFixed(1)).join(' ');const nl=LEVELS[S.level];
- return`<svg class="spark" viewBox="0 0 ${W} ${Hh}" preserveAspectRatio="none">${[3,4,5].map(v=>`<line x1="0" x2="${W}" y1="${ys(v)}" y2="${ys(v)}" stroke="rgba(46,32,25,.12)"/><text x="2" y="${ys(v)-2}" font-size="8" fill="#9A8574">${v}</text>`).join('')}${nl?`<line x1="0" x2="${W}" y1="${ys(nl.rating)}" y2="${ys(nl.rating)}" stroke="#C99A45" stroke-dasharray="3 3"/>`:''}<path d="${path}" fill="none" stroke="#5E8F4E" stroke-width="2"/>${H.map((h,i)=>`<circle cx="${xs(i)}" cy="${ys(h.r)}" r="2.6" fill="#5E8F4E"/>`).join('')}</svg>
+ return`<svg class="spark" viewBox="0 0 ${W} ${Hh}" preserveAspectRatio="none">${[3,4,5].map(v=>`<line x1="0" x2="${W}" y1="${ys(v)}" y2="${ys(v)}" stroke="rgba(46,32,25,.12)"/><text x="2" y="${ys(v)-2}" font-size="8" fill="#9A8574">${v}</text>`).join('')}${nl&&nl.rating>0?`<line x1="0" x2="${W}" y1="${ys(nl.rating)}" y2="${ys(nl.rating)}" stroke="#C99A45" stroke-dasharray="3 3"/>`:''}<path d="${path}" fill="none" stroke="#5E8F4E" stroke-width="2"/>${H.map((h,i)=>`<circle cx="${xs(i)}" cy="${ys(h.r)}" r="2.6" fill="#5E8F4E"/>`).join('')}</svg>
   <div class="card rh">${H.slice().reverse().slice(0,8).map((h,i,arr)=>{const prev=H[H.indexOf(h)-1];const d=prev?h.r-prev.r:0;return`<div class="rrow"><span>DAY ${h.d}</span><b>${h.r.toFixed(2)}</b><em class="${d>0.004?'up':d<-0.004?'dn':''}">${d>0.004?'↑':d<-0.004?'↓':'→'}${prev&&Math.abs(d)>.004?Math.abs(d).toFixed(2):''}</em><small>${h.why&&h.why.length?h.why.join('・'):h.rs!=null?`今日評論平均 ${h.rs} 星`:'沒有新評論'}</small></div>`}).join('')}</div>`}
 function achDay(st,plated){if(S.stats.days+1>=7)ach('week');if(st.rev>=20000)ach('rev20k');if(st.guests>=60)ach('guests60');const short=Object.values(st.short||{}).reduce((a,b)=>a+b,0);if(short===0&&st.guests>=30)ach('noshort');
  const Rc=S.records||{};if((Rc.calmRun||0)>=7)ach('calm7');const W=R.weather;if((W==='rain'||W==='storm')&&(st.dish.soup||0)>=6)ach('rain');if(W==='storm'&&st.guests>=15)ach('storm');if(W==='hot'&&WX_COLD.filter(d=>DISH(d).cat==='drink').reduce((a,d)=>a+(st.dish[d]||0),0)>=12)ach('hot');
@@ -5301,7 +5423,7 @@ function endDay(){if(!R)return;try{upNightEnd()}catch(e){console.warn('[up]',e)}
  if(st.guests>=10)ach('rush');if(plated>=8&&st.q.B===0&&st.q.O===0&&st.angry===0)ach('perfectnight');if(rating()>=4.75&&S.reviews.length>=20)ach('chef');
  const r0=(S.rhist&&S.rhist.length)?S.rhist[S.rhist.length-1].r:3;const story=ratingStory(st,plated);S.rhist=S.rhist||[];S.rhist.push({d:D,r:Math.round(rating()*100)/100,n:st.reviews.length,rs:st.reviews.length?Math.round(st.reviews.reduce((a,r)=>a+r.s,0)/st.reviews.length*10)/10:null,why:story.slice(0,2).map(x=>x.t)});if(S.rhist.length>60)S.rhist.shift();
  const recs=updRecords(st,plated,D);achDay(st,plated);
- S.lastSummary={day:D,rev:st.rev,cost:S.todayCost,wages,cfee,rent,wine,piano,ken,kt:st.kt?{n:st.kt.n,rev:st.kt.rev,cost:Math.round(st.kt.cost)}:null,rentParts:rentParts(),loan:lent-repaid,tips:st.tips,bonus,net:st.rev+st.tips+bonus-S.todayCost-wages-cfee-rent-wine-piano-ken,guests:st.guests,lost:st.lost,walkins:st.walkins||0,families:st.families||0,angry:st.angry,perfect:st.perfect,plated,avg:Math.round(avg),top,stars:dayStars,reviews:st.reviews.slice(-3),tasks,maxCombo:R.maxCombo,reco:recoDish(),recoN:recoDish()?(st.dish[recoDish()]||0):0,photos:albumList().filter(p=>p.day===D).length,r0,r1:Math.round(rating()*100)/100,story,recs,weather:R.weather,event:R.event,treats:st.treats||0,sets:st.sets||0,camp:st.camp&&st.camp.via?Object.assign({},st.camp):null,vip:st.vipN?{n:st.vipN,off:st.vipOff||0}:null,lg:loungeLv()?{tabs:st.lgTabs||0,rev:st.lgRev||0,off:st.lgOff||0,tip:st.lgTip||0,wait:st.lgWait||0,after:st.lgAfter||0,direct:st.lgDirect||0,sport:st.sport||0,cn:st.cn?{n:st.cn.n,rev:st.cn.rev}:null,open:loungeOpenTonight()}:null,pd:pdBuilt()?{n:st.pdN||0,res:st.pdRes||0,top:st.pdTop||0}:null,crew:(S.crew||[]).map(m=>({name:m.name,role:m.role,lv:m.lv,wage:crewWage(m),n:(st.crew||{})[m.id]||{},away:(crewAwayOf(m)||{}).k||null})),short:Object.values(st.short||{}).reduce((a,b)=>a+b,0),
+ S.lastSummary={day:D,rev:st.rev,cost:S.todayCost,wages,cfee,rent,wine,piano,ken,kt:st.kt?{n:st.kt.n,rev:st.kt.rev,cost:Math.round(st.kt.cost)}:null,rentParts:rentParts(),loan:lent-repaid,tips:st.tips,bonus,insp:st.insp||0,net:st.rev+st.tips+bonus+(st.insp||0)-S.todayCost-wages-cfee-rent-wine-piano-ken,guests:st.guests,lost:st.lost,walkins:st.walkins||0,families:st.families||0,angry:st.angry,perfect:st.perfect,plated,avg:Math.round(avg),top,stars:dayStars,reviews:st.reviews.slice(-3),tasks,maxCombo:R.maxCombo,reco:recoDish(),recoN:recoDish()?(st.dish[recoDish()]||0):0,photos:albumList().filter(p=>p.day===D).length,r0,r1:Math.round(rating()*100)/100,story,recs,weather:R.weather,event:R.event,treats:st.treats||0,sets:st.sets||0,camp:st.camp&&st.camp.via?Object.assign({},st.camp):null,vip:st.vipN?{n:st.vipN,off:st.vipOff||0}:null,lg:loungeLv()?{tabs:st.lgTabs||0,rev:st.lgRev||0,off:st.lgOff||0,tip:st.lgTip||0,wait:st.lgWait||0,after:st.lgAfter||0,direct:st.lgDirect||0,sport:st.sport||0,cn:st.cn?{n:st.cn.n,rev:st.cn.rev}:null,open:loungeOpenTonight()}:null,pd:pdBuilt()?{n:st.pdN||0,res:st.pdRes||0,top:st.pdTop||0}:null,crew:(S.crew||[]).map(m=>({name:m.name,role:m.role,lv:m.lv,wage:crewWage(m),n:(st.crew||{})[m.id]||{},away:(crewAwayOf(m)||{}).k||null})),short:Object.values(st.short||{}).reduce((a,b)=>a+b,0),
   lgSales:loungeLv()?Object.keys(st.lgSold||{}).map(d=>({d,n:st.lgSold[d].n,rev:st.lgSold[d].rev,wine:String(d).startsWith('w_')})).filter(x=>x.n>0).sort((a,b)=>(b.wine-a.wine)||(b.n-a.n)):null,   /* v2.4 rc7 (14:51): what the Lounge's tabs paid for — its total is the Lounge's takings above */
   dinWine:Object.keys(st.dinWine||{}).map(d=>({d,n:st.dinWine[d].n,rev:st.dinWine[d].rev})).filter(x=>x.n>0).sort((a,b)=>b.n-a.n),
   sales:menuList().filter(d=>!(DISHES[d]&&DISHES[d].bar)).map(d=>({d,n:st.dish[d]||0,rev:(st.dishRev||{})[d]!=null?st.dishRev[d]:(st.dish[d]||0)*priceOf(d),short:(st.short||{})[d]||0,unmet:(st.unmet||{})[d]||0,left:S.stock[d]||0})).sort((a,b)=>b.n-a.n),
@@ -5319,7 +5441,7 @@ function trayFloat(s,txt,col){s.fx={txt,col,t:0}}
 function showCombo(){const el=$('#combo');el.hidden=false;el.innerHTML='COMBO<b>×'+(R.combo|0)+'</b>';el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump')}
 function hideCombo(){$('#combo').hidden=true}
 function banner(title,subt,kind){const b=$('#banner');const d=document.createElement('div');d.className='bn '+(kind||'');d.innerHTML=`<b>${title}</b>${subt?`<span>${subt}</span>`:''}`;b.innerHTML='';b.appendChild(d);setTimeout(()=>{if(d.parentNode)d.remove()},kind==='perfect'?1050:1700)}
-function toast(html,kind,o){const box=$('#toasts');const lastT=box.lastElementChild;if(lastT&&lastT.innerHTML===html&&lastT.style.opacity!=='0')return;const d=document.createElement('div');d.className='toast '+(kind||'');d.innerHTML=html;if(o&&(o.g||o.who||o.tg)){d.classList.add('who');d.onclick=()=>{try{if(o.tg&&idFocusTable(o.tg))return;if(o.g)idFocusGroup(o.g,o.k||0);else idFocusWho(o.who)}catch(e){}}}   /* v2.4 rc6 (07:09): a line someone said finds them */box.appendChild(d);while(box.children.length>2)box.firstChild.remove();setTimeout(()=>{d.style.transition='opacity .4s';d.style.opacity='0';setTimeout(()=>d.remove(),400)},kind==='q'?3600:2800)}
+function toast(html,kind,o){const box=$('#toasts');const lastT=box.lastElementChild;if(lastT&&lastT.innerHTML===html&&lastT.style.opacity!=='0')return;const d=document.createElement('div');d.className='toast '+(kind||'');d.innerHTML=html;if(o&&(o.g||o.who||o.tg)){d.classList.add('who');d.onclick=()=>{try{if(o.tg&&idFocusTable(o.tg))return;if(o.g)idFocusGroup(o.g,o.k||0);else idFocusWho(o.who)}catch(e){}}}   /* v2.4 rc6 (07:09): a line someone said finds them */box.appendChild(d);while(box.children.length>2)box.firstChild.remove();plinesLift();setTimeout(()=>{d.style.transition='opacity .4s';d.style.opacity='0';setTimeout(()=>{d.remove();plinesLift()},400)},kind==='q'?3600:2800)}
 function ach(id){if(S.achievements[id])return;S.achievements[id]=S.day;const a=ACH.find(x=>x.id===id);if(a){setTimeout(()=>banner(a.n,'成就解鎖'),600);sfx.buy()}}
 function coach(k){if(!R||R.coach<0)return;if(k===R.coach){showCoach(COACH[k]);R.coach++;if(R.coach>=COACH.length){R.coach=-1;setTimeout(hideCoach,4500)}}}
 /* rc8 (the player, 2026-10-03: 「這一段開店很久都不消失！」): a tip shows for 9 seconds of the service and goes; the next step still
@@ -5328,7 +5450,11 @@ const COACH_SHOW=9;
 function showCoach(txt){const c=$('#coach');c.hidden=false;if(R)R.coachAt=R.t;c.innerHTML=`<img alt="" src="${portraitURL([JILL_LOOK],'jill',true)}"><div>${txt}</div>`;plinesLift()}
 function hideCoach(){$('#coach').hidden=true;plinesLift()}
 /* rc7.5: while the coach talks, the lines people say sit above it (they shared the bottom of the screen) */
-function plinesLift(){const c=$('#coach'),p=$('#plines');if(!p)return;if(!c||c.hidden){p.style.bottom='';return}const need=(parseFloat(c.style.bottom)||8)+(c.offsetHeight||0)+8;p.style.bottom=need>72?need+'px':''}
+function plinesLift(){const c=$('#coach'),p=$('#plines');if(!p)return;let need=72;if(c&&!c.hidden)need=Math.max(need,(parseFloat(c.style.bottom)||8)+(c.offsetHeight||0)+8);
+ /* audit WS1-10／W3-10 (2026-10-06): the lines with a face sit above the toasts, never on them — on Day 1's first photo the
+    husband's 「拍妳。」「嗯。」 (toasts) were under Jill's lines; with two toasts the upper one was covered */
+ const tb=$('#toasts');if(tb&&tb.children.length&&p.offsetParent){const pr=p.offsetParent.getBoundingClientRect();const top=Math.min(...[...tb.children].map(e=>e.getBoundingClientRect().top));if(isFinite(top))need=Math.max(need,Math.round(pr.bottom-top+6+8))}   /* +8: a toast still sliding in (tIn) sits 8px low */
+ p.style.bottom=need>72?need+'px':''}
 
 /* ================= HUD & tickets ================= */
 let hudCache={};
@@ -5447,7 +5573,7 @@ function renderStock(){const p=$('#stockPanel');if(!p||p.hidden||!R)return;const
  p.innerHTML=`<div class="sp-h"><h4>冰箱 <span>${tot}/${cap}</span></h4><button class="sp-x" data-stock="close" aria-label="關閉">✕</button></div>
   ${lowAll.length&&fillCost>0?`<button class="btn sm sp-fill" data-stock="fill" ${S.money<fillCost?'disabled':''}>低於 3 份的全部補到 3　${fmt(fillCost)}</button>`:''}
   <div class="sp-list">${ms.map(d=>{const n=S.stock[d]||0;const lv=stockLevel(d);const c=emergencyCost(d);return`<div class="sp-row ${lv}"><img alt="" src="${dishURL(d,'P')}"><div class="nm">${dishName(d)}<small>${lv==='out'?'賣完了':lv==='low'?'快沒了':'還夠'}・叫貨 ${fmt(c)}/份</small></div><b class="n">${n}</b><button data-stock="buy" data-d="${d}" data-n="1" ${S.money<c||tot>=cap?'disabled':''}>+1 <small>${fmt(c)}</small></button>${(()=>{const mx=Math.max(0,Math.min(cap-tot,Math.floor(S.money/c),12));return`<button data-stock="buy" data-d="${d}" data-n="${mx}" ${mx<=1?'disabled':''}>補滿 +${mx} <small>${fmt(c*mx)}</small></button>`})()}</div>`}).join('')}</div>
-  <p class="sp-note">臨時叫貨是平常進貨的 1.5 倍價，馬上到；按一下就叫、立刻扣款（金額印在按鈕上）。賣完的菜客人點不到；店不會自己花錢叫貨。</p>`}
+  <p class="sp-note">臨時叫貨是平常進貨的 1.5 倍價，馬上到；按一下就叫、立刻扣款（金額印在按鈕上）。${soldOutRule()}</p>`}
 {const sp=$('#stockPanel');if(sp){sp.addEventListener('click',e=>{const b=e.target.closest('[data-stock]');if(!b||b.disabled)return;const a=b.dataset.stock;audioInit();
   if(a==='close'){sp.hidden=true;return}
   /* v2.2.1 #2: one tap, always. There used to be a hidden rule — an order of $600 or more asked for a second tap
@@ -5721,7 +5847,7 @@ function drawJillAt(c,J,V,now){const moving=J.moving;const stp=moving?Math.sin(J
 function drawTableOverlay(c,t,now,pulse){const g=t.group;const bx=t.x,by=t.pdr?t.y+40:t.y-(t.seats===4?74:68);const ring=(col,w,dash)=>{if(t.pdr){const G=pdGeo();c.strokeStyle=col;c.lineWidth=w;if(dash)c.setLineDash(dash);rr(c,G.x-G.hw-30,G.y0-18,(G.hw+30)*2,G.y1-G.y0+30,14);c.stroke();c.setLineDash([]);return true}return false};
    if(g&&!['toTable','leave'].includes(g.state)){let kind=null,extra=null;if(g.state==='reading')kind='menu';else if(g.state==='order')kind='order';else if(g.state==='wait'){const it=g.ticket?g.ticket.items:[];if(it.some(i=>i.st==='ready'&&!i.picked))kind='ready';else kind='wait',extra=[it.filter(i=>i.st==='served').length,it.length]}else if(g.state==='check')kind='check';
     const act=kind==='order'||kind==='ready'||kind==='check';if(act&&!ring(`rgba(255,215,110,${.35+pulse*.45})`,2)){c.strokeStyle=`rgba(255,215,110,${.35+pulse*.45})`;c.lineWidth=2;c.beginPath();c.ellipse(t.x,t.y-4,(t.seats===4?42:34)+pulse*3,15+pulse*1.5,0,0,7);c.stroke()}
-    if(g.rowdy){kind='angry';c.save();c.translate(Math.sin(now*40)*1.2,0)}if(kind)bubble(c,bx,by,kind,g.rowdy?pulse:act?pulse:0,extra);if(g.rowdy)c.restore();if(['order','wait','check'].includes(g.state))patBar(c,bx,by+13,g.pat);if(g.ret||g.reg){c.fillStyle='#E8798A';c.beginPath();const hx=bx+15,hy=by-8;c.moveTo(hx,hy+4);c.bezierCurveTo(hx-6,hy,hx-3,hy-5,hx,hy-2);c.bezierCurveTo(hx+3,hy-5,hx+6,hy,hx,hy+4);c.fill()}
+    if(g.rowdy){kind='angry';c.save();c.translate(Math.sin(now*40)*1.2,0)}if(kind)bubble(c,bx,by,kind,g.rowdy?pulse:act?pulse:0,extra);if(g.rowdy)c.restore();if(['order','wait','check'].includes(g.state))patBar(c,bx,by+13,g.pat);if(smHeart(g)){/* the user, 2026-10-04: 「B. 愛心只給 Sophie 和 Mia；熟客不再有任何記號。」 (audit WS1-04: the bubble's heart still came for every regular) */c.fillStyle='#E8798A';c.beginPath();const hx=bx+15,hy=by-8;c.moveTo(hx,hy+4);c.bezierCurveTo(hx-6,hy,hx-3,hy-5,hx,hy-2);c.bezierCurveTo(hx+3,hy-5,hx+6,hy,hx,hy+4);c.fill()}
     if(g.type==='vip'){c.fillStyle='#E0B863';c.font=`800 7px ${FONT}`;c.textAlign='center';c.fillText('VIP',bx-17,by-6)}}
    else if(!g&&t.dirty){bubble(c,bx,by+8,'dirty',pulse);if(!ring(`rgba(160,210,235,${.3+pulse*.4})`,2)){c.strokeStyle=`rgba(160,210,235,${.3+pulse*.4})`;c.lineWidth=2;c.beginPath();c.ellipse(t.x,t.y-4,34+pulse*3,15,0,0,7);c.stroke()}}
    else if(!g&&!t.dirty&&queued().some(q=>q.size<=t.seats&&(!t.pdr||pdTableFor(q)))){if(!ring(`rgba(140,200,120,${.25+pulse*.35})`,1.6,[4,4])){c.strokeStyle=`rgba(140,200,120,${.25+pulse*.35})`;c.lineWidth=1.6;c.setLineDash([4,4]);c.beginPath();c.ellipse(t.x,t.y-4,t.seats===4?42:32,14,0,0,7);c.stroke();c.setLineDash([])}}}
@@ -7935,8 +8061,8 @@ function firstPhotoShutter(){const J=R.jill;const shot=firstPhotoSnap(J);R.fpSho
  /* rc8 (the player, 2026-10-03: 「我發現dylan第一天就露臉了」「第一天就寫jill先生但不露臉」): before the reveal he is 「Jill 先生」 on
     this line and his face is not shown — Jill's lines carry only hers */
  const pre=!dylanOut();
- L.forEach(([w,t],i)=>setTimeout(()=>{if(!R||phase!=='service')return;if(w==='jill'){if(!pre)jillSay(t,{with:'dylan',withTone:'default'});else{logLine('Jill',t,'j');if(!portraitLine('jill',t,{tone:'default'}))toast(`<b>Jill</b>：「${t}」`,'q')}}
-  else if(pre){logLine('Jill 先生',t,'d');toast(`<b>Jill 先生</b>：「${t}」`,'q')}else{logLine('Dylan',t,'d');portraitLine('dylan',t,{tone:'default',with:'jill',withTone:'default'})}},(window.__fastSay?0:500)+i*1700+(i>=4?1500:0)))}
+ talk(()=>L.forEach(([w,t],i)=>speakLater(()=>{if(!R||phase!=='service')return;if(w==='jill'){if(!pre)jillSay(t,{with:'dylan',withTone:'default'});else{logLine('Jill',t,'j');if(!portraitLine('jill',t,{tone:'default'}))toast(`<b>Jill</b>：「${t}」`,'q')}}
+  else if(pre){logLine('Jill 先生',t,'d');toast(`<b>Jill 先生</b>：「${t}」`,'q')}else{logLine('Dylan',t,'d');portraitLine('dylan',t,{tone:'default',with:'jill',withTone:'default'})}},(window.__fastSay?0:500)+i*1700+(i>=4?1500:0))))}
 function albumAdd(kind,img,info){const A=albumList();if(ACH_BY_MEMO[kind])ach(ACH_BY_MEMO[kind]);if(A.length+1>=50)ach('photos50');const keep=!A.some(p=>p.kind===kind);const clock=R&&R.closing==null?clockStr():evening()?eveningClock():'';let txt='';try{txt=(MEM_TXT[kind]||(()=>''))(info||{})}catch(e){}
  const p={id:'p'+S.day+'_'+kind+'_'+Math.random().toString(36).slice(2,8),kind,day:S.day,clock,cap:(info&&info.cap)||MEMS[kind]||kind,txt:(info&&info.txt)||txt,keep};A.push(p);
  photoPut(p.id,img).then(ok=>{if(!ok){p.img=img;save()}});   /* no store: the picture stays in the save */
@@ -8118,6 +8244,9 @@ function startRace(c){const o=catBy(c.def.id==='tora'?'snow':'tora');if(!o)retur
 function raceStep(c){const n=c.path&&c.path.shift();if(!n){c.run=0;c.path=null;const f=CATS.find(o=>o.st==='race'&&o.target===c);if(f){f.st='rest';f.run=0;f.target=null;finishRace(f)}finishRace(c);return}c.st='walk';c.tx=n.x;c.ty=n.y;c.after='raceNext';c.run=1}
 function finishRace(c){c.run=0;if(c.def.id==='snow'){if(spotFree('bed')&&Math.random()<.4)catGo(c,'bed');else sleepHere(c,30,60)}else{c.st='rest';c.pose='groom';c.t=rand(4,8)}}
 /* ---- memories ---- */
+/* audit WS7-01 (2026-10-06): every picture says the room it happens in — the sofa's are Jill's room ('home'), a table's
+   are that table's room — so the camera takes it there and nowhere else (a photo taken of the room on screen showed the
+   dining room's booths for 「膝上的重量」); 'main' only for what happens in the dining room itself */
 function memo(id,x,y,info){if(!MEMS[id])return;if(MEMQ.some(m=>m.id===id)||(!albumAllows(id)&&!(info&&info.always)))return;   /* info.always: a night's own picture (rc7.6, the chef's night) whatever else the day kept */MEMQ.push({id,x,y,info,room:(info&&info.room)||'main'})}
 /* The frame is built from the subjects of the moment (info.subj: the cats, Jill, the guest…), not from one
    point: a close-up for one subject, wider when there are several, the whole room if that is what it takes.
@@ -8126,7 +8255,16 @@ function memFrame(m){const pts=[{x:m.x,y:m.y}].concat((m.info&&m.info.subj)||[])
  let x0=Math.min(...pts.map(p=>p.x-18)),x1=Math.max(...pts.map(p=>p.x+18)),y0=Math.min(...pts.map(p=>p.y-34)),y1=Math.max(...pts.map(p=>p.y+10));
  let w=Math.max(150,x1-x0),h=Math.max(112,y1-y0);if(w/h>4/3)h=w*3/4;else w=h*4/3;const cx=(x0+x1)/2,cy=(y0+y1)/2-2;
  const W=SV.w/SV.s,H=SV.h/SV.s;w=Math.min(w,W);h=Math.min(h,H);let fx=cx-w/2,fy=cy-h/2;fx=clamp(fx,-SV.ox/SV.s,W-SV.ox/SV.s-w);fy=clamp(fy,-SV.oy/SV.s,H-SV.oy/SV.s-h);return{x:fx,y:fy,w,h}}
-function flushMem(){if(!MEMQ.length)return;for(const m of MEMQ.splice(0)){if(m.room!==room)continue;/* the camera only sees the room on screen */try{const f=memFrame(m);const sx=(SV.ox+f.x*SV.s)*DPR,sy=(SV.oy+f.y*SV.s)*DPR,sw=f.w*SV.s*DPR,sh=f.h*SV.s*DPR;const cv=mkCanvas(360,270),c=cv.getContext('2d');c.drawImage(sc,sx,sy,sw,sh,0,0,360,270);albumAdd(m.id,cv.toDataURL('image/jpeg',.68),m.info);S.mem=S.mem||{};if(!S.mem[m.id])S.mem[m.id]={day:S.day};FLASH={x:m.x,y:m.y,t:0};sfx.shutter();save()}catch(e){}}}
+/* audit WS7-01 (2026-10-06): a picture is of the room it happened in. The room on screen is copied as it is. Jill's room
+   — her sofa while the player looks at the dining room — is drawn for the camera the way the first photo is
+   (firstPhotoSnap: that room, a fixed random stream so the game's own is untouched), then the screen comes back. The
+   rooms of the service (the dining rooms, the Lounge, upstairs) keep rc6's rule: their moments are taken while they are
+   the room on screen — the day's four pictures are the evening the player watched */
+function flushMem(){if(!MEMQ.length)return;for(const m of MEMQ.splice(0)){const other=m.room!==room;const room0=room,M=Math.random;
+  if(other&&m.room!=='home')continue;   /* the dining rooms, the Lounge and upstairs: the camera sees the room on screen (rc6); only Jill's room is drawn when the player is elsewhere (WS7-01) */
+  try{if(other){if(!roomOpen(m.room))continue;room=m.room;SNAP=true;Math.random=rng(29);drawScene(performance.now()/1000)}
+   const f=memFrame(m);const sx=(SV.ox+f.x*SV.s)*DPR,sy=(SV.oy+f.y*SV.s)*DPR,sw=f.w*SV.s*DPR,sh=f.h*SV.s*DPR;const cv=mkCanvas(360,270),c=cv.getContext('2d');c.drawImage(sc,sx,sy,sw,sh,0,0,360,270);albumAdd(m.id,cv.toDataURL('image/jpeg',.68),m.info);S.mem=S.mem||{};if(!S.mem[m.id])S.mem[m.id]={day:S.day};if(!other){FLASH={x:m.x,y:m.y,t:0};sfx.shutter()}save()}
+  catch(e){}finally{if(other){SNAP=false;Math.random=M;room=room0;forceDraw=true}}}}
 const SPACE_PHOTO={side:[()=>S.newRooms&&S.newRooms.side,'側廳'],front:[()=>S.newRooms&&S.newRooms.terrace,'戶外的位子'],lounge:[()=>S.newRooms&&S.newRooms.lounge,'The Lounge'],up:[()=>S.newRooms&&S.newRooms.up,'二樓'],staff:[()=>srBuilt()?srOf().done:null,'員工休息室'],pdr:[()=>pdBuilt()?pdOf().done:null,'包廂']};   /* the day each was finished, as the shop's other firsts read it (NOVELTY) */
 function spacePhotoCheck(){if(!R||phase!=='service')return;const P=SPACE_PHOTO[room];if(!P)return;const d=P[0]();if(d==null||S.day<d||S.day-d>4)return;const done=S.spacePhoto=S.spacePhoto||{};if(done[room])return;done[room]=S.day;memo('newspace',200,LH*.55,{room,a:P[1],always:true,subj:[{x:70,y:150},{x:330,y:FB-30}]})}
 function memChecks(){if(!CATS)return;try{spacePhotoCheck()}catch(e){}const T=catBy('tora'),H=catBy('ban'),B=catBy('mei'),Bb=catBy('snow');
@@ -8135,9 +8273,9 @@ function memChecks(){if(!CATS)return;try{spacePhotoCheck()}catch(e){}const T=cat
  if(B&&B.perch>=0&&[6,13,12].includes(B.perch)&&B.st==='rest')memo('best',B.x,B.y+20,{a:nm(B)});
  if(Bb&&(Bb.st==='sleep'||Bb.st==='bed')&&R&&(R.fire>0||R.insp||R.thief||R.groups.length>=6))memo('sleepgod',Bb.x,Bb.y,{a:nm(Bb),subj:R.groups.filter(g=>g.table!=null).slice(0,3).map(g=>R.tables[g.table])});
  const sl=CATS.filter(c=>!c.hidden&&(c.st==='sleep'||c.st==='bed'||(c.st==='side'&&c.sleepy)));if(sl.length>=3){const cx=sl.reduce((a,c)=>a+c.x,0)/sl.length,cy=sl.reduce((a,c)=>a+c.y,0)/sl.length;const trio=sl.filter(c=>Math.hypot(c.x-cx,c.y-cy)<75);if(trio.length>=3)memo('nap3',cx,cy,{subj:trio})}
- {const L=LIFE.jill;const on=sofaCats();if(L.on&&evening()&&L.sinceSit>6){if(on.length>=1)memo('sofa',(SOFA.x0+SOFA.x1)/2,120,{cats:on.map(nm).join('、'),subj:on.concat([{x:L.x,y:SOFA.jy}])});if(on.length>=3)memo('sofafull',(SOFA.x0+SOFA.x1)/2,120,{n:on.length,subj:on.concat([{x:L.x,y:SOFA.jy}])})}
-  const lap=on.find(c=>c.sofa.kind==='lap');if(L.on&&lap&&L.sinceSit>3)memo('lap',lap.x,lap.y,{a:nm(lap),subj:[{x:L.x,y:SOFA.jy}]});
-  const D=LIFE.dylan;if(D&&D.onSofa&&evening())memo('dylan',D.x,SOFA.jy,{subj:L.on?[{x:L.x,y:SOFA.jy}]:[]})}
+ {const L=LIFE.jill;const on=sofaCats();if(L.on&&evening()&&L.sinceSit>6){if(on.length>=1)memo('sofa',(SOFA.x0+SOFA.x1)/2,120,{cats:on.map(nm).join('、'),room:'home',subj:on.concat([{x:L.x,y:SOFA.jy}])});if(on.length>=3)memo('sofafull',(SOFA.x0+SOFA.x1)/2,120,{n:on.length,room:'home',subj:on.concat([{x:L.x,y:SOFA.jy}])})}
+  const lap=on.find(c=>c.sofa.kind==='lap');if(L.on&&lap&&L.sinceSit>3)memo('lap',lap.x,lap.y,{a:nm(lap),room:'home',subj:[{x:L.x,y:SOFA.jy}]});
+  const D=LIFE.dylan;if(D&&D.onSofa&&evening())memo('dylan',D.x,SOFA.jy,{room:'home',subj:L.on?[{x:L.x,y:SOFA.jy}]:[]})}
  /* 樾樾 pressed against 柔柔; 寶寶 and 小齁 sharing the cushion; 柔柔 relaxed beside a stranger; odd sleeping spots */
  {const M=catBy('mikan');if(T&&M&&T.st==='sleep'&&!T.hidden&&!M.hidden&&['sleep','rest','bed','side'].includes(M.st)&&Math.hypot(T.x-M.x,T.y-M.y)<28)memo('pressed',(T.x+M.x)/2,(T.y+M.y)/2,{a:nm(T),b:nm(M),subj:[T,M]});
   if(B&&H&&OCC.bed.includes(B)&&OCC.bed.includes(H)&&B.st==='bed'&&H.st==='bed'&&Math.abs(B.x-H.x)>=14)memo('cushion',SPOT.bed.x,SPOT.bed.y,{a:nm(H),b:nm(B),subj:[B,H]});
@@ -8157,7 +8295,7 @@ function memChecks(){if(!CATS)return;try{spacePhotoCheck()}catch(e){}const T=cat
  {const up=CATS.filter(c=>c.st==='up'&&!c.upTo);const one=up.find(c=>c.away==='up'&&c.upWin);if(one&&room==='up')memo('upwin',one.ax,one.ay,{a:nm(one),room:'up',subj:[{x:one.ax,y:one.ay}]});
   const two=up.filter(c=>c.away==='up');if(two.length>=2&&room==='up')memo('upcats',(two[0].ax+two[1].ax)/2,(two[0].ay+two[1].ay)/2,{a:nm(two[0]),b:nm(two[1]),room:'up',subj:two.slice(0,2).map(c=>({x:c.ax,y:c.ay}))});
   const sr=up.find(c=>c.away==='staff');if(sr&&room==='staff')memo('srcat',sr.ax,sr.ay,{a:nm(sr),room:'staff',subj:[{x:sr.ax,y:sr.ay}]})}
-  const L=LIFE.jill;if(evening()&&L.on&&L.act==='read'&&L.sinceSit>12){const asleep=CATS.filter(c=>!c.hidden&&(c.st==='sleep'||c.st==='bed'||(c.st==='side'&&c.sleepy)));if(asleep.length>=2)memo('reading',L.x,SOFA.jy,{cats:asleep.slice(0,3).map(nm).join('、'),subj:asleep.slice(0,3)});if(!LIFE.dylan&&asleep.length>=2)memo('quiet',L.x,SOFA.jy,{subj:asleep.slice(0,2)})}
+  const L=LIFE.jill;if(evening()&&L.on&&L.act==='read'&&L.sinceSit>12){const asleep=CATS.filter(c=>c.away==='home'&&(c.homeSleep||c.st==='sleep'||c.st==='bed'||(c.st==='side'&&c.sleepy)));const at=c=>c.sofa&&c.sofaOn?{x:c.x,y:c.y}:{x:c.ax!=null?c.ax:c.x,y:c.ay!=null?c.ay:c.y};   /* the cats asleep in her room, where she is reading — not the dining room's */if(asleep.length>=2)memo('reading',L.x,SOFA.jy,{cats:asleep.slice(0,3).map(nm).join('、'),room:'home',subj:asleep.slice(0,3).map(at)});if(!LIFE.dylan&&asleep.length>=2)memo('quiet',L.x,SOFA.jy,{room:'home',subj:asleep.slice(0,2).map(at)})}
   if(S.newRoom&&S.newRoom<S.day&&evening()&&CATS.filter(c=>!c.hidden).length>=3){const v=CATS.filter(c=>!c.hidden);memo('newroom',v.reduce((a,c)=>a+c.x,0)/v.length,v.reduce((a,c)=>a+c.y,0)/v.length,{subj:v});S.newRoom=0}}
  const vis=CATS.filter(c=>!c.hidden);if(vis.length===5){const cx=vis.reduce((a,c)=>a+c.x,0)/5,cy=vis.reduce((a,c)=>a+c.y,0)/5;if(vis.every(c=>Math.hypot(c.x-cx,c.y-cy)<100))memo('everyone',cx,cy,{subj:vis})}}
 /* ---- update ---- */
@@ -8462,7 +8600,7 @@ function snapshotService(){if(!R||phase!=='service'||R.closing!=null||R.ended)re
  const slots=R.slots.map(s0=>{const o={broken:!!s0.broken,fix:s0.fix||0,job:null};if(s0.job){const j=s0.job;const jo={};for(const k in j)if(k!=='tk'&&k!=='it')jo[k]=j[k];jo.tk=ti(j.tk);jo.it=ir(j.it);o.job=jo}return o});
  const J=R.jill;const jill={};for(const k in J)if(!['carry','cur','pet','lookAt','rest','restPos','sofa','visit','__op'].includes(k))jill[k]=J[k];jill.carry=J.carry.map(c=>({tk:ti(c.tk),it:ir(c.it)}));jill.cur=J.cur?Object.assign({},J.cur):null;
  const cw={};for(const id in R.cw||{}){const w=R.cw[id];const o={};for(const k in w)if(k!=='task'&&k!=='carry'&&k!=='__op')o[k]=w[k];   /* a walker's worked-out way round the furniture (__op) is not kept */o.task=w.task?Object.assign({},w.task,{g:gi2(w.task.g),t:w.task.t?w.task.t.i:-1,tk:ti(w.task.tk)}):null;o.carry=w.carry?w.carry.map(ir):null;cw[id]=o}
- const tables=R.tables.map(t=>({group:gi2(t.group),dirty:!!t.dirty,plates:(t.plates||[]).map(p=>Object.assign({},p)),busT:t.busT||0,claim:t.claim||null,tst:t.tst||0,cnr:t.cnr||0}));
+ const tables=R.tables.map(t=>({spot:t.spot,group:gi2(t.group),dirty:!!t.dirty,plates:(t.plates||[]).map(p=>Object.assign({},p)),busT:t.busT||0,claim:t.claim||null,tst:t.tst||0,cnr:t.cnr||0}));
  const misc={};for(const k of CP_KEYS)if(k in R)misc[k]=R[k];misc.nights=nightsSnap();
  const snap={groups,tickets,slots,jill,cw,tables,misc,tablesN:R.tables.length,slotsN:R.slots.length};
  return JSON.parse(JSON.stringify(snap))}   /* through JSON once: proves it is plain data, drops undefined */
@@ -8485,7 +8623,7 @@ function nightsRestore(N,snap){const M=(snap.misc&&snap.misc.nights)||{};const G
   if(!M.cn)for(const t of lg)t.cnr=1}
  const pg=G.find(g=>g.pianist);
  if(pg){N.ya=Object.assign({trial:!!fact('ya_trial')&&!fact('ya_join'),on:pg.state==='piano'?1:0,t0:N.t-(pg.state==='piano'?N.dur*.08:0)},M.ya||{},{g:pg});if(N.ya.trial&&!M.ya)N.ya.clap=1}}
-function checkpointSave(why){if(!R||phase!=='service')return false;try{const snap=snapshotService();if(!snap)return false;S.checkpoint={day:S.day,at:R.t,clock:clockStr(),why,snap};save();return true}catch(e){console.warn('[checkpoint] not saved:',e&&e.message);return false}}
+function checkpointSave(why){if(!R||phase!=='service')return false;try{const snap=snapshotService();if(!snap)return false;const panel=DLG&&(DLG.sh||DLG.hold||why==='hidden'||why==='pagehide')?shPersist():null;S.checkpoint={day:S.day,at:R.t,clock:clockStr(),why,snap};if(panel)S.checkpoint.panel=panel;save();return true}catch(e){console.warn('[checkpoint] not saved:',e&&e.message);return false}}
 function clearCheckpoint(){if(S.checkpoint){S.checkpoint=null}}
 function restoreService(cp){const snap=cp.snap;if(!snap||cp.day!==S.day)throw new Error('checkpoint is for another day');
  lifeReset();streetReset();dylanStageCheck();bg=null;lastEv=null;const dur=snap.misc.dur||dayDur(S.day);
@@ -8494,17 +8632,31 @@ function restoreService(cp){const snap=cp.snap;if(!snap||cp.day!==S.day)throw ne
   combo:0,maxCombo:0,streak:0,fire:0,fireCount:0,floats:[],parts:[],tv:1,gid:1,tkid:1,
   st:{rev:0,tips:0,guests:0,groups:0,perfect:0,q:{P:0,G:0,O:0,B:0},sats:[],dish:{},angry:0,lost:0,reviews:[],critic:null,blogger:null,treats:0,jtreats:0,ptreats:0},
   rush:feat().rush,rushT0:dur*120/270,rushT1:dur*180/270,rushShown:false,weather:S.today&&S.today.weather,event:S.today&&S.today.event,coach:-1,taskDone:{},lastSpawn:0,idleT:0,focus:0,focusLock:0,holdSlot:null,inc:[],cw:{},thief:null,insp:null,chaser:null};
- if(N.tables.length!==snap.tablesN||N.slots.length!==snap.slotsN)throw new Error('room changed');
+ if(N.slots.length!==snap.slotsN)throw new Error('kitchen changed');
+ /* audit WS2-01: a checkpoint made before a version that changed the tables (35 → 36 when the Lounge's seats changed) came
+    back as an empty shop. Each table is found again: by its spot (kept in the snapshot from now on); in an older snapshot
+    with the same count, by its number as before; otherwise every party gets the table of that number if it is still a
+    table of their room that seats them, else the free one of their room nearest to where they are. Only a party with
+    nowhere to sit still ends in the fallback. */
+ const tmap={};
+ if(snap.tables.some(o=>o.spot!=null))snap.tables.forEach((o,i)=>{const t=N.tables.find(x=>x.spot===o.spot);if(t)tmap[i]=t.i});
+ else if(snap.tablesN===N.tables.length)for(let i=0;i<N.tables.length;i++)tmap[i]=i;
+ else{const taken=new Set(),rm=t=>t.room||'main';
+  for(const g of snap.groups){const i=g.table;if(i==null||i<0||tmap[i]!=null)continue;const r=g.room||'main';const ok=x=>!!x&&rm(x)===r&&!taken.has(x.i)&&(x.seats||2)>=(g.size||1);
+   const t=ok(N.tables[i])?N.tables[i]:N.tables.filter(ok).sort((a,b)=>Math.abs(a.x-g.x)-Math.abs(b.x-g.x)||Math.abs(a.y-g.y)-Math.abs(b.y-g.y))[0];
+   if(t){tmap[i]=t.i;taken.add(t.i)}}}
+ const tix=i=>i==null||i<0?i:tmap[i]!=null?tmap[i]:-2;   /* -2: a table that is not there any more */
  for(const k of CP_KEYS)if(k in snap.misc)N[k]=snap.misc[k];
  N.groups=snap.groups.map(o=>Object.assign({},o,{wcat:null,gone:false}));
  N.tickets=snap.tickets.map(o=>Object.assign({},o,{items:o.items.map(i=>Object.assign({},i))}));
  N.tickets.forEach((tk,i)=>{tk.g=N.groups[snap.tickets[i].g];if(!tk.g)throw new Error('ticket without guests')});
- N.groups.forEach((g,i)=>{const t=snap.groups[i].ticket;g.ticket=t>=0?N.tickets[t]:null;if(t>=0&&!g.ticket)throw new Error('guests without ticket');if(!G_STATES.includes(g.state)||!isFinite(g.x)||!isFinite(g.y)||!Array.isArray(g.looks))throw new Error('bad guest')});
- snap.tables.forEach((o,i)=>{const t=N.tables[i];t.group=o.group>=0?N.groups[o.group]:null;if(o.group>=0&&!t.group)throw new Error('table without guests');t.dirty=o.dirty;t.plates=o.plates||[];t.busT=o.busT||0;t.claim=o.claim||null;t.tst=o.tst||0;t.cnr=o.cnr||0});
+ N.groups.forEach((g,i)=>{if(g.table!=null&&g.table>=0){g.table=tix(g.table);if(g.table<0)throw new Error('a party without its table')}const t=snap.groups[i].ticket;g.ticket=t>=0?N.tickets[t]:null;if(t>=0&&!g.ticket)throw new Error('guests without ticket');if(!G_STATES.includes(g.state)||!isFinite(g.x)||!isFinite(g.y)||!Array.isArray(g.looks))throw new Error('bad guest')});
+ if(Object.keys(tmap).some(i=>tmap[i]!==+i))N.tickets.forEach(tk=>{if(tk.g&&tk.g.table!=null&&tk.g.table>=0)tk.no=tk.g.table+1});
+ snap.tables.forEach((o,i)=>{if(tmap[i]==null){if(o.group>=0)throw new Error('table without guests');return}const t=N.tables[tmap[i]];t.group=o.group>=0?N.groups[o.group]:null;if(o.group>=0&&!t.group)throw new Error('table without guests');t.dirty=o.dirty;t.plates=o.plates||[];t.busT=o.busT||0;t.claim=o.claim||null;t.tst=o.tst||0;t.cnr=o.cnr||0});
  const item=ref=>{if(!ref)return null;const tk=N.tickets[ref[0]];return tk&&tk.items[ref[1]]||null};
  snap.slots.forEach((o,i)=>{const s0=N.slots[i];s0.broken=!!o.broken;s0.fix=o.fix||0;if(o.job){const j=Object.assign({},o.job);j.tk=N.tickets[o.job.tk];j.it=item(o.job.it);if(!j.tk||!j.it||!DISH(j.d))throw new Error('job without ticket');if(j.step){j.step=Object.assign({},j.step);j.step.hold=false}s0.job=j}});
- Object.assign(N.jill,snap.jill);N.jill.carry=snap.jill.carry.map(c=>({tk:N.tickets[c.tk],it:item(c.it)})).filter(c=>c.tk&&c.it);N.jill.cur=snap.jill.cur?Object.assign({},snap.jill.cur):null;N.jill.q=(snap.jill.q||[]).slice();if(!isFinite(N.jill.x)||!isFinite(N.jill.y))throw new Error('bad jill');N.jill.sofa=false;N.jill.rest=null;N.jill.pet=null;N.jill.lookAt=null;N.jill.nod=0;N.jill.visit=null;
- for(const id in snap.cw){const o=snap.cw[id];const w=Object.assign({},o);if(o.task){w.task=Object.assign({},o.task);w.task.g=o.task.g>=0?N.groups[o.task.g]:null;w.task.t=o.task.t>=0?N.tables[o.task.t]:null;w.task.tk=o.task.tk>=0?N.tickets[o.task.tk]:null;if((o.task.g>=0&&!w.task.g)||(o.task.t>=0&&!w.task.t)||(o.task.tk>=0&&!w.task.tk))w.task=null}w.carry=o.carry?o.carry.map(item).filter(Boolean):null;if(w.carry&&!w.carry.length)w.carry=null;N.cw[id]=w}
+ Object.assign(N.jill,snap.jill);N.jill.carry=snap.jill.carry.map(c=>({tk:N.tickets[c.tk],it:item(c.it)})).filter(c=>c.tk&&c.it);N.jill.cur=snap.jill.cur?Object.assign({},snap.jill.cur):null;if(N.jill.cur&&N.jill.cur.t!=null){N.jill.cur.t=tix(N.jill.cur.t);if(N.jill.cur.t===-2)N.jill.cur=null}N.jill.q=(snap.jill.q||[]).map(tix).filter(x=>x!=null&&x>=0);if(!isFinite(N.jill.x)||!isFinite(N.jill.y))throw new Error('bad jill');N.jill.sofa=false;N.jill.rest=null;N.jill.pet=null;N.jill.lookAt=null;N.jill.nod=0;N.jill.visit=null;
+ for(const id in snap.cw){const o=snap.cw[id];const w=Object.assign({},o);if(o.task){w.task=Object.assign({},o.task);w.task.g=o.task.g>=0?N.groups[o.task.g]:null;{const tt=tix(o.task.t);w.task.t=tt>=0?N.tables[tt]:null}w.task.tk=o.task.tk>=0?N.tickets[o.task.tk]:null;if((o.task.g>=0&&!w.task.g)||(o.task.t>=0&&!w.task.t)||(o.task.tk>=0&&!w.task.tk))w.task=null}w.carry=o.carry?o.carry.map(item).filter(Boolean):null;if(w.carry&&!w.carry.length)w.carry=null;N.cw[id]=w}
  N.holdSlot=null;N.panel=false;N.panelT=0;N.closing=null;nightsRestore(N,snap);
  R=N;phase='service';paused=false;hideScreen();layoutAll();renderTickets();renderTasks();hud(true);audioInit();return true}
 function resumeCheckpoint(){const cp=S.checkpoint;if(!cp||cp.day!==S.day){goMain();return}
@@ -8512,9 +8664,14 @@ function resumeCheckpoint(){const cp=S.checkpoint;if(!cp||cp.day!==S.day){goMain
  try{restoreService(cp);banner('繼續營業',`DAY ${S.day} · ${cp.clock}`,'');toast(`從 ${cp.clock} 繼續今天的營業`)}
  catch(e){console.warn('[checkpoint] could not restore fully:',e&&e.message);
   /* the safe fallback: reopen at the same clock with today's numbers, the room starts empty */
-  startService();R.t=cp.at;if(cp.snap&&cp.snap.misc){if(cp.snap.misc.st)R.st=cp.snap.misc.st;if(cp.snap.misc.sched)R.sched=cp.snap.misc.sched;if(cp.snap.misc.si!=null)R.si=cp.snap.misc.si}
-  toast(`今天的店內狀況無法完整還原，從 ${cp.clock} 重新開店（今天的營收與客人數都保留，店裡的客人會重新入座）`)}
- clearCheckpoint();save()}
+  startService({resume:true});R.t=cp.at;R.rushShown=R.t>=R.rushT0;if(cp.snap&&cp.snap.misc){if(cp.snap.misc.st)R.st=cp.snap.misc.st;if(cp.snap.misc.sched)R.sched=cp.snap.misc.sched;if(cp.snap.misc.si!=null)R.si=cp.snap.misc.si}
+  /* audit WS9-04: it said 「店裡的客人會重新入座」 — they are not brought back; and the explaining toast was pushed off at once */
+  banner('繼續營業',`DAY ${S.day} · 從 ${cp.clock} 重新開店`,'');toast(`今天的店內狀況無法完整還原：從 ${cp.clock} 重新開店。今天的營收與客人數都保留，當時店裡的客人沒辦法接回來。`,'q')}
+ if(cp.panel)try{shReplay(cp.panel)}catch(e){console.warn('[story] replay',e)}   /* the story that was on screen when the app went away */
+ /* audit W3-01: the evening just brought back is the new checkpoint at once — it used to be cleared here, and an evening
+    that began closing before the next one (every 20 s; none is taken while closing) was lost when the player left again:
+    the title offered the same day's prep, no summary, no wages, no rent. If none can be taken, the one it came from stays. */
+ if(!checkpointSave('resume'))save()}
 /* ================= life: the sofa, the rolling TV, Jill's evenings, Dylan ================= */
 /* Nothing in this section plays a scene. Jill, Dylan, the five cats and the TV each decide for
    themselves from their own state, personality, what is free on the sofa, where the others are,
@@ -9003,10 +9160,10 @@ function dylanUsual(){const o=S.dylan&&S.dylan.orders;if(!o)return null;let best
 /* his order is remembered; now and then Jill already knows it — a shorthand between two people, said across the
    room, a small familiarity the player can notice (counted once a day as its own kind of clue) */
 function dylanOrdered(g,tk){const d=S.dylan;d.orders=d.orders||{};const main=tk.items.find(i=>DISH(i.d).cat==='main')||tk.items[0];if(!main)return;const u=dylanUsual();d.orders[main.d]=(d.orders[main.d]||0)+1;
- if(u&&(S.regulars.dylan||0)>=2&&Math.random()<.45&&canChat('dusual',150,3)){const same=main.d===u;if(same){d.clues.usual=(d.clues.usual||0)+1}setTimeout(()=>{if(!R||phase!=='service'||!R.groups.includes(g))return;jillSay(same?pickT(['老樣子？','一樣的？','還是那個？']):pickT(['今天不一樣？','換口味了？']),{with:'dylan'});setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,same?pickT(['老樣子。','嗯。','妳知道的。']):pickT(['換個口味。','今天想吃這個。']))},1300)},700)}}
+ if(u&&(S.regulars.dylan||0)>=2&&Math.random()<.45&&canChat('dusual',150,3)){const same=main.d===u;if(same){d.clues.usual=(d.clues.usual||0)+1}setTimeout(()=>{if(!R||phase!=='service'||!R.groups.includes(g))return;jillSay(same?pickT(['老樣子？','一樣的？','還是那個？']):pickT(['今天不一樣？','換口味了？']),{with:'dylan'});speakLater(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,same?pickT(['老樣子。','嗯。','妳知道的。']):pickT(['換個口味。','今天想吃這個。']))},1300)},700)}}
 /* a regular who has been coming for a while notices that he has too — once in a while, one line, no follow-up */
-function regularsNoticeDylan(g){if(!R||!g.reg||g.reg==='dylan'||(REG_BY[g.reg]&&REG_BY[g.reg].pair))return;const dg=R.groups.find(q=>q.reg==='dylan'&&q.table!=null);if(!dg||(S.regulars[g.reg]||0)<4||(S.regulars.dylan||0)<3)return;const d=S.dylan;if((d.noticedDay||-9)>S.day-4||Math.random()>.35)return;d.noticedDay=S.day;d.clues.noticed=(d.clues.noticed||0)+1;
- setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g)&&R.groups.includes(dg))quote(g,pickT(['那位先生又來了。','他好像每次都在。','那個人跟老闆娘很熟的樣子。','他上次也坐那裡。']))},1200)}
+function regularsNoticeDylan(g){if(!R||!g.reg||g.reg==='dylan'||(REG_BY[g.reg]&&REG_BY[g.reg].pair)||dylanOut())return;   /* audit N07 (2026-10-06): after the reveal nobody notices him as 「那位先生」 any more (Mia, Day 95: 「那個人跟老闆娘很熟的樣子。」), and no clue is counted */const dg=R.groups.find(q=>q.reg==='dylan'&&q.table!=null);if(!dg||(S.regulars[g.reg]||0)<4||(S.regulars.dylan||0)<3)return;const d=S.dylan;if((d.noticedDay||-9)>S.day-4||Math.random()>.35)return;d.noticedDay=S.day;d.clues.noticed=(d.clues.noticed||0)+1;
+ speakLater(()=>{if(R&&phase==='service'&&R.groups.includes(g)&&R.groups.includes(dg))quote(g,pickT(['那位先生又來了。','他好像每次都在。','那個人跟老闆娘很熟的樣子。','他上次也坐那裡。']))},1200)}
 /* The running act: he asks, she brushes him off. Before the reveal it reads as a patient regular
    trying his luck; after it, the same act keeps going — now it's an old joke between the two of
    them. Each entry: what he says, what she answers (null = she doesn't dignify it), what he adds. */
@@ -9034,9 +9191,9 @@ function dylanScene(g){const seen=S.dylan.seen=S.dylan.seen||{};for(const sc of 
  const L=pick(sc.lines);const say=(i,txt)=>setTimeout(()=>{if(!R||phase!=='service')return;if(sc.note&&txt.startsWith('王太太：')){const wg=R.groups.find(q=>regsOf(q).includes('wangwife')&&q.table!=null);if(wg)quote(wg,txt.slice(4).replace(/^「|」$/g,''),{who:'wangwife',with:'jill'});else noteLine(txt)}else if(i%2===0){if(R.groups.includes(g))quote(g,txt)}else jillSay(txt,{with:'dylan'})},600+i*1500);
  shStart('dy_'+sc.k,true,g,()=>L.forEach((txt,i)=>{if(txt)say(i,txt)}));/* v2.2.1: each line is logged when it is spoken (quote / jillSay / noteLine) — the script itself is not a log entry */return true}return false}
 function dylanAct(g){const st=S.dylan.stage;const pool=st>=3?DYLAN_ACT.after:DYLAN_ACT.before;const line=pick(pool).map(x=>x&&x.replace('{T}',g.table+1));quote(g,line[0]);
- if(line[1])setTimeout(()=>{if(R&&phase==='service')jillSay(line[1],{with:'dylan'})},1500);else setTimeout(()=>{if(R&&phase==='service')noteLine('Jill 看了他一眼，沒有回答。')},1500);
- if(line[2])setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,line[2])},3100);
- if(line[3])setTimeout(()=>{if(R&&phase==='service'&&R.groups.includes(g))jillSay(line[3],{with:'dylan'})},4700)}/* v2.3: a four-line exchange ends with Jill (before, the fourth line was never said) */
+ if(line[1])speakLater(()=>{if(R&&phase==='service')jillSay(line[1],{with:'dylan'})},1500);else speakLater(()=>{if(R&&phase==='service')noteLine('Jill 看了他一眼，沒有回答。')},1500);
+ if(line[2])speakLater(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,line[2])},3100);
+ if(line[3])speakLater(()=>{if(R&&phase==='service'&&R.groups.includes(g))jillSay(line[3],{with:'dylan'})},4700)}/* v2.3: a four-line exchange ends with Jill (before, the fourth line was never said) */
 function dylanGuestUpd(g,dt){const t=R.tables[g.table];const J=R.jill;g.glT=(g.glT??rand(5,12))-dt;
  const jillLooking=Math.hypot(J.x-t.x,J.y-t.y)<80&&((J.face>0)===(t.x>=J.x));
  if(g.gaze>R.t&&jillLooking)g.gaze=0;
@@ -9283,15 +9440,22 @@ function chefAuto(s,dt){const j=s.job,k=j.step;const ch=chefHandles(s);if(!ch||k
  if(!cookPresent(s))return true;k.auto+=dt;if(k.auto<chefDelay(ch)*barCookMul(ch,j.d))return true;
  switch(k.t){case'add':k.left.forEach(i=>j.adds.push(i));k.left=[];s.pop={id:k.items[k.items.length-1],t:0};break;case'hold':k.level=(k.a+k.b)/2;applyHold(j,k);break;case'dose':for(let i=0;i<k.min;i++)j.adds.push(k.ing);k.cnt=k.min;break;case'tap':if(k.heat)j.mix=1;else{j.cut=true;if(CUTADD[j.d])j.adds.push(CUTADD[j.d])}break}
  j.overStart=null;advance(s,chefScore(ch));return true}
+/* audit W3-05, WS2-02: the waiters with nothing to do each have their own place by the door — they used to stand on one
+   point, six or seven people and one name tag on top of each other */
+const WAIT_POSTS=[[84,150],[58,152],[84,128],[58,130],[32,150],[110,128],[32,128]];
+function waitPost(m){const k=Math.max(0,(S.crew||[]).filter(x=>x.role==='waiter').indexOf(m));return WAIT_POSTS[k%WAIT_POSTS.length]}
+/* the cleaners wait by the back of the room, each in her own place (they stayed where they had cleaned, on the spot a waiter had used) */
+const CLEAN_POSTS=[[362,190],[362,214],[340,178],[340,202]];
+function cleanPost(m){const k=Math.max(0,(S.crew||[]).filter(x=>x.role==='cleaner'&&crewPool(x)!=='lounge').indexOf(m));return CLEAN_POSTS[k%CLEAN_POSTS.length]}
 function crewUpd(dt){R.cw=R.cw||{};for(const m of S.crew||[]){
  if(!crewHere(m)){if(m.role!=='chef')crewAwayUpd(m,dt);continue}   /* v2.4 A3: not in today, not yet, or gone home */
- if(m.role==='chef'){const peers=(S.crew||[]).filter(q=>q.role==='chef'&&q.duty===m.duty&&crewHere(q)).length;const share=Math.ceil(R.slots.filter(q=>q.type===m.duty).length/Math.max(1,peers));for(const s of R.slots)if(s.type===m.duty&&!s.job&&!s.broken){if(R.slots.filter(q=>q.job&&q.job.chef===m.id).length>=share)break;let n=null;for(const tk of R.tickets){for(const it of tk.items)if(it.st==='pending'&&DISH(it.d).st===s.type&&chefCan(m,it.d)){n={tk,it};break}if(n)break}if(n&&startCook(n.tk,n.it,true)&&s.job){s.job.chef=m.id;crewCount(m,'cook');if(n.it.d==='signature'&&!S.taught){S.taught=S.day;jillSay('這道也交給你了。');setTimeout(()=>{if(R&&phase==='service')staffSay(m,'交給我。')},1400);ach('taught')}}}
+ if(m.role==='chef'){const peers=(S.crew||[]).filter(q=>q.role==='chef'&&q.duty===m.duty&&crewHere(q)).length;const share=Math.ceil(R.slots.filter(q=>q.type===m.duty).length/Math.max(1,peers));for(const s of R.slots)if(s.type===m.duty&&!s.job&&!s.broken){if(R.slots.filter(q=>q.job&&q.job.chef===m.id).length>=share)break;let n=null;for(const tk of R.tickets){for(const it of tk.items)if(it.st==='pending'&&DISH(it.d).st===s.type&&chefCan(m,it.d)){n={tk,it};break}if(n)break}if(n&&startCook(n.tk,n.it,true)&&s.job){s.job.chef=m.id;crewCount(m,'cook');if(n.it.d==='signature'&&!S.taught){S.taught=S.day;jillSay('這道也交給你了。');speakLater(()=>{if(R&&phase==='service')staffSay(m,'交給我。')},1400);ach('taught')}}}
   /* rc8: then a station with no cook of its own — one of its dishes at a time, if nothing of his own is waiting (chefCover) */
   if(!R.slots.some(q=>q.job&&q.job.chef===m.id&&q.type!==m.duty)&&!R.tickets.some(tk=>tk.items.some(it=>it.st==='pending'&&DISH(it.d).st===m.duty&&chefCan(m,it.d)))){
    for(const s of R.slots){if(s.job||s.broken||s.type===m.duty||chefFor(s.type))continue;let n=null;for(const tk of R.tickets){for(const it of tk.items)if(it.st==='pending'&&DISH(it.d).st===s.type&&chefCan(m,it.d)){n={tk,it};break}if(n)break}
     if(n&&startCook(n.tk,n.it,true)&&s.job){s.job.chef=m.id;crewCount(m,'cook');break}}}
   continue}
- let w=R.cw[m.id];if(!w){const lgc=m.role==='cleaner'&&crewPool(m)==='lounge'&&loungeLv();/* v2.4 rc5: the Lounge's cleaner starts her evening there */w=R.cw[m.id]={bk:1,x:m.role==='waiter'?84:m.role==='bartender'?LG.bk.x:lgc?LG.bk.x:362,y:m.role==='waiter'?150:m.role==='bartender'?LG.bk.y:lgc?LG.bk.y+20:190,task:null,cd:1,face:1,step:0,busy:0,room:m.role==='bartender'||lgc?'lounge':'main',troom:m.role==='bartender'||lgc?'lounge':'main'};
+ let w=R.cw[m.id];if(!w){const lgc=m.role==='cleaner'&&crewPool(m)==='lounge'&&loungeLv();/* v2.4 rc5: the Lounge's cleaner starts her evening there */w=R.cw[m.id]={bk:1,x:m.role==='waiter'?waitPost(m)[0]:m.role==='bartender'?LG.bk.x:lgc?LG.bk.x:cleanPost(m)[0],y:m.role==='waiter'?waitPost(m)[1]:m.role==='bartender'?LG.bk.y:lgc?LG.bk.y+20:cleanPost(m)[1],task:null,cd:1,face:1,step:0,busy:0,room:m.role==='bartender'||lgc?'lounge':'main',troom:m.role==='bartender'||lgc?'lounge':'main'};
   const aw=crewAwayOf(m);if(aw&&aw.k==='late'){/* v2.4 A3: in late — from the street, through the front door, to her place */w.tx=w.x;w.ty=w.y;w.troom=w.room;w.room='front';w.x=FR.enter.x;w.y=FR.enter.y;w.arriving=1}}if(!w.room)w.room='main';
  if(w.arriving){if(stepTo(w,(115+15*m.lv)*dt)){w.arriving=0;w.moving=false;v24Arrived(m)}else{w.moving=true;w.step+=dt*12;continue}}
  if(m.role==='bartender'){if(m.duty==='lbar'&&loungeLv())bartenderUpd(m,w,dt);continue}   /* v2.3 */
@@ -9338,8 +9502,8 @@ function crewUpd(dt){R.cw=R.cw||{};for(const m of S.crew||[]){
   if(waiterDoes(m,'serve')){const own=crewPool(m)==='lounge'||!lgWaiterHere();/* rc7.2 (23:07): a Lounge table's plate is the Lounge's own waiter's when she is in */const okT=t=>!t.cn&&t.g.table!=null&&t.g.state==='wait'&&!t.claim&&t.items.some(i=>i.st==='ready'&&!i.picked&&!i.ktp&&(!i.lbar||!R.tables[t.g.table].lounge))&&!jillTargets(t.g.table)&&!R.jill.carry.some(c0=>c0.tk===t)&&lgOK(R.tables[t.g.table])&&(own||!R.tables[t.g.table].lounge);   /* rc7.6: the chef's night's plates are at the bar, the Lounge's to carry (cnServe) */const tk=R.tickets.find(t=>okT(t)&&R.tables[t.g.table].pdr)||R.tickets.find(okT);if(tk){tk.claim=m.id;const pu=pickupFor(R.tables[tk.g.table],tk.g.table%2?14:-14);w.task={k:'serve',tk,g:tk.g,t:R.tables[tk.g.table],x:pu.x,y:pu.y,dur:.25,phase:'pickup',room:pu.room};continue}}
   if(waiterDoes(m,'check')){const t=pdFirst(t=>t.group&&t.group.state==='check'&&!t.claim&&!jillTargets(t.i)&&lgOK(t));if(t){t.claim=m.id;w.task={k:'check',g:t.group,t,x:t.x+(t.x<200?-26:26),y:t.y+22,dur:.6};continue}}
   if(waiterDoes(m,'clean')){const t=pdFirst(t=>t.dirty&&!t.group&&!t.claim&&!jillTargets(t.i)&&lgOK(t));if(t){t.claim=m.id;w.task={k:'clean',t,x:t.x+(t.x<200?-24:24),y:t.y+22,dur:cleanDur(m)+.4};continue}}
-  w.cd=.4;if(w.room!=='main'||Math.hypot(w.x-84,w.y-150)>4){w.tx=84;w.ty=150;w.troom='main';if(!stepTo(w,80*dt)){w.moving=true;w.step+=dt*12}}}
- else{const free=q=>q.dirty&&!q.group&&!q.claim&&!jillTargets(q.i);const t=(crewPool(m)==='lounge'&&R.tables.find(q=>q.lounge&&free(q)))||pdFirst(free);/* v2.4 rc5: the Lounge's cleaner clears the Lounge first, then wherever she is needed */if(t){t.claim=m.id;w.task={k:'clean',t,x:t.x+(t.x<200?-24:24),y:t.y+22,dur:cleanDur(m)};continue}w.cd=.4}}}
+  w.cd=.4;{const P=waitPost(m);if(w.room!=='main'||Math.hypot(w.x-P[0],w.y-P[1])>4){w.tx=P[0];w.ty=P[1];w.troom='main';if(!stepTo(w,80*dt)){w.moving=true;w.step+=dt*12}}}}
+ else{const free=q=>q.dirty&&!q.group&&!q.claim&&!jillTargets(q.i);const t=(crewPool(m)==='lounge'&&R.tables.find(q=>q.lounge&&free(q)))||pdFirst(free);/* v2.4 rc5: the Lounge's cleaner clears the Lounge first, then wherever she is needed */if(t){t.claim=m.id;w.task={k:'clean',t,x:t.x+(t.x<200?24:-24),y:t.y+22,dur:cleanDur(m)};continue}/* a cleaner wipes from the table's other side: the waiter's side (the bill, the plates) was where they ended on top of each other */w.cd=.4;{const lg=crewPool(m)==='lounge'&&loungeLv();/* the Lounge's cleaner goes back to the Lounge's back corner */const P=lg?[LG.bk.x,LG.bk.y+20]:cleanPost(m),rm=lg?'lounge':'main';if(w.room!==rm||Math.hypot(w.x-P[0],w.y-P[1])>4){w.tx=P[0];w.ty=P[1];w.troom=rm;if(!stepTo(w,70*dt)){w.moving=true;w.step+=dt*12}}}}}}
 function crewDraw(c,now,list,rm){if(qaSolo(rm)){stageDraw(c,list,rm);return}
  if(R&&R.cw)for(const m of S.crew||[]){if(m.role==='chef')continue;const w=R.cw[m.id];if(!w||(w.room||'main')!==(rm||'main')||rm==='staff'||srWalker(m.id))continue;/* v2.4 rc6: in the Staff Room they are drawn sitting (srDrawPeople); a bartender walking up is his walker */list.push({y:w.y,f:()=>{const stp=w.moving?Math.sin(w.step):0;const L0=crewLook(m);if(w.phone)L0.acc='phone';drawPerson(c,w.x,w.y,L0,{step:stp,bob:w.moving?Math.abs(stp)*-.8:0,mood:m.name==='秀琴阿姨'&&wallWorrying()?'ok':'happy',flip:w.face<0,carry:!!(w.carry&&w.carry.length),arms:m.role==='cleaner'&&w.task&&w.task.k==='clean'&&!w.moving?[.3,1.0]:null});
   if(w.carry)w.carry.slice(0,3).forEach((it,i)=>{const cv=dishCanvas(it.d,it.q,64,S.decor.ware>0,it.want);c.drawImage(cv,w.x+(i%2?5:-21),w.y-50-Math.floor(i/2)*8,16,16)});
@@ -9353,18 +9517,18 @@ function planIncidents(dur){const D=S.day;if(D<3)return[];const n=D<6?1:D<12?2:3
   /* v2.2.1 J (#15): the same incident does not come two days running; the electrical work thins the power cuts (half, then none) and the breakdowns (−25%, then −50%) */if(last[k]===D-1)continue;if(k==='power'&&(pw>=2||(pw===1&&Math.random()<.5)))continue;if(k==='broken'&&pw>=1&&Math.random()<(pw>=2?.5:.25))continue;if(isBad)bad++;pool.push(k)}
  return pool.map((k,i)=>({k,t:dur*(.2+.62*(i+Math.random()*.7)/n),tries:0}))}
 function fireIncident(k){switch(k){
- case'rowdy':{const cand=R.groups.filter(g=>['order','wait','eat'].includes(g.state)&&g.type!=='vip'&&!g.reg&&g.table!=null);if(!cand.length)return false;const g=pick(cand);g.rowdy=R.t+16;banner('奧客鬧事！',`T${g.table+1} 的客人在大吵大鬧`,'fire');toast('點那張桌子，讓 Jill 過去安撫');sfx.angry();return true}
+ case'rowdy':{const cand=R.groups.filter(g=>['order','wait','eat'].includes(g.state)&&g.type!=='vip'&&anonG(g)&&g.table!=null);   /* audit N03: never a named guest */if(!cand.length)return false;const g=pick(cand);g.rowdy=R.t+16;banner('奧客鬧事！',`T${g.table+1} 的客人在大吵大鬧`,'fire');toast('點那張桌子，讓 Jill 過去安撫');sfx.angry();return true}
  case'broken':{const cand=R.slots.filter(s=>!s.job&&!s.broken&&s.type!=='prep');if(!cand.length)return false;const s=pick(cand);s.broken=true;s.fix=0;banner('設備故障！',`${ST_N[s.type]}${s.no} 冒煙了`,'fire');toast('連點那台設備把它修好');sfx.burnt();return true}
  case'thief':{const ds=menuList().filter(d=>(S.stock[d]||0)>=2).sort((a,b)=>S.stock[b]-S.stock[a]);if(!ds.length)return false;const d=ds[0];const n=Math.min(4,S.stock[d]);S.stock[d]-=n;R.thief={x:130,y:FB-12,d,n,caught:false,look:{skin:'#E2AE88',hair:'#1E1E24',hs:0,top:'#2A2A30',acc:'shades',pants:'#1B1B20'}};banner('食材被偷了！','快點那個小偷！','fire');sfx.angry();
   const cat=CATS&&CATS.find(c=>c.perch<0&&!c.hidden&&!['jump','visit'].includes(c.st));if(cat){releaseSpots(cat);cat.guest=null;cat.run=1;catWalk(cat,R.thief.x,R.thief.y,'rest');R.chaser=cat}return true}
  case'inspector':{factSet('inspection');/* v2.3 */R.insp={t:0,dur:22,x:DOOR.x,y:DOOR.y+20,tx:224,ty:204,b0:R.st.q.B,out:false};banner('衛生檢查員突襲！','22 秒內把髒桌子收乾淨、別燒焦','fire');sfx.door();logLine('衛生檢查員','衛生局，例行檢查。','g');portraitLine('named:衛生檢查員','衛生局，例行檢查。');return true}
  case'viprush':{for(let i=0;i<3;i++)R.sched.splice(R.si,0,{t:R.t+i*2.5,type:i===1?'gourmet':'vip',size:2});R.sched.sort((a,b)=>a.t-b.t);banner('饕客尖峰時刻！','一群 VIP 饕客湧進來了','fire');return true}
  case'wave':{for(let i=0;i<3;i++)R.sched.splice(R.si,0,Object.assign({t:R.t+i*3},rollGuest()));schedTailSort();noteLine('外面一下子來了一群人');return true}
- case'lucky':{const cand=R.groups.filter(g=>g.table!=null&&['eat','check'].includes(g.state)&&!g.reg);if(!cand.length)return false;const g=pick(cand);const t=R.tables[g.table];const tip=Math.round(80+Math.random()*120);S.money+=tip;S.lifetime+=tip;R.st.tips+=tip;quote(g,pickT(['不用找了。','這個給你們，辛苦了。','多的當小費。']));addFloat(t.x,t.y-58,'小費 +'+fmt(tip),'#BFE3A8',1,t.room);sfx.cash();return true}
+ case'lucky':{const cand=R.groups.filter(g=>g.table!=null&&['eat','check'].includes(g.state)&&anonG(g));if(!cand.length)return false;const g=pick(cand);const t=R.tables[g.table];const tip=Math.round(80+Math.random()*120);S.money+=tip;S.lifetime+=tip;R.st.tips+=tip;quote(g,pickT(['不用找了。','這個給你們，辛苦了。','多的當小費。']));addFloat(t.x,t.y-58,'小費 +'+fmt(tip),'#BFE3A8',1,t.room);sfx.cash();return true}
  case'delivery':{const ms=menuList().filter(d=>stationOk(d)&&(S.stock[d]||0)<=6);if(!ms.length||stockTotal()+2>fridgeCap())return false;const d=pick(ms);S.stock[d]=(S.stock[d]||0)+2;noteLine(`供應商多送了 2 份${dishName(d)}的料，算他們請的`);sfx.ding();R.tv++;return true}
  case'quiet':{let n=0;for(let i=R.si;i<R.sched.length;i++){const o=R.sched[i];if(o.t<R.t+35&&!o.hold){o.t+=35;n++}}schedTailSort();/* rc7: a visit whose hour matters (hold: 予安's trial, a tasting) keeps it */if(!n&&R.groups.length>2)return false;noteLine('店裡突然安靜下來了');return true}
  case'musician':{R.musicT=R.t+45;noteLine('門口有人在唱歌，等位的客人不那麼急了');const q=queued();if(q.length)quote(q[0],pickT(['外面有人在唱歌。','這首我會。']));return true}
- case'selfie':{const cand=R.groups.filter(g=>g.table!=null&&g.state==='eat'&&g.pat>.6&&!g.reg);const J=R.jill;if(!cand.length||J.visit||J.rest||J.cur||J.q.length||jillWorkload()>1)return false;const g=pick(cand);const t=R.tables[g.table];quote(g,pickT(['可以跟妳合照嗎？','老闆娘，一起拍一張？']));J.visit={g,t0:t,phase:'go',kind:'selfie'};J.troom=t.room||'main';J.tx=t.x+(t.x<200?30:-30);J.ty=t.y+20;J.idle=0;return true}
+ case'selfie':{const cand=R.groups.filter(g=>g.table!=null&&g.state==='eat'&&g.pat>.6&&anonG(g));const J=R.jill;if(!cand.length||J.visit||J.rest||J.cur||J.q.length||jillWorkload()>1)return false;const g=pick(cand);const t=R.tables[g.table];quote(g,pickT(['可以跟妳合照嗎？','老闆娘，一起拍一張？']));J.visit={g,t0:t,phase:'go',kind:'selfie'};J.troom=t.room||'main';J.tx=t.x+(t.x<200?30:-30);J.ty=t.y+20;J.idle=0;return true}
  case'power':{R.blackout=2.6;sawBlackout();/* v2.3 */noteLine('跳電了一下');sfx.burnt();if(CATS)for(const c of CATS){if(c.hidden||c.sofa||c.perch>=0||['jump','walk','race','dash','chase','hide2','bed','sleep'].includes(c.st))continue;releaseSpots(c);c.st='daze';c.pose='daze';c.t=rand(2,4);c.moving=false}return true}
  case'rainstart':{if(R.weather!=='sun'&&R.weather!=='cloud')return false;R.weather='rain';S.today.weather='rain';S.wxPrev='rain';v24Wx('rain');noteLine('外面突然下起雨了');const g=R.groups.find(g=>g.table!=null&&['reading','wait','eat'].includes(g.state));if(g)quote(g,pickT(['下雨了。','還好進來了。','雨來得真快。']));bg=null;return true}}return false}
 function incUpd(dt){for(const e of R.inc||[]){if(!e.done&&R.t>=e.t&&!R.closed){if(fireIncident(e.k)){e.done=true;S.incLast=S.incLast||{};S.incLast[e.k]=S.day}else if(++e.tries>2)e.done=true;else e.t=R.t+8}}
@@ -9372,7 +9536,7 @@ function incUpd(dt){for(const e of R.inc||[]){if(!e.done&&R.t>=e.t&&!R.closed){i
  const th=R.thief;if(th){const tx=DOOR.x,ty=DOOR.y+6,dx=tx-th.x,dy=ty-th.y,d=Math.hypot(dx,dy),v=(th.caught?95:38)*dt;th.step=(th.step||0)+dt*14;if(d>v){th.x+=dx/d*v;th.y+=dy/d*v;th.face=dx>=0?1:-1}else{if(!th.caught)toast(`小偷帶著 ${DISH(th.d).n}×${th.n} 跑掉了…`);R.thief=null}
   if(R.chaser&&R.chaser.st==='walk'&&R.thief){R.chaser.tx=clamp(th.x-10,80,372);R.chaser.ty=clamp(th.y+4,120,FB-12)}}
  const I=R.insp;if(I){const dx=I.tx-I.x,dy=I.ty-I.y,d=Math.hypot(dx,dy),v=60*dt;if(d>v){I.x+=dx/d*v;I.y+=dy/d*v;I.moving=true;I.step=(I.step||0)+dt*12;I.face=dx>=0?1:-1}else{I.moving=false;if(I.out){R.insp=null;return}}
-  if(!I.out&&!I.moving){I.t+=dt;if(I.t>=I.dur){const dirty=R.tables.some(t=>t.dirty);const burnt=R.st.q.B>I.b0;if(!dirty&&!burnt){ach('inspect');S.money+=300;S.reviews.push({s:5,txt:'衛生檢查：桌面乾淨、出餐穩定，滿分通過。',name:'衛生檢查員',day:S.day,w:2});R.st.reviews.push(S.reviews[S.reviews.length-1]);banner('檢查通過！','衛生獎勵 +$300');sfx.perfect()}else{S.money-=300;S.reviews.push({s:2,txt:dirty?'衛生檢查：桌上還堆著髒盤子，需要改進。':'衛生檢查：廚房有燒焦味，需要改進。',name:'衛生檢查員',day:S.day,w:2});banner('檢查沒過…','罰款 -$300','fire');sfx.angry()}I.out=true;I.tx=DOOR.x;I.ty=DOOR.y}}}}
+  if(!I.out&&!I.moving){I.t+=dt;if(I.t>=I.dur){const dirty=R.tables.some(t=>t.dirty);const burnt=R.st.q.B>I.b0;if(!dirty&&!burnt){ach('inspect');S.money+=300;R.st.insp=(R.st.insp||0)+300;/* audit WS1-02: in the day's ledger too */S.reviews.push({s:5,txt:'衛生檢查：桌面乾淨、出餐穩定，滿分通過。',name:'衛生檢查員',day:S.day,w:2});R.st.reviews.push(S.reviews[S.reviews.length-1]);banner('檢查通過！','衛生獎勵 +$300');sfx.perfect()}else{S.money-=300;R.st.insp=(R.st.insp||0)-300;S.reviews.push({s:2,txt:dirty?'衛生檢查：桌上還堆著髒盤子，需要改進。':'衛生檢查：廚房有燒焦味，需要改進。',name:'衛生檢查員',day:S.day,w:2});banner('檢查沒過…','罰款 -$300','fire');sfx.angry()}I.out=true;I.tx=DOOR.x;I.ty=DOOR.y}}}}
 function tapThief(p){const th=R&&R.thief;if(!th||th.caught)return false;if(Math.hypot(p.x-th.x,p.y-(th.y-22))>26)return false;th.caught=true;ach('caught');S.stock[th.d]=(S.stock[th.d]||0)+th.n;toast(`抓到了！搶回 ${DISH(th.d).n}×${th.n}`);addFloat(th.x,th.y-50,'抓到了！','#FFE38A',1);sfx.perfect();R.tv++;if(R.chaser){R.chaser.happy=2;R.chaser.hearts.push({x:0,y:-26,t:0})}return true}
 function incDraw(c,now,list){const th=R&&R.thief;if(th)list.push({y:th.y,f:()=>{const stp=Math.sin(th.step||0);drawPerson(c,th.x,th.y,th.look,{step:stp,bob:Math.abs(stp)*-1,mood:th.caught?'sad':'ok',flip:(th.face||-1)<0});if(!th.caught){c.fillStyle='#8A6A42';el(c,th.x+10,th.y-30,8,9);c.fillStyle='#6E5230';c.fillRect(th.x+7,th.y-40,6,3);c.drawImage(dishCanvas(th.d,'G',64,false),th.x-2,th.y-86,24,24);c.fillStyle='#E0543A';c.font=`800 8px ${FONT}`;c.textAlign='center';c.fillText('點我！',th.x+10,th.y-90)}}});
  const I=R&&R.insp;if(I)list.push({y:I.y,f:()=>{const stp=I.moving?Math.sin(I.step):0;drawPerson(c,I.x,I.y,NAMED['衛生檢查員'].looks,{step:stp,mood:'ok',flip:(I.face||1)<0});c.fillStyle='#8A6A42';rr(c,I.x+8,I.y-30,8,10,1);c.fill();c.fillStyle='#fff';c.fillRect(I.x+9,I.y-28,6,7);
@@ -9381,11 +9545,20 @@ function incDraw(c,now,list){const th=R&&R.thief;if(th)list.push({y:th.y,f:()=>{
 /* v2.2: a unit leaves the fridge when it is ordered. There is no automatic emergency order any more: the game never spends
    the player's money on its own, so money cannot go negative here. If the fridge is empty after all (a re-make after a
    burnt plate), the item is cancelled and the guest is told. */
+/* audit WS1-05 / README #7 (2026-10-07): who fills the fridge, and what a dish with nothing left does, is one rule — and the screen
+   said it four ways. The first two days Jill stocks at opening, and a dish that runs out is ordered on the spot (1.5×, the guest
+   waits); from Day 3 the player stocks, and a dish with nothing in the fridge cannot be ordered — nobody orders it for you. The
+   start-of-day warning still said 「客人點了要臨時叫貨（1.5 倍價、要等）」 on Day 3 (the night a new player lost every table), the
+   manual 「客人點到沒貨的菜，Jill 也會自動叫貨」, the fridge 「店不會自己花錢叫貨」 on Day 1. One test for the rule, one sentence for
+   each side of it, used wherever it is said. */
+function jillStocks(){return S.day<=2}
+const SOLD_OUT={first:'前兩天，客人點到賣完的菜，錢夠的話 Jill 會自己臨時叫貨（1.5 倍價，客人要多等一下）。',after:'賣完的菜客人點不到；店不會自己花錢叫貨。'};
+function soldOutRule(){return jillStocks()?SOLD_OUT.first:SOLD_OUT.after}
 function takeStock(it){if((S.stock[it.d]||0)>0){S.stock[it.d]--;return true}
- if(S.day<=2||it.kept){/* the two opening days: the game provisions for the player (it says so on the prep screen) — an emergency unit at 1.5×, only if the till can pay it */const c=Math.round(costOf(it.d)*1.5);if(S.money>=c){S.money-=c;S.todayCost+=c;it.st='order';it.ordT=R.t+5;R.st.short=R.st.short||{};R.st.short[it.d]=(R.st.short[it.d]||0)+1;return true}}
+ if(jillStocks()||it.kept){/* the two opening days: the game provisions for the player (it says so on the prep screen) — an emergency unit at 1.5×, only if the till can pay it */const c=Math.round(costOf(it.d)*1.5);if(S.money>=c){S.money-=c;S.todayCost+=c;it.st='order';it.ordT=R.t+5;R.st.short=R.st.short||{};R.st.short[it.d]=(R.st.short[it.d]||0)+1;return true}}
  it.st='cancel';R.st.short=R.st.short||{};R.st.short[it.d]=(R.st.short[it.d]||0)+1;return false}
 /* low-stock and sold-out notices, once each per dish per day, with a shortcut to the fridge */
-function stockWatch(){if(!R||!feat().stock)return;R.stockNote=R.stockNote||{};for(const d of menuList().filter(stationOk)){const n=S.stock[d]||0;const k=R.stockNote[d]||0;if(n<=0&&k<2){R.stockNote[d]=2;toast(`<b>${dishName(d)}</b> 賣完了，菜單上先標示售完（冰箱可以臨時叫貨）`,'warn');logLine('',`${dishName(d)}賣完了。`,'e')}else if(n<=2&&k<1){R.stockNote[d]=1;if(R.t-(R.lowToastT||-99)>25){R.lowToastT=R.t;toast(`${dishName(d)} 只剩 ${n} 份`)}}}stockChip()}
+function stockWatch(){if(!R||!feat().stock)return;R.stockNote=R.stockNote||{};for(const d of menuList().filter(stationOk)){const n=S.stock[d]||0;const k=R.stockNote[d]||0;if(n<=0&&k<2){R.stockNote[d]=2;toast(jillStocks()?`<b>${dishName(d)}</b> 賣完了：客人再點，錢夠的話 Jill 會臨時叫貨（1.5 倍價，要多等一下）`:`<b>${dishName(d)}</b> 賣完了，客人點不到了（冰箱可以臨時叫貨）`,'warn');logLine('',`${dishName(d)}賣完了。`,'e')}else if(n<=2&&k<1){R.stockNote[d]=1;if(R.t-(R.lowToastT||-99)>25){R.lowToastT=R.t;toast(`${dishName(d)} 只剩 ${n} 份`)}}}stockChip()}
 function stockArrive(){let n=0;for(const tk of R.tickets)for(const it of tk.items)if(it.st==='order'&&R.t>=it.ordT){it.st='pending';n++}if(n){R.tv++;toast('叫的食材送到了！可以開始做了');sfx.ding()}}
 function closeShop(msg){if(!R||R.closed)return;R.closed=true;toast(msg);for(const g of R.groups)if(g.state==='arrive'||g.state==='queue'){g.state='leave';sendOut(g)}}
 /* ================= stars & lab ================= */
@@ -9471,182 +9644,108 @@ function drawBagSparkle(c,now){const t=now-BAG_T;const base=.35+Math.sin(now*2)*
 /* rc8 (the player, 2026-10-03: 「每一項都一大坨 很難閱讀」): an entry reads as short lines — one sentence a line, split at 。 and ；
    outside 「」（）『』 */
 function guideLines(t){const out=[];let d=0,cur='';for(const ch of t){cur+=ch;if('「（『(['.includes(ch))d++;else if('」）』)]'.includes(ch))d=Math.max(0,d-1);else if((ch==='。'||ch==='；')&&d===0){out.push(cur);cur=''}}if(cur.trim())out.push(cur);return out}
-const GUIDE=[   /* the manual describes the game as it is. Audited every release (docs/RELEASE_CHECKLIST.md) — last: v2.4 rc8.5 (a picture always holds the service: 插圖, 店裡暫停中; the crew go up to the Staff Room in a service and are seen there: 員工休息室; the room phases' buttons work — no wording changed; the ticket's heart, the small talk, Rush Mode's end and the Lounge moves were never in the manual: checked, no change) — before: v2.4 rc8.4 (the tasting night is 品酒之夜 — its entry, 結算, 晚餐之後, and the summary's lines; Ken's first three nights each have a picture and an album photo, and 插圖 and 相簿 already say so: no change there) — before: v2.4 rc8.3 (the queue waits at the shopfront: 帶位; two litter cabinets and the bowls: 裡面有什麼; three pizzas: 酒吧披薩) — before: v2.4 rc8.2 (the manual shows only the spaces the shop has — GUIDE_WHEN, 「每個空間等他出現才出現在說明書吧」; 「VIP 卡」 and 「配菜的酒」 moved to sections every shop has; what Jill does in her room: Jill 的空檔, Jill 在房間; the Staff Room comes with the second floor: 二樓 section, 怎麼來的) — before: v2.4 rc8 (every entry as short lines, one sentence a line, the 29 longest rewritten short — 「每一項都一大坨 很難閱讀」; the cooks take a dish's first plate too, and a cook from another station covers one with no cook of its own: 做菜, 廚師, 誰來做 and the chef's card; Jill rests most of a staffed evening but hosts its opening and its end: Jill 的空檔, Jill 在房間; Madame Lin's bar next door, the signing and the works, The Lounge's opening and the three restaurant lists were written with Checkpoints B–C and checked again) — before: v2.4 rc7.7 (no change: the page no longer carries the 35 portraits the game never shows) — before: v2.4 rc7.6 (主廚之夜, booked out — the whole Lounge, plated at the bar, course by course; Ken's tasting night the whole Lounge, poured a round at a time; the bar's L from Lounge II, nine seats) — before: v2.4 rc7.5 (the album starts on the opening day; its limit said right: 240, not 30) — before: v2.4 rc7.4 (the pizza oven, one more cook, the bar pizza researched; each regular's and named guest's favourite dish and glass, learned in play, marked on the menu; the Lounge's Buffalo wings, cheese sticks, oysters and pork knuckle; the Lounge's TV and sound system, and the game nights) — before: v2.4 rc7.3 (Jill's room: the room tab and its doors, her rest and her evening there — the sofa or the edge of the bed —, the cats' home, petting in the room, the steals that never work, 寶寶 and the regulars, the posts' pictures and likes) — before: v2.4 rc7.2 (秀琴阿姨's $3,000 loans and the payback at the summary; her first evening held; the pass takes a tap; the heart for a regular who is one; the 招待 chip beside the name; a line with a face answers a touch; the log's ×; a regular's head at a busy table is the table; a story on the summary opens its page; no 解雇; 🎲 隨機選菜單; the wages (LV5 twice); the missing cats found and the open door held; Sophie's pad seen and marked; 晚餐後 Lounge 八折) — earlier: v2.4 rc7 (the day's money: the glasses' cost, the rent, the wages, 秀琴阿姨's loan, 予安's fee; Ken's tasting nights and 「晚餐之後」; the piano and 予安; Ken's and 予安's stories hold the restaurant; a line said on the way to a table; the story guests look like their portraits — earlier: v2.4 rc6 (the Staff Room, the Private Dining Room and its bookings, two more places on the restaurant's list; the stories that hold the restaurant, the day's stories on the summary, the Lounge's list and sales, the things to spend on, the Second Floor after the Lounge, the new places' photos, a day off)), 2026-10-02 */
- {ic:'🍳',h:'開店與料理',sum:'每天 17:00 開店、21:30 打烊。你是 Chef Jill，點餐廳裡的東西就能指揮她。',pts:[
-  ['房間','票券列下面的分頁：店門口・主廳・側廳・二樓（租下以後）・休息室・包廂（蓋好以後）・Lounge（蓋好以後）・廚房・房間；也可以用 ←→ 或數字鍵。亮著的分頁寫著那一間的全名。上二樓的樓梯門在側廳；新房間蓋好的那天，開店前會先帶你上二樓看一眼。Lounge 是隔壁的店，跟主廳不相通：在店門口點它的門進去。廚房是自己的一間，出菜口在那裡。'],
-  ['帶位','有空桌客人會自己進來坐；客滿時在店門口外面等，買了門口長椅就坐著等。想指定順序，點那組客人（在「店門口」）或點空桌。'],
-  ['誰在哪裡','訂單上的桌號或名字點一下，會切到那一桌的房間，那一桌亮一下。畫面下方誰說了一句話，點那句話就會找到他現在在哪；還在走向座位的路上說的話，會帶你到他要坐的那一桌。標示幾秒就消失。'],
-  ['點餐','桌上出現紅色「!」→ 點桌子，Jill 過去點餐。'],
-  ['做菜','切到廚房，點亮著「+」的設備，照料理台的指示一步一步做。有廚師的工作站他們會自己接；沒有廚師的工作站，其他廚師有空時會過去幫忙。'],
-  ['上菜','桌上出現銀色餐蓋 → 點桌子，Jill 去出菜口端菜。在廚房點出菜口，Jill 會把做好的菜都送出去。有服務生（LV2 起）他們會自己端。'],
-  ['配菜的酒','試酒的晚上以後，晚餐桌上就有配菜的酒：氣泡酒、清爽白酒、輕盈紅酒。客人點了，服務生或 Jill 在出菜口倒好、端過去；「酒水成本」照杯算，結算也另外列「晚餐桌上配的酒」。Lounge 開了以後，晚餐桌上的酒改由調酒師倒，酒單也更長。'],
-  ['收錢・收桌','出現金幣點桌子收錢；客人走後點桌子收乾淨才能接下一組。'],
-  ['料理台的幾種步驟','放食材（有些要照順序）／Jill 自己來（切、炒、打發，開始後她會做完）／等一下／看準時機（指針到金色區按）／按住放開（在金色區間放開）／撒幾下（數量對了按完成）。'],
-  ['把店開得順','連續好評出菜會累積 COMBO，連續 5 道 PERFECT 進入 JILL\'S ON FIRE。速度按鈕可以把整個店開快一點。'],
-  ['突發事件（第 3 天起）','奧客鬧事點桌子安撫；設備冒煙連點修理；小偷抱著食材跑，快點他；衛生檢查倒數時桌面要乾淨、料理不能燒焦。同一種事件不會連續兩天發生；配電盤升級後跳電變少、增容後不再跳電。']]},
- {ic:'🧊',h:'開店前：備料與菜單',sum:'建議量是一道一道算的；賣完的需求會記下來，明天不會反而建議更少。',pts:[
-  ['建議備料','每道菜的建議量＝預估銷量＋一點緩衝（賣得多的緩衝多一點，比例上小一點）。「一鍵補到建議量」或每道菜自己調。'],
-  ['冰箱裝不下','建議總量超過冰箱容量時，會先減每道菜的緩衝、把冰箱填滿，畫面上會說一聲。想多放：升級冰箱、蓋冷藏庫，後期還有走入式冷藏庫。'],
-  ['營業中補貨','庫存不夠時，庫存面板（左上「庫存」或廚房的冰箱）每道菜有「補滿」，一按就到（1.5 倍價，不會再問一次）。客人點到沒貨的菜，Jill 也會自動叫貨。'],
-  ['賣完了','賣完的菜會估計「少賣了幾份」，寫在結算裡，並算進明天的建議量。'],
-  ['隨機選菜單','「今日菜單」上面的「🎲 隨機選菜單」一按就照名額排好今天的菜：只排客人點得到的（有那個工作站）、至少一道主食、每一類盡量有一道；今日任務要賣的菜和宣傳中的菜會留著，再按一次就換一組。酒吧小點和招牌菜不動。排完記得備料。'],
-  ['天氣推薦','開店前會依天氣建議菜單外的一兩道菜。菜單滿了按它，會跳出「換掉哪一道」讓你選，不會自己換。'],
-  ['今日推薦','選一道當今天的推薦，客人點它的機率大增；招牌菜和招牌甜點也可以推。'],
-  ['套餐','主餐＋飲料、主餐＋甜點、全套：加點的機率變高，加點的那一份便宜一點。'],
-  ['售價','每道菜可以調價；客人有自己的預算與敏感度，太貴會有人抱怨。']]},
- {ic:'👩🏻‍🍳',h:'Jill 與員工',sum:'商店的「員工」分頁：先是「工作分配」看板，再是每個人；最下面是招募（餐廳員工）和 Lounge 名單。',pts:[
-  ['工作分配','每個工作站和每項外場工作各一列（有 Lounge 以後多「Lounge 吧台」「Lounge 外場」），直接看到誰在哪裡。點 × 把人移出，點 ＋ 從名單挑人加進來。開店前如果有站沒人而菜單需要它，備料畫面會提醒。'],
-  ['員工','等級、日薪、訓練升級；最下面是招募。請了就是店裡的人，沒有解雇。員工分兩個名單，名額各算各的、互不佔用。<b>餐廳員工</b>分成廚師、服務生、清潔員三種，各有自己的名額，不能互相借（廚師的名額只能聘廚師）；每次擴建多哪一種寫在擴建的卡片上（例：披薩烤爐廚師 +1、私人包廂 I 和 III 服務生各 +1；休息室不加名額）。<b>Lounge 名單</b>是固定的幾個人：Evan 在 Lounge I 蓋好那天就在吧台，不用聘；沈晴、阿拓、安安、許葳要聘。每個人的卡片寫著在店幾天、熟悉哪裡。'],
-  ['新來的人','頭幾班會問東西放哪，做久的人會回答；剛排到 Lounge 的服務生頭幾班慢一點，待久了反而比較快。'],
-  ['廚師','LV1 只做簡單的菜，LV3 起也會接手 Jill 做到一半的菜；LV5 才做招牌菜和招牌甜點。新菜也一樣：有廚師做得來，就不用 Jill 自己做。自己的工作站沒事的時候，廚師也會去沒有廚師的工作站幫忙，一次一道。'],
-  ['服務生','帶位、點餐、收桌；LV2 起端菜，LV3 起結帳。做哪些在工作分配裡點。'],
-  ['清潔員','客人走後自動收桌，比服務生快。第一位清潔員是秀琴阿姨。'],
-  ['秀琴阿姨','Jill 認識很久的阿姨。還沒有清潔員的時候，很多晚上她會在快打烊時順路進來，幫忙擦一擦、收一收，收完就回家——不收桌、不招呼客人，店裡的事還是要你來。請第一位清潔員就是請她：之後營業時間她也在，跟其他清潔員一樣收桌。'],
-  ['晚點到','員工也有自己的事，有時候會晚點到，偶爾也會請一天假（當天開店時會說）。還沒到、或沒來的那段時間，他負責的工作沒有人做，日薪照付；到了就照常上工。'],
-  ['調酒師','Lounge 名單上的 Evan 和沈晴。Evan 是首席調酒師，Lounge 蓋好那天就在吧台；沈晴從 Lounge I 起可以聘。站在吧台倒酒；主廳和側廳點的酒也是他們倒、服務生端。'],
-  ['Jill 的空檔','沒有急事時她會回房間坐一下（穿過廚房，房間在廚房後面）：看電子書、看電視、跟網友打一場手遊、跟先生聊兩句、跟貓待著。員工夠、廚師把菜都接走的晚上，她大半個晚上都能休息。工作一來她馬上起身——你點桌子，她也會立刻回來，只是要多走一段。剛開店和快打烊的時候她都在主廳，迎接第一批客人、送最後一批客人走。']]},
- {ic:'🎁',h:'招待與熟客',sum:'招待是店主的一個動作；熟客的心是關係。兩件事各自算，誰都不會因為變熟而少了什麼。',pts:[
-  ['招待（你的）','營業中每張票券右上有「招待」：Jill 有空會端一杯飲料（或一份甜點）過去，算店裡請的，扣一份庫存。一天兩桌，票券上寫著還剩幾桌。'],
-  ['票券上的字','招待＝現在可以；集點卡・請甜點／紀念日・請甜點＝這桌已經有東西要送過去了；已招待＝這桌今天請過了；招待 0/2＝今天的兩桌用完了；沒東西可請＝冰箱裡沒有飲料或甜點。'],
-  ['Jill 自己請','等太久的客人，她可能主動請一杯（熟客更常）；這也是一天兩桌，跟你的分開算。'],
-  ['集點卡與紀念日','熟客每第 5 次來，Jill 會請甜點；王先生王太太的結婚紀念日也是。這些是約定，不受任何限制。'],
-  ['VIP 卡','來店 5 次的客人拿到 VIP 卡：餐廳、Lounge 都九折，吃完晚餐再去 Lounge 八折。來 10 次換成八折卡：都八折，吃完再去 Lounge 七折。一桌照桌上最好的那張卡算；單子上的名字旁邊會寫幾折。日誌的「VIP」分頁是 VIP 名單：誰有卡、哪一張、哪天拿到的，還有誰再來一次就有。'],
-  ['熟客','來過 2 次眼熟、4 次熟客、12 次老客人；老客人耐心多一點。日誌的「熟客」有他們的老位子、常點的菜和留言；最下面的「店裡的人」列著有名字的客人。升職、換工作、畢業這種事只會發生一次，之後記在卡片上。有故事的客人樣子跟頭像一樣，遠遠就認得出來。'],  ['最愛的一道、一杯','每位熟客和有名字的客人，都有一道最愛的菜、一杯最愛的酒或飲料。沒有人會直接告訴你：點到時他會說出來。知道以後，日誌會寫「最愛」，菜單上那一道旁邊會標 ♥ 和他的名字；放上菜單那天他多半會點。隨機選菜單也會稍微偏向有人最愛的菜。'],
-
-  ['Dylan','常常在打烊前才來的那位。他不是員工，也不用你招待。你認識他以後，他來的時候日誌會記一行，他的卡片會顯示最近幾天來了沒（●來了・◐門口看了一眼・○沒來）。客滿時他會晚點再來，打烊前來不及就只在門口看一眼。']]},
- {ic:'🪑',h:'商店：家具、工程、營運',sum:'打烊後（開店前也可以）用今天賺的錢把店變成你要的樣子。錢買得到的都看得到。',pts:[
-  ['家具與佈置','主廳最多 9 張桌；側廳最多 9 張，「側廳卡座」把整排換成卡座；露天桌 1–3 張。還有店裡的植物、燈、畫、椅子，和門口的布置。'],
-  ['店舖工程','擴建店面（評分夠高才能擴建），還有戶外區、大出菜口、冷藏庫、廚房擴建、側廳；後期有走入式冷藏庫和廚房二期。Lounge 的企劃出現以後也在這裡（I → II → III）。Lounge 蓋好以後，樓上的事就會慢慢開始；故事走到那裡，這裡會多「二樓（整層）」，之後是「二樓的房間」。租下二樓以後有一張二樓平面圖；「看看整層」是整層現在的樣子。'],
-  ['營運升級','動線規劃、門口候位區、後場整理區、大菜單板。空調三級：熱天客人的耐心少扣。電力設施兩級：跳電變少，最後不再跳電。商用洗碗機：收桌快三成。Lounge III 以後的 Bar 小廚／油炸站。每一級都畫在牆上。'],
-  ['夢想工程','都是存錢目標，結算下面會告訴你還差多少。整面玻璃店面、主廳主燈、木樑天花板與吊扇、貓的空中走道、委託的一幅畫、乾式熟成櫃。有 Lounge II 以後還有 Lounge 的酒窖（可以研發老藤卡本內）和 Lounge 的鋼琴（之後由予安一個禮拜彈三晚）。'],
-  ['季節佈置','家具與佈置的最下面：春櫻、夏日、秋楓、冬天的松枝，每張桌子中間一小枝。買過的那一套隨時可以換上或收起來；擺著的時候氛圍 +1，換了客人會注意到。'],
-  ['食材契作','廚房設備的最下面：有機農場、漁港直送、牧場直送。簽約付一次簽約金，之後每天付契作費。合約裡那幾道菜賣貴一點也不會被嫌（+8%），點的人也變多（+10%）；進貨不會變便宜。卡片上會估算一天多賺多少，隨時可以停。'],
-  ['貓咪生活','紙箱、睡墊、藤籃、隧道、貓窩、貓草、大跳台。側廳的東西分兩區：窗邊和最裡面那面牆（隧道、藤籃、貓窩）。'],
-  ['側廳的大窗','從窗邊貓架開始，一階一階加上去：軟墊窗台、多層窗邊步道、窗邊吊床、多貓觀景平台。每一階窗上都多一樣東西；上不上去是牠們自己決定的，窗上同時最多三隻，會在不同高度之間跳來跳去。卡片上寫著誰用過。'],
-  ['廚房設備','爐台、烤箱、咖啡吧、冷盤台、冰箱、平底鍋。升級後更快、位子更多。設備升滿以後，最下面的「後場工程」還有：走入式冷藏庫（食材容量 +140 份）、廚房二期（第二台咖啡機，咖啡吧多兩個出杯位；服務生多兩位）；有 Lounge 以後還有披薩烤爐（可以研發酒吧披薩；廚師多一位，顧烤爐）。'],
-  ['先留一點錢','商店上方會顯示明天的基本備料大約要多少、建議保留多少。買太多不會擋你，但會提醒你。'],
-  ['存錢目標','開店前會寫一個存錢目標：只列現在真的買得到的東西，還差多少、大約幾天。'],
-  ['看店裡','商店和開店前畫面都有「看店裡」，看的時候可以切房間。']]},
- {ic:'💰',h:'每天的帳',sum:'營業額和小費在營業中進來；食材是開店前就付了；打烊以後付酒水、租金和薪水。',pts:[
-  ['結算','營業額、食材成本、酒水成本、薪資、租金、食材契作、鋼琴演奏、品酒之夜分潤、小費、任務獎勵，最後是今日淨利。淨利下面另外一項「今天的店」，一行一項：天氣、Lounge、包廂、VIP 卡、宣傳……。品酒之夜和主廚之夜那晚，Lounge 只寫那一行。'],
-  ['酒水成本','每倒一杯酒——在 Lounge 或晚餐桌上——就是那杯酒的進貨成本，大約售價的三成。酒不用備料，倒了才算。'],
-  ['租金','每天付，跟店的大小走：主廳每擴建一次就高一點；側廳、戶外區、廚房擴建、Lounge、二樓各有自己的一份。結算會一項一項列出來。剛開的小店一天 $300。'],
-  ['薪水','日薪跟等級走：剛來的時候最便宜，每升一級都多一截，LV5 是剛來時的五倍多（廚師 LV1 一天 $304、LV5 一天 $1,690）。'],
-  ['錢不夠的時候','收銀機不會變成負的，付到 $0 為止，不會欠到明天。開店頭十天，要是打烊時付完當天的開銷剩不到 $300，秀琴阿姨會借你 $3,000——每次不夠都會借。結算時錢超過 $20,000，就會把欠她的全部還掉。']]},
- {ic:'⭐',h:'招牌菜與招牌甜點',sum:'兩道只屬於 Jill 的東西，各自有自己的進程。',pts:[
-  ['招牌菜','從主食、蛋白質、醬汁、配菜組一道（$3,000，改配方 $800）。永遠在菜單最上方，客人會專程為它來（客流 +10%）。在爐台用平底鍋做。賣到 40 份換第二版（醬汁畫盤與嫩葉），110 份第三版（食用花與金箔），價格也高一點。'],
-  ['招牌甜點','有了招牌菜、擴建到 Jill\'s Kitchen、有冷盤台之後可以研發（$4,000，改配方 $800）：底、奶餡、水果、點綴四樣。排在招牌菜下面，為招牌菜來的客人多半會一起點。在冷盤台冷作擺盤。賣到 30 份換第二版（果泥畫盤與薄荷），80 份第三版（糖絲與金箔）。'],
-  ['誰來做','LV5 的廚師會接手這兩道。'],
-  ['在哪裡看','商店的「招牌菜」分頁；日誌的「熟練度」也有它們。']]},
- {ic:'🍷',h:'Lounge：留下來的地方',sum:'主廳是吃飯，側廳是聚餐，Lounge 是留下來。它本來是隔壁 Madame Lin 開了很多年的酒吧，不是升級選單裡冒出來的。',pts:[
-  ['怎麼來的','店門口右邊是 Madame Lin 開了很多年的酒吧，開店那天她就是鄰居；Jill 一開始不賣酒——想喝酒，隔壁就有。品酒師 Ken 會問「妳真的不賣酒？」，之後晚餐桌上才有配菜的酒。過一陣子 Madame Lin 會說她做到月底。Jill 看過隔壁，就決定接下來。之後手上有 $50,000，就能在「店舖工程」按「簽約・開工」，不用等 Madame Lin 的最後一晚；改裝兩天，The Lounge 就開幕，Evan 留下來。'],
-  ['Lounge I／II／III','I：吧台六個位子（坐得開，不會肩碰肩）、三張小桌、一面酒牆（三種酒），Lounge 名單有 Evan、沈晴、阿拓。II：吧台加長、轉成 L 型——調酒師在 L 裡面，靠牆那一頭留了進出的口——九個位子（一樣坐得開）；多一張小桌、四人沙發、有燈的酒櫃（五種酒），Lounge 名單多安安、許葳。III：最裡面一個安靜的角落。'],
-  ['安安','來的時候就是 LV2，排在「Lounge 外場」：先顧 Lounge 的桌子，沒事才去主廳幫忙。Lounge 的小點在廚房做，從後場遞到 Lounge 吧台的那一頭，由她送過去。出菜口的「送菜」只送主廳、側廳的菜。'],
-  ['要有調酒師','Lounge 蓋好那天，Evan 就在吧台後面；把吧台的人都移開的話，Lounge 那晚不開。調酒師倒酒、送酒。點單、結帳、送小食由「Lounge 外場」的服務生做，沒人負責時調酒師自己來。'],
-  ['客人怎麼用','客滿的時候，等桌的人會先坐吧台喝一杯，位子好了再過去（帳是分開的，不會多算一次來店）；吃完飯的人有些會留下來再喝一杯；也有人晚一點專程來。主廳、側廳桌上的酒，從此由調酒師倒、服務生端。'],
-  ['晚餐後八折','在主廳或側廳吃完飯、再到 Lounge 坐的客人，Lounge 那一單打八折（酒和小點都算，每樣四捨五入到 $5）；知道有折扣，吃完留下來的人會多一點。結算「今天的店」的 Lounge 下面會寫「吃完留下 n 位・晚餐後折扣 −$…」。'],
-  ['Bar Food','炸雞塊、起司可樂餅、起司拼盤、水牛城雞翅、起司條（II 起多蒜香蘑菇、生蠔；III 起多德國豬腳）。在同一個廚房做，不佔菜單名額，備料在同一台冰箱。Lounge 生意好，廚房就忙。'],  ['酒吧披薩','後場工程的「披薩烤爐」（要先有 Lounge）蓋好以後，「菜單研發」可以研發三種披薩：酒吧披薩、瑪格麗特披薩、蘑菇白醬披薩，試做的食材多了「披薩麵團」。披薩是 Lounge 的小點，不佔菜單名額；兩個人以上、或來看球的客人比較常點。在「工作分配」把一位廚師排到「披薩烤爐」；烤爐沒有自己的廚師時，其他廚師有空會過去，沒有廚師才是 Jill 自己烤。'],  ['主廚之夜','Lounge II 以後、有了招牌菜，可以在「店舖工程」的 Lounge 那一段排主廚之夜，排在明晚；前一天的新聞會寫「明晚｜主廚之夜 · N 席」。主廚之夜是包場：那一晚整個 Lounge 都是主廚之夜的客人。三道是 Jill 最拿手的前菜、招牌菜、招牌甜點，每道配一杯，一道一道上。每位 $1,800（含酒）。一週最多一次，不跟品酒之夜同一晚。'],  ['電視與音響','「家具與佈置」最下面的「Lounge 的家具」：Lounge 大電視（$200,000），有比賽的晚上（大約一週兩晚）轉播，會多看球的客人，小點點得多。電視音響系統（$150,000，要先有電視）讓看球的人更多，沒有比賽的晚上放音樂。結算的 Lounge 下面會寫「有比賽轉播」。'],
-
-  ['酒單研發','「菜單研發」的最下面：粉紅氣泡酒、橘酒、黑皮諾、招牌調酒「晚安」、香檳、老藤卡本內（要有酒窖）。價錢和研發一道菜差不多，研發一次就能在 Lounge 倒。每一支都有配的菜或客人，那一桌更常配一杯、更常留下來。今晚倒的酒裡每多一支研發過的，留下來的人多一點（最多 +15%）。'],
-  ['今晚倒哪幾種','開店前，「今日菜單」下面有「Lounge 酒單」：每一種酒都可以開或關，至少留一種；Lounge 的客人只會點今晚有倒的。酒吧小點在上面的菜單裡，不佔菜單名額，名額旁邊會寫「＋ 酒吧小點 幾道（不佔名額）」。'],
-  ['品酒課','員工頁每位服務生的卡片上（有 Lounge 以後）：$12,000，上完對酒就「自在」了。外場懂酒的人多，主廳、側廳吃飯的客人更常點一杯。'],
-  ['Lounge 的人怎麼升級','Lounge 名單上的人是在店裡邊做邊學的：訓練升級一天最多一級，先讓他上一天班再說。'],
-  ['品酒之夜','Lounge 開了以後，Ken 會提議在 Lounge 辦品酒之夜（品酒會只有 Ken 辦）。那一晚整個 Lounge 都留給品酒的客人，酒照杯算。前三次 Ken 自己排；「晚餐之後」出來以後，開店前的新聞會問「品酒之夜｜今晚要辦嗎？」，按「今晚辦」就是今晚，也可以按「這次不辦」。一週最多一次，不跟主廚之夜同一晚。品酒的收入扣掉成本，三成是 Ken 的「品酒之夜分潤」——他本來說友情主持就好，是 Jill 堅持要給。'],
-  ['鋼琴與予安','鋼琴買來以後，一開始沒有人彈。過一陣子，一位常來 Lounge 的客人——予安——會成為固定的鋼琴師：一個禮拜彈三個晚上。那幾晚開店前的新聞會寫「今晚｜予安在 Lounge 彈琴」，吃完飯留下來的人比較多；每晚付她演奏費 $2,500，結算會列一行「鋼琴演奏」。她不彈的晚上，鋼琴就安靜地放著。'],
-  ['晚餐之後','Ken 辦過三次品酒之夜以後，會和 Jill 一起做一支酒：「晚餐之後」（JILL\'S KITCHEN × KEN），一支輕盈的紅酒，配 Jill 的招牌菜。酒進來以後就一直在 Lounge 的酒單上，一杯大約 $420；不用研發，也可以在「Lounge 酒單」關掉。'],
-  ['帳','結算的晚上會寫「Lounge 幾桌・營業額・吃完留下幾組」。營業額是 Lounge 那幾桌付的錢，不含小費，跟下面「Lounge 今天賣了什麼」的合計一樣；Lounge 的小費另外一行，晚餐桌上配的酒也另外一行。員工那一欄寫調酒師調了幾杯。']]},
- {ic:'🚪',h:'二樓：休息室與包廂',sum:'二樓整層租下來的時候，就一起隔出一間給店裡的人的員工休息室，其他地方先空著；給一桌人的包廂，是之後從店裡的日子裡長出來的。',pts:[
-  ['怎麼來的','二樓的房間都不是升級選單裡冒出來的。店裡的人連坐下來的地方都沒有，打烊後 Jill 自己看見了（《大家待的地方》），才打給房東；所以休息室是跟整層一起來的。之後有客人想要安靜、不被打擾的位子（《關上門以後》），包廂的企劃才會出現在「店舖工程 › 二樓的房間」，選「之後再說」也不會不見。'],
-  ['員工休息室','二樓的一間房，給店裡的人換班、等人、坐一下。營業中手上沒事的服務生、清潔員會輪流上去坐一會兒，切到「休息室」就看得到；打烊後廚房和吧台的人也會上去。I 就是完整的房間；II 多一張撞球台和每個人自己的東西；III 多一張按摩椅，是用久了的樣子。有些晚上打烊後會有人打一局撞球。這些都只是他們的日子：沒有分數，也不用管。二樓一次只做一件工程；休息室不是用餐區，不加座位，也不加員工名額。'],
-  ['誰會上去','早到的先上去坐一下；店裡不忙時，外場偶爾上去喘口氣；打烊後有人上去坐一下才回家。客人不會進去。不用你安排，也沒有要照顧的數值。'],
-  ['私人包廂','二樓臨街窗前最大的那一間，有一扇可以關上的門。I：4–6 位；II：4–8 位；III：4–10 位，最少都是 4 位。上一階用過一陣子才能升級。服務生名額 I 和 III 各 +1。'],
-  ['預約','訂位會自己進來，一個晚上最多一組，不用接電話也不用排。開店前的新聞會寫「今晚｜私人包廂｜已預約」、幾位、哪一種聚餐、最低消費。剛蓋好的頭一兩個晚上就會有人訂；之後不會每晚都有，II、III 會越來越常。有預約的晚上，包廂留給他們，就算還沒到也不會讓別人坐。'],
-  ['最低消費','訂位的時候就定了：照這麼多人、這種聚餐平常會點的菜和當天的價錢來算，訂在稍低一點（包廂越完整，越接近他們會吃的）；人越多越高。之後漲價、包廂升級、存檔重開，都不會改。預約的那一桌照常點菜、吃飯、結帳：吃得比最低消費多就照實算，少了就收最低消費——客人不會為了湊低消多點。'],
-  ['沒有預約的晚上','4 位以上、坐得下的客人可以直接坐包廂，照常算，沒有最低消費。熟客和 Lounge 的客人照舊坐他們的位子。結算的晚上會寫「包廂 幾組」；預約的那一桌吃得比最低消費少的話，也寫補足了多少。']]},
- {ic:'🛋️',h:'Jill 的房間',sum:'廚房後面那一間，是 Jill 自己住的房間——從第一天就在。不是工程，不用買，也沒有要照顧的數值。',pts:[
-  ['怎麼進去','房間分頁的最後一個「房間」（點開寫著「Jill 的房間」）。也可以在廚房點右手邊那扇淺木門（寫著「房間 ›」）；在房間裡點門口的「‹ 廚房」回到廚房。Jill 也是走那扇門；房間另外有一扇自己的門，通到後巷。'],
-  ['裡面有什麼','窗下那張燕麥色沙發、可以推過來推過去的電視、一張雙人床、一張堆滿書和講義的書桌、貓抓板、貓床、兩個收在淺木櫃裡的貓砂盆、放飼料和水的貓碗架，還有從主廳搬進來的那座貓跳台。主廳原本放沙發的地方空了出來，留給走道。'],
-  ['Jill 在房間','營業中沒事的時候，她會回房間坐一下（剛開店和快打烊的時候除外，那時她在主廳）；打烊後把出菜口擦一擦，就回房間。她會自己找事做：把電視推過來看、跟網友打手遊、跟書桌前的先生聊兩句、走到他背後看他在忙什麼、傳訊息給他、叫貓過來（牠們不一定來）。看電子書只在房間。沙發被貓佔滿的晚上，或她想換個地方的時候，她會坐在床邊看書。'],
-  ['貓的家','房間是五隻貓的家，不是關牠們的地方：營業中牠們一樣在店裡走來走去，也會自己回房間。樾樾幾乎都待在房間；柔柔愛在店裡晃，睡覺會回房間；小齁偶爾跑回房間喵一聲；包包在房間睡，也會在店裡最熱鬧的地方睡；寶寶喜歡房間，偶爾出來看看。打烊以後回房間的貓多一點，但不會一下子全部回去。'],
-  ['樾樾等 Jill','樾樾很怕生，客人走光了也不太敢出來。等他跟店裡的人熟了，打烊以後他會出來，在廚房門口等 Jill，再跟她一起回房間。']]},
- {ic:'🐈',h:'五隻店貓',sum:'樾樾、小齁、寶寶、柔柔、包包住在店裡。不用餵、不用照顧，牠們有自己的生活。',pts:[
-  ['個性','樾樾黏 Jill、怕生，大部分時間在 Jill 的房間；小齁愛玩也黏人；寶寶天生明星，總坐在好看的位子；柔柔有點傻，愛埋伏寶寶；包包很會睡。'],
-  ['點牠們','可以摸，但牠們不一定理你。點睡著的包包，他會睜一下眼、動動耳朵尾巴——然後繼續睡。在 Jill 的房間裡的貓也一樣可以摸。'],
-  ['偷吃（從來沒成功）','小齁看到炸物、寶寶看到牛排，偶爾會跳上客人的桌子想偷吃。不是每次，也從來沒成功：客人或 Jill 一句話，牠們就跳下去，盤子沒事。包包想吃雞腿，但大多只是坐在桌子底下抬頭看。'],
-  ['寶寶和熟客','寶寶偶爾會從房間出來，走到認得她的客人旁邊叫一聲「喵～」；對方通常當場融化。'],
-  ['客人也看貓','客人會轉頭看貓、微笑，有人會拿手機拍一張。等太久的客人，親人的貓有時會去陪一下。常來的客人會慢慢認得某一隻，叫得出名字。'],
-  ['牠們不出門','貓只在店裡，窗邊再熱鬧也是在窗戶裡面。二樓是店裡的以後，偶爾會有一隻上樓待一會兒，再自己下來。門口的狗是客人帶來的，有五種：博美、臘腸、米克斯、垂耳、黃金獵犬。買了狗狗休息角（門邊的小木屋），牠會在屋前等主人。'],
-  ['名字','在餐廳日誌的「店貓」可以直接改名字。']]},
- {ic:'🧪',h:'料理研發',sum:'每種食材都寫著它的角色和味道。用看得到的資訊推理，不是猜密碼。',pts:[
-  ['怎麼選','先選一個主角（主體／飲品基底／甜點基底），再配配料、調味或醬汁。選好會先看到相性、整體味道、可能適合哪個工作站。'],
-  ['試做的結果','大成功＝就是這道菜；成功料理＝多了一種食材也做出來了；有潛力＝方向對了，告訴你哪些是對的、還缺哪一種，累積三次研究進度就完成；普通試作品＝會說為什麼（缺少主體、味道太重、甜鹹混在一起…）。'],
-  ['相性','一起出現在菜單上的食材、或試做證明過的組合，會標「很好」。其他依角色判斷「可以」或「不合」。'],
-  ['急的話','每道菜也可以直接買食譜；做熟了還能升到 3 星。']]},
- {ic:'📖',h:'餐廳日誌',sum:'店的紀錄：總覽、故事、餐廳、社群、評價、熟客、話語、相簿、店貓、成就、熟練度。',pts:[
-  ['在哪裡','開店前和商店在右上的書本；營業中在暫停選單的「餐廳日誌」；結算畫面右上也有。'],
-  ['故事','見下面「故事」那一節。'],
-  ['餐廳','營業紀錄（單日最高營業額、最多客人、最高評分…），還有員工與開銷。'],
-  ['社群','最近大家在談什麼、Jill 可以發的貼文、宣傳。營業中只能看；發文和宣傳在開店前或打烊後。'],
-  ['評價','所有客人的評論；具名的常客會有他們的臉。神秘美食評論家的評論權重是三倍。評論寫的是客人那天真的遇到的事（等太久、賣完、一杯酒、Lounge、貓）；上面的「最近大家在說」是最近評論和貼文最常提到的。'],
-  ['話語','每天店裡說過的話，一句一句、按時間，誰說的就寫誰——一整天的都在。營業中點左上的 💬 也看得到，可以往下捲，右上的 × 關閉。'],
-  ['相簿','店裡的日常剛好被看到時，會留下一張照片。每種畫面的第一張會珍藏，其他最多留 240 張，舊的慢慢換新。相簿從開店那天開始，一直翻得回去；結算畫面的「看今天的照片」直接跳到今天。故事真的走到某一步時，會多一張故事照片，永久保存。新的地方也有自己的畫面，例如下班以後的一局撞球。'],
-  ['熟客','來過的熟客、老位子、最愛（知道以後）、常點的菜、留言與集點卡；最下面「店裡的人」是來過的有名字的客人。']]},
- {ic:'📜',h:'故事',sum:'店裡的人會慢慢認得彼此，有些關係會一段一段往前走，店自己也是。不是任務——只是記下來。',pts:[
-  ['兩個部分','「餐廳故事」是這間店自己的故事，一章一章往前；「人物／關係支線」是店裡的人和他們之間的故事。'],
-  ['一段一段','每個故事寫著一共幾段、看過幾段（●━○），每一段都有編號。看過的寫著是哪一天（太久以前、沒有記下日期的寫「更早以前」）；還沒看過的只寫「？？？」——什麼時候發生，要看他們自己，你不用做什麼。還沒開始的故事只會是一個「？？？」。'],
-  ['故事更新','有新的一段時，房間分頁下面會跳一個小通知；點它直接看那一段。'],
-  ['店裡暫停中','重要的故事在營業中發生時，店裡會整個停住：時間、訂單、客人的耐心都不動，上方寫著「店裡暫停中」。例如 Ken 的故事、予安和鋼琴的故事、戀愛的故事，還有每一段有插圖的。一句一句點著看，想看多久都可以；看完從停住的那一刻接著營業。其他小事照樣在店裡發生，不會停。'],
-  ['今天的故事','每日結算有一欄「今天的故事」：今天往前走了的每一段、發生了什麼，點「看故事頁」直接過去。'],
-  ['忙的時候錯過了','沒關係：每一段點開可以看那天的經過和當時說過的話（只收那一段自己的話，旁邊別人說的不算）。當天說過的所有話也都在「話語」。'],
-  ['朋友和戀人','有些是友情（例如 Ken 和 Monsieur 杜，總是談不攏的兩個人），有些慢慢變成別的——你看得出來的時候就是了。'],
-  ['留下來的東西','有些故事會在店裡留下東西（一塊小貓墊、一盆植物），和一張故事照片。'],
-  ['插圖','有幾段故事有一張插圖，跟那段對話一起出現。營業中跳出插圖時，店裡會停住，點完才繼續。看過以後，故事裡那一段有「看插圖」，可以再打開。'],
-  ['店外的生活','員工也有店外的生活：家人、搬家這些事。有些會一段一段發生在店裡——誰晚點到、誰走到熟客桌邊多聊了幾句（說完就回去工作，廚師不會離開廚房）。']]},
- {ic:'📣',h:'社群與宣傳',sum:'大家在談什麼、Jill 要發什麼、要不要花錢讓更多人知道。都是真的發生過的事。',pts:[
-  ['在哪裡','第 6 天起：開店前的畫面有一行「社群與宣傳」，點了直接打開；商店的「社群與宣傳」分頁（在「店舖工程」旁邊）；日誌的「社群」也看得到——營業中只能看，發文和宣傳在開店前或打烊後。'],
-  ['客人的貼文','客人只會寫他們那天真的遇到的：看到哪隻貓、吃了哪道菜、坐在哪裡。'],
-  ['照片和讚','每一則貼文都有它的照片：Jill 發的是她選的那張相簿照片，客人發的是他拍的東西——那道菜、那隻貓、吧台的燈。讚會一直慢慢多，舊的貼文也是：貓的最多，Momo 很多，Jill 的要看店有多紅，一般客人幾個。最近的六則在上面，「看更早的貼文」可以全部看。'],
-  ['Jill 的貼文','每天最多三個候選，都是這幾天真的發生的事（新菜、新的一間、相簿裡的一張照片）；發了以後三天，會有人為了那件事來，那道菜點的人也會變多。'],
-  ['宣傳','選現在想讓誰知道 Jill\'s Kitchen，持續三天：在地、料理、側廳／聚餐、店貓、晚餐／酒單（有 Lounge 以後）。開店前買的當天開始，打烊後買的隔天開始。'],
-  ['看得出來','看到宣傳來的客人，票券上名字旁有 📱，有些人會說他們是為了什麼來的；結算的標籤會寫今天有幾組；宣傳結束後的新聞列出這三天真正的數字。'],
-  ['不是買熟客','宣傳只把人第一次帶進來。會不會再來，看那一頓。']]},
- {ic:'💾',h:'存檔與備份',sum:'進度都在這台裝置的瀏覽器裡。換手機前，先備份成一個檔案。',pts:[
-  ['自動存檔','每天打烊、每次購買，還有營業中每 20 秒、暫停、切到別的 App 時，都會存下當下的店內狀況。下次打開可以從那個時間點繼續。'],
-  ['手動存檔','營業中：暫停 → 設定・存檔・備份，裡面有【儲存目前進度】，上面寫著最後儲存的時間。'],
-  ['備份到檔案','設定 → 備份到檔案，會下載一個 .json。從備份檔恢復時會先檢查檔案，確認沒問題才覆蓋現在的進度。也可以複製／貼上備份文字。'],
-  ['舊存檔','主廳超過 9 張桌的舊存檔載入時，多的桌子會搬到側廳（側廳放不下就按原價退還），打烊後的新聞會說明。'],
-  ['清除瀏覽器資料','會連存檔一起清掉。備份檔留著就不怕。']]}];
-/* rc8 (the player, 2026-10-03: 「每個空間等他出現才出現在說明書吧」 — the manual of an 80-day save had all of them, and a new
-   shop's had them too): the manual shows a space once the shop has met it. A section, an entry or one line about a room
-   the shop does not have yet is left out when the manual opens, and a line can lose only the words about that room.
-   GUIDE keeps every word (the release audit and the tests read all of it); this is only what the page shows today. */
-function guideHas(){const F=k=>!!fact(k),L=loungeLv()>0,up=upTaken();return{side:projOn('side'),ter:projOn('terrace'),kext:projOn('kext'),L,LP:L||F('lounge_project'),wine:L||F('pairing_wine'),UPA:up||F('up_ask'),up,sr:up&&(F('sr_story')||srOn()),pd:up&&(F('pd_story')||pdOn()),srB:srBuilt(),pdB:pdBuilt()}}
+const GUIDE=[   /* the manual describes the game as it is. Audited every release (docs/RELEASE_CHECKLIST.md) — last: v2.4 rc8.7, 2026-10-07 (story first: the Lounge's people — 沈晴、阿拓 from Lounge I, 安安、許葳 with II; no level, rating or Lounge II for the Lounge, the piano, 予安 or the floor, and the manual names none; checked, that one line changed) — before: v2.4 rc8.6, 2026-10-07 (the stock rule as the game plays it: from Day 3 a dish with nothing in the fridge cannot be ordered; Jill orders one herself only on the first two days); the rewrite of 2026-10-06 from docs/audit/2026-10-06/ws5_manual.md: the first card is how a day is played; only what the screen does not tell and a player needs to know stays (what the screen already says, how the game was built, old saves and stories still to come left it); a space, and a story's own entry, comes into it when it is there */
+ {ic:"🍳",h:"一天怎麼玩",sum:"第一次玩，先看這一張。",pts:[
+  ["一天","開店前選今天的菜單、備料 → 17:00 開店 → 21:30 打烊，客人吃完就結算 → 用今天賺的錢在商店買東西 → 準備下一天。前兩天開店時，遊戲會自動幫你補好備料（照價付）。"],
+  ["營業中","客人會自己找空桌坐。桌上出現紅色「!」：點桌子點餐。到廚房點訂單上的菜（或點那道菜的設備）開始做，照料理台上的指示做完。桌上出現銀色餐蓋：點桌子把菜端過去。出現金幣：點桌子收錢；客人走了再點一次收桌。"],
+  ["員工","請了廚師、服務生、清潔員，他們會自己接工作。Jill 有空時會回房間坐一下，你點桌子她就回來。"],
+  ["故事","重要的故事發生時，店裡會整個停住；一句一句點著看完，店才接著營業。錯過的都在「餐廳日誌」。"],
+  ["暫停","營業中點右上的「II」：調營業速度、看日誌、存檔備份、提早打烊。"],
+  ["換手機以前","進度只存在這台裝置的瀏覽器裡：設定 → 備份到檔案。"],
+ ]},
+ {ic:"🍽️",h:"營業中",sum:"畫面上看不出來、但很好用的事。",pts:[
+  ["房間","票券列下面的分頁是店裡的每一間：店門口・主廳・側廳・二樓（租下以後）・休息室・包廂（蓋好以後）・Lounge（蓋好以後）・廚房・房間。Lounge 是隔壁的店，在店門口點它的門進去。上二樓的樓梯門在側廳。"],
+  ["帶位","有空桌客人會自己坐；想指定順序，點那組客人（在「店門口」），再點空桌。"],
+  ["找人","點訂單上的桌號或名字，會切到那一桌。畫面下方誰說了一句話，點那句話就找得到他。"],
+  ["出菜口","在廚房點出菜口，Jill 會把做好的菜都送出去。服務生 LV2 起會自己端，LV3 起會結帳。"],
+  ["庫存不夠","左上「庫存」或廚房的冰箱：每道菜有「補滿」，一按就到（1.5 倍價）。賣完的菜客人點不到；只有前兩天，錢夠的話 Jill 會自己臨時叫貨。"],
+  ["配菜的酒","晚餐桌上的酒不用備料：倒一杯算一杯的成本，大約售價的三成。客人點了，服務生或 Jill 在出菜口倒好端過去。Lounge 開了以後由調酒師倒。"],
+  ["招待","每張票券右上的「招待」：Jill 有空會端一杯飲料或一份甜點過去，算店裡請的。一天兩桌。"],
+  ["今日任務","每天幾個小目標，開店前就看得到；營業中點上方的「今日任務」看進度，做到了結算有獎金。"],
+  ["評分 ★","上方的 ★ 是最近客人評價的平均：越高客人越多。擴建到 Jill's Restaurant 起，每一次擴建都要評分夠。"],
+ ]},
+ {ic:"🧊",h:"開店前",sum:"今天賣什麼、準備多少。",pts:[
+  ["備料","「一鍵補到建議量」照預估把每道菜補好，也可以每道自己調。冰箱裝不下時會先少放一點，畫面上會說。"],
+  ["售價","每道菜可以調價；客人有自己的預算，太貴會有人抱怨。"],
+  ["工作站沒人","菜單需要的工作站今天沒人顧，開店前會提醒；在商店「員工」最上面的「工作分配」調整。"],
+ ]},
+ {ic:"🛒",h:"打烊以後",sum:"結算、商店，店怎麼長大。",pts:[
+  ["商店分頁","一開始只有「家具與佈置」：第 2 天多廚房設備、菜單研發；第 3 天店舖工程；第 4 天貓咪生活、員工；第 6 天社群與宣傳；第 7 天招牌菜。灰色的分頁點了會說哪天開。"],
+  ["擴建","在「店舖工程」：Jill's Bistro（第 4 天打烊後，$5,000）→ Jill's Restaurant（評分 3.9，$16,000）→ Jill's Fine Dining（4.3，$40,000）→ JILL（4.6，$90,000）。每擴建一次，桌位、菜單、員工名額都會多。"],
+  ["員工","請了就是店裡的人，沒有解雇。<b>餐廳員工</b>分成廚師、服務生、清潔員，各有自己的名額，不能互相借；擴建或工程多哪一種，卡片上寫著。<b>Lounge 名單</b>另外算，跟餐廳員工互不佔用。"],
+  ["廚師","LV1 只做簡單的菜，LV3 起會接手 Jill 做到一半的菜，LV5 才做招牌菜和招牌甜點。"],
+  ["晚點到","員工偶爾會晚點到，或請一天假（開店時會說）；沒到的那段時間，他的工作沒人做，日薪照付。"],
+  ["清潔員","請第一位清潔員就是請秀琴阿姨。"],
+  ["租金","每天付，跟店的大小走；新的空間各有自己的一份，結算會一項一項列出來。"],
+  ["錢不夠的時候","收銀機不會變成負的。開店頭十天，打烊時付完開銷剩不到 $300，秀琴阿姨會借你 $3,000；結算時錢超過 $20,000 就會還她。"],
+  ["招牌菜","第 7 天起、擴建到 Jill's Bistro 以後可以研發（$3,000）：永遠在菜單最上方，客人會專程為它來。賣得越多，盤子越講究，價格也高一點。"],
+  ["招牌甜點","有了招牌菜、擴建到 Jill's Restaurant、有冷盤台以後可以研發（$4,000）。"],
+  ["食譜","研發猜不出來的話，每道菜也可以直接買食譜；做熟了還能升到 3 星。"],
+ ]},
+ {ic:"🎁",h:"熟客",sum:"常來的人，會慢慢認得。",pts:[
+  ["熟客","來過 2 次眼熟、4 次熟客、12 次老客人；老客人耐心多一點。日誌的「熟客」有他們的老位子和常點的菜。"],
+  ["最愛","每位熟客都有一道最愛的菜、一杯最愛的酒或飲料，點到時他會說；知道以後，菜單上那一道旁邊會標 ♥。"],
+  ["VIP 卡","來店 5 次的客人拿到 VIP 卡：餐廳、Lounge 都九折，吃完晚餐再去 Lounge 八折。來 10 次換成八折卡：都八折，吃完再去 Lounge 七折。一桌照桌上最好的那張卡算。"],
+ ]},
+ {ic:"🍷",h:"Lounge：留下來的地方",sum:"隔壁的酒吧：吃完飯，留下來喝一杯的地方。",pts:[
+  ["要有調酒師","吧台要有人，Lounge 那晚才會開；把吧台的人都移開就不開。主廳、側廳點的酒也是調酒師倒。"],
+  ["Lounge 的人","Evan 在 Lounge 蓋好那天就在吧台，沈晴、阿拓可以聘。Lounge II 起多安安、許葳。他們一天最多訓練一級。"],
+  ["晚餐後八折","在主廳或側廳吃完、再到 Lounge 坐的客人，Lounge 那一單打八折；知道有折扣，留下來的人多一點。"],
+  ["小點","酒吧小點在同一個廚房做、用同一台冰箱，不佔菜單名額；做好由「Lounge 外場」送過去，出菜口的「送菜」只送主廳、側廳的菜。"],
+  ["今晚的酒單","開店前「今日菜單」下面的「Lounge 酒單」：每一種酒可以開或關，客人只點今晚有倒的。研發過的酒越多，留下來的人越多。"],
+  ["主廚之夜","在「店舖工程」的 Lounge 那一段排在明晚：整個 Lounge 包場，三道菜各配一杯，每位 $1,800。一週最多一次。"],
+  ["品酒之夜","Ken 辦的晚上，整個 Lounge 留給品酒的客人。一週最多一次，不跟主廚之夜同一晚。收入扣掉成本，三成是 Ken 的分潤。"],
+  ["鋼琴","予安一個禮拜彈三晚，那幾晚留下來的人比較多；每晚付她演奏費 $2,500。"],
+  ["Lounge 的帳","結算寫「Lounge 幾桌・營業額・吃完留下幾組」；Lounge 的小費、晚餐桌上配的酒各另外一行。"],
+ ]},
+ {ic:"🚪",h:"二樓",sum:"整層租下來以後，店裡多出來的地方。",pts:[
+  ["員工休息室","給店裡的人坐一下的地方：不是用餐區，不加座位，也不加名額。誰上去不用你安排。"],
+  ["私人包廂","臨街那間有門的房間，給 4 位以上的一桌。訂位會自己進來（一晚最多一組），開店前的新聞會寫「今晚｜私人包廂｜已預約」；有預約時包廂留給他們。"],
+  ["最低消費","預約的那一桌吃得比最低消費少，就收最低消費；吃得多就照實算。沒有預約的晚上，4 位以上的客人可以直接坐，沒有最低消費。"],
+  ["工程","二樓一次只做一件工程。"],
+ ]},
+ {ic:"🛋️",h:"Jill 的房間",sum:"廚房後面那一間，Jill 住的地方。",pts:[
+  ["怎麼進去","房間分頁的最後一個；或在廚房點右手邊那扇淺木門。在房間點門口的「‹ 廚房」回去。"],
+ ]},
+ {ic:"🐈",h:"五隻店貓",sum:"樾樾、小齁、寶寶、柔柔、包包。不用餵、不用照顧，牠們有自己的生活。",pts:[
+  ["點牠們","可以摸，牠們不一定理你；房間裡的貓也一樣。"],
+  ["名字","在日誌的「店貓」可以改名字。"],
+ ]},
+ {ic:"📖",h:"日誌與故事",sum:"店的紀錄、故事和照片都在這裡。",pts:[
+  ["在哪裡","開店前和商店在右上的書本；營業中在暫停選單；結算畫面右上也有。"],
+  ["話語","一整天店裡說過的話，誰說的就寫誰；營業中點左上的 💬 也看得到。"],
+  ["故事","每個故事寫著一共幾段、看過幾段；還沒看過的寫「？？？」——什麼時候發生要看他們自己，你不用做什麼。"],
+  ["故事更新","有新的一段時，房間分頁下面會跳一個小通知，點它直接看那一段。"],
+  ["錯過了","每一段點開，可以再看那天的經過和當時說過的話；有插圖的段落可以「看插圖」。"],
+  ["留下來的東西","有些故事會在店裡留下一樣東西，相簿也會多一張故事照片。"],
+ ]},
+ {ic:"📣",h:"社群與宣傳",sum:"大家在談什麼、Jill 要發什麼、要不要花錢讓更多人知道。",pts:[
+  ["在哪裡","開店前畫面的「社群與宣傳」、商店的分頁、日誌的「社群」。營業中只能看；發文和宣傳在開店前或打烊後。"],
+  ["發文","Jill 每天最多有三則可以發；發了以後三天，會有人為那件事來，那道菜點的人也會變多。"],
+  ["宣傳","選一群想讓他們知道的人，持續三天：開店前買的當天開始，打烊後買的隔天開始。宣傳只把人第一次帶進來，會不會再來，看那一頓。"],
+ ]},
+ {ic:"💾",h:"存檔與備份",sum:"進度都在這台裝置的瀏覽器裡。",pts:[
+  ["自動存檔","每天打烊、每次購買，營業中每 20 秒、暫停、切到別的 App 時都會存；下次打開，從那個時間點繼續。"],
+  ["手動存檔","營業中：暫停 → 設定・存檔・備份 →【儲存目前進度】。"],
+  ["備份到檔案","設定 → 備份到檔案，會下載一個 .json；恢復時會先檢查檔案，沒問題才覆蓋。"],
+  ["清除瀏覽器資料","會連存檔一起清掉。備份檔留著就不怕。"],
+ ]},
+];
+function guideHas(){const F=k=>!!fact(k),L=loungeLv()>0,up=upTaken();return{side:projOn('side'),ter:projOn('terrace'),kext:projOn('kext'),L,L2:loungeLv()>=2,sig:!!S.signature,kt:F('ken_t1'),ya:F('ya_join'),social:shopDay()>=6,wine:L||F('pairing_wine'),up,sr:up&&(F('sr_story')||srOn()),pd:up&&(F('pd_story')||pdOn()),srB:srBuilt(),pdB:pdBuilt()}}
 const GUIDE_WHEN={
- sec:{'Lounge：留下來的地方':h=>h.LP,'二樓：休息室與包廂':h=>h.up},
- pt:{'開店與料理|配菜的酒':h=>h.wine,'Jill 與員工|調酒師':h=>h.L,'商店：家具、工程、營運|側廳的大窗':h=>h.side,'每天的帳|酒水成本':h=>h.wine,
-  '二樓：休息室與包廂|員工休息室':h=>h.sr,'二樓：休息室與包廂|誰會上去':h=>h.sr,'二樓：休息室與包廂|私人包廂':h=>h.pd,'二樓：休息室與包廂|預約':h=>h.pd,
-  '二樓：休息室與包廂|最低消費':h=>h.pd,'二樓：休息室與包廂|沒有預約的晚上':h=>h.pd},
+ /* audit WS5-02 (2026-10-06): a space's card comes when the space is there (the Lounge's when it is built, not when its
+    project appears); a story's own entry when the story has happened (品酒之夜, 予安) */
+ sec:{'Lounge：留下來的地方':h=>h.L,'二樓':h=>h.up,'社群與宣傳':h=>h.social},
+ pt:{'營業中|配菜的酒':h=>h.wine,'Lounge：留下來的地方|主廚之夜':h=>h.L2&&h.sig,'Lounge：留下來的地方|品酒之夜':h=>h.kt,'Lounge：留下來的地方|鋼琴':h=>h.ya,
+  '二樓|員工休息室':h=>h.sr,'二樓|私人包廂':h=>h.pd,'二樓|最低消費':h=>h.pd},
  /* [words in the line, when they stay, what they become otherwise (none: the line goes; a function's null: the line goes)] */
  line:[
   ['店門口・主廳・側廳・二樓（租下以後）・休息室・包廂（蓋好以後）・Lounge（蓋好以後）・廚房・房間',h=>h.side&&h.up&&h.srB&&h.pdB&&h.L,h=>[['店門口',1],['主廳',1],['側廳',h.side],['二樓',h.up],['休息室',h.srB],['包廂',h.pdB],['Lounge',h.L],['廚房',1],['房間',1]].filter(x=>x[1]).map(x=>x[0]).join('・')+'（新的房間蓋好以後會加進來）'],
-  ['上二樓的樓梯門在側廳',h=>h.up],['開店前會先帶你上二樓看一眼',h=>h.up],['Lounge 是隔壁的店，跟主廳不相通',h=>h.L],
-  ['Lounge 開了以後，晚餐桌上的酒改由調酒師倒',h=>h.L],
-  ['（有 Lounge 以後多「Lounge 吧台」「Lounge 外場」）',h=>h.L,''],['和 Lounge 名單',h=>h.L,''],
-  ['員工分兩個名單，名額各算各的、互不佔用',h=>h.L],['（例：披薩烤爐廚師 +1、私人包廂 I 和 III 服務生各 +1；休息室不加名額）',h=>h.L&&h.pd,'（例：側廳服務生 +2）'],
-  ['<b>Lounge 名單</b>是固定的幾個人',h=>h.L],['沈晴、阿拓、安安、許葳要聘',h=>h.L],['剛排到 Lounge 的服務生頭幾班慢一點',h=>h.L],
-  ['酒吧小點和招牌菜不動',h=>h.L,'招牌菜不動'],
+  ['Lounge 是隔壁的店，在店門口點它的門進去',h=>h.L],['上二樓的樓梯門在側廳',h=>h.up],
+  ['Lounge 開了以後由調酒師倒',h=>h.L],
+  ['<b>Lounge 名單</b>另外算，跟餐廳員工互不佔用',h=>h.L],
   ['餐廳、Lounge 都九折，吃完晚餐再去 Lounge 八折',h=>h.L,'九折'],['都八折，吃完再去 Lounge 七折',h=>h.L,'八折'],
-  ['側廳最多 9 張，「側廳卡座」把整排換成卡座',h=>h.side],['露天桌 1–3 張',h=>h.ter],
-  ['Lounge 的企劃出現以後也在這裡',h=>h.LP],['Lounge 蓋好以後，樓上的事就會慢慢開始',h=>h.UPA],['這裡會多「二樓（整層）」',h=>h.UPA],
-  ['租下二樓以後有一張二樓平面圖',h=>h.up],['「看看整層」是整層現在的樣子',h=>h.up],
-  ['Lounge III 以後的 Bar 小廚／油炸站',h=>h.L],['有 Lounge II 以後還有 Lounge 的酒窖',h=>h.L],['側廳的東西分兩區',h=>h.side],['有 Lounge 以後還有披薩烤爐',h=>h.L],
-  ['酒水成本、薪資',h=>h.wine,'薪資'],['鋼琴演奏、品酒之夜分潤、',h=>h.L,''],['天氣、Lounge、',h=>h.L,'天氣、'],['、包廂、VIP',h=>h.pd,'、VIP'],
-  ['品酒之夜和主廚之夜那晚，Lounge 只寫那一行',h=>h.L],['——在 Lounge 或晚餐桌上——',h=>h.L,'——在晚餐桌上——'],
-  ['側廳、戶外區、廚房擴建、Lounge、二樓各有自己的一份',h=>h.side&&h.ter&&h.kext&&h.L&&h.up,h=>{const n=[['側廳',h.side],['戶外區',h.ter],['廚房擴建',h.kext],['Lounge',h.L],['二樓',h.up]].filter(x=>x[1]).map(x=>x[0]);return n.length?n.join('、')+(/[A-Za-z]$/.test(n[n.length-1])?' ':'')+(n.length>1?'各有':'有')+'自己的一份':null}],
-  ['之後有客人想要安靜、不被打擾的位子',h=>h.pd],
-  ['二樓是店裡的以後',h=>h.up],['、Lounge、貓',h=>h.L,'、貓'],['予安和鋼琴的故事、',h=>h.L,''],
-  ['付酒水、租金',h=>h.wine,'付租金'],['，例如下班以後的一局撞球',h=>h.srB,''],
-  ['、側廳／聚餐',h=>h.side,''],['、晚餐／酒單（有 Lounge 以後）',h=>h.L,'']]};
+  ['Lounge II 起多阿拓、安安、許葳',h=>h.L2]]};
 function guideCut(t,h){for(const [w,ok,to] of GUIDE_WHEN.line){if(t==null)break;if(!t.includes(w)||ok(h))continue;if(to===undefined)return null;const r=typeof to==='function'?to(h):to;t=r==null?null:t.replace(w,r)}return t}
 function guideView(){const full=()=>GUIDE.map(g=>({ic:g.ic,h:g.h,sum:g.sum,pts:g.pts.map(([k,t])=>[k,guideLines(t)])}));let h;try{h=guideHas()}catch(e){return full()}
  const out=[];for(const g of GUIDE){const sw=GUIDE_WHEN.sec[g.h];if(sw&&!sw(h))continue;const pts=[];
@@ -9655,7 +9754,7 @@ function guideView(){const full=()=>GUIDE.map(g=>({ic:g.ic,h:g.h,sum:g.sum,pts:g
  return out}
 function showGuide(){sub='guide';show(`<div class="sheet tall"><div class="sh-top"><div class="ttl"><div class="eyebrow">JILL'S KITCHEN</div><h2>小小店主手冊</h2></div><button class="btn sm" data-act="closeSub">關閉</button></div>
  <p class="muted" style="font-size:12.5px;margin:0 0 10px">點一張卡片展開。</p>
- <div class="guide2">${guideView().map((g,i)=>`<details class="gcard" ${i===0?'open':''}><summary><span class="gic">${g.ic}</span><span class="gh"><b>${g.h}</b><small>${g.sum}</small></span><span class="gchev">›</span></summary><div class="gbody">${g.pts.map(([k,L])=>{return`<div class="gpt"><b>${k}</b><span${L.length>1?' class="ml"':''}>${L.map(l=>`<i>${L.length>1?l.replace(/；$/,''):l}</i>`).join('')}</span></div>`}).join('')}</div></details>`).join('')}</div>
+ <div class="guide2">${guideView().map((g,i)=>`<details class="gcard" ${i===0?'open':''}><summary><span class="gic">${g.ic}</span><span class="gh"><b>${g.h}</b><small>${g.sum}</small></span><span class="gchev">›</span></summary><div class="gbody">${g.pts.map(([k,L])=>{return`<div class="gpt"><b>${k}</b><span${L.length>1?' class="ml"':''}>${L.map(l=>`<i>${l.replace(/；$/,L.length>1?'':'。')}</i>`).join('')}</span></div>`}).join('')}</div></details>`).join('')}</div>
  <div class="footer"><button class="btn primary big" data-act="closeSub">知道了</button></div></div>`)}
 
 /* ================= input ================= */
@@ -9714,7 +9813,14 @@ const SVG={
  hot:`<svg viewBox="0 0 40 40"><circle cx="20" cy="18" r="10" fill="#F28A3A"/><path d="M8 32h24" stroke="#F2B43A" stroke-width="2.4" stroke-linecap="round"/><path d="M11 36h18" stroke="#F2B43A" stroke-width="2" stroke-linecap="round" opacity=".6"/></svg>`,
 };
 function starsHTML(v){let h='';for(let i=1;i<=5;i++)h+=v>=i?SVG.star(1):v>=i-.5?SVG.half():SVG.star(0);return h}
-function show(html,cls){screenEl.hidden=false;{const pp=$('#peekPill');if(pp&&!pp.hidden){pp.hidden=true;if(UPV==='look')upViewClose()}}/* v2.4 rc6 (10:00): a sheet ends a peek — the pill never outlives it */{const sn=$('#storyNote');if(sn)sn.hidden=true}screenEl.className=cls||'';screenEl.innerHTML=html;$('#taskPanel').hidden=true;renderTasks()}
+function show(html,cls){screenEl.hidden=false;{const pp=$('#peekPill');if(pp&&!pp.hidden){pp.hidden=true;if(UPV==='look')upViewClose()}}/* v2.4 rc6 (10:00): a sheet ends a peek — the pill never outlives it */{const sn=$('#storyNote');if(sn)sn.hidden=true}const tabX=[...screenEl.querySelectorAll('.tabs')].map(e=>e.scrollLeft);screenEl.className=cls||'';screenEl.innerHTML=html;$('#taskPanel').hidden=true;renderTasks();tabsSettle(tabX)}
+/* audit 2026-10-06 (W3-11, WS2-06, the user: 「電腦版升級餐廳點不到右邊的項目」): a strip of tabs keeps where the player
+   left it across a re-render, the open tab is always in view (it opened off the screen, or jumped back to the start after
+   a tab further right was chosen), and a strip with more tabs to one side fades on that side. With a mouse the strips
+   wrap instead (style.css): every tab is on the screen. */
+function tabsSettle(prev){[...screenEl.querySelectorAll('.tabs')].forEach((s,i)=>{if(prev&&prev[i]!=null)s.scrollLeft=prev[i];tabsShowOn(s);tabsEdge(s)})}
+function tabsShowOn(s){const on=s.querySelector('.on');if(!on||s.scrollWidth<=s.clientWidth+1)return;const sr=s.getBoundingClientRect(),r=on.getBoundingClientRect(),pad=28;if(r.left<sr.left+pad)s.scrollLeft-=Math.ceil(sr.left+pad-r.left);else if(r.right>sr.right-pad)s.scrollLeft+=Math.ceil(r.right-(sr.right-pad))}
+function tabsEdge(s){const more=s.scrollWidth>s.clientWidth+1;s.classList.toggle('more-r',more&&s.scrollLeft+s.clientWidth<s.scrollWidth-2);s.classList.toggle('more-l',more&&s.scrollLeft>2)}
 /* ================= v2.2 Q: dialogue portraits =================
    One reusable system: a character id → its portrait asset(s), the side it enters from, and a fallback. The assets
    are the supplied illustrations (assets/portraits, cut by tools/portraits.py; the display versions ride in
@@ -9747,8 +9853,8 @@ let DLG=null;
    shown even where tests skip scenes (the journal reopening a picture). A line may carry a name for someone without a
    portrait. */
 function scene(lines,onDone,o){o=o||{};const el=$('#dlg');
- if(SCX&&SCX.authored&&shOn()&&lines&&lines.length){const cx=SCX;const n0=cx.q.length;for(const l of lines){const L=Object.assign({},l);if(L.illus)illusSeen(L.illus);cx.q.push(L);shRec(cx,{name:L.name||whoLabel(L.who||''),text:L.text})}if(o.illus){illusSeen(o.illus);cx.q[n0].illus=o.illus}if(onDone)cx.q[cx.q.length-1].after=onDone;shShow(cx);return true}
- if(SCX&&lines&&lines.length)for(const l of lines)if(l&&l.text)shRec(SCX,{name:l.name||whoLabel(l.who||''),text:l.text});   /* v2.4 rc6: a beat not held keeps its scene's words too (怡君's 「吃飯啊。」) */
+ if(SCX&&SCX.authored&&shOn()&&lines&&lines.length){const cx=SCX;const n0=cx.q.length;for(const l of lines){const L=Object.assign({},l);if(L.illus)illusSeen(L.illus);cx.q.push(L);shRec(cx,{name:L.name||whoLabel(L.who||''),text:L.text},true)}if(o.illus){illusSeen(o.illus);cx.q[n0].illus=o.illus}if(onDone)cx.q[cx.q.length-1].after=onDone;shShow(cx);return true}
+ if(SCX&&lines&&lines.length)for(const l of lines)if(l&&l.text)shRec(SCX,{name:l.name||whoLabel(l.who||''),text:l.text},true);   /* v2.4 rc6: a beat not held keeps its scene's words too (怡君's 「吃飯啊。」) */
  if(DLG&&DLG.sh&&lines&&lines.length){SH_WAIT.push({scene:[lines,onDone,o]});return true}   /* v2.4 rc6: after the beat on screen */if(o.illus)illusSeen(o.illus);for(const l of lines||[])if(l&&l.illus)illusSeen(l.illus);if(!el||!lines||!lines.length){if(onDone)onDone();return false}const ok=(o.illus||o.modal||lines.some(l=>l.illus)||lines.some(l=>portraitOf(l.who,l.tone)))&&(!window.__noScenes||o.force);if(!ok){/* nobody in this scene has a portrait: the plain presentation */for(const l of lines){const nm=l.name||whoLabel(l.who||'');if(nm)logLine(nm,l.text,l.who==='jill'?'j':l.who==='dylan'?'d':(l.who||'').startsWith('staff:')?'s':'g');else if(l.text)logLine('',l.text,'e')}if(onDone)onDone();return false}
  DLG={lines,i:0,onDone,illus:o.illus||null,hold:!!o.hold};el.hidden=false;{/* v2.4: a story-update notice already up waits under the scene, and comes back when it closes */const sn=$('#storyNote');if(sn&&!sn.hidden&&storyNoteShow.last){sn.hidden=true;clearTimeout(storyNoteShow.t);storyNoteShow.pending=storyNoteShow.last}}el.className='';dlgShow();return true}
 function dlgShow(){const el=$('#dlg');const L=DLG.lines[DLG.i];if(L.illus!==undefined)DLG.illus=L.illus||null;{/* v2.4: the story illustration, if the scene has one; rc6: a story's picture on its own line */const ib=el.querySelector('.dlg-illus');const I=L.photo?{src:L.photo,t:L.cap||'',tbd:false}:DLG.illus&&illusSrc(DLG.illus)?Object.assign({t:STORY_ILLUS[DLG.illus].t},illusSrc(DLG.illus)):null;if(ib){ib.hidden=!I;if(I){const im=ib.querySelector('img');if(im.getAttribute('src')!==I.src)im.src=I.src;ib.querySelector('.dlg-illus-t').textContent=I.t;ib.querySelector('.dlg-illus-tbd').hidden=!I.tbd}}el.classList.toggle('has-illus',!!I);
@@ -9763,12 +9869,12 @@ function dlgNext(){if(!DLG)return;
  if(DLG.sh){/* v2.4 rc6: a beat's panel — one line per tap, never two; what the beat still had to say comes now, in its order */const now=performance.now();if(now-(DLG.shownAt||0)<280)return;const cx=DLG.sh;const L=DLG.lines[DLG.i];if(L&&L.after){const f=L.after;L.after=null;shRun(cx,f)}
   while(DLG&&DLG.sh===cx&&DLG.i>=DLG.lines.length-1&&shFlushOne(cx)){}if(!DLG||DLG.sh!==cx)return;
   if(DLG.i>=DLG.lines.length-1){shClose();return}DLG.i++;DLG.shownAt=now;dlgShow();return}
- DLG.i++;if(DLG.i>=DLG.lines.length){const d=DLG;DLG=null;$('#dlg').hidden=true;if(d.onDone)d.onDone();if(!DLG&&SH_WAIT.length){shNextWaiting();return}if(storyNoteShow.pending){const n=storyNoteShow.pending;storyNoteShow.pending=null;setTimeout(()=>storyNoteShow(n),300)}return}dlgShow()}
+ DLG.i++;if(DLG.i>=DLG.lines.length){const d=DLG;DLG=null;$('#dlg').hidden=true;if(d.onDone)d.onDone();if(!DLG&&SH_WAIT.length){shNextSoon();return}if(storyNoteShow.pending){const n=storyNoteShow.pending;storyNoteShow.pending=null;setTimeout(()=>storyNoteShow(n),300)}return}dlgShow()}
 /* ---- the line: during service, a small card with the portrait beside the words, gone by itself; not a modal.
    Jill/Dylan exchanges show both faces, the speaker lit. ---- */
 function portraitLine(who,txt,o){o=o||{};const p=portraitOf(who,o.tone);if(!p)return false;const box=$('#plines');if(!box)return false;const w=o.with?portraitOf(o.with,o.withTone):null;
  const d=document.createElement('div');d.className='pline '+(p.side==='right'?'right':'left');d.innerHTML=`${w&&w.side==='left'?`<img class="dim" alt="" src="${w.src}">`:''}${p.side==='left'?`<img alt="" src="${p.src}">`:''}<div class="pl-t"><b>${p.name}</b><span>${txt}</span></div>${p.side==='right'?`<img alt="" src="${p.src}">`:''}${w&&w.side==='right'?`<img class="dim" alt="" src="${w.src}">`:''}`;
- box.appendChild(d);while(box.children.length>2)box.firstChild.remove();const T=setTimeout(()=>{d.classList.add('out');setTimeout(()=>d.remove(),260)},o.ms||4600);let done=false;const act=e=>{if(done)return;done=true;if(e&&e.preventDefault)e.preventDefault();clearTimeout(T);d.remove();try{if(o.tg&&R&&idFocusTable(o.tg))return;if(o.g&&R)idFocusGroup(o.g,o.k||0,{name:p.name});else if(!(who==='jill'&&o.with&&idFocusWithWho(o.with)))idFocusWho(who)}catch(e2){}};d.onpointerdown=act;d.onclick=act;   /* rc7.2 (the player, 22:07: 「有出現人頭的點下去不會看到他在哪一組」 — on the phone the tap went nowhere; on a computer it found them): the line answers the touch itself, not the click a phone may never send for it, and stays a little longer to be caught */   /* v2.4 rc6 (07:09): a tap on the line finds who said it; rc7 (15:37): a line said at a table finds the table, Jill's to someone finds them */
+ box.appendChild(d);while(box.children.length>2)box.firstChild.remove();plinesLift();const T=setTimeout(()=>{d.classList.add('out');setTimeout(()=>d.remove(),260)},o.ms||4600);let done=false;const act=e=>{if(done)return;done=true;if(e&&e.preventDefault)e.preventDefault();clearTimeout(T);d.remove();try{if(o.tg&&R&&idFocusTable(o.tg))return;if(o.g&&R)idFocusGroup(o.g,o.k||0,{name:p.name});else if(!(who==='jill'&&o.with&&idFocusWithWho(o.with)))idFocusWho(who)}catch(e2){}};d.onpointerdown=act;d.onclick=act;   /* rc7.2 (the player, 22:07: 「有出現人頭的點下去不會看到他在哪一組」 — on the phone the tap went nowhere; on a computer it found them): the line answers the touch itself, not the click a phone may never send for it, and stays a little longer to be caught */   /* v2.4 rc6 (07:09): a tap on the line finds who said it; rc7 (15:37): a line said at a table finds the table, Jill's to someone finds them */
  return true}
 function hideScreen(){screenEl.hidden=true;screenEl.innerHTML='';sub=null}
 function topIcons(){return`<button class="icon-btn" data-act="peek" aria-label="看店裡" style="font-weight:800;font-size:11px;width:auto;padding:0 9px">看店裡</button><button class="icon-btn" data-act="guide" aria-label="店主手冊" style="font-weight:800;font-size:15px">?</button><button class="icon-btn" data-act="book" aria-label="餐廳日誌">${SVG.book}</button><button class="icon-btn" data-act="settings" aria-label="設定">${SVG.gear}</button>`}
@@ -9782,14 +9888,16 @@ function goMain(){if(S.phase==='shop'&&S.lastSummary)showShop();else{applyGates(
 
 /* v2.2 Q: the morning — one line from Jill when the day's prep screen first opens, from the weather and the day */
 function morningLine(){const W=S.today?S.today.weather:'sun';const ev=S.today&&S.today.event;const pool={sun:['天氣好。今天會忙一點，先把料備夠。','太陽很大，冰的先備。','晴天。客人會多，桌子先擦一遍。'],cloud:['多雲，不冷不熱，普通的一天。','今天沒什麼特別的，那就把每一道做好。'],rain:['下雨了。湯要多備一點，傘架先拿出來。','雨天客人少，但來的人會待久一點。今天慢慢做。'],storm:['雨很大。今天來的都是真的想來的人。','大雨。熱的東西先備，門口的地會濕，小心。'],hot:['好熱。冰飲和冰甜點會賣得特別快。','今天熱到不想開爐。但還是要開。'],cool:['涼涼的，適合走路過來吃飯的天氣。','今天空氣很好，門開著就好。']}[W]||['今天也開店。'];
- const extra=[];const cn=CATS&&CATS.filter(c=>!c.hidden&&['sleep','bed'].includes(c.st));if(cn&&cn.length)extra.push(`${catName(cn[0].def)}還在睡，先不吵牠。`);if(S.day>=3&&S.regulars&&Object.keys(S.regulars).length>=3)extra.push('熟客差不多這個時間會來。');if(ev&&ev!=='none'&&EVENTS[ev])extra.push(`今天${EVENTS[ev].n}。`);if(S.reveal&&S.reveal.day===S.day-1&&!KITCHEN_WORKS.some(P=>P.k===S.reveal.k))extra.push('昨天的工程，今天客人就看得到了。');
- return pickT(pool)+(extra.length&&Math.random()<.7?pickT(extra):'')}
+ const extra=[];const cn=CATS&&CATS.filter(c=>!c.hidden&&['sleep','bed'].includes(c.st));if(cn&&cn.length)extra.push(`${catName(cn[0].def)}還在睡，先不吵牠。`);if(S.day>=3&&S.regulars&&Object.keys(S.regulars).length>=3)extra.push('熟客差不多這個時間會來。');if(S.reveal&&S.reveal.day===S.day-1&&!KITCHEN_WORKS.some(P=>P.k===S.reveal.k))extra.push('昨天的工程，今天客人就看得到了。');
+ /* audit N16 (2026-10-06): a day with an event (a VIP's booking, the anniversary…) is not 「今天沒什麼特別的」 — the event is always said, and the weather's 「普通的一天」 lines are left out */
+ const evOn=ev&&ev!=='none'&&EVENTS[ev];const base=evOn?pool.filter(t=>!/沒什麼特別|普通的一天/.test(t)):pool;
+ return cjkSp(pickT(base.length?base:['今天也開店。'])+(evOn?`今天${EVENTS[ev].n}。`:extra.length&&Math.random()<.7?pickT(extra):''))}
 function morningRemark(){if(!S.today||S.morningSaid===S.day||phase!=='prep')return;S.morningSaid=S.day;const W=S.today.weather;scene([{who:'jill',tone:W==='rain'||W==='storm'?'gentle':W==='sun'||W==='cool'?'cheerful':'default',text:morningLine()}])}
 let menuSwap=null;   /* v2.2.1 #5: the weather dish waiting for a slot while the player chooses what to take off */
 function menuSwapHTML(){if(!menuSwap||!S.today)return'';const inn=menuSwap;const exp=expectDemand(S.today.groups,60);const cur=S.menu.filter(x=>S.unlocked.includes(x)).map(d=>({d,e:Math.round(exp[d]||0),st:S.stock[d]||0})).sort((a,b)=>a.e-b.e);
  return`<div class="mswap"><div class="ms-h">菜單已滿，要換掉哪一道？<span class="muted">換成 <b>${dishName(inn)}</b></span><button class="btn sm" data-act="menuSwapNo">取消</button></div><div class="ms-list">${cur.map(x=>`<button class="ms-row" data-act="menuSwapDo" data-d="${x.d}"><img alt="" src="${dishURL(x.d,'P')}"><span class="nm">${dishName(x.d)}</span><small>預估 ${x.e} 份${x.st?`・冰箱 ${x.st}`:''}</small><b>換掉</b></button>`).join('')}</div><p class="small muted" style="margin:6px 0 0">依今天的預估銷量排序，最不會被點的在最前面。換掉的菜庫存留著，明天可以再放回來。</p></div>`}
 /* rc7.4: a Lounge already built when the new bites came has them on its list from the next morning, said once */
-function barMenuMig(){if(!loungeLv())return;const add=barDishes().filter(d=>!S.unlocked.includes(d)&&!DISHES[d].rd);if(!add.length)return;for(const d of add)unlockDish(d);S.news=S.news||[];S.news.push(`<b>Lounge 的小點多了：</b>${add.map(dishName).join('、')}。一樣是餐廳的廚師在廚房做（每道新菜的第一份還是 Jill 親自做），Lounge 的外場送過去；不佔菜單名額，冰箱記得補。`)}
+function barMenuMig(){if(!loungeLv())return;const add=barDishes().filter(d=>!S.unlocked.includes(d)&&!DISHES[d].rd);if(!add.length)return;for(const d of add)unlockDish(d);S.news=S.news||[];S.news.push(`<b>Lounge 的小點多了：</b>${add.map(dishName).join('、')}。一樣是餐廳的廚師在廚房做，Lounge 的外場送過去；不佔菜單名額，冰箱記得補。`)}
 function showPrep(){try{barMenuMig()}catch(e){console.warn('[bar]',e)}try{firstPhotoMig()}catch(e){console.warn('[first photo]',e)}phase='prep';mainScreen='prep';R=null;room='main';try{storyPhotoFlush();staffMealStory();upStaffMeal();/* v2.4 P2 */setTimeout(()=>{try{if(UPV==='reveal')return;storyProgressCheck()}catch(e){}},900)}catch(e){console.warn('[story]',e)}/* v2.3 */if(upRevealDue())setTimeout(()=>{try{upRevealStart()}catch(e){console.warn('[uprv]',e)}},450);else if(S.loungeProj&&S.loungeProj.state==='built'&&S.loungeProj.open===S.day&&!S.loungeProj.rv)setTimeout(()=>{try{loungeOpenReveal()}catch(e){console.warn('[lounge rv]',e)}},450);/* v2.4 rc6 (05:23): a room finished overnight is shown first */lifeReset();IDLE=makeIdle();layoutAll();hud(true);renderTickets();planToday();try{pdStoryDay();pdDay()}catch(e){console.warn('[pd]',e)}/* v2.4 rc6 */const T=S.today,F=feat();const W=WEATHER[T.weather],E=EVENTS[T.event];
  const ms=menuList();const unlocked=[...S.unlocked];const sug=suggestStock();let restockCost=0;for(const d of ms){const need=Math.max(0,sug[d]-(S.stock[d]||0));restockCost+=need*costOf(d)}
  const cap=fridgeCap(),tot=stockTotal();const menuN=menuCount();
@@ -9798,7 +9906,7 @@ function showPrep(){try{barMenuMig()}catch(e){console.warn('[bar]',e)}try{firstP
   return`<div class="menu-row ${on?'':'off'}"><img alt="" src="${dishURL(d,'P')}"><div class="nm">${D.n}<span class="stars">${'★'.repeat(starOf(d))}</span>${lov.length?`<span class="love" title="熟客的最愛">♥ ${lov.map(loveName).join('、')}</span>`:''}<small>${CAT_N[D.cat]} · LV${lv}${D.bar?' · 酒吧小點，不佔名額':''}</small></div><button class="tog ${on?'on':''}" data-act="toggle" data-d="${d}" aria-label="${on?'從菜單移除':'加入菜單'}"></button>
   <div class="meta">${fmt(priceOf(d))} · 成本 ${fmt(costOf(d))} · ${D.steps.length} 步驟・${mechN(d)}${stationOk(d)?'':` · <b style="color:var(--tomato)">缺少${ST_N[D.st]}，客人不會點</b>`}</div>
   ${!on&&F.stock&&st>0?`<div class="ctl offstock"><span>冰箱裡還有 ${st} 份，佔著位子</span><button class="btn sm" data-act="stock" data-d="${d}" data-v="-99">退掉（退 ${fmt(st*costOf(d))}）</button></div>`:''}
-  ${on&&(F.prices||F.stock)?`<div class="ctl">${F.prices?`<span class="step"><label>售價</label><button data-act="price" data-d="${d}" data-v="-1" aria-label="降價">−</button><span>${fmt(priceOf(d))}${m!==1?` <small>${m>1?'+':''}${Math.round((m-1)*100)}%</small>`:''}</span><button data-act="price" data-d="${d}" data-v="1" aria-label="漲價">＋</button></span>`:''}${F.stock?(()=>{const sg=sug[d]||0;const q1=stockQuote(d,1);return`<span class="step stk"><label>庫存</label><button data-act="stock" data-d="${d}" data-v="-1" aria-label="退一份" ${st>0?'':'disabled'}>−</button><span>${st} 份</span><button data-act="stock" data-d="${d}" data-v="1" aria-label="進一份" ${q1.n>0?'':'disabled'}>＋</button></span><span class="stkq"><button class="mini" data-act="stockTo" data-d="${d}" data-k="sug" ${st<sg&&q1.n>0?'':'disabled'}>補到建議 ${sg}</button><button class="mini" data-act="stockTo" data-d="${d}" data-k="max" ${q1.n>0?'':'disabled'}>補滿</button></span>`})():''}${F.prices?priceFeelHTML(d):''}${F.stock&&st===0?'<span class="warnpill">沒有備料</span>':''}</div>`:''}</div>`}).join('');
+  ${on&&(F.prices||F.stock)?`<div class="ctl">${F.prices?`<span class="step"><label>售價</label><button data-act="price" data-d="${d}" data-v="-1" aria-label="降價">−</button><span>${fmt(priceOf(d))}${m!==1?` <small>${m>1?'+':''}${Math.round((m-1)*100)}%</small>`:''}</span><button data-act="price" data-d="${d}" data-v="1" aria-label="漲價">＋</button></span>`:''}${F.stock?(()=>{const sg=sug[d]||0;const q1=stockQuote(d,1);return`<span class="step stk"><label>庫存</label><button data-act="stock" data-d="${d}" data-v="-1" aria-label="退一份" ${st>0?'':'disabled'}>−</button><span>${st} 份</span><button data-act="stock" data-d="${d}" data-v="1" aria-label="進一份" ${q1.n>0?'':'disabled'}>＋</button></span><span class="stkq"><button class="mini" data-act="stockTo" data-d="${d}" data-k="sug" ${st<sg&&q1.n>0?'':'disabled'}>補到建議 ${sg}</button><button class="mini" data-act="stockTo" data-d="${d}" data-k="max" ${q1.n>0?'':'disabled'}>補滿</button></span>`})():''}${F.prices?priceFeelHTML(d):''}${F.stock&&st===0&&!jillStocks()?'<span class="warnpill">沒有備料</span>':''}</div>`:''}</div>`}).join('');
  const sig=S.signature?`<div class="sig"><img alt="" src="${dishURL('signature','P')}"><div><div class="st">★ CHEF JILL'S SIGNATURE ★</div><b>${S.signature.name}</b><small>${fmt(priceOf('signature'))} · 庫存 ${S.stock.signature||0} 份 · 永遠在菜單最上方</small>${F.stock?`<div style="margin-top:6px" class="step"><button data-act="stock" data-d="signature" data-v="-2" style="color:var(--cream)">−</button><span style="color:var(--cream)">${S.stock.signature||0} 份</span><button data-act="stock" data-d="signature" data-v="2" style="color:var(--cream)">＋</button></div>`:''}</div></div>${S.sigDessert?`<div class="sig sigd"><img alt="" src="${dishURL('sigdessert','P')}"><div><div class="st">★ JILL'S SIGNATURE DESSERT ★</div><b>${S.sigDessert.name}</b><small>${fmt(priceOf('sigdessert'))} · 庫存 ${S.stock.sigdessert||0} 份 · 排在招牌菜下面</small>${F.stock?`<div style="margin-top:6px" class="step"><button data-act="stock" data-d="sigdessert" data-v="-2" style="color:var(--cream)">−</button><span style="color:var(--cream)">${S.stock.sigdessert||0} 份</span><button data-act="stock" data-d="sigdessert" data-v="2" style="color:var(--cream)">＋</button></div>`:''}</div></div>`:''}`:'';
  show(`<div class="sheet tall"><div class="sh-top"><div class="ttl"><div class="eyebrow">DAY ${S.day} · 開店前</div><h2>${LV().n}</h2></div>${topIcons()}</div>
   <div class="card today"><div class="wx">${SVG[W.ic||T.weather]||SVG.sun}</div><div><b>${W.n} · 預計約 ${T.people} 位客人</b><p>${W.d}${S.buzz>1?' 店裡最近很紅，人潮會多一些。':''}${(()=>{const c=campaign();if(!c)return'';const C=CAMPS.find(x=>x.k===c.k);return`<br>📱 ${C.n}${c.dish?`（${dishName(c.dish)}）`:''}進行中，到 DAY ${c.until}${c.dish?'——那道菜備多一點。':'。'}`})()}${(()=>{const w=(S.crew||[]).filter(m=>m.role==='waiter').length;const NT=tablesTotal();return NT>w*6+8?`<br><b style="color:#B8432C">⚠ ${NT} 張桌、${w} 位服務生：桌數比服務生顧得來的多，客人會等太久。</b>`:''})()}</p>${(()=>{const h=wxHints();return h.length?`<p class="hint">今天可能要多準備：<b>${h.map(dishName).join('、')}</b></p>`:''})()}${(()=>{const off=wxOffMenu();if(!off.length)return'';const full=menuCount()>=menuCap();return`<p class="hint">今天的天氣也適合，但不在今天的菜單上：</p><div class="wxadd">${off.map(d=>`<button class="mini ${menuSwap===d?'on':''}" data-act="menuAdd" data-d="${d}">＋ ${dishName(d)}</button>`).join('')}</div>${full&&!menuSwap?`<p class="small muted">菜單已滿（${menuCap()} 道）——點一道，選要換掉哪一道。</p>`:''}${menuSwapHTML()}`})()}</div></div>
@@ -9814,8 +9922,8 @@ function showPrep(){try{barMenuMig()}catch(e){console.warn('[bar]',e)}try{firstP
    <p class="small">${reco?`今日推薦：<b>${dishName(reco)}</b>，預估約 ${Math.max(1,Math.round(exp[reco]||0))} 份。`:'還沒選。'}${dt?` 今日任務要賣 ${dt.n} 份${dishName(dt.d)}${reco===dt.d?'，就是這道。':`（預估約 ${Math.max(1,Math.round(exp[dt.d]||0))} 份）——推薦它會比較容易。`}`:''}</p></div>`})()}
   ${F.prices&&menuList().some(d=>DISH(d).cat==='drink'||DISH(d).cat==='dessert')?`<h3>套餐</h3><div class="card sets"><p class="d">要不要推套餐？點主餐的客人會更常加點；加點的那一份便宜一點。單點照常。</p>${Object.keys(SETS).map(k=>`<button class="setb ${setOn(k)?'on':''}" data-act="setT" data-k="${k}"><b>${setOn(k)?'✓ ':''}${SETS[k].n}</b><small>${SETS[k].d}${(S.setHist&&S.setHist[k]&&S.setHist[k].n)?`<br>累計賣出 ${S.setHist[k].n} 份・${fmt(S.setHist[k].rev)}`:''}</small></button>`).join('')}</div>`:''}
   <h3>今日菜單 <small>${menuN}/${menuCap()} 道${S.signature?' ＋ 招牌菜':''}${S.sigDessert?' ＋ 招牌甜點':''}${(()=>{const n=S.menu.filter(d=>DISHES[d]&&DISHES[d].bar&&S.unlocked.includes(d)).length;const all=Object.keys(DISHES).filter(d=>DISHES[d].bar&&S.unlocked.includes(d)).length;/* v2.4 rc7 (the player, 14:47 「酒吧小點是3種 但應該是4種?」): how many are on tonight, of how many there are */return all&&loungeLv()?` ＋ 酒吧小點 ${n} 道${n<all?`（共 ${all} 道，不佔名額）`:'（不佔名額）'}`:''})()}</small></h3>
-  <div class="mrand"><button class="btn sm" data-act="menuRandom">🎲 隨機選菜單</button><small>照名額隨機排今天的菜；今日任務要賣的那道會留著。再按一次換一組。</small></div>
-  ${sig}<div class="card">${rows||'<p class="muted">還沒有料理</p>'}</div>
+  <div class="mrand"><button class="btn sm" data-act="menuRandom">🎲 隨機選菜單</button><small>照名額隨機排今天的菜；今日任務要賣的那道${(()=>{const c=campaign();return c&&c.dish?`和宣傳中的${dishName(c.dish)}`:''})()}會留著。再按一次換一組。</small></div>
+  ${F.stock&&jillStocks()?`<p class="small autostk" style="margin:4px 2px 8px">前兩天開店時，Jill 會照建議量把每道菜的備料補好（照價付）；想自己調也可以。</p>`:''}${sig}<div class="card">${rows||'<p class="muted">還沒有料理</p>'}</div>
   ${wineTonightHTML()}
   ${F.stock?`<div class="cap"><span>冰箱</span><div class="capbar"><i style="width:${tot/cap*100}%"></i></div><span>${tot}/${cap}</span></div>${S.today&&S.today.sugCapped?`<p class="small" style="margin:4px 2px 6px">冰箱裝不下今天的預估需求（約 ${S.today.sugCapped} 份，容量 ${cap}），建議量已按容量縮減，熱門菜可能提早賣完；升級冰箱或冷藏庫可以多放。</p>`:''}<button class="btn sm" data-act="restock" ${restockCost>0?'':'disabled'} style="width:100%">一鍵補到建議量 ${restockCost>0?fmt(restockCost):'（已足夠）'}</button>${(()=>{const off=unlocked.filter(d=>!S.menu.includes(d)&&(S.stock[d]||0)>0);if(!off.length)return'';const n=off.reduce((a,d)=>a+S.stock[d],0);return`<button class="btn sm" data-act="${discardArmed?'discardAll':'discardAsk'}" style="width:100%;margin-top:6px">${discardArmed?`確定退掉這 ${n} 份？（再按一次）`:`退掉不在菜單上的庫存（${n} 份）`}</button>`})()}`:`<p class="muted" style="font-size:12.5px;margin:8px 2px 0">前兩天會自動備料。第 3 天開始可以自己進貨、調整售價。</p>`}
   ${S.day>=2?`<button class="btn sm" data-act="backShop" style="width:100%;margin-top:10px">‹ 返回升級餐廳</button>`:''}
@@ -9838,11 +9946,11 @@ function menuRandom(){const cap=menuCap();const can=d=>S.unlocked.includes(d)&&!
 /* v2.4 rc6 (09:44): the stories that moved today — each page's step dated today (its title and what happened), and the
    restaurant's own chapters; one tap opens the story pages */
 function storyToday(D){const out=[];for(const L of STORY_LINES){let P=null;try{P=lineProgress(L)}catch(e){continue}for(const b of P.done)if(b.d===D){let note='';try{note=(b.k&&beatNote(b.k))||(typeof b.note==='function'?b.note():b.note)||''}catch(e){}out.push({who:lineWho(L),t:b.t,note,k:L.k})}}
- try{for(const [i,C] of restChapters().entries()){if(C.hidden&&C.hidden())continue;for(const b of C.beats)if(b[1]===D)out.push({who:C.t,t:b[0],note:'',k:'ch'+i})}}catch(e){}   /* rc7.2: the chapter's own place on the page */
+ try{for(const [i,C] of restChapters().entries()){if(!chapterShown(C)||(C.hidden&&C.hidden()))continue;for(const b of C.beats)if(b[1]===D)out.push({who:C.t,t:b[0],note:'',k:'ch'+i})}}catch(e){}   /* rc7.2: the chapter's own place on the page */
  return out}
 /* rc7.2 (the player, 22:38: 「結算看故事頁點進去就不會跳到那個故事啊，要從最上面自己找很不方便」): each of the day's stories on the summary
    is a way into its own page — a tap opens the journal at that story (openStory, as the story notice does) */
-function storyTodayHTML(D){const L=storyToday(D);if(!L.length)return'';return`<h3>今天的故事</h3><div class="card stoday">${L.map(x=>`<div class="st-row" data-act="story" data-k="${x.k}" role="button" title="看這一段"><b>${x.who}</b><span>「${String(x.t).replace(/^「|」$/g,'')}」</span>${x.note?`<small>${x.note}</small>`:''}</div>`).join('')}<button class="jmore" data-act="bookStory">看故事頁 ›</button></div>`}
+function storyTodayHTML(D){const L=storyToday(D);if(!L.length)return'';return`<h3>今天的故事</h3><div class="card stoday">${L.map(x=>`<div class="st-row" data-act="story" data-k="${x.k}" role="button" title="看這一段"><b>${String(x.k).startsWith('ch')?x.who:storyLabel(x.who)}</b><span>${beatTitleHTML(x.t)}</span>${x.note?`<small>${x.note}</small>`:''}</div>`).join('')}<button class="jmore" data-act="bookStory">看故事頁 ›</button></div>`}
 /* v2.4 rc6 (09:56): the Lounge's list for tonight, chosen before opening — at least one */
 function wineTonightHTML(){if(!loungeLv())return'';const all=wineAvail();if(!all.length)return'';const off=S.wineOff||{};const on=all.filter(k=>!off[k]);
  return`<h3>Lounge 酒單 <small>今晚倒 ${on.length||all.length} 種${Object.keys(WINES).some(k=>WINES[k].dev&&!wineHas(k))?'・更多在「菜單研發」':''}</small></h3><div class="card wines">${all.map(k=>{const W=WINES[k];const o=!off[k];const lov=lovesOf(k,'g');return`<div class="menu-row wrow ${o?'':'off'}"><img alt="" src="${dishURL(k,'P')}"><div class="nm">${W.n}${lov.length?`<span class="love" title="熟客的最愛">♥ ${lov.map(loveName).join('、')}</span>`:''}<small>${W.story?'JILL\'S KITCHEN × KEN · ':''}${W.cocktail?'調酒':'酒'} · 一杯 ${fmt(priceOf(k))}${W.pn?` · 配${W.pn}`:''}</small></div><button class="tog ${o?'on':''}" data-act="wineT" data-k="${k}" aria-label="${o?'今晚不倒':'今晚倒'}"></button></div>`}).join('')}<p class="small muted" style="margin:6px 2px 2px">Lounge 的客人只會點今晚有倒的酒。在餐廳吃過飯再過來的客人，Lounge 那一單打八折。酒吧小點在上面的菜單裡，不佔名額。</p></div>`}
@@ -9867,11 +9975,11 @@ function dayNotesHTML(s){const W=WEATHER[s.weather]||WEATHER.sun,E=EVENTS[s.even
 function showSummary(){phase='summary';mainScreen='summary';const s=S.lastSummary;if(!s){showShop();return}hud(true);/* v2.2 A5: the wages just left the till — the HUD must say so on this screen, not on the next */
  const topHTML=s.top?`<img alt="" src="${dishURL(s.top,'P')}" style="width:34px;height:34px;vertical-align:middle;margin-right:4px">${DISH(s.top)?DISH(s.top).n:''}`:'—';
  show(`<div class="sheet tall"><div class="sh-top"><div class="ttl"><div class="eyebrow">今日結算</div><h2>DAY ${s.day}</h2><div class="sum-stars">${starsHTML(s.stars)}</div></div><button class="icon-btn" data-act="peek" style="font-weight:800;font-size:11px;width:auto;padding:0 9px">看店裡</button><button class="icon-btn" data-act="book" aria-label="餐廳日誌">${SVG.book}</button></div>
-  <div class="ledger"><div><span>營業額</span><span>${fmt(s.rev)}</span></div><div class="neg"><span>食材成本</span><span>-${fmt(s.cost)}</span></div>${s.wine?`<div class="neg"><span>酒水成本</span><span>-${fmt(s.wine)}</span></div>`:''}${s.wages?`<div class="neg"><span>薪資</span><span>-${fmt(s.wages)}</span></div>`:''}${s.rent?`<div class="neg rent"><span>租金<small>${(s.rentParts||[]).map(p=>`${p[0]} ${fmt(p[1])}`).join('・')}</small></span><span>-${fmt(s.rent)}</span></div>`:''}${s.cfee?`<div class="neg"><span>食材契作</span><span>-${fmt(s.cfee)}</span></div>`:''}${s.piano?`<div class="neg"><span>鋼琴演奏<small>林予安，今晚在 Lounge</small></span><span>-${fmt(s.piano)}</span></div>`:''}${s.ken?`<div class="neg"><span>品酒之夜分潤<small>Ken，品酒客利潤的三成</small></span><span>-${fmt(s.ken)}</span></div>`:''}<div class="pos"><span>小費</span><span>+${fmt(s.tips)}</span></div>${s.bonus?`<div class="pos"><span>任務獎勵</span><span>+${fmt(s.bonus)}</span></div>`:''}<div class="net"><span>今日淨利</span><span style="color:${s.net>=0?'var(--sage)':'#A2412B'}">${s.net>=0?'+':''}${fmt(s.net)}</span></div>${s.loan>0?`<div class="pos loan"><span>秀琴阿姨借的<small>結算時錢超過 $20,000 就會還她</small></span><span>+${fmt(s.loan)}</span></div>`:s.loan<0?`<div class="neg loan"><span>還秀琴阿姨</span><span>-${fmt(-s.loan)}</span></div>`:''}</div>
+  <div class="ledger"><div><span>營業額</span><span>${fmt(s.rev)}</span></div><div class="neg"><span>食材成本</span><span>-${fmt(s.cost)}</span></div>${s.wine?`<div class="neg"><span>酒水成本</span><span>-${fmt(s.wine)}</span></div>`:''}${s.wages?`<div class="neg"><span>薪資</span><span>-${fmt(s.wages)}</span></div>`:''}${s.rent?`<div class="neg rent"><span>租金<small>${(s.rentParts||[]).map(p=>`${p[0]} ${fmt(p[1])}`).join('・')}</small></span><span>-${fmt(s.rent)}</span></div>`:''}${s.cfee?`<div class="neg"><span>食材契作</span><span>-${fmt(s.cfee)}</span></div>`:''}${s.piano?`<div class="neg"><span>鋼琴演奏<small>林予安，今晚在 Lounge</small></span><span>-${fmt(s.piano)}</span></div>`:''}${s.ken?`<div class="neg"><span>品酒之夜分潤<small>Ken，品酒客利潤的三成</small></span><span>-${fmt(s.ken)}</span></div>`:''}<div class="pos"><span>小費</span><span>+${fmt(s.tips)}</span></div>${s.bonus?`<div class="pos"><span>任務獎勵</span><span>+${fmt(s.bonus)}</span></div>`:''}${s.insp?`<div class="${s.insp>0?'pos':'neg'}"><span>衛生檢查${s.insp>0?'獎勵':'罰款'}</span><span>${s.insp>0?'+':'-'}${fmt(Math.abs(s.insp))}</span></div>`:''}<div class="net"><span>今日淨利</span><span style="color:${s.net>=0?'var(--sage)':'#A2412B'}">${s.net>=0?'+':''}${fmt(s.net)}</span></div>${s.loan>0?`<div class="pos loan"><span>秀琴阿姨借的<small>結算時錢超過 $20,000 就會還她</small></span><span>+${fmt(s.loan)}</span></div>`:s.loan<0?`<div class="neg loan"><span>還秀琴阿姨</span><span>-${fmt(-s.loan)}</span></div>`:''}</div>
   ${dayNotesHTML(s)}
   ${s.r1!=null?(()=>{const up=s.r1>s.r0+.004,dn=s.r1<s.r0-.004;const F=(s.story||[]).map(x=>x.label?x:{label:x.t,value:'',sub:'',s:x.s});const pos=F.filter(x=>x.s>0).slice(0,3),neg=F.filter(x=>x.s<0).slice(0,3);
    const row=x=>`<div class="rf"><span class="rf-k">${x.label}</span><span class="rf-v">${x.value}</span>${x.sub?`<small class="rf-s">${x.sub}</small>`:''}</div>`;
-   const nl=LEVELS[S.level];const gate=nl?(s.r1>=nl.rating?`已達擴建到 ${nl.n} 的門檻 ${nl.rating.toFixed(1)}`:`擴建到 ${nl.n} 需要 ${nl.rating.toFixed(1)}，還差 ${(nl.rating-s.r1).toFixed(2)}`):'';
+   const nl=LEVELS[S.level];const gate=nl&&nl.rating>0?(s.r1>=nl.rating?`已達擴建到 ${nl.n} 的門檻 ${nl.rating.toFixed(1)}`:`擴建到 ${nl.n} 需要 ${nl.rating.toFixed(1)}，還差 ${(nl.rating-s.r1).toFixed(2)}`):'';
    return`<div class="card rating"><div class="rl"><span>餐廳評分</span><b>${(s.r0||3).toFixed(2)} <i>→</i> ${s.r1.toFixed(2)}</b><em class="${up?'up':dn?'dn':''}">${up?'↑':dn?'↓':'→'}</em></div>
     ${pos.length||neg.length?`<div class="rfs">${neg.length?`<div class="rfg dn"><div class="rfg-h">扣分</div>${neg.map(row).join('')}</div>`:''}${pos.length?`<div class="rfg up"><div class="rfg-h">加分</div>${pos.map(row).join('')}</div>`:''}</div>`:'<p class="muted" style="margin:4px 0 0">今天沒有明顯影響評分的事。</p>'}${gate?`<small>${gate}</small>`:''}</div>`})():''}
   ${s.recs&&s.recs.length?`<div class="recs"><span class="recs-h">🏆 今天創了紀錄</span>${s.recs.map(k=>`<span class="recchip">${REC_N[k]}</span>`).join('')}</div>`:''}
@@ -9887,7 +9995,9 @@ function showSummary(){phase='summary';mainScreen='summary';const s=S.lastSummar
   ${goalLadderHTML()}
   ${nextDayNote(s.day+1)?`<div class="news" style="margin-top:14px">明天：${nextDayNote(s.day+1)}</div>`:''}
   <div class="footer"><button class="btn primary big" data-act="toShop">晚上升級餐廳</button></div></div>`);if(s.net>0)sfx.cash()}
-function nextDayNote(D){return{2:'解鎖 <b>拿鐵咖啡</b>',3:'第二口 <b>爐子</b> 到貨，還有 <b>番茄義大利麵</b>',4:'冷盤台與 <b>田園沙拉</b>，以及第一次 <b>Rush Hour</b>',5:'晚上可以開始 <b>裝潢與擴建</b> 了',6:'可以聘請 <b>員工</b>，評論家也可能出現',8:'可以研發 <b>Jill 的招牌菜</b>'}[D]||''}
+/* audit WS1-09 (2026-10-06): each on the evening the shop really opens it (shopTabs: decor, expansion and staff from evening 4,
+   the signature from evening 7) — it said each a day late */
+function nextDayNote(D){return{2:'解鎖 <b>拿鐵咖啡</b>',3:'第二口 <b>爐子</b> 到貨，還有 <b>番茄義大利麵</b>',4:'冷盤台與 <b>田園沙拉</b>，以及第一次 <b>Rush Hour</b>；晚上可以開始 <b>裝潢與擴建</b>，也可以聘請 <b>員工</b>',6:'評論家可能出現',7:'晚上可以研發 <b>Jill 的招牌菜</b>'}[D]||''}
 
 let shopTab='kitchen';
 /* the shop belongs to the evening: opened again from the next morning's preparation, it still counts as that evening */
@@ -9895,7 +10005,7 @@ function shopDay(){return S.phase==='prep'&&phase==='shop'?S.day-1:S.day}
 /* v2.2 H: the shop in three big rooms of its own — 家具與佈置 (what the place looks like), 店舖工程 (what changes the
    place), 貓咪生活 (the cats' things) — plus the kitchen, the research, the staff and the signature. Every item that was
    in the old eight tabs is still here; the old tab keys still open the right page. */
-function shopTabs(){const D=shopDay();return[{k:'home',n:'家具與佈置',on:true},{k:'works',n:'店舖工程',on:D>=3},{k:'social',n:'社群與宣傳',on:D>=6},{k:'catlife',n:'貓咪生活',on:D>=4},{k:'kitchen',n:'廚房設備',on:D>=2},{k:'menu',n:'菜單研發',on:D>=2},{k:'staff',n:'員工',on:D>=4},{k:'sig',n:'招牌菜',on:D>=7}]}
+function shopTabs(){const D=shopDay();return[{k:'home',n:'家具與佈置',from:1},{k:'works',n:'店舖工程',from:3},{k:'social',n:'社群與宣傳',from:6},{k:'catlife',n:'貓咪生活',from:4},{k:'kitchen',n:'廚房設備',from:2},{k:'menu',n:'菜單研發',from:2},{k:'staff',n:'員工',from:4},{k:'sig',n:'招牌菜',from:7}].map(t=>Object.assign(t,{on:D>=t.from}))}
 const SHOP_TAB_MAP={tables:'home',decor:'home',projects:'works',cats:'catlife'};
 function secTables(money,btn){const cap=tableCap();const next=S.tables<cap?TABLE_COST[S.tables]:null;let body='';
   body+=`<div class="item"><img alt="" src="${iconURL('table')}"><div class="nm">餐桌 <span class="muted" style="font-weight:600;font-size:12px">${S.tables} / ${cap} 張</span></div><div class="d">多一張桌子，同時就能多接待一組客人。${S.decor.sofa?`其中 ${S.decor.sofa*2} 張是四人卡座。`:''}</div><div class="act">${next!=null?btn(next,'buyTable','','加一張桌子'):LEVELS[S.level]?`<span class="lock">這個規模最多 ${cap} 張，擴建後可以再加</span>`:`<span class="lock">${cap} 張是 JILL 的極限。想接待更多人：沙發卡座、候位區、動線。</span>`}</div></div>`;
@@ -10005,19 +10115,19 @@ function showShop(){phase='shop';mainScreen='shop';R=null;rdAutoUnlock();IDLE=ma
   else body+=`<div class="item"><img alt="" src="${dishURL('signature','P')}"><div class="nm">Jill's Signature Dish</div><div class="d">從主食、蛋白質、醬汁、配菜組出一道只屬於 Jill 的料理。會出現在菜單最上方，客人也會專程為它而來（客流 +10%）。</div><div class="act">${S.level<2?'<span class="lock">需要擴建到 Jill\'s Bistro</span>':btn(3000,'sigOpen','','開始研發')}</div></div>`;
   /* v2.2.1 #16: the second signature — a dessert of Jill's own, plated at the 冷盤台, with its own versions */
   if(S.sigDessert)body+=`<div class="sig sigd"><img alt="" src="${dishURL('sigdessert','P')}"><div><div class="st">★ JILL'S SIGNATURE DESSERT ★</div><b>${S.sigDessert.name}</b><small>${fmt(priceOf('sigdessert'))} · ${Object.keys(SIGD).map(k=>SIGD[k][S.sigDessert[k]].n).join('・')}</small><small style="display:block;margin-top:3px">${sigDLv()>=3?'第三版 · 糖絲與金箔':sigDLv()===2?`第二版 · 果泥畫盤與薄荷 · 賣到 ${SIGD_EVO[2]} 份升第三版（目前 ${sigDSold()}）`:`第一版 · 賣到 ${SIGD_EVO[1]} 份升第二版（目前 ${sigDSold()}）`}</small></div></div><p class="muted" style="font-size:12.5px">招牌甜點排在招牌菜下面，為招牌菜來的客人多半會把它一起點了；在冷盤台冷作擺盤。賣得夠多，盤子會越做越講究。可以花 $800 重新調整配方。</p>${btn(800,'sigdOpen','','重新設計')}`;
-  else body+=`<div class="item"><img alt="" src="${dishURL('sigdessert','P')}"><div class="nm">Jill's Signature Dessert</div><div class="d">從底、奶餡、水果、點綴組出一道 Jill 自己的甜點：在冷盤台冷作擺盤，排在招牌菜下面，為招牌菜來的客人多半會一起點。有自己的版本進程。</div><div class="act">${!S.signature?'<span class="lock">先研發招牌菜</span>':S.level<3?'<span class="lock">需要擴建到 Jill\'s Kitchen</span>':stationCap('prep')<=0?'<span class="lock">需要冷盤台（廚房設備）</span>':btn(4000,'sigdOpen','','開始研發')}</div></div>`}
+  else body+=`<div class="item"><img alt="" src="${dishURL('sigdessert','P')}"><div class="nm">Jill's Signature Dessert</div><div class="d">從底、奶餡、水果、點綴組出一道 Jill 自己的甜點：在冷盤台冷作擺盤，排在招牌菜下面，為招牌菜來的客人多半會一起點。有自己的版本進程。</div><div class="act">${!S.signature?'<span class="lock">先研發招牌菜</span>':S.level<3?'<span class="lock">需要擴建到 '+LEVELS[2].n+'</span>':stationCap('prep')<=0?'<span class="lock">需要冷盤台（廚房設備）</span>':btn(4000,'sigdOpen','','開始研發')}</div></div>`}
  show(`<div class="sheet tall"><div class="sh-top"><div class="ttl"><div class="eyebrow">${S.phase==='prep'?`DAY ${S.day} · 開店前`:`DAY ${S.day} · 打烊後`}</div><h2>升級 Jill 的餐廳</h2></div>${topIcons()}</div>
   <div class="row" style="margin-bottom:6px"><span class="muted" style="font-weight:700">目前現金</span><span class="moneytag">${fmt(S.money)}</span><span style="margin-left:auto" class="muted">評分 ${rating().toFixed(1)}</span></div>
   ${(()=>{const est=restockEstimate(),keep=keepAside();const low=S.money<keep;const when=S.phase==='prep'?'今天':'明日';return`<div class="budget ${low?'low':''}"><span>${when}預估基本備料 約 ${fmt(est)}</span><span>建議保留 約 ${fmt(keep)}</span>${low?`<span class="w">⚠ 現在的現金可能不夠完成建議備料，${when}可以少備一點或臨時叫貨</span>`:''}</div>`})()}
-  <div class="tabs">${tabs.map(t=>`<button class="${t.k===shopTab?'on':''}" data-act="tab" data-k="${t.k}" ${t.on?'':'disabled'}>${t.n}</button>`).join('')}</div>
+  <div class="tabs">${tabs.map(t=>`<button class="${t.k===shopTab?'on':''}${t.on?'':' off'}" data-act="tab" data-k="${t.k}" ${t.on?'':'aria-disabled="true"'}>${t.n}</button>`).join('')}</div>
   <div class="card">${body}</div>
   <div class="footer">${S.phase==='prep'?`<button class="btn primary big" data-act="toPrep">回到開店準備 ›</button>`:`<button class="btn primary big" data-act="nextDay">準備 DAY ${S.day+1}</button>`}</div></div>`);try{upPlanPaint()}catch(e){console.warn('[plan]',e)}}
 
 let sigDraft=null,sigKind='m';   /* 'm' the main signature, 'd' the dessert (v2.2.1 #16) — one designer, two tables */
 function sigT(){return sigKind==='d'?{T:SIGD,N:SIGD_CAT_N,id:'sigdessert',key:'sigDessert',base:150,eyebrow:"Jill's Signature Dessert",title:'設計招牌甜點',st:"★ JILL'S SIGNATURE DESSERT ★",how:'在冷盤台冷作擺盤：底、奶餡、水果、點綴',make:4000,mk:'研發招牌甜點 $4,000'}:{T:SIG,N:SIG_CAT_N,id:'signature',key:'signature',base:320,eyebrow:"Jill's Signature Dish",title:'設計招牌菜',st:"★ CHEF JILL'S SIGNATURE ★",how:'在爐台用平底鍋煎，看準時機起鍋',make:3000,mk:'研發招牌菜 $3,000'}}
-function showSig(){sub='sig';const d=sigDraft;const K=sigT();const old=S[K.key];S[K.key]=d;DCACHE.clear();const url=dishCanvas(K.id,'P',220,S.decor.ware>0);S[K.key]=old;DCACHE.clear();const price=K.base+Object.keys(K.T).reduce((a,k)=>a+K.T[k][d[k]].p,0);const has=!!S[K.key];
+function showSig(){sub='sig';const d=sigDraft;const K=sigT();const old=S[K.key];S[K.key]=d;DCACHE.clear();const url=dishCanvas(K.id,'P',220,S.decor.ware>0);S[K.key]=old;DCACHE.clear();const price=K.base+Object.keys(K.T).reduce((a,k)=>a+K.T[k][d[k]].p,0);/* audit WS2-11: the price the menu will charge for this recipe — with its level, its stars and the player's own price (it said the recipe's base: $610 for a $940 dish) */let shown=price;{const o=S[K.key];S[K.key]=d;try{shown=priceOf(K.id)}catch(e){}finally{S[K.key]=o}}const has=!!S[K.key];
  show(`<div class="sheet tall"><div class="sh-top"><div class="ttl"><div class="eyebrow">${K.eyebrow}</div><h2>${K.title}</h2></div><button class="btn sm" data-act="closeSub">取消</button></div>
-  <div class="sigprev"><canvas id="sigCv" width="220" height="220"></canvas><div><div class="eyebrow">${K.st}</div><div style="font-family:var(--disp);font-size:19px;margin:4px 0">${d.name}</div><div class="muted" style="font-size:12.5px">售價 ${fmt(price)} · ${K.how}</div></div></div>
+  <div class="sigprev"><canvas id="sigCv" width="220" height="220"></canvas><div><div class="eyebrow">${K.st}</div><div style="font-family:var(--disp);font-size:19px;margin:4px 0">${d.name}</div><div class="muted" style="font-size:12.5px">售價 ${fmt(shown)} · ${K.how}</div></div></div>
   ${Object.keys(K.T).map(cat=>`<h3>${K.N[cat]}</h3><div class="opts">${Object.keys(K.T[cat]).map(k=>`<button class="${d[cat]===k?'on':''}" data-act="sigPick" data-c="${cat}" data-k="${k}">${K.T[cat][k].n}<small>+${K.T[cat][k].p}</small></button>`).join('')}</div>`).join('')}
   <h3>${sigKind==='d'?'甜點名':'菜名'}</h3><input class="txt" id="sigName" maxlength="18" value="${d.name.replace(/"/g,'&quot;')}">
   <div class="footer"><button class="btn primary big" data-act="sigMake" ${S.money>=(has?800:K.make)?'':'disabled'}>${has?'更新配方 $800':K.mk}</button></div></div>`);
@@ -10055,10 +10165,10 @@ function storyEvents(){const ev=[{day:1,t:'開店。第一天。',ic:'signlamp'}
  const seen=new Set();return ev.filter(e=>e.day>0&&e.day<=S.day&&!seen.has(e.day+e.t)&&seen.add(e.day+e.t)).sort((a,b)=>a.day-b.day)}
 function weekOf(day){return Math.floor((day-1)/7)+1}
 function albumStoryHTML(){try{firstPhotoMig()}catch(e){}const A=albumList().slice().sort((a,b)=>a.day-b.day);const ev=storyEvents();const wk=weekOf(S.day);const weeks=[];for(let w=1;w<=wk;w++){const ph=A.filter(p=>weekOf(p.day)===w),ee=ev.filter(e=>weekOf(e.day)===w);if(ph.length||ee.length||w===wk)weeks.push({w,ph,ee})}
- const cats=CATS?CATS.filter(c=>!c.hidden).length:CAT_DEF.length;const today=`<div class="story-now"><span class="when">DAY ${S.day}${S.today&&S.today.day===S.day&&WEATHER[S.today.weather]?' · '+WEATHER[S.today.weather].n:''}</span><b>今天。</b><span>營業了 ${S.stats.days||0} 天，店還開著。${cats} 隻貓都在，${S.crew.length?`${S.crew.length} 位員工，`:''}熟客 ${REGS.filter(r=>(S.regulars[r.id]||0)>=4).length} 位。還在繼續。</span></div>`;
+ const cats=CAT_DEF.length;   /* audit N01 (2026-10-06): the five cats are always there (PROJECT_MEMORY §4) — not the ones the dining room shows right now */const today=`<div class="story-now"><span class="when">DAY ${S.day}${S.today&&S.today.day===S.day&&WEATHER[S.today.weather]?' · '+WEATHER[S.today.weather].n:''}</span><b>今天。</b><span>營業了 ${S.stats.days||0} 天，店還開著。${cats} 隻貓都在，${S.crew.length?`${S.crew.length} 位員工，`:''}熟客 ${REGS.filter(r=>(S.regulars[r.id]||0)>=4).length} 位。還在繼續。</span></div>`;
  if(!A.length&&ev.length<=1)return `<div class="card"><p class="muted" style="margin:0">還沒有留下任何畫面。</p></div>`+today;
  let i=0;return weeks.map(({w,ph,ee})=>{const d0=(w-1)*7+1,d1=Math.min(S.day,w*7);const evH=ee.length?`<div class="story-ev">${ee.map(e=>`<div><img alt="" src="${iconURL(e.ic||'star')}"><span class="when">DAY ${e.day}</span><span>${e.t}</span></div>`).join('')}</div>`:'';
-  return`<div class="story-week" ${w===wk?'id="story-thisweek"':''}><div class="jt story-h">第 ${w} 週 <span class="muted">DAY ${d0}–${d1}${w===wk?' · 這一週':''}</span></div>${evH}${ph.length?`<div class="album">${ph.map(p=>albumFigure(p,i++)).join('')}</div>`:''}</div>`}).join('')+today}
+  return`<div class="story-week" ${w===wk?'id="story-thisweek"':''}><div class="jt story-h">第 ${w} 週 <span class="muted">DAY ${d0}${d1>d0?`–${d1}`:''}${w===wk?' · 這一週':''}</span></div>${evH}${ph.length?`<div class="album">${ph.map(p=>albumFigure(p,i++)).join('')}</div>`:''}</div>`}).join('')+today}
 /* v2.2.1 #4: two ways into the album. The journal's tab reads from the beginning (the restaurant's history); the
    settlement's 看最新相片 lands on today's photos — the newest polaroid in view, no scrolling from Day 1. */
 function albumScrollLatest(){const sh=screenEl.querySelector('.sheet');if(!sh)return;const A=albumList();const last=A.length?A.reduce((a,p)=>p.day>a.day?p:a,A[0]):null;const el=(last&&screenEl.querySelector(`.polaroid[data-k="${last.id}"]`))||screenEl.querySelector('#story-thisweek')||screenEl.querySelector('.story-now');if(!el)return;const top=el.getBoundingClientRect().top-sh.getBoundingClientRect().top+sh.scrollTop;sh.scrollTop=Math.max(0,top-72)}
@@ -10077,7 +10187,7 @@ function showBook(){sub='book';let body='';if(bookTab==='social'&&shopDay()<6)bo
   +(()=>{const v=S.regulars.dylan||0;if(!v)return'';const rv=S.dylan.stage>=3;const tier=regTier(v);return`<div class="reg">${regFaceHTML('dylan',true,portraitURL(DYLAN.looks,'regdylan'))}<div><b>Dylan</b> <span class="tier ${rv?'t2':'t'+Math.floor(tier)}">${rv?'Jill 的先生':TIER_N[tier]}</span></div><p>${rv?DYLAN.who2:DYLAN.who}<br>來店 ${v} 次${rv?`・DAY ${S.dylan.reveal}`:''}</p></div>`})()+'</div>'+namedGuestsHTML()}
  if(bookTab==='rest'){const nl=LEVELS[S.level];const wages=crewWages();const last=S.lastSummary;
   body=`<div class="jsec" style="margin-top:0;padding-top:0;border-top:0"><div class="jt">評分走勢 <span class="muted" style="font-weight:600;font-size:12px">最近 14 天</span></div>${ratingHistHTML()}
-   <p class="muted" style="font-size:12px;margin:8px 0 0">評分＝最近 40 則評論的平均（評論家 ×3、檢查員 ×2）。客人給幾顆星看四件事：料理品質、等了多久、價格合不合理、店裡的氛圍；生氣離開一律一顆星，客滿沒等到的人有時留兩顆星。${nl?`擴建到 ${nl.n} 需要 ${nl.rating.toFixed(1)}。`:'這已經是最大的規模。'}</p></div>
+   <p class="muted" style="font-size:12px;margin:8px 0 0">評分＝最近 40 則評論的平均（評論家 ×3、檢查員 ×2）。客人給幾顆星看四件事：料理品質、等了多久、價格合不合理、店裡的氛圍；生氣離開一律一顆星，客滿沒等到的人有時留兩顆星。${nl?(nl.rating>0?`擴建到 ${nl.n} 需要 ${nl.rating.toFixed(1)}。`:''):'這已經是最大的規模。'}</p></div>
    <div class="jsec"><div class="jt">餐廳紀錄</div>${recordsHTML()}</div>
    <div class="jsec"><div class="jt">員工與開銷</div><div class="card">${(S.crew||[]).length?(S.crew||[]).map(m=>`<div class="srow"><b>${m.name}</b><span>${ROLES[m.role].n} LV${m.lv}・${DUTY_N[m.duty]||m.duty}</span><small>日薪 ${fmt(crewWage(m))}</small></div>`).join('')+`<div class="srow tot"><b>每日薪資</b><span>${fmt(wages)}${last&&last.rev?`（昨天營業額的 ${Math.round(wages/last.rev*100)}%）`:''}</span></div>`:'<p class="muted" style="margin:0">還沒有員工。</p>'}</div>
    <div class="card" style="margin-top:8px"><div class="srow"><b>開業</b><span>${S.stats.days||0} 天・${S.stats.guests||0} 位客人</span></div><div class="srow"><b>累積收入</b><span>${fmt(S.lifetime||0)}</span></div>${last?`<div class="srow"><b>昨天</b><span>營業額 ${fmt(last.rev)}・食材 ${fmt(last.cost)}・薪資 ${fmt(last.wages)}・淨利 ${fmt(last.net)}</span></div>`:''}</div></div>`}
@@ -10109,7 +10219,7 @@ function saveCardHTML(){const cp=S.checkpoint&&S.checkpoint.day===S.day?S.checkp
  ${phase==='service'&&R&&R.closing==null?`<p class="small">營業中每 20 秒、暫停時、切到別的 App 時都會存下目前的店內狀況（客人、訂單、爐上的菜、Jill 和員工）。下次開啟可以從這個時間點繼續。</p><button class="btn" style="width:100%;margin-top:8px" data-act="save">儲存目前進度</button>`:`<p class="small">每天打烊、購買升級後都會自動存檔${cp?`；今天營業到一半的進度（${cp.clock}）也還在`:''}。</p><button class="btn" style="width:100%;margin-top:8px" data-act="save">存檔</button>`}</div>
  <div class="card" style="margin-top:10px"><div class="setrow"><span><b>備份與移轉</b></span></div><p class="small">換手機、換瀏覽器、以防萬一：把進度存成一個檔案，之後再讀回來。</p>
  <div class="row" style="margin-top:8px"><button class="btn" style="flex:1" data-act="export">備份到檔案</button><button class="btn" style="flex:1" data-act="import">從備份檔恢復</button></div>
- <div class="row" style="margin-top:8px"><button class="btn sm" style="flex:1" data-act="copyBackup">複製備份文字</button><button class="btn sm" style="flex:1" data-act="pasteBackup">貼上備份文字恢復</button></div></div>`}
+ <div class="row" style="margin-top:8px"><button class="btn sm" style="flex:1" data-act="pasteBackup">貼上以前的備份文字恢復</button></div></div>`}   /* audit WS2-14: no 「複製備份文字」 — the user, 2026-10-02: 「按複製直接當機」「不能用文字方式這樣只會當機」; PROJECT_MEMORY §10: 不要再用「文字框複製」做備份. A text saved before still comes back */
 function showPause(){sub='pause';show(`<div class="modal"><h2>暫停中</h2><p>DAY ${S.day} · ${clockStr()} · 目前營業額 ${fmt(R?R.st.rev:0)}</p>
  <div class="stack"><button class="btn primary big" data-act="resume">繼續營業</button></div>
  <div class="card" style="margin-top:10px"><div class="setrow"><span>營業速度</span><span class="seg">${SPEEDS.map(v=>`<button class="${simSpeed()===v?'on':''}" data-act="speed" data-k="${v}">${v}×</button>`).join('')}</span></div><p class="small" style="margin:6px 0 0">慢一點可以好好看菜和店裡的動靜；快一點是等菜的時候用。點上方的時間也可以切換。</p></div>
@@ -10120,6 +10230,8 @@ function closeSub(){sub=null;if(phase==='service'){if(bookFromNote){bookFromNote
 
 let startWarned=false,discardArmed=false;
 screenEl.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;audioInit();doAct(b.dataset.act,b.dataset.d,b.dataset.k,b)});
+/* a tab strip's fades follow its scroll: one listener for every strip the screen will ever draw (scroll does not bubble; it is caught on the way down) */
+screenEl.addEventListener('scroll',e=>{const s=e.target;if(s&&s.classList&&s.classList.contains('tabs'))tabsEdge(s)},{capture:true,passive:true});
 {const dl=$('#dlg');if(dl)dl.addEventListener('click',e=>{e.preventDefault();audioInit();sfx.tap();dlgNext()})}
 function doAct(a,d,k,b){const money0=S.money;try{doAct0(a,d,k,b)}finally{if(S.money!==money0)hud(true)}}
 function doAct0(a,d,k,b){
@@ -10138,12 +10250,16 @@ function doAct0(a,d,k,b){
  case'price':{const steps=[.8,.9,1,1.1,1.2,1.3,1.5];let i=steps.indexOf(S.price[d]||1);if(i<0)i=2;i=clamp(i+(+b.dataset.v),0,steps.length-1);S.price[d]=steps[i];sfx.tap();save();keepScroll(showPrep,`.menu-row [data-act=toggle][data-d="${d}"]`);break}
  case'stock':{const want=+b.dataset.v;const ok=buyStock(d,want);const q=buyStock.last||{};if(!ok)toast(stockFailText(d,q),'warn');else{sfx.tap();if(want>0&&q.n<want)toast(`只進了 ${q.n} 份：${q.why==='cap'?'冰箱空間不足':'錢不夠再多'}`)}save();keepScroll(showPrep,`.menu-row [data-act=toggle][data-d="${d}"]`);break}
  case'stockTo':{/* v2.2: to the suggested amount, or 補滿 (as many as the fridge and the money allow) */const mode=b.dataset.k;const cur=S.stock[d]||0;const want=mode==='max'?999:Math.max(0,(suggestStock()[d]||0)-cur);if(want<=0){toast(mode==='max'?'冰箱已經放不下了':'已經達到建議量');break}const ok=buyStock(d,want);const q=buyStock.last||{};if(!ok)toast(stockFailText(d,q),'warn');else{sfx.buy();if(mode!=='max'&&q.n<want)toast(`只進了 ${q.n} 份：${q.why==='cap'?'冰箱空間不足':'錢不夠再多'}`)}save();keepScroll(showPrep,`.menu-row [data-act=toggle][data-d="${d}"]`);break}
- case'restock':{const sug=suggestStock();for(const x in sug){const need=sug[x]-(S.stock[x]||0);if(need>0)buyStock(x,need)}sfx.buy();save();keepScroll(showPrep);break}
- case'start':{const empty=menuList().filter(x=>(S.stock[x]||0)===0);if(feat().stock&&empty.length&&!startWarned){startWarned=true;$('#startWarn').innerHTML=`<div class="inline-warn">${empty.map(x=>DISH(x).n).join('、')} 沒有備料，客人點了要臨時叫貨（1.5 倍價、要等）。再按一次直接開店。</div>`;break}startWarned=false;clearCheckpoint();save();startService();break}
+ case'restock':{const sug=suggestStock(),m0=S.money;for(const x in sug){const need=sug[x]-(S.stock[x]||0);if(need>0)buyStock(x,need)}
+  /* audit WS2-04: a press that cannot fill every dish says why (the fridge full after 「補滿」 on one dish; the money) */
+  const short=Object.keys(sug).filter(x=>(S.stock[x]||0)<sug[x]);if(short.length){const q=stockQuote(short[0],sug[short[0]]-(S.stock[short[0]]||0));const names=short.slice(0,3).map(dishName).join('、')+(short.length>3?` 等 ${short.length} 道`:'');
+   toast(q.why==='money'?`錢不夠：${names}還沒補到建議量。`:`冰箱滿了（${stockTotal()}/${fridgeCap()}）：${names}補不到建議量。先在放太多的那道按「−」退一點，或退掉不在菜單上的庫存。`,'warn')}
+  if(S.money!==m0)sfx.buy();save();keepScroll(showPrep);break}
+ case'start':{const empty=menuList().filter(x=>(S.stock[x]||0)===0);if(feat().stock&&!jillStocks()&&empty.length&&!startWarned){startWarned=true;$('#startWarn').innerHTML=`<div class="inline-warn">${empty.map(x=>DISH(x).n).join('、')} 沒有備料：今晚客人點不到，店也不會自己叫貨。再按一次直接開店。</div>`;break}startWarned=false;clearCheckpoint();save();startService();break}
  case'toShop':showShop();break;
  case'backShop':showShop();break;
  case'toPrep':showPrep();break;
- case'tab':shopTab=k;sfx.tap();showShop();break;
+ case'tab':{const t=shopTabs().find(x=>x.k===k);if(t&&!t.on){toast(`「${t.n}」第 ${t.from} 天打烊後開放。`);break}/* audit WS1-07: a grey tab says when it opens (it said nothing) */shopTab=k;sfx.tap();showShop();break}
  case'buyTable':{const c=TABLE_COST[S.tables];if(S.money>=c&&S.tables<tableCap()){S.money-=c;S.tables++;sfx.buy();toast('新桌子搬進來了！');save();IDLE=null;showShop();shopAfterBuy()}break}
  case'buySideTable':{const n=S.sideTables||0;const c=SIDE_TABLE_COST[n];if(projOn('side')&&c!=null&&S.money>=c){S.money-=c;S.sideTables=n+1;sfx.buy();toast('側廳多了一張桌子');save();IDLE=null;keepScroll(showShop);shopAfterBuy()}break}
  case'buySideBooth':{const b=S.sideBooths|0;const c=SIDE_BOOTH_COST[b];if(!projOn('side')||c==null||(S.sideTables||0)<(b+2)*3||S.money<c)break;S.money-=c;S.sideBooths=b+1;save();IDLE=null;bg=null;for(const kk in BGC)delete BGC[kk];

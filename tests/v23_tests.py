@@ -119,23 +119,23 @@ def sophie_and_baobao_the_arc_runs_on_real_conditions_and_leaves_a_pad_a_fact_an
         g.ev("(()=>{const c=catBy('mei');const t=R.tables[%d];c.hidden=false;c.perch=-1;c.sofa=null;c.st='rest';c.x=%s;c.y=%s})()" % (ti, 't.x+30' if cat_near else '40', 't.y+14' if cat_near else 'FB-12'))
         return ti
     # beat 1: the cat is near her and she looks at it (the game's own event)
-    day_with_sophie(True); g.ev("catEv(R.groups.find(q=>q.reg==='sophie'),'look',catBy('mei'))"); g.ev("__tick(2500)")
+    day_with_sophie(True); g.ev("catEv(R.groups.find(q=>q.reg==='sophie'),'look',catBy('mei'))"); g.ev("__tick(2500);__talkFor(2.5)")
     check(g.ev("evDone('sophie_mei_1')"), 'beat 1 fired when 寶寶 was really near her')
     check(g.ev("S.dayLog.concat(R.log||[]).some(l=>/不要讓牠靠我的包/.test(l.t))") or g.ev("(R.log||[]).some(l=>/不要讓牠靠我的包/.test(l.t))"), 'she said it')
     # not again the same visit, and beat 2 not yet (visits)
     g.ev("catEv(R.groups.find(q=>q.reg==='sophie'),'pet',catBy('mei'))"); check(g.ev("evState('sophie_mei_1').n") == 1, 'once')
     g.ev("S.day++;storyDay()"); day_with_sophie(False); check(not g.ev("evDone('sophie_mei_2')"), 'beat 2 waits for three more visits')
     # three visits later, the cat away: beat 2
-    g.ev("S.regulars.sophie+=3;S.day++"); day_with_sophie(False); g.ev("__tick(4000)")
+    g.ev("S.regulars.sophie+=3;S.day++"); day_with_sophie(False); g.ev("__tick(4000);__talkFor(8)")   # (audit N04: her question waits for the greeting to be said)
     check(g.ev("evDone('sophie_mei_2')"), 'beat 2 fired on a visit without the cat')
     g.ev("S.day++"); day_with_sophie(True); g.ev("catEv(R.groups.find(q=>q.reg==='sophie'),'look',catBy('mei'))"); check(not g.ev("evDone('sophie_mei_3')"), 'beat 3 waits for two more visits')
     # the cat's own choice is weighted toward her table while beat 3 is pending
     g.ev("S.regulars.sophie+=2"); check(g.ev("!!storyCatPull(catBy('mei'))"), 'storyCatPull points 寶寶 at her table (a weight, not a move)')
-    g.ev("S.day++"); day_with_sophie(True); g.ev("catEv(R.groups.find(q=>q.reg==='sophie'),'look',catBy('mei'))"); g.ev("__tick(1500)")
+    g.ev("S.day++"); day_with_sophie(True); g.ev("catEv(R.groups.find(q=>q.reg==='sophie'),'look',catBy('mei'))"); g.ev("__tick(1500);__talkFor(8)")   # (audit N04: after the greeting)
     check(g.ev("evDone('sophie_mei_3')") and g.ev("relN('sophie','mei','sat_near')") == 1, 'beat 3 fired with the cat near again')
     # beat 4 at her checkout, two visits later: the pad, the fact, the photo
     n0 = g.ev("albumList().length"); g.ev("S.regulars.sophie+=2;S.day++"); ti = day_with_sophie(False)
-    g.ev("(()=>{const q=R.groups.find(x=>x.reg==='sophie');q.ticket={id:R.tkid++,no:1,g:q,items:[{d:'friedrice',st:'served',q:'P',want:0,picked:true}],t0:R.t};q.state='check';R.tickets.push(q.ticket);collect(q)})()"); g.page.wait_for_timeout(200)
+    g.ev("(()=>{const q=R.groups.find(x=>x.reg==='sophie');q.ticket={id:R.tkid++,no:1,g:q,items:[{d:'friedrice',st:'served',q:'P',want:0,picked:true}],t0:R.t};q.state='check';R.tickets.push(q.ticket);collect(q)})()"); g.page.wait_for_timeout(200); g.ev("__talkFor(14)")   # (audit N04: the beat waits for the exchange being said when she pays; N10: the photo a moment after its last line)
     check(g.ev("evDone('sophie_mei_4')") and g.ev("gearOn('sophiepad')") and g.ev("S.gearFrom.sophiepad") == 'sophie', 'beat 4: the pad is in the room, from Sophie')
     check(g.ev("regMem('sophie').facts.some(f=>/小貓墊/.test(f.txt))"), 'her card carries the fact')
     check(g.ev("albumList().length") == n0 + 1 and g.ev("albumList().slice(-1)[0].kind") == 'story:sophie_mei' and g.ev("albumList().slice(-1)[0].story") == 1 and g.ev("albumList().slice(-1)[0].keep") is True, 'one Story Photo, kept')
@@ -259,36 +259,38 @@ def the_lounge_has_an_origin_ken_wine_a_tasting_and_a_project_that_never_disappe
     check(g.ev("story().named[%s].v" % json.dumps(ken)) == 1, 'his visit was counted')
     # a fixture: he has been here (visits and a main), the beat needs his next paid visit
     g.ev("S.day++;storyDay();story().named[%s]={v:3,last:S.day-1,dishes:{steak:2,coffee:1}}" % json.dumps(ken))
-    g.ev(SEAT_NAMED + "(%s)" % json.dumps(ken)); pay(ken); g.ev("__tick(7500)")
+    g.ev(SEAT_NAMED + "(%s)" % json.dumps(ken)); pay(ken); g.ev("__tick(7500);__talkFor(7.5)")
     check(g.ev("evDone('ken_wine_q')") and g.ev("!!fact('ken_wine_q')"), 'beat 1: 「妳真的不賣酒？」')
     check(g.ev("(R.log||[]).some(l=>/妳真的不賣酒/.test(l.t))&&(R.log||[]).some(l=>/隔壁就有/.test(l.t))&&(R.log||[]).some(l=>/那是隔壁/.test(l.t))&&!(R.log||[]).some(l=>/完全不賣酒|來找工作/.test(l.t))"), 'the exchange was spoken and logged: the bar next door')
     check(g.ev("loungeArcOpen()") and g.ev("R.sched.length") >= 0, 'the arc is open')
     # pairing, alone (no 杜), on an order
-    g.ev("S.day++;storyDay()"); g.ev(SEAT_NAMED + "(%s)" % json.dumps(ken)); g.ev("(()=>{const q=R.groups.find(x=>x.name===%s);q.state='order';createTicket(q)})()" % json.dumps(ken)); g.ev("__tick(2500)")
+    g.ev("S.day++;storyDay()"); g.ev(SEAT_NAMED + "(%s)" % json.dumps(ken)); g.ev("(()=>{const q=R.groups.find(x=>x.name===%s);q.state='order';createTicket(q)})()" % json.dumps(ken)); g.ev("__tick(2500);__talkFor(2.5)")
     check(g.ev("factN('ken_pairing')") == 1 and not g.ev("!!fact('ken_du_argue')"), 'pairing talk without 杜 — the fallback presentation')
     g.ev("(()=>{const q=R.groups.find(x=>x.name===%s);q.state='order';createTicket(q)})()" % json.dumps(ken)); check(g.ev("factN('ken_pairing')") == 1, 'not twice the same day (cooldown)')
     # with 杜 at a table: their argument, once
     g.ev("S.day+=2;storyDay()"); g.ev(SEAT_NAMED + "(%s)" % json.dumps(du)); g.ev(SEAT_NAMED + "(%s)" % json.dumps(ken))
-    g.ev("(()=>{const q=R.groups.find(x=>x.name===%s);q.state='order';createTicket(q)})()" % json.dumps(ken)); g.ev("__tick(6500)")
+    g.ev("(()=>{const q=R.groups.find(x=>x.name===%s);q.state='order';createTicket(q)})()" % json.dumps(ken)); g.ev("__tick(6500);__talkFor(30)")   # (audit N04: after the exchanges already going — their greetings, a crew moment — have been said)
     check(g.ev("!!fact('ken_du_argue')") and g.ev("relN('n:'+%s,'n:'+%s,'argued')" % (json.dumps(ken), json.dumps(du))) == 1, 'with 杜 there: 「不要。」「我還沒講。」')
-    check(g.ev("(R.log||[]).some(l=>/我知道你要講什麼/.test(l.t))"), '杜 spoke')
+    _said = g.ev("JSON.stringify({log:(R.log||[]).slice(-10).map(l=>l.w+':'+l.t),q:(R.talkq||[]).map(x=>+(x.t-R.t).toFixed(2)),du:R.groups.filter(q=>/杜/.test(q.name||'')).map(q=>q.state+'/'+q.gone)})")
+    check(g.ev("(R.log||[]).some(l=>/我知道你要講什麼/.test(l.t))"), f'杜 spoke: {_said}')
     # the idea returns through others (forced roll)
     g.ev("Math.random=()=>0.1;R.t=R.dur*.7;barNextP=()=>1")   # rc8: these guests walk over next door after dinner
     for i in range(3):
-        g.ev("S.day+=3;storyDay();R.groups.forEach(x=>{if(x.state==='leave')x.gone=true});R.groups=R.groups.filter(x=>!x.gone);spawn({type:'couple',size:2,name:'Ryan 與 Ivy'});const q=R.groups[R.groups.length-1];const t=R.tables.find(t=>!t.lounge&&!t.group);t.dirty=false;seatGroup(q,t);q.state='check';q.ticket={id:R.tkid++,no:1,g:q,items:[{d:'steak',st:'served',q:'P',want:1,picked:true}],t0:R.t};R.tickets.push(q.ticket);q.moving=false;collect(q)")
+        g.ev("S.day+=3;storyDay();R.groups.forEach(x=>{if(x.state==='leave')x.gone=true});R.groups=R.groups.filter(x=>!x.gone);spawn({type:'couple',size:2,name:'Ryan 與 Ivy'});const q=R.groups[R.groups.length-1];const t=R.tables.find(t=>!t.lounge&&!t.group);t.dirty=false;seatGroup(q,t);q.state='check';q.ticket={id:R.tkid++,no:1,g:q,items:[{d:'steak',st:'served',q:'P',want:1,picked:true}],t0:R.t};R.tickets.push(q.ticket);q.moving=false;collect(q);__talkFor(10)")   # (audit N04: what is said at one checkout is said before the next)
     n_idea = g.ev("factN('lounge_idea')"); check(n_idea >= 2, f'the idea came back: {n_idea}')
     check(g.ev("(R.log||[]).some(l=>/隔壁/.test(l.t))&&!(R.log||[]).some(l=>/附近有沒有可以再喝一杯/.test(l.t))"), 'rc8: after dinner, next door — never 「附近有沒有可以再喝一杯的地方？」')
     # the tasting night: decided at a day's start, Ken on the schedule, the choice, glasses
     g.ev("S.day++;story().named[%s].v=5;R.tasting=null;R.sched.length=0" % json.dumps(ken)); g.ev("storyTick('daystart',{})")
     check(g.ev("evDone('ken_tasting')") and g.ev("!!R.tasting") and g.ev("R.sched.some(o=>o.name===%s&&o.tasting)" % json.dumps(ken)), 'the tasting evening is set, Ken is coming')
-    g.ev(SEAT_NAMED + "(%s)" % json.dumps(ken)); g.page.wait_for_timeout(100)
+    g.ev(SEAT_NAMED + "(%s)" % json.dumps(ken)); g.page.wait_for_timeout(100); g.ev("__talkFor(10)")   # (audit N04: the scene waits for the line being said)
     check(g.ev("sub") == 'tasting' and g.ev("!!document.querySelector('[data-act=tastingDir]')"), 'the one choice is asked')
     g.ev("tastingDir('food')"); check(g.ev("R.tasting.dir") == 'food' and g.ev("!!fact('tasting_dir_food')") and g.ev("sub") is None, 'chosen, and play goes on')
     g.ev("Math.random=()=>0.2;for(let k=0;k<4;k++){spawn({type:'office',size:1});const q=R.groups[R.groups.length-1];const t=R.tables.find(t=>!t.lounge&&!t.group);if(!t)break;t.dirty=false;seatGroup(q,t);q.state='wait';q.ticket={id:R.tkid++,no:1,g:q,items:[{d:'friedrice',st:'ready',q:'P',want:0,picked:false}],t0:R.t};R.tickets.push(q.ticket);serveItems(q,[{it:q.ticket.items[0]}])}")
     check(g.ev("R.tasting.n") >= 2, f'glasses went out with the food: {g.ev("R.tasting.n")}')
     # rc8 (19:19 §6): as Ken pays that night, Jill asks him for those wines again — for dinner; from then on, glasses with dinner
-    g.ev("R.t=R.dur*.6;storyDay().lp={}"); pay(ken); g.ev("__tick(7500)")
-    check(g.ev("evDone('pairing_start')") and g.ev("!!fact('pairing_wine')") and g.ev("(R.log||[]).some(l=>/想喝酒，隔壁就有/.test(l.t))"), 'Jill keeps a few wines for dinner: 「配菜的。」「想喝酒，隔壁就有。」')
+    g.ev("R.t=R.dur*.6;R.floorUntil=null;storyDay().lp={}"); pay(ken); g.ev("__tick(7500);__talkFor(20)")   # (the test moves the clock back from .7 of the evening: the floor taken then is not this moment's; audit N04)
+    _ps = g.ev("JSON.stringify({done:evDone('pairing_start'),fact:!!fact('pairing_wine'),pend:[...SH_PEND],sub,dlg:!!DLG,q:(R.talkq||[]).map(x=>+(x.t-R.t).toFixed(2)),log:(R.log||[]).slice(-8).map(l=>l.w+':'+l.t),ken:R.groups.filter(q=>q.name==='品酒師 Ken').map(q=>q.state)})")
+    check(g.ev("evDone('pairing_start')") and g.ev("!!fact('pairing_wine')") and g.ev("(R.log||[]).some(l=>/想喝酒，隔壁就有/.test(l.t))"), f'Jill keeps a few wines for dinner: 「配菜的。」「想喝酒，隔壁就有。」 {_ps}')
     check(g.ev("JSON.stringify(wineList())") == '["w_spark","w_white","w_lred"]' and g.ev("dinWineTonight()") and not g.ev("loungeLv()"), 'the three pairing wines, poured with dinner before any Lounge')
     # after closing, the next day: no Lounge idea any more; the project comes from next door (decided by 《看看》, its own test)
     g.ev("S.day++;storyDay();R.tasting=null"); g.ev(SEAT_NAMED + "(%s)" % json.dumps(ken)); g.ev("storyTick('close',{})"); g.page.wait_for_timeout(120)
@@ -827,90 +829,56 @@ def followup_a_campaign_is_felt_in_the_room(b, port, target):
 
 @test
 def followup_the_manual_describes_the_current_game(b, port, target):
-    """v2.3 follow-up: the manual audit, re-run after the final merge — the manual explains the 故事 page (餐廳故事 and
-    人物／關係支線, numbered stages, 更早以前) and where story updates appear, 社群與宣傳 from the prep screen / shop / journal
-    (read-only in service), the room tabs under the ticket rail, regulars' once-in-a-life events, how a campaign shows
-    itself, the Lounge staff jobs, the journal's places, the whole-day dialogue log; stale lines are gone."""
+    """The manual, rewritten 2026-10-06 from the audit's inventory (docs/audit/2026-10-06/ws5_manual.md) on the user's
+    instruction: 「第一個畫面先讓新玩家真的知道「一天怎麼玩」；留下玩家看畫面本身無法知道、但實際需要知道的規則；刪掉重複 UI、開發／
+    舊存檔說明和未發生劇情的劇透；空間與角色相關說明等實際出現後再解鎖」. The first card is how a day is played; the rules a player
+    needs and cannot read off the screen are there (the audit's A list and its missing E items); what only repeats the screen,
+    how the game was built, old saves and stories still to come are not. The v2.3–rc8 versions of this test asked for some
+    hundred and fifty phrases, most of them the very words the user asked to let go."""
     g = Game(b, port, target, seed=104, manual=True)
+    G = json.loads(g.ev("JSON.stringify(GUIDE)"))
     txt = g.ev("GUIDE.map(s=>s.h+' '+s.sum+' '+s.pts.map(p=>p.join(' ')).join(' ')).join('\\n')")
-    # rc8 (the player, 2026-10-03: 「店主手冊也太冗長吧」「每一項都一大坨 很難閱讀」): the manual is short lines now; the details it no
-    # longer carries (the Staff Room's woods, the floor plan's 「？」 and zoom, how each round is poured, the hour the chef's night's
-    # guests come, each project's places one by one) are the game's to show — their phrases left this list.
-    for need in ['故事更新', '餐廳故事', '人物／關係支線', '更早以前', '房間分頁下面', '票券列下面的分頁', '社群與宣傳', '日誌的「社群」', '營業中只能看', '只會發生一次', '📱', 'Lounge 外場', 'Lounge 吧台', '調酒師', '暫停選單的「餐廳日誌」', '一整天的都在', '店裡的人', '存錢目標', 'Bar 小廚', '側廳卡座', '側廳的大窗', '後場工程', '走入式冷藏庫', '廚房二期', '黃金獵犬', '小木屋',
-                 # v2.4 rc5: the two staff lists, the Lounge's people, the second floor
-                 '餐廳員工', 'Lounge 名單', '許葳', '互不佔用', '二樓', '樓梯門', '上樓待一會兒',
-                 # v2.4 rc6: the two rooms upstairs, the bookings, the two places
-                 '二樓：休息室與包廂', '員工休息室', '私人包廂', '二樓的房間', '今晚｜私人包廂｜已預約', '最低消費', '4–6 位', '4–8 位', '4–10 位',
-                 '一個晚上最多一組', '客人不會為了湊低消多點', '私人包廂 I 和 III 服務生各 +1', '休息室不加名額', '包廂 幾組',
-                 # v2.4 rc6 (the player's 05:19, 05:23, 06:36, 06:43): the rooms are tabs and so is the floor; its plan in 店舖工程; the Staff Room's pool table and massage chair
-                 '寫著那一間的全名', '二樓（租下以後）', '看看整層', '開店前會先帶你上二樓看一眼', '二樓平面圖', '燕麥色沙發', '撞球台', '按摩椅', '沒有分數',
-                 # v2.4 rc6 (07:09): who is where
-                 '誰在哪裡', '訂單上的桌號', '點那句話就會找到他',
-                 # v2.4 rc6 (09:39–12:16): the stories that hold the restaurant, the day's stories, the Lounge's list, research and sales, the things to spend on, the floor after the Lounge, 安安, a day off, the new places' photos
-                 '店裡暫停中', '一句一句點著看', '今天的故事', '只收那一段自己的話', 'Lounge 今天賣了什麼', '今晚倒哪幾種', '酒單研發', '和研發一道菜差不多', '最多 +15%', '品酒課', '訓練升級一天最多一級',
-                 '委託的一幅畫', '乾式熟成櫃', 'Lounge 的酒窖', 'Lounge 的鋼琴', '季節佈置', '食材契作', 'Lounge 蓋好以後，樓上的事就會慢慢開始', '來的時候就是 LV2', '偶爾也會請一天假', '下班以後的一局撞球',
-                 # v2.4 rc7 (14:39–14:51): the day's money — the glasses' cost, the rent, the wages, 秀琴阿姨's loan; the Lounge's figure without its tips
-                 '每天的帳', '酒水成本', '租金', '一天 $300', '不會欠到明天', '秀琴阿姨會借你 $3,000', '每次不夠都會借', '結算時錢超過 $20,000', '不含小費', '晚餐桌上配的酒也另外一行',
-                 # v2.4 rc7 (15:24–16:46): Ken's tasting nights and the wine, 予安 and the piano, their stories hold, a line on the way to a table, the story guests' looks
-                 '品酒之夜', '品酒會只有 Ken 辦', '營業中跳出插圖時，店裡會停住', '會輪流上去坐一會兒', '晚餐之後', '鋼琴與予安', '一個禮拜彈三個晚上', '鋼琴演奏', '一開始沒有人彈', 'Ken 的故事', '予安和鋼琴的故事',
-                 '走向座位的路上', '跟頭像一樣',
-                 # v2.4 rc7.2 (22:38–23:07): the pass, the random menu, the cards and the Lounge after dinner, no 解雇, the wages, 安安 carries the bites
-                 '在廚房點出菜口', '隨機選菜單', '今日任務要賣的菜和宣傳中的菜會留著', '晚餐後八折', 'VIP 卡', 'VIP 名單', '吃完再去 Lounge 七折', '沒有解雇', '五倍多', '由她送過去',
-                 # v2.4 rc7.3: Jill's room, its doors, the bed, petting there, the steals, 寶寶 and the regulars, the posts
-                 'Jill 的房間', '從第一天就在', '「房間 ›」', '「‹ 廚房」', '看電子書只在房間', '坐在床邊看書', '房間裡的貓也一樣可以摸',
-                 '從來沒成功', '盤子沒事', '桌子底下抬頭看', '當場融化', '樾樾等 Jill', '照片和讚',
-                 # v2.4 rc7.4: favourites
-                 '最愛的一道、一杯', '沒有人會直接告訴你', '標 ♥ 和他的名字', '偏向有人最愛的菜',
-                 # v2.4 rc7.4: the Lounge's new bites, its TV and sound
-                 '水牛城雞翅、起司條', '生蠔', '德國豬腳', 'Lounge 的家具', 'Lounge 大電視（$200,000）', '電視音響系統（$150,000', '有比賽轉播',
-                 # v2.4 rc7.5 (23:08): the pizza oven, one more cook, the bar pizza
-                 '披薩烤爐', '酒吧披薩', '披薩麵團', '把一位廚師排到「披薩烤爐」', '披薩烤爐廚師 +1',
-                 # v2.4 rc7.5: the album from the opening day; its real limit
-                 '相簿從開店那天開始', '最多留 240 張',
-                 # v2.4 rc7.6: the chef's night, booked out (08:00); Ken's night the whole room (07:44); the bar's L (07:44–07:45)
-                 '主廚之夜', '明晚｜主廚之夜 · N 席', '主廚之夜是包場', '一道一道上',
-                 '那一晚整個 Lounge 都留給品酒的客人', '九個位子（一樣坐得開）',
-                 # v2.4 rc7.6 (08:51): after the wine, the player holds a tasting night
-                 '品酒之夜｜今晚要辦嗎？', '按「今晚辦」就是今晚', '這次不辦',
-                 # v2.4 rc7.7 (10:10, 10:32): the Lounge's people pour the rounds; Ken's share; Evan from the first night
-                 '品酒之夜分潤', '友情主持', 'Evan 在 Lounge I 蓋好那天就在吧台',
-                 # rc8 (2026-10-02 19:19): the Lounge is the shop next door
-                 'Lounge 是隔壁的店', '從後場遞到 Lounge 吧台的那一頭',
-                 '淨利下面另外一項「今天的店」',
-                 # rc8 §21: the restaurant's three lists
-                 '分成廚師、服務生、清潔員三種', '廚師的名額只能聘廚師', '寫在擴建的卡片上', '它本來是隔壁 Madame Lin 開了很多年的酒吧', '想喝酒，隔壁就有', '晚餐桌上就有配菜的酒', 'Jill 看過隔壁，就決定接下來', '「店舖工程」按「簽約・開工」', '調酒師在 L 裡面，靠牆那一頭留了進出的口']:
-        check(need in txt, f'the manual mentions {need}')
-    for stale in [# 2026-10-06 (the user): 《看看》 settles it — no 「再想想」
-                  '自己決定要不要接', '再想想', '等她最後一晚過了', "店要先擴建到 Jill's Fine Dining",
-                  '暫停選單和設定裡都有【儲存目前進度】', '把杯子交給吧台的客人；桌位由有', '上方的分頁', '畫面上方會跳一個小通知', '打烊後或開店前，商店的「社群與宣傳」分頁（第 6 天起）。', '下一段寫著', '窗邊（貓架、睡墊）', '牠會在門邊趴著等主人',
-                  '人數上限跟擴建、後場整理區、側廳、廚房擴建、廚房二期、Lounge 有關', '有 Lounge 以後才能招募', '第二位調酒師',
-                  # v2.4 rc6: the rc5 line that said the staff list's number came only from the ground floor
-                  '側廳、廚房擴建、廚房二期有關；', '輪流切',
-                  # v2.4 rc6 (05:23): the Staff Room is no longer green; (06:36) the floor is an everyday tab again — the lines that said it was not are gone
-                  '還是一個「二樓」分頁', '置物櫃、小冰箱、咖啡機、多一排插座', '整層二樓只在幾個時候出現', '二樓本身不是每天要看的分頁', '點它回到側廳',
-                  # v2.4 rc8.4 (the player, 2026-10-04: 「ken品酒夜 請改成品酒之夜」)
-                  'Ken 的品酒夜',
-                  # v2.4 rc7 (14:49): the piano no longer plays itself
-                  '大約三個晚上有一晚現場演奏',
-                  # v2.4 rc7.2 (21:57–21:58): not one loan of $20,000
-                  '秀琴阿姨會借你兩萬', '店站穩了，Jill 會還她',
-                  # v2.4 rc7.2 (22:39, 22:51): nobody is let go; LV5 is not three times the start any more
-                  '訓練升級、解雇', 'LV5 大約是剛來時的三倍',
-                  # v2.4 rc7.4: the old list of the Lounge's bites
-                  '炸雞塊、起司可樂餅、起司拼盤（II 起多蒜香蘑菇）',
-                  # v2.4 rc7.5: the album never kept only 30
-                  '其他最多留 30 張',
-                  # v2.4 rc7.6: the chef's night is no longer the bar's six; Ken's night no longer the bar's stools only
-                  '吧台的六個位子留給訂位的客人', '只有主廚之夜的客人在 Lounge 吃餐廳的菜', '那一晚吧台的位子留給品酒的客人',
-                  # v2.4 rc7.7: Ken no longer pours every round himself; Evan is never hired
-                  '今晚的三支他一輪一輪倒', 'Lounge I 的 Evan、沈晴',
-                  # rc8: no arch from the Main Hall to the Lounge
-                  'Lounge 蓋好以後旁邊多一道', '放在拱門和吧台之間的牆邊', '結算的 Lounge 那一行會寫', '結算在 Lounge 那一行另外寫', '是 Ken 先嫌沒有酒，才有的', 'Jill 打烊後想到：讓人吃完飯以後', '妳真的完全不賣酒', '附近有沒有地方再喝一杯', '後面那間', '提議在吧台辦小型的品酒之夜', '之後每一兩個禮拜他會再辦一次，不用你安排',
-                  # rc8 §21: no generic +2 any more
-                  '員工上限多兩人', '員工上限多一人', '私人包廂 I 和 III 也各多一位', '的上限跟擴建、後場整理區、側廳、廚房擴建、廚房二期、披薩烤爐有關']:
-        check(stale not in txt, f'stale line removed: {stale}')
+    # the first card: how a day goes, what to tap in service, what holds the room, where the save lives
+    check(G[0]['h'] == '一天怎麼玩', f'the first card is how a day is played: {G[0]["h"]}')
+    first = ' '.join(t for k, t in G[0]['pts'])
+    for need in ['開店前', '17:00', '21:30', '結算', '商店', '自動幫你補好備料', '點桌子點餐', '到廚房點訂單上的菜', '銀色餐蓋', '金幣', '收桌', '會自己接工作', '店裡會整個停住', '餐廳日誌', '「II」', '備份到檔案']:
+        check(need in first, f'the first card says: {need}')
+    # short: the whole manual a few screens, no entry a wall of text (the player, 2026-10-03: 「店主手冊也太冗長吧」)
+    n = sum(len(c['pts']) for c in G); longest = max(len(t) for c in G for k, t in c['pts'])
+    check(n <= 70 and len(txt) <= 4000 and longest <= 160, f'short: {n} entries, {len(txt)} characters, the longest {longest}')
+    # what a player needs and the screen does not tell (each was checked against the game by the audit)
+    for need in ['第 2 天多廚房設備、菜單研發；第 3 天店舖工程；第 4 天貓咪生活、員工；第 6 天社群與宣傳；第 7 天招牌菜', '灰色的分頁點了會說哪天開',   # WS5-11
+                 'Jill\'s Bistro（第 4 天打烊後，$5,000）', 'Jill\'s Restaurant（評分 3.9，$16,000）', '4.3，$40,000', '4.6，$90,000',   # WS5-08: the first expansion is a day, not a rating
+                 '擴建到 Jill\'s Restaurant、有冷盤台',   # WS5-04: no 「Jill's Kitchen」 stage
+                 '在廚房點出菜口，Jill 會把做好的菜都送出去', '點那句話就找得到他', '點訂單上的桌號或名字', '補滿', '1.5 倍價',
+                 '沒有解雇', '不能互相借', '日薪照付', '請第一位清潔員就是請秀琴阿姨', '收銀機不會變成負的', '秀琴阿姨會借你 $3,000', '結算時錢超過 $20,000 就會還她',
+                 '一桌照桌上最好的那張卡算', '標 ♥', '開店前買的當天開始，打烊後買的隔天開始', '宣傳只把人第一次帶進來',
+                 '每 20 秒', '恢復時會先檢查檔案', '會連存檔一起清掉',
+                 'Evan 在 Lounge 蓋好那天就在吧台，沈晴、阿拓可以聘']:   # the user, 2026-10-07: 阿拓 comes with Lounge I
+        check(need in txt, f'the manual says: {need}')
+    for stale in [  # how the game was built, old saves, versions
+                  '舊存檔', '版本', 'rc', '2.4', '後場休息室',
+                  # the screen says it already (the audit's B list): the Staff Room's furniture, the plan's 「？」, the wage table
+                  '撞球台', '按摩椅', '燕麥色沙發', '二樓平面圖', '廚師 LV1 一天 $304',
+                  # stories still to come (the audit's C list)
+                  '予安和鋼琴的故事', 'Ken 的故事', '友情主持', '它本來是隔壁 Madame Lin 開了很多年的酒吧', '提議在吧台辦小型的品酒之夜',
+                  # wrong (WS5-04, WS5-08, WS5-07)
+                  '擴建到 Jill\'s Kitchen', '評分夠高才能擴建', '頭幾班會問東西放哪',
+                  # lines earlier releases already took out
+                  '秀琴阿姨會借你兩萬', '訓練升級、解雇', 'Ken 的品酒夜', '大約三個晚上有一晚現場演奏', '員工上限多兩人', '暫停選單和設定裡都有【儲存目前進度】',
+                  # the Lounge before 2026-10-06/07 (《看看》 decides; $50,000; 阿拓 with Lounge I)
+                  'Lounge II 起多阿拓', '再想想', '等她最後一晚過了', "店要先擴建到 Jill's Fine Dining"]:
+        check(stale not in txt, f'not in the manual: {stale}')
+    # the screen: a new game opens on the first card; a card whose place is not there yet is not shown (社群與宣傳 from Day 6)
+    g.click('[data-act=open]'); g.page.wait_for_timeout(100)
     g.ev("showGuide()"); g.page.wait_for_timeout(50)
-    check('故事' in g.ev("document.querySelector('#screen').innerText") and '社群與宣傳' in g.ev("document.querySelector('#screen').innerText"), 'the manual screen shows the new sections')
+    scr = g.ev("document.querySelector('#screen').innerText")
+    check(g.ev("document.querySelector('#screen details[open] summary b').textContent") == '一天怎麼玩' and '17:00 開店' in scr, 'the manual opens on 一天怎麼玩')
+    check('日誌與故事' in scr and '社群與宣傳' not in scr.replace('第 6 天社群與宣傳', ''), f'Day {g.ev("S.day")}: the 社群與宣傳 card is not there yet')
+    semi = g.ev("(document.querySelectorAll('#screen details').forEach(d=>d.open=true),[...document.querySelectorAll('#screen .gpt i')].map(i=>i.textContent).filter(t=>/；$/.test(t)))")
+    check(semi == [], f'no line on the screen ends in 「；」 (audit WS5-07): {semi}')
+    g.ev("S.day=6;showGuide()"); g.page.wait_for_timeout(50)
+    check('社群與宣傳' in g.ev("[...document.querySelectorAll('#screen summary b')].map(b=>b.textContent).join('|')"), 'Day 6: the 社群與宣傳 card')
     check(not g.errors, g.errors[:3]); g.close()
 
 @test
@@ -967,7 +935,7 @@ def dylan_dialogue_revisions_2026_10_01(b, port, target):
     start_day(g); g.ev(P7_HELPERS)
     g.ev("S.dylan.stage=3;for(const q of R.groups.slice()){q.gone=true}R.groups=[];for(const t of R.tables){t.group=null;t.dirty=false}spawn({t:R.t,type:'regular',reg:'dylan',size:1});const d=R.groups.find(x=>x.reg==='dylan');seatGroup(d,R.tables.find(t=>!t.lounge&&!t.group));__p7.fed(d,['pasta']);d.state='eat';d.timer=0;d.eatDur=90;window.__dg=d")
     g.ev("const r=Math.random;const i=DYLAN_ACT.after.findIndex(x=>x[2]==='誰？');Math.random=()=>(i+.5)/DYLAN_ACT.after.length;dylanAct(__dg);Math.random=r")
-    g.ev("for(let i=0;i<60;i++)__tick(100)")   # the virtual clock (ms): the exchange's later lines are timed
+    g.ev("for(let i=0;i<60;i++){__tick(100);__talkFor(.05)}__talkFor(6)")   # the virtual clock (ms): the exchange's later lines are timed (a frame moves the service 0.05 s, the talk the rest — audit N04)
     log = json.loads(g.ev("JSON.stringify((R.log||[]).slice(-8).map(l=>l.w+'：'+l.t))"))
     check(any(l.endswith('誰？') and l.startswith('Dylan') for l in log) and any(l.startswith('Jill') and l.endswith('你。') for l in log), f'the four-line exchange is said to the end: {log}')
     check(not g.errors, g.errors[:3]); g.close()

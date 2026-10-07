@@ -1,0 +1,20 @@
+# 0e41527 — the tests that load saves and read story pages, rerun after the ordering fix (2026-10-07)
+# python3 tests/run_tests.py -k single_file_in_sync,every_player_save_migrates_plays_a_day_and_keeps_its_story,followup_story_progress_is_visible_retrievable_and_honest,v24_rc6_an_authored_beat_holds_the_service_until_it_is_read,v24_rc6_sophie_and_mia_begin,v24_rc6_story_pages_keep_only_their_own_lines,v24_rc7_madame_lin_says_which_corner,v24_rc7_the_landlord_goes_up,v24_rc7_the_money,v24_yijun_comes_early_in_a_fresh_game_and_meets_her_mother_at_closing,v24_yijun_comes_to_eat_and_her_mother_walks_over,qa_a_late_save_reads_true,qa_a_long_scene_is_kept_whole_on_its_page,qa_a_held_story_survives_leaving_the_app,old_saves_load,save_and_load_roundtrip
+PASS  single_file_in_sync  (0.3s)
+PASS  save_and_load_roundtrip  (2.1s)
+PASS  old_saves_load  (5.2s)
+PASS  followup_story_progress_is_visible_retrievable_and_honest  (8.6s)
+PASS  every_player_save_migrates_plays_a_day_and_keeps_its_story  (223.2s)
+PASS  v24_yijun_comes_to_eat_and_her_mother_walks_over  (3.1s)
+PASS  v24_yijun_comes_early_in_a_fresh_game_and_meets_her_mother_at_closing  (14.0s)
+PASS  v24_rc6_an_authored_beat_holds_the_service_until_it_is_read  (44.5s)
+PASS  v24_rc6_story_pages_keep_only_their_own_lines  (12.2s)
+PASS  v24_rc6_sophie_and_mia_begin  (27.2s)
+PASS  v24_rc7_the_money  (13.5s)
+PASS  v24_rc7_madame_lin_says_which_corner  (1.0s)
+PASS  v24_rc7_the_landlord_goes_up  (4.0s)
+PASS  qa_a_held_story_survives_leaving_the_app  (118.9s)
+PASS  qa_a_long_scene_is_kept_whole_on_its_page  (8.0s)
+PASS  qa_a_late_save_reads_true  (5.4s)
+
+16 passed, 0 failed

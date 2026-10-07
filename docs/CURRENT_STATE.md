@@ -1,18 +1,21 @@
 # Jill's Kitchen — 目前狀態（暫時的，會一直更新）
 
 這份只放「現在」的狀態：branch、版本、待辦、待確認。永久的設計規則在 `docs/PROJECT_MEMORY.md`，不要寫到這裡；這裡的內容過時了就
-直接改掉或刪掉。最後更新：2026-10-06，全面 Audit 與例行 QA 合回 `main` 之後（遊戲還是 rc8.5，沒有發布）。
+直接改掉或刪掉。最後更新：2026-10-07 中午，v2.4 rc8.6 發布（Version 8，Audit 之後的修正）。
 
 ## Repo 與 branch
 
 - GitHub：`pyhuanglaw/jills-kitchen`，預設 branch 是 `main`。
-- **`main` ＝ Jill's Kitchen 的正式主線**：目前的、穩定的、發布出去的版本都在這裡。最新正式版是 bded558（v2.4 rc8.5），之後
+- **`main` ＝ Jill's Kitchen 的正式主線**：目前的、穩定的、發布出去的版本都在這裡。最新正式版是 023b17c（v2.4 rc8.6），之後
   `main` 上只有文件與紀錄。從 v2.2.1 起的完整開發歷史都在 `main` 上。
 - 還沒做完的遊戲功能，另外開短期的 `feature/…` 或 `wip/…` branch；做完、測試通過才回到 `main`，發布的 commit 一定在 `main` 上。
   文件與紀錄可以直接在 `main`。不要讓工作 branch 跟 `main` 長期並行。
 - GitHub 上的 branch：`main`、`archive/rc7.6-import-main`、`feature/fewer-lines`（rc8.5，已合回 `main`，可以在 GitHub 網頁刪掉）、
-  `feature/dylan-room`（Dylan 在房間的名字，還沒合回、還沒發布）、`feature/lounge-decided`（《看看》後直接決定接隔壁、Lounge I 的新條件；
-  還沒合回、還沒發布）、`qa/audit-2026-10-06`（全面 Audit 與例行 QA；2026-10-06 使用者同意合回 `main`，已合回，可以在 GitHub 網頁刪掉）。
+  `feature/dylan-room`（Dylan 在房間的名字，還沒合回、還沒發布）、`feature/lounge-decided`（《看看》後直接決定接隔壁、Lounge I 的新條件、
+  試酒之夜改看評分 4.0；還沒合回、還沒發布，見下面「進行中」）、`qa/audit-2026-10-06`（全面 Audit 與例行 QA；2026-10-06 使用者同意合回
+  `main`，已合回，可以在 GitHub 網頁刪掉）、`fix/audit-narrative-2026-10-06`（Audit 之後的修正；2026-10-07 快轉合回 `main` 並發布成
+  rc8.6，可以在 GitHub 網頁刪掉）、`proto/cooking-flow`（料理流程的獨立試玩頁 `prototype/cooking/`，不動遊戲本體；使用者 2026-10-07：
+  不合併、不發布、現在不做）。
 - 已刪除（玩家 2026-10-04 在 GitHub 網頁刪掉）：`feature/ken-tasting-pictures`（81cbe46，rc8.4 已合回 `main`）、`wip/lin`（舊的開發
   branch 名稱；最後指向的 b87b77b 在 `main` 裡）、`claude/jills-kitchen-github-setup-4x7483`（8ca784b，接在舊的匯入 commit 後面改網址；
   同樣的改動在主線的 ec985d1）。三條的內容都已經在 `main` 或不需要了。
@@ -21,16 +24,18 @@
 - 2026-10-04 的整理：`main` 從 d0947ea 強制改指到 b865d3c（舊的保存在 `archive/rc7.6-import-main`）。要復原：
   `git push --force-with-lease=refs/heads/main:<目前的 main> origin d0947ead2c18167ab3955fef51478a9168f5b8fd:refs/heads/main`。
 - 本機的 `bundle` remote 是原開發 session 的備份 bundle，只是還原來源，不推送。
-- 版本 tag（`v2.4-rc8` 到 `v2.4-rc8.5` 等）只在本機：推 tag 到 GitHub 時連線會被中斷。各版的 commit 寫在它的發布報告裡。
+- 版本 tag（`v2.4-rc8` 到 `v2.4-rc8.6` 等）只在本機：推 tag 到 GitHub 時連線會被中斷（2026-10-07 rc8.6 再試一次，一樣）。各版的 commit 寫在它的發布報告裡。
 - 舊版本（玩家 2026-10-03 給的 v2.2.1、v2.4 rc4，以及其他每一版）怎麼查：`docs/OLD_VERSIONS.md`。
 
 ## 已發布
 
-- **v2.4 rc8.5**，2026-10-04，發布到 **https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA**（**Version 7**，id 1791128420-4d10）。
-  遊戲內容＝ commit bded558（tag `v2.4-rc8.5`，只在本機）。報告：`docs/V24_RC8_5_REPORT.md`。Gate：bded558 上 247/247；讀回與
-  live_check 通過（`docs/evidence/v24_rc8_5/`）。內容：玩家的圖跳出時店一定停住；營業中員工會上休息室（以前在忙的店裡幾乎不會）；
-  二樓房間的訂購／動工按鈕修好（從 rc6 起按了沒反應，包廂也一直蓋不起來）；點單的愛心只給 Sophie 和 Mia；路人閒聊少很多、
-  同一句一週不重複、沒頭沒尾的句子改寫（Ken 和杜的「果味」）。
+- **v2.4 rc8.6**，2026-10-07，發布到 **https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA**（**Version 8**，id 1791369869-f9ed）。
+  遊戲內容＝ commit 023b17c（tag `v2.4-rc8.6`）。報告：`docs/V24_RC8_6_REPORT.md`。Gate：023b17c 上完整回歸 296/296；讀回與
+  live_check 通過（`docs/evidence/v24_rc8_6/`）。內容：2026-10-06 Audit 之後的修正（`docs/audit/2026-10-06/FIXES.md`）——電腦版分頁、
+  對話一次一組照營業時鐘走、Ken 和杜／Dylan／熟客說的話對得上、存檔與「繼續營業」接得回來、日誌長場景整段留著（舊存檔讀檔補齊）、
+  相簿數五隻貓、結算的錢、手冊重寫、備料規則一種說法、拿掉「複製備份文字」。17 個已知未修全部修好。
+- v2.4 rc8.5（Version 7，bded558；報告 `docs/V24_RC8_5_REPORT.md`）：玩家的圖跳出時店一定停住；營業中員工會上休息室；二樓房間的
+  訂購／動工按鈕修好；點單的愛心只給 Sophie 和 Mia；路人閒聊少很多。
 - v2.4 rc8.4（Version 6，922223b；報告 `docs/V24_RC8_4_REPORT.md`）：Ken 前三次品酒之夜各一張圖和相簿照片；名稱改成「品酒之夜」。
 - v2.4 rc8.3（Version 5，e797665；報告 `docs/V24_RC8_3_REPORT.md`）：候位到店門口、三種披薩、房間的貓砂盆與碗架、寶寶靠著 Jill／
   柔柔睡腳上、拿掉 PERFECT 橫幅、Sophie 和 Mia 坐隔壁桌、杯墊那段的旁白、香煎鴨胸 6 天說一次、品酒之夜的分帳與開場、猜酒、
@@ -45,43 +50,43 @@
 
 ### 已完成、尚未發布
 
+- **料理流程 prototype**（branch `proto/cooking-flow`，`prototype/cooking/`）：獨立試玩頁，不是遊戲本體。使用者 2026-10-07：不合併、
+  不發布、現在不要再做；之後重新開始時，以正式遊戲原本的廚房畫面為底，不重新設計美術。私人連結 https://claude.ai/artifact/EBzi6qETraguAApvettBFe 。
+
 - **Dylan 在房間裡的名字**（branch `feature/dylan-room`，還沒合回 `main`、還沒跑完整回歸）：玩家 2026-10-05「Dylan已經揭露但在房間還是沒寫Dylan」。
   揭曉後他頭上的名牌寫 Dylan（揭曉前「先生」）、房間分頁寫「Jill 和 Dylan 的房間」（放不下時「Jill & Dylan」、再放不下「房間」），
   分頁那一排不會再超出畫面；帽子照玩家 10/3 的話一直戴著。相關測試通過（`rc86_dylan_is_named_in_their_room` 等）。玩家說「發布」時：
   合回 `main` → 完整回歸 → 發布。
 
-- **Lounge I：《看看》後 Jill 就決定接；條件是評分 4.0＋$50,000，不等 Madame Lin 的最後一晚**（branch `feature/lounge-decided`，
-  還沒合回 `main`、還沒跑完整回歸、沒有發布）：使用者 2026-10-06 的最終規則（PROJECT_MEMORY §6 第 6 條）。玩家會看到：《看看》最後一句
-  「隔壁，Jill 決定接下來。簽約和改裝在「升級餐廳 › 店舖工程」。」，沒有「接下隔壁／再想想」；當天店舖工程就有 Lounge I，卡片只寫還缺
-  什麼（「需要餐廳評分 4.0（目前 X）」、「還差 $X」），夠了就能按「簽約・開工 $50,000」。她最後一晚之前簽，簽約前一晚就是她的最後一晚；
-  沒簽的話她照常做到最後一晚，結束時提醒一次簽約在哪裡。Lounge II／III 不變。舊存檔：「再想想」、卡片沒回答、《看看》和卡片之間存的檔
-  都當作已決定（`linDecMig`）；已付 $120,000 的不重收、已開幕的不動。相關 29 個測試通過，含 `v24_lounge_one_after_the_viewing_rating_four_
-  and_50000_no_wait_for_her_last_night` 和例行 QA 的 `qa_lounge_one_signs_before_her_last_night`；例行 QA 11 過、17 個已知未修。
-  新玩家時間表（`docs/evidence/lounge_decided_2026-10-06/50000/`）：規則照現在，模擬玩家第 32–34 天買側廳後評分掉到 2–3.7、110 天內
-  沒開 Lounge；假設評分不擋，第 48–49 天付錢、第 51–52 天開幕，依賴 Lounge 的故事比 $80,000 早 12–17 天。開幕後收銀機停在 $0 的平衡
-  問題：方案比較在 `options.md`，等使用者選，正式經濟沒改。評分 4.0 會卡住評分掉下去的玩家：等使用者決定。使用者說「發布」時：合回 `main` → 完整回歸 → 發布。
 - **2026-10-06 全面 Audit 與例行 QA**（已合回 `main`，使用者 2026-10-06「Audit 這套 QA 工具和測試我同意合回 main」；沒有改遊戲、沒有發布）：報告 `docs/audit/2026-10-06/README.md`；
   例行 QA `python3 tests/run_tests.py --qa`（`docs/QA.md`）；全面 Audit 的做法 `docs/audit/PLAYBOOK.md`。Audit 找到、還沒修的問題，
   每一條都已經有測試在等（`tests/qa_known_open.json`）。
 
 ### 進行中／等待玩家素材
 
-- 沒有。品酒之夜的三張圖已在 rc8.4 發布。
+- **Lounge 的開店條件**（branch `feature/lounge-decided`，a8c6abd，還沒合回、還沒發布）：使用者 2026-10-07 選 C——Ken 的試酒之夜從
+  「升到 Fine Dining（S.level≥4）」改成「評分 4.0」，日誌「晚餐之後」章節照同樣的邏輯顯示。正常玩家 seed 300／301／302 的模擬在跑，
+  看 Lounge 會不會提早開、開了以後錢會不會出問題。跟 `main` 在 `game.js` 有 2 處小衝突。沒有使用者確認不合回、不發布。
+- 品酒之夜的三張圖已在 rc8.4 發布。
 
 ## 測試
 
 - **例行 QA**（2026-10-06 起）：`python3 tests/run_tests.py --qa`，`tests/qa_tests.py` 的 `qa_` 測試，用 `tests/player.py` 真的點畫面、
   故事面板開著。每次改完遊戲跑；完整回歸也包含它們。已知未修的問題列在 `tests/qa_known_open.json`（失敗顯示 OPEN、不算失敗；修好時
   顯示 FIXED，要把那一條拿掉）。
-- 247 個測試（`tests/run_tests.py` 95、`tests/v23_tests.py` 30、`tests/v24_tests.py` 122；`feature/lounge-decided` 上 v24 多一個，248；`python3 tests/run_tests.py` 全跑，`-k a,b,c`
-  跑指定的）。最近一次完整回歸：rc8.5 的 bded558 上 247/247（`docs/evidence/v24_rc8_5/regression/`）。
+- 296 個測試（其中 50 個是例行 QA 的 `qa_` 測試；`python3 tests/run_tests.py` 全跑，`-k a,b,c` 跑指定的）。最近一次完整回歸：
+  rc8.6 的 023b17c 上 296/296（2026-10-07，在固定在那個 commit 的另一個 worktree 分三份跑；`docs/evidence/v24_rc8_6/regression/`）。
+  這一批中途的紀錄（292e654 的 295/296 與 0e41527 的補跑）在 `docs/evidence/fix_audit_2026-10-06/regression/`。
+- 這一批的私人測試版（https://claude.ai/artifact/BzGu1nFBVEqDt72Fad1sHP ，Version 3，0e41527）已經被正式版 rc8.6 取代，不用再開。
 - 已知會在單一 seed 上偶爾落差的機率性測試，都在測試註解裡寫了量過的分布（例：`lounge_i_content_bar_food…`、
   `v24_rc6_new_things_are_talked_about`）。
 
 ## 待辦／待確認
 
 - **2026-10-06 Audit 的結果**（`docs/audit/2026-10-06/README.md`）：十件最重要的事、接下來最值得做的 3–5 件、以及最後一段「需要使用者決定」
-  的 20 個問題，都等使用者看過再動。Audit 本身沒有改遊戲。
+  的 24 個問題（第 19、20 條已決定），都等使用者看過再動。Audit 本身沒有改遊戲。
+- **修 bug 時看到、等使用者決定的事**：`docs/audit/2026-10-06/DECISIONS.md`（料理 prototype 6 條、這一批 3 條、故事與文字 16 條）。
+  使用者回答之前，遊戲維持現在的樣子。
 - ~~營業中存檔、「繼續營業」在特別的晚上會變成空店~~：rc8.3 已修（`rc83_a_special_evening_comes_back_with_its_room`）。原本的說明：存檔時有人在
   `piano`（予安彈琴）、`toHost`／`host`（Ken 主持品酒夜）這些狀態，`restoreService` 的 `G_STATES` 不認得，整個還原失敗，
   退回「同一時間、店是空的」；主廚之夜的 `R.cn`、品酒夜的 `R.kt`、予安的 `R.ya` 也不會還原。存檔本身沒有壞，只是那一晚
