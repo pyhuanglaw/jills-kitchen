@@ -87,6 +87,100 @@ def cooking_the_bar_takes_a_waiting_coffee_while_the_fried_rice_is_selected(b, p
 
 
 @test
+def cooking_every_drink_is_its_own_cup(b, port, target):
+    """The user, 2026-10-09: 「飯可以一次炒多份 但咖啡不能一次兩杯吧」, then 「每一杯都要是獨立 work item、獨立杯子、獨立完成與
+    出杯」 — 「可以同時做多杯，不是一次動作批量生出多杯」, the latte, the tea, the sparkling water and the berry soda alike.
+    Drinks ordered together are as many pieces of work, one cup each (never one cup marked ×2, as before, when drinks were
+    batched like the fried rice). The bar holds as many cups at once as it has places: a tap on the machine while a cup is
+    being made there starts the next drink at a free place; with every place taken the next one waits (等空位). Each cup is
+    done on its own and taken out on its own — Jill carries that one glass, the others stay at the bar — to its own spot
+    on the pass, and the place it leaves takes the drink that was waiting."""
+    g = _day(b, port, target, 7130, "S.level=5;S.eq.bar=3;for(const d of ['coffee','blacktea']){if(!S.unlocked.includes(d))S.unlocked.push(d);if(!S.menu.includes(d))S.menu.push(d)}")
+    g.ev("window.__k=function(n){for(let i=0;i<n;i++){for(const q of R.groups)q.pat=1;__tick(1000/30)}}")
+    places = g.ev("R.slots.filter(s=>s.type==='bar').length")
+    check(places >= 2 and places == g.ev("barCups(S.eq.bar)"), f'the bar has its places: {places}')
+    check(_wait_orders(g, 1), 'a table is in')
+    # one more drink than the bar has places: lattes and a tea
+    kinds = ['coffee' if i % 2 == 0 else 'blacktea' for i in range(places + 1)]
+    g.ev("(()=>{" + "".join(f"__addOrders(1,'{d}');" for d in kinds) + "wfGather()})()")
+    DR = "wfList().filter(n=>WF_DISH[baseOf(n.d)]==='drink2')"
+    dr = json.loads(g.ev(f"JSON.stringify({DR}.map(n=>({{id:n.id,d:n.d,n:n.n,its:n.its.length}})))"))
+    check(len(dr) == places + 1 and all(x['n'] == 1 and x['its'] == 1 for x in dr), f'{places + 1} drinks, {places + 1} pieces of work, one cup each: {dr}')
+    ids = []
+    for k in range(places):   # the machine tapped once for each place: each tap starts the next waiting drink at a free place
+        _tap_slot(g, "R.slots.find(s=>s.type==='bar')")
+        mine = json.loads(g.ev(f"JSON.stringify({DR}.filter(n=>n.who==='jill'||n.lastBy==='jill'||n.st==='ready').map(n=>n.id))"))
+        new = [i for i in mine if i not in ids]
+        check(len(new) == 1, f'tap {k + 1} on the machine: one more drink is Jill\'s: {mine} (had {ids})')
+        ids += new
+        g.ev("__k(4)")
+    at = json.loads(g.ev(f"JSON.stringify({ids}.map(i=>{{const n=wfNode(i);const s=n.slot||n.to;return s&&s.type==='bar'?s.no:null}}))"))
+    check(None not in at and len(set(at)) == places, f'each at its own place at the bar: {at}')
+    last = next(x['id'] for x in dr if x['id'] not in ids)
+    _tap_slot(g, "R.slots.find(s=>s.type==='bar')")
+    check(not g.ev(f"wfNode({last}).who") and '等空位' in g.ev(f"wfState(wfNode({last}))"), f'every place taken: the last drink waits — {g.ev(f"wfState(wfNode({last}))")}')
+    # done on its own: the first cup is ready while another is still being made
+    check(_until(g, f"wfNode({ids[0]}).st==='ready'", step=2), 'the first cup is done')
+    check(any(g.ev(f"wfNode({i}).st") != 'ready' for i in ids[1:]), 'the others are not done with it: ' + g.ev(f"JSON.stringify({ids}.map(i=>wfNode(i).st))"))
+    # taken out on its own: a tap on that cup
+    fs = json.loads(g.ev(f"JSON.stringify((()=>{{const n=wfNode({ids[0]});return wfFoodSpot(n,n.slot)}})())"))
+    _tap_scene(g, fs['x'], fs['y'] - 6)
+    if g.ev(f"wfNode({ids[0]}).who") != 'jill':   # a finished cup not selected yet: the first tap picks it out, the next sends Jill
+        _tap_scene(g, fs['x'], fs['y'] - 6)
+    check(g.ev(f"wfNode({ids[0]}).who") == 'jill' and g.ev(f"wfNode({ids[0]}).st") in ('fetch', 'go'), f'the cup tapped: Jill takes it out — {g.ev(f"wfNode({ids[0]}).st")}')
+    check(_until(g, f"!wfNode({ids[0]})", step=2), 'set down on the pass')
+    rest = json.loads(g.ev(f"JSON.stringify({ids[1:]}.map(i=>{{const n=wfNode(i);return n&&{{st:n.st,carry:!!n.carry,slot:n.slot&&n.slot.type}}}}))"))
+    check(all(r and not r['carry'] for r in rest), f'the other cups were not carried with it: {rest}')
+    pi = json.loads(g.ev("JSON.stringify(R.tickets.flatMap(t=>t.items).filter(i=>(i.d==='coffee'||i.d==='blacktea')&&i.st==='ready').map(i=>i.pi))"))
+    check(len(pi) == 1 and pi[0] is not None, f'one glass on the pass, at its own spot: {pi}')
+    # the place it left takes the drink that waited
+    _tap_slot(g, "R.slots.find(s=>s.type==='bar')")
+    check(g.ev(f"wfNode({last}).who") == 'jill', f'the freed place takes the waiting drink: {g.ev(f"wfState(wfNode({last}))")}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def cooking_a_drink_batch_from_an_older_checkpoint_becomes_its_cups(b, port, target):
+    """A service saved before every cup was its own (2026-10-09) can hold a batch of drinks: one nobody has started comes
+    back as its cups, one under way finishes as it is (nothing made twice, nothing lost). And a checkpoint from a kitchen
+    whose coffee bar had fewer places — before the places' kinds were kept in it — comes back with every piece of work at
+    the same place, not as an empty shop."""
+    g = _day(b, port, target, 7131, "S.eq.bar=3;for(const d of ['coffee','blacktea']){if(!S.unlocked.includes(d))S.unlocked.push(d);if(!S.menu.includes(d))S.menu.push(d)}")
+    check(_wait_orders(g, 1), 'a table is in')
+    # two batches the old way: lattes nobody has started, teas on the machine
+    g.ev("(()=>{const M0=wfMax;wfMax=d=>2;__addOrders(2,'blacktea');wfGather();__addOrders(2,'coffee');wfGather();wfMax=M0})()")
+    tea = g.ev("wfList().find(n=>n.d==='blacktea').id")
+    check(g.ev(f"wfNode({tea}).n") == 2 and g.ev("wfList().find(n=>n.d==='coffee').n") == 2, 'two batches of two, the old way')
+    g.ev(f"wfAssign(wfNode({tea}),'jill',R.slots.find(s=>s.type==='bar'&&s.no===1))")
+    check(_until(g, f"wfNode({tea}).st==='cook'", step=2), 'the teas on the machine')
+    snap = json.loads(g.ev("JSON.stringify(snapshotService())"))
+    # as an older version wrote it: no kinds, and the bar with its old count of places (the extra ones at its end removed)
+    kinds = snap.pop('slotsK')
+    old = g.ev("(S.eq.bar>=3?2:1)+(projOn('kitchen2')?2:0)")
+    bars = [i for i, k in enumerate(kinds) if k == 'bar']
+    drop = bars[old:]
+    check(all(not snap['slots'][i]['job'] for i in drop), 'nothing at the places the older kitchen did not have')
+    keep = [i for i in range(len(kinds)) if i not in drop]
+    remap = {o: n for n, o in enumerate(keep)}
+    snap['slots'] = [snap['slots'][i] for i in keep]; snap['slotsN'] = len(keep)
+    for n in snap['wfx']['wf']:
+        for k in ('slot', 'to'):
+            if n.get(k) and n[k][0] == 's':
+                check(n[k][1] in remap, f'work at a place the older kitchen had: {n[k]}'); n[k] = ['s', remap[n[k][1]]]
+    ok = g.ev(f"(()=>{{try{{restoreService({{day:S.day,snap:{json.dumps(snap, ensure_ascii=False)}}});return true}}catch(e){{return String(e)}}}})()")
+    check(ok is True, f'the older checkpoint restores: {ok}')
+    after = json.loads(g.ev("JSON.stringify(wfList().filter(n=>n.d!=='friedrice').map(n=>({id:n.id,d:n.d,n:n.n,st:n.st,slot:n.slot&&[n.slot.type,n.slot.no],ok:n.its.every(o=>o.it.wf===n.id)})))"))
+    cof = [x for x in after if x['d'] == 'coffee']; tw = [x for x in after if x['d'] == 'blacktea']
+    check(len(cof) == 2 and all(x['n'] == 1 and x['st'] == 'wait' and x['ok'] for x in cof), f'the lattes nobody had started: two cups, two pieces of work: {cof}')
+    check(len(tw) == 1 and tw[0]['n'] == 2 and tw[0]['st'] == 'cook' and tw[0]['slot'] == ['bar', 1], f'the teas on the machine stay there, a batch to the end: {tw}')
+    check(g.ev("R.slots.filter(s=>s.type==='bar').length") == g.ev("barCups(S.eq.bar)"), 'the bar as it is now')
+    check(_until(g, f"(()=>{{const n=wfNode({tea});if(n&&wfOpen(n))wfAssign(n,'jill');return !n}})()", step=3), 'the teas finish')
+    tr = json.loads(g.ev("JSON.stringify(R.tickets.flatMap(t=>t.items).filter(i=>i.d==='blacktea').map(i=>i.st))"))
+    check(len(tr) == 2 and all(x in ('ready', 'served') for x in tr), f'both teas made, once: {tr}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
 def cooking_fried_rice_goes_hot_then_plating_by_taps(b, port, target):
     """The first dish of the new kitchen, by real taps (the user's prototype list, J1–J15): the ticket item selects its
     work (the card says ● 熱區 → ○ 裝盤, 下一步：熱區; the burner is lit); a tap on the burner sends Jill, who walks there; the

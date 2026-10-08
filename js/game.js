@@ -790,8 +790,10 @@ function buildTables(){const out=[];const nM=Math.min(S.tables,MAIN_MAX);const o
  loungeSeatDefs().forEach((d,k)=>out.push({i:out.length,spot:300+k,x:d.x,y:d.y,seats:d.seats,kind:d.kind,leg:d.leg?1:0,group:null,dirty:false,plates:[],busT:0,room:'lounge',lounge:true}));   /* v2.3: the Lounge's seats — never for dining */
  if(pdBuilt()){const T=PDL_TABLE();out.push({i:out.length,spot:400,x:T.x,y:T.y,seats:pdMax(),group:null,dirty:false,plates:[],busT:0,room:'pdr',pdr:true})}   /* v2.4 rc6: the Private Dining Room's one table */
  return out}
-function buildSlots(){const a=[];const add=(t,n)=>{for(let i=0;i<n;i++)a.push({type:t,no:i+1,job:null,fx:null,flash:0})};
- add('stove',stoveSlots(S.eq.stove));if(S.eq.oven)add('oven',S.eq.oven>=3?2:1);if(S.eq.bar)add('bar',barCups(S.eq.bar));if(S.eq.prep)add('prep',S.eq.fridge>=3?2:1);if(projOn('pizzaoven'))add('pizza',1);return a}   /* rc7.5: the pizza oven */
+/* the kitchen's places, kind by kind in this order (bar: how many cups the coffee bar holds — a checkpoint from an older
+   kitchen is laid out with its own count, slotMapOf) */
+function slotPlan(bar){return[['stove',stoveSlots(S.eq.stove)],['oven',S.eq.oven?(S.eq.oven>=3?2:1):0],['bar',bar],['prep',S.eq.prep?(S.eq.fridge>=3?2:1):0],['pizza',projOn('pizzaoven')?1:0]]}   /* rc7.5: the pizza oven */
+function buildSlots(){const a=[];for(const[t,n]of slotPlan(barCups(S.eq.bar)))for(let i=0;i<n;i++)a.push({type:t,no:i+1,job:null,fx:null,flash:0});return a}
 function seatPos(t){if(t.pdr)return pdSeats();return t.seats===4?[{dx:-14,dy:-15,side:0},{dx:14,dy:-15,side:0},{dx:-36,dy:2,side:-1},{dx:36,dy:2,side:1}]:[{dx:-28,dy:0,side:-1},{dx:28,dy:0,side:1}]}   /* v2.2.1 F: the two-top grew a little (rx 22→25) so it holds its own beside the booths; its chairs step out with it */
 
 /* ================= food art ================= */
@@ -6029,10 +6031,13 @@ function wfTimes(d,f){const key=baseOf(d)+'|'+f;const own=d==='signature'||d==='
   case'oven':case'pizza':r={act:1.2,pas:clamp(heat,5,12)};break;case'drink':r={act:1.4,pas:clamp(heat,1.5,4)};break;case'plate':r={act:2.4,pas:0};break;default:r={act:.7,pas:0}}
  return own?r:(WF_T[key]=r)}
 /* a batch: the same dish for several tables, made as one (spec §12). How many at once grows with the restaurant; the dishes
-   that cook in a pot or a basket batch best, the ones plated piece by piece least (spec §9 of the capacity rule) */
-const WF_BIG=new Set(['friedrice','pasta','soup','risotto','fries','bites','cheesestick','wings','mushroom','coffee','blacktea','sparkling','fruitsoda']);
+   that cook in a pot or a basket batch best, the ones plated piece by piece least (spec §9 of the capacity rule).
+   Drinks are never a batch (the user, 2026-10-09: 「飯可以一次炒多份 但咖啡不能一次兩杯吧」, then 「每一杯都要是獨立 work item、
+   獨立杯子、獨立完成與出杯」 — 「可以同時做多杯，不是一次動作批量生出多杯」): every cup is its own piece of work at its own place at
+   the bar, made, finished and taken out on its own; the bar holds as many cups at once as it has places (barCups) */
+const WF_BIG=new Set(['friedrice','pasta','soup','risotto','fries','bites','cheesestick','wings','mushroom']);
 const WF_SMALL=new Set(['steak','duck','salmon','souffle','signature','sigdessert']);
-function wfMax(d){const b=baseOf(d),L=S.level||1;if(WF_BIG.has(b))return L>=5?4:L>=3?3:2;if(WF_SMALL.has(b))return L>=3?2:1;return L>=5?3:2}
+function wfMax(d){const b=baseOf(d),L=S.level||1;if(WF_DISH[b]==='drink2')return 1;if(WF_BIG.has(b))return L>=5?4:L>=3?3:2;if(WF_SMALL.has(b))return L>=3?2:1;return L>=5?3:2}
 /* the pass (the user, 2026-10-08: 「PLATING 是角色去料理旁邊把它變成一道可以上桌的菜；PASS 是一道已經裝好盤的菜交給外場的
    位置」). Its places — one, two with the wide pass (大出菜口), three with the kitchen's second phase: the capacity rule's
    1 → 2 → 3 — are how many dishes can be being plated at once: whoever plates holds one from the moment they set off for
@@ -7469,7 +7474,16 @@ function wfHitSlot(p){if(!R)return null;let best=null,bd=1e9;
  return best}
 function wfFamOf(s){return WF_TYPE_F[s.type]}
 function wfTap(p){const r=wfTap0(p);if(r){renderTickets();wfGuideUpd()}return r}
-function wfTap0(p){const s=wfHitSlot(p);if(!s)return false;const sel=R.wsel?wfNode(R.wsel):null;const f=wfFamOf(s);
+/* the coffee bar's places share its machine (two, with kitchen II): a tap right on a cup is that cup; a tap on the machine is
+   the place the selected drink is at or headed for, else a free place when a drink waits to be made, else a finished cup (to
+   take out), else one being made (to see it). Before 2026-10-09 the machine always meant its first place: with a cup there,
+   the next drink could not be started by a tap */
+function wfBarPick(p,s){const cx=wfSlotCenter(s).x;const grp=R.slots.filter(x=>x.type==='bar'&&wfSlotCenter(x).x===cx);if(grp.length<2)return s;
+ let cup=null,cd=10;for(const x of grp){const n=x.wf;if(!n||n.slot!==x)continue;const fs=wfFoodSpot(n,x);const d=Math.hypot(p.x-fs.x,(p.y-fs.y+6)*1.3);if(d<cd){cd=d;cup=x}}if(cup)return cup;
+ const sel=R.wsel?wfNode(R.wsel):null;if(sel){if(sel.slot&&grp.includes(sel.slot))return sel.slot;if(sel.to&&grp.includes(sel.to))return sel.to}
+ const free=grp.find(wfSlotFree);if(free&&wfList().some(n=>wfOpen(n)&&wfNext(n)==='drink'))return free;
+ return grp.find(x=>x.wf&&x.wf.slot===x&&x.wf.st==='ready')||grp.find(x=>x.wf&&x.wf.slot===x)||free||s}
+function wfTap0(p){let s=wfHitSlot(p);if(!s)return false;if(s.type==='bar')s=wfBarPick(p,s);const sel=R.wsel?wfNode(R.wsel):null;const f=wfFamOf(s);
  if(sel&&wfOpen(sel)&&(wfNext(sel)==='plate'||wfNext(sel)==='serve')&&sel.slot===s){const f0=wfNext(sel);if(wfAssign(sel,'jill'))wfFirstUse(sel,f0);sfx.tap();return true}   /* the finished food tapped: Jill brings plates and plates it there; a finished drink: she takes it out to the pass (送飲料 — before 2026-10-08 evening nothing the player could tap did this) */
  if(sel&&wfOpen(sel)&&wfNext(sel)===f&&wfSlotFree(s)){if(wfAssign(sel,'jill',s)){wfFirstUse(sel,f);sfx.tap();return true}}
  if(sel&&wfTakeBack(sel,s)){wfFirstUse(sel,f);sfx.tap();return true}
@@ -7495,17 +7509,28 @@ function wfBot(lazy){if(!R)return;wfGather();if(wfJillTask())return;const open=w
  open.sort((a,b)=>(b.st==='ready')-(a.st==='ready')||a.tr-b.tr);for(const n of open){if(wfAssign(n,'jill'))return}}
 /* Jill's share of the kitchen (jillWorkload, the kitchen tab's badge): work no cook here can take */
 function wfJillLoad(){if(!R||!R.wf)return 0;let w=0;for(const n of R.wf)if(wfOpen(n)&&!wfStaffCan(n))w++;return w+wfJ().q.length}
+/* a checkpoint's places onto today's kitchen, by kind and number: the same kitchen one to one; one whose places changed in a
+   newer version (the coffee bar, 2026-10-09) each old place onto the same one of its kind. A checkpoint from before the kinds
+   were kept is laid out as the kitchen was then (the coffee bar's old count: 1, 2 with the double group head, 2 more with
+   kitchen II). -1: a place that is not there any more (null: the checkpoint cannot be read this way) */
+function slotMapOf(slots,snap){const n=snap.slotsN;if(n==null)return null;let kinds=snap.slotsK;
+ if(!kinds){if(slots.length===n)return slots.map((_,i)=>i);kinds=[];for(const[t,k]of slotPlan(S.eq.bar?(S.eq.bar>=3?2:1)+(projOn('kitchen2')?2:0):0))for(let i=0;i<k;i++)kinds.push(t)}
+ if(kinds.length!==n)return null;const seen={};return kinds.map(t=>{const no=seen[t]=(seen[t]||0)+1;return slots.findIndex(s0=>s0.type===t&&s0.no===no)})}
 /* a checkpoint's work back (restoreService). A dish of the new kitchen still on an old-style station job — a checkpoint saved
    before this version — goes back to the start and is made again; work that does not resolve does too (never lost, never
    doubled: its stock was taken when it was ordered) */
-function wfRestore(N,x,item){for(const s0 of N.slots)if(s0.job&&isWF(s0.job.d)){const it=s0.job.it;if(it&&it.st==='cooking'){it.st='pending';delete it.wf}s0.job=null}
+function wfRestore(N,x,item,sx){for(const s0 of N.slots)if(s0.job&&isWF(s0.job.d)){const it=s0.job.it;if(it&&it.st==='cooking'){it.st='pending';delete it.wf}s0.job=null}
  N.pss=[];for(let i=0;i<passCap();i++)N.pss.push({type:'pass',no:i+1,wf:null});
  const reset=()=>{N.wf=[];N.jk=null;N.wfc={};N.wsel=null;for(const s0 of N.slots)s0.wf=null;for(const s0 of N.pss)s0.wf=null;for(const tk of N.tickets)for(const it of tk.items)if(it.wf||(isWF(it.d)&&it.st==='cooking')){if(it.st==='cooking')it.st='pending';delete it.wf}};
  if(!x||!x.wf){reset();return}
- try{const sget=r=>!r?null:r[0]==='p'?N.pss[r[1]]:N.slots[r[1]];
+ try{const sget=r=>!r?null:r[0]==='p'?N.pss[r[1]]:N.slots[sx?sx[r[1]]:r[1]];
   N.wf=x.wf.map(o=>{const n=Object.assign({},o);n.its=(o.its||[]).map(r=>{const it=item(r);if(!it)throw new Error('work without its portion');const tk=N.tickets.find(t=>t.items.includes(it));if(!tk)throw new Error('portion without its ticket');return{tk,it}});
    n.slot=sget(o.slot);n.to=sget(o.to);if((o.slot&&!n.slot)||(o.to&&!n.to))throw new Error('work without its place');if(n.slot)n.slot.wf=n;if(n.to)n.to.wf=n;n.rj=null;if(!isWF(n.d))throw new Error('not a dish of the new kitchen');return n});
   N.jk=x.jk||null;N.wfc=x.wfc||{};N.wsel=x.wsel||null;WFID=Math.max(WFID,x.wfid||0,...N.wf.map(n=>n.id||0));
+  /* drinks made as a batch before every cup was its own (2026-10-09): a batch nobody has started is split into its cups; one
+     under way finishes as it is — nothing made twice, nothing lost */
+  for(const n of N.wf.slice()){if(WF_DISH[baseOf(n.d)]!=='drink2'||n.its.length<2||n.st!=='wait'||n.who||n.adv||n.si!==0)continue;
+   n.its.slice(1).forEach((o,k)=>{const c=Object.assign({},n,{id:++WFID,n:1,its:[o],slot:null,to:null,who:null,rj:null,sc:[],seed:((n.seed||1)+7919*(k+1))|0});o.it.wf=c.id;N.wf.push(c)});n.its=n.its.slice(0,1);n.n=1}
   /* a plating under way the old way (before 2026-10-08: the food carried to the pass and plated there) — fetching it, carrying
      it or plating it on the pass — is plated: its dish waits on the pass, nothing lost and nothing made twice */
   for(const n of N.wf.slice()){const fl=wfFl(n);const toPlate=n.adv&&fl[n.si+1]==='plate';if(!((toPlate&&(n.st==='fetch'||n.st==='go'))||(n.st==='work'&&n.slot&&n.slot.type==='pass')))continue;
@@ -10173,7 +10198,7 @@ function snapshotService(){if(!R||phase!=='service'||R.closing!=null||R.ended)re
  /* v2.5: the new kitchen's work — its portions as ticket item refs, its places as slot indices (the pass's own apart) */
  const sref=s0=>!s0?null:s0.type==='pass'?['p',(R.pss||[]).indexOf(s0)]:['s',R.slots.indexOf(s0)];
  const wfx={wf:(R.wf||[]).map(n=>{const o={};for(const k in n)if(!['its','slot','to','rj'].includes(k))o[k]=n[k];o.its=n.its.map(x=>ir(x.it));o.slot=sref(n.slot);o.to=sref(n.to);return o}),jk:R.jk?Object.assign({},R.jk,{q:(R.jk.q||[]).slice()}):null,wfc:Object.assign({},R.wfc||{}),wsel:R.wsel||null,wfid:WFID};
- const snap={groups,tickets,slots,jill,cw,tables,misc,tablesN:R.tables.length,slotsN:R.slots.length,wfx};
+ const snap={groups,tickets,slots,jill,cw,tables,misc,tablesN:R.tables.length,slotsN:R.slots.length,slotsK:R.slots.map(s0=>s0.type),wfx};
  return JSON.parse(JSON.stringify(snap))}   /* through JSON once: proves it is plain data, drops undefined */
 /* rc8.3 (the player's Day 87 save, 19:19: 29 guests, 0 after 「繼續營業」): the evening's special nights come back with the
    room — 予安 at the piano (R.ya), Ken's tasting night (R.kt), the chef's night (R.cn). The snapshot keeps their flags; the
@@ -10203,7 +10228,7 @@ function restoreService(cp){const snap=cp.snap;if(!snap||cp.day!==S.day)throw ne
   combo:0,maxCombo:0,streak:0,fire:0,fireCount:0,floats:[],parts:[],tv:1,gid:1,tkid:1,
   st:{rev:0,tips:0,guests:0,groups:0,perfect:0,q:{P:0,G:0,O:0,B:0},sats:[],dish:{},angry:0,lost:0,reviews:[],critic:null,blogger:null,treats:0,jtreats:0,ptreats:0},
   rush:feat().rush,rushT0:dur*120/270,rushT1:dur*180/270,rushShown:false,weather:S.today&&S.today.weather,event:S.today&&S.today.event,coach:-1,taskDone:{},lastSpawn:0,idleT:0,focus:0,focusLock:0,holdSlot:null,inc:[],cw:{},thief:null,insp:null,chaser:null};
- if(N.slots.length!==snap.slotsN)throw new Error('kitchen changed');
+ const sx=slotMapOf(N.slots,snap);if(!sx)throw new Error('kitchen changed');   /* the checkpoint's places → today's (2026-10-09: the coffee bar's count can differ from an older version's) */
  /* audit WS2-01: a checkpoint made before a version that changed the tables (35 → 36 when the Lounge's seats changed) came
     back as an empty shop. Each table is found again: by its spot (kept in the snapshot from now on); in an older snapshot
     with the same count, by its number as before; otherwise every party gets the table of that number if it is still a
@@ -10225,8 +10250,9 @@ function restoreService(cp){const snap=cp.snap;if(!snap||cp.day!==S.day)throw ne
  if(Object.keys(tmap).some(i=>tmap[i]!==+i))N.tickets.forEach(tk=>{if(tk.g&&tk.g.table!=null&&tk.g.table>=0)tk.no=tk.g.table+1});
  snap.tables.forEach((o,i)=>{if(tmap[i]==null){if(o.group>=0)throw new Error('table without guests');return}const t=N.tables[tmap[i]];t.group=o.group>=0?N.groups[o.group]:null;if(o.group>=0&&!t.group)throw new Error('table without guests');t.dirty=o.dirty;t.plates=o.plates||[];t.busT=o.busT||0;t.claim=o.claim||null;t.tst=o.tst||0;t.cnr=o.cnr||0});
  const item=ref=>{if(!ref)return null;const tk=N.tickets[ref[0]];return tk&&tk.items[ref[1]]||null};
- snap.slots.forEach((o,i)=>{const s0=N.slots[i];s0.broken=!!o.broken;s0.fix=o.fix||0;if(o.job){const j=Object.assign({},o.job);j.tk=N.tickets[o.job.tk];j.it=item(o.job.it);if(!j.tk||!j.it||!DISH(j.d))throw new Error('job without ticket');if(j.step){j.step=Object.assign({},j.step);j.step.hold=false}s0.job=j}});
- wfRestore(N,snap.wfx,item);
+ if(typeof N.focus==='number'&&N.focus>=0)N.focus=sx[N.focus]>=0?sx[N.focus]:0;
+ snap.slots.forEach((o,i)=>{const s0=N.slots[sx[i]];if(!s0){if(o.job)throw new Error('a job without its place');return}s0.broken=!!o.broken;s0.fix=o.fix||0;if(o.job){const j=Object.assign({},o.job);j.tk=N.tickets[o.job.tk];j.it=item(o.job.it);if(!j.tk||!j.it||!DISH(j.d))throw new Error('job without ticket');if(j.step){j.step=Object.assign({},j.step);j.step.hold=false}s0.job=j}});
+ wfRestore(N,snap.wfx,item,sx);
  Object.assign(N.jill,snap.jill);N.jill.hands=handsBack(snap.jill.hands||snap.jill.carry,N.tickets,item);delete N.jill.carry;N.jill.cur=snap.jill.cur?Object.assign({},snap.jill.cur):null;if(N.jill.cur&&N.jill.cur.t!=null){N.jill.cur.t=tix(N.jill.cur.t);if(N.jill.cur.t===-2)N.jill.cur=null}N.jill.q=(snap.jill.q||[]).map(tix).filter(x=>x!=null&&x>=0);if(!isFinite(N.jill.x)||!isFinite(N.jill.y))throw new Error('bad jill');N.jill.sofa=false;N.jill.rest=null;N.jill.pet=null;N.jill.lookAt=null;N.jill.nod=0;N.jill.visit=null;
  for(const id in snap.cw){const o=snap.cw[id];const w=Object.assign({},o);if(o.task){w.task=Object.assign({},o.task);w.task.g=o.task.g>=0?N.groups[o.task.g]:null;{const tt=tix(o.task.t);w.task.t=tt>=0?N.tables[tt]:null}w.task.tk=o.task.tk>=0?N.tickets[o.task.tk]:null;if(o.task.tks){w.task.tks=o.task.tks.map(i=>N.tickets[i]).filter(Boolean);w.task.stops=(o.task.stops||[]).map(i=>N.tickets[i]).filter(Boolean)}if((o.task.g>=0&&!w.task.g)||(o.task.t>=0&&!w.task.t)||(o.task.tk>=0&&!w.task.tk))w.task=null}w.hands=handsBack(o.hands||(o.carry?o.carry.map(r=>({it:r,tk:r?r[0]:-1})):null),N.tickets,item);delete w.carry;N.cw[id]=w}
  N.holdSlot=null;N.panel=false;N.panelT=0;N.closing=null;nightsRestore(N,snap);
