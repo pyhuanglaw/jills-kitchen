@@ -1,0 +1,1632 @@
+（使用者 2026-10-08，實玩料理測試版第一天之後；一次傳來的幾則訊息，逐字。前一則 onboarding 的要求在
+docs/v24/cooking_onboarding_2026-10-08.txt。）
+
+我已經開始實際玩私人測試版。
+
+第一天實玩，我覺得現在明顯比較像我原本想像中的料理遊戲。
+
+因此目前先依以下決策繼續：
+
+1. 前三天 throughput 下降：先不要修
+
+模擬顯示前三天新廚房服務客人約少 18%，但我真人實玩第一天後，目前的料理節奏是正面的。
+
+不要為了把 Day 1 的模擬服務人數補回 main，而去：
+
+* 加快 Jill 移動
+* 大幅縮短料理時間
+* 增加早期 batch
+* 改客人耐心
+* 改客流
+* 改價格／收入
+* 讓員工提早出現
+* 讓所有廚師什麼都會
+
+目前保留現況。
+
+早期 Jill 一個人真的在廚房各站之間料理，本身可以是合理的 early-game pacing；之後聘到廚師，效率提升才會有成長感。
+
+除非後續真人實玩出現「主要時間都在無聊等 Jill 走路」的問題，否則不要因為模擬數字自行修快。
+
+⸻
+
+2. 前期只有 Jill 能處理部分 PLATING：目前不要因此讓所有廚師都會裝盤
+
+不要為了修 throughput，直接給每個廚師 PLATING 能力。
+
+維持 proficiency / specialization 的意義。
+
+我會繼續實玩到有員工的階段，確認實際感受。
+
+真正的驗收不是數字，而是我能不能自然理解：
+
+「阿德正在做那個，所以我來處理這個。」
+
+如果前期 PLATING bottleneck 真人玩起來真的煩，再針對 proficiency / recruitment progression 處理，不先用全員 PLATING 解掉。
+
+⸻
+
+3. 值班表保留
+
+被排成「待命」的廚師就休息，不要偷偷工作。
+
+值班中的廚師才參與 kitchen AI。
+
+目前這個方向保留。
+
+⸻
+
+4. 舊的「燒焦」相關文字／規則要列入清理
+
+新 Cooking System 已經沒有燒焦失敗，因此：
+
+* 衛生檢查員「別燒焦」
+* review / 結算裡仍假設會燒焦的文字
+* 其他舊 cooking failure 文案
+
+都已經成為 legacy inconsistency。
+
+請完整 audit 所有舊「燒焦 / burn / 焦掉 / timing failure」相關 reference。
+
+先整理：
+
+* 出現位置
+* 現在功能
+* 是純文字還是實際影響條件／評分
+* 建議的新語意
+
+如果只是明顯過時文案，可以改成符合新系統的內容。
+
+如果會改變衛生檢查、評價、經濟或其他系統的實際 balance，先列出再決定，不要偷偷重做整套系統。
+
+⸻
+
+5. PREP 第三個位置不要硬塞第三塊砧板
+
+既有冷盤台只能自然容納兩塊砧板，就不要為了讓資料表達到 PREP=3 而破壞目前廚房。
+
+原廚房視覺優先於預先寫死的容量數字。
+
+PREP mature capacity 暫時可以維持 2。
+
+未來如果實際 simulation / 真人遊玩證明 PREP 長期成為不合理瓶頸，再找符合現有廚房空間的升級方式。
+
+不要現在硬加第三塊板。
+
+⸻
+
+6. 現在優先讓我真人測 gameplay，不要再為模擬數字大改
+
+接下來請維持私人測試版，修：
+
+* 明確 bug
+* workflow 顯示錯誤
+* handler 顯示錯誤
+* 點擊／touch 問題
+* 動畫或食物位置不合理
+* player/staff claim race
+* 存檔問題
+* mobile layout
+* 明顯 legacy inconsistency
+
+不要因為 simulator 的 throughput 差異主動重新 balance 核心料理節奏。
+
+我現在最需要觀察的是：
+
+1. 我是否永遠知道下一步去哪。
+2. 我是否永遠知道誰正在處理。
+3. 我想介入時能不能自然介入。
+4. 我不想管時員工能不能自然接手。
+5. 多道菜一起來時，我是在思考優先順序，而不是搞不懂 UI。
+6. 有廚師之後，是否從「自己做菜」自然變成「一起經營廚房」。
+7. 我離開廚房去看貓／客人／故事時，會不會因此受到不合理懲罰。
+
+目前第一天的實玩方向是正確的。
+
+先不要把一個已經開始好玩的東西，為了追平舊版模擬數字又調回去。
+PLATING 是一般廚師四大 proficiency 之一，不設「前期只有 Jill 能裝盤」的通則。廚師是否能／多主動處理 PLATING，由其 PLATING proficiency 決定。不要因舊 chefCan 的 Jill-first 規則，把 PLATING 人為鎖給 Jill。只有明確指定的 Signature 關鍵步驟可以保留 Jill 專屬／優先。
+我剛實際玩了料理測試版第一天。
+
+整體新的 Cooking workflow 已經比舊版更像我想要的料理遊戲；目前不要重做 workflow、station、guidance、staff handoff，也不要增加玩家操作。
+
+但我發現一個很明顯的問題：
+
+黃金蛋炒飯在 HOT 時，看起來像一份已經完成的炒飯直接出現在料理位置，然後慢慢變大。
+
+這不夠像「Jill 正在做炒飯」。
+
+所以現在要補的是：
+
+Cooking Visual Choreography
+
+玩家少按，不代表 Jill／廚師少做
+
+核心規則：
+
+菜色可以很多，廚房工作的語法要很少；但每一道菜在工作站裡，必須看得出它正在經歷自己的料理過程。
+
+這一輪不要增加任何 player-perceivable step。
+
+例如黃金蛋炒飯仍然只有：
+
+HOT → PLATING
+
+玩家仍然只需要：
+
+1. 點炒飯
+2. 點 HOT
+3. 做完後點 PLATING
+
+但 HOT 這一站內部，Jill／廚師必須自己完成真正像炒飯的視覺過程。
+
+⸻
+
+HARD RULES
+
+1. 禁止用「完成品 sprite 從小慢慢變大」當主要 cooking animation。
+
+scale 可以有非常輕微的呼吸／動態，但不能拿「變大」代表料理進度。
+
+2. 每一道料理至少要有：
+
+* raw / initial visual
+* 1 個以上 visible transformation
+* finished-at-this-station visual
+
+複雜料理最好 3–5 個 internal visual beats。
+
+3. internal visual beat：
+
+* 不增加玩家 click
+* 不增加 workflow step
+* 不增加 QTE
+* 不增加 timing challenge
+* 不增加 failure / burning
+* 不需要玩家記配方
+
+它只是 Jill／廚師真的在做事。
+
+4. 角色的手部／工具動作與食物狀態必須有因果關係。
+
+例如：
+Jill 倒蛋 → 鍋裡才出現蛋。
+Jill 加飯 → 飯才出現。
+Jill 翻牛排 → 熟面才翻上來。
+
+不要食物自己憑空 morph，而角色只在旁邊 generic 揮手。
+
+5. 可以重用底層動畫 primitive：
+
+* chop
+* mix
+* stir
+* toss
+* flip
+* pour
+* spread
+* place
+* garnish
+* whisk
+* shake
+* slice
+
+但每道料理的 choreography 必須由下面的 dish spec 決定，不能只按照 workflow family 給所有 HOT 菜同一套動畫。
+
+6. 食物在料理過程中可以簡化，不要求高成本逐幀動畫。
+
+可以使用：
+
+* ingredient layer 出現／消失
+* 色澤漸變
+* 位置小幅移動
+* steam
+* pan toss
+* flip
+* sauce layer spread
+* garnish appearing
+* container change
+
+重點是玩家一眼能理解「現在真的在做這道菜」。
+
+⸻
+
+A. Restaurant 22 dishes
+
+1. 黃金蛋炒飯
+
+Workflow：HOT → PLATING
+
+HOT：
+
+* 開始時是空鍋／少量油，不准直接出現完成炒飯。
+* Jill／廚師打蛋或倒入蛋液。
+* 鍋內先出現黃色半凝固蛋。
+* 加入白飯。
+* 加入蔥／配料。
+* 使用鍋鏟翻炒，或做小幅度 pan toss。
+* 白飯＋蛋從分離狀態逐漸變成均勻金黃色炒飯。
+* 最後才成為現在的完成炒飯 visual。
+
+PLATING：
+
+* 炒飯從鍋移到盤中。
+* 整形成自然的一份炒飯。
+* 最後少量蔥花／裝飾。
+
+禁止：一開始就是完成炒飯，然後 scale 變大。
+
+⸻
+
+2. 拿鐵咖啡
+
+Workflow：DRINK → SERVE
+
+DRINK：
+
+* 空杯。
+* espresso 深色咖啡液先進杯。
+* 奶流從上方倒入。
+* 咖啡顏色由深變成拿鐵棕。
+* 最後形成簡單奶泡／latte surface。
+
+不要一開始就是完整拿鐵。
+
+SERVE：
+
+* 完成杯放到出杯位置。
+
+⸻
+
+3. 番茄義大利麵
+
+Workflow：HOT → PLATING
+
+HOT：
+
+* 鍋中先是麵／少量基底，不是完成品。
+* 加入番茄醬。
+* Jill／廚師翻拌。
+* 麵條由淺色逐漸均勻裹上紅色番茄醬。
+* 有輕微蒸氣。
+* 最後才變成完成的番茄義大利麵。
+
+PLATING：
+
+* 麵移入盤中。
+* 稍微捲／集中。
+* 最後出現起司／香草 garnish。
+
+⸻
+
+4. 田園沙拉
+
+Workflow：PREP → PLATING
+
+PREP：
+
+* 砧板／工作碗先有未處理蔬菜。
+* 切生菜／番茄／其他蔬菜。
+* 切好的不同蔬菜 layer 一樣一樣累積。
+* 放進碗中。
+* 加 dressing。
+* Jill／廚師拌沙拉。
+
+PLATING：
+
+* 拌好的沙拉移到盤／碗。
+* 最後補少量 garnish。
+
+不能一開始就出現完成沙拉。
+
+⸻
+
+5. 經典牛肉漢堡
+
+Workflow：PREP → HOT → PLATING
+
+PREP：
+
+* 麵包、肉排、蔬菜分開。
+* Jill／廚師整理／調味生肉排。
+* 生肉排保持明顯 raw visual。
+* 生菜、番茄等切好放旁邊。
+
+HOT：
+
+* 生肉排下鍋／煎台。
+* 接觸面由紅／生肉色變成褐色。
+* 中段自動 flip。
+* 翻面後看得到第一面已煎好。
+* 第二面繼續上色。
+* 可在後段加入起司並略融化。
+
+PLATING：
+
+* 下層麵包。
+* 生菜／番茄。
+* 熟肉排。
+* 起司。
+* 醬。
+* 上層麵包。
+* 最後才變成完整漢堡。
+
+⸻
+
+6. 錫蘭檸檬紅茶
+
+Workflow：DRINK → SERVE
+
+DRINK：
+
+* 空杯／冰塊。
+* 茶液倒入。
+* 顏色逐漸變成琥珀茶色。
+* 加入檸檬片／檸檬汁。
+* 輕微攪拌。
+
+SERVE：
+
+* 完成杯放到出杯位置。
+
+⸻
+
+7. 檸檬氣泡水
+
+Workflow：DRINK → SERVE
+
+DRINK：
+
+* 空透明杯。
+* 冰塊先進杯。
+* 氣泡水倒入。
+* 可見少量氣泡。
+* 加檸檬片／檸檬汁。
+* 完成時保持透明、清爽，不要像普通白色飲料。
+
+⸻
+
+8. 南瓜濃湯
+
+Workflow：HOT → PLATING
+
+HOT：
+
+* 鍋內先是南瓜基底／塊狀食材。
+* 加入高湯。
+* 攪拌。
+* 內容物由較粗／塊狀逐漸變成均勻橘色濃湯。
+* 後段加入鮮奶油或奶類。
+* 顏色稍微變柔和。
+* 蒸氣。
+
+PLATING：
+
+* 湯從鍋舀／倒進湯碗。
+* 最後一圈 cream／香草 garnish。
+
+⸻
+
+9. 焦糖布丁
+
+Workflow：PREP → PLATING
+
+PREP：
+
+* 空布丁模／容器。
+* 先倒焦糖，底部形成焦糖層。
+* 再倒布丁液。
+* 布丁液慢慢填滿容器。
+* 內部等待／定型可以自動發生，玩家不操作。
+* 完成後從液態視覺變成凝固定型。
+
+PLATING：
+
+* 布丁脫模到盤上。
+* 焦糖醬流到頂部／周圍。
+* 最後才是完整焦糖布丁。
+
+不要一開始就畫完成布丁。
+
+⸻
+
+10. 松露薯條
+
+Workflow：OVEN → PLATING
+
+OVEN：
+
+* 開始是淡色／未熟薯條。
+* 放入烤箱。
+* 烤製過程由淡黃色逐漸變成金黃色。
+* 邊緣稍深。
+* 完成後才有酥脆感。
+
+PLATING：
+
+* 薯條移入盤／容器。
+* 撒鹽／香草。
+* 最後加入松露相關 garnish／醬。
+
+⸻
+
+11. 莓果蘇打
+
+Workflow：DRINK → SERVE
+
+DRINK：
+
+* 空杯＋冰塊。
+* 莓果 syrup／果料先加入。
+* 氣泡水倒入後產生顏色漸層。
+* 攪拌後變成均勻莓果色。
+* 最後莓果／薄荷 garnish。
+
+⸻
+
+12. 香料烤蔬菜
+
+Workflow：PREP → OVEN → PLATING
+
+PREP：
+
+* 完整／大塊蔬菜。
+* Jill／廚師切成烤蔬菜大小。
+* 不同蔬菜逐步排到烤盤。
+* 淋油。
+* 撒香料。
+
+OVEN：
+
+* 生鮮色 → 烤熟色。
+* 邊緣逐漸焦糖化／略深。
+* 不要只是整盤放大。
+
+PLATING：
+
+* 烤蔬菜移到盤中。
+* 最後少量香草。
+
+⸻
+
+13. 提拉米蘇
+
+Workflow：PREP → PLATING
+
+PREP：
+
+* 容器／盤底。
+* 手指餅乾 layer。
+* 咖啡液倒／刷上。
+* mascarpone cream layer 鋪上。
+* 再形成第二層。
+* 表面抹平。
+
+PLATING：
+
+* 切／移成一份。
+* 最後才撒 cocoa powder。
+
+⸻
+
+14. 香草烤雞
+
+Workflow：PREP → OVEN → PLATING
+
+PREP：
+
+* 生雞肉。
+* Jill／廚師抹油／香草／調味。
+* 香草 visibly 附著在雞肉表面。
+* 放到烤盤。
+
+OVEN：
+
+* 生肉粉白色 → 熟雞肉金黃色。
+* 表皮逐漸上色。
+* 後段形成較明顯金黃烤皮。
+
+PLATING：
+
+* 移到盤中。
+* 最後加香草／配菜。
+
+⸻
+
+15. 炙烤肋眼牛排
+
+Workflow：PREP → HOT → PLATING
+
+PREP：
+
+* 明顯 raw ribeye。
+* 調味：鹽／胡椒。
+* 不要在 PREP 就變成熟牛排。
+
+HOT：
+
+* 生牛排下鍋。
+* 第一面接觸面逐漸褐化。
+* 可有輕微油花／steam。
+* 中段自動 flip。
+* 翻面後第一面有漂亮 sear。
+* 第二面繼續上色。
+* 後段才加入奶油／香草，奶油融化並淋在牛排附近。
+* 完成後短暫 rest visual 可以存在 station 內，不增加 step。
+
+PLATING：
+
+* 牛排移到盤。
+* 可以有 2–3 刀 slice visual 或已切開的一小段，讓熟度可見。
+* 加醬／配菜。
+* 最後 garnish。
+
+⸻
+
+16. 巴斯克乳酪蛋糕
+
+Workflow：PREP → OVEN → PLATING
+
+PREP：
+
+* mixing bowl。
+* 乳酪糊逐步倒入／混合。
+* 攪拌至均勻。
+* 倒入蛋糕模。
+
+OVEN：
+
+* 淺色 batter → 膨起／定型。
+* 表面逐漸出現巴斯克特有深褐色焦面。
+* 不准直接用完成蛋糕縮放。
+
+PLATING：
+
+* 脫模／切一片。
+* 一片蛋糕放上盤。
+
+⸻
+
+17. 生火腿沙拉
+
+Workflow：PREP → PLATING
+
+PREP：
+
+* 蔬菜先切／整理。
+* 生菜進碗。
+* dressing。
+* 輕拌。
+
+PLATING：
+
+* 沙拉先放盤。
+* 生火腿片最後一片片鋪上。
+* 可補起司／香草。
+
+生火腿不應該跟生菜一起被「切碎變大」。
+
+⸻
+
+18. 香烤鮭魚
+
+Workflow：PREP → OVEN → PLATING
+
+PREP：
+
+* raw salmon，顏色較鮮、半透明感。
+* 調味／抹油／香草。
+* 放烤盤。
+
+OVEN：
+
+* 鮭魚由 raw 橘紅逐漸變成較淡、不透明的熟鮭魚色。
+* 表面出現烤色。
+* 邊緣略金黃。
+
+PLATING：
+
+* 鮭魚放盤。
+* 配菜／檸檬。
+* 最後 sauce/garnish。
+
+⸻
+
+19. 海鮮義大利麵
+
+Workflow：PREP → HOT → PLATING
+
+PREP：
+
+* 海鮮與麵／配料分開準備。
+* 處理蝦／貝類等。
+* 海鮮保持 raw visual。
+
+HOT：
+
+* 海鮮先下鍋，raw → cooked。
+* 加麵。
+* 加醬／高湯。
+* 翻拌。
+* 麵逐漸裹醬，海鮮均勻分布。
+
+PLATING：
+
+* 麵入盤。
+* 海鮮保持可辨識，不要變成一團 texture。
+* 最後香草。
+
+⸻
+
+20. 香煎鴨胸
+
+Workflow：PREP → HOT → PLATING
+
+PREP：
+
+* raw duck breast。
+* Jill／廚師在皮面做劃刀 scoring animation。
+* 調味。
+* 完成 PREP 後仍然是生鴨胸，只是皮面有刀紋。
+
+HOT：
+
+* 皮面朝下先煎。
+* 皮面逐漸由淡色變金黃褐色。
+* 油脂可有少量 sizzling visual。
+* 中段 flip。
+* 翻面後清楚看得到金黃皮面。
+* 第二面熟成。
+* station 內自動 rest，不增加 step。
+
+PLATING：
+
+* 鴨胸移到盤。
+* slice 成數片／至少顯示切片結果。
+* 最後加入醬汁。
+
+⸻
+
+21. 松露燉飯
+
+Workflow：HOT → PLATING
+
+HOT：
+
+* 鍋內先是米＋少量液體。
+* 分次加入高湯的 visual。
+* Jill／廚師持續攪拌。
+* 米粒由乾／分散逐漸變成 creamy risotto。
+* 後段加入奶油／起司。
+* 最後加入松露元素。
+
+PLATING：
+
+* 燉飯舀入盤中。
+* 自然攤開。
+* 最後松露片／起司 garnish。
+
+⸻
+
+22. 舒芙蕾
+
+Workflow：PREP → OVEN → PLATING
+
+PREP：
+
+* 蛋白／蛋液在 bowl。
+* whisk animation。
+* 混合物逐漸變蓬鬆。
+* fold batter。
+* 倒入 ramekin。
+
+OVEN：
+
+* 一開始高度低。
+* 烘烤過程真的逐漸膨起。
+* 表面逐漸金黃。
+* 這一道可以合理使用高度增加，因為舒芙蕾本來就會膨脹；但不是整張完成品 sprite uniform scale。
+
+PLATING：
+
+* ramekin 放上盤。
+* 最後糖粉。
+
+⸻
+
+B. Lounge food
+
+23. 炸雞塊
+
+Workflow：HOT → PLATING
+
+HOT：
+
+* 生／裹粉雞塊先下鍋。
+* 顏色由淡色逐漸變金黃。
+* 小幅翻動／翻面。
+* 完成才有炸雞酥脆外觀。
+
+PLATING：
+
+* 雞塊裝盤／籃。
+* 最後 sauce／香草。
+
+⸻
+
+24. 起司可樂餅
+
+Workflow：PREP → HOT → PLATING
+
+PREP：
+
+* 馬鈴薯／餡料混合。
+* 包入起司。
+* 塑形成餅。
+* 裹粉／麵包粉。
+
+HOT：
+
+* 淡色可樂餅 → 金黃褐色。
+* 中段翻面／翻動。
+* 完成後外皮酥脆。
+
+PLATING：
+
+* 切開或至少有一個能看到起司內餡的 visual。
+* 加 sauce。
+
+⸻
+
+25. 起司拼盤
+
+Workflow：PREP → PLATING
+
+PREP：
+
+* 空木板。
+* 不同起司一塊塊放上。
+* 生火腿加入。
+* 無花果／水果加入。
+* 蜂蜜最後淋上。
+
+PLATING：
+
+* 整理成完成 composition。
+* 不需要重新變成另一張突然出現的圖。
+
+目前 branch 新加的木板方向保留，但要確認是「逐步組成」，不是完成木板直接出現。
+
+⸻
+
+26. 蒜香蘑菇
+
+Workflow：HOT → PLATING
+
+HOT：
+
+* 生蘑菇先入鍋。
+* 加油／奶油。
+* 加蒜。
+* 蘑菇逐漸縮小一點、顏色加深。
+* 翻炒。
+* 最後變成有光澤的熟蘑菇。
+
+PLATING：
+
+* 裝盤。
+* parsley／香草最後撒。
+
+⸻
+
+27. 水牛城雞翅
+
+Workflow：HOT → PLATING
+
+HOT：
+
+* 生／未熟雞翅進鍋。
+* 表面逐漸金黃熟成。
+* 翻動。
+* 後段加入 buffalo sauce。
+* 醬從局部逐漸均勻包覆雞翅。
+
+PLATING：
+
+* 雞翅堆疊裝盤。
+* 最後少量 garnish／沾醬。
+
+⸻
+
+28. 起司條
+
+Workflow：HOT → PLATING
+
+HOT：
+
+* 淡色裹粉起司條。
+* 下鍋後逐漸變金黃。
+* 翻動。
+* 後段可有極輕微 cheese melt cue，但不要全部融掉。
+
+PLATING：
+
+* 裝盤。
+* 一根可略露融化起司／拉絲，增加辨識度。
+* sauce。
+
+⸻
+
+29. 生蠔
+
+Workflow：PREP → PLATING
+
+PREP：
+
+* 完整閉合 oyster shell。
+* Jill／廚師用工具開殼。
+* 上殼移除。
+* 蠔肉才露出。
+* 清理／整理。
+
+PLATING：
+
+* 生蠔排列到冰盤／盤中。
+* 放檸檬。
+* 最後 garnish。
+
+不要一開始就是六顆已開好的生蠔。
+
+⸻
+
+30. 德國豬腳
+
+Workflow：PREP → OVEN → PLATING
+
+PREP：
+
+* 生／未烤豬腳。
+* 調味、抹香料。
+* 放烤盤。
+
+OVEN：
+
+* 表皮逐漸由淡色 → 金黃 → 深金褐。
+* 表面產生 crisp roast visual。
+* 肉本體熟成。
+
+PLATING：
+
+* 豬腳放盤。
+* 配菜／酸菜等加入。
+* 最後 mustard／sauce。
+
+⸻
+
+31. 酒吧披薩
+
+Workflow：PREP → PIZZA OVEN → PLATING
+
+PREP：
+
+* 生麵團／pizza base。
+* 醬從中央倒下並由 Jill／廚師抹開。
+* 起司撒上。
+* topping 一樣一樣加入。
+* 最後才是一張「生披薩」。
+
+PIZZA OVEN：
+
+* 生麵團 → 烤熟餅皮。
+* 邊緣逐漸膨起、上色。
+* 起司融化。
+* topping 出現烤色。
+
+PLATING：
+
+* 披薩移出。
+* slice。
+* 最後 garnish。
+
+⸻
+
+C. Additional pizzas
+
+32. 瑪格麗特披薩
+
+Workflow：PREP → PIZZA OVEN → PLATING
+
+PREP：
+
+* 生麵團。
+* 番茄醬倒下並抹開。
+* mozzarella 一塊塊放上。
+* basil 不要過早全部變成完成品構圖。
+
+PIZZA OVEN：
+
+* 餅皮膨起／上色。
+* mozzarella 融化。
+* 番茄醬變成烤後質感。
+
+PLATING：
+
+* 切片。
+* 新鮮 basil 最後加入。
+
+⸻
+
+33. 蘑菇白醬披薩
+
+Workflow：PREP → PIZZA OVEN → PLATING
+
+PREP：
+
+* 生麵團。
+* 白醬倒下並抹開。
+* 起司。
+* 蘑菇片逐步鋪上。
+
+PIZZA OVEN：
+
+* 餅皮上色。
+* 起司／白醬融合。
+* 蘑菇縮小並產生烤色。
+
+PLATING：
+
+* 切片。
+* 最後香草／少量 garnish。
+
+⸻
+
+D. Signature dishes
+
+34. Jill Signature Main
+
+Workflow：PREP → HOT → PLATING
+
+這道不要做成 generic steak clone。
+
+先 audit 現有 Signature Main 在 repo 裡既有的食材、視覺、描述與 recipe data，再依既有 Signature Main 的實際菜色做 choreography。
+
+但必須符合：
+
+* PREP：原始食材明確存在，Jill／高階廚師做 preparation。
+* HOT：從 raw → cooked，有至少一次可見 transformation。
+* PLATING：有 Signature 特有 plating／sauce／garnish。
+* 完成品不能從第一秒就存在。
+* 高階廚師學會 Signature 後使用完全相同 choreography，不另做簡化版。
+
+如果 repo 的資料不足以判斷 Signature Main 到底是什麼，不要自行重新發明菜色；列出缺的資料給我決定。
+
+⸻
+
+35. Jill Signature Dessert
+
+Workflow：PREP → PLATING
+
+同樣先 audit repo 裡既有 Signature Dessert 的實際食材／描述／visual。
+
+至少：
+
+* PREP：從 component／base 開始。
+* 有 mixing／layering／assembly 等真正製作過程。
+* PLATING：最後才完成 Signature composition 與 garnish。
+* 不准一開始就是完整甜點。
+
+資料不足不要自行發明。
+
+⸻
+
+E. Specials / mastered variants
+
+所有 Special／特製版：
+
+* workflow 完全繼承 base dish。
+* cooking choreography 也繼承 base dish。
+* 可以在最後 PLATING 增加一個很小的 premium finish：
+    * 更漂亮 garnish
+    * 額外 sauce stroke
+    * 更精緻擺盤
+* 但不能增加 station。
+* 不能增加 player click。
+* 不能增加料理時間玩法。
+* 不能做成另一套 minigame。
+
+⸻
+
+F. 動畫品質層級
+
+不要試圖一次做 35 套昂貴逐幀動畫。
+
+建立 reusable choreography primitives，再由 dish-specific timeline 組合。
+
+例如：
+
+addIngredient(type)
+pour(type)
+spread(type)
+chop(type)
+whisk()
+mix()
+stir()
+tossPan()
+flip()
+brown(amount)
+bakeColor(amount)
+melt(type)
+rise(amount)
+slice()
+garnish(type)
+
+但資料層應該能回答：
+
+「黃金蛋炒飯現在 35% 時，鍋裡應該看見什麼？」
+
+而不是只回答：
+
+「它是 HOT，所以畫一個鍋。」
+
+同樣也不能只用 progress 去 uniform scale 完成品。
+
+⸻
+
+G. 角色演出
+
+Jill／廚師站在工作站時，至少區分：
+
+* cutting / prep
+* stirring / tossing
+* flipping
+* pouring
+* whisking / mixing
+* assembling
+* plating
+
+不要求角色骨架重做。
+
+可以沿用現有 hand/tool animation，但要讓工具與料理合理：
+
+* 沙拉不要 pan toss。
+* 牛排不要一直 stir。
+* 生蠔不要拿鍋鏟。
+* 舒芙蕾 PREP 要像 whisk/mix。
+* 披薩 PREP 要像 spread/place toppings。
+* 炒飯 HOT 要像 stir/toss。
+* plating 才使用 plating/finishing gesture。
+
+⸻
+
+H. 第一優先驗收：黃金蛋炒飯
+
+先把黃金蛋炒飯修到我實際玩第一天時，肉眼能清楚看到：
+
+空鍋／油
+→ 蛋
+→ 蛋半熟
+→ 飯加入
+→ 配料加入
+→ 翻炒／拋鍋
+→ 金黃色完成炒飯
+→ PLATING 才進盤
+
+不要先改其他 gameplay。
+
+先截：
+
+1. HOT 約 10%
+2. HOT 約 35%
+3. HOT 約 65%
+4. HOT 約 95%
+5. PLATING 完成
+
+我要五張連續狀態放在一起看時，完全不用文字也能看出「這是一份炒飯從原料被炒熟」。
+
+這一條通過後，再把同樣的 dish-specific choreography system 擴到上面全部料理。
+
+⸻
+
+I. 全料理驗收
+
+完成後產出一張／一組 evidence：
+
+每道菜至少顯示：
+
+* 該 dish 第一站 early state
+* 該 dish 第一站 late state
+* 若有第二 cooking station，顯示它的 mid state
+* final plated state
+
+不要只做自動測試說 state 有改。
+
+我要肉眼看得到 transformation。
+
+尤其抽查這些差異最大的菜：
+
+* 黃金蛋炒飯：蛋＋飯真的被炒成炒飯
+* 牛排：raw → sear → flip → cooked
+* 鴨胸：score → skin sear → flip → slice
+* 沙拉：whole ingredients → chopped/mixed → plate
+* 布丁：caramel → custard liquid → set → unmold
+* 巴斯克：batter → baked dark top
+* 舒芙蕾：batter → actual rise
+* 生蠔：closed shell → shucked
+* 披薩：dough → sauce/toppings → baked pizza
+* 拿鐵：espresso → milk → latte
+
+如果這十道肉眼看起來仍只是「完成品慢慢變大／換顏色」，就不算完成。
+
+⸻
+
+J. 不准破壞目前已經成功的部分
+
+這一輪是 visual choreography pass，不是 Cooking System 第二次重構。
+
+不要改：
+
+* workflow
+* station count
+* station capacity
+* order UX
+* guidance
+* batching
+* staff claim
+* handoff
+* chef specialization
+* difficulty
+* no-burning rule
+* safe waiting
+* current kitchen layout
+* current kitchen art direction
+
+不要因為動畫比較複雜，就重新加入玩家操作。
+
+核心仍然是：
+
+遊戲負責記住流程，玩家只負責做決定。
+
+現在只是再補一句：
+
+玩家決定這道菜去哪裡；Jill 和廚師要真的把它做出來。
+
+完成後跑完整 regression，並另外報告：
+
+1. 黃金蛋炒飯原本為什麼看起來只是變大。
+2. 新 choreography architecture 怎麼做。
+3. 哪些 visual primitive 是共用的。
+4. 35 道料理每一道實際用了哪些 internal beats。
+5. 哪些料理因 repo 現有素材不足而只能做到簡化版。
+6. Signature Main / Dessert audit 到底查到什麼。
+7. 提供上述 visual evidence，不要只給測試數字。
+補充一個重要修正：我實際玩後發現，目前 PLATING 的空間邏輯是錯的。
+
+請先不要把 PLATING = Pass 固定工作站 當成產品 canon。
+
+我實際看到的行為是：
+
+HOT 做完
+→ 食物自己跑到別的位置／備料台附近
+→ 我點裝盤
+→ Jill 才走去做一個裝盤動作
+→ 最後到 Pass
+
+這不對。
+
+而且目前 tests/cooking_tests.py 本身也把舊邏輯寫成 acceptance：
+HOT 完成後 cue Pass，玩家點 Pass，Jill fetch，然後 plates it。
+
+請連 architecture 與 tests 一起修正，不要只改 animation。
+
+PLATING 的正確定義
+
+PLATING 仍然是玩家可理解的 workflow step：
+
+HOT → PLATING
+
+但 PLATING 不是「食物自己移動到某個 plating station」。
+
+它代表：
+
+角色拿一個空盤，走到上一個料理站已經完成的食物旁，把食物真正裝進盤子／擺盤，然後把完成的盤子送到 Pass。
+
+因此要把：
+
+PLATING = food goes to Pass
+
+改成：
+
+PLATING = handler fetches plate → handler goes to finished food → plates there → handler carries completed plate → Pass
+
+⸻
+
+以黃金蛋炒飯為標準範例
+
+正確完整流程：
+
+1. HOT
+
+Jill 在炒台完成炒飯：
+
+空鍋／油
+→ 蛋
+→ 飯
+→ 配料
+→ 翻炒
+→ 完成炒飯
+
+HOT 完成後：
+
+炒飯繼續留在原本那個鍋／炒台 slot。
+
+不要瞬移。
+不要自己跑去 PREP。
+不要自己跑去 Pass。
+不要先變成盤裝完成品。
+
+Ticket：
+
+✓ 熱區 → ● 裝盤
+下一步：裝盤 · 等待處理
+
+⸻
+
+2. 玩家選擇 PLATING
+
+玩家 focus 黃金蛋炒飯。
+
+這時 guidance 不應該表達：
+
+「把炒飯送去 Pass。」
+
+而應該讓玩家理解：
+
+「現在可以把這鍋炒飯裝盤。」
+
+如果玩家正式指派 Jill 做 PLATING：
+
+Jill claim PLATING step。
+
+⸻
+
+3. Jill 先取得空盤
+
+Jill 應該有一個很短、自然的：
+
+拿空盤
+
+動作。
+
+盤子可以來自目前廚房合理的 plate stack / plating supply。
+
+不需要玩家另外點盤子。
+
+玩家只需要下達「做 PLATING」這個決定。
+
+「拿盤」是 Jill 自動完成的 internal choreography。
+
+不要因此增加第四個 gameplay step。
+
+⸻
+
+4. Jill 走回炒好的食物
+
+Jill 拿著空盤：
+
+→ 走到剛才完成炒飯的 burner / wok。
+
+這時：
+
+* 炒飯仍然在原鍋
+* 鍋仍然在原 burner
+* Jill 手上／動作狀態有盤子
+* 食物沒有 teleport
+
+⸻
+
+5. 真正的 plating animation 在這裡發生
+
+Jill 在炒台旁：
+
+→ 用鍋鏟把炒飯盛入盤中
+→ 鍋裡的炒飯量減少／消失
+→ 盤中的炒飯出現
+→ 整理形狀
+→ garnish / 蔥花
+
+這一刻才叫 PLATING。
+
+不是食物已經跑到 Pass 之後，角色再演一個抽象的 plating gesture。
+
+⸻
+
+6. 完成後 Jill 拿著成品去 Pass
+
+裝盤完成：
+
+Jill 手上現在是：
+
+完成的黃金蛋炒飯 plate
+
+然後：
+
+→ Jill 從炒台走到 Pass
+→ 把完成盤放到 Pass
+→ waiter 才能 pickup / serve
+
+所以 Pass 的角色是：
+
+completed-food handoff / pickup point
+
+而不是：
+
+cooking/plating station。
+
+這兩個概念請徹底分開。
+
+⸻
+
+空間連續性 HARD RULE
+
+任何料理從上一個 station 完成到 PLATING，都必須回答：
+
+「這份食物現在物理上在哪裡？」
+
+答案不能突然改變。
+
+例如：
+
+牛排 HOT 完成：
+牛排仍在 HOT pan/grill。
+
+烤雞 OVEN 完成：
+烤雞仍在 oven tray / oven output position。
+
+沙拉 PREP 完成：
+拌好的沙拉仍在 PREP bowl。
+
+披薩 PIZZA OVEN 完成：
+披薩仍在 pizza oven output / tray。
+
+它們都不應該因為 workflow 進入 PLATING 就 teleport 到 Pass 或另一張桌子。
+
+⸻
+
+不同上一站的 PLATING
+
+HOT → PLATING
+
+例：
+
+* 黃金蛋炒飯
+* 番茄義大利麵
+* 南瓜濃湯
+* 松露燉飯
+* 蒜香蘑菇
+* 炸雞塊
+
+角色：
+
+拿盤／碗
+→ 走到 HOT finished food
+→ 盛出／夾出／倒出
+→ garnish
+→ 拿成品去 Pass
+
+⸻
+
+PREP → PLATING
+
+例：
+
+* 田園沙拉
+* 生火腿沙拉
+* 提拉米蘇
+* 焦糖布丁
+* 起司拼盤
+* 生蠔
+
+角色：
+
+拿 serving plate / bowl
+→ 到 PREP finished food
+→ transfer / assemble / unmold / arrange
+→ garnish
+→ 拿成品去 Pass
+
+⸻
+
+OVEN → PLATING
+
+例：
+
+* 香草烤雞
+* 香烤鮭魚
+* 巴斯克
+* 舒芙蕾
+* 德國豬腳
+* 松露薯條
+
+角色：
+
+取得盤子
+→ 到 oven / oven output
+→ 取出完成食物
+→ transfer / slice / garnish
+→ 拿成品去 Pass
+
+如果視覺上直接從 oven 拿 tray 比較合理，可以先取 tray，再在 oven adjacent usable surface 完成 plating。
+
+重點仍然是：
+
+人搬食物，不是食物自己瞬移。
+
+⸻
+
+PIZZA OVEN → PLATING
+
+角色：
+
+→ 帶 plate / board 去 pizza oven
+→ 取出 pizza
+→ 放上 board
+→ slice
+→ garnish
+→ 把完成 pizza 帶去 Pass
+
+⸻
+
+PLATING capacity 的重新解釋
+
+我們原本有：
+
+PLATING capacity 1 → 2 → 3
+
+不要直接刪掉 capacity concept。
+
+但它不再代表：
+
+「Pass 有幾個地方可以讓食物 teleport 過去裝盤。」
+
+它應代表：
+
+同時能進行多少個 finishing / plating operation，以及有多少可用的 plate/pass landing capacity。
+
+請 audit 現有 Pass、plate positions、heat lamps、plate stack 與角色動線後，用最小 architecture 改動重新定義。
+
+如果需要區分：
+
+* plating action capacity
+* Pass completed-plate holding capacity
+
+可以內部分開。
+
+但玩家不需要看到兩套複雜系統。
+
+⸻
+
+Staff 同樣遵守
+
+如果小林師傅接 PLATING：
+
+不能：
+
+炒飯 HOT 完成
+→ 炒飯瞬移
+→ 小林在 Pass 等它。
+
+而是：
+
+炒飯留在 burner
+→ ticket 顯示 下一步：裝盤 · 小林師傅前往中
+→ 小林取得盤子
+→ 小林走到炒飯
+→ 小林把炒飯盛進盤子
+→ 小林拿完成盤去 Pass。
+
+因此 handler 才是真的「接手這份料理」。
+
+⸻
+
+Guidance 也要跟著改
+
+現在 tests 裡的：
+
+HOT finished → pass is cued
+
+需要修改。
+
+HOT finished 後，focus 該料理時，主要 cue 應該圍繞：
+
+* 原本完成食物所在的位置
+* PLATING 可以開始
+* handler 將前往該 finished food
+
+不要讓玩家誤以為「下一站是把食物 teleport 去 Pass」。
+
+UI workflow 仍然可以寫：
+
+✓ 熱區 → ● 裝盤
+
+因為對玩家而言這仍然是 PLATING step。
+
+只是 physical choreography 不再把 PLATING 錯誤等同 Pass。
+
+⸻
+
+Test 必須一起改
+
+目前 cooking_tests.py 有 acceptance 明確寫：
+
+done, it waits on the fire
+the pass lit
+a tap on the pass
+Jill plates it
+plate goes the old way
+
+這個 test 現在與新產品決策衝突。
+
+請改 acceptance test，至少驗證：
+
+1. HOT 完成後，food visual 仍在原 HOT slot。
+2. PLATING claim 不會讓 food teleport。
+3. handler 取得 plate。
+4. handler 實際走到 finished food。
+5. plating animation 在 finished-food location 發生。
+6. raw/cooked food visual 從鍋／tray 轉移到 plate。
+7. plating 完成後，handler 才帶 completed plate 前往 Pass。
+8. completed plate 到 Pass 後 waiter 才可 pickup。
+9. 整段過程 work node identity 不變。
+10. staff plating 走完全相同 physical logic。
+11. batch ×N 要合理產生對應完成份數，但仍是一個 work node。
+12. save / old-save / handoff / capacity 不 regression。
+
+⸻
+
+與上一則「全料理動畫」規格合併
+
+上一則每一道料理的 PLATING choreography 都按照這個新 architecture 解讀。
+
+例如牛排：
+
+PREP
+→ HOT 煎熟
+→ 牛排留在 HOT
+→ handler 拿盤走到牛排
+→ transfer / slice / sauce / garnish
+→ handler 拿完成牛排去 Pass。
+
+鴨胸：
+
+PREP score
+→ HOT skin sear / flip / rest
+→ 鴨胸留在 HOT finished position
+→ handler 帶盤過來
+→ slice
+→ arrange slices
+→ sauce
+→ handler 帶完成盤去 Pass。
+
+沙拉：
+
+PREP 切／拌
+→ salad 留在 PREP bowl
+→ handler 帶 serving bowl / plate 過來
+→ transfer
+→ garnish
+→ Pass。
+
+因此：
+
+PLATING 是角色去料理旁邊把它變成一道可以上桌的菜。
+
+而：
+
+PASS 是一道已經裝好盤的菜交給外場的位置。
+
+兩者不要再混在一起。
+
+最重要的空間規則：
+
+食物不會自己去下一個地方。人去拿它、處理它、搬它。
+
+這才是目前 Cooking System 接下來所有動畫與 handoff 的基礎。
