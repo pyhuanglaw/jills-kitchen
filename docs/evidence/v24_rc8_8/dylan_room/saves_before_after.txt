@@ -1,0 +1,4 @@
+before (player_day68_1033.json): 04_before_day68_room.png | {"day": 68, "stage": 2, "out": false, "desk": true, "sofa": false, "tags": ["先生"], "tab": "Jill 的房間", "w": 375, "n": 6}
+before: after the evening phase=summary; next: Day 69 prep; reload title has DAY 69: True; page errors: 0 []
+after (player_day92_2105.json): 05_after_day92_room.png | {"day": 93, "stage": 3, "out": true, "desk": true, "sofa": false, "tags": ["Dylan"], "tab": "Jill & Dylan", "w": 382, "n": 8}
+after: after the evening phase=summary; next: Day 94 prep; reload title has DAY 94: True; page errors: 0 []
