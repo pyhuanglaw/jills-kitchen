@@ -14,7 +14,9 @@ MK = r"""window.__mk=(ti,items)=>{const t=R.tables[ti];const o=rollGuest();const
   const tk={id:R.tkid++,no:R.tickets.length+1,g:gg,items:items.map(d=>({d,st:'pending',q:null,want:0,picked:false})),t0:R.t};gg.ticket=tk;R.tickets.push(tk);R.tv++;renderTickets();return tk}"""
 SETUP = """S.level=5;S.eq.stove=4;S.eq.oven=2;S.eq.bar=3;S.eq.prep=2;S.eq.fridge=4;for(const k of ['oven','prep','bar'])S.eq[k]=Math.max(S.eq[k],2);
  S.rooms=S.rooms||{};if(!S.unlocked.includes('%(d)s'))S.unlocked.push('%(d)s');if(!S.menu.includes('%(d)s'))S.menu.push('%(d)s');S.stock['%(d)s']=20;S.tut=1;%(extra)ssave()"""
-EXTRA = {'pizza': "S.projs=S.projs||{};", 'pzmarg': "", 'pzfungi': ""}
+EXTRA = {'pizza': "S.projs=S.projs||{};", 'pzmarg': "", 'pzfungi': "",
+         'signature': "S.signature=S.signature||{base:'mash',protein:'duck',sauce:'redwine',side:'asparagus',name:'招牌'};",   # Jill's own two: as a player made them
+         'sigdessert': "S.sigDessert=S.sigDessert||{base:'pannacotta',cream:'mascarpone',fruit:'berries',finish:'caramel',name:'招牌甜點'};"}
 STATE = "JSON.stringify((()=>{const n=wfList()[0];if(!n)return null;const lf=wfLookF(n);const s=chOf(n.d,lf)?chState(n,lf):null;const p=n.st==='work'&&n.f==='plate'&&chOf(n.d,'plate')?chState(n,'plate'):null;return{st:n.st,f:n.f,lf,prog:+wfProg(n).toFixed(2),hands:+wfHands(n).toFixed(2),beat:s&&s.beat?s.beat.say:null,plate:p&&p.beat?p.beat.say:null,slot:n.slot&&n.slot.type}})())"
 # how far into a place's beats the work is: the beat's index plus its share done (-1 before the place's work begins, 999 once its beats are all done)
 BEAT = "(()=>{const n=wfList()[0];const f='%s';if(!n||!(n.st==='work'||n.st==='cook')||n.f!==f)return n&&n.st==='ready'?999:-1;const s=chState(n,f);if(!s)return -1;if(!s.beat)return 999;const L=(s.spec.hands||[]).concat(s.spec.heat||[]);return L.indexOf(s.beat)+s.t})()"

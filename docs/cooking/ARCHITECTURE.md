@@ -456,6 +456,11 @@
     `S.projDone.pizzaoven` 開披薩烤爐（遊戲讀的是 `S.rooms`，所以從來沒開成，披薩一直做不到披薩烤爐那一步），改成 `S.rooms`；
     `tools/qa/plating_sheet.py` 一樣加上披薩烤爐；`tools/qa/dish_sheet.py` 加中文菜名。
 
+30. **2026-10-09（第六批：招牌主菜、招牌甜點）**：`cooking_each_dish_with_its_own_beats_starts_raw_and_changes_by_hand` 的 `want`
+    加上 `signature.prep／hot／plate`、`sigdessert.prep／plate`；這個測試的廚房多了一道做好的招牌主菜和招牌甜點
+    （`S.signature`、`S.sigDessert`，跟 `cooking_` 其他測試用的一樣）——招牌兩道在遊戲裡是 Jill 做出來以後才存在，沒有它們就讀不到
+    食譜（原本會在 `recipeOf` 出錯）。檢查的方法沒變。`tools/qa/dish_frames.py` 加上招牌兩道的預設組合，`dish_sheet.py` 加菜名。
+
 ## 使用者 iPhone 回報（2026-10-08 晚上到 10-09 凌晨）
 
 使用者：「我剛在 iPhone 真人實玩私人測試版，發現兩個 blocker」，附第 3 天的存檔（`tests/saves/cooking_day3_0156.json`）。

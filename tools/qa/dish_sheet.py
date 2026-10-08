@@ -12,7 +12,8 @@ NAMES = {'friedrice': '黃金蛋炒飯', 'coffee': '拿鐵咖啡', 'blacktea': '
          'tiramisu': '提拉米蘇', 'chicken': '香草烤雞', 'steak': '炙烤肋眼牛排', 'basque': '巴斯克乳酪蛋糕', 'prosciutto': '生火腿沙拉',
          'salmon': '香烤鮭魚', 'seafood': '海鮮義大利麵', 'duck': '香煎鴨胸', 'risotto': '松露燉飯', 'souffle': '舒芙蕾',
          'bites': '炸雞塊', 'croquette': '起司可樂餅', 'cheeseplate': '起司拼盤', 'mushroom': '蒜香蘑菇', 'wings': '水牛城雞翅', 'cheesestick': '起司條',
-         'oyster': '生蠔', 'knuckle': '德國豬腳', 'pizza': '酒吧披薩', 'pzmarg': '瑪格麗特披薩', 'pzfungi': '蘑菇白醬披薩'}
+         'oyster': '生蠔', 'knuckle': '德國豬腳', 'pizza': '酒吧披薩', 'pzmarg': '瑪格麗特披薩', 'pzfungi': '蘑菇白醬披薩',
+         'signature': 'Jill 的招牌主菜（奶油薯泥・鴨胸・紅酒醬・蘆筍）', 'sigdessert': 'Jill 的招牌甜點（奶酪・馬斯卡彭・莓果・焦糖）'}
 tmp = os.path.join(src, '_sheet'); os.makedirs(tmp, exist_ok=True)
 rows = []
 for d in DISHES:

@@ -7480,7 +7480,37 @@ const CH={
   plate:{v:'pizzapan',from:{cut:0,gar:0},
    hands:[{to:.18,g:'pull',say:'披薩鏟把披薩拉出來',set:{}},
           {to:.76,g:'chop',say:'切成一格一格',set:{cut:1}},
-          {to:1,g:'sprinkle',ing:'parsley',say:'最後撒一點巴西里',set:{gar:1}}]}}};
+          {to:1,g:'sprinkle',ing:'parsley',say:'最後撒一點巴西里',set:{gar:1}}]}},
+ /* the sixth batch (2026-10-09): Jill's own two (§34, §35), as the player made them — the protein, base, side and sauce of the
+    signature main, the base, cream, fruit and finish of the signature dessert (S.signature, S.sigDessert); a cook who has learnt
+    them makes them the same way */
+ signature:{
+  prep:{v:'cutboard',from:{season:0,press:0,side:0},
+   hands:[{to:.4,g:'sprinkle',ing:'salt',say:'選好的蛋白質（鴨胸、和牛、鮭魚、雞腿或干貝）生的放在砧板上，撒鹽和胡椒',set:{season:1}},
+          {to:.62,g:'press',say:'輕輕壓一下，讓調味貼住',set:{press:1}},
+          {to:1,g:'chop',ing:'side',say:'配菜整理好放旁邊（蘆筍、蔬菜、生菜或切好的馬鈴薯）',set:{side:1}}]},
+  hot:{v:'pan',from:{on:0,sear1:0,flip:0,sear2:0},
+   hands:[{to:1,g:'place',ing:'protein',say:'生的蛋白質下鍋',set:{on:1}}],
+   heat:[{to:.45,say:'第一面貼著鍋煎出焦色',set:{sear1:1}},
+         {to:.55,g:'flip',say:'翻面，煎好的那面朝上',set:{flip:1}},
+         {to:1,say:'第二面上色，熟度剛好',set:{sear2:1}}]},
+  plate:{v:'plate',from:{base:0,out:0,side:0,sauce:0,gar:0},
+   hands:[{to:.24,g:'scoop',ing:'base',say:'先放主食（米飯、薯泥、寬麵或麵包）',set:{base:1}},
+          {to:.48,g:'scoop',say:'煎好的蛋白質移到主食上',set:{out:1}},
+          {to:.64,g:'place',ing:'side',say:'配菜放旁邊',set:{side:1}},
+          {to:.84,g:'pour',ing:'sauce',say:'淋上招牌醬汁',set:{sauce:1}},
+          {to:1,g:'sprinkle',ing:'herbs',say:'香草和一點金色碎粒；第二、三版的醬汁線、嫩葉、花和金箔也是最後放',set:{gar:1}}]}},
+ sigdessert:{
+  prep:{v:'cutboard',from:{base:0,whip:0,fruit:0},
+   hands:[{to:.34,g:'place',ing:'base',say:'先做底：奶酪從模子倒出來、海綿蛋糕切塊、塔皮放好、或可麗餅折好',set:{base:1}},
+          {to:.7,g:'whisk',ing:'cream',say:'奶餡在碗裡打到挺',set:{whip:1}},
+          {to:1,g:'chop',ing:'fruit',say:'水果切好（莓果、無花果、芒果或柑橘）',set:{fruit:1}}]},
+  plate:{v:'plate',from:{base:0,cream:0,fruit:0,finish:0,gar:0},
+   hands:[{to:.22,g:'place',ing:'base',say:'底放上盤子',set:{base:1}},
+          {to:.46,g:'scoop',ing:'cream',say:'湯匙挖一球奶餡放上去',set:{cream:1}},
+          {to:.66,g:'place',ing:'fruit',say:'水果擺上',set:{fruit:1}},
+          {to:.86,g:'pour',ing:'finish',say:'最後的點綴（焦糖、可可粉、蜂蜜堅果或糖粉）',set:{finish:1}},
+          {to:1,g:'place',ing:'mint',say:'第二、三版的果醬線、薄荷、糖絲和金箔最後放',set:{gar:1}}]}}};
 function chOf(d,f){const c=CH[baseOf(d)];return c&&c[f]||null}
 function chRun(st,list,u){let a=0;for(const b of list||[]){if(u>=b.to){Object.assign(st,b.set);a=b.to;continue}const t=clamp((u-a)/Math.max(1e-6,b.to-a),0,1);const e=b.ease?Math.pow(t,b.ease):t;for(const k in b.set){const v0=st[k]||0;st[k]=v0+(b.set[k]-v0)*e}return{b,t}}return null}
 /* how far a piece of work is into a place's beats: the hands' share (h) and the heat's (q); a place it is done with is all done */
@@ -7985,7 +8015,43 @@ const CHD={
    if(g&&g.g==='scoop')chCarry(c,g,m,{x:sp.x,y:sp.y},k=>wfPlateAt(n,sp,k),(x,y)=>chAir(c,n,sp,x,y,()=>knuckleRoast(c,-6,-2,.95,'#9A5422')),1)}},
  pizza:{vessel:chPizzaVessel,oven:chPizzaOven,held:chPizzaHeld,plates:chPizzaPlates},
  pzmarg:{vessel:chPizzaVessel,oven:chPizzaOven,held:chPizzaHeld,plates:chPizzaPlates},
- pzfungi:{vessel:chPizzaVessel,oven:chPizzaOven,held:chPizzaHeld,plates:chPizzaPlates}};
+ pzfungi:{vessel:chPizzaVessel,oven:chPizzaOven,held:chPizzaHeld,plates:chPizzaPlates},
+ signature:{
+  /* the player's signature main: the board — the chosen protein raw, salted and peppered, pressed; the side made ready beside it.
+     The pan — laid in raw, the first side searing, turned over, the second side colouring. Plated — the base first from its small
+     pot, the protein over it, the side, the signature sauce poured, the garnish last (the later versions' extras with it) */
+  vessel(c,n,S0,sp,now,hand,out){const st=S0.st,g=hand&&S0.ph.h<1?S0.beat:null;const s=chSigOf();
+   if(wfLookF(n)==='prep'){chIn(c,sp,()=>{drawVesselBack(c,'cutboard');chSigBoard(c,s,st,now,g)});return}
+   const on=n.st==='cook'||n.st==='work'&&n.f==='hot';const gone=chGone(out,Math.min(4,Math.max(1,n.n)));
+   chIn(c,sp,()=>{drawVesselBack(c,'pan');c.save();c.beginPath();c.ellipse(0,0,40,17,0,0,7);c.clip();c.scale(1,17/40);if(st.on>=1&&!gone)chSigPan(c,s,st,now);c.restore();drawVesselFront(c,'pan');
+    if(st.on>0&&st.on<1){c.save();c.translate(0,-(1-st.on)*34);c.scale(1,17/40);chSigPan(c,s,{sear1:0,flip:0,sear2:0},now);c.restore()}
+    if(on&&st.on>=1&&!gone){for(let i=0;i<5;i++){const ph=(now*1.5+i*.21)%1;c.globalAlpha=(1-ph)*.8;c.fillStyle=i%2?'#FFF1B0':'#FFD27A';circ(c,-22+i*11+Math.sin(now*9+i*2)*3,-8-ph*20,1.5-ph)}c.globalAlpha=1;chSteam(c,.45,now,-22,36)}
+    if(hand&&S0.beat&&S0.beat.g==='flip'&&st.flip>0&&st.flip<1){const t=st.flip;c.save();c.translate(-6,-Math.sin(t*Math.PI)*16*17/40-2);c.rotate(-.2);c.fillStyle='#B9C2C6';rr(c,-14,-2,26,5,2);c.fill();c.strokeStyle='#6B4428';c.lineWidth=3;c.lineCap='round';c.beginPath();c.moveTo(12,0);c.lineTo(34,-16);c.stroke();c.restore()}})},
+  held(c,n,x,y){const s=chSigOf();c.save();c.translate(x,y);c.scale(.22,.22);drawVesselBack(c,'plate');c.save();c.scale(1,.42);chSigPan(c,s,{sear1:0,flip:0,sear2:0},0);c.restore();c.restore()},
+  plates(c,n,S0,pl,sp,now,hand){const st=pl.st;const m=Math.min(4,Math.max(1,n.n));const g=hand?pl.beat:null;const s=chSigOf();const pot={x:sp.x+18*sp.sc,y:sp.y-16*sp.sc,sc:sp.sc*.42};
+   if(st.base<1)chIn(c,pot,()=>{drawVesselBack(c,'pot');c.save();c.beginPath();c.ellipse(0,-16,33,9.5,0,0,7);c.clip();c.fillStyle=chSigBaseCol(s);c.fillRect(-34,-27,68,22);c.restore();drawVesselFront(c,'pot')});   /* the base, kept warm in its small pot behind the pan */
+   for(let k=m-1;k>=0;k--){const pp=wfPlateAt(n,sp,k);const L={base:clamp(st.base*m-k,0,1),out:clamp(st.out*m-k,0,1),side:clamp(st.side*m-k,0,1),sauce:clamp(st.sauce*m-k,0,1),gar:clamp(st.gar*m-k,0,1)};
+    if(L.gar>=1&&k<n.its.length){chDishPic(c,n,pp,k);continue}
+    c.save();c.translate(pp.x,pp.y);c.scale(pp.sc,pp.sc);drawPlate(c,S.decor.ware>0);c.scale(1.12,1.12*.8);chSigPlate(c,s,L,n.its[k]&&n.its[k].it.want);c.restore()}
+   if(g&&g.g==='scoop'&&g.ing==='base')chCarry(c,g,m,{x:pot.x,y:pot.y-12*pot.sc},k=>wfPlateAt(n,sp,k),(x,y)=>{c.fillStyle='#B9C2C6';el(c,x,y+1,4.2,1.8);c.fillStyle=chSigBaseCol(s);el(c,x,y-.6,3.4,1.6)});
+   else if(g&&g.g==='scoop')chCarry(c,g,m,{x:sp.x,y:sp.y},k=>wfPlateAt(n,sp,k),(x,y)=>chAir(c,n,sp,x,y,()=>chSigProteinAt(c,s,0,0)),1);
+   if(g&&g.g==='pour'){const pp=wfPlateAt(n,sp,Math.min(m-1,Math.floor(g.u*m)));c.save();c.translate(pp.x+7,pp.y-14);c.rotate(-.9);c.fillStyle='#FFFFFF';c.strokeStyle='rgba(150,130,110,.6)';c.lineWidth=.5;rr(c,-2,-2.6,4,5.2,1);c.fill();c.stroke();c.restore();chStream(c,pp.x+4.4,pp.y-12.4,pp.x+1,pp.y-3,SIG.sauce[s.sauce].c,1,now)}
+   if(g&&g.g==='sprinkle'){const pp=wfPlateAt(n,sp,Math.min(m-1,Math.floor(g.u*m)));chFall(c,pp.x,pp.y-14,'#6FA84E',now,'dot')}}},
+ sigdessert:{
+  /* the player's signature dessert: the board — the base made ready (the panna cotta turned out of its mould, the sponge cut, the
+     tart shell set down, the crêpe folded), the cream whisked in its bowl until it holds, the fruit cut. Plated — the base, a
+     quenelle of the cream, the fruit, the finish; the later versions' coulis and mint, spun sugar and gold last */
+  vessel(c,n,S0,sp,now,hand,out,pl){const st=S0.st,g=hand&&S0.ph.h<1?S0.beat:null;const s=chSigDOf();const m=Math.min(4,Math.max(1,n.n));
+   const used=pl?{base:pl.st.base,cream:pl.st.cream,fruit:pl.st.fruit}:{base:0,cream:0,fruit:0};chIn(c,sp,()=>{drawVesselBack(c,'cutboard');chSigDBoard(c,s,st,now,g,used)})},
+  plates(c,n,S0,pl,sp,now,hand){const st=pl.st;const m=Math.min(4,Math.max(1,n.n));const g=hand?pl.beat:null;const s=chSigDOf();
+   for(let k=m-1;k>=0;k--){const pp=wfPlateAt(n,sp,k);const L={base:clamp(st.base*m-k,0,1),cream:clamp(st.cream*m-k,0,1),fruit:clamp(st.fruit*m-k,0,1),finish:clamp(st.finish*m-k,0,1),gar:clamp(st.gar*m-k,0,1)};
+    if(L.gar>=1&&k<n.its.length){chDishPic(c,n,pp,k);continue}
+    c.save();c.translate(pp.x,pp.y);c.scale(pp.sc,pp.sc);drawPlate(c,S.decor.ware>0);c.scale(1.12,1.12*.8);chSigDPlate(c,s,L,n.its[k]&&n.its[k].it.want);c.restore()}
+   const from=k=>({x:sp.x+k*sp.sc,y:sp.y-4*sp.sc});
+   if(g&&g.ing==='base')chCarry(c,g,m,from(-30),k=>wfPlateAt(n,sp,k),(x,y)=>chAir(c,n,sp,x,y,()=>chSigDBase(c,s,rng(5))),1);
+   if(g&&g.ing==='cream')chCarry(c,g,m,from(2),k=>wfPlateAt(n,sp,k),(x,y)=>{c.fillStyle='#B9C2C6';el(c,x,y+1,4.2,1.8);c.fillStyle=SIGD.cream[s.cream].c;el(c,x,y-.8,3.2,1.8)},1);
+   if(g&&g.ing==='fruit')chCarry(c,g,m,from(30),k=>wfPlateAt(n,sp,k),(x,y)=>{c.fillStyle=chSigDFruitCol(s);circ(c,x-1,y-.6,1.4);circ(c,x+1.4,y,1.3)},1);
+   if(g&&g.g==='pour'){const pp=wfPlateAt(n,sp,Math.min(m-1,Math.floor(g.u*m)));const f=s.finish;if(f==='caramel'){chStream(c,pp.x+6,pp.y-14,pp.x,pp.y-4,'#B8661F',.8,now)}else chFall(c,pp.x,pp.y-14,f==='cocoa'?'#3C1E0F':f==='sugar'?'#FFFFFF':'#C98B3A',now,'dot')}}}};
 /* a tool over a wok or pan, in the vessel's own coordinates (the pan at 0,0, its rim 44 wide): what the hands are doing */
 function chWokTool(c,g,now){const k=g.g;c.save();c.lineCap='round';
  if(k==='pour'&&g.ing==='oil'){c.save();c.translate(20,-50);c.rotate(-2.3);c.fillStyle='#E7C25A';rr(c,-5,-13,10,24,3);c.fill();c.fillStyle='rgba(255,255,255,.45)';c.fillRect(-3,-11,2,18);c.fillStyle='#3A3A3A';rr(c,-2.4,-19,4.8,7,1.2);c.fill();c.restore();
@@ -8617,6 +8683,88 @@ function chPizzaVessel(c,n,S0,sp,now,hand,out,pl){const st=S0.st,g=hand&&S0.ph.h
 function chPizzaOven(c,n,S0,sp){const P=chPizzaP(n,S0.st,'pizza',null);P.bake=S0.st.bake==null?1:S0.st.bake;chIn(c,sp,()=>chPizzaPans(c,n,P))}
 function chPizzaHeld(c,n,x,y){c.save();c.translate(x,y);c.scale(.22,.22);drawVesselBack(c,'pizzapan');c.save();c.scale(1.47,.63);chPizza(c,{kind:baseOf(n.d),dough:1,sauce:1,spread:1,cheese:1,top:1,bake:0},n.seed||1);c.restore();c.restore()}
 function chPizzaPlates(c,n,S0,pl,sp,now,hand){}
+/* ---- the sixth batch's pieces (2026-10-09): Jill's signature main and dessert, drawn from what the player chose ---- */
+/* the signature as the player made it, or the menu's own default before there is one */
+function chSigOf(){return S.signature||{base:'mash',protein:'duck',sauce:'redwine',side:'asparagus'}}
+function chSigDOf(){return S.sigDessert||{base:'pannacotta',cream:'mascarpone',fruit:'berries',finish:'caramel'}}
+function chSigBaseCol(s){return s.base==='rice'?'#F3E3B0':s.base==='mash'?'#F3E2B6':s.base==='pasta'?'#F3DB9A':'#E9C88E'}
+/* raw scallops: three ivory rounds */
+function chScallopsRaw(c,x,y,s){for(let k=0;k<3;k++){const px=x+(k-1)*12*s,py=y+(k%2?3:-2)*s;c.fillStyle='rgba(0,0,0,.15)';el(c,px+1,py+2,6.6*s,4.8*s);c.fillStyle='#F3E9D8';el(c,px,py,6.4*s,4.6*s);c.fillStyle='rgba(255,255,255,.5)';el(c,px-2*s,py-1.4*s,2.4*s,s)}}
+/* the board: the chosen protein raw (the duck breast scored, the ribeye, the salmon fillet, the chicken leg, the scallops), salt
+   and pepper over it by hand, pressed on; the side made ready beside it */
+function chSigBoard(c,s,st,now,g){const p=s.protein;c.save();c.translate(-10,-1);
+ if(p==='duck'){c.scale(.8,.8);chDuckBreast(c,{scored:1},1)}else if(p==='beef'){c.scale(.72,.58);chSteakCut(c,{},1)}else if(p==='salmon')chSalmonFillet(c,0,0,1,-.1,0);else if(p==='chicken')chChickenLeg(c,0,0,.95,0,0,0);else chScallopsRaw(c,0,0,1.3);c.restore();
+ const se=st.season||0;if(se>0){const R=rng(61);for(let i=0;i<24;i++){const x=-30+R()*36,y=-10+R()*16,w=R()<.5;if(i>=Math.round(24*se))continue;c.fillStyle=w?'rgba(255,255,255,.95)':'rgba(40,30,25,.8)';circ(c,x,y,.65)}}
+ if(g&&g.g==='sprinkle')chFall(c,-12,-26,'#FFFFFF',now,'dot');if(g&&g.g==='press'){c.fillStyle='rgba(240,205,180,.9)';el(c,-12,-6+Math.sin(now*6)*1.5,9,4)}
+ const sd=st.side||0;if(sd>0){c.save();c.globalAlpha=Math.min(1,sd*1.5);const X=34,Y=-2;
+  if(s.side==='asparagus')asparagus(c,X-6,Y,.75,4,.1);else if(s.side==='veg'){cherryTom(c,X-4,Y-2,3.4);cherryTom(c,X+4,Y+1,3.2);c.fillStyle='#4E7F2E';circ(c,X,Y+5,3.6);c.fillStyle='#E7EDB8';circ(c,X,Y+5,2.6)}
+  else if(s.side==='salad')greens(c,rng(62),X,Y,7,9);else{c.fillStyle='#F3E3B0';for(let i=0;i<6;i++){c.save();c.translate(X-6+i*2.4,Y+(i%2)*2);c.rotate(.3);rr(c,-1.3,-6,2.6,12,1);c.fill();c.restore()}}c.restore()}
+ if(g&&g.g==='chop')chKnife(c,40,-8,now)}
+/* the protein in the pan (the pan's circle of 40, squashed by the caller): laid in raw, the first side searing, turned over half
+   way — the seared side up — the second side colouring underneath. The duck and the ribeye are their own dishes' (the skin side
+   first for the duck) */
+function chSigPan(c,s,st,now){const p=s.protein,fl=st.flip||0,up=fl>=.5;
+ if(p==='duck'){chDuckPan(c,{skin:st.sear1||0,flip:fl,meat:st.sear2||0},now);return}
+ if(p==='beef'){chSteakPan(c,{on:1,sear1:st.sear1||0,flip:fl,sear2:st.sear2||0,butter:0,melt:0},now,false);return}
+ c.save();if(fl>0&&fl<1){c.translate(0,-Math.sin(fl*Math.PI)*16);c.scale(1,Math.max(.12,Math.abs(Math.cos(fl*Math.PI))))}
+ const top=up?(st.sear1||0):0,under=up?(st.sear2||0):(st.sear1||0);const k=40/17;
+ if(p==='salmon'){c.save();c.scale(1,k);chSalmonFillet(c,0,0,1,-.1,Math.max(top,under*.6));if(top>0){c.strokeStyle=`rgba(150,80,30,${.6*top})`;c.lineWidth=1.6;for(let i=-1;i<=2;i++){c.beginPath();c.moveTo(-9+i*7,-7);c.lineTo(-4+i*7,7);c.stroke()}}   /* the pan's lines across the seared side, inside the fillet */c.restore()}
+ else if(p==='chicken'){c.save();c.scale(.82,.82*k);chChickenLeg(c,0,0,1,Math.max(top,under*.5),0,1);c.restore()}
+ else{c.save();c.scale(1.3,1.3*k);for(let i=0;i<3;i++){const px=(i-1)*12,py=(i%2?3:-2);c.fillStyle=mix('#E9DCC4','#A8632A',under);el(c,px,py+1.6,6.8,5);let g=c.createRadialGradient(px,py,1,px,py,7);g.addColorStop(0,mix('#F5ECDC','#E0A45A',top));g.addColorStop(1,mix('#E9DECB','#A8632A',top));c.fillStyle=g;el(c,px,py,6.4,4.6);gloss(c,px-2,py-1.5,2.2,1,.4)}c.restore()}
+ c.restore()}
+/* the protein as the plate has it (the menu's picture): the duck and the beef sliced, the salmon, the leg, the scallops */
+function chSigProteinAt(c,s,x,y){if(s.protein==='duck')duckSlices(c,x,y,.85);else if(s.protein==='beef')steakSlices(c,x,y,.8,1);else if(s.protein==='salmon')salmonFillet(c,x,y-2,.75,-.3);else if(s.protein==='chicken')chickenLeg(c,x,y-2,.75);else scallops(c,x,y-2,1)}
+/* the signature plate the way the menu's picture is drawn (the same random numbers in the same order: a part that is not on the
+   plate yet is drawn invisibly, so the numbers stay in step and the last beat is the picture itself) */
+function chSigPlate(c,s,L,want){const R=rng(hash('signature|'+(want||0)+(S.signature?JSON.stringify(S.signature):'')));const vis=(on,fn)=>{c.save();if(!on)c.globalAlpha=0;fn();c.restore()};
+ vis(L.sauce>=CH_LAND,()=>{c.fillStyle=SIG.sauce[s.sauce].c;el(c,2,4,26,15);c.fillStyle='rgba(255,255,255,.2)';el(c,-6,0,8,3)});
+ vis(L.base>=CH_LAND,()=>{if(s.base==='rice')riceMound(c,R,-14,4,11);else if(s.base==='mash')mash(c,-12,4,1);else if(s.base==='pasta')noodleNest(c,R,-13,4,11,['#F3DB9A','#E9C678','#F7E6B4']);else bread(c,-14,4,1)});
+ vis(L.side>=CH_LAND,()=>{if(s.side==='asparagus')asparagus(c,4,14,.7,4,-.1);else if(s.side==='veg'){cherryTom(c,16,14,4);c.fillStyle='#4E7F2E';circ(c,8,16,4.5);c.fillStyle='#E7EDB8';circ(c,8,16,3.3)}else if(s.side==='salad')greens(c,R,16,12,8,10);else friesPile(c,R,16,12,.7,8)});
+ vis(L.out>=CH_LAND,()=>chSigProteinAt(c,s,6,-4));
+ vis(L.gar>=CH_LAND,()=>{c.fillStyle='#E9C46A';for(let k=0;k<6;k++)c.fillRect(-10+R()*30,-16+R()*16,1.6,1.6);herbs(c,R,10,-14,5,4,'#6FA84E');
+  const lv=sigLv();if(lv>=2){c.strokeStyle=shade(SIG.sauce[s.sauce].c,-.25);c.lineWidth=3.2;c.lineCap='round';c.beginPath();c.moveTo(-26,16);c.quadraticCurveTo(-8,26,20,20);c.stroke();c.lineWidth=1.2;c.strokeStyle='rgba(255,255,255,.25)';c.beginPath();c.moveTo(-24,15);c.quadraticCurveTo(-8,23,16,19);c.stroke();for(let k=0;k<7;k++){c.save();c.translate(22+(R()-.5)*8,-12+(R()-.5)*8);c.rotate(R()*3);leaf(c,0,0,5,2.2,0,k%2?'#4E9E44':'#7CBF4A');c.restore()}}
+  if(lv>=3){c.save();c.translate(-20,-14);for(let k=0;k<6;k++){c.save();c.rotate(k*1.047);c.fillStyle=k%2?'#F4B6C2':'#F7D06B';el(c,3.2,0,3,1.6);c.restore()}c.fillStyle='#F0932B';circ(c,0,0,1.5);c.restore();c.fillStyle='#F1C64B';for(let k=0;k<5;k++){c.save();c.translate(-4+R()*24,-8+R()*18);c.rotate(R()*3);c.fillRect(-1.4,-.9,2.8,1.8);c.restore()}c.fillStyle='rgba(255,255,255,.5)';for(let k=0;k<3;k++)circ(c,-2+R()*20,-6+R()*14,.5)}})}
+/* the dessert's base as the plate has it (the menu's picture; R: its random numbers) */
+function chSigDBase(c,s,R){if(s.base==='pannacotta'){c.fillStyle='rgba(90,50,25,.16)';el(c,1,12,20,7);c.fillStyle='#FFF6EA';el(c,0,4,18,12);el(c,0,-4,18,9);c.fillStyle='#F7ECDB';el(c,0,-5,18,8);gloss(c,-6,-8,5,1.6,.5)}
+ else if(s.base==='sponge'){c.fillStyle='rgba(90,50,25,.16)';el(c,1,12,22,7);c.fillStyle='#E9C878';c.fillRect(-18,-4,36,14);c.fillStyle='#F3D98A';c.fillRect(-18,-8,36,6);c.fillStyle='rgba(120,80,30,.25)';for(let k=0;k<12;k++)circ(c,-15+R()*30,-2+R()*10,.7)}
+ else if(s.base==='tart'){c.fillStyle='rgba(90,50,25,.16)';el(c,1,12,22,7);c.fillStyle='#C9944E';el(c,0,4,22,10);c.fillStyle='#D9A86A';el(c,0,1,22,10);c.fillStyle='#C9944E';for(let k=0;k<14;k++){const a=k/14*6.283;el(c,Math.cos(a)*20,Math.sin(a)*8.5+1,2.2,1.5)}c.fillStyle='#EBC98A';el(c,0,0,16,6.5)}
+ else{c.fillStyle='rgba(90,50,25,.16)';el(c,1,12,22,7);c.fillStyle='#EFD6A2';c.beginPath();c.moveTo(-22,4);c.quadraticCurveTo(-10,-10,10,-8);c.quadraticCurveTo(24,-4,20,8);c.quadraticCurveTo(0,12,-22,4);c.fill();c.fillStyle='rgba(160,100,40,.3)';for(let k=0;k<8;k++)el(c,-14+R()*30,-4+R()*10,2,1.2)}}
+function chSigDFruitCol(s){return s.fruit==='berries'?'#C8324A':s.fruit==='fig'?'#6E2E4A':s.fruit==='mango'?'#F2A93B':'#F4A32B'}
+/* the dessert plate the way the menu's picture is drawn (the same random numbers in the same order; what is not on it yet drawn
+   invisibly): the base, the quenelle of cream, the fruit, the finish, the later versions' coulis and mint, spun sugar and gold */
+function chSigDPlate(c,s,L,want){const R=rng(hash('sigdessert|'+(want||0)+(S.sigDessert?JSON.stringify(S.sigDessert):'')));const lv=sigDLv();const CR=SIGD.cream[s.cream].c;const vis=(on,fn)=>{c.save();if(!on)c.globalAlpha=0;fn();c.restore()};
+ vis(L.base>=CH_LAND,()=>chSigDBase(c,s,R));
+ vis(L.cream>=CH_LAND,()=>{c.fillStyle=shade(CR,-.12);el(c,-2,-6,11,6);c.fillStyle=CR;c.beginPath();c.moveTo(-12,-6);c.quadraticCurveTo(-4,-16,10,-10);c.quadraticCurveTo(12,-4,0,-1);c.quadraticCurveTo(-12,-1,-12,-6);c.fill();gloss(c,-4,-11,3,1.2,.45)});
+ vis(L.fruit>=CH_LAND,()=>{if(s.fruit==='berries'){c.fillStyle='#3A2E6A';circ(c,9,-2,3.2);circ(c,14,2,2.8);c.fillStyle='#D23A4A';circ(c,6,4,3);c.fillStyle='#B2283A';circ(c,13,-6,2.4);gloss(c,8,-3,1.1,.7,.6)}
+  else if(s.fruit==='fig'){c.fillStyle='#6E2E4A';el(c,10,0,6,5);c.fillStyle='#D9556E';el(c,10,0,4.4,3.4);c.fillStyle='#F2C4B8';for(let k=0;k<8;k++)circ(c,8+R()*4,-1.5+R()*3,.5);c.fillStyle='#6E2E4A';el(c,3,5,4.5,3.5);c.fillStyle='#D9556E';el(c,3,5,3.2,2.4)}
+  else if(s.fruit==='mango'){c.fillStyle='#F2A93B';for(const [x,y,a] of[[8,-2,.3],[12,3,-.2],[4,5,.5]]){c.save();c.translate(x,y);c.rotate(a);el(c,0,0,5,2.6);c.restore()}gloss(c,9,-3,2,.8,.5)}
+  else{c.fillStyle='#F4A32B';for(const [x,y] of[[8,-2],[13,3],[4,5]]){el(c,x,y,4.2,3.2);c.fillStyle='#FFD27A';el(c,x,y,3,2.2);c.fillStyle='#F4A32B'}c.strokeStyle='rgba(255,255,255,.6)';c.lineWidth=.6;for(const [x,y] of[[8,-2],[13,3],[4,5]]){c.beginPath();c.moveTo(x-3,y);c.lineTo(x+3,y);c.stroke()}}});
+ vis(L.finish>=CH_LAND,()=>{if(s.finish==='caramel'){c.strokeStyle='#B8661F';c.lineWidth=1.6;c.lineCap='round';c.beginPath();c.moveTo(-16,-12);c.quadraticCurveTo(0,-2,16,-8);c.stroke();c.fillStyle='#B8661F';for(let k=0;k<4;k++)circ(c,-12+k*9,-2+(k%2)*6,1)}
+  else if(s.finish==='cocoa'){c.fillStyle='rgba(60,30,15,.55)';for(let k=0;k<26;k++)circ(c,-14+R()*30,-14+R()*10,.6)}
+  else if(s.finish==='sugar'){c.fillStyle='rgba(255,255,255,.85)';for(let k=0;k<26;k++)circ(c,-14+R()*30,-14+R()*10,.55)}
+  else{c.fillStyle='#E5A83A';el(c,-6,6,7,2.2);c.fillStyle='#C98B3A';for(let k=0;k<5;k++)circ(c,-12+k*5,5+(k%2),1.1);c.fillStyle='#F3D28A';for(let k=0;k<5;k++)circ(c,-12+k*5,4.6+(k%2),.5)}});
+ vis(L.gar>=CH_LAND,()=>{if(lv>=2){const cc=s.fruit==='mango'?'#F2A93B':s.fruit==='citrus'?'#F4A32B':s.fruit==='fig'?'#B2283A':'#C8324A';c.strokeStyle=cc;c.lineWidth=3;c.lineCap='round';c.beginPath();c.moveTo(-26,14);c.quadraticCurveTo(-10,22,18,18);c.stroke();c.strokeStyle='rgba(255,255,255,.25)';c.lineWidth=1;c.beginPath();c.moveTo(-24,13);c.quadraticCurveTo(-10,20,14,17);c.stroke();leaf(c,-8,-14,6,2.6,-.6,'#4E9E44');leaf(c,-4,-15,5,2.2,.3,'#7CBF4A')}
+  if(lv>=3){c.strokeStyle='rgba(240,200,120,.85)';c.lineWidth=.7;for(let k=0;k<7;k++){c.beginPath();c.arc(-2+(k-3)*2,-6,13+k*.8,3.3+k*.15,6.1-k*.12);c.stroke()}c.fillStyle='#F1C64B';for(let k=0;k<5;k++){c.save();c.translate(-8+R()*18,-10+R()*12);c.rotate(R()*3);c.fillRect(-1.3,-.9,2.6,1.8);c.restore()}c.fillStyle='rgba(255,255,255,.5)';for(let k=0;k<3;k++)circ(c,-4+R()*14,-8+R()*10,.5)}})}
+/* the dessert board: the base made ready at the left (the panna cotta's mould lifted off it, the sponge cut from its slab, the tart
+   shell set down, the crêpe folded), the cream whisked in its bowl in the middle until it stands in peaks, the fruit cut at the
+   right; used: how much of each has gone to the plates */
+function chSigDBoard(c,s,st,now,g,used){const b=st.base||0,w=st.whip||0,f=st.fruit||0;const CR=SIGD.cream[s.cream].c;
+ if(used.base<1){c.save();c.translate(-30,-2);c.scale(.62,.62);
+  if(s.base==='pannacotta'){if(b>0)chSigDBase(c,s,rng(5));if(b<1){c.save();c.translate(0,-b*30);c.globalAlpha=1-b*.8;c.fillStyle='#E8ECEE';rr(c,-16,-14,32,24,5);c.fill();c.fillStyle='rgba(255,255,255,.5)';c.fillRect(-12,-11,4,16);c.restore()}}
+  else if(s.base==='sponge'){c.fillStyle='#E9C878';c.fillRect(-26,-6,52*(1-.3*b),16);c.fillStyle='#F3D98A';c.fillRect(-26,-10,52*(1-.3*b),6);if(b>0){c.save();c.translate(14*b,4*b);c.fillStyle='#E9C878';c.fillRect(-8,-4,16,12);c.fillStyle='#F3D98A';c.fillRect(-8,-8,16,5);c.restore()}if(g&&g.g==='place')chKnife(c,8,-14,now)}
+  else if(s.base==='tart'){c.save();c.globalAlpha=Math.min(1,b*1.4);c.translate(0,-(1-Math.min(1,b*1.4))*20);chSigDBase(c,s,rng(5));c.restore()}
+  else{const k=b;c.fillStyle='#EFD6A2';el(c,0,0,24*(1-.4*k),10);c.fillStyle='rgba(160,100,40,.25)';el(c,-6,-1,4,2);el(c,8,2,3,1.6);if(k>.5){c.fillStyle='#E4C88E';c.beginPath();c.moveTo(-14,2);c.quadraticCurveTo(0,-8*k,14,2);c.fill()}}
+  c.restore()}
+ /* the bowl of cream */c.save();c.translate(2,-2);c.fillStyle='rgba(0,0,0,.15)';el(c,1,8,16,4);c.fillStyle='#F4F1EA';c.beginPath();c.moveTo(-15,-2);c.quadraticCurveTo(-14,10,0,10);c.quadraticCurveTo(14,10,15,-2);c.closePath();c.fill();
+ const left=1-(used.cream||0);if(left>0){c.fillStyle=CR;el(c,0,-2,13*Math.sqrt(left),3.6*Math.sqrt(left));const pk=Math.round(6*w*left);c.fillStyle=mix(CR,'#FFFFFF',.15);for(let i=0;i<pk;i++)circ(c,-9+i*3.6,-3-Math.sin(i*1.3)*1.6*w,1.6+w*.8);if(w<1)gloss(c,-4,-3,4,1,.4*(1-w))}
+ c.strokeStyle='rgba(150,130,110,.55)';c.lineWidth=1;c.beginPath();c.ellipse(0,-2,15,4.4,0,0,7);c.stroke();
+ if(g&&g.g==='whisk'){const a=now*12;const x=Math.cos(a)*5,y=-4+Math.sin(a)*1.2;c.strokeStyle='#C9D0D3';c.lineWidth=.9;for(let i=-1;i<=1;i++){c.beginPath();c.ellipse(x+i*1.2,y-5,2,6,0,0,7);c.stroke()}c.strokeStyle='#6B4428';c.lineWidth=2;c.beginPath();c.moveTo(x,y-11);c.lineTo(x+6,y-24);c.stroke()}c.restore();
+ /* the fruit */if(used.fruit<1){c.save();c.translate(32,-2);const fc=chSigDFruitCol(s);
+  if(s.fruit==='berries'){for(let i=0;i<6;i++){c.fillStyle=i%2?'#3A2E6A':'#C8324A';circ(c,-6+(i%3)*5,-2+Math.floor(i/3)*5,2.4)}}
+  else if(s.fruit==='fig'){if(f<.5){c.fillStyle='#6E2E4A';el(c,0,0,7,6)}else{for(const[x,y]of[[-4,0],[4,1]]){c.fillStyle='#6E2E4A';el(c,x,y,4.8,4);c.fillStyle='#D9556E';el(c,x,y,3.4,2.8)}}}
+  else if(s.fruit==='mango'){if(f<.5){c.fillStyle='#F2A93B';el(c,0,0,9,6);c.fillStyle='#E8892A';el(c,2,1,6,3)}else{c.fillStyle='#F2A93B';for(let i=0;i<5;i++)rr(c,-8+(i%3)*5,-4+Math.floor(i/3)*5,4,4,1),c.fill()}}
+  else{if(f<.5){c.fillStyle='#F4A32B';circ(c,0,0,6.4)}else{for(const[x,y]of[[-4,-1],[3,2],[5,-3]]){c.fillStyle='#F4A32B';el(c,x,y,4,3);c.fillStyle='#FFD27A';el(c,x,y,2.8,2)}}}
+  if(g&&g.g==='chop')chKnife(c,6,-10,now);c.restore()}}
 /* the line (called from drawLine): every piece of work at its place, sorted with the old jobs by depth */
 function wfLineItems(V){const out=[];if(!V||!V.slots)return out;for(const s of V.slots){const n=s.wf;if(!n||n.slot!==s){if(!n&&!s.job&&s.left)out.push({s,left:s.left,sp:wfFoodSpot({st:'left',d:'friedrice'},s)});continue}out.push({s,wf:n,sp:wfFoodSpot(n,s)})}return out}
 function wfDrawFood(c,v,now){const n=v.wf,sp=v.sp;const plating=n.st==='work'&&n.f==='plate';
