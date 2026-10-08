@@ -6192,12 +6192,12 @@ function wfShort(n){if(!n||!n.who)return'';if(n.who==='jill')return'Jill';const 
 function wfHeading(n){if(!n)return null;const fl=wfFl(n);if(n.st==='go'||n.st==='fetch')return fl[n.adv?n.si+1:n.si]||null;return wfNext(n)}
 /* the one line every piece of work answers (the user, 2026-10-08 §B, §F — what it is, how far, where next, who):
    「第一步：備料 · 等待處理」 → 「下一步：熱區 · 阿德前往中」 → 「● 熱區 · 阿德」; a full place 「下一步：熱區 · 等空位」;
-   on the fire or in the oven by itself 「● 熱區 · 正在煮」 */
+   on the fire or in the oven by itself 「● 熱區 · 正在煮」; Jill sent to two places in a row: the second 「Jill 接著做」 */
 function wfState(n){if(!n)return'';const who=wfWho(n);
  if(n.st==='work')return cjkSp(`● ${WF_ST[n.f].n} · ${who||''}`);
  if(n.st==='cook')return`● ${WF_ST[n.f].n} · ${n.f==='oven'||n.f==='pizza'?'正在烤':n.f==='drink'?'快好了':'正在煮'}`;
  const f=wfHeading(n);if(!f)return'';const lead=`${n.si===0&&!n.adv&&n.st!=='ready'?'第一步':'下一步'}：${WF_ST[f].n}`;
- if(who)return cjkSp(`${lead} · ${who}前往中`);
+ if(who)return cjkSp(`${lead} · ${who}${n.who==='jill'&&wfJillTask()!==n?' 接著做':'前往中'}`);
  return`${lead} · ${WF_ST[f].slot&&!wfFreeSlot(f)?'等空位':'等待處理'}`}
 /* the ticket's own mark under a dish: the workflow in one line (熱›裝), the step it is on picked out */
 function wfTag(it){if(!isWF(it.d)||it.st==='ready'||it.st==='served'||it.st==='order')return'';const n=wfOf(it);const ms=wfMarks(n,wfFlow(it.d));

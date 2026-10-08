@@ -243,6 +243,12 @@ def cooking_any_dish_answers_the_five_questions(b, port, target):
         g.ev(f"__addOrders(1,'{d}')")
     g.ev("__run(2)"); g.ev("(()=>{wfGather();const n=wfList().find(n=>n.d==='steak');if(n)wfAssign(n,'jill')})()")
     g.ev("__run(70)")
+    # Jill sent to two places in a row: the second says she does it next, not that she is on her way
+    two = json.loads(g.ev(r"""JSON.stringify((()=>{const L=wfList().filter(n=>wfOpen(n)&&WF_ST[wfNext(n)].slot&&wfFreeSlot(wfNext(n)));const out=[];
+      for(const n of L){if(out.length>=2)break;if(out.some(o=>wfNext(o)===wfNext(n)&&!wfSlots(wfNext(n)).filter(wfSlotFree).length))continue;if(wfAssign(n,'jill'))out.push(n)}
+      return out.map(n=>wfState(n))})())"""))
+    if len(two) == 2:
+        check('接著做' in two[1] and '接著做' not in two[0], f'Jill\'s second job reads 「Jill 接著做」, the first 「Jill 前往中」: {two}')
     nodes = json.loads(g.ev("JSON.stringify(wfList().map(n=>n.id))"))
     phases = set(g.ev("wfList().map(n=>n.st+(n.who?'*':''))"))
     check(len(nodes) >= 4 and len(phases) >= 3, f'dishes at several phases: {phases}')
@@ -255,7 +261,7 @@ def cooking_any_dish_answers_the_five_questions(b, port, target):
         how_far = '●' in r['marks']
         where_next = any(w in r['line'] for w in ('第一步：', '下一步：', '● '))
         where = r['lit'] > 0 or r['held'] or r['at'] or not r['free']
-        who = any(w in r['line'] for w in ('等待處理', '等空位', '前往中', '正在煮', '正在烤', '快好了', 'Jill', '阿德師傅', 'Marco'))
+        who = any(w in r['line'] for w in ('等待處理', '等空位', '前往中', '接著做', '正在煮', '正在烤', '快好了', 'Jill', '阿德師傅', 'Marco'))
         step_in = (r['open'] and (r['lit'] > 0 or not r['free'])) or (r['who'] and r['who'] != 'jill' and r['st'] in ('go', 'fetch') and r['held']) or r['st'] in ('work', 'cook') or r['who'] == 'jill' or (r['st'] in ('go', 'fetch'))
         if not (how_far and where_next and where and who and step_in):
             bad.append(r)
