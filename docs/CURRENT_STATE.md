@@ -70,8 +70,10 @@
   起始現金 $1,200；`docs/cooking/ARCHITECTURE.md`「前三天」）都在私人測試版第 10 版；使用者的兩份驗收清單逐條對照在
   `docs/cooking/WORKFLOW_B_ACCEPTANCE.md`（附 iPhone 上 20 分鐘自己驗的步驟）。**等使用者決定**：商用洗碗機做什麼、
   中期的店少四分之一客人是否可以、秀琴阿姨第 2–3 天要不要來、有人正在去收的桌子點了要不要派 Jill、第 45 節那一幕要不要
-  更常出現、兩個 Jill、主廚之夜一次端、秀琴阿姨第一天的字、Signature 的關鍵步驟、燒焦的舊程式三件事。炒飯／裝盤等使用者
-  在 iPhone 上確認後，才做其他 34 道菜。
+  更常出現、兩個 Jill、主廚之夜一次端、秀琴阿姨第一天的字、Signature 的關鍵步驟、燒焦的舊程式三件事。
+  2026-10-09：使用者在 iPhone 上回報的兩個 blocker（拿鐵送不出去、裝盤的人沒站到料理旁）修好，私人測試版第 11、12 版；
+  接著「繼續做其他道料理，做好幾道就先放上去給我測試」：每道菜自己的料理動作一批一批做，記在 `docs/cooking/CHOREOGRAPHY.md`。
+  第一批（拿鐵、紅茶、氣泡水、沙拉、義大利麵、南瓜湯）在私人測試版第 13 版。
 
 - **2026-10-06 全面 Audit 與例行 QA**（已合回 `main`，使用者 2026-10-06「Audit 這套 QA 工具和測試我同意合回 main」；沒有改遊戲、沒有發布）：報告 `docs/audit/2026-10-06/README.md`；
   例行 QA `python3 tests/run_tests.py --qa`（`docs/QA.md`）；全面 Audit 的做法 `docs/audit/PLAYBOOK.md`。Audit 找到、還沒修的問題，

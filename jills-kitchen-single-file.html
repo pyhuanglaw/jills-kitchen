@@ -7082,14 +7082,68 @@ const CH={
   plate:{v:'plate',from:{out:0,shape:0,gar:0},
    hands:[{to:.66,g:'scoop',say:'一鏟一鏟盛進盤子',set:{out:1}},
           {to:.84,g:'shape',say:'整成一份',set:{shape:1}},
-          {to:1,g:'sprinkle',ing:'scallion',say:'撒上蔥花',set:{gar:1}}]}}};
+          {to:1,g:'sprinkle',ing:'scallion',say:'撒上蔥花',set:{gar:1}}]}},
+ /* the first ones after it (2026-10-09, the user: 「改好之後繼續做其他道料理」), in the spec's words: the latte (§2), the pasta
+    (§3), the salad (§4), the tea (§6), the sparkling water (§7), the soup (§8). What goes in goes in by a hand (or the
+    machine the hand started); what the heat does by itself is only the heat's: a colour, a sauce through the noodles, the
+    pumpkin cooking down, the foam settling, the tea steeping */
+ coffee:{
+  drink:{v:'cup',from:{esp:0,milk:0,art:0,foam:0},
+   hands:[{to:.14,g:'press',say:'杯子放在咖啡機下，按下萃取',set:{}},
+          {to:.48,g:'press',ing:'espresso',say:'深色的濃縮咖啡流進杯裡',set:{esp:1}},
+          {to:1,g:'pour',ing:'milk',say:'熱牛奶從上面倒進去，咖啡變成拿鐵色',set:{milk:1,art:.4}}],
+   heat:[{to:1,say:'奶泡浮上來，拉花成形',set:{foam:1,art:1}}]}},
+ blacktea:{
+  drink:{v:'cup',from:{tea:0,amber:0,lemon:0},
+   hands:[{to:.55,g:'pour',ing:'tea',say:'從茶壺倒入熱紅茶',set:{tea:1,amber:.2}},
+          {to:.8,g:'place',ing:'lemon',say:'放上檸檬片',set:{lemon:1}},
+          {to:1,g:'stir',say:'輕輕攪拌',set:{}}],
+   heat:[{to:1,say:'茶色慢慢變成琥珀色',set:{amber:1}}]}},
+ sparkling:{
+  drink:{v:'glass',from:{ice:0,soda:0,lemon:0,fizz:0},
+   hands:[{to:.3,g:'drop',ing:'ice',say:'冰塊先放進空杯',set:{ice:1}},
+          {to:.76,g:'pour',ing:'soda',say:'倒入氣泡水，冒出氣泡',set:{soda:1,fizz:1}},
+          {to:1,g:'place',ing:'lemon',say:'放進檸檬片',set:{lemon:1}}],
+   heat:[{to:1,say:'氣泡慢慢往上冒，水一直是透明的',set:{fizz:.4}}]}},
+ salad:{
+  prep:{v:'cutboard',from:{cl:0,ct:0,cc:0,bowl:0,dress:0,toss:0},
+   hands:[{to:.26,g:'chop',ing:'greens',say:'切生菜',set:{cl:1}},
+          {to:.42,g:'chop',ing:'ctomato',say:'切番茄',set:{ct:1}},
+          {to:.56,g:'chop',ing:'cucumber',say:'切小黃瓜',set:{cc:1}},
+          {to:.72,g:'sweep',say:'切好的菜一樣一樣放進碗裡',set:{bowl:1}},
+          {to:.84,g:'pour',ing:'dressing',say:'淋上油醋醬',set:{dress:1}},
+          {to:1,g:'mix',say:'拌勻',set:{toss:1}}]},
+  plate:{v:'bowl',from:{out:0,gar:0},
+   hands:[{to:.74,g:'scoop',say:'用沙拉夾一份一份盛進碗裡',set:{out:1}},
+          {to:1,g:'sprinkle',ing:'crouton',say:'最後撒上麵包丁',set:{gar:1}}]}},
+ pasta:{
+  hot:{v:'pan',from:{nood:0,sauce:0,coat:0},
+   hands:[{to:.4,g:'drop',ing:'noodle',say:'煮好的麵條下鍋',set:{nood:1}},
+          {to:.8,g:'pour',ing:'tomato',say:'加入番茄醬汁',set:{sauce:1}},
+          {to:1,g:'toss',say:'翻拌',set:{coat:.12}}],
+   heat:[{to:1,g:'toss',say:'麵條慢慢均勻裹上番茄醬',set:{coat:1}}]},
+  plate:{v:'plate',from:{out:0,twirl:0,gar:0},
+   hands:[{to:.62,g:'twirl',say:'用夾子把麵捲起來放進盤子',set:{out:1}},
+          {to:.8,g:'shape',say:'整成一捲',set:{twirl:1}},
+          {to:1,g:'sprinkle',ing:'parmesan',say:'撒上起司、放上羅勒',set:{gar:1}}]}},
+ soup:{
+  hot:{v:'pot',from:{chunk:0,stock:0,cream:0,smooth:0},
+   hands:[{to:.34,g:'drop',ing:'pumpkin',say:'南瓜塊下鍋',set:{chunk:1}},
+          {to:.64,g:'pour',ing:'stock',say:'倒入高湯',set:{stock:1}},
+          {to:.84,g:'pour',ing:'cream',say:'加一點鮮奶油',set:{cream:1}},
+          {to:1,g:'stir',say:'攪拌',set:{smooth:.06}}],
+   heat:[{to:1,g:'stir',say:'南瓜慢慢煮化，變成滑順的橘色濃湯',set:{smooth:1}}]},
+  plate:{v:'bowl',from:{out:0,swirl:0,gar:0},
+   hands:[{to:.62,g:'ladle',say:'用湯杓舀進湯碗',set:{out:1}},
+          {to:.84,g:'pour',ing:'cream',say:'淋一圈鮮奶油',set:{swirl:1}},
+          {to:1,g:'sprinkle',ing:'seeds',say:'撒上南瓜籽和麵包丁',set:{gar:1}}]}}};
 function chOf(d,f){const c=CH[baseOf(d)];return c&&c[f]||null}
 function chRun(st,list,u){let a=0;for(const b of list||[]){if(u>=b.to){Object.assign(st,b.set);a=b.to;continue}const t=clamp((u-a)/Math.max(1e-6,b.to-a),0,1);const e=b.ease?Math.pow(t,b.ease):t;for(const k in b.set){const v0=st[k]||0;st[k]=v0+(b.set[k]-v0)*e}return{b,t}}return null}
 /* how far a piece of work is into a place's beats: the hands' share (h) and the heat's (q); a place it is done with is all done */
 function chPh(n,f){const cur=(n.st==='work'||n.st==='cook')&&n.f===f;if(!cur)return{h:1,q:1};if(n.st==='work')return{h:wfHands(n),q:0};return{h:1,q:n.pas0?clamp(1-n.pas/n.pas0,0,1):1}}
 function chState(n,f){const sp=chOf(n.d,f);if(!sp)return null;const ph=chPh(n,f);const st=Object.assign({},sp.from);let cur=chRun(st,sp.hands,ph.h);if(!cur&&sp.heat)cur=chRun(st,sp.heat,ph.q);return{st,beat:cur?cur.b:null,t:cur?cur.t:1,ph,spec:sp}}
 /* the beat in progress for the hands at a piece of work: what they are doing now (null: the old gestures) */
-function chGestOf(n){if(!n)return null;const f=n.st==='work'||n.st==='cook'?n.f:null;if(!f)return null;const s=chState(n,f);return s&&s.beat?Object.assign({u:s.t},s.beat):null}
+function chGestOf(n){if(!n)return null;const f=n.st==='work'||n.st==='cook'?n.f:null;if(!f)return null;const s=chState(n,f);return s&&s.beat&&s.beat.g?Object.assign({u:s.t},s.beat):null}   /* (a beat the heat does by itself has no hands) */
 /* who is at a piece of work with their hands on it now: whoever has the step and is there, or (while it cooks) whoever put
    it on and has nothing else to do */
 function wfHandsAt(n){if(n.st==='work'&&n.who&&wfHere(n)){if(n.who==='jill'){const J=wfJ();return{x:J.x,y:J.y,f:J.face<0?-1:1}}const a=R.ck&&R.ck[n.who];return a?{x:a.x,y:a.y,f:a.face<0?-1:1}:null}
@@ -7099,7 +7153,9 @@ function wfAttending(who,x,y){for(const n of wfList()){if(n.st!=='cook'||n.lastB
 /* the arms for a gesture: a pour tips one hand forward, stirring circles, tossing jerks both, sprinkling lifts one, a scoop
    reaches between the pan and the plate, shaping cups both over the plate */
 function chArms(g,now){const k=g.g;if(k==='pour')return[.3,.72];if(k==='drop')return[.3,.8];if(k==='sprinkle')return[.35,.66+Math.sin(now*14)*.06];if(k==='toss'){const t=Math.max(0,Math.sin(now*5.5));return[.55+t*.22,.55+t*.22]}
- if(k==='scoop')return[.35,.78+Math.sin(now*6)*.2];if(k==='shape')return[.62+Math.sin(now*9)*.06,.62-Math.sin(now*9)*.06];return[.35,.85+Math.sin(now*6)*.22]}
+ if(k==='scoop'||k==='ladle')return[.35,.78+Math.sin(now*6)*.2];if(k==='shape')return[.62+Math.sin(now*9)*.06,.62-Math.sin(now*9)*.06];
+ if(k==='press')return[.3,.92+Math.max(0,Math.sin(now*3))*.08];if(k==='place')return[.35,.74];if(k==='chop')return[.4,.7+Math.abs(Math.sin(now*14))*.35];if(k==='sweep')return[.55,.62+Math.sin(now*6)*.08];
+ if(k==='mix'){const t=Math.sin(now*7);return[.6+t*.12,.6-t*.12]}if(k==='twirl')return[.35,.8+Math.sin(now*8)*.15];return[.35,.85+Math.sin(now*6)*.22]}
 /* the tool in the hand for a gesture: the oil bottle, the bowl of beaten egg, the bowl of rice, a pinch of scallion, the spatula */
 function chDrawTool(c,x,y,f,g,now){const k=g.g;c.save();
  if(k==='pour'&&g.ing==='oil'){c.translate(x+f*7,y-33);c.rotate(f*1.05);c.fillStyle='#E7C25A';rr(c,-2.4,-7,4.8,10,1.6);c.fill();c.fillStyle='rgba(255,255,255,.4)';c.fillRect(-1.6,-6,1,8);c.fillStyle='#3A3A3A';c.fillRect(-1.1,-9.5,2.2,3)}
@@ -7167,7 +7223,71 @@ const CHD={
    /* the scoop in the air between the wok and the plate it is going to */
    if(hand&&g&&g.g==='scoop'){const total=m*2;const pos=g.u*total;const i=Math.floor(pos),tau=pos-i;const k=Math.min(m-1,Math.floor(i/2));const pp=wfPlateAt(n,sp,k);if(tau>.15&&tau<.85){const t=(tau-.15)/.7;const x=sp.x+(pp.x-sp.x)*t,y=sp.y-4+(pp.y-4-(sp.y-4))*t-Math.sin(t*Math.PI)*12;c.fillStyle='#F3D07C';el(c,x,y,4.2,2.6);c.fillStyle='#FFCF3A';circ(c,x-1,y-.6,1.2);c.fillStyle='#B9C2C6';rr(c,x-3,y+1.6,6,1.6,.8);c.fill()}}
    /* the pinch of scallion falling on the last plate */
-   if(hand&&g&&g.g==='sprinkle'){const pp=wfPlateAt(n,sp,Math.min(m-1,Math.floor(g.u*m)));for(let i=0;i<5;i++){const ph=(now*2.4+i*.2)%1;c.strokeStyle='#5CB646';c.lineWidth=1;c.beginPath();c.arc(pp.x-3+i*1.6,pp.y-16+ph*12,1.1,0,7);c.stroke()}}}}};
+   if(hand&&g&&g.g==='sprinkle'){const pp=wfPlateAt(n,sp,Math.min(m-1,Math.floor(g.u*m)));for(let i=0;i<5;i++){const ph=(now*2.4+i*.2)%1;c.strokeStyle='#5CB646';c.lineWidth=1;c.beginPath();c.arc(pp.x-3+i*1.6,pp.y-16+ph*12,1.1,0,7);c.stroke()}}}},
+ coffee:{
+  /* the cup on the counter under the machine: empty, the espresso running dark from the spout into it, the hot milk poured
+     over it from the jug turning it latte brown, the pour's last turn leaving the heart that the foam lifts as it settles */
+  vessel(c,n,S0,sp,now,hand){const st=S0.st,g=hand&&S0.ph.h<1?S0.beat:null;const f=chBarSide(n,sp);
+   chIn(c,sp,()=>{drawVesselBack(c,'cup');chCupTop(c,st.esp*.42+st.milk*.58,()=>chLatte(c,st));
+    if(g&&g.ing==='espresso'){const s=chSpout(n,sp);chStream(c,s.x,s.y,0,-10,'#3A1C0C',3.4,now)}
+    if(g&&g.ing==='milk'){const tip=chJug(c,f*30,-46,f,'#C9D0D3');chStream(c,tip.x,tip.y,f*2,-11,'#FFF9EE',4.4,now)}
+    chSteam(c,st.milk*.7,now,-24,24)})}},
+ blacktea:{
+  /* the cup: hot tea poured from the pot, pale at first; the lemon slice laid on it, a stir; it steeps to amber by itself */
+  vessel(c,n,S0,sp,now,hand){const st=S0.st,g=hand&&S0.ph.h<1?S0.beat:null;const f=chBarSide(n,sp);const stir=!!(g&&g.g==='stir');
+   chIn(c,sp,()=>{drawVesselBack(c,'cup');
+    chCupTop(c,st.tea,()=>{c.fillStyle=mix('#E9C48E','#B5561F',st.amber);circ(c,0,0,20);c.fillStyle=`rgba(255,240,210,${.3*(1-st.amber)})`;circ(c,-4,-4,9);
+     if(stir){c.strokeStyle='rgba(255,236,200,.6)';c.lineWidth=1.6;for(let i=0;i<2;i++){c.beginPath();c.arc(0,0,7+i*6,now*7+i,now*7+i+2.2);c.stroke()}}
+     if(st.lemon>=1)chLemonSlice(c,6,-3,7,stir?now*7:0)});
+    if(g&&g.ing==='tea'){const tip=chTeapot(c,f*34,-48,f);chStream(c,tip.x,tip.y,f*2,-11,'#C8702E',3.6,now)}
+    if(st.lemon>0&&st.lemon<1){/* the slice on its way down from the fingers */c.save();c.translate(0,-9.5);c.scale(1,5.6/19.5);chLemonSlice(c,6,-3-(1-st.lemon)*130,7,0);c.restore()}
+    if(stir){const a=now*7;c.strokeStyle='#C9D0D3';c.lineWidth=2.4;c.lineCap='round';c.beginPath();c.moveTo(Math.cos(a)*7,-10+Math.sin(a)*1.8);c.lineTo(Math.cos(a)*7+11,-38);c.stroke()}
+    chSteam(c,st.tea*.7,now,-24,24)})}},
+ sparkling:{
+  /* the empty glass: ice dropped in from the scoop, the sparkling water poured from its bottle, the level rising and the
+     bubbles coming up through it, the lemon slipped in — clear all the way through, never milky (the user's §7) */
+  vessel(c,n,S0,sp,now,hand){const st=S0.st,g=hand&&S0.ph.h<1?S0.beat:null;const f=chBarSide(n,sp);const top=29-66*st.soda;
+   chIn(c,sp,()=>{drawVesselBack(c,'glass');chSoda(c,st,top,now,f);drawVesselFront(c,'glass');
+    if(g&&g.ing==='ice')chScoop(c,f*30,-72,f);
+    if(g&&g.ing==='soda'){const tip=chBottle(c,f*34,-78,f);chStream(c,tip.x,tip.y,f*3,top,'rgba(222,244,250,.95)',3.2,now)}})}},
+ salad:{
+  /* the board: a whole lettuce, tomato and cucumber cut one after another by the knife, each kind's pieces in a heap of its
+     own; swept into the bowl a kind at a time, the dressing poured over, tossed together with the servers */
+  vessel(c,n,S0,sp,now,hand,out){const g=hand&&S0.ph.h<1?S0.beat:null;chIn(c,sp,()=>{drawVesselBack(c,'cutboard');chSaladBoard(c,n,S0.st,now,g,S0.t,out||0)})},
+  /* the bowls beside the board: the salad lifted in from the working bowl with the servers, two lifts each; the croutons last */
+  plates(c,n,S0,pl,sp,now,hand){const st=pl.st;const m=Math.min(4,Math.max(1,n.n));const per=1/m;const g=hand?pl.beat:null;
+   for(let k=m-1;k>=0;k--){const pp=wfPlateAt(n,sp,k);const fill=clamp((st.out-k*per)/per,0,1),gk=clamp(st.gar*m-k,0,1);
+    if(fill>=1&&gk>=1&&k<n.its.length){chDishPic(c,n,pp,k);continue}
+    c.save();c.translate(pp.x,pp.y);c.scale(pp.sc,pp.sc);drawBowl(c,S.decor.ware>0);c.scale(1.12,1.12*.8);chSaladIn(c,k,fill,gk);c.restore()}
+   if(g&&g.g==='scoop')chCarry(c,g,m,{x:sp.x+33*sp.sc,y:sp.y-4*sp.sc},k=>wfPlateAt(n,sp,k),(x,y)=>{greens(c,rng(7),x,y-.6,3.6,6);cherryTom(c,x+1.4,y-.8,1.2);c.fillStyle='#C9A26A';rr(c,x-4,y+1.4,8,1.4,.7);c.fill()});
+   if(g&&g.g==='sprinkle'){const pp=wfPlateAt(n,sp,Math.min(m-1,Math.floor(g.u*m)));chFall(c,pp.x,pp.y-14,'#D9A45A',now,'sq')}}},
+ pasta:{
+  /* the pan: the cooked noodles tipped in pale, the tomato sauce poured over one side, tossed until every strand is coated
+     red and glossy; plated with the tongs a twist at a time, the cheese and basil last */
+  vessel(c,n,S0,sp,now,hand,out){const st=S0.st,g=hand?S0.beat:null;const toss=g&&g.g==='toss'?Math.max(0,Math.sin(now*5.5)):0;out=out||0;
+   chIn(c,sp,()=>{drawVesselBack(c,'pan');c.save();c.translate(0,-toss*9);c.scale(1+toss*.05,1-toss*.1);c.beginPath();c.ellipse(0,0,40,17,0,0,7);c.clip();c.scale(1,17/40);chPasta(c,n,st,out);c.restore();drawVesselFront(c,'pan');
+    if(g&&S0.ph.h<1&&g.g!=='toss')chTool(c,g,now,0,-2);else if(g&&g.g==='toss')chWokTool(c,g,now);
+    chSteam(c,((st.sauce>0?.35:0)+.45*st.coat)*(1-out),now,-26,40)})},
+  plates(c,n,S0,pl,sp,now,hand){const st=pl.st;const m=Math.min(4,Math.max(1,n.n));const per=1/m;const g=hand?pl.beat:null;
+   for(let k=m-1;k>=0;k--){const pp=wfPlateAt(n,sp,k);const fill=clamp((st.out-k*per)/per,0,1),tk=clamp(st.twirl*m-k,0,1),gk=clamp(st.gar*m-k,0,1);
+    if(fill>=1&&tk>=1&&gk>=1&&k<n.its.length){chDishPic(c,n,pp,k);continue}
+    c.save();c.translate(pp.x,pp.y);c.scale(pp.sc,pp.sc);drawPlate(c,S.decor.ware>0);c.scale(1.12,1.12*.8);chPastaPlate(c,n,k,fill,tk,gk);c.restore()}
+   if(g&&g.g==='twirl')chCarry(c,g,m,{x:sp.x,y:sp.y},k=>wfPlateAt(n,sp,k),(x,y)=>{c.strokeStyle='#E39A4A';c.lineWidth=1.2;c.beginPath();c.arc(x,y,2.6,0,5.6);c.stroke();c.fillStyle='#C8361E';el(c,x+.6,y-.4,1.5,1);c.strokeStyle='#B9C2C6';c.lineWidth=.8;c.beginPath();c.moveTo(x+1,y-2);c.lineTo(x+6,y-7);c.moveTo(x+2.4,y-1);c.lineTo(x+7,y-6);c.stroke()});
+   if(g&&g.g==='sprinkle'){const pp=wfPlateAt(n,sp,Math.min(m-1,Math.floor(g.u*m)));chFall(c,pp.x,pp.y-14,'#FFF4D8',now,'dot')}}},
+ soup:{
+  /* the pot: the pumpkin dropped in in chunks, the stock poured over them, a little cream, stirred; on the fire the chunks
+     cook down into a smooth orange soup that the cream softens; ladled into the bowls, a ring of cream, the seeds */
+  vessel(c,n,S0,sp,now,hand,out){const st=S0.st,g=hand?S0.beat:null;out=out||0;
+   chIn(c,sp,()=>{drawVesselBack(c,'pot');c.save();c.beginPath();c.ellipse(0,-16,33,9.5,0,0,7);c.clip();c.translate(0,-16);c.scale(1,9.5/33);chSoupPot(c,n,st,now,out);c.restore();drawVesselFront(c,'pot');
+    if(g&&(S0.ph.h<1||g.g==='stir'))chTool(c,g,now,0,-16);
+    chSteam(c,(st.stock*.4+st.smooth*.35)*(1-out),now,-34,40)})},
+  plates(c,n,S0,pl,sp,now,hand){const st=pl.st;const m=Math.min(4,Math.max(1,n.n));const per=1/m;const g=hand?pl.beat:null;
+   for(let k=m-1;k>=0;k--){const pp=wfPlateAt(n,sp,k);const fill=clamp((st.out-k*per)/per,0,1),sk=clamp(st.swirl*m-k,0,1),gk=clamp(st.gar*m-k,0,1);
+    if(fill>=1&&sk>=1&&gk>=1&&k<n.its.length){chDishPic(c,n,pp,k);continue}
+    c.save();c.translate(pp.x,pp.y);c.scale(pp.sc,pp.sc);drawBowl(c,S.decor.ware>0);c.scale(1.12,1.12*.8);chSoupBowl(c,k,fill,sk,gk);c.restore()}
+   if(g&&g.g==='ladle')chCarry(c,g,m,{x:sp.x,y:sp.y-16*sp.sc},k=>wfPlateAt(n,sp,k),(x,y)=>{c.fillStyle='#B9C2C6';el(c,x,y,3.4,2);c.fillStyle='#E8892A';el(c,x,y-.4,2.8,1.4);c.strokeStyle='#9AA4A8';c.lineWidth=.9;c.beginPath();c.moveTo(x+3,y-.5);c.lineTo(x+8,y-7);c.stroke()});
+   if(g&&g.g==='pour'){const pp=wfPlateAt(n,sp,Math.min(m-1,Math.floor(g.u*m)));c.save();c.translate(pp.x+7,pp.y-14);c.rotate(-.9);c.fillStyle='#FFFFFF';c.strokeStyle='rgba(150,130,110,.6)';c.lineWidth=.5;rr(c,-2,-2.6,4,5.2,1);c.fill();c.stroke();c.restore();chStream(c,pp.x+4.4,pp.y-12.4,pp.x+1,pp.y-3,'rgba(255,252,244,.95)',1,now)}
+   if(g&&g.g==='sprinkle'){const pp=wfPlateAt(n,sp,Math.min(m-1,Math.floor(g.u*m)));chFall(c,pp.x,pp.y-14,'#4F7A35',now,'seed')}}}};
 /* a tool over a wok or pan, in the vessel's own coordinates (the pan at 0,0, its rim 44 wide): what the hands are doing */
 function chWokTool(c,g,now){const k=g.g;c.save();c.lineCap='round';
  if(k==='pour'&&g.ing==='oil'){c.save();c.translate(20,-50);c.rotate(-2.3);c.fillStyle='#E7C25A';rr(c,-5,-13,10,24,3);c.fill();c.fillStyle='rgba(255,255,255,.45)';c.fillRect(-3,-11,2,18);c.fillStyle='#3A3A3A';rr(c,-2.4,-19,4.8,7,1.2);c.fill();c.restore();
@@ -7195,6 +7315,131 @@ function chFriedRice(c,n,st,now,out){const R0=rng((n.seed||1)*7+11);const left=1
    const x=lerp(5+Math.cos(a0)*d0,Math.cos(a1)*d1,mx),y=lerp(-3+Math.sin(a0)*d0*.85,Math.sin(a1)*d1,mx);c.save();c.translate(x,y);c.rotate(rot);c.fillStyle=mix(v<.5?'#FFFDF6':'#EFE8D6',v<.5?'#F4C45A':'#DE9E3A',gold);el(c,0,0,2.5,1.25);c.restore()}}
  /* the scallion: on top of the mound, then through the rice, a little darker as it cooks */
  if(st.scal>0){const N=14,shown=Math.floor(N*st.scal*left);const R3=rng((n.seed||1)*11+1);for(let i=0;i<N;i++){const a0=R3()*6.283,d0=Math.sqrt(R3())*11,a1=R3()*6.283,d1=Math.sqrt(R3())*29;if(i>=shown)continue;const x=lerp(5+Math.cos(a0)*d0,Math.cos(a1)*d1,mx),y=lerp(-5+Math.sin(a0)*d0*.8,Math.sin(a1)*d1,mx);c.strokeStyle=mix('#5CB646','#3E8A30',gold*.8);c.lineWidth=1.3;c.beginPath();c.arc(x,y,1.9,0,7);c.stroke()}}}
+/* ---- the pieces the dishes after the fried rice share (the user's primitives: pour, drop, stir, toss, chop, mix, place,
+   garnish, steam), each in the food's own coordinates unless it says so ---- */
+function chIn(c,sp,fn){c.save();c.translate(sp.x,sp.y);c.scale(sp.sc,sp.sc);fn();c.restore()}
+/* steam over something hot (k: how much) */
+function chSteam(c,k,now,y0,w){if(k<=0)return;for(let i=0;i<4;i++){const ph=(now*.7+i*.25)%1;c.globalAlpha=(1-ph)*.34*Math.min(1,k);c.fillStyle='#fff';circ(c,-w/2+i*w/3+Math.sin(now*2+i)*4,y0-ph*40,5+ph*8)}c.globalAlpha=1}
+/* a stream poured from a spout into the food, wavering a little */
+function chStream(c,x0,y0,x1,y1,col,w,now){c.save();c.strokeStyle=col;c.lineWidth=w;c.lineCap='round';const wob=Math.sin(now*28)*w*.3;c.beginPath();c.moveTo(x0,y0);c.quadraticCurveTo(x0+(x1-x0)*.2+wob,(y0+y1)/2,x1,y1);c.stroke();c.restore()}
+/* the coffee machine's spout over a cup at the bar, in the cup's coordinates (drawLine's drawEspresso: one machine with two
+   spouts, or kitchen II's two slim ones) */
+function chSpout(n,sp){const b=KX.bar.x;const xs=projOn('kitchen2')?[b+6.7,b+18.3,b+31.7,b+43.3]:[b+12,b+22];let x=xs[0];for(const q of xs)if(Math.abs(q-sp.x)<Math.abs(x-sp.x))x=q;const y=KY.top+10+(S.eq.bar>=3?44:40)*.62+12;return{x:(x-sp.x)/sp.sc,y:(y-sp.y)/sp.sc}}
+/* the side of a cup a jug or a bottle comes from: away from the machine between the cups */
+function chBarSide(n,sp){const h=slotHome(n.slot);return sp.x<h.cx?-1:1}
+/* what is in a cup (drawVesselBack 'cup'): its surface, lower and narrower while it fills; paint draws on it in a circle of 20 */
+function chCupTop(c,lvl,paint){if(lvl<=0)return;const l=Math.min(1,lvl),k=.66+.34*l;c.save();c.translate(0,-9.5+(1-l)*5);c.scale(19.5*k/20,5.6*k/20);c.beginPath();c.arc(0,0,20,0,7);c.clip();paint();c.restore()}
+/* the latte's surface: the espresso dark under its crema, latte brown as the milk goes through it (white where the milk lands
+   until it is through), the heart the pour leaves, the foam's rim */
+function chLatte(c,st){const m=st.milk;let g=c.createRadialGradient(-5,-5,2,0,0,21);g.addColorStop(0,mix('#5A2E14','#A8683A',m));g.addColorStop(1,mix('#2A140A','#6A391C',m));c.fillStyle=g;circ(c,0,0,20);
+ if(st.esp>0&&m<1){c.fillStyle=`rgba(178,110,54,${.6*(1-m)})`;circ(c,0,0,12)}
+ const spot=m>0?.75*(1-clamp((m-.55)/.45,0,1)):0;if(spot>0){c.fillStyle=`rgba(255,248,236,${spot})`;el(c,0,3,3+9*m,2.6+7*m)}
+ if(st.foam>0){c.strokeStyle=`rgba(241,221,187,${.55*st.foam})`;c.lineWidth=3;c.beginPath();c.arc(0,0,18.5,0,7);c.stroke()}
+ if(st.art>0){c.globalAlpha=Math.min(1,st.art);c.fillStyle='#F1DDBB';c.beginPath();c.moveTo(0,12);c.bezierCurveTo(-16,0,-10,-12,0,-5);c.bezierCurveTo(10,-12,16,0,0,12);c.fill();c.globalAlpha=1}}
+/* the milk jug tipped towards the cup from side f; the spout's tip is returned for the stream */
+function chJug(c,x,y,f,col){c.save();c.translate(x,y);c.scale(-f,1);c.rotate(.7);let g=c.createLinearGradient(-10,0,10,0);g.addColorStop(0,'#8C979C');g.addColorStop(.45,'#EEF2F3');g.addColorStop(1,'#7C878C');c.fillStyle=g;c.beginPath();c.moveTo(-8,-9);c.lineTo(8,-9);c.lineTo(15,-12);c.lineTo(10,-4);c.lineTo(10,10);c.lineTo(-10,10);c.closePath();c.fill();c.strokeStyle=col;c.lineWidth=2.6;c.beginPath();c.arc(-11,0,6,1.9,4.4);c.stroke();c.restore();return{x:x-f*19.2,y:y+.5}}
+/* the teapot tipped over the cup */
+function chTeapot(c,x,y,f){c.save();c.translate(x,y);c.scale(-f,1);c.rotate(.6);c.fillStyle='#F4EFE6';el(c,0,0,13,10);c.fillStyle='#E2D8C8';el(c,0,-9,7,2.4);c.fillStyle='#D2C4AE';circ(c,0,-11.4,2.4);c.strokeStyle='#F4EFE6';c.lineCap='round';c.lineWidth=3.4;c.beginPath();c.moveTo(10,-1);c.quadraticCurveTo(18,-3,21,-10);c.stroke();c.lineWidth=2.6;c.beginPath();c.arc(-14,0,6,1.9,4.4);c.stroke();c.fillStyle='#C76A6A';c.fillRect(-11,-1,22,2.4);c.restore();return{x:x-f*23,y:y+3.6}}
+/* a slice of lemon */
+function chLemonSlice(c,x,y,r,rot){c.save();c.translate(x,y);c.rotate(rot||0);c.fillStyle='#F2D23E';circ(c,0,0,r);c.fillStyle='#FBEFA2';circ(c,0,0,r*.8);c.strokeStyle='#F2D23E';c.lineWidth=.7;for(let k=0;k<6;k++){c.beginPath();c.moveTo(0,0);c.lineTo(Math.cos(k)*r*.78,Math.sin(k)*r*.78);c.stroke()}c.restore()}
+/* the sparkling water in its glass (the glass's own coordinates; top: the water's surface; f: the side the hand comes from):
+   clear, the bubbles rising through it (many while it is poured), the ice dropped in a cube at a time and floating once the
+   water is up, the lemon slipped in */
+function chSoda(c,st,top,now,f){if(st.soda>0){c.save();c.beginPath();c.moveTo(-18,-45);c.lineTo(18,-45);c.lineTo(14.5,29);c.lineTo(-14.5,29);c.closePath();c.clip();
+  let g=c.createLinearGradient(0,top,0,29);g.addColorStop(0,'rgba(214,242,248,.22)');g.addColorStop(1,'rgba(168,220,234,.42)');c.fillStyle=g;c.fillRect(-20,top,40,30-top);c.fillStyle='rgba(255,255,255,.8)';c.fillRect(-20,top,40,1.3);
+  const N=Math.round(4+14*st.fizz);c.strokeStyle='rgba(255,255,255,.95)';c.lineWidth=.8;for(let i=0;i<N;i++){const ph=(now*(.45+.5*st.fizz)+i*.173)%1;c.beginPath();c.arc(-12+((i*7.3)%24),28-ph*(28-top),.8+(i%3)*.45,0,7);c.stroke()}c.restore()}
+ for(let i=0;i<3;i++){const q=clamp(st.ice*3-i,0,1);if(q<=0)continue;const rest=Math.min(18-i*9,top+2+i*8);c.save();c.translate(lerp(f*20,-9+i*7,q),lerp(-80,rest,q*q));c.rotate(.2*(i-1));c.fillStyle='rgba(236,248,255,.72)';rr(c,-5,-5,10,10,2);c.fill();c.strokeStyle='rgba(150,195,215,.8)';c.lineWidth=.8;rr(c,-5,-5,10,10,2);c.stroke();c.fillStyle='rgba(255,255,255,.85)';c.fillRect(-3.4,-3.4,3,1.2);c.restore()}
+ if(st.lemon>0)chLemonSlice(c,lerp(f*20,-3,st.lemon),lerp(-80,top+(29-top)*.55,st.lemon),8,0)}
+/* the ice scoop tipped over the glass */
+function chScoop(c,x,y,f){c.save();c.translate(x,y);c.scale(-f,1);c.rotate(.9);c.fillStyle='#C9D0D3';c.beginPath();c.moveTo(-12,-6);c.lineTo(10,-6);c.quadraticCurveTo(12,8,-2,8);c.quadraticCurveTo(-12,8,-12,-6);c.fill();c.fillStyle='rgba(236,248,255,.92)';rr(c,-8,-11,8,8,2);c.fill();rr(c,0,-12,8,8,2);c.fill();c.fillStyle='#8A9498';rr(c,-24,-4,12,4,2);c.fill();c.restore()}
+/* a bottle tipped to pour (the sparkling water's green one; a small one of dressing); the neck's tip is returned */
+function chBottle(c,x,y,f,col,s){s=s||1;c.save();c.translate(x,y);c.scale(-f*s,s);c.rotate(1.9);c.fillStyle=col||'rgba(111,174,122,.92)';rr(c,-6,-4,12,24,3);c.fill();c.beginPath();c.moveTo(-4,-4);c.lineTo(-2.4,-14);c.lineTo(2.4,-14);c.lineTo(4,-4);c.fill();c.fillStyle='#F2F2EE';rr(c,-6,4,12,8,1);c.fill();c.fillStyle='rgba(255,255,255,.45)';c.fillRect(-4,-2,2,18);c.restore();return{x:x-f*s*13.25,y:y+s*4.5}}
+/* a chef's knife (the blade's tip at x-20, its edge on y+4) */
+function chKnife(c,x,y,a){c.save();c.translate(x,y);c.rotate(a);let kg=c.createLinearGradient(0,-8,0,6);kg.addColorStop(0,'#F4F6F7');kg.addColorStop(1,'#9AA4A8');c.fillStyle=kg;c.beginPath();c.moveTo(-20,4);c.lineTo(18,4);c.lineTo(18,-4);c.quadraticCurveTo(-6,-11,-20,4);c.fill();c.fillStyle='#3A2A20';rr(c,18,-3,17,7,3);c.fill();c.fillStyle='#C99A45';circ(c,23,.5,1);circ(c,30,.5,1);c.restore()}
+/* the salad at the board (the board's own coordinates): the whole vegetables on the left, cut by the knife into heaps in
+   the middle, swept into the working bowl on the right a kind at a time, dressed and tossed there; plated out of the bowl */
+function chSaladBoard(c,n,st,now,g,t,out){const BX=33,BY=-4;const R0=rng((n.seed||1)*13+7);
+ if(st.cl<1){const r=9*(1-st.cl*.7);c.fillStyle='#5E9E36';circ(c,-37,-3,r);c.fillStyle='#8CC84E';circ(c,-37.6,-3.8,r*.72);c.fillStyle='#C2E28A';circ(c,-38.4,-4.6,r*.36)}
+ if(st.ct<1){if(st.ct<.45)cherryTom(c,-21,-7,5);else{c.fillStyle='#D8392A';el(c,-23.4,-6,3.2,4);el(c,-18.6,-6,3.2,4);c.fillStyle='#F7B08C';el(c,-22.8,-6,1.9,2.8);el(c,-19.2,-6,1.9,2.8)}}
+ if(st.cc<1){const L=12*(1-st.cc);c.fillStyle='#3F7A2A';el(c,-38+L,6,L,3.4);c.fillStyle='#5E9A3E';el(c,-38+L,5.2,L,1.5);if(st.cc>0){c.fillStyle='#DDEFC2';el(c,-38+2*L,6,1.2,2.8)}}
+ c.fillStyle='rgba(0,0,0,.18)';el(c,BX+1,BY+9,15,3.5);let gb=c.createLinearGradient(BX-16,0,BX+16,0);gb.addColorStop(0,'#D6CDBE');gb.addColorStop(.4,'#FFFFFF');gb.addColorStop(1,'#CCC2B2');c.fillStyle=gb;c.beginPath();c.moveTo(BX-16,BY-1);c.quadraticCurveTo(BX-15,BY+10,BX,BY+10);c.quadraticCurveTo(BX+15,BY+10,BX+16,BY-1);c.fill();c.fillStyle='#F7F3EC';el(c,BX,BY-1,16,5);c.fillStyle='#E6DED0';el(c,BX,BY-.6,14,4.2);
+ const kinds=[['L',14,st.cl,-6,-5,7,0],['T',6,st.ct,5,1,4,.3],['C',7,st.cc,-12,5,4,.6]];const inb=[],air=[];
+ for(const [k,N,amt,hx,hy,hr,s0] of kinds){const q=clamp((st.bowl-s0)/.4,0,1);const shown=Math.floor(N*amt+1e-6);
+  for(let i=0;i<N;i++){const a=R0()*6.283,d=Math.sqrt(R0())*hr,a2=R0()*6.283,d2=Math.sqrt(R0()),a3=R0()*6.283,d3=Math.sqrt(R0()),rot=R0()*3;if(i>=shown)continue;
+   const px=hx+Math.cos(a)*d,py=hy+Math.sin(a)*d*.6;const lr=k==='L'?12:8;const b0x=BX+Math.cos(a2)*d2*lr,b0y=BY-1.4+Math.sin(a2)*d2*lr*.3,b1x=BX+Math.cos(a3)*d3*12,b1y=BY-1.4+Math.sin(a3)*d3*3.6;
+   let x=lerp(px,b0x,q),y=lerp(py,b0y,q)-Math.sin(q*Math.PI)*7;if(q>=1){x=lerp(b0x,b1x,st.toss);y=lerp(b0y,b1y,st.toss);if(g&&g.g==='mix'){x+=Math.sin(now*9+i*1.7)*1.1;y+=Math.cos(now*8+i)*.5}}
+   (q>=1?inb:air).push({k,x,y,rot,o:k==='L'?0:k==='T'?1:2,i})}}
+ inb.length=Math.max(0,Math.ceil(inb.length*(1-out)-1e-6));   /* plated out of the bowl a lift at a time */
+ if(st.toss>0)inb.sort((p,q)=>(p.i*7+p.o*3)%11-(q.i*7+q.o*3)%11);
+ for(const p of inb)chSaladPiece(c,p);
+ if(st.dress>0&&inb.length){const R1=rng((n.seed||1)*31+2);for(let i=0;i<Math.round(st.dress*9*(1-out));i++){c.fillStyle='rgba(236,204,112,.95)';el(c,BX+(R1()-.5)*22,BY-1.4+(R1()-.5)*6,1.6,.9)}}
+ c.strokeStyle='rgba(255,255,255,.9)';c.lineWidth=1.2;c.beginPath();c.ellipse(BX,BY-1,16,5,0,.2,Math.PI-.2);c.stroke();
+ for(const p of air)chSaladPiece(c,p);
+ /* the hands' tools: the knife over what it is cutting, its flat sweeping the heaps along, the dressing's bottle, the servers */
+ if(g&&g.g==='chop'){const tx=g.ing==='greens'?-37:g.ing==='ctomato'?-21:-38+24*(1-st.cc);const lift=Math.abs(Math.sin(now*14))*7;chKnife(c,tx+9,-10-lift,-.12);if(lift<2){c.fillStyle=g.ing==='greens'?'#8CC84E':g.ing==='ctomato'?'#E0503A':'#7DBE4C';circ(c,tx-4+Math.sin(now*31)*2,-9,1.2);circ(c,tx+5,-10+Math.cos(now*27),1)}}
+ if(g&&g.g==='sweep')chKnife(c,lerp(-12,18,t),-9,0);
+ if(g&&g.ing==='dressing'){const tip=chBottle(c,BX+22,BY-34,1,'rgba(226,196,106,.92)',.8);chStream(c,tip.x,tip.y,BX+3,BY-3,'rgba(232,198,98,.95)',1.6,now)}
+ if(g&&g.g==='mix'){const a=now*7;for(const s of[0,Math.PI]){const x=BX+Math.cos(a+s)*7,y=BY-2+Math.sin(a+s)*2;c.strokeStyle='#B07A46';c.lineWidth=2;c.lineCap='round';c.beginPath();c.moveTo(x,y);c.lineTo(x+(s?-8:8),y-16);c.stroke();c.fillStyle='#C9915A';el(c,x,y,2.6,1.6)}}}
+function chSaladPiece(c,p){if(p.k==='L')leaf(c,p.x,p.y,7,3.2,p.rot,['#6FB33F','#8FCC52','#4F9A3A','#B5DB68'][p.i%4]);
+ else if(p.k==='T'){c.save();c.translate(p.x,p.y);c.rotate(p.rot);c.fillStyle='#D8392A';c.beginPath();c.arc(0,0,2.8,0,Math.PI);c.closePath();c.fill();c.fillStyle='#F28A6A';c.beginPath();c.arc(0,.2,1.8,0,Math.PI);c.closePath();c.fill();c.restore()}
+ else{c.fillStyle='#4E8A33';el(c,p.x,p.y,2.8,2);c.fillStyle='#DDEFC2';el(c,p.x,p.y,2.1,1.4)}}
+/* the salad in a serving bowl (flat: the dish picture's coordinates): the leaves lifted in with the tomatoes and the cucumber,
+   the croutons and the dressing's line last */
+function chSaladIn(c,k,fill,gk){if(fill<=0)return;const R0=rng(hash('saladbowl|'+k));greens(c,R0,0,0,24,Math.round(36*fill));
+ if(fill>.4)cherryTom(c,-8,-6,4.6);if(fill>.7)cherryTom(c,9,5,4.6);if(fill>.9)cherryTom(c,5,-12,4);
+ const R1=rng(hash('saladcuc|'+k));for(let i=0;i<3;i++){const px=(R1()-.5)*30,py=(R1()-.5)*26;if(fill<.5+i*.2)continue;c.fillStyle='#5A8F3A';circ(c,px,py,5.2);c.fillStyle='#DDEFC2';circ(c,px,py,4.2)}
+ if(gk>0){const R2=rng(hash('saladcr|'+k));c.fillStyle='#D9A45A';for(let i=0;i<Math.round(4*gk);i++){c.save();c.translate((R2()-.5)*30,(R2()-.5)*26);c.rotate(R2());c.fillRect(-2.5,-2.5,5,5);c.restore()}
+  if(gk>=.6){c.strokeStyle=`rgba(255,250,235,${.85*(gk-.6)/.4})`;c.lineWidth=1.3;c.beginPath();c.moveTo(-16,4);c.bezierCurveTo(-6,-10,4,14,16,-4);c.stroke()}}}
+/* plate k's own finished picture, once everything has gone on to it */
+function chDishPic(c,n,pp,k){const sz=100*pp.sc;c.drawImage(dishCanvas(n.d,'G',64,S.decor.ware>0,n.its[k]&&n.its[k].it.want),pp.x-sz/2,pp.y-sz/2,sz,sz)}
+/* what the hands carry from the food to the plate it is going to, two lifts a plate (the salad's servers, the pasta's tongs,
+   the soup's ladle — as the fried rice's scoop) */
+function chCarry(c,g,m,from,toAt,draw){const pos=g.u*m*2;const i=Math.floor(pos),tau=pos-i;if(tau<=.15||tau>=.85)return;const pp=toAt(Math.min(m-1,Math.floor(i/2)));const t=(tau-.15)/.7;draw(from.x+(pp.x-from.x)*t,from.y-4+(pp.y-from.y)*t-Math.sin(t*Math.PI)*12)}
+/* a pinch falling on a plate: croutons (sq), grated cheese (dot), seeds */
+function chFall(c,x,y,col,now,kind){c.fillStyle=col;for(let i=0;i<5;i++){const ph=(now*2.4+i*.2)%1;const px=x-3+i*1.6,py=y+ph*12;if(kind==='sq')c.fillRect(px-.8,py-.8,1.6,1.6);else if(kind==='seed')el(c,px,py,1.1,.6);else circ(c,px,py,.6)}}
+/* the hand's tool over a pan or a pot (its own coordinates; tx,ty: where the food is in it): a bowl tipped to drop the
+   noodles or the pumpkin in, a small pan or a jug pouring (the tomato sauce, the stock, the cream), a wooden spoon stirring */
+function chTool(c,g,now,tx,ty){const k=g.g,ing=g.ing;c.save();c.lineCap='round';
+ if(k==='drop'){c.save();c.translate(tx+24,ty-44);c.rotate(-1.2);c.fillStyle='#F4F1EA';c.beginPath();c.moveTo(-15,-4);c.quadraticCurveTo(-14,11,0,12);c.quadraticCurveTo(14,11,15,-4);c.closePath();c.fill();c.strokeStyle='rgba(150,130,110,.55)';c.lineWidth=1.2;c.beginPath();c.ellipse(0,-4,15,5,0,0,7);c.stroke();c.fillStyle=ing==='pumpkin'?'#EE9A32':'#F3E7C2';el(c,0,-4,13,3.6);c.restore();
+  for(let i=0;i<7;i++){const ph=(now*2.4+i*.143)%1;c.save();c.translate(tx+12-14*ph+Math.sin(i*2.7)*4,ty-38+36*ph);c.rotate(i+now*3);if(ing==='pumpkin'){c.fillStyle=i%2?'#F2A33A':'#E88C2A';rr(c,-3.4,-3.4,6.8,6.8,1.4);c.fill()}else{c.strokeStyle=i%2?'#F3E7C2':'#E8D7A6';c.lineWidth=2.2;c.beginPath();c.arc(0,0,4,0,3.4);c.stroke()}c.restore()}}
+ else if(k==='pour'){const col=ing==='tomato'?'#C8361E':ing==='stock'?'#E7C987':'#FFFBF2';
+  if(ing==='tomato'){c.save();c.translate(tx+26,ty-42);c.rotate(-.75);c.fillStyle='#9AA4A8';el(c,0,0,13,6);c.fillStyle='#C8361E';el(c,0,-1,11,4.4);c.fillStyle='#6B4428';rr(c,12,-2,16,4,2);c.fill();c.restore();chStream(c,tx+16,ty-34,tx+2,ty-2,col,6,now)}
+  else{/* a jug, its handle away from the pot */c.save();c.translate(tx+28,ty-46);c.rotate(-.8);const body=ing==='cream'?'#FFFFFF':'#C9D0D3',edge=ing==='cream'?'rgba(150,130,110,.6)':'#8C979C';c.strokeStyle=edge;c.lineWidth=2.6;c.beginPath();c.arc(11,0,6,-1.3,1.3);c.stroke();c.fillStyle=body;c.beginPath();c.moveTo(-8,-10);c.lineTo(-13,-13);c.lineTo(8,-10);c.lineTo(10,11);c.lineTo(-10,11);c.closePath();c.fill();c.lineWidth=.8;c.stroke();c.fillStyle=col;el(c,0,-10,7.5,2.4);c.fillStyle='rgba(255,255,255,.5)';c.fillRect(-6,-6,2.4,14);c.restore();chStream(c,tx+10,ty-46,tx+2,ty-2,col,4.6,now)}}
+ else if(k==='stir'){const a=now*6;const bx=tx+Math.cos(a)*14,by=ty+Math.sin(a)*4;c.strokeStyle='#6B4428';c.lineWidth=3;c.beginPath();c.moveTo(tx+30,ty-44);c.lineTo(bx+3,by-4);c.stroke();c.fillStyle='#8A5A30';el(c,bx,by,5,3)}
+ c.restore()}
+/* the pasta in the pan (a circle of 40, squashed by the caller): the strands pale as they come from the water, warming to
+   the sauce's colour as they are tossed through it; the sauce a red pool where it was poured, worked into the strands */
+function chPasta(c,n,st,out){const left=1-out;if(st.nood<=0||left<=0)return;const R0=rng((n.seed||1)*17+3);const co=st.coat;
+ const N=44,shown=Math.floor(N*st.nood*left+1e-6);c.lineCap='round';
+ for(let i=0;i<N;i++){const r0=4+R0()*22,a0=R0()*6.283,sw=1.4+R0()*2.2,cx=(R0()-.5)*8,cy=(R0()-.5)*8,v=R0();if(i>=shown)continue;c.strokeStyle=mix(v<.5?'#F3E7C2':'#EAD9A8',v<.5?'#E9A04A':'#DD7E3A',co);c.lineWidth=2.6;c.beginPath();c.arc(cx,cy,r0,a0,a0+sw);c.stroke()}
+ if(st.sauce>0){const pool=st.sauce*(1-co);if(pool>0){c.globalAlpha=Math.min(1,pool*1.5)*left;tomatoSauce(c,rng(5),-10,-6,6+12*st.sauce);c.globalAlpha=1}
+  const R1=rng((n.seed||1)*29+1);for(let i=0;i<Math.round(36*co*left);i++){const a=R1()*6.283,d=Math.sqrt(R1())*27,rot=R1()*3;c.save();c.translate(Math.cos(a)*d,Math.sin(a)*d);c.rotate(rot);c.fillStyle=i%3?'#C8361E':'#E0582E';el(c,0,0,3.2,1.6);c.restore()}
+  if(co>.6){c.globalAlpha=(co-.6)/.4*left;tomatoSauce(c,rng(9),0,-2,13);c.globalAlpha=1}}
+ if(co>0){c.globalAlpha=.3*co*left;c.fillStyle='#fff';el(c,-10,-12,7,2.2);c.globalAlpha=1}}
+/* a twist of pasta on its plate (flat: the dish picture's coordinates): the strands laid down lift by lift, turned into one
+   neat twist with the sauce on top, then the basil and the cheese */
+function chPastaPlate(c,n,k,fill,tk,gk){if(fill<=0)return;const R0=rng(hash('pastaplate|'+k));const shown=Math.round(34*fill);c.lineCap='round';
+ for(let i=0;i<34;i++){const r0=4+R0()*20,a0=R0()*6.283,sw=1.6+R0()*2,v=R0();if(i>=shown)continue;c.strokeStyle=v<.5?'#E9A04A':'#DD7E3A';c.lineWidth=2.6;c.beginPath();c.arc(0,0,lerp(r0,r0*.8,tk),a0+tk*2,a0+tk*2+sw);c.stroke()}
+ const R1=rng(hash('pastared|'+k));for(let i=0;i<Math.round(20*fill);i++){const a=R1()*6.283,d=Math.sqrt(R1())*22,rot=R1()*3;c.save();c.translate(Math.cos(a)*d,Math.sin(a)*d);c.rotate(rot);c.fillStyle=i%3?'#C8361E':'#E0582E';el(c,0,0,3,1.5);c.restore()}
+ if(tk>0){c.globalAlpha=tk;tomatoSauce(c,rng(9),0,-2,12);c.globalAlpha=1}
+ if(gk>.3)leaf(c,7,-9,12,6,-.6,'#3F8B3A');if(gk>.6)leaf(c,11,-4,10,5,.4,'#4E9E44');
+ if(gk>0){c.fillStyle='#FFF6DC';const R2=rng(hash('pastach|'+k));for(let i=0;i<Math.round(16*gk);i++)circ(c,(R2()-.5)*30,(R2()-.5)*28,.9)}}
+/* the soup in the pot (a circle of 33, squashed by the caller): the pumpkin chunks dropped in, the stock pale gold over
+   them, the cream in streaks; on the fire the chunks cook down and it turns orange, the cream softening it; ladled out, it
+   goes down */
+function chSoupPot(c,n,st,now,out){const left=1-out;const R0=rng((n.seed||1)*19+5);const dy=out*7;
+ if(st.stock>0&&left>0){let col=mix('#E9CF96','#E8892A',st.smooth);col=mix(col,'#F3B76E',st.cream*st.smooth*.45);c.globalAlpha=Math.min(1,st.stock*1.3);c.fillStyle=col;circ(c,0,dy,33*(1-out*.35));c.globalAlpha=1;
+  if(st.smooth>.5){c.fillStyle=`rgba(255,236,190,${.5*(st.smooth-.5)})`;el(c,-10,-10+dy,10,4)}}
+ const shown=Math.floor(9*st.chunk+1e-6),s=10*(1-st.smooth*.96);
+ for(let i=0;i<9;i++){const x=(R0()-.5)*44,y=(R0()-.5)*40,rot=R0()*3;if(i>=shown||s<1.2||left<=0)continue;c.save();c.translate(x,y+dy);c.rotate(rot);c.fillStyle=i%2?'#F2A33A':'#E88C2A';rr(c,-s/2,-s/2,s,s,2);c.fill();c.fillStyle='rgba(255,220,150,.6)';c.fillRect(-s/2+1,-s/2+1,s*.4,s*.25);c.restore()}
+ if(st.cream>0&&st.smooth<1&&left>0){c.strokeStyle=`rgba(255,250,240,${.85*Math.min(1,st.cream*1.5)*(1-st.smooth)})`;c.lineWidth=3;c.beginPath();for(let t=0;t<9*st.cream;t+=.25){const q=t*2.4;c.lineTo(6+Math.cos(t)*q,-4+Math.sin(t)*q)}c.stroke()}
+ if(st.stock>0&&left>0&&(n.st==='cook'||(n.st==='work'&&n.f==='hot'))){c.fillStyle='rgba(255,240,210,.7)';for(let i=0;i<7;i++){const ph=(now*1.3+i*.37)%1;circ(c,Math.cos(i*2.1)*20,Math.sin(i*2.1)*20+dy,1+ph*2.6)}}}
+/* the soup in a bowl (flat: the dish picture's coordinates): it comes up as the ladle pours, the cream's spiral drawn as it
+   is poured, the seeds and the croutons last */
+function chSoupBowl(c,k,fill,sk,gk){if(fill<=0)return;const r=12+16*fill;let g=c.createRadialGradient(-6,-6,3,0,0,r);g.addColorStop(0,'#F7B24A');g.addColorStop(1,'#DA7A20');c.fillStyle=g;circ(c,0,2,r);
+ if(sk>0){c.strokeStyle='rgba(255,250,240,.9)';c.lineWidth=2.4;c.beginPath();for(let t=0;t<14*sk;t+=.2){const q=t*1.1;c.lineTo(Math.cos(t)*q,2+Math.sin(t)*q)}c.stroke()}
+ if(gk>0){const R0=rng(hash('soupseed|'+k));c.fillStyle='#4F7A35';for(let i=0;i<Math.round(6*gk);i++){c.save();c.translate((R0()-.5)*30,(R0()-.5)*30);c.rotate(R0()*3);el(c,0,0,3,1.6);c.restore()}c.fillStyle='#D9A45A';if(gk>.5)c.fillRect(8,-12,5,5);if(gk>.8)c.fillRect(-14,8,5,5)}
+ if(fill>=1)gloss(c,-10,-10,8,3,.3)}
 /* the line (called from drawLine): every piece of work at its place, sorted with the old jobs by depth */
 function wfLineItems(V){const out=[];if(!V||!V.slots)return out;for(const s of V.slots){const n=s.wf;if(!n||n.slot!==s){if(!n&&!s.job&&s.left)out.push({s,left:s.left,sp:wfFoodSpot({st:'left',d:'friedrice'},s)});continue}out.push({s,wf:n,sp:wfFoodSpot(n,s)})}return out}
 function wfDrawFood(c,v,now){const n=v.wf,sp=v.sp;const plating=n.st==='work'&&n.f==='plate';
@@ -7279,7 +7524,7 @@ function wfDrawCue(c,now){if(!R||room!=='kitchen'||!R.wsel)return;const n=wfNode
  c.save();c.strokeStyle=`rgba(255,226,170,${.55+.25*br})`;c.lineWidth=1.8;c.lineCap='round';c.setLineDash([5,4]);c.lineDashOffset=-now*8;c.beginPath();c.moveTo(x0,y0);c.quadraticCurveTo(mx,my,x1,y1);c.stroke();c.setLineDash([]);
  const t=.96,ax=(1-t)*(1-t)*x0+2*(1-t)*t*mx+t*t*x1,ay=(1-t)*(1-t)*y0+2*(1-t)*t*my+t*t*y1;const ang=Math.atan2(y1-ay,x1-ax);c.fillStyle=`rgba(255,226,170,${.7+.2*br})`;c.translate(x1,y1);c.rotate(ang);c.beginPath();c.moveTo(1,0);c.lineTo(-6,-3.6);c.lineTo(-6,3.6);c.closePath();c.fill();c.restore()}
 /* 「現在可以把這鍋炒飯裝盤」: a clean plate laid faintly beside the finished food, where it will be plated */
-function wfDrawPlateGhost(c,n,now){const t=n.slot&&n.slot.type;const sp=t==='oven'||t==='pizza'?wfOutSpot(n):wfFoodSpot(n,n.slot);const pp=wfPlateAt(n,sp,0);   /* (a baked dish: beside where the tray is set down, not on the oven's door) */c.save();c.globalAlpha=.42+.1*Math.sin(now*2.2);c.translate(pp.x,pp.y);c.scale(pp.sc,pp.sc);drawVesselBack(c,'plate');c.restore()}
+function wfDrawPlateGhost(c,n,now){const t=n.slot&&n.slot.type;const sp=t==='oven'||t==='pizza'?wfOutSpot(n):wfFoodSpot(n,n.slot);const pp=wfPlateAt(n,sp,0);   /* (a baked dish: beside where the tray is set down, not on the oven's door) */c.save();c.globalAlpha=.42+.1*Math.sin(now*2.2);c.translate(pp.x,pp.y);c.scale(pp.sc,pp.sc);if(VESSEL[baseOf(n.d)]==='bowl')drawBowl(c,false);else drawVesselBack(c,'plate');c.restore()}   /* (a soup or a salad: its bowl) */
 /* a quiet mark over food that is done with its step and waiting to go on */
 function wfDrawReady(c,now){if(!R||!R.wf)return;for(const n of R.wf){if(n.st!=='ready'||!n.slot||n.slot.type==='pass')continue;const sp=wfFoodSpot(n,n.slot);const x=sp.x+(sp.inOven?0:12),y=sp.y-(sp.inOven?10:20);c.fillStyle='rgba(255,248,236,.92)';circ(c,x,y,4.2);c.strokeStyle='rgba(120,160,90,.9)';c.lineWidth=1.1;c.beginPath();c.moveTo(x-2,y);c.lineTo(x-.5,y+1.6);c.lineTo(x+2.2,y-1.6);c.stroke()}}
 /* ---- the player's hands: a dish on a ticket selects its work; a lit place in the kitchen sends Jill there ---- */
@@ -9021,7 +9266,7 @@ function drawStageFood(c,s,j,cx,vy,vs,now){const D=DISH(j.d);const k=j.step;cons
  if(steamy){for(let i=0;i<4;i++){const ph=(now*.7+i*.25)%1;c.globalAlpha=(1-ph)*(smoky?.55:.3);c.fillStyle=smoky?'#555':'#fff';circ(c,-18+i*12+Math.sin(now*2+i)*4,-26-ph*40,5+ph*8)}c.globalAlpha=1}
  if(s.pop&&s.pop.t<.5){const t=s.pop.t/.5;c.globalAlpha=1-t;drawIng(c,s.pop.id,0,-50+t*36,12);c.globalAlpha=1}
  c.restore()}
-function drawBoard(c,j,k,now,s){c.fillStyle='rgba(0,0,0,.28)';el(c,2,18,54,12);c.fillStyle='#9A6534';rr(c,-52,-8,104,26,7);c.fill();c.fillStyle='#C8965E';rr(c,-52,-14,104,26,7);c.fill();c.strokeStyle='rgba(120,70,30,.25)';c.lineWidth=.8;for(let i=0;i<4;i++){c.beginPath();c.moveTo(-46,-9+i*6);c.quadraticCurveTo(0,-7+i*6,46,-10+i*6);c.stroke()}
+function drawBoard(c,j,k,now,s){drawVesselBack(c,'cutboard');
  const p=k.taps/k.n;const R0=rng(j.seed);
  const jd=baseOf(j.d);if(k.slice){/* rested: the seared piece, the slices fanning off it as the knife goes */const n=Math.floor(p*6);c.fillStyle='rgba(0,0,0,.2)';el(c,-4,4,32,9);if(jd==='duck'){c.fillStyle='#C9782E';el(c,-14+n*2,-2,16-n*2,9);c.fillStyle='#F3DCC0';el(c,-14+n*2,-4,15-n*2,4);for(let i=0;i<n;i++){c.save();c.translate(2+i*6.5,-1);c.rotate(-.15);c.fillStyle='#E39292';el(c,0,0,4.6,8);c.fillStyle='#F6C9B0';el(c,0,-6.5,4.2,1.8);c.fillStyle='#C9782E';el(c,0,-7.5,4.4,1.2);c.restore()}}else{c.fillStyle='#7A3E22';el(c,-14+n*2,-2,16-n*2,9.5);c.fillStyle='#8A4A2A';el(c,-14+n*2,-5,14-n*2,3);for(let i=0;i<n;i++){c.save();c.translate(2+i*6.5,-1);c.rotate(-.15);c.fillStyle='#C43A4C';el(c,0,0,4.6,8.5);c.fillStyle='#E8788A';el(c,-.5,0,2.6,6);c.fillStyle='#5A2E1C';el(c,0,-8,4.4,1.3);c.restore()}}c.fillStyle='rgba(120,40,30,.35)';for(let i=0;i<4;i++)circ(c,-24+R0()*40,6+R0()*5,1.2)}
  else if(jd==='duck'){c.fillStyle='#E39292';el(c,-6,-1,30,12);c.fillStyle='#F3DCC0';el(c,-6,-3,28,9.5);c.strokeStyle='rgba(150,90,60,.85)';c.lineWidth=1.2;for(let i=0;i<k.taps;i++){const off=-20+i*(36/Math.max(1,k.n-1));c.beginPath();c.moveTo(off-5,-11);c.lineTo(off+5,4);c.stroke();c.beginPath();c.moveTo(off+5,-11);c.lineTo(off-5,4);c.stroke()}}
@@ -9029,6 +9274,7 @@ function drawBoard(c,j,k,now,s){c.fillStyle='rgba(0,0,0,.28)';el(c,2,18,54,12);c
  else{const cols=jd==='salad'?['#7CBF4A','#D8392A','#9AC66A']:['#4E7F2E','#D6392E','#F2BE2E'];const whole=Math.max(0,3-Math.floor(p*3));for(let i=0;i<whole;i++){c.fillStyle=cols[i];el(c,-36+i*11,-3,7.5,5.5);gloss(c,-38+i*11,-5,2.5,1.2,.4)}const pieces=Math.floor(p*16);for(let i=0;i<pieces;i++){c.fillStyle=cols[i%3];c.save();c.translate(2+R0()*40,-11+R0()*15);c.rotate(R0()*3);c.fillRect(-2.6,-1.8,5.2,3.6);c.restore()}}
  if(jd!=='souffle'){const lift=(s.shake||0)*10;c.save();c.translate(-8,-18-lift);c.rotate(-.12);let kg=c.createLinearGradient(0,-8,0,6);kg.addColorStop(0,'#F4F6F7');kg.addColorStop(1,'#9AA4A8');c.fillStyle=kg;c.beginPath();c.moveTo(-20,4);c.lineTo(18,4);c.lineTo(18,-4);c.quadraticCurveTo(-6,-11,-20,4);c.fill();c.fillStyle='#3A2A20';rr(c,18,-3,17,7,3);c.fill();c.fillStyle='#C99A45';circ(c,23,.5,1);circ(c,30,.5,1);c.restore()}}
 function drawVesselBack(c,v){let g;switch(v){
+ case'cutboard':/* the prep's cutting board */c.fillStyle='rgba(0,0,0,.28)';el(c,2,18,54,12);c.fillStyle='#9A6534';rr(c,-52,-8,104,26,7);c.fill();c.fillStyle='#C8965E';rr(c,-52,-14,104,26,7);c.fill();c.strokeStyle='rgba(120,70,30,.25)';c.lineWidth=.8;for(let i=0;i<4;i++){c.beginPath();c.moveTo(-46,-9+i*6);c.quadraticCurveTo(0,-7+i*6,46,-10+i*6);c.stroke()}break;
  case'board':/* the cheese plate's serving board, with its handle */c.fillStyle='rgba(0,0,0,.26)';el(c,2,12,46,9);c.fillStyle='#9A6534';rr(c,-44,-11,80,24,6);c.fill();rr(c,34,-8,14,12,4);c.fill();c.fillStyle='#C8965E';rr(c,-44,-15,80,24,6);c.fill();rr(c,34,-12,14,12,4);c.fill();c.fillStyle='#9A6534';circ(c,42,-6,2);
   c.strokeStyle='rgba(120,70,30,.22)';c.lineWidth=.8;for(let i=0;i<3;i++){c.beginPath();c.moveTo(-40,-9+i*6);c.quadraticCurveTo(-4,-7+i*6,32,-10+i*6);c.stroke()}break;
  case'wok':c.fillStyle='rgba(0,0,0,.3)';el(c,0,10,50,16);c.fillStyle='#6B3A22';rr(c,40,-6,34,7,3);c.fill();c.fillStyle='#8A5230';c.fillRect(44,-5,26,2);c.fillStyle='#1E1E20';el(c,0,3,48,23);g=c.createRadialGradient(-10,-6,4,0,0,44);g.addColorStop(0,'#58585F');g.addColorStop(1,'#26262A');c.fillStyle=g;el(c,0,0,44,19);break;

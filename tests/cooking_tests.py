@@ -718,3 +718,34 @@ def cooking_the_users_day3_latte_goes_out_by_a_tap(b, port, target):
         tick(3)
     check(g.ev("(R.st.dish||{}).coffee>0"), f'林小姐 has her latte: {g.ev("JSON.stringify(R.tickets.flatMap(t=>t.items).map(i=>[i.d,i.st]))")}')
     check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def cooking_each_dish_with_its_own_beats_starts_raw_and_changes_by_hand(b, port, target):
+    """The choreography (the user's spec, docs/v24/cooking_choreography_2026-10-08.txt, HARD RULES 1–4), for every dish with
+    its own beats so far (the fried rice; the latte, the pasta, the salad, the tea, the sparkling water, the soup): what goes
+    in goes in by a hand — a beat that adds something is the hands', never the heat's, and every beat of the hands has its
+    gesture; at the start of each place the dish is its raw look (nothing of the place done), the beats in order bring it to
+    the place's finished look; and drawn in the kitchen it looks different at the start, when the hands are done (half way
+    through them where nothing cooks by itself) and at the end of each place, and while it is plated — never one finished picture from the first moment."""
+    g = _day(b, port, target, 9101, "S.eq.bar=Math.max(S.eq.bar,1);S.eq.prep=Math.max(S.eq.prep,1);")
+    beats = json.loads(g.ev(r"""JSON.stringify((()=>{const out={};for(const d of Object.keys(CH))for(const f of Object.keys(CH[d])){const c=CH[d][f];const bad=[];
+      for(const x of c.hands||[])if(!x.g)bad.push('hands without a gesture: '+x.say);
+      for(const x of c.heat||[])if(x.ing)bad.push('added by the heat: '+x.say);
+      const s0=Object.assign({},c.from);chRun(s0,c.hands,0);const raw=Object.keys(c.from).every(k=>s0[k]===c.from[k]);
+      const s1=Object.assign({},c.from);chRun(s1,c.hands,1);if(c.heat)chRun(s1,c.heat,1);const last={};for(const x of(c.hands||[]).concat(c.heat||[]))Object.assign(last,x.set);
+      out[d+'.'+f]={bad,raw,done:Object.keys(last).every(k=>Math.abs(s1[k]-last[k])<1e-9),n:(c.hands||[]).length+(c.heat||[]).length}}return out})())"""))
+    for want in ('friedrice.hot', 'friedrice.plate', 'coffee.drink', 'blacktea.drink', 'sparkling.drink', 'salad.prep', 'salad.plate', 'pasta.hot', 'pasta.plate', 'soup.hot', 'soup.plate'):
+        check(want in beats, f'{want} has its own beats: {sorted(beats)}')
+    for k, v in beats.items():
+        check(not v['bad'] and v['raw'] and v['done'] and v['n'] >= 2, f'{k}: by hand, from raw to done in its beats: {v}')
+    # drawn: each place at its start, when the hands are done, at its end; the plates at their start, half way, done
+    looks = json.loads(g.ev(r"""JSON.stringify((()=>{const cv=document.createElement('canvas');cv.width=240;cv.height=200;const c=cv.getContext('2d');const out={};
+      const hashOf=()=>{const px=c.getImageData(0,0,240,200).data;let h=2166136261;for(let i=0;i<px.length;i+=4){h^=px[i]+px[i+1]*3+px[i+2]*7+px[i+3]*11;h=Math.imul(h,16777619)}return(h>>>0).toString(16)};
+      for(const d of Object.keys(CH)){const fl=wfFlow(d);if(!fl)continue;fl.forEach((f,si)=>{if(!CH[d][f])return;const plating=f==='plate';const ty=WF_ST[plating?fl[si-1]:f].slot;const slot=R.slots.find(s=>s.type===ty);if(!slot)return;
+        const at=(st,act,pas)=>{const n={id:-7,d,n:1,its:[{it:{want:0}}],seed:7,st,f,si,act0:1,act,pas0:1,pas,dur:2,slot,who:null};const sp=wfFoodSpot(n,slot);c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,240,200);c.translate(120-sp.x,130-sp.y);chDrawFood(c,n,slot,sp,0,plating);return hashOf()};
+        out[d+'.'+f]=plating?[at('work',1,0),at('work',.5,0),at('work',0,0)]:[at('work',1,1),CH[d][f].heat?at('cook',0,1):at('work',.5,1),at('ready',0,0)]})}return out})())"""))   # (a place without heat — the salad's board — is all hands: its middle is half way through them)
+    for k, (h0, h1, h2) in looks.items():
+        check(len({h0, h1, h2}) == 3, f'{k}: drawn differently at its start, when the hands are done and at its end: {[h0, h1, h2]}')
+    check(len(looks) >= 11, f'every place with its own beats was drawn: {sorted(looks)}')
+    check(not g.errors, g.errors[:3]); g.close()

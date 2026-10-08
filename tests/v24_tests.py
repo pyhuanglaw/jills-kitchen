@@ -4449,7 +4449,10 @@ def v24_rc76_the_chefs_night(b, port, target):
       fact:!!fact('cn_first'),S:S.cn,list:Object.values(R.st.lgSold||{}).reduce((a,x)=>a+x.rev,0),takings:R.st.lgRev||0,at:Math.floor((17*60+R.cn.t0/R.dur*270)/60),endAt:R.t/R.dur}})())"""))
     check(res['at'] == 19, f'it begins after seven, as the scene and the manual say: {res["at"]}:xx')
     check(res['list'] == res['takings'], f'the Lounge\'s list is still its takings: {res}')
-    check(res['end'] and res['people'] == 23 and res['served'] and res['endAt'] < .9, f'the night came to its end well before closing: all 23, every course and glass out: {res}')
+    # (2026-10-09: was endAt < .9. Measured on 8b17220 and 8c8fb6e over seeds 7611–7615 the night ends at .86–.96 of the
+    # service on both — the same spread; .9 sat inside it. What the night needs is to end before the doors close: the
+    # first night's closing scene (謝謝。) plays only before the closing, which cannot begin before 21:30. docs/cooking/ARCHITECTURE.md 26.)
+    check(res['end'] and res['people'] == 23 and res['served'] and res['endAt'] < 1, f'the night came to its end before the doors close: all 23, every course and glass out: {res}')
     check(res['fact'] and res['S']['n'] == 1 and res['S']['next'] is None and res['S']['last'] == g.ev("S.day"), f'counted once: {res["S"]}')
     other = json.loads(g.ev("JSON.stringify(__cnOther)"))
     check(not other, f'nobody else sat in the Lounge while it lasted: {other}')
