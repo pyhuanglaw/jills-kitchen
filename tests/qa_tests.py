@@ -1495,3 +1495,19 @@ def qa_a_guest_who_moves_to_the_lounge_is_counted_once(b, port, target):
         check(r['guests'] == r['size'] and r['groups'] == 1, f'one visit counted {r["guests"]} guests / {r["groups"]} groups for a party of {r["size"]}')
     finally:
         p.close()
+
+
+# ---------------------------------------------------------------- the code itself (guard)
+
+@test
+def qa_no_function_is_declared_twice(b, port, target):
+    """Found by the lint (tools/lint.mjs, no-redeclare) in the final regression of 2026-10-09: the fifth batch of dishes
+    added its own small plate knife as `function chKnife(c,x,y,now)` — the cutting board's knife already had that name.
+    Two declarations of one function do not fail anything: the later one silently replaces the earlier everywhere, so
+    every earlier dish's cut (the salad, the prosciutto, the tiramisu…) drew the plate knife, at an angle read as a
+    time. A top-level function name is declared once."""
+    src = open(os.environ.get('JK_GAME_JS') or os.path.join(ROOT, 'js', 'game.js'), encoding='utf-8').read()
+    names = re.findall(r'(?m)^(?:async\s+)?function\s*\*?\s*([A-Za-z_$][\w$]*)\s*\(', src)
+    check(len(names) > 1000, f'the functions were not found: {len(names)}')
+    twice = sorted({n for n in names if names.count(n) > 1})
+    check(not twice, f'declared more than once (the last one replaces the others): {twice}')
