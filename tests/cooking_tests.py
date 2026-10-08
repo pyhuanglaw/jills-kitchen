@@ -208,3 +208,41 @@ def cooking_the_work_survives_a_checkpoint(b, port, target):
     st = g.ev(f"R.tickets[{tki}].items[{iti}].st")
     check(st in ('pending', 'cooking') and not g.ev("R.slots.some(s=>s.job&&s.job.d==='friedrice')"), f'its fried rice is back to be made again, not on an old job: {st}')
     check(not g.errors, g.errors[:3]); g.close()
+
+
+# every place in the kitchen: the oven, the coffee machine, the prep boards, the pizza oven, the signature dishes
+ALL_PLACES = ("S.level=5;S.eq.stove=3;S.eq.oven=3;S.eq.bar=3;S.eq.prep=1;S.eq.fridge=3;S.rooms=S.rooms||{};S.rooms.pizzaoven=1;"
+              "for(const d in DISHES)if(!S.unlocked.includes(d))S.unlocked.push(d);"
+              "S.signature={base:'mash',protein:'duck',sauce:'redwine',side:'asparagus',name:'Test Sig'};")
+# one dish through its workflow, Jill on every step: the places it used, in order, and how it ended
+WALK = r"""(d=>{R.tickets=R.tickets.filter(t=>t.id!==997);const g0={id:'t997',name:'T',size:1,table:0,state:'wait',pat:1,type:'office',looks:makeLooks('office',1)};
+  const it={d,st:'pending',q:null,want:d==='steak'?1:0,picked:false};const tk={id:997,no:1,g:g0,items:[it],t0:R.t};R.tickets.push(tk);
+  wfGather();const n=wfOf(it);if(!n)return{d,err:'no work'};const places=[],seen=[];let guard=0;
+  while(wfNode(n.id)&&guard++<6000){if(wfOpen(n)){if(!wfAssign(n,'jill'))return{d,err:'no place for '+wfNext(n),places}}
+   const k=n.si+'|'+n.st;if(n.slot&&!seen.includes(n.si)&&(n.st==='work'||n.st==='cook')){seen.push(n.si);places.push(n.slot.type)}
+   if(n.st==='work'&&!n.slot&&!seen.includes(n.si)){seen.push(n.si);places.push('pick')}
+   for(const q of R.groups)q.pat=1;__tick(1000/30)}
+  R.tickets=R.tickets.filter(t=>t!==tk);return{d,places,q:it.q,st:it.st,flow:wfFlow(d)}})"""
+
+
+@test
+def cooking_every_family_goes_its_own_way(b, port, target):
+    """The user's workflow table (cooking_workflow_canon_2026-10-07.txt), family by family: each dish of the new kitchen
+    goes through exactly the places of its own workflow, in order — 備料 at a prep board, 熱區 on a burner, 烤箱 in the oven,
+    飲料 at the coffee machine, 披薩烤爐 in the pizza oven, 裝盤 at the pass, 出杯 set down for the floor — and, made by
+    Jill, it is Perfect. A special goes its base dish's way."""
+    g = _day(b, port, target, 7130, ALL_PLACES)
+    ids = g.ev("Object.keys(DISHES).concat(['signature','sigdessert']).filter(isWF)")
+    want_slot = {'prep': 'prep', 'hot': 'stove', 'oven': 'oven', 'drink': 'bar', 'pizza': 'pizza', 'plate': 'pass', 'serve': 'pick'}
+    bad, seen_fams = {}, set()
+    for d in ids:
+        r = json.loads(g.ev(f"JSON.stringify(({WALK})({json.dumps(d)}))"))
+        exp = [want_slot[f] for f in (r.get('flow') or [])]
+        if r.get('err') or r.get('places') != exp or r.get('q') != 'P':
+            bad[d] = r
+        seen_fams.add(tuple(r.get('flow') or []))
+    check(not bad, f'dishes off their workflow, or not Perfect from Jill: {bad}')
+    check(len(seen_fams) == 7, f'all seven workflows are on the new kitchen: {sorted(seen_fams)}')
+    sp = g.ev("Object.keys(SPECIALS).filter(b=>isWF(b)).every(b=>JSON.stringify(wfFlow(SPECIALS[b].id))===JSON.stringify(wfFlow(b)))")
+    check(sp, 'a special goes its base dish\'s way')
+    check(not g.errors, g.errors[:3]); g.close()

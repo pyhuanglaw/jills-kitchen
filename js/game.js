@@ -1927,7 +1927,10 @@ function staffSay(m,txt,tone,tg){if(shGrab({who:'staff:'+m.name,name:m.name,text
 function noteLine(txt){if(shGrab({who:'',name:'',text:txt}))return;noteRaw(txt)}
 function noteRaw(txt){logLine('',txt,'e');toast(txt)}
 /* a dish needs its station in the kitchen before anyone can order it (a recipe found before the station exists waits) */
-function stationOk(d){const D=DISH(d);if(!D)return false;const st=D.st;if(st==='pizza')return projOn('pizzaoven');return st==='stove'||!!(S.eq[st])}
+/* v2.5: the first place of a dish's workflow the kitchen does not have yet (its slot type), or null */
+function wfMissing(d){const fl=wfFlow(d);if(!fl)return null;for(const f of fl){const t=WF_ST[f].slot;if(!t||t==='pass'||t==='stove')continue;if(t==='pizza'?!projOn('pizzaoven'):!S.eq[t])return t}return null}
+function wfFlowText(d){const fl=wfFlow(d);return fl?fl.map(f=>WF_ST[f].n).join(' → '):''}
+function stationOk(d){const D=DISH(d);if(!D)return false;if(isWF(d))return !wfMissing(d);const st=D.st;if(st==='pizza')return projOn('pizzaoven');return st==='stove'||!!(S.eq[st])}
 /* How likely a guest of type T is to pick dish d, relative to the other dishes in its category. One
    function for everything that reasons about demand: ordering, the stock suggestion, the day's dish
    mission and the hint on the prep screen. Signature is desirable (×1.35) but no longer swallows the
@@ -5982,7 +5985,7 @@ const WF_ST={prep:{n:'備料',k:'備',slot:'prep'},hot:{n:'熱區',k:'熱',slot:
 const WF_FAM={hot2:['hot','plate'],cold2:['prep','plate'],drink2:['drink','serve'],oven2:['oven','plate'],hot3:['prep','hot','plate'],oven3:['prep','oven','plate'],pizza3:['prep','pizza','plate']};
 /* each dish's workflow is the user's table (cooking_workflow_canon_2026-10-07.txt), never ours; a special follows its base
    dish. A dish not in this list still cooks the old way (the two pizzas the table does not name wait for the user). */
-const WF_DISH={friedrice:'hot2'};
+const WF_DISH={friedrice:'hot2',salad:'cold2',coffee:'drink2',fries:'oven2',burger:'hot3',chicken:'oven3',pizza:'pizza3'};
 const WF_TYPE_F={prep:'prep',stove:'hot',oven:'oven',bar:'drink',pizza:'pizza',pass:'plate'};
 function wfFlow(d){const f=WF_DISH[baseOf(d)];return f?WF_FAM[f]:null}
 function isWF(d){return !!(d&&wfFlow(d))}
@@ -6088,15 +6091,32 @@ function chefSkill(m){return CHEF_SKILL[m.name]||['hot','prep','plate']}
 function chefProf(m,f){if(f==='drink'||f==='serve')return 2;const fam=f==='pizza'?'oven':f;const sk=chefSkill(m),L=m.lv||1;
  if(fam===sk[0])return 3;if(fam===sk[1])return L>=3?2:L>=2?1:0;if(fam===sk[2])return L>=5?2:L>=4?1:0;return 0}
 /* ---- what the kitchen shows: the food where the work is, the same vessels and art as before ---- */
+/* what the dish's own recipe says about the look of each place: every ingredient (in order), the ones in the pan or the oven
+   while it cooks (before its last spell on the fire), the knife work of its prep when it has one before the fire (duck's
+   scoring, the soufflé's whites, cutting the vegetables — drawn on the board as before), and the last pour of a drink */
+function wfLook(d){const st=recipeOf(d)||[];const all=[],fire=[];let lastHeat=-1,firstHeat=-1,board=null,pour=null;
+ st.forEach((k,i)=>{const heat=k.t==='zone'||k.t==='wait'||(k.t==='work'&&!k.board);if(heat){lastHeat=i;if(firstHeat<0)firstHeat=i}});
+ st.forEach((k,i)=>{const its=k.t==='add'?k.items.filter(x=>!x.startsWith('s_')):k.t==='dose'?Array(k.min||1).fill(k.ing):[];all.push(...its);if(i<lastHeat)fire.push(...its);
+  if(k.t==='work'&&k.board&&!board&&(firstHeat<0||i<firstHeat))board=k;if(k.t==='hold')pour=k.ing});
+ return{all,fire:fire.length?fire:all,board,pour}}
+function wfHasBoard(d){return !!wfLook(d).board}
+/* the vessel a dish is prepared in: its own, except a pan or a pot — the prep of a dish for the fire is laid out on a plate */
+function wfPrepVessel(d){const v=DISH(d).v;return v==='wok'||v==='pan'||v==='griddle'||v==='pot'?'plate':v}
 /* a stand-in for an old job, only for the renderers (drawStageFood, drawBoard, drawContents): every ingredient of the dish,
    the mixing, the board's knife work growing with the step */
-function wfRJ(n){if(!n.rj){const st=recipeOf(n.d)||[];const adds=[];for(const k of st){if(k.t==='add')adds.push(...k.items.filter(i=>!i.startsWith('s_')));else if(k.t==='dose')for(let i=0;i<(k.min||1);i++)adds.push(k.ing)}
-  n.rj={d:n.d,seed:n.seed,adds,mix:0,cut:true,side:1,sear:[1,1],fill:1,grind:.7,foam:.8,sauce:0,it:null,step:null,wf:1}}
- const rj=n.rj,p=wfProg(n),f=n.f||wfFl(n)[n.si];rj.it=n.its[0]?n.its[0].it:{want:1};rj.mix=f==='hot'?(n.st==='ready'?1:Math.max(.15,p)):1;
- rj.step=f==='prep'?{t:'work',board:true,taps:Math.round((n.st==='ready'?1:p)*8),n:8}:f==='hot'&&n.st==='work'?{t:'work',anim:'toss'}:f==='hot'&&n.st==='cook'?{t:'wait',anim:'stir'}:null;
+function wfRJ(n){const L=wfLook(n.d);if(!n.rj)n.rj={d:n.d,seed:n.seed,adds:[],mix:0,cut:true,side:1,sear:[1,1],fill:1,grind:.7,foam:.8,sauce:0,it:null,step:null,wf:1,lastZone:0};
+ const rj=n.rj,f=n.f||wfFl(n)[n.si],done=n.st==='ready',p=done?1:wfProg(n);rj.it=n.its[0]?n.its[0].it:{want:1};
+ if(f==='prep'){/* the board's knife work as before, or the dish's own vessel filling as it is put together */
+  rj.adds=L.all.slice(0,Math.max(1,Math.ceil(p*L.all.length)));rj.mix=0;rj.lastZone=0;
+  rj.step=L.board?Object.assign({},L.board,{t:'work',board:true,taps:Math.round(p*8),n:8,slice:false}):{t:'prep',v:wfPrepVessel(n.d)}}
+ else if(f==='hot'){rj.adds=L.fire.slice();rj.mix=done?1:Math.max(.15,p);rj.lastZone=done?.95:Math.min(.95,p);
+  rj.step=n.st==='work'?{t:'work',anim:'toss'}:n.st==='cook'?{t:'wait',anim:'stir'}:null}
+ else if(f==='oven'||f==='pizza'){rj.adds=L.fire.slice();rj.mix=1;rj.lastZone=n.st==='work'?0:done?.95:Math.min(.95,p);rj.fill=1;rj.step=null}
+ else if(f==='drink'){rj.adds=L.all.slice();rj.mix=1;rj.fill=p;rj.step=n.st==='work'&&L.pour?{t:'hold',hold:true,ing:L.pour,level:Math.max(.2,p),a:.6,b:.9}:null}
+ else{rj.adds=L.all.slice();rj.mix=1;rj.step=null}
  return rj}
 /* where a piece of work's food is drawn: on its board, burner, the oven's trivet or inside the oven, the machine */
-function wfFoodSpot(n,s){const h=slotHome(s);if(s.type==='prep')return{x:h.x,y:172,sc:.4};
+function wfFoodSpot(n,s){const h=slotHome(s);if(s.type==='prep')return{x:h.x,y:172,sc:wfHasBoard(n.d)?.4:.36};
  if(s.type==='oven'){if(n.st==='cook')return{x:KX.oven.x+(s.no>1?34:12),y:KY.top+KY.h+10,sc:.17,inOven:true};return{x:KX.oven.x+22,y:170,sc:.36}}
  if(s.type==='pizza'){const P=pizzaOvenRect();if(n.st==='cook')return{x:P.mx,y:P.my-3,sc:.2,inOven:true};return{x:KX.oven.x+26,y:186,sc:.3}}
  return{x:h.x,y:h.y,sc:h.sc}}
@@ -6187,7 +6207,7 @@ function wfRestore(N,x,item){for(const s0 of N.slots)if(s0.job&&isWF(s0.job.d)){
  catch(e){console.warn('[wf] restore',e);reset()}}
 /* Jill in the kitchen (drawn where she is working or walking; the same rule as before for when she is painted there) */
 function wfDrawJill(c,now){const J=R&&R.jk;if(!J)return false;const t=wfJillTask();if(!t&&!J.moving)return false;const stp=J.moving?Math.sin(J.step):0;
- const work=t&&t.st==='work';const board=work&&t.f==='prep';drawPerson(c,J.x,J.y,JILL_LOOK,{jill:true,me:true,tall:true,s:1.1,mood:'happy',expr:work?'focus':'smile',step:stp,flip:J.face<0,bob:J.moving?Math.abs(stp)*-1:work?Math.abs(Math.sin(now*(board?9:5)))*-1:Math.sin(now*2)*.4,blink:Math.sin(now*1.7)>.985,arms:work?[.35,.95+Math.sin(now*(board?9:6))*.25]:null});
+ const work=t&&t.st==='work';const board=work&&t.f==='prep'&&wfHasBoard(t.d);drawPerson(c,J.x,J.y,JILL_LOOK,{jill:true,me:true,tall:true,s:1.1,mood:'happy',expr:work?'focus':'smile',step:stp,flip:J.face<0,bob:J.moving?Math.abs(stp)*-1:work?Math.abs(Math.sin(now*(board?9:5)))*-1:Math.sin(now*2)*.4,blink:Math.sin(now*1.7)>.985,arms:work?[.35,.95+Math.sin(now*(board?9:6))*.25]:null});
  if(board)drawHandKnife(c,J.x,J.y,J.face<0?-1:1,now);else if(work&&(t.f==='hot'))drawHandSpoon(c,J.x,J.y,J.face<0?-1:1,now);
  if(t&&t.carry&&(wfFl(t)[t.si+1]==='plate'||wfFl(t)[t.si+1]==='serve')){c.drawImage(dishCanvas(t.d,'G',64,S.decor.ware>0,t.its[0]&&t.its[0].it.want),J.x-10,J.y-44,20,20)}
  return true}
@@ -10138,7 +10158,7 @@ function showPrep(){try{barMenuMig()}catch(e){console.warn('[bar]',e)}try{firstP
  const rows=unlocked.map(d=>{const D=DISH(d);const on=S.menu.includes(d);const m=S.price[d]||1;const st=S.stock[d]||0;const lv=mLv(d);
   const lov=lovesOf(d,'d').concat(lovesOf(d,'g').filter(x=>!lovesOf(d,'d').includes(x)));
   return`<div class="menu-row ${on?'':'off'}"><img alt="" src="${dishURL(d,'P')}"><div class="nm">${D.n}<span class="stars">${'★'.repeat(starOf(d))}</span>${lov.length?`<span class="love" title="熟客的最愛">♥ ${lov.map(loveName).join('、')}</span>`:''}<small>${CAT_N[D.cat]} · LV${lv}${D.bar?' · 酒吧小點，不佔名額':''}</small></div><button class="tog ${on?'on':''}" data-act="toggle" data-d="${d}" aria-label="${on?'從菜單移除':'加入菜單'}"></button>
-  <div class="meta">${fmt(priceOf(d))} · 成本 ${fmt(costOf(d))} · ${D.steps.length} 步驟・${mechN(d)}${stationOk(d)?'':` · <b style="color:var(--tomato)">缺少${ST_N[D.st]}，客人不會點</b>`}</div>
+  <div class="meta">${fmt(priceOf(d))} · 成本 ${fmt(costOf(d))} · ${isWF(d)?wfFlowText(d):`${D.steps.length} 步驟・${mechN(d)}`}${stationOk(d)?'':` · <b style="color:var(--tomato)">缺少${ST_N[wfMissing(d)||D.st]}，客人不會點</b>`}</div>
   ${!on&&F.stock&&st>0?`<div class="ctl offstock"><span>冰箱裡還有 ${st} 份，佔著位子</span><button class="btn sm" data-act="stock" data-d="${d}" data-v="-99">退掉（退 ${fmt(st*costOf(d))}）</button></div>`:''}
   ${on&&(F.prices||F.stock)?`<div class="ctl">${F.prices?`<span class="step"><label>售價</label><button data-act="price" data-d="${d}" data-v="-1" aria-label="降價">−</button><span>${fmt(priceOf(d))}${m!==1?` <small>${m>1?'+':''}${Math.round((m-1)*100)}%</small>`:''}</span><button data-act="price" data-d="${d}" data-v="1" aria-label="漲價">＋</button></span>`:''}${F.stock?(()=>{const sg=sug[d]||0;const q1=stockQuote(d,1);return`<span class="step stk"><label>庫存</label><button data-act="stock" data-d="${d}" data-v="-1" aria-label="退一份" ${st>0?'':'disabled'}>−</button><span>${st} 份</span><button data-act="stock" data-d="${d}" data-v="1" aria-label="進一份" ${q1.n>0?'':'disabled'}>＋</button></span><span class="stkq"><button class="mini" data-act="stockTo" data-d="${d}" data-k="sug" ${st<sg&&q1.n>0?'':'disabled'}>補到建議 ${sg}</button><button class="mini" data-act="stockTo" data-d="${d}" data-k="max" ${q1.n>0?'':'disabled'}>補滿</button></span>`})():''}${F.prices?priceFeelHTML(d):''}${F.stock&&st===0&&!jillStocks()?'<span class="warnpill">沒有備料</span>':''}</div>`:''}</div>`}).join('');
  const sig=S.signature?`<div class="sig"><img alt="" src="${dishURL('signature','P')}"><div><div class="st">★ CHEF JILL'S SIGNATURE ★</div><b>${S.signature.name}</b><small>${fmt(priceOf('signature'))} · 庫存 ${S.stock.signature||0} 份 · 永遠在菜單最上方</small>${F.stock?`<div style="margin-top:6px" class="step"><button data-act="stock" data-d="signature" data-v="-2" style="color:var(--cream)">−</button><span style="color:var(--cream)">${S.stock.signature||0} 份</span><button data-act="stock" data-d="signature" data-v="2" style="color:var(--cream)">＋</button></div>`:''}</div></div>${S.sigDessert?`<div class="sig sigd"><img alt="" src="${dishURL('sigdessert','P')}"><div><div class="st">★ JILL'S SIGNATURE DESSERT ★</div><b>${S.sigDessert.name}</b><small>${fmt(priceOf('sigdessert'))} · 庫存 ${S.stock.sigdessert||0} 份 · 排在招牌菜下面</small>${F.stock?`<div style="margin-top:6px" class="step"><button data-act="stock" data-d="sigdessert" data-v="-2" style="color:var(--cream)">−</button><span style="color:var(--cream)">${S.stock.sigdessert||0} 份</span><button data-act="stock" data-d="sigdessert" data-v="2" style="color:var(--cream)">＋</button></div>`:''}</div></div>`:''}`:'';
