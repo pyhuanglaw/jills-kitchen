@@ -167,6 +167,7 @@ window.__act = function(){
   for (const t of R.tables) { if (tableActionable(t) && !jillTargets(t.i)) tapTable(t); }
   for (const tk of R.tickets) for (const it of tk.items) if (it.st==='pending') startCook(tk,it,true);
   if (typeof wfBot==='function') wfBot(false);   // v2.5: the new kitchen — one step at a time, as a person
+  if (typeof ddTap==='function' && !ddS().wash && ddCount()>=8) ddTap();   // Workflow B: a player who sees the dirty dishes piling up (8 of 10) asks for washing
   for (const s of R.slots) {
     if (s.broken) { tapStation(R.slots.indexOf(s)); continue; }
     const j=s.job; if (!j || !j.step) continue; const k=j.step;
@@ -260,6 +261,7 @@ window.__actLazy=function(){if(!(phase==='service'&&R))return false;const cov=cr
  for(const t of R.tables){if(!tableActionable(t)||jillTargets(t.i))continue;const g=t.group;if(!g){if(!cov('clean'))tapTable(t);continue}if(g.rowdy){tapTable(t);continue}if(g.state==='order'&&!cov('order'))tapTable(t);else if(g.state==='check'&&!cov('check'))tapTable(t);else if(g.state==='wait'&&!cov('serve'))tapTable(t)}
  for(const tk of R.tickets)for(const it of tk.items)if(it.st==='pending'&&!chefCanAny(it.d))startCook(tk,it,true);
  if(typeof wfBot==='function')wfBot(true);   /* v2.5: what no cook here can take */
+ if(typeof ddTap==='function'&&!ddS().wash&&ddCount()>=8&&!(S.crew||[]).some(m=>m.role==='cleaner'&&crewHere(m)))ddTap();   /* Workflow B: with no cleaner in, a player asks for washing when the dishes pile up */
  for(const s of R.slots){if(s.broken){tapStation(R.slots.indexOf(s));continue}const j=s.job;if(!j||!j.step)continue;const k=j.step;if(chefHandles(s))continue;if(k.t==='add'){const id=k.left[0];if(id)actIng(s,id)}else if(k.t==='tap')actTap(s);else if(k.t==='zone'){if(k.p>=k.z.c)actZone(s)}else if(k.t==='hold'){k.hold=true;R.holdSlot=s;k.level=(k.a+k.b)/2;holdEnd()}else if(k.t==='dose'){if(k.cnt<k.min)actDose(s);else actDoseDone(s)}}return true};
 """
 # A reasoning player in the lab. Reads only what the screen shows: each dish's 主角 and ingredient count,

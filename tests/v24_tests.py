@@ -434,10 +434,14 @@ def _act(g, a, **kv):
 
 @test
 def v24_xiuqin_is_there_from_day_one_and_is_not_free_labour(b, port, target):
-    """A new game: 秀琴阿姨 walks in near closing on Day 1 — Jill's acquaintance, come to help tidy up — and the coach
-    names her once. She claims no table, ticket or dish: Day 1 played with her and without her (window.__noXQH) ends
-    with the same money, guests, stars and reviews. A while into the closing she goes home. Day 2's news names her, and
-    until a cleaner is hired the staff tab says the first cleaner is her."""
+    """A new game: 秀琴阿姨 — Jill's acquaintance — walks in on Day 1 and helps; the scene of her first evening says who she
+    is. Changed 2026-10-08 (the user: 「第一天秀琴阿姨的故事既然是她主動來幫忙，那她不能只是站在店裡、實際上完全不收桌」,
+    「她說來幫忙，就真的有幫忙」, docs/v24/cooking_onboarding_2026-10-08.txt and restaurant_workflow_b_2026-10-08.txt; was: she
+    came near closing, claimed nothing, and Day 1 ended the same with and without her): she comes in when the first table is
+    done, clears tables into her hands, carries the dishes to the tub in the kitchen and washes there — a player who leaves the
+    tables to her sees her do it. Still not the cleaner the player hires (「不要因此提前正式解鎖完整清潔員系統」): she is not on
+    the staff, she is paid nothing, a while into the closing she goes home, Day 2's news names her, and until a cleaner is hired
+    the staff tab says the first cleaner is her."""
     out = {}
     for helper in (True, False):
         g = Game(b, port, target, seed=260, manual=True, viewport={'width': 390, 'height': 844})
@@ -445,25 +449,27 @@ def v24_xiuqin_is_there_from_day_one_and_is_not_free_labour(b, port, target):
         g.click('[data-act=open]')
         g.ev("window.__fastSay=1" + ("" if helper else ";window.__noXQH=1"))
         start_day(g)
-        g.ev("__botUntil('R.t>=R.dur*.9',60000,1/30)")
-        check(not g.ev("!!R.xqh"), 'not before the last part of the evening')
-        seen = {'in': False, 'coach': '', 'claims': []}
+        g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;")   # a player who leaves the tables to whoever helps
+        g.ev("""window.__xq={came:null,cleared:0,carried:0,deposited:0,washed:0};{const C0=ddCollect;ddCollect=function(w,t,cap,res){const k=C0.apply(this,arguments);if(R.xqh&&w===R.xqh&&k>0){__xq.cleared++;__xq.carried+=k}return k}}
+          {const D0=ddDeposit;ddDeposit=function(w){const k=D0.apply(this,arguments);if(R.xqh&&w===R.xqh)__xq.deposited+=k;return k}}{const S0=ddStat;ddStat=function(k,n,who){if(k==='wash'&&who==='xq')__xq.washed+=n;return S0.apply(this,arguments)}}""")
+        seen = {'in': None, 'coach': ''}
         for _ in range(400):
             g.page.evaluate('()=>window.__bot(15,1/30)')
             if g.ev("phase") != 'service': break
-            st = json.loads(g.ev("JSON.stringify({h:!!(R&&R.xqh&&!R.xqh.arriving),coach:$('#coach').hidden?'':$('#coach').innerText,"
-                                 "claims:R?R.tables.filter(t=>t.claim==='xq').length+R.groups.filter(q=>q.claim==='xq').length+R.tickets.filter(k=>k.claim==='xq').length:0,carry:!!(R&&R.xqh&&R.xqh.carry)})"))
-            if st['h']: seen['in'] = True
+            st = json.loads(g.ev("JSON.stringify({h:!!(R&&R.xqh&&!R.xqh.arriving),late:R?R.t>=R.dur*.92:true,coach:$('#coach').hidden?'':$('#coach').innerText})"))
+            if st['h'] and seen['in'] is None: seen['in'] = st['late']
             if '秀琴阿姨' in st['coach']: seen['coach'] = st['coach']
-            if st['claims'] or st['carry']: seen['claims'].append(st)
-        out[helper] = json.loads(g.ev("JSON.stringify({d:__digest(),log:dayLog().map(l=>l.w+'：'+l.t),f:fact('xq_helper')})"))
+        out[helper] = json.loads(g.ev("JSON.stringify({d:__digest(),log:dayLog().map(l=>l.w+'：'+l.t),f:fact('xq_helper'),xq:__xq,crew:(S.crew||[]).length,wages:S.lastSummary&&S.lastSummary.wages})"))
         if helper:
-            check(seen['in'] and out[helper]['f'] and out[helper]['f']['d'] == 1, f'she came in on Day 1: {seen}')
-            check(any(l.startswith('秀琴阿姨：我來幫妳收一下。') for l in out[helper]['log']) and any(l == 'Jill：阿姨，不用啦。' for l in out[helper]['log']), 'who she is to the place, in her own words')
-            check(any('Jill 認識很久的阿姨' in l for l in out[helper]['log']) and '秀琴阿姨' not in seen['coach'], 'who she is, in the scene of her first evening (no coach card)')
-            check(not seen['claims'], f'she never claims a table, a ticket or a dish: {seen["claims"][:2]}')
+            o = out[helper]
+            check(seen['in'] is False and o['f'] and o['f']['d'] == 1, f'she came in on Day 1, before the last part of the evening: {seen}')
+            check(any(l.startswith('秀琴阿姨：我來幫妳收一下。') for l in o['log']) and any(l == 'Jill：阿姨，不用啦。' for l in o['log']), 'who she is to the place, in her own words')
+            check(any('Jill 認識很久的阿姨' in l and '今天她會幫忙收桌' in l for l in o['log']) and '秀琴阿姨' not in seen['coach'], 'who she is and what she does tonight, in the scene of her first evening (no coach card)')
+            x = o['xq']
+            check(x['cleared'] >= 2 and x['carried'] >= 2 and x['carried'] - 3 <= x['deposited'] <= x['carried'] and x['washed'] >= 1, f'she clears tables, carries the dishes to the tub (the last few may be in her hands when the evening ends), and washes: {x}')
+            check(o['crew'] == 0 and not o['wages'], f'not on the staff, paid nothing: {o["crew"]} / {o["wages"]}')
         else:
-            check(not seen['in'] and not out[helper]['f'], 'the control run has no helper')
+            check(seen['in'] is None and not out[helper]['f'] and out[helper]['xq']['cleared'] == 0, 'the control run has no helper')
         if helper:
             # the summary, the shop: the recruit list says who the first cleaner is; then Day 2's news
             if g.ev("phase") == 'summary': g.click('[data-act=toShop]')
@@ -474,9 +480,6 @@ def v24_xiuqin_is_there_from_day_one_and_is_not_free_labour(b, port, target):
             news = g.ev("S.news.join(' ')")
             check('秀琴阿姨' in news and '第一位就是她' in news and '2.4' not in news, f'Day 2: the news names her (a new game gets no update note): {news}')
         check(not g.errors, g.errors[:3]); g.close()
-    a, c = out[True]['d'], out[False]['d']
-    for k in ['money', 'lifetime', 'summary', 'reviews', 'reviewHash', 'stats', 'regulars', 'stock']:
-        check(a[k] == c[k], f'no free labour — {k} is the same with and without her: {a[k]} / {c[k]}')
 
 
 @test

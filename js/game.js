@@ -598,7 +598,7 @@ const COACH=[
  '炒飯會自己炒好，不用盯著。好了點訂單上的炒飯，再點那鍋，Jill 會拿盤子來裝。',   /* v2.5: the new kitchen (fried rice: 熱區 → 裝盤); 2026-10-08: plated where it is, never at the pass */
  '炒飯好了，放在出菜口。點那張桌子，Jill 會端過去。',
  '客人開動了。吃完會出現金幣，點桌子收錢。',
- '最後點桌子收拾乾淨，就能接下一組客人。',
+ '客人走了：點桌子，Jill 會把髒盤子收回廚房，桌子就能再坐人。',   /* Workflow B: the dishes go back to the kitchen */
  '做得好，Chef Jill！就這樣一路做到打烊吧。',
 ];
 
@@ -1744,7 +1744,7 @@ function drainRate(g){const T=TYPES[g.type];const base={queue:1/32,order:1/28,wa
  if(g.table!=null&&R.tables[g.table]&&R.tables[g.table].lounge)m*=.5;if(g.table!=null&&R.tables[g.table]&&R.tables[g.table].pdr)m*=g.state==='check'?.15:.35;/* v2.4 rc6: a door closed, a long dinner — and two floors for whoever brings the bill *//* v2.3: a glass in hand, or waiting with one — nobody is in a hurry here */m*=1+Math.min(.35,S.day*.012);m*=1-Math.min(.25,ambience()*.02);m*=1-.08*S.decor.chairs;{const wp=WEATHER[R.weather]&&WEATHER[R.weather].pat;if(wp){const f=R.weather==='hot'?hotFactor():1;m/=1-(1-wp)*f}}if(R.musicT>R.t&&(g.state==='queue'||g.state==='arrive'))m*=.7;if(g.catT&&g.catT>R.t)m*=.6;if(!g.rowdy&&g.table!=null&&R.groups.some(o=>o.rowdy&&o.table!=null&&Math.hypot(R.tables[o.table].x-R.tables[g.table].x,R.tables[o.table].y-R.tables[g.table].y)<140))m*=1.7;if(S.day<=2)m*=.62;else if(S.day<=4)m*=.82;return base*m}
 function updGroup(g,dt){
  if(['arrive','queue','toTable','leave','toHost','toPiano'].includes(g.state)){const there=stepTo(g,78*dt);if(!there){g.walk=(g.walk||0)+dt*11;g.moving=true}else{g.moving=false;
-  if(g.state==='arrive'){g.landed=true;const t=!R.closed&&freeTableFor(g);if(t&&!t.claim){seatGroup(g,t);return}g.state='queue';requeue()}else if(g.state==='toTable'){g.state='reading';g.timer=rand(2.4,3.8)*(TYPES[g.type].read||1)*(S.day===1?.8:1)*(g.usual?.3:1)*(g.reg==='koba'&&!g.unhurried?.55:1)*(g.rushed?.6:1)*(g.table!=null&&R.tables[g.table]&&R.tables[g.table].pdr?1.3:1)}else if(g.state==='leave'){if(g.bus){g.bus=false;sendOut(g);sfx.plop()}else{g.gone=true;return}}else if(g.state==='toHost'){g.state='host';g.tx=g.x+1;g.ty=g.y}else if(g.state==='toPiano'){g.state='piano'}}}
+  if(g.state==='arrive'){g.landed=true;const t=!R.closed&&freeTableFor(g);if(t&&!t.claim){seatGroup(g,t);return}g.state='queue';requeue()}else if(g.state==='toTable'){g.state='reading';g.timer=rand(2.4,3.8)*(TYPES[g.type].read||1)*(S.day===1?.8:1)*(g.usual?.3:1)*(g.reg==='koba'&&!g.unhurried?.55:1)*(g.rushed?.6:1)*(g.table!=null&&R.tables[g.table]&&R.tables[g.table].pdr?1.3:1)}else if(g.state==='leave'){if(g.bus){g.bus=false;if(g.dd){for(const v of g.dd)ddS().n.push(v);ddStat('in',g.dd.length);g.dd=null}sendOut(g);sfx.plop()}else{g.gone=true;return}}else if(g.state==='toHost'){g.state='host';g.tx=g.x+1;g.ty=g.y}else if(g.state==='toPiano'){g.state='piano'}}}
  if(g.state==='queue'||g.state==='order'||g.state==='wait'||g.state==='check'||g.state==='arrive'){const dr=drainRate(g.state==='arrive'?{...g,state:'queue'}:g);g.pat-=dt*dr;if(g.pat<=0){g.pat=0;angryLeave(g);return}}
  if(g.state==='queue'&&!g.moving){g.notice=(g.notice??rand(2,4))-dt;if(g.notice<=0){g.notice=rand(1.5,3);if(!R.closed){const t=freeTableFor(g);if(t&&!t.claim&&!queued().some(o=>o!==g&&o.id<g.id&&o.size<=t.seats)){seatGroup(g,t);return}if(!t&&loungeWaitOK(g)){g.lgTried=1;if(Math.random()<.6){const ls=loungeSeatFor(g);if(ls){loungeSeat(g,ls,'wait');return}}}}requeue()}
   /* waiting is mostly just sitting; now and then they look around, check a phone, watch a cat, or chat */
@@ -2192,7 +2192,7 @@ function collect(g,o){o=o||{};const again=!!(o.tab||g.counted);/* v2.3: a Lounge
  if(!again&&g.reg!=='dylan'&&!t.lounge&&loungeLv()&&Math.random()<loungeAfterP(g)){/* no draw without a Lounge: the old days' random stream is untouched */const ls=loungeSeatFor(g);if(ls){g.ticket&&(R.tickets=R.tickets.filter(x=>x!==g.ticket),R.tv++);moveToLounge(g,ls);coach(6);return}}
  if(!again)for(const id of storyIdsOf(g))factSet('first_'+id);pairLeaveCheck(g);storyLeaveTogether(g);/* v2.3 Phase 7 */
  leaveGroup(g,sat>=70?'happy':sat>=45?'ok':'sad');t.dirty=true;coach(6);
- if(g.reg==='dylan'){if(dylanStays(g))dylanLinger(g,t);else{/* he clears his own table: plate to the pass, then out. A habit, not a job. */t.dirty=false;t.plates=[];t.busT=0;g.bus=true;g.troom='main';g.tx=PASS.x+18;g.ty=PASS.y-2;S.dylan.clues.tidy=(S.dylan.clues.tidy||0)+1}}}
+ if(g.reg==='dylan'){if(dylanStays(g))dylanLinger(g,t);else if(ddFree()>=ddUnits(t)){/* he clears his own table: plate to the pass, then out. A habit, not a job. Workflow B: handed in at the hatch, it goes in the tub with the rest — only when there is room for it */g.dd=t.plates.map(p=>ddKind(p&&p.d));t.dirty=false;t.plates=[];t.busT=0;g.bus=true;g.troom='main';g.tx=PASS.x+18;g.ty=PASS.y-2;S.dylan.clues.tidy=(S.dylan.clues.tidy||0)+1}}}
 
 /* ---- Jill ---- */
 /* Lines for a familiar face. Tier 1 = 熟客 (5+ visits), tier 2 = 老客人 (20+). Short, and never every visit. */
@@ -3579,7 +3579,7 @@ function serviceFrac(){if(R&&phase==='service'&&R.dur)return R.closing!=null?1:M
 function crewHere(m){const e=crewAwayOf(m);if(!e)return true;if(e.k==='off')return false;const f=serviceFrac();return e.k==='late'?f>=e.at:e.k==='left'?f<e.at:true}
 /* someone who is not here (any more): out through the front door if they were in the room, then gone */
 function crewAwayUpd(m,dt){const w=R.cw&&R.cw[m.id];if(!w)return;const tk=w.task;if(tk){if(tk.k!=='visit'){if(tk.g&&tk.g.claim===m.id)tk.g.claim=null;if(tk.t&&tk.t.claim===m.id)tk.t.claim=null;if(tk.tk&&tk.tk.claim===m.id)tk.tk.claim=null}w.task=null}
- handsDrop(w);w.next=null;w.nextQ=null;w.arriving=0;w.phone=0;w.tx=FR.exit.x;w.ty=FR.exit.y;w.troom='front';
+ handsDrop(w);ddDeposit(w);if(ddWasher()===m.id)ddWashEnd(w);w.next=null;w.nextQ=null;w.arriving=0;w.phone=0;w.tx=FR.exit.x;w.ty=FR.exit.y;w.troom='front';
  if(stepTo(w,(115+15*m.lv)*dt))delete R.cw[m.id];else{w.moving=true;w.step+=dt*12}}
 /* a cook who is not here (any more): out of the kitchen door, then gone */
 function cookAwayUpd(m,dt){const a=R.ck&&R.ck[m.id];if(!a)return;const d0=KR.door,dx=d0.x-a.x,dy=d0.y-a.y,dd=Math.hypot(dx,dy),v=(200+16*m.lv)*dt;a.idle=null;if(dd<=v){delete R.ck[m.id];return}a.x+=dx/dd*v;a.y+=dy/dd*v;a.moving=true;a.step+=dt*13;if(Math.abs(dx)>.5)a.face=dx>0?1:-1;a.beat={kind:'idle',x:d0.x,y:d0.y}}
@@ -3988,24 +3988,28 @@ function xqSpotOK(sp){return !!sp&&(!sp.t||(!sp.t.group&&!sp.t.dirty))}
 function xqPickSpot(h){const n=h.spots=(h.spots||0)+1;const ts=R.tables.filter(t=>(t.room||'main')==='main'&&!t.lounge&&!t.group&&!t.dirty&&t.y<=460&&(!h.spot||h.spot.t!==t));
  if(!ts.length)return{x:244,y:441,t:null};const t=ts[hash('xqs|'+S.day+'|'+n)%ts.length];return{x:t.x+(t.x<200?-24:24),y:t.y+22,t}}
 function xqHelperUpd(dt){const h=R.xqh;
- if(!h){if((R.closed||R.t>=R.dur*.92)&&!R.xqhDone&&xqHelperToday()){R.xqhDone=1;const sp=xqPickSpot({});R.xqh={x:FR.enter.x,y:FR.enter.y,room:'front',troom:'main',tx:sp.x,ty:sp.y,spot:sp,spotT:R.t+30,arriving:1,face:1,step:0,moving:true,busy:0,task:null,next:null}}return}
+ if(!h){if((R.closed||R.t>=R.dur*.92||(!fact('xq_helper')&&S.day===1&&R.tables.some(t=>t.dirty&&!t.group)))&&!R.xqhDone&&xqHelperToday()){   /* Workflow B (the user, 2026-10-08: 「她說來幫忙，就真的有幫忙」): her first evening (Day 1) she comes in when the first table is done, and helps the rest of it */R.xqhDone=1;const sp=xqPickSpot({});R.xqh={x:FR.enter.x,y:FR.enter.y,room:'front',troom:'main',tx:sp.x,ty:sp.y,spot:sp,spotT:R.t+30,arriving:1,face:1,step:0,moving:true,busy:0,task:null,next:null}}return}
  const v=110*dt;
- if(h.leaving){h.tx=FR.exit.x;h.ty=FR.exit.y;h.troom='front';h.wipe=0;if(stepTo(h,v))R.xqh=null;else{h.moving=true;h.step+=dt*12}return}
+ if(h.leaving){if(handsN(h,'dirty')){ddDeposit(h);if(ddWasher()==='xq')ddWashEnd(h)}h.tx=FR.exit.x;h.ty=FR.exit.y;h.troom='front';h.wipe=0;if(stepTo(h,v))R.xqh=null;else{h.moving=true;h.step+=dt*12}return}
  if(h.arriving){if(stepTo(h,v)){h.arriving=0;h.moving=false;xqHelperArrived()}else{h.moving=true;h.step+=dt*12}return}
  /* the pass wiped, the chairs up: a while into the closing she goes home */
- if(R.closing!=null&&R.closing>22&&!h.task&&!h.next&&!(h.nextQ&&h.nextQ.length)&&!DLG){h.leaving=1;return}
+ if(R.closing!=null&&R.closing>22&&!h.task&&!h.next&&!(h.nextQ&&h.nextQ.length)&&!DLG&&!handsN(h,'dirty')&&ddWasher()!=='xq'){h.leaving=1;return}
  if(!h.task&&h.next){h.task=h.next;h.next=null;h.busy=0}
+ if(h.task&&['clean','dump','wash'].includes(h.task.k)){h.wipe=0;ddTaskTick(XQ_HELPER,h,dt,v);return}   /* Workflow B: her dirty-side work */
  const tk=h.task;
  if(tk){const ok=!tk.g||(R.groups.includes(tk.g)&&!tk.g.gone&&tk.g.table!=null);if(!ok){h.task=null;if(h.nextQ&&h.nextQ.length)h.next=h.nextQ.shift();return}
   h.tx=tk.x;h.ty=tk.y;h.troom=tk.room||'main';h.wipe=0;if(!stepTo(h,v)){h.moving=true;h.step+=dt*12;return}
   h.moving=false;if(!tk.fired){tk.fired=1;h.face=tk.t.x>=h.x?1:-1;if(tk.phone)h.phone=1;if(tk.then)try{tk.then()}catch(e){console.warn('[visit]',e)}}if(!DLG)h.busy+=dt;if(h.busy>=tk.dur){h.task=null;h.busy=0;h.phone=0;if(h.nextQ&&h.nextQ.length)h.next=h.nextQ.shift()}return}
+ {/* Workflow B (the user: 「她說來幫忙，就真的有幫忙」): she clears tables into her hands, takes them to the tub, washes — as a LV1 cleaner */const me=XQ_HELPER;
+  if(handsN(h,'dirty')){h.task=ddDumpTask();return}if(ddWasher()==='xq'||ddWashNow(me,true)){if(!ddWasher())ddStartWash('xq');h.task={k:'wash'};return}
+  const t=pdFirst(q=>ddCanClear(q)&&!q.claim&&!jillTargets(q.i)&&(q.room||'main')==='main'&&!q.lounge);if(t){const ct=ddCleanTask(me,h,t);if(ct){h.task=ct;h.wipe=0;return}}if(ddWashNow(me)){ddStartWash('xq');h.task={k:'wash'};return}}
  if(!xqSpotOK(h.spot)||R.t>=h.spotT){h.spot=xqPickSpot(h);h.spotT=R.t+6+hash('xqd|'+S.day+'|'+h.spots)%40/10}const sp=h.spot;
  if(h.room!=='main'||Math.hypot(h.x-sp.x,h.y-sp.y)>3){h.tx=sp.x;h.ty=sp.y;h.troom='main';h.wipe=0;if(stepTo(h,v*.8))h.moving=false;else{h.moving=true;h.step+=dt*12}}else{h.moving=false;h.wipe=1;h.face=sp.t?(sp.t.x>=h.x?1:-1):1}}
 function xqHelperArrived(){factSet('xq_helper');
  /* rc7.2 (the player, 21:49: 「秀琴阿姨出場要暫停遊戲吧 有劇情的」): her first evening is a story beat — the service waits while she
     says who she is to the place, and goes on when the player has tapped through it (was: a coach card that came and went) */
- if(factN('xq_helper')===1){v24Scene([{who:'',text:'快打烊的時候，秀琴阿姨從門口走了進來。'},{who:'staff:秀琴阿姨',text:'我來幫妳收一下。'},{who:'jill',text:'阿姨，不用啦。'},{who:'staff:秀琴阿姨',text:'順路啦。妳一個人怎麼收得完。'},
-  {who:'',text:'秀琴阿姨是 Jill 認識很久的阿姨。很多晚上，她會在快打烊時順路進來幫忙收一收——客人和桌子，還是要靠你。'}]);return}
+ if(factN('xq_helper')===1){v24Scene([{who:'',text:S.day===1&&R&&!R.closed&&R.t<R.dur*.92?'第一桌客人吃完走了，秀琴阿姨從門口走了進來。':'快打烊的時候，秀琴阿姨從門口走了進來。'},{who:'staff:秀琴阿姨',text:'我來幫妳收一下。'},{who:'jill',text:'阿姨，不用啦。'},{who:'staff:秀琴阿姨',text:'順路啦。妳一個人怎麼收得完。'},
+  {who:'',text:'秀琴阿姨是 Jill 認識很久的阿姨。今天她會幫忙收桌、把髒盤子拿回廚房洗；之後很多晚上，她會在快打烊時順路進來幫忙收一收。'}]);return}
  let f=null;try{f=storyTick('xqin',{})}catch(e){console.warn('[xqin]',e)}if(!f)xqHelperChat()}
 /* the evening's few words with Jill; the first evening says who she is to the place */
 function xqHelperChat(){const n=factN('xq_helper');if(fact('yj_move')&&!fact('yj_move_told')){factSet('yj_move_told');shStart('yj_move',false,null,()=>{JILL_SAY('搬完了？',300);xqSay('搬完了。箱子都還沒拆。',1500)});return}if(n>1&&R&&R.sched.some(o=>o.name===YJN)&&yjDueTonight())return;/* her daughter is here tonight: that is the evening's talk */if(n<=1){xqSay('我來幫妳收一下。',300);JILL_SAY('阿姨，不用啦。',1500);xqSay('順路啦。妳一個人怎麼收得完。',2700);return}
@@ -4026,7 +4030,7 @@ function yjDueTonight(){return due('yj_meet',null,0,'yj')||due('yj_look','yj_mee
 /* helper mode: 怡君 came late; when a step of hers is due she finishes eating and stays a little, until her mother is in */
 function yjWaitsForMom(g){if(!isYJ(g)||g.yjWait||!xqHelperMode()||!xqHelperToday()||(R.xqhDone&&!(R.xqh&&R.xqh.arriving))||!yjDueTonight())return false;g.yjWait=1;g.timer=Math.min(60,Math.max(6,R.dur*.92-R.t+12));return true}
 function xqSay(txt,ms,tone){later(()=>{if(R&&phase==='service'){const m=xqHere();if(m)staffSay(m,txt,tone)}},ms||400)}
-function xqHelperDraw(c,list,rm){const h=R&&R.xqh;if(!h||(h.room||'main')!==(rm||'main'))return;list.push({y:h.y,f:()=>{const stp=h.moving?Math.sin(h.step):0;const L0=Object.assign({},STAFF_LOOKS['秀琴阿姨']);if(h.phone)L0.acc='phone';drawPerson(c,h.x,h.y,L0,{step:stp,bob:h.moving?Math.abs(stp)*-.8:0,mood:'happy',flip:h.face<0,arms:h.wipe&&!h.moving?[.3,1.0]:null});if(h.wipe&&!h.moving){c.fillStyle='#F4F6F7';rr(c,h.x+9,h.y-24,7,4,1.2);c.fill()}nameTag(c,h.x,h.y-64,'秀琴阿姨')}})}
+function xqHelperDraw(c,list,rm){const h=R&&R.xqh;if(!h||(h.room||'main')!==(rm||'main'))return;list.push({y:h.y,f:()=>{const stp=h.moving?Math.sin(h.step):0;const L0=Object.assign({},STAFF_LOOKS['秀琴阿姨']);if(h.phone)L0.acc='phone';drawPerson(c,h.x,h.y,L0,{step:stp,bob:h.moving?Math.abs(stp)*-.8:0,mood:'happy',flip:h.face<0,carry:!!handsN(h,'dirty'),arms:h.task&&h.task.k==='wash'&&!h.moving&&ddAtSink(h)?[.35,.95+Math.sin(performance.now()/1000*7)*.25]:h.wipe&&!h.moving?[.3,1.0]:null});if(h.wipe&&!h.moving){c.fillStyle='#F4F6F7';rr(c,h.x+9,h.y-24,7,4,1.2);c.fill()}ddDrawHands(c,h,h.x,h.y-26);nameTag(c,h.x,h.y-64,'秀琴阿姨')}})}
 function xqKnows(id){const m=xqm();return m?relN('s:'+m.id,id,'spoke'):0}
 /* 秀琴阿姨 knows them well enough to care (implementation pass H1): a few real exchanges with each */
 function smFamiliar(){const a=xqKnows('sophie'),b=xqKnows('mia');return a>=1&&b>=1&&a+b>=3}
@@ -5208,6 +5212,7 @@ function arriveAct(){const J=R.jill;if(J.restTo){J.restTo=false;J.sit=true;J.fac
    else if(r<.75){const pr=st>=3?pick([['吃慢一點。','嗯。'],['今天很多人。','看得出來。'],['貓都在。','我知道。']]):pick([['還可以嗎？','很好吃。'],['今天人很多。','我不急。'],[null,'老闆娘，妳很忙。']]);setTimeout(()=>{if(!R||phase!=='service')return;if(pr[0])jillSay(pr[0]);speakLater(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,pr[1])},pr[0]?1400:0)},400)}}
   return}
  if(J.rest==='go'){const L=LIFE.jill;if(!L.reserved||!L.pos){J.rest=null;return}J.visit=null;J.rest='sit';J.sofa=true;memo('rest',JPOS[L.pos].x,SOFA.jy,{subj:sofaCats(),rush:!!(R.fireCount&&R.t-(R.fireEnd||-99)<60),room:'home'});L.room='home';L.troom='home';L.x=JPOS[L.pos].x;L.y=SOFA.jy;L.on=true;L.reserved=false;L.act='idle';L.t=rand(4,9);L.last=null;L.sinceSit=0;L.legs=0;L.legTarget=0;L.gazeT=0;L.flip=0;L.settleT=rand(20,40);L.bobT=.5;J.face=L.face;J.x=L.x;J.y=SOFA.front+10;return}
+ if(J.cur&&J.cur.dump){ddDeposit(J);J.busy=.3;J.cur.done=true;return}   /* Workflow B: the dishes into the tub */
  if(!J.cur)return;const t=R.tables[J.cur.t];
  if(J.cur.step==='pickup'){const g=t.group;if(g&&g.ticket){const tk=g.ticket;for(const it of tk.items)if(it.st==='ready'&&!it.picked&&(J.cur.ev===2||(J.cur.ev?(tk.cn||it.ktp):(!tk.cn&&!it.ktp)))){it.picked=true;J.hands.push({k:'dish',tk,it})}}J.busy=.22;J.cur.step='table';J.cur.go=true;R.tv++;return}
  let busy=0;const g=t.group;/* what this trip is for is decided before anything changes: a checkout leaves the table dirty,
@@ -5220,7 +5225,7 @@ function arriveAct(){const J=R.jill;if(J.restTo){J.restTo=false;J.sit=true;J.fac
  if(g&&g.ticket&&J.hands.length){const mine=handsFor(J,g.ticket);if(mine.length){serveItems(g,mine);handsTake(J,g.ticket);busy=Math.max(busy,.4)}}
  if(g&&g.reg==='dylan'&&!g.said&&(J.cur.step==='table')&&(g.state==='check'||(g.ticket&&g.ticket.items.some(i=>i.st==='served')))&&Math.random()<.6){g.said=1;speakLater(()=>{if(R&&phase==='service'&&R.groups.includes(g)){if(g.back&&Math.random()<.5)quote(g,'剛才太滿了，繞了一圈再回來。');else if(Math.random()<.55)dylanAct(g);else quote(g,dylanLine())}},600)}
  if(g&&g.state==='check'){if(g.gift)regGift(g,t);jillFarewell(g);regularNote(g);collect(g);busy=Math.max(busy,.5)}
- if(clearing&&!t.group&&t.dirty){t.dirty=false;t.plates=[];t.busT=0;busy=Math.max(busy,opsLv('dish')?.35:.55);sfx.clear();coach(7)}
+ if(clearing&&!t.group&&t.dirty){const k=ddCollect(J,t,carryCap('jill'));if(k<0){toast('廚房的髒盤區滿了：到廚房點髒盤車，安排人洗。');busy=Math.max(busy,.2)}else{busy=Math.max(busy,opsLv('dish')?.35:.55);sfx.clear();if(!t.dirty)coach(7)}}   /* Workflow B: into her hands, as many as fit and as the tub has room for */
  J.hands=J.hands.filter(c=>c.k!=='dish'||R.tickets.includes(c.tk));J.busy=busy||.08;J.cur.done=true}
 /* What still needs Jill herself right now. Staff who cover a job take it off her plate, which is how
    hiring people turns into free time for her — no employee-count bonus anywhere. */
@@ -5229,7 +5234,8 @@ function arriveAct(){const J=R.jill;if(J.restTo){J.restTo=false;J.sit=true;J.fac
 function waiterDuties(m){if(!m.duties){const d=m.duty||'both';m.duties={seat:d!=='order',order:d!=='seat',serve:d==='both',check:d==='both',clean:false}}if(m.duties.lounge==null)m.duties.lounge=false;/* v2.3 */return m.duties}
 function waiterDoes(m,k){if(m.role!=='waiter')return false;const d=waiterDuties(m);if(!d[k])return false;if(k==='serve')return m.lv>=2;if(k==='check')return m.lv>=3;return true}
 function dutyLabel(m){const d=waiterDuties(m);const on=[['seat','帶位'],['order','點餐'],['serve','上菜'],['check','結帳'],['clean','收桌']].filter(([k])=>d[k]).map(([,n])=>n);const lg=d.lounge?'・Lounge':'';return(on.length===5?'全部都做':on.length?on.join('＋'):'（沒有職責）')+lg}
-function crewCovers(kind){for(const m of S.crew||[]){if(kind==='clean'&&(m.role==='cleaner'||waiterDoes(m,'clean')))return true;if(m.role!=='waiter')continue;if(waiterDoes(m,kind))return true}return false}
+function crewCovers(kind){if(kind==='clean'&&R&&R.xqh&&!R.xqh.arriving&&!R.xqh.leaving)return true;   /* Workflow B: 秀琴阿姨 in, helping, the tables are hers too */
+ for(const m of S.crew||[]){if(kind==='clean'&&(m.role==='cleaner'||waiterDoes(m,'clean')))return true;if(m.role!=='waiter')continue;if(waiterDoes(m,kind))return true}return false}
 function chefCanAny(d){const D=DISH(d);if(!D)return false;const m=chefFor(D.st);if(m)return chefCan(m,d);return !!chefCover(D.st,d)}
 /* rc8 (the player, 2026-10-03: 「其他時候廚師都可以自己接手」, then 「不管是不是第一次做那道菜，有廚師她就不用做」): a station with no
    cook of its own today — a cook from another station takes its dishes (chefCan: his level's, the signature only at LV5),
@@ -5326,6 +5332,7 @@ function jillUpd(dt){const J=R.jill;const fire=R.fire>0;if(upSearching()||(R&&R.
  J.calm=(J.calm||0)+dt;J.wlChk=(J.wlChk||0)+dt;if(J.wlChk>.5){J.wlChk=0;if(J.cur||J.q.length||jillWorkload()>0)J.calm=0}
  if(J.rest==='sit'){restTick(dt);if(J.rest==='sit')return}
  if(J.busy>0){J.busy-=dt*(fire?1.5:1);if(J.busy>0)return;J.busy=0;if(J.cur){if(J.cur.go){J.cur.go=false;const t=R.tables[J.cur.t];J.troom=t.room||'main';J.tx=t.x;J.ty=t.y+26}else if(J.cur.done)J.cur=null}}
+ if(!J.cur&&handsN(J,'dirty')&&!(J.q.length&&ddChainJ(J))){J.cur={dump:1};const d=ddDrop();J.troom='kitchen';J.tx=d.x;J.ty=d.y;J.idle=0}   /* Workflow B: with dishes in hand, to the tub — unless the next table she was sent to is another to clear */
  if(!J.cur&&J.q.length){J.cur={t:J.q.shift()};planAct();J.idle=0}
  if(J.fp&&(J.cur||J.q.length||R.closing!=null))fpDrop();   /* rc7.5: work comes first */
  if(J.tx!=null){const v=165*flowMul('jill')*(fire?1.5:1)*dt;if(stepTo(J,v)){J.tx=null;J.moving=false;arriveAct()}else{J.step+=dt*12;J.moving=true}return}
@@ -5352,6 +5359,7 @@ function tapTable(t){const g=t.group;if(R.jill.visit&&!jillTargets(t.i))cancelVi
  if(g&&(g.state==='toTable'||g.state==='reading')){toast('客人還在看菜單');return}
  if(g&&g.state==='eat'){toast('客人正在享用中');return}
  if(g&&g.state==='wait'&&!tableActionable(t)){toast('料理還沒好，先去廚房做菜吧');return}
+ if(!g&&t.dirty&&ddUnits(t)&&ddFree()<=0){toast('廚房的髒盤區滿了：到廚房點髒盤車，安排人洗。');return}   /* Workflow B: no room for its dishes yet — the table waits */
  if(jillTargets(t.i))return;R.jill.q.push(t.i);if(R.jill.rest)endRest();sfx.tap()}
 
 /* ---- staff ---- */
@@ -5776,6 +5784,7 @@ function bubble(c,x,y,kind,pulse,extra){c.save();c.translate(x,y);const s=1+puls
  else if(kind==='ready'){let g=c.createLinearGradient(0,-8,0,4);g.addColorStop(0,'#F4F6F7');g.addColorStop(1,'#A9B4BA');c.fillStyle=g;c.beginPath();c.arc(0,3,8,Math.PI,0);c.fill();c.fillStyle='#8E9AA0';c.fillRect(-10,3,20,2);circ(c,0,-5.5,1.5)}
  else if(kind==='check'){c.fillStyle='#E6C27A';circ(c,0,-1.5,7.5);c.strokeStyle='#8E6422';c.lineWidth=1;c.beginPath();c.arc(0,-1.5,5.6,0,7);c.stroke();c.fillStyle='#6B4712';c.font=`800 9px ${FONT}`;c.textAlign='center';c.textBaseline='middle';c.fillText('$',0,-1)}
  else if(kind==='angry'){c.strokeStyle='#FF6A4A';c.lineWidth=2;c.lineCap='round';for(let q=0;q<4;q++){c.save();c.rotate(q*Math.PI/2+.78);c.beginPath();c.arc(5,5,3.2,Math.PI,Math.PI*1.5);c.stroke();c.restore()}}
+ else if(kind==='dirtyfull'){/* Workflow B: the tub in the kitchen is full — a little stack waiting, quiet */for(let k=0;k<3;k++){c.fillStyle=k===2?'#F4F1EA':'#E8E2D6';el(c,0,1-k*2.4,6.4,1.9);c.strokeStyle='rgba(120,80,50,.45)';c.lineWidth=.6;c.beginPath();c.ellipse(0,1-k*2.4,6.4,1.9,0,0,Math.PI*2);c.stroke()}c.fillStyle='rgba(154,74,46,.7)';el(c,1.5,-4,1.6,.6)}
  else if(kind==='dirty'){c.strokeStyle='#6E9AB0';c.lineWidth=1.6;for(let k=0;k<3;k++){const a=k*2.1;c.beginPath();c.moveTo(Math.cos(a)*2,Math.sin(a)*2-2);c.lineTo(Math.cos(a)*7,Math.sin(a)*7-2);c.stroke()}c.fillStyle='#8FB8CC';circ(c,0,-2,2)}
  c.restore()}
 function patBar(c,x,y,p){c.fillStyle='rgba(20,15,10,.55)';rr(c,x-14,y,28,5,2.5);c.fill();c.fillStyle=p>.55?'#7BC06A':p>.28?'#F0B43A':'#E0543A';rr(c,x-13,y+1,26*p,3,1.5);c.fill()}
@@ -5831,7 +5840,7 @@ function drawScene(now){const c=sctx;c.setTransform(1,0,0,1,0,0);c.globalAlpha=1
  if(R&&!SNAP){const pulse=(Math.sin(now*6)+1)/2;
   for(const t of R.tables)if((t.room||'main')==='main')drawTableOverlay(c,t,now,pulse);
   queued().forEach(g=>{if(g.state==='queue'&&!g.moving&&(g.room||'main')==='main')patBar(c,g.x,g.y-(isSeated(g)?50:56),g.pat)});
-  const qs=(J.cur?[J.cur.t]:[]).concat(J.q);qs.forEach((ti,k)=>{const t=R.tables[ti];if((t.room||'main')!=='main')return;c.fillStyle='#2E2019';circ(c,t.x+(t.seats===4?40:30),t.y-22,7);c.fillStyle='#E6C27A';c.font=`800 8px ${FONT}`;c.textAlign='center';c.textBaseline='middle';c.fillText(String(k+1),t.x+(t.seats===4?40:30),t.y-21.5)});
+  const qs=(J.cur&&J.cur.t!=null?[J.cur.t]:[]).concat(J.q);qs.forEach((ti,k)=>{const t=R.tables[ti];if((t.room||'main')!=='main')return;c.fillStyle='#2E2019';circ(c,t.x+(t.seats===4?40:30),t.y-22,7);c.fillStyle='#E6C27A';c.font=`800 8px ${FONT}`;c.textAlign='center';c.textBaseline='middle';c.fillText(String(k+1),t.x+(t.seats===4?40:30),t.y-21.5)});
   for(const p of R.parts){if((p.room||'main')!=='main')continue;const a=1-p.t/p.life;if(p.kind==='coin'){c.fillStyle=`rgba(244,196,78,${a})`;el(c,p.x,p.y,3,3.4);c.fillStyle=`rgba(142,100,34,${a})`;el(c,p.x,p.y,1.4,1.8)}else{c.fillStyle=`rgba(255,230,140,${a})`;c.save();c.translate(p.x,p.y);c.rotate(p.t*6);c.fillRect(-2.5,-.6,5,1.2);c.fillRect(-.6,-2.5,1.2,5);c.restore()}}
   for(const f of R.floats){if((f.room||'main')!=='main')continue;const a=1-f.t/f.life;c.globalAlpha=Math.min(1,a*1.5);c.font=`800 ${f.big?12:9.5}px ${FONT}`;c.textAlign='center';c.textBaseline='middle';c.lineWidth=3;c.strokeStyle='rgba(30,20,15,.8)';c.strokeText(f.txt,f.x,f.y-f.t*22);c.fillStyle=f.col;c.fillText(f.txt,f.x,f.y-f.t*22);c.globalAlpha=1}
   if(R.fire>0){const a=.25+Math.sin(now*8)*.08;let g=c.createRadialGradient(200,220,150,200,220,320);g.addColorStop(0,'rgba(255,120,30,0)');g.addColorStop(1,`rgba(255,110,30,${a})`);c.fillStyle=g;c.fillRect(X0,-TOP,XW,LH+TOP)}}
@@ -5856,13 +5865,13 @@ function drawJillAt(c,J,V,now){const moving=J.moving;const stp=moving?Math.sin(J
   if(R&&R.closing!=null&&LIFE.jill.act==='wrap'&&!moving){const wx=J.x+9+Math.sin(now*5.5)*6,wy=J.y-19;c.fillStyle='#BFD9EC';c.save();c.translate(wx,wy);c.rotate(Math.sin(now*5.5)*.3);rr(c,-4,-2.2,8,4.4,1.4);c.fill();c.restore();c.fillStyle=JILL_LOOK.skin;circ(c,wx-2,wy-1,2.3)}
   if(pet&&pet.cat){const p=pet.cat;const hx=p.x+(p.x<J.x?6:-6),hy=p.y-(p.st==='sleep'?6:10);c.fillStyle=JILL_LOOK.skin;circ(c,hx,hy,2.6);c.fillStyle='rgba(60,34,22,.35)';c.beginPath();c.arc(hx,hy,2.6,0,7);c.stroke()}
   if(cooking){const f=J.face<0?-1:1;const a=Math.sin(now*9);c.save();c.translate(J.x+f*4,J.y-29+a*1.6);c.rotate(f*(-.55+a*.3));c.fillStyle='#D9D9DD';rr(c,-1.1,-8,2.4,9.5,1);c.fill();c.strokeStyle='rgba(60,34,22,.4)';c.lineWidth=.5;c.stroke();c.fillStyle='#4A3226';rr(c,-1.4,1.4,3,4.4,1.2);c.fill();c.restore()}
-  handsDraw(c,J,J.x,J.y-50)}
+  handsDraw(c,J,J.x,J.y-50);ddDrawHands(c,J,J.x,J.y-26)}
 function drawTableOverlay(c,t,now,pulse){const g=t.group;const bx=t.x,by=t.pdr?t.y+40:t.y-(t.seats===4?74:68);const ring=(col,w,dash)=>{if(t.pdr){const G=pdGeo();c.strokeStyle=col;c.lineWidth=w;if(dash)c.setLineDash(dash);rr(c,G.x-G.hw-30,G.y0-18,(G.hw+30)*2,G.y1-G.y0+30,14);c.stroke();c.setLineDash([]);return true}return false};
    if(g&&!['toTable','leave'].includes(g.state)){let kind=null,extra=null;if(g.state==='reading')kind='menu';else if(g.state==='order')kind='order';else if(g.state==='wait'){const it=g.ticket?g.ticket.items:[];if(it.some(i=>i.st==='ready'&&!i.picked))kind='ready';else kind='wait',extra=[it.filter(i=>i.st==='served').length,it.length]}else if(g.state==='check')kind='check';
     const act=kind==='order'||kind==='ready'||kind==='check';if(act&&!ring(`rgba(255,215,110,${.35+pulse*.45})`,2)){c.strokeStyle=`rgba(255,215,110,${.35+pulse*.45})`;c.lineWidth=2;c.beginPath();c.ellipse(t.x,t.y-4,(t.seats===4?42:34)+pulse*3,15+pulse*1.5,0,0,7);c.stroke()}
     if(g.rowdy){kind='angry';c.save();c.translate(Math.sin(now*40)*1.2,0)}if(kind)bubble(c,bx,by,kind,g.rowdy?pulse:act?pulse:0,extra);if(g.rowdy)c.restore();if(['order','wait','check'].includes(g.state))patBar(c,bx,by+13,g.pat);if(smHeart(g)){/* the user, 2026-10-04: 「B. 愛心只給 Sophie 和 Mia；熟客不再有任何記號。」 (audit WS1-04: the bubble's heart still came for every regular) */c.fillStyle='#E8798A';c.beginPath();const hx=bx+15,hy=by-8;c.moveTo(hx,hy+4);c.bezierCurveTo(hx-6,hy,hx-3,hy-5,hx,hy-2);c.bezierCurveTo(hx+3,hy-5,hx+6,hy,hx,hy+4);c.fill()}
     if(g.type==='vip'){c.fillStyle='#E0B863';c.font=`800 7px ${FONT}`;c.textAlign='center';c.fillText('VIP',bx-17,by-6)}}
-   else if(!g&&t.dirty){bubble(c,bx,by+8,'dirty',pulse);if(!ring(`rgba(160,210,235,${.3+pulse*.4})`,2)){c.strokeStyle=`rgba(160,210,235,${.3+pulse*.4})`;c.lineWidth=2;c.beginPath();c.ellipse(t.x,t.y-4,34+pulse*3,15,0,0,7);c.stroke()}}
+   else if(!g&&t.dirty){bubble(c,bx,by+8,ddUnits(t)&&ddFree()<=0?'dirtyfull':'dirty',pulse);if(!ring(`rgba(160,210,235,${.3+pulse*.4})`,2)){c.strokeStyle=`rgba(160,210,235,${.3+pulse*.4})`;c.lineWidth=2;c.beginPath();c.ellipse(t.x,t.y-4,34+pulse*3,15,0,0,7);c.stroke()}}
    else if(!g&&!t.dirty&&queued().some(q=>q.size<=t.seats&&(!t.pdr||pdTableFor(q)))){if(!ring(`rgba(140,200,120,${.25+pulse*.35})`,1.6,[4,4])){c.strokeStyle=`rgba(140,200,120,${.25+pulse*.35})`;c.lineWidth=1.6;c.setLineDash([4,4]);c.beginPath();c.ellipse(t.x,t.y-4,t.seats===4?42:32,14,0,0,7);c.stroke();c.setLineDash([])}}}
 /* the pass, seen from the dining room: the counter with today's ready plates (drawCounter) plus one status dot per
    station and the way to the kitchen. Tapping the counter goes to the kitchen. */
@@ -5891,7 +5900,7 @@ function drawOtherRoom(c,now,dusk,V,X0,XW,TOP){const k=room;const J=V.jill;const
   for(const L0 of spots){let g=c.createRadialGradient(L0.x,L0.y,2,L0.x,L0.y+30,L0.r);g.addColorStop(0,`rgba(${L0.col||'255,196,120'},${lk*L0.k})`);g.addColorStop(1,'rgba(255,170,90,0)');c.fillStyle=g;c.fillRect(L0.x-L0.r,L0.y-L0.r,L0.r*2,L0.r*2.4)}
   if(k==='side'||k==='lounge')for(const t of V.tables){if(t.room!==k)continue;let g=c.createRadialGradient(t.x,t.y-15,1,t.x,t.y-15,26);g.addColorStop(0,`rgba(255,190,100,${.1+dusk*.12})`);g.addColorStop(1,'rgba(255,190,100,0)');c.fillStyle=g;c.fillRect(t.x-26,t.y-41,52,52)}c.restore()}
  if(R){const pulse=(Math.sin(now*6)+1)/2;for(const t of R.tables)if((t.room||'main')===k)drawTableOverlay(c,t,now,pulse);
-  const qs=(J.cur?[J.cur.t]:[]).concat(J.q);qs.forEach((ti,i)=>{const t=R.tables[ti];if((t.room||'main')!==k)return;c.fillStyle='#2E2019';circ(c,t.x+(t.seats===4?40:30),t.y-22,7);c.fillStyle='#E6C27A';c.font=`800 8px ${FONT}`;c.textAlign='center';c.textBaseline='middle';c.fillText(String(i+1),t.x+(t.seats===4?40:30),t.y-21.5)});
+  const qs=(J.cur&&J.cur.t!=null?[J.cur.t]:[]).concat(J.q);qs.forEach((ti,i)=>{const t=R.tables[ti];if((t.room||'main')!==k)return;c.fillStyle='#2E2019';circ(c,t.x+(t.seats===4?40:30),t.y-22,7);c.fillStyle='#E6C27A';c.font=`800 8px ${FONT}`;c.textAlign='center';c.textBaseline='middle';c.fillText(String(i+1),t.x+(t.seats===4?40:30),t.y-21.5)});
   for(const p of R.parts){if((p.room||'main')!==k)continue;const a=1-p.t/p.life;if(p.kind==='coin'){c.fillStyle=`rgba(244,196,78,${a})`;el(c,p.x,p.y,3,3.4);c.fillStyle=`rgba(142,100,34,${a})`;el(c,p.x,p.y,1.4,1.8)}else{c.fillStyle=`rgba(255,230,140,${a})`;c.save();c.translate(p.x,p.y);c.rotate(p.t*6);c.fillRect(-2.5,-.6,5,1.2);c.fillRect(-.6,-2.5,1.2,5);c.restore()}}
   for(const f of R.floats){if((f.room||'main')!==k)continue;const a=1-f.t/f.life;c.globalAlpha=Math.min(1,a*1.5);c.font=`800 ${f.big?12:9.5}px ${FONT}`;c.textAlign='center';c.textBaseline='middle';c.lineWidth=3;c.strokeStyle='rgba(30,20,15,.8)';c.strokeText(f.txt,f.x,f.y-f.t*22);c.fillStyle=f.col;c.fillText(f.txt,f.x,f.y-f.t*22);c.globalAlpha=1}
   if(R.blackout>0){R.blackout-=1/60;const a=R.blackout>2.2?.75:R.blackout>.5?.85:(R.blackout/.5)*.85;c.fillStyle=`rgba(8,6,12,${a})`;c.fillRect(X0,-TOP,XW,LH+TOP)}}
@@ -6092,7 +6101,7 @@ function wfTarget(n){if(n.st==='fetch'||n.st==='tofood'){const sp=wfSpot(n.slot)
  if(n.st==='go'){if(n.to){const sp=wfSpot(n.to);return{x:sp.cx,y:sp.cy}}return n.pi?wfRowSpot(n):{x:WF_PICK.x,y:WF_PICK.y}}
  if(n.st==='work'){if(n.slot){const sp=wfSpot(n.slot);return{x:sp.cx,y:sp.cy}}return n.pi?wfRowSpot(n):{x:WF_PICK.x,y:WF_PICK.y}}return null}
 function wfArrive(n){if(n.st==='fetch'){const at=n.slot?wfSpot(n.slot).x:KX.bar.x;if(n.slot){n.slot.wf=null;n.slot=null}n.carry=true;n.st='go';if(!n.to)n.pi=wfRowTake(n,at);/* a glass for the floor: its own spot on the pass, the nearest free one */R.tv++;return}
- if(n.st==='dish'){n.dishes=true;n.st='tofood';R.rackT=R.t;R.tv++;return}   /* clean plates in hand: back to the food, where it is */
+ if(n.st==='dish'){n.dishes=true;n.st='tofood';R.rackT=R.t;if(R.dd&&R.dd.rack)R.dd.rack--;R.tv++;return}   /* clean plates in hand: back to the food, where it is */
  if(n.st==='topass'){wfUnhand(n);wfFinish(n);return}   /* set down on the pass: only now can the floor take it */
  if(n.st!=='go'&&n.st!=='tofood')return;const plating=n.st==='tofood';n.carry=false;if(n.adv){n.si++;n.adv=false}if(n.to&&!plating){n.slot=n.to;n.to=null}
  const f=wfFl(n)[n.si];const T=wfTimes(n.d,f);n.f=f;n.act=n.act0=T.act*(1+.15*(n.n-1));n.pas=n.pas0=T.pas*(1+.1*(n.n-1));n.dur=n.act+n.pas;n.st='work';R.tv++;if(n.who&&n.who!=='jill')wfChefTook(n,wfCrew(n.who));
@@ -6132,7 +6141,9 @@ function wfStaff(){const open=wfList().filter(wfOpen);if(!open.length)return;con
  pairs.sort((a,b)=>b.s-a.s);const used=new Set();for(const q of pairs){if(used.has(q.m.id)||!wfOpen(q.n))continue;if(wfAssign(q.n,q.m.id))used.add(q.m.id)}}
 /* every frame of a service */
 function wfUpd(dt){if(!R)return;wfGather();const J=wfJ();const jt=wfJillTask();
- if(jt&&jt.st!=='work'){const tg=wfTarget(jt);if(tg){const v=165*flowMul('jill')*(R.fire>0?1.5:1)*dt;const dx=tg.x-J.x,dy=tg.y-J.y,d=Math.hypot(dx,dy);if(d>v){J.x+=dx/d*v;J.y+=dy/d*v;J.moving=true;J.step+=dt*12;if(Math.abs(dx)>.5)J.face=dx>0?1:-1}else{J.x=tg.x;J.y=tg.y;J.moving=false;wfArrive(jt)}}}
+ if(ddWasher()==='jill'&&jt)ddS().wash.stop=1;   /* Workflow B: the player asked Jill to wash; a dish for her ends it after the one in hand */
+ if(ddWasher()==='jill'&&(!jt||handsN(J,'dirty'))){const sp=washStep(J,'jill',dt,1);if(sp){const v=165*flowMul('jill')*dt;const dx=sp.x-J.x,dy=sp.y-J.y,d=Math.hypot(dx,dy);if(d>v){J.x+=dx/d*v;J.y+=dy/d*v;J.moving=true;J.step+=dt*12;if(Math.abs(dx)>.5)J.face=dx>0?1:-1}else{J.x=sp.x;J.y=sp.y;J.moving=false}}else J.moving=false}
+ else if(jt&&jt.st!=='work'){const tg=wfTarget(jt);if(tg){const v=165*flowMul('jill')*(R.fire>0?1.5:1)*dt;const dx=tg.x-J.x,dy=tg.y-J.y,d=Math.hypot(dx,dy);if(d>v){J.x+=dx/d*v;J.y+=dy/d*v;J.moving=true;J.step+=dt*12;if(Math.abs(dx)>.5)J.face=dx>0?1:-1}else{J.x=tg.x;J.y=tg.y;J.moving=false;wfArrive(jt)}}}
  else J.moving=false;
  for(const id in R.wfc||{}){const n=wfNode(R.wfc[id]);if(!n||n.who!==id||!WF_HELD.has(n.st)){delete R.wfc[id];continue}if(n.st!=='work'&&wfHere(n))wfArrive(n)}
  /* a plate waiting on the pass from before its spot was kept (an older save) is given one, once */
@@ -6142,7 +6153,7 @@ function wfUpd(dt){if(!R)return;wfGather();const J=wfJ();const jt=wfJillTask();
   if(n.st==='work'){if(n.act>0&&wfHere(n))n.act-=dt*wfSpeed(n.who,n.f,n.d);if(n.act<=0){n.act=0;n.sc.push(wfScore(n.who,n.f));if(n.pas>0){n.lastBy=n.who;wfUnhand(n);n.st='cook';R.tv++}else if(n.f==='plate')wfPlated(n);else wfStepDone(n)}}
   else if(n.st==='cook'){n.pas-=dt*wfPasSpeed(n);if(n.pas<=0){n.pas=0;wfStepDone(n)}}}
  if(R.t-(R.wfAi||0)>.2){R.wfAi=R.t;wfStaff()}
- passSample(dt)}
+ passSample(dt);ddSample(dt)}
 /* how far the current step has come, 0–1 (the hands, then the fire) */
 function wfProg(n){if(n.st==='ready')return 1;if(n.st!=='work'&&n.st!=='cook')return 0;const T=n.dur||1;return clamp(1-(n.act+n.pas)/T,0,1)}
 /* ---- the cooks' places (spec §15–§21). PROPOSAL, not canon: the user's own skeleton of 2026-10-07 (core ★★★, a second place
@@ -6485,8 +6496,8 @@ function wfRestore(N,x,item){for(const s0 of N.slots)if(s0.job&&isWF(s0.job.d)){
 function wfDrawJill(c,now){const J=R&&R.jk;if(!J)return false;const t=wfJillTask();const stp=J.moving?Math.sin(J.step):0;
  const att=!t&&!J.moving?wfAttending('jill',J.x,J.y):null;   /* nothing else to do: she stays with the dish on the fire */
  const work=!!(t&&t.st==='work')&&!J.moving;const g=work?chGestOf(t):att?chGestOf(att):null;const board=work&&!g&&t.f==='prep'&&wfHasBoard(t.d);const f=J.face<0?-1:1;
- const busy=work||!!g;const arms=J.moving?null:g?chArms(g,now):work?[.35,.95+Math.sin(now*(board?9:6))*.25]:null;
- drawPerson(c,J.x,J.y,JILL_LOOK,{jill:true,me:true,tall:true,s:1.1,mood:'happy',expr:busy?'focus':'smile',step:stp,flip:J.face<0,bob:J.moving?Math.abs(stp)*-1:busy?Math.abs(Math.sin(now*(board?9:5)))*-1:Math.sin(now*2)*.4,blink:Math.sin(now*1.7)>.985,arms});
+ const wash=ddWasher()==='jill'&&!J.moving&&ddAtSink(J);const busy=work||!!g||wash;const arms=J.moving?null:wash?[.35,.95+Math.sin(now*7)*.25]:g?chArms(g,now):work?[.35,.95+Math.sin(now*(board?9:6))*.25]:null;
+ drawPerson(c,J.x,J.y,JILL_LOOK,{jill:true,me:true,tall:true,s:1.1,mood:'happy',expr:busy?'focus':'smile',step:stp,flip:J.face<0,bob:J.moving?Math.abs(stp)*-1:busy?Math.abs(Math.sin(now*(board?9:5)))*-1:Math.sin(now*2)*.4,blink:Math.sin(now*1.7)>.985,arms});ddDrawHands(c,J,J.x,J.y-26);
  if(!g&&board)drawHandKnife(c,J.x,J.y,f,now);else if(!g&&work&&t.f==='hot')drawHandSpoon(c,J.x,J.y,f,now);   /* a dish with its own beats has its tool at the food (CHD) */
  wfDrawHeld(c,J.x,J.y,t,now);
  return true}
@@ -6522,11 +6533,12 @@ function drawKitchenRoom(c,now,dusk,V,X0,XW,TOP,list){const E=S.eq;const LHk=LH;
  list.push({y:KY.rail+23,f:()=>drawHeatLamps(c,now)});
  list.push({y:KY.passTop+KY.passH+KY.passFace+1,f:()=>drawPass(c,now,V)});
  list.push({y:KY.passTop+38,f:()=>drawKitchenHomeDoor(c)});   /* rc7.3: the door to Jill's room */
+ list.push({y:ddCart().y,f:()=>ddDrawCart(c,now)});   /* Workflow B: the dirty dishes' cart */
  {if(projOn('dryage')){const dx=KR.fridge.x-34,dy=LH-34;list.push({y:dy,f:()=>drawDryAge(c,dx,dy,now)})}/* v2.4 rc6 */const {x,y,w,h}=KR.fridge;list.push({y:y+h,f:()=>drawKFridge(c,now,x,y,w,h)});if(S.rooms&&S.rooms.cooler){const k=KR.cooler;list.push({y:k.y+k.h,f:()=>projOn('walkin')?drawWalkin(c,now,k):drawCooler(c,now,k)})}}
  if(R&&R.ck)for(const m of S.crew||[]){if(m.role!=='chef')continue;const a=R.ck[m.id];if(!a)continue;list.push({y:a.y,f:()=>drawCook(c,m,a,now)})}
- if(R)list.push({y:1e6,f:()=>{wfDrawReady(c,now);wfDrawCue(c,now)}});   /* v2.5: the selected work's places and the quiet marks, over everything */
+ if(R)list.push({y:1e6,f:()=>{wfDrawReady(c,now);wfDrawCue(c,now);ddDrawLabel(c)}});   /* v2.5: the selected work's places and the quiet marks, over everything */
  else{/* before and after service the cooks are at their places, wiping down */let i=0;for(const m of S.crew||[]){if(m.role!=='chef')continue;const h=homeSpot(m,i++);const a={x:h.x,y:h.y,face:1,step:0,moving:false,beat:{kind:'idle',x:h.x,y:h.y}};list.push({y:a.y,f:()=>drawCook(c,m,a,now)})}}
- const J=V.jill;const nearPass=!!(R&&(J.room||'main')==='main'&&Math.hypot(J.x-PASS.x,J.y-PASS.y)<30);const wj=!!(R&&R.jk&&(wfJillTask()||R.jk.moving||(R.jk.used&&nearPass)));if(wj)list.push({y:R.jk.y,f:()=>wfDrawJill(c,now)});   /* 2026-10-08: once she has worked in the kitchen she stays where she stopped (at the wok, or tossing it while it cooks) instead of reappearing at the front of the pass */   /* v2.5: Jill goes to the place she was sent and works there (the user's spec: 「Jill 自己走過去」) — as before, she is the restaurant's one chef, at the pass and in the kitchen */
+ const J=V.jill;const nearPass=!!(R&&(J.room||'main')==='main'&&Math.hypot(J.x-PASS.x,J.y-PASS.y)<30);const jt0=R&&R.jk?wfJillTask():null;const jIn=!!(R&&(J.room||'main')==='kitchen');const wj=!!(R&&R.jk&&(jt0||R.jk.moving||(R.jk.used&&nearPass)||ddWasher()==='jill')&&!jIn);   /* Workflow B: the floor's Jill in the kitchen (dishes to the tub) is the one Jill drawn — the kitchen's work goes on unseen for those seconds (the two Jills are one person: the user's decision 7 is open) */if(wj)list.push({y:R.jk.y,f:()=>wfDrawJill(c,now)});   /* 2026-10-08: once she has worked in the kitchen she stays where she stopped (at the wok, or tossing it while it cooks) instead of reappearing at the front of the pass */   /* v2.5: Jill goes to the place she was sent and works there (the user's spec: 「Jill 自己走過去」) — as before, she is the restaurant's one chef, at the pass and in the kitchen */
  else if(R&&(J.room||'main')==='main'&&Math.hypot(J.x-PASS.x,J.y-PASS.y)<30){
   const ms=R.slots.find(s0=>s0.job&&!s0.cook&&s0.job.step&&s0.job.step.t!=='wait');
   if(ms){const sp=stepSpot(ms);const k=ms.job.step;list.push({y:sp.cy,f:()=>{const bob=Math.abs(Math.sin(now*9))*-1.2;drawPerson(c,sp.cx,sp.cy,JILL_LOOK,{jill:true,me:true,tall:true,s:1.1,mood:'happy',expr:'focus',bob,blink:Math.sin(now*1.7)>.985});if(k.t==='work'&&k.board)drawHandKnife(c,sp.cx,sp.cy,1,now)/* v2.2 Q+: no name label on Jill — her silhouette is her label */}})}
@@ -6542,8 +6554,8 @@ function drawLine(c,now,V){const E=S.eq;const x0=KX.sink.x-4,x1=KX.bar.x+KX.bar.
  /* the face: cream doors and drawers */c.fillStyle='#A47B54';rr(c,x0,y+h-2,x1-x0,f+2,2);c.fill();for(let dx=x0+6;dx<x1-30;dx+=34){if(dx>KX.range.x-8&&dx<KX.range.x+KX.range.w)continue;if(dx>KX.oven.x-8&&dx<KX.oven.x+KX.oven.w-4&&E.oven)continue;c.fillStyle='#EDE6D8';rr(c,dx,y+h+2,30,f-6,1.5);c.fill();c.fillStyle='#8A6A42';c.fillRect(dx+13,y+h+f/2-1,4,1.6)}
  c.fillStyle='rgba(0,0,0,.2)';c.fillRect(x0,y+h+f-2,x1-x0,3);
  /* the sink */{const x=KX.sink.x;c.fillStyle='#8E979B';rr(c,x+1,y+16,24,30,4);c.fill();c.fillStyle='#6F7A7E';rr(c,x+3,y+19,20,24,3);c.fill();c.fillStyle='#A8B3B8';rr(c,x+4,y+20,18,5,2);c.fill();c.strokeStyle='#C9D0D3';c.lineWidth=2.2;c.lineCap='round';c.beginPath();c.moveTo(x+13,y+16);c.lineTo(x+13,y+6);c.quadraticCurveTo(x+13,y,x+19,y+1);c.stroke();c.fillStyle='#C9D0D3';circ(c,x+19,y+2,1.6);
-  const drain=R&&R.slots.some(s0=>s0.job&&stepSpot(s0).place==='sink');if(drain){c.strokeStyle='rgba(170,215,240,.9)';c.lineWidth=1.5;c.beginPath();c.moveTo(x+19,y+3);c.lineTo(x+19,y+26);c.stroke();c.fillStyle='rgba(255,255,255,.9)';for(let i=0;i<6;i++){const ph=(now*1.4+i*.17)%1;circ(c,x+6+(i*5)%16,y+30-ph*10,1.2+ph)}}
-  /* the dish rack: where the plates come from (a plate fewer for a moment when someone has just taken some) */c.fillStyle='#4A4A4E';c.fillRect(x-1,y+50,3,10);c.fillRect(x+22,y+50,3,10);c.fillStyle='#E8E4DC';const took=R&&R.rackT!=null&&R.t-R.rackT<1.4;for(let i=took?1:0;i<3;i++){el(c,x+6+i*6.5,y+56,3.6,7)}}
+  const drain=R&&(R.slots.some(s0=>s0.job&&stepSpot(s0).place==='sink')||(!!ddS().wash&&ddWasherAt()));if(drain){c.strokeStyle='rgba(170,215,240,.9)';c.lineWidth=1.5;c.beginPath();c.moveTo(x+19,y+3);c.lineTo(x+19,y+26);c.stroke();c.fillStyle='rgba(255,255,255,.9)';for(let i=0;i<6;i++){const ph=(now*1.4+i*.17)%1;circ(c,x+6+(i*5)%16,y+30-ph*10,1.2+ph)}}
+  /* the dish rack: where the plates come from (a plate fewer for a moment when someone has just taken some) */c.fillStyle='#4A4A4E';c.fillRect(x-1,y+50,3,10);c.fillRect(x+22,y+50,3,10);c.fillStyle='#E8E4DC';const took=R&&R.rackT!=null&&R.t-R.rackT<1.4;const rk=R?Math.min(3,ddS().rack||0):0;for(let i=took?1:0;i<3+rk;i++){el(c,x+2+i*(rk?4.2:6.5),y+56,3.6,7)}}   /* Workflow B: the washed ones join them */
  /* prep: boards, a knife, greens, salt; a bread basket while there is no cold station yet */{const x=KX.prep.x;const boards=E.prep?(E.fridge>=3?2:1):0;for(let i=0;i<boards;i++){const bx=x+(i?50:20);c.fillStyle='rgba(0,0,0,.14)';el(c,bx+1,y+50,20,4);c.fillStyle='#C8965E';rr(c,bx-19,y+34,38,14,3);c.fill();c.fillStyle='#9A6534';c.fillRect(bx-19,y+46,38,2)}
   if(!E.prep){c.fillStyle='rgba(0,0,0,.12)';el(c,x+32,y+48,18,4);c.fillStyle='#B8905E';c.beginPath();c.moveTo(x+14,y+32);c.lineTo(x+50,y+32);c.lineTo(x+46,y+46);c.lineTo(x+18,y+46);c.closePath();c.fill();c.fillStyle='#D9A066';for(let k=0;k<3;k++)el(c,x+22+k*10,y+31,6,4);c.fillStyle='#F0C892';for(let k=0;k<3;k++)el(c,x+22+k*10,y+30,4,2)}
   c.fillStyle='#F4F1EA';rr(c,x+4,y+8,8,10,2);c.fill();c.fillStyle='#2A2A2A';c.fillRect(x+4,y+6,8,2.5);c.fillStyle='#E8E4DC';el(c,x+54,y+14,7,4);c.fillStyle='#5E9E3D';for(let k=0;k<4;k++)el(c,x+50+k*3,y+11-(k%2)*2,3,2);
@@ -9080,7 +9092,7 @@ function drawKItem(c,it,now){const {x,y,w,h}=it;const b=bump(it.k);c.save();c.tr
 function hitKItem(p){if(room!=='main')return null;for(const it of kitchenItems()){if(p.x>=it.x-3&&p.x<=it.x+it.w+3&&p.y>=it.y-8&&p.y<=it.y+it.h+3)return it.k}return null}
 /* a tap in one of the other rooms: stations, the fridge, doorways, tables, regulars */
 function roomTap(p,e){e.preventDefault();audioInit();
- if(room==='kitchen'){if(R&&!paused&&phase==='service'){if(wfTap(p))return true;const si=hitStation(p);if(si>=0){const s0=R.slots[si];if(s0.broken||s0.job||nextPendingFor(s0.type)){tapStation(si);return true}SW.idle=si;return false}}const f=KR.fridge;if(p.x>=f.x-4&&p.x<=f.x+f.w+4&&p.y>=f.y-8&&p.y<=f.y+f.h+12){FRIDGE_T=performance.now()/1000;sfx.fridge();if(R&&phase==='service')openStock(true);return true}
+ if(room==='kitchen'){if(R&&!paused&&phase==='service'){if(ddHit(p)){ddTap();return true}if(wfTap(p))return true;const si=hitStation(p);if(si>=0){const s0=R.slots[si];if(s0.broken||s0.job||nextPendingFor(s0.type)){tapStation(si);return true}SW.idle=si;return false}}const f=KR.fridge;if(p.x>=f.x-4&&p.x<=f.x+f.w+4&&p.y>=f.y-8&&p.y<=f.y+f.h+12){FRIDGE_T=performance.now()/1000;sfx.fridge();if(R&&phase==='service')openStock(true);return true}
   if(S.rooms&&S.rooms.cooler){const k=KR.cooler;if(p.x>=k.x-4&&p.x<=k.x+k.w+4&&p.y>=k.y-8&&p.y<=k.y+k.h+12){if(R&&phase==='service')openStock(true);return true}}
   if(R&&!paused&&phase==='service'&&passHit(p)){servePass();return true}
   if(homeKDoorHit(p)){setRoom('home');return true}   /* rc7.3: the door by the pass, to Jill's room */
@@ -9124,7 +9136,7 @@ function tapStation(i){const s=R.slots[i];if(!s)return;audioInit();if(s.broken){
    checkpoint writes it into the save as plain data (references become indices), and restoreService()
    builds a new R from it. Anything that does not resolve throws, and the caller falls back to
    reopening at the same clock with today's numbers kept — and says so. */
-const CP_KEYS=['t','dur','si','closed','log','cds','treatT','musicT','blackout','combo','maxCombo','streak','fire','fireCount','tv','gid','tkid','st','rush','rushT0','rushT1','rushShown','weather','event','coach','taskDone','lastSpawn','idleT','focus','sched','inc','noticeT','catCheck','cpT','tasting'];   /* v2.3: the tasting night survives a checkpoint */
+const CP_KEYS=['dd','t','dur','si','closed','log','cds','treatT','musicT','blackout','combo','maxCombo','streak','fire','fireCount','tv','gid','tkid','st','rush','rushT0','rushT1','rushShown','weather','event','coach','taskDone','lastSpawn','idleT','focus','sched','inc','noticeT','catCheck','cpT','tasting'];   /* v2.3: the tasting night survives a checkpoint */
 const G_STATES=['arrive','queue','toTable','reading','order','wait','eat','check','leave','toPiano','piano','toHost','host'];   /* rc8.3: 予安 at the piano, Ken behind the bar — a save made then used to throw the whole room away */
 function snapshotService(){if(!R||phase!=='service'||R.closing!=null||R.ended)return null;
  const ti=t=>t?R.tickets.indexOf(t):-1;
@@ -9135,8 +9147,8 @@ function snapshotService(){if(!R||phase!=='service'||R.closing!=null||R.ended)re
  const slots=R.slots.map(s0=>{const o={broken:!!s0.broken,fix:s0.fix||0,job:null};if(s0.job){const j=s0.job;const jo={};for(const k in j)if(k!=='tk'&&k!=='it')jo[k]=j[k];jo.tk=ti(j.tk);jo.it=ir(j.it);o.job=jo}return o});
  const J=R.jill;const jill={};for(const k in J)if(!['carry','hands','cur','pet','lookAt','rest','restPos','sofa','visit','__op'].includes(k))jill[k]=J[k];jill.hands=handsSnap(J.hands,ti,ir);jill.cur=J.cur?Object.assign({},J.cur):null;
  const cw={};for(const id in R.cw||{}){const w=R.cw[id];const o={};for(const k in w)if(k!=='task'&&k!=='carry'&&k!=='hands'&&k!=='__op')o[k]=w[k];   /* a walker's worked-out way round the furniture (__op) is not kept */o.task=w.task?Object.assign({},w.task,{g:gi2(w.task.g),t:w.task.t?w.task.t.i:-1,tk:ti(w.task.tk)},w.task.tks?{tks:w.task.tks.map(ti),stops:(w.task.stops||[]).map(ti)}:{}):null;o.hands=handsSnap(w.hands,ti,ir);cw[id]=o}
- const tables=R.tables.map(t=>({spot:t.spot,group:gi2(t.group),dirty:!!t.dirty,plates:(t.plates||[]).map(p=>Object.assign({},p)),busT:t.busT||0,claim:t.claim||null,tst:t.tst||0,cnr:t.cnr||0}));
- const misc={};for(const k of CP_KEYS)if(k in R)misc[k]=R[k];misc.nights=nightsSnap();
+ const tables=R.tables.map(t=>({spot:t.spot,group:gi2(t.group),dirty:!!t.dirty,plates:(t.plates||[]).map(p=>Object.assign({},p)),busT:t.busT||0,claim:t.claim==='xq'?null:(t.claim||null),tst:t.tst||0,cnr:t.cnr||0}));
+ const misc={};for(const k of CP_KEYS)if(k in R)misc[k]=R[k];if(misc.dd&&R.xqh){const d=JSON.parse(JSON.stringify(misc.dd));for(const e of R.xqh.hands||[])if(e.k==='dirty')d.n.push(e.v);if(d.wash&&d.wash.who==='xq')d.wash=null;misc.dd=d}misc.nights=nightsSnap();
  /* v2.5: the new kitchen's work — its portions as ticket item refs, its places as slot indices (the pass's own apart) */
  const sref=s0=>!s0?null:s0.type==='pass'?['p',(R.pss||[]).indexOf(s0)]:['s',R.slots.indexOf(s0)];
  const wfx={wf:(R.wf||[]).map(n=>{const o={};for(const k in n)if(!['its','slot','to','rj'].includes(k))o[k]=n[k];o.its=n.its.map(x=>ir(x.it));o.slot=sref(n.slot);o.to=sref(n.to);return o}),jk:R.jk?Object.assign({},R.jk,{q:(R.jk.q||[]).slice()}):null,wfc:Object.assign({},R.wfc||{}),wsel:R.wsel||null,wfid:WFID};
@@ -9770,8 +9782,8 @@ function dylanUpd(dt){const D=LIFE.dylan;if(!D)return;D.t-=dt;D.since+=dt;const 
  case'pushing':break;
  case'gone':LIFE.dylan=null;break}}
 function dylanArrive(D){const a=D.after;D.after=null;const J=LIFE.jill;
- if(a==='bus'){const t=R&&R.tables[D.table];if(t&&t.dirty&&!t.group){t.dirty=false;t.plates=[];t.busT=0;D.carry=true;S.dylan.clues.tidy=(S.dylan.clues.tidy||0)+1;dylanWalk(D,PASS.x+18,PASS.y-2,'pass')}else{D.state='think';D.t=1}}
- else if(a==='pass'){D.carry=false;sfx.clear();D.state='think';D.t=rand(1,3)}
+ if(a==='bus'){const t=R&&R.tables[D.table];if(t&&t.dirty&&!t.group&&ddFree()>=ddUnits(t)){D.dd=t.plates.map(p=>ddKind(p&&p.d));t.dirty=false;t.plates=[];t.busT=0;D.carry=true;S.dylan.clues.tidy=(S.dylan.clues.tidy||0)+1;dylanWalk(D,PASS.x+18,PASS.y-2,'pass')}else{D.state='think';D.t=1}}
+ else if(a==='pass'){D.carry=false;if(D.dd){for(const v of D.dd)ddS().n.push(v);ddStat('in',D.dd.length);D.dd=null}sfx.clear();D.state='think';D.t=rand(1,3)}   /* Workflow B: handed in at the hatch, into the tub with the rest */
  else if(a==='sitTable'){D.seated=true;D.state='sitTable';D.t=S.dylan.stage>=3?rand(14,40):rand(25,70);D.phone=Math.random()<.65}
  else if(a==='stand'){D.state='stand';D.t=rand(8,20);D.phone=Math.random()<.5}
  else if(a==='cat'){const c=D.cat;D.state='crouch';D.t=rand(6,12);D.face=c&&c.x>=D.x?1:-1;D.catCD=LIFE.t+40;
@@ -10035,6 +10047,8 @@ function serveTrip(m,first,okT,ev){const W=waiterWays(m);const t0=R.tables[first
  return{k:'serve',tk:first,g:first.g,t:t0,tks,x:pu.x,y:pu.y,dur:.25,phase:'pickup',room:pu.room,ev:ev?1:0}}
 /* the dining rooms' plates (rc7.2, 23:07: a Lounge table's plate is the Lounge's own waiter's when she is in; rc7.6: the chef's
    night's plates are at the bar, the Lounge's to carry) */
+function waiterServeTask0(m){const lgOK=t=>!t.lounge||waiterDuties(m).lounge;const own=crewPool(m)==='lounge'||!lgWaiterHere();
+ return waiterDoes(m,'serve')&&R.tickets.some(t=>!t.cn&&t.g&&t.g.table!=null&&t.g.state==='wait'&&!t.claim&&t.items.some(i=>i.st==='ready'&&!i.picked&&!i.ktp)&&!jillTargets(t.g.table)&&lgOK(R.tables[t.g.table])&&(own||!R.tables[t.g.table].lounge))}
 function waiterServeTask(m){const lgOK=t=>!t.lounge||waiterDuties(m).lounge;const own=crewPool(m)==='lounge'||!lgWaiterHere();
  const okT=t=>!t.cn&&t.g.table!=null&&t.g.state==='wait'&&!t.claim&&t.items.some(i=>i.st==='ready'&&!i.picked&&!i.ktp&&(!i.lbar||!R.tables[t.g.table].lounge))&&!jillTargets(t.g.table)&&!R.jill.hands.some(c0=>c0.tk===t)&&lgOK(R.tables[t.g.table])&&(own||!R.tables[t.g.table].lounge);
  const tk=R.tickets.find(t=>okT(t)&&R.tables[t.g.table].pdr)||R.tickets.find(okT);return tk?serveTrip(m,tk,okT,0):null}
@@ -10050,8 +10064,8 @@ function serveGo(tk,T){const t=R.tables[T.g.table];tk.tk=T;tk.g=T.g;tk.t=t;tk.ro
 /* at the pass: the plates into the hands, up to what they hold; a moment longer for one that is just coming (hands not full,
    the pass not crowded, never longer than his ways allow); then the tables in order — the nearest first for a waiter who
    has learned to — and off. Returns true while the trip goes on from here. */
-function servePickup(m,w,tk,dt){const H=handsOf(w),W=waiterWays(m);
- for(const T of tk.tks||[tk.tk]){if(!serveStopOK(T))continue;for(const i of serveReady(T,tk.ev)){if(H.length>=W.cap)break;i.picked=true;H.push({k:'dish',it:i,tk:T});R.tv++}}
+function servePickup(m,w,tk,dt){const H=handsOf(w),W=waiterWays(m);const cap=tk.ev?99:W.cap;   /* a night's course or round (the chef's night, Ken's tasting) goes to its table together, on a tray, as before: the nights' pacing is the stories' */
+ for(const T of tk.tks||[tk.tk]){if(!serveStopOK(T))continue;for(const i of serveReady(T,tk.ev)){if(H.length>=cap)break;i.picked=true;H.push({k:'dish',it:i,tk:T});R.tv++}}
  if(!tk.ev&&H.length<W.cap&&W.wait>0&&(tk.waited||0)<W.wait&&passLoad()<.6&&(tk.tks||[]).some(T=>soonAtPass(T))){tk.waited=(tk.waited||0)+dt;w.busy=tk.dur;return true}
  const tks=(tk.tks||[tk.tk]).filter(T=>{if(H.some(e=>e.k==='dish'&&e.tk===T))return true;if(T.claim===m.id)T.claim=null;return false});
  if(!tks.length){w.task=null;w.busy=0;w.cd=.3;return true}
@@ -10064,10 +10078,156 @@ function serveAtTable(m,w,tk){const T=tk.tk;const mine=handsFor(w,T);
  if(mine.length&&Math.random()<.08&&canChat('waiter',60,5))staffBark(m,pick(['久等了。','請慢用。','小心燙。']),tk.g);
  tk.stops=(tk.stops||[]).filter(x=>x!==T);
  if(tk.stops.length&&handsN(w,'dish')){crewCount(m,'serve');serveGo(tk,tk.stops[0]);w.busy=0;return true}
+ /* on the way back (「回程發現兩桌吃完 → 收一批 dirty dishes → 一次帶回廚房」): a waiter from LV3 who clears tables takes a finished
+    table near the last one he served, if the tub has room */
+ if(waiterDoes(m,'clean')&&waiterWays(m).tables>1&&ddFree()>0&&tk.t){const t0=tk.t;let best=null,bd=140;for(const t of R.tables){if(!ddCanClear(t)||!ddUnits(t)||t.claim||jillTargets(t.i)||(t.room||'main')!==(t0.room||'main'))continue;const d=Math.hypot(t.x-t0.x,t.y-t0.y);if(d<bd){bd=d;best=t}}
+  if(best){const ct=ddCleanTask(m,w,best);if(ct){crewCount(m,'serve');w.task=ct;w.busy=0;return true}}}
  return false}
 /* the evening's trips, for the simulation's numbers (R.st.wb, kept with the day): how many, how many plates in hand, the
    biggest hand, trips by plates (1, 2, 3, 4+), and how many served more than one table */
 function waiterTrip(items,tables){const s=R.st.wb||(R.st.wb={trips:0,items:0,max:0,n:[0,0,0,0,0],multi:0});s.trips++;s.items+=items;s.max=Math.max(s.max,items);s.n[Math.min(4,items)]++;if(tables>1)s.multi++}
+/* ================= v2.5 Workflow B: the dirty dishes =================
+   The user (2026-10-08): 「出去的是一道道完成料理；回來的是一疊疊髒盤子。」 What a table was served — each plate, bowl, cup and
+   glass still on it (t.plates) — goes back by hand: whoever clears the table takes it into the same hands the plates went
+   out in (hands, k:'dirty'), carries it through the kitchen door and puts it in the tub on the little cart in front of the
+   sink. The tub holds 10 (ddCap). Full, a table that needs clearing waits for room — nothing vanishes, no clean plates are
+   counted, plating never waits for a plate (「Dirty Dish Capacity 不等於 clean plate inventory」). At the sink they are washed
+   one by one and are out of the count, onto the rack the plating takes its plates from. */
+const DD_CAP=[10];   /* Dirty Dish Area I; II and III after the simulation (「暫時不要武斷鎖死後期一定是 15 / 20」) */
+function ddLv(){return 0}   /* where an upgrade will go (a bigger landing rack, a longer sink counter): none yet */
+function ddCap(){return DD_CAP[Math.min(DD_CAP.length-1,ddLv())]}
+function ddS(){if(!R)return{n:[],wash:null,rack:0};return R.dd||(R.dd={n:[],wash:null,rack:0})}
+/* what a dish comes back as: a cup, a glass, a bowl or a plate — one unit each, one tub for all (「先不要拆兩套 inventory」) */
+function ddKind(d){const D=DISH(d);if(!D)return'plate';if(D.cat==='drink')return(D.wine||D.lbar||D.v==='glass')?'glass':'cup';if(D.v==='bowl'||(D.v==='pot'&&/湯/.test(D.n||'')))return'bowl';return'plate'}
+/* everyone who can have dirty dishes in hand: Jill on the floor and in the kitchen, 秀琴阿姨, the crew */
+function ddCarriers(){const out=[];if(!R)return out;if(R.jill)out.push(R.jill);if(R.jk)out.push(R.jk);if(R.xqh)out.push(R.xqh);for(const id in R.cw||{})out.push(R.cw[id]);return out}
+/* the ones taken to the sink and not clean yet; the ones on their way to the tub (in hands, or promised by someone walking to a table) */
+function ddWashing(){let k=0;for(const w of ddCarriers())for(const e of w.hands||[])if(e.k==='dirty'&&e.w)k++;return k}
+function ddOnTheWay(){let k=0;for(const w of ddCarriers()){for(const e of w.hands||[])if(e.k==='dirty'&&!e.w)k++;const tk=w.task;if(tk&&tk.k==='clean'&&tk.res)k+=tk.res}return k}
+function ddCount(){return ddS().n.length+ddWashing()}   /* 「髒餐具 7/10」 */
+function ddFree(){return ddCap()-ddCount()-ddOnTheWay()}
+function ddUnits(t){return t&&t.plates?t.plates.length:0}
+/* a table with nothing on it is only wiped; one with dishes can be cleared when the tub has room for at least one */
+function ddCanClear(t){return !!t&&t.dirty&&!t.group&&(!ddUnits(t)||ddFree()>0)}
+/* a table cleared into someone's hands: as many as fit in the hands and in the tub (res: room already kept for them), and the
+   table is clear when nothing is left on it. Returns how many were taken, or -1 when there were dishes and no room */
+function ddCollect(w,t,cap,res){const u=ddUnits(t);if(!u){t.dirty=false;t.busT=0;R.tv++;return 0}
+ const room=res!=null?res:Math.max(0,ddFree());const k=Math.min(u,Math.max(0,cap-handsN(w,'dirty')),room);if(k<=0)return -1;
+ const H=handsOf(w);for(let i=0;i<k;i++){const p=t.plates.pop();H.push({k:'dirty',v:ddKind(p&&p.d),t:t.i})}
+ if(!t.plates.length){t.dirty=false;t.busT=0;coach(7)}R.tv++;return k}
+/* the dishes in hand into the tub */
+function ddDeposit(w){const D=ddS();let k=0;w.hands=(w.hands||[]).filter(e=>{if(e.k==='dirty'&&!e.w){D.n.push(e.v);k++;return false}return true});if(k){ddStat('in',k);R.tv++}return k}
+/* where it is (kitchen): the cart on the floor in front of the sink, at the aisle's end clear of the pass; the spot at its
+   front where dishes are put in, the spot behind it where the one washing takes them, and the sink (where the pasta is drained) */
+function ddCart(){return{x:KX.sink.x+7,y:KY.top+KY.h+KY.face+42}}
+function ddDrop(){const c=ddCart();return{x:c.x+8,y:c.y+18}}
+function ddTake(){const c=ddCart();return{x:c.x+2,y:c.y-26}}
+function ddSink(){return{x:KX.sink.x+13,y:KY.feet}}
+/* Jill with dishes in hand: the next table she was sent to is another one to clear (and they fit) — that one first */
+function ddChainJ(J){const t=R.tables[J.q[0]];return !!t&&!t.group&&t.dirty&&ddUnits(t)>0&&handsN(J,'dirty')<carryCap('jill')&&ddFree()>0}
+function ddDumpTask(){const d=ddDrop();return{k:'dump',x:d.x,y:d.y,room:'kitchen',dur:.35}}
+/* a table to clear, for someone (me: a crew member, or 秀琴阿姨 as {id:'xq',role:'cleaner',lv:1}): the room in the tub for
+   what they will bring is kept from now (res), so two people never fill the same last places */
+function ddCleanTask(me,w,t){const u=ddUnits(t);const res=u?Math.min(u,Math.max(0,carryCap(me)-handsN(w,'dirty')),Math.max(0,ddFree())):0;if(u&&res<=0)return null;
+ t.claim=me.id;const wt=me.role==='waiter';return{k:'clean',t,res,x:t.x+((t.x<200)===wt?-24:24),y:t.y+22,dur:cleanDur(me)+(wt?.4:0)}}
+/* how many tables one trip of clearing takes in: a cleaner from LV2 two, from LV4 three; a waiter as his serving trips */
+const CLEAN_TABLES=[1,2,2,3,3];
+function ddTripTables(me){return me.role==='waiter'?waiterWays(me).tables:CLEAN_TABLES[clamp(Math.round(me.lv||1),1,5)-1]}
+/* after a table: another one close by on the way, while the hands and the tub have room (「Table 2 收2 → Table 3 收2 → 回 Dirty
+   Dish Area」) — or off to the tub */
+function ddNextAfter(me,w,t0){w.ddN=(w.ddN||0)+1;if(handsN(w,'dirty')<carryCap(me)&&w.ddN<ddTripTables(me)&&ddFree()>0){
+  let best=null,bd=170;for(const t of R.tables){if(t===t0||!ddCanClear(t)||!ddUnits(t)||t.claim||jillTargets(t.i)||(t.room||'main')!==(t0.room||'main'))continue;const d=Math.hypot(t.x-t0.x,t.y-t0.y);if(d<bd){bd=d;best=t}}
+  if(best){const tk=ddCleanTask(me,w,best);if(tk)return tk}}
+ w.ddN=0;return handsN(w,'dirty')?ddDumpTask():null}
+/* washing (「員工到 sink：→ 從 dirty stack 拿一個／一小批 → 放到 sink → 洗／刷／沖 → 放到 clean side」): one person at the sink.
+   Two at a time from the tub (Jill one), washed one by one, each out of the count and onto the rack under the sink. Between
+   two the one washing can be called away; what is still in the tub stays for whoever washes next (「不要重置」). */
+const WASH_T={cleaner:[2,1.8,1.6,1.4,1.2],waiter:[2.4,2.2,2,1.8,1.6]};
+function washT(id){if(id==='jill')return 1.8;if(id==='xq')return 2;const m=(S.crew||[]).find(q=>q.id===id);if(!m)return 2;const L=WASH_T[m.role]||WASH_T.cleaner;return L[clamp(Math.round(m.lv||1),1,5)-1]}
+function ddWasher(){const W=ddS().wash;return W?W.who:null}
+function ddWho(id){return id==='jill'?'Jill':id==='xq'?'秀琴阿姨':((S.crew||[]).find(m=>m.id===id)||{}).name||''}
+function ddStartWash(id){const D=ddS();D.wash={who:id,ph:'take',t:0};R.tv++}
+function ddAtSink(w){const Sk=ddSink();return !!w&&(w.room||'kitchen')==='kitchen'&&Math.hypot(w.x-Sk.x,w.y-Sk.y)<3}
+/* one step of washing for whoever is at it: the place to walk to, or null while at the sink (or done) */
+function washStep(w,id,dt,batch){const D=ddS(),W=D.wash;if(!W||W.who!==id)return null;const H=handsOf(w);
+ if(W.ph==='take'){const T=ddTake();if((w.room||'kitchen')!=='kitchen'||Math.hypot(w.x-T.x,w.y-T.y)>3)return{x:T.x,y:T.y,room:'kitchen'};
+  if(!D.n.length||W.stop){ddWashEnd(w);return null}const k=Math.min(batch,D.n.length);for(let i=0;i<k;i++)H.push({k:'dirty',v:D.n.pop(),w:1});W.ph='sink';W.t=0;R.tv++;return null}
+ const Sk=ddSink();if((w.room||'kitchen')!=='kitchen'||Math.hypot(w.x-Sk.x,w.y-Sk.y)>3)return{x:Sk.x,y:Sk.y,room:'kitchen'};
+ const held=H.filter(e=>e.k==='dirty'&&e.w);if(!held.length){if(D.n.length&&!W.stop){W.ph='take';return null}ddWashEnd(w);return null}
+ W.t+=dt/washT(id);W.on=1;
+ if(W.t>=1){W.t=0;H.splice(H.indexOf(held[held.length-1]),1);D.rack=Math.min(6,(D.rack||0)+1);ddStat('wash',1,id);R.tv++}
+ return null}
+/* the washing ends: anything still in hand goes back on the stack (only when someone has to leave at once) */
+function ddWashEnd(w){const D=ddS();if(w)for(const e of w.hands||[])if(e.k==='dirty'&&e.w)D.n.push(e.v);if(w)w.hands=(w.hands||[]).filter(e=>!(e.k==='dirty'&&e.w));D.wash=null;R.tv++}
+/* the dirty side's tasks, for anyone who does them (a cleaner, a waiter, 秀琴阿姨): to a table and clear it into the hands
+   ('clean'), to the tub and put them in ('dump'), at the sink ('wash'). v: the walking step. Returns true while busy. */
+function ddTaskTick(me,w,dt,v){const tk=w.task;if(!tk)return false;
+ if(tk.k==='wash'){const D=ddS();if(!D.wash||D.wash.who!==me.id){w.task=null;w.cd=.3;w.moving=false;return false}
+  /* called away (a waiter with guests waiting, a cleaner with tables to clear and a low stack): after the one in hand */
+  if(!D.wash.stop&&ddWashCalled(me,w))D.wash.stop=1;
+  const sp=washStep(w,me.id,dt,2);if(!D.wash||D.wash.who!==me.id){w.task=null;w.cd=.3;w.moving=false;return false}
+  if(sp){w.tx=sp.x;w.ty=sp.y;w.troom=sp.room;if(!stepTo(w,v)){w.moving=true;w.step+=dt*12}else w.moving=false}else{w.moving=false;w.face=1}
+  return true}
+ if(tk.k==='clean'&&!(tk.t.dirty&&!tk.t.group)){if(tk.t.claim===me.id)tk.t.claim=null;tk.res=0;w.task=null;w.cd=.2;return false}
+ w.tx=tk.x;w.ty=tk.y;w.troom=tk.room||(tk.t?tk.t.room:'main')||'main';
+ if(!stepTo(w,v)){w.moving=true;w.step+=dt*12;return true}
+ w.moving=false;w.busy=(w.busy||0)+dt;if(w.busy<tk.dur)return true;w.busy=0;
+ if(tk.k==='dump'){ddDeposit(w);w.ddN=0;w.task=null;w.cd=.3;return false}
+ const k=ddCollect(w,tk.t,carryCap(me),tk.res);tk.res=0;if(tk.t.claim===me.id)tk.t.claim=null;if(k>=0)sfx.clear();if(S.crew&&S.crew.includes(me))crewCount(me,'clean');
+ w.task=ddNextAfter(me,w,tk.t);if(!w.task)w.cd=.35;return !!w.task}
+/* a reason to leave the sink after the one in hand */
+function ddWaiterHasGuests(me){if(waiterServeTask0(me))return true;for(const t of R.tables){const g=t.group;if(!g||t.claim||jillTargets(t.i))continue;if((g.state==='order'&&waiterDoes(me,'order'))||(g.state==='check'&&waiterDoes(me,'check')))return true}return waiterDoes(me,'seat')&&queued().some(g=>g.state==='queue'&&!g.claim&&freeTableFor(g))}
+function ddWashCalled(me,w){if(me.role==='waiter')return ddCount()<=5||ddWaiterHasGuests(me);
+ return ddCount()<=4&&R.tables.some(t=>ddCanClear(t)&&!t.claim&&ddUnits(t))}
+/* the AI's own reasons to wash (「0–5 washing priority 很低；6–7 cleaner 有空可以開始處理；8–9 明顯提高；10 非常高」): a cleaner
+   (and 秀琴阿姨) from 6, before clearing from 8; a waiter only from 8, with nothing for the guests and nobody at the sink;
+   Jill and the cooks never by themselves */
+const DD_CLEANER_AT=6,DD_FIRST_AT=8,DD_WAITER_AT=8;
+function ddWashNow(me,early){if(ddS().wash||!ddS().n.length)return false;const n=ddCount();if(me.role==='waiter')return n>=DD_WAITER_AT;return n>=(early?DD_FIRST_AT:DD_CLEANER_AT)}
+/* the player taps the cart or the sink: someone who can wash goes (a cleaner first, 秀琴阿姨, a waiter, then Jill herself) */
+function ddPickWasher(){const cand=[];for(const m of S.crew||[]){if((m.role!=='cleaner'&&m.role!=='waiter')||!crewHere(m)||crewPool(m)==='lounge')continue;const w=R.cw&&R.cw[m.id];if(!w||w.arriving)continue;cand.push({id:m.id,w,r:(m.role==='cleaner'?0:2)+(w.task?1:0)})}
+ if(R.xqh&&!R.xqh.leaving&&!R.xqh.arriving)cand.push({id:'xq',w:R.xqh,r:R.xqh.task?1.5:.5});cand.sort((a,b)=>a.r-b.r);return cand[0]||{id:'jill',w:null}}
+function ddTap(){const D=ddS();if(D.wash){toast(`${ddWho(D.wash.who)} 正在洗`);return}if(!ddCount()){toast('還沒有髒餐具');return}
+ const who=ddPickWasher();ddStartWash(who.id);if(who.w){const t0={k:'wash'};if(who.w.task&&who.w.task.k!=='wash')who.w.next=t0;else who.w.task=t0}
+ sfx.tap();toast(`洗滌 · ${ddWho(who.id)}`)}
+/* the cart, for a tap: the cart itself and the sink above it */
+function ddHit(p){const c=ddCart();if(p.x>=c.x-20&&p.x<=c.x+20&&p.y>=c.y-38&&p.y<=c.y+6)return true;const x=KX.sink.x;return p.x>=x-2&&p.x<=x+28&&p.y>=KY.top+10&&p.y<=KY.top+60}
+/* the evening's numbers for the simulation (R.st.dd, kept with the day): dishes in, washed (by whom), the most at once, the
+   seconds full and how many times it filled, the table-seconds a table waited for room, the seconds of washing by role */
+function ddStat(k,n,who){const s=R.st.dd||(R.st.dd={in:0,wash:0,by:{},peak:0,full:0,fulls:0,occ:0,t:0,blockT:0,washT:{}});if(k==='in')s.in+=n;if(k==='wash'){s.wash+=n;const r=ddRole(who);s.by[r]=(s.by[r]||0)+n}}
+function ddRole(id){return id==='jill'?'jill':id==='xq'?'xq':((S.crew||[]).find(m=>m.id===id)||{}).role||'?'}
+function ddSample(dt){if(!R||!R.st)return;ddStat('in',0);const s=R.st.dd;const n=ddCount();s.t+=dt;s.occ+=n*dt;if(n>s.peak)s.peak=n;const full=n>=ddCap();if(full){s.full+=dt;if(!R.ddFull)s.fulls++}R.ddFull=full;
+ if(ddFree()<=0)for(const t of R.tables)if(t.dirty&&!t.group&&ddUnits(t))s.blockT+=dt;
+ const W=ddS().wash;if(W&&W.on){const r=ddRole(W.who);s.washT[r]=(s.washT[r]||0)+dt;W.on=0}}
+/* dirty dishes in hand, drawn in front: a little stack, cups and glasses on top */
+function ddDrawItem(c,v,x,y,s){s=s||1;c.save();c.translate(x,y);c.scale(s,s);
+ if(v==='cup'){c.fillStyle='#F2EEE6';rr(c,-3.4,-5,6.8,5.6,1.6);c.fill();c.strokeStyle='rgba(90,70,50,.45)';c.lineWidth=.6;c.stroke();c.fillStyle='#7A5236';el(c,0,-4.6,2.6,.9)}
+ else if(v==='glass'){c.strokeStyle='rgba(170,190,200,.95)';c.lineWidth=.8;c.beginPath();c.moveTo(-2.6,-7);c.quadraticCurveTo(-2.6,-3,0,-2.4);c.quadraticCurveTo(2.6,-3,2.6,-7);c.moveTo(0,-2.4);c.lineTo(0,0);c.moveTo(-1.8,0);c.lineTo(1.8,0);c.stroke();c.fillStyle='rgba(140,40,60,.35)';el(c,0,-3.6,1.6,.8)}
+ else if(v==='bowl'){c.fillStyle='#EFE9DE';c.beginPath();c.ellipse(0,-2.4,4.6,1.6,0,0,Math.PI*2);c.fill();c.beginPath();c.moveTo(-4.6,-2.4);c.quadraticCurveTo(0,3,4.6,-2.4);c.fill();c.fillStyle='rgba(150,110,70,.45)';el(c,0,-2.5,2.6,.8)}
+ else{c.fillStyle='#F4F1EA';el(c,0,-1,6,2.1);c.strokeStyle='rgba(90,70,50,.35)';c.lineWidth=.5;c.beginPath();c.ellipse(0,-1,6,2.1,0,0,Math.PI*2);c.stroke();c.fillStyle='rgba(160,110,60,.5)';el(c,-1.6,-1.2,1.8,.6);el(c,2,-.8,1,.5)}
+ c.restore()}
+function ddDrawHands(c,w,x,y){const H=(w.hands||[]).filter(e=>e.k==='dirty');if(!H.length)return;const plates=H.filter(e=>e.v==='plate'||e.v==='bowl'),small=H.filter(e=>e.v==='cup'||e.v==='glass');
+ plates.forEach((e,i)=>ddDrawItem(c,e.v,x,y-i*1.6,1.1));small.forEach((e,i)=>ddDrawItem(c,e.v,x-3+i*4,y-plates.length*1.6-1,1))}
+/* the cart in front of the sink: a steel frame on castors, a grey tub on top; what is in it says how full it is without a number
+   (0, a few, a stack, two stacks and the glasses, heaped with the shelf below taken too) — and a small quiet number under it */
+function ddDrawCart(c,now){const D=ddS(),C=ddCart(),n=R?D.n.length:0,cap=ddCap();const x=C.x,y=C.y;
+ c.fillStyle='rgba(0,0,0,.16)';el(c,x,y+1,17,3.4);
+ c.strokeStyle='#8D969A';c.lineWidth=1.4;for(const dx of[-13,13]){c.beginPath();c.moveTo(x+dx,y-2);c.lineTo(x+dx,y-24);c.stroke()}
+ c.fillStyle='#A9B2B6';rr(c,x-15,y-12,30,2.4,1);c.fill();c.fillStyle='#3A3C40';for(const dx of[-12,12])circ(c,x+dx,y-.6,1.8);
+ /* the lower shelf: the overflow */if(n>=cap){for(let i=0;i<3;i++)ddDrawItem(c,i%2?'plate':'bowl',x-8+i*8,y-12.5-i*.3,1.15)}
+ c.fillStyle='#6E7A80';rr(c,-16+x,y-30,32,8,2.5);c.fill();c.fillStyle='#5A666C';rr(c,x-15,y-23,30,2,1);c.fill();c.fillStyle='#4F5A60';rr(c,x-14,y-30,28,3,1.5);c.fill();
+ const items=D.n.slice(0,Math.min(n,cap));const pl=items.filter(v=>v==='plate'||v==='bowl'),sm=items.filter(v=>v==='cup'||v==='glass');
+ const stacks=[pl.slice(0,Math.ceil(pl.length/2)),pl.slice(Math.ceil(pl.length/2))];stacks.forEach((st,si)=>st.forEach((v,i)=>ddDrawItem(c,v,x-6.5+si*13,y-30-i*2.6,1.35)));
+ sm.forEach((v,i)=>ddDrawItem(c,v,x-10+(i%3)*9,y-32-Math.max(stacks[0].length,stacks[1].length)*2.6-(i>=3?6:0),1.3));
+}
+/* 「髒餐具 7/10」 and 「洗滌 · 秀琴阿姨前往中」 → 「洗滌 · 秀琴阿姨」: two short lines under the cart, left of the pass, over
+   everything (the pass's ticket clips must not cover them); the number turns a quiet brick colour when full (「只有真的滿了可以
+   有克制提示」) */
+function ddDrawLabel(c){if(!R||room!=='kitchen')return;const D=ddS(),cap=ddCap(),n=ddCount();if(!n&&!D.wash)return;const C=ddCart();const x=Math.max(KX.sink.x-10,C.x-24),y=C.y+9;
+ c.font=`800 6.5px ${FONT}`;c.textAlign='left';c.textBaseline='middle';c.lineWidth=2.4;c.strokeStyle='rgba(255,250,240,.88)';
+ const l1=`髒餐具 ${n}/${cap}`,l2=D.wash?`洗滌 · ${ddWho(D.wash.who)}${ddWasherAt()?'':' 前往中'}`:n>=cap?'滿了':'';
+ c.strokeText(l1,x,y);c.fillStyle=n>=cap?'#9A4A2E':'rgba(60,44,34,.88)';c.fillText(l1,x,y);if(l2){c.font=`700 6px ${FONT}`;c.strokeText(l2,x,y+8);c.fillStyle=l2==='滿了'?'#9A4A2E':'rgba(60,44,34,.8)';c.fillText(l2,x,y+8)}}
+function ddWasherAt(){const W=ddS().wash;if(!W)return false;const w=W.who==='jill'?R.jk:W.who==='xq'?R.xqh:R.cw&&R.cw[W.who];return !!w&&ddAtSink(w)}
 /* audit W3-05, WS2-02: the waiters with nothing to do each have their own place by the door — they used to stand on one
    point, six or seven people and one name tag on top of each other */
 const WAIT_POSTS=[[84,150],[58,152],[84,128],[58,130],[32,150],[110,128],[32,128]];
@@ -10088,6 +10248,7 @@ function crewUpd(dt){R.cw=R.cw||{};for(const m of S.crew||[]){
  if(w.arriving){if(stepTo(w,(115+15*m.lv)*dt)){w.arriving=0;w.moving=false;v24Arrived(m)}else{w.moving=true;w.step+=dt*12;continue}}
  if(m.role==='bartender'){if(m.duty==='lbar'&&loungeLv())bartenderUpd(m,w,dt);continue}   /* v2.3 */
  if(!w.task&&w.next){w.task=w.next;w.next=null;w.busy=0}   /* v2.4: a walk-over waits for the task in hand */
+ if(w.task&&(w.task.k==='clean'||w.task.k==='dump'||w.task.k==='wash')){ddTaskTick(m,w,dt,(115+15*m.lv)*flowMul('crew')*dt);continue}   /* Workflow B: the dirty side */
  if(w.task){const tk=w.task;let ok=true;
   if(tk.k==='visit')ok=!tk.g||(R.groups.includes(tk.g)&&!tk.g.gone&&tk.g.table!=null);if(tk.k==='visit'&&!ok&&w.nextQ&&w.nextQ.length&&!w.next)w.next=w.nextQ.shift();
   if(tk.k==='seat')ok=R.groups.includes(tk.g)&&tk.g.state==='queue'&&!tk.t.group&&!tk.t.dirty;
@@ -10102,13 +10263,13 @@ function crewUpd(dt){R.cw=R.cw||{};for(const m of S.crew||[]){
    w.busy+=dt;if(w.busy>=tk.dur){
    if(tk.k==='seat'){seatGroup(tk.g,tk.t);if(Math.random()<.08&&canChat('waiter',60,5))staffSay(m,pick(['這邊請。','兩位這邊。','請坐。']),undefined,tk.g)}
    if(tk.k==='order'&&!jillTargets(tk.t.i))createTicket(tk.g);else if(tk.k==='order'&&tk.g.state==='order')createTicket(tk.g);
-   if(tk.k==='clean'){tk.t.dirty=false;tk.t.plates=[];tk.t.busT=0;sfx.clear()}
    if(tk.k==='serve'&&tk.phase==='pickup'){if(servePickup(m,w,tk,dt))continue;if(!w.task)continue}
    if(tk.k==='serve'){if(serveAtTable(m,w,tk))continue}
    if(tk.k==='check'&&tk.g.state==='check'){regularNote(tk.g);collect(tk.g)}
    crewCount(m,tk.k);if(tk.g)tk.g.claim=null;if(tk.t)tk.t.claim=null;w.task=null;w.busy=0;w.cd=m.role==='waiter'?waiterDelay(m):.35}}
   continue}
  w.cd-=dt;if(w.cd>0){w.moving=false;continue}
+ if(handsN(w,'dirty')&&(m.role==='waiter'||m.role==='cleaner')){w.task=ddDumpTask();continue}   /* Workflow B: dishes in hand go to the tub first */
  if(m.role==='waiter'){
   const lgOK=t=>!t.lounge||waiterDuties(m).lounge;   /* v2.3: the Lounge is a job on the board */
   /* v2.4 rc6 (10:06): the Lounge's own floor person (安安) looks after the Lounge's tables first — an order, a bill, a table
@@ -10118,8 +10279,8 @@ function crewUpd(dt){R.cw=R.cw||{};for(const m of S.crew||[]){
       kitchen, are hers to carry — first, before an order or a bill */
    if(lgServes(m)){const ct=(R.cn||R.kt)&&R.tickets.find(t=>(t.cn||t.kt)&&t.g&&t.g.table!=null&&t.g.state==='wait'&&!t.claim&&R.tables[t.g.table]&&R.tables[t.g.table].kind!=='bar'&&t.items.some(i=>i.st==='ready'&&!i.picked&&(t.cn||i.ktp))&&!jillTargets(t.g.table)&&!R.jill.hands.some(c0=>c0.tk===t));if(ct){w.task=serveTrip(m,ct,null,1);continue}   /* rc7.7: a tasting night's rounds too */   /* rc7.6: the chef's night's courses, from the end of the bar's L */
     const lgT=t=>!t.cn&&t.lounge&&t.g&&t.g.table!=null&&t.g.state==='wait'&&!t.claim&&R.tables[t.g.table]&&R.tables[t.g.table].lounge&&t.items.some(i=>i.st==='ready'&&!i.picked&&!i.lbar&&!i.ktp)&&!jillTargets(t.g.table)&&!R.jill.hands.some(c0=>c0.tk===t);const tk=R.tickets.find(lgT);if(tk){w.task=serveTrip(m,tk,lgT,0);continue}}
-   const k=['order','check','clean'].find(k=>waiterDoes(m,k)&&R.tables.some(t=>t.lounge&&!t.claim&&!jillTargets(t.i)&&(k==='clean'?t.dirty&&!t.group:t.group&&t.group.state===k)));
-   if(k){const t=R.tables.find(t=>t.lounge&&!t.claim&&!jillTargets(t.i)&&(k==='clean'?t.dirty&&!t.group:t.group&&t.group.state===k));t.claim=m.id;w.task=k==='clean'?{k,t,x:t.x+(t.x<200?-24:24),y:t.y+22,dur:cleanDur(m)+.4}:{k,g:t.group,t,x:t.x+(t.x<200?-26:26),y:t.y+22,dur:k==='check'?.6:.5};continue}}
+   const k=['order','check','clean'].find(k=>waiterDoes(m,k)&&R.tables.some(t=>t.lounge&&!t.claim&&!jillTargets(t.i)&&(k==='clean'?ddCanClear(t):t.group&&t.group.state===k)));
+   if(k){const t=R.tables.find(t=>t.lounge&&!t.claim&&!jillTargets(t.i)&&(k==='clean'?ddCanClear(t):t.group&&t.group.state===k));if(k==='clean'){const ct=ddCleanTask(m,w,t);if(ct){w.task=ct;continue}}else{t.claim=m.id;w.task={k,g:t.group,t,x:t.x+(t.x<200?-26:26),y:t.y+22,dur:k==='check'?.6:.5};continue}}}
   /* Workflow B (the user: 「Pass 快滿時，pickup priority 上升」): from LV3 a waiter takes the plates before the door when the pass is filling */
   if(waiterWays(m).pass&&waiterDoes(m,'serve')&&passLoad()>=.6){const st=waiterServeTask(m);if(st){w.task=st;continue}}
   if(waiterDoes(m,'seat')){const g=queued().find(g=>g.state==='queue'&&!g.claim&&freeTableFor(g)&&!freeTableFor(g).claim);if(g){const t=freeTableFor(g);g.claim=m.id;t.claim=m.id;w.task={k:'seat',g,t,x:g.x+22,y:g.y+2,dur:.25,room:g.room||'main'}/* rc8.3: out to the shopfront for them */;continue}}
@@ -10131,11 +10292,14 @@ function crewUpd(dt){R.cw=R.cw||{};for(const m of S.crew||[]){
   if(waiterDoes(m,'order')){const t=pdFirst(t=>t.group&&t.group.state==='order'&&!t.claim&&!jillTargets(t.i)&&lgOK(t));if(t){t.claim=m.id;w.task={k:'order',g:t.group,t,x:t.x+(t.x<200?-26:26),y:t.y+22,dur:.5};continue}}
   if(waiterDoes(m,'serve')){const st=waiterServeTask(m);if(st){w.task=st;continue}}
   if(waiterDoes(m,'check')){const t=pdFirst(t=>t.group&&t.group.state==='check'&&!t.claim&&!jillTargets(t.i)&&lgOK(t));if(t){t.claim=m.id;w.task={k:'check',g:t.group,t,x:t.x+(t.x<200?-26:26),y:t.y+22,dur:.6};continue}}
-  if(waiterDoes(m,'clean')){const t=pdFirst(t=>t.dirty&&!t.group&&!t.claim&&!jillTargets(t.i)&&lgOK(t));if(t){t.claim=m.id;w.task={k:'clean',t,x:t.x+(t.x<200?-24:24),y:t.y+22,dur:cleanDur(m)+.4};continue}}
+  if(waiterDoes(m,'clean')){const t=pdFirst(t=>ddCanClear(t)&&!t.claim&&!jillTargets(t.i)&&lgOK(t));if(t){const ct=ddCleanTask(m,w,t);if(ct){w.task=ct;continue}}}
+  if(crewPool(m)!=='lounge'&&ddWashNow(m)&&passLoad()<.5&&!ddWaiterHasGuests(m)&&!(S.crew||[]).some(q=>q.role==='cleaner'&&crewHere(q)&&crewPool(q)!=='lounge'&&!(R.cw[q.id]&&R.cw[q.id].task))){ddStartWash(m.id);w.task={k:'wash'};continue}   /* Workflow B: near full, nothing for the guests, nobody at the sink */
   w.cd=.4;{const P=waitPost(m);if(w.room!=='main'||Math.hypot(w.x-P[0],w.y-P[1])>4){w.tx=P[0];w.ty=P[1];w.troom='main';if(!stepTo(w,80*dt)){w.moving=true;w.step+=dt*12}}}}
- else{const free=q=>q.dirty&&!q.group&&!q.claim&&!jillTargets(q.i);const t=(crewPool(m)==='lounge'&&R.tables.find(q=>q.lounge&&free(q)))||pdFirst(free);/* v2.4 rc5: the Lounge's cleaner clears the Lounge first, then wherever she is needed */if(t){t.claim=m.id;w.task={k:'clean',t,x:t.x+(t.x<200?24:-24),y:t.y+22,dur:cleanDur(m)};continue}/* a cleaner wipes from the table's other side: the waiter's side (the bill, the plates) was where they ended on top of each other */w.cd=.4;{const lg=crewPool(m)==='lounge'&&loungeLv();/* the Lounge's cleaner goes back to the Lounge's back corner */const P=lg?[LG.bk.x,LG.bk.y+20]:cleanPost(m),rm=lg?'lounge':'main';if(w.room!==rm||Math.hypot(w.x-P[0],w.y-P[1])>4){w.tx=P[0];w.ty=P[1];w.troom=rm;if(!stepTo(w,70*dt)){w.moving=true;w.step+=dt*12}}}}}}
+ else{if(ddWashNow(m,true)){ddStartWash(m.id);w.task={k:'wash'};continue}   /* Workflow B: the stack high — washing comes first */
+  const free=q=>ddCanClear(q)&&!q.claim&&!jillTargets(q.i);const t=(crewPool(m)==='lounge'&&R.tables.find(q=>q.lounge&&free(q)))||pdFirst(free);/* v2.4 rc5: the Lounge's cleaner clears the Lounge first, then wherever she is needed */if(t){const ct=ddCleanTask(m,w,t);if(ct){w.task=ct;continue}}
+  if(ddWashNow(m)){ddStartWash(m.id);w.task={k:'wash'};continue}/* a cleaner wipes from the table's other side: the waiter's side (the bill, the plates) was where they ended on top of each other */w.cd=.4;{const lg=crewPool(m)==='lounge'&&loungeLv();/* the Lounge's cleaner goes back to the Lounge's back corner */const P=lg?[LG.bk.x,LG.bk.y+20]:cleanPost(m),rm=lg?'lounge':'main';if(w.room!==rm||Math.hypot(w.x-P[0],w.y-P[1])>4){w.tx=P[0];w.ty=P[1];w.troom=rm;if(!stepTo(w,70*dt)){w.moving=true;w.step+=dt*12}}}}}}
 function crewDraw(c,now,list,rm){if(qaSolo(rm)){stageDraw(c,list,rm);return}
- if(R&&R.cw)for(const m of S.crew||[]){if(m.role==='chef')continue;const w=R.cw[m.id];if(!w||(w.room||'main')!==(rm||'main')||rm==='staff'||srWalker(m.id))continue;/* v2.4 rc6: in the Staff Room they are drawn sitting (srDrawPeople); a bartender walking up is his walker */list.push({y:w.y,f:()=>{const stp=w.moving?Math.sin(w.step):0;const L0=crewLook(m);if(w.phone)L0.acc='phone';drawPerson(c,w.x,w.y,L0,{step:stp,bob:w.moving?Math.abs(stp)*-.8:0,mood:m.name==='秀琴阿姨'&&wallWorrying()?'ok':'happy',flip:w.face<0,carry:!!(w.hands&&w.hands.length),arms:m.role==='cleaner'&&w.task&&w.task.k==='clean'&&!w.moving?[.3,1.0]:null});
+ if(R&&R.cw)for(const m of S.crew||[]){if(m.role==='chef')continue;const w=R.cw[m.id];if(!w||(w.room||'main')!==(rm||'main')||rm==='staff'||srWalker(m.id))continue;/* v2.4 rc6: in the Staff Room they are drawn sitting (srDrawPeople); a bartender walking up is his walker */list.push({y:w.y,f:()=>{const stp=w.moving?Math.sin(w.step):0;const L0=crewLook(m);if(w.phone)L0.acc='phone';drawPerson(c,w.x,w.y,L0,{step:stp,bob:w.moving?Math.abs(stp)*-.8:0,mood:m.name==='秀琴阿姨'&&wallWorrying()?'ok':'happy',flip:w.face<0,carry:!!(w.hands&&w.hands.length),arms:w.task&&w.task.k==='wash'&&!w.moving&&ddAtSink(w)?[.35,.95+Math.sin(now*7+w.x)*.25]:m.role==='cleaner'&&w.task&&w.task.k==='clean'&&!w.moving?[.3,1.0]:null});ddDrawHands(c,w,w.x,w.y-26);
   handsDraw(c,w,w.x,w.y-50);
   const hx=w.x+(w.face<0?-12:12);if(m.role==='cleaner'){c.strokeStyle='#8A6A3A';c.lineWidth=1.6;c.beginPath();c.moveTo(hx,w.y-30);c.lineTo(hx+(w.face<0?-4:4),w.y-2);c.stroke();c.fillStyle='#C9A86A';el(c,hx+(w.face<0?-4:4),w.y-1,5,2.4)}else{c.fillStyle='#C9CED0';el(c,hx,w.y-26,7,2)}
   nameTag(c,w.x,w.y-64,m.name)}})}srDrawPeople(c,now,list,rm);xqHelperDraw(c,list,rm);stageDraw(c,list,rm)}
@@ -10274,9 +10438,10 @@ function drawBagSparkle(c,now){const t=now-BAG_T;const base=.35+Math.sin(now*2)*
 /* rc8 (the player, 2026-10-03: 「每一項都一大坨 很難閱讀」): an entry reads as short lines — one sentence a line, split at 。 and ；
    outside 「」（）『』 */
 function guideLines(t){const out=[];let d=0,cur='';for(const ch of t){cur+=ch;if('「（『(['.includes(ch))d++;else if('」）』)]'.includes(ch))d=Math.max(0,d-1);else if((ch==='。'||ch==='；')&&d===0){out.push(cur);cur=''}}if(cur.trim())out.push(cur);return out}
-const GUIDE=[   /* the manual describes the game as it is. Audited every release (docs/RELEASE_CHECKLIST.md) — in progress, not released: v2.5 料理 (feature/cooking-gameplay), 2026-10-08 (the new kitchen: 一天怎麼玩 › 營業中 says how a dish goes now — the ticket's dish, the lit place, the flow in small type, a done step waits, and when it is to be plated the dish itself is lit (2026-10-08: plating happens where the food is) — instead of the old station panel; 員工 says a cook takes only the places he knows, and — Workflow B, 2026-10-08 — that a waiter carries two plates and more, to more tables, as he grows) — last: v2.4 rc8.8, 2026-10-07 (the room's lit tab says whose it is once Dylan is out and his name is over him there; 怎麼進去 already says only 「房間分頁的最後一個」 and the tab list gives the short names: checked, no line changed) — before: v2.4 rc8.7, 2026-10-07 (story first: the Lounge's people — 沈晴、阿拓 from Lounge I, 安安、許葳 with II; no level, rating or Lounge II for the Lounge, the piano, 予安 or the floor, and the manual names none; checked, that one line changed) — before: v2.4 rc8.6, 2026-10-07 (the stock rule as the game plays it: from Day 3 a dish with nothing in the fridge cannot be ordered; Jill orders one herself only on the first two days); the rewrite of 2026-10-06 from docs/audit/2026-10-06/ws5_manual.md: the first card is how a day is played; only what the screen does not tell and a player needs to know stays (what the screen already says, how the game was built, old saves and stories still to come left it); a space, and a story's own entry, comes into it when it is there */
+const GUIDE=[   /* the manual describes the game as it is. Audited every release (docs/RELEASE_CHECKLIST.md) — in progress, not released: v2.5 料理 (feature/cooking-gameplay), 2026-10-08 (the new kitchen: 一天怎麼玩 › 營業中 says how a dish goes now — the ticket's dish, the lit place, the flow in small type, a done step waits, and when it is to be plated the dish itself is lit (2026-10-08: plating happens where the food is) — instead of the old station panel; 員工 says a cook takes only the places he knows, and — Workflow B, 2026-10-08 — that a waiter carries two plates and more, to more tables, as he grows; and a point of its own, 髒盤子: the dishes go back to the cart by the sink, ten at most, tap it for washing) — last: v2.4 rc8.8, 2026-10-07 (the room's lit tab says whose it is once Dylan is out and his name is over him there; 怎麼進去 already says only 「房間分頁的最後一個」 and the tab list gives the short names: checked, no line changed) — before: v2.4 rc8.7, 2026-10-07 (story first: the Lounge's people — 沈晴、阿拓 from Lounge I, 安安、許葳 with II; no level, rating or Lounge II for the Lounge, the piano, 予安 or the floor, and the manual names none; checked, that one line changed) — before: v2.4 rc8.6, 2026-10-07 (the stock rule as the game plays it: from Day 3 a dish with nothing in the fridge cannot be ordered; Jill orders one herself only on the first two days); the rewrite of 2026-10-06 from docs/audit/2026-10-06/ws5_manual.md: the first card is how a day is played; only what the screen does not tell and a player needs to know stays (what the screen already says, how the game was built, old saves and stories still to come left it); a space, and a story's own entry, comes into it when it is there */
  {ic:"🍳",h:"一天怎麼玩",sum:"第一次玩，先看這一張。",pts:[
   ["一天","開店前選今天的菜單、備料 → 17:00 開店 → 21:30 打烊，客人吃完就結算 → 用今天賺的錢在商店買東西 → 準備下一天。前兩天開店時，遊戲會自動幫你補好備料（照價付）。"],
+  ["髒盤子","收桌時，盤子、杯子會被拿回廚房，放進水槽前的髒盤車（最多 10 個）。車滿了，吃完的桌子要等：點髒盤車，就有人去洗。清潔員和秀琴阿姨會自己洗，服務生快滿了才洗。"],
   ["營業中","客人會自己找空桌坐。桌上出現紅色「!」：點桌子點餐。到廚房點訂單上的菜，它下一步的位置會亮起來，點那裡 Jill 就去做；裝盤時亮的是菜本身。菜下的小字是流程，粗體是現在這站，小名字是誰在做；做好的一站在原地等，不會壞。銀色餐蓋：點桌子上菜。金幣：點桌子收錢；客人走了再點一次收桌。"],
   ["員工","請了廚師、服務生、清潔員，他們會自己接工作；廚師只接自己會的位置（員工頁寫著每個人的）。廚師還在走過去時，點他要去的位置就換 Jill 做。服務生一次端兩盤起，等級越高端越多、一趟送越多桌。Jill 有空時會回房間坐一下，你點桌子她就回來。"],
   ["故事","重要的故事發生時，店裡會整個停住；一句一句點著看完，店才接著營業。錯過的都在「餐廳日誌」。"],
@@ -10390,7 +10555,7 @@ function showGuide(){sub='guide';show(`<div class="sheet tall"><div class="sh-to
 /* ================= input ================= */
 function scenePt(e){const r=sc.getBoundingClientRect();return{x:(e.clientX-r.left-SV.ox)/SV.s,y:(e.clientY-r.top-SV.oy)/SV.s}}
 /* v2.2 X: with a mouse, the cursor says what can be tapped — the same targets as the tap below, nothing else */
-function roomHot(p){if(room==='kitchen'){if(R&&!paused&&phase==='service'&&hitStation(p)>=0)return true;const f=KR.fridge;if(p.x>=f.x-4&&p.x<=f.x+f.w+4&&p.y>=f.y-8&&p.y<=f.y+f.h+12)return true;if(S.rooms&&S.rooms.cooler){const k=KR.cooler;if(p.x>=k.x-4&&p.x<=k.x+k.w+4&&p.y>=k.y-8&&p.y<=k.y+k.h+12)return true}if(p.y>LH-70&&Math.abs(p.x-200)<60)return true;if(homeKDoorHit(p))return true;return false}
+function roomHot(p){if(room==='kitchen'){if(R&&!paused&&phase==='service'&&(hitStation(p)>=0||ddHit(p)))return true;const f=KR.fridge;if(p.x>=f.x-4&&p.x<=f.x+f.w+4&&p.y>=f.y-8&&p.y<=f.y+f.h+12)return true;if(S.rooms&&S.rooms.cooler){const k=KR.cooler;if(p.x>=k.x-4&&p.x<=k.x+k.w+4&&p.y>=k.y-8&&p.y<=k.y+k.h+12)return true}if(p.y>LH-70&&Math.abs(p.x-200)<60)return true;if(homeKDoorHit(p))return true;return false}
  if(room==='home'){if(!paused&&homeHitCat(p))return true;if(homeDoorHit(p))return true}
  if(room==='side'){const a=SIDE_L.arch;if(p.x>=a.x-8&&p.x<=a.x+a.w+8&&p.y>=a.y-6&&p.y<=a.y+112)return true}if(room==='front'&&R&&phase==='service'&&frontQueueAt(p))return true;if(room==='front'&&Math.abs(p.x-FR.door.x)<30&&p.y>176&&p.y<276)return true;if(room==='front'&&roomOpen('lounge')&&Math.abs(p.x-FR.ldoor.x)<22&&p.y>176&&p.y<276)return true;if(room==='lounge'&&loungeLv()&&Math.abs(p.x-LG.door.x)<20&&p.y>4&&p.y<112)return true;if(hitRegular(p)&&!paused)return true;if(!R||paused||phase!=='service')return false;
  for(const t of R.tables){if((t.room||'main')!==room)continue;if(t.pdr?pdHit(p):Math.hypot((p.x-t.x)*.85,p.y-(t.y-16))<(t.seats===4?46:40))return true}return false}

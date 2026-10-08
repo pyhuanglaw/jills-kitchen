@@ -134,3 +134,189 @@ def workflow_the_pass_is_a_buffer_and_a_full_pass_is_a_quiet_wait(b, port, targe
     check(g.ev("wfRowOK(wfNode(%d))" % nid) and g.ev("wfAssign(wfNode(%d),'jill')" % nid), 'room on the pass: the plating starts')
     check(not g.errors, g.errors[:3]); g.close()
 
+
+
+# ---------------------------------------------------------------- the dirty dishes, on the same hands (the user's Part 1)
+
+# a day with a cleaner (LV1) and nothing else of the floor's: guests kept patient, the kitchen left to the test
+def _dirty_day(b, port, target, seed, crew="{id:'c1',role:'cleaner',name:'阿芳',lv:1,duty:'clean',since:1,days:3,pool:'restaurant'}"):
+    g = Game(b, port, target, seed=seed, manual=True, viewport={'width': 390, 'height': 844})
+    _rt.install_bot(g)
+    g.click('[data-act=open]'); g.page.wait_for_timeout(80)
+    g.ev("S.level=2;S.tables=4;S.money=5000;S.crew=[%s];save();window.__noXQH=1" % crew)
+    start_day(g)
+    g.ev("R.sched=[];R.si=0")   # nobody new comes in: the test sets the tables
+    return g
+
+
+# a table left with plates on it (the guests gone): n of them
+DIRTY = "((i,n,d)=>{const t=R.tables[i];t.group=null;t.dirty=true;t.plates=[];for(let k=0;k<n;k++)t.plates.push({d:d||(k%3===2?'coffee':'friedrice'),q:'P',want:0});R.tv++;return t.i})"
+TICK = "(n=>{for(let i=0;i<n;i++){for(const q of R.groups)q.pat=1;__tick(1000/30)}})"
+
+
+@test
+def workflow_dirty_dishes_go_back_by_hand_to_the_tub(b, port, target):
+    """Part 1 (一、六、七、八、acceptance 1–5, 8–11): a table left with three plates is cleared by the cleaner — the plates leave
+    the table into her hands (a stack, not nothing), she walks through the kitchen door to the cart in front of the sink and
+    puts them in: 髒餐具 3/10. Tapping the cart sends someone to wash: she walks to the sink, takes two, washes them one by
+    one; the count goes 3 → 2 → 1 → 0, one at a time, never all at once."""
+    g = _dirty_day(b, port, target, 9201)
+    ti = g.ev(DIRTY + "(0,3)")
+    seen = {'hands': 0, 'kitchen': False, 'count': []}
+    for _ in range(300):
+        g.ev(TICK + "(3)")
+        st = json.loads(g.ev("JSON.stringify({h:handsN(R.cw.c1||{},'dirty'),room:R.cw.c1&&R.cw.c1.room,n:ddCount(),dirty:R.tables[%d].dirty,left:R.tables[%d].plates.length})" % (ti, ti)))
+        seen['hands'] = max(seen['hands'], st['h'])
+        if st['h'] and st['room'] == 'kitchen': seen['kitchen'] = True
+        if st['n'] == 3 and not st['h']: break
+    check(seen['hands'] == 3 and seen['kitchen'], f'the three plates in her hands, carried into the kitchen: {seen}')
+    check(g.ev("ddCount()") == 3 and g.ev("ddS().n.length") == 3 and not g.ev("R.tables[%d].dirty" % ti), 'in the tub: 3/10, the table clear')
+    check(json.loads(g.ev("JSON.stringify(ddS().n.slice().sort())")) == sorted(['plate', 'plate', 'cup']), 'a cup and two plates, as they were served')
+    # washing: the player taps the cart
+    g.ev("setRoom('kitchen')")
+    C = json.loads(g.ev("JSON.stringify(ddCart())"))
+    o = json.loads(g.ev("JSON.stringify((()=>{const r=sc.getBoundingClientRect();return{x:r.left+SV.ox+%f*SV.s,y:r.top+SV.oy+%f*SV.s}})())" % (C['x'], C['y'] - 16)))
+    g.page.mouse.click(o['x'], o['y']); g.page.wait_for_timeout(40)
+    check(g.ev("ddWasher()") == 'c1', 'the cart tapped: the cleaner is sent to wash')
+    counts, at_sink = [], False
+    for _ in range(400):
+        g.ev(TICK + "(2)")
+        n = g.ev("ddCount()"); at_sink = at_sink or g.ev("ddWasherAt()")
+        if not counts or counts[-1] != n: counts.append(n)
+        if n == 0: break
+    check(at_sink and counts == [3, 2, 1, 0], f'at the sink, one at a time: {counts}')
+    check(g.ev("(R.st.dd||{}).wash") == 3 and g.ev("(R.st.dd||{}).in") == 3, 'the evening counts three in, three washed')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def workflow_a_full_tub_holds_the_table_and_never_the_plating(b, port, target):
+    """「10/10 後不能再完成新收桌」 and 「不會因此阻止 Cooking PLATING」 (acceptance 6, 7, 13): with the tub full, a table left with
+    plates stays dirty — nobody takes its plates (they never vanish), Jill sent to it comes back without, it cannot be
+    seated — while a finished dish can still be plated (no clean-plate count). Washed down to 9, the table is cleared."""
+    g = _dirty_day(b, port, target, 9202)
+    g.ev("ddS().n=Array(10).fill('plate');ddS().wash={who:'x',ph:'take',t:0};R.tv++")   # full, and the sink taken (nobody can make room yet)
+    ti = g.ev(DIRTY + "(1,2)")
+    g.ev(TICK + "(240)")
+    st = json.loads(g.ev("JSON.stringify({dirty:R.tables[%d].dirty,left:R.tables[%d].plates.length,n:ddCount(),hands:handsN(R.cw.c1||{},'dirty'),free:ddFree()})" % (ti, ti)))
+    check(st['dirty'] and st['left'] == 2 and st['n'] == 10 and st['hands'] == 0, f'eight seconds later: the table still has its two plates, nobody holds any: {st}')
+    g.ev("tapTable(R.tables[%d])" % ti)
+    check(not g.ev("jillTargets(%d)" % ti), 'Jill is not sent to a table whose dishes have nowhere to go (the toast says the tub is full)')
+    check(g.ev("freeTableFor({size:1,state:'queue'})!==R.tables[%d]" % ti), 'it cannot be seated')
+    # the plating does not wait for plates: a wok of rice done, plated
+    nid = g.ev("""(()=>{const tk={id:999,g:null,items:[{d:'friedrice',st:'cooking',q:null,want:0,picked:false,set:null}],no:1};const n=wfNew('friedrice');n.its.push({tk,it:tk.items[0]});n.n=1;tk.items[0].wf=n.id;wfList().push(n);
+      const s=R.slots.find(x=>x.type==='stove');n.st='ready';n.si=0;n.slot=s;s.wf=n;return n.id})()""")
+    check(g.ev("wfAssign(wfNode(%d),'jill')" % nid) and g.ev("wfNode(%d).st" % nid) == 'dish', 'a full tub: the plating still starts, plates from the rack')
+    g.ev("wfList().splice(wfList().indexOf(wfNode(%d)),1);R.slots.forEach(s=>{if(s.wf&&s.wf.id===%d)s.wf=null})" % (nid, nid))
+    # the sink free again: the cleaner washes (the stack is high) and clears the table when there is room
+    g.ev("ddS().wash=null;R.tv++")
+    for _ in range(600):
+        g.ev(TICK + "(3)")
+        if not g.ev("R.tables[%d].dirty" % ti): break
+    check(not g.ev("R.tables[%d].dirty" % ti), 'room in the tub: the table is cleared')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def workflow_washing_can_stop_halfway_and_the_rest_waits(b, port, target):
+    """「洗滌可以中斷… 剩下 6/10 就留在 Dirty Dish Area。之後其他人可以繼續洗。不要重置」 (acceptance 12): washing six, the one
+    at the sink is called away after the ones in hand; what is left stays in the tub, counted; the next one to wash goes on
+    from there."""
+    g = _dirty_day(b, port, target, 9203)
+    g.ev("ddS().n=['plate','plate','cup','plate','bowl','glass'];R.tv++;ddTap()")
+    for _ in range(600):
+        g.ev(TICK + "(2)")
+        if g.ev("ddCount()") <= 4: break
+    g.ev("ddS().wash.stop=1")
+    for _ in range(300):
+        g.ev(TICK + "(2)")
+        if not g.ev("ddWasher()"): break
+    left = g.ev("ddCount()")
+    check(not g.ev("ddWasher()") and 1 <= left <= 4 and g.ev("ddS().n.length") == left, f'called away: the rest stays in the tub, counted: {left}')
+    g.ev(TICK + "(150)")
+    check(g.ev("ddCount()") == left, 'and it is still there five seconds later (nothing reset, nothing washed by itself)')
+    g.ev("ddTap()")
+    for _ in range(600):
+        g.ev(TICK + "(2)")
+        if g.ev("ddCount()") == 0: break
+    check(g.ev("ddCount()") == 0 and g.ev("(R.st.dd||{}).wash") == 6, 'the next washing goes on from there: all six')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def workflow_waiters_keep_serving_and_one_at_most_washes(b, port, target):
+    """「不要讓 waiter 在有大量菜等著送時，所有人一起跑去洗碗」 (acceptance 14): two waiters and no cleaner, the tub at 9 of 10 and
+    plates waiting on the pass — neither goes to wash while there are plates for the guests; with nothing for the guests
+    one (never two) washes; Jill and the cooks never wash by themselves."""
+    g = _floor_day(b, port, target, 9204, 4, ",{id:'w2',role:'waiter',name:'阿哲',lv:3,duty:'both',since:1,days:3,pool:'restaurant'},{id:'k1',role:'chef',name:'阿德師傅',lv:3,duty:'stove',since:1,days:3,pool:'restaurant'}")
+    tks = json.loads(g.ev(READY2))
+    check(tks, 'plates on the pass for two tables')
+    g.ev("ddS().n=Array(9).fill('plate');R.tv++")
+    washed_while_plates = []
+    for _ in range(200):
+        g.ev("for(const q of R.groups)q.pat=1;__tick(1000/30)")
+        w = g.ev("ddWasher()")
+        plates = g.ev("R.tickets.some(t=>!t.claim&&t.items.some(i=>i.st==='ready'&&!i.picked))")   # plates nobody is coming for
+        if w and plates: washed_while_plates.append(w)
+    check(not washed_while_plates, f'no waiter at the sink while plates wait with nobody coming for them: {washed_while_plates[:3]}')
+    # nothing for the guests now: one of them washes, the other does not
+    g.ev("R.sched=[];R.si=0;for(const q of R.groups.slice())leaveGroup(q,'ok');for(const t of R.tables){t.dirty=false;t.plates=[]}")
+    whos = set()
+    for _ in range(600):
+        g.ev("__tick(1000/30)")
+        w = g.ev("ddWasher()")
+        if w: whos.add(w)
+        n_wash = g.ev("Object.values(R.cw).filter(w=>w.task&&w.task.k==='wash').length")
+        check(n_wash <= 1, 'never two at the sink')
+        if g.ev("ddCount()") < 8: break
+    check(whos and whos <= {'w1', 'w2'}, f'a waiter washes when nothing is waiting for the guests: {whos}')
+    check(g.ev("ddWasher()") != 'jill' and not g.ev("R.jk&&handsN(R.jk,'dirty')"), 'Jill never by herself')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def workflow_the_dirty_dishes_survive_a_checkpoint(b, port, target):
+    """「save/reload dirty dish state 不 duplication / disappearance」 (acceptance 16, 17): mid-evening — dishes in the tub, some
+    in the cleaner's hands on the way, two at the sink being washed — the checkpoint brings back the same count, the same
+    hands, the same washing; a checkpoint from before the dirty dishes (no tub in it) comes back with an empty tub."""
+    g = _dirty_day(b, port, target, 9205)
+    g.ev(DIRTY + "(0,3)"); g.ev(DIRTY + "(1,2)")
+    for _ in range(400):
+        g.ev(TICK + "(2)")
+        if g.ev("handsN(R.cw.c1,'dirty')>0&&R.cw.c1.task&&R.cw.c1.task.k==='dump'"): break
+    g.ev("ddS().n.push('plate','plate','cup','glass');R.tv++")
+    before = json.loads(g.ev("JSON.stringify({n:ddCount(),tub:ddS().n.length,hands:handsN(R.cw.c1,'dirty'),dirty:R.tables.filter(t=>t.dirty).map(t=>[t.i,t.plates.length])})"))
+    check(before['hands'] > 0, f'caught on the way: {before}')
+    check(g.ev("checkpointSave('manual')"), 'the checkpoint is written')
+    g.reload(); _rt.install_bot(g)
+    g.click('[data-act=open]')
+    after = json.loads(g.ev("JSON.stringify({n:ddCount(),tub:ddS().n.length,hands:handsN(R.cw.c1,'dirty'),dirty:R.tables.filter(t=>t.dirty).map(t=>[t.i,t.plates.length])})"))
+    check(after == before, f'the same dishes, in the same places: {before} / {after}')
+    # an older checkpoint (no tub in it): an empty tub, and the evening goes on
+    g.ev("(()=>{const cp=JSON.parse(JSON.stringify(S.checkpoint));delete cp.snap.misc.dd;restoreService(cp)})()")   # (a reload writes a new checkpoint on the way out: the old one is restored directly)
+    check(g.ev("phase") == 'service' and g.ev("ddS().n.length") == 0, 'a checkpoint from before: an empty tub')
+    g.ev(TICK + "(60)")
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def workflow_the_cart_shows_how_full_it_is(b, port, target):
+    """「場景 visual 在 0、低、中、高、滿容量有明顯差異」 and 「mobile touch target 好點」 (acceptance 18, 19): the cart drawn at 0,
+    2, 5, 8 and 10 is a different picture each time (more of it filled); the place to tap is at least 40 px each way on a phone."""
+    g = _dirty_day(b, port, target, 9206)
+    g.ev("setRoom('kitchen')")
+    C = json.loads(g.ev("JSON.stringify(ddCart())"))
+    shots = []
+    for n in (0, 2, 5, 8, 10):
+        g.ev(f"ddS().n=[];for(let i=0;i<{n};i++)ddS().n.push(['plate','plate','cup','bowl','glass'][i%5]);R.tv++;forceDraw=true;__tick(1000/30)")
+        g.page.wait_for_timeout(40)
+        r = json.loads(g.ev("JSON.stringify((()=>{const r=sc.getBoundingClientRect();return{x:r.left+SV.ox+%f*SV.s,y:r.top+SV.oy+%f*SV.s,s:SV.s}})())" % (C['x'] - 18, C['y'] - 60)))
+        shots.append(g.page.screenshot(clip={'x': r['x'], 'y': r['y'], 'width': 40 * r['s'], 'height': 70 * r['s']}))
+    from io import BytesIO
+    from PIL import Image, ImageChops
+    ims = [Image.open(BytesIO(x)).convert('RGB') for x in shots]
+    diffs = [sum(ImageChops.difference(ims[i], ims[i + 1]).convert('L').point(lambda v: 255 if v > 24 else 0).histogram()[255:]) for i in range(4)]
+    check(all(d > 40 for d in diffs), f'each step looks different on the cart: {diffs}')
+    s = g.ev("SV.s")
+    check(40 * s >= 40 and 44 * s >= 40, f'the cart is a big enough place to tap: {40 * s:.0f} × {44 * s:.0f} px')
+    check(not g.errors, g.errors[:3]); g.close()
