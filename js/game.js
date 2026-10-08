@@ -9975,11 +9975,10 @@ function crewWageAt(role,lv){const L=clamp(Math.round(lv||1),1,5);return Math.ro
 function crewWage(m){return crewWageAt(m.role,m.lv)}
 function crewWages(){return(S.crew||[]).reduce((a,m)=>a+crewWage(m),0)}
 function chefFor(type){let b=null;for(const m of S.crew||[])if(m.role==='chef'&&m.duty===type&&crewHere(m)&&(!b||m.lv>b.lv))b=m;return b}
-/* What a chef is trusted with: LV1 simple dishes, LV2 ordinary ones, LV3+ everything up to the hardest recipes and
-   dishes Jill started herself. The signature dish and a recipe's very first plate always stay with Jill. */
-/* What a chef can cook: dishes up to their level's difficulty (LV3 handles everything ordinary), and only
-   dishes Jill has made at least once. The Signature is Jill's own until a chef reaches LV5 — then she has
-   taught it. (Jill still makes the first portion of every new dish herself.) */
+/* What a chef can cook: dishes up to their level's difficulty (LV1 simple, LV2 ordinary, LV3+ everything up to the
+   hardest recipes); the Signature only from LV5 — Jill has taught it by then. A dish's first plate is not Jill's alone
+   any more (rc8, the player 2026-10-03). In the new kitchen who takes which step — plating included — goes by the
+   station proficiency (docs/cooking/ARCHITECTURE.md, M7), never by a rule that Jill goes first. */
 function chefCan(m,d){const D=DISH(d);if(!D)return false;if(D.sig||isSig(d))return m.lv>=5;return D.diff<=Math.min(3,m.lv)}   /* rc8 (the player, 2026-10-03: 「不管是不是第一次做那道菜，有廚師她就不用做」): a dish's first plate is no longer Jill's alone */
 function chefLock(m,d){const D=DISH(d);if(!D)return'';if(D.sig||isSig(d))return m.lv>=5?'':'LV5 進階訓練';return D.diff>Math.min(3,m.lv)?`LV${D.diff}`:''}
 function chefHandles(s){const j=s.job;if(!j)return null;if(j.chef){/* 2.0: the cook who started it keeps it — a second cook of the same duty is a real second pair of hands */const own=(S.crew||[]).find(m=>m.id===j.chef&&m.role==='chef');if(own&&crewHere(own))return own}const ch=chefFor(s.type);if(!ch)return null;return ch.lv>=3&&chefCan(ch,j.d)?ch:null}
@@ -10343,7 +10342,7 @@ function fireIncident(k){switch(k){
  case'broken':{const cand=R.slots.filter(s=>!s.job&&!s.wf&&!s.broken&&s.type!=='prep');if(!cand.length)return false;const s=pick(cand);s.broken=true;s.fix=0;banner('設備故障！',`${ST_N[s.type]}${s.no} 冒煙了`,'fire');toast('連點那台設備把它修好');sfx.burnt();return true}
  case'thief':{const ds=menuList().filter(d=>(S.stock[d]||0)>=2).sort((a,b)=>S.stock[b]-S.stock[a]);if(!ds.length)return false;const d=ds[0];const n=Math.min(4,S.stock[d]);S.stock[d]-=n;R.thief={x:130,y:FB-12,d,n,caught:false,look:{skin:'#E2AE88',hair:'#1E1E24',hs:0,top:'#2A2A30',acc:'shades',pants:'#1B1B20'}};banner('食材被偷了！','快點那個小偷！','fire');sfx.angry();
   const cat=CATS&&CATS.find(c=>c.perch<0&&!c.hidden&&!['jump','visit'].includes(c.st));if(cat){releaseSpots(cat);cat.guest=null;cat.run=1;catWalk(cat,R.thief.x,R.thief.y,'rest');R.chaser=cat}return true}
- case'inspector':{factSet('inspection');/* v2.3 */R.insp={t:0,dur:22,x:DOOR.x,y:DOOR.y+20,tx:224,ty:204,b0:R.st.q.B,out:false};banner('衛生檢查員突襲！','22 秒內把髒桌子收乾淨、別燒焦','fire');sfx.door();logLine('衛生檢查員','衛生局，例行檢查。','g');portraitLine('named:衛生檢查員','衛生局，例行檢查。');return true}
+ case'inspector':{factSet('inspection');/* v2.3 */R.insp={t:0,dur:22,x:DOOR.x,y:DOOR.y+20,tx:224,ty:204,b0:R.st.q.B,out:false};banner('衛生檢查員突襲！','22 秒內把髒桌子收乾淨','fire')/* v2.5: nothing burns in the new kitchen (docs/cooking/ARCHITECTURE.md, 燒焦) */;sfx.door();logLine('衛生檢查員','衛生局，例行檢查。','g');portraitLine('named:衛生檢查員','衛生局，例行檢查。');return true}
  case'viprush':{for(let i=0;i<3;i++)R.sched.splice(R.si,0,{t:R.t+i*2.5,type:i===1?'gourmet':'vip',size:2});R.sched.sort((a,b)=>a.t-b.t);banner('饕客尖峰時刻！','一群 VIP 饕客湧進來了','fire');return true}
  case'wave':{for(let i=0;i<3;i++)R.sched.splice(R.si,0,Object.assign({t:R.t+i*3},rollGuest()));schedTailSort();noteLine('外面一下子來了一群人');return true}
  case'lucky':{const cand=R.groups.filter(g=>g.table!=null&&['eat','check'].includes(g.state)&&anonG(g));if(!cand.length)return false;const g=pick(cand);const t=R.tables[g.table];const tip=Math.round(80+Math.random()*120);S.money+=tip;S.lifetime+=tip;R.st.tips+=tip;quote(g,pickT(['不用找了。','這個給你們，辛苦了。','多的當小費。']));addFloat(t.x,t.y-58,'小費 +'+fmt(tip),'#BFE3A8',1,t.room);sfx.cash();return true}
