@@ -87,6 +87,18 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .it.later,.it.pour,.it.round{opacity:.55;border:1.5px dashed rgba(46,32,25,.28);filter:grayscale(.5)}   /* rc7.6: a chef's night course still to come; its glass, poured when its plate is up; a glass of Ken's next round */
 .it.order{border:2px dashed #C99A45;opacity:.8}
 .it .dl{position:absolute;left:-4px;right:-4px;bottom:-5px;font-size:8px;font-weight:800;background:#C99A45;color:#fff;border-radius:5px;padding:1px 0;text-align:center}
+/* v2.5 (the user, 2026-10-07: the player never has to remember the next step): under a dish on its ticket, its workflow in
+   one quiet line — 熱›裝 — with the step it is on picked out; the selected dish's ticket item is ringed */
+.it .wf{position:absolute;left:-5px;right:-5px;bottom:-6px;display:flex;justify-content:center;align-items:center;font-size:7.5px;font-weight:800;line-height:10px;background:rgba(255,248,236,.97);color:#A8998A;border-radius:5px;box-shadow:0 0 0 1px rgba(46,32,25,.16);white-space:nowrap;pointer-events:none}
+.it .wf b{color:#2E2019;background:#F2D48C;border-radius:3px;padding:0 1.5px;font-weight:800}
+.it .wf i{font-style:normal}.it .wf i.done{color:#6E9A5C}.it .wf u{text-decoration:none;color:#C4B8A8;padding:0 .5px}
+.it.wsel{box-shadow:0 0 0 2px #E6C27A,0 0 8px rgba(230,194,122,.5)}
+/* v2.5: the selected work in words, at the foot of the scene (where the cooking panel used to open) */
+#wfGuide{position:absolute;left:50%;transform:translateX(-50%);bottom:10px;z-index:5;width:max-content;max-width:calc(100% - 24px);padding:6px 12px 7px;border-radius:12px;background:rgba(255,248,236,.95);color:var(--ink);box-shadow:0 6px 18px rgba(0,0,0,.28);font-size:12px;line-height:1.4;text-align:center;pointer-events:none}
+#wfGuide b{font-size:13px}
+#wfGuide .wfl{margin-top:1px;font-weight:700;color:var(--ink3)}#wfGuide .wfl span.done{color:#5E8F4E}#wfGuide .wfl span.now{color:var(--ink)}#wfGuide .wfl i{font-style:normal;margin:0 4px;color:var(--ink3)}
+#wfGuide .wfn{margin-top:1px;font-weight:800;color:#8E6422}
+#wfGuide:not([hidden]) ~ #toasts{transform:translateY(-62px)}
 .stars{color:#C99A45;font-size:11px;letter-spacing:1px;margin-left:2px}
 .lab .opts button{display:inline-flex;align-items:center;gap:4px;padding:5px 9px 5px 5px}
 .lab .opts img{width:22px;height:22px}
