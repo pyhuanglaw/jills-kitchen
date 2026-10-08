@@ -1082,7 +1082,7 @@ def waiter_serves_ready_food(b, port, target):
       for(const s of R.slots){if(s.broken){tapStation(R.slots.indexOf(s));continue}const j=s.job;if(!j||!j.step)continue;const k=j.step;if(chefHandles(s))continue;
        if(k.t==='add'){const id=k.left[0];if(id)actIng(s,id)}else if(k.t==='zone'){if(k.p>=k.z.c)actZone(s)}else if(k.t==='hold'){k.hold=true;R.holdSlot=s;k.level=(k.a+k.b)/2;holdEnd()}else if(k.t==='dose'){if(k.cnt<k.min)actDose(s);else actDoseDone(s)}}
       return true}""")
-    g.ev("window.__srv={waiter:0,jill:0};const s0=serveItems;serveItems=function(g,items){const byW=R.cw&&Object.values(R.cw).some(w=>w.carry&&w.carry.length&&items.every(x=>w.carry.includes(x.it)));if(byW)__srv.waiter++;else __srv.jill++;return s0.apply(this,arguments)}")
+    g.ev("window.__srv={waiter:0,jill:0};const s0=serveItems;serveItems=function(g,items){const byW=R.cw&&Object.values(R.cw).some(w=>w.hands&&w.hands.length&&items.every(x=>w.hands.some(e=>e.it===x.it)));if(byW)__srv.waiter++;else __srv.jill++;return s0.apply(this,arguments)}")
     g.ev("S.day=6;S.level=2;S.tables=5;S.money=8000;S.crew=[{id:'w1',role:'waiter',name:'小美',lv:2,duty:'both'}];unlockDish('coffee');for(const d of S.unlocked)S.stock[d]=30")
     g.click('[data-act=open]'); start_day(g)
     for _ in range(300):
@@ -1289,14 +1289,14 @@ def service_checkpoint_resumes_the_day(b, port, target):
     g.ev("S.day=6;S.level=2;S.tables=5;S.money=6000;S.eq.bar=1;S.eq.oven=1;for(const d of['coffee','pasta','salad','burger'])unlockDish(d);for(const d of S.unlocked)S.stock[d]=30;S.crew=[{id:'w1',role:'waiter',name:'小美',lv:2,duty:'both'},{id:'c1',role:'cleaner',name:'阿明',lv:1,duty:'clean'}];save()")
     g.click('[data-act=open]'); start_day(g)
     g.ev("__play(1500,0,'R.t>40&&R.groups.filter(q=>q.table!=null).length>=2&&R.slots.some(s=>s.job)')")
-    before = g.ev(r"""JSON.stringify({t:+R.t.toFixed(2),groups:R.groups.filter(q=>!q.gone).map(q=>[q.id,q.state,q.table,q.x|0,q.y|0,q.ticket?q.ticket.id:null]),tickets:R.tickets.map(k=>[k.id,k.g.id,k.items.map(i=>i.d+':'+i.st)]),jobs:R.slots.map(s=>s.job?[s.job.d,s.job.si,s.job.step&&s.job.step.t,s.job.tk.id]:null),jill:[R.jill.x|0,R.jill.y|0,R.jill.q.slice(),R.jill.carry.length],cw:Object.keys(R.cw).map(k=>[k,R.cw[k].x|0,R.cw[k].y|0,R.cw[k].task?R.cw[k].task.k:null]),st:R.st.rev+'/'+R.st.tips+'/'+R.st.guests,money:S.money,tables:R.tables.map(t=>[t.group?t.group.id:null,t.dirty])})""")
+    before = g.ev(r"""JSON.stringify({t:+R.t.toFixed(2),groups:R.groups.filter(q=>!q.gone).map(q=>[q.id,q.state,q.table,q.x|0,q.y|0,q.ticket?q.ticket.id:null]),tickets:R.tickets.map(k=>[k.id,k.g.id,k.items.map(i=>i.d+':'+i.st)]),jobs:R.slots.map(s=>s.job?[s.job.d,s.job.si,s.job.step&&s.job.step.t,s.job.tk.id]:null),jill:[R.jill.x|0,R.jill.y|0,R.jill.q.slice(),R.jill.hands.length],cw:Object.keys(R.cw).map(k=>[k,R.cw[k].x|0,R.cw[k].y|0,R.cw[k].task?R.cw[k].task.k:null]),st:R.st.rev+'/'+R.st.tips+'/'+R.st.guests,money:S.money,tables:R.tables.map(t=>[t.group?t.group.id:null,t.dirty])})""")
     check(g.ev("checkpointSave('manual')"), 'checkpoint not written')
     check(g.ev("S.checkpoint&&S.checkpoint.day===S.day&&typeof S.checkpoint.snap==='object'"), 'checkpoint missing from the save')
     g.reload(); install_bot(g)
     check(g.page.is_visible('text=繼續營業'), 'the title should offer to continue today')
     g.click('[data-act=open]')
     check(g.ev("phase") == 'service' and g.ev("!paused"), 'did not resume into service')
-    after = g.ev(r"""JSON.stringify({t:+R.t.toFixed(2),groups:R.groups.filter(q=>!q.gone).map(q=>[q.id,q.state,q.table,q.x|0,q.y|0,q.ticket?q.ticket.id:null]),tickets:R.tickets.map(k=>[k.id,k.g.id,k.items.map(i=>i.d+':'+i.st)]),jobs:R.slots.map(s=>s.job?[s.job.d,s.job.si,s.job.step&&s.job.step.t,s.job.tk.id]:null),jill:[R.jill.x|0,R.jill.y|0,R.jill.q.slice(),R.jill.carry.length],cw:Object.keys(R.cw).map(k=>[k,R.cw[k].x|0,R.cw[k].y|0,R.cw[k].task?R.cw[k].task.k:null]),st:R.st.rev+'/'+R.st.tips+'/'+R.st.guests,money:S.money,tables:R.tables.map(t=>[t.group?t.group.id:null,t.dirty])})""")
+    after = g.ev(r"""JSON.stringify({t:+R.t.toFixed(2),groups:R.groups.filter(q=>!q.gone).map(q=>[q.id,q.state,q.table,q.x|0,q.y|0,q.ticket?q.ticket.id:null]),tickets:R.tickets.map(k=>[k.id,k.g.id,k.items.map(i=>i.d+':'+i.st)]),jobs:R.slots.map(s=>s.job?[s.job.d,s.job.si,s.job.step&&s.job.step.t,s.job.tk.id]:null),jill:[R.jill.x|0,R.jill.y|0,R.jill.q.slice(),R.jill.hands.length],cw:Object.keys(R.cw).map(k=>[k,R.cw[k].x|0,R.cw[k].y|0,R.cw[k].task?R.cw[k].task.k:null]),st:R.st.rev+'/'+R.st.tips+'/'+R.st.guests,money:S.money,tables:R.tables.map(t=>[t.group?t.group.id:null,t.dirty])})""")
     check(before == after, 'the restored day differs from the checkpoint:\n' + before + '\n' + after)
     # audit W3-01: the old checkpoint is consumed and the evening it brought back is saved at once as the new one (an evening
     # that began closing before the next periodic checkpoint was lost when the player left again)

@@ -3940,8 +3940,8 @@ def v24_rc74_the_lounges_new_bites(b, port, target):
       window.__LO=window.__LO||loungeOrder;loungeOrder=q=>q.__want||__LO(q);
       spawn({t:R.t,type:'office',size:2,lounge:1});const q=R.groups[R.groups.length-1];q.__want=['w_house','wings'];q.__probe=1;return q.table!=null?R.tables[q.table].room:null})()""")
     check(where == 'lounge', f'two guests sit straight down in the Lounge: {where}')
-    g.ev("""window.__carried=[];const sv0=serveItems;serveItems=function(q,list){for(const c of list){const it=c.it;if(it&&it.d==='wings'&&it.st==='ready'){const m=(S.crew||[]).find(m=>{const w=R.cw&&R.cw[m.id];return w&&w.carry&&w.carry.includes(it)});
-      __carried.push(m?[m.name,m.role,crewPool(m),!!waiterDuties(m).lounge,lgWaiterHere()]:(R.jill.carry.some(c0=>c0.it===it)?['Jill']:['?']))}}return sv0.apply(this,arguments)}""")   # rc8: who carried it, at the moment it reached the table (the walk from the end of the Lounge's bar is short)
+    g.ev("""window.__carried=[];const sv0=serveItems;serveItems=function(q,list){for(const c of list){const it=c.it;if(it&&it.d==='wings'&&it.st==='ready'){const m=(S.crew||[]).find(m=>{const w=R.cw&&R.cw[m.id];return w&&w.hands&&w.hands.some(e=>e.it===it)});
+      __carried.push(m?[m.name,m.role,crewPool(m),!!waiterDuties(m).lounge,lgWaiterHere()]:(R.jill.hands.some(c0=>c0.it===it)?['Jill']:['?']))}}return sv0.apply(this,arguments)}""")   # rc8: who carried it, at the moment it reached the table (the walk from the end of the Lounge's bar is short)
     claims = set(); cooks = set(); r = {}
     # v2.5 (docs/cooking/ARCHITECTURE.md §「改過的測試」): the wings go through the new kitchen (熱區 → 裝盤); who put them
     # on the fire is who took their 熱區 step, not an old station job's cook
@@ -3949,7 +3949,7 @@ def v24_rc74_the_lounges_new_bites(b, port, target):
     for _ in range(500):
         r = json.loads(g.ev("""JSON.stringify((()=>{const q=R.groups.find(q=>q.__probe);if(!q)return{gone:1};const tk=q.ticket;if(!tk)return{st:q.state};const it=tk.items.find(i=>i.d==='wings');
           const m=tk.claim!=null?S.crew.find(m=>m.id===tk.claim):null;const s=R.slots.find(s=>s.job&&s.job.it===it);const ch=s&&s.job.chef!=null?S.crew.find(m=>m.id===s.job.chef):null;
-          return{st:q.state,it:it&&it.st,picked:!!(it&&it.picked),claim:m?[m.name,m.role,crewPool(m),!!waiterDuties(m).lounge,lgWaiterHere()]:null,cook:s?s.type+':'+(ch?ch.role+':'+crewPool(ch):'jill'):null,jill:R.jill.carry.some(c=>c.tk===tk)}})())"""))
+          return{st:q.state,it:it&&it.st,picked:!!(it&&it.picked),claim:m?[m.name,m.role,crewPool(m),!!waiterDuties(m).lounge,lgWaiterHere()]:null,cook:s?s.type+':'+(ch?ch.role+':'+crewPool(ch):'jill'):null,jill:R.jill.hands.some(c=>c.tk===tk)}})())"""))
         if r.get('claim') and r.get('picked'): claims.add(tuple(r['claim']))   # who has the plate (the bartender's claim is the glass)
         if r.get('cook'): cooks.add(r['cook'])
         for c in json.loads(g.ev("JSON.stringify(__wcook)")): cooks.add(c)
@@ -4090,8 +4090,8 @@ def v24_rc75_the_pizza_oven_one_more_cook_and_the_bar_pizza(b, port, target):
       for(const t of R.tables)if(t.room==='lounge'&&t.kind!=='bar'&&!t.group){t.dirty=false;t.claim=null;t.plates=[]}
       window.__LO=window.__LO||loungeOrder;loungeOrder=q=>q.__want||__LO(q);spawn({t:R.t,type:'office',size:2,lounge:1});const q=R.groups[R.groups.length-1];q.__want=['w_house','pizza'];q.__probe=1;return q.table!=null?R.tables[q.table].room:null})()""")
     check(where == 'lounge', f'two guests in the Lounge: {where}')
-    g.ev("""window.__carried=[];const sv0=serveItems;serveItems=function(q,list){for(const c of list){const it=c.it;if(it&&it.d==='pizza'&&it.st==='ready'){const m=(S.crew||[]).find(m=>{const w=R.cw&&R.cw[m.id];return w&&w.carry&&w.carry.includes(it)});
-      __carried.push(m?[m.name,m.role,crewPool(m),!!waiterDuties(m).lounge,lgWaiterHere()]:(R.jill.carry.some(c0=>c0.it===it)?['Jill']:['?']))}}return sv0.apply(this,arguments)}""")   # rc8: who carried it, at the moment it reached the table (the walk from the end of the Lounge's bar is short)
+    g.ev("""window.__carried=[];const sv0=serveItems;serveItems=function(q,list){for(const c of list){const it=c.it;if(it&&it.d==='pizza'&&it.st==='ready'){const m=(S.crew||[]).find(m=>{const w=R.cw&&R.cw[m.id];return w&&w.hands&&w.hands.some(e=>e.it===it)});
+      __carried.push(m?[m.name,m.role,crewPool(m),!!waiterDuties(m).lounge,lgWaiterHere()]:(R.jill.hands.some(c0=>c0.it===it)?['Jill']:['?']))}}return sv0.apply(this,arguments)}""")   # rc8: who carried it, at the moment it reached the table (the walk from the end of the Lounge's bar is short)
     seen = set(); shot = False; r = {}
     # v2.5 (docs/cooking/ARCHITECTURE.md §「改過的測試」): the bar pizza goes 備料 → 披薩烤爐 → 裝盤 in the new kitchen. The cook
     # who bakes it is who took its 披薩烤爐 step; it bakes in the oven's mouth while that step cooks by itself ('cook').
@@ -4543,7 +4543,7 @@ def v24_rc77_the_lounge_pours_kens_rounds(b, port, target):
     end of the bar's L, where it waits on a tray — never on the kitchen's pass, never fetched by the restaurant's floor.
     With no floor person in, the bartenders walk it over. Every round reaches every seat."""
     spy = """window.__kp=[];const s0=serveItems;serveItems=function(g,list){for(const c of list){const it=c.it;if(it&&it.ktp&&it.st==='ready'){const t=R.tables[g.table];
-      const m=(S.crew||[]).find(m=>{const w=R.cw&&R.cw[m.id];return w&&w.carry&&w.carry.includes(it)});const j=R.jill.carry.some(c0=>c0.it===it);
+      const m=(S.crew||[]).find(m=>{const w=R.cw&&R.cw[m.id];return w&&w.hands&&w.hands.some(e=>e.it===it)});const j=R.jill.hands.some(c0=>c0.it===it);
       __kp.push({bar:t.kind==='bar',role:m?m.role:(j?'jill':'?'),name:m?m.name:'',lg:m?crewPool(m):''})}}return s0.apply(this,arguments)};
       window.__pass=0;window.__tray=0;const u0=kenRounds;kenRounds=function(){const r=u0.apply(this,arguments);for(const tk of R.tickets)for(const it of tk.items)if(it.ktp&&it.st==='ready'&&!it.picked){__tray++;if(it.lbar||!tk.kt)__pass++}return r}"""
     for floor in (True, False):
@@ -4771,7 +4771,7 @@ def v24_rc8_the_bar_next_door_from_kens_question_to_jills_decision(b, port, targ
     load_save(g, 'player_day52.json')
     check(g.ev("!!fact('ken_wine_q')") and not g.ev("!!fact('tasting_night')") and g.ev("S.dylan.stage") == 2 and g.ev("barState()") == 'lin', 'the save: Ken has asked; no tasting yet; Dylan not revealed; her bar open')
     g.ev("window.__walked=[];const __so=sendOut;sendOut=function(q){if(q&&q.toBar&&barState()==='lin'&&!q.__w){q.__w=1;__walked.push({d:S.day,n:namedId(q)||q.type})}return __so.apply(this,arguments)}")
-    g.ev("window.__din=[];const __sv=serveItems;serveItems=function(q,list){for(const c of list||[]){const it=c.it;if(it&&DISH(it.d)&&DISH(it.d).wine){const m=(S.crew||[]).find(m=>{const w=R.cw&&R.cw[m.id];return w&&w.carry&&w.carry.includes(it)});__din.push({d:S.day,dinw:!!it.dinw,lbar:!!it.lbar,by:m?m.role:'jill',room:(R.tables[q.table]||{}).room||'main'})}}return __sv.apply(this,arguments)}")
+    g.ev("window.__din=[];const __sv=serveItems;serveItems=function(q,list){for(const c of list||[]){const it=c.it;if(it&&DISH(it.d)&&DISH(it.d).wine){const m=(S.crew||[]).find(m=>{const w=R.cw&&R.cw[m.id];return w&&w.hands&&w.hands.some(e=>e.it===it)});__din.push({d:S.day,dinw:!!it.dinw,lbar:!!it.lbar,by:m?m.role:'jill',room:(R.tables[q.table]||{}).room||'main'})}}return __sv.apply(this,arguments)}")
     log = _lin_play_days(g, 34, stop="!!fact('lin_closed')&&!!fact('lounge_project')")
     F = json.loads(g.ev("JSON.stringify(Object.fromEntries(['tasting_night','pairing_wine','lin_retiring','ken_where','jd_want','dylan_book','lin_viewing','lounge_project','lin_take','lin_closed'].map(k=>[k,fact(k)?fact(k).d:null])))"))
     E = json.loads(g.ev("JSON.stringify(Object.fromEntries(['ken_tasting','pairing_start','lin_retire','ken_where','jd_want','dylan_book','lin_viewing','lin_last','lounge_reveal'].map(k=>[k,evState(k).d||null])))"))
