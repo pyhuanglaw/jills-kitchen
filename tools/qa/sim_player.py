@@ -810,7 +810,7 @@ HUMAN_JS = r"""(()=>{if(window.__actHuman)return 'already';
    if(g.state==='order'&&!cov('order'))C.push([4,'order'+t.i+g.id,()=>tapTable(t),H.gap]);
    else if(g.state==='check'&&!cov('check'))C.push([2,'check'+t.i+g.id,()=>tapTable(t),H.gap]);
    else if(g.state==='wait'&&!cov('serve'))C.push([5,'serve'+t.i+g.id,()=>tapTable(t),H.gap])}
-  if(H.sts.length<H.max){let done=false;for(const tk of R.tickets){if(done)break;for(const it of tk.items)if(it.st==='pending'&&!chefCanAny(it.d)){C.push([4.5,'cook'+tk.id+'_'+tk.items.indexOf(it),()=>{if(startCook(tk,it,true)){const s2=R.slots.findIndex(x=>x.job&&x.job.it===it);if(s2>=0)H.sts.push(s2)}},H.gap]);done=true;break}}}
+  if(H.sts.length<H.max){let done=false;for(const tk of R.tickets){if(done)break;for(const it of tk.items)if(it.st==='pending'&&!(typeof isWF==='function'&&isWF(it.d))&&!chefCanAny(it.d)){C.push([4.5,'cook'+tk.id+'_'+tk.items.indexOf(it),()=>{if(startCook(tk,it,true)){const s2=R.slots.findIndex(x=>x.job&&x.job.it===it);if(s2>=0)H.sts.push(s2)}},H.gap]);done=true;break}}}
   /* v2.5: the new kitchen — Jill takes one step at a time, of the work no cook here can take; a dish done with its step goes
      on first (plating frees the fire), then the work that has waited longest. Seen like everything else (react) */
   if(typeof wfOpen==='function'&&!wfJillTask()){wfGather();const W=wfList().filter(n=>wfOpen(n)&&!wfStaffCan(n)&&(!WF_ST[wfNext(n)].slot||wfFreeSlot(wfNext(n))));W.sort((a,b)=>(b.st==='ready')-(a.st==='ready')||a.tr-b.tr);
