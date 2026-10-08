@@ -1,0 +1,59 @@
+rc85_the_crew_go_up_to_the_staff_room_in_a_busy_evening (tests/v24_tests.py) on the player's Day 92 save, six seeds on two builds.
+Why: the final regression of 2026-10-09 (114d5fb) failed it on its seed 9204: one of the floor went up in the whole evening
+(秀琴阿姨, about 30 minutes; .06 of the evening is about 16 minutes), the test wants two or more. Bisected: 9f86680 (the session's start), 2a9d1eb (every drink its own
+cup) and eac1f28 (the fifth batch) pass; b1bdfe2 (the sixth batch: the signature main and dessert with their own beats) fails.
+The sixth batch adds no simulation code, but a dish with its own beats on the fire is kept moving by the cook who put it on
+while he has nothing else to do (wfChefAttend, since the first batch) - the Day 92 save serves the signature main, so from
+b1bdfe2 the cooks stand at the stove for it (seed 9204: the signature is among the dishes being attended in 6 of 98 checks
+on b1bdfe2, never on eac1f28), walk from there to the next piece of work, and the evening's timings move.
+Tool: the test's own loop with another seed (scratchpad rc85_sweep.py; JK_GAME_JS = the build's js/game.js). Run 2026-10-08 23:35.
+A visit is (who, how long as a share of the evening); None = called back on the way.
+
+== eac1f28 (the fifth batch)
+seed 9204: PASS visits [('小茉', 0.12), ('Nina', 0.096), ('許葳', 0.104)] most 1  served 117
+seed 9205: PASS visits [('Kai', 0.08), ('阿哲', 0.092), ('Nina', 0.096)] most 1  served 112
+seed 9206: PASS visits [('Kai', 0.08), ('小威', 0.108), ('小彤', 0.104), ('安安', None)] most 1  served 110
+seed 9207: PASS visits [('Kai', 0.08), ('安安', 0.092), ('Nina', 0.096)] most 1  served 104
+seed 9208: PASS visits [('小茉', 0.12), ('安安', 0.092), ('安安', 0.09), ('Kai', None)] most 1  served 116
+seed 9209: PASS visits [('Kai', 0.08), ('阿哲', 0.092), ('Nina', 0.096)] most 1  served 107
+
+== b1bdfe2 (the sixth batch; the same simulation as 47dc17b)
+seed 9204: FAIL visits [('秀琴阿姨', 0.112)] most 1  served 113
+seed 9205: PASS visits [('Kai', 0.08), ('許葳', 0.104), ('安安', 0.092)] most 1  served 130
+seed 9206: PASS visits [('Kai', 0.08), ('安安', 0.092), ('小彤', 0.104)] most 1  served 103
+seed 9207: PASS visits [('Kai', 0.08), ('安安', 0.092), ('安安', 0.09), ('小彤', 0.104)] most 1  served 104
+seed 9208: PASS visits [('小茉', 0.12), ('安安', 0.092), ('小威', 0.108), ('小茉', 0.12)] most 1  served 107
+seed 9209: PASS visits [('Kai', 0.08), ('許葳', 0.104), ('Kai', 0.078), ('小威', 0.108)] most 1  served 119
+
+Seed 9204, the evening tenth by tenth (every 6th check of 15 ticks; idle floor = waiters and cleaners with nothing in hand):
+== eac1f28  (page errors: none)
+  0.0-0.1: idle floor avg  9.3 (min 8), at the door avg  0.4, up there 1, breaks so far 0
+  0.1-0.2: idle floor avg  7.5 (min 6), at the door avg  0.4, up there 1, breaks so far 1
+  0.2-0.3: idle floor avg  5.4 (min 3), at the door avg  0.8, up there 1, breaks so far 1
+  0.3-0.4: idle floor avg  3.8 (min 1), at the door avg  1.0, up there 1, breaks so far 2
+  0.4-0.5: idle floor avg  3.0 (min 1), at the door avg  1.4, up there 1, breaks so far 3
+  0.5-0.6: idle floor avg  1.8 (min 0), at the door avg  3.9, up there 1, breaks so far 3
+  0.6-0.7: idle floor avg  2.0 (min 1), at the door avg  6.4, up there 0, breaks so far 3
+  0.7-0.8: idle floor avg  1.5 (min 0), at the door avg  4.2, up there 0, breaks so far 3
+  0.8-0.9: idle floor avg  1.1 (min 0), at the door avg  1.5, up there 0, breaks so far 3
+  0.9-1.0: idle floor avg  3.2 (min 1), at the door avg  4.2, up there 0, breaks so far 3
+== b1bdfe2  (page errors: none)
+  0.0-0.1: idle floor avg  9.3 (min 8), at the door avg  0.4, up there 1, breaks so far 0
+  0.1-0.2: idle floor avg  7.4 (min 5), at the door avg  0.4, up there 1, breaks so far 1
+  0.2-0.3: idle floor avg  6.8 (min 5), at the door avg  0.8, up there 1, breaks so far 1
+  0.3-0.4: idle floor avg  3.0 (min 2), at the door avg  1.0, up there 0, breaks so far 1
+  0.4-0.5: idle floor avg  2.6 (min 0), at the door avg  1.4, up there 0, breaks so far 1
+  0.5-0.6: idle floor avg  1.1 (min 0), at the door avg  5.0, up there 0, breaks so far 1
+  0.6-0.7: idle floor avg  1.3 (min 0), at the door avg  6.8, up there 0, breaks so far 1
+  0.7-0.8: idle floor avg  0.6 (min 0), at the door avg  3.9, up there 0, breaks so far 1
+  0.8-0.9: idle floor avg  2.2 (min 0), at the door avg  1.1, up there 0, breaks so far 1
+  0.9-1.0: idle floor avg  2.0 (min 0), at the door avg  3.0, up there 0, breaks so far 1
+
+Reading:
+- The same evenings on both builds: three or four of the floor go up on every seed but one, each about 21-32 minutes, one at a time;
+  the guests served are in the same range (eac1f28 104-117, b1bdfe2 103-130). No page errors.
+- On 9204 the sixth batch's evening gave the first quiet stretch (0.1-0.3) to 秀琴阿姨, whose break was one of the longest, and the
+  restaurant filled from 0.4 (an average of one or two of the floor free): one visit. On the fifth batch the first break was
+  shorter and two more fitted before 0.5. A matter of which trajectory, not of fewer breaks.
+- The test's seed moves to 9205, which meets the test on both builds (3 visits each). What it checks is unchanged.
+
