@@ -1,0 +1,17 @@
+v2.4-rc8.8: the page built from the tag (6855053 bytes, sha256 c51a6be0f7a6) is inside the live HTML (6855605 bytes) byte for byte, js/game.js once; the host adds 552 bytes (its document skeleton)
+01_title.png: the title with the save: DAY 92 | {"phase":"title","day":92,"t":null,"room":"main"}
+01b_shop.png: OPEN: the save was made after closing — 升級餐廳 | {"phase":"shop","day":92,"t":null,"room":"main"}
+02_prep.png: OPEN: the prep screen | {"phase":"prep","day":93,"t":null,"room":"main"}
+03_main.png: the dining room, early evening | {"phase":"service","day":93,"t":"31%","room":"main"}
+04_side.png: the side room (the stair door at the near edge) | {"phase":"service","day":93,"t":"43%","room":"side"}
+05_front.png: the street | {"phase":"service","day":93,"t":"56%","room":"front"}
+06_lounge.png: the Lounge | {"phase":"service","day":93,"t":"67%","room":"lounge"}
+07_kitchen.png: the kitchen | {"phase":"service","day":93,"t":"75%","room":"kitchen"}
+07b_home.png: Jill's room (rc7.3) | {"phase":"service","day":93,"t":"81%","room":"home"}
+08_summary.png: the day's summary | {"phase":"summary","day":93,"t":null,"room":"home"}
+the summary's 今天的故事: (none today)
+the staff page: 餐廳員工：廚師 7/7・服務生 6/6・清潔員 2/2・Lounge 員工 5/5・每日薪資 $31,050。廚師、服務生、清潔員各有自己的名額，不能互相借；擴建和工程都寫著多哪一種。 Lounge 的人是固定的名單，名額跟餐廳分開算。
+09_staff.png: the shop, the staff page: two numbers | {"phase":"shop","day":93,"t":null,"room":"home"}
+10_prep_next_day.png: the next day's prep (Day 94) | {"phase":"prep","day":94,"t":null,"room":"main"}
+11_after_reload.png: the page reloaded: the title keeps DAY 94 | {"phase":"title","day":94,"t":null,"room":"main"}
+page errors: none (0)
