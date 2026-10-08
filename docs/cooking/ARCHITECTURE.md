@@ -434,6 +434,22 @@
     - `cooking_each_dish_with_its_own_beats_starts_raw_and_changes_by_hand`：要有自己動作的地方加上第四批的 14 個（鮭魚、海鮮
       義大利麵、鴨胸、松露燉飯、舒芙蕾）；檢查的方法沒變。
 
+28. **2026-10-09（新對話：飲料每杯獨立；跑測試的機器換了）**：
+    - `golden_scenario`：第 2 天起的基準重錄。原本——飲料跟炒飯一樣成批（一個杯位一次 2–4 杯）。不再成立——使用者 2026-10-09：
+      每杯獨立（`wfMax` 對飲料一律 1），咖啡吧 1 → 2 → 4 杯（方案 2）。第 2 天賣拿鐵起不同：客人 17 → 18 組、淨收入
+      $2,239 → $2,308、拿鐵經驗 16 → 14、評論 11 → 10。證明只差在飲料：把飲料改回成批（其他程式全是新的：點咖啡機選杯位、
+      存檔記位置種類、商店和手冊的字）重跑，`golden_scenario`、`golden_frames`、`cat_personality_fingerprint` 跟基準完全一樣。
+    - `golden_frames`：畫面基準重錄，**沒有包含遊戲改動**。原因是跑測試的機器換了（Chromium 141／Playwright 1.56），字的邊緣算出來
+      不同，連標題畫面都不一樣。做法：先用改飲料以前的程式（3aed7ab）在這台機器重錄；再確認「飲料改回成批」的版本和新程式都跟
+      它完全一樣，所以新基準就是這次重錄的那一份。
+    - `kitchen_works_walk_in_and_a_second_coffee_machine`：原本——咖啡機卡片寫「共 4 個」（「出杯位」的說法）。不再成立——
+      2026-10-08 使用者「出杯這個用語太怪了吧」，卡片改成「一次 2 杯…共 4 杯」（8c8fb6e；那時這個測試沒有跑到，所以是舊的失敗），
+      2026-10-09 再改成「同時 2 杯…共 4 杯」（「一次 2 杯」會讀成一個動作做出兩杯）。改成檢查「共 4 杯」；14 人、4 個杯位不變。
+    - 新增 `cooking_every_drink_is_its_own_cup`（每杯一個工作、點咖啡機開下一杯、杯位滿了等空位、每杯自己做好、自己送去出菜口
+      自己的位置）、`cooking_the_bar_holds_one_cup_two_with_the_double_group_head_four_with_kitchen_ii`（1 → 2 → 4；咖啡機 1 級
+      第二杯要等第一杯離開；商店寫「同時 N 杯」）、`cooking_a_drink_batch_from_an_older_checkpoint_becomes_its_cups`（舊存檔裡還沒
+      開始的一批拆成一杯一杯，做到一半的照原樣做完；咖啡吧杯位數不同的舊存檔照位置種類對回去，不會變成空店）。
+
 ## 使用者 iPhone 回報（2026-10-08 晚上到 10-09 凌晨）
 
 使用者：「我剛在 iPhone 真人實玩私人測試版，發現兩個 blocker」，附第 3 天的存檔（`tests/saves/cooking_day3_0156.json`）。

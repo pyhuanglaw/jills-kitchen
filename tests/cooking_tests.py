@@ -95,7 +95,7 @@ def cooking_every_drink_is_its_own_cup(b, port, target):
     being made there starts the next drink at a free place; with every place taken the next one waits (等空位). Each cup is
     done on its own and taken out on its own — Jill carries that one glass, the others stay at the bar — to its own spot
     on the pass, and the place it leaves takes the drink that was waiting."""
-    g = _day(b, port, target, 7130, "S.level=5;S.eq.bar=3;for(const d of ['coffee','blacktea']){if(!S.unlocked.includes(d))S.unlocked.push(d);if(!S.menu.includes(d))S.menu.push(d)}")
+    g = _day(b, port, target, 7130, "S.level=5;S.eq.bar=3;for(const d of ['coffee','blacktea'])if(!S.unlocked.includes(d))S.unlocked.push(d);S.menu=['friedrice'];")   # the guests order fried rice; the drinks are the test's
     g.ev("window.__k=function(n){for(let i=0;i<n;i++){for(const q of R.groups)q.pat=1;__tick(1000/30)}}")
     places = g.ev("R.slots.filter(s=>s.type==='bar').length")
     check(places >= 2 and places == g.ev("barCups(S.eq.bar)"), f'the bar has its places: {places}')
@@ -145,7 +145,7 @@ def cooking_the_bar_holds_one_cup_two_with_the_double_group_head_four_with_kitch
     經營意義」 — the 2026-10-07 capacity rule's DRINK 1 → 2 → 4, 「不要改成 3」): Day 2's machine holds one cup, so a second
     latte waits (等空位) until the first is taken off the machine; the double group head (LV3) holds two; kitchen II's second
     machine two more. The shop says it the same way — 同時 N 杯, never 「一次 N 杯」, which reads as one press making N cups."""
-    g = _day(b, port, target, 7132, "S.eq.bar=1;if(!S.unlocked.includes('coffee'))S.unlocked.push('coffee');if(!S.menu.includes('coffee'))S.menu.push('coffee');")
+    g = _day(b, port, target, 7132, "S.eq.bar=1;if(!S.unlocked.includes('coffee'))S.unlocked.push('coffee');S.menu=['friedrice'];")
     g.ev("window.__k=function(n){for(let i=0;i<n;i++){for(const q of R.groups)q.pat=1;__tick(1000/30)}}")
     cups = json.loads(g.ev("JSON.stringify((()=>{const k2=S.rooms.kitchen2;const out=[];for(const k of [0,1]){S.rooms.kitchen2=k;out.push([1,2,3,5].map(barCups))}S.rooms.kitchen2=k2;return out})())"))
     check(cups == [[1, 1, 2, 2], [3, 3, 4, 4]], f'the bar: 1, 2 with the double group head, 2 more with kitchen II: {cups}')
@@ -178,7 +178,7 @@ def cooking_a_drink_batch_from_an_older_checkpoint_becomes_its_cups(b, port, tar
     back as its cups, one under way finishes as it is (nothing made twice, nothing lost). And a checkpoint from a kitchen
     whose coffee bar had fewer places — before the places' kinds were kept in it — comes back with every piece of work at
     the same place, not as an empty shop."""
-    g = _day(b, port, target, 7131, "S.eq.bar=3;for(const d of ['coffee','blacktea']){if(!S.unlocked.includes(d))S.unlocked.push(d);if(!S.menu.includes(d))S.menu.push(d)}")
+    g = _day(b, port, target, 7131, "S.eq.bar=3;for(const d of ['coffee','blacktea'])if(!S.unlocked.includes(d))S.unlocked.push(d);S.menu=['friedrice'];")
     check(_wait_orders(g, 1), 'a table is in')
     # two batches the old way: lattes nobody has started, teas on the machine
     g.ev("(()=>{const M0=wfMax;wfMax=d=>2;__addOrders(2,'blacktea');wfGather();__addOrders(2,'coffee');wfGather();wfMax=M0})()")

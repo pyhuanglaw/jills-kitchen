@@ -391,6 +391,12 @@ Event CG（`STORY_ILLUS`）＝故事插圖。PHOTO = evidence that the moment ac
 branch」）：`main` 是正式、目前、穩定的主線，發布的 commit 在 `main` 上。還沒做完的功能開短期的 `feature/…` 或 `wip/…` branch，
 做完、測試通過再回到 `main`，不讓兩條線長期並行。不要 merge 沒有共同祖先的歷史（`archive/rc7.6-import-main`），不要改寫已推上去的
 歷史。現在有哪些 branch 見 `docs/CURRENT_STATE.md`。
+Branch 的規則（使用者 2026-10-09，整理 GitHub branch 時）：1. `main` 是正式穩定主線。2. 新的大型功能用 `feature/<功能名稱>`。
+3. Bug fix 可以用短期的 `fix/<問題名稱>`。4. QA branch 只在真的需要隔離時才開。5. 功能完成、合併、驗證後，評估刪掉不再用的
+branch（刪之前確認每一個 commit 都在 `main` 的歷史裡，或另外有 tag 指著）。6. 私人 Artifact 每次發布不另外開 branch。7. 版本用
+commit SHA、平台回傳的發布 id、必要時加 Git tag 追蹤（私人測試版的對照寫在 `docs/CURRENT_STATE.md`）。8. 同一個功能不要反覆開好幾條
+branch。9. 不可以因為整理 branch 就把還沒驗收的功能合進 `main`。10. 定期檢查已經做完、不再使用的功能和測試 branch。
+（這個對話環境的 Git 連線不能刪 branch、不能推 tag：刪除和打 tag 由使用者在 GitHub 網頁做，我們整理清單和 SHA。）
 
 **新料理系統／Restaurant Workflow：只在開發分支和私人測試版，使用者說「可以進 main」才進**（HARD RULE，2026-10-08 使用者，原文
 `docs/v24/restaurant_workflow_b_2026-10-08.txt` 末段）：新 Cooking System、每道菜的料理過程、PLATING 動線、Pass、服務生多份配送與

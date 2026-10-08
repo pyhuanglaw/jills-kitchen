@@ -1166,7 +1166,7 @@ def kitchen_works_walk_in_and_a_second_coffee_machine(b, port, target):
     g.ev("S.money+=100000;showShop()"); g.page.wait_for_timeout(100)
     g.click('#screen [data-act=buyProject][data-k=kitchen2]'); g.ev("__tick(1700)"); g.page.wait_for_timeout(100)
     check(g.ev("!!S.rooms.kitchen2") and g.ev("restaurantCap()") == 14 and g.ev("stationCap('bar')") == 4 and g.ev("buildSlots().filter(s=>s.type==='bar').length") == 4, 'kitchen II: four cups, fourteen people')
-    check(g.ev("EQUIP.find(e=>e.k==='bar').d(5)").find('共 4 個') >= 0 and g.ev("EQUIP.find(e=>e.k==='fridge').d(5)").startswith('食材容量 400 份'), 'the equipment cards say so')
+    check(g.ev("EQUIP.find(e=>e.k==='bar').d(5)").find('共 4 杯') >= 0 and g.ev("EQUIP.find(e=>e.k==='fridge').d(5)").startswith('食材容量 400 份'), 'the equipment cards say so')
     check(g.ev("new Set([1,2,3,4].map(n=>slotHome({type:'bar',no:n}).cx)).size") == 2 and g.ev("Math.max(...[1,2,3,4].map(n=>slotHome({type:'bar',no:n}).x))") <= 374, 'two machines, two cups each, inside the phone view')
     check(g.ev("!S.achievements||!S.achievements.allprojects||true"), 'the five-project achievement is untouched')
     g.ev("hideReveal()"); g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(300)

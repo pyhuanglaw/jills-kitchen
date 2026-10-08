@@ -16,6 +16,23 @@
   `main`，已合回，可以在 GitHub 網頁刪掉）、`fix/audit-narrative-2026-10-06`（Audit 之後的修正；2026-10-07 快轉合回 `main` 並發布成
   rc8.6，可以在 GitHub 網頁刪掉）、`proto/cooking-flow`（料理流程的獨立試玩頁 `prototype/cooking/`，不動遊戲本體；使用者 2026-10-07：
   不合併、不發布、現在不做）。
+- **2026-10-09 branch 整理**（使用者要求；規則在 `docs/PROJECT_MEMORY.md` §10「Git branch」）。GitHub 上 10 條，沒有任何 PR，
+  沒有 GitHub Actions（所有 branch 都沒有 `.github/`），程式、測試、工具都沒有寫死 branch 名稱，沒有別的 Claude 對話在用。
+  這個對話環境的 Git 連線**不能刪 branch、不能推 tag**（`git push --delete` 和推 tag 都被 GitHub 那端斷線；文件之前就記過推 tag 會斷），
+  所以刪除要使用者在 GitHub 網頁（repo → Branches → 垃圾桶）做。
+  - **可以刪（每一個 commit 都已經在 `main` 的歷史裡，刪了不會少任何東西）**：`feature/dylan-room-rc88`（fc0f5d8，就是現在的
+    `main`，rc8.8）、`feature/fewer-lines`（ae64e56，rc8.5）、`feature/lounge-decided`（6589e89，rc8.7）、
+    `fix/audit-narrative-2026-10-06`（3182df6，rc8.6）、`qa/audit-2026-10-06`（6bc6e29，2026-10-06 Audit 與例行 QA）。
+  - **`feature/dylan-room`（09f3312）**：比 `main` 多 1 個 commit，是「揭曉後房間寫 Dylan」第一次做在 rc8.5 上的版本；同樣的改動
+    後來以 fbbfca5 進 `main`、發布成 rc8.8（程式只差註解裡的版本號）。唯一沒進 `main` 的是那次沒發布的嘗試留下的 4 個證據檔
+    （`docs/evidence/v24_rc8_6/` 的 3 張截圖和 `dylan_room.txt`）。刪掉它，這 4 個檔就只剩在 commit 09f3312（沒有 branch 或 tag
+    指著，GitHub 之後可能清掉）。想留的話先在 GitHub 網頁用它建一個 tag（例如 `archive/feature-dylan-room`）再刪；不想留就直接刪。
+  - **保留**：`main`（正式主線）、`feature/cooking-gameplay`（料理系統開發中）、`proto/cooking-flow`（10 個 commit 都是獨立的
+    料理流程試玩頁 `prototype/cooking/`、設計筆記和試玩腳本，現在的料理系統沒有用到；使用者 2026-10-07：不合併、不發布，之後
+    重來時參考；交接文件寫「不要動」）、`archive/rc7.6-import-main`（2026-10-03 匯入 rc7.6 的原始 commit d0947ea，跟 `main` 沒有
+    共同祖先是因為 2026-10-04 `main` 改指到完整開發歷史，見下面那一條；是歷史備份，復原指令要用到它）。
+  - 整理前後 `main`＝fc0f5d8b09fc8152991c408a26de96bef49235aa、`feature/cooking-gameplay`＝7423dfc9779114811e733fbbb8e9e957d66ef11d，
+    沒有變；私人測試版、正式版的發布紀錄都沒有動。GitHub 上沒有任何 tag（版本 tag 只在當時的本機）。
 - 已刪除（玩家 2026-10-04 在 GitHub 網頁刪掉）：`feature/ken-tasting-pictures`（81cbe46，rc8.4 已合回 `main`）、`wip/lin`（舊的開發
   branch 名稱；最後指向的 b87b77b 在 `main` 裡）、`claude/jills-kitchen-github-setup-4x7483`（8ca784b，接在舊的匯入 commit 後面改網址；
   同樣的改動在主線的 ec985d1）。三條的內容都已經在 `main` 或不需要了。
@@ -65,6 +82,11 @@
   main、不發布到正式玩家版；只更新私人測試版**（PROJECT_MEMORY §10）。開發中；做到哪裡寫在那條 branch 的 `docs/cooking/ARCHITECTURE.md`，2026-10-08 早上的報告
   `docs/cooking/MORNING_REPORT_2026-10-08.md`。私人測試版（不是正式版，存檔分開）https://claude.ai/artifact/TQpEqEFgqUW6jUm2Gfnhbg ，
   用 `tools/qa/cooking_test_build.py` 建、發布到同一個網址。
+  **這一輪的工作方式（使用者 2026-10-09）**：連續自主開發，「發布私人測試版不是工作終點，而是中途里程碑」。順序：飲料（每杯獨立，
+  咖啡吧 1 → 2 → 4）測完發布 → 第五批（Lounge 料理＋三種披薩）→ 第六批（招牌主菜、招牌甜點，先檢查既有實作）→ 完整回歸、固定
+  劇本比較、必要修復、最後報告。每個可測試的階段可以發布私人測試版，發布後直接做下一項，不等驗收。一般技術問題自己查、修、測；
+  小歧義照既有 canon、文件、程式架構決定；真的要使用者決定的大問題，記下建議、先做不受影響的工作。**不要動**留給使用者決定的事
+  （料理教學卡片、商用洗碗機、兩個 Jill……，見 `docs/cooking/HANDOFF_2026-10-09.md` 第 4 節）。不要為了測試覆蓋率無限擴大範圍。
   **私人測試版的發布紀錄（使用者 2026-10-09 的規則）**：「Git commit SHA 才是內容版本的唯一可信識別；Artifact 的 Version 數字只當
   平台 revision，不要把兩者混在一起。」
   - 每次只更新上面這個私人 Artifact；不碰 `main`、不碰正式 Artifact。
