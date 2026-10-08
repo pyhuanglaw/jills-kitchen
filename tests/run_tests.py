@@ -357,7 +357,8 @@ def single_file_in_sync(b, port, target):
 def new_game_starts(b, port, target):
     g = Game(b, port, target, seed=1, manual=True)
     check(g.page.is_visible('text=OPEN FOR DINNER'), 'title screen missing')
-    check(g.ev("S.day") == 1 and g.ev("S.money") == 500, 'fresh state wrong')
+    # the starting money is the game's START_MONEY (onboarding 2026-10-08: $500 → $1,200, docs/cooking/ARCHITECTURE.md 24)
+    check(g.ev("S.day") == 1 and g.ev("S.money") == g.ev("START_MONEY"), 'fresh state wrong')
     g.click('[data-act=open]')
     check(g.ev("phase") == 'prep', 'prep screen did not open')
     start_day(g)
@@ -528,9 +529,9 @@ def save_and_load_roundtrip(b, port, target):
     g.click('.links [data-act=settings]'); g.click('[data-act=save]'); g.click('[data-act=load]')
     check(g.ev("S.tables") == tables + 1, 'LOAD lost data')
     g.click('.links [data-act=settings]'); g.click('[data-act=reset1]')
-    check(g.ev("S.tables") == tables + 1 and g.ev("S.money") != 500, 'RESET fired on the first press')
+    check(g.ev("S.tables") == tables + 1 and g.ev("S.money") != g.ev("START_MONEY"), 'RESET fired on the first press')
     g.click('[data-act=reset2]')
-    check(g.ev("S.day") == 1 and g.ev("S.money") == 500, 'RESET did not reset')
+    check(g.ev("S.day") == 1 and g.ev("S.money") == g.ev("START_MONEY"), 'RESET did not reset')
     check(not g.errors, g.errors)
     g.close()
 
@@ -586,7 +587,7 @@ def unreadable_save_is_kept(b, port, target):
     newer['v'] = 99
     for label, raw in [('broken JSON', '{"v":1,"day":7,"money":'), ('newer version', json.dumps(newer, ensure_ascii=False))]:
         g = Game(b, port, target, seed=15, manual=True, storage={SAVE_KEY: raw})
-        check(g.ev("S.day") == 1 and g.ev("S.money") == 500, f'{label}: game did not start fresh')
+        check(g.ev("S.day") == 1 and g.ev("S.money") == g.ev("START_MONEY"), f'{label}: game did not start fresh')
         g.click('[data-act=open]'); start_day(g)   # starting a day saves, overwriting the main key
         check(g.ev(f"JSON.parse(localStorage.getItem('{SAVE_KEY}')).day") == 1, f'{label}: new progress not saved')
         check(g.ev(f"localStorage.getItem('{SAVE_KEY}-unreadable')") == raw, f'{label}: unreadable save was not kept')

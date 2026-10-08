@@ -604,7 +604,11 @@ const COACH=[
 
 /* ================= save / state ================= */
 const KEY='jills-kitchen-save-v1';
-function newState(){return{v:1,day:1,phase:'prep',money:500,lifetime:0,level:1,
+/* the money a new game starts with (onboarding, the user, 2026-10-08: 「一開始應該多給一些錢，讓正常備貨不會造成不必要的資金壓力」):
+   $500 was Jill's own Day 1 stocking ($490) and $10 left. 1,200 leaves about $675 after it, and about $400 for a player who
+   stocks half again as much (docs/cooking/ARCHITECTURE.md, onboarding) — working capital, not a reward */
+const START_MONEY=1200;
+function newState(){return{v:1,day:1,phase:'prep',money:START_MONEY,lifetime:0,level:1,
  eq:{stove:1,oven:0,bar:0,prep:0,fridge:1,pan:1},tables:2,
  decor:{plants:0,lights:0,art:0,chairs:0,rug:0,ware:0,bar:0,sofa:0},staff:{busser:false,bartender:false},mem:{},catFam:{},crew:[],crewMig:1,rstar:{},dylan:{stage:0,stay:0,reveal:0,last:0,clues:{}},life:{sofa:0,tv:0},checkpoint:null,savedAt:0,savedLabel:'',rdProg:{},rdDone:{},labKnown:{},labTried:{},album:null,notes:[],taught:0,ops:{},theme:'classic',themes:{classic:1},sets:{},rooms:{side:0,terrace:0,kext:0,cooler:0,pass:0,lounge:0},sideTables:0,frontTables:0,ext:{awning:0,sign:0,plants:0,lights:0,bench:0,season:0},gear:{},gearUse:{},newRooms:{},reveal:null,rhist:[],records:{},salesHist:{},menuSince:{},regMem:{},props:{},regDay:null,gourmetBoost:0,dayLog:[],dayLogDay:0,
  unlocked:['friedrice'],menu:['friedrice'],price:{},stock:{},xp:{},reviews:[],achievements:{},regulars:{},returning:0,
@@ -1611,8 +1615,8 @@ function applyGates(){try{if(S.loungeProj&&S.loungeProj.state==='signing'&&!fact
  if(S.news24c==null){if(S.day<=1||!poolCrew('restaurant').length)S.news24c=-1;else{S.news24c=S.day;const over=CAP_ROLES.filter(r=>roleCrew(r).length>roleCap(r));S.news.push(`<b>餐廳的名額分成三種。</b>廚師、服務生、清潔員各有自己的名額，不能互相借：廚師的名額只能聘廚師。擴建和每一個工程都寫著多哪一種。現在 ${CAP_ROLES.map(r=>`${ROLES[r].n} ${roleCrew(r).length}/${roleCap(r)}`).join('、')}${over.length?`；${over.map(r=>ROLES[r].n).join('、')}比名額多，大家都留著`:''}。${loungeLv()?'Lounge 的名單照舊。':''}`)}}   /* rc8 §21: told once to a save that was already going; nobody moves, nobody leaves */
  while(S.gate<S.day){S.gate++;const D=S.gate;
  if(D===2){unlockDish('coffee');S.eq.bar=Math.max(1,S.eq.bar);S.news.push('<b>新料理解鎖：拿鐵咖啡</b>。咖啡吧開張了，客人會加點飲料。');if(fact('xq_helper')&&xqHelperMode())S.news.push('昨晚快打烊時來幫忙收店的是<b>秀琴阿姨</b>，Jill 認識很久的阿姨。她不是員工，很多晚上會順路來；之後請清潔員，第一位就是她。')}
- if(D===3){/* audit WS1-08: the second burner comes on Day 3 for everyone — one bought in the shop the evening before is paid back */const had=S.eq.stove>=2,back=had?EQUIP.find(x=>x.k==='stove').cost[1]:0;if(S.eq.stove<2){S.eq.stove=2}if(back){S.money+=back}unlockDish('pasta');S.news.push(`<b>第二口爐子到貨！</b>同時可以做兩道熱菜。${back?`你昨天已經自己買了一台，那 ${fmt(back)} 退回來了。`:''}<br><b>新料理：番茄義大利麵</b>（先煮麵，再加醬）。<br>從今天開始要自己<b>備料</b>。`)}   /* audit WS1-06: stocking was open from Day 1 and prices from Day 2 — what Day 3 changes is that the fridge is no longer filled for you */
- if(D===4){S.eq.prep=1;unlockDish('salad');S.news.push('<b>冷盤台啟用：田園沙拉</b>（Jill 切菜的時候，可以先去忙別的）。<br>今晚 19:00 會有第一次 <b>Rush Hour</b>，做好準備！')}
+ if(D===3){/* audit WS1-08: the second burner comes on Day 3 for everyone — one bought in the shop the evening before is paid back */const had=S.eq.stove>=2,back=had?EQUIP.find(x=>x.k==='stove').cost[1]:0;if(S.eq.stove<2){S.eq.stove=2}if(back){S.money+=back}S.eq.prep=Math.max(1,S.eq.prep||0);unlockDish('salad');S.news.push(`<b>第二口爐子到貨！</b>同時可以做兩道熱菜。${back?`你昨天已經自己買了一台，那 ${fmt(back)} 退回來了。`:''}<br><b>冷盤台啟用：田園沙拉</b>（在砧板上切好、就在那裡裝盤，不用開火）。<br>從今天開始要自己<b>備料</b>。`)}   /* onboarding (the user, 2026-10-08: 「Day 1 HOT → PLATING、Day 2 DRINK → SERVE、Day 3 PREP → PLATING」): the cold station and the salad a day earlier, the pasta a day later — the burner stays on Day 3 (audit WS1-08) */   /* audit WS1-06: stocking was open from Day 1 and prices from Day 2 — what Day 3 changes is that the fridge is no longer filled for you */
+ if(D===4){/* a save that passed Day 3 before the onboarding change had the pasta then: its cold station and salad come now */const late=!S.eq.prep;if(late){S.eq.prep=1;unlockDish('salad')}unlockDish('pasta');S.news.push(`${late?'<b>冷盤台啟用：田園沙拉</b>（在砧板上切好、就在那裡裝盤，不用開火）。<br>':''}<b>新料理：番茄義大利麵</b>（先煮麵，再加醬）。<br>今晚 19:00 會有第一次 <b>Rush Hour</b>，做好準備！`)}
  if(D===5)S.news.push('昨晚開始可以<b>裝潢與擴建</b>了。菜單研發也有更多選擇。')
  if(D===6)S.news.push('聽說<b>神秘美食評論家</b>最近會在城裡出沒…')
  if(D===8&&!S.signature)S.news.push('Jill 想做一道只屬於自己的料理。晚上可以在商店研發<b>招牌菜</b>（需要擴建到 Bistro）。')

@@ -508,3 +508,72 @@ def cooking_baked_food_waits_in_the_oven_and_a_glass_goes_to_its_spot(b, port, t
     it = json.loads(g.ev("JSON.stringify(R.tickets.flatMap(tk=>tk.items.filter(it=>it.d==='coffee'&&it.st==='ready').map(it=>it.pi)))"))
     check(it == pi, f'it waits on the spot it was carried to: {it} vs {pi}')
     check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def cooking_the_first_three_days_teach_three_kinds_of_work(b, port, target):
+    """The user's onboarding (2026-10-08, docs/v24/cooking_onboarding_2026-10-08.txt): 「第一天學做菜，第二天發現飲料也是工作，
+    第三天開始真的覺得這是一間有不同工作區的廚房」. A fresh game, three evenings played by the test's player (it taps what
+    needs tapping; on Day 3, the first day the player stocks, it takes the suggestion):
+    - Day 1: only the fried rice, and it goes HOT → PLATING; 秀琴阿姨 really clears (dishes she carried in reach the cart);
+    - Day 2: the latte comes with the day and so does the coffee machine — nobody pays for it — and a coffee goes DRINK → SERVE;
+    - Day 3: a dish made another way — the salad, PREP → PLATING, on the cold station the day brings;
+    - the money: a new game starts with START_MONEY ($1,200), and Jill's own Day 1 stocking leaves more than $500."""
+    g = Game(b, port, target, seed=313, manual=True, viewport={'width': 390, 'height': 844})
+    _rt.install_bot(g); g.click('[data-act=open]')
+    check(g.ev("S.money") == 1200 and g.ev("START_MONEY") == 1200, f'a new game starts with $1,200: {g.ev("S.money")}')
+    # what each piece of work went through, and what 秀琴阿姨 carried into the tub
+    g.ev("""window.__steps={};window.__xqIn=0;{const D0=ddDeposit;ddDeposit=function(w){if(R&&w===R.xqh)__xqIn+=(w.hands||[]).filter(e=>e.k==='dirty'&&!e.w).length;return D0(w)}}
+     window.__look=function(){if(!R)return;for(const n of R.wf||[])if(n.f)(__steps[n.d]||(__steps[n.d]=[])).includes(n.f)||__steps[n.d].push(n.f)}""")
+    seen = {}
+    for day in (1, 2, 3):
+        if day == 3:
+            g.ev("autoStock()")   # the player presses the suggested stocking (from Day 3 Jill no longer stocks by herself)
+        m_prep = g.ev("S.money")
+        start_day(g)
+        g.ev(_rt.LAZY_ACTOR + "\nwindow.__act=window.__actLazy;")   # a player who leaves to 秀琴阿姨 what she covers
+        info = json.loads(g.ev("JSON.stringify({day:S.day,money:S.money,menu:menuList(),bar:S.eq.bar,prep:S.eq.prep})"))
+        if day == 1:
+            check(info['menu'] == ['friedrice'], f'Day 1 is the fried rice alone: {info["menu"]}')
+            check(info['money'] >= 500, f'after Jill stocks Day 1 there is still a cushion: ${info["money"]}')
+        if day == 2:
+            check('coffee' in info['menu'] and info['bar'] >= 1 and bar_day1 == 0, f'Day 2 brings the latte and the machine: {info}, Day 1 {bar_day1}')
+            check(m_prep >= m_shop1, f'nobody paid for the machine: ${m_shop1} after Day 1, ${m_prep} on Day 2 before stocking')
+        if day == 3:
+            check('salad' in info['menu'] and info['prep'] >= 1 and 'pasta' not in info['menu'], f'Day 3 brings the salad and the cold station: {info}')
+        g.ev("window.__steps={}")
+        for _ in range(1500):
+            r = g.page.evaluate('()=>{const r=window.__bot(30,1/30);window.__look();return r}')
+            if g.ev("phase") != 'service' or not g.ev("!!R"): break
+            if r['ticks'] < 30: break
+        seen[day] = json.loads(g.ev("JSON.stringify(__steps)"))
+        if g.ev("phase") == 'summary': g.click('[data-act=toShop]')
+        if day == 1: bar_day1 = g.ev("S.eq.bar||0"); m_shop1 = g.ev("S.money")
+        if day < 3: g.click('[data-act=nextDay]')
+    check(seen[1].get('friedrice') == ['hot', 'plate'], f'Day 1: the fried rice goes HOT → PLATING: {seen[1]}')
+    check(g.ev("__xqIn") >= 2, f'秀琴阿姨 carried dishes into the tub on Day 1: {g.ev("__xqIn")}')
+    check(seen[2].get('coffee') == ['drink', 'serve'], f'Day 2: a coffee goes DRINK → SERVE: {seen[2]}')
+    check(seen[3].get('salad') == ['prep', 'plate'], f'Day 3: the salad goes PREP → PLATING: {seen[3]}')
+    grammars = {tuple(seen[1]['friedrice']), tuple(seen[2]['coffee']), tuple(seen[3]['salad'])}
+    check(len(grammars) == 3, f'three days, three ways of working: {grammars}')
+    check(not g.errors, g.errors)
+    g.close()
+
+
+@test
+def cooking_a_save_past_day_three_before_the_onboarding_change_gets_its_cold_station_on_day_four(b, port, target):
+    """The onboarding change moved the salad and the cold station from Day 4 to Day 3 and the pasta from Day 3 to Day 4.
+    A save that passed Day 3 before it (the pasta, no cold station) gets the cold station and the salad on Day 4 with the
+    pasta it already has — nothing is lost and nothing is unlocked twice; a new game's Day 4 adds only the pasta."""
+    g = Game(b, port, target, seed=314, manual=True)
+    g.click('[data-act=open]')
+    old = json.loads(g.ev("""JSON.stringify((()=>{S.day=4;S.gate=3;S.unlocked=['friedrice','coffee','pasta'];S.menu=['friedrice','coffee','pasta'];
+      S.eq.prep=0;S.eq.bar=1;S.eq.stove=2;S.news=[];applyGates();return{prep:S.eq.prep,unl:S.unlocked.slice(),news:S.news.join(' ')}})())"""))
+    check(old['prep'] == 1 and 'salad' in old['unl'] and old['unl'].count('pasta') == 1 and '冷盤台啟用' in old['news'] and '番茄義大利麵' in old['news'],
+          f'the old save catches up on Day 4: {old}')
+    new = json.loads(g.ev("""JSON.stringify((()=>{S.day=4;S.gate=3;S.unlocked=['friedrice','coffee','salad'];S.menu=['friedrice','coffee','salad'];
+      S.eq.prep=1;S.eq.bar=1;S.eq.stove=2;S.news=[];applyGates();return{prep:S.eq.prep,unl:S.unlocked.slice(),news:S.news.join(' ')}})())"""))
+    check(new['unl'] == ['friedrice', 'coffee', 'salad', 'pasta'] and '冷盤台啟用' not in new['news'] and '番茄義大利麵' in new['news'],
+          f"a new game's Day 4 adds the pasta only: {new}")
+    check(not g.errors, g.errors)
+    g.close()

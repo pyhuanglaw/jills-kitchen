@@ -1,7 +1,7 @@
 [
  {
   "day": 1,
-  "money": 2029,
+  "money": 2747,
   "lifetime": 2117,
   "level": 1,
   "stats": {
@@ -17,16 +17,16 @@
   "stock": {
    "friedrice": 0
   },
-  "reviews": 3,
-  "reviewHash": "88099852",
+  "reviews": 4,
+  "reviewHash": "25d095cc",
   "regulars": {},
   "summary": {
    "rev": 1800,
-   "cost": 543,
+   "cost": 525,
    "tips": 317,
    "bonus": 255,
    "wages": 0,
-   "net": 1529,
+   "net": 1547,
    "guests": 15,
    "lost": 0,
    "perfect": 15,
@@ -39,7 +39,7 @@
    [
     "tora",
     "home",
-    "loaf",
+    "curl",
     72,
     525,
     -1,
@@ -48,7 +48,7 @@
    [
     "ban",
     "side",
-    "sit",
+    "loaf",
     222,
     529,
     -1,
@@ -56,35 +56,35 @@
    ],
    [
     "snow",
-    "bed",
-    "curl",
-    252,
-    124,
+    "walk",
+    "daze",
+    249,
+    132,
     -1,
     false
    ],
    [
     "mikan",
-    "walk",
-    "loaf",
-    247,
-    190,
+    "rest",
+    "groom",
+    178,
+    529,
     -1,
     false
    ],
    [
     "mei",
     "home",
-    "loaf",
+    "sit",
     338,
     423,
     -1,
     true
    ]
   ],
-  "catHash": "53db282f",
+  "catHash": "1c0288",
   "mem": [],
-  "weights": "2134:4e195924",
+  "weights": "2083:30782bb",
   "dylan": {
    "stage": 0,
    "stay": 0,
@@ -99,96 +99,94 @@
  },
  {
   "day": 2,
-  "money": 3600,
-  "lifetime": 5144,
+  "money": 5057,
+  "lifetime": 5936,
   "level": 1,
   "stats": {
-   "guests": 32,
-   "perfect": 39,
+   "guests": 34,
+   "perfect": 43,
    "days": 2,
-   "walkins": 0,
+   "walkins": 2,
    "families": 0
   },
   "xp": {
-   "friedrice": 62,
-   "coffee": 16
+   "friedrice": 66,
+   "coffee": 20
   },
   "stock": {
-   "friedrice": 6,
-   "coffee": 4
+   "friedrice": 5,
+   "coffee": 3
   },
-  "reviews": 9,
-  "reviewHash": "6850b21",
-  "regulars": {
-   "chen": 1
-  },
+  "reviews": 10,
+  "reviewHash": "93311dc3",
+  "regulars": {},
   "summary": {
-   "rev": 2640,
-   "cost": 986,
-   "tips": 387,
+   "rev": 3060,
+   "cost": 1039,
+   "tips": 759,
    "bonus": 330,
    "wages": 0,
-   "net": 2071,
-   "guests": 17,
+   "net": 2810,
+   "guests": 19,
    "lost": 0,
-   "perfect": 24,
-   "plated": 24,
-   "avg": 96,
+   "perfect": 28,
+   "plated": 28,
+   "avg": 94,
    "top": "friedrice",
-   "stars": 5
+   "stars": 4.5
   },
   "cats": [
    [
     "tora",
     "home",
-    "curl",
-    72,
-    525,
+    "walk",
+    94,
+    100,
     -1,
     true
    ],
    [
     "ban",
-    "home",
-    "walk",
-    72,
-    525,
-    -1,
-    true
-   ],
-   [
-    "snow",
     "side",
-    "loaf",
-    178,
+    "sit",
+    222,
     529,
     -1,
     false
    ],
    [
+    "snow",
+    "sleep",
+    "curl",
+    85,
+    459,
+    1,
+    false
+   ],
+   [
     "mikan",
-    "home",
-    "loaf",
-    72,
-    525,
+    "jump",
+    "stretch",
+    349,
+    -13,
     -1,
-    true
+    false
    ],
    [
     "mei",
-    "sleep",
-    "curl",
+    "rest",
+    "sit",
     190,
     -49,
     13,
     false
    ]
   ],
-  "catHash": "d6f0c6c7",
+  "catHash": "d75c4656",
   "mem": [
    "first:1::811c9dc5"
   ],
-  "weights": "4338:1eced0cb",
+  "weights": "4227:8cb8d711",
   "dylan": {
    "stage": 0,
    "stay": 0,
@@ -203,76 +201,58 @@
  },
  {
   "day": 3,
-  "money": 4955,
-  "lifetime": 6529,
+  "money": 6053,
+  "lifetime": 6962,
   "level": 1,
   "stats": {
    "guests": 39,
-   "perfect": 49,
+   "perfect": 51,
    "days": 3,
-   "walkins": 0,
+   "walkins": 3,
    "families": 0
   },
   "xp": {
-   "friedrice": 74,
-   "coffee": 24,
-   "pasta": 0
+   "friedrice": 76,
+   "coffee": 26,
+   "salad": 0
   },
   "stock": {
    "friedrice": 0,
    "coffee": 0
   },
-  "reviews": 14,
-  "reviewHash": "22b2348f",
+  "reviews": 10,
+  "reviewHash": "93311dc3",
   "regulars": {
-   "chen": 1
+   "mia": 1
   },
   "summary": {
-   "rev": 1080,
+   "rev": 870,
    "cost": 0,
-   "tips": 305,
+   "tips": 156,
    "bonus": 270,
    "wages": 0,
-   "net": 1355,
-   "guests": 7,
+   "net": 996,
+   "guests": 5,
    "lost": 0,
-   "perfect": 10,
-   "plated": 10,
-   "avg": 97,
+   "perfect": 8,
+   "plated": 8,
+   "avg": 95,
    "top": "friedrice",
-   "stars": 5
+   "stars": 4.5
   },
   "cats": [
    [
     "tora",
     "home",
-    "loaf",
-    72,
-    525,
+    "walk",
+    94,
+    100,
     -1,
     true
    ],
    [
     "ban",
-    "side",
-    "loaf",
-    178,
-    529,
-    -1,
-    false
-   ],
-   [
-    "snow",
-    "sleep",
-    "belly",
-    63,
-    425,
-    2,
-    false
-   ],
-   [
-    "mikan",
-    "side",
+    "play",
     "sit",
     222,
     529,
@@ -280,33 +260,57 @@
     false
    ],
    [
+    "snow",
+    "sleep",
+    "curl",
+    107,
+    530,
+    -1,
+    false
+   ],
+   [
+    "mikan",
+    "play",
+    "sit",
+    178,
+    529,
+    -1,
+    false
+   ],
+   [
     "mei",
     "jump",
-    "daze",
-    356,
-    3,
-    -1,
+    "sit",
+    365,
+    75,
+    13,
     false
    ]
   ],
-  "catHash": "9af56e9a",
+  "catHash": "d7cdc799",
   "mem": [
    "first:1::811c9dc5"
   ],
-  "weights": "6876:83d394b8",
+  "weights": "6830:3cb86c01",
   "dylan": {
    "stage": 0,
    "stay": 0,
    "reveal": 0,
-   "last": 0,
+   "last": 3,
    "clues": {},
    "trace": [
     {
      "d": 3,
      "p": 60,
-     "s": 0
+     "s": 1,
+     "t": 91,
+     "c": 1,
+     "at": 60,
+     "back": 0,
+     "r": "main"
     }
-   ]
+   ],
+   "first": 3
   },
   "life": {
    "sofa": 0,
