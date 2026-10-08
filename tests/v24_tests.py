@@ -2749,7 +2749,7 @@ def v24_rc7_the_money(b, port, target):
     # gift on the first day; each time the till would be under $300 after the day's costs, in the first ten days)
     g = Game(b, port, target, seed=72, manual=True, viewport={'width': 390, 'height': 844})
     g.click('[data-act=open]'); g.page.wait_for_timeout(150)
-    check(g.ev("S.money") == 500 and not g.ev("S.loan"), 'no gift on the first day: a new game starts with $500 and owes nothing')
+    check(g.ev("S.money") == g.ev("START_MONEY") and not g.ev("S.loan"), 'no gift on the first day: a new game starts with its starting cash and owes nothing')   # (the onboarding's $1,200, 2026-10-08; it was $500)
     g.ev("autoStock()"); start_day(g); install_bot(g)
     for _ in range(300):
         g.page.evaluate('()=>window.__bot(60,1/30)')

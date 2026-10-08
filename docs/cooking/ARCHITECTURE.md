@@ -365,6 +365,8 @@
 24. **新遊戲的起始現金 $500 → $1,200**（onboarding，使用者 2026-10-08：「一開始應該多給一些錢」，見下面「前三天」）：
     `new_game_starts`、`save_and_load_roundtrip`、`unreadable_save_is_kept` 原本驗證新遊戲的錢是 500。不再成立——改成讀遊戲
     裡的 `START_MONEY`（以後再調數字不用再改測試）。驗證的事（新遊戲、重置、讀不了的存檔都是全新的開始）不變。
+    `v24_rc7_the_money` 的最後一段（秀琴阿姨的借款）一開始也驗證「新遊戲 $500、沒有欠錢」——同樣改成 `START_MONEY`
+    （8ef21cf 的完整回歸抓到的）；驗證的事（第一天沒有送錢、沒有欠錢；錢不夠時她借 $3,000）不變。
     基準再錄一次（2026-10-08 晚上）：逐張比對，改的只有錢（第一天營業中 $10 → $675——就是你說的那個問題）、冰箱 11 → 12 份、
     商店的預估備料；標準劇本第 3 天的菜是沙拉不是義大利麵，第 2 天客人 17 → 19。新增 `cooking_the_first_three_days_teach_three_kinds_of_work`、
     `cooking_a_save_past_day_three_before_the_onboarding_change_gets_its_cold_station_on_day_four`。
