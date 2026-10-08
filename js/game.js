@@ -6135,7 +6135,7 @@ function wfHere(n){const tg=wfTarget(n);if(!tg)return false;if(n.who==='jill'){c
 function wfStepDone(n){const fl=wfFl(n);wfUnhand(n);if(n.si>=fl.length-1){wfFinish(n);return}n.st='ready';n.tr=R.t;R.tv++}
 /* plated where the food was: the pan (tray, board, bowl) is free for the next dish, and whoever plated carries the plates
    to the pass — the spots they will be set down on are held now, the nearest to the food first */
-function wfPlated(n){const at=n.slot?wfSpot(n.slot).x:WF_PASS_X[0];if(n.slot){if(n.slot.type==='pass'){if(!n.to)n.to=n.slot}else{const j=wfRJ(n);const ch=chOf(n.d,wfLookF(n));const V=j.step&&j.step.board?null:ch?ch.v:stepVessel(j);n.slot.left=V&&V!=='plate'&&V!=='cup'&&V!=='glass'&&V!=='cutboard'&&V!=='mold'?{v:V}:null;   /* (the pan, the pot, the tray stay where they were; a board is the counter's own, a mould goes with the plate) */n.slot.wf=null}n.slot=null}n.dishes=false;n.carry=true;n.st='topass';n.pi=wfRowTake(n,at);R.tv++}
+function wfPlated(n){const at=n.slot?wfSpot(n.slot).x:WF_PASS_X[0];if(n.slot){if(n.slot.type==='pass'){if(!n.to)n.to=n.slot}else{const j=wfRJ(n);const ch=chOf(n.d,wfLookF(n));const V=j.step&&j.step.board?null:ch?ch.v:stepVessel(j);n.slot.left=V&&V!=='plate'&&V!=='cup'&&V!=='glass'&&V!=='cutboard'&&V!=='mold'&&V!=='ramekin'?{v:V}:null;   /* (the pan, the pot, the tray stay where they were; a board is the counter's own, a mould or a ramekin goes with the plate) */n.slot.wf=null}n.slot=null}n.dishes=false;n.carry=true;n.st='topass';n.pi=wfRowTake(n,at);R.tv++}
 /* the last step done: every portion of the batch is a plate (or a glass) ready for the floor */
 function wfFinish(n){const avg=n.sc.length?n.sc.reduce((a,b)=>a+b,0)/n.sc.length:1;const q=avg>=.88?'P':avg>=.68?'G':'O';
  if(n.slot){n.slot.wf=null;n.slot=null}if(n.to){n.to.wf=null;n.to=null}R.wf=wfList().filter(x=>x!==n);if(R.wsel===n.id)R.wsel=null;
@@ -6843,10 +6843,10 @@ const CHD={
      noodles. The pan: the garlic, the shrimp and the mussels in first, then the noodles, the stock and wine; tossed, the shrimp
      turn red and curl, the mussels open, the noodles take the sauce and the seafood spreads through them; plated in a twist with
      every shrimp and mussel still itself on top */
-  vessel(c,n,S0,sp,now,hand,out){const st=S0.st,g=hand?S0.beat:null;
+  vessel(c,n,S0,sp,now,hand,out,pl){const st=S0.st,g=hand?S0.beat:null;const so=pl?pl.st.sea||0:0;
    if(wfLookF(n)==='prep'){chIn(c,sp,()=>{drawVesselBack(c,'cutboard');chSeafoodBoard(c,st,now,g&&S0.ph.h<1?g:null)});return}
    const toss=g&&g.g==='toss'?Math.max(0,Math.sin(now*5.5)):0;
-   chIn(c,sp,()=>{drawVesselBack(c,'pan');c.save();c.translate(0,-toss*9);c.scale(1+toss*.05,1-toss*.1);c.beginPath();c.ellipse(0,0,40,17,0,0,7);c.clip();c.scale(1,17/40);chSeafoodPan(c,n,st,out||0);c.restore();drawVesselFront(c,'pan');
+   chIn(c,sp,()=>{drawVesselBack(c,'pan');c.save();c.translate(0,-toss*9);c.scale(1+toss*.05,1-toss*.1);c.beginPath();c.ellipse(0,0,40,17,0,0,7);c.clip();c.scale(1,17/40);chSeafoodPan(c,n,st,out||0,so);c.restore();drawVesselFront(c,'pan');
     if(g&&S0.ph.h<1&&g.g!=='toss')chTool(c,g,now,0,-2);else if(g&&g.g==='toss')chWokTool(c,g,now);
     chSteam(c,((st.sea>0?.3:0)+.45*(st.coat||0))*(1-(out||0)),now,-26,40)})},
   held(c,n,x,y){c.save();c.translate(x,y);c.scale(.22,.22);drawVesselBack(c,'plate');c.save();c.scale(1,.5);chShrimp(c,-16,-6,1,.4,0);chShrimp(c,-4,6,1,2,0);chMussel(c,10,-8,1,.5,0);chMussel(c,14,8,1,-.4,0);noodleNest(c,rng(4),28,0,10,['#F3E7C2','#EAD9A8','#F7EDCF']);c.restore();c.restore()},
@@ -6855,6 +6855,7 @@ const CHD={
     if(L.gar>=1&&k<n.its.length){chDishPic(c,n,pp,k);continue}
     c.save();c.translate(pp.x,pp.y);c.scale(pp.sc,pp.sc);drawPlate(c,S.decor.ware>0);c.scale(1.12,1.12*.8);chSeafoodPlate(c,k,L);c.restore()}
    if(g&&g.g==='twirl')chCarry(c,g,m,{x:sp.x,y:sp.y},k=>wfPlateAt(n,sp,k),(x,y)=>{c.strokeStyle='#E9C678';c.lineWidth=1.2;c.beginPath();c.arc(x,y,2.6,0,5.6);c.stroke();c.strokeStyle='#B9C2C6';c.lineWidth=.8;c.beginPath();c.moveTo(x+1,y-2);c.lineTo(x+6,y-7);c.moveTo(x+2.4,y-1);c.lineTo(x+7,y-6);c.stroke()});
+   if(g&&g.g==='place')chCarry(c,g,m,{x:sp.x,y:sp.y},k=>wfPlateAt(n,sp,k),(x,y)=>{const i=Math.floor(g.u*m*5)%5;c.save();c.translate(x,y);c.scale(.36,.36);if(i<3)shrimp(c,0,0,1,.4);else mussel(c,0,0,1,.5);c.restore();c.strokeStyle='#B9C2C6';c.lineWidth=.8;c.beginPath();c.moveTo(x+1.5,y-1);c.lineTo(x+7,y-7);c.moveTo(x+2.6,y+.6);c.lineTo(x+8,y-5.4);c.stroke()},5);   /* each shrimp and mussel taken over with the tongs */
    if(g&&g.g==='sprinkle'){const pp=wfPlateAt(n,sp,Math.min(m-1,Math.floor(g.u*m)));chFall(c,pp.x,pp.y-14,'#3E8A36',now,'seed')}}},
  duck:{
   /* the board: a raw duck breast, its skin scored by the knife into a crosshatch one cut at a time, salted — still raw. The pan:
@@ -6865,11 +6866,11 @@ const CHD={
    if(wfLookF(n)==='prep'){chIn(c,sp,()=>{drawVesselBack(c,'cutboard');chDuckBoard(c,st,now,g&&S0.ph.h<1?g:null)});return}
    const on=n.st==='cook'||n.st==='work'&&n.f==='hot';
    chIn(c,sp,()=>{drawVesselBack(c,'pan');c.save();c.beginPath();c.ellipse(0,0,40,17,0,0,7);c.clip();c.scale(1,17/40);if(st.on>=1&&(out||0)<.5)chDuckPan(c,st,now);c.restore();drawVesselFront(c,'pan');
-    if(st.on>0&&st.on<1){c.save();c.translate(0,-(1-st.on)*34);c.scale(1,17/40);chDuckBreast(c,{},1);c.restore()}
-    if(g&&g.g==='flip'&&st.flip>0&&st.flip<1){const t=st.flip;c.save();c.translate(-6,-Math.sin(t*Math.PI)*16*17/40-2);c.rotate(-.2);c.fillStyle='#B9C2C6';rr(c,-14,-2,26,5,2);c.fill();c.strokeStyle='#6B4428';c.lineWidth=3;c.lineCap='round';c.beginPath();c.moveTo(12,0);c.lineTo(34,-16);c.stroke();c.restore()}
+    if(st.on>0&&st.on<1){c.save();c.translate(0,-(1-st.on)*34);c.scale(.74,.74);chDuckBreast(c,{pan:1},1);c.restore()}
+    if(g&&g.g==='flip'&&st.flip>0&&st.flip<1){const t=st.flip;c.save();c.translate(-6,-Math.sin(t*Math.PI)*16*.74-2);c.rotate(-.2);c.fillStyle='#B9C2C6';rr(c,-14,-2,26,5,2);c.fill();c.strokeStyle='#6B4428';c.lineWidth=3;c.lineCap='round';c.beginPath();c.moveTo(12,0);c.lineTo(34,-16);c.stroke();c.restore()}
     if(on&&st.on>=1&&(out||0)<.5&&!(st.rest>0)){for(let i=0;i<5;i++){const ph=(now*1.5+i*.21)%1;c.globalAlpha=(1-ph)*.8;c.fillStyle=i%2?'#FFF1B0':'#FFD27A';circ(c,-22+i*11+Math.sin(now*9+i*2)*3,-8-ph*20,1.5-ph)}c.globalAlpha=1}
     if(on&&st.on>=1&&(out||0)<.5)chSteam(c,.45*(1-(st.rest||0)*.6),now,-22,36)})},
-  held(c,n,x,y){c.save();c.translate(x,y);c.scale(.22,.22);drawVesselBack(c,'plate');c.save();c.scale(.9,.45);chDuckBreast(c,{scored:1},1);c.restore();c.restore()},
+  held(c,n,x,y){c.save();c.translate(x,y);c.scale(.22,.22);drawVesselBack(c,'plate');c.save();c.scale(.8,.8);chDuckBreast(c,{scored:1},1);c.restore();c.restore()},
   plates(c,n,S0,pl,sp,now,hand){const st=pl.st;const m=Math.min(4,Math.max(1,n.n));const g=hand?pl.beat:null;
    for(let k=m-1;k>=0;k--){const pp=wfPlateAt(n,sp,k);const L={out:clamp(st.out*m-k,0,1),cut:clamp(st.cut*m-k,0,1),sauce:clamp(st.sauce*m-k,0,1)};
     if(L.sauce>=1&&k<n.its.length){chDishPic(c,n,pp,k);continue}
@@ -6905,7 +6906,7 @@ const CHD={
    for(let k=m-1;k>=0;k--){const pp=wfPlateAt(n,sp,k);const o=clamp(st.out*m-k,0,1),s2=clamp(st.sugar*m-k,0,1);
     if(s2>=1&&k<n.its.length){chDishPic(c,n,pp,k);continue}
     c.save();c.translate(pp.x,pp.y);c.scale(pp.sc,pp.sc);drawPlate(c,S.decor.ware>0);if(o>=1){c.save();c.scale(1.12,1.12);chSouffleRamekin(c,1,1,s2,true);c.restore()}c.restore()}
-   if(g&&g.g==='scoop')chCarry(c,g,m,{x:sp.x,y:sp.y},k=>wfPlateAt(n,sp,k),(x,y)=>{c.save();c.translate(x,y-2);c.scale(.12,.12);chSouffleRamekin(c,1,1,0);c.restore()},1);
+   if(g&&g.g==='scoop')chCarry(c,g,m,{x:sp.x,y:sp.y},k=>wfPlateAt(n,sp,k),(x,y)=>{c.save();c.translate(x,y-2);c.scale(.3,.3);chSouffleRamekin(c,1,1,0);c.restore()},1);
    if(g&&g.g==='sprinkle'){const pp=wfPlateAt(n,sp,Math.min(m-1,Math.floor(g.u*m)));chFall(c,pp.x,pp.y-18,'#FFFFFF',now,'dot')}}}};
 /* a tool over a wok or pan, in the vessel's own coordinates (the pan at 0,0, its rim 44 wide): what the hands are doing */
 function chWokTool(c,g,now){const k=g.g;c.save();c.lineCap='round';
@@ -7264,19 +7265,20 @@ function chProsPlate(c,k,L){const R=rng(hash('prosplate|'+k));if(L.out>0)greens(
 /* ---- the fourth batch's pieces ---- */
 /* a salmon fillet (the dish picture's, from raw to cooked): raw it is a deeper, glassy orange-red with thin white lines;
    cooked it is paler and opaque, its top browning and its edges golden */
-function chSalmonFillet(c,x,y,s,a,cook){c.save();c.translate(x,y);c.rotate(a);c.fillStyle=mix('#A8442A','#B8572B',cook);rr(c,-18*s,-10*s,36*s,21*s,9*s);c.fill();
- let g=c.createLinearGradient(0,-10*s,0,10*s);g.addColorStop(0,mix('#FF7E52','#F7A67A',cook));g.addColorStop(1,mix('#E4502C','#E3703F',cook));c.fillStyle=g;rr(c,-17*s,-10*s,34*s,17*s,8*s);c.fill();
- c.strokeStyle=`rgba(255,230,215,${.55+.25*cook})`;c.lineWidth=(1.3-.4*(1-cook))*s;for(let k=-3;k<=3;k++){c.beginPath();c.moveTo(k*4.5*s-3*s,-9*s);c.quadraticCurveTo(k*4.5*s+1*s,-2*s,k*4.5*s-2*s,6*s);c.stroke()}
- if(cook>.4){c.fillStyle=`rgba(200,120,40,${.45*(cook-.4)/.6})`;rr(c,-17*s,-10*s,34*s,4*s,3*s);c.fill();for(let k=0;k<4;k++)el(c,-10*s+k*7*s,-5*s,2.6*s,1.2*s)}
- gloss(c,-6*s,-6*s,7*s,2*s,.35+.25*(1-cook));c.restore()}
+function chSalmonFillet(c,x,y,s,a,cook){c.save();c.translate(x,y);c.rotate(a);c.fillStyle=mix('#9A3022','#B8572B',cook);rr(c,-18*s,-10*s,36*s,21*s,9*s);c.fill();
+ let g=c.createLinearGradient(0,-10*s,0,10*s);g.addColorStop(0,mix('#FF6A4C','#F7A67A',cook));g.addColorStop(1,mix('#D0362A','#E3703F',cook));c.fillStyle=g;rr(c,-17*s,-10*s,34*s,17*s,8*s);c.fill();
+ c.strokeStyle=`rgba(255,230,215,${.3+.5*cook})`;c.lineWidth=(.7+.6*cook)*s;for(let k=-3;k<=3;k++){c.beginPath();c.moveTo(k*4.5*s-3*s,-9*s);c.quadraticCurveTo(k*4.5*s+1*s,-2*s,k*4.5*s-2*s,6*s);c.stroke()}
+ if(cook>.4){const q=(cook-.4)/.6;c.fillStyle=`rgba(200,120,40,${.5*q})`;rr(c,-17*s,-10*s,34*s,4*s,3*s);c.fill();c.strokeStyle=`rgba(214,140,52,${.7*q})`;c.lineWidth=1.2*s;rr(c,-17*s,-10*s,34*s,17*s,8*s);c.stroke()}
+ if(cook<.5){/* raw: glassy */c.fillStyle=`rgba(255,255,255,${.45*(1-cook*2)})`;el(c,-4*s,-6*s,9*s,1.8*s);el(c,7*s,-1*s,4*s,1.2*s)}
+ gloss(c,-6*s,-6*s,7*s,2*s,.3);c.restore()}
 /* the salmon at the board: a raw fillet and the asparagus; oiled (it shines), salted, herbs laid on it; onto the small tray */
 function chSalmonBoard(c,n,st,now,g){const TX=30,TY=-2,TS=.42;c.save();c.translate(TX,TY);c.scale(TS,TS);drawVesselBack(c,'tray');if(st.tray>=1)chSalmonTray(c,n,0,0,0,st.herb);c.restore();
- if(st.tray<1){const q=st.tray;const fx=lerp(-18,TX-8*TS,q),fy=lerp(-2,TY,q)-Math.sin(q*Math.PI)*10;c.save();c.translate(lerp(-40,TX+26*TS,q),lerp(5,TY,q)-Math.sin(q*Math.PI)*8);asparagus(c,0,0,lerp(.5,.9*TS,q),3,.2);c.restore();chSalmonFillet(c,fx,fy,lerp(.62,.9*TS,q),-.1,0);
-  if(st.oil>0){c.fillStyle=`rgba(255,250,230,${.35*st.oil})`;el(c,fx-3,fy-3,6,1.4)}
-  if(st.salt>0){const R0=rng(79);for(let i=0;i<Math.round(12*st.salt);i++){c.fillStyle=i%2?'#FFFFFF':'#2A2A2A';circ(c,fx+(R0()-.5)*20,fy+(R0()-.5)*8,.6)}}
-  if(st.herb>0){const R1=rng(80);for(let i=0;i<Math.round(8*st.herb);i++)leaf(c,fx+(R1()-.5)*18,fy-2+(R1()-.5)*6,3.2,1.2,R1()*3,'#6FA84E')}}
- if(g&&g.g==='mix'){c.fillStyle='#F0C8A8';el(c,-18+Math.sin(now*9)*5,-8,6.4,3)}
- if(g&&g.g==='sprinkle')chFall(c,-18,-18,g.ing==='salt'?'#FFFFFF':'#6FA84E',now,g.ing==='salt'?'dot':'seed')}
+ if(st.tray<1){const q=st.tray;const fs=lerp(.88,.9*TS,q);const fx=lerp(-10,TX-8*TS,q),fy=lerp(-1,TY,q)-Math.sin(q*Math.PI)*10;c.save();c.translate(lerp(-37,TX+26*TS,q),lerp(6,TY,q)-Math.sin(q*Math.PI)*8);asparagus(c,0,0,lerp(.62,.9*TS,q),3,.2);c.restore();chSalmonFillet(c,fx,fy,fs,-.1,0);
+  if(st.oil>0){/* oiled: it shines */c.fillStyle=`rgba(255,226,140,${.22*st.oil})`;el(c,fx,fy-1,15*fs,8*fs);gloss(c,fx-5*fs,fy-5*fs,9*fs,1.8*fs,.65*st.oil);gloss(c,fx+7*fs,fy-1*fs,4*fs,1.2*fs,.55*st.oil)}
+  if(st.salt>0){const R0=rng(79);for(let i=0;i<Math.round(14*st.salt);i++){c.fillStyle=i%2?'#FFFFFF':'#2A2A2A';circ(c,fx+(R0()-.5)*26*fs,fy-1+(R0()-.5)*12*fs,.65)}}
+  if(st.herb>0){const R1=rng(80);for(let i=0;i<Math.round(8*st.herb);i++)leaf(c,fx+(R1()-.5)*24*fs,fy-2+(R1()-.5)*8*fs,3.4,1.3,R1()*3,'#6FA84E')}}
+ if(g&&g.g==='mix'){/* a pastry brush, the oil on its bristles, back and forth over the fillet */const bx=-10+Math.sin(now*9)*8,by=-4;c.strokeStyle='#8A5A30';c.lineWidth=2;c.lineCap='round';c.beginPath();c.moveTo(bx+3,by-4);c.lineTo(bx+12,by-17);c.stroke();c.fillStyle='#E9C46A';rr(c,bx-3,by-5,7,4.4,1.4);c.fill();c.fillStyle='#C9D0D3';rr(c,bx,by-6.4,4,2,.6);c.fill()}
+ if(g&&g.g==='sprinkle')chFall(c,-10,-17,g.ing==='salt'?'#FFFFFF':'#6FA84E',now,g.ing==='salt'?'dot':'seed')}
 /* on the tray (the tray's own coordinates): the asparagus and a fillet for each portion; lifted off as it is plated */
 function chSalmonTray(c,n,cook,asp,out,herb){const m=Math.min(3,Math.max(1,n.n||1));const fl=m-Math.round((out||0)*m),as=m-Math.round((asp||0)*m);
  for(let i=0;i<m;i++){if(i>=as)continue;asparagus(c,22,-12+i*9,.9,3,.15)}
@@ -7290,40 +7292,45 @@ function chShrimp(c,x,y,s,a,cook){c.save();c.translate(x,y);c.rotate(a);c.lineCa
 /* a mussel: shut, or opened by the heat to its orange meat */
 function chMussel(c,x,y,s,a,open){c.save();c.translate(x,y);c.rotate(a);c.fillStyle='#262A3A';el(c,0,0,8.5*s,5.2*s);if(open>0){c.globalAlpha=Math.min(1,open*1.6);c.fillStyle='#F09A5C';el(c,.5*s,0,5.4*s*Math.min(1,open*1.4),3.1*s);c.globalAlpha=1}else{c.strokeStyle='rgba(120,130,160,.6)';c.lineWidth=.8*s;c.beginPath();c.moveTo(-7*s,0);c.lineTo(7*s,0);c.stroke()}gloss(c,-3*s,-2.5*s,3*s,1*s,.35);c.restore()}
 /* the seafood at the board: shrimp grey and raw (the knife cleaning them), mussels laid out shut, garlic sliced, the noodles */
-function chSeafoodBoard(c,st,now,g){for(let i=0;i<3;i++){chShrimp(c,-42+i*9,-3+(i%2)*4,.62,.4+i,0);if(st.shrimp>(i+1)/3-1e-6){c.strokeStyle='rgba(70,50,50,.6)';c.lineWidth=.6;c.beginPath();c.arc(-42+i*9,-3+(i%2)*4,3.6,.6,2.6);c.stroke()}}
- for(let i=0;i<Math.ceil(4*st.mussel-1e-6);i++)chMussel(c,-14+(i%2)*9,-6+Math.floor(i/2)*7-(i===Math.ceil(4*st.mussel)-1&&st.mussel<1?(1-(4*st.mussel-i))*14:0),.62,.3,0);
- if(st.garlic<1){c.fillStyle='#F2E8D4';el(c,6,-2,4.4*(1-st.garlic*.6),3.6*(1-st.garlic*.6))}for(let i=0;i<Math.floor(st.garlic*5+1e-6);i++){c.fillStyle='#F5EEDF';el(c,12+i*3,1,1.6,1.2)}
- if(st.nood>0){c.save();c.translate(36,-1-(1-st.nood)*16);noodleNest(c,rng(4),0,0,9,['#F3E7C2','#EAD9A8','#F7EDCF']);c.restore()}
- if(g&&g.g==='chop'){const tx=g.ing==='garlic'?6:-34;const lift=Math.abs(Math.sin(now*14))*7;chKnife(c,tx+9,-10-lift,-.12)}}
+function chSeafoodBoard(c,st,now,g){for(let i=0;i<3;i++){const x=-42+i*10,y=-3+(i%2)*5;chShrimp(c,x,y,.85,.4+i,0);if(st.shrimp>(i+1)/3-1e-6){c.strokeStyle='rgba(70,50,50,.6)';c.lineWidth=.7;c.beginPath();c.arc(x,y,4.6,.6,2.6);c.stroke()}}
+ const nm=Math.ceil(4*st.mussel-1e-6);for(let i=0;i<nm;i++)chMussel(c,-8+(i%2)*11,-5+Math.floor(i/2)*8-(i===nm-1&&st.mussel<1?(1-(4*st.mussel-i))*14:0),.82,.3,0);
+ if(st.garlic<1){c.fillStyle='#F2E8D4';el(c,16,-4,5.4*(1-st.garlic*.6),4.4*(1-st.garlic*.6))}for(let i=0;i<Math.floor(st.garlic*5+1e-6);i++){c.fillStyle='#F5EEDF';el(c,12+i*3.4,6,1.9,1.4)}
+ if(st.nood>0){c.save();c.translate(40,-1-(1-st.nood)*16);noodleNest(c,rng(4),0,0,11,['#F3E7C2','#EAD9A8','#F7EDCF']);c.restore()}
+ if(g&&g.g==='chop'){const tx=g.ing==='garlic'?16:-32;const lift=Math.abs(Math.sin(now*14))*7;chKnife(c,tx+9,-10-lift,-.12)}}
 /* the seafood pasta in the pan (a circle of 40, squashed by the caller): garlic, the shrimp and mussels grey and shut, cooking
    red and open; the noodles pale, then glossy and golden with the sauce through them and herbs; the stock a pool, taken up */
-function chSeafoodPan(c,n,st,out){const left=1-out;if(left<=0)return;const R0=rng((n.seed||1)*29+7);const co=st.coat||0,ck=st.cook||0;
- if(st.sauce>0){c.fillStyle=`rgba(232,206,120,${.45*st.sauce*(1-co*.8)})`;circ(c,0,0,34)}
+function chSeafoodPan(c,n,st,out,so){const left=1-out,sl=1-(so||0);if(left<=0&&sl<=0)return;const R0=rng((n.seed||1)*29+7);const co=st.coat||0,ck=st.cook||0;
+ if(st.sauce>0&&left>0){c.fillStyle=`rgba(232,206,120,${.45*st.sauce*(1-co*.8)*left})`;circ(c,0,0,34)}
  if(st.nood>0){const N=40,shown=Math.floor(N*st.nood*left+1e-6);c.lineCap='round';for(let i=0;i<N;i++){const r0=4+R0()*22,a0=R0()*6.283,sw=1.4+R0()*2.2,cx=(R0()-.5)*8,cy=(R0()-.5)*8,v=R0();if(i>=shown)continue;c.strokeStyle=mix(v<.5?'#F3E7C2':'#EAD9A8',v<.5?'#F3DB9A':'#E9C678',co);c.lineWidth=2.6;c.beginPath();c.arc(cx,cy,r0,a0,a0+sw);c.stroke()}
-  if(co>0){c.fillStyle=`rgba(120,160,40,${.22*co})`;circ(c,0,0,24);c.fillStyle='#3E8A36';for(let i=0;i<Math.round(12*co*left);i++)circ(c,(R0()-.5)*44,(R0()-.5)*40,1.1)}}
- if(st.sea>0&&left>0){const g=Math.min(1,st.sea*1.4);c.globalAlpha=g;c.fillStyle='#F2E8D4';for(let i=0;i<6;i++)el(c,-20+i*8,10-(i%2)*14,2.6,1.8);c.globalAlpha=1;
-  const spread=co;const P=[[-14,-8],[12,-10],[2,12],[-16,10],[18,6]].map((p,i)=>[lerp(p[0]*.55,p[0],spread),lerp(p[1]*.55,p[1],spread)]);
-  chShrimp(c,P[0][0],P[0][1],1,.4,ck);chShrimp(c,P[1][0],P[1][1],1,2.2,ck);chShrimp(c,P[2][0],P[2][1],1,-1,ck);chMussel(c,P[3][0],P[3][1],1.2,.5,clamp((ck-.3)/.5,0,1));chMussel(c,P[4][0],P[4][1],1.2,-.7,clamp((ck-.3)/.5,0,1))}}
+  if(co>0&&left>0){c.fillStyle=`rgba(120,160,40,${.22*co*left})`;circ(c,0,0,24);c.fillStyle='#3E8A36';for(let i=0;i<Math.round(12*co*left);i++)circ(c,(R0()-.5)*44,(R0()-.5)*40,1.1)}}
+ if(st.sea>0){const a=Math.min(1,st.sea*1.4);if(left>0){c.globalAlpha=a*left;c.fillStyle='#F2E8D4';for(let i=0;i<6;i++)el(c,-20+i*8,10-(i%2)*14,2.6,1.8);c.globalAlpha=1}
+  /* each shrimp and mussel drawn upright against the pan's squash; taken out one by one as they are laid on the plates */
+  const P=[[-14,-8,.4],[12,-10,2.2],[2,12,-1],[-16,10,.5],[18,6,-.7]];const gone=Math.floor(5*(so||0)+.85);c.globalAlpha=a;
+  for(let i=gone;i<5;i++){const p=P[i];const x=lerp(p[0]*.55,p[0],co),y=lerp(p[1]*.55,p[1],co);c.save();c.translate(x,y);c.scale(1.3,1.3*40/17*.6);if(i<3)chShrimp(c,0,0,1,p[2],ck);else chMussel(c,0,0,1,p[2],clamp((ck-.3)/.5,0,1));c.restore()}c.globalAlpha=1}}
 /* the plate (flat: the dish picture's coordinates): the twist of noodles, every shrimp and mussel laid on it, herbs and lemon */
 function chSeafoodPlate(c,k,L){const R=rng(hash('seaplate|'+k));if(L.out>0){const shown=Math.round(30*L.out);c.lineCap='round';for(let i=0;i<30;i++){const r0=4+R()*20,a0=R()*6.283,sw=1.6+R()*2,v=R();if(i>=shown)continue;c.strokeStyle=v<.5?'#F3DB9A':'#E9C678';c.lineWidth=2.6;c.beginPath();c.arc(0,0,r0,a0,a0+sw);c.stroke()}if(L.out>=1){c.fillStyle='rgba(120,160,40,.25)';el(c,0,0,20,18)}}
- if(L.sea>0){const n=Math.ceil(5*L.sea-1e-6);const P=[[-9,-6,.4],[9,-8,2.2],[2,8,-1]];for(let i=0;i<Math.min(3,n);i++)shrimp(c,P[i][0],P[i][1],1,P[i][2]);if(n>3)mussel(c,-12,8,1,.5);if(n>4)mussel(c,14,5,1,-.7)}
+ if(L.sea>0){const n=Math.floor(5*L.sea+.15+1e-6);const P=[[-9,-6,.4],[9,-8,2.2],[2,8,-1]];for(let i=0;i<Math.min(3,n);i++)shrimp(c,P[i][0],P[i][1],1,P[i][2]);if(n>3)mussel(c,-12,8,1,.5);if(n>4)mussel(c,14,5,1,-.7)}
  if(L.gar>0){herbs(c,R,0,0,20,Math.round(8*L.gar),'#3E8A36');if(L.gar>.6)lemonWedge(c,22,-16,.8,.6)}}
 /* a duck breast (its own coordinates, about 60 wide): raw — the deep pink flesh, the pale skin on top, scored into a
    crosshatch; in the pan skin side down (the flesh up, the skin seen at its edge going golden), turned over: the golden scored
    skin up */
+function chDuckPath(c,k){c.beginPath();c.moveTo(-30*k,1*k);c.bezierCurveTo(-29*k,-10*k,16*k,-14*k,29*k,-4*k);c.bezierCurveTo(34*k,4*k,14*k,13*k,-6*k,12*k);c.bezierCurveTo(-21*k,11*k,-31*k,7*k,-30*k,1*k);c.closePath()}
 function chDuckBreast(c,st,s){const fl=st.flip||0,up=fl>=.5;c.save();c.scale(s||1,s||1);if(fl>0&&fl<1){c.translate(0,-Math.sin(fl*Math.PI)*16);c.scale(1,Math.max(.12,Math.abs(Math.cos(fl*Math.PI))))}
- const skinCol=mix('#F3DCC0','#C9782E',st.skin||0),meatCol=mix('#E39292','#B86A5E',up?(st.meat||0):(st.skin||0)*.35);c.fillStyle='rgba(0,0,0,.25)';el(c,2,4,30,13);
- if(st.pan){/* skin side down: the flesh up, the skin showing at the rim */c.fillStyle=up?meatCol:skinCol;el(c,0,0,30,13);c.fillStyle=up?skinCol:meatCol;el(c,0,-1,26,10.5)}
- else{c.fillStyle='#E39292';el(c,0,1,30,12);c.fillStyle=skinCol;el(c,0,-1,28,9.5)}
- const sc=st.scored!=null?st.scored:1;if((!st.pan||up)&&sc>0){c.strokeStyle=up?'rgba(110,50,20,.75)':'rgba(150,90,60,.85)';c.lineWidth=1.2;const nC=Math.round(5*sc);for(let i=0;i<nC;i++){const off=-20+i*10;c.beginPath();c.moveTo(off-5,-9);c.lineTo(off+5,6);c.stroke();c.beginPath();c.moveTo(off+5,-9);c.lineTo(off-5,6);c.stroke()}}
- if(up&&(st.skin||0)>.5)gloss(c,-8,-5,8,2,.35);c.restore()}
+ const sk=st.skin||0,skinCol=mix('#F2DEC4','#C27028',sk),meatCol=mix('#B4434C','#9C5242',up?(st.meat||0):sk*.3);
+ c.fillStyle='rgba(0,0,0,.25)';c.save();c.translate(2,4);chDuckPath(c,1);c.fill();c.restore();
+ if(st.pan&&!up){/* skin side down: the flesh on top, the skin a rim round it going golden */c.fillStyle=skinCol;chDuckPath(c,1);c.fill();c.fillStyle=meatCol;c.save();c.translate(0,-1.5);chDuckPath(c,.84);c.fill();c.restore();gloss(c,-6,-4,7,1.6,.2)}
+ else{c.fillStyle=meatCol;chDuckPath(c,1);c.fill();c.save();c.translate(0,-2.2);c.fillStyle=skinCol;chDuckPath(c,.9);c.fill();
+  const sc=st.scored!=null?st.scored:1;if(sc>0){chDuckPath(c,.9);c.clip();c.strokeStyle=up&&st.pan?'rgba(110,50,20,.75)':'rgba(176,118,84,.8)';c.lineWidth=1.2;const nC=Math.round(6*sc);for(let i=0;i<nC;i++){const o=-24+i*9;c.beginPath();c.moveTo(o-6,-12);c.lineTo(o+6,11);c.stroke();c.beginPath();c.moveTo(o+6,-12);c.lineTo(o-6,11);c.stroke()}}c.restore();
+  gloss(c,-8,-6,8,2,up&&sk>.5?.35:.22)}
+ c.restore()}
 /* the duck at the board: raw, the knife scoring its skin one stroke after another, salted */
 function chDuckBoard(c,st,now,g){c.save();c.translate(-6,-1);c.scale(.75,.75);chDuckBreast(c,{scored:st.score},1);c.restore();
- if(st.salt>0){const R0=rng(92);c.fillStyle='#FFFFFF';for(let i=0;i<Math.round(12*st.salt);i++)circ(c,-6+(R0()-.5)*36,-2+(R0()-.5)*10,.6)}
- if(g&&g.g==='chop'){const x=-6+(-20+Math.min(4,Math.floor(st.score*5))*10)*.75;const lift=Math.abs(Math.sin(now*12))*6;chKnife(c,x+12,-10-lift,-.5)}
+ if(st.salt>0){const R0=rng(92);c.fillStyle='#FFFFFF';for(let i=0;i<Math.round(12*st.salt);i++)circ(c,-6+(R0()-.5)*36,-3+(R0()-.5)*10,.6)}
+ if(g&&g.g==='chop'){const x=-6+(-24+Math.min(5,Math.floor(st.score*6))*9)*.75;const lift=Math.abs(Math.sin(now*12))*6;chKnife(c,x+12,-10-lift,-.5)}
  if(g&&g.g==='sprinkle')chFall(c,-6,-16,'#FFFFFF',now,'dot')}
 /* the duck in its pan (a circle of 40, squashed by the caller): skin side down, the fat it gives a golden pool round it */
-function chDuckPan(c,st,now){if((st.skin||0)>0){c.fillStyle=`rgba(240,200,110,${.18+.25*(st.skin||0)})`;el(c,0,0,36+4*(st.skin||0),28)}c.save();c.scale(1.2,2);chDuckBreast(c,Object.assign({pan:1},st),1);c.restore()}
+function chDuckPan(c,st,now){const sk=st.skin||0;if(sk>0){c.fillStyle=`rgba(255,226,150,${.1+.16*sk})`;c.beginPath();c.ellipse(1,3,33,27,0,0,7);c.fill();c.strokeStyle=`rgba(255,214,120,${.2+.4*sk})`;c.lineWidth=2;c.beginPath();c.ellipse(1,3,33,27,0,0,7);c.stroke()}
+ c.save();c.scale(.74,.74*40/17);chDuckBreast(c,Object.assign({pan:1},st),1);c.restore()}
 /* the plate (flat: the dish picture's coordinates): the breast laid on, cut into slices fanned out, the orange sauce last */
 function chDuckPlate(c,k,L){const R=rng(hash('duckplate|'+k));if(L.sauce>0){c.fillStyle='#C8732A';el(c,2,6,26*L.sauce,14*L.sauce);c.fillStyle='#B25E1E';el(c,6,8,18*L.sauce,9*L.sauce)}
  if(L.out>0){if(L.cut<1){c.save();c.translate(0,-2-(1-L.out)*14);c.scale(.9,.9);chDuckBreast(c,{pan:1,flip:1,skin:1,meat:1,scored:1},1);c.strokeStyle='rgba(60,25,10,.85)';c.lineWidth=1.4;for(let i=0;i<Math.floor(L.cut*4);i++){c.beginPath();c.moveTo(14-i*9,-12);c.lineTo(10-i*9,12);c.stroke()}c.restore()}else duckSlices(c,0,-2,1.1)}
@@ -7343,7 +7350,7 @@ function chRisottoPlate(c,k,L){if(L.out<=0)return;const R=rng(hash('risoplate|'+
  if(L.gar>0){const R2=rng(hash('risogar|'+k));c.fillStyle='rgba(255,255,255,.7)';for(let i=0;i<Math.round(8*L.gar);i++){c.save();c.translate((R2()-.5)*40,(R2()-.5)*36);c.rotate(R2()*3);c.fillRect(-3,-1,6,2);c.restore()}for(let i=0;i<Math.round(7*L.gar);i++)truffleShave(c,(R2()-.5)*30,(R2()-.5)*28,3.6+R2()*1.6)}}
 /* the soufflé at the board: the whites in the bowl, whisked from a clear puddle into soft white peaks, the yolk batter folded
    through in yellow streaks, poured into the buttered ramekin at the board's end */
-function chSouffleBoard(c,st,now,g,t){const BX=-12,BY=-4,TX=32,TY=-2;
+function chSouffleBoard(c,st,now,g,t){c.save();c.scale(1.25,1.25);const BX=-12,BY=-4,TX=28,TY=-2;
  c.save();c.translate(TX,TY+2);c.scale(.36,.36);drawVesselBack(c,'ramekin');if(st.pour>0){c.fillStyle='#F7EBC4';el(c,0,-10+(1-st.pour)*16,22,5)}c.restore();
  c.fillStyle='rgba(0,0,0,.18)';el(c,BX+1,BY+9,15,3.5);let gb=c.createLinearGradient(BX-16,0,BX+16,0);gb.addColorStop(0,'#D6CDBE');gb.addColorStop(.4,'#FFFFFF');gb.addColorStop(1,'#CCC2B2');c.fillStyle=gb;c.beginPath();c.moveTo(BX-16,BY-1);c.quadraticCurveTo(BX-15,BY+10,BX,BY+10);c.quadraticCurveTo(BX+15,BY+10,BX+16,BY-1);c.fill();c.fillStyle='#F7F3EC';el(c,BX,BY-1,16,5);c.fillStyle='#E6DED0';el(c,BX,BY-.6,14,4.2);
  const left=1-st.pour;if(left>0){const w=st.whip,f=st.fold;if(w<.25){c.fillStyle='rgba(250,245,215,.85)';el(c,BX,BY-.6,12,3.6)}
@@ -7352,7 +7359,7 @@ function chSouffleBoard(c,st,now,g,t){const BX=-12,BY=-4,TX=32,TY=-2;
  c.strokeStyle='rgba(255,255,255,.9)';c.lineWidth=1.2;c.beginPath();c.ellipse(BX,BY-1,16,5,0,.2,Math.PI-.2);c.stroke();
  if(g&&g.g==='whisk'){const a=now*12;const x=BX+Math.cos(a)*5,y=BY-3+Math.sin(a)*1.4;c.strokeStyle='#C9D0D3';c.lineWidth=.9;for(let i=-1;i<=1;i++){c.beginPath();c.ellipse(x+i*1.2,y-5,2,6,0,0,7);c.stroke()}c.strokeStyle='#8A5A30';c.lineWidth=2.2;c.beginPath();c.moveTo(x,y-10);c.lineTo(x+5,y-22);c.stroke()}
  if(g&&g.g==='mix'){const a=Math.sin(now*6);c.fillStyle='#B9C2C6';rr(c,BX-3+a*6,BY-8,6,3,1);c.fill();c.strokeStyle='#6B4428';c.lineWidth=2;c.beginPath();c.moveTo(BX+a*6+2,BY-8);c.lineTo(BX+a*6+10,BY-20);c.stroke()}
- if(g&&g.g==='pour'){chStream(c,BX+14,BY-4,TX,TY-4,'#F7EBC4',2.6,now)}}
+ if(g&&g.g==='pour'){chStream(c,BX+14,BY-4,TX,TY-4,'#F7EBC4',2.6,now)}c.restore()}
 /* the soufflé in its ramekin (the ramekin's own coordinates): level with the rim at first, then rising well above it as it
    bakes, its top turning golden; on its plate, the icing sugar and the berries */
 function chSouffleRamekin(c,rise,gold,sugar,plated){drawVesselBack(c,'ramekin');const h=1+20*rise;const col=mix('#F7EBC4','#D9A04A',gold);
