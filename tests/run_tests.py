@@ -483,14 +483,17 @@ def cat_ai_keeps_running(b, port, target):
     """No cat freezes: over five minutes of Day 1 every cat changes what she is doing at least three times. Since rc7.3 a
     cat may spend the evening in Jill's room (st 'home'); there, going from one of her spots to another is a change too
     (rc8.3: on this seed 寶寶 — who likes the room — stayed in it the whole five minutes, at the window, the tree, the
-    rug, the bed and the tree again, and the count of st alone called her stuck)."""
+    rug, the bed and the tree again, and the count of st alone called her stuck). Onboarding (2026-10-08, docs/cooking/
+    ARCHITECTURE.md 24): with the new starting money the evening's random numbers moved, and on this seed 寶寶 spent it on
+    the sofa in Jill's room — grooming, asleep, sitting up, asleep again — one spot, so the count called her stuck; on the
+    sofa a new way of sitting or lying (awake or asleep) is a change too."""
     g = Game(b, port, target, seed=7, manual=True)
     install_bot(g)
     g.click('[data-act=open]'); start_day(g)
     r = g.ev(r"""(()=>{__bot(1,1/30);const changes={},last={},sleep={},nearJ={},bad=[];const ids=CATS.map(c=>c.def.id);ids.forEach(i=>{changes[i]=0;sleep[i]=0;nearJ[i]=0});
       const force=[()=>startRace(catBy('tora')),()=>startAmbush(catBy('mikan'))];
       for(let n=0;n<9000;n++){__bot(1,1/30);if(phase!=='service')break;if(n===1500)force[0]();if(n===3000)force[1]();
-        for(const c of CATS){const k=c.st+'|'+(c.st==='home'?c.homeSpot||'':'');if(k!==last[c.def.id]){changes[c.def.id]++;last[c.def.id]=k}
+        for(const c of CATS){const k=c.st+'|'+(c.st==='home'?(c.homeSpot||'')+(c.homeSpot==='sofa'?'|'+c.pose+'|'+(c.homeSleep?'z':''):''):'');if(k!==last[c.def.id]){changes[c.def.id]++;last[c.def.id]=k}
           if(c.st==='sleep'||c.st==='bed')sleep[c.def.id]++;if(Math.hypot(c.x-PASS.x,c.y-PASS.y)<60)nearJ[c.def.id]++;
           if(!isFinite(c.x)||!isFinite(c.y))bad.push(c.def.id+' NaN');
           if(c.x<-BGM-5||c.x>LW+BGM+5||c.y>LH+5||c.y<wallTop()-40)bad.push(c.def.id+' out of bounds '+Math.round(c.x)+','+Math.round(c.y)+' '+c.st)}
