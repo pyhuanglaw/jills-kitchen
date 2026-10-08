@@ -1006,7 +1006,7 @@ def cooking_flow_families(b, port, target):
     (cooking_workflow_canon_2026-10-07.txt) — waiting, flipping and draining are never steps, nothing burns, no timing —
     so the old shapes no longer exist for those dishes. What this test holds: the dishes the old shapes named are on the
     new kitchen with the user's workflow (steak/burger/duck 備料→熱區→裝盤, soup/risotto 熱區→裝盤,
-    salad/prosciutto/tiramisu 備料→裝盤, salmon/chicken 備料→烤箱→裝盤, coffee 飲料→出杯).
+    salad/prosciutto/tiramisu 備料→裝盤, salmon/chicken 備料→烤箱→裝盤, coffee 飲料→送飲料).
 
     v2.5, 2026-10-08: until tonight the two pizzas the table did not name were still on the old path, and this test also
     held the old rules on them (2–5 interactions, no tap-repeat, the sauce gauge, the bake forgiven when a little late and

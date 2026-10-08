@@ -347,7 +347,7 @@ def cooking_every_family_goes_its_own_way(b, port, target):
     goes through exactly the places of its own workflow, in order — 備料 at a prep board, 熱區 on a burner, 烤箱 in the oven,
     飲料 at the coffee machine, 披薩烤爐 in the pizza oven, 裝盤 where the food already is (changed 2026-10-08, the user's
     PLATING correction: it was 「裝盤 at the pass」 — the wok's rice is plated at the wok, the salad at its board, the baked
-    dish at the oven), 出杯 set down for the floor — and, made by Jill, it is Perfect. A special goes its base dish's way."""
+    dish at the oven), 送飲料: set down for the floor — and, made by Jill, it is Perfect. A special goes its base dish's way."""
     g = _day(b, port, target, 7130, ALL_PLACES)
     ids = g.ev("Object.keys(DISHES).concat(['signature','sigdessert']).filter(isWF)")
     want_slot = {'prep': 'prep', 'hot': 'stove', 'oven': 'oven', 'drink': 'bar', 'pizza': 'pizza', 'serve': 'pick'}   # 'plate': the place before it
@@ -528,7 +528,7 @@ def cooking_the_first_three_days_teach_three_kinds_of_work(b, port, target):
     # what each piece of work went through, and what 秀琴阿姨 carried into the tub
     g.ev("""window.__steps={};window.__xqIn=0;{const D0=ddDeposit;ddDeposit=function(w){if(R&&w===R.xqh)__xqIn+=(w.hands||[]).filter(e=>e.k==='dirty'&&!e.w).length;return D0(w)}}
      window.__look=function(){if(!R)return;for(const n of R.wf||[])if(n.f)(__steps[n.d]||(__steps[n.d]=[])).includes(n.f)||__steps[n.d].push(n.f)}
-     {const A0=wfArrive;wfArrive=function(n){const r=A0.apply(this,arguments);__look();return r}}   /* each step seen as it starts: 出杯 is 0.7 s, shorter than the test's 1-second look (it was missed when the walk to the cups changed, 2026-10-08 evening) */""")
+     {const A0=wfArrive;wfArrive=function(n){const r=A0.apply(this,arguments);__look();return r}}   /* each step seen as it starts: 送飲料 is 0.7 s, shorter than the test's 1-second look (it was missed when the walk to the cups changed, 2026-10-08 evening) */""")
     seen = {}
     for day in (1, 2, 3):
         if day == 3:
@@ -584,46 +584,137 @@ def cooking_a_save_past_day_three_before_the_onboarding_change_gets_its_cold_sta
 
 
 @test
-def cooking_a_made_latte_goes_out_by_the_players_taps(b, port, target):
-    """The user on the iPhone (2026-10-08 evening): 「拿鐵咖啡做好無法出杯」 — the drink made, nothing the player could tap
-    took it on to 出杯 (the earlier tests sent Jill by the program, never by a tap). Day 2, nobody but Jill: the latte chosen
-    on its ticket, the coffee machine tapped — made; then the machine is the lit place, and a tap on it sends Jill to it:
-    she stands beside the cups (from in front of the counter, where they are within reach), takes them to the pass and sets
-    them down for the floor. Everything here is a tap where the player taps."""
-    g = Game(b, port, target, seed=7174, manual=True, viewport={'width': 390, 'height': 844})
-    g.ev(FLOOR)
-    g.click('[data-act=open]'); g.page.wait_for_timeout(80)
-    g.ev("S.day=2;S.gate=1;applyGates();for(const d of menuList())S.stock[d]=12;S.tables=2;save()")
-    start_day(g)
-    g.ev("setRoom('kitchen');window.__patient=1")
-    nid = 0
+def cooking_day_two_a_latte_from_the_order_to_the_guest_by_taps(b, port, target):
+    """The user's Day 2 acceptance (2026-10-08 evening, on the iPhone: 「拿鐵咖啡做好無法出杯」; 「請新增一個真正從 Day 2 玩家
+    操作開始的 acceptance test，不要只直接改內部 state」; 「Day 2 新遊戲能不能從點拿鐵一路完整做到客人收到」). A new game, Day 1
+    played by the test's bot; then Day 2 as the player plays it, every step a tap where the player taps it on a phone, table
+    after table until a latte has reached its guest: the table with a 「!」 for the order; the 廚房 tab; each dish on the
+    ticket chosen on the ticket, then its lit place (the stove, the coffee machine), and when it is done its lit place again
+    (the wok to plate it, the machine to 送飲料 — the user's word since 「出杯這個用語太怪了吧」); the 主廳 tab; the table for its
+    plates. On the way: made, the coffee machine is the lit place and the guide says 送飲料 (before the fix nothing was lit
+    and no tap did anything); whoever takes a finished dish or the cups stands beside it, within reach; each waits on the
+    pass at its own spot; and the guest has the latte."""
+    g = Game(b, port, target, seed=7175, manual=True, viewport={'width': 390, 'height': 844})
+    _rt.install_bot(g); g.click('[data-act=open]'); g.page.wait_for_timeout(80)
+    start_day(g); _rt.play_day(g)                                   # Day 1, the bot
+    if g.ev("phase") == 'summary': g.click('[data-act=toShop]')
+    g.click('[data-act=nextDay]'); g.page.wait_for_timeout(80)
+    check(g.ev("S.day") == 2 and 'coffee' in g.ev("menuList()") and g.ev("S.eq.bar") >= 1, f'Day 2: the latte and the coffee machine: {g.ev("menuList()")}')
+    start_day(g)                                                    # from here on, only the player's taps and the clock
+    tick = lambda n=1: g.ev(f"(n=>{{for(let i=0;i<n;i++)__tick(1000/30)}})({n})")
+    def tap_scene(x, y):
+        o = json.loads(g.ev(f"JSON.stringify((()=>{{const r=sc.getBoundingClientRect();return{{x:r.left+SV.ox+{x}*SV.s,y:r.top+SV.oy+{y}*SV.s}}}})())"))
+        g.page.mouse.click(o['x'], o['y']); g.page.wait_for_timeout(30); tick()
+    def to_room(k):
+        if g.ev("room") == k: return
+        g.ev("renderRoomTabs(true)"); g.page.click(f'#roomTabs [data-room="{k}"]'); g.page.wait_for_timeout(30); tick()
+        check(g.ev("room") == k, f'the {k} tab')
+    def tap_table(t):
+        to_room('main')
+        xy = json.loads(g.ev(f"JSON.stringify((t=>({{x:t.x,y:t.y}}))(R.tables[{t}]))"))
+        tap_scene(xy['x'], xy['y'])
+    def choose(tid, idx):
+        g.ev("renderTickets()"); g.page.click(f'#tickets [data-tk="{tid}"][data-i="{idx}"]'); g.page.wait_for_timeout(30); tick()
+    seen = {'coffee_lit': False, 'reach': []}
+    def cook(tid):
+        """every dish of a ticket, by taps, until it waits on the pass"""
+        to_room('kitchen')
+        for idx in range(g.ev(f"R.tickets.find(t=>t.id==={tid}).items.length")):
+            it = json.loads(g.ev(f"JSON.stringify((it=>({{d:it.d,st:it.st,wf:it.wf||null}}))(R.tickets.find(t=>t.id==={tid}).items[{idx}]))"))
+            if it['st'] != 'pending': continue
+            d = it['d']
+            choose(tid, idx)
+            nid = g.ev("R.wsel")
+            check(nid and g.ev(f"wfNode({nid}).d") == d, f'{d}: chosen on its ticket')
+            first = json.loads(g.ev(f"JSON.stringify((()=>{{const n=wfNode({nid});const s=wfBestSlot(n,wfCueSlots(n));return s?wfSlotCenter(s):null}})())"))
+            check(first, f'{d}: its first place is lit')
+            tap_scene(first['x'], first['y'])
+            check(g.ev(f"wfNode({nid}).who==='jill'"), f'{d}: the lit place tapped, Jill goes')
+            for _ in range(900):
+                if g.ev(f"(n=>!n||n.st==='ready')(wfNode({nid}))"): break
+                tick(3)
+            check(g.ev(f"wfNode({nid})&&wfNode({nid}).st==='ready'"), f'{d}: made, it waits where it was made')
+            if g.ev("R.wsel") != nid: choose(tid, idx)
+            nxt = g.ev(f"wfNext(wfNode({nid}))")
+            cue = json.loads(g.ev(f"JSON.stringify((c=>c.free.map(s=>s.type))(wfCueSlots(wfNode({nid}))))"))
+            if d == 'coffee':
+                check(nxt == 'serve' and cue == ['bar'] and '送飲料' in g.ev(GUIDE) and '出杯' not in g.ev(GUIDE),
+                      f'the latte made: the machine is the lit place and the guide says 送飲料: {nxt} {cue} / {g.ev(GUIDE)}')
+                seen['coffee_lit'] = True
+            sp = json.loads(g.ev(f"JSON.stringify((()=>{{const n=wfNode({nid});const s=wfFoodSpot(n,n.slot);return{{x:s.x,y:s.y}}}})())"))
+            tap_scene(sp['x'], sp['y'] - 6)                        # the finished food / the cups, where they are
+            check(g.ev(f"wfNode({nid}).who==='jill'"), f'{d}: tapped where it is: Jill goes for it ({nxt})')
+            reach = json.loads(g.ev(f"JSON.stringify((()=>{{const r=wfReach(wfNode({nid}));return{{x:r.x,y:r.y}}}})())"))
+            near = False
+            for _ in range(900):
+                if not g.ev(f"!!wfNode({nid})"): break
+                p = json.loads(g.ev("JSON.stringify((J=>({x:J.x,y:J.y}))(wfJ()))"))
+                if abs(p['x'] - reach['x']) < 3 and abs(p['y'] - reach['y']) < 3: near = True
+                tick(2)
+            hands = ((reach['x'] - sp['x']) ** 2 + (reach['y'] - 33 - sp['y']) ** 2) ** .5
+            seen['reach'].append((d, round(hands)))
+            check(near and hands < 50, f'{d}: she went to it and stood within reach of it ({hands:.0f} px from her hands)')
+            st = json.loads(g.ev(f"JSON.stringify((it=>({{st:it.st,pi:it.pi}}))(R.tickets.find(t=>t.id==={tid}).items[{idx}]))"))
+            check(st['st'] in ('ready', 'served') and (st['st'] == 'served' or st['pi'] is not None), f'{d}: on the pass at its own spot for the floor: {st}')
+    served_latte = False
+    done = set()
+    to_room('main')
+    for _ in range(1200):
+        if not g.ev("phase==='service'&&!!R"): break
+        t = g.ev("(()=>{const t=R.tables.find(t=>t.group&&t.group.state==='order'&&!jillTargets(t.i));return t?t.i:null})()")
+        if t is not None: tap_table(t)                              # the 「!」: the order
+        tid = g.ev("(()=>{const tk=R.tickets.find(tk=>!tk.lounge&&tk.items.some(i=>i.st==='pending'));return tk?tk.id:null})()")
+        if tid and tid not in done:
+            has_latte = g.ev(f"R.tickets.find(t=>t.id==={tid}).items.some(i=>i.d==='coffee')")
+            table = g.ev(f"R.tickets.find(t=>t.id==={tid}).g.table")
+            cook(tid); done.add(tid)
+            tap_table(table)                                        # the plates to the table
+            for _ in range(600):
+                if g.ev(f"!R.tickets.find(t=>t.id==={tid})||R.tickets.find(t=>t.id==={tid}).items.every(i=>i.st==='served')"): break
+                tick(3)
+            got = json.loads(g.ev(f"JSON.stringify((()=>{{const tk=R.tickets.find(t=>t.id==={tid});return tk?tk.items.map(i=>[i.d,i.st]):'done'}})())"))
+            check(got == 'done' or all(st == 'served' for d, st in got), f'the table has its order: {got}')
+            if has_latte:
+                served_latte = True; break
+        tick(3)
+    check(served_latte and seen['coffee_lit'], f'a latte made, taken out with a tap and brought to its guest: {seen}')
+    check(g.ev("(R&&R.st.dish||{}).coffee>0"), 'the evening counts the latte as served')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def cooking_the_users_day3_latte_goes_out_by_a_tap(b, port, target):
+    """The user's own save (tests/saves/cooking_day3_0156.json, private test page Version 10, sent with 「拿鐵咖啡做好無法
+    出杯」): Day 3, 18:33, a latte made at the coffee machine and waiting there — nothing lit, no tap taking it out. Resumed
+    the way the title's OPEN resumes it: now the machine is lit and the guide says 送飲料; a tap on the cups sends Jill to
+    them; they go to the pass; a tap on the table, and 林小姐 has her latte."""
+    import os
+    raw = json.load(open(os.path.join(_rt.ROOT, 'tests', 'saves', 'cooking_day3_0156.json'), encoding='utf-8'))['save']
+    g = Game(b, port, target, seed=1, manual=True, viewport={'width': 390, 'height': 844})
+    g.ev("phase='title';R=null;localStorage.setItem(KEY,JSON.stringify(%s))" % json.dumps(raw, ensure_ascii=False)); g.reload(); g.page.wait_for_timeout(150)
+    g.click('[data-act=open]'); g.page.wait_for_timeout(150)
+    for _ in range(30):
+        if g.ev("typeof DLG!=='undefined'&&!!DLG"): g.ev("dlgNext()")
+    tick = lambda n=1: g.ev(f"(n=>{{for(let i=0;i<n;i++){{for(const q of R.groups)q.pat=1;__tick(1000/30)}}}})({n})")
+    check(g.ev("phase") == 'service' and g.ev("S.day") == 3, 'the evening resumed at 18:33')
+    n = json.loads(g.ev("JSON.stringify((n=>n&&{st:n.st,d:n.d,next:wfNext(n),slot:n.slot&&n.slot.type})(wfNode(8)))"))
+    check(n == {'st': 'ready', 'd': 'coffee', 'next': 'serve', 'slot': 'bar'}, f'the latte as it was: made, at the machine, its next step 送飲料: {n}')
+    g.ev("setRoom('kitchen');R.wsel=8;renderTickets();wfGuideUpd();__tick(1000/30)")
+    check(json.loads(g.ev("JSON.stringify(wfCueSlots(wfNode(8)).free.map(s=>s.type))")) == ['bar'] and '送飲料' in g.ev(GUIDE), f'the machine is lit, the guide says 送飲料: {g.ev(GUIDE)}')
+    sp = json.loads(g.ev("JSON.stringify((n=>{const s=wfFoodSpot(n,n.slot);return{x:s.x,y:s.y}})(wfNode(8)))"))
+    _tap_scene(g, sp['x'], sp['y'] - 6)
+    check(g.ev("wfNode(8).who==='jill'&&wfNode(8).st==='fetch'"), 'a tap on the cups: Jill goes for them')
     for _ in range(600):
-        g.ev("__run(3)")
-        nid = g.ev("(()=>{wfGather();const n=wfList().find(n=>n.d==='coffee'&&n.st==='wait');return n?n.id:0})()")
-        if nid: break
-    check(nid, 'a latte ordered')
-    sel = g.ev(f"(()=>{{const n=wfNode({nid});const o=n.its[0];const i=o.tk.items.indexOf(o.it);return '#tickets [data-tk=\"'+o.tk.id+'\"][data-i=\"'+i+'\"]'}})()")
-    g.ev("renderTickets()"); g.page.click(sel); g.page.wait_for_timeout(40)
-    check(g.ev("R.wsel") == nid, 'the latte chosen on its ticket')
-    _tap_slot(g, "R.slots.find(s=>s.type==='bar')")
-    check(g.ev(f"wfNode({nid}).who==='jill'"), 'the coffee machine tapped: Jill makes it')
-    check(_until(g, f"wfNode({nid}).st==='ready'", step=3), 'made')
-    cue = json.loads(g.ev(f"JSON.stringify((c=>({{free:c.free.map(s=>s.type)}}))(wfCueSlots(wfNode({nid}))))"))
-    check(cue['free'] == ['bar'] and '出杯' in g.ev(GUIDE), f'made: the machine with the cups is the lit place, the guide says 出杯: {cue} / {g.ev(GUIDE)}')
-    if g.ev("R.wsel") != nid:
-        _tap_slot(g, f"wfNode({nid}).slot")   # (chosen again with a tap on it, if the choice went away)
-    _tap_slot(g, f"wfNode({nid}).slot")
-    check(g.ev(f"wfNode({nid}).who==='jill'&&wfNode({nid}).st==='fetch'"), f'a tap on it: Jill goes for the cups: {g.ev(WF)}')
-    reach = json.loads(g.ev(f"JSON.stringify((()=>{{const n=wfNode({nid});const r=wfReach(n);const sp=wfFoodSpot(n,n.slot);return{{x:r.x,y:r.y,side:r.side,cx:sp.x,cy:sp.y}}}})())"))
-    check(reach['side'] and abs(reach['x'] - reach['cx']) < 50 and ((reach['x'] - reach['cx']) ** 2 + (reach['y'] - 33 - reach['cy']) ** 2) ** .5 < 50,
-          f'where she takes them: beside the cups, within reach: {reach}')
-    at = False
-    for _ in range(400):
-        p = json.loads(g.ev("JSON.stringify((()=>{const J=wfJ();return{x:J.x,y:J.y}})())"))
-        if abs(p['x'] - reach['x']) < 3 and abs(p['y'] - reach['y']) < 3: at = True
-        if not g.ev(f"!!wfNode({nid})"): break
-        g.ev("__run(1)")
-    check(at, 'she went to the cups')
-    items = json.loads(g.ev("JSON.stringify(R.tickets.flatMap(tk=>tk.items.filter(it=>it.d==='coffee').map(it=>[it.st,it.pi])))"))
-    check(items and all(st in ('ready', 'served') for st, _ in items), f'out: on the pass for the floor (or served already): {items}')
+        if not g.ev("!!wfNode(8)"): break
+        tick(2)
+    it = json.loads(g.ev("JSON.stringify(R.tickets.flatMap(t=>t.items).filter(i=>i.d==='coffee').map(i=>[i.st,i.pi]))"))
+    check(it and it[0][0] == 'ready' and it[0][1] is not None, f'the latte on the pass at its own spot: {it}')
+    table = g.ev("R.tickets.find(t=>t.items.some(i=>i.d==='coffee'&&i.st==='ready')).g.table")
+    g.ev("setRoom('main');__tick(1000/30)")
+    xy = json.loads(g.ev(f"JSON.stringify((t=>({{x:t.x,y:t.y}}))(R.tables[{table}]))"))
+    _tap_scene(g, xy['x'], xy['y'])
+    for _ in range(600):
+        if g.ev("(R.st.dish||{}).coffee>0"): break
+        tick(3)
+    check(g.ev("(R.st.dish||{}).coffee>0"), f'林小姐 has her latte: {g.ev("JSON.stringify(R.tickets.flatMap(t=>t.items).map(i=>[i.d,i.st]))")}')
     check(not g.errors, g.errors[:3]); g.close()
