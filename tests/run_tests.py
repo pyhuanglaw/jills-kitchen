@@ -3956,6 +3956,7 @@ import v23_tests  # noqa: E402,F401
 import v24_tests  # noqa: E402,F401
 import qa_tests  # noqa: E402,F401   (the routine QA, docs/QA.md: `--qa` runs only these)
 import sim_player_tests  # noqa: E402,F401   (the simulated player's own tests: tools/qa/sim_player.py)
+import cooking_tests  # noqa: E402,F401   (v2.5: the working kitchen — docs/cooking/ARCHITECTURE.md)
 
 def main():
     ap = argparse.ArgumentParser()

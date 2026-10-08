@@ -99,6 +99,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 #wfGuide .wfl{margin-top:1px;font-weight:700;color:var(--ink3)}#wfGuide .wfl span.done{color:#5E8F4E}#wfGuide .wfl span.now{color:var(--ink)}#wfGuide .wfl i{font-style:normal;margin:0 4px;color:var(--ink3)}
 #wfGuide .wfn{margin-top:1px;font-weight:800;color:#8E6422}
 #wfGuide:not([hidden]) ~ #toasts{transform:translateY(-62px)}
+#coach:not([hidden]) ~ #wfGuide{bottom:78px}   /* above a first-day tip, never under it */
 .stars{color:#C99A45;font-size:11px;letter-spacing:1px;margin-left:2px}
 .lab .opts button{display:inline-flex;align-items:center;gap:4px;padding:5px 9px 5px 5px}
 .lab .opts img{width:22px;height:22px}
