@@ -1,0 +1,902 @@
+（使用者 2026-10-08 凌晨，接在「睡前最後補一則……防災條款」之後的補充，逐字。防災條款本身已經收在 cooking_overnight_orders_2026-10-07.txt。）
+
+補充：你剛才找到的兩道漏網料理，不需要留到我醒來決定。
+
+我希望目前遊戲中所有既有料理都進入新的 Cooking workflow system。如果你在 repo 裡又找到我們清單沒有列到的料理，不要因為清單漏掉，就永久保留舊 cooking state machine 當特殊例外。
+
+目前新增確認：
+
+* 瑪格麗特披薩 — PREP → PIZZA OVEN → PLATING
+* 蘑菇白醬披薩 — PREP → PIZZA OVEN → PLATING
+
+兩者與酒吧披薩使用同一套 workflow family。
+
+其中：
+
+* PREP 自動包含餅皮整形、抹醬、起司與配料組裝等實際動作。
+* PIZZA OVEN 自動包含烘烤與等待。
+* PLATING 自動包含出爐後必要的切片／整理／上 Pass。
+* 這些內部動作可以有動畫，但不增加玩家 step。
+
+因此目前至少是：
+
+Restaurant 22 + Lounge 9 + 兩道額外披薩 + Signature Main + Signature Dessert + Specials。
+
+如果接下來 audit 又找到其他既有料理：
+
+1. 先不要停工。
+2. 不要永久沿用舊 cooking system。
+3. 優先按照料理實際製作方式，把它歸入我們已存在的 workflow family：
+    * HOT → PLATING
+    * PREP → PLATING
+    * PREP → HOT → PLATING
+    * OVEN → PLATING
+    * PREP → OVEN → PLATING
+    * DRINK → SERVE
+    * PREP → PIZZA OVEN → PLATING
+4. 玩家可感知步驟仍然最多 3 步，而且大部分維持 2 步。
+5. 切、拌、翻面、攪拌、瀝乾、加醬、休息、切片、裝飾等真實料理細節，優先放在 station 內作為 Jill／員工的自動動作與動畫，不要因此增加玩家 step。
+6. 如果某道料理你真的不知道應該歸哪個 workflow，把菜名與目前遊戲資料記下來，不要自己亂定，也不要因此停止其他工作。 我會替它決定流程。
+
+原則仍然是：
+
+菜色可以很多，廚房工作的語法要很少。
+
+以及：
+
+料理的真實感主要由角色實際做出的動畫表現，不靠增加玩家點擊次數。
+
+所以不要因為一道菜現實中有七八個製作動作，就做成七八個 gameplay steps。
+廚師 audit 這幾點不用全部留成待決問題，可以先依下面原則繼續。
+
+1. 阿德師傅
+
+新 Cooking System 中，阿德師傅確定以 HOT 為 core specialty。
+
+前期只有阿德一位廚師沒有問題。這反而可以形成：
+
+* Jill：四區 all-rounder
+* 阿德：HOT specialist
+
+讓玩家早期自然感受到第一個廚師帶來的是「熱區有人可以幫忙顧」，而不是多一個無差別自動做菜的人。
+
+具體星等與升級曲線可以等 proficiency architecture 完成後再校準，但 HOT 是阿德永久核心專長。
+
+⸻
+
+2. 首位廚師目前預設在咖啡吧
+
+這是舊系統行為，不要把它當成新 Cooking System 的產品 canon。
+
+我們已經決定 generic chef 的專長領域只有：
+
+* HOT
+* PREP
+* OVEN
+* PLATING
+
+DRINK 不屬於 generic chef proficiency tree。
+
+所以新系統不要因為舊版首位廚師 home/default spot 在咖啡吧，就把阿德設計成 DRINK／咖啡專長。
+
+請查清楚目前「首位廚師預設在咖啡吧」究竟只是 actor home spot、idle positioning，還是真的參與咖啡工作。
+
+如果只是 idle/home positioning，可以在新系統中調整成符合廚房動線的位置。
+
+如果它牽涉既有 gameplay logic，先記錄 dependency，再以最小改動解耦。
+
+不要因此重新設計咖啡吧或廚房。
+
+⸻
+
+3. 現在廚師沒有個別專長
+
+這代表 proficiency 是新 Cooking System 新增的 architecture，不需要假裝相容一套不存在的舊 specialty system。
+
+仍採：
+
+* 每位廚師有永久 core specialty
+* 有 secondary tendency
+* 升級後可以跨區支援
+* 不 hard-lock
+* 不讓滿級所有人變成完全相同的 all-rounder
+* Jill 是唯一真正四區全能，但同一時間仍只能處理有限工作
+
+先把 generic proficiency architecture 做乾淨。
+
+角色的最終 specialty mapping 只有在人設／招募順序不確定時才留待決，不要因此停止 architecture。
+
+⸻
+
+4. 小魏目前無法正常招募
+
+先不要為了湊八人 specialty matrix 而擅自讓小魏變成可招募。
+
+請查清楚：
+
+* 小魏角色資料是否完整
+* 是否有 recruitment condition
+* 是否有 recruitment event / UI
+* 是否曾經可以招募
+* Git history 是否顯示招募入口被刪除
+* 是否只是 unreachable condition
+* 是否是未完成內容
+* 是否是刻意 disabled
+* 是否只有測試／舊資料殘留
+
+然後把結論寫進 audit。
+
+在原因確認以前：
+
+目前正常遊戲可招募的 7 位廚師才是 gameplay reality。
+
+不要因為我們先前曾設計「8 人＝四區各兩位 core」就修改正式 progression 來符合那張表。
+
+如果小魏本來就是漏接的完整角色，再提出修復方案。
+
+如果小魏本來就不是正式可招募角色，我們就用實際 7 人重新分配 specialization。
+
+⸻
+
+5. M7 不應因此停工
+
+可以先完成：
+
+* proficiency data structure
+* ★ / ★★ / ★★★ 行為差異
+* core / secondary / cross-cover 規則
+* AI station preference
+* batching preference
+* player override / staff handoff
+* upgrade hooks
+
+然後再把已確認角色逐一掛入。
+
+角色 mapping 是 data；proficiency system 是 architecture。不要讓前者的不確定阻塞後者。
+
+另外，員工升級不能增加 station capacity；設備／空間才增加 capacity。
+
+⸻
+
+目前先以：
+
+「Full roster 要能完整覆蓋四區；小團隊容易形成合理覆蓋；單一員工不必全能。」
+
+作為 balance 原則。
+
+不需要為了數學上漂亮而強迫每一區一定剛好兩名 core specialist。角色差異與實際 recruitment progression 優先。
+你可以大概跟我講你需要多少時間做這個東西嗎？然後中間會出現的東西大概幾小時會出現什麼？
+補充兩個重要的 Cooking System canon：玩家／員工的交接必須無縫，以及 Signature 不永久綁 Jill。
+
+一、料理工作屬於 work node，不屬於某個角色
+
+請把這當成 handoff architecture 的核心：
+
+料理的 workflow state、目前 step、step progress、batch quantity、station assignment 屬於 work node；Jill／員工只是目前的 handler。
+
+所以換人不能：
+
+* 重置目前 step
+* 重做已完成 step
+* 重置等待時間
+* 重新產生一張 ticket
+* 把料理搬回上一站
+* 取消 batch
+* 造成明顯停頓
+
+例如：
+
+✓ PREP → ● HOT 63%（阿德） → ○ PLATING
+
+Jill 接手後應直接變成：
+
+✓ PREP → ● HOT 63%（Jill） → ○ PLATING
+
+而不是 HOT 從 0% 重來。
+
+⸻
+
+二、玩家「停止操作」不應該需要按一個交接按鈕
+
+不要做：
+
+交給員工
+取消控制
+AUTO
+請求接手
+
+這些會讓本來應該自然的系統變得很機械。
+
+玩家做完一個 step，例如：
+
+✓ PREP → ● HOT → ○ PLATING
+
+如果玩家沒有繼續指派 HOT，這道菜就自然回到 available work queue。
+
+任何符合資格、目前有空的廚師都可以依 AI priority 接手。
+
+玩家不需要宣告：
+
+我不做了。
+
+不繼續做，本身就是放手。
+
+⸻
+
+三、玩家優先，但不要讓「選取」本身造成搶工作
+
+避免玩家只是點一道菜查看 workflow，就立刻把員工踢走。
+
+建議區分：
+
+Focus / Inspect
+
+玩家點 ticket：
+
+* 顯示 workflow
+* 顯示下一步
+* 顯示 directional guidance
+* 顯示目前 handler
+
+不改 ownership。
+
+Commit / Assign
+
+玩家真的點合法 station、讓 Jill 執行工作時，才算玩家介入。
+
+如果工作尚未開始：
+
+* Jill 優先取得 work node。
+
+如果員工已經在做：
+
+* 不要瞬間 teleport 或粗暴取消動畫。
+* 在合理的 handoff point 交接，或如果該動作本身不適合中途換人，就讓目前短動作完成後 Jill 接下一個可交接點。
+
+產品原則是：
+
+state 可以無縫延續，但畫面不能荒謬。
+
+例如一個鍋子正在阿德手上翻炒，Jill 不應瞬間把鍋子從他手上吸過來。
+
+可以：
+
+* 阿德完成目前很短的 animation beat
+* 把位置／器具讓出
+* Jill 接續同一個 HOT progress
+
+玩家感覺仍然應該是立即回應，而不是重新做菜。
+
+⸻
+
+四、員工接手也要自然
+
+Jill 做完 PREP 後離開：
+
+✓ PREP → ● HOT → ○ PLATING
+
+阿德決定接手時：
+
+1. work node handler → 阿德
+2. 阿德走向實際 HOT station
+3. 合法 slot 保留給該 work node
+4. 食物／容器跟著合理移動
+5. 阿德開始 HOT
+6. ticket 更新為：
+    ✓ PREP → ● HOT（阿德） → ○ PLATING
+
+不要讓料理瞬移，也不要讓 UI 與角色行為不同步。
+
+如果 HOT 滿：
+
+✓ PREP → ● HOT（等待） → ○ PLATING
+
+料理安全留在合理的位置。
+
+HOT slot 空出後，符合資格的員工可以自然接走。
+
+⸻
+
+五、玩家可以只做一部分
+
+這是正式玩法，不是 edge case。
+
+玩家可以：
+
+* 只做 PREP
+* 只處理 HOT
+* 只清 PLATING
+* 做兩個 step 後放手
+* 接員工做到一半的工作
+* 處理 bottleneck 後再離開廚房
+
+不要假設「玩家一旦碰這道菜，就必須負責到底」。
+
+同樣也不要假設「員工一旦接手，玩家就不能碰」。
+
+Handler 是暫時的；work node 才是持續存在的主體。
+
+⸻
+
+六、避免 Jill 和 AI 搶同一份工作
+
+需要 reservation / claim state。
+
+至少區分：
+
+* available
+* claimed / walking to station
+* active
+* waiting for next station
+* completed
+
+當 Jill 已正式 commit 某個 work node，AI 不再 claim。
+
+當員工已 claim 並正在走過去，玩家仍可介入，但系統要乾淨取消／轉移 claim，不能兩個人走去拿同一盤。
+
+任何時刻一個 work node / station slot 只能有一個有效 handler。
+
+⸻
+
+七、交接的目標不是「看得出系統在換人」
+
+最好的 handoff 應該讓玩家幾乎不用想它。
+
+玩家看到的是：
+
+我做完這個，去看別的事情。
+
+過一會回來：
+
+喔，阿德已經在處理下一步了。
+
+或者：
+
+阿德正在做，我現在想接。
+
+點 station 後 Jill 自然走過去接續。
+
+不要大量 popup、confirmation modal、ownership icon、handoff notification。
+
+Ticket 上一個簡單的 handler 名稱就夠：
+
+● HOT · 阿德
+
+⸻
+
+Signature 修正
+
+不要把 Jill Signature Main / Dessert 設計成永久只有 Jill 能製作。
+
+正確方向是：
+
+Jill
+
+* 最早解鎖／創作 Signature
+* 一開始自然只有 Jill 會
+* proficiency 高
+* 是這道料理的 originator
+
+其他廚師
+
+隨著員工等級／能力成長，高等級且符合料理所需 station proficiency 的廚師可以學會並獨立完成 Signature。
+
+所以 Signature 的限制應該是：
+
+skill / mastery gate，而不是永久 character lock。
+
+例如早期：
+
+Jill Signature Main
+只有 Jill 能處理。
+
+成熟餐廳後：
+
+某位已達足夠等級、且 HOT / PREP 等相關能力成熟的廚師，也能接：
+
+PREP → HOT → PLATING
+
+玩家不必永遠親自做 Signature。
+
+這樣員工成長才真的有意義。
+
+可以保留 Jill 對自己 Signature 的最高熟練度／較高 AI priority／較早掌握，但不要用「只有 Jill 可以做」維持 Jill 的存在感。
+
+不要為了讓 Jill 有事做而故意讓其他成熟廚師學不會料理。
+
+Jill 的角色存在感應來自她是主廚、創作者、全區 all-rounder、故事核心與玩家最自由的介入角色，而不是人工封鎖員工能力。
+
+⸻
+
+最終體驗目標
+
+廚師足夠、能力足夠時：
+
+玩家完全不介入，餐廳也能正常完成料理。
+
+玩家想玩的時候：
+
+任何時候都能自然介入。
+
+玩家玩到一半不想管：
+
+放著即可，符合資格的員工自然接續。
+
+玩家回去看貓、熟客、Lounge 或故事：
+
+廚房繼續活著。
+
+玩家重新回廚房：
+
+不是重新開始料理，而是加入一個一直持續運作的廚房。
+
+核心不是 AUTO mode。
+
+核心是：
+
+同一間廚房一直在運作；玩家只是自由決定自己現在要參與多少。
+補充一個比「可以 handoff」更重要的 UX 原則：
+
+玩家任何時候都不能困惑兩件事：
+
+1. 我做完這一步，接下來去哪？
+2. 這道菜現在到底是我要做，還是哪個員工要做？
+
+A. Step 完成時，下一站必須立即、永久可見
+
+例如 Jill 完成牛排 PREP 的同一刻：
+
+✓ 備料 → ● 熱區 → ○ 裝盤
+
+並立即顯示：
+
+下一步：熱區
+
+如果玩家 focus 這道菜：
+
+* 實際合法 HOT station 出現克制的空間 cue
+* 必要時有方向提示
+* 不需要打開 recipe/help
+* 不需要記流程
+
+玩家離開十分鐘再回來，也仍然能從 ticket 看懂現在在哪一步、下一步去哪。
+
+不能存在 workflow 的認知空窗。
+
+⸻
+
+B. 員工不能無預告地把料理「拿走」
+
+自動 staff AI 可以存在，但玩家必須看得懂它即將做什麼。
+
+料理完成一個 step、尚未有人接下一步時：
+
+✓ 備料 → ● 熱區 → ○ 裝盤
+下一步：熱區 · 等待處理
+
+阿德決定接手後，在真正開始前更新：
+
+下一步：熱區 · 阿德前往中
+
+然後角色實際走向料理／station。
+
+開始後：
+
+● 熱區 · 阿德
+
+因此玩家可以從：
+
+等待 → 被 claim → 前往 → 工作中
+
+看見完整因果。
+
+不要料理放著一秒，下一秒突然消失，然後玩家才從另一個角落發現阿德正在做。
+
+⸻
+
+C. 玩家正在做的 step，員工原則上不要中途搶
+
+修正 handoff 的粒度：
+
+正常 handoff point 是 step boundary，而不是任意 progress percentage。
+
+例如：
+
+Jill：
+● PREP
+
+Jill 完成後：
+
+✓ PREP → ● HOT
+
+這時阿德可以接 HOT。
+
+不要讓：
+
+HOT 47%（Jill）
+
+突然變成：
+
+HOT 47%（阿德）
+
+除非未來有非常特殊且合理的中斷情境。
+
+這可以大幅降低：
+
+* ownership confusion
+* animation discontinuity
+* utensil/food teleport
+* AI/player race conditions
+* 玩家不知道誰在做什麼
+
+所以正常設計是：
+
+一個 step 一個 handler；step 與 step 之間自由交接。
+
+⸻
+
+D. 玩家可以在員工「前往中」時拿回工作
+
+如果：
+
+下一步：熱區 · 阿德前往中
+
+玩家這時 focus 該料理並正式指派 Jill 到 HOT：
+
+* Jill claim 優先
+* 阿德取消該 claim
+* 阿德重新尋找其他工作
+* 不跳 confirmation modal
+* 不懲罰
+* 不重置料理
+
+但如果阿德已經正式開始 HOT，原則上讓他完成 HOT；玩家可以在下一個 PLATING step 再接。
+
+這讓 ownership 非常容易理解。
+
+⸻
+
+E. Focus 永遠不能等於 Claim
+
+玩家點一道料理只是想確認：
+
+它現在做到哪？
+下一步去哪？
+誰正在做？
+
+所以 focus ticket 只強化：
+
+* workflow
+* next step
+* station guidance
+* current/next handler
+
+只有玩家真的把 Jill 指派到合法 station，才取得 claim。
+
+⸻
+
+F. Ticket 必須回答四件事
+
+任何 active work node，不用打開額外介面就應該能知道：
+
+這是什麼？
+黃金蛋炒飯 ×3
+
+做到哪？
+✓ 熱區 → ● 裝盤
+
+下一步去哪？
+下一步：裝盤
+
+誰會處理？
+以下其中一種：
+
+* 等待處理
+* Jill
+* 阿德前往中
+* 阿德處理中
+
+這些資訊比百分比、秒數、quality meter 更重要。
+
+⸻
+
+G. 最重要的 UX test
+
+請把這列入 Cooking prototype 驗收：
+
+同時放 4–6 個不同 workflow phase 的 work nodes。
+
+測試者不記任何 recipe。
+
+隨機點其中任何一道菜後，2 秒內必須回答：
+
+1. 這道菜現在做到哪？
+2. 下一步去哪？
+3. 廚房裡那個地方在哪？
+4. 現在有人要處理它嗎？
+5. 如果我想自己處理，我現在能不能介入？
+
+任何一題需要猜，guidance / handoff UX 就還沒完成。
+
+核心原則：
+
+遊戲負責記住流程，也負責說清楚現在誰在做；玩家只負責決定要不要介入。
+補充 Cooking System 很重要的「Order → Kitchen」入口 UX。
+
+目前不要只設計料理已經進 workflow 之後的 guidance；玩家從客人訂單開始，就必須可以非常直覺地把一道料理送進第一個 station。
+
+1. 客人訂單不能因為訂單變多而無限縮小
+
+不要採用：
+
+「畫面有幾張單，就把全部 ticket 一直縮小直到全部塞得下。」
+
+這在手機上會導致：
+
+* 菜名看不清楚
+* 數量看不清楚
+* touch target 太小
+* 很難準確點到想處理的菜
+* service 越忙，UI 反而越不能操作
+
+每個可操作 order / dish entry 必須維持穩定、舒服的最小尺寸與 touch target。
+
+訂單太多時應採：
+
+* 可捲動
+* 合理分頁／堆疊
+* focused order 展開
+* 非 focused order 保持摘要
+
+而不是繼續縮小。
+
+手機優先。
+
+玩家必須能很容易點到「我現在就是要做這一道」。
+
+⸻
+
+2. 玩家點客人訂單中的一道菜後，立刻進入 Cooking Focus
+
+例如桌 3：
+
+炙烤肋眼牛排 ×1
+
+玩家點它。
+
+不要再跳出 recipe menu 或 station selection modal。
+
+立即：
+
+Ticket / workflow
+
+顯示：
+
+炙烤肋眼牛排 ×1
+● 備料 → ○ 熱區 → ○ 裝盤
+第一步：備料
+
+Kitchen
+
+實際廚房裡合法的 PREP station 同時得到克制但明確的 focused cue。
+
+如果有多個 PREP slot：
+
+* 系統優先標示目前可用／最合理的一個
+* 玩家不需要自己理解「這是 Prep 1、Prep 2、Prep 3」
+
+Food/work representation
+
+第一個 station 應該出現這道料理「準備開始」的合理視覺 representation／placement cue。
+
+例如牛排：
+
+* Prep board 上的 ingredient / tray / work cue
+
+炒飯：
+
+* 合法 HOT burner / pan position 上的 work cue
+
+烤雞：
+
+* PREP first，因此先在 Prep，不直接跳 Oven
+
+讓玩家肉眼看得出：
+
+「喔，這道菜現在應該從那裡開始。」
+
+⸻
+
+3. 第二次點實體 station = 開始工作
+
+核心 interaction：
+
+第一次：點我要做的菜。
+第二次：點廚房裡它該去的地方。
+
+然後 Jill 自然走過去開始。
+
+例如：
+
+玩家點：
+黃金蛋炒飯 ×2
+
+→ workflow 顯示：
+● HOT → ○ PLATING
+
+→ 一個合法 burner / pan position 被提示
+
+玩家點那個實體位置
+
+→ Jill claim work node
+→ Jill 走過去
+→ 開始 HOT
+
+不要再插入：
+
+* 「開始料理？」確認
+* station 下拉選單
+* recipe book
+* 「選擇工作區」
+* 大型 START 按鈕
+
+點菜 → 看見目的地 → 點目的地 → Jill 開始。
+
+⸻
+
+4. Focus 時，料理應該在空間上「有去處」
+
+玩家最不能遇到：
+
+我剛剛點牛排了。
+然後呢？
+它在哪？
+我要按什麼？
+
+所以 focus 一道尚未開始的料理時：
+
+必須同時回答：
+
+* 這是什麼菜
+* 第一個 step 是什麼
+* 第一站在哪裡
+* 廚房裡哪個實際位置可以開始
+
+也就是：
+
+UI workflow + physical kitchen cue 必須同步。
+
+不是只有 ticket 上寫 PREP，然後玩家自己在漂亮廚房裡猜哪張桌子叫 PREP。
+
+⸻
+
+5. 料理開始後沿用永久 guidance
+
+一旦第一步開始，就回到既定 workflow canon。
+
+例如：
+
+● PREP · Jill
+
+完成：
+
+✓ PREP → ● HOT → ○ PLATING
+下一步：熱區 · 等待處理
+
+玩家 focus 它：
+
+→ 合法 HOT station 被提示。
+
+玩家點 HOT：
+
+→ Jill 接續。
+
+如果玩家不點：
+
+→ 合格員工可以依 handoff canon claim。
+
+所以從客人下單到出菜是一條完全連續的 interaction：
+
+Order
+↓
+點料理
+↓
+第一站被指出
+↓
+點實體 station
+↓
+Jill / staff 做 step
+↓
+下一站立即指出
+↓
+玩家決定自己繼續或放手
+↓
+PLATING
+↓
+Serve
+
+中間不能出現「不知道下一步要按哪裡」的斷點。
+
+⸻
+
+6. 訂單很多時仍然必須容易找到料理
+
+請特別做 mobile stress test：
+
+* 4 tables
+* 5–6 active dishes
+* 不同料理
+* 有 batch
+* 有料理已開始
+* 有料理尚未開始
+* 有員工處理中
+
+要求：
+
+每一道仍然容易點。
+
+不要為了全部同時露出而縮成很小。
+
+如果空間不足，寧可讓 order area 有清楚的 scroll / stack / focus behavior。
+
+Focused dish 必須明顯，但不要蓋掉大半個廚房。
+
+⸻
+
+7. Focus 可以隨時切換
+
+玩家點牛排：
+
+→ 牛排第一站提示。
+
+突然改變主意，點炒飯：
+
+→ 牛排 focus cue 收掉
+→ 炒飯 workflow 成為 focused
+→ HOT 第一站 cue 出現。
+
+牛排本身不消失、不取消、不受懲罰。
+
+一次只需要一個強 guidance，避免廚房同時滿天箭頭。
+
+⸻
+
+8. 員工已經 claim 的訂單也仍可點
+
+例如客人訂單中的炒飯已經被阿德接手。
+
+玩家點它，不要重新開始，也不要搶走。
+
+顯示：
+
+黃金蛋炒飯 ×3
+● HOT · 阿德
+
+並 focus 實際阿德正在使用的 burner。
+
+玩家立刻理解：
+
+「這道已經有人在做。」
+
+而不是點了沒反應。
+
+⸻
+
+驗收標準
+
+新玩家第一次看到客人訂單，不看說明書：
+
+1. 能點到自己想做的料理。
+2. 點下去後 2 秒內知道第一步在哪。
+3. 能直接點實體廚房位置讓 Jill 開始。
+4. 完成後 2 秒內知道下一站。
+5. 訂單增加時 touch target 不會縮到難點。
+6. 員工已經處理的料理，點下去能看懂誰在做、在哪裡做。
+
+核心操作應該簡單到可以概括成：
+
+「點你想做的菜，廚房告訴你去哪；點那個地方，Jill 就開始。」
+
+玩家負責選「我要做哪一道」。
+
+遊戲負責回答「它現在該去哪裡」。
