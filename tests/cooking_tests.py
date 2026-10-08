@@ -73,7 +73,7 @@ def cooking_fried_rice_goes_hot_then_plating_by_taps(b, port, target):
     n = json.loads(g.ev(WF))
     check(len(n) >= 1 and g.ev("R.wsel") == n[0]['id'] and g.ev("room") == 'kitchen', f'the ticket item selects its work, in the kitchen: {n}')
     gt = g.ev(GUIDE)
-    check('黃金蛋炒飯' in gt and '● 熱區' in gt and '○ 裝盤' in gt and '下一步：熱區' in gt, f'the card: the dish, its workflow, the next step: {gt!r}')
+    check('黃金蛋炒飯' in gt and '● 熱區' in gt and '○ 裝盤' in gt and '第一步：熱區 · 等待處理' in gt, f'the card: the dish, its workflow, its first step, nobody on it yet: {gt!r}')
     check(g.ev("!!document.querySelector('#tickets .it.wsel .wf b')") and g.ev("document.querySelector('#tickets .it.wsel .wf b').textContent") == '熱',
           'the ticket item is picked out and its mark says 熱 now')
     check(g.ev("wfCueSlots(wfNode(R.wsel)).free.length") == 2, 'both free burners are cued')
@@ -93,7 +93,7 @@ def cooking_fried_rice_goes_hot_then_plating_by_taps(b, port, target):
     _tap_scene(g, pp['x'], pp['y'] - 2)
     check(g.ev("wfNode(R.wsel)&&wfNode(R.wsel).st") in ('fetch', 'go'), 'the pass tapped: Jill goes to fetch it')
     gt = g.ev(GUIDE)
-    check('Jill 正在裝盤' in gt, f'on her way the card names the step she takes it to, not the one it left: {gt!r}')
+    check('下一步：裝盤 · Jill 前往中' in gt, f'on her way the card names the step she takes it to, not the one it left: {gt!r}')
     its = g.ev("wfNode(R.wsel).its.length")
     check(_until(g, "!R.wsel||!wfNode(R.wsel)"), 'she plates it')
     rd = json.loads(g.ev("JSON.stringify(R.tickets.flatMap(tk=>tk.items.filter(it=>it.d==='friedrice'&&(it.st==='ready'||it.st==='served')).map(it=>it.q)))"))
@@ -105,9 +105,9 @@ def cooking_fried_rice_goes_hot_then_plating_by_taps(b, port, target):
 
 @test
 def cooking_a_full_place_is_a_quiet_wait(b, port, target):
-    """The capacity rule's cases A–F on 熱區 2 and 裝盤 1: two batches cook at once (A); a third is told 「下一步：熱區 · 目前
-    忙碌」, never an error, and cannot be put on a burner that is taken (B); when a burner is free it is 「可進行」 again but
-    does not start by itself (C); a batch of three takes one burner (D); two batches done at once and one plating place:
+    """The capacity rule's cases A–F on 熱區 2 and 裝盤 1: two batches cook at once (A); a third is told 「第一步：熱區 · 等空位」
+    (2026-10-08: the user's 「第一步」 for a dish not started yet; was 「下一步：熱區 · 目前忙碌」), never an error, and cannot be
+    put on a burner that is taken (B); when a burner is free it is 「等待處理」 again but does not start by itself (C); a batch of three takes one burner (D); two batches done at once and one plating place:
     one is plated, the other waits on its burner with its quality untouched (E); a cook who can plate takes the waiting one
     when the pass is free (F). D runs last, on the burner F's plating leaves."""
     g = _day(b, port, target, 7102, "S.level=1")
@@ -123,7 +123,7 @@ def cooking_a_full_place_is_a_quiet_wait(b, port, target):
     check(ok, 'A: both burners take a batch')
     g.ev(f"R.wsel={c};__tick(1000/30)")
     gt = g.ev(GUIDE)
-    check('下一步：熱區 · 目前忙碌' in gt, f'B: the third is told the fire is busy — a wait, not an error: {gt!r}')
+    check('第一步：熱區 · 等空位' in gt, f'B: the third is told the fire is busy — a wait, not an error: {gt!r}')
     check(g.ev(f"wfAssign(wfNode({c}),'jill',R.slots.find(s=>s.type==='stove'&&s.no===1))") is False and g.ev(f"wfNode({c}).st") == 'wait', 'B: it cannot be put on a burner that is taken; it stays as it was')
     check(_until(g, f"wfNode({a}).st==='ready'&&wfNode({b2}).st==='ready'", cap=900), 'A: both cook to done')
     # E: one plating place, two batches done
@@ -133,7 +133,7 @@ def cooking_a_full_place_is_a_quiet_wait(b, port, target):
     check(g.ev(f"wfNode({b2}).st") == 'ready' and g.ev(f"wfNode({b2}).slot.type") == 'stove' and g.ev(f"JSON.stringify(wfNode({b2}).sc)") == q0, 'E: the other waited on its burner, nothing lost')
     # C: a burner free again: the third may go, and does not go by itself
     gt = g.ev(GUIDE)
-    check('目前忙碌' not in gt and '下一步：熱區' in gt, f'C: a burner is free: the third reads 可進行 again: {gt!r}')
+    check('等空位' not in gt and '第一步：熱區 · 等待處理' in gt, f'C: a burner is free: the third waits for someone again: {gt!r}')
     g.ev("__run(150)")
     check(g.ev(f"wfNode({c}).st") == 'wait', 'C: and it waits for someone to start it (no cook here can)')
     g.ev(f"wfAssign(wfNode({c}),'jill')")   # Jill puts it on the free burner: both burners are taken again
@@ -180,6 +180,87 @@ def cooking_jill_and_the_cooks_hand_work_on(b, port, target):
     check(out['B'] == ['t_ade@0', 't_lin@1'], f"B: 阿德師傅 on the fire, 小林師傅 at the pass, no tap: {out['B']}")
     check(out['C'] == ['jill@0', 't_lin@1'], f"C: Jill on the fire, 小林師傅 plates: {out['C']}")
     check(out['D'] == ['t_ade@0', 'jill@1'], f"D: 阿德師傅 on the fire, Jill plates: {out['D']}")
+
+
+@test
+def cooking_the_card_says_who_has_it_and_a_dish_can_be_taken_back(b, port, target):
+    """The user's hand-off canon (2026-10-08 §B, §D, §E, §F): a dish waiting says so (「第一步：熱區 · 等待處理」, no name on
+    the ticket); a cook who decides to take it is seen deciding before he starts (「阿德師傅前往中」, his name outlined on the
+    ticket); at work it is his (「● 熱區 · 阿德師傅」, his name filled). Focusing a dish never takes it (focus ≠ claim). While
+    he is still on his way the player takes it back with a tap on the place it is headed for: Jill has it, nothing reset,
+    the cook lets it go and takes other work; once he has started, a tap there only shows it — he finishes the step."""
+    ADE = "{id:'t_ade',role:'chef',name:'阿德師傅',lv:3,duty:'bar',since:1,days:0,pool:'restaurant'}"   # posted at the coffee machine: a walk to the burners
+    g = _day(b, port, target, 7140, f"S.level=3;S.eq.bar=1;S.crew.push({ADE})")
+    g.ev("window.__patient=1")
+    g.ev("window.__hold=true;{const W=wfStaff;wfStaff=function(){if(window.__hold)return;return W.apply(this,arguments)}}")   # the cook waits until the dish has been seen waiting
+    check(_wait_orders(g, 1), 'an order')
+    nid = g.ev("(()=>{wfGather();return wfList()[0].id})()")
+    g.ev(f"(()=>{{const n=wfNode({nid});wfSelectItem(n.its[0].tk,n.its[0].it)}})()"); g.ev("__run(1)")
+    gt = g.ev(GUIDE)
+    check('第一步：熱區 · 等待處理' in gt, f'waiting: {gt!r}')
+    check(not g.ev("!!document.querySelector('#tickets .it.wsel .wh')"), 'no name on the ticket while it waits')
+    check(g.ev(f"wfNode({nid}).who") is None, 'focus is not a claim')
+    g.ev("window.__hold=false")
+    check(_until(g, f"wfNode({nid}).who==='t_ade'", step=1), 'the cook takes it')
+    g.ev("__run(4)")   # the strip is redrawn a few times a second
+    gt = g.ev(GUIDE)
+    check('第一步：熱區 · 阿德師傅前往中' in gt and g.ev(f"wfNode({nid}).st") == 'go', f'on his way, said before he starts: {gt!r}')
+    check(g.ev("(()=>{const e=document.querySelector('#tickets .it.wsel .wh');return !!e&&e.classList.contains('go')&&e.textContent==='阿德'})()"), 'his name on the ticket, outlined while on the way')
+    # the player takes it back: a tap on the burner held for it
+    to = g.ev(f"wfNode({nid}).to.no")
+    _tap_slot(g, f"wfNode({nid}).to")
+    st = json.loads(g.ev(f"JSON.stringify((()=>{{const n=wfNode({nid});return{{who:n.who,st:n.st,si:n.si,to:n.to&&n.to.no,its:n.its.map(o=>o.it.st),cook:(R.wfc||{{}}).t_ade||null,q:wfJ().q,ck:n.ck||[]}}}})())"))
+    check(st['who'] == 'jill' and st['st'] == 'go' and st['si'] == 0 and st['to'] == to and all(x == 'cooking' for x in st['its']) and st['cook'] is None and nid in st['q'] and not st['ck'],
+          f'taken back: Jill has it, nothing reset, the cook let it go (and is not counted for it): {st}')
+    check('第一步：熱區 · Jill 前往中' in g.ev(GUIDE), 'the card says Jill is on her way')
+    # the cook goes on to other work: a second dish ordered is his
+    g.ev("__addOrders(1,'pasta')"); g.ev("__run(2)")
+    n2 = g.ev("(()=>{wfGather();const n=wfList().find(n=>n.d==='pasta');return n?n.id:0})()")
+    check(n2 and _until(g, f"wfNode({n2})&&wfNode({n2}).who==='t_ade'", step=2), 'the cook finds other work')
+    # once he has started, a tap on his place only shows it: he finishes the step
+    check(_until(g, f"wfNode({n2}).st==='work'", step=1), 'he starts the pasta')
+    _tap_slot(g, f"wfNode({n2}).slot"); g.ev("__run(4)")
+    check(g.ev("R.wsel") == n2 and g.ev(f"wfNode({n2}).who") == 't_ade', 'a tap on the place he is working at shows it, and it stays his')
+    gt = g.ev(GUIDE)
+    check('● 熱區 · 阿德師傅' in gt, f'at work: {gt!r}')
+    check(g.ev("(()=>{const e=document.querySelector('#tickets .it.wsel .wh');return !!e&&!e.classList.contains('go')})()"), 'his name filled on the ticket at work')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def cooking_any_dish_answers_the_five_questions(b, port, target):
+    """The user's UX test (2026-10-08 §G): with dishes at different phases, a tap on any one of them answers at once — how
+    far it is (the marks), where it goes next (第一步／下一步, or the place it is at now), where that is in the kitchen (a lit
+    place, the place held for it, or the place it is at), whether someone has it (等待處理, 等空位, X 前往中, X, 正在煮／烤),
+    and whether Jill can step in (a free place lit for her; the place held for a cook still on his way; not while a cook
+    is at work on it)."""
+    CREW = ("S.crew.push({id:'t_ade',role:'chef',name:'阿德師傅',lv:3,duty:'stove',since:1,days:0,pool:'restaurant'},"
+            "{id:'t_marco',role:'chef',name:'Marco',lv:3,duty:'oven',since:1,days:0,pool:'restaurant'})")
+    g = _day(b, port, target, 7150, "S.level=4;S.eq.stove=3;S.eq.oven=1;S.eq.bar=1;S.eq.prep=1;S.eq.fridge=2;" + CREW)
+    g.ev("window.__patient=1")
+    check(_until(g, "R.tickets.length>0"), 'an order')
+    for d in ('friedrice', 'steak', 'salad', 'coffee', 'chicken', 'fries', 'pasta'):
+        g.ev(f"__addOrders(1,'{d}')")
+    g.ev("__run(2)"); g.ev("(()=>{wfGather();const n=wfList().find(n=>n.d==='steak');if(n)wfAssign(n,'jill')})()")
+    g.ev("__run(70)")
+    nodes = json.loads(g.ev("JSON.stringify(wfList().map(n=>n.id))"))
+    phases = set(g.ev("wfList().map(n=>n.st+(n.who?'*':''))"))
+    check(len(nodes) >= 4 and len(phases) >= 3, f'dishes at several phases: {phases}')
+    bad = []
+    for nid in nodes:
+        g.ev(f"(()=>{{const n=wfNode({nid});R.wsel=null;wfSelectItem(n.its[0].tk,n.its[0].it)}})()")
+        r = json.loads(g.ev(f"""JSON.stringify((()=>{{const n=wfNode({nid});const e=document.querySelector('#wfGuide');const cue=wfCueSlots(n);
+          return{{d:n.d,st:n.st,who:n.who,card:e&&!e.hidden?e.innerText:'',marks:(e&&e.querySelector('.wfl')||{{}}).innerText||'',line:(e&&e.querySelector('.wfn')||{{}}).innerText||'',
+            lit:cue.free.length,held:!!cue.held,at:!!n.slot,open:wfOpen(n),free:!!(wfNext(n)&&(!WF_ST[wfNext(n)].slot||wfFreeSlot(wfNext(n))))}}}})())"""))
+        how_far = '●' in r['marks']
+        where_next = any(w in r['line'] for w in ('第一步：', '下一步：', '● '))
+        where = r['lit'] > 0 or r['held'] or r['at'] or not r['free']
+        who = any(w in r['line'] for w in ('等待處理', '等空位', '前往中', '正在煮', '正在烤', '快好了', 'Jill', '阿德師傅', 'Marco'))
+        step_in = (r['open'] and (r['lit'] > 0 or not r['free'])) or (r['who'] and r['who'] != 'jill' and r['st'] in ('go', 'fetch') and r['held']) or r['st'] in ('work', 'cook') or r['who'] == 'jill' or (r['st'] in ('go', 'fetch'))
+        if not (how_far and where_next and where and who and step_in):
+            bad.append(r)
+    check(not bad, f'dishes whose card leaves a question open: {bad}')
+    check(not g.errors, g.errors[:3]); g.close()
 
 
 @test

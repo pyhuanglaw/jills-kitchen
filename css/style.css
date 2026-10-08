@@ -55,7 +55,6 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 #tickets.scroll{pointer-events:auto;touch-action:pan-x;scroll-snap-type:x proximity;padding-right:52px}
 #tickets.scroll .tk{scroll-snap-align:start}
 #tickets.compact .tk{min-width:64px;padding:3px 5px 4px}
-#tickets.compact .it{width:32px;height:32px}
 #tickets.compact .tk-who{font-size:9.5px}
 #tickets.compact .tk-who img{width:13px;height:13px}
 .tk-nav{position:absolute;top:22px;right:8px;z-index:3;width:38px;height:44px;border:0;border-radius:10px;background:rgba(22,33,36,.88);color:var(--cream);font-size:22px;font-weight:800;line-height:1;box-shadow:0 0 0 1px rgba(230,194,122,.35),0 2px 6px rgba(0,0,0,.35);padding:0}
@@ -93,6 +92,11 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .it .wf b{color:#2E2019;background:#F2D48C;border-radius:3px;padding:0 1.5px;font-weight:800}
 .it .wf i{font-style:normal}.it .wf i.done{color:#6E9A5C}.it .wf u{text-decoration:none;color:#C4B8A8;padding:0 .5px}
 .it.wsel{box-shadow:0 0 0 2px #E6C27A,0 0 8px rgba(230,194,122,.5)}
+/* v2.5: who has the dish, in a word (filled at work, outlined on the way; Jill in her own colour) */
+.it .wh{position:absolute;left:-4px;top:-5px;z-index:1;font-size:7.5px;font-weight:800;line-height:10px;padding:0 3px;border-radius:5px;background:#5E4A3A;color:#FFF8EC;white-space:nowrap;pointer-events:none;box-shadow:0 0 0 1px rgba(255,248,236,.9)}
+.it .wh.go{background:rgba(255,248,236,.97);color:#5E4A3A;box-shadow:0 0 0 1px rgba(46,32,25,.35)}
+.it .wh.j{background:#B8536A}.it .wh.j.go{background:rgba(255,248,236,.97);color:#B8536A;box-shadow:0 0 0 1px rgba(184,83,106,.55)}
+.it.pending .tag,.it.cooking .tag{bottom:auto;top:-5px}   /* the steak's doneness above, clear of the workflow marks */
 /* v2.5: the selected work in words, at the foot of the scene (where the cooking panel used to open) */
 #wfGuide{position:absolute;left:50%;transform:translateX(-50%);bottom:10px;z-index:5;width:max-content;max-width:calc(100% - 24px);padding:6px 12px 7px;border-radius:12px;background:rgba(255,248,236,.95);color:var(--ink);box-shadow:0 6px 18px rgba(0,0,0,.28);font-size:12px;line-height:1.4;text-align:center;pointer-events:none}
 #wfGuide b{font-size:13px}
@@ -677,11 +681,11 @@ html.desk button,html.desk [data-act],html.desk .polaroid{cursor:pointer}
 .sline .next{font-size:12.5px;color:var(--ink2);margin-top:3px}
 .sb .no,.chap .no{display:inline-block;min-width:22px;color:var(--ink2);font-size:11px;font-weight:800}.sb.un{color:var(--ink2);letter-spacing:.08em}
 /* v2.4 rc6: a party's ticket (five plates or more) — smaller plates on one line, so ten people never push the strip */
-.tk.big{max-width:290px}.tk.big .it{width:28px;height:28px;border-radius:8px}.tk.big .tk-items{gap:3px}
+.tk.big{max-width:none}   /* v2.5 (the user, 2026-10-08): a big order stacks its same dishes (×N) and keeps finger-sized buttons; the strip scrolls */
 /* v2.4 rc6: tonight's Private Dining Room on the prep screen — one line, the minimum never cut */
 .event.pdres{display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline;background:#F3E9DA;border-style:solid;border-color:rgba(142,100,34,.35)}.event.pdres b{white-space:nowrap}.event.pdres span{font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}.event.pdres.quiet{background:var(--paper2);border-color:var(--line)}.event.pdres.quiet span{font-weight:600;color:var(--ink2);font-size:12px}
 /* v2.4 rc6: a ticket for the long table upstairs (nine to twelve plates): one row, smaller plates */
-.tk.huge{max-width:300px}#tickets .tk.huge .it{width:22px;height:22px;border-radius:6px}.tk.huge .tk-items{gap:2px}
+.it .cnt{position:absolute;right:-6px;top:50%;transform:translateY(-62%);z-index:1;font-size:8px;font-weight:800;line-height:11px;padding:0 3px;border-radius:6px;background:var(--ink);color:#fff;pointer-events:none;box-shadow:0 0 0 1px rgba(255,248,236,.9)}
 /* v2.4 rc6 (05:23): a room finished overnight — the card that comes once the walls are up, beside the floor, never over the rooms */
 #upRv{position:absolute;right:10px;top:47%;z-index:6;width:186px;padding:12px 12px 10px;border-radius:14px;background:rgba(250,245,236,.97);border:1px solid rgba(201,154,69,.45);box-shadow:0 6px 22px rgba(30,20,10,.28);color:#2A1B10;animation:uprvIn .35s ease-out}
 #upRv .eyebrow{font-size:10.5px;letter-spacing:.14em;color:#A07A3A;font-weight:800}

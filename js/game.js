@@ -5540,10 +5540,15 @@ function idLabel(c,x,y,a,b,strong,vl,vr,top,below){const fa=`800 ${strong?10.6:9
    任何記號」): the heart on a ticket is Sophie's and Mia's, once they are regulars (four visits: rc7.2, 21:55); no other regular is
    marked */
 function smHeart(g){return regsOf(g).some(id=>(id==='sophie'||id==='mia')&&regTier((S.regulars||{})[id]||0)>=1)}
+/* a big order's dishes: the same dish in the same state (and the same batch) stacked as one entry with its count — an order
+   never shrinks to fit (the user, 2026-10-08: 「每個可操作 order / dish entry 必須維持穩定、舒服的最小尺寸與 touch
+   target……訂單太多時應採可捲動、合理分頁／堆疊」); a small order keeps one button per dish, as before */
+function tkEntries(tk){const out=[],by={};const big=tk.items.length>5;
+ tk.items.forEach((it,i)=>{const k=big?[it.d,it.want||0,it.st,it.wf||'',it.picked?1:0].join('|'):'#'+i;const e=by[k];if(e)e.n++;else out.push(by[k]={it,i,n:1})});return out}
 function renderTickets(){if(!R){ticketsEl.innerHTML=`<div class="tk-empty">${phase==='service'?'':'訂單會出現在這裡。'}</div>`;tkVer=-1;tkRefs=[];ticketsEl.classList.remove('scroll','compact');const m=$('#tkMore');if(m){m.hidden=true;$('#tkBack').hidden=true}return}
  if(R.tv===tkVer)return;tkVer=R.tv;
  if(!R.tickets.length){ticketsEl.innerHTML='<div class="tk-empty">還沒有訂單。點有「!」的桌子幫客人點餐。</div>';tkRefs=[];ticketsLayout();return}
- ticketsEl.innerHTML=R.tickets.map(tk=>{const g=tk.g;return`<div class="tk${tk.items.length>8?' big huge':tk.items.length>5?' big':''} ${g.reg?(g.reg==='dylan'?'isdylan':smHeart(g)?'isreg':''):g.type==='vip'?'isvip':''}" data-tk="${tk.id}"><div class="tk-h"><b>T${tk.no}</b>${(()=>{/* rc7.2 (23:46): the card's rate in the ticket's top line, so the name, the heart and the 招待 chip keep their room */const r=billRate(g);return r<1?`<span class="tk-off" title="這一桌${RATE_N[r]}">${RATE_N[r]}</span>`:''})()}<em data-w>0:00</em></div><div class="tk-who"><img alt="" src="${guestPortrait(g)}"><span>${g.reg==='dylan'?'Dylan':g.name}</span>${g.via==='camp'?'<i class="via" title="看到宣傳來的">📱</i>':''}${(()=>{/* rc7.2 (the player, 21:50: 「招待按鈕寫沒東西可請的字重疊到了」): the chip is in the name's line, after it */const st=treatState(g);if(!st.k)return'';if(st.k==='offer')return`<button class="tk-treat" data-treat="${tk.id}" aria-label="招待，今天還可以 ${st.left} 桌">招待<i>${st.left}</i></button>`;return`<span class="tk-treat ${st.k}" title="${st.n}">${st.n}</span>`})()}</div><div class="tk-items">${tk.items.map((it,i)=>`<button class="it ${it.st}${R.wsel&&it.wf===R.wsel?' wsel':''}" data-tk="${tk.id}" data-i="${i}" aria-label="${DISH(it.d).n}"><img alt="" src="${dishURL(it.d,it.st==='ready'||it.st==='served'?it.q:'G',it.want)}">${it.d==='steak'?`<span class="tag">${STEAK_S[it.want]}</span>`:''}${it.st==='ready'?'<span class="ok">✓</span>':''}${it.st==='order'?'<span class="dl">叫貨中</span>':''}${wfTag(it)}</button>`).join('')}</div><div class="tk-pat"><i data-p></i></div></div>`}).join('');ticketsLayout();
+ ticketsEl.innerHTML=R.tickets.map(tk=>{const g=tk.g;const ents=tkEntries(tk);return`<div class="tk${ents.length>5?' big':''} ${g.reg?(g.reg==='dylan'?'isdylan':smHeart(g)?'isreg':''):g.type==='vip'?'isvip':''}" data-tk="${tk.id}"><div class="tk-h"><b>T${tk.no}</b>${(()=>{/* rc7.2 (23:46): the card's rate in the ticket's top line, so the name, the heart and the 招待 chip keep their room */const r=billRate(g);return r<1?`<span class="tk-off" title="這一桌${RATE_N[r]}">${RATE_N[r]}</span>`:''})()}<em data-w>0:00</em></div><div class="tk-who"><img alt="" src="${guestPortrait(g)}"><span>${g.reg==='dylan'?'Dylan':g.name}</span>${g.via==='camp'?'<i class="via" title="看到宣傳來的">📱</i>':''}${(()=>{/* rc7.2 (the player, 21:50: 「招待按鈕寫沒東西可請的字重疊到了」): the chip is in the name's line, after it */const st=treatState(g);if(!st.k)return'';if(st.k==='offer')return`<button class="tk-treat" data-treat="${tk.id}" aria-label="招待，今天還可以 ${st.left} 桌">招待<i>${st.left}</i></button>`;return`<span class="tk-treat ${st.k}" title="${st.n}">${st.n}</span>`})()}</div><div class="tk-items">${ents.map(({it,i,n})=>`<button class="it ${it.st}${R.wsel&&it.wf===R.wsel?' wsel':''}" data-tk="${tk.id}" data-i="${i}" aria-label="${DISH(it.d).n}${n>1?' ×'+n:''}"><img alt="" src="${dishURL(it.d,it.st==='ready'||it.st==='served'?it.q:'G',it.want)}">${it.d==='steak'?`<span class="tag">${STEAK_S[it.want]}</span>`:''}${it.st==='ready'?'<span class="ok">✓</span>':''}${it.st==='order'?'<span class="dl">叫貨中</span>':''}${n>1?`<span class="cnt">×${n}</span>`:''}${wfTag(it)}</button>`).join('')}</div><div class="tk-pat"><i data-p></i></div></div>`}).join('');ticketsLayout();
  tkRefs=[...ticketsEl.querySelectorAll('.tk')].map(el=>({el,tk:R.tickets.find(t=>t.id===+el.dataset.tk),w:el.querySelector('[data-w]'),p:el.querySelector('[data-p]')}));updTicketBars()}
 function updTicketBars(){if(!R)return;for(const r of tkRefs){if(!r.tk)continue;const e=Math.floor(R.t-r.tk.t0);r.w.textContent=`${Math.floor(e/60)}:${String(e%60).padStart(2,'0')}`;const p=r.tk.g.pat;r.p.style.width=(p*100)+'%';r.p.style.background=p>.55?'#5E8F4E':p>.28?'#E0A43A':'#D4553A';r.el.classList.toggle('urgent',p<.28)}}
 /* a long press on a game control (hold-and-release cooking, buttons, the room) must never become a text
@@ -6043,7 +6048,7 @@ function wfAssign(n,who,slot){if(!wfOpen(n))return false;const f=wfNext(n);const
  if(t){if(!slot)slot=wfFreeSlot(f);if(!wfSlotFree(slot)||slot.type!==t)return false;slot.wf=n}
  n.to=slot||null;n.who=who;n.adv=n.st==='ready';n.st=n.adv?'fetch':'go';if(who!=='jill')n.jill=false;
  for(const o of n.its)if(o.it.st==='pending')o.it.st='cooking';
- if(who==='jill'){const J=wfJ();if(!J.q.includes(n.id))J.q.push(n.id)}else{(R.wfc||(R.wfc={}))[who]=n.id;wfChefTook(n,wfCrew(who))}
+ if(who==='jill'){const J=wfJ();if(!J.q.includes(n.id))J.q.push(n.id)}else(R.wfc||(R.wfc={}))[who]=n.id;
  R.tv++;return true}
 /* a cook's hand on a dish, as before: the day's count of what he made (the summary's 「做了 N 道」, each dish once per cook),
    and the first signature dish a cook takes — Jill hands it over (v1.8.1: 「這道也交給你了。」「交給我。」) */
@@ -6056,7 +6061,7 @@ function wfTarget(n){if(n.st==='fetch'){const sp=wfSpot(n.slot);return sp?{x:sp.
  if(n.st==='work'){if(n.slot){const sp=wfSpot(n.slot);return{x:sp.cx,y:sp.cy}}return{x:WF_PICK.x,y:WF_PICK.y}}return null}
 function wfArrive(n){if(n.st==='fetch'){if(n.slot){n.slot.wf=null;n.slot=null}n.carry=true;n.st='go';R.tv++;return}
  if(n.st!=='go')return;n.carry=false;if(n.adv){n.si++;n.adv=false}if(n.to){n.slot=n.to;n.to=null}
- const f=wfFl(n)[n.si];const T=wfTimes(n.d,f);n.f=f;n.act=n.act0=T.act*(1+.15*(n.n-1));n.pas=T.pas*(1+.1*(n.n-1));n.dur=n.act+n.pas;n.st='work';R.tv++;
+ const f=wfFl(n)[n.si];const T=wfTimes(n.d,f);n.f=f;n.act=n.act0=T.act*(1+.15*(n.n-1));n.pas=T.pas*(1+.1*(n.n-1));n.dur=n.act+n.pas;n.st='work';R.tv++;if(n.who&&n.who!=='jill')wfChefTook(n,wfCrew(n.who));
  if(f==='hot'&&n.who==='jill')coach(3)}   /* the first day's tip about the fire, when her first dish is on it — however she was sent */
 function wfCrew(id){return(S.crew||[]).find(m=>m.id===id)||null}
 /* a cook's way with a place: his own (3), one he is learning (2, 1), or none (0); drinks are everyone's and nobody's
@@ -6107,6 +6112,11 @@ function wfProg(n){if(n.st==='ready')return 1;if(n.st!=='work'&&n.st!=='cook')re
 const CHEF_SKILL={'阿德師傅':['hot','prep','plate'],'Marco':['oven','prep','hot'],'小林師傅':['plate','hot','prep'],'阿珠姐':['prep','plate','oven'],
  'Hugo':['hot','oven','plate'],'阿勇':['prep','hot','oven'],'老周師傅':['oven','plate','prep'],'小魏':['plate','prep','hot'],'阿拓':['hot','plate','prep']};
 function chefSkill(m){return CHEF_SKILL[m.name]||['hot','prep','plate']}
+/* a new cook's post on the duty board: his own place — 阿德師傅 the range, Marco the oven (the user, 2026-10-08: 阿德師傅's
+   core is HOT; drinks are no cook's speciality). Before the new kitchen the first cook hired went to the coffee machine
+   whenever there was one, because whoever stood there made the coffee; a post the player chose on the board is left as
+   it is. A cook whose own place is the pass waits by the range, behind it. */
+function chefHomeDuty(name){const f=chefSkill({name})[0];return f==='prep'&&S.eq.prep?'prep':f==='oven'&&S.eq.oven?'oven':'stove'}
 /* his places on the staff card, in the spec's words (§20: 會做 · 熟練 · 專長), and what the next levels bring — never stars,
    which the menu and the rating already use */
 function wfPlacesHTML(m){const sk=chefSkill(m);const W=['','會做','熟練','專長'];return sk.map((f,i)=>{const p=chefProf(m,f);const nm=WF_ST[f].n;if(p)return`<span class="ok">${nm} ${W[p]}</span>`;return`<span class="no">${nm} <small>LV${i===1?2:4} 起</small></span>`}).join('')}
@@ -6169,20 +6179,44 @@ function wfDrawPass(c,now,V){if(!R||!R.pss)return;const y=KY.passTop;for(const s
 /* the steps as marks: done ✓, the one now ●, still to come ○ */
 function wfMarks(n,fl){const now=!n?0:(n.st==='ready'||n.adv)?n.si+1:n.si;const doneTo=now;return fl.map((f,i)=>({f,n:WF_ST[f].n,k:WF_ST[f].k,s:i<doneTo?'done':i===now?'now':'todo'}))}
 function wfWho(n){if(!n||!n.who)return null;if(n.who==='jill')return'Jill';const m=wfCrew(n.who);return m?m.name:null}
+/* the same, short enough for the ticket (阿德師傅 → 阿德, 阿珠姐 → 阿珠) */
+function wfShort(n){if(!n||!n.who)return'';if(n.who==='jill')return'Jill';const m=wfCrew(n.who);return m?m.name.replace(/師傅$|姐$/,''):''}
+/* the place a piece of work is headed for: the one someone is walking it to, or the one it waits for */
+function wfHeading(n){if(!n)return null;const fl=wfFl(n);if(n.st==='go'||n.st==='fetch')return fl[n.adv?n.si+1:n.si]||null;return wfNext(n)}
+/* the one line every piece of work answers (the user, 2026-10-08 §B, §F — what it is, how far, where next, who):
+   「第一步：備料 · 等待處理」 → 「下一步：熱區 · 阿德前往中」 → 「● 熱區 · 阿德」; a full place 「下一步：熱區 · 等空位」;
+   on the fire or in the oven by itself 「● 熱區 · 正在煮」 */
+function wfState(n){if(!n)return'';const who=wfWho(n);
+ if(n.st==='work')return cjkSp(`● ${WF_ST[n.f].n} · ${who||''}`);
+ if(n.st==='cook')return`● ${WF_ST[n.f].n} · ${n.f==='oven'||n.f==='pizza'?'正在烤':n.f==='drink'?'快好了':'正在煮'}`;
+ const f=wfHeading(n);if(!f)return'';const lead=`${n.si===0&&!n.adv&&n.st!=='ready'?'第一步':'下一步'}：${WF_ST[f].n}`;
+ if(who)return cjkSp(`${lead} · ${who}前往中`);
+ return`${lead} · ${WF_ST[f].slot&&!wfFreeSlot(f)?'等空位':'等待處理'}`}
 /* the ticket's own mark under a dish: the workflow in one line (熱›裝), the step it is on picked out */
 function wfTag(it){if(!isWF(it.d)||it.st==='ready'||it.st==='served'||it.st==='order')return'';const n=wfOf(it);const ms=wfMarks(n,wfFlow(it.d));
- return`<span class="wf">${ms.map(m=>m.s==='now'?`<b>${m.k}</b>`:`<i class="${m.s}">${m.k}</i>`).join('<u>›</u>')}</span>`}
+ /* who has it, in a word (the user: 「Ticket 上一個簡單的 handler 名稱就夠」) — outlined while on the way, filled at work */
+ const w=wfShort(n);const wh=w&&n.st!=='cook'?`<span class="wh${n.st==='go'||n.st==='fetch'?' go':''}${n.who==='jill'?' j':''}">${w}</span>`:'';
+ return`${wh}<span class="wf">${ms.map(m=>m.s==='now'?`<b>${m.k}</b>`:`<i class="${m.s}">${m.k}</i>`).join('<u>›</u>')}</span>`}
 /* the selected work, in words, at the foot of the screen */
-function wfGuideText(n){const fl=wfFl(n);const ms=wfMarks(n,fl);const who=wfWho(n);const f=wfNext(n);
+function wfGuideText(n){const fl=wfFl(n);const ms=wfMarks(n,fl);
  const line=ms.map(m=>`<span class="${m.s}">${m.s==='done'?'✓':m.s==='now'?'●':'○'} ${m.n}</span>`).join('<i>→</i>');
- let next='';if(f){next=`下一步：${WF_ST[f].n}`;if(WF_ST[f].slot&&!wfFreeSlot(f))next+=' · 目前忙碌'}else if(n.st==='cook')next=`${WF_ST[n.f].n}：正在自己${n.f==='oven'||n.f==='pizza'?'烤':'煮'}`;else if(who){/* on the way, it is the step she is taking it to */const sf=n.st==='fetch'||n.st==='go'?fl[n.adv?n.si+1:n.si]:(n.f||fl[n.si]);next=`${who} 正在${WF_ST[sf].n}`}
- return`<b>${dishName(n.d)}${n.n>1?' ×'+n.n:''}</b><div class="wfl">${line}</div><div class="wfn">${next}${who&&f?'':''}</div>`}
+ return`<b>${dishName(n.d)}${n.n>1?' ×'+n.n:''}</b><div class="wfl">${line}</div><div class="wfn">${wfState(n)}</div>`}
 let wfGuideEl=null,wfGuideHTML='';
 function wfGuideUpd(){if(!wfGuideEl){const w=$('#sceneWrap');if(!w)return;wfGuideEl=document.createElement('div');wfGuideEl.id='wfGuide';wfGuideEl.hidden=true;const t=$('#toasts');if(t&&t.parentNode===w)w.insertBefore(wfGuideEl,t);else w.appendChild(wfGuideEl)}
  const n=R&&phase==='service'&&R.wsel?wfNode(R.wsel):null;if(!n){if(!wfGuideEl.hidden)wfGuideEl.hidden=true;return}
  const h=wfGuideText(n);if(h!==wfGuideHTML){wfGuideHTML=h;wfGuideEl.innerHTML=h}if(wfGuideEl.hidden)wfGuideEl.hidden=false}
 /* the places the selected work can go now (free ones first; all of that kind when every one is busy) */
-function wfCueSlots(n){const f=wfNext(n);if(!f||!WF_ST[f].slot)return{f,free:[],busy:[]};const all=wfSlots(f);return{f,free:all.filter(wfSlotFree),busy:all.filter(s=>!wfSlotFree(s))}}
+function wfCueSlots(n){const f=wfNext(n);
+ if(!f){const h=wfHeading(n);return{f:h,free:[],busy:[],held:h&&n.to&&(n.st==='go'||n.st==='fetch')?n.to:null}}   /* on its way: the place held for it */
+ if(!WF_ST[f].slot)return{f,free:[],busy:[]};const all=wfSlots(f);return{f,free:all.filter(wfSlotFree),busy:all.filter(s=>!wfSlotFree(s))}}
+/* of the free places, the one to point at: the nearest to where the food is (the user, 2026-10-08: 「系統優先標示目前可用／最合理的一個」) */
+function wfBestSlot(n,cue){const at=wfAt(n);let best=null,bd=1e9;for(const s of cue.free){const o=wfSlotCenter(s);const d=Math.hypot(o.x-at.x,o.y-at.y);if(d<bd){bd=d;best=s}}return best}
+/* 「準備開始」 (the user, 2026-10-08 §2): a dish not started yet is laid out faintly at the place it would start — the steak's
+   cut on the prep board, the rice and egg in a pan on the burner — so the eye sees where it begins. Nothing to read. */
+function wfDrawGhost(c,n,s,now){const f=WF_TYPE_F[s.type];if(!f)return;c.save();c.globalAlpha=.38+.1*Math.sin(now*2.2);
+ if(s.type==='pass'){const sp=wfSpot(s);const sz=24;c.drawImage(dishCanvas(n.d,'G',64,S.decor.ware>0,n.its[0]&&n.its[0].it.want),sp.x-sz/2,KY.passTop+14-sz/2,sz,sz)}
+ else{const g0=Object.assign({},n,{f,st:'work',slot:s,act:.01,act0:1,pas:1,dur:1.01,rj:null,flp:0});const rj=wfRJ(g0);if(!(rj.step&&rj.step.board))rj.step=null;const sp=wfFoodSpot(g0,s);drawStageFood(c,{type:'ghost',no:s.no},rj,sp.x,sp.y,sp.sc,now)}   /* not lit, not steaming: nothing has started */
+ c.restore()}
 function wfSlotCenter(s){if(s.type==='pass'){const sp=wfSpot(s);return{x:sp.x,y:KY.passTop+14,rx:20,ry:10}}
  if(s.type==='oven'){const dx=KX.oven.x+2+(s.no-1)*22;return{x:dx+10,y:KY.top+KY.h+9,rx:13,ry:10}}
  if(s.type==='pizza'){const P=pizzaOvenRect();return{x:P.mx,y:P.my-6,rx:22,ry:11}}
@@ -6193,10 +6227,12 @@ function wfAt(n){const s=n.slot;if(s){if(s.type==='pass'){const sp=wfSpot(s);ret
 /* drawn over the kitchen, last: a warm outline on the real places, breathing slowly; one soft arrow from the food to the
    nearest free one. Only for the selected work — never several at once (spec §11) */
 function wfDrawCue(c,now){if(!R||room!=='kitchen'||!R.wsel)return;const n=wfNode(R.wsel);if(!n)return;const cue=wfCueSlots(n);const br=.5+.5*Math.sin(now*2.2);
- const ring=(s,a)=>{const o=wfSlotCenter(s);c.save();c.strokeStyle=`rgba(255,214,140,${a})`;c.lineWidth=1.6;c.shadowColor='rgba(255,200,110,.55)';c.shadowBlur=6;c.beginPath();c.ellipse(o.x,o.y,o.rx,o.ry,0,0,7);c.stroke();c.restore()};
- for(const s of cue.free)ring(s,.45+.3*br);for(const s of cue.busy)ring(s,.16);
+ const ring=(s,a,w)=>{const o=wfSlotCenter(s);c.save();c.strokeStyle=`rgba(255,214,140,${a})`;c.lineWidth=w||1.6;c.shadowColor='rgba(255,200,110,.55)';c.shadowBlur=6;c.beginPath();c.ellipse(o.x,o.y,o.rx,o.ry,0,0,7);c.stroke();c.restore()};
+ /* one strong cue (the user: 「一次只需要一個強 guidance」): the best free place breathes, the other free ones are a quiet outline */
+ const bs=wfBestSlot(n,cue);for(const s of cue.free)if(s!==bs)ring(s,.2+.08*br,1.1);for(const s of cue.busy)ring(s,.12,1);if(cue.held)ring(cue.held,.28+.16*br,1.3);
+ if(bs){if(n.st==='wait'&&n.si===0&&!n.who)wfDrawGhost(c,n,bs,now);ring(bs,.5+.3*br,1.8)}
  /* the work itself, picked out */const at=wfAt(n);c.save();c.strokeStyle='rgba(255,236,200,.75)';c.setLineDash([2.5,2.5]);c.lineWidth=1;c.beginPath();c.ellipse(at.x,at.y+4,15,7,0,0,7);c.stroke();c.restore();
- if(!cue.free.length)return;let best=null,bd=1e9;for(const s of cue.free){const o=wfSlotCenter(s);const d=Math.hypot(o.x-at.x,o.y-at.y);if(d<bd){bd=d;best=o}}if(!best||bd<18)return;
+ if(!bs)return;const best=wfSlotCenter(bs);const bd=Math.hypot(best.x-at.x,best.y-at.y);if(bd<18)return;
  const x0=at.x,y0=at.y,x1=best.x,y1=best.y-best.ry-2;const mx=(x0+x1)/2,my=Math.min(y0,y1)-Math.min(40,Math.abs(x1-x0)*.25+16);
  c.save();c.strokeStyle=`rgba(255,226,170,${.55+.25*br})`;c.lineWidth=1.8;c.lineCap='round';c.setLineDash([5,4]);c.lineDashOffset=-now*8;c.beginPath();c.moveTo(x0,y0);c.quadraticCurveTo(mx,my,x1,y1);c.stroke();c.setLineDash([]);
  const t=.96,ax=(1-t)*(1-t)*x0+2*(1-t)*t*mx+t*t*x1,ay=(1-t)*(1-t)*y0+2*(1-t)*t*my+t*t*y1;const ang=Math.atan2(y1-ay,x1-ax);c.fillStyle=`rgba(255,226,170,${.7+.2*br})`;c.translate(x1,y1);c.rotate(ang);c.beginPath();c.moveTo(1,0);c.lineTo(-6,-3.6);c.lineTo(-6,3.6);c.closePath();c.fill();c.restore()}
@@ -6212,10 +6248,19 @@ function wfFamOf(s){return WF_TYPE_F[s.type]}
 function wfTap(p){const r=wfTap0(p);if(r){renderTickets();wfGuideUpd()}return r}
 function wfTap0(p){const s=wfHitSlot(p);if(!s)return false;const sel=R.wsel?wfNode(R.wsel):null;const f=wfFamOf(s);
  if(sel&&wfOpen(sel)&&wfNext(sel)===f&&wfSlotFree(s)){if(wfAssign(sel,'jill',s)){wfFirstUse(sel,f);sfx.tap();return true}}
- if(s.wf){R.wsel=R.wsel===s.wf.id?null:s.wf.id;R.tv++;sfx.tap();return true}
+ if(sel&&wfTakeBack(sel,s)){wfFirstUse(sel,f);sfx.tap();return true}
+ if(s.wf){if(R.wsel!==s.wf.id){R.wsel=s.wf.id;R.tv++}sfx.tap();return true}   /* the work there, focused: what it is, who has it */
  if(!sel&&wfSlotFree(s)){const n=wfList().filter(x=>wfOpen(x)&&wfNext(x)===f).sort((a,b)=>a.tr-b.tr)[0];if(n&&wfAssign(n,'jill',s)){wfFirstUse(n,f);sfx.tap();return true}}
  if(s.type==='pass')return false;   /* the pass's own tap (deliver what is ready) stays */
  return false}
+/* the user, 2026-10-08 §D: while a cook is still on his way to a dish (「阿德前往中」), the player can send Jill instead — a
+   tap on the place it is headed for: Jill has it, the cook lets it go and finds other work; no question, nothing lost,
+   nothing reset. Once he has started the step he finishes it (Jill can take the next one). */
+function wfTakeBack(n,s){if(!n||!n.who||n.who==='jill'||!(n.st==='go'||n.st==='fetch')||n.carry)return false;   /* the food already in his hands: he brings it */const f=wfHeading(n);if(!f||WF_TYPE_F[s.type]!==f)return false;
+ if(s!==n.to&&!wfSlotFree(s))return false;
+ if(R.wfc&&R.wfc[n.who]===n.id)delete R.wfc[n.who];
+ if(s!==n.to){if(n.to)n.to.wf=null;n.to=s;s.wf=n}
+ n.who='jill';const J=wfJ();if(!J.q.includes(n.id))J.q.push(n.id);R.tv++;return true}
 /* the first time Jill uses a place, a few words more — the marks on the ticket and the lit places stay for good */
 function wfFirstUse(n,f){if(f==='hot')coach(3)}
 /* the test player and the simulated player: one thing at a time, as a person — the work furthest along first (plating
@@ -9940,8 +9985,8 @@ function guideLines(t){const out=[];let d=0,cur='';for(const ch of t){cur+=ch;if
 const GUIDE=[   /* the manual describes the game as it is. Audited every release (docs/RELEASE_CHECKLIST.md) — in progress, not released: v2.5 料理 (feature/cooking-gameplay), 2026-10-08 (the new kitchen: 一天怎麼玩 › 營業中 says how a dish goes now — the ticket's dish, the lit place, the flow in small type, a done step waits — instead of the old station panel; 員工 says a cook takes only the places he knows) — last: v2.4 rc8.8, 2026-10-07 (the room's lit tab says whose it is once Dylan is out and his name is over him there; 怎麼進去 already says only 「房間分頁的最後一個」 and the tab list gives the short names: checked, no line changed) — before: v2.4 rc8.7, 2026-10-07 (story first: the Lounge's people — 沈晴、阿拓 from Lounge I, 安安、許葳 with II; no level, rating or Lounge II for the Lounge, the piano, 予安 or the floor, and the manual names none; checked, that one line changed) — before: v2.4 rc8.6, 2026-10-07 (the stock rule as the game plays it: from Day 3 a dish with nothing in the fridge cannot be ordered; Jill orders one herself only on the first two days); the rewrite of 2026-10-06 from docs/audit/2026-10-06/ws5_manual.md: the first card is how a day is played; only what the screen does not tell and a player needs to know stays (what the screen already says, how the game was built, old saves and stories still to come left it); a space, and a story's own entry, comes into it when it is there */
  {ic:"🍳",h:"一天怎麼玩",sum:"第一次玩，先看這一張。",pts:[
   ["一天","開店前選今天的菜單、備料 → 17:00 開店 → 21:30 打烊，客人吃完就結算 → 用今天賺的錢在商店買東西 → 準備下一天。前兩天開店時，遊戲會自動幫你補好備料（照價付）。"],
-  ["營業中","客人會自己找空桌坐。桌上出現紅色「!」：點桌子點餐。到廚房點訂單上的菜：它下一步要去的位置會亮起來，點那裡 Jill 就過去做。菜下面的小字是它的流程，粗體是現在這一站；做好的一站會在原地等，不會壞。桌上出現銀色餐蓋：點桌子把菜端過去。出現金幣：點桌子收錢；客人走了再點一次收桌。"],
-  ["員工","請了廚師、服務生、清潔員，他們會自己接工作；廚師只接自己會的位置（員工頁寫著每個人的）。Jill 有空時會回房間坐一下，你點桌子她就回來。"],
+  ["營業中","客人會自己找空桌坐。桌上出現紅色「!」：點桌子點餐。到廚房點訂單上的菜：它下一步要去的位置會亮起來，點那裡 Jill 就過去做。菜下面的小字是它的流程，粗體是現在這一站，左上角的小名字是誰在做；做好的一站會在原地等，不會壞。桌上出現銀色餐蓋：點桌子把菜端過去。出現金幣：點桌子收錢；客人走了再點一次收桌。"],
+  ["員工","請了廚師、服務生、清潔員，他們會自己接工作；廚師只接自己會的位置（員工頁寫著每個人的）。廚師還在走過去時，點他要去的位置就換 Jill 做。Jill 有空時會回房間坐一下，你點桌子她就回來。"],
   ["故事","重要的故事發生時，店裡會整個停住；一句一句點著看完，店才接著營業。錯過的都在「餐廳日誌」。"],
   ["暫停","營業中點右上的「II」：調營業速度、看日誌、存檔備份、提早打烊。"],
   ["換手機以前","進度只存在這台裝置的瀏覽器裡：設定 → 備份到檔案。"],
@@ -10590,9 +10635,9 @@ function doAct0(a,d,k,b){
  case'buyOps':{const o=OPS.find(x=>x.k===k);if(!o)break;const t=opsLv(k);const c=o.tiers[t];if(c==null||S.money<c||S.level<o.lv||(o.need&&!o.need()))break;S.money-=c;S.ops=S.ops||{};S.ops[k]=t+1;sfx.buy();toast(`${o.n}：完成了`);if(k==='room')ach('room');save();keepScroll(showShop);shopAfterBuy();break}
  case'buyLgFurn':{/* rc7.4: the Lounge's TV and its sound */const F=LG_FURN.find(x=>x.k===k);if(!F||lgFurnOn(F.k)||(F.need&&!lgFurnOn(F.need))||!loungeLv()||S.money<F.cost)break;S.money-=F.cost;S.lgFurn=S.lgFurn||{};S.lgFurn[F.k]=S.day;S.newRooms=S.newRooms||{};S.newRooms['lg'+F.k]=S.day;save();IDLE=null;projectReveal({k:'lg'+F.k,n:F.n,done:F.done,jill:F.jill,room:'lounge',eyebrow:'裝好了'});break}
  case'buyDecor':{const Dc=DECOR.find(x=>x.k===k);const t=S.decor[k]||0;const c=Dc.tiers[t];const needLv=Dc.tierLv?Dc.tierLv[Math.min(t,Dc.tiers.length-1)]:Dc.lv;if(c!=null&&S.money>=c&&S.level>=needLv){S.money-=c;S.decor[k]=t+1;S.newDecor=S.day;sfx.buy();toast(`${Dc.n} 裝好了，看看店裡！`);save();IDLE=null;bg=null;keepScroll(showShop);shopAfterBuy()}break}
- case'hire':{const R0=ROLES[k];S.crew=S.crew||[];if(!R0||R0.lounge||!CAP_ROLES.includes(k)||S.money<R0.hire||roleCrew(k).length>=roleCap(k))break;/* rc8 §21: a chef's place is a chef's */S.money-=R0.hire;const used=S.crew.map(m=>m.name);const lname=LOUNGE_ROSTER.map(r=>r.name);let name=(CREW_NAMES[k]||[]).find(n=>!used.includes(n)&&!lname.includes(n))||`${R0.n}${S.crew.filter(m=>m.role===k).length+1}`;/* v2.4 rc5: the restaurant hires from its own pools — the Lounge's people only come from the Lounge's list */const duty=k==='chef'?(projOn('pizzaoven')&&!chefsAt('pizza').length?'pizza':S.eq.bar&&!chefFor('bar')?'bar':'stove'):R0.duties[0];const nm={id:'c'+Date.now().toString(36)+Math.floor(Math.random()*999),role:k,name,lv:1,duty,since:S.day,days:0,fam:{},pool:'restaurant'};const xqJoin=name==='秀琴阿姨'&&k==='cleaner'&&!!fact('xq_helper')&&!fact('xq_gone')&&!(S.crew||[]).some(m=>m.id==='xq');if(xqJoin){nm.id='xq';factSet('xq_hired')}/* v2.4: the evening helper becomes the cleaner — the same person, the same id, everything she knows */S.crew.push(nm);ach('hire');sfx.buy();if(xqJoin)scene([{who:'staff:秀琴阿姨',text:'那以後就天天來了。'}]);/* her one line, over the shop */else toast(`${name} 加入了 Jill's Kitchen！`);save();keepScroll(showShop);shopAfterBuy();break}
+ case'hire':{const R0=ROLES[k];S.crew=S.crew||[];if(!R0||R0.lounge||!CAP_ROLES.includes(k)||S.money<R0.hire||roleCrew(k).length>=roleCap(k))break;/* rc8 §21: a chef's place is a chef's */S.money-=R0.hire;const used=S.crew.map(m=>m.name);const lname=LOUNGE_ROSTER.map(r=>r.name);let name=(CREW_NAMES[k]||[]).find(n=>!used.includes(n)&&!lname.includes(n))||`${R0.n}${S.crew.filter(m=>m.role===k).length+1}`;/* v2.4 rc5: the restaurant hires from its own pools — the Lounge's people only come from the Lounge's list */const duty=k==='chef'?(projOn('pizzaoven')&&!chefsAt('pizza').length?'pizza':chefHomeDuty(name)):R0.duties[0];const nm={id:'c'+Date.now().toString(36)+Math.floor(Math.random()*999),role:k,name,lv:1,duty,since:S.day,days:0,fam:{},pool:'restaurant'};const xqJoin=name==='秀琴阿姨'&&k==='cleaner'&&!!fact('xq_helper')&&!fact('xq_gone')&&!(S.crew||[]).some(m=>m.id==='xq');if(xqJoin){nm.id='xq';factSet('xq_hired')}/* v2.4: the evening helper becomes the cleaner — the same person, the same id, everything she knows */S.crew.push(nm);ach('hire');sfx.buy();if(xqJoin)scene([{who:'staff:秀琴阿姨',text:'那以後就天天來了。'}]);/* her one line, over the shop */else toast(`${name} 加入了 Jill's Kitchen！`);save();keepScroll(showShop);shopAfterBuy();break}
  case'hireLounge':{/* v2.4 rc5: one of the Lounge's own people, by name */const r=LOUNGE_ROSTER.find(x=>x.name===k);S.crew=S.crew||[];if(!r||loungeLv()<r.lv||poolCrew('lounge').some(m=>m.name===r.name)||poolCrew('lounge').length>=loungeCap())break;const R0=ROLES[r.role];if(S.money<R0.hire)break;S.money-=R0.hire;
-  const duty=r.role==='chef'?(S.eq.bar&&!chefFor('bar')?'bar':'stove'):r.role==='bartender'?'lbar':R0.duties[0];const nm={id:'c'+Date.now().toString(36)+Math.floor(Math.random()*999),role:r.role,name:r.name,lv:r.name==='安安'?2:1,duty,since:S.day,days:0,fam:{},pool:'lounge'};
+  const duty=r.role==='chef'?chefHomeDuty(r.name):r.role==='bartender'?'lbar':R0.duties[0];const nm={id:'c'+Date.now().toString(36)+Math.floor(Math.random()*999),role:r.role,name:r.name,lv:r.name==='安安'?2:1,duty,since:S.day,days:0,fam:{},pool:'lounge'};
   if(r.name==='安安')nm.duties={seat:true,order:true,serve:false,check:false,clean:false,lounge:true};   /* v2.4 rc6 (10:06): the Lounge's floor person from her first night — the job on the board and the level it asks for */S.crew.push(nm);ach('hire');sfx.buy();toast(`${r.name} 加入了 Lounge！`);save();keepScroll(showShop);shopAfterBuy();break}
  case'crewUp':{const m=(S.crew||[]).find(m=>m.id===k);if(!m||m.lv>=5)break;if(crewPool(m)==='lounge'&&m.upDay===shopDay()){toast(`${m.name} 今天已經訓練過了，先讓他上一天班再說。`);break}/* v2.4 rc6 (09:51): the Lounge's people learn on the job */const c=ROLES[m.role].up*m.lv;if(S.money<c)break;S.money-=c;m.lv++;if(crewPool(m)==='lounge')m.upDay=shopDay();sfx.buy();toast(`${m.name} 升到 LV${m.lv}！`);save();keepScroll(showShop);shopAfterBuy();break}
  case'bdOpen':{const st=b.dataset.st,d=b.dataset.d;boardPick=(boardPick&&(st?boardPick.st===st:boardPick.duty===d))?null:(st?{st}:{duty:d});sfx.tap();keepScroll(showShop,st?`.brow[data-st="${st}"]`:`.brow[data-d="${d}"]`);break}
