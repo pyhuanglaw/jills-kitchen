@@ -8,7 +8,8 @@ from playwright.sync_api import sync_playwright
 from PIL import Image
 src, out, DISHES = sys.argv[1], sys.argv[2], sys.argv[3:]
 NAMES = {'friedrice': '黃金蛋炒飯', 'coffee': '拿鐵咖啡', 'blacktea': '錫蘭檸檬紅茶', 'sparkling': '檸檬氣泡水', 'salad': '田園沙拉', 'pasta': '番茄義大利麵', 'soup': '南瓜濃湯',
-         'burger': '經典牛肉漢堡', 'pudding': '焦糖布丁', 'fries': '松露薯條', 'fruitsoda': '莓果蘇打', 'veg': '香料烤蔬菜'}
+         'burger': '經典牛肉漢堡', 'pudding': '焦糖布丁', 'fries': '松露薯條', 'fruitsoda': '莓果蘇打', 'veg': '香料烤蔬菜',
+         'tiramisu': '提拉米蘇', 'chicken': '香草烤雞', 'steak': '炙烤肋眼牛排', 'basque': '巴斯克乳酪蛋糕', 'prosciutto': '生火腿沙拉'}
 tmp = os.path.join(src, '_sheet'); os.makedirs(tmp, exist_ok=True)
 rows = []
 for d in DISHES:

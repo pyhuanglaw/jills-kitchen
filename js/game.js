@@ -6380,7 +6380,76 @@ const CH={
   plate:{v:'plate',from:{out:0,gar:0},
    hands:[{to:.18,g:'pull',say:'烤盤從烤箱拉出來',set:{}},
           {to:.76,g:'scoop',say:'烤蔬菜盛到盤子上',set:{out:1}},
-          {to:1,g:'place',ing:'herbs',say:'放一枝迷迭香',set:{gar:1}}]}}};
+          {to:1,g:'place',ing:'herbs',say:'放一枝迷迭香',set:{gar:1}}]}},
+ /* the third batch (2026-10-09): the tiramisu (§13), the roast chicken (§14), the ribeye (§15), the Basque cheesecake (§16),
+    the prosciutto salad (§17) */
+ tiramisu:{
+  prep:{v:'mold',from:{lf1:0,cof1:0,cr1:0,lf2:0,cof2:0,cr2:0,smooth:0},
+   hands:[{to:.18,g:'place',ing:'ladyfinger',say:'手指餅乾排在底部',set:{lf1:1}},
+          {to:.3,g:'pour',ing:'espresso',say:'刷上咖啡液',set:{cof1:1}},
+          {to:.46,g:'spread',ing:'mascarpone',say:'鋪一層馬斯卡彭',set:{cr1:1}},
+          {to:.62,g:'place',ing:'ladyfinger',say:'第二層手指餅乾',set:{lf2:1}},
+          {to:.72,g:'pour',ing:'espresso',say:'再刷咖啡液',set:{cof2:1}},
+          {to:.88,g:'spread',ing:'mascarpone',say:'再鋪一層',set:{cr2:1}},
+          {to:1,g:'spread',say:'表面抹平',set:{smooth:1}}]},
+  plate:{v:'plate',from:{out:0,cocoa:0,mint:0},
+   hands:[{to:.5,g:'scoop',say:'切下一份，移到盤子上',set:{out:1}},
+          {to:.86,g:'sprinkle',ing:'cocoa',say:'最後才撒可可粉',set:{cocoa:1}},
+          {to:1,g:'place',ing:'mint',say:'放一片薄荷',set:{mint:1}}]}},
+ chicken:{
+  prep:{v:'cutboard',from:{oil:0,herb:0,salt:0,tray:0},
+   hands:[{to:.3,g:'mix',ing:'oil',say:'生雞腿抹上油',set:{oil:1}},
+          {to:.55,g:'sprinkle',ing:'herbs',say:'香草抹在雞皮上',set:{herb:1}},
+          {to:.7,g:'sprinkle',ing:'salt',say:'撒鹽',set:{salt:1}},
+          {to:1,g:'place',say:'雞腿和馬鈴薯放到烤盤上',set:{tray:1}}]},
+  oven:{v:'tray',from:{in:0,roast:0},
+   hands:[{to:1,g:'place',say:'送進烤箱',set:{in:1}}],
+   heat:[{to:1,say:'粉白色的雞皮烤成金黃，最後一段烤皮更明顯',set:{roast:1}}]},
+  plate:{v:'plate',from:{out:0,pot:0,gar:0},
+   hands:[{to:.18,g:'pull',say:'烤盤從烤箱拉出來',set:{}},
+          {to:.5,g:'scoop',say:'雞腿移到盤子上',set:{out:1}},
+          {to:.76,g:'scoop',say:'烤馬鈴薯放旁邊',set:{pot:1}},
+          {to:1,g:'place',ing:'herbs',say:'迷迭香和一塊檸檬',set:{gar:1}}]}},
+ steak:{
+  prep:{v:'cutboard',from:{salt:0,pep:0,rest:0},
+   hands:[{to:.4,g:'sprinkle',ing:'salt',say:'生肋眼撒鹽',set:{salt:1}},
+          {to:.75,g:'sprinkle',ing:'pepper',say:'撒黑胡椒',set:{pep:1}},
+          {to:1,g:'press',say:'輕輕壓一下，讓調味貼住',set:{rest:1}}]},
+  hot:{v:'pan',from:{on:0,butter:0,sear1:0,flip:0,sear2:0,melt:0},
+   hands:[{to:.6,g:'place',ing:'steak',say:'生牛排下鍋',set:{on:1}},
+          {to:1,g:'place',ing:'butter',say:'一塊奶油和一枝迷迭香放在鍋邊',set:{butter:1}}],
+   heat:[{to:.4,say:'第一面貼著鍋，慢慢褐化，冒油花',set:{sear1:1}},
+         {to:.5,g:'flip',say:'翻面，第一面是漂亮的焦色',set:{flip:1}},
+         {to:1,g:'stir',say:'第二面上色；奶油慢慢融化，淋在牛排上',set:{sear2:1,melt:1}}]},
+  plate:{v:'plate',from:{out:0,cut:0,sauce:0,gar:0},
+   hands:[{to:.3,g:'scoop',say:'牛排移到盤子上',set:{out:1}},
+          {to:.62,g:'chop',say:'切開幾刀，看得到熟度',set:{cut:1}},
+          {to:.8,g:'pour',ing:'sauce',say:'淋上鍋裡的奶油醬',set:{sauce:1}},
+          {to:1,g:'sprinkle',ing:'salt',say:'迷迭香、一小塊奶油、鹽花',set:{gar:1}}]}},
+ basque:{
+  prep:{v:'cutboard',from:{cheese:0,egg:0,whisk:0,pour:0},
+   hands:[{to:.25,g:'drop',ing:'cheese',say:'奶油乳酪和糖放進攪拌盆',set:{cheese:1}},
+          {to:.45,g:'pour',ing:'egg',say:'蛋液和鮮奶油慢慢倒進去',set:{egg:1}},
+          {to:.75,g:'whisk',say:'攪拌到滑順',set:{whisk:1}},
+          {to:1,g:'pour',ing:'cheesebatter',say:'倒進鋪好烘焙紙的蛋糕模',set:{pour:1}}]},
+  oven:{v:'cakepan',from:{in:0,rise:0,burn:0},
+   hands:[{to:1,g:'place',say:'送進烤箱',set:{in:1}}],
+   heat:[{to:.55,say:'淺色的麵糊膨起來、定型',set:{rise:1}},
+         {to:1,say:'表面烤出巴斯克特有的深褐色焦面',set:{burn:1}}]},
+  plate:{v:'plate',from:{out:0,berries:0},
+   hands:[{to:.18,g:'pull',say:'蛋糕從烤箱拿出來',set:{}},
+          {to:.7,g:'chop',say:'脫模，切一片放上盤子',set:{out:1}},
+          {to:1,g:'place',ing:'berries',say:'旁邊放上莓果',set:{berries:1}}]}},
+ prosciutto:{
+  prep:{v:'cutboard',from:{cut:0,bowl:0,dress:0,toss:0},
+   hands:[{to:.3,g:'chop',ing:'greens',say:'生菜切好、整理',set:{cut:1}},
+          {to:.52,g:'sweep',say:'生菜放進碗裡',set:{bowl:1}},
+          {to:.72,g:'pour',ing:'dressing',say:'淋上醬汁',set:{dress:1}},
+          {to:1,g:'mix',say:'輕輕拌一下',set:{toss:1}}]},
+  plate:{v:'plate',from:{out:0,ham:0,top:0},
+   hands:[{to:.36,g:'scoop',say:'沙拉先放上盤子',set:{out:1}},
+          {to:.8,g:'place',ing:'prosciutto',say:'生火腿一片一片鋪上去',set:{ham:1}},
+          {to:1,g:'sprinkle',ing:'parmesan',say:'起司片、無花果、幾滴巴薩米克醋',set:{top:1}}]}}};
 function chOf(d,f){const c=CH[baseOf(d)];return c&&c[f]||null}
 function chRun(st,list,u){let a=0;for(const b of list||[]){if(u>=b.to){Object.assign(st,b.set);a=b.to;continue}const t=clamp((u-a)/Math.max(1e-6,b.to-a),0,1);const e=b.ease?Math.pow(t,b.ease):t;for(const k in b.set){const v0=st[k]||0;st[k]=v0+(b.set[k]-v0)*e}return{b,t}}return null}
 /* how far a piece of work is into a place's beats: the hands' share (h) and the heat's (q); a place it is done with is all done */
@@ -6608,7 +6677,80 @@ const CHD={
    for(let k=m-1;k>=0;k--){const pp=wfPlateAt(n,sp,k);const fill=clamp((st.out-k*per)/per,0,1),gk=clamp(st.gar*m-k,0,1);
     if(gk>=1&&k<n.its.length){chDishPic(c,n,pp,k);continue}
     c.save();c.translate(pp.x,pp.y);c.scale(pp.sc,pp.sc);drawPlate(c,S.decor.ware>0);c.scale(1.12,1.12*.8);chVegPlate(c,k,fill,gk);c.restore()}
-   if(g&&g.g==='scoop')chCarry(c,g,m,{x:sp.x,y:sp.y},k=>wfPlateAt(n,sp,k),(x,y)=>{c.fillStyle='#C94A2E';rr(c,x-3,y-2,3.4,2.6,.8);c.fill();c.fillStyle='#6E8F3A';rr(c,x+.4,y-1.6,3,2.4,.8);c.fill();c.fillStyle='#B9C2C6';rr(c,x-4,y+1.4,8,1.4,.7);c.fill()})}}};
+   if(g&&g.g==='scoop')chCarry(c,g,m,{x:sp.x,y:sp.y},k=>wfPlateAt(n,sp,k),(x,y)=>{c.fillStyle='#C94A2E';rr(c,x-3,y-2,3.4,2.6,.8);c.fill();c.fillStyle='#6E8F3A';rr(c,x+.4,y-1.6,3,2.4,.8);c.fill();c.fillStyle='#B9C2C6';rr(c,x-4,y+1.4,8,1.4,.7);c.fill()})}},
+ tiramisu:{
+  /* the glass dish: ladyfingers laid in a row one by one, brushed with coffee until they darken, the mascarpone spread over them
+     from one end to the other, a second row, coffee again, the second layer, the top smoothed */
+  vessel(c,n,S0,sp,now,hand,out){const st=S0.st,g=hand&&S0.ph.h<1?S0.beat:null;
+   chIn(c,sp,()=>{drawVesselBack(c,'mold');chTiramisuIn(c,st,now,out||0);drawVesselFront(c,'mold');if(g)chTiramisuTool(c,g,st,S0.t,now)})},
+  /* plated: a square cut and lifted onto the plate, the cocoa dusted over it last, a mint leaf */
+  plates(c,n,S0,pl,sp,now,hand){const st=pl.st;const m=Math.min(4,Math.max(1,n.n));const per=1/m;const g=hand?pl.beat:null;
+   for(let k=m-1;k>=0;k--){const pp=wfPlateAt(n,sp,k);const fill=clamp((st.out-k*per)/per,0,1),ck=clamp(st.cocoa*m-k,0,1),mk=clamp(st.mint*m-k,0,1);
+    if(mk>=1&&k<n.its.length){chDishPic(c,n,pp,k);continue}
+    c.save();c.translate(pp.x,pp.y);c.scale(pp.sc,pp.sc);drawPlate(c,S.decor.ware>0);if(fill>=1)chTiramisuSlice(c,k,ck,mk);c.restore()}
+   if(g&&g.g==='scoop')chCarry(c,g,m,{x:sp.x,y:sp.y},k=>wfPlateAt(n,sp,k),(x,y)=>{c.fillStyle='#F4E6CC';rr(c,x-3.4,y-3.4,6.8,4.8,.6);c.fill();c.fillStyle='#9A6236';c.fillRect(x-3.4,y-1.8,6.8,1);c.fillRect(x-3.4,y,6.8,.9);c.fillStyle='#B9C2C6';rr(c,x-4,y+1.6,8,1.4,.7);c.fill()},1);
+   if(g&&g.g==='sprinkle'){const pp=wfPlateAt(n,sp,Math.min(m-1,Math.floor(g.u*m)));chFall(c,pp.x,pp.y-15,'#6E4226',now,'dot')}}},
+ chicken:{
+  /* the board: a raw chicken leg and potatoes, the leg rubbed with oil, the herbs pressed on so they stay, salt, then all of it
+     onto the small tray; carried to the oven on it and slid in; behind the door's window the pale skin turns golden, deeper at
+     the end; pulled out, the leg and the potatoes onto the plate, rosemary and a wedge of lemon */
+  vessel(c,n,S0,sp,now,hand,out,pl){const st=S0.st,g=hand&&S0.ph.h<1?S0.beat:null;
+   if(wfLookF(n)==='prep'){chIn(c,sp,()=>{drawVesselBack(c,'cutboard');chChickenBoard(c,n,st,now,g)});return}
+   const at=chIntoOven(n,sp,n.st==='work'&&n.f==='oven'?st.in||0:0);chIn(c,at,()=>{drawVesselBack(c,'tray');chChickenTray(c,n,st.roast||0,pl?pl.st.out:0,pl?pl.st.pot:0)})},
+  oven(c,n,S0,sp){chIn(c,sp,()=>{drawVesselBack(c,'tray');chChickenTray(c,n,S0.st.roast||0,0,0)})},
+  held(c,n,x,y){c.save();c.translate(x,y);c.scale(.2,.2);drawVesselBack(c,'tray');chChickenTray(c,n,0,0,0);c.restore()},
+  plates(c,n,S0,pl,sp,now,hand){const st=pl.st;const m=Math.min(4,Math.max(1,n.n));const g=hand?pl.beat:null;
+   for(let k=m-1;k>=0;k--){const pp=wfPlateAt(n,sp,k);const L={out:clamp(st.out*m-k,0,1),pot:clamp(st.pot*m-k,0,1),gar:clamp(st.gar*m-k,0,1)};
+    if(L.gar>=1&&k<n.its.length){chDishPic(c,n,pp,k);continue}
+    c.save();c.translate(pp.x,pp.y);c.scale(pp.sc,pp.sc);drawPlate(c,S.decor.ware>0);c.scale(1.12,1.12*.8);chChickenPlate(c,L);c.restore()}
+   if(g&&g.g==='scoop')chCarry(c,g,m,{x:sp.x,y:sp.y},k=>wfPlateAt(n,sp,k),(x,y)=>{if(st.out<1){c.save();c.translate(x,y);c.scale(.22,.22);chChickenLeg(c,0,0,1,1,1);c.restore()}else{c.fillStyle='#E9A84A';el(c,x-1.6,y,1.8,1.5);el(c,x+1.6,y-.4,1.8,1.5)}c.fillStyle='#B9C2C6';rr(c,x-4,y+1.6,8,1.4,.7);c.fill()},1)}},
+ steak:{
+  /* the board: a raw ribeye, its fat white, salted and peppered and pressed so it holds — still raw. The pan: laid in, the side
+     on the pan browning at the rim with the fat spitting, turned over half way to its seared side, the second side colouring;
+     the butter and a sprig of rosemary set at the pan's side by hand at the start melt in the last part and are spooned over it
+     by whoever stays. Plated: moved over, cut so its colour inside shows, the butter sauce, the garnish */
+  vessel(c,n,S0,sp,now,hand,out){const st=S0.st,g=hand?S0.beat:null;
+   if(wfLookF(n)==='prep'){chIn(c,sp,()=>{drawVesselBack(c,'cutboard');chSteakBoard(c,st,now,g&&S0.ph.h<1?g:null)});return}
+   const on=n.st==='cook'||n.st==='work'&&n.f==='hot';
+   chIn(c,sp,()=>{drawVesselBack(c,'pan');c.save();c.beginPath();c.ellipse(0,0,40,17,0,0,7);c.clip();c.scale(1,17/40);chSteakPan(c,st,now,(out||0)>=.5);c.restore();drawVesselFront(c,'pan');
+    if(st.on>0&&st.on<1){c.save();c.translate(0,-(1-st.on)*34);c.scale(1,17/40);chSteakCut(c,{},1);c.restore()}
+    if(st.butter>0&&st.butter<1){c.fillStyle='#F8E08E';rr(c,18,-6-(1-st.butter)*30,10,7,2);c.fill()}
+    if(g&&g.g==='flip'&&st.flip>0&&st.flip<1){const t=st.flip;c.save();c.translate(-6,-Math.sin(t*Math.PI)*16*17/40-2);c.rotate(-.2);c.fillStyle='#B9C2C6';rr(c,-14,-2,26,5,2);c.fill();c.strokeStyle='#6B4428';c.lineWidth=3;c.lineCap='round';c.beginPath();c.moveTo(12,0);c.lineTo(34,-16);c.stroke();c.restore()}
+    if(g&&g.g==='stir'&&st.melt>.1){/* the spoon basting it with the butter */const a=Math.sin(now*4);c.save();c.translate(16+a*4,-16);c.rotate(-.6);c.fillStyle='#C9D0D3';el(c,0,0,6,3.4);c.strokeStyle='#9AA4A8';c.lineWidth=2;c.beginPath();c.moveTo(5,-1);c.lineTo(22,-10);c.stroke();c.restore();for(let i=0;i<3;i++){const ph=(now*2+i*.33)%1;c.fillStyle='rgba(248,220,120,.9)';circ(c,12+a*4-ph*6,-12+ph*12,1.4)}}
+    if(on&&st.on>=1&&(out||0)<.5){for(let i=0;i<5;i++){const ph=(now*1.5+i*.21)%1;c.globalAlpha=(1-ph)*.8;c.fillStyle=i%2?'#FFF1B0':'#FFD27A';circ(c,-22+i*11+Math.sin(now*9+i*2)*3,-8-ph*20,1.5-ph)}c.globalAlpha=1;chSteam(c,.4,now,-22,36)}})},
+  held(c,n,x,y){c.save();c.translate(x,y);c.scale(.22,.22);drawVesselBack(c,'plate');c.save();c.scale(.8,.8*.45);chSteakCut(c,{},1);c.restore();c.restore()},
+  plates(c,n,S0,pl,sp,now,hand){const st=pl.st;const m=Math.min(4,Math.max(1,n.n));const g=hand?pl.beat:null;
+   for(let k=m-1;k>=0;k--){const pp=wfPlateAt(n,sp,k);const L={out:clamp(st.out*m-k,0,1),cut:clamp(st.cut*m-k,0,1),sauce:clamp(st.sauce*m-k,0,1),gar:clamp(st.gar*m-k,0,1)};
+    if(L.gar>=1&&k<n.its.length){chDishPic(c,n,pp,k);continue}
+    c.save();c.translate(pp.x,pp.y);c.scale(pp.sc,pp.sc);drawPlate(c,S.decor.ware>0);c.scale(1.12,1.12*.8);chSteakPlate(c,k,L,n.its[k]&&n.its[k].it.want||1);c.restore()}
+   if(g&&g.g==='scoop')chCarry(c,g,m,{x:sp.x,y:sp.y},k=>wfPlateAt(n,sp,k),(x,y)=>{c.fillStyle='#5A2E1C';el(c,x,y,4.6,2.4);c.fillStyle='#B9C2C6';rr(c,x-4,y+1.6,8,1.4,.7);c.fill()},1);
+   if(g&&g.g==='chop'){const pp=wfPlateAt(n,sp,Math.min(m-1,Math.floor(g.u*m)));const lift=Math.abs(Math.sin(now*12))*4;c.save();c.translate(pp.x+4,pp.y-8-lift);c.scale(.3,.3);chKnife(c,0,0,-.4);c.restore()}
+   if(g&&g.g==='pour'){const pp=wfPlateAt(n,sp,Math.min(m-1,Math.floor(g.u*m)));c.save();c.translate(pp.x+7,pp.y-14);c.rotate(-.9);c.fillStyle='#C9D0D3';rr(c,-2,-2.6,4,5.2,1);c.fill();c.restore();chStream(c,pp.x+4.4,pp.y-12.4,pp.x+1,pp.y-3,'rgba(214,170,80,.95)',1,now)}
+   if(g&&g.g==='sprinkle'){const pp=wfPlateAt(n,sp,Math.min(m-1,Math.floor(g.u*m)));chFall(c,pp.x,pp.y-14,'#FFFFFF',now,'dot')}}},
+ basque:{
+  /* the board: cream cheese and sugar dropped into the mixing bowl, the eggs and cream poured in, whisked from lumps to a smooth
+     pale batter, poured into the lined tin; carried to the oven and slid in; behind its window the pale batter rises and sets,
+     then its top darkens into the burnt brown it is known for; pulled out, a slice cut and laid on the plate, berries */
+  vessel(c,n,S0,sp,now,hand,out,pl){const st=S0.st,g=hand&&S0.ph.h<1?S0.beat:null;
+   if(wfLookF(n)==='prep'){chIn(c,sp,()=>{drawVesselBack(c,'cutboard');chBasqueBoard(c,st,now,g,S0.t)});return}
+   const at=chIntoOven(n,sp,n.st==='work'&&n.f==='oven'?st.in||0:0);chIn(c,at,()=>chBasqueTin(c,{pour:1,rise:st.rise||0,burn:st.burn||0},pl?pl.st.out:0))},
+  oven(c,n,S0,sp){chIn(c,sp,()=>chBasqueTin(c,{pour:1,rise:S0.st.rise||0,burn:S0.st.burn||0},0))},
+  held(c,n,x,y){c.save();c.translate(x,y);c.scale(.24,.24);chBasqueTin(c,{pour:1,rise:0,burn:0},0);c.restore()},
+  plates(c,n,S0,pl,sp,now,hand){const st=pl.st;const m=Math.min(4,Math.max(1,n.n));const g=hand?pl.beat:null;
+   for(let k=m-1;k>=0;k--){const pp=wfPlateAt(n,sp,k);const o=clamp(st.out*m-k,0,1),b=clamp(st.berries*m-k,0,1);
+    if(b>=1&&k<n.its.length){chDishPic(c,n,pp,k);continue}
+    c.save();c.translate(pp.x,pp.y);c.scale(pp.sc,pp.sc);drawPlate(c,S.decor.ware>0);c.scale(1.12,1.12*.8);if(o>=1)chBasqueSlice(c,b);c.restore()}
+   if(g&&g.g==='chop'){const pos=g.u*m;const k=Math.min(m-1,Math.floor(pos)),t=pos-k;const pp=wfPlateAt(n,sp,k);if(t<.45){const lift=Math.abs(Math.sin(now*12))*5;c.save();c.translate(sp.x+6,sp.y-10-lift);c.scale(.3,.3);chKnife(c,0,0,-.5);c.restore()}else if(t<.95){const q=(t-.45)/.5;const x=lerp(sp.x,pp.x,q),y=lerp(sp.y-4,pp.y-4,q)-Math.sin(q*Math.PI)*12;c.fillStyle='#F4DFA9';c.beginPath();c.moveTo(x-4,y+1);c.lineTo(x+4,y-1);c.lineTo(x+4,y+2);c.lineTo(x-4,y+3);c.closePath();c.fill();c.fillStyle='#3E2210';c.fillRect(x-4,y-.6,8,1.4);c.fillStyle='#B9C2C6';rr(c,x-4,y+3,8,1.4,.7);c.fill()}}}},
+ prosciutto:{
+  /* the board: the lettuce cut, swept into the bowl, dressed, tossed lightly. Plated: the salad on the plate first, the
+     prosciutto laid on it one slice at a time — never chopped in with the leaves — then the cheese, a fig, the balsamic */
+  vessel(c,n,S0,sp,now,hand,out){const g=hand&&S0.ph.h<1?S0.beat:null;chIn(c,sp,()=>{drawVesselBack(c,'cutboard');chProsBoard(c,n,S0.st,now,g,S0.t,out||0)})},
+  plates(c,n,S0,pl,sp,now,hand){const st=pl.st;const m=Math.min(4,Math.max(1,n.n));const per=1/m;const g=hand?pl.beat:null;
+   for(let k=m-1;k>=0;k--){const pp=wfPlateAt(n,sp,k);const L={out:clamp((st.out-k*per)/per,0,1),ham:clamp(st.ham*m-k,0,1),top:clamp(st.top*m-k,0,1)};
+    if(L.top>=1&&k<n.its.length){chDishPic(c,n,pp,k);continue}
+    c.save();c.translate(pp.x,pp.y);c.scale(pp.sc,pp.sc);drawPlate(c,S.decor.ware>0);c.scale(1.12,1.12*.8);chProsPlate(c,k,L);c.restore()}
+   if(g&&g.g==='scoop')chCarry(c,g,m,{x:sp.x+33*sp.sc,y:sp.y-4*sp.sc},k=>wfPlateAt(n,sp,k),(x,y)=>{greens(c,rng(9),x,y-.6,3.6,6);c.fillStyle='#C9A26A';rr(c,x-4,y+1.4,8,1.4,.7);c.fill()});
+   if(g&&g.g==='sprinkle'){const pp=wfPlateAt(n,sp,Math.min(m-1,Math.floor(g.u*m)));chFall(c,pp.x,pp.y-14,'#FFF4D8',now,'sq')}}}};
 /* a tool over a wok or pan, in the vessel's own coordinates (the pan at 0,0, its rim 44 wide): what the hands are doing */
 function chWokTool(c,g,now){const k=g.g;c.save();c.lineCap='round';
  if(k==='pour'&&g.ing==='oil'){c.save();c.translate(20,-50);c.rotate(-2.3);c.fillStyle='#E7C25A';rr(c,-5,-13,10,24,3);c.fill();c.fillStyle='rgba(255,255,255,.45)';c.fillRect(-3,-11,2,18);c.fillStyle='#3A3A3A';rr(c,-2.4,-19,4.8,7,1.2);c.fill();c.restore();
@@ -6849,6 +6991,119 @@ function chVegBoard(c,n,st,now,g,t){const w=1-st.cut;
  if(g&&g.ing==='herbs')chFall(c,TX,TY-14,'#4E9A3A',now,'seed')}
 /* roast vegetables on a plate (flat: the dish picture's coordinates): the chunks lifted on, the rosemary last */
 function chVegPlate(c,k,fill,gk){const R=rng(hash('vegplate|'+k));for(let i=0;i<8;i++){const a=R()*6.28,d=R()*20,px=Math.cos(a)*d,py=Math.sin(a)*d,rot=R()*3;if(i>=Math.round(8*fill))continue;chVegChunk(c,px,py,rot,i,1)}if(gk>0){c.save();c.translate(0,-(1-gk)*14);rosemary(c,10,14,1,.3);c.restore()}}
+/* ---- the third batch's pieces ---- */
+/* the tiramisu in its dish (the mould's own coordinates): ladyfingers in a row (the next one on its way down), darkening as the
+   coffee is brushed on, the mascarpone spread from one end, a second row, a second layer, the top smoothed; a portion cut out */
+function chTiramisuIn(c,st,now,out){c.save();c.beginPath();c.rect(-29,-15,58,32);c.clip();const cut=Math.min(.85,out*.35)*58;c.beginPath();c.rect(-29,-15,58-cut,32);c.clip();
+ const row=(y,a,cof)=>{const k=a*6;for(let i=0;i<6;i++){if(i>=Math.ceil(k-1e-6))break;const fr=Math.min(1,k-i);c.fillStyle=mix('#E9C98A','#94603A',cof);rr(c,-29+i*9.67+.3,y-(1-fr)*24,9.1,6,2.6);c.fill();c.fillStyle='rgba(255,255,255,.25)';c.fillRect(-27+i*9.67,y+1-(1-fr)*24,5,1)}};
+ const cream=(y,a,flat)=>{if(a<=0)return;const w=58*a;c.fillStyle='#F7EEDC';c.beginPath();c.moveTo(-29,y+8);c.lineTo(-29,y);for(let x=-29;x<=-29+w;x+=3)c.lineTo(x,y+(flat?0:Math.sin(x*.7)*1.2));c.quadraticCurveTo(-29+w+3,y+4,-29+w,y+8);c.closePath();c.fill()};
+ row(11,st.lf1,st.cof1);cream(3,st.cr1,true);row(-3,st.lf2,st.cof2);cream(-11,st.cr2,st.smooth>=1);
+ if(st.cr2>=1&&st.smooth>0&&st.smooth<1){c.fillStyle='rgba(255,255,255,.5)';c.fillRect(-29,-11.5,58*st.smooth,1.2)}
+ c.restore()}
+/* the hands' tools over the dish: the brush taking the coffee along the row, the spatula spreading the cream, then smoothing it */
+function chTiramisuTool(c,g,st,t,now){c.save();c.lineCap='round';
+ if(g.ing==='espresso'){const y=(st.cr1<1?11:-3)-2,x=lerp(-26,26,t);c.strokeStyle='#8A5A30';c.lineWidth=2.4;c.beginPath();c.moveTo(x+8,y-18);c.lineTo(x+1,y-4);c.stroke();c.fillStyle='#4A2A14';rr(c,x-2.6,y-5,5.2,5,1.2);c.fill()}
+ else if(g.ing==='mascarpone'){const y=st.cr1<1?3:-11,a=st.cr1<1?st.cr1:st.cr2,x=-29+58*a;c.fillStyle='#F7EEDC';el(c,x,y+2,4,3);c.fillStyle='#B9C2C6';rr(c,x-1,y-6,3,10,1);c.fill();c.strokeStyle='#6B4428';c.lineWidth=2.4;c.beginPath();c.moveTo(x+1,y-6);c.lineTo(x+10,y-18);c.stroke()}
+ else if(g.g==='spread'){const x=Math.sin(now*5)*20;c.fillStyle='#B9C2C6';rr(c,x-8,-14,16,2.6,1);c.fill();c.strokeStyle='#6B4428';c.lineWidth=2.4;c.beginPath();c.moveTo(x+6,-14);c.lineTo(x+16,-26);c.stroke()}
+ c.restore()}
+/* a slice of tiramisu on its plate (the dish picture's own drawing, scaled as it is): its layers, the cocoa dusted over the top
+   and onto the plate, a mint leaf */
+function chTiramisuSlice(c,k,ck,mk){c.save();c.scale(1.12,1.12);const R=rng(hash('tirami|'+k));c.fillStyle='rgba(90,50,25,.18)';el(c,0,16,28,8);c.fillStyle='#F4E6CC';c.fillRect(-18,-4,36,20);c.fillStyle='#B77A45';c.fillRect(-18,1,36,4);c.fillRect(-18,10,36,4);
+ c.fillStyle=mix('#F2E6CF','#6E4226',ck);c.beginPath();c.moveTo(-18,-4);c.lineTo(-10,-14);c.lineTo(26,-14);c.lineTo(18,-4);c.closePath();c.fill();c.fillStyle='#E9DCC2';c.beginPath();c.moveTo(18,-4);c.lineTo(26,-14);c.lineTo(26,6);c.lineTo(18,16);c.closePath();c.fill();c.fillStyle='#A8703E';c.beginPath();c.moveTo(18,1);c.lineTo(26,-9);c.lineTo(26,-5);c.lineTo(18,5);c.fill();
+ c.fillStyle='rgba(60,30,15,.5)';for(let i=0;i<Math.round(30*ck);i++)circ(c,-12+R()*34,-12+R()*7,.6);c.fillStyle='rgba(110,66,38,.5)';for(let i=0;i<Math.round(20*ck);i++)circ(c,(R()-.5)*60,20+R()*8,.6);
+ if(mk>0)leaf(c,4,-14-(1-mk)*14,9,4,-.4,'#4E9A3A');c.restore()}
+/* a chicken leg (the dish picture's, its colour from raw to roast): pale pink and glossy with oil, herbs on its skin, golden and
+   deeper as it roasts */
+function chChickenLeg(c,x,y,s,roast,herb,oil){c.save();c.translate(x,y);c.rotate(-.45);c.fillStyle='#F5EAD6';rr(c,12*s,-3*s,12*s,6*s,3*s);c.fill();circ(c,24*s,-3*s,3.2*s);circ(c,24*s,3*s,3.2*s);
+ let g=c.createRadialGradient(-6*s,-6*s,2,0,0,22*s);g.addColorStop(0,mix('#F9DDCB','#EDB463',roast));g.addColorStop(.7,mix('#F1C4AA','#C7772F',roast));g.addColorStop(1,mix('#E2A58C','#8E4A1C',roast));c.fillStyle=g;el(c,-2*s,0,19*s,13*s);
+ gloss(c,-8*s,-6*s,7*s,2.5*s,.2+.25*Math.max(oil==null?1:oil,roast));gloss(c,4*s,-4*s,3*s,1.2*s,.3);
+ if(roast>.4){c.fillStyle=`rgba(90,50,20,${.35*(roast-.4)/.6})`;for(let k=0;k<6;k++)circ(c,-12*s+k*4*s,(k%2?3:-2)*s,.9*s)}
+ if(herb>0){const R=rng(31);c.fillStyle=mix('#4E9A3A','#3A5A20',roast);for(let i=0;i<Math.round(12*herb);i++)el(c,-2*s+(R()-.5)*30*s,(R()-.5)*18*s,1.5*s,.7*s)}c.restore()}
+/* a potato chunk, raw to roast */
+function chPotato(c,x,y,r,roast){c.fillStyle=mix('#F2E2B0','#C98A34',roast);el(c,x,y,r,r*.82);c.fillStyle=mix('#FBF0CC','#F4CE79',roast);el(c,x-r*.25,y-r*.25,r*.55,r*.42)}
+/* the chicken at the board: a raw leg and potatoes; oiled (it shines), herbed, salted, then onto the small tray at the end */
+function chChickenBoard(c,n,st,now,g){const TX=30,TY=-2,TS=.42;c.save();c.translate(TX,TY);c.scale(TS,TS);drawVesselBack(c,'tray');if(st.tray>=1)chChickenTray(c,n,0,0,0,st);c.restore();
+ if(st.tray<1){const q=st.tray;const lx=lerp(-20,TX-12*TS,q),ly=lerp(-2,TY,q)-Math.sin(q*Math.PI)*10;chChickenLeg(c,lx,ly,lerp(.55,.75*TS,q),0,st.herb,st.oil);for(let i=0;i<3;i++){const px=lerp(-44+i*6,TX+(26+i*6)*TS,q),py=lerp(6-(i%2)*3,TY+(i%2?5:-5)*TS,q)-Math.sin(q*Math.PI)*8;chPotato(c,px,py,lerp(3.4,6*TS,q),0)}
+  if(st.salt>0){const R0=rng(78);c.fillStyle='#FFFFFF';for(let i=0;i<Math.round(10*st.salt);i++)circ(c,lx-2+(R0()-.5)*16,ly+(R0()-.5)*8,.6)}}
+ if(g&&g.g==='mix'){c.fillStyle='#F0C8A8';el(c,-20+Math.sin(now*9)*5,-8,6.4,3)}
+ if(g&&g.g==='sprinkle')chFall(c,-20,-18,g.ing==='salt'?'#FFFFFF':'#4E9A3A',now,g.ing==='salt'?'dot':'seed')}
+/* on the tray (the tray's own coordinates): a leg for each portion, potatoes round them; lifted off as it is plated */
+function chChickenTray(c,n,roast,out,pot,st){const m=Math.min(3,Math.max(1,n.n||1));const legs=m-Math.round((out||0)*m),pots=2*m-Math.round((pot||0)*2*m);const herb=st?st.herb:1;
+ for(let i=0;i<2*m;i++){if(i>=pots)continue;chPotato(c,26+(i%2)*12,(i<2?-6:i<4?6:0)+(i>=4?-2:0),6,roast)}
+ for(let i=0;i<m;i++){if(i>=legs)continue;chChickenLeg(c,-30+i*20,i%2?4:-3,.75,roast,herb==null?1:herb,1)}}
+/* the plate (flat: the dish picture's coordinates): the leg laid on it, the potatoes beside it, the rosemary and the lemon */
+function chChickenPlate(c,L){if(L.pot>0){for(let k=0;k<Math.round(4*L.pot);k++){const px=-16+k*10,py=16-(k%2)*5;let g=c.createRadialGradient(px-2,py-2,1,px,py,6);g.addColorStop(0,'#F4CE79');g.addColorStop(1,'#C98A34');c.fillStyle=g;el(c,px,py,6,5)}}
+ if(L.out>0){c.save();c.translate(0,-(1-L.out)*14);chickenLeg(c,-2,-4,1.05);c.restore()}
+ if(L.gar>0){c.save();c.translate(0,-(1-L.gar)*12);rosemary(c,18,-14,.9,1.2);lemonWedge(c,-22,-12,.8,-.6);c.restore()}}
+/* a ribeye (its own coordinates): raw — red, the fat white and marbled — or seared on the side that was down; turned over with a
+   hop, flat to its edge and back; the rim browning on the side on the pan */
+function chSteakCut(c,st,s){const raw='#C43A4C',done='#7A3E22';const fl=st.flip||0,up=fl>=.5;c.save();c.scale(s||1,s||1);if(fl>0&&fl<1){c.translate(0,-Math.sin(fl*Math.PI)*16);c.scale(1,Math.max(.12,Math.abs(Math.cos(fl*Math.PI))))}
+ const under=up?(st.sear2||0):(st.sear1||0),top=up?mix(raw,done,.85*(st.sear1||0)):raw;const path=()=>{c.beginPath();c.moveTo(-28,-10);c.bezierCurveTo(-24,-24,18,-26,28,-12);c.bezierCurveTo(34,4,24,22,0,22);c.bezierCurveTo(-24,22,-34,6,-28,-10)};
+ c.fillStyle='rgba(0,0,0,.28)';el(c,2,5,31,23);c.fillStyle=mix(raw,done,Math.min(1,under*1.1));path();c.fill();c.save();c.translate(0,1);c.scale(.9,.88);c.fillStyle=top;path();c.fill();c.restore();
+ c.fillStyle=up?mix('#F3E6D0','#C89A60',st.sear1||0):'#F3E6D0';c.beginPath();c.moveTo(-28,-10);c.bezierCurveTo(-24,-24,18,-26,28,-12);c.lineTo(24,-8);c.bezierCurveTo(14,-19,-20,-17,-24,-5);c.closePath();c.fill();
+ if(!up){c.strokeStyle='rgba(255,255,255,.35)';c.lineWidth=.9;for(let i=0;i<5;i++){c.beginPath();c.moveTo(-18+i*8,-5);c.quadraticCurveTo(-14+i*8,5,-20+i*8,15);c.stroke()}}
+ else if((st.sear1||0)>.35){c.strokeStyle='rgba(40,18,8,.65)';c.lineWidth=2.4;for(let i=-2;i<=2;i++){c.beginPath();c.moveTo(-16+i*10,-14);c.lineTo(-4+i*10,18);c.stroke()}}
+ gloss(c,-10,-8,9,3,.22);c.restore()}
+/* the ribeye in its pan (a circle of 40, squashed by the caller), with the butter and the rosemary set at its side by hand at
+   the start: a pat, then melting into a foaming golden pool round it */
+function chSteakPan(c,st,now,gone){if(st.on>=1&&!gone){if(st.butter>=1&&st.melt>0){c.fillStyle=`rgba(248,214,110,${.25+.35*st.melt})`;el(c,6,4,24+14*st.melt,20+10*st.melt);c.fillStyle='rgba(255,246,210,.8)';for(let i=0;i<Math.round(10*st.melt);i++){const a=i*.63+now*.6;circ(c,6+Math.cos(a)*(24+12*st.melt),4+Math.sin(a)*(18+9*st.melt),1.4)}}chSteakCut(c,st,1)}
+ if(st.butter>=1){if((st.melt||0)<.6){c.globalAlpha=1-(st.melt||0)/.6;c.fillStyle='#F8E08E';rr(c,22,8,10,7,2);c.fill();c.globalAlpha=1}rosemary(c,30,-4,.9,.4)}}
+/* the ribeye at the board (the board's own coordinates): raw, salted and peppered, pressed */
+function chSteakBoard(c,st,now,g){c.save();c.translate(-6,-1);c.scale(.62,.5);chSteakCut(c,{},1);c.restore();const R0=rng(91);
+ for(let i=0;i<Math.round(14*st.salt);i++){c.fillStyle='#FFFFFF';circ(c,-6+(R0()-.5)*30,-1+(R0()-.5)*16,.7)}
+ for(let i=0;i<Math.round(14*st.pep);i++){c.fillStyle='#2A2A2A';circ(c,-6+(R0()-.5)*30,-1+(R0()-.5)*16,.7)}
+ if(g&&g.g==='sprinkle')chFall(c,-6,-18,g.ing==='pepper'?'#2A2A2A':'#FFFFFF',now,'dot');
+ if(g&&g.g==='press'){c.fillStyle='#F0C8A8';el(c,-6,-10-Math.abs(Math.sin(now*8))*3,9,3.6)}}
+/* the ribeye on its plate (flat: the dish picture's coordinates): laid on, cut — a few strokes, then the slices fanned so its
+   colour inside shows — the butter sauce under it, a pat of butter, herbs, rosemary, salt */
+function chSteakPlate(c,k,L,want){if(L.sauce>0){c.fillStyle=`rgba(120,40,30,${.25*L.sauce})`;el(c,0,4,26*L.sauce,14*L.sauce)}
+ if(L.out>0){if(L.cut<1){c.save();c.translate(0,-2-(1-L.out)*14);c.scale(.8,.8);chSteakCut(c,{flip:1,sear1:1,sear2:1},1);c.strokeStyle='rgba(40,18,8,.9)';c.lineWidth=1.6;for(let i=0;i<Math.floor(L.cut*4);i++){c.beginPath();c.moveTo(12-i*9,-20);c.lineTo(6-i*9,20);c.stroke()}c.restore()}else steakSlices(c,0,-1,1,want)}
+ if(L.gar>0){const R=rng(hash('steakgar|'+k));c.save();c.translate(0,-(1-L.gar)*10);c.fillStyle='#F8E08E';rr(c,-22,-18,10,8,2);c.fill();herbs(c,R,-17,-14,3,3,'#4E7A3A');rosemary(c,16,14,.9,-.4);c.restore();c.fillStyle='#fff';for(let i=0;i<Math.round(8*L.gar);i++)circ(c,(R()-.5)*34,(R()-.5)*28,.7)}}
+/* the Basque cheesecake at the board (the board's own coordinates): cream cheese and sugar into the mixing bowl, the eggs and
+   cream poured in, whisked from lumps to a smooth pale batter, poured into the lined tin at the board's end */
+function chBasqueBoard(c,st,now,g,t){const BX=-12,BY=-4,TX=32,TY=-2,TS=.4;
+ c.save();c.translate(TX,TY);c.scale(TS,TS);chBasqueTin(c,{pour:st.pour,rise:0,burn:0},0);c.restore();
+ c.fillStyle='rgba(0,0,0,.18)';el(c,BX+1,BY+9,15,3.5);let gb=c.createLinearGradient(BX-16,0,BX+16,0);gb.addColorStop(0,'#D6CDBE');gb.addColorStop(.4,'#FFFFFF');gb.addColorStop(1,'#CCC2B2');c.fillStyle=gb;c.beginPath();c.moveTo(BX-16,BY-1);c.quadraticCurveTo(BX-15,BY+10,BX,BY+10);c.quadraticCurveTo(BX+15,BY+10,BX+16,BY-1);c.fill();c.fillStyle='#F7F3EC';el(c,BX,BY-1,16,5);c.fillStyle='#E6DED0';el(c,BX,BY-.6,14,4.2);
+ const left=1-st.pour;if(left>0){if(st.egg>0){c.fillStyle=mix('#F7E6A8','#F4E3B0',st.whisk);c.globalAlpha=Math.min(1,st.egg*1.5);el(c,BX,BY-.6,13*Math.sqrt(left),3.8*Math.sqrt(left));c.globalAlpha=1}
+  const lumps=Math.round(5*st.cheese*(1-st.whisk));for(let i=0;i<lumps;i++){c.fillStyle='#FFFDF4';rr(c,BX-9+i*4,BY-3+(i%2)*1.5,3.4,2.6,.8);c.fill()}
+  if(st.whisk>0&&st.whisk<1){c.strokeStyle='rgba(255,255,255,.6)';c.lineWidth=.8;c.beginPath();c.arc(BX,BY-.6,6,now*8,now*8+3);c.stroke()}}
+ c.strokeStyle='rgba(255,255,255,.9)';c.lineWidth=1.2;c.beginPath();c.ellipse(BX,BY-1,16,5,0,.2,Math.PI-.2);c.stroke();
+ if(g&&g.ing==='cheese'){for(let i=0;i<4;i++){const ph=(now*2.4+i*.25)%1;c.fillStyle='#FFFDF4';rr(c,BX-4+i*2,BY-30+ph*26,3.4,2.6,.8);c.fill()}}
+ if(g&&g.ing==='egg'){const tip=chJug(c,BX+26,BY-30,1,'#C9D0D3');chStream(c,tip.x,tip.y,BX+2,BY-2,'#F7DC7A',2.4,now)}
+ if(g&&g.g==='whisk'){const a=now*9;const x=BX+Math.cos(a)*5,y=BY-2+Math.sin(a)*1.4;c.strokeStyle='#C9D0D3';c.lineWidth=.9;for(let i=-1;i<=1;i++){c.beginPath();c.ellipse(x+i*1.2,y-5,2,6,0,0,7);c.stroke()}c.strokeStyle='#8A5A30';c.lineWidth=2.2;c.beginPath();c.moveTo(x,y-10);c.lineTo(x+5,y-22);c.stroke()}
+ if(g&&g.ing==='cheesebatter'){chStream(c,BX+14,BY-4,TX,TY-4,'#F4E3B0',2.6,now)}}
+/* the cake in its lined tin (its own coordinates): the batter's surface rising inside as it is poured; in the oven it rises
+   above the rim and sets, its top darkening to the deep burnt brown; a slice cut out of it when it is plated */
+function chBasqueTin(c,st,out){c.fillStyle='rgba(0,0,0,.25)';el(c,0,16,32,7);let gt=c.createLinearGradient(-30,0,30,0);gt.addColorStop(0,'#8C979C');gt.addColorStop(.45,'#DDE2E4');gt.addColorStop(1,'#7C878C');c.fillStyle=gt;c.fillRect(-30,-10,60,24);el(c,0,14,30,8);
+ c.fillStyle='#5E676B';el(c,0,-10,30,9);c.fillStyle='#F3ECDD';el(c,0,-10,28,8);
+ const top=lerp(14,-10,Math.min(1,st.pour))-8*(st.rise||0);if(st.pour>0){c.save();c.beginPath();c.ellipse(0,-10,28,8,0,0,7);c.rect(-28,-10,56,30);c.clip();
+  let g=c.createRadialGradient(-4,top-2,2,0,top,28);g.addColorStop(0,mix('#F4DFA9','#3E2210',st.burn||0));g.addColorStop(1,mix('#EAD29A','#7A4A22',st.burn||0));c.fillStyle=g;el(c,0,top,28,8);
+  if((st.burn||0)>.4){c.fillStyle=`rgba(30,15,5,${.5*(st.burn-.4)/.6})`;for(let k=0;k<6;k++)el(c,-14+k*6,top-1+(k%2)*2,2.4,1.1)}
+  if(out>0){c.fillStyle='#F4DFA9';c.beginPath();c.moveTo(0,top);c.lineTo(28,top-2);c.lineTo(22*Math.min(1,out*2),top+6);c.closePath();c.fill()}c.restore()}
+ c.strokeStyle='#F3ECDD';c.lineWidth=2;c.beginPath();for(let x=-30;x<=30;x+=5)c.lineTo(x,-14+((x/5)%2?2:0));c.stroke()}
+/* a slice of the Basque cheesecake on its plate (flat: the dish picture's coordinates), the berries put beside it */
+function chBasqueSlice(c,b){c.fillStyle='#EAD29A';c.beginPath();c.moveTo(-26,-2);c.lineTo(24,-14);c.lineTo(24,18);c.lineTo(-26,6);c.closePath();c.fill();c.fillStyle='#F4DFA9';c.beginPath();c.moveTo(-26,-2);c.lineTo(24,4);c.lineTo(24,18);c.lineTo(-26,6);c.closePath();c.fill();let g=c.createLinearGradient(-26,0,24,0);g.addColorStop(0,'#7A4A22');g.addColorStop(1,'#3E2210');c.fillStyle=g;c.beginPath();c.moveTo(-26,-3);c.lineTo(24,-15);c.lineTo(24,4);c.lineTo(-26,-1);c.closePath();c.fill();
+ if(b>0){c.save();c.translate(0,-(1-b)*12);c.fillStyle='#3A2E6A';circ(c,-18,14,3.4);circ(c,-12,17,3);c.fillStyle='#D23A4A';circ(c,-6,15,3.2);c.restore()}}
+/* the prosciutto salad at the board (the board's own coordinates): a lettuce and a handful of rocket cut into leaves, swept into
+   the bowl, dressed, tossed lightly; plated out of the bowl */
+function chProsBoard(c,n,st,now,g,t,out){const BX=33,BY=-4;const R0=rng((n.seed||1)*17+11);
+ if(st.cut<1){const r=9*(1-st.cut*.7);c.fillStyle='#5E9E36';circ(c,-37,-3,r);c.fillStyle='#8CC84E';circ(c,-37.6,-3.8,r*.72);c.fillStyle='#4F8A2E';for(let i=0;i<Math.round(4*(1-st.cut));i++)leaf(c,-22+i*3,5,7,2.6,.4+i*.3,'#4F8A2E')}
+ c.fillStyle='rgba(0,0,0,.18)';el(c,BX+1,BY+9,15,3.5);let gb=c.createLinearGradient(BX-16,0,BX+16,0);gb.addColorStop(0,'#D6CDBE');gb.addColorStop(.4,'#FFFFFF');gb.addColorStop(1,'#CCC2B2');c.fillStyle=gb;c.beginPath();c.moveTo(BX-16,BY-1);c.quadraticCurveTo(BX-15,BY+10,BX,BY+10);c.quadraticCurveTo(BX+15,BY+10,BX+16,BY-1);c.fill();c.fillStyle='#F7F3EC';el(c,BX,BY-1,16,5);c.fillStyle='#E6DED0';el(c,BX,BY-.6,14,4.2);
+ const N=16,shown=Math.floor(N*st.cut+1e-6);const inb=[],air=[];
+ for(let i=0;i<N;i++){const a=R0()*6.283,d=Math.sqrt(R0())*8,a2=R0()*6.283,d2=Math.sqrt(R0()),rot=R0()*3;if(i>=shown)continue;const q=st.bowl;const px=-6+Math.cos(a)*d,py=-2+Math.sin(a)*d*.6,bx=BX+Math.cos(a2)*d2*12,by=BY-1.4+Math.sin(a2)*d2*3.6;
+  let x=lerp(px,bx,q),y=lerp(py,by,q)-Math.sin(q*Math.PI)*7;if(q>=1&&g&&g.g==='mix'){x+=Math.sin(now*9+i)*1;y+=Math.cos(now*8+i)*.4}(q>=1?inb:air).push({k:'L',x,y,rot,i,o:0})}
+ inb.length=Math.max(0,Math.ceil(inb.length*(1-out)-1e-6));for(const p of inb)chSaladPiece(c,p);
+ if(st.dress>0&&inb.length){const R1=rng((n.seed||1)*37+2);for(let i=0;i<Math.round(st.dress*7*(1-out));i++){c.fillStyle='rgba(236,204,112,.95)';el(c,BX+(R1()-.5)*22,BY-1.4+(R1()-.5)*6,1.6,.9)}}
+ c.strokeStyle='rgba(255,255,255,.9)';c.lineWidth=1.2;c.beginPath();c.ellipse(BX,BY-1,16,5,0,.2,Math.PI-.2);c.stroke();for(const p of air)chSaladPiece(c,p);
+ if(g&&g.g==='chop'){const lift=Math.abs(Math.sin(now*14))*7;chKnife(c,-37+9,-10-lift,-.12)}
+ if(g&&g.g==='sweep')chKnife(c,lerp(-12,18,t),-9,0);
+ if(g&&g.ing==='dressing'){const tip=chBottle(c,BX+22,BY-34,1,'rgba(226,196,106,.92)',.8);chStream(c,tip.x,tip.y,BX+3,BY-3,'rgba(232,198,98,.95)',1.6,now)}
+ if(g&&g.g==='mix'){const a=now*5;for(const s of[0,Math.PI]){const x=BX+Math.cos(a+s)*6,y=BY-2+Math.sin(a+s)*2;c.strokeStyle='#B07A46';c.lineWidth=2;c.lineCap='round';c.beginPath();c.moveTo(x,y);c.lineTo(x+(s?-8:8),y-16);c.stroke()}}}
+/* the plate (flat: the dish picture's coordinates): the salad first, the prosciutto laid on it a slice at a time, the cheese,
+   a fig and drops of balsamic last */
+function chProsPlate(c,k,L){const R=rng(hash('prosplate|'+k));if(L.out>0)greens(c,R,0,2,20,Math.round(20*L.out));c.lineCap='round';
+ for(let i=0;i<4;i++){const a=L.ham*4-i;if(a<=0)continue;const px=(i-1.5)*11,py=(i%2?-6:5)-(1-Math.min(1,a))*12;c.strokeStyle='#D9737A';c.lineWidth=8.5;c.beginPath();c.moveTo(px-8,py);c.bezierCurveTo(px-3,py-9,px+3,py+9,px+8,py);c.stroke();c.strokeStyle='#F3C1C0';c.lineWidth=2;c.beginPath();c.moveTo(px-7,py-2.4);c.bezierCurveTo(px-3,py-10,px+3,py+6,px+7,py-2.4);c.stroke()}
+ if(L.top>0){const R2=rng(hash('prostop|'+k));c.fillStyle='#FFF4D8';for(let i=0;i<Math.round(5*L.top);i++){c.save();c.translate((R2()-.5)*30,(R2()-.5)*26);c.rotate(R2()*3);c.fillRect(-3,-1,6,2);c.restore()}if(L.top>.4){c.fillStyle='#6B2E4A';circ(c,-18,-10,4.5);c.fillStyle='#E88A9A';circ(c,-18,-10,3)}if(L.top>.7){c.fillStyle='#4A1F1F';for(let i=0;i<7;i++)circ(c,(R2()-.5)*44,(R2()-.5)*40,1)}}}
 /* the line (called from drawLine): every piece of work at its place, sorted with the old jobs by depth */
 function wfLineItems(V){const out=[];if(!V||!V.slots)return out;for(const s of V.slots){const n=s.wf;if(!n||n.slot!==s){if(!n&&!s.job&&s.left)out.push({s,left:s.left,sp:wfFoodSpot({st:'left',d:'friedrice'},s)});continue}out.push({s,wf:n,sp:wfFoodSpot(n,s)})}return out}
 function wfDrawFood(c,v,now){const n=v.wf,sp=v.sp;const plating=n.st==='work'&&n.f==='plate';
