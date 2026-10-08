@@ -811,6 +811,10 @@ HUMAN_JS = r"""(()=>{if(window.__actHuman)return 'already';
    else if(g.state==='check'&&!cov('check'))C.push([2,'check'+t.i+g.id,()=>tapTable(t),H.gap]);
    else if(g.state==='wait'&&!cov('serve'))C.push([5,'serve'+t.i+g.id,()=>tapTable(t),H.gap])}
   if(H.sts.length<H.max){let done=false;for(const tk of R.tickets){if(done)break;for(const it of tk.items)if(it.st==='pending'&&!chefCanAny(it.d)){C.push([4.5,'cook'+tk.id+'_'+tk.items.indexOf(it),()=>{if(startCook(tk,it,true)){const s2=R.slots.findIndex(x=>x.job&&x.job.it===it);if(s2>=0)H.sts.push(s2)}},H.gap]);done=true;break}}}
+  /* v2.5: the new kitchen — Jill takes one step at a time, of the work no cook here can take; a dish done with its step goes
+     on first (plating frees the fire), then the work that has waited longest. Seen like everything else (react) */
+  if(typeof wfOpen==='function'&&!wfJillTask()){wfGather();const W=wfList().filter(n=>wfOpen(n)&&!wfStaffCan(n)&&(!WF_ST[wfNext(n)].slot||wfFreeSlot(wfNext(n))));W.sort((a,b)=>(b.st==='ready')-(a.st==='ready')||a.tr-b.tr);
+   if(W.length){const n=W[0];C.push([n.st==='ready'?4.7:4.5,'wf'+n.id+'_'+n.si+n.st,()=>wfAssign(n,'jill'),H.gap])}}
   for(let i=0;i<R.slots.length;i++)if(R.slots[i].broken)C.push([2.5,'fix'+i+R.slots[i].fix,()=>tapStation(i),H.tap]);
   const ready=C.filter(c=>c[0]>=8||seen(c[1]));if(!ready.length)return true;ready.sort((a,b)=>b[0]-a[0]);const c=ready[0];c[2]();H.acts++;H.next=H.t+c[3];return true};
  return 'installed'})()"""

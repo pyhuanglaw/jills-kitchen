@@ -657,7 +657,8 @@ def ui_basics(b, port, target):
 @test
 def touch_controls(b, port, target):
     """Real pointer taps on the canvases: seat a guest, tap a table, open a station, press a
-    kitchen-panel ingredient, pet a cat, tap the fridge. Exercises the input layer end to end."""
+    kitchen-panel ingredient, pet a cat, tap the fridge. Exercises the input layer end to end.
+    v2.5: the station and the panel steps are the new kitchen's (a burner sends Jill; the ticket's dish shows its card)."""
     g = Game(b, port, target, seed=14, manual=True)
     install_bot(g)
     def tap(x, y):  # scene coordinates -> screen pixels
@@ -686,25 +687,25 @@ def touch_controls(b, port, target):
         g.ev("(()=>{for(const t of R.tables)if(tableActionable(t)&&!jillTargets(t.i))tapTable(t);for(let i=0;i<15;i++)__tick(1000/30)})()")
     check(g.ev("R.tickets.length>0"), 'no order ticket appeared')
     si = g.ev("R.slots.findIndex(s=>s.type==='stove')")
-    # 2.0: the stations live in the kitchen room; a tap on the burner starts the cooking there
+    # 2.0: the stations live in the kitchen room; a tap on the burner starts the cooking there.
+    # v2.5 (docs/cooking/ARCHITECTURE.md §「改過的測試」): fried rice has no old station job and no ingredient panel any
+    # more. The tap on the burner sends Jill there with the dish that waits for it (no panel opens); the ingredient press
+    # and the panel's X are replaced by the new kitchen's own touch: the dish on the ticket strip shows its card, and a
+    # second tap on it puts the card away.
     g.ev("setRoom('kitchen')"); g.ev("__tick(1000/30)")
-    rx, ry = g.ev(f"(()=>{{const h=slotHome(R.slots[{si}]);return[h.x,h.y-8]}})()")
+    g.ev("wfGather()")
+    rx, ry = g.ev(f"(()=>{{const o=wfSlotCenter(R.slots[{si}]);return[o.x,o.y]}})()")
     tap(rx, ry)
-    check(g.ev(f"!!R.slots[{si}].job && R.panel===true"), 'tapping the stove did not start cooking / open the panel')
-    g.ev("__tick(1000/30)")
-    check(g.ev("!$('#trayWrap').hidden"), 'kitchen panel not visible')
+    st = g.ev(f"(()=>{{const n=wfList().find(n=>n.to===R.slots[{si}]||n.slot===R.slots[{si}]);return n?{{who:n.who,st:n.st,panel:!!R.panel}}:null}})()")
+    check(st and st['who'] == 'jill' and st['st'] in ('go', 'work', 'cook') and not st['panel'], f'tapping the stove did not send Jill there with the waiting dish: {st}')
+    # 3) the dish on the ticket strip: its card, saying who is on it
+    g.page.locator('#tickets .it.cooking').first.click(); g.ev("__tick(1000/30)")
+    card = g.ev("(()=>{const e=document.querySelector('#wfGuide');return e&&!e.hidden?e.innerText:''})()")
+    check(g.ev("!!R.wsel") and '熱區' in card and 'Jill' in card, f'tapping the dish on the ticket did not show its card: {card!r}')
+    # 4) and a second tap puts it away
+    g.page.locator('#tickets .it.wsel').first.click(); g.ev("__tick(1000/30)")
+    check(g.ev("R.wsel===null&&document.querySelector('#wfGuide').hidden"), 'the card did not go away')
     g.ev("setRoom('main')"); g.ev("__tick(1000/30)")
-    # 3) press the ingredient the recipe asks for, on the kitchen-panel canvas
-    before = g.ev(f"R.slots[{si}].job.adds.length")
-    want = g.ev(f"R.slots[{si}].job.step.t==='add'?R.slots[{si}].job.step.left[0]:null")
-    check(want is not None, 'first recipe step is not an ingredient step')
-    hx, hy = g.ev(f"(()=>{{const h=TRAYHIT.ctrls.find(h=>h.act==='ing'&&h.arg==={json.dumps(want)});const r=tc.getBoundingClientRect();return[r.left+h.x+h.w/2,r.top+h.y+h.h/2]}})()")
-    g.page.mouse.click(hx, hy); g.ev("__tick(1000/30)")
-    check(g.ev(f"R.slots[{si}].job.adds.length") == before + 1, 'tapping the ingredient did not add it')
-    # 4) close the panel with its X
-    hx, hy = g.ev("(()=>{const h=TRAYHIT.ctrls.find(h=>h.act==='close');const r=tc.getBoundingClientRect();return[r.left+h.x+h.w/2,r.top+h.y+h.h/2]})()")
-    g.page.mouse.click(hx, hy); g.ev("__tick(1000/30)")
-    check(g.ev("R.panel===false && $('#trayWrap').hidden"), 'panel did not close')
     # 5) pet a cat that is sitting on the floor away from the counter
     # rc7.3: and one the finger can actually reach — on the scene canvas at that point (nothing over it, inside the phone's
     # view) and the cat the game would pick there (not a closer one)
@@ -855,7 +856,8 @@ def cats_use_sofa_by_personality(b, port, target):
 @test
 def dylan_stays_a_quiet_regular_early_on(b, port, target):
     """Before anything is revealed Dylan is just an unusually patient guest who glances at Jill. He does not
-    stay after closing, nothing in the UI names the relationship, and no romance UI exists."""
+    stay after closing (except on Valentine's Day, when he brings flowers and stays late by design), nothing in the UI
+    names the relationship, and no romance UI exists."""
     g = Game(b, port, target, seed=77, manual=True)
     install_bot(g)
     g.ev("S.day=3;S.money=4000;S.level=2;S.tables=4")
@@ -877,7 +879,10 @@ def dylan_stays_a_quiet_regular_early_on(b, port, target):
         stage0 = g.ev("S.dylan.stage") == 0
         play_day(g)
         if os.environ.get('JK_TRACE'): print('   day', d, 'phase', g.ev("phase"), 'R', g.ev("!!R"), 'visible', g.page.locator('[data-act=toShop]').count(), g.ev("screenEl.hidden"))
-        if stage0: stayed += 1 if g.ev("!!LIFE.dylan") else 0
+        # v2.5 (docs/cooking/ARCHITECTURE.md §「改過的測試」): on Valentine's Day he stays late by design, before the reveal
+        # too (the dylan_valentine beat, v2.3). The new kitchen draws the evening's random numbers in another order, and
+        # on this seed Day 5 became Valentine's Day — so that evening is not counted.
+        if stage0 and not g.ev("!!fact('valentine_'+S.day)"): stayed += 1 if g.ev("!!LIFE.dylan") else 0
         if g.ev("(S.regulars.dylan||0)<3||S.day<6"): check(g.ev("S.dylan.stage") == 0, 'stage moved before the conditions were met')
         next_day(g)
     check(visits >= 3, f'Dylan should have been seated on most of these days: {visits}')
@@ -1371,13 +1376,19 @@ def jill_rests_when_staff_cover_the_floor(b, port, target):
         for _ in range(1500):
             r = g.ev("(()=>{for(let i=0;i<10;i++){if(!(phase==='service'&&R))return 0;if(i===0)%s();__tick(1000/30);const J=R.jill;__rs.frames++;if(J.rest==='sit'){__rs.sit++;__rs.acts.add(LIFE.jill.act)}if(J.pet)__rs.pets++;for(const s of R.slots){const m=s.job&&s.job.chef&&(S.crew||[]).find(q=>q.id===s.job.chef);if(m&&m.duty!==s.type)__rs.cov.add(s.type)}if(R.closing!=null&&R.closing>2&&!R.ended){finishClosing();return 0}}return 1})()" % actor)
             if not r: break
-        return g.ev("({sit:__rs.sit,frames:__rs.frames,acts:[...__rs.acts],pets:__rs.pets,cov:[...__rs.cov]})")
+        return g.ev("({sit:__rs.sit,frames:__rs.frames,acts:[...__rs.acts],pets:__rs.pets,cov:[...__rs.cov,...(window.__wfx||[])]})")
     alone = run_day('__act')
     check(alone['sit'] / max(1, alone['frames']) < .03, f'day 1 alone: Jill has no time to sit ({alone})')
     check(alone['pets'] > 0, 'even on a busy day she pats a cat that comes by')
     if g.ev("phase") == 'summary': g.click('[data-act=toShop]')
     g.click('[data-act=nextDay]')
-    g.ev("(()=>{S.money=9000;S.level=4;S.eq.bar=1;S.eq.oven=1;S.eq.prep=1;for(const d in DISHES){unlockDish(d);S.xp[d]=8}S.crew=[{id:'w1',role:'waiter',name:'小美',lv:3,duty:'both'},{id:'k1',role:'cleaner',name:'阿宏',lv:2,duty:'clean'},{id:'c1',role:'chef',name:'阿德',lv:3,duty:'stove'},{id:'c2',role:'chef',name:'小玉',lv:3,duty:'bar'}];save();showPrep()})()")
+    # v2.5 (docs/cooking/ARCHITECTURE.md §「改過的測試」): in the new kitchen a cook works the places he knows (the user's
+    # skeleton, CHEF_SKILL) — the two LV3 cooks this day used to have (阿德 and 小玉, unnamed in the roster, so both 熱區 and
+    # 備料) knew neither the oven nor the pass, so every plate was Jill's and she never sat. The crew is now the roster's
+    # first three cooks at LV3 (熱區, 烤箱, 裝盤 each someone's own; 備料 the others' second place): the kitchen is covered
+    # and the expectation is the same.
+    g.ev("(()=>{S.money=9000;S.level=4;S.eq.bar=1;S.eq.oven=1;S.eq.prep=1;for(const d in DISHES){unlockDish(d);S.xp[d]=8}S.crew=[{id:'w1',role:'waiter',name:'小美',lv:3,duty:'both'},{id:'k1',role:'cleaner',name:'阿宏',lv:2,duty:'clean'},{id:'c1',role:'chef',name:'阿德師傅',lv:3,duty:'stove'},{id:'c2',role:'chef',name:'Marco',lv:3,duty:'oven'},{id:'c3',role:'chef',name:'小林師傅',lv:3,duty:'bar'}];save();showPrep()})()")
+    g.ev("window.__wfx=new Set();{const A0=wfAssign;wfAssign=function(n,who,slot){const f=wfNext(n);const r=A0(n,who,slot);if(r&&who!=='jill'){const m=wfCrew(who);const t=f&&WF_ST[f].slot;if(m&&t&&t!==m.duty)__wfx.add(t)}return r}}")
     g.ev("(()=>{const el=document.createElement('button');el.dataset.act='restock';$('#screen').appendChild(el);el.click();el.remove()})()")
     staffed = run_day('__actLazy')
     frac = staffed['sit'] / max(1, staffed['frames'])
@@ -1389,7 +1400,7 @@ def jill_rests_when_staff_cover_the_floor(b, port, target):
     # a crew this day is the cooks' and she rests most of the service (0.91/0.89/0.90 on seeds 7/8/9). "Not always" is
     # her own day (above) and the tapped table that gets her up at once (below).
     check(frac > .5, f'with a full crew she rests most of the service: {staffed}')
-    check('oven' in staffed['cov'] or 'prep' in staffed['cov'], f'a cook from another station took the oven or cold-station dishes: {staffed}')
+    check(any(k in staffed['cov'] for k in ('oven', 'prep', 'pass')), f'a cook worked a place that is not his station on the board: {staffed}')
     check('read' in staffed['acts'] or 'look' in staffed['acts'], f'on the sofa she reads or looks around: {staffed}')
     # work arrives while she sits: she gets up at once
     if g.ev("phase") == 'summary': g.click('[data-act=toShop]')
@@ -1572,8 +1583,10 @@ def demand_recommendation_staff_v181(b, port, target):
     start_day(g)
     g.ev("(()=>{const t=R.tables[0];const o=rollGuest();const gg={id:R.gid++,type:'office',size:1,reg:null,forSig:true,looks:makeLooks('office',1),name:'測試客',state:'reading',table:0,pat:1,x:t.x,y:t.y+8,tx:t.x,ty:t.y+8,timer:0,ticket:null,seed:1,mood:'ok'};R.groups.push(gg);t.group=gg;createTicket(gg)})()")
     check(g.ev("R.tickets[0].items.some(i=>i.d==='signature')"), 'a signature-seeking guest orders the Signature')
-    n = g.ev("(()=>{let n=0;while(n<600&&!R.slots.some(s=>s.job&&s.job.d==='signature'&&s.job.chef)){update(1/30);updateCats(1/30,0);n++}return n})()")
-    check(g.ev("R.slots.some(s=>s.job&&s.job.d==='signature'&&s.job.chef==='c3')"), f'the LV5 chef should pick up the Signature order ({n} frames)')
+    # v2.5 (docs/cooking/ARCHITECTURE.md §「改過的測試」): the signature goes through the new kitchen; the chef picking it up
+    # is the chef taking a step of its work (n.ck: the cooks who had a hand in it), not an old station job
+    n = g.ev("(()=>{let n=0;while(n<600&&!(R.wf||[]).some(w=>w.d==='signature'&&(w.ck||[]).length)){update(1/30);updateCats(1/30,0);n++}return n})()")
+    check(g.ev("(R.wf||[]).some(w=>w.d==='signature'&&(w.ck||[]).includes('c3'))"), f'the LV5 chef should pick up the Signature order ({n} frames)')
     check(g.ev("S.taught") == 8 and '交給你了' in g.page.locator('#toasts').inner_text(), 'the hand-over moment fires once, on the first Signature the chef takes')
     # staff list
     # rc8: a dish Jill has never made no longer locks it (the player, 2026-10-03); a LV2 cook still has 🔒 by level (the Signature: LV5)
@@ -1689,24 +1702,42 @@ def cook_by_hand(g, d, max_frames=900):
         g.ev("__tick(1000/30)")
     return max_frames, None
 
+# v2.5: an order made into the new kitchen's work instead of an old station job (its item kept in window.__hit)
+MAKE_WF_ORDER = MAKE_ORDER.replace("return startCook(tk,it)})()", "window.__hit=it;wfGather();return !!wfOf(it)})()")
+
+def cook_by_flow(g, d, max_frames=2400):
+    """v2.5: dish d made through its workflow on the real, rendered frame loop, Jill taking every step (the test player's
+    wfBot). Returns (frames, final item state)."""
+    for n in range(0, max_frames, 10):
+        st = g.ev("(()=>{for(let i=0;i<10;i++){wfBot(false);__tick(1000/30)}return{st:__hit.st,q:__hit.q}})()")
+        if st['st'] in ('ready', 'served'):
+            return n + 10, st
+    return max_frames, None
+
 @test
 def hold_recipes_never_lock_the_game(b, port, target):
     """V18.2 regression (real iPhone, Day 25): starting the soufflé's hold threw inside the ramekin drawing
     (mix() fed an rgb() string -> NaN colour) and the exception killed the frame loop: the hold stopped
     responding, the restaurant froze, only DOM buttons like Pause still worked. Every hold-bearing recipe
     now cooks to the end through the real, rendered frame loop with real pointer presses on the hold button;
-    the frame loop keeps going and the day's clock keeps moving."""
-    for d in HOLD_DISHES:
+    the frame loop keeps going and the day's clock keeps moving.
+
+    v2.5 (docs/cooking/ARCHITECTURE.md §「改過的測試」): the dishes of the user's workflow table have no hold any more (no
+    gauge, no timing); they are made through their workflow on the same rendered frame loop — the drinks' pour is drawn by
+    the same code that once threw — and must come out with the loop and the clock still going. The real hold-button
+    presses are kept for the recipes still on the old path (the two pizzas, their sauce)."""
+    for d in HOLD_DISHES + ['pzmarg', 'pzfungi']:
         g = Game(b, port, target, seed=3, manual=True)
         install_bot(g)
         g.click('[data-act=open]')
-        g.ev("S.day=6;S.level=4;S.eq={stove:3,oven:3,bar:3,prep:2,fridge:3,pan:3};S.tables=6;S.money=99999;for(const k of Object.keys(DISHES))if(!S.unlocked.includes(k))S.unlocked.push(k);S.menu=['friedrice'];S.phase='prep';S.today=null;planToday();showPrep()")
+        g.ev("S.day=6;S.level=4;S.eq={stove:3,oven:3,bar:3,prep:2,fridge:3,pan:3};S.rooms=S.rooms||{};S.rooms.pizzaoven=1;S.tables=6;S.money=99999;for(const k of Object.keys(DISHES))if(!S.unlocked.includes(k))S.unlocked.push(k);S.menu=['friedrice'];S.phase='prep';S.today=null;planToday();showPrep()")
         g.ev("S.menu=['friedrice','%s'];S.stock['%s']=5;S.stock.friedrice=5;save();showPrep()" % (d, d))
         start_day(g)
-        check(g.ev(MAKE_ORDER % d), f'{d}: could not start cooking')
+        wf = g.ev("isWF('%s')" % d)
+        check(g.ev((MAKE_WF_ORDER if wf else MAKE_ORDER) % d), f'{d}: could not start cooking')
         raf0 = g.page.evaluate('window.__stats.raf'); t0 = g.ev("R.t")
-        frames, res = cook_by_hand(g, d)
-        check(res and res['st'] == 'ready', f'{d}: not plated after {frames} frames: {res}')
+        frames, res = (cook_by_flow(g, d) if wf else cook_by_hand(g, d))
+        check(res and res['st'] in (('ready', 'served') if wf else ('ready',)), f'{d}: not plated after {frames} frames: {res}')
         check(g.page.evaluate('window.__stats.raf') - raf0 >= frames - 2, f'{d}: the frame loop stopped')
         check(g.ev("R.t") - t0 > 0.5, f'{d}: the day did not advance while cooking')
         check(not g.errors, f'{d}: {g.errors[:2]}')
@@ -1830,7 +1861,10 @@ def rating_story_records_and_panels_v182(b, port, target):
     work and the fridge tap no longer buys blind; the 💬 panel lists the day's lines."""
     g = Game(b, port, target, seed=4, manual=True)
     install_bot(g); g.click('[data-act=open]')
-    g.ev("S.day=6;S.level=2;S.tables=5;S.eq.bar=1;S.unlocked.push('pasta','burger','coffee');S.menu=['friedrice','pasta','burger','coffee'];S.stock={friedrice:0,pasta:2,burger:6,coffee:6};S.money=4000;S.phase='prep';S.today=null;planToday();save();showPrep()")
+    # v2.5 (docs/cooking/ARCHITECTURE.md §「改過的測試」): this hand-built Day 6 had no prep board, which every real Day 6
+    # has (Day 4 brings it). The burger now goes 備料 → 熱區 → 裝盤, so without the board it could not be ordered and the
+    # fridge panel (orderable dishes only) listed three. The day gets its board.
+    g.ev("S.day=6;S.level=2;S.tables=5;S.eq.bar=1;S.eq.prep=1;S.unlocked.push('pasta','burger','coffee');S.menu=['friedrice','pasta','burger','coffee'];S.stock={friedrice:0,pasta:2,burger:6,coffee:6};S.money=4000;S.phase='prep';S.today=null;planToday();save();showPrep()")
     start_day(g); g.ev("__tick(200)")
     check(g.ev("!$('#stockChip').hidden&&$('#stockChip').textContent.includes('缺')"), 'the stock chip shows what is out')
     g.page.click('#stockChip'); g.ev("__tick(60)")
@@ -2052,11 +2086,13 @@ def golden_frames(b, port, target, record=False):
         r1 = g.ev("__play(600, 30)")
         if d == 0:
             shot('service_20s')
-            r1['samples'] += g.ev("__play(900, 30, 'R.slots.some(s=>s.job)')")['samples']
-            check(g.ev("R.slots.some(s=>s.job)"), 'no dish on the stove to show in the kitchen panel')
-            g.ev("(()=>{const i=R.slots.findIndex(s=>s.job);R.focus=i;R.panel=true})()")
+            # v2.5 (docs/cooking/ARCHITECTURE.md §「改過的測試」): the new kitchen has no ingredient panel; what it shows
+            # instead is the selected dish's card and its lit places, in the kitchen
+            r1['samples'] += g.ev("__play(900, 30, '(R.wf||[]).length>0')")['samples']
+            check(g.ev("(R.wf||[]).length>0"), 'no work in the kitchen to show')
+            g.ev("(()=>{R.wsel=R.wf[0].id;setRoom('kitchen');renderTickets();wfGuideUpd()})()")
             shot('service_panel')
-            g.ev("R.panel=false")
+            g.ev("(()=>{R.wsel=null;setRoom('main');renderTickets();wfGuideUpd()})()")
             g.page.click('#hPause'); shot('pause'); g.click('[data-act=resume]')
         r2 = g.ev("__play(20000, 30, 'R.closing!=null&&R.closing>5')")
         if d == 0:
@@ -2145,14 +2181,17 @@ def mature_save_loads_into_2_0(b, port, target):
 @test
 def kitchen_cooks_walk_the_line_and_plate(b, port, target):
     """Chefs are actors: a job's handwork waits for its cook to be at the counter, a chef carries the finished dish to
-    the pass and plates it there, and the whole day's orders still get cooked (no deadlock between presence and steps)."""
+    the pass and plates it there, and the whole day's orders still get cooked (no deadlock between presence and steps).
+    v2.5 (docs/cooking/ARCHITECTURE.md §「改過的測試」): measured on the new kitchen's work instead of old station jobs —
+    a cook plating at the pass is a 裝盤 step in a cook's hands; handwork waiting for him is a step held for him while he
+    walks there; a dish being cooked belongs to a piece of work."""
     g = Game(b, port, target, seed=26, manual=True)
     mature(g); g.click('[data-act=open]'); start_day(g); install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;")
     g.ev("setRoom('kitchen')")
     moved, plated, gated = set(), 0, 0
     for i in range(160):
         g.page.evaluate('()=>window.__play(10,0)')
-        st = json.loads(g.ev("JSON.stringify({ck:Object.entries(R.ck||{}).map(([k,a])=>[k,Math.round(a.x),Math.round(a.y),a.beat&&a.beat.kind]),pl:R.slots.filter(s=>s.job&&s.job.plating).length,gate:R.slots.filter(s=>s.job&&s.cook&&s.job.step&&['add','hold','dose','tap'].includes(s.job.step.t)&&!cookPresent(s)).length})"))
+        st = json.loads(g.ev("JSON.stringify({ck:Object.entries(R.ck||{}).map(([k,a])=>[k,Math.round(a.x),Math.round(a.y),a.beat&&a.beat.kind]),pl:(R.wf||[]).filter(n=>n.st==='work'&&n.f==='plate'&&n.who&&n.who!=='jill').length,gate:(R.wf||[]).filter(n=>n.who&&n.who!=='jill'&&(n.st==='go'||n.st==='fetch'||(n.st==='work'&&!wfHere(n)))).length})"))
         for k, x, y, kind in st['ck']: moved.add((k, x // 40, y // 40))
         plated += st['pl']; gated += st['gate']
         if g.ev("phase") != 'service': break
@@ -2161,7 +2200,7 @@ def kitchen_cooks_walk_the_line_and_plate(b, port, target):
     check(gated > 0, 'handwork never waited for a cook to arrive')
     plated_n = g.ev("R?(R.st.q.P+R.st.q.G+R.st.q.O):S.lastSummary.plated")
     check(plated_n >= 10, f'too few dishes came out: {plated_n}')
-    check(g.ev("R?R.tickets.every(t=>t.items.every(i=>i.st!=='cooking'||R.slots.some(s=>s.job&&s.job.it===i))):true"), 'a cooking item has no job')
+    check(g.ev("R?R.tickets.every(t=>t.items.every(i=>i.st!=='cooking'||R.slots.some(s=>s.job&&s.job.it===i)||!!wfOf(i))):true"), 'a cooking item has no job')
     check(not g.errors, g.errors)
     g.close()
 
@@ -2277,11 +2316,14 @@ def specials_are_a_finer_version_of_a_mastered_dish(b, port, target):
     check(g.ev("screenEl.innerText.includes('已研發')"), 'the shop should show them as researched')
     g.ev("S.menu=['friedrice_x','pasta_x','soup_x','souffle_x','coffee','salad'];for(const d of S.menu)S.stock[d]=40;save();showShop()")
     g.click('[data-act=toPrep]'); start_day(g); install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;")
+    # v2.5 (docs/cooking/ARCHITECTURE.md §「改過的測試」): the specials go through the new kitchen, which has no old station
+    # job to look at; a cook taking a step of one is what counts as the cooks cooking it
+    g.ev("window.__spc=new Set();{const A0=wfAssign;wfAssign=function(n,who,slot){const r=A0(n,who,slot);if(r&&who!=='jill'&&(DISHES[n.d]||{}).special)__spc.add(n.d);return r}}")
     seen = set()
     for i in range(50):
         g.page.evaluate('()=>window.__play(40,0)')
         if g.ev("phase") != 'service': break
-        for d in json.loads(g.ev("JSON.stringify(R.slots.filter(s=>s.job&&(DISHES[s.job.d]||{}).special&&s.job.chef).map(s=>s.job.d))")): seen.add(d)
+        for d in json.loads(g.ev("JSON.stringify([...__spc])")): seen.add(d)
         if len(seen) >= 3 and g.ev("Object.keys(R.st.dish).filter(d=>(DISHES[d]||{}).special).length>=3"): break
     check(len(seen) >= 3, f'the cooks should cook the specials on the line: {seen}')
     served = json.loads(g.ev("JSON.stringify(Object.fromEntries(Object.entries(R.st.dish).filter(([d])=>(DISHES[d]||{}).special)))"))
@@ -2563,7 +2605,9 @@ def d_service_speed_scales_the_whole_simulation_and_keeps_hand_timing_fair(b, po
     """D. 0.75×/1×/1.5×/2×: the clock, the cooks and the guests all take the same scaled time; the choice is kept in the
     save and shown on the clock chip; on Jill's own tray the zone gauge never runs faster than 1.5× real time."""
     g = Game(b, port, target, seed=37, manual=True)
-    player30(g); start_day(g); install_bot(g); g.ev("window.__act=()=>{}")
+    # v2.5 (docs/cooking/ARCHITECTURE.md §「改過的測試」): the new kitchen has no timing step (waiting is never a step), so
+    # the hand-timing half is held on a dish still cooked the old way — the margherita's bake in the pizza oven
+    player30(g); g.ev("S.rooms=S.rooms||{};S.rooms.pizzaoven=1"); start_day(g); install_bot(g); g.ev("window.__act=()=>{}")
     def clock_per_second(v):
         g.ev(f"setSpeed({v})"); g.page.evaluate('()=>{for(let i=0;i<5;i++)window.__tick(1000/30)}')
         t0 = g.ev("R.t"); g.page.evaluate('()=>{for(let i=0;i<60;i++)window.__tick(1000/30)}'); return g.ev("R.t") - t0
@@ -2573,13 +2617,13 @@ def d_service_speed_scales_the_whole_simulation_and_keeps_hand_timing_fair(b, po
     check('1.5' in g.ev("document.querySelector('#hClock').textContent"), 'the clock chip should show the speed')
     g.ev("cycleSpeed()"); check(g.ev("simSpeed()") == 2 and g.ev("S.speed") == 2, 'the chip cycles to the next speed')
     # hand timing: a zone step on Jill's own stove advances at 1.5× while the clock runs at 2×
-    g.ev("setSpeed(2);(()=>{R.sched=[];R.si=0;R.groups=[];const g0={id:R.gid++,type:'office',size:1,looks:makeLooks('office',1),name:'測試',state:'wait',table:0,pat:1,room:'main',troom:'main',x:200,y:200,tx:200,ty:200,timer:0,ticket:null,seed:1,mood:'ok'};R.groups.push(g0);R.tables[0].group=g0;const tk={id:R.tkid++,no:1,g:g0,items:[{d:'steak',st:'pending',q:null,want:1}],t:R.t};g0.ticket=tk;R.tickets.push(tk);S.stock.steak=5;for(const m of S.crew)if(m.role==='chef')m.duty='bar';startCook(tk,tk.items[0],true)})()")
-    g.ev("(()=>{const s=R.slots.find(x=>x.job);const j=s.job;j.chef=null;j.adds.push('steak');enterStep(j,1);j.si=1})()")
+    g.ev("setSpeed(2);(()=>{R.sched=[];R.si=0;R.groups=[];const g0={id:R.gid++,type:'office',size:1,looks:makeLooks('office',1),name:'測試',state:'wait',table:0,pat:1,room:'main',troom:'main',x:200,y:200,tx:200,ty:200,timer:0,ticket:null,seed:1,mood:'ok'};R.groups.push(g0);R.tables[0].group=g0;const tk={id:R.tkid++,no:1,g:g0,items:[{d:'pzmarg',st:'pending',q:null,want:1}],t:R.t};g0.ticket=tk;R.tickets.push(tk);S.stock.steak=5;for(const m of S.crew)if(m.role==='chef')m.duty='bar';startCook(tk,tk.items[0],true)})()")
+    g.ev("(()=>{const s=R.slots.find(x=>x.job);const j=s.job;j.chef=null;j.adds.push('dough','freshmoz');enterStep(j,3);j.si=3})()")
     check(g.ev("(()=>{const s=R.slots.find(x=>x.job);return s.job.step.t==='zone'&&!chefHandles(s)})()"), 'the fixture should have Jill on a zone step')
     t0 = g.ev("R.t"); p0 = g.ev("R.slots.find(x=>x.job).job.step.p")
     g.page.evaluate('()=>{for(let i=0;i<30;i++)window.__tick(1000/30)}')
     dtc = g.ev("R.t") - t0; dp = g.ev("R.slots.find(x=>x.job).job.step.p") - p0
-    sp = g.ev("dishSpeed('steak','stove')"); ktime = g.ev("R.slots.find(x=>x.job).job.step.time")
+    sp = g.ev("dishSpeed('pzmarg','pizza')"); ktime = g.ev("R.slots.find(x=>x.job).job.step.time")
     expected_full = dtc * sp / ktime      # if the gauge followed the 2× clock
     check(dp < expected_full * .85 and dp > expected_full * .6, f'at 2× the zone gauge should advance at 1.5× (got {dp:.3f} vs full-speed {expected_full:.3f})')
     g.ev("setSpeed(1)")
@@ -3937,9 +3981,10 @@ def a_second_signature_the_dessert_with_its_own_progression(b, port, target):
     g.click('[data-act=closeSub]'); g.page.wait_for_timeout(60)
     # it cooks to the end through the real tray
     g.ev("S.menu=S.menu.slice(0,4);S.stock.sigdessert=5;for(const d of menuList())S.stock[d]=Math.max(S.stock[d]||0,3);showPrep()"); start_day(g); install_bot(g); g.ev("window.__act=()=>{}")
-    check(g.ev(MAKE_ORDER % 'sigdessert'), 'could not start the dessert')
-    frames, res = cook_by_hand(g, 'sigdessert')
-    check(res and res['st'] == 'ready', f'the dessert is not plated after {frames} frames: {res}')
+    # v2.5 (docs/cooking/ARCHITECTURE.md §「改過的測試」): the dessert is 備料 → 裝盤 in the new kitchen — no tray, no hold
+    check(g.ev(MAKE_WF_ORDER % 'sigdessert'), 'could not start the dessert')
+    frames, res = cook_by_flow(g, 'sigdessert')
+    check(res and res['st'] in ('ready', 'served'), f'the dessert is not plated after {frames} frames: {res}')
     check(g.ev("S.xp.sigdessert") >= 1, "Jill's first plate is counted")
     # the counter moves when it is paid for
     g.ev("(()=>{const q=R.groups.find(q=>q.ticket&&q.ticket.items.some(i=>i.d==='sigdessert'));q.ticket.items[0].st='served';q.state='check';R.tables[q.table].plates=[{d:'sigdessert',q:'P',want:0}];collect(q)})()")

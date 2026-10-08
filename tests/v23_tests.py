@@ -341,7 +341,7 @@ def lounge_i_content_bar_food_in_the_kitchen_wine_at_dinner_the_cast_by_name(b, 
     check(g.ev("S.crew.find(m=>m.id==='cb2').name") == '沈晴' and g.ev("!!portraitOf('staff:沈晴')"), 'the second bartender is 沈晴')
     g.ev("showPrep();autoStock();S.stock.bites=Math.max(S.stock.bites||0,12);S.stock.croquette=Math.max(S.stock.croquette||0,10);S.stock.cheeseplate=Math.max(S.stock.cheeseplate||0,8)")
     start_day(g); install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;")
-    g.ev("window.__lg={bites:0,wineDine:0,cooked:0};const ct0=createTicket;createTicket=function(q){const r=ct0.apply(this,arguments);const tk=q.ticket;if(!tk)return r;if(tk.lounge){if(tk.items.some(i=>DISHES[i.d]&&DISHES[i.d].bar))__lg.bites++}else if(tk.items.some(i=>i.lbar))__lg.wineDine++;return r};const pl0=plate;plate=function(sl,q){const j=sl.job;if(j&&DISHES[j.d]&&DISHES[j.d].bar)__lg.cooked++;return pl0.apply(this,arguments)}")
+    g.ev("window.__lg={bites:0,wineDine:0,cooked:0};const ct0=createTicket;createTicket=function(q){const r=ct0.apply(this,arguments);const tk=q.ticket;if(!tk)return r;if(tk.lounge){if(tk.items.some(i=>DISHES[i.d]&&DISHES[i.d].bar))__lg.bites++}else if(tk.items.some(i=>i.lbar))__lg.wineDine++;return r};const pl0=plate;plate=function(sl,q){const j=sl.job;if(j&&DISHES[j.d]&&DISHES[j.d].bar)__lg.cooked++;return pl0.apply(this,arguments)};const wf0=wfFinish;wfFinish=function(n){if(n&&DISHES[n.d]&&DISHES[n.d].bar)__lg.cooked+=n.n||1;return wf0.apply(this,arguments)}")   # v2.5: the bites go through the new kitchen (docs/cooking/ARCHITECTURE.md §「改過的測試」); plated there, they are counted there
     play_day(g, max_steps=60000)
     for _ in range(400):
         if g.ev("phase") != 'service': break

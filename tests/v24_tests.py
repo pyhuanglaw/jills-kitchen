@@ -2178,7 +2178,12 @@ def v24_rc6_an_authored_beat_holds_the_service_until_it_is_read(b, port, target)
     _frames(g, 120)
     amb = json.loads(g.ev("JSON.stringify({dlg:!!DLG,log:dayLog().slice(-30).map(l=>l.t)})"))
     check(fired == 'hugo_tuo' and not amb['dlg'] and g.ev("R.t") > t0 + 2 and '你炸的比較快。' in amb['log'] and '油比較熱。' in amb['log'], f'an ambient moment is not held: {fired} {amb}')
-    # the panel at phone size
+    # the panel at phone size — fired, as above, when nobody in the room is in the middle of a line (audit N04: a panel waits
+    # for it). v2.5 (docs/cooking/ARCHITECTURE.md §「改過的測試」): the new kitchen moved the evening's timing, and on this
+    # seed someone was mid-sentence at this moment, so the panel rightly waited; this part now waits as the first one does.
+    for _ in range(40):
+        if g.ev("!floorBusy()&&!(R.talkq||[]).length"): break
+        _frames(g, 15)
     g.ev("delete story().ev.qt_1;delete story().facts.qt_1;storyDay().minor=0;storyDay().lp={};storyTick('order',{})")
     lay = json.loads(g.ev("""JSON.stringify((()=>{const b=$('#dlg .dlg-box').getBoundingClientRect(),c=$('#dlg .dlg-hold').getBoundingClientRect(),t=$('#dlg .dlg-text');return{box:[b.left,b.top,b.right,b.bottom],chip:[c.left,c.top,c.right,c.bottom],fs:parseFloat(getComputedStyle(t).fontSize),W:innerWidth,H:innerHeight}})())"""))
     check(lay['box'][0] >= 0 and lay['box'][2] <= lay['W'] and lay['box'][3] <= lay['H'] and lay['chip'][3] < lay['box'][1] and lay['chip'][1] >= 0 and lay['fs'] >= 15, f'readable at 390×844: {lay}')
@@ -2745,7 +2750,13 @@ def v24_rc7_the_money(b, port, target):
     # the next evening short again: again, shorter; a till over $300 after the costs: nothing
     g.click('[data-act=toShop]'); g.page.wait_for_timeout(100); g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(150)
     g.ev("autoStock()"); start_day(g); install_bot(g)
-    g.ev("__botUntil('R.closed||R.closing!=null',90000,1/30)"); g.ev("S.money=10"); play_day(g)
+    # v2.5 (docs/cooking/ARCHITECTURE.md §「改過的測試」): the till is short when the shop stops seating (秀琴阿姨 comes in to
+    # help on such an evening) and still short at the closing. It used to be set to $10 once, counting on little coming in
+    # before the closing; with the new kitchen more tables are still eating then and pay first, and by the closing the till
+    # was over the line.
+    g.ev("__botUntil('R.closed||R.closing!=null',90000,1/30)"); g.ev("S.money=10")
+    g.ev("{const day=S.day,t0=storyTick;storyTick=function(at,ctx){if(at==='close'&&R&&S.day===day&&!R.__short){R.__short=1;S.money=10}return t0.apply(this,arguments)}}")
+    play_day(g)
     L2 = json.loads(g.ev("JSON.stringify({loan:S.lastSummary.loan,owed:loanOwed(),n:factN('xq_loan'),times:S.loan.times,line:(story().beatLines||{}).xq_loan||null})"))
     check(L2['loan'] == 3000 and L2['owed'] == 6000 and L2['n'] == 2 and L2['times'] == 2, f'a second short evening, a second $3,000: {L2}')
     check(g.ev("(()=>{const d=S.day,m=S.money;S.day=Math.min(10,d+1);S.money=dayCostsDue()+300;const a=loanNeeded();S.money=dayCostsDue()+299;const b=loanNeeded();S.day=11;const c=loanNeeded();S.day=d;S.money=m;return [a,b,c].join()})()") == 'false,true,false', 'under $300 after the costs, and only in the first ten days')
