@@ -829,7 +829,8 @@ SERVICE_LABELS = {'perfect': '完美操作玩家（每一步都在完美時機�
 
 ECON_HOOKS = r"""(()=>{if(window.__econ)return 'already';window.__econ={};
  const D=()=>{const k=S.day;return __econ[k]=__econ[k]||{main:{groups:0,guests:0,food:0,drink:0,wine:0,tips:0},lounge:{groups:0,guests:0,food:0,drink:0,wine:0,tips:0},
-   waits:[],served:0,samples:0,occMain:0,capMain:0,occLg:0,capLg:0,queue:0,left:{},arrived:0,turned:0}};
+   waits:[],served:0,samples:0,occMain:0,capMain:0,occLg:0,capLg:0,queue:0,left:{},arrived:0,turned:0,
+   wf:{steps:{jill:0,crew:0},samples:0,jillBusy:0,busyWait:0,jillOnly:0}}};   /* v2.5: the new kitchen — who took the steps, and (per sample) Jill at work, work waiting on a full place, work only Jill can take */
  const kind=d=>{const X=DISH(d)||{};return X.wine?'wine':X.cat==='drink'?'drink':'food'};
  const c0=collect;collect=function(g,o){const day=D();const lg=!!(g&&g.ticket&&g.ticket.lounge);const items=((g&&g.ticket&&g.ticket.items)||[]).filter(i=>i.st==='served');
   const r0=R.st.rev,t0=R.st.tips;const out=c0.apply(this,arguments);const dr=R.st.rev-r0,dt=R.st.tips-t0;
@@ -839,7 +840,9 @@ ECON_HOOKS = r"""(()=>{if(window.__econ)return 'already';window.__econ={};
  const s0=serveItems;serveItems=function(g,list){const day=D();const tk=g&&g.ticket;const before=tk?tk.items.filter(i=>i.st==='served').length:0;const out=s0.apply(this,arguments);
   if(tk){const after=tk.items.filter(i=>i.st==='served').length;day.served+=after-before;if(before===0&&after>0&&tk.t0!=null)day.waits.push(Math.round(R.t-tk.t0))}return out};
  const l0=leaveGroup;leaveGroup=function(g,why){const day=D();if(g&&!g.__econLeft&&!['paid','done'].includes(why)){g.__econLeft=1;const k=String(why||'?');day.left[k]=(day.left[k]||0)+(g.size||1)}return l0.apply(this,arguments)};
- window.__econSample=function(){if(!(R&&phase==='service'))return;const day=D();day.samples++;for(const t of R.tables){if(t.lounge){day.capLg++;if(t.group)day.occLg++}else{day.capMain++;if(t.group)day.occMain++}}day.queue+=(typeof queued==='function'?queued().length:0)};
+ if(typeof wfAssign==='function'){const a0=wfAssign;wfAssign=function(n,who,slot){const r=a0.apply(this,arguments);if(r)D().wf.steps[who==='jill'?'jill':'crew']++;return r}}
+ window.__econSample=function(){if(!(R&&phase==='service'))return;const day=D();day.samples++;
+  if(typeof wfList==='function'){const w=day.wf;w.samples++;if(wfJillTask())w.jillBusy++;for(const n of wfList()){if(!wfOpen(n))continue;const f=wfNext(n);if(WF_ST[f].slot&&!wfFreeSlot(f))w.busyWait++;else if(!wfStaffCan(n))w.jillOnly++}}for(const t of R.tables){if(t.lounge){day.capLg++;if(t.group)day.occLg++}else{day.capMain++;if(t.group)day.occMain++}}day.queue+=(typeof queued==='function'?queued().length:0)};
  window.__notes=[];const nl=noteLine;noteLine=function(t){__notes.push({d:S.day,t:String(t)});return nl.apply(this,arguments)};
  return 'installed'})()"""
 

@@ -100,6 +100,8 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 #wfGuide .wfn{margin-top:1px;font-weight:800;color:#8E6422}
 #wfGuide:not([hidden]) ~ #toasts{transform:translateY(-62px)}
 #coach:not([hidden]) ~ #wfGuide{bottom:78px}   /* above a first-day tip, never under it */
+#wfGuide:not([hidden]) ~ #plines{transform:translateY(-22px)}   /* the lines said in the room step up over the card, never on it */
+#coach:not([hidden]) ~ #wfGuide:not([hidden]) ~ #plines{transform:translateY(-90px)}
 .stars{color:#C99A45;font-size:11px;letter-spacing:1px;margin-left:2px}
 .lab .opts button{display:inline-flex;align-items:center;gap:4px;padding:5px 9px 5px 5px}
 .lab .opts img{width:22px;height:22px}
