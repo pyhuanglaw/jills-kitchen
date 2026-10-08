@@ -61,6 +61,32 @@ def _until(g, cond, cap=600, step=10):
 
 
 @test
+def cooking_the_bar_takes_a_waiting_coffee_while_the_fried_rice_is_selected(b, port, target):
+    """The user, 2026-10-09 (real play, Day 2): 「有時候在等炒飯 有咖啡訂單卻顯示現在沒有訂單不能做」. The fried rice picked on
+    the ticket and sent to the burner stays selected while it cooks (and while it waits to be plated); a tap on the free
+    coffee bar then fell through to the old kitchen's 「咖啡吧：目前沒有要做的料理」 although a coffee was waiting — a free
+    place took its own waiting work only when nothing at all was selected. Now a free place takes its oldest waiting work
+    whatever else is selected (a selected dish that goes to that place still goes first)."""
+    g = _day(b, port, target, 7105, "S.eq.bar=Math.max(1,S.eq.bar);if(!S.unlocked.includes('coffee'))S.unlocked.push('coffee');")
+    g.ev("window.__toasts=[];{const T0=toast;toast=function(m){__toasts.push(String(m));return T0.apply(this,arguments)}}")
+    check(_wait_orders(g, 1), 'a table orders fried rice')
+    # the fried rice's ticket item tapped (what the ticket's tap calls), then the burner
+    check(g.ev("(()=>{for(const tk of R.tickets)for(const it of tk.items)if(it.d==='friedrice'&&it.st==='pending')return wfSelectItem(tk,it);return false})()"), 'the fried rice picked on its ticket')
+    g.ev("__tick(1000/30)")
+    fr = g.ev("R.wsel")
+    _tap_slot(g, "R.slots.find(s=>s.type==='stove'&&s.no===1)")
+    check(_until(g, "(()=>{const n=wfNode(R.wsel);return n&&(n.st==='work'||n.st==='cook')})()", step=3), 'the fried rice is on the fire')
+    g.ev("__addOrders(1,'coffee');wfGather()")
+    co = json.loads(g.ev("JSON.stringify((R.wf||[]).filter(n=>n.d==='coffee').map(n=>({id:n.id,st:n.st,who:n.who})))"))
+    check(len(co) == 1 and co[0]['st'] == 'wait' and not co[0]['who'] and g.ev("R.wsel") == fr, f'a coffee waits; the fried rice is still the one selected: {co}')
+    _tap_slot(g, "R.slots.find(s=>s.type==='bar')")
+    st = json.loads(g.ev(f"JSON.stringify((()=>{{const n=wfNode({co[0]['id']});return{{st:n.st,who:n.who,to:n.to&&n.to.type}}}})())"))
+    check(st['who'] == 'jill' and st['to'] == 'bar', f'the bar tapped: Jill takes the waiting coffee to it: {st}')
+    check(not any('目前沒有要做的料理' in t for t in g.ev("__toasts")), f'no 「目前沒有要做的料理」: {g.ev("__toasts")}')
+    check(_until(g, f"(()=>{{const n=wfNode({co[0]['id']});return n&&(n.st==='work'||n.st==='ready')}})()", step=3), 'she makes it')
+
+
+@test
 def cooking_fried_rice_goes_hot_then_plating_by_taps(b, port, target):
     """The first dish of the new kitchen, by real taps (the user's prototype list, J1–J15): the ticket item selects its
     work (the card says ● 熱區 → ○ 裝盤, 下一步：熱區; the burner is lit); a tap on the burner sends Jill, who walks there; the
@@ -737,7 +763,8 @@ def cooking_each_dish_with_its_own_beats_starts_raw_and_changes_by_hand(b, port,
       out[d+'.'+f]={bad,raw,done:Object.keys(last).every(k=>Math.abs(s1[k]-last[k])<1e-9),n:(c.hands||[]).length+(c.heat||[]).length}}return out})())"""))
     for want in ('friedrice.hot', 'friedrice.plate', 'coffee.drink', 'blacktea.drink', 'sparkling.drink', 'salad.prep', 'salad.plate', 'pasta.hot', 'pasta.plate', 'soup.hot', 'soup.plate',
                  'burger.prep', 'burger.hot', 'burger.plate', 'pudding.prep', 'pudding.plate', 'fries.oven', 'fries.plate', 'fruitsoda.drink', 'veg.prep', 'veg.oven', 'veg.plate',
-                 'tiramisu.prep', 'tiramisu.plate', 'chicken.prep', 'chicken.oven', 'chicken.plate', 'steak.prep', 'steak.hot', 'steak.plate', 'basque.prep', 'basque.oven', 'basque.plate', 'prosciutto.prep', 'prosciutto.plate'):
+                 'tiramisu.prep', 'tiramisu.plate', 'chicken.prep', 'chicken.oven', 'chicken.plate', 'steak.prep', 'steak.hot', 'steak.plate', 'basque.prep', 'basque.oven', 'basque.plate', 'prosciutto.prep', 'prosciutto.plate',
+                 'salmon.prep', 'salmon.oven', 'salmon.plate', 'seafood.prep', 'seafood.hot', 'seafood.plate', 'duck.prep', 'duck.hot', 'duck.plate', 'risotto.hot', 'risotto.plate', 'souffle.prep', 'souffle.oven', 'souffle.plate'):
         check(want in beats, f'{want} has its own beats: {sorted(beats)}')
     for k, v in beats.items():
         check(not v['bad'] and v['raw'] and v['done'] and v['n'] >= 2, f'{k}: by hand, from raw to done in its beats: {v}')

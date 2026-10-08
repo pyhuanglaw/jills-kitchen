@@ -3984,7 +3984,7 @@ function xqHelperMode(){return !xiuqin()&&!fact('xq_gone')&&!(S.crew||[]).some(m
 function xqm(){return xiuqin()||(xqHelperMode()?XQ_HELPER:null)}
 /* known: she has been part of the restaurant's days for about a week (the legacy crew always) */
 function xqKnown(){const m=xiuqin();if(m&&crewLegacy(m))return true;const f=fact('xq_helper');const first=Math.min(f?f.d:1e9,m&&m.since?m.since:1e9);const n=factN('xq_helper')+(m?m.days||0:0);return first<1e9&&S.day-first>=6&&n>=4}
-function xqHelperToday(){if(window.__noXQH||!xqHelperMode()||story().xqOff===S.day)return false;return !fact('xq_helper')||(!!R&&R.sched.some(o=>o.name===YJN))||loanNeeded()||hash('xqh|'+S.day)%100<70}   /* v2.4 rc7: and the evening the till is short (her loan) */   /* most evenings; always the first, and the evenings her daughter is coming */
+function xqHelperToday(){if(window.__noXQH||!xqHelperMode()||story().xqOff===S.day)return false;return true}   /* every evening until a cleaner is hired (the user, 2026-10-09: 「還沒請清潔員以前，她每晚都來，不再看日子。」): it used to be most evenings by the day's number, so every new game's Days 2 and 3 had no 秀琴 at all */
 /* where she tidies: beside a table nobody is at and that is already clear (never a dirty one — clearing is the game's
    job, not hers), in the dining room's rows a phone shows; now and then the next one. No random draw: the day's random
    stream is the same with her and without her. */
@@ -6449,7 +6449,79 @@ const CH={
   plate:{v:'plate',from:{out:0,ham:0,top:0},
    hands:[{to:.36,g:'scoop',say:'沙拉先放上盤子',set:{out:1}},
           {to:.8,g:'place',ing:'prosciutto',say:'生火腿一片一片鋪上去',set:{ham:1}},
-          {to:1,g:'sprinkle',ing:'parmesan',say:'起司片、無花果、幾滴巴薩米克醋',set:{top:1}}]}}};
+          {to:1,g:'sprinkle',ing:'parmesan',say:'起司片、無花果、幾滴巴薩米克醋',set:{top:1}}]}},
+ /* the fourth batch (2026-10-09): the salmon (§18), the seafood pasta (§19), the duck breast (§20), the truffle risotto (§21),
+    the soufflé (§22) — the restaurant's twenty-two all done with it */
+ salmon:{
+  prep:{v:'cutboard',from:{oil:0,salt:0,herb:0,tray:0},
+   hands:[{to:.3,g:'mix',ing:'oil',say:'生鮭魚抹上油',set:{oil:1}},
+          {to:.5,g:'sprinkle',ing:'salt',say:'撒鹽和胡椒',set:{salt:1}},
+          {to:.7,g:'sprinkle',ing:'herbs',say:'放上香草',set:{herb:1}},
+          {to:1,g:'place',say:'鮭魚和蘆筍放到烤盤上',set:{tray:1}}]},
+  oven:{v:'tray',from:{in:0,cook:0},
+   hands:[{to:1,g:'place',say:'送進烤箱',set:{in:1}}],
+   heat:[{to:1,say:'鮮豔半透明的橘紅烤成不透明的熟鮭魚色，表面和邊緣金黃',set:{cook:1}}]},
+  plate:{v:'plate',from:{asp:0,out:0,lemon:0,sauce:0},
+   hands:[{to:.18,g:'pull',say:'烤盤從烤箱拉出來',set:{}},
+          {to:.4,g:'scoop',ing:'asparagus',say:'蘆筍先放上盤子',set:{asp:1}},
+          {to:.66,g:'scoop',say:'鮭魚放在上面',set:{out:1}},
+          {to:.84,g:'place',ing:'lemon',say:'一塊檸檬',set:{lemon:1}},
+          {to:1,g:'pour',ing:'sauce',say:'淋醬、撒香草',set:{sauce:1}}]}},
+ seafood:{
+  prep:{v:'cutboard',from:{shrimp:0,mussel:0,garlic:0,nood:0},
+   hands:[{to:.3,g:'chop',ing:'shrimp',say:'生蝦去殼、挑腸泥',set:{shrimp:1}},
+          {to:.52,g:'place',ing:'mussel',say:'淡菜洗好排在一邊',set:{mussel:1}},
+          {to:.76,g:'chop',ing:'garlic',say:'蒜頭切片',set:{garlic:1}},
+          {to:1,g:'place',ing:'noodle',say:'煮好的麵分成一份',set:{nood:1}}]},
+  hot:{v:'pan',from:{sea:0,cook:0,nood:0,sauce:0,coat:0},
+   hands:[{to:.36,g:'drop',ing:'seafood',say:'蒜片、生蝦、淡菜先下鍋',set:{sea:1,cook:.2}},
+          {to:.66,g:'drop',ing:'noodle',say:'加麵',set:{nood:1,cook:.35}},
+          {to:.88,g:'pour',ing:'stock',say:'加高湯和白酒',set:{sauce:1,cook:.45}},
+          {to:1,g:'toss',say:'翻拌',set:{coat:.12}}],
+   heat:[{to:1,g:'toss',say:'蝦變紅、淡菜打開，麵條裹上醬汁，海鮮分散開來',set:{cook:1,coat:1}}]},
+  plate:{v:'plate',from:{out:0,sea:0,gar:0},
+   hands:[{to:.5,g:'twirl',say:'麵捲起來放進盤子',set:{out:1}},
+          {to:.8,g:'place',say:'蝦和淡菜放在麵上，看得清楚',set:{sea:1}},
+          {to:1,g:'sprinkle',ing:'parsley',say:'最後撒香草、放一塊檸檬',set:{gar:1}}]}},
+ duck:{
+  prep:{v:'cutboard',from:{score:0,salt:0},
+   hands:[{to:.72,g:'chop',ing:'duck',say:'鴨皮劃刀，一刀一刀劃出格紋',set:{score:1}},
+          {to:1,g:'sprinkle',ing:'salt',say:'撒鹽調味（還是生的）',set:{salt:1}}]},
+  hot:{v:'pan',from:{on:0,skin:0,flip:0,meat:0,rest:0},
+   hands:[{to:1,g:'place',ing:'duck',say:'鴨胸皮面朝下放進鍋',set:{on:1}}],
+   heat:[{to:.45,say:'皮面慢慢煎成金黃褐色，鴨油滋滋作響',set:{skin:1}},
+         {to:.55,g:'flip',say:'翻面，看得到金黃的皮',set:{flip:1}},
+         {to:.9,say:'另一面煎熟',set:{meat:1}},
+         {to:1,say:'在鍋裡靜置一下',set:{rest:1}}]},
+  plate:{v:'plate',from:{out:0,cut:0,sauce:0},
+   hands:[{to:.32,g:'scoop',say:'鴨胸移到盤子上',set:{out:1}},
+          {to:.7,g:'chop',say:'切成幾片排開',set:{cut:1}},
+          {to:1,g:'pour',ing:'orange',say:'最後淋上橙醬',set:{sauce:1}}]}},
+ risotto:{
+  hot:{v:'pan',from:{rice:0,wine:0,stock1:0,stock2:0,butter:0,cream:0},
+   hands:[{to:.24,g:'drop',ing:'arborio',say:'燉飯米下鍋',set:{rice:1}},
+          {to:.42,g:'pour',ing:'wine',say:'倒一點白酒',set:{wine:1}},
+          {to:.62,g:'pour',ing:'stock',say:'加一勺高湯',set:{stock1:1}},
+          {to:.82,g:'pour',ing:'stock',say:'再加一勺',set:{stock2:1}},
+          {to:1,g:'place',ing:'butter',say:'放上一塊奶油',set:{butter:1}}],
+   heat:[{to:1,g:'stir',say:'一直攪拌，米粒吸飽高湯變成綿滑的燉飯，奶油在最後化進去',set:{cream:1}}]},
+  plate:{v:'plate',from:{out:0,flat:0,gar:0},
+   hands:[{to:.56,g:'scoop',say:'燉飯舀進盤子',set:{out:1}},
+          {to:.72,g:'shape',say:'輕敲盤子，自然攤開',set:{flat:1}},
+          {to:1,g:'sprinkle',ing:'truffle',say:'刨上松露片和起司',set:{gar:1}}]}},
+ souffle:{
+  prep:{v:'cutboard',from:{whip:0,fold:0,pour:0},
+   hands:[{to:.46,g:'whisk',ing:'whites',say:'蛋白在碗裡打發，越來越蓬鬆',set:{whip:1}},
+          {to:.7,g:'mix',ing:'batter',say:'拌入蛋黃糊',set:{fold:1}},
+          {to:1,g:'pour',ing:'batter',say:'倒進烤模',set:{pour:1}}]},
+  oven:{v:'ramekin',from:{in:0,rise:0,gold:0},
+   hands:[{to:1,g:'place',say:'送進烤箱',set:{in:1}}],
+   heat:[{to:.75,say:'一開始很矮，在烤箱裡真的慢慢膨起來',set:{rise:1,gold:.5}},
+         {to:1,say:'表面變金黃',set:{gold:1}}]},
+  plate:{v:'plate',from:{out:0,sugar:0},
+   hands:[{to:.18,g:'pull',say:'烤模從烤箱拿出來',set:{}},
+          {to:.6,g:'scoop',say:'烤模放上盤子',set:{out:1}},
+          {to:1,g:'sprinkle',ing:'sugar',say:'最後撒糖粉、放莓果',set:{sugar:1}}]}}};
 function chOf(d,f){const c=CH[baseOf(d)];return c&&c[f]||null}
 function chRun(st,list,u){let a=0;for(const b of list||[]){if(u>=b.to){Object.assign(st,b.set);a=b.to;continue}const t=clamp((u-a)/Math.max(1e-6,b.to-a),0,1);const e=b.ease?Math.pow(t,b.ease):t;for(const k in b.set){const v0=st[k]||0;st[k]=v0+(b.set[k]-v0)*e}return{b,t}}return null}
 /* how far a piece of work is into a place's beats: the hands' share (h) and the heat's (q); a place it is done with is all done */
@@ -6750,7 +6822,91 @@ const CHD={
     if(L.top>=1&&k<n.its.length){chDishPic(c,n,pp,k);continue}
     c.save();c.translate(pp.x,pp.y);c.scale(pp.sc,pp.sc);drawPlate(c,S.decor.ware>0);c.scale(1.12,1.12*.8);chProsPlate(c,k,L);c.restore()}
    if(g&&g.g==='scoop')chCarry(c,g,m,{x:sp.x+33*sp.sc,y:sp.y-4*sp.sc},k=>wfPlateAt(n,sp,k),(x,y)=>{greens(c,rng(9),x,y-.6,3.6,6);c.fillStyle='#C9A26A';rr(c,x-4,y+1.4,8,1.4,.7);c.fill()});
-   if(g&&g.g==='sprinkle'){const pp=wfPlateAt(n,sp,Math.min(m-1,Math.floor(g.u*m)));chFall(c,pp.x,pp.y-14,'#FFF4D8',now,'sq')}}}};
+   if(g&&g.g==='sprinkle'){const pp=wfPlateAt(n,sp,Math.min(m-1,Math.floor(g.u*m)));chFall(c,pp.x,pp.y-14,'#FFF4D8',now,'sq')}}},
+ salmon:{
+  /* the board: a raw fillet, bright and glassy, oiled, seasoned, herbs laid on it, onto the small tray with the asparagus;
+     in the oven it turns from glassy orange-red to the paler opaque colour of cooked salmon, its top and edges golden; plated
+     on the asparagus, a wedge of lemon, the sauce and herbs last */
+  vessel(c,n,S0,sp,now,hand,out,pl){const st=S0.st,g=hand&&S0.ph.h<1?S0.beat:null;
+   if(wfLookF(n)==='prep'){chIn(c,sp,()=>{drawVesselBack(c,'cutboard');chSalmonBoard(c,n,st,now,g)});return}
+   const at=chIntoOven(n,sp,n.st==='work'&&n.f==='oven'?st.in||0:0);chIn(c,at,()=>{drawVesselBack(c,'tray');chSalmonTray(c,n,st.cook||0,pl?pl.st.asp:0,pl?pl.st.out:0,1)})},
+  oven(c,n,S0,sp){chIn(c,sp,()=>{drawVesselBack(c,'tray');chSalmonTray(c,n,S0.st.cook||0,0,0,1)})},
+  held(c,n,x,y){c.save();c.translate(x,y);c.scale(.2,.2);drawVesselBack(c,'tray');chSalmonTray(c,n,0,0,0,1);c.restore()},
+  plates(c,n,S0,pl,sp,now,hand){const st=pl.st;const m=Math.min(4,Math.max(1,n.n));const g=hand?pl.beat:null;
+   for(let k=m-1;k>=0;k--){const pp=wfPlateAt(n,sp,k);const L={};for(const q of['asp','out','lemon','sauce'])L[q]=clamp((st[q]||0)*m-k,0,1);
+    if(L.sauce>=1&&k<n.its.length){chDishPic(c,n,pp,k);continue}
+    c.save();c.translate(pp.x,pp.y);c.scale(pp.sc,pp.sc);drawPlate(c,S.decor.ware>0);c.scale(1.12,1.12*.8);chSalmonPlate(c,k,L);c.restore()}
+   if(g&&g.g==='scoop')chCarry(c,g,m,{x:sp.x,y:sp.y},k=>wfPlateAt(n,sp,k),(x,y)=>{if(st.asp<1){c.strokeStyle='#5E8F3A';c.lineWidth=1;c.beginPath();c.moveTo(x-4,y);c.lineTo(x+4,y-1);c.moveTo(x-4,y+1.2);c.lineTo(x+4,y+.2);c.stroke()}else{c.fillStyle='#F7A67A';rr(c,x-4,y-2.4,8,4,1.6);c.fill()}c.fillStyle='#B9C2C6';rr(c,x-4,y+1.6,8,1.4,.7);c.fill()},1);
+   if(g&&g.g==='pour'){const pp=wfPlateAt(n,sp,Math.min(m-1,Math.floor(g.u*m)));chStream(c,pp.x+5,pp.y-13,pp.x+1,pp.y-3,'rgba(250,236,190,.95)',1,now)}}},
+ seafood:{
+  /* the board: the shrimp grey and raw, cleaned with the knife; the mussels laid out shut; garlic sliced; a portion of the cooked
+     noodles. The pan: the garlic, the shrimp and the mussels in first, then the noodles, the stock and wine; tossed, the shrimp
+     turn red and curl, the mussels open, the noodles take the sauce and the seafood spreads through them; plated in a twist with
+     every shrimp and mussel still itself on top */
+  vessel(c,n,S0,sp,now,hand,out){const st=S0.st,g=hand?S0.beat:null;
+   if(wfLookF(n)==='prep'){chIn(c,sp,()=>{drawVesselBack(c,'cutboard');chSeafoodBoard(c,st,now,g&&S0.ph.h<1?g:null)});return}
+   const toss=g&&g.g==='toss'?Math.max(0,Math.sin(now*5.5)):0;
+   chIn(c,sp,()=>{drawVesselBack(c,'pan');c.save();c.translate(0,-toss*9);c.scale(1+toss*.05,1-toss*.1);c.beginPath();c.ellipse(0,0,40,17,0,0,7);c.clip();c.scale(1,17/40);chSeafoodPan(c,n,st,out||0);c.restore();drawVesselFront(c,'pan');
+    if(g&&S0.ph.h<1&&g.g!=='toss')chTool(c,g,now,0,-2);else if(g&&g.g==='toss')chWokTool(c,g,now);
+    chSteam(c,((st.sea>0?.3:0)+.45*(st.coat||0))*(1-(out||0)),now,-26,40)})},
+  held(c,n,x,y){c.save();c.translate(x,y);c.scale(.22,.22);drawVesselBack(c,'plate');c.save();c.scale(1,.5);chShrimp(c,-16,-6,1,.4,0);chShrimp(c,-4,6,1,2,0);chMussel(c,10,-8,1,.5,0);chMussel(c,14,8,1,-.4,0);noodleNest(c,rng(4),28,0,10,['#F3E7C2','#EAD9A8','#F7EDCF']);c.restore();c.restore()},
+  plates(c,n,S0,pl,sp,now,hand){const st=pl.st;const m=Math.min(4,Math.max(1,n.n));const per=1/m;const g=hand?pl.beat:null;
+   for(let k=m-1;k>=0;k--){const pp=wfPlateAt(n,sp,k);const L={out:clamp((st.out-k*per)/per,0,1),sea:clamp(st.sea*m-k,0,1),gar:clamp(st.gar*m-k,0,1)};
+    if(L.gar>=1&&k<n.its.length){chDishPic(c,n,pp,k);continue}
+    c.save();c.translate(pp.x,pp.y);c.scale(pp.sc,pp.sc);drawPlate(c,S.decor.ware>0);c.scale(1.12,1.12*.8);chSeafoodPlate(c,k,L);c.restore()}
+   if(g&&g.g==='twirl')chCarry(c,g,m,{x:sp.x,y:sp.y},k=>wfPlateAt(n,sp,k),(x,y)=>{c.strokeStyle='#E9C678';c.lineWidth=1.2;c.beginPath();c.arc(x,y,2.6,0,5.6);c.stroke();c.strokeStyle='#B9C2C6';c.lineWidth=.8;c.beginPath();c.moveTo(x+1,y-2);c.lineTo(x+6,y-7);c.moveTo(x+2.4,y-1);c.lineTo(x+7,y-6);c.stroke()});
+   if(g&&g.g==='sprinkle'){const pp=wfPlateAt(n,sp,Math.min(m-1,Math.floor(g.u*m)));chFall(c,pp.x,pp.y-14,'#3E8A36',now,'seed')}}},
+ duck:{
+  /* the board: a raw duck breast, its skin scored by the knife into a crosshatch one cut at a time, salted — still raw. The pan:
+     laid skin side down, the skin (seen at its edge) going from pale to golden brown as its fat renders and spits; turned over
+     half way, the golden scored skin up; the other side cooked; rested in the pan. Plated: moved over, cut into slices fanned
+     out, the orange sauce last */
+  vessel(c,n,S0,sp,now,hand,out){const st=S0.st,g=hand?S0.beat:null;
+   if(wfLookF(n)==='prep'){chIn(c,sp,()=>{drawVesselBack(c,'cutboard');chDuckBoard(c,st,now,g&&S0.ph.h<1?g:null)});return}
+   const on=n.st==='cook'||n.st==='work'&&n.f==='hot';
+   chIn(c,sp,()=>{drawVesselBack(c,'pan');c.save();c.beginPath();c.ellipse(0,0,40,17,0,0,7);c.clip();c.scale(1,17/40);if(st.on>=1&&(out||0)<.5)chDuckPan(c,st,now);c.restore();drawVesselFront(c,'pan');
+    if(st.on>0&&st.on<1){c.save();c.translate(0,-(1-st.on)*34);c.scale(1,17/40);chDuckBreast(c,{},1);c.restore()}
+    if(g&&g.g==='flip'&&st.flip>0&&st.flip<1){const t=st.flip;c.save();c.translate(-6,-Math.sin(t*Math.PI)*16*17/40-2);c.rotate(-.2);c.fillStyle='#B9C2C6';rr(c,-14,-2,26,5,2);c.fill();c.strokeStyle='#6B4428';c.lineWidth=3;c.lineCap='round';c.beginPath();c.moveTo(12,0);c.lineTo(34,-16);c.stroke();c.restore()}
+    if(on&&st.on>=1&&(out||0)<.5&&!(st.rest>0)){for(let i=0;i<5;i++){const ph=(now*1.5+i*.21)%1;c.globalAlpha=(1-ph)*.8;c.fillStyle=i%2?'#FFF1B0':'#FFD27A';circ(c,-22+i*11+Math.sin(now*9+i*2)*3,-8-ph*20,1.5-ph)}c.globalAlpha=1}
+    if(on&&st.on>=1&&(out||0)<.5)chSteam(c,.45*(1-(st.rest||0)*.6),now,-22,36)})},
+  held(c,n,x,y){c.save();c.translate(x,y);c.scale(.22,.22);drawVesselBack(c,'plate');c.save();c.scale(.9,.45);chDuckBreast(c,{scored:1},1);c.restore();c.restore()},
+  plates(c,n,S0,pl,sp,now,hand){const st=pl.st;const m=Math.min(4,Math.max(1,n.n));const g=hand?pl.beat:null;
+   for(let k=m-1;k>=0;k--){const pp=wfPlateAt(n,sp,k);const L={out:clamp(st.out*m-k,0,1),cut:clamp(st.cut*m-k,0,1),sauce:clamp(st.sauce*m-k,0,1)};
+    if(L.sauce>=1&&k<n.its.length){chDishPic(c,n,pp,k);continue}
+    c.save();c.translate(pp.x,pp.y);c.scale(pp.sc,pp.sc);drawPlate(c,S.decor.ware>0);c.scale(1.12,1.12*.8);chDuckPlate(c,k,L);c.restore()}
+   if(g&&g.g==='scoop')chCarry(c,g,m,{x:sp.x,y:sp.y},k=>wfPlateAt(n,sp,k),(x,y)=>{c.fillStyle='#C9782E';el(c,x,y,4.6,2.4);c.fillStyle='#B9C2C6';rr(c,x-4,y+1.6,8,1.4,.7);c.fill()},1);
+   if(g&&g.g==='chop'){const pp=wfPlateAt(n,sp,Math.min(m-1,Math.floor(g.u*m)));const lift=Math.abs(Math.sin(now*12))*4;c.save();c.translate(pp.x+4,pp.y-8-lift);c.scale(.3,.3);chKnife(c,0,0,-.4);c.restore()}
+   if(g&&g.g==='pour'){const pp=wfPlateAt(n,sp,Math.min(m-1,Math.floor(g.u*m)));c.save();c.translate(pp.x+7,pp.y-14);c.rotate(-.9);c.fillStyle='#C9D0D3';rr(c,-2,-2.6,4,5.2,1);c.fill();c.restore();chStream(c,pp.x+4.4,pp.y-12.4,pp.x+1,pp.y-3,'#D9802E',1,now)}}},
+ risotto:{
+  /* the pan: the rice dropped in dry, a splash of wine, the stock a ladle at a time; stirred all the while, the grains drink it in
+     and turn creamy, the butter set on top melting through in the last part; ladled onto the plate, tapped so it spreads, the
+     truffle and the cheese shaved over */
+  vessel(c,n,S0,sp,now,hand,out){const st=S0.st,g=hand?S0.beat:null;
+   chIn(c,sp,()=>{drawVesselBack(c,'pan');c.save();c.beginPath();c.ellipse(0,0,40,17,0,0,7);c.clip();c.scale(1,17/40);chRisottoPan(c,n,st,now,out||0);c.restore();drawVesselFront(c,'pan');
+    if(g&&S0.ph.h<1&&g.ing!=='butter')chTool(c,g,now,0,-2);else if(g&&g.g==='stir')chTool(c,g,now,0,-2);
+    if(g&&g.ing==='butter'&&st.butter<1){c.fillStyle='#F8E08E';rr(c,-4,-6-(1-st.butter)*30,10,7,2);c.fill()}
+    chSteam(c,((st.stock1>0?.3:0)+.3*(st.cream||0))*(1-(out||0)),now,-26,40)})},
+  plates(c,n,S0,pl,sp,now,hand){const st=pl.st;const m=Math.min(4,Math.max(1,n.n));const per=1/m;const g=hand?pl.beat:null;
+   for(let k=m-1;k>=0;k--){const pp=wfPlateAt(n,sp,k);const L={out:clamp((st.out-k*per)/per,0,1),flat:clamp(st.flat*m-k,0,1),gar:clamp(st.gar*m-k,0,1)};
+    if(L.gar>=1&&k<n.its.length){chDishPic(c,n,pp,k);continue}
+    c.save();c.translate(pp.x,pp.y);c.scale(pp.sc,pp.sc);drawPlate(c,S.decor.ware>0);c.scale(1.12,1.12*.8);chRisottoPlate(c,k,L);c.restore()}
+   if(g&&g.g==='scoop')chCarry(c,g,m,{x:sp.x,y:sp.y},k=>wfPlateAt(n,sp,k),(x,y)=>{c.fillStyle='#F2E2B0';el(c,x,y-.6,3.6,2.2);c.fillStyle='#B9C2C6';rr(c,x-4,y+1.4,8,1.4,.7);c.fill()});
+   if(g&&g.g==='sprinkle'){const pp=wfPlateAt(n,sp,Math.min(m-1,Math.floor(g.u*m)));chFall(c,pp.x,pp.y-14,'#2F2622',now,'dot')}}},
+ souffle:{
+  /* the board: the whites whisked in the bowl until they stand in soft peaks, the yolk batter folded in, poured into the ramekin;
+     in the oven it starts low and really rises above the rim, its top turning golden (the spec allows the height here: a soufflé
+     rises); the ramekin set on a plate, the icing sugar and berries last */
+  vessel(c,n,S0,sp,now,hand,out){const st=S0.st,g=hand&&S0.ph.h<1?S0.beat:null;
+   if(wfLookF(n)==='prep'){chIn(c,sp,()=>{drawVesselBack(c,'cutboard');chSouffleBoard(c,st,now,g,S0.t)});return}
+   if((out||0)>=.5)return;const at=chIntoOven(n,sp,n.st==='work'&&n.f==='oven'?st.in||0:0);chIn(c,at,()=>chSouffleRamekin(c,st.rise||0,st.gold||0,0))},
+  oven(c,n,S0,sp){chIn(c,sp,()=>chSouffleRamekin(c,S0.st.rise||0,S0.st.gold||0,0))},
+  held(c,n,x,y){c.save();c.translate(x,y);c.scale(.24,.24);chSouffleRamekin(c,0,0,0);c.restore()},
+  plates(c,n,S0,pl,sp,now,hand){const st=pl.st;const m=Math.min(4,Math.max(1,n.n));const g=hand?pl.beat:null;
+   for(let k=m-1;k>=0;k--){const pp=wfPlateAt(n,sp,k);const o=clamp(st.out*m-k,0,1),s2=clamp(st.sugar*m-k,0,1);
+    if(s2>=1&&k<n.its.length){chDishPic(c,n,pp,k);continue}
+    c.save();c.translate(pp.x,pp.y);c.scale(pp.sc,pp.sc);drawPlate(c,S.decor.ware>0);if(o>=1){c.save();c.scale(1.12,1.12);chSouffleRamekin(c,1,1,s2,true);c.restore()}c.restore()}
+   if(g&&g.g==='scoop')chCarry(c,g,m,{x:sp.x,y:sp.y},k=>wfPlateAt(n,sp,k),(x,y)=>{c.save();c.translate(x,y-2);c.scale(.12,.12);chSouffleRamekin(c,1,1,0);c.restore()},1);
+   if(g&&g.g==='sprinkle'){const pp=wfPlateAt(n,sp,Math.min(m-1,Math.floor(g.u*m)));chFall(c,pp.x,pp.y-18,'#FFFFFF',now,'dot')}}}};
 /* a tool over a wok or pan, in the vessel's own coordinates (the pan at 0,0, its rim 44 wide): what the hands are doing */
 function chWokTool(c,g,now){const k=g.g;c.save();c.lineCap='round';
  if(k==='pour'&&g.ing==='oil'){c.save();c.translate(20,-50);c.rotate(-2.3);c.fillStyle='#E7C25A';rr(c,-5,-13,10,24,3);c.fill();c.fillStyle='rgba(255,255,255,.45)';c.fillRect(-3,-11,2,18);c.fillStyle='#3A3A3A';rr(c,-2.4,-19,4.8,7,1.2);c.fill();c.restore();
@@ -6863,10 +7019,11 @@ function chFall(c,x,y,col,now,kind){c.fillStyle=col;for(let i=0;i<5;i++){const p
 /* the hand's tool over a pan or a pot (its own coordinates; tx,ty: where the food is in it): a bowl tipped to drop the
    noodles or the pumpkin in, a small pan or a jug pouring (the tomato sauce, the stock, the cream), a wooden spoon stirring */
 function chTool(c,g,now,tx,ty){const k=g.g,ing=g.ing;c.save();c.lineCap='round';
- if(k==='drop'){c.save();c.translate(tx+24,ty-44);c.rotate(-1.2);c.fillStyle='#F4F1EA';c.beginPath();c.moveTo(-15,-4);c.quadraticCurveTo(-14,11,0,12);c.quadraticCurveTo(14,11,15,-4);c.closePath();c.fill();c.strokeStyle='rgba(150,130,110,.55)';c.lineWidth=1.2;c.beginPath();c.ellipse(0,-4,15,5,0,0,7);c.stroke();c.fillStyle=ing==='pumpkin'?'#EE9A32':ing==='potato'?'#F3E3B0':'#F3E7C2';el(c,0,-4,13,3.6);c.restore();
-  for(let i=0;i<7;i++){const ph=(now*2.4+i*.143)%1;c.save();c.translate(tx+12-14*ph+Math.sin(i*2.7)*4,ty-38+36*ph);c.rotate(i+now*3);if(ing==='pumpkin'){c.fillStyle=i%2?'#F2A33A':'#E88C2A';rr(c,-3.4,-3.4,6.8,6.8,1.4);c.fill()}else if(ing==='potato'){c.fillStyle=i%2?'#F4E6B8':'#E9D59C';rr(c,-1.6,-6,3.2,12,1.4);c.fill()}else{c.strokeStyle=i%2?'#F3E7C2':'#E8D7A6';c.lineWidth=2.2;c.beginPath();c.arc(0,0,4,0,3.4);c.stroke()}c.restore()}}
- else if(k==='pour'){const col=ing==='tomato'?'#C8361E':ing==='stock'?'#E7C987':'#FFFBF2';
+ if(k==='drop'){c.save();c.translate(tx+24,ty-44);c.rotate(-1.2);c.fillStyle='#F4F1EA';c.beginPath();c.moveTo(-15,-4);c.quadraticCurveTo(-14,11,0,12);c.quadraticCurveTo(14,11,15,-4);c.closePath();c.fill();c.strokeStyle='rgba(150,130,110,.55)';c.lineWidth=1.2;c.beginPath();c.ellipse(0,-4,15,5,0,0,7);c.stroke();c.fillStyle=ing==='pumpkin'?'#EE9A32':ing==='potato'?'#F3E3B0':ing==='seafood'?'#A9B5BD':ing==='arborio'?'#F8F2DE':'#F3E7C2';el(c,0,-4,13,3.6);c.restore();
+  for(let i=0;i<7;i++){const ph=(now*2.4+i*.143)%1;c.save();c.translate(tx+12-14*ph+Math.sin(i*2.7)*4,ty-38+36*ph);c.rotate(i+now*3);if(ing==='pumpkin'){c.fillStyle=i%2?'#F2A33A':'#E88C2A';rr(c,-3.4,-3.4,6.8,6.8,1.4);c.fill()}else if(ing==='potato'){c.fillStyle=i%2?'#F4E6B8':'#E9D59C';rr(c,-1.6,-6,3.2,12,1.4);c.fill()}else if(ing==='seafood'){if(i%3===0){c.fillStyle='#F2E8D4';el(c,0,0,2.6,1.8)}else if(i%3===1){c.strokeStyle='#9AA8B0';c.lineWidth=2.6;c.beginPath();c.arc(0,0,3.2,.3,3.7);c.stroke()}else{c.fillStyle='#262A3A';el(c,0,0,4.4,2.6)}}else if(ing==='arborio'){c.fillStyle=i%2?'#FBF7EC':'#EDE6D2';el(c,-2,0,1.7,.9);el(c,2,1,1.7,.9);el(c,0,-2,1.7,.9)}else{c.strokeStyle=i%2?'#F3E7C2':'#E8D7A6';c.lineWidth=2.2;c.beginPath();c.arc(0,0,4,0,3.4);c.stroke()}c.restore()}}
+ else if(k==='pour'){const col=ing==='tomato'?'#C8361E':ing==='stock'?'#E7C987':ing==='wine'?'#F2E6A0':'#FFFBF2';
   if(ing==='tomato'){c.save();c.translate(tx+26,ty-42);c.rotate(-.75);c.fillStyle='#9AA4A8';el(c,0,0,13,6);c.fillStyle='#C8361E';el(c,0,-1,11,4.4);c.fillStyle='#6B4428';rr(c,12,-2,16,4,2);c.fill();c.restore();chStream(c,tx+16,ty-34,tx+2,ty-2,col,6,now)}
+  else if(ing==='wine'){const m=chBottle(c,tx+30,ty-46,1,'rgba(64,112,72,.95)',1);chStream(c,m.x,m.y,tx+2,ty-2,col,2.6,now)}
   else{/* a jug, its handle away from the pot */c.save();c.translate(tx+28,ty-46);c.rotate(-.8);const body=ing==='cream'?'#FFFFFF':'#C9D0D3',edge=ing==='cream'?'rgba(150,130,110,.6)':'#8C979C';c.strokeStyle=edge;c.lineWidth=2.6;c.beginPath();c.arc(11,0,6,-1.3,1.3);c.stroke();c.fillStyle=body;c.beginPath();c.moveTo(-8,-10);c.lineTo(-13,-13);c.lineTo(8,-10);c.lineTo(10,11);c.lineTo(-10,11);c.closePath();c.fill();c.lineWidth=.8;c.stroke();c.fillStyle=col;el(c,0,-10,7.5,2.4);c.fillStyle='rgba(255,255,255,.5)';c.fillRect(-6,-6,2.4,14);c.restore();chStream(c,tx+10,ty-46,tx+2,ty-2,col,4.6,now)}}
  else if(k==='stir'){const a=now*6;const bx=tx+Math.cos(a)*14,by=ty+Math.sin(a)*4;c.strokeStyle='#6B4428';c.lineWidth=3;c.beginPath();c.moveTo(tx+30,ty-44);c.lineTo(bx+3,by-4);c.stroke();c.fillStyle='#8A5A30';el(c,bx,by,5,3)}
  c.restore()}
@@ -7104,6 +7261,105 @@ function chProsBoard(c,n,st,now,g,t,out){const BX=33,BY=-4;const R0=rng((n.seed|
 function chProsPlate(c,k,L){const R=rng(hash('prosplate|'+k));if(L.out>0)greens(c,R,0,2,20,Math.round(20*L.out));c.lineCap='round';
  for(let i=0;i<4;i++){const a=L.ham*4-i;if(a<=0)continue;const px=(i-1.5)*11,py=(i%2?-6:5)-(1-Math.min(1,a))*12;c.strokeStyle='#D9737A';c.lineWidth=8.5;c.beginPath();c.moveTo(px-8,py);c.bezierCurveTo(px-3,py-9,px+3,py+9,px+8,py);c.stroke();c.strokeStyle='#F3C1C0';c.lineWidth=2;c.beginPath();c.moveTo(px-7,py-2.4);c.bezierCurveTo(px-3,py-10,px+3,py+6,px+7,py-2.4);c.stroke()}
  if(L.top>0){const R2=rng(hash('prostop|'+k));c.fillStyle='#FFF4D8';for(let i=0;i<Math.round(5*L.top);i++){c.save();c.translate((R2()-.5)*30,(R2()-.5)*26);c.rotate(R2()*3);c.fillRect(-3,-1,6,2);c.restore()}if(L.top>.4){c.fillStyle='#6B2E4A';circ(c,-18,-10,4.5);c.fillStyle='#E88A9A';circ(c,-18,-10,3)}if(L.top>.7){c.fillStyle='#4A1F1F';for(let i=0;i<7;i++)circ(c,(R2()-.5)*44,(R2()-.5)*40,1)}}}
+/* ---- the fourth batch's pieces ---- */
+/* a salmon fillet (the dish picture's, from raw to cooked): raw it is a deeper, glassy orange-red with thin white lines;
+   cooked it is paler and opaque, its top browning and its edges golden */
+function chSalmonFillet(c,x,y,s,a,cook){c.save();c.translate(x,y);c.rotate(a);c.fillStyle=mix('#A8442A','#B8572B',cook);rr(c,-18*s,-10*s,36*s,21*s,9*s);c.fill();
+ let g=c.createLinearGradient(0,-10*s,0,10*s);g.addColorStop(0,mix('#FF7E52','#F7A67A',cook));g.addColorStop(1,mix('#E4502C','#E3703F',cook));c.fillStyle=g;rr(c,-17*s,-10*s,34*s,17*s,8*s);c.fill();
+ c.strokeStyle=`rgba(255,230,215,${.55+.25*cook})`;c.lineWidth=(1.3-.4*(1-cook))*s;for(let k=-3;k<=3;k++){c.beginPath();c.moveTo(k*4.5*s-3*s,-9*s);c.quadraticCurveTo(k*4.5*s+1*s,-2*s,k*4.5*s-2*s,6*s);c.stroke()}
+ if(cook>.4){c.fillStyle=`rgba(200,120,40,${.45*(cook-.4)/.6})`;rr(c,-17*s,-10*s,34*s,4*s,3*s);c.fill();for(let k=0;k<4;k++)el(c,-10*s+k*7*s,-5*s,2.6*s,1.2*s)}
+ gloss(c,-6*s,-6*s,7*s,2*s,.35+.25*(1-cook));c.restore()}
+/* the salmon at the board: a raw fillet and the asparagus; oiled (it shines), salted, herbs laid on it; onto the small tray */
+function chSalmonBoard(c,n,st,now,g){const TX=30,TY=-2,TS=.42;c.save();c.translate(TX,TY);c.scale(TS,TS);drawVesselBack(c,'tray');if(st.tray>=1)chSalmonTray(c,n,0,0,0,st.herb);c.restore();
+ if(st.tray<1){const q=st.tray;const fx=lerp(-18,TX-8*TS,q),fy=lerp(-2,TY,q)-Math.sin(q*Math.PI)*10;c.save();c.translate(lerp(-40,TX+26*TS,q),lerp(5,TY,q)-Math.sin(q*Math.PI)*8);asparagus(c,0,0,lerp(.5,.9*TS,q),3,.2);c.restore();chSalmonFillet(c,fx,fy,lerp(.62,.9*TS,q),-.1,0);
+  if(st.oil>0){c.fillStyle=`rgba(255,250,230,${.35*st.oil})`;el(c,fx-3,fy-3,6,1.4)}
+  if(st.salt>0){const R0=rng(79);for(let i=0;i<Math.round(12*st.salt);i++){c.fillStyle=i%2?'#FFFFFF':'#2A2A2A';circ(c,fx+(R0()-.5)*20,fy+(R0()-.5)*8,.6)}}
+  if(st.herb>0){const R1=rng(80);for(let i=0;i<Math.round(8*st.herb);i++)leaf(c,fx+(R1()-.5)*18,fy-2+(R1()-.5)*6,3.2,1.2,R1()*3,'#6FA84E')}}
+ if(g&&g.g==='mix'){c.fillStyle='#F0C8A8';el(c,-18+Math.sin(now*9)*5,-8,6.4,3)}
+ if(g&&g.g==='sprinkle')chFall(c,-18,-18,g.ing==='salt'?'#FFFFFF':'#6FA84E',now,g.ing==='salt'?'dot':'seed')}
+/* on the tray (the tray's own coordinates): the asparagus and a fillet for each portion; lifted off as it is plated */
+function chSalmonTray(c,n,cook,asp,out,herb){const m=Math.min(3,Math.max(1,n.n||1));const fl=m-Math.round((out||0)*m),as=m-Math.round((asp||0)*m);
+ for(let i=0;i<m;i++){if(i>=as)continue;asparagus(c,22,-12+i*9,.9,3,.15)}
+ for(let i=0;i<m;i++){if(i>=fl)continue;chSalmonFillet(c,-24+i*16,(i%2?6:-4),.9,-.15,cook);if(herb){const R1=rng(81+i);for(let k=0;k<6;k++)leaf(c,-24+i*16+(R1()-.5)*22,(i%2?6:-4)-3+(R1()-.5)*6,3.6,1.3,R1()*3,mix('#6FA84E','#4E6E30',cook))}}}
+/* the plate (flat: the dish picture's coordinates): the asparagus, the salmon on it, a wedge of lemon, the sauce and herbs */
+function chSalmonPlate(c,k,L){if(L.asp>0)asparagus(c,-2,-2,1,Math.max(1,Math.round(5*L.asp)),.25);if(L.out>0){c.save();c.translate(0,-(1-L.out)*14);salmonFillet(c,2,-4,1,-.18);c.restore()}
+ if(L.lemon>0)lemonWedge(c,20,14-(1-L.lemon)*12,.9,.4);if(L.sauce>0){c.strokeStyle='rgba(250,236,190,.95)';c.lineWidth=1.4;c.beginPath();for(let t=0;t<=L.sauce+1e-6;t+=.05){const x=-14+t*28,y=10+Math.sin(t*12)*3;if(t===0)c.moveTo(x,y);else c.lineTo(x,y)}c.stroke();herbs(c,rng(hash('salmonh|'+k)),-10,-14,5,Math.round(5*L.sauce),'#6FA84E')}}
+/* a shrimp (the dish picture's): grey and translucent raw, red and curled cooked */
+function chShrimp(c,x,y,s,a,cook){c.save();c.translate(x,y);c.rotate(a);c.lineCap='round';c.strokeStyle=mix('#9AA8B0','#E46A43',cook);c.lineWidth=6*s;c.beginPath();c.arc(0,0,6*s,.3,3.7);c.stroke();c.strokeStyle=mix('#C9D3D8','#F8A57E',cook);c.lineWidth=2.6*s;c.beginPath();c.arc(0,0,6*s,.4,3.4);c.stroke();
+ c.strokeStyle='rgba(255,255,255,.7)';c.lineWidth=.8*s;for(let k=0;k<4;k++){const t=.7+k*.7;c.beginPath();c.moveTo(Math.cos(t)*3*s,Math.sin(t)*3*s);c.lineTo(Math.cos(t)*9*s,Math.sin(t)*9*s);c.stroke()}c.fillStyle=mix('#7E8C94','#D5492F',cook);circ(c,Math.cos(3.7)*6*s,Math.sin(3.7)*6*s,2.2*s);c.restore()}
+/* a mussel: shut, or opened by the heat to its orange meat */
+function chMussel(c,x,y,s,a,open){c.save();c.translate(x,y);c.rotate(a);c.fillStyle='#262A3A';el(c,0,0,8.5*s,5.2*s);if(open>0){c.globalAlpha=Math.min(1,open*1.6);c.fillStyle='#F09A5C';el(c,.5*s,0,5.4*s*Math.min(1,open*1.4),3.1*s);c.globalAlpha=1}else{c.strokeStyle='rgba(120,130,160,.6)';c.lineWidth=.8*s;c.beginPath();c.moveTo(-7*s,0);c.lineTo(7*s,0);c.stroke()}gloss(c,-3*s,-2.5*s,3*s,1*s,.35);c.restore()}
+/* the seafood at the board: shrimp grey and raw (the knife cleaning them), mussels laid out shut, garlic sliced, the noodles */
+function chSeafoodBoard(c,st,now,g){for(let i=0;i<3;i++){chShrimp(c,-42+i*9,-3+(i%2)*4,.62,.4+i,0);if(st.shrimp>(i+1)/3-1e-6){c.strokeStyle='rgba(70,50,50,.6)';c.lineWidth=.6;c.beginPath();c.arc(-42+i*9,-3+(i%2)*4,3.6,.6,2.6);c.stroke()}}
+ for(let i=0;i<Math.ceil(4*st.mussel-1e-6);i++)chMussel(c,-14+(i%2)*9,-6+Math.floor(i/2)*7-(i===Math.ceil(4*st.mussel)-1&&st.mussel<1?(1-(4*st.mussel-i))*14:0),.62,.3,0);
+ if(st.garlic<1){c.fillStyle='#F2E8D4';el(c,6,-2,4.4*(1-st.garlic*.6),3.6*(1-st.garlic*.6))}for(let i=0;i<Math.floor(st.garlic*5+1e-6);i++){c.fillStyle='#F5EEDF';el(c,12+i*3,1,1.6,1.2)}
+ if(st.nood>0){c.save();c.translate(36,-1-(1-st.nood)*16);noodleNest(c,rng(4),0,0,9,['#F3E7C2','#EAD9A8','#F7EDCF']);c.restore()}
+ if(g&&g.g==='chop'){const tx=g.ing==='garlic'?6:-34;const lift=Math.abs(Math.sin(now*14))*7;chKnife(c,tx+9,-10-lift,-.12)}}
+/* the seafood pasta in the pan (a circle of 40, squashed by the caller): garlic, the shrimp and mussels grey and shut, cooking
+   red and open; the noodles pale, then glossy and golden with the sauce through them and herbs; the stock a pool, taken up */
+function chSeafoodPan(c,n,st,out){const left=1-out;if(left<=0)return;const R0=rng((n.seed||1)*29+7);const co=st.coat||0,ck=st.cook||0;
+ if(st.sauce>0){c.fillStyle=`rgba(232,206,120,${.45*st.sauce*(1-co*.8)})`;circ(c,0,0,34)}
+ if(st.nood>0){const N=40,shown=Math.floor(N*st.nood*left+1e-6);c.lineCap='round';for(let i=0;i<N;i++){const r0=4+R0()*22,a0=R0()*6.283,sw=1.4+R0()*2.2,cx=(R0()-.5)*8,cy=(R0()-.5)*8,v=R0();if(i>=shown)continue;c.strokeStyle=mix(v<.5?'#F3E7C2':'#EAD9A8',v<.5?'#F3DB9A':'#E9C678',co);c.lineWidth=2.6;c.beginPath();c.arc(cx,cy,r0,a0,a0+sw);c.stroke()}
+  if(co>0){c.fillStyle=`rgba(120,160,40,${.22*co})`;circ(c,0,0,24);c.fillStyle='#3E8A36';for(let i=0;i<Math.round(12*co*left);i++)circ(c,(R0()-.5)*44,(R0()-.5)*40,1.1)}}
+ if(st.sea>0&&left>0){const g=Math.min(1,st.sea*1.4);c.globalAlpha=g;c.fillStyle='#F2E8D4';for(let i=0;i<6;i++)el(c,-20+i*8,10-(i%2)*14,2.6,1.8);c.globalAlpha=1;
+  const spread=co;const P=[[-14,-8],[12,-10],[2,12],[-16,10],[18,6]].map((p,i)=>[lerp(p[0]*.55,p[0],spread),lerp(p[1]*.55,p[1],spread)]);
+  chShrimp(c,P[0][0],P[0][1],1,.4,ck);chShrimp(c,P[1][0],P[1][1],1,2.2,ck);chShrimp(c,P[2][0],P[2][1],1,-1,ck);chMussel(c,P[3][0],P[3][1],1.2,.5,clamp((ck-.3)/.5,0,1));chMussel(c,P[4][0],P[4][1],1.2,-.7,clamp((ck-.3)/.5,0,1))}}
+/* the plate (flat: the dish picture's coordinates): the twist of noodles, every shrimp and mussel laid on it, herbs and lemon */
+function chSeafoodPlate(c,k,L){const R=rng(hash('seaplate|'+k));if(L.out>0){const shown=Math.round(30*L.out);c.lineCap='round';for(let i=0;i<30;i++){const r0=4+R()*20,a0=R()*6.283,sw=1.6+R()*2,v=R();if(i>=shown)continue;c.strokeStyle=v<.5?'#F3DB9A':'#E9C678';c.lineWidth=2.6;c.beginPath();c.arc(0,0,r0,a0,a0+sw);c.stroke()}if(L.out>=1){c.fillStyle='rgba(120,160,40,.25)';el(c,0,0,20,18)}}
+ if(L.sea>0){const n=Math.ceil(5*L.sea-1e-6);const P=[[-9,-6,.4],[9,-8,2.2],[2,8,-1]];for(let i=0;i<Math.min(3,n);i++)shrimp(c,P[i][0],P[i][1],1,P[i][2]);if(n>3)mussel(c,-12,8,1,.5);if(n>4)mussel(c,14,5,1,-.7)}
+ if(L.gar>0){herbs(c,R,0,0,20,Math.round(8*L.gar),'#3E8A36');if(L.gar>.6)lemonWedge(c,22,-16,.8,.6)}}
+/* a duck breast (its own coordinates, about 60 wide): raw — the deep pink flesh, the pale skin on top, scored into a
+   crosshatch; in the pan skin side down (the flesh up, the skin seen at its edge going golden), turned over: the golden scored
+   skin up */
+function chDuckBreast(c,st,s){const fl=st.flip||0,up=fl>=.5;c.save();c.scale(s||1,s||1);if(fl>0&&fl<1){c.translate(0,-Math.sin(fl*Math.PI)*16);c.scale(1,Math.max(.12,Math.abs(Math.cos(fl*Math.PI))))}
+ const skinCol=mix('#F3DCC0','#C9782E',st.skin||0),meatCol=mix('#E39292','#B86A5E',up?(st.meat||0):(st.skin||0)*.35);c.fillStyle='rgba(0,0,0,.25)';el(c,2,4,30,13);
+ if(st.pan){/* skin side down: the flesh up, the skin showing at the rim */c.fillStyle=up?meatCol:skinCol;el(c,0,0,30,13);c.fillStyle=up?skinCol:meatCol;el(c,0,-1,26,10.5)}
+ else{c.fillStyle='#E39292';el(c,0,1,30,12);c.fillStyle=skinCol;el(c,0,-1,28,9.5)}
+ const sc=st.scored!=null?st.scored:1;if((!st.pan||up)&&sc>0){c.strokeStyle=up?'rgba(110,50,20,.75)':'rgba(150,90,60,.85)';c.lineWidth=1.2;const nC=Math.round(5*sc);for(let i=0;i<nC;i++){const off=-20+i*10;c.beginPath();c.moveTo(off-5,-9);c.lineTo(off+5,6);c.stroke();c.beginPath();c.moveTo(off+5,-9);c.lineTo(off-5,6);c.stroke()}}
+ if(up&&(st.skin||0)>.5)gloss(c,-8,-5,8,2,.35);c.restore()}
+/* the duck at the board: raw, the knife scoring its skin one stroke after another, salted */
+function chDuckBoard(c,st,now,g){c.save();c.translate(-6,-1);c.scale(.75,.75);chDuckBreast(c,{scored:st.score},1);c.restore();
+ if(st.salt>0){const R0=rng(92);c.fillStyle='#FFFFFF';for(let i=0;i<Math.round(12*st.salt);i++)circ(c,-6+(R0()-.5)*36,-2+(R0()-.5)*10,.6)}
+ if(g&&g.g==='chop'){const x=-6+(-20+Math.min(4,Math.floor(st.score*5))*10)*.75;const lift=Math.abs(Math.sin(now*12))*6;chKnife(c,x+12,-10-lift,-.5)}
+ if(g&&g.g==='sprinkle')chFall(c,-6,-16,'#FFFFFF',now,'dot')}
+/* the duck in its pan (a circle of 40, squashed by the caller): skin side down, the fat it gives a golden pool round it */
+function chDuckPan(c,st,now){if((st.skin||0)>0){c.fillStyle=`rgba(240,200,110,${.18+.25*(st.skin||0)})`;el(c,0,0,36+4*(st.skin||0),28)}c.save();c.scale(1.2,2);chDuckBreast(c,Object.assign({pan:1},st),1);c.restore()}
+/* the plate (flat: the dish picture's coordinates): the breast laid on, cut into slices fanned out, the orange sauce last */
+function chDuckPlate(c,k,L){const R=rng(hash('duckplate|'+k));if(L.sauce>0){c.fillStyle='#C8732A';el(c,2,6,26*L.sauce,14*L.sauce);c.fillStyle='#B25E1E';el(c,6,8,18*L.sauce,9*L.sauce)}
+ if(L.out>0){if(L.cut<1){c.save();c.translate(0,-2-(1-L.out)*14);c.scale(.9,.9);chDuckBreast(c,{pan:1,flip:1,skin:1,meat:1,scored:1},1);c.strokeStyle='rgba(60,25,10,.85)';c.lineWidth=1.4;for(let i=0;i<Math.floor(L.cut*4);i++){c.beginPath();c.moveTo(14-i*9,-12);c.lineTo(10-i*9,12);c.stroke()}c.restore()}else duckSlices(c,0,-2,1.1)}
+ if(L.sauce>.5){c.fillStyle='#F29A38';el(c,-22,10,5,3);el(c,-18,14,5,3);herbs(c,R,16,-12,6,6,'#5AA048');c.fillStyle='#8A3A1A';for(let i=0;i<5;i++)circ(c,-20+i*10,20,1.6)}}
+/* the risotto in its pan (a circle of 40, squashed by the caller): dry grains, a splash of wine, the stock in ladles — a pool
+   each time — drunk in as it is stirred until it is one creamy mass, the butter on top melting through at the end */
+function chRisottoPan(c,n,st,now,out){const left=1-out;if(left<=0&&!(st.rice>0))return;const R0=rng((n.seed||1)*53+3);const cr=st.cream||0;
+ const liq=(st.wine*.25+st.stock1*.4+st.stock2*.4)*(1-cr*.85);if(liq>0&&left>0){c.fillStyle=`rgba(236,206,130,${Math.min(.7,liq)})`;circ(c,0,0,30+4*liq)}
+ if(cr>0&&left>0){let g=c.createRadialGradient(-6,-6,3,0,0,28);g.addColorStop(0,'#F6E6B6');g.addColorStop(1,'#DEBF80');c.globalAlpha=Math.min(1,cr*1.2);c.fillStyle=g;circ(c,0,0,28*Math.sqrt(left));c.globalAlpha=1}
+ const N=90,shown=Math.floor(N*st.rice*left+1e-6);for(let i=0;i<N;i++){const a=R0()*6.283,d=Math.sqrt(R0())*26,v=R0(),rot=R0()*3;if(i>=shown)continue;c.globalAlpha=1-cr*.55;c.fillStyle=v<.5?mix('#FBF7EC','#F8ECC8',cr):mix('#EDE6D2','#E0C78D',cr);c.save();c.translate(Math.cos(a)*d*(1-cr*.15),Math.sin(a)*d*(1-cr*.15));c.rotate(rot);el(c,0,0,2.4,1.3);c.restore()}c.globalAlpha=1;
+ if(st.butter>=1&&left>0){const melt=clamp((cr-.6)/.4,0,1);c.globalAlpha=1-melt;c.fillStyle='#F8E08E';rr(c,-4,-6,10,7,2);c.fill();c.globalAlpha=1;if(melt>0){c.fillStyle=`rgba(255,240,180,${.4*melt})`;el(c,0,-2,14,10)}}
+ if(cr>.5&&left>0)gloss(c,-9,-10,8,3,.3*(cr-.5)*2)}
+/* the plate (flat: the dish picture's coordinates): ladled on in spoonfuls, tapped so it spreads, the truffle and cheese shaved */
+function chRisottoPlate(c,k,L){if(L.out<=0)return;const R=rng(hash('risoplate|'+k));const r=lerp(19,27,L.flat)*Math.sqrt(L.out);let rg=c.createRadialGradient(-6,-6,3,0,0,r);rg.addColorStop(0,'#F6E6B6');rg.addColorStop(1,'#DEBF80');c.fillStyle=rg;el(c,0,0,r,r*lerp(1.05,.93,L.flat));
+ for(let i=0;i<Math.round(80*L.out);i++){const a=R()*6.28,d=Math.sqrt(R())*(r-3);c.fillStyle=R()<.5?'#F8ECC8':'#E0C78D';c.save();c.translate(Math.cos(a)*d,Math.sin(a)*d);c.rotate(R()*3);el(c,0,0,2.4,1.3);c.restore()}
+ if(L.flat<1)gloss(c,-6,-8,6*(1-L.flat)+3,2,.35);
+ if(L.gar>0){const R2=rng(hash('risogar|'+k));c.fillStyle='rgba(255,255,255,.7)';for(let i=0;i<Math.round(8*L.gar);i++){c.save();c.translate((R2()-.5)*40,(R2()-.5)*36);c.rotate(R2()*3);c.fillRect(-3,-1,6,2);c.restore()}for(let i=0;i<Math.round(7*L.gar);i++)truffleShave(c,(R2()-.5)*30,(R2()-.5)*28,3.6+R2()*1.6)}}
+/* the soufflé at the board: the whites in the bowl, whisked from a clear puddle into soft white peaks, the yolk batter folded
+   through in yellow streaks, poured into the buttered ramekin at the board's end */
+function chSouffleBoard(c,st,now,g,t){const BX=-12,BY=-4,TX=32,TY=-2;
+ c.save();c.translate(TX,TY+2);c.scale(.36,.36);drawVesselBack(c,'ramekin');if(st.pour>0){c.fillStyle='#F7EBC4';el(c,0,-10+(1-st.pour)*16,22,5)}c.restore();
+ c.fillStyle='rgba(0,0,0,.18)';el(c,BX+1,BY+9,15,3.5);let gb=c.createLinearGradient(BX-16,0,BX+16,0);gb.addColorStop(0,'#D6CDBE');gb.addColorStop(.4,'#FFFFFF');gb.addColorStop(1,'#CCC2B2');c.fillStyle=gb;c.beginPath();c.moveTo(BX-16,BY-1);c.quadraticCurveTo(BX-15,BY+10,BX,BY+10);c.quadraticCurveTo(BX+15,BY+10,BX+16,BY-1);c.fill();c.fillStyle='#F7F3EC';el(c,BX,BY-1,16,5);c.fillStyle='#E6DED0';el(c,BX,BY-.6,14,4.2);
+ const left=1-st.pour;if(left>0){const w=st.whip,f=st.fold;if(w<.25){c.fillStyle='rgba(250,245,215,.85)';el(c,BX,BY-.6,12,3.6)}
+  const peaks=Math.round(7*w);const col=mix('#FFFFFF','#F7EBC4',f);for(let i=0;i<peaks;i++){const h=(2+6*w)*Math.sqrt(left);c.fillStyle=col;circ(c,BX-10+i*3.4,BY-1-Math.sin(i*1.3)*h*.4,2+h*.35)}
+  if(f>0&&f<1){c.strokeStyle='rgba(240,200,90,.8)';c.lineWidth=1;c.beginPath();c.arc(BX,BY-3,5,now*4,now*4+2.4);c.stroke()}}
+ c.strokeStyle='rgba(255,255,255,.9)';c.lineWidth=1.2;c.beginPath();c.ellipse(BX,BY-1,16,5,0,.2,Math.PI-.2);c.stroke();
+ if(g&&g.g==='whisk'){const a=now*12;const x=BX+Math.cos(a)*5,y=BY-3+Math.sin(a)*1.4;c.strokeStyle='#C9D0D3';c.lineWidth=.9;for(let i=-1;i<=1;i++){c.beginPath();c.ellipse(x+i*1.2,y-5,2,6,0,0,7);c.stroke()}c.strokeStyle='#8A5A30';c.lineWidth=2.2;c.beginPath();c.moveTo(x,y-10);c.lineTo(x+5,y-22);c.stroke()}
+ if(g&&g.g==='mix'){const a=Math.sin(now*6);c.fillStyle='#B9C2C6';rr(c,BX-3+a*6,BY-8,6,3,1);c.fill();c.strokeStyle='#6B4428';c.lineWidth=2;c.beginPath();c.moveTo(BX+a*6+2,BY-8);c.lineTo(BX+a*6+10,BY-20);c.stroke()}
+ if(g&&g.g==='pour'){chStream(c,BX+14,BY-4,TX,TY-4,'#F7EBC4',2.6,now)}}
+/* the soufflé in its ramekin (the ramekin's own coordinates): level with the rim at first, then rising well above it as it
+   bakes, its top turning golden; on its plate, the icing sugar and the berries */
+function chSouffleRamekin(c,rise,gold,sugar,plated){drawVesselBack(c,'ramekin');const h=1+20*rise;const col=mix('#F7EBC4','#D9A04A',gold);
+ let g=c.createRadialGradient(-5,-10-h,2,0,-10,26);g.addColorStop(0,mix(col,'#FFFFFF',.25));g.addColorStop(1,col);c.fillStyle=g;c.beginPath();c.moveTo(-23,-10);c.bezierCurveTo(-26,-10-h*1.6,26,-10-h*1.6,23,-10);c.closePath();c.fill();
+ c.fillStyle='#FFFFFF';el(c,0,-10,23,3.4);c.fillStyle=col;el(c,0,-11,22,2.6);
+ if(sugar>0){c.fillStyle='rgba(255,255,255,.95)';const R=rng(57);for(let i=0;i<Math.round(26*sugar);i++)circ(c,(R()-.5)*30,-10-R()*h*1.1,.9)}
+ if(plated&&sugar>.5){c.fillStyle='#D23A4A';circ(c,22,14,3.4);c.fillStyle='#3A2E6A';circ(c,26,17,3)}}
 /* the line (called from drawLine): every piece of work at its place, sorted with the old jobs by depth */
 function wfLineItems(V){const out=[];if(!V||!V.slots)return out;for(const s of V.slots){const n=s.wf;if(!n||n.slot!==s){if(!n&&!s.job&&s.left)out.push({s,left:s.left,sp:wfFoodSpot({st:'left',d:'friedrice'},s)});continue}out.push({s,wf:n,sp:wfFoodSpot(n,s)})}return out}
 function wfDrawFood(c,v,now){const n=v.wf,sp=v.sp;const plating=n.st==='work'&&n.f==='plate';
@@ -7203,7 +7459,7 @@ function wfTap0(p){const s=wfHitSlot(p);if(!s)return false;const sel=R.wsel?wfNo
  if(sel&&wfOpen(sel)&&wfNext(sel)===f&&wfSlotFree(s)){if(wfAssign(sel,'jill',s)){wfFirstUse(sel,f);sfx.tap();return true}}
  if(sel&&wfTakeBack(sel,s)){wfFirstUse(sel,f);sfx.tap();return true}
  if(s.wf){if(R.wsel!==s.wf.id){R.wsel=s.wf.id;R.tv++}sfx.tap();return true}   /* the work there, focused: what it is, who has it */
- if(!sel&&wfSlotFree(s)){const n=wfList().filter(x=>wfOpen(x)&&wfNext(x)===f).sort((a,b)=>a.tr-b.tr)[0];if(n&&wfAssign(n,'jill',s)){wfFirstUse(n,f);sfx.tap();return true}}
+ if((!sel||!wfOpen(sel)||wfNext(sel)!==f)&&wfSlotFree(s)){const n=wfList().filter(x=>wfOpen(x)&&wfNext(x)===f).sort((a,b)=>a.tr-b.tr)[0];if(n&&wfAssign(n,'jill',s)){wfFirstUse(n,f);sfx.tap();return true}}   /* a free place takes its oldest waiting work, whatever else is selected (the user, 2026-10-09: 「有時候在等炒飯 有咖啡訂單卻顯示現在沒有訂單不能做」 — the fried rice stays selected while it cooks, and the bar took nothing) */
  if(s.type==='pass')return false;   /* the pass's own tap (deliver what is ready) stays */
  return false}
 /* the user, 2026-10-08 §D: while a cook is still on his way to a dish (「阿德前往中」), the player can send Jill instead — a

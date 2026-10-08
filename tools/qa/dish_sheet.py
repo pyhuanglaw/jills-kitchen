@@ -9,7 +9,8 @@ from PIL import Image
 src, out, DISHES = sys.argv[1], sys.argv[2], sys.argv[3:]
 NAMES = {'friedrice': '黃金蛋炒飯', 'coffee': '拿鐵咖啡', 'blacktea': '錫蘭檸檬紅茶', 'sparkling': '檸檬氣泡水', 'salad': '田園沙拉', 'pasta': '番茄義大利麵', 'soup': '南瓜濃湯',
          'burger': '經典牛肉漢堡', 'pudding': '焦糖布丁', 'fries': '松露薯條', 'fruitsoda': '莓果蘇打', 'veg': '香料烤蔬菜',
-         'tiramisu': '提拉米蘇', 'chicken': '香草烤雞', 'steak': '炙烤肋眼牛排', 'basque': '巴斯克乳酪蛋糕', 'prosciutto': '生火腿沙拉'}
+         'tiramisu': '提拉米蘇', 'chicken': '香草烤雞', 'steak': '炙烤肋眼牛排', 'basque': '巴斯克乳酪蛋糕', 'prosciutto': '生火腿沙拉',
+         'salmon': '香烤鮭魚', 'seafood': '海鮮義大利麵', 'duck': '香煎鴨胸', 'risotto': '松露燉飯', 'souffle': '舒芙蕾'}
 tmp = os.path.join(src, '_sheet'); os.makedirs(tmp, exist_ok=True)
 rows = []
 for d in DISHES:
