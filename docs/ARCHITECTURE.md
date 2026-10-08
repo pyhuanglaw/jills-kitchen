@@ -158,7 +158,8 @@ const MIGRATE={
 ## 6. 測試
 
 ```bash
-pip install playwright        # 第一次才需要；本機要有 Chromium（playwright install chromium）
+pip install playwright pillow numpy scipy   # 第一次才需要；本機要有 Chromium（playwright install chromium）
+                                            # （pillow：截圖比對；numpy、scipy：portrait_crops_isolate_each_figure，少了會失敗）
 python3 tests/run_tests.py                  # 多檔版（index.html）
 python3 tests/run_tests.py --target single  # 單檔版
 python3 tests/run_tests.py -k cats          # 只跑名稱含 cats 的測試
