@@ -5987,8 +5987,9 @@ function hitStation(p){if(!R||room!=='kitchen')return -1;let best=-1,bd=1e9;
 const WF_ST={prep:{n:'備料',k:'備',slot:'prep'},hot:{n:'熱區',k:'熱',slot:'stove'},oven:{n:'烤箱',k:'烤',slot:'oven'},drink:{n:'飲料',k:'飲',slot:'bar'},pizza:{n:'披薩烤爐',k:'窯',slot:'pizza'},plate:{n:'裝盤',k:'裝',slot:'pass'},serve:{n:'出杯',k:'出',slot:null}};
 const WF_FAM={hot2:['hot','plate'],cold2:['prep','plate'],drink2:['drink','serve'],oven2:['oven','plate'],hot3:['prep','hot','plate'],oven3:['prep','oven','plate'],pizza3:['prep','pizza','plate']};
 /* each dish's workflow is the user's table (cooking_workflow_canon_2026-10-07.txt), never ours; a special follows its base
-   dish. A dish not in this list still cooks the old way: the two pizzas the table does not name (瑪格麗特、蘑菇白醬) wait for
-   the user. 22 of the restaurant, 9 of the Lounge, the signature dish and the signature dessert. */
+   dish. 22 of the restaurant, 9 of the Lounge, the two pizzas the table did not name (the user, 2026-10-08: 瑪格麗特、蘑菇白醬
+   — PREP → PIZZA OVEN → PLATING, the bar pizza's family), the signature dish and the signature dessert: every dish there is.
+   The user: a dish found later goes into the family of how it is really made — never left on the old station jobs. */
 const WF_DISH={
  friedrice:'hot2',pasta:'hot2',soup:'hot2',risotto:'hot2',bites:'hot2',mushroom:'hot2',wings:'hot2',cheesestick:'hot2',
  salad:'cold2',pudding:'cold2',tiramisu:'cold2',prosciutto:'cold2',cheeseplate:'cold2',oyster:'cold2',sigdessert:'cold2',
@@ -5996,7 +5997,7 @@ const WF_DISH={
  fries:'oven2',
  burger:'hot3',steak:'hot3',seafood:'hot3',duck:'hot3',croquette:'hot3',signature:'hot3',
  veg:'oven3',chicken:'oven3',basque:'oven3',salmon:'oven3',souffle:'oven3',knuckle:'oven3',
- pizza:'pizza3'};
+ pizza:'pizza3',pzmarg:'pizza3',pzfungi:'pizza3'};
 const WF_TYPE_F={prep:'prep',stove:'hot',oven:'oven',bar:'drink',pizza:'pizza',pass:'plate'};
 function wfFlow(d){const f=WF_DISH[baseOf(d)];return f?WF_FAM[f]:null}
 function isWF(d){return !!(d&&wfFlow(d)&&DISH(d))}   /* the signature dishes exist only once Jill has made them */
@@ -6055,7 +6056,7 @@ function wfTarget(n){if(n.st==='fetch'){const sp=wfSpot(n.slot);return sp?{x:sp.
  if(n.st==='work'){if(n.slot){const sp=wfSpot(n.slot);return{x:sp.cx,y:sp.cy}}return{x:WF_PICK.x,y:WF_PICK.y}}return null}
 function wfArrive(n){if(n.st==='fetch'){if(n.slot){n.slot.wf=null;n.slot=null}n.carry=true;n.st='go';R.tv++;return}
  if(n.st!=='go')return;n.carry=false;if(n.adv){n.si++;n.adv=false}if(n.to){n.slot=n.to;n.to=null}
- const f=wfFl(n)[n.si];const T=wfTimes(n.d,f);n.f=f;n.act=T.act*(1+.15*(n.n-1));n.pas=T.pas*(1+.1*(n.n-1));n.dur=n.act+n.pas;n.st='work';R.tv++;
+ const f=wfFl(n)[n.si];const T=wfTimes(n.d,f);n.f=f;n.act=n.act0=T.act*(1+.15*(n.n-1));n.pas=T.pas*(1+.1*(n.n-1));n.dur=n.act+n.pas;n.st='work';R.tv++;
  if(f==='hot'&&n.who==='jill')coach(3)}   /* the first day's tip about the fire, when her first dish is on it — however she was sent */
 function wfCrew(id){return(S.crew||[]).find(m=>m.id===id)||null}
 /* a cook's way with a place: his own (3), one he is learning (2, 1), or none (0); drinks are everyone's and nobody's
@@ -6093,6 +6094,7 @@ function wfUpd(dt){if(!R)return;wfGather();const J=wfJ();const jt=wfJillTask();
  else J.moving=false;
  for(const id in R.wfc||{}){const n=wfNode(R.wfc[id]);if(!n||n.who!==id||!(n.st==='fetch'||n.st==='go'||n.st==='work')){delete R.wfc[id];continue}if(n.st!=='work'&&wfHere(n))wfArrive(n)}
  for(const n of wfList().slice()){
+  if(n.f==='hot'&&n.slot&&!n.flp&&(n.st==='work'||n.st==='cook')&&wfProg(n)>=.5&&wfLook(n.d).flip){n.flp=1;n.slot.flipT=.42}   /* a pan dish turned over half way, as before */
   if(n.st==='work'){if(n.act>0&&wfHere(n))n.act-=dt*wfSpeed(n.who,n.f,n.d);if(n.act<=0){n.act=0;n.sc.push(wfScore(n.who,n.f));if(n.pas>0){wfUnhand(n);n.st='cook';R.tv++}else wfStepDone(n)}}
   else if(n.st==='cook'){n.pas-=dt*wfPasSpeed(n);if(n.pas<=0){n.pas=0;wfStepDone(n)}}}
  if(R.t-(R.wfAi||0)>.2){R.wfAi=R.t;wfStaff()}}
@@ -6111,29 +6113,39 @@ function wfPlacesHTML(m){const sk=chefSkill(m);const W=['','會做','熟練','�
 function chefProf(m,f){if(f==='drink'||f==='serve')return 2;const fam=f==='pizza'?'oven':f;const sk=chefSkill(m),L=m.lv||1;
  if(fam===sk[0])return 3;if(fam===sk[1])return L>=3?2:L>=2?1:0;if(fam===sk[2])return L>=5?2:L>=4?1:0;return 0}
 /* ---- what the kitchen shows: the food where the work is, the same vessels and art as before ---- */
-/* what the dish's own recipe says about the look of each place: every ingredient (in order), the ones in the pan or the oven
-   while it cooks (before its last spell on the fire), the knife work of its prep when it has one before the fire (duck's
-   scoring, the soufflé's whites, cutting the vegetables — drawn on the board as before), and the last pour of a drink */
-function wfLook(d){const st=recipeOf(d)||[];const all=[],fire=[];let lastHeat=-1,firstHeat=-1,board=null,pour=null;
+/* what the dish's own recipe says about the look of each place: every ingredient (in order), the ones laid out at the prep
+   before anything meets the fire, the ones in the pan or the oven while it cooks (before its last spell on the fire), the
+   knife work of its prep when it has one before the fire (duck's scoring, the soufflé's whites, cutting the vegetables —
+   drawn on the board as before), the last pour of a drink, and each sauce or pour at the level the old gauge called right */
+function wfLook(d){const st=recipeOf(d)||[];const all=[],fire=[],pre=[],holds={};let lastHeat=-1,firstHeat=-1,board=null,pour=null;
  st.forEach((k,i)=>{const heat=k.t==='zone'||k.t==='wait'||(k.t==='work'&&!k.board);if(heat){lastHeat=i;if(firstHeat<0)firstHeat=i}});
- st.forEach((k,i)=>{const its=k.t==='add'?k.items.filter(x=>!x.startsWith('s_')):k.t==='dose'?Array(k.min||1).fill(k.ing):[];all.push(...its);if(i<lastHeat)fire.push(...its);
-  if(k.t==='work'&&k.board&&!board&&(firstHeat<0||i<firstHeat))board=k;if(k.t==='hold')pour=k.ing});
- return{all,fire:fire.length?fire:all,board,pour}}
+ st.forEach((k,i)=>{const its=k.t==='add'?k.items.filter(x=>!x.startsWith('s_')):k.t==='dose'?Array(k.min||1).fill(k.ing):k.t==='hold'?[k.ing]:[];all.push(...its);if(i<lastHeat)fire.push(...its);if(firstHeat<0||i<firstHeat)pre.push(...its);
+  if(k.t==='work'&&k.board&&!board&&(firstHeat<0||i<firstHeat))board=k;if(k.t==='hold'){pour=k.ing;holds[k.ing]=(k.a+k.b)/2}});
+ return{all,fire:fire.length?fire:all,pre:pre.length?pre:all,board,pour,holds,flip:st.some(k=>k.t==='zone'&&k.verb==='翻面')}}
+/* the hands' share of the step done, 0–1: how much has gone into the vessel so far */
+function wfHands(n){if(n.st==='ready'||n.st==='cook')return 1;if(n.st!=='work')return 0;const a0=n.act0||n.act||1;return clamp(1-n.act/a0,0,1)}
+/* what is in the vessel as the hands go: the dish's own ingredients one after another, a sauce or a pour (the old gauge's
+   steps — the cream, the custard, the pizza's sauce) poured in at its turn, at the level the old gauge called just right */
+function wfReveal(rj,list,u,L,v){const k=Math.min(list.length,Math.ceil(u*list.length));let adds=list.slice(0,Math.max(1,k)),pour=null;
+ if(u<1&&k>0&&L.holds[list[k-1]]!=null){const ing=list[k-1];adds=adds.slice(0,-1);pour={t:'hold',hold:true,ing,level:L.holds[ing]*clamp(u*list.length-(k-1),0,1),a:0,b:1,v}}
+ wfPoured(rj,adds,L);return pour}
+function wfPoured(rj,adds,L){rj.adds=adds;for(const ing of adds)if(L.holds[ing]!=null)applyHold(rj,{ing,level:L.holds[ing]})}
 function wfHasBoard(d){return !!wfLook(d).board}
 /* the vessel a dish is prepared in: its own, except a pan or a pot — the prep of a dish for the fire is laid out on a plate */
 function wfPrepVessel(d){const v=DISH(d).v;return v==='wok'||v==='pan'||v==='griddle'||v==='pot'?'plate':v}
 /* a stand-in for an old job, only for the renderers (drawStageFood, drawBoard, drawContents): every ingredient of the dish,
    the mixing, the board's knife work growing with the step */
 function wfRJ(n){const L=wfLook(n.d);if(!n.rj)n.rj={d:n.d,seed:n.seed,adds:[],mix:0,cut:true,side:1,sear:[1,1],fill:1,grind:.7,foam:.8,sauce:0,it:null,step:null,wf:1,lastZone:0};
- const rj=n.rj,f=n.f||wfFl(n)[n.si],done=n.st==='ready',p=done?1:wfProg(n);rj.it=n.its[0]?n.its[0].it:{want:1};
- if(f==='prep'){/* the board's knife work as before, or the dish's own vessel filling as it is put together */
-  rj.adds=L.all.slice(0,Math.max(1,Math.ceil(p*L.all.length)));rj.mix=0;rj.lastZone=0;
-  rj.step=L.board?Object.assign({},L.board,{t:'work',board:true,taps:Math.round(p*8),n:8,slice:false}):{t:'prep',v:wfPrepVessel(n.d)}}
- else if(f==='hot'){rj.adds=L.fire.slice();rj.mix=done?1:Math.max(.15,p);rj.lastZone=done?.95:Math.min(.95,p);
-  rj.step=n.st==='work'?{t:'work',anim:'toss'}:n.st==='cook'?{t:'wait',anim:'stir'}:null}
- else if(f==='oven'||f==='pizza'){rj.adds=L.fire.slice();rj.mix=1;rj.lastZone=n.st==='work'?0:done?.95:Math.min(.95,p);rj.fill=1;rj.step=null}
- else if(f==='drink'){rj.adds=L.all.slice();rj.mix=1;rj.fill=p;rj.step=n.st==='work'&&L.pour?{t:'hold',hold:true,ing:L.pour,level:Math.max(.2,p),a:.6,b:.9}:null}
- else{rj.adds=L.all.slice();rj.mix=1;rj.step=null}
+ const rj=n.rj,f=n.f||wfFl(n)[n.si],done=n.st==='ready',p=done?1:wfProg(n),u=done?1:wfHands(n);rj.it=n.its[0]?n.its[0].it:{want:1};
+ if(f==='prep'){/* the board's knife work as before, or the dish's own vessel filling as it is put together, sauces poured at their turn */
+  const pv=wfPrepVessel(n.d);const pour=wfReveal(rj,L.pre,p,L,pv);rj.mix=0;rj.lastZone=0;rj.side=0;rj.sear=[0,0];
+  rj.step=L.board?Object.assign({},L.board,{t:'work',board:true,taps:Math.round(p*8),n:8,slice:false}):pour||{t:'prep',v:pv}}
+ else if(f==='hot'){/* into the pan one after another while the hands are on it, then the fire */const pour=n.st==='work'?wfReveal(rj,L.fire,u,L,DISH(n.d).v):(wfPoured(rj,L.fire.slice(),L),null);
+  rj.mix=done?1:Math.max(.15,p);rj.lastZone=done?.95:Math.min(.95,p);if(L.flip){const up=done||!!n.flp;rj.side=up?1:0;rj.sear=[up?.72:0,0]}
+  rj.step=n.st==='work'?pour||{t:'work',anim:'toss'}:n.st==='cook'?{t:'wait',anim:'stir'}:null}
+ else if(f==='oven'||f==='pizza'){wfPoured(rj,L.fire.slice(),L);rj.mix=1;rj.lastZone=n.st==='work'?0:done?.95:Math.min(.95,p);rj.step=null}
+ else if(f==='drink'){wfPoured(rj,L.all.filter(x=>x!==L.pour||n.st!=='work'),L);rj.mix=1;rj.fill=p;rj.step=n.st==='work'&&L.pour?{t:'hold',hold:true,ing:L.pour,level:Math.max(.2,p),a:.6,b:.9}:null}
+ else{wfPoured(rj,L.all.slice(),L);rj.mix=1;rj.step=null}
  return rj}
 /* where a piece of work's food is drawn: on its board, burner, the oven's trivet or inside the oven, the machine */
 function wfFoodSpot(n,s){const h=slotHome(s);if(s.type==='prep')return{x:h.x,y:172,sc:wfHasBoard(n.d)?.4:.36};
@@ -7914,6 +7926,8 @@ function drawBoard(c,j,k,now,s){c.fillStyle='rgba(0,0,0,.28)';el(c,2,18,54,12);c
  else{const cols=jd==='salad'?['#7CBF4A','#D8392A','#9AC66A']:['#4E7F2E','#D6392E','#F2BE2E'];const whole=Math.max(0,3-Math.floor(p*3));for(let i=0;i<whole;i++){c.fillStyle=cols[i];el(c,-36+i*11,-3,7.5,5.5);gloss(c,-38+i*11,-5,2.5,1.2,.4)}const pieces=Math.floor(p*16);for(let i=0;i<pieces;i++){c.fillStyle=cols[i%3];c.save();c.translate(2+R0()*40,-11+R0()*15);c.rotate(R0()*3);c.fillRect(-2.6,-1.8,5.2,3.6);c.restore()}}
  if(jd!=='souffle'){const lift=(s.shake||0)*10;c.save();c.translate(-8,-18-lift);c.rotate(-.12);let kg=c.createLinearGradient(0,-8,0,6);kg.addColorStop(0,'#F4F6F7');kg.addColorStop(1,'#9AA4A8');c.fillStyle=kg;c.beginPath();c.moveTo(-20,4);c.lineTo(18,4);c.lineTo(18,-4);c.quadraticCurveTo(-6,-11,-20,4);c.fill();c.fillStyle='#3A2A20';rr(c,18,-3,17,7,3);c.fill();c.fillStyle='#C99A45';circ(c,23,.5,1);circ(c,30,.5,1);c.restore()}}
 function drawVesselBack(c,v){let g;switch(v){
+ case'board':/* the cheese plate's serving board, with its handle */c.fillStyle='rgba(0,0,0,.26)';el(c,2,12,46,9);c.fillStyle='#9A6534';rr(c,-44,-11,80,24,6);c.fill();rr(c,34,-8,14,12,4);c.fill();c.fillStyle='#C8965E';rr(c,-44,-15,80,24,6);c.fill();rr(c,34,-12,14,12,4);c.fill();c.fillStyle='#9A6534';circ(c,42,-6,2);
+  c.strokeStyle='rgba(120,70,30,.22)';c.lineWidth=.8;for(let i=0;i<3;i++){c.beginPath();c.moveTo(-40,-9+i*6);c.quadraticCurveTo(-4,-7+i*6,32,-10+i*6);c.stroke()}break;
  case'wok':c.fillStyle='rgba(0,0,0,.3)';el(c,0,10,50,16);c.fillStyle='#6B3A22';rr(c,40,-6,34,7,3);c.fill();c.fillStyle='#8A5230';c.fillRect(44,-5,26,2);c.fillStyle='#1E1E20';el(c,0,3,48,23);g=c.createRadialGradient(-10,-6,4,0,0,44);g.addColorStop(0,'#58585F');g.addColorStop(1,'#26262A');c.fillStyle=g;el(c,0,0,44,19);break;
  case'pan':case'griddle':c.fillStyle='rgba(0,0,0,.3)';el(c,0,10,50,15);c.fillStyle='#2A2A2C';rr(c,38,-4,36,7,3.5);c.fill();c.fillStyle='#46464C';c.fillRect(40,-3,30,1.5);c.fillStyle='#1B1B1D';el(c,0,3,46,21);g=c.createRadialGradient(-8,-6,4,0,0,42);g.addColorStop(0,'#4C4C52');g.addColorStop(1,'#2A2A2E');c.fillStyle=g;el(c,0,0,42,18);break;
  case'pot':c.fillStyle='rgba(0,0,0,.3)';el(c,0,28,44,10);g=c.createLinearGradient(-36,0,36,0);g.addColorStop(0,'#8C979C');g.addColorStop(.4,'#E8ECEE');g.addColorStop(1,'#7C878C');c.fillStyle=g;c.beginPath();c.moveTo(-36,-16);c.lineTo(36,-16);c.lineTo(34,24);c.ellipse(0,24,34,8,0,0,Math.PI);c.closePath();c.fill();c.fillStyle='#9AA4A8';rr(c,-49,-13,13,6,3);c.fill();rr(c,36,-13,13,6,3);c.fill();c.fillStyle='#CDD4D7';el(c,0,-16,36,11);c.fillStyle='#6E787C';el(c,0,-16,33,9.5);break;
@@ -7933,7 +7947,7 @@ function drawVesselFront(c,v){switch(v){
  case'pizzapan':c.strokeStyle='rgba(255,255,255,.2)';c.lineWidth=1.4;c.beginPath();c.ellipse(0,0,45,19,0,.25,Math.PI-.25);c.stroke();break;
  case'mold':c.fillStyle='rgba(230,240,245,.18)';c.fillRect(-30,-16,60,34);c.strokeStyle='rgba(255,255,255,.8)';c.lineWidth=1.4;c.strokeRect(-30,-16,60,34);c.fillStyle='rgba(255,255,255,.35)';c.fillRect(-27,-13,3,28);break}}
 function drawContents(c,j,v,now){const R0=rng(j.seed);
- if(v==='wok'||v==='pan'||v==='griddle'||v==='tray'||v==='plate'||v==='bowl'||v==='pizzapan'){c.save();if(v==='tray'){c.beginPath();c.rect(-45,-15,90,30);c.clip();c.scale(1,.62)}else{const rx=v==='bowl'?38:v==='plate'?40:42,ry=v==='bowl'?11:v==='plate'?16:18,oy=v==='bowl'?-7:0;c.beginPath();c.ellipse(0,oy,rx,ry,0,0,7);c.clip();c.translate(0,oy);c.scale(1,ry/rx)}drawTopLayers(c,j,R0,now,v);c.restore()}
+ if(v==='wok'||v==='pan'||v==='griddle'||v==='tray'||v==='plate'||v==='bowl'||v==='pizzapan'||v==='board'){c.save();if(v==='tray'||v==='board'){c.beginPath();if(v==='board')c.rect(-42,-14,76,22);else c.rect(-45,-15,90,30);c.clip();c.scale(1,.62)}else{const rx=v==='bowl'?38:v==='plate'?40:42,ry=v==='bowl'?11:v==='plate'?16:18,oy=v==='bowl'?-7:0;c.beginPath();c.ellipse(0,oy,rx,ry,0,0,7);c.clip();c.translate(0,oy);c.scale(1,ry/rx)}drawTopLayers(c,j,R0,now,v);c.restore()}
  else if(v==='pot')drawPot(c,j,R0,now);else if(v==='cup')drawCupC(c,j,R0,now);else if(v==='glass')drawGlassC(c,j,R0,now);else if(v==='mold')drawMoldC(c,j,R0,now);else if(v==='ramekin')drawRamekinC(c,j,R0,now)}
 function drawTopLayers(c,j,R0,now,v){const d=baseOf(j.d);const cnt=id=>j.adds.filter(x=>x===id).length;const k=j.step;
  if(v==='plate'&&j.sliced){/* rested and sliced, on the plate: the sauce pools under the slices as it is poured */const holding=k&&k.t==='hold';const lv=holding?k.level:(j.sauce||0);if(lv>0){c.fillStyle=holding?((ING[k.ing]||{}).c||'#8A3A1A'):(j.sauceC||'#8A3A1A');c.globalAlpha=.85;el(c,2,6,10+lv*22,5+lv*10);c.globalAlpha=1}if(d==='duck')duckSlices(c,0,-3,1.15);else steakSlices(c,0,-2,1.05,j.it&&j.it.want||1);if(d==='steak'){c.fillStyle='#F8E08E';rr(c,-24,-18,10,8,2);c.fill()}return}

@@ -442,24 +442,25 @@ def cooking_every_recipe(b, port, target):
     v2.5 (the new kitchen, docs/cooking/ARCHITECTURE.md §「改過的測試」): this used to drive every dish through its old
     station job. The dishes of the user's workflow table no longer have one — startCook says no and they go through their
     workflow instead, so the old loop reported them NO_SLOT. They are covered by cooking_every_family_goes_its_own_way
-    (each through exactly its workflow's places, Perfect from Jill). This test keeps the old path honest for the dishes
-    still on it: the two pizzas the table does not name (瑪格麗特、蘑菇白醬), until the user decides."""
+    (each through exactly its workflow's places, Perfect from Jill).
+
+    v2.5, 2026-10-08 (the user: 「我希望目前遊戲中所有既有料理都進入新的 Cooking workflow system……不要因為清單漏掉，就永久保留
+    舊 cooking state machine 當特殊例外」; 瑪格麗特、蘑菇白醬 — PREP → PIZZA OVEN → PLATING): the two pizzas were the last
+    recipes on the old path, so there is nothing left for the old loop to cook. What this test holds now is the user's rule
+    itself: every dish in the game — the restaurant's, the Lounge's, the three pizzas, every special version, the
+    signature dish and the signature dessert — is on the new kitchen, and the old station job takes none of them. A dish
+    added later without a workflow fails here."""
     g = Game(b, port, target, seed=5, manual=True)
-    g.ev("S.level=5;S.eq.oven=3;S.eq.bar=3;S.eq.prep=1;S.eq.fridge=3;S.rooms=S.rooms||{};S.rooms.pizzaoven=1;for(const d in DISHES)if(!S.unlocked.includes(d))S.unlocked.push(d);S.signature={base:'mash',protein:'duck',sauce:'redwine',side:'asparagus',name:'Test Sig'}")
+    g.ev("S.level=5;S.eq.oven=3;S.eq.bar=3;S.eq.prep=1;S.eq.fridge=3;S.rooms=S.rooms||{};S.rooms.pizzaoven=1;for(const d in DISHES)if(!S.unlocked.includes(d))S.unlocked.push(d);S.signature={base:'mash',protein:'duck',sauce:'redwine',side:'asparagus',name:'Test Sig'};S.sigDessert={base:'pannacotta',cream:'mascarpone',fruit:'berries',finish:'caramel',name:'試作'}")
     g.click('[data-act=open]'); start_day(g)
-    res = g.ev(r"""(()=>{const out={};const ids=Object.keys(DISHES).concat(['signature']).filter(d=>!isWF(d));
+    res = json.loads(g.ev(r"""JSON.stringify((()=>{const ids=Object.keys(DISHES).concat(['signature','sigdessert']);const old=ids.filter(d=>!isWF(d));const took=[];
       for(const d of ids){R.tickets=[];for(const s of R.slots)s.job=null;const g0={name:'T',size:1,table:0,state:'wait',pat:1,type:'office',looks:[]};
-        const it={d,st:'pending',q:null,want:d==='steak'?1:0,picked:false};const tk={id:999,no:1,g:g0,items:[it],t0:R.t};R.tickets.push(tk);
-        if(!startCook(tk,it,true)){out[d]='NO_SLOT';continue}
-        const s=R.slots.find(x=>x.job&&x.job.it===it);let guard=0;
-        while(it.st==='cooking'&&guard++<4000){const j=s.job;if(!j)break;const k=j.step;
-          if(k.t==='add')actIng(s,k.left[0]);else if(k.t==='tap')actTap(s);else if(k.t==='zone'){if(k.p>=k.z.c)actZone(s);else updJob(s,1/30)}
-          else if(k.t==='hold'){k.hold=true;R.holdSlot=s;k.level=(k.a+k.b)/2;holdEnd()}else if(k.t==='dose'){if(k.cnt<k.min)actDose(s);else actDoseDone(s)}else updJob(s,1/30);R.t+=1/30}
-        out[d]=it.st==='ready'?it.q:('STUCK:'+it.st)}
-      return out})()""")
-    bad = {k: v for k, v in res.items() if v != 'P'}
-    check(not bad, f'recipes not finishing PERFECT with perfect input: {bad}')
-    check(len(res) == g.ev("Object.keys(DISHES).concat(['signature']).filter(d=>!isWF(d)).length") and sorted(res) == ['pzfungi', 'pzmarg'], f'every recipe still on the old path tested: {sorted(res)}')
+        const it={d,st:'pending',q:null,want:0,picked:false};const tk={id:999,no:1,g:g0,items:[it],t0:R.t};R.tickets.push(tk);if(startCook(tk,it,true))took.push(d)}
+      R.tickets=[];for(const s of R.slots)s.job=null;return{n:ids.length,old,took,specials:Object.keys(SPECIALS).map(b=>SPECIALS[b].id).filter(d=>!isWF(d))}})())"""))
+    check(not res['old'], f'dishes still on the old station jobs: {res["old"]}')
+    check(not res['took'], f'the old station job still takes: {res["took"]}')
+    check(not res['specials'], f'special versions off the new kitchen: {res["specials"]}')
+    check(res['n'] >= 34 + 2, f'every dish counted (the restaurant\'s, the Lounge\'s, the pizzas, the specials, the two signatures): {res["n"]}')
     check(not g.errors, g.errors)
     g.close()
 
@@ -997,44 +998,34 @@ def cooking_flow_families(b, port, target):
 
     v2.5 (the new kitchen, docs/cooking/ARCHITECTURE.md §「改過的測試」): the families are now the user's workflow table
     (cooking_workflow_canon_2026-10-07.txt) — waiting, flipping and draining are never steps, nothing burns, no timing —
-    so the old shapes no longer exist for those dishes. What this test holds now:
-    - the dishes the old shapes named are on the new kitchen with the user's workflow (steak/burger/duck 備料→熱區→裝盤,
-      soup/risotto 熱區→裝盤, salad/prosciutto/tiramisu 備料→裝盤, salmon/chicken 備料→烤箱→裝盤, coffee 飲料→出杯);
-    - the recipes still on the old path (the two pizzas the table does not name) keep the old rules: 2–5 interactions,
-      no tap-repeat, Perfect with perfect input, the sauce gauge (hold) and the bake (zone);
-    - and the old forgiveness on their bake: late but not forgotten is Okay, forgotten burns (the burger it used to be
-      tried on has no pan step any more)."""
+    so the old shapes no longer exist for those dishes. What this test holds: the dishes the old shapes named are on the
+    new kitchen with the user's workflow (steak/burger/duck 備料→熱區→裝盤, soup/risotto 熱區→裝盤,
+    salad/prosciutto/tiramisu 備料→裝盤, salmon/chicken 備料→烤箱→裝盤, coffee 飲料→出杯).
+
+    v2.5, 2026-10-08: until tonight the two pizzas the table did not name were still on the old path, and this test also
+    held the old rules on them (2–5 interactions, no tap-repeat, the sauce gauge, the bake forgiven when a little late and
+    burnt when forgotten). The user put them in the bar pizza's family (「瑪格麗特披薩 — PREP → PIZZA OVEN → PLATING；
+    蘑菇白醬披薩 — PREP → PIZZA OVEN → PLATING……PREP 自動包含餅皮整形、抹醬、起司與配料組裝……PIZZA OVEN 自動包含烘烤
+    與等待……這些內部動作可以有動畫，但不增加玩家 step」), so no recipe has a gauge, a timing or a burn any more. The
+    three pizzas' workflow is held here instead, and that the sauce is still seen going on at the prep (the old gauge's
+    step, now Jill's hands)."""
     g = Game(b, port, target, seed=5, manual=True)
     g.ev("S.level=5;S.eq.oven=3;S.eq.bar=3;S.eq.prep=1;S.eq.fridge=3;S.rooms=S.rooms||{};S.rooms.pizzaoven=1;for(const d in DISHES)if(!S.unlocked.includes(d))S.unlocked.push(d);S.signature={base:'mash',protein:'duck',sauce:'redwine',side:'asparagus',name:'Test Sig'}")
     g.click('[data-act=open]'); start_day(g)
-    flows = json.loads(g.ev("JSON.stringify(Object.fromEntries(['steak','burger','duck','soup','risotto','salad','prosciutto','tiramisu','salmon','chicken','coffee'].map(d=>[d,(wfFlow(d)||[]).join('>')])))"))
+    names = ['steak', 'burger', 'duck', 'soup', 'risotto', 'salad', 'prosciutto', 'tiramisu', 'salmon', 'chicken', 'coffee', 'pizza', 'pzmarg', 'pzfungi']
+    flows = json.loads(g.ev("JSON.stringify(Object.fromEntries(%s.map(d=>[d,(wfFlow(d)||[]).join('>')])))" % json.dumps(names)))
     want = {'steak': 'prep>hot>plate', 'burger': 'prep>hot>plate', 'duck': 'prep>hot>plate', 'soup': 'hot>plate', 'risotto': 'hot>plate',
             'salad': 'prep>plate', 'prosciutto': 'prep>plate', 'tiramisu': 'prep>plate', 'salmon': 'prep>oven>plate', 'chicken': 'prep>oven>plate',
-            'coffee': 'drink>serve'}
+            'coffee': 'drink>serve', 'pizza': 'prep>pizza>plate', 'pzmarg': 'prep>pizza>plate', 'pzfungi': 'prep>pizza>plate'}
     check(flows == want, f'the families are the user\'s workflows now: {flows}')
-    res = g.ev(r"""(()=>{const out={};const ids=Object.keys(DISHES).concat(['signature']).filter(d=>!isWF(d));
-      for(const d of ids){R.tickets=[];for(const s of R.slots)s.job=null;const g0={name:'T',size:1,table:0,state:'wait',pat:1,type:'office',looks:[]};
-        const it={d,st:'pending',q:null,want:d==='steak'?1:0,picked:false};const tk={id:999,no:1,g:g0,items:[it],t0:R.t};R.tickets.push(tk);
-        if(!startCook(tk,it,true)){out[d]={q:'NO_SLOT'};continue}
-        const s=R.slots.find(x=>x.job&&x.job.it===it);let guard=0,n=0;const kinds=new Set();let waitT=0;
-        while(it.st==='cooking'&&guard++<6000){const j=s.job;if(!j)break;const k=j.step;kinds.add(k.t);
-          if(k.t==='add'){actIng(s,k.left[0]);n++}else if(k.t==='tap'){actTap(s);n++}else if(k.t==='zone'){if(k.p>=k.z.c){actZone(s);n++}else updJob(s,1/30)}
-          else if(k.t==='hold'){k.hold=true;R.holdSlot=s;k.level=(k.a+k.b)/2;holdEnd();n++}else if(k.t==='dose'){if(k.cnt<k.min){actDose(s);n++}else{actDoseDone(s);n++}}else{updJob(s,1/30);waitT+=1/30}R.t+=1/30}
-        out[d]={q:it.st==='ready'?it.q:('STUCK:'+it.st),n,kinds:[...kinds],waitT:+waitT.toFixed(1),cat:DISH(d).cat,st:DISH(d).st}}
-      return out})()""")
-    check(sorted(res) == ['pzfungi', 'pzmarg'], f'the recipes still on the old path: {sorted(res)}')
-    bad = {k: v['q'] for k, v in res.items() if v['q'] != 'P'}
-    check(not bad, f'recipes not finishing PERFECT with perfect input: {bad}')
-    check(not any('tap' in v['kinds'] for v in res.values()), 'a recipe still uses tap-repeat steps')
-    counts = {k: v['n'] for k, v in res.items() if k != 'signature'}
-    check(all(2 <= n <= 5 for n in counts.values()), f'interactions outside 2–5: {counts}')
-    check(all('hold' in v['kinds'] and 'zone' in v['kinds'] for v in res.values()), f'the old pizzas keep the sauce gauge and the bake: {res}')
-    # forgiveness on the bake: late but not forgotten -> Okay, forgotten -> burnt
-    r = g.ev(r"""(()=>{const out={};for(const p of[1.1,1.3]){R.tickets=[];for(const s of R.slots)s.job=null;const g0={name:'T',size:1,table:0,state:'wait',pat:1,type:'office',looks:[]};
-      const it={d:'pzmarg',st:'pending',q:null,want:0,picked:false};const tk={id:998,no:1,g:g0,items:[it],t0:R.t};R.tickets.push(tk);startCook(tk,it,true);const s=R.slots.find(x=>x.job&&x.job.it===it);
-      actIng(s,'dough');{const k=s.job.step;k.hold=true;R.holdSlot=s;k.level=(k.a+k.b)/2;holdEnd()}actIng(s,'freshmoz');const k=s.job.step;k.p=p;actZone(s);out[p]={burnt:!!(s.job&&s.job.burnt)||it.q==='B',q:it.q,st:it.st}}return out})()""")
-    check(not r['1.1']['burnt'], f'a slightly late bake should be forgiven, not burnt: {r}')
-    check(r['1.3']['burnt'], f'a forgotten pizza should burn: {r}')
+    check(not g.ev("Object.keys(DISHES).concat(['signature']).filter(d=>!isWF(d)).length"), 'no recipe is left with the old gauges and timings')
+    # the pizzas' sauce at the prep: poured on part of the way through Jill's hands, there at the end
+    r = json.loads(g.ev(r"""JSON.stringify(['pzmarg','pzfungi','pizza'].map(d=>{const n=wfNew(d);n.f='prep';n.st='work';const T=wfTimes(d,'prep');n.act0=T.act;n.dur=T.act;n.its=[{tk:null,it:{d,want:0}}];
+      const at=u=>{n.act=T.act*(1-u);const rj=wfRJ(n);return{pour:rj.step&&rj.step.t==='hold'?rj.step.ing:null,adds:rj.adds.slice(),sauce:rj.sauce}};const seen=[.2,.4,.5,.6].map(at).find(x=>x.pour);n.st='ready';n.act=0;const end=wfRJ(n);
+      return{d,pour:seen&&seen.pour,end:end.adds.slice(),sauce:end.sauce}}))"""))
+    for x in r:
+        sk = 'pzwhite' if x['d'] == 'pzfungi' else 'pzsauce'
+        check(x['pour'] == sk and sk in x['end'] and x['sauce'] > .5, f'{x["d"]}: the sauce should be spread at the prep, and stay: {x}')
     check(not g.errors, g.errors)
     g.close()
 
@@ -1047,10 +1038,15 @@ def kitchen_staff_ladder(b, port, target):
     v2.5 (docs/cooking/ARCHITECTURE.md §「改過的測試」): the take-over half drove fried rice and seafood pasta through old
     station jobs, which those dishes no longer have. In the new kitchen nobody takes over a step half done — the user's
     hand-offs happen between steps, to whoever can do the next one — so the level ladder is what decides: a LV1 cook
-    leaves seafood pasta (a LV3 dish) alone, at LV3 he takes it. The old take-over rule is still held for the recipes on
-    the old path (瑪格麗特披薩: LV1 leaves what Jill started, LV3 carries it on)."""
+    leaves seafood pasta (a LV3 dish) alone, at LV3 he takes it.
+
+    v2.5, 2026-10-08: the old take-over rule (a LV3 cook carries on a dish Jill started) was still held on the margherita
+    while it was on the old path; the user moved it to the new kitchen, and the user's hand-off rule replaces that one
+    (「交接只發生在 step boundary……不做 mid-step takeover」): while Jill is putting the pizza together at the prep board, the
+    cook who stands by leaves it to her (c); when her step is done, the cook whose place is the oven takes it to the pizza
+    oven (d)."""
     g = Game(b, port, target, seed=12, manual=True)
-    g.ev("S.rooms=S.rooms||{};S.rooms.pizzaoven=1;S.level=5;S.eq.stove=3;S.eq.oven=3;S.eq.bar=3;S.eq.prep=1;for(const d in DISHES)if(!S.unlocked.includes(d))S.unlocked.push(d);S.signature={base:'mash',protein:'duck',sauce:'redwine',side:'asparagus',name:'Sig'};S.xp={friedrice:30,seafood:30,burger:30};S.crew=[{id:'c1',role:'chef',name:'阿德',lv:1,duty:'stove'}]")
+    g.ev("S.rooms=S.rooms||{};S.rooms.pizzaoven=1;S.level=5;S.eq.stove=3;S.eq.oven=3;S.eq.bar=3;S.eq.prep=1;for(const d in DISHES)if(!S.unlocked.includes(d))S.unlocked.push(d);S.signature={base:'mash',protein:'duck',sauce:'redwine',side:'asparagus',name:'Sig'};S.xp={friedrice:30,seafood:30,burger:30};S.crew=[{id:'c1',role:'chef',name:'阿德',lv:1,duty:'stove'},{id:'c2',role:'chef',name:'Marco',lv:1,duty:'oven'}]")
     r = g.ev("(()=>{const m=S.crew[0];const at=lv=>{m.lv=lv;return{fr:chefCan(m,'friedrice'),pasta:chefCan(m,'pasta'),seafood:chefCan(m,'seafood'),sig:chefCan(m,'signature')}};return{l1:at(1),l2:at(2),l3:at(3),l5:at(5)}})()")
     check(r['l1'] == {'fr': True, 'pasta': False, 'seafood': False, 'sig': False}, f'LV1 chef scope wrong: {r}')
     check(r['l3']['seafood'] and not r['l3']['sig'] and r['l5']['sig'], f'LV3+/signature scope wrong (rc8: LV5 cooks the signature, first time or not): {r}')
@@ -1061,10 +1057,12 @@ def kitchen_staff_ladder(b, port, target):
       /* the new kitchen: seafood pasta waits for its prep; the LV1 cook leaves it, the LV3 cook takes it */
       m.lv=1;const w=tkOf('seafood');wfGather();const n=wfOf(w.it);run(45);const a=!!n&&n.st==='wait'&&!n.who;
       m.lv=3;run(45);const b=!!n&&(n.who===m.id||n.st!=='wait');
-      /* the old path: a pizza Jill started — LV1 leaves it, LV3 carries it on */
-      R.wf=[];for(const s of R.slots){s.wf=null;s.job=null}R.wfc={};m.duty='pizza';const o=tkOf('pzmarg');startCook(o.tk,o.it,true);const s1=R.slots.find(x=>x.job&&x.job.it===o.it);
-      m.lv=1;const c=!!s1&&!!chefHandles(s1);m.lv=3;const d=!!s1&&!!chefHandles(s1);return{a,b,c,d}})()""")
-    check(r == {'a': True, 'b': True, 'c': False, 'd': True}, f'the ladder in the new kitchen (a, b) and the old take-over rule on the old path (c, d): {r}')
+      /* a pizza Jill puts together: nobody takes it from her half way (c); at the step's end the oven's cook takes it on (d) */
+      for(const x of wfList())wfUnhand(x);R.wf=[];for(const s of R.slots){s.wf=null;s.job=null}for(const s of wfPassSlots())s.wf=null;R.wfc={};R.tickets=[];
+      const mc=S.crew[1];const o=tkOf('pzmarg');wfGather();const p=wfOf(o.it);const sent=!!p&&wfAssign(p,'jill');let c=sent,d=false;
+      for(let i=0;i<600&&p;i++){__tick(1000/30);if(p.who===mc.id||p.si>=1){d=p.who===mc.id||(p.ck||[]).includes(mc.id);break}if(p.st!=='ready'&&p.who!=='jill')c=false}
+      return{a,b,c,d}})()""")
+    check(r == {'a': True, 'b': True, 'c': True, 'd': True}, f'the ladder in the new kitchen (a, b), and the hand-off at the step\'s end, never half way (c, d): {r}')
     check(not g.errors, g.errors)
     g.close()
 
@@ -1724,8 +1722,11 @@ def hold_recipes_never_lock_the_game(b, port, target):
 
     v2.5 (docs/cooking/ARCHITECTURE.md §「改過的測試」): the dishes of the user's workflow table have no hold any more (no
     gauge, no timing); they are made through their workflow on the same rendered frame loop — the drinks' pour is drawn by
-    the same code that once threw — and must come out with the loop and the clock still going. The real hold-button
-    presses are kept for the recipes still on the old path (the two pizzas, their sauce)."""
+    the same code that once threw — and must come out with the loop and the clock still going.
+
+    v2.5, 2026-10-08: the real hold-button presses were kept for the two pizzas while they were on the old path; the user
+    moved them to the new kitchen (PREP → PIZZA OVEN → PLATING), so they too are made through their workflow here — the
+    sauce now spread by Jill's hands at the prep, drawn by the same pour code — and no recipe has a hold button left."""
     for d in HOLD_DISHES + ['pzmarg', 'pzfungi']:
         g = Game(b, port, target, seed=3, manual=True)
         install_bot(g)
@@ -2603,10 +2604,14 @@ def c_restock_shortcuts_respect_both_the_fridge_and_the_money(b, port, target):
 @test
 def d_service_speed_scales_the_whole_simulation_and_keeps_hand_timing_fair(b, port, target):
     """D. 0.75×/1×/1.5×/2×: the clock, the cooks and the guests all take the same scaled time; the choice is kept in the
-    save and shown on the clock chip; on Jill's own tray the zone gauge never runs faster than 1.5× real time."""
+    save and shown on the clock chip; on Jill's own tray the zone gauge never runs faster than 1.5× real time.
+
+    v2.5, 2026-10-08 (docs/cooking/ARCHITECTURE.md §「改過的測試」): the hand-timing half was held on the margherita's bake,
+    the last timing step left; the user moved the two pizzas to the new kitchen (PREP → PIZZA OVEN → PLATING), where
+    waiting is never a step and nothing asks for a timing. The 1.5× cap was there so a player could still hit a gauge at
+    2×; with no gauge left there is nothing for it to keep fair. What is held now: no dish asks Jill for a timing, and
+    her hands on a step follow the clock like the cooks' and the guests' (the same work per clock second at 1× and 2×)."""
     g = Game(b, port, target, seed=37, manual=True)
-    # v2.5 (docs/cooking/ARCHITECTURE.md §「改過的測試」): the new kitchen has no timing step (waiting is never a step), so
-    # the hand-timing half is held on a dish still cooked the old way — the margherita's bake in the pizza oven
     player30(g); g.ev("S.rooms=S.rooms||{};S.rooms.pizzaoven=1"); start_day(g); install_bot(g); g.ev("window.__act=()=>{}")
     def clock_per_second(v):
         g.ev(f"setSpeed({v})"); g.page.evaluate('()=>{for(let i=0;i<5;i++)window.__tick(1000/30)}')
@@ -2616,16 +2621,20 @@ def d_service_speed_scales_the_whole_simulation_and_keeps_hand_timing_fair(b, po
     check(json.loads(g.ev("localStorage.getItem(KEY)"))['speed'] == 1.5, 'the chosen speed must be saved')
     check('1.5' in g.ev("document.querySelector('#hClock').textContent"), 'the clock chip should show the speed')
     g.ev("cycleSpeed()"); check(g.ev("simSpeed()") == 2 and g.ev("S.speed") == 2, 'the chip cycles to the next speed')
-    # hand timing: a zone step on Jill's own stove advances at 1.5× while the clock runs at 2×
-    g.ev("setSpeed(2);(()=>{R.sched=[];R.si=0;R.groups=[];const g0={id:R.gid++,type:'office',size:1,looks:makeLooks('office',1),name:'測試',state:'wait',table:0,pat:1,room:'main',troom:'main',x:200,y:200,tx:200,ty:200,timer:0,ticket:null,seed:1,mood:'ok'};R.groups.push(g0);R.tables[0].group=g0;const tk={id:R.tkid++,no:1,g:g0,items:[{d:'pzmarg',st:'pending',q:null,want:1}],t:R.t};g0.ticket=tk;R.tickets.push(tk);S.stock.steak=5;for(const m of S.crew)if(m.role==='chef')m.duty='bar';startCook(tk,tk.items[0],true)})()")
-    g.ev("(()=>{const s=R.slots.find(x=>x.job);const j=s.job;j.chef=null;j.adds.push('dough','freshmoz');enterStep(j,3);j.si=3})()")
-    check(g.ev("(()=>{const s=R.slots.find(x=>x.job);return s.job.step.t==='zone'&&!chefHandles(s)})()"), 'the fixture should have Jill on a zone step')
-    t0 = g.ev("R.t"); p0 = g.ev("R.slots.find(x=>x.job).job.step.p")
-    g.page.evaluate('()=>{for(let i=0;i<30;i++)window.__tick(1000/30)}')
-    dtc = g.ev("R.t") - t0; dp = g.ev("R.slots.find(x=>x.job).job.step.p") - p0
-    sp = g.ev("dishSpeed('pzmarg','pizza')"); ktime = g.ev("R.slots.find(x=>x.job).job.step.time")
-    expected_full = dtc * sp / ktime      # if the gauge followed the 2× clock
-    check(dp < expected_full * .85 and dp > expected_full * .6, f'at 2× the zone gauge should advance at 1.5× (got {dp:.3f} vs full-speed {expected_full:.3f})')
+    check(not g.ev("Object.keys(DISHES).concat(['signature']).filter(d=>!isWF(d)).length"), 'no dish asks Jill for a timing any more')
+    # Jill's hands on the margherita's prep: the same work per clock second at 1× and at 2×
+    g.ev("(()=>{R.sched=[];R.si=0;R.groups=[];R.fire=0;const g0={id:R.gid++,type:'office',size:1,looks:makeLooks('office',1),name:'測試',state:'wait',table:0,pat:1,room:'main',troom:'main',x:200,y:200,tx:200,ty:200,timer:0,ticket:null,seed:1,mood:'ok'};R.groups.push(g0);R.tables[0].group=g0;const tk={id:R.tkid++,no:1,g:g0,items:[{d:'pzmarg',st:'pending',q:null,want:1}],t:R.t};g0.ticket=tk;R.tickets.push(tk);S.stock.pzmarg=5;wfGather();const n=wfOf(tk.items[0]);window.__pz=n;wfAssign(n,'jill')})()")
+    for _ in range(300):
+        if g.ev("__pz.st==='work'&&wfHere(__pz)"): break
+        g.page.evaluate('()=>{window.__tick(1000/30)}')
+    check(g.ev("__pz.st==='work'&&__pz.who==='jill'"), f'Jill should be at the prep board with the pizza: {g.ev("JSON.stringify({st:__pz.st,who:__pz.who})")}')
+    g.ev("__pz.act=__pz.act0=99")   # a long step, so both speeds are measured on the same work
+    def hands_per_clock(v):
+        g.ev(f"setSpeed({v})"); t0 = g.ev("R.t"); a0 = g.ev("__pz.act")
+        g.page.evaluate('()=>{for(let i=0;i<30;i++)window.__tick(1000/30)}')
+        return (a0 - g.ev("__pz.act")) / max(1e-6, g.ev("R.t") - t0)
+    h1, h2 = hands_per_clock(1), hands_per_clock(2)
+    check(h1 > 0 and abs(h2 / h1 - 1) < .1, f'Jill\'s hands should follow the clock at any speed: {h1:.3f} at 1×, {h2:.3f} at 2× (per clock second)')
     g.ev("setSpeed(1)")
     check(not g.errors, g.errors)
     g.close()
