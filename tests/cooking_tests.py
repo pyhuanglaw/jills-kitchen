@@ -140,6 +140,39 @@ def cooking_every_drink_is_its_own_cup(b, port, target):
 
 
 @test
+def cooking_the_bar_holds_one_cup_two_with_the_double_group_head_four_with_kitchen_ii(b, port, target):
+    """How many cups at once is the coffee machine's (the user, 2026-10-09, choosing 「方案 2，讓料理與飲料設備的升級有真正的
+    經營意義」 — the 2026-10-07 capacity rule's DRINK 1 → 2 → 4, 「不要改成 3」): Day 2's machine holds one cup, so a second
+    latte waits (等空位) until the first is taken off the machine; the double group head (LV3) holds two; kitchen II's second
+    machine two more. The shop says it the same way — 同時 N 杯, never 「一次 N 杯」, which reads as one press making N cups."""
+    g = _day(b, port, target, 7132, "S.eq.bar=1;if(!S.unlocked.includes('coffee'))S.unlocked.push('coffee');if(!S.menu.includes('coffee'))S.menu.push('coffee');")
+    g.ev("window.__k=function(n){for(let i=0;i<n;i++){for(const q of R.groups)q.pat=1;__tick(1000/30)}}")
+    cups = json.loads(g.ev("JSON.stringify((()=>{const k2=S.rooms.kitchen2;const out=[];for(const k of [0,1]){S.rooms.kitchen2=k;out.push([1,2,3,5].map(barCups))}S.rooms.kitchen2=k2;return out})())"))
+    check(cups == [[1, 1, 2, 2], [3, 3, 4, 4]], f'the bar: 1, 2 with the double group head, 2 more with kitchen II: {cups}')
+    shop = json.loads(g.ev("JSON.stringify([1,3].map(l=>EQUIP.find(e=>e.k==='bar').d(l)))"))
+    check('同時 1 杯' in shop[0] and '雙沖煮頭，同時 2 杯' in shop[1] and not any('一次' in t for t in shop), f'the shop says how many at the same time: {shop}')
+    k2 = g.ev("JSON.stringify(PROJECTS.concat(KITCHEN_WORKS).find(p=>p.k==='kitchen2'))")
+    check('一次' not in k2 and '最多同時 4 杯' in k2, f'kitchen II says it the same way: {k2[:160]}')
+    check(g.ev("R.slots.filter(s=>s.type==='bar').length") == 1, 'Day 2\'s machine: one place')
+    check(_wait_orders(g, 1), 'a table is in')
+    g.ev("__addOrders(2,'coffee');wfGather()")
+    ids = json.loads(g.ev("JSON.stringify(wfList().filter(n=>n.d==='coffee').map(n=>n.id))"))
+    check(len(ids) == 2, f'two lattes, two pieces of work: {ids}')
+    _tap_slot(g, "R.slots.find(s=>s.type==='bar')")
+    a = next(i for i in ids if g.ev(f"wfNode({i}).who") == 'jill'); bb = next(i for i in ids if i != a)
+    g.ev("__k(6)")
+    _tap_slot(g, "R.slots.find(s=>s.type==='bar')")
+    check(not g.ev(f"wfNode({bb}).who") and '等空位' in g.ev(f"wfState(wfNode({bb}))"), f'the second latte waits for the place: {g.ev(f"wfState(wfNode({bb}))")}')
+    check(_until(g, f"wfNode({a}).st==='ready'", step=2), 'the first latte is done')
+    check(not g.ev(f"wfNode({bb}).who") and g.ev(f"wfNode({bb}).st") == 'wait', 'the second has not started: the cup is still on the machine')
+    g.ev(f"wfAssign(wfNode({a}),'jill')")   # 送飲料: Jill takes it off the machine
+    check(_until(g, f"(()=>{{const n=wfNode({a});return !n||n.carry}})()", step=1), 'the first latte is off the machine')
+    _tap_slot(g, "R.slots.find(s=>s.type==='bar')")
+    check(g.ev(f"wfNode({bb}).who") == 'jill', f'now the second one is made: {g.ev(f"wfState(wfNode({bb}))")}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
 def cooking_a_drink_batch_from_an_older_checkpoint_becomes_its_cups(b, port, target):
     """A service saved before every cup was its own (2026-10-09) can hold a batch of drinks: one nobody has started comes
     back as its cups, one under way finishes as it is (nothing made twice, nothing lost). And a checkpoint from a kitchen
