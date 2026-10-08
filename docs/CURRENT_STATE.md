@@ -60,8 +60,10 @@
 - **料理流程 prototype**（branch `proto/cooking-flow`，`prototype/cooking/`）：獨立試玩頁，不是遊戲本體。使用者 2026-10-07：不合併、
   不發布、現在不要再做；之後重新開始時，以正式遊戲原本的廚房畫面為底，不重新設計美術。私人連結 https://claude.ai/artifact/EBzi6qETraguAApvettBFe 。
 
-- **新的料理系統**（branch `feature/cooking-gameplay`）：使用者 2026-10-07 的規格（`docs/v24/cooking_*.txt`，在那條 branch 上）。
-  開發中，不發布到玩家版；做到哪裡寫在那條 branch 的 `docs/cooking/ARCHITECTURE.md`。
+- **新的料理系統**（branch `feature/cooking-gameplay`）：使用者 2026-10-07、10-08 的規格（`docs/v24/cooking_*.txt`，在那條 branch 上）。
+  開發中，不發布到玩家版；做到哪裡寫在那條 branch 的 `docs/cooking/ARCHITECTURE.md`，2026-10-08 早上的報告
+  `docs/cooking/MORNING_REPORT_2026-10-08.md`。私人測試版（不是正式版，存檔分開）https://claude.ai/artifact/TQpEqEFgqUW6jUm2Gfnhbg ，
+  用 `tools/qa/cooking_test_build.py` 建、發布到同一個網址。
 
 - **2026-10-06 全面 Audit 與例行 QA**（已合回 `main`，使用者 2026-10-06「Audit 這套 QA 工具和測試我同意合回 main」；沒有改遊戲、沒有發布）：報告 `docs/audit/2026-10-06/README.md`；
   例行 QA `python3 tests/run_tests.py --qa`（`docs/QA.md`）；全面 Audit 的做法 `docs/audit/PLAYBOOK.md`。Audit 找到、還沒修的問題，
