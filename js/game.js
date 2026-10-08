@@ -3990,6 +3990,7 @@ function xqPickSpot(h){const n=h.spots=(h.spots||0)+1;const ts=R.tables.filter(t
 function xqHelperUpd(dt){const h=R.xqh;
  if(!h){if((R.closed||R.t>=R.dur*.92||(!fact('xq_helper')&&S.day===1&&R.tables.some(t=>t.dirty&&!t.group)))&&!R.xqhDone&&xqHelperToday()){   /* Workflow B (the user, 2026-10-08: 「她說來幫忙，就真的有幫忙」): her first evening (Day 1) she comes in when the first table is done, and helps the rest of it */R.xqhDone=1;const sp=xqPickSpot({});R.xqh={x:FR.enter.x,y:FR.enter.y,room:'front',troom:'main',tx:sp.x,ty:sp.y,spot:sp,spotT:R.t+30,arriving:1,face:1,step:0,moving:true,busy:0,task:null,next:null}}return}
  const v=110*dt;
+ if(!h.leaving&&!h.arriving)wlCrew('xq','xq',h,dt);   /* Workflow B telemetry */
  if(h.leaving){if(handsN(h,'dirty')){ddDeposit(h);if(ddWasher()==='xq')ddWashEnd(h)}h.tx=FR.exit.x;h.ty=FR.exit.y;h.troom='front';h.wipe=0;if(stepTo(h,v))R.xqh=null;else{h.moving=true;h.step+=dt*12}return}
  if(h.arriving){if(stepTo(h,v)){h.arriving=0;h.moving=false;xqHelperArrived()}else{h.moving=true;h.step+=dt*12}return}
  /* the pass wiped, the chairs up: a while into the closing she goes home */
@@ -6051,7 +6052,10 @@ function wfRowOK(n){const k=wfRowNeed(n);return !k||wfRowFree()>=k}
 function passLoad(){return R?(wfRowUsed().size+wfRowRes())/wfRowN():0}
 /* the pass over the evening, for the simulation's numbers (R.st.ps, kept with the day): seconds watched, plate-seconds on it
    (the plates waiting for the floor), the most at once, the seconds it was full */
-function passSample(dt){if(!R||R.closed||!R.st)return;const s=R.st.ps||(R.st.ps={t:0,occ:0,peak:0,full:0});const u=wfRowUsed().size;s.t+=dt;s.occ+=u*dt;if(u>s.peak)s.peak=u;if(u+wfRowRes()>=wfRowN())s.full+=dt}
+function passSample(dt){if(!R||R.closed||!R.st)return;const s=R.st.ps||(R.st.ps={t:0,occ:0,peak:0,full:0});const u=wfRowUsed().size;s.t+=dt;s.occ+=u*dt;if(u>s.peak)s.peak=u;if(u+wfRowRes()>=wfRowN())s.full+=dt;
+ /* plates at the pass nobody has come for yet (plate-seconds), and the part of it when every waiter who serves is busy with something else */
+ let n=0;for(const tk of R.tickets)if(!tk.claim&&!tk.lounge&&!tk.cn)for(const it of tk.items)if(it.st==='ready'&&!it.picked&&it.pi!=null)n++;
+ if(n){s.wait=(s.wait||0)+n*dt;const ws=(S.crew||[]).filter(m=>waiterDoes(m,'serve')&&crewHere(m));if(ws.length&&ws.every(m=>R.cw&&R.cw[m.id]&&R.cw[m.id].task))s.noW=(s.noW||0)+n*dt}}
 function wfRowUsed(){const u=new Set();if(!R)return u;for(const tk of R.tickets)for(const it of tk.items)if(it.st==='ready'&&!it.picked&&it.pi!=null)u.add(it.pi);for(const n of wfList())for(const i of n.pi||[])if(i!=null)u.add(i);return u}
 /* the free spots for a piece of work's plates (or glasses), the nearest to where they come from first, side by side */
 function wfRowTake(n,nearX){const k=n.its.filter(o=>!o.tk.lounge&&!o.tk.cn).length;if(!k)return[];const u=wfRowUsed();const free=[];for(let i=0;i<wfRowN();i++)if(!u.has(i))free.push(i);
@@ -6153,7 +6157,7 @@ function wfUpd(dt){if(!R)return;wfGather();const J=wfJ();const jt=wfJillTask();
   if(n.st==='work'){if(n.act>0&&wfHere(n))n.act-=dt*wfSpeed(n.who,n.f,n.d);if(n.act<=0){n.act=0;n.sc.push(wfScore(n.who,n.f));if(n.pas>0){n.lastBy=n.who;wfUnhand(n);n.st='cook';R.tv++}else if(n.f==='plate')wfPlated(n);else wfStepDone(n)}}
   else if(n.st==='cook'){n.pas-=dt*wfPasSpeed(n);if(n.pas<=0){n.pas=0;wfStepDone(n)}}}
  if(R.t-(R.wfAi||0)>.2){R.wfAi=R.t;wfStaff()}
- passSample(dt);ddSample(dt)}
+ passSample(dt);ddSample(dt);wlJill(dt)}
 /* how far the current step has come, 0–1 (the hands, then the fire) */
 function wfProg(n){if(n.st==='ready')return 1;if(n.st!=='work'&&n.st!=='cook')return 0;const T=n.dur||1;return clamp(1-(n.act+n.pas)/T,0,1)}
 /* ---- the cooks' places (spec §15–§21). PROPOSAL, not canon: the user's own skeleton of 2026-10-07 (core ★★★, a second place
@@ -10146,7 +10150,7 @@ const WASH_T={cleaner:[2,1.8,1.6,1.4,1.2],waiter:[2.4,2.2,2,1.8,1.6]};
 function washT(id){if(id==='jill')return 1.8;if(id==='xq')return 2;const m=(S.crew||[]).find(q=>q.id===id);if(!m)return 2;const L=WASH_T[m.role]||WASH_T.cleaner;return L[clamp(Math.round(m.lv||1),1,5)-1]}
 function ddWasher(){const W=ddS().wash;return W?W.who:null}
 function ddWho(id){return id==='jill'?'Jill':id==='xq'?'秀琴阿姨':((S.crew||[]).find(m=>m.id===id)||{}).name||''}
-function ddStartWash(id){const D=ddS();D.wash={who:id,ph:'take',t:0};R.tv++}
+function ddStartWash(id){const D=ddS();D.wash={who:id,ph:'take',t:0};if(R.st)ddStat('start',ddCount());R.tv++}
 function ddAtSink(w){const Sk=ddSink();return !!w&&(w.room||'kitchen')==='kitchen'&&Math.hypot(w.x-Sk.x,w.y-Sk.y)<3}
 /* one step of washing for whoever is at it: the place to walk to, or null while at the sink (or done) */
 function washStep(w,id,dt,batch){const D=ddS(),W=D.wash;if(!W||W.who!==id)return null;const H=handsOf(w);
@@ -10194,11 +10198,19 @@ function ddTap(){const D=ddS();if(D.wash){toast(`${ddWho(D.wash.who)} 正在洗`
 function ddHit(p){const c=ddCart();if(p.x>=c.x-20&&p.x<=c.x+20&&p.y>=c.y-38&&p.y<=c.y+6)return true;const x=KX.sink.x;return p.x>=x-2&&p.x<=x+28&&p.y>=KY.top+10&&p.y<=KY.top+60}
 /* the evening's numbers for the simulation (R.st.dd, kept with the day): dishes in, washed (by whom), the most at once, the
    seconds full and how many times it filled, the table-seconds a table waited for room, the seconds of washing by role */
-function ddStat(k,n,who){const s=R.st.dd||(R.st.dd={in:0,wash:0,by:{},peak:0,full:0,fulls:0,occ:0,t:0,blockT:0,washT:{}});if(k==='in')s.in+=n;if(k==='wash'){s.wash+=n;const r=ddRole(who);s.by[r]=(s.by[r]||0)+n}}
+function ddStat(k,n,who){const s=R.st.dd||(R.st.dd={in:0,wash:0,by:{},peak:0,full:0,fulls:0,occ:0,t:0,blockT:0,washT:{}});if(k==='in')s.in+=n;if(k==='start'){s.starts=(s.starts||0)+1;s.startN=(s.startN||0)+n}if(k==='wash'){s.wash+=n;const r=ddRole(who);s.by[r]=(s.by[r]||0)+n}}
 function ddRole(id){return id==='jill'?'jill':id==='xq'?'xq':((S.crew||[]).find(m=>m.id===id)||{}).role||'?'}
 function ddSample(dt){if(!R||!R.st)return;ddStat('in',0);const s=R.st.dd;const n=ddCount();s.t+=dt;s.occ+=n*dt;if(n>s.peak)s.peak=n;const full=n>=ddCap();if(full){s.full+=dt;if(!R.ddFull)s.fulls++}R.ddFull=full;
  if(ddFree()<=0)for(const t of R.tables)if(t.dirty&&!t.group&&ddUnits(t))s.blockT+=dt;
  const W=ddS().wash;if(W&&W.on){const r=ddRole(W.who);s.washT[r]=(s.washT[r]||0)+dt;W.on=0}}
+/* Workflow B telemetry (the user's spec §43, for the simulations; nothing in play reads it): what each kind of person spends the
+   evening on, in seconds — a waiter's or cleaner's serving, clearing (and carrying back), washing, guests (seat, order, bill),
+   story, walking back, idle; 秀琴 the same; Jill on the floor: carrying dirty dishes, a table, idle; a waiter's walking on his trips */
+function wlAdd(role,k,dt){if(!R||!R.st)return;const W=R.st.wl||(R.st.wl={});const r=W[role]||(W[role]={});r[k]=(r[k]||0)+dt}
+function wlKind(w){const t=w&&w.task;if(!t)return w&&w.moving?'walk':'idle';return t.k==='serve'?'serve':t.k==='clean'||t.k==='dump'?'clear':t.k==='wash'?'wash':t.k==='visit'?'story':'guest'}
+function wlCrew(role,id,w,dt){if(!R||!R.st)return;wlAdd(role,wlKind(w),dt);
+ if(role==='waiter'){const P=R.wlP||(R.wlP={});const p=P[id];if(w.task&&w.task.k==='serve'&&p&&p.room===w.room)wlAdd('waiter','dist',Math.hypot(w.x-p.x,w.y-p.y));P[id]={x:w.x,y:w.y,room:w.room}}}
+function wlJill(dt){const J=R&&R.jill;if(!J||!R.st)return;wlAdd('jill',(J.cur&&J.cur.dump)||handsN(J,'dirty')?'dish':J.cur?'table':'idle',dt)}
 /* dirty dishes in hand, drawn in front: a little stack, cups and glasses on top */
 function ddDrawItem(c,v,x,y,s){s=s||1;c.save();c.translate(x,y);c.scale(s,s);
  if(v==='cup'){c.fillStyle='#F2EEE6';rr(c,-3.4,-5,6.8,5.6,1.6);c.fill();c.strokeStyle='rgba(90,70,50,.45)';c.lineWidth=.6;c.stroke();c.fillStyle='#7A5236';el(c,0,-4.6,2.6,.9)}
@@ -10246,6 +10258,7 @@ function crewUpd(dt){R.cw=R.cw||{};for(const m of S.crew||[]){
  let w=R.cw[m.id];if(!w){const lgc=m.role==='cleaner'&&crewPool(m)==='lounge'&&loungeLv();/* v2.4 rc5: the Lounge's cleaner starts her evening there */w=R.cw[m.id]={bk:1,x:m.role==='waiter'?waitPost(m)[0]:m.role==='bartender'?LG.bk.x:lgc?LG.bk.x:cleanPost(m)[0],y:m.role==='waiter'?waitPost(m)[1]:m.role==='bartender'?LG.bk.y:lgc?LG.bk.y+20:cleanPost(m)[1],task:null,cd:1,face:1,step:0,busy:0,room:m.role==='bartender'||lgc?'lounge':'main',troom:m.role==='bartender'||lgc?'lounge':'main'};
   const aw=crewAwayOf(m);if(aw&&aw.k==='late'){/* v2.4 A3: in late — from the street, through the front door, to her place */w.tx=w.x;w.ty=w.y;w.troom=w.room;w.room='front';w.x=FR.enter.x;w.y=FR.enter.y;w.arriving=1}}if(!w.room)w.room='main';
  if(w.arriving){if(stepTo(w,(115+15*m.lv)*dt)){w.arriving=0;w.moving=false;v24Arrived(m)}else{w.moving=true;w.step+=dt*12;continue}}
+ wlCrew(m.role,m.id,w,dt);   /* Workflow B telemetry */
  if(m.role==='bartender'){if(m.duty==='lbar'&&loungeLv())bartenderUpd(m,w,dt);continue}   /* v2.3 */
  if(!w.task&&w.next){w.task=w.next;w.next=null;w.busy=0}   /* v2.4: a walk-over waits for the task in hand */
  if(w.task&&(w.task.k==='clean'||w.task.k==='dump'||w.task.k==='wash')){ddTaskTick(m,w,dt,(115+15*m.lv)*flowMul('crew')*dt);continue}   /* Workflow B: the dirty side */
