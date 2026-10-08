@@ -60,8 +60,9 @@
 - **料理流程 prototype**（branch `proto/cooking-flow`，`prototype/cooking/`）：獨立試玩頁，不是遊戲本體。使用者 2026-10-07：不合併、
   不發布、現在不要再做；之後重新開始時，以正式遊戲原本的廚房畫面為底，不重新設計美術。私人連結 https://claude.ai/artifact/EBzi6qETraguAApvettBFe 。
 
-- **新的料理系統**（branch `feature/cooking-gameplay`）：使用者 2026-10-07、10-08 的規格（`docs/v24/cooking_*.txt`，在那條 branch 上）。
-  開發中，不發布到玩家版；做到哪裡寫在那條 branch 的 `docs/cooking/ARCHITECTURE.md`，2026-10-08 早上的報告
+- **新的料理系統＋Restaurant Workflow**（branch `feature/cooking-gameplay`）：使用者 2026-10-07、10-08 的規格（`docs/v24/cooking_*.txt`、
+  `docs/v24/restaurant_workflow_b_2026-10-08.txt`，在那條 branch 上）。**HARD RULE（2026-10-08）：使用者說「可以進 main」以前，不 merge
+  main、不發布到正式玩家版；只更新私人測試版**（PROJECT_MEMORY §10）。開發中；做到哪裡寫在那條 branch 的 `docs/cooking/ARCHITECTURE.md`，2026-10-08 早上的報告
   `docs/cooking/MORNING_REPORT_2026-10-08.md`。私人測試版（不是正式版，存檔分開）https://claude.ai/artifact/TQpEqEFgqUW6jUm2Gfnhbg ，
   用 `tools/qa/cooking_test_build.py` 建、發布到同一個網址。
 

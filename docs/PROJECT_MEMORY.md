@@ -392,6 +392,15 @@ branch」）：`main` 是正式、目前、穩定的主線，發布的 commit �
 做完、測試通過再回到 `main`，不讓兩條線長期並行。不要 merge 沒有共同祖先的歷史（`archive/rc7.6-import-main`），不要改寫已推上去的
 歷史。現在有哪些 branch 見 `docs/CURRENT_STATE.md`。
 
+**新料理系統／Restaurant Workflow：只在開發分支和私人測試版，使用者說「可以進 main」才進**（HARD RULE，2026-10-08 使用者，原文
+`docs/v24/restaurant_workflow_b_2026-10-08.txt` 末段）：新 Cooking System、每道菜的料理過程、PLATING 動線、Pass、服務生多份配送與
+路線、收桌、Dirty Dishes、洗滌與容量、員工自動化、服務生／清潔員 AI、之後可能的洗碗／杯具員工，以及這一整套直接相關的平衡、
+模擬、經濟調整，全部只留在 `feature/cooking-gameplay` 和私人測試版。「**在我明確說『可以進 main』以前，全部都不要 merge 進 main。
+不要發布到正式玩家版。不要因為 tests 全過、simulation 漂亮、功能技術上做完，就自行判定可以發布。**」某一部分先做完也不單獨
+先進 main。可以做：實作、修 bug、改動畫和 AI、模擬、回歸、截圖證據、更新私人測試版。優先順序：「**真人實玩感受 > 產品設計
+正確 > regression 通過 > simulation 數字**」；tests／simulation 是驗證工具，不是發布授權。真人實玩發現核心設計不好玩，就在測試
+分支繼續改或重做，不必因為「已經做很多了」硬保留。「**main 必須保持目前正式版的安全狀態。**」
+
 ---
 
 ## 11. 已改掉的舊規則（看到就不要再改回去）

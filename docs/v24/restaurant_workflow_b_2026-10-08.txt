@@ -1,0 +1,2113 @@
+（使用者 2026-10-08，一次傳來的幾則訊息，逐字。前面是 Dirty Dishes／洗滌與薪資 ×0.8 的要求；中間一段是使用者貼上的
+Restaurant Workflow B 完整提示詞（含使用者轉述的前後說明）；後面是「不進 main、不發布」的 HARD RULE；最後問「你覺得你這次要
+花多久？」。之後使用者說：「你就繼續做啊」。）
+
+我要新增一個新的餐廳營運系統：Dirty Dishes / 洗滌系統。
+
+這不是單純背景動畫。
+
+它應該是一個很輕量、看得懂，而且真的會影響餐廳營運的 service-side bottleneck。
+
+同時調整目前所有既有員工薪資。
+
+⸻
+
+Part 1｜Dirty Dishes System
+
+一、核心循環
+
+客人用餐完畢後：
+
+客人吃完
+→ 員工收桌
+→ 把髒盤／髒杯實際拿回廚房
+→ 放進 Dirty Dish Area
+→ Dirty Dish Area 累積餐具
+→ 玩家可以點這個區域安排洗滌
+→ 員工走過去洗
+→ 髒餐具數量逐漸下降
+→ 洗完後該批餐具從 dirty system 消失
+
+核心體驗：
+
+出去的是一道道完成料理；回來的是一疊疊髒盤子。
+
+我要看得到餐廳真的在運作。
+
+⸻
+
+二、Dirty Dish Area 初始容量 = 10
+
+新增一個：
+
+Dirty Dish Capacity
+
+初始：
+
+0 / 10
+
+每次員工從桌上收回餐具，都會增加 dirty dish count。
+
+盤、碗、杯目前可以共用同一個 capacity，不需要拆成三種 inventory。
+
+例如：
+
+髒餐具 7 / 10
+
+到了：
+
+10 / 10
+
+就是滿了。
+
+⸻
+
+三、滿了之後的真正後果
+
+Dirty Dish Area = 10/10 時：
+
+不能再完成新的收桌工作。
+
+不要讓髒盤憑空消失。
+
+因此新的 dirty table 必須暫時等待：
+
+* 員工可以知道它需要清理
+* 但因為廚房沒有地方放新的髒餐具，所以不能完成收桌
+* 桌子因此暫時不能正常 turnover
+
+直到有人洗掉一些：
+
+10/10 → 9/10 → 8/10
+
+空間重新出現後，外場才能繼續把新的髒餐具收進來。
+
+這就是這套系統的 gameplay consequence。
+
+但注意：
+
+Dirty Dish Capacity 不等於 clean plate inventory。
+
+即使現在有：
+
+10 / 10 dirty dishes
+
+也不要因此讓 Cooking PLATING 出現：
+
+* 沒盤子
+* 沒碗
+* 沒杯子
+* 不能出餐
+
+目前不要追蹤 clean plate / bowl / cup inventory。
+
+Dirty Dish system 只控制：
+
+收桌 → 髒餐具回收 → 洗滌 → turnover
+
+不要擴張成餐具庫存模擬器。
+
+⸻
+
+四、要新增實際的洗滌空間，但不要新增房間
+
+請先 audit 現有 Kitchen layout。
+
+我不希望為了這個功能：
+
+* 重畫廚房
+* 新增洗碗房
+* 改變現在漂亮的 kitchen composition
+* 移動主要 Cooking stations
+
+優先利用目前已存在的：
+
+sink / sink-adjacent counter
+
+把它做成一個自然的：
+
+Dirty Dish + Washing Area
+
+它不是 HOT / PREP / OVEN / PLATING 的第五種 chef station。
+
+它是：
+
+service-side operating station。
+
+在現有 sink 附近找合理的位置加入：
+
+* dirty dish landing area / rack
+* sink washing position
+* 必要的 dish stack visual
+
+不要放巨大的「洗碗區」招牌。
+
+讓它自然長在原本廚房裡。
+
+⸻
+
+五、髒餐具必須真的看得到
+
+不要只有 UI：
+
+7 / 10
+
+廚房場景本身也要看得到。
+
+例如：
+
+0/10：
+幾乎沒有髒盤。
+
+1–3/10：
+零星幾個盤／杯。
+
+4–6/10：
+開始形成一疊。
+
+7–9/10：
+明顯很多。
+
+10/10：
+看起來真的滿了。
+
+不需要每一個餐具都精準畫成獨立 sprite。
+
+可以使用幾個 visual tiers / stack composition。
+
+但玩家不看數字，也應該大概知道：
+
+「喔，髒盤快滿了。」
+
+⸻
+
+六、餐具要有物理移動
+
+客人吃完後，不要：
+
+桌子髒
+→ 點一下
+→ 桌子乾淨
+→ 髒盤消失。
+
+正確是：
+
+員工到桌邊
+→ 收盤／杯
+→ 手上出現一疊 dirty dishes
+→ 抱著走回廚房
+→ 走到 Dirty Dish Area
+→ 放下
+→ dirty count 增加。
+
+這個角色可以是 cleaner，也可以是 waiter。
+
+如果 Dirty Dish Area 已滿：
+
+員工不要把盤子 teleport 進去。
+
+該桌保持等待清理狀態，等容量出現。
+
+⸻
+
+七、玩家點 Dirty Dish Area = 安排洗滌
+
+這個 interaction 要像 Cooking station 一樣自然。
+
+玩家看到髒盤區：
+
+髒餐具 8/10
+
+直接點場景中的髒盤／sink area。
+
+不要跳複雜 menu。
+
+點下去後：
+
+系統安排一名目前可處理洗滌工作的合格員工。
+
+Ticket / small feedback 可以顯示：
+
+洗滌 · 秀琴阿姨前往中
+
+角色真的走過去。
+
+開始後：
+
+洗滌 · 秀琴阿姨
+
+⸻
+
+八、洗滌動畫
+
+員工到 sink：
+
+→ 從 dirty stack 拿一個／一小批
+→ 放到 sink
+→ 洗／刷／沖
+→ 放到 clean side / drying rack
+→ dirty count 減少
+
+例如：
+
+8/10
+→ 洗
+→ 7/10
+→ 洗
+→ 6/10
+
+不要：
+
+點一下 → 8 個瞬間全部消失。
+
+我要看到這是一項持續工作的 job。
+
+可以有：
+
+* 水流
+* scrub
+* rinse
+* stack movement
+* clean dish placement
+
+但不用做 QTE。
+
+⸻
+
+九、洗滌可以中斷
+
+如果員工正在：
+
+8/10 → 7/10 → 6/10
+
+不要求他一定要洗到 0 才能離開。
+
+如果有更高優先工作、玩家重新安排，或 AI priority 合理要求：
+
+可以在完成目前這一個 washing beat 後離開。
+
+剩下：
+
+6/10
+
+就留在 Dirty Dish Area。
+
+之後其他人可以繼續洗。
+
+不要重置。
+
+⸻
+
+十、誰可以洗
+
+第一版：
+
+Cleaner
+
+可以：
+
+* 收桌
+* 搬 dirty dishes
+* 洗滌
+
+而且相對積極處理 Dirty Dish Area。
+
+Waiter
+
+也可以：
+
+* 收桌
+* 搬 dirty dishes
+* 洗滌
+
+但正常 priority 應該仍然是：
+
+* serve
+* guest-facing work
+* clear tables
+
+Dirty Dish Area 接近滿時，washing priority 才提高。
+
+不要讓 waiter 在有大量菜等著送時，所有人一起跑去洗碗。
+
+Jill / generic chef
+
+目前不要讓 AI 自動安排他們洗碗。
+
+料理人力不應該因為髒杯子 4/10 就離開 HOT/PREP。
+
+未來如果有特殊情況再討論。
+
+⸻
+
+十一、第一天秀琴阿姨
+
+這套系統剛好可以與 Day 1 onboarding 結合。
+
+目前故事說秀琴阿姨主動來幫忙，但實玩時她只是站著。
+
+請讓 Day 1 的秀琴阿姨真的可以：
+
+客人吃完
+→ 秀琴去收桌
+→ 抱髒盤回 Kitchen
+→ 放進 Dirty Dish Area
+→ 在適當時候洗滌。
+
+這是故事上的 temporary help。
+
+不要因此提前正式解鎖完整 cleaner hiring system。
+
+玩家第一天就應該看得懂：
+
+「喔，她真的有來幫忙。」
+
+⸻
+
+十二、Dirty Dish Capacity 可以升級
+
+初始：
+
+Dirty Dish Area I = 10
+
+請建立可擴充 architecture。
+
+未來可以有：
+
+* larger landing rack
+* larger sink-side counter
+* better dishwashing setup
+
+增加 dirty dish capacity。
+
+暫時不要武斷鎖死後期一定是 15 / 20。
+
+先 audit：
+
+* 每桌平均產生多少 dirty units
+* 正常尖峰同時多少桌
+* waiter / cleaner washing speed
+* turnover
+* Lounge 未來可能增加的杯子量
+
+再提出合理的：
+
+Level I / II / III capacity
+
+與 upgrade timing / cost。
+
+產品目的不是：
+
+「升級後洗得比較快所以 +15%。」
+
+更重要的是：
+
+容量增加後，尖峰時玩家可以更晚才需要處理洗滌 bottleneck。
+
+⸻
+
+十三、未來專職洗滌員工：先留 architecture，不要現在擅自新增
+
+我們接下來可能會規劃：
+
+專門負責洗盤子／杯子的員工。
+
+可能包含 restaurant dishwasher / steward，甚至 Lounge glassware 的專門處理。
+
+但這一輪：
+
+先不要自行創角色、名字、薪資、招募故事。
+
+先讓 architecture 支援未來存在：
+
+dishwashing specialist
+
+即可。
+
+先讓 cleaner / waiter 跑通整個 system。
+
+等實玩確認洗滌工作量與 bottleneck 後，我再決定是否正式加入新的員工類型。
+
+⸻
+
+十四、與 Cooking PLATING 的餐具生命週期要一致
+
+這與上一則 PLATING 修正一起理解。
+
+餐具的世界循環現在是：
+
+空盤
+→ handler 拿盤
+→ 到完成料理旁裝盤
+→ 完成品送到 Pass
+→ waiter pickup
+→ 客人吃
+→ dirty dish
+→ waiter / cleaner 收走
+→ Dirty Dish Area
+→ washing
+→ 回到抽象 clean supply
+
+最後一步仍然是抽象的。
+
+不要建立 clean plate inventory。
+
+但是畫面上，這個循環應該是連續可信的。
+
+⸻
+
+十五、Lounge 杯子先保留相容性
+
+Lounge 未來有大量：
+
+* wine glass
+* cocktail glass
+* water glass
+* small plates
+
+所以 Dirty Dish architecture 不要 hard-code 成只有 plate。
+
+底層可以使用：
+
+dirtyDishUnits
+
+或合理等價 abstraction。
+
+Visual 可以依來源混合：
+
+* plate
+* bowl
+* cup
+* glass
+
+目前 capacity 可以共用。
+
+未來如果實玩證明 Lounge glassware 值得獨立處理，再擴充。
+
+現在不要提前拆兩套 inventory。
+
+⸻
+
+Part 2｜既有員工薪資全部調整為目前的 80%
+
+我以前曾經把整套員工薪資直接提高／翻倍。
+
+現在因為：
+
+* Cooking System 讓員工有更完整的實際工作價值
+* waiter / cleaner 開始有更多實際工作
+* 未來可能增加 dishwashing / glassware specialist
+* 員工 roster 未來可能變大
+
+我要先把目前既有員工薪資稍微往下降。
+
+HARD RULE
+
+請以：
+
+目前 feature branch / current game data 中實際存在的薪資
+
+作為基準。
+
+所有既有員工：
+
+new salary = current salary × 0.8
+
+也就是：
+
+目前薪資的五分之四。
+
+不是：
+
+* 最初版薪資 × 0.8
+* 翻倍以前薪資 × 0.8
+* 自己重新設計一套薪資
+* 只調 early game
+* 只調某個 role
+
+而是目前所有既有員工，在各自目前薪資基礎上統一乘：
+
+0.8
+
+⸻
+
+十六、所有階段／角色一致套用
+
+包括目前所有既有：
+
+* chef
+* waiter
+* cleaner
+* bartender
+* Lounge staff
+* 其他正常會產生日薪／薪資成本的既有員工
+
+如果某類角色的 compensation architecture 不同，先 audit 並報告，不要硬套造成 bug。
+
+但產品意圖是：
+
+現有員工的實際人事成本整體降到現在的 80%。
+
+不要只改 UI 顯示。
+
+實際每日成本、財務紀錄、預估、結算都必須一致。
+
+⸻
+
+十七、薪資 rounding
+
+請先 audit 現有 salary 的單位與數值。
+
+如果 ×0.8 後不是整數：
+
+使用與現有經濟系統一致、最自然的 rounding。
+
+不要產生 $437.6/day 這種不符合目前遊戲 UI 的薪資。
+
+完成後列出：
+
+員工	Role	Current salary	New salary
+
+讓我確認。
+
+⸻
+
+十八、不要因為薪資下降就同步偷偷 rebalance 其他經濟
+
+這次只調：
+
+employee salary × 0.8
+
+不要自行：
+
+* 降營收
+* 降售價
+* 增加食材成本
+* 增加租金
+* 增加 upgrade cost
+* 改 tip
+* 改客流
+* 改 Lounge 收入
+
+我之後會看整體 simulation 再決定。
+
+⸻
+
+驗收
+
+請至少測：
+
+Dirty Dish
+
+1. 客人吃完產生 dirty table。
+2. waiter / cleaner 實際去收。
+3. 角色抱餐具回廚房。
+4. 髒餐具真的堆在 sink-side Dirty Dish Area。
+5. count 正確增加。
+6. 10/10 後不能再完成新收桌。
+7. 不會因此阻止 Cooking PLATING。
+8. 點 Dirty Dish Area 可以安排洗滌。
+9. 員工真的走去 sink。
+10. 洗滌 animation 發生。
+11. count 一個／一批逐步下降，不瞬間清零。
+12. 中途離開後剩餘 dirty count 保留。
+13. capacity 出現後，等待中的 dirty table 可以再次被收。
+14. cleaner / waiter priority 不會導致所有人放棄主要工作去洗碗。
+15. Day 1 秀琴阿姨真的會幫忙收／洗。
+16. old save 不壞。
+17. save/reload dirty dish state 不 duplication / disappearance。
+18. mobile touch target 好點。
+19. 場景 visual 在 0、低、中、高、滿容量有明顯差異。
+
+Salary
+
+20. 所有既有員工 current salary ×0.8。
+21. UI、daily cost、finance calculation 一致。
+22. 沒有角色漏改。
+23. 不影響 recruitment condition，除非它本來直接依 salary data 計算。
+24. 跑完整 regression。
+
+另外跑一輪 simulation，報告新增 washing system 後：
+
+* average dirty dish count
+* peak dirty dish count
+* 一天 hit 10/10 幾次
+* 因滿載造成 dirty table 等待的時間
+* 每個 role 花多少時間 washing
+* 是否出現 waiter 全在洗、沒人送餐
+* 是否出現 cleaner 一直洗到沒有其他工作
+* Day 1–3 是否因此變得過忙
+* 中後期是否真的出現「我開始想多一個專門洗東西的人」的自然需求
+
+不要為了 simulation 漂亮就自動新增 dishwasher。
+
+我要先看結果，再決定專職洗滌員工怎麼設計。
+
+核心體驗：
+
+洗碗不是懲罰玩家的雜務，而是餐廳尖峰時另一條看得見的工作流。
+
+以及：
+
+我不是在管理有幾個乾淨盤子；我是在管理髒東西有沒有堆到廚房塞住。
+可以，這次我把它寫成一份可以直接丟給 Claude 的完整實作提示詞。這版不是叫他「幫我想想」，而是把我們已經決定的產品方向鎖住，同時要求他先 audit feature/cooking-gameplay，不要重複做已經存在的 Cooking / handoff / capacity。
+
+Jill’s Kitchen｜Restaurant Workflow B：Pass、服務生多份配送、收桌、Dirty Dishes、洗滌與自動化完整重構
+
+我現在要在 feature/cooking-gameplay 上繼續擴充新的 Restaurant Workflow。
+
+這不是把 Jill’s Kitchen 改成高壓的 time-management game，也不是做 Diner Dash / Overcooked。
+
+產品方向是：
+
+餐廳裡的工作要真的有人做、真的有物理流動、真的可能形成 bottleneck；但員工會自己運作，玩家只在想介入時介入。
+
+核心體驗：
+
+前期：玩家學會做事。
+中期：玩家和員工一起做事。
+後期：員工自己能做事，玩家管理 bottleneck。
+
+不要增加玩家手速要求。
+
+不要讓玩家必須一直點。
+
+不要加入 Game Over 型失敗。
+
+不要讓玩家離開廚房看貓、熟客、故事或 Lounge 就受到不合理懲罰。
+
+⸻
+
+0. 先 audit，不要重複造輪子
+
+開始前先完整 audit：
+
+feature/cooking-gameplay
+
+尤其確認現在已經存在的：
+
+* Cooking work node
+* HOT / PREP / OVEN / DRINK / PIZZA workflow
+* batching
+* chef proficiency
+* staff claim / handoff
+* station capacity
+* waiter pickup
+* cleaner / waiter 現有 AI
+* Pass / heat lamps
+* table dirty / clear logic
+* crew duty / standby
+* staff upgrade
+* current salary data
+
+不要平行做第二套系統。
+
+新功能要接到現在已有架構上。
+
+⸻
+
+1. HARD PRODUCT RULE
+
+整間餐廳現在應該形成四條可見工作流：
+
+Cooking Flow
+
+Order → PREP / HOT / OVEN / DRINK → PLATING → Pass
+
+Service Flow
+
+Pass → waiter pickup → table
+
+Table Flow
+
+guest finishes → dirty table → waiter / cleaner clears
+
+Dish Return Flow
+
+dirty dishes → Dirty Dish Area → washing
+
+玩家玩的不是：
+
+「一直快速點東西。」
+
+玩家玩的是：
+
+「現在到底是哪一條工作流塞住了？」
+
+⸻
+
+2. PLATING 與 Pass 必須徹底分開
+
+延續最新 Cooking choreography canon。
+
+PLATING 不是 Pass。
+
+正確物理流程：
+
+上一站完成
+→ 食物留在原位置
+→ handler 取得空盤
+→ handler 去完成料理旁
+→ 真正裝盤
+→ handler 把完成餐點拿到 Pass
+
+所以：
+
+PLATING = making the finished dish into a plateable/servable dish
+
+PASS = completed food handoff / pickup buffer
+
+食物不能自己 teleport。
+
+⸻
+
+3. Pass 正式變成 Finished Food Buffer
+
+Pass 不再是 plating station。
+
+它是：
+
+已經完成的餐點等待外場 pickup 的地方。
+
+要有真正容量。
+
+先 audit 現有 Pass / heat lamp / plate position。
+
+優先沿用現有視覺。
+
+不要重新設計廚房。
+
+Pass capacity 可以隨既有餐廳／廚房工程成長。
+
+例如概念上：
+
+early：較少
+mid：增加
+mature：再增加
+
+但不要先武斷改成任意數字。
+
+先依現在實際 Pass visual 與現有 upgrade 決定。
+
+Pass 滿時：
+
+不失敗。
+
+只是新的 completed plate 暫時不能放上去，因此 upstream plating / finishing 會安全等待。
+
+不燒焦。
+
+不降 quality。
+
+不紅色 FAIL。
+
+不倒數。
+
+⸻
+
+4. Waiter 不能被設計成一次只能拿一盤
+
+這是 HARD RULE。
+
+一般服務生有兩隻手，而且熟練服務生現實上可以一次拿多盤，或使用 tray。
+
+所以：
+
+服務生必須有 Carry Capacity。
+
+不要設計：
+
+一個 waiter = 一次只能一盤
+
+這會讓後期看起來很笨，而且造成大量無意義走路。
+
+⸻
+
+5. Waiter Carry Capacity
+
+建立一個簡單的：
+
+carryCapacity
+
+概念。
+
+初期 waiter 可以合理一次帶至少 2 個 service units。
+
+因為最基本就是兩手。
+
+後續能力成長可以增加：
+
+例如概念上：
+
+* beginner：2
+* experienced：3
+* senior：4
+* very skilled：4–5
+
+最終數字要 simulation / visual test 後決定，不要只因為這裡舉例就硬鎖。
+
+但：
+
+絕對不要初期 = 1。
+
+⸻
+
+6. Service Unit 保持簡單
+
+不要建立複雜重量系統。
+
+第一版：
+
+* 主菜 = 1 unit
+* 飲料 = 1 unit
+* 小食 = 1 unit
+* 一般甜點 = 1 unit
+
+不要做：
+
+* 牛排 1.3
+* 湯 1.4
+* 酒杯 0.7
+
+這些目前都不需要。
+
+目標是：
+
+玩家看得懂：
+
+這個服務生一次大概可以拿幾樣東西。
+
+⸻
+
+7. Waiter pickup 不應該一有一盤就無腦衝
+
+熟練服務生應該可以做非常短的 batching / anticipation。
+
+例如 Pass：
+
+* 炒飯 → Table 2
+* 紅茶 → Table 2
+* 牛排 → Table 5
+
+一個 capacity 3 的 waiter 不應該一定：
+
+炒飯一完成
+→ 馬上拿一盤跑出去
+→ 回來
+→ 再拿紅茶
+
+他可以合理判斷：
+
+如果同桌下一份餐點即將完成，而且 Pass 不塞：
+
+稍等一下，一起拿。
+
+但這個等待必須很短。
+
+不要因為想湊滿 tray 而讓客人一直等。
+
+核心判斷：
+
+send now vs wait briefly to consolidate
+
+⸻
+
+8. Waiter routing
+
+Waiter 拿多份後：
+
+不需要每送一份就回廚房。
+
+他應該可以：
+
+Pass pickup ×3
+→ Table 2
+→ Table 5
+→ hand empty
+→ return
+
+優先 route：
+
+* 同桌料理一起
+* 空間方向合理
+* 不要來回折返
+
+不要求做 TSP 最佳化。
+
+不需要完美演算法。
+
+只要：
+
+明顯比「一盤一趟」聰明。
+
+⸻
+
+9. Waiter 升級要改變行為，不只是速度
+
+服務生能力提升至少可以影響：
+
+* carry capacity
+* batching willingness
+* routing quality
+* Pass pickup priority
+* dirty-table awareness
+
+不要所有升級都只是：
+
+walk speed +15%
+
+移動速度仍然可以是能力的一部分。
+
+但真正讓玩家有「這個人變厲害」感覺的是：
+
+他一趟可以處理更多，而且越來越知道怎麼安排這一趟。
+
+⸻
+
+10. 客人吃完後，餐具不能消失
+
+客人吃完：
+
+不要直接：
+
+table dirty → click → clean
+
+正確是：
+
+guest finishes
+→ table retains dirty dishes
+→ waiter / cleaner arrives
+→ collects dishes
+→ dishes appear in employee’s hands
+→ employee carries them back toward kitchen
+
+這些 dirty dishes 必須進入新的 Dirty Dish System。
+
+⸻
+
+11. 收桌也使用 Carry Capacity
+
+服務生／cleaner 不需要每收一桌就立刻回廚房。
+
+例如 capacity 4：
+
+Table 2：
+
+2 dirty units
+
+收完：
+
+hands 2/4
+
+如果附近 Table 3 也有：
+
+2 dirty units
+
+可以：
+
+Table 2 收2
+→ Table 3 收2
+→ hands 4/4
+→ 回 Dirty Dish Area
+
+這應該是自然的。
+
+不要讓角色每拿一個盤子就來回跑。
+
+⸻
+
+12. Dirty Dish Area
+
+新增一個真正的 service-side station：
+
+Dirty Dish Area / Washing Area
+
+它不是 Cooking station。
+
+不屬於：
+
+HOT / PREP / OVEN / PLATING proficiency。
+
+優先利用現有 Kitchen 的：
+
+sink + sink-adjacent counter
+
+不新增新房間。
+
+不破壞現在廚房格局。
+
+不蓋一個突兀的大洗碗台。
+
+讓它自然長在現有水槽區域。
+
+⸻
+
+13. Dirty Dish Capacity
+
+初始：
+
+10 dirty units
+
+顯示概念：
+
+Dirty Dishes 0/10
+
+每個被收回的：
+
+* plate
+* bowl
+* cup
+* glass
+
+暫時都算 1 dirty unit。
+
+第一版不要拆 inventory。
+
+⸻
+
+14. Dirty Dish Area 要真的看得到
+
+不要只有 UI number。
+
+場景本身至少分成幾個 visual tiers：
+
+* 0：幾乎空
+* low
+* medium
+* high
+* full
+
+玩家不用看文字也大概知道：
+
+「這邊快堆滿了。」
+
+可以重用盤子、碗、杯子 sprite。
+
+不要求 10 個 unit 就精準畫 10 個 object。
+
+可以用 composition tiers。
+
+⸻
+
+15. Dirty Dish 滿了以後真的有後果
+
+到：
+
+10/10
+
+後：
+
+不能再完成新的 dirty-table collection。
+
+也就是下一桌吃完：
+
+員工知道要收，
+
+但沒有地方放新的 dirty dishes。
+
+所以：
+
+table 保持 dirty。
+
+table 不能 turnover。
+
+等：
+
+10 → 9
+
+之後才能繼續收。
+
+這是 bottleneck。
+
+但不是失敗。
+
+⸻
+
+16. Dirty Dish 絕對不要變成 clean-plate inventory
+
+HARD RULE。
+
+不要建立：
+
+* clean plates remaining
+* clean bowls remaining
+* clean cups remaining
+
+Dirty Dish 滿了：
+
+不影響 Cooking PLATING 能不能找到乾淨盤。
+
+Cooking 照常。
+
+這個系統只影響：
+
+clear table → dirty dish return → washing → table turnover
+
+我不要玩餐具庫存模擬器。
+
+⸻
+
+17. 點 Dirty Dish Area = 安排洗滌
+
+玩家可以直接點場景中的：
+
+dirty dish stack / sink area。
+
+不要跳大型 menu。
+
+不要問：
+
+「要洗幾個？」
+
+點下去代表：
+
+我現在想讓人處理洗滌 bottleneck。
+
+系統安排合格而且可用的人。
+
+可以顯示非常小的 feedback：
+
+洗滌 · 秀琴阿姨前往中
+
+開始後：
+
+洗滌 · 秀琴阿姨
+
+⸻
+
+18. 洗滌不是瞬間清空
+
+到 sink：
+
+employee：
+
+拿 dirty item / small batch
+→ wash
+→ rinse
+→ move to clean side
+
+Dirty Dish count：
+
+8
+→ 7
+→ 6
+→ 5
+
+不要：
+
+點一下
+→ 8 → 0
+
+要看得到是一個持續工作。
+
+⸻
+
+19. Washing 可以中斷
+
+員工不需要一定洗到 0。
+
+例如：
+
+8 → 7 → 6
+
+然後外場突然有更重要的工作。
+
+他可以在完成當前 washing beat 後離開。
+
+Dirty count 保留：
+
+6/10
+
+其他員工之後可以接著洗。
+
+不 reset。
+
+⸻
+
+20. Cleaner 與 Waiter 的差異
+
+不要把兩者做成只有名字不同。
+
+Waiter
+
+強項：
+
+* Pass pickup
+* serving
+* multi-dish carrying
+* route planning
+* clearing tables
+
+可以 wash。
+
+但正常 priority：
+
+guest-facing service > washing
+
+除非 Dirty Dish 快滿。
+
+Cleaner
+
+強項：
+
+* clearing tables
+* carrying dirty dishes
+* dishwashing
+* dealing with dirty-side bottlenecks
+
+Cleaner 可以更早主動處理 Dirty Dish。
+
+⸻
+
+21. 不要讓 waiter 全部跑去洗碗
+
+AI priority 必須避免荒謬情況。
+
+例如：
+
+Pass 有 3 盤菜，
+但兩個 waiter 都在洗碗。
+
+這不合理。
+
+Normal priority 應該讓 waiter 優先：
+
+* serve ready food
+* handle guests
+* clear necessary tables
+
+Washing 是：
+
+secondary / bottleneck-driven task
+
+⸻
+
+22. Jill 與 Chef 不要自動洗碗
+
+目前：
+
+chef / Jill AI 不要因為 Dirty Dish 5/10 就跑去洗。
+
+Cooking staff 的任務還是料理。
+
+未來特殊情況再討論。
+
+不要現在跨職業自動化過頭。
+
+⸻
+
+23. Day 1 秀琴阿姨
+
+延續最新 onboarding canon。
+
+Day 1 故事說秀琴阿姨主動來幫忙。
+
+她必須真的：
+
+* clear dirty tables
+* carry dirty dishes
+* bring them to kitchen
+* wash when needed
+
+玩家第一天肉眼就能理解：
+
+「她真的有來幫忙。」
+
+這仍然是 story-driven temporary help。
+
+不代表正式 cleaner hiring system 提前解鎖。
+
+⸻
+
+24. Automation 不要做成 AUTO button
+
+不要新增：
+
+* AUTO ON/OFF
+* 洗碗自動化開關
+* 配送自動化開關
+* AI 設定頁
+* 70% 開始洗這種 slider
+
+自動化應該表現在：
+
+員工逐漸變聰明。
+
+⸻
+
+25. Dirty Dish AI Priority
+
+可以內部使用 threshold。
+
+玩家不需要看到設定。
+
+例如初始 capacity 10 時：
+
+0–5
+
+washing priority 很低。
+
+6–7
+
+cleaner 有空可以開始處理。
+
+8–9
+
+washing priority 明顯提高。
+
+10
+
+非常高 priority，因為 table turnover 已經被堵住。
+
+這些不是硬要求最終一定用這幾個 exact numbers。
+
+simulation 後可以微調。
+
+但行為方向照這個。
+
+⸻
+
+26. Pass 也需要 bottleneck-aware AI
+
+Waiter AI 要知道：
+
+Pass 快滿時，
+
+pickup priority 上升。
+
+不要讓服務生還在做低價值事情，Pass 已經塞爆。
+
+同樣：
+
+Pass 滿不是 Game Over。
+
+只是 upstream flow 變慢。
+
+⸻
+
+27. Staff automation progression
+
+員工升級的意義不應該只有：
+
+speed +X%
+
+應該逐漸改變：
+
+Waiter
+
+* carry capacity
+* batching
+* routing
+* Pass awareness
+* table clearing efficiency
+
+Cleaner
+
+* dirty dish carry capacity
+* table-clearing efficiency
+* washing speed
+* washing priority awareness
+
+Chef
+
+已有：
+
+* station proficiency
+* batching
+* cross-cover
+* workflow autonomy
+
+不要重新設計第二套 chef AI。
+
+⸻
+
+28. 玩家仍然可以手動介入
+
+員工會自己做，
+
+但玩家可以：
+
+* 點 Dirty Dish Area 要求現在處理
+* 點 Cooking work node 介入
+* 調整值班／員工安排
+* 提前解 bottleneck
+
+玩得好的價值是：
+
+restaurant becomes smoother
+
+不是：
+
+otherwise restaurant collapses
+
+⸻
+
+29. Pressure Budget
+
+這是 HARD BALANCE RULE。
+
+正常營業：
+
+同時真正值得玩家介入的 bottleneck 約 0–2 個。
+
+尖峰：
+
+約 2–4 個。
+
+如果一般營業常常有：
+
+5 個以上需要玩家立刻處理的 bottleneck
+
+那不是「遊戲比較有深度」。
+
+那代表：
+
+* AI 太笨
+* capacity 太小
+* timing 太緊
+* 系統太多
+
+應該修系統。
+
+不要叫玩家按更快。
+
+⸻
+
+30. Mature Restaurant 必須可以自己跑
+
+員工充足、能力充足、設備成熟時：
+
+玩家完全不介入，餐廳也應該能正常完成營業。
+
+可能：
+
+* throughput 不是理論最佳
+* 某些地方偶爾排隊
+* 玩家介入可以更漂亮
+
+但不能：
+
+* 因沒點洗碗就整晚鎖死
+* 因沒手動送每一盤就失敗
+* 因玩家去看貓就客人全部爆炸
+
+⸻
+
+31. Dirty Dish Capacity Upgrade
+
+初始：
+
+10
+
+建立可擴充 architecture。
+
+後期可以因：
+
+* larger dirty rack
+* extended sink counter
+* back-of-house improvement
+
+增加容量。
+
+但請先 simulation 再提出 II / III 最終數字。
+
+不要現在硬鎖 10 → 15 → 20，除非資料支持。
+
+升級目的：
+
+尖峰期間玩家可以更晚才需要處理這個 bottleneck。
+
+⸻
+
+32. 可見升級優先於抽象加成
+
+這一輪與未來 upgrade 設計的原則：
+
+好的 upgrade：
+
+* Pass 多一個 holding position
+* Dirty Dish Area capacity 增加
+* waiter carry capacity 增加
+* wash station 增加合理 capacity
+* staff AI 變得更會安排工作
+
+比較不好的 upgrade：
+
+* 所有事情單純 +10%
+
+數值可以存在。
+
+但玩家應該肉眼感覺得到餐廳真的變成熟。
+
+⸻
+
+33. 專職 Dishwasher / Steward 暫時不要做
+
+我們未來可能新增：
+
+* restaurant dishwasher / steward
+* Lounge glassware specialist
+
+但這一輪：
+
+不要新增角色。
+
+不要自行取名字。
+
+不要自行畫人設。
+
+不要新增 recruitment story。
+
+architecture 只要能未來支援即可。
+
+先用：
+
+waiter + cleaner
+
+實際跑。
+
+等 simulation 與真人遊玩證明：
+
+「真的自然需要一個專門洗的人」
+
+再設計。
+
+⸻
+
+34. Lounge Glassware 相容，但不要現在拆系統
+
+Dirty Dish 底層不要 hard-code 成只有 plate。
+
+可以是：
+
+dirtyDishUnits
+
+Visual 可以包含：
+
+* plate
+* bowl
+* cup
+* wine glass
+* cocktail glass
+
+但目前全部共享同一 capacity。
+
+不要現在建立：
+
+* plate rack
+* glass rack
+* cup rack
+
+三套 inventory。
+
+⸻
+
+35. 員工薪資調整
+
+我以前曾經把整個員工薪資提高／翻倍。
+
+現在因為：
+
+* Cooking System 員工價值提高
+* waiter 工作更完整
+* cleaner 工作更完整
+* 未來可能增加洗滌 specialist
+* roster 未來可能增加
+
+目前所有既有員工薪資先調整為：
+
+current salary × 0.8
+
+HARD RULE：
+
+基準是：
+
+現在 branch / 現在遊戲資料真正使用中的 salary
+
+不是最早版薪資。
+
+不是翻倍以前薪資。
+
+不是你重新設計一套薪資。
+
+所有現有會計入薪資的 staff 都統一依現在數值 ×0.8。
+
+包含正常相關：
+
+* chefs
+* waiters
+* cleaners
+* bartenders
+* Lounge staff
+
+如果某些角色使用不同 compensation architecture：
+
+先 audit，再報告。
+
+不要硬改壞。
+
+⸻
+
+36. 薪資 rounding
+
+如果 ×0.8 不是整數：
+
+依目前 game economy 的顯示習慣合理 rounding。
+
+不要出現：
+
+$437.6 / day
+
+完成後列：
+
+角色｜role｜原 salary｜新 salary
+
+給我看。
+
+⸻
+
+37. 不要因薪資下降偷偷改其他經濟
+
+這次不要自行：
+
+* 降售價
+* 降客流
+* 增食材成本
+* 加租金
+* 改 tip
+* 改客人 patience
+* 改工程價格
+
+salary 先單獨調。
+
+整體 economics 之後再看 simulation。
+
+⸻
+
+38. 不要破壞最新 Cooking System
+
+這一輪不要推翻：
+
+* 35 dishes workflow
+* dish-specific choreography
+* player guidance
+* batching
+* chef proficiency
+* claim
+* handoff
+* no-burning
+* safe waiting
+* food spatial continuity
+* latest PLATING architecture
+
+Restaurant Workflow B 是接在 Cooking System 外圍。
+
+不是第二次重寫 Cooking。
+
+⸻
+
+39. Visual continuity
+
+這些工作一定要真的看得到角色做。
+
+至少：
+
+waiter：
+
+* goes to Pass
+* picks up multiple dishes
+* visibly carries them
+* walks to table(s)
+* items disappear from hands as delivered
+
+cleaner / waiter：
+
+* approaches dirty table
+* collects dishes
+* stack appears in hands
+* may collect another nearby table if capacity remains
+* walks back
+* deposits at Dirty Dish Area
+
+washing：
+
+* employee arrives
+* takes dirty item
+* washes
+* rinses
+* moves it to clean side
+* dirty stack visibly decreases
+
+不要全部只是 hidden state change。
+
+⸻
+
+40. Mobile UX
+
+這仍然是手機優先。
+
+Dirty Dish Area 要：
+
+* 好點
+* 不蓋 Cooking
+* 不需要小到難按的 icon
+
+Pass food / waiter interaction：
+
+玩家不需要逐盤點。
+
+大部分是 AI 自動。
+
+玩家看的主要是：
+
+哪裡塞住。
+
+⸻
+
+41. 不要新增一堆警告 UI
+
+Dirty 8/10：
+
+不要紅色閃爍。
+
+Pass 快滿：
+
+不要警報。
+
+bottleneck 應該主要透過：
+
+* 場景本身
+* stack visual
+* subtle number
+* existing workflow cues
+
+讓玩家看懂。
+
+只有真的滿了可以有克制提示。
+
+不要滿畫面：
+
+WARNING!
+
+⸻
+
+42. AI 必須允許「不完美」
+
+不要把 AI 做成數學最優。
+
+如果 AI 每次 2/10 Dirty Dish 就開始洗，
+
+玩家永遠看不到 bottleneck。
+
+如果 waiter 永遠以最佳路徑完美配送，
+
+玩家也沒有介入價值。
+
+正確是：
+
+AI 足以正常營業。
+
+玩家介入：
+
+可以讓營運更流暢、更漂亮。
+
+⸻
+
+43. Simulation 必須新增紀錄
+
+請加入 telemetry：
+
+Pass
+
+* average occupancy
+* peak occupancy
+* time full
+* meals waiting for pickup
+
+Waiter
+
+* trips per night
+* average items per trip
+* max items carried
+* distance / trip 或合理等價
+* percentage trips with 1 / 2 / 3 / 4+ items
+* serving wait caused by unavailable waiter
+
+Dirty Dishes
+
+* average dirty count
+* peak
+* number of times capacity full
+* total full duration
+* dirty tables waiting because capacity full
+
+Washing
+
+* who washed
+* time spent washing by role
+* washes per night
+* average dirty count when washing began
+
+Staff workload
+
+* waiter time serving
+* waiter time clearing
+* waiter time washing
+* cleaner time clearing
+* cleaner time washing
+* idle time
+
+⸻
+
+44. 必做的壓力測試
+
+至少測：
+
+A. Day 1
+
+Jill + temporary 秀琴阿姨。
+
+確認：
+
+* 玩家不會忙爆
+* 秀琴真的幫忙
+* Dirty Dish 不會第一天立刻成為懲罰系統
+
+B. Early game
+
+少量 waiter / cleaner。
+
+看：
+
+* 兩手兩盤是否明顯比一盤一趟自然
+* Pass 是否合理
+* dirty capacity 10 是否太小／太大
+
+C. Mid game
+
+多桌、多菜、不同 workflow。
+
+看：
+
+* waiter multi-pickup
+* multi-table routing
+* clearing + washing priority
+
+D. Mature restaurant
+
+staff 接近完整。
+
+玩家完全不介入。
+
+必須能完成一晚。
+
+再跑一晚由玩家偶爾提前解 bottleneck。
+
+比較：
+
+* throughput
+* waiter trips
+* dirty full time
+* Pass full time
+
+玩家介入應該：
+
+變更順。
+
+但不是：
+
+從不能營業變成能營業。
+
+⸻
+
+45. 真人體驗驗收
+
+我要實際玩時感覺：
+
+「服務生真的在服務。」
+
+而不是：
+
+「每一盤都像 NPC script。」
+
+我應該可以看到：
+
+一個熟練 waiter：
+
+→ 一次從 Pass 拿三份
+→ 送兩桌
+→ 回程發現兩桌吃完
+→ 收一批 dirty dishes
+→ 一次帶回廚房
+
+這才叫餐廳真的活著。
+
+⸻
+
+46. 禁止事項
+
+不要：
+
+* waiter 一次永遠只能拿 1
+* dirty dishes teleport
+* waiter 每收一桌必回廚房
+* waiter 每送一盤必回廚房
+* wash 一點全部瞬間清空
+* clean plate inventory
+* dishwashing QTE
+* washing minigame
+* AUTO toggle
+* automation settings screen
+* 大量紅色警報
+* failure countdown
+* 因為玩家沒洗碗直接 Game Over
+* 重做原本漂亮的 kitchen
+* 為了新功能新增另一間洗碗房
+* 現在就新增 dishwasher 角色
+
+⸻
+
+47. 最後請回報
+
+完成後不要只說：
+
+tests passed
+
+我要看到：
+
+1. 現有 waiter / cleaner 原本怎麼運作。
+2. 這一輪實際修改了哪些 state / AI architecture。
+3. Pass 現在的 capacity 與 upgrade。
+4. Waiter carry capacity 最終怎麼定。
+5. 新手／熟練 waiter 行為差在哪。
+6. multi-pickup / multi-table routing 怎麼運作。
+7. dirty dish 初始 10 在 simulation 裡表現如何。
+8. washing threshold 最後用了什麼。
+9. cleaner 與 waiter 工作比例。
+10. 有沒有出現 waiter 全在洗、沒人送餐的壞情況。
+11. Day 1–3 是否比現在明顯更忙。
+12. mature restaurant 無玩家介入能不能穩定營業。
+13. 現有所有薪資 old → new 對照。
+14. 完整 regression 結果。
+15. 手機尺寸 screenshots / evidence。
+
+最後另外回答我：
+
+現在實玩是否已經自然產生「我開始想聘一個專門洗盤子／杯子的人」的需求？
+
+如果答案還不明顯：
+
+不要新增 dishwasher。
+
+如果答案很明顯：
+
+只提出下一階段設計方案，
+
+不要自行實作。
+
+⸻
+
+最終產品原則
+
+Jill’s Kitchen 不要變成：
+
+玩家必須一直按才不會爆炸的餐廳遊戲。
+
+我要的是：
+
+餐廳裡每件事情真的有人做；玩家看得懂哪裡堵住，也可以選擇要不要伸手。
+
+員工越成熟：
+
+不是只是走得更快。
+
+而是：
+
+一趟可以做更多，並且越來越知道什麼時候該做什麼。
+
+最後成熟餐廳的幻想應該是：
+
+整間店自己活著。
+
+玩家可以認真經營，
+
+也可以去看 Jill、貓、熟客和故事，
+
+回來時餐廳仍然在合理運作。
+
+這版我會直接給 Claude。它已經把你剛才最重要的新修正——服務生從第一天就至少能合理拿兩份，而且升級重點是「一趟做更多」而不是單純加跑速——寫成硬規則了。這樣後面 waiter、收桌、洗碗、Pass 才會是一套，而不是四個彼此沒關係的小系統。
+從現在開始，所有與新 Cooking System／Restaurant Workflow 有關的改動，全部先留在目前的開發分支與私人測試版。
+
+包含但不限於：
+
+- 新 Cooking System
+- dish-specific cooking choreography
+- 真正的 PLATING 動線
+- Pass 作為 completed-food buffer
+- waiter multi-carry / 一次拿多盤
+- waiter routing
+- table clearing
+- dirty dishes
+- washing
+- Dirty Dish capacity
+- staff automation
+- waiter / cleaner AI
+- 後續可能新增的 dishwasher / glassware staff
+- 與這一整套玩法直接相關的 balance / simulation / economy 調整
+
+HARD RULE：
+
+**在我明確說「可以進 main」以前，全部都不要 merge 進 main。**
+
+**不要發布到正式玩家版。**
+
+**不要因為 tests 全過、simulation 漂亮、功能技術上做完，就自行判定可以發布。**
+
+我接下來會持續真人實玩這整套系統。
+
+目前可以繼續：
+
+- 實作
+- 修 bug
+- 改動畫
+- 改 AI
+- 做 PLATING
+- 做 Pass
+- 做 waiter multi-carry
+- 做收桌
+- 做 Dirty Dishes
+- 做 washing
+- 做 capacity / upgrade
+- 做 staff automation
+- 做 simulation
+- 做 regression
+- 做 screenshots / evidence
+- 更新私人測試版
+
+但不能：
+
+- merge main
+- 更新正式玩家版
+- 用這套未經我確認的新玩法取代目前正式版
+- 因為「我覺得應該好了」就自己發布
+
+目前這整套 Cooking / Restaurant Workflow 都視為：
+
+**大型玩法測試中。**
+
+即使某一部分已經完成，也不要把它單獨提前 merge main，除非我明確指定。
+
+優先順序：
+
+**真人實玩感受 > 產品設計正確 > regression 通過 > simulation 數字**
+
+tests / simulation 是驗證工具，不是發布授權。
+
+如果真人實玩發現某個核心設計不好玩，就繼續在測試分支改，不需要顧慮「已經做很多了所以要硬保留」。
+
+最重要的是：
+
+**main 必須保持目前正式版的安全狀態。**
+
+新的 Cooking / Restaurant Workflow 可以大改、可以試錯、可以重做，但在我明確批准以前，一律只存在於開發分支與私人測試版。
+你覺得你這次要花多久？
