@@ -25,7 +25,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     g = rt.Game(b, port, 'index', seed=9101, manual=True, viewport={'width': 390, 'height': 844})
     g.click('[data-act=open]'); g.page.wait_for_timeout(100)
-    g.ev("S.eq.stove=2;S.eq.bar=Math.max(S.eq.bar,1);S.eq.prep=Math.max(S.eq.prep,1);S.eq.oven=Math.max(S.eq.oven,1);")
+    g.ev("S.eq.stove=2;S.eq.bar=Math.max(S.eq.bar,1);S.eq.prep=Math.max(S.eq.prep,1);S.eq.oven=Math.max(S.eq.oven,1);S.rooms=S.rooms||{};S.rooms.pizzaoven=1;")
     rt.start_day(g); g.ev("setRoom('kitchen')")
     font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 14) if os.path.exists('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf') else None
     for d in DISHES:

@@ -29,7 +29,7 @@ with sync_playwright() as p:
         g = rt.Game(b, port, 'index', seed=4040, manual=True, viewport={'width': 390, 'height': 844})
         g.click('[data-act=open]'); g.page.wait_for_timeout(150)
         g.ev(SETUP % {'d': d, 'extra': EXTRA.get(d, '')})
-        if d in ('pizza', 'pzmarg', 'pzfungi'): g.ev("if(typeof projBuild==='function'){}S.projDone=S.projDone||{};S.projDone.pizzaoven=1;save()")
+        if d in ('pizza', 'pzmarg', 'pzfungi'): g.ev("S.rooms=S.rooms||{};S.rooms.pizzaoven=1;save()")   # projOn reads S.rooms
         rt.start_day(g)
         g.ev("for(let i=0;i<30;i++){if(typeof DLG!=='undefined'&&DLG)dlgNext()}")
         g.ev(MK); g.ev("R.sched=[];R.si=0;for(const q of R.groups.slice())leaveGroup(q,'ok');R.tickets=[];setRoom('kitchen')")

@@ -450,6 +450,12 @@
       第二杯要等第一杯離開；商店寫「同時 N 杯」）、`cooking_a_drink_batch_from_an_older_checkpoint_becomes_its_cups`（舊存檔裡還沒
       開始的一批拆成一杯一杯，做到一半的照原樣做完；咖啡吧杯位數不同的舊存檔照位置種類對回去，不會變成空店）。
 
+29. **2026-10-09（第五批料理動作）**：`cooking_each_dish_with_its_own_beats_starts_raw_and_changes_by_hand`：要有自己動作的
+    地方加上第五批的 27 個（炸雞塊、起司可樂餅、起司拼盤、蒜香蘑菇、水牛城雞翅、起司條、生蠔、德國豬腳、三種披薩）；這個測試的
+    廚房多了披薩烤爐（`S.rooms.pizzaoven=1`），披薩才畫得出來；檢查的方法沒變。工具：`tools/qa/dish_frames.py` 原本用
+    `S.projDone.pizzaoven` 開披薩烤爐（遊戲讀的是 `S.rooms`，所以從來沒開成，披薩一直做不到披薩烤爐那一步），改成 `S.rooms`；
+    `tools/qa/plating_sheet.py` 一樣加上披薩烤爐；`tools/qa/dish_sheet.py` 加中文菜名。
+
 ## 使用者 iPhone 回報（2026-10-08 晚上到 10-09 凌晨）
 
 使用者：「我剛在 iPhone 真人實玩私人測試版，發現兩個 blocker」，附第 3 天的存檔（`tests/saves/cooking_day3_0156.json`）。

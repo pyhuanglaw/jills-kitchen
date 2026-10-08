@@ -881,7 +881,7 @@ def cooking_each_dish_with_its_own_beats_starts_raw_and_changes_by_hand(b, port,
     gesture; at the start of each place the dish is its raw look (nothing of the place done), the beats in order bring it to
     the place's finished look; and drawn in the kitchen it looks different at the start, when the hands are done (half way
     through them where nothing cooks by itself) and at the end of each place, and while it is plated — never one finished picture from the first moment."""
-    g = _day(b, port, target, 9101, "S.eq.bar=Math.max(S.eq.bar,1);S.eq.prep=Math.max(S.eq.prep,1);S.eq.oven=Math.max(S.eq.oven,1);")
+    g = _day(b, port, target, 9101, "S.eq.bar=Math.max(S.eq.bar,1);S.eq.prep=Math.max(S.eq.prep,1);S.eq.oven=Math.max(S.eq.oven,1);S.rooms=S.rooms||{};S.rooms.pizzaoven=1;")   # (the pizza oven: the fifth batch's pizzas are drawn in its mouth)
     beats = json.loads(g.ev(r"""JSON.stringify((()=>{const out={};for(const d of Object.keys(CH))for(const f of Object.keys(CH[d])){const c=CH[d][f];const bad=[];
       for(const x of c.hands||[])if(!x.g)bad.push('hands without a gesture: '+x.say);
       for(const x of c.heat||[])if(x.ing)bad.push('added by the heat: '+x.say);
@@ -891,7 +891,10 @@ def cooking_each_dish_with_its_own_beats_starts_raw_and_changes_by_hand(b, port,
     for want in ('friedrice.hot', 'friedrice.plate', 'coffee.drink', 'blacktea.drink', 'sparkling.drink', 'salad.prep', 'salad.plate', 'pasta.hot', 'pasta.plate', 'soup.hot', 'soup.plate',
                  'burger.prep', 'burger.hot', 'burger.plate', 'pudding.prep', 'pudding.plate', 'fries.oven', 'fries.plate', 'fruitsoda.drink', 'veg.prep', 'veg.oven', 'veg.plate',
                  'tiramisu.prep', 'tiramisu.plate', 'chicken.prep', 'chicken.oven', 'chicken.plate', 'steak.prep', 'steak.hot', 'steak.plate', 'basque.prep', 'basque.oven', 'basque.plate', 'prosciutto.prep', 'prosciutto.plate',
-                 'salmon.prep', 'salmon.oven', 'salmon.plate', 'seafood.prep', 'seafood.hot', 'seafood.plate', 'duck.prep', 'duck.hot', 'duck.plate', 'risotto.hot', 'risotto.plate', 'souffle.prep', 'souffle.oven', 'souffle.plate'):
+                 'salmon.prep', 'salmon.oven', 'salmon.plate', 'seafood.prep', 'seafood.hot', 'seafood.plate', 'duck.prep', 'duck.hot', 'duck.plate', 'risotto.hot', 'risotto.plate', 'souffle.prep', 'souffle.oven', 'souffle.plate',
+                 'bites.hot', 'bites.plate', 'croquette.prep', 'croquette.hot', 'croquette.plate', 'cheeseplate.prep', 'cheeseplate.plate', 'mushroom.hot', 'mushroom.plate',
+                 'wings.hot', 'wings.plate', 'cheesestick.hot', 'cheesestick.plate', 'oyster.prep', 'oyster.plate', 'knuckle.prep', 'knuckle.oven', 'knuckle.plate',
+                 'pizza.prep', 'pizza.pizza', 'pizza.plate', 'pzmarg.prep', 'pzmarg.pizza', 'pzmarg.plate', 'pzfungi.prep', 'pzfungi.pizza', 'pzfungi.plate'):
         check(want in beats, f'{want} has its own beats: {sorted(beats)}')
     for k, v in beats.items():
         check(not v['bad'] and v['raw'] and v['done'] and v['n'] >= 2, f'{k}: by hand, from raw to done in its beats: {v}')
