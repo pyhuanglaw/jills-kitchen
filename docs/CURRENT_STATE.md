@@ -67,8 +67,10 @@
   用 `tools/qa/cooking_test_build.py` 建、發布到同一個網址。
   2026-10-08 晚上：Restaurant Workflow B（服務生一次端多盤、出菜口有上限、髒盤子拿回廚房洗、秀琴阿姨第一天幫忙；報告
   `docs/cooking/WORKFLOW_B_REPORT_2026-10-08.md`、設計 `docs/cooking/WORKFLOW_B.md`）和前三天的 onboarding（炒飯／咖啡／沙拉、
-  起始現金 $1,200；`docs/cooking/ARCHITECTURE.md`「前三天」）都在私人測試版第 9 版。**等使用者決定**：商用洗碗機做什麼、
-  中期的店少四分之一客人是否可以、兩個 Jill、主廚之夜一次端、秀琴阿姨第一天的字、燒焦的舊程式三件事。炒飯／裝盤等使用者
+  起始現金 $1,200；`docs/cooking/ARCHITECTURE.md`「前三天」）都在私人測試版第 10 版；使用者的兩份驗收清單逐條對照在
+  `docs/cooking/WORKFLOW_B_ACCEPTANCE.md`（附 iPhone 上 20 分鐘自己驗的步驟）。**等使用者決定**：商用洗碗機做什麼、
+  中期的店少四分之一客人是否可以、秀琴阿姨第 2–3 天要不要來、有人正在去收的桌子點了要不要派 Jill、第 45 節那一幕要不要
+  更常出現、兩個 Jill、主廚之夜一次端、秀琴阿姨第一天的字、Signature 的關鍵步驟、燒焦的舊程式三件事。炒飯／裝盤等使用者
   在 iPhone 上確認後，才做其他 34 道菜。
 
 - **2026-10-06 全面 Audit 與例行 QA**（已合回 `main`，使用者 2026-10-06「Audit 這套 QA 工具和測試我同意合回 main」；沒有改遊戲、沒有發布）：報告 `docs/audit/2026-10-06/README.md`；
