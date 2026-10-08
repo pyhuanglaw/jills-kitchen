@@ -1,0 +1,212 @@
+{
+ "perfect_day1": {
+  "end": {
+   "t": 168,
+   "guests": 14,
+   "lost": 0,
+   "wb": {},
+   "pass": {
+    "avg": 0.12,
+    "peak": 2,
+    "full": 0,
+    "wait": 0,
+    "noW": 0
+   },
+   "dd": {
+    "avg": 0,
+    "peak": 0,
+    "fulls": 0,
+    "full": 0,
+    "block": 0,
+    "in": 0,
+    "wash": 0,
+    "by": {},
+    "washT": {},
+    "starts": 0,
+    "startAvg": 0
+   },
+   "wl": {},
+   "dirtyNow": 0
+  },
+  "summary": {
+   "guests": 14,
+   "lost": 0,
+   "rev": 1680
+  }
+ },
+ "perfect_day2": {
+  "end": {
+   "t": 194,
+   "guests": 19,
+   "lost": 0,
+   "wb": {},
+   "pass": {
+    "avg": 0.3,
+    "peak": 3,
+    "full": 0,
+    "wait": 0,
+    "noW": 0
+   },
+   "dd": {
+    "avg": 0,
+    "peak": 0,
+    "fulls": 0,
+    "full": 0,
+    "block": 0,
+    "in": 0,
+    "wash": 0,
+    "by": {},
+    "washT": {},
+    "starts": 0,
+    "startAvg": 0
+   },
+   "wl": {},
+   "dirtyNow": 0
+  },
+  "summary": {
+   "guests": 19,
+   "lost": 0,
+   "rev": 3180
+  }
+ },
+ "perfect_day3": {
+  "end": {
+   "t": 195,
+   "guests": 4,
+   "lost": 0,
+   "wb": {},
+   "pass": {
+    "avg": 0.04,
+    "peak": 2,
+    "full": 0,
+    "wait": 0,
+    "noW": 0
+   },
+   "dd": {
+    "avg": 0,
+    "peak": 0,
+    "fulls": 0,
+    "full": 0,
+    "block": 0,
+    "in": 0,
+    "wash": 0,
+    "by": {},
+    "washT": {},
+    "starts": 0,
+    "startAvg": 0
+   },
+   "wl": {},
+   "dirtyNow": 0
+  },
+  "summary": {
+   "guests": 4,
+   "lost": 0,
+   "rev": 420
+  }
+ },
+ "lazy_day1": {
+  "end": {
+   "t": 168,
+   "guests": 14,
+   "lost": 0,
+   "wb": {},
+   "pass": {
+    "avg": 0.12,
+    "peak": 2,
+    "full": 0,
+    "wait": 0,
+    "noW": 0
+   },
+   "dd": {
+    "avg": 0,
+    "peak": 0,
+    "fulls": 0,
+    "full": 0,
+    "block": 0,
+    "in": 0,
+    "wash": 0,
+    "by": {},
+    "washT": {},
+    "starts": 0,
+    "startAvg": 0
+   },
+   "wl": {},
+   "dirtyNow": 0
+  },
+  "summary": {
+   "guests": 14,
+   "lost": 0,
+   "rev": 1680
+  }
+ },
+ "lazy_day2": {
+  "end": {
+   "t": 194,
+   "guests": 19,
+   "lost": 0,
+   "wb": {},
+   "pass": {
+    "avg": 0.3,
+    "peak": 3,
+    "full": 0,
+    "wait": 0,
+    "noW": 0
+   },
+   "dd": {
+    "avg": 0,
+    "peak": 0,
+    "fulls": 0,
+    "full": 0,
+    "block": 0,
+    "in": 0,
+    "wash": 0,
+    "by": {},
+    "washT": {},
+    "starts": 0,
+    "startAvg": 0
+   },
+   "wl": {},
+   "dirtyNow": 0
+  },
+  "summary": {
+   "guests": 19,
+   "lost": 0,
+   "rev": 3180
+  }
+ },
+ "lazy_day3": {
+  "end": {
+   "t": 195,
+   "guests": 4,
+   "lost": 0,
+   "wb": {},
+   "pass": {
+    "avg": 0.04,
+    "peak": 2,
+    "full": 0,
+    "wait": 0,
+    "noW": 0
+   },
+   "dd": {
+    "avg": 0,
+    "peak": 0,
+    "fulls": 0,
+    "full": 0,
+    "block": 0,
+    "in": 0,
+    "wash": 0,
+    "by": {},
+    "washT": {},
+    "starts": 0,
+    "startAvg": 0
+   },
+   "wl": {},
+   "dirtyNow": 0
+  },
+  "summary": {
+   "guests": 4,
+   "lost": 0,
+   "rev": 420
+  }
+ }
+}

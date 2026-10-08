@@ -33,3 +33,30 @@ Reading:
   On 7000 the trajectory moved (the plating walk changes how many random numbers each evening draws), and 怡君's
   move landed a day later: a matter of which trajectory, not of this change.
 - The test's seed base moves to 7600, which meets every target on both builds (as in rc7, rc7.3, rc7.4, rc8.2).
+
+
+== 01fcd77 (the dirty dishes, the private page's Version 7)
+7000: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 79 (15 days), wall_article 82 (+3)  — meets every target
+7100: yj_meet 53, yj_key 63, wall_worry 67, wall_settle 83 (16 days), wall_article 87 (+4)  — misses: the move within ten days, the wall in 62-66, by 82
+7200: yj_meet 53, yj_key 63, wall_worry 65, wall_settle 86 (21 days), wall_article 90 (+4)  — misses: the move within ten days, by 82
+7300: yj_meet 53, yj_key 61, wall_worry 66, wall_settle 82 (16 days), wall_article 85 (+3)  — meets every target
+7400: yj_meet 53, yj_key 63, wall_worry 65, wall_settle 83 (18 days), wall_article 88 (+5)  — misses: the move within ten days, by 82
+7500: yj_meet 53, yj_key 63, wall_worry 67, wall_settle 85 (18 days), wall_article 89 (+4)  — misses: the move within ten days, the wall in 62-66, by 82
+7600: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 82 (18 days), wall_article 85 (+3)  — meets every target
+   every target: 3 of 7
+
+== d4bbb4b (after the simulation: the 商用洗碗機 washes in half the time and brings a cart of 20; the Day 52 save has one)
+7000: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 80 (16 days), wall_article 83 (+3)  — meets every target
+7100: yj_meet 53, yj_key 61, wall_worry 65, wall_settle 81 (16 days), wall_article 84 (+3)  — meets every target
+7200: yj_meet 53, yj_key 63, wall_worry 66, wall_settle 83 (17 days), wall_article 87 (+4)  — misses: the move within ten days, by 82
+7300: yj_meet 53, yj_key 61, wall_worry 63, wall_settle 79 (16 days), wall_article 82 (+3)  — meets every target
+7400: yj_meet 53, yj_key 61, wall_worry 63, wall_settle 79 (16 days), wall_article 82 (+3)  — meets every target
+7500: yj_meet 53, yj_key 63, wall_worry 67, wall_settle 83 (16 days), wall_article 89 (+6)  — misses: the move within ten days, the wall in 62-66, by 82
+7600: yj_meet 53, yj_key 61, wall_worry 63, wall_settle 79 (16 days), wall_article 82 (+3)  — meets every target
+   every target: 5 of 7
+
+Reading (2026-10-08 evening):
+- 01fcd77, the cart at 10 in a restaurant of 21 tables: the evenings served about a fifth fewer guests and the wall's beats
+  came later on most seeds: 3 of 7. Likely (not traced beat by beat): those beats need two regulars seated at the same time,
+  and with tables waiting to be cleared that happens less often.
+- d4bbb4b: back to the earlier spread (5 of 7; 7600 meets every target, so the test's seed base stays 7600).

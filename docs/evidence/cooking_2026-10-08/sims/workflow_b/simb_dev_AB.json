@@ -1,0 +1,279 @@
+{
+ "perfect_day1": {
+  "end": {
+   "t": 174,
+   "guests": 15,
+   "lost": 0,
+   "wb": {},
+   "pass": {
+    "avg": 0.16,
+    "peak": 2,
+    "full": 0,
+    "wait": 14.5,
+    "noW": 0
+   },
+   "dd": {
+    "avg": 3.02,
+    "peak": 7,
+    "fulls": 0,
+    "full": 0,
+    "block": 0,
+    "in": 15,
+    "wash": 12,
+    "by": {
+     "xq": 12
+    },
+    "washT": {
+     "xq": 24.00000000000035
+    },
+    "starts": 3,
+    "startAvg": 6.3
+   },
+   "wl": {
+    "jill": {
+     "idle": 87.46666666666427,
+     "table": 52.43333333333292,
+     "dish": 34.10000000000063
+    },
+    "xq": {
+     "idle": 72.39999999999846,
+     "walk": 21.266666666666882,
+     "wash": 43.333333333333435
+    }
+   },
+   "dirtyNow": 0
+  },
+  "summary": {
+   "guests": 15,
+   "lost": 0,
+   "rev": 1800
+  }
+ },
+ "perfect_day2": {
+  "end": {
+   "t": 197,
+   "guests": 17,
+   "lost": 0,
+   "wb": {},
+   "pass": {
+    "avg": 0.45,
+    "peak": 4,
+    "full": 0,
+    "wait": 54.9,
+    "noW": 0
+   },
+   "dd": {
+    "avg": 5.25,
+    "peak": 10,
+    "fulls": 2,
+    "full": 8.8,
+    "block": 26,
+    "in": 22,
+    "wash": 14,
+    "by": {
+     "jill": 14
+    },
+    "washT": {
+     "jill": 25.6666666666671
+    },
+    "starts": 5,
+    "startAvg": 8.4
+   },
+   "wl": {
+    "jill": {
+     "idle": 51.33333333333298,
+     "table": 97.23333333333038,
+     "dish": 48.433333333333145
+    }
+   },
+   "dirtyNow": 1
+  },
+  "summary": {
+   "guests": 17,
+   "lost": 0,
+   "rev": 2640
+  }
+ },
+ "perfect_day3": {
+  "end": {
+   "t": 194,
+   "guests": 7,
+   "lost": 0,
+   "wb": {},
+   "pass": {
+    "avg": 0.09,
+    "peak": 2,
+    "full": 0,
+    "wait": 7.2,
+    "noW": 0
+   },
+   "dd": {
+    "avg": 2.13,
+    "peak": 8,
+    "fulls": 0,
+    "full": 0,
+    "block": 0,
+    "in": 10,
+    "wash": 10,
+    "by": {
+     "jill": 10
+    },
+    "washT": {
+     "jill": 18.333333333333403
+    },
+    "starts": 2,
+    "startAvg": 8
+   },
+   "wl": {
+    "jill": {
+     "idle": 116.96666666666259,
+     "table": 60.033333333332486,
+     "dish": 17.000000000000004
+    }
+   },
+   "dirtyNow": 0
+  },
+  "summary": {
+   "guests": 7,
+   "lost": 0,
+   "rev": 1080
+  }
+ },
+ "lazy_day1": {
+  "end": {
+   "t": 174,
+   "guests": 13,
+   "lost": 0,
+   "wb": {},
+   "pass": {
+    "avg": 0.11,
+    "peak": 2,
+    "full": 0,
+    "wait": 8.7,
+    "noW": 0
+   },
+   "dd": {
+    "avg": 3.37,
+    "peak": 7,
+    "fulls": 0,
+    "full": 0,
+    "block": 0,
+    "in": 11,
+    "wash": 6,
+    "by": {
+     "xq": 6
+    },
+    "washT": {
+     "xq": 11.999999999999968
+    },
+    "starts": 2,
+    "startAvg": 6.5
+   },
+   "wl": {
+    "jill": {
+     "idle": 124.76666666666215,
+     "table": 45.33333333333332,
+     "dish": 3.899999999999996
+    },
+    "xq": {
+     "idle": 30.46666666666734,
+     "clear": 67.86666666666538,
+     "walk": 22.466666666666942,
+     "wash": 16.199999999999964
+    }
+   },
+   "dirtyNow": 0
+  },
+  "summary": {
+   "guests": 13,
+   "lost": 0,
+   "rev": 1560
+  }
+ },
+ "lazy_day2": {
+  "end": {
+   "t": 211,
+   "guests": 19,
+   "lost": 2,
+   "wb": {},
+   "pass": {
+    "avg": 0.36,
+    "peak": 4,
+    "full": 0,
+    "wait": 38.1,
+    "noW": 0
+   },
+   "dd": {
+    "avg": 5.81,
+    "peak": 10,
+    "fulls": 2,
+    "full": 24.2,
+    "block": 32.5,
+    "in": 27,
+    "wash": 19,
+    "by": {
+     "jill": 19
+    },
+    "washT": {
+     "jill": 35.36666666666722
+    },
+    "starts": 6,
+    "startAvg": 9.3
+   },
+   "wl": {
+    "jill": {
+     "idle": 67.79999999999872,
+     "table": 92.83333333333063,
+     "dish": 50.36666666666637
+    }
+   },
+   "dirtyNow": 1
+  },
+  "summary": {
+   "guests": 19,
+   "lost": 2,
+   "rev": 3060
+  }
+ },
+ "lazy_day3": {
+  "end": {
+   "t": 197,
+   "guests": 3,
+   "lost": 0,
+   "wb": {},
+   "pass": {
+    "avg": 0.04,
+    "peak": 1,
+    "full": 0,
+    "wait": 3.4,
+    "noW": 0
+   },
+   "dd": {
+    "avg": 2.9,
+    "peak": 4,
+    "fulls": 0,
+    "full": 0,
+    "block": 0,
+    "in": 4,
+    "wash": 0,
+    "by": {},
+    "washT": {},
+    "starts": 0,
+    "startAvg": 0
+   },
+   "wl": {
+    "jill": {
+     "idle": 125.13333333332879,
+     "table": 62.066666666665704,
+     "dish": 9.799999999999976
+    }
+   },
+   "dirtyNow": 0
+  },
+  "summary": {
+   "guests": 3,
+   "lost": 0,
+   "rev": 420
+  }
+ }
+}

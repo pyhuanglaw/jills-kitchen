@@ -1,0 +1,146 @@
+{
+ "C": {
+  "end": {
+   "t": 296,
+   "guests": 80,
+   "lost": 9,
+   "wb": {
+    "trips": 81,
+    "items": 124,
+    "max": 4,
+    "n": [
+     0,
+     54,
+     16,
+     6,
+     5
+    ],
+    "multi": 13
+   },
+   "pass": {
+    "avg": 1.54,
+    "peak": 8,
+    "full": 0.3,
+    "wait": 0,
+    "noW": 0
+   },
+   "dd": {
+    "avg": 0,
+    "peak": 0,
+    "fulls": 0,
+    "full": 0,
+    "block": 0,
+    "in": 0,
+    "wash": 0,
+    "by": {},
+    "washT": {},
+    "starts": 0,
+    "startAvg": 0
+   },
+   "wl": {},
+   "dirtyNow": 0
+  },
+  "summary": {
+   "guests": 80,
+   "lost": 9,
+   "rev": 39470
+  },
+  "errors": []
+ },
+ "D": {
+  "end": {
+   "t": 276,
+   "guests": 73,
+   "lost": 0,
+   "wb": {
+    "trips": 67,
+    "items": 104,
+    "max": 4,
+    "n": [
+     0,
+     36,
+     26,
+     4,
+     1
+    ],
+    "multi": 5
+   },
+   "pass": {
+    "avg": 0.7,
+    "peak": 4,
+    "full": 0,
+    "wait": 0,
+    "noW": 0
+   },
+   "dd": {
+    "avg": 0,
+    "peak": 0,
+    "fulls": 0,
+    "full": 0,
+    "block": 0,
+    "in": 0,
+    "wash": 0,
+    "by": {},
+    "washT": {},
+    "starts": 0,
+    "startAvg": 0
+   },
+   "wl": {},
+   "dirtyNow": 0
+  },
+  "summary": {
+   "guests": 73,
+   "lost": 0,
+   "rev": 51710
+  },
+  "errors": []
+ },
+ "D2": {
+  "end": {
+   "t": 275,
+   "guests": 79,
+   "lost": 2,
+   "wb": {
+    "trips": 76,
+    "items": 104,
+    "max": 3,
+    "n": [
+     0,
+     49,
+     26,
+     1,
+     0
+    ],
+    "multi": 6
+   },
+   "pass": {
+    "avg": 0.73,
+    "peak": 4,
+    "full": 0,
+    "wait": 0,
+    "noW": 0
+   },
+   "dd": {
+    "avg": 0,
+    "peak": 0,
+    "fulls": 0,
+    "full": 0,
+    "block": 0,
+    "in": 0,
+    "wash": 0,
+    "by": {},
+    "washT": {},
+    "starts": 0,
+    "startAvg": 0
+   },
+   "wl": {},
+   "dirtyNow": 0
+  },
+  "summary": {
+   "guests": 79,
+   "lost": 2,
+   "rev": 50170
+  },
+  "errors": []
+ }
+}
