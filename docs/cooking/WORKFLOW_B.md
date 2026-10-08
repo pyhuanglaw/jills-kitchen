@@ -120,6 +120,17 @@
   `workflow_washing_can_stop_halfway_and_the_rest_waits`、`workflow_waiters_keep_serving_and_one_at_most_washes`、
   `workflow_the_dirty_dishes_survive_a_checkpoint`、`workflow_the_cart_shows_how_full_it_is`。
 
+- **完整回歸在 d4bbb4b 上 323/326**，三個失敗，都處理了：
+  - `v24_rc6_the_staff_room_plays_a_frame_and_dozes`：**是遊戲的問題，改遊戲**。打烊時外場的人照排好的時間上樓到員工休息室；
+    那一刻手上有事的人（還在把最後的盤子拿回廚房、在洗）以前就再也不上樓了——以前打烊時大家早就閒著，所以沒發生過。
+    現在：那一刻在忙，忙完就上樓（最晚晚 45 秒）。這個存檔那晚的撞球因此又打得起來。測試沒改。
+  - `v24_rc6_an_authored_beat_holds_the_service_until_it_is_read`：原本——包廂那一段，故事在固定的時間點觸發。不再成立——
+    盤子拿回廚房改變了那晚的時間，這個種子在那一刻有人正說到一半，面板照規則等他說完（audit N04）。改成——跟同一個測試的
+    前兩段一樣，先等沒有人在說話再觸發。驗證的事（包廂的客人跟著停住、之後在原地）不變。
+  - `v24_rc7_2_xiuqin_first_evening_holds_the_service`：原本——玩到晚上 90%（場景關著）才開始找她第一次進門的那一段。
+    不再成立——你決定她第一天第一桌吃完就來（「她說來幫忙，就真的有幫忙」）。改成——從開店就開著場景玩（第一天其他會停住
+    店裡的故事先點完），等到她那一段；而且要在打烊前。驗證的事（店裡停住、她在裡面、點完才繼續）不變。
+
 ## 8. 還沒做／待決定
 
 - **商用洗碗機現在做什麼（請你決定）**：它原本是「收桌快 30%，Jill 收桌不用再多走一趟」。有了髒盤子，「不用多走一趟」

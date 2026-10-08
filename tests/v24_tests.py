@@ -2209,6 +2209,11 @@ def v24_rc6_an_authored_beat_holds_the_service_until_it_is_read(b, port, target)
     g.ev("pdSeated({size:5,pdWalk:1},pdTable())")
     _frames(g, 30)
     g.ev("const d=storyDay();d.major=9;d.minor=9;d.v24=9"); _frames(g, 300)
+    # Workflow B (docs/cooking/WORKFLOW_B.md §7): the dishes carried back moved the evening's timing, and on this seed someone
+    # was mid-sentence at this moment, so the panel rightly waited (audit N04); this part now waits as the first one does
+    for _ in range(40):
+        if g.ev("!floorBusy()&&!(R.talkq||[]).length"): break
+        _frames(g, 15)
     g.ev("window.__holds=true;room='pdr';renderRoomTabs(true);storyDay().minor=0;storyDay().lp={};STORY_EV.push({k:'pd__hold_t',lane:'minor',at:['order'],when:()=>true,run:()=>{JILL_SAY('包廂那桌點好了嗎？',300);noteLine('（測試用的一段。）')}})")
     pd0 = json.loads(g.ev("JSON.stringify((()=>{const t=pdTable(),q=t&&t.group;return{st:q&&q.state,pat:q&&+q.pat.toFixed(4),tk:q&&q.ticket?q.ticket.items.map(i=>i.st).join(''):null,room,t:+R.t.toFixed(4)}})())"))
     check(g.ev("storyTick('order',{})") == 'pd__hold_t' and g.ev("!!DLG&&DLG.hold"), 'held, upstairs too')
@@ -3224,16 +3229,24 @@ def v24_rc7_story_guests_have_their_own_faces(b, port, target):
 def v24_rc7_2_xiuqin_first_evening_holds_the_service(b, port, target):
     """rc7.2 (the player, 21:49: 「秀琴阿姨出場要暫停遊戲吧 有劇情的」): when 秀琴阿姨 walks in for the first time, a scene with her
     portrait holds the service — the clock, the guests and the stoves wait — until the player has tapped through it; then
-    the evening goes on where it stopped. Her later evenings are the few words in the room, as before."""
+    the evening goes on where it stopped. Her later evenings are the few words in the room, as before.
+    Workflow B (the user, 2026-10-08: 「她說來幫忙，就真的有幫忙」; docs/cooking/WORKFLOW_B.md §7): her first evening she
+    walks in when the first table is done, not at closing — the test used to play to 90% of the evening with the scenes
+    off and only then look for hers; now it plays with the scenes on from the start (any other held scene of Day 1 is
+    tapped through) until hers opens."""
     g = Game(b, port, target, seed=264, manual=True, viewport={'width': 390, 'height': 844})
     install_bot(g); g.click('[data-act=open]')
     start_day(g)
-    g.ev("__botUntil('R.t>=R.dur*.9',60000,1/30)")
     g.ev("window.__noScenes=false")
-    for _ in range(400):
+    XQ = "!!(DLG&&DLG.hold)&&factN('xq_helper')===1&&($('#dlg .dlg-name').textContent+$('#dlg .dlg-text').textContent).includes('秀琴阿姨')"
+    for _ in range(3000):
         g.page.evaluate('()=>window.__bot(15,1/30)')
-        if g.ev("!!(DLG&&DLG.hold)") or g.ev("phase") != 'service': break
-    check(g.ev("!!(DLG&&DLG.hold)") and g.ev("factN('xq_helper')") == 1, 'her first evening opens a held scene')
+        if g.ev(XQ) or g.ev("phase") != 'service': break
+        if g.ev("!!(DLG&&DLG.hold)") and g.ev("factN('xq_helper')") != 1:
+            for _ in range(20):
+                if not g.ev("!!DLG"): break
+                g.ev("dlgNext()"); g.page.wait_for_timeout(20)
+    check(g.ev(XQ) and g.ev("R.t<R.dur*.9"), f'her first evening opens a held scene, before the closing: {g.ev("R&&+(R.t/R.dur).toFixed(2)")}')
     check('秀琴阿姨' in g.ev("$('#dlg .dlg-name').textContent+$('#dlg .dlg-text').textContent"), 'she is in it')
     t0 = g.ev("R.t"); g.ev("for(let i=0;i<60;i++)__tick(1000/30)")
     check(g.ev("R.t") == t0, 'the service waits while it is open')
