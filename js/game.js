@@ -236,7 +236,7 @@ const MAIN_MAX=9,SIDE_MAX=9;   /* declared before load(): mainHallMig runs while
 const ROLES={
  chef:{n:'廚師',hire:1500,wage:240,up:1200,d:'負責一個工作站。LV1 只做簡單的菜，升級後能處理更多料理；LV3 起也會接手 Jill 做到一半的菜；LV5 連 Jill 的招牌菜都學會了。',duties:['stove','oven','prep','bar']},
  waiter:{n:'服務生',hire:1200,wage:200,up:1000,d:'帶位、點餐、收桌；LV2 起會把做好的菜端給客人，LV3 起連結帳都包了。職責可以自己配：今天只收桌，或全部都做。等級越高動作越快。',duties:['both','seat','order']},
- cleaner:{n:'清潔員',hire:900,wage:150,up:800,d:'專職收桌，比服務生收得快，薪水也比較便宜。忙的時候幫服務生分擔最後那一趟。',duties:['clean']},
+ cleaner:{n:'清潔員',hire:900,wage:150,up:800,d:'專職收桌：把髒盤子收回廚房、洗乾淨。比服務生收得快，薪水也比較便宜。忙的時候幫服務生分擔最後那一趟。',duties:['clean']},
  bartender:{n:'調酒師',hire:2600,wage:320,up:1500,d:'站在 Lounge 的吧台後面：倒酒、把杯子交給吧台的客人；沒有 Lounge 外場的時候，桌邊的點單、送杯、結帳也一手包。等級越高越快、越記得客人。',duties:['lbar'],lounge:1},
 };
 /* v2.4 rc5 (the player, 19:07–19:16; docs/v24/staff_pools_1907_2026-10-01.txt): two employment pools — where someone
@@ -308,7 +308,7 @@ const OPS=[
  /* v2.2.1 J (#14, #15, Day 35 #2/#3): infrastructure you can see — each tier is a thing on a wall, not a number */
  {k:'ac',n:'空調',tiers:[14000,38000,95000],lv:2,d:t=>['基本冷氣：主廳牆上一台冷氣。熱天客人的耐心少扣一半。','靜音商用空調：換成一台安靜的商用機，熱天幾乎不影響客人；客人會注意到；店裡氛圍 +1。','分區恆溫系統：主廳、側廳各自恆溫，熱天完全不影響；氛圍再 +2。'][t-1]},
  {k:'power',n:'電力設施',tiers:[18000,48000],lv:3,d:t=>t===1?'配電盤升級：廚房牆上一面新的配電盤。跳電少一半、不會連續兩天跳電，設備故障少 25%。':'商用電力增容＋備用電源：不再跳電；設備故障再少一半。'},
- {k:'dish',n:'商用洗碗機',tiers:[32000],lv:4,d:()=>'後場一台商用洗碗機：收桌快 30%，Jill 收桌不用再多走一趟。'},
+ {k:'dish',n:'商用洗碗機',tiers:[32000],lv:4,d:()=>'後場一台商用洗碗機：洗碗快一倍，髒盤車放得下 20 個，收桌快 30%。'},   /* Workflow B: it washes now (pending the user's word, WORKFLOW_B.md §8) */
  {k:'pantry',n:'Bar 小廚／油炸站',tiers:[60000],lv:5,need:()=>loungeLv()>=3,d:()=>'廚房多一口爐和一台油炸機，專做 Lounge 的小食：爐台多一個位子，炸物、可樂餅、小食做得快 20%。不是第二個廚房——主菜、招牌菜還是那條線。'},   /* v2.3: optional, late, only once the Lounge is big */
 ];
 function opsLv(k){return(S.ops&&S.ops[k])||0}
@@ -10083,8 +10083,9 @@ function serveAtTable(m,w,tk){const T=tk.tk;const mine=handsFor(w,T);
  tk.stops=(tk.stops||[]).filter(x=>x!==T);
  if(tk.stops.length&&handsN(w,'dish')){crewCount(m,'serve');serveGo(tk,tk.stops[0]);w.busy=0;return true}
  /* on the way back (「回程發現兩桌吃完 → 收一批 dirty dishes → 一次帶回廚房」): a waiter from LV3 who clears tables takes a finished
-    table near the last one he served, if the tub has room */
- if(waiterDoes(m,'clean')&&waiterWays(m).tables>1&&ddFree()>0&&tk.t){const t0=tk.t;let best=null,bd=140;for(const t of R.tables){if(!ddCanClear(t)||!ddUnits(t)||t.claim||jillTargets(t.i)||(t.room||'main')!==(t0.room||'main'))continue;const d=Math.hypot(t.x-t0.x,t.y-t0.y);if(d<bd){bd=d;best=t}}
+    table near the last one he served, if the tub has room — on the way back, whether or not 收桌 is one of his jobs (收桌 on the
+    board is going out to clear tables; this is what he picks up passing by, the user's 「回程發現兩桌吃完」) */
+ if(waiterWays(m).tables>1&&ddFree()>0&&tk.t){const t0=tk.t;let best=null,bd=140;for(const t of R.tables){if(!ddCanClear(t)||!ddUnits(t)||t.claim||jillTargets(t.i)||(t.room||'main')!==(t0.room||'main'))continue;const d=Math.hypot(t.x-t0.x,t.y-t0.y);if(d<bd){bd=d;best=t}}
   if(best){const ct=ddCleanTask(m,w,best);if(ct){crewCount(m,'serve');w.task=ct;w.busy=0;return true}}}
  return false}
 /* the evening's trips, for the simulation's numbers (R.st.wb, kept with the day): how many, how many plates in hand, the
@@ -10097,8 +10098,10 @@ function waiterTrip(items,tables){const s=R.st.wb||(R.st.wb={trips:0,items:0,max
    sink. The tub holds 10 (ddCap). Full, a table that needs clearing waits for room — nothing vanishes, no clean plates are
    counted, plating never waits for a plate (「Dirty Dish Capacity 不等於 clean plate inventory」). At the sink they are washed
    one by one and are out of the count, onto the rack the plating takes its plates from. */
-const DD_CAP=[10];   /* Dirty Dish Area I; II and III after the simulation (「暫時不要武斷鎖死後期一定是 15 / 20」) */
-function ddLv(){return 0}   /* where an upgrade will go (a bigger landing rack, a longer sink counter): none yet */
+const DD_CAP=[10,20];   /* Dirty Dish Area I, and II with the 商用洗碗機 (its rack and landing table) — the simulation 2026-10-08
+   (docs/cooking/WORKFLOW_B.md §9): the Day 52 restaurant, nobody stepping in, served a fifth fewer guests at 10; with the machine's
+   faster washing and 20 it is within a few. III: not until a restaurant needs it (「不要現在硬鎖 10 → 15 → 20，除非資料支持」) */
+function ddLv(){return opsLv('dish')?1:0}
 function ddCap(){return DD_CAP[Math.min(DD_CAP.length-1,ddLv())]}
 function ddS(){if(!R)return{n:[],wash:null,rack:0};return R.dd||(R.dd={n:[],wash:null,rack:0})}
 /* what a dish comes back as: a cup, a glass, a bowl or a plate — one unit each, one tub for all (「先不要拆兩套 inventory」) */
@@ -10147,7 +10150,9 @@ function ddNextAfter(me,w,t0){w.ddN=(w.ddN||0)+1;if(handsN(w,'dirty')<carryCap(m
    Two at a time from the tub (Jill one), washed one by one, each out of the count and onto the rack under the sink. Between
    two the one washing can be called away; what is still in the tub stays for whoever washes next (「不要重置」). */
 const WASH_T={cleaner:[2,1.8,1.6,1.4,1.2],waiter:[2.4,2.2,2,1.8,1.6]};
-function washT(id){if(id==='jill')return 1.8;if(id==='xq')return 2;const m=(S.crew||[]).find(q=>q.id===id);if(!m)return 2;const L=WASH_T[m.role]||WASH_T.cleaner;return L[clamp(Math.round(m.lv||1),1,5)-1]}
+/* the 商用洗碗機: the one at the sink loads it and takes the clean ones out — each in half the time */
+function washT(id){return washT0(id)*(opsLv('dish')?.5:1)}
+function washT0(id){if(id==='jill')return 1.8;if(id==='xq')return 2;const m=(S.crew||[]).find(q=>q.id===id);if(!m)return 2;const L=WASH_T[m.role]||WASH_T.cleaner;return L[clamp(Math.round(m.lv||1),1,5)-1]}
 function ddWasher(){const W=ddS().wash;return W?W.who:null}
 function ddWho(id){return id==='jill'?'Jill':id==='xq'?'秀琴阿姨':((S.crew||[]).find(m=>m.id===id)||{}).name||''}
 function ddStartWash(id){const D=ddS();D.wash={who:id,ph:'take',t:0};if(R.st)ddStat('start',ddCount());R.tv++}
@@ -10185,7 +10190,8 @@ function ddWashCalled(me,w){if(me.role==='waiter')return ddCount()<=5||ddWaiterH
  return ddCount()<=4&&R.tables.some(t=>ddCanClear(t)&&!t.claim&&ddUnits(t))}
 /* the AI's own reasons to wash (「0–5 washing priority 很低；6–7 cleaner 有空可以開始處理；8–9 明顯提高；10 非常高」): a cleaner
    (and 秀琴阿姨) from 6, before clearing from 8; a waiter only from 8, with nothing for the guests and nobody at the sink;
-   Jill and the cooks never by themselves */
+   Jill and the cooks never by themselves. (Simulated 2026-10-08: washing whenever idle, or as soon as the cart has no room,
+   did not change the evenings — and 「如果 AI 每次 2/10 Dirty Dish 就開始洗，玩家永遠看不到 bottleneck」.) */
 const DD_CLEANER_AT=6,DD_FIRST_AT=8,DD_WAITER_AT=8;
 function ddWashNow(me,early){if(ddS().wash||!ddS().n.length)return false;const n=ddCount();if(me.role==='waiter')return n>=DD_WAITER_AT;return n>=(early?DD_FIRST_AT:DD_CLEANER_AT)}
 /* the player taps the cart or the sink: someone who can wash goes (a cleaner first, 秀琴阿姨, a waiter, then Jill herself) */
@@ -10223,14 +10229,19 @@ function ddDrawHands(c,w,x,y){const H=(w.hands||[]).filter(e=>e.k==='dirty');if(
 /* the cart in front of the sink: a steel frame on castors, a grey tub on top; what is in it says how full it is without a number
    (0, a few, a stack, two stacks and the glasses, heaped with the shelf below taken too) — and a small quiet number under it */
 function ddDrawCart(c,now){const D=ddS(),C=ddCart(),n=R?D.n.length:0,cap=ddCap();const x=C.x,y=C.y;
- c.fillStyle='rgba(0,0,0,.16)';el(c,x,y+1,17,3.4);
- c.strokeStyle='#8D969A';c.lineWidth=1.4;for(const dx of[-13,13]){c.beginPath();c.moveTo(x+dx,y-2);c.lineTo(x+dx,y-24);c.stroke()}
- c.fillStyle='#A9B2B6';rr(c,x-15,y-12,30,2.4,1);c.fill();c.fillStyle='#3A3C40';for(const dx of[-12,12])circ(c,x+dx,y-.6,1.8);
- /* the lower shelf: the overflow */if(n>=cap){for(let i=0;i<3;i++)ddDrawItem(c,i%2?'plate':'bowl',x-8+i*8,y-12.5-i*.3,1.15)}
- c.fillStyle='#6E7A80';rr(c,-16+x,y-30,32,8,2.5);c.fill();c.fillStyle='#5A666C';rr(c,x-15,y-23,30,2,1);c.fill();c.fillStyle='#4F5A60';rr(c,x-14,y-30,28,3,1.5);c.fill();
+ /* Dirty Dish Area II (the 商用洗碗機's rack, 20): the same cart a third wider, three stacks instead of two */
+ const big=cap>10,hw=big?20:15,ns=big?3:2,sp=big?12.5:13;
+ c.fillStyle='rgba(0,0,0,.16)';el(c,x,y+1,hw+2,3.4);
+ c.strokeStyle='#8D969A';c.lineWidth=1.4;for(const dx of[-(hw-2),hw-2]){c.beginPath();c.moveTo(x+dx,y-2);c.lineTo(x+dx,y-24);c.stroke()}
+ c.fillStyle='#A9B2B6';rr(c,x-hw,y-12,hw*2,2.4,1);c.fill();c.fillStyle='#3A3C40';for(const dx of[-(hw-3),hw-3])circ(c,x+dx,y-.6,1.8);
+ /* the lower shelf: the overflow */if(n>=cap){for(let i=0;i<(big?4:3);i++)ddDrawItem(c,i%2?'plate':'bowl',x-(big?12:8)+i*8,y-12.5-i*.3,1.15)}
+ c.fillStyle='#6E7A80';rr(c,-(hw+1)+x,y-30,(hw+1)*2,8,2.5);c.fill();c.fillStyle='#5A666C';rr(c,x-hw,y-23,hw*2,2,1);c.fill();c.fillStyle='#4F5A60';rr(c,x-(hw-1),y-30,(hw-1)*2,3,1.5);c.fill();
  const items=D.n.slice(0,Math.min(n,cap));const pl=items.filter(v=>v==='plate'||v==='bowl'),sm=items.filter(v=>v==='cup'||v==='glass');
- const stacks=[pl.slice(0,Math.ceil(pl.length/2)),pl.slice(Math.ceil(pl.length/2))];stacks.forEach((st,si)=>st.forEach((v,i)=>ddDrawItem(c,v,x-6.5+si*13,y-30-i*2.6,1.35)));
- sm.forEach((v,i)=>ddDrawItem(c,v,x-10+(i%3)*9,y-32-Math.max(stacks[0].length,stacks[1].length)*2.6-(i>=3?6:0),1.3));
+ const per=Math.ceil(pl.length/ns),stacks=[];for(let i=0;i<ns;i++)stacks.push(pl.slice(i*per,(i+1)*per));
+ stacks.forEach((st,si)=>st.forEach((v,i)=>ddDrawItem(c,v,x-sp*(ns-1)/2+si*sp,y-30-i*2.6,1.35)));
+ const top=Math.max(0,...stacks.map(st=>st.length));
+ if(big)sm.forEach((v,i)=>ddDrawItem(c,v,x-13.5+(i%4)*9,y-32-top*2.6-Math.floor(i/4)*6,1.3));
+ else sm.forEach((v,i)=>ddDrawItem(c,v,x-10+(i%3)*9,y-32-top*2.6-(i>=3?6:0),1.3));
 }
 /* 「髒餐具 7/10」 and 「洗滌 · 秀琴阿姨前往中」 → 「洗滌 · 秀琴阿姨」: two short lines under the cart, left of the pass, over
    everything (the pass's ticket clips must not cover them); the number turns a quiet brick colour when full (「只有真的滿了可以
@@ -10454,7 +10465,7 @@ function guideLines(t){const out=[];let d=0,cur='';for(const ch of t){cur+=ch;if
 const GUIDE=[   /* the manual describes the game as it is. Audited every release (docs/RELEASE_CHECKLIST.md) — in progress, not released: v2.5 料理 (feature/cooking-gameplay), 2026-10-08 (the new kitchen: 一天怎麼玩 › 營業中 says how a dish goes now — the ticket's dish, the lit place, the flow in small type, a done step waits, and when it is to be plated the dish itself is lit (2026-10-08: plating happens where the food is) — instead of the old station panel; 員工 says a cook takes only the places he knows, and — Workflow B, 2026-10-08 — that a waiter carries two plates and more, to more tables, as he grows; and a point of its own, 髒盤子: the dishes go back to the cart by the sink, ten at most, tap it for washing) — last: v2.4 rc8.8, 2026-10-07 (the room's lit tab says whose it is once Dylan is out and his name is over him there; 怎麼進去 already says only 「房間分頁的最後一個」 and the tab list gives the short names: checked, no line changed) — before: v2.4 rc8.7, 2026-10-07 (story first: the Lounge's people — 沈晴、阿拓 from Lounge I, 安安、許葳 with II; no level, rating or Lounge II for the Lounge, the piano, 予安 or the floor, and the manual names none; checked, that one line changed) — before: v2.4 rc8.6, 2026-10-07 (the stock rule as the game plays it: from Day 3 a dish with nothing in the fridge cannot be ordered; Jill orders one herself only on the first two days); the rewrite of 2026-10-06 from docs/audit/2026-10-06/ws5_manual.md: the first card is how a day is played; only what the screen does not tell and a player needs to know stays (what the screen already says, how the game was built, old saves and stories still to come left it); a space, and a story's own entry, comes into it when it is there */
  {ic:"🍳",h:"一天怎麼玩",sum:"第一次玩，先看這一張。",pts:[
   ["一天","開店前選今天的菜單、備料 → 17:00 開店 → 21:30 打烊，客人吃完就結算 → 用今天賺的錢在商店買東西 → 準備下一天。前兩天開店時，遊戲會自動幫你補好備料（照價付）。"],
-  ["髒盤子","收桌時，盤子、杯子會被拿回廚房，放進水槽前的髒盤車（最多 10 個）。車滿了，吃完的桌子要等：點髒盤車，就有人去洗。清潔員和秀琴阿姨會自己洗，服務生快滿了才洗。"],
+  ["髒盤子","收桌時，盤子、杯子會被拿回廚房，放進水槽前的髒盤車（最多 10 個；有商用洗碗機 20 個）。車滿了，吃完的桌子要等：點髒盤車，就有人去洗。清潔員和秀琴阿姨會自己洗，服務生快滿了才洗。"],
   ["營業中","客人會自己找空桌坐。桌上出現紅色「!」：點桌子點餐。到廚房點訂單上的菜，它下一步的位置會亮起來，點那裡 Jill 就去做；裝盤時亮的是菜本身。菜下的小字是流程，粗體是現在這站，小名字是誰在做；做好的一站在原地等，不會壞。銀色餐蓋：點桌子上菜。金幣：點桌子收錢；客人走了再點一次收桌。"],
   ["員工","請了廚師、服務生、清潔員，他們會自己接工作；廚師只接自己會的位置（員工頁寫著每個人的）。廚師還在走過去時，點他要去的位置就換 Jill 做。服務生一次端兩盤起，等級越高端越多、一趟送越多桌。Jill 有空時會回房間坐一下，你點桌子她就回來。"],
   ["故事","重要的故事發生時，店裡會整個停住；一句一句點著看完，店才接著營業。錯過的都在「餐廳日誌」。"],
