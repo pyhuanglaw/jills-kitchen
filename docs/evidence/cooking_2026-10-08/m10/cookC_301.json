@@ -1,0 +1,2286 @@
+{
+ "args": {
+  "days": 8,
+  "seed": 301,
+  "policy": "normal",
+  "service": "human",
+  "after_opening": 32,
+  "width": 390,
+  "json": "/tmp/claude-0/-home-user/64ee893e-2a9e-517e-af2d-4f2493c4fa84/scratchpad/m10/cookC_301.json",
+  "log": "/tmp/claude-0/-home-user/64ee893e-2a9e-517e-af2d-4f2493c4fa84/scratchpad/m10/cookC_301_log.txt",
+  "what_if": "{const _m=wfMax;wfMax=function(d){return Math.max(_m(d),3)}}",
+  "save": null,
+  "dump_at": null,
+  "dump_save": null,
+  "probe": null,
+  "dump_when": null
+ },
+ "policy": "合理玩家模擬",
+ "service": "一般玩家節奏（員工做他們的事；Jill 看到事情約 0.9 秒後才動、每 0.45 秒一下、最多同時顧兩個工作站、時機題約四分之三打中 Perfect）",
+ "rows": [
+  {
+   "day": 1,
+   "money": 1385,
+   "level": 1,
+   "rate": 4.2,
+   "rate1": 4.2,
+   "tables": 2,
+   "crew": 0,
+   "roles": {},
+   "wagePools": {
+    "restaurant": 0,
+    "lounge": 0
+   },
+   "rentParts": [
+    [
+     "主廳",
+     300
+    ]
+   ],
+   "sum": {
+    "rev": 1200,
+    "tips": 220,
+    "bonus": 255,
+    "cost": 490,
+    "wages": 0,
+    "rent": 300,
+    "wine": 0,
+    "cfee": 0,
+    "piano": 0,
+    "ken": 0,
+    "loan": 0,
+    "net": 885,
+    "guests": 10,
+    "lost": 0,
+    "perfect": 10,
+    "plated": 10,
+    "avg": 96,
+    "lg": null,
+    "lgSales": null,
+    "dinWine": []
+   },
+   "econ": {
+    "main": {
+     "groups": 9,
+     "guests": 10,
+     "food": 1200,
+     "drink": 0,
+     "wine": 0,
+     "tips": 220
+    },
+    "lounge": {
+     "groups": 0,
+     "guests": 0,
+     "food": 0,
+     "drink": 0,
+     "wine": 0,
+     "tips": 0
+    },
+    "waits": [
+     15,
+     20,
+     14,
+     14,
+     14,
+     11,
+     14,
+     14,
+     14
+    ],
+    "served": 10,
+    "samples": 243,
+    "occMain": 265,
+    "capMain": 486,
+    "occLg": 0,
+    "capLg": 0,
+    "queue": 27,
+    "left": {
+     "happy": 10
+    },
+    "arrived": 0,
+    "turned": 0,
+    "wf": {
+     "steps": {
+      "jill": 18,
+      "crew": 0
+     },
+     "samples": 243,
+     "jillBusy": 49,
+     "busyWait": 0,
+     "jillOnly": 22
+    }
+   },
+   "beats": [
+    "m:lin_hello"
+   ],
+   "lounge": 0,
+   "proj": null,
+   "viewing": false,
+   "linCard": null,
+   "up": false,
+   "wines": 0,
+   "unlocked": 1,
+   "menu": [
+    [
+     "friedrice",
+     120
+    ]
+   ],
+   "dy": {
+    "stage": 0,
+    "reveal": null
+   },
+   "hud": {
+    "day": 1,
+    "clock": "打烊後",
+    "rate": 4.2,
+    "money": 1385
+   },
+   "seen": {
+    "r0": 3,
+    "r1": 4.2,
+    "arrow": "↑",
+    "minus": [],
+    "plus": [
+     {
+      "k": "料理品質",
+      "v": "10 道 Perfect",
+      "s": "10 道裡的 100%"
+     },
+     {
+      "k": "上菜速度",
+      "v": "客人很少等",
+      "s": "平均耐心 93%"
+     }
+    ],
+    "guests": 10,
+    "lost": 0,
+    "sat": 96
+   },
+   "decisions": [
+    {
+     "day": 1,
+     "kind": "decide",
+     "saw": "開店前：一鍵補到建議量 $525，現金 $500，冰箱 [0, 40]",
+     "why": "每天開店前先補到建議量",
+     "pressed": "一鍵補到建議量 $525",
+     "cost": 490,
+     "result": "現金 $500 → $10；畫面：錢不夠：黃金蛋炒飯還沒補到建議量。"
+    },
+    {
+     "day": 1,
+     "kind": "decide",
+     "saw": "開店前畫面",
+     "why": "準備好了，開始營業",
+     "pressed": "開始營業",
+     "cost": null,
+     "result": ""
+    }
+   ],
+   "svc": "{\"err\":0,\"last\":null,\"acts\":54}"
+  },
+  {
+   "day": 2,
+   "money": 3841,
+   "level": 1,
+   "rate": 4.53,
+   "rate1": 4.5,
+   "tables": 2,
+   "crew": 0,
+   "roles": {},
+   "wagePools": {
+    "restaurant": 0,
+    "lounge": 0
+   },
+   "rentParts": [
+    [
+     "主廳",
+     300
+    ]
+   ],
+   "sum": {
+    "rev": 2490,
+    "tips": 571,
+    "bonus": 330,
+    "cost": 635,
+    "wages": 0,
+    "rent": 300,
+    "wine": 0,
+    "cfee": 0,
+    "piano": 0,
+    "ken": 0,
+    "loan": 0,
+    "net": 2456,
+    "guests": 15,
+    "lost": 0,
+    "perfect": 23,
+    "plated": 23,
+    "avg": 98,
+    "lg": null,
+    "lgSales": null,
+    "dinWine": []
+   },
+   "econ": {
+    "main": {
+     "groups": 9,
+     "guests": 15,
+     "food": 1680,
+     "drink": 810,
+     "wine": 0,
+     "tips": 571
+    },
+    "lounge": {
+     "groups": 0,
+     "guests": 0,
+     "food": 0,
+     "drink": 0,
+     "wine": 0,
+     "tips": 0
+    },
+    "waits": [
+     14,
+     25,
+     12,
+     15,
+     15,
+     18,
+     16,
+     14,
+     13
+    ],
+    "served": 23,
+    "samples": 272,
+    "occMain": 320,
+    "capMain": 544,
+    "occLg": 0,
+    "capLg": 0,
+    "queue": 46,
+    "left": {
+     "happy": 15
+    },
+    "arrived": 0,
+    "turned": 0,
+    "wf": {
+     "steps": {
+      "jill": 30,
+      "crew": 0
+     },
+     "samples": 272,
+     "jillBusy": 83,
+     "busyWait": 8,
+     "jillOnly": 86
+    }
+   },
+   "beats": [],
+   "lounge": 0,
+   "proj": null,
+   "viewing": false,
+   "linCard": null,
+   "up": false,
+   "wines": 0,
+   "unlocked": 2,
+   "menu": [
+    [
+     "friedrice",
+     120
+    ],
+    [
+     "coffee",
+     90
+    ]
+   ],
+   "dy": {
+    "stage": 0,
+    "reveal": null
+   },
+   "hud": {
+    "day": 2,
+    "clock": "打烊後",
+    "rate": 4.5,
+    "money": 3841
+   },
+   "seen": {
+    "r0": 4.2,
+    "r1": 4.53,
+    "arrow": "↑",
+    "minus": [],
+    "plus": [
+     {
+      "k": "料理品質",
+      "v": "23 道 Perfect",
+      "s": "23 道裡的 100%"
+     },
+     {
+      "k": "上菜速度",
+      "v": "客人很少等",
+      "s": "平均耐心 97%"
+     }
+    ],
+    "guests": 15,
+    "lost": 0,
+    "sat": 98
+   },
+   "decisions": [
+    {
+     "day": 2,
+     "kind": "decide",
+     "saw": "開店前：一鍵補到建議量 $635，現金 $1,385，冰箱 [4, 40]",
+     "why": "每天開店前先補到建議量",
+     "pressed": "一鍵補到建議量 $635",
+     "cost": 635,
+     "result": "現金 $1,385 → $750"
+    },
+    {
+     "day": 2,
+     "kind": "decide",
+     "saw": "開店前畫面",
+     "why": "準備好了，開始營業",
+     "pressed": "開始營業",
+     "cost": null,
+     "result": ""
+    },
+    {
+     "day": 2,
+     "kind": "decide",
+     "saw": "菜單研發：「南瓜濃湯 前菜」售價 $130 · 成本 $30 · 爐台 · 難度 ● 研，直接買食譜 $700",
+     "why": "售價高的料理先研發",
+     "pressed": "菜單研發 › 直接買食譜 $700",
+     "cost": 700,
+     "result": "現金 $3,841 → $3,141；畫面：研發成功：南瓜濃湯！已加入菜單"
+    },
+    {
+     "day": 2,
+     "kind": "decide",
+     "saw": "菜單研發：「錫蘭檸檬紅茶 飲料」售價 $70 · 成本 $10 · 咖啡吧 · 難度 ● 研，直接買食譜 $300",
+     "why": "售價高的料理先研發",
+     "pressed": "菜單研發 › 直接買食譜 $300",
+     "cost": 300,
+     "result": "現金 $3,141 → $2,841；畫面：研發成功：錫蘭檸檬紅茶！已加入菜單"
+    },
+    {
+     "day": 2,
+     "kind": "decide",
+     "saw": "菜單研發：「檸檬氣泡水 飲料」售價 $60 · 成本 $8 · 咖啡吧 · 難度 ● 研究，直接買食譜 $250",
+     "why": "售價高的料理先研發",
+     "pressed": "菜單研發 › 直接買食譜 $250",
+     "cost": 250,
+     "result": "現金 $2,841 → $2,591；畫面：研發成功：檸檬氣泡水！已加入菜單"
+    },
+    {
+     "day": 2,
+     "kind": "decide",
+     "saw": "食譜升級：「黃金蛋炒飯」目前售價 $120（卡片：每升一顆星售價 +15%）",
+     "why": "賣得多的菜先升星",
+     "pressed": "菜單研發 › 升級 $950",
+     "cost": 950,
+     "result": "現金 $2,591 → $1,641；畫面：黃金蛋炒飯 升到 ★★"
+    }
+   ],
+   "svc": "{\"err\":0,\"last\":null,\"acts\":126}"
+  },
+  {
+   "day": 3,
+   "money": 3451,
+   "level": 1,
+   "rate": 4.45,
+   "rate1": 4.5,
+   "tables": 2,
+   "crew": 0,
+   "roles": {},
+   "wagePools": {
+    "restaurant": 0,
+    "lounge": 0
+   },
+   "rentParts": [
+    [
+     "主廳",
+     300
+    ]
+   ],
+   "sum": {
+    "rev": 2240,
+    "tips": 519,
+    "bonus": 405,
+    "cost": 1054,
+    "wages": 0,
+    "rent": 300,
+    "wine": 0,
+    "cfee": 0,
+    "piano": 0,
+    "ken": 0,
+    "loan": 0,
+    "net": 1810,
+    "guests": 12,
+    "lost": 7,
+    "perfect": 18,
+    "plated": 18,
+    "avg": 93,
+    "lg": null,
+    "lgSales": null,
+    "dinWine": []
+   },
+   "econ": {
+    "main": {
+     "groups": 9,
+     "guests": 12,
+     "food": 1760,
+     "drink": 480,
+     "wine": 0,
+     "tips": 519
+    },
+    "lounge": {
+     "groups": 0,
+     "guests": 0,
+     "food": 0,
+     "drink": 0,
+     "wine": 0,
+     "tips": 0
+    },
+    "waits": [
+     13,
+     30,
+     15,
+     16,
+     14,
+     29,
+     14,
+     14,
+     17
+    ],
+    "served": 18,
+    "samples": 293,
+    "occMain": 374,
+    "capMain": 586,
+    "occLg": 0,
+    "capLg": 0,
+    "queue": 232,
+    "left": {
+     "happy": 12
+    },
+    "arrived": 0,
+    "turned": 0,
+    "wf": {
+     "steps": {
+      "jill": 32,
+      "crew": 0
+     },
+     "samples": 293,
+     "jillBusy": 86,
+     "busyWait": 17,
+     "jillOnly": 110
+    }
+   },
+   "beats": [
+    "a:recognize"
+   ],
+   "lounge": 0,
+   "proj": null,
+   "viewing": false,
+   "linCard": null,
+   "up": false,
+   "wines": 0,
+   "unlocked": 6,
+   "menu": [
+    [
+     "friedrice",
+     140
+    ],
+    [
+     "coffee",
+     90
+    ],
+    [
+     "soup",
+     130
+    ],
+    [
+     "blacktea",
+     70
+    ],
+    [
+     "pasta",
+     160
+    ]
+   ],
+   "dy": {
+    "stage": 0,
+    "reveal": null
+   },
+   "hud": {
+    "day": 3,
+    "clock": "打烊後",
+    "rate": 4.5,
+    "money": 3451
+   },
+   "seen": {
+    "r0": 4.53,
+    "r1": 4.45,
+    "arrow": "↓",
+    "minus": [
+     {
+      "k": "客滿離開",
+      "v": "7 位",
+      "s": "其中 1 則留下兩顆星"
+     }
+    ],
+    "plus": [
+     {
+      "k": "料理品質",
+      "v": "18 道 Perfect",
+      "s": "18 道裡的 100%"
+     },
+     {
+      "k": "上菜速度",
+      "v": "客人很少等",
+      "s": "平均耐心 84%"
+     }
+    ],
+    "guests": 12,
+    "lost": 7,
+    "sat": 93
+   },
+   "decisions": [
+    {
+     "day": 3,
+     "kind": "decide",
+     "saw": "開店前：今日菜單 5/5 道已滿；「檸檬氣泡水」$60 是菜單上最便宜的",
+     "why": "讓位給更貴的「番茄義大利麵」$160",
+     "pressed": "檸檬氣泡水 的開關",
+     "cost": null,
+     "result": ""
+    },
+    {
+     "day": 3,
+     "kind": "decide",
+     "saw": "開店前：「番茄義大利麵」$160 研發好了但不在今晚菜單",
+     "why": "售價比較高，放上菜單",
+     "pressed": "番茄義大利麵 的開關",
+     "cost": null,
+     "result": ""
+    },
+    {
+     "day": 3,
+     "kind": "decide",
+     "saw": "開店前：一鍵補到建議量 $1,054，現金 $1,641，冰箱 [4, 40]",
+     "why": "每天開店前先補到建議量",
+     "pressed": "一鍵補到建議量 $1,054",
+     "cost": 1054,
+     "result": "現金 $1,641 → $587"
+    },
+    {
+     "day": 3,
+     "kind": "decide",
+     "saw": "開店前畫面",
+     "why": "準備好了，開始營業",
+     "pressed": "開始營業",
+     "cost": null,
+     "result": ""
+    },
+    {
+     "day": 3,
+     "kind": "decide",
+     "saw": "結算：「7 位沒等到」；家具與佈置：餐桌 2 / 4 張 加一張桌子 $500",
+     "why": "客人來了沒位子坐，多一張桌子",
+     "pressed": "家具與佈置 › 加一張桌子 $500",
+     "cost": 500,
+     "result": "現金 $3,451 → $2,951；畫面：新桌子搬進來了！"
+    },
+    {
+     "day": 3,
+     "kind": "decide",
+     "saw": "結算：「7 位沒等到」；家具與佈置：餐桌 3 / 4 張 加一張桌子 $800",
+     "why": "客人來了沒位子坐，多一張桌子",
+     "pressed": "家具與佈置 › 加一張桌子 $800",
+     "cost": 800,
+     "result": "現金 $2,951 → $2,151"
+    }
+   ],
+   "svc": "{\"err\":0,\"last\":null,\"acts\":203}"
+  },
+  {
+   "day": 4,
+   "money": 7545,
+   "level": 1,
+   "rate": 4.65,
+   "rate1": 4.6,
+   "tables": 4,
+   "crew": 0,
+   "roles": {},
+   "wagePools": {
+    "restaurant": 0,
+    "lounge": 0
+   },
+   "rentParts": [
+    [
+     "主廳",
+     300
+    ]
+   ],
+   "sum": {
+    "rev": 4390,
+    "tips": 1090,
+    "bonus": 480,
+    "cost": 566,
+    "wages": 0,
+    "rent": 300,
+    "wine": 0,
+    "cfee": 0,
+    "piano": 0,
+    "ken": 0,
+    "loan": 0,
+    "net": 5394,
+    "guests": 26,
+    "lost": 2,
+    "perfect": 35,
+    "plated": 35,
+    "avg": 96,
+    "lg": null,
+    "lgSales": null,
+    "dinWine": []
+   },
+   "econ": {
+    "main": {
+     "groups": 16,
+     "guests": 26,
+     "food": 3400,
+     "drink": 990,
+     "wine": 0,
+     "tips": 1090
+    },
+    "lounge": {
+     "groups": 0,
+     "guests": 0,
+     "food": 0,
+     "drink": 0,
+     "wine": 0,
+     "tips": 0
+    },
+    "waits": [
+     13,
+     27,
+     33,
+     26,
+     26,
+     17,
+     16,
+     17,
+     22,
+     19,
+     15,
+     21,
+     19,
+     24,
+     18,
+     17
+    ],
+    "served": 35,
+    "samples": 315,
+    "occMain": 750,
+    "capMain": 1260,
+    "occLg": 0,
+    "capLg": 0,
+    "queue": 127,
+    "left": {
+     "happy": 26
+    },
+    "arrived": 0,
+    "turned": 0,
+    "wf": {
+     "steps": {
+      "jill": 46,
+      "crew": 0
+     },
+     "samples": 315,
+     "jillBusy": 124,
+     "busyWait": 46,
+     "jillOnly": 272
+    }
+   },
+   "beats": [
+    "m:ken_wine_q",
+    "a:lounge_idea"
+   ],
+   "lounge": 0,
+   "proj": null,
+   "viewing": false,
+   "linCard": null,
+   "up": false,
+   "wines": 0,
+   "unlocked": 7,
+   "menu": [
+    [
+     "friedrice",
+     140
+    ],
+    [
+     "coffee",
+     90
+    ],
+    [
+     "soup",
+     130
+    ],
+    [
+     "pasta",
+     160
+    ],
+    [
+     "salad",
+     110
+    ]
+   ],
+   "dy": {
+    "stage": 0,
+    "reveal": null
+   },
+   "hud": {
+    "day": 4,
+    "clock": "打烊後",
+    "rate": 4.6,
+    "money": 7545
+   },
+   "seen": {
+    "r0": 4.45,
+    "r1": 4.65,
+    "arrow": "↑",
+    "minus": [],
+    "plus": [
+     {
+      "k": "料理品質",
+      "v": "35 道 Perfect",
+      "s": "35 道裡的 100%"
+     },
+     {
+      "k": "上菜速度",
+      "v": "客人很少等",
+      "s": "平均耐心 89%"
+     }
+    ],
+    "guests": 26,
+    "lost": 2,
+    "sat": 96
+   },
+   "decisions": [
+    {
+     "day": 4,
+     "kind": "decide",
+     "saw": "開店前：今日菜單 5/5 道已滿；「錫蘭檸檬紅茶」$70 是菜單上最便宜的",
+     "why": "讓位給更貴的「田園沙拉」$110",
+     "pressed": "錫蘭檸檬紅茶 的開關",
+     "cost": null,
+     "result": ""
+    },
+    {
+     "day": 4,
+     "kind": "decide",
+     "saw": "開店前：「田園沙拉」$110 研發好了但不在今晚菜單",
+     "why": "售價比較高，放上菜單",
+     "pressed": "田園沙拉 的開關",
+     "cost": null,
+     "result": ""
+    },
+    {
+     "day": 4,
+     "kind": "decide",
+     "saw": "開店前：一鍵補到建議量 $622，現金 $2,151，冰箱 [22, 40]",
+     "why": "每天開店前先補到建議量",
+     "pressed": "一鍵補到建議量 $622",
+     "cost": 566,
+     "result": "現金 $2,151 → $1,585；畫面：冰箱滿了（40/40）：田園沙拉補不到建議量。先在放太多的那道按「−」退一點，或退掉不在菜單上的庫存"
+    },
+    {
+     "day": 4,
+     "kind": "decide",
+     "saw": "開店前畫面",
+     "why": "準備好了，開始營業",
+     "pressed": "開始營業",
+     "cost": null,
+     "result": ""
+    },
+    {
+     "day": 4,
+     "kind": "decide",
+     "saw": "員工：廚師 0/1，聘請 $1,500，日薪 $304 起",
+     "why": "廚師還有名額，錢夠付幾天薪水 → 補人",
+     "pressed": "員工 › 聘請 $1,500",
+     "cost": 1500,
+     "result": "現金 $7,545 → $6,045；畫面：阿德師傅 加入了 Jill's Kitchen！"
+    },
+    {
+     "day": 4,
+     "kind": "decide",
+     "saw": "員工：阿德師傅 廚師（卡片上今晚菜單的菜鎖著：🔒 番茄義大利麵 LV2）",
+     "why": "這些菜現在都要 Jill 自己做 → 訓練廚師",
+     "pressed": "員工 › 訓練升級 $1,200",
+     "cost": 1200,
+     "result": "現金 $6,045 → $4,845；畫面：阿德師傅 升到 LV2！"
+    },
+    {
+     "day": 4,
+     "kind": "decide",
+     "saw": "菜單研發：「經典牛肉漢堡 主餐」售價 $190 · 成本 $62 · 爐台 · 難度 ●● ，直接買食譜 $600",
+     "why": "售價高的料理先研發",
+     "pressed": "菜單研發 › 直接買食譜 $600",
+     "cost": 600,
+     "result": "現金 $4,845 → $4,245；畫面：研發成功：經典牛肉漢堡！菜單已滿，記得在開店前調整"
+    },
+    {
+     "day": 4,
+     "kind": "decide",
+     "saw": "菜單研發：「焦糖布丁 甜點」售價 $120 · 成本 $28 · 冷盤台 · 難度 ● ，直接買食譜 $700",
+     "why": "售價高的料理先研發",
+     "pressed": "菜單研發 › 直接買食譜 $700",
+     "cost": 700,
+     "result": "現金 $4,245 → $3,545；畫面：研發成功：焦糖布丁！菜單已滿，記得在開店前調整"
+    },
+    {
+     "day": 4,
+     "kind": "decide",
+     "saw": "食譜升級：「拿鐵咖啡」目前售價 $90（卡片：每升一顆星售價 +15%）",
+     "why": "賣得多的菜先升星",
+     "pressed": "菜單研發 › 升級 $700",
+     "cost": 700,
+     "result": "現金 $3,545 → $2,845；畫面：拿鐵咖啡 升到 ★★"
+    }
+   ],
+   "svc": "{\"err\":0,\"last\":null,\"acts\":327}"
+  },
+  {
+   "day": 5,
+   "money": 7301,
+   "level": 1,
+   "rate": 4.67,
+   "rate1": 4.7,
+   "tables": 4,
+   "crew": 1,
+   "roles": {
+    "chef": 1
+   },
+   "wagePools": {
+    "restaurant": 532,
+    "lounge": 0
+   },
+   "rentParts": [
+    [
+     "主廳",
+     300
+    ]
+   ],
+   "sum": {
+    "rev": 4795,
+    "tips": 1207,
+    "bonus": 555,
+    "cost": 1269,
+    "wages": 532,
+    "rent": 300,
+    "wine": 0,
+    "cfee": 0,
+    "piano": 0,
+    "ken": 0,
+    "loan": 0,
+    "net": 4456,
+    "guests": 26,
+    "lost": 0,
+    "perfect": 34,
+    "plated": 34,
+    "avg": 93,
+    "lg": null,
+    "lgSales": null,
+    "dinWine": []
+   },
+   "econ": {
+    "main": {
+     "groups": 19,
+     "guests": 26,
+     "food": 3640,
+     "drink": 1155,
+     "wine": 0,
+     "tips": 1207
+    },
+    "lounge": {
+     "groups": 0,
+     "guests": 0,
+     "food": 0,
+     "drink": 0,
+     "wine": 0,
+     "tips": 0
+    },
+    "waits": [
+     17,
+     14,
+     17,
+     11,
+     10,
+     12,
+     10,
+     12,
+     27,
+     16,
+     10,
+     8,
+     13,
+     14,
+     22,
+     10,
+     26,
+     10,
+     10
+    ],
+    "served": 34,
+    "samples": 310,
+    "occMain": 748,
+    "capMain": 1240,
+    "occLg": 0,
+    "capLg": 0,
+    "queue": 111,
+    "left": {
+     "happy": 25,
+     "ok": 1
+    },
+    "arrived": 0,
+    "turned": 0,
+    "wf": {
+     "steps": {
+      "jill": 19,
+      "crew": 43
+     },
+     "samples": 310,
+     "jillBusy": 64,
+     "busyWait": 32,
+     "jillOnly": 24
+    }
+   },
+   "beats": [
+    "a:first_shift",
+    "m:ken_pairing"
+   ],
+   "lounge": 0,
+   "proj": null,
+   "viewing": false,
+   "linCard": null,
+   "up": false,
+   "wines": 0,
+   "unlocked": 9,
+   "menu": [
+    [
+     "friedrice",
+     140
+    ],
+    [
+     "coffee",
+     105
+    ],
+    [
+     "pasta",
+     160
+    ],
+    [
+     "burger",
+     190
+    ],
+    [
+     "pudding",
+     120
+    ]
+   ],
+   "dy": {
+    "stage": 0,
+    "reveal": null
+   },
+   "hud": {
+    "day": 5,
+    "clock": "打烊後",
+    "rate": 4.7,
+    "money": 7301
+   },
+   "seen": {
+    "r0": 4.65,
+    "r1": 4.67,
+    "arrow": "↑",
+    "minus": [],
+    "plus": [
+     {
+      "k": "料理品質",
+      "v": "34 道 Perfect",
+      "s": "34 道裡的 100%"
+     },
+     {
+      "k": "上菜速度",
+      "v": "客人很少等",
+      "s": "平均耐心 84%"
+     }
+    ],
+    "guests": 26,
+    "lost": 0,
+    "sat": 93
+   },
+   "decisions": [
+    {
+     "day": 5,
+     "kind": "decide",
+     "saw": "開店前：今日菜單 5/5 道已滿；「田園沙拉」$110 是菜單上最便宜的",
+     "why": "讓位給更貴的「經典牛肉漢堡」$190",
+     "pressed": "田園沙拉 的開關",
+     "cost": null,
+     "result": ""
+    },
+    {
+     "day": 5,
+     "kind": "decide",
+     "saw": "開店前：「經典牛肉漢堡」$190 研發好了但不在今晚菜單",
+     "why": "售價比較高，放上菜單",
+     "pressed": "經典牛肉漢堡 的開關",
+     "cost": null,
+     "result": ""
+    },
+    {
+     "day": 5,
+     "kind": "decide",
+     "saw": "開店前：今日菜單 5/5 道已滿；「南瓜濃湯」$130 是菜單上最便宜的",
+     "why": "讓位給更貴的「焦糖布丁」$120",
+     "pressed": "南瓜濃湯 的開關",
+     "cost": null,
+     "result": ""
+    },
+    {
+     "day": 5,
+     "kind": "decide",
+     "saw": "開店前：「焦糖布丁」$120 研發好了但不在今晚菜單",
+     "why": "售價比較高，放上菜單",
+     "pressed": "焦糖布丁 的開關",
+     "cost": null,
+     "result": ""
+    },
+    {
+     "day": 5,
+     "kind": "decide",
+     "saw": "開店前：一鍵補到建議量 $1,325，現金 $2,845，冰箱 [5, 40]",
+     "why": "每天開店前先補到建議量",
+     "pressed": "一鍵補到建議量 $1,325",
+     "cost": 1269,
+     "result": "現金 $2,845 → $1,576；畫面：冰箱滿了（40/40）：焦糖布丁補不到建議量。先在放太多的那道按「−」退一點，或退掉不在菜單上的庫存"
+    },
+    {
+     "day": 5,
+     "kind": "decide",
+     "saw": "開店前畫面",
+     "why": "準備好了，開始營業",
+     "pressed": "開始營業",
+     "cost": null,
+     "result": ""
+    },
+    {
+     "day": 5,
+     "kind": "decide",
+     "saw": "食譜升級：「拿鐵咖啡」目前售價 $105（卡片：每升一顆星售價 +15%）",
+     "why": "賣得多的菜先升星",
+     "pressed": "菜單研發 › 升級 $1,450",
+     "cost": 1450,
+     "result": "現金 $7,301 → $5,851；畫面：拿鐵咖啡 升到 ★★★"
+    },
+    {
+     "day": 5,
+     "kind": "decide",
+     "saw": "食譜升級：「番茄義大利麵」目前售價 $160（卡片：每升一顆星售價 +15%）",
+     "why": "賣得多的菜先升星",
+     "pressed": "菜單研發 › 升級 $1,300",
+     "cost": 1300,
+     "result": "現金 $5,851 → $4,551；畫面：番茄義大利麵 升到 ★★"
+    },
+    {
+     "day": 5,
+     "kind": "decide",
+     "saw": "結算：賣完、估計少賣 9 份；廚房設備：冰箱 LV1",
+     "why": "冰箱大一點，備料夠",
+     "pressed": "廚房設備 › 升級 $800",
+     "cost": 800,
+     "result": "現金 $4,551 → $3,751；畫面：冰箱 升級完成：LV2"
+    }
+   ],
+   "svc": "{\"err\":0,\"last\":null,\"acts\":434}"
+  },
+  {
+   "day": 6,
+   "money": 10353,
+   "level": 1,
+   "rate": 4.56,
+   "rate1": 4.6,
+   "tables": 4,
+   "crew": 1,
+   "roles": {
+    "chef": 1
+   },
+   "wagePools": {
+    "restaurant": 532,
+    "lounge": 0
+   },
+   "rentParts": [
+    [
+     "主廳",
+     300
+    ]
+   ],
+   "sum": {
+    "rev": 7245,
+    "tips": 1715,
+    "bonus": 630,
+    "cost": 2156,
+    "wages": 532,
+    "rent": 300,
+    "wine": 0,
+    "cfee": 0,
+    "piano": 0,
+    "ken": 0,
+    "loan": 0,
+    "net": 6602,
+    "guests": 31,
+    "lost": 16,
+    "perfect": 48,
+    "plated": 48,
+    "avg": 91,
+    "lg": null,
+    "lgSales": null,
+    "dinWine": []
+   },
+   "econ": {
+    "main": {
+     "groups": 21,
+     "guests": 31,
+     "food": 5865,
+     "drink": 1380,
+     "wine": 0,
+     "tips": 1575
+    },
+    "lounge": {
+     "groups": 0,
+     "guests": 0,
+     "food": 0,
+     "drink": 0,
+     "wine": 0,
+     "tips": 0
+    },
+    "waits": [
+     10,
+     13,
+     16,
+     21,
+     11,
+     11,
+     16,
+     13,
+     14,
+     12,
+     14,
+     29,
+     13,
+     12,
+     11,
+     14,
+     23,
+     8,
+     11,
+     15,
+     11
+    ],
+    "served": 48,
+    "samples": 346,
+    "occMain": 861,
+    "capMain": 1384,
+    "occLg": 0,
+    "capLg": 0,
+    "queue": 261,
+    "left": {
+     "happy": 31
+    },
+    "arrived": 0,
+    "turned": 0,
+    "wf": {
+     "steps": {
+      "jill": 28,
+      "crew": 54
+     },
+     "samples": 346,
+     "jillBusy": 95,
+     "busyWait": 102,
+     "jillOnly": 39
+    }
+   },
+   "beats": [
+    "a:lin_seen",
+    "a:recognize"
+   ],
+   "lounge": 0,
+   "proj": null,
+   "viewing": false,
+   "linCard": null,
+   "up": false,
+   "wines": 0,
+   "unlocked": 9,
+   "menu": [
+    [
+     "friedrice",
+     140
+    ],
+    [
+     "coffee",
+     115
+    ],
+    [
+     "pasta",
+     185
+    ],
+    [
+     "burger",
+     190
+    ],
+    [
+     "pudding",
+     120
+    ]
+   ],
+   "dy": {
+    "stage": 0,
+    "reveal": null
+   },
+   "hud": {
+    "day": 6,
+    "clock": "打烊後",
+    "rate": 4.6,
+    "money": 10353
+   },
+   "seen": {
+    "r0": 4.67,
+    "r1": 4.56,
+    "arrow": "↓",
+    "minus": [
+     {
+      "k": "客滿離開",
+      "v": "16 位",
+      "s": "其中 1 則留下兩顆星"
+     }
+    ],
+    "plus": [
+     {
+      "k": "料理品質",
+      "v": "48 道 Perfect",
+      "s": "48 道裡的 100%"
+     },
+     {
+      "k": "貓在店裡過日子",
+      "v": "3 桌客人遇到了牠們",
+      "s": "牠們沒有在招呼誰，客人自己開心"
+     }
+    ],
+    "guests": 31,
+    "lost": 16,
+    "sat": 91
+   },
+   "decisions": [
+    {
+     "day": 6,
+     "kind": "decide",
+     "saw": "開店前：一鍵補到建議量 $2,212，現金 $3,751，冰箱 [2, 60]",
+     "why": "每天開店前先補到建議量",
+     "pressed": "一鍵補到建議量 $2,212",
+     "cost": 2156,
+     "result": "現金 $3,751 → $1,595；畫面：冰箱滿了（60/60）：焦糖布丁補不到建議量。先在放太多的那道按「−」退一點，或退掉不在菜單上的庫存"
+    },
+    {
+     "day": 6,
+     "kind": "decide",
+     "saw": "開店前畫面",
+     "why": "準備好了，開始營業",
+     "pressed": "開始營業",
+     "cost": null,
+     "result": ""
+    },
+    {
+     "day": 6,
+     "kind": "decide",
+     "saw": "員工：阿德師傅 廚師 LV2，目前：爐台・日薪 $532・每步 1.3 秒・品質 86 在",
+     "why": "「16 位沒等到」 → 訓練，動作快一點",
+     "pressed": "員工 › 訓練升級 $2,400",
+     "cost": 2400,
+     "result": "現金 $10,353 → $7,953；畫面：阿德師傅 升到 LV3！"
+    },
+    {
+     "day": 6,
+     "kind": "decide",
+     "saw": "員工：阿德師傅 廚師 LV3，目前：爐台・日薪 $832・每步 1.1 秒・品質 90 在",
+     "why": "「16 位沒等到」 → 訓練，動作快一點",
+     "pressed": "員工 › 訓練升級 $3,600",
+     "cost": 3600,
+     "result": "現金 $7,953 → $4,353；畫面：阿德師傅 升到 LV4！"
+    }
+   ],
+   "svc": "{\"err\":0,\"last\":null,\"acts\":566}"
+  },
+  {
+   "day": 7,
+   "money": 9598,
+   "level": 1,
+   "rate": 4.53,
+   "rate1": 4.5,
+   "tables": 4,
+   "crew": 1,
+   "roles": {
+    "chef": 1
+   },
+   "wagePools": {
+    "restaurant": 1224,
+    "lounge": 0
+   },
+   "rentParts": [
+    [
+     "主廳",
+     300
+    ]
+   ],
+   "sum": {
+    "rev": 6070,
+    "tips": 1822,
+    "bonus": 705,
+    "cost": 1828,
+    "wages": 1224,
+    "rent": 300,
+    "wine": 0,
+    "cfee": 0,
+    "piano": 0,
+    "ken": 0,
+    "loan": 0,
+    "net": 5245,
+    "guests": 25,
+    "lost": 14,
+    "perfect": 41,
+    "plated": 41,
+    "avg": 90,
+    "lg": null,
+    "lgSales": null,
+    "dinWine": []
+   },
+   "econ": {
+    "main": {
+     "groups": 18,
+     "guests": 25,
+     "food": 4920,
+     "drink": 1150,
+     "wine": 0,
+     "tips": 1822
+    },
+    "lounge": {
+     "groups": 0,
+     "guests": 0,
+     "food": 0,
+     "drink": 0,
+     "wine": 0,
+     "tips": 0
+    },
+    "waits": [
+     17,
+     12,
+     27,
+     19,
+     12,
+     20,
+     11,
+     23,
+     18,
+     13,
+     11,
+     20,
+     17,
+     31,
+     20,
+     17,
+     11,
+     21
+    ],
+    "served": 41,
+    "samples": 340,
+    "occMain": 890,
+    "capMain": 1360,
+    "occLg": 0,
+    "capLg": 0,
+    "queue": 330,
+    "left": {
+     "happy": 24,
+     "ok": 1
+    },
+    "arrived": 0,
+    "turned": 0,
+    "wf": {
+     "steps": {
+      "jill": 0,
+      "crew": 72
+     },
+     "samples": 340,
+     "jillBusy": 0,
+     "busyWait": 195,
+     "jillOnly": 0
+    }
+   },
+   "beats": [
+    "a:lounge_idea"
+   ],
+   "lounge": 0,
+   "proj": null,
+   "viewing": false,
+   "linCard": null,
+   "up": false,
+   "wines": 0,
+   "unlocked": 9,
+   "menu": [
+    [
+     "friedrice",
+     140
+    ],
+    [
+     "coffee",
+     115
+    ],
+    [
+     "pasta",
+     185
+    ],
+    [
+     "burger",
+     190
+    ],
+    [
+     "pudding",
+     120
+    ]
+   ],
+   "dy": {
+    "stage": 0,
+    "reveal": null
+   },
+   "hud": {
+    "day": 7,
+    "clock": "打烊後",
+    "rate": 4.5,
+    "money": 9598
+   },
+   "seen": {
+    "r0": 4.56,
+    "r1": 4.53,
+    "arrow": "↓",
+    "minus": [
+     {
+      "k": "客滿離開",
+      "v": "14 位",
+      "s": "其中 1 則留下兩顆星"
+     }
+    ],
+    "plus": [
+     {
+      "k": "料理品質",
+      "v": "41 道 Perfect",
+      "s": "41 道裡的 100%"
+     },
+     {
+      "k": "貓在店裡過日子",
+      "v": "4 桌客人遇到了牠們",
+      "s": "牠們沒有在招呼誰，客人自己開心"
+     }
+    ],
+    "guests": 25,
+    "lost": 14,
+    "sat": 90
+   },
+   "decisions": [
+    {
+     "day": 7,
+     "kind": "decide",
+     "saw": "開店前：一鍵補到建議量 $1,884，現金 $4,353，冰箱 [12, 60]",
+     "why": "每天開店前先補到建議量",
+     "pressed": "一鍵補到建議量 $1,884",
+     "cost": 1828,
+     "result": "現金 $4,353 → $2,525；畫面：冰箱滿了（60/60）：焦糖布丁補不到建議量。先在放太多的那道按「−」退一點，或退掉不在菜單上的庫存"
+    },
+    {
+     "day": 7,
+     "kind": "decide",
+     "saw": "開店前畫面",
+     "why": "準備好了，開始營業",
+     "pressed": "開始營業",
+     "cost": null,
+     "result": ""
+    },
+    {
+     "day": 7,
+     "kind": "decide",
+     "saw": "「14 位沒等到」；家具與佈置：「新椅子」坐得舒服，客人耐心 +8%。 氛圍 +1",
+     "why": "卡片寫客人等得住／門口多等幾組",
+     "pressed": "家具與佈置 › 購買 $700",
+     "cost": 700,
+     "result": "現金 $9,598 → $8,898；畫面：新椅子 裝好了，看看店裡！"
+    },
+    {
+     "day": 7,
+     "kind": "decide",
+     "saw": "「14 位沒等到」；家具與佈置：「新椅子」坐得舒服，客人耐心 +8%。 氛圍 +1",
+     "why": "卡片寫客人等得住／門口多等幾組",
+     "pressed": "家具與佈置 › 購買 $3,000",
+     "cost": 3000,
+     "result": "現金 $8,898 → $5,898"
+    },
+    {
+     "day": 7,
+     "kind": "hold",
+     "saw": "「14 位沒等到」；員工沒有空的名額；店舖工程：「擴建：Jill's Bistro」擴建 $5,000",
+     "why": "付了就低於要留的 $4,889，再存",
+     "pressed": null,
+     "cost": null,
+     "result": null
+    },
+    {
+     "day": 7,
+     "kind": "decide",
+     "saw": "家具與佈置：「觀葉植物」角落多一點綠色，客人會待得更舒服。 氛圍 +1，購買 $300",
+     "why": "錢有餘，買一樣讓店更好的",
+     "pressed": "家具與佈置 › 購買 $300",
+     "cost": 300,
+     "result": "現金 $5,898 → $5,598；畫面：觀葉植物 裝好了，看看店裡！"
+    }
+   ],
+   "svc": "{\"err\":0,\"last\":null,\"acts\":662}"
+  },
+  {
+   "day": 8,
+   "money": 11834,
+   "level": 1,
+   "rate": 4.53,
+   "rate1": 4.5,
+   "tables": 4,
+   "crew": 1,
+   "roles": {
+    "chef": 1
+   },
+   "wagePools": {
+    "restaurant": 1224,
+    "lounge": 0
+   },
+   "rentParts": [
+    [
+     "主廳",
+     300
+    ]
+   ],
+   "sum": {
+    "rev": 6285,
+    "tips": 2082,
+    "bonus": 780,
+    "cost": 1387,
+    "wages": 1224,
+    "rent": 300,
+    "wine": 0,
+    "cfee": 0,
+    "piano": 0,
+    "ken": 0,
+    "loan": 0,
+    "net": 6236,
+    "guests": 25,
+    "lost": 0,
+    "perfect": 42,
+    "plated": 42,
+    "avg": 99,
+    "lg": null,
+    "lgSales": null,
+    "dinWine": []
+   },
+   "econ": {
+    "main": {
+     "groups": 19,
+     "guests": 25,
+     "food": 5020,
+     "drink": 1265,
+     "wine": 0,
+     "tips": 2082
+    },
+    "lounge": {
+     "groups": 0,
+     "guests": 0,
+     "food": 0,
+     "drink": 0,
+     "wine": 0,
+     "tips": 0
+    },
+    "waits": [
+     11,
+     17,
+     14,
+     26,
+     17,
+     18,
+     13,
+     19,
+     17,
+     16,
+     21,
+     24,
+     15,
+     27,
+     15,
+     21,
+     17,
+     9,
+     25
+    ],
+    "served": 42,
+    "samples": 349,
+    "occMain": 891,
+    "capMain": 1396,
+    "occLg": 0,
+    "capLg": 0,
+    "queue": 165,
+    "left": {
+     "happy": 25
+    },
+    "arrived": 0,
+    "turned": 0,
+    "wf": {
+     "steps": {
+      "jill": 0,
+      "crew": 80
+     },
+     "samples": 349,
+     "jillBusy": 0,
+     "busyWait": 193,
+     "jillOnly": 0
+    }
+   },
+   "beats": [
+    "a:recognize",
+    "m:ken_pairing",
+    "m:yj_meet"
+   ],
+   "lounge": 0,
+   "proj": null,
+   "viewing": false,
+   "linCard": null,
+   "up": false,
+   "wines": 0,
+   "unlocked": 9,
+   "menu": [
+    [
+     "friedrice",
+     140
+    ],
+    [
+     "coffee",
+     115
+    ],
+    [
+     "pasta",
+     185
+    ],
+    [
+     "burger",
+     190
+    ],
+    [
+     "pudding",
+     120
+    ]
+   ],
+   "dy": {
+    "stage": 1,
+    "reveal": null
+   },
+   "hud": {
+    "day": 8,
+    "clock": "打烊後",
+    "rate": 4.5,
+    "money": 11834
+   },
+   "seen": {
+    "r0": 4.53,
+    "r1": 4.53,
+    "arrow": "→",
+    "minus": [],
+    "plus": [
+     {
+      "k": "料理品質",
+      "v": "42 道 Perfect",
+      "s": "42 道裡的 100%"
+     },
+     {
+      "k": "上菜速度",
+      "v": "客人很少等",
+      "s": "平均耐心 90%"
+     }
+    ],
+    "guests": 25,
+    "lost": 0,
+    "sat": 99
+   },
+   "decisions": [
+    {
+     "day": 8,
+     "kind": "decide",
+     "saw": "開店前：一鍵補到建議量 $1,443，現金 $5,598，冰箱 [19, 60]",
+     "why": "每天開店前先補到建議量",
+     "pressed": "一鍵補到建議量 $1,443",
+     "cost": 1387,
+     "result": "現金 $5,598 → $4,211；畫面：冰箱滿了（60/60）：焦糖布丁補不到建議量。先在放太多的那道按「−」退一點，或退掉不在菜單上的庫存"
+    },
+    {
+     "day": 8,
+     "kind": "decide",
+     "saw": "開店前畫面",
+     "why": "準備好了，開始營業",
+     "pressed": "開始營業",
+     "cost": null,
+     "result": ""
+    },
+    {
+     "day": 8,
+     "kind": "decide",
+     "saw": "食譜升級：「番茄義大利麵」目前售價 $185（卡片：每升一顆星售價 +15%）",
+     "why": "賣得多的菜先升星",
+     "pressed": "菜單研發 › 升級 $2,550",
+     "cost": 2550,
+     "result": "現金 $11,834 → $9,284；畫面：番茄義大利麵 升到 ★★★"
+    },
+    {
+     "day": 8,
+     "kind": "decide",
+     "saw": "食譜升級：「黃金蛋炒飯」目前售價 $140（卡片：每升一顆星售價 +15%）",
+     "why": "賣得多的菜先升星",
+     "pressed": "菜單研發 › 升級 $1,900",
+     "cost": 1900,
+     "result": "現金 $9,284 → $7,384；畫面：黃金蛋炒飯 升到 ★★★"
+    },
+    {
+     "day": 8,
+     "kind": "decide",
+     "saw": "食譜升級：「經典牛肉漢堡」目前售價 $190（卡片：每升一顆星售價 +15%）",
+     "why": "賣得多的菜先升星",
+     "pressed": "菜單研發 › 升級 $1,500",
+     "cost": 1500,
+     "result": "現金 $7,384 → $5,884；畫面：經典牛肉漢堡 升到 ★★"
+    }
+   ],
+   "svc": "{\"err\":0,\"last\":null,\"acts\":772}"
+  }
+ ],
+ "log": [
+  {
+   "day": 1,
+   "kind": "decide",
+   "saw": "開店前：一鍵補到建議量 $525，現金 $500，冰箱 [0, 40]",
+   "why": "每天開店前先補到建議量",
+   "pressed": "一鍵補到建議量 $525",
+   "cost": 490,
+   "result": "現金 $500 → $10；畫面：錢不夠：黃金蛋炒飯還沒補到建議量。"
+  },
+  {
+   "day": 1,
+   "kind": "decide",
+   "saw": "開店前畫面",
+   "why": "準備好了，開始營業",
+   "pressed": "開始營業",
+   "cost": null,
+   "result": ""
+  },
+  {
+   "day": 2,
+   "kind": "decide",
+   "saw": "開店前：一鍵補到建議量 $635，現金 $1,385，冰箱 [4, 40]",
+   "why": "每天開店前先補到建議量",
+   "pressed": "一鍵補到建議量 $635",
+   "cost": 635,
+   "result": "現金 $1,385 → $750"
+  },
+  {
+   "day": 2,
+   "kind": "decide",
+   "saw": "開店前畫面",
+   "why": "準備好了，開始營業",
+   "pressed": "開始營業",
+   "cost": null,
+   "result": ""
+  },
+  {
+   "day": 2,
+   "kind": "decide",
+   "saw": "菜單研發：「南瓜濃湯 前菜」售價 $130 · 成本 $30 · 爐台 · 難度 ● 研，直接買食譜 $700",
+   "why": "售價高的料理先研發",
+   "pressed": "菜單研發 › 直接買食譜 $700",
+   "cost": 700,
+   "result": "現金 $3,841 → $3,141；畫面：研發成功：南瓜濃湯！已加入菜單"
+  },
+  {
+   "day": 2,
+   "kind": "decide",
+   "saw": "菜單研發：「錫蘭檸檬紅茶 飲料」售價 $70 · 成本 $10 · 咖啡吧 · 難度 ● 研，直接買食譜 $300",
+   "why": "售價高的料理先研發",
+   "pressed": "菜單研發 › 直接買食譜 $300",
+   "cost": 300,
+   "result": "現金 $3,141 → $2,841；畫面：研發成功：錫蘭檸檬紅茶！已加入菜單"
+  },
+  {
+   "day": 2,
+   "kind": "decide",
+   "saw": "菜單研發：「檸檬氣泡水 飲料」售價 $60 · 成本 $8 · 咖啡吧 · 難度 ● 研究，直接買食譜 $250",
+   "why": "售價高的料理先研發",
+   "pressed": "菜單研發 › 直接買食譜 $250",
+   "cost": 250,
+   "result": "現金 $2,841 → $2,591；畫面：研發成功：檸檬氣泡水！已加入菜單"
+  },
+  {
+   "day": 2,
+   "kind": "decide",
+   "saw": "食譜升級：「黃金蛋炒飯」目前售價 $120（卡片：每升一顆星售價 +15%）",
+   "why": "賣得多的菜先升星",
+   "pressed": "菜單研發 › 升級 $950",
+   "cost": 950,
+   "result": "現金 $2,591 → $1,641；畫面：黃金蛋炒飯 升到 ★★"
+  },
+  {
+   "day": 3,
+   "kind": "decide",
+   "saw": "開店前：今日菜單 5/5 道已滿；「檸檬氣泡水」$60 是菜單上最便宜的",
+   "why": "讓位給更貴的「番茄義大利麵」$160",
+   "pressed": "檸檬氣泡水 的開關",
+   "cost": null,
+   "result": ""
+  },
+  {
+   "day": 3,
+   "kind": "decide",
+   "saw": "開店前：「番茄義大利麵」$160 研發好了但不在今晚菜單",
+   "why": "售價比較高，放上菜單",
+   "pressed": "番茄義大利麵 的開關",
+   "cost": null,
+   "result": ""
+  },
+  {
+   "day": 3,
+   "kind": "decide",
+   "saw": "開店前：一鍵補到建議量 $1,054，現金 $1,641，冰箱 [4, 40]",
+   "why": "每天開店前先補到建議量",
+   "pressed": "一鍵補到建議量 $1,054",
+   "cost": 1054,
+   "result": "現金 $1,641 → $587"
+  },
+  {
+   "day": 3,
+   "kind": "decide",
+   "saw": "開店前畫面",
+   "why": "準備好了，開始營業",
+   "pressed": "開始營業",
+   "cost": null,
+   "result": ""
+  },
+  {
+   "day": 3,
+   "kind": "decide",
+   "saw": "結算：「7 位沒等到」；家具與佈置：餐桌 2 / 4 張 加一張桌子 $500",
+   "why": "客人來了沒位子坐，多一張桌子",
+   "pressed": "家具與佈置 › 加一張桌子 $500",
+   "cost": 500,
+   "result": "現金 $3,451 → $2,951；畫面：新桌子搬進來了！"
+  },
+  {
+   "day": 3,
+   "kind": "decide",
+   "saw": "結算：「7 位沒等到」；家具與佈置：餐桌 3 / 4 張 加一張桌子 $800",
+   "why": "客人來了沒位子坐，多一張桌子",
+   "pressed": "家具與佈置 › 加一張桌子 $800",
+   "cost": 800,
+   "result": "現金 $2,951 → $2,151"
+  },
+  {
+   "day": 4,
+   "kind": "decide",
+   "saw": "開店前：今日菜單 5/5 道已滿；「錫蘭檸檬紅茶」$70 是菜單上最便宜的",
+   "why": "讓位給更貴的「田園沙拉」$110",
+   "pressed": "錫蘭檸檬紅茶 的開關",
+   "cost": null,
+   "result": ""
+  },
+  {
+   "day": 4,
+   "kind": "decide",
+   "saw": "開店前：「田園沙拉」$110 研發好了但不在今晚菜單",
+   "why": "售價比較高，放上菜單",
+   "pressed": "田園沙拉 的開關",
+   "cost": null,
+   "result": ""
+  },
+  {
+   "day": 4,
+   "kind": "decide",
+   "saw": "開店前：一鍵補到建議量 $622，現金 $2,151，冰箱 [22, 40]",
+   "why": "每天開店前先補到建議量",
+   "pressed": "一鍵補到建議量 $622",
+   "cost": 566,
+   "result": "現金 $2,151 → $1,585；畫面：冰箱滿了（40/40）：田園沙拉補不到建議量。先在放太多的那道按「−」退一點，或退掉不在菜單上的庫存"
+  },
+  {
+   "day": 4,
+   "kind": "decide",
+   "saw": "開店前畫面",
+   "why": "準備好了，開始營業",
+   "pressed": "開始營業",
+   "cost": null,
+   "result": ""
+  },
+  {
+   "day": 4,
+   "kind": "decide",
+   "saw": "員工：廚師 0/1，聘請 $1,500，日薪 $304 起",
+   "why": "廚師還有名額，錢夠付幾天薪水 → 補人",
+   "pressed": "員工 › 聘請 $1,500",
+   "cost": 1500,
+   "result": "現金 $7,545 → $6,045；畫面：阿德師傅 加入了 Jill's Kitchen！"
+  },
+  {
+   "day": 4,
+   "kind": "decide",
+   "saw": "員工：阿德師傅 廚師（卡片上今晚菜單的菜鎖著：🔒 番茄義大利麵 LV2）",
+   "why": "這些菜現在都要 Jill 自己做 → 訓練廚師",
+   "pressed": "員工 › 訓練升級 $1,200",
+   "cost": 1200,
+   "result": "現金 $6,045 → $4,845；畫面：阿德師傅 升到 LV2！"
+  },
+  {
+   "day": 4,
+   "kind": "decide",
+   "saw": "菜單研發：「經典牛肉漢堡 主餐」售價 $190 · 成本 $62 · 爐台 · 難度 ●● ，直接買食譜 $600",
+   "why": "售價高的料理先研發",
+   "pressed": "菜單研發 › 直接買食譜 $600",
+   "cost": 600,
+   "result": "現金 $4,845 → $4,245；畫面：研發成功：經典牛肉漢堡！菜單已滿，記得在開店前調整"
+  },
+  {
+   "day": 4,
+   "kind": "decide",
+   "saw": "菜單研發：「焦糖布丁 甜點」售價 $120 · 成本 $28 · 冷盤台 · 難度 ● ，直接買食譜 $700",
+   "why": "售價高的料理先研發",
+   "pressed": "菜單研發 › 直接買食譜 $700",
+   "cost": 700,
+   "result": "現金 $4,245 → $3,545；畫面：研發成功：焦糖布丁！菜單已滿，記得在開店前調整"
+  },
+  {
+   "day": 4,
+   "kind": "decide",
+   "saw": "食譜升級：「拿鐵咖啡」目前售價 $90（卡片：每升一顆星售價 +15%）",
+   "why": "賣得多的菜先升星",
+   "pressed": "菜單研發 › 升級 $700",
+   "cost": 700,
+   "result": "現金 $3,545 → $2,845；畫面：拿鐵咖啡 升到 ★★"
+  },
+  {
+   "day": 5,
+   "kind": "decide",
+   "saw": "開店前：今日菜單 5/5 道已滿；「田園沙拉」$110 是菜單上最便宜的",
+   "why": "讓位給更貴的「經典牛肉漢堡」$190",
+   "pressed": "田園沙拉 的開關",
+   "cost": null,
+   "result": ""
+  },
+  {
+   "day": 5,
+   "kind": "decide",
+   "saw": "開店前：「經典牛肉漢堡」$190 研發好了但不在今晚菜單",
+   "why": "售價比較高，放上菜單",
+   "pressed": "經典牛肉漢堡 的開關",
+   "cost": null,
+   "result": ""
+  },
+  {
+   "day": 5,
+   "kind": "decide",
+   "saw": "開店前：今日菜單 5/5 道已滿；「南瓜濃湯」$130 是菜單上最便宜的",
+   "why": "讓位給更貴的「焦糖布丁」$120",
+   "pressed": "南瓜濃湯 的開關",
+   "cost": null,
+   "result": ""
+  },
+  {
+   "day": 5,
+   "kind": "decide",
+   "saw": "開店前：「焦糖布丁」$120 研發好了但不在今晚菜單",
+   "why": "售價比較高，放上菜單",
+   "pressed": "焦糖布丁 的開關",
+   "cost": null,
+   "result": ""
+  },
+  {
+   "day": 5,
+   "kind": "decide",
+   "saw": "開店前：一鍵補到建議量 $1,325，現金 $2,845，冰箱 [5, 40]",
+   "why": "每天開店前先補到建議量",
+   "pressed": "一鍵補到建議量 $1,325",
+   "cost": 1269,
+   "result": "現金 $2,845 → $1,576；畫面：冰箱滿了（40/40）：焦糖布丁補不到建議量。先在放太多的那道按「−」退一點，或退掉不在菜單上的庫存"
+  },
+  {
+   "day": 5,
+   "kind": "decide",
+   "saw": "開店前畫面",
+   "why": "準備好了，開始營業",
+   "pressed": "開始營業",
+   "cost": null,
+   "result": ""
+  },
+  {
+   "day": 5,
+   "kind": "decide",
+   "saw": "食譜升級：「拿鐵咖啡」目前售價 $105（卡片：每升一顆星售價 +15%）",
+   "why": "賣得多的菜先升星",
+   "pressed": "菜單研發 › 升級 $1,450",
+   "cost": 1450,
+   "result": "現金 $7,301 → $5,851；畫面：拿鐵咖啡 升到 ★★★"
+  },
+  {
+   "day": 5,
+   "kind": "decide",
+   "saw": "食譜升級：「番茄義大利麵」目前售價 $160（卡片：每升一顆星售價 +15%）",
+   "why": "賣得多的菜先升星",
+   "pressed": "菜單研發 › 升級 $1,300",
+   "cost": 1300,
+   "result": "現金 $5,851 → $4,551；畫面：番茄義大利麵 升到 ★★"
+  },
+  {
+   "day": 5,
+   "kind": "decide",
+   "saw": "結算：賣完、估計少賣 9 份；廚房設備：冰箱 LV1",
+   "why": "冰箱大一點，備料夠",
+   "pressed": "廚房設備 › 升級 $800",
+   "cost": 800,
+   "result": "現金 $4,551 → $3,751；畫面：冰箱 升級完成：LV2"
+  },
+  {
+   "day": 6,
+   "kind": "decide",
+   "saw": "開店前：一鍵補到建議量 $2,212，現金 $3,751，冰箱 [2, 60]",
+   "why": "每天開店前先補到建議量",
+   "pressed": "一鍵補到建議量 $2,212",
+   "cost": 2156,
+   "result": "現金 $3,751 → $1,595；畫面：冰箱滿了（60/60）：焦糖布丁補不到建議量。先在放太多的那道按「−」退一點，或退掉不在菜單上的庫存"
+  },
+  {
+   "day": 6,
+   "kind": "decide",
+   "saw": "開店前畫面",
+   "why": "準備好了，開始營業",
+   "pressed": "開始營業",
+   "cost": null,
+   "result": ""
+  },
+  {
+   "day": 6,
+   "kind": "decide",
+   "saw": "員工：阿德師傅 廚師 LV2，目前：爐台・日薪 $532・每步 1.3 秒・品質 86 在",
+   "why": "「16 位沒等到」 → 訓練，動作快一點",
+   "pressed": "員工 › 訓練升級 $2,400",
+   "cost": 2400,
+   "result": "現金 $10,353 → $7,953；畫面：阿德師傅 升到 LV3！"
+  },
+  {
+   "day": 6,
+   "kind": "decide",
+   "saw": "員工：阿德師傅 廚師 LV3，目前：爐台・日薪 $832・每步 1.1 秒・品質 90 在",
+   "why": "「16 位沒等到」 → 訓練，動作快一點",
+   "pressed": "員工 › 訓練升級 $3,600",
+   "cost": 3600,
+   "result": "現金 $7,953 → $4,353；畫面：阿德師傅 升到 LV4！"
+  },
+  {
+   "day": 7,
+   "kind": "decide",
+   "saw": "開店前：一鍵補到建議量 $1,884，現金 $4,353，冰箱 [12, 60]",
+   "why": "每天開店前先補到建議量",
+   "pressed": "一鍵補到建議量 $1,884",
+   "cost": 1828,
+   "result": "現金 $4,353 → $2,525；畫面：冰箱滿了（60/60）：焦糖布丁補不到建議量。先在放太多的那道按「−」退一點，或退掉不在菜單上的庫存"
+  },
+  {
+   "day": 7,
+   "kind": "decide",
+   "saw": "開店前畫面",
+   "why": "準備好了，開始營業",
+   "pressed": "開始營業",
+   "cost": null,
+   "result": ""
+  },
+  {
+   "day": 7,
+   "kind": "decide",
+   "saw": "「14 位沒等到」；家具與佈置：「新椅子」坐得舒服，客人耐心 +8%。 氛圍 +1",
+   "why": "卡片寫客人等得住／門口多等幾組",
+   "pressed": "家具與佈置 › 購買 $700",
+   "cost": 700,
+   "result": "現金 $9,598 → $8,898；畫面：新椅子 裝好了，看看店裡！"
+  },
+  {
+   "day": 7,
+   "kind": "decide",
+   "saw": "「14 位沒等到」；家具與佈置：「新椅子」坐得舒服，客人耐心 +8%。 氛圍 +1",
+   "why": "卡片寫客人等得住／門口多等幾組",
+   "pressed": "家具與佈置 › 購買 $3,000",
+   "cost": 3000,
+   "result": "現金 $8,898 → $5,898"
+  },
+  {
+   "day": 7,
+   "kind": "hold",
+   "saw": "「14 位沒等到」；員工沒有空的名額；店舖工程：「擴建：Jill's Bistro」擴建 $5,000",
+   "why": "付了就低於要留的 $4,889，再存",
+   "pressed": null,
+   "cost": null,
+   "result": null
+  },
+  {
+   "day": 7,
+   "kind": "decide",
+   "saw": "家具與佈置：「觀葉植物」角落多一點綠色，客人會待得更舒服。 氛圍 +1，購買 $300",
+   "why": "錢有餘，買一樣讓店更好的",
+   "pressed": "家具與佈置 › 購買 $300",
+   "cost": 300,
+   "result": "現金 $5,898 → $5,598；畫面：觀葉植物 裝好了，看看店裡！"
+  },
+  {
+   "day": 8,
+   "kind": "decide",
+   "saw": "開店前：一鍵補到建議量 $1,443，現金 $5,598，冰箱 [19, 60]",
+   "why": "每天開店前先補到建議量",
+   "pressed": "一鍵補到建議量 $1,443",
+   "cost": 1387,
+   "result": "現金 $5,598 → $4,211；畫面：冰箱滿了（60/60）：焦糖布丁補不到建議量。先在放太多的那道按「−」退一點，或退掉不在菜單上的庫存"
+  },
+  {
+   "day": 8,
+   "kind": "decide",
+   "saw": "開店前畫面",
+   "why": "準備好了，開始營業",
+   "pressed": "開始營業",
+   "cost": null,
+   "result": ""
+  },
+  {
+   "day": 8,
+   "kind": "decide",
+   "saw": "食譜升級：「番茄義大利麵」目前售價 $185（卡片：每升一顆星售價 +15%）",
+   "why": "賣得多的菜先升星",
+   "pressed": "菜單研發 › 升級 $2,550",
+   "cost": 2550,
+   "result": "現金 $11,834 → $9,284；畫面：番茄義大利麵 升到 ★★★"
+  },
+  {
+   "day": 8,
+   "kind": "decide",
+   "saw": "食譜升級：「黃金蛋炒飯」目前售價 $140（卡片：每升一顆星售價 +15%）",
+   "why": "賣得多的菜先升星",
+   "pressed": "菜單研發 › 升級 $1,900",
+   "cost": 1900,
+   "result": "現金 $9,284 → $7,384；畫面：黃金蛋炒飯 升到 ★★★"
+  },
+  {
+   "day": 8,
+   "kind": "decide",
+   "saw": "食譜升級：「經典牛肉漢堡」目前售價 $190（卡片：每升一顆星售價 +15%）",
+   "why": "賣得多的菜先升星",
+   "pressed": "菜單研發 › 升級 $1,500",
+   "cost": 1500,
+   "result": "現金 $7,384 → $5,884；畫面：經典牛肉漢堡 升到 ★★"
+  }
+ ],
+ "notes": [
+  {
+   "d": 1,
+   "t": "隔壁 Madame Lin 送的門鈴，掛在店門上。"
+  },
+  {
+   "d": 3,
+   "t": "跳電了一下"
+  },
+  {
+   "d": 4,
+   "t": "Emma 說要去隔壁坐一下。"
+  },
+  {
+   "d": 5,
+   "t": "有人在門口看了一下，走進來了。"
+  },
+  {
+   "d": 6,
+   "t": "外面一下子來了一群人"
+  },
+  {
+   "d": 6,
+   "t": "有人在門口看了一下，走進來了。"
+  },
+  {
+   "d": 7,
+   "t": "Mr. Hart 與朋友 說要去隔壁坐一下。"
+  },
+  {
+   "d": 7,
+   "t": "店裡突然安靜下來了"
+  },
+  {
+   "d": 7,
+   "t": "有人在門口看了一下，走進來了。"
+  }
+ ],
+ "errors": [],
+ "final": {
+  "day": 9,
+  "facts": {
+   "lin_hello": 1,
+   "xq_helper": 1,
+   "first_chen": 2,
+   "first_dylan": 3,
+   "first_n:品酒師 Ken": 3,
+   "inspection": 4,
+   "first_mia": 4,
+   "first_n:吃貨小琪": 4,
+   "ken_wine_q": 4,
+   "lounge_idea": 4,
+   "ken_pairing": 5,
+   "first_n:周董": 5,
+   "first_leo": 5,
+   "first_n:Madame Lin": 6,
+   "first_n:老饕李先生": 6,
+   "first_koba": 6,
+   "first_sophie": 7,
+   "first_n:Mr. Hart": 7,
+   "ken_du_argue": 8,
+   "yj_meet": 8,
+   "first_n:Monsieur 杜": 8,
+   "first_n:怡君": 8
+  },
+  "newRooms": {},
+  "crew": [
+   [
+    "阿德師傅",
+    "chef",
+    4
+   ]
+  ]
+ },
+ "lounge": {
+  "《看看》": null,
+  "第一次自然有 $50,000": null,
+  "兩個條件同時成立（《看看》、$50,000）": null,
+  "付錢（簽約・開工）": null,
+  "Madame Lin 最後一晚": null,
+  "《簽約》": null,
+  "The Lounge 開幕": null
+ },
+ "first": {
+  "lin_hello": 1,
+  "recognize": 3,
+  "ken_wine_q": 4,
+  "lounge_idea": 4,
+  "first_shift": 5,
+  "ken_pairing": 5,
+  "lin_seen": 6,
+  "yj_meet": 8
+ }
+}

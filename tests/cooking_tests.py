@@ -264,6 +264,26 @@ def cooking_any_dish_answers_the_five_questions(b, port, target):
 
 
 @test
+def cooking_a_cook_on_standby_rests_and_his_card_counts_his_dishes(b, port, target):
+    """The duty board in the new kitchen (ARCHITECTURE.md, decision 8): a cook taken off the board (「待命中」) does not take
+    work, as the board says; put back on it, he does. A cook hired from now on is posted at his own place (阿德師傅 the
+    range), never the coffee machine just because it was free. His staff card counts the restaurant's recipes that have a
+    step he can take, and lists the ones his level does not allow yet."""
+    ADE = "{id:'t_ade',role:'chef',name:'阿德師傅',lv:3,duty:null,since:1,days:0,pool:'restaurant'}"
+    g = _day(b, port, target, 7160, f"S.level=3;S.crew.push({ADE})")
+    g.ev("window.__patient=1")
+    check(_until(g, "R.tickets.length>0"), 'an order')
+    g.ev("__run(150)")
+    check(not g.ev("wfList().some(n=>n.who==='t_ade'||(n.ck||[]).includes('t_ade'))"), f'a cook on standby rests: {g.ev(WF)}')
+    g.ev("S.crew.find(m=>m.id==='t_ade').duty='stove'")
+    check(_until(g, "wfList().some(n=>n.who==='t_ade')||R.tickets.some(tk=>tk.items.some(it=>it.st==='ready'))", step=3), 'back on the board, he takes work')
+    check(g.ev("chefHomeDuty('阿德師傅')") == 'stove' and g.ev("(S.eq.oven=1,chefHomeDuty('Marco'))") == 'oven', 'a new cook is posted at his own place, not the coffee machine')
+    card = g.ev("(()=>{const m={id:'t_k',role:'chef',name:'阿德師傅',lv:1,duty:'stove'};for(const d of ['friedrice','steak','salad'])if(!S.unlocked.includes(d))S.unlocked.push(d);return wfChefDishesHTML(m)})()")
+    check('有他會的步驟：' in card and '🔒' in card and '炙烤肋眼牛排' in card, f'his card counts what he can do and shows what his level cannot yet: {card}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
 def cooking_the_work_survives_a_checkpoint(b, port, target):
     """A service saved in the middle of the new kitchen's work comes back with it: the batch on the fire is still on the
     fire, held by the same place. A checkpoint from before this version, with fried rice on an old-style station job, does
