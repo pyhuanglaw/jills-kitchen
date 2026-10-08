@@ -6055,7 +6055,8 @@ function wfTarget(n){if(n.st==='fetch'){const sp=wfSpot(n.slot);return sp?{x:sp.
  if(n.st==='work'){if(n.slot){const sp=wfSpot(n.slot);return{x:sp.cx,y:sp.cy}}return{x:WF_PICK.x,y:WF_PICK.y}}return null}
 function wfArrive(n){if(n.st==='fetch'){if(n.slot){n.slot.wf=null;n.slot=null}n.carry=true;n.st='go';R.tv++;return}
  if(n.st!=='go')return;n.carry=false;if(n.adv){n.si++;n.adv=false}if(n.to){n.slot=n.to;n.to=null}
- const f=wfFl(n)[n.si];const T=wfTimes(n.d,f);n.f=f;n.act=T.act*(1+.15*(n.n-1));n.pas=T.pas*(1+.1*(n.n-1));n.dur=n.act+n.pas;n.st='work';R.tv++}
+ const f=wfFl(n)[n.si];const T=wfTimes(n.d,f);n.f=f;n.act=T.act*(1+.15*(n.n-1));n.pas=T.pas*(1+.1*(n.n-1));n.dur=n.act+n.pas;n.st='work';R.tv++;
+ if(f==='hot'&&n.who==='jill')coach(3)}   /* the first day's tip about the fire, when her first dish is on it — however she was sent */
 function wfCrew(id){return(S.crew||[]).find(m=>m.id===id)||null}
 /* a cook's way with a place: his own (3), one he is learning (2, 1), or none (0); drinks are everyone's and nobody's
    speciality (spec §15) — the table that says who is good at what is a proposal for the user (chefSkill below) */
@@ -6162,7 +6163,7 @@ function wfTag(it){if(!isWF(it.d)||it.st==='ready'||it.st==='served'||it.st==='o
 /* the selected work, in words, at the foot of the screen */
 function wfGuideText(n){const fl=wfFl(n);const ms=wfMarks(n,fl);const who=wfWho(n);const f=wfNext(n);
  const line=ms.map(m=>`<span class="${m.s}">${m.s==='done'?'✓':m.s==='now'?'●':'○'} ${m.n}</span>`).join('<i>→</i>');
- let next='';if(f){next=`下一步：${WF_ST[f].n}`;if(WF_ST[f].slot&&!wfFreeSlot(f))next+=' · 目前忙碌'}else if(n.st==='cook')next=`${WF_ST[n.f].n}：正在自己${n.f==='oven'||n.f==='pizza'?'烤':'煮'}`;else if(who)next=`${who} 正在${WF_ST[n.f||fl[n.adv?n.si+1:n.si]].n}`;
+ let next='';if(f){next=`下一步：${WF_ST[f].n}`;if(WF_ST[f].slot&&!wfFreeSlot(f))next+=' · 目前忙碌'}else if(n.st==='cook')next=`${WF_ST[n.f].n}：正在自己${n.f==='oven'||n.f==='pizza'?'烤':'煮'}`;else if(who){/* on the way, it is the step she is taking it to */const sf=n.st==='fetch'||n.st==='go'?fl[n.adv?n.si+1:n.si]:(n.f||fl[n.si]);next=`${who} 正在${WF_ST[sf].n}`}
  return`<b>${dishName(n.d)}${n.n>1?' ×'+n.n:''}</b><div class="wfl">${line}</div><div class="wfn">${next}${who&&f?'':''}</div>`}
 let wfGuideEl=null,wfGuideHTML='';
 function wfGuideUpd(){if(!wfGuideEl){const w=$('#sceneWrap');if(!w)return;wfGuideEl=document.createElement('div');wfGuideEl.id='wfGuide';wfGuideEl.hidden=true;const t=$('#toasts');if(t&&t.parentNode===w)w.insertBefore(wfGuideEl,t);else w.appendChild(wfGuideEl)}

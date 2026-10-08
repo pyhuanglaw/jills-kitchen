@@ -3932,12 +3932,16 @@ def v24_rc74_the_lounges_new_bites(b, port, target):
     g.ev("""window.__carried=[];const sv0=serveItems;serveItems=function(q,list){for(const c of list){const it=c.it;if(it&&it.d==='wings'&&it.st==='ready'){const m=(S.crew||[]).find(m=>{const w=R.cw&&R.cw[m.id];return w&&w.carry&&w.carry.includes(it)});
       __carried.push(m?[m.name,m.role,crewPool(m),!!waiterDuties(m).lounge,lgWaiterHere()]:(R.jill.carry.some(c0=>c0.it===it)?['Jill']:['?']))}}return sv0.apply(this,arguments)}""")   # rc8: who carried it, at the moment it reached the table (the walk from the end of the Lounge's bar is short)
     claims = set(); cooks = set(); r = {}
+    # v2.5 (docs/cooking/ARCHITECTURE.md §「改過的測試」): the wings go through the new kitchen (熱區 → 裝盤); who put them
+    # on the fire is who took their 熱區 step, not an old station job's cook
+    g.ev("window.__wcook=[];{const A0=wfAssign;wfAssign=function(n,who,slot){const f=n&&wfNext(n);const r=A0(n,who,slot);if(r&&n.d==='wings'&&f==='hot'){const m=who==='jill'?null:wfCrew(who);__wcook.push('stove:'+(m?m.role+':'+crewPool(m):'jill'))}return r}}")
     for _ in range(500):
         r = json.loads(g.ev("""JSON.stringify((()=>{const q=R.groups.find(q=>q.__probe);if(!q)return{gone:1};const tk=q.ticket;if(!tk)return{st:q.state};const it=tk.items.find(i=>i.d==='wings');
           const m=tk.claim!=null?S.crew.find(m=>m.id===tk.claim):null;const s=R.slots.find(s=>s.job&&s.job.it===it);const ch=s&&s.job.chef!=null?S.crew.find(m=>m.id===s.job.chef):null;
           return{st:q.state,it:it&&it.st,picked:!!(it&&it.picked),claim:m?[m.name,m.role,crewPool(m),!!waiterDuties(m).lounge,lgWaiterHere()]:null,cook:s?s.type+':'+(ch?ch.role+':'+crewPool(ch):'jill'):null,jill:R.jill.carry.some(c=>c.tk===tk)}})())"""))
         if r.get('claim') and r.get('picked'): claims.add(tuple(r['claim']))   # who has the plate (the bartender's claim is the glass)
         if r.get('cook'): cooks.add(r['cook'])
+        for c in json.loads(g.ev("JSON.stringify(__wcook)")): cooks.add(c)
         if r.get('it') == 'served' or r.get('gone'): break
         g.ev("for(let i=0;i<15;i++)__tick(1000/30)")
     check(r.get('it') == 'served', f'the wings reached the table: {r}')
@@ -4078,11 +4082,14 @@ def v24_rc75_the_pizza_oven_one_more_cook_and_the_bar_pizza(b, port, target):
     g.ev("""window.__carried=[];const sv0=serveItems;serveItems=function(q,list){for(const c of list){const it=c.it;if(it&&it.d==='pizza'&&it.st==='ready'){const m=(S.crew||[]).find(m=>{const w=R.cw&&R.cw[m.id];return w&&w.carry&&w.carry.includes(it)});
       __carried.push(m?[m.name,m.role,crewPool(m),!!waiterDuties(m).lounge,lgWaiterHere()]:(R.jill.carry.some(c0=>c0.it===it)?['Jill']:['?']))}}return sv0.apply(this,arguments)}""")   # rc8: who carried it, at the moment it reached the table (the walk from the end of the Lounge's bar is short)
     seen = set(); shot = False; r = {}
+    # v2.5 (docs/cooking/ARCHITECTURE.md §「改過的測試」): the bar pizza goes 備料 → 披薩烤爐 → 裝盤 in the new kitchen. The cook
+    # who bakes it is who took its 披薩烤爐 step; it bakes in the oven's mouth while that step cooks by itself ('cook').
+    g.ev("window.__pcook=[];{const A0=wfAssign;wfAssign=function(n,who,slot){const f=n&&wfNext(n);const r=A0(n,who,slot);if(r&&n.d==='pizza'&&f==='pizza')__pcook.push(who==='jill'?'jill':(wfCrew(who)||{}).duty||'?');return r}}")
     for _ in range(600):
-        r = json.loads(g.ev("""JSON.stringify((()=>{const q=R.groups.find(q=>q.__probe);if(!q)return{gone:1};const tk=q.ticket;if(!tk)return{st:q.state};const it=tk.items.find(i=>i.d==='pizza');const s=R.slots.find(s=>s.job&&s.job.it===it);
-          const ch=s&&s.job.chef!=null?S.crew.find(m=>m.id===s.job.chef):null;const sp=s?stepSpot(s):null;const m=tk.claim!=null?S.crew.find(m=>m.id===tk.claim):null;
-          return{it:it&&it.st,picked:!!(it&&it.picked),slot:s?s.type:null,cook:ch?ch.duty:(s?'jill':null),oven:!!(sp&&sp.inOven),step:s&&s.job.step?s.job.step.t:null,claim:m&&it&&it.picked?[m.role,crewPool(m)]:null}})())"""))
-        if r.get('slot'): seen.add(('slot', r['slot'], r['cook']))
+        r = json.loads(g.ev("""JSON.stringify((()=>{const q=R.groups.find(q=>q.__probe);if(!q)return{gone:1};const tk=q.ticket;if(!tk)return{st:q.state};const it=tk.items.find(i=>i.d==='pizza');const n=it&&wfOf(it);
+          const at=n&&n.slot?n.slot.type:null;const m=tk.claim!=null?S.crew.find(m=>m.id===tk.claim):null;
+          return{it:it&&it.st,picked:!!(it&&it.picked),slot:at,oven:at==='pizza'&&n.st==='cook',step:at==='pizza'&&n.st==='cook'?'bake':null,claim:m&&it&&it.picked?[m.role,crewPool(m)]:null,cooks:__pcook}})())"""))
+        for c in (r.get('cooks') or []): seen.add(('slot', 'pizza', c))
         if r.get('oven'):
             seen.add(('oven', r['step']))
             if not shot:
@@ -4092,7 +4099,10 @@ def v24_rc75_the_pizza_oven_one_more_cook_and_the_bar_pizza(b, port, target):
         if r.get('it') == 'served' or r.get('gone'): break
         g.ev("for(let i=0;i<15;i++)__tick(1000/30)")
     check(r.get('it') == 'served', f'the pizza reached the table: {r} {seen}')
-    check(('slot', 'pizza', 'pizza') in seen and ('oven', 'zone') in seen, f'the cook at the oven made it, and it baked in the oven\'s mouth: {seen}')
+    # v2.5: in the new kitchen the cooks take a place by what they know (the oven is 烤箱 for them); the one on the oven's
+    # duty is preferred, not the only one — so: a cook, not Jill, baked it
+    bakers = {x[2] for x in seen if x[0] == 'slot'}
+    check(bakers and 'jill' not in bakers and ('oven', 'bake') in seen, f'a cook made it, and it baked in the oven\'s mouth: {seen}')
     carried = [tuple(x[1:3]) for x in json.loads(g.ev("JSON.stringify(__carried)"))]
     check(carried and all(c == ('waiter', 'lounge') for c in carried), f'the Lounge\'s waiter carried it: {carried} {seen}')
     g.ev("loungeOrder=window.__LO")

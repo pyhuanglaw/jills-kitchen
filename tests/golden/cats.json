@@ -1,29 +1,31 @@
 {
  "evening": {
-  "states": "1720acf7",
+  "states": "62c64daa",
   "time": {
-   "ban:eat": 161,
-   "ban:home": 2463,
-   "ban:rest": 571,
-   "ban:side": 13853,
-   "ban:walk": 952,
-   "mei:bed": 555,
-   "mei:daze": 109,
-   "mei:home": 10938,
-   "mei:jump": 476,
-   "mei:rest": 1708,
-   "mei:side": 2240,
-   "mei:toy": 123,
-   "mei:walk": 1851,
-   "mikan:home": 17801,
-   "mikan:rest": 65,
-   "mikan:walk": 134,
-   "snow:daze": 44,
-   "snow:home": 17485,
-   "snow:walk": 471,
-   "tora:home": 18000
+   "ban:home": 15313,
+   "ban:rest": 184,
+   "ban:side": 1847,
+   "ban:walk": 656,
+   "mei:home": 18000,
+   "mikan:bed": 575,
+   "mikan:daze": 81,
+   "mikan:hide2": 679,
+   "mikan:home": 3857,
+   "mikan:rest": 763,
+   "mikan:side": 9539,
+   "mikan:walk": 2506,
+   "snow:daze": 1324,
+   "snow:home": 4388,
+   "snow:jump": 289,
+   "snow:rest": 669,
+   "snow:sleep": 9505,
+   "snow:walk": 1825,
+   "tora:home": 14858,
+   "tora:rest": 510,
+   "tora:side": 2364,
+   "tora:walk": 268
   },
-  "weights": "4802:d1882196"
+  "weights": "4814:a648e923"
  },
  "prep": {
   "states": "b1442666",
@@ -73,7 +75,7 @@
   "weights": "3239:563352c4"
  },
  "service": {
-  "states": "7e148b45",
-  "weights": "3818:34ca049e"
+  "states": "6db63186",
+  "weights": "3760:4d282953"
  }
 }

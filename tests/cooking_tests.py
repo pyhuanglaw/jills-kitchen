@@ -92,6 +92,8 @@ def cooking_fried_rice_goes_hot_then_plating_by_taps(b, port, target):
     pp = json.loads(g.ev("JSON.stringify(wfSpot(wfPassSlots()[0]))"))
     _tap_scene(g, pp['x'], pp['y'] - 2)
     check(g.ev("wfNode(R.wsel)&&wfNode(R.wsel).st") in ('fetch', 'go'), 'the pass tapped: Jill goes to fetch it')
+    gt = g.ev(GUIDE)
+    check('Jill 正在裝盤' in gt, f'on her way the card names the step she takes it to, not the one it left: {gt!r}')
     its = g.ev("wfNode(R.wsel).its.length")
     check(_until(g, "!R.wsel||!wfNode(R.wsel)"), 'she plates it')
     rd = json.loads(g.ev("JSON.stringify(R.tickets.flatMap(tk=>tk.items.filter(it=>it.d==='friedrice'&&(it.st==='ready'||it.st==='served')).map(it=>it.q)))"))

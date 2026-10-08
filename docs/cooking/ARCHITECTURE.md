@@ -230,10 +230,14 @@
 14. **`lounge_i_content_bar_food_in_the_kitchen_wine_at_dinner_the_cast_by_name`**：原本——Lounge 點的小食在廚房做好（數舊的裝盤）。
     改成——也數新廚房的裝盤。
 15. **`a_second_signature_the_dessert_with_its_own_progression`**：最後一段原本用舊的料理面板做招牌甜點。改成——用新流程做（備料 → 裝盤）。
-16. **`golden_frames`、`golden_scenario`、`cat_personality_fingerprint`**：錄好的基準。新廚房改變了每一天營業的畫面和時間（客人數、
+16. **`v24_rc74_the_lounges_new_bites`**：原本——Lounge 點的雞翅由廚師在爐台的舊工作站做。改成——誰接了雞翅的熱區步驟（廚師，不是 Jill）。
+17. **`v24_rc75_the_pizza_oven_one_more_cook_and_the_bar_pizza`**：原本——值班在披薩烤爐的那位廚師做酒吧披薩、在烤爐口烤。不再成立——
+    新廚房裡廚師照會的位置接（披薩烤爐算烤箱），值班的人只是優先，所以可能是另一位會烤的廚師接。改成——是廚師（不是 Jill）烤的，
+    而且在烤爐口烤；「新聘的廚師去顧烤爐」那一段不變。
+18. **`golden_frames`、`golden_scenario`、`cat_personality_fingerprint`**：錄好的基準。新廚房改變了每一天營業的畫面和時間（客人數、
     亂數順序），基準重錄。`golden_frames` 原本拍舊的料理面板，改拍廚房裡選中一道菜時的卡片和亮起來的位置。貓的指紋：
     開店前（只有貓）那一段完全一樣，營業和打烊後不同，是亂數順序造成的。
-17. **`single_file_in_sync`**：單檔版要在這條 branch 上重建（`tools/build_single.py`）。
+19. **`single_file_in_sync`**：單檔版要在這條 branch 上重建（`tools/build_single.py`）。
 
 ## 技術衝突（程式現況跟規格不一樣的地方，沒有自己改）
 
