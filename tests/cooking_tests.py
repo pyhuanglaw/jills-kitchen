@@ -213,7 +213,8 @@ def cooking_the_work_survives_a_checkpoint(b, port, target):
 # every place in the kitchen: the oven, the coffee machine, the prep boards, the pizza oven, the signature dishes
 ALL_PLACES = ("S.level=5;S.eq.stove=3;S.eq.oven=3;S.eq.bar=3;S.eq.prep=1;S.eq.fridge=3;S.rooms=S.rooms||{};S.rooms.pizzaoven=1;"
               "for(const d in DISHES)if(!S.unlocked.includes(d))S.unlocked.push(d);"
-              "S.signature={base:'mash',protein:'duck',sauce:'redwine',side:'asparagus',name:'Test Sig'};")
+              "S.signature={base:'mash',protein:'duck',sauce:'redwine',side:'asparagus',name:'Test Sig'};"
+              "S.sigDessert={base:'pannacotta',cream:'mascarpone',fruit:'berries',finish:'caramel',name:'試作'};")
 # one dish through its workflow, Jill on every step: the places it used, in order, and how it ended
 WALK = r"""(d=>{R.tickets=R.tickets.filter(t=>t.id!==997);const g0={id:'t997',name:'T',size:1,table:0,state:'wait',pat:1,type:'office',looks:makeLooks('office',1)};
   const it={d,st:'pending',q:null,want:d==='steak'?1:0,picked:false};const tk={id:997,no:1,g:g0,items:[it],t0:R.t};R.tickets.push(tk);

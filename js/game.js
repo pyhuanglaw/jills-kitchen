@@ -5987,19 +5987,27 @@ function hitStation(p){if(!R||room!=='kitchen')return -1;let best=-1,bd=1e9;
 const WF_ST={prep:{n:'備料',k:'備',slot:'prep'},hot:{n:'熱區',k:'熱',slot:'stove'},oven:{n:'烤箱',k:'烤',slot:'oven'},drink:{n:'飲料',k:'飲',slot:'bar'},pizza:{n:'披薩烤爐',k:'窯',slot:'pizza'},plate:{n:'裝盤',k:'裝',slot:'pass'},serve:{n:'出杯',k:'出',slot:null}};
 const WF_FAM={hot2:['hot','plate'],cold2:['prep','plate'],drink2:['drink','serve'],oven2:['oven','plate'],hot3:['prep','hot','plate'],oven3:['prep','oven','plate'],pizza3:['prep','pizza','plate']};
 /* each dish's workflow is the user's table (cooking_workflow_canon_2026-10-07.txt), never ours; a special follows its base
-   dish. A dish not in this list still cooks the old way (the two pizzas the table does not name wait for the user). */
-const WF_DISH={friedrice:'hot2',salad:'cold2',coffee:'drink2',fries:'oven2',burger:'hot3',chicken:'oven3',pizza:'pizza3'};
+   dish. A dish not in this list still cooks the old way: the two pizzas the table does not name (瑪格麗特、蘑菇白醬) wait for
+   the user. 22 of the restaurant, 9 of the Lounge, the signature dish and the signature dessert. */
+const WF_DISH={
+ friedrice:'hot2',pasta:'hot2',soup:'hot2',risotto:'hot2',bites:'hot2',mushroom:'hot2',wings:'hot2',cheesestick:'hot2',
+ salad:'cold2',pudding:'cold2',tiramisu:'cold2',prosciutto:'cold2',cheeseplate:'cold2',oyster:'cold2',sigdessert:'cold2',
+ coffee:'drink2',blacktea:'drink2',sparkling:'drink2',fruitsoda:'drink2',
+ fries:'oven2',
+ burger:'hot3',steak:'hot3',seafood:'hot3',duck:'hot3',croquette:'hot3',signature:'hot3',
+ veg:'oven3',chicken:'oven3',basque:'oven3',salmon:'oven3',souffle:'oven3',knuckle:'oven3',
+ pizza:'pizza3'};
 const WF_TYPE_F={prep:'prep',stove:'hot',oven:'oven',bar:'drink',pizza:'pizza',pass:'plate'};
 function wfFlow(d){const f=WF_DISH[baseOf(d)];return f?WF_FAM[f]:null}
-function isWF(d){return !!(d&&wfFlow(d))}
+function isWF(d){return !!(d&&wfFlow(d)&&DISH(d))}   /* the signature dishes exist only once Jill has made them */
 /* how long each place takes, in seconds at speed 1: the hands (act) and the fire or the oven on its own (pas). Read off the
    dish's own recipe, so a risotto stays on the fire longer than fried rice; plating stays short (spec: PLATING 2–4 s) */
 const WF_T={};
-function wfTimes(d,f){const key=baseOf(d)+'|'+f;if(WF_T[key])return WF_T[key];const st=recipeOf(d)||[];let heat=0,hands=0;
+function wfTimes(d,f){const key=baseOf(d)+'|'+f;const own=d==='signature'||d==='sigdessert';/* Jill's own dishes change as they grow */if(!own&&WF_T[key])return WF_T[key];const st=recipeOf(d)||[];let heat=0,hands=0;
  for(const k of st){if(k.t==='wait'||k.t==='zone')heat+=k.time||0;else if(k.t==='work')(k.board?hands+=k.time||0:heat+=k.time||0);else hands+=.6}
  let r;switch(f){case'prep':r={act:clamp(1.6+hands*.6,2.2,4.6),pas:0};break;case'hot':r={act:1.6,pas:clamp(heat,4,12)};break;
   case'oven':case'pizza':r={act:1.2,pas:clamp(heat,5,12)};break;case'drink':r={act:1.4,pas:clamp(heat,1.5,4)};break;case'plate':r={act:2.4,pas:0};break;default:r={act:.7,pas:0}}
- return WF_T[key]=r}
+ return own?r:(WF_T[key]=r)}
 /* a batch: the same dish for several tables, made as one (spec §12). How many at once grows with the restaurant; the dishes
    that cook in a pot or a basket batch best, the ones plated piece by piece least (spec §9 of the capacity rule) */
 const WF_BIG=new Set(['friedrice','pasta','soup','risotto','fries','bites','cheesestick','wings','mushroom','coffee','blacktea','sparkling','fruitsoda']);

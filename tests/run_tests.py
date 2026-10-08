@@ -437,10 +437,17 @@ def close_shop_early(b, port, target):
 
 @test
 def cooking_every_recipe(b, port, target):
+    """Every recipe still cooked the old way finishes PERFECT with perfect input.
+
+    v2.5 (the new kitchen, docs/cooking/ARCHITECTURE.md §「改過的測試」): this used to drive every dish through its old
+    station job. The dishes of the user's workflow table no longer have one — startCook says no and they go through their
+    workflow instead, so the old loop reported them NO_SLOT. They are covered by cooking_every_family_goes_its_own_way
+    (each through exactly its workflow's places, Perfect from Jill). This test keeps the old path honest for the dishes
+    still on it: the two pizzas the table does not name (瑪格麗特、蘑菇白醬), until the user decides."""
     g = Game(b, port, target, seed=5, manual=True)
     g.ev("S.level=5;S.eq.oven=3;S.eq.bar=3;S.eq.prep=1;S.eq.fridge=3;S.rooms=S.rooms||{};S.rooms.pizzaoven=1;for(const d in DISHES)if(!S.unlocked.includes(d))S.unlocked.push(d);S.signature={base:'mash',protein:'duck',sauce:'redwine',side:'asparagus',name:'Test Sig'}")
     g.click('[data-act=open]'); start_day(g)
-    res = g.ev(r"""(()=>{const out={};const ids=Object.keys(DISHES).concat(['signature']);
+    res = g.ev(r"""(()=>{const out={};const ids=Object.keys(DISHES).concat(['signature']).filter(d=>!isWF(d));
       for(const d of ids){R.tickets=[];for(const s of R.slots)s.job=null;const g0={name:'T',size:1,table:0,state:'wait',pat:1,type:'office',looks:[]};
         const it={d,st:'pending',q:null,want:d==='steak'?1:0,picked:false};const tk={id:999,no:1,g:g0,items:[it],t0:R.t};R.tickets.push(tk);
         if(!startCook(tk,it,true)){out[d]='NO_SLOT';continue}
@@ -452,7 +459,7 @@ def cooking_every_recipe(b, port, target):
       return out})()""")
     bad = {k: v for k, v in res.items() if v != 'P'}
     check(not bad, f'recipes not finishing PERFECT with perfect input: {bad}')
-    check(len(res) == g.ev("Object.keys(DISHES).length+1"), 'not every recipe tested')
+    check(len(res) == g.ev("Object.keys(DISHES).concat(['signature']).filter(d=>!isWF(d)).length") and sorted(res) == ['pzfungi', 'pzmarg'], f'every recipe still on the old path tested: {sorted(res)}')
     check(not g.errors, g.errors)
     g.close()
 
@@ -979,13 +986,28 @@ def long_play_is_stable(b, port, target):
 # ---------------------------------------------------------------- version 16
 @test
 def cooking_flow_families(b, port, target):
-    """Every ordinary recipe takes 2–5 player interactions with perfect play, nothing is tap-repeated,
-    the recipe families have the shapes the design asks for, and a late pan flip is forgiven before
-    it burns."""
+    """The recipe families. Before v2.5: every ordinary recipe took 2–5 player interactions with perfect play, nothing
+    was tap-repeated, the families had the shapes the old design asked for (pan dishes a flip/remove timing, stews a long
+    wait, cold dishes quick, drinks the pour gauge), and a late pan flip was forgiven before it burned.
+
+    v2.5 (the new kitchen, docs/cooking/ARCHITECTURE.md §「改過的測試」): the families are now the user's workflow table
+    (cooking_workflow_canon_2026-10-07.txt) — waiting, flipping and draining are never steps, nothing burns, no timing —
+    so the old shapes no longer exist for those dishes. What this test holds now:
+    - the dishes the old shapes named are on the new kitchen with the user's workflow (steak/burger/duck 備料→熱區→裝盤,
+      soup/risotto 熱區→裝盤, salad/prosciutto/tiramisu 備料→裝盤, salmon/chicken 備料→烤箱→裝盤, coffee 飲料→出杯);
+    - the recipes still on the old path (the two pizzas the table does not name) keep the old rules: 2–5 interactions,
+      no tap-repeat, Perfect with perfect input, the sauce gauge (hold) and the bake (zone);
+    - and the old forgiveness on their bake: late but not forgotten is Okay, forgotten burns (the burger it used to be
+      tried on has no pan step any more)."""
     g = Game(b, port, target, seed=5, manual=True)
     g.ev("S.level=5;S.eq.oven=3;S.eq.bar=3;S.eq.prep=1;S.eq.fridge=3;S.rooms=S.rooms||{};S.rooms.pizzaoven=1;for(const d in DISHES)if(!S.unlocked.includes(d))S.unlocked.push(d);S.signature={base:'mash',protein:'duck',sauce:'redwine',side:'asparagus',name:'Test Sig'}")
     g.click('[data-act=open]'); start_day(g)
-    res = g.ev(r"""(()=>{const out={};const ids=Object.keys(DISHES).concat(['signature']);
+    flows = json.loads(g.ev("JSON.stringify(Object.fromEntries(['steak','burger','duck','soup','risotto','salad','prosciutto','tiramisu','salmon','chicken','coffee'].map(d=>[d,(wfFlow(d)||[]).join('>')])))"))
+    want = {'steak': 'prep>hot>plate', 'burger': 'prep>hot>plate', 'duck': 'prep>hot>plate', 'soup': 'hot>plate', 'risotto': 'hot>plate',
+            'salad': 'prep>plate', 'prosciutto': 'prep>plate', 'tiramisu': 'prep>plate', 'salmon': 'prep>oven>plate', 'chicken': 'prep>oven>plate',
+            'coffee': 'drink>serve'}
+    check(flows == want, f'the families are the user\'s workflows now: {flows}')
+    res = g.ev(r"""(()=>{const out={};const ids=Object.keys(DISHES).concat(['signature']).filter(d=>!isWF(d));
       for(const d of ids){R.tickets=[];for(const s of R.slots)s.job=null;const g0={name:'T',size:1,table:0,state:'wait',pat:1,type:'office',looks:[]};
         const it={d,st:'pending',q:null,want:d==='steak'?1:0,picked:false};const tk={id:999,no:1,g:g0,items:[it],t0:R.t};R.tickets.push(tk);
         if(!startCook(tk,it,true)){out[d]={q:'NO_SLOT'};continue}
@@ -995,25 +1017,19 @@ def cooking_flow_families(b, port, target):
           else if(k.t==='hold'){k.hold=true;R.holdSlot=s;k.level=(k.a+k.b)/2;holdEnd();n++}else if(k.t==='dose'){if(k.cnt<k.min){actDose(s);n++}else{actDoseDone(s);n++}}else{updJob(s,1/30);waitT+=1/30}R.t+=1/30}
         out[d]={q:it.st==='ready'?it.q:('STUCK:'+it.st),n,kinds:[...kinds],waitT:+waitT.toFixed(1),cat:DISH(d).cat,st:DISH(d).st}}
       return out})()""")
+    check(sorted(res) == ['pzfungi', 'pzmarg'], f'the recipes still on the old path: {sorted(res)}')
     bad = {k: v['q'] for k, v in res.items() if v['q'] != 'P'}
     check(not bad, f'recipes not finishing PERFECT with perfect input: {bad}')
     check(not any('tap' in v['kinds'] for v in res.values()), 'a recipe still uses tap-repeat steps')
     counts = {k: v['n'] for k, v in res.items() if k != 'signature'}
     check(all(2 <= n <= 5 for n in counts.values()), f'interactions outside 2–5: {counts}')
-    # families
-    fam = {k: v['kinds'] for k, v in res.items()}
-    check('zone' in fam['steak'] and 'zone' in fam['burger'] and 'zone' in fam['duck'], f'pan-seared dishes should be flip/remove timing: {fam}')
-    check('wait' in fam['soup'] and 'wait' in fam['risotto'] and res['soup']['waitT'] >= 4, f'stewed dishes should have a long passive wait: {fam}')
-    check(not ({'zone', 'wait'} & set(fam['salad'])) and not ({'zone', 'wait'} & set(fam['prosciutto'])), f'cold dishes should be quick: {fam}')
-    check('wait' in fam['tiramisu'] and 'zone' in fam['salmon'] and 'zone' in fam['chicken'], f'oven/chilled dishes should be prep then a long wait: {fam}')
-    check(all('hold' in fam[d] for d in ['coffee', 'sparkling', 'fruitsoda', 'blacktea'] if d in fam and res[d]['cat'] == 'drink') or 'hold' in fam['coffee'], 'the drink gauge (hold) must stay')
-    check('work' in fam['salad'] and 'work' in fam['souffle'] and 'work' in fam['duck'], f'handwork steps should be Jill\'s own (work): {fam}')
-    # forgiveness on a pan: late but not forgotten -> Okay, forgotten -> burnt
+    check(all('hold' in v['kinds'] and 'zone' in v['kinds'] for v in res.values()), f'the old pizzas keep the sauce gauge and the bake: {res}')
+    # forgiveness on the bake: late but not forgotten -> Okay, forgotten -> burnt
     r = g.ev(r"""(()=>{const out={};for(const p of[1.1,1.3]){R.tickets=[];for(const s of R.slots)s.job=null;const g0={name:'T',size:1,table:0,state:'wait',pat:1,type:'office',looks:[]};
-      const it={d:'burger',st:'pending',q:null,want:0,picked:false};const tk={id:998,no:1,g:g0,items:[it],t0:R.t};R.tickets.push(tk);startCook(tk,it,true);const s=R.slots.find(x=>x.job&&x.job.it===it);
-      actIng(s,'patty');const k=s.job.step;k.p=p;actZone(s);out[p]={burnt:!s.job||!!s.job.burnt||it.q==='B',score:s.job?s.job.scores[s.job.scores.length-1]:null}}return out})()""")
-    check(not r['1.1']['burnt'] and r['1.1']['score'] < .9, f'a slightly late flip should be forgiven, not burnt: {r}')
-    check(r['1.3']['burnt'], f'a forgotten pan should burn: {r}')
+      const it={d:'pzmarg',st:'pending',q:null,want:0,picked:false};const tk={id:998,no:1,g:g0,items:[it],t0:R.t};R.tickets.push(tk);startCook(tk,it,true);const s=R.slots.find(x=>x.job&&x.job.it===it);
+      actIng(s,'dough');{const k=s.job.step;k.hold=true;R.holdSlot=s;k.level=(k.a+k.b)/2;holdEnd()}actIng(s,'freshmoz');const k=s.job.step;k.p=p;actZone(s);out[p]={burnt:!!(s.job&&s.job.burnt)||it.q==='B',q:it.q,st:it.st}}return out})()""")
+    check(not r['1.1']['burnt'], f'a slightly late bake should be forgiven, not burnt: {r}')
+    check(r['1.3']['burnt'], f'a forgotten pizza should burn: {r}')
     check(not g.errors, g.errors)
     g.close()
 
@@ -1021,28 +1037,45 @@ def cooking_flow_families(b, port, target):
 def kitchen_staff_ladder(b, port, target):
     """Chefs grow by capability: LV1 only simple dishes, LV2 ordinary ones, LV3+ also takes over a dish Jill
     started. The signature dish stays Jill's until LV5. rc8 (the player, 2026-10-03: 「不管是不是第一次做那道菜，有廚師她就
-    不用做」): a dish's first serving is no longer Jill's alone — a chef of the right level cooks a dish she never has."""
+    不用做」): a dish's first serving is no longer Jill's alone — a chef of the right level cooks a dish she never has.
+
+    v2.5 (docs/cooking/ARCHITECTURE.md §「改過的測試」): the take-over half drove fried rice and seafood pasta through old
+    station jobs, which those dishes no longer have. In the new kitchen nobody takes over a step half done — the user's
+    hand-offs happen between steps, to whoever can do the next one — so the level ladder is what decides: a LV1 cook
+    leaves seafood pasta (a LV3 dish) alone, at LV3 he takes it. The old take-over rule is still held for the recipes on
+    the old path (瑪格麗特披薩: LV1 leaves what Jill started, LV3 carries it on)."""
     g = Game(b, port, target, seed=12, manual=True)
-    g.ev("S.level=5;S.eq.stove=3;S.eq.oven=3;S.eq.bar=3;for(const d in DISHES)if(!S.unlocked.includes(d))S.unlocked.push(d);S.signature={base:'mash',protein:'duck',sauce:'redwine',side:'asparagus',name:'Sig'};S.xp={friedrice:30,seafood:30,burger:30};S.crew=[{id:'c1',role:'chef',name:'阿德',lv:1,duty:'stove'}]")
+    g.ev("S.rooms=S.rooms||{};S.rooms.pizzaoven=1;S.level=5;S.eq.stove=3;S.eq.oven=3;S.eq.bar=3;S.eq.prep=1;for(const d in DISHES)if(!S.unlocked.includes(d))S.unlocked.push(d);S.signature={base:'mash',protein:'duck',sauce:'redwine',side:'asparagus',name:'Sig'};S.xp={friedrice:30,seafood:30,burger:30};S.crew=[{id:'c1',role:'chef',name:'阿德',lv:1,duty:'stove'}]")
     r = g.ev("(()=>{const m=S.crew[0];const at=lv=>{m.lv=lv;return{fr:chefCan(m,'friedrice'),pasta:chefCan(m,'pasta'),seafood:chefCan(m,'seafood'),sig:chefCan(m,'signature')}};return{l1:at(1),l2:at(2),l3:at(3),l5:at(5)}})()")
     check(r['l1'] == {'fr': True, 'pasta': False, 'seafood': False, 'sig': False}, f'LV1 chef scope wrong: {r}')
     check(r['l3']['seafood'] and not r['l3']['sig'] and r['l5']['sig'], f'LV3+/signature scope wrong (rc8: LV5 cooks the signature, first time or not): {r}')
     check(r['l2']['pasta'] and g.ev("(S.xp.pasta||0)") == 0, 'rc8: a dish Jill has never cooked (xp 0) is a LV2 chef\'s too')
     g.click('[data-act=open]'); start_day(g)
-    r = g.ev(r"""(()=>{const g0={name:'T',size:1,table:0,state:'wait',pat:1,type:'office',looks:[]};const mk=d=>{const it={d,st:'pending',q:null,want:0,picked:false};const tk={id:900+Math.random()*99|0,no:1,g:g0,items:[it],t0:R.t};R.tickets.push(tk);startCook(tk,it,true);return R.slots.find(x=>x.job&&x.job.it===it)};
-      const m=S.crew[0];m.lv=1;const s1=mk('friedrice');const a=!!chefHandles(s1);m.lv=3;const b=!!chefHandles(s1);const s2=mk('seafood');const c=!!chefHandles(s2);m.lv=1;const d=!!chefHandles(s2);return{a,b,c,d}})()""")
-    check(r == {'a': False, 'b': True, 'c': True, 'd': False}, f'take-over rule (LV3+ continues what Jill started) wrong: {r}')
+    r = g.ev(r"""(()=>{const g0={id:'t900',name:'T',size:1,table:0,state:'wait',pat:1,type:'office',looks:makeLooks('office',1)};const tkOf=d=>{const it={d,st:'pending',q:null,want:0,picked:false};const tk={id:900+Math.random()*99|0,no:1,g:g0,items:[it],t0:R.t};R.tickets.push(tk);return{tk,it}};
+      const m=S.crew[0];const run=n=>{for(let i=0;i<n;i++)__tick(1000/30)};
+      /* the new kitchen: seafood pasta waits for its prep; the LV1 cook leaves it, the LV3 cook takes it */
+      m.lv=1;const w=tkOf('seafood');wfGather();const n=wfOf(w.it);run(45);const a=!!n&&n.st==='wait'&&!n.who;
+      m.lv=3;run(45);const b=!!n&&(n.who===m.id||n.st!=='wait');
+      /* the old path: a pizza Jill started — LV1 leaves it, LV3 carries it on */
+      R.wf=[];for(const s of R.slots){s.wf=null;s.job=null}R.wfc={};m.duty='pizza';const o=tkOf('pzmarg');startCook(o.tk,o.it,true);const s1=R.slots.find(x=>x.job&&x.job.it===o.it);
+      m.lv=1;const c=!!s1&&!!chefHandles(s1);m.lv=3;const d=!!s1&&!!chefHandles(s1);return{a,b,c,d}})()""")
+    check(r == {'a': True, 'b': True, 'c': False, 'd': True}, f'the ladder in the new kitchen (a, b) and the old take-over rule on the old path (c, d): {r}')
     check(not g.errors, g.errors)
     g.close()
 
 @test
 def waiter_serves_ready_food(b, port, target):
-    """A LV2 waiter on 帶位＋點餐 also carries finished plates from the pass to the table."""
+    """A LV2 waiter on 帶位＋點餐 also carries finished plates from the pass to the table.
+
+    v2.5 (docs/cooking/ARCHITECTURE.md §「改過的測試」): this test's own player cooked only the old way; fried rice and
+    coffee now go through the new kitchen, so nothing it ordered became ready and the waiter had nothing to carry. Its
+    player now also works the new kitchen (wfBot, as the standard test player does). The expectation is unchanged."""
     g = Game(b, port, target, seed=5, manual=True)
     install_bot(g)
     g.ev(r"""window.__act=function(){if(!(phase==='service'&&R))return false;
       for(const t of R.tables){if(tableActionable(t)&&!jillTargets(t.i)){const gg=t.group;const ready=gg&&gg.ticket&&gg.ticket.items.some(i=>i.st==='ready'&&!i.picked);if(!ready)tapTable(t)}}
       for(const tk of R.tickets)for(const it of tk.items)if(it.st==='pending')startCook(tk,it,true);
+      if(typeof wfBot==='function')wfBot(false);
       for(const s of R.slots){if(s.broken){tapStation(R.slots.indexOf(s));continue}const j=s.job;if(!j||!j.step)continue;const k=j.step;if(chefHandles(s))continue;
        if(k.t==='add'){const id=k.left[0];if(id)actIng(s,id)}else if(k.t==='zone'){if(k.p>=k.z.c)actZone(s)}else if(k.t==='hold'){k.hold=true;R.holdSlot=s;k.level=(k.a+k.b)/2;holdEnd()}else if(k.t==='dose'){if(k.cnt<k.min)actDose(s);else actDoseDone(s)}}
       return true}""")
