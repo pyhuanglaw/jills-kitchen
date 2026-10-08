@@ -412,6 +412,16 @@
       的事（包包大多在座墊、大多在睡；寶寶喜歡椅背和扶手；樾樾、小齁靠近 Jill）不變。
     - `v24_day52_save_plays_the_stories_in_order_over_forty_days`、`v24_the_night_of_the_missing_cats`：e28d150 那一輪各失敗
       一次（當時機器同時跑三組），在 8b17220 和 8c8fb6e 上重跑都通過，沒有改。
+27. **2026-10-09 清晨（使用者玩第二天的回報；第四批料理動作）**：
+    - `golden_scenario`：第 2 天的基準重錄。原本——第 2 天（新遊戲）秀琴阿姨不會來。不再成立——使用者 2026-10-09：「還沒請
+      清潔員以前，她每晚都來，不再看日子。」她第 2 天快打烊時進門幫忙收，小費 $470 → $468、多一則評論、貓的位置跟著亂數動。
+      證明只差在她：把她的規則改回舊的（其他程式不變）重跑，`golden_scenario` 和 `golden_frames` 都跟舊基準完全一樣。
+    - `golden_frames`：重錄。兩個原因：(1) 同上，第 2 天第 159 秒起（快打烊、秀琴阿姨進門）畫面不同；(2) 裝盤時手上端的東西
+      （炒飯的鏟子一勺一勺送到盤子上）從這次起才真的畫出來（`docs/cooking/CHOREOGRAPHY.md`「裝盤時手上端的東西」）。
+    - 新增 `cooking_the_bar_takes_a_waiting_coffee_while_the_fried_rice_is_selected`（使用者：「有時候在等炒飯 有咖啡訂單卻顯示
+      現在沒有訂單不能做」；修之前會失敗）。
+    - `cooking_each_dish_with_its_own_beats_starts_raw_and_changes_by_hand`：要有自己動作的地方加上第四批的 14 個（鮭魚、海鮮
+      義大利麵、鴨胸、松露燉飯、舒芙蕾）；檢查的方法沒變。
 
 ## 使用者 iPhone 回報（2026-10-08 晚上到 10-09 凌晨）
 
