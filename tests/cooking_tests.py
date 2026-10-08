@@ -1,6 +1,7 @@
 """The working kitchen (v2.5; the user's spec of 2026-10-07 — docs/v24/cooking_*.txt, docs/cooking/ARCHITECTURE.md).
 
-Every dish is a short workflow over the kitchen's own places (備料, 熱區, 烤箱, 飲料, 披薩烤爐, 裝盤 at the pass); a batch of
+Every dish is a short workflow over the kitchen's own places (備料, 熱區, 烤箱, 飲料, 披薩烤爐, and 裝盤 — done where the food
+is, then carried to the pass: the user, 2026-10-08, docs/v24/cooking_choreography_2026-10-08.txt); a batch of
 the same dish is one piece of work and takes one place; Jill and the cooks share the same work. These tests hold the
 user's acceptance list: the player always sees where a dish is and where it goes next, a full place means a quiet wait
 (never a failure), a batch of three takes one burner, and the four hand-offs (Jill only, the cooks only, Jill then a cook,
@@ -63,9 +64,11 @@ def _until(g, cond, cap=600, step=10):
 def cooking_fried_rice_goes_hot_then_plating_by_taps(b, port, target):
     """The first dish of the new kitchen, by real taps (the user's prototype list, J1–J15): the ticket item selects its
     work (the card says ● 熱區 → ○ 裝盤, 下一步：熱區; the burner is lit); a tap on the burner sends Jill, who walks there; the
-    rice is in the wok and cooks by itself, no tap in between; done, it waits on the fire (✓ 熱區 → ● 裝盤, 下一步：裝盤,
-    the pass lit) for as long as it takes — nothing spoils; a tap on the pass and Jill plates it; the plate goes the old
-    way (ready at the pass, carried, paid), with its XP."""
+    rice is in the wok and cooks by itself, no tap in between; done, it waits on the fire (✓ 熱區 → ● 裝盤, 下一步：裝盤)
+    for as long as it takes — nothing spoils. 2026-10-08 (the user: 「PLATING 不是食物自己移動到某個 plating station」):
+    what is lit for 裝盤 is the wok itself, never the pass; a tap on the wok sends Jill for plates, she plates it at the
+    wok, carries the plate to the pass; then the plate goes the old way (ready at the pass, carried, paid), with its XP.
+    (Changed 2026-10-08: it used to light the pass and plate there — the old acceptance the user named as wrong.)"""
     g = _day(b, port, target, 7101)
     check(_wait_orders(g, 1), 'a table orders fried rice')
     xp0 = g.ev("S.xp.friedrice||0")
@@ -84,14 +87,17 @@ def cooking_fried_rice_goes_hot_then_plating_by_taps(b, port, target):
     check(_until(g, "(()=>{const n=wfNode(R.wsel);return n&&n.st==='ready'})()"), 'the rice is done by itself, with no tap in between')
     gt = g.ev(GUIDE)
     check('✓ 熱區' in gt and '● 裝盤' in gt and '下一步：裝盤' in gt, f'done: the card says where it goes next: {gt!r}')
-    check(g.ev("wfCueSlots(wfNode(R.wsel)).f") == 'plate' and g.ev("wfCueSlots(wfNode(R.wsel)).free.length") == 1, 'the pass is cued')
+    cue = json.loads(g.ev("JSON.stringify((()=>{const n=wfNode(R.wsel);const c=wfCueSlots(n);return{f:c.f,food:!!c.food,free:c.free.map(s=>s.type+s.no),at:n.slot.type+n.slot.no}})())"))
+    check(cue['f'] == 'plate' and cue['food'] and cue['free'] == [cue['at']], f'the wok itself is cued for 裝盤, not the pass: {cue}')
     g.ev("__run(600)")   # twenty seconds of nothing
     st = json.loads(g.ev("JSON.stringify((()=>{const n=wfNode(R.wsel);return{st:n.st,sc:n.sc,slot:n.slot&&n.slot.type}})())"))
     check(st['st'] == 'ready' and st['slot'] == 'stove' and st['sc'] == [1], f'twenty seconds later it is still waiting on the fire, nothing lost: {st}')
     check(not any(w in g.ev(GUIDE) for w in ('秒', '%', '焦', '快')), 'the card has no timer, no score, no hurry')
     pp = json.loads(g.ev("JSON.stringify(wfSpot(wfPassSlots()[0]))"))
     _tap_scene(g, pp['x'], pp['y'] - 2)
-    check(g.ev("wfNode(R.wsel)&&wfNode(R.wsel).st") in ('fetch', 'go'), 'the pass tapped: Jill goes to fetch it')
+    check(g.ev("wfNode(R.wsel)&&wfNode(R.wsel).st") == 'ready', 'a tap on the pass does not plate it (the pass is where plated food waits)')
+    _tap_slot(g, "wfNode(R.wsel).slot")
+    check(g.ev("wfNode(R.wsel)&&wfNode(R.wsel).st") == 'dish' and g.ev("wfNode(R.wsel).slot.type") == 'stove', 'the wok tapped: Jill goes for plates, the rice stays in the wok')
     gt = g.ev(GUIDE)
     check('下一步：裝盤 · Jill 前往中' in gt, f'on her way the card names the step she takes it to, not the one it left: {gt!r}')
     its = g.ev("wfNode(R.wsel).its.length")
@@ -339,15 +345,17 @@ WALK = r"""(d=>{R.tickets=R.tickets.filter(t=>t.id!==997);const g0={id:'t997',na
 def cooking_every_family_goes_its_own_way(b, port, target):
     """The user's workflow table (cooking_workflow_canon_2026-10-07.txt), family by family: each dish of the new kitchen
     goes through exactly the places of its own workflow, in order — 備料 at a prep board, 熱區 on a burner, 烤箱 in the oven,
-    飲料 at the coffee machine, 披薩烤爐 in the pizza oven, 裝盤 at the pass, 出杯 set down for the floor — and, made by
-    Jill, it is Perfect. A special goes its base dish's way."""
+    飲料 at the coffee machine, 披薩烤爐 in the pizza oven, 裝盤 where the food already is (changed 2026-10-08, the user's
+    PLATING correction: it was 「裝盤 at the pass」 — the wok's rice is plated at the wok, the salad at its board, the baked
+    dish at the oven), 出杯 set down for the floor — and, made by Jill, it is Perfect. A special goes its base dish's way."""
     g = _day(b, port, target, 7130, ALL_PLACES)
     ids = g.ev("Object.keys(DISHES).concat(['signature','sigdessert']).filter(isWF)")
-    want_slot = {'prep': 'prep', 'hot': 'stove', 'oven': 'oven', 'drink': 'bar', 'pizza': 'pizza', 'plate': 'pass', 'serve': 'pick'}
+    want_slot = {'prep': 'prep', 'hot': 'stove', 'oven': 'oven', 'drink': 'bar', 'pizza': 'pizza', 'serve': 'pick'}   # 'plate': the place before it
     bad, seen_fams = {}, set()
     for d in ids:
         r = json.loads(g.ev(f"JSON.stringify(({WALK})({json.dumps(d)}))"))
-        exp = [want_slot[f] for f in (r.get('flow') or [])]
+        fl = r.get('flow') or []
+        exp = [want_slot[fl[i - 1]] if f == 'plate' and i else want_slot[f] for i, f in enumerate(fl)]
         if r.get('err') or r.get('places') != exp or r.get('q') != 'P':
             bad[d] = r
         seen_fams.add(tuple(r.get('flow') or []))
@@ -355,4 +363,148 @@ def cooking_every_family_goes_its_own_way(b, port, target):
     check(len(seen_fams) == 7, f'all seven workflows are on the new kitchen: {sorted(seen_fams)}')
     sp = g.ev("Object.keys(SPECIALS).filter(b=>isWF(b)).every(b=>JSON.stringify(wfFlow(SPECIALS[b].id))===JSON.stringify(wfFlow(b)))")
     check(sp, 'a special goes its base dish\'s way')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+# where a person is: Jill in the kitchen, or a cook
+POS = "(w=>{if(w==='jill'){const J=wfJ();return{x:J.x,y:J.y}}const a=R.ck&&R.ck[w];return a?{x:a.x,y:a.y}:null})"
+
+
+@test
+def cooking_plating_happens_where_the_food_is(b, port, target):
+    """The user's PLATING correction (2026-10-08, docs/v24/cooking_choreography_2026-10-08.txt): 「食物不會自己去下一個
+    地方。人去拿它、處理它、搬它。」 Its twelve checks: (1) done on the fire, the food stays in its pan on its burner;
+    (2) claiming 裝盤 does not move it; (3) whoever plates first takes clean plates from the rack; (4) then walks to the
+    food; (5) plates it there, beside the pan; (6) the pan empties as the plates fill; (7) only then carries the plates to
+    the pass; (8) only once they are set down can the floor take them; (9) one work node all the way; (10) a cook plates
+    the same way; (11) a batch of three gives three plates, still one work node; (12) a checkpoint in the middle of it
+    comes back, a cook on his way to plate can be taken back, and the pass's places (1 at level 1) still hold one plating
+    at a time."""
+    # 1–9: Jill, one portion
+    g = _day(b, port, target, 7170)
+    g.ev("window.__patient=1")
+    check(_wait_orders(g, 1), 'an order')
+    nid = g.ev("(()=>{wfGather();const n=wfList()[0];wfAssign(n,'jill');return n.id})()")
+    check(_until(g, f"wfNode({nid}).st==='ready'", step=3), 'on the fire, then done')
+    at = json.loads(g.ev(f"JSON.stringify((()=>{{const n=wfNode({nid});const sp=wfFoodSpot(n,n.slot),h=slotHome(n.slot);return{{type:n.slot.type,no:n.slot.no,held:n.slot.wf===n,x:sp.x,y:sp.y,hx:h.x,hy:h.y}}}})())"))
+    check(at['type'] == 'stove' and at['held'] and abs(at['x'] - at['hx']) < 1 and abs(at['y'] - at['hy']) < 1, f'(1) done, the rice is in its wok on its burner: {at}')
+    trail = []
+    g.ev(f"window.__trail=[];window.__nid={nid}")
+    g.ev(f"(()=>{{const n=wfNode({nid});R.wsel=n.id}})()")
+    _tap_slot(g, f"wfNode({nid}).slot")
+    s0 = json.loads(g.ev(f"JSON.stringify((()=>{{const n=wfNode({nid});return{{st:n.st,who:n.who,slot:n.slot&&(n.slot.type+n.slot.no),held:!!n.slot&&n.slot.wf===n,tok:!!n.to&&n.to.type==='pass'&&n.to.wf===n,its:n.its.map(o=>o.it.st)}}}})())"))
+    check(s0['st'] == 'dish' and s0['who'] == 'jill' and s0['slot'] == f"stove{at['no']}" and s0['held'] and s0['tok'] and all(x == 'cooking' for x in s0['its']),
+          f'(2) 裝盤 claimed by a tap on the wok: the rice has not moved, its burner is still its, one of the pass\'s places is held: {s0}')
+    rack = json.loads(g.ev("JSON.stringify(wfRack())"))
+    seen = {'rack': False, 'food': False, 'work_at_food': False, 'out': [], 'topass_pi': None, 'ready_while_carried': False, 'ids': set()}
+    for _ in range(900):
+        r = json.loads(g.ev(f"""JSON.stringify((()=>{{const n=wfNode({nid});const p={POS}('jill');if(!n)return{{gone:true,p}};
+          const o={{st:n.st,id:n.id,dishes:!!n.dishes,slot:n.slot&&(n.slot.type+n.slot.no),p,its:n.its.map(x=>x.it.st),pi:n.pi||null}};
+          if(n.st==='work'&&n.f==='plate'){{const c=chState(n,'plate');o.out=c?c.st.out:null;const sp=wfFoodSpot(n,n.slot);o.plate=wfPlateAt(n,sp,0);o.food={{x:sp.x,y:sp.y}};const t=wfSpot(n.slot);o.spot={{x:t.cx,y:t.cy}}}}
+          if(n.st==='tofood'){{const t=wfSpot(n.slot);o.spot={{x:t.cx,y:t.cy}}}}return o}})())"""))
+        if r.get('gone'):
+            break
+        seen['ids'].add(r['id'])
+        if r['st'] == 'tofood' and r['dishes']:
+            if abs(r['p']['x'] - rack['x']) < 2 and abs(r['p']['y'] - rack['y']) < 2:
+                seen['rack'] = True   # she has just taken the plates at the rack
+        if r['st'] == 'work' and r.get('out') is not None:
+            seen['work_at_food'] = seen['work_at_food'] or (r['slot'] == f"stove{at['no']}" and abs(r['p']['x'] - r['spot']['x']) < 3 and abs(r['p']['y'] - r['spot']['y']) < 3
+                                                             and abs(r['plate']['x'] - r['food']['x']) < 60 and abs(r['plate']['y'] - r['food']['y']) < 20)
+            seen['out'].append(r['out'])
+        if r['st'] == 'topass':
+            seen['topass_pi'] = r['pi']
+            seen['ready_while_carried'] = seen['ready_while_carried'] or any(x == 'ready' for x in r['its'])
+            seen['carry_slot'] = r['slot']
+        g.ev("__run(1)")
+    check(seen['rack'], f'(3) she took clean plates at the rack (wfRack {rack})')
+    check(seen['work_at_food'], '(4)(5) she walked back to the wok and plated it there, the plate beside the wok')
+    outs = seen['out']
+    check(len(outs) >= 3 and outs[0] < .5 and outs[-1] > .9 and all(b2 >= a for a, b2 in zip(outs, outs[1:])), f'(6) the rice leaves the wok for the plate as she goes: {outs[:3]}…{outs[-3:]}')
+    check(seen['topass_pi'] is not None and seen.get('carry_slot') is None and not seen['ready_while_carried'],
+          f'(7)(8) plated, the plate is carried to the pass (its spot held: {seen["topass_pi"]}) and nobody can take it until it is set down')
+    check(seen['ids'] == {nid}, f'(9) one work node all the way: {seen["ids"]}')
+    pl = json.loads(g.ev("JSON.stringify(R.tickets.flatMap(tk=>tk.items.filter(it=>it.d==='friedrice'&&it.st==='ready').map(it=>it.pi)))"))
+    jx = json.loads(g.ev(f"JSON.stringify({POS}('jill'))"))
+    mid = sum(g.ev(f"wfRowX({i})") for i in seen['topass_pi']) / len(seen['topass_pi'])
+    check(pl and sorted(pl) == sorted(seen['topass_pi']) and abs(mid - jx['x']) < 2, f'(8) set down on the pass at the spots held for them, under her hands: {pl} at x={jx}')
+    left = g.ev(f"(()=>{{const s=R.slots.find(s=>s.type==='stove'&&s.no==={at['no']});return s.left&&s.left.v}})()")
+    check(left == 'wok', f'the empty wok stays on its burner: {left}')
+    check(g.ev(f"JSON.stringify(__who[{nid}])") == '["jill@0","jill@1"]', 'Jill on the fire, Jill plating')
+    check(not g.errors, g.errors[:3]); g.close()
+
+    # 10–12: a cook plates the same way; a batch of three; a checkpoint mid-plating; taking it back; one plating at a time
+    LIN = "{id:'t_lin',role:'chef',name:'小林師傅',lv:1,duty:'stove',since:1,days:0,pool:'restaurant'}"
+    g = _day(b, port, target, 7171, f"S.level=3;S.crew.push({LIN})")
+    g.ev("window.__patient=1")
+    g.ev("window.__hold=true;{const W=wfStaff;wfStaff=function(){if(window.__hold)return;return W.apply(this,arguments)}}")
+    check(_wait_orders(g, 1), 'an order')
+    g.ev("__addOrders(2)"); g.ev("__run(2)")
+    nid = g.ev("(()=>{wfGather();const n=wfList().find(n=>n.n===3);return n?n.id:0})()")
+    check(nid, f'(11) three portions, one batch: {g.ev(WF)}')
+    g.ev(f"wfAssign(wfNode({nid}),'jill')")
+    check(_until(g, f"wfNode({nid}).st==='ready'", step=3), 'the batch done on the fire')
+    g.ev("window.__hold=false")
+    check(_until(g, f"wfNode({nid}).who==='t_lin'&&wfNode({nid}).st==='dish'", step=1), '(10) 小林師傅 (plating is his) sets off for the plates')
+    # (12) the pass's one place at level 3? — level 3 still has one unless the wide pass is built: a second plating waits
+    check(g.ev("passCap()") == 1 and not g.ev("!!wfFreeSlot('plate')"), '(12) one plating at a time: the pass\'s one place is held')
+    # (12) take it back while he is on his way: the dish focused, then a tap on the wok it is in
+    g.ev(f"(()=>{{const n=wfNode({nid});R.wsel=null;wfSelectItem(n.its[0].tk,n.its[0].it)}})()")
+    _tap_slot(g, f"wfNode({nid}).slot")
+    tb = json.loads(g.ev(f"JSON.stringify((()=>{{const n=wfNode({nid});return{{who:n.who,st:n.st,cook:(R.wfc||{{}}).t_lin||null,slot:n.slot&&n.slot.type}}}})())"))
+    check(tb['who'] == 'jill' and tb['st'] == 'dish' and tb['cook'] is None and tb['slot'] == 'stove', f'(12) taken back: Jill goes for the plates instead, the rice still in the wok: {tb}')
+    # hand it back to him: Jill lets go (a fresh claim by the cook)
+    g.ev(f"(()=>{{const n=wfNode({nid});wfUnhand(n);if(n.to){{n.to.wf=null;n.to=null}}n.st='ready';n.adv=false;n.dishes=false}})()")
+    check(_until(g, f"wfNode({nid}).who==='t_lin'&&wfNode({nid}).st==='tofood'", step=1), '(10) 小林師傅 has the plates and walks to the wok')
+    # (12) a checkpoint now: it comes back mid-way and finishes
+    snap = g.ev("JSON.stringify(snapshotService())")
+    g.ev(f"(()=>{{const cp={{day:S.day,snap:JSON.parse({json.dumps(snap)})}};restoreService(cp)}})()")
+    back = json.loads(g.ev(f"JSON.stringify((()=>{{const n=wfNode({nid});return n?{{st:n.st,who:n.who,slot:n.slot&&n.slot.type,held:!!n.slot&&n.slot.wf===n,tok:!!n.to&&n.to.wf===n}}:null}})())"))
+    check(back and back['st'] == 'tofood' and back['who'] == 't_lin' and back['slot'] == 'stove' and back['held'] and back['tok'], f'(12) after a checkpoint: the same work, the same place: {back}')
+    seen = {'work': False, 'plates': None}
+    for _ in range(900):
+        r = json.loads(g.ev(f"""JSON.stringify((()=>{{const n=wfNode({nid});if(!n)return{{gone:true}};const a=R.ck&&R.ck.t_lin;const t=n.slot?wfSpot(n.slot):null;
+           return{{st:n.st,f:n.f,at:a&&t?Math.hypot(a.x-t.cx,a.y-t.cy):null,pi:n.pi||null}}}})())"""))
+        if r.get('gone'):
+            break
+        if r['st'] == 'work' and r['f'] == 'plate' and r['at'] is not None and r['at'] < 3:
+            seen['work'] = True
+        if r['st'] == 'topass':
+            seen['plates'] = r['pi']
+        g.ev("__run(1)")
+    check(seen['work'], '(10) he plated it at the wok, standing where the food is')
+    check(seen['plates'] and len(seen['plates']) == 3 and len(set(seen['plates'])) == 3, f'(11) three plates carried, three spots on the pass: {seen["plates"]}')
+    rd = json.loads(g.ev("JSON.stringify(R.tickets.flatMap(tk=>tk.items.filter(it=>it.d==='friedrice'&&it.st==='ready').map(it=>it.pi)))"))
+    check(len(rd) >= 3 and len(set(rd)) == len(rd), f'(11) three plates waiting, each at its own spot: {rd}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def cooking_baked_food_waits_in_the_oven_and_a_glass_goes_to_its_spot(b, port, target):
+    """The same rule at the other places (2026-10-08): a dish done in the oven stays in the oven until whoever plates it
+    pulls it out — it does not jump onto the counter by itself; a drink is carried from the machine to its own spot on the
+    pass and set down there, where it waits."""
+    g = _day(b, port, target, 7172, "S.level=3;S.eq.oven=1;S.eq.bar=1;S.eq.fridge=2")
+    g.ev("window.__patient=1")
+    check(_until(g, "R.tickets.length>0"), 'an order')
+    g.ev("__addOrders(1,'fries');__addOrders(1,'coffee')"); g.ev("__run(2)")
+    fid = g.ev("(()=>{wfGather();const n=wfList().find(n=>n.d==='fries');wfAssign(n,'jill');return n.id})()")
+    check(_until(g, f"wfNode({fid}).st==='ready'", step=3), 'the fries bake, then are done')
+    sp = json.loads(g.ev(f"JSON.stringify((()=>{{const n=wfNode({fid});return wfFoodSpot(n,n.slot)}})())"))
+    check(sp.get('inOven'), f'done, the fries are still in the oven: {sp}')
+    g.ev(f"wfAssign(wfNode({fid}),'jill')")
+    check(_until(g, f"wfNode({fid}).st==='work'", step=1), 'Jill has plates and is at the oven')
+    early = json.loads(g.ev(f"JSON.stringify((()=>{{const n=wfNode({fid});return wfFoodSpot(n,n.slot)}})())"))
+    check(early.get('inOven'), f'as she starts, the tray is still in the oven (her hands pull it out): {early}')
+    check(_until(g, f"(()=>{{const n=wfNode({fid});return n&&n.st==='work'&&wfHands(n)>.3}})()", step=1), 'plating goes on')
+    out = json.loads(g.ev(f"JSON.stringify((()=>{{const n=wfNode({fid});return wfFoodSpot(n,n.slot)}})())"))
+    check(not out.get('inOven'), f'then it is out on the counter beside the plate: {out}')
+    check(_until(g, f"!wfNode({fid})", step=2), 'plated and set down')
+    cid = g.ev("(()=>{const n=wfList().find(n=>n.d==='coffee');return n?n.id:0})()")
+    check(cid and _until(g, f"(()=>{{const n=wfNode({cid});if(n&&wfOpen(n))wfAssign(n,'jill');return n&&n.st==='go'&&n.carry}})()", step=1), 'the coffee made, carried')
+    pi = json.loads(g.ev(f"JSON.stringify(wfNode({cid}).pi)"))
+    check(pi and pi[0] is not None, f'the glass has its own spot on the pass while it is carried: {pi}')
+    check(_until(g, f"!wfNode({cid})", step=2), 'set down')
+    it = json.loads(g.ev("JSON.stringify(R.tickets.flatMap(tk=>tk.items.filter(it=>it.d==='coffee'&&it.st==='ready').map(it=>it.pi)))"))
+    check(it == pi, f'it waits on the spot it was carried to: {it} vs {pi}')
     check(not g.errors, g.errors[:3]); g.close()
