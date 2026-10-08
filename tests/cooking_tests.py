@@ -400,8 +400,8 @@ def cooking_plating_happens_where_the_food_is(b, port, target):
     for _ in range(900):
         r = json.loads(g.ev(f"""JSON.stringify((()=>{{const n=wfNode({nid});const p={POS}('jill');if(!n)return{{gone:true,p}};
           const o={{st:n.st,id:n.id,dishes:!!n.dishes,slot:n.slot&&(n.slot.type+n.slot.no),p,its:n.its.map(x=>x.it.st),pi:n.pi||null}};
-          if(n.st==='work'&&n.f==='plate'){{const c=chState(n,'plate');o.out=c?c.st.out:null;const sp=wfFoodSpot(n,n.slot);o.plate=wfPlateAt(n,sp,0);o.food={{x:sp.x,y:sp.y}};const t=wfSpot(n.slot);o.spot={{x:t.cx,y:t.cy}}}}
-          if(n.st==='tofood'){{const t=wfSpot(n.slot);o.spot={{x:t.cx,y:t.cy}}}}return o}})())"""))
+          if(n.st==='work'&&n.f==='plate'){{const c=chState(n,'plate');o.out=c?c.st.out:null;const sp=wfFoodSpot(n,n.slot);o.plate=wfPlateAt(n,sp,0);o.food={{x:sp.x,y:sp.y}};const t=wfReach(n);o.spot={{x:t.x,y:t.y}}}}
+          if(n.st==='tofood'){{const t=wfReach(n);o.spot={{x:t.x,y:t.y}}}}return o}})())"""))
         if r.get('gone'):
             break
         seen['ids'].add(r['id'])
@@ -409,7 +409,10 @@ def cooking_plating_happens_where_the_food_is(b, port, target):
             if abs(r['p']['x'] - rack['x']) < 2 and abs(r['p']['y'] - rack['y']) < 2:
                 seen['rack'] = True   # she has just taken the plates at the rack
         if r['st'] == 'work' and r.get('out') is not None:
+            # (the user, 2026-10-08 evening: 「裝盤的時候人沒有真的到料理旁邊」 — standing behind the counter her hands were some 70
+            # px from a front burner's wok: now she comes round to it, and her hands (33 px above her feet) are within reach of it)
             seen['work_at_food'] = seen['work_at_food'] or (r['slot'] == f"stove{at['no']}" and abs(r['p']['x'] - r['spot']['x']) < 3 and abs(r['p']['y'] - r['spot']['y']) < 3
+                                                             and ((r['p']['x'] - r['food']['x']) ** 2 + (r['p']['y'] - 33 - r['food']['y']) ** 2) ** .5 < 50
                                                              and abs(r['plate']['x'] - r['food']['x']) < 60 and abs(r['plate']['y'] - r['food']['y']) < 20)
             seen['out'].append(r['out'])
         if r['st'] == 'topass':
@@ -418,7 +421,7 @@ def cooking_plating_happens_where_the_food_is(b, port, target):
             seen['carry_slot'] = r['slot']
         g.ev("__run(1)")
     check(seen['rack'], f'(3) she took clean plates at the rack (wfRack {rack})')
-    check(seen['work_at_food'], '(4)(5) she walked back to the wok and plated it there, the plate beside the wok')
+    check(seen['work_at_food'], '(4)(5) she walked back to the wok and plated it there — beside it, her hands within reach of it — the plate beside the wok')
     outs = seen['out']
     check(len(outs) >= 3 and outs[0] < .5 and outs[-1] > .9 and all(b2 >= a for a, b2 in zip(outs, outs[1:])), f'(6) the rice leaves the wok for the plate as she goes: {outs[:3]}…{outs[-3:]}')
     check(seen['topass_pi'] is not None and seen.get('carry_slot') is None and not seen['ready_while_carried'],
@@ -463,8 +466,8 @@ def cooking_plating_happens_where_the_food_is(b, port, target):
     check(back and back['st'] == 'tofood' and back['who'] == 't_lin' and back['slot'] == 'stove' and back['held'] and back['tok'], f'(12) after a checkpoint: the same work, the same place: {back}')
     seen = {'work': False, 'plates': None}
     for _ in range(900):
-        r = json.loads(g.ev(f"""JSON.stringify((()=>{{const n=wfNode({nid});if(!n)return{{gone:true}};const a=R.ck&&R.ck.t_lin;const t=n.slot?wfSpot(n.slot):null;
-           return{{st:n.st,f:n.f,at:a&&t?Math.hypot(a.x-t.cx,a.y-t.cy):null,pi:n.pi||null}}}})())"""))
+        r = json.loads(g.ev(f"""JSON.stringify((()=>{{const n=wfNode({nid});if(!n)return{{gone:true}};const a=R.ck&&R.ck.t_lin;const t=n.slot&&n.slot.type!=='pass'?wfReach(n):null;
+           return{{st:n.st,f:n.f,at:a&&t?Math.hypot(a.x-t.x,a.y-t.y):null,pi:n.pi||null}}}})())"""))
         if r.get('gone'):
             break
         if r['st'] == 'work' and r['f'] == 'plate' and r['at'] is not None and r['at'] < 3:
@@ -524,7 +527,8 @@ def cooking_the_first_three_days_teach_three_kinds_of_work(b, port, target):
     check(g.ev("S.money") == 1200 and g.ev("START_MONEY") == 1200, f'a new game starts with $1,200: {g.ev("S.money")}')
     # what each piece of work went through, and what 秀琴阿姨 carried into the tub
     g.ev("""window.__steps={};window.__xqIn=0;{const D0=ddDeposit;ddDeposit=function(w){if(R&&w===R.xqh)__xqIn+=(w.hands||[]).filter(e=>e.k==='dirty'&&!e.w).length;return D0(w)}}
-     window.__look=function(){if(!R)return;for(const n of R.wf||[])if(n.f)(__steps[n.d]||(__steps[n.d]=[])).includes(n.f)||__steps[n.d].push(n.f)}""")
+     window.__look=function(){if(!R)return;for(const n of R.wf||[])if(n.f)(__steps[n.d]||(__steps[n.d]=[])).includes(n.f)||__steps[n.d].push(n.f)}
+     {const A0=wfArrive;wfArrive=function(n){const r=A0.apply(this,arguments);__look();return r}}   /* each step seen as it starts: 出杯 is 0.7 s, shorter than the test's 1-second look (it was missed when the walk to the cups changed, 2026-10-08 evening) */""")
     seen = {}
     for day in (1, 2, 3):
         if day == 3:
@@ -577,3 +581,49 @@ def cooking_a_save_past_day_three_before_the_onboarding_change_gets_its_cold_sta
           f"a new game's Day 4 adds the pasta only: {new}")
     check(not g.errors, g.errors)
     g.close()
+
+
+@test
+def cooking_a_made_latte_goes_out_by_the_players_taps(b, port, target):
+    """The user on the iPhone (2026-10-08 evening): 「拿鐵咖啡做好無法出杯」 — the drink made, nothing the player could tap
+    took it on to 出杯 (the earlier tests sent Jill by the program, never by a tap). Day 2, nobody but Jill: the latte chosen
+    on its ticket, the coffee machine tapped — made; then the machine is the lit place, and a tap on it sends Jill to it:
+    she stands beside the cups (from in front of the counter, where they are within reach), takes them to the pass and sets
+    them down for the floor. Everything here is a tap where the player taps."""
+    g = Game(b, port, target, seed=7174, manual=True, viewport={'width': 390, 'height': 844})
+    g.ev(FLOOR)
+    g.click('[data-act=open]'); g.page.wait_for_timeout(80)
+    g.ev("S.day=2;S.gate=1;applyGates();for(const d of menuList())S.stock[d]=12;S.tables=2;save()")
+    start_day(g)
+    g.ev("setRoom('kitchen');window.__patient=1")
+    nid = 0
+    for _ in range(600):
+        g.ev("__run(3)")
+        nid = g.ev("(()=>{wfGather();const n=wfList().find(n=>n.d==='coffee'&&n.st==='wait');return n?n.id:0})()")
+        if nid: break
+    check(nid, 'a latte ordered')
+    sel = g.ev(f"(()=>{{const n=wfNode({nid});const o=n.its[0];const i=o.tk.items.indexOf(o.it);return '#tickets [data-tk=\"'+o.tk.id+'\"][data-i=\"'+i+'\"]'}})()")
+    g.ev("renderTickets()"); g.page.click(sel); g.page.wait_for_timeout(40)
+    check(g.ev("R.wsel") == nid, 'the latte chosen on its ticket')
+    _tap_slot(g, "R.slots.find(s=>s.type==='bar')")
+    check(g.ev(f"wfNode({nid}).who==='jill'"), 'the coffee machine tapped: Jill makes it')
+    check(_until(g, f"wfNode({nid}).st==='ready'", step=3), 'made')
+    cue = json.loads(g.ev(f"JSON.stringify((c=>({{free:c.free.map(s=>s.type)}}))(wfCueSlots(wfNode({nid}))))"))
+    check(cue['free'] == ['bar'] and '出杯' in g.ev(GUIDE), f'made: the machine with the cups is the lit place, the guide says 出杯: {cue} / {g.ev(GUIDE)}')
+    if g.ev("R.wsel") != nid:
+        _tap_slot(g, f"wfNode({nid}).slot")   # (chosen again with a tap on it, if the choice went away)
+    _tap_slot(g, f"wfNode({nid}).slot")
+    check(g.ev(f"wfNode({nid}).who==='jill'&&wfNode({nid}).st==='fetch'"), f'a tap on it: Jill goes for the cups: {g.ev(WF)}')
+    reach = json.loads(g.ev(f"JSON.stringify((()=>{{const n=wfNode({nid});const r=wfReach(n);const sp=wfFoodSpot(n,n.slot);return{{x:r.x,y:r.y,side:r.side,cx:sp.x,cy:sp.y}}}})())"))
+    check(reach['side'] and abs(reach['x'] - reach['cx']) < 50 and ((reach['x'] - reach['cx']) ** 2 + (reach['y'] - 33 - reach['cy']) ** 2) ** .5 < 50,
+          f'where she takes them: beside the cups, within reach: {reach}')
+    at = False
+    for _ in range(400):
+        p = json.loads(g.ev("JSON.stringify((()=>{const J=wfJ();return{x:J.x,y:J.y}})())"))
+        if abs(p['x'] - reach['x']) < 3 and abs(p['y'] - reach['y']) < 3: at = True
+        if not g.ev(f"!!wfNode({nid})"): break
+        g.ev("__run(1)")
+    check(at, 'she went to the cups')
+    items = json.loads(g.ev("JSON.stringify(R.tickets.flatMap(tk=>tk.items.filter(it=>it.d==='coffee').map(it=>[it.st,it.pi])))"))
+    check(items and all(st in ('ready', 'served') for st, _ in items), f'out: on the pass for the floor (or served already): {items}')
+    check(not g.errors, g.errors[:3]); g.close()

@@ -5962,7 +5962,7 @@ function kitchenUpd(dt){if(!R)return;R.ck=R.ck||{};
  for(const s of R.slots){const m=jobChef(s);s.cook=m?m.id:null;if(s.job&&s.job.plating&&!s.job.plating.x)s.job.plating.x=platingSpot()}
  let i=0;for(const m of S.crew||[]){if(m.role!=='chef')continue;if(!crewHere(m)){cookAwayUpd(m,dt);continue}/* v2.4 A3 */let a=R.ck[m.id];if(!a){const h=homeSpot(m,i);const aw=crewAwayOf(m),d0=KR.door;a=R.ck[m.id]=aw&&aw.k==='late'?{x:d0.x,y:d0.y,face:1,step:0,moving:false}:{x:h.x,y:h.y,face:1,step:0,moving:false}}
   const b=a.beat=chefBeat(m,a,i);i++;const v=(200+16*m.lv)*flowMul('crew')*dt;const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy);
-  if(d>v){a.x+=dx/d*v;a.y+=dy/d*v;a.moving=true;a.step+=dt*13;if(Math.abs(dx)>.5)a.face=dx>0?1:-1;a.idle=null}else{a.x=b.x;a.y=b.y;a.moving=false;a.face=a.idle==='chat'&&a.chatFace?a.chatFace:1}
+  if(d>v){a.x+=dx/d*v;a.y+=dy/d*v;a.moving=true;a.step+=dt*13;if(Math.abs(dx)>.5)a.face=dx>0?1:-1;a.idle=null}else{a.x=b.x;a.y=b.y;a.moving=false;a.face=b.face||(a.idle==='chat'&&a.chatFace?a.chatFace:1)}
   cookIdleTick(m,a,b,dt);
   if(b.kind==='plate'&&!a.moving&&!b.wf){const j=b.s.job;j.plating.t+=dt;if(j.plating.t>=j.plating.dur)finishJob(b.s)}}}
 /* 2.1: what a cook does with a quiet minute — wipes the counter, drinks some water, tastes the sauce, reads the rail,
@@ -6102,12 +6102,21 @@ function wfAssign(n,who,slot){if(!wfOpen(n))return false;const f=wfNext(n);const
 function wfChefTook(n,m){if(!m)return;n.ck=n.ck||[];if(!n.ck.includes(m.id)){n.ck.push(m.id);for(let i=0;i<n.n;i++)crewCount(m,'cook')}
  if(n.d==='signature'&&!S.taught){S.taught=S.day;jillSay('這道也交給你了。');speakLater(()=>{if(R&&phase==='service')staffSay(m,'交給我。')},1400);ach('taught')}}
 function wfUnhand(n){if(n.who==='jill'){const J=wfJ();J.q=J.q.filter(x=>x!==n.id)}else if(n.who&&R.wfc&&R.wfc[n.who]===n.id)delete R.wfc[n.who];n.who=null}
+/* where someone stands to take finished food in hand — to plate it, or to take a glass out (the user, 2026-10-08 evening:
+   「裝盤的時候人沒有真的到料理旁邊」). From behind the counter only its back half is within reach: food on the front half (the
+   front burners, the coffee machine's cups, the pizza ledge) is reached from in front of the counter, standing beside it
+   (side: which side of it, -1 left / 1 right; 0 = from behind, as before — the back burners, the board, the trivet) */
+function wfReach(n){const t=n.slot.type;const sp=t==='oven'||t==='pizza'?wfOutSpot(n):wfFoodSpot(n,n.slot);if(sp.y<180){const h=wfSpot(n.slot);return{x:h.cx,y:h.cy,side:0}}   /* (a baked dish: where it is put down to be plated) */
+ const side=t==='bar'?-1:t==='oven'||t==='pizza'?1:t==='prep'?(sp.x<KX.prep.x+35?-1:1):(sp.x<KX.range.x+KX.range.w/2?-1:1);
+ return{x:sp.x+side*44,y:KY.top+KY.h+KY.face+4,side}}
 /* where the one doing the step has to stand */
-function wfTarget(n){if(n.st==='fetch'||n.st==='tofood'){const sp=wfSpot(n.slot);return sp?{x:sp.cx,y:sp.cy}:null}
+function wfTarget(n){if(n.st==='fetch'||n.st==='tofood'){if(n.slot&&n.slot.type!=='pass'){const r=wfReach(n);return{x:r.x,y:r.y}}const sp=wfSpot(n.slot);return sp?{x:sp.cx,y:sp.cy}:null}
  if(n.st==='dish')return wfRack();
  if(n.st==='topass')return wfRowSpot(n);
  if(n.st==='go'){if(n.to){const sp=wfSpot(n.to);return{x:sp.cx,y:sp.cy}}return n.pi?wfRowSpot(n):{x:WF_PICK.x,y:WF_PICK.y}}
- if(n.st==='work'){if(n.slot){const sp=wfSpot(n.slot);return{x:sp.cx,y:sp.cy}}return n.pi?wfRowSpot(n):{x:WF_PICK.x,y:WF_PICK.y}}return null}
+ if(n.st==='work'){if(n.slot){if(n.f==='plate'&&n.slot.type!=='pass'){const r=wfReach(n);return{x:r.x,y:r.y}}const sp=wfSpot(n.slot);return{x:sp.cx,y:sp.cy}}return n.pi?wfRowSpot(n):{x:WF_PICK.x,y:WF_PICK.y}}return null}
+/* the way the one plating faces: towards the food (from beside it), or the room (from behind) */
+function wfReachFace(n){if(!n||!n.slot||n.slot.type==='pass')return 0;const r=wfReach(n);return -r.side}
 function wfArrive(n){if(n.st==='fetch'){const at=n.slot?wfSpot(n.slot).x:KX.bar.x;if(n.slot){n.slot.wf=null;n.slot=null}n.carry=true;n.st='go';if(!n.to)n.pi=wfRowTake(n,at);/* a glass for the floor: its own spot on the pass, the nearest free one */R.tv++;return}
  if(n.st==='dish'){n.dishes=true;n.st='tofood';R.rackT=R.t;if(R.dd&&R.dd.rack)R.dd.rack--;R.tv++;return}   /* clean plates in hand: back to the food, where it is */
  if(n.st==='topass'){wfUnhand(n);wfFinish(n);return}   /* set down on the pass: only now can the floor take it */
@@ -6153,6 +6162,7 @@ function wfUpd(dt){if(!R)return;wfGather();const J=wfJ();const jt=wfJillTask();
  if(ddWasher()==='jill'&&(!jt||handsN(J,'dirty'))){const sp=washStep(J,'jill',dt,1);if(sp){const v=165*flowMul('jill')*dt;const dx=sp.x-J.x,dy=sp.y-J.y,d=Math.hypot(dx,dy);if(d>v){J.x+=dx/d*v;J.y+=dy/d*v;J.moving=true;J.step+=dt*12;if(Math.abs(dx)>.5)J.face=dx>0?1:-1}else{J.x=sp.x;J.y=sp.y;J.moving=false}}else J.moving=false}
  else if(jt&&jt.st!=='work'){const tg=wfTarget(jt);if(tg){const v=165*flowMul('jill')*(R.fire>0?1.5:1)*dt;const dx=tg.x-J.x,dy=tg.y-J.y,d=Math.hypot(dx,dy);if(d>v){J.x+=dx/d*v;J.y+=dy/d*v;J.moving=true;J.step+=dt*12;if(Math.abs(dx)>.5)J.face=dx>0?1:-1}else{J.x=tg.x;J.y=tg.y;J.moving=false;wfArrive(jt)}}}
  else J.moving=false;
+ if(jt&&jt.st==='work'&&jt.f==='plate'&&!J.moving){const fc=wfReachFace(jt);if(fc)J.face=fc}   /* beside the food: turned to it */
  for(const id in R.wfc||{}){const n=wfNode(R.wfc[id]);if(!n||n.who!==id||!WF_HELD.has(n.st)){delete R.wfc[id];continue}if(n.st!=='work'&&wfHere(n))wfArrive(n)}
  /* a plate waiting on the pass from before its spot was kept (an older save) is given one, once */
  if(R.t-(R.wfRow||0)>.5){R.wfRow=R.t;let u=null;for(const tk of R.tickets){if(tk.lounge||tk.cn)continue;for(const it of tk.items)if(it.st==='ready'&&!it.picked&&!it.lbar&&!it.ktp&&it.pi===undefined){u=u||wfRowUsed();let i=0;while(u.has(i)&&i<wfRowN())i++;it.pi=i<wfRowN()?i:null;if(it.pi!=null)u.add(it.pi)}}}
@@ -6293,7 +6303,9 @@ function wfDrawCookWF(c,m,a,b,now){const n=b.wf;const moving=a.moving;const stp=
 /* where baked food is put down once it is out of the oven: the trivet on the counter, or the ledge under the pizza oven */
 function wfOutSpot(n){const t=n.slot&&n.slot.type;if(t==='pizza')return{x:KX.oven.x+26,y:186,sc:.3};return{x:KX.oven.x+22,y:170,sc:.36}}
 /* where plate k of a piece of work sits while it is plated: on the counter beside the food, to the side with room */
-function wfPlateAt(n,sp,k){const t=n.slot?n.slot.type:'stove';let side;if(t==='oven'||t==='pizza')side=-1;else if(t==='prep')side=sp.x<KX.prep.x+35?-1:1;else if(t==='bar')side=-1;else side=sp.x<KX.range.x+KX.range.w/2?-1:1;
+function wfPlateAt(n,sp,k){const t=n.slot?n.slot.type:'stove';
+ if(n.slot&&t!=='pass'&&!sp.inOven){const r=wfReach(n);if(r.side){const y=KY.top+KY.h-6;return k===0?{x:sp.x+r.side*23,y,sc:.33}:{x:sp.x-r.side*(30+(k-1)*9),y:y+(k-1)*1.4,sc:.33}}}   /* plated from in front of the counter (wfReach): the first plate under her hand, between her and the food; the others on the counter's edge on its far side */
+ let side;if(t==='oven'||t==='pizza')side=-1;else if(t==='prep')side=sp.x<KX.prep.x+35?-1:1;else if(t==='bar')side=-1;else side=sp.x<KX.range.x+KX.range.w/2?-1:1;
  const base=t==='stove'?33:t==='prep'?25:30;return{x:sp.x+side*(base+k*9),y:sp.y+(t==='stove'?5:3)+k*1.4,sc:.33}}
 /* plates being filled beside the food, the old way of looking for a dish without its own beats: the food goes from its
    vessel onto the plates as the hands go (the dish's picture comes in on the plate — never grown — and its garnish last) */
@@ -6415,8 +6427,10 @@ function wfGuideUpd(){if(!wfGuideEl){const w=$('#sceneWrap');if(!w)return;wfGuid
 /* the places the selected work can go now (free ones first; all of that kind when every one is busy) */
 function wfCueSlots(n){const f=wfNext(n);
  if(!f){const h=wfHeading(n);if(h==='plate'&&(n.st==='dish'||n.st==='tofood'))return{f:h,free:[],busy:[],held:n.slot,food:true};   /* someone is coming to plate it: the food is the place */
+  if(h==='serve'&&n.st==='fetch'&&n.slot)return{f:h,free:[],busy:[],held:n.slot};   /* someone is coming for the glass: where it stands */
   return{f:h,free:[],busy:[],held:h&&n.to&&(n.st==='go'||n.st==='fetch')?n.to:null}}   /* on its way: the place held for it */
  if(f==='plate'&&n.slot){const ok=!!wfFreeSlot('plate')&&wfRowOK(n);return{f,free:ok?[n.slot]:[],busy:ok?[]:[n.slot],food:true}}   /* plating is done where the food is (the user, 2026-10-08): the finished food is what is lit, never the pass */
+ if(f==='serve'&&n.slot){const ok=wfRowOK(n);return{f,free:ok?[n.slot]:[],busy:ok?[]:[n.slot]}}   /* 出杯 (the user, 2026-10-08: 「拿鐵咖啡做好無法出杯」): the finished drink is what is lit — a tap on it sends Jill to take it to the pass */
  if(!WF_ST[f].slot)return{f,free:[],busy:[]};const all=wfSlots(f);return{f,free:all.filter(wfSlotFree),busy:all.filter(s=>!wfSlotFree(s))}}
 /* of the free places, the one to point at: the nearest to where the food is (the user, 2026-10-08: 「系統優先標示目前可用／最合理的一個」) */
 function wfBestSlot(n,cue){const at=wfAt(n);let best=null,bd=1e9;for(const s of cue.free){const o=wfSlotCenter(s);const d=Math.hypot(o.x-at.x,o.y-at.y);if(d<bd){bd=d;best=s}}return best}
@@ -6458,7 +6472,7 @@ function wfHitSlot(p){if(!R)return null;let best=null,bd=1e9;
 function wfFamOf(s){return WF_TYPE_F[s.type]}
 function wfTap(p){const r=wfTap0(p);if(r){renderTickets();wfGuideUpd()}return r}
 function wfTap0(p){const s=wfHitSlot(p);if(!s)return false;const sel=R.wsel?wfNode(R.wsel):null;const f=wfFamOf(s);
- if(sel&&wfOpen(sel)&&wfNext(sel)==='plate'&&sel.slot===s){if(wfAssign(sel,'jill'))wfFirstUse(sel,'plate');sfx.tap();return true}   /* the finished food tapped: Jill brings plates and plates it there */
+ if(sel&&wfOpen(sel)&&(wfNext(sel)==='plate'||wfNext(sel)==='serve')&&sel.slot===s){const f0=wfNext(sel);if(wfAssign(sel,'jill'))wfFirstUse(sel,f0);sfx.tap();return true}   /* the finished food tapped: Jill brings plates and plates it there; a finished drink: she takes it out to the pass (出杯 — before 2026-10-08 evening nothing the player could tap did this) */
  if(sel&&wfOpen(sel)&&wfNext(sel)===f&&wfSlotFree(s)){if(wfAssign(sel,'jill',s)){wfFirstUse(sel,f);sfx.tap();return true}}
  if(sel&&wfTakeBack(sel,s)){wfFirstUse(sel,f);sfx.tap();return true}
  if(s.wf){if(R.wsel!==s.wf.id){R.wsel=s.wf.id;R.tv++}sfx.tap();return true}   /* the work there, focused: what it is, who has it */
@@ -6512,7 +6526,7 @@ function wfDrawJill(c,now){const J=R&&R.jk;if(!J)return false;const t=wfJillTask
 /* a cook's beat while he has a piece of work (chefBeat): walk to it, then the hands the place needs */
 function wfChefBeat(m){const id=R.wfc&&R.wfc[m.id];const n=id?wfNode(id):null;if(!n||n.who!==m.id||!WF_HELD.has(n.st))return null;const tg=wfTarget(n);if(!tg)return null;
  const f=n.st==='work'?n.f:wfFl(n)[n.adv?n.si+1:n.si];const rj=wfRJ(n);const job={d:n.d,it:rj.it,step:f==='prep'?{t:'work',board:true}:f==='hot'?{t:'work'}:f==='drink'?{t:'hold',ing:'milk'}:null};
- const kind=n.st!=='work'?'go':f==='plate'||f==='serve'?'plate':f==='oven'||f==='pizza'?'watch':'work';return{kind,x:tg.x,y:tg.y,s:{job},wf:n}}
+ const kind=n.st!=='work'?'go':f==='plate'||f==='serve'?'plate':f==='oven'||f==='pizza'?'watch':'work';return{kind,x:tg.x,y:tg.y,s:{job},wf:n,face:n.st==='work'&&f==='plate'?wfReachFace(n):0}}
 /* a cook with nothing in hand keeps the dish he put on the fire moving until it is done (the fried rice tossed): only
    while he has no other work — the next piece of work takes him away at once, and the dish cooks just as well without him */
 function wfChefAttend(m){const n=wfAttending(m.id);if(!n)return null;const sp=wfSpot(n.slot);return{kind:'attend',x:sp.cx,y:sp.cy,s:{job:{d:n.d,it:n.its[0]&&n.its[0].it,step:{t:'wait'}}},wf:n}}
@@ -10469,7 +10483,7 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
  {ic:"🍳",h:"一天怎麼玩",sum:"第一次玩，先看這一張。",pts:[
   ["一天","開店前選今天的菜單、備料 → 17:00 開店 → 21:30 打烊，客人吃完就結算 → 用今天賺的錢在商店買東西 → 準備下一天。前兩天開店時，遊戲會自動幫你補好備料（照價付）。"],
   ["髒盤子","收桌時，盤子、杯子會被拿回廚房，放進水槽前的髒盤車（最多 10 個；有商用洗碗機 20 個）。車滿了，吃完的桌子要等：點髒盤車，就有人去洗。清潔員和秀琴阿姨會自己洗，服務生快滿了才洗。"],
-  ["營業中","客人會自己找空桌坐。桌上出現紅色「!」：點桌子點餐。到廚房點訂單上的菜，它下一步的位置會亮起來，點那裡 Jill 就去做；裝盤時亮的是菜本身。菜下的小字是流程，粗體是現在這站，小名字是誰在做；做好的一站在原地等，不會壞。銀色餐蓋：點桌子上菜。金幣：點桌子收錢；客人走了再點一次收桌。"],
+  ["營業中","客人會自己找空桌坐。桌上出現紅色「!」：點桌子點餐。到廚房點訂單上的菜，它下一步的位置會亮起來，點那裡 Jill 就去做；裝盤、出杯時亮的是菜或飲料本身。菜下的小字是流程，粗體是現在這站，小名字是誰在做；做好的一站在原地等，不會壞。銀色餐蓋：點桌子上菜。金幣：點桌子收錢；客人走了再點一次收桌。"],
   ["員工","請了廚師、服務生、清潔員，他們會自己接工作；廚師只接自己會的位置（員工頁寫著每個人的）。廚師還在走過去時，點他要去的位置就換 Jill 做。服務生一次端兩盤起，等級越高端越多、一趟送越多桌。Jill 有空時會回房間坐一下，你點桌子她就回來。"],
   ["故事","重要的故事發生時，店裡會整個停住；一句一句點著看完，店才接著營業。錯過的都在「餐廳日誌」。"],
   ["暫停","營業中點右上的「II」：調營業速度、看日誌、存檔備份、提早打烊。"],
