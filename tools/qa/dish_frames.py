@@ -53,6 +53,14 @@ with sync_playwright() as p:
         for si, f in enumerate(fl):
             if f == 'plate' or f == 'serve': break
             g.ev("(()=>{const n=wfList()[0];if(wfOpen(n))wfAssign(n,'jill')})()")
+            if si > 0:   # carried from the last place to this one
+                for _ in range(600):
+                    tick(g, 1)
+                    if g.ev("(()=>{const n=wfList()[0];return !n||(n.st==='go'&&n.carry)})()"): break
+                for _ in range(120):   # where the one carrying it is in sight: behind the counter (in front of it only for a moment: everyone walks straight through)
+                    tick(g, 1)
+                    if g.ev("(()=>{const n=wfList()[0];if(!n||n.st!=='go')return true;const J=wfJ();return J.y<158})()"): break
+                shot(f'{si}carry', f'端去{f}')
             nb = g.ev(NB % (d, f))
             if nb:
                 for i in range(-1, nb):   # -1: the moment the work begins

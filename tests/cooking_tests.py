@@ -723,19 +723,20 @@ def cooking_the_users_day3_latte_goes_out_by_a_tap(b, port, target):
 @test
 def cooking_each_dish_with_its_own_beats_starts_raw_and_changes_by_hand(b, port, target):
     """The choreography (the user's spec, docs/v24/cooking_choreography_2026-10-08.txt, HARD RULES 1–4), for every dish with
-    its own beats so far (the fried rice; the latte, the pasta, the salad, the tea, the sparkling water, the soup): what goes
+    its own beats so far (docs/cooking/CHOREOGRAPHY.md: the fried rice; batch 1, batch 2 …): what goes
     in goes in by a hand — a beat that adds something is the hands', never the heat's, and every beat of the hands has its
     gesture; at the start of each place the dish is its raw look (nothing of the place done), the beats in order bring it to
     the place's finished look; and drawn in the kitchen it looks different at the start, when the hands are done (half way
     through them where nothing cooks by itself) and at the end of each place, and while it is plated — never one finished picture from the first moment."""
-    g = _day(b, port, target, 9101, "S.eq.bar=Math.max(S.eq.bar,1);S.eq.prep=Math.max(S.eq.prep,1);")
+    g = _day(b, port, target, 9101, "S.eq.bar=Math.max(S.eq.bar,1);S.eq.prep=Math.max(S.eq.prep,1);S.eq.oven=Math.max(S.eq.oven,1);")
     beats = json.loads(g.ev(r"""JSON.stringify((()=>{const out={};for(const d of Object.keys(CH))for(const f of Object.keys(CH[d])){const c=CH[d][f];const bad=[];
       for(const x of c.hands||[])if(!x.g)bad.push('hands without a gesture: '+x.say);
       for(const x of c.heat||[])if(x.ing)bad.push('added by the heat: '+x.say);
       const s0=Object.assign({},c.from);chRun(s0,c.hands,0);const raw=Object.keys(c.from).every(k=>s0[k]===c.from[k]);
       const s1=Object.assign({},c.from);chRun(s1,c.hands,1);if(c.heat)chRun(s1,c.heat,1);const last={};for(const x of(c.hands||[]).concat(c.heat||[]))Object.assign(last,x.set);
       out[d+'.'+f]={bad,raw,done:Object.keys(last).every(k=>Math.abs(s1[k]-last[k])<1e-9),n:(c.hands||[]).length+(c.heat||[]).length}}return out})())"""))
-    for want in ('friedrice.hot', 'friedrice.plate', 'coffee.drink', 'blacktea.drink', 'sparkling.drink', 'salad.prep', 'salad.plate', 'pasta.hot', 'pasta.plate', 'soup.hot', 'soup.plate'):
+    for want in ('friedrice.hot', 'friedrice.plate', 'coffee.drink', 'blacktea.drink', 'sparkling.drink', 'salad.prep', 'salad.plate', 'pasta.hot', 'pasta.plate', 'soup.hot', 'soup.plate',
+                 'burger.prep', 'burger.hot', 'burger.plate', 'pudding.prep', 'pudding.plate', 'fries.oven', 'fries.plate', 'fruitsoda.drink', 'veg.prep', 'veg.oven', 'veg.plate'):
         check(want in beats, f'{want} has its own beats: {sorted(beats)}')
     for k, v in beats.items():
         check(not v['bad'] and v['raw'] and v['done'] and v['n'] >= 2, f'{k}: by hand, from raw to done in its beats: {v}')
@@ -747,5 +748,5 @@ def cooking_each_dish_with_its_own_beats_starts_raw_and_changes_by_hand(b, port,
         out[d+'.'+f]=plating?[at('work',1,0),at('work',.5,0),at('work',0,0)]:[at('work',1,1),CH[d][f].heat?at('cook',0,1):at('work',.5,1),at('ready',0,0)]})}return out})())"""))   # (a place without heat — the salad's board — is all hands: its middle is half way through them)
     for k, (h0, h1, h2) in looks.items():
         check(len({h0, h1, h2}) == 3, f'{k}: drawn differently at its start, when the hands are done and at its end: {[h0, h1, h2]}')
-    check(len(looks) >= 11, f'every place with its own beats was drawn: {sorted(looks)}')
+    check(set(looks) == set(beats), f'every place with its own beats was drawn: {sorted(set(beats) - set(looks))} missing')
     check(not g.errors, g.errors[:3]); g.close()

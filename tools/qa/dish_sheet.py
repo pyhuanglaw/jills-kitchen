@@ -7,7 +7,8 @@ import sys, os, re, html as H
 from playwright.sync_api import sync_playwright
 from PIL import Image
 src, out, DISHES = sys.argv[1], sys.argv[2], sys.argv[3:]
-NAMES = {'friedrice': '黃金蛋炒飯', 'coffee': '拿鐵咖啡', 'blacktea': '錫蘭檸檬紅茶', 'sparkling': '檸檬氣泡水', 'salad': '田園沙拉', 'pasta': '番茄義大利麵', 'soup': '南瓜濃湯'}
+NAMES = {'friedrice': '黃金蛋炒飯', 'coffee': '拿鐵咖啡', 'blacktea': '錫蘭檸檬紅茶', 'sparkling': '檸檬氣泡水', 'salad': '田園沙拉', 'pasta': '番茄義大利麵', 'soup': '南瓜濃湯',
+         'burger': '經典牛肉漢堡', 'pudding': '焦糖布丁', 'fries': '松露薯條', 'fruitsoda': '莓果蘇打', 'veg': '香料烤蔬菜'}
 tmp = os.path.join(src, '_sheet'); os.makedirs(tmp, exist_ok=True)
 rows = []
 for d in DISHES:
@@ -16,10 +17,10 @@ for d in DISHES:
     cells = []
     for i, (cap, fn) in enumerate(figs):
         im = Image.open(fn); w, h = im.size
-        whole = '裝盤' in cap or '端走' in cap
+        whole = '裝盤' in cap or '端' in cap
         c = im if whole else im.crop((w // 2 - 130, int(h * .62) - 150, w // 2 + 130, int(h * .62) + 60))
         p = os.path.join(tmp, f'{d}_{i}.png'); c.save(p)
-        cap = H.unescape(cap).replace('drink', '飲料').replace('prep', '備料').replace('hot', '熱區')
+        cap = H.unescape(cap).replace('drink', '飲料').replace('prep', '備料').replace('hot', '熱區').replace('oven', '烤箱')
         cells.append(f'<figure><img src="file://{p}"><figcaption>{H.escape(cap)}</figcaption></figure>')
     rows.append(f'<h2>{H.escape(NAMES.get(d, d))}</h2><div class=row>{"".join(cells)}</div>')
 doc = f"""<!doctype html><meta charset=utf-8><style>body{{margin:0;padding:8px 0 12px;background:#FAF6EE;font-family:'Noto Sans TC','PingFang TC',sans-serif;color:#2E2019;width:1180px}}
