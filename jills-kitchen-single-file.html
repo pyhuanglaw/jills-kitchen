@@ -1412,7 +1412,7 @@ const COACH=[
  '客人來了！有空桌的話他們會自己入座；客滿時會先在店門口外面等，等桌子空出來。',   /* audit WS1-12: Day 1 has no bench (it is bought later) — the manual's own words */
  '客人在看菜單。等桌上出現「!」，點那張桌子幫他們點餐。',
  '訂單來了！點上方訂單條裡的炒飯，再點廚房裡亮起來的爐口，Jill 就會過去炒。',
- '炒飯會在爐上自己炒好，不用一直盯著。好了以後一樣點訂單上的炒飯，再點亮起來的那鍋，Jill 會拿盤子過來裝。',   /* v2.5: the new kitchen (fried rice: 熱區 → 裝盤); 2026-10-08: plated where it is, never at the pass */
+ '炒飯會自己炒好，不用盯著。好了點訂單上的炒飯，再點那鍋，Jill 會拿盤子來裝。',   /* v2.5: the new kitchen (fried rice: 熱區 → 裝盤); 2026-10-08: plated where it is, never at the pass */
  '炒飯好了，放在出菜口。點那張桌子，Jill 會端過去。',
  '客人開動了。吃完會出現金幣，點桌子收錢。',
  '最後點桌子收拾乾淨，就能接下一組客人。',
@@ -10750,7 +10750,12 @@ function stationWarnings(){/* the prep screen: a station with dishes on today's 
    LV5 is twice what it was; a new hire only 15% more than before, and each level between climbs toward it (×1.15, ×1.3,
    ×1.5, ×1.75, ×2 of the rc7 wage) */
 const WAGE_K=1.1,WAGE_LV=.55,WAGE_UP=[1.15,1.3,1.5,1.75,2];
-function crewWageAt(role,lv){const L=clamp(Math.round(lv||1),1,5);return Math.round(ROLES[role].wage*WAGE_K*(1+WAGE_LV*(L-1))*WAGE_UP[L-1])}
+/* 2026-10-08 (the user, docs/v24/restaurant_workflow_b_2026-10-08.txt Part 2: 「所有既有員工：new salary = current salary × 0.8」):
+   every wage — each role, each level, the Lounge's roster and 秀琴阿姨 alike — is four fifths of what it was that morning,
+   rounded to the dollar as wages always were. The curve, the roles, the hiring and training prices are as they were.
+   Not wages and not changed: 予安's fee for a night at the piano (YA_FEE), Ken's share of a tasting night (KEN_CUT). */
+const WAGE_NOW=.8;
+function crewWageAt(role,lv){const L=clamp(Math.round(lv||1),1,5);return Math.round(Math.round(ROLES[role].wage*WAGE_K*(1+WAGE_LV*(L-1))*WAGE_UP[L-1])*WAGE_NOW)}
 function crewWage(m){return crewWageAt(m.role,m.lv)}
 function crewWages(){return(S.crew||[]).reduce((a,m)=>a+crewWage(m),0)}
 function chefFor(type){let b=null;for(const m of S.crew||[])if(m.role==='chef'&&m.duty===type&&crewHere(m)&&(!b||m.lv>b.lv))b=m;return b}
