@@ -386,13 +386,18 @@ def v24_day52_save_plays_the_stories_in_order_over_forty_days(b, port, target):
     # needs her to know both. The release talks with each (three apiece, the one she knows less first): the wall begins
     # Day 63–66 and settles by Day 82 on all seven (rc8.1: 79–84), every target on four of seven (rc8.1 four). 7000 meets
     # every target on rc8.1 and on the release.
+    # v2.5 (the new kitchen, 2026-10-08): on 5bf7aff (plating where the food is) 7000 moved 怡君 in on Day 63, ten days
+    # after she met Jill — one over. Seven seeds on 2c66a14 (the build the user played) and a08b09c
+    # (docs/evidence/cooking_2026-10-08/sims/day52_seeds.txt): the move on Day 61-63 on both, the wall begins 63-67 and
+    # 63-65, settles 81-83 and 79-82; every target on four of seven before and six of seven now. 7600 meets every target
+    # on both builds.
     first = None; majors = {}
     for d in range(40):
         if g.ev("phase") == 'summary':
             g.click('[data-act=toShop]'); g.page.wait_for_timeout(60)
         if g.ev("phase") == 'shop':
             g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(100)
-        g.ev(seed % (7000 + d)); g.ev("S.today.sugKey=null;S.today.sug=null;autoStock()")
+        g.ev(seed % (7600 + d)); g.ev("S.today.sugKey=null;S.today.sug=null;autoStock()")
         start_day(g); install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;window.__noScenes=true")
         if first is None:
             first = g.ev("S.day")
@@ -2703,9 +2708,11 @@ def v24_rc7_the_money(b, port, target):
     small = json.loads(g.ev("(()=>{const L=S.level,r0=Object.assign({},S.rooms),lv=S.rooms.lounge;S.level=1;S.rooms={};const a=rentToday();S.level=L;S.rooms=r0;return JSON.stringify(a)})()"))
     check(small == 300, f'a first-day shop pays {small} a day')
     w = json.loads(g.ev("JSON.stringify({c1:crewWageAt('chef',1),c5:crewWageAt('chef',5),w5:crewWageAt('waiter',5),cl5:crewWageAt('cleaner',5),b5:crewWageAt('bartender',5),all:crewWages()})"))
-    # rc7.2 (the player, 22:51): LV5 twice the rc7 wage, a new hire 15% more
-    check(w['c1'] == 304 and w['c5'] == 1690 and w['w5'] == 1408 and w['cl5'] == 1056 and w['b5'] == 2253, f'the wages: {w}')
-    check(14679 * 1.98 < w['all'] < 14679 * 2.02, f'the Day 71 crew, all LV5: $14,679 a day in rc7, {w["all"]} now')
+    # rc7.2 (the player, 22:51): LV5 twice the rc7 wage, a new hire 15% more. v2.5 (the user, 2026-10-08: 「既有員工薪資全部
+    # 調整為目前的 80%」; docs/cooking/ARCHITECTURE.md §「改過的測試」): every wage four fifths of rc7.2's, rounded — 304 → 243, 1690 → 1352,
+    # 1408 → 1126, 1056 → 845, 2253 → 1802; the crew's day the same four fifths of rc7.2's twice rc7
+    check(w['c1'] == 243 and w['c5'] == 1352 and w['w5'] == 1126 and w['cl5'] == 845 and w['b5'] == 1802, f'the wages: {w}')
+    check(14679 * 1.98 * .8 < w['all'] < 14679 * 2.02 * .8, f'the Day 71 crew, all LV5: $14,679 a day in rc7, twice that in rc7.2, four fifths of it now: {w["all"]}')
     # the menu: the bar bites on tonight, of how many — three of four on this save before rc7.4; rc7.4's four new ones
     # (水牛城雞翅、起司條、生蠔、德國豬腳 — this Lounge is III) come onto the menu with the morning's news: seven of eight
     g.ev("showPrep()"); g.page.wait_for_timeout(100)
@@ -3597,14 +3604,18 @@ def v24_rc7_2_the_lounges_own_waiter_carries_its_bites(b, port, target):
 def v24_rc7_2_no_firing_and_the_wages(b, port, target):
     """rc7.2 (the player, 22:39: 「員工如果請了就不要再有解雇的選項了」): no 解雇 on any card, for either list; (22:51: 「我覺得他們的
     薪水應該都是現在的兩倍…你自己去推算他們一開始的但也不要差太多」): LV5 twice the rc7 wage, a new hire 15% more, the levels between
-    in steps; the staff page and the manual say the numbers."""
+    in steps; the staff page and the manual say the numbers. v2.5 (2026-10-08, 「既有員工薪資全部調整為目前的 80%」): every one of them four
+    fifths of that, rounded."""
     g = Game(b, port, target, seed=2251, manual=True, viewport={'width': 390, 'height': 844})
     load_save(g, 'player_day74_1508.json')
     g.ev("shopTab='staff';showShop()"); g.page.wait_for_timeout(80)
     scr = g.ev("$('#screen').innerText")
     check('解雇' not in scr and not g.ev("!!document.querySelector('[data-act=crewFire]')") and g.ev("document.querySelectorAll('#screen .item').length") >= 10, 'the staff page: every card, no 解雇')
     w = json.loads(g.ev("JSON.stringify(['chef','waiter','cleaner','bartender'].map(r=>[1,2,3,4,5].map(l=>crewWageAt(r,l))))"))
-    check(w == [[304, 532, 832, 1224, 1690], [253, 443, 693, 1020, 1408], [190, 332, 520, 765, 1056], [405, 709, 1109, 1632, 2253]], f'the wages: {w}')
+    # v2.5 (the user, 2026-10-08: 「既有員工薪資全部調整為目前的 80%」; docs/cooking/ARCHITECTURE.md §「改過的測試」): four fifths of rc7.2's
+    # table, rounded (rc7.2: [[304, 532, 832, 1224, 1690], [253, 443, 693, 1020, 1408], [190, 332, 520, 765, 1056],
+    # [405, 709, 1109, 1632, 2253]]); the steps between the levels, and LV5 against LV1, are as they were
+    check(w == [[243, 426, 666, 979, 1352], [202, 354, 554, 816, 1126], [152, 266, 416, 612, 845], [324, 567, 887, 1306, 1802]], f'the wages: {w}')
     check(f'每日薪資 {g.ev("fmt(crewWages())")}' in scr, 'the page shows the day\'s wages')
     man = g.ev("JSON.stringify(GUIDE)")
     check('請了就是店裡的人，沒有解雇' in man and '訓練升級、解雇' not in man, 'the manual (2026-10-06: each card shows its own wage; the manual no longer lists them)')

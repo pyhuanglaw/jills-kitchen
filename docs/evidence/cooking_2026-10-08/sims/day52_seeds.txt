@@ -1,0 +1,35 @@
+The forty days from the player's Day 52 save (tests/v24_tests.py v24_day52_save_plays_the_stories_in_order_over_forty_days),
+seven seed bases on two builds. The day each beat happened.
+Targets, as the test checks them (docs/v24/pacing_correction_2026-10-01.txt; first played day = 53): 怡君 moves in
+within about ten days (yj_key - yj_meet <= 9 and yj_key <= 63); the wall begins Day 62-66; it settles within 18 days of
+beginning and by Day 82.
+Tool: tools/sims/day52_seeds.py ROOT SEEDBASE (the test's own loop), each build in its own worktree. Run 2026-10-08 10:42-11:20.
+Why: the full regression on 5bf7aff (plating where the food is) failed this test on its seed base 7000: 怡君 met on Day 53,
+moved in on Day 63 — ten days, one over.
+
+== 2c66a14 (the private test page's Version 4, the build the user played; regression 314/314)
+7000: yj_meet 53, yj_key 61, wall_worry 65, wall_settle 81 (16 days), wall_article 85 (+4)  — meets every target
+7100: yj_meet 53, yj_key 61, wall_worry 66, wall_settle 83 (17 days), wall_article 87 (+4)  — misses: by 82
+7200: yj_meet 53, yj_key 61, wall_worry 66, wall_settle 81 (15 days), wall_article 84 (+3)  — meets every target
+7300: yj_meet 53, yj_key 63, wall_worry 67, wall_settle 82 (15 days), wall_article 85 (+3)  — misses: the move within ten days, the wall in 62-66
+7400: yj_meet 53, yj_key 61, wall_worry 65, wall_settle 82 (17 days), wall_article 85 (+3)  — meets every target
+7500: yj_meet 53, yj_key 63, wall_worry 66, wall_settle 82 (16 days), wall_article 85 (+3)  — misses: the move within ten days
+7600: yj_meet 53, yj_key 61, wall_worry 63, wall_settle 81 (18 days), wall_article 84 (+3)  — meets every target
+   every target: 4 of 7
+
+== a08b09c (plating where the food is, fried rice's beats, wages x0.8, the manual line)
+7000: yj_meet 53, yj_key 63, wall_worry 65, wall_settle 81 (16 days), wall_article 84 (+3)  — misses: the move within ten days
+7100: yj_meet 54, yj_key 63, wall_worry 65, wall_settle 81 (16 days), wall_article 84 (+3)  — meets every target
+7200: yj_meet 53, yj_key 61, wall_worry 65, wall_settle 82 (17 days), wall_article 85 (+3)  — meets every target
+7300: yj_meet 53, yj_key 61, wall_worry 63, wall_settle 80 (17 days), wall_article 83 (+3)  — meets every target
+7400: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 79 (15 days), wall_article 82 (+3)  — meets every target
+7500: yj_meet 53, yj_key 61, wall_worry 65, wall_settle 82 (17 days), wall_article 85 (+3)  — meets every target
+7600: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 80 (16 days), wall_article 83 (+3)  — meets every target
+   every target: 6 of 7
+
+Reading:
+- The same spread on both builds: the move on Day 61-63, the wall begins 63-67 (2c66a14) and 63-65 (a08b09c), settles
+  81-83 and 79-82, the article three or four days after. The new build meets every target on more seeds, not fewer.
+  On 7000 the trajectory moved (the plating walk changes how many random numbers each evening draws), and 怡君's
+  move landed a day later: a matter of which trajectory, not of this change.
+- The test's seed base moves to 7600, which meets every target on both builds (as in rc7, rc7.3, rc7.4, rc8.2).

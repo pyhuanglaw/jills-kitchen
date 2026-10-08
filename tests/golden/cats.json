@@ -1,31 +1,40 @@
 {
  "evening": {
-  "states": "62c64daa",
+  "states": "aff359b6",
   "time": {
-   "ban:home": 15313,
-   "ban:rest": 184,
-   "ban:side": 1847,
-   "ban:walk": 656,
+   "ban:daze": 146,
+   "ban:home": 14866,
+   "ban:jump": 17,
+   "ban:rest": 290,
+   "ban:side": 1424,
+   "ban:sleep": 1090,
+   "ban:walk": 167,
    "mei:home": 18000,
-   "mikan:bed": 575,
-   "mikan:daze": 81,
-   "mikan:hide2": 679,
-   "mikan:home": 3857,
-   "mikan:rest": 763,
-   "mikan:side": 9539,
-   "mikan:walk": 2506,
-   "snow:daze": 1324,
-   "snow:home": 4388,
-   "snow:jump": 289,
-   "snow:rest": 669,
-   "snow:sleep": 9505,
-   "snow:walk": 1825,
-   "tora:home": 14858,
-   "tora:rest": 510,
-   "tora:side": 2364,
-   "tora:walk": 268
+   "mikan:bed": 366,
+   "mikan:bench": 992,
+   "mikan:daze": 368,
+   "mikan:hide": 577,
+   "mikan:hide2": 691,
+   "mikan:jump": 51,
+   "mikan:rest": 474,
+   "mikan:scr": 95,
+   "mikan:side": 9378,
+   "mikan:sleep": 1007,
+   "mikan:stare": 258,
+   "mikan:toy": 170,
+   "mikan:walk": 3573,
+   "snow:bench": 845,
+   "snow:daze": 751,
+   "snow:home": 11389,
+   "snow:jump": 51,
+   "snow:rest": 180,
+   "snow:sleep": 4153,
+   "snow:walk": 631,
+   "tora:home": 17941,
+   "tora:rest": 58,
+   "tora:walk": 1
   },
-  "weights": "4814:a648e923"
+  "weights": "4808:135395"
  },
  "prep": {
   "states": "b1442666",
@@ -75,7 +84,7 @@
   "weights": "3239:563352c4"
  },
  "service": {
-  "states": "6db63186",
-  "weights": "3760:4d282953"
+  "states": "b10fa127",
+  "weights": "3773:628cdd63"
  }
 }
