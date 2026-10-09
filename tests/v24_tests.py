@@ -2287,8 +2287,19 @@ def v24_rc6_story_pages_keep_only_their_own_lines(b, port, target):
     if g.ev("phase") == 'shop': g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(300)
     g.ev("for(let i=0;i<30;i++){if(typeof DLG!=='undefined'&&DLG)dlgNext()}"); _quiet(g); to_service(g)
     g.ev("__botUntil('R.t>=R.dur*.3',90000,1/30)")
-    r = json.loads(g.ev("""JSON.stringify((()=>{const gs=R.groups.filter(q=>q.table!=null&&q.state!=='leave');if(gs.length<2)return{skip:1};const m=gs[0],s0=gs[1];
+    # (2026-10-09: two groups that stay at their tables — ordering, waiting or eating — and a quiet floor. The test used the
+    #  first two seated groups, whatever they were doing; after the washing fix moved the Day 67 evening, the second was
+    #  already paying (「check」) and left before her line at 2.2 s, so the line was never said and the page had one line —
+    #  failing for a reason that is not its question, which is whose lines a page keeps. And with the floor busy (audit N04)
+    #  the beat began only after Jill's 「哪隻？」, so that line never came 「right after the beat began」, the moment this test
+    #  is about. docs/cooking/ARCHITECTURE.md 「改過的測試」 38)
+    for _ in range(60):
+        if not g.ev("floorBusy()") and g.ev("R.groups.filter(q=>q.table!=null&&['order','wait','eat'].includes(q.state)).length") >= 2: break
+        _frames(g, 10)
+    check(not g.ev("floorBusy()"), 'a quiet floor to begin the beat on')
+    r = json.loads(g.ev("""JSON.stringify((()=>{const gs=R.groups.filter(q=>q.table!=null&&['order','wait','eat'].includes(q.state));if(gs.length<2)return{skip:1};const m=gs[0],s0=gs[1];
       const E=STORY_EV.find(e=>e.k==='sm_a');shStart('sm_a',false,null,()=>{sayG(m,'妳也常來？',600);sayG(s0,'……妳不是也一樣。',2200)});jillSay('哪隻？');return{ok:1}})())"""))
+    check(not r.get('skip'), 'two groups at their tables to say the beat')
     # the room speaks one exchange at a time on the service clock (audit N04): the beat's second line may wait for the floor
     for _ in range(12):
         _frames(g, 60)

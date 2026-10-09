@@ -1,0 +1,16 @@
+# v24_rc6_story_pages_keep_only_their_own_lines — why it changed and that it still catches the rc6 leak (2026-10-09)
+# The final regression on 8298e18 (the old test): FAIL  only the beat's own: [{'w': '老饕李先生', 't': '妳也常來？'}]
+# Diagnosis ($S/sm_diag.py): the second of the first two seated groups (Ruby) was paying (state check) and left before
+# her line at 2.2 s, so it was never said. The same old test passes on 89bd685 (the evening went otherwise).
+# Fixed test (two groups ordering/waiting/eating, a quiet floor so the beat begins at once), and a beat's scene context
+# left on after its code (shRun without restoring SCX: Jill's 「哪隻？」 lands on the page — the rc6 leak):
+-- 8298e18
+PASS  v24_rc6_story_pages_keep_only_their_own_lines  (12.6s)
+-- 89bd685
+PASS  v24_rc6_story_pages_keep_only_their_own_lines  (8.9s)
+-- mutant-on-8298e18
+FAIL  v24_rc6_story_pages_keep_only_their_own_lines  (12.3s)
+      only the beat's own: [{'w': 'Jill', 't': '哪隻？'}, {'w': 'Sophie', 't': '香煎鴨胸！就這個。'}, {'w': 'Mr. Hart', 't': '妳也常來？'}]
+-- mutant-on-89bd685
+FAIL  v24_rc6_story_pages_keep_only_their_own_lines  (7.0s)
+      only the beat's own: [{'w': 'Jill', 't': '哪隻？'}, {'w': '老饕李先生', 't': '妳也常來？'}]
