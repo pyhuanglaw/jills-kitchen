@@ -1,0 +1,16 @@
+# v24_rc6_the_staff_room_plays_a_frame_and_dozes — why it changed and that it still catches what it guards (2026-10-09)
+# The final regression on 8298e18 (the old test): Page.evaluate: TypeError: Cannot read properties of null (reading 'srPool')
+# Diagnosis ($S/sr_diag.py, 8298e18): the frame began at 46 s of the 75 s closing (秀琴阿姨 Hugo; 秀琴阿姨 went up after
+# washing), 4 shots, 小彤 asleep in the massage chair; the closing ended while the frame was being put away (st 2), and the
+# test read R after 20 ticks without looking whether the evening was still on. The old test passes on 89bd685.
+# Fixed test (stops reading when the evening is over), and two broken versions:
+-- 8298e18 (the final game), fixed test
+PASS  v24_rc6_the_staff_room_plays_a_frame_and_dozes  (26.1s)
+-- 89bd685, fixed test
+PASS  v24_rc6_the_staff_room_plays_a_frame_and_dozes  (23.4s)
+-- mutant: no frame ever
+FAIL  v24_rc6_the_staff_room_plays_a_frame_and_dozes  (27.3s)
+      a frame: two at the table, shots: {'start': 0, 'shots': 0, 'say': set(), 'doze': 1, 'cue': 0}
+-- mutant: nobody dozes
+FAIL  v24_rc6_the_staff_room_plays_a_frame_and_dozes  (26.4s)
+      someone asleep in the massage chair: {'start': 1, 'shots': 4, 'say': {'打一局？', '睡著了？', '來。', '再一局？', '明天吧。'}, 'doze': 0, 'cue': 0}

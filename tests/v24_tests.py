@@ -1890,7 +1890,8 @@ def v24_rc6_the_staff_room_plays_a_frame_and_dozes(b, port, target):
     seen = {'start': 0, 'shots': 0, 'say': set(), 'doze': 0, 'cue': 0}
     for _ in range(80):
         if not g.ev("phase==='service'&&!!R"): break
-        g.ev("for(let i=0;i<20;i++)__tick(1000/30)")
+        g.ev("for(let i=0;i<20;i++){if(!R)break;__tick(1000/30)}")
+        if not g.ev("phase==='service'&&!!R"): break   # (2026-10-09: the closing can end inside these ticks — a frame begun late, 秀琴阿姨 washing first, is still on when the evening ends; reading R then threw. ARCHITECTURE 「改過的測試」 38)
         st = json.loads(g.ev("JSON.stringify({p:R.srPool?{st:R.srPool.st,shot:R.srPool.shot}:null,say:(R.srSay||[]).map(s=>s.txt),doze:srPeople().some(p=>p.doze),at:srPeople().filter(p=>/^pool/.test(p.spotK||'')).length})"))
         if st['p'] and st['p']['st'] >= 1: seen['start'] = 1
         if st['p']: seen['shots'] = max(seen['shots'], st['p']['shot'])
