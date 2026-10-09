@@ -118,6 +118,10 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 /* v2.5: the selected work in words, at the foot of the scene (where the cooking panel used to open) */
 #wfGuide{position:absolute;left:50%;transform:translateX(-50%);bottom:10px;z-index:5;width:max-content;max-width:calc(100% - 24px);padding:6px 12px 7px;border-radius:12px;background:rgba(255,248,236,.95);color:var(--ink);box-shadow:0 6px 18px rgba(0,0,0,.28);font-size:12px;line-height:1.4;text-align:center;pointer-events:none}
 #wfGuide b{font-size:13px}
+#wfGuide{padding-right:26px}#wfGuide .wgx{pointer-events:auto;position:absolute;top:1px;right:2px;border:0;background:none;font-size:17px;line-height:1;color:var(--ink3);padding:5px 7px;cursor:pointer}   /* #1 (2026-10-09): it can be put away */
+#wfGuide .wfh{margin-top:2px;font-weight:700;color:var(--ink2)}
+#wfHelp{position:absolute;left:10px;bottom:10px;z-index:5;padding:5px 11px;border-radius:999px;border:0;background:rgba(255,248,236,.95);color:var(--ink);font-size:12px;font-weight:800;box-shadow:0 3px 10px rgba(0,0,0,.25);cursor:pointer}   /* the card on request, while a dish is picked (bottom left: the shelves, no station, not the fridge) */
+#coach:not([hidden]) ~ #wfHelp{bottom:78px}
 #wfGuide .wfl{margin-top:1px;font-weight:700;color:var(--ink3)}#wfGuide .wfl span.done{color:#5E8F4E}#wfGuide .wfl span.now{color:var(--ink)}#wfGuide .wfl i{font-style:normal;margin:0 4px;color:var(--ink3)}
 #wfGuide .wfn{margin-top:1px;font-weight:800;color:#8E6422}
 #wfGuide:not([hidden]) ~ #toasts{transform:translateY(-62px)}
@@ -2429,7 +2433,7 @@ function applyGates(){try{if(S.loungeProj&&S.loungeProj.state==='signing'&&!fact
  if(S.day<=1){if(S.news21==null)S.news21=-1;if(S.news20==null)S.news20=-1}   /* audit WS1-06: the 2.0 / 2.1 notes are for saves from those versions, not a new restaurant */
  if(!S.news21&&S.day>=3){S.news21=S.day;S.news.push('<b>2.1：食物與日常。</b>做熟的菜（熟練度 LV3）可以在<b>菜單研發</b>研發成<b>特製版</b>；招牌菜賣得多會換盤；街上有人經過、有人在門口看菜單就進來；帶小孩的家庭、雨天的傘、廚房裡的空檔。')}
  if(!S.news20&&S.day>=3){S.news20=S.day;S.news.push('<b>2.0：店可以變大了。</b>主廳上方可以切到<b>店門口</b>和<b>廚房</b>（廚師真的在裡面煮）。打烊後商店裡多了<b>工程</b>（戶外區、大出菜口、冷藏庫、廚房擴建、側廳）和<b>貓的東西</b>；結算會告訴你下一個存錢的目標。')}
- if(S.news24==null){if(S.day<=1)S.news24=-1;else{S.news24=S.day;S.news.push(`<b>2.4：店裡的人，店外的生活。</b>員工有時候會因為自己的事晚點到（當天開店時會說）。幾段故事有一張插圖，看過以後在日誌「故事」的那一段可以再打開。${opsLv('room')?'營運升級的「後場休息室」現在叫<b>後場整理區</b>：廚房門邊的層架和掛鉤，一樣多兩位員工（廚師、服務生各一位）。':''}${xqHelperMode()?'Jill 認識很久的<b>秀琴阿姨</b>，很多晚上會在快打烊時順路來幫忙收一收；請第一位清潔員，就是請她。':''}`)}}   /* v2.4: for a save that was already going — the systems only; nobody's story is told in advance */
+ if(S.news24==null){if(S.day<=1)S.news24=-1;else{S.news24=S.day;S.news.push(`<b>2.4：店裡的人，店外的生活。</b>員工有時候會因為自己的事晚點到（當天開店時會說）。幾段故事有一張插圖，看過以後在日誌「故事」的那一段可以再打開。${opsLv('room')?'營運升級的「後場休息室」現在叫<b>後場整理區</b>：廚房門邊的層架和掛鉤，一樣多兩位員工（廚師、服務生各一位）。':''}${xqHelperMode()?'Jill 認識很久的<b>秀琴阿姨</b>，每天晚上都會在快打烊時順路來幫忙收一收；請第一位清潔員，就是請她。':''}`)}}   /* v2.4: for a save that was already going — the systems only; nobody's story is told in advance */
  if(S.news24b==null){if(S.day<=1||!(S.crew||[]).length)S.news24b=-1;else{S.news24b=S.day;const lc=(S.crew||[]).filter(m=>crewPool(m)==='lounge').length;S.news.push(`<b>員工分成兩個名單。</b>餐廳員工（廚師、服務生、清潔員）和 Lounge 名單的名額各算各的，互不佔用。${loungeLv()?`Lounge 名單是固定的幾個人：${loungeLv()>=2?'Evan、沈晴、阿拓、安安、許葳':'Evan、沈晴和阿拓（Lounge II 再加兩位）'}，在「員工 › Lounge 名單」；現在 ${lc}/${loungeCap()}。`:'Lounge 蓋好以後，它有自己的名單。'}在哪裡上班照「工作分配」：服務生兩邊共用，廚房只有一個，調酒師只顧吧台。`)}}   /* v2.4 rc5: the two staff pools, told once to a save that was already going */
  if(S.news24c==null){if(S.day<=1||!poolCrew('restaurant').length)S.news24c=-1;else{S.news24c=S.day;const over=CAP_ROLES.filter(r=>roleCrew(r).length>roleCap(r));S.news.push(`<b>餐廳的名額分成三種。</b>廚師、服務生、清潔員各有自己的名額，不能互相借：廚師的名額只能聘廚師。擴建和每一個工程都寫著多哪一種。現在 ${CAP_ROLES.map(r=>`${ROLES[r].n} ${roleCrew(r).length}/${roleCap(r)}`).join('、')}${over.length?`；${over.map(r=>ROLES[r].n).join('、')}比名額多，大家都留著`:''}。${loungeLv()?'Lounge 的名單照舊。':''}`)}}   /* rc8 §21: told once to a save that was already going; nobody moves, nobody leaves */
  while(S.gate<S.day){S.gate++;const D=S.gate;
@@ -4833,7 +4837,7 @@ function xqHelperArrived(){factSet('xq_helper');
  /* rc7.2 (the player, 21:49: 「秀琴阿姨出場要暫停遊戲吧 有劇情的」): her first evening is a story beat — the service waits while she
     says who she is to the place, and goes on when the player has tapped through it (was: a coach card that came and went) */
  if(factN('xq_helper')===1){v24Scene([{who:'',text:S.day===1&&R&&!R.closed&&R.t<R.dur*.92?'第一桌客人吃完走了，秀琴阿姨從門口走了進來。':'快打烊的時候，秀琴阿姨從門口走了進來。'},{who:'staff:秀琴阿姨',text:'我來幫妳收一下。'},{who:'jill',text:'阿姨，不用啦。'},{who:'staff:秀琴阿姨',text:'順路啦。妳一個人怎麼收得完。'},
-  {who:'',text:'秀琴阿姨是 Jill 認識很久的阿姨。今天她會幫忙收桌、把髒盤子拿回廚房洗；之後很多晚上，她會在快打烊時順路進來幫忙收一收。'}]);return}
+  {who:'',text:'秀琴阿姨是 Jill 認識很久的阿姨。今天她會幫忙收桌、把髒盤子拿回廚房洗；之後每天晚上，她會在快打烊時順路進來幫忙收一收。'}]);return}
  let f=null;try{f=storyTick('xqin',{})}catch(e){console.warn('[xqin]',e)}if(!f)xqHelperChat()}
 /* the evening's few words with Jill; the first evening says who she is to the place */
 function xqHelperChat(){const n=factN('xq_helper');if(fact('yj_move')&&!fact('yj_move_told')){factSet('yj_move_told');shStart('yj_move',false,null,()=>{JILL_SAY('搬完了？',300);xqSay('搬完了。箱子都還沒拆。',1500)});return}if(n>1&&R&&R.sched.some(o=>o.name===YJN)&&yjDueTonight())return;/* her daughter is here tonight: that is the evening's talk */if(n<=1){xqSay('我來幫妳收一下。',300);JILL_SAY('阿姨，不用啦。',1500);xqSay('順路啦。妳一個人怎麼收得完。',2700);return}
@@ -6475,7 +6479,9 @@ function peeking(){const p=$('#peekPill');return!!p&&!p.hidden}   /* v2.2.1 #8: 
    the Staff Room and the Private Dining Room, each one tap from anywhere (nobody has to cross the floor to reach them);
    the tab you are in reads the room's whole name (員工休息室, 私人包廂), so inside a room it is that room, never 二樓. */
 function roomTabName(k,lv){if(k==='lounge'&&!loungeLv())return'隔壁';/* rc8: before it is Jill's, the bar next door */const r=ROOMS[k];if(k!==room)return r.n;lv=lv||0;return lv===0&&r.full?r.full:lv<=1&&r.mid?r.mid:r.n}
-function renderRoomTabs(force){const el=$('#roomTabs');if(!el)return;const rv=phase!=='service'&&UPV==='reveal';const show=(phase==='service'&&!!R)||rv||(phase!=='service'&&peeking()&&roomsOpen().length>1);el.hidden=!show;if(!show)return;const A=roomAlerts();
+/* 2026-10-09 #14: in the kitchen 今日任務 sits beside 庫存 (over the hood, nothing to tap there) — on the right it covered the pizza oven's dome on a phone */
+function taskChipPlace(){const tc=$('#taskChip'),sc0=$('#stockChip'),tp=$('#taskPanel');if(!tc)return;const k=room==='kitchen'&&!!sc0&&!sc0.hidden;const l=k?(sc0.offsetLeft+sc0.offsetWidth+6)+'px':'';if(tc.style.left!==l){tc.style.left=l;tc.style.right=k?'auto':'';if(tp){tp.style.left=k?'8px':'';tp.style.right=k?'auto':''}}}
+function renderRoomTabs(force){taskChipPlace();const el=$('#roomTabs');if(!el)return;const rv=phase!=='service'&&UPV==='reveal';const show=(phase==='service'&&!!R)||rv||(phase!=='service'&&peeking()&&roomsOpen().length>1);el.hidden=!show;if(!show)return;const A=roomAlerts();
  const list=rv?['up']:UPV==='look'&&phase!=='service'?['up','staff','pdr'].filter(roomOpen):roomsOpen();el.classList.toggle('many',list.length>=7);el.classList.toggle('many8',list.length>=8);el.classList.toggle('many9',list.length>=9);   /* the floor's look (店舖工程, a reveal): the floor and its rooms only */
  const h=list.map(k=>`<button data-room="${k}" class="${k===room?'on':''}${A[k].u?' urgent':''}${roomIsNew(k)&&k!==room?' new':''}"><span>${roomTabName(k)}</span>${A[k].n?`<b>${A[k].n}</b>`:roomIsNew(k)&&k!==room?'<b class="nw">NEW</b>':''}</button>`).join('');
  if(force||h!==tabsHTML){tabsHTML=h;el.innerHTML=h;
@@ -8839,14 +8845,29 @@ function wfTag(it){if(!isWF(it.d)||it.st==='ready'||it.st==='served'||it.st==='o
  /* who has it, in a word (the user: 「Ticket 上一個簡單的 handler 名稱就夠」) — outlined while on the way, filled at work */
  const w=wfShort(n);const wh=w&&n.st!=='cook'?`<span class="wh${n.st==='go'||n.st==='fetch'||n.st==='dish'||n.st==='tofood'?' go':''}${n.who==='jill'?' j':''}">${w}</span>`:'';
  return`${wh}<span class="wf">${ms.map(m=>m.s==='now'?`<b>${m.k}</b>`:`<i class="${m.s}">${m.k}</i>`).join('<u>›</u>')}</span>`}
-/* the selected work, in words, at the foot of the screen */
+/* the selected work, in words, at the foot of the screen — a quiet teacher (the user, 2026-10-09 #1,
+   docs/v24/cooking_final_decisions_2026-10-09.txt: 「點擊訂單時不再自動彈出白色教學卡」). It comes once for each dish, the first
+   time it is picked (S.wfTaught, kept with the save, never reset by a day); again for that dish only after two taps in a row
+   that did nothing with it (R.wfMiss); and whenever the player asks: the 說明 chip, in the kitchen while a dish is picked and
+   the card is away. It goes by itself after about four seconds; its × puts it away at once. At the foot of the screen, over
+   the floor — never over a station. Its words are kept up to date while it is away, so it opens on the present. */
+function wfGuideHow(n){if(!wfOpen(n))return'';const f=wfNext(n);return f==='plate'?'點亮起來的菜，Jill 拿盤子過去裝。':f==='serve'?'點亮起來的那一杯，Jill 送去出菜口。':'點亮起來的位置，Jill 就走過去做。'}
 function wfGuideText(n){const fl=wfFl(n);const ms=wfMarks(n,fl);
- const line=ms.map(m=>`<span class="${m.s}">${m.s==='done'?'✓':m.s==='now'?'●':'○'} ${m.n}</span>`).join('<i>→</i>');
- return`<b>${dishName(n.d)}${n.n>1?' ×'+n.n:''}</b><div class="wfl">${line}</div><div class="wfn">${wfState(n)}</div>`}
-let wfGuideEl=null,wfGuideHTML='';
-function wfGuideUpd(){if(!wfGuideEl){const w=$('#sceneWrap');if(!w)return;wfGuideEl=document.createElement('div');wfGuideEl.id='wfGuide';wfGuideEl.hidden=true;const t=$('#toasts');if(t&&t.parentNode===w)w.insertBefore(wfGuideEl,t);else w.appendChild(wfGuideEl)}
- const n=R&&phase==='service'&&R.wsel?wfNode(R.wsel):null;if(!n){if(!wfGuideEl.hidden)wfGuideEl.hidden=true;return}
- const h=wfGuideText(n);if(h!==wfGuideHTML){wfGuideHTML=h;wfGuideEl.innerHTML=h}if(wfGuideEl.hidden)wfGuideEl.hidden=false}
+ const line=ms.map(m=>`<span class="${m.s}">${m.s==='done'?'✓':m.s==='now'?'●':'○'} ${m.n}</span>`).join('<i>→</i>');const how=wfGuideHow(n);
+ return`<button class="wgx" type="button" aria-label="收起來">×</button><b>${dishName(n.d)}${n.n>1?' ×'+n.n:''}</b><div class="wfl">${line}</div><div class="wfn">${wfState(n)}</div>${how?`<div class="wfh">${how}</div>`:''}`}
+let wfGuideEl=null,wfGuideHTML='',wfHelpEl=null,wgSel=null;
+function wfGuideShow(n,why){if(!R||!n)return;R.wg={id:n.id,until:performance.now()+4000,why};wfGuideUpd()}
+function wfGuideHide(){if(R)R.wg=null;wfGuideUpd()}
+function wfGuideUpd(){if(!wfGuideEl){const w=$('#sceneWrap');if(!w)return;wfGuideEl=document.createElement('div');wfGuideEl.id='wfGuide';wfGuideEl.hidden=true;const t=$('#toasts');if(t&&t.parentNode===w)w.insertBefore(wfGuideEl,t);else w.appendChild(wfGuideEl);
+  wfGuideEl.addEventListener('click',e=>{if(e.target.closest('.wgx')){e.stopPropagation();sfx.tap();wfGuideHide()}});
+  wfHelpEl=document.createElement('button');wfHelpEl.id='wfHelp';wfHelpEl.type='button';wfHelpEl.textContent='說明';wfHelpEl.hidden=true;w.insertBefore(wfHelpEl,wfGuideEl.nextSibling);
+  wfHelpEl.addEventListener('click',e=>{e.stopPropagation();const n=R&&R.wsel?wfNode(R.wsel):null;if(n){sfx.tap();wfGuideShow(n,'ask')}})}
+ const n=R&&phase==='service'&&R.wsel?wfNode(R.wsel):null;
+ if(!n){wgSel=null;if(R&&R.wg)R.wg=null;if(!wfGuideEl.hidden)wfGuideEl.hidden=true;if(!wfHelpEl.hidden)wfHelpEl.hidden=true;return}
+ if(R.wsel!==wgSel){wgSel=R.wsel;const b=baseOf(n.d);const T=S.wfTaught||(S.wfTaught={});if(!T[b]){T[b]=1;R.wg={id:n.id,until:performance.now()+4000,why:'teach'}}else if(R.wg&&R.wg.id!==n.id)R.wg=null}   /* the first time a dish is picked: once */
+ const W=R.wg;const on=!!(W&&W.id===n.id&&performance.now()<W.until);if(W&&!on)R.wg=null;
+ const h=wfGuideText(n);if(h!==wfGuideHTML){wfGuideHTML=h;wfGuideEl.innerHTML=h}
+ if(wfGuideEl.hidden===on)wfGuideEl.hidden=!on;const chip=!on&&room==='kitchen';if(wfHelpEl.hidden===chip)wfHelpEl.hidden=!chip}
 /* the places the selected work can go now (free ones first; all of that kind when every one is busy) */
 function wfCueSlots(n){const f=wfNext(n);
  if(!f){const h=wfHeading(n);if(h==='plate'&&(n.st==='dish'||n.st==='tofood'))return{f:h,free:[],busy:[],held:n.slot,food:true};   /* someone is coming to plate it: the food is the place */
@@ -8893,7 +8914,9 @@ function wfHitSlot(p){if(!R)return null;let best=null,bd=1e9;
  for(const s of R.slots){const pts=[wfSlotCenter(s)];if(s.wf&&s.wf.slot===s){const fs=wfFoodSpot(s.wf,s);pts.push({x:fs.x,y:fs.y-6})}for(const o of pts){const d=Math.hypot(p.x-o.x,(p.y-o.y)*1.3);if(d<24&&d<bd){bd=d;best=s}}}
  return best}
 function wfFamOf(s){return WF_TYPE_F[s.type]}
-function wfTap(p){const r=wfTap0(p);if(r){renderTickets();wfGuideUpd()}return r}
+function wfTap(p){const sel=R.wsel?wfNode(R.wsel):null;const open=!!(sel&&wfOpen(sel));const hit=open&&wfHitSlot(p);const r=wfTap0(p);
+ if(hit){const b=baseOf(sel.d);const M=R.wfMiss||(R.wfMiss={});if(r)M[b]=0;else if((M[b]=(M[b]||0)+1)>=2){M[b]=0;wfGuideShow(sel,'miss')}}   /* #1: two taps in a row that did nothing with the picked dish: the card again, for a moment */
+ if(r){renderTickets();wfGuideUpd()}return r}
 /* the coffee bar's places share its machine (two, with kitchen II): a tap right on a cup is that cup; a tap on the machine is
    the place the selected drink is at or headed for, else a free place when a drink waits to be made, else a finished cup (to
    take out), else one being made (to see it). Before 2026-10-09 the machine always meant its first place: with a cup there,
@@ -9040,9 +9063,9 @@ function drawLine(c,now,V){const E=S.eq;const x0=KX.sink.x-4,x1=KX.bar.x+KX.bar.
   if(R&&R.panel&&R.slots[R.focus]===v.s){const p=(Math.sin(now*6)+1)/2;c.strokeStyle=`rgba(230,194,122,${.5+p*.4})`;c.lineWidth=1.5;c.beginPath();c.ellipse(v.sp.x,v.sp.y+2,26,13,0,0,7);c.stroke()}}}
 /* rc7.5 (23:08): the pizza oven — built into the back wall beside the hood: a brick dome, its mouth glowing, a stone
     ledge, the flue up through the ceiling, the peel hanging beside it; a pizza in the mouth while it bakes */
-function pizzaOvenRect(){const x=KX.oven.x;return{x,y:8,w:52,mx:x+26,my:64}}   /* its glowing mouth stays clear of the HUD's right-hand chips on a phone (今日任務 above it; a combo only grazes its edge) */
-function drawPizzaOven(c,now,V,TOP){const P=pizzaOvenRect();const x=P.x,w=P.w,mx=P.mx,my=P.my;const baking=!!(V.slots&&V.slots.some(s0=>s0.type==='pizza'&&((s0.job&&stepSpot(s0).inOven)||(s0.wf&&s0.wf.slot===s0&&s0.wf.st==='cook'))));
-  c.fillStyle='#5A5E62';c.fillRect(x+22,-TOP,8,TOP+12);c.fillStyle='rgba(255,255,255,.16)';c.fillRect(x+23,-TOP,2,TOP+12);
+function pizzaOvenRect(){const x=KX.oven.x;return{x,y:20,w:52,mx:x+26,my:76}}   /* 2026-10-09 #14: 12 lower than before, so the room tabs (房間) no longer cover the top of its dome on a phone (375–430 wide) — still clear of the cooks' name tags below its shelf */   /* its glowing mouth stays clear of the HUD's right-hand chips on a phone (今日任務 above it; a combo only grazes its edge) */
+function drawPizzaOven(c,now,V,TOP){const P=pizzaOvenRect();const dy=P.y-8;const x=P.x,w=P.w,mx=P.mx,my=P.my-dy;   /* drawn in its own frame (top at 8), moved down by dy */const baking=!!(V.slots&&V.slots.some(s0=>s0.type==='pizza'&&((s0.job&&stepSpot(s0).inOven)||(s0.wf&&s0.wf.slot===s0&&s0.wf.st==='cook'))));
+  c.fillStyle='#5A5E62';c.fillRect(x+22,-TOP,8,TOP+12+dy);c.fillStyle='rgba(255,255,255,.16)';c.fillRect(x+23,-TOP,2,TOP+12+dy);c.save();c.translate(0,dy);
   const dome=()=>{c.beginPath();c.moveTo(x,my);c.lineTo(x,34);c.arc(x+26,34,26,Math.PI,0);c.lineTo(x+w,my);c.closePath()};
   c.fillStyle='rgba(0,0,0,.16)';c.save();c.translate(2,2);dome();c.fill();c.restore();
   c.fillStyle='#B5603E';dome();c.fill();c.save();dome();c.clip();c.strokeStyle='rgba(90,40,20,.42)';c.lineWidth=.7;for(let yy=12,k=0;yy<my;yy+=6,k++){c.beginPath();c.moveTo(x,yy);c.lineTo(x+w,yy);c.stroke();for(let xx=x+(k%2?5:0);xx<x+w;xx+=10){c.beginPath();c.moveTo(xx,yy);c.lineTo(xx,yy+6);c.stroke()}}
@@ -9054,7 +9077,7 @@ function drawPizzaOven(c,now,V,TOP){const P=pizzaOvenRect();const x=P.x,w=P.w,mx
   c.strokeStyle='#8E3E26';c.lineWidth=3.2;c.beginPath();c.arc(mx,my-12,17,Math.PI,0);c.stroke();c.strokeStyle='rgba(255,220,180,.28)';c.lineWidth=.6;for(let a=0;a<=8;a++){const t=Math.PI+a*Math.PI/8;c.beginPath();c.moveTo(mx+Math.cos(t)*15.4,my-12+Math.sin(t)*15.4);c.lineTo(mx+Math.cos(t)*18.6,my-12+Math.sin(t)*18.6);c.stroke()}
   c.fillStyle='#8E8A84';rr(c,x-4,my-1,w+8,6,1.5);c.fill();c.fillStyle='rgba(255,255,255,.3)';c.fillRect(x-3,my-.5,w+6,1.2);
   c.fillStyle='#8A6A42';c.fillRect(x+w+5,14,2.4,30);c.fillStyle='rgba(0,0,0,.12)';el(c,x+w+7.4,51,5.4,7.4);c.fillStyle='#C8965E';el(c,x+w+6.2,50,6,8);c.strokeStyle='rgba(120,80,40,.35)';c.lineWidth=.5;c.beginPath();c.moveTo(x+w+6.2,43);c.lineTo(x+w+6.2,57);c.stroke();
-  if(baking){c.save();c.globalCompositeOperation='lighter';let lg=c.createRadialGradient(mx,my+4,2,mx,my+4,30);lg.addColorStop(0,`rgba(255,150,60,${.22*fl})`);lg.addColorStop(1,'rgba(255,150,60,0)');c.fillStyle=lg;c.fillRect(mx-30,my-26,60,60);c.restore()}}
+  if(baking){c.save();c.globalCompositeOperation='lighter';let lg=c.createRadialGradient(mx,my+4,2,mx,my+4,30);lg.addColorStop(0,`rgba(255,150,60,${.22*fl})`);lg.addColorStop(1,'rgba(255,150,60,0)');c.fillStyle=lg;c.fillRect(mx-30,my-26,60,60);c.restore()}c.restore()}
 function drawBurner(c,cx,gy,sc,active,now){c.fillStyle='#17191A';el(c,cx,gy,22*sc*2,11*sc);c.strokeStyle='#6A6E70';c.lineWidth=2*sc;c.beginPath();c.ellipse(cx,gy,36*sc,9*sc,0,0,7);c.stroke();c.lineWidth=1.2*sc;for(let a=0;a<6;a++){c.beginPath();c.moveTo(cx+Math.cos(a)*14*sc,gy+Math.sin(a)*3.4*sc);c.lineTo(cx+Math.cos(a)*42*sc,gy+Math.sin(a)*10.4*sc);c.stroke()}
  if(active){for(let i=0;i<16;i++){const a=i/16*6.283+now*2.5;const fl=(4+Math.sin(now*22+i*1.7)*1.8)*sc;const px=cx+Math.cos(a)*16*sc,py=gy+Math.sin(a)*4*sc;c.fillStyle=i%3?'rgba(90,140,255,.9)':'rgba(255,180,80,.8)';el(c,px,py-fl*.6,1.7*sc,fl)}let hg=c.createRadialGradient(cx,gy,2,cx,gy,56*sc);hg.addColorStop(0,'rgba(255,140,60,.28)');hg.addColorStop(1,'rgba(255,140,60,0)');c.fillStyle=hg;c.fillRect(cx-56*sc,gy-30*sc,112*sc,60*sc)}}
 function drawEspresso(c,x,y,w,h,now,nos){const slim=w<28;let b2=c.createLinearGradient(x,0,x+w,0);b2.addColorStop(0,'#9E7026');b2.addColorStop(.5,'#EFCB80');b2.addColorStop(1,'#95691F');c.fillStyle='rgba(0,0,0,.16)';rr(c,x+2,y+3,w,h,4);c.fill();c.fillStyle=b2;rr(c,x,y,w,h*.62,slim?4:5);c.fill();c.fillStyle='#2A2A2A';rr(c,x+3,y+h*.62,w-6,6,2);c.fill();c.fillStyle='#8FD3F4';if(slim){circ(c,x+6,y+9,1.8);circ(c,x+w-6,y+9,1.8)}else{circ(c,x+8,y+9,2);circ(c,x+w/2,y+9,2);circ(c,x+w-8,y+9,2)}c.fillStyle='#555';if(slim){c.fillRect(x+4,y+h*.62+6,3.4,6);c.fillRect(x+w-7.4,y+h*.62+6,3.4,6)}else{c.fillRect(x+9,y+h*.62+6,4,6);if(h>36)c.fillRect(x+w-13,y+h*.62+6,4,6)}c.fillStyle='#3A3F42';rr(c,x+2,y+h-6,w-4,6,2);c.fill();c.strokeStyle='#C9D0D3';c.lineWidth=1.6;c.beginPath();c.moveTo(x+w-3,y+h*.5);c.lineTo(x+w+(slim?3:4),y+h*.75);c.stroke();

@@ -100,6 +100,10 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 /* v2.5: the selected work in words, at the foot of the scene (where the cooking panel used to open) */
 #wfGuide{position:absolute;left:50%;transform:translateX(-50%);bottom:10px;z-index:5;width:max-content;max-width:calc(100% - 24px);padding:6px 12px 7px;border-radius:12px;background:rgba(255,248,236,.95);color:var(--ink);box-shadow:0 6px 18px rgba(0,0,0,.28);font-size:12px;line-height:1.4;text-align:center;pointer-events:none}
 #wfGuide b{font-size:13px}
+#wfGuide{padding-right:26px}#wfGuide .wgx{pointer-events:auto;position:absolute;top:1px;right:2px;border:0;background:none;font-size:17px;line-height:1;color:var(--ink3);padding:5px 7px;cursor:pointer}   /* #1 (2026-10-09): it can be put away */
+#wfGuide .wfh{margin-top:2px;font-weight:700;color:var(--ink2)}
+#wfHelp{position:absolute;left:10px;bottom:10px;z-index:5;padding:5px 11px;border-radius:999px;border:0;background:rgba(255,248,236,.95);color:var(--ink);font-size:12px;font-weight:800;box-shadow:0 3px 10px rgba(0,0,0,.25);cursor:pointer}   /* the card on request, while a dish is picked (bottom left: the shelves, no station, not the fridge) */
+#coach:not([hidden]) ~ #wfHelp{bottom:78px}
 #wfGuide .wfl{margin-top:1px;font-weight:700;color:var(--ink3)}#wfGuide .wfl span.done{color:#5E8F4E}#wfGuide .wfl span.now{color:var(--ink)}#wfGuide .wfl i{font-style:normal;margin:0 4px;color:var(--ink3)}
 #wfGuide .wfn{margin-top:1px;font-weight:800;color:#8E6422}
 #wfGuide:not([hidden]) ~ #toasts{transform:translateY(-62px)}

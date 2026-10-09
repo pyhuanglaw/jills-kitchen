@@ -1008,3 +1008,73 @@ def cooking_one_jill_through_whole_evenings_early_middle_late(b, port, target):
         check(not bad and n >= 50, f'{name}: one Jill, in her room, her hands only where she is ({n} looks, rooms {rooms}): {bad}')
         check('kitchen' in rooms and 'main' in rooms, f'{name}: she was in the kitchen and in the dining room: {rooms}')
         check(not g.errors, f'{name}: {g.errors[:3]}'); g.close()
+
+
+@test
+def cooking_the_teaching_card_is_quiet(b, port, target):
+    """The user, 2026-10-09 #1 (docs/v24/cooking_final_decisions_2026-10-09.txt): the white card no longer comes up on every
+    tap of an order. The first time a dish is picked it comes once (with how to send Jill), and goes by itself after about
+    four seconds; its × puts it away at once; picked again, the dish brings no card (what was taught is kept with the save,
+    not reset by a day); the 說明 chip brings it whenever the player asks; two taps in a row that do nothing with the picked
+    dish bring it back for a moment. Neither the card nor the chip is over a station, nor over the fridge."""
+    g = _day(b, port, target, 7151, "S.menu=['friedrice'];S.eq.bar=1;")
+    check(_wait_orders(g, 1), 'a fried rice ordered')
+    vis = "(()=>{const e=document.querySelector('#wfGuide');return !!e&&!e.hidden})()"
+    chip = "(()=>{const e=document.querySelector('#wfHelp');return !!e&&!e.hidden})()"
+    g.click('#tickets .it.pending'); g.page.wait_for_timeout(60); g.ev("__tick(1000/30)")
+    check(g.ev(vis) and 'Jill 就走過去做' in g.ev(GUIDE), f'the first time the dish is picked: the card, with how to send Jill: {g.ev(GUIDE)!r}')
+    check(g.ev("S.wfTaught&&S.wfTaught.friedrice") == 1, 'taught: kept in the save')
+    for _ in range(140): g.ev("for(const q of R.groups)q.pat=1;__tick(1000/30)")
+    check(not g.ev(vis) and g.ev(chip), 'after about four seconds it goes by itself; the 說明 chip is there')
+    g.click('#tickets .it.wsel'); g.ev("__tick(1000/30)")
+    check(not g.ev(vis) and not g.ev(chip) and g.ev("R.wsel") is None, 'unpicked: no card, no chip')
+    g.click('#tickets .it.pending'); g.page.wait_for_timeout(60); g.ev("__tick(1000/30)")
+    check(not g.ev(vis) and g.ev(chip), 'picked again: no card (taught), only the chip')
+    g.click('#wfHelp'); g.ev("__tick(1000/30)")
+    check(g.ev(vis), 'the chip brings the card')
+    g.click('#wfGuide .wgx'); g.ev("__tick(1000/30)")
+    check(not g.ev(vis), 'its × puts it away at once')
+    # two taps in a row on a place this dish cannot go (the coffee machine): the card again
+    check(g.ev("R.slots.some(s=>s.type==='bar')"), 'a coffee machine to tap by mistake')
+    if True:
+        _tap_slot(g, "R.slots.find(s=>s.type==='bar')"); g.ev("__tick(1000/30)")
+        check(not g.ev(vis), 'one tap that does nothing: no card yet')
+        _tap_slot(g, "R.slots.find(s=>s.type==='bar')"); g.ev("__tick(1000/30)")
+        check(g.ev(vis), 'the second in a row: the card comes back for a moment')
+    # where they are: never over a station, nor over the fridge
+    g.ev("wfGuideShow(wfNode(R.wsel),'ask')"); g.ev("__tick(1000/30)")
+    over = json.loads(g.ev("""JSON.stringify((()=>{const out=[];const box=q=>{const e=document.querySelector(q);if(!e||e.hidden)return null;return e.getBoundingClientRect()};
+      const B=[box('#wfGuide'),box('#wfHelp')].filter(Boolean);const cr=sc.getBoundingClientRect();
+      const pts=R.slots.map(s=>{const o=wfSlotCenter(s);return{k:s.type+s.no,x:o.x,y:o.y}});const F=KR.fridge;pts.push({k:'fridge',x:F.x+F.w/2,y:F.y+F.h/2});
+      for(const p of pts){const x=cr.left+SV.ox+p.x*SV.s,y=cr.top+SV.oy+p.y*SV.s;for(const b of B)if(x>=b.left&&x<=b.right&&y>=b.top&&y<=b.bottom)out.push(p.k)}return out})())"""))
+    check(not over, f'the card and the chip are over no station and not over the fridge: {over}')
+    # kept with the save: a new day does not teach the fried rice again
+    g.ev("save()")
+    check(json.loads(g.ev("localStorage.getItem(KEY)")).get('wfTaught', {}).get('friedrice') == 1, 'what was taught is in the saved game')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def cooking_the_pizza_oven_is_clear_of_the_buttons(b, port, target):
+    """The user, 2026-10-09 #14: the pizza oven on the kitchen's back wall was covered on a phone by the room tabs (房間, over
+    its dome) and by 今日任務 (over the dome, just above the mouth). On the three phone sizes measured, with the evening's
+    buttons all showing, the oven — dome, mouth, the shelf it stands on — is clear of every one of them; 今日任務 in the
+    kitchen sits beside 庫存, and back on the right in the dining room."""
+    import v24_tests as v
+    for vw, vh in ((375, 667), (390, 844), (430, 932)):   # a page of its own for each size: the scene's scale is set when the page is laid out
+        g = Game(b, port, target, seed=7161, manual=True, viewport={'width': vw, 'height': vh})
+        v.load_save(g, 'player_day92_2105.json')
+        g.ev("for(let i=0;i<30;i++){if(typeof DLG!=='undefined'&&DLG)dlgNext()}"); v.to_service(g)
+        g.ev("S.rooms=S.rooms||{};S.rooms.pizzaoven=1;__botUntil('false',60,1/30)")
+        g.ev("setRoom('kitchen');renderTasks();renderRoomTabs(true);forceDraw=true;__tick(1000/30)"); g.page.wait_for_timeout(60)
+        r = json.loads(g.ev("""JSON.stringify((()=>{const P=pizzaOvenRect();const cv=sc.getBoundingClientRect();const o={x0:cv.left+SV.ox+(P.x-4)*SV.s,x1:cv.left+SV.ox+(P.x+P.w+4)*SV.s,y0:cv.top+SV.oy+P.y*SV.s,y1:cv.top+SV.oy+(P.my+6)*SV.s,shown:[],bad:[]};
+          for(const id of['roomTabs','stockChip','taskChip','logChip']){const e=document.getElementById(id);if(!e||e.hidden)continue;const r=e.getBoundingClientRect();if(!r.width)continue;o.shown.push(id);
+           const ox=Math.min(o.x1,r.right)-Math.max(o.x0,r.left),oy=Math.min(o.y1,r.bottom)-Math.max(o.y0,r.top);if(ox>1&&oy>1)o.bad.push([id,Math.round(ox),Math.round(oy)])}return o})())"""))
+        check(set(r['shown']) >= {'roomTabs', 'stockChip', 'taskChip'}, f'{vw}×{vh}: the buttons are there to be checked: {r["shown"]}')
+        check(r['y0'] < 260 and r['y1'] > r['y0'], f'{vw}×{vh}: the oven is near the top of the screen, where the buttons are: {r}')
+        check(not r['bad'], f'{vw}×{vh}: the pizza oven under a button: {r["bad"]}')
+        tl = g.ev("(()=>{const t=document.getElementById('taskChip').getBoundingClientRect(),s=document.getElementById('stockChip').getBoundingClientRect();return t.left>s.right&&Math.abs(t.top-s.top)<2})()")
+        check(tl, f'{vw}×{vh}: in the kitchen 今日任務 sits beside 庫存')
+        g.ev("setRoom('main');renderRoomTabs(true);__tick(1000/30)")
+        check(g.ev("(()=>{const t=document.getElementById('taskChip').getBoundingClientRect();return t.right>=innerWidth-12})()"), f'{vw}×{vh}: in the dining room it is back on the right')
+        check(not g.errors, g.errors[:3]); g.close()
