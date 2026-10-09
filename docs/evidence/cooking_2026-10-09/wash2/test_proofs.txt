@@ -1,0 +1,46 @@
+# The washing tests against broken versions of the final washing code (JK_GAME_JS); each must fail where it says
+-- w3_fulltub
+FAIL  workflow_a_full_tub_holds_the_table_and_never_the_plating  (3.3s)
+      eight seconds later: the table still has its two plates, nobody holds any: {'dirty': False, 'left': 0, 'n': 10, 'hands': 2, 'free': -2}
+PASS  workflow_washing_can_stop_halfway_and_the_rest_waits  (10.7s)
+PASS  workflow_a_second_cleaner_washes_beside_the_first  (25.3s)
+PASS  workflow_every_dish_goes_round_and_none_is_lost_or_made  (15.5s)
+3 passed, 1 failed
+-- w3_stopreset
+PASS  workflow_a_full_tub_holds_the_table_and_never_the_plating  (16.4s)
+FAIL  workflow_washing_can_stop_halfway_and_the_rest_waits  (6.4s)
+      called away: the rest stays in the tub, counted: 0
+PASS  workflow_a_second_cleaner_washes_beside_the_first  (25.7s)
+FAIL  workflow_every_dish_goes_round_and_none_is_lost_or_made  (4.0s)
+      Jill alone: every dish accounted for: [{'t': 271, 'made': 11, 'tables': 2, 'hands': 0, 'cart': 0, 'washed': 0, 'dyl': 0}, {'t': 272, 'made': 11, 'tables': 2, 'hands': 0, 'cart': 0, 'washed': 0, 'dyl': 0}, {'t': 273
+2 passed, 2 failed
+-- w3_onlyone
+PASS  workflow_a_full_tub_holds_the_table_and_never_the_plating  (16.5s)
+PASS  workflow_washing_can_stop_halfway_and_the_rest_waits  (14.5s)
+FAIL  workflow_a_second_cleaner_washes_beside_the_first  (13.0s)
+      two cleaners, the stack high: both wash, each at a place of their own: None
+PASS  workflow_every_dish_goes_round_and_none_is_lost_or_made  (15.1s)
+3 passed, 1 failed
+-- w3_waiterjoins
+PASS  workflow_a_full_tub_holds_the_table_and_never_the_plating  (16.1s)
+PASS  workflow_washing_can_stop_halfway_and_the_rest_waits  (11.1s)
+FAIL  workflow_a_second_cleaner_washes_beside_the_first  (21.4s)
+      one cleaner and a waiter: the waiter is never the second at the sink, and the stack is washed: {'w1'}
+PASS  workflow_every_dish_goes_round_and_none_is_lost_or_made  (11.7s)
+3 passed, 1 failed
+-- w3_spotlost
+PASS  workflow_a_full_tub_holds_the_table_and_never_the_plating  (14.3s)
+PASS  workflow_washing_can_stop_halfway_and_the_rest_waits  (9.0s)
+FAIL  workflow_a_second_cleaner_washes_beside_the_first  (11.5s)
+      two cleaners, the stack high: both wash, each at a place of their own: None
+PASS  workflow_every_dish_goes_round_and_none_is_lost_or_made  (12.4s)
+3 passed, 1 failed
+
+# Why two tests changed (the new rule, js/game.js at the change, before the tests were updated):
+-- workflow_a_full_tub_holds_the_table_and_never_the_plating (old setup: only the first place at the sink taken by a stand-in)
+FAIL  eight seconds later: the table still has its two plates, nobody holds any: {'dirty': True, 'left': 2, 'n': 10, 'hands': 2, 'free': 0}
+   (the cleaner went to the second place and took two of the ten to wash — the new rule; the test's question is a full tub
+    with nobody able to make room, so now both places are taken by stand-ins)
+-- workflow_washing_can_stop_halfway_and_the_rest_waits (old: only the one tapped is called away)
+FAIL  called away: the rest stays in the tub, counted: 0
+   (the cleaner was washing beside Jill and went on; the test's question is everyone at the sink called away, so now all are)

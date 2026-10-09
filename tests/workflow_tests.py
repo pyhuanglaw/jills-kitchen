@@ -195,7 +195,9 @@ def workflow_a_full_tub_holds_the_table_and_never_the_plating(b, port, target):
     plates stays dirty — nobody takes its plates (they never vanish), Jill sent to it comes back without, it cannot be
     seated — while a finished dish can still be plated (no clean-plate count). Washed down to 9, the table is cleared."""
     g = _dirty_day(b, port, target, 9202)
-    g.ev("ddS().n=Array(10).fill('plate');ddS().wash={who:'x',ph:'take',t:0};R.tv++")   # full, and the sink taken (nobody can make room yet)
+    g.ev("ddS().n=Array(10).fill('plate');ddS().wash={who:'x',ph:'take',t:0,spot:0};ddS().wash2={who:'y',ph:'take',t:0,spot:1};R.tv++")   # full, and the sink taken (nobody can make room yet)
+    # (2026-10-09: the sink has two places now — a second cleaner washes beside the first — so both are taken; with only the
+    #  first taken, the cleaner here washes beside it and takes two of the ten, which is the new rule, not this test's question)
     ti = g.ev(DIRTY + "(1,2)")
     g.ev(TICK + "(240)")
     st = json.loads(g.ev("JSON.stringify({dirty:R.tables[%d].dirty,left:R.tables[%d].plates.length,n:ddCount(),hands:handsN(R.cw.c1||{},'dirty'),free:ddFree()})" % (ti, ti)))
@@ -209,7 +211,7 @@ def workflow_a_full_tub_holds_the_table_and_never_the_plating(b, port, target):
     check(g.ev("wfAssign(wfNode(%d),'jill')" % nid) and g.ev("wfNode(%d).st" % nid) == 'dish', 'a full tub: the plating still starts, plates from the rack')
     g.ev("wfList().splice(wfList().indexOf(wfNode(%d)),1);R.slots.forEach(s=>{if(s.wf&&s.wf.id===%d)s.wf=null})" % (nid, nid))
     # the sink free again: the cleaner washes (the stack is high) and clears the table when there is room
-    g.ev("ddS().wash=null;R.tv++")
+    g.ev("ddS().wash=null;ddS().wash2=null;R.tv++")
     for _ in range(600):
         g.ev(TICK + "(3)")
         if not g.ev("R.tables[%d].dirty" % ti): break
@@ -227,7 +229,7 @@ def workflow_washing_can_stop_halfway_and_the_rest_waits(b, port, target):
     for _ in range(600):
         g.ev(TICK + "(2)")
         if g.ev("ddCount()") <= 4: break
-    g.ev("ddS().wash.stop=1")
+    g.ev("ddWashers().forEach(W=>W.stop=1)")   # (2026-10-09: everyone at the sink — the cleaner may be washing beside the one tapped)
     for _ in range(300):
         g.ev(TICK + "(2)")
         if not g.ev("ddWasher()"): break
@@ -271,6 +273,76 @@ def workflow_waiters_keep_serving_and_one_at_most_washes(b, port, target):
         if g.ev("ddCount()") < 8: break
     check(whos and whos <= {'w1', 'w2'}, f'a waiter washes when nothing is waiting for the guests: {whos}')
     check(g.ev("ddWasher()") != 'jill' and not g.ev("(R.jill.hands||[]).some(e=>e.k==='dirty'&&e.w)"), 'Jill never by herself')   # (2026-10-09: the one Jill — what she washes is in R.jill's hands, marked w)
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def workflow_a_second_cleaner_washes_beside_the_first(b, port, target):
+    """The release gate (2026-10-09, 四-1／四-3: a bottleneck a hire or an upgrade can relieve) and the user's #5 (「重要的是玩家
+    能透過聘人及設備投資解除瓶頸」): with two cleaners, the stack high and no table to clear, the second washes beside the first —
+    each at a place of their own at the sink (behind the counter, the second on the sink's right); a tap on the cart says who
+    is washing; saved and read back with two at the sink, both go on and every dish is washed once; a waiter is never the
+    second one at the sink; with one at the sink, a tap on the cart sends Jill (no cleaner free) to the other place."""
+    C2 = ("{id:'c1',role:'cleaner',name:'阿芳',lv:3,duty:'clean',since:1,days:3,pool:'restaurant'},"
+          "{id:'c2',role:'cleaner',name:'小彤',lv:3,duty:'clean',since:1,days:3,pool:'restaurant'}")
+    g = _dirty_day(b, port, target, 9331, C2)
+    g.ev("ddS().n=Array(9).fill('plate');R.tv++")
+    two = None
+    for _ in range(400):
+        g.ev(TICK + "(2)")
+        o = json.loads(g.ev("JSON.stringify({W:ddWashers().map(W=>({who:W.who,spot:W.spot,at:ddWasherAt(W)})),n:ddCount()})"))
+        if len(o['W']) == 2 and all(w['at'] for w in o['W']): two = o; break
+    check(two and {w['who'] for w in two['W']} == {'c1', 'c2'} and {w['spot'] for w in two['W']} == {0, 1}, f'two cleaners, the stack high: both wash, each at a place of their own: {two}')
+    pos = json.loads(g.ev("JSON.stringify([ddSink(),ddSink2(),R.cw.c1&&{x:R.cw.c1.x,y:R.cw.c1.y},R.cw.c2&&{x:R.cw.c2.x,y:R.cw.c2.y}])"))
+    check(pos[0]['y'] == pos[1]['y'] and pos[1]['x'] > pos[0]['x'] + 10, f'the second place is beside the first, on its right, behind the counter: {pos}')
+    g.ev("toast=(m=>{window.__toast=m})");g.ev("ddTap()")
+    lab = g.ev("window.__toast||''")
+    check('阿芳' in lab and '小彤' in lab, f'a tap on the cart says who is washing — both: {lab}')
+    # saved and read back with two at the sink: both go on, and every dish is washed once
+    before = json.loads(g.ev("JSON.stringify({n:ddCount(),W:ddWashers().map(W=>W.who+':'+W.spot).sort()})"))
+    check(g.ev("checkpointSave('manual')"), 'the checkpoint is written')
+    g.reload(); _rt.install_bot(g)
+    g.click('[data-act=open]')
+    after = json.loads(g.ev("JSON.stringify({n:ddCount(),W:ddWashers().map(W=>W.who+':'+W.spot).sort()})"))
+    check(after == before, f'read back: the same count, the same two at their places: {before} / {after}')
+    for _ in range(900):
+        g.ev(TICK + "(2)")
+        if g.ev("ddCount()") == 0: break
+    check(g.ev("ddCount()") == 0 and g.ev("(R.st.dd||{}).wash") == 9, f'all nine washed, each once: {g.ev("JSON.stringify(R.st.dd)")}')
+    check(not g.errors, g.errors[:3]); g.close()
+    # one cleaner and a waiter: the waiter never joins the one at the sink (a cleaner may join a waiter who is washing)
+    g = _dirty_day(b, port, target, 9332, "{id:'c1',role:'cleaner',name:'阿芳',lv:3,duty:'clean',since:1,days:3,pool:'restaurant'},{id:'w1',role:'waiter',name:'小茉',lv:3,duty:'both',since:1,days:3,pool:'restaurant'}")
+    g.ev("ddS().n=Array(9).fill('plate');R.tv++")
+    seconds = set()
+    for _ in range(600):
+        g.ev(TICK + "(2)")
+        w2 = g.ev("ddS().wash2&&ddS().wash2.who")
+        if w2: seconds.add(w2)
+        if g.ev("ddCount()") == 0: break
+    check('w1' not in seconds and g.ev("ddCount()") == 0, f'one cleaner and a waiter: the waiter is never the second at the sink, and the stack is washed: {seconds}')
+    check(not g.errors, g.errors[:3]); g.close()
+    # one cleaner washing, the player taps the cart: Jill goes to the other place and washes too; asked for a table, she
+    # finishes the plate in hand and goes, the cleaner washing on
+    g = _dirty_day(b, port, target, 9333)
+    g.ev("ddS().n=Array(10).fill('plate');R.tv++")
+    for _ in range(300):
+        g.ev(TICK + "(2)")
+        if g.ev("ddWasher()==='c1'"): break
+    g.ev("toast=(m=>{window.__toast=m})"); g.ev("ddTap()")
+    check(g.ev("ddS().wash2&&ddS().wash2.who") == 'jill' and 'Jill' in g.ev("window.__toast||''"), f'a tap with one at the sink sends Jill to the other place: {g.ev("JSON.stringify(ddWashers())")} {g.ev("window.__toast")}')
+    at = False
+    for _ in range(300):
+        g.ev(TICK + "(2)")
+        if g.ev("!!ddWashOf('jill')&&ddWasherAt(ddWashOf('jill'))&&(R.jill.hands||[]).some(e=>e.k==='dirty'&&e.w)"): at = True; break
+    check(at, 'Jill at the second place with a plate to wash')
+    g.ev("ddTap()")
+    check('阿芳' in g.ev("window.__toast||''") and 'Jill' in g.ev("window.__toast||''") and '正在洗' in g.ev("window.__toast||''"), f'both places taken: a tap says who is washing: {g.ev("window.__toast")}')
+    ti = g.ev(DIRTY + "(0,0)")
+    g.ev("tapTable(R.tables[%d])" % ti)
+    for _ in range(300):
+        g.ev(TICK + "(2)")
+        if not g.ev("!!ddWashOf('jill')"): break
+    check(not g.ev("!!ddWashOf('jill')") and g.ev("ddWasher()") == 'c1', f'asked for a table, Jill leaves the sink after the plate in hand; the cleaner washes on: {g.ev("JSON.stringify(ddWashers())")}')
     check(not g.errors, g.errors[:3]); g.close()
 
 

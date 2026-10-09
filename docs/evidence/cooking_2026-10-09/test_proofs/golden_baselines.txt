@@ -1,0 +1,87 @@
+# The golden baselines (tests/golden/) after the sixteen decisions — what moved them, the re-recording, and that they still catch a change.
+# Run 2026-10-09 by $S/golden_proof2.sh: steps 1–2 in worktrees at 9dd4cd1 and a67e2a8 (each with its own tests and baselines),
+# steps 3–5 on 89bd685 (the build then; the re-recorded baselines are those committed with the washing fix, which leaves the
+# three scripted runs unchanged — see the last block). Step 5: three small changes made one at a time (JK_GAME_JS).
+== 1. 9dd4cd1 (the last commit before the one Jill), its own tests and baselines
+PASS  cat_personality_fingerprint  (1.6s)
+PASS  golden_scenario  (2.8s)
+PASS  golden_frames  (142.4s)
+3 passed, 0 failed
+== 2. a67e2a8 (the one Jill, nothing else), its own tests and baselines
+FAIL  cat_personality_fingerprint  (2.1s)
+      cat behaviour differs from the baseline in: ['evening.states', 'evening.time', 'evening.weights', 'service.states', 'service.weights']
+FAIL  golden_scenario  (3.3s)
+      day 1 differs from golden baseline: {"lifetime": [1811, 1195], "reviews": [6, 3], "weights": ["1957:8206046e", "2037:48d4fee4"], "xp": [{"friedrice": 26}, {"friedrice": 18}], "stock": [{"friedrice": 2}, {"friedrice": 6}], "money": [2441, 1825], "catHash"
+FAIL  golden_frames  (150.5s)
+      service_20s: pixels differ in box (13, 50, 288, 781) (see tests/artifacts/)
+      service_panel: pixels differ in box (5, 50, 294, 747) (see tests/artifacts/)
+      pause: pixels differ in box (13, 50, 264, 781) (see tests/artifacts/)
+      evening: pixels differ in box (39, 19, 390, 781) (see tests/artifacts/)
+      summary: pixels differ in box (37, 19, 374, 708) (see tests/artifacts/)
+      shop: pixels differ in box (91, 19, 374, 447) (see tests/artifacts/)
+      book_cats: pixels differ in box (138, 19, 334, 96) (see tests/artifacts/)
+      book_mem: pixels differ in box (23, 19, 366, 795) (see tests/artifacts/)
+      day1: 7916 frames, baseline 7498
+      day1: first differing sample #12 (t=12.033): scene
+      day1: end-of-day digest differs: money, lifetime, stats, xp, stock, reviews, reviewHash, summary, cats, catHash, mem, weights, life
+      day2: 8568 frames, baseline 8092
+      day2: first differing sample #0 (t=0.033): scene, dom, cats, weights
+      day2: end-of-day digest differs: money, lifetime, stats, xp, stock, reviews, reviewHash, regulars, summary, cats, catHash, mem, weights, life
+0 passed, 3 failed
+== 3. the final build, the old baselines
+FAIL  cat_personality_fingerprint  (1.8s)
+      cat behaviour differs from the baseline in: ['evening.states', 'evening.time', 'evening.weights', 'service.states', 'service.weights']
+FAIL  golden_scenario  (3.3s)
+      day 1 differs from golden baseline: {"reviewHash": ["36f50d69", "5dd53ce6"], "lifetime": [1811, 1160], "xp": [{"friedrice": 26}, {"friedrice": 18}], "summary": [{"rev": 1560, "cost": 525, "tips": 251, "bonus": 255, "wages": 0, "net": 1241, "guests": 13, 
+FAIL  golden_frames  (161.0s)
+      service_20s: pixels differ in box (13, 50, 288, 781) (see tests/artifacts/)
+      service_panel: pixels differ in box (0, 50, 382, 747) (see tests/artifacts/)
+      pause: pixels differ in box (13, 50, 264, 781) (see tests/artifacts/)
+      evening: pixels differ in box (39, 19, 346, 786) (see tests/artifacts/)
+      summary: pixels differ in box (37, 19, 374, 708) (see tests/artifacts/)
+      shop: pixels differ in box (91, 19, 374, 447) (see tests/artifacts/)
+      book_cats: pixels differ in box (138, 19, 334, 31) (see tests/artifacts/)
+      book_mem: pixels differ in box (23, 19, 366, 795) (see tests/artifacts/)
+      day1: 7709 frames, baseline 7498
+      day1: first differing sample #12 (t=12.033): scene
+      day1: end-of-day digest differs: money, lifetime, stats, xp, stock, reviews, reviewHash, summary, cats, catHash, mem, weights, life
+      day2: 9259 frames, baseline 8092
+      day2: first differing sample #0 (t=0.033): scene, dom, cats, weights
+      day2: end-of-day digest differs: money, lifetime, stats, xp, stock, reviews, reviewHash, summary, cats, catHash, mem, weights, life
+0 passed, 3 failed
+== 4. re-recorded on the final build
+    recorded cat fingerprint -> tests/golden/cats.json
+PASS  cat_personality_fingerprint  (2.6s)
+    recorded golden baseline -> tests/golden/scenario.json
+PASS  golden_scenario  (5.7s)
+    recorded frame baseline -> tests/golden/frames.json + 10 screens
+PASS  golden_frames  (148.0s)
+3 passed, 0 failed
+PASS  cat_personality_fingerprint  (1.9s)
+PASS  golden_scenario  (3.4s)
+PASS  golden_frames  (135.2s)
+3 passed, 0 failed
+== 5. still caught: three small changes, one at a time
+price 120 hair #221712
+-- g_price
+FAIL  cat_personality_fingerprint  (1.9s)
+FAIL  golden_scenario  (3.5s)
+FAIL  golden_frames  (141.8s)
+0 passed, 3 failed
+-- g_hair
+PASS  cat_personality_fingerprint  (2.0s)
+PASS  golden_scenario  (3.6s)
+FAIL  golden_frames  (132.9s)
+2 passed, 1 failed
+-- g_weight
+PASS  cat_personality_fingerprint  (1.7s)
+FAIL  golden_scenario  (2.9s)
+PASS  golden_frames  (133.5s)
+2 passed, 1 failed
+== done
+
+== 6. the washing fix (two at the sink) on top: the re-recorded baselines, compared (not recorded) — unchanged
+PASS  cat_personality_fingerprint
+PASS  golden_scenario
+PASS  golden_frames
+3 passed, 0 failed
