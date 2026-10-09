@@ -164,7 +164,9 @@ window.__act = function(){
   if (!R.closed) {
     for (const g of queued()) { if (g.state==='queue') { const t=freeTableFor(g); if (t) seatGroup(g,t); } }
   }
-  for (const t of R.tables) { if (tableActionable(t) && !jillTargets(t.i)) tapTable(t); }
+  // 2026-10-09 (the one Jill, the user's #6): a table someone else is already on (its claim, or its plates' ticket) is left to them — a
+  // player tapping it again and again would hand it to Jill (再點一次，改由 Jill 收拾)
+  for (const t of R.tables) { if (tableActionable(t) && !jillTargets(t.i) && !(t.claim && t.claim!=='jill') && !(t.group && t.group.ticket && t.group.ticket.claim && t.group.ticket.claim!=='jill')) tapTable(t); }
   for (const tk of R.tickets) for (const it of tk.items) if (it.st==='pending') startCook(tk,it,true);
   if (typeof wfBot==='function') wfBot(false);   // v2.5: the new kitchen — one step at a time, as a person
   if (typeof ddTap==='function' && !ddS().wash && ddCount()>=8) ddTap();   // Workflow B: a player who sees the dirty dishes piling up (8 of 10) asks for washing

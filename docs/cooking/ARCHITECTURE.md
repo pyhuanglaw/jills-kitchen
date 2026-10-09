@@ -275,6 +275,11 @@
 - **畫**：廚房只在她人在廚房時畫她（`wfDrawJill`，一次）；主廳、側廳、Lounge 照舊（`drawJillAt`）。舊的「出菜口前面再畫一個」、
   「舊工作站上的 Jill」拿掉了。
 - **訂單卡**：交給她、但她還在忙別的，寫「Jill 接著做」；輪到她、她在路上，寫「Jill 前往中」（`jillOnIt`）。
+- **員工和她的桌子**：員工只避開她「正在去」的桌子（`jillGoing`）；她被叫了、還沒出發的桌子，有空的服務生可以先接，輪到她時
+  別人已經在處理或已經不需要她的就拿掉（`jillLetGo`）——不會兩個人去同一張。玩家按「改由 Jill 收拾」的桌子保留給她（`qOnly`）。
+  玩家點一張服務生已經在去點餐、結帳、送菜的桌子，說「某某正在過去了。」，不另外派她。
+- **路過廚房**：她要回房間休息、把髒盤子放進髒盤車再出去，只是路過廚房，不會被「在廚房沒事先待 2 秒」留下來
+  （這個 bug 讓她一直走不到沙發：`jill_rests_when_staff_cover_the_floor` 抓到，已修）。
 - **營業中存檔**：新的存檔記 `wq`；以前的存檔（廚房的 Jill 在 `wfx.jk`）讀回來，她的料理工作接到 `wq`，她從原本站的地方走回去做。
   另外每秒檢查一次：她手上的工作如果不在任何隊列裡，放回她的隊列（不會有工作永遠沒人做）。
 - 測試：`cooking_one_jill_finishes_her_step_then_goes_and_nothing_of_hers_moves_on_while_she_is_away`（固定情境，含存檔讀回）、
@@ -550,6 +555,9 @@
     - `infrastructure_you_can_see_and_a_calmer_incident_calendar`：原本——有洗碗機收桌快 30%（`cleanDur` ×0.7）。不再成立——使用者
       第 4 題：洗碗機只洗得快，收桌的加成取消。改成——有洗碗機洗碗時間一半、收桌時間不變。其他驗證的事不變。
     - 新增 `workflow_the_dishwasher_washes_and_the_big_cart_is_its_own`、`workflow_a_table_someone_is_going_to_clear_is_not_given_to_jill_too`。
+    - 測試用的自動玩家（`run_tests.py` 的 `__act`，「每一桌都點」的那一位）：不再點別人已經在處理的桌子（桌子的 claim、或那一桌
+      菜的 ticket claim）。原因——第 6 題以後，同一張有人在去收的桌子點兩次會交給 Jill；這位玩家每一格都點同一張桌子，等於一直把
+      員工的工作搶給 Jill。真的玩家不會這樣點。
     - `listeners_do_not_accumulate`、`long_play_is_stable`：沒有改。教學卡的 × 和「說明」按鈕一開始用 addEventListener，測試數到
       監聽器多了兩個（只掛一次，不是累積）；改用 `onclick`，兩個測試照舊通過。
 
