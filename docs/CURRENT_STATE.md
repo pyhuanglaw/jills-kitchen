@@ -1,17 +1,22 @@
 # Jill's Kitchen — 目前狀態（暫時的，會一直更新）
 
 這份只放「現在」的狀態：branch、版本、待辦、待確認。永久的設計規則在 `docs/PROJECT_MEMORY.md`，不要寫到這裡；這裡的內容過時了就
-直接改掉或刪掉。最後更新：2026-10-08 凌晨，v2.4 rc8.8 發布（Version 10，Dylan 揭曉後房間裡寫他的名字）。
+直接改掉或刪掉。最後更新：2026-10-09，新的料理系統合併進 `main`（使用者授權；**還沒發布**，正式版仍是 rc8.8）。
 
 ## Repo 與 branch
 
 - GitHub：`pyhuanglaw/jills-kitchen`，預設 branch 是 `main`。
-- **`main` ＝ Jill's Kitchen 的正式主線**：目前的、穩定的、發布出去的版本都在這裡。最新正式版是 9253fae（v2.4 rc8.8），之後
-  `main` 上只有文件與紀錄。從 v2.2.1 起的完整開發歷史都在 `main` 上。
+- **`main` ＝ Jill's Kitchen 的正式主線**：目前的、穩定的、發布出去的版本都在這裡。最新正式版是 9253fae（v2.4 rc8.8）。從 v2.2.1 起的
+  完整開發歷史都在 `main` 上。
+- **2026-10-09：新的料理系統快轉合併進 `main`**（遊戲內容＝ commit 8298e18；使用者 2026-10-09 授權「自主測試、驗收與合併 main」，
+  `docs/v24/cooking_merge_authorization_2026-10-09.txt`；Release Gate 紀錄 `docs/cooking/RELEASE_GATE_2026-10-09.md`）。所以 `main`
+  現在比正式版多了整個料理系統（16 項決策、Workflow B、一個 Jill……），**下次說「發布」就會把它發出去**。合併前的 `main`（fc0f5d8，
+  rc8.8 之後的文件）保存在 `archive/main-before-cooking-2026-10-09`；要回到合併前：`git push --force-with-lease=refs/heads/main:<目前的 main> origin fc0f5d8b09fc8152991c408a26de96bef49235aa:refs/heads/main`
+  （只在使用者要求時）。
 - 還沒做完的遊戲功能，另外開短期的 `feature/…` 或 `wip/…` branch；做完、測試通過才回到 `main`，發布的 commit 一定在 `main` 上。
   文件與紀錄可以直接在 `main`。不要讓工作 branch 跟 `main` 長期並行。
 - GitHub 上的 branch：`main`、`archive/rc7.6-import-main`、`feature/fewer-lines`（rc8.5，已合回 `main`，可以在 GitHub 網頁刪掉）、
-  `feature/dylan-room`（Dylan 在房間的名字，做在 rc8.5 上的原版 09f3312；同樣的改動已經帶到 `feature/dylan-room-rc88`，可以在 GitHub 網頁刪掉）、`feature/dylan-room-rc88`（上面那個帶到 rc8.7 的版本；2026-10-08 快轉合回 `main` 並發布成 rc8.8，可以在 GitHub 網頁刪掉）、`feature/cooking-gameplay`（新的料理系統，開發中；使用者 2026-10-07：不發布到玩家版）、`feature/lounge-decided`（故事優先：Lounge、試酒之夜、鋼琴、予安、二樓；
+  `feature/dylan-room`（Dylan 在房間的名字，做在 rc8.5 上的原版 09f3312；同樣的改動已經帶到 `feature/dylan-room-rc88`，可以在 GitHub 網頁刪掉）、`feature/dylan-room-rc88`（上面那個帶到 rc8.7 的版本；2026-10-08 快轉合回 `main` 並發布成 rc8.8，可以在 GitHub 網頁刪掉）、`feature/cooking-gameplay`（新的料理系統；2026-10-09 快轉合併進 `main`，跟 `main` 同一個 commit；使用者第 16 題：保留）、`feature/lounge-decided`（故事優先：Lounge、試酒之夜、鋼琴、予安、二樓；
   2026-10-07 快轉合回 `main` 並發布成 rc8.7，可以在 GitHub 網頁刪掉）、`qa/audit-2026-10-06`（全面 Audit 與例行 QA；2026-10-06 使用者同意合回
   `main`，已合回，可以在 GitHub 網頁刪掉）、`fix/audit-narrative-2026-10-06`（Audit 之後的修正；2026-10-07 快轉合回 `main` 並發布成
   rc8.6，可以在 GitHub 網頁刪掉）、`proto/cooking-flow`（料理流程的獨立試玩頁 `prototype/cooking/`，不動遊戲本體；使用者 2026-10-07：
@@ -33,6 +38,12 @@
     共同祖先是因為 2026-10-04 `main` 改指到完整開發歷史，見下面那一條；是歷史備份，復原指令要用到它）。
   - 整理前後 `main`＝fc0f5d8b09fc8152991c408a26de96bef49235aa、`feature/cooking-gameplay`＝7423dfc9779114811e733fbbb8e9e957d66ef11d，
     沒有變；私人測試版、正式版的發布紀錄都沒有動。GitHub 上沒有任何 tag（版本 tag 只在當時的本機）。
+  - **2026-10-09 合併前做的備份（推得上去的是 branch，不是 tag）**：`archive/main-before-cooking-2026-10-09`＝fc0f5d8（合併前的 `main`）、
+    `archive/feature-dylan-room`＝09f3312（`feature/dylan-room` 那 4 個獨有的證據檔）；兩條都推到 GitHub、讀回確認過。所以
+    `feature/dylan-room` 現在也可以刪了。**可以刪的（在 GitHub 網頁刪）**：`feature/dylan-room`、`feature/dylan-room-rc88`、
+    `feature/fewer-lines`、`feature/lounge-decided`、`fix/audit-narrative-2026-10-06`、`qa/audit-2026-10-06`。**保留**：`main`、
+    `feature/cooking-gameplay`、`proto/cooking-flow`、`archive/rc7.6-import-main`、`archive/main-before-cooking-2026-10-09`、
+    `archive/feature-dylan-room`。
 - 已刪除（玩家 2026-10-04 在 GitHub 網頁刪掉）：`feature/ken-tasting-pictures`（81cbe46，rc8.4 已合回 `main`）、`wip/lin`（舊的開發
   branch 名稱；最後指向的 b87b77b 在 `main` 裡）、`claude/jills-kitchen-github-setup-4x7483`（8ca784b，接在舊的匯入 commit 後面改網址；
   同樣的改動在主線的 ec985d1）。三條的內容都已經在 `main` 或不需要了。
@@ -45,6 +56,8 @@
 - 舊版本（玩家 2026-10-03 給的 v2.2.1、v2.4 rc4，以及其他每一版）怎麼查：`docs/OLD_VERSIONS.md`。
 
 ## 已發布
+
+（2026-10-09：`main` 已經合併料理系統，但正式 Artifact 沒有更新，仍然是下面的 rc8.8。）
 
 - **v2.4 rc8.8**，2026-10-08 凌晨，發布到 **https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA**（**Version 10**，id 1791419491-01ae）。
   遊戲內容＝ commit 9253fae（tag `v2.4-rc8.8`）。報告：`docs/V24_RC8_8_REPORT.md`。Gate：9253fae 上完整回歸 306/306；讀回與
@@ -78,8 +91,11 @@
   不發布、現在不要再做；之後重新開始時，以正式遊戲原本的廚房畫面為底，不重新設計美術。私人連結 https://claude.ai/artifact/EBzi6qETraguAApvettBFe 。
 
 - **新的料理系統＋Restaurant Workflow**（branch `feature/cooking-gameplay`）：使用者 2026-10-07、10-08 的規格（`docs/v24/cooking_*.txt`、
-  `docs/v24/restaurant_workflow_b_2026-10-08.txt`，在那條 branch 上）。**HARD RULE（2026-10-08）：使用者說「可以進 main」以前，不 merge
-  main、不發布到正式玩家版；只更新私人測試版**（PROJECT_MEMORY §10）。開發中；做到哪裡寫在那條 branch 的 `docs/cooking/ARCHITECTURE.md`，2026-10-08 早上的報告
+  `docs/v24/restaurant_workflow_b_2026-10-08.txt`）。**HARD RULE（2026-10-08）：使用者說「可以進 main」以前，不 merge
+  main、不發布到正式玩家版；只更新私人測試版**（PROJECT_MEMORY §10）。**2026-10-09 使用者授權合併**（16 項決策
+  `docs/v24/cooking_final_decisions_2026-10-09.txt`、授權 `docs/v24/cooking_merge_authorization_2026-10-09.txt`、驗收標準
+  `docs/v24/cooking_release_gate_2026-10-09.txt`）：16 項做完、Release Gate 通過後快轉合併進 `main`（紀錄
+  `docs/cooking/RELEASE_GATE_2026-10-09.md`）。**發布到正式版仍要使用者說「發布」**（合併 ≠ 發布）。以下是開發過程的紀錄；做到哪裡寫在那條 branch 的 `docs/cooking/ARCHITECTURE.md`，2026-10-08 早上的報告
   `docs/cooking/MORNING_REPORT_2026-10-08.md`。私人測試版（不是正式版，存檔分開）https://claude.ai/artifact/TQpEqEFgqUW6jUm2Gfnhbg ，
   用 `tools/qa/cooking_test_build.py` 建、發布到同一個網址。
   **這一輪的工作方式（使用者 2026-10-09）**：連續自主開發，「發布私人測試版不是工作終點，而是中途里程碑」。順序：飲料（每杯獨立，
@@ -106,6 +122,7 @@
   | 2026-10-09 | `eac1f28455602b6e5a316ef21d15c3aa6c43956a` | Version 18，id `1791500720-1e96` | 第五批料理：Lounge 的九道（炸雞塊、起司可樂餅、起司拼盤、蒜香蘑菇、水牛城雞翅、起司條、生蠔、德國豬腳、酒吧披薩）、瑪格麗特披薩、蘑菇白醬披薩 |
   | 2026-10-09 | `b1bdfe258800d86debb623eccebe59614369a4cc` | Version 19，id `1791501430-c60d` | 第六批料理：Jill 的招牌主菜、招牌甜點（照玩家自己選的組合） |
 | 2026-10-09 | `ebd701cf09fe63e09a445dcbbf3e0574709dd309` | Version 20，id `1791506130-ad8a` | 完整回歸後的版本：前四批切菜時砧板上的大刀回來了（第五批的小刀同名、把它換掉了）；遊戲其他部分跟 b1bdfe2 一樣（之後的 commit 只改測試和文件） |
+| 2026-10-09 | `8298e18f8f55b0ea2d185f43e6704fdb717864be` | Version 21，id `1791522142-3255`（發布前讀到的線上 id：`1791506130-ad8a`） | 16 項決策全部做完、Release Gate 修正後的版本（＝合併進 `main` 的遊戲內容）：一個 Jill、教學卡、秀琴阿姨的台詞、披薩烤爐、洗碗機與大髒盤車、收桌不重複派、服務生順路收盤、衛生檢查、拿掉燒焦與料理失常、繞過流理台走、Bar 小廚的爐子、水槽兩個位置 |
   2026-10-08 晚上：Restaurant Workflow B（服務生一次端多盤、出菜口有上限、髒盤子拿回廚房洗、秀琴阿姨第一天幫忙；報告
   `docs/cooking/WORKFLOW_B_REPORT_2026-10-08.md`、設計 `docs/cooking/WORKFLOW_B.md`）和前三天的 onboarding（炒飯／咖啡／沙拉、
   起始現金 $1,200；`docs/cooking/ARCHITECTURE.md`「前三天」）都在私人測試版第 10 版；使用者的兩份驗收清單逐條對照在
@@ -138,8 +155,9 @@
 - **例行 QA**（2026-10-06 起）：`python3 tests/run_tests.py --qa`，`tests/qa_tests.py` 的 `qa_` 測試，用 `tests/player.py` 真的點畫面、
   故事面板開著。每次改完遊戲跑；完整回歸也包含它們。已知未修的問題列在 `tests/qa_known_open.json`（失敗顯示 OPEN、不算失敗；修好時
   顯示 FIXED，要把那一條拿掉）。
-- 306 個測試（其中 50 個是例行 QA 的 `qa_` 測試，5 個是模擬玩家的 `sim_player_` 測試；`python3 tests/run_tests.py` 全跑，
-  `-k a,b,c` 跑指定的）。最近一次完整回歸：rc8.8 的 9253fae 上 306/306（2026-10-08，在固定在那個 commit 的另一個 worktree 分三份跑，
+- 347 個測試（其中 52 個是例行 QA 的 `qa_` 測試，5 個是模擬玩家的 `sim_player_` 測試；`python3 tests/run_tests.py` 全跑，
+  `-k a,b,c` 跑指定的）。最近一次完整回歸：合併進 `main` 的 d57bac8 上 347/347（2026-10-09，固定在那個 commit 的 worktree 分三份跑，48 分鐘；
+  `docs/evidence/cooking_2026-10-09/regression/`）。再前一次：rc8.8 的 9253fae 上 306/306（2026-10-08，在固定在那個 commit 的另一個 worktree 分三份跑，
   37 分鐘；`docs/evidence/v24_rc8_8/regression/`）。再前一次：rc8.7 的 24ecf98 上 305/305。這一批中途：合併 commit c614255 的完整回歸開跑後停掉（手冊一句話的出現條件漏改，
   a0ee007 修好）；a0ee007 上合併影響到的 96 個 94 過，2 個是測試還照舊規則寫，24ecf98 改了測試。
 - 這一批的私人測試版（https://claude.ai/artifact/BzGu1nFBVEqDt72Fad1sHP ，Version 3，0e41527）已經被正式版 rc8.6 取代，不用再開。
@@ -148,6 +166,9 @@
 
 ## 待辦／待確認
 
+- **料理系統合併後，要使用者決定的事**（`docs/cooking/RELEASE_GATE_2026-10-09.md` 第十節）：新遊戲前期的節奏（正常玩家到第 30 天
+  大多還沒擴建，Lounge 等要錢的故事會晚）、流理台中間要不要開走道（第 13 題繞路的代價）、ON FIRE 中後期約四分之三的晚上（main 就這樣）、
+  揭曉那晚的距離（main 就有）、專職洗碗的人（2026-10-08 的提案）。
 - **2026-10-06 Audit 的結果**（`docs/audit/2026-10-06/README.md`）：十件最重要的事、接下來最值得做的 3–5 件、以及最後一段「需要使用者決定」
   的 24 個問題（第 19、20 條已決定），都等使用者看過再動。Audit 本身沒有改遊戲。
 - **模擬玩家從 Day 92 存檔往後再跑 10–15 天**（看包廂 I 之後還有沒有它不認得的畫面）：使用者 2026-10-07 17:52 決定先發布、
