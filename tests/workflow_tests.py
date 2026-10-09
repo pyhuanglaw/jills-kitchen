@@ -121,7 +121,7 @@ def workflow_the_pass_is_a_buffer_and_a_full_pass_is_a_quiet_wait(b, port, targe
     check(g.ev("wfRowN()") == 9 and g.ev("(()=>{const r=S.rooms.pass;S.rooms.pass=1;const n=wfRowN();S.rooms.pass=r;return n})()") in (9, 11), 'the row')
     # a finished wok of fried rice waiting for 裝盤, and the pass filled with plates nobody has taken yet
     nid = g.ev("""(()=>{for(let i=0;i<3000&&!R.tickets.length;i++){for(const q of R.groups)q.pat=1;for(const t of R.tables){const q=t.group;if(q&&q.state==='order'&&!jillTargets(t.i))tapTable(t)}__tick(1000/30)}wfGather();const n=wfList()[0];if(!n)return null;
-      const s=R.slots.find(x=>x.type==='stove');wfAssign(n,'jill',s);n.st='ready';n.si=0;n.slot=s;s.wf=n;n.who=null;n.to=null;wfJ().q=[];
+      const s=R.slots.find(x=>x.type==='stove');wfAssign(n,'jill',s);n.st='ready';n.si=0;n.slot=s;s.wf=n;n.who=null;n.to=null;wfJ().wq=[];
       const tk=R.tickets[0];for(let k=0;k<wfRowN();k++){tk.items.push({d:'friedrice',st:'ready',q:'P',want:0,picked:false,set:null,pi:k})}R.tv++;return n.id})()""")
     check(nid, 'a wok of rice done, waiting to be plated')
     st = json.loads(g.ev("JSON.stringify({free:wfRowFree(),ok:wfRowOK(wfNode(%d)),line:wfState(wfNode(%d)),cue:wfCueSlots(wfNode(%d)).free.length,assign:wfAssign(wfNode(%d),'jill')})" % (nid, nid, nid, nid)))
@@ -270,7 +270,7 @@ def workflow_waiters_keep_serving_and_one_at_most_washes(b, port, target):
         check(n_wash <= 1, 'never two at the sink')
         if g.ev("ddCount()") < 8: break
     check(whos and whos <= {'w1', 'w2'}, f'a waiter washes when nothing is waiting for the guests: {whos}')
-    check(g.ev("ddWasher()") != 'jill' and not g.ev("R.jk&&handsN(R.jk,'dirty')"), 'Jill never by herself')
+    check(g.ev("ddWasher()") != 'jill' and not g.ev("(R.jill.hands||[]).some(e=>e.k==='dirty'&&e.w)"), 'Jill never by herself')   # (2026-10-09: the one Jill — what she washes is in R.jill's hands, marked w)
     check(not g.errors, g.errors[:3]); g.close()
 
 

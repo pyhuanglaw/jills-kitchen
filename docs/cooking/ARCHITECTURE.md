@@ -260,6 +260,28 @@
 **平衡原則**（使用者）：「Full roster 要能完整覆蓋四區；小團隊容易形成合理覆蓋；單一員工不必全能。」——上面的 coverage 表照這個看：
 前三位就蓋到四區，滿編每一區至少一位專長，沒有人四區全會。
 
+## Jill 只有一個（使用者 2026-10-09 第 8 題，`docs/v24/cooking_final_decisions_2026-10-09.txt`）
+
+以前廚房裡的 Jill 是另一個人（`R.jk`，自己的位置、自己的工作隊列），外場的 Jill（`R.jill`）照樣收桌、端盤、摸貓；廚房畫面還會在
+外場的 Jill 站在出菜口時，在出菜口前面再畫一個。現在：
+
+- **一個身體**：`R.jill`。`wfJ()` 回傳她；交給她的料理工作在她自己的隊列 `R.jill.wq`（以前的 `R.jk.q`），外場的桌子在 `R.jill.q`。
+- **照被叫的順序做**（`jillKitchenTurn`）：每件事記下被叫的時間（料理 `n.jt`、桌子 `R.jill.qAt`），先叫的先做。手上的事一定先做完：
+  爐子／工作台上手做到一半的一步（`R.jill.kcur`）、外場的一趟（`J.cur`）、從桌上收下來的髒盤子（先送到廚房的髒盤車）、正在洗的那一個。
+- **她不在廚房時**：`wfHere` 要她人在廚房、站在那裡，手做的步驟才會前進；爐火、烤箱上的（`cook`）照常計時。
+- **走路**：在廚房也用 `stepTo`，從主廳的廚房門進出（`doorway`）；沒有瞬間移動。
+- **沒事做時**：她自己放上火的菜還在煮，就站在旁邊顧著（`wfAttending`）；不然約 2 秒後走回主廳的出菜口（外場的生活照舊：
+  摸貓、陪 Dylan、回房間坐一下）。
+- **畫**：廚房只在她人在廚房時畫她（`wfDrawJill`，一次）；主廳、側廳、Lounge 照舊（`drawJillAt`）。舊的「出菜口前面再畫一個」、
+  「舊工作站上的 Jill」拿掉了。
+- **訂單卡**：交給她、但她還在忙別的，寫「Jill 接著做」；輪到她、她在路上，寫「Jill 前往中」（`jillOnIt`）。
+- **營業中存檔**：新的存檔記 `wq`；以前的存檔（廚房的 Jill 在 `wfx.jk`）讀回來，她的料理工作接到 `wq`，她從原本站的地方走回去做。
+  另外每秒檢查一次：她手上的工作如果不在任何隊列裡，放回她的隊列（不會有工作永遠沒人做）。
+- 測試：`cooking_one_jill_finishes_her_step_then_goes_and_nothing_of_hers_moves_on_while_she_is_away`（固定情境，含存檔讀回）、
+  `cooking_one_jill_through_whole_evenings_early_middle_late`（新遊戲第一天、第 30 天、第 92 天各一整晚：每次同時畫每個房間數 Jill，
+  最多一個、在她所在的房間；她不在廚房時她的手做步驟一次都沒前進；每晚都打烊）。兩個測試在改之前的程式上都會失敗
+  （`docs/evidence/cooking_2026-10-09/onejill/tests_before_after.txt`）。
+
 ## 存檔
 
 - `S`（每天的存檔）沒有新欄位，舊存檔讀進來不用 migration；料理的工作只在營業中（`R`）。
@@ -482,6 +504,15 @@
       都實際跑過、通過）；驗證的事不變。
     - `portrait_crops_isolate_each_figure`：沒有改。這台機器沒裝 `scipy`（`tools/portraits.py` 要用），裝了以後通過；
       `docs/ARCHITECTURE.md` §6 補上測試要裝的套件。
+
+32. **2026-10-09（Jill 只有一個，第 8 題）**：
+    - `cooking_the_card_says_who_has_it_and_a_dish_can_be_taken_back`：讀廚房 Jill 的隊列 `wfJ().q` → `wfJ().wq`（同一個隊列，
+      換了名字：`R.jill.q` 是外場的桌子）。檢查的事不變。
+    - `workflow_the_pass_is_a_buffer_and_a_full_pass_is_a_quiet_wait`：設定時清空廚房隊列 `wfJ().q=[]` → `wfJ().wq=[]`（沒改的話
+      會清掉她外場的桌子）。
+    - `workflow_waiters_keep_serving_and_one_at_most_washes`：「Jill never by herself」原本看 `R.jk` 手上的髒盤子；`R.jk` 沒有了，
+      改看 `R.jill` 手上正在洗的盤子（`e.w`）。不改的話這一項永遠通過（`R.jk` 是 undefined）。
+    - 新增 `cooking_one_jill_…` 兩個（見上面「Jill 只有一個」）。
 
 ## 使用者 iPhone 回報（2026-10-08 晚上到 10-09 凌晨）
 

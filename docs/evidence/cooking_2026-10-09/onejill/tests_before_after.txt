@@ -1,0 +1,19 @@
+The one Jill (the user, 2026-10-09 #8). The two tests that guard it, run on the code just before the change
+(scratchpad copy of js/game.js at 9dd4cd1 = ebd701c's game) and on the change itself.
+
+== before (two Jills: R.jill on the floor, R.jk in the kitchen)
+FAIL  cooking_one_jill_finishes_her_step_then_goes_and_nothing_of_hers_moves_on_while_she_is_away  (5.7s)
+      she walked in by the door from the dining room: ['main']
+FAIL  cooking_one_jill_through_whole_evenings_early_middle_late  (8.3s)
+      day 1: one Jill, in her room, her hands only where she is (121 looks, rooms ['main', 'kitchen']): ['a second Jill (R.jk)', 'a second Jill (R.jk)', 'a second Jill (R.jk)', 'a second Jill (R.jk)', 'a second Jill (R.jk)', 'a second Jill (R.jk)']
+
+The whole-evening test's drawing check alone (its R.jk check left out), before:
+day 1 looks 121: 894 problems, the first: 'Jill drawn 2 times at once: main:1 kitchen:1 (she is in main, t=1.5)'
+day 30 looks 223: 2407 problems, the first: 'Jill drawn 2 times at once: main:1 kitchen:1 (she is in main, t=1.5)'
+(the kitchen drew its own Jill at the front of the pass, or at a station, while the one in the dining room stood at the pass)
+
+== after
+PASS  cooking_one_jill_finishes_her_step_then_goes_and_nothing_of_hers_moves_on_while_she_is_away  (27.5s)
+PASS  cooking_one_jill_through_whole_evenings_early_middle_late  (101.5s)
+  (day 1, day 30 and day 92 played through: every look at every room at once finds one Jill at most, in the room she is
+  in; no step of hers moves on while she is out of the kitchen; no second Jill; every evening closes)

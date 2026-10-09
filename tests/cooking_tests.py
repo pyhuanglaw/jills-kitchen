@@ -368,7 +368,7 @@ def cooking_the_card_says_who_has_it_and_a_dish_can_be_taken_back(b, port, targe
     # the player takes it back: a tap on the burner held for it
     to = g.ev(f"wfNode({nid}).to.no")
     _tap_slot(g, f"wfNode({nid}).to")
-    st = json.loads(g.ev(f"JSON.stringify((()=>{{const n=wfNode({nid});return{{who:n.who,st:n.st,si:n.si,to:n.to&&n.to.no,its:n.its.map(o=>o.it.st),cook:(R.wfc||{{}}).t_ade||null,q:wfJ().q,ck:n.ck||[]}}}})())"))
+    st = json.loads(g.ev(f"JSON.stringify((()=>{{const n=wfNode({nid});return{{who:n.who,st:n.st,si:n.si,to:n.to&&n.to.no,its:n.its.map(o=>o.it.st),cook:(R.wfc||{{}}).t_ade||null,q:wfJ().wq,ck:n.ck||[]}}}})())"))
     check(st['who'] == 'jill' and st['st'] == 'go' and st['si'] == 0 and st['to'] == to and all(x == 'cooking' for x in st['its']) and st['cook'] is None and nid in st['q'] and not st['ck'],
           f'taken back: Jill has it, nothing reset, the cook let it go (and is not counted for it): {st}')
     check('第一步：熱區 · Jill 前往中' in g.ev(GUIDE), 'the card says Jill is on her way')
@@ -910,3 +910,101 @@ def cooking_each_dish_with_its_own_beats_starts_raw_and_changes_by_hand(b, port,
         check(len({h0, h1, h2}) == 3, f'{k}: drawn differently at its start, when the hands are done and at its end: {[h0, h1, h2]}')
     check(set(looks) == set(beats), f'every place with its own beats was drawn: {sorted(set(beats) - set(looks))} missing')
     check(not g.errors, g.errors[:3]); g.close()
+
+
+# ---------------------------------------------------------------- the one Jill (the user, 2026-10-09 #8)
+# docs/v24/cooking_final_decisions_2026-10-09.txt: 「Jill 是一個人，不是外場一個 Jill、廚房另一個 Jill」 — 「驗收標準：在正常遊戲的任何時間點，
+# 不可能存在兩個 Jill 同時工作。不要用單純隱藏其中一個角色的畫面來掩蓋問題，底層工作狀態也必須一致。」 Two checks run all through:
+# every room drawn at once counts Jill (at most once, and only in the room she is in), and every frame a step of hers at a
+# station may move on only while she is in the kitchen (her hands are where she is).
+ONE_JILL = r"""window.__oj={bad:[],samples:0,cnt:0,rooms:{}};
+{const DP=drawPerson;drawPerson=function(c,x,y,L,o){if(L===JILL_LOOK&&window.__ojOn)__oj.cnt++;return DP.apply(this,arguments)}}
+{const U=update;update=function(dt){const before=R?wfList().filter(n=>n.who==='jill'&&n.st==='work').map(n=>[n,n.act]):[];U(dt);if(!R)return;const J=R.jill;
+  for(const [n,a] of before)if(n.act<a-1e-9&&(J.room||'main')!=='kitchen')__oj.bad.push('her hands moved '+n.d+' on while she was in '+J.room+' (t='+R.t.toFixed(1)+')');
+  if(R.jk)__oj.bad.push('a second Jill (R.jk)');__oj.rooms[J.room||'main']=1}}
+window.__ojLook=function(){if(!R)return 0;const keep=room;const rooms=[...new Set(['main','kitchen',...roomsOpen()])];let tot=0;const where=[];
+  for(const k of rooms){room=k;__oj.cnt=0;window.__ojOn=1;try{drawScene(performance.now()/1000)}finally{window.__ojOn=0}if(__oj.cnt){tot+=__oj.cnt;where.push(k+':'+__oj.cnt)}}
+  room=keep;forceDraw=true;__oj.samples++;const J=R.jill;const at=J.rest==='sit'?'home':(J.room||'main');
+  if(tot>1)__oj.bad.push('Jill drawn '+tot+' times at once: '+where.join(' ')+' (she is in '+at+', t='+R.t.toFixed(1)+')');
+  if(tot===1&&!where[0].startsWith(at+':'))__oj.bad.push('Jill drawn in '+where[0]+' while she is in '+at+' (t='+R.t.toFixed(1)+')');
+  return tot};
+window.__ojRun=function(n,look){for(let i=0;i<n;i++){for(const q of R.groups)q.pat=1;__tick(1000/30);if(look&&i%look===0)__ojLook()}}"""
+
+
+@test
+def cooking_one_jill_finishes_her_step_then_goes_and_nothing_of_hers_moves_on_while_she_is_away(b, port, target):
+    """The one Jill, step by step (the user, 2026-10-09 #8): sent to a dirty table while her hands are on the wok, she finishes
+    that step first (「需要跨房間工作時，先妥善處理目前工作」), then walks out of the kitchen by its door; while she is out the
+    rice goes on cooking by itself (「烤箱烘烤、燉煮等工作可以依原有規則繼續計時」) and the plating she is given waits for her
+    — nothing of hers is done by an unseen second Jill; she takes the plates from the table to the tub, comes back and plates
+    it. Saved and read back while she is out, it all comes back and ends the same. Drawn once, in the room she is in."""
+    g = _day(b, port, target, 7131)
+    check(_wait_orders(g, 1), 'a table orders fried rice')
+    g.ev(ONE_JILL)
+    check(_until(g, "!R.jill.cur&&!R.jill.q.length", step=3), 'her table work done first')
+    nid = g.ev("(()=>{wfGather();const n=wfList().find(n=>n.d==='friedrice'&&wfOpen(n));if(!n)return null;R.wsel=n.id;return wfAssign(n,'jill',R.slots.find(s=>s.type==='stove'&&s.no===1))?n.id:null})()")
+    check(nid, 'the fried rice given to Jill at the first burner')
+    N = f"wfNode({nid})"
+    rooms = []
+    for _ in range(900):
+        g.ev("__ojRun(1,1)")
+        r = g.ev("R.jill.room||'main'")
+        if not rooms or rooms[-1] != r: rooms.append(r)
+        if g.ev(f"(()=>{{const n={N};return n.st==='work'&&wfHere(n)}})()"): break
+    check(rooms[-1] == 'kitchen' and 'main' in rooms, f'she walked in by the door from the dining room: {rooms}')
+    act0 = g.ev(f"{N}.act")
+    check(act0 > 0.2, f'her hands on it: {act0}')
+    g.ev("(()=>{let t=R.tables.find(t=>!t.group);if(!t){const q=R.groups.find(q=>q.table!=null&&!(q.ticket&&q.ticket.items.some(it=>it.d==='friedrice')));t=R.tables[q.table];leaveGroup(q,'ok')}t.dirty=true;t.plates=['plate','cup'];window.__ojT=t.i;tapTable(t)})()")
+    check(g.ev("R.jill.q.includes(window.__ojT)"), 'sent to a dirty table while she works the wok')
+    left_at = None
+    for _ in range(600):
+        g.ev("__ojRun(1,2)")
+        st, room_ = g.ev(f"{N}.st"), g.ev("R.jill.room||'main'")
+        if room_ != 'kitchen':
+            left_at = st; break
+    check(left_at == 'cook', f'she left only once the hands of the step were done (the rice cooking by itself): {left_at}')
+    pas0 = g.ev(f"{N}.pas")
+    g.ev("__ojRun(20,5)")
+    check(g.ev("R.jill.room||'main'") != 'kitchen' and g.ev(f"{N}.pas") < pas0, 'out of the kitchen, the rice goes on cooking')
+    check(_until(g, f"{N}.st==='ready'", step=3), 'done on the fire, waiting')
+    g.ev(f"wfAssign({N},'jill')")
+    check(g.ev(f"{N}.who") == 'jill' and g.ev(f"wfState({N})").find('接著做') >= 0 or g.ev("R.jill.room") == 'kitchen', f'plating given to her while she is out: 「接著做」 on the card: {g.ev(f"wfState({N})")!r}')
+    # saved and read back while she is out
+    snap = g.ev("JSON.stringify(snapshotService())")
+    g.ev(f"(()=>{{restoreService({{day:S.day,snap:JSON.parse({json.dumps(snap)})}})}})()")   # (the counting wraps the game's functions, not R: it carries on over the reload)
+    check(g.ev(f"R.jill.wq.includes({nid})") and g.ev(f"{N}.who") == 'jill', 'read back: the plating is still hers, in her queue')
+    for _ in range(1500):
+        g.ev("__ojRun(3,5)")
+        if g.ev(f"!{N}"): break
+    check(g.ev(f"!{N}"), 'she came back and plated it')
+    rd = g.ev("R.tickets.flatMap(tk=>tk.items).filter(it=>it.d==='friedrice'&&(it.st==='ready'||it.st==='served')).length")
+    check(rd >= 1, f'the plate is on the pass (or out): {rd}')
+    check(g.ev("ddS().n.length+(ddS().wash?1:0)+(ddS().done||0)") >= 0 and not g.ev("R.tables[window.__ojT].dirty"), 'the dirty table was cleared, its plates taken to the tub')
+    bad = g.ev("__oj.bad.slice(0,6)"); n = g.ev("__oj.samples")
+    check(not bad and n >= 40, f'drawn once, in her room, and nothing of hers moved on away from her ({n} looks): {bad}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def cooking_one_jill_through_whole_evenings_early_middle_late(b, port, target):
+    """The one Jill over whole evenings played by the test player (the kitchen and the floor both asking for her): a new game's
+    first day, the player's Day 30 save (five cooks, the cold station, the oven) and the Day 92 save (the whole crew, the
+    Lounge, the second floor). Every look at every room at once finds one Jill at most, in the room she is in; no step of hers
+    moves on while she is away from it; no second Jill exists; and each evening closes (nobody stuck)."""
+    import v24_tests as v
+    for name, save in (('day 1', None), ('day 30', 'player_day30.json'), ('day 92', 'player_day92_2105.json')):
+        g = Game(b, port, target, seed=7140, manual=True, viewport={'width': 390, 'height': 844})
+        if save:
+            v.load_save(g, save)
+            g.ev("for(let i=0;i<30;i++){if(typeof DLG!=='undefined'&&DLG)dlgNext()}"); v.to_service(g, lazy=False)
+        else:
+            g.click('[data-act=open]'); g.page.wait_for_timeout(80); start_day(g); _rt.install_bot(g)
+        g.ev(ONE_JILL)
+        for _ in range(400):
+            r = json.loads(g.ev("(()=>{const o=__bot(45,1/30);if(R&&phase==='service')__ojLook();return JSON.stringify(o)})()"))
+            if g.ev("phase") != 'service' or r['ticks'] < 45: break
+        bad = g.ev("__oj.bad.slice(0,6)"); n = g.ev("__oj.samples"); rooms = g.ev("Object.keys(__oj.rooms)")
+        check(g.ev("phase") != 'service', f'{name}: the evening closed')
+        check(not bad and n >= 50, f'{name}: one Jill, in her room, her hands only where she is ({n} looks, rooms {rooms}): {bad}')
+        check('kitchen' in rooms and 'main' in rooms, f'{name}: she was in the kitchen and in the dining room: {rooms}')
+        check(not g.errors, f'{name}: {g.errors[:3]}'); g.close()
