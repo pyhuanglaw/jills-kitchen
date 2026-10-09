@@ -3825,7 +3825,8 @@ def infrastructure_you_can_see_and_a_calmer_incident_calendar(b, port, target):
     → zoned system), 電力設施 (配電盤升級 → 商用電力增容＋備用電源), 商用洗碗機 — and a 主廳主燈 among the dreams. Each tier is
     bought in order and is a thing on a wall; the effects are light: a hot day costs less patience (×.6, ×.3, none), the
     quiet unit and the zoned system add ambience, power cuts thin out and then stop and breakdowns thin with them, the
-    same incident never comes two days running, clearing a table is quicker with the dishwasher, and guests praise the
+    same incident never comes two days running, the dishwasher washes twice as fast (since 2026-10-09 it no longer makes
+    clearing quicker — the user's #4), and guests praise the
     cooling only once there is some. The Day 35 player has these left to buy."""
     g = Game(b, port, target, seed=44, manual=True)
     raw = json.load(open(os.path.join(ROOT, 'tests', 'saves', 'player_day35.json'), encoding='utf-8'))['save']
@@ -3850,7 +3851,9 @@ def infrastructure_you_can_see_and_a_calmer_incident_calendar(b, port, target):
     r = json.loads(g.ev("(()=>{const q={type:'office',size:1,state:'wait',reg:null,table:0,seed:1};R.weather='sun';const a=drainRate(q);R.weather='hot';const h3=drainRate(q);S.ops.ac=0;const h0=drainRate(q);S.ops.ac=3;R.weather='sun';return JSON.stringify({sun:a,hot3:h3,hot0:h0})})()"))
     check(abs(r['hot3'] - r['sun']) < 1e-9 and r['hot0'] > r['sun'] * 1.05, f'a hot day is a sunny day with the zoned system: {r}')
     # the dishwasher
-    check(g.ev("(()=>{const m={lv:3};S.ops.dish=0;const a=cleanDur(m);S.ops.dish=1;const b2=cleanDur(m);return Math.abs(b2-a*.7)<1e-9})()"), 'clearing is 30% quicker with the dishwasher')
+    # 2026-10-09 (the user's #4, docs/v24/cooking_final_decisions_2026-10-09.txt): the dishwasher washes (twice as fast) and that
+    # is all — clearing a table is as quick as whoever clears it (a cleaner's own level), the big cart is 大髒盤車
+    check(g.ev("(()=>{const m={lv:3};S.ops.dish=0;const a=cleanDur(m),w0=washT('c1');S.ops.dish=1;const b2=cleanDur(m),w1=washT('c1');return Math.abs(b2-a)<1e-9&&Math.abs(w1-w0*.5)<1e-9})()"), 'the dishwasher washes twice as fast and does not change clearing')
     # incidents: power cuts thin then stop, breakdowns thin, nothing repeats the day after
     stats = json.loads(g.ev(r"""(()=>{const mr=Math.random;const rng0=(seed)=>{let a=seed;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}};
      const count=(pw,last)=>{S.ops.power=pw;S.incLast=last||{};Math.random=rng0(7);const c={power:0,broken:0,rowdy:0,n:0};for(let i=0;i<600;i++){for(const e of planIncidents(250)){c[e.k]=(c[e.k]||0)+1}c.n++}return c};

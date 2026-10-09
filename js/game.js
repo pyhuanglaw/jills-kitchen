@@ -308,7 +308,8 @@ const OPS=[
  /* v2.2.1 J (#14, #15, Day 35 #2/#3): infrastructure you can see — each tier is a thing on a wall, not a number */
  {k:'ac',n:'空調',tiers:[14000,38000,95000],lv:2,d:t=>['基本冷氣：主廳牆上一台冷氣。熱天客人的耐心少扣一半。','靜音商用空調：換成一台安靜的商用機，熱天幾乎不影響客人；客人會注意到；店裡氛圍 +1。','分區恆溫系統：主廳、側廳各自恆溫，熱天完全不影響；氛圍再 +2。'][t-1]},
  {k:'power',n:'電力設施',tiers:[18000,48000],lv:3,d:t=>t===1?'配電盤升級：廚房牆上一面新的配電盤。跳電少一半、不會連續兩天跳電，設備故障少 25%。':'商用電力增容＋備用電源：不再跳電；設備故障再少一半。'},
- {k:'dish',n:'商用洗碗機',tiers:[32000],lv:4,d:()=>'後場一台商用洗碗機：洗碗快一倍，髒盤車放得下 20 個，收桌快 30%。'},   /* Workflow B: it washes now (pending the user's word, WORKFLOW_B.md §8) */
+ {k:'cart',n:'大髒盤車',tiers:[8000],lv:3,d:()=>'水槽前換一台大的髒盤車：放得下 20 個髒盤子（原本 10 個），車滿、吃完的桌子要等的時候少很多。'},   /* 2026-10-09 #4 (the user): the 20 the dishwasher used to bring is an upgrade of its own — cheap, mid-game */
+ {k:'dish',n:'商用洗碗機',tiers:[32000],lv:4,d:()=>'後場一台商用洗碗機：洗碗快一倍。'},   /* 2026-10-09 #4 (the user): it washes — twice as fast — and that is all: the bigger cart is 大髒盤車 now, and clearing a table is as quick as whoever clears it (a cleaner's own level) */
  {k:'pantry',n:'Bar 小廚／油炸站',tiers:[60000],lv:5,need:()=>loungeLv()>=3,d:()=>'廚房多一口爐和一台油炸機，專做 Lounge 的小食：爐台多一個位子，炸物、可樂餅、小食做得快 20%。不是第二個廚房——主菜、招牌菜還是那條線。'},   /* v2.3: optional, late, only once the Lounge is big */
 ];
 function opsLv(k){return(S.ops&&S.ops[k])||0}
@@ -653,6 +654,8 @@ function dlgAuditMig(o){if(o.dlgAudit)return o;o.dlgAudit=1;o.regMem=o.regMem||{
  for(const [id,k,share] of heard){if(((o.regulars||{})[id]||0)<12)continue;const st=M(share);st.flags=st.flags||{};st.cb=st.cb||{};if(!st.cb[k])st.cb[k]=o.day}
  for(const [id,flag,txt] of [['mia','moved','搬家了，還是會來。'],['chen','students','以前的學生來看他，都當爸爸了。']]){const m=M(id);m.flags=m.flags||{};const f=(m.facts||[]).find(x=>x.txt===txt);if(f&&!m.flags[flag])m.flags[flag]=Math.max(2,f.day)}
  return o}
+/* 2026-10-09 #4: a save from before has its big cart with the dishwasher (the 20 came with it): it keeps it, as 大髒盤車 — the restaurant does not get slower overnight; said once on the prep screen */
+function cartMig(o){if(o.cartMig)return o;o.cartMig=1;o.ops=o.ops||{};if(o.ops.dish&&!o.ops.cart){o.ops.cart=1;o.news=o.news||[];o.news.push('<b>大髒盤車</b>：商用洗碗機現在只管把碗洗得快一倍；放得下 20 個的大髒盤車變成一項自己的升級（店舖工程・營運升級）。你的店已經有洗碗機，大髒盤車也一起留著。')}return o}
 function parseSave(t){let o;try{o=JSON.parse(t)}catch(e){return{err:'notjson'}}
  let photos=null;if(o&&typeof o==='object'&&o.app===BACKUP_APP&&o.save&&typeof o.save==='object'){if(o.photos&&typeof o.photos==='object')photos=o.photos;o=o.save}   /* a backup file wraps the save (and its pictures) */
  else if(o&&typeof o==='object'&&typeof o[KEY]==='string'){try{o=JSON.parse(o[KEY])}catch(e){return{err:'notjson'}}}   /* a raw localStorage dump */
@@ -660,7 +663,7 @@ function parseSave(t){let o;try{o=JSON.parse(t)}catch(e){return{err:'notjson'}}
  if(typeof o.v!=='number'||o.v%1)return{err:'notsave'};
  if(!(typeof o.day==='number'&&typeof o.money==='number'&&Array.isArray(o.unlocked)&&Array.isArray(o.menu)))return{err:'notsave'};
  if(o.v<1)return{err:'notsave'};if(o.v>SAVE_V)return{err:'newer',v:o.v};
- try{for(let n=o.v;n<SAVE_V;n++){MIGRATE[n](o);o.v=n+1}o=srLeaseMig(linDecMig(linMig(evanMig(giftTagMig(crewPoolMig(dlgAuditMig(crewNameFix(mainHallMig(legacyWang(legacyCrew(fillDefaults(o))))))))))))}catch(e){return{err:'broken'}}if(STORY_READY){try{beatLinesMig(o)}catch(e){console.warn('[beatLines]',e)}try{kenIllusMig(o)}catch(e){console.warn('[kenIllus]',e)}}   /* a save loaded in play; the first one is cleaned at boot, when every story's code is there */
+ try{for(let n=o.v;n<SAVE_V;n++){MIGRATE[n](o);o.v=n+1}o=cartMig(srLeaseMig(linDecMig(linMig(evanMig(giftTagMig(crewPoolMig(dlgAuditMig(crewNameFix(mainHallMig(legacyWang(legacyCrew(fillDefaults(o)))))))))))))}catch(e){return{err:'broken'}}if(STORY_READY){try{beatLinesMig(o)}catch(e){console.warn('[beatLines]',e)}try{kenIllusMig(o)}catch(e){console.warn('[kenIllus]',e)}}   /* a save loaded in play; the first one is cleaned at boot, when every story's code is there */
  if(!(o.day>=1&&isFinite(o.money)&&o.unlocked.every(d=>typeof d==='string')&&o.menu.every(d=>typeof d==='string')&&Array.isArray(o.crew)&&o.dylan&&typeof o.dylan==='object'))return{err:'broken'};
  o.day=Math.max(1,Math.floor(o.day));o.money=Math.round(o.money);return{o,photos}}
 /* rc7.2 (22:49): a save that already has Sophie's pad is shown, once, which one it is (a new gift's tag, that day and the next) */
@@ -5232,7 +5235,7 @@ function arriveAct(){const J=R.jill;if(J.restTo){J.restTo=false;J.sit=true;J.fac
  if(g&&g.ticket&&J.hands.length){const mine=handsFor(J,g.ticket);if(mine.length){serveItems(g,mine);handsTake(J,g.ticket);busy=Math.max(busy,.4)}}
  if(g&&g.reg==='dylan'&&!g.said&&(J.cur.step==='table')&&(g.state==='check'||(g.ticket&&g.ticket.items.some(i=>i.st==='served')))&&Math.random()<.6){g.said=1;speakLater(()=>{if(R&&phase==='service'&&R.groups.includes(g)){if(g.back&&Math.random()<.5)quote(g,'剛才太滿了，繞了一圈再回來。');else if(Math.random()<.55)dylanAct(g);else quote(g,dylanLine())}},600)}
  if(g&&g.state==='check'){if(g.gift)regGift(g,t);jillFarewell(g);regularNote(g);collect(g);busy=Math.max(busy,.5)}
- if(clearing&&!t.group&&t.dirty){const k=ddCollect(J,t,carryCap('jill'));if(k<0){toast('廚房的髒盤區滿了：到廚房點髒盤車，安排人洗。');busy=Math.max(busy,.2)}else{busy=Math.max(busy,opsLv('dish')?.35:.55);sfx.clear();if(!t.dirty)coach(7)}}   /* Workflow B: into her hands, as many as fit and as the tub has room for */
+ if(clearing&&!t.group&&t.dirty){const k=ddCollect(J,t,carryCap('jill'));if(k<0){toast('廚房的髒盤區滿了：到廚房點髒盤車，安排人洗。');busy=Math.max(busy,.2)}else{busy=Math.max(busy,.55);sfx.clear();if(!t.dirty)coach(7)}}   /* Workflow B: into her hands, as many as fit and as the tub has room for */
  J.hands=J.hands.filter(c=>c.k!=='dish'||R.tickets.includes(c.tk));J.busy=busy||.08;J.cur.done=true}
 /* What still needs Jill herself right now. Staff who cover a job take it off her plate, which is how
    hiring people turns into free time for her — no employee-count bonus anywhere. */
@@ -5402,6 +5405,11 @@ function tapTable(t){const g=t.group;if(R.jill.visit&&!jillTargets(t.i))cancelVi
  if(g&&g.state==='eat'){toast('客人正在享用中');return}
  if(g&&g.state==='wait'&&!tableActionable(t)){toast('料理還沒好，先去廚房做菜吧');return}
  if(!g&&t.dirty&&ddUnits(t)&&ddFree()<=0){toast('廚房的髒盤區滿了：到廚房點髒盤車，安排人洗。');return}   /* Workflow B: no room for its dishes yet — the table waits */
+ if(!g&&t.dirty&&t.claim&&t.claim!=='jill'&&!jillTargets(t.i)){/* 2026-10-09 #6 (the user: 「不再自動派 Jill 去搶同一份工作」): someone is on it — said, not doubled; a second tap within a few seconds gives it to Jill instead, and they let it go and find other work */
+  const id=t.claim,w=id==='xq'?R.xqh:R.cw&&R.cw[id],who=id==='xq'?'秀琴阿姨':((S.crew||[]).find(m=>m.id===id)||{}).name||'員工';
+  const going=!!(w&&w.task&&w.task.k==='clean'&&w.task.t===t&&(w.moving||Math.hypot(w.x-w.task.x,w.y-w.task.y)>4));
+  if(going&&R.reTap&&R.reTap.t===t.i&&R.t-R.reTap.at<4){w.task=null;w.cd=.3;t.claim=null;R.reTap=null;jillAsk(t.i);if(R.jill.rest)endRest();toast(`改由 Jill 收拾，${who}去忙別的。`);sfx.tap();return}
+  R.reTap={t:t.i,at:R.t};toast(going?`${who}正在過去收拾。再點一次，改由 Jill 收拾。`:`${who}正在收拾這一桌。`);return}
  if(jillTargets(t.i))return;jillAsk(t.i);if(R.jill.rest)endRest();sfx.tap()}
 
 /* ---- staff ---- */
@@ -8038,9 +8046,9 @@ let wfGuideEl=null,wfGuideHTML='',wfHelpEl=null,wgSel=null;
 function wfGuideShow(n,why){if(!R||!n)return;R.wg={id:n.id,until:performance.now()+4000,why};wfGuideUpd()}
 function wfGuideHide(){if(R)R.wg=null;wfGuideUpd()}
 function wfGuideUpd(){if(!wfGuideEl){const w=$('#sceneWrap');if(!w)return;wfGuideEl=document.createElement('div');wfGuideEl.id='wfGuide';wfGuideEl.hidden=true;const t=$('#toasts');if(t&&t.parentNode===w)w.insertBefore(wfGuideEl,t);else w.appendChild(wfGuideEl);
-  wfGuideEl.addEventListener('click',e=>{if(e.target.closest('.wgx')){e.stopPropagation();sfx.tap();wfGuideHide()}});
+  wfGuideEl.onclick=e=>{if(e.target.closest('.wgx')){e.stopPropagation();sfx.tap();wfGuideHide()}};   /* (one handler each, set once: onclick, not another listener on every service) */
   wfHelpEl=document.createElement('button');wfHelpEl.id='wfHelp';wfHelpEl.type='button';wfHelpEl.textContent='說明';wfHelpEl.hidden=true;w.insertBefore(wfHelpEl,wfGuideEl.nextSibling);
-  wfHelpEl.addEventListener('click',e=>{e.stopPropagation();const n=R&&R.wsel?wfNode(R.wsel):null;if(n){sfx.tap();wfGuideShow(n,'ask')}})}
+  wfHelpEl.onclick=e=>{e.stopPropagation();const n=R&&R.wsel?wfNode(R.wsel):null;if(n){sfx.tap();wfGuideShow(n,'ask')}}}
  const n=R&&phase==='service'&&R.wsel?wfNode(R.wsel):null;
  if(!n){wgSel=null;if(R&&R.wg)R.wg=null;if(!wfGuideEl.hidden)wfGuideEl.hidden=true;if(!wfHelpEl.hidden)wfHelpEl.hidden=true;return}
  if(R.wsel!==wgSel){wgSel=R.wsel;const b=baseOf(n.d);const T=S.wfTaught||(S.wfTaught={});if(!T[b]){T[b]=1;R.wg={id:n.id,until:performance.now()+4000,why:'teach'}}else if(R.wg&&R.wg.id!==n.id)R.wg=null}   /* the first time a dish is picked: once */
@@ -11642,7 +11650,7 @@ function chefHandles(s){const j=s.job;if(!j)return null;if(j.chef){/* 2.0: the c
 function chefDelay(m){return Math.max(.45,1.5-.22*(m.lv-1))}
 function chefScore(m){return[.8,.86,.9,.95,1][m.lv-1]}
 function waiterDelay(m){return Math.max(.3,2.2-.4*(m.lv-1))*(projOn('pass')?.85:1)}
-function cleanDur(m){return Math.max(.3,1.3-.22*(m.lv-1))*(opsLv('dish')?.7:1)}   /* v2.2.1 J: the dishwasher takes the scraping out of clearing */
+function cleanDur(m){return Math.max(.3,1.3-.22*(m.lv-1))}   /* a cleaner's own level (2026-10-09 #4: the dishwasher's 30% quicker clearing is gone — it washes; the user: 「若目前沒有適合的既有機制，先取消這項加成」) */
 function crewStat(m){return m.role==='chef'?`每步 ${chefDelay(m).toFixed(1)} 秒・品質 ${Math.round(chefScore(m)*100)}`:m.role==='waiter'?`一次端 ${carryCap(m)} 盤${waiterWays(m).tables>1?`、一趟送 ${waiterWays(m).tables} 桌`:''}・反應 ${waiterDelay(m).toFixed(1)} 秒`:m.role==='bartender'?`一杯 ${Math.max(.9,2.4-.3*m.lv).toFixed(1)} 秒`:`收桌 ${cleanDur(m).toFixed(1)} 秒`}
 /* hash() is unsigned 32-bit: shift with >>> — a signed >> turns half of all ids negative, HAIR[-2] is undefined and the first draw of that employee throws (and with it the whole frame loop) */
 const LOUNGE_LOOKS={Evan:{skin:'#E2AE88',hair:'#1E1E24',hs:24,beard:'stubble',top:'#1E1E22',apron:'#5A3E28',pants:'#2E2B33'},'沈晴':{skin:'#F6D3B5',hair:'#2B1D16',hs:25,ear:'hoop',earc:'#D8B66A',top:'#1E1E22',apron:'#3A2C26',pants:'#2E2B33'},'阿拓':{skin:'#EDC19C',hair:'#1E1E24',hs:26,top:'#EFEBE3',apron:'#3E3A36',pants:'#2E2B33'},'安安':{skin:'#F6D3B5',hair:'#2B1D16',hs:2,top:'#1E1E22',apron:'#3A2C26',pants:'#2E2B33'},'許葳':{skin:'#F6D3B5',hair:'#1A1716',hs:1,top:'#4A4845',apron:'#1E1E22',pants:'#1E1E22'}};   /* 許葳 (rc5): dark hair tied low, the dark grey work shirt, a black waist apron */   /* v2.3: the four are their own people. v2.4 rc5 (the player, 18:32 「Evan是男的吧」): Evan had style 2, Sophie's long hair — he has his portrait's dark waves now; 安安 her long hair, not a bun */
@@ -11745,8 +11753,11 @@ function serveAtTable(m,w,tk){const T=tk.tk;const mine=handsFor(w,T);
  /* on the way back (「回程發現兩桌吃完 → 收一批 dirty dishes → 一次帶回廚房」): a waiter from LV3 who clears tables takes a finished
     table near the last one he served, if the tub has room — on the way back, whether or not 收桌 is one of his jobs (收桌 on the
     board is going out to clear tables; this is what he picks up passing by, the user's 「回程發現兩桌吃完」) */
- if(waiterWays(m).tables>1&&ddFree()>0&&tk.t){const t0=tk.t;let best=null,bd=140;for(const t of R.tables){if(!ddCanClear(t)||!ddUnits(t)||t.claim||jillTargets(t.i)||(t.room||'main')!==(t0.room||'main'))continue;const d=Math.hypot(t.x-t0.x,t.y-t0.y);if(d<bd){bd=d;best=t}}
-  if(best){const ct=ddCleanTask(m,w,best);if(ct){crewCount(m,'serve');w.task=ct;w.busy=0;return true}}}
+ /* 2026-10-09 #7 (the user: 「此行為應當自然、可被玩家偶爾觀察到，而不是一晚幾乎完全不發生」): from LV2 and within 220 (it was LV3
+    and 140) — but only while the pass is not piling up (serving comes first), and never a table a cleaner is already on her
+    way to (its claim) */
+ if((m.lv||1)>=2&&ddFree()>0&&tk.t&&passLoad()<.6){const t0=tk.t;let best=null,bd=220;for(const t of R.tables){if(!ddCanClear(t)||!ddUnits(t)||t.claim||jillTargets(t.i)||(t.room||'main')!==(t0.room||'main'))continue;const d=Math.hypot(t.x-t0.x,t.y-t0.y);if(d<bd){bd=d;best=t}}
+  if(best){const ct=ddCleanTask(m,w,best);if(ct){crewCount(m,'serve');w.task=ct;w.busy=0;R.st.wayBack=(R.st.wayBack||0)+1;return true}}}
  return false}
 /* the evening's trips, for the simulation's numbers (R.st.wb, kept with the day): how many, how many plates in hand, the
    biggest hand, trips by plates (1, 2, 3, 4+), and how many served more than one table */
@@ -11758,10 +11769,10 @@ function waiterTrip(items,tables){const s=R.st.wb||(R.st.wb={trips:0,items:0,max
    sink. The tub holds 10 (ddCap). Full, a table that needs clearing waits for room — nothing vanishes, no clean plates are
    counted, plating never waits for a plate (「Dirty Dish Capacity 不等於 clean plate inventory」). At the sink they are washed
    one by one and are out of the count, onto the rack the plating takes its plates from. */
-const DD_CAP=[10,20];   /* Dirty Dish Area I, and II with the 商用洗碗機 (its rack and landing table) — the simulation 2026-10-08
+const DD_CAP=[10,20];   /* Dirty Dish Area I, and II with 大髒盤車 (2026-10-09 #4: an upgrade of its own; before, it came with the 商用洗碗機) — the simulation 2026-10-08
    (docs/cooking/WORKFLOW_B.md §9): the Day 52 restaurant, nobody stepping in, served a fifth fewer guests at 10; with the machine's
    faster washing and 20 it is within a few. III: not until a restaurant needs it (「不要現在硬鎖 10 → 15 → 20，除非資料支持」) */
-function ddLv(){return opsLv('dish')?1:0}
+function ddLv(){return opsLv('cart')?1:0}   /* 大髒盤車 (2026-10-09 #4; it came with the dishwasher before) */
 function ddCap(){return DD_CAP[Math.min(DD_CAP.length-1,ddLv())]}
 function ddS(){if(!R)return{n:[],wash:null,rack:0};return R.dd||(R.dd={n:[],wash:null,rack:0})}
 /* what a dish comes back as: a cup, a glass, a bowl or a plate — one unit each, one tub for all (「先不要拆兩套 inventory」) */
@@ -12125,7 +12136,7 @@ function guideLines(t){const out=[];let d=0,cur='';for(const ch of t){cur+=ch;if
 const GUIDE=[   /* the manual describes the game as it is. Audited every release (docs/RELEASE_CHECKLIST.md) — in progress, not released: v2.5 料理 (feature/cooking-gameplay), 2026-10-09 (營業中 › Jill 只有一個: one Jill, one place at a time, in the order asked — the user's decision #8; 營業中 › 飲料: every cup its own; how many at once is the coffee machine's, 1 → 2 → 4), 2026-10-08 (the new kitchen: 一天怎麼玩 › 營業中 says how a dish goes now — the ticket's dish, the lit place, the flow in small type, a done step waits, and when it is to be plated the dish itself is lit (2026-10-08: plating happens where the food is) — instead of the old station panel; 員工 says a cook takes only the places he knows, and — Workflow B, 2026-10-08 — that a waiter carries two plates and more, to more tables, as he grows; and a point of its own, 髒盤子: the dishes go back to the cart by the sink, ten at most, tap it for washing) — last: v2.4 rc8.8, 2026-10-07 (the room's lit tab says whose it is once Dylan is out and his name is over him there; 怎麼進去 already says only 「房間分頁的最後一個」 and the tab list gives the short names: checked, no line changed) — before: v2.4 rc8.7, 2026-10-07 (story first: the Lounge's people — 沈晴、阿拓 from Lounge I, 安安、許葳 with II; no level, rating or Lounge II for the Lounge, the piano, 予安 or the floor, and the manual names none; checked, that one line changed) — before: v2.4 rc8.6, 2026-10-07 (the stock rule as the game plays it: from Day 3 a dish with nothing in the fridge cannot be ordered; Jill orders one herself only on the first two days); the rewrite of 2026-10-06 from docs/audit/2026-10-06/ws5_manual.md: the first card is how a day is played; only what the screen does not tell and a player needs to know stays (what the screen already says, how the game was built, old saves and stories still to come left it); a space, and a story's own entry, comes into it when it is there */
  {ic:"🍳",h:"一天怎麼玩",sum:"第一次玩，先看這一張。",pts:[
   ["一天","開店前選今天的菜單、備料 → 17:00 開店 → 21:30 打烊，客人吃完就結算 → 用今天賺的錢在商店買東西 → 準備下一天。前兩天開店時，遊戲會自動幫你補好備料（照價付）。"],
-  ["髒盤子","收桌時，盤子、杯子會被拿回廚房，放進水槽前的髒盤車（最多 10 個；有商用洗碗機 20 個）。車滿了，吃完的桌子要等：點髒盤車，就有人去洗。清潔員和秀琴阿姨會自己洗，服務生快滿了才洗。"],
+  ["髒盤子","收桌時，盤子、杯子會被拿回廚房，放進水槽前的髒盤車（最多 10 個；換了大髒盤車 20 個）。車滿了，吃完的桌子要等：點髒盤車，就有人去洗。清潔員和秀琴阿姨會自己洗，服務生快滿了才洗。"],
   ["營業中","客人會自己找空桌坐。桌上出現紅色「!」：點桌子點餐。到廚房點訂單上的菜，它下一步的位置會亮起來，點那裡 Jill 就去做；裝盤、送飲料時亮的是菜或飲料本身。菜下的小字是流程，粗體是現在這站，小名字是誰在做；做好的一站在原地等，不會壞。銀色餐蓋：點桌子上菜。金幣：點桌子收錢；客人走了再點一次收桌。"],
   ["員工","請了廚師、服務生、清潔員，他們會自己接工作；廚師只接自己會的位置（員工頁寫著每個人的）。廚師還在走過去時，點他要去的位置就換 Jill 做。服務生一次端兩盤起，等級越高端越多、一趟送越多桌。Jill 有空時會回房間坐一下，你點桌子她就回來。"],
   ["故事","重要的故事發生時，店裡會整個停住；一句一句點著看完，店才接著營業。錯過的都在「餐廳日誌」。"],

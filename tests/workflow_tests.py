@@ -320,3 +320,70 @@ def workflow_the_cart_shows_how_full_it_is(b, port, target):
     s = g.ev("SV.s")
     check(40 * s >= 40 and 44 * s >= 40, f'the cart is a big enough place to tap: {40 * s:.0f} × {44 * s:.0f} px')
     check(not g.errors, g.errors[:3]); g.close()
+
+
+# ---------------------------------------------------------------- the user's decisions of 2026-10-09 (#4, #6, #7)
+
+@test
+def workflow_the_dishwasher_washes_and_the_big_cart_is_its_own(b, port, target):
+    """The user, 2026-10-09 #4 (docs/v24/cooking_final_decisions_2026-10-09.txt): the 商用洗碗機 washes twice as fast and that
+    is all — no bigger cart, no quicker clearing; the bigger cart (10 → 20) is 大髒盤車, a cheap mid-game upgrade ($8,000,
+    from Jill's Restaurant) in the shop's 營運升級, bought with the same button as the others. A save from before that has
+    the dishwasher keeps its 20 (as 大髒盤車), told once; one without keeps 10."""
+    g = _dirty_day(b, port, target, 9311)
+    o = json.loads(g.ev("JSON.stringify(OPS.find(o=>o.k==='cart'))"))
+    check(o and o['tiers'] == [8000] and o['lv'] == 3, f'大髒盤車: $8,000, from level 3: {o}')
+    caps = json.loads(g.ev("(()=>{const r=[];for(const [d,c] of [[0,0],[1,0],[0,1],[1,1]]){S.ops.dish=d;S.ops.cart=c;r.push(ddCap())}S.ops.dish=0;S.ops.cart=0;return JSON.stringify(r)})()"))
+    check(caps == [10, 10, 20, 20], f'the cart holds 10, 20 with 大髒盤車, whatever the dishwasher: {caps}')
+    w = json.loads(g.ev("(()=>{const m={lv:2};S.ops.dish=0;const a=[washT('c1'),cleanDur(m)];S.ops.dish=1;const b2=[washT('c1'),cleanDur(m)];S.ops.dish=0;return JSON.stringify([a,b2])})()"))
+    check(abs(w[1][0] - w[0][0] * .5) < 1e-9 and abs(w[1][1] - w[0][1]) < 1e-9, f'the dishwasher: washing in half the time, clearing as before: {w}')
+    texts = json.loads(g.ev("JSON.stringify({dish:OPS.find(o=>o.k==='dish').d(1),cart:OPS.find(o=>o.k==='cart').d(1),guide:JSON.stringify(GUIDE)})"))
+    check('洗碗快一倍' in texts['dish'] and '20' not in texts['dish'] and '收桌' not in texts['dish'], f'the dishwasher card says washing only: {texts["dish"]!r}')
+    check('20' in texts['cart'] and '大髒盤車 20 個' in texts['guide'], f'the cart card and the manual say 20 with 大髒盤車: {texts["cart"]!r}')
+    # bought with the shop's button
+    g.ev("R=null;phase='shop';S.day=10;S.level=3;S.money=20000;showShop();shopTab='works';showShop()"); g.page.wait_for_timeout(60)   # (店舖工程 opens on Day 3)
+    check(g.ev("!!document.querySelector('[data-act=buyOps][data-k=cart]')"), '大髒盤車 for sale in 店舖工程')
+    m0 = g.ev("S.money"); g.click('[data-act=buyOps][data-k=cart]'); g.page.wait_for_timeout(60)
+    check(g.ev("opsLv('cart')") == 1 and g.ev("S.money") == m0 - 8000 and g.ev("ddCap()") == 20, 'bought: $8,000, the cart holds 20')
+    # a save from before
+    olds = json.loads(g.ev("""(()=>{const base=JSON.parse(localStorage.getItem(KEY));const a=Object.assign({},base,{ops:{dish:1},cartMig:undefined,news:[]});delete a.cartMig;
+      const b2=Object.assign({},base,{ops:{},news:[]});delete b2.cartMig;const ra=parseSave(JSON.stringify(a)),rb=parseSave(JSON.stringify(b2));
+      return JSON.stringify({a:ra.o.ops,an:ra.o.news.filter(x=>x.includes('大髒盤車')).length,b:rb.o.ops,bn:rb.o.news.filter(x=>x.includes('大髒盤車')).length,again:parseSave(JSON.stringify(ra.o)).o.news.filter(x=>x.includes('大髒盤車')).length})})()"""))
+    check(olds['a'].get('cart') == 1 and olds['an'] == 1, f'a save with the dishwasher keeps the 20 (大髒盤車), told once: {olds}')
+    check(not olds['b'].get('cart') and olds['bn'] == 0, f'a save without keeps 10, nothing said: {olds}')
+    check(olds['again'] == 1, f'read again, it is not told twice: {olds}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def workflow_a_table_someone_is_going_to_clear_is_not_given_to_jill_too(b, port, target):
+    """The user, 2026-10-09 #6: a dirty table a cleaner (or 秀琴阿姨) is already on her way to — tapped, it says so (「阿芳正在
+    過去收拾。再點一次，改由 Jill 收拾。」) and Jill is not sent to race her for it; her trip goes on. Tapped again within a few
+    seconds, Jill takes it: the cleaner lets it go (her task and her place in the tub are released) and finds other work —
+    never two people on their way to one table."""
+    g = _dirty_day(b, port, target, 9321)
+    ti = g.ev(DIRTY + "(2,2)")
+    ok = False
+    for _ in range(60):
+        g.ev(TICK + "(1)")
+        if g.ev("(()=>{const w=R.cw.c1;return !!(w&&w.task&&w.task.k==='clean'&&w.task.t===R.tables[%d]&&w.moving)})()" % ti): ok = True; break
+    check(ok, 'the cleaner is on her way to the table')
+    g.ev("tapTable(R.tables[%d])" % ti)
+    msg = g.ev("[...document.querySelectorAll('#toasts .toast')].map(e=>e.textContent).join(' ')")
+    check('阿芳正在過去收拾' in msg and '改由 Jill 收拾' in msg, f'it says who is on it: {msg!r}')
+    check(not g.ev("jillTargets(%d)" % ti) and g.ev("R.cw.c1.task&&R.cw.c1.task.t===R.tables[%d]" % ti), 'Jill is not sent; the cleaner goes on')
+    on_way0 = g.ev("ddOnTheWay()")
+    g.ev(TICK + "(3)")
+    g.ev("tapTable(R.tables[%d])" % ti)
+    check(g.ev("jillTargets(%d)" % ti) and g.ev("R.tables[%d].claim" % ti) is None, 'tapped again: Jill has it, the claim let go')
+    check(not g.ev("R.cw.c1.task&&R.cw.c1.task.k==='clean'&&R.cw.c1.task.t===R.tables[%d]" % ti), 'the cleaner let it go')
+    check(g.ev("ddOnTheWay()") < on_way0, f'her place in the tub released: {on_way0} → {g.ev("ddOnTheWay()")}')
+    both = False
+    for _ in range(300):
+        g.ev(TICK + "(2)")
+        w_on = g.ev("(()=>{const w=R.cw.c1;return !!(w&&w.task&&w.task.k==='clean'&&w.task.t===R.tables[%d])})()" % ti)
+        if w_on and g.ev("jillTargets(%d)" % ti): both = True
+        if not g.ev("R.tables[%d].dirty" % ti): break
+    check(not both, 'never two people on their way to it')
+    check(not g.ev("R.tables[%d].dirty" % ti), 'Jill cleared it')
+    check(not g.errors, g.errors[:3]); g.close()
