@@ -1,0 +1,76 @@
+The forty days from the player's Day 52 save (tests/v24_tests.py v24_day52_save_plays_the_stories_in_order_over_forty_days),
+fourteen seed bases on two builds. The day each beat happened; from 7700 on, each evening counted too (the day's summary:
+guests served, lost, angry, the average wait, the takings — averaged over the forty evenings).
+Targets, as the test checks them (docs/v24/pacing_correction_2026-10-01.txt; first played day = 53): 怡君 moves in within
+about ten days (yj_key - yj_meet <= 9 and yj_key <= 63); the wall begins Day 62-66; it settles within 18 days of beginning
+and by Day 82; every beat (the article last) within the forty days.
+Tool: tools/sims/day52_seeds.py ROOT SEEDBASE (the test's own loop), each build in its own worktree. Run 2026-10-08 23:52 -
+2026-10-09 00:25, four at a time (the regression's last part, then the routine QA, alongside).
+Why: the final regression of 2026-10-09 (114d5fb) failed the test on its seed base 7600: 怡君 got her key on Day 63, the wall
+began on Day 68, settled on Day 90, and the article did not come in the forty days. Run again on the same code with
+less beside it: the same days, so not the machine's load. Seed 7600 bisected: 9f86680 (the session's start: 61, 64, 80, 83), 2a9d1eb (every drink its
+own cup: 61, 63, 79, 82) and eac1f28 (the fifth batch: 61, 63, 79, 82) meet every target; b1bdfe2 (the sixth batch) is the
+first that does not. The sixth batch adds no simulation code; what moves is the cooks: the signature main has its own beats
+now, so the cook who puts it on the fire stays at the stove with it while he has nothing else to do (wfChefAttend, since the
+first batch; a cook standing there is still free for the next piece of work, wfStaff), and every evening's walks and timings
+move with him. The Day 52 save serves the signature main (menuList puts it first).
+
+== eac1f28 (the fifth batch)
+7000: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 82 (18 days), wall_article 85 (+3)  — meets every target
+7100: yj_meet 53, yj_key 61, wall_worry 63, wall_settle 79 (16 days), wall_article 82 (+3)  — meets every target
+7200: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 82 (18 days), wall_article 85 (+3)  — meets every target
+7300: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 82 (18 days), wall_article 85 (+3)  — meets every target
+7400: yj_meet 53, yj_key 63, wall_worry 66, wall_settle 85 (19 days), wall_article 88 (+3)  — misses: the move within ten days, by 82 / within 18 days
+7500: yj_meet 53, yj_key 61, wall_worry 63, wall_settle 79 (16 days), wall_article 82 (+3)  — meets every target
+7600: yj_meet 53, yj_key 61, wall_worry 63, wall_settle 79 (16 days), wall_article 82 (+3)  — meets every target
+7700: yj_meet 54, yj_key 63, wall_worry 68, wall_settle 84 (16 days), wall_article 87 (+3)  — misses: the wall in 62-66, by 82 / within 18 days
+      evenings: 84.7 guests, 36.4 lost, 3.7 angry, wait 92.3, takings $63,819 a night
+7800: yj_meet 53, yj_key 63, wall_worry 65, wall_settle 80 (15 days), wall_article 83 (+3)  — misses: the move within ten days
+      evenings: 84.4 guests, 36.7 lost, 3.9 angry, wait 91.8, takings $63,890 a night
+7900: yj_meet 53, yj_key 63, wall_worry 67, wall_settle 83 (16 days), wall_article 87 (+4)  — misses: the move within ten days, the wall in 62-66, by 82 / within 18 days
+      evenings: 85.5 guests, 39.5 lost, 3.8 angry, wait 92.6, takings $64,158 a night
+8000: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 85 (21 days), wall_article 88 (+3)  — misses: by 82 / within 18 days
+      evenings: 85.3 guests, 37.0 lost, 3.9 angry, wait 91.5, takings $64,740 a night
+8100: yj_meet 53, yj_key 61, wall_worry 63, wall_settle 80 (17 days), wall_article 83 (+3)  — meets every target
+      evenings: 83.2 guests, 38.4 lost, 4.9 angry, wait 91.8, takings $63,484 a night
+8200: yj_meet 53, yj_key 61, wall_worry 63, wall_settle 78 (15 days), wall_article 81 (+3)  — meets every target
+      evenings: 84.5 guests, 38.2 lost, 4.0 angry, wait 91.9, takings $64,528 a night
+8300: yj_meet 54, yj_key 63, wall_worry 65, wall_settle 81 (16 days), wall_article 84 (+3)  — meets every target
+      evenings: 82.2 guests, 38.4 lost, 4.3 angry, wait 92.2, takings $62,331 a night
+   every target: 9 of 14; the key on Day 63: 5 of 14
+
+== the sixth batch (b1bdfe2; 47dc17b and later: the same simulation, the knife fix is drawing only)
+7000: yj_meet 53, yj_key 63, wall_worry 67, wall_settle 84 (17 days), wall_article 87 (+3)  — misses: the move within ten days, the wall in 62-66, by 82 / within 18 days
+7100: yj_meet 53, yj_key 61, wall_worry 63, wall_settle 79 (16 days), wall_article 82 (+3)  — meets every target
+7200: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 79 (15 days), wall_article 82 (+3)  — meets every target
+7300: yj_meet 53, yj_key 61, wall_worry 63, wall_settle 80 (17 days), wall_article 83 (+3)  — meets every target
+7400: yj_meet 53, yj_key 63, wall_worry 68, wall_settle 84 (16 days), wall_article 89 (+5)  — misses: the move within ten days, the wall in 62-66, by 82 / within 18 days
+7500: yj_meet 53, yj_key 63, wall_worry 68, wall_settle 84 (16 days), wall_article 87 (+3)  — misses: the move within ten days, the wall in 62-66, by 82 / within 18 days
+7600: yj_meet 53, yj_key 63, wall_worry 68, wall_settle 90 (22 days), wall_article none in forty days  — misses: the move within ten days, the wall in 62-66, by 82 / within 18 days, the article in forty days
+7700: yj_meet 54, yj_key 63, wall_worry 67, wall_settle 83 (16 days), wall_article 87 (+4)  — misses: the wall in 62-66, by 82 / within 18 days
+      evenings: 84.3 guests, 35.7 lost, 4.4 angry, wait 91.0, takings $64,423 a night
+7800: yj_meet 53, yj_key 63, wall_worry 65, wall_settle 82 (17 days), wall_article 85 (+3)  — misses: the move within ten days
+      evenings: 84.7 guests, 40.2 lost, 3.0 angry, wait 92.4, takings $63,705 a night
+7900: yj_meet 53, yj_key 63, wall_worry 65, wall_settle 81 (16 days), wall_article 84 (+3)  — misses: the move within ten days
+      evenings: 83.7 guests, 39.3 lost, 3.8 angry, wait 92.2, takings $64,016 a night
+8000: yj_meet 53, yj_key 61, wall_worry 65, wall_settle 80 (15 days), wall_article 83 (+3)  — meets every target
+      evenings: 85.3 guests, 39.1 lost, 3.3 angry, wait 92.9, takings $65,604 a night
+8100: yj_meet 53, yj_key 61, wall_worry 63, wall_settle 80 (17 days), wall_article 83 (+3)  — meets every target
+      evenings: 84.6 guests, 37.4 lost, 4.4 angry, wait 92.2, takings $64,207 a night
+8200: yj_meet 53, yj_key 61, wall_worry 63, wall_settle 78 (15 days), wall_article 81 (+3)  — meets every target
+      evenings: 85.4 guests, 38.1 lost, 3.9 angry, wait 92.3, takings $64,570 a night
+8300: yj_meet 53, yj_key 63, wall_worry 65, wall_settle 83 (18 days), wall_article 87 (+4)  — misses: the move within ten days, by 82 / within 18 days
+      evenings: 84.6 guests, 38.4 lost, 3.9 angry, wait 92.1, takings $64,358 a night
+   every target: 6 of 14; the key on Day 63: 8 of 14
+
+Reading:
+- The evenings are the same: over 7700-8300 (seven seeds, 280 evenings a build) 84.3 guests a night on the fifth
+  batch and 84.7 on the sixth (each seed 82.2-85.5 and 83.7-85.4), the same losses, anger and waits,
+  takings $63,850 and $64,412.
+- Where the stories land is the trajectory's: 怡君 gets her key on Day 61 or on Day 63 on both builds (63 on 5 of 14 before,
+  8 of 14 now), and a Day-63 key takes the wall's beginning and settlement with it. Every target on 9 and 6 of 14 — within
+  the spread of the earlier builds (3 to 6 of 7: docs/evidence/cooking_2026-10-08/sims/day52_seeds.txt). Seed 7600 on the
+  sixth batch is the slowest of the twenty-eight runs (the settlement 22 days after the wall began); no other run here
+  lost the article.
+- The test's seed base moves to 7100, which meets every target on both builds (61, 63, 79, 82 on both); the test, run on
+  both, passes. What it checks is unchanged.

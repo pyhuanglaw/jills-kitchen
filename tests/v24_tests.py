@@ -391,13 +391,20 @@ def v24_day52_save_plays_the_stories_in_order_over_forty_days(b, port, target):
     # (docs/evidence/cooking_2026-10-08/sims/day52_seeds.txt): the move on Day 61-63 on both, the wall begins 63-67 and
     # 63-65, settles 81-83 and 79-82; every target on four of seven before and six of seven now. 7600 meets every target
     # on both builds.
+    # 2026-10-09 (the sixth batch: the signature main has its own beats, so the cook who puts it on the fire stays with it
+    # when idle — every trajectory moved): on 7600 怡君 got her key on Day 63 and the wall settled on Day 90, the article
+    # past the forty days. Fourteen seeds (7000-8300) on eac1f28 (the fifth batch) and on the sixth batch
+    # (docs/evidence/cooking_2026-10-09/sims/day52_seeds.txt): the same evenings where counted (7700-8300: about 84 guests
+    # a night, the same losses, waits and takings on both); the key on Day 61 or 63 on both builds (63 on 5 of 14 before,
+    # 8 of 14 now) and every target on 9 and 6 of 14 — within the spread of the earlier builds (3 to 6 of 7). 7100 meets
+    # every target on both builds (the same days on both).
     first = None; majors = {}
     for d in range(40):
         if g.ev("phase") == 'summary':
             g.click('[data-act=toShop]'); g.page.wait_for_timeout(60)
         if g.ev("phase") == 'shop':
             g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(100)
-        g.ev(seed % (7600 + d)); g.ev("S.today.sugKey=null;S.today.sug=null;autoStock()")
+        g.ev(seed % (7100 + d)); g.ev("S.today.sugKey=null;S.today.sug=null;autoStock()")
         start_day(g); install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;window.__noScenes=true")
         if first is None:
             first = g.ev("S.day")
