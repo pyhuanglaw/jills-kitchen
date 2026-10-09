@@ -1,0 +1,34 @@
+== main is 2abc52e3601001739945da9b2709369fb49bdec4
+== the single file matches the game
+jills-kitchen-single-file.html is up to date
+== lint
+TOTAL 51 errors 3
+== start, a whole first evening, saves load, checkpoints resume, the core flow
+PASS  single_file_in_sync  (0.2s)
+PASS  new_game_starts  (0.8s)
+PASS  main_loop_single_instance  (3.0s)
+PASS  customer_full_flow_and_economy  (1.4s)
+PASS  save_and_load_roundtrip  (2.0s)
+PASS  old_saves_load  (4.7s)
+PASS  unreadable_save_is_kept  (2.1s)
+PASS  service_checkpoint_resumes_the_day  (33.9s)
+PASS  the_players_saves_load_through_a_real_reload  (5.2s)
+PASS  followup_the_manual_describes_the_current_game  (0.8s)
+PASS  every_player_save_migrates_plays_a_day_and_keeps_its_story  (185.4s)
+PASS  v24_saves_load_and_nothing_fires_on_load  (46.9s)
+PASS  qa_the_players_checkpoints_resume  (134.6s)
+PASS  qa_every_tab_reaches_by_finger  (12.7s)
+PASS  cooking_fried_rice_goes_hot_then_plating_by_taps  (15.0s)
+PASS  cooking_day_two_a_latte_from_the_order_to_the_guest_by_taps  (12.0s)
+PASS  cooking_one_jill_through_whole_evenings_early_middle_late  (89.4s)
+PASS  workflow_dirty_dishes_go_back_by_hand_to_the_tub  (7.0s)
+PASS  workflow_a_second_cleaner_washes_beside_the_first  (29.7s)
+19 passed, 0 failed
+== the private test page from main opens and loads the Day 30 save
+build: 2abc52e3601001739945da9b2709369fb49bdec4  — after publishing, write this SHA and the revision / id the platform returns into docs/CURRENT_STATE.md
+confirm: ['importYes:讀取這個存檔']
+title now: DAY 30 · $70,588 · 今天營業到一半存了進度
+after open: 
+errors: []
+== the release page builder still builds from main (nothing is published)
+/tmp/claude-0/-home-user-jills-kitchen/63b8740a-97ce-5ff7-813a-d847b68fd153/scratchpad/main_wt_page/official-build-check.html: 6894 KB, 2 scripts

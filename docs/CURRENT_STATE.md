@@ -8,7 +8,8 @@
 - GitHub：`pyhuanglaw/jills-kitchen`，預設 branch 是 `main`。
 - **`main` ＝ Jill's Kitchen 的正式主線**：目前的、穩定的、發布出去的版本都在這裡。最新正式版是 9253fae（v2.4 rc8.8）。從 v2.2.1 起的
   完整開發歷史都在 `main` 上。
-- **2026-10-09：新的料理系統快轉合併進 `main`**（遊戲內容＝ commit 8298e18；使用者 2026-10-09 授權「自主測試、驗收與合併 main」，
+- **2026-10-09：新的料理系統快轉合併進 `main`**（`main` ＝ 2abc52e，從 fc0f5d8 快轉 89 個 commit；遊戲內容＝ commit 8298e18；合併後在 `main`
+  上驗證過：開遊戲、讀存檔、核心流程，`docs/evidence/cooking_2026-10-09/regression/after_merge_main_2abc52e_smoke.txt`；使用者 2026-10-09 授權「自主測試、驗收與合併 main」，
   `docs/v24/cooking_merge_authorization_2026-10-09.txt`；Release Gate 紀錄 `docs/cooking/RELEASE_GATE_2026-10-09.md`）。所以 `main`
   現在比正式版多了整個料理系統（16 項決策、Workflow B、一個 Jill……），**下次說「發布」就會把它發出去**。合併前的 `main`（fc0f5d8，
   rc8.8 之後的文件）保存在 `archive/main-before-cooking-2026-10-09`；要回到合併前：`git push --force-with-lease=refs/heads/main:<目前的 main> origin fc0f5d8b09fc8152991c408a26de96bef49235aa:refs/heads/main`

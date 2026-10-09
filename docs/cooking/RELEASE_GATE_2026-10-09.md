@@ -7,7 +7,8 @@
 ## 先講結論
 
 - **合併的遊戲版本＝ commit `8298e18f8f55b0ea2d185f43e6704fdb717864be`**（branch `feature/cooking-gameplay`）。之後的 commit 只有兩個測試
-  的修正和文件（`git diff 8298e18 <合併的 commit> -- js css index.html` 是空的）。合併後 `main` ＝【待填】。
+  的修正和文件（`git diff 8298e18 2abc52e -- js css index.html` 是空的）。**合併後 `main` ＝ `2abc52e3601001739945da9b2709369fb49bdec4`**
+  （2026-10-09 從 fc0f5d8 快轉，89 個 commit；之後只有這份紀錄的文件 commit）。
 - **P0：0 件。**
 - **完整回歸**：實際合併的 commit d57bac8 上 **347 項全部通過**（之前在 8298e18 上 345 通過，2 個失敗都是測試的缺陷：改了、證明了）。
 - **沒有真實 iPhone**：手機畫面都是桌面 Chromium 開成 iPhone 尺寸（390×844、375×667、430×932、橫向 844×390），不是實機驗收。
@@ -210,11 +211,17 @@
 
 ## 九、合併
 
-- 合併前：`main` ＝ fc0f5d8b09fc8152991c408a26de96bef49235aa；`feature/cooking-gameplay` ＝【待填】。`main` 是 feature 的祖先，用快轉
+- 合併前（合併前一刻在 GitHub 上讀的）：`main` ＝ fc0f5d8b09fc8152991c408a26de96bef49235aa；`feature/cooking-gameplay` ＝
+  2abc52e3601001739945da9b2709369fb49bdec4。`main` 是 feature 的祖先，用快轉
   （fast-forward）合併，不強推、不改寫歷史。
 - 可以回復的備份：`archive/main-before-cooking-2026-10-09`（＝ fc0f5d8，合併前的 `main`）、`archive/feature-dylan-room`（＝ 09f3312，
   `feature/dylan-room` 獨有的證據檔）。兩條都推到 GitHub、讀回確認過。
-- 合併後在 `main` 上：【待填：啟動、讀存檔、核心流程的 smoke test】。
+- 合併：`git push origin 2abc52e:refs/heads/main`（fc0f5d8..2abc52e，快轉；GitHub 回 `fc0f5d8..2abc52e`）。
+- 合併後在 `main` 上（另一個 worktree 固定在 origin/main ＝ 2abc52e，`regression/after_merge_main_2abc52e_smoke.txt`）：
+  單檔版跟遊戲一致；語法檢查跟之前一樣；19 項核心測試全部通過——開新遊戲、主迴圈只有一個、一整晚的客人與收支、存讀檔、
+  舊存檔、讀不了的存檔會保留、營業中存檔再繼續、真的重新載入頁面讀存檔、使用者的每一個存檔讀進來玩一天且故事保留、讀檔時不會
+  觸發故事、使用者的存檔點、每個分頁手指點得到、炒飯、第二天的拿鐵、一個 Jill 前中後期整晚、髒盤子拿回廚房、兩個人一起洗、手冊；
+  從 `main` 建的私人測試頁打得開、讀得進 Day 30 存檔、沒有錯誤；發布頁產生器（`tools/build_artifact.py`）照樣建得出來（沒有發布）。
 
 ## 十、還沒解決、要使用者決定的事
 
