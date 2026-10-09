@@ -1,0 +1,9 @@
+{"wb": 19, "guests": 56, "lost": 34, "angry": 2, "avg": 94, "rev": 34695, "tag": "k13", "who": "lazy", "save": "day30", "seed": 1}
+{"wb": 12, "guests": 56, "lost": 30, "angry": 2, "avg": 96, "rev": 33520, "tag": "k13", "who": "lazy", "save": "day30", "seed": 2}
+{"wb": 19, "guests": 48, "lost": 35, "angry": 3, "avg": 94, "rev": 29635, "tag": "k13", "who": "lazy", "save": "day30", "seed": 3}
+{"wb": 10, "guests": 79, "lost": 40, "angry": 5, "avg": 94, "rev": 59335, "tag": "k13", "who": "lazy", "save": "day52", "seed": 1}
+{"wb": 11, "guests": 92, "lost": 47, "angry": 0, "avg": 93, "rev": 63795, "tag": "k13", "who": "lazy", "save": "day52", "seed": 2}
+{"wb": 12, "guests": 85, "lost": 38, "angry": 4, "avg": 91, "rev": 64525, "tag": "k13", "who": "lazy", "save": "day52", "seed": 3}
+{"wb": 18, "guests": 106, "lost": 25, "angry": 1, "avg": 95, "rev": 100055, "tag": "k13", "who": "lazy", "save": "day92", "seed": 1}
+{"wb": 20, "guests": 111, "lost": 18, "angry": 0, "avg": 94, "rev": 102220, "tag": "k13", "who": "lazy", "save": "day92", "seed": 2}
+{"wb": 20, "guests": 118, "lost": 14, "angry": 0, "avg": 98, "rev": 100165, "tag": "k13", "who": "lazy", "save": "day92", "seed": 3}

@@ -1,0 +1,22 @@
+# main fc0f5d8 (before the cooking system), tools/sims/onfire_rate.py, 2026-10-09
+{"fires": 3, "q": {"P": 17, "G": 0, "O": 0, "B": 0}, "fireT": 45, "evT": 172, "tag": "main", "save": "fresh", "day": 1, "who": "lazy", "seed": 101}
+{"fires": 4, "q": {"P": 21, "G": 0, "O": 0, "B": 0}, "fireT": 60, "evT": 177, "tag": "main", "save": "fresh", "day": 2, "who": "lazy", "seed": 101}
+{"fires": 5, "q": {"P": 25, "G": 0, "O": 0, "B": 0}, "fireT": 74, "evT": 198, "tag": "main", "save": "fresh", "day": 3, "who": "lazy", "seed": 101}
+{"fires": 3, "q": {"P": 17, "G": 0, "O": 0, "B": 0}, "fireT": 45, "evT": 172, "tag": "main", "save": "fresh", "day": 1, "who": "every", "seed": 101}
+{"fires": 4, "q": {"P": 21, "G": 0, "O": 0, "B": 0}, "fireT": 60, "evT": 177, "tag": "main", "save": "fresh", "day": 2, "who": "every", "seed": 101}
+{"fires": 5, "q": {"P": 25, "G": 0, "O": 0, "B": 0}, "fireT": 74, "evT": 198, "tag": "main", "save": "fresh", "day": 3, "who": "every", "seed": 101}
+{"fires": 3, "q": {"P": 17, "G": 0, "O": 0, "B": 0}, "fireT": 45, "evT": 169, "tag": "main", "save": "fresh", "day": 1, "who": "lazy", "seed": 202}
+{"fires": 6, "q": {"P": 32, "G": 0, "O": 0, "B": 0}, "fireT": 90, "evT": 197, "tag": "main", "save": "fresh", "day": 2, "who": "lazy", "seed": 202}
+{"fires": 5, "q": {"P": 29, "G": 0, "O": 0, "B": 0}, "fireT": 75, "evT": 204, "tag": "main", "save": "fresh", "day": 3, "who": "lazy", "seed": 202}
+{"fires": 3, "q": {"P": 17, "G": 0, "O": 0, "B": 0}, "fireT": 45, "evT": 169, "tag": "main", "save": "fresh", "day": 1, "who": "every", "seed": 202}
+{"fires": 6, "q": {"P": 32, "G": 0, "O": 0, "B": 0}, "fireT": 90, "evT": 197, "tag": "main", "save": "fresh", "day": 2, "who": "every", "seed": 202}
+{"fires": 5, "q": {"P": 29, "G": 0, "O": 0, "B": 0}, "fireT": 75, "evT": 204, "tag": "main", "save": "fresh", "day": 3, "who": "every", "seed": 202}
+{"fires": 15, "q": {"P": 154, "G": 0, "O": 0, "B": 0}, "fireT": 225, "evT": 294, "tag": "main", "save": "day30", "who": "lazy", "seed": 1}
+{"fires": 15, "q": {"P": 149, "G": 0, "O": 0, "B": 0}, "fireT": 225, "evT": 294, "tag": "main", "save": "day30", "who": "lazy", "seed": 2}
+{"fires": 16, "q": {"P": 160, "G": 0, "O": 0, "B": 0}, "fireT": 241, "evT": 291, "tag": "main", "save": "day30", "who": "lazy", "seed": 3}
+{"fires": 16, "q": {"P": 193, "G": 0, "O": 0, "B": 0}, "fireT": 241, "evT": 302, "tag": "main", "save": "day52", "who": "lazy", "seed": 1}
+{"fires": 15, "q": {"P": 177, "G": 0, "O": 0, "B": 0}, "fireT": 225, "evT": 292, "tag": "main", "save": "day52", "who": "lazy", "seed": 2}
+{"fires": 15, "q": {"P": 192, "G": 0, "O": 0, "B": 0}, "fireT": 225, "evT": 304, "tag": "main", "save": "day52", "who": "lazy", "seed": 3}
+{"fires": 15, "q": {"P": 196, "G": 0, "O": 0, "B": 0}, "fireT": 225, "evT": 281, "tag": "main", "save": "day92", "who": "lazy", "seed": 1}
+{"fires": 15, "q": {"P": 238, "G": 0, "O": 0, "B": 0}, "fireT": 225, "evT": 300, "tag": "main", "save": "day92", "who": "lazy", "seed": 2}
+{"fires": 15, "q": {"P": 227, "G": 0, "O": 0, "B": 0}, "fireT": 225, "evT": 290, "tag": "main", "save": "day92", "who": "lazy", "seed": 3}

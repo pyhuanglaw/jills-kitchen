@@ -1218,7 +1218,10 @@ def world_stays_visible_across_days(b, port, target):
     for day in range(1, 11):
         act('restock'); g.ev("__tick(200)")
         if day == 4:   # ids whose hash has the sign bit set: c1 (cleaner), m1 (chef) — the shape that used to crash
-            g.ev("S.crew.push({id:'c1',role:'cleaner',name:'阿明',lv:1,duty:'clean'},{id:'m1',role:'chef',name:'Hugo',lv:2,duty:'stove'})")
+            # 2026-10-09: names with no face of their own (STAFF_FACE gives 阿明 and Hugo theirs, which covered the hashed hair, so
+            # the sign-bit ids had stopped reaching it: a build with the signed shift back passed) — an old save's crew, or a name
+            # the roster does not draw (docs/cooking/ARCHITECTURE.md, test changes 35)
+            g.ev("S.crew.push({id:'c1',role:'cleaner',name:'測試員甲',lv:1,duty:'clean'},{id:'m1',role:'chef',name:'測試員乙',lv:2,duty:'stove'})")
         start_day(g)
         t_prev = -1
         for sec in range(8):
@@ -1236,6 +1239,12 @@ def world_stays_visible_across_days(b, port, target):
         g.ev("for(let i=0;i<60;i++)__tick(1000/30)")
         check(not g.errors, f'day {day}: page error at closing: {g.errors[:2]}')
         if g.ev("phase") == 'summary': g.click('[data-act=toShop]')
+        # 2026-10-09: the plan is bought — the money for it is there. The test is about the world being drawn while the shop
+        # grows (more tables, gear, staff, the expansions); until the one Jill (the user's #8) the perfect bot's own takings
+        # paid for this plan, and with one Jill a shop without staff takes less on its first days by design (Day 1–3:
+        # docs/cooking/ARCHITECTURE.md, test changes 35), so the expansions waited past Day 10 and the layouts they draw
+        # were never reached. Still caught: the sign-bit employee crash it was written for (same place, test changes 35).
+        g.ev("S.money=Math.max(S.money,30000)")
         for a, kv in plan.get(day, []):
             act(a, **kv); g.ev("__tick(30)")
         check(not g.errors, f'day {day}: page error in the shop: {g.errors[:2]}')

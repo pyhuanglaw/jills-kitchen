@@ -491,7 +491,14 @@ def v24_xiuqin_is_there_from_day_one_and_is_not_free_labour(b, port, target):
 
 @test
 def v24_xiuqin_goes_home_a_while_into_the_closing(b, port, target):
-    """She is not part of the evening at the sofa: about twenty seconds into the closing she walks out of the front door."""
+    """She is not part of the evening at the sofa: about twenty seconds into the closing she walks out of the front door.
+    Since Workflow B (01fcd77, 2026-10-08: 「她說來幫忙，就真的有幫忙」) she does not walk out with dirty plates in her hands or
+    from a wash she has started — she puts them in the cart and washes the pile first. The rc8.3 version of this test (gone
+    by 32 s, written 2026-10-03) assumed nothing was left to wash; with the one Jill (2026-10-09) this seed's evening ends
+    with seven dishes (five in the cart, two in her hands) and she leaves at ~25 s, out of the door at ~35 s. So: when
+    she has nothing to finish, gone by 32 s as before; when she has, gone within 12 s of being done — and either way well
+    inside the closing (75 s), and not back that evening. (A build where she stays, or leaves only as the closing ends,
+    fails it: docs/cooking/ARCHITECTURE.md, test changes.)"""
     g = Game(b, port, target, seed=262, manual=True, viewport={'width': 390, 'height': 844})
     install_bot(g)
     g.click('[data-act=open]'); g.ev("window.__fastSay=1")
@@ -500,8 +507,16 @@ def v24_xiuqin_goes_home_a_while_into_the_closing(b, port, target):
     check(g.ev("!!R.xqh&&!R.xqh.leaving"), 'there at the start of the closing')
     g.ev("for(let i=0;i<30*20;i++){update(1/30);updateCats(1/30,0)}")
     check(g.ev("!!R.xqh"), 'still there twenty seconds in')
-    g.ev("for(let i=0;i<30*12;i++){update(1/30);updateCats(1/30,0)}")
-    check(not g.ev("!!R.xqh") and g.ev("R.xqhDone") == 1, 'gone by thirty — and she does not come back that evening')
+    free = gone = None; back = False
+    for s in range(20 * 4, 75 * 4):   # quarter seconds, to the end of the closing
+        st = json.loads(g.ev("JSON.stringify({h:!!R.xqh,busy:!!R.xqh&&(ddWasher()==='xq'||handsN(R.xqh,'dirty')>0||!!(R.xqh.task&&!R.xqh.leaving)),c:R.closing})"))
+        if st['c'] is None: break
+        if st['h'] and gone is not None: back = True
+        if st['h'] and not st['busy'] and free is None and s >= 22 * 4: free = s / 4
+        if not st['h'] and gone is None: gone = s / 4; free = free if free is not None else s / 4
+        g.ev("for(let i=0;i<7;i++){update(1/30);updateCats(1/30,0)}")   # (7 frames ~ a quarter second)
+    check(gone is not None and g.ev("R.xqhDone") == 1 and not back, f'gone within the closing — and she does not come back that evening: free {free}, gone {gone}, back {back}')
+    check(gone <= (32 if free <= 22.5 else free + 12), f'gone by thirty, or within twelve seconds of finishing the dishes: free {free}, gone {gone}')
     check(not g.errors, g.errors[:3]); g.close()
 
 

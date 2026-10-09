@@ -387,3 +387,54 @@ def workflow_a_table_someone_is_going_to_clear_is_not_given_to_jill_too(b, port,
     check(not both, 'never two people on their way to it')
     check(not g.ev("R.tables[%d].dirty" % ti), 'Jill cleared it')
     check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def workflow_the_inspector_weighs_how_many_how_long_and_who_is_on_them(b, port, target):
+    """The user, 2026-10-09 #12: the inspection is no longer 「22 秒內所有髒桌必須清空」 — he weighs how many dirty tables, for
+    how long, and whether someone is on them; a table someone is on counts less than one nobody is; and it stays a
+    challenge — tables someone is on do not pass by themselves. While he looks round (22 s) each dirty table counts every
+    second: 1 when someone is on it (a claim, or Jill's), 2 when nobody is; he passes the place at 30 or less (INSP_OK).
+    Burnt food plays no part (nothing burns). His review is tagged, so the summary never counts it as 料理失常 — a line
+    the summary and the review digest no longer show (the new kitchen has none)."""
+    g = _dirty_day(b, port, target, 9331)
+    RUN = """(()=>{const out={};const run=(set,secs)=>{for(const t of R.tables){t.dirty=false;t.claim=null;t.group=null}R.jill.q=[];R.jill.cur=null;set();const I={sc:0,scU:0};for(let i=0;i<(secs||22)*30;i++)inspScore(I,1/30);return [Math.round(I.sc),Math.round(I.scU)]};
+      out.none=run(()=>{});
+      out.one_nobody=run(()=>{R.tables[0].dirty=true});
+      out.one_nobody_15s=run(()=>{R.tables[0].dirty=true},15);
+      out.one_cleaner=run(()=>{R.tables[0].dirty=true;R.tables[0].claim='c1'});
+      out.one_jill=run(()=>{R.tables[0].dirty=true;R.jill.q=[0]});
+      out.two_cleaner=run(()=>{for(const i of [0,1]){R.tables[i].dirty=true;R.tables[i].claim='c1'}});
+      out.three_cleaner_10s=run(()=>{for(const i of [0,1,2]){R.tables[i].dirty=true;R.tables[i].claim='c1'}},10);
+      out.four_cleaner_10s=run(()=>{for(const i of [0,1,2,3]){R.tables[i].dirty=true;R.tables[i].claim='c1'}},10);
+      for(const t of R.tables){t.dirty=false;t.claim=null}R.jill.q=[];return JSON.stringify(out)})()"""
+    sc = json.loads(g.ev(RUN))
+    ok = g.ev("INSP_OK")
+    check(ok == 30, f'he passes at 30 or less: {ok}')
+    check(sc['none'] == [0, 0] and sc['one_cleaner'] == [22, 0] and sc['one_jill'] == [22, 0], f'clean, or one table someone is on the whole time: passes: {sc}')
+    check(sc['one_nobody'] == [44, 44] and sc['one_nobody_15s'] == [30, 30], f'one table nobody is on counts double — a whole visit fails, 15 s is the line: {sc}')
+    check(sc['two_cleaner'][0] > ok and sc['four_cleaner_10s'][0] > ok and sc['three_cleaner_10s'][0] <= ok + 1, f'tables someone is on still count: two the whole time, or four for 10 s, fail: {sc}')
+    # the verdict at the end of his 22 s: the money, the review (tagged), the words
+    res = []
+    for s0, u0 in ((29, 0), (31, 31), (40, 10)):
+        res.append(json.loads(g.ev("""(()=>{const m0=S.money,n0=S.reviews.length;R.insp={t:21.99,dur:22,x:224,y:204,tx:224,ty:204,sc:%d,scU:%d,out:false};__tick(1000/30);
+          const r=S.reviews[S.reviews.length-1];return JSON.stringify({dm:S.money-m0,n:S.reviews.length-n0,s:r.s,txt:r.txt,tags:r.tags,out:!!(R.insp&&R.insp.out)})})()""" % (s0, u0))))
+        g.ev("R.insp=null")
+    check(res[0]['dm'] == 300 and res[0]['s'] == 5 and res[0]['tags'] == ['insp'], f'29: passed, +$300: {res[0]}')
+    check(res[1]['dm'] == -300 and res[1]['s'] == 2 and '沒人收' in res[1]['txt'] and res[1]['tags'] == ['insp'], f'31, all of it nobody\'s: failed, 「放著沒人收」: {res[1]}')
+    check(res[2]['dm'] == -300 and '太多、收得太慢' in res[2]['txt'], f'40, mostly tables someone was on: failed, 「太多、收得太慢」: {res[2]}')
+    # in play: a table the cleaner clears while he looks round passes; the ring and the tag over him say how it goes
+    g.ev("fireIncident('inspector');R.insp.x=R.insp.tx;R.insp.y=R.insp.ty")
+    ti = g.ev(DIRTY + "(1,2)")
+    m0 = g.ev("S.money"); seen = set()
+    for _ in range(400):
+        g.ev(TICK + "(3)")
+        if g.ev("R.tables[%d].dirty" % ti): seen.add(g.ev("R.tables[%d].claim" % ti) or 'nobody')
+        if not g.ev("!!R.insp") or g.ev("R.insp.out"): break
+    check('c1' in seen and g.ev("S.money") - m0 == 300, f'the cleaner on it, cleared while he looked: passed: {seen}, {g.ev("S.money") - m0}')
+    # no 「料理失常」: not in the summary's factors (even with an old day's Okay and burnt), not in the digest
+    labels = json.loads(g.ev("JSON.stringify(ratingStory({q:{P:2,G:1,O:3,B:2},pats:[.9,.9],lost:0,reviews:[],angry:0,short:{},catJoy:0},8).map(x=>x.label))"))
+    check('料理失常' not in labels, f'the summary has no 料理失常: {labels}')
+    g.ev("for(let i=0;i<6;i++)S.reviews.push({s:2,txt:'x',name:'y',day:S.day,w:1})")   # untagged low reviews (older saves', the inspector's before)
+    check('料理失常' not in g.ev("reviewDigestHTML()"), f'nor the digest: {g.ev("reviewDigestHTML()")}')
+    check(not g.errors, g.errors[:3]); g.close()

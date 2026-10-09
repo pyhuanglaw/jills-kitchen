@@ -1078,3 +1078,94 @@ def cooking_the_pizza_oven_is_clear_of_the_buttons(b, port, target):
         g.ev("setRoom('main');renderRoomTabs(true);__tick(1000/30)")
         check(g.ev("(()=>{const t=document.getElementById('taskChip').getBoundingClientRect();return t.right>=innerWidth-12})()"), f'{vw}×{vh}: in the dining room it is back on the right')
         check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def cooking_the_bar_kitchens_burner_has_a_place_of_its_own(b, port, target):
+    """The user, 2026-10-09 #15B: the Bar 小廚's burner, which really heats food, is one of the hot zone's places, with the same
+    rules as the others — and counted once. It was counted once in the number (stoveSlots: one more) but not in the room:
+    its slot sat on another burner's spot (the fifth on the third, the seventh on the fourth), two pans on one fire and one cook
+    in the other's place. Now every burner has its own spot (one more across the front row, a little smaller), on the range
+    as it is and on the expanded range; without the Bar 小廚 nothing moved. A dish on its burner cooks like on any other."""
+    g = _day(b, port, target, 7341)
+    out = json.loads(g.ev("""(()=>{const r=[];const S0=JSON.stringify({eq:S.eq,ops:S.ops,rooms:S.rooms,level:S.level});
+      for(const kext of [0,1])for(const pantry of [0,1])for(const lv of [1,2,3,4,5]){S.level=5;S.eq.stove=lv;S.ops=S.ops||{};S.ops.pantry=pantry;S.rooms=S.rooms||{};S.rooms.kext=kext;
+        const n=stoveSlots(lv);const pos=[];for(let i=1;i<=n;i++){const h=slotHome({type:'stove',no:i});pos.push([h.x,h.y,h.sc])}r.push({kext,pantry,lv,n,pos})}
+      const o=JSON.parse(S0);Object.assign(S,{eq:o.eq,ops:o.ops,rooms:o.rooms,level:o.level});return JSON.stringify(r)})()"""))
+    for c in out:
+        keys = {(p[0], p[1]) for p in c['pos']}
+        check(len(keys) == c['n'], f'every burner its own spot: {c}')
+        xs = sorted(p[0] for p in c['pos'] if p[1] == 186)
+        check(all(b2 - a2 >= 38 for a2, b2 in zip(xs, xs[1:])), f'the front row is not crowded on top of itself: {c}')
+    plain = {(c['kext'], c['lv']): c['pos'] for c in out if not c['pantry']}
+    old = {(0, lv): [[148 + [32, 96][i % 2], 186 if i < 2 else 160, .62] for i in range(n)] for lv, n in ((1, 1), (2, 2), (3, 3), (4, 3), (5, 4))}
+    check(all(plain[k] == v for k, v in old.items()), f'without the Bar 小廚 the range is as it was: {plain}')
+    # a dish on the Bar 小廚's burner (the last one) cooks like on any other
+    g.ev("S.level=5;S.eq.stove=5;S.ops=S.ops||{};S.ops.pantry=1;R=null;phase='prep'")
+    g.close()
+    g = _day(b, port, target, 7342, "S.level=5;S.eq.stove=5;S.ops=S.ops||{};S.ops.pantry=1;S.menu=['friedrice'];")
+    check(g.ev("R.slots.filter(s=>s.type==='stove').length") == 5, 'five burners: four and the Bar 小廚\'s')
+    check(_wait_orders(g, 1), 'a table orders fried rice')
+    g.ev("for(const s of R.slots)if(s.type==='stove'&&s.no<5)s.broken=true")   # (the other four out of use: the fifth is the one free)
+    g.ev("wfGather()")
+    nid = g.ev("(wfList().find(n=>n.d==='friedrice')||{}).id")
+    ok = g.ev(f"wfAssign(wfNode({nid}),'jill',R.slots.find(s=>s.type==='stove'&&s.no===5))")
+    check(ok is True and g.ev(f"(wfNode({nid}).slot||wfNode({nid}).to).no") == 5, f'Jill puts it on the fifth burner: {ok}')
+    at5 = False
+    for _ in range(600):
+        g.ev("__run(3)")
+        if g.ev(f"!!wfNode({nid})&&!!wfNode({nid}).slot&&wfNode({nid}).slot.no===5&&wfNode({nid}).st==='cook'"): at5 = True
+        if g.ev(f"!wfNode({nid})||wfNode({nid}).si>0||wfNode({nid}).st==='ready'"): break
+    check(at5 and g.ev(f"!wfNode({nid})||wfNode({nid}).si>0||wfNode({nid}).st==='ready'"), f'it cooked there: {at5}, {g.ev(f"JSON.stringify(wfNode({nid})&&wfState(wfNode({nid})))")}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+WALKS = r"""(()=>{const boxes=kitchenObs(),hard=boxes.slice(0,2);   /* the line and the pass: nobody's feet ever inside them */
+ const inside=(o,x,y,m)=>x>o.bx0+m&&x<o.bx1-m&&y>o.by0+m&&y<o.by1-m;
+ const walk=(a,b)=>{const e={x:a[0],y:a[1],room:'kitchen'};let len=0,bad=null;for(let i=0;i<3000;i++){const w=obsNext(e,'kitchen',b[0],b[1]);const tx=w?w.x:b[0],ty=w?w.y:b[1];const dx=tx-e.x,dy=ty-e.y,d=Math.hypot(dx,dy),v=3;
+   if(d<=v){e.x=tx;e.y=ty;len+=d}else{e.x+=dx/d*v;e.y+=dy/d*v;len+=v}
+   for(const o of hard)if(!inside(o,a[0],a[1],-1)&&!inside(o,b[0],b[1],-1)&&inside(o,e.x,e.y,1)&&!bad)bad=[Math.round(e.x),Math.round(e.y)];
+   if(Math.abs(e.x-b[0])<.01&&Math.abs(e.y-b[1])<.01)return{ok:1,len,bad}}return{ok:0,len,bad}};
+ const P={door:[KR.door.x,KR.door.y],room:[homeKDoor().x,homeKDoor().y],drop:[ddDrop().x,ddDrop().y],take:[ddTake().x,ddTake().y],sink:[ddSink().x,ddSink().y],rack:[wfRack().x,wfRack().y],pick:[WF_PICK.x,WF_PICK.y]};
+ WF_PASS_X.forEach((x,i)=>P['pass'+i]=[x,KY.passFeet]);
+ for(const s of R.slots){const sp=wfSpot(s);P[s.type+s.no]=[sp.cx,sp.cy];const h=slotHome(s);if(h.y>=165)P[s.type+s.no+'f']=[h.x-44,KY.top+KY.h+KY.face+4]}
+ const K=Object.keys(P),out={n:0,stuck:[],through:[],worst:0,worstK:''};
+ for(const a of K)for(const b of K){if(a===b)continue;const r=walk(P[a],P[b]);out.n++;if(!r.ok)out.stuck.push(a+'→'+b);if(r.bad)out.through.push(a+'→'+b+' at '+r.bad);
+   const st=Math.hypot(P[b][0]-P[a][0],P[b][1]-P[a][1]);const extra=r.len-st;if(extra>out.worst){out.worst=Math.round(extra);out.worstK=a+'→'+b}}
+ return JSON.stringify(out)})()"""
+
+
+@test
+def cooking_people_walk_round_the_counters(b, port, target):
+    """The user, 2026-10-09 #13: 「角色不能直接穿越流理台、工作檯、爐具等實體設備。優先使用既有路徑或加入必要的簡單轉折點，使人物
+    自然繞過設備。不需要重建大型尋路系統。同時確認修改不會使員工被卡住、繞遠路過度增加出餐時間，或無法到達工作站。」 The kitchen has a
+    floor plan for the Staff Room's rounding (kitchenObs → obsNext): the line (its cooks behind it), the pass, the cart, the crates
+    and the bin, the fridge and the cold room. On every kitchen the game builds (Day 1, the middle game, the expanded range, the
+    longer pass, kitchen II, the pizza oven, the Bar 小廚): from every place people stand to every other (the door, the door to
+    Jill's room, each station from behind and from the front, the pass, the cart, the sink, the rack) the walk gets there, never
+    with its feet inside the line or the pass, and never more than a counter's length out of its way. In play (the user's Day 52
+    save, a whole evening): nobody's feet inside the line or the pass, Jill's, the cooks', the cleaners' and the waiters'."""
+    layouts = [('Day 1', ''),
+               ('middle', "S.level=3;S.eq.stove=3;S.eq.prep=1;S.eq.oven=1;S.eq.bar=2;"),
+               ('expanded range, longer pass, walk-in', "S.level=5;S.eq.stove=5;S.eq.prep=2;S.eq.oven=3;S.eq.bar=3;S.rooms=S.rooms||{};S.rooms.kext=1;S.rooms.pass=1;S.rooms.cooler=1;S.rooms.walkin=1;"),
+               ('kitchen II, pizza oven, Bar 小廚', "S.level=5;S.eq.stove=5;S.eq.prep=2;S.eq.oven=3;S.eq.bar=3;S.rooms=S.rooms||{};S.rooms.kext=1;S.rooms.kitchen2=1;S.rooms.pizzaoven=1;S.rooms.lounge=3;S.ops=S.ops||{};S.ops.pantry=1;")]
+    for name, setup in layouts:
+        g = _day(b, port, target, 7351, setup)
+        r = json.loads(g.ev(WALKS))
+        check(r['n'] > 100 and not r['stuck'], f'{name}: every place reaches every other: {r["stuck"][:5]} of {r["n"]}')
+        check(not r['through'], f'{name}: no walk through the line or the pass: {r["through"][:5]}')
+        check(r['worst'] <= 420, f'{name}: never more than a counter\'s length out of the way: {r["worst"]} ({r["worstK"]})')
+        check(not g.errors, g.errors[:3]); g.close()
+    # in play
+    import v24_tests as v
+    g = Game(b, port, target, seed=7352, manual=True, viewport={'width': 390, 'height': 844})
+    v.load_save(g, 'player_day52.json')
+    g.ev("for(let i=0;i<30;i++){if(typeof DLG!=='undefined'&&DLG)dlgNext()}"); v.to_service(g, lazy=True)
+    g.ev("""window.__in=[];window.__inStep=function(n){const H=()=>kitchenObs().slice(0,2);const ins=(o,x,y)=>x>o.bx0+1&&x<o.bx1-1&&y>o.by0+1&&y<o.by1-1;let k=0;
+      for(let i=0;i<n;i++){if(!__act())break;update(1/30);updateCats(1/30,0);k++;if(!R||phase!=='service')break;const hb=H();const who=[];const J=R.jill;if((J.room||'main')==='kitchen')who.push(['jill',J]);for(const id in R.ck||{})who.push(['cook '+id,R.ck[id]]);for(const id in R.cw||{}){const w=R.cw[id];if(w&&w.room==='kitchen')who.push([id,w])}if(R.xqh&&R.xqh.room==='kitchen')who.push(['xq',R.xqh]);
+        for(const [nm,e] of who)for(const o of hb)if(ins(o,e.x,e.y)&&__in.length<20)__in.push([nm,Math.round(e.x),Math.round(e.y),Math.round(R.t)])}return k}""")
+    for _ in range(3000):
+        if g.ev("phase") != 'service' or not g.ev("!!R"): break
+        if g.page.evaluate('()=>window.__inStep(60)') < 60: break
+    check(g.ev("__in.length") == 0, f'in play nobody stands in the line or the pass: {g.ev("JSON.stringify(__in)")}')
+    check(not g.errors, g.errors[:3]); g.close()
