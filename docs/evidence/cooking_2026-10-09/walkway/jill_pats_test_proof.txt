@@ -1,0 +1,81 @@
+jill_rests_when_staff_cover_the_floor — 「再忙也會摸一下路過的貓」(2026-10-09, the walkway through the line)
+
+== 1. The original case: the test as it was (HEAD 7851f7c's tests/run_tests.py, seed 16), on the walkway build and on 8298e18
+FAIL  jill_rests_when_staff_cover_the_floor  (33.4s)
+      even on a busy day she pats a cat that comes by
+0 passed, 1 failed
+PASS  jill_rests_when_staff_cover_the_floor  (98.5s)
+1 passed, 0 failed
+
+== 2. The distribution: the rc8.5 harness (docs/evidence/v24_rc8_5/sims/jill_pats.py), Day 1 alone, seeds 1-20
+-- main before the cooking system (fc0f5d8)
+seed, times she patted a cat, share of the day sitting: [(1, 3, 0.0), (2, 1, 0.0), (3, 2, 0.0), (4, 2, 0.0), (5, 2, 0.0), (6, 1, 0.0), (7, 0, 0.0), (8, 0, 0.0), (9, 3, 0.0), (10, 2, 0.0), (11, 1, 0.0), (12, 1, 0.0), (13, 1, 0.0), (14, 0, 0.0), (15, 1, 0.0), (16, 3, 0.0), (17, 0, 0.0), (18, 1, 0.0), (19, 2, 0.0), (20, 3, 0.0)]
+days with a pat: 16 of 20 ; pats in total: 29
+-- 8298e18 (main's game now)
+seed, times she patted a cat, share of the day sitting: [(1, 1, 0.0), (2, 3, 0.0), (3, 0, 0.0), (4, 0, 0.0), (5, 2, 0.0), (6, 1, 0.0), (7, 0, 0.0), (8, 0, 0.0), (9, 0, 0.0), (10, 1, 0.0), (11, 0, 0.0), (12, 1, 0.0), (13, 0, 0.0), (14, 0, 0.0), (15, 1, 0.0), (16, 1, 0.0), (17, 0, 0.0), (18, 1, 0.0), (19, 0, 0.0), (20, 1, 0.0)]
+days with a pat: 10 of 20 ; pats in total: 13
+-- the walkway
+seed, times she patted a cat, share of the day sitting: [(1, 3, 0.0), (2, 2, 0.0), (3, 0, 0.0), (4, 1, 0.0), (5, 1, 0.0), (6, 0, 0.0), (7, 1, 0.0), (8, 2, 0.0), (9, 0, 0.0), (10, 1, 0.0), (11, 1, 0.0), (12, 0, 0.0), (13, 0, 0.0), (14, 1, 0.0), (15, 0, 0.0), (16, 0, 0.0), (17, 0, 0.0), (18, 0, 0.0), (19, 1, 0.0), (20, 1, 0.0)]
+days with a pat: 11 of 20 ; pats in total: 15
+(seed 16: 3 pats on main, 1 on 8298e18, 0 with the walkway; the rate with the walkway is 8298e18's.)
+
+== 3. First try, not kept: 樾樾 brought beside her at every breather in the dining room, the roll left to chance (seeds 1-12)
+8298e18 (seed, pats, times the cat came by, share sitting): [(1, 2, 6, 0.0), (2, 3, 5, 0.0), (3, 2, 5, 0.0), (4, 2, 6, 0.0), (5, 3, 6, 0.0), (6, 1, 3, 0.0), (7, 1, 4, 0.0), (8, 1, 5, 0.0), (9, 1, 6, 0.0), (10, 2, 4, 0.0), (11, 1, 5, 0.0), (12, 1, 6, 0.0)]
+8298e18 days with a pat: 12 of 12
+walkway (seed, pats, times the cat came by, share sitting): [(1, 3, 6, 0.0), (2, 1, 6, 0.0), (3, 2, 5, 0.0), (4, 1, 5, 0.0), (5, 2, 7, 0.0), (6, 2, 5, 0.0), (7, 2, 4, 0.0), (8, 2, 4, 0.0), (9, 2, 6, 0.0), (10, 1, 4, 0.0), (11, 0, 4, 0.0), (12, 0, 4, 0.0)]
+walkway days with a pat: 10 of 12
+(2 of 12 missed on the walkway: her breathers there are a few seconds and the roll did not come in time — still a coin toss.)
+
+== 4. Her breathers on Day 1 alone (idle > 1.5 s in the dining room): when, workload, tables taken, dishes open (seeds 1-12)
+8298e18 seed 1 [{'t': 1.5, 'wl': 0, 'tables': 0, 'open': 0}, {'t': 8.8, 'wl': 1, 'tables': 1, 'open': 0}, {'t': 115.6, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 117.5, 'wl': 1, 'tables': 2, 'open': 0}, {'t': 166.5, 'wl': 0, 'tables': 2, 'open': 0}, {'t': 168.4, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 175.2, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 177.1, 'wl': 0, 'tables': 1, 'open': 0}]
+8298e18 seed 2 [{'t': 1.5, 'wl': 0, 'tables': 0, 'open': 0}, {'t': 117.2, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 119.1, 'wl': 1, 'tables': 2, 'open': 0}, {'t': 166.7, 'wl': 0, 'tables': 2, 'open': 0}, {'t': 168.6, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 172.5, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 174.4, 'wl': 0, 'tables': 1, 'open': 0}]
+8298e18 seed 3 [{'t': 1.5, 'wl': 0, 'tables': 0, 'open': 0}, {'t': 108.1, 'wl': 0, 'tables': 2, 'open': 0}, {'t': 109.9, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 165, 'wl': 0, 'tables': 2, 'open': 0}, {'t': 166.9, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 171.5, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 173.4, 'wl': 0, 'tables': 1, 'open': 0}]
+8298e18 seed 4 [{'t': 1.5, 'wl': 0, 'tables': 0, 'open': 0}, {'t': 112, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 113.9, 'wl': 1, 'tables': 2, 'open': 0}, {'t': 171.3, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 173.2, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 177.2, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 179.1, 'wl': 0, 'tables': 1, 'open': 0}]
+8298e18 seed 5 [{'t': 1.5, 'wl': 0, 'tables': 0, 'open': 0}, {'t': 111, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 112.9, 'wl': 1, 'tables': 2, 'open': 0}, {'t': 191.7, 'wl': 0, 'tables': 2, 'open': 0}, {'t': 193.4, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 197.7, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 199.5, 'wl': 0, 'tables': 1, 'open': 0}]
+8298e18 seed 6 [{'t': 1.5, 'wl': 0, 'tables': 0, 'open': 0}, {'t': 110.3, 'wl': 0, 'tables': 2, 'open': 0}, {'t': 166.1, 'wl': 0, 'tables': 2, 'open': 0}, {'t': 168, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 173.2, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 175.1, 'wl': 0, 'tables': 1, 'open': 0}]
+8298e18 seed 7 [{'t': 1.5, 'wl': 0, 'tables': 0, 'open': 0}, {'t': 116.2, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 117.7, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 173.8, 'wl': 0, 'tables': 2, 'open': 0}, {'t': 175.7, 'wl': 0, 'tables': 1, 'open': 0}]
+8298e18 seed 8 [{'t': 1.5, 'wl': 0, 'tables': 0, 'open': 0}, {'t': 115.1, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 116.6, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 172, 'wl': 0, 'tables': 2, 'open': 0}, {'t': 173.9, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 178.2, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 180.1, 'wl': 0, 'tables': 1, 'open': 0}]
+8298e18 seed 9 [{'t': 1.5, 'wl': 0, 'tables': 0, 'open': 0}, {'t': 115.5, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 117, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 170.7, 'wl': 0, 'tables': 2, 'open': 0}, {'t': 172.2, 'wl': 0, 'tables': 2, 'open': 0}]
+8298e18 seed 10 [{'t': 1.5, 'wl': 0, 'tables': 0, 'open': 0}, {'t': 116.5, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 118, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 173, 'wl': 0, 'tables': 2, 'open': 0}, {'t': 174.9, 'wl': 0, 'tables': 1, 'open': 0}]
+8298e18 seed 11 [{'t': 1.5, 'wl': 0, 'tables': 0, 'open': 0}, {'t': 118.1, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 119.6, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 173, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 174.9, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 180.2, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 182.1, 'wl': 0, 'tables': 1, 'open': 0}]
+8298e18 seed 12 [{'t': 1.5, 'wl': 0, 'tables': 0, 'open': 0}, {'t': 112.2, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 113.7, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 167.3, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 169.2, 'wl': 0, 'tables': 1, 'open': 0}]
+walkway seed 1 [{'t': 1.5, 'wl': 0, 'tables': 0, 'open': 0}, {'t': 8.8, 'wl': 1, 'tables': 1, 'open': 0}, {'t': 110.1, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 112, 'wl': 1, 'tables': 2, 'open': 0}, {'t': 155.9, 'wl': 0, 'tables': 2, 'open': 0}]
+walkway seed 2 [{'t': 1.5, 'wl': 0, 'tables': 0, 'open': 0}, {'t': 111.8, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 113.7, 'wl': 1, 'tables': 2, 'open': 0}, {'t': 158.6, 'wl': 0, 'tables': 2, 'open': 0}, {'t': 160.5, 'wl': 0, 'tables': 2, 'open': 0}, {'t': 166.2, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 168.1, 'wl': 0, 'tables': 1, 'open': 0}]
+walkway seed 3 [{'t': 1.5, 'wl': 0, 'tables': 0, 'open': 0}, {'t': 105.3, 'wl': 0, 'tables': 2, 'open': 0}, {'t': 107, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 159.9, 'wl': 0, 'tables': 2, 'open': 0}, {'t': 161.8, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 165.8, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 167.7, 'wl': 0, 'tables': 1, 'open': 0}]
+walkway seed 4 [{'t': 1.5, 'wl': 0, 'tables': 0, 'open': 0}, {'t': 107.4, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 109.3, 'wl': 1, 'tables': 2, 'open': 0}, {'t': 164.3, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 166.2, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 172.4, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 174.3, 'wl': 0, 'tables': 1, 'open': 0}]
+walkway seed 5 [{'t': 1.5, 'wl': 0, 'tables': 0, 'open': 0}, {'t': 106.1, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 108, 'wl': 1, 'tables': 2, 'open': 0}, {'t': 138.3, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 140.2, 'wl': 2, 'tables': 3, 'open': 0}, {'t': 194.8, 'wl': 0, 'tables': 2, 'open': 0}, {'t': 196.6, 'wl': 0, 'tables': 1, 'open': 0}]
+walkway seed 6 [{'t': 1.5, 'wl': 0, 'tables': 0, 'open': 0}, {'t': 108.6, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 110.1, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 162.6, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 164.5, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 170.2, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 172.1, 'wl': 0, 'tables': 1, 'open': 0}]
+walkway seed 7 [{'t': 1.5, 'wl': 0, 'tables': 0, 'open': 0}, {'t': 112.4, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 113.9, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 167.6, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 169.5, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 174.8, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 176.7, 'wl': 0, 'tables': 1, 'open': 0}]
+walkway seed 8 [{'t': 1.5, 'wl': 0, 'tables': 0, 'open': 0}, {'t': 110.6, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 112.1, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 167.6, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 169.5, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 174.7, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 176.6, 'wl': 0, 'tables': 1, 'open': 0}]
+walkway seed 9 [{'t': 1.5, 'wl': 0, 'tables': 0, 'open': 0}, {'t': 109.7, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 111.2, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 162.6, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 164.5, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 168.5, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 170.4, 'wl': 0, 'tables': 1, 'open': 0}]
+walkway seed 10 [{'t': 1.5, 'wl': 0, 'tables': 0, 'open': 0}, {'t': 112, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 113.5, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 165.6, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 167.5, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 173.2, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 175.1, 'wl': 0, 'tables': 1, 'open': 0}]
+walkway seed 11 [{'t': 1.5, 'wl': 0, 'tables': 0, 'open': 0}, {'t': 114.6, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 116.1, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 171, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 172.9, 'wl': 0, 'tables': 1, 'open': 0}]
+walkway seed 12 [{'t': 1.5, 'wl': 0, 'tables': 0, 'open': 0}, {'t': 108.8, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 110.3, 'wl': 1, 'tables': 3, 'open': 0}, {'t': 187.7, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 189.5, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 196.4, 'wl': 0, 'tables': 1, 'open': 0}, {'t': 198.1, 'wl': 0, 'tables': 1, 'open': 0}]
+
+== 5. The check now: her first breather with two or more tables taken, 樾樾 beside her, the roll held low for one update (seeds 1-12)
+8298e18 (seed, the probe, share sitting): [(1, {'t': 115.6, 'wl': 1, 'tables': 3, 'pet': 'tora'}, 0.0), (2, {'t': 117.2, 'wl': 1, 'tables': 3, 'pet': 'tora'}, 0.0), (3, {'t': 108.1, 'wl': 0, 'tables': 2, 'pet': 'tora'}, 0.0), (4, {'t': 112, 'wl': 1, 'tables': 3, 'pet': 'tora'}, 0.0), (5, {'t': 111, 'wl': 1, 'tables': 3, 'pet': 'tora'}, 0.0), (6, {'t': 110.3, 'wl': 0, 'tables': 2, 'pet': 'tora'}, 0.0), (7, {'t': 116.2, 'wl': 1, 'tables': 3, 'pet': 'tora'}, 0.0), (8, {'t': 115.1, 'wl': 1, 'tables': 3, 'pet': 'tora'}, 0.0), (9, {'t': 115.5, 'wl': 1, 'tables': 3, 'pet': 'tora'}, 0.0), (10, {'t': 116.5, 'wl': 1, 'tables': 3, 'pet': 'tora'}, 0.0), (11, {'t': 118.1, 'wl': 1, 'tables': 3, 'pet': 'tora'}, 0.0), (12, {'t': 112.2, 'wl': 1, 'tables': 3, 'pet': 'tora'}, 0.0)]
+8298e18 she patted at the probe on 12 of 12 days
+walkway (seed, the probe, share sitting): [(1, {'t': 110.1, 'wl': 1, 'tables': 3, 'pet': 'tora'}, 0.0), (2, {'t': 111.8, 'wl': 1, 'tables': 3, 'pet': 'tora'}, 0.0), (3, {'t': 105.3, 'wl': 0, 'tables': 2, 'pet': 'tora'}, 0.0), (4, {'t': 107.4, 'wl': 1, 'tables': 3, 'pet': 'tora'}, 0.0), (5, {'t': 106.1, 'wl': 1, 'tables': 3, 'pet': 'tora'}, 0.0), (6, {'t': 108.6, 'wl': 1, 'tables': 3, 'pet': 'tora'}, 0.0), (7, {'t': 112.4, 'wl': 1, 'tables': 3, 'pet': 'tora'}, 0.0), (8, {'t': 110.6, 'wl': 1, 'tables': 3, 'pet': 'tora'}, 0.0), (9, {'t': 109.7, 'wl': 1, 'tables': 3, 'pet': 'tora'}, 0.0), (10, {'t': 112, 'wl': 1, 'tables': 3, 'pet': 'tora'}, 0.0), (11, {'t': 114.6, 'wl': 1, 'tables': 3, 'pet': 'tora'}, 0.0), (12, {'t': 108.8, 'wl': 1, 'tables': 3, 'pet': 'tora'}, 0.0)]
+walkway she patted at the probe on 12 of 12 days
+
+== 6. The test now (seed 16): passes on the walkway and on 8298e18; still caught — no pats (m_nopat), pats only after 5 s calm (m_calm),
+   pats only with nothing waiting (m_wl0; caught on seed 16, whose breather has one thing waiting — on seeds 3 and 6 it has none)
+== the walkway build (js/game.js)
+PASS  jill_rests_when_staff_cover_the_floor  (102.2s)
+1 passed, 0 failed
+== 8298e18 (main's game)
+PASS  jill_rests_when_staff_cover_the_floor  (103.3s)
+1 passed, 0 failed
+== mutant m_nopat
+FAIL  jill_rests_when_staff_cover_the_floor  (38.7s)
+      even on a busy day she pats a cat that comes by ({'sit': 0, 'frames': 5115, 'acts': [], 'pets': 0, 'probe': {'t': 112.4, 'wl': 1, 'tables': 3, 'pet': None}, 'cov': []})
+0 passed, 1 failed
+== mutant m_calm
+FAIL  jill_rests_when_staff_cover_the_floor  (40.2s)
+      even on a busy day she pats a cat that comes by ({'sit': 0, 'frames': 5255, 'acts': [], 'pets': 0, 'probe': {'t': 114.4, 'wl': 1, 'tables': 3, 'pet': None}, 'cov': []})
+0 passed, 1 failed
+== mutant m_wl0
+FAIL  jill_rests_when_staff_cover_the_floor  (39.3s)
+      even on a busy day she pats a cat that comes by ({'sit': 0, 'frames': 5255, 'acts': [], 'pets': 137, 'probe': {'t': 112.4, 'wl': 1, 'tables': 3, 'pet': None}, 'cov': []})
+0 passed, 1 failed
+== done

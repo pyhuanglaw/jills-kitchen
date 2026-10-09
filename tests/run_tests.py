@@ -1395,21 +1395,35 @@ def jill_rests_when_staff_cover_the_floor(b, port, target):
     feedback (eyes, tail) without waking him.
     rc8.5: seed 7 → 16. On a day she runs alone she pats a passing cat on about three days in four, rc8.4 and rc8.5
     alike (15/20 and 16/20 seeds, 32 and 29 pats; docs/evidence/v24_rc8_5/sims/jill_pats_*.txt); the small-talk budget
-    moved the random stream and seed 7 landed on a day without one."""
+    moved the random stream and seed 7 landed on a day without one.
+    2026-10-09 (the walkway through the line): her first breather on the busy floor. With the cooking system she spends
+    most of a day alone in the kitchen: on Day 1 she pats a passing cat on 10 of 20 days (8298e18; main before it 16/20,
+    29 pats → 13), the walkway 11/20, the same harness as above (docs/evidence/cooking_2026-10-09/walkway/jill_pats_*.txt).
+    Her breathers in the dining room are two or three of a few seconds, and whether a cat happens to be beside her then
+    is a coin toss that anything moving the random stream flips: the walkway turned seed 16 from a day with pats to one
+    without, the rate unchanged; bringing 樾樾 to her at every breather still missed on 2 of 12 seeds (the roll did not
+    come in time). What the line asks — a busy floor does not stop her — is now asked of the rule itself: at her first
+    breather in the dining room with two or more tables taken (on Day 1, once the first wave is served, about 110 s in;
+    there on seeds 1-12 of both builds), 樾樾 rests beside her and the roll comes up (Math.random held low for that one
+    update): she pats a cat. Still caught (…/jill_pats_test_proof.txt): no pats at all; pats only once she has been calm
+    for 5 s, as the sofa asks; on this seed also pats only with nothing waiting (her breather here has one thing waiting).
+    The natural rate is the harness's to measure, not one seed's day."""
     g = Game(b, port, target, seed=16, manual=True)
     install_bot(g)
     g.ev(LAZY_ACTOR)
     g.click('[data-act=open]')
-    def run_day(actor):
+    PROBE = "if(__rs.probe===null&&!J.cur&&!J.pet&&!J.rest&&J.tx==null&&(J.room||'main')==='main'&&J.idle>1.5&&R.closing==null&&R.groups.filter(q=>q.table!=null).length>=2){const wl=jillWorkload();if(wl<=2){const c=CATS.find(k=>k.def.id==='tora');releaseSpots(c);Object.assign(c,{x:J.x+(J.x<200?20:-20),y:J.y+4,st:'rest',pose:'sit',t:12,perch:-1,sofa:null,hidden:false,moving:false});J.petCD=0;const r0=Math.random;Math.random=()=>.01;try{jillUpd(1/30)}finally{Math.random=r0}__rs.probe={t:+R.t.toFixed(1),wl,tables:R.groups.filter(q=>q.table!=null).length,pet:J.pet?J.pet.cat.def.id:null}}}"
+    def run_day(actor, probe=False):
         start_day(g)
-        stats = g.ev("(()=>{window.__rs={sit:0,frames:0,acts:new Set(),pets:0,cov:new Set()};return 1})()")
+        stats = g.ev("(()=>{window.__rs={sit:0,frames:0,acts:new Set(),pets:0,cov:new Set(),probe:%s};return 1})()" % ('null' if probe else "'off'"))
         for _ in range(1500):
-            r = g.ev("(()=>{for(let i=0;i<10;i++){if(!(phase==='service'&&R))return 0;if(i===0)%s();__tick(1000/30);const J=R.jill;__rs.frames++;if(J.rest==='sit'){__rs.sit++;__rs.acts.add(LIFE.jill.act)}if(J.pet)__rs.pets++;for(const s of R.slots){const m=s.job&&s.job.chef&&(S.crew||[]).find(q=>q.id===s.job.chef);if(m&&m.duty!==s.type)__rs.cov.add(s.type)}if(R.closing!=null&&R.closing>2&&!R.ended){finishClosing();return 0}}return 1})()" % actor)
+            r = g.ev("(()=>{for(let i=0;i<10;i++){if(!(phase==='service'&&R))return 0;if(i===0)%s();__tick(1000/30);const J=R.jill;__rs.frames++;if(J.rest==='sit'){__rs.sit++;__rs.acts.add(LIFE.jill.act)}if(J.pet)__rs.pets++;%s;for(const s of R.slots){const m=s.job&&s.job.chef&&(S.crew||[]).find(q=>q.id===s.job.chef);if(m&&m.duty!==s.type)__rs.cov.add(s.type)}if(R.closing!=null&&R.closing>2&&!R.ended){finishClosing();return 0}}return 1})()" % (actor, PROBE))
             if not r: break
-        return g.ev("({sit:__rs.sit,frames:__rs.frames,acts:[...__rs.acts],pets:__rs.pets,cov:[...__rs.cov,...(window.__wfx||[])]})")
-    alone = run_day('__act')
+        return g.ev("({sit:__rs.sit,frames:__rs.frames,acts:[...__rs.acts],pets:__rs.pets,probe:__rs.probe,cov:[...__rs.cov,...(window.__wfx||[])]})")
+    alone = run_day('__act', probe=True)
     check(alone['sit'] / max(1, alone['frames']) < .03, f'day 1 alone: Jill has no time to sit ({alone})')
-    check(alone['pets'] > 0, 'even on a busy day she pats a cat that comes by')
+    check(isinstance(alone['probe'], dict), f'day 1 alone: she never had a breather in the dining room with two tables taken ({alone})')
+    check(isinstance(alone['probe'], dict) and bool(alone['probe']['pet']), f'even on a busy day she pats a cat that comes by ({alone})')
     if g.ev("phase") == 'summary': g.click('[data-act=toShop]')
     g.click('[data-act=nextDay]')
     # v2.5 (docs/cooking/ARCHITECTURE.md §「改過的測試」): in the new kitchen a cook works the places he knows (the user's

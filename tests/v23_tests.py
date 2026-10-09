@@ -1153,7 +1153,7 @@ def kitchen_works_walk_in_and_a_second_coffee_machine(b, port, target):
     load_fixture(g, 'player_day52.json')
     g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(200)
     check(g.ev("fridgeCap()") == 260 and g.ev("restaurantCap()") == 12 and g.ev("stationCap('bar')") == 2 and g.ev("buildSlots().filter(s=>s.type==='bar').length") == 2, 'before: 260, 12 people, two cups')
-    check(g.ev("[0,1,2].map(i=>slotHome({type:'stove',no:i+1}).x-KX.range.x).join(',')") == '30,80,130', 'the six-burner line is where it always was')
+    check(g.ev("[0,1,2].map(i=>slotHome({type:'stove',no:i+1}).x-KX.range.x).join(',')") == '30,78,126', 'the six-burner line is where it always was')   # (2026-10-09: 30,80,130 on a range 160 wide; 156 since the walkway through the line)
     g.ev("shopTab='kitchen';showShop()"); g.page.wait_for_timeout(100)
     txt = g.ev("document.querySelector('#screen').innerText")
     check('後場工程' in txt and '走入式冷藏庫' in txt and '廚房二期' in txt and '冷藏庫' in txt and '廚房擴建' in txt, 'the kitchen tab ends with the back-of-house works')

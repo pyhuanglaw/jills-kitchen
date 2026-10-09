@@ -1,0 +1,62 @@
+== 0. what differs in the game: files and lines
+ js/game.js | 30 ++++++++++++++++++------------
+ 1 file changed, 18 insertions(+), 12 deletions(-)
+== 1. 8298e18's game, the baselines as they are
+PASS  cat_personality_fingerprint  (2.2s)
+PASS  golden_scenario  (3.0s)
+PASS  golden_frames  (117.3s)
+3 passed, 0 failed
+== 2. the walkway build, the baselines as they are
+FAIL  cat_personality_fingerprint  (1.6s)
+      cat behaviour differs from the baseline in: ['evening.states', 'evening.time', 'evening.weights', 'service.states', 'service.weights']
+FAIL  golden_scenario  (2.5s)
+      day 1 differs from golden baseline: {"lifetime": [1160, 1179], "weights": ["2004:9911bef", "2135:e4b9eea5"], "catHash": ["1aed7219", "d40a9f2b"], "reviewHash": ["5dd53ce6", "9bb86316"], "money": [1790, 1809], "reviews": [3, 4], "cats": [[["tora", "home", "walk", 114, 90, -1, true], ["ban", "side", "loaf", 222, 529, -1, false], ["snow", "home", "loaf", 184, 132, -1, true], ["mikan", "rest", "
+FAIL  golden_frames  (113.7s)
+      service_panel: pixels differ in box (0, 127, 390, 562) (see tests/artifacts/)
+      evening: pixels differ in box (46, 19, 377, 783) (see tests/artifacts/)
+      summary: pixels differ in box (183, 19, 374, 683) (see tests/artifacts/)
+      shop: pixels differ in box (114, 19, 390, 416) (see tests/artifacts/)
+      book_cats: pixels differ in box (315, 19, 334, 31) (see tests/artifacts/)
+      book_mem: pixels differ in box (23, 19, 366, 795) (see tests/artifacts/)
+      day1: 7516 frames, baseline 7709
+      day1: first differing sample #22 (t=22.1): scene
+      day1: end-of-day digest differs: money, lifetime, stats, reviews, reviewHash, summary, cats, catHash, mem, weights, life
+      day2: 8013 frames, baseline 9259
+      day2: first differing sample #0 (t=0.033): scene, dom, cats, weights
+      day2: end-of-day digest differs: money, lifetime, stats, xp, stock, reviews, reviewHash, summary, cats, catHash, mem, weights, life
+0 passed, 3 failed
+== 3. re-recorded on the walkway build
+    recorded cat fingerprint -> tests/golden/cats.json
+PASS  cat_personality_fingerprint  (1.6s)
+    recorded golden baseline -> tests/golden/scenario.json
+PASS  golden_scenario  (2.8s)
+    recorded frame baseline -> tests/golden/frames.json + 10 screens
+PASS  golden_frames  (110.6s)
+3 passed, 0 failed
+PASS  cat_personality_fingerprint  (1.5s)
+PASS  golden_scenario  (2.8s)
+PASS  golden_frames  (108.2s)
+3 passed, 0 failed
+== 4. still caught: three small changes, one at a time
+price 120 hair #221712
+-- g_price
+FAIL  cat_personality_fingerprint  (1.6s)
+FAIL  golden_scenario  (2.5s)
+FAIL  golden_frames  (108.1s)
+0 passed, 3 failed
+-- g_hair
+PASS  cat_personality_fingerprint  (2.1s)
+PASS  golden_scenario  (3.2s)
+FAIL  golden_frames  (110.7s)
+2 passed, 1 failed
+-- g_weight
+PASS  cat_personality_fingerprint  (1.6s)
+FAIL  golden_scenario  (2.9s)
+PASS  golden_frames  (109.4s)
+2 passed, 1 failed
+-- g_gap
+FAIL  cat_personality_fingerprint  (1.7s)
+FAIL  golden_scenario  (3.2s)
+FAIL  golden_frames  (110.9s)
+0 passed, 3 failed
+== done

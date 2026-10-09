@@ -1098,7 +1098,8 @@ def cooking_the_bar_kitchens_burner_has_a_place_of_its_own(b, port, target):
         xs = sorted(p[0] for p in c['pos'] if p[1] == 186)
         check(all(b2 - a2 >= 38 for a2, b2 in zip(xs, xs[1:])), f'the front row is not crowded on top of itself: {c}')
     plain = {(c['kext'], c['lv']): c['pos'] for c in out if not c['pantry']}
-    old = {(0, lv): [[148 + [32, 96][i % 2], 186 if i < 2 else 160, .62] for i in range(n)] for lv, n in ((1, 1), (2, 2), (3, 3), (4, 3), (5, 4))}
+    rx = g.ev("KX_BASE.range.x")   # (2026-10-09: the range moved right for the walkway through the line — the burners keep their places on it)
+    old = {(0, lv): [[rx + [32, 96][i % 2], 186 if i < 2 else 160, .62] for i in range(n)] for lv, n in ((1, 1), (2, 2), (3, 3), (4, 3), (5, 4))}
     check(all(plain[k] == v for k, v in old.items()), f'without the Bar 小廚 the range is as it was: {plain}')
     # a dish on the Bar 小廚's burner (the last one) cooks like on any other
     g.ev("S.level=5;S.eq.stove=5;S.ops=S.ops||{};S.ops.pantry=1;R=null;phase='prep'")
