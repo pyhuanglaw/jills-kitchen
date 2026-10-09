@@ -1,0 +1,63 @@
+# 改過或新增的測試，仍抓得到它要防的問題（2026-10-09，Release Gate 八）
+# 每一項：怎麼做出「有問題的版本」（JK_GAME_JS 指向改過的 game.js），測試的結果。現在的版本這些測試都通過。
+
+## v24_xiuqin_goes_home_a_while_into_the_closing（秀琴阿姨打烊後回家）
+mutant: xqHelperUpd 的 R.closing>22 改成 R.closing>9999（她留下來）
+  FAIL gone within the closing — and she does not come back that evening: free 25.0, gone None, back False
+mutant: R.closing>70（打烊快結束才走）
+  FAIL gone within the closing — and she does not come back that evening: free 25.0, gone None, back False
+mutant: R.closing>40（晚走）
+  FAIL gone by thirty, or within twelve seconds of finishing the dishes: free 25.0, gone 46.5
+
+## world_stays_visible_across_days（第 5 天整個畫面空白的那個 bug）
+mutant: crewLook 的 (h>>>3)、(h>>>6)、(h>>>9) 改回有號的 >>（原本的 bug）
+FAIL  world_stays_visible_across_days  (11.4s)
+      day 4: page error during service: ["console.error: [frame] TypeError: Cannot read properties of undefined (reading 'charAt')\n    at hex2rgb (http://127.0.0.1:59523/js/game.js:31:26)\n    at mix (http://127.0.0.1:59523/js/game.js:32:29)\n    at shade (http://127.0.0.1:59523/js/game.js:9792:51)\n    at drawPerson (http://127.0.0.1:59523/js/game.js:1117:73)\n    at Object.f (http://127.0.0.1:5
+（同一個 mutant，在改測試以前的版本——員工叫 阿明、Hugo——照樣 PASS：那時測試已經抓不到它。）
+
+## rc85_the_crew_go_up_to_the_staff_room_in_a_busy_evening（營業中員工上休息室；種子 9205）
+mutant: 休息規則改回 rc8.5 以前的「整間店安靜下來才休息」(const quiet=!q.length&&R.groups.length<=1&&F.length>=3)
+FAIL  rc85_the_crew_go_up_to_the_staff_room_in_a_busy_evening  (14.8s)
+      several of the floor went up on their own and stayed a while (more than ~16 minutes each): []
+
+## cooking_people_walk_round_the_counters（第 13 題）
+mutant: roomObs('kitchen') 回傳 null（直線走）
+  FAIL Day 1: no walk through the line or the pass: ['door→drop at 89,329', 'door→take at 99,327', 'door→sink at 123,327', 'door→rack at 123,328', 'door→pick at 280,329']
+mutant: 廚師不繞（kWay 直接回傳目的地）
+  FAIL in play nobody stands in the line or the pass: [["cook ...",128,155,20],["cook ...",138,159,20],...]
+
+## cooking_the_bar_kitchens_burner_has_a_place_of_its_own（第 15B 題）
+build: 修之前（ad075ec 之前的工作區）
+  FAIL every burner its own spot: {'kext': 0, 'pantry': 1, 'lv': 5, 'n': 5, 'pos': [[180, 186, 0.62], [244, 186, 0.62], [180, 160, 0.62], [244, 160, 0.62], [180, 160, 0.62]]}
+
+## workflow_every_dish_goes_round_and_none_is_lost_or_made（新增；Release Gate 三 C 的守恆）
+mutant: ddDeposit 放進髒盤車時，每次第二個盤子不放進去（盤子消失）
+  FAIL Jill alone: every dish accounted for: [{'t': 138, 'made': 4, 'tables': 0, 'hands': 0, 'cart': 3, 'washed': 0, 'dyl': 0}, ...]
+
+## dylan_hidden_reveal（種子 88 → 90；分布在 dylan_seeds.txt）
+original case: ad075ec 上種子 88 → FAIL after the reveal he never sat beside her: beside=0 elsewhere=3（四個晚上沙發上 Jill 旁邊都被貓佔了）
+mutant: dylanCanSofa 永遠找不到位子（他不能坐她旁邊）
+  FAIL after the reveal he never sat beside her: beside=0 elsewhere=2
+
+## v24_saves_load_and_nothing_fires_on_load（存檔讀進來，錢、升級、員工照舊）
+原本：S.ops 要跟存檔一模一樣。ad075ec 上 player_day39.json 失敗：多了 "cart":1——第 4 題的舊存檔遷移（有洗碗機的店送大髒盤車，
+髒盤車照舊 20 個）。改成：照存檔，只多這一項（有洗碗機、沒有大髒盤車的存檔才多）。
+mutant: 每個存檔都送大髒盤車（不管有沒有洗碗機）
+  FAIL player_day2_2155.json: kept as it was (with 大髒盤車 for a dishwasher): {... 'ops': '{"cart":1}' ...} vs {}
+mutant: 讀檔時弄丟一項升級（ops.ac）
+  FAIL player_day39.json: kept as it was (with 大髒盤車 for a dishwasher): {... no "ac" ...} vs {... 'ac': 2 ...}
+
+## v24_rc6_an_authored_beat_holds_the_service_until_it_is_read（環境小事不暫停店）
+原本：hugo_tuo 觸發後 120 格（約 4 秒）內兩句話要出現。18d2039 起失敗：那一刻店裡比較熱鬧，兩句話照「閒聊不插進別人正在講的話」
+（audit N04）排在後面，大約 10 秒後才說。改成：等店裡沒人在講話才觸發（跟同一個測試前半段的暫停面板一樣），然後等兩句話出現，
+這段時間裡一次都不能出現面板、時間一直在走。
+mutant: 把 hugo_tuo 也當成要暫停的故事（shAuthored 回傳 true）
+  FAIL an ambient moment is not held: hugo_tuo held True {'dlg': True, ...}
+
+## v24_day52_save_plays_the_stories_in_order_over_forty_days（種子 7100；之前 7600 → 7100 的那一次）
+mutant: 《那面牆》永遠等不到下雨的日子（wallRain 回傳 false：故事被排程永久卡住）
+  FAIL every beat happened in forty days: {... 'yj_key': 63, 'wall_worry': None, 'wall_photos': None, ...}
+（ad075ec 上這個測試本身通過：種子 7100 的時間線動了，仍然達標。）
+
+## rc85_the_crew_go_up_to_the_staff_room_in_a_busy_evening（種子 9205；之前 9204 → 9205 的那一次）
+見上面 rc85 的 mutant：休息規則改回「整間店安靜下來才休息」→ FAIL（沒有人上樓）。

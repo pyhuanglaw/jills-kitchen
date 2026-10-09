@@ -255,7 +255,11 @@ def v24_saves_load_and_nothing_fires_on_load(b, port, target):
         raw = load_save(g, name)
         ok = json.loads(g.ev("""JSON.stringify({money:S.money,crew:(S.crew||[]).length,ops:JSON.stringify(S.ops||{}),t:(S.crew||[]).every(m=>!!tenure(m)),
           v24:Object.keys((S.story&&S.story.facts)||{}).filter(k=>/^(yj_|wall_|up_|xq_)/.test(k))})"""))
-        check(ok['money'] == raw['money'] and ok['crew'] == len(raw.get('crew') or []) and ok['ops'] == json.dumps(raw.get('ops') or {}, separators=(',', ':')), f'{name}: kept as it was: {ok}')
+        # 2026-10-09 (the user's #4): the 商用洗碗機 no longer brings the cart of 20; a save that has it gets 大髒盤車 once on
+        # loading (cartMig), so its cart stays 20 — the one change a save's upgrades take; everything else exactly as saved
+        want_ops = dict(raw.get('ops') or {})
+        if want_ops.get('dish') and not want_ops.get('cart'): want_ops['cart'] = 1
+        check(ok['money'] == raw['money'] and ok['crew'] == len(raw.get('crew') or []) and json.loads(ok['ops']) == want_ops, f'{name}: kept as it was (with 大髒盤車 for a dishwasher): {ok} vs {want_ops}')
         raw_v24 = sorted(k for k in ((raw.get('story') or {}).get('facts') or {}) if re.match(r'^(yj_|wall_|up_|xq_)', k))
         check(ok['t'] and sorted(ok['v24']) == raw_v24, f'{name}: tenure classes; the v2.4 story facts exactly as saved (none for a save from before v2.4): {ok} vs {raw_v24}')
         check(not g.errors, f'{name}: {g.errors[:3]}'); g.close()
@@ -2207,12 +2211,23 @@ def v24_rc6_an_authored_beat_holds_the_service_until_it_is_read(b, port, target)
     check([x['t'] for x in kept] == ['炸雞好了沒？', '沒有。'] + script and {x['w'] for x in kept} == {'沈晴', '阿拓'}, f'its page keeps exactly its lines: {kept}')
     _frames(g, 30)
     check(json.loads(g.ev(HOLD_SNAP))['t'] > before['t'], 'and the service goes on')
-    # an ambient moment: in the room, in real time, nothing held
+    # an ambient moment: in the room, in real time, nothing held. 2026-10-09: its two lines are said as small talk is — after the
+    # exchange being said in the room (audit N04's floor); since the one Jill (18d2039) this evening's room is busier at this
+    # moment and the lines came some ten seconds on, past the old four seconds. So: fired when the floor is free, as the panel
+    # above is, and the lines waited for (never held: no panel, the clock running all along). Still caught: an ambient moment
+    # made a held beat fails it (docs/cooking/ARCHITECTURE.md, test changes 36).
+    for _ in range(40):
+        if g.ev("!floorBusy()&&!(R.talkq||[]).length"): break
+        _frames(g, 15)
     g.ev("delete story().ev.hugo_tuo;const E=STORY_EV.find(e=>e.k==='hugo_tuo');E.__w=E.when;E.when=()=>true")
     t0 = g.ev("R.t"); fired = g.ev("storyTick('order',{})")
-    _frames(g, 120)
-    amb = json.loads(g.ev("JSON.stringify({dlg:!!DLG,log:dayLog().slice(-30).map(l=>l.t)})"))
-    check(fired == 'hugo_tuo' and not amb['dlg'] and g.ev("R.t") > t0 + 2 and '你炸的比較快。' in amb['log'] and '油比較熱。' in amb['log'], f'an ambient moment is not held: {fired} {amb}')
+    held = False
+    for _ in range(40):
+        _frames(g, 15)
+        held = held or g.ev("!!DLG")
+        if all(t in json.loads(g.ev("JSON.stringify(dayLog().slice(-40).map(l=>l.t))")) for t in ('你炸的比較快。', '油比較熱。')): break
+    amb = json.loads(g.ev("JSON.stringify({dlg:!!DLG,log:dayLog().slice(-40).map(l=>l.t)})"))
+    check(fired == 'hugo_tuo' and not held and not amb['dlg'] and g.ev("R.t") > t0 + 2 and '你炸的比較快。' in amb['log'] and '油比較熱。' in amb['log'], f'an ambient moment is not held: {fired} held {held} {amb}')
     # the panel at phone size — fired, as above, when nobody in the room is in the middle of a line (audit N04: a panel waits
     # for it). v2.5 (docs/cooking/ARCHITECTURE.md §「改過的測試」): the new kitchen moved the evening's timing, and on this
     # seed someone was mid-sentence at this moment, so the panel rightly waited; this part now waits as the first one does.

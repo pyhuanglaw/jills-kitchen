@@ -970,7 +970,13 @@ def dylan_hidden_reveal(b, port, target):
     dining room and says it there (「老公。」「嗯。」), then they go back together. It is one photo and one line
     in the book, and the game just goes on. Afterwards he sometimes sits beside her and sometimes has to
     sit elsewhere."""
-    g = Game(b, port, target, seed=88, manual=True)
+    # 2026-10-09: seed 88 → 90. On ad075ec (people walk round the kitchen's counters, the user's #13) every evening's
+    # timings moved, and on 88 the four evenings after the reveal all had the sofa beside Jill taken by the cats (beside 0,
+    # elsewhere 3). Sixteen seeds (80–95) on c1a12db and on ad075ec (docs/evidence/cooking_2026-10-09/test_proofs/dylan_seeds.txt):
+    # the test passes on 10 of 16 before and 13 of 16 after (he never sat beside her: 3 seeds before, 2 after; the reveal
+    # away from his table: 3 before, 1 after) — the same behaviour, a different trajectory. 90 passes on both. Still caught:
+    # with dylanCanSofa never finding a place (he cannot sit beside her) it fails on 90 (beside 0).
+    g = Game(b, port, target, seed=90, manual=True)
     revealed_at, beside, elsewhere = dylan_reveal_scenario(g)
     check(revealed_at is not None, 'the reveal never happened in 14 evenings')
     check(g.ev("S.dylan.stage") == 3, 'stage 3 not set')

@@ -438,3 +438,44 @@ def workflow_the_inspector_weighs_how_many_how_long_and_who_is_on_them(b, port, 
     g.ev("for(let i=0;i<6;i++)S.reviews.push({s:2,txt:'x',name:'y',day:S.day,w:1})")   # untagged low reviews (older saves', the inspector's before)
     check('料理失常' not in g.ev("reviewDigestHTML()"), f'nor the digest: {g.ev("reviewDigestHTML()")}')
     check(not g.errors, g.errors[:3]); g.close()
+
+
+DISH_COUNT = r"""(()=>{window.__dc={made:0,bad:[],over:[],peak:0};const D=window.__dc;
+ const onT=()=>R.tables.reduce((a,t)=>a+(t.plates?t.plates.length:0),0);
+ for(const name of ['serveItems','treatArrive']){const f0=eval(name);const wrap=function(){const a=onT();const r=f0.apply(this,arguments);D.made+=Math.max(0,onT()-a);return r};if(name==='serveItems')serveItems=wrap;else treatArrive=wrap}
+ window.__dcCheck=function(){const hands=ddCarriers().reduce((a,w)=>a+handsN(w,'dirty'),0);const dyl=R.groups.reduce((a,g)=>a+(g.bus&&Array.isArray(g.dd)?g.dd.length:0),0)+(LIFE.dylan&&LIFE.dylan.carry&&Array.isArray(LIFE.dylan.dd)?LIFE.dylan.dd.length:0);   /* Dylan carrying his own plates to the hatch */
+  const washed=(R.st.dd&&R.st.dd.wash)||0;const now=onT()+hands+ddS().n.length+washed+dyl;const c=ddCount();if(c>D.peak)D.peak=c;
+  if(now!==D.made&&D.bad.length<5)D.bad.push({t:+R.t.toFixed(1),made:D.made,tables:onT(),hands,cart:ddS().n.length,washed,dyl});
+  if(c>ddCap()&&D.over.length<5)D.over.push({t:+R.t.toFixed(1),count:c,cap:ddCap()})}})()"""
+
+
+@test
+def workflow_every_dish_goes_round_and_none_is_lost_or_made(b, port, target):
+    """The user's release gate (2026-10-09, 三 C): 客人用餐結束 → 桌面產生髒盤 → 員工收桌 → 髒盤送回 → 洗碗 → 乾淨餐具恢復可用 →
+    桌位重新接待客人, 「資源與數量守恆，不得無故複製或消失餐盤」 — with nobody to clear but Jill, one cleaner, two cleaners with the
+    dishwasher and the big cart, a cleaner and two seasoned waiters who clear on the way. A busy stretch of each evening, every
+    second: every dish set down at a table (served, or a treat) is still on a table, in someone's hands, in the cart, or washed —
+    none lost, none made — and the cart never holds more than it can."""
+    configs = [
+        ('Jill alone', "", "window.__noXQH=1"),
+        ('one cleaner', "{id:'c1',role:'cleaner',name:'阿芳',lv:1,duty:'clean',since:1,days:3,pool:'restaurant'}", ""),
+        ('two cleaners, dishwasher, big cart', "{id:'c1',role:'cleaner',name:'阿芳',lv:2,duty:'clean',since:1,days:3,pool:'restaurant'},{id:'c2',role:'cleaner',name:'小彤',lv:1,duty:'clean',since:1,days:3,pool:'restaurant'}", "S.ops=S.ops||{};S.ops.dish=1;S.ops.cart=1"),
+        ('a cleaner, two waiters on the way', "{id:'c1',role:'cleaner',name:'阿芳',lv:1,duty:'clean',since:1,days:3,pool:'restaurant'},{id:'w1',role:'waiter',name:'小茉',lv:3,duty:'both',since:1,days:3,pool:'restaurant'},{id:'w2',role:'waiter',name:'Kai',lv:2,duty:'both',since:1,days:3,pool:'restaurant'}", "S.ops=S.ops||{};S.ops.cart=1"),
+    ]
+    for name, crew, extra in configs:
+        g = Game(b, port, target, seed=9361, manual=True, viewport={'width': 390, 'height': 844})
+        _rt.install_bot(g)
+        g.click('[data-act=open]'); g.page.wait_for_timeout(80)
+        g.ev("S.day=12;S.level=3;S.tables=6;S.money=20000;S.eq.stove=3;S.eq.prep=1;S.eq.bar=2;S.eq.fridge=3;S.crew=[%s];%s;autoStock();save()" % (crew, extra))
+        start_day(g)
+        g.ev(_rt.LAZY_ACTOR + "\nwindow.__act=window.__actLazy;")
+        g.ev(DISH_COUNT)
+        for _ in range(300):   # five minutes of the evening
+            g.ev("for(let i=0;i<30;i++){if(!__act())break;update(1/30);updateCats(1/30,0);if(!R||phase!=='service')break}if(R)__dcCheck()")
+            if g.ev("phase") != 'service': break
+        r = json.loads(g.ev("JSON.stringify({made:__dc.made,bad:__dc.bad,over:__dc.over,peak:__dc.peak,washed:(R&&R.st.dd&&R.st.dd.wash)||0,cap:R?ddCap():null})"))
+        check(r['made'] >= (6 if name == 'Jill alone' else 10), f'{name}: a busy stretch (dishes set down: {r["made"]})')
+        check(not r['bad'], f'{name}: every dish accounted for: {r["bad"]}')
+        check(not r['over'], f'{name}: the cart never holds more than it can: {r["over"]}')
+        check(name == 'Jill alone' or r['washed'] > 0, f'{name}: dishes washed and back in use: {r}')
+        check(not g.errors, f'{name}: {g.errors[:3]}'); g.close()

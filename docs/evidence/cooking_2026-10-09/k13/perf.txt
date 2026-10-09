@@ -1,0 +1,7 @@
+# 第 13 題（繞著檯子走）的運算成本：Day 92 存檔、營業一分鐘後，每一格的時間（毫秒，這台機器、headless Chromium、同時跑著回歸，只看前後差）
+# update = 遊戲邏輯一格（__act + update + updateCats）；frame = 邏輯＋整個畫面畫一次。兩次各量一遍。
+c1a12db (before)  main: frame 43.13 update 0.715 | kitchen: frame 16.75 update 0.592
+ad075ec (after)   main: frame 45.95 update 0.897 | kitchen: frame 15.81 update 0.781
+c1a12db (before)  main: frame 40.46 update 0.555 | kitchen: frame 15.95 update 0.450
+ad075ec (after)   main: frame 36.46 update 0.663 | kitchen: frame 15.54 update 0.835
+# 邏輯每格多約 0.1–0.4 ms（找路的轉角點）；畫面的時間沒有變。

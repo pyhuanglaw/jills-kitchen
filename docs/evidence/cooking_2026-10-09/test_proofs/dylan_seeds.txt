@@ -1,0 +1,52 @@
+# dylan_hidden_reveal's scenario (tests/run_tests.py dylan_reveal_scenario, checks on), seeds 80-95
+## c1a12db (before #12/#13/#15)
+{"seed": 80, "revealed": 0, "beside": 2, "elsewhere": 2, "errors": []}
+{"seed": 81, "revealed": 2, "beside": 0, "elsewhere": 3, "errors": []}
+{"seed": 82, "revealed": 2, "beside": 3, "elsewhere": 3, "errors": []}
+{"seed": 83, "error": "the reveal happened away from his table: {'t': 62.7, 'jillOn': False, 'act': 'reveal', 'jillRoom': 'main', 'dylanRoom': 'main', 'dst': 'reveal', 'dist': 67, 'phase': 'summary'}"}
+{"seed": 84, "revealed": 3, "beside": 3, "elsewhere": 4, "errors": []}
+{"seed": 85, "error": "the reveal happened away from his table: {'t': 80.15, 'jillOn': False, 'act': 'reveal', 'jillRoom': 'main', 'dylanRoom': 'main', 'dst': 'reveal', 'dist': 145, 'phase': 'summary'}"}
+{"seed": 86, "revealed": 4, "beside": 2, "elsewhere": 1, "errors": []}
+{"seed": 87, "error": "the reveal happened away from his table: {'t': 32.85, 'jillOn': False, 'act': 'reveal', 'jillRoom': 'main', 'dylanRoom': 'main', 'dst': 'reveal', 'dist': 151, 'phase': 'summary'}"}
+{"seed": 88, "revealed": 1, "beside": 3, "elsewhere": 4, "errors": []}
+{"seed": 89, "revealed": 0, "beside": 0, "elsewhere": 4, "errors": []}
+{"seed": 90, "revealed": 2, "beside": 3, "elsewhere": 2, "errors": []}
+{"seed": 91, "revealed": 1, "beside": 2, "elsewhere": 2, "errors": []}
+{"seed": 92, "revealed": 0, "beside": 1, "elsewhere": 3, "errors": []}
+{"seed": 93, "revealed": 2, "beside": 0, "elsewhere": 3, "errors": []}
+{"seed": 94, "revealed": 0, "beside": 1, "elsewhere": 2, "errors": []}
+{"seed": 95, "revealed": 0, "beside": 1, "elsewhere": 1, "errors": []}
+## ad075ec
+{"seed": 80, "revealed": 2, "beside": 3, "elsewhere": 2, "errors": []}
+{"seed": 81, "revealed": 1, "beside": 5, "elsewhere": 4, "errors": []}
+{"seed": 82, "revealed": 4, "beside": 4, "elsewhere": 4, "errors": []}
+{"seed": 83, "revealed": 1, "beside": 2, "elsewhere": 4, "errors": []}
+{"seed": 84, "error": "the reveal happened away from his table: {'t': 66.25, 'jillOn': False, 'act': 'reveal', 'jillRoom': 'main', 'dylanRoom': 'main', 'dst': 'reveal', 'dist': 83, 'phase': 'summary'}"}
+{"seed": 85, "revealed": 1, "beside": 3, "elsewhere": 3, "errors": []}
+{"seed": 86, "revealed": 2, "beside": 2, "elsewhere": 2, "errors": []}
+{"seed": 87, "revealed": 1, "beside": 2, "elsewhere": 4, "errors": []}
+{"seed": 88, "revealed": 4, "beside": 0, "elsewhere": 3, "errors": []}
+{"seed": 89, "revealed": 0, "beside": 0, "elsewhere": 2, "errors": []}
+{"seed": 90, "revealed": 1, "beside": 2, "elsewhere": 3, "errors": []}
+{"seed": 91, "revealed": 0, "beside": 4, "elsewhere": 3, "errors": []}
+{"seed": 92, "revealed": 0, "beside": 2, "elsewhere": 2, "errors": []}
+{"seed": 93, "revealed": 1, "beside": 3, "elsewhere": 2, "errors": []}
+{"seed": 94, "revealed": 5, "beside": 2, "elsewhere": 3, "errors": []}
+{"seed": 95, "revealed": 1, "beside": 2, "elsewhere": 2, "errors": []}
+## main fc0f5d8 (the official line, before the cooking system)
+{"seed": 80, "revealed": 0, "beside": 2, "elsewhere": 4, "errors": []}
+{"seed": 81, "revealed": 0, "beside": 2, "elsewhere": 4, "errors": []}
+{"seed": 82, "error": "the reveal happened away from his table: {'t': 93.7, 'jillOn': False, 'act': 'reveal', 'jillRoom': 'main', 'dylanRoom': 'main', 'dst': 'reveal', 'dist': 125, 'phase': 'summary'}"}
+{"seed": 83, "revealed": 2, "beside": 4, "elsewhere": 4, "errors": []}
+{"seed": 84, "revealed": 2, "beside": 0, "elsewhere": 2, "errors": []}
+{"seed": 85, "revealed": 2, "beside": 3, "elsewhere": 3, "errors": []}
+{"seed": 86, "revealed": 3, "beside": 1, "elsewhere": 3, "errors": []}
+{"seed": 87, "revealed": 2, "beside": 4, "elsewhere": 3, "errors": []}
+{"seed": 88, "revealed": 0, "beside": 4, "elsewhere": 4, "errors": []}
+{"seed": 89, "revealed": 2, "beside": 0, "elsewhere": 2, "errors": []}
+{"seed": 90, "revealed": 0, "beside": 3, "elsewhere": 5, "errors": []}
+{"seed": 91, "error": "the reveal happened away from his table: {'t': 79.7, 'jillOn': False, 'act': 'reveal', 'jillRoom': 'main', 'dylanRoom': 'main', 'dst': 'reveal', 'dist': 114, 'phase': 'summary'}"}
+{"seed": 92, "revealed": 0, "beside": 2, "elsewhere": 4, "errors": []}
+{"seed": 93, "revealed": 3, "beside": 3, "elsewhere": 4, "errors": []}
+{"seed": 94, "revealed": 0, "beside": 3, "elsewhere": 4, "errors": []}
+{"seed": 95, "revealed": 1, "beside": 3, "elsewhere": 4, "errors": []}

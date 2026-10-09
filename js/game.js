@@ -2416,7 +2416,8 @@ function storyTick(at,ctx){if(!S||phase==='title')return null;if(at==='close'&&t
   /* v2.4 rc6: the longest-waiting beat's day (owed) and the beat today's visits came for (res) each keep a slot; rc7: with
      two slots a day, the others wait only while every free slot is spoken for */
   if(lane==='major'&&cands.length&&(owed||res)){const want=[];if(owed)want.push(owed);for(const k of res||[])if(!want.includes(k))want.push(k);
-   if(LANE_CAP.major-(day.major||0)<=want.length){const keep=cands.filter(o=>want.includes(o.E.k)||o.E.floor===0);/* floor 0: a beat that has only this day (Dylan on Valentine's) never waits */for(const o of cands)if(!keep.includes(o))storyMiss(o.E,day);cands=keep}}
+   if(LANE_CAP.major-(day.major||0)<=want.length){const fixed=want.filter(k=>{const F=STORY_EV.find(e=>e.k===k);return !!F&&F.floor===0}),keepK=fixed.length&&fixed.length>=LANE_CAP.major-(day.major||0)?fixed:want;   /* 2026-10-09: when the slots left are fewer than the beats kept for, a beat that has only this day (floor 0: the tasting night's pairing) before one a visit came for, which can come another day */
+    const keep=cands.filter(o=>keepK.includes(o.E.k)||o.E.floor===0);/* floor 0: a beat that has only this day (Dylan on Valentine's) never waits */for(const o of cands)if(!keep.includes(o))storyMiss(o.E,day);cands=keep}}
   if(!cands.length)continue;const c=wpick(cands,x=>x.w);if(!c)continue;for(const o of cands)if(o!==c)storyMiss(o.E,day);
   const k=c.E.k;day.seen[k]=1;if(lane!=='ambient'){day[lane]=(day[lane]||0)+1;if(pos!=null)(day.lp=day.lp||{})[lane]=pos}storyTrace({at,k,lane});
   SH_PEND.add(k);shStart(k,shAuthored(c.E),ctx.g,()=>{SH_PEND.delete(k);const s=evState(k);s.n++;s.last=S.day;if(!s.d)s.d=S.day;s.miss=0;return c.pv.run(ctx)},at==='daystart');fired=fired||k}   /* the day's own beats (daystart: who is off, who is coming, the tasting) are the day as it begins — never kept waiting */
@@ -2820,7 +2821,12 @@ STORY_EV.push(
  /* BEAT 4 — the tasting evening: one authored night. Decided at the day's start; Ken is on the schedule; the choice is the player's */
  {k:'ken_tasting',lane:'major',cls:'A',floor:1,at:['daystart'],once:true,ic:'star',note:'那一晚，Ken 幫忙選了幾瓶酒——第一次有酒配菜。',
   when:()=>loungeArcOpen()&&factN('ken_pairing')>=2&&factN('lounge_idea')>=2&&kenHist().v>=4,   /* the user, 2026-10-07 (PROJECT_MEMORY §6): no Fine Dining, no restaurant level, no rating — the night comes from Ken's own story: his visits, a main he ate (ken_wine_q), the pairing talk and the idea next door, each on its own later day. S.level>=4 was v2.3's (421dd42), the rating 4.0 one morning's (a8c6abd); neither was the user's */
-  run:()=>{R.tasting={dir:null,n:0};R.sched.push({t:R.dur*.3,type:'gourmet',size:1,name:KEN,tasting:1});R.sched.sort((a,b)=>a.t-b.t);S.news=S.news||[];factSet('tasting_night');speakLater(()=>{if(R&&phase==='service')noteLine('今晚是試酒的晚上：Ken 說他會早一點來。')},2600)}},
+  run:()=>{R.tasting={dir:null,n:0};R.sched.push({t:R.dur*.3,type:'gourmet',size:1,name:KEN,tasting:1});R.sched.sort((a,b)=>a.t-b.t);S.news=S.news||[];factSet('tasting_night');
+   /* 2026-10-09 (the release gate's story check): the pairing wines are kept the night of the tasting, as Ken pays (pairing_start, 「今晚那幾支」) — that
+      major slot is the night's own, kept like the beat a story visit comes for (v24Held); without it another major beat could take the day's second
+      slot (怡君's 《三個選項》 on seed 8200 after the kitchen's walks changed every evening) and the scene came the next evening, with 「今晚」 a day late */
+   {const v=v24();if(!v.res||v.res.d!==S.day)v.res={d:S.day,k:[]};if(!v.res.k.includes('pairing_start'))v.res.k.push('pairing_start')}
+   speakLater(()=>{if(R&&phase==='service')noteLine('今晚是試酒的晚上：Ken 說他會早一點來。')},2600)}},
  /* the tasting itself, when Ken sits down that night */
  {k:'tasting_start',lane:'minor',cls:'A',floor:0,at:['seat'],once:true,
   when:ctx=>R.tasting&&!R.tasting.on&&ctx.g&&namedId(ctx.g)===KEN,
