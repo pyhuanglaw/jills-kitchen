@@ -1437,6 +1437,74 @@ def staff_every_list_has_a_name_for_every_place(b, port, target):
     check(not g.errors, g.errors[:3]); g.close()
 
 
+# the simulated player's swaps on the user's Day 92 save (overnight QA, 2026-10-10): seven cheap dishes off the menu, seven dearer on
+_SWAP_OFF = ['檸檬氣泡水', '錫蘭檸檬紅茶', '拿鐵咖啡', '焦糖布丁', '南瓜濃湯', '松露薯條', '巴斯克乳酪蛋糕']
+_SWAP_ON = ['番茄義大利麵', '經典牛肉漢堡', '生火腿沙拉', '海鮮義大利麵', '蟹肉蛋炒飯', '布拉塔番茄麵', '松露南瓜濃湯']
+
+
+def _swap_menu_by_its_switches(g):
+    for nm in _SWAP_OFF + _SWAP_ON:
+        ok = g.ev(f"""(()=>{{const d=[...S.unlocked].find(k=>dishName(k)==='{nm}');const b=d&&[...document.querySelectorAll('#screen [data-act=toggle]')].find(x=>x.dataset.d===d);if(!b)return false;b.click();return true}})()""")
+        check(ok, f'the prep screen has a switch for {nm}')
+        g.page.wait_for_timeout(30)
+
+
+@test
+def stock_one_tap_restock_leaves_no_dish_of_tonight_empty(b, port, target):
+    """Overnight QA, 2026-10-10 (the user's Day 92 save played on by the simulated player): seven dishes taken off the menu kept
+    26 portions in the fridge, seven new ones went on; 「一鍵補到建議量」 bought dish after dish in the menu's order until the
+    fridge was full, and the last ones — 布拉塔番茄麵 0/9, 松露南瓜濃湯 0/8, the dishes just put on — had nothing, every evening
+    after (「沒有備料：今晚客人點不到」), so they were never ordered. The manual: 「冰箱裝不下時會先少放一點」. Now: the fridge
+    full, every dish of tonight's menu has some (the room went round them), the toast says each was cut a little and where the
+    room is (the 26 portions off the menu, the button under it), and the opening does not warn of a dish with nothing. The same
+    with Jill's own restock (autoStock). With room for every suggestion, every dish is at its suggestion, as before; with room
+    for three portions only, they go to three dishes that have nothing, one each."""
+    g = Game(b, port, target, seed=934, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day92_2105.json')
+    if g.ev("phase") == 'shop': g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(200)
+    for _ in range(10):
+        if g.ev("typeof DLG!=='undefined'&&!!DLG"): g.ev("dlgNext()")
+    check(g.ev("phase") == 'prep', f'the prep screen: {g.ev("phase")}')
+    # room for every suggestion (the save as it is): every dish at its suggestion
+    room = json.loads(g.ev("JSON.stringify((()=>{const s=suggestStock();let need=0;for(const d in s)need+=Math.max(0,s[d]-(S.stock[d]||0));return {need,room:fridgeCap()-stockTotal()}})())"))
+    check(room['need'] <= room['room'], f'the case: room for every suggestion: {room}')
+    plan = json.loads(g.ev("JSON.stringify(restockPlan())")); full = json.loads(g.ev("JSON.stringify((()=>{const s=suggestStock(),o={};for(const d in s){const n=s[d]-(S.stock[d]||0);if(n>0)o[d]=n}return o})())"))
+    check(plan == full, 'with room for everything the plan is every suggestion')
+    # the swaps, then the press
+    _swap_menu_by_its_switches(g)
+    off = g.ev("[...S.unlocked].filter(d=>!S.menu.includes(d)).reduce((a,d)=>a+(S.stock[d]||0),0)")
+    check(off == 26, f'the case: 26 portions of dishes now off the menu stay in the fridge: {off}')
+    g.ev("if(!window.__tw){window.__tw=1;window.__toasts=[];const t0=toast;toast=function(t){__toasts.push(String(t));return t0.apply(this,arguments)}}")
+    g.click('[data-act=restock]'); g.page.wait_for_timeout(150)
+    st = json.loads(g.ev("JSON.stringify({total:stockTotal(),cap:fridgeCap(),empty:menuList().filter(stationOk).filter(d=>!((S.stock[d]||0)>0)).map(dishName),short:(()=>{const s=suggestStock();return Object.keys(s).filter(d=>(S.stock[d]||0)<s[d]).length})()})"))
+    check(st['total'] == st['cap'], f'the fridge is used to the last portion: {st}')
+    check(not st['empty'], f'no dish of tonight\'s menu is left with nothing: {st["empty"]}')
+    t = [x for x in json.loads(g.ev("JSON.stringify(__toasts)")) if '冰箱滿了' in x]
+    check(t and '每道菜都先少放一點' in t[-1] and '26 份' in t[-1] and '退掉不在菜單上的庫存' in t[-1], f'the toast says each was cut a little and where the room is: {t}')
+    g.click('[data-act=start]'); g.page.wait_for_timeout(150)
+    warn = g.ev("(()=>{const e=document.querySelector('.inline-warn');return e?e.textContent:''})()")
+    check('沒有備料' not in (warn or ''), f'the opening does not warn of a dish with nothing: {warn}')
+    # Jill's own restock (autoStock) on the same swaps
+    load_save(g, 'player_day92_2105.json')
+    if g.ev("phase") == 'shop': g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(200)
+    for _ in range(10):
+        if g.ev("typeof DLG!=='undefined'&&!!DLG"): g.ev("dlgNext()")
+    _swap_menu_by_its_switches(g); g.ev("autoStock()")
+    empty = json.loads(g.ev("JSON.stringify(menuList().filter(stationOk).filter(d=>!((S.stock[d]||0)>0)).map(dishName))"))
+    check(not empty and g.ev("stockTotal()===fridgeCap()"), f'autoStock: the fridge full and no dish with nothing: {empty}')
+    # room for three portions only (the setup puts the rest of the room into a dish off the menu, as if it had been left over):
+    # the three go to dishes that have nothing, one each — not to dishes that already have some
+    load_save(g, 'player_day92_2105.json')
+    if g.ev("phase") == 'shop': g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(200)
+    for _ in range(10):
+        if g.ev("typeof DLG!=='undefined'&&!!DLG"): g.ev("dlgNext()")
+    _swap_menu_by_its_switches(g)
+    g.ev("(()=>{const d=[...S.unlocked].find(k=>dishName(k)==='拿鐵咖啡');S.stock[d]=(S.stock[d]||0)+Math.max(0,fridgeCap()-stockTotal()-3)})()")
+    tight = json.loads(g.ev("JSON.stringify((()=>{const p=restockPlan();return {room:fridgeCap()-stockTotal(),plan:Object.entries(p).map(([d,n])=>[dishName(d),n,S.stock[d]||0])}})())"))
+    check(tight['room'] == 3 and sum(n for _, n, _ in tight['plan']) == 3 and all(n == 1 and had == 0 for _, n, had in tight['plan']), f'three portions of room go to three dishes with nothing, one each: {tight}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
 @test
 def v24_an_old_shared_cap_save_keeps_everyone_and_waits(b, port, target):
     """rc5 migration: before the split, the Lounge's +2 and +2 were added to one shared cap, so a save can hold more

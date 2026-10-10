@@ -1,0 +1,20 @@
+Day 93 prep; fridge 177/400; menu 29
+  switch 檸檬氣泡水 (sparkling): pressed -> on the menu: False
+  switch 錫蘭檸檬紅茶 (blacktea): pressed -> on the menu: False
+  switch 拿鐵咖啡 (coffee): pressed -> on the menu: False
+  switch 焦糖布丁 (pudding): pressed -> on the menu: False
+  switch 南瓜濃湯 (soup): pressed -> on the menu: False
+  switch 松露薯條 (fries): pressed -> on the menu: False
+  switch 巴斯克乳酪蛋糕 (basque): pressed -> on the menu: False
+  switch 番茄義大利麵 (pasta): pressed -> on the menu: True
+  switch 經典牛肉漢堡 (burger): pressed -> on the menu: True
+  switch 生火腿沙拉 (prosciutto): pressed -> on the menu: True
+  switch 海鮮義大利麵 (seafood): pressed -> on the menu: True
+  switch 蟹肉蛋炒飯 (friedrice_x): pressed -> on the menu: True
+  switch 布拉塔番茄麵 (pasta_x): pressed -> on the menu: True
+  switch 松露南瓜濃湯 (soup_x): pressed -> on the menu: True
+leftovers of dishes now off the menu: 拿鐵咖啡 2、南瓜濃湯 3、焦糖布丁 4、檸檬氣泡水 6、巴斯克乳酪蛋糕 6、松露薯條 5
+after 一鍵補到建議量: fridge 400/400; tonight's dishes with nothing: none; below their suggestion: ["Jill's 檸檬奶油干貝 18/20", "Jill's 莓果奶酪 12/13", '舒芙蕾 10/11', '莓果蘇打 57/63', '香煎鴨胸 9/10', '海膽燉飯 11/12', '松露蘑菇牛肉堡 13/14', '抹茶舒芙蕾 15/16', '櫻桃鴨胸 14/15', '炙烤肋眼牛排 13/14', '提拉米蘇 10/11', '香烤鮭魚 12/13', '香草烤雞 7/8', '番茄義大利麵 7/8', '經典牛肉漢堡 8/9', '生火腿沙拉 7/8', '海鮮義大利麵 8/9', '蟹肉蛋炒飯 9/10', '布拉塔番茄麵 8/9', '松露南瓜濃湯 7/8']
+toast: 冰箱滿了（400/400）：每道菜都先少放一點，Jill's 檸檬奶油干貝、Jill's 莓果奶酪、舒芙蕾 等 20 道還沒到建議量。不在菜單上的菜還放著 26 份，按下面的「退掉不在菜單上的庫存」就有位子。
+the opening's warning: None
+page errors: []

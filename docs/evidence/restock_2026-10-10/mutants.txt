@@ -1,0 +1,23 @@
+一鍵補到建議量：冰箱裝不下全部建議量時，今晚菜單上不會有菜一份都沒有（2026-10-10 晚上，使用者 Day 92 存檔被模擬玩家玩下去時發現）。
+測試 stock_one_tap_restock_leaves_no_dish_of_tonight_empty；故意做壞的版本（JK_GAME_JS 換掉 game.js），每一個都要失敗：
+- restock_in_the_menus_order：按鈕照菜單順序一道一道買（原本的做法）
+- autostock_in_the_menus_order：Jill 自己補貨（autoStock）照原本的做法
+- the_old_toast：提示照原本的寫法（沒說每道菜都少放一點）
+- no_portion_first_for_the_empty：空間很緊時不先給一份都沒有的菜
+- v2.5.2 的遊戲（fb7b6aa）
+
+== mutant restock_in_the_menus_order
+FAIL  stock_one_tap_restock_leaves_no_dish_of_tonight_empty  (6.1s)
+      no dish of tonight's menu is left with nothing: ['布拉塔番茄麵', '松露南瓜濃湯']
+== mutant autostock_in_the_menus_order
+FAIL  stock_one_tap_restock_leaves_no_dish_of_tonight_empty  (12.7s)
+      autoStock: the fridge full and no dish with nothing: ['布拉塔番茄麵', '松露南瓜濃湯']
+== mutant the_old_toast
+FAIL  stock_one_tap_restock_leaves_no_dish_of_tonight_empty  (6.7s)
+      the toast says each was cut a little and where the room is: ["冰箱滿了（400/400）：Jill's 檸檬奶油干貝、Jill's 莓果奶酪、舒芙蕾 等 20 道補不到建議量。不在菜單上的菜還放著 26 份，按下面的「退掉不在菜單上的庫存」就有位子。"]
+== mutant no_portion_first_for_the_empty
+FAIL  stock_one_tap_restock_leaves_no_dish_of_tonight_empty  (17.6s)
+      three portions of room go to three dishes with nothing, one each: {'room': 3, 'plan': [['莓果蘇打', 1, 10], ["Jill's 檸檬奶油干貝", 1, 0], ['炙烤肋眼牛排', 1, 0]]}
+== the v2.5.2 game (fb7b6aa)
+FAIL  stock_one_tap_restock_leaves_no_dish_of_tonight_empty  (2.6s)
+      Page.evaluate: ReferenceError: restockPlan is not defined

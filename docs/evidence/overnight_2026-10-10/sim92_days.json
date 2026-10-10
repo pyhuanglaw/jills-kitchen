@@ -1,0 +1,2636 @@
+{
+"args": {
+"days": 12,
+"seed": 300,
+"policy": "normal",
+"service": "human",
+"after_opening": 32,
+"width": 390,
+"json": "/tmp/claude-0/-home-user-jills-kitchen/63b8740a-97ce-5ff7-813a-d847b68fd153/scratchpad/r10/sim92/out.json",
+"log": "/tmp/claude-0/-home-user-jills-kitchen/63b8740a-97ce-5ff7-813a-d847b68fd153/scratchpad/r10/sim92/log.txt",
+"what_if": "",
+"save": "player_day92_2105.json",
+"dump_at": null,
+"dump_save": null,
+"probe": "/tmp/claude-0/-home-user-jills-kitchen/63b8740a-97ce-5ff7-813a-d847b68fd153/scratchpad/r10/sim92/probe.json",
+"dump_when": null
+},
+"rows": [
+{
+"day": 93,
+"level": 5,
+"money": 1258330,
+"crew": 20,
+"rate": 4.7,
+"beats": [
+"a:cat_known",
+"a:lin_seen",
+"a:wall_fixed",
+"a:qt_days"
+],
+"probe": {
+"waiters": "小茉、Kai、Nina、阿哲、Momo、小威",
+"wcap": "6/7",
+"chefs": "7/8",
+"cleaners": "1/2",
+"pd": 0,
+"numbered": "",
+"xia_heng": ""
+},
+"sum": {
+"rev": 114030,
+"tips": 30727,
+"bonus": 4770,
+"cost": 23515,
+"wages": 24837,
+"rent": 12200,
+"wine": 6091,
+"cfee": 3700,
+"piano": 0,
+"ken": 0,
+"loan": 0,
+"net": 79184,
+"guests": 122,
+"lost": 11,
+"perfect": 205,
+"plated": 205,
+"avg": 95,
+"lg": {
+"tabs": 19,
+"rev": 11115,
+"tip": 2987
+},
+"lgSales": [
+{
+"d": "w_house",
+"n": 6,
+"rev": 2350,
+"wine": true
+},
+{
+"d": "w_fred",
+"n": 5,
+"rev": 1370,
+"wine": true
+},
+{
+"d": "w_old",
+"n": 4,
+"rev": 2850,
+"wine": true
+},
+{
+"d": "w_spark",
+"n": 3,
+"rev": 540,
+"wine": true
+},
+{
+"d": "w_rose",
+"n": 3,
+"rev": 600,
+"wine": true
+},
+{
+"d": "w_fwhite",
+"n": 3,
+"rev": 605,
+"wine": true
+},
+{
+"d": "w_white",
+"n": 2,
+"rev": 400,
+"wine": true
+},
+{
+"d": "w_orange",
+"n": 2,
+"rev": 575,
+"wine": true
+},
+{
+"d": "w_pinot",
+"n": 1,
+"rev": 315,
+"wine": true
+},
+{
+"d": "w_cham",
+"n": 1,
+"rev": 490,
+"wine": true
+},
+{
+"d": "cheeseplate",
+"n": 1,
+"rev": 270,
+"wine": false
+},
+{
+"d": "croquette",
+"n": 1,
+"rev": 145,
+"wine": false
+},
+{
+"d": "wings",
+"n": 1,
+"rev": 230,
+"wine": false
+},
+{
+"d": "oyster",
+"n": 1,
+"rev": 375,
+"wine": false
+}
+],
+"dinWine": [
+{
+"d": "w_cham",
+"n": 6,
+"rev": 3690
+},
+{
+"d": "w_pinot",
+"n": 5,
+"rev": 1975
+},
+{
+"d": "w_rose",
+"n": 4,
+"rev": 920
+},
+{
+"d": "w_house",
+"n": 3,
+"rev": 1260
+},
+{
+"d": "w_white",
+"n": 2,
+"rev": 360
+},
+{
+"d": "w_fwhite",
+"n": 2,
+"rev": 420
+},
+{
+"d": "w_old",
+"n": 2,
+"rev": 1500
+},
+{
+"d": "w_spark",
+"n": 1,
+"rev": 145
+},
+{
+"d": "w_lred",
+"n": 1,
+"rev": 175
+}
+]
+}
+},
+{
+"day": 94,
+"level": 5,
+"money": 1215442,
+"crew": 23,
+"rate": 4.72,
+"beats": [
+"a:first_shift",
+"a:first_shift",
+"a:anan_seat",
+"a:recognize",
+"a:kd_order_together",
+"a:qx_dylan",
+"a:kx_heard",
+"a:sm_pad",
+"a:qx_after",
+"a:qt_days"
+],
+"probe": {
+"waiters": "小茉、Kai、Nina、阿哲、Momo、小威、阿芳",
+"wcap": "7/7",
+"chefs": "8/8",
+"cleaners": "2/2",
+"pd": 0,
+"numbered": "",
+"xia_heng": ""
+},
+"sum": {
+"rev": 101345,
+"tips": 25464,
+"bonus": 7230,
+"cost": 20781,
+"wages": 26931,
+"rent": 12200,
+"wine": 6915,
+"cfee": 3700,
+"piano": 0,
+"ken": 0,
+"loan": 0,
+"net": 63812,
+"guests": 113,
+"lost": 16,
+"perfect": 181,
+"plated": 181,
+"avg": 96,
+"lg": {
+"tabs": 25,
+"rev": 14605,
+"tip": 3554
+},
+"lgSales": [
+{
+"d": "w_house",
+"n": 8,
+"rev": 3105,
+"wine": true
+},
+{
+"d": "w_fred",
+"n": 7,
+"rev": 1870,
+"wine": true
+},
+{
+"d": "w_old",
+"n": 5,
+"rev": 3150,
+"wine": true
+},
+{
+"d": "w_white",
+"n": 4,
+"rev": 680,
+"wine": true
+},
+{
+"d": "w_lred",
+"n": 3,
+"rev": 525,
+"wine": true
+},
+{
+"d": "w_rose",
+"n": 3,
+"rev": 600,
+"wine": true
+},
+{
+"d": "w_cham",
+"n": 2,
+"rev": 1105,
+"wine": true
+},
+{
+"d": "w_spark",
+"n": 2,
+"rev": 325,
+"wine": true
+},
+{
+"d": "w_orange",
+"n": 2,
+"rev": 575,
+"wine": true
+},
+{
+"d": "w_pinot",
+"n": 1,
+"rev": 315,
+"wine": true
+},
+{
+"d": "croquette",
+"n": 3,
+"rev": 510,
+"wine": false
+},
+{
+"d": "knuckle",
+"n": 2,
+"rev": 1215,
+"wine": false
+},
+{
+"d": "bites",
+"n": 1,
+"rev": 235,
+"wine": false
+},
+{
+"d": "pizza",
+"n": 1,
+"rev": 395,
+"wine": false
+}
+],
+"dinWine": [
+{
+"d": "w_rose",
+"n": 7,
+"rev": 1610
+},
+{
+"d": "w_house",
+"n": 6,
+"rev": 2520
+},
+{
+"d": "w_old",
+"n": 4,
+"rev": 3000
+},
+{
+"d": "w_pinot",
+"n": 4,
+"rev": 1580
+},
+{
+"d": "w_fwhite",
+"n": 2,
+"rev": 475
+},
+{
+"d": "w_white",
+"n": 2,
+"rev": 400
+},
+{
+"d": "w_cham",
+"n": 2,
+"rev": 1230
+},
+{
+"d": "w_lred",
+"n": 1,
+"rev": 220
+}
+]
+}
+},
+{
+"day": 95,
+"level": 5,
+"money": 1271951,
+"crew": 23,
+"rate": 4.8,
+"beats": [
+"a:cat_known",
+"a:veteran_knows",
+"a:zhou_random",
+"a:lin_seen",
+"a:xq_sm_talk",
+"a:koba_not_today",
+"m:qt_often",
+"a:qt_days"
+],
+"probe": {
+"waiters": "小茉、Kai、Nina、阿哲、Momo、小威、阿芳",
+"wcap": "7/7",
+"chefs": "8/8",
+"cleaners": "2/2",
+"pd": 0,
+"numbered": "",
+"xia_heng": ""
+},
+"sum": {
+"rev": 110145,
+"tips": 30571,
+"bonus": 7305,
+"cost": 18252,
+"wages": 28160,
+"rent": 12200,
+"wine": 5350,
+"cfee": 3700,
+"piano": 2500,
+"ken": 0,
+"loan": 0,
+"net": 77859,
+"guests": 127,
+"lost": 34,
+"perfect": 225,
+"plated": 225,
+"avg": 97,
+"lg": {
+"tabs": 20,
+"rev": 12265,
+"tip": 3775
+},
+"lgSales": [
+{
+"d": "w_house",
+"n": 4,
+"rev": 1510,
+"wine": true
+},
+{
+"d": "w_fred",
+"n": 4,
+"rev": 1145,
+"wine": true
+},
+{
+"d": "w_white",
+"n": 3,
+"rev": 560,
+"wine": true
+},
+{
+"d": "w_old",
+"n": 3,
+"rev": 2100,
+"wine": true
+},
+{
+"d": "w_pinot",
+"n": 3,
+"rev": 985,
+"wine": true
+},
+{
+"d": "w_spark",
+"n": 2,
+"rev": 325,
+"wine": true
+},
+{
+"d": "w_fwhite",
+"n": 2,
+"rev": 450,
+"wine": true
+},
+{
+"d": "w_rose",
+"n": 2,
+"rev": 415,
+"wine": true
+},
+{
+"d": "w_lred",
+"n": 2,
+"rev": 395,
+"wine": true
+},
+{
+"d": "w_cham",
+"n": 2,
+"rev": 980,
+"wine": true
+},
+{
+"d": "w_orange",
+"n": 2,
+"rev": 510,
+"wine": true
+},
+{
+"d": "knuckle",
+"n": 3,
+"rev": 1755,
+"wine": false
+},
+{
+"d": "bites",
+"n": 2,
+"rev": 425,
+"wine": false
+},
+{
+"d": "croquette",
+"n": 2,
+"rev": 315,
+"wine": false
+},
+{
+"d": "pizza",
+"n": 1,
+"rev": 395,
+"wine": false
+}
+],
+"dinWine": [
+{
+"d": "w_rose",
+"n": 7,
+"rev": 1610
+},
+{
+"d": "w_house",
+"n": 7,
+"rev": 2855
+},
+{
+"d": "w_fwhite",
+"n": 3,
+"rev": 685
+},
+{
+"d": "w_pinot",
+"n": 3,
+"rev": 1105
+},
+{
+"d": "w_fred",
+"n": 2,
+"rev": 500
+},
+{
+"d": "w_spark",
+"n": 1,
+"rev": 145
+},
+{
+"d": "w_white",
+"n": 1,
+"rev": 160
+},
+{
+"d": "w_old",
+"n": 1,
+"rev": 750
+},
+{
+"d": "w_cham",
+"n": 1,
+"rev": 615
+}
+]
+}
+},
+{
+"day": 96,
+"level": 5,
+"money": 1324773,
+"crew": 23,
+"rate": 4.74,
+"beats": [
+"a:recognize",
+"a:lin_seen",
+"a:qt_days"
+],
+"probe": {
+"waiters": "小茉、Kai、Nina、阿哲、Momo、小威、阿芳",
+"wcap": "7/7",
+"chefs": "8/8",
+"cleaners": "2/2",
+"pd": 0,
+"numbered": "",
+"xia_heng": ""
+},
+"sum": {
+"rev": 93365,
+"tips": 24870,
+"bonus": 4920,
+"cost": 21010,
+"wages": 28160,
+"rent": 12200,
+"wine": 5263,
+"cfee": 3700,
+"piano": 0,
+"ken": 0,
+"loan": 0,
+"net": 52822,
+"guests": 108,
+"lost": 5,
+"perfect": 189,
+"plated": 189,
+"avg": 94,
+"lg": {
+"tabs": 20,
+"rev": 11605,
+"tip": 2767
+},
+"lgSales": [
+{
+"d": "w_house",
+"n": 13,
+"rev": 4995,
+"wine": true
+},
+{
+"d": "w_fwhite",
+"n": 3,
+"rev": 795,
+"wine": true
+},
+{
+"d": "w_fred",
+"n": 3,
+"rev": 775,
+"wine": true
+},
+{
+"d": "w_white",
+"n": 2,
+"rev": 400,
+"wine": true
+},
+{
+"d": "w_rose",
+"n": 2,
+"rev": 370,
+"wine": true
+},
+{
+"d": "w_old",
+"n": 1,
+"rev": 750,
+"wine": true
+},
+{
+"d": "w_lred",
+"n": 1,
+"rev": 220,
+"wine": true
+},
+{
+"d": "w_cham",
+"n": 1,
+"rev": 615,
+"wine": true
+},
+{
+"d": "pizza",
+"n": 5,
+"rev": 2225,
+"wine": false
+},
+{
+"d": "bites",
+"n": 1,
+"rev": 190,
+"wine": false
+},
+{
+"d": "cheeseplate",
+"n": 1,
+"rev": 270,
+"wine": false
+}
+],
+"dinWine": [
+{
+"d": "w_rose",
+"n": 11,
+"rev": 2530
+},
+{
+"d": "w_house",
+"n": 8,
+"rev": 3360
+},
+{
+"d": "w_old",
+"n": 4,
+"rev": 3000
+},
+{
+"d": "w_pinot",
+"n": 2,
+"rev": 710
+},
+{
+"d": "w_fwhite",
+"n": 1,
+"rev": 210
+},
+{
+"d": "w_spark",
+"n": 1,
+"rev": 180
+},
+{
+"d": "w_fred",
+"n": 1,
+"rev": 250
+},
+{
+"d": "w_white",
+"n": 1,
+"rev": 200
+}
+]
+}
+},
+{
+"day": 97,
+"level": 5,
+"money": 1404858,
+"crew": 23,
+"rate": 4.7,
+"beats": [
+"m:ken_wine",
+"a:cat_known",
+"v:pd_yj",
+"a:lin_seen",
+"m:dylan_valentine",
+"a:qt_extra",
+"a:qt_days"
+],
+"probe": {
+"waiters": "小茉、Kai、Nina、阿哲、Momo、小威、阿芳",
+"wcap": "7/7",
+"chefs": "8/8",
+"cleaners": "2/2",
+"pd": 0,
+"numbered": "",
+"xia_heng": ""
+},
+"sum": {
+"rev": 113495,
+"tips": 30917,
+"bonus": 7455,
+"cost": 18053,
+"wages": 28160,
+"rent": 12200,
+"wine": 7169,
+"cfee": 3700,
+"piano": 2500,
+"ken": 0,
+"loan": 0,
+"net": 80085,
+"guests": 120,
+"lost": 34,
+"perfect": 218,
+"plated": 218,
+"avg": 98,
+"lg": {
+"tabs": 21,
+"rev": 15195,
+"tip": 4373
+},
+"lgSales": [
+{
+"d": "w_cham",
+"n": 10,
+"rev": 5275,
+"wine": true
+},
+{
+"d": "w_rose",
+"n": 7,
+"rev": 1295,
+"wine": true
+},
+{
+"d": "w_lred",
+"n": 5,
+"rev": 965,
+"wine": true
+},
+{
+"d": "w_fred",
+"n": 5,
+"rev": 1275,
+"wine": true
+},
+{
+"d": "w_house",
+"n": 3,
+"rev": 1005,
+"wine": true
+},
+{
+"d": "w_spark",
+"n": 3,
+"rev": 470,
+"wine": true
+},
+{
+"d": "w_fwhite",
+"n": 2,
+"rev": 395,
+"wine": true
+},
+{
+"d": "w_pinot",
+"n": 1,
+"rev": 315,
+"wine": true
+},
+{
+"d": "w_white",
+"n": 1,
+"rev": 160,
+"wine": true
+},
+{
+"d": "w_orange",
+"n": 1,
+"rev": 320,
+"wine": true
+},
+{
+"d": "w_old",
+"n": 1,
+"rev": 600,
+"wine": true
+},
+{
+"d": "pizza",
+"n": 4,
+"rev": 1730,
+"wine": false
+},
+{
+"d": "bites",
+"n": 1,
+"rev": 190,
+"wine": false
+},
+{
+"d": "oyster",
+"n": 1,
+"rev": 375,
+"wine": false
+},
+{
+"d": "wings",
+"n": 1,
+"rev": 285,
+"wine": false
+},
+{
+"d": "knuckle",
+"n": 1,
+"rev": 540,
+"wine": false
+}
+],
+"dinWine": [
+{
+"d": "w_rose",
+"n": 5,
+"rev": 1105
+},
+{
+"d": "w_cham",
+"n": 4,
+"rev": 2460
+},
+{
+"d": "w_old",
+"n": 4,
+"rev": 3000
+},
+{
+"d": "w_pinot",
+"n": 3,
+"rev": 1105
+},
+{
+"d": "w_house",
+"n": 3,
+"rev": 1260
+},
+{
+"d": "w_spark",
+"n": 2,
+"rev": 340
+},
+{
+"d": "w_fwhite",
+"n": 2,
+"rev": 475
+},
+{
+"d": "w_fred",
+"n": 1,
+"rev": 250
+},
+{
+"d": "w_white",
+"n": 1,
+"rev": 160
+},
+{
+"d": "w_lred",
+"n": 1,
+"rev": 220
+}
+]
+}
+},
+{
+"day": 98,
+"level": 5,
+"money": 1471941,
+"crew": 23,
+"rate": 4.78,
+"beats": [
+"m:kt_night",
+"a:veteran_knows",
+"a:recognize",
+"a:lin_seen",
+"a:qt_days"
+],
+"probe": {
+"waiters": "小茉、Kai、Nina、阿哲、Momo、小威、阿芳",
+"wcap": "7/7",
+"chefs": "8/8",
+"cleaners": "2/2",
+"pd": 0,
+"numbered": "",
+"xia_heng": ""
+},
+"sum": {
+"rev": 114755,
+"tips": 28972,
+"bonus": 7530,
+"cost": 21896,
+"wages": 28160,
+"rent": 12200,
+"wine": 11410,
+"cfee": 3700,
+"piano": 0,
+"ken": 7108,
+"loan": 0,
+"net": 67083,
+"guests": 119,
+"lost": 33,
+"perfect": 191,
+"plated": 191,
+"avg": 98,
+"lg": {
+"tabs": 18,
+"rev": 35035,
+"tip": 9590
+},
+"lgSales": [
+{
+"d": "w_jk",
+"n": 23,
+"rev": 9575,
+"wine": true
+},
+{
+"d": "w_cham",
+"n": 23,
+"rev": 14020,
+"wine": true
+},
+{
+"d": "w_old",
+"n": 7,
+"rev": 5250,
+"wine": true
+},
+{
+"d": "w_spark",
+"n": 2,
+"rev": 290,
+"wine": true
+},
+{
+"d": "w_house",
+"n": 1,
+"rev": 335,
+"wine": true
+},
+{
+"d": "w_rose",
+"n": 1,
+"rev": 185,
+"wine": true
+},
+{
+"d": "w_orange",
+"n": 1,
+"rev": 255,
+"wine": true
+},
+{
+"d": "cheeseplate",
+"n": 4,
+"rev": 1360,
+"wine": false
+},
+{
+"d": "wings",
+"n": 3,
+"rev": 855,
+"wine": false
+},
+{
+"d": "bites",
+"n": 3,
+"rev": 705,
+"wine": false
+},
+{
+"d": "pizza",
+"n": 2,
+"rev": 890,
+"wine": false
+},
+{
+"d": "croquette",
+"n": 1,
+"rev": 210,
+"wine": false
+},
+{
+"d": "oyster",
+"n": 1,
+"rev": 470,
+"wine": false
+},
+{
+"d": "cheesestick",
+"n": 1,
+"rev": 220,
+"wine": false
+},
+{
+"d": "pzfungi",
+"n": 1,
+"rev": 415,
+"wine": false
+}
+],
+"dinWine": [
+{
+"d": "w_rose",
+"n": 7,
+"rev": 1565
+},
+{
+"d": "w_house",
+"n": 4,
+"rev": 1680
+},
+{
+"d": "w_white",
+"n": 3,
+"rev": 600
+},
+{
+"d": "w_jk",
+"n": 3,
+"rev": 1260
+},
+{
+"d": "w_old",
+"n": 3,
+"rev": 2250
+},
+{
+"d": "w_spark",
+"n": 2,
+"rev": 360
+},
+{
+"d": "w_pinot",
+"n": 1,
+"rev": 395
+},
+{
+"d": "w_fwhite",
+"n": 1,
+"rev": 210
+}
+]
+}
+},
+{
+"day": 99,
+"level": 5,
+"money": 1549140,
+"crew": 23,
+"rate": 4.81,
+"beats": [
+"a:cat_known",
+"a:anan_seat",
+"a:zhou_random",
+"a:kx_heard",
+"a:kd_argue",
+"a:qx_after",
+"a:qt_days"
+],
+"probe": {
+"waiters": "小茉、Kai、Nina、阿哲、Momo、小威、阿芳",
+"wcap": "7/7",
+"chefs": "8/8",
+"cleaners": "2/2",
+"pd": 0,
+"numbered": "",
+"xia_heng": ""
+},
+"sum": {
+"rev": 110690,
+"tips": 31468,
+"bonus": 7605,
+"cost": 18876,
+"wages": 28160,
+"rent": 12200,
+"wine": 7128,
+"cfee": 3700,
+"piano": 2500,
+"ken": 0,
+"loan": 0,
+"net": 77199,
+"guests": 131,
+"lost": 19,
+"perfect": 218,
+"plated": 218,
+"avg": 99,
+"lg": {
+"tabs": 26,
+"rev": 17720,
+"tip": 4754
+},
+"lgSales": [
+{
+"d": "w_pinot",
+"n": 10,
+"rev": 3270,
+"wine": true
+},
+{
+"d": "w_house",
+"n": 6,
+"rev": 2520,
+"wine": true
+},
+{
+"d": "w_spark",
+"n": 6,
+"rev": 975,
+"wine": true
+},
+{
+"d": "w_cham",
+"n": 5,
+"rev": 2825,
+"wine": true
+},
+{
+"d": "w_old",
+"n": 4,
+"rev": 2475,
+"wine": true
+},
+{
+"d": "w_white",
+"n": 3,
+"rev": 460,
+"wine": true
+},
+{
+"d": "w_fwhite",
+"n": 3,
+"rev": 740,
+"wine": true
+},
+{
+"d": "w_jk",
+"n": 2,
+"rev": 755,
+"wine": true
+},
+{
+"d": "w_rose",
+"n": 2,
+"rev": 415,
+"wine": true
+},
+{
+"d": "w_fred",
+"n": 2,
+"rev": 465,
+"wine": true
+},
+{
+"d": "w_lred",
+"n": 2,
+"rev": 330,
+"wine": true
+},
+{
+"d": "w_orange",
+"n": 1,
+"rev": 255,
+"wine": true
+},
+{
+"d": "wings",
+"n": 2,
+"rev": 460,
+"wine": false
+},
+{
+"d": "cheesestick",
+"n": 2,
+"rev": 395,
+"wine": false
+},
+{
+"d": "pizza",
+"n": 1,
+"rev": 495,
+"wine": false
+},
+{
+"d": "pzfungi",
+"n": 1,
+"rev": 520,
+"wine": false
+},
+{
+"d": "croquette",
+"n": 1,
+"rev": 210,
+"wine": false
+},
+{
+"d": "mushroom",
+"n": 1,
+"rev": 155,
+"wine": false
+}
+],
+"dinWine": [
+{
+"d": "w_rose",
+"n": 5,
+"rev": 1150
+},
+{
+"d": "w_white",
+"n": 2,
+"rev": 360
+},
+{
+"d": "w_pinot",
+"n": 2,
+"rev": 790
+},
+{
+"d": "w_old",
+"n": 2,
+"rev": 1500
+},
+{
+"d": "w_lred",
+"n": 2,
+"rev": 440
+},
+{
+"d": "w_cham",
+"n": 2,
+"rev": 1230
+},
+{
+"d": "w_spark",
+"n": 2,
+"rev": 325
+},
+{
+"d": "w_house",
+"n": 1,
+"rev": 420
+},
+{
+"d": "w_fred",
+"n": 1,
+"rev": 250
+},
+{
+"d": "w_jk",
+"n": 1,
+"rev": 420
+},
+{
+"d": "w_fwhite",
+"n": 1,
+"rev": 210
+}
+]
+}
+},
+{
+"day": 100,
+"level": 5,
+"money": 1605926,
+"crew": 23,
+"rate": 4.63,
+"beats": [
+"v:pd_other",
+"a:recognize",
+"a:kx_asks",
+"a:qx_dylan",
+"a:kd_order_together",
+"a:qx_dylan",
+"a:lin_seen",
+"a:qt_days"
+],
+"probe": {
+"waiters": "小茉、Kai、Nina、阿哲、Momo、小威、阿芳",
+"wcap": "7/7",
+"chefs": "8/8",
+"cleaners": "2/2",
+"pd": 0,
+"numbered": "",
+"xia_heng": ""
+},
+"sum": {
+"rev": 97775,
+"tips": 26766,
+"bonus": 5120,
+"cost": 22023,
+"wages": 28160,
+"rent": 12200,
+"wine": 6492,
+"cfee": 3700,
+"piano": 0,
+"ken": 0,
+"loan": 0,
+"net": 56786,
+"guests": 116,
+"lost": 28,
+"perfect": 193,
+"plated": 193,
+"avg": 98,
+"lg": {
+"tabs": 21,
+"rev": 10620,
+"tip": 2974
+},
+"lgSales": [
+{
+"d": "w_house",
+"n": 7,
+"rev": 2855,
+"wine": true
+},
+{
+"d": "w_rose",
+"n": 7,
+"rev": 1385,
+"wine": true
+},
+{
+"d": "w_fred",
+"n": 4,
+"rev": 1120,
+"wine": true
+},
+{
+"d": "w_spark",
+"n": 4,
+"rev": 540,
+"wine": true
+},
+{
+"d": "w_cham",
+"n": 3,
+"rev": 1720,
+"wine": true
+},
+{
+"d": "w_fwhite",
+"n": 2,
+"rev": 475,
+"wine": true
+},
+{
+"d": "w_white",
+"n": 2,
+"rev": 360,
+"wine": true
+},
+{
+"d": "w_lred",
+"n": 2,
+"rev": 350,
+"wine": true
+},
+{
+"d": "w_jk",
+"n": 1,
+"rev": 335,
+"wine": true
+},
+{
+"d": "w_pinot",
+"n": 1,
+"rev": 395,
+"wine": true
+},
+{
+"d": "cheesestick",
+"n": 3,
+"rev": 570,
+"wine": false
+},
+{
+"d": "wings",
+"n": 2,
+"rev": 515,
+"wine": false
+}
+],
+"dinWine": [
+{
+"d": "w_pinot",
+"n": 6,
+"rev": 2290
+},
+{
+"d": "w_house",
+"n": 5,
+"rev": 2100
+},
+{
+"d": "w_rose",
+"n": 4,
+"rev": 920
+},
+{
+"d": "w_jk",
+"n": 4,
+"rev": 1680
+},
+{
+"d": "w_cham",
+"n": 4,
+"rev": 2460
+},
+{
+"d": "w_old",
+"n": 3,
+"rev": 2250
+},
+{
+"d": "w_fwhite",
+"n": 2,
+"rev": 475
+},
+{
+"d": "w_fred",
+"n": 1,
+"rev": 250
+},
+{
+"d": "w_spark",
+"n": 1,
+"rev": 180
+}
+]
+}
+},
+{
+"day": 101,
+"level": 5,
+"money": 1686377,
+"crew": 23,
+"rate": 4.62,
+"beats": [
+"a:veteran_knows",
+"a:koba_not_today",
+"a:cat_known",
+"m:du_wine",
+"m:kd_photo2",
+"a:lin_seen",
+"m:milestone",
+"a:qt_extra",
+"a:qt_days"
+],
+"probe": {
+"waiters": "小茉、Kai、Nina、阿哲、Momo、小威、阿芳",
+"wcap": "7/7",
+"chefs": "8/8",
+"cleaners": "2/2",
+"pd": 0,
+"numbered": "",
+"xia_heng": ""
+},
+"sum": {
+"rev": 109140,
+"tips": 32245,
+"bonus": 7755,
+"cost": 17858,
+"wages": 28160,
+"rent": 12200,
+"wine": 6771,
+"cfee": 3700,
+"piano": 0,
+"ken": 0,
+"loan": 0,
+"net": 80451,
+"guests": 120,
+"lost": 18,
+"perfect": 213,
+"plated": 213,
+"avg": 99,
+"lg": {
+"tabs": 24,
+"rev": 14780,
+"tip": 4757
+},
+"lgSales": [
+{
+"d": "w_pinot",
+"n": 7,
+"rev": 2325,
+"wine": true
+},
+{
+"d": "w_spark",
+"n": 7,
+"rev": 1120,
+"wine": true
+},
+{
+"d": "w_lred",
+"n": 4,
+"rev": 700,
+"wine": true
+},
+{
+"d": "w_fred",
+"n": 4,
+"rev": 1060,
+"wine": true
+},
+{
+"d": "w_cham",
+"n": 3,
+"rev": 1845,
+"wine": true
+},
+{
+"d": "w_house",
+"n": 3,
+"rev": 1260,
+"wine": true
+},
+{
+"d": "w_orange",
+"n": 3,
+"rev": 830,
+"wine": true
+},
+{
+"d": "w_white",
+"n": 3,
+"rev": 600,
+"wine": true
+},
+{
+"d": "w_rose",
+"n": 2,
+"rev": 415,
+"wine": true
+},
+{
+"d": "w_jk",
+"n": 2,
+"rev": 670,
+"wine": true
+},
+{
+"d": "w_old",
+"n": 1,
+"rev": 750,
+"wine": true
+},
+{
+"d": "knuckle",
+"n": 3,
+"rev": 1890,
+"wine": false
+},
+{
+"d": "bites",
+"n": 2,
+"rev": 470,
+"wine": false
+},
+{
+"d": "mushroom",
+"n": 1,
+"rev": 220,
+"wine": false
+},
+{
+"d": "wings",
+"n": 1,
+"rev": 230,
+"wine": false
+},
+{
+"d": "pizza",
+"n": 1,
+"rev": 395,
+"wine": false
+}
+],
+"dinWine": [
+{
+"d": "w_house",
+"n": 9,
+"rev": 3780
+},
+{
+"d": "w_pinot",
+"n": 5,
+"rev": 1895
+},
+{
+"d": "w_rose",
+"n": 4,
+"rev": 920
+},
+{
+"d": "w_cham",
+"n": 3,
+"rev": 1845
+},
+{
+"d": "w_white",
+"n": 3,
+"rev": 560
+},
+{
+"d": "w_jk",
+"n": 2,
+"rev": 840
+},
+{
+"d": "w_fwhite",
+"n": 1,
+"rev": 210
+},
+{
+"d": "w_old",
+"n": 1,
+"rev": 750
+},
+{
+"d": "w_orange",
+"n": 1,
+"rev": 320
+},
+{
+"d": "w_spark",
+"n": 1,
+"rev": 180
+}
+]
+}
+},
+{
+"day": 102,
+"level": 5,
+"money": 1660508,
+"crew": 23,
+"rate": 4.57,
+"beats": [
+"a:recognize",
+"a:lin_seen",
+"a:qx_dylan",
+"m:pd_story",
+"a:qx_after",
+"a:qt_days"
+],
+"probe": {
+"waiters": "小茉、Kai、Nina、阿哲、Momo、小威、阿芳",
+"wcap": "7/7",
+"chefs": "8/8",
+"cleaners": "2/2",
+"pd": 0,
+"numbered": "",
+"xia_heng": ""
+},
+"sum": {
+"rev": 104285,
+"tips": 28185,
+"bonus": 5220,
+"cost": 20109,
+"wages": 28160,
+"rent": 12200,
+"wine": 6590,
+"cfee": 3700,
+"piano": 2500,
+"ken": 0,
+"loan": 0,
+"net": 64131,
+"guests": 124,
+"lost": 23,
+"perfect": 204,
+"plated": 204,
+"avg": 95,
+"lg": {
+"tabs": 22,
+"rev": 14380,
+"tip": 3425
+},
+"lgSales": [
+{
+"d": "w_cham",
+"n": 6,
+"rev": 3315,
+"wine": true
+},
+{
+"d": "w_jk",
+"n": 5,
+"rev": 1845,
+"wine": true
+},
+{
+"d": "w_house",
+"n": 5,
+"rev": 1930,
+"wine": true
+},
+{
+"d": "w_spark",
+"n": 5,
+"rev": 830,
+"wine": true
+},
+{
+"d": "w_white",
+"n": 4,
+"rev": 760,
+"wine": true
+},
+{
+"d": "w_fred",
+"n": 3,
+"rev": 715,
+"wine": true
+},
+{
+"d": "w_pinot",
+"n": 3,
+"rev": 1105,
+"wine": true
+},
+{
+"d": "w_rose",
+"n": 2,
+"rev": 345,
+"wine": true
+},
+{
+"d": "w_lred",
+"n": 2,
+"rev": 350,
+"wine": true
+},
+{
+"d": "w_fwhite",
+"n": 2,
+"rev": 530,
+"wine": true
+},
+{
+"d": "w_old",
+"n": 1,
+"rev": 750,
+"wine": true
+},
+{
+"d": "cheeseplate",
+"n": 2,
+"rev": 540,
+"wine": false
+},
+{
+"d": "wings",
+"n": 1,
+"rev": 285,
+"wine": false
+},
+{
+"d": "croquette",
+"n": 1,
+"rev": 210,
+"wine": false
+},
+{
+"d": "oyster",
+"n": 1,
+"rev": 375,
+"wine": false
+},
+{
+"d": "pizza",
+"n": 1,
+"rev": 495,
+"wine": false
+}
+],
+"dinWine": [
+{
+"d": "w_pinot",
+"n": 6,
+"rev": 2290
+},
+{
+"d": "w_house",
+"n": 6,
+"rev": 2520
+},
+{
+"d": "w_rose",
+"n": 3,
+"rev": 690
+},
+{
+"d": "w_fwhite",
+"n": 2,
+"rev": 475
+},
+{
+"d": "w_old",
+"n": 2,
+"rev": 1500
+},
+{
+"d": "w_white",
+"n": 1,
+"rev": 160
+},
+{
+"d": "w_fred",
+"n": 1,
+"rev": 250
+},
+{
+"d": "w_orange",
+"n": 1,
+"rev": 320
+},
+{
+"d": "w_jk",
+"n": 1,
+"rev": 420
+},
+{
+"d": "w_lred",
+"n": 1,
+"rev": 220
+},
+{
+"d": "w_cham",
+"n": 1,
+"rev": 615
+}
+]
+}
+},
+{
+"day": 103,
+"level": 5,
+"money": 1488474,
+"crew": 23,
+"rate": 4.57,
+"beats": [
+"a:cat_known",
+"a:zhou_random",
+"a:lin_seen",
+"a:qt_days"
+],
+"probe": {
+"waiters": "小茉、Kai、Nina、阿哲、Momo、小威、阿芳",
+"wcap": "7/8",
+"chefs": "8/8",
+"cleaners": "2/2",
+"pd": 1,
+"numbered": "",
+"xia_heng": ""
+},
+"sum": {
+"rev": 100230,
+"tips": 29110,
+"bonus": 7905,
+"cost": 19397,
+"wages": 28160,
+"rent": 12200,
+"wine": 5822,
+"cfee": 3700,
+"piano": 0,
+"ken": 0,
+"loan": 0,
+"net": 67966,
+"guests": 120,
+"lost": 9,
+"perfect": 201,
+"plated": 201,
+"avg": 99,
+"lg": {
+"tabs": 18,
+"rev": 11305,
+"tip": 3885
+},
+"lgSales": [
+{
+"d": "w_spark",
+"n": 7,
+"rev": 1135,
+"wine": true
+},
+{
+"d": "w_cham",
+"n": 5,
+"rev": 3075,
+"wine": true
+},
+{
+"d": "w_pinot",
+"n": 3,
+"rev": 1025,
+"wine": true
+},
+{
+"d": "w_orange",
+"n": 3,
+"rev": 800,
+"wine": true
+},
+{
+"d": "w_house",
+"n": 2,
+"rev": 755,
+"wine": true
+},
+{
+"d": "w_lred",
+"n": 2,
+"rev": 440,
+"wine": true
+},
+{
+"d": "w_fred",
+"n": 2,
+"rev": 620,
+"wine": true
+},
+{
+"d": "w_jk",
+"n": 2,
+"rev": 670,
+"wine": true
+},
+{
+"d": "w_rose",
+"n": 1,
+"rev": 230,
+"wine": true
+},
+{
+"d": "w_white",
+"n": 1,
+"rev": 160,
+"wine": true
+},
+{
+"d": "w_old",
+"n": 1,
+"rev": 600,
+"wine": true
+},
+{
+"d": "cheeseplate",
+"n": 2,
+"rev": 610,
+"wine": false
+},
+{
+"d": "oyster",
+"n": 1,
+"rev": 470,
+"wine": false
+},
+{
+"d": "pizza",
+"n": 1,
+"rev": 495,
+"wine": false
+},
+{
+"d": "cheesestick",
+"n": 1,
+"rev": 220,
+"wine": false
+}
+],
+"dinWine": [
+{
+"d": "w_rose",
+"n": 6,
+"rev": 1380
+},
+{
+"d": "w_pinot",
+"n": 5,
+"rev": 1895
+},
+{
+"d": "w_house",
+"n": 4,
+"rev": 1595
+},
+{
+"d": "w_cham",
+"n": 3,
+"rev": 1845
+},
+{
+"d": "w_orange",
+"n": 2,
+"rev": 640
+},
+{
+"d": "w_spark",
+"n": 2,
+"rev": 290
+},
+{
+"d": "w_lred",
+"n": 1,
+"rev": 175
+},
+{
+"d": "w_fwhite",
+"n": 1,
+"rev": 210
+},
+{
+"d": "w_fred",
+"n": 1,
+"rev": 250
+},
+{
+"d": "w_old",
+"n": 1,
+"rev": 750
+},
+{
+"d": "w_white",
+"n": 1,
+"rev": 160
+},
+{
+"d": "w_jk",
+"n": 1,
+"rev": 420
+}
+]
+}
+},
+{
+"day": 104,
+"level": 5,
+"money": 1546397,
+"crew": 24,
+"rate": 4.78,
+"beats": [
+"a:veteran_knows",
+"a:first_shift",
+"a:recognize",
+"a:qx_dylan",
+"a:anan_seat",
+"a:lin_seen",
+"a:qt_days"
+],
+"probe": {
+"waiters": "小茉、Kai、Nina、阿哲、Momo、小威、阿芳、小夏",
+"wcap": "8/8",
+"chefs": "8/8",
+"cleaners": "2/2",
+"pd": 1,
+"numbered": "",
+"xia_heng": "小夏 LV5"
+},
+"sum": {
+"rev": 103460,
+"tips": 33416,
+"bonus": 5320,
+"cost": 19892,
+"wages": 29286,
+"rent": 12200,
+"wine": 5495,
+"cfee": 3700,
+"piano": 2500,
+"ken": 0,
+"loan": 0,
+"net": 69123,
+"guests": 111,
+"lost": 35,
+"perfect": 209,
+"plated": 209,
+"avg": 97,
+"lg": {
+"tabs": 22,
+"rev": 12745,
+"tip": 4199
+},
+"lgSales": [
+{
+"d": "w_house",
+"n": 9,
+"rev": 3270,
+"wine": true
+},
+{
+"d": "w_rose",
+"n": 7,
+"rev": 1385,
+"wine": true
+},
+{
+"d": "w_cham",
+"n": 4,
+"rev": 1960,
+"wine": true
+},
+{
+"d": "w_jk",
+"n": 4,
+"rev": 1595,
+"wine": true
+},
+{
+"d": "w_fred",
+"n": 2,
+"rev": 560,
+"wine": true
+},
+{
+"d": "w_fwhite",
+"n": 2,
+"rev": 475,
+"wine": true
+},
+{
+"d": "w_pinot",
+"n": 2,
+"rev": 710,
+"wine": true
+},
+{
+"d": "w_white",
+"n": 1,
+"rev": 160,
+"wine": true
+},
+{
+"d": "w_spark",
+"n": 1,
+"rev": 145,
+"wine": true
+},
+{
+"d": "pizza",
+"n": 2,
+"rev": 890,
+"wine": false
+},
+{
+"d": "cheeseplate",
+"n": 2,
+"rev": 540,
+"wine": false
+},
+{
+"d": "cheesestick",
+"n": 1,
+"rev": 220,
+"wine": false
+},
+{
+"d": "mushroom",
+"n": 1,
+"rev": 175,
+"wine": false
+},
+{
+"d": "oyster",
+"n": 1,
+"rev": 470,
+"wine": false
+},
+{
+"d": "bites",
+"n": 1,
+"rev": 190,
+"wine": false
+}
+],
+"dinWine": [
+{
+"d": "w_rose",
+"n": 11,
+"rev": 2485
+},
+{
+"d": "w_pinot",
+"n": 5,
+"rev": 1975
+},
+{
+"d": "w_spark",
+"n": 4,
+"rev": 685
+},
+{
+"d": "w_house",
+"n": 2,
+"rev": 840
+},
+{
+"d": "w_cham",
+"n": 1,
+"rev": 615
+},
+{
+"d": "w_fred",
+"n": 1,
+"rev": 310
+},
+{
+"d": "w_fwhite",
+"n": 1,
+"rev": 210
+},
+{
+"d": "w_jk",
+"n": 1,
+"rev": 335
+},
+{
+"d": "w_lred",
+"n": 1,
+"rev": 175
+}
+]
+}
+}
+],
+"final": {
+"day": 105,
+"facts": {
+"first_n:品酒師 Ken": 50,
+"first_sophie": 50,
+"first_n:周董": 50,
+"first_chen": 50,
+"inspection": 50,
+"first_n:Monsieur 杜": 50,
+"first_n:老饕李先生": 50,
+"first_mia": 50,
+"first_wang": 50,
+"first_wangwife": 50,
+"first_dylan": 50,
+"first_n:Mr. Hart": 50,
+"first_koba": 50,
+"first_n:Madame Lin": 50,
+"first_leo": 50,
+"ken_wine_q": 51,
+"lounge_idea": 51,
+"first_n:戴帽子的客人": 51,
+"jill_post": 51,
+"li_2": 52,
+"ken_pairing": 52,
+"ken_du_argue": 52,
+"milestone_3000000": 52,
+"yj_meet": 54,
+"first_n:怡君": 54,
+"koba_drink": 54,
+"yj_look": 55,
+"first_n:吃貨小琪": 55,
+"tasting_night": 56,
+"tasting_dir_food": 56,
+"tasted_n:老饕李先生": 56,
+"inspector_dinner": 57,
+"lounge_project": 57,
+"lounge_built_1": 57,
+"yj_three": 58,
+"lounge_wait_leo": 58,
+"lounge_direct_n:品酒師 Ken": 58,
+"zhou_side": 59,
+"lounge_wait_koba": 59,
+"yj_chose": 59,
+"lounge_built_2": 59,
+"lounge_after_sophie": 60,
+"lounge_after_wangwife": 60,
+"lounge_after_n:Monsieur 杜": 60,
+"lounge_after_n:周董": 60,
+"yj_move": 61,
+"lounge_after_n:老饕李先生": 61,
+"lounge_after_n:品酒師 Ken": 61,
+"qt_1": 61,
+"lin_saw": 61,
+"qt_days": 61,
+"meal_box_s:cmuioxn5652|s:cmujzz8d7273": 62,
+"lounge_wait_n:Madame Lin": 62,
+"yj_key": 63,
+"yj_key_seen": 63,
+"lounge_wait_chen": 63,
+"xw_done": 63,
+"critic_back": 64,
+"lounge_after_chen": 64,
+"lounge_wait_n:周董": 64,
+"wang_dylan_1": 64,
+"lounge_built_3": 65,
+"sm_a": 65,
+"wall_worry": 65,
+"wall_call": 65,
+"sm_b": 66,
+"wall_photos": 66,
+"wang_solo": 66,
+"lounge_direct_n:Monsieur 杜": 66,
+"wall_jill": 66,
+"qt_2": 67,
+"lounge_direct_n:周董": 67,
+"wall_visit": 69,
+"lounge_wait_sophie": 69,
+"wang_dylan_2": 70,
+"wall_wang": 70,
+"staff_ensemble": 70,
+"first_n:衛生檢查員": 71,
+"up_hint": 71,
+"sp_stuff": 71,
+"qt_3": 71,
+"wall_setback": 72,
+"sp_seat": 73,
+"lounge_after_koba": 73,
+"held_n:品酒師 Ken": 73,
+"lounge_after_mia": 73,
+"lin_gift": 73,
+"up_staff": 73,
+"lounge_after_n:戴帽子的客人": 74,
+"wall_report": 75,
+"lounge_after_n:怡君": 75,
+"ken_propose": 75,
+"kd_usual": 75,
+"left_n:Monsieur 杜|n:品酒師 Ken": 75,
+"lounge_after_n:Madame Lin": 75,
+"qt_extra": 75,
+"up_inspect": 76,
+"kd_evan_1": 76,
+"wall_fee": 76,
+"lounge_direct_n:林予安": 76,
+"ya_1": 76,
+"first_n:林予安": 76,
+"sp_box": 76,
+"waited_n:Monsieur 杜": 77,
+"evan_origin": 77,
+"tuo_off": 78,
+"ken_tn": 78,
+"ken_t1": 78,
+"qt_absence": 78,
+"lounge_wait_n:Mr. Hart": 78,
+"sp_wait": 78,
+"wall_prep": 78,
+"meal_two_s:cmuioxn5652|s:cmujzz8d7273": 79,
+"up_door": 79,
+"up_cats": 79,
+"lin_hello": 0,
+"pairing_wine": 0,
+"lin_retiring": 0,
+"ken_where": 0,
+"jd_want": 0,
+"dylan_book": 0,
+"lin_viewing": 0,
+"lin_take": 0,
+"lin_closed": 0,
+"lin_signed": 0,
+"evan_knows_dylan": 0,
+"held_n:Monsieur 杜": 80,
+"ya_2": 80,
+"lounge_direct_n:Madame Lin": 81,
+"lin_guest": 81,
+"lounge_direct_dylan": 81,
+"valentine_81": 81,
+"dylan_valentine": 81,
+"up_full": 81,
+"kd_coaster": 81,
+"qt_drink": 82,
+"up_quiet": 82,
+"qx_pay": 82,
+"up_remind": 82,
+"up_small": 83,
+"ken_t2": 83,
+"ken_cut": 83,
+"wall_mediation": 84,
+"wall_settle": 84,
+"ya_3": 84,
+"up_busy": 84,
+"lounge_after_leo": 84,
+"qx_after": 84,
+"valentine_85": 85,
+"waited_n:品酒師 Ken": 85,
+"lounge_after_n:衛生檢查員": 85,
+"up_ask": 85,
+"up_lease": 85,
+"up_leak": 86,
+"sophie_gift": 86,
+"kd_qing": 86,
+"wall_paper": 86,
+"wall_paid": 86,
+"up_use": 87,
+"ya_trial": 87,
+"lounge_direct_wang": 87,
+"lounge_direct_wangwife": 87,
+"ya_join": 87,
+"wall_article": 87,
+"cn_night": 87,
+"cn_first": 87,
+"ken_t3": 88,
+"ken_collab": 88,
+"sm_c": 89,
+"dylan_notices": 89,
+"first_n:美食部落客 Momo": 89,
+"sr_story": 0,
+"sr_build": 85,
+"sm_d": 90,
+"qx_dylan": 90,
+"lounge_after_wang": 90,
+"qt_late": 90,
+"sm_e": 91,
+"lounge_direct_n:老饕李先生": 92,
+"ken_samples": 92,
+"wall_fixed": 93,
+"sr_first": 93,
+"lounge_wait_mia": 94,
+"qt_often": 95,
+"ya_sees_qt": 95,
+"ken_wine": 97,
+"pd_yj": 97,
+"valentine_97": 97,
+"sr_food": 97,
+"lounge_after_n:Mr. Hart": 99,
+"lounge_wait_n:Monsieur 杜": 99,
+"pd_other": 100,
+"lounge_wait_dylan": 100,
+"held_sophie": 101,
+"du_wine": 101,
+"milestone_10000000": 101,
+"pd_story": 102,
+"sr_fridge": 102,
+"pd_build": 102,
+"sr_nina": 104
+},
+"newRooms": {
+"pass": 27,
+"side": 29,
+"terrace": 31,
+"cooler": 31,
+"kext": 32,
+"glass": 35,
+"ceiling": 42,
+"chandelier": 44,
+"catwalk": 50,
+"walkin": 52,
+"lounge": 57,
+"lounge1": 57,
+"lounge2": 59,
+"kitchen2": 63,
+"lounge3": 65,
+"painting": 71,
+"dryage": 71,
+"piano": 71,
+"cellar": 72,
+"pizzaoven": 81,
+"lgtv": 85,
+"up": 85,
+"staff": 85,
+"pdr": 103
+},
+"crew": [
+[
+"阿德師傅",
+"chef",
+50
+],
+[
+"小茉",
+"waiter",
+50
+],
+[
+"Marco",
+"chef",
+50
+],
+[
+"小林師傅",
+"chef",
+50
+],
+[
+"秀琴阿姨",
+"cleaner",
+50
+],
+[
+"阿珠姐",
+"chef",
+50
+],
+[
+"Kai",
+"waiter",
+50
+],
+[
+"Nina",
+"waiter",
+50
+],
+[
+"Hugo",
+"chef",
+50
+],
+[
+"阿哲",
+"waiter",
+50
+],
+[
+"小彤",
+"cleaner",
+50
+],
+[
+"阿勇",
+"chef",
+50
+],
+[
+"Evan",
+"bartender",
+57
+],
+[
+"沈晴",
+"bartender",
+57
+],
+[
+"阿拓",
+"chef",
+61
+],
+[
+"安安",
+"waiter",
+61
+],
+[
+"許葳",
+"cleaner",
+61
+],
+[
+"Momo",
+"waiter",
+63
+],
+[
+"小威",
+"waiter",
+63
+],
+[
+"老周師傅",
+"chef",
+81
+],
+[
+"阿芳",
+"waiter",
+93
+],
+[
+"小魏",
+"chef",
+93
+],
+[
+"阿明",
+"cleaner",
+93
+],
+[
+"小夏",
+"waiter",
+103
+]
+]
+},
+"errors": []
+}

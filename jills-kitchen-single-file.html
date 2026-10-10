@@ -2524,7 +2524,20 @@ function shopAfterBuy(){const keep=keepAside();if(S.money<keep)toast(`⚠ 現金
 function stockQuote(d,want){const room=Math.max(0,fridgeCap()-stockTotal());const c=costOf(d);const byMoney=Math.floor(Math.max(0,S.money)/c);const n=Math.max(0,Math.min(want,room,byMoney));return{n,c,room,byMoney,why:n>=want?'':room<=0?'cap':byMoney<=0?'money':room<want&&byMoney>=room?'cap':'money'}}
 function buyStock(d,delta){const cur=S.stock[d]||0;if(delta>0){const q=stockQuote(d,delta);if(q.n<=0){buyStock.last=q;return false}S.money-=q.n*q.c;S.todayCost+=q.n*q.c;S.stock[d]=cur+q.n;buyStock.last=q;return true}else{delta=Math.max(delta,-cur);if(delta===0){buyStock.last={n:0,why:'none'};return false}S.money+= -delta*costOf(d);S.todayCost-= -delta*costOf(d);S.stock[d]=cur+delta;buyStock.last={n:delta,why:''};return true}}
 function stockFailText(d,q){return q.why==='cap'?`冰箱空間不足（還能放 ${q.room} 份，升級冰箱可以放更多）`:q.why==='money'?`錢不夠：${dishName(d)} 一份 ${fmt(q.c)}，現金 ${fmt(S.money)}`:'沒有庫存可以退'}
-function autoStock(){const sug=suggestStock();for(const d in sug){const need=sug[d]-(S.stock[d]||0);if(need>0)buyStock(d,need)}}
+/* 2026-10-10 (overnight QA on the user's Day 92 save): 「一鍵補到建議量」 bought dish after dish in the menu's order until the
+   fridge was full, so when it could not hold every suggestion (leftovers of dishes just taken off the menu, or of tonight's
+   dishes above theirs) the whole shortfall fell on the last dishes — the ones just put on the menu, left with nothing and
+   never ordered (布拉塔番茄麵 0/9, 松露南瓜濃湯 0/8, every day). The room there is now goes round tonight's dishes: each one
+   with nothing gets a portion first, the rest in proportion to what each still needs (the manual: 「冰箱裝不下時會先少放
+   一點」). With room for every suggestion it is every suggestion, as before. The money is still bought in the menu's order. */
+function restockPlan(){const sug=suggestStock();const need={};let tot=0;for(const d in sug){const n=sug[d]-(S.stock[d]||0);if(n>0){need[d]=n;tot+=n}}
+ const room=Math.max(0,fridgeCap()-stockTotal());if(tot<=room)return need;
+ const out={};let left=room;for(const d in need)if(left>0&&!(S.stock[d]>0)){out[d]=1;left--}
+ let rest=0;for(const d in need)rest+=need[d]-(out[d]||0);
+ if(rest>0&&left>0){const f=left/rest,frac=[];for(const d in need){const r=(need[d]-(out[d]||0))*f,k=Math.floor(r);if(k>0){out[d]=(out[d]||0)+k;left-=k}frac.push([d,r-k])}
+  frac.sort((x,y)=>y[1]-x[1]);for(const [d] of frac){if(left<=0)break;if((out[d]||0)<need[d]){out[d]=(out[d]||0)+1;left--}}}
+ return out}
+function autoStock(){const plan=restockPlan();for(const d in plan)buyStock(d,plan[d])}
 
 /* ================= service ================= */
 /* o.resume (audit N16, 2026-10-06): the fallback of 繼續營業 reopens the room at the clock it stopped — it is not the evening's
@@ -13734,10 +13747,11 @@ function doAct0(a,d,k,b){
  case'price':{const steps=[.8,.9,1,1.1,1.2,1.3,1.5];let i=steps.indexOf(S.price[d]||1);if(i<0)i=2;i=clamp(i+(+b.dataset.v),0,steps.length-1);S.price[d]=steps[i];sfx.tap();save();keepScroll(showPrep,`.menu-row [data-act=toggle][data-d="${d}"]`);break}
  case'stock':{const want=+b.dataset.v;const ok=buyStock(d,want);const q=buyStock.last||{};if(!ok)toast(stockFailText(d,q),'warn');else{sfx.tap();if(want>0&&q.n<want)toast(`只進了 ${q.n} 份：${q.why==='cap'?'冰箱空間不足':'錢不夠再多'}`)}save();keepScroll(showPrep,`.menu-row [data-act=toggle][data-d="${d}"]`);break}
  case'stockTo':{/* v2.2: to the suggested amount, or 補滿 (as many as the fridge and the money allow) */const mode=b.dataset.k;const cur=S.stock[d]||0;const want=mode==='max'?999:Math.max(0,(suggestStock()[d]||0)-cur);if(want<=0){toast(mode==='max'?'冰箱已經放不下了':'已經達到建議量');break}const ok=buyStock(d,want);const q=buyStock.last||{};if(!ok)toast(stockFailText(d,q),'warn');else{sfx.buy();if(mode!=='max'&&q.n<want)toast(`只進了 ${q.n} 份：${q.why==='cap'?'冰箱空間不足':'錢不夠再多'}`)}save();keepScroll(showPrep,`.menu-row [data-act=toggle][data-d="${d}"]`);break}
- case'restock':{const sug=suggestStock(),m0=S.money;for(const x in sug){const need=sug[x]-(S.stock[x]||0);if(need>0)buyStock(x,need)}
+ case'restock':{const sug=suggestStock(),plan=restockPlan(),m0=S.money;for(const x in plan)buyStock(x,plan[x])
   /* audit WS2-04: a press that cannot fill every dish says why (the fridge full after 「補滿」 on one dish; the money) */
   const short=Object.keys(sug).filter(x=>(S.stock[x]||0)<sug[x]);if(short.length){const q=stockQuote(short[0],sug[short[0]]-(S.stock[short[0]]||0));const names=short.slice(0,3).map(dishName).join('、')+(short.length>3?` 等 ${short.length} 道`:'');
-   toast(q.why==='money'?`錢不夠：${names}還沒補到建議量。`:`冰箱滿了（${stockTotal()}/${fridgeCap()}）：${names}補不到建議量。先在放太多的那道按「−」退一點，或退掉不在菜單上的庫存。`,'warn')}
+   const offN=[...S.unlocked].filter(x=>!S.menu.includes(x)).reduce((a,x)=>a+(S.stock[x]||0),0);
+   toast(q.why==='money'?`錢不夠：${names}還沒補到建議量。`:`冰箱滿了（${stockTotal()}/${fridgeCap()}）：每道菜都先少放一點，${names}還沒到建議量。${offN>0?`不在菜單上的菜還放著 ${offN} 份，按下面的「退掉不在菜單上的庫存」就有位子。`:'在放太多的那道按「−」退一點就有位子。'}`,'warn')}
   if(S.money!==m0)sfx.buy();save();keepScroll(showPrep);break}
  case'start':{const empty=menuList().filter(x=>(S.stock[x]||0)===0);if(feat().stock&&!jillStocks()&&empty.length&&!startWarned){startWarned=true;$('#startWarn').innerHTML=`<div class="inline-warn">${empty.map(x=>DISH(x).n).join('、')} 沒有備料：今晚客人點不到，店也不會自己叫貨。再按一次直接開店。</div>`;break}startWarned=false;clearCheckpoint();save();startService();break}
  case'toShop':showShop();break;

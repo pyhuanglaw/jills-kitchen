@@ -1,0 +1,639 @@
+{
+"args": {
+"days": 14,
+"seed": 300,
+"policy": "normal",
+"service": "human",
+"after_opening": 32,
+"width": 390,
+"json": "/tmp/claude-0/-home-user-jills-kitchen/63b8740a-97ce-5ff7-813a-d847b68fd153/scratchpad/r10/sim6/out.json",
+"log": "/tmp/claude-0/-home-user-jills-kitchen/63b8740a-97ce-5ff7-813a-d847b68fd153/scratchpad/r10/sim6/log.txt",
+"what_if": "",
+"save": "player_day6_1254.json",
+"dump_at": null,
+"dump_save": null,
+"probe": "/tmp/claude-0/-home-user-jills-kitchen/63b8740a-97ce-5ff7-813a-d847b68fd153/scratchpad/r10/sim6/probe.json",
+"dump_when": null
+},
+"rows": [
+{
+"day": 6,
+"level": 1,
+"money": 1884,
+"crew": 3,
+"rate": 2.21,
+"beats": [
+"a:xq_sm_talk"
+],
+"probe": {
+"staff": "秀琴阿姨(清2) 阿德師傅(廚1) 小茉(服2)",
+"caps": "廚1/1 服1/1 清0/0",
+"level": 1,
+"fire": 0
+},
+"sum": {
+"rev": 2130,
+"tips": 339,
+"bonus": 420,
+"cost": 180,
+"wages": 863,
+"rent": 300,
+"wine": 0,
+"cfee": 0,
+"piano": 0,
+"ken": 0,
+"loan": 0,
+"net": 1546,
+"guests": 11,
+"lost": 4,
+"perfect": 20,
+"plated": 20,
+"avg": 86,
+"lg": null,
+"lgSales": null,
+"dinWine": []
+}
+},
+{
+"day": 7,
+"level": 1,
+"money": 4932,
+"crew": 3,
+"rate": 2.45,
+"beats": [
+"a:recognize"
+],
+"probe": {
+"staff": "秀琴阿姨(清2) 阿德師傅(廚1) 小茉(服2)",
+"caps": "廚1/1 服1/1 清0/0",
+"level": 1,
+"fire": 0
+},
+"sum": {
+"rev": 3675,
+"tips": 545,
+"bonus": 470,
+"cost": 479,
+"wages": 863,
+"rent": 300,
+"wine": 0,
+"cfee": 0,
+"piano": 0,
+"ken": 0,
+"loan": 0,
+"net": 3048,
+"guests": 19,
+"lost": 5,
+"perfect": 30,
+"plated": 30,
+"avg": 86,
+"lg": null,
+"lgSales": null,
+"dinWine": []
+}
+},
+{
+"day": 8,
+"level": 1,
+"money": 6222,
+"crew": 3,
+"rate": 3.04,
+"beats": [
+"m:dylan_valentine",
+"a:xq_sm_talk",
+"m:yj_meet"
+],
+"probe": {
+"staff": "秀琴阿姨(清2) 阿德師傅(廚2) 小茉(服2)",
+"caps": "廚1/1 服1/1 清0/0",
+"level": 1,
+"fire": 0
+},
+"sum": {
+"rev": 3705,
+"tips": 686,
+"bonus": 520,
+"cost": 1075,
+"wages": 1046,
+"rent": 300,
+"wine": 0,
+"cfee": 0,
+"piano": 0,
+"ken": 0,
+"loan": 0,
+"net": 2490,
+"guests": 18,
+"lost": 8,
+"perfect": 31,
+"plated": 31,
+"avg": 87,
+"lg": null,
+"lgSales": null,
+"dinWine": []
+}
+},
+{
+"day": 9,
+"level": 1,
+"money": 7146,
+"crew": 3,
+"rate": 3.36,
+"beats": [
+"a:recognize",
+"m:sophie_mei_1"
+],
+"probe": {
+"staff": "秀琴阿姨(清2) 阿德師傅(廚2) 小茉(服3)",
+"caps": "廚1/1 服1/1 清0/0",
+"level": 1,
+"fire": 0
+},
+"sum": {
+"rev": 3915,
+"tips": 579,
+"bonus": 855,
+"cost": 879,
+"wages": 1246,
+"rent": 300,
+"wine": 0,
+"cfee": 0,
+"piano": 0,
+"ken": 0,
+"loan": 0,
+"net": 2924,
+"guests": 20,
+"lost": 8,
+"perfect": 32,
+"plated": 32,
+"avg": 77,
+"lg": null,
+"lgSales": null,
+"dinWine": []
+}
+},
+{
+"day": 10,
+"level": 1,
+"money": 6792,
+"crew": 3,
+"rate": 3.27,
+"beats": [
+"a:xq_sm_talk",
+"m:sm_a",
+"v:yj_look"
+],
+"probe": {
+"staff": "秀琴阿姨(清3) 阿德師傅(廚2) 小茉(服3)",
+"caps": "廚1/1 服1/1 清0/0",
+"level": 1,
+"fire": 0
+},
+"sum": {
+"rev": 3985,
+"tips": 582,
+"bonus": 0,
+"cost": 925,
+"wages": 1396,
+"rent": 300,
+"wine": 0,
+"cfee": 0,
+"piano": 0,
+"ken": 0,
+"loan": 0,
+"net": 1946,
+"guests": 20,
+"lost": 14,
+"perfect": 33,
+"plated": 33,
+"avg": 78,
+"lg": null,
+"lgSales": null,
+"dinWine": []
+}
+},
+{
+"day": 11,
+"level": 1,
+"money": 8276,
+"crew": 3,
+"rate": 3.47,
+"beats": [
+"a:xq_sm_talk"
+],
+"probe": {
+"staff": "秀琴阿姨(清3) 阿德師傅(廚2) 小茉(服3)",
+"caps": "廚1/1 服1/1 清0/0",
+"level": 1,
+"fire": 0
+},
+"sum": {
+"rev": 4765,
+"tips": 723,
+"bonus": 670,
+"cost": 1128,
+"wages": 1396,
+"rent": 300,
+"wine": 0,
+"cfee": 0,
+"piano": 0,
+"ken": 0,
+"loan": 0,
+"net": 3334,
+"guests": 20,
+"lost": 8,
+"perfect": 37,
+"plated": 37,
+"avg": 78,
+"lg": null,
+"lgSales": null,
+"dinWine": []
+}
+},
+{
+"day": 12,
+"level": 1,
+"money": 8995,
+"crew": 3,
+"rate": 3.65,
+"beats": [
+"a:xq_sm_talk",
+"a:recognize",
+"m:yj_three",
+"a:lin_seen"
+],
+"probe": {
+"staff": "秀琴阿姨(清3) 阿德師傅(廚3) 小茉(服3)",
+"caps": "廚1/1 服1/1 清0/0",
+"level": 1,
+"fire": 0
+},
+"sum": {
+"rev": 4920,
+"tips": 1110,
+"bonus": 720,
+"cost": 1295,
+"wages": 1636,
+"rent": 300,
+"wine": 0,
+"cfee": 0,
+"piano": 0,
+"ken": 0,
+"loan": 0,
+"net": 3819,
+"guests": 19,
+"lost": 11,
+"perfect": 36,
+"plated": 36,
+"avg": 88,
+"lg": null,
+"lgSales": null,
+"dinWine": []
+}
+},
+{
+"day": 13,
+"level": 1,
+"money": 9291,
+"crew": 3,
+"rate": 3.77,
+"beats": [
+"v:yj_chose"
+],
+"probe": {
+"staff": "秀琴阿姨(清4) 阿德師傅(廚3) 小茉(服3)",
+"caps": "廚1/1 服1/1 清0/0",
+"level": 1,
+"fire": 0
+},
+"sum": {
+"rev": 5010,
+"tips": 606,
+"bonus": 770,
+"cost": 1258,
+"wages": 1832,
+"rent": 300,
+"wine": 0,
+"cfee": 0,
+"piano": 0,
+"ken": 0,
+"loan": 0,
+"net": 2996,
+"guests": 20,
+"lost": 14,
+"perfect": 37,
+"plated": 37,
+"avg": 80,
+"lg": null,
+"lgSales": null,
+"dinWine": []
+}
+},
+{
+"day": 14,
+"level": 1,
+"money": 8511,
+"crew": 3,
+"rate": 3.74,
+"beats": [],
+"probe": {
+"staff": "秀琴阿姨(清4) 阿德師傅(廚3) 小茉(服4)",
+"caps": "廚1/1 服1/1 清0/0",
+"level": 1,
+"fire": 0
+},
+"sum": {
+"rev": 4840,
+"tips": 677,
+"bonus": 410,
+"cost": 1313,
+"wages": 2094,
+"rent": 300,
+"wine": 0,
+"cfee": 0,
+"piano": 0,
+"ken": 0,
+"loan": 0,
+"net": 2220,
+"guests": 21,
+"lost": 33,
+"perfect": 36,
+"plated": 36,
+"avg": 80,
+"lg": null,
+"lgSales": null,
+"dinWine": []
+}
+},
+{
+"day": 15,
+"level": 1,
+"money": 10292,
+"crew": 3,
+"rate": 3.88,
+"beats": [
+"v:yj_move",
+"m:sm_b",
+"a:recognize"
+],
+"probe": {
+"staff": "秀琴阿姨(清4) 阿德師傅(廚3) 小茉(服4)",
+"caps": "廚1/1 服1/1 清0/0",
+"level": 1,
+"fire": 0
+},
+"sum": {
+"rev": 5035,
+"tips": 1077,
+"bonus": 870,
+"cost": 1357,
+"wages": 2094,
+"rent": 300,
+"wine": 0,
+"cfee": 0,
+"piano": 0,
+"ken": 0,
+"loan": 0,
+"net": 3231,
+"guests": 22,
+"lost": 13,
+"perfect": 34,
+"plated": 34,
+"avg": 90,
+"lg": null,
+"lgSales": null,
+"dinWine": []
+}
+},
+{
+"day": 16,
+"level": 1,
+"money": 11282,
+"crew": 3,
+"rate": 3.94,
+"beats": [
+"m:sophie_mei_2"
+],
+"probe": {
+"staff": "秀琴阿姨(清5) 阿德師傅(廚3) 小茉(服4)",
+"caps": "廚1/1 服1/1 清0/0",
+"level": 1,
+"fire": 0
+},
+"sum": {
+"rev": 5735,
+"tips": 1114,
+"bonus": 1380,
+"cost": 1412,
+"wages": 2327,
+"rent": 300,
+"wine": 0,
+"cfee": 0,
+"piano": 0,
+"ken": 0,
+"loan": 0,
+"net": 4190,
+"guests": 25,
+"lost": 15,
+"perfect": 40,
+"plated": 40,
+"avg": 91,
+"lg": null,
+"lgSales": null,
+"dinWine": []
+}
+},
+{
+"day": 17,
+"level": 1,
+"money": 10978,
+"crew": 3,
+"rate": 4.16,
+"beats": [
+"m:yj_key",
+"m:lin_sees",
+"a:recognize",
+"a:lin_seen",
+"a:yj_key_seen",
+"m:ken_wine_q",
+"a:lounge_idea"
+],
+"probe": {
+"staff": "秀琴阿姨(清5) 阿德師傅(廚4) 小茉(服4)",
+"caps": "廚1/1 服1/1 清0/0",
+"level": 1,
+"fire": 0
+},
+"sum": {
+"rev": 5955,
+"tips": 1627,
+"bonus": 1455,
+"cost": 2001,
+"wages": 2640,
+"rent": 300,
+"wine": 0,
+"cfee": 0,
+"piano": 0,
+"ken": 0,
+"loan": 0,
+"net": 4096,
+"guests": 22,
+"lost": 16,
+"perfect": 43,
+"plated": 43,
+"avg": 93,
+"lg": null,
+"lgSales": null,
+"dinWine": []
+}
+},
+{
+"day": 18,
+"level": 1,
+"money": 13301,
+"crew": 3,
+"rate": 4.4,
+"beats": [
+"m:lin_sees",
+"m:lin_gift",
+"a:lin_seen",
+"a:xq_sm_talk",
+"m:ken_pairing"
+],
+"probe": {
+"staff": "秀琴阿姨(清5) 阿德師傅(廚4) 小茉(服4)",
+"caps": "廚1/1 服1/1 清0/0",
+"level": 1,
+"fire": 0
+},
+"sum": {
+"rev": 6285,
+"tips": 1909,
+"bonus": 1530,
+"cost": 1461,
+"wages": 2640,
+"rent": 300,
+"wine": 0,
+"cfee": 0,
+"piano": 0,
+"ken": 0,
+"loan": 0,
+"net": 5323,
+"guests": 23,
+"lost": 18,
+"perfect": 44,
+"plated": 44,
+"avg": 89,
+"lg": null,
+"lgSales": null,
+"dinWine": []
+}
+},
+{
+"day": 19,
+"level": 1,
+"money": 11859,
+"crew": 3,
+"rate": 4.54,
+"beats": [
+"a:veteran_knows",
+"a:lin_seen",
+"a:recognize"
+],
+"probe": {
+"staff": "秀琴阿姨(清5) 阿德師傅(廚4) 小茉(服5)",
+"caps": "廚1/1 服1/1 清0/0",
+"level": 1,
+"fire": 0
+},
+"sum": {
+"rev": 5935,
+"tips": 1197,
+"bonus": 1605,
+"cost": 1429,
+"wages": 2950,
+"rent": 300,
+"wine": 0,
+"cfee": 0,
+"piano": 0,
+"ken": 0,
+"loan": 0,
+"net": 4058,
+"guests": 23,
+"lost": 5,
+"perfect": 42,
+"plated": 42,
+"avg": 91,
+"lg": null,
+"lgSales": null,
+"dinWine": []
+}
+}
+],
+"final": {
+"day": 20,
+"facts": {
+"lin_hello": 1,
+"xq_helper": 1,
+"first_chen": 3,
+"xq_loan": 3,
+"badrv_koba": 4,
+"first_dylan": 6,
+"first_n:美食部落客 Momo": 6,
+"first_mia": 6,
+"first_leo": 7,
+"first_sophie": 7,
+"meal_box_s:cmv1wvhmu252|s:cmv1wvlws349": 8,
+"valentine_8": 8,
+"dylan_valentine": 8,
+"saw_power_chen": 8,
+"saw_power_koba": 8,
+"yj_meet": 8,
+"first_n:怡君": 8,
+"first_koba": 9,
+"first_n:Monsieur 杜": 9,
+"sm_a": 10,
+"yj_look": 10,
+"first_n:老饕李先生": 11,
+"yj_three": 12,
+"inspection": 12,
+"first_n:Madame Lin": 12,
+"first_n:Mr. Hart": 12,
+"first_n:戴帽子的客人": 13,
+"yj_chose": 13,
+"meal_two_s:cmv1wvhmu252|s:cmv1wvlws349": 14,
+"yj_move": 15,
+"sm_b": 15,
+"first_wang": 16,
+"first_wangwife": 16,
+"first_n:品酒師 Ken": 16,
+"yj_key": 17,
+"lin_saw": 17,
+"yj_key_seen": 17,
+"saw_power_n:老饕李先生": 17,
+"ken_wine_q": 17,
+"first_n:周董": 17,
+"lounge_idea": 17,
+"lin_gift": 18,
+"ken_pairing": 18
+},
+"newRooms": {},
+"crew": [
+[
+"秀琴阿姨",
+"cleaner",
+1
+],
+[
+"阿德師傅",
+"chef",
+3
+],
+[
+"小茉",
+"waiter",
+3
+]
+]
+},
+"errors": []
+}

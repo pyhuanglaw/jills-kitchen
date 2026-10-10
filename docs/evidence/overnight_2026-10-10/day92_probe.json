@@ -1,0 +1,9 @@
+{
+ "waiters": "roleCrew('waiter').map(m=>m.name).join('、')",
+ "wcap": "roleCrew('waiter').length+'/'+roleCap('waiter')",
+ "chefs": "roleCrew('chef').length+'/'+roleCap('chef')",
+ "cleaners": "roleCrew('cleaner').length+'/'+roleCap('cleaner')",
+ "pd": "pdStage()",
+ "numbered": "S.crew.filter(m=>/^(服務生|廚師|清潔員)\\d*$/.test(m.name)).map(m=>m.name).join(',')",
+ "xia_heng": "S.crew.filter(m=>m.name==='小夏'||m.name==='阿衡').map(m=>m.name+' LV'+m.lv).join('、')"
+}

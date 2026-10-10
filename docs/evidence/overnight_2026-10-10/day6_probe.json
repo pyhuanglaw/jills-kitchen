@@ -1,0 +1,6 @@
+{
+ "staff": "S.crew.map(m=>m.name+'('+({chef:'廚',waiter:'服',cleaner:'清',bartender:'酒'}[m.role]||m.role)+m.lv+')').join(' ')",
+ "caps": "'廚'+roleCrew('chef').length+'/'+roleCap('chef')+' 服'+roleCrew('waiter').length+'/'+roleCap('waiter')+' 清'+roleCrew('cleaner').length+'/'+roleCap('cleaner')",
+ "level": "S.level",
+ "fire": "(R&&R.fireCount)||0"
+}
