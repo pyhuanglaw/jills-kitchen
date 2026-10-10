@@ -6,7 +6,7 @@ main，不需要再詢問」）。驗收標準沿用 `docs/cooking/RELEASE_GATE_
 
 ## 先講結論
 
-- **合併的遊戲版本＝ commit 8ded2e2**（branch `feature/cooking-gameplay`；之後的 commit 只有文件、證據和兩個測試的修正，`js/` 沒有再動）。**合併後 `main` ＝ 【待填：MAIN】**。
+- **合併的遊戲版本＝ commit 8ded2e2**（branch `feature/cooking-gameplay`；之後的 commit 只有文件、證據和兩個測試的修正，`js/` 沒有再動）。**合併後 `main` ＝ 10fc67f**（從 7851f7c 快轉，2026-10-10；這份紀錄是合併後再補的一個只改文件的 commit）。
 - **P0：0 件。** 這一輪找到並修好一個會讓晚上停住的舊問題（營業中途存檔時有員工正走去休息室，重開後出錯；見「六」）。
 - **完整回歸**：8ded2e2 上 354 項，**352 通過、2 個失敗**。兩個都是從 1f7ff75（Jill 走過去摸貓）起整天的時間線移動，測試原本靠一個種子的運氣通過的地方——不是遊戲的問題；原始案例都保留、量了分布、照規則處理、用做壞的版本證明還抓得到（「七」）。處理後兩個測試在最後的程式上都通過；其他 352 項的程式從 8ded2e2 起沒有變。
 - **沒有真實 iPhone**：手機畫面都是桌面 Chromium 開成 iPhone 尺寸（390×844、375×667、430×932、橫向 844×390），不是實機驗收。
@@ -194,7 +194,18 @@ main，不需要再詢問」）。驗收標準沿用 `docs/cooking/RELEASE_GATE_
 
 ## 九、合併
 
-【待填：MERGE】
+- **合併前確認**（2026-10-10，合併前一刻）：`origin/main` ＝ 7851f7c15e87b96d74ffbdc98536efbb991f621c，`origin/feature/cooking-gameplay` ＝
+  10fc67f90db2f48b2a4aaab0a03c3692c7fadf13（本機一樣）；`main` 是 feature 的祖先，可以快轉，中間 12 個 commit。
+- **可回復的備份**：`archive/main-before-round2-2026-10-10` ＝ 7851f7c（推上 GitHub。這個環境推不上 tag，備份用 branch，和 2026-10-09 一樣）。
+  要回到合併前：`git push --force-with-lease=refs/heads/main:<目前的 main> origin 7851f7c:refs/heads/main`（只在使用者要求時）。
+- **合併**：`git push origin 10fc67f:refs/heads/main`——快轉（7851f7c..10fc67f），沒有強推、沒有改寫歷史、沒有刪任何 branch 或 tag。
+- **合併後在 `main` 本身驗證**（新開一個 worktree 在 `origin/main`，13 分鐘）：`main` ＝ 10fc67f；單一檔案和遊戲一致；語法檢查 52（合併前的
+  `main` 是 51，多的一個是 `ddWasher`，同樣的 3 個舊 error）；28 個測試全部通過（開新遊戲、整個第一晚、存檔與讀檔、舊存檔、營業中途存檔再接回、
+  使用者存檔真的重新載入、每一個使用者存檔的轉換、秀琴阿姨第一天就在而且領薪水、第 2 天開放聘用、她在每個存檔都只有一位、員工走去休息室的
+  存檔點、例行 QA 的存檔點與每個分頁、炒飯與拿鐵用點的、一個 Jill、ON FIRE、出菜口中間的通道、繞過檯子走、髒盤子拿回水槽、第二位清潔員一起洗、
+  揭曉夜、摸貓、手冊）；從 `main` 做的私人測試頁打得開、載入第 30 天存檔沒有錯；正式版的產生器照常產生（沒有發布）。
+- **私人測試版**（https://claude.ai/artifact/TQpEqEFgqUW6jUm2Gfnhbg）：8ded2e2 的遊戲，平台回傳 Version 22、id `1791607235-84a7`（發布前讀到的線上 id：
+  `1791522142-3255`）。**正式 Artifact 沒有動**（仍是 rc8.8）。
 
 ## 十、取捨與已知問題（要使用者知道的）
 
