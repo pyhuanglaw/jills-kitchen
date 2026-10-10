@@ -1,0 +1,21 @@
+Day 62: 71 popups — toast 48, face 10, panel:held 9, banner 3, panel 1 | a guest's line 22, other toast 17, system 12, story panel 10, face (Jill / Dylan / a regular) 4, staff 3, named guest 3
+Day 63: 112 popups — toast 53, panel:held 33, face 20, banner 5, panel 1 | story panel 34, other toast 24, a guest's line 23, system 11, face (Jill / Dylan / a regular) 10, named guest 9, staff 1
+page errors: []
+
+the most repeated (numbers as #):
+  ×10  COMBO 中斷
+  ×2  OPEN FOR DINNER JILL 開始營業
+  ×2  有人在門口看了一下，走進來了。
+  ×2  RUSH HOUR 晚餐尖峰時段開始！
+  ×2  VIP 貴賓到了！消費高，要求也高。
+  ×2  Jill：「來了這麼多次，這個算我的。」
+  ×2  有隻狗在門口的休息角趴下來了。
+  ×2  #:# 打烊，不再接新客人
+  ×1  jill：天氣好。今天會忙一點，先把料備夠。今天情人節。
+  ×1  你今天是不是把我的甜點吃掉了？
+  ×1  林小姐：「那隻貓好可愛。」
+  ×1  Jill：「叫柔柔，不怕人。」
+  ×1  Chloe：「隔壁的酒吧好像變大了。」
+  ×1  Jill：「那個⋯⋯放哪？」
+  ×1  第二層左邊。
+exit=0

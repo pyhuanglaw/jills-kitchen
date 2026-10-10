@@ -1,0 +1,183 @@
+D62 prep  panel                  jill：天氣好。今天會忙一點，先把料備夠。今天情人節。
+D62 prep  face:staff:阿哲          你今天是不是把我的甜點吃掉了？
+D62 17:00  banner                 OPEN FOR DINNER JILL 開始營業
+D62 17:11  toast                  有人在門口看了一下，走進來了。
+D62 17:12  toast:q                林小姐：「那隻貓好可愛。」
+D62 17:14  toast:q                Jill：「叫柔柔，不怕人。」
+D62 17:20  toast:q                Chloe：「隔壁的酒吧好像變大了。」
+D62 17:30  toast:q                Jill：「那個⋯⋯放哪？」
+D62 17:33  face:staff:阿珠姐         第二層左邊。
+D62 17:34  toast                  阿珠姐 連頭都沒回。
+D62 17:35  panel:held             ：Dylan 帶了花來，放在櫃台上。
+D62 17:35  panel:held             Dylan：今天有花。
+D62 17:35  panel:held             Jill：你每年都這樣？
+D62 17:35  panel:held             Dylan：每年都不一樣。
+D62 17:35  panel:held             Jill：花一樣。
+D62 17:37  toast:q                Chloe：「留了肚子給它。」
+D62 17:40  toast                  Monsieur 杜朝Dylan點了個頭。
+D62 17:47  face:named:Monsieur 杜  老樣子，再加一道沒吃過的。
+D62 17:47  face:dylan             今天也很好吃。
+D62 17:50  toast:q                吳小姐：「聽說酒吧那邊擴大了。」
+D62 17:54  face:named:老饕李先生       松露燉飯！就這個。
+D62 17:54  toast:q                Chloe：「松露蘑菇牛肉堡長這樣。」
+D62 18:06  toast                  店裡突然安靜下來了
+D62 18:11  toast:q                黃先生：「隔壁桌那個是什麼？」
+D62 18:29  toast:q                小周與阿晴：「今天想吃點好的。」
+D62 18:50  toast:q                Grace：「Lounge 是新開的嗎？」
+D62 18:53  face:named:品酒師 Ken     我就是來吃 Jill's 檸檬奶油干貝的。
+D62 18:57  toast:q                小周與阿晴：「香烤鮭魚長這樣啊。」
+D62 19:00  banner                 RUSH HOUR 晚餐尖峰時段開始！
+D62 19:04  toast                  VIP 貴賓到了！消費高，要求也高。
+D62 19:10  toast:q                Eric：「隔壁多了沙發？」
+D62 19:17  toast:q                Ryan 與 Ivy：「下次帶朋友來。」
+D62 19:24  face:chen              今天沒有黃金蛋炒飯啊……
+D62 19:26  banner                 食材被偷了！ 快點那個小偷！
+D62 19:28  toast                  Chloe 看到客滿，失望地走了…
+D62 19:30  toast                  南瓜濃湯 只剩 1 份
+D62 19:32  panel:held             小林：樓上也是你們的？
+D62 19:32  panel:held             Jill：不是，房東的。
+D62 19:32  panel:held             小林：一直空著？
+D62 19:32  panel:held             Jill：好像是。
+D62 19:39  toast                  小偷帶著 莓果蘇打×4 跑掉了…
+D62 19:41  toast:q                阿傑與小雯：「這就是招牌菜？」
+D62 19:43  toast:q                Jill：「來了這麼多次，這個算我的。」
+D62 19:47  face:chen              謝謝！
+D62 19:51  toast:q                小宇：「欸，是柔柔嗎？」
+D62 19:57  toast                  佳佳 等太久，離開了
+D62 19:57  face:staff:Nina        小心燙。
+D62 19:58  toast                  有隻狗在門口的休息角趴下來了。
+D62 20:05  toast                  COMBO 中斷
+D62 20:05  toast                  Grace 生氣地離開了…
+D62 20:07  toast                  張經理 等太久，離開了
+D62 20:11  toast:q                Eric：「可以摸嗎？」
+D62 20:12  toast                  熟練度提升：起司條 LV2
+D62 20:13  toast                  品酒師 Ken 第 10 次來了，VIP 卡換成八折的：餐廳、Lounge 都八折，吃完再去 Lounge 七折。
+D62 20:13  toast                  品酒師 Ken 的 VIP 卡換成八折的
+D62 20:26  toast                  周董 第 10 次來了，VIP 卡換成八折的：餐廳、Lounge 都八折，吃完再去 Lounge 七折。
+D62 20:26  toast                  周董 的 VIP 卡換成八折的
+D62 20:37  toast                  熟練度提升：生蠔 LV2
+D62 20:45  toast:q                小安：「就是這間吧？我看到那篇貓咪的。」
+D62 20:46  toast:q                蔡課長：「酒櫃有燈了。」
+D62 20:54  toast                  COMBO 中斷
+D62 20:54  toast                  Eric 生氣地離開了…
+D62 21:07  toast:q                Sam 與 Lena：「照片上那隻……在嗎？」
+D62 21:07  toast                  COMBO 中斷
+D62 21:07  toast                  Jason 生氣地離開了…
+D62 21:08  toast                  抹茶舒芙蕾 只剩 2 份
+D62 21:09  face:leo               今晚有檸檬氣泡水，那就這個。
+D62 21:24  toast:q                Jill：「今天等有點久，這杯算我的。」
+D62 21:30  toast                  21:30 打烊，不再接新客人
+D62 21:42  toast                  熟練度提升：起司可樂餅 LV3
+D62 21:57  toast:q                Sam 與 Lena：「真的有柔柔。」
+D63 prep  panel                  jill：晴天。客人會多，桌子先擦一遍。今天漁獲新鮮。
+D63 17:00  panel:held             ：上班前，秀琴阿姨先繞去怡君的新家。
+D63 17:00  banner                 OPEN FOR DINNER JILL 開始營業
+D63 17:00  panel:held             named:怡君：給妳。
+D63 17:00  panel:held             staff:秀琴阿姨：幹嘛？
+D63 17:00  panel:held             named:怡君：下次來不用在樓下等。
+D63 17:00  panel:held             staff:秀琴阿姨：我又不常來。
+D63 17:00  panel:held             named:怡君：那就偶爾用。
+D63 17:11  toast:q                張經理：「隔壁多了沙發？」
+D63 17:17  face:jill              Leo，上班習慣了嗎？
+D63 17:18  face:leo               還是這裡好。
+D63 17:18  face:leo               Jill 姊，我期末考考完了！
+D63 17:20  toast                  VIP 貴賓到了！消費高，要求也高。
+D63 17:20  face:leo               習慣了，但還是最想念這裡。
+D63 17:27  toast:q                Jill：「來了這麼多次，這個算我的。」
+D63 17:31  face:leo               Jill，謝謝。
+D63 17:35  panel:held             王太太：他上次自己跑來吃。
+D63 17:35  panel:held             王先生：妳前天不也來了？
+D63 17:35  panel:held             王太太：我是經過。
+D63 17:35  panel:held             王先生：我也是經過。
+D63 17:35  face:named:Mr. Hart    還好今天有香烤鮭魚。
+D63 17:38  toast:q                張經理：「這隻貓叫什麼名字？」
+D63 17:45  face:wang              一份甜點，兩支叉子。
+D63 17:47  toast:q                Jill：「新鑰匙？」
+D63 17:50  face:staff:秀琴阿姨        她給的。
+D63 18:06  toast:q                Sam 與 Lena：「乾式熟成肋眼跟一般的差在哪？」
+D63 18:10  toast                  有人在門口看了一下，走進來了。
+D63 18:12  toast:q                Sam 與 Lena：「聽說酒吧那邊擴大了。」
+D63 18:12  toast                  Mr. Hart 第 10 次來了，VIP 卡換成八折的：餐廳、Lounge 都八折，吃完再去 Lounge 七折。
+D63 18:12  toast                  Mr. Hart 的 VIP 卡換成八折的
+D63 18:16  toast                  門口有人在唱歌，等位的客人不那麼急了
+D63 18:18  face:jill              換口味了？
+D63 18:21  face:dylan             今天想吃這個。
+D63 18:28  face:dylan             今天出菜很順。
+D63 18:31  toast:q                阿凱：「隔壁的酒吧好像變大了。」
+D63 18:36  banner                 JILL'S ON FIRE Rush Mode：出菜更快、小費 ×1.5
+D63 18:38  toast:q                吳小姐：「包包好可愛。」
+D63 18:41  toast:q                小周與阿晴：「照片上那隻……在嗎？」
+D63 18:50  toast                  有隻狗在門口的休息角趴下來了。
+D63 18:53  toast:q                阿傑與小雯：「就是這間吧？我看到那篇貓咪的。」
+D63 18:56  toast:q                Ben 與 Lily：「拍一張再吃。」
+D63 19:00  banner                 RUSH HOUR 晚餐尖峰時段開始！
+D63 19:10  banner                 衛生檢查員突襲！ 他看 22 秒：髒桌子越少、越快有人收越好
+D63 19:10  face:named:衛生檢查員       衛生局，例行檢查。
+D63 19:16  panel:held             品酒師 Ken：我在這裡坐了好幾個晚上了。
+D63 19:16  panel:held             Jill：我知道，你都坐同一張。
+D63 19:16  panel:held             品酒師 Ken：這裡其實可以辦品酒。
+D63 19:16  panel:held             Jill：在這裡？
+D63 19:16  panel:held             品酒師 Ken：嗯。不用很多人，這一間坐得下就好。
+D63 19:16  panel:held             Jill：你要辦？
+D63 19:16  panel:held             品酒師 Ken：我主持。酒我挑，菜妳配。
+D63 19:16  panel:held             Jill：那你的部分怎麼算？
+D63 19:16  panel:held             品酒師 Ken：不用算。我自己喜歡，友情主持。
+D63 19:16  panel:held             Jill：不行，該算的還是要算。
+D63 19:16  panel:held             品酒師 Ken：我又不是為了錢。
+D63 19:16  panel:held             Jill：我知道。
+D63 19:16  panel:held             品酒師 Ken：……好。
+D63 19:16  panel:held             Jill：哪一天？
+D63 19:16  panel:held             品酒師 Ken：妳店裡比較不忙的那天。
+D63 19:16  panel:held             Jill：……那就過三天。
+D63 19:16  panel:held             ：Jill 在吧台的小黑板上寫了一行：品酒之夜・21 席。
+D63 19:17  toast                  小宇 看到客滿，失望地走了…
+D63 19:19  face:named:Madame Lin  柔柔今天呢？
+D63 19:22  face:named:Monsieur 杜  上次你帶來那支比較好喝。
+D63 19:26  face:named:品酒師 Ken     那支也是我挑的。
+D63 19:26  toast                  COMBO 中斷
+D63 19:26  toast                  吳小姐 生氣地離開了…
+D63 19:29  face:named:Monsieur 杜  所以我才說比較好。
+D63 19:32  face:named:老饕李先生       飽滿白酒，一杯。
+D63 19:32  face:named:Monsieur 杜  今晚有濃郁紅酒，那就這個。
+D63 19:34  face:named:Madame Lin  氣泡酒，一杯。
+D63 19:37  banner                 檢查通過！ 衛生獎勵 +$300
+D63 19:38  toast:q                Chloe：「那個好像很好吃。」
+D63 19:41  toast                  COMBO 中斷
+D63 19:41  toast                  Sam 與 Lena 生氣地離開了…
+D63 19:48  toast:q                Sam 與 Lena：「這組沙發好舒服。」
+D63 19:48  toast                  黃先生 等太久，離開了
+D63 19:51  toast                  COMBO 中斷
+D63 19:51  toast                  Ben 與 Lily 生氣地離開了…
+D63 19:54  toast:q                Ruby：「來了來了。」
+D63 19:58  toast                  熟練度提升：起司拼盤 LV3
+D63 20:06  toast:q                小周與阿晴：「貓呢？貓在哪？」
+D63 20:07  toast                  周董 與朋友 和另外 9 組看到客滿，失望地走了…
+D63 20:07  toast:q                Ryan 與 Ivy：「布拉塔番茄麵長這樣。」
+D63 20:09  face:chen              今晚有錫蘭檸檬紅茶，那就這個。
+D63 20:10  toast                  COMBO 中斷
+D63 20:10  toast                  佳佳 生氣地離開了…
+D63 20:23  toast:q                Jason：「把你們最好的端上來吧。」
+D63 20:31  toast:q                小周與阿晴：「真的有包包。」
+D63 20:38  toast                  林小姐 等太久，離開了
+D63 20:39  toast                  Eric 等太久，離開了
+D63 20:43  toast                  COMBO 中斷
+D63 20:43  toast                  阿彥 生氣地離開了…
+D63 20:45  toast                  阿傑與小雯 生氣地離開了…
+D63 20:46  toast:q                陳家：「有推薦的嗎？算了，都點吧。」
+D63 20:47  toast:q                阿彥：「隔壁重新開了？」
+D63 21:02  toast:q                Ryan 與 Ivy：「謝謝。」
+D63 21:04  toast                  COMBO 中斷
+D63 21:04  toast                  Ruby 生氣地離開了…
+D63 21:06  toast:q                阿彥：「還是沒看到貓。」
+D63 21:07  toast                  COMBO 中斷
+D63 21:07  toast                  Tina 生氣地離開了…
+D63 21:09  toast:q                Jill：「包包在那邊睡覺。」
+D63 21:09  toast                  蔡課長 生氣地離開了…
+D63 21:27  toast                  松露燉飯 只剩 2 份
+D63 21:30  toast                  21:30 打烊，不再接新客人
+D63 22:36  panel:held             Nina：樓上真的一直都空著喔？
+D63 22:36  panel:held             Jill：嗯。
+D63 22:36  panel:held             Hugo：上面多大？
+D63 22:36  panel:held             Jill：不知道。
+D63 22:36  panel:held             Nina：妳沒上去過？
+D63 22:36  panel:held             Jill：沒有啊。

@@ -26,3 +26,7 @@ page errors: []
 total: {'補貨：冰箱滿了': 34, '等太久': 4}
 days played: 40
 page errors: []
+== day92_normal_player_25_days_v253 (seed 301): 私人包廂 I 第 102 天、小夏第 103 天、私人包廂 II 第 109 天；第 117 天還沒有第三期（阿衡）
+total: {'補貨：冰箱滿了': 25}
+days played: 25
+page errors: []
