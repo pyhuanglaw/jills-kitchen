@@ -1,0 +1,22 @@
+The Day 52 test on its new seed base (7000), then three slowed-down versions of the final game (8ded2e2). A FAIL is the proof.
+Made by mutants_make.py (from js/game.js of 8ded2e2), run by mutants_run.sh; 2026-10-10 04:01-04:20 UTC.
+  yj_slow     — the move two days later: due('yj_move','yj_chose',2,'yj') -> 4 (怡君's arc slower than the user's targets)
+  wall_slow   — the mediation six days later: due('wall_mediation','wall_prep',3,'wall') -> 9 (the wall settles too late)
+  up_on_wall  — the Second Floor opens on the wall, not on the Lounge (the player's 10:25)
+
+== the test on seed base 7000, the game of 8ded2e2 (6299978 + the test's new seed; js/game.js unchanged)  04:01:04
+PASS  v24_day52_save_plays_the_stories_in_order_over_forty_days  (307.6s)
+1 passed, 0 failed
+-- mutant yj_slow  04:06:16
+FAIL  v24_day52_save_plays_the_stories_in_order_over_forty_days  (316.6s)
+      怡君 moved in within about ten days, by Day 62 (59–62) — a day later when a dated beat takes her first day (this seed: Dylan on Valentine's, Day 53): {'yj_meet': 54, 'yj_look': 55, 'yj_three': 58, 'yj_chose': 59, 'yj_move': 63, 'yj_key': 65, 'wall_worry': 67, 'wall_photos': 68, 'wall_visit': 70, 'wall_wang': 71, 'wall_setback': 73, 'wall_report': 76, 'wall_fee': 77, 'wall_prep': 79, 'wall_mediation': 82, 'wall_settle': 82, 'wall_article': 85}
+0 passed, 1 failed
+-- mutant wall_slow  04:11:36
+FAIL  v24_day52_save_plays_the_stories_in_order_over_forty_days  (271.0s)
+      settled within about two and a half weeks, by Day 82 (75–82): {'yj_meet': 54, 'yj_look': 55, 'yj_three': 58, 'yj_chose': 59, 'yj_move': 61, 'yj_key': 63, 'wall_worry': 65, 'wall_photos': 66, 'wall_visit': 68, 'wall_wang': 69, 'wall_setback': 71, 'wall_report': 74, 'wall_fee': 75, 'wall_prep': 77, 'wall_mediation': 86, 'wall_settle': 86, 'wall_article': 90}
+0 passed, 1 failed
+-- mutant up_on_wall  04:16:10
+FAIL  v24_day52_save_plays_the_stories_in_order_over_forty_days  (255.1s)
+      the wall settled, no Lounge in this save: the floor still waits for the Lounge
+0 passed, 1 failed
+== done 04:20:30
