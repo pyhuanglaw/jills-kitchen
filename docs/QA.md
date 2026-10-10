@@ -5,7 +5,8 @@
 | 層 | 什麼時候 | 跑什麼 | 多久 |
 |---|---|---|---|
 | 1. 例行 QA | 每次改完遊戲 | `python3 tests/run_tests.py --qa`，加上這次改動相關的測試 `-k 名稱` | 約 10–15 分鐘 |
-| 2. 發布前完整回歸 | 使用者說「發布」 | `python3 tests/run_tests.py`（全部，含例行 QA），照 `docs/RELEASE_CHECKLIST.md` | 約 50 分鐘（分三份同時跑約 17 分鐘） |
+| 1½. 正常玩家把存檔玩下去 | 改到經濟、備料、員工、故事排程這種「每天都會碰到」的系統之後；有空的時候（例如整夜自主工作） | 見下面「正常玩家模擬」 | 背景跑，一局 5–30 分鐘 |
+| 2. 發布前完整回歸 | 使用者說「發布」 | `python3 tests/run_tests.py`（全部，含例行 QA），照 `docs/RELEASE_CHECKLIST.md` | 約 50 分鐘（分三份同時跑約 60 分鐘） |
 | 3. 全面 Audit | 隔一段時間、大改版之後、或使用者要 | `docs/audit/PLAYBOOK.md`（多組代理人實際玩、讀、挑） | 幾個小時 |
 
 ## 1. 例行 QA 會自動檢查什麼
@@ -36,6 +37,24 @@
 
 **修 bug 的規矩**：修正時附上能防止它再發生的測試。如果它已經在已知未修清單裡，修好、讓測試通過、把那一條拿掉；
 如果是新發現的、能自動驗的問題，先寫測試（會失敗），再修。
+
+## 1½. 正常玩家模擬（2026-10-10 整夜 QA 用它抓到「一鍵補到建議量」讓新菜 0 份）
+
+測試只看它設計好要看的事；有些問題要「一天接一天玩下去」才會出現（撤下來的菜的庫存留在冰箱、新菜排在菜單最後……），而且每天都會
+碰到。做法：讓合理玩家（只看畫面上看得到的資訊做決定）把使用者的存檔玩下去，再掃一遍他每天看到的警告。
+
+```
+python3 tools/qa/new_game_timeline.py --save player_day6_1254.json --days 14 > run.txt   # 使用者最新的存檔；營業中存的會先接著玩完那一晚
+python3 tools/qa/new_game_timeline.py --save player_day92_2105.json --days 12 > run92.txt # 後期
+python3 tools/qa/new_game_timeline.py --days 30 --seed 303 > new.txt                     # 全新遊戲
+python3 tools/qa/scan_timeline_log.py run.txt                                            # 每天看到的警告
+python3 tools/qa/evening_census.py player_day89_0448.json 3 OUT/                          # 一晚跳出幾則（要比較就用同一個存檔）
+```
+
+- **天天都出現的警告最值得查**：那是玩家擺脫不了的東西。2026-10-10：第 92 天存檔 12 天裡天天「沒有備料」→ 用存檔照模擬玩家按的開關重現
+  → 修 → 寫測試 → 重跑模擬確認變成 0 天（`docs/evidence/overnight_2026-10-10/`）。
+- 模擬是 `T`，不是 `O`：它告訴你正常玩家**可能**遇到什麼、多常，不代表使用者真的遇到。
+- 一局一個種子只是一條路；要說「多常」就多跑幾個種子，或像 `docs/evidence/v251_release/balance/` 那樣三局一起比。
 
 ## 2. 例行 QA 不會（也不該）自動判斷的
 
