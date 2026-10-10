@@ -1,14 +1,15 @@
 # Jill's Kitchen — 目前狀態（暫時的，會一直更新）
 
 這份只放「現在」的狀態：branch、版本、待辦、待確認。永久的設計規則在 `docs/PROJECT_MEMORY.md`，不要寫到這裡；這裡的內容過時了就
-直接改掉或刪掉。最後更新：2026-10-10，**v2.5.2 發布**（第 8、9 位服務生：小夏、阿衡，使用者的圖做成員工卡片、遊戲裡的小人照圖畫；
-`docs/v24/waiters_8_9_2026-10-10.txt`）。正式網址 **Version 13**，id `1791638162-6b48`；遊戲內容＝ commit `fb7b6aa`（tag `v2.5.2`，只在本機；GitHub 上是
-branch `archive/release-v2.5.2`）；報告 `docs/V252_REPORT.md`。使用者 2026-10-10 晚上睡前交代整夜自主工作（`docs/v24/overnight_autonomy_2026-10-10.txt`）。
+直接改掉或刪掉。最後更新：2026-10-10 晚上，**v2.5.3 發布**（使用者睡前交代整夜自主工作，`docs/v24/overnight_autonomy_2026-10-10.txt`：
+模擬玩家抓到的 bug——「一鍵補到建議量」在冰箱放不下時，最後放上菜單的新菜一份都補不到——修好）。正式網址 **Version 14**，id `1791642868-d632`；
+遊戲內容＝ commit `0d41d8e`（tag `v2.5.3`，只在本機；GitHub 上是 branch `archive/release-v2.5.3`）；報告 `docs/V253_REPORT.md`；整夜的報告
+`docs/OVERNIGHT_REPORT_2026-10-10.md`（裡面有三件要使用者決定的事）。前一版 v2.5.2（第 8、9 位服務生小夏、阿衡）同一晚稍早發布。
 
 ## Repo 與 branch
 
 - GitHub：`pyhuanglaw/jills-kitchen`，預設 branch 是 `main`。
-- **`main` ＝ Jill's Kitchen 的正式主線**：目前的、穩定的、發布出去的版本都在這裡。最新正式版是 fb7b6aa（v2.5.2）。從 v2.2.1 起的
+- **`main` ＝ Jill's Kitchen 的正式主線**：目前的、穩定的、發布出去的版本都在這裡。最新正式版是 0d41d8e（v2.5.3）。從 v2.2.1 起的
   完整開發歷史都在 `main` 上。
 - **2026-10-09：新的料理系統快轉合併進 `main`**（`main` ＝ 2abc52e，從 fc0f5d8 快轉 89 個 commit；遊戲內容＝ commit 8298e18；合併後在 `main`
   上驗證過：開遊戲、讀存檔、核心流程，`docs/evidence/cooking_2026-10-09/regression/after_merge_main_2abc52e_smoke.txt`；使用者 2026-10-09 授權「自主測試、驗收與合併 main」，
@@ -30,10 +31,13 @@ branch `archive/release-v2.5.2`）；報告 `docs/V252_REPORT.md`。使用者 20
 - **2026-10-10：v2.5.2 發布前，`feature/cooking-gameplay` 快轉合回 `main`**（從 22d939c 到 fb7b6aa；合併前確認兩邊的 SHA、main 是 feature 的
   祖先，沒有強推）。合併前的 `main`（22d939c）保存在 `archive/main-before-v2.5.2-2026-10-10`；要回到合併前：
   `git push --force-with-lease=refs/heads/main:<目前的 main> origin 22d939c:refs/heads/main`（只在使用者要求時）。
+- **2026-10-10 晚上：v2.5.3 發布前，`feature/cooking-gameplay` 快轉合回 `main`**（從 dd36fb9 到 0d41d8e；合併前確認兩邊的 SHA、main 是 feature
+  的祖先，沒有強推）。合併前的 `main`（dd36fb9）保存在 `archive/main-before-v2.5.3-2026-10-10`；要回到合併前：
+  `git push --force-with-lease=refs/heads/main:<目前的 main> origin dd36fb9:refs/heads/main`（只在使用者要求時）。
 - **版本 tag 推不上 GitHub**（2026-10-10 v2.5 發布時試過：annotated tag 被斷線、lightweight tag 回 HTTP 403，是這個環境的連線政策；
   這裡的 GitHub 工具也不能建 tag 或 release；v2.5.1 沒有再試）。GitHub 上沒有任何 tag，用 branch 代替：`archive/release-v2.5`＝
   fb86e3aa1ece41416e981fd28c9e845c782a4ba6（Version 11，id 1791620792-2036）、`archive/release-v2.5.1`＝da77df36477c324b541e12f2311eeeb89513227c
-  （Version 12，id 1791630519-9eb9）、`archive/release-v2.5.2`＝fb7b6aa（Version 13，id 1791638162-6b48；使用者 2026-10-10：tag 的事「暫時不用再處理」）。要補 tag：GitHub 網頁 Releases → Draft a new release → tag 填 `v2.5`（或 `v2.5.1`）、Target 選對應的
+  （Version 12，id 1791630519-9eb9）、`archive/release-v2.5.2`＝fb7b6aa（Version 13，id 1791638162-6b48）、`archive/release-v2.5.3`＝0d41d8e（Version 14，id 1791642868-d632；使用者 2026-10-10：tag 的事「暫時不用再處理」）。要補 tag：GitHub 網頁 Releases → Draft a new release → tag 填 `v2.5`（或 `v2.5.1`）、Target 選對應的
   branch → Publish（`docs/evidence/v251_release/tag_check.txt`）。
 - 還沒做完的遊戲功能，另外開短期的 `feature/…` 或 `wip/…` branch；做完、測試通過才回到 `main`，發布的 commit 一定在 `main` 上。
   文件與紀錄可以直接在 `main`。不要讓工作 branch 跟 `main` 長期並行。
@@ -79,6 +83,10 @@ branch `archive/release-v2.5.2`）；報告 `docs/V252_REPORT.md`。使用者 20
 
 ## 已發布
 
+- **v2.5.3**，2026-10-10 晚上，發布到 **https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA**（**Version 14**，id 1791642868-d632；發布前讀到的線上 id：
+  1791638162-6b48；14:34 UTC）。遊戲內容＝ commit 0d41d8e（tag `v2.5.3`，只在本機）。報告：`docs/V253_REPORT.md`。Gate：0d41d8e 上完整回歸 361/361（三份同時跑，
+  60 分鐘；`docs/evidence/v253_release/regression/`）；讀回與 live_check 見報告。內容：「一鍵補到建議量」在冰箱放不下全部建議量時，每道菜都先少放一點，
+  不會有菜 0 份（以前照菜單順序補，最後放上菜單的新菜一份都補不到）；提示說哪裡可以騰出位子。
 - **v2.5.2**，2026-10-10，發布到 **https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA**（**Version 13**，id 1791638162-6b48；發布前讀到的線上 id：
   1791630519-9eb9；13:16 UTC）。遊戲內容＝ commit fb7b6aa（tag `v2.5.2`，只在本機）。報告：`docs/V252_REPORT.md`。Gate：fb7b6aa 上完整回歸 359/359（三份同時跑，
   53 分鐘；`docs/evidence/v252_release/regression/`）；讀回與 live_check 見報告。內容：第 8、9 位服務生小夏、阿衡（名字、使用者的圖做的員工卡片、照圖畫的
@@ -120,7 +128,7 @@ branch `archive/release-v2.5.2`）；報告 `docs/V252_REPORT.md`。使用者 20
 
 ### 已完成、尚未發布
 
-- （v2.5.2 發布以後，沒有已完成、尚未發布的遊戲改動。）
+- （v2.5.3 發布以後，沒有已完成、尚未發布的遊戲改動。）
 
 - **料理流程 prototype**（branch `proto/cooking-flow`，`prototype/cooking/`）：獨立試玩頁，不是遊戲本體。使用者 2026-10-07：不合併、
   不發布、現在不要再做；之後重新開始時，以正式遊戲原本的廚房畫面為底，不重新設計美術。私人連結 https://claude.ai/artifact/EBzi6qETraguAApvettBFe 。
@@ -192,8 +200,9 @@ branch `archive/release-v2.5.2`）；報告 `docs/V252_REPORT.md`。使用者 20
 - **例行 QA**（2026-10-06 起）：`python3 tests/run_tests.py --qa`，`tests/qa_tests.py` 的 `qa_` 測試，用 `tests/player.py` 真的點畫面、
   故事面板開著。每次改完遊戲跑；完整回歸也包含它們。已知未修的問題列在 `tests/qa_known_open.json`（失敗顯示 OPEN、不算失敗；修好時
   顯示 FIXED，要把那一條拿掉）。
-- 359 個測試（其中 54 個是例行 QA 的 `qa_` 測試，5 個是模擬玩家的 `sim_player_` 測試；`python3 tests/run_tests.py` 全跑，
-  `-k a,b,c` 跑指定的）。最近一次完整回歸：**v2.5.2 發布的 fb7b6aa 上 359/359**（2026-10-10，三份同時跑，53 分鐘；`docs/evidence/v252_release/regression/`）。
+- 361 個測試（其中 54 個是例行 QA 的 `qa_` 測試，5 個是模擬玩家的 `sim_player_` 測試；`python3 tests/run_tests.py` 全跑，
+  `-k a,b,c` 跑指定的）。最近一次完整回歸：**v2.5.3 發布的 0d41d8e 上 361/361**（2026-10-10 晚上，三份同時跑，60 分鐘；`docs/evidence/v253_release/regression/`）。
+  再前一次：**v2.5.2 發布的 fb7b6aa 上 359/359**（2026-10-10，三份同時跑，53 分鐘；`docs/evidence/v252_release/regression/`）。
   再前一次：**v2.5.1 發布的 da77df3 上 357/357**（2026-10-10，三份同時跑，58 分鐘；`docs/evidence/v251_release/regression/`）。
   再前一次：**v2.5 發布的 fb86e3a 上 356/356**（2026-10-10，固定在那個 commit 的 worktree 分三份跑，57 分鐘；
   `docs/evidence/v25_release/regression/`）。再前一次：第二輪合併的 8ded2e2 上 352/354；另外 2 個是測試靠一個種子的運氣通過的檢查，原始案例保留、量了分布、修好並證明（`docs/cooking/RELEASE_GATE_2026-10-10.md`「七」）（2026-10-10，固定在那個 commit 的 worktree 分三份跑；
@@ -206,6 +215,9 @@ branch `archive/release-v2.5.2`）；報告 `docs/V252_REPORT.md`。使用者 20
 
 ## 待辦／待確認
 
+- **整夜工作後要使用者決定的三件事**（`docs/OVERNIGHT_REPORT_2026-10-10.md` 第 4 節）：(1)「一鍵補到建議量」要不要順便自動退掉不在菜單上的
+  庫存（前期幾乎天天「冰箱滿了」）；(2) 故事要某個角色坐下來的那一晚，她（例如怡君）要不要不會「生氣地離開」；(3) 同一晚同一個名字的
+  一般客人（例如 Eric）會走好幾次，要不要盡量不重複。使用者回答之前維持現狀。
 - **v2.5 發布後的待決事項：2026-10-10 使用者全部定案**（`docs/v24/post_v25_decisions_2026-10-10.txt`），v2.5.1 做完並發布（`docs/V251_REPORT.md`）。
   服務生的名字只有 7 個（第 8、9 位叫「服務生8」「服務生9」）的問題：使用者決定加小夏、阿衡，v2.5.2 做完並發布（`docs/V252_REPORT.md`）。
   v2.5、v2.5.1、v2.5.2 的 tag：使用者說暫時不用處理（GitHub 上用 `archive/release-…` branch 代替，見上面「Repo 與 branch」）。
@@ -255,6 +267,7 @@ branch `archive/release-v2.5.2`）；報告 `docs/V252_REPORT.md`。使用者 20
 - 樾樾打烊後出來等 Jill、Jill 在開店和快打烊時在主廳。
 - rc8.7：新遊戲裡 Lounge、阿拓、鋼琴、予安、二樓來的時間，以及中間等錢的那段感覺對不對（正常玩家模擬：試酒之夜 Day 15–21、
   Lounge 開幕 Day 46–58、鋼琴 Day 69–76、予安 Day 83–88、二樓 Day 67–74；`docs/qa/2026-10-07_story_first_seeds.md`）。
+- v2.5.3：開店前換菜後按「一鍵補到建議量」，每道菜都有一點、提示看得懂（前期冰箱 40 份時最常遇到）。
 - v2.5.2：小夏、阿衡的員工卡片和遊戲裡的小人在 iPhone 上的樣子（要蓋到二樓私人包廂才請得到；測試用使用者 Day 92 存檔加上私人包廂請到）。
 - v2.5.1：開店前沒有「目前無人」的提醒；擴建 Bistro 以後能多請一位廚師、一位服務生；還沒請廚師的頭一兩天偶爾 ON FIRE（模擬：第 1 天大約四成）。
 - v2.5：新的廚房在 iPhone 上整個玩起來的感覺（使用者玩過私人測試版 Version 22）；修好以後的三件事（第 1 級廚師自己裝盤、去盤架拿盤子、
