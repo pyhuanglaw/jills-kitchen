@@ -1,0 +1,16 @@
+== day6_normal_player_14_days
+total: {'補貨：冰箱滿了': 11, '等太久': 5}
+days played: 14
+page errors: []
+== day6_normal_player_14_days_after_fix
+total: {'補貨：冰箱滿了': 11, '等太久': 5}
+days played: 14
+page errors: []
+== day92_normal_player_12_days
+total: {'補貨：冰箱滿了': 12, '開店：沒有備料': 12}
+days played: 12
+page errors: []
+== day92_normal_player_12_days_after_fix
+total: {'補貨：冰箱滿了': 12}
+days played: 12
+page errors: []
