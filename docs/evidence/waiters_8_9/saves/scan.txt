@@ -1,0 +1,33 @@
+OK   cooking_day3_0156.json: 0 → 1 people (+秀琴阿姨); renamed nobody; waiters 0/1 []; next waiter hired: 小茉
+OK   player_day2_2155.json: 0 → 1 people (+秀琴阿姨); renamed nobody; waiters 0/1 []; next waiter hired: 小茉
+OK   player_day30.json: 10 → 10 people; renamed nobody; waiters 4/5 ['小茉', 'Kai', 'Nina', '阿哲']; next waiter hired: Momo
+OK   player_day33.json: 12 → 12 people; renamed [('廚師', '阿勇')]; waiters 4/5 ['小茉', 'Kai', 'Nina', '阿哲']; next waiter hired: Momo
+OK   player_day35.json: 12 → 12 people; renamed [('廚師', '阿勇')]; waiters 4/5 ['小茉', 'Kai', 'Nina', '阿哲']; next waiter hired: Momo
+OK   player_day39.json: 12 → 12 people; renamed nobody; waiters 4/5 ['小茉', 'Kai', 'Nina', '阿哲']; next waiter hired: Momo
+OK   player_day42.json: 12 → 12 people; renamed nobody; waiters 4/5 ['小茉', 'Kai', 'Nina', '阿哲']; next waiter hired: Momo
+OK   player_day44.json: 12 → 12 people; renamed nobody; waiters 4/5 ['小茉', 'Kai', 'Nina', '阿哲']; next waiter hired: Momo
+OK   player_day46.json: 12 → 12 people; renamed nobody; waiters 4/5 ['小茉', 'Kai', 'Nina', '阿哲']; next waiter hired: Momo
+OK   player_day48.json: 12 → 12 people; renamed nobody; waiters 4/5 ['小茉', 'Kai', 'Nina', '阿哲']; next waiter hired: Momo
+OK   player_day49.json: 12 → 12 people; renamed nobody; waiters 4/5 ['小茉', 'Kai', 'Nina', '阿哲']; next waiter hired: Momo
+OK   player_day50a.json: 12 → 12 people; renamed nobody; waiters 4/5 ['小茉', 'Kai', 'Nina', '阿哲']; next waiter hired: Momo
+OK   player_day50b.json: 12 → 12 people; renamed nobody; waiters 4/5 ['小茉', 'Kai', 'Nina', '阿哲']; next waiter hired: Momo
+OK   player_day52.json: 12 → 12 people; renamed nobody; waiters 4/5 ['小茉', 'Kai', 'Nina', '阿哲']; next waiter hired: Momo
+OK   player_day52a.json: 12 → 12 people; renamed nobody; waiters 4/5 ['小茉', 'Kai', 'Nina', '阿哲']; next waiter hired: Momo
+OK   player_day61.json: 14 → 14 people; renamed nobody; waiters 4/5 ['小茉', 'Kai', 'Nina', '阿哲']; next waiter hired: Momo
+OK   player_day61_0933.json: 17 → 17 people; renamed nobody; waiters 4/5 ['小茉', 'Kai', 'Nina', '阿哲', '安安']; next waiter hired: Momo
+OK   player_day65_1004.json: 19 → 19 people; renamed nobody; waiters 6/7 ['小茉', 'Kai', 'Nina', '阿哲', '安安', 'Momo', '小威']; next waiter hired: 阿芳
+OK   player_day67_1016.json: 19 → 19 people; renamed nobody; waiters 6/7 ['小茉', 'Kai', 'Nina', '阿哲', '安安', 'Momo', '小威']; next waiter hired: 阿芳
+OK   player_day68_1033.json: 19 → 19 people; renamed nobody; waiters 6/7 ['小茉', 'Kai', 'Nina', '阿哲', '安安', 'Momo', '小威']; next waiter hired: 阿芳
+OK   player_day6_1254.json: 3 → 3 people; renamed nobody; waiters 1/1 ['小茉']; next waiter hired: Kai
+OK   player_day71_1215.json: 19 → 19 people; renamed nobody; waiters 6/7 ['小茉', 'Kai', 'Nina', '阿哲', '安安', 'Momo', '小威']; next waiter hired: 阿芳
+OK   player_day73_1452.json: 19 → 19 people; renamed nobody; waiters 6/7 ['小茉', 'Kai', 'Nina', '阿哲', '安安', 'Momo', '小威']; next waiter hired: 阿芳
+OK   player_day74_1508.json: 19 → 19 people; renamed nobody; waiters 6/7 ['小茉', 'Kai', 'Nina', '阿哲', '安安', 'Momo', '小威']; next waiter hired: 阿芳
+OK   player_day81_2206.json: 19 → 19 people; renamed nobody; waiters 6/7 ['小茉', 'Kai', 'Nina', '阿哲', '安安', 'Momo', '小威']; next waiter hired: 阿芳
+OK   player_day83_2218.json: 20 → 20 people; renamed nobody; waiters 6/7 ['小茉', 'Kai', 'Nina', '阿哲', '安安', 'Momo', '小威']; next waiter hired: 阿芳
+OK   player_day86_2229.json: 20 → 20 people; renamed nobody; waiters 6/7 ['小茉', 'Kai', 'Nina', '阿哲', '安安', 'Momo', '小威']; next waiter hired: 阿芳
+OK   player_day87_2257.json: 20 → 20 people; renamed nobody; waiters 6/7 ['小茉', 'Kai', 'Nina', '阿哲', '安安', 'Momo', '小威']; next waiter hired: 阿芳
+OK   player_day89_0448.json: 20 → 20 people; renamed nobody; waiters 6/7 ['小茉', 'Kai', 'Nina', '阿哲', '安安', 'Momo', '小威']; next waiter hired: 阿芳
+OK   player_day89_2320.json: 20 → 20 people; renamed nobody; waiters 6/7 ['小茉', 'Kai', 'Nina', '阿哲', '安安', 'Momo', '小威']; next waiter hired: 阿芳
+OK   player_day92_2105.json: 20 → 20 people; renamed nobody; waiters 6/7 ['小茉', 'Kai', 'Nina', '阿哲', '安安', 'Momo', '小威']; next waiter hired: 阿芳
+
+31 saves, 0 not OK

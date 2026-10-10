@@ -1,0 +1,65 @@
+例行 QA（python3 tests/run_tests.py --qa），2026-10-10 小夏接好以後在工作目錄背景開跑；跑到第 37 個測試時（共 54 個），跑測試的程式被這個環境
+中斷（Playwright 的連線斷掉：EPIPE，沒有留下 exit 行）。前 36 個都 PASS。中途工作目錄又接上了阿衡，所以這份不是任何一個 commit 的完整結果，
+只留作紀錄；沒有單獨重跑——完整回歸（fb7b6aa，docs/evidence/v252_release/regression/）本來就包含全部的 qa_ 測試。
+
+PASS  qa_merged_room_tabs_cushion_light_and_social_entrances  (3.8s)
+PASS  qa_a_late_day_by_taps_from_prep_to_the_next_prep  (249.3s)
+PASS  qa_a_new_game_first_day_by_taps  (7.6s)
+PASS  qa_every_button_in_the_shop_does_something  (77.0s)
+PASS  qa_every_button_on_the_prep_screen_does_something  (150.7s)
+PASS  qa_restock_says_why_it_cannot  (2.7s)
+PASS  qa_the_private_dining_room_is_bought_by_a_tap  (1.6s)
+PASS  qa_lounge_one_signs_before_her_last_night  (4.5s)
+PASS  qa_the_players_checkpoints_resume  (184.1s)
+PASS  qa_a_checkpoint_survives_a_new_table_count  (2.5s)
+PASS  qa_a_held_story_survives_leaving_the_app  (120.7s)
+PASS  qa_leaving_while_closing_after_a_resume_keeps_the_day  (149.0s)
+PASS  qa_the_screens_fit_375_390_430  (167.4s)
+PASS  qa_the_task_list_opens_under_its_chip_and_any_tap_puts_it_away  (16.0s)
+PASS  qa_the_kitchen_chips_never_sit_on_the_counters  (16.2s)
+PASS  qa_every_tab_reaches_by_finger  (16.6s)
+PASS  qa_every_tab_reaches_by_mouse_in_a_small_window  (40.8s)
+PASS  qa_the_selected_tab_is_on_screen  (5.1s)
+PASS  qa_the_pause_button_works_outside_the_service  (2.5s)
+PASS  qa_a_drink_on_a_ticket_reads_right  (70.5s)
+PASS  qa_waiting_staff_do_not_stand_on_one_spot  (85.3s)
+PASS  qa_the_inspection_money_is_in_the_summary  (263.0s)
+PASS  qa_table_hearts_only_for_sophie_and_mia  (125.2s)
+PASS  qa_the_album_counts_all_five_cats  (2.2s)
+PASS  qa_photos_of_jills_room_are_taken_in_her_room  (1.4s)
+PASS  qa_a_favourite_is_missed_only_when_it_is_off_the_menu  (3.4s)
+PASS  qa_a_review_talks_about_the_food_not_the_glass  (3.3s)
+PASS  qa_a_new_game_gets_no_old_version_notes  (6.2s)
+PASS  qa_the_first_two_days_say_the_stock_fills_itself  (3.8s)
+PASS  qa_the_stock_rule_is_said_the_way_it_works  (4.5s)
+PASS  qa_no_text_copy_backup  (1.3s)
+PASS  qa_the_second_burner_bought_on_day_two_is_paid_back  (3.4s)
+PASS  qa_the_signature_editor_shows_the_menus_price  (1.6s)
+PASS  qa_every_level_named_in_the_text_exists  (0.0s)
+PASS  qa_stories_wait_for_stories_not_for_dates  (0.7s)
+PASS  qa_who_is_still_there_at_closing  (3.2s)
+node:events:497
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: write EPIPE
+    at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+    at writeGeneric (node:internal/stream_base_commons:150:3)
+    at Socket._writeGeneric (node:net:966:11)
+    at Socket._write (node:net:978:8)
+    at writeOrBuffer (node:internal/streams/writable:572:12)
+    at _write (node:internal/streams/writable:501:10)
+    at Writable.write (node:internal/streams/writable:510:10)
+    at PipeTransport.send (/usr/local/lib/python3.13/dist-packages/playwright/driver/package/lib/server/utils/pipeTransport.js:52:21)
+    at dispatcherConnection.onmessage (/usr/local/lib/python3.13/dist-packages/playwright/driver/package/lib/cli/driver.js:60:59)
+    at DispatcherConnection.sendEvent (/usr/local/lib/python3.13/dist-packages/playwright/driver/package/lib/server/dispatchers/dispatcher.js:180:10)
+Emitted 'error' event on Socket instance at:
+    at emitErrorNT (node:internal/streams/destroy:170:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  errno: -32,
+  code: 'EPIPE',
+  syscall: 'write'
+}
+
+Node.js v22.20.0
