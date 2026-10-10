@@ -1,0 +1,56 @@
+The tests changed or added after the user's iPhone reports (2026-10-10), by run.sh (mutants by mutants_make.py from js/game.js of 6bf5002;
+the game before the reports = 8ded2e2's js/game.js). A FAIL on the old game or on a broken version is the proof. 2026-10-10 06:59-07:09 UTC.
+Note: qa_the_kitchen_chips_never_sit_on_the_counters asks the game for what can be tapped (kitchenTapBoxes), which 8ded2e2 does not have —
+its failure there is a ReferenceError, not a proof; its proofs are chips_never_lift and chips_lift_all_or_none.
+
+== the game as it is (45f3bee; js/game.js as 6bf5002: yes)  06:59:39
+PASS  qa_the_task_list_opens_under_its_chip_and_any_tap_puts_it_away  (17.3s)
+PASS  qa_the_kitchen_chips_never_sit_on_the_counters  (18.1s)
+PASS  cooking_a_full_place_is_a_quiet_wait  (27.4s)
+PASS  cooking_jill_and_the_cooks_hand_work_on  (62.5s)
+PASS  cooking_a_cook_on_standby_rests_and_his_card_counts_his_dishes  (6.4s)
+PASS  cooking_plating_happens_where_the_food_is  (26.1s)
+6 passed, 0 failed
+== the game before the reports (8ded2e2's js/game.js)  07:02:19
+FAIL  qa_the_task_list_opens_under_its_chip_and_any_tap_puts_it_away  (3.3s)
+      covered by H4.
+FAIL  qa_the_kitchen_chips_never_sit_on_the_counters  (3.2s)
+      Page.evaluate: ReferenceError: kitchenTapBoxes is not defined
+FAIL  cooking_a_full_place_is_a_quiet_wait  (156.1s)
+      the kitchen finishes what is left (Jill and 小林師傅)
+FAIL  cooking_jill_and_the_cooks_hand_work_on  (75.5s)
+      E: plated
+FAIL  cooking_a_cook_on_standby_rests_and_his_card_counts_his_dishes  (5.9s)
+      his card counts what he makes and shows what his level cannot yet: <span class="ok">✓ 有他會的步驟：1／3 道菜</span><span class="no">🔒 炙烤肋眼牛排 <small>LV3</small></span>
+FAIL  cooking_plating_happens_where_the_food_is  (13.2s)
+      (3) the plates are taken where they are: her hands at 62,113, the plates at {'x': 62, 'y': 186}
+0 passed, 6 failed
+-- chips_never_lift -> qa_the_kitchen_chips_never_sit_on_the_counters  07:06:37
+FAIL  qa_the_kitchen_chips_never_sit_on_the_counters  (15.7s)
+      844×390: taskChip on the counters ({'x0': 247, 'x1': 348, 'y0': 181, 'y1': 210}) | 844×390: taskChip on the room tabs | 1100×500: taskChip on the counters ({'x0': 375, 'x1': 476, 'y0': 181, 'y1': 210}) | 1100×500: taskChip on the room tabs
+0 passed, 1 failed
+-- chips_lift_all_or_none -> qa_the_kitchen_chips_never_sit_on_the_counters  07:06:54
+FAIL  qa_the_kitchen_chips_never_sit_on_the_counters  (15.6s)
+      844×390: taskChip on the counters ({'x0': 247, 'x1': 348, 'y0': 181, 'y1': 210}) | 844×390: taskChip on the room tabs | 1100×500: taskChip on the counters ({'x0': 375, 'x1': 476, 'y0': 181, 'y1': 210}) | 1100×500: taskChip on the room tabs
+0 passed, 1 failed
+-- task_list_stays -> qa_the_task_list_opens_under_its_chip_and_any_tap_puts_it_away  07:07:11
+FAIL  qa_the_task_list_opens_under_its_chip_and_any_tap_puts_it_away  (14.7s)
+      375px kitchen: a tap in the room did not put the list away | 375px main: a tap in the room did not put the list away | 390px kitchen: a tap in the room did not put the list away | 390px main: a tap in the room did not put the list away | 430px kitchen: a tap in the room did not put the list away | 430px main: a tap in the room did not put the list away
+0 passed, 1 failed
+-- task_list_over_chip -> qa_the_task_list_opens_under_its_chip_and_any_tap_puts_it_away  07:07:27
+FAIL  qa_the_task_list_opens_under_its_chip_and_any_tap_puts_it_away  (3.5s)
+      covered by H4.
+0 passed, 1 failed
+-- batch_of_three_split -> cooking_a_full_place_is_a_quiet_wait  07:07:31
+FAIL  cooking_a_full_place_is_a_quiet_wait  (20.8s)
+      D: three portions gathered as one batch at level 3: [{"id":5,"d":"friedrice","n":2,"st":"wait","si":0,"who":null,"slot":null,"to":null},{"id":6,"d":"friedrice","n":1,"st":"wait","si":0,"who":null,"slot":null,"to":null}]
+0 passed, 1 failed
+-- cooks_never_plate -> cooking_jill_and_the_cooks_hand_work_on  07:07:53
+FAIL  cooking_jill_and_the_cooks_hand_work_on  (48.1s)
+      B: plated
+0 passed, 1 failed
+-- rack_by_the_wall -> cooking_plating_happens_where_the_food_is  07:08:43
+FAIL  cooking_plating_happens_where_the_food_is  (13.6s)
+      (3) the plates are taken where they are: her hands at 62,113, the plates at {'x': 62, 'y': 186}
+0 passed, 1 failed
+== done 07:08:58

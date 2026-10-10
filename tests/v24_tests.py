@@ -369,7 +369,10 @@ def v24_day52_save_plays_the_stories_in_order_over_forty_days(b, port, target):
     g = Game(b, port, target, seed=254, manual=True, viewport={'width': 390, 'height': 844})
     load_save(g, 'player_day52.json')
     g.ev("window.__fastSay=1")
-    seed = "Math.random=(function(){let a=%d;return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}})()"
+    seed = "Math.random=(function(){let a=%s;return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}})()"
+    # each morning's draw (planToday at nextDay: the day's weather, its event, its tasks) from a stream of its own, BASE + 500000 + d
+    g.ev("window.__wxSeed=null;const __pt0=planToday;planToday=function(){if(window.__wxSeed!=null)" + seed % 'window.__wxSeed' + ";return __pt0.apply(this,arguments)}")
+    BASE = 7600
     # v2.4 rc7: the seed base was 7000. One seed is one trajectory, and any change in how many random numbers a day draws
     # moves it: since 8e8d407 (Ken: a named guest's party is never a passer-by's) the walk-ins draw less, and on 7000 the
     # wall began on Day 67, a day past the window. Seven seeds on both builds (docs/evidence/v24_rc7/sims/day52_seeds.txt):
@@ -420,13 +423,29 @@ def v24_day52_save_plays_the_stories_in_order_over_forty_days(b, port, target):
     # which then moves the seed base to the smallest one that meets every target on both builds: 7000 (main 53, 61, 64, 81;
     # 8ded2e2 54, 63, 65, 80). What the test checks is unchanged; on 7000 the move two days later, the mediation six days
     # later and the Second Floor opening on the wall each fail it (day52/mutants.txt).
+    # 2026-10-10, after the user's iPhone reports (every cook takes any kitchen step; 1dba1c9-6bf5002): on 7000 怡君 got her key
+    # on Day 63 again and the wall settled on Day 83 (docs/evidence/cooking_2026-10-10/day52/after_iphone/). Fourteen seeds on
+    # 6bf5002: the key on Day 62.29 (main 62.00), the wall begins 65.29 (64.86), settles 83.43 (81.21); every target on 2 of
+    # 14 (8) — slower by the rule above, so the game was looked into, not the seed. 怡君's arc kept its pace and the evenings
+    # were the same; the days were lost at the wall's visit, which waits for rain within a day (or four days): 11 of 14
+    # seeds waited all four (main 2). That was this test's blind spot: each morning's weather is drawn at nextDay from
+    # whatever the evening before left in the random state, before this loop seeds the day, so a cook taking one more step
+    # redrew all the weather after it (seed 7500: the two builds part on Day 54). Each morning's draw now comes from its own
+    # stream (BASE + 500000 + d), so a seed base is the same weather on every build. The same fourteen bases on main
+    # (8298e18) and 6bf5002, the same weather on every day of every base (after_iphone/wxseed/): the key on Day 62.00 and
+    # 62.00, the wall begins 64.36 and 64.79, settles 81.21 and 81.43; every target on 7 and 8 of 14; the same evenings (81.1
+    # and 81.4 guests, 40.7 and 40.2 lost, $61,929 and $62,137). Not slower by the same rule, which takes the smallest base
+    # that meets every target on both: 7600 (both: 53, 61, 63, 80). What the test checks is unchanged; on 7600 the move two
+    # days later, the mediation six days later and the floor opening on the wall each fail it (after_iphone/mutants.txt).
     first = None; majors = {}
     for d in range(40):
         if g.ev("phase") == 'summary':
             g.click('[data-act=toShop]'); g.page.wait_for_timeout(60)
+        g.ev("window.__wxSeed=%d" % (BASE + 500000 + d))
         if g.ev("phase") == 'shop':
             g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(100)
-        g.ev(seed % (7000 + d)); g.ev("S.today.sugKey=null;S.today.sug=null;autoStock()")
+        g.ev("window.__wxSeed=null")
+        g.ev(seed % (BASE + d)); g.ev("S.today.sugKey=null;S.today.sug=null;autoStock()")
         start_day(g); install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;window.__noScenes=true")
         if first is None:
             first = g.ev("S.day")

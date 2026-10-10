@@ -1,0 +1,34 @@
+The Day 52 test with each morning's draw seeded (planToday: BASE + 500000 + d) and seed base 7600, on 6bf5002's game, on main's
+game (8298e18), and on three slowed-down versions of 6bf5002's game (made by ../mutants_make.py from js/game.js of 6bf5002). A FAIL
+is the proof. Run by one.sh (each: JK_GAME_JS=<game> python3 tests/run_tests.py -k v24_day52_save_plays_the_stories_in_order_over_forty_days,
+with the test of the working tree), three at a time; 2026-10-10 06:55-07:02 UTC.
+  yj_slow     — the move two days later: due('yj_move','yj_chose',2,'yj') -> 4
+  wall_slow   — the mediation six days later: due('wall_mediation','wall_prep',3,'wall') -> 9
+  up_on_wall  — the Second Floor opens on the wall, not on the Lounge
+
+== game_6bf5002
+PASS  v24_day52_save_plays_the_stories_in_order_over_forty_days  (249.3s)
+1 passed, 0 failed
+== game_main_8298e18
+PASS  v24_day52_save_plays_the_stories_in_order_over_forty_days  (250.4s)
+1 passed, 0 failed
+== mut_yj_slow
+FAIL  v24_day52_save_plays_the_stories_in_order_over_forty_days  (242.6s)
+      怡君 moved in within about ten days, by Day 62 (59–62) — a day later when a dated beat takes her first day (this seed: Dylan on Valentine's, Day 53): {'yj_meet': 53, 'yj_look': 54, 'yj_three': 56, 'yj_chose': 57, 'yj_move': 61, 'yj_key': 63, 'wall_worry': 65, 'wall_photos': 68, 'wall_visit': 70, 'wall_wang': 71, 'wall_setback': 73, 'wall_report': 76, 'wall_fee': 77, 'wall_prep': 79, 'wall_mediation': 82, 'wall_settle': 82, 'wall_article': 85}
+0 passed, 1 failed
+== mut_wall_slow
+FAIL  v24_day52_save_plays_the_stories_in_order_over_forty_days  (176.5s)
+      settled within about two and a half weeks, by Day 82 (75–82): {'yj_meet': 53, 'yj_look': 54, 'yj_three': 56, 'yj_chose': 57, 'yj_move': 59, 'yj_key': 61, 'wall_worry': 63, 'wall_photos': 64, 'wall_visit': 68, 'wall_wang': 69, 'wall_setback': 71, 'wall_report': 74, 'wall_fee': 75, 'wall_prep': 77, 'wall_mediation': 86, 'wall_settle': 86, 'wall_article': 89}
+0 passed, 1 failed
+== mut_up_on_wall
+FAIL  v24_day52_save_plays_the_stories_in_order_over_forty_days  (179.7s)
+      the wall settled, no Lounge in this save: the floor still waits for the Lounge
+0 passed, 1 failed
+
+finished:
+mut_yj_slow exit=1 06:58:46
+game_6bf5002 exit=0 06:58:52
+game_main_8298e18 exit=0 06:58:53
+mut_wall_slow exit=1 07:01:45
+mut_up_on_wall exit=1 07:01:53
+ALL-DONE
