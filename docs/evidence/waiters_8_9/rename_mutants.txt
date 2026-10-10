@@ -1,0 +1,9 @@
+== mutant old_rename
+FAIL  staff_numbered_names_become_the_pools_names_in_hiring_order  (1.7s)
+      A: the numbered eighth takes 阿芳: {'id': 'nw8', 'name': '服務生8', 'role': 'waiter', 'lv': 3, 'duty': 'both', 'pool': 'restaurant'}
+== mutant rename_resets_level
+FAIL  staff_numbered_names_become_the_pools_names_in_hiring_order  (1.6s)
+      A: the numbered eighth takes 阿芳: {'id': 'nw8', 'name': '阿芳', 'role': 'waiter', 'lv': 1, 'duty': 'both', 'pool': 'restaurant'}
+== mutant rename_ignores_used
+FAIL  staff_numbered_names_become_the_pools_names_in_hiring_order  (1.5s)
+      A: the numbered eighth takes 阿芳: {'id': 'nw8', 'name': '小茉', 'role': 'waiter', 'lv': 3, 'duty': 'both', 'pool': 'restaurant'}

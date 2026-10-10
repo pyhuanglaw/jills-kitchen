@@ -652,7 +652,13 @@ function fillDefaults(o){const base=newState0();/* (2026-10-10: not newState() �
    here on each of them is counted only when they come. Runs once. */
 /* v2.2.1 F: the main hall holds nine tables now. More than nine in a save move to the side hall where there is room
    (the player keeps every table); what cannot move is refunded at its purchase price and said on the prep screen. */
-function crewNameFix(o){/* v2.2.1: a sixth chef used to be called just 廚師 — the name pools were shorter than the crew cap; give them a name from the longer pool, once */for(const m of o.crew||[]){const R0=ROLES[m.role];if(!R0||m.name!==R0.n)continue;const used=(o.crew||[]).map(q=>q.name);const nm=(CREW_NAMES[m.role]||[]).find(n=>!used.includes(n));if(nm)m.name=nm}return o}
+function crewNameFix(o){/* v2.2.1: a sixth chef used to be called just 廚師 — the name pools were shorter than the crew cap; give them a name from the longer pool, once */
+ /* 2026-10-10 (the user, after v2.5.1: 「新增兩位具名服務生，取代『服務生8』『服務生9』」「舊存檔中已經存在的第八、第九位服務生，應安全轉換成具名角色，不得造成員工遺失或
+    重複聘用」): the numbered names too — 服務生8, 服務生9 (or 10: the count took in 安安), what hiring called someone when the pool had run out. In the
+    order they were hired, each takes the pool's first name nobody has (on the crew or the Lounge's roster); the person is the same — id, level, days,
+    duty, history — only the name. Nothing free: the name stays. Runs at every load; a named one never matches again. */
+ const lname=LOUNGE_ROSTER.map(r=>r.name);
+ for(const m of o.crew||[]){const R0=ROLES[m.role];if(!R0||!(m.name===R0.n||(typeof m.name==='string'&&m.name.startsWith(R0.n)&&/^\d+$/.test(m.name.slice(R0.n.length)))))continue;const used=(o.crew||[]).map(q=>q.name);const nm=(CREW_NAMES[m.role]||[]).find(n=>!used.includes(n)&&!lname.includes(n));if(nm)m.name=nm}return o}
 function mainHallMig(o){if(o.hallMig||!(o.tables>MAIN_MAX))return o;o.hallMig=1;let extra=o.tables-MAIN_MAX;o.tables=MAIN_MAX;let moved=0,refund=0;
  if(o.rooms&&o.rooms.side){const room=SIDE_MAX-(o.sideTables||0);moved=Math.max(0,Math.min(extra,room));o.sideTables=(o.sideTables||0)+moved;extra-=moved}
  for(let i=0;i<extra;i++)refund+=TABLE_COST[MAIN_MAX+i]||0;if(refund)o.money=(o.money||0)+refund;

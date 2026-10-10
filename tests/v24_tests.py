@@ -1291,6 +1291,61 @@ def v24_restaurant_and_lounge_staff_are_two_pools_that_never_share_places(b, por
     check(not g.errors, g.errors[:3]); g.close()
 
 
+def _load_raw(g, raw):
+    g.ev("phase='title';R=null;localStorage.setItem(KEY,JSON.stringify(%s))" % json.dumps(raw, ensure_ascii=False)); g.reload(); g.page.wait_for_timeout(150)
+    g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(150)
+
+
+@test
+def staff_numbered_names_become_the_pools_names_in_hiring_order(b, port, target):
+    """The user, 2026-10-10 after v2.5.1: 「新增兩位具名服務生，取代『服務生8』『服務生9』」「舊存檔中已經存在的第八、第九位服務生，應安全轉換成
+    具名角色，不得造成員工遺失或重複聘用」. When the waiters' pool had run out, hiring called the next one 服務生N (N counted every waiter, 安安 too,
+    so a restaurant's eighth could be 服務生9). On loading, every such numbered name takes the pool's first name nobody has, in the order they
+    were hired; the person keeps id, level, duty and pool; nobody is lost or doubled; it holds across reloads. With nothing free the name stays.
+    The user's Day 92 save (six restaurant waiters and 安安): A) a numbered eighth while a pool name is still free gets it; B) the realistic
+    case — all seven named, then 服務生9 and 服務生10 — each gets the next free name of the pool (the eighth and ninth, once they are in it)."""
+    raw0 = json.load(open(os.path.join(ROOT, 'tests', 'saves', 'player_day92_2105.json'), encoding='utf-8')); raw0 = raw0.get('save', raw0)
+    g = Game(b, port, target, seed=811, manual=True, viewport={'width': 390, 'height': 844})
+    pool = json.loads(g.ev("JSON.stringify(CREW_NAMES.waiter)")); lounge = json.loads(g.ev("JSON.stringify(LOUNGE_ROSTER.map(r=>r.name))"))
+    def free_after(raw):
+        used = [m['name'] for m in raw['crew']]
+        return [n for n in pool if n not in used and n not in lounge]
+    def crew_now():
+        return json.loads(g.ev("JSON.stringify(S.crew.map(m=>({id:m.id,name:m.name,role:m.role,lv:m.lv,duty:m.duty||null,pool:crewPool(m)})))"))
+    import copy
+    # A) a free name in the pool
+    raw = copy.deepcopy(raw0)
+    n0 = len(raw['crew'])
+    raw['crew'].append({'id': 'nw8', 'role': 'waiter', 'name': '服務生8', 'lv': 3, 'duty': 'both', 'pool': 'restaurant'})
+    want = free_after(raw)[0]
+    _load_raw(g, raw)
+    c = crew_now(); m = next(x for x in c if x['id'] == 'nw8')
+    check(len(c) == n0 + 1 and m['name'] == want and m['lv'] == 3 and m['duty'] == 'both' and m['pool'] == 'restaurant', f'A: the numbered eighth takes {want}: {m}')
+    check(len({x['name'] for x in c}) == len(c), f'A: no name twice: {[x["name"] for x in c]}')
+    # B) all seven named, then the two the pool had no name for
+    raw = copy.deepcopy(raw0)
+    used = [m['name'] for m in raw['crew']]
+    for nm in [n for n in pool[:7] if n not in used]:
+        raw['crew'].append({'id': 'n_' + nm, 'role': 'waiter', 'name': nm, 'lv': 1, 'duty': 'both', 'pool': 'restaurant'})
+    raw['crew'].append({'id': 'nw9', 'role': 'waiter', 'name': '服務生9', 'lv': 2, 'duty': 'seat', 'pool': 'restaurant'})
+    raw['crew'].append({'id': 'nw10', 'role': 'waiter', 'name': '服務生10', 'lv': 1, 'duty': 'both', 'pool': 'restaurant'})
+    n1 = len(raw['crew']); fr = free_after(raw)
+    want9, want10 = (fr[0] if len(fr) > 0 else '服務生9'), (fr[1] if len(fr) > 1 else '服務生10')
+    _load_raw(g, raw)
+    for k in range(3):
+        c = crew_now(); m9 = next(x for x in c if x['id'] == 'nw9'); m10 = next(x for x in c if x['id'] == 'nw10')
+        check(len(c) == n1 and m9['name'] == want9 and m10['name'] == want10 and m9['lv'] == 2 and m9['duty'] == 'seat', f'B (load {k + 1}): the eighth {want9}, the ninth {want10}, as hired: {m9}, {m10}')
+        check(len({x['name'] for x in c}) == len(c), f'B: no name twice: {[x["name"] for x in c]}')
+        g.ev("save()"); g.reload(); g.page.wait_for_timeout(150)
+        g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(150)
+    # the staff page
+    g.ev("shopTab='staff';showShop()"); g.page.wait_for_timeout(150)
+    txt = g.ev("document.querySelector('#screen').innerText")
+    for nm in (want9, want10):
+        check(nm.startswith('服務生') or nm in txt, f'the staff page shows {nm}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
 @test
 def v24_an_old_shared_cap_save_keeps_everyone_and_waits(b, port, target):
     """rc5 migration: before the split, the Lounge's +2 and +2 were added to one shared cap, so a save can hold more
