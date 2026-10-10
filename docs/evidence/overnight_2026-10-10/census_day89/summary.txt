@@ -1,0 +1,22 @@
+Day 89: 63 popups — toast 38, panel:held 15, face 8, banner 2 | a guest's line 16, story panel 15, other toast 12, system 12, face (Jill / Dylan / a regular) 5, staff 2, named guest 1
+Day 90: 68 popups — toast 29, face 20, panel:held 12, banner 6, panel 1 | a guest's line 16, system 14, face (Jill / Dylan / a regular) 14, story panel 13, other toast 5, named guest 4, staff 2
+Day 91: 45 popups — toast 30, face 12, banner 2, panel 1 | a guest's line 13, system 12, other toast 7, face (Jill / Dylan / a regular) 6, named guest 4, staff 2, story panel 1
+page errors: []
+
+the most repeated (numbers as #):
+  ×3  OPEN FOR DINNER JILL 開始營業
+  ×3  VIP 貴賓到了！消費高，要求也高。
+  ×3  有隻狗在門口的休息角趴下來了。
+  ×3  有人在門口看了一下，走進來了。
+  ×3  RUSH HOUR 晚餐尖峰時段開始！
+  ×3  #:# 打烊，不再接新客人
+  ×2  外面一下子來了一群人
+  ×2  門口有人在唱歌，等位的客人不那麼急了
+  ×2  檸檬氣泡水 只剩 # 份
+  ×2  怎麼好意思。
+  ×2  還好今天有香烤鮭魚。
+  ×2  張媽媽一家 等太久，離開了
+  ×2  巴斯克乳酪蛋糕 只剩 # 份
+  ×1  冰箱滿了（#/#）：每道菜都先少放一點，莓果蘇打還沒到建議量。在放太多的那道按「−」退一點就有位子。
+  ×1  陳家：「牠都不怕人耶。」
+exit=0

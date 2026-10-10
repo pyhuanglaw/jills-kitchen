@@ -1,0 +1,176 @@
+D89 prep  toast:warn             冰箱滿了（400/400）：每道菜都先少放一點，莓果蘇打還沒到建議量。在放太多的那道按「−」退一點就有位子。
+D89 17:00  banner                 OPEN FOR DINNER JILL 開始營業
+D89 17:10  toast:q                陳家：「牠都不怕人耶。」
+D89 17:13  toast:q                Jill：「叫柔柔，不怕人。」
+D89 17:17  toast:q                吳小姐：「樓上要做什麼？」
+D89 17:19  toast                  VIP 貴賓到了！消費高，要求也高。
+D89 17:19  toast                  有隻狗在門口的休息角趴下來了。
+D89 17:19  toast                  有人在門口看了一下，走進來了。
+D89 17:37  toast:q                陳家：「先吃飯，貓等一下再看。」
+D89 17:47  face:chen              走一走就到了。
+D89 17:53  face:chen              Jill，今天還是老樣子。
+D89 17:58  toast:q                Chloe：「上次那道還有嗎？」
+D89 18:06  toast                  外面一下子來了一群人
+D89 18:14  face:named:Mr. Hart    下次還要點香烤鮭魚。
+D89 18:22  toast:q                Chloe：「又來了。」
+D89 18:48  toast:q                Ryan 與 Ivy：「這個要拍一下。」
+D89 18:56  toast                  供應商多送了 2 份松露燉飯的料，算他們請的
+D89 19:00  banner                 RUSH HOUR 晚餐尖峰時段開始！
+D89 19:01  toast                  田園沙拉 只剩 2 份
+D89 19:02  toast:q                Grace：「那個是新的貓窩？」
+D89 19:09  toast:q                李家：「聞起來好香…」
+D89 19:15  panel:held             ：予安來了。這次她沒有點酒，直接走到鋼琴前面。
+D89 19:15  panel:held             Jill：現在？
+D89 19:15  panel:held             林予安：現在。
+D89 19:15  panel:held             ：她把琴蓋打開，試了幾個音，然後開始彈。
+D89 19:19  toast                  靠近鋼琴的那一桌，原本在聊天的客人慢慢小聲了。
+D89 19:23  toast                  吧台有一位客人放下酒杯，聽了一小段。
+D89 19:25  toast:warn             莓果蘇打 賣完了，客人點不到了（冰箱可以臨時叫貨）
+D89 19:25  face:koba              Jill，老樣子，快快快。
+D89 19:26  toast:q                Eric：「好香喔，是 Jill 在煎東西嗎？」
+D89 19:27  toast                  Lounge 裡有人轉過頭，看了鋼琴好一會兒。
+D89 19:32  panel:held             ：一首彈完，Lounge 安靜了一下。靠近鋼琴的那一桌先拍手，接著又有兩三桌。
+D89 19:32  panel:held             ：王太太站起來，走到鋼琴旁邊。
+D89 19:32  panel:held             王太太：彈得真好。
+D89 19:32  panel:held             林予安：謝謝。
+D89 19:32  panel:held             ：王先生抬頭看了一下，笑了笑，又繼續聽。
+D89 19:32  panel:held             ：她沒有起身，又彈了下一首。
+D89 19:42  toast:q                Amy：「品酒之夜下次是什麼時候？」
+D89 19:45  face:staff:Evan        Ken 說了算。
+D89 19:47  toast                  Sophie 看到客滿，失望地走了…
+D89 19:48  toast                  門口有人在唱歌，等位的客人不那麼急了
+D89 19:48  toast:q                Chloe：「外面有人在唱歌。」
+D89 20:00  toast                  香煎鴨胸 只剩 2 份
+D89 20:13  toast:q                Sam 與 Lena：「我的蟹肉蛋炒飯！」
+D89 20:20  panel:held             ：客人散了一些。予安彈完最後一首，闔上琴蓋，走到吧台邊。
+D89 20:20  panel:held             Jill：下週還有空嗎？
+D89 20:20  panel:held             林予安：星期幾？
+D89 20:20  panel:held             ：從下個禮拜開始，予安一個禮拜來 Lounge 彈三個晚上。
+D89 20:25  toast                  熟練度提升：酒吧披薩 LV3
+D89 20:34  toast                  香料烤蔬菜 只剩 2 份
+D89 20:43  toast                  Chloe 和另外 9 組看到客滿，失望地走了…
+D89 20:45  toast:q                Chloe：「樓上也是你們的了？」
+D89 20:58  toast                  Eric 等太久，離開了
+D89 20:58  toast                  林小姐 等太久，離開了
+D89 20:58  toast:q                林小姐：「今天不趕時間，慢慢上。」
+D89 21:04  toast                  吳小姐 等太久，離開了
+D89 21:16  toast                  檸檬氣泡水 只剩 2 份
+D89 21:18  toast:q                Jill：「來了這麼多次，這個算我的。」
+D89 21:22  face:leo               怎麼好意思。
+D89 21:30  toast                  21:30 打烊，不再接新客人
+D89 22:20  panel:held             ：打烊後阿拓又放了一盤在晴旁邊。「多的。」
+D89 23:04  face:jill              坐啊。
+D89 23:04  face:staff:小彤          喔，好。
+D90 prep  panel                  jill：好熱。冰飲和冰甜點會賣得特別快。今天店慶。
+D90 17:00  banner                 OPEN FOR DINNER JILL 開始營業
+D90 17:05  toast:q                Ben 與 Lily：「那隻貓找到新位子了。」
+D90 17:19  toast                  有隻狗在門口的休息角趴下來了。
+D90 17:19  toast                  有人在門口看了一下，走進來了。
+D90 17:28  toast:q                Chloe：「晚上從外面看，樓上亮著。」
+D90 17:44  toast:q                Ben 與 Lily：「比照片還好看。」
+D90 18:04  face:staff:小茉          妳們兩個比我們早用。
+D90 18:07  face:jill              不要提醒我。
+D90 18:18  toast:q                小周一家：「留了肚子給它。」
+D90 18:24  banner                 食材被偷了！ 快點那個小偷！
+D90 18:30  toast                  VIP 貴賓到了！消費高，要求也高。
+D90 18:33  face:named:Mr. Hart    今天天氣好，坐外面。
+D90 18:34  face:named:Mr. Hart    今天也來啦。
+D90 18:37  toast                  小偷帶著 莓果蘇打×4 跑掉了…
+D90 18:39  face:named:Mr. Hart    還好今天有香烤鮭魚。
+D90 18:41  toast:q                Jill：「還合口味嗎？」
+D90 18:44  toast:q                小安：「下次還要點這個。」
+D90 19:00  banner                 RUSH HOUR 晚餐尖峰時段開始！
+D90 19:02  toast:q                Jill：「今天想吃什麼？」
+D90 19:10  face:jill              王先生、王太太，慢用。
+D90 19:13  banner                 衛生檢查員突襲！ 他看 22 秒：髒桌子越少、越快有人收越好
+D90 19:13  face:named:衛生檢查員       衛生局，例行檢查。
+D90 19:13  face:wangwife          妳的店也要一直開下去喔。
+D90 19:22  toast:q                Mina：「外面像烤箱。」
+D90 19:26  toast                  Emma 看到客滿，失望地走了…
+D90 19:26  toast                  炙烤肋眼牛排 只剩 2 份
+D90 19:26  face:wangwife          Jill，今天他又說要提早走，妳別理他。
+D90 19:37  toast:q                吳小姐：「謝謝。」
+D90 19:40  banner                 檢查通過！ 衛生獎勵 +$300
+D90 19:47  face:dylan             老闆娘，我可以追妳嗎？
+D90 19:50  face:jill              你不是在追？
+D90 19:54  face:dylan             那我繼續。
+D90 19:58  toast:q                阿凱：「這隻貓叫什麼名字？」
+D90 20:11  toast                  小周與阿晴 和另外 11 組看到客滿，失望地走了…
+D90 20:13  toast:q                Emma：「貓有新東西了。」
+D90 20:14  toast                  張媽媽一家 等太久，離開了
+D90 20:23  banner                 饕客尖峰時刻！ 一群 VIP 饕客湧進來了
+D90 20:33  toast:q                張經理：「老闆娘手藝真好。」
+D90 20:35  toast                  熟練度提升：德國豬腳 LV4
+D90 20:36  face:mia               Jill 主廚，今天也拜託你的咖啡續命。
+D90 20:38  toast:q                Amy：「樓上那間是員工休息室？」
+D90 20:40  toast                  王家三口 等太久，離開了
+D90 20:51  toast                  熟練度提升：起司可樂餅 LV5
+D90 21:02  toast:q                Amy：「來了來了。」
+D90 21:06  toast:q                Jill：「第五次了，這個請你。」
+D90 21:10  face:chen              謝謝！
+D90 21:10  toast                  巴斯克乳酪蛋糕 只剩 2 份
+D90 21:12  face:jill              小林，今天也很快？
+D90 21:13  face:koba              今天加班，還好還開著。
+D90 21:15  face:koba              今天…可以慢一點。
+D90 21:30  toast                  21:30 打烊，不再接新客人
+D90 21:31  toast:q                Jill：「集點卡滿了。這個店裡請。」
+D90 21:34  face:koba              怎麼好意思。
+D90 22:08  face:sophie            好可愛……
+D90 22:27  panel:held             ：收店了。Lounge 只剩吧台那一區的燈。
+D90 22:27  panel:held             ：Evan、沈晴、阿拓留下來喝一點。Dylan 還坐在吧台。
+D90 22:27  panel:held             ：Evan 多拿了一個杯子，放在 Dylan 前面。
+D90 22:27  panel:held             staff:沈晴：今天沙發那四個，炸雞點了三次。
+D90 22:27  panel:held             staff:阿拓：四次。
+D90 22:27  panel:held             staff:沈晴：第四次是外帶。
+D90 22:27  panel:held             staff:Evan：外帶也算。
+D90 22:27  panel:held             ：沈晴伸手找酒。阿拓剛好在旁邊，直接把那一支遞給她。
+D90 22:27  panel:held             staff:沈晴：謝啦。
+D90 22:27  panel:held             ：阿拓點了一下頭。
+D90 22:27  panel:held             ：散的時候，Dylan 把錢壓在杯子底下。
+D90 22:28  panel:held             ：相簿多了一張：「有你在的晚班」
+D90 22:49  face:staff:阿珠姐         插座不夠。
+D91 prep  panel                  jill：涼涼的，適合走路過來吃飯的天氣。今天週末晚餐。
+D91 17:00  banner                 OPEN FOR DINNER JILL 開始營業
+D91 17:13  face:named:老饕李先生       今天沒看到寶寶。
+D91 17:22  toast                  有隻狗在門口的休息角趴下來了。
+D91 17:22  toast                  有人在門口看了一下，走進來了。
+D91 17:31  toast:q                張經理：「今天天氣真舒服。」
+D91 17:45  toast:q                小周與阿晴：「下次還要點乾式熟成肋眼。」
+D91 17:56  toast                  VIP 貴賓到了！消費高，要求也高。
+D91 18:12  face:named:Mr. Hart    還好今天有香烤鮭魚。
+D91 18:15  toast:q                Ruby：「不用找了。」
+D91 18:18  face:named:周董          樓上那間是員工休息室？
+D91 18:45  face:staff:Nina        久等了。
+D91 19:00  banner                 RUSH HOUR 晚餐尖峰時段開始！
+D91 19:00  toast:q                Ben 與 Lily：「這次換點別的。」
+D91 19:09  toast                  外面一下子來了一群人
+D91 19:17  toast                  林小姐 看到客滿，失望地走了…
+D91 19:18  toast:q                林小姐：「我的提拉米蘇！」
+D91 19:24  toast:q                李家：「那隻貓找到新位子了。」
+D91 19:36  toast                  巴斯克乳酪蛋糕 只剩 2 份
+D91 19:37  toast:q                Emma：「櫻桃鴨胸長這樣。」
+D91 19:50  face:wangwife          一個人也想來。
+D91 19:54  toast:q                Ruby：「你們員工有休息室了喔？」
+D91 19:56  face:wangwife          粉紅氣泡酒，一杯。
+D91 20:10  toast                  Amy 和另外 9 組看到客滿，失望地走了…
+D91 20:11  toast                  門口有人在唱歌，等位的客人不那麼急了
+D91 20:11  toast:q                Ruby：「這首我會。」
+D91 20:14  toast:warn             香草烤雞 賣完了，客人點不到了（冰箱可以臨時叫貨）
+D91 20:20  toast                  Jill's 莓果奶酪 只剩 2 份
+D91 20:20  toast:warn             乾式熟成肋眼 賣完了，客人點不到了（冰箱可以臨時叫貨）
+D91 20:25  face:staff:Kai         請坐。
+D91 20:33  toast:warn             巴斯克乳酪蛋糕 賣完了，客人點不到了（冰箱可以臨時叫貨）
+D91 20:36  toast:q                王家三口：「香料烤蔬菜長這樣啊。」
+D91 20:42  toast                  其實剛才那位，是神秘美食評論家！
+D91 20:42  face:named:戴帽子的客人      會寫進專欄。下次再來。
+D91 20:47  toast:q                Chloe：「貓有新東西了。」
+D91 20:58  toast                  張媽媽一家 等太久，離開了
+D91 21:04  toast                  檸檬氣泡水 只剩 2 份
+D91 21:08  face:dylan             紀念日想吃什麼？
+D91 21:11  face:jill              你決定。
+D91 21:15  face:dylan             我每次決定妳都說不要。
+D91 21:18  face:jill              所以你先想三個。
+D91 21:26  toast:q                Jill：「味道還好嗎？」
+D91 21:29  toast:q                Sam 與 Lena：「這個我喜歡。」
+D91 21:30  toast                  21:30 打烊，不再接新客人
+D91 22:18  toast                  收店以後，Dylan 也在吧台坐了一下。走的時候，杯子底下壓著酒錢。
