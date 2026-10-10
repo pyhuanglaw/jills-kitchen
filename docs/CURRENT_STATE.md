@@ -1,8 +1,10 @@
 # Jill's Kitchen — 目前狀態（暫時的，會一直更新）
 
 這份只放「現在」的狀態：branch、版本、待辦、待確認。永久的設計規則在 `docs/PROJECT_MEMORY.md`，不要寫到這裡；這裡的內容過時了就
-直接改掉或刪掉。最後更新：2026-10-10，**v2.5 發布**（使用者：「可以了 放到正是遊戲」）：新的廚房（料理系統）、第二輪決策、使用者在 iPhone 上的
-回報，一起發布到正式網址（**Version 11**，id `1791620792-2036`；遊戲內容＝ commit `fb86e3a`，tag `v2.5`；報告 `docs/V25_REPORT.md`）。
+直接改掉或刪掉。最後更新：2026-10-10，**v2.5.1 發布**（v2.5 發布後使用者的最終決策 `docs/v24/post_v25_decisions_2026-10-10.txt`：
+開店前過時的分工提醒拿掉、Bistro 多一位廚師和一位服務生的名額、ON FIRE 第 1 天起就可能出現；小費、怡君確認後不改）。正式網址
+**Version 12**，id `1791630519-9eb9`；遊戲內容＝ commit `da77df3`（tag `v2.5.1`，只在本機；GitHub 上是 branch `archive/release-v2.5.1`）；
+報告 `docs/V251_REPORT.md`。
 
 ## Repo 與 branch
 
@@ -23,6 +25,14 @@
 - **2026-10-10：v2.5 發布前，`feature/cooking-gameplay` 快轉合回 `main`**（從 8299c30 到 fb86e3a；之後只有發布紀錄的文件）。合併前的 `main`（8299c30）
   保存在 `archive/main-before-v25-2026-10-10`；要回到合併前：`git push --force-with-lease=refs/heads/main:<目前的 main> origin 8299c30:refs/heads/main`
   （只在使用者要求時）。
+- **2026-10-10：v2.5.1 發布前，`feature/cooking-gameplay` 快轉合回 `main`**（從 812d97f 到 da77df3；合併前確認兩邊的 SHA、main 是 feature 的
+  祖先，沒有強推）。合併前的 `main`（812d97f）保存在 `archive/main-before-v2.5.1-2026-10-10`；要回到合併前：
+  `git push --force-with-lease=refs/heads/main:<目前的 main> origin 812d97f:refs/heads/main`（只在使用者要求時）。
+- **版本 tag 推不上 GitHub**（2026-10-10 v2.5 發布時試過：annotated tag 被斷線、lightweight tag 回 HTTP 403，是這個環境的連線政策；
+  這裡的 GitHub 工具也不能建 tag 或 release；v2.5.1 沒有再試）。GitHub 上沒有任何 tag，用 branch 代替：`archive/release-v2.5`＝
+  fb86e3aa1ece41416e981fd28c9e845c782a4ba6（Version 11，id 1791620792-2036）、`archive/release-v2.5.1`＝da77df36477c324b541e12f2311eeeb89513227c
+  （Version 12，id 1791630519-9eb9）。要補 tag：GitHub 網頁 Releases → Draft a new release → tag 填 `v2.5`（或 `v2.5.1`）、Target 選對應的
+  branch → Publish（`docs/evidence/v251_release/tag_check.txt`）。
 - 還沒做完的遊戲功能，另外開短期的 `feature/…` 或 `wip/…` branch；做完、測試通過才回到 `main`，發布的 commit 一定在 `main` 上。
   文件與紀錄可以直接在 `main`。不要讓工作 branch 跟 `main` 長期並行。
 - GitHub 上的 branch：`main`、`archive/rc7.6-import-main`、`feature/fewer-lines`（rc8.5，已合回 `main`，可以在 GitHub 網頁刪掉）、
@@ -67,6 +77,10 @@
 
 ## 已發布
 
+- **v2.5.1**，2026-10-10，發布到 **https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA**（**Version 12**，id 1791630519-9eb9；發布前讀到的線上 id：
+  1791620792-2036）。遊戲內容＝ commit da77df3（tag `v2.5.1`，只在本機）。報告：`docs/V251_REPORT.md`。Gate：da77df3 上完整回歸 357/357（三份同時跑，
+  58 分鐘；`docs/evidence/v251_release/regression/`）；讀回與 live_check 見報告。內容：開店前不再有「⚠ 某站目前無人／安排員工」；Bistro 比第 1 級
+  多廚師 1、服務生 1 的名額（之後每級照舊多）；Jill 一個人做菜的晚上 ON FIRE 用她自己的標準（33／40），第 1 天起就可能出現。
 - **v2.5**，2026-10-10，發布到 **https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA**（**Version 11**，id 1791620792-2036；發布前讀到的線上 id：1791419491-01ae）。
   遊戲內容＝ commit fb86e3a（tag `v2.5`，只在本機）。報告：`docs/V25_REPORT.md`。Gate：fb86e3a 上完整回歸 356/356（三份同時跑，57 分鐘；docs/evidence/v25_release/regression/）；讀回與 live_check 通過
   （`docs/evidence/v25_release/`）。內容：新的廚房（每道菜一步一步做、飲料一杯一杯、Jill 只有一個、服務生端多盤、髒盤子拿回廚房洗、
@@ -100,7 +114,7 @@
 
 ### 已完成、尚未發布
 
-- （v2.5 發布以後，沒有已完成、尚未發布的遊戲改動。）
+- （v2.5.1 發布以後，沒有已完成、尚未發布的遊戲改動。）
 
 - **料理流程 prototype**（branch `proto/cooking-flow`，`prototype/cooking/`）：獨立試玩頁，不是遊戲本體。使用者 2026-10-07：不合併、
   不發布、現在不要再做；之後重新開始時，以正式遊戲原本的廚房畫面為底，不重新設計美術。私人連結 https://claude.ai/artifact/EBzi6qETraguAApvettBFe 。
@@ -172,8 +186,9 @@
 - **例行 QA**（2026-10-06 起）：`python3 tests/run_tests.py --qa`，`tests/qa_tests.py` 的 `qa_` 測試，用 `tests/player.py` 真的點畫面、
   故事面板開著。每次改完遊戲跑；完整回歸也包含它們。已知未修的問題列在 `tests/qa_known_open.json`（失敗顯示 OPEN、不算失敗；修好時
   顯示 FIXED，要把那一條拿掉）。
-- 356 個測試（其中 54 個是例行 QA 的 `qa_` 測試，5 個是模擬玩家的 `sim_player_` 測試；`python3 tests/run_tests.py` 全跑，
-  `-k a,b,c` 跑指定的）。最近一次完整回歸：**v2.5 發布的 fb86e3a 上 356/356**（2026-10-10，固定在那個 commit 的 worktree 分三份跑，57 分鐘；
+- 357 個測試（其中 54 個是例行 QA 的 `qa_` 測試，5 個是模擬玩家的 `sim_player_` 測試；`python3 tests/run_tests.py` 全跑，
+  `-k a,b,c` 跑指定的）。最近一次完整回歸：**v2.5.1 發布的 da77df3 上 357/357**（2026-10-10，三份同時跑，58 分鐘；`docs/evidence/v251_release/regression/`）。
+  再前一次：**v2.5 發布的 fb86e3a 上 356/356**（2026-10-10，固定在那個 commit 的 worktree 分三份跑，57 分鐘；
   `docs/evidence/v25_release/regression/`）。再前一次：第二輪合併的 8ded2e2 上 352/354；另外 2 個是測試靠一個種子的運氣通過的檢查，原始案例保留、量了分布、修好並證明（`docs/cooking/RELEASE_GATE_2026-10-10.md`「七」）（2026-10-10，固定在那個 commit 的 worktree 分三份跑；
   `docs/evidence/cooking_2026-10-10/regression/`）。再前一次：合併料理系統的 d57bac8 上 347/347（2026-10-09）。再前一次：rc8.8 的 9253fae 上 306/306（2026-10-08，在固定在那個 commit 的另一個 worktree 分三份跑，
   37 分鐘；`docs/evidence/v24_rc8_8/regression/`）。再前一次：rc8.7 的 24ecf98 上 305/305。這一批中途：合併 commit c614255 的完整回歸開跑後停掉（手冊一句話的出現條件漏改，
@@ -184,7 +199,10 @@
 
 ## 待辦／待確認
 
-- **v2.5 發布後要使用者決定的事**（`docs/V25_REPORT.md` 第 7 節）：開店前「⚠ 某某站目前無人」和「安排員工」的提醒，在廚師不分工以後
+- **v2.5 發布後的待決事項：2026-10-10 使用者全部定案**（`docs/v24/post_v25_decisions_2026-10-10.txt`），v2.5.1 做完並發布（`docs/V251_REPORT.md`）。
+  還留著的：服務生的名字只有 7 個、名額全開最多 9 位（第 8、9 位叫「服務生8」「服務生9」，沒有自己的臉和立繪；v2.5 起最多 8 位就會這樣）——
+  補名字要連臉、立繪一起設計，等使用者決定；v2.5、v2.5.1 的 tag 等使用者在 GitHub 網頁補（見上面「Repo 與 branch」）。
+- ~~**v2.5 發布後要使用者決定的事**~~（v2.5.1 處理了提醒；「占」「佔」、Day 52 的故事目標照舊）（`docs/V25_REPORT.md` 第 7 節）：開店前「⚠ 某某站目前無人」和「安排員工」的提醒，在廚師不分工以後
   跟「不要分工了」相反（你的第 6 天存檔每天兩條：冷盤台、咖啡吧）——建議拿掉；「占」「佔」兩種寫法並存；Day 52 的故事目標很貼著
   現在的節奏（`main` 也只有一半的種子每一項都達到）。
 - ~~**2026-10-10 合併後，使用者在 iPhone 上玩私人測試版（Version 22）的回報**~~（v2.5 已發布）：
@@ -192,7 +210,7 @@
   還沒定案」），改成有空就接廚房任何一步；料理難度照等級（🔒）先保留。(2) 「今日任務」收不起來，擋住冷盤台。(3) 「裝盤應該要走到
   盤子在的地方」（現在裝盤會走到左上角，那裡沒有盤子）。秀琴阿姨的借款：前 10 天錢不夠時打烊借 $3,000，結算時錢超過 $20,000 一次還清
   （使用者問了，照現在的規則回答，沒有改）。
-- **第二輪合併後，要使用者決定的事**（`docs/cooking/RELEASE_GATE_2026-10-10.md` 第十節）：ON FIRE 變少以後中後期的小費少了（Day 92 每晚淨利
+- ~~**第二輪合併後，要使用者決定的事**~~（2026-10-10 v2.5 發布後全部定案：小費不補償、ON FIRE 第 1 天起可以、Bistro 多廚師和服務生、怡君保留第 8 天；v2.5.1）（`docs/cooking/RELEASE_GATE_2026-10-10.md` 第十節）：ON FIRE 變少以後中後期的小費少了（Day 92 每晚淨利
   少約兩成），要不要補；前三天不再有 ON FIRE（只有 Jill 一個人顧店的第 3 天，沒等到就走的客人變多），要不要讓小店也有機會；第 1 級和 Bistro
   的員工名額一樣（擴建只多桌子）；新遊戲裡怡君的故事第 8 天就開始（秀琴阿姨第一天就上班的結果，節奏要不要放慢）。（2026-10-09 那一批的
   「出菜口走道」「一開始就能請員工」「摸貓變少」「ON FIRE 太常」「揭曉那晚的距離」「專職洗碗」都由 2026-10-10 的決策處理了。）
@@ -230,6 +248,7 @@
 - 樾樾打烊後出來等 Jill、Jill 在開店和快打烊時在主廳。
 - rc8.7：新遊戲裡 Lounge、阿拓、鋼琴、予安、二樓來的時間，以及中間等錢的那段感覺對不對（正常玩家模擬：試酒之夜 Day 15–21、
   Lounge 開幕 Day 46–58、鋼琴 Day 69–76、予安 Day 83–88、二樓 Day 67–74；`docs/qa/2026-10-07_story_first_seeds.md`）。
+- v2.5.1：開店前沒有「目前無人」的提醒；擴建 Bistro 以後能多請一位廚師、一位服務生；還沒請廚師的頭一兩天偶爾 ON FIRE（模擬：第 1 天大約四成）。
 - v2.5：新的廚房在 iPhone 上整個玩起來的感覺（使用者玩過私人測試版 Version 22）；修好以後的三件事（第 1 級廚師自己裝盤、去盤架拿盤子、
   「今日任務」的 × 和點旁邊收起來）；舊存檔（正式版 rc8.8 的）讀進來以後的樣子。
 - rc8.8：揭曉後房間裡 Dylan 的名牌、房間分頁的名字（iPhone 寬度、8 個分頁時寫「Jill & Dylan」）。
