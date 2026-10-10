@@ -14,3 +14,11 @@ page errors: []
 total: {'補貨：冰箱滿了': 12}
 days played: 12
 page errors: []
+== day61_normal_player_10_days_after_fix
+total: {'補貨：冰箱滿了': 10}
+days played: 10
+page errors: []
+== new_game_seed303_30_days_after_fix
+total: {'等太久': 5, '補貨：冰箱滿了': 22}
+days played: 30
+page errors: []
