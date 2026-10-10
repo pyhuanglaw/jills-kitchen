@@ -35,7 +35,8 @@ Chromium 開成 iPhone 尺寸，不是實機。
 ## 3. 哪些已經合併／發布
 
 - v2.5.2：2026-10-10 13:16 UTC 發布到正式網址（Version 13）；`main` 快轉到 fb7b6aa（之後是發布紀錄 dd36fb9）。
-- v2.5.3：2026-10-10 14:34 UTC 發布到正式網址（Version 14，id 1791642868-d632）；`main` 快轉到 0d41d8e（之後是發布紀錄）。
+- v2.5.3：2026-10-10 14:34 UTC 發布到正式網址（Version 14，id 1791642868-d632）；`main` 快轉到 0d41d8e，之後只加了紀錄和文件，
+  現在 `main` 和 `feature/cooking-gameplay` 是同一個 commit。
 - 兩版合併前的 `main` 都存成 `archive/main-before-…` branch；GitHub 上的 tag 照你說的先不處理，用 `archive/release-v2.5.2`、`archive/release-v2.5.3` branch 代替。
 
 ## 4. 真的需要你決定的事
