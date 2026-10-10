@@ -413,10 +413,13 @@ def v24_day52_save_plays_the_stories_in_order_over_forty_days(b, port, target):
     # she came back, so the beat waited for her next evening (Day 58). The cat walk draws random numbers while Jill is idle,
     # and every evening's walk-ins and walks move with them from the first evening (Day 53: 87 guests and 56 lost before, 86
     # and 48 after); over the forty evenings the same (81.3 -> 82.0 guests, 42.0 -> 41.4 lost, 4.2 -> 3.8 angry). Fourteen
-    # seeds (7000-8300) on main (8298e18) and on 8ded2e2: [the comparison is being completed]. The seed base moves to 7000:
-    # the rule, written down before the results (day52/README.md), takes the smallest seed base that meets every target on
-    # both builds, and only if the final build is not slower than main. What the test checks is unchanged; three
-    # slowed-down versions fail it (day52/mutants.txt).
+    # seeds (7000-8300) on main (8298e18) and on 8ded2e2 (day52/seeds.txt): the key on Day 62.00 and 62.43 on average, the
+    # wall begins 64.86 and 65.57, settles 81.21 and 81.79; every target on 8 of 14 on both; the key on Day 63 on 7 and 10
+    # of 14; the same evenings (81.6 and 81.4 guests, 40.8 and 39.9 lost, $62,267 and $62,254 a night). Not slower by the
+    # rule written down before the results (day52/README.md: a mean a day later, or four fewer seeds meeting every target),
+    # which then moves the seed base to the smallest one that meets every target on both builds: 7000 (main 53, 61, 64, 81;
+    # 8ded2e2 54, 63, 65, 80). What the test checks is unchanged; on 7000 the move two days later, the mediation six days
+    # later and the Second Floor opening on the wall each fail it (day52/mutants.txt).
     first = None; majors = {}
     for d in range(40):
         if g.ev("phase") == 'summary':

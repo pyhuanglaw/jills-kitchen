@@ -1,0 +1,48 @@
+The forty days from the player's Day 52 save (the test's own loop: tools/sims/day52_seeds.py ROOT SEEDBASE), fourteen seed bases
+(7000-8300) on main's game (8298e18, before round 2) and on round 2's final game (8ded2e2); 2026-10-10 03:35-04:26 UTC, three at a
+time beside the final regression. Targets as the test checks them (first played day 53): the key within 9 days of meeting and by
+Day 63; the wall begins Day 62-66; it settles within 18 days and by Day 82; the wall after the move settled; every beat in forty days.
+"satisfaction" is the day summary's avg (the guests' average satisfaction, 0-100). Files: runs/; this table: python3 table.py runs
+
+== main 8298e18  (14 seeds)
+7000: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 81 (17 days), wall_article 84  — meets every target   | evenings 80.3 guests, 39.5 lost, 4.5 angry, satisfaction 91.5, $61,864
+7100: yj_meet 53, yj_key 61, wall_worry 63, wall_settle 80 (17 days), wall_article 83  — meets every target   | evenings 82.1 guests, 42.7 lost, 3.1 angry, satisfaction 91.5, $62,779
+7200: yj_meet 54, yj_key 63, wall_worry 67, wall_settle 82 (15 days), wall_article 85  — misses: the wall in 62-66   | evenings 83.0 guests, 40.0 lost, 3.5 angry, satisfaction 91.2, $62,458
+7300: yj_meet 54, yj_key 63, wall_worry 65, wall_settle 80 (15 days), wall_article 83  — meets every target   | evenings 81.1 guests, 42.6 lost, 3.9 angry, satisfaction 92.0, $62,404
+7400: yj_meet 53, yj_key 61, wall_worry 63, wall_settle 80 (17 days), wall_article 83  — meets every target   | evenings 79.9 guests, 41.9 lost, 4.3 angry, satisfaction 91.3, $61,285
+7500: yj_meet 54, yj_key 63, wall_worry 67, wall_settle 82 (15 days), wall_article 85  — misses: the wall in 62-66   | evenings 81.7 guests, 40.5 lost, 3.6 angry, satisfaction 91.6, $62,598
+7600: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 80 (16 days), wall_article 83  — meets every target   | evenings 81.9 guests, 40.8 lost, 4.0 angry, satisfaction 91.5, $62,163
+7700: yj_meet 54, yj_key 63, wall_worry 67, wall_settle 83 (16 days), wall_article 87  — misses: the wall in 62-66, by 82 / within 18 days   | evenings 81.5 guests, 38.2 lost, 4.2 angry, satisfaction 90.2, $62,320
+7800: yj_meet 53, yj_key 63, wall_worry 65, wall_settle 82 (17 days), wall_article 85  — misses: the move within ten days   | evenings 82.8 guests, 39.9 lost, 3.4 angry, satisfaction 91.3, $62,406
+7900: yj_meet 53, yj_key 61, wall_worry 65, wall_settle 81 (16 days), wall_article 84  — meets every target   | evenings 81.5 guests, 41.1 lost, 3.8 angry, satisfaction 91.7, $61,680
+8000: yj_meet 53, yj_key 61, wall_worry 65, wall_settle 81 (16 days), wall_article 84  — meets every target   | evenings 82.5 guests, 41.1 lost, 3.5 angry, satisfaction 91.4, $62,887
+8100: yj_meet 53, yj_key 61, wall_worry 63, wall_settle 80 (17 days), wall_article 83  — meets every target   | evenings 81.8 guests, 42.6 lost, 3.9 angry, satisfaction 91.4, $62,766
+8200: yj_meet 53, yj_key 63, wall_worry 65, wall_settle 82 (17 days), wall_article 85  — misses: the move within ten days   | evenings 80.5 guests, 40.2 lost, 4.4 angry, satisfaction 90.6, $61,870
+8300: yj_meet 53, yj_key 63, wall_worry 65, wall_settle 83 (18 days), wall_article 88  — misses: the move within ten days, by 82 / within 18 days   | evenings 82.3 guests, 40.4 lost, 3.4 angry, satisfaction 91.1, $62,254
+   mean: yj_key 62.00, wall_worry 64.86, wall_settle 81.21, wall_article 84.43 | every target: 8 of 14 | the key on Day 63 or later: 7 of 14 | evenings: 81.6 guests, 40.8 lost, 3.8 angry, $62,267
+== final 8ded2e2  (14 seeds)
+7000: yj_meet 54, yj_key 63, wall_worry 65, wall_settle 80 (15 days), wall_article 83  — meets every target   | evenings 81.7 guests, 39.5 lost, 3.9 angry, satisfaction 91.3, $62,750
+7100: yj_meet 53, yj_key 63, wall_worry 66, wall_settle 83 (17 days), wall_article 88  — misses: the move within ten days, by 82 / within 18 days   | evenings 82.0 guests, 41.4 lost, 3.8 angry, satisfaction 91.5, $62,766
+7200: yj_meet 53, yj_key 61, wall_worry 64, wall_settle 79 (15 days), wall_article 82  — meets every target   | evenings 81.2 guests, 38.1 lost, 4.5 angry, satisfaction 91.2, $62,176
+7300: yj_meet 54, yj_key 63, wall_worry 65, wall_settle 82 (17 days), wall_article 85  — meets every target   | evenings 81.4 guests, 40.2 lost, 4.5 angry, satisfaction 91.6, $62,740
+7400: yj_meet 53, yj_key 63, wall_worry 67, wall_settle 84 (17 days), wall_article 88  — misses: the move within ten days, the wall in 62-66, by 82 / within 18 days   | evenings 80.5 guests, 40.7 lost, 4.7 angry, satisfaction 91.4, $61,115
+7500: yj_meet 53, yj_key 61, wall_worry 66, wall_settle 81 (15 days), wall_article 84  — meets every target   | evenings 80.8 guests, 39.9 lost, 4.3 angry, satisfaction 91.3, $61,953
+7600: yj_meet 53, yj_key 61, wall_worry 63, wall_settle 79 (16 days), wall_article 82  — meets every target   | evenings 81.3 guests, 40.0 lost, 4.2 angry, satisfaction 91.8, $62,352
+7700: yj_meet 54, yj_key 63, wall_worry 69, wall_settle 86 (17 days), wall_article 89  — misses: the wall in 62-66, by 82 / within 18 days   | evenings 82.7 guests, 38.0 lost, 3.5 angry, satisfaction 90.5, $62,904
+7800: yj_meet 53, yj_key 63, wall_worry 65, wall_settle 82 (17 days), wall_article 85  — misses: the move within ten days   | evenings 80.6 guests, 39.5 lost, 4.7 angry, satisfaction 91.2, $61,241
+7900: yj_meet 54, yj_key 63, wall_worry 65, wall_settle 81 (16 days), wall_article 84  — meets every target   | evenings 82.1 guests, 41.0 lost, 3.4 angry, satisfaction 91.4, $62,218
+8000: yj_meet 53, yj_key 63, wall_worry 66, wall_settle 81 (15 days), wall_article 84  — misses: the move within ten days   | evenings 82.1 guests, 39.7 lost, 4.2 angry, satisfaction 90.8, $63,750
+8100: yj_meet 53, yj_key 63, wall_worry 66, wall_settle 86 (20 days), wall_article 90  — misses: the move within ten days, by 82 / within 18 days   | evenings 80.7 guests, 40.3 lost, 5.2 angry, satisfaction 91.0, $60,919
+8200: yj_meet 53, yj_key 61, wall_worry 65, wall_settle 80 (15 days), wall_article 83  — meets every target   | evenings 81.3 guests, 41.0 lost, 4.3 angry, satisfaction 91.7, $62,322
+8300: yj_meet 54, yj_key 63, wall_worry 66, wall_settle 81 (15 days), wall_article 84  — meets every target   | evenings 81.8 guests, 39.6 lost, 4.4 angry, satisfaction 91.2, $62,346
+   mean: yj_key 62.43, wall_worry 65.57, wall_settle 81.79, wall_article 85.07 | every target: 8 of 14 | the key on Day 63 or later: 10 of 14 | evenings: 81.4 guests, 39.9 lost, 4.3 angry, $62,254
+
+The bisect of the original case (seed base 7100):
+== d12a638  (1 seeds)
+7100: yj_meet 53, yj_key 61, wall_worry 66, wall_settle 82 (16 days), wall_article 85  — meets every target   | evenings 81.3 guests, 42.0 lost, 4.2 angry, satisfaction 91.5, $61,948
+== c50184d  (1 seeds)
+7100: yj_meet 53, yj_key 61, wall_worry 66, wall_settle 82 (16 days), wall_article 85  — meets every target   | evenings 81.3 guests, 42.0 lost, 4.2 angry, satisfaction 91.5, $61,948
+== 1f7ff75  (1 seeds)
+7100: yj_meet 53, yj_key 63, wall_worry 66, wall_settle 83 (17 days), wall_article 88  — misses: the move within ten days, by 82 / within 18 days   | evenings 82.0 guests, 41.4 lost, 3.8 angry, satisfaction 91.5, $62,766
+== final 8ded2e2  (14 seeds)
+7100: yj_meet 53, yj_key 63, wall_worry 66, wall_settle 83 (17 days), wall_article 88  — misses: the move within ten days, by 82 / within 18 days   | evenings 82.0 guests, 41.4 lost, 3.8 angry, satisfaction 91.5, $62,766
