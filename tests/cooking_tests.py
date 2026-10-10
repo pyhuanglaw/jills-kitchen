@@ -374,7 +374,15 @@ def cooking_the_card_says_who_has_it_and_a_dish_can_be_taken_back(b, port, targe
     st = json.loads(g.ev(f"JSON.stringify((()=>{{const n=wfNode({nid});return{{who:n.who,st:n.st,si:n.si,to:n.to&&n.to.no,its:n.its.map(o=>o.it.st),cook:(R.wfc||{{}}).t_ade||null,q:wfJ().wq,ck:n.ck||[]}}}})())"))
     check(st['who'] == 'jill' and st['st'] == 'go' and st['si'] == 0 and st['to'] == to and all(x == 'cooking' for x in st['its']) and st['cook'] is None and nid in st['q'] and not st['ck'],
           f'taken back: Jill has it, nothing reset, the cook let it go (and is not counted for it): {st}')
-    check('第一步：熱區 · Jill 前往中' in g.ev(GUIDE), 'the card says Jill is on her way')
+    # 2026-10-10 (the final regression on 8ded2e2): this read the card on the frame of the tap, and said 「Jill 前往中」 only if Jill
+    # happened to be free at that moment. She usually is not: she is finishing the table she is at, and the card says 「Jill 接著做」
+    # until she sets off (wfState / jillOnIt, the rule since 2026-10-09) — free at the tap on 7 of 20 seeds on main, 2 of 20 on round 2;
+    # 7140 was one of them until 1f7ff75 moved the day by a frame. On every seed of the three builds the card named Jill from the tap,
+    # never the cook or 「等待處理」, and said 「Jill 前往中」 within 16 frames (docs/evidence/cooking_2026-10-10/card/). So: Jill's at
+    # once, and on her way within a second.
+    gt = g.ev(GUIDE)
+    check(('第一步：熱區 · Jill 接著做' in gt or '第一步：熱區 · Jill 前往中' in gt) and '阿德' not in gt, f'the card is Jill\'s at once: {gt!r}')
+    check(_until(g, f"{GUIDE}.includes('第一步：熱區 · Jill 前往中')", cap=30, step=1), 'the card says Jill is on her way')
     # the cook goes on to other work: a second dish ordered is his
     g.ev("__addOrders(1,'pasta')"); g.ev("__run(2)")
     n2 = g.ev("(()=>{wfGather();const n=wfList().find(n=>n.d==='pasta');return n?n.id:0})()")

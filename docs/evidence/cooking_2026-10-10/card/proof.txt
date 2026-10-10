@@ -1,0 +1,18 @@
+== the new check on the final game (8ded2e2, js/game.js unchanged), seed 7140 as before  04:38:34
+PASS  cooking_the_card_says_who_has_it_and_a_dish_can_be_taken_back  (5.0s)
+1 passed, 0 failed
+== the new check on 8298e18's game
+PASS  cooking_the_card_says_who_has_it_and_a_dish_can_be_taken_back  (4.8s)
+1 passed, 0 failed
+== the new check on c50184d's game
+PASS  cooking_the_card_says_who_has_it_and_a_dish_can_be_taken_back  (4.7s)
+1 passed, 0 failed
+-- mutant card_never_on_way (the final game made wrong)
+FAIL  cooking_the_card_says_who_has_it_and_a_dish_can_be_taken_back  (4.7s)
+      the card says Jill is on her way
+0 passed, 1 failed
+-- mutant card_no_jill (the final game made wrong)
+FAIL  cooking_the_card_says_who_has_it_and_a_dish_can_be_taken_back  (4.2s)
+      the card is Jill's at once: '×\n黃金蛋炒飯 ×2\n● 熱區→○ 裝盤\n第一步：熱區 · 等待處理'
+0 passed, 1 failed
+== done 04:39:04

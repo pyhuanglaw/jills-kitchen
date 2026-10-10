@@ -892,6 +892,14 @@ Release Gate 四-1／四-3：「不得出現無法透過合理操作、聘人或
       （`seeds.txt`）。不慢 → 換成 7000（兩個版本都全部達標）。檢查和門檻都沒改。還抓得到：怡君搬家晚兩天（yj_slow）、調解晚六天
       （wall_slow）、二樓跟著牆開（up_on_wall）——在 7000 上三個都失敗，最後版本通過（`mutants.txt`）。照實記下的傾向：三個平均都晚
       半天左右、鑰匙在第 63 天的種子 7 → 10 個（約一個標準誤）；main 本身就有一半的種子比使用者的目標晚一天（Release Gate 2026-10-10「十」）。
+    - **最終回歸（8ded2e2）抓到的第二個**：`cooking_the_card_says_who_has_it_and_a_dish_can_be_taken_back`（種子 7140，沒有換）：玩家把廚師
+      正要去做的菜收回來以後，「點下去那一格」卡片寫「Jill 接著做」，不是「Jill 前往中」。原始案例留著（`docs/evidence/cooking_2026-10-10/card/`）。
+      卡片的規則本來就是這樣（`wfState`／`jillOnIt`：Jill 地板上還有事要先做就寫「接著做」，出發才寫「前往中」）；那一格她還在主廳把桌邊
+      那一步做完，下一兩格出發。二分：main、d12a638、c50184d 在這個種子上那一刻她剛好已經閒著；1f7ff75（摸貓多抽亂數）起差了一格。
+      不合理的地方——三個版本各 20 個種子：點下去那一刻 Jill 剛好閒著的只有 7／20、2／20、2／20，原本的檢查要靠這個運氣；卡片在每一個
+      種子上都從點下去起就寫 Jill（接著做或前往中，從沒寫回廚師或「等待處理」），最久 16 格內變成「前往中」。改成——點下去當下卡片
+      就是 Jill 的、一秒內寫「Jill 前往中」；種子和其他檢查都沒動。還抓得到：卡片永遠不寫「前往中」（card_never_on_way）、收回以後
+      卡片不寫 Jill（card_no_jill）——兩個都失敗；改過的測試在 8ded2e2、main、c50184d 的遊戲上都通過（`card/proof.txt`）。
     - **新增**：`cooking_the_pass_opens_in_the_middle_and_keeps_its_row`、`cooking_on_fire_is_earned_by_a_run_of_fast_tables`、
       `jill_pats_a_cat_on_her_way_and_lets_go_for_work`（走回出菜口途中摸、有工作就放手、手上有盤子不停；後來加上「工作短暫空檔
       走過去摸」：不瞬移、在貓旁邊摸、路上有工作就回去）、`dylan_reveal_says_it_beside_him`、`v24_round2_hiring_opens_after_day_one_and_pays`、
