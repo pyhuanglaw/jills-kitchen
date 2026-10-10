@@ -126,9 +126,12 @@ with sync_playwright() as p:
     note('the summary\'s 今天的故事: ' + (st or '(none today)'))
     g.tap('[data-act=toShop]'); g.page.wait_for_timeout(150)
     g.tap('[data-act=tab][data-k=staff]'); g.page.wait_for_timeout(150)
-    t = text(g); assert '餐廳員工' in t and 'Lounge 員工' in t, t[:300]
+    # the Lounge's list is on the page once the Lounge is built or has its people (showShop: loungeLv()||lc.length) — a save from
+    # before the Lounge (the user's Day 6 save, 2026-10-10) has the restaurant's list only
+    lounge = g.ev("loungeLv()>0||(S.crew||[]).some(m=>crewPool(m)==='lounge')")
+    t = text(g); assert '餐廳員工' in t and ('Lounge 員工' in t or not lounge), t[:300]
     note('the staff page: ' + re.search(r'餐廳員工[^\n]*', t).group(0))
-    shot(g, '09_staff.png', 'the shop, the staff page: two numbers')
+    shot(g, '09_staff.png', 'the shop, the staff page: two numbers' if lounge else 'the shop, the staff page (no Lounge yet: the restaurant\'s list only)')
     g.tap('#screen [data-act=nextDay]'); g.page.wait_for_timeout(250)
     g.ev("for(let i=0;i<80&&typeof DLG!=='undefined'&&DLG;i++){__tick(400);dlgNext()}")
     assert g.ev("phase") == 'prep' and g.ev("S.day") == day0 + 1; inv(g, 'next prep')

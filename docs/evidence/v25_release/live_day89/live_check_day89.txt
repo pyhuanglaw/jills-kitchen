@@ -1,0 +1,19 @@
+v2.5: the page built from the tag (7210845 bytes, sha256 5593f86d6398) is inside the live HTML (7211391 bytes) byte for byte, js/game.js once; the host adds 546 bytes (its document skeleton)
+01_title.png: the title with the save: DAY 89, 繼續營業 · 18:59 (the save was made during the evening) | {"phase":"title","day":89,"t":null,"room":"main"}
+02_resumed.png: 繼續營業: the evening resumed where the save stopped (18:59) | {"phase":"service","day":89,"t":"44%","room":"main"}
+03_main.png: the dining room | {"phase":"service","day":89,"t":"44%","room":"main"}
+04_side.png: the side room (the stair door at the near edge) | {"phase":"service","day":89,"t":"45%","room":"side"}
+05_front.png: the street | {"phase":"service","day":89,"t":"56%","room":"front"}
+06_lounge.png: the Lounge | {"phase":"service","day":89,"t":"67%","room":"lounge"}
+07_kitchen.png: the kitchen | {"phase":"service","day":89,"t":"75%","room":"kitchen"}
+07b_home.png: Jill's room (rc7.3) | {"phase":"service","day":89,"t":"81%","room":"home"}
+08_summary.png: the day's summary | {"phase":"summary","day":89,"t":null,"room":"home"}
+the summary's 今天的故事: 林予安 的故事 「彈得真好。」 / 林予安 的故事 「星期幾？」
+the staff page: 餐廳員工：廚師 7/7・服務生 6/6・清潔員 1/2・另有清潔員秀琴阿姨（開店就在，不占名額）・Lounge 員工 5/5・每日薪資 $24,837。廚師、服務生、清潔員各有自己的名額，不能互相借；擴建和工程都寫著多哪一種。 Lounge 的人是固定的名單，名額跟餐廳分開算。
+09_staff.png: the shop, the staff page: two numbers | {"phase":"shop","day":89,"t":null,"room":"home"}
+10_prep_next_day.png: the next day's prep (Day 90) | {"phase":"prep","day":90,"t":null,"room":"main"}
+restock on Day 90: $902,750 → $887,486
+after the reload the money is still $887,486: the restock was saved
+11_after_reload.png: the page reloaded: the title keeps DAY 90 | {"phase":"title","day":90,"t":null,"room":"main"}
+page errors: none (0)
+ok

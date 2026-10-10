@@ -17,8 +17,9 @@ v2.5 是**新的廚房（料理系統）第一次發布到正式版**。上一�
 iPhone 上玩過的是私人測試版 Version 22（回報的問題在 Version 23 修好）；**修好以後的樣子，使用者還沒有在 iPhone 上確認**。手機畫面
 都是桌面 Chromium 開成 iPhone 尺寸，不是實機驗收。
 
-- Branch `main`，tag `v2.5` ＝ commit `[待填]`（`feature/cooking-gameplay` 快轉合回 `main`）。
-- 發布到正式網址：https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA ——**[待填：平台回傳的 Version 與 id]**。
+- Branch `main`，tag `v2.5` ＝ commit `fb86e3a`（fb86e3aa1ece41416e981fd28c9e845c782a4ba6；`feature/cooking-gameplay` 快轉合回 `main`，從 8299c30）。
+- 發布到正式網址：https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA ——**Version 11（version id `1791620792-2036`）**；發布前線上是
+  Version 10（`1791419491-01ae`，rc8.8）。2026-10-10 08:26 UTC。
 
 ## 1. 玩家會看到什麼
 
@@ -27,7 +28,7 @@ iPhone 上玩過的是私人測試版 Version 22（回報的問題在 Version 23
 | 你會看到的 | 什麼時候、在哪裡 |
 |---|---|
 | 每道菜一步一步做：點訂單上的菜，下一步的位置會亮，點那裡 Jill 就走過去做；做好的一站在原地等，不會壞 | 營業中切到「廚房」。訂單上菜名下的小字是流程和誰在做 |
-| 看得到每一下：倒蛋、翻炒、切、抹醬、放進烤箱、拉出來；裝盤時人拿著空盤走到食物旁邊盛 | 每一道菜（35 道＋招牌主菜、招牌甜點） |
+| 看得到每一下：倒蛋、翻炒、切、抹醬、放進烤箱、拉出來；裝盤時人拿著空盤走到食物旁邊盛 | 每一道菜（35 道，招牌主菜、招牌甜點也在裡面） |
 | 飲料一杯一杯做、一杯一杯送；咖啡機同時 1 杯，雙沖煮頭 2 杯，廚房二期再多 2 杯 | 點飲料的客人 |
 | 爐子、砧板、烤箱有自己的空位；滿了就「等空位」，不是錯誤 | 客人多的晚上 |
 | 拿掉了以前的燒焦和「料理失常」；做菜沒有時機要抓 | — |
@@ -120,9 +121,9 @@ docs/evidence/cooking_2026-10-10/day52/after_iphone/README.md`）：
 
 ## 5. 測試與存檔
 
-- **完整回歸**：在 **`fb86e3a`（就是發布的這個 commit）上跑，REG_RESULT**。
+- **完整回歸**：在 **`fb86e3a`（就是發布的這個 commit）上跑，356 個全部通過**；0 個失敗，0 個已知未修。
   - 356 個測試，其中 54 個是例行 QA（`qa_`，用真的點畫面）；已知未修的 0 個。
-  - 從固定在這個 commit 的獨立 worktree 分三份同時跑：REG_TIME。
+  - 從固定在這個 commit 的獨立 worktree 分三份同時跑：119＋119＋118，57 分鐘（2026-10-10 07:28 → 08:25 UTC）。
   - 紀錄：`docs/evidence/v25_release/regression/fb86e3a_part*.txt`。
 - **這一批改過、新增的測試**（`docs/cooking/ARCHITECTURE.md` 第 41 條；證明 `docs/evidence/cooking_2026-10-10/test_proofs/iphone_fixes/`）：
   - 在遊戲上都通過；改之前的遊戲（8ded2e2）上，交接、員工卡、盤架、今日任務都失敗；七個故意做壞的版本（按鈕不移、全部一起移、
@@ -137,8 +138,18 @@ docs/evidence/cooking_2026-10-10/day52/after_iphone/README.md`）：
   `qa_the_players_checkpoints_resume`（營業到一半的存檔接得回來）都在完整回歸裡。這一版沒有改存檔格式。
 - **單檔版同步**：`single_file_in_sync` 通過（在發布的 commit 上重建單檔版，一個字不差）。
 - **手機畫面**（390×844，你的第 6 天存檔；桌面 Chromium，不是手機）：`docs/evidence/v25_release/screens/`。
-- 發布前確認：`main` 是快轉合回（MERGE_LINE），`main` 本身沒有被改寫；合併前的 `main` 保存在 `archive/main-before-v25-2026-10-10`。
-- **發布後檢查**（`tools/sims/live_check.py`，紀錄在 `docs/evidence/v25_release/live/`）：LIVE_RESULT
+- 發布前確認：`main` 是快轉合回（8299c30 → fb86e3a，沒有強制推送），`main` 本身沒有被改寫；合併前的 `main` 保存在 `archive/main-before-v25-2026-10-10`。
+- **發布後檢查**（`tools/sims/live_check.py`，紀錄在 `docs/evidence/v25_release/live/`、`live_day89/`）：
+  - 從 tag 建的頁面（7,210,845 bytes）一個字不差地在線上頁面裡（7,211,391 bytes），主機只加了 546 bytes 的外框；`js/game.js` 只出現一次。
+  - **你的第 6 天存檔**（`player_day6_1254.json`，你最新的存檔）：標題畫面「DAY 6 · 繼續營業 · 20:40」→ 接回原本的晚上（82%）→ 主廳、門口、
+    廚房（阿德師傅和秀琴阿姨在做事、訂單上寫「阿德」）、房間 → 結算 → 員工頁（「餐廳員工：廚師 1/1・服務生 1/1・清潔員 0/0・另有清潔員
+    秀琴阿姨（開店就在，不占名額）」）→ 第 7 天開店前 → 補貨（$1,714 → $1,295）→ 重新整理以後錢還是 $1,295、標題 DAY 7。頁面錯誤 0。
+    （`live/`）
+  - **正式版那一代的存檔**（`player_day89_0448.json`，rc8.5，第 89 天營業到 18:59 存的）：一樣接得回來、玩完一天（予安的兩段故事）、
+    員工頁兩個名單都在、第 90 天開店前、補貨存得住、重新整理還是 DAY 90。頁面錯誤 0。（`live_day89/`）——現在在正式版玩的人，
+    打開新版本接著玩，就是走這一條路。
+  - 線上檢查的程式改了一處：員工頁原本一定要看到「Lounge 員工」，可是還沒有 Lounge 的存檔（你的第 6 天）本來就不會顯示那一段；
+    改成有 Lounge 才檢查（第一次跑在那裡停下的紀錄留著：`live/live_check_day6_first_try.txt`）。
 
 ## 6. 四層
 
