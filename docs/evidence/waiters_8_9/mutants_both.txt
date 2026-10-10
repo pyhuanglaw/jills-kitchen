@@ -57,7 +57,10 @@ FAIL  staff_numbered_names_become_the_pools_names_in_hiring_order  (1.7s)
       the pool names the eighth and the ninth 小夏 and 阿衡 (the user, 2026-10-10): ['小夏']
 == mutant xia_no_portrait (the staff portraits count)
 FAIL  named_guests_keep_one_face_and_the_staff_have_theirs  (2.3s)
-      all twenty-seven staff names have a portrait (2026-10-10: 小夏 and 阿衡, the eighth and ninth waiters, from the user's pictures) (the Lounge's five: the four keep theirs, 許葳 from the player's sheet of v2.4 rc5; the twenty were redrawn 2026-10-01): [['Evan', True], ['沈晴', True], ['�
+      all twenty-seven staff names have a portrait (2026-10-10: 小夏 and 阿衡, the eighth and ninth waiters, from the user's pictures) (the Lounge's five: the four keep theirs, 許葳 from the player's sheet of v2.4 rc5; the twenty were redrawn 2026-10-01): [['Evan', True], ['沈晴', True], ['…
 == mutant heng_no_portrait (the staff portraits count)
 FAIL  named_guests_keep_one_face_and_the_staff_have_theirs  (2.4s)
-      all twenty-seven staff names have a portrait (2026-10-10: 小夏 and 阿衡, the eighth and ninth waiters, from the user's pictures) (the Lounge's five: the four keep theirs, 許葳 from the player's sheet of v2.4 rc5; the twenty were redrawn 2026-10-01): [['Evan', True], ['沈晴', True], ['�
+      all twenty-seven staff names have a portrait (2026-10-10: 小夏 and 阿衡, the eighth and ninth waiters, from the user's pictures) (the Lounge's five: the four keep theirs, 許葳 from the player's sheet of v2.4 rc5; the twenty were redrawn 2026-10-01): [['Evan', True], ['沈晴', True], ['…
+== the v2.5.1 game (da77df3 js/game.js) with this release's tests, in a separate worktree (the stamp check reads js/game.js from the disk, so JK_GAME_JS does not reach it)
+FAIL  v24_manual_tutorial_and_news_cover_the_new_content  (0.6s)
+      the audit stamp on GUIDE (the release checklist §2: the stamp says the release the manual was last audited for; v2.5.2 from 2026-10-10, was v2.5.1, before it v2.5, v2.4 rc8)

@@ -361,6 +361,11 @@ Knowledge：予安自己看出來；Dylan 到「……沈晴？」才知道；�
   - 不得以「服務生8」「服務生9」當最後的名字：舊存檔裡用號碼命名的人（名單用完時聘的，可能叫服務生8、9 或 10——號碼連 安安 一起算），
     讀檔時照聘用順序換成名單上還沒人用的名字（`crewNameFix`），同一個人（id、等級、年資、職務）只換名字，不會少人、不會重複。
   - 名單上的每一個名字都要有立繪（測試 `no one in the name pools is without a portrait`）：兩人的名字跟立繪一起加進 `CREW_NAMES.waiter`。
+  - 使用者的圖（2026-10-10 收到，原檔一個位元組都不動：`assets/portraits/src/sheet_xia_v251.png`、`sheet_heng_v251.jpg`）：員工卡片是圖的
+    中間那一格，照其他員工卡片的方式裁（沒有重畫、沒有改色，`tools/portraits_v251.py`）。遊戲裡的小人照圖畫：小夏髮型 27（下巴長度的
+    鮑伯、一邊塞到耳後別米黃色髮夾；髮色、髮夾的顏色取自圖上），阿衡髮型 28（黑色微捲短髮）加細框長方眼鏡（`specs:'thin'`；Kai 是圓框）；
+    兩人穿服務生制服、打領帶，跟其他服務生一樣。測試 `staff_the_eighth_and_ninth_waiters_are_named_people` 比對髮色、髮夾顏色、眼鏡形狀，
+    髮型不跟任何人共用。
 
 ---
 
