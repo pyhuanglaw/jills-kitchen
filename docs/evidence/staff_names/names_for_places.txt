@@ -1,0 +1,20 @@
+名單的名字夠不夠：每一種餐廳員工，名單上能請的名字（不算秀琴阿姨——她開店就在、不占名額；不算 Lounge 的人）要不少於這種員工最多的名額
+（最後一級＋每一個加名額的房間和工程都蓋好）。2026-10-10 v2.5.2 發布後：廚師 8 個名字／最多 8 個名額，服務生 9／9，清潔員 4／2。
+測試 staff_every_list_has_a_name_for_every_place；下面是故意做壞的版本（用 JK_GAME_JS 換掉 game.js），每一個都失敗：
+- v251_pool：v2.5.1 的服務生名單（七個名字）
+- one_more_chef_place：披薩烤爐多給 1 個廚師名額
+- one_more_waiter_place：私人包廂 III 多給 1 個服務生名額
+- cleaners_at_the_last_level_five：最後一級的清潔員名額變成 4
+
+== mutant v251_pool
+FAIL  staff_every_list_has_a_name_for_every_place  (0.9s)
+      waiter: 7 names for 9 places at most: ['小茉', 'Kai', 'Nina', '阿哲', 'Momo', '小威', '阿芳']
+== mutant one_more_chef_place
+FAIL  staff_every_list_has_a_name_for_every_place  (1.1s)
+      chef: 8 names for 9 places at most: ['阿德師傅', 'Marco', '小林師傅', '阿珠姐', 'Hugo', '阿勇', '老周師傅', '小魏']
+== mutant one_more_waiter_place
+FAIL  staff_every_list_has_a_name_for_every_place  (0.9s)
+      waiter: 9 names for 10 places at most: ['小茉', 'Kai', 'Nina', '阿哲', 'Momo', '小威', '阿芳', '小夏', '阿衡']
+== mutant cleaners_at_the_last_level_five
+FAIL  staff_every_list_has_a_name_for_every_place  (0.8s)
+      cleaner: 4 names for 5 places at most: ['小彤', '阿明', 'Yuki', '阿桂']

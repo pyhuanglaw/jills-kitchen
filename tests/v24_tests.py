@@ -1421,6 +1421,23 @@ def staff_the_eighth_and_ninth_waiters_are_named_people(b, port, target):
 
 
 @test
+def staff_every_list_has_a_name_for_every_place(b, port, target):
+    """The user, 2026-10-10 after v2.5.1 (「不得以『服務生8』『服務生9』作為最終顯示名稱」): the waiters' list had seven names for nine places, so
+    a restaurant that grew all the way called its eighth and ninth 服務生8, 服務生9 until 小夏 and 阿衡 came. For each of the restaurant's three
+    lists, the names a hire can take (not 秀琴阿姨 — on the staff from the opening, she takes no place; not the Lounge's people) are at least the
+    places the role can ever have: the last level's, and every room and project that adds one, all built. A new place without a new name
+    fails here, before a player meets 廚師9."""
+    g = Game(b, port, target, seed=813, manual=True, viewport={'width': 390, 'height': 844})
+    r = json.loads(g.ev("""JSON.stringify(CAP_ROLES.map(role=>{const ln=LOUNGE_ROSTER.map(x=>x.name);
+      const max=CAP_LEVEL[CAP_LEVEL.length-1][role]+capSources().reduce((a,s)=>a+(s.add[role]||0),0);
+      const names=(CREW_NAMES[role]||[]).filter(n=>n!=='秀琴阿姨'&&!ln.includes(n));return {role,max,names}}))"""))
+    for x in r:
+        check(len(x['names']) >= x['max'], f"{x['role']}: {len(x['names'])} names for {x['max']} places at most: {x['names']}")
+    check(len(r) == 3 and all(isinstance(x['max'], int) and x['max'] > 0 for x in r), f'every role has places to count: {r}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
 def v24_an_old_shared_cap_save_keeps_everyone_and_waits(b, port, target):
     """rc5 migration: before the split, the Lounge's +2 and +2 were added to one shared cap, so a save can hold more
     restaurant people than the restaurant's own places, and 安安 / 阿拓 were hired as a plain waiter / chef. Nobody is
