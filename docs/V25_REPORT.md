@@ -120,7 +120,25 @@ docs/evidence/cooking_2026-10-10/day52/after_iphone/README.md`）：
 
 ## 5. 測試與存檔
 
-[待填]
+- **完整回歸**：在 **`fb86e3a`（就是發布的這個 commit）上跑，REG_RESULT**。
+  - 356 個測試，其中 54 個是例行 QA（`qa_`，用真的點畫面）；已知未修的 0 個。
+  - 從固定在這個 commit 的獨立 worktree 分三份同時跑：REG_TIME。
+  - 紀錄：`docs/evidence/v25_release/regression/fb86e3a_part*.txt`。
+- **這一批改過、新增的測試**（`docs/cooking/ARCHITECTURE.md` 第 41 條；證明 `docs/evidence/cooking_2026-10-10/test_proofs/iphone_fixes/`）：
+  - 在遊戲上都通過；改之前的遊戲（8ded2e2）上，交接、員工卡、盤架、今日任務都失敗；七個故意做壞的版本（按鈕不移、全部一起移、
+    點旁邊不收、清單蓋住按鈕、三份拆成兩批、廚師不裝盤、盤架在牆邊）各自被它的測試抓到。
+  - **Day 52 測試**：原始失敗保留；先照事先寫好的規則比 14 個種子，判定「變慢」；查出是測試的天氣不在種子控制裡；天氣固定時新版本
+    跟 `main` 一樣快；測試改成每天早上抽天氣也用自己的種子，種子照同一條規則換成 7600，檢查和門檻沒改；三個故意做慢的版本都失敗
+    （`docs/evidence/cooking_2026-10-10/day52/after_iphone/README.md`）。
+  - **金樣本**：只有盤架的位置讓它們變（只把盤架改回去，舊的三個全部通過）；重錄後四個小改動都抓得到。
+- **舊存檔**：`every_player_save_migrates_plays_a_day_and_keeps_its_story` 把 `tests/saves/` 裡你的每一個存檔（Day 30 到 Day 92，**包括
+  你 2026-10-10 的第 6 天存檔** `player_day6_1254.json`）讀進來、不跳任何通知、玩完一整天、存檔重開以後故事紀錄一個不少；
+  `old_saves_load`、`v24_saves_load_and_nothing_fires_on_load`、`v24_round2_xiuqin_once_in_every_save`（秀琴阿姨不會變兩個）、
+  `qa_the_players_checkpoints_resume`（營業到一半的存檔接得回來）都在完整回歸裡。這一版沒有改存檔格式。
+- **單檔版同步**：`single_file_in_sync` 通過（在發布的 commit 上重建單檔版，一個字不差）。
+- **手機畫面**（390×844，你的第 6 天存檔；桌面 Chromium，不是手機）：`docs/evidence/v25_release/screens/`。
+- 發布前確認：`main` 是快轉合回（MERGE_LINE），`main` 本身沒有被改寫；合併前的 `main` 保存在 `archive/main-before-v25-2026-10-10`。
+- **發布後檢查**（`tools/sims/live_check.py`，紀錄在 `docs/evidence/v25_release/live/`）：LIVE_RESULT
 
 ## 6. 四層
 
