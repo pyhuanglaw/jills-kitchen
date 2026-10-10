@@ -1,0 +1,10 @@
+6bf5002's game with only the rack put back by the wall (rack_by_the_wall), against the golden baselines recorded on 8ded2e2
+(a worktree of 6bf5002, its tests/golden/), 2026-10-10 07:13-07:17 UTC (golden_rack_only.sh; run as two invocations):
+-- -k golden_scenario,cat_personality_fingerprint
+PASS  cat_personality_fingerprint  (2.1s)
+PASS  golden_scenario  (3.6s)
+2 passed, 0 failed
+-- -k golden_frames
+PASS  golden_frames  (183.7s)
+1 passed, 0 failed
+=> the three baselines moved only because of the rack: the cooks taking any step, the task list and the chips leave them as they were.

@@ -1,0 +1,7 @@
+01 the task list: open True, its × True, the chip uncovered True
+   a tap in the kitchen puts it away: True
+02 阿德師傅 (LV1) plating: {"d":"friedrice","n":1,"t":23}
+03 his staff card: <span class="ok">熱區 專長</span><span class="ok">其他步驟都會做</span> | <span class="ok">✓ 會做 4／5 道菜</span><span class="no">🔒 番茄義大利麵 <small>LV2</small></span>
+   the staff page shows 其他步驟都會做: True
+04 844×390: the chips lifted {"side":"left","top":99,"ids":["taskChip"]}
+05 Jill at the rack: rack {'x': 62, 'y': 224}, Jill {'x': 60.96436716029099, 'y': 224.3295195399074}

@@ -930,7 +930,11 @@ Release Gate 四-1／四-3：「不得出現無法透過合理操作、聘人或
         今日任務、💬）不蓋在點得到的東西上（流理台和上面的站、咖啡機、披薩烤爐，`kitchenTapBoxes`）。還抓得到：按鈕永遠不移
         （chips_never_lift）、要移就全部一起移（chips_lift_all_or_none，第一版的做法：1100×500 一顆都沒移）——都失敗（844×390、
         1100×500「今日任務」壓在檯面上）。改之前的遊戲沒有 `kitchenTapBoxes`（測試問遊戲哪裡點得到），那一次的失敗不算證明。
-    - **金樣本**（`golden_frames`、`golden_scenario`、`cat_personality_fingerprint`）：GOLDEN_PLACEHOLDER
+    - **金樣本**（`golden_frames`、`golden_scenario`、`cat_personality_fingerprint`）：基準重錄（`test_proofs/iphone_fixes/golden_baselines.txt`）：8ded2e2（基準錄的版本）三個都通過；
+      6bf5002 三個都失敗（第 1 天第 28 秒起不一樣：Jill 去盤架拿盤子走的路換了，之後整晚的時間跟著移）。是什麼讓它們變：6bf5002 的遊戲只把
+      盤架改回牆邊，舊的三個基準全部通過（`golden_rack_only.txt`）——廚師不分工、今日任務、廚房按鈕都沒有動到它們（金樣本那幾天
+      沒有廚師、沒打開清單，390 寬的按鈕不移）。在 6bf5002 重錄，再拿四個小改動各跑一次（炒飯貴 $5、Jill 的頭髮顏色、晴天的權重、
+      出菜口中間的開口左邊寬 2 點），每一個都被至少一個金樣本抓到。
     - **`v24_day52_save_plays_the_stories_in_order_over_forty_days`**：1dba1c9 的回歸（跑到一半，容器重開；`regression/1dba1c9_partial_part0.txt`）
       在種子底數 7000 上失敗：怡君第 63 天拿到鑰匙、第 83 天調解。原始案例留著（`docs/evidence/cooking_2026-10-10/day52/after_iphone/`）。
       先照事先寫好的規則比 14 個種子：6bf5002 調解平均 83.43（main 81.21）、「每一個目標都達到」2／14（main 8／14）——**判定變慢**，
