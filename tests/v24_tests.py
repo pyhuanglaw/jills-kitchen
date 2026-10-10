@@ -503,7 +503,9 @@ def v24_xiuqin_stays_through_the_closing_like_the_staff(b, port, target):
     g.ev("__botUntil('R.closing!=null',80000,1/30)")
     check(g.ev("!!xqHere()&&!R.xqh"), 'there at the start of the closing, as staff')
     g.ev("for(let i=0;i<30*20;i++){update(1/30);updateCats(1/30,0)}")
-    check(g.ev("R&&R.closing!=null?!!R.cw&&!!R.cw.xq:true"), 'still there twenty seconds in')
+    # (2026-10-10, the mutants' run: her sprite alone was asked for, and it is still there while she walks out — xq_goes_home
+    #  passed; now she must still be at work: here, not on her way out)
+    check(g.ev("R&&R.closing!=null?!!xqHere()&&!!R.cw&&!!R.cw.xq&&!(R.cw.xq.tx===FR.exit.x&&R.cw.xq.troom==='front'):true"), 'still there twenty seconds in, at work (not walking out)')
     check(g.ev("R?!R.xqh:true"), 'never the evening helper')
     check(not g.errors, g.errors[:3]); g.close()
 
@@ -5583,3 +5585,42 @@ def v24_rc8_qing_tuo_after_work_five_scenes(b, port, target):
     check(pre is False, 'before the reveal 《今天喝？》 is not due')
     check(g.ev("['qt_first','qt_more','qt_lesson','qt_play','qt_alone'].every(k=>{const s=illusSrc(k);return s&&!s.tbd})") is True, 'the five pictures are the player\'s')
     check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_round2_staff_on_their_way_somewhere_come_back_from_a_checkpoint(b, port, target):
+    """Found by the release gate's long play (2026-10-10: the user's Day 92 save, seed 11, the reload on Day 96 —
+    'TypeError: Cannot read properties of null (reading 'x') at crewUpd'): a checkpoint taken while a waiter walks to a
+    place that is not a table (the staff room, the window upstairs, a story's spot) kept his place as nothing, and after
+    繼續營業 he threw on arriving — every frame, so the evening stopped. And one taken while a story's walk-over waited
+    in someone's line (its table, its party) was not saved at all. Now: the checkpoint is written (at that moment), and
+    after a real reload and 繼續營業 the waiter is still on his way to the staff room — and the evening goes on, no error."""
+    g = Game(b, port, target, seed=96, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day92_2105.json'); to_service(g, lazy=True)
+    g.ev("__bot(30*60,1/30)")
+    st = json.loads(g.ev("""JSON.stringify((()=>{const ok=m=>(m.role==='waiter'||m.role==='cleaner')&&crewHere(m)&&R.cw[m.id]&&!R.cw[m.id].arriving&&crewPool(m)!=='lounge';
+      const free=(S.crew||[]).find(m=>ok(m)&&!R.cw[m.id].task&&!R.cw[m.id].next&&(R.cw[m.id].room||'main')==='main');if(!free)return null;const sent=srSend(free,30);
+      const busy=(S.crew||[]).find(m=>m!==free&&ok(m)&&R.cw[m.id].task&&R.cw[m.id].task.k!=='visit');const t=R.tables.find(t=>t.group&&t.group.ticket&&!t.lounge);
+      const queued=!!(busy&&t&&staffWalkOver(busy,t,{dur:1})&&R.cw[busy.id].next);window.__sr=free.id;const w=R.cw[free.id];
+      return{id:free.id,name:free.name,sent,place:w.task&&w.task.t&&{x:w.task.t.x,y:w.task.t.y,room:w.task.t.room},queued,room:w.room||'main'}})())"""))
+    check(st and st['sent'] and st['place'] and st['place']['room'] == 'staff' and st['room'] == 'main', f'a waiter in the dining room sent to the staff room: {st}')
+    check(st['queued'], f"and a walk-over waiting in another one's line: {st}")
+    t0 = g.ev("R.t")
+    check(g.ev("checkpointSave('test')") is True, 'the checkpoint is written')
+    cp = json.loads(g.ev("JSON.stringify((()=>{const c=JSON.parse(localStorage.getItem(KEY)).checkpoint;return c&&{at:c.at,why:c.why}})())"))
+    check(cp and cp['why'] == 'test' and abs(cp['at'] - t0) < .5, f'saved at that moment, not an older one: {cp} / {t0}')
+    g.reload(); install_bot(g); g.page.wait_for_timeout(150)
+    g.click('[data-act=open]'); g.page.wait_for_timeout(150)
+    check(g.ev("phase") == 'service', '繼續營業 brings the evening back')
+    back = json.loads(g.ev("JSON.stringify((()=>{const w=R.cw[window.__sr||'%s'];return w?{task:w.task&&w.task.k,place:w.task&&w.task.t&&{x:w.task.t.x,y:w.task.t.y,room:w.task.t.room},room:w.room}:null})())" % st['id']))
+    check(back and back['task'] == 'visit' and back['place'] == st['place'] and back['room'] != 'staff', f'he is still on his way to the staff room: {back} / {st["place"]}')
+    g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;window.__noScenes=true")
+    g.ev("__bot(30*40,1/30)")
+    check(g.ev("phase") in ('service', 'summary') and not g.errors, f'the evening goes on: {g.errors[:2]}')
+    # a checkpoint written before this fix (the walk's place saved as nothing) comes back too: that walk is let go
+    if g.ev("phase") == 'service':
+        r = g.ev("""(()=>{const m=(S.crew||[]).find(m=>(m.role==='waiter'||m.role==='cleaner')&&crewHere(m)&&R.cw[m.id]&&!R.cw[m.id].task&&!R.cw[m.id].next&&!R.cw[m.id].arriving&&crewPool(m)!=='lounge');
+          if(!m||!srSend(m,30))return 'none';const snap=snapshotService();delete snap.cw[m.id].task.t;restoreService({day:S.day,snap});
+          try{for(let i=0;i<300;i++)update(1/30)}catch(e){return 'ERR '+e.message}const w=R.cw[m.id];return w&&w.task&&w.task.k==='visit'&&!w.task.t?'kept without its place':'ok'})()""")
+        check(r == 'ok', f'an older checkpoint with the place missing: {r}')
+    g.close()

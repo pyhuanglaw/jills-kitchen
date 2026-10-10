@@ -1,0 +1,66 @@
+== 0. what differs in the game: files and lines
+ js/game.js | 231 ++++++++++++++++++++++++++++++++++++-------------------------
+ 1 file changed, 135 insertions(+), 96 deletions(-)
+== 1. 6834a6d's game (the baselines were recorded on it), the baselines as they are
+PASS  cat_personality_fingerprint  (2.0s)
+PASS  golden_scenario  (3.2s)
+PASS  golden_frames  (285.7s)
+3 passed, 0 failed
+== 2. round 2's game, the baselines as they are
+FAIL  cat_personality_fingerprint  (2.7s)
+      cat behaviour differs from the baseline in: ['evening.states', 'evening.time', 'evening.weights', 'service.states', 'service.weights']
+FAIL  golden_scenario  (4.3s)
+      day 1 differs from golden baseline: {"reviewHash": ["9bb86316", "c634197"], "catHash": ["d40a9f2b", "fff355b3"], "summary": [{"rev": 1080, "cost": 525, "tips": 99, "bonus": 255, "wages": 0, "net": 609, "guests": 9, "lost": 1, "perfect": 9, "plated": 9, "avg": 83, "top": "friedrice", "stars": 4}, {"rev": 1080, "cost": 525, "tips": 93, "bonus": 255, "wages": 152, "net": 451, "guests": 9, "lost": 1, "perfect": 9, "plated": 9, "avg": 83, "top": "friedrice", "stars": 4}], "money": [1809, 2451], "lifetime": [1179, 1173], "cats": [[["tora", "home", "curl", 174, 527, -1, true], ["ban", "rest", "yawn", 243, 220, -1, false], ["snow", "daze", "daze", 252, 124, -1, false], ["mikan", "side", "loaf", 222, 529, -1, false], ["mei", "home", "loaf", 338, 423, -1, true]], [["tora", "home", "walk", 112, 132, -1, true], ["ban", "rest", "stretch", 72, 525, -1, false], ["snow", "sleep", "loaf", 85, 459, 1, false], ["mikan", "walk", "sit", 168, 425, -1, false], ["mei", "home", "loaf", 338, 423, -1, true]]], "weights": ["2135:e4b9eea5", "2137:a2ea9e38"], "stats": [{"guests": 9, "perfect": 9, "days": 1, "walkins": 1, "families": 0}, {"guests": 9, "perfect": 9, "days": 1, "walkins": 0, "families": 0}]}
+FAIL  golden_frames  (184.4s)
+      title: pixels differ in box (291, 19, 315, 31) (see tests/artifacts/)
+      prep: pixels differ in box (291, 19, 315, 31) (see tests/artifacts/)
+      service_20s: pixels differ in box (0, 17, 390, 781) (see tests/artifacts/)
+      service_panel: pixels differ in box (0, 17, 361, 571) (see tests/artifacts/)
+      pause: pixels differ in box (0, 17, 390, 781) (see tests/artifacts/)
+      evening: pixels differ in box (24, 19, 377, 786) (see tests/artifacts/)
+      summary: pixels differ in box (15, 19, 374, 741) (see tests/artifacts/)
+      shop: pixels differ in box (91, 19, 390, 537) (see tests/artifacts/)
+      book_cats: pixels differ in box (291, 19, 334, 31) (see tests/artifacts/)
+      book_mem: pixels differ in box (23, 19, 366, 795) (see tests/artifacts/)
+      day1: 7403 frames, baseline 7516
+      day1: first differing sample #0 (t=0.033): scene, dom
+      day1: end-of-day digest differs: money, lifetime, stats, reviewHash, summary, cats, catHash, mem, weights, life
+      day2: 9195 frames, baseline 8013
+      day2: first differing sample #0 (t=0.033): scene, dom, cats, weights
+      day2: end-of-day digest differs: money, lifetime, stats, xp, stock, reviews, reviewHash, regulars, summary, cats, catHash, mem, weights, life
+0 passed, 3 failed
+== 3. re-recorded on round 2's game
+    recorded cat fingerprint -> tests/golden/cats.json
+PASS  cat_personality_fingerprint  (2.4s)
+    recorded golden baseline -> tests/golden/scenario.json
+PASS  golden_scenario  (3.9s)
+    recorded frame baseline -> tests/golden/frames.json + 10 screens
+PASS  golden_frames  (181.9s)
+3 passed, 0 failed
+PASS  cat_personality_fingerprint  (1.9s)
+PASS  golden_scenario  (3.3s)
+PASS  golden_frames  (182.3s)
+3 passed, 0 failed
+== 4. still caught: four small changes, one at a time
+price 120 hair #221712
+-- g_price
+FAIL  cat_personality_fingerprint  (2.0s)
+FAIL  golden_scenario  (3.7s)
+FAIL  golden_frames  (184.9s)
+0 passed, 3 failed
+-- g_hair
+PASS  cat_personality_fingerprint  (2.0s)
+PASS  golden_scenario  (3.2s)
+FAIL  golden_frames  (182.7s)
+2 passed, 1 failed
+-- g_weight
+PASS  cat_personality_fingerprint  (1.8s)
+FAIL  golden_scenario  (3.3s)
+PASS  golden_frames  (181.0s)
+2 passed, 1 failed
+-- g_passgap
+FAIL  cat_personality_fingerprint  (2.4s)
+FAIL  golden_scenario  (3.8s)
+FAIL  golden_frames  (172.1s)
+0 passed, 3 failed
+== done

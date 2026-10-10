@@ -399,9 +399,12 @@
   照原本的數字（起始 $1,200、廚師簽約 $1,500、服務生 $1,200），第 1 天結束 3 個種子只有 1 個請得起廚師，請完剩 $15；改成起始
   $2,000、第 1 級簽約費減半（`hireFee`：廚師 $750、服務生 $600），第 1 天晚上兩位都請完還剩 $540–970，第 2 天備料照付；日薪不變。
   第 1–3 天的教學菜（炒飯、拿鐵、沙拉，`TEACH_DISH`）Jill 做過一次以前廚師不接（`wfJillTeach`；有廚師在時提示「第一份…要 Jill 親手做」）。
-- **摸貓**（§3）：閒 0.8 秒（原本 1.5 秒）就有機會；走回出菜口途中經過休息的貓會停下來摸一下，有工作立刻結束、手上有盤子不停
-  （`jillPatNear`、`jillPat`）。第 1 天一個人顧店、種子 1–20（同 rc8.5 的方法）：改版前 16 天、29 次；料理系統後 10 天、13 次；
-  現在 見 `docs/evidence/cooking_2026-10-10/cats/`。
+- **摸貓**（§3）：三個自然的機會，都在主廳、都是走過去（不瞬移）、有工作立刻回去、手上有盤子不停：閒 0.8 秒（原本 1.5 秒）就摸
+  身邊的貓；走回出菜口途中經過休息的貓會停下來摸一下（`jillPatNear`、`jillPat`）；店裡安靜的幾秒（她手上沒事、店裡也沒有等她的事），
+  附近（120 點內）有休息中、而且有心情的貓（照每隻貓的個性，出發前就決定），她走過去摸一下（`J.petGo`、`catPatP`）。
+  第 1 天一個人顧店、種子 1–20（同 rc8.5 的方法）：改版前 16 天、29 次；料理系統後 10 天、13 次；只有前兩個機會 14 天、18 次；
+  三個都有 18 天、29 次（`docs/evidence/cooking_2026-10-10/cats/`）。量的時候也看了她錯過的機會在哪：多半是走去桌邊做事的路上（那是工作，
+  不停下來）。
 - **ON FIRE**（§5）：不再是連續 5 份 Perfect（新廚房每道都 Perfect，中後期每晚 13–16 次、約四分之三的時間；文件寫的「四分之三」是
   時間，不是晚上數）。改成 `fireTable`：一桌的菜全部上齊時，從坐下算 30 秒內（`FIRE_FAST`）、全部 Perfect、店裡至少一半的桌有客人
   （`FIRE_BUSY`），連續的計數加 1（有 Jill 做的菜算 1.5——主廚優勢）；超過 36 秒（`FIRE_SLOW`）、不是 Perfect、有人生氣離開就歸零；
@@ -814,13 +817,16 @@ Release Gate 四-1／四-3：「不得出現無法透過合理操作、聘人或
         不停住營業的版本會失敗（xq_scene_not_held）。
       - 名額：`v24_rc8_the_restaurants_three_lists_and_the_lounges_one`、`v24_restaurant_and_lounge_staff_are_two_pools_that_never_share_places`、
         `v24_an_old_shared_cap_save_keeps_everyone_and_waits`：第 1 級從「廚師 1」變成「廚師 1、服務生 1」，她不算在清潔員名額裡；
-        數字照新規則改。還抓得到：第 1 級沒有服務生名額（cap_l1_old）、她占名額（xq_takes_place）都會失敗。
+        數字照新規則改。還抓得到：她占名額（xq_takes_place）三個都失敗；第 1 級沒有服務生名額（cap_l1_old）由三張名單那一個抓到
+        （另外兩個是成熟的存檔，第 1 級的名額用不到）。
       - 手冊與新聞：`v24_manual_tutorial_and_news_cover_the_new_content`、`followup_the_manual_describes_the_current_game`：新的必要字句
-        （員工分頁第一個商店就開、第 1 級廚師與服務生各一、秀琴阿姨不占名額）。還抓得到：第 2 天的新聞沒說可以請人（news_day2_old）。
+        （員工分頁第一個商店就開、第 1 級廚師與服務生各一、秀琴阿姨不占名額）。還抓得到：手冊改回「請第一位清潔員就是請秀琴阿姨」
+        （manual_old_xq，兩個都失敗）、舊存檔讀進來沒說她成了正式清潔員（news_joined_missing）；第 2 天的新聞沒說可以請人
+        （news_day2_old）由 `v24_xiuqin_is_there_from_day_one_and_is_not_free_labour` 抓到。
       - `cooking_the_first_three_days_teach_three_kinds_of_work`：起始 $1,200 → $2,000；她端的盤子是員工的（`R.cw.xq`），不是幫手的。
         還抓得到：起始金額改回 $1,200 會失敗（start_1200）。
       - `cooking_people_walk_round_the_counters`（`WALKS`）：出菜口兩段（`kitchenObs` 的 2、3），另外檢查走到每一個盤位、出菜口中間、
-        流理台走道的路都不穿過設備。
+        流理台走道的路都不穿過設備。還抓得到：找路時漏掉右邊那一段出菜檯（walk_through_right_pass，人從檯子中間穿過去）。
     - **d12a638 完整回歸抓到的**（每一個都在原本的種子、存檔上重現過；細節 `regression_d12a638_failures.txt`）：
       - `touch_controls`（種子 14）：測試先把桌子都弄髒等客人排隊，假設第 1 天沒人收；秀琴阿姨一下子就收好、前兩組坐下，沒有空桌可以點。
         改成——這一段讓她暫時不接新工作，點完放開。還抓得到：點排隊的客人不帶位（tap_queue_no_seat）。
@@ -832,23 +838,47 @@ Release Gate 四-1／四-3：「不得出現無法透過合理操作、聘人或
       - `v24_rc7_2_a_regulars_head_at_a_busy_table_and_the_log_closes`（種子 2229、Day 74）：點到熟客的頭＝點桌子（對的），Jill 被叫了；
         同一格裡空著的服務生先動、接走了點餐（2026-10-09 第 6 題的規則），她就放掉。種子 2229–2238：main（第二輪之前）10 次 4 次 Jill 去、
         第二輪 5 次——原本的種子在 main 上只是剛好（`regulars_head_sweep.txt`）。改成——點的那一格外場的人不接新工作，之後還原。
-        還抓得到：點到頭就跳卡片（reghead_card）。
+        還抓得到：點到頭就跳卡片（reghead_card，主廳和其他房間兩條路都改）。
       - 廚房測試的 `_day()`（`cooking_jill_and_the_cooks_hand_work_on`、`cooking_a_cook_on_standby_rests_and_his_card_counts_his_dishes`、
         `cooking_plating_happens_where_the_food_is`、`cooking_the_card_says_who_has_it_and_a_dish_can_be_taken_back`）：在第 1 天加廚師；新的
         教學規則（§2「需要 Jill 親自操作的教學，仍由 Jill 完成」）讓廚師不接 Jill 還沒做過的炒飯。這些測試問的是交接，不是教學：
-        `_day()` 把三道教學菜記成做過。還抓得到：教學規則永遠不放手（teach_forever）。
+        `_day()` 把三道教學菜記成做過。還抓得到：教學規則永遠不放手（teach_forever）——交接的測試失敗。
       - `cooking_one_jill_finishes_her_step_then_goes_and_nothing_of_hers_moves_on_while_she_is_away`（種子 7131）：派 Jill 去收髒桌，
         空著的秀琴阿姨照第 6 題的規則接走，Jill 就不出廚房了。這個測試問的是 Jill 跨房間：那一晚讓秀琴阿姨先回家（`setCrewAway`）。
-        還抓得到：Jill 手上那一步沒做完就走（jill_leaves_midstep）。
+        還抓得到：Jill 手上那一步沒做完就走（jill_leaves_midstep2）。
       - `workflow_waiters_keep_serving_and_one_at_most_washes`（「兩位服務生、沒有清潔員」，去洗的變成她）、`workflow_a_second_cleaner_washes_beside_the_first`
         （兩位清潔員之外多了她，點車子時第二個位置被她站走，派不到 Jill）：現在每個遊戲都有她。工作流測試自己設定員工的兩個 helper
         （`_floor_day`、`_dirty_day`；`_dirty_day` 原本就用 `__noXQH` 把當時的幫手關掉）讓她那晚休假，員工就是每個測試自己設的；
-        工作流的 15 項在新的 helper 上全部通過。還抓得到：服務生有客人的事也去洗（waiter_washes_with_guests）。
+        工作流的 15 項在新的 helper 上全部通過。還抓得到：服務生先去洗碗、不先送菜（waiter_washes_first）。
       - `qa_waiting_staff_do_not_stand_on_one_spot`：1 對。那一刻是一位服務生在回自己位置的路上、兩件工作之間的短暫停頓，剛好停在另一位的
         位置上——是經過，不是兩個人站在同一個點等。種子掃描：兩個版本都會偶爾看到經過的那一對，從來沒有兩個人站在同一個位置
         （`waiting_staff.txt`）。改成——只算兩個人都站在自己要去的位置上。還抓得到：所有服務生的位置是同一點（one_wait_post，
         當初 W3-05 的樣子）。
-      - `golden_frames`、`golden_scenario`、`cat_personality_fingerprint`：基準重錄（`golden_baselines.txt`）。
+      - `golden_frames`、`golden_scenario`、`cat_personality_fingerprint`：基準重錄（`golden_baselines.txt`）：6834a6d（基準錄的版本）
+        三個都通過；第二輪三個都失敗（起始金額 $2,000 出現在標題和開店前的畫面；秀琴阿姨第一天就在、領薪水；Jill 摸貓讓貓的亂數順序變了——
+        只有貓自己的「開店前」那一段沒變，貓的個性、權重、時間都沒動）；在第二輪重錄，再拿四個小改動各跑一次（炒飯貴 $5、Jill 的頭髮
+        顏色、晴天的權重、出菜口中間的開口左邊寬 2 點），每一個都被抓到。
+    - **故意做壞的版本第一次跑完以後，補強的測試**（那一輪有幾個版本沒被抓到，查出來是測試太鬆，或做壞的地方沒碰到測試走的路）：
+      - `dylan_reveal_says_it_beside_him`：原本——種子 91 那一晚他在她走過去時起身移動（6834a6d 上 163 點外說「老公」）。不再成立——
+        第二輪的時間線變了，種子 91 那一晚他沒有移動，舊的程式也是在他旁邊說，這個測試分不出新舊（reveal_old 通過）。改成——她一出發
+        （往他那裡走、`after==='atHim'`），測試就把他往旁邊移 110 點，像他起身走開了；她仍然要走到他旁邊才說。舊的程式在 86 點外說，失敗。
+      - `jill_pats_a_cat_on_her_way_and_lets_go_for_work` 的「手上有盤子不停」：原本的貓在她走回出菜口的路上，但手上有髒盤子的她是往
+        水槽走，根本不經過，所以「任何路上都可以停下來摸」的版本也通過。改成——貓就躺在她出發的地方旁邊。pat_on_any_walk 失敗。
+        （只拿掉「手上沒東西」這個條件的 pat_with_hands 照樣通過：手上有盤子的她一定在路上，走回出菜口的那一條規則要求沒有路要走，
+        那個條件是第二道保險，玩家碰不到差別。）
+      - `v24_xiuqin_stays_through_the_closing_like_the_staff`：原本只問「她的人物還在」，走出門的路上也還在（xq_goes_home 通過）。改成——
+        她還在工作、不是往門口走。
+      - 另外三個是做壞的版本沒打中：`reghead_card` 只改了其他房間的那一條路（這一晚熟客坐主廳，主廳是另一條）→ 兩條都改，失敗；
+        `waiter_washes_with_guests` 拿掉的條件在服務生的工作順序裡排在送菜後面，改了也不會先洗 → 改成 waiter_washes_first（洗碗排到
+        最前面），失敗；`jill_leaves_midstep` 拿掉一個條件、另一個條件照樣讓她留下 → jill_leaves_midstep2（兩個都改），失敗。
+    - **長時間模擬抓到的遊戲問題（不是這一輪造成的，但會讓晚上停住）**：使用者 Day 92 存檔、種子 11、第 96 天營業中途存檔再重開以後
+      `TypeError: Cannot read properties of null (reading 'x') at crewUpd`。原因有兩個：(1) 存檔點把「走去一個地方、不是一張桌子」的路
+      （去休息室、二樓的窗邊、故事裡的位置）的目的地存成空的，重開以後那個人一走到就出錯，而且每一格都出錯，整個晚上停住；
+      (2) 有人身上排著故事的「走過去」（那張桌子、那組客人）時，存檔點寫不進去（循環參照），只剩更早的存檔點。修好——目的地照實存；
+      排隊中的「走過去」不存（它到了要演的那一段本來就存不下來；請人去洗碗的照存）；舊的存檔點讀進來，沒有目的地的那一段路放掉；
+      走到時沒有目的地也不出錯。新增 **`v24_round2_staff_on_their_way_somewhere_come_back_from_a_checkpoint`**（存檔點寫得進去、而且是
+      那一刻的；真的重新載入、繼續營業以後他還在往休息室走；晚上照常；舊的存檔點也接得回來）。還抓得到：目的地存成空的（cp_point_lost）、
+      排隊的照存（cp_next_kept）、沒有放掉也沒有防呆（cp_old_unguarded，訊息就是原本的錯誤）、1f7ff75 的遊戲本身——四個都失敗。
     - **新增**：`cooking_the_pass_opens_in_the_middle_and_keeps_its_row`、`cooking_on_fire_is_earned_by_a_run_of_fast_tables`、
       `jill_pats_a_cat_on_her_way_and_lets_go_for_work`（走回出菜口途中摸、有工作就放手、手上有盤子不停；後來加上「工作短暫空檔
       走過去摸」：不瞬移、在貓旁邊摸、路上有工作就回去）、`dylan_reveal_says_it_beside_him`、`v24_round2_hiring_opens_after_day_one_and_pays`、

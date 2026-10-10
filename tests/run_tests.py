@@ -930,7 +930,7 @@ def dylan_stays_a_quiet_regular_early_on(b, port, target):
     check(not g.errors, g.errors)
     g.close()
 
-def dylan_reveal_scenario(g, evenings=14, checks=True):
+def dylan_reveal_scenario(g, evenings=14, checks=True, extra=""):
     """the reveal scenario: Day 13, stage-1 Dylan with clues, Jill settled on the sofa in the evenings; from the third
     evening the dice are loaded, everything else has to happen by itself. Returns (revealed_at, beside, elsewhere)."""
     install_bot(g)
@@ -953,7 +953,7 @@ def dylan_reveal_scenario(g, evenings=14, checks=True):
         force = 'if(%s&&S.dylan.stage===2&&LIFE.revealRoll===-1)LIFE.revealRoll=1;' % ('true' if d >= 2 else 'false')
         # rc7.3: she gets up from her sofa (in her room), walks out through the kitchen to his table and says it there —
         # recorded at the moment the stage turns: where each of them is, how far apart, and that it came that way
-        hook = "t=>{%sif(S.dylan.stage===3&&!window.__rv){const L=LIFE.jill,D=LIFE.dylan;window.__rv={t,jillOn:L.on,act:L.act,jillRoom:L.room||'main',dylanRoom:D?(D.room||'main'):null,dst:D?D.state:null,dist:D?Math.round(Math.hypot(L.x-D.x,L.y-D.y)):null,phase}}}" % force
+        hook = "t=>{%s%sif(S.dylan.stage===3&&!window.__rv){const L=LIFE.jill,D=LIFE.dylan;window.__rv={t,jillOn:L.on,act:L.act,jillRoom:L.room||'main',dylanRoom:D?(D.room||'main'):null,dst:D?D.state:null,dist:D?Math.round(Math.hypot(L.x-D.x,L.y-D.y)):null,phase}}}" % (force, extra)
         samples = g.ev(f"__evening(120,1/20,10,{hook})")['samples']
         rv = g.page.evaluate('window.__rv||null')
         if rv and revealed_at is None:
@@ -1006,11 +1006,20 @@ def dylan_reveal_says_it_beside_him(b, port, target):
     (docs/evidence/cooking_2026-10-10/reveal/: 15 of 16 seeds beside him before, 16 of 16 after). Now he waits where he is once
     she sets off, and on arriving she is beside him (REVEAL_NEAR) or walks on to where he is; the line comes then: she up from
     her sofa and walked there, in the dining room, both in the scene."""
+    # (2026-10-10, the mutants' run on the final build: seed 91's evening no longer has him moving while she walks — the
+    #  timeline moved — so the old behaviour passed it too. The case is made here instead: once she has set off for him
+    #  (her walk ends 'atHim'), he is moved 110 px along the room, as if he had got up and gone on; she must still say it
+    #  beside him. The old code says it where she arrives, 110 px away — mutant reveal_old fails this.)
+    MOVE = ("if(S.dylan.stage===2&&LIFE.jill&&LIFE.jill.after==='atHim'&&!window.__mv&&LIFE.dylan){const D=LIFE.dylan;"
+            "window.__mv={x0:Math.round(D.x)};D.x=clamp(D.x+(D.x<200?110:-110),40,360);if(D.tx!=null)D.tx=D.x;window.__mv.x1=Math.round(D.x)}")
     g = Game(b, port, target, seed=91, manual=True)
-    revealed_at, beside, elsewhere = dylan_reveal_scenario(g)   # (the scenario checks dist < 40 at the moment the stage turns)
+    revealed_at, beside, elsewhere = dylan_reveal_scenario(g, checks=False, extra=MOVE)
     check(revealed_at is not None, 'the reveal never happened in 14 evenings')
+    mv = g.page.evaluate('window.__mv||null')
+    check(mv and abs(mv['x1'] - mv['x0']) >= 100, f'he moved on after she had set off: {mv}')
     rv = g.page.evaluate('window.__rv||null')
-    check(rv and rv['dist'] is not None and rv['dist'] <= g.ev("REVEAL_NEAR"), f'beside him when she says it: {rv}')
+    check(rv and rv['act'] == 'reveal' and rv['jillRoom'] == 'main' and rv['dylanRoom'] == 'main', f'the reveal came from her walk to him, in the dining room: {rv}')
+    check(rv['dist'] is not None and rv['dist'] <= g.ev("REVEAL_NEAR"), f'beside him when she says it, though he had moved: {rv}')
     check(not g.errors, g.errors[:3]); g.close()
 
 @test
@@ -1439,8 +1448,10 @@ def jill_pats_a_cat_on_her_way_and_lets_go_for_work(b, port, target):
     g.ev("(()=>{const t=R.tables.find(t=>t.group&&['order','check'].includes(t.group.state))||R.tables.find(t=>t.group);if(t){t.group.state='order';jillAsk(t.i)}})()")
     g.ev("for(let i=0;i<2;i++){update(1/30);updateCats(1/30,0)}")
     check(g.ev("R.jill.pet===null&&!!R.jill.cur"), 'a table that needs her ends it at once, and she goes')
-    # plates in her hands: she does not stop
-    g.ev(SETUP); g.ev("R.jill.hands=[{k:'dirty',n:1}]")
+    # plates in her hands: she does not stop — dirty plates send her to the tub at once, and 樾樾 lies right beside her as she
+    # sets off (2026-10-10: the cat was where her walk to the pass would have gone, not on her way to the tub, so the check
+    # passed even with a pat allowed on any walk — the mutant pat_on_any_walk; now it fails that)
+    g.ev(SETUP); g.ev("(()=>{const J=R.jill;J.hands=[{k:'dirty',n:1}];const c=CATS.find(k=>k.def.id==='tora');Object.assign(c,{x:J.x+12,y:J.y+4,st:'rest',pose:'sit',t:30})})()")
     check(g.ev(TICK % 60) != 'pet', 'with plates in her hands she does not stop for a cat')
     # a quiet moment (nothing for her anywhere: her workload and the kitchen's turn are held at nothing), 樾樾 resting a few steps
     # away: she walks over — no jump — and pats him there; on the way, a table that needs her calls her back
