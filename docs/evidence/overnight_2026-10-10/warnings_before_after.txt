@@ -22,3 +22,7 @@ page errors: []
 total: {'等太久': 5, '補貨：冰箱滿了': 22}
 days played: 30
 page errors: []
+== new_game_seed304_40_days_v253
+total: {'補貨：冰箱滿了': 34, '等太久': 4}
+days played: 40
+page errors: []
