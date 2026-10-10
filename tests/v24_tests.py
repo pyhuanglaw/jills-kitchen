@@ -259,7 +259,10 @@ def v24_saves_load_and_nothing_fires_on_load(b, port, target):
         # loading (cartMig), so its cart stays 20 — the one change a save's upgrades take; everything else exactly as saved
         want_ops = dict(raw.get('ops') or {})
         if want_ops.get('dish') and not want_ops.get('cart'): want_ops['cart'] = 1
-        check(ok['money'] == raw['money'] and ok['crew'] == len(raw.get('crew') or []) and json.loads(ok['ops']) == want_ops, f'{name}: kept as it was (with 大髒盤車 for a dishwasher): {ok} vs {want_ops}')
+        # round 2 (2026-10-10, §2): 秀琴阿姨 is on every save's staff from Day 1 — a save from before, without her (the Day 2
+        # save), gains her once; one that has her keeps its crew as it was (was: the crew's count exactly as saved)
+        want_crew = len(raw.get('crew') or []) + (0 if any(m.get('name') == '秀琴阿姨' and m.get('role') == 'cleaner' for m in (raw.get('crew') or [])) else 1)
+        check(ok['money'] == raw['money'] and ok['crew'] == want_crew and json.loads(ok['ops']) == want_ops, f'{name}: kept as it was (with 大髒盤車 for a dishwasher; 秀琴阿姨 once): {ok} vs {want_ops}, crew {want_crew}')
         raw_v24 = sorted(k for k in ((raw.get('story') or {}).get('facts') or {}) if re.match(r'^(yj_|wall_|up_|xq_)', k))
         check(ok['t'] and sorted(ok['v24']) == raw_v24, f'{name}: tenure classes; the v2.4 story facts exactly as saved (none for a save from before v2.4): {ok} vs {raw_v24}')
         check(not g.errors, f'{name}: {g.errors[:3]}'); g.close()
@@ -3462,9 +3465,14 @@ def v24_rc7_2_a_regulars_head_at_a_busy_table_and_the_log_closes(b, port, target
     head = "JSON.stringify((()=>{const q=__rq;const p=idMemberAt(q,0);const r=sc.getBoundingClientRect();return[r.left+SV.ox+p.x*SV.s,r.top+SV.oy+(p.y-20)*SV.s]})())"
     # work waiting: the order is ready to be taken
     clear = "document.querySelectorAll('#plines>*,#toasts>*').forEach(e=>e.remove())"   # nothing said lies over the table
-    g.ev("__rq.state='order';R.jill.q.length=0;$('#regcard').hidden=true;" + clear)
+    # (2026-10-10, round 2: under the one-Jill rule of 2026-10-09 #6 a table she was asked to but has not set off for is free
+    #  for a waiter who is free — and the crew move before her in a frame, so a free waiter can take this order in the very
+    #  frame of the tap, and she lets it go: seed 2229 on round 2's build, the Day 74 save, Jill getting up from her room.
+    #  What is asked here is the tap — the table's, no card — so the floor staff start nothing new in that one frame.)
+    g.ev("__rq.state='order';R.jill.q.length=0;$('#regcard').hidden=true;window.__cd0={};for(const k in R.cw||{}){__cd0[k]=R.cw[k].cd;R.cw[k].cd=1e9}" + clear)
     xy = json.loads(g.ev(head)); g.page.mouse.click(xy[0], xy[1]); g.ev("__tick(1000/30)")
     st = json.loads(g.ev("JSON.stringify({card:!$('#regcard').hidden,q:R.jill.q.slice(),cur:R.jill.cur?R.jill.cur.t:null})"))
+    g.ev("for(const k in __cd0)if(R.cw[k])R.cw[k].cd=__cd0[k]")
     check(not st['card'] and (info['t'] in st['q'] or st['cur'] == info['t']), f'the tap on his head took the order: Jill goes, no card: {st}')
     # nothing to do there: the card
     g.ev("R.jill.q.length=0;R.jill.cur=null;__rq.state='eat';" + clear)

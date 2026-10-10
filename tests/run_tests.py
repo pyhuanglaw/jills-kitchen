@@ -567,7 +567,10 @@ def old_saves_load(b, port, target):
         if orig.get('staff', {}).get('bartender') and 'crew' not in orig:
             # KNOWN QUIRK (kept on purpose, see docs/REFACTOR_REPORT.md): load() fills crewMig from the
             # defaults before checking it, so a pre-crew save's bartender/busser are NOT turned into crew.
-            check(g.ev("S.crew.length") == 0, f'{name}: legacy staff migration behaviour changed')
+            # Round 2 (2026-10-10): 秀琴阿姨 is on every save's staff from Day 1 (xqCrewMig), once — so the check is that
+            # nobody else came in from the old bartender/busser (was: S.crew.length == 0).
+            check(g.ev("S.crew.filter(m=>m.id!=='xq').length") == 0, f'{name}: legacy staff migration behaviour changed')
+            check(g.ev("S.crew.filter(m=>m.name==='秀琴阿姨').length") == 1, f'{name}: 秀琴阿姨 is not on the staff once')
         if orig.get('mem'):
             g.click('.links [data-act=book]'); g.click('[data-act=btab][data-k=mem]')
             n = g.page.locator('.polaroid img').count()
@@ -677,7 +680,11 @@ def touch_controls(b, port, target):
     g.click('[data-act=open]'); start_day(g)
     # 1) the tables are all dirty, so a guest group waits outside, at the shopfront (rc8.3) -> free a table, go to the
     #    shopfront and tap the group -> it gets seated at once (left alone it would get up by itself a few seconds later)
-    g.ev("for(const t of R.tables)t.dirty=true;__tick(1000/30)")
+    #    Round 2 (2026-10-10): 秀琴阿姨 is a cleaner on the staff from Day 1 and would clear these tables at once, so the
+    #    first two parties sit and no table is free for the tap (seed 14: 'tapping the waiting guests did not seat them').
+    #    She waits (no new task) until the tap is done, so the tables stay dirty as this check needs (her place in the
+    #    room, R.cw.xq, is made on the service's first frame).
+    g.ev("__tick(1000/30);R.cw.xq.cd=1e9;for(const t of R.tables)t.dirty=true;__tick(1000/30)")
     for _ in range(60):
         if g.ev("queued().some(x=>x.state==='queue'&&!x.moving)"): break
         g.ev("for(let i=0;i<30;i++)__tick(1000/30)")
@@ -688,7 +695,7 @@ def touch_controls(b, port, target):
     g.ev("setRoom('front')"); g.ev("__tick(1000/30)")
     tap(gx, gy)
     check(g.ev(f"R.groups.find(x=>x.id==={gid}).table!=null"), 'tapping the waiting guests did not seat them')
-    g.ev("setRoom('main')"); g.ev("__tick(1000/30)")
+    g.ev("R.cw.xq.cd=0;setRoom('main')"); g.ev("__tick(1000/30)")
     g.ev("for(const t of R.tables)if(!t.group)t.dirty=false")
     # 2) walk the service forward until a ticket exists, then tap the station to open the kitchen panel
     for _ in range(60):
@@ -1756,7 +1763,7 @@ def album_store_and_viewer_v181(b, port, target):
     raw = storage[SAVE_KEY]; orig = json.loads(raw)
     g = Game(b, port, target, seed=4, manual=True, storage=storage)
     install_bot(g); g.page.wait_for_timeout(600)
-    check(g.ev("S.day") == orig['day'] and g.ev("S.money") == orig['money'] and g.ev("S.unlocked.length") == len(orig['unlocked']) and g.ev("S.regulars.chen") == orig['regulars']['chen'] and g.ev("S.crew.length") == 1, 'V18 save: progress preserved')
+    check(g.ev("S.day") == orig['day'] and g.ev("S.money") == orig['money'] and g.ev("S.unlocked.length") == len(orig['unlocked']) and g.ev("S.regulars.chen") == orig['regulars']['chen'] and g.ev("S.crew.filter(m=>m.id!=='xq').length") == 1 and g.ev("S.crew.filter(m=>m.id==='xq').length") == 1, 'V18 save: progress preserved')   # round 2 (2026-10-10): + 秀琴阿姨, on every save's staff once
     check(g.ev("albumList().length") == len(orig['album']) and g.ev("albumList().filter(p=>p.keep).length") == sum(1 for p in orig['album'] if p.get('keep')), 'V18 save: album records and 珍藏 preserved')
     g.page.wait_for_timeout(800)
     check(g.ev("albumList().filter(p=>p.img).length") == 0 and g.ev("PHOTOS.size") == len(orig['album']), 'V18 pictures moved into the store')

@@ -1159,8 +1159,7 @@ def cooking_on_fire_is_earned_by_a_run_of_fast_tables(b, port, target):
     check(k == {'fast': 30, 'slow': 36, 'run': 4, 'busy': .5}, f'the numbers: {k}')
     F, SL = k['fast'] - 5, k['slow'] + 5
     # Perfect portions in a row no longer light it
-    g.ev("__reset();for(let i=0;i<12;i++){R.st.perfect++;R.streak++}")
-    check(g.ev("R.fire") <= 0 and g.ev("R.fireCount") == 0, 'twelve Perfect portions in a row: no fire (it was five)')
+    check(g.ev("!String(wfFinish).includes('startFire')&&!String(plate).includes('startFire')&&String(checkAllServed).includes('fireTable')"), 'Perfect portions in a row light nothing any more (it was five); a table served does the counting')
     g.ev("__reset()")
     r = json.loads(g.ev(f"JSON.stringify(__F({{tables:[[{F}],[{F}],[{F}]]}}))"))
     check(not r[-1][2] and r[-1][1] == 3, f'three fast tables: a run of three, no fire yet: {r}')
