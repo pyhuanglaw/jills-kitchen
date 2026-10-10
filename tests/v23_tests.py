@@ -847,11 +847,11 @@ def followup_the_manual_describes_the_current_game(b, port, target):
     n = sum(len(c['pts']) for c in G); longest = max(len(t) for c in G for k, t in c['pts'])
     check(n <= 70 and len(txt) <= 4000 and longest <= 160, f'short: {n} entries, {len(txt)} characters, the longest {longest}')
     # what a player needs and the screen does not tell (each was checked against the game by the audit)
-    for need in ['第 2 天多廚房設備、菜單研發；第 3 天店舖工程；第 4 天貓咪生活、員工；第 6 天社群與宣傳；第 7 天招牌菜', '灰色的分頁點了會說哪天開',   # WS5-11
+    for need in ['一開始有「家具與佈置」、「員工」：第 2 天多廚房設備、菜單研發；第 3 天店舖工程；第 4 天貓咪生活；第 6 天社群與宣傳；第 7 天招牌菜', '灰色的分頁點了會說哪天開',   # WS5-11
                  'Jill\'s Bistro（第 4 天打烊後，$5,000）', 'Jill\'s Restaurant（評分 3.9，$16,000）', '4.3，$40,000', '4.6，$90,000',   # WS5-08: the first expansion is a day, not a rating
                  '擴建到 Jill\'s Restaurant、有冷盤台',   # WS5-04: no 「Jill's Kitchen」 stage
                  '在廚房點出菜口，Jill 會把做好的菜都送出去', '點那句話就找得到他', '點訂單上的桌號或名字', '補滿', '1.5 倍價',
-                 '沒有解雇', '不能互相借', '日薪照付', '請第一位清潔員就是請秀琴阿姨', '收銀機不會變成負的', '秀琴阿姨會借你 $3,000', '結算時錢超過 $20,000 就會還她',
+                 '沒有解雇', '不能互相借', '日薪照付', '秀琴阿姨開店就是清潔員，不占名額', '收銀機不會變成負的', '秀琴阿姨會借你 $3,000', '結算時錢超過 $20,000 就會還她',
                  '一桌照桌上最好的那張卡算', '標 ♥', '開店前買的當天開始，打烊後買的隔天開始', '宣傳只把人第一次帶進來',
                  '每 20 秒', '恢復時會先檢查檔案', '會連存檔一起清掉',
                  'Evan 在 Lounge 蓋好那天就在吧台，沈晴、阿拓可以聘']:   # the user, 2026-10-07: 阿拓 comes with Lounge I

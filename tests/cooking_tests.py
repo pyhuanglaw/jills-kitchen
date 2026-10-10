@@ -674,12 +674,14 @@ def cooking_the_first_three_days_teach_three_kinds_of_work(b, port, target):
     - Day 1: only the fried rice, and it goes HOT → PLATING; 秀琴阿姨 really clears (dishes she carried in reach the cart);
     - Day 2: the latte comes with the day and so does the coffee machine — nobody pays for it — and a coffee goes DRINK → SERVE;
     - Day 3: a dish made another way — the salad, PREP → PLATING, on the cold station the day brings;
-    - the money: a new game starts with START_MONEY ($1,200), and Jill's own Day 1 stocking leaves more than $500."""
+    - the money: a new game starts with START_MONEY ($1,200; $2,000 since 2026-10-10, round 2 §2: hiring on Day 1's evening is
+      a real choice — docs/evidence/cooking_2026-10-10/economy/), and Jill's own Day 1 stocking leaves more than $500.
+    2026-10-10: 秀琴阿姨 is the cleaner from the first day (round 2 §2): the dishes she carries are her crew sprite's, not the helper's."""
     g = Game(b, port, target, seed=313, manual=True, viewport={'width': 390, 'height': 844})
     _rt.install_bot(g); g.click('[data-act=open]')
-    check(g.ev("S.money") == 1200 and g.ev("START_MONEY") == 1200, f'a new game starts with $1,200: {g.ev("S.money")}')
+    check(g.ev("S.money") == 2000 and g.ev("START_MONEY") == 2000, f'a new game starts with $2,000: {g.ev("S.money")}')
     # what each piece of work went through, and what 秀琴阿姨 carried into the tub
-    g.ev("""window.__steps={};window.__xqIn=0;{const D0=ddDeposit;ddDeposit=function(w){if(R&&w===R.xqh)__xqIn+=(w.hands||[]).filter(e=>e.k==='dirty'&&!e.w).length;return D0(w)}}
+    g.ev("""window.__steps={};window.__xqIn=0;{const D0=ddDeposit;ddDeposit=function(w){if(R&&R.cw&&w===R.cw.xq)__xqIn+=(w.hands||[]).filter(e=>e.k==='dirty'&&!e.w).length;return D0(w)}}
      window.__look=function(){if(!R)return;for(const n of R.wf||[])if(n.f)(__steps[n.d]||(__steps[n.d]=[])).includes(n.f)||__steps[n.d].push(n.f)}
      {const A0=wfArrive;wfArrive=function(n){const r=A0.apply(this,arguments);__look();return r}}   /* each step seen as it starts: 送飲料 is 0.7 s, shorter than the test's 1-second look (it was missed when the walk to the cups changed, 2026-10-08 evening) */""")
     seen = {}
@@ -1121,7 +1123,7 @@ def cooking_the_bar_kitchens_burner_has_a_place_of_its_own(b, port, target):
     check(not g.errors, g.errors[:3]); g.close()
 
 
-WALKS = r"""(()=>{const boxes=kitchenObs(),hard=boxes.slice(0,2);   /* the line and the pass: nobody's feet ever inside them */
+WALKS = r"""(()=>{const boxes=kitchenObs(),hard=boxes.slice(0,4);   /* the line and the pass, two pieces each since the walkways (2026-10-09, -10): nobody's feet ever inside them */
  const inside=(o,x,y,m)=>x>o.bx0+m&&x<o.bx1-m&&y>o.by0+m&&y<o.by1-m;
  const walk=(a,b)=>{const e={x:a[0],y:a[1],room:'kitchen'};let len=0,bad=null;for(let i=0;i<3000;i++){const w=obsNext(e,'kitchen',b[0],b[1]);const tx=w?w.x:b[0],ty=w?w.y:b[1];const dx=tx-e.x,dy=ty-e.y,d=Math.hypot(dx,dy),v=3;
    if(d<=v){e.x=tx;e.y=ty;len+=d}else{e.x+=dx/d*v;e.y+=dy/d*v;len+=v}
@@ -1129,11 +1131,94 @@ WALKS = r"""(()=>{const boxes=kitchenObs(),hard=boxes.slice(0,2);   /* the line 
    if(Math.abs(e.x-b[0])<.01&&Math.abs(e.y-b[1])<.01)return{ok:1,len,bad}}return{ok:0,len,bad}};
  const P={door:[KR.door.x,KR.door.y],room:[homeKDoor().x,homeKDoor().y],drop:[ddDrop().x,ddDrop().y],take:[ddTake().x,ddTake().y],sink:[ddSink().x,ddSink().y],rack:[wfRack().x,wfRack().y],pick:[WF_PICK.x,WF_PICK.y]};
  WF_PASS_X.forEach((x,i)=>P['pass'+i]=[x,KY.passFeet]);
+ for(let i=0;i<wfRowN();i++)P['row'+i]=[wfRowX(i),KY.passFeet];   /* (2026-10-10) where each plate is set down */
+ P.mat=[(PASS_GAP.x0+PASS_GAP.x1)/2,KY.passTop+KY.passH+KY.passFace+16];P.aisle=[(KX.gap.x0+KX.gap.x1)/2,(KY.top+KY.h+KY.face+KY.passFeet)/2];
  for(const s of R.slots){const sp=wfSpot(s);P[s.type+s.no]=[sp.cx,sp.cy];const h=slotHome(s);if(h.y>=165)P[s.type+s.no+'f']=[h.x-44,KY.top+KY.h+KY.face+4]}
  const K=Object.keys(P),out={n:0,stuck:[],through:[],worst:0,worstK:''};
  for(const a of K)for(const b of K){if(a===b)continue;const r=walk(P[a],P[b]);out.n++;if(!r.ok)out.stuck.push(a+'→'+b);if(r.bad)out.through.push(a+'→'+b+' at '+r.bad);
    const st=Math.hypot(P[b][0]-P[a][0],P[b][1]-P[a][1]);const extra=r.len-st;if(extra>out.worst){out.worst=Math.round(extra);out.worstK=a+'→'+b}}
  return JSON.stringify(out)})()"""
+
+
+@test
+def cooking_on_fire_is_earned_by_a_run_of_fast_tables(b, port, target):
+    """The user, 2026-10-10 (docs/v24/cooking_round2_decisions_2026-10-10.txt §5): 「中後期約 75% 的晚上觸發，已經太頻繁，失去特殊感。
+    調整目標為：一般成熟餐廳在正常經營情況下，約 25%–35% 的營業夜晚觸發。仍應由料理品質、團隊表現及經營狀態決定，不要改成與玩家表現無關
+    的純隨機抽籤。Jill 的主廚優勢應保留。」 The rule, table by table (the user's Day 30 save, an evening under way): Perfect portions in a
+    row no longer light it; a run of tables served within FIRE_FAST of sitting down, all Perfect, on a busy floor does — FIRE_RUN of
+    them, a table Jill cooked for counting one and a half; a slow table, a dish not Perfect or an angry walkout ends the run; a
+    quiet floor does not count; once a night. (How often, over many evenings: docs/evidence/cooking_2026-10-10/onfire/.)"""
+    import v24_tests as v
+    g = Game(b, port, target, seed=7354, manual=True, viewport={'width': 390, 'height': 844})
+    v.load_save(g, 'player_day30.json'); g.ev("for(let i=0;i<30;i++){if(typeof DLG!=='undefined'&&DLG)dlgNext()}"); v.to_service(g, lazy=True)
+    g.ev("__bot(300,1/30)")
+    g.ev("""window.__F=function(spec){const ts=R.tables.filter(t=>!t.lounge);const keep=ts.map(t=>t.group);const busy=spec.busy==null?.7:spec.busy;ts.forEach((t,i)=>{t.group=i<Math.ceil(busy*ts.length)?(t.group||{dummy:1}):null});
+      const out=[];try{for(const x of spec.tables){if(x==='angry'){R.frun=0;out.push(['angry',R.frun,R.fire>0]);continue}const g={seatAt:R.t-x[0],ticket:{items:[{q:x[1]||'P',byJill:!!x[2]}]}};fireTable(g);out.push([x[0],R.frun,R.fire>0,R.fireCount])}}finally{ts.forEach((t,i)=>{t.group=keep[i]})}return out};
+      window.__reset=function(){R.frun=0;R.fireDone=0;R.fire=0;R.fireCount=0}""")
+    k = json.loads(g.ev("JSON.stringify({fast:FIRE_FAST,slow:FIRE_SLOW,run:FIRE_RUN,busy:FIRE_BUSY})"))
+    check(k == {'fast': 30, 'slow': 36, 'run': 4, 'busy': .5}, f'the numbers: {k}')
+    F, SL = k['fast'] - 5, k['slow'] + 5
+    # Perfect portions in a row no longer light it
+    g.ev("__reset();for(let i=0;i<12;i++){R.st.perfect++;R.streak++}")
+    check(g.ev("R.fire") <= 0 and g.ev("R.fireCount") == 0, 'twelve Perfect portions in a row: no fire (it was five)')
+    g.ev("__reset()")
+    r = json.loads(g.ev(f"JSON.stringify(__F({{tables:[[{F}],[{F}],[{F}]]}}))"))
+    check(not r[-1][2] and r[-1][1] == 3, f'three fast tables: a run of three, no fire yet: {r}')
+    r = json.loads(g.ev(f"JSON.stringify(__F({{tables:[[{SL}]]}}))"))
+    check(r[-1][1] == 0, f'a slow table ends the run: {r}')
+    r = json.loads(g.ev(f"JSON.stringify(__F({{tables:[[{F}],[{F}],[{F}],[{F}]]}}))"))
+    check(r[-1][2] and r[-1][3] == 1 and g.ev("R.fireDone") == 1, f'four fast tables in a row: ON FIRE: {r}')
+    g.ev("R.fire=0")
+    r = json.loads(g.ev(f"JSON.stringify(__F({{tables:[[{F}],[{F}],[{F}],[{F}],[{F}],[{F}]]}}))"))
+    check(not r[-1][2] and r[-1][3] == 1, f'once a night: {r}')
+    g.ev("__reset()")
+    r = json.loads(g.ev(f"JSON.stringify(__F({{tables:[[{F},'P',1],[{F},'P',1],[{F},'P',1]]}}))"))
+    check(r[-1][2] and r[-1][1] == 4.5, f'the head chef\'s hand: three tables Jill cooked for count four and a half: {r}')
+    g.ev("__reset()")
+    r = json.loads(g.ev(f"JSON.stringify(__F({{tables:[[{F}],[{F}],[{F}],[{F},'G'],[{F}],[{F}],[{F}]]}}))"))
+    check(not r[-1][2] and r[3][1] == 0, f'a dish not Perfect ends the run: {r}')
+    g.ev("__reset()")
+    r = json.loads(g.ev(f"JSON.stringify(__F({{busy:.3,tables:[[{F}],[{F}],[{F}],[{F}],[{F}]]}}))"))
+    check(not r[-1][2] and r[-1][1] == 0, f'a quiet floor does not count: {r}')
+    g.ev("__reset()")
+    g.ev(f"__F({{tables:[[{F}],[{F}],[{F}]]}})")
+    g.ev("(()=>{let k=0;while(k<3000&&!R.groups.some(q=>q.table!=null&&!['leave','gone','toTable'].includes(q.state))){__tick(1000/30);k++}})()")
+    g.ev("R.frun=3")
+    walked = g.ev("(()=>{const g=R.groups.find(q=>q.table!=null&&!['leave','gone','toTable'].includes(q.state));if(!g)return null;const s0=g.state;angryLeave(g);return s0})()")
+    check(walked is not None and g.ev("R.frun") == 0, f'a guest walking out angry ends the run: {walked}, {g.ev("R.frun")}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def cooking_the_pass_opens_in_the_middle_and_keeps_its_row(b, port, target):
+    """The user, 2026-10-10 (docs/v24/cooking_round2_decisions_2026-10-10.txt §1): 「出菜口也開設中央通道，讓 Jill 與廚師能以合理路徑
+    移動」「不得穿越實體設備」「保留原本有效出菜容量」「熱燈、盤位與出菜檯必須合理配置」. The pass is two counters with an opening
+    between them (PASS_GAP), straight up from the door to the dining room. On the first kitchen, the wide pass and kitchen II: the
+    row still holds 9 plates (11 with the wide pass) and the plating places are still 1/2/3; every plate on its spot lies whole on
+    a counter, never over the opening; each lamp hangs over a counter, two to a side; the tickets hang on the counters' rails; the
+    floor plan has the two counters with the opening between them; and the walk from the door to behind the range goes up
+    through the opening — never through a counter — and is shorter than going round the pass."""
+    layouts = [('first kitchen', '', 9, 1), ('wide pass', "S.level=4;S.rooms=S.rooms||{};S.rooms.pass=1;", 11, 2),
+               ('kitchen II', "S.level=5;S.rooms=S.rooms||{};S.rooms.kext=1;S.rooms.pass=1;S.rooms.kitchen2=1;", 11, 3)]
+    for name, setup, rows, cap in layouts:
+        g = _day(b, port, target, 7353, setup)
+        r = json.loads(g.ev("""JSON.stringify((()=>{const E=passEnds(),H=passHalves();const onC=(a,b2)=>H.some(([x0,x1])=>a>=x0-.01&&b2<=x1+.01);
+          const spots=[...Array(wfRowN()).keys()].map(i=>wfRowX(i));const boxes=kitchenObs();
+          const walk=(a,b2)=>{const e={x:a[0],y:a[1],room:'kitchen'};let len=0,gap=false,bad=null;for(let i=0;i<4000;i++){const w=obsNext(e,'kitchen',b2[0],b2[1]);const tx=w?w.x:b2[0],ty=w?w.y:b2[1];const dx=tx-e.x,dy=ty-e.y,d=Math.hypot(dx,dy),v=3;if(d<=v){e.x=tx;e.y=ty;len+=d}else{e.x+=dx/d*v;e.y+=dy/d*v;len+=v}
+            if(e.y>KY.passFeet+2&&e.y<KY.passTop+KY.passH+KY.passFace+2){if(e.x>PASS_GAP.x0&&e.x<PASS_GAP.x1)gap=true;else if(e.x>E.x0&&e.x<E.x1&&!bad)bad=[Math.round(e.x),Math.round(e.y)]}
+            if(Math.abs(e.x-b2[0])<.01&&Math.abs(e.y-b2[1])<.01)return{ok:1,len:Math.round(len),gap,bad}}return{ok:0,len,gap,bad}};
+          const st=R.slots.find(s=>s.type==='stove');const back=[wfSpot(st).cx,wfSpot(st).cy];
+          return{n:wfRowN(),cap:passCap(),gap:PASS_GAP,halves:H,spots,dishOn:spots.every(x=>onC(x-14,x+14)),distinct:new Set(spots).size===spots.length,
+            lamps:passLamps(),lampsOn:passLamps().every(x=>onC(x-11,x+11)),lampSides:[passLamps().filter(x=>x<PASS_GAP.x0).length,passLamps().filter(x=>x>PASS_GAP.x1).length],
+            tickets:[...Array(9).keys()].map(k=>passTicketX(k)),ticketsOn:[...Array(9).keys()].every(k=>onC(passTicketX(k),passTicketX(k)+16)),
+            box:boxes.slice(2,4).map(o=>[o.bx0,o.bx1]),door:walk([KR.door.x,KR.door.y],back)}})())"""))
+        check(r['n'] == rows and r['cap'] == cap, f'{name}: the row and the plating places as they were ({rows}, {cap}): {r["n"]}, {r["cap"]}')
+        check(r['dishOn'] and r['distinct'], f'{name}: every plate lies whole on a counter, each on its own spot: {r["spots"]} on {r["halves"]}')
+        check(r['lampsOn'] and r['lampSides'] == [2, 2], f'{name}: two lamps over each counter: {r["lamps"]}')
+        check(r['ticketsOn'], f'{name}: the tickets hang over the counters, none over the opening: {r["tickets"]}')
+        check(r['box'][0][1] == r['gap']['x0'] and r['box'][1][0] == r['gap']['x1'], f'{name}: the floor plan has the opening between the two counters: {r["box"]} / {r["gap"]}')
+        check(r['door']['ok'] and r['door']['gap'] and not r['door']['bad'], f'{name}: from the door to behind the range, up through the opening and never through a counter: {r["door"]}')
+        check(not g.errors, g.errors[:3]); g.close()
 
 
 @test
@@ -1162,7 +1247,7 @@ def cooking_people_walk_round_the_counters(b, port, target):
     g = Game(b, port, target, seed=7352, manual=True, viewport={'width': 390, 'height': 844})
     v.load_save(g, 'player_day52.json')
     g.ev("for(let i=0;i<30;i++){if(typeof DLG!=='undefined'&&DLG)dlgNext()}"); v.to_service(g, lazy=True)
-    g.ev("""window.__in=[];window.__inStep=function(n){const H=()=>kitchenObs().slice(0,2);const ins=(o,x,y)=>x>o.bx0+1&&x<o.bx1-1&&y>o.by0+1&&y<o.by1-1;let k=0;
+    g.ev("""window.__in=[];window.__inStep=function(n){const H=()=>kitchenObs().slice(0,4);const ins=(o,x,y)=>x>o.bx0+1&&x<o.bx1-1&&y>o.by0+1&&y<o.by1-1;let k=0;
       for(let i=0;i<n;i++){if(!__act())break;update(1/30);updateCats(1/30,0);k++;if(!R||phase!=='service')break;const hb=H();const who=[];const J=R.jill;if((J.room||'main')==='kitchen')who.push(['jill',J]);for(const id in R.ck||{})who.push(['cook '+id,R.ck[id]]);for(const id in R.cw||{}){const w=R.cw[id];if(w&&w.room==='kitchen')who.push([id,w])}if(R.xqh&&R.xqh.room==='kitchen')who.push(['xq',R.xqh]);
         for(const [nm,e] of who)for(const o of hb)if(ins(o,e.x,e.y)&&__in.length<20)__in.push([nm,Math.round(e.x),Math.round(e.y),Math.round(R.t)])}return k}""")
     for _ in range(3000):

@@ -1429,8 +1429,23 @@ const KEY='jills-kitchen-save-v1';
 /* the money a new game starts with (onboarding, the user, 2026-10-08: 「一開始應該多給一些錢，讓正常備貨不會造成不必要的資金壓力」):
    $500 was Jill's own Day 1 stocking ($490) and $10 left. 1,200 leaves about $675 after it, and about $400 for a player who
    stocks half again as much (docs/cooking/ARCHITECTURE.md, onboarding) — working capital, not a reward */
-const START_MONEY=1200;
-function newState(){return{v:1,day:1,phase:'prep',money:START_MONEY,lifetime:0,level:1,
+/* 2026-10-10 (the user, round 2 §2: 「第 2 天正式開放聘用系統…請檢查初始資金、聘用費及薪資，確保第二天聘人是實際可行的選擇，而不只是介面上
+   解鎖。不要因此讓所有員工免費或取消經營成本」): measured (docs/evidence/cooking_2026-10-10/economy/): with $1,200 and the full
+   signing fees, after Day 1 a chef ($1,500) was out of reach on two seeds of three and left $15 on the third — not enough for
+   Day 2's food. Now $2,000 to start, and a level-1 restaurant's signing fee is half (hireFee): after Day 1 both the chef and
+   the waiter can be signed with $540–970 left; the wages are as they were. */
+const START_MONEY=2000;
+/* 2026-10-10 (the user, docs/v24/cooking_round2_decisions_2026-10-10.txt: 「秀琴阿姨從第一天起就是正式編制內的清潔員。她不是臨時來幫忙，也不是
+   尚未聘用的角色」「出現在員工名單中」「不需要玩家另外聘用」「不會因存檔或事件重複生成」「秀琴阿姨不占用上述名額」): she is on the crew in
+   every game, from the first day — a cleaner like any other (her wage, her level, the duty board, late days), outside the
+   hiring places (core). One only: the one a save already has (hired, or an old save's cleaner) is kept and marked. */
+function xqNew(since){return{id:'xq',role:'cleaner',name:'秀琴阿姨',lv:1,duty:'clean',since:since||1,days:0,fam:{},pool:'restaurant',core:1}}
+function xqCrewMig(o){if(!o||typeof o!=='object')return o;o.crew=Array.isArray(o.crew)?o.crew:[];const is=m=>m&&m.name==='秀琴阿姨'&&m.role==='cleaner';const xs=o.crew.filter(is);
+ if(xs.length>1){const keep=xs.find(m=>m.id==='xq')||xs.slice().sort((a,b)=>(b.lv||1)-(a.lv||1))[0];o.crew=o.crew.filter(m=>!is(m)||m===keep)}
+ let m=o.crew.find(is);if(!m){const f=o.story&&o.story.facts&&o.story.facts.xq_helper;m=xqNew(f&&f.d?f.d:1);m.days=Math.max(0,(o.day||1)-m.since);o.crew.push(m);if((o.day||1)>1)o.xqJoined=o.day}
+ m.core=1;m.pool='restaurant';return o}
+function newState(){return xqCrewMig(newState0())}
+function newState0(){return{v:1,day:1,phase:'prep',money:START_MONEY,lifetime:0,level:1,
  eq:{stove:1,oven:0,bar:0,prep:0,fridge:1,pan:1},tables:2,
  decor:{plants:0,lights:0,art:0,chairs:0,rug:0,ware:0,bar:0,sofa:0},staff:{busser:false,bartender:false},mem:{},catFam:{},crew:[],crewMig:1,rstar:{},dylan:{stage:0,stay:0,reveal:0,last:0,clues:{}},life:{sofa:0,tv:0},checkpoint:null,savedAt:0,savedLabel:'',rdProg:{},rdDone:{},labKnown:{},labTried:{},album:null,notes:[],taught:0,ops:{},theme:'classic',themes:{classic:1},sets:{},rooms:{side:0,terrace:0,kext:0,cooler:0,pass:0,lounge:0},sideTables:0,frontTables:0,ext:{awning:0,sign:0,plants:0,lights:0,bench:0,season:0},gear:{},gearUse:{},newRooms:{},reveal:null,rhist:[],records:{},salesHist:{},menuSince:{},regMem:{},props:{},regDay:null,gourmetBoost:0,dayLog:[],dayLogDay:0,
  unlocked:['friedrice'],menu:['friedrice'],price:{},stock:{},xp:{},reviews:[],achievements:{},regulars:{},returning:0,
@@ -1484,7 +1499,7 @@ function parseSave(t){let o;try{o=JSON.parse(t)}catch(e){return{err:'notjson'}}
  if(typeof o.v!=='number'||o.v%1)return{err:'notsave'};
  if(!(typeof o.day==='number'&&typeof o.money==='number'&&Array.isArray(o.unlocked)&&Array.isArray(o.menu)))return{err:'notsave'};
  if(o.v<1)return{err:'notsave'};if(o.v>SAVE_V)return{err:'newer',v:o.v};
- try{for(let n=o.v;n<SAVE_V;n++){MIGRATE[n](o);o.v=n+1}o=cartMig(srLeaseMig(linDecMig(linMig(evanMig(giftTagMig(crewPoolMig(dlgAuditMig(crewNameFix(mainHallMig(legacyWang(legacyCrew(fillDefaults(o)))))))))))))}catch(e){return{err:'broken'}}if(STORY_READY){try{beatLinesMig(o)}catch(e){console.warn('[beatLines]',e)}try{kenIllusMig(o)}catch(e){console.warn('[kenIllus]',e)}}   /* a save loaded in play; the first one is cleaned at boot, when every story's code is there */
+ try{for(let n=o.v;n<SAVE_V;n++){MIGRATE[n](o);o.v=n+1}o=xqCrewMig(cartMig(srLeaseMig(linDecMig(linMig(evanMig(giftTagMig(crewPoolMig(dlgAuditMig(crewNameFix(mainHallMig(legacyWang(legacyCrew(fillDefaults(o))))))))))))))}catch(e){return{err:'broken'}}if(STORY_READY){try{beatLinesMig(o)}catch(e){console.warn('[beatLines]',e)}try{kenIllusMig(o)}catch(e){console.warn('[kenIllus]',e)}}   /* a save loaded in play; the first one is cleaned at boot, when every story's code is there */
  if(!(o.day>=1&&isFinite(o.money)&&o.unlocked.every(d=>typeof d==='string')&&o.menu.every(d=>typeof d==='string')&&Array.isArray(o.crew)&&o.dylan&&typeof o.dylan==='object'))return{err:'broken'};
  o.day=Math.max(1,Math.floor(o.day));o.money=Math.round(o.money);return{o,photos}}
 /* rc7.2 (22:49): a save that already has Sophie's pad is shown, once, which one it is (a new gift's tag, that day and the next) */
@@ -2431,7 +2446,7 @@ let DPR=1,SV={w:0,h:0,s:1,ox:0,oy:0},TL={cols:1,rows:1,w:100,h:84,pad:8,gap:6,x0
 let R=null,IDLE=null,phase='title',paused=false,mainScreen='title',sub=null;
 
 /* ================= planning a day ================= */
-function applyGates(){try{if(S.loungeProj&&S.loungeProj.state==='signing'&&!fact('lin_signed')&&S.day>=(S.loungeProj.paid||0)+3)linSigned();if(loungeOpenDue())loungeOpenNow()}catch(e){console.warn('[lounge open]',e)}if(S.sigdEvoNews&&S.sigDessert){const lv=S.sigdEvoNews;S.sigdEvoNews=0;S.news.push(`<b>招牌甜點升級了。</b>${S.sigDessert.name}賣到 ${lv===3?SIGD_EVO[2]:SIGD_EVO[1]} 份，${lv===3?'Jill 在上面拉了一層糖絲，點了金箔。':'Jill 在盤邊畫了一道果泥，放了一片薄荷。'}`)}if(S.sigEvoNews&&S.signature){const lv=S.sigEvoNews;S.sigEvoNews=0;S.news.push(`<b>招牌菜升級了。</b>${S.signature.name}賣到 ${lv===3?SIG_EVO[2]:SIG_EVO[1]} 份，Jill 把盤子重新做過：${lv===3?'食用花與金箔':'醬汁畫盤與一撮嫩葉'}，價格高 $${(lv-1)*30}。`)}
+function applyGates(){if(S.xqJoined&&!S.xqJoinedTold){S.xqJoinedTold=1;S.news.push('<b>秀琴阿姨</b>現在是店裡的正式清潔員：收桌、洗碗都是她，照清潔員領日薪，不占員工名額。')}try{if(S.loungeProj&&S.loungeProj.state==='signing'&&!fact('lin_signed')&&S.day>=(S.loungeProj.paid||0)+3)linSigned();if(loungeOpenDue())loungeOpenNow()}catch(e){console.warn('[lounge open]',e)}if(S.sigdEvoNews&&S.sigDessert){const lv=S.sigdEvoNews;S.sigdEvoNews=0;S.news.push(`<b>招牌甜點升級了。</b>${S.sigDessert.name}賣到 ${lv===3?SIGD_EVO[2]:SIGD_EVO[1]} 份，${lv===3?'Jill 在上面拉了一層糖絲，點了金箔。':'Jill 在盤邊畫了一道果泥，放了一片薄荷。'}`)}if(S.sigEvoNews&&S.signature){const lv=S.sigEvoNews;S.sigEvoNews=0;S.news.push(`<b>招牌菜升級了。</b>${S.signature.name}賣到 ${lv===3?SIG_EVO[2]:SIG_EVO[1]} 份，Jill 把盤子重新做過：${lv===3?'食用花與金箔':'醬汁畫盤與一撮嫩葉'}，價格高 $${(lv-1)*30}。`)}
  if(S.day<=1){if(S.news21==null)S.news21=-1;if(S.news20==null)S.news20=-1}   /* audit WS1-06: the 2.0 / 2.1 notes are for saves from those versions, not a new restaurant */
  if(!S.news21&&S.day>=3){S.news21=S.day;S.news.push('<b>2.1：食物與日常。</b>做熟的菜（熟練度 LV3）可以在<b>菜單研發</b>研發成<b>特製版</b>；招牌菜賣得多會換盤；街上有人經過、有人在門口看菜單就進來；帶小孩的家庭、雨天的傘、廚房裡的空檔。')}
  if(!S.news20&&S.day>=3){S.news20=S.day;S.news.push('<b>2.0：店可以變大了。</b>主廳上方可以切到<b>店門口</b>和<b>廚房</b>（廚師真的在裡面煮）。打烊後商店裡多了<b>工程</b>（戶外區、大出菜口、冷藏庫、廚房擴建、側廳）和<b>貓的東西</b>；結算會告訴你下一個存錢的目標。')}
@@ -2439,7 +2454,7 @@ function applyGates(){try{if(S.loungeProj&&S.loungeProj.state==='signing'&&!fact
  if(S.news24b==null){if(S.day<=1||!(S.crew||[]).length)S.news24b=-1;else{S.news24b=S.day;const lc=(S.crew||[]).filter(m=>crewPool(m)==='lounge').length;S.news.push(`<b>員工分成兩個名單。</b>餐廳員工（廚師、服務生、清潔員）和 Lounge 名單的名額各算各的，互不佔用。${loungeLv()?`Lounge 名單是固定的幾個人：${loungeLv()>=2?'Evan、沈晴、阿拓、安安、許葳':'Evan、沈晴和阿拓（Lounge II 再加兩位）'}，在「員工 › Lounge 名單」；現在 ${lc}/${loungeCap()}。`:'Lounge 蓋好以後，它有自己的名單。'}在哪裡上班照「工作分配」：服務生兩邊共用，廚房只有一個，調酒師只顧吧台。`)}}   /* v2.4 rc5: the two staff pools, told once to a save that was already going */
  if(S.news24c==null){if(S.day<=1||!poolCrew('restaurant').length)S.news24c=-1;else{S.news24c=S.day;const over=CAP_ROLES.filter(r=>roleCrew(r).length>roleCap(r));S.news.push(`<b>餐廳的名額分成三種。</b>廚師、服務生、清潔員各有自己的名額，不能互相借：廚師的名額只能聘廚師。擴建和每一個工程都寫著多哪一種。現在 ${CAP_ROLES.map(r=>`${ROLES[r].n} ${roleCrew(r).length}/${roleCap(r)}`).join('、')}${over.length?`；${over.map(r=>ROLES[r].n).join('、')}比名額多，大家都留著`:''}。${loungeLv()?'Lounge 的名單照舊。':''}`)}}   /* rc8 §21: told once to a save that was already going; nobody moves, nobody leaves */
  while(S.gate<S.day){S.gate++;const D=S.gate;
- if(D===2){unlockDish('coffee');S.eq.bar=Math.max(1,S.eq.bar);S.news.push('<b>新料理解鎖：拿鐵咖啡</b>。咖啡吧開張了，客人會加點飲料。');if(fact('xq_helper')&&xqHelperMode())S.news.push('昨晚來幫忙收桌、洗盤子的是<b>秀琴阿姨</b>，Jill 認識很久的阿姨。她不是員工，還沒請清潔員以前，每天晚上都會順路來幫忙；之後請清潔員，第一位就是她。')}
+ if(D===2){unlockDish('coffee');S.eq.bar=Math.max(1,S.eq.bar);S.news.push('<b>新料理解鎖：拿鐵咖啡</b>。咖啡吧開張了，客人會加點飲料。');if(!(S.crew||[]).some(m=>!m.core&&m.pool==='restaurant'))S.news.push('現在可以請員工了：第 1 級可以請一位<b>廚師</b>、一位<b>服務生</b>（商店「員工」；開店前也能從商店請）。清潔員是<b>秀琴阿姨</b>，不占名額。')}
  if(D===3){/* audit WS1-08: the second burner comes on Day 3 for everyone — one bought in the shop the evening before is paid back */const had=S.eq.stove>=2,back=had?EQUIP.find(x=>x.k==='stove').cost[1]:0;if(S.eq.stove<2){S.eq.stove=2}if(back){S.money+=back}S.eq.prep=Math.max(1,S.eq.prep||0);unlockDish('salad');S.news.push(`<b>第二口爐子到貨！</b>同時可以做兩道熱菜。${back?`你昨天已經自己買了一台，那 ${fmt(back)} 退回來了。`:''}<br><b>冷盤台啟用：田園沙拉</b>（在砧板上切好、就在那裡裝盤，不用開火）。<br>從今天開始要自己<b>備料</b>。`)}   /* onboarding (the user, 2026-10-08: 「Day 1 HOT → PLATING、Day 2 DRINK → SERVE、Day 3 PREP → PLATING」): the cold station and the salad a day earlier, the pasta a day later — the burner stays on Day 3 (audit WS1-08) */   /* audit WS1-06: stocking was open from Day 1 and prices from Day 2 — what Day 3 changes is that the fridge is no longer filled for you */
  if(D===4){/* a save that passed Day 3 before the onboarding change had the pasta then: its cold station and salad come now */const late=!S.eq.prep;if(late){S.eq.prep=1;unlockDish('salad')}unlockDish('pasta');S.news.push(`${late?'<b>冷盤台啟用：田園沙拉</b>（在砧板上切好、就在那裡裝盤，不用開火）。<br>':''}<b>新料理：番茄義大利麵</b>（先煮麵，再加醬）。<br>今晚 19:00 會有第一次 <b>Rush Hour</b>，做好準備！`)}
  if(D===5)S.news.push('昨晚開始可以<b>裝潢與擴建</b>了。菜單研發也有更多選擇。')
@@ -2492,13 +2507,13 @@ function autoStock(){const sug=suggestStock();for(const d in sug){const need=sug
 /* o.resume (audit N16, 2026-10-06): the fallback of 繼續營業 reopens the room at the clock it stopped — it is not the evening's
    start again: no opening banner, no daystart story (「那天下午…」), no first-days stocking, no tutorial, and the rush already
    announced if its time has passed (「RUSH HOUR」 came at 22:08) */
-function startService(o){o=o||{};SH_PEND.clear();/* a beat that was waiting for the floor when the last service ended (or the app closed) is still to come (audit N04) */lifeReset();streetReset();dylanStageCheck();bg=null;lastEv=null;if(UPV||UPRV)upViewClose();{const pp=$('#peekPill');pp.hidden=true;pp.textContent='回到選單 ›'}/* v2.4 rc6 (10:00): never into a service */if(room==='up')room='main';
+function startService(o){o=o||{};xqCrewMig(S);/* (2026-10-10: she is always on the crew, once) */SH_PEND.clear();/* a beat that was waiting for the floor when the last service ended (or the app closed) is still to come (audit N04) */lifeReset();streetReset();dylanStageCheck();bg=null;lastEv=null;if(UPV||UPRV)upViewClose();{const pp=$('#peekPill');pp.hidden=true;pp.textContent='回到選單 ›'}/* v2.4 rc6 (10:00): never into a service */if(room==='up')room='main';
  if(!o.resume&&S.money<150&&stockTotal()<5){S.money+=300;toast('Jill 翻出了抽屜裡的應急金 $300')}
  if(!o.resume&&jillStocks())autoStock();S.news=[];
  const T=S.today,dur=dayDur(S.day);
  R={t:0,dur,tables:buildTables(),slots:buildSlots(),groups:[],tickets:[],sched:[],si:0,closed:false,ended:false,
   jill:{x:PASS.x,y:PASS.y,tx:null,ty:null,q:[],qAt:{},wq:[],cur:null,busy:0,hands:[],idle:0,face:1,step:0,room:'main',troom:'main',bk:1},
-  combo:0,maxCombo:0,streak:0,fire:0,fireCount:0,floats:[],parts:[],tv:1,gid:1,tkid:1,
+  combo:0,maxCombo:0,streak:0,fire:0,fireCount:0,frun:0,fireDone:0,floats:[],parts:[],tv:1,gid:1,tkid:1,
   st:{rev:0,tips:0,guests:0,groups:0,perfect:0,q:{P:0,G:0,O:0,B:0},sats:[],dish:{},angry:0,lost:0,reviews:[],critic:null,blogger:null,treats:0,jtreats:0,ptreats:0},
   rush:feat().rush,rushT0:dur*120/270,rushT1:dur*180/270,rushShown:false,weather:T.weather,event:T.event,coach:(S.day===1&&!S.tut&&!o.resume)?0:-1,taskDone:{},lastSpawn:0,idleT:0,focus:0,focusLock:0,holdSlot:null,inc:planIncidents(dur),cw:{},thief:null,insp:null,chaser:null};
  R.sched=buildSchedule(dur);R.log=o.resume?[]:(S.preLog&&S.preLog.d===S.day?S.preLog.L.slice():[]);S.preLog=null;logNew=0;phase='service';if(!o.resume){try{cnDayStart()}catch(e){console.warn('[cn]',e)}/* rc7.6 */storyTick('daystart',{})}/* v2.3 */paused=false;room=STAGE&&roomOpen(STAGE.room)?STAGE.room:'main';/* rc8: a scene staged before opening (the viewing next door) keeps its room */hideScreen();layoutAll();renderTickets();renderTasks();hud(true);logChip();stockChip();renderRoomTabs(true);
@@ -2583,7 +2598,7 @@ function updGroup(g,dt){
  if(g.reg==='dylan'&&g.table!=null&&['reading','order','wait','eat','check'].includes(g.state))dylanGuestUpd(g,dt);
  if(g.state==='reading'){g.timer-=dt;if(g.timer<=0){g.state='order';sfx.bubble()}}
  if(g.state==='eat'){g.timer-=dt;if(g.timer<=0&&!storyLinger(g)){g.state='check';g.ate=1;sfx.bubble()}}}
-function seatGroup(g,t){t.group=g;t.dirty=false;g.table=t.i;if(t.pdr)pdSeated(g,t);if(g.reg==='dylan')dylanTrace({r:t.room||'main'});g.state='toTable';g.troom=t.room||'main';g.tx=t.x;g.ty=t.y+8;   /* v2.4 rc6: the long table — they come to its near end */g.pat=Math.min(1,g.pat+.1);requeue();sfx.tap();jillGreet(g,t);if(projOn('side')&&R.tables.some(q=>q.room==='side')&&R.tables.every(q=>q.room==='front'||q.group))ach('sideful');
+function seatGroup(g,t){t.group=g;t.dirty=false;g.table=t.i;if(g.seatAt==null)g.seatAt=R.t;if(t.pdr)pdSeated(g,t);if(g.reg==='dylan')dylanTrace({r:t.room||'main'});g.state='toTable';g.troom=t.room||'main';g.tx=t.x;g.ty=t.y+8;   /* v2.4 rc6: the long table — they come to its near end */g.pat=Math.min(1,g.pat+.1);requeue();sfx.tap();jillGreet(g,t);if(projOn('side')&&R.tables.some(q=>q.room==='side')&&R.tables.every(q=>q.room==='front'||q.group))ach('sideful');
  if(g.reg&&g.reg!=='dylan'){for(const id of regsOf(g)){const m=regMem(id);m.seats[t.i]=(m.seats[t.i]||0)+1}const v=S.regulars[g.reg]||0;/* v2.2 L: Jill's Card — every fifth visit, something on the house; visits are the only stamp */if((v+1)%5===0&&v>0&&!g.treat){g.treat='dessert';g.card=true}if(usualTable(g.reg)===t.i&&v>=4&&Math.random()<.25&&canChat('seat'+g.reg,300,3))speakLater(()=>{if(R&&phase==='service'&&R.groups.includes(g))quote(g,pickT(['老位子。','還是這裡好。','這個位子看得到貓。']))},500);
   const ud=usualDish(g.reg);if(ud&&v>=4&&!g.moment&&Math.random()<.5)g.usual=ud;regSeatMoment(g,t);regMeet(g);regularsNoticeDylan(g)}
  storySeatHook(g,t);storyCopresence(g);storyTick('seat',{g,t});   /* v2.3 */
@@ -2644,7 +2659,7 @@ function freeTableFor(g){const pdOK=pdTableFor(g);const ts=R.tables.filter(t=>!t
 function leaveGroup(g,mood){if(R){R.leftAt=R.leftAt||{};for(const id of storyIdsOf(g))R.leftAt[id]={t:R.t,closed:!!R.closed,together:!!g.leaveWith}}const t=g.table!=null?R.tables[g.table]:null;if(t&&t.group===g)t.group=null;g.state='leave';g.mood=mood||'ok';sendOut(g);
  if(g.ticket){const tk=g.ticket;for(const s of R.slots)if(s.job&&s.job.tk===tk)s.job=null;wfDropTicket(tk);for(const it of tk.items)if(it.st==='pending')S.stock[it.d]=(S.stock[it.d]||0)+1;R.tickets=R.tickets.filter(x=>x!==tk);R.jill.hands=R.jill.hands.filter(c=>c.tk!==tk);R.tv++;g.ticket=null}}
 function angryLeave(g){if(g.state==='queue'||g.state==='arrive'){R.st.lost+=g.size;toast(`${g.name} 等太久，離開了`);g.state='leave';sendOut(g);g.mood='sad';requeue();if(Math.random()<.35)addReview(g,2,pickT(['在門口的長椅上等到跟隔壁的陌生人變朋友。','等到腳痠，下次早點來。','客滿，沒等到位子。'].filter(x=>extOn('bench')||!x.includes('長椅'))),{wait:true,left:true});return}
- const t=R.tables[g.table];const served=g.ticket?g.ticket.items.some(i=>i.st==='served'):false;R.st.angry++;if(R.combo>=3)toast('COMBO 中斷');R.combo=0;R.streak=0;sfx.angry();
+ const t=R.tables[g.table];const served=g.ticket?g.ticket.items.some(i=>i.st==='served'):false;R.st.angry++;if(R.combo>=3)toast('COMBO 中斷');R.combo=0;R.streak=0;R.frun=0;sfx.angry();
  addFloat(t.x,t.y-50,'生氣離開','#E0654A',1,t.room);toast(`${g.name} 生氣地離開了…`);if(!g.counted)addReview(g,1,null,{wait:true,left:true});/* v2.3: one review per visit */leaveGroup(g,'angry');if(served){t.dirty=true}}
 /* ---- the day's talk: every line anyone says is kept, so a bubble missed during the rush can be read later ---- */
 let logNew=0;
@@ -2914,11 +2929,23 @@ function updJob(s,dt){const j=s.job,k=j.step;if(!k)return;const sp=dishSpeed(j.d
 function addXP(d,n){const before=mLv(d);S.xp[d]=(S.xp[d]||0)+n;const after=mLv(d);if(after>before){toast(`熟練度提升：${DISH(d).n} LV${after}`);if(d==='duck'&&after>=5)ach('duck')}}
 function plate(s,q){const j=s.job;s.job=null;const it=j.it;if(!R.tickets.includes(j.tk))return;it.st='ready';it.q=q;it.byJill=!j.chef;R.tv++;if(DISH(j.d).special&&!S.firstSpecial){S.firstSpecial=S.day;const px=j.plating&&j.plating.x||200;memo('firstspecial',px,KY.passTop+6,{d:dishName(j.d),room:'kitchen'});logLine('',`第一盤${dishName(j.d)}從出菜口出去了。`,'e')}
  addXP(it.d,q==='P'?2:1);R.st.q[q]++;trayFloat(s,QN[q],q==='P'?'#FFD95A':q==='G'?'#9ED08A':q==='O'?'#E6D3B0':'#E0654A');
- if(q==='P'){R.st.perfect++;R.streak++;/* rc8.3 (the player: 「可以不要一直跳出perfect擋住選區嗎」): no banner across the screen — the tray's own PERFECT, its sparkle and its sound */sfx.perfect();burst('tray',s,'#FFE38A');if(!S.achievements.first)ach('first');if(R.streak>=5&&R.fire<=0){R.streak=0;startFire()}}
+ if(q==='P'){R.st.perfect++;R.streak++;/* rc8.3 (the player: 「可以不要一直跳出perfect擋住選區嗎」): no banner across the screen — the tray's own PERFECT, its sparkle and its sound */sfx.perfect();burst('tray',s,'#FFE38A');if(!S.achievements.first)ach('first')}
  else{R.streak=0;if(q==='G')sfx.good();else sfx.okay()}
  coach(4)}
+/* ON FIRE (2026-10-10, the user: 「中後期約 75% 的晚上觸發，已經太頻繁，失去特殊感。調整目標為：一般成熟餐廳在正常經營情況下，約 25%–35% 的
+   營業夜晚觸發。仍應由料理品質、團隊表現及經營狀態決定，不要改成與玩家表現無關的純隨機抽籤。Jill 的主廚優勢應保留。」): it was five Perfect
+   portions in a row, and every dish of the new kitchen is Perfect — 13 to 16 fires a night, three quarters of every evening's time.
+   Now the floor earns it: a run of tables served fast and Perfect while the room is busy. A table whose whole order reaches it
+   within FIRE_FAST seconds of sitting down adds to the run — one and a half when Jill cooked for it (the head chef's hand), its
+   dishes all Perfect, and only while at least FIRE_BUSY of the tables are taken; a table kept waiting past FIRE_SLOW, a dish
+   that is not Perfect or a guest walking out angry ends the run. FIRE_RUN lights it, once a night. No random draw. */
+const FIRE_FAST=30,FIRE_SLOW=36,FIRE_RUN=4,FIRE_BUSY=.5;   /* calibrated on the user's Day 30/52/92 saves, 36 evenings, the fire off: a third of the evenings (docs/evidence/cooking_2026-10-10/onfire/) */
+function fireTable(g){if(!R||g.__fr||g.seatAt==null)return;g.__fr=1;const its=(g.ticket&&g.ticket.items)||[];if(!its.length)return;const w=R.t-g.seatAt;
+ if(its.some(it=>it.q&&it.q!=='P')||w>FIRE_SLOW){R.frun=0;return}if(w>FIRE_FAST)return;
+ const ts=R.tables.filter(t=>!t.lounge);if(ts.filter(t=>t.group).length<FIRE_BUSY*ts.length)return;
+ R.frun=(R.frun||0)+(its.some(it=>it.byJill)?1.5:1);if(R.frun>=FIRE_RUN&&!R.fireDone&&R.fire<=0){R.fireDone=1;startFire()}}
 function startFire(){R.fire=15;R.fireCount++;banner("JILL'S ON FIRE",'Rush Mode：出菜更快、小費 ×1.5','fire');sfx.fire();ach('fire')}
-function checkAllServed(g){if(g.ticket&&g.ticket.items.length&&g.ticket.items.every(it=>it.st==='served')&&g.state==='wait'){g.state='eat';g.timer=rand(7,11)*(TYPES[g.type].eat||1)*(S.day<=2?.8:1)*(R.weather==='storm'?1.2:1)*(g.quick||g.rushed?.7:1)*(g.unhurried?1.3:1);if(g.table!=null&&R.tables[g.table].lounge){g.timer*=g.lg&&g.lg.why==='wait'?1.2:2.4;g.lg&&(g.lg.served=1)}/* v2.3: a glass is not a course — they stay a while */if(g.table!=null&&R.tables[g.table].pdr)g.timer*=1.6;/* v2.4 rc6: 慢慢吃 */g.eatDur=g.timer}}
+function checkAllServed(g){if(g.ticket&&g.ticket.items.length&&g.ticket.items.every(it=>it.st==='served')&&g.state==='wait'){g.state='eat';fireTable(g);g.timer=rand(7,11)*(TYPES[g.type].eat||1)*(S.day<=2?.8:1)*(R.weather==='storm'?1.2:1)*(g.quick||g.rushed?.7:1)*(g.unhurried?1.3:1);if(g.table!=null&&R.tables[g.table].lounge){g.timer*=g.lg&&g.lg.why==='wait'?1.2:2.4;g.lg&&(g.lg.served=1)}/* v2.3: a glass is not a course — they stay a while */if(g.table!=null&&R.tables[g.table].pdr)g.timer*=1.6;/* v2.4 rc6: 慢慢吃 */g.eatDur=g.timer}}
 function serveItems(g,list){const t=R.tables[g.table];let best=null;
  for(const c of list){const it=c.it;if(it.st!=='ready')continue;it.st='served';t.plates.push({d:it.d,q:it.q,want:it.want});g.pat=Math.min(1,g.pat+.12);
   if(it.q==='P'||it.q==='G'){R.combo++;R.maxCombo=Math.max(R.maxCombo,R.combo);if(R.combo>=2){showCombo();sfx.combo(R.combo)}if(R.combo>=10)ach('combo10')}else{if(R.combo>=3)toast('COMBO 中斷');R.combo=0;hideCombo()}
@@ -4811,45 +4838,16 @@ function xqFree(){const m=xqHere();return m&&!walkingOver(m)?m:null}
    early game is played as before; the player simply knows her. Hiring the first cleaner is hiring her (she is first on
    the list), and from then on she is an ordinary cleaner. */
 const XQ_HELPER={id:'xq',name:'秀琴阿姨',role:'cleaner',lv:1,helper:1};
-function xqHelperMode(){return !xiuqin()&&!fact('xq_gone')&&!(S.crew||[]).some(m=>m.role==='cleaner')}
+function xqHelperMode(){return false}   /* 2026-10-10: never — she is on the crew from the first day (xqCrewMig); the helper's code below stays for nothing to call it */
 function xqm(){return xiuqin()||(xqHelperMode()?XQ_HELPER:null)}
 /* known: she has been part of the restaurant's days for about a week (the legacy crew always) */
 function xqKnown(){const m=xiuqin();if(m&&crewLegacy(m))return true;const f=fact('xq_helper');const first=Math.min(f?f.d:1e9,m&&m.since?m.since:1e9);const n=factN('xq_helper')+(m?m.days||0:0);return first<1e9&&S.day-first>=6&&n>=4}
 function xqHelperToday(){if(window.__noXQH||!xqHelperMode()||story().xqOff===S.day)return false;return true}   /* every evening until a cleaner is hired (the user, 2026-10-09: 「還沒請清潔員以前，她每晚都來，不再看日子。」): it used to be most evenings by the day's number, so every new game's Days 2 and 3 had no 秀琴 at all */
-/* where she tidies: beside a table nobody is at and that is already clear (never a dirty one — clearing is the game's
-   job, not hers), in the dining room's rows a phone shows; now and then the next one. No random draw: the day's random
-   stream is the same with her and without her. */
-function xqSpotOK(sp){return !!sp&&(!sp.t||(!sp.t.group&&!sp.t.dirty))}
-function xqPickSpot(h){const n=h.spots=(h.spots||0)+1;const ts=R.tables.filter(t=>(t.room||'main')==='main'&&!t.lounge&&!t.group&&!t.dirty&&t.y<=460&&(!h.spot||h.spot.t!==t));
- if(!ts.length)return{x:244,y:441,t:null};const t=ts[hash('xqs|'+S.day+'|'+n)%ts.length];return{x:t.x+(t.x<200?-24:24),y:t.y+22,t}}
-function xqHelperUpd(dt){const h=R.xqh;
- if(!h){if((R.closed||R.t>=R.dur*.92||(!fact('xq_helper')&&S.day===1&&R.tables.some(t=>t.dirty&&!t.group)))&&!R.xqhDone&&xqHelperToday()){   /* Workflow B (the user, 2026-10-08: 「她說來幫忙，就真的有幫忙」): her first evening (Day 1) she comes in when the first table is done, and helps the rest of it */R.xqhDone=1;const sp=xqPickSpot({});R.xqh={x:FR.enter.x,y:FR.enter.y,room:'front',troom:'main',tx:sp.x,ty:sp.y,spot:sp,spotT:R.t+30,arriving:1,face:1,step:0,moving:true,busy:0,task:null,next:null}}return}
- const v=110*dt;
- if(!h.leaving&&!h.arriving)wlCrew('xq','xq',h,dt);   /* Workflow B telemetry */
- if(h.leaving){if(handsN(h,'dirty')){ddDeposit(h);if(ddWasher()==='xq')ddWashEnd(h,'xq')}h.tx=FR.exit.x;h.ty=FR.exit.y;h.troom='front';h.wipe=0;if(stepTo(h,v))R.xqh=null;else{h.moving=true;h.step+=dt*12}return}
- if(h.arriving){if(stepTo(h,v)){h.arriving=0;h.moving=false;xqHelperArrived()}else{h.moving=true;h.step+=dt*12}return}
- /* the pass wiped, the chairs up: a while into the closing she goes home */
- if(R.closing!=null&&R.closing>22&&!h.task&&!h.next&&!(h.nextQ&&h.nextQ.length)&&!DLG&&!handsN(h,'dirty')&&ddWasher()!=='xq'){h.leaving=1;return}
- if(!h.task&&h.next){h.task=h.next;h.next=null;h.busy=0}
- if(h.task&&['clean','dump','wash'].includes(h.task.k)){h.wipe=0;ddTaskTick(XQ_HELPER,h,dt,v);return}   /* Workflow B: her dirty-side work */
- const tk=h.task;
- if(tk){const ok=!tk.g||(R.groups.includes(tk.g)&&!tk.g.gone&&tk.g.table!=null);if(!ok){h.task=null;if(h.nextQ&&h.nextQ.length)h.next=h.nextQ.shift();return}
-  h.tx=tk.x;h.ty=tk.y;h.troom=tk.room||'main';h.wipe=0;if(!stepTo(h,v)){h.moving=true;h.step+=dt*12;return}
-  h.moving=false;if(!tk.fired){tk.fired=1;h.face=tk.t.x>=h.x?1:-1;if(tk.phone)h.phone=1;if(tk.then)try{tk.then()}catch(e){console.warn('[visit]',e)}}if(!DLG)h.busy+=dt;if(h.busy>=tk.dur){h.task=null;h.busy=0;h.phone=0;if(h.nextQ&&h.nextQ.length)h.next=h.nextQ.shift()}return}
- {/* Workflow B (the user: 「她說來幫忙，就真的有幫忙」): she clears tables into her hands, takes them to the tub, washes — as a LV1 cleaner */const me=XQ_HELPER;
-  if(handsN(h,'dirty')){h.task=ddDumpTask();return}if(ddWasher()==='xq'||ddWashNow(me,true)){if(!ddWasher())ddStartWash('xq');h.task={k:'wash'};return}
-  const t=pdFirst(q=>ddCanClear(q)&&!q.claim&&!jillGoing(q.i)&&(q.room||'main')==='main'&&!q.lounge);if(t){const ct=ddCleanTask(me,h,t);if(ct){h.task=ct;h.wipe=0;return}}if(ddWashNow(me)){ddStartWash('xq');h.task={k:'wash'};return}}
- if(!xqSpotOK(h.spot)||R.t>=h.spotT){h.spot=xqPickSpot(h);h.spotT=R.t+6+hash('xqd|'+S.day+'|'+h.spots)%40/10}const sp=h.spot;
- if(h.room!=='main'||Math.hypot(h.x-sp.x,h.y-sp.y)>3){h.tx=sp.x;h.ty=sp.y;h.troom='main';h.wipe=0;if(stepTo(h,v*.8))h.moving=false;else{h.moving=true;h.step+=dt*12}}else{h.moving=false;h.wipe=1;h.face=sp.t?(sp.t.x>=h.x?1:-1):1}}
-function xqHelperArrived(){factSet('xq_helper');
- /* rc7.2 (the player, 21:49: 「秀琴阿姨出場要暫停遊戲吧 有劇情的」): her first evening is a story beat — the service waits while she
-    says who she is to the place, and goes on when the player has tapped through it (was: a coach card that came and went) */
- if(factN('xq_helper')===1){v24Scene([{who:'',text:S.day===1&&R&&!R.closed&&R.t<R.dur*.92?'第一桌客人吃完走了，秀琴阿姨從門口走了進來。':'快打烊的時候，秀琴阿姨從門口走了進來。'},{who:'staff:秀琴阿姨',text:'我來幫妳收一下。'},{who:'jill',text:'阿姨，不用啦。'},{who:'staff:秀琴阿姨',text:'順路啦。妳一個人怎麼收得完。'},
-  {who:'',text:'秀琴阿姨是 Jill 認識很久的阿姨。今天她會幫忙收桌、把髒盤子拿回廚房洗；之後每天晚上，她會在快打烊時順路進來幫忙收一收。'}]);return}
- let f=null;try{f=storyTick('xqin',{})}catch(e){console.warn('[xqin]',e)}if(!f)xqHelperChat()}
-/* the evening's few words with Jill; the first evening says who she is to the place */
-function xqHelperChat(){const n=factN('xq_helper');if(fact('yj_move')&&!fact('yj_move_told')){factSet('yj_move_told');shStart('yj_move',false,null,()=>{JILL_SAY('搬完了？',300);xqSay('搬完了。箱子都還沒拆。',1500)});return}if(n>1&&R&&R.sched.some(o=>o.name===YJN)&&yjDueTonight())return;/* her daughter is here tonight: that is the evening's talk */if(n<=1){xqSay('我來幫妳收一下。',300);JILL_SAY('阿姨，不用啦。',1500);xqSay('順路啦。妳一個人怎麼收得完。',2700);return}
- if(hash('xqc|'+S.day)%100>=55)return;const L=[['今天很多人喔。','還好啦。'],['這邊我擦一下就走。','阿姨，真的不用。'],['椅子我幫妳收上去。','謝謝阿姨。'],['妳也早點回去。','嗯，收完就走。']];const p=L[(n+hash('xqp|'+S.day))%L.length];xqSay(p[0],300);JILL_SAY(p[1],1600)}
+/* 2026-10-10: her first evening, now that she is the restaurant's cleaner from the opening — when the first table is done she goes
+   over to it, and the service waits while she and Jill say the few words (rc7.2: 「秀琴阿姨出場要暫停遊戲吧 有劇情的」) */
+function xqCrewTick(dt){if(!R||R.closed||S.day!==1||fact('xq_helper')||!R.tables.some(t=>t.dirty&&!t.group))return;const m=xqHere();if(!m)return;factSet('xq_helper');
+ v24Scene([{who:'',text:'第一桌客人吃完走了，秀琴阿姨拿著抹布走了過去。'},{who:'staff:秀琴阿姨',text:'這桌我來。'},{who:'jill',text:'阿姨，今天就麻煩妳了。'},{who:'staff:秀琴阿姨',text:'講這什麼話。妳一個人怎麼顧得完，收桌洗碗交給我。'},
+  {who:'',text:'秀琴阿姨是 Jill 認識很久的阿姨，從開店第一天就是店裡的清潔員：收桌、把髒盤子拿回廚房洗，都是她。'}])}
 /* v2.4 rc7.2 (the player, 21:57–21:58): in the first ten days, each evening that would leave the till under $300 once the
    day's costs are paid, 秀琴阿姨 lends $3,000 at closing — the first time with the whole scene, later ones short. The money
    moves when the scene starts (a closing cut short keeps it). It is paid back at the summary (endDay), not here. Neither
@@ -5937,7 +5935,7 @@ function storyCapLine(who,txt,kind){return;const C=STORY_CAP;if(!C)return;const 
    in. A page whose words all come from elsewhere (a shared pool) is left as it is. Once, on loading. */
 function beatSrcOf(k){const out=[];for(const E of STORY_EV){const src=String(E.run||'')+(E.present||[]).map(p=>String(p.run||'')).join('');if(E.k===k||src.includes(`factSet('${k}'`)||src.includes(`v24Cap('${k}'`))out.push(src)}
  if(k.startsWith('dy_')&&typeof DYLAN_SCENES!=='undefined'){const sc=DYLAN_SCENES.find(x=>'dy_'+x.k===k);if(sc)out.push(JSON.stringify(sc.lines))}
- if(k==='meal_box'||k==='meal_two')out.push(String(staffMealStory));if(k==='yj_move')out.push(String(xqHelperChat));if(k==='up_ask')out.push(String(upAskUpd));if(k==='up_inspect')out.push(String(upInspectLines));return out.join('\n')}
+ if(k==='meal_box'||k==='meal_two')out.push(String(staffMealStory));if(k==='yj_move')out.push(String(V24_ARRIVE.yj_move));   /* (2026-10-10: told when she comes in late; she is on the crew from the first day) */if(k==='up_ask')out.push(String(upAskUpd));if(k==='up_inspect')out.push(String(upInspectLines));return out.join('\n')}
 /* a beat's scene as its page keeps it, read from the code that plays it — only when that scene is written out line by line
    ({who:'…',text:'…'} each, nothing computed); null otherwise (a name, a count or a choice in it: the page is left alone) */
 function sceneLinesOf(k){const E=STORY_EV.find(x=>x.k===k);const srcs=[];if(E)srcs.push(String(E.run||'')+(E.present||[]).map(p=>String(p.run||'')).join(''));
@@ -6200,6 +6198,10 @@ function jillKitchen(J,dt){const jt=wfJillTask();const v=165*flowMul('jill')*(R.
   if(go(tg.x,tg.y)&&jt.st!=='work')wfArrive(jt);return}
  J.kcur=null;const att=wfAttending('jill');if(att&&att.slot){const sp=wfSpot(att.slot);if((J.room||'main')!=='kitchen'||Math.hypot(J.x-sp.cx,J.y-sp.cy)>=4)go(sp.cx,sp.cy);else stand();return}
  stand()}
+/* a cat she can pat from where she stands (resting on the floor, not on a perch or the sofa), and the pat itself: each cat's own liking
+   for it; a look down instead when the cat is not in the mood (2026-10-10: one place for the two ways it happens) */
+function jillPatNear(J,r){return CATS?CATS.find(c=>!c.hidden&&c.perch<0&&!c.sofa&&['rest','daze','stare','sleep','side'].includes(c.st)&&Math.hypot(c.x-J.x,c.y-J.y)<r):null}
+function jillPat(J,near){const id=near.def.id;const p=id==='tora'?.9:id==='ban'?.85:id==='mikan'?.6:id==='mei'?.45:.35;J.petCD=R.t+rand(18,40);if(Math.random()<p){J.pet={cat:near,t:rand(1.6,3),crouch:near.st!=='side'};if(near.st!=='side')memo('pet',near.x,near.y-6,{a:catName(near.def),subj:[{x:J.x,y:J.y}]});J.face=near.x>=J.x?1:-1;if(near.st!=='sleep'){releaseSpots(near);near.st='pet';near.pose=near.st==='sleep'?near.pose:'rub';near.happy=rand(2,3.5);near.quiet=1;near.face=J.x>=near.x?1:-1}near.hearts.push({x:0,y:-26,t:0});if(id==='snow'&&near.st==='sleep')snowNudge(near)}else{J.lookAt={x:near.x,y:near.y,t:rand(1,2),down:true}}}
 function jillUpd(dt){const J=R.jill;const fire=R.fire>0;if(upSearching()||(R&&R.srFirst)){upJillUpd(dt);return}/* v2.4 P2: the search, the phone call at the stair door */
  J.calm=(J.calm||0)+dt;J.wlChk=(J.wlChk||0)+dt;if(J.wlChk>.5){J.wlChk=0;if(J.cur||J.q.length||jillWorkload()>0)J.calm=0}
  if(J.rest==='sit'){restTick(dt);if(J.rest==='sit')return}
@@ -6210,6 +6212,10 @@ function jillUpd(dt){const J=R.jill;const fire=R.fire>0;if(upSearching()||(R&&R.
  if(!J.cur&&jillHandsDirty(J)&&!(J.q.length&&ddChainJ(J))){J.cur={dump:1};const d=ddDrop();J.troom='kitchen';J.tx=d.x;J.ty=d.y;J.idle=0}   /* Workflow B: with dishes in hand, to the tub — unless the next table she was sent to is another to clear */
  if(!J.cur&&J.q.length){J.cur={t:J.q.shift()};planAct();J.idle=0}
  if(J.fp&&(J.cur||J.q.length||R.closing!=null))fpDrop();   /* rc7.5: work comes first */
+ /* 2026-10-10 (the user: 「Jill 經過附近的貓咪、工作短暫空檔，或完成工作後順手摸一下」，不為摸貓中斷重要工作): on her way back to her
+    spot with nothing to do, a cat resting by the way gets a pat — she stops for it, then walks on; any work ends it */
+ if(J.pet&&J.tx!=null){J.moving=false;J.pet.t-=dt;if(J.pet.t<=0)J.pet=null;else if(J.cur||J.q.length||jillWorkload()>2)J.pet=null;if(J.pet)return}
+ if(J.tx!=null&&!J.cur&&!J.pet&&!J.visit&&!J.fp&&!J.rest&&R.closing==null&&J.troom==='main'&&(J.room||'main')==='main'&&J.tx===PASS.x&&J.ty===PASS.y&&!(J.hands||[]).length&&(J.petCD||0)<R.t&&Math.random()<dt*3){const near=jillPatNear(J,30);if(near){jillPat(J,near);if(J.pet){J.moving=false;return}}}
  if(J.tx!=null){const v=165*flowMul('jill')*(fire?1.5:1)*dt;if(stepTo(J,v)){J.tx=null;J.moving=false;arriveAct()}else{J.step+=dt*12;J.moving=true}return}
  if(J.room!=='main'){/* away from the dining room with nothing to do: back to the pass */J.troom='main';J.tx=PASS.x;J.ty=PASS.y;return}
  if(J.fp){const F=J.fp;/* rc7.5: the look at the herbs, the shutter, a look back at him, then on to the sill */
@@ -6218,8 +6224,9 @@ function jillUpd(dt){const J=R.jill;const fire=R.fire>0;if(upSearching()||(R&&R.
   if(F.phase==='place'){F.t-=dt;if(F.t<=0){fpDrop();J.idle=0}return}
   fpDrop()}
  if(J.pet){J.pet.t-=dt;if(J.pet.t<=0){J.pet=null;J.idle=0}else if(J.q.length||jillWorkload()>2)J.pet=null}
- if(!J.cur&&!J.pet&&R.closing==null&&J.idle>1.5&&(J.petCD||0)<R.t&&CATS&&Math.random()<dt*.5){/* a cat wandered close: look down, crouch, one pat */const near=CATS.find(c=>!c.hidden&&c.perch<0&&!c.sofa&&['rest','daze','stare','sleep','side'].includes(c.st)&&Math.hypot(c.x-J.x,c.y-J.y)<42);
-  if(near){const id=near.def.id;const p=id==='tora'?.9:id==='ban'?.85:id==='mikan'?.6:id==='mei'?.45:.35;J.petCD=R.t+rand(18,40);if(Math.random()<p){J.pet={cat:near,t:rand(1.6,3),crouch:near.st!=='side'};if(near.st!=='side')memo('pet',near.x,near.y-6,{a:catName(near.def),subj:[{x:J.x,y:J.y}]});J.face=near.x>=J.x?1:-1;if(near.st!=='sleep'){releaseSpots(near);near.st='pet';near.pose=near.st==='sleep'?near.pose:'rub';near.happy=rand(2,3.5);near.quiet=1;near.face=J.x>=near.x?1:-1}near.hearts.push({x:0,y:-26,t:0});if(id==='snow'&&near.st==='sleep')snowNudge(near)}else{J.lookAt={x:near.x,y:near.y,t:rand(1,2),down:true}}}}
+ /* a cat wandered close: look down, crouch, one pat. 2026-10-10: a short breather is enough (0.8 s, was 1.5; the look comes sooner) —
+    with the cooking system her breathers in the dining room are a few seconds each (Day 1 alone: 13 pats in 20 days, 29 before) */
+ if(!J.cur&&!J.pet&&R.closing==null&&J.idle>.8&&(J.petCD||0)<R.t&&CATS&&Math.random()<dt*1.2){const near=jillPatNear(J,42);if(near)jillPat(J,near)}
  if(J.lookAt){J.lookAt.t-=dt;if(J.lookAt.t<=0)J.lookAt=null}if(J.nod>0)J.nod-=dt;
  if(J.visit){const V=J.visit;if(J.q.length||jillWorkload()>1||!R.groups.includes(V.g)||V.g.table==null){cancelVisit()}else if(V.phase==='stand'){V.t-=dt;J.lookAt={x:V.t0.x,y:V.t0.y-8,t:.3};if(V.t<=0){J.visit=null;J.idle=2.3}return}}
  if(!J.cur&&R.closing==null){J.idle+=dt;treatTick();if(J.visit)return;
@@ -6233,12 +6240,12 @@ function tapTable(t){const g=t.group;if(R.jill.visit&&!jillTargets(t.i))cancelVi
  if(!g&&!t.dirty){const q=queued().filter(x=>x.state==='queue'||x.state==='arrive');const fit=q.find(x=>x.size<=t.seats);if(fit){seatGroup(fit,t);return}if(q.length)toast('這張桌子坐不下這組客人');return}
  if(g&&(g.state==='toTable'||g.state==='reading')){toast('客人還在看菜單');return}
  {const o=(t.claim&&t.claim!=='jill')?t.claim:(g&&g.state==='wait'&&g.ticket&&g.ticket.claim&&g.ticket.claim!=='jill')?g.ticket.claim:null;   /* 2026-10-09 (#6's rule for every job at a table): a waiter already on his way to take the order, bring the plates or the bill — said, Jill not sent too */
-  if(g&&o&&!jillTargets(t.i)&&['order','check','wait'].includes(g.state)){const nm=o==='xq'?'秀琴阿姨':((S.crew||[]).find(m=>m.id===o)||{}).name||'員工';toast(`${nm}正在過去了。`);return}}
+  if(g&&o&&!jillTargets(t.i)&&['order','check','wait'].includes(g.state)){const nm=((S.crew||[]).find(m=>m.id===o)||{}).name||(o==='xq'?'秀琴阿姨':'員工');toast(`${nm}正在過去了。`);return}}
  if(g&&g.state==='eat'){toast('客人正在享用中');return}
  if(g&&g.state==='wait'&&!tableActionable(t)){toast('料理還沒好，先去廚房做菜吧');return}
  if(!g&&t.dirty&&ddUnits(t)&&ddFree()<=0){toast('廚房的髒盤區滿了：到廚房點髒盤車，安排人洗。');return}   /* Workflow B: no room for its dishes yet — the table waits */
  if(!g&&t.dirty&&t.claim&&t.claim!=='jill'&&!jillTargets(t.i)){/* 2026-10-09 #6 (the user: 「不再自動派 Jill 去搶同一份工作」): someone is on it — said, not doubled; a second tap within a few seconds gives it to Jill instead, and they let it go and find other work */
-  const id=t.claim,w=id==='xq'?R.xqh:R.cw&&R.cw[id],who=id==='xq'?'秀琴阿姨':((S.crew||[]).find(m=>m.id===id)||{}).name||'員工';
+  const id=t.claim,w=(R.cw&&R.cw[id])||(id==='xq'?R.xqh:null),who=((S.crew||[]).find(m=>m.id===id)||{}).name||(id==='xq'?'秀琴阿姨':'員工');
   const going=!!(w&&w.task&&w.task.k==='clean'&&w.task.t===t&&(w.moving||Math.hypot(w.x-w.task.x,w.y-w.task.y)>4));
   if(going&&R.reTap&&R.reTap.t===t.i&&R.t-R.reTap.at<4){w.task=null;w.cd=.3;t.claim=null;R.reTap=null;jillAsk(t.i);(R.jill.qOnly||(R.jill.qOnly={}))[t.i]=1;if(R.jill.rest)endRest();toast(`改由 Jill 收拾，${who}去忙別的。`);sfx.tap();return}
   R.reTap={t:t.i,at:R.t};toast(going?`${who}正在過去收拾。再點一次，改由 Jill 收拾。`:`${who}正在收拾這一桌。`);return}
@@ -6258,7 +6265,7 @@ function update(dt){R.t+=dt;if(R.v24q&&R.v24q.length)v24Upd();if(R.talkq&&R.talk
  for(const g of R.groups)updGroup(g,dt);R.groups=R.groups.filter(g=>!g.gone);
  kitchenUpd(dt);wfUpd(dt);wfGuideUpd();streetUpd(dt);
  for(const s of R.slots){if(s.job)updJob(s,dt);if(s.pop)s.pop.t+=dt;if(s.fx){s.fx.t+=dt;if(s.fx.t>1)s.fx=null}if(s.flash>0)s.flash=Math.max(0,s.flash-dt*1.5);if(s.shake>0)s.shake=Math.max(0,s.shake-dt*8);if(s.flipT>0)s.flipT=Math.max(0,s.flipT-dt)}
- staffUpd(dt);xqHelperUpd(dt);ambientTick(dt);if(R.coachAt!=null&&R.t-R.coachAt>COACH_SHOW){R.coachAt=null;hideCoach()}if(R.panel){const sl=R.slots[R.focus];const k=sl&&sl.job&&sl.job.step;const done=!sl||!sl.job||!!chefHandles(sl);if(done||(k&&(k.t==='wait'||k.t==='work')&&!R.holdSlot)){R.panelT=(R.panelT||0)+dt;if(R.panelT>(done?.7:.9)){R.panel=false;R.panelT=0}}else R.panelT=0}jillUpd(dt);
+ staffUpd(dt);xqCrewTick(dt);ambientTick(dt);if(R.coachAt!=null&&R.t-R.coachAt>COACH_SHOW){R.coachAt=null;hideCoach()}if(R.panel){const sl=R.slots[R.focus];const k=sl&&sl.job&&sl.job.step;const done=!sl||!sl.job||!!chefHandles(sl);if(done||(k&&(k.t==='wait'||k.t==='work')&&!R.holdSlot)){R.panelT=(R.panelT||0)+dt;if(R.panelT>(done?.7:.9)){R.panel=false;R.panelT=0}}else R.panelT=0}jillUpd(dt);
  for(const f of R.floats)f.t+=dt;R.floats=R.floats.filter(f=>f.t<f.life);
  for(const p of R.parts){p.t+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=p.g*dt}R.parts=R.parts.filter(p=>p.t<p.life);
  for(const k in S.stock)if(S.stock[k]<0)S.stock[k]=0;
@@ -6780,7 +6787,7 @@ function drawOtherRoom(c,now,dusk,V,X0,XW,TOP){const k=room;const J=V.jill;const
  if(k==='front'&&R&&!SNAP&&phase==='service')queued().forEach(g=>{if(g.state==='queue'&&!g.moving&&g.room==='front')patBar(c,g.x,g.y-(isSeated(g)?50:56),g.pat)});   /* rc8.3: the queue waits out here now */
  /* the light of the hour, as in the dining room (the street bakes it into its sky) */
  if(k!=='front'){c.save();c.globalCompositeOperation='multiply';c.fillStyle=k==='lounge'?mix(wxTint(tintFor(dusk)),'#5A4E48',.55):k==='staff'||k==='home'?mix(wxTint(tintFor(dusk)),'#FFF7EC',k==='home'?.36:.42):wxTint(tintFor(dusk));/* v2.4 rc6: the Staff Room stays light and warm at night (05:19) */c.fillRect(X0,-TOP,XW,LH+TOP);/* v2.3: the Lounge is dimmer, whatever the hour */c.restore();
-  /* the room's own lamps come up with the evening */c.save();c.globalCompositeOperation='lighter';const lk=.1+clamp(dusk,0,1)*.22;const spots=k==='side'?[{x:104,y:40,r:90,k:1},{x:296,y:40,r:90,k:1},{x:200,y:150,r:130,k:.8}]:k==='lounge'?[{x:242,y:150,r:96,k:1.5,col:'255,190,110'},{x:322,y:150,r:96,k:1.5,col:'255,190,110'},{x:296,y:70,r:120,k:1.1,col:'255,200,130'}].concat(LG.leg?[{x:LG.leg.x0+11,y:(LG.leg.y0+LG.bar.y)/2-6,r:84,k:1.4,col:'255,190,110'}]:[]).concat(V.tables.filter(t=>t.room==='lounge'&&t.kind!=='bar').map(t=>({x:t.x-34,y:t.y-30,r:74,k:1.35,col:'255,196,120'}))):k==='up'?upLampSpots():k==='staff'?srLampSpots():k==='home'?[{x:HM.lamp.x,y:HM.lamp.y-70,r:110,k:1.2,col:'255,214,150'},{x:HM.night.x0+9,y:HM.night.y-30,r:70,k:1,col:'255,214,150'},{x:340,y:HM.desk.top-30,r:80,k:.8,col:'255,236,200'},{x:200,y:LH-80,r:110,k:.4}]:k==='pdr'?(()=>{const G=pdGeo();return[{x:200,y:(G.y0+G.y1)/2-40,r:Math.max(160,(G.y1-G.y0)*.8),k:.9,col:'255,206,140'},{x:200,y:PDW-40,r:120,k:.5,col:'255,214,160'}]})():[{x:KX.range.x+KX.range.w/2,y:60,r:120,k:.9,col:'255,236,190'},{x:132,y:KY.rail+20,r:70,k:.9},{x:200,y:KY.rail+20,r:70,k:.9},{x:268,y:KY.rail+20,r:70,k:.9},{x:200,y:LH-60,r:90,k:.5}];
+  /* the room's own lamps come up with the evening */c.save();c.globalCompositeOperation='lighter';const lk=.1+clamp(dusk,0,1)*.22;const spots=k==='side'?[{x:104,y:40,r:90,k:1},{x:296,y:40,r:90,k:1},{x:200,y:150,r:130,k:.8}]:k==='lounge'?[{x:242,y:150,r:96,k:1.5,col:'255,190,110'},{x:322,y:150,r:96,k:1.5,col:'255,190,110'},{x:296,y:70,r:120,k:1.1,col:'255,200,130'}].concat(LG.leg?[{x:LG.leg.x0+11,y:(LG.leg.y0+LG.bar.y)/2-6,r:84,k:1.4,col:'255,190,110'}]:[]).concat(V.tables.filter(t=>t.room==='lounge'&&t.kind!=='bar').map(t=>({x:t.x-34,y:t.y-30,r:74,k:1.35,col:'255,196,120'}))):k==='up'?upLampSpots():k==='staff'?srLampSpots():k==='home'?[{x:HM.lamp.x,y:HM.lamp.y-70,r:110,k:1.2,col:'255,214,150'},{x:HM.night.x0+9,y:HM.night.y-30,r:70,k:1,col:'255,214,150'},{x:340,y:HM.desk.top-30,r:80,k:.8,col:'255,236,200'},{x:200,y:LH-80,r:110,k:.4}]:k==='pdr'?(()=>{const G=pdGeo();return[{x:200,y:(G.y0+G.y1)/2-40,r:Math.max(160,(G.y1-G.y0)*.8),k:.9,col:'255,206,140'},{x:200,y:PDW-40,r:120,k:.5,col:'255,214,160'}]})():[{x:KX.range.x+KX.range.w/2,y:60,r:120,k:.9,col:'255,236,190'},...passLamps().map(x=>({x,y:KY.rail+20,r:62,k:.68})),{x:200,y:LH-60,r:90,k:.5}];
   for(const L0 of spots){let g=c.createRadialGradient(L0.x,L0.y,2,L0.x,L0.y+30,L0.r);g.addColorStop(0,`rgba(${L0.col||'255,196,120'},${lk*L0.k})`);g.addColorStop(1,'rgba(255,170,90,0)');c.fillStyle=g;c.fillRect(L0.x-L0.r,L0.y-L0.r,L0.r*2,L0.r*2.4)}
   if(k==='side'||k==='lounge')for(const t of V.tables){if(t.room!==k)continue;let g=c.createRadialGradient(t.x,t.y-15,1,t.x,t.y-15,26);g.addColorStop(0,`rgba(255,190,100,${.1+dusk*.12})`);g.addColorStop(1,'rgba(255,190,100,0)');c.fillStyle=g;c.fillRect(t.x-26,t.y-41,52,52)}c.restore()}
  if(R){const pulse=(Math.sin(now*6)+1)/2;for(const t of R.tables)if((t.room||'main')===k)drawTableOverlay(c,t,now,pulse);
@@ -6817,19 +6824,19 @@ function slotHome(s){const i=s.no-1;switch(s.type){
 /* where the current step of a job happens: the board for knife work, the sink to drain, the oven while it bakes,
    the pass once an oven dish is out (and for the plating of every chef's dish) */
 function stepSpot(s){const j=s.job;const h=slotHome(s);const out=Object.assign({cy:KY.feet},h);if(!j)return out;
- if(j.plating){const x=j.plating.x||200;return Object.assign(out,{place:'pass',cx:x,cy:KY.passFeet,x,y:KY.passTop+22,sc:.5})}
+ if(j.plating){const x=j.plating.x||WF_PASS_X[0];return Object.assign(out,{place:'pass',cx:x,cy:KY.passFeet,x,y:KY.passTop+22,sc:.5})}
  const k=j.step;if(!k)return out;const v=k.verb||k.txt||'';
  if(k.t==='work'&&k.board){const x=s.type==='prep'?h.x:KX.prep.x+35;return Object.assign(out,{place:'prep',x,y:172,cx:x,sc:.4,board:true})}
  if(k.t==='add'&&/瀝乾/.test(v)){const x=KX.sink.x+13;return Object.assign(out,{place:'sink',x,y:158,cx:x,sc:.5})}
- if(k.v==='plate')return Object.assign(out,{place:'pass',cx:200,cy:KY.passFeet,x:200,y:KY.passTop+22,sc:.5});
+ if(k.v==='plate')return Object.assign(out,{place:'pass',cx:WF_PASS_X[0],cy:KY.passFeet,x:WF_PASS_X[0],y:KY.passTop+22,sc:.5});
  if(s.type==='pizza'){const steps=recipeOf(j.d);const zi=steps.findIndex(q=>q.t==='zone');const P=pizzaOvenRect();
   if(k.t==='zone')return Object.assign(out,{inOven:true,x:P.mx,y:P.my-3,sc:.2,cx:P.mx+8});
-  if(zi>=0&&j.si>zi)return Object.assign(out,{place:'pass',cx:200,cy:KY.passFeet,x:200,y:KY.passTop+22,sc:.5})}
+  if(zi>=0&&j.si>zi)return Object.assign(out,{place:'pass',cx:WF_PASS_X[0],cy:KY.passFeet,x:WF_PASS_X[0],y:KY.passTop+22,sc:.5})}
  if(s.type==='oven'){const steps=recipeOf(j.d);const zi=steps.findIndex(q=>q.t==='zone');
   if(k.t==='zone')return Object.assign(out,{inOven:true,x:KX.oven.x+(s.no>1?34:12),y:KY.top+KY.h+10,sc:.17,cx:KX.oven.x+22});
-  if(zi>=0&&j.si>zi)return Object.assign(out,{place:'pass',cx:200,cy:KY.passFeet,x:200,y:KY.passTop+22,sc:.5})}
+  if(zi>=0&&j.si>zi)return Object.assign(out,{place:'pass',cx:WF_PASS_X[0],cy:KY.passFeet,x:WF_PASS_X[0],y:KY.passTop+22,sc:.5})}
  return out}
-function platingSpot(){const used=R.slots.filter(s=>s.job&&s.job.plating&&s.job.plating.x).map(s=>s.job.plating.x);if(R.slots.some(s=>s.job&&!s.job.plating&&stepSpot(s).place==='pass'))used.push(200);return[200,148,252,174,226,122,278].find(x=>!used.includes(x))||200}
+function platingSpot(){const used=R.slots.filter(s=>s.job&&s.job.plating&&s.job.plating.x).map(s=>s.job.plating.x);if(R.slots.some(s=>s.job&&!s.job.plating&&stepSpot(s).place==='pass'))used.push(WF_PASS_X[0]);return[160,240,134,266,112,288,96].find(x=>!used.includes(x))||WF_PASS_X[0]}
 function jobChef(s){return s.job?chefHandles(s):null}
 /* handwork waits for the cook to be at that spot (the fire does not) */
 function cookPresent(s){const id=s.cook;if(!id)return true;const a=R.ck&&R.ck[id];if(!a)return true;const b=a.beat;return !!b&&b.s===s&&!a.moving}
@@ -6926,13 +6933,22 @@ function wfMax(d){const b=baseOf(d),L=S.level||1;if(WF_DISH[b]==='drink2')return
    1 → 2 → 3 — are how many dishes can be being plated at once: whoever plates holds one from the moment they set off for
    the plates until the plate is set down on the pass. Nothing is plated on the pass any more (WF_PASS_X: where the first
    special's memory is pinned, and where a plating from an older save that was under way at the pass finishes). */
-const WF_PASS_X=[200,148,252];
+const WF_PASS_X=[160,240,112];   /* 2026-10-10: off the opening in the middle (were 200, 148, 252) */
+/* 2026-10-10 (the user: 「出菜口也開設中央通道，讓 Jill 與廚師能以合理路徑移動」「不得穿越實體設備」「保留原本有效出菜容量」「熱燈、盤位與
+   出菜檯必須合理配置」): the pass is two counters with an opening between them (PASS_GAP), straight up from the door to the
+   dining room and across the aisle from the walkway through the line. The row keeps its 9 spots (11 with the wide pass):
+   five and four (six and five) to a side, closer together, the plates drawn a little smaller; two lamps over each side. */
+const PASS_GAP={x0:188,x1:212};
+function passEnds(){return projOn('pass')?{x0:64,x1:336}:{x0:80,x1:320}}
+function passHalves(){const E=passEnds();return[[E.x0,PASS_GAP.x0],[PASS_GAP.x1,E.x1]]}
+function passLamps(){return projOn('pass')?[110,170,230,290]:[112,156,244,288]}
+function passTicketX(k){const E=passEnds();return k<5?E.x0+8+k*20:PASS_GAP.x1+4+(k-5)*20}
 /* where clean plates are taken: the dish rack under the sink, already in the kitchen's picture */
 function wfRack(){return{x:KX.sink.x+12,y:KY.feet}}
 /* the plates waiting on the pass for the floor, in a row under the lamps; each keeps the spot it was set down on until
    it is taken (it.pi), so nothing slides along the pass by itself */
 function wfRowN(){return projOn('pass')?11:9}
-function wfRowX(i){return(projOn('pass')?64:80)+18+i*26}
+function wfRowX(i){const E=passEnds(),n=wfRowN(),nl=Math.ceil(n/2),p=projOn('pass')?18:18.5;if(i<nl)return E.x0+17+i*p;const nr=n-nl,span=(E.x1-17)-(PASS_GAP.x1+17);return PASS_GAP.x1+17+(span-(nr-1)*p)/2+(i-nl)*p}
 /* v2.5 Workflow B (the user: 「Pass 正式變成 Finished Food Buffer… 要有真正容量」 and 「先依現在實際 Pass visual 與現有 upgrade
    決定」): the pass holds what its row holds — 9 plates, 11 with the bigger pass. Counted: the plates on it, the plates on
    their way to it, and the platings (and glasses) already under way, each needing its spots. Full, the next plating waits —
@@ -7026,10 +7042,11 @@ function wfStepDone(n){const fl=wfFl(n);wfUnhand(n);if(n.si>=fl.length-1){wfFini
 function wfPlated(n){const at=n.slot?wfSpot(n.slot).x:WF_PASS_X[0];if(n.slot){if(n.slot.type==='pass'){if(!n.to)n.to=n.slot}else{const j=wfRJ(n);const ch=chOf(n.d,wfLookF(n));const V=j.step&&j.step.board?null:ch?ch.v:stepVessel(j);n.slot.left=V&&V!=='plate'&&V!=='cup'&&V!=='glass'&&V!=='cutboard'&&V!=='mold'&&V!=='ramekin'&&V!=='board'&&V!=='pizzapan'?{v:V}:null;   /* (the pan, the pot, the tray stay where they were; a board is the counter's own, a mould or a ramekin goes with the plate; the cheese board and a pizza's pan are what the food goes out on) */n.slot.wf=null}n.slot=null}n.dishes=false;n.carry=true;n.st='topass';n.pi=wfRowTake(n,at);R.tv++}
 /* the last step done: every portion of the batch is a plate (or a glass) ready for the floor */
 function wfFinish(n){const avg=n.sc.length?n.sc.reduce((a,b)=>a+b,0)/n.sc.length:1;const q=avg>=.88?'P':avg>=.68?'G':'O';
+ if(n.jill){(S.jillMade||(S.jillMade={}))[baseOf(n.d)]=1}   /* (2026-10-10: a teaching dish she has made — wfJillTeach) */
  if(n.slot){n.slot.wf=null;n.slot=null}if(n.to){n.to.wf=null;n.to=null}R.wf=wfList().filter(x=>x!==n);if(R.wsel===n.id)R.wsel=null;
  let k=0;for(const o of n.its){const it=o.it;if(!R.tickets.includes(o.tk)||it.st!=='cooking')continue;it.st='ready';it.q=q;it.byJill=n.jill;it.wf=null;if(!o.tk.lounge&&!o.tk.cn){const pi=(n.pi||[])[k++];it.pi=pi==null?null:pi}
   addXP(it.d,q==='P'?2:1);R.st.q[q]++;
-  if(q==='P'){R.st.perfect++;R.streak++;if(!S.achievements.first)ach('first');if(R.streak>=5&&R.fire<=0){R.streak=0;startFire()}}else R.streak=0;
+  if(q==='P'){R.st.perfect++;R.streak++;if(!S.achievements.first)ach('first')}else R.streak=0;   /* (2026-10-10: ON FIRE is the floor's run now — fireTable) */
   if(DISH(it.d).special&&!S.firstSpecial){S.firstSpecial=S.day;memo('firstspecial',WF_PASS_X[0],KY.passTop+6,{d:dishName(it.d),room:'kitchen'});logLine('',`第一盤${dishName(it.d)}從出菜口出去了。`,'e')}}
  sfx.good();coach(4);R.tv++}
 /* a ticket that leaves (the table walked out): its portions come out of the work; work with nothing left is put away */
@@ -7039,10 +7056,15 @@ function wfDropTicket(tk){if(!R||!R.wf)return;for(const n of R.wf.slice()){const
 function wfOldBusy(m){return R.slots.some(s=>s.job&&s.cook===m.id&&(s.job.plating||(s.job.step&&['add','hold','dose','tap','work'].includes(s.job.step.t))))}
 /* the cooks: each free one takes the open step that suits him best — the most skilled hands for each place first, then the
    work that has waited longest; a cook who is only learning a place (★) leaves fresh work to the others for a moment */
+/* 2026-10-10 (the user: 「第 2、3 天的料理教學照常進行，但不限制玩家聘用員工。需要 Jill 親自操作的教學，仍由 Jill 完成」): the dish each of the
+   first three days teaches is Jill's until she has made it once (S.jillMade, with the save); the cooks take it from then on */
+const TEACH_DISH={1:'friedrice',2:'coffee',3:'salad'};
+function wfJillTeach(n){if(S.day>3)return false;const d=TEACH_DISH[S.day];return !!d&&baseOf(n.d)===d&&!(S.jillMade||{})[d]}
 function wfStaff(){const open=wfList().filter(wfOpen);if(!open.length)return;const free=[];
+ if(R.teachTold!==S.day&&(S.crew||[]).some(m=>m.role==='chef'&&crewHere(m))){const n=open.find(wfJillTeach);if(n&&!n.who){R.teachTold=S.day;toast(`第一份${dishName(n.d)}要 Jill 親手做：點訂單上的${dishName(n.d)}。做過一次，廚師就會接手。`)}}   /* (2026-10-10) */
  for(const m of S.crew||[]){if(m.role!=='chef'||!crewHere(m)||!m.duty)continue;   /* 待命 (taken off the duty board): he rests, as the board says */if(R.wfc&&R.wfc[m.id]&&wfNode(R.wfc[m.id]))continue;if(wfOldBusy(m))continue;free.push(m)}
  if(!free.length)return;const pairs=[];
- for(const m of free)for(const n of open){const f=wfNext(n);const p=chefProf(m,f);if(!p||!chefCan(m,n.d))continue;if(p===1&&R.t-n.tr<6)continue;if(WF_ST[f].slot&&!wfFreeSlot(f))continue;
+ for(const m of free)for(const n of open){if(wfJillTeach(n))continue;const f=wfNext(n);const p=chefProf(m,f);if(!p||!chefCan(m,n.d))continue;if(p===1&&R.t-n.tr<6)continue;if(WF_ST[f].slot&&!wfFreeSlot(f))continue;
   pairs.push({m,n,s:p*100+Math.min(60,R.t-n.tr)+(WF_ST[f].slot===m.duty?8:0)})}
  pairs.sort((a,b)=>b.s-a.s);const used=new Set();for(const q of pairs){if(used.has(q.m.id)||!wfOpen(q.n))continue;if(wfAssign(q.n,q.m.id))used.add(q.m.id)}}
 /* every frame of a service */
@@ -8916,7 +8938,7 @@ function wfSlotCenter(s){if(s.type==='pass'){const sp=wfSpot(s);return{x:sp.x,y:
  const h=slotHome(s);if(s.type==='prep')return{x:h.x,y:172,rx:21,ry:9};if(s.type==='bar')return{x:h.cx,y:172,rx:15,ry:16};return{x:h.x,y:h.y,rx:28*h.sc/.62,ry:13*h.sc/.62}}
 /* where the selected work is now (its food, or the rail when it has not started) */
 function wfAt(n){const s=n.slot;if(s){if(s.type==='pass'){const sp=wfSpot(s);return{x:sp.x,y:KY.passTop+10}}const sp=wfFoodSpot(n,s);return{x:sp.x,y:sp.y-6}}
- const it=n.its[0];const tk=it&&it.tk;const open=R.tickets.filter(t=>t.items.some(i=>i.st==='pending'||i.st==='cooking'));const k=Math.max(0,open.indexOf(tk));const x0=projOn('pass')?64:80;return{x:x0+23+Math.min(k,8)*22,y:KY.passTop-10}}
+ const it=n.its[0];const tk=it&&it.tk;const open=R.tickets.filter(t=>t.items.some(i=>i.st==='pending'||i.st==='cooking'));const k=Math.max(0,open.indexOf(tk));return{x:passTicketX(Math.min(k,8))+8,y:KY.passTop-10}}
 /* drawn over the kitchen, last: a warm outline on the real places, breathing slowly; one soft arrow from the food to the
    nearest free one. Only for the selected work — never several at once (spec §11) */
 function wfDrawCue(c,now){if(!R||room!=='kitchen'||!R.wsel)return;const n=wfNode(R.wsel);if(!n)return;const cue=wfCueSlots(n);const br=.5+.5*Math.sin(now*2.2);
@@ -8972,7 +8994,7 @@ function wfTakeBack(n,s){if(n&&n.who&&n.who!=='jill'&&(n.st==='dish'||n.st==='to
 function wfFirstUse(n,f){if(f==='hot')coach(3)}
 /* the test player and the simulated player: one thing at a time, as a person — the work furthest along first (plating
    frees the fire); the lazy one leaves to the cooks what a cook here can do */
-function wfStaffCan(n){const f=wfNext(n);if(!f)return false;return(S.crew||[]).some(m=>m.role==='chef'&&crewHere(m)&&chefProf(m,f)>0&&chefCan(m,n.d))}
+function wfStaffCan(n){const f=wfNext(n);if(!f||wfJillTeach(n))return false;return(S.crew||[]).some(m=>m.role==='chef'&&crewHere(m)&&chefProf(m,f)>0&&chefCan(m,n.d))}
 function wfBot(lazy){if(!R)return;wfGather();if(wfJillTask())return;const open=wfList().filter(n=>wfOpen(n)&&(!lazy||!wfStaffCan(n)));
  open.sort((a,b)=>(b.st==='ready')-(a.st==='ready')||a.tr-b.tr);for(const n of open){if(wfAssign(n,'jill'))return}}
 /* Jill's share of the kitchen (jillWorkload, the kitchen tab's badge): work no cook here can take */
@@ -9109,22 +9131,23 @@ function drawBurner(c,cx,gy,sc,active,now){c.fillStyle='#17191A';el(c,cx,gy,22*s
 function drawEspresso(c,x,y,w,h,now,nos){const slim=w<28;let b2=c.createLinearGradient(x,0,x+w,0);b2.addColorStop(0,'#9E7026');b2.addColorStop(.5,'#EFCB80');b2.addColorStop(1,'#95691F');c.fillStyle='rgba(0,0,0,.16)';rr(c,x+2,y+3,w,h,4);c.fill();c.fillStyle=b2;rr(c,x,y,w,h*.62,slim?4:5);c.fill();c.fillStyle='#2A2A2A';rr(c,x+3,y+h*.62,w-6,6,2);c.fill();c.fillStyle='#8FD3F4';if(slim){circ(c,x+6,y+9,1.8);circ(c,x+w-6,y+9,1.8)}else{circ(c,x+8,y+9,2);circ(c,x+w/2,y+9,2);circ(c,x+w-8,y+9,2)}c.fillStyle='#555';if(slim){c.fillRect(x+4,y+h*.62+6,3.4,6);c.fillRect(x+w-7.4,y+h*.62+6,3.4,6)}else{c.fillRect(x+9,y+h*.62+6,4,6);if(h>36)c.fillRect(x+w-13,y+h*.62+6,4,6)}c.fillStyle='#3A3F42';rr(c,x+2,y+h-6,w-4,6,2);c.fill();c.strokeStyle='#C9D0D3';c.lineWidth=1.6;c.beginPath();c.moveTo(x+w-3,y+h*.5);c.lineTo(x+w+(slim?3:4),y+h*.75);c.stroke();
  const on=R&&R.slots.some(s0=>s0.type==='bar'&&(s0.job||s0.wf)&&(!nos||nos.includes(s0.no)));if(on){c.fillStyle=`rgba(120,255,140,${.6+Math.sin(now*8)*.3})`;circ(c,x+w/2,y+9,slim?1.8:2)}}   /* nos: the cups this machine serves (kitchen II has two machines) */
 function drawHeatLamps(c,now){const y=KY.rail;const big=projOn('pass');const x0=big?76:92,x1=big?324:308;c.fillStyle='#2A2A2A';c.fillRect(x0,y,x1-x0,2.6);for(const x of[x0,x1]){c.fillRect(x-1.2,y-20,2.4,20)}
- for(const x of big?[110,170,230,290]:[132,200,268]){c.fillStyle='#2A2A2A';c.fillRect(x-.8,y+2,1.6,8);c.fillStyle='#B8536A';c.beginPath();c.moveTo(x-11,y+22);c.lineTo(x+11,y+22);c.lineTo(x+6,y+10);c.lineTo(x-6,y+10);c.closePath();c.fill();c.fillStyle='#8A3A4A';c.fillRect(x-11,y+21,22,1.5);c.fillStyle=`rgba(255,214,120,${.8+Math.sin(now*3+x)*.1})`;el(c,x,y+22.5,7,1.8);
+ for(const x of passLamps()){c.fillStyle='#2A2A2A';c.fillRect(x-.8,y+2,1.6,8);c.fillStyle='#B8536A';c.beginPath();c.moveTo(x-11,y+22);c.lineTo(x+11,y+22);c.lineTo(x+6,y+10);c.lineTo(x-6,y+10);c.closePath();c.fill();c.fillStyle='#8A3A4A';c.fillRect(x-11,y+21,22,1.5);c.fillStyle=`rgba(255,214,120,${.8+Math.sin(now*3+x)*.1})`;el(c,x,y+22.5,7,1.8);
   let g=c.createLinearGradient(0,y+24,0,KY.passTop+30);g.addColorStop(0,'rgba(255,200,110,.22)');g.addColorStop(1,'rgba(255,200,110,0)');c.fillStyle=g;c.beginPath();c.moveTo(x-9,y+24);c.lineTo(x+9,y+24);c.lineTo(x+30,KY.passTop+30);c.lineTo(x-30,KY.passTop+30);c.closePath();c.fill()}}
 /* the pass: steel top, the tickets on the rail along its back edge, the plates being finished and the ones waiting */
-function drawPass(c,now,V){const T=TH();const big=projOn('pass');const x0=big?64:80,x1=big?336:320,y=KY.passTop,h=KY.passH,f=KY.passFace;
- c.fillStyle='rgba(0,0,0,.18)';rr(c,x0+2,y+5,x1-x0,h+f+6,4);c.fill();let g=c.createLinearGradient(0,y,0,y+h);g.addColorStop(0,'#D3D7D9');g.addColorStop(1,'#AEB5B8');c.fillStyle=g;rr(c,x0,y,x1-x0,h,4);c.fill();c.fillStyle='rgba(255,255,255,.5)';rr(c,x0+2,y+1.5,x1-x0-4,2.5,1.2);c.fill();
- let fg=c.createLinearGradient(0,y+h,0,y+h+f);fg.addColorStop(0,T.c0);fg.addColorStop(1,T.c1);c.fillStyle=fg;rr(c,x0,y+h-2,x1-x0,f+2,2);c.fill();c.fillStyle='rgba(0,0,0,.2)';c.fillRect(x0,y+h+f-2,x1-x0,3);
- /* the rail with the open tickets */c.fillStyle='#3A3A3A';c.fillRect(x0+8,y-2,x1-x0-16,2);if(V.tickets){const open=V.tickets.filter(tk=>tk.items.some(it=>it.st==='pending'||it.st==='cooking'));
-  open.slice(0,9).forEach((tk,i)=>{const x=x0+14+i*22,ty=y-16;c.fillStyle='rgba(0,0,0,.15)';c.fillRect(x+1,ty+1,18,15);c.fillStyle='#FFFDF5';c.fillRect(x,ty,18,15);c.fillStyle='#8A9498';c.fillRect(x+7,ty-2,4,3);c.fillStyle='#2E2019';c.font=`800 6px ${FONT}`;c.textAlign='center';c.textBaseline='middle';c.fillText('T'+tk.no,x+9,ty+5);tk.items.slice(0,4).forEach((it,k)=>{c.fillStyle=it.st==='cooking'||it.st==='plate'?'#E6B04A':it.st==='pending'?'#E0543A':it.st==='later'||it.st==='pour'||it.st==='round'?'#B8B2A6':'#8FB07A';circ(c,x+4+k*3.6,ty+11.5,1.3)})});c.textBaseline='alphabetic'}
+function drawPass(c,now,V){const T=TH();const y=KY.passTop,h=KY.passH,f=KY.passFace;const H=passHalves();   /* 2026-10-10: two counters, the opening between them */
+ for(const [a,b] of H){c.fillStyle='rgba(0,0,0,.18)';rr(c,a+2,y+5,b-a,h+f+6,4);c.fill()}
+ for(const [a,b] of H){let g=c.createLinearGradient(0,y,0,y+h);g.addColorStop(0,'#D3D7D9');g.addColorStop(1,'#AEB5B8');c.fillStyle=g;rr(c,a,y,b-a,h,4);c.fill();c.fillStyle='rgba(255,255,255,.5)';rr(c,a+2,y+1.5,b-a-4,2.5,1.2);c.fill();
+  let fg=c.createLinearGradient(0,y+h,0,y+h+f);fg.addColorStop(0,T.c0);fg.addColorStop(1,T.c1);c.fillStyle=fg;rr(c,a,y+h-2,b-a,f+2,2);c.fill();c.fillStyle='rgba(0,0,0,.2)';c.fillRect(a,y+h+f-2,b-a,3)}
+ /* the rail with the open tickets, along each counter's back edge */c.fillStyle='#3A3A3A';for(const [a,b] of H)c.fillRect(a+6,y-2,b-a-12,2);if(V.tickets){const open=V.tickets.filter(tk=>tk.items.some(it=>it.st==='pending'||it.st==='cooking'));
+  open.slice(0,9).forEach((tk,i)=>{const x=passTicketX(i),ty=y-16;c.fillStyle='rgba(0,0,0,.15)';c.fillRect(x+1,ty+1,16,15);c.fillStyle='#FFFDF5';c.fillRect(x,ty,16,15);c.fillStyle='#8A9498';c.fillRect(x+6,ty-2,4,3);c.fillStyle='#2E2019';c.font=`800 6px ${FONT}`;c.textAlign='center';c.textBaseline='middle';c.fillText('T'+tk.no,x+8,ty+5);tk.items.slice(0,4).forEach((it,k)=>{c.fillStyle=it.st==='cooking'||it.st==='plate'?'#E6B04A':it.st==='pending'?'#E0543A':it.st==='later'||it.st==='pour'||it.st==='round'?'#B8B2A6':'#8FB07A';circ(c,x+3+k*3.4,ty+11.5,1.3)})});c.textBaseline='alphabetic'}
  /* 2.1: a step that happens on the pass itself — the sauce over the sliced duck, the baked dish out of the oven */for(const s0 of V.slots){const j=s0.job;if(!j||j.plating)continue;const sp=stepSpot(s0);if(sp.place!=='pass')continue;drawStageFood(c,s0,j,sp.x,y+16,.5,now)}
- /* plates being finished at the pass */for(const s0 of V.slots){const j=s0.job;if(!j||!j.plating)continue;const px=j.plating.x||200,py=y+14;const u=clamp(j.plating.t/j.plating.dur,0,1);const sz=24+u*10;c.globalAlpha=.55+u*.45;c.drawImage(dishCanvas(j.d,'G',64,S.decor.ware>0,j.it.want),px-sz/2,py-sz/2,sz,sz);c.globalAlpha=1;
+ /* plates being finished at the pass */for(const s0 of V.slots){const j=s0.job;if(!j||!j.plating)continue;const px=j.plating.x||WF_PASS_X[0],py=y+14;const u=clamp(j.plating.t/j.plating.dur,0,1);const sz=24+u*10;c.globalAlpha=.55+u*.45;c.drawImage(dishCanvas(j.d,'G',64,S.decor.ware>0,j.it.want),px-sz/2,py-sz/2,sz,sz);c.globalAlpha=1;
   if(u>.55){/* the garnish going on */const fin=DISH(j.d).fin;if(fin&&fin.length){const t=(u-.55)/.45;c.globalAlpha=1-t;drawIng(c,fin[0],px+8,py-16-t*10,9);c.globalAlpha=1}}
   for(let k=0;k<3;k++){const ph=(now*1.2+k*.33)%1;c.globalAlpha=(1-ph)*.5;c.fillStyle='#fff';circ(c,px-8+k*8,py-16-ph*14,2+ph*3);c.globalAlpha=1}}
  wfDrawPass(c,now,V);
  /* plates waiting under the lamps, ticket number on each, each on the spot it was set down on (2026-10-08: never sliding
     along by itself) */if(V.tickets){const ready=[];for(const tk of V.tickets)for(const it of tk.items)if(it.st==='ready'&&!it.picked&&!it.lbar&&!it.ktp&&!tk.cn&&!tk.lounge&&it.pi!=null&&it.pi<wfRowN())ready.push({tk,it});   /* rc7.7: only what is at the pass — a glass waits at the bar; a chef's night's course and a tasting night's round at the end of the bar's L */
-  ready.forEach((r0,i)=>{const x=wfRowX(r0.it.pi),py=y+22;c.fillStyle='rgba(0,0,0,.12)';el(c,x,py+14,15,3.5);c.drawImage(dishCanvas(r0.it.d,r0.it.q,64,S.decor.ware>0,r0.it.want),x-17,py-17,34,34);c.fillStyle='#FFF8EC';rr(c,x+6,py-22,14,8,2);c.fill();c.fillStyle='#2E2019';c.font=`800 5.5px ${FONT}`;c.textAlign='center';c.textBaseline='middle';c.fillText('T'+r0.tk.no,x+13,py-18);c.textBaseline='alphabetic';
+  ready.forEach((r0,i)=>{const x=wfRowX(r0.it.pi),py=y+22;c.fillStyle='rgba(0,0,0,.12)';el(c,x,py+12,12.5,3);c.drawImage(dishCanvas(r0.it.d,r0.it.q,64,S.decor.ware>0,r0.it.want),x-14,py-14,28,28);c.fillStyle='#FFF8EC';rr(c,x+4,py-20,13,8,2);c.fill();c.fillStyle='#2E2019';c.font=`800 5.5px ${FONT}`;c.textAlign='center';c.textBaseline='middle';c.fillText('T'+r0.tk.no,x+10.5,py-16);c.textBaseline='alphabetic';
    c.strokeStyle='rgba(255,255,255,.45)';c.lineWidth=1;for(let k=0;k<2;k++){const ph=(now*.8+i*.37+k*.5)%1;c.globalAlpha=(1-ph)*.6;c.beginPath();c.moveTo(x-4+k*8,py-12-ph*10);c.quadraticCurveTo(x-1+k*8,py-16-ph*10,x-4+k*8,py-20-ph*10);c.stroke();c.globalAlpha=1}})}}
 function drawKFridge(c,now,x,y,w,h){const open=(now-FRIDGE_T)<1.8;c.fillStyle='rgba(0,0,0,.16)';rr(c,x+2,y+3,w,h,3);c.fill();c.fillStyle=S.level>=4?'#4A4A4E':'#C9CDD0';rr(c,x,y,w,h,3);c.fill();let fg=c.createLinearGradient(x,0,x+w,0);fg.addColorStop(0,'#E4E6E7');fg.addColorStop(.5,'#F7F8F8');fg.addColorStop(1,'#CDD1D3');c.fillStyle=fg;rr(c,x+2,y+(open?6:2),w-4,h-6,2);c.fill();c.fillStyle='#9AA3A6';rr(c,x+w-14,y+h*.45,8,3,1);c.fill();c.fillStyle='#2A2F33';rr(c,x+w-16,y+8,10,6,1);c.fill();c.fillStyle='#8FD3F4';c.font=`800 4px ${FONT}`;c.textAlign='center';c.fillText('3°C',x+w-11,y+12.4);c.fillStyle='rgba(60,56,50,.75)';c.font=`800 6.5px ${FONT}`;c.fillText('冰箱 · 庫存',x+w/2,y+h+9);
  if(R&&menuList().some(d=>(S.stock[d]||0)<=1)){const p=(Math.sin(now*6)+1)/2;c.fillStyle='#E0543A';circ(c,x+6,y-4-p*1.5,5.5);c.fillStyle='#fff';c.font=`800 7.5px ${FONT}`;c.textAlign='center';c.textBaseline='middle';c.fillText('!',x+6,y-3.6-p*1.5);c.textBaseline='alphabetic'}}
@@ -9349,7 +9372,7 @@ function segRect(x0,y0,x1,y1,rx0,ry0,rx1,ry1){let t0=0,t1=1;const dx=x1-x0,dy=y1
    the one taking from it) leaves that one out for that walk, as everywhere (obsNext). */
 function kitchenObs(){const big=projOn('pass'),D=ddDrop(),P0=Math.max(big?64:80,D.x+4),P1=big?336:320,L0=KX.sink.x-4,L1=KX.bar.x+KX.bar.w+4,C=ddCart(),f=KR.fridge,k=KR.cooler;   /* (the longer pass stops short of the cart's drop) */
  const G=KX.gap;return[{bx0:L0,bx1:G.x0,by0:KY.feet+4,by1:KY.top+KY.h+KY.face+1},{bx0:G.x1,bx1:L1,by0:KY.feet+4,by1:KY.top+KY.h+KY.face+1},   /* (2026-10-09: the walkway between the prep counter and the range) */
-  {bx0:P0,bx1:P1,by0:KY.passFeet+2,by1:KY.passTop+KY.passH+KY.passFace+2},
+  {bx0:P0,bx1:PASS_GAP.x0,by0:KY.passFeet+2,by1:KY.passTop+KY.passH+KY.passFace+2},{bx0:PASS_GAP.x1,bx1:P1,by0:KY.passFeet+2,by1:KY.passTop+KY.passH+KY.passFace+2},   /* (2026-10-10: the opening in the middle of the pass) */
   {bx0:C.x-16,bx1:C.x+16,by0:C.y-30,by1:C.y+1},{bx0:48,bx1:92,by0:KY.passTop+62,by1:KY.passTop+114},{bx0:318,bx1:346,by0:KY.passTop+68,by1:KY.passTop+108},
   {bx0:f.x,bx1:f.x+f.w,by0:f.y+f.h-26,by1:f.y+f.h},{bx0:k.x,bx1:k.x+k.w,by0:k.y+k.h-26,by1:k.y+k.h}]}
 function roomObs(rm){if(rm==='kitchen')return kitchenObs();if(rm==='up'){const st=UP_L.stair;const L=[{bx0:st.x+4,bx1:st.x+st.w+4,by0:st.y-6,by1:st.y+st.h+4}];   /* the stair well (its left end is the way in) */if(srBuilt()||srBuilding()){const B=UPR.sr;L.push({bx0:B.x0-4,bx1:B.x1+UPRW.sd+4,by0:B.y0-4,by1:B.y1+3})}if(pdBuilt()||pdBuilding()){const B=UPR.pd;L.push({bx0:B.x0-4,bx1:B.x1+UPRW.sd+4,by0:B.y0,by1:B.y1+3})}return L}if(rm==='pdr'&&pdBuilt()){const G=pdGeo();return{bx0:G.x-G.hw-34,bx1:G.x+G.hw+34,by0:G.y0-16,by1:G.y1+6}}if(rm==='staff'&&srBuilt())return srObs();if(rm==='lounge'&&LG.leg){/* rc7.6: the L and its two stools, and the counter (from behind it, the counter is not in the way: a start inside is ignored) */const Lg=LG.leg,b=LG.bar;return[{bx0:Lg.x0-32,bx1:Lg.x1+4,by0:Lg.y0-6,by1:b.y+40},{bx0:Lg.x0,bx1:b.x1+4,by0:b.y-16,by1:b.y+40}]}return null}
@@ -11658,7 +11681,7 @@ function tapStation(i){const s=R.slots[i];if(!s)return;audioInit();if(s.broken){
    checkpoint writes it into the save as plain data (references become indices), and restoreService()
    builds a new R from it. Anything that does not resolve throws, and the caller falls back to
    reopening at the same clock with today's numbers kept — and says so. */
-const CP_KEYS=['dd','t','dur','si','closed','log','cds','treatT','musicT','blackout','combo','maxCombo','streak','fire','fireCount','tv','gid','tkid','st','rush','rushT0','rushT1','rushShown','weather','event','coach','taskDone','lastSpawn','idleT','focus','sched','inc','noticeT','catCheck','cpT','tasting'];   /* v2.3: the tasting night survives a checkpoint */
+const CP_KEYS=['dd','t','dur','si','closed','log','cds','treatT','musicT','blackout','combo','maxCombo','streak','fire','fireCount','frun','fireDone','tv','gid','tkid','st','rush','rushT0','rushT1','rushShown','weather','event','coach','taskDone','lastSpawn','idleT','focus','sched','inc','noticeT','catCheck','cpT','tasting'];   /* v2.3: the tasting night survives a checkpoint */
 const G_STATES=['arrive','queue','toTable','reading','order','wait','eat','check','leave','toPiano','piano','toHost','host'];   /* rc8.3: 予安 at the piano, Ken behind the bar — a save made then used to throw the whole room away */
 function snapshotService(){if(!R||phase!=='service'||R.closing!=null||R.ended)return null;
  const ti=t=>t?R.tickets.indexOf(t):-1;
@@ -11669,7 +11692,7 @@ function snapshotService(){if(!R||phase!=='service'||R.closing!=null||R.ended)re
  const slots=R.slots.map(s0=>{const o={broken:!!s0.broken,fix:s0.fix||0,job:null};if(s0.job){const j=s0.job;const jo={};for(const k in j)if(k!=='tk'&&k!=='it')jo[k]=j[k];jo.tk=ti(j.tk);jo.it=ir(j.it);o.job=jo}return o});
  const J=R.jill;const jill={};for(const k in J)if(!['carry','hands','cur','pet','lookAt','rest','restPos','sofa','visit','__op'].includes(k))jill[k]=J[k];jill.hands=handsSnap(J.hands,ti,ir);jill.cur=J.cur?Object.assign({},J.cur):null;
  const cw={};for(const id in R.cw||{}){const w=R.cw[id];const o={};for(const k in w)if(k!=='task'&&k!=='carry'&&k!=='hands'&&k!=='__op')o[k]=w[k];   /* a walker's worked-out way round the furniture (__op) is not kept */o.task=w.task?Object.assign({},w.task,{g:gi2(w.task.g),t:w.task.t?w.task.t.i:-1,tk:ti(w.task.tk)},w.task.tks?{tks:w.task.tks.map(ti),stops:(w.task.stops||[]).map(ti)}:{}):null;o.hands=handsSnap(w.hands,ti,ir);cw[id]=o}
- const tables=R.tables.map(t=>({spot:t.spot,group:gi2(t.group),dirty:!!t.dirty,plates:(t.plates||[]).map(p=>Object.assign({},p)),busT:t.busT||0,claim:t.claim==='xq'?null:(t.claim||null),tst:t.tst||0,cnr:t.cnr||0}));
+ const tables=R.tables.map(t=>({spot:t.spot,group:gi2(t.group),dirty:!!t.dirty,plates:(t.plates||[]).map(p=>Object.assign({},p)),busT:t.busT||0,claim:t.claim==='xq'&&R.xqh?null:(t.claim||null),tst:t.tst||0,cnr:t.cnr||0}));
  const misc={};for(const k of CP_KEYS)if(k in R)misc[k]=R[k];if(misc.dd&&R.xqh){const d=JSON.parse(JSON.stringify(misc.dd));for(const e of R.xqh.hands||[])if(e.k==='dirty')d.n.push(e.v);if(d.wash2&&d.wash2.who==='xq')d.wash2=null;if(d.wash&&d.wash.who==='xq'){d.wash=d.wash2||null;d.wash2=null}misc.dd=d}misc.nights=nightsSnap();
  /* v2.5: the new kitchen's work — its portions as ticket item refs, its places as slot indices (the pass's own apart) */
  const sref=s0=>!s0?null:s0.type==='pass'?['p',(R.pss||[]).indexOf(s0)]:['s',R.slots.indexOf(s0)];
@@ -11701,7 +11724,7 @@ function restoreService(cp){const snap=cp.snap;if(!snap||cp.day!==S.day)throw ne
  lifeReset();streetReset();dylanStageCheck();bg=null;lastEv=null;const dur=snap.misc.dur||dayDur(S.day);
  const N={t:0,dur,tables:buildTables(),slots:buildSlots(),groups:[],tickets:[],sched:[],si:0,closed:false,ended:false,
   jill:{x:PASS.x,y:PASS.y,tx:null,ty:null,q:[],qAt:{},wq:[],cur:null,busy:0,hands:[],idle:0,face:1,step:0,room:'main',troom:'main',bk:1},
-  combo:0,maxCombo:0,streak:0,fire:0,fireCount:0,floats:[],parts:[],tv:1,gid:1,tkid:1,
+  combo:0,maxCombo:0,streak:0,fire:0,fireCount:0,frun:0,fireDone:0,floats:[],parts:[],tv:1,gid:1,tkid:1,
   st:{rev:0,tips:0,guests:0,groups:0,perfect:0,q:{P:0,G:0,O:0,B:0},sats:[],dish:{},angry:0,lost:0,reviews:[],critic:null,blogger:null,treats:0,jtreats:0,ptreats:0},
   rush:feat().rush,rushT0:dur*120/270,rushT1:dur*180/270,rushShown:false,weather:S.today&&S.today.weather,event:S.today&&S.today.event,coach:-1,taskDone:{},lastSpawn:0,idleT:0,focus:0,focusLock:0,holdSlot:null,inc:[],cw:{},thief:null,insp:null,chaser:null};
  const sx=slotMapOf(N.slots,snap);if(!sx)throw new Error('kitchen changed');   /* the checkpoint's places → today's (2026-10-09: the coffee bar's count can differ from an older version's) */
@@ -12193,7 +12216,10 @@ function jillArrive(L,a){const tv=LIFE.tv;
  else if(a==='bed'){const b=bedSeat();L.bed=true;L.x=b.x;L.y=b.y;L.face=1;L.act='settle';L.t=rand(1.5,3);L.sinceSit=0;if(!L.counted){L.counted=true;S.life=S.life||{};S.life.bed=(S.life.bed||0)+1}}
  else if(a==='wrap'){L.act='wrap'}
  else if(a==='peek'){if(!homeDylanAtDesk()){L.act='toSofa';return}L.act='peeking';L.face=1;L.t=roomTalk(L,pick(ROOM_LINES.peek))+.6}
- else if(a==='atHim'){const D=LIFE.dylan;if(!D||S.dylan.stage!==2){L.act='toSofa';return}L.act='reveal';L.revealT=5.6;L.face=D.x>=L.x?1:-1;D.state='reveal';D.face=L.x>=D.x?1:-1;doReveal()}}
+ else if(a==='atHim'){const D=LIFE.dylan;if(!D||S.dylan.stage!==2){if(D)D.waitJ=0;L.act='toSofa';return}
+  if(Math.hypot(L.x-D.x,L.y-D.y)>REVEAL_NEAR&&(L.himTries||0)<4){L.himTries=(L.himTries||0)+1;jillWalk(L,clamp(D.x+(D.x<200?24:-24),40,360),clamp(D.y+6,150,FB-6),'atHim',D.room||'main');return}   /* 2026-10-10: not beside him yet (he had a few steps left when she set off): on to where he is now */
+  if(Math.hypot(L.x-D.x,L.y-D.y)>REVEAL_NEAR){D.waitJ=0;L.act='toSofa';return}   /* (never from across the room) */
+  D.waitJ=0;L.act='reveal';L.revealT=5.6;L.face=D.x>=L.x?1:-1;D.state='reveal';D.face=L.x>=D.x?1:-1;doReveal()}}
 function jillDecide(L){const tv=LIFE.tv,D=LIFE.dylan;const W=[];const add=(k,w)=>{if(w>0)W.push([k,w])};const prev=L.act;
  add('read',L.last==='read'?2:4);add('idle',L.last==='idle'?1.2:2.4);
  const lap=CATS.some(c=>c.sofa&&c.sofa.kind==='lap');const tvOk=tvUsable()&&!(tv.at!=='use'&&lap&&!(D&&!D.onSofa&&S.dylan.stage>=1));
@@ -12201,7 +12227,7 @@ function jillDecide(L){const tv=LIFE.tv,D=LIFE.dylan;const W=[];const add=(k,w)=
  roomActWeights(L,W,'sofa');   /* rc8: her room's other evenings */
  if(revealDue()&&L.on&&L.sinceSit>3){W.length=0;add('callHim',1)}
  const k=wpick(W,o=>o[1])[0];if(prev==='game')roomGameEnd(L);L.last=k;L.act=k;
- if(k==='callHim'){/* rc7.3: up from the sofa, out through the kitchen, to his table */for(const c of sofaCats())if(c.sofa.kind==='lap'||c.sofa.kind==='lean')leaveSofa(c);const D=LIFE.dylan;L.on=false;L.reserved=false;L.pos=null;L.legs=0;L.legTarget=0;L.act='standing';L.y=SOFA.front+10;jillWalk(L,clamp(D.x+(D.x<200?24:-24),40,360),clamp(D.y+6,150,FB-6),'atHim','main');return}
+ if(k==='callHim'){/* rc7.3: up from the sofa, out through the kitchen, to his table */for(const c of sofaCats())if(c.sofa.kind==='lap'||c.sofa.kind==='lean')leaveSofa(c);const D=LIFE.dylan;L.on=false;L.reserved=false;L.pos=null;L.legs=0;L.legTarget=0;L.act='standing';L.y=SOFA.front+10;D.waitJ=1;L.himTries=0;jillWalk(L,clamp(D.x+(D.x<200?24:-24),40,360),clamp(D.y+6,150,FB-6),'atHim','main');return}   /* 2026-10-10: he stays where he is until she is there (dylanUpd) */
  if(k==='read'){L.t=rand(25,75);L.flipT=rand(4,10)}else if(k==='idle')L.t=rand(10,40);
  else if(k==='tv'){if(tv.at==='use'&&!tv.mover){tv.on=true;L.t=rand(30,90);S.life.tv=(S.life.tv||0)+1;tvNoticed()}else{L.act='wantTV';L.t=rand(2,6)}}
  else if(k==='peek'){/* up, round to his chair, a look at his screen, back */for(const c of sofaCats())if(c.sofa.kind==='lap'||c.sofa.kind==='lean')leaveSofa(c);L.act='fetch';L.fetch='legsIn';L.fetchTo='peek';L.t=0;roomCD(L,'peek',120)}
@@ -12286,6 +12312,7 @@ function dylanUpd(dt){const D=LIFE.dylan;if(!D)return;D.t-=dt;D.since+=dt;const 
  if(D.walking&&(D.troom||D.room||'main')!==(D.room||'main')){/* rc7.3: home through the kitchen */D.step+=dt*11;D.moving=true;if(stepTo(D,80*dt)){D.walking=false;D.moving=false;dylanArrive(D)}return}
  if(D.walking){const tx=D.via?D.via.x:D.tx,ty=D.via?D.via.y:D.ty;const dx=tx-D.x,dy=ty-D.y,d=Math.hypot(dx,dy),v=80*dt;
   if(d<=v){D.x=tx;D.y=ty;if(D.via)D.via=null;else{D.walking=false;D.moving=false;dylanArrive(D)}}else{D.x+=dx/d*v;D.y+=dy/d*v;D.face=dx>=0?1:-1;D.step+=dt*11;D.moving=true}return}
+ if(D.waitJ&&st===2&&D.state!=='reveal'){D.moving=false;if(J.walking||J.after==='atHim'||J.act==='standing')return;D.waitJ=0}   /* 2026-10-10 (the user: 「Jill 說出「老公」前，必須先走到 Dylan 桌旁的合理距離」): she is on her way to him — he waits where he is (a walk under way ends first) */
  switch(D.state){
  case'linger':{if(!R||R.closing!=null){D.state='think';D.t=rand(.4,1.5);D.since=0;break}
   const t=R&&R.tables[D.table];if(t&&t.group){/* his table is needed again: he gives it up and waits by the door */D.seated=false;dylanWalk(D,rand(66,84),rand(156,186),'stand');break}
@@ -12352,6 +12379,7 @@ function dylanDecide(D){const st=S.dylan.stage;const J=LIFE.jill;const tv=LIFE.t
 /* rc7.3: the reveal is in the dining room — he is still at his table after closing; she comes out of their room to him:
    「老公。」「嗯。」, then 「老公，走了。」「好。」 and the two of them go through the kitchen to their room (the words of v1,
    where they now mean what they say) */
+const REVEAL_NEAR=36;   /* 2026-10-10: how close she is when she says it — beside his table (she sets off for 24 px to his side) */
 function revealDue(){const D=LIFE.dylan;return S.dylan.stage===2&&LIFE.revealRoll===1&&!!D&&(D.room||'main')==='main'&&!D.walking&&['linger','sitTable','stand','think','crouch'].includes(D.state)&&!upSearching()}
 function doReveal(){const d=S.dylan;if(d.stage>=3)return;d.stage=3;d.reveal=S.day;ach('husband');save();const D=LIFE.dylan,J=LIFE.jill;if(D&&J){say('j',J.x,J.y-50,'老公。');say('d',D.x,D.y-(D.seated?40:48),'嗯。',1.4)}setTimeout(()=>{if(S.dylan.stage>=3)scene([{who:'jill',tone:'gentle',text:'老公，走了。'},{who:'dylan',tone:'gentle',text:'好。'}])},3200);memo('husband',J&&D?(J.x+D.x)/2:200,J&&D?Math.min(J.y,D.y)-8:200,{subj:[{x:J.x,y:J.y},{x:D?D.x:J.x,y:D?D.y:J.y}],room:(J&&J.room)||'main'})}
 function say(who,x,y,txt,delay,rm){const o=who==='j'?LIFE.jill:LIFE.dylan;LIFE.say.push({who,x,y,txt,t:-(delay||0),life:2.6,room:rm||(o&&o.room)||'main'});logLine(who==='j'?'Jill':'Dylan',txt,who==='j'?'j':'d')}
@@ -12424,7 +12452,7 @@ function poolCrew(p){return(S.crew||[]).filter(m=>crewPool(m)===p)}
    then 小茉, Marco, 小林師傅, 秀琴阿姨 and 阿珠姐, then the works' Kai, Nina, Hugo, 阿哲, 小彤, 阿勇, and 廚房二期's Momo
    and 小威), so none of their saves is over any number; level by level they add up to what the one number used to be. */
 const CAP_ROLES=['chef','waiter','cleaner'];
-const CAP_LEVEL=[{chef:1,waiter:0,cleaner:0},{chef:1,waiter:1,cleaner:0},{chef:2,waiter:1,cleaner:0},{chef:3,waiter:1,cleaner:0},{chef:4,waiter:1,cleaner:1}];
+const CAP_LEVEL=[{chef:1,waiter:1,cleaner:0},{chef:1,waiter:1,cleaner:0},{chef:2,waiter:1,cleaner:0},{chef:3,waiter:1,cleaner:0},{chef:4,waiter:1,cleaner:1}];
 function capSources(){return[
  {k:'room',n:'後場整理區',w:'營運升級',on:opsLv('room')>0,add:{chef:1,waiter:1}},
  {k:'side',n:'側廳',w:'工程',on:projOn('side'),add:{waiter:2}},
@@ -12436,7 +12464,8 @@ function capSources(){return[
 function roleCapAt(r,lv){return(CAP_LEVEL[Math.max(0,Math.min(CAP_LEVEL.length,lv||1)-1)]||{})[r]||0}
 function roleCap(r){return capSources().reduce((a,s)=>a+(s.on?(s.add[r]||0):0),roleCapAt(r,S.level))}
 function restaurantCap(){return CAP_ROLES.reduce((a,r)=>a+roleCap(r),0)}   /* the three added up — for the summary lines; hiring goes by roleCap */
-function roleCrew(r){return poolCrew('restaurant').filter(m=>m.role===r)}
+function hireFee(r){const R0=ROLES[r];return R0?Math.round(R0.hire*(S.level<=1&&!R0.lounge?.5:1)):0}   /* (2026-10-10: a level-1 restaurant signs for half) */
+function roleCrew(r){return poolCrew('restaurant').filter(m=>m.role===r&&!m.core)}   /* (2026-10-10: 秀琴阿姨 takes no place) */
 /* where more places for this role would come from: the next expansion that adds one, and the works not built yet
    (the pizza oven once there is a Lounge, the private room once the second floor is Jill's) */
 function capMoreFor(r){const out=[];for(let lv=S.level+1;lv<=CAP_LEVEL.length;lv++)if(roleCapAt(r,lv)>roleCapAt(r,S.level)){out.push(`擴建到「${LEVELS[lv-1].n}」`);break}
@@ -12661,6 +12690,7 @@ function ddSink2(){return{x:KX.sink.x+KX.sink.w+4,y:KY.feet}}   /* (on the left 
 function ddWashOf(id){const D=ddS();return D.wash&&D.wash.who===id?D.wash:D.wash2&&D.wash2.who===id?D.wash2:null}
 function ddSinkOf(id){const W=ddWashOf(id);return W&&W.spot===1?ddSink2():ddSink()}
 function ddWashers(){const D=ddS();return[D.wash,D.wash2].filter(Boolean)}
+function ddWasher(){const W=ddS().wash;return W?W.who:null}   /* who is at the first place (the tests read it) */
 /* Jill with dishes in hand: the next table she was sent to is another one to clear (and they fit) — that one first */
 function ddChainJ(J){const t=R.tables[J.q[0]];return !!t&&!t.group&&t.dirty&&ddUnits(t)>0&&handsN(J,'dirty')<carryCap('jill')&&ddFree()>0}
 function ddDumpTask(){const d=ddDrop();return{k:'dump',x:d.x,y:d.y,room:'kitchen',dur:.35}}
@@ -12683,8 +12713,7 @@ function ddNextAfter(me,w,t0){w.ddN=(w.ddN||0)+1;if(handsN(w,'dirty')<carryCap(m
 const WASH_T={cleaner:[2,1.8,1.6,1.4,1.2],waiter:[2.4,2.2,2,1.8,1.6]};
 /* the 商用洗碗機: the one at the sink loads it and takes the clean ones out — each in half the time */
 function washT(id){return washT0(id)*(opsLv('dish')?.5:1)}
-function washT0(id){if(id==='jill')return 1.8;if(id==='xq')return 2;const m=(S.crew||[]).find(q=>q.id===id);if(!m)return 2;const L=WASH_T[m.role]||WASH_T.cleaner;return L[clamp(Math.round(m.lv||1),1,5)-1]}
-function ddWasher(){const W=ddS().wash;return W?W.who:null}
+function washT0(id){if(id==='jill')return 1.8;const m=(S.crew||[]).find(q=>q.id===id);if(!m)return 2;const L=WASH_T[m.role]||WASH_T.cleaner;return L[clamp(Math.round(m.lv||1),1,5)-1]}
 function ddWho(id){return id==='jill'?'Jill':id==='xq'?'秀琴阿姨':((S.crew||[]).find(m=>m.id===id)||{}).name||''}
 function ddStartWash(id){const D=ddS();if(ddWashOf(id))return;if(!D.wash)D.wash={who:id,ph:'take',t:0,spot:0};else if(!D.wash2)D.wash2={who:id,ph:'take',t:0,spot:D.wash.spot===1?0:1};else return;if(R.st)ddStat('start',ddCount());R.tv++}
 function ddAtSink(w){if(!w||(w.room||'kitchen')!=='kitchen')return false;for(const Sk of[ddSink(),ddSink2()])if(Math.hypot(w.x-Sk.x,w.y-Sk.y)<3)return true;return false}
@@ -12727,7 +12756,7 @@ function ddWashCalled(me,w){if(me.role==='waiter')return ddCount()<=5||ddWaiterH
    did not change the evenings — and 「如果 AI 每次 2/10 Dirty Dish 就開始洗，玩家永遠看不到 bottleneck」.) */
 const DD_CLEANER_AT=6,DD_FIRST_AT=8,DD_WAITER_AT=8;
 function ddWashNow(me,early){const D=ddS();if(!D.n.length||ddWashOf(me.id))return false;const n=ddCount();
- if(D.wash)return !early&&me.role==='cleaner'&&me.id!=='xq'&&!D.wash2&&n>=DD_CLEANER_AT;   /* a second cleaner beside the one washing: only with no table they can clear (none dirty, or the cart has no room for what is on them) */
+ if(D.wash)return !early&&me.role==='cleaner'&&!me.helper&&!D.wash2&&n>=DD_CLEANER_AT;   /* a second cleaner beside the one washing: only with no table they can clear (none dirty, or the cart has no room for what is on them) */
  if(me.role==='waiter')return n>=DD_WAITER_AT;return n>=(early?DD_FIRST_AT:DD_CLEANER_AT)}
 /* the player taps the cart or the sink: someone who can wash goes (a cleaner first, 秀琴阿姨, a waiter, then Jill herself) */
 function ddPickWasher(){const cand=[];for(const m of S.crew||[]){if((m.role!=='cleaner'&&m.role!=='waiter')||!crewHere(m)||crewPool(m)==='lounge')continue;const w=R.cw&&R.cw[m.id];if(!w||w.arriving)continue;cand.push({id:m.id,w,r:(m.role==='cleaner'?0:2)+(w.task?1:0)})}
@@ -12743,7 +12772,7 @@ function ddHit(p){const c=ddCart();if(p.x>=c.x-20&&p.x<=c.x+20&&p.y>=c.y-38&&p.y
 /* the evening's numbers for the simulation (R.st.dd, kept with the day): dishes in, washed (by whom), the most at once, the
    seconds full and how many times it filled, the table-seconds a table waited for room, the seconds of washing by role */
 function ddStat(k,n,who){const s=R.st.dd||(R.st.dd={in:0,wash:0,by:{},peak:0,full:0,fulls:0,occ:0,t:0,blockT:0,washT:{}});if(k==='in')s.in+=n;if(k==='start'){s.starts=(s.starts||0)+1;s.startN=(s.startN||0)+n}if(k==='wash'){s.wash+=n;const r=ddRole(who);s.by[r]=(s.by[r]||0)+n}}
-function ddRole(id){return id==='jill'?'jill':id==='xq'?'xq':((S.crew||[]).find(m=>m.id===id)||{}).role||'?'}
+function ddRole(id){return id==='jill'?'jill':((S.crew||[]).find(m=>m.id===id)||{}).role||(id==='xq'?'xq':'?')}
 function ddSample(dt){if(!R||!R.st)return;ddStat('in',0);const s=R.st.dd;const n=ddCount();s.t+=dt;s.occ+=n*dt;if(n>s.peak)s.peak=n;const full=n>=ddCap();if(full){s.full+=dt;if(!R.ddFull)s.fulls++}R.ddFull=full;
  if(ddFree()<=0)for(const t of R.tables)if(t.dirty&&!t.group&&ddUnits(t))s.blockT+=dt;
  const W=ddS().wash;if(W&&W.on){const r=ddRole(W.who);s.washT[r]=(s.washT[r]||0)+dt;W.on=0}}
@@ -12788,7 +12817,7 @@ function ddDrawLabel(c){if(!R||room!=='kitchen')return;const D=ddS(),cap=ddCap()
  c.font=`800 6.5px ${FONT}`;c.textAlign='left';c.textBaseline='middle';c.lineWidth=2.4;c.strokeStyle='rgba(255,250,240,.88)';
  const l1=`髒餐具 ${n}/${cap}`,l2=D.wash?`洗滌 · ${ddWashers().map(W=>ddWho(W.who)+(ddWasherAt(W)?'':' 前往中')).join('、')}`:n>=cap?'滿了':'';
  c.strokeText(l1,x,y);c.fillStyle=n>=cap?'#9A4A2E':'rgba(60,44,34,.88)';c.fillText(l1,x,y);if(l2){c.font=`700 6px ${FONT}`;c.strokeText(l2,x,y+8);c.fillStyle=l2==='滿了'?'#9A4A2E':'rgba(60,44,34,.8)';c.fillText(l2,x,y+8)}}
-function ddWasherAt(W){W=W||ddS().wash;if(!W)return false;const w=W.who==='jill'?R.jill:W.who==='xq'?R.xqh:R.cw&&R.cw[W.who];if(!w||(w.room||'kitchen')!=='kitchen')return false;const Sk=W.spot===1?ddSink2():ddSink();return Math.hypot(w.x-Sk.x,w.y-Sk.y)<3}
+function ddWasherAt(W){W=W||ddS().wash;if(!W)return false;const w=W.who==='jill'?R.jill:(R.cw&&R.cw[W.who])||(W.who==='xq'?R.xqh:null);if(!w||(w.room||'kitchen')!=='kitchen')return false;const Sk=W.spot===1?ddSink2():ddSink();return Math.hypot(w.x-Sk.x,w.y-Sk.y)<3}
 /* audit W3-05, WS2-02: the waiters with nothing to do each have their own place by the door — they used to stand on one
    point, six or seven people and one name tag on top of each other */
 const WAIT_POSTS=[[84,150],[58,152],[84,128],[58,130],[32,150],[110,128],[32,128]];
@@ -13013,7 +13042,7 @@ function guideLines(t){const out=[];let d=0,cur='';for(const ch of t){cur+=ch;if
 const GUIDE=[   /* the manual describes the game as it is. Audited every release (docs/RELEASE_CHECKLIST.md) — in progress, not released: v2.5 料理 (feature/cooking-gameplay), 2026-10-09 (髒盤子: two cleaners wash together — the release gate's washing fix; 房間 says 「租下後／蓋好後」 to make the room; 營業中 › Jill 只有一個: one Jill, one place at a time, in the order asked — the user's decision #8; to stay within the 4,000 characters the manual test keeps (「店主手冊也太冗長吧」), the kitchen's own lines said shorter — the flow line's gloss, 員工's pointer to the staff page, 飲料 and 髒盤子 in fewer words, nothing a player needs taken out; 營業中 › 飲料: every cup its own; how many at once is the coffee machine's, 1 → 2 → 4), 2026-10-08 (the new kitchen: 一天怎麼玩 › 營業中 says how a dish goes now — the ticket's dish, the lit place, the flow in small type, a done step waits, and when it is to be plated the dish itself is lit (2026-10-08: plating happens where the food is) — instead of the old station panel; 員工 says a cook takes only the places he knows, and — Workflow B, 2026-10-08 — that a waiter carries two plates and more, to more tables, as he grows; and a point of its own, 髒盤子: the dishes go back to the cart by the sink, ten at most, tap it for washing) — last: v2.4 rc8.8, 2026-10-07 (the room's lit tab says whose it is once Dylan is out and his name is over him there; 怎麼進去 already says only 「房間分頁的最後一個」 and the tab list gives the short names: checked, no line changed) — before: v2.4 rc8.7, 2026-10-07 (story first: the Lounge's people — 沈晴、阿拓 from Lounge I, 安安、許葳 with II; no level, rating or Lounge II for the Lounge, the piano, 予安 or the floor, and the manual names none; checked, that one line changed) — before: v2.4 rc8.6, 2026-10-07 (the stock rule as the game plays it: from Day 3 a dish with nothing in the fridge cannot be ordered; Jill orders one herself only on the first two days); the rewrite of 2026-10-06 from docs/audit/2026-10-06/ws5_manual.md: the first card is how a day is played; only what the screen does not tell and a player needs to know stays (what the screen already says, how the game was built, old saves and stories still to come left it); a space, and a story's own entry, comes into it when it is there */
  {ic:"🍳",h:"一天怎麼玩",sum:"第一次玩，先看這一張。",pts:[
   ["一天","開店前選今天的菜單、備料 → 17:00 開店 → 21:30 打烊，客人吃完就結算 → 用今天賺的錢在商店買東西 → 準備下一天。前兩天開店時，遊戲會自動幫你補好備料（照價付）。"],
-  ["髒盤子","收桌的盤子、杯子放進水槽前的髒盤車（10 個，大髒盤車 20 個）。車滿了，吃完的桌子要等：點髒盤車就有人去洗。清潔員、秀琴阿姨會自己洗，兩位清潔員一起洗；服務生快滿了才洗。"],
+  ["髒盤子","收桌的盤子、杯子放進水槽前的髒盤車（10 個，大髒盤車 20 個）。車滿了，吃完的桌子要等：點髒盤車就有人去洗。清潔員會自己洗，兩位一起洗；服務生快滿了才洗。"],
   ["營業中","客人會自己找空桌坐。桌上出現紅色「!」：點桌子點餐。到廚房點訂單上的菜，下一步的位置會亮，點那裡 Jill 就去做；裝盤、送飲料時亮的是它本身。菜下的小字是流程和誰在做；做好的一站在原地等，不會壞。銀色餐蓋：點桌子上菜。金幣：點桌子收錢；客人走了再點一次收桌。"],
   ["員工","請了廚師、服務生、清潔員，他們會自己接工作；廚師只接自己會的位置。廚師還在走過去時，點他要去的位置就換 Jill 做。服務生等級越高，一趟端越多盤、送越多桌。Jill 有空時會回房間坐一下，你點桌子她就回來。"],
   ["故事","重要的故事發生時，店裡會整個停住；一句一句點著看完，店才接著營業。錯過的都在「餐廳日誌」。"],
@@ -13039,12 +13068,12 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
   ["工作站沒人","菜單需要的工作站今天沒人顧，開店前會提醒；在商店「員工」最上面的「工作分配」調整。"],
  ]},
  {ic:"🛒",h:"打烊以後",sum:"結算、商店，店怎麼長大。",pts:[
-  ["商店分頁","一開始只有「家具與佈置」：第 2 天多廚房設備、菜單研發；第 3 天店舖工程；第 4 天貓咪生活、員工；第 6 天社群與宣傳；第 7 天招牌菜。灰色的分頁點了會說哪天開。"],
+  ["商店分頁","一開始有「家具與佈置」、「員工」：第 2 天多廚房設備、菜單研發；第 3 天店舖工程；第 4 天貓咪生活；第 6 天社群與宣傳；第 7 天招牌菜。灰色的分頁點了會說哪天開。"],
   ["擴建","在「店舖工程」：Jill's Bistro（第 4 天打烊後，$5,000）→ Jill's Restaurant（評分 3.9，$16,000）→ Jill's Fine Dining（4.3，$40,000）→ JILL（4.6，$90,000）。每擴建一次，桌位、菜單、員工名額都會多。"],
   ["員工","請了就是店裡的人，沒有解雇。<b>餐廳員工</b>分成廚師、服務生、清潔員，各有自己的名額，不能互相借；擴建或工程多哪一種，卡片上寫著。<b>Lounge 名單</b>另外算，跟餐廳員工互不佔用。"],
   ["廚師","LV1 只做簡單的菜，LV3 起會接手 Jill 做到一半的菜，LV5 才做招牌菜和招牌甜點。"],
   ["晚點到","員工偶爾會晚點到，或請一天假（開店時會說）；沒到的那段時間，他的工作沒人做，日薪照付。"],
-  ["清潔員","請第一位清潔員就是請秀琴阿姨。"],
+  ["清潔員","秀琴阿姨開店就是清潔員，不占名額。"],
   ["租金","每天付，跟店的大小走；新的空間各有自己的一份，結算會一項一項列出來。"],
   ["錢不夠的時候","收銀機不會變成負的。開店頭十天，打烊時付完開銷剩不到 $300，秀琴阿姨會借你 $3,000；結算時錢超過 $20,000 就會還她。"],
   ["招牌菜","第 7 天起、擴建到 Jill's Bistro 以後可以研發（$3,000）：永遠在菜單最上方，客人會專程為它來。賣得越多，盤子越講究，價格也高一點。"],
@@ -13366,7 +13395,7 @@ function showSummary(){phase='summary';mainScreen='summary';const s=S.lastSummar
   <div class="footer"><button class="btn primary big" data-act="toShop">晚上升級餐廳</button></div></div>`);if(s.net>0)sfx.cash()}
 /* audit WS1-09 (2026-10-06): each on the evening the shop really opens it (shopTabs: decor, expansion and staff from evening 4,
    the signature from evening 7) — it said each a day late */
-function nextDayNote(D){return{2:'解鎖 <b>拿鐵咖啡</b>',3:'第二口 <b>爐子</b> 到貨，還有 <b>番茄義大利麵</b>',4:'冷盤台與 <b>田園沙拉</b>，以及第一次 <b>Rush Hour</b>；晚上可以開始 <b>裝潢與擴建</b>，也可以聘請 <b>員工</b>',6:'評論家可能出現',7:'晚上可以研發 <b>Jill 的招牌菜</b>'}[D]||''}
+function nextDayNote(D){return{2:'解鎖 <b>拿鐵咖啡</b>；可以有 <b>員工</b> 了：廚師、服務生各一位，今晚就能在商店請',3:'第二口 <b>爐子</b> 到貨，還有冷盤台與 <b>田園沙拉</b>',4:'<b>番茄義大利麵</b>，以及第一次 <b>Rush Hour</b>；晚上可以開始 <b>裝潢與擴建</b>',6:'評論家可能出現',7:'晚上可以研發 <b>Jill 的招牌菜</b>'}[D]||''}
 
 let shopTab='kitchen';
 /* the shop belongs to the evening: opened again from the next morning's preparation, it still counts as that evening */
@@ -13374,7 +13403,7 @@ function shopDay(){return S.phase==='prep'&&phase==='shop'?S.day-1:S.day}
 /* v2.2 H: the shop in three big rooms of its own — 家具與佈置 (what the place looks like), 店舖工程 (what changes the
    place), 貓咪生活 (the cats' things) — plus the kitchen, the research, the staff and the signature. Every item that was
    in the old eight tabs is still here; the old tab keys still open the right page. */
-function shopTabs(){const D=shopDay();return[{k:'home',n:'家具與佈置',from:1},{k:'works',n:'店舖工程',from:3},{k:'social',n:'社群與宣傳',from:6},{k:'catlife',n:'貓咪生活',from:4},{k:'kitchen',n:'廚房設備',from:2},{k:'menu',n:'菜單研發',from:2},{k:'staff',n:'員工',from:4},{k:'sig',n:'招牌菜',from:7}].map(t=>Object.assign(t,{on:D>=t.from}))}
+function shopTabs(){const D=shopDay();return[{k:'home',n:'家具與佈置',from:1},{k:'works',n:'店舖工程',from:3},{k:'social',n:'社群與宣傳',from:6},{k:'catlife',n:'貓咪生活',from:4},{k:'kitchen',n:'廚房設備',from:2},{k:'menu',n:'菜單研發',from:2},{k:'staff',n:'員工',from:1},{k:'sig',n:'招牌菜',from:7}].map(t=>Object.assign(t,{on:D>=t.from}))}
 const SHOP_TAB_MAP={tables:'home',decor:'home',projects:'works',cats:'catlife'};
 function secTables(money,btn){const cap=tableCap();const next=S.tables<cap?TABLE_COST[S.tables]:null;let body='';
   body+=`<div class="item"><img alt="" src="${iconURL('table')}"><div class="nm">餐桌 <span class="muted" style="font-weight:600;font-size:12px">${S.tables} / ${cap} 張</span></div><div class="d">多一張桌子，同時就能多接待一組客人。${S.decor.sofa?`其中 ${S.decor.sofa*2} 張是四人卡座。`:''}</div><div class="act">${next!=null?btn(next,'buyTable','','加一張桌子'):LEVELS[S.level]?`<span class="lock">這個規模最多 ${cap} 張，擴建後可以再加</span>`:`<span class="lock">${cap} 張是 JILL 的極限。想接待更多人：沙發卡座、候位區、動線。</span>`}</div></div>`;
@@ -13466,7 +13495,7 @@ function showShop(){phase='shop';mainScreen='shop';R=null;rdAutoUnlock();IDLE=ma
  if(shopTab==='staff'){const crew=S.crew||[];const rc=poolCrew('restaurant'),lc=poolCrew('lounge'),lcap=loungeCap();
   /* rc8 §21: three numbers for the restaurant, one for the Lounge; a list over its number keeps everyone and waits */
   const over=CAP_ROLES.filter(r=>roleCrew(r).length>roleCap(r));
-  body+=`<p class="muted capline" style="font-size:12.5px;margin:0 0 6px">餐廳員工：${CAP_ROLES.map(r=>`${ROLES[r].n} <b>${roleCrew(r).length}/${roleCap(r)}</b>`).join('・')}${lc.length||loungeLv()?`・Lounge 員工 <b>${lc.length}/${lcap}</b>`:''}・每日薪資 ${fmt(crewWages())}。廚師、服務生、清潔員各有自己的名額，不能互相借；擴建和工程都寫著多哪一種。${over.length?` ${over.map(r=>`${ROLES[r].n}現在有 ${roleCrew(r).length} 位，比名額多`).join('；')}：以前的名額是大家共用的。大家都留著；要等人數降到名額以下，才能再聘${over.map(r=>ROLES[r].n).join('、')}。`:''}${loungeLv()?' Lounge 的人是固定的名單，名額跟餐廳分開算。':''}</p>`;
+  body+=`<p class="muted capline" style="font-size:12.5px;margin:0 0 6px">餐廳員工：${CAP_ROLES.map(r=>`${ROLES[r].n} <b>${roleCrew(r).length}/${roleCap(r)}</b>`).join('・')}${xiuqin()?'・另有清潔員秀琴阿姨（開店就在，不占名額）':''}${lc.length||loungeLv()?`・Lounge 員工 <b>${lc.length}/${lcap}</b>`:''}・每日薪資 ${fmt(crewWages())}。廚師、服務生、清潔員各有自己的名額，不能互相借；擴建和工程都寫著多哪一種。${over.length?` ${over.map(r=>`${ROLES[r].n}現在有 ${roleCrew(r).length} 位，比名額多`).join('；')}：以前的名額是大家共用的。大家都留著；要等人數降到名額以下，才能再聘${over.map(r=>ROLES[r].n).join('、')}。`:''}${loungeLv()?' Lounge 的人是固定的名單，名額跟餐廳分開算。':''}</p>`;
   /* v2.2.1 (real device): two lists — 工作分配 first (each station and each floor job with the people on it; × takes someone off, ＋ adds someone), then 員工 (the people: level, wage, training, firing) and 招募 */
   if(crew.length)body+=boardHTML();
   const crewCard=m=>{const R0=ROLES[m.role];const up=m.lv<5?R0.up*m.lv:null;const pf=portraitOf('staff:'+m.name);const ro=crewPool(m)==='lounge'?rosterOf(m):null;return`<div class="item"><img alt="" class="${pf?'face':''}" src="${pf?pf.src:iconURL(m.role)}"><div class="nm">${m.name} <span class="tier t1">${ro?ro.title:R0.n}</span>${crewPool(m)==='lounge'?' <span class="tier t2">Lounge</span>':''} <span class="pips">${[1,2,3,4,5].map(i=>`<i class="${i<=m.lv?'on':''}"></i>`).join('')}</span></div><div class="d">目前：<b>${m.role==='waiter'?dutyLabel(m):m.role==='chef'||m.role==='bartender'?(DUTY_N[m.duty]||'待命'):'收桌'}</b>・日薪 ${fmt(crewWage(m))}・${crewStat(m)}${(()=>{const t=tenureLine(m),f=famLine(m);return(t||f)?`<br><span class="muted">${[t,f].filter(Boolean).join('・')}</span>`:''})()}</div>${m.role==='chef'?`<div class="cap wfp">${wfPlacesHTML(m)}</div>`:''}${m.role==='chef'?`<div class="cap">${!m.duty?'<span class="muted">待命中：不接工作——在上面的「工作分配」把他排到一個位置</span>':wfChefDishesHTML(m)}</div>`:m.role==='waiter'?`<div class="cap"><span class="muted">LV2 起會上菜，LV3 起會結帳；做哪些在上面的「工作分配」點</span></div>`:m.role==='bartender'?`<div class="cap"><span class="ok">✓ 倒酒、吧台的客人</span><span class="${(S.crew||[]).some(q=>q.role==='waiter'&&waiterDuties(q).lounge)?'no':'ok'}">${(S.crew||[]).some(q=>q.role==='waiter'&&waiterDuties(q).lounge)?'桌位有 Lounge 外場':'✓ 沒有 Lounge 外場時連桌位一起'}</span>${m.wine?`<span class="muted">倒過 ${m.wine} 杯</span>`:''}</div>`:`<div class="cap"><span class="ok">✓ 客人走後收桌</span></div>`}<div class="act">${up!=null?btn(up,'crewUp',`data-k="${m.id}"`,'訓練升級'):'<span class="muted">已滿級</span>'}${m.role==='waiter'&&loungeLv()&&(m.wine||0)<40?btn(WINE_COURSE,'wineCourse',`data-k="${m.id}"`,'上品酒課'):''}</div></div>`};   /* rc7.2 (the player, 22:39 「員工如果請了就不要再有解雇的選項了，因為他們又不會做什麼不好的事，而且有些人被解雇劇情很難安排」): no 解雇 */
@@ -13475,7 +13504,7 @@ function showShop(){phase='shop';mainScreen='shop';R=null;rdAutoUnlock();IDLE=ma
   for(const [role,title] of GROUPS){const ms=crew.filter(m=>m.role===role).sort((a,b)=>(a.duty||'').localeCompare(b.duty||'')||b.lv-a.lv);if(!ms.length)continue;
    body+=`<div class="crewgrp"><div class="cg-h"><b>${title}</b><span class="muted">${ms.length} 人</span></div>
     <div class="cg-cmp">${ms.map(m=>`<div class="cg-row"><span class="cg-n">${m.name}</span><span class="pips">${[1,2,3,4,5].map(i=>`<i class="${i<=m.lv?'on':''}"></i>`).join('')}</span><span class="cg-d">${role==='chef'||role==='bartender'?(DUTY_N[m.duty]||'待命'):role==='waiter'?dutyLabel(m):'收桌'}</span><span class="cg-s">${crewStat(m)}</span></div>`).join('')}</div>${ms.map(crewCard).join('')}</div>`}
-  body+=`<div class="nm" style="font-weight:800;font-size:15px;margin:14px 0 2px">招募</div><p class="muted" style="font-size:12px;margin:0 0 6px">廚師、服務生、清潔員各算各的名額。</p>`+CAP_ROLES.map(r=>{const R0=ROLES[r];const n=roleCrew(r).length,c=roleCap(r);return`<div class="item hire-${r}"><img alt="" src="${iconURL(r)}"><div class="nm">${R0.n} <span class="tier t1">${n}/${c}</span></div><div class="d">${R0.d} 日薪 ${fmt(crewWageAt(r,1))} 起，LV5 ${fmt(crewWageAt(r,5))}。${r==='cleaner'&&xqHelperMode()&&fact('xq_helper')?'<br>第一位清潔員就是<b>秀琴阿姨</b>：現在她只是晚上順路來幫忙收店，聘了以後，營業時間也會在。':''}</div><div class="act">${n>=c?`<span class="lock">${capLockText(r)}</span>`:btn(R0.hire,'hire',`data-k="${r}"`,'聘請')}</div></div>`}).join('');
+  body+=`<div class="nm" style="font-weight:800;font-size:15px;margin:14px 0 2px">招募</div><p class="muted" style="font-size:12px;margin:0 0 6px">廚師、服務生、清潔員各算各的名額。</p>`+CAP_ROLES.map(r=>{const R0=ROLES[r];const n=roleCrew(r).length,c=roleCap(r);return`<div class="item hire-${r}"><img alt="" src="${iconURL(r)}"><div class="nm">${R0.n} <span class="tier t1">${n}/${c}</span></div><div class="d">${R0.d} 日薪 ${fmt(crewWageAt(r,1))} 起，LV5 ${fmt(crewWageAt(r,5))}。${r==='cleaner'&&xiuqin()?'<br><b>秀琴阿姨</b>開店就是清潔員，不占這裡的名額。':''}</div><div class="act">${n>=c?`<span class="lock">${capLockText(r)}</span>`:btn(hireFee(r),'hire',`data-k="${r}"`,'聘請')}</div></div>`}).join('');
   /* the Lounge's roster: these people and nobody else (v2.4 rc5) */
   if(loungeLv()||lc.length){const hired=r=>lc.some(m=>m.name===r.name);const full=lc.length>=lcap;
    body+=`<div class="nm" style="font-weight:800;font-size:15px;margin:14px 0 2px">Lounge 名單</div><p class="muted" style="font-size:12px;margin:0 0 6px">Lounge 員工 ${lc.length}/${lcap}。固定的幾個人，不會出現別人；名額跟餐廳分開算。在哪裡上班照「工作分配」：服務生兩邊共用，廚房只有一個，調酒師只顧吧台。${full&&lcap>=LOUNGE_ROSTER.length?'<b>Lounge 的人都到齊了。</b>':''}</p>`+LOUNGE_ROSTER.map(r=>{const R0=ROLES[r.role];const pf=portraitOf('staff:'+r.name);const on=hired(r);const open=loungeLv()>=r.lv;
@@ -13666,7 +13695,7 @@ function doAct0(a,d,k,b){
  case'buyOps':{const o=OPS.find(x=>x.k===k);if(!o)break;const t=opsLv(k);const c=o.tiers[t];if(c==null||S.money<c||S.level<o.lv||(o.need&&!o.need()))break;S.money-=c;S.ops=S.ops||{};S.ops[k]=t+1;sfx.buy();toast(`${o.n}：完成了`);if(k==='room')ach('room');save();keepScroll(showShop);shopAfterBuy();break}
  case'buyLgFurn':{/* rc7.4: the Lounge's TV and its sound */const F=LG_FURN.find(x=>x.k===k);if(!F||lgFurnOn(F.k)||(F.need&&!lgFurnOn(F.need))||!loungeLv()||S.money<F.cost)break;S.money-=F.cost;S.lgFurn=S.lgFurn||{};S.lgFurn[F.k]=S.day;S.newRooms=S.newRooms||{};S.newRooms['lg'+F.k]=S.day;save();IDLE=null;projectReveal({k:'lg'+F.k,n:F.n,done:F.done,jill:F.jill,room:'lounge',eyebrow:'裝好了'});break}
  case'buyDecor':{const Dc=DECOR.find(x=>x.k===k);const t=S.decor[k]||0;const c=Dc.tiers[t];const needLv=Dc.tierLv?Dc.tierLv[Math.min(t,Dc.tiers.length-1)]:Dc.lv;if(c!=null&&S.money>=c&&S.level>=needLv){S.money-=c;S.decor[k]=t+1;S.newDecor=S.day;sfx.buy();toast(`${Dc.n} 裝好了，看看店裡！`);save();IDLE=null;bg=null;keepScroll(showShop);shopAfterBuy()}break}
- case'hire':{const R0=ROLES[k];S.crew=S.crew||[];if(!R0||R0.lounge||!CAP_ROLES.includes(k)||S.money<R0.hire||roleCrew(k).length>=roleCap(k))break;/* rc8 §21: a chef's place is a chef's */S.money-=R0.hire;const used=S.crew.map(m=>m.name);const lname=LOUNGE_ROSTER.map(r=>r.name);let name=(CREW_NAMES[k]||[]).find(n=>!used.includes(n)&&!lname.includes(n))||`${R0.n}${S.crew.filter(m=>m.role===k).length+1}`;/* v2.4 rc5: the restaurant hires from its own pools — the Lounge's people only come from the Lounge's list */const duty=k==='chef'?(projOn('pizzaoven')&&!chefsAt('pizza').length?'pizza':chefHomeDuty(name)):R0.duties[0];const nm={id:'c'+Date.now().toString(36)+Math.floor(Math.random()*999),role:k,name,lv:1,duty,since:S.day,days:0,fam:{},pool:'restaurant'};const xqJoin=name==='秀琴阿姨'&&k==='cleaner'&&!!fact('xq_helper')&&!fact('xq_gone')&&!(S.crew||[]).some(m=>m.id==='xq');if(xqJoin){nm.id='xq';factSet('xq_hired')}/* v2.4: the evening helper becomes the cleaner — the same person, the same id, everything she knows */S.crew.push(nm);ach('hire');sfx.buy();if(xqJoin)scene([{who:'staff:秀琴阿姨',text:'那以後就天天來了。'}]);/* her one line, over the shop */else toast(`${name} 加入了 Jill's Kitchen！`);save();keepScroll(showShop);shopAfterBuy();break}
+ case'hire':{const R0=ROLES[k];S.crew=S.crew||[];if(!R0||R0.lounge||!CAP_ROLES.includes(k)||S.money<hireFee(k)||roleCrew(k).length>=roleCap(k))break;/* rc8 §21: a chef's place is a chef's */S.money-=hireFee(k);const used=S.crew.map(m=>m.name);const lname=LOUNGE_ROSTER.map(r=>r.name);let name=(CREW_NAMES[k]||[]).find(n=>!used.includes(n)&&!lname.includes(n))||`${R0.n}${S.crew.filter(m=>m.role===k).length+1}`;/* v2.4 rc5: the restaurant hires from its own pools — the Lounge's people only come from the Lounge's list */const duty=k==='chef'?(projOn('pizzaoven')&&!chefsAt('pizza').length?'pizza':chefHomeDuty(name)):R0.duties[0];const nm={id:'c'+Date.now().toString(36)+Math.floor(Math.random()*999),role:k,name,lv:1,duty,since:S.day,days:0,fam:{},pool:'restaurant'};S.crew.push(nm);ach('hire');sfx.buy();toast(`${name} 加入了 Jill's Kitchen！`);   /* (2026-10-10: 秀琴阿姨 is on the crew from the first day — never hired) */save();keepScroll(showShop);shopAfterBuy();break}
  case'hireLounge':{/* v2.4 rc5: one of the Lounge's own people, by name */const r=LOUNGE_ROSTER.find(x=>x.name===k);S.crew=S.crew||[];if(!r||loungeLv()<r.lv||poolCrew('lounge').some(m=>m.name===r.name)||poolCrew('lounge').length>=loungeCap())break;const R0=ROLES[r.role];if(S.money<R0.hire)break;S.money-=R0.hire;
   const duty=r.role==='chef'?chefHomeDuty(r.name):r.role==='bartender'?'lbar':R0.duties[0];const nm={id:'c'+Date.now().toString(36)+Math.floor(Math.random()*999),role:r.role,name:r.name,lv:r.name==='安安'?2:1,duty,since:S.day,days:0,fam:{},pool:'lounge'};
   if(r.name==='安安')nm.duties={seat:true,order:true,serve:false,check:false,clean:false,lounge:true};   /* v2.4 rc6 (10:06): the Lounge's floor person from her first night — the job on the board and the level it asks for */S.crew.push(nm);ach('hire');sfx.buy();toast(`${r.name} 加入了 Lounge！`);save();keepScroll(showShop);shopAfterBuy();break}

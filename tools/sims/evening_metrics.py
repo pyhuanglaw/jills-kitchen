@@ -6,6 +6,7 @@ leaves to the staff what they cover and taps the rest. One JSON line per evening
   wait: seconds from being seated to the last plate of the order — mean and 90th percentile; done: served / (served + lost);
   st: each kind of station, the share of the evening it had work on it; busy: Jill, waiters, cleaners, cooks (share not idle);
   loss: queue-seconds while a dirty table stood, seconds tables waited on a full dish cart, work-seconds waiting in the kitchen.
+  cats (2026-10-10): times Jill patted a cat standing (J.pet) and on the sofa during a break (LIFE.jill.act 'pet').
   python3 tools/sims/evening_metrics.py TAG [fresh,day30,day52,day92]"""
 import sys, os, json
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -15,11 +16,11 @@ import run_tests as rt
 import v24_tests as v
 from playwright.sync_api import sync_playwright
 SAVES = {'day30': 'player_day30.json', 'day52': 'player_day52.json', 'day92': 'player_day92_2105.json'}
-HOOK = r"""(()=>{window.__m={waits:[],st:{},stT:0,qDirty:0,kWait:0,ck:{},ckT:0};
+HOOK = r"""(()=>{window.__m={waits:[],st:{},stT:0,qDirty:0,kWait:0,ck:{},ckT:0,pat:0,sofaPet:0,_p:0,_s:0};
  if(!window.__mh){window.__mh=1;const S0=seatGroup;seatGroup=function(g,t){const r=S0.apply(this,arguments);if(g&&g.__seat==null)g.__seat=R.t;return r};
   const C0=checkAllServed;checkAllServed=function(g){const was=g&&g.state;const r=C0.apply(this,arguments);if(g&&was==='wait'&&g.state==='eat'&&g.__seat!=null&&!g.__w){g.__w=1;__m.waits.push(R.t-g.__seat)}return r}}
  window.__mStep=function(n){let k=0;const M=__m;for(let i=0;i<n;i++){if(!__act())break;update(1/30);updateCats(1/30,0);k++;if(!R||phase!=='service')break;if(R.closing!=null){if(R.closing>1&&!R.ended){finishClosing();break}continue}
-   const dt=1/30;M.stT+=dt;for(const s of R.slots){if(!['stove','prep','oven','bar','pizza'].includes(s.type))continue;const o=M.st[s.type]||(M.st[s.type]={n:0,busy:0});o.n+=dt;if(s.wf||s.job)o.busy+=dt}
+   const dt=1/30;M.stT+=dt;{const J=R.jill;if(J.pet&&!M._p)M.pat++;M._p=J.pet?1:0;const La=LIFE.jill&&LIFE.jill.act==='pet'&&J.rest==='sit';if(La&&!M._s)M.sofaPet++;M._s=La?1:0}for(const s of R.slots){if(!['stove','prep','oven','bar','pizza'].includes(s.type))continue;const o=M.st[s.type]||(M.st[s.type]={n:0,busy:0});o.n+=dt;if(s.wf||s.job)o.busy+=dt}
    const q=queued().filter(g=>g.state==='queue').length;if(q&&R.tables.some(t=>t.dirty&&!t.group))M.qDirty+=q*dt;
    M.kWait+=(typeof wfList==='function'?wfList().filter(n=>n.st==='wait'||n.st==='ready').length:R.tickets.reduce((a,tk)=>a+tk.items.filter(i=>i.st==='pending').length,0))*dt;   /* (main, before the cooking system: dishes not started yet) */
    for(const m of S.crew||[]){if(m.role!=='chef'||!R.ck||!R.ck[m.id])continue;const o=M.ck[m.id]||(M.ck[m.id]={t:0,b:0});o.t+=dt;if((R.wfc&&R.wfc[m.id]&&typeof wfNode==='function'&&wfNode(R.wfc[m.id]))||(R.ck[m.id].beat&&R.ck[m.id].beat.kind!=='idle'))o.b+=dt}}return k}})()"""
@@ -70,6 +71,7 @@ with sync_playwright() as p:
                    'busy': {'jill': busy(wl, 'jill'), 'waiter': busy(wl, 'waiter'), 'cleaner': busy(wl, 'cleaner'), 'xq': busy(wl, 'xq'),
                             'cooks': round(sum(o['b'] for o in m['ck'].values()) / max(1e-9, sum(o['t'] for o in m['ck'].values())), 3) if m['ck'] else None},
                    'loss': {'queue_s_dirty_table': round(m['qDirty']), 'cart_full_block_s': round(dd.get('blockT', 0) or 0), 'kitchen_wait_s': round(m['kWait'])},
+                   'cats': {'pats': m['pat'], 'sofa_pets': m['sofaPet']},
                    'errors': g.errors[:2]}
             print(json.dumps(rec, ensure_ascii=False), flush=True)
             if which == 'fresh':

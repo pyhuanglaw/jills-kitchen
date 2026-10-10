@@ -992,6 +992,21 @@ def dylan_hidden_reveal(b, port, target):
     g.close()
 
 @test
+def dylan_reveal_says_it_beside_him(b, port, target):
+    """The user, 2026-10-10 (docs/v24/cooking_round2_decisions_2026-10-10.txt §6): 「Jill 說出「老公」前，必須先走到 Dylan 桌旁的合理
+    距離。對話、移動及動畫順序必須一致。不得在距離 Dylan 很遠的位置提前觸發台詞」. The case that showed it: seed 91 of the reveal
+    scenario on 6834a6d — she set off for where he was, he got up and moved while she walked, and she said it 163 px from him
+    (docs/evidence/cooking_2026-10-10/reveal/: 15 of 16 seeds beside him before, 16 of 16 after). Now he waits where he is once
+    she sets off, and on arriving she is beside him (REVEAL_NEAR) or walks on to where he is; the line comes then: she up from
+    her sofa and walked there, in the dining room, both in the scene."""
+    g = Game(b, port, target, seed=91, manual=True)
+    revealed_at, beside, elsewhere = dylan_reveal_scenario(g)   # (the scenario checks dist < 40 at the moment the stage turns)
+    check(revealed_at is not None, 'the reveal never happened in 14 evenings')
+    rv = g.page.evaluate('window.__rv||null')
+    check(rv and rv['dist'] is not None and rv['dist'] <= g.ev("REVEAL_NEAR"), f'beside him when she says it: {rv}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+@test
 def long_play_is_stable(b, port, target):
     """Ten days in a row: nothing piles up (listeners, reviews, per-day arrays, save size)."""
     g = Game(b, port, target, seed=13, manual=True)
@@ -1386,6 +1401,40 @@ def daylight_returns_every_morning(b, port, target):
     check(dark < base - 20 and abs(back - base) < 6, f'a wiped background cache should be rebuilt: wiped {dark}, after {back}, day {base}')
     check(not g.errors, g.errors)
     g.close()
+
+@test
+def jill_pats_a_cat_on_her_way_and_lets_go_for_work(b, port, target):
+    """The user, 2026-10-10 (docs/v24/cooking_round2_decisions_2026-10-10.txt §3): 「料理系統不應讓 Jill 幾乎失去與貓咪相處的時間。請增加
+    自然、合理的摸貓機會，例如 Jill 經過附近的貓咪、工作短暫空檔，或完成工作後順手摸一下」 — 「Jill 確實在貓咪附近」「有實際可見的互動」
+    「不瞬間移動」「不出現第二個 Jill」「不強迫每晚發生」「不為摸貓中斷重要工作」. Day 1 of a new game: Jill walks back to her spot
+    by the pass with nothing to do; 樾樾 rests on the way. She stops beside him and pats him (crouched, the cat purring with
+    hearts) — in the dining room, the one Jill, where she was walking; a table that needs her ends it at once and she goes;
+    with plates in her hands she does not stop. (How often, over twenty days: docs/evidence/cooking_2026-10-10/cats/.)"""
+    g = Game(b, port, target, seed=74, manual=True)
+    install_bot(g); g.click('[data-act=open]')
+    start_day(g)
+    g.ev("__bot(240,1/30)")   # the first guests in
+    SETUP = """(()=>{const J=R.jill;J.cur=null;J.q=[];J.hands=[];J.pet=null;J.lookAt=null;J.visit=null;J.fp=null;J.rest=null;J.kcur=null;J.room='main';J.troom='main';J.x=PASS.x-90;J.y=PASS.y;J.tx=PASS.x;J.ty=PASS.y;J.moving=true;J.petCD=0;
+      const c=CATS.find(k=>k.def.id==='tora');releaseSpots(c);Object.assign(c,{x:PASS.x-60,y:PASS.y+6,st:'rest',pose:'sit',t:30,perch:-1,sofa:null,hidden:false,moving:false});R.wf=[];return 1})()"""
+    TICK = "(()=>{const J=R.jill;for(let i=0;i<%d;i++){const x0=J.x;update(1/30);updateCats(1/30,0);if(Math.abs(J.x-x0)>12)return 'jump';if(J.pet||J.lookAt&&J.lookAt.down)return J.pet?'pet':'look'}return 'none'})()"
+    got = None
+    for _ in range(6):   # a look instead of a pat (the cat's own mood) has its cooldown: set up again
+        g.ev(SETUP); r = g.ev(TICK % 90)
+        if r == 'pet': got = r; break
+        check(r in ('look', 'none'), f'no jump on her way: {r}')
+    check(got == 'pet', 'on her way back to the pass she stops for the cat on the way')
+    st = json.loads(g.ev("""JSON.stringify((()=>{const J=R.jill,c=J.pet&&J.pet.cat;return{room:J.room,moving:J.moving,tx:J.tx,near:c?Math.round(Math.hypot(c.x-J.x,c.y-J.y)):null,cat:c&&c.def.id,cst:c&&c.st,hearts:c?c.hearts.length:0,crouch:!!(J.pet&&J.pet.crouch),jills:document.querySelectorAll('canvas').length}})())"""))
+    check(st['room'] == 'main' and st['tx'] is not None and not st['moving'] and st['near'] is not None and st['near'] < 32, f'beside the cat, stopped on her walk, in the dining room: {st}')
+    check(st['cst'] == 'pet' and st['hearts'] > 0 and st['crouch'], f'visible: crouched, the cat purring, hearts: {st}')
+    # work comes: she lets go at once and goes
+    g.ev("(()=>{const t=R.tables.find(t=>t.group&&['order','check'].includes(t.group.state))||R.tables.find(t=>t.group);if(t){t.group.state='order';jillAsk(t.i)}})()")
+    g.ev("for(let i=0;i<2;i++){update(1/30);updateCats(1/30,0)}")
+    check(g.ev("R.jill.pet===null&&!!R.jill.cur"), 'a table that needs her ends it at once, and she goes')
+    # plates in her hands: she does not stop
+    g.ev(SETUP); g.ev("R.jill.hands=[{k:'dirty',n:1}]")
+    check(g.ev(TICK % 60) != 'pet', 'with plates in her hands she does not stop for a cat')
+    check(not g.errors, g.errors[:3]); g.close()
+
 
 @test
 def jill_rests_when_staff_cover_the_floor(b, port, target):

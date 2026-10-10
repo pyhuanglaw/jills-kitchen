@@ -445,124 +445,180 @@ def _act(g, a, **kv):
 
 @test
 def v24_xiuqin_is_there_from_day_one_and_is_not_free_labour(b, port, target):
-    """A new game: 秀琴阿姨 — Jill's acquaintance — walks in on Day 1 and helps; the scene of her first evening says who she
-    is. Changed 2026-10-08 (the user: 「第一天秀琴阿姨的故事既然是她主動來幫忙，那她不能只是站在店裡、實際上完全不收桌」,
-    「她說來幫忙，就真的有幫忙」, docs/v24/cooking_onboarding_2026-10-08.txt and restaurant_workflow_b_2026-10-08.txt; was: she
-    came near closing, claimed nothing, and Day 1 ended the same with and without her): she comes in when the first table is
-    done, clears tables into her hands, carries the dishes to the tub in the kitchen and washes there — a player who leaves the
-    tables to her sees her do it. Still not the cleaner the player hires (「不要因此提前正式解鎖完整清潔員系統」): she is not on
-    the staff, she is paid nothing, a while into the closing she goes home, Day 2's news names her, and until a cleaner is hired
-    the staff tab says the first cleaner is her."""
-    out = {}
-    for helper in (True, False):
-        g = Game(b, port, target, seed=260, manual=True, viewport={'width': 390, 'height': 844})
-        install_bot(g)
-        g.click('[data-act=open]')
-        g.ev("window.__fastSay=1" + ("" if helper else ";window.__noXQH=1"))
-        start_day(g)
-        g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;")   # a player who leaves the tables to whoever helps
-        g.ev("""window.__xq={came:null,cleared:0,carried:0,deposited:0,washed:0};{const C0=ddCollect;ddCollect=function(w,t,cap,res){const k=C0.apply(this,arguments);if(R.xqh&&w===R.xqh&&k>0){__xq.cleared++;__xq.carried+=k}return k}}
-          {const D0=ddDeposit;ddDeposit=function(w){const k=D0.apply(this,arguments);if(R.xqh&&w===R.xqh)__xq.deposited+=k;return k}}{const S0=ddStat;ddStat=function(k,n,who){if(k==='wash'&&who==='xq')__xq.washed+=n;return S0.apply(this,arguments)}}""")
-        seen = {'in': None, 'coach': ''}
-        for _ in range(400):
-            g.page.evaluate('()=>window.__bot(15,1/30)')
-            if g.ev("phase") != 'service': break
-            st = json.loads(g.ev("JSON.stringify({h:!!(R&&R.xqh&&!R.xqh.arriving),late:R?R.t>=R.dur*.92:true,coach:$('#coach').hidden?'':$('#coach').innerText})"))
-            if st['h'] and seen['in'] is None: seen['in'] = st['late']
-            if '秀琴阿姨' in st['coach']: seen['coach'] = st['coach']
-        out[helper] = json.loads(g.ev("JSON.stringify({d:__digest(),log:dayLog().map(l=>l.w+'：'+l.t),f:fact('xq_helper'),xq:__xq,crew:(S.crew||[]).length,wages:S.lastSummary&&S.lastSummary.wages})"))
-        if helper:
-            o = out[helper]
-            check(seen['in'] is False and o['f'] and o['f']['d'] == 1, f'she came in on Day 1, before the last part of the evening: {seen}')
-            check(any(l.startswith('秀琴阿姨：我來幫妳收一下。') for l in o['log']) and any(l == 'Jill：阿姨，不用啦。' for l in o['log']), 'who she is to the place, in her own words')
-            check(any('Jill 認識很久的阿姨' in l and '今天她會幫忙收桌' in l for l in o['log']) and '秀琴阿姨' not in seen['coach'], 'who she is and what she does tonight, in the scene of her first evening (no coach card)')
-            x = o['xq']
-            check(x['cleared'] >= 2 and x['carried'] >= 2 and x['carried'] - 3 <= x['deposited'] <= x['carried'] and x['washed'] >= 1, f'she clears tables, carries the dishes to the tub (the last few may be in her hands when the evening ends), and washes: {x}')
-            check(o['crew'] == 0 and not o['wages'], f'not on the staff, paid nothing: {o["crew"]} / {o["wages"]}')
-        else:
-            check(seen['in'] is None and not out[helper]['f'] and out[helper]['xq']['cleared'] == 0, 'the control run has no helper')
-        if helper:
-            # the summary, the shop: the recruit list says who the first cleaner is; then Day 2's news
-            if g.ev("phase") == 'summary': g.click('[data-act=toShop]')
-            g.ev("window.__d0=S.day;S.day=Math.max(S.day,4);shopTab='staff';showShop()"); g.page.wait_for_timeout(50)   # the staff tab opens on Day 4
-            check('第一位清潔員就是秀琴阿姨' in g.ev("document.querySelector('#screen').innerText"), 'the staff tab says the first cleaner is her')
-            g.ev("S.day=__d0;shopTab='home';showShop()")
-            g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(100)
-            news = g.ev("S.news.join(' ')")
-            check('秀琴阿姨' in news and '第一位就是她' in news and '2.4' not in news, f'Day 2: the news names her (a new game gets no update note): {news}')
-        check(not g.errors, g.errors[:3]); g.close()
+    """A new game: 秀琴阿姨 — Jill's acquaintance — is at work on Day 1 and the scene of her first evening says who she is.
+    2026-10-10 (the user, docs/v24/cooking_round2_decisions_2026-10-10.txt §2: 「秀琴阿姨從第一天起就是正式編制內的清潔員。她不是
+    臨時來幫忙，也不是尚未聘用的角色」「出現在員工名單中」「正常執行清潔、收桌與洗碗工作」「依照正式員工規則」「不需要玩家另外聘用」
+    「不會因存檔或事件重複生成」「秀琴阿姨不占用上述名額」; was, 2026-10-08/09: an evening helper, not on the staff, paid nothing,
+    hired as the first cleaner): she is on the staff from the start — one of her, the restaurant's cleaner, outside the hiring
+    places — at work from the opening: she clears tables into her hands, carries the dishes to the tub and washes. When the
+    first table is done the scene says who she is (the cleaner since the first day); she is paid a cleaner's wage; the staff
+    tab after Day 1 lists her and says she takes no place, and Day 2's news says hiring is open and the cleaner is her."""
+    g = Game(b, port, target, seed=260, manual=True, viewport={'width': 390, 'height': 844})
+    crew0 = json.loads(g.ev("JSON.stringify(S.crew.map(m=>({id:m.id,name:m.name,role:m.role,core:m.core,lv:m.lv,since:m.since})))"))
+    check(crew0 == [{'id': 'xq', 'name': '秀琴阿姨', 'role': 'cleaner', 'core': 1, 'lv': 1, 'since': 1}], f'a new game: she is on the staff from the start, the only one: {crew0}')
+    install_bot(g)
+    g.click('[data-act=open]')
+    g.ev("window.__fastSay=1")
+    start_day(g)
+    g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;")   # a player who leaves the tables to whoever does them
+    g.ev("""window.__xq={cleared:0,carried:0,deposited:0,washed:0};{const C0=ddCollect;ddCollect=function(w,t,cap,res){const k=C0.apply(this,arguments);if(R.cw&&w===R.cw.xq&&k>0){__xq.cleared++;__xq.carried+=k}return k}}
+      {const D0=ddDeposit;ddDeposit=function(w){const k=D0.apply(this,arguments);if(R.cw&&w===R.cw.xq)__xq.deposited+=k;return k}}{const S0=ddStat;ddStat=function(k,n,who){if(k==='wash'&&who==='xq')__xq.washed+=n;return S0.apply(this,arguments)}}""")
+    g.page.evaluate('()=>window.__bot(90,1/30)')   # (the first three seconds: the staff come in from the back)
+    check(g.ev("!!xqHere()&&!xqHelperMode()&&!R.xqh&&!!R.cw&&!!R.cw.xq"), f'at work from the opening, as staff (no evening helper): {g.ev("JSON.stringify(R.cw&&R.cw.xq&&{x:R.cw.xq.x,y:R.cw.xq.y,ar:R.cw.xq.arriving})")}')
+    for _ in range(400):
+        g.page.evaluate('()=>window.__bot(15,1/30)')
+        if g.ev("phase") != 'service': break
+    o = json.loads(g.ev("JSON.stringify({log:dayLog().map(l=>l.w+'：'+l.t),f:fact('xq_helper'),xq:__xq,wages:S.lastSummary&&S.lastSummary.wages,crew:S.lastSummary&&S.lastSummary.crew.map(c=>c.name+':'+c.wage)})"))
+    check(o['f'] and o['f']['d'] == 1, 'her first evening is Day 1')
+    check(any(l == '秀琴阿姨：這桌我來。' for l in o['log']) and any(l == 'Jill：阿姨，今天就麻煩妳了。' for l in o['log']), f'who she is to the place, in her own words: {o["log"][:8]}')
+    check(any('Jill 認識很久的阿姨' in l and '從開店第一天就是店裡的清潔員' in l for l in o['log']), 'the scene says she is the cleaner since the first day')
+    x = o['xq']
+    check(x['cleared'] >= 2 and x['carried'] >= 2 and x['carried'] - 3 <= x['deposited'] <= x['carried'] and x['washed'] >= 1, f'she clears tables, carries the dishes to the tub (the last few may be in her hands when the evening ends), and washes: {x}')
+    check(o['wages'] == g.ev("crewWageAt('cleaner',1)") and o['crew'] == ['秀琴阿姨:%d' % g.ev("crewWageAt('cleaner',1)")], f'on the staff and paid a cleaner\'s wage: {o["wages"]} / {o["crew"]}')
+    # the summary, the shop: the staff tab is open after Day 1 and lists her; then Day 2's news
+    if g.ev("phase") == 'summary': g.click('[data-act=toShop]')
+    g.ev("shopTab='staff';showShop()"); g.page.wait_for_timeout(50)
+    scr = g.ev("document.querySelector('#screen').innerText")
+    check(g.ev("shopTabs().find(t=>t.k==='staff').on") and '另有清潔員秀琴阿姨（開店就在，不占名額）' in scr and '開店就是清潔員' in scr and '第一位清潔員就是' not in scr, 'the staff tab is open after Day 1, lists her and says she takes no place')
+    g.ev("shopTab='home';showShop()")
+    g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(100)
+    news = g.ev("S.news.join(' ')")
+    check('現在可以請員工了' in news and '秀琴阿姨' in news and '第一位就是她' not in news and '2.4' not in news, f'Day 2: hiring is open, the cleaner is her (a new game gets no update note): {news}')
+    check(g.ev("xqCrewMig(S);xqCrewMig(S);S.crew.filter(m=>m.name==='秀琴阿姨').length") == 1, 'one of her, however often the crew is checked')
+    check(not g.errors, g.errors[:3]); g.close()
 
 
 @test
-def v24_xiuqin_goes_home_a_while_into_the_closing(b, port, target):
-    """She is not part of the evening at the sofa: about twenty seconds into the closing she walks out of the front door.
-    Since Workflow B (01fcd77, 2026-10-08: 「她說來幫忙，就真的有幫忙」) she does not walk out with dirty plates in her hands or
-    from a wash she has started — she puts them in the cart and washes the pile first. The rc8.3 version of this test (gone
-    by 32 s, written 2026-10-03) assumed nothing was left to wash; with the one Jill (2026-10-09) this seed's evening ends
-    with seven dishes (five in the cart, two in her hands) and she leaves at ~25 s, out of the door at ~35 s. So: when
-    she has nothing to finish, gone by 32 s as before; when she has, gone within 12 s of being done — and either way well
-    inside the closing (75 s), and not back that evening. (A build where she stays, or leaves only as the closing ends,
-    fails it: docs/cooking/ARCHITECTURE.md, test changes.)"""
+def v24_xiuqin_stays_through_the_closing_like_the_staff(b, port, target):
+    """2026-10-10 (§2: 「依照正式員工規則管理工作狀態」; replaces v24_xiuqin_goes_home_a_while_into_the_closing — the evening helper
+    went home twenty seconds into the closing): she is staff, so the closing is hers like everyone's — there at its start and
+    still there twenty seconds in, at work on the dishes; no evening-helper walk in or out."""
     g = Game(b, port, target, seed=262, manual=True, viewport={'width': 390, 'height': 844})
     install_bot(g)
     g.click('[data-act=open]'); g.ev("window.__fastSay=1")
     start_day(g)
     g.ev("__botUntil('R.closing!=null',80000,1/30)")
-    check(g.ev("!!R.xqh&&!R.xqh.leaving"), 'there at the start of the closing')
+    check(g.ev("!!xqHere()&&!R.xqh"), 'there at the start of the closing, as staff')
     g.ev("for(let i=0;i<30*20;i++){update(1/30);updateCats(1/30,0)}")
-    check(g.ev("!!R.xqh"), 'still there twenty seconds in')
-    free = gone = None; back = False
-    for s in range(20 * 4, 75 * 4):   # quarter seconds, to the end of the closing
-        st = json.loads(g.ev("JSON.stringify({h:!!R.xqh,busy:!!R.xqh&&(ddWasher()==='xq'||handsN(R.xqh,'dirty')>0||!!(R.xqh.task&&!R.xqh.leaving)),c:R.closing})"))
-        if st['c'] is None: break
-        if st['h'] and gone is not None: back = True
-        if st['h'] and not st['busy'] and free is None and s >= 22 * 4: free = s / 4
-        if not st['h'] and gone is None: gone = s / 4; free = free if free is not None else s / 4
-        g.ev("for(let i=0;i<7;i++){update(1/30);updateCats(1/30,0)}")   # (7 frames ~ a quarter second)
-    check(gone is not None and g.ev("R.xqhDone") == 1 and not back, f'gone within the closing — and she does not come back that evening: free {free}, gone {gone}, back {back}')
-    check(gone <= (32 if free <= 22.5 else free + 12), f'gone by thirty, or within twelve seconds of finishing the dishes: free {free}, gone {gone}')
+    check(g.ev("R&&R.closing!=null?!!R.cw&&!!R.cw.xq:true"), 'still there twenty seconds in')
+    check(g.ev("R?!R.xqh:true"), 'never the evening helper')
     check(not g.errors, g.errors[:3]); g.close()
 
 
 @test
-def v24_the_first_cleaner_hired_is_her_and_keeps_what_she_knows(b, port, target):
-    """Hiring the first cleaner is hiring her: the same person (id 'xq'), what she knows (who she has talked to) carries
-    over, one line — 「那以後就天天來了。」; from then on an ordinary cleaner and no evening helper. The next cleaner is
-    someone else. (rc7.2, the player 22:39: nobody is let go — there is no 解雇.)"""
+def v24_xiuqin_is_never_hired_and_takes_no_place(b, port, target):
+    """2026-10-10 (§2: 「不需要玩家另外聘用」「秀琴阿姨已經是第一位清潔員。其他清潔員仍依既有餐廳升級及員工名額規則解鎖」「不得出現『必須先聘用
+    第一位清潔員，秀琴阿姨才正式加入』的矛盾條件」; replaces v24_the_first_cleaner_hired_is_her_and_keeps_what_she_knows — hiring the
+    first cleaner was hiring her): she is on the staff and takes none of the cleaners' places. A new shop has no cleaner's place;
+    at JILL the first cleaner hired is someone else (小彤), and 秀琴阿姨 is still one; the place is then full; the kitchen extension
+    adds one more. What she knows stays with her. Nobody is let go (rc7.2, 22:39: no 解雇)."""
     g = Game(b, port, target, seed=261, manual=True, viewport={'width': 390, 'height': 844})
     install_bot(g)
     g.click('[data-act=open]'); g.ev("window.__fastSay=1")
     start_day(g); g.ev("__bot(80000,1/30)"); g.ev("for(let i=0;i<30;i++)__tick(1000/30)")
     if g.ev("phase") == 'summary': g.click('[data-act=toShop]')
-    check(g.ev("xqHelperMode()&&!!fact('xq_helper')&&xqm().helper===1"), 'before a cleaner: the evening helper')
-    g.ev("relSet('s:xq','sophie','spoke');relSet('s:xq','mia','spoke');S.money=99999;S.day=4;shopTab='staff';showShop()")   # the staff tab opens on Day 4
-    check(g.ev("roleCap('cleaner')") == 0 and '還沒有清潔員的名額' in g.ev("document.querySelector('#screen').innerText"), 'rc8 §21: a new shop has no cleaner\'s place yet; the card says where one comes from')
+    g.ev("relSet('s:xq','sophie','spoke');relSet('s:xq','mia','spoke');S.money=99999;shopTab='staff';showShop()")
+    check(g.ev("roleCap('cleaner')") == 0 and g.ev("roleCrew('cleaner').length") == 0 and '還沒有清潔員的名額' in g.ev("document.querySelector('#screen').innerText"), 'a new shop has no cleaner\'s place, and she takes none')
     g.ev("S.level=5;showShop()")   # JILL: the first cleaner's place
-    check('第一位清潔員就是秀琴阿姨' in g.ev("document.querySelector('#screen').innerText"), 'the recruit list says so before')
     _act(g, 'hire', k='cleaner'); g.ev("__tick(30)")
-    m = json.loads(g.ev("JSON.stringify((S.crew||[]).map(m=>({id:m.id,name:m.name,role:m.role})))"))
-    check(m == [{'id': 'xq', 'name': '秀琴阿姨', 'role': 'cleaner'}], f'the first cleaner is her, the same person: {m}')
-    check(g.ev("!!fact('xq_hired')&&!xqHelperMode()&&xqm()===xiuqin()&&xqKnows('sophie')===1&&xqKnows('mia')===1"), 'an ordinary cleaner now, who still knows them')
-    check(g.ev("dayLog().some(l=>l.w==='秀琴阿姨'&&l.t==='那以後就天天來了。')"), 'her one line (a scene with her face over the shop; tests log it)')
-    check('第一位清潔員就是秀琴阿姨' not in g.ev("document.querySelector('#screen').innerText"), 'the recruit note is gone')
+    names = g.ev("S.crew.filter(m=>m.role==='cleaner').map(m=>m.name).join()")
+    check(names == '秀琴阿姨,小彤', f'the first cleaner hired is someone else; she is still one: {names}')
     _act(g, 'hire', k='cleaner'); g.ev("__tick(30)")
-    check(g.ev("S.crew.length") == 1, 'rc8 §21: one cleaner\'s place, taken')
+    check(g.ev("S.crew.filter(m=>m.role==='cleaner').length") == 2, 'the one cleaner\'s place is taken (she is not in it)')
     g.ev("S.rooms=S.rooms||{};S.rooms.kext=1")   # 廚房擴建: one more cleaner's place
     _act(g, 'hire', k='cleaner'); g.ev("__tick(30)")
-    check(g.ev("S.crew.map(m=>m.name).join()") == '秀琴阿姨,小彤', 'the next cleaner is someone else')
+    check(g.ev("S.crew.filter(m=>m.role==='cleaner').map(m=>m.name).join()") == '秀琴阿姨,小彤,阿明', 'the next one with the extension')
+    check(g.ev("S.crew.filter(m=>m.name==='秀琴阿姨').length") == 1 and g.ev("xqKnows('sophie')===1&&xqKnows('mia')===1"), 'one of her, who still knows them')
     g.ev("shopTab='staff';showShop()"); g.page.wait_for_timeout(60)
     scr = g.ev("document.querySelector('#screen').innerText")
     check('解雇' not in scr and not g.ev("!!document.querySelector('[data-act=crewFire]')"), 'no 解雇 on the staff page (rc7.2, 22:39)')
     _act(g, 'crewFire', k='xq')
-    check(g.ev("S.crew.map(m=>m.name).join()") == '秀琴阿姨,小彤' and not g.ev("!!fact('xq_gone')"), 'and no way to let her go: she stays')
+    check(g.ev("S.crew.filter(m=>m.name==='秀琴阿姨').length") == 1, 'and no way to let her go: she stays')
     check(not g.errors, g.errors[:3]); g.close()
 
 
 @test
-def v24_yijun_comes_early_in_a_fresh_game_and_meets_her_mother_at_closing(b, port, target):
-    """Not gated on a late day or on Sophie × Mia: in a new game with no cleaner hired, once 秀琴阿姨 has been part of
-    the evenings for about a week, 怡君 comes to eat — late, when her mother is in — and 「妳怎麼來了？」「吃飯啊。」 plays
-    with the helper walking over. Her visit's hour is kept (not pulled earlier on a quiet evening)."""
+def v24_round2_hiring_opens_after_day_one_and_pays(b, port, target):
+    """The user, 2026-10-10 (docs/v24/cooking_round2_decisions_2026-10-10.txt §2): 「第一天 Jill 與秀琴阿姨一起經營；第二天就能聘請廚師與
+    服務生」「第 1 級餐廳可以另外聘用：1 位廚師。1 位服務生。兩種名額分開計算，秀琴阿姨不占用上述名額」「第 2、3 天的料理教學照常進行，
+    但不限制玩家聘用員工。需要 Jill 親自操作的教學，仍由 Jill 完成」「請檢查初始資金、聘用費及薪資，確保第二天聘人是實際可行的選擇」「不要
+    因此讓所有員工免費或取消經營成本」. A new game ($2,000): Day 1 is Jill and 秀琴阿姨; the shop after it has the staff tab with a
+    chef's and a waiter's place, a level-1 restaurant's signing fees (half: $750, $600) and the wages as they are; both are signed
+    with what Day 1 leaves and the next day's food is still paid for; there is no third place; on Day 2 both are at work — the
+    first latte (the day's lesson) is Jill's, the cook takes the next — and the day's wages are the three of them."""
+    g = Game(b, port, target, seed=268, manual=True, viewport={'width': 390, 'height': 844})
+    check(g.ev("S.money") == 2000 and g.ev("START_MONEY") == 2000, f'a new game starts with $2,000: {g.ev("S.money")}')
+    install_bot(g); g.click('[data-act=open]'); g.ev("window.__fastSay=1")
+    start_day(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;")
+    for _ in range(400):
+        g.page.evaluate('()=>window.__bot(15,1/30)')
+        if g.ev("phase") != 'service': break
+    check(g.ev("S.crew.map(m=>m.name).join()") == '秀琴阿姨', 'Day 1: Jill and 秀琴阿姨')
+    if g.ev("phase") == 'summary': g.click('[data-act=toShop]')
+    g.ev("shopTab='staff';showShop()"); g.page.wait_for_timeout(60)
+    scr = g.ev("document.querySelector('#screen').innerText")
+    check(g.ev("shopTabs().find(t=>t.k==='staff').on") and '廚師 0/1' in scr and '服務生 0/1' in scr, 'the first shop: the staff tab, a chef\'s and a waiter\'s place')
+    fees = json.loads(g.ev("JSON.stringify([hireFee('chef'),hireFee('waiter'),ROLES.chef.hire,ROLES.waiter.hire,crewWageAt('chef',1),crewWageAt('waiter',1),crewWageAt('cleaner',1)])"))
+    check(fees == [750, 600, 1500, 1200, 243, 202, 152], f'level 1 signs for half; the wages as they are: {fees}')
+    m0 = g.ev("S.money")
+    _act(g, 'hire', k='chef'); g.ev("__tick(30)"); _act(g, 'hire', k='waiter'); g.ev("__tick(30)")
+    check(g.ev("S.crew.filter(m=>!m.core).map(m=>m.role).join()") == 'chef,waiter' and g.ev("S.money") == m0 - 1350, f'both signed: ${m0} - $1,350 = ${g.ev("S.money")}')
+    check(g.ev("S.money") > g.ev("restockEstimate()"), f'tomorrow\'s food is still paid for: ${g.ev("S.money")} / ${g.ev("restockEstimate()")}')
+    _act(g, 'hire', k='chef'); g.ev("__tick(30)"); _act(g, 'hire', k='waiter'); g.ev("__tick(30)")
+    check(g.ev("S.crew.length") == 3, 'no third place')
+    g.ev("S.level=2;showShop()"); check(g.ev("hireFee('chef')") == 1500, 'a bigger restaurant signs at the full fee'); g.ev("S.level=1;showShop()")
+    g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(100)
+    start_day(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;")
+    g.ev("window.__latte=[];{const A0=wfAssign;wfAssign=function(n,who,slot){const r=A0.apply(this,arguments);if(r&&n&&baseOf(n.d)==='coffee'&&!__latte.some(x=>x[0]===n.id))__latte.push([n.id,who]);return r}}")
+    for _ in range(500):
+        g.page.evaluate('()=>window.__bot(15,1/30)')
+        if g.ev("phase") != 'service': break
+    lat = json.loads(g.ev("JSON.stringify(__latte)"))
+    check(lat and lat[0][1] == 'jill' and g.ev("!!(S.jillMade||{}).coffee"), f'the first latte is Jill\'s (the lesson): {lat}')
+    check(g.ev("S.lastSummary&&S.lastSummary.wages") == 243 + 202 + 152, f'Day 2\'s wages: the cook, the waiter and 秀琴阿姨: {g.ev("S.lastSummary&&S.lastSummary.wages")}')
+    crew = json.loads(g.ev("JSON.stringify(S.lastSummary.crew.map(c=>[c.name,Object.values(c.n||{}).reduce((a,b)=>a+b,0)]))"))
+    check(all(n > 0 for _, n in crew), f'all three worked on Day 2: {crew}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_round2_xiuqin_once_in_every_save(b, port, target):
+    """The user, 2026-10-10 (§2 and §9.3): 「秀琴阿姨不會重複出現，舊存檔正常」. Every save the player sent: she is on the staff once,
+    a cleaner who takes no place — kept as she was where she was already on the staff (her id and level), added where she was
+    not; nothing else on the staff changes; once again after a reload; and an evening's checkpoint brings her back once."""
+    for f in sorted(glob.glob(os.path.join(ROOT, 'tests', 'saves', 'player_*.json'))) + [os.path.join(ROOT, 'tests', 'saves', 'cooking_day3_0156.json')]:
+        name = os.path.basename(f)
+        raw = json.load(open(f, encoding='utf-8')); raw = raw.get('save', raw)
+        had = [m for m in raw.get('crew', []) if m.get('name') == '秀琴阿姨' and m.get('role') == 'cleaner']
+        others = sorted((m['id'], m['role']) for m in raw.get('crew', []) if not (m.get('name') == '秀琴阿姨' and m.get('role') == 'cleaner'))
+        g = Game(b, port, target, seed=269, manual=True, viewport={'width': 390, 'height': 844})
+        load_save(g, name)
+        xs = json.loads(g.ev("JSON.stringify(S.crew.filter(m=>m.name==='秀琴阿姨').map(m=>({id:m.id,lv:m.lv,role:m.role,core:m.core})))"))
+        check(len(xs) == 1 and xs[0]['role'] == 'cleaner' and xs[0]['core'] == 1, f'{name}: one of her, a cleaner on no list: {xs}')
+        if had:
+            check(xs[0]['id'] == had[0]['id'] and xs[0]['lv'] == had[0].get('lv', 1), f'{name}: kept as she was: {xs[0]} / {had[0].get("id")} lv{had[0].get("lv")}')
+        else:
+            check(xs[0]['id'] == 'xq' and xs[0]['lv'] == 1, f'{name}: added: {xs[0]}')
+        now = json.loads(g.ev("JSON.stringify(S.crew.filter(m=>m.name!=='秀琴阿姨').map(m=>[m.id,m.role,m.name]))"))
+        extra = [x for x in now if (x[0], x[1]) not in others]
+        check(all((i, r) in [(x[0], x[1]) for x in now] for i, r in others) and all(x[2] == 'Evan' for x in extra), f'{name}: nobody else changed (an older save\'s generic name and Evan are their own migrations): {extra}')
+        if name in ('player_day2_2155.json', 'player_day52.json'):
+            _reload(g)
+            check(g.ev("S.crew.filter(m=>m.name==='秀琴阿姨').length") == 1, f'{name}: once again after a reload')
+            to_service(g); g.ev("__bot(900,1/30)")
+            check(g.ev("checkpointSave()!==false&&!!S.checkpoint"), f'{name}: an evening checkpoint')
+            g.ev("save()"); g.reload(); g.page.wait_for_timeout(150)
+            g.click('[data-act=open]') if g.page.query_selector('[data-act=open]') else None; g.page.wait_for_timeout(200)
+            check(g.ev("S.crew.filter(m=>m.name==='秀琴阿姨').length") == 1, f'{name}: once after the evening comes back')
+        check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def v24_yijun_comes_early_in_a_fresh_game_and_meets_her_mother(b, port, target):
+    """Not gated on a late day or on Sophie × Mia: in a new game, once 秀琴阿姨 has been part of the evenings for about a
+    week, 怡君 comes to eat and 「妳怎麼來了？」「吃飯啊。」 plays with her mother walking over. 2026-10-10 (§2: she is on the staff
+    from the first day; was: the evening helper, in only at closing, so 怡君 came late and the visit was held there): her
+    mother is at work all evening, so 怡君's visits keep their own hour."""
     g = Game(b, port, target, seed=263, manual=True, viewport={'width': 390, 'height': 844})
     install_bot(g)
     g.click('[data-act=open]'); g.ev("window.__fastSay=1")
@@ -580,7 +636,7 @@ def v24_yijun_comes_early_in_a_fresh_game_and_meets_her_mother_at_closing(b, por
         g.ev("for(let i=0;i<30;i++)__tick(1000/30)")
         if g.ev("!!fact('yj_meet')") and met is None:
             met = g.ev("S.day")
-            check(g.ev("xqHelperMode()&&xqm().helper===1"), 'her mother is still the evening helper (no cleaner hired)')
+            check(g.ev("!xqHelperMode()&&xqm()===xiuqin()&&!!xqm().core"), 'her mother is on the staff (no evening helper)')
             lines = g.ev("JSON.stringify(story().beatLines.yj_meet||[])")
             check('妳怎麼來了？' in lines and '吃飯啊。' in lines, f'the lines: {lines}')
             check(g.ev("relN('s:xq','n:怡君','family')") == 1, 'remembered between the two of them')
@@ -590,7 +646,7 @@ def v24_yijun_comes_early_in_a_fresh_game_and_meets_her_mother_at_closing(b, por
         g.click('[data-act=nextDay]'); g.ev("__tick(100)")
         if met: break
     check(met is not None and 7 <= met <= 14, f'怡君 met her mother here within the second week (Day {met})')
-    check(late and all(s['hold'] and s['t'] >= .89 for s in late), f'her visits are planned late and kept there: {late}')
+    check(late and not all(s['t'] >= .89 for s in late), f'her visits keep their own hour (no longer held to the closing): {late}')
     check(g.ev("fact('xq_helper').d") == 1, '秀琴阿姨 since Day 1')
     check(not g.errors, g.errors[:3]); g.close()
 
@@ -603,9 +659,9 @@ def v24_manual_tutorial_and_news_cover_the_new_content(b, port, target):
     nobody's story told in advance); a new game does not (Day 1's coach and Day 2's news introduce her instead)."""
     g = Game(b, port, target, seed=264, manual=True, viewport={'width': 390, 'height': 844})
     txt = g.ev("GUIDE.map(s=>s.h+' '+s.sum+' '+s.pts.map(p=>p.join(' ')).join(' ')).join('\\n')")
-    for need in ['秀琴阿姨', '請第一位清潔員就是請秀琴阿姨', '晚點到', '日薪照付', '看插圖']:
+    for need in ['秀琴阿姨', '秀琴阿姨開店就是清潔員，不占名額', '晚點到', '日薪照付', '看插圖']:   # (2026-10-10: on the staff from the first day; was 請第一位清潔員就是請秀琴阿姨)
         check(need in txt, f'the manual mentions {need}')
-    for stale in ['後場休息室', '吧台我擦']:
+    for stale in ['後場休息室', '吧台我擦', '請第一位清潔員就是請秀琴阿姨']:
         check(stale not in txt, f'not in the manual: {stale}')
     check('— last: v2.4 rc8' in open(os.path.join(ROOT, 'js', 'game.js'), encoding='utf-8').read(), 'the audit stamp on GUIDE (the release checklist §2: the stamp says the release the manual was last audited for)')
     g.click('[data-act=open]'); g.page.wait_for_timeout(100)
@@ -623,7 +679,7 @@ def v24_manual_tutorial_and_news_cover_the_new_content(b, port, target):
     g.ev("S.today=null;S.news=[];applyGates()")
     check('2.4' not in g.ev("S.news.join(' ')"), 'only once')
     check(not g.errors, g.errors[:3]); g.close()
-    # an older save with no cleaner: the note says who comes in the evenings
+    # an older save with no cleaner (2026-10-10): she joins the staff on loading, and the news says so once
     g = Game(b, port, target, seed=266, manual=True, viewport={'width': 390, 'height': 844})
     raw = json.load(open(os.path.join(ROOT, 'tests', 'saves', 'player_day30.json'), encoding='utf-8')); raw = raw.get('save', raw)
     raw['crew'] = [m for m in raw.get('crew', []) if m['role'] != 'cleaner']
@@ -632,7 +688,10 @@ def v24_manual_tutorial_and_news_cover_the_new_content(b, port, target):
     if g.ev("phase") == 'shop':
         g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(200)
     news = g.ev("S.news.join(' ')")
-    check('秀琴阿姨' in news and '請第一位清潔員，就是請她' in news, f'no cleaner yet: the note says who helps in the evenings: {news}')
+    check('<b>秀琴阿姨</b>現在是店裡的正式清潔員' in news and '請第一位清潔員，就是請她' not in news, f'she is on the staff now, said once: {news}')
+    check(g.ev("S.crew.filter(m=>m.name==='秀琴阿姨'&&m.core).length") == 1, 'one of her, on the staff')
+    g.ev("S.today=null;S.news=[];applyGates()")
+    check('正式清潔員' not in g.ev("S.news.join(' ')"), 'only once')
     check(not g.errors, g.errors[:3]); g.close()
 
 
@@ -1148,7 +1207,7 @@ def v24_restaurant_and_lounge_staff_are_two_pools_that_never_share_places(b, por
     pools = json.loads(g.ev("JSON.stringify(Object.fromEntries(S.crew.map(m=>[m.name,m.pool])))"))
     check(pools['Evan'] == 'lounge' and pools['沈晴'] == 'lounge' and all(v == 'restaurant' for k, v in pools.items() if k not in ('Evan', '沈晴')), f'migrated: {pools}')
     check(g.ev("restaurantCap()") == 12 and g.ev("poolCrew('restaurant').length") == 12, 'the restaurant: level 5 (6) + 後場整理區 + 側廳 + 廚房擴建 (2 each) = 12, all taken')
-    check(g.ev("CAP_ROLES.map(r=>roleCrew(r).length+'/'+roleCap(r)).join()") == '6/6,4/4,2/2', 'rc8: chefs 6/6, waiters 4/4, cleaners 2/2')
+    check(g.ev("CAP_ROLES.map(r=>roleCrew(r).length+'/'+roleCap(r)).join()") == '6/6,4/4,1/2', 'rc8: chefs 6/6, waiters 4/4, cleaners 1/2 (秀琴阿姨 takes no place, 2026-10-10)')
     check(g.ev("loungeCap()") == 5 and g.ev("poolCrew('lounge').length") == 2, 'the Lounge: its roster at II is five; two hired')
     g.ev("S.money+=500000")
     n = g.ev("S.crew.length"); _hire(g, 'hire', 'waiter')
@@ -1177,7 +1236,7 @@ def v24_restaurant_and_lounge_staff_are_two_pools_that_never_share_places(b, por
     check(g.ev("(()=>{const m=S.crew.find(m=>m.name==='安安');const d=waiterDuties(m);return d.lounge&&d.seat&&d.order})()") is True, '安安: the Lounge floor, and seating and orders anywhere')
     # the shop says it, the manual says it
     g.ev("showShop();shopTab='staff';showShop()"); g.page.wait_for_timeout(80); txt = g.ev("document.querySelector('#screen').innerText")
-    check('廚師 6/6・服務生 4/4・清潔員 2/2' in txt and 'Lounge 員工 5/5' in txt and 'Lounge 名單' in txt and 'Lounge 的人都到齊了' in txt, 'the staff page shows two pools (the restaurant\'s as three numbers, rc8)')
+    check('廚師 6/6・服務生 4/4・清潔員 1/2' in txt and 'Lounge 員工 5/5' in txt and 'Lounge 名單' in txt and 'Lounge 的人都到齊了' in txt, 'the staff page shows two pools (the restaurant\'s as three numbers, rc8)')
     check('阿拓 黃柘' in txt and 'Bar Food 料理員' in txt and '許葳' in txt, 'the roster by name and job')
     check(g.ev("GUIDE.some(s=>s.pts.some(e=>e[0]==='員工'&&/Lounge 名單/.test(e[1])&&/互不佔用/.test(e[1])))") is True, 'the manual explains the two lists')
     # 許葳: her portrait, her faces, her look (not Jill's tail)
@@ -1208,7 +1267,8 @@ def v24_an_old_shared_cap_save_keeps_everyone_and_waits(b, port, target):
     g.ev("S.money+=500000"); n = g.ev("S.crew.length"); _hire(g, 'hire', 'chef')
     check(g.ev("S.crew.length") == n, 'over its number, the chefs\' list does not hire')
     _hire(g, 'hire', 'cleaner')
-    check(g.ev("S.crew.length") == n, 'the cleaners are full on their own (2/2)')
+    check(g.ev("S.crew.length") == n + 1 and g.ev("roleCrew('cleaner').length+'/'+roleCap('cleaner')") == '2/2', 'the cleaners\' list is its own: 秀琴阿姨 takes no place (2026-10-10), so one cleaner was hired and then it is full (2/2)')
+    n = g.ev("S.crew.length")
     g.ev("showShop();shopTab='staff';showShop()"); g.page.wait_for_timeout(80); txt = g.ev("document.querySelector('#screen').innerText")
     check('廚師 7/6' in txt and '比名額多' in txt and '大家都留著' in txt, 'the page says why')
     g.ev("S.crew=S.crew.filter(m=>m.name!=='Nina')")   # a waiter's place opens (nobody is ever let go in the game; the test makes the gap)
@@ -3287,7 +3347,8 @@ def v24_rc7_2_xiuqin_first_evening_holds_the_service(b, port, target):
     Workflow B (the user, 2026-10-08: 「她說來幫忙，就真的有幫忙」; docs/cooking/WORKFLOW_B.md §7): her first evening she
     walks in when the first table is done, not at closing — the test used to play to 90% of the evening with the scenes
     off and only then look for hers; now it plays with the scenes on from the start (any other held scene of Day 1 is
-    tapped through) until hers opens."""
+    tapped through) until hers opens. 2026-10-10: she is the cleaner from the first day (round 2 §2) — the scene opens when
+    she goes over to the first table that is done, and its words say so."""
     g = Game(b, port, target, seed=264, manual=True, viewport={'width': 390, 'height': 844})
     install_bot(g); g.click('[data-act=open]')
     start_day(g)
@@ -3308,7 +3369,7 @@ def v24_rc7_2_xiuqin_first_evening_holds_the_service(b, port, target):
     for _ in range(12):
         if not g.ev("!!DLG"): break
         texts.append(g.ev("$('#dlg .dlg-text').textContent")); g.ev("dlgNext()"); g.page.wait_for_timeout(30)
-    check(not g.ev("!!DLG") and any('Jill 認識很久的阿姨' in x for x in texts) and '我來幫妳收一下。' in texts, f'tapped through: {texts}')
+    check(not g.ev("!!DLG") and any('Jill 認識很久的阿姨' in x for x in texts) and '這桌我來。' in texts, f'tapped through: {texts}')   # (2026-10-10: her lines as the cleaner since the first day; were 我來幫妳收一下。)
     g.ev("for(let i=0;i<30;i++)__tick(1000/30)")
     check(g.ev("R.t") > t0, 'then the evening goes on')
     check(not g.errors, g.errors[:3]); g.close()
@@ -4973,30 +5034,32 @@ def v24_rc8_the_restaurants_three_lists_and_the_lounges_one(b, port, target):
     """The player's brief of 2026-10-02 19:19 §21–§22: the restaurant's people are three lists — 廚師, 服務生, 清潔員 —
     each with its own places (a chef's place only hires a chef); every expansion and every work says which list it adds
     to; level by level the three add up to the one old number, so none of the player's saves is over any list; the
-    Lounge's list is untouched by any of it, and a restaurant waiter working the Lounge floor stays a restaurant waiter."""
+    Lounge's list is untouched by any of it, and a restaurant waiter working the Lounge floor stays a restaurant waiter.
+    2026-10-10 (the user, round 2 §2: 「第 1 級餐廳可以另外聘用：1 位廚師。1 位服務生。兩種名額分開計算，秀琴阿姨不占用上述名額」「其他清潔
+    員仍依既有餐廳升級及員工名額規則解鎖」): level 1 has a chef's and a waiter's place (the old one number was 1), so the Bistro adds no
+    staff place any more; 秀琴阿姨 is on the staff and on no list; the staff tab opens in the first shop."""
     import glob
     g = Game(b, port, target, seed=8601, manual=True, viewport={'width': 390, 'height': 844})
     g.click('[data-act=open]'); g.page.wait_for_timeout(100)
     lv = json.loads(g.ev("JSON.stringify([1,2,3,4,5].map(l=>CAP_ROLES.map(r=>roleCapAt(r,l))))"))
-    check([sum(x) for x in lv] == [1, 2, 3, 4, 6], f'each level adds up to the old number: {lv}')
+    check([sum(x) for x in lv] == [2, 2, 3, 4, 6] and lv[0] == [1, 1, 0], f'each level adds up to the old number, level 1 a chef and a waiter (2026-10-10): {lv}')
     check(all(all(lv[i][j] >= lv[i - 1][j] for j in range(3)) for i in range(1, 5)), f'no list ever gets smaller with a level: {lv}')
     src = json.loads(g.ev("JSON.stringify(capSources().map(s=>[s.k,s.add]))"))
     check(src == [['room', {'chef': 1, 'waiter': 1}], ['side', {'waiter': 2}], ['kext', {'chef': 1, 'cleaner': 1}], ['kitchen2', {'waiter': 2}], ['pd1', {'waiter': 1}], ['pd3', {'waiter': 1}], ['pizzaoven', {'chef': 1}]], f'every work says which list: {src}')
-    # a new shop: one chef's place; a waiter or a cleaner is not hired into it
-    g.ev("S.money=99999;S.day=5;shopTab='staff';showShop()"); g.page.wait_for_timeout(60)   # the staff tab opens from the evening of Day 4
-    for k in ('waiter', 'cleaner'):
-        _act(g, 'hire', k=k); g.ev("__tick(30)")
-    check(g.ev("(S.crew||[]).length") == 0, 'the chef\'s place takes no waiter and no cleaner')
+    # a new shop: a chef's place and a waiter's place; a cleaner is not hired; 秀琴阿姨 is there and takes neither
+    g.ev("S.money=99999;S.day=2;shopTab='staff';showShop()"); g.page.wait_for_timeout(60)   # Day 2's morning: the shop of Day 1's evening (2026-10-10: the staff tab opens in the first shop)
+    _act(g, 'hire', k='cleaner'); g.ev("__tick(30)")
+    check(g.ev("(S.crew||[]).filter(m=>!m.core).length") == 0, 'no cleaner\'s place: a cleaner is not hired')
     txt = g.ev("document.querySelector('#screen').innerText")
-    check('廚師 0/1' in txt and '服務生 0/0' in txt and '清潔員 0/0' in txt and '還沒有服務生的名額' in txt and 'Jill\'s Bistro' in txt, 'the page shows three numbers and where the next one comes from')
-    _act(g, 'hire', k='chef'); g.ev("__tick(30)")
-    check(g.ev("S.crew.map(m=>m.role).join()") == 'chef', 'a chef is hired into the chef\'s place')
-    _act(g, 'hire', k='chef'); g.ev("__tick(30)")
-    check(g.ev("S.crew.length") == 1, 'and only one')
+    check('廚師 0/1' in txt and '服務生 0/1' in txt and '清潔員 0/0' in txt and '還沒有清潔員的名額' in txt and '秀琴阿姨' in txt, 'the page shows three numbers, where the next one comes from, and her')
+    _act(g, 'hire', k='chef'); g.ev("__tick(30)"); _act(g, 'hire', k='waiter'); g.ev("__tick(30)")
+    check(g.ev("S.crew.filter(m=>!m.core).map(m=>m.role).join()") == 'chef,waiter', 'a chef into the chef\'s place, a waiter into the waiter\'s')
+    _act(g, 'hire', k='chef'); g.ev("__tick(30)"); _act(g, 'hire', k='waiter'); g.ev("__tick(30)")
+    check(g.ev("S.crew.filter(m=>!m.core).length") == 2, 'and one each')
     # the expansion card says what each level adds
-    g.ev("shopTab='works';showShop()"); g.page.wait_for_timeout(60)
+    g.ev("S.day=5;shopTab='works';showShop()"); g.page.wait_for_timeout(60)   # (the works tab: from Day 3)
     card = g.ev("(()=>{const e=[...document.querySelectorAll('#screen .item')].find(e=>/擴建：/.test(e.innerText));return e?e.innerText.replace(/\\s+/g,' '):''})()")
-    check('服務生 +1' in card and '廚師 +' not in card, f'the Bistro: one waiter\'s place: {card}')
+    check('擴建' in card and '服務生 +' not in card and '廚師 +' not in card, f'the Bistro: no staff place any more (level 1 has the waiter\'s, 2026-10-10): {card}')
     g.ev("S.level=4;shopTab='works';showShop()"); g.page.wait_for_timeout(60)
     card = g.ev("(()=>{const e=[...document.querySelectorAll('#screen .item')].find(e=>/擴建：/.test(e.innerText));return e?e.innerText.replace(/\\s+/g,' '):''})()")
     check('廚師 +1' in card and '清潔員 +1' in card and '服務生 +' not in card, f'JILL: a chef\'s and a cleaner\'s place: {card}')
@@ -5018,7 +5081,7 @@ def v24_rc8_the_restaurants_three_lists_and_the_lounges_one(b, port, target):
     g = Game(b, port, target, seed=8603, manual=True, viewport={'width': 390, 'height': 844})
     load_save(g, 'player_day61.json')
     r0 = g.ev("CAP_ROLES.map(r=>roleCrew(r).length+'/'+roleCap(r)).join()"); l0 = g.ev("loungeCap()")
-    check(r0 == '6/6,4/4,2/2' and l0 == 5, f'the restaurant full, the Lounge 2 of 5: {r0}, {l0}')
+    check(r0 == '6/6,4/4,1/2' and l0 == 5, f'the restaurant full but for a cleaner (秀琴阿姨 takes no place, 2026-10-10), the Lounge 2 of 5: {r0}, {l0}')
     g.ev("S.money+=500000")
     for nm in ['阿拓', '安安', '許葳']:
         _hire(g, 'hireLounge', nm)
@@ -5029,7 +5092,7 @@ def v24_rc8_the_restaurants_three_lists_and_the_lounges_one(b, port, target):
     g.ev("(()=>{const m=S.crew[S.crew.length-1];m.duties=Object.assign({},waiterDuties(m),{lounge:true})})()")
     check(g.ev("(()=>{const m=S.crew[S.crew.length-1];return m.role==='waiter'&&crewPool(m)==='restaurant'&&waiterDuties(m).lounge})()") is True and g.ev("roleCrew('waiter').length") == 5 and g.ev("poolCrew('lounge').length") == 5, 'a new restaurant waiter on the Lounge floor: still the restaurant\'s waiter (5/6), the Lounge still 5/5')
     _reload(g)
-    check(g.ev("CAP_ROLES.map(r=>roleCrew(r).length+'/'+roleCap(r)).join()") == '6/7,5/6,2/2' and g.ev("poolCrew('lounge').length") == 5, 'kept across a reload')
+    check(g.ev("CAP_ROLES.map(r=>roleCrew(r).length+'/'+roleCap(r)).join()") == '6/7,5/6,1/2' and g.ev("poolCrew('lounge').length") == 5, 'kept across a reload')
     check(not g.errors, g.errors[:3]); g.close()
 
 
