@@ -179,6 +179,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .ll{display:grid;grid-template-columns:auto auto 1fr;gap:0 6px;padding:4px 0;border-top:1px solid var(--line);font-size:12px;line-height:1.4;align-items:baseline}.ll:first-of-type{border-top:0}.ll small{color:var(--ink2);font-variant-numeric:tabular-nums;font-size:10.5px}.ll b{color:var(--tomato)}.ll.j b{color:#2E6B4A}.ll.d b{color:#2E3A4B}.ll.s b{color:#8E6422}.ll.e{grid-template-columns:auto 1fr;color:var(--ink2)}.ll b{white-space:nowrap}.ll span{min-width:0;overflow-wrap:anywhere}
 #taskPanel{position:absolute;top:126px;right:8px;z-index:4;width:min(250px,calc(100% - 16px));background:var(--paper);color:var(--ink);border-radius:12px;padding:10px 12px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
 #taskPanel h4{margin:0 0 6px;font-family:var(--disp);font-weight:400;font-size:15px}
+#taskPanel{cursor:pointer}#taskPanel h4{position:relative;padding-right:30px}#taskPanel .tpx{position:absolute;top:-6px;right:-8px;border:0;background:none;color:var(--ink2);font-size:21px;line-height:1;padding:4px 9px;cursor:pointer}   /* 2026-10-10: the list's own ×, and the whole list taps shut (iOS: a tappable look) */
 .task{display:grid;grid-template-columns:1fr auto;gap:2px 8px;padding:6px 0;border-top:1px solid var(--line);font-size:12.5px}
 .task:first-of-type{border-top:0}
 .task .bar{grid-column:1/-1;height:5px;border-radius:3px;background:rgba(46,32,25,.1);overflow:hidden}

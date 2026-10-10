@@ -484,6 +484,37 @@ def qa_the_screens_fit_375_390_430(b, port, target):
 
 
 @test
+def qa_the_task_list_opens_under_its_chip_and_any_tap_puts_it_away(b, port, target):
+    """今日任務 (the user on the iPhone, 2026-10-10: 「今日任務的按鍵位置擋到冷盤了」「今日任務還沒辦法按掉」): the list opened over its
+    own chip — in the kitchen over the sink and the cold station too — and nothing on it said how to close it; a tap
+    beside it did not. On each phone width, a new game's first evening, in the kitchen and in the dining room, by finger:
+    the list opens under its chip (the chip can still be reached), and the chip, its ×, the list itself and a tap
+    anywhere else in the room each put it away."""
+    bad = []
+    for W in WIDTHS:
+        p = Player(b, port, target, W=W)
+        try:
+            p.tap('[data-act=open]'); p.settle(); p.start_day(); p.settle()
+            check(p.state()['phase'] == 'service', f'{W}px: Day 1 did not open')
+            for rm in ('kitchen', 'main'):
+                p.room_tab(rm)
+                for nm, close in (('the chip', lambda: p.tap('#taskChip')), ('its ×', lambda: p.tap('#taskPanel .tpx')),
+                                  ('the list', lambda: p.tap('#taskPanel h4')), ('a tap in the room', lambda: p.tap_scene(200, 300))):
+                    p.tap('#taskChip')
+                    if p.ev("$('#taskPanel').hidden"):
+                        bad.append(f'{W}px {rm}: the chip did not open the list'); continue
+                    if not p.can_reach('#taskChip'):
+                        bad.append(f'{W}px {rm}: the open list covers its chip')
+                    close()
+                    if not p.ev("$('#taskPanel').hidden"):
+                        bad.append(f'{W}px {rm}: {nm} did not put the list away'); p.ev("$('#taskPanel').hidden=true")
+            check(not p.errors, p.errors[:3])
+        finally:
+            p.close()
+    check(not bad, ' | '.join(bad[:6]))
+
+
+@test
 def qa_every_tab_reaches_by_finger(b, port, target):
     """The shop's and the journal's tab strips scroll sideways: on each phone width every tab can be swiped to and
     tapped, and the tap opens it."""

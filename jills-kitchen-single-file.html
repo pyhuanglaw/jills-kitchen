@@ -197,6 +197,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .ll{display:grid;grid-template-columns:auto auto 1fr;gap:0 6px;padding:4px 0;border-top:1px solid var(--line);font-size:12px;line-height:1.4;align-items:baseline}.ll:first-of-type{border-top:0}.ll small{color:var(--ink2);font-variant-numeric:tabular-nums;font-size:10.5px}.ll b{color:var(--tomato)}.ll.j b{color:#2E6B4A}.ll.d b{color:#2E3A4B}.ll.s b{color:#8E6422}.ll.e{grid-template-columns:auto 1fr;color:var(--ink2)}.ll b{white-space:nowrap}.ll span{min-width:0;overflow-wrap:anywhere}
 #taskPanel{position:absolute;top:126px;right:8px;z-index:4;width:min(250px,calc(100% - 16px));background:var(--paper);color:var(--ink);border-radius:12px;padding:10px 12px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
 #taskPanel h4{margin:0 0 6px;font-family:var(--disp);font-weight:400;font-size:15px}
+#taskPanel{cursor:pointer}#taskPanel h4{position:relative;padding-right:30px}#taskPanel .tpx{position:absolute;top:-6px;right:-8px;border:0;background:none;color:var(--ink2);font-size:21px;line-height:1;padding:4px 9px;cursor:pointer}   /* 2026-10-10: the list's own ×, and the whole list taps shut (iOS: a tappable look) */
 .task{display:grid;grid-template-columns:1fr auto;gap:2px 8px;padding:6px 0;border-top:1px solid var(--line);font-size:12.5px}
 .task:first-of-type{border-top:0}
 .task .bar{grid-column:1/-1;height:5px;border-radius:3px;background:rgba(46,32,25,.1);overflow:hidden}
@@ -1055,7 +1056,7 @@ const TABLE_COST=[0,0,500,800,1400,2000,2800,3800,5000,6500,8000,10000];
 const MAIN_MAX=9,SIDE_MAX=9;   /* declared before load(): mainHallMig runs while the save is read */
 /* the crew's roles and name pools — declared before load(): crewNameFix runs while the save is read */
 const ROLES={
- chef:{n:'廚師',hire:1500,wage:240,up:1200,d:'負責一個工作站。LV1 只做簡單的菜，升級後能處理更多料理；LV3 起也會接手 Jill 做到一半的菜；LV5 連 Jill 的招牌菜都學會了。',duties:['stove','oven','prep','bar']},
+ chef:{n:'廚師',hire:1500,wage:240,up:1200,d:'廚房每一步都會做，有空就接。LV1 只做簡單的菜，升級後能處理更多料理；LV5 連 Jill 的招牌菜都學會了。',duties:['stove','oven','prep','bar']},
  waiter:{n:'服務生',hire:1200,wage:200,up:1000,d:'帶位、點餐、收桌；LV2 起會把做好的菜端給客人，LV3 起連結帳都包了。職責可以自己配：今天只收桌，或全部都做。等級越高動作越快。',duties:['both','seat','order']},
  cleaner:{n:'清潔員',hire:900,wage:150,up:800,d:'專職收桌：把髒盤子收回廚房、洗乾淨。比服務生收得快，薪水也比較便宜。忙的時候幫服務生分擔最後那一趟。',duties:['clean']},
  bartender:{n:'調酒師',hire:2600,wage:320,up:1500,d:'站在 Lounge 的吧台後面：倒酒、把杯子交給吧台的客人；沒有 Lounge 外場的時候，桌邊的點單、送杯、結帳也一手包。等級越高越快、越記得客人。',duties:['lbar'],lounge:1},
@@ -6473,8 +6474,14 @@ ticketsEl.addEventListener('click',e=>{const tb=e.target.closest('[data-treat]')
  {const th=e.target.closest('.tk-h,.tk-who');if(th&&R){const el0=th.closest('.tk');const tk=el0&&R.tickets.find(t=>t.id===+el0.dataset.tk);if(tk)idFocusTicket(tk);return}}   /* v2.4 rc6 (07:09): the order's number or name — its table */const b=e.target.closest('.it');if(!b||!R)return;const tk=R.tickets.find(t=>t.id===+b.dataset.tk);if(!tk)return;const it=tk.items[+b.dataset.i];if(!it)return;
  if(isWF(it.d)&&(it.st==='pending'||it.st==='cooking')){wfSelectItem(tk,it);return}if(it.st==='pending')startCook(tk,it);else if(it.st==='ready'){const t=R.tables[tk.g.table];if(t)tapTable(t)}else if(it.st==='order'){toast(`食材運送中，還要 ${Math.max(1,Math.ceil(it.ordT-R.t))} 秒`)}else if(it.st==='cooking'){const i=R.slots.findIndex(x=>x.job&&x.job.it===it);if(i>=0){R.focus=i;R.panel=true;R.panelT=0}}});
 function renderTasks(){const chip=$('#taskChip');if(!S.today||phase!=='service'){chip.hidden=true;$('#taskPanel').hidden=true;const lp=$('#logPanel');if(lp)lp.hidden=true;const sp=$('#stockPanel');if(sp)sp.hidden=true;logChip();stockChip();const rt=$('#roomTabs');if(rt)rt.hidden=true;return}chip.hidden=false;const ts=S.today.tasks;$('#taskDots').innerHTML=ts.map(t=>`<i class="${taskProg(t)>=t.n?'on':''}"></i>`).join('');
- if(!$('#taskPanel').hidden)$('#taskPanel').innerHTML=`<h4>今日任務</h4>`+ts.map(t=>{const p=Math.min(t.n,taskProg(t));const done=p>=t.n;return`<div class="task ${done?'done':''}"><span>${t.txt}</span><small>+${fmt(t.reward)}</small><div class="bar"><i style="width:${t.k==='noangry'?(R&&R.st.angry?0:100):p/t.n*100}%"></i></div><small>${t.k==='noangry'?(R&&R.st.angry?'失敗':'維持中'):t.k==='revenue'?fmt(p)+' / '+fmt(t.n):p+' / '+t.n}</small></div>`}).join('')}
-$('#taskChip').addEventListener('click',()=>{const p=$('#taskPanel');p.hidden=!p.hidden;$('#logPanel').hidden=true;const sp=$('#stockPanel');if(sp)sp.hidden=true;renderTasks()});
+ if(!$('#taskPanel').hidden)$('#taskPanel').innerHTML=`<h4>今日任務<button class="tpx" aria-label="收起來">×</button></h4>`+ts.map(t=>{const p=Math.min(t.n,taskProg(t));const done=p>=t.n;return`<div class="task ${done?'done':''}"><span>${t.txt}</span><small>+${fmt(t.reward)}</small><div class="bar"><i style="width:${t.k==='noangry'?(R&&R.st.angry?0:100):p/t.n*100}%"></i></div><small>${t.k==='noangry'?(R&&R.st.angry?'失敗':'維持中'):t.k==='revenue'?fmt(p)+' / '+fmt(t.n):p+' / '+t.n}</small></div>`}).join('')}
+$('#taskChip').addEventListener('click',()=>{const p=$('#taskPanel');p.hidden=!p.hidden;$('#logPanel').hidden=true;const sp=$('#stockPanel');if(sp)sp.hidden=true;taskPanelPlace();renderTasks()});
+/* 2026-10-10 (the user, on the iPhone: 「今日任務的按鍵位置擋到冷盤了」「今日任務還沒辦法按掉」): the list opened over its own chip and,
+   in the kitchen, over the sink and the cold station, with nothing that said how to close it and no way out but a tap on
+   the list itself. Now it opens under the chip (the chip shows and closes it again), has its ×, and any tap elsewhere puts
+   it away — the tap still does what it does (a station, a ticket) */
+function taskPanelPlace(){const tc=$('#taskChip'),tp=$('#taskPanel');if(!tc||!tp||tc.hidden)return;const top=(tc.offsetTop+tc.offsetHeight+6)+'px';if(tp.style.top!==top)tp.style.top=top}
+document.addEventListener('pointerdown',e=>{const p=$('#taskPanel');if(p&&!p.hidden&&!p.contains(e.target)&&!$('#taskChip').contains(e.target))p.hidden=true},{capture:true,passive:true});
 function logHTML(list,n){const L=list.slice(-(n||14)).reverse();if(!L.length)return'<p class="muted" style="margin:4px 0">還沒有人說話。</p>';return L.map(e=>`<div class="ll ${e.k}${e.w&&(NAMED[e.w]||REGS.some(r=>r.n===e.w)||e.w==='Dylan'||e.w==='Jill')?' named':''}"><small>${e.c}</small>${e.w?`<b>${e.w}</b>`:''}<span>${e.k==='e'?e.t:'「'+e.t+'」'}</span></div>`).join('')}
 /* ---- 庫存: what is in the fridge right now, by dish, and emergency orders at 1.5× with real buttons ---- */
 function stockLevel(d){const n=S.stock[d]||0;return n<=0?'out':n<=2?'low':'ok'}
@@ -6516,7 +6523,7 @@ function peeking(){const p=$('#peekPill');return!!p&&!p.hidden}   /* v2.2.1 #8: 
    the tab you are in reads the room's whole name (員工休息室, 私人包廂), so inside a room it is that room, never 二樓. */
 function roomTabName(k,lv){if(k==='lounge'&&!loungeLv())return'隔壁';/* rc8: before it is Jill's, the bar next door */const r=ROOMS[k];if(k!==room)return r.n;lv=lv||0;return lv===0&&r.full?r.full:lv<=1&&r.mid?r.mid:r.n}
 /* 2026-10-09 #14: in the kitchen 今日任務 sits beside 庫存 (over the hood, nothing to tap there) — on the right it covered the pizza oven's dome on a phone */
-function taskChipPlace(){const tc=$('#taskChip'),sc0=$('#stockChip'),tp=$('#taskPanel');if(!tc)return;const k=room==='kitchen'&&!!sc0&&!sc0.hidden;const l=k?(sc0.offsetLeft+sc0.offsetWidth+6)+'px':'';if(tc.style.left!==l){tc.style.left=l;tc.style.right=k?'auto':'';if(tp){tp.style.left=k?'8px':'';tp.style.right=k?'auto':''}}}
+function taskChipPlace(){const tc=$('#taskChip'),sc0=$('#stockChip'),tp=$('#taskPanel');if(!tc)return;const k=room==='kitchen'&&!!sc0&&!sc0.hidden;const l=k?(sc0.offsetLeft+sc0.offsetWidth+6)+'px':'';if(tc.style.left!==l){tc.style.left=l;tc.style.right=k?'auto':'';if(tp){tp.style.left=k?'8px':'';tp.style.right=k?'auto':''}}taskPanelPlace()}
 function renderRoomTabs(force){taskChipPlace();const el=$('#roomTabs');if(!el)return;const rv=phase!=='service'&&UPV==='reveal';const show=(phase==='service'&&!!R)||rv||(phase!=='service'&&peeking()&&roomsOpen().length>1);el.hidden=!show;if(!show)return;const A=roomAlerts();
  const list=rv?['up']:UPV==='look'&&phase!=='service'?['up','staff','pdr'].filter(roomOpen):roomsOpen();el.classList.toggle('many',list.length>=7);el.classList.toggle('many8',list.length>=8);el.classList.toggle('many9',list.length>=9);   /* the floor's look (店舖工程, a reveal): the floor and its rooms only */
  const h=list.map(k=>`<button data-room="${k}" class="${k===room?'on':''}${A[k].u?' urgent':''}${roomIsNew(k)&&k!==room?' new':''}"><span>${roomTabName(k)}</span>${A[k].n?`<b>${A[k].n}</b>`:roomIsNew(k)&&k!==room?'<b class="nw">NEW</b>':''}</button>`).join('');
@@ -6953,8 +6960,11 @@ function passEnds(){return projOn('pass')?{x0:64,x1:336}:{x0:80,x1:320}}
 function passHalves(){const E=passEnds();return[[E.x0,PASS_GAP.x0],[PASS_GAP.x1,E.x1]]}
 function passLamps(){return projOn('pass')?[110,170,230,290]:[112,156,244,288]}
 function passTicketX(k){const E=passEnds();return k<5?E.x0+8+k*20:PASS_GAP.x1+4+(k-5)*20}
-/* where clean plates are taken: the dish rack under the sink, already in the kitchen's picture */
-function wfRack(){return{x:KX.sink.x+12,y:KY.feet}}
+/* where clean plates are taken: the dish rack under the sink, already in the kitchen's picture. It stands on the counter's front
+   half (drawn at KY.top+50..63), so it is reached from in front of the counter, as the front burners are. 2026-10-10 (the user on
+   the iPhone: 「裝盤為什麼走到左上角？那裏又沒有盤子」「裝盤應該要走到盤子在的地方」): the plates were fetched from behind the counter,
+   by the wall (KY.feet), where the sink is and no plate is — the washer's place (ddSink), not the rack's */
+function wfRack(){return{x:KX.sink.x+12,y:KY.top+KY.h+KY.face+4}}
 /* the plates waiting on the pass for the floor, in a row under the lamps; each keeps the spot it was set down on until
    it is taken (it.pi), so nothing slides along the pass by itself */
 function wfRowN(){return projOn('pass')?11:9}
@@ -7094,30 +7104,32 @@ function wfUpd(dt){if(!R)return;wfGather();const J=wfJ();const jt=wfJillTask();
  passSample(dt);ddSample(dt);wlJill(dt)}
 /* how far the current step has come, 0–1 (the hands, then the fire) */
 function wfProg(n){if(n.st==='ready')return 1;if(n.st!=='work'&&n.st!=='cook')return 0;const T=n.dur||1;return clamp(1-(n.act+n.pas)/T,0,1)}
-/* ---- the cooks' places (spec §15–§21). PROPOSAL, not canon: the user's own skeleton of 2026-10-07 (core ★★★, a second place
-   learnt at LV2–3, a third at LV4–5), kept here until the user confirms or changes it — docs/cooking/ARCHITECTURE.md lists
-   it with the coverage check. Nobody ever has all four, as Jill does; drinks are anyone's (spec §15). 阿拓 (the Lounge's
-   cook) is not in the skeleton: his own description — 炸物、小食、出餐的 timing — gives 熱區, then 裝盤, then 備料. ---- */
+/* ---- the cooks' places (spec §15–§21). 2026-10-10 (the user, playing the private build on the iPhone: 「廚師就有空都要做吧
+   不要分工了」「裝盤怎麼可以當作技能」): every cook takes any step of the kitchen when he is free — no place is learnt, and plating
+   is nobody's skill. Of the 2026-10-07 skeleton (core ★★★, a second place at LV2–3, a third at LV4–5 — a proposal, never
+   confirmed) only each cook's own place is left: the first of his line that is not the pass (chefCore). There he is a little
+   quicker and surer; everywhere else he works as Jill does. Before, the first cook, 阿德師傅 at LV1, cooked and never plated.
+   阿拓 (the Lounge's cook) is not in the skeleton: his own description — 炸物、小食、出餐的 timing — gives 熱區. ---- */
 const CHEF_SKILL={'阿德師傅':['hot','prep','plate'],'Marco':['oven','prep','hot'],'小林師傅':['plate','hot','prep'],'阿珠姐':['prep','plate','oven'],
  'Hugo':['hot','oven','plate'],'阿勇':['prep','hot','oven'],'老周師傅':['oven','plate','prep'],'小魏':['plate','prep','hot'],'阿拓':['hot','plate','prep']};
 function chefSkill(m){return CHEF_SKILL[m.name]||['hot','prep','plate']}
+function chefCore(m){return chefSkill(m).find(f=>f!=='plate')||'hot'}   /* his own place: never the pass (2026-10-10) */
 /* a new cook's post on the duty board: his own place — 阿德師傅 the range, Marco the oven (the user, 2026-10-08: 阿德師傅's
    core is HOT; drinks are no cook's speciality). Before the new kitchen the first cook hired went to the coffee machine
    whenever there was one, because whoever stood there made the coffee; a post the player chose on the board is left as
    it is. A cook whose own place is the pass waits by the range, behind it. */
-/* the staff card under his places: how many of the restaurant's recipes have a step he can take (his places, above, say
-   which), and the recipes his level does not allow yet (🔒 LV3, the signature LV5). Before the new kitchen this listed the
-   dishes of his duty-board station, which no longer decides what he makes. */
+/* the staff card under his places: how many of the restaurant's recipes he makes (every step of them, 2026-10-10), and the
+   recipes his level does not allow yet (🔒 LV3, the signature LV5). Before the new kitchen this listed the dishes of his
+   duty-board station, which no longer decides what he makes. */
 function wfChefDishesHTML(m){const menu=S.unlocked.concat(S.signature?['signature']:[],S.sigDessert?['sigdessert']:[]).filter(d=>isWF(d)&&!DISH(d).special);let can=0;const locks=[];
  for(const d of menu){const lock=chefLock(m,d);if(lock){locks.push(`<span class="no">🔒 ${dishName(d)} <small>${lock}</small></span>`);continue}
-  if((wfFlow(d)||[]).some(f=>f!=='serve'&&chefProf(m,f)>0))can++}
- return(menu.length?`<span class="ok">✓ 有他會的步驟：${can}／${menu.length} 道菜</span>`:'')+locks.join('')}
-function chefHomeDuty(name){const f=chefSkill({name})[0];return f==='prep'&&S.eq.prep?'prep':f==='oven'&&S.eq.oven?'oven':'stove'}
-/* his places on the staff card, in the spec's words (§20: 會做 · 熟練 · 專長), and what the next levels bring — never stars,
-   which the menu and the rating already use */
-function wfPlacesHTML(m){const sk=chefSkill(m);const W=['','會做','熟練','專長'];return sk.map((f,i)=>{const p=chefProf(m,f);const nm=WF_ST[f].n;if(p)return`<span class="ok">${nm} ${W[p]}</span>`;return`<span class="no">${nm} <small>LV${i===1?2:4} 起</small></span>`}).join('')}
-function chefProf(m,f){if(f==='drink'||f==='serve')return 2;const fam=f==='pizza'?'oven':f;const sk=chefSkill(m),L=m.lv||1;
- if(fam===sk[0])return 3;if(fam===sk[1])return L>=3?2:L>=2?1:0;if(fam===sk[2])return L>=5?2:L>=4?1:0;return 0}
+  can++}
+ return(menu.length?`<span class="ok">✓ 會做 ${can}／${menu.length} 道菜</span>`:'')+locks.join('')}
+function chefHomeDuty(name){const f=chefCore({name});return f==='prep'&&S.eq.prep?'prep':f==='oven'&&S.eq.oven?'oven':'stove'}
+/* his place on the staff card, in the spec's words (§20): his own place, and that he takes every other step (2026-10-10: no place
+   is learnt) — never stars, which the menu and the rating already use */
+function wfPlacesHTML(m){return`<span class="ok">${WF_ST[chefCore(m)].n} 專長</span><span class="ok">其他步驟都會做</span>`}
+function chefProf(m,f){const fam=f==='pizza'?'oven':f;return fam===chefCore(m)?3:2}   /* 3 his own place, 2 any other step (drinks, the pass included) */
 /* ---- what the kitchen shows: the food where the work is, the same vessels and art as before ---- */
 /* what the dish's own recipe says about the look of each place: every ingredient (in order), the ones laid out at the prep
    before anything meets the fire, the ones in the pan or the oven while it cooks (before its last spell on the fire), the
@@ -13055,7 +13067,7 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
   ["一天","開店前選今天的菜單、備料 → 17:00 開店 → 21:30 打烊，客人吃完就結算 → 用今天賺的錢在商店買東西 → 準備下一天。前兩天開店時，遊戲會自動幫你補好備料（照價付）。"],
   ["髒盤子","收桌的盤子、杯子放進水槽前的髒盤車（10 個，大髒盤車 20 個）。車滿了，吃完的桌子要等：點髒盤車就有人去洗。清潔員會自己洗，兩位一起洗；服務生快滿了才洗。"],
   ["營業中","客人會自己找空桌坐。桌上出現紅色「!」：點桌子點餐。到廚房點訂單上的菜，下一步的位置會亮，點那裡 Jill 就去做；裝盤、送飲料時亮的是它本身。菜下的小字是流程和誰在做；做好的一站在原地等，不會壞。銀色餐蓋：點桌子上菜。金幣：點桌子收錢；客人走了再點一次收桌。"],
-  ["員工","請了廚師、服務生、清潔員，他們會自己接工作；廚師只接自己會的位置。廚師還在走過去時，點他要去的位置就換 Jill 做。服務生等級越高，一趟端越多盤、送越多桌。Jill 有空時會回房間坐一下，你點桌子她就回來。"],
+  ["員工","請了廚師、服務生、清潔員，他們會自己接工作；廚師有空就接廚房任何一步。廚師還在走過去時，點他要去的位置就換 Jill 做。服務生等級越高，一趟端越多盤、送越多桌。Jill 有空時會回房間坐一下，你點桌子她就回來。"],
   ["故事","重要的故事發生時，店裡會整個停住；一句一句點著看完，店才接著營業。錯過的都在「餐廳日誌」。"],
   ["暫停","營業中點右上的「II」：調營業速度、看日誌、存檔備份、提早打烊。"],
   ["換手機以前","進度只存在這台裝置的瀏覽器裡：設定 → 備份到檔案。"],
@@ -13082,7 +13094,7 @@ const GUIDE=[   /* the manual describes the game as it is. Audited every release
   ["商店分頁","一開始有「家具與佈置」、「員工」：第 2 天多廚房設備、菜單研發；第 3 天店舖工程；第 4 天貓咪生活；第 6 天社群與宣傳；第 7 天招牌菜。灰色的分頁點了會說哪天開。"],
   ["擴建","在「店舖工程」：Jill's Bistro（第 4 天打烊後，$5,000）→ Jill's Restaurant（評分 3.9，$16,000）→ Jill's Fine Dining（4.3，$40,000）→ JILL（4.6，$90,000）。每擴建一次，桌位、菜單、員工名額都會多。"],
   ["員工","請了就是店裡的人，沒有解雇。<b>餐廳員工</b>分成廚師、服務生、清潔員，各有自己的名額，不能互相借；擴建或工程多哪一種，卡片上寫著。<b>Lounge 名單</b>另外算，跟餐廳員工互不佔用。"],
-  ["廚師","LV1 只做簡單的菜，LV3 起會接手 Jill 做到一半的菜，LV5 才做招牌菜和招牌甜點。"],
+  ["廚師","LV1 只做簡單的菜，越難的菜要越高等級，LV5 才做招牌菜和招牌甜點。"],
   ["晚點到","員工偶爾會晚點到，或請一天假（開店時會說）；沒到的那段時間，他的工作沒人做，日薪照付。"],
   ["清潔員","秀琴阿姨開店就是清潔員，不占名額。"],
   ["租金","每天付，跟店的大小走；新的空間各有自己的一份，結算會一項一項列出來。"],

@@ -316,22 +316,31 @@ def cooking_a_full_place_is_a_quiet_wait(b, port, target):
 @test
 def cooking_jill_and_the_cooks_hand_work_on(b, port, target):
     """The four hand-offs, one state machine (spec §35): A Jill from start to end; B the cooks from start to end with no
-    tap; C Jill on the fire, a cook plates; D a cook on the fire, Jill plates. A cook only takes what he can do: 阿德師傅
-    at LV1 has the fire and not the pass (the proposal in CHEF_SKILL), 小林師傅 the pass."""
+    tap; C Jill on the fire, a cook plates; D a cook on the fire, Jill plates; and E (2026-10-10, the user on the iPhone:
+    「廚師就有空都要做吧 不要分工了」「裝盤怎麼可以當作技能」) the first cook alone, 阿德師傅 at LV1, cooks and plates with no
+    tap. Was: a cook only took the places he had learnt (the proposal in CHEF_SKILL) — 阿德師傅 at LV1 the fire and never
+    the pass, so on Day 2-6 of the user's game every plate was Jill's. In D the cook would now plate it himself; the hand-off
+    to Jill is the player's: he is taken off the board (待命) while the dish is on the fire, and Jill plates."""
     ADE = "{id:'t_ade',role:'chef',name:'阿德師傅',lv:1,duty:'stove',since:1,days:0,pool:'restaurant'}"
     LIN = "{id:'t_lin',role:'chef',name:'小林師傅',lv:1,duty:'stove',since:1,days:0,pool:'restaurant'}"
     out = {}
-    for case, crew in (('A', ''), ('B', f"S.crew.push({ADE},{LIN})"), ('C', f"S.crew.push({LIN})"), ('D', f"S.crew.push({ADE})")):
+    for case, crew in (('A', ''), ('B', f"S.crew.push({ADE},{LIN})"), ('C', f"S.crew.push({LIN})"), ('D', f"S.crew.push({ADE})"), ('E', f"S.crew.push({ADE})")):
         g = _day(b, port, target, 7110 + ord(case), crew)
         g.ev("window.__patient=1")
         if case in ('A', 'C'):
+            if case == 'C':   # (2026-10-10: 小林師傅 now takes the fire as soon as it is there; the player gives it to Jill first)
+                g.ev("window.__hold=true;{const W=wfStaff;wfStaff=function(){if(window.__hold)return;return W.apply(this,arguments)}}")
             check(_wait_orders(g, 1), f'{case}: an order')
             nid = g.ev("(()=>{wfGather();return wfList()[0].id})()")
             check(g.ev(f"wfAssign(wfNode({nid}),'jill')") is True, f'{case}: Jill takes the fire')
+            g.ev("window.__hold=false")
         else:
             check(_until(g, "(R.wf||[]).length>0", step=5), f'{case}: an order')
             nid = g.ev("wfList()[0].id")
-        check(_until(g, f"(()=>{{const n=wfNode({nid});return !n||n.st==='ready'}})()", cap=900, step=2), f'{case}: on the fire, then done')
+        if case == 'D':   # the player keeps the plating for Jill: the cook goes on standby once the dish is his on the fire
+            check(_until(g, f"(()=>{{const n=wfNode({nid});return !!n&&n.who==='t_ade'&&(n.st==='work'||n.st==='cook')}})()", cap=900, step=1), 'D: the cook has it on the fire')
+            g.ev("S.crew.find(m=>m.id==='t_ade').duty=null")
+        check(_until(g, f"(()=>{{const n=wfNode({nid});return !n||n.st==='ready'||(n.si>0&&n.who!=null)}})()", cap=900, step=2), f'{case}: on the fire, then done')
         if case in ('A', 'D'):
             check(g.ev(f"wfNode({nid})&&wfNode({nid}).st") == 'ready', f'{case}: it waits at the fire for Jill')
             check(g.ev(f"wfAssign(wfNode({nid}),'jill')") is True, f'{case}: Jill takes the plating')
@@ -339,9 +348,10 @@ def cooking_jill_and_the_cooks_hand_work_on(b, port, target):
         out[case] = json.loads(g.ev(f"JSON.stringify(__who[{nid}]||[])"))
         check(not g.errors, g.errors[:3]); g.close()
     check(out['A'] == ['jill@0', 'jill@1'], f"A: Jill, then Jill: {out['A']}")
-    check(out['B'] == ['t_ade@0', 't_lin@1'], f"B: 阿德師傅 on the fire, 小林師傅 at the pass, no tap: {out['B']}")
+    check([x.split('@')[1] for x in out['B']] == ['0', '1'] and all(x.split('@')[0] in ('t_ade', 't_lin') for x in out['B']), f"B: the cooks on the fire and at the pass, no tap: {out['B']}")
     check(out['C'] == ['jill@0', 't_lin@1'], f"C: Jill on the fire, 小林師傅 plates: {out['C']}")
     check(out['D'] == ['t_ade@0', 'jill@1'], f"D: 阿德師傅 on the fire, Jill plates: {out['D']}")
+    check(out['E'] == ['t_ade@0', 't_ade@1'], f"E: the first cook alone, at LV1, cooks and plates, no tap: {out['E']}")
 
 
 @test
@@ -443,8 +453,9 @@ def cooking_any_dish_answers_the_five_questions(b, port, target):
 def cooking_a_cook_on_standby_rests_and_his_card_counts_his_dishes(b, port, target):
     """The duty board in the new kitchen (ARCHITECTURE.md, decision 8): a cook taken off the board (「待命中」) does not take
     work, as the board says; put back on it, he does. A cook hired from now on is posted at his own place (阿德師傅 the
-    range), never the coffee machine just because it was free. His staff card counts the restaurant's recipes that have a
-    step he can take, and lists the ones his level does not allow yet."""
+    range), never the coffee machine just because it was free. His staff card says his own place and that he takes every
+    other step (2026-10-10: no places to learn), counts the restaurant's recipes he makes, and lists the ones his level does
+    not allow yet."""
     ADE = "{id:'t_ade',role:'chef',name:'阿德師傅',lv:3,duty:null,since:1,days:0,pool:'restaurant'}"
     g = _day(b, port, target, 7160, f"S.level=3;S.crew.push({ADE})")
     g.ev("window.__patient=1")
@@ -455,7 +466,9 @@ def cooking_a_cook_on_standby_rests_and_his_card_counts_his_dishes(b, port, targ
     check(_until(g, "wfList().some(n=>n.who==='t_ade')||R.tickets.some(tk=>tk.items.some(it=>it.st==='ready'))", step=3), 'back on the board, he takes work')
     check(g.ev("chefHomeDuty('阿德師傅')") == 'stove' and g.ev("(S.eq.oven=1,chefHomeDuty('Marco'))") == 'oven', 'a new cook is posted at his own place, not the coffee machine')
     card = g.ev("(()=>{const m={id:'t_k',role:'chef',name:'阿德師傅',lv:1,duty:'stove'};for(const d of ['friedrice','steak','salad'])if(!S.unlocked.includes(d))S.unlocked.push(d);return wfChefDishesHTML(m)})()")
-    check('有他會的步驟：' in card and '🔒' in card and '炙烤肋眼牛排' in card, f'his card counts what he can do and shows what his level cannot yet: {card}')
+    check('✓ 會做 ' in card and '🔒' in card and '炙烤肋眼牛排' in card, f'his card counts what he makes and shows what his level cannot yet: {card}')
+    places = g.ev("wfPlacesHTML({id:'t_k',role:'chef',name:'阿德師傅',lv:1,duty:'stove'})+'|'+wfPlacesHTML({id:'t_l',role:'chef',name:'小林師傅',lv:1,duty:'stove'})")
+    check('熱區 專長' in places and '其他步驟都會做' in places and '裝盤' not in places and '起' not in places, f'his own place, every other step, nothing to learn, plating no one\'s speciality: {places}')
     check(not g.errors, g.errors[:3]); g.close()
 
 
@@ -585,6 +598,11 @@ def cooking_plating_happens_where_the_food_is(b, port, target):
             seen['carry_slot'] = r['slot']
         g.ev("__run(1)")
     check(seen['rack'], f'(3) she took clean plates at the rack (wfRack {rack})')
+    # 2026-10-10 (the user on the iPhone: 「裝盤為什麼走到左上角？那裏又沒有盤子」「裝盤應該要走到盤子在的地方」): the rack's spot is where the
+    # plates are drawn — her hands (33 px above her feet) within reach of the plates on the counter's front half — not behind
+    # the counter by the wall
+    plates = json.loads(g.ev("JSON.stringify({x:KX.sink.x+12,y:KY.top+56})"))
+    check(((rack['x'] - plates['x']) ** 2 + (rack['y'] - 33 - plates['y']) ** 2) ** .5 < 50, f'(3) the plates are taken where they are: her hands at {rack["x"]},{rack["y"] - 33}, the plates at {plates}')
     check(seen['work_at_food'], '(4)(5) she walked back to the wok and plated it there — beside it, her hands within reach of it — the plate beside the wok')
     outs = seen['out']
     check(len(outs) >= 3 and outs[0] < .5 and outs[-1] > .9 and all(b2 >= a for a, b2 in zip(outs, outs[1:])), f'(6) the rice leaves the wok for the plate as she goes: {outs[:3]}…{outs[-3:]}')
