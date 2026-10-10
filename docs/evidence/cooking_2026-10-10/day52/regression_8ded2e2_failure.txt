@@ -1,0 +1,3 @@
+FAIL  v24_day52_save_plays_the_stories_in_order_over_forty_days  (251.9s)
+      怡君 moved in within about ten days, by Day 62 (59–62) — a day later when a dated beat takes her first day (this seed: Dylan on Valentine's, Day 53): {'yj_meet': 53, 'yj_look': 54, 'yj_three': 58, 'yj_chose': 59, 'yj_move': 61, 'yj_key': 63, 'wall_worry': 66, 'wall_photos': 67, 'wall_visit': 70, 'wall_wang': 71, 'wall_setback': 73, 'wall_report': 77, 'wall_fee': 78, 'wall_prep': 80, 'wall_mediation': 83, 'wall_settle': 83, 'wall_article': 88}
+PASS  v24_xiuqin_is_never_hired_and_takes_no_place  (4.1s)

@@ -1,0 +1,63 @@
+fresh_11.jsonl days 30 D1-D30 stuck 0 two_jills 0 errors 0 bad 0 money 2000 -> 56692 crew 1 level 1 facts 45
+   reload day 4 {'saved': True, 'phase': 'service', 'groups': [2, 2]}
+   reload day 13 {'saved': True, 'phase': 'service', 'groups': [4, 4]}
+   reload day 25 {'saved': True, 'phase': 'service', 'groups': [5, 5]}
+   guests [7, 10, 6, 7, 11, 8, 11, 8, 10, 11, 9, 11, 10, 10, 10, 9, 8, 9, 8, 11, 11, 9, 9, 10, 9, 9, 10, 10, 9, 10]
+   lost   [1, 3, 9, 12, 8, 6, 13, 12, 16, 21, 11, 15, 11, 17, 5, 12, 17, 26, 10, 20, 14, 9, 25, 18, 15, 19, 19, 16, 19, 16]
+fresh_12.jsonl days 30 D1-D30 stuck 0 two_jills 0 errors 0 bad 0 money 2000 -> 59695 crew 1 level 1 facts 44
+   reload day 4 {'saved': True, 'phase': 'service', 'groups': [3, 3]}
+   reload day 13 {'saved': True, 'phase': 'service', 'groups': [2, 2]}
+   reload day 25 {'saved': True, 'phase': 'service', 'groups': [5, 5]}
+   guests [8, 10, 10, 9, 8, 9, 9, 10, 9, 11, 9, 10, 9, 11, 9, 11, 11, 11, 12, 11, 12, 8, 10, 9, 12, 11, 11, 9, 8, 12]
+   lost   [1, 3, 6, 4, 7, 14, 8, 17, 10, 18, 15, 12, 14, 10, 12, 17, 13, 15, 15, 10, 14, 23, 18, 8, 12, 11, 15, 14, 20, 15]
+fresh_13.jsonl days 30 D1-D30 stuck 0 two_jills 0 errors 0 bad 0 money 2000 -> 55852 crew 1 level 1 facts 38
+   reload day 4 {'saved': True, 'phase': 'service', 'groups': [2, 2]}
+   reload day 13 {'saved': True, 'phase': 'service', 'groups': [5, 5]}
+   reload day 25 {'saved': True, 'phase': 'service', 'groups': [2, 2]}
+   guests [6, 7, 7, 10, 6, 11, 10, 8, 11, 11, 11, 12, 11, 8, 10, 9, 8, 9, 10, 9, 11, 11, 10, 9, 10, 7, 10, 11, 9, 10]
+   lost   [1, 4, 10, 6, 15, 15, 8, 9, 9, 22, 11, 10, 7, 19, 20, 16, 24, 10, 14, 12, 16, 23, 17, 15, 12, 30, 21, 11, 19, 13]
+player_day30_11.jsonl days 30 D30-D59 stuck 0 two_jills 0 errors 0 bad 0 money 84998 -> 792220 crew 10 level 5 facts 68
+   reload day 33 {'saved': True, 'phase': 'service', 'groups': [11, 11]}
+   reload day 42 {'saved': True, 'phase': 'service', 'groups': [13, 13]}
+   reload day 54 {'saved': True, 'phase': 'service', 'groups': [10, 10]}
+   guests [54, 62, 61, 65, 59, 57, 62, 57, 56, 58, 54, 55, 61, 54, 54, 62, 54, 58, 55, 53, 56, 54, 61, 50, 59, 54, 50, 58, 57, 53]
+   lost   [38, 24, 38, 22, 31, 29, 14, 31, 21, 32, 23, 23, 16, 39, 31, 28, 28, 26, 33, 40, 41, 29, 35, 31, 26, 29, 32, 33, 34, 32]
+player_day30_12.jsonl days 30 D30-D59 stuck 0 two_jills 0 errors 0 bad 0 money 84998 -> 796166 crew 10 level 5 facts 70
+   reload day 33 {'saved': True, 'phase': 'service', 'groups': [10, 10]}
+   reload day 42 {'saved': True, 'phase': 'service', 'groups': [13, 13]}
+   reload day 54 {'saved': True, 'phase': 'service', 'groups': [11, 11]}
+   guests [60, 58, 63, 57, 64, 61, 55, 59, 57, 61, 54, 63, 63, 54, 52, 60, 53, 54, 56, 57, 62, 54, 57, 55, 52, 60, 55, 55, 56, 48]
+   lost   [31, 31, 22, 22, 21, 36, 18, 29, 26, 30, 30, 30, 33, 19, 35, 47, 33, 33, 21, 23, 32, 31, 36, 37, 32, 25, 30, 37, 33, 26]
+player_day30_13.jsonl days 30 D30-D59 stuck 0 two_jills 0 errors 0 bad 0 money 84998 -> 778954 crew 10 level 5 facts 69
+   reload day 33 {'saved': True, 'phase': 'service', 'groups': [13, 13]}
+   reload day 42 {'saved': True, 'phase': 'service', 'groups': [14, 14]}
+   reload day 54 {'saved': True, 'phase': 'service', 'groups': [11, 11]}
+   guests [58, 53, 61, 59, 56, 59, 63, 56, 53, 60, 54, 48, 53, 53, 55, 59, 59, 55, 56, 56, 57, 57, 59, 57, 52, 54, 58, 56, 52, 55]
+   lost   [30, 34, 28, 18, 31, 39, 29, 37, 35, 29, 32, 21, 35, 33, 35, 42, 20, 31, 45, 16, 43, 39, 25, 36, 34, 39, 34, 46, 26, 30]
+player_day92_2105_11.jsonl days 30 D93-D122 stuck 0 two_jills 0 errors 0 bad 0 money 1179146 -> 3369599 crew 20 level 5 facts 23
+   reload day 96 {'saved': True, 'phase': 'service', 'groups': [15, 15]}
+   reload day 105 {'saved': True, 'phase': 'service', 'groups': [11, 11]}
+   reload day 117 {'saved': True, 'phase': 'service', 'groups': [11, 11]}
+   guests [116, 112, 122, 121, 114, 117, 112, 108, 116, 115, 108, 120, 118, 114, 114, 109, 110, 108, 120, 107, 107, 114, 114, 113, 104, 121, 126, 115, 118, 120]
+   lost   [16, 26, 19, 31, 26, 43, 21, 23, 23, 35, 36, 28, 20, 28, 24, 22, 23, 30, 25, 26, 38, 16, 23, 24, 18, 19, 18, 13, 35, 7]
+player_day92_2105_12.jsonl days 30 D93-D122 stuck 0 two_jills 0 errors 0 bad 0 money 1179146 -> 3372994 crew 20 level 5 facts 23
+   reload day 96 {'saved': True, 'phase': 'service', 'groups': [10, 10]}
+   reload day 105 {'saved': True, 'phase': 'service', 'groups': [17, 17]}
+   reload day 117 {'saved': True, 'phase': 'service', 'groups': [21, 21]}
+   guests [117, 109, 104, 108, 120, 121, 111, 121, 106, 122, 115, 106, 115, 117, 115, 124, 104, 119, 121, 109, 116, 116, 117, 112, 125, 111, 119, 101, 118, 107]
+   lost   [23, 19, 21, 21, 10, 24, 21, 26, 24, 22, 18, 28, 30, 35, 14, 15, 31, 20, 19, 25, 32, 19, 30, 37, 17, 15, 34, 29, 24, 22]
+player_day92_2105_13.jsonl days 30 D93-D122 stuck 0 two_jills 0 errors 0 bad 0 money 1179146 -> 3350213 crew 20 level 5 facts 16
+   reload day 96 {'saved': True, 'phase': 'service', 'groups': [17, 17]}
+   reload day 105 {'saved': True, 'phase': 'service', 'groups': [14, 14]}
+   reload day 117 {'saved': True, 'phase': 'service', 'groups': [11, 11]}
+   guests [123, 109, 107, 112, 112, 110, 115, 128, 103, 110, 100, 114, 108, 119, 117, 109, 107, 109, 99, 107, 108, 122, 114, 104, 113, 111, 120, 107, 117, 111]
+   lost   [9, 21, 35, 12, 30, 12, 18, 19, 25, 34, 38, 28, 27, 40, 25, 26, 40, 21, 25, 25, 24, 16, 21, 28, 35, 22, 26, 26, 11, 28]
+fresh_11.jsonl money change = the day's net on every day: True []
+fresh_12.jsonl money change = the day's net on every day: True []
+fresh_13.jsonl money change = the day's net on every day: True []
+player_day30_11.jsonl money change = the day's net on every day: True []
+player_day30_12.jsonl money change = the day's net on every day: True []
+player_day30_13.jsonl money change = the day's net on every day: True []
+player_day92_2105_11.jsonl money change = the day's net on every day: True []
+player_day92_2105_12.jsonl money change = the day's net on every day: True []
+player_day92_2105_13.jsonl money change = the day's net on every day: True []

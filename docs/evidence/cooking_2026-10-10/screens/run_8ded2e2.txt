@@ -1,0 +1,5 @@
+390x844 26 screens
+375x667 8 screens
+430x932 8 screens
+844x390 8 screens
+
