@@ -66,17 +66,21 @@ def run(A):
             player.to_shop(); k0 = player.settle()
         if k0 == 'shop':
             player.next_day(); player.settle()
+        # a save made during the evening (the title's 「繼續營業 · HH:MM」, 2026-10-10: the user's Day 6 save): OPEN resumed that
+        # evening, its prep long done — the first day is played from there
+        resumed = k0 == 'service'
         day0 = screen.hud()['day'] if A.save else 1
         if A.save:
-            print(f'FROM SAVE {A.save}: Day {day0}', flush=True)
+            print(f'FROM SAVE {A.save}: Day {day0}' + (' — resumed in the evening (繼續營業)' if resumed else ''), flush=True)
         opened_at = None
         for day in range(day0, day0 + A.days):
             p.page.evaluate(SEED_JS % (A.seed * 1000 + day))
-            k = player.settle()
-            if k != 'prep':
-                print(f'Day {day}: expected the prep screen, the screen is {k!r}: {screen.buttons()[:6]}', flush=True); break
-            player.prep(day)
-            player.open_shop()
+            if not (resumed and day == day0):
+                k = player.settle()
+                if k != 'prep':
+                    print(f'Day {day}: expected the prep screen, the screen is {k!r}: {screen.buttons()[:6]}', flush=True); break
+                player.prep(day)
+                player.open_shop()
             # the service, then the closing played to its end
             for _ in range(600):
                 if obs.phase() != 'service':
