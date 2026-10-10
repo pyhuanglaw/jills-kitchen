@@ -201,6 +201,12 @@ def main():
     for pid in [c[0] for c in p24.CARDS]:
         fp = os.path.join(OUT, pid + '.png')
         if os.path.exists(fp): data[pid] = pack(Image.open(fp).convert('RGBA'), pid)
+    # 2026-10-10 (after v2.5.1): the eighth and ninth waiters' cards, from the user's own pictures (tools/portraits_v251.py)
+    spec6 = importlib.util.spec_from_file_location('portraits_v251', os.path.join(ROOT, 'tools', 'portraits_v251.py'))
+    p251 = importlib.util.module_from_spec(spec6); spec6.loader.exec_module(p251)
+    for pid in [c[0] for c in p251.CARDS]:
+        fp = os.path.join(OUT, pid + '.png')
+        if os.path.exists(fp): data[pid] = pack(Image.open(fp).convert('RGBA'), pid)
     # v2.4 rc7.1 (the player, 20:50–20:56: the page got slow to open on a phone): portraits the game never shows stay out of
     # the page — kept as files in assets/portraits — the seven outside-cast cards of P5 (paused, 18:38) and the 2.2.1 staff
     # cards the player redrew as st23_* in 2.3. rc7.7: and Sophie's and Mia's first cards (sophie, mia), redrawn as reg23_*

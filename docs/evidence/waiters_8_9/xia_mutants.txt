@@ -1,0 +1,12 @@
+== mutant xia_not_in_pool
+FAIL  staff_the_eighth_and_ninth_waiters_are_named_people  (0.6s)
+      then the new ones, in order: ['小茉', 'Kai', 'Nina', '阿哲', 'Momo', '小威', '阿芳']
+== mutant xia_no_portrait
+FAIL  staff_the_eighth_and_ninth_waiters_are_named_people  (0.5s)
+      'portrait'
+== mutant xia_shares_a_hairstyle
+FAIL  staff_the_eighth_and_ninth_waiters_are_named_people  (0.8s)
+      小夏: hairstyle 16 is set for nobody else in the game (guests, regulars, the Lounge, the staff): 2 uses
+== mutant xia_hair_not_hers
+FAIL  staff_the_eighth_and_ninth_waiters_are_named_people  (0.8s)
+      小夏: the figure's hair #C9A06A is the card's hair (avg [92, 67, 58], distance 151)

@@ -13,6 +13,7 @@ then packs `js/portraits.js`.
 | `sheet_staff_12_v23.png` | v2.3 follow-up | Twelve staff redrawn: 阿德師傅, Marco, 小林師傅, 阿珠姐, Hugo, 阿勇, 小茉, Kai, Nina, 阿哲, 秀琴阿姨, 小彤 | `tools/portraits_staff_v23.py` |
 | `sheet_staff_8_v23.png` | v2.3 follow-up | The other eight staff: 老周師傅, 小魏, Momo, 小威, 阿芳, 阿明, Yuki, 阿桂 | `tools/portraits_staff_v23.py` |
 | `sophie_mia_sheet_anime_v23.png` | v2.3 follow-up | Sophie × Mia, illustrated; each one's main panel became her portrait | `tools/portraits_regulars_v23.py` |
+| `sheet_xia_v251.png` | 2026-10-10 (after v2.5.1) | 小夏, the eighth waiter (the user's picture): standing, a smiling bust facing us, a three-quarter bust; the middle panel is her card | `tools/portraits_v251.py` |
 
 Also:
 

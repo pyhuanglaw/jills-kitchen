@@ -1346,6 +1346,62 @@ def staff_numbered_names_become_the_pools_names_in_hiring_order(b, port, target)
     check(not g.errors, g.errors[:3]); g.close()
 
 
+# the eighth and ninth waiters (2026-10-10, after v2.5.1): their names, where their cards are cut from, a patch of hair on the
+# card (card px) to compare with the figure's hair, and the figure's own hairstyle
+NEW_WAITERS = [('小夏', 'st251_xia', (230, 140, 280, 170))]
+
+
+@test
+def staff_the_eighth_and_ninth_waiters_are_named_people(b, port, target):
+    """The user, 2026-10-10 after v2.5.1 (docs/v24/waiters_8_9_2026-10-10.txt): the eighth and ninth waiters are 小夏 and 阿衡,
+    never 「服務生8」「服務生9」; restaurant illustration, the user's own pictures; hired, at work, named, on the staff page, saved
+    and loaded; the seven before them unchanged. Each new one: next in the waiters' pool after the seven; a card portrait (the
+    user's picture, cut as a card) in the page's data; a figure of their own (a hairstyle nobody else has, its hair colour within
+    reach of the hair on the card — the figure looks like the picture); hired from the shop in order on the user's Day 92 save
+    with nine waiters' places (the Private Dining Room built), the card on the staff page showing the portrait; kept across a
+    reload; nobody named 服務生N."""
+    from PIL import Image
+    g = Game(b, port, target, seed=812, manual=True, viewport={'width': 390, 'height': 844})
+    pool = json.loads(g.ev("JSON.stringify(CREW_NAMES.waiter)"))
+    check(pool[:7] == ['小茉', 'Kai', 'Nina', '阿哲', 'Momo', '小威', '阿芳'], f'the seven before them, unchanged and first: {pool}')
+    check(pool[7:] == [n for n, _, _ in NEW_WAITERS], f'then the new ones, in order: {pool}')
+    for nm, pid, patch in NEW_WAITERS:
+        info = json.loads(g.ev(f"""JSON.stringify((()=>{{const L=crewLook({{id:'t1',name:'{nm}',role:'waiter'}});const F=STAFF_FACE['{nm}'];
+          const others=Object.entries(STAFF_FACE).filter(([k])=>k!=='{nm}').map(([k,v])=>v.hs);
+          return {{portrait:STAFF_PORTRAITS['{nm}'],data:!!(window.PORTRAIT_DATA&&PORTRAIT_DATA[STAFF_PORTRAITS['{nm}']]),shown:!!portraitOf('staff:{nm}'),
+            hs:L.hs,hair:L.hair,face:!!F,uniform:L.top==='#F4F1EA'&&L.apron==='#2A2220',unique:!others.includes(F&&F.hs)&&F.hs>=STORY_HS_MIN}}}})())"""))
+        check(info['portrait'] == pid and info['data'] and info['shown'], f'{nm}: the card portrait {pid} is in the page and shown: {info}')
+        check(info['face'] and info['unique'] and info['uniform'], f'{nm}: a figure of their own (a hairstyle nobody else on the staff has), in the waiters\' uniform: {info}')
+        uses = g.page.evaluate("async(hs)=>{const t=await (await fetch('js/game.js')).text();return (t.match(new RegExp('\\\\bhs:'+hs+'\\\\b','g'))||[]).length}", info['hs'])
+        check(uses == 1, f'{nm}: hairstyle {info["hs"]} is set for nobody else in the game (guests, regulars, the Lounge, the staff): {uses} uses')
+        im = Image.open(os.path.join(ROOT, 'assets', 'portraits', pid + '.png')).convert('RGB').crop(patch)
+        px = list(im.getdata()); avg = [sum(p[i] for p in px) / len(px) for i in range(3)]
+        h = info['hair'].lstrip('#'); fig = [int(h[i:i + 2], 16) for i in (0, 2, 4)]
+        dist = sum((a - b2) ** 2 for a, b2 in zip(avg, fig)) ** .5
+        check(dist < 40, f'{nm}: the figure\'s hair {info["hair"]} is the card\'s hair (avg {[round(x) for x in avg]}, distance {dist:.0f})')
+    # hired from the shop, in order, on the user's Day 92 save with nine places
+    load_save(g, 'player_day92_2105.json')
+    g.ev("S.money+=500000"); g.ev(PD_OPEN); g.ev("pdW().st2=S.day;pdW().st3=S.day")
+    check(g.ev("roleCap('waiter')") == 9, 'nine waiters\' places with the Private Dining Room')
+    got = []
+    for _ in range(1 + len(NEW_WAITERS)):   # 阿芳 (the save has the other six), then each new one
+        n0 = g.ev("S.crew.length"); _hire(g, 'hire', 'waiter')
+        if g.ev("S.crew.length") > n0: got.append(g.ev("S.crew[S.crew.length-1].name"))
+    want = ['阿芳'] + [n for n, _, _ in NEW_WAITERS]
+    check(got == want, f'hired in order: {got} (want {want})')
+    g.ev("save()"); g.reload(); g.page.wait_for_timeout(150)
+    g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(150)
+    names = json.loads(g.ev("JSON.stringify(roleCrew('waiter').map(m=>m.name))"))
+    check(all(n in names for n in got) and len(set(names)) == len(names), f'kept across a reload, nobody twice: {names}')
+    check(not any(n.startswith('服務生') for n in names), f'nobody named 服務生N: {names}')
+    g.ev("shopTab='staff';showShop()"); g.page.wait_for_timeout(150)
+    for nm, pid, _ in NEW_WAITERS:
+        if nm not in got: continue
+        ok = g.ev(f"(()=>{{const it=[...document.querySelectorAll('#screen .item')].find(x=>x.querySelector('.nm')&&x.querySelector('.nm').textContent.includes('{nm}'));const im=it&&it.querySelector('img.face');return!!(im&&im.src===portraitOf('staff:{nm}').src)}})()")
+        check(ok, f'the staff page: {nm}\'s card shows her or his portrait')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
 @test
 def v24_an_old_shared_cap_save_keeps_everyone_and_waits(b, port, target):
     """rc5 migration: before the split, the Lounge's +2 and +2 were added to one shared cap, so a save can hold more
