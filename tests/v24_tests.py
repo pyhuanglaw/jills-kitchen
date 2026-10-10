@@ -1245,10 +1245,12 @@ def v24_restaurant_and_lounge_staff_are_two_pools_that_never_share_places(b, por
     load_save(g, 'player_day61.json')
     pools = json.loads(g.ev("JSON.stringify(Object.fromEntries(S.crew.map(m=>[m.name,m.pool])))"))
     check(pools['Evan'] == 'lounge' and pools['沈晴'] == 'lounge' and all(v == 'restaurant' for k, v in pools.items() if k not in ('Evan', '沈晴')), f'migrated: {pools}')
-    check(g.ev("restaurantCap()") == 12 and g.ev("poolCrew('restaurant').length") == 12, 'the restaurant: level 5 (6) + 後場整理區 + 側廳 + 廚房擴建 (2 each) = 12, all taken')
-    check(g.ev("CAP_ROLES.map(r=>roleCrew(r).length+'/'+roleCap(r)).join()") == '6/6,4/4,1/2', 'rc8: chefs 6/6, waiters 4/4, cleaners 1/2 (秀琴阿姨 takes no place, 2026-10-10)')
+    check(g.ev("restaurantCap()") == 14 and g.ev("poolCrew('restaurant').length") == 12, 'the restaurant: level 5 (8) + 後場整理區 + 側廳 + 廚房擴建 (2 each) = 14, twelve taken')
+    check(g.ev("CAP_ROLES.map(r=>roleCrew(r).length+'/'+roleCap(r)).join()") == '6/7,4/5,1/2', 'rc8: chefs 6/7, waiters 4/5, cleaners 1/2 (秀琴阿姨 takes no place; the Bistro\'s chef\'s and waiter\'s places, 2026-10-10)')
     check(g.ev("loungeCap()") == 5 and g.ev("poolCrew('lounge').length") == 2, 'the Lounge: its roster at II is five; two hired')
     g.ev("S.money+=500000")
+    _hire(g, 'hire', 'chef'); _hire(g, 'hire', 'waiter')   # (2026-10-10 after v2.5: the two places the Bistro added, filled — the restaurant full as in the player's save)
+    check(g.ev("CAP_ROLES.map(r=>roleCrew(r).length+'/'+roleCap(r)).join()") == '7/7,5/5,1/2' and g.ev("poolCrew('restaurant').length") == 14, 'a chef and a waiter hired into the open places: the restaurant full')
     n = g.ev("S.crew.length"); _hire(g, 'hire', 'waiter')
     check(g.ev("S.crew.length") == n, 'the restaurant is full: no waiter, though the Lounge has three open places')
     _hire(g, 'hire', 'bartender')
@@ -1257,9 +1259,9 @@ def v24_restaurant_and_lounge_staff_are_two_pools_that_never_share_places(b, por
         _hire(g, 'hireLounge', nm)
     got = json.loads(g.ev("JSON.stringify(poolCrew('lounge').map(m=>[m.name,m.role]))"))
     check(sorted(got) == sorted([['Evan', 'bartender'], ['沈晴', 'bartender'], ['阿拓', 'chef'], ['安安', 'waiter'], ['許葳', 'cleaner']]), f'the five, by name: {got}')
-    check(g.ev("poolCrew('restaurant').length") == 12 and g.ev("restaurantCap()") == 12, 'hiring the Lounge took no restaurant place')
+    check(g.ev("poolCrew('restaurant').length") == 14 and g.ev("restaurantCap()") == 14, 'hiring the Lounge took no restaurant place')
     n = g.ev("S.crew.length"); _hire(g, 'hireLounge', '阿拓'); _hire(g, 'hire', 'chef')
-    check(g.ev("S.crew.length") == n, 'full on both sides: no sixth Lounge person, no thirteenth restaurant one')
+    check(g.ev("S.crew.length") == n, 'full on both sides: no sixth Lounge person, no fifteenth restaurant one')
     # the restaurant's works add restaurant places only, the Lounge's works Lounge places only
     l0, r0 = g.ev("loungeCap()"), g.ev("restaurantCap()")
     g.ev("S.rooms.kitchen2=1")
@@ -1275,7 +1277,7 @@ def v24_restaurant_and_lounge_staff_are_two_pools_that_never_share_places(b, por
     check(g.ev("(()=>{const m=S.crew.find(m=>m.name==='安安');const d=waiterDuties(m);return d.lounge&&d.seat&&d.order})()") is True, '安安: the Lounge floor, and seating and orders anywhere')
     # the shop says it, the manual says it
     g.ev("showShop();shopTab='staff';showShop()"); g.page.wait_for_timeout(80); txt = g.ev("document.querySelector('#screen').innerText")
-    check('廚師 6/6・服務生 4/4・清潔員 1/2' in txt and 'Lounge 員工 5/5' in txt and 'Lounge 名單' in txt and 'Lounge 的人都到齊了' in txt, 'the staff page shows two pools (the restaurant\'s as three numbers, rc8)')
+    check('廚師 7/7・服務生 5/5・清潔員 1/2' in txt and 'Lounge 員工 5/5' in txt and 'Lounge 名單' in txt and 'Lounge 的人都到齊了' in txt, 'the staff page shows two pools (the restaurant\'s as three numbers, rc8)')
     check('阿拓 黃柘' in txt and 'Bar Food 料理員' in txt and '許葳' in txt, 'the roster by name and job')
     check(g.ev("GUIDE.some(s=>s.pts.some(e=>e[0]==='員工'&&/Lounge 名單/.test(e[1])&&/互不佔用/.test(e[1])))") is True, 'the manual explains the two lists')
     # 許葳: her portrait, her faces, her look (not Jill's tail)
@@ -1285,7 +1287,7 @@ def v24_restaurant_and_lounge_staff_are_two_pools_that_never_share_places(b, por
     # it all survives a reload
     g.ev("save()"); g.reload(); g.page.wait_for_timeout(150)
     g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(150)
-    check(g.ev("poolCrew('lounge').length") == 5 and g.ev("poolCrew('restaurant').length") == 12, 'kept across a reload')
+    check(g.ev("poolCrew('lounge').length") == 5 and g.ev("poolCrew('restaurant').length") == 14, 'kept across a reload')
     check(not g.errors, g.errors[:3]); g.close()
 
 
@@ -1296,20 +1298,20 @@ def v24_an_old_shared_cap_save_keeps_everyone_and_waits(b, port, target):
     fired: 安安 and 阿拓 are the Lounge's by name; the restaurant shows over its number and hires again only below it."""
     g = Game(b, port, target, seed=272, manual=True, viewport={'width': 390, 'height': 844})
     raw = json.load(open(os.path.join(ROOT, 'tests', 'saves', 'player_day61.json'), encoding='utf-8')); raw = raw.get('save', raw)
-    raw['crew'] = raw['crew'] + [{'id': 'old1', 'role': 'chef', 'name': '老周師傅', 'lv': 2, 'duty': 'stove'}, {'id': 'old2', 'role': 'waiter', 'name': '安安', 'lv': 3, 'duty': 'both', 'duties': {'seat': True, 'order': True, 'lounge': True}}, {'id': 'old3', 'role': 'chef', 'name': '阿拓', 'lv': 2, 'duty': 'bar'}]
+    raw['crew'] = raw['crew'] + [{'id': 'old1', 'role': 'chef', 'name': '老周師傅', 'lv': 2, 'duty': 'stove'}, {'id': 'old2', 'role': 'waiter', 'name': '安安', 'lv': 3, 'duty': 'both', 'duties': {'seat': True, 'order': True, 'lounge': True}}, {'id': 'old3', 'role': 'chef', 'name': '阿拓', 'lv': 2, 'duty': 'bar'}, {'id': 'old4', 'role': 'chef', 'name': '小魏', 'lv': 1, 'duty': 'stove'}]   # (2026-10-10 after v2.5: the Bistro's chef's place — one more legacy chef keeps this save over the chefs' number)
     g.ev("phase='title';R=null;localStorage.setItem(KEY,JSON.stringify(%s))" % json.dumps(raw, ensure_ascii=False)); g.reload(); g.page.wait_for_timeout(150)
     g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(150)
-    check(g.ev("S.crew.length") == 17, 'nobody was fired')
+    check(g.ev("S.crew.length") == 18, 'nobody was fired')
     check(g.ev("crewPool(S.crew.find(m=>m.name==='安安'))") == 'lounge' and g.ev("crewPool(S.crew.find(m=>m.name==='阿拓'))") == 'lounge', '安安 and 阿拓 are the Lounge\'s')
-    check(g.ev("poolCrew('restaurant').length") == 13 and g.ev("restaurantCap()") == 12, 'the restaurant: 13 of 12')
-    check(g.ev("roleCrew('chef').length") == 7 and g.ev("roleCap('chef')") == 6, 'rc8: the chefs are 7 of 6')
+    check(g.ev("poolCrew('restaurant').length") == 14 and g.ev("restaurantCap()") == 14, 'the restaurant: 14 of 14')
+    check(g.ev("roleCrew('chef').length") == 8 and g.ev("roleCap('chef')") == 7, 'rc8: the chefs are 8 of 7')
     g.ev("S.money+=500000"); n = g.ev("S.crew.length"); _hire(g, 'hire', 'chef')
     check(g.ev("S.crew.length") == n, 'over its number, the chefs\' list does not hire')
     _hire(g, 'hire', 'cleaner')
     check(g.ev("S.crew.length") == n + 1 and g.ev("roleCrew('cleaner').length+'/'+roleCap('cleaner')") == '2/2', 'the cleaners\' list is its own: 秀琴阿姨 takes no place (2026-10-10), so one cleaner was hired and then it is full (2/2)')
     n = g.ev("S.crew.length")
     g.ev("showShop();shopTab='staff';showShop()"); g.page.wait_for_timeout(80); txt = g.ev("document.querySelector('#screen').innerText")
-    check('廚師 7/6' in txt and '比名額多' in txt and '大家都留著' in txt, 'the page says why')
+    check('廚師 8/7' in txt and '比名額多' in txt and '大家都留著' in txt, 'the page says why')
     g.ev("S.crew=S.crew.filter(m=>m.name!=='Nina')")   # a waiter's place opens (nobody is ever let go in the game; the test makes the gap)
     _hire(g, 'hire', 'waiter')
     check(g.ev("roleCrew('waiter').length") == 4 and g.ev("S.crew.length") == n, 'a waiter\'s place that opens is a waiter\'s, though the chefs are over theirs')
@@ -5080,13 +5082,15 @@ def v24_rc8_the_restaurants_three_lists_and_the_lounges_one(b, port, target):
     to; level by level the three add up to the one old number, so none of the player's saves is over any list; the
     Lounge's list is untouched by any of it, and a restaurant waiter working the Lounge floor stays a restaurant waiter.
     2026-10-10 (the user, round 2 §2: 「第 1 級餐廳可以另外聘用：1 位廚師。1 位服務生。兩種名額分開計算，秀琴阿姨不占用上述名額」「其他清潔
-    員仍依既有餐廳升級及員工名額規則解鎖」): level 1 has a chef's and a waiter's place (the old one number was 1), so the Bistro adds no
-    staff place any more; 秀琴阿姨 is on the staff and on no list; the staff tab opens in the first shop."""
+    員仍依既有餐廳升級及員工名額規則解鎖」): level 1 has a chef's and a waiter's place (the old one number was 1); 秀琴阿姨 is on the staff and
+    on no list; the staff tab opens in the first shop. 2026-10-10 after v2.5 (the user: 「Bistro 相對第 1 級，增加：廚師名額 +1。服務生名額 +1。
+    清潔員名額維持既有升級規則」「不得讓既有員工因名額變更被移除」): the Bistro adds a chef's and a waiter's place, every later level what it
+    added before (a chef, a chef, a chef and a cleaner), so the levels are 2, 4, 5, 6, 8 places and no list gets smaller."""
     import glob
     g = Game(b, port, target, seed=8601, manual=True, viewport={'width': 390, 'height': 844})
     g.click('[data-act=open]'); g.page.wait_for_timeout(100)
     lv = json.loads(g.ev("JSON.stringify([1,2,3,4,5].map(l=>CAP_ROLES.map(r=>roleCapAt(r,l))))"))
-    check([sum(x) for x in lv] == [2, 2, 3, 4, 6] and lv[0] == [1, 1, 0], f'each level adds up to the old number, level 1 a chef and a waiter (2026-10-10): {lv}')
+    check(lv == [[1, 1, 0], [2, 2, 0], [3, 2, 0], [4, 2, 0], [5, 2, 1]], f'level 1 a chef and a waiter; the Bistro one more of each; then a chef, a chef, a chef and a cleaner (2026-10-10): {lv}')
     check(all(all(lv[i][j] >= lv[i - 1][j] for j in range(3)) for i in range(1, 5)), f'no list ever gets smaller with a level: {lv}')
     src = json.loads(g.ev("JSON.stringify(capSources().map(s=>[s.k,s.add]))"))
     check(src == [['room', {'chef': 1, 'waiter': 1}], ['side', {'waiter': 2}], ['kext', {'chef': 1, 'cleaner': 1}], ['kitchen2', {'waiter': 2}], ['pd1', {'waiter': 1}], ['pd3', {'waiter': 1}], ['pizzaoven', {'chef': 1}]], f'every work says which list: {src}')
@@ -5103,13 +5107,13 @@ def v24_rc8_the_restaurants_three_lists_and_the_lounges_one(b, port, target):
     # the expansion card says what each level adds
     g.ev("S.day=5;shopTab='works';showShop()"); g.page.wait_for_timeout(60)   # (the works tab: from Day 3)
     card = g.ev("(()=>{const e=[...document.querySelectorAll('#screen .item')].find(e=>/擴建：/.test(e.innerText));return e?e.innerText.replace(/\\s+/g,' '):''})()")
-    check('擴建' in card and '服務生 +' not in card and '廚師 +' not in card, f'the Bistro: no staff place any more (level 1 has the waiter\'s, 2026-10-10): {card}')
+    check('擴建' in card and '廚師 +1' in card and '服務生 +1' in card and '清潔員 +' not in card, f'the Bistro: a chef\'s and a waiter\'s place (2026-10-10, after v2.5): {card}')
     g.ev("S.level=4;shopTab='works';showShop()"); g.page.wait_for_timeout(60)
     card = g.ev("(()=>{const e=[...document.querySelectorAll('#screen .item')].find(e=>/擴建：/.test(e.innerText));return e?e.innerText.replace(/\\s+/g,' '):''})()")
     check('廚師 +1' in card and '清潔員 +1' in card and '服務生 +' not in card, f'JILL: a chef\'s and a cleaner\'s place: {card}')
     # the works' words name the list; no generic 「員工 +2」 anywhere
     words = g.ev("JSON.stringify([OPS.find(o=>o.k==='room').d(1)].concat(PROJECTS.concat(KITCHEN_WORKS).filter(p=>['side','kext','kitchen2','pizzaoven'].includes(p.k)).map(p=>p.d+' '+(p.unlock||[]).join(' '))).concat(PD_PROJ.filter(Boolean).map(p=>p.d+' '+(p.unlock||[]).join(' '))))")
-    check('廚師和服務生各可以再多聘 1 位' in words and '服務生可以再多聘 2 位' in words and '廚師 +1、清潔員 +1' in words and '服務生 +2' in words and '廚師 +1（顧烤爐）' in words and '服務生名額 +1' in words, 'each work names its list')
+    check('廚師和服務生各可以再多聘 1 位' in words and '服務生可以再多聘 2 位' in words and '廚師 +1、清潔員 +1' in words and '服務生 +2' in words and '廚師 +1' in words and '顧烤爐' not in words and '有人顧' not in words and '服務生名額 +1' in words, 'each work names its list')
     check('再聘 2 位員工' not in words and '員工名額 +1' not in words and '員工 +2' not in words and '再多聘 1 位，' not in words.replace('廚師可以再多聘 1 位，', ''), 'no generic places left')
     g.close()
     # every save the player sent: no list over its number
@@ -5125,18 +5129,18 @@ def v24_rc8_the_restaurants_three_lists_and_the_lounges_one(b, port, target):
     g = Game(b, port, target, seed=8603, manual=True, viewport={'width': 390, 'height': 844})
     load_save(g, 'player_day61.json')
     r0 = g.ev("CAP_ROLES.map(r=>roleCrew(r).length+'/'+roleCap(r)).join()"); l0 = g.ev("loungeCap()")
-    check(r0 == '6/6,4/4,1/2' and l0 == 5, f'the restaurant full but for a cleaner (秀琴阿姨 takes no place, 2026-10-10), the Lounge 2 of 5: {r0}, {l0}')
+    check(r0 == '6/7,4/5,1/2' and l0 == 5, f'the restaurant with a chef\'s, a waiter\'s and a cleaner\'s place open (the Bistro\'s two, 2026-10-10 after v2.5; 秀琴阿姨 takes no place), the Lounge 2 of 5: {r0}, {l0}')
     g.ev("S.money+=500000")
     for nm in ['阿拓', '安安', '許葳']:
         _hire(g, 'hireLounge', nm)
     check(g.ev("CAP_ROLES.map(r=>roleCrew(r).length+'/'+roleCap(r)).join()") == r0 and g.ev("poolCrew('lounge').length") == 5, '阿拓 (a cook), 安安 (a waiter), 許葳 (a cleaner): the Lounge\'s, on no restaurant list')
     g.ev("S.rooms.kitchen2=1;S.rooms.pizzaoven=1")
-    check(g.ev("roleCap('waiter')") == 6 and g.ev("roleCap('chef')") == 7 and g.ev("loungeCap()") == l0, 'the restaurant\'s works add the restaurant\'s places only')
+    check(g.ev("roleCap('waiter')") == 7 and g.ev("roleCap('chef')") == 8 and g.ev("loungeCap()") == l0, 'the restaurant\'s works add the restaurant\'s places only')
     _hire(g, 'hire', 'waiter')
     g.ev("(()=>{const m=S.crew[S.crew.length-1];m.duties=Object.assign({},waiterDuties(m),{lounge:true})})()")
     check(g.ev("(()=>{const m=S.crew[S.crew.length-1];return m.role==='waiter'&&crewPool(m)==='restaurant'&&waiterDuties(m).lounge})()") is True and g.ev("roleCrew('waiter').length") == 5 and g.ev("poolCrew('lounge').length") == 5, 'a new restaurant waiter on the Lounge floor: still the restaurant\'s waiter (5/6), the Lounge still 5/5')
     _reload(g)
-    check(g.ev("CAP_ROLES.map(r=>roleCrew(r).length+'/'+roleCap(r)).join()") == '6/7,5/6,1/2' and g.ev("poolCrew('lounge').length") == 5, 'kept across a reload')
+    check(g.ev("CAP_ROLES.map(r=>roleCrew(r).length+'/'+roleCap(r)).join()") == '6/8,5/7,1/2' and g.ev("poolCrew('lounge').length") == 5, 'kept across a reload')
     check(not g.errors, g.errors[:3]); g.close()
 
 

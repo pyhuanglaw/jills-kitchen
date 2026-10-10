@@ -639,7 +639,7 @@ html.desk button,html.desk [data-act],html.desk .polaroid{cursor:pointer}
 .lk{font-size:11px;color:#A2412B;font-weight:700}
 .stc{display:inline-block;font-style:normal;padding:1px 7px;border-radius:999px;background:rgba(46,32,25,.07);margin-right:4px;font-weight:700}.stc.none{background:rgba(212,85,58,.14);color:#A2412B}
 .btn.on{box-shadow:inset 0 0 0 2px var(--brass)}
-.stwarn{display:grid;grid-template-columns:auto 1fr auto;gap:4px 8px;align-items:center;margin:8px 0;padding:9px 12px;border-radius:12px;background:rgba(212,85,58,.1);border:1px solid rgba(212,85,58,.35);font-size:12.5px;color:var(--ink)}.stwarn b{grid-column:2;font-weight:800;color:#A2412B}.stwarn span{grid-column:2;color:var(--ink2);font-size:12px}.stwarn .btn{grid-column:3;grid-row:1/3}
+
 /* v2.2.1 #5: the weather dish's swap chooser on the prep screen */
 .wxadd .mini.on{box-shadow:inset 0 0 0 2px var(--brass)}
 .mswap{margin:8px 0 2px;padding:8px 10px;border-radius:12px;background:rgba(46,32,25,.05);border:1px solid var(--line)}

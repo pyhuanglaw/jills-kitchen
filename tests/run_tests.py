@@ -3636,8 +3636,11 @@ def workstation_assignment_is_explicit_with_capacities_and_swaps(b, port, target
     tap, and keep training separate from assignment"). The staff tab is two lists: 工作分配 — one row per bought station
     (n/cap, cap = its cooking slots, today's dish count) and per floor job, the people on it as chips, × takes someone
     off (a chef goes to 待命), ＋ lists who can be added with where they come from and one tap adds them, a full station
-    says 已滿 — then 員工 (level, wage, training, firing; no assignment controls) and 招募. The prep screen warns when a
-    station with dishes on today's menu has nobody at it. Older saves' waiter duties still load."""
+    says 已滿 — then 員工 (level, wage, training, firing; no assignment controls) and 招募. Older saves' waiter duties still load.
+    2026-10-10 (the user, after v2.5: 「直接移除『⚠ 冷盤台／咖啡吧目前無人』以及不再符合現行工作機制的『安排員工』提示。但不要移除仍有用途的員工
+    管理功能」): every cook takes any step of the kitchen when he is free, so a station with nobody posted at it is nothing to
+    warn about — the prep screen says nothing of it (it did: 「⚠ 冷盤台目前無人……其他站的廚師有空時會過去幫忙，一次一道」 and 安排員工),
+    and the board does not mark such a station red; the board itself, 待命 and the floor's jobs are as they were."""
     g = Game(b, port, target, seed=9, manual=True)
     player30(g)
     g.ev("shopTab='staff';phase='shop';mainScreen='shop';showShop()"); g.page.wait_for_timeout(80)
@@ -3695,14 +3698,14 @@ def workstation_assignment_is_explicit_with_capacities_and_swaps(b, port, target
     g.click(".brow[data-d='check'] [data-act=bdOpen]"); g.page.wait_for_timeout(60)
     check(g.ev("!!document.querySelector('.brow[data-d=check] .blist [data-act=bdAddD][data-k=\"%s\"][disabled]')" % wid), 'a LV1 waiter is listed for 結帳 but cannot be added (LV3 起)')
     g.reload(); check(g.ev(f"waiterDuties(S.crew.find(m=>m.id==='{wid}')).seat") is True, 'the assignment survives a reload')
-    # the prep warning: nobody at a station today's menu needs
+    # nobody posted at a station today's menu uses: no warning on the prep screen, no red row on the board (2026-10-10)
     g.ev("S.crew.filter(m=>m.role==='chef').forEach(m=>m.duty='stove');phase='prep';mainScreen='prep';S.phase='prep';showPrep()"); g.page.wait_for_timeout(80)
-    warns = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('.stwarn')].map(w=>w.textContent))"))
     need = json.loads(g.ev("JSON.stringify(['oven','prep','bar'].filter(st=>stationCap(st)>0&&menuList().some(d=>DISH(d).st===st&&stationOk(d))))"))
-    check(len(warns) == len(need) and all('目前無人' in w for w in warns), f'one warning per empty station the menu needs: {warns} / {need}')
-    check(g.ev("!!document.querySelector('.stwarn [data-act=staffTab]')"), 'the warning has 安排員工')
-    g.click('.stwarn [data-act=staffTab]'); g.page.wait_for_timeout(80)
-    check(g.ev("shopTab") == 'staff' and g.ev("phase") == 'shop' and g.ev("!!document.querySelector('.board')"), 'it opens the staff tab on the board')
+    check(need, f'the Day 30 menu uses a station with nobody at it now: {need}')
+    prep = g.ev("document.querySelector('#screen').innerText")
+    check('目前無人' not in prep and '安排員工' not in prep and '其他站的廚師' not in prep and not g.ev("!!document.querySelector('.stwarn,[data-act=staffTab]')"), f'the prep screen says nothing of it: {prep[:300]}')
+    g.ev("shopTab='staff';phase='shop';mainScreen='shop';showShop()"); g.page.wait_for_timeout(60)
+    check(g.ev("!document.querySelector('.brow[data-st].none')") and g.ev("!!document.querySelector('.board')") and '廚師有空就接廚房任何一步' in g.ev("document.querySelector('.board .bd-h').textContent"), 'the board: no station row marked as missing someone; it says how the kitchen works')
     # a chef on standby during a service does nothing and breaks nothing
     g.ev("S.crew.find(m=>m.role==='chef').duty=null;save();showPrep()"); fill_fridge(g); start_day(g); install_bot(g); g.ev(LAZY_ACTOR + "\nwindow.__act=window.__actLazy;")
     g.page.evaluate('()=>window.__bot(900,1/30)')

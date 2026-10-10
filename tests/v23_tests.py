@@ -867,7 +867,10 @@ def followup_the_manual_describes_the_current_game(b, port, target):
                   # lines earlier releases already took out
                   '秀琴阿姨會借你兩萬', '訓練升級、解雇', 'Ken 的品酒夜', '大約三個晚上有一晚現場演奏', '員工上限多兩人', '暫停選單和設定裡都有【儲存目前進度】',
                   # the Lounge before 2026-10-06/07 (《看看》 decides; $50,000; 阿拓 with Lounge I)
-                  'Lounge II 起多阿拓', '再想想', '等她最後一晚過了', "店要先擴建到 Jill's Fine Dining"]:
+                  'Lounge II 起多阿拓', '再想想', '等她最後一晚過了', "店要先擴建到 Jill's Fine Dining",
+                  # the old kitchen's division of labour (the user, 2026-10-10: 「廚師就有空都要做吧 不要分工了」; after v2.5: the prep
+                  # screen's 「⚠ 某站目前無人」 removed, and the manual's line about it)
+                  '工作站沒人', '目前無人', '廚師只接自己會的位置', 'LV3 起會接手']:
         check(stale not in txt, f'not in the manual: {stale}')
     # the screen: a new game opens on the first card; a card whose place is not there yet is not shown (社群與宣傳 from Day 6)
     g.click('[data-act=open]'); g.page.wait_for_timeout(100)
