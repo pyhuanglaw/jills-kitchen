@@ -515,6 +515,37 @@ def qa_the_task_list_opens_under_its_chip_and_any_tap_puts_it_away(b, port, targ
 
 
 @test
+def qa_the_kitchen_chips_never_sit_on_the_counters(b, port, target):
+    """庫存, 今日任務 and 💬 in the kitchen (the user, 2026-10-10: 「按鈕擋住冷盤台、點不到」, on a computer): they sit at a fixed height,
+    and on a short screen — a laptop's window, a phone held sideways — the counters come up under them, so the stations there
+    could not be tapped. On a tall phone, a phone sideways, a short laptop window and a desktop window, a new game's first
+    evening in the kitchen: no chip lies on what can be tapped there (the counters and their stations, the coffee machine,
+    the pizza oven: kitchenTapBoxes), none on the room tabs, and each can be reached by a finger."""
+    bad = []
+    for W, H in ((390, 844), (375, 667), (844, 390), (1100, 500), (1280, 720)):
+        p = Player(b, port, target, W=W, H=H)
+        try:
+            p.tap('[data-act=open]'); p.settle(); p.start_day(); p.settle()
+            p.room_tab('kitchen'); p.frames(10)
+            r = json.loads(p.ev("""JSON.stringify((()=>{const s=sc.getBoundingClientRect(),X=x=>s.left+SV.ox+x*SV.s,Y=y=>s.top+SV.oy+y*SV.s;
+              const box=e=>{if(!e||e.hidden)return null;const b=e.getBoundingClientRect();return{x0:b.left,x1:b.right,y0:b.top,y1:b.bottom}};
+              return{boxes:kitchenTapBoxes().map(b=>({x0:X(b.x0),x1:X(b.x1),y0:Y(b.y0),y1:Y(b.y1)})),
+                tabs:box($('#roomTabs')),chips:['stockChip','taskChip','logChip'].map(id=>[id,box($('#'+id))]).filter(c=>c[1])}})())"""))
+            hit = lambda a, c: a['x0'] < c['x1'] - 1 and a['x1'] > c['x0'] + 1 and a['y0'] < c['y1'] - 1 and a['y1'] > c['y0'] + 1
+            for cid, c in r['chips']:
+                if any(hit(c, x) for x in r['boxes']):
+                    bad.append(f'{W}×{H}: {cid} on the counters ({c})')
+                if r['tabs'] and hit(c, r['tabs']):
+                    bad.append(f'{W}×{H}: {cid} on the room tabs')
+                if not p.can_reach('#' + cid):
+                    bad.append(f'{W}×{H}: {cid} cannot be reached')
+            check(not p.errors, p.errors[:3])
+        finally:
+            p.close()
+    check(not bad, ' | '.join(bad[:6]))
+
+
+@test
 def qa_every_tab_reaches_by_finger(b, port, target):
     """The shop's and the journal's tab strips scroll sideways: on each phone width every tab can be swiped to and
     tapped, and the tap opens it."""

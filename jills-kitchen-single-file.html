@@ -6523,7 +6523,33 @@ function peeking(){const p=$('#peekPill');return!!p&&!p.hidden}   /* v2.2.1 #8: 
    the tab you are in reads the room's whole name (員工休息室, 私人包廂), so inside a room it is that room, never 二樓. */
 function roomTabName(k,lv){if(k==='lounge'&&!loungeLv())return'隔壁';/* rc8: before it is Jill's, the bar next door */const r=ROOMS[k];if(k!==room)return r.n;lv=lv||0;return lv===0&&r.full?r.full:lv<=1&&r.mid?r.mid:r.n}
 /* 2026-10-09 #14: in the kitchen 今日任務 sits beside 庫存 (over the hood, nothing to tap there) — on the right it covered the pizza oven's dome on a phone */
-function taskChipPlace(){const tc=$('#taskChip'),sc0=$('#stockChip'),tp=$('#taskPanel');if(!tc)return;const k=room==='kitchen'&&!!sc0&&!sc0.hidden;const l=k?(sc0.offsetLeft+sc0.offsetWidth+6)+'px':'';if(tc.style.left!==l){tc.style.left=l;tc.style.right=k?'auto':'';if(tp){tp.style.left=k?'8px':'';tp.style.right=k?'auto':''}}taskPanelPlace()}
+function taskChipPlace(){const tc=$('#taskChip'),sc0=$('#stockChip'),tp=$('#taskPanel');if(!tc)return;const u=chipsWhere();if(!u){const k=room==='kitchen'&&!!sc0&&!sc0.hidden;const l=k?(sc0.offsetLeft+sc0.offsetWidth+6)+'px':'';if(tc.style.left!==l){tc.style.left=l;tc.style.right=k?'auto':''}if(tp){const pl=k?'8px':'';if(tp.style.left!==pl){tp.style.left=pl;tp.style.right=k?'auto':''}}}chipsLift(u);taskPanelPlace()}
+/* 2026-10-10 (the user: 「按鈕擋住冷盤台、點不到」): on a short screen — a laptop's window, a phone held sideways — the kitchen's
+   counters come up under the chips (庫存, 今日任務, 💬), and the stations there cannot be tapped. Then the chips go up into the room
+   tabs' row, beside the tabs, where there is room; on a tall phone nothing moves (the counters are well below them) */
+/* what can be tapped along the kitchen's back wall, in the scene's units: the counters' top and face (the stations on them), the
+   coffee machine standing above the counter, and the pizza oven's dome on the wall */
+function kitchenTapBoxes(){const out=[{x0:Math.min(KX.sink.x,KX.prep.x)-4,x1:Math.max(KX.bar.x+KX.bar.w,KX.oven.x+KX.oven.w)+4,y0:KY.top-6,y1:KY.top+KY.h+KY.face},{x0:KX.bar.x-2,x1:KX.bar.x+KX.bar.w+2,y0:KY.top-32,y1:KY.top}];
+ if(projOn('pizzaoven')){const o=pizzaOvenRect();out.push({x0:o.x,x1:o.x+o.w,y0:o.y,y1:o.my+20})}return out}
+let chipsKey='',chipsUp=null;
+function chipsWhere(){const sc0=$('#stockChip'),tc=$('#taskChip'),lc=$('#logChip'),tabs=$('#roomTabs');if(room!=='kitchen'||!sc0||sc0.hidden||!tabs||tabs.hidden||!sc||!sc0.offsetParent)return null;
+ const C=sc0.offsetParent.getBoundingClientRect(),T=tabs.getBoundingClientRect(),ws=sc0.offsetWidth,wt=tc&&!tc.hidden?tc.offsetWidth:0,wl=lc&&!lc.hidden?lc.offsetWidth:0,h=sc0.offsetHeight||29;
+ const key=[innerWidth,innerHeight,SV.s,SV.ox,SV.oy,ws,wt,wl,Math.round(T.left),Math.round(T.width),projOn('pizzaoven')?1:0].join(',');if(key===chipsKey)return chipsUp;chipsKey=key;
+ const r=sc.getBoundingClientRect(),X=x=>r.left+SV.ox+x*SV.s,Y=y=>r.top+SV.oy+y*SV.s;
+ const boxes=kitchenTapBoxes().map(b=>({x0:X(b.x0),x1:X(b.x1),y0:Y(b.y0),y1:Y(b.y1)}));
+ /* where each chip sits when nothing moves (the CSS: a row at 132, the 💬 under 庫存 at 166; 今日任務 beside 庫存 in the kitchen) */
+ const at=[{id:'stockChip',x0:C.left+8,w:ws,y0:C.top+132},{id:'taskChip',x0:C.left+8+ws+6,w:wt,y0:C.top+132},{id:'logChip',x0:C.left+8,w:wl,y0:C.top+166}].filter(c=>c.w>0);
+ const over=at.filter(c=>boxes.some(b=>c.x0<b.x1&&c.x0+c.w>b.x0&&c.y0<b.y1&&c.y0+h>b.y0));if(!over.length)return chipsUp=null;
+ const need=over.reduce((a,c)=>a+c.w,0)+6*(over.length-1)+16,top=Math.round(T.top-C.top+(T.height-h)/2);
+ const side=T.left-C.left>=need?'left':C.right-T.right>=need?'right':null;return chipsUp=side?{side,top,ids:over.map(c=>c.id)}:null}
+/* the chips on the counters go up into the tabs' row (only those); the others stay where they are */
+function chipsLift(u){const sc0=$('#stockChip'),tc=$('#taskChip'),lc=$('#logChip');if(!sc0)return;const set=(e,top,left,right)=>{if(!e)return;if(e.style.top!==top)e.style.top=top;if(left!=null&&e.style.left!==left)e.style.left=left;if(right!=null&&e.style.right!==right)e.style.right=right};
+ if(!u){if(sc0.dataset.up){delete sc0.dataset.up;set(sc0,'','','');set(lc,'','','');set(tc,'','','');chipsKey=''}return}
+ sc0.dataset.up=u.side;const ws=sc0.offsetWidth,top=u.top+'px',up=id=>u.ids.includes(id);
+ /* the ones that stay: their places as when nothing moves */
+ if(!up('stockChip'))set(sc0,'','','');if(!up('logChip'))set(lc,'','','');if(!up('taskChip'))set(tc,'',(8+ws+6)+'px','auto');
+ let x=8;const order=u.side==='left'?['stockChip','taskChip','logChip']:['logChip','taskChip','stockChip'];
+ for(const id of order){if(!up(id))continue;const e=$('#'+id);if(!e||e.hidden)continue;if(u.side==='left')set(e,top,x+'px','auto');else set(e,top,'auto',x+'px');x+=e.offsetWidth+6}}
 function renderRoomTabs(force){taskChipPlace();const el=$('#roomTabs');if(!el)return;const rv=phase!=='service'&&UPV==='reveal';const show=(phase==='service'&&!!R)||rv||(phase!=='service'&&peeking()&&roomsOpen().length>1);el.hidden=!show;if(!show)return;const A=roomAlerts();
  const list=rv?['up']:UPV==='look'&&phase!=='service'?['up','staff','pdr'].filter(roomOpen):roomsOpen();el.classList.toggle('many',list.length>=7);el.classList.toggle('many8',list.length>=8);el.classList.toggle('many9',list.length>=9);   /* the floor's look (店舖工程, a reveal): the floor and its rooms only */
  const h=list.map(k=>`<button data-room="${k}" class="${k===room?'on':''}${A[k].u?' urgent':''}${roomIsNew(k)&&k!==room?' new':''}"><span>${roomTabName(k)}</span>${A[k].n?`<b>${A[k].n}</b>`:roomIsNew(k)&&k!==room?'<b class="nw">NEW</b>':''}</button>`).join('');
