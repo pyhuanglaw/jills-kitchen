@@ -7,6 +7,9 @@ background kept; nothing redrawn, stretched or recoloured. Packed by tools/portr
 - 小夏 (sheet_xia_v251.png, supplied 2026-10-10 11:20 UTC): the sheet has three panels — standing, a smiling bust facing
   us, a three-quarter bust; the card is the middle one (her hair, the clip and her smile all show), from the top of the
   sheet to the panel's own lower edge.
+- 阿衡 (sheet_heng_v251.jpg, supplied 2026-10-10 11:22 UTC): the same three panels; the card is the middle one (his hair, the
+  thin frames and the quiet smile), from just under the file's own black strip along its top edge (rows 0–3) to the panel's
+  lower edge.
 
   python3 tools/portraits_v251.py && python3 tools/portraits.py
 """
@@ -23,6 +26,7 @@ RADIUS = 18
 # (id, sheet, box in sheet px, name)
 CARDS = [
     ('st251_xia', 'sheet_xia_v251.png', (368, 0, 945, 905), '小夏'),
+    ('st251_heng', 'sheet_heng_v251.jpg', (316, 4, 832, 813), '阿衡'),
 ]
 
 

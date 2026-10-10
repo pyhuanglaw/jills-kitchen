@@ -4169,7 +4169,7 @@ def named_guests_keep_one_face_and_the_staff_have_theirs(b, port, target):
     check(g.ev("!!R.insp") and g.ev("!!document.querySelector('#plines img')") and g.ev("(R.log||[]).some(l=>l.w==='衛生檢查員')"), 'the inspector arrives with her face and a line')
     # the staff
     st = json.loads(g.ev("JSON.stringify(Object.keys(STAFF_PORTRAITS).map(n=>[n,!!portraitOf('staff:'+n)]))"))
-    check(len(st) == 26 and all(ok for n, ok in st) and all(n in dict(st) for n in ['Evan', '沈晴', '阿拓', '安安', '許葳', '小夏']), f'all twenty-six staff names have a portrait (2026-10-10: 小夏, the eighth waiter, from the user\'s picture) (the Lounge\'s five: the four keep theirs, 許葳 from the player\'s sheet of v2.4 rc5; the twenty were redrawn 2026-10-01): {st}')
+    check(len(st) == 27 and all(ok for n, ok in st) and all(n in dict(st) for n in ['Evan', '沈晴', '阿拓', '安安', '許葳', '小夏', '阿衡']), f'all twenty-seven staff names have a portrait (2026-10-10: 小夏 and 阿衡, the eighth and ninth waiters, from the user\'s pictures) (the Lounge\'s five: the four keep theirs, 許葳 from the player\'s sheet of v2.4 rc5; the twenty were redrawn 2026-10-01): {st}')
     check(g.ev("CREW_NAMES.chef.concat(CREW_NAMES.waiter,CREW_NAMES.cleaner,CREW_NAMES.bartender).filter(n=>!STAFF_PORTRAITS[n]).join(',')") == '', 'no one in the name pools is without a portrait any more')
     check(g.ev("portraitOf('jill').src===portraitData('jill_default')&&portraitOf('dylan').src===portraitData('dylan_default')"), "Jill's and Dylan's portraits are untouched")
     # a named reviewer's face in the journal

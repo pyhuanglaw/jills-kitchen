@@ -1,7 +1,9 @@
 waiters before: 小茉、Kai、Nina、阿哲、Momo、小威 (6/9)
-hired from the shop, in order: ['阿芳', '小夏']; the toast: 阿芳 加入了 Jill's Kitchen！ | 小夏 加入了 Jill's Kitchen！
-waiters after: 小茉、Kai、Nina、阿哲、Momo、小威、阿芳、小夏 (8/9)
+hired from the shop, in order: ['阿芳', '小夏', '阿衡']; the toast: 小夏 加入了 Jill's Kitchen！ | 阿衡 加入了 Jill's Kitchen！
+waiters after: 小茉、Kai、Nina、阿哲、Momo、小威、阿芳、小夏、阿衡 (9/9)
 the staff page, 小夏's card: {'img': True, 'src': True, 'text': '小夏 服務生 目前：帶位＋點餐＋上菜＋結帳・日薪 $202・一次端 2 盤・反應 1.9 秒 今天剛來・正在熟悉：主廳、側廳・酒：還不熟 LV2 起會上菜，LV3 起會結帳；做哪些在上面的「工作分配」點 訓練升級 $1,000 上品酒課 $'}
-after a reload: 小茉 LV5、Kai LV5、Nina LV5、阿哲 LV5、Momo LV5、小威 LV5、阿芳 LV1、小夏 LV1
-小夏 at work in the main (order), at 111,143
+the staff page, 阿衡's card: {'img': True, 'src': True, 'text': '阿衡 服務生 目前：帶位＋點餐＋上菜＋結帳・日薪 $202・一次端 2 盤・反應 1.9 秒 今天剛來・正在熟悉：主廳、側廳・酒：還不熟 LV2 起會上菜，LV3 起會結帳；做哪些在上面的「工作分配」點 訓練升級 $1,000 上品酒課 $'}
+after a reload: 小茉 LV5、Kai LV5、Nina LV5、阿哲 LV5、Momo LV5、小威 LV5、阿芳 LV1、小夏 LV1、阿衡 LV1
+小夏 at work in the main (order), at 79,157
+阿衡 at work in the main (order), at 89,137
 page errors: []

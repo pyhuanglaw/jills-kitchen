@@ -296,7 +296,7 @@ function kenIllusMig(o){const st=o&&o.story;if(!st||!st.facts)return o;for(const
 function srLeaseMig(o){if(!o||!(o.rooms&&o.rooms.up))return o;const u=o.up=o.up||{};const sr=u.sr=u.sr||{};if(sr.done!=null)return o;const L=u.lease!=null?u.lease:(o.day||1);sr.bought=L;sr.done=L;sr.mig=1;o.newRooms=o.newRooms||{};if(o.newRooms.staff==null)o.newRooms.staff=L;
  const st=o.story=o.story&&typeof o.story==='object'?o.story:{v:1};const F=st.facts=st.facts||{};if(!F.sr_story)F.sr_story={d:0,n:1,l:0,retro:1};if(!F.sr_build)F.sr_build={d:L,n:1,l:L};return o}
 function evanMig(o){if(((o.rooms&&o.rooms.lounge)||0)>0&&!(o.crew||[]).some(m=>m.name==='Evan'&&m.role==='bartender')){o.crew=o.crew||[];o.crew.push(evanNew(o.day))}return o}
-const CREW_NAMES={bartender:['Evan','沈晴'],chef:['阿德師傅','Marco','小林師傅','阿珠姐','Hugo','阿勇','老周師傅','小魏'],waiter:['小茉','Kai','Nina','阿哲','Momo','小威','阿芳','小夏'],cleaner:['秀琴阿姨','小彤','阿明','Yuki','阿桂']};   /* v2.2.1: the pools are longer than the crew cap, so nobody is ever called just 廚師 */
+const CREW_NAMES={bartender:['Evan','沈晴'],chef:['阿德師傅','Marco','小林師傅','阿珠姐','Hugo','阿勇','老周師傅','小魏'],waiter:['小茉','Kai','Nina','阿哲','Momo','小威','阿芳','小夏','阿衡'],cleaner:['秀琴阿姨','小彤','阿明','Yuki','阿桂']};   /* v2.2.1: the pools are longer than the crew cap, so nobody is ever called just 廚師 */
 /* Operations: what a restaurant that cannot grow any bigger can still get better at. Each one is a real capacity or
    throughput change, bought once (or in tiers), and none of them needs a next expansion. */
 /* the pieces that were bought with the room in mind now live in the projects page too */
@@ -998,7 +998,8 @@ function dishURL(id,q,want){const k='u'+id+(q||'G')+(want||0)+(id==='signature'&
    stories are out): 24 Evan's tousled waves to the collar, a low messy fringe · 25 沈晴's loose knot at the crown, strands by
    her face (and gold hoops) · 26 阿拓's short, textured points · 2026-10-10 (the user, after v2.5.1: the eighth and ninth waiters,
    drawn from the user's own pictures, docs/v24/waiters_8_9_2026-10-10.txt): 27 小夏's chin-length bob, parted on her right,
-   that side tucked behind the ear with a beige clip (L.clip), the other side down to the jaw. And the face: L.specs (thin|bold|wire|tint — never the strangers' round frames), L.beard
+   that side tucked behind the ear with a beige clip (L.clip), the other side down to the jaw · 28 阿衡's short black hair with a
+   slight wave, a tousled fringe swept to his left, the ears showing (and L.specs 'thin'). And the face: L.specs (thin|bold|wire|tint — never the strangers' round frames), L.beard
    (stubble|goatee|full), L.brow (thick|straight|arch), L.lash, L.lips, L.eye ('calm'), L.ear (stud|pearl|drop, L.earc),
    L.neckl (pearls), L.cravat, L.overall, L.camera. */
 const STORY_HS_MIN=10;
@@ -1027,6 +1028,7 @@ function drawStoryHair(c,L,hy,layer){const hair=L.hair,dk=shade(hair,-.28),lt=sh
   else if(hs===25)back([[-8,1.6],[-9.8,4.6],[-7.4,7],[0,7.6],[7.4,7],[9.8,4.6],[8,1.6]]);   /* 沈晴: the nape, under the knot */
   else if(hs===26)back([[-10.6,-5],[-11.2,0],[-10,2.6],[10,2.6],[11.2,0],[10.6,-5],[6,-10.4],[0,-11.4],[-6,-10.4]],.6);   /* 阿拓: short at the back */
   else if(hs===27)back([[-11,-7],[-12.2,-1.4],[-12.2,3.6],[-11.2,7.6],[-9,8.8],[-5,8.4],[5,8.6],[9.2,9.6],[11.8,8.6],[12.6,4.2],[12.4,-1],[11.2,-7],[6,-11.2],[0,-12.2],[-6,-11.2]],.9);   /* 小夏: the bob behind, to the jaw */
+  else if(hs===28)back([[-10.8,-5],[-11.6,0],[-10.6,3.6],[-7.6,4.6],[7.6,4.6],[10.6,3.6],[11.6,0],[10.8,-5],[6,-10.6],[0,-11.6],[-6,-10.6]],.6);   /* 阿衡: short at the nape */
   return}
  /* on the head */
  if(hs===10){fill([[-9.7,1],[-10.5,-4.5],[-9.8,-9.5],[-6.5,-12.6],[-1.5,-13.6],[3.5,-13.2],[8,-11],[10.6,-6.5],[10.4,-1.5],[9.7,1],[8.2,-1.4],[5.5,-3.2],[2.5,-4],[0,-3.6],[-1.6,-2.2],[-2.6,-4.8],[-5,-6.2],[-7.6,-4.6],[-8.8,-1]]);
@@ -1092,7 +1094,12 @@ function drawStoryHair(c,L,hy,layer){const hair=L.hair,dk=shade(hair,-.28),lt=sh
     the jaw; her right side is tucked behind the ear — the ear shows — with a beige clip above it, slanting down toward her face */
   fill([[-9.6,-.4],[-10.6,-4.8],[-9.8,-9.4],[-6.8,-12.4],[-2.6,-13.6],[2.4,-13.4],[6.8,-11.8],[10.2,-8.2],[11.8,-3.2],[12.2,2.2],[11.6,6.8],[10.4,9.8],[9.2,8.6],[9.4,4.4],[8.8,.2],[7.2,-3.4],[4.8,-6],[1.8,-7.8],[-1.2,-9],[-2.8,-9.8],[-4.2,-8.6],[-6.2,-6.8],[-7.8,-4.2],[-8.6,-1.4]],null,.85);
   str([[-6.4,-10.6],[-2,-12],[3,-11.6],[7,-9.4]],lt,.85);str([[-1.2,-9],[3,-7.6],[7,-4.4],[9.2,-.6]],lt,.55);str([[-2.8,-9.8],[-2.6,-12.8]],dk,.5);str([[11,0],[10.8,4.6],[10.2,8.4]],lt,.5);
-  const cl=L.clip||'#DCC2A8';c.fillStyle=cl;c.beginPath();for(const [k,[x,y]] of [[-10.3,-5.6],[-8.3,-3.8],[-7.7,-4.6],[-9.7,-6.4]].entries())k?c.lineTo(x,hy+y):c.moveTo(x,hy+y);c.closePath();c.fill();c.strokeStyle=shade(cl,-.32);c.lineWidth=.35;c.stroke()}
+  const cl=L.clip||'#D2AE92';c.fillStyle=cl;c.beginPath();for(const [k,[x,y]] of [[-10.3,-5.6],[-8.3,-3.8],[-7.7,-4.6],[-9.7,-6.4]].entries())k?c.lineTo(x,hy+y):c.moveTo(x,hy+y);c.closePath();c.fill();c.strokeStyle=shade(cl,-.32);c.lineWidth=.35;c.stroke()}
+ else if(hs===28){/* 阿衡 (his picture, 2026-10-10): short black hair with a slight wave; the fringe falls in loose points across to his left,
+    lower over that brow, higher on the other side; the ears show */
+  fill([[-9.8,1.4],[-10.8,-3.4],[-10.6,-8.4],[-8,-11.8],[-4.4,-13.8],[-.4,-14.6],[3.8,-14.2],[7.6,-12.6],[10.4,-9.6],[11.4,-5.4],[11,-1],[10,1.6],[9.2,-.8],[8.6,-3.6],[7.4,-2.2],[6.4,-4.6],[4.8,-3.4],[3.6,-6],[2,-4.8],[.6,-7],[-1.6,-6.6],[-3.6,-7.8],[-5.6,-6.4],[-7.4,-5],[-8.6,-2.4],[-9,.6]],null,.5);
+  curls([[-7,-10,0],[-2.4,-12.4,.6],[2.8,-12.4,1],[7.4,-10,.4]],1.4,.6);
+  str([[-3.6,-7.8],[-1.4,-11],[1.6,-13.2]],dk,.55);str([[2,-4.8],[5,-8],[8.4,-9.6]],lt,.6);str([[-6.4,-9.4],[-3,-11.6],[1,-12.6]],lt,.7)}
  if(L.ear){/* earrings: over the hair at the lobes */for(const sx of[-1,1]){const x=sx*9.5;if(L.ear==='stud'){c.fillStyle=L.earc||'#D8B66A';circ(c,x,hy+3.7,.6)}
    else if(L.ear==='pearl'){c.fillStyle=L.earc||'#F3EFE6';circ(c,x,hy+4,.95);c.fillStyle='rgba(255,255,255,.9)';circ(c,x-.3,hy+3.7,.3)}
    else if(L.ear==='hoop'){c.strokeStyle=L.earc||'#D8B66A';c.lineWidth=.55;c.beginPath();c.arc(x,hy+5.4,1.6,0,Math.PI*2);c.stroke()}
@@ -11802,7 +11809,9 @@ const STAFF_FACE={
  'Momo':{skin:'#F6D3B5',hair:'#5C3B2A',hs:3},'小威':{skin:'#EDC19C',hair:'#4A2E1F',hs:0},'阿芳':{skin:'#F6D3B5',hair:'#5C3B2A',hs:7},
  /* 2026-10-10 (the user, after v2.5.1): the eighth waiter, from her picture — dark chestnut, the bob and its beige clip (style 27); the
     waiters' uniform as everyone's (the tie is the figures' uniform; the cards show none) */
- '小夏':{skin:'#F6D3B5',hair:'#563C33',hs:27,clip:'#DCC2A8'},
+ '小夏':{skin:'#F6D3B5',hair:'#563C33',hs:27,clip:'#D2AE92'},
+ /* and the ninth, from his picture — near-black hair with a slight wave (style 28), thin rectangular frames (L.specs 'thin'; Kai's are the round ones), the uniform's tie */
+ '阿衡':{skin:'#F6D3B5',hair:'#3B312D',hs:28,specs:'thin'},
  '小彤':{skin:'#F6D3B5',hair:'#2B1D16',hs:3},'阿明':{skin:'#E2AE88',hair:'#8A8A8A',hs:5},'Yuki':{skin:'#F6D3B5',hair:'#3B2418',hs:8},'阿桂':{skin:'#EDC19C',hair:'#2B1D16',hs:7,band:'#8E7AB5'}};
 function crewLook(m){if(STAFF_LOOKS[m.name]&&m.role==='cleaner')return Object.assign({},STAFF_LOOKS[m.name]);if(LOUNGE_LOOKS[m.name]){const L=Object.assign({},LOUNGE_LOOKS[m.name]);if(m.role==='chef'){L.chef=true;L.kerchief='#2A2A2A'}return L}const h=hash(m.id);const L={skin:SKIN[h%SKIN.length],hair:HAIR[(h>>>3)%HAIR.length],hs:[0,1,2,3,6,6,7][(h>>>6)%7],top:m.role==='waiter'?'#F4F1EA':m.role==='cleaner'?'#8FA3B5':'#FFFFFF',acc:m.role==='waiter'?'tie':null,pants:'#2E2B33'};if(m.role==='chef'){L.chef=true;L.kerchief=['#B8536A','#2E6B4A','#3A5A8A','#C99A45','#6B3A5A'][(h>>>9)%5]}else L.apron=m.role==='waiter'?'#2A2220':'#5E6E7A';{const F=STAFF_FACE[m.name];if(F){Object.assign(L,F);if(m.role!=='chef')delete L.kerchief}}return L}
 function chefAuto(s,dt){const j=s.job,k=j.step;const ch=chefHandles(s);if(!ch||k.t==='wait'||k.t==='work')return false;const sp=dishSpeed(j.d,s.type);
@@ -12488,7 +12497,7 @@ const PORTRAITS={
  dylan:{name:'Dylan',side:'right',v:{default:'dylan_default',friendly:'dylan_friendly',playful:'dylan_playful',gentle:'dylan_gentle'}},
  chen:{name:'陳伯伯',side:'right',v:{default:'chen'}},mia:{name:'Mia',side:'right',v:{default:'reg23_mia',thinking:'v24_mia_thinking'}},koba:{name:'小林',side:'right',v:{default:'xiaolin'}},leo:{name:'Leo',side:'right',v:{default:'leo'}},sophie:{name:'Sophie',side:'right',v:{default:'reg23_sophie'}},wang:{name:'王先生',side:'right',v:{default:'mr_wang',serious:'v24_wang_wait',dry:'v24_wang_smile'}},wangwife:{name:'王太太',side:'right',v:{default:'mrs_wang'}},landlord:{name:'房東',side:'right',v:{default:'v24_landlord',talk:'v24_landlord_talk',surprised:'v24_landlord_surprised'}}};   /* v2.4: the Second Floor's landlord (the player's sheet) */   /* v2.3 follow-up: Sophie and Mia from the player's illustrated sheet (tools/portraits_regulars_v23.py), as in their story photos; the others as before */
 /* the six staff designs → the game's own staff records, by role and hiring order (CREW_NAMES); the data stays authoritative */
-const STAFF_PORTRAITS={'Evan':'staff_evan','沈晴':'staff_qing','阿拓':'staff_tuo','安安':'staff_anan','許葳':'v24_xuwei',/* v2.4 rc5: the player's sheet, 19:11 *//* v2.3: the Lounge cast, by name */'阿德師傅':'st23_ade','Marco':'st23_marco','小林師傅':'st23_xiaolin','小茉':'st23_xiaomo','Kai':'st23_kai','秀琴阿姨':'st23_xiuqin','阿珠姐':'st23_azhu','Hugo':'st23_hugo','Nina':'st23_nina','阿哲':'st23_azhe','Momo':'st23_momo','小彤':'st23_xiaotong','阿明':'st23_aming','Yuki':'st23_yuki','阿勇':'st23_ayong','老周師傅':'st23_laozhou','小魏':'st23_wei','小威':'st23_xiaowei','阿芳':'st23_afang','阿桂':'st23_agui','小夏':'st251_xia'};   /* v2.3 follow-up: all twenty redrawn by the player (tools/portraits_staff_v23.py); the Lounge four keep theirs */   /* v2.2.1 H2: the eight from the card sheet; 老周師傅 and 阿勇 wait for cleaner assets */
+const STAFF_PORTRAITS={'Evan':'staff_evan','沈晴':'staff_qing','阿拓':'staff_tuo','安安':'staff_anan','許葳':'v24_xuwei',/* v2.4 rc5: the player's sheet, 19:11 *//* v2.3: the Lounge cast, by name */'阿德師傅':'st23_ade','Marco':'st23_marco','小林師傅':'st23_xiaolin','小茉':'st23_xiaomo','Kai':'st23_kai','秀琴阿姨':'st23_xiuqin','阿珠姐':'st23_azhu','Hugo':'st23_hugo','Nina':'st23_nina','阿哲':'st23_azhe','Momo':'st23_momo','小彤':'st23_xiaotong','阿明':'st23_aming','Yuki':'st23_yuki','阿勇':'st23_ayong','老周師傅':'st23_laozhou','小魏':'st23_wei','小威':'st23_xiaowei','阿芳':'st23_afang','阿桂':'st23_agui','小夏':'st251_xia','阿衡':'st251_heng'};   /* v2.3 follow-up: all twenty redrawn by the player (tools/portraits_staff_v23.py); the Lounge four keep theirs */   /* v2.2.1 H2: the eight from the card sheet; 老周師傅 and 阿勇 wait for cleaner assets */
 function portraitData(key){const D=window.PORTRAIT_DATA;return D&&key&&D[key]?D[key]:null}
 /* who: 'jill' | 'dylan' | a regular id | 'staff:<name>'. Returns {src,name,side} or null (= keep the plain presentation). */
 /* v2.4: a few people have more than one face (the player's expression sheets). A line in a mood nobody drew for that

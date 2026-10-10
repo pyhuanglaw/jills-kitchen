@@ -1,0 +1,63 @@
+阿衡接好以後（2026-10-10），兩位新服務生的測試是不是真的抓得到錯：每一個「突變」是故意改壞一個地方的 game.js
+（用 JK_GAME_JS 換掉，工作目錄不動），測試必須 FAIL。正常的 game.js 三個測試都 PASS（named_guests_keep_one_face_and_the_staff_have_theirs、
+staff_numbered_names_become_the_pools_names_in_hiring_order、staff_the_eighth_and_ninth_waiters_are_named_people）。
+
+- not_in_pool：名字不在服務生名單 → 請不到這個人、舊存檔的「服務生8／9」改不成他們
+- no_portrait：沒有立繪 → 員工卡片沒有使用者給的圖
+- shares_a_hairstyle：髮型跟別人共用（小夏借 16、阿衡借 Ken 的 10）
+- hair_not_hers/his：小人的髮色跟卡片上的頭髮差很多
+- xia_clip_not_drawn：小夏的髮夾沒畫出來；xia_clip_the_earlier_colour：髮夾用一開始比較淺的 #DCC2A8（跟卡片上的髮夾差 48，
+  所以改成 #D2AE92，差 17）
+- heng_no_glasses：阿衡沒戴眼鏡；heng_round_glasses：換成圓框（使用者說的是細框長方眼鏡）
+
+清楚的「沒有立繪」訊息：原本測試在 portrait 不存在時直接出 KeyError（還是 FAIL，但看不懂），改成 info.get('portrait') 後重跑兩個
+no_portrait 突變，下面是重跑的結果。
+
+== mutant xia_not_in_pool
+FAIL  staff_the_eighth_and_ninth_waiters_are_named_people  (0.5s)
+      then the new ones, in order: ['小茉', 'Kai', 'Nina', '阿哲', 'Momo', '小威', '阿芳', '阿衡']
+== mutant xia_no_portrait
+FAIL  staff_the_eighth_and_ninth_waiters_are_named_people  (0.6s)
+      小夏: the card portrait st251_xia is in the page and shown: {'data': False, 'shown': False, 'hs': 27, 'hair': '#563C33', 'face': True, 'uniform': True, 'unique': True}
+== mutant xia_shares_a_hairstyle
+FAIL  staff_the_eighth_and_ninth_waiters_are_named_people  (0.8s)
+      小夏: hairstyle 16 is set for nobody else in the game (guests, regulars, the Lounge, the staff): 2 uses
+== mutant xia_hair_not_hers
+FAIL  staff_the_eighth_and_ninth_waiters_are_named_people  (0.9s)
+      小夏: the figure's hair #C9A06A is the card's hair (avg [92, 67, 58], distance 151)
+== mutant xia_clip_not_drawn
+FAIL  staff_the_eighth_and_ninth_waiters_are_named_people  (0.9s)
+      小夏: clip is drawn on the figure (0 px at 4×; the same figure twice: 0): {'v': '#D2AE92', 'n': 0, 'same': 0}
+== mutant xia_clip_the_earlier_colour
+FAIL  staff_the_eighth_and_ninth_waiters_are_named_people  (0.9s)
+      小夏: the figure's clip #DCC2A8 is the colour on the card (avg [202, 162, 136], distance 48)
+== mutant heng_not_in_pool
+FAIL  staff_the_eighth_and_ninth_waiters_are_named_people  (0.5s)
+      then the new ones, in order: ['小茉', 'Kai', 'Nina', '阿哲', 'Momo', '小威', '阿芳', '小夏']
+== mutant heng_no_portrait
+FAIL  staff_the_eighth_and_ninth_waiters_are_named_people  (0.9s)
+      阿衡: the card portrait st251_heng is in the page and shown: {'data': False, 'shown': False, 'hs': 28, 'hair': '#3B312D', 'face': True, 'uniform': True, 'unique': True}
+== mutant heng_shares_a_hairstyle
+FAIL  staff_the_eighth_and_ninth_waiters_are_named_people  (1.2s)
+      阿衡: hairstyle 10 is set for nobody else in the game (guests, regulars, the Lounge, the staff): 2 uses
+== mutant heng_hair_not_his
+FAIL  staff_the_eighth_and_ninth_waiters_are_named_people  (1.0s)
+      阿衡: the figure's hair #C9A06A is the card's hair (avg [61, 50, 48], distance 187)
+== mutant heng_no_glasses
+FAIL  staff_the_eighth_and_ninth_waiters_are_named_people  (1.2s)
+      阿衡: specs is drawn on the figure (0 px at 4×; the same figure twice: 0): {'v': None, 'n': 0, 'same': 0}
+== mutant heng_round_glasses
+FAIL  staff_the_eighth_and_ninth_waiters_are_named_people  (1.3s)
+      阿衡: thin rectangular frames (not the round ones, not the bold): wire
+== mutant xia_not_in_pool (the numbered names)
+FAIL  staff_numbered_names_become_the_pools_names_in_hiring_order  (1.6s)
+      the pool names the eighth and the ninth 小夏 and 阿衡 (the user, 2026-10-10): ['阿衡']
+== mutant heng_not_in_pool (the numbered names)
+FAIL  staff_numbered_names_become_the_pools_names_in_hiring_order  (1.7s)
+      the pool names the eighth and the ninth 小夏 and 阿衡 (the user, 2026-10-10): ['小夏']
+== mutant xia_no_portrait (the staff portraits count)
+FAIL  named_guests_keep_one_face_and_the_staff_have_theirs  (2.3s)
+      all twenty-seven staff names have a portrait (2026-10-10: 小夏 and 阿衡, the eighth and ninth waiters, from the user's pictures) (the Lounge's five: the four keep theirs, 許葳 from the player's sheet of v2.4 rc5; the twenty were redrawn 2026-10-01): [['Evan', True], ['沈晴', True], ['�
+== mutant heng_no_portrait (the staff portraits count)
+FAIL  named_guests_keep_one_face_and_the_staff_have_theirs  (2.4s)
+      all twenty-seven staff names have a portrait (2026-10-10: 小夏 and 阿衡, the eighth and ninth waiters, from the user's pictures) (the Lounge's five: the four keep theirs, 許葳 from the player's sheet of v2.4 rc5; the twenty were redrawn 2026-10-01): [['Evan', True], ['沈晴', True], ['�
