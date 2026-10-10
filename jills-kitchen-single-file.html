@@ -6534,7 +6534,7 @@ function kitchenTapBoxes(){const out=[{x0:Math.min(KX.sink.x,KX.prep.x)-4,x1:Mat
 let chipsKey='',chipsUp=null;
 function chipsWhere(){const sc0=$('#stockChip'),tc=$('#taskChip'),lc=$('#logChip'),tabs=$('#roomTabs');if(room!=='kitchen'||!sc0||sc0.hidden||!tabs||tabs.hidden||!sc||!sc0.offsetParent)return null;
  const C=sc0.offsetParent.getBoundingClientRect(),T=tabs.getBoundingClientRect(),ws=sc0.offsetWidth,wt=tc&&!tc.hidden?tc.offsetWidth:0,wl=lc&&!lc.hidden?lc.offsetWidth:0,h=sc0.offsetHeight||29;
- const key=[innerWidth,innerHeight,SV.s,SV.ox,SV.oy,ws,wt,wl,Math.round(T.left),Math.round(T.width),projOn('pizzaoven')?1:0].join(',');if(key===chipsKey)return chipsUp;chipsKey=key;
+ const key=[window.innerWidth,window.innerHeight,SV.s,SV.ox,SV.oy,ws,wt,wl,Math.round(T.left),Math.round(T.width),projOn('pizzaoven')?1:0].join(',');if(key===chipsKey)return chipsUp;chipsKey=key;
  const r=sc.getBoundingClientRect(),X=x=>r.left+SV.ox+x*SV.s,Y=y=>r.top+SV.oy+y*SV.s;
  const boxes=kitchenTapBoxes().map(b=>({x0:X(b.x0),x1:X(b.x1),y0:Y(b.y0),y1:Y(b.y1)}));
  /* where each chip sits when nothing moves (the CSS: a row at 132, the 💬 under 庫存 at 166; 今日任務 beside 庫存 in the kitchen) */

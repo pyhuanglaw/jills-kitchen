@@ -270,8 +270,10 @@ def cooking_a_full_place_is_a_quiet_wait(b, port, target):
     """The capacity rule's cases A–F on 熱區 2 and 裝盤 1: two batches cook at once (A); a third is told 「第一步：熱區 · 等空位」
     (2026-10-08: the user's 「第一步」 for a dish not started yet; was 「下一步：熱區 · 目前忙碌」), never an error, and cannot be
     put on a burner that is taken (B); when a burner is free it is 「等待處理」 again but does not start by itself (C); a batch of three takes one burner (D); two batches done at once and one plating place:
-    one is plated, the other waits on its burner with its quality untouched (E); a cook who can plate takes the waiting one
-    when the pass is free (F). D runs last, on the burner F's plating leaves."""
+    one is plated, the other waits on its burner with its quality untouched (E); a cook takes the waiting one when the pass
+    is free (F). D runs last, on a free burner. (2026-10-10: every cook takes any step — 小林師傅, once he has plated, puts the
+    next waiting batch on the burner F left himself, as he should; D now waits until the kitchen has nothing left, and he goes
+    on standby, so the batch of three is Jill's to put on a burner.)"""
     g = _day(b, port, target, 7102, "S.level=1")
     g.ev("window.__patient=1")
     check(_wait_orders(g, 1), 'a table orders fried rice')
@@ -301,8 +303,10 @@ def cooking_a_full_place_is_a_quiet_wait(b, port, target):
     g.ev(f"wfAssign(wfNode({c}),'jill')")   # Jill puts it on the free burner: both burners are taken again
     # F: a cook who plates takes the waiting batch once the pass is free
     g.ev("S.crew.push({id:'t_kobayashi',role:'chef',name:'小林師傅',lv:1,duty:'stove',since:1,days:0,pool:'restaurant'})")
-    check(_until(g, f"!wfNode({b2})", cap=900), 'F: 小林師傅 (plating is his) plates the batch that waited')
-    # D: a batch of three is one burner (level 3) — the burner the plated batch left
+    check(_until(g, f"!wfNode({b2})", cap=900), 'F: 小林師傅 plates the batch that waited')
+    check(_until(g, "wfList().length===0", cap=1500), 'the kitchen finishes what is left (Jill and 小林師傅)')   # (2026-10-10)
+    g.ev("S.crew.find(m=>m.id==='t_kobayashi').duty=null")   # on standby: the batch of three below is Jill's
+    # D: a batch of three is one burner (level 3) — a burner free
     g.ev("S.level=3;__addOrders(3)")
     big = g.ev("(()=>{wfGather();const n=wfList().find(n=>n.st==='wait'&&n.n===3);return n?n.id:0})()")
     check(big, f'D: three portions gathered as one batch at level 3: {g.ev(WF)}')
