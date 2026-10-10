@@ -948,6 +948,45 @@ Release Gate 四-1／四-3：「不得出現無法透過合理操作、聘人或
       檢查和門檻都沒改。還抓得到：在 7600 上怡君搬家晚兩天（yj_slow）、調解晚六天（wall_slow）、二樓跟著牆開（up_on_wall）——
       三個都失敗（鑰匙第 63 天、調解第 86 天、二樓沒等 Lounge）；改過的測試在 6bf5002 和 main（8298e18）的遊戲上都通過（`after_iphone/mutants.txt`）。
 
+42. **2026-10-10（v2.5 發布後，使用者的最終決策 `docs/v24/post_v25_decisions_2026-10-10.txt`；2baa9d4、2e67df3）**：每一條「還抓得到」
+    都是用 v2.5 的遊戲（fb86e3a）或故意做壞的版本跑那個測試、失敗才算數；全部在 `docs/evidence/cooking_2026-10-10/test_proofs/after_v25/`
+    （`v25_game_with_the_new_tests.txt`：v2.5 的遊戲配這一版的測試，7 個全部失敗；`make_mutants.py`、`mutants.txt`）。沒有刪測試、沒有跳過、
+    沒有降低門檻。
+    - **使用者改了規則**：
+      - `workstation_assignment_is_explicit_with_capacities_and_swaps`（§1「直接移除『⚠ 冷盤台／咖啡吧目前無人』以及不再符合現行工作機制的
+        『安排員工』提示」）：原本——開店前畫面要提醒「某站目前無人」、有「安排員工」按鈕，工作分配裡沒人的站標紅。不再成立——廚師有空
+        就接廚房任何一步，一站沒人不代表那道菜沒人做。改成——開店前沒有「目前無人」「安排員工」「其他站的廚師」，沒有 `.stwarn` 和
+        `[data-act=staffTab]`；工作分配的列不標紅，標題說「廚師有空就接廚房任何一步」。仍然檢查：今天的菜需要的站存在、工作分配的人數和
+        名額（測試其他部分沒動）。還抓得到：v2.5 的遊戲（使用者 Day 30 存檔開店前三條「目前無人」）失敗。
+      - `followup_the_manual_describes_the_current_game`：手冊不該再有的字多了「工作站沒人」「目前無人」「廚師只接自己會的位置」「LV3 起會
+        接手」。還抓得到：v2.5 的遊戲（手冊還有「工作站沒人」）失敗。
+      - `v24_rc8_the_restaurants_three_lists_and_the_lounges_one`（§4「Bistro 相對第 1 級，增加：廚師名額 +1。服務生名額 +1。清潔員名額維持
+        既有升級規則」）：每一級的名額從 `[[1,1,0],[1,1,0],[2,1,0],[3,1,0],[4,1,1]]` 改成 `[[1,1,0],[2,2,0],[3,2,0],[4,2,0],[5,2,1]]`；
+        Bistro 的擴建卡寫「廚師 +1」「服務生 +1」；Day 61 存檔的名額、重開以後的名額跟著改；披薩烤爐的卡片不再說「顧烤爐」「有人顧」。
+        還抓得到：Bistro 不多名額（bistro_no_more_places）、Bistro 只多服務生（bistro_waiter_only）、v2.5 的遊戲——都失敗。
+      - `v24_restaurant_and_lounge_staff_are_two_pools_that_never_share_places`：餐廳名額 12 → 14（第 5 級多一位廚師、一位服務生）；測試先把
+        新多的兩個位置請滿（7/7、5/5、1/2），再檢查「名額已滿」和兩份名單不互借。還抓得到：bistro_no_more_places、v2.5 的遊戲——失敗。
+      - `v24_an_old_shared_cap_save_keeps_everyone_and_waits`：舊的共用名額存檔多放一位廚師（小魏），讓廚師仍然超過新名額（8／7），
+        繼續檢查「超過的人都留著、降到名額以下才能再請」——名額變多以後，原本的存檔不再超過，測試就量不到它要守的事。還抓得到：
+        bistro_no_more_places、v2.5 的遊戲——失敗。
+      - `v24_manual_tutorial_and_news_cover_the_new_content`：手冊的稽核戳記 `— last: v2.5.1,`。還抓得到：v2.5 的遊戲失敗。
+      - 完整回歸（2e67df3，跑到一半）抓到另外三個寫死名額數字的測試——Bistro 多的廚師、服務生名額會一路帶到後面每一級，所以成熟存檔的
+        餐廳多 2 個名額（使用者 Day 52／61 存檔：廚師 6/7、服務生 4/5，v2.5 是 6/6、4/4；`docs/evidence/v251_release/staff_places_on_the_users_saves.txt`）。
+        測試要守的事都沒變，只有數字跟著使用者的決定：
+        - `kitchen_works_walk_in_and_a_second_coffee_machine`：Day 52 存檔餐廳 12 → 14 人，廚房二期後 14 → 16 人（仍然是「多 2 人」）。
+        - `v24_back_of_house_is_a_work_area_and_keeps_its_two`：12 → 14，並加一項「後場整理區的名額還在」（`capSources` 的 room 有開）。
+        - `v24_rc6_two_more_restaurant_places_and_the_lounge_unchanged`：要守的是「私人包廂的兩個名額是服務生的（廚師名單維持滿的）」；
+          這個存檔現在廚師、服務生各空一個位置，第一個聘請按鈕變成廚師，所以測試先把這兩個新位置請滿（檢查 7/7、5/5），再照原本的步驟。
+        還抓得到（`mutants_staff_numbers.txt`）：Bistro 不多名額（三個都失敗）、後場整理區不加名額（三個都失敗）、廚房二期不加名額（第一個
+        失敗）、私人包廂的名額變成廚師的（第三個失敗）。
+    - **新增**：
+      - `cooking_on_fire_can_come_on_the_first_day`（§3「第 1 天起就允許 ON FIRE 觸發」）：新遊戲第 1 天（沒有廚師）是 Jill 一個人的標準
+        `FIRE_SOLO`（比 30／36 長）；三桌比 30 秒慢一點、全部 Perfect 就點燃；超過她的慢門檻、有一道不是 Perfect 都重來；規則裡沒有天數；
+        服務生不算廚師、廚師待命或今晚沒來不算；使用者 Day 30 存檔是 30／36。還抓得到：第 3 天以前不點燃（fire_day_gate）、Jill 的標準
+        改回 30／36（fire_solo_is_mature）、服務生算成廚師（fire_waiter_is_a_cook；第一版的做壞版本保留了「有位置」的條件，服務生的
+        both 不是位置，所以它根本沒有把服務生算進去，等於沒做壞，重做以後失敗）、待命的廚師算進去（fire_standby_counts）、v2.5 的遊戲
+        ——都失敗。多常發生：`docs/evidence/cooking_2026-10-10/onfire_early/`。
+
 ## 使用者 iPhone 回報（2026-10-08 晚上到 10-09 凌晨）
 
 使用者：「我剛在 iPhone 真人實玩私人測試版，發現兩個 blocker」，附第 3 天的存檔（`tests/saves/cooking_day3_0156.json`）。

@@ -30,7 +30,7 @@ def v24_back_of_house_is_a_work_area_and_keeps_its_two(b, port, target):
     g = Game(b, port, target, seed=241, manual=True, viewport={'width': 390, 'height': 844})
     raw = load_save(g, 'player_day52.json')
     check(g.ev("opsLv('room')") == 1 and g.ev("OPS.find(o=>o.k==='room').n") == '後場整理區', 'the purchase is kept, under its new name')
-    check(g.ev("restaurantCap()") == 12 and g.ev("S.crew.length") == 12, 'the +2 is kept: the crew of twelve still fits')
+    check(g.ev("restaurantCap()") == 14 and g.ev("capSources().find(s=>s.k==='room').on") and g.ev("S.crew.length") == 12, 'the +2 is kept: the crew of twelve still fits (14 places since the Bistro\'s chef and waiter, 2026-10-10; 12 without the work area)')
     check(g.ev("S.money") == raw['money'], 'nothing refunded or charged')
     d = g.ev("OPS.find(o=>o.k==='room').d(1)")
     check('休息' not in d and '整理區' in d and '廚師和服務生各可以再多聘 1 位' in d, f'work storage, +2 (rc8: a chef and a waiter): {d}')
@@ -1757,6 +1757,10 @@ def v24_rc6_two_more_restaurant_places_and_the_lounge_unchanged(b, port, target)
     the Lounge's list stays its five; the new places hire from the restaurant's pool; saved and reloaded."""
     g = Game(b, port, target, seed=295, manual=True, viewport={'width': 390, 'height': 844})
     load_save(g, 'player_day61.json')
+    # 2026-10-10 (the user, after v2.5 §4): the Bistro's chef's and waiter's places carry into every later level, so this save
+    # (chefs 6/6, waiters 4/4 on v2.5) has one of each open; they are filled first — the lists full as the test means them
+    g.ev("S.money+=500000"); _hire(g, 'hire', 'chef'); _hire(g, 'hire', 'waiter')
+    check(g.ev("CAP_ROLES.map(r=>roleCrew(r).length+'/'+roleCap(r)).join()") == '7/7,5/5,1/2', 'the chefs\' and waiters\' lists full before the room')
     _floor(g, 50); g.ev(PD_OPEN)
     g.ev("pdW().done=S.day+1")
     base = g.ev("restaurantCap()"); lc = g.ev("loungeCap()"); roster = g.ev("JSON.stringify(LOUNGE_ROSTER.map(r=>r.name))")

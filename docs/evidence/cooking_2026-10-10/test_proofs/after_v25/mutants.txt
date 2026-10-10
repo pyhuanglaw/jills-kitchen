@@ -1,0 +1,34 @@
+== mutant fire_day_gate
+FAIL  cooking_on_fire_can_come_on_the_first_day  (2.2s)
+      two of her tables: a run of three, no fire yet: [[31, 0, False, 0], [31, 0, False, 0]]
+0 passed, 1 failed
+== mutant fire_solo_is_mature
+FAIL  cooking_on_fire_can_come_on_the_first_day  (2.4s)
+      her windows are longer than the mature 30/36: [30, 36]
+0 passed, 1 failed
+== mutant fire_waiter_is_a_cook
+PASS  cooking_on_fire_can_come_on_the_first_day  (4.7s)
+1 passed, 0 failed
+== mutant fire_standby_counts
+FAIL  cooking_on_fire_can_come_on_the_first_day  (1.9s)
+      a waiter: still her kitchen of one; a cook with a place: the mature windows; on standby or off tonight: hers again: [[0, [33, 40]], [1, [30, 36]], [1, [30, 36]], [0, [33, 40]]]
+0 passed, 1 failed
+== mutant bistro_no_more_places
+FAIL  v24_restaurant_and_lounge_staff_are_two_pools_that_never_share_places  (4.0s)
+      the restaurant: level 5 (8) + 後場整理區 + 側廳 + 廚房擴建 (2 each) = 14, twelve taken
+FAIL  v24_an_old_shared_cap_save_keeps_everyone_and_waits  (4.0s)
+      the restaurant: 14 of 14
+FAIL  v24_rc8_the_restaurants_three_lists_and_the_lounges_one  (1.8s)
+      level 1 a chef and a waiter; the Bistro one more of each; then a chef, a chef, a chef and a cleaner (2026-10-10): [[1, 1, 0], [1, 1, 0], [2, 1, 0], [3, 1, 0], [4, 1, 1]]
+0 passed, 3 failed
+== mutant bistro_waiter_only
+PASS  v24_restaurant_and_lounge_staff_are_two_pools_that_never_share_places  (6.4s)
+PASS  v24_an_old_shared_cap_save_keeps_everyone_and_waits  (5.5s)
+FAIL  v24_rc8_the_restaurants_three_lists_and_the_lounges_one  (2.0s)
+      level 1 a chef and a waiter; the Bistro one more of each; then a chef, a chef, a chef and a cleaner (2026-10-10): [[1, 1, 0], [1, 2, 0], [3, 2, 0], [4, 2, 0], [5, 2, 1]]
+2 passed, 1 failed
+done 09:31:27
+== mutant fire_waiter_is_a_cook (redone: the first version kept the place check, so a waiter with 'both' never counted — an equivalent mutant)
+FAIL  cooking_on_fire_can_come_on_the_first_day  (1.9s)
+      a waiter: still her kitchen of one; a cook with a place: the mature windows; on standby or off tonight: hers again: [[1, [30, 36]], [2, [30, 36]], [1, [30, 36]], [1, [30, 36]]]
+0 passed, 1 failed

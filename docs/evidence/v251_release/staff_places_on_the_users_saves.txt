@@ -1,0 +1,17 @@
+The restaurant's staff places on the user's saves: v2.5 (fb86e3a, game_v25.js) vs v2.5.1 (2e67df3, game.js). Each save loaded, nothing else done.
+(the user, after v2.5 §4: 「確認升級後的員工上限、聘用介面、薪資及舊存檔正確。不得讓既有員工因名額變更被移除。」)
+
+game_v25.js player_day6_1254.json {"day":6,"lv":1,"crew":3,"caps":"廚師 1/1、服務生 1/1、清潔員 0/0"}
+game_v25.js player_day30.json {"day":30,"lv":5,"crew":10,"caps":"廚師 5/5、服務生 4/4、清潔員 0/1"}
+game_v25.js player_day52.json {"day":52,"lv":5,"crew":12,"caps":"廚師 6/6、服務生 4/4、清潔員 1/2"}
+game_v25.js player_day61.json {"day":61,"lv":5,"crew":14,"caps":"廚師 6/6、服務生 4/4、清潔員 1/2"}
+game_v25.js player_day89_0448.json {"day":89,"lv":5,"crew":20,"caps":"廚師 7/7、服務生 6/6、清潔員 1/2"}
+game_v25.js player_day92_2105.json {"day":92,"lv":5,"crew":20,"caps":"廚師 7/7、服務生 6/6、清潔員 1/2"}
+game.js player_day6_1254.json {"day":6,"lv":1,"crew":3,"caps":"廚師 1/1、服務生 1/1、清潔員 0/0"}
+game.js player_day30.json {"day":30,"lv":5,"crew":10,"caps":"廚師 5/6、服務生 4/5、清潔員 0/1"}
+game.js player_day52.json {"day":52,"lv":5,"crew":12,"caps":"廚師 6/7、服務生 4/5、清潔員 1/2"}
+game.js player_day61.json {"day":61,"lv":5,"crew":14,"caps":"廚師 6/7、服務生 4/5、清潔員 1/2"}
+game.js player_day89_0448.json {"day":89,"lv":5,"crew":20,"caps":"廚師 7/8、服務生 6/7、清潔員 1/2"}
+game.js player_day92_2105.json {"day":92,"lv":5,"crew":20,"caps":"廚師 7/8、服務生 6/7、清潔員 1/2"}
+
+Every save keeps everyone (the crew count is the same); at level 2 and above there is one more chef's and one more waiter's place (the Bistro's +1 carries into every later level); level 1 (the user's Day 6 save) is as before.

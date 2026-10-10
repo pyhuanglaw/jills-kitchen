@@ -1,0 +1,24 @@
+== v25_fb86e3a/normal_300.json
+   yj_meet:9  yj_look:10  yj_three:12  yj_chose:13  yj_move:15  yj_key:17  wall_worry:21  wall_photos:22  wall_visit:24  wall_wang:25  wall_setback:27  wall_fee:31  wall_mediation:36  wall_paper:38  wall_article:40  wall_fixed:43
+   from meeting: {'yj_meet': 0, 'yj_look': 1, 'yj_three': 3, 'yj_chose': 4, 'yj_move': 6, 'yj_key': 8, 'wall_worry': 12, 'wall_photos': 13, 'wall_visit': 15, 'wall_wang': 16, 'wall_setback': 18, 'wall_fee': 22, 'wall_mediation': 27, 'wall_paper': 29, 'wall_article': 31, 'wall_fixed': 34}
+   span 9 - 43 = 34 days; beat-days 16 ; days with >=3 major/v24 beats in the span 4
+== v25_fb86e3a/normal_301.json
+   yj_meet:8  yj_look:9  yj_three:11  yj_chose:12  yj_move:14  yj_key:16  wall_worry:34  wall_photos:35  wall_visit:37  wall_wang:39  wall_setback:41  wall_fee:45  wall_mediation:50
+   from meeting: {'yj_meet': 0, 'yj_look': 1, 'yj_three': 3, 'yj_chose': 4, 'yj_move': 6, 'yj_key': 8, 'wall_worry': 26, 'wall_photos': 27, 'wall_visit': 29, 'wall_wang': 31, 'wall_setback': 33, 'wall_fee': 37, 'wall_mediation': 42}
+   span 8 - 50 = 42 days; beat-days 13 ; days with >=3 major/v24 beats in the span 4
+== v25_fb86e3a/normal_302.json
+   yj_meet:8  yj_look:11  yj_three:13  yj_chose:14  yj_move:16  yj_key:18  wall_worry:28  wall_photos:29  wall_visit:31  wall_wang:33  wall_setback:35  wall_fee:40  wall_mediation:45  wall_paper:47  wall_article:48
+   from meeting: {'yj_meet': 0, 'yj_look': 3, 'yj_three': 5, 'yj_chose': 6, 'yj_move': 8, 'yj_key': 10, 'wall_worry': 20, 'wall_photos': 21, 'wall_visit': 23, 'wall_wang': 25, 'wall_setback': 27, 'wall_fee': 32, 'wall_mediation': 37, 'wall_paper': 39, 'wall_article': 40}
+   span 8 - 48 = 40 days; beat-days 15 ; days with >=3 major/v24 beats in the span 4
+== v251_2e67df3/normal_300.json
+   yj_meet:9  yj_look:10  yj_three:12  yj_chose:13  yj_move:15  yj_key:17  wall_worry:21  wall_photos:22  wall_visit:24  wall_wang:25  wall_setback:27  wall_fee:31  wall_mediation:36  wall_paper:39  wall_article:40  wall_fixed:43
+   from meeting: {'yj_meet': 0, 'yj_look': 1, 'yj_three': 3, 'yj_chose': 4, 'yj_move': 6, 'yj_key': 8, 'wall_worry': 12, 'wall_photos': 13, 'wall_visit': 15, 'wall_wang': 16, 'wall_setback': 18, 'wall_fee': 22, 'wall_mediation': 27, 'wall_paper': 30, 'wall_article': 31, 'wall_fixed': 34}
+   span 9 - 43 = 34 days; beat-days 16 ; days with >=3 major/v24 beats in the span 3
+== v251_2e67df3/normal_301.json
+   yj_meet:8  yj_look:9  yj_three:11  yj_chose:12  yj_move:14  yj_key:16  wall_worry:24  wall_photos:25  wall_visit:29  wall_wang:30  wall_setback:32  wall_fee:36  wall_mediation:41  wall_paper:43  wall_article:44  wall_fixed:48
+   from meeting: {'yj_meet': 0, 'yj_look': 1, 'yj_three': 3, 'yj_chose': 4, 'yj_move': 6, 'yj_key': 8, 'wall_worry': 16, 'wall_photos': 17, 'wall_visit': 21, 'wall_wang': 22, 'wall_setback': 24, 'wall_fee': 28, 'wall_mediation': 33, 'wall_paper': 35, 'wall_article': 36, 'wall_fixed': 40}
+   span 8 - 48 = 40 days; beat-days 16 ; days with >=3 major/v24 beats in the span 5
+== v251_2e67df3/normal_302.json
+   yj_meet:8  yj_look:11  yj_three:13  yj_chose:14  yj_move:16  yj_key:18  wall_worry:28  wall_photos:30  wall_visit:34  wall_wang:36  wall_setback:38  wall_fee:43  wall_mediation:48  wall_paper:50
+   from meeting: {'yj_meet': 0, 'yj_look': 3, 'yj_three': 5, 'yj_chose': 6, 'yj_move': 8, 'yj_key': 10, 'wall_worry': 20, 'wall_photos': 22, 'wall_visit': 26, 'wall_wang': 28, 'wall_setback': 30, 'wall_fee': 35, 'wall_mediation': 40, 'wall_paper': 42}
+   span 8 - 50 = 42 days; beat-days 14 ; days with >=3 major/v24 beats in the span 4

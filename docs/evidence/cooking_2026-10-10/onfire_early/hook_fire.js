@@ -1,0 +1,1 @@
+(()=>{window.__fires={};const F0=startFire;startFire=function(){try{(__fires[S.day]=__fires[S.day]||[]).push([+R.t.toFixed(1),typeof fireHands==='function'?fireHands():null])}catch(e){}return F0.apply(this,arguments)}})()

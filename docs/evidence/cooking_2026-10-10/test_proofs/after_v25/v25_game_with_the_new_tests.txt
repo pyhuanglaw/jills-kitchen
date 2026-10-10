@@ -1,0 +1,49 @@
+FAIL  workstation_assignment_is_explicit_with_capacities_and_swaps  (11.2s)
+      the prep screen says nothing of it: DAY 30 · 開店前
+JILL
+看店裡
+?
+炎熱 · 預計約 68 位客人
+
+冰飲和冰甜點會賣得特別好，熱湯乏人問津。
+
+今天可能要多準備：提拉米蘇、莓果蘇打、巴斯克乳酪蛋糕、檸檬氣泡水、焦糖布丁、錫蘭檸檬紅茶
+
+⚠
+烤箱目前無人
+今日有 5 道料理需要烤箱，其他站的廚師有空時會過去幫忙，一次一道。
+安排員工
+⚠
+冷盤台目前無人
+今日有 5 道料理需要冷盤台，其他站的廚師有空時會過去幫忙，一次一道。
+安排員工
+⚠
+咖啡吧目前無人
+今日有 4 道料理需要咖啡吧，其他站的廚師有空時會過去幫忙，一次一道。
+安排員工
+存錢目標
+委託的一幅畫
+還差 $19,412
+社群與宣傳
+最近大家在說什麼
+今天
+FAIL  followup_the_manual_describes_the_current_game  (1.6s)
+      not in the manual: 工作站沒人
+FAIL  v24_manual_tutorial_and_news_cover_the_new_content  (2.2s)
+      the audit stamp on GUIDE (the release checklist §2: the stamp says the release the manual was last audited for; v2.5.1 from 2026-10-10, was v2.5, before it v2.4 rc8)
+FAIL  v24_restaurant_and_lounge_staff_are_two_pools_that_never_share_places  (4.2s)
+      the restaurant: level 5 (8) + 後場整理區 + 側廳 + 廚房擴建 (2 each) = 14, twelve taken
+FAIL  v24_an_old_shared_cap_save_keeps_everyone_and_waits  (4.3s)
+      the restaurant: 14 of 14
+FAIL  v24_rc8_the_restaurants_three_lists_and_the_lounges_one  (2.3s)
+      level 1 a chef and a waiter; the Bistro one more of each; then a chef, a chef, a chef and a cleaner (2026-10-10): [[1, 1, 0], [1, 1, 0], [2, 1, 0], [3, 1, 0], [4, 1, 1]]
+FAIL  cooking_on_fire_can_come_on_the_first_day  (1.7s)
+      Page.evaluate: ReferenceError: fireCooks is not defined
+    at eval (eval at window.__jk (http://127.0.0.1:36345/js/game.js:13037:32), <anonymous>:1:33)
+    at window.__jk (http://127.0.0.1:36345/js/game.js:13037:32)
+    at eval (eval at evaluate (:290:30), <anonymous>:1:11)
+    at UtilityScript.evaluate (<anonymous>:297:18)
+    at UtilityScript.<anonymous> (<anonymous>:1:44)
+
+0 passed, 7 failed
+exit=1 09:30:18

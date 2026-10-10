@@ -1,0 +1,1 @@
+{"fe":"(window.__fe&&__fe[S.day])||[]","fires":"(S.lastSummary&&S.lastSummary.fires)","lv":"S.level","crew":"(S.crew||[]).map(m=>m.role+(m.duty?':'+m.duty:'')).join(',')"}

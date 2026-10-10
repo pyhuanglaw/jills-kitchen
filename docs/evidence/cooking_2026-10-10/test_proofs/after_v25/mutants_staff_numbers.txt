@@ -1,0 +1,28 @@
+== mutant bistro_no_more_places
+FAIL  kitchen_works_walk_in_and_a_second_coffee_machine  (1.9s)
+      before: 260, 14 people, two cups
+FAIL  v24_back_of_house_is_a_work_area_and_keeps_its_two  (2.0s)
+      the +2 is kept: the crew of twelve still fits (14 places since the Bistro's chef and waiter, 2026-10-10; 12 without the work area)
+FAIL  v24_rc6_two_more_restaurant_places_and_the_lounge_unchanged  (2.4s)
+      the chefs' and waiters' lists full before the room
+0 passed, 3 failed
+== mutant room_adds_nothing
+FAIL  kitchen_works_walk_in_and_a_second_coffee_machine  (2.0s)
+      before: 260, 14 people, two cups
+FAIL  v24_back_of_house_is_a_work_area_and_keeps_its_two  (1.9s)
+      the +2 is kept: the crew of twelve still fits (14 places since the Bistro's chef and waiter, 2026-10-10; 12 without the work area)
+FAIL  v24_rc6_two_more_restaurant_places_and_the_lounge_unchanged  (2.3s)
+      the chefs' and waiters' lists full before the room
+0 passed, 3 failed
+== mutant kitchen2_adds_nothing
+FAIL  kitchen_works_walk_in_and_a_second_coffee_machine  (3.2s)
+      kitchen II: four cups, two more people (16)
+PASS  v24_back_of_house_is_a_work_area_and_keeps_its_two  (2.3s)
+PASS  v24_rc6_two_more_restaurant_places_and_the_lounge_unchanged  (4.9s)
+2 passed, 1 failed
+== mutant pd_places_are_chefs
+PASS  kitchen_works_walk_in_and_a_second_coffee_machine  (11.6s)
+PASS  v24_back_of_house_is_a_work_area_and_keeps_its_two  (2.2s)
+FAIL  v24_rc6_two_more_restaurant_places_and_the_lounge_unchanged  (3.2s)
+      rc8 §21: the room's two places are waiters' (the chefs' list stays full)
+2 passed, 1 failed

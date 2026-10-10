@@ -1,0 +1,18 @@
+v2.5 tag check, 2026-10-10 09:52 UTC (the user, after v2.5 §6: 「請確認 GitHub 遠端是否已存在 v2.5 tag」)
+
+GitHub API (mcp__github__list_tags, pyhuanglaw/jills-kitchen, perPage 100): []  — no tags at all
+
+git ls-remote --tags origin:
+(empty: no tags)
+
+git ls-remote origin (the branches that stand in for the release tags):
+fb86e3aa1ece41416e981fd28c9e845c782a4ba6	refs/heads/archive/release-v2.5
+2e67df306a119b90ae6adf592c544a23b193b221	refs/heads/feature/cooking-gameplay
+812d97fce6d90a3cc0807e97ca7241d168f445bf	refs/heads/main
+
+local tag v2.5:
+tag
+e65332c7bd8871b2380a347fec9239f8df46ec5f
+fb86e3aa1ece41416e981fd28c9e845c782a4ba6
+
+Pushing the tag: refused in this session — 2026-10-10 the annotated tag push ended in 'unexpected disconnect', the lightweight ref push got HTTP 403 from the session's git proxy (organization egress policy; /root/.ccr/README.md: 403 = policy denial, do not retry). The GitHub tools available here (MCP) have no way to create a tag or a release. Not retried.
