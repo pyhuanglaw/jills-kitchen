@@ -1,0 +1,27 @@
+v24_rc7_2_a_regulars_head_at_a_busy_table_and_the_log_closes 原本的檢查（不讓外場的人停一格），種子 2229–2238，Day 74 存檔：
+點到熟客的頭之後，那一格是 Jill 去（jill_goes）還是服務生接走（claimed_by_staff）。兩個版本都有服務生接走的種子——
+是 2026-10-09 第 6 題的規則在同一格裡的先後，不是第二輪造成的；原本的種子 2229 在 main 上剛好是 Jill 去。
+
+main 7851f7c（第二輪之前）: Jill 去 4／10；服務生接走 6；跳出卡片 0
+   {"seed": 2229, "table": 12, "room": "side", "jill_rest": "sit", "jill_room": "home", "free_waiters": 0, "card": false, "jill_goes": true, "claimed_by_staff": false}
+   {"seed": 2230, "table": 26, "room": "lounge", "jill_rest": "sit", "jill_room": "home", "free_waiters": 0, "card": false, "jill_goes": false, "claimed_by_staff": true}
+   {"seed": 2231, "table": 8, "room": "main", "jill_rest": "sit", "jill_room": "home", "free_waiters": 0, "card": false, "jill_goes": true, "claimed_by_staff": false}
+   {"seed": 2232, "table": 3, "room": "main", "jill_rest": "sit", "jill_room": "home", "free_waiters": 0, "card": false, "jill_goes": false, "claimed_by_staff": true}
+   {"seed": 2233, "table": 11, "room": "side", "jill_rest": "sit", "jill_room": "home", "free_waiters": 1, "card": false, "jill_goes": false, "claimed_by_staff": true}
+   {"seed": 2234, "table": 8, "room": "main", "jill_rest": "sit", "jill_room": "home", "free_waiters": 1, "card": false, "jill_goes": false, "claimed_by_staff": true}
+   {"seed": 2235, "table": 14, "room": "side", "jill_rest": "sit", "jill_room": "home", "free_waiters": 2, "card": false, "jill_goes": false, "claimed_by_staff": true}
+   {"seed": 2236, "table": 5, "room": "main", "jill_rest": "sit", "jill_room": "home", "free_waiters": 0, "card": false, "jill_goes": false, "claimed_by_staff": true}
+   {"seed": 2237, "table": 6, "room": "main", "jill_rest": "sit", "jill_room": "home", "free_waiters": 0, "card": false, "jill_goes": true, "claimed_by_staff": false}
+   {"seed": 2238, "table": 34, "room": "lounge", "jill_rest": "sit", "jill_room": "home", "free_waiters": 0, "card": false, "jill_goes": true, "claimed_by_staff": false}
+
+第二輪 c50184d: Jill 去 5／10；服務生接走 5；跳出卡片 0
+   {"seed": 2229, "table": 10, "room": "side", "jill_rest": "go", "jill_room": "home", "free_waiters": 1, "card": false, "jill_goes": false, "claimed_by_staff": true}
+   {"seed": 2230, "table": 1, "room": "main", "jill_rest": null, "jill_room": "main", "free_waiters": 0, "card": false, "jill_goes": true, "claimed_by_staff": false}
+   {"seed": 2231, "table": 8, "room": "main", "jill_rest": "sit", "jill_room": "home", "free_waiters": 0, "card": false, "jill_goes": false, "claimed_by_staff": true}
+   {"seed": 2232, "table": 3, "room": "main", "jill_rest": "sit", "jill_room": "home", "free_waiters": 2, "card": false, "jill_goes": false, "claimed_by_staff": true}
+   {"seed": 2233, "table": 10, "room": "side", "jill_rest": "sit", "jill_room": "home", "free_waiters": 0, "card": false, "jill_goes": true, "claimed_by_staff": false}
+   {"seed": 2234, "table": 4, "room": "main", "jill_rest": "sit", "jill_room": "home", "free_waiters": 1, "card": false, "jill_goes": false, "claimed_by_staff": true}
+   {"seed": 2235, "table": 14, "room": "side", "jill_rest": "sit", "jill_room": "home", "free_waiters": 0, "card": false, "jill_goes": true, "claimed_by_staff": false}
+   {"seed": 2236, "table": 0, "room": "main", "jill_rest": null, "jill_room": "home", "free_waiters": 0, "card": false, "jill_goes": false, "claimed_by_staff": true}
+   {"seed": 2237, "table": 6, "room": "main", "jill_rest": "sit", "jill_room": "home", "free_waiters": 0, "card": false, "jill_goes": true, "claimed_by_staff": false}
+   {"seed": 2238, "table": 4, "room": "main", "jill_rest": null, "jill_room": "main", "free_waiters": 0, "card": false, "jill_goes": true, "claimed_by_staff": false}

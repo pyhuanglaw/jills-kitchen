@@ -1,0 +1,72 @@
+第二輪（d12a638）完整回歸的失敗：原始案例、重現、原因、處理（2026-10-10）
+
+d12a638 上 353 項的完整回歸（固定在那個 commit 的 worktree，分三份），失敗的測試與原始訊息在 ../regression/d12a638_part*.txt。
+每一個都在同一個種子、同一個存檔上重現過，原因查清楚才處理；沒有換種子、沒有刪測試。
+
+1. touch_controls（種子 14，新遊戲第 1 天）
+   原始訊息：tapping the waiting guests did not seat them
+   重現：touch_controls_repro.py。等候的客人出現時兩張桌子都已經有人：
+     [{"i":0,"dirty":false,"g":1},{"i":1,"dirty":false,"g":2}]，排隊的是第 3 組；測試把 0 號桌設成乾淨，但那張桌子有客人，
+     freeTableFor 找不到空桌 → 「目前沒有空桌，先收拾一下吧」。
+   原因：測試先把所有桌子弄髒，假設第 1 天沒有人會去收；秀琴阿姨第一天就是清潔員（使用者 2026-10-10 §2），一下子就把兩張桌子
+     收乾淨，前兩組坐下了。遊戲做的是對的。
+   處理：測試這一段讓秀琴阿姨暫時不接新工作（R.cw.xq.cd），點完再放開；其他照舊。還抓得到：點等候客人不帶位的版本會失敗
+     （mutants.txt 的 tap_queue_no_seat）。
+
+2. old_saves_load（legacy_v1_staff.json）
+   原始訊息：legacy staff migration behaviour changed（S.crew.length 不是 0）
+   原因：每個存檔都有秀琴阿姨一位（xqCrewMig，§2），舊存檔讀進來員工名單多了她。測試要防的是「舊的 bartender/busser 被轉成員工」。
+   處理：改成「除了她以外沒有人」＋「她剛好一位」。還抓得到：讓舊的轉換照跑的版本會失敗（legacy_crew_runs）。
+
+3. album_store_and_viewer_v181（v18_day4_album.json）
+   原始訊息：V18 save: progress preserved（S.crew.length 不是 1）
+   原因同 2：存檔裡原本的服務生小美還在，多了秀琴阿姨。
+   處理：原本的那一位還在＋她一位。還抓得到：讀檔把原本的員工弄丟的版本會失敗（crew_dropped）。
+
+4. v24_saves_load_and_nothing_fires_on_load（player_day2_2155.json）
+   原始訊息：kept as it was … crew 1 vs 0
+   原因同 2：第 2 天的存檔沒有她（那時她是晚上來幫忙的人），讀進來補上一位。其他存檔本來就有她（cmuitze6q506），名單不變。
+   處理：沒有她的存檔多一位，有她的不變。還抓得到：crew_dropped、xq_dup（重複補一位）都會失敗。
+
+5. every_player_save_migrates_plays_a_day_and_keeps_its_story（player_day2_2155.json）
+   原始訊息：prep, and nothing announced on opening but the new day's own beats (prep, {"k":"_rest","who":"餐廳故事","t":"第一位員工","n":2,"total":4})
+   原因：遊戲的問題。餐廳故事「小小的餐廳」的「第一位員工」用「員工名單有人」判斷；第 2 天的存檔讀進來補上秀琴阿姨，這一拍
+     變成完成，日期是第 1 天（她的第一天），對第 2 天來說算「昨天的事」，開店時就跳出故事更新——讀檔不該宣布過去的事。
+   處理（遊戲）：xqCrewMig 補上她時，把這一拍記成已經看過（靜默收進）；fillDefaults 不再從 newState() 複製她（只在 xqCrewMig
+     補，日數、新聞都對）。測試沒有改。還抓得到：拿掉靜默收進的版本會失敗（rest_beat_announced）。
+
+6. v24_rc7_2_a_regulars_head_at_a_busy_table_and_the_log_closes（種子 2229，player_day74_1508.json）
+   原始訊息：the tap on his head took the order: Jill goes, no card: {'card': False, 'q': [], 'cur': None}
+   重現：regulars_head_repro.py。點到熟客的頭 → tapTable(10) → jillAsk(10)，Jill 的佇列是 [10]（點擊這一步是對的）；同一個畫格裡
+     服務生先動，看到 10 號桌在等點餐、Jill 還沒出發，就接走了（claim），Jill 輪到時放掉（jillLetGo）。
+   原因：2026-10-09 第 6 題的規則（「不再自動派 Jill 去搶同一份工作」：Jill 被叫了但還沒出發的桌子，空著的服務生可以接，她輪到時
+     放掉）。這次剛好 Jill 在自己的房間休息、被叫起來，服務生同一格就接了。測試要問的是「點到頭＝點桌子，不跳卡片」，不是誰去。
+   分布：regulars_head_sweep.py，種子 2229–2238，兩個版本（main 7851f7c 和第二輪）各跑一次，結果在 regulars_head_sweep.txt。
+   處理：點的那一格讓外場的人不接新工作（cd），之後還原；其他照舊。還抓得到：點到頭就跳卡片的版本會失敗（reghead_card）。
+
+7. golden_frames、golden_scenario、cat_personality_fingerprint：基準重錄，見 golden_baselines.txt。
+
+8. 廚房測試的 _day()：cooking_jill_and_the_cooks_hand_work_on（B: on the fire, then done）、
+   cooking_a_cook_on_standby_rests_and_his_card_counts_his_dishes（back on the board, he takes work）、
+   cooking_plating_happens_where_the_food_is、cooking_the_card_says_who_has_it_and_a_dish_can_be_taken_back（the cook takes it）
+   原因：_day() 是第 1 天、加廚師；第二輪的教學規則（§2「需要 Jill 親自操作的教學，仍由 Jill 完成」）讓廚師不接 Jill 還沒做過的炒飯。
+   處理：_day() 把三道教學菜記成做過（S.jillMade）。四項重跑通過。還抓得到：teach_forever。
+
+9. cooking_one_jill_finishes_her_step_then_goes_and_nothing_of_hers_moves_on_while_she_is_away（種子 7131）
+   原始訊息：she left only once the hands of the step were done (the rice cooking by itself): ready
+   原因：測試派 Jill 去收髒桌；秀琴阿姨（第 1 天就是清潔員）空著，照 2026-10-09 第 6 題的規則接走這張桌子，Jill 就沒出廚房，
+     等到飯好了（ready）。
+   處理：那一晚讓秀琴阿姨先回家（setCrewAway 'left'），髒桌是 Jill 的。重跑通過。還抓得到：jill_leaves_midstep。
+
+10. workflow_waiters_keep_serving_and_one_at_most_washes（a waiter washes when nothing is waiting for the guests: {'xq'}）、
+    workflow_a_second_cleaner_washes_beside_the_first（a tap with one at the sink sends Jill to the other place: 阿芳、秀琴阿姨 正在洗）
+    原因：工作流測試自己設定員工（S.crew=[…]），開店時 xqCrewMig 又把秀琴阿姨補進來，多了一位清潔員。
+    處理：_floor_day、_dirty_day 讓她那晚休假（setCrewAway 'off'），員工就是每個測試設的。工作流 15 項全部重跑通過。
+    還抓得到：waiter_washes_with_guests。
+
+11. qa_waiting_staff_do_not_stand_on_one_spot（1 pairs of idle staff on the same spot）
+    重現：seed 1 的第 25 次看：服務生 Kai 在回自己位置（58,152）的路上、兩件工作之間的停頓，停在阿哲的位置（86,190）。
+    分布：waiting_staff.txt（種子 1–6、兩個版本各 360 次看：main 0 次、第二輪 1 次，就是這一次；兩個人站在同一個位置等：0）。
+    處理：只算兩個人都站在自己要去的位置上。還抓得到：one_wait_post（所有服務生同一個位置，當初 W3-05 的樣子）。
+
+d12a638 上的總數：353 項，336 通過、17 失敗（part0 7、part1 4、part2 6）；上面每一項都查清楚、處理、重跑通過。

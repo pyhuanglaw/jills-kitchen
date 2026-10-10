@@ -24,11 +24,14 @@ GUIDE = "((document.querySelector('#wfGuide')||{}).innerText||'')"
 
 
 def _day(b, port, target, seed, setup=''):
-    """Day 1 of a new game with the kitchen as the test needs it (two burners, a level, cooks), the floor run by __floor"""
+    """Day 1 of a new game with the kitchen as the test needs it (two burners, a level, cooks), the floor run by __floor.
+    Round 2 (2026-10-10, §2: 「需要 Jill 親自操作的教學，仍由 Jill 完成」): on Days 1–3 a cook leaves the day's lesson dish (fried
+    rice on Day 1) to Jill until she has made one (wfJillTeach). These tests are about the kitchen's hand-offs, not the lesson:
+    it counts as done (S.jillMade), so the cooks they add work as on any later day."""
     g = Game(b, port, target, seed=seed, manual=True, viewport={'width': 390, 'height': 844})
     g.ev(FLOOR)
     g.click('[data-act=open]'); g.page.wait_for_timeout(80)
-    g.ev("S.eq.stove=2;" + setup)
+    g.ev("S.eq.stove=2;S.jillMade={friedrice:1,coffee:1,salad:1};" + setup)
     start_day(g)
     g.ev("setRoom('kitchen')")
     return g
@@ -956,6 +959,10 @@ def cooking_one_jill_finishes_her_step_then_goes_and_nothing_of_hers_moves_on_wh
     check(rooms[-1] == 'kitchen' and 'main' in rooms, f'she walked in by the door from the dining room: {rooms}')
     act0 = g.ev(f"{N}.act")
     check(act0 > 0.2, f'her hands on it: {act0}')
+    # (round 2, 2026-10-10: 秀琴阿姨 is the cleaner from Day 1 and, free, would take this table — the one-Jill rule of 2026-10-09
+    #  #6 lets a free cleaner have a table Jill has not set off for — and Jill would never leave the kitchen: seed 7131 on d12a638,
+    #  'ready'. This is about Jill crossing rooms: tonight 秀琴阿姨 went home early, so the dirty table is Jill's.)
+    g.ev("setCrewAway(xiuqin(),'left',0)")
     g.ev("(()=>{let t=R.tables.find(t=>!t.group);if(!t){const q=R.groups.find(q=>q.table!=null&&!(q.ticket&&q.ticket.items.some(it=>it.d==='friedrice')));t=R.tables[q.table];leaveGroup(q,'ok')}t.dirty=true;t.plates=['plate','cup'];window.__ojT=t.i;tapTable(t)})()")
     check(g.ev("R.jill.q.includes(window.__ojT)"), 'sent to a dirty table while she works the wok')
     left_at = None

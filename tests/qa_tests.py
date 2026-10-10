@@ -644,7 +644,11 @@ def qa_waiting_staff_do_not_stand_on_one_spot(b, port, target):
         worst = 0
         for _ in range(60):
             p.settle(); p.ev("for(let i=0;i<30;i++){__act();__tick(1000/30)}")
-            n = p.ev("""(()=>{const W=Object.values(R.cw||{}).filter(w=>!w.task&&(w.room||'main')==='main');let n=0;
+            # (2026-10-10, round 2: d12a638's run failed with 1 pair — at one look a waiter on his way back to his place, in his
+            #  short pause between jobs, was passing over another's place (scratchpad sweep in docs/evidence/cooking_2026-10-10/
+            #  test_proofs/waiting_staff.txt: a passing pair on both builds' seeds, never two standing on one place). What the
+            #  finding was about is two people *waiting* on one spot: both must be at the place they are going to.)
+            n = p.ev("""(()=>{const W=Object.values(R.cw||{}).filter(w=>!w.task&&(w.room||'main')==='main'&&(w.tx==null||Math.hypot(w.x-w.tx,w.y-w.ty)<3));let n=0;
               for(let i=0;i<W.length;i++)for(let j=i+1;j<W.length;j++)if(Math.hypot(W[i].x-W[j].x,W[i].y-W[j].y)<6)n++;return n})()""")
             worst = max(worst, n)
         check(worst == 0, f'{worst} pairs of idle staff on the same spot')

@@ -40,7 +40,9 @@ def _floor_day(b, port, target, seed, lv, crew_extra=''):
     g = Game(b, port, target, seed=seed, manual=True, viewport={'width': 390, 'height': 844})
     _rt.install_bot(g)
     g.click('[data-act=open]'); g.page.wait_for_timeout(80)
-    g.ev("S.level=2;S.tables=4;S.money=5000;S.crew=[{id:'w1',role:'waiter',name:'小茉',lv:%d,duty:'both',since:1,days:3,pool:'restaurant'}%s];save()" % (lv, crew_extra))
+    # (round 2, 2026-10-10: 秀琴阿姨 is on every game's staff from Day 1 — the service adds her if a crew lacks her. These tests
+    #  set the crew they are about, so she has the evening off: the crew stays the one each test sets.)
+    g.ev("S.level=2;S.tables=4;S.money=5000;S.crew=[{id:'w1',role:'waiter',name:'小茉',lv:%d,duty:'both',since:1,days:3,pool:'restaurant'}%s];xqCrewMig(S);setCrewAway(xiuqin(),'off');save()" % (lv, crew_extra))
     start_day(g)
     g.ev("for(const q of R.groups)q.pat=1")
     return g
@@ -143,7 +145,7 @@ def _dirty_day(b, port, target, seed, crew="{id:'c1',role:'cleaner',name:'阿芳
     g = Game(b, port, target, seed=seed, manual=True, viewport={'width': 390, 'height': 844})
     _rt.install_bot(g)
     g.click('[data-act=open]'); g.page.wait_for_timeout(80)
-    g.ev("S.level=2;S.tables=4;S.money=5000;S.crew=[%s];save();window.__noXQH=1" % crew)
+    g.ev("S.level=2;S.tables=4;S.money=5000;S.crew=[%s];xqCrewMig(S);setCrewAway(xiuqin(),'off');save();window.__noXQH=1" % crew)   # (round 2: her evening off, as in _floor_day)
     start_day(g)
     g.ev("R.sched=[];R.si=0")   # nobody new comes in: the test sets the tables
     return g

@@ -6041,6 +6041,7 @@ function planAct(){const J=R.jill,t=R.tables[J.cur.t],g=t.group;const tk=g&&g.ti
  /* rc7.7: what waits at the pass is fetched there; a chef's night's course or a tasting night's round waits at the end of the bar's L */
  if(atPass){const pu=pickupFor(t,t.x<200?-14:14);J.cur.step='pickup';J.cur.ev=t.lounge?2:0;J.troom=pu.room;J.tx=pu.x;J.ty=pu.y}else if(atBar){const P=cnPick();J.cur.step='pickup';J.cur.ev=1;J.troom='lounge';J.tx=P.x;J.ty=P.y}else{J.cur.step='table';J.troom=t.room||'main';J.tx=t.x;J.ty=t.y+26}}
 function arriveAct(){const J=R.jill;if(J.restTo){J.restTo=false;J.sit=true;J.face=1;return}
+ if(J.petGo){const c=J.petGo.cat;J.petGo=null;if(c&&CATS.includes(c)&&!c.hidden&&c.perch<0&&!c.sofa&&['rest','daze','stare','sleep','side'].includes(c.st)&&Math.hypot(c.x-J.x,c.y-J.y)<40)jillPat(J,c,true);return}   /* there: the pat (the cat may have got up and gone) */
  if(J.fp&&!J.cur&&J.fp.phase==='go'){J.fp.phase='stand';J.fp.t=.9;J.face=-1;J.lookAt={x:J.x-8,y:J.y-30,t:1.4,down:true};return}   /* rc7.5: on her way to the window with the herbs, a look at them */
  if(J.fp&&!J.cur&&J.fp.phase==='sill'){J.fp.phase='place';J.fp.t=.8;J.face=-1;J.lookAt={x:FP_SILL.x-12,y:FP_SILL.y-28,t:.8};return}   /* and onto the sill */
  if(J.visit&&J.visit.phase==='go'&&J.visit.kind==='selfie'){const V=J.visit;V.phase='stand';V.t=rand(2,3);const t=V.t0,g=V.g;J.face=t.x>=J.x?1:-1;J.lookAt={x:t.x,y:t.y-8,t:V.t};if(R.groups.includes(g)){jillSay(pickT(['好啊。','來。','貓也要一起嗎？']));g.pat=Math.min(1,g.pat+.1);memo('selfie',t.x,t.y-6,{g:g.name,room:t.room||'main',subj:[{x:J.x,y:J.y}]})}return}
@@ -6203,7 +6204,8 @@ function jillKitchen(J,dt){const jt=wfJillTask();const v=165*flowMul('jill')*(R.
 /* a cat she can pat from where she stands (resting on the floor, not on a perch or the sofa), and the pat itself: each cat's own liking
    for it; a look down instead when the cat is not in the mood (2026-10-10: one place for the two ways it happens) */
 function jillPatNear(J,r){return CATS?CATS.find(c=>!c.hidden&&c.perch<0&&!c.sofa&&['rest','daze','stare','sleep','side'].includes(c.st)&&Math.hypot(c.x-J.x,c.y-J.y)<r):null}
-function jillPat(J,near){const id=near.def.id;const p=id==='tora'?.9:id==='ban'?.85:id==='mikan'?.6:id==='mei'?.45:.35;J.petCD=R.t+rand(18,40);if(Math.random()<p){J.pet={cat:near,t:rand(1.6,3),crouch:near.st!=='side'};if(near.st!=='side')memo('pet',near.x,near.y-6,{a:catName(near.def),subj:[{x:J.x,y:J.y}]});J.face=near.x>=J.x?1:-1;if(near.st!=='sleep'){releaseSpots(near);near.st='pet';near.pose=near.st==='sleep'?near.pose:'rub';near.happy=rand(2,3.5);near.quiet=1;near.face=J.x>=near.x?1:-1}near.hearts.push({x:0,y:-26,t:0});if(id==='snow'&&near.st==='sleep')snowNudge(near)}else{J.lookAt={x:near.x,y:near.y,t:rand(1,2),down:true}}}
+function catPatP(c){const id=c.def.id;return id==='tora'?.9:id==='ban'?.85:id==='mikan'?.6:id==='mei'?.45:.35}   /* how likely a cat is in the mood for her pat */
+function jillPat(J,near,sure){const id=near.def.id,p=catPatP(near);J.petCD=R.t+rand(18,40);if(sure||Math.random()<p){J.pet={cat:near,t:rand(1.6,3),crouch:near.st!=='side'};if(near.st!=='side')memo('pet',near.x,near.y-6,{a:catName(near.def),subj:[{x:J.x,y:J.y}]});J.face=near.x>=J.x?1:-1;if(near.st!=='sleep'){releaseSpots(near);near.st='pet';near.pose=near.st==='sleep'?near.pose:'rub';near.happy=rand(2,3.5);near.quiet=1;near.face=J.x>=near.x?1:-1}near.hearts.push({x:0,y:-26,t:0});if(id==='snow'&&near.st==='sleep')snowNudge(near)}else{J.lookAt={x:near.x,y:near.y,t:rand(1,2),down:true}}}
 function jillUpd(dt){const J=R.jill;const fire=R.fire>0;if(upSearching()||(R&&R.srFirst)){upJillUpd(dt);return}/* v2.4 P2: the search, the phone call at the stair door */
  J.calm=(J.calm||0)+dt;J.wlChk=(J.wlChk||0)+dt;if(J.wlChk>.5){J.wlChk=0;if(J.cur||J.q.length||jillWorkload()>0)J.calm=0}
  if(J.rest==='sit'){restTick(dt);if(J.rest==='sit')return}
@@ -6213,6 +6215,7 @@ function jillUpd(dt){const J=R.jill;const fire=R.fire>0;if(upSearching()||(R&&R.
  if(J.kWalk){J.kWalk=false;if(!J.cur){J.tx=null;J.ty=null;J.moving=false}}   /* a walk in the kitchen nothing calls for any more stops where she is */
  if(!J.cur&&jillHandsDirty(J)&&!(J.q.length&&ddChainJ(J))){J.cur={dump:1};const d=ddDrop();J.troom='kitchen';J.tx=d.x;J.ty=d.y;J.idle=0}   /* Workflow B: with dishes in hand, to the tub — unless the next table she was sent to is another to clear */
  if(!J.cur&&J.q.length){J.cur={t:J.q.shift()};planAct();J.idle=0}
+ if(J.petGo&&(J.cur||J.q.length||J.rest||J.visit||jillWorkload()>1||R.closing!=null)){J.petGo=null;if(!J.cur&&!J.rest&&!J.visit){J.tx=null;J.ty=null;J.moving=false}}   /* walking over to a cat: any work calls her back */
  if(J.fp&&(J.cur||J.q.length||R.closing!=null))fpDrop();   /* rc7.5: work comes first */
  /* 2026-10-10 (the user: 「Jill 經過附近的貓咪、工作短暫空檔，或完成工作後順手摸一下」，不為摸貓中斷重要工作): on her way back to her
     spot with nothing to do, a cat resting by the way gets a pat — she stops for it, then walks on; any work ends it */
@@ -6235,6 +6238,11 @@ function jillUpd(dt){const J=R.jill;const fire=R.fire>0;if(upSearching()||(R&&R.
   if(!J.fp&&!J.pet&&!J.rest&&J.idle>.6&&firstPhotoDue()){J.fp={phase:'go'};J.troom='main';J.tx=FP_SPOT.x;J.ty=FP_SPOT.y;return}
   /* Dylan is here and she has a moment: she goes over and stands by his table for a bit. Not a job; once a visit. */
   if(!J.visit&&!J.rest&&!J.pet&&J.idle>1.2&&J.calm>2.5&&(J.visitCD||0)<R.t&&Math.random()<dt*.35&&jillWorkload()<=1){const g=R.groups.find(q=>q.reg==='dylan'&&q.table!=null&&q.room!=='lounge'&&['wait','eat'].includes(q.state)&&!q.paused);if(g){const t=R.tables[g.table];g.paused=true;J.visitCD=R.t+60;J.visit={g,t0:t,phase:'go'};J.troom=t.room||'main';J.tx=t.x+(t.x<200?30:-30);J.ty=t.y+20;S.dylan.clues.pause=(S.dylan.clues.pause||0)+1;return}}
+  /* 2026-10-10 (the user: 「工作短暫空檔」「Jill 確實在貓咪附近」「不瞬間移動」「不為摸貓中斷重要工作」「不強迫每晚發生」): a quiet moment
+     and a cat resting a few steps away, in the mood (the cat's own odds, decided before she goes) — she walks over for a pat; any
+     work calls her back. Day 1 alone, seeds 1–20: 29 pats on 18 days (before the cooking system 29 on 16; without this 18 on 14). */
+  if(!J.petGo&&!J.visit&&!J.rest&&!J.pet&&!(J.hands||[]).length&&J.idle>1.2&&J.calm>2.5&&(J.petCD||0)<R.t&&(J.room||'main')==='main'&&Math.random()<dt*.3&&jillWorkload()<=1){const c=jillPatNear(J,120);
+   if(c&&Math.hypot(c.x-J.x,c.y-J.y)>30){J.petCD=R.t+rand(8,14);if(Math.random()<catPatP(c)){J.petGo={cat:c};J.troom='main';J.tx=clamp(c.x+(c.x<=J.x?16:-16),20,380);J.ty=c.y+4;return}}}
   /* a quiet moment: nothing on the pass, nobody waiting on her -> she may sit down on the sofa for a bit */
   if(!J.rest&&!J.pet&&J.calm>5&&(J.restCD||0)<R.t&&R.t>Math.max(10,R.dur*JILL_HOST[0])&&R.t<R.dur*JILL_HOST[1]&&Math.random()<dt*.3&&jillWorkload()===0){const pos=freeJillPos();if(pos){startRest(pos);return}J.restCD=R.t+15}
   if(J.idle>2.2&&Math.hypot(J.x-PASS.x,J.y-PASS.y)>3){J.troom='main';J.tx=PASS.x;J.ty=PASS.y}}}

@@ -855,7 +855,7 @@ DAY_RECORD = r"""JSON.stringify((()=>{const L=S.lastSummary||{};const e=(window.
   beats:(story().trace||[]).filter(t=>t.d===S.day).map(t=>t.lane[0]+':'+t.k),
   lounge:typeof loungeLv==='function'?loungeLv():0,proj:S.loungeProj?{state:S.loungeProj.state||null,open:S.loungeProj.open||null}:null,viewing:!!fact('lin_viewing'),
   linCard:(fact('lounge_project')&&!loungeLv())?{cost:LOUNGE_PROJ[0].cost}:null,up:!!(S.rooms&&S.rooms.up),wines:Object.keys(S.wineDev||{}).length,unlocked:(S.unlocked||[]).length,
-  menu:menuList().map(d=>[d,priceOf(d)]),dy:S.dylan?{stage:S.dylan.stage,reveal:S.dylan.reveal||null}:null}})())"""
+  menu:menuList().map(d=>[d,priceOf(d)]),dy:S.dylan?{stage:S.dylan.stage,reveal:S.dylan.reveal||null}:null,firstFire:(S.achievements||{}).fire||null}})())"""   # (2026-10-10: the day of the first ON FIRE)
 
 
 class Observer:

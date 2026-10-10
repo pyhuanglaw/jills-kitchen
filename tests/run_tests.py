@@ -1416,7 +1416,9 @@ def jill_pats_a_cat_on_her_way_and_lets_go_for_work(b, port, target):
     「不瞬間移動」「不出現第二個 Jill」「不強迫每晚發生」「不為摸貓中斷重要工作」. Day 1 of a new game: Jill walks back to her spot
     by the pass with nothing to do; 樾樾 rests on the way. She stops beside him and pats him (crouched, the cat purring with
     hearts) — in the dining room, the one Jill, where she was walking; a table that needs her ends it at once and she goes;
-    with plates in her hands she does not stop. (How often, over twenty days: docs/evidence/cooking_2026-10-10/cats/.)"""
+    with plates in her hands she does not stop. And 「工作短暫空檔」: in a quiet moment, with a cat resting a few steps away, she
+    walks over to it (no jump) and pats it there; a table that needs her calls her back on the way. (How often, over twenty
+    days: docs/evidence/cooking_2026-10-10/cats/.)"""
     g = Game(b, port, target, seed=74, manual=True)
     install_bot(g); g.click('[data-act=open]')
     start_day(g)
@@ -1440,6 +1442,26 @@ def jill_pats_a_cat_on_her_way_and_lets_go_for_work(b, port, target):
     # plates in her hands: she does not stop
     g.ev(SETUP); g.ev("R.jill.hands=[{k:'dirty',n:1}]")
     check(g.ev(TICK % 60) != 'pet', 'with plates in her hands she does not stop for a cat')
+    # a quiet moment (nothing for her anywhere: her workload and the kitchen's turn are held at nothing), 樾樾 resting a few steps
+    # away: she walks over — no jump — and pats him there; on the way, a table that needs her calls her back
+    WALK = """(()=>{const J=R.jill;J.cur=null;J.q=[];J.hands=[];J.pet=null;J.lookAt=null;J.visit=null;J.fp=null;J.rest=null;J.kcur=null;J.petGo=null;J.room='main';J.troom='main';J.x=PASS.x;J.y=PASS.y;J.tx=null;J.ty=null;J.moving=false;J.petCD=0;J.idle=2;J.calm=3;J.restCD=R.t+60;
+      window.__wl0=window.__wl0||jillWorkload;jillWorkload=()=>0;window.__wj0=window.__wj0||wfJillTask;wfJillTask=()=>null;const c=CATS.find(k=>k.def.id==='tora');releaseSpots(c);Object.assign(c,{x:PASS.x-85,y:PASS.y-12,st:'rest',pose:'sit',t:60,perch:-1,sofa:null,hidden:false,moving:false});R.wf=[];return Math.round(Math.hypot(c.x-J.x,c.y-J.y))})()"""
+    WTICK = "(()=>{const J=R.jill;let went=false;for(let i=0;i<%d;i++){const x0=J.x,y0=J.y;update(1/30);updateCats(1/30,0);if(Math.hypot(J.x-x0,J.y-y0)>12)return 'jump';if(J.petGo)went=true;if(J.pet)return went?'walked-pet':'pet'}return went?'walked':'none'})()"
+    d0 = g.ev(WALK); got = None
+    for _ in range(8):   # (a cat not in the mood has its cooldown, and a cat may get up: set up again)
+        r = g.ev(WTICK % 180)
+        check(r != 'jump', f'no jump on her way over: {r}')
+        if r == 'walked-pet': got = r; break
+        g.ev(WALK)
+    st = json.loads(g.ev("""JSON.stringify((()=>{const J=R.jill,c=J.pet&&J.pet.cat;return{room:J.room,near:c?Math.round(Math.hypot(c.x-J.x,c.y-J.y)):null,moved:Math.round(Math.hypot(J.x-PASS.x,J.y-PASS.y)),cat:c&&c.def.id,hearts:c?c.hearts.length:0}})())"""))
+    check(got == 'walked-pet' and st['room'] == 'main' and st['near'] is not None and st['near'] < 40 and st['moved'] > 40 and st['hearts'] > 0, f'a quiet moment: she walks over to the cat {d0} px away and pats him there: {got} {st}')
+    for _ in range(8):
+        g.ev(WALK)
+        if g.ev("(()=>{for(let i=0;i<180;i++){update(1/30);updateCats(1/30,0);if(R.jill.petGo)return true}return false})()"): break
+    check(g.ev("!!R.jill.petGo"), 'she sets off for the cat')
+    g.ev("jillWorkload=window.__wl0;wfJillTask=window.__wj0;(()=>{const t=R.tables.find(t=>t.group&&['order','check'].includes(t.group.state))||R.tables.find(t=>t.group);if(t){t.group.state='order';jillAsk(t.i)}})()")
+    g.ev("for(let i=0;i<2;i++){update(1/30);updateCats(1/30,0)}")
+    check(g.ev("!R.jill.petGo&&!R.jill.pet&&!!R.jill.cur"), 'a table that needs her calls her back on the way')
     check(not g.errors, g.errors[:3]); g.close()
 
 

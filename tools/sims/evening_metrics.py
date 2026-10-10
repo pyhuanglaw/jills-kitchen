@@ -7,6 +7,7 @@ leaves to the staff what they cover and taps the rest. One JSON line per evening
   st: each kind of station, the share of the evening it had work on it; busy: Jill, waiters, cleaners, cooks (share not idle);
   loss: queue-seconds while a dirty table stood, seconds tables waited on a full dish cart, work-seconds waiting in the kitchen.
   cats (2026-10-10): times Jill patted a cat standing (J.pet) and on the sofa during a break (LIFE.jill.act 'pet').
+  fires (2026-10-10): how many times the evening went ON FIRE (R.fireCount).
   python3 tools/sims/evening_metrics.py TAG [fresh,day30,day52,day92]"""
 import sys, os, json
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -58,7 +59,7 @@ with sync_playwright() as p:
                 rt.start_day(g); g.ev(rt.LAZY_ACTOR + "\nwindow.__act=window.__actLazy;")
             else:
                 v.to_service(g, lazy=True)
-            g.ev("window.__wlKeep=null;{const E=endDay;endDay=function(){try{if(R&&R.st)window.__wlKeep=JSON.parse(JSON.stringify({wl:R.st.wl||null,dd:R.st.dd||null}))}catch(e){}return E.apply(this,arguments)}}")
+            g.ev("window.__wlKeep=null;{const E=endDay;endDay=function(){try{if(R&&R.st)window.__wlKeep=JSON.parse(JSON.stringify({wl:R.st.wl||null,dd:R.st.dd||null,fires:R.fireCount||0}))}catch(e){}return E.apply(this,arguments)}}")
             m, end = evening(g)
             keep = json.loads(g.ev("JSON.stringify(window.__wlKeep||{})"))
             wl, dd = keep.get('wl') or {}, keep.get('dd') or {}
@@ -71,7 +72,7 @@ with sync_playwright() as p:
                    'busy': {'jill': busy(wl, 'jill'), 'waiter': busy(wl, 'waiter'), 'cleaner': busy(wl, 'cleaner'), 'xq': busy(wl, 'xq'),
                             'cooks': round(sum(o['b'] for o in m['ck'].values()) / max(1e-9, sum(o['t'] for o in m['ck'].values())), 3) if m['ck'] else None},
                    'loss': {'queue_s_dirty_table': round(m['qDirty']), 'cart_full_block_s': round(dd.get('blockT', 0) or 0), 'kitchen_wait_s': round(m['kWait'])},
-                   'cats': {'pats': m['pat'], 'sofa_pets': m['sofaPet']},
+                   'cats': {'pats': m['pat'], 'sofa_pets': m['sofaPet']}, 'fires': keep.get('fires'),
                    'errors': g.errors[:2]}
             print(json.dumps(rec, ensure_ascii=False), flush=True)
             if which == 'fresh':

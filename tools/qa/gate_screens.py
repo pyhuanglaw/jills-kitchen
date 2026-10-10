@@ -38,6 +38,18 @@ with sync_playwright() as p:
             g.ev(f"(()=>{{setRoom('kitchen');const n=wfNode({nid});const it=n.its[0];wfSelectItem(it.tk,it.it);renderTickets();wfGuideUpd()}})()")
             L.append(shot(g, '04_kitchen_card_day1', size))
         room(g, 'home'); L.append(shot(g, '05_jills_room', size))
+        # round 2 (2026-10-10): the rest of the first evening with 秀琴阿姨 on the staff, the first shop's staff tab (hiring after
+        # Day 1: a chef and a waiter at the first level), both hired, and Day 2's morning with its news
+        room(g, 'main'); rt.install_bot(g); g.ev(v.LAZY_ACTOR + "\nwindow.__act=window.__actLazy;window.__noScenes=true")
+        g.ev("__botUntil('phase!==\"service\"',90000,1/30)")
+        if g.ev("phase") == 'summary':
+            g.click('[data-act=toShop]'); g.page.wait_for_timeout(100)
+            g.ev("shopTab='staff';showShop()"); g.page.wait_for_timeout(100); L.append(shot(g, '11_shop_staff_day1', size))
+            for k in ('chef', 'waiter'):
+                g.ev(f"(()=>{{const el=document.createElement('button');el.dataset.act='hire';el.dataset.k='{k}';$('#screen').appendChild(el);el.click();el.remove()}})()"); g.page.wait_for_timeout(80)
+            g.ev("shopTab='staff';showShop()"); g.page.wait_for_timeout(100); L.append(shot(g, '12_shop_staff_hired', size))
+            g.ev("shopTab='home';showShop()"); g.page.wait_for_timeout(60)
+            g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(150); L.append(shot(g, '13_prep_day2', size))
         g.close()
         if size not in ('390x844',):
             continue

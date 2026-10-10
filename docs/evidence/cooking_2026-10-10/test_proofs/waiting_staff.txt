@@ -1,0 +1,18 @@
+qa_waiting_staff_do_not_stand_on_one_spot 的迴圈（Day 92 → 隔天營業、懶玩家、每秒看一次、60 秒），Player 種子 1–6，兩個版本。
+每一次「看」：沒有工作的人裡，相距 6 點以內的對數——全部（原本測試數的）、以及兩個人都站在自己要去的位置上（真的站在同一點等）。
+d12a638 的完整回歸失敗在種子 1：第 25 次看的時候，服務生 Kai 在回自己位置（58,152）的路上、兩件工作之間的短暫停頓，停在阿哲的位置（86,190）上。
+
+main 7851f7c（第二輪之前）: 有一對的「看」0 次／360；兩個人都站在自己位置上的 0 對
+   {"seed": 1, "looks_with_a_pair": 0, "pairs_any": 0, "pairs_both_waiting_at_their_place": 0, "examples": []}
+   {"seed": 2, "looks_with_a_pair": 0, "pairs_any": 0, "pairs_both_waiting_at_their_place": 0, "examples": []}
+   {"seed": 3, "looks_with_a_pair": 0, "pairs_any": 0, "pairs_both_waiting_at_their_place": 0, "examples": []}
+   {"seed": 4, "looks_with_a_pair": 0, "pairs_any": 0, "pairs_both_waiting_at_their_place": 0, "examples": []}
+   {"seed": 5, "looks_with_a_pair": 0, "pairs_any": 0, "pairs_both_waiting_at_their_place": 0, "examples": []}
+   {"seed": 6, "looks_with_a_pair": 0, "pairs_any": 0, "pairs_both_waiting_at_their_place": 0, "examples": []}
+第二輪 c50184d: 有一對的「看」1 次／360；兩個人都站在自己位置上的 0 對
+   {"seed": 1, "looks_with_a_pair": 1, "pairs_any": 1, "pairs_both_waiting_at_their_place": 0, "examples": [[25, ["cmujyhgtx171", "cmujzz8d7273", false, true]]]}
+   {"seed": 2, "looks_with_a_pair": 0, "pairs_any": 0, "pairs_both_waiting_at_their_place": 0, "examples": []}
+   {"seed": 3, "looks_with_a_pair": 0, "pairs_any": 0, "pairs_both_waiting_at_their_place": 0, "examples": []}
+   {"seed": 4, "looks_with_a_pair": 0, "pairs_any": 0, "pairs_both_waiting_at_their_place": 0, "examples": []}
+   {"seed": 5, "looks_with_a_pair": 0, "pairs_any": 0, "pairs_both_waiting_at_their_place": 0, "examples": []}
+   {"seed": 6, "looks_with_a_pair": 0, "pairs_any": 0, "pairs_both_waiting_at_their_place": 0, "examples": []}

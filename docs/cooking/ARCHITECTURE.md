@@ -390,7 +390,10 @@
   （LV1 $152）、可以訓練。晚上順路來的「幫手」（`R.xqh`）不再出現（`xqHelperMode` 永遠 false），幫手專用的程式刪掉；`'xq'` 的特例
   改成一般清潔員（洗碗時間照等級、可以當第二位洗碗的人、統計算清潔員）。第一天第一桌吃完時那一幕改成「開店就在」的版本：
   「這桌我來。」「阿姨，今天就麻煩妳了。」「講這什麼話。妳一個人怎麼顧得完，收桌洗碗交給我。」。舊存檔讀進來時補上她，新聞說一次
-  「秀琴阿姨現在是店裡的正式清潔員」。其他清潔員照既有名額（JILL、廚房擴建）。
+  「秀琴阿姨現在是店裡的正式清潔員」。其他清潔員照既有名額（JILL、廚房擴建）。舊存檔只在 `xqCrewMig` 補她（`fillDefaults` 改用
+  `newState0()`，不再把她當預設值複製進來，日數、新聞才對）；她讓餐廳故事「小小的餐廳」的「第一位員工」成立，這一拍在補她的時候
+  靜默收進（`XQ_REST_BEAT`）——第 2 天的存檔原本一讀進來就跳「餐廳故事：第一位員工」（d12a638 完整回歸抓到的）。名單上她第一天寫
+  「開店第一天就在」（舊的「今天起正式上班」要等一個已經不存在的聘用紀錄）。
 - **第二天開放聘用**（§2）：員工分頁在第一個商店（第 1 天打烊後）就開，那時請的人第 2 天上班；第 1 級餐廳廚師 1、服務生 1
   （`CAP_LEVEL[0]`；第 2 級跟第 1 級一樣，所以擴建到 Bistro 不再多員工名額）。經濟（`docs/evidence/cooking_2026-10-10/economy/`）：
   照原本的數字（起始 $1,200、廚師簽約 $1,500、服務生 $1,200），第 1 天結束 3 個種子只有 1 個請得起廚師，請完剩 $15；改成起始
@@ -787,6 +790,69 @@ Release Gate 四-1／四-3：「不得出現無法透過合理操作、聘人或
       是走道（`git diff 8298e18 -- js/game.js`：只有走道這一處，加 18 行、刪 12 行）；走道版三個都失敗（爐台挪了、走路變短讓第一天的時間線和貓的亂數順序變了）。
       在走道版重錄，再拿四個小改動各跑一次（炒飯貴 $5、Jill 的頭髮顏色、晴天的權重、走道左邊寬 2 點），每一個都被抓到。
       證據：`docs/evidence/cooking_2026-10-09/walkway/golden_baselines.txt`。
+
+40. **2026-10-10（第二輪決策；d12a638 那一輪完整回歸）**：每一條「還抓得到」都是故意做壞的版本跑那個測試、失敗才算數，
+    全部的結果在 `docs/evidence/cooking_2026-10-10/test_proofs/mutants.txt`；原始失敗的訊息與重現在
+    `test_proofs/regression_d12a638_failures.txt`。沒有刪測試、沒有跳過、沒有為了通過換種子。
+    - **使用者改了規則（§2：秀琴阿姨第一天起是正式清潔員；第 2 天開放聘用）**，原本的測試照舊規則寫：
+      - `v24_xiuqin_is_there_from_day_one_and_is_not_free_labour`：原本——她是晚上順路來幫忙的人：第一桌吃完才從門口進來、不在員工名單、
+        沒有薪水；商店說「第一位清潔員就是秀琴阿姨」。不再成立——§2「她不是臨時來幫忙，也不是尚未聘用的角色」「出現在員工名單中」。
+        改成——新遊戲一開始她就在名單上（只有她一位、core、不占名額）；開店就在工作（收桌、拿回廚房、洗）；第一桌吃完那一幕說她是開店
+        第一天起的清潔員；照清潔員領日薪；第一個商店的員工分頁開著、寫她不占名額；第 2 天的新聞說可以請人了、清潔員是她；
+        `xqCrewMig` 跑幾次都只有她一位。還抓得到：她不工作（xq_not_working）、不付她薪水（xq_unpaid）都會失敗。
+      - `v24_xiuqin_goes_home_a_while_into_the_closing` → **`v24_xiuqin_stays_through_the_closing_like_the_staff`**：原本——幫手在打烊
+        二十秒左右回家。不再成立——§2「依照正式員工規則管理工作狀態」。改成——打烊時照員工一樣在店裡，不會變回幫手。還抓得到：打烊
+        一陣子就讓她回家的版本會失敗（xq_goes_home）。
+      - `v24_the_first_cleaner_hired_is_her_and_keeps_what_she_knows` → **`v24_xiuqin_is_never_hired_and_takes_no_place`**：原本——請第一位
+        清潔員就是請她（同一個人、記得的事帶過去）。不再成立——§2「不需要玩家另外聘用」「不得出現『必須先聘用第一位清潔員，秀琴阿姨
+        才正式加入』的矛盾條件」。改成——第 1 級沒有清潔員名額、她不占；有名額以後請到的是別人（小彤），她還是一位、記得的事還在、
+        不能被辭退。還抓得到：她占名額的版本會失敗（xq_takes_place）。
+      - `v24_yijun_comes_early_in_a_fresh_game_and_meets_her_mother_at_closing` → **`v24_yijun_comes_early_in_a_fresh_game_and_meets_her_mother`**：
+        原本——媽媽是晚上才來的幫手，怡君的來訪排在快打烊。不再成立——媽媽開店就在。改成——來訪照自己的時間、媽媽在員工名單上、
+        新聞只說一次「秀琴阿姨現在是店裡的正式清潔員」。還抓得到：來訪又被壓到打烊的版本會失敗（yj_held_late）。
+      - `v24_rc7_2_xiuqin_first_evening_holds_the_service`：第一句台詞換成新的「這桌我來。」（那一幕仍然停住營業）。還抓得到：那一幕
+        不停住營業的版本會失敗（xq_scene_not_held）。
+      - 名額：`v24_rc8_the_restaurants_three_lists_and_the_lounges_one`、`v24_restaurant_and_lounge_staff_are_two_pools_that_never_share_places`、
+        `v24_an_old_shared_cap_save_keeps_everyone_and_waits`：第 1 級從「廚師 1」變成「廚師 1、服務生 1」，她不算在清潔員名額裡；
+        數字照新規則改。還抓得到：第 1 級沒有服務生名額（cap_l1_old）、她占名額（xq_takes_place）都會失敗。
+      - 手冊與新聞：`v24_manual_tutorial_and_news_cover_the_new_content`、`followup_the_manual_describes_the_current_game`：新的必要字句
+        （員工分頁第一個商店就開、第 1 級廚師與服務生各一、秀琴阿姨不占名額）。還抓得到：第 2 天的新聞沒說可以請人（news_day2_old）。
+      - `cooking_the_first_three_days_teach_three_kinds_of_work`：起始 $1,200 → $2,000；她端的盤子是員工的（`R.cw.xq`），不是幫手的。
+        還抓得到：起始金額改回 $1,200 會失敗（start_1200）。
+      - `cooking_people_walk_round_the_counters`（`WALKS`）：出菜口兩段（`kitchenObs` 的 2、3），另外檢查走到每一個盤位、出菜口中間、
+        流理台走道的路都不穿過設備。
+    - **d12a638 完整回歸抓到的**（每一個都在原本的種子、存檔上重現過；細節 `regression_d12a638_failures.txt`）：
+      - `touch_controls`（種子 14）：測試先把桌子都弄髒等客人排隊，假設第 1 天沒人收；秀琴阿姨一下子就收好、前兩組坐下，沒有空桌可以點。
+        改成——這一段讓她暫時不接新工作，點完放開。還抓得到：點排隊的客人不帶位（tap_queue_no_seat）。
+      - `old_saves_load`、`album_store_and_viewer_v181`、`v24_saves_load_and_nothing_fires_on_load`：舊存檔讀進來員工名單多了她一位。
+        改成——原本的人都在（數目照舊）＋她剛好一位（原本就有她的存檔不變）。還抓得到：舊的 bartender/busser 轉換照跑
+        （legacy_crew_runs）、讀檔把原本的員工弄丟（crew_dropped）、重複補她（xq_dup）。
+      - `every_player_save_migrates_plays_a_day_and_keeps_its_story`：**遊戲的問題**，測試沒改。第 2 天的存檔補上她以後，「第一位員工」
+        這一拍變成完成、日期第 1 天，一開店就跳故事更新；改成補她時靜默收進。還抓得到：拿掉靜默收進（rest_beat_announced）。
+      - `v24_rc7_2_a_regulars_head_at_a_busy_table_and_the_log_closes`（種子 2229、Day 74）：點到熟客的頭＝點桌子（對的），Jill 被叫了；
+        同一格裡空著的服務生先動、接走了點餐（2026-10-09 第 6 題的規則），她就放掉。種子 2229–2238：main（第二輪之前）10 次 4 次 Jill 去、
+        第二輪 5 次——原本的種子在 main 上只是剛好（`regulars_head_sweep.txt`）。改成——點的那一格外場的人不接新工作，之後還原。
+        還抓得到：點到頭就跳卡片（reghead_card）。
+      - 廚房測試的 `_day()`（`cooking_jill_and_the_cooks_hand_work_on`、`cooking_a_cook_on_standby_rests_and_his_card_counts_his_dishes`、
+        `cooking_plating_happens_where_the_food_is`、`cooking_the_card_says_who_has_it_and_a_dish_can_be_taken_back`）：在第 1 天加廚師；新的
+        教學規則（§2「需要 Jill 親自操作的教學，仍由 Jill 完成」）讓廚師不接 Jill 還沒做過的炒飯。這些測試問的是交接，不是教學：
+        `_day()` 把三道教學菜記成做過。還抓得到：教學規則永遠不放手（teach_forever）。
+      - `cooking_one_jill_finishes_her_step_then_goes_and_nothing_of_hers_moves_on_while_she_is_away`（種子 7131）：派 Jill 去收髒桌，
+        空著的秀琴阿姨照第 6 題的規則接走，Jill 就不出廚房了。這個測試問的是 Jill 跨房間：那一晚讓秀琴阿姨先回家（`setCrewAway`）。
+        還抓得到：Jill 手上那一步沒做完就走（jill_leaves_midstep）。
+      - `workflow_waiters_keep_serving_and_one_at_most_washes`（「兩位服務生、沒有清潔員」，去洗的變成她）、`workflow_a_second_cleaner_washes_beside_the_first`
+        （兩位清潔員之外多了她，點車子時第二個位置被她站走，派不到 Jill）：現在每個遊戲都有她。工作流測試自己設定員工的兩個 helper
+        （`_floor_day`、`_dirty_day`；`_dirty_day` 原本就用 `__noXQH` 把當時的幫手關掉）讓她那晚休假，員工就是每個測試自己設的；
+        工作流的 15 項在新的 helper 上全部通過。還抓得到：服務生有客人的事也去洗（waiter_washes_with_guests）。
+      - `qa_waiting_staff_do_not_stand_on_one_spot`：1 對。那一刻是一位服務生在回自己位置的路上、兩件工作之間的短暫停頓，剛好停在另一位的
+        位置上——是經過，不是兩個人站在同一個點等。種子掃描：兩個版本都會偶爾看到經過的那一對，從來沒有兩個人站在同一個位置
+        （`waiting_staff.txt`）。改成——只算兩個人都站在自己要去的位置上。還抓得到：所有服務生的位置是同一點（one_wait_post，
+        當初 W3-05 的樣子）。
+      - `golden_frames`、`golden_scenario`、`cat_personality_fingerprint`：基準重錄（`golden_baselines.txt`）。
+    - **新增**：`cooking_the_pass_opens_in_the_middle_and_keeps_its_row`、`cooking_on_fire_is_earned_by_a_run_of_fast_tables`、
+      `jill_pats_a_cat_on_her_way_and_lets_go_for_work`（走回出菜口途中摸、有工作就放手、手上有盤子不停；後來加上「工作短暫空檔
+      走過去摸」：不瞬移、在貓旁邊摸、路上有工作就回去）、`dylan_reveal_says_it_beside_him`、`v24_round2_hiring_opens_after_day_one_and_pays`、
+      `v24_round2_xiuqin_once_in_every_save`。每一個都有故意做壞的版本證明（`mutants.txt`）。
 
 ## 使用者 iPhone 回報（2026-10-08 晚上到 10-09 凌晨）
 
