@@ -1226,6 +1226,56 @@ def cooking_on_fire_is_earned_by_a_run_of_fast_tables(b, port, target):
 
 
 @test
+def cooking_on_fire_can_come_on_the_first_day(b, port, target):
+    """The user, 2026-10-10 after v2.5 (docs/v24/post_v25_decisions_2026-10-10.txt §3): 「第 1 天起就允許 ON FIRE 觸發。保留既有表現導向
+    機制，不必提高前三天的料理品質，也不保證玩家一定觸發。前期發生機率可以自然低於成熟餐廳，但不可僅因遊戲天數不足就完全禁止。」 The run is
+    the same rule (cooking_on_fire_is_earned_by_a_run_of_fast_tables); what is fast is fast for the kitchen working tonight: with no cook
+    of the restaurant at work (fireCooks(): a cook with a place, in tonight) Jill cooks every dish, and her kitchen of one has the windows
+    FIRE_SOLO — longer than FIRE_FAST/FIRE_SLOW, which any evening with a cook keeps. Day 1 of a new game: three tables served a little
+    slower than 30 seconds, all Perfect, light it (her hand counts one and a half) — the mature windows would not count them; a table past
+    her slow window ends the run, so does a dish not Perfect. No day in the rule. A cook with a place makes it the mature windows; a cook on
+    standby or not in tonight does not; the user's Day 30 save has the mature windows. (How often, over many new games:
+    docs/evidence/cooking_2026-10-10/onfire_early/.)"""
+    g = Game(b, port, target, seed=7355, manual=True, viewport={'width': 390, 'height': 844})
+    g.click('[data-act=open]'); g.page.wait_for_timeout(80); start_day(g)
+    g.ev("""window.__F=function(spec){const ts=R.tables.filter(t=>!t.lounge);const keep=ts.map(t=>t.group);ts.forEach(t=>{t.group=t.group||{dummy:1}});
+      const out=[];try{for(const x of spec.tables){const g={seatAt:R.t-x[0],ticket:{items:[{q:x[1]||'P',byJill:x[2]==null?true:!!x[2]}]}};fireTable(g);out.push([x[0],R.frun,R.fire>0,R.fireCount])}}finally{ts.forEach((t,i)=>{t.group=keep[i]})}return out};
+      window.__reset=function(){R.frun=0;R.fireDone=0;R.fire=0;R.fireCount=0}""")
+    k = json.loads(g.ev("JSON.stringify({day:S.day,cooks:fireCooks(),win:fireWin(),fast:FIRE_FAST,slow:FIRE_SLOW,solo:FIRE_SOLO,crew:S.crew.map(m=>m.role)})"))
+    check(k['day'] == 1 and k['cooks'] == 0 and k['win'] == k['solo'], f'Day 1 of a new game: no cook, Jill\'s kitchen of one: {k}')
+    fast, slow = k['solo']
+    check(fast > k['fast'] and slow > k['slow'] and slow > fast, f'her windows are longer than the mature 30/36: {k["solo"]}')
+    F = fast - 2
+    check(F > k['fast'], f'the tables below are too slow for the mature windows: {F}')
+    g.ev("__reset()")
+    r = json.loads(g.ev(f"JSON.stringify(__F({{tables:[[{F}],[{F}]]}}))"))
+    check(not r[-1][2] and r[-1][1] == 3, f'two of her tables: a run of three, no fire yet: {r}')
+    r = json.loads(g.ev(f"JSON.stringify(__F({{tables:[[{F}]]}}))"))
+    check(r[-1][2] and r[-1][3] == 1, f'the third: ON FIRE on Day 1: {r}')
+    g.ev("__reset()")
+    r = json.loads(g.ev(f"JSON.stringify(__F({{tables:[[{F}],[{F}],[{slow + 3}],[{F}],[{F}]]}}))"))
+    check(not r[-1][2] and r[2][1] == 0, f'a table past her slow window ends the run: {r}')
+    g.ev("__reset()")
+    r = json.loads(g.ev(f"JSON.stringify(__F({{tables:[[{F}],[{F},'G'],[{F}],[{F}]]}}))"))
+    check(not r[-1][2] and r[1][1] == 0, f'a dish not Perfect ends the run: {r}')
+    src = g.ev("String(fireTable)+String(fireWin)+String(fireCooks)")
+    check('S.day' not in src and 'shopDay' not in src, 'no day in the rule')
+    # who makes it a kitchen with a cook: a cook with a place, in tonight — not a waiter, not a cook on standby, not one off tonight
+    h = json.loads(g.ev("""JSON.stringify((()=>{const out=[];const w={id:'tw1',role:'waiter',name:'測試服務生',lv:1,duty:'both',pool:'restaurant'};S.crew.push(w);out.push([fireCooks(),fireWin()]);
+      const c={id:'tc1',role:'chef',name:'測試廚師',lv:1,duty:'stove',pool:'restaurant'};S.crew.push(c);out.push([fireCooks(),fireWin()]);
+      c.duty=null;out.push([fireCooks(),fireWin()]);c.duty='stove';setCrewAway(c,'off');out.push([fireCooks(),fireWin()]);
+      S.crew=S.crew.filter(m=>m!==c&&m!==w);return out})())"""))
+    M, SO = [k['fast'], k['slow']], k['solo']
+    check(h == [[0, SO], [1, M], [0, SO], [0, SO]], f'a waiter: still her kitchen of one; a cook with a place: the mature windows; on standby or off tonight: hers again: {h}')
+    check(not g.errors, g.errors[:3]); g.close()
+    import v24_tests as v
+    g = Game(b, port, target, seed=7354, manual=True, viewport={'width': 390, 'height': 844})
+    v.load_save(g, 'player_day30.json'); g.ev("for(let i=0;i<30;i++){if(typeof DLG!=='undefined'&&DLG)dlgNext()}"); v.to_service(g, lazy=True)
+    m = json.loads(g.ev("JSON.stringify({cooks:fireCooks(),win:fireWin()})"))
+    check(m['cooks'] >= 1 and m['win'] == M, f'the user\'s Day 30 save: the mature windows, as calibrated: {m}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+@test
 def cooking_the_pass_opens_in_the_middle_and_keeps_its_row(b, port, target):
     """The user, 2026-10-10 (docs/v24/cooking_round2_decisions_2026-10-10.txt §1): 「出菜口也開設中央通道，讓 Jill 與廚師能以合理路徑
     移動」「不得穿越實體設備」「保留原本有效出菜容量」「熱燈、盤位與出菜檯必須合理配置」. The pass is two counters with an opening

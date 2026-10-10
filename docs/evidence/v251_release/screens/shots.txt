@@ -1,0 +1,4 @@
+01 prep: stations tonight and their cooks [["stove",1],["bar",0],["prep",0]]; '目前無人' in the text False, '安排員工' False, a .stwarn False
+02 board: header '工作分配\n誰在哪裡上班。廚師有空就接廚房任何一步；點 × 移出（待命），點 ＋ 加人。'; rows marked none 0
+03 the Bistro card: "擴建：Jill's Bistro\n桌位上限 6 張、菜單上限 7 道、門口最多等候 4 組、廚師 +1、服務生 +1。牆面、地板與招牌全部換新，也會吸引更講究的客人。\n擴建 $5,000"
+04 Bistro staff: 廚師 1/2、服務生 1/2、清潔員 0/0; hire buttons ["chef:聘請 $1,500","waiter:聘請 $1,200"]; wages a day $863; hire fees chef $1,500 waiter $1,200
