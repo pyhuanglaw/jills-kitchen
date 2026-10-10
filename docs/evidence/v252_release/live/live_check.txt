@@ -1,0 +1,18 @@
+v2.5.2: the page built from the tag (7285997 bytes, sha256 5083374fe4cd) is inside the live HTML (7286543 bytes) byte for byte, js/game.js once; the host adds 546 bytes (its document skeleton)
+01_title.png: the title with the save: DAY 6, 繼續營業 · 20:40 (the save was made during the evening) | {"phase":"title","day":6,"t":null,"room":"main"}
+02_resumed.png: 繼續營業: the evening resumed where the save stopped (20:40) | {"phase":"service","day":6,"t":"82%","room":"main"}
+03_main.png: the dining room | {"phase":"service","day":6,"t":"82%","room":"main"}
+04_side.png: the side room (the stair door at the near edge) | {"phase":"service","day":6,"t":"82%","room":"main"}
+05_front.png: the street | {"phase":"service","day":6,"t":"82%","room":"front"}
+06_lounge.png: the Lounge | {"phase":"service","day":6,"t":"82%","room":"front"}
+07_kitchen.png: the kitchen | {"phase":"service","day":6,"t":"83%","room":"kitchen"}
+07b_home.png: Jill's room (rc7.3) | {"phase":"service","day":6,"t":"84%","room":"home"}
+08_summary.png: the day's summary | {"phase":"summary","day":6,"t":null,"room":"home"}
+the summary's 今天的故事: (none today)
+the staff page: 餐廳員工：廚師 1/1・服務生 1/1・清潔員 0/0・另有清潔員秀琴阿姨（開店就在，不占名額）・每日薪資 $863。廚師、服務生、清潔員各有自己的名額，不能互相借；擴建和工程都寫著多哪一種。
+09_staff.png: the shop, the staff page (no Lounge yet: the restaurant's list only) | {"phase":"shop","day":6,"t":null,"room":"home"}
+10_prep_next_day.png: the next day's prep (Day 7) | {"phase":"prep","day":7,"t":null,"room":"main"}
+restock on Day 7: $1,714 → $1,295
+after the reload the money is still $1,295: the restock was saved
+11_after_reload.png: the page reloaded: the title keeps DAY 7 | {"phase":"title","day":7,"t":null,"room":"main"}
+page errors: none (0)
