@@ -1,0 +1,23 @@
+Day 6: 38 popups — toast 25, face 8, banner 5 | system 17, a guest's line 12, named guest 4, face (Jill / Dylan / a regular) 4, other toast 1
+Day 7: 40 popups — toast 28, banner 7, face 4, panel 1 | system 17, other toast 11, a guest's line 7, named guest 3, story panel 1, staff 1
+Day 8: 31 popups — toast 24, face 4, banner 2, panel 1 | other toast 12, system 7, a guest's line 7, face (Jill / Dylan / a regular) 3, story panel 1, staff 1
+Day 9: 33 popups — toast 19, face 7, panel:held 4, banner 2, panel 1 | system 9, a guest's line 9, face (Jill / Dylan / a regular) 7, story panel 5, other toast 3
+page errors: []
+
+the most repeated (numbers as #):
+  ×4  OPEN FOR DINNER Jill's Little Kitchen 開始營業
+  ×4  番茄義大利麵 賣完了，客人點不到了（冰箱可以臨時叫貨）
+  ×4  RUSH HOUR 晚餐尖峰時段開始！
+  ×4  #:# 打烊，不再接新客人
+  ×3  番茄義大利麵 只剩 # 份
+  ×3  Jill：「味道還好嗎？」
+  ×3  田園沙拉 只剩 # 份
+  ×3  COMBO 中斷
+  ×3  Eric 等太久，離開了
+  ×2  熟練度提升：南瓜濃湯 LV#
+  ×2  拿鐵咖啡 只剩 # 份
+  ×2  黃金蛋炒飯 只剩 # 份
+  ×2  Jill：「還可以嗎？」
+  ×2  黃金蛋炒飯 賣完了，客人點不到了（冰箱可以臨時叫貨）
+  ×2  Jill：「還合口味嗎？」
+exit=0

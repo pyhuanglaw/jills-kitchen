@@ -1,0 +1,142 @@
+D6 17:00  banner                 OPEN FOR DINNER Jill's Little Kitchen 開始營業
+D6 17:05  toast:q                小周與阿晴：「等雨小一點再走。」
+D6 17:36  face:named:戴帽子的客人      先點這些，不夠再加。
+D6 17:52  toast:q                Ryan 與 Ivy：「剛剛是 Jill 自己端過來的。」
+D6 17:59  toast                  熟練度提升：南瓜濃湯 LV2
+D6 18:21  toast:q                阿彥：「這盤擺得也太好看。」
+D6 18:23  toast                  門口有人在唱歌，等位的客人不那麼急了
+D6 18:35  toast                  其實剛才那位，是神秘美食評論家！
+D6 18:35  face:named:戴帽子的客人      會寫進專欄。下次再來。
+D6 18:36  toast                  番茄義大利麵 只剩 2 份
+D6 18:36  face:leo               番茄義大利麵！就這個。
+D6 18:36  banner                 Critic's Choice 成就解鎖
+D6 18:59  toast:warn             番茄義大利麵 賣完了，客人點不到了（冰箱可以臨時叫貨）
+D6 19:00  banner                 RUSH HOUR 晚餐尖峰時段開始！
+D6 19:20  toast:q                Tina：「先拍照，等我一下！」
+D6 19:25  face:leo               會再來。
+D6 19:27  toast                  美食部落客走進來了，手機已經拿出來了。
+D6 19:29  face:named:吃貨小琪        燈光不錯，照片會好看。
+D6 19:30  face:mia               拿鐵咖啡，一杯。
+D6 19:31  banner                 衛生檢查員突襲！ 他看 22 秒：髒桌子越少、越快有人收越好
+D6 19:31  face:named:衛生檢查員       衛生局，例行檢查。
+D6 19:48  toast:q                Jill：「味道還好嗎？」
+D6 19:51  face:mia               太好吃了。
+D6 19:54  toast                  拿鐵咖啡 只剩 2 份
+D6 20:00  banner                 檢查沒過… 罰款 -$300
+D6 20:04  toast:q                Emma：「上次路過就想進來了。」
+D6 20:33  toast                  黃金蛋炒飯 只剩 2 份
+D6 20:33  toast:warn             拿鐵咖啡 賣完了，客人點不到了（冰箱可以臨時叫貨）
+D6 20:50  toast:q                Jill：「還可以嗎？」
+D6 20:54  toast:q                Emma：「這個我喜歡。」
+D6 21:18  toast:warn             黃金蛋炒飯 賣完了，客人點不到了（冰箱可以臨時叫貨）
+D6 21:18  toast                  田園沙拉 只剩 2 份
+D6 21:18  toast:q                Chloe：「田園沙拉，網路上那個？」
+D6 21:30  toast                  21:30 打烊，不再接新客人
+D6 21:33  toast:q                Chloe：「我的黃金蛋炒飯！」
+D6 21:45  toast                  熟練度提升：南瓜濃湯 LV3
+D6 21:56  toast:q                Jill：「還合口味嗎？」
+D6 21:59  toast:q                張經理：「這個我喜歡。」
+D7 prep  panel                  jill：今天熱到不想開爐。但還是要開。今天 VIP 預約。
+D7 prep  banner                 One Week 成就解鎖
+D7 prep  banner                 Come Rain Or Shine 成就解鎖
+D7 prep  banner                 No One Waits 成就解鎖
+D7 17:00  banner                 OPEN FOR DINNER Jill's Little Kitchen 開始營業
+D7 17:14  toast:q                Ryan 與 Ivy：「南瓜濃湯是新的？」
+D7 17:41  toast                  田園沙拉 只剩 2 份
+D7 17:41  face:named:Monsieur 杜  聽說田園沙拉很好吃。
+D7 17:41  face:named:Monsieur 杜  這裡會不會有香草烤雞？
+D7 17:54  toast                  熟練度提升：番茄義大利麵 LV4
+D7 18:21  banner                 A Moment 成就解鎖
+D7 18:25  toast                  店裡突然安靜下來了
+D7 18:44  toast:q                Jill：「味道還好嗎？」
+D7 18:47  face:named:Monsieur 杜  下次還要點這個。
+D7 18:51  toast                  有人在門口看了一下，走進來了。
+D7 18:59  toast:q                阿傑與小雯：「隔壁桌那個是什麼？」
+D7 19:00  banner                 RUSH HOUR 晚餐尖峰時段開始！
+D7 19:14  toast:warn             田園沙拉 賣完了，客人點不到了（冰箱可以臨時叫貨）
+D7 19:35  toast                  熟練度提升：田園沙拉 LV4
+D7 19:41  toast                  周董 與朋友 看到客滿，失望地走了…
+D7 19:45  toast:q                Jill：「今天等有點久，這杯算我的。」
+D7 19:45  toast                  COMBO 中斷
+D7 19:45  toast                  Jason 生氣地離開了…
+D7 19:47  banner                 On The House 成就解鎖
+D7 19:52  toast                  跳電了一下
+D7 19:56  toast                  黃金蛋炒飯 只剩 2 份
+D7 19:59  toast                  陳先生 等太久，離開了
+D7 20:15  toast                  Leo 等太久，離開了
+D7 20:20  face:staff:小茉          久等了。
+D7 20:21  toast                  Mia 等太久，離開了
+D7 20:41  toast:q                Chloe：「來了來了。」
+D7 21:00  toast                  阿凱 等太久，離開了
+D7 21:11  toast                  拿鐵咖啡 只剩 2 份
+D7 21:15  toast:warn             黃金蛋炒飯 賣完了，客人點不到了（冰箱可以臨時叫貨）
+D7 21:15  toast:warn             番茄義大利麵 賣完了，客人點不到了（冰箱可以臨時叫貨）
+D7 21:30  toast                  21:30 打烊，不再接新客人
+D7 21:42  toast                  COMBO 中斷
+D7 21:42  toast                  Chloe 生氣地離開了…
+D7 21:54  toast:q                Jill：「還可以嗎？」
+D7 21:58  toast:q                Ruby：「好吃，真的。」
+D8 prep  panel                  jill：涼涼的，適合走路過來吃飯的天氣。今天附近公司聚餐。
+D8 prep  face:staff:小茉          你今天是不是把我的甜點吃掉了？
+D8 17:00  banner                 OPEN FOR DINNER Jill's Little Kitchen 開始營業
+D8 17:05  toast:q                林小姐：「這裡的貓是不是很有名？」
+D8 17:20  toast                  南瓜濃湯 只剩 2 份
+D8 18:32  toast:q                張經理：「有推薦的嗎？算了，都點吧。」
+D8 18:44  toast                  外面一下子來了一群人
+D8 18:48  toast:q                阿凱：「今天天氣真舒服。」
+D8 19:00  banner                 RUSH HOUR 晚餐尖峰時段開始！
+D8 19:12  toast                  Grace 看到客滿，失望地走了…
+D8 19:19  toast                  陳先生 等太久，離開了
+D8 19:20  toast                  Eric 等太久，離開了
+D8 19:24  toast:q                Jill：「還合口味嗎？」
+D8 19:27  toast:q                阿凱：「太好吃了。」
+D8 19:38  toast                  番茄義大利麵 只剩 2 份
+D8 19:47  toast                  Eric 等太久，離開了
+D8 20:12  toast:warn             田園沙拉 賣完了，客人點不到了（冰箱可以臨時叫貨）
+D8 20:12  face:sophie            讓我看看這家店有什麼本事。
+D8 20:14  toast                  吳小姐 等太久，離開了
+D8 20:18  toast                  品酒師 Ken 等太久，離開了
+D8 20:37  toast                  林小姐 和另外 4 組看到客滿，失望地走了…
+D8 20:38  toast:q                Sam 與 Lena：「下次帶朋友來。」
+D8 20:57  toast                  Eric 等太久，離開了
+D8 21:00  toast                  COMBO 中斷
+D8 21:00  toast                  怡君 生氣地離開了…
+D8 21:02  face:leo               月底了。
+D8 21:11  toast:q                吳小姐：「終於涼了。」
+D8 21:21  toast:warn             番茄義大利麵 賣完了，客人點不到了（冰箱可以臨時叫貨）
+D8 21:21  face:leo               請問學生有優惠嗎？沒有也沒關係。
+D8 21:23  toast                  吳小姐 生氣地離開了…
+D8 21:30  toast                  21:30 打烊，不再接新客人
+D9 prep  panel                  jill：天氣好。今天會忙一點，先把料備夠。今天附近公司聚餐。
+D9 17:00  banner                 OPEN FOR DINNER Jill's Little Kitchen 開始營業
+D9 17:09  face:leo               上次來要等，今天剛好有位。
+D9 17:17  face:leo               我就是來吃番茄義大利麵的。
+D9 17:20  face:chen              今天也來啦。
+D9 17:33  toast:q                黃先生：「那隻貓好可愛。」
+D9 17:42  toast                  熟練度提升：番茄義大利麵 LV5
+D9 18:01  toast                  有人在門口看了一下，走進來了。
+D9 18:15  toast:q                Eric：「他們那桌吃的看起來不錯。」
+D9 18:22  toast:q                Jill：「好啊。」
+D9 18:35  toast                  南瓜濃湯 只剩 2 份
+D9 19:00  banner                 RUSH HOUR 晚餐尖峰時段開始！
+D9 19:07  toast:q                Jason：「牠都不怕人耶。」
+D9 19:29  toast:q                張經理：「這個給你們，辛苦了。」
+D9 19:33  toast                  陳先生 看到客滿，失望地走了…
+D9 19:59  toast                  番茄義大利麵 只剩 2 份
+D9 20:15  toast                  Jason 等太久，離開了
+D9 20:21  toast:q                Ben 與 Lily：「聽說田園沙拉很好吃。」
+D9 20:34  toast                  阿凱 等太久，離開了
+D9 21:05  toast                  田園沙拉 只剩 2 份
+D9 21:09  toast:q                Jill：「味道還好嗎？」
+D9 21:10  toast:warn             番茄義大利麵 賣完了，客人點不到了（冰箱可以臨時叫貨）
+D9 21:12  toast:q                Ben 與 Lily：「比想像中還好吃。」
+D9 21:23  panel:held             staff:秀琴阿姨：妳怎麼來了？
+D9 21:23  panel:held             named:怡君：吃飯啊。
+D9 21:23  panel:held             staff:秀琴阿姨：附近那麼多間。
+D9 21:23  panel:held             named:怡君：不能吃妳工作的喔？
+D9 21:30  toast                  21:30 打烊，不再接新客人
+D9 21:38  face:dylan             老闆娘，打烊後要去哪？
+D9 21:41  face:jill              回家。
+D9 21:45  face:dylan             一個人？
+D9 21:49  face:jill              跟貓。
+D9 21:50  toast:q                Jill：「這個請你，等久了。」
