@@ -1,0 +1,11 @@
+=== the game as it is, re-recorded golden
+PASS  golden_scenario  (3.1s)
+=== without decision 三 (names as v2.5.3)
+FAIL  golden_scenario  (3.2s)
+      day 1 differs from golden baseline: {"reviewHash": ["130bc32f", "cd3bab33"]}
+=== v2.5.3 (tag)
+FAIL  golden_scenario  (3.3s)
+      day 1 differs from golden baseline: {"reviewHash": ["130bc32f", "cd3bab33"]}
+=== this version with every dish's cost +$1 (a change the golden must see)
+FAIL  golden_scenario  (3.0s)
+      day 1 differs from golden baseline: {"money": [2440, 2425], "summary": [{"rev": 1080, "cost": 525, "tips": 82, "bonus": 255, "wages": 152, "net": 440, "guests": 9, "lost": 1, "perfect": 9, "plated": 9, "avg": 75, "top": "friedrice", "stars": 3.5}, {"rev": 1080, "cost": 540, "tips": 82, "bonus": 255, "wages": 152, "net": 425, "guests": 9, "lost": 1, "perfect": 9, "plated": 9, "avg": 75, "top"

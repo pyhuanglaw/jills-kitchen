@@ -1,0 +1,330 @@
+[
+ {
+  "day": 1,
+  "money": 2440,
+  "lifetime": 1162,
+  "level": 1,
+  "stats": {
+   "guests": 9,
+   "perfect": 9,
+   "days": 1,
+   "walkins": 1,
+   "families": 0
+  },
+  "xp": {
+   "friedrice": 18
+  },
+  "stock": {
+   "friedrice": 6
+  },
+  "reviews": 3,
+  "reviewHash": "cd3bab33",
+  "regulars": {},
+  "summary": {
+   "rev": 1080,
+   "cost": 525,
+   "tips": 82,
+   "bonus": 255,
+   "wages": 152,
+   "net": 440,
+   "guests": 9,
+   "lost": 1,
+   "perfect": 9,
+   "plated": 9,
+   "avg": 75,
+   "top": "friedrice",
+   "stars": 3.5
+  },
+  "cats": [
+   [
+    "tora",
+    "home",
+    "loaf",
+    72,
+    525,
+    -1,
+    true
+   ],
+   [
+    "ban",
+    "side",
+    "sit",
+    222,
+    529,
+    -1,
+    false
+   ],
+   [
+    "snow",
+    "sleep",
+    "curl",
+    63,
+    425,
+    2,
+    false
+   ],
+   [
+    "mikan",
+    "rest",
+    "sit",
+    131,
+    492,
+    -1,
+    false
+   ],
+   [
+    "mei",
+    "rest",
+    "groom",
+    190,
+    -49,
+    13,
+    false
+   ]
+  ],
+  "catHash": "a239dca4",
+  "mem": [],
+  "weights": "1969:6c5c7dc1",
+  "dylan": {
+   "stage": 0,
+   "stay": 0,
+   "reveal": 0,
+   "last": 0,
+   "clues": {}
+  },
+  "life": {
+   "sofa": 0,
+   "tv": 0
+  }
+ },
+ {
+  "day": 2,
+  "money": 2847,
+  "lifetime": 2866,
+  "level": 1,
+  "stats": {
+   "guests": 17,
+   "perfect": 23,
+   "days": 2,
+   "walkins": 1,
+   "families": 0
+  },
+  "xp": {
+   "friedrice": 34,
+   "coffee": 12
+  },
+  "stock": {
+   "friedrice": 9,
+   "coffee": 4
+  },
+  "reviews": 7,
+  "reviewHash": "5e80ec8f",
+  "regulars": {},
+  "summary": {
+   "rev": 1500,
+   "cost": 565,
+   "tips": 204,
+   "bonus": 220,
+   "wages": 152,
+   "net": 907,
+   "guests": 8,
+   "lost": 5,
+   "perfect": 14,
+   "plated": 14,
+   "avg": 79,
+   "top": "friedrice",
+   "stars": 4
+  },
+  "cats": [
+   [
+    "tora",
+    "home",
+    "loaf",
+    72,
+    525,
+    -1,
+    true
+   ],
+   [
+    "ban",
+    "hide",
+    "stretch",
+    318,
+    126,
+    -1,
+    true
+   ],
+   [
+    "snow",
+    "sleep",
+    "loaf",
+    63,
+    425,
+    2,
+    false
+   ],
+   [
+    "mikan",
+    "home",
+    "sit",
+    72,
+    525,
+    -1,
+    true
+   ],
+   [
+    "mei",
+    "walk",
+    "sit",
+    245,
+    513,
+    -1,
+    false
+   ]
+  ],
+  "catHash": "61d98d96",
+  "mem": [
+   "first:1::811c9dc5"
+  ],
+  "weights": "4266:e7fa0e51",
+  "dylan": {
+   "stage": 0,
+   "stay": 0,
+   "reveal": 0,
+   "last": 0,
+   "clues": {}
+  },
+  "life": {
+   "sofa": 0,
+   "tv": 0
+  }
+ },
+ {
+  "day": 3,
+  "money": 4076,
+  "lifetime": 4277,
+  "level": 1,
+  "stats": {
+   "guests": 26,
+   "perfect": 35,
+   "days": 3,
+   "walkins": 2,
+   "families": 0
+  },
+  "xp": {
+   "friedrice": 50,
+   "coffee": 20,
+   "salad": 0
+  },
+  "stock": {
+   "friedrice": 1,
+   "coffee": 0
+  },
+  "reviews": 10,
+  "reviewHash": "7f6ece3b",
+  "regulars": {
+   "mia": 1,
+   "dylan": 1
+  },
+  "summary": {
+   "rev": 1200,
+   "cost": 0,
+   "tips": 211,
+   "bonus": 270,
+   "wages": 152,
+   "net": 1229,
+   "guests": 9,
+   "lost": 6,
+   "perfect": 12,
+   "plated": 12,
+   "avg": 88,
+   "top": "friedrice",
+   "stars": 4.5
+  },
+  "cats": [
+   [
+    "tora",
+    "home",
+    "curl",
+    72,
+    525,
+    -1,
+    true
+   ],
+   [
+    "ban",
+    "side",
+    "loaf",
+    178,
+    529,
+    -1,
+    false
+   ],
+   [
+    "snow",
+    "sleep",
+    "belly",
+    63,
+    425,
+    2,
+    false
+   ],
+   [
+    "mikan",
+    "sleep",
+    "curl",
+    101,
+    516,
+    -1,
+    false
+   ],
+   [
+    "mei",
+    "rest",
+    "sit",
+    153,
+    160,
+    -1,
+    false
+   ]
+  ],
+  "catHash": "bbcc1ce9",
+  "mem": [
+   "first:1::811c9dc5"
+  ],
+  "weights": "6743:bb51ddbf",
+  "dylan": {
+   "stage": 0,
+   "stay": 0,
+   "reveal": 0,
+   "last": 3,
+   "clues": {
+    "look": 1,
+    "pet": 1,
+    "tidy": 1
+   },
+   "trace": [
+    {
+     "d": 3,
+     "p": 60,
+     "s": 1,
+     "t": 88,
+     "c": 1,
+     "at": 88,
+     "back": 0,
+     "r": "main",
+     "q": 1
+    }
+   ],
+   "first": 3,
+   "orders": {
+    "friedrice": 1
+   },
+   "seen": {}
+  },
+  "life": {
+   "sofa": 0,
+   "tv": 0
+  }
+ }
+]

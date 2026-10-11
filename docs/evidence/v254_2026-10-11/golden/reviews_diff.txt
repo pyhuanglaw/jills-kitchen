@@ -1,0 +1,11 @@
+keys ['cat', 'critic', 'day', 'name', 's', 'tags', 'topics', 'txt', 'w']
+day 1 reviews 3 3
+   {"name": ["黃先生", "Grace"]}
+   {"name": ["小安", "小宇"]}
+   {"name": ["Grace", "林小姐"]}
+  everything but the name the same: True
+day 2 reviews 4 4
+   {"name": ["阿傑與小雯", "Sam 與 Lena"]}
+  everything but the name the same: True
+day 3 reviews 3 3
+  everything but the name the same: True

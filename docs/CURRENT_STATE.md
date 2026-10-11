@@ -132,6 +132,18 @@
   一、「一鍵補到建議量」先退掉不在菜單上的庫存（照當初的進貨價），再補；二、故事安排來的那一次不會等到生氣離開；三、同一晚一般客人
   不重名。程式和測試寫好了（d7a9c64、2c3414c、9849217；故意做壞的版本 `docs/evidence/v254_2026-10-11/`），接著是正常玩家模擬、
   完整回歸、合併 `main`、發布。
+  - **2026-10-11 使用量到上限，中途停下（接手從這裡開始）**。已完成：三項的程式、測試（每項都有故意做壞的版本證明抓得到）、
+    手冊「開店前 › 備料」與稽核戳記 v2.5.4、PROJECT_MEMORY §2／§11、ARCHITECTURE 第 45 條、金樣本重錄（只有評論名字變，證據
+    `docs/evidence/v254_2026-10-11/golden/`）；模擬工具會記每天的提示和客人名字（`tools/qa/sim_player.py`），新增「每天換兩道菜」的
+    模擬玩家（`--policy churn`）和 `tools/qa/scan_timeline_json.py`。
+  - 停下時跑到一半、**還沒有結果的**：例行 QA（`--qa`，停下前通過的都是 PASS）、補貨相關的舊測試（`golden_frames`、
+    `a1_failed_restock_changes_nothing_and_the_suggestion_holds_still` 還沒跑到）。
+  - **接下來照順序**：(1) `python3 tests/run_tests.py --qa`，加上 `-k golden_frames,a1_failed_restock` ；(2) 正常玩家模擬（全新 30 天
+    `--seed 303`、Day 61 存檔 10 天、Day 92 存檔 12 天、Day 92 `--policy churn` 10 天、Day 6 存檔 14 天，都加 `--json`，再用
+    `scan_timeline_json.py` 看：冰箱滿了是不是還天天跳、故事那一幕的人有沒有離開、同一晚有沒有重名）；(3) 原始失敗案例重跑：
+    `python3 tools/qa/evening_census.py player_day6_1254.json 3 OUT --seed 1`，對照 `docs/evidence/overnight_2026-10-10/census_day6/transcript.txt`
+    第 8 天（原本「Eric 等太久」三次、21:00「怡君 生氣地離開了…」）；(4) 完整回歸（乾淨 worktree、分三份）；(5) 手機尺寸截圖；
+    (6) 照 `docs/RELEASE_CHECKLIST.md` 合併 `main`、發布 v2.5.4、線上檢查、`docs/V254_REPORT.md`；(7) 使用者交代的第五點自主排查。
 
 - **料理流程 prototype**（branch `proto/cooking-flow`，`prototype/cooking/`）：獨立試玩頁，不是遊戲本體。使用者 2026-10-07：不合併、
   不發布、現在不要再做；之後重新開始時，以正式遊戲原本的廚房畫面為底，不重新設計美術。私人連結 https://claude.ai/artifact/EBzi6qETraguAApvettBFe 。
