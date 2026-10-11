@@ -204,6 +204,19 @@ const NAMES={
  critic:['戴帽子的客人'],
  blogger:['吃貨小琪','美食部落客 Momo'],
 };
+/* v2.5.4 (decision 三, the user 2026-10-11: 「同一營業夜晚內，普通客人盡量不重名」): the pools above are short (5–10 of a kind)
+   and a busy evening drew the same one again — 「Eric 等太久，離開了」 three times on one evening (the overnight QA, Day 8 of
+   the user's Day 6 save): three tables of office workers the player could only take for one man. A guest with no name of
+   their own (not a regular, not a named person, not anyone a story or a booking named) whose name tonight has already
+   used gets one it has not: the rest of the kind's pool first, then these — names only, nobody with a story, none the
+   game uses for anyone else — and when even these are gone, 「另一位」 the name drawn (freshName). */
+const NAMES_MORE={
+ office:['許小姐','鄭先生','謝經理','郭小姐','洪先生','曾小姐','邱先生','廖小姐','賴先生','徐小姐','葉先生','蘇小姐','莊先生','呂小姐','江先生','何小姐','羅先生','Kevin','Vivian','Daniel','Joyce','Peter','Cindy','Tony','Wendy'],
+ student:['小柏','阿翔','小涵','阿誠','Sandy','小芸','阿豪','Joy','小真','阿樂','Kelly','小恩'],
+ gourmet:['Olivia','Henry','Claire','Vincent','Jasmine','Albert','Irene','Louis'],
+ couple:['阿翰與小慧','Max 與 Zoe','阿志與佩佩','Tom 與 Jenny','阿宏與小如','Chris 與 Nora','Eason 與 Kiki','阿文與小敏'],
+ family:['黃家','吳家四口','劉家','楊家三口','許媽媽一家','鄭家','謝家三口','郭家','蔡家','何家四口'],
+};
 const REGS=[
  {id:'chen',n:'陳伯伯',day:2,type:'regular',size:1,fav:['friedrice','risotto'],looks:[{skin:'#EDC19C',hair:'#C9C3BA',hs:5,top:'#8A847C',pat:'knit',neck:'crew',outer:{k:'blazer',col:'#6B4E36'},brow:'thick',pants:'#5A5048'}],
   l:['一份炒飯，謝謝。','Jill，今天還是老樣子。'],cb:[{k:'fourTables',t:'我記得你這裡剛開幕的時候只有四張桌子。',once:1,need:()=>S.level>=2}],who:'住在附近的退休老師，每天散步都會經過。'},
@@ -1795,8 +1808,22 @@ function requeue(){for(const g of queued()){if(g.state==='arrive'&&!g.landed)con
    the 「店裡突然安靜下來了」 moment pushed the next half-minute's walk-ins back without reordering, and a held visit behind them
    (a tasting's guests, 予安's trial, a chef's night) waited for them; Dylan's later try went in unsorted too. */
 function schedTailSort(from){if(!R)return;const tail=R.sched.splice(from==null?R.si:from);tail.sort((a,b)=>a.t-b.t);for(const o of tail)R.sched.push(o)}   /* from: R.si+1 inside spawn() (the entry at R.si is the one being spawned) */
+/* the evening's names (decision 三): every name tonight has used — walked in, turned away at the door, booked for tonight
+   (a tasting's, a chef's night's guests are named when they book) — is kept in R.nmUsed, saved with the evening
+   (CP_KEYS). The draw is the same draw as before (the day's random stream untouched); a name already used is replaced by
+   one not used yet, picked by a hash of the day and the group — never a loop of draws */
+function nmUsed(){if(!R.nmUsed)R.nmUsed=[...new Set(R.sched.filter(o=>o.name).map(o=>o.name).concat(R.groups.map(g=>g.name)).filter(Boolean))];return R.nmUsed}
+function freshName(nm,type){const U=nmUsed();if(!U.includes(nm))return nm;
+ const own=(NAMES[type]||[]).filter(n=>!NAMED[n]),adult=!['student','couple','family'].includes(type);
+ const pre=type==='couple'?'另一對':type==='family'?'另一組':'另一位',sp=n=>pre+(/^[A-Za-z]/.test(n)?' ':'')+n;
+ /* the kind's own names, its extra ones; one grown-up's name is as good as another's (the gourmet's own are two, the
+    VIPs' all people's), so a grown-up then takes an office worker's or a gourmet's not used yet; then 「另一位」 the name
+    drawn, 「另一位」 another of the kind's; past all that the name drawn, as it was */
+ const chain=[own,NAMES_MORE[type]||[]];if(adult)chain.push(NAMES.office.concat(NAMES.gourmet).filter(n=>!NAMED[n]),NAMES_MORE.office.concat(NAMES_MORE.gourmet));
+ chain.push([sp(nm)],own.map(sp));
+ const h=hash('nm|'+S.day+'|'+R.gid);for(const L of chain){const f=L.filter(n=>!U.includes(n));if(f.length)return f[h%f.length]}return nm}
 function spawn(o){if(R.closed)return;if(o.pdWalk&&(!pdBuilt()||pdHeld()||pdOccupied()||(R.tables.find(t=>t.pdr)||{}).dirty))return;   /* v2.4 rc6: a party looks in only when the room is free */const reg=o.reg?REG_BY[o.reg]:null;const size=Math.min(o.size,maxSeats(R.tables));if(o.looks&&o.looks.length>size)o.looks=o.looks.slice(0,size);
- let nm0=o.name||(reg?reg.n:pick(NAMES[o.type]||NAMES.office));if(!o.reg&&NAMED[nm0]&&!o.kenHost&&!o.pianist&&(R.groups.some(q=>(q.named||q.name)===nm0&&!q.gone)||((story().named[nm0]||{}).seen===S.day&&!o.tries&&!o.tasting)||(!o.name&&R.sched.slice(R.si+1).some(q=>q.name===nm0)))){/* one person, one visit a day; a pool pick yields to the same person's planned evening */let alt=(NAMES[o.type]||NAMES.office).filter(n=>!NAMED[n]);if(!alt.length)alt=NAMES.gourmet.concat(NAMES.office).filter(n=>!NAMED[n]);/* every VIP name is a person: another VIP tonight is someone else */if(alt.length)nm0=R.groups.some(q=>(q.named||q.name)===nm0&&!q.gone)?pick(alt):alt[hash(nm0+'|'+S.day+'|'+R.gid)%alt.length]}/* (the visited-today case picks without touching the day's random stream) */if(!o.reg&&NAMED[nm0])namedHist(nm0).seen=S.day;/* one person, one visit a day — counted when they walk in *//* v2.3: a named guest is one person — never two Kens in one evening */const g={id:R.gid++,type:o.type,size,reg:o.reg||null,regs:(o.regs||(o.reg?[o.reg]:[])).slice(0,size),forSig:!!o.forSig,ret:!!o.ret,looks:o.looks||(reg?reg.looks:(NAMED[nm0]?[Object.assign({},NAMED[nm0].looks)].concat(makeLooks(o.type,size,o.pdRes||o.pdWalk||o.pdStory?'pdr':o.lounge?'lounge':'main').slice(1)):makeLooks(o.type,size,o.pdRes||o.pdWalk||o.pdStory?'pdr':o.lounge?'lounge':'main'))),name:!o.reg&&NAMED[nm0]&&size>1?nm0+' 與朋友':nm0,named:!o.reg&&NAMED[nm0]?nm0:null,story:!!o.story,beat:!!o.beat,v24grp:o.v24grp||null,pdRes:o.pdRes||null,pdWalk:!!o.pdWalk,pdStory:o.pdStory||null,moment:o.moment||null,comp:o.comp||null,together:o.together||null,offduty:!!o.offduty,wantDish:o.wantDish||null,wantSide:!!o.wantSide,catfan:!!o.catfan,/* v2.3 */tasting:!!o.tasting,kenHost:!!o.kenHost,pianist:!!o.pianist,/* rc7 */
+ let nm0=o.name||(reg?reg.n:pick(NAMES[o.type]||NAMES.office));if(!o.reg&&NAMED[nm0]&&!o.kenHost&&!o.pianist&&(R.groups.some(q=>(q.named||q.name)===nm0&&!q.gone)||((story().named[nm0]||{}).seen===S.day&&!o.tries&&!o.tasting)||(!o.name&&R.sched.slice(R.si+1).some(q=>q.name===nm0)))){/* one person, one visit a day; a pool pick yields to the same person's planned evening */let alt=(NAMES[o.type]||NAMES.office).filter(n=>!NAMED[n]);if(!alt.length)alt=NAMES.gourmet.concat(NAMES.office).filter(n=>!NAMED[n]);/* every VIP name is a person: another VIP tonight is someone else */if(alt.length)nm0=R.groups.some(q=>(q.named||q.name)===nm0&&!q.gone)?pick(alt):alt[hash(nm0+'|'+S.day+'|'+R.gid)%alt.length]}/* (the visited-today case picks without touching the day's random stream) */if(!o.name&&!reg&&!NAMED[nm0])nm0=freshName(nm0,o.type);{const U=nmUsed();if(!U.includes(nm0))U.push(nm0)}/* v2.5.4: tonight's names */if(!o.reg&&NAMED[nm0])namedHist(nm0).seen=S.day;/* one person, one visit a day — counted when they walk in *//* v2.3: a named guest is one person — never two Kens in one evening */const g={id:R.gid++,type:o.type,size,reg:o.reg||null,regs:(o.regs||(o.reg?[o.reg]:[])).slice(0,size),forSig:!!o.forSig,ret:!!o.ret,looks:o.looks||(reg?reg.looks:(NAMED[nm0]?[Object.assign({},NAMED[nm0].looks)].concat(makeLooks(o.type,size,o.pdRes||o.pdWalk||o.pdStory?'pdr':o.lounge?'lounge':'main').slice(1)):makeLooks(o.type,size,o.pdRes||o.pdWalk||o.pdStory?'pdr':o.lounge?'lounge':'main'))),name:!o.reg&&NAMED[nm0]&&size>1?nm0+' 與朋友':nm0,named:!o.reg&&NAMED[nm0]?nm0:null,story:!!o.story,beat:!!o.beat,v24grp:o.v24grp||null,pdRes:o.pdRes||null,pdWalk:!!o.pdWalk,pdStory:o.pdStory||null,moment:o.moment||null,comp:o.comp||null,together:o.together||null,offduty:!!o.offduty,wantDish:o.wantDish||null,wantSide:!!o.wantSide,catfan:!!o.catfan,/* v2.3 */tasting:!!o.tasting,kenHost:!!o.kenHost,pianist:!!o.pianist,/* rc7 */
   state:'arrive',table:null,pat:1,room:'front',troom:'front',x:FR.enter.x,y:FR.enter.y,tx:FR.door.x,ty:FR.door.y+28,/* rc8.3: to the door; in only when there is a table */timer:0,ticket:null,seed:Math.random()*10,mood:'ok'};
  if(reg&&(S.regulars[reg.id]||0)>0)g.ret=true;
  if(g.named==='Madame Lin'&&g.troom!=='lounge'&&barState()==='lin'){g.x=FR.ldoor.x;g.y=FR.ldoor.y+6}   /* rc8: she comes over from her own bar, next door */
@@ -10971,7 +10998,7 @@ function tapStation(i){const s=R.slots[i];if(!s)return;audioInit();if(s.broken){
    checkpoint writes it into the save as plain data (references become indices), and restoreService()
    builds a new R from it. Anything that does not resolve throws, and the caller falls back to
    reopening at the same clock with today's numbers kept — and says so. */
-const CP_KEYS=['dd','t','dur','si','closed','log','cds','treatT','musicT','blackout','combo','maxCombo','streak','fire','fireCount','frun','fireDone','tv','gid','tkid','st','rush','rushT0','rushT1','rushShown','weather','event','coach','taskDone','lastSpawn','idleT','focus','sched','inc','noticeT','catCheck','cpT','tasting'];   /* v2.3: the tasting night survives a checkpoint */
+const CP_KEYS=['dd','t','dur','si','closed','log','cds','treatT','musicT','blackout','combo','maxCombo','streak','fire','fireCount','frun','fireDone','tv','gid','tkid','st','rush','rushT0','rushT1','rushShown','weather','event','coach','taskDone','lastSpawn','idleT','focus','sched','inc','noticeT','catCheck','cpT','tasting','nmUsed'];   /* v2.3: the tasting night survives a checkpoint */
 const G_STATES=['arrive','queue','toTable','reading','order','wait','eat','check','leave','toPiano','piano','toHost','host'];   /* rc8.3: 予安 at the piano, Ken behind the bar — a save made then used to throw the whole room away */
 function snapshotService(){if(!R||phase!=='service'||R.closing!=null||R.ended)return null;
  const ti=t=>t?R.tickets.indexOf(t):-1;

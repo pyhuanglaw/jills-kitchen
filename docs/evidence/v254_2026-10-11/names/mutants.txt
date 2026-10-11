@@ -1,0 +1,27 @@
+=== the game as it is
+PASS  guests_one_evening_does_not_repeat_a_name  (5.6s)
+=== no_fresh_name
+FAIL  guests_one_evening_does_not_repeat_a_name  (5.3s)
+      no name of a guest with no name of their own comes twice tonight: ['Amy', 'Chloe', 'Emma', 'Jason', 'Lin family', 'Mina', 'Ruby', 'Ryan 與 Ivy', '佳佳', '小周與阿晴', '小宇', '張經理', '李家', '阿凱', '阿彥', '陳先生'] (65 of them)
+=== bookings_not_reserved
+FAIL  guests_one_evening_does_not_repeat_a_name  (2.0s)
+      the names a booking or a story gave are tonight's from the start
+=== not_saved_with_the_evening
+FAIL  guests_one_evening_does_not_repeat_a_name  (5.7s)
+      'cp'
+=== renames_everyone
+FAIL  guests_one_evening_does_not_repeat_a_name  (5.6s)
+      the regulars keep their names: [('mia', '吳小姐'), ('sophie', 'Emma'), ('chen', '張經理'), ('koba', '鄭先生'), ('dylan', 'Dylan'), ('wang', '阿宏與小如')]
+=== no_borrowing
+FAIL  guests_one_evening_does_not_repeat_a_name  (5.6s)
+      no name of a guest with no name of their own comes twice tonight: ['Chloe', 'Emma'] (65 of them)
+=== no_another
+FAIL  guests_one_evening_does_not_repeat_a_name  (5.6s)
+      the names run out: a grown-up borrows another grown-up's, then 「另一位」 the name, 「另一位」 another; past all that the name drawn — no loop; a couple 「另一對」; a student never an office worker's: {'a': 'Emma', 'b': 'Eric', 'c': 'Eric', 'd': 'Eric', 'e': 'Ryan 與 Ivy', 'f
+=== no_extra_names
+FAIL  guests_one_evening_does_not_repeat_a_name  (5.6s)
+      no name of a guest with no name of their own comes twice tonight: ['Mina', '阿彥'] (65 of them)
+=== v2.5.3 (tag v2.5.3)
+FAIL  guests_one_evening_does_not_repeat_a_name  (0.4s)
+      Page.evaluate: ReferenceError: NAMES_MORE is not defined
+ALLDONE

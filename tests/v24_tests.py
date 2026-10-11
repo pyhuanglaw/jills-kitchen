@@ -1724,6 +1724,68 @@ def story_a_beats_visitor_is_not_sent_away_by_the_ordinary_wait(b, port, target)
 
 
 @test
+def guests_one_evening_does_not_repeat_a_name(b, port, target):
+    """Decision 三, the user 2026-10-11 (docs/v24/three_decisions_2026-10-11.txt): 「同一營業夜晚內，普通客人盡量不重名」「優先分配
+    尚未使用的名字」「同一位客人的名稱必須在入座、點餐、離席及所有通知中保持一致」「不能只是為了避免重複而改掉重要 NPC、固定常客、
+    故事角色或員工的名字」「如果當晚客人數量超過可用姓名數量，請設計自然、合理的備援命名方式，而不是讓系統無限嘗試抽名字」「既有
+    客人的 ID、訂單及桌位資料不得因改名而混亂」. The overnight QA: 「Eric 等太久，離開了」 three times on one evening. A whole
+    evening of the user's Day 92 save (about a hundred guests): no name of a guest with no name of their own comes twice —
+    walked in or turned away at the door; the regulars, the named people and anyone booked or brought by a story keep
+    theirs, and no one else takes them; each notice's name is one group's; tables and tickets point at the right groups.
+    The names a booking gave are tonight's from the start. The evening's names are saved with it. When a kind's names run
+    out: a grown-up takes another grown-up's not used yet, then 「另一位 Eric」 (「另一對 …」 for a couple), and past that the
+    name drawn — no loop of draws. The extra names are nobody's in
+    the game."""
+    g = Game(b, port, target, seed=940, manual=True, viewport={'width': 390, 'height': 844})
+    more = json.loads(g.ev("JSON.stringify(NAMES_MORE)"))
+    src = '\n'.join(open(os.path.join(ROOT, 'js', f), encoding='utf-8').read() for f in ('game.js', 'story_art.js'))
+    taken = json.loads(g.ev("JSON.stringify([].concat(REGS.map(r=>r.n),Object.keys(NAMED),...Object.values(CREW_NAMES),(typeof LOUNGE_ROSTER!=='undefined'?LOUNGE_ROSTER.map(r=>r.name):[]),...Object.values(NAMES)))"))
+    for k, L in more.items():
+        for n in L:
+            check(n not in taken and src.count(f"'{n}'") == 1, f'the extra name {n} is nobody\'s in the game')
+    load_save(g, 'player_day92_2105.json')
+    to_service(g)
+    check(set(json.loads(g.ev("JSON.stringify(R.sched.filter(o=>o.name).map(o=>o.name))"))) <= set(json.loads(g.ev("JSON.stringify(nmUsed())"))), 'the names a booking or a story gave are tonight\'s from the start')
+    g.ev("""window.__gs=[];window.__seen=new Set();window.__toasts=[];{const t0=toast;toast=function(t){__toasts.push(String(t));return t0.apply(this,arguments)}}
+      {const s0=spawn;spawn=function(o){const n=R.gid;const r=s0.apply(this,arguments);for(const x of R.groups)if(x.id>=n&&!__seen.has(x.id)){__seen.add(x.id);__gs.push({id:x.id,name:x.name,reg:x.reg,named:x.named,oname:o.name||null,type:x.type})}return r}}""")
+    snap = None
+    for i in range(80):
+        r = g.page.evaluate('()=>window.__bot(600,1/30)')
+        if snap is None and g.ev("R&&R.t>R.dur*.5"):
+            snap = json.loads(g.ev("JSON.stringify({cp:snapshotService().misc.nmUsed,now:nmUsed()})"))
+        if g.ev("phase") != 'service' or g.ev("!R||R.closed"): break
+        bad = g.ev("(()=>{for(const tk of R.tickets){if(!R.groups.includes(tk.g))return 'ticket '+tk.id+' of a group not here';if(tk.g.table!=null&&!tk.lounge&&R.tables[tk.g.table].group!==tk.g)return 'table '+tk.g.table+' not '+tk.g.name}return ''})()")
+        check(not bad, f'tables and tickets point at their groups: {bad}')
+    gs = json.loads(g.ev("JSON.stringify(__gs)"))
+    check(len(gs) >= 30, f'the case: a busy evening ({len(gs)} groups)')
+    check(snap and snap['cp'] == snap['now'], 'the evening\'s names are saved with it (the checkpoint)')
+    plain = [x for x in gs if not x['reg'] and not x['named'] and not x['oname']]
+    names = [x['name'] for x in plain]
+    dup = sorted({n for n in names if names.count(n) > 1})
+    check(not dup, f'no name of a guest with no name of their own comes twice tonight: {dup} ({len(plain)} of them)')
+    own = {x['name'] for x in gs if x['reg'] or x['named'] or x['oname']}
+    check(not (set(names) & own), f'and none takes the name of a regular, a named person or a booking: {set(names) & own}')
+    regs = json.loads(g.ev("JSON.stringify(Object.fromEntries(REGS.map(r=>[r.id,r.n])))"))
+    check(all(x['reg'] not in regs or x['name'].startswith(regs[x['reg']]) for x in gs if x['reg']), f'the regulars keep their names: {[(x["reg"], x["name"]) for x in gs if x["reg"]]}')
+    check(all(x['name'] in (x['named'], x['named'] + ' 與朋友') for x in gs if x['named']), 'the named people keep theirs')
+    check(all(x['name'] in (x['oname'], x['oname'] + ' 與朋友') for x in gs if x['oname']), f'anyone a booking or a story named keeps that name: {[(x["oname"], x["name"]) for x in gs if x["oname"] and x["name"] != x["oname"]]}')
+    t = json.loads(g.ev("JSON.stringify(__toasts)"))
+    door = [m.group(1) for x in t for m in [re.match(r'^(.+?) (?:等太久，離開了|生氣地離開了…|看到客滿，失望地走了…)$', x)] if m]
+    check(all(names.count(n) + sum(1 for x in gs if x['name'] == n and (x['reg'] or x['named'] or x['oname'])) <= 1 for n in door if n in names), f'each name a notice says is one group\'s: {door}')
+    # a kind's names all used: 「另一位」, then the name itself — no loop
+    fb = json.loads(g.ev("""JSON.stringify((()=>{const U=R.nmUsed,A=NAMES.office.concat(NAMES.gourmet,NAMES_MORE.office,NAMES_MORE.gourmet).filter(n=>!NAMED[n]);
+      R.nmUsed=NAMES.office.concat(NAMES_MORE.office);const a=freshName('Eric','office');
+      R.nmUsed=A.slice();const b=freshName('Eric','office');R.nmUsed.push(b);const c=freshName('Eric','office');
+      R.nmUsed=A.concat(NAMES.office.map(n=>'另一位'+(/^[A-Za-z]/.test(n)?' ':'')+n));const d=freshName('Eric','office');
+      R.nmUsed=NAMES.couple.concat(NAMES_MORE.couple);const e=freshName('Ryan 與 Ivy','couple');
+      R.nmUsed=NAMES.student.concat(NAMES_MORE.student);const f=freshName('小安','student');
+      R.nmUsed=U;return {a,b,c,d,e,f}})())"""))
+    check(fb['a'] in more['gourmet'] + ['Chloe', 'Emma'] and fb['b'] == '另一位 Eric' and fb['c'].startswith('另一位') and fb['c'] != '另一位 Eric' and fb['d'] == 'Eric' and fb['e'] == '另一對 Ryan 與 Ivy' and fb['f'] == '另一位小安',
+          f'the names run out: a grown-up borrows another grown-up\'s, then 「另一位」 the name, 「另一位」 another; past all that the name drawn — no loop; a couple 「另一對」; a student never an office worker\'s: {fb}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
 def v24_an_old_shared_cap_save_keeps_everyone_and_waits(b, port, target):
     """rc5 migration: before the split, the Lounge's +2 and +2 were added to one shared cap, so a save can hold more
     restaurant people than the restaurant's own places, and 安安 / 阿拓 were hired as a plain waiter / chef. Nobody is
