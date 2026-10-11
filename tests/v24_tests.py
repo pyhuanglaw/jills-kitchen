@@ -1479,8 +1479,12 @@ def stock_one_tap_restock_leaves_no_dish_of_tonight_empty(b, port, target):
     st = json.loads(g.ev("JSON.stringify({total:stockTotal(),cap:fridgeCap(),empty:menuList().filter(stationOk).filter(d=>!((S.stock[d]||0)>0)).map(dishName),short:(()=>{const s=suggestStock();return Object.keys(s).filter(d=>(S.stock[d]||0)<s[d]).length})()})"))
     check(st['total'] == st['cap'], f'the fridge is used to the last portion: {st}')
     check(not st['empty'], f'no dish of tonight\'s menu is left with nothing: {st["empty"]}')
-    t = [x for x in json.loads(g.ev("JSON.stringify(__toasts)")) if '冰箱滿了' in x]
-    check(t and '每道菜都先少放一點' in t[-1] and '26 份' in t[-1] and '退掉不在菜單上的庫存' in t[-1], f'the toast says each was cut a little and where the room is: {t}')
+    # v2.5.4 (decision 一, the user 2026-10-11): the button now sends the 26 back first, so the toast that pointed at
+    # 「退掉不在菜單上的庫存」 is gone with what it pointed at — the line says what went back. The case this test is for (the
+    # dishes just put on left with nothing) is still the two checks above and the opening's below; the fridge too small even
+    # after, through the button, is stock_one_tap_restock_sends_back_the_dishes_off_the_menu_first's
+    t = json.loads(g.ev("JSON.stringify(__toasts)"))
+    check(any('已退回 26 份下架菜品' in x for x in t) and not any('退掉不在菜單上的庫存' in x for x in t), f'the toast says what went back (v2.5.4): {t}')
     g.click('[data-act=start]'); g.page.wait_for_timeout(150)
     warn = g.ev("(()=>{const e=document.querySelector('.inline-warn');return e?e.textContent:''})()")
     check('沒有備料' not in (warn or ''), f'the opening does not warn of a dish with nothing: {warn}')
@@ -1502,6 +1506,220 @@ def stock_one_tap_restock_leaves_no_dish_of_tonight_empty(b, port, target):
     g.ev("(()=>{const d=[...S.unlocked].find(k=>dishName(k)==='拿鐵咖啡');S.stock[d]=(S.stock[d]||0)+Math.max(0,fridgeCap()-stockTotal()-3)})()")
     tight = json.loads(g.ev("JSON.stringify((()=>{const p=restockPlan();return {room:fridgeCap()-stockTotal(),plan:Object.entries(p).map(([d,n])=>[dishName(d),n,S.stock[d]||0])}})())"))
     check(tight['room'] == 3 and sum(n for _, n, _ in tight['plan']) == 3 and all(n == 1 and had == 0 for _, n, had in tight['plan']), f'three portions of room go to three dishes with nothing, one each: {tight}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+def _day92_prep(g):
+    load_save(g, 'player_day92_2105.json')
+    if g.ev("phase") == 'shop': g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(200)
+    for _ in range(10):
+        if g.ev("typeof DLG!=='undefined'&&!!DLG"): g.ev("dlgNext()")
+    check(g.ev("phase") == 'prep', f'the prep screen: {g.ev("phase")}')
+    g.ev("if(!window.__tw){window.__tw=1;window.__toasts=[];const t0=toast;toast=function(t){__toasts.push(String(t));return t0.apply(this,arguments)}}")
+
+
+# what the fridge is worth at what its portions cost, and the money: no press of any button may make this grow
+_WORTH = "S.money+Object.keys(S.stock).reduce((a,d)=>a+(S.stock[d]||0)*stockUnit(d),0)"
+_OFF = "JSON.stringify((()=>{const o={};for(const d of S.unlocked)if(!S.menu.includes(d)&&(S.stock[d]||0)>0)o[d]=S.stock[d];return o})())"
+
+
+@test
+def stock_one_tap_restock_sends_back_the_dishes_off_the_menu_first(b, port, target):
+    """Decision 一, the user 2026-10-11 (docs/v24/three_decisions_2026-10-11.txt): 「玩家按『一鍵補到建議量』時，系統先檢查目前
+    菜單。不在菜單上的菜品庫存，優先自動退回，騰出冰箱空間」「完成庫存整理後，再依目前菜單自動補貨」「補貨完成時顯示簡短摘要，
+    例如『已退回 26 份下架菜品，並完成補貨』」「不需要再跳出一個確認視窗」「若玩家只是暫時將菜品下架、沒有按下自動補貨，庫存應
+    保持原狀」. The user's Day 92 save with the simulated player's swaps (the case that left 布拉塔番茄麵 0/9 every evening):
+    taking the seven off by their switches changes nothing in the fridge or the till; one press of the button sends the 26
+    portions back — at what they cost (the save is from before the record, so at each dish's ordinary price) — and fills
+    tonight's dishes to their suggestions; one line says so; no dish is left with nothing, no stock below zero, the opening
+    does not warn. With the fridge still too small after (one of tonight's dishes far above its suggestion), the room goes
+    round tonight's dishes as in v2.5.3 and the line says what went back and where the rest of the room is."""
+    g = Game(b, port, target, seed=935, manual=True, viewport={'width': 390, 'height': 844})
+    _day92_prep(g)
+    check(not g.ev("S.stockAvg&&Object.keys(S.stockAvg).length"), 'the case: a save from before what the portions cost was kept')
+    s0 = g.ev("JSON.stringify({stock:S.stock,money:S.money})")
+    _swap_menu_by_its_switches(g)
+    check(g.ev("JSON.stringify({stock:S.stock,money:S.money})") == s0, 'taking dishes off the menu by their switches leaves the fridge and the money as they were (no press, nothing sent back)')
+    off = json.loads(g.ev(_OFF))
+    check(sum(off.values()) == 26, f'the case: 26 portions of dishes now off the menu: {off}')
+    rf = g.ev("(o=>Object.keys(o).reduce((a,d)=>a+Math.floor(o[d]*DISH(d).cost+1e-6),0))(%s)" % json.dumps(off))
+    before = json.loads(g.ev("JSON.stringify(S.stock)")); m0 = g.ev("S.money"); w0 = g.ev(_WORTH)
+    check(g.page.query_selector('#screen [data-act=restock]') is not None and not g.ev("document.querySelector('#screen [data-act=restock]').disabled"), 'the button is there to press')
+    g.click('#screen [data-act=restock]'); g.page.wait_for_timeout(150)
+    check(not g.page.query_selector('#screen .dlg, #dlg:not([hidden])') or not g.ev("typeof DLG!=='undefined'&&!!DLG"), 'no window to confirm in between')
+    check(json.loads(g.ev(_OFF)) == {}, 'nothing of a dish off the menu is left in the fridge')
+    after = json.loads(g.ev("JSON.stringify(S.stock)"))
+    spent = g.ev("(b=>menuList().reduce((a,d)=>a+Math.max(0,(S.stock[d]||0)-(b[d]||0))*costOf(d),0))(%s)" % json.dumps(before))
+    check(g.ev("S.money") == m0 + rf - spent, f'the money: what went back at its ordinary price ({rf}), less what came in ({spent}): {m0} -> {g.ev("S.money")}')
+    check(g.ev(_WORTH) <= w0 + 1e-6, 'the till and the fridge together are worth no more than before')
+    check(all(v >= 0 for v in after.values()), f'no stock below zero: {after}')
+    st = json.loads(g.ev("JSON.stringify((()=>{const s=suggestStock();return {total:stockTotal(),cap:fridgeCap(),short:Object.keys(s).filter(d=>(S.stock[d]||0)<s[d]).map(d=>[dishName(d),S.stock[d]||0,s[d]]),empty:menuList().filter(stationOk).filter(d=>!((S.stock[d]||0)>0)).map(dishName)}})())"))
+    check(not st['empty'] and all(n - have <= max(1, n * .1) for _, have, n in st['short']), f'with the room back, every dish of tonight is at its suggestion (the fridge full: a dish or two a portion short, two of tonight\'s leftovers being over theirs): {st}')
+    t = json.loads(g.ev("JSON.stringify(__toasts)"))
+    check(any('已退回 26 份下架菜品' in x and '並完成補貨' in x for x in t), f'one line says what went back and that the fridge is filled: {t}')
+    check(not any('冰箱滿了' in x for x in t), f'no 「冰箱滿了」 on this press: {t}')
+    g.click('[data-act=start]'); g.page.wait_for_timeout(150)
+    warn = g.ev("(()=>{const e=document.querySelector('.inline-warn');return e?e.textContent:''})()")
+    check('沒有備料' not in (warn or ''), f'the opening does not warn of a dish with nothing: {warn}')
+    # the fridge still too small after the 26 went back: the room goes round tonight's dishes (v2.5.3), the line says both
+    _day92_prep(g); _swap_menu_by_its_switches(g)
+    g.ev("(()=>{const d=menuList().filter(stationOk)[0];window.__overd=dishName(d);S.stock[d]=(S.stock[d]||0)+Math.max(0,fridgeCap()-stockTotal()+26-20)})()")
+    g.click('#screen [data-act=restock]'); g.page.wait_for_timeout(150)
+    st = json.loads(g.ev("JSON.stringify({total:stockTotal(),cap:fridgeCap(),off:%s,empty:menuList().filter(stationOk).filter(d=>!((S.stock[d]||0)>0)).map(dishName)})" % _OFF))
+    check(st['total'] == st['cap'] and json.loads(st['off']) == {} and not st['empty'], f'tight: the 26 went back, the fridge is full, no dish of tonight has nothing: {st}')
+    t = [x for x in json.loads(g.ev("JSON.stringify(__toasts)")) if '冰箱滿了' in x]
+    over = g.ev("__overd")
+    check(t and '已退回 26 份下架菜品' in t[-1] and '每道菜都先少放一點' in t[-1] and over in t[-1].split('比今晚的建議量多')[0].split('還沒到建議量。')[-1] and '「−」' in t[-1] and '退掉不在菜單上的庫存' not in t[-1], f'tight: the line says what went back, that each was cut a little, and which dish holds the rest of the room ({over}): {t}')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def stock_returns_never_pay_back_more_than_was_paid(b, port, target):
+    """Decision 一 (2026-10-11): 「退款依照原本進貨價格計算，不額外收費，也不能獲得超過原始成本的退款」「反覆切換菜單、補貨、退貨，
+    不能產生無限金錢」「不得出現負庫存」「不得移除訂單已經使用的食材」「舊存檔相容」. Before v2.5.4 a return paid today's price:
+    seafood bought on a 漁獲新鮮 day (×0.7) went back the next day at the full price, a truffle dish bought the day before went
+    back on a 松露價格上漲 day at ×1.5 — money made from nothing, now by the button too. Here: ten rounds of a dish off, the
+    button, the dish on, the button — the till and the fridge together never worth more; both events — each portion goes
+    back at what was paid; portions the supplier gave (a 「多送了 2 份」 evening) go back at nothing; portions of mixed price
+    sent back one by one add up to no more than was paid (an average of half a dollar rounds down); the record of what the portions cost survives a save and a reload;
+    during the evening the button's return sends nothing back and the portions an order took stay with it.""" 
+    g = Game(b, port, target, seed=936, manual=True, viewport={'width': 390, 'height': 844})
+    _day92_prep(g)
+    g.click('#screen [data-act=restock]'); g.page.wait_for_timeout(120)
+    w0 = g.ev(_WORTH)
+    on = json.loads(g.ev("JSON.stringify(menuList().filter(d=>S.menu.includes(d)&&(S.stock[d]||0)>0&&DISH(d).cat!=='drink').slice(0,3))"))
+    check(len(on) == 3, f'the case: three of tonight\'s dishes with portions: {on}')
+    tog = lambda d: g.ev(f"""(()=>{{const b=[...document.querySelectorAll('#screen [data-act=toggle]')].find(x=>x.dataset.d==='{d}');if(!b)return false;b.click();return true}})()""")
+    for i in range(10):
+        d = on[i % 3]
+        check(tog(d), f'the switch of {d}'); g.page.wait_for_timeout(20)
+        if not g.ev("document.querySelector('#screen [data-act=restock]').disabled"): g.click('#screen [data-act=restock]'); g.page.wait_for_timeout(20)
+        check(g.ev(f"(S.stock['{d}']||0)") == 0 or g.ev(f"S.menu.includes('{d}')"), f'round {i}: {d} off the menu went back')
+        check(tog(d), f'the switch of {d} again'); g.page.wait_for_timeout(20)
+        if not g.ev("document.querySelector('#screen [data-act=restock]').disabled"): g.click('#screen [data-act=restock]'); g.page.wait_for_timeout(20)
+        w = g.ev(_WORTH)
+        check(w <= w0 + 1e-6, f'round {i}: the till and the fridge together are worth no more than before ({w0} -> {w})')
+        check(g.ev("Object.values(S.stock).every(v=>v>=0)"), f'round {i}: no stock below zero')
+    # the two events: what was paid goes back, at either price
+    sea = g.ev("S.unlocked.includes('seafood')"); tru = g.ev("S.unlocked.find(d=>DISH(d).truffle&&d!=='seafood')")
+    check(sea and tru, f'the case: seafood and a truffle dish in the save: {sea}, {tru}')
+    g.ev("(()=>{let n=24;for(const k of Object.keys(S.stock).filter(k=>k!=='seafood'&&k!==%s)){const m=Math.min(n,Math.max(0,(S.stock[k]||0)-2));if(m>0){buyStock(k,-m);n-=m}if(n<=0)break}})()" % json.dumps(tru))
+    check(g.ev("fridgeCap()-stockTotal()") >= 20, 'the case: room for what is bought below')
+    ev0 = g.ev("S.today.event")   # the day's own (附近的市集): no price of its own on these
+    for d, ev_buy, ev_back in (('seafood', 'fresh', ev0), (tru, ev0, 'truffle')):
+        g.ev(f"S.stock['{d}']&&buyStock('{d}',-S.stock['{d}'])")
+        g.ev(f"S.today.event={json.dumps(ev_buy)}"); c_buy = g.ev(f"costOf('{d}')")
+        m = g.ev("S.money"); g.ev(f"buyStock('{d}',4)"); paid = m - g.ev("S.money")
+        check(paid == 4 * c_buy and g.ev(f"S.stock['{d}']") == 4, f'{d}: four bought at {c_buy} on {ev_buy}')
+        g.ev(f"S.today.event={json.dumps(ev_back)}"); c_back = g.ev(f"costOf('{d}')")
+        check(c_back != c_buy, f'the case: the price is not the same the day it goes back ({c_buy} / {c_back})')
+        if g.ev(f"S.menu.includes('{d}')"): check(tog(d), f'{d} off the menu')
+        r = json.loads(g.ev("JSON.stringify(returnOffMenu())"))
+        check(g.ev(f"S.stock['{d}']||0") == 0 and r['n'] == 4, f'{d}: the four went back: {r}')
+        check(r['rf'] == paid, f'{d}: what went back is what was paid ({paid}), not today\'s price ({4 * c_back}): {r["rf"]}')
+        g.ev(f"S.today.event={json.dumps(ev0)}")
+    # mixed prices sent back one by one: never more than was paid
+    g.ev("S.stock.seafood&&buyStock('seafood',-S.stock.seafood)")
+    g.ev("S.today.event='fresh'"); m = g.ev("S.money"); g.ev("buyStock('seafood',1)"); g.ev(f"S.today.event={json.dumps(ev0)}"); g.ev("buyStock('seafood',1)"); paid = m - g.ev("S.money")
+    check(paid % 2 == 1, f'the case: two portions whose average is not a whole dollar ({paid})')
+    m = g.ev("S.money")
+    for _ in range(2): g.ev("buyStock('seafood',-1)")
+    check(g.ev("S.money") - m <= paid and paid - (g.ev("S.money") - m) <= 1, f'two portions of mixed price back one by one: no more than was paid ({paid}), at most a dollar less: {g.ev("S.money") - m}')
+    # a save and a reload keep the record
+    g.ev("S.today.event='fresh'"); g.ev("buyStock('seafood',3)"); g.ev(f"S.today.event={json.dumps(ev0)}"); g.ev("save()")
+    g.reload(); g.page.wait_for_timeout(150)
+    g.click('[data-act=openFresh]') if g.page.query_selector('[data-act=openFresh]') else g.click('[data-act=open]'); g.page.wait_for_timeout(150)
+    check(g.ev("Math.round(stockUnit('seafood'))") == g.ev("Math.round(DISH('seafood').cost*.7)"), 'after a reload the seafood still goes back at the 漁獲新鮮 price')
+    # during the evening: the button's return sends nothing back, an order's portions stay with it
+    if g.ev("phase") != 'prep':
+        for _ in range(10):
+            if g.ev("typeof DLG!=='undefined'&&!!DLG"): g.ev("dlgNext()")
+    start_day(g); install_bot(g); g.ev("__tick(40)")
+    tk = g.ev("R.tickets.reduce((a,t)=>a+t.items.filter(i=>i.st!=='cancel'&&!i.lbar).length,0)")
+    s1 = g.ev("JSON.stringify(S.stock)")
+    g.ev("(()=>{const d=menuList()[0];S.menu=S.menu.filter(x=>x!==d);window.__offd=d})()")
+    r = json.loads(g.ev("JSON.stringify(returnOffMenu())"))
+    check(r['n'] == 0 and g.ev("JSON.stringify(S.stock)") == s1, f'during the evening nothing goes back: {r}')
+    check(g.ev("R.tickets.reduce((a,t)=>a+t.items.filter(i=>i.st!=='cancel'&&!i.lbar).length,0)") == tk, 'the orders keep what they took')
+    check(not g.page.query_selector('#screen [data-act=restock]'), 'the button is not there during the evening')
+    # the supplier's 「多送了 2 份」 that evening: the two came free, so they lower what a portion of that dish cost
+    g.ev("(()=>{const ms=menuList().filter(stationOk);for(const d of ms)if((S.stock[d]||0)<=6)S.stock[d]=7;S.stock[ms[0]]=4;while(stockTotal()+2>fridgeCap()){const k=Object.keys(S.stock).find(x=>x!==ms[0]&&S.stock[x]>7);if(!k)break;S.stock[k]--}window.__dd=ms[0]})()")
+    u0 = g.ev("stockUnit(__dd)")
+    check(g.ev("fireIncident('delivery')") and g.ev("S.stock[__dd]") == 6, 'the case: the supplier sent two more of the one dish with 6 or fewer')
+    check(abs(g.ev("stockUnit(__dd)") - u0 * 4 / 6) < 1e-6, f'the two free portions came in at nothing: {u0} -> {g.ev("stockUnit(__dd)")}')
+    check(g.ev("stockRefund(__dd,6)") <= round(u0 * 4), 'all six go back for no more than the four cost')
+    check(not g.errors, g.errors[:3]); g.close()
+
+
+@test
+def story_a_beats_visitor_is_not_sent_away_by_the_ordinary_wait(b, port, target):
+    """Decision 二, the user 2026-10-11 (docs/v24/three_decisions_2026-10-11.txt): 「故事指定來店的角色，在該次劇情必要的造訪
+    期間，不應因普通客人等待機制生氣離開」「不得在玩家還沒正式認識怡君之前，就顯示『怡君生氣地離開了』等破壞敘事順序的訊息」
+    「這項保護僅限故事指定的必要造訪」「不得利用這個機制讓一般客人永久等待」「其他由故事指定到店的重要角色…採用一致的處理方式」.
+    The overnight QA (2026-10-10) on the user's Day 6 save: Day 8, the evening the story brought 怡君 for 秀琴阿姨 to see her
+    (yj_meet), the player not yet introduced, 「怡君生氣地離開了…」 — the beat went to the next day. On that save, in its
+    evening: the story's plan marks her visit as tonight's beat, and Sophie's and Mia's evenings that only make them
+    familiar not; 怡君 for her beat outwaits her patience in the queue and at the table, without a word in her name; a
+    full room at the door sends her back later past the old three tries, and at the end of the evening the door says
+    nothing in her name; with nothing she wants left she is not sent away hungry, and the notice of the portion ordered in
+    for her says 「T? 的客人」, not her name, until the player has met her. The others, as before: an ordinary
+    guest and Sophie on an evening that is not a beat leave when their patience is gone (「等太久，離開了」), and a full
+    door turns them away after three tries."""
+    g = Game(b, port, target, seed=938, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day6_1254.json')
+    g.ev("S.day=8;showPrep()")   # the evening the overnight run had her (Day 8 of that save): her beat is due from the day after the save's
+    check(not g.ev("!!fact('yj_meet')"), 'the case: the player has not met 怡君 yet')
+    want = json.loads(g.ev("JSON.stringify(V24_WANTS.flatMap(f=>f()||[]))"))
+    yj = [w for w in want if w.get('name') == '怡君']
+    check(yj and all(w.get('beat') for w in yj) and yj[0].get('k') == 'yj_meet', f'the plan: 怡君 for yj_meet is tonight\'s beat: {want}')
+    check(all(not w.get('beat') for w in want if w.get('reg') in ('sophie', 'mia')), f'the plan: Sophie and Mia only around to become familiar are not: {want}')
+    plan = json.loads(g.ev("JSON.stringify((()=>{const out=[];v24Visits(out,300,()=>true);return out.map(o=>({n:o.name||o.reg,beat:!!o.beat,story:!!o.story}))})())"))
+    check(any(o['n'] == '怡君' and o['beat'] for o in plan) and all(not o['beat'] for o in plan if o['n'] in ('sophie', 'mia')), f'tonight\'s schedule carries it: {plan}')
+    to_service(g)
+    g.ev("if(!window.__tw){window.__tw=1;window.__toasts=[];const t0=toast;toast=function(t){__toasts.push(String(t));return t0.apply(this,arguments)};const n0=noteLine;noteLine=function(t){__toasts.push(String(t));return n0.apply(this,arguments)}}")
+    g.ev("for(const t of R.tables)if(!t.lounge&&!t.group)t.dirty=true")
+    sp = "(o=>{const n=R.groups.length;spawn(o);return R.groups.length>n?R.groups[R.groups.length-1]:null})"
+    g.ev(f"window.__yj={sp}({{t:R.t,type:'regular',size:1,name:YJN,story:1,beat:1}})")
+    check(g.ev("!!__yj&&__yj.name==='怡君'&&__yj.beat"), 'the case: 怡君 came in for her beat')
+    # the queue: her patience runs out, she waits on
+    g.ev("__yj.state='queue';__yj.pat=.0005;updGroup(__yj,1);updGroup(__yj,1)")
+    check(g.ev("R.groups.includes(__yj)&&!__yj.gone&&__yj.state==='queue'&&__yj.pat>0"), f'in the queue with no patience left she waits on: {g.ev("__yj.state")} {g.ev("__yj.pat")}')
+    # the table: the same
+    g.ev("(()=>{const t=R.tables.find(t=>!t.lounge&&!t.group&&t.seats>=1);t.dirty=false;seatGroup(__yj,t);__yj.state='order';__yj.pat=.0005;updGroup(__yj,1);updGroup(__yj,1)})()")
+    check(g.ev("R.groups.includes(__yj)&&!__yj.gone&&__yj.table!=null&&__yj.pat>0"), f'at the table with no patience left she waits on: {g.ev("__yj.state")}')
+    # nothing she wants left: not sent away hungry
+    g.ev("S.money+=5000;window.__st0=JSON.stringify(S.stock);for(const k in S.stock)S.stock[k]=0;createTicket(__yj)")
+    check(g.ev("R.groups.includes(__yj)&&!__yj.gone&&!!__yj.ticket&&__yj.ticket.items.length>0"), 'with the fridge empty she still has her order (one portion ordered in)')
+    g.ev(f"window.__sb={sp}(Object.assign(regPlanVisit({{t:R.t,type:'regular',reg:'sophie',size:1}}),{{story:1,beat:1}}));(()=>{{const t=R.tables.find(t=>!t.lounge&&!t.group&&t.seats>=__sb.size);t.dirty=false;seatGroup(__sb,t);__sb.state='order';createTicket(__sb)}})()")
+    check(g.ev("!!__sb&&__sb.beat&&R.groups.includes(__sb)&&!__sb.gone&&!!__sb.ticket&&__sb.ticket.items.length>0"), 'the same for anyone the story brought for a beat (Sophie here)')
+    g.ev("(()=>{const t=R.tables[__sb.table];if(__sb.ticket){R.tickets=R.tickets.filter(x=>x!==__sb.ticket);__sb.ticket=null}t.group=null;__sb.table=null;__sb.gone=true;R.groups=R.groups.filter(x=>x!==__sb)})()")
+    g.ev("S.stock=JSON.parse(__st0)")
+    t = json.loads(g.ev("JSON.stringify(__toasts)"))
+    check(not any('怡君' in x and ('離開' in x or '走了' in x) for x in t), f'not a word of her leaving: {t}')
+    check(any('的客人 要多等一下' in x for x in t) and not any('怡君' in x for x in t), f'the order in for her: the notice says the guest at her table, not her name before the player has met her: {t}')
+    check(g.ev("(()=>{const F=story().facts;F.yj_meet={d:S.day};const n=shownName(__yj);delete F.yj_meet;return n})()") == '怡君', 'once 秀琴阿姨 has gone over to her, the notices use her name')
+    # the others, as before: an ordinary guest, Sophie on an evening that is not a beat
+    g.ev(f"window.__og={sp}({{t:R.t,type:'office',size:1}});window.__so={sp}(Object.assign(regPlanVisit({{t:R.t,type:'regular',reg:'sophie',size:1}}),{{story:1}}))")
+    check(g.ev("!!__og&&!!__so&&!__og.beat&&!__so.beat&&__so.reg==='sophie'"), 'the case: an ordinary guest and Sophie (her visit not a beat)')
+    g.ev("for(const x of[__og,__so]){if(x.table!=null){const t=R.tables[x.table];t.group=null;x.table=null}x.state='queue';x.pat=.0005;updGroup(x,1)}")
+    t = json.loads(g.ev("JSON.stringify(__toasts)"))
+    check(g.ev("__og.state==='leave'&&__so.state==='leave'") and any(g.ev("__og.name") in x and '等太久' in x for x in t) and any('Sophie' in x and '等太久' in x for x in t), f'they leave when their patience is gone, as before: {t[-3:]}')
+    # the door: a full room and a full queue
+    g.ev("for(const t of R.tables)if(!t.lounge&&!t.group)t.dirty=true")
+    g.ev(f"(()=>{{let k=0;while(queued().length<queueMax()&&k++<20){sp}({{t:R.t,type:'office',size:2}})}})()")
+    check(g.ev("queued().length>=queueMax()&&!R.tables.some(t=>!t.lounge&&!t.group&&!t.dirty)"), 'the case: no table, the queue full')
+    g.ev("__yj.gone=true;R.groups=R.groups.filter(x=>x!==__yj);if(__yj.table!=null){R.tables[__yj.table].group=null}")
+    n0 = g.ev("R.sched.length")
+    g.ev("spawn({t:R.t,type:'regular',size:1,name:YJN,story:1,beat:1,tries:3})")
+    check(g.ev("R.sched.length") == n0 + 1 and g.ev("R.sched.some(o=>o.name===YJN&&o.tries===4)"), 'a full door after three tries: she comes back later still')
+    g.ev("spawn(Object.assign(regPlanVisit({t:R.t,type:'regular',reg:'sophie',size:1}),{story:1,tries:3}))")
+    check(not g.ev("R.sched.some(o=>o.reg==='sophie'&&o.tries===4)"), 'Sophie on an evening that is not a beat: three tries, as before')
+    lost = g.ev("R.st.lost")
+    g.ev("R.t=R.dur*.86;spawn({t:R.t,type:'regular',size:1,name:YJN,story:1,beat:1,tries:5})")
+    check(not g.ev("R.sched.some(o=>o.name===YJN&&o.tries===6)") and g.ev("R.st.lost") == lost + 1, 'too late in the evening: the beat waits for another day')
+    t = json.loads(g.ev("JSON.stringify(__toasts)"))
+    check(not any('怡君' in x for x in t), f'the door said nothing in her name: {[x for x in t if "怡君" in x]}')
+    check(g.ev("story().trace.some(x=>x.at==='door'&&x.beat===YJN)"), 'the story\'s trace keeps it')
     check(not g.errors, g.errors[:3]); g.close()
 
 

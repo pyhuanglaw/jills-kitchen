@@ -1,0 +1,34 @@
+=== no_patience_protection
+FAIL  story_a_beats_visitor_is_not_sent_away_by_the_ordinary_wait  (1.2s)
+      in the queue with no patience left she waits on: leave 0
+=== protect_every_story_visit
+FAIL  story_a_beats_visitor_is_not_sent_away_by_the_ordinary_wait  (1.3s)
+      they leave when their patience is gone, as before: ['<b>南瓜濃湯</b> 賣完了，客人點不到了（冰箱可以臨時叫貨）', '食材不夠！Jill 緊急叫貨中（1.5 倍價），Sophie 要多等一下', '陳先生 等太久，離開了']
+=== door_three_tries
+FAIL  story_a_beats_visitor_is_not_sent_away_by_the_ordinary_wait  (1.4s)
+      a full door after three tries: she comes back later still
+=== door_says_her_name
+FAIL  story_a_beats_visitor_is_not_sent_away_by_the_ordinary_wait  (1.3s)
+      the story's trace keeps it
+=== plan_untagged
+FAIL  story_a_beats_visitor_is_not_sent_away_by_the_ordinary_wait  (1.2s)
+      the plan: 怡君 for yj_meet is tonight's beat: [{'name': '怡君', 'p': 0.85, 'type': 'regular', 'size': 1, 'grp': None, 'k': 'yj_meet'}, {'reg': 'sophie', 'p': 0.35}, {'reg': 'mia', 'p': 0.35}]
+=== familiarity_tagged
+FAIL  story_a_beats_visitor_is_not_sent_away_by_the_ordinary_wait  (1.3s)
+      the plan: Sophie and Mia only around to become familiar are not: [{'name': '怡君', 'p': 0.85, 'type': 'regular', 'size': 1, 'grp': None, 'k': 'yj_meet', 'beat': 1}, {'reg': 'sophie', 'p': 0.35, 'beat': 1}, {'reg': 'mia', 'p': 0.35, 'beat': 1}]
+=== schedule_drops_it
+FAIL  story_a_beats_visitor_is_not_sent_away_by_the_ordinary_wait  (1.2s)
+      tonight's schedule carries it: [{'n': '怡君', 'beat': False, 'story': True}, {'n': 'Sophie', 'beat': False, 'story': True}, {'n': 'Mia', 'beat': False, 'story': True}]
+=== spawn_drops_it
+FAIL  story_a_beats_visitor_is_not_sent_away_by_the_ordinary_wait  (1.2s)
+      the case: 怡君 came in for her beat
+=== sold_out_only_yj
+FAIL  story_a_beats_visitor_is_not_sent_away_by_the_ordinary_wait  (1.3s)
+      the same for anyone the story brought for a beat (Sophie here)
+=== notice_says_her_name
+FAIL  story_a_beats_visitor_is_not_sent_away_by_the_ordinary_wait  (1.3s)
+      the order in for her: the notice says the guest at her table, not her name before the player has met her: ['食材不夠！Jill 緊急叫貨中（1.5 倍價），怡君 要多等一下', '<b>黃金蛋炒飯</b> 賣完了，客人點不到了（冰箱可以臨時叫貨）', '<b>拿鐵咖啡</b>
+=== refund_rounds_up (after the test's rounding case was changed)
+FAIL  stock_returns_never_pay_back_more_than_was_paid  (10.3s)
+      two portions of mixed price back one by one: no more than was paid (221), at most a dollar less: 222
+ALLDONE

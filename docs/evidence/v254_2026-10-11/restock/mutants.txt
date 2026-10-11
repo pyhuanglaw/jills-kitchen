@@ -1,0 +1,55 @@
+=== no_return
+FAIL  stock_one_tap_restock_leaves_no_dish_of_tonight_empty  (4.7s)
+      the toast says what went back (v2.5.4): ['冰箱滿了（400/400）：每道菜都先少放一點，炙烤肋眼牛排還沒到建議量。起司條比今晚的建議量多，按「−」退一點就有位子。']
+FAIL  stock_one_tap_restock_sends_back_the_dishes_off_the_menu_first  (4.6s)
+      nothing of a dish off the menu is left in the fridge
+FAIL  stock_returns_never_pay_back_more_than_was_paid  (2.7s)
+      round 0: souffle off the menu went back
+=== refund_at_todays_price
+PASS  stock_one_tap_restock_leaves_no_dish_of_tonight_empty  (12.1s)
+PASS  stock_one_tap_restock_sends_back_the_dishes_off_the_menu_first  (8.9s)
+FAIL  stock_returns_never_pay_back_more_than_was_paid  (10.2s)
+      seafood: what went back is what was paid (364), not today's price (520): 520
+=== refund_rounds_up
+PASS  stock_one_tap_restock_leaves_no_dish_of_tonight_empty  (11.9s)
+PASS  stock_one_tap_restock_sends_back_the_dishes_off_the_menu_first  (9.0s)
+PASS  stock_returns_never_pay_back_more_than_was_paid  (11.9s)
+=== buy_not_recorded
+PASS  stock_one_tap_restock_leaves_no_dish_of_tonight_empty  (12.2s)
+PASS  stock_one_tap_restock_sends_back_the_dishes_off_the_menu_first  (9.0s)
+FAIL  stock_returns_never_pay_back_more_than_was_paid  (10.7s)
+      seafood: what went back is what was paid (364), not today's price (520): 520
+=== free_delivery_at_cost
+PASS  stock_one_tap_restock_leaves_no_dish_of_tonight_empty  (12.5s)
+PASS  stock_one_tap_restock_sends_back_the_dishes_off_the_menu_first  (8.5s)
+FAIL  stock_returns_never_pay_back_more_than_was_paid  (11.6s)
+      the two free portions came in at nothing: 214 -> 214
+=== return_during_evening
+PASS  stock_one_tap_restock_leaves_no_dish_of_tonight_empty  (11.9s)
+PASS  stock_one_tap_restock_sends_back_the_dishes_off_the_menu_first  (8.7s)
+FAIL  stock_returns_never_pay_back_more_than_was_paid  (11.3s)
+      during the evening nothing goes back: {'n': 3, 'rf': 273}
+=== return_on_toggle
+FAIL  stock_one_tap_restock_leaves_no_dish_of_tonight_empty  (4.1s)
+      the case: 26 portions of dishes now off the menu stay in the fridge: 0
+FAIL  stock_one_tap_restock_sends_back_the_dishes_off_the_menu_first  (3.9s)
+      taking dishes off the menu by their switches leaves the fridge and the money as they were (no press, nothing sent back)
+FAIL  stock_returns_never_pay_back_more_than_was_paid  (10.6s)
+      fries: the four went back: {'n': 0, 'rf': 0}
+=== old_toast_v253
+PASS  stock_one_tap_restock_leaves_no_dish_of_tonight_empty  (11.8s)
+FAIL  stock_one_tap_restock_sends_back_the_dishes_off_the_menu_first  (4.3s)
+      one line says what went back and that the fridge is filled: ['已退回 26 份下架菜品（退回 $748）。冰箱滿了（400/400）：每道菜都先少放一點，還沒到建議量。蒜香蘑菇、起司條比今晚的建議量多，按「−」退一點就有位子。']
+PASS  stock_returns_never_pay_back_more_than_was_paid  (11.6s)
+=== no_summary
+FAIL  stock_one_tap_restock_leaves_no_dish_of_tonight_empty  (4.3s)
+      the toast says what went back (v2.5.4): []
+FAIL  stock_one_tap_restock_sends_back_the_dishes_off_the_menu_first  (4.3s)
+      one line says what went back and that the fridge is filled: []
+PASS  stock_returns_never_pay_back_more_than_was_paid  (12.3s)
+=== menu_order_buying
+PASS  stock_one_tap_restock_leaves_no_dish_of_tonight_empty  (11.9s)
+FAIL  stock_one_tap_restock_sends_back_the_dishes_off_the_menu_first  (4.4s)
+      with the room back, every dish of tonight is at its suggestion (the fridge full: a dish or two a portion short, two of tonight's leftovers being over theirs): {'total': 400, 'cap': 400, 'short': [['松露南瓜濃湯', 4, 6]], 'empty': []}
+PASS  stock_returns_never_pay_back_more_than_was_paid  (11.8s)
+ALLDONE
