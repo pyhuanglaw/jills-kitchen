@@ -770,7 +770,34 @@ class BaselinePlayer(PlayerBase):
     name, label = 'baseline', '刻意不投資的 baseline'
 
 
-POLICIES = {'normal': NormalPlayer, 'baseline': BaselinePlayer}
+class MenuChurnPlayer(NormalPlayer):
+    """換菜很勤的玩家 (2026-10-11, v2.5.4's decision 一: 「頻繁更換菜單並使用一鍵補貨」): the normal player, and every morning
+    after the normal menu two dishes on it come off and two researched ones not on it go on (by their switches, in turn,
+    so a dish taken off yesterday may come back today) — then 「一鍵補到建議量」 as anyone. What it is for: the portions of
+    dishes just taken off, every day, and what the button does with them."""
+    name, label = 'churn', '換菜很勤的玩家（每天換兩道）'
+
+    def prep_menu(self):
+        super().prep_menu()
+        p = self.s.prep()
+        if not p or not p['menuCap']:
+            return
+        rows = [r for r in p['rows'] if r['d'] and not r['noStation'] and not r['bar']]
+        on = [r for r in rows if r['on'] and r['cat'] == '主餐']
+        off = [r for r in rows if not r['on']]
+        k = getattr(self, 'day', 0) or 0
+        for i in range(min(2, len(off), max(0, len(on) - 1))):
+            o = on[(k + i) % len(on)]
+            a = off[(k * 3 + i) % len(off)]
+            if o['d'] == a['d']:
+                continue
+            self.press('toggle', d=o['d'], saw=f"開店前：「{o['name']}」在今晚菜單上", why='今天換換口味，先下架', label=f"{o['name']} 的開關")
+            self.press('toggle', d=a['d'], saw=f"開店前：「{a['name']}」不在今晚菜單", why='今天換它上去', label=f"{a['name']} 的開關")
+            on = [r for r in on if r['d'] != o['d']]
+            off = [r for r in off if r['d'] != a['d']]
+
+
+POLICIES = {'normal': NormalPlayer, 'baseline': BaselinePlayer, 'churn': MenuChurnPlayer}
 
 
 # ======================================================================= C. 營業中的手 (the hands during a service)
@@ -844,6 +871,11 @@ ECON_HOOKS = r"""(()=>{if(window.__econ)return 'already';window.__econ={};
  window.__econSample=function(){if(!(R&&phase==='service'))return;const day=D();day.samples++;
   if(typeof wfList==='function'){const w=day.wf;w.samples++;if(wfJillTask())w.jillBusy++;for(const n of wfList()){if(!wfOpen(n))continue;const f=wfNext(n);if(WF_ST[f].slot&&!wfFreeSlot(f))w.busyWait++;else if(!wfStaffCan(n))w.jillOnly++}}for(const t of R.tables){if(t.lounge){day.capLg++;if(t.group)day.occLg++}else{day.capMain++;if(t.group)day.occMain++}}day.queue+=(typeof queued==='function'?queued().length:0)};
  window.__notes=[];const nl=noteLine;noteLine=function(t){__notes.push({d:S.day,t:String(t)});return nl.apply(this,arguments)};
+ /* 2026-10-11 (v2.5.4's three decisions): what the player was told and who walked in, for the record — every notice with its
+    moment of the evening (-1 outside the evening), and every group's name: [name, regular, named person, named by a booking
+    or a story, a story's beat] (tools/qa/scan_timeline_log.py --json reads them) */
+ const tz0=toast;toast=function(h){const day=D();(day.toasts=day.toasts||[]).push([R&&phase==='service'?Math.round(R.t):-1,String(h).replace(/<[^>]+>/g,'')]);return tz0.apply(this,arguments)};
+ const sp0=spawn;spawn=function(o){const day=D();const n=R.gid;const r=sp0.apply(this,arguments);for(const x of R.groups)if(x.id>=n&&!x.__nmRec){x.__nmRec=1;(day.names=day.names||[]).push([x.name,x.reg?1:0,x.named?1:0,o&&o.name?1:0,x.beat?1:0])}return r};
  return 'installed'})()"""
 
 DAY_RECORD = r"""JSON.stringify((()=>{const L=S.lastSummary||{};const e=(window.__econ||{})[S.day]||null;
