@@ -1,0 +1,42 @@
+Neighbouring tests, run on the batch-two working tree before the last two fixes (python3 tests/run_tests.py -k <34 names>):
+31 passed, 2 failed — golden_frames (the prep screen, expected: golden/README.md) and qa_restock_says_why_it_cannot (the button is now greyed when it can buy nothing; the test adapted and proved, mutants.txt).
+After the fixes both were run again: see the end of this file.
+
+PASS  weather_days_and_stock_v182  (1.0s)
+PASS  rating_story_records_and_panels_v182  (2.4s)
+FAIL  golden_frames  (144.8s)
+      prep: pixels differ in box (16, 283, 374, 741) (see tests/artifacts/)
+PASS  a1_failed_restock_changes_nothing_and_the_suggestion_holds_still  (2.8s)
+PASS  b_staff_are_grouped_by_job  (1.8s)
+PASS  c_restock_shortcuts_respect_both_the_fridge_and_the_money  (3.3s)
+PASS  e_rating_card_is_structured_and_records_are_chips  (1.7s)
+PASS  o_toggling_a_dish_keeps_the_scroll_position  (2.1s)
+PASS  z_regression_rooms_kitchen_construction_and_staff_assignment  (192.5s)
+PASS  restock_during_service_is_one_tap_with_immediate_feedback  (2.6s)
+PASS  workstation_assignment_is_explicit_with_capacities_and_swaps  (4.0s)
+PASS  weather_dish_replaces_a_chosen_dish_when_the_menu_is_full  (2.2s)
+PASS  stock_suggestion_follows_each_dish_and_counts_the_demand_it_missed  (13.3s)
+PASS  followup_the_manual_describes_the_current_game  (0.8s)
+PASS  stock_one_tap_restock_leaves_no_dish_of_tonight_empty  (12.6s)
+PASS  stock_one_tap_restock_sends_back_the_dishes_off_the_menu_first  (9.6s)
+PASS  stock_returns_never_pay_back_more_than_was_paid  (9.1s)
+PASS  v24_the_signature_steppers_stay_on_their_own_line  (2.0s)
+PASS  qa_a_late_day_by_taps_from_prep_to_the_next_prep  (176.1s)
+PASS  qa_every_button_in_the_shop_does_something  (52.2s)
+PASS  qa_every_button_on_the_prep_screen_does_something  (107.3s)
+FAIL  qa_restock_says_why_it_cannot  (1.9s)
+      disabled
+PASS  qa_the_screens_fit_375_390_430  (114.6s)
+PASS  qa_the_prep_screens_small_buttons_take_a_finger  (3.4s)
+PASS  qa_restock_sits_under_todays_weather  (5.2s)
+PASS  qa_the_prep_screens_44_reach_by_real_taps  (11.8s)
+PASS  qa_the_staff_x_takes_a_finger  (3.4s)
+PASS  qa_the_summary_says_when_the_fridge_was_short  (4.1s)
+PASS  qa_the_staff_tables_show_what_each_one_does  (3.6s)
+PASS  qa_the_first_two_days_say_the_stock_fills_itself  (2.8s)
+PASS  qa_the_stock_rule_is_said_the_way_it_works  (3.2s)
+PASS  qa_a_late_save_reads_true  (3.7s)
+PASS  sim_player_plays_three_days_by_taps  (15.7s)
+
+31 passed, 2 failed
+EXIT 1

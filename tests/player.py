@@ -223,7 +223,8 @@ class Player:
 
     # ---- a day ----
     def restock(self):
-        """the prep screen's 「一鍵補到建議量」, by a tap (it is at the bottom of a long page: the player scrolls)"""
+        """the prep screen's 「一鍵補到建議量」, by a tap (since 2026-10-13, decision 四, under today's card at the top; before, at the
+        bottom of a long page — the player scrolled)"""
         m0 = self.state()['money']
         self.tap('#screen [data-act=restock]')
         return m0 - self.state()['money']

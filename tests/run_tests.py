@@ -4080,7 +4080,9 @@ def stock_suggestion_follows_each_dish_and_counts_the_demand_it_missed(b, port, 
     check(capd['n'] >= 15 and capd['capped'] > capd['cap'] and capd['tot'] == capd['cap'], f'the Day 33 menu is capped and the fridge is used to the last portion: {capd}')
     check((not capd['meansFit']) or capd['keep'], f'when the means fit, every dish keeps its mean: {capd}')
     g.ev("showPrep()"); g.page.wait_for_timeout(60)
-    check('冰箱裝不下' in g.ev("$('#screen').innerText"), 'the prep screen says the fridge cannot hold the day')
+    # 2026-10-13 decision 五 (docs/v24/eight_decisions_2026-10-13.txt): the line is now the user's own wording, in the restock card at the
+    # top — 「預估需求 118 份｜冰箱容量 60 份」 — in the day's numbers (it was 「冰箱裝不下今天的預估需求（約 N 份，容量 M）…」 at the foot)
+    check(f'預估需求 {capd["capped"]} 份｜冰箱容量 {capd["cap"]} 份' in g.ev("$('#screen').innerText"), f'the prep screen says the fridge cannot hold the day, in its numbers: {capd}')
     # the demand that met an empty shelf is counted, shown, and blended into the history
     fill_fridge(g); start_day(g); install_bot(g); g.ev("window.__act=()=>{}")
     d = g.ev("(()=>{const ds=menuList().filter(d=>stationOk(d)&&DISH(d).cat==='main');const d=ds[0];S.stock[d]=0;return d})()")

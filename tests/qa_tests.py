@@ -50,7 +50,7 @@ def _till_vs_summary(p, m0, c0):
 @test
 def qa_a_late_day_by_taps_from_prep_to_the_next_prep(b, port, target):
     """A day of the late game, every step a real tap (390×844 touch, the story panels read through): OPEN →
-    準備 DAY 93 → 一鍵補到建議量 (at the bottom of a page of ten thousand pixels: the finger scrolls there) → 開店 → the
+    準備 DAY 93 → 一鍵補到建議量 (since 2026-10-13 under today's card; it was at the bottom of a page of ten thousand pixels) → 開店 → the
     evening (the crew work) → the summary → 升級餐廳 → 準備 DAY 94. Nothing the player sees reads 'undefined' or 'NaN'."""
     p = Player(b, port, target, save=LATE)
     try:
@@ -271,6 +271,14 @@ def qa_restock_says_why_it_cannot(b, port, target):
         p.tap(f'#screen [data-act=stockTo][data-k=max][data-d="{d}"]')
         SHORT = "JSON.stringify(Object.entries(suggestStock()).filter(([k,v])=>(S.stock[k]||0)<v).map(([k])=>k))"
         setup_check(p.ev("stockTotal()>=fridgeCap()") and json.loads(p.ev(SHORT)), f'the case: the fridge full after 補滿 {d}, other dishes short of their suggestion')
+        # 2026-10-13 (decision 四, docs/evidence/eight_2026-10-13/batch2/): the card says before the press what the press will buy;
+        # with nothing it can buy, the button is greyed and says so (「一鍵補到建議量（冰箱已滿）」, the card 「冰箱滿了，放不下更多。」) —
+        # the case this test was written for (a press that does nothing and says nothing) cannot happen that way any more; a
+        # greyed button that does not say why, or a live one that buys nothing and says nothing, still fails here
+        bt = json.loads(p.ev("JSON.stringify((()=>{const b=document.querySelector('#screen [data-act=restock]');return {dis:!!b.disabled,txt:b.innerText,card:(b.closest('.card')||{}).innerText||''}})())"))
+        if bt['dis']:
+            check('冰箱已滿' in bt['txt'] and '冰箱滿了' in bt['card'], f'一鍵補到建議量 greyed with a full fridge and {json.loads(p.ev(SHORT))} short, without saying why: {bt}')
+            return
         t0, txt0 = p.ev("__toastN"), p.text('#screen'); p.tap('#screen [data-act=restock]')
         short, txt1 = json.loads(p.ev(SHORT)), p.text('#screen')
         said = p.ev("__toastN") > t0 or txt1.count('冰箱') > txt0.count('冰箱')
@@ -913,7 +921,11 @@ def qa_the_prep_screens_small_buttons_take_a_finger(b, port, target):
     (docs/evidence/qa5_2026-10-13/tap_reach/: the screens pixel for pixel). Phone widths 375 and 430, every control on the
     screen, by the page's own hit testing.
     (First written against a ::before reaching past the button, it sampled the drawn box widened by the reach; the reach is now
-    the button's own box, so it samples that box and asks its size — the same points, docs/evidence/qa5_2026-10-13/tap_reach/.)"""
+    the button's own box, so it samples that box and asks its size — the same points, docs/evidence/qa5_2026-10-13/tap_reach/.)
+    Decision 八, 2026-10-13 (docs/v24/eight_decisions_2026-10-13.txt: 「儘可能讓重要觸控範圍達到約 44×44 CSS px」「不可因擴大點擊區
+    而誤觸旁邊的按鈕」): every one of them 44 high now — 「−」「＋」 42×44, the switches 54×44, the signature's 46×44 — still with no
+    point of its box going to another control. That the lines under a dish are no farther apart, and that a real tap at the edge of
+    the reach does what the button says: qa_the_prep_screens_44_reach_by_real_taps."""
     for W in (375, 430):
         p = Player(b, port, target, save=LATE, W=W)
         try:
@@ -923,7 +935,7 @@ def qa_the_prep_screens_small_buttons_take_a_finger(b, port, target):
             p.settle()
             check(p.state()['phase'] == 'prep', f'not at the prep screen: {p.state()}')
             out = json.loads(p.ev(r"""JSON.stringify((()=>{const sc=document.querySelector('#screen');const els=[...sc.querySelectorAll('.tog, .step button, .stkq .mini')].filter(e=>e.getBoundingClientRect().width>0&&!e.disabled);
-              const need=e=>e.classList.contains('tog')?[54,36]:e.classList.contains('mini')?[0,36]:e.closest('.sig')?[46,42]:[42,38];const bad=[],small=[];let n=0;
+              const need=e=>e.classList.contains('tog')?[54,44]:e.classList.contains('mini')?[0,44]:e.closest('.sig')?[46,44]:[42,44];const bad=[],small=[];let n=0;
               for(const e of els){e.scrollIntoView({block:'center'});const r=e.getBoundingClientRect();const [w,h]=need(e);
                 if(r.width<w-.5||r.height<h-.5)small.push([e.dataset.act+(e.dataset.v||e.dataset.k||''),Math.round(r.width),Math.round(r.height)]);
                 const L=r.left+1,T=r.top+1,Rt=r.right-1,B=r.bottom-1;const rad=getComputedStyle(e).borderTopLeftRadius.split(' ').map(parseFloat);const cx=(rad[0]||0)*.2929,cy=(rad[1]!=null?rad[1]:rad[0]||0)*.2929;
@@ -934,6 +946,245 @@ def qa_the_prep_screens_small_buttons_take_a_finger(b, port, target):
             check(out['controls'] >= 100, f'{W}: the late prep screen should show its many small controls: {out}')
             check(out['nsmall'] == 0, f'{W}: {out["nsmall"]} of {out["controls"]} controls take a press only as far as a small button: {out["small"]}')
             check(out['nbad'] == 0, f'{W}: {out["nbad"]} of {out["controls"]} controls lose part of their box to another control: {out["bad"]}')
+        finally:
+            p.close()
+
+
+_PREP_OPEN = """(()=>{const sc=document.querySelector('#screen .sheet');return sc?sc.scrollTop:null})()"""
+
+
+def _to_prep(p):
+    p.tap('#screen [data-act=open]')
+    if p.state()['phase'] == 'shop':
+        p.tap('#screen [data-act=nextDay]')
+    p.settle()
+    check(p.state()['phase'] == 'prep', f'not at the prep screen: {p.state()}')
+
+
+@test
+def qa_restock_sits_under_todays_weather(b, port, target):
+    """Decisions 四 and 五 (2026-10-13, docs/v24/eight_decisions_2026-10-13.txt): 「在開店前畫面上方、今日天氣資訊下方，放置明顯的
+    「一鍵補到建議量」主要操作按鈕」「玩家進入開店前畫面，不必向下捲動就應能找到」「顯示目前冰箱使用量、容量，以及簡短的補貨預估」
+    「按鈕沿用目前已完成的…邏輯」「原本下方重複的主要補貨按鈕可以移除」「各菜品的個別補貨、調整份數功能全部保留」; 「預估需求 118 份｜
+    冰箱容量 60 份」「字級不得過小」「所有數字應由真實營運資料計算」. The user's Day 92, Day 33 and Day 6 saves, on a 390×844 phone and
+    a 375×667 one: as the prep screen opens (not scrolled) the button is on the screen, nothing over it, right under today's card and
+    above the dishes; it is the only one; the card's fridge, the portions still to buy and their cost are the game's own; the
+    shortfall line is there exactly when the day's suggestion was cut to the fridge, in the day's numbers, 13 px or more; a finger
+    on the button does what the old button did (sends back what is off the menu, then restockPlan()) — on the Day 92 save at 390
+    with a stocked dish first taken off the menu by its switch (the card says those portions go back first), the stock comes out
+    as that plan says and the dish taken off has none left, and the card's 「還要補 N 份，約 $X」 is that plan before the press (a full fridge reads 「冰箱
+    滿了」 — the Day 92 save after the press, four dishes a portion short, said 「還要補 4 份，約 $432」 on a button that bought
+    nothing); every dish keeps its own 「−」「＋」."""
+    cases = [(LATE, 390, 844), (LATE, 375, 667), ('player_day33.json', 390, 844), ('player_day6_1254.json', 375, 667)]
+    seen_short = seen_plain = 0
+    for save, W, H in cases:
+        p = Player(b, port, target, save=save, W=W, H=H, checkpoint=False)   # (the Day 33 save was made in the middle of a night: from its morning)
+        try:
+            _to_prep(p)
+            out = json.loads(p.ev(r"""JSON.stringify((()=>{const sc=document.querySelector('#screen .sheet');const btns=[...document.querySelectorAll('#screen [data-act=restock]')];const bt=btns[0];
+              if(!bt)return {none:1,scroll:sc.scrollTop};const r=bt.getBoundingClientRect();const foot=document.querySelector('#screen .footer');const fr=foot?foot.getBoundingClientRect():{top:innerHeight};
+              const hit=document.elementFromPoint((r.left+r.right)/2,(r.top+r.bottom)/2);const today=document.querySelector('#screen .card.today');const row=document.querySelector('#screen .menu-row');
+              const after=!!today&&!!(today.compareDocumentPosition(bt)&Node.DOCUMENT_POSITION_FOLLOWING);const before=!row||!!(bt.compareDocumentPosition(row)&Node.DOCUMENT_POSITION_FOLLOWING);
+              const snap=JSON.stringify(S);returnOffMenu();const plan=restockPlan();const o=JSON.parse(snap);for(const k of Object.keys(S))if(!(k in o))delete S[k];Object.assign(S,o);
+              let need=0,cost=0;for(const d in plan){need+=plan[d];cost+=plan[d]*costOf(d)}
+              const card=bt.closest('.card.restock');const sh=card&&card.querySelector('.rs-short');const shb=sh&&sh.querySelector('b');
+              return {n:btns.length,scroll:sc.scrollTop,top:r.top,bottom:r.bottom,footTop:fr.top,vh:innerHeight,hitOk:!!hit&&(hit===bt||bt.contains(hit)),after,before,
+                card:card?card.innerText:null,fridge:`冰箱 ${stockTotal()}/${fridgeCap()} 份`,need,cost:fmt(Math.round(cost)),btnText:bt.innerText,capd:S.today.sugCapped||0,cap:fridgeCap(),
+                short:shb?shb.innerText:null,shortPx:shb?parseFloat(getComputedStyle(shb).fontSize):0,shortSubPx:sh?parseFloat(getComputedStyle(sh).fontSize):0,
+                steps:document.querySelectorAll('#screen .menu-row [data-act=stock]').length,rows:[...document.querySelectorAll('#screen .menu-row')].filter(x=>x.querySelector('.step.stk')).length}})())"""))
+            tag = f'{save} {W}×{H}'
+            check(not out.get('none'), f'{tag}: no 「一鍵補到建議量」 on the prep screen: {out}')
+            check(out['n'] == 1, f'{tag}: {out["n"]} restock buttons on the screen — one is the decision')
+            check(out['scroll'] == 0, f'{tag}: the prep screen did not open at its top: {out["scroll"]}')
+            check(out['top'] >= 0 and out['bottom'] <= min(out['vh'], out['footTop']) and out['hitOk'],
+                  f'{tag}: the button is not on the opening screen, clear of the 開始營業 bar: top {out["top"]:.0f}, bottom {out["bottom"]:.0f}, bar at {out["footTop"]:.0f}, screen {out["vh"]}, reachable {out["hitOk"]}')
+            check(out['after'] and out['before'], f'{tag}: the button is not between today\'s card and the dishes: {out}')
+            check(out['fridge'] in out['card'], f'{tag}: the card does not say the fridge 「{out["fridge"]}」: {out["card"]!r}')
+            if out['need'] > 0:
+                check(f'還要補 {out["need"]} 份' in out['card'] and out['cost'] in out['card'] and out['cost'] in out['btnText'],
+                      f'{tag}: the card\'s estimate is not the game\'s ({out["need"]} 份, {out["cost"]}): {out["card"]!r}')
+            if out['capd']:
+                seen_short += 1
+                check(out['short'] == f'預估需求 {out["capd"]} 份｜冰箱容量 {out["cap"]} 份', f'{tag}: the shortfall line is not the day\'s numbers ({out["capd"]}, {out["cap"]}): {out["short"]!r}')
+                check(out['shortPx'] >= 13 and out['shortSubPx'] >= 13, f'{tag}: the shortfall is in small type: {out["shortPx"]} / {out["shortSubPx"]} px')
+            else:
+                seen_plain += 1
+                check(out['short'] is None, f'{tag}: a shortfall line on a day the fridge held the suggestion: {out["short"]!r}')
+            check(out['rows'] > 0 and out['steps'] >= 2 * out['rows'], f'{tag}: a dish lost its own 「−」「＋」: {out["steps"]} for {out["rows"]} dishes')
+            if W == 390:
+                # a dish with portions in the fridge taken off tonight's menu by its switch: the press sends those back first
+                off_d = p.ev("(()=>{const r=[...document.querySelectorAll('#screen .menu-row')].find(r=>{const t=r.querySelector('.tog.on');const d=t&&t.dataset.d;return d&&d!=='signature'&&(S.stock[d]||0)>=3&&DISH(d).cat!=='drink'});return r?r.querySelector('.tog').dataset.d:null})()")
+                check(off_d, f'{tag}: no dish with portions in the fridge to take off the menu')
+                p.tap(f'#screen .tog[data-d="{off_d}"]'); p.settle()
+                n_off = p.ev(f"S.menu.includes('{off_d}')?-1:(S.stock['{off_d}']||0)")
+                check(n_off > 0, f'{tag}: {off_d} is still on the menu, or its portions went with it: {n_off}')
+                p.ev("document.querySelector('#screen .sheet').scrollTop=0"); p.frames(3)
+                card = p.ev("(document.querySelector('#screen .card.restock')||{}).innerText||''")
+                check(f'先退掉不在菜單上的 {n_off} 份' in card, f'{tag}: the card does not say the {n_off} portions of {off_d} go back first: {card!r}')
+                exp = json.loads(p.ev(r"""JSON.stringify((()=>{const snap=JSON.stringify(S);const st0=Object.assign({},S.stock),m0=S.money;returnOffMenu();const plan=restockPlan();const mid=Object.assign({},S.stock);
+                  const o=JSON.parse(snap);for(const k of Object.keys(S))if(!(k in o))delete S[k];Object.assign(S,o);const want={};for(const d of Object.keys(Object.assign({},mid,plan)))want[d]=(mid[d]||0)+(plan[d]||0);return {want,m0}})())"""))
+                m0 = p.state()['money']
+                x, y = json.loads(p.ev("JSON.stringify((()=>{const r=document.querySelector('#screen [data-act=restock]').getBoundingClientRect();return [(r.left+r.right)/2,(r.top+r.bottom)/2]})())"))
+                p.page.touchscreen.tap(x, y); p.frames(6)
+                got = json.loads(p.ev("JSON.stringify({stock:S.stock,money:S.money,scroll:document.querySelector('#screen .sheet').scrollTop,card:(document.querySelector('#screen .card.restock')||{}).innerText})"))
+                off = {d: (exp['want'].get(d, 0), got['stock'].get(d, 0)) for d in set(exp['want']) | set(got['stock']) if exp['want'].get(d, 0) != got['stock'].get(d, 0)}
+                check(got['money'] < m0, f'{tag}: a tap on the button bought nothing: {m0} → {got["money"]}')
+                check(not off, f'{tag}: the stock is not what the restock plan says (wanted, got): {dict(list(off.items())[:6])}')
+                check(got['stock'].get(off_d, 0) == 0, f'{tag}: the {off_d} taken off the menu was not sent back: {got["stock"].get(off_d)}')
+                check('還要補' not in got['card'] and ('都補到建議量了' in got['card'] or '冰箱滿了' in got['card']), f'{tag}: after the tap the card still asks for more: {got["card"]!r}')
+                dis = p.ev("document.querySelector('#screen [data-act=restock]').disabled")
+                check(dis, f'{tag}: after the tap the button still offers to buy: {got["card"]!r}')
+        finally:
+            p.close()
+    check(seen_short and seen_plain, f'the saves should show both a day the fridge cut the suggestion and one it did not: {seen_short}, {seen_plain}')
+
+
+_REACH_ROW = r"""((d)=>{const row=[...document.querySelectorAll('#screen .menu-row')].find(r=>r.querySelector(`[data-act=stockTo][data-d="${d}"]`));if(!row)return null;
+  const q=s=>row.querySelector(s);const box=e=>{const r=e.getBoundingClientRect();return {l:r.left,t:r.top,r:r.right,b:r.bottom}};
+  return {pm:box(q(`[data-act=price][data-v="-1"]`)),pp:box(q(`[data-act=price][data-v="1"]`)),sm:box(q(`[data-act=stock][data-v="-1"]`)),sp:box(q(`[data-act=stock][data-v="1"]`)),
+    sug:box(q(`[data-act=stockTo][data-k=sug]`)),tog:box(q('.tog')),price:S.price[d],stock:S.stock[d]||0,on:S.menu.includes(d),sugN:suggestStock()[d]||0}})"""
+
+
+@test
+def qa_the_prep_screens_44_reach_by_real_taps(b, port, target):
+    """Decision 八 (2026-10-13): 「儘可能讓重要觸控範圍達到約 44×44 CSS px」「不可因擴大點擊區而誤觸旁邊的按鈕」「不要讓每道菜那一列
+    明顯變高」「以手機尺寸實際點擊驗證，不能只有截圖」. On the user's Day 92 save at 375, 390 and 430 (the three ways a dish's lines fall:
+    price / stock / 補到建議; price / stock 補到建議; price stock / 補到建議), a finger (touchscreen taps) 4 px inside the far edge of each
+    control's reach — where nothing of it is drawn — does that control's thing and nothing else: 「＋」「−」 of the price above the price,
+    「＋」「−」 of the stock below the stock, 「補到建議」 below itself, the switch above itself. Where the price's reach meets the stock's,
+    2 px either side goes to the nearer one. Each control is 44 high, and a dish's row is as tall as it was before the reach (the
+    numbers of 1c2db6e: 156.5 / 134.4 / 126.4 px on average at 375 / 390 / 430).
+    (4 px, not 2: within 2–3 px of the line between a 「−」「＋」 and the 「補到建議」 under it, Chromium's touch adjustment moves a
+    tap into 「補到建議」 — the same on 1c2db6e, before the reach was made 44 — docs/evidence/eight_2026-10-13/batch2/touch_edges.txt.
+    A finger is not that exact; what this asks is that the reach a finger meets past what is drawn is the control's.)"""
+    AVG = {375: 156.5, 390: 134.4, 430: 126.4}
+    for W in WIDTHS:
+        p = Player(b, port, target, save=LATE, W=W)
+        try:
+            _to_prep(p)
+            d = p.ev("""(()=>{const sug=suggestStock();const rows=[...document.querySelectorAll('#screen .menu-row')].filter(r=>r.querySelector('[data-act=stockTo][data-k=sug]:not(:disabled)'));
+              for(const r of rows){const d=r.querySelector('[data-act=stockTo]').dataset.d;if((S.stock[d]||0)>=2&&(sug[d]||0)>(S.stock[d]||0)+1&&DISH(d).cat!=='drink')return d}return null})()""")
+            check(d, f'{W}: no dish on the Day 92 prep screen with stock to add and the price, stock and switch')
+            avg = p.ev("(()=>{const hs=[...document.querySelectorAll('#screen .menu-row')].filter(r=>r.getBoundingClientRect().height>0).map(r=>r.getBoundingClientRect().height);return hs.reduce((a,b)=>a+b,0)/hs.length})()")
+            check(abs(avg - AVG[W]) < 0.6, f'{W}: a dish\'s row is {avg:.1f} px on average, it was {AVG[W]} — the reach made the rows taller')
+
+            def row():
+                p.ev(f"""(()=>{{const e=document.querySelector('#screen [data-act=stockTo][data-d="{d}"]');e.closest('.menu-row').scrollIntoView({{block:'center'}})}})()""")
+                p.frames(2)
+                return json.loads(p.ev(f"JSON.stringify({_REACH_ROW}('{d}'))"))
+
+            def tap(x, y):
+                p.page.touchscreen.tap(x, y); p.frames(6)
+
+            r0 = row()
+            for k in ('pm', 'pp', 'sm', 'sp', 'sug', 'tog'):
+                h = r0[k]['b'] - r0[k]['t']
+                check(h >= 43.5, f'{W}: {k} takes a press only {h:.0f} high')
+            # the price: its reach is above the drawn stepper
+            tap(r0['pp']['r'] - 3, r0['pp']['t'] + 4)
+            r1 = row(); check(r1['price'] > r0['price'] and r1['stock'] == r0['stock'], f'{W}: a tap at the top of 「＋」 (price) did not raise the price alone: {r0["price"]}/{r0["stock"]} → {r1["price"]}/{r1["stock"]}')
+            tap(r1['pm']['l'] + 3, r1['pm']['t'] + 4)
+            r2 = row(); check(r2['price'] == r0['price'] and r2['stock'] == r0['stock'], f'{W}: a tap at the top of 「−」 (price) did not bring the price back: {r1["price"]} → {r2["price"]}, stock {r2["stock"]}')
+            # the stock: its reach is below
+            tap(r2['sp']['r'] - 3, r2['sp']['b'] - 4)
+            r3 = row(); check(r3['stock'] == r0['stock'] + 1 and r3['price'] == r0['price'], f'{W}: a tap at the bottom of 「＋」 (stock) did not add one: {r2["stock"]} → {r3["stock"]}, price {r3["price"]}')
+            tap(r3['sm']['l'] + 3, r3['sm']['b'] - 4)
+            r4 = row(); check(r4['stock'] == r0['stock'] and r4['price'] == r0['price'], f'{W}: a tap at the bottom of 「−」 (stock) did not take one back: {r3["stock"]} → {r4["stock"]}')
+            # where the price's reach meets the stock's (375, 390: one over the other): 1 px each side
+            if r4['sp']['t'] > r4['pp']['t'] + 20 and r4['sp']['l'] < r4['pp']['r'] and r4['pp']['l'] < r4['sp']['r']:
+                xm = (max(r4['pp']['l'], r4['sp']['l']) + min(r4['pp']['r'], r4['sp']['r'])) / 2
+                tap(xm, r4['pp']['b'] - 2)
+                r5 = row(); check(r5['price'] > r4['price'] and r5['stock'] == r4['stock'], f'{W}: 2 px above where the price\'s reach ends went to {"the stock" if r5["stock"] != r4["stock"] else "nothing"}')
+                tap(xm, r5['sp']['t'] + 2)
+                r6 = row(); check(r6['stock'] == r5['stock'] + 1 and r6['price'] == r5['price'], f'{W}: 2 px below where the stock\'s reach starts went to {"the price" if r6["price"] != r5["price"] else "nothing"}')
+                tap(r6['pm']['l'] + 3, r6['pm']['t'] + 4); tap(r6['sm']['l'] + 3, r6['sm']['b'] - 4)
+                r4 = row(); check(r4['stock'] == r0['stock'] and r4['price'] == r0['price'], f'{W}: could not put the price and the stock back: {r4}')
+            # 補到建議: its reach is below what is drawn (over the small type)
+            tap((r4['sug']['l'] + r4['sug']['r']) / 2, r4['sug']['b'] - 4)
+            r7 = row(); check(r7['stock'] == r7['sugN'] and r7['price'] == r0['price'], f'{W}: a tap at the bottom of 「補到建議」 did not fill to {r7["sugN"]}: {r4["stock"]} → {r7["stock"]}')
+            # the switch: its reach is above
+            tap((r7['tog']['l'] + r7['tog']['r']) / 2, r7['tog']['t'] + 4)
+            p.settle()
+            on = p.ev(f"S.menu.includes('{d}')")
+            check(on is False, f'{W}: a tap at the top of the switch did not take the dish off the menu')
+        finally:
+            p.close()
+
+
+@test
+def qa_the_staff_x_takes_a_finger(b, port, target):
+    """Decision 八 (2026-10-13): 「商店「工作分配」仍約 24×24 的「×」也一併改善觸控範圍」「不可因擴大點擊區而誤觸旁邊的按鈕」「以手機尺寸
+    實際點擊驗證」. On the user's Day 92 save, shop › 員工 at 375 and 430: every 「×」 (taking someone off a station) is 44 high and 37
+    wide (as wide as it can be without going over the 「LV」 beside it, or more than half the way to the next chip), still drawn as
+    the 24 px ring; every point of its box is that 「×」; a finger at the corner of the box — outside the ring — takes that cook off
+    his station, and a finger just inside the 「＋ 加人」 beside it opens that, taking no one off."""
+    for W in (375, 430):
+        p = Player(b, port, target, save=LATE, W=W)
+        try:
+            p.tap('#screen [data-act=open]'); p.settle()
+            check(p.state()['phase'] == 'shop', f'not in the shop: {p.state()}')
+            p.tap('#screen [data-act=tab][data-k=staff]'); p.settle()
+            out = json.loads(p.ev(r"""JSON.stringify((()=>{const xs=[...document.querySelectorAll('#screen .bchip .x')];const small=[],bad=[];
+              for(const e of xs){e.scrollIntoView({block:'center'});const r=e.getBoundingClientRect();if(r.width<36.5||r.height<43.5)small.push([e.getAttribute('aria-label'),r.width,r.height]);
+                for(const [x,y] of [[r.left+1,r.top+1],[r.right-1,r.top+1],[r.left+1,r.bottom-1],[r.right-1,r.bottom-1],[(r.left+r.right)/2,(r.top+r.bottom)/2]]){const h=document.elementFromPoint(x,y);if(h!==e){bad.push([e.getAttribute('aria-label'),Math.round(x-r.left),Math.round(y-r.top),h?(h.dataset.act||h.className||h.tagName):null]);break}}}
+              const ring=xs[0]?getComputedStyle(xs[0]).backgroundImage:'';return {n:xs.length,small,bad,ring}})())"""))
+            check(out['n'] >= 10, f'{W}: the stations\' 「×」 are not there: {out["n"]}')
+            check(not out['small'], f'{W}: 「×」 smaller than 37×44: {out["small"][:4]}')
+            check(not out['bad'], f'{W}: part of a 「×」 goes to something else: {out["bad"][:4]}')
+            check('radial-gradient' in out['ring'] and '12px' in out['ring'], f'{W}: the 「×」 is not drawn as its 24 px ring: {out["ring"]}')
+            FIND = r"""JSON.stringify((()=>{const xs=[...document.querySelectorAll('#screen .bchip .x[data-act=bdRm]')].filter(x=>{const m=(S.crew||[]).find(m=>m.id===x.dataset.k);return m&&m.duty});
+              const e=xs.find(x=>{const n=x.closest('.bchip').nextElementSibling;return n&&n.dataset.act==='bdOpen'})||null;if(!e)return null;
+              e.scrollIntoView({block:'center'});const r=e.getBoundingClientRect(),q=e.closest('.bchip').nextElementSibling.getBoundingClientRect();return {id:e.dataset.k,l:r.left,t:r.top,r:r.right,b:r.bottom,al:q.left,at:q.top,ab:q.bottom}})())"""
+            pick = json.loads(p.ev(FIND))
+            check(pick, f'{W}: no cook on a station with 「＋ 加人」 beside him')
+            duty = lambda: p.ev(f"((S.crew||[]).find(m=>m.id==={json.dumps(pick['id'])})||{{}}).duty||null")
+            d0 = duty()
+            # the next control, 「＋ 加人」, 4 px inside its near edge: it opens, and no one is taken off
+            p.page.touchscreen.tap(pick['al'] + 4, (pick['at'] + pick['ab']) / 2); p.frames(6)
+            opened = p.ev("!!document.querySelector('#screen .badd.on')")
+            check(duty() == d0 and opened, f'{W}: a tap just inside 「＋ 加人」 beside the 「×」: duty {d0} → {duty()}, opened {opened}')
+            pick = json.loads(p.ev(FIND))
+            p.page.touchscreen.tap(pick['r'] - 4, pick['t'] + 4); p.frames(6)
+            check(duty() is None, f'{W}: a tap at the top right corner of the 「×」 (outside its ring) did not take {pick["id"]} off {d0}')
+        finally:
+            p.close()
+
+
+@test
+def qa_the_summary_says_when_the_fridge_was_short(b, port, target):
+    """Decision 五 (2026-10-13): 「如果當晚確實因庫存不足造成售完，可以在結算頁面簡短說明，幫玩家理解損失」「所有數字應由真實營運資料
+    計算，不得寫死」. On the user's Day 92 save (the suggestion cut to the fridge: 468 wanted, 400 held), restocked and opened: two
+    dishes run out with tables still asking for them (3 and 2) — the summary says, under 「今天賣了什麼」, the day's demand and the
+    fridge, how many dishes ran out, the 5 portions and what they would have fetched at tonight's prices; on the Day 33 save (the
+    fridge held the day) the same night says nothing. 「可升級冰箱」 only while there is an upgrade left (the Day 92 fridge is at
+    its largest; with the fridge two levels down, the prep card says it can grow)."""
+    for save in (LATE, 'player_day33.json'):
+        p = Player(b, port, target, save=save, W=390, checkpoint=False)
+        try:
+            _to_prep(p)
+            capd = p.ev("S.today.sugCapped||0")
+            if save == LATE:
+                txt = p.ev("(document.querySelector('#screen .rs-short')||{}).innerText||''")
+                check(capd and '冰箱和冷藏庫都已經是最大' in txt and '可升級' not in txt, f'the Day 92 fridge is at its largest; the prep card says: {txt!r}')
+                lv = p.ev("S.eq.fridge")
+                p.ev("S.eq.fridge=3;S.today.sugKey=null;showPrep()"); p.frames(3)
+                txt2 = json.loads(p.ev("JSON.stringify({t:(document.querySelector('#screen .rs-short')||{}).innerText||'',capd:S.today.sugCapped,cap:fridgeCap()})"))
+                check(f'預估需求 {txt2["capd"]} 份｜冰箱容量 {txt2["cap"]} 份' in txt2['t'] and '可升級冰箱增加容量' in txt2['t'], f'a smaller fridge: {txt2}')
+                p.ev(f"S.eq.fridge={lv};S.today.sugKey=null;showPrep()"); p.frames(3)
+            p.restock(); p.start_day()
+            r = json.loads(p.ev(r"""JSON.stringify((()=>{const ms=menuList().filter(d=>DISH(d)&&!DISH(d).bar&&DISH(d).cat!=='drink');const a=ms[0],b=ms[1];S.stock[a]=0;S.stock[b]=0;R.st.dish[a]=(R.st.dish[a]||0)+4;R.st.unmet={[a]:3,[b]:2};
+              const st=R.st;for(const g of R.groups)g.gone=true;R.groups.length=0;R.closed=true;R.ended=true;endDay();while(typeof DLG!=='undefined'&&DLG)dlgNext();if(phase!=='summary')showSummary();
+              const out=menuList().filter(d=>DISH(d)&&!DISH(d).bar&&(S.stock[d]||0)<=0&&((st.dish[d]||0)>0||(st.unmet[d]||0)>0)).length;
+              const h=[...document.querySelectorAll('#screen h3')].find(x=>x.innerText.includes('今天賣了什麼'));const el=document.querySelector('#screen .sum-fridge');
+              return {txt:el?el.innerText:null,under:!!(h&&el&&h.nextElementSibling===el),rev:fmt(3*priceOf(a)+2*priceOf(b)),out,cap:fridgeCap(),px:el?parseFloat(getComputedStyle(el).fontSize):0}})())"""))
+            if save == LATE:
+                check(r['txt'], 'the Day 92 night ran out with the fridge too small for the day, and the summary says nothing')
+                for part in (f'預估需求 {capd} 份｜冰箱容量 {r["cap"]} 份', f'今晚 {r["out"]} 道菜賣完', '估計 5 份', r['rev']):
+                    check(part in r['txt'], f'the summary\'s fridge line misses 「{part}」: {r["txt"]!r}')
+                check('升級冰箱' not in r['txt'], f'the fridge is at its largest, the summary still says to upgrade: {r["txt"]!r}')
+                check(r['under'] and r['px'] >= 13, f'the line is not right under 「今天賣了什麼」 in readable type: {r}')
+            else:
+                check(not capd and r['txt'] is None, f'the Day 33 fridge held the day (capped {capd}); the summary still blames it: {r["txt"]!r}')
         finally:
             p.close()
 

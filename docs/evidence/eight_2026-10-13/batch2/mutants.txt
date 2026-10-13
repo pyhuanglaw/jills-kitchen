@@ -1,0 +1,81 @@
+== current (test: qa_restock_sits_under_todays_weather)
+PASS  qa_restock_sits_under_todays_weather  (6.1s)
+== current (test: qa_the_prep_screens_44_reach_by_real_taps)
+PASS  qa_the_prep_screens_44_reach_by_real_taps  (13.2s)
+== current (test: qa_the_staff_x_takes_a_finger)
+PASS  qa_the_staff_x_takes_a_finger  (3.7s)
+== current (test: qa_the_summary_says_when_the_fridge_was_short)
+PASS  qa_the_summary_says_when_the_fridge_was_short  (4.7s)
+== current (test: qa_the_prep_screens_small_buttons_take_a_finger)
+PASS  qa_the_prep_screens_small_buttons_take_a_finger  (3.8s)
+== restock_at_the_foot (test: qa_restock_sits_under_todays_weather)
+FAIL  qa_restock_sits_under_todays_weather  (1.9s)
+      player_day92_2105.json 390×844: the button is not on the opening screen, clear of the 開始營業 bar: top 8929, bottom 8972, bar at 764, screen 844, reachable False
+== shortfall_written_in (test: qa_restock_sits_under_todays_weather)
+FAIL  qa_restock_sits_under_todays_weather  (1.7s)
+      player_day92_2105.json 390×844: the shortfall line is not the day's numbers (468, 400): '預估需求 118 份｜冰箱容量 60 份'
+== shortfall_small (test: qa_restock_sits_under_todays_weather)
+FAIL  qa_restock_sits_under_todays_weather  (1.9s)
+      player_day92_2105.json 390×844: the shortfall is in small type: 11.5 / 11 px
+== estimate_from_deficits (test: qa_restock_sits_under_todays_weather)
+FAIL  qa_restock_sits_under_todays_weather  (1.8s)
+      player_day92_2105.json 390×844: the card's estimate is not the game's (223 份, $23,678): '備料\n冰箱 177/400 份\n\n照今晚的建議量還要補 227 份，約 $24,110。\n\n預估需求 468 份｜冰箱容量 400 份\n部分料理可能提前售完，冰箱和冷藏庫都已經是最大\n一鍵補到建議量 $24,110'
+== own_algorithm (test: qa_restock_sits_under_todays_weather)
+FAIL  qa_restock_sits_under_todays_weather  (2.4s)
+      player_day92_2105.json 390×844: the stock is not what the restock plan says (wanted, got): {'chicken': (11, 4), 'soup': (0, 3), 'signature': (19, 20), 'blacktea': (21, 22), 'coffee': (24, 25), 'steak': (18, 19)}
+== always_upgrade (test: qa_the_summary_says_when_the_fridge_was_short)
+FAIL  qa_the_summary_says_when_the_fridge_was_short  (1.5s)
+      the Day 92 fridge is at its largest; the prep card says: '預估需求 468 份｜冰箱容量 400 份\n部分料理可能提前售完，可升級冰箱增加容量'
+== summary_any_night (test: qa_the_summary_says_when_the_fridge_was_short)
+FAIL  qa_the_summary_says_when_the_fridge_was_short  (4.6s)
+      the Day 33 fridge held the day (capped 0); the summary still blames it: '冰箱不夠放：預估需求 0 份｜冰箱容量 260 份\n開店時放了 236 份。今晚 2 道菜賣完，賣完後還有人想點的估計 5 份（照售價約 $2,780）。升級冰箱可以多放。'
+== summary_upgrade_always (test: qa_the_summary_says_when_the_fridge_was_short)
+FAIL  qa_the_summary_says_when_the_fridge_was_short  (2.8s)
+      the fridge is at its largest, the summary still says to upgrade: '冰箱不夠放：預估需求 468 份｜冰箱容量 400 份\n今晚 2 道菜賣完，賣完後還有人想點的估計 5 份（照售價約 $3,540）。升級冰箱可以多放。'
+== summary_no_line (test: qa_the_summary_says_when_the_fridge_was_short)
+FAIL  qa_the_summary_says_when_the_fridge_was_short  (3.1s)
+      the Day 92 night ran out with the fridge too small for the day, and the summary says nothing
+== reach_v255 (test: qa_the_prep_screens_44_reach_by_real_taps)
+FAIL  qa_the_prep_screens_44_reach_by_real_taps  (1.8s)
+      375: pm takes a press only 38 high
+== reach_v255 (test: qa_the_prep_screens_small_buttons_take_a_finger)
+FAIL  qa_the_prep_screens_small_buttons_take_a_finger  (2.0s)
+      375: 218 of 218 controls take a press only as far as a small button: [['stock-2', 46, 42], ['stock2', 46, 42], ['stock-2', 46, 42], ['stock2', 46, 42], ['toggle', 54, 36], ['toggle', 54, 36]]
+== reach_overlaps (test: qa_the_prep_screens_44_reach_by_real_taps)
+FAIL  qa_the_prep_screens_44_reach_by_real_taps  (3.3s)
+      375: a tap at the bottom of 「−」 (stock) did not take one back: 4 → 7
+== reach_overlaps (test: qa_the_prep_screens_small_buttons_take_a_finger)
+FAIL  qa_the_prep_screens_small_buttons_take_a_finger  (1.9s)
+      375: 114 of 218 controls lose part of their box to another control: [['price-1', 1, 43, 'stock'], ['price1', 1, 43, 'stock'], ['stock-1', 1, 43, 'stockTo'], ['stock1', 1, 43, 'stockTo'], ['price-1', 1, 43, 'stock'], ['price1', 1, 43, 'stock']]
+== mini_under_the_note (test: qa_the_prep_screens_44_reach_by_real_taps)
+PASS  qa_the_prep_screens_44_reach_by_real_taps  (12.9s)
+== mini_under_the_note (test: qa_the_prep_screens_small_buttons_take_a_finger)
+PASS  qa_the_prep_screens_small_buttons_take_a_finger  (4.4s)
+== rows_taller (test: qa_the_prep_screens_44_reach_by_real_taps)
+FAIL  qa_the_prep_screens_44_reach_by_real_taps  (1.8s)
+      375: a dish's row is 167.1 px on average, it was 156.5 — the reach made the rows taller
+== rows_taller (test: qa_the_prep_screens_small_buttons_take_a_finger)
+PASS  qa_the_prep_screens_small_buttons_take_a_finger  (4.4s)
+== tog_even_in_rows (test: qa_the_prep_screens_44_reach_by_real_taps)
+PASS  qa_the_prep_screens_44_reach_by_real_taps  (13.2s)
+== tog_even_in_rows (test: qa_the_prep_screens_small_buttons_take_a_finger)
+FAIL  qa_the_prep_screens_small_buttons_take_a_finger  (3.6s)
+      430: 23 of 218 controls lose part of their box to another control: [['toggle', 1, 43, 'stock'], ['toggle', 1, 43, 'stock'], ['toggle', 1, 43, 'stock'], ['toggle', 1, 43, 'stock'], ['toggle', 1, 43, 'stock'], ['toggle', 1, 43, 'stock']]
+== x_24 (test: qa_the_staff_x_takes_a_finger)
+FAIL  qa_the_staff_x_takes_a_finger  (1.2s)
+      375: 「×」 smaller than 37×44: [['把 Hugo 移出', 24, 24], ['把 阿勇 移出', 24, 24], ['把 阿拓 移出', 24, 24], ['把 小林師傅 移出', 24, 24]]
+== x_rows_close (test: qa_the_staff_x_takes_a_finger)
+FAIL  qa_the_staff_x_takes_a_finger  (1.3s)
+      375: part of a 「×」 goes to something else: [['把 Hugo 移出', 1, 43, 'bdRm'], ['把 阿勇 移出', 1, 43, 'bdRm'], ['把 阿德師傅 移出', 1, 43, 'bdRm'], ['把 Evan 移出', 1, 43, 'bdRm']]
+
+== mini_under_the_note, corrected (the first version kept z-index:0 on a flex item, so the button stayed over the note: it did not break anything — rebuilt with position:static;z-index:auto)
+FAIL  qa_the_prep_screens_44_reach_by_real_taps — 375: a tap at the bottom of 「補到建議」 did not fill to 7: 3 → 3
+FAIL  qa_the_prep_screens_small_buttons_take_a_finger — 375: 50 of 218 controls lose part of their box to another control: [['stockTosug', 84, 43, 'SMALL.pf fair'], ...]
+
+== qa_restock_says_why_it_cannot, adapted (the restock button is greyed with 「（冰箱已滿）」 when the press can buy nothing; the
+   test pressed it and met a disabled button). What it was written for — a press with a full fridge that does nothing and
+   says nothing — is checked both ways now:
+current                     PASS
+greyed_silent               FAIL  一鍵補到建議量 greyed with a full fridge and [...22 dishes] short, without saying why: {'dis': True, 'txt': '一鍵補到建議量 （已足夠）', 'card': '…今晚的菜都補到建議量了。…'}
+live_silent                 FAIL  一鍵補到建議量 with a full fridge: [...22 dishes] stay short and nothing says why
+1c2db6e (before batch two)  PASS  (the old path: the button pressed, the toast 「冰箱滿了（400/400）…」)
