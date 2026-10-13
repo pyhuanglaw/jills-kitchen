@@ -209,12 +209,15 @@ const NAMES={
    the user's Day 6 save): three tables of office workers the player could only take for one man. A guest with no name of
    their own (not a regular, not a named person, not anyone a story or a booking named) whose name tonight has already
    used gets one it has not: the rest of the kind's pool first, then these — names only, nobody with a story, none the
-   game uses for anyone else — and when even these are gone, 「另一位」 the name drawn (freshName). */
+   game uses for anyone else — and when even these are gone, 「另一位」 the name drawn (freshName). How many: a late
+   evening of the user's Day 92 save played on (2026-10-11) had up to 20 couples and about 60 single grown-ups and
+   students walk in, and up to 17 groups turned away at the door (they took a name too): the couples' first 13 ran
+   out (21 couples and the door's), so there are enough here for about twice that. */
 const NAMES_MORE={
- office:['許小姐','鄭先生','謝經理','郭小姐','洪先生','曾小姐','邱先生','廖小姐','賴先生','徐小姐','葉先生','蘇小姐','莊先生','呂小姐','江先生','何小姐','羅先生','Kevin','Vivian','Daniel','Joyce','Peter','Cindy','Tony','Wendy'],
+ office:['許小姐','鄭先生','謝經理','郭小姐','洪先生','曾小姐','邱先生','廖小姐','賴先生','徐小姐','葉先生','蘇小姐','莊先生','呂小姐','江先生','何小姐','羅先生','Kevin','Vivian','Daniel','Joyce','Peter','Cindy','Tony','Wendy','方小姐','孫先生','馬經理','朱小姐','胡先生','簡小姐','汪先生','石小姐','Alice','Brian','Nancy','Mark','Linda','Jerry'],
  student:['小柏','阿翔','小涵','阿誠','Sandy','小芸','阿豪','Joy','小真','阿樂','Kelly','小恩'],
  gourmet:['Olivia','Henry','Claire','Vincent','Jasmine','Albert','Irene','Louis'],
- couple:['阿翰與小慧','Max 與 Zoe','阿志與佩佩','Tom 與 Jenny','阿宏與小如','Chris 與 Nora','Eason 與 Kiki','阿文與小敏'],
+ couple:['阿翰與小慧','Max 與 Zoe','阿志與佩佩','Tom 與 Jenny','阿宏與小如','Chris 與 Nora','Eason 與 Kiki','阿文與小敏','阿祥與小琳','阿成與小蓉','阿峰與小婷','阿偉與小娟','阿政與小雅','阿龍與小青','阿嘉與小萱','Nick 與 Amber','Alan 與 Fiona','Eddie 與 Joanne','Frank 與 Tiffany','Gary 與 Stella','Ivan 與 Sharon','Owen 與 Lucy','Paul 與 Mandy','Steve 與 Carol'],
  family:['黃家','吳家四口','劉家','楊家三口','許媽媽一家','鄭家','謝家三口','郭家','蔡家','何家四口'],
 };
 const REGS=[
