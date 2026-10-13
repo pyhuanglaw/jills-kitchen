@@ -216,7 +216,7 @@ const NAMES={
    calls a guest it does not know: a surname — 「鍾先生」「彭小姐」, 「鍾先生和太太」, 「鍾家」 (nmGen) — from surnames no one in
    the game has (not 王 李 林 陳 周 杜 沈 許: the Wangs, 老饕李先生, Madame Lin and 林予安, 陳伯伯, 周董, Monsieur 杜, 沈晴,
    許葳). (2026-10-11: on the user's Day 92 save a late evening uses 60–80 names of grown-ups, counting the door.) */
-const NM_SURN='鍾彭游詹胡施余盧梁趙顏柯翁魏孫戴范方宋鄧傅侯曹薛丁卓阮馬溫唐藍蔣石古紀姚連馮歐程湯黃蔡楊鄭謝郭洪曾邱廖賴徐葉蘇莊呂江何蕭羅高潘簡朱'.split('');
+const NM_SURN='鍾彭游詹胡施余盧梁趙顏柯翁魏孫戴方宋鄧傅侯曹薛丁卓阮馬溫唐藍蔣石古紀姚連馮歐程湯黃蔡楊鄭謝郭洪曾邱廖賴徐葉蘇莊呂江何蕭羅高潘簡朱'.split('');
 function nmGen(type){return type==='couple'?NM_SURN.map(x=>x+'先生和太太'):type==='family'?NM_SURN.map(x=>x+'家'):type==='student'?[]:NM_SURN.flatMap(x=>[x+'先生',x+'小姐'])}
 const NAMES_MORE={
  office:['鍾小姐','鄭先生','謝經理','郭小姐','洪先生','曾小姐','邱先生','廖小姐','賴先生','徐小姐','葉先生','蘇小姐','莊先生','呂小姐','江先生','何小姐','羅先生','Kevin','Vivian','Daniel','Joyce','Peter','Cindy','Tony','Wendy','方小姐','孫先生','馬經理','朱小姐','胡先生','簡小姐','汪先生','石小姐','Alice','Brian','Nancy','Mark','Linda','Jerry'],
@@ -12620,7 +12620,7 @@ function hideScreen(){screenEl.hidden=true;screenEl.innerHTML='';sub=null}
    「補貨完成時顯示簡短摘要」), 「只進了 N 份」, the shop's 「錢不夠」. While a sheet is open the same notices sit on top of it,
    above its bottom button (no tap is taken: they never catch one); back in the room when it closes */
 function toastsHost(){const b=$('#toasts'),sc=$('#screen'),app=$('#app'),w=$('#sceneWrap');if(!b||!sc||!app||!w)return;if(!sc.hidden){if(b.parentNode!==app){app.appendChild(b);b.classList.add('over')}}else if(b.parentNode!==w){w.insertBefore(b,$('#storyNote'));b.classList.remove('over')}}
-try{new MutationObserver(toastsHost).observe($('#screen'),{attributes:true,attributeFilter:['hidden']})}catch(e){}
+try{new window.MutationObserver(toastsHost).observe($('#screen'),{attributes:true,attributeFilter:['hidden']})}catch(e){}
 function topIcons(){return`<button class="icon-btn" data-act="peek" aria-label="看店裡" style="font-weight:800;font-size:11px;width:auto;padding:0 9px">看店裡</button><button class="icon-btn" data-act="guide" aria-label="店主手冊" style="font-weight:800;font-size:15px">?</button><button class="icon-btn" data-act="book" aria-label="餐廳日誌">${SVG.book}</button><button class="icon-btn" data-act="settings" aria-label="設定">${SVG.gear}</button>`}
 
 function showTitle(){phase='title';mainScreen='title';R=null;IDLE=null;lifeReset();hud(true);renderTickets();const has=hasSave()&&(S.day>1||S.stats.days>0);
