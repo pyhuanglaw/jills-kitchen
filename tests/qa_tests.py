@@ -907,10 +907,13 @@ def qa_a_table_that_gave_up_does_not_review_the_door(b, port, target):
 @test
 def qa_the_prep_screens_small_buttons_take_a_finger(b, port, target):
     """Audit WS2-15, still so on 2026-10-13 (the user's Day 92 save): the prep screen's 「−」「＋」 are 30×30 (116 of them), the
-    switches 46×28, 「補滿」 41×28 — under a finger. The place that takes the press now reaches past each drawn control (steppers
-    6 px left and right, 4 px up and down; switches 4 px; 「補到建議」「補滿」 2 px sideways, 4 px up and down), half of the
-    narrowest gap to the next control, so every point of every control's reach presses that control and no other. Nothing drawn
-    moves. Phone widths 375 and 430, every control on the screen, by the page's own hit testing."""
+    switches 46×28, 「補滿」 41×28 — under a finger. The box that takes the press is now bigger than what is drawn: 「−」「＋」 at
+    least 42×38 (34×34 drawn on the signature's: 46×42), the switches 54×36, 「補到建議」「補滿」 36 high — half of the narrowest
+    gap to the next control, so every point of every control's box presses that control and no other. Nothing drawn moves
+    (docs/evidence/qa5_2026-10-13/tap_reach/: the screens pixel for pixel). Phone widths 375 and 430, every control on the
+    screen, by the page's own hit testing.
+    (First written against a ::before reaching past the button, it sampled the drawn box widened by the reach; the reach is now
+    the button's own box, so it samples that box and asks its size — the same points, docs/evidence/qa5_2026-10-13/tap_reach/.)"""
     for W in (375, 430):
         p = Player(b, port, target, save=LATE, W=W)
         try:
@@ -920,14 +923,17 @@ def qa_the_prep_screens_small_buttons_take_a_finger(b, port, target):
             p.settle()
             check(p.state()['phase'] == 'prep', f'not at the prep screen: {p.state()}')
             out = json.loads(p.ev(r"""JSON.stringify((()=>{const sc=document.querySelector('#screen');const els=[...sc.querySelectorAll('.tog, .step button, .stkq .mini')].filter(e=>e.getBoundingClientRect().width>0&&!e.disabled);
-              const reach=e=>e.classList.contains('tog')?[4,4]:e.classList.contains('mini')?[2,4]:[6,4];const bad=[];let n=0,small=0;
-              for(const e of els){e.scrollIntoView({block:'center'});const r=e.getBoundingClientRect();const [h,v]=reach(e);if(r.width<44||r.height<44)small++;
-                const L=r.left-h+1,T=r.top-v+1,Rt=r.right+h-1,B=r.bottom+v-1;
-                for(const [x,y] of [[L,T],[Rt,T],[L,B],[Rt,B],[(L+Rt)/2,T],[(L+Rt)/2,B],[L,(T+B)/2],[Rt,(T+B)/2]]){n++;const hit=document.elementFromPoint(x,y);const got=hit&&hit.closest('button');
+              const need=e=>e.classList.contains('tog')?[54,36]:e.classList.contains('mini')?[0,36]:e.closest('.sig')?[46,42]:[42,38];const bad=[],small=[];let n=0;
+              for(const e of els){e.scrollIntoView({block:'center'});const r=e.getBoundingClientRect();const [w,h]=need(e);
+                if(r.width<w-.5||r.height<h-.5)small.push([e.dataset.act+(e.dataset.v||e.dataset.k||''),Math.round(r.width),Math.round(r.height)]);
+                const L=r.left+1,T=r.top+1,Rt=r.right-1,B=r.bottom-1;const rad=getComputedStyle(e).borderTopLeftRadius.split(' ').map(parseFloat);const cx=(rad[0]||0)*.2929,cy=(rad[1]!=null?rad[1]:rad[0]||0)*.2929;
+                /* the corners of a rounded box are not the box: its corner points are taken on the curve (45°) */
+                for(const [x,y] of [[L+cx,T+cy],[Rt-cx,T+cy],[L+cx,B-cy],[Rt-cx,B-cy],[(L+Rt)/2,T],[(L+Rt)/2,B],[L,(T+B)/2],[Rt,(T+B)/2]]){n++;const hit=document.elementFromPoint(x,y);const got=hit&&hit.closest('button');
                   if(got!==e){bad.push([e.dataset.act+(e.dataset.v||e.dataset.k||''),Math.round(x-r.left),Math.round(y-r.top),got?(got.dataset.act||got.className):(hit?hit.tagName+'.'+hit.className:null)]);break}}}
-              return {controls:els.length,small,points:n,bad:bad.slice(0,6),nbad:bad.length}})())"""))
-            check(out['controls'] >= 100 and out['small'] >= 100, f'{W}: the late prep screen should show its many small controls: {out}')
-            check(out['nbad'] == 0, f'{W}: {out["nbad"]} of {out["controls"]} controls do not take the press just outside what is drawn (or another control does): {out["bad"]}')
+              return {controls:els.length,points:n,small:small.slice(0,6),nsmall:small.length,bad:bad.slice(0,6),nbad:bad.length}})())"""))
+            check(out['controls'] >= 100, f'{W}: the late prep screen should show its many small controls: {out}')
+            check(out['nsmall'] == 0, f'{W}: {out["nsmall"]} of {out["controls"]} controls take a press only as far as a small button: {out["small"]}')
+            check(out['nbad'] == 0, f'{W}: {out["nbad"]} of {out["controls"]} controls lose part of their box to another control: {out["bad"]}')
         finally:
             p.close()
 

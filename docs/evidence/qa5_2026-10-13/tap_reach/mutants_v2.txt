@@ -1,0 +1,15 @@
+== before (the css of 24c04ec, before any reach)
+FAIL  qa_the_prep_screens_small_buttons_take_a_finger  (2.8s)
+      375: 218 of 218 controls take a press only as far as a small button: [['stock-2', 34, 34], ['stock2', 34, 34], ['stock-2', 34, 34], ['stock2', 34, 34], ['toggle', 46, 28], ['toggle', 46, 28]]
+== 「−」「＋」 not positioned: the number covers their reach
+FAIL  qa_the_prep_screens_small_buttons_take_a_finger  (3.7s)
+      375: 58 of 218 controls lose part of their box to another control: [['stock-2', 45, 21, 'SPAN.'], ['stock-2', 45, 21, 'SPAN.'], ['price-1', 41, 19, 'SPAN.'], ['stock-1', 41, 19, 'SPAN.'], ['price-1', 41, 19, 'SPAN.'], ['stock-1', 41, 19, 'SPAN.']]
+== 「−」「＋」 reaching 8 px up and down: the price and stock rows overlap
+FAIL  qa_the_prep_screens_small_buttons_take_a_finger  (2.9s)
+      375: 103 of 218 controls lose part of their box to another control: [['price-1', 1, 45, 'stock'], ['price1', 1, 45, 'stock'], ['stockTosug', 43, 1, 'stock'], ['stockTomax', 23, 1, 'stock'], ['price-1', 1, 45, 'stock'], ['price1', 1, 45, 'stock']]
+== switches without reach
+FAIL  qa_the_prep_screens_small_buttons_take_a_finger  (2.6s)
+      375: 50 of 218 controls take a press only as far as a small button: [['toggle', 46, 28], ['toggle', 46, 28], ['toggle', 46, 28], ['toggle', 46, 28], ['toggle', 46, 28], ['toggle', 46, 28]]
+== 「補到建議」「補滿」 without reach
+FAIL  qa_the_prep_screens_small_buttons_take_a_finger  (3.5s)
+      375: 50 of 218 controls take a press only as far as a small button: [['stockTosug', 81, 28], ['stockTomax', 41, 28], ['stockTosug', 73, 28], ['stockTomax', 41, 28], ['stockTosug', 80, 28], ['stockTomax', 41, 28]]

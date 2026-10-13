@@ -1,0 +1,2 @@
+FAIL  qa_the_screens_fit_375_390_430  (148.3s)
+      375px settings: [['cut', 'BUTTON', 50, 46, ''], ['cut', 'BUTTON', 50, 46, '']] | 375px prep: [['cut', 'BUTTON', 40, 34, '−'], ['cut', 'BUTTON', 40, 34, '＋']] | 390px settings: [['cut', 'BUTTON', 50, 46, ''], ['cut', 'BUTTON', 50, 46, '']] | 390px prep: [['cut', 'BUTTON', 40, 34, '−'], ['cut', 'BUTTON', 40, 34, '＋']] | 430px settings: [['cut', 'BUTTON', 50, 46, ''], ['cut', 'BUTTON', 50, 46, '']] | 430px prep: [['cut', 'BUTTON', 40, 34, '−'], ['cut', 'BUTTON', 40, 34, '＋']]
