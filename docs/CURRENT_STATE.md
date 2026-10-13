@@ -3,12 +3,13 @@
 這份只放「現在」的狀態：branch、版本、待辦、待確認。永久的設計規則在 `docs/PROJECT_MEMORY.md`，不要寫到這裡；這裡的內容過時了就
 直接改掉或刪掉。最後更新：2026-10-13，**v2.5.4 已發布**（使用者 2026-10-11 的三項決策；正式網址 **Version 15**，id `1791906199-248b`；
 遊戲內容＝ commit `f8d9b87`，tag `v2.5.4` 只在本機，GitHub 上是 branch `archive/release-v2.5.4`；報告 `docs/V254_REPORT.md`）。之後照使用者交代的
-第五點自主排查（`docs/QA5_REPORT_2026-10-13.md`），修好三個 bug，**v2.5.5 正在 Release Gate**（下面「已完成、尚未發布」）。
+第五點自主排查（`docs/QA5_REPORT_2026-10-13.md`），修好三個 bug，**v2.5.5 已發布**（Version 16，id `1791915824-da9e`；遊戲內容＝ commit
+`401f7bc`，tag `v2.5.5` 只在本機，GitHub 上是 branch `archive/release-v2.5.5`；報告 `docs/V255_REPORT.md`）。
 
 ## Repo 與 branch
 
 - GitHub：`pyhuanglaw/jills-kitchen`，預設 branch 是 `main`。
-- **`main` ＝ Jill's Kitchen 的正式主線**：目前的、穩定的、發布出去的版本都在這裡。最新正式版是 f8d9b87（v2.5.4）。從 v2.2.1 起的
+- **`main` ＝ Jill's Kitchen 的正式主線**：目前的、穩定的、發布出去的版本都在這裡。最新正式版是 401f7bc（v2.5.5）。從 v2.2.1 起的
   完整開發歷史都在 `main` 上。
 - **2026-10-09：新的料理系統快轉合併進 `main`**（`main` ＝ 2abc52e，從 fc0f5d8 快轉 89 個 commit；遊戲內容＝ commit 8298e18；合併後在 `main`
   上驗證過：開遊戲、讀存檔、核心流程，`docs/evidence/cooking_2026-10-09/regression/after_merge_main_2abc52e_smoke.txt`；使用者 2026-10-09 授權「自主測試、驗收與合併 main」，
@@ -82,6 +83,12 @@
 
 ## 已發布
 
+- **v2.5.5**，2026-10-13，發布到 **https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA**（**Version 16**，id 1791915824-da9e；發布前讀到的線上 id：
+  1791906199-248b）。遊戲內容＝ commit 401f7bc（tag `v2.5.5`，只在本機；GitHub 上 branch `archive/release-v2.5.5`）。報告：`docs/V255_REPORT.md`。
+  Gate：401f7bc 上完整回歸 368/368（`docs/evidence/qa5_2026-10-13/regression/`）；86820a6 上那一次 366/368 的兩個失敗都處理了（小按鈕的做法改了；
+  第 52 天測試照事先寫好的規則比 14 個種子、沒有變慢，種子 7600 → 7000，證據 `docs/evidence/qa5_2026-10-13/day52/`）。合併前的 `main`（1fc0a5c）存在
+  `archive/main-before-v2.5.5-2026-10-13`。內容：第五點排查修好的三個 bug——商店 › 員工總表看得到每個人負責什麼、開店前的小按鈕比較好按、
+  坐著生氣離開的客人評論不再寫「客滿，沒等到位子。」。
 - **v2.5.4**，2026-10-13，發布到 **https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA**（**Version 15**，id 1791906199-248b；發布前讀到的線上 id：
   1791642868-d632）。遊戲內容＝ commit f8d9b87（tag `v2.5.4`，只在本機；GitHub 上 branch `archive/release-v2.5.4`）。報告：`docs/V254_REPORT.md`。
   Gate：f8d9b87 上完整回歸 365/365（三份同時跑；`docs/evidence/v254_2026-10-11/regression/`）；6f650b0 上那一次 364/365 的失敗是測試的缺陷
@@ -133,10 +140,7 @@
 
 ### 已完成、尚未發布
 
-- **v2.5.5（Release Gate 中，branch `feature/cooking-gameplay`）**：第五點排查修好的三個 bug——坐著生氣離開的客人評論不寫「客滿，沒等到位子。」
-  （24c04ec）、開店前的小按鈕按得到的範圍大一點（77f80d4）、商店 › 員工總表「負責什麼」那一欄被擠成 0 px（43703fe）；手冊戳記 v2.5.5（86820a6）。
-  完整回歸在 86820a6 上：`v24_day52_save_plays_the_stories_in_order_over_forty_days` 失敗（怡君第 63 天拿到鑰匙，晚一天），照
-  `docs/evidence/qa5_2026-10-13/day52/README.md` 事先寫好的規則比 14 個種子中。報告草稿 `docs/V255_REPORT.md`。
+- （v2.5.5 發布以後，沒有已完成、尚未發布的遊戲改動。）
 
 - **料理流程 prototype**（branch `proto/cooking-flow`，`prototype/cooking/`）：獨立試玩頁，不是遊戲本體。使用者 2026-10-07：不合併、
   不發布、現在不要再做；之後重新開始時，以正式遊戲原本的廚房畫面為底，不重新設計美術。私人連結 https://claude.ai/artifact/EBzi6qETraguAApvettBFe 。
@@ -223,6 +227,9 @@
 
 ## 待辦／待確認
 
+- **第五點排查留下、要使用者決定的 8 件事**（`docs/QA5_REPORT_2026-10-13.md`「要你決定的」）：Dylan 會因為「想點的都賣完了」走掉；故事角色在一般的晚上照
+  一般客人的規則（Madame Lin 隨機 VIP、一星評論）；王家三口；「一鍵補到建議量」在開店前畫面最底；冰箱放不下那一行字太小；後期冷盤台砧板是廚房最塞的地方；
+  後期每晚約 3 道賣完（冰箱滿級 400 < 需求約 468、預估封頂約 102 位）；小按鈕要不要畫大。另外商店「工作分配」的「×」還是約 24×24。
 - ~~**整夜工作後要使用者決定的三件事**~~：2026-10-11 使用者三件都定案（`docs/v24/three_decisions_2026-10-11.txt`），v2.5.4 做完並發布（`docs/V254_REPORT.md`）。
   使用者同時交代：v2.5.4 發布後繼續用正常玩家模擬自主排查（前期重複提醒、中後期經營瓶頸、故事角色和一般客人規則的衝突、人物／員工／
   貓／房間的矛盾、2026-10-06 Audit 還沒修又能重現的 bug），確定的 bug 直接修，會改故事、人物或核心玩法的先記下來，最後一次回報。
