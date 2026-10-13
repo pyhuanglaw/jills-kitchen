@@ -1,0 +1,44 @@
+# v16_save_continues_in_v17：完整回歸裡失敗的那一次（2026-10-13）
+
+## 原始案例（保留）
+完整回歸 6f650b0（分三份同時跑，另外一局第 92 天存檔模擬也在跑，四顆 CPU）：第二份第 10 個測試
+  FAIL  v16_save_continues_in_v17  (10.0s)
+        the Version 16 backup file was not accepted
+（`6f650b0_part1.txt`）。這個測試以前也在機器很忙時失敗過一次（docs/cooking/ARCHITECTURE.md「完整回歸中 v16_save_continues_in_v17
+失敗過一次（匯入存檔只等 150 毫秒…）」）。
+
+## 原因
+測試選了 Version 16 的備份檔以後，只等固定的 150 毫秒（真實時間）就檢查遊戲有沒有收到檔案（pendingImport）。瀏覽器讀檔
+（FileReader）是自己的時間，不是遊戲的虛擬時鐘。遊戲裡只有三個地方會把 pendingImport 清掉：讀檔失敗（同一個檔案每次結果一樣）、
+按「確定」、按「取消」——測試那時都沒有發生。所以失敗只可能是：檢查的時候檔案還沒讀完。
+
+## 重現與分布（舊的測試，6f650b0）
+- 單獨重跑：3 次 3 次通過。
+- 六個 yes 佔滿 CPU（Chromium 的優先權比較高，搶不太到）：4／4 通過。
+  === run 1: part 1's order up to v16, one browser, the test as it was (6f650b0), three busy processes
+  PASS  v16_save_continues_in_v17  (9.6s)
+  === run 2: part 1's order up to v16, one browser, the test as it was (6f650b0), three busy processes
+  PASS  v16_save_continues_in_v17  (10.8s)
+  === run 3: part 1's order up to v16, one browser, the test as it was (6f650b0), three busy processes
+  PASS  v16_save_continues_in_v17  (10.0s)
+- 三個 golden_frames（Chromium 全畫面繪製）同時跑：5／5 通過。
+- 磁碟大量寫入（兩個 dd，direct I/O）：5／5 通過。
+- 合計：舊的測試 21 次，失敗 1 次（就是完整回歸那一次）。重現不出來，所以改量時間：
+## 選檔以後多久遊戲收到檔案（import_timing.py，每種 15 次）
+- 機器空著：16–48 毫秒（中位數 27）
+- 三個 golden_frames 同時跑：30–89 毫秒（中位數 42），越忙尾巴越長。
+  150 毫秒只有不到兩倍的餘裕；完整回歸那時四個 Chromium 加上磁碟，偶爾超過是合理的。
+
+## 修正（測試，不是遊戲）
+等到遊戲收到檔案為止（最多 5 秒）再檢查（tests/run_tests.py `_wait_import`），兩處匯入都一樣。檢查的內容、門檻都沒變。
+=== the test now, a quiet machine, 3 runs
+PASS  v16_save_continues_in_v17  (8.7s)
+PASS  v16_save_continues_in_v17  (9.5s)
+PASS  v16_save_continues_in_v17  (9.0s)
+## 修正後還抓得到原本要防的問題
+=== the test now against a game that refuses the Version 16 backup file (day 10; the own backup, day 11, still accepted)
+FAIL  v16_save_continues_in_v17  (13.2s)
+      the Version 16 backup file was not accepted
+=== the test as it was (6f650b0) against the same game
+FAIL  v16_save_continues_in_v17  (8.3s)
+      the Version 16 backup file was not accepted

@@ -1295,6 +1295,17 @@ def world_stays_visible_across_days(b, port, target):
     check(not g.errors, g.errors)
     g.close()
 
+def _wait_import(g, limit=5.0):
+    """The browser reads a chosen file on its own time (FileReader), not the game's virtual clock: wait until the game has
+    it (pendingImport) or said why not, up to `limit` seconds. (2026-10-13: the fixed 150 ms this test waited was too short on
+    a busy machine — the v2.5.4 full regression ran three parts and a simulation on four cores and this check failed; alone
+    it passed three times in three. Evidence: docs/evidence/v254_2026-10-11/regression/v16_import_wait.txt.)"""
+    t0 = time.time()
+    while time.time() - t0 < limit:
+        if g.ev("!!(typeof pendingImport!=='undefined'&&pendingImport)"):
+            return
+        g.page.wait_for_timeout(50)
+
 @test
 def v16_save_continues_in_v17(b, port, target):
     """A real Version 16 save (10 days, staff with the game's own ids, Dylan met) opens in this build,
@@ -1321,7 +1332,7 @@ def v16_save_continues_in_v17(b, port, target):
     path = os.path.join(ARTIFACTS, 'v16_roundtrip.json'); os.makedirs(ARTIFACTS, exist_ok=True); dl.value.save_as(path)
     with g.page.expect_file_chooser() as fc:
         g.click('[data-act=import]')
-    fc.value.set_files(path); g.page.wait_for_timeout(150); g.ev("__tick(100)")
+    fc.value.set_files(path); _wait_import(g); g.ev("__tick(100)")
     g.click('[data-act=importYes]'); g.ev("__tick(50)")
     check(g.ev("S.day") == day_after and g.ev("S.crew.length") == len(orig['crew']), 'own backup did not restore')
     g.click('[data-act=open]'); start_day(g); g.ev("__play(60,0)")
@@ -1334,7 +1345,7 @@ def v16_save_continues_in_v17(b, port, target):
     g.click('.links [data-act=settings]') if g.page.is_visible('.links [data-act=settings]') else g.click('[data-act=settings]')
     with g.page.expect_file_chooser() as fc:
         g.click('[data-act=import]')
-    fc.value.set_files(os.path.join(FIXTURES, 'v16_backup_file.json')); g.page.wait_for_timeout(150); g.ev("__tick(100)")
+    fc.value.set_files(os.path.join(FIXTURES, 'v16_backup_file.json')); _wait_import(g); g.ev("__tick(100)")
     check(g.ev("pendingImport&&pendingImport.day===10"), 'the Version 16 backup file was not accepted')
     g.click('[data-act=importYes]'); g.ev("__tick(50)")
     check(g.ev("S.day") == 10 and g.ev("S.regulars.dylan") == orig['regulars']['dylan'], 'V16 backup file not restored')
