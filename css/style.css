@@ -359,6 +359,14 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .step label{font-size:10px;color:var(--ink3);padding-left:8px;font-weight:700}
 /* v2.2: the restock shortcuts beside the stepper */
 .step button:disabled{opacity:.3}
+/* 2026-10-13 (audit WS2-15, still so on the user's Day 92 save: 116 「−」「＋」 of 30×30 and 39 switches of 46×28 on the prep
+   screen, under a finger's 44): the place a finger can press reaches past the drawn button — half of the narrowest gap to the
+   next control (8 px between the price and the stock rows, 5 px between 「補到建議」 and 「補滿」), so no two places overlap.
+   Nothing drawn moves. */
+.step button,.stkq .mini{position:relative}
+.step button::before,.stkq .mini::before,.tog::before{content:"";position:absolute;inset:-4px -6px}
+.stkq .mini::before{inset:-4px -2px}
+.tog::before{inset:-4px -4px}
 .stkq{display:inline-flex;gap:5px}
 .stkq .mini{height:28px;padding:0 9px;border:0;border-radius:9px;background:var(--paper2);box-shadow:inset 0 0 0 1px var(--line);font-weight:800;font-size:11.5px;color:var(--ink)}
 .stkq .mini:disabled{opacity:.35}

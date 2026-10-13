@@ -1,0 +1,9 @@
+== before (HEAD css)
+FAIL  qa_the_prep_screens_small_buttons_take_a_finger  (1.9s)
+      375: 218 of 218 controls do not take the press just outside what is drawn (or another control does): [['stock-2', -5, -3, 'DIV.sig'], ['stock2', -5, -3, 'DIV.'], ['stock-2', -5, -3, 'DIV.sig sigd'], ['stock2', -5, -3, 'DIV.'], ['toggle', -3, -3, 'DIV.menu-row off'], ['toggle', -3, -3, 'DIV.menu-row ']]
+== overlapping reach (steppers 6px up and down: the price and stock rows overlap)
+FAIL  qa_the_prep_screens_small_buttons_take_a_finger  (2.1s)
+      375: 58 of 218 controls do not take the press just outside what is drawn (or another control does): [['price-1', -5, 33, 'stock'], ['price1', -5, 33, 'stock'], ['price-1', -5, 33, 'stock'], ['price1', -5, 33, 'stock'], ['price-1', -5, 33, 'stock'], ['price1', -5, 33, 'stock']]
+== switches without reach
+FAIL  qa_the_prep_screens_small_buttons_take_a_finger  (1.9s)
+      375: 50 of 218 controls do not take the press just outside what is drawn (or another control does): [['toggle', -3, -3, 'DIV.menu-row off'], ['toggle', -3, -3, 'DIV.menu-row '], ['toggle', -3, -3, 'DIV.menu-row off'], ['toggle', -3, -3, 'DIV.menu-row off'], ['toggle', -3, -3, 'DIV.menu-row off'], ['toggle', -3, -3, 'DIV.menu-row ']]

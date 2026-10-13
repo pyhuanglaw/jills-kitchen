@@ -905,6 +905,34 @@ def qa_a_table_that_gave_up_does_not_review_the_door(b, port, target):
 
 
 @test
+def qa_the_prep_screens_small_buttons_take_a_finger(b, port, target):
+    """Audit WS2-15, still so on 2026-10-13 (the user's Day 92 save): the prep screen's 「−」「＋」 are 30×30 (116 of them), the
+    switches 46×28, 「補滿」 41×28 — under a finger. The place that takes the press now reaches past each drawn control (steppers
+    6 px left and right, 4 px up and down; switches 4 px; 「補到建議」「補滿」 2 px sideways, 4 px up and down), half of the
+    narrowest gap to the next control, so every point of every control's reach presses that control and no other. Nothing drawn
+    moves. Phone widths 375 and 430, every control on the screen, by the page's own hit testing."""
+    for W in (375, 430):
+        p = Player(b, port, target, save=LATE, W=W)
+        try:
+            p.tap('#screen [data-act=open]')
+            if p.state()['phase'] == 'shop':
+                p.tap('#screen [data-act=nextDay]')
+            p.settle()
+            check(p.state()['phase'] == 'prep', f'not at the prep screen: {p.state()}')
+            out = json.loads(p.ev(r"""JSON.stringify((()=>{const sc=document.querySelector('#screen');const els=[...sc.querySelectorAll('.tog, .step button, .stkq .mini')].filter(e=>e.getBoundingClientRect().width>0&&!e.disabled);
+              const reach=e=>e.classList.contains('tog')?[4,4]:e.classList.contains('mini')?[2,4]:[6,4];const bad=[];let n=0,small=0;
+              for(const e of els){e.scrollIntoView({block:'center'});const r=e.getBoundingClientRect();const [h,v]=reach(e);if(r.width<44||r.height<44)small++;
+                const L=r.left-h+1,T=r.top-v+1,Rt=r.right+h-1,B=r.bottom+v-1;
+                for(const [x,y] of [[L,T],[Rt,T],[L,B],[Rt,B],[(L+Rt)/2,T],[(L+Rt)/2,B],[L,(T+B)/2],[Rt,(T+B)/2]]){n++;const hit=document.elementFromPoint(x,y);const got=hit&&hit.closest('button');
+                  if(got!==e){bad.push([e.dataset.act+(e.dataset.v||e.dataset.k||''),Math.round(x-r.left),Math.round(y-r.top),got?(got.dataset.act||got.className):(hit?hit.tagName+'.'+hit.className:null)]);break}}}
+              return {controls:els.length,small,points:n,bad:bad.slice(0,6),nbad:bad.length}})())"""))
+            check(out['controls'] >= 100 and out['small'] >= 100, f'{W}: the late prep screen should show its many small controls: {out}')
+            check(out['nbad'] == 0, f'{W}: {out["nbad"]} of {out["controls"]} controls do not take the press just outside what is drawn (or another control does): {out["bad"]}')
+        finally:
+            p.close()
+
+
+@test
 def qa_a_new_game_gets_no_old_version_notes(b, port, target):
     """Known-open (WS1-06): on Day 3 a new game's prep screen shows the notes written for v2.0/v2.1 saves (「2.1：食物與
     日常。…」「2.0：店可以變大了。…」), which are not true for a new restaurant."""
