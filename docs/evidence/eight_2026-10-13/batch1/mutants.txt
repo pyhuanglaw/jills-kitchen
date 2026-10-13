@@ -1,0 +1,54 @@
+== before (test: dylan_takes_what_is_left_and_never_storms_off)
+FAIL  dylan_takes_what_is_left_and_never_storms_off  (1.3s)
+      player_day6_1254.json: nothing left — the visit ends, calmly: {'state': 'leave', 'mood': 'sad', 'ticket': False, 'tx': 424, 'ty': 300, 'exit': [424, 300], 'so': 1, 'rv': 0, 'money': 0, 'said': ['Dylan：沒東西可以點了？', 'Dylan 想點的都賣完了，走了。', '：Dylan 想點的都賣完了，走了。', 'Dylan 想點的都賣完了，走了。']}
+== before (test: important_people_complain_in_their_own_words)
+FAIL  important_people_complain_in_their_own_words  (2.2s)
+      Page.evaluate: ReferenceError: CRIT_VOICE is not defined
+== before (test: madame_lin_comes_as_herself_not_as_a_drawn_stranger)
+FAIL  madame_lin_comes_as_herself_not_as_a_drawn_stranger  (2.1s)
+      before 《隔壁》: never drawn: [29, 90]
+== before (test: a_passing_family_is_not_the_wangs)
+FAIL  a_passing_family_is_not_the_wangs  (3.5s)
+      no ordinary name carries 王: ['王家三口']
+== dylan_no_substitute (test: dylan_takes_what_is_left_and_never_storms_off)
+FAIL  dylan_takes_what_is_left_and_never_storms_off  (3.4s)
+      player_day92_2105.json: only a dessert left — he has it rather than leaving (8 Dylans): ['none:leave', 'none:leave', 'none:leave', 'none:leave', 'none:leave', 'none:leave', 'none:leave', 'none:leave'] (sigdessert)
+== dylan_leaves_like_a_stranger (test: dylan_takes_what_is_left_and_never_storms_off)
+FAIL  dylan_takes_what_is_left_and_never_storms_off  (1.3s)
+      player_day6_1254.json: nothing left — the visit ends, calmly: {'state': 'leave', 'mood': 'sad', 'ticket': False, 'tx': 424, 'ty': 300, 'exit': [424, 300], 'so': 1, 'rv': 0, 'money': 0, 'said': ['Dylan：沒東西可以點了？', 'Dylan 想點的都賣完了，走了。', '：Dylan 想點的都賣完了，走了。', 'Dylan 想點的都賣完了，走了。']}
+== dylan_reviews (test: dylan_takes_what_is_left_and_never_storms_off)
+FAIL  dylan_takes_what_is_left_and_never_storms_off  (1.3s)
+      player_day6_1254.json: Dylan writes no review: {'state': 'leave', 'rv': 1, 'said': ['Dylan 等不下去，先走了。'], 'angry': 1}
+== dylan_storms_off (test: dylan_takes_what_is_left_and_never_storms_off)
+FAIL  dylan_takes_what_is_left_and_never_storms_off  (1.4s)
+      player_day6_1254.json: patience gone at the table: {'state': 'leave', 'rv': 0, 'said': ['Dylan 生氣地離開了…'], 'angry': 1}
+== no_voice_reviews (test: important_people_complain_in_their_own_words)
+FAIL  important_people_complain_in_their_own_words  (2.2s)
+      chen: gave up at the door — their own two stars: [[2, '等到腳痠，下次早點來。'], [2, '客滿，沒等到位子。']]
+== no_stranger_filter (test: important_people_complain_in_their_own_words)
+FAIL  important_people_complain_in_their_own_words  (2.2s)
+      chen: their good reviews carry no stranger-only line: ['香煎鴨胸完美。我要把這家店藏起來不告訴別人。', '香煎鴨胸熱騰騰地上桌，吃得很滿足。下次帶朋友。', '香煎鴨胸很好吃。值得繞路。']
+== no_spoken_line (test: important_people_complain_in_their_own_words)
+FAIL  important_people_complain_in_their_own_words  (2.3s)
+      chen: and they say it: ['陳伯伯 等不下去，先走了。']
+== yijun_named_before_met (test: important_people_complain_in_their_own_words)
+FAIL  important_people_complain_in_their_own_words  (3.5s)
+      怡君 before she is met: no name, no voice of her own: {'s': 1, 'txt': '等到我開始懷疑人生。', 'name': '怡君', 'day': 6, 'w': 1, 'critic': False, 'tags': ['wait', 'left'], 'topics': ['waiting']}
+== yijun_voice_before_met (test: important_people_complain_in_their_own_words)
+FAIL  important_people_complain_in_their_own_words  (3.3s)
+      怡君 before she is met: no name, no voice of her own: {'s': 1, 'txt': '今天先走了。', 'name': '一位客人', 'day': 6, 'w': 1, 'critic': False, 'tags': ['wait', 'left'], 'topics': ['waiting']}
+== lin_ungated (test: madame_lin_comes_as_herself_not_as_a_drawn_stranger)
+FAIL  madame_lin_comes_as_herself_not_as_a_drawn_stranger  (2.1s)
+      before 《隔壁》: never drawn: [29, 90]
+== lin_in_the_rush (test: madame_lin_comes_as_herself_not_as_a_drawn_stranger)
+FAIL  madame_lin_comes_as_herself_not_as_a_drawn_stranger  (2.2s)
+      never the reserved stranger nor one of the rush: res [0, 90] rush [32, 90]
+== lin_announced_as_vip (test: madame_lin_comes_as_herself_not_as_a_drawn_stranger)
+FAIL  madame_lin_comes_as_herself_not_as_a_drawn_stranger  (1.9s)
+      the VIP notice: not for her, as before for a stranger VIP: {'before': [0, 90], 'after': [31, 90], 'res': [0, 90], 'rush': [0, 90], 'last': [0, 90], 'storyLast': True, 'toastLin': 1, 'toastHart': 0}
+== lin_on_her_last_night (test: madame_lin_comes_as_herself_not_as_a_drawn_stranger)
+FAIL  madame_lin_comes_as_herself_not_as_a_drawn_stranger  (2.0s)
+      not on her own last night: [23, 90]
+== wang_family_back (test: a_passing_family_is_not_the_wangs)
+FAIL  a_passing_family_is_not_the_wangs  (3.4s)
+      no ordinary name carries 王: ['王家三口']

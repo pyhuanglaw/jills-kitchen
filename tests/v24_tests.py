@@ -6196,3 +6196,178 @@ def v24_round2_staff_on_their_way_somewhere_come_back_from_a_checkpoint(b, port,
           try{for(let i=0;i<300;i++)update(1/30)}catch(e){return 'ERR '+e.message}const w=R.cw[m.id];return w&&w.task&&w.task.k==='visit'&&!w.task.t?'kept without its place':'ok'})()""")
         check(r == 'ok', f'an older checkpoint with the place missing: {r}')
     g.close()
+
+
+# ---- 2026-10-13: the user's eight decisions after v2.5.5 (docs/v24/eight_decisions_2026-10-13.txt), batch one ----
+_SPAWN = "(o=>{const n=R.groups.length;spawn(o);return R.groups.length>n?R.groups[R.groups.length-1]:null})"
+_CLEAR = "(()=>{for(const q of R.groups.slice()){leaveGroup(q,'ok');q.gone=true}R.groups=[];for(const t of R.tables){t.dirty=false;t.group=null}})"
+_SEAT = "((g,st)=>{const t=R.tables.find(t=>!t.lounge&&!t.group&&t.seats>=g.size);t.dirty=false;seatGroup(g,t);g.state=st||'order';g.x=t.x;g.y=t.y;return t})"
+_HOOK = ("if(!window.__tw){window.__tw=1;window.__toasts=[];const t0=toast;toast=function(t){__toasts.push(String(t));return t0.apply(this,arguments)};"
+         "const n0=noteLine;noteLine=function(t){__toasts.push(String(t));return n0.apply(this,arguments)};"
+         "const l0=logLine;logLine=function(w,t,k){__toasts.push(String(w)+'：'+String(t));return l0.apply(this,arguments)}}")
+# empty the room for real between guests: gone, off the list, the tables free
+_CLEAR = "(()=>{for(const q of R.groups.slice()){leaveGroup(q,'ok');q.gone=true}R.groups=[];for(const t of R.tables){t.dirty=false;t.group=null}})"
+
+
+@test
+def dylan_takes_what_is_left_and_never_storms_off(b, port, target):
+    """Decision 一 (the user, 2026-10-13): 「Dylan 不是普通陌生客人」「如果想吃的菜賣完，優先從仍可供應的菜品選擇替代」「如果所有適合的
+    菜都賣完，結束當次點餐，不產生生氣離席或負面評論」「不強迫 Jill 額外製作不存在的菜，也不憑空創造食材」「不增加需要玩家親自處理的特殊
+    訂單」「揭曉前後的呈現必須符合既定劇情」「Dylan 的位置、回房間及其他既有故事行為不得矛盾」. On the user's Day 6 save (before the
+    reveal) and Day 92 save (after): with only a dessert left and no mind for one this time (the case that sent him away), he has
+    the dessert; with only one main left that is not his, an ordinary ticket for it; with only a drink left, the drink; with nothing at all, he leaves — the way he leaves after any dinner (out the
+    front), no 「想點的都賣完了」 in his name, no review, nothing counted as a sold-out loss, nothing ordered in. When his patience runs
+    out at the table: 「Dylan 等不下去，先走了。」, never 「生氣地離開了」, and no review. Nothing in either era names him her husband."""
+    for save in ('player_day6_1254.json', 'player_day92_2105.json'):
+        g = Game(b, port, target, seed=941, manual=True, viewport={'width': 390, 'height': 844})
+        load_save(g, save)
+        to_service(g)
+        g.ev(_HOOK)
+        stage = g.ev("S.dylan.stage")
+        check(not g.ev("jillStocks()"), f'{save}: the case is a day the shop does not order in by itself')
+        out = json.loads(g.ev(r"""JSON.stringify((()=>{const sp=%s,seat=%s;const ms=menuList().filter(d=>DISH(d)&&!DISH(d).wine&&!DISH(d).bar&&stationOk(d));
+          const ord=(S.dylan&&S.dylan.orders)||{};const mains=ms.filter(d=>DISH(d).cat==='main').sort((x,y)=>(ord[x]||0)-(ord[y]||0));const left=mains.find(d=>d!=='signature');
+          S.today.reco=mains.find(d=>d!==left&&d!=='signature')||null;   /* what he goes for (the signature, else today's pick) is gone; the one left is not his usual */const drink=ms.find(d=>DISH(d).cat==='drink');const st0=JSON.stringify(S.stock);
+          const clear=()=>{for(const k in S.stock)S.stock[k]=0};const res={sub:[],drink:null,none:null};
+          const dessert=ms.find(d=>DISH(d).cat==='dessert');res.dessertWas=dessert||null;res.des=[];
+          /* the case that sent him away: nothing left but a dessert, and this time he does not go for one (Math.random high) */
+          if(dessert)for(let i=0;i<8;i++){(%s)();clear();S.stock[dessert]=3;const d=sp({t:R.t,type:'regular',reg:'dylan',size:1});seat(d,'order');{const r0=Math.random;Math.random=()=>0.99;try{createTicket(d)}finally{Math.random=r0}}res.des.push(d.ticket?d.ticket.items.map(i=>i.d).join(','):'none:'+d.state)}
+          for(let i=0;i<20;i++){(%s)();clear();S.stock[left]=3;const d=sp({t:R.t,type:'regular',reg:'dylan',size:1});seat(d,'order');{const r0=Math.random;Math.random=()=>0.01;try{createTicket(d)}finally{Math.random=r0}}
+            res.sub.push(d.ticket?d.ticket.items.map(i=>i.d).join(','):'none:'+d.state)}
+          (%s)();clear();if(drink)S.stock[drink]=2;{const d=sp({t:R.t,type:'regular',reg:'dylan',size:1});seat(d,'order');createTicket(d);res.drink=d.ticket?d.ticket.items.map(i=>i.d).join(','):'none:'+d.state;res.drinkWas=drink}
+          (%s)();clear();{const so0=R.st.soldOutLeft||0,rv0=R.st.reviews.length,m0=S.money,n0=__toasts.length;const d=sp({t:R.t,type:'regular',reg:'dylan',size:1});seat(d,'order');createTicket(d);
+            res.none={state:d.state,mood:d.mood,ticket:!!d.ticket,tx:d.tx,ty:d.ty,exit:[FR.exit.x,FR.exit.y],so:(R.st.soldOutLeft||0)-so0,rv:R.st.reviews.length-rv0,money:S.money-m0,said:__toasts.slice(n0)}}
+          (%s)();clear();S.stock[left]=3;{const rv0=R.st.reviews.length,n0=__toasts.length,a0=R.st.angry;const d=sp({t:R.t,type:'regular',reg:'dylan',size:1});seat(d,'order');angryLeave(d);
+            res.gaveUp={state:d.state,rv:R.st.reviews.length-rv0,said:__toasts.slice(n0),angry:R.st.angry-a0}}
+          res.left=left;return res})())""" % ((_SPAWN, _SEAT) + (_CLEAR,) * 5)))
+        if out['dessertWas']:
+            check(all(x == out['dessertWas'] for x in out['des']), f'{save}: only a dessert left — he has it rather than leaving (8 Dylans): {out["des"]} ({out["dessertWas"]})')
+        food = [[d for d in x.split(',') if not d.startswith('w_')] for x in out['sub']]
+        check(all(f == [out['left']] for f in food), f'{save}: with one main left he orders it, every time (20 Dylans; a dinner glass may come with it): {out["sub"]} (left: {out["left"]})')
+        if out['drinkWas']:
+            check([d for d in out['drink'].split(',') if not d.startswith('w_')] == [out['drinkWas']], f'{save}: with only a drink left, the drink: {out["drink"]}')
+        n = out['none']
+        check(n['state'] == 'leave' and n['mood'] == 'ok' and not n['ticket'], f'{save}: nothing left — the visit ends, calmly: {n}')
+        check([n['tx'], n['ty']] == n['exit'], f'{save}: out the way he goes after any dinner (the front): {n}')
+        check(n['so'] == 0 and n['rv'] == 0 and n['money'] == 0, f'{save}: no sold-out loss, no review, nothing ordered in: {n}')
+        check(not [t for t in n['said'] if '賣完了' in t or '生氣' in t] and any('Dylan 先走了' in t for t in n['said']), f'{save}: what is said: {n["said"]}')
+        gv = out['gaveUp']
+        check(any('Dylan 等不下去，先走了' in t for t in gv['said']) and not [t for t in gv['said'] if '生氣' in t], f'{save}: patience gone at the table: {gv}')
+        check(gv['rv'] == 0, f'{save}: Dylan writes no review: {gv}')
+        said = ' '.join(n['said'] + gv['said'])
+        check(not re.search(r'老公|丈夫|她先生|Jill 先生', said), f'{save} (stage {stage}): nothing names him her husband: {said}')
+        check(not g.errors, f'{save}: page errors {g.errors[:2]}')
+        g.close()
+
+
+@test
+def important_people_complain_in_their_own_words(b, port, target):
+    """Decision 二 (the user, 2026-10-13): 「Madame Lin、Ken、Monsieur 杜等重要角色可以正常吃飯、等待，也可以對服務不滿意」「但不應使用匿名
+    陌生人的制式台詞或不符合其人物設定的一星評論」「重要角色的批評以符合其性格的自然反應呈現」「不因此給重要角色無限耐心、免費料理或額外經濟
+    特權」「請檢查其他具名常客是否有同類問題」. The user's Day 92 save: Madame Lin, Ken, Monsieur 杜 and the regulars (陳伯伯, Mia, 小林, Leo,
+    Sophie, 王先生, 王太太) giving up at the table say it their own way and their one-star review is that line (CRIT_VOICE.left) — the same
+    one star, the same count on the summary; giving up at the door, their two-star review is theirs (wait); a dinner they did not like,
+    theirs (low, naming the dish); their good reviews never carry the lines only a stranger writes (RV_STRANGER). An anonymous guest
+    keeps the common lines and 「生氣地離開了」. 怡君 before the player has met her (the Day 6 save): no name on her review, no voice."""
+    g = Game(b, port, target, seed=942, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day92_2105.json')
+    to_service(g)
+    g.ev(_HOOK)
+    people = [('reg', x) for x in ('chen', 'mia', 'koba', 'leo', 'sophie', 'wang', 'wangwife')] + [('named', x) for x in ('Madame Lin', '品酒師 Ken', 'Monsieur 杜')]
+    out = json.loads(g.ev(r"""JSON.stringify((()=>{const sp=%s,seat=%s;const P=%s;const food=menuList().find(d=>DISH(d)&&DISH(d).cat==='main'&&d!=='signature');const res={};
+      const mk=(k,id)=>{(%s)();
+        const g=k==='reg'?sp({t:R.t,type:'regular',reg:id,size:1}):sp({t:R.t,type:id==='Madame Lin'?'vip':'gourmet',size:1,name:id});if(g&&k==='named')namedHist(id).seen=0;return g};
+      for(const [k,id] of P){const r={};const v=k==='reg'?id:id;
+        {const g=mk(k,id);seat(g,'order');const n=R.st.reviews.length,a=R.st.angry,t0=__toasts.length;angryLeave(g);const rv=R.st.reviews[R.st.reviews.length-1];
+          r.left={s:R.st.reviews.length>n?rv.s:null,txt:R.st.reviews.length>n?rv.txt:null,name:R.st.reviews.length>n?rv.name:null,angry:R.st.angry-a,said:__toasts.slice(t0)}}
+        r.wait=[];for(let i=0;i<40&&r.wait.length<2;i++){const g=mk(k,id);g.state='queue';const n=R.st.reviews.length;angryLeave(g);if(R.st.reviews.length>n){const rv=R.st.reviews[R.st.reviews.length-1];r.wait.push([rv.s,rv.txt])}}
+        {const g=mk(k,id);seat(g,'eat');g.ticket={id:R.tkid++,no:1,g,items:[{d:food,st:'served',q:'P'}],t0:R.t};const rv=addReview(g,2,null,{});r.low=rv?[rv.s,rv.txt]:null}
+        r.good=[];for(let i=0;i<40;i++){const g=mk(k,id);seat(g,'eat');g.ticket={id:R.tkid++,no:1,g,items:[{d:food,st:'served',q:'P'}],t0:R.t};const rv=addReview(g,4+(i%%2),null,{});if(rv)r.good.push(rv.txt)}
+        res[id]=r}
+      {const g=mk('anon','');const a=sp({t:R.t,type:'office',size:1});seat(a,'order');const t0=__toasts.length;angryLeave(a);res.anon={said:__toasts.slice(t0),txt:R.st.reviews[R.st.reviews.length-1].txt}}
+      {const d=sp({t:R.t,type:'regular',reg:'dylan',size:1});res.dylanReview=addReview(d,1,null,{wait:true,left:true})}
+      return {res,voice:CRIT_VOICE,dish:dishName(food),stranger:String(RV_STRANGER.source),common1:RV_DET.left[1].concat(RV[1])}})())""" % (_SPAWN, _SEAT, json.dumps(people, ensure_ascii=False), _CLEAR)))
+    res, voice, dish = out['res'], out['voice'], out['dish']
+    stranger = re.compile(out['stranger'])
+    for k, id in people:
+        r, V = res[id], voice[id]
+        name = id
+        check(r['left']['s'] == 1 and r['left']['txt'] in V['left'], f'{id}: gave up at the table — one star, in their words: {r["left"]}')
+        check(r['left']['angry'] == 1, f'{id}: counted on the summary like anyone (no privilege): {r["left"]}')
+        check(any('等不下去，先走了' in t for t in r['left']['said']) and not [t for t in r['left']['said'] if '生氣地離開' in t], f'{id}: what the room hears: {r["left"]["said"]}')
+        check(any(r['left']['txt'] in t for t in r['left']['said']), f'{id}: and they say it: {r["left"]["said"]}')
+        check(r['wait'] and all(s == 2 and t in V['wait'] for s, t in r['wait']), f'{id}: gave up at the door — their own two stars: {r["wait"]}')
+        lows = [x.replace('{d}', dish) for x in V['low']]
+        check(r['low'] and r['low'][0] == 2 and r['low'][1] in lows, f'{id}: a dinner they did not like, theirs: {r["low"]}')
+        check(len(r['good']) >= 30 and not [t for t in r['good'] if stranger.search(t)], f'{id}: their good reviews carry no stranger-only line: {[t for t in r["good"] if stranger.search(t)][:3]}')
+    check(any('生氣地離開了' in t for t in res['anon']['said']) and res['anon']['txt'] in out['common1'], f'an anonymous guest as before: {res["anon"]}')
+    check(res['dylanReview'] is None, 'Dylan writes no review')
+    check(not g.errors, f'page errors {g.errors[:2]}')
+    g.close()
+    # 怡君 before the player has met her: anonymous, no voice
+    g = Game(b, port, target, seed=943, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day6_1254.json')
+    to_service(g)
+    g.ev(_HOOK)
+    check(not g.ev("!!fact('yj_meet')"), 'the case: the player has not met 怡君')
+    yj = json.loads(g.ev(r"""JSON.stringify((()=>{const sp=%s,seat=%s;const g=sp({t:R.t,type:'regular',size:1,name:YJN});seat(g,'order');const n=R.st.reviews.length,t0=__toasts.length;angryLeave(g);
+      const rv=R.st.reviews.length>n?R.st.reviews[R.st.reviews.length-1]:null;return {rv,said:__toasts.slice(t0),voice:CRIT_VOICE['怡君']}})())""" % (_SPAWN, _SEAT)))
+    check(yj['rv'] and yj['rv']['name'] == '一位客人' and yj['rv']['txt'] not in sum(yj['voice'].values(), []), f'怡君 before she is met: no name, no voice of her own: {yj["rv"]}')
+    check(not [t for t in yj['said'] if '怡君' in t], f'nothing says her name: {yj["said"]}')
+    g.close()
+
+
+@test
+def madame_lin_comes_as_herself_not_as_a_drawn_stranger(b, port, target):
+    """Decision 二 (the user, 2026-10-13): 「Madame Lin 不得在尚未符合相關故事條件時，被隨機 VIP 系統抽出參與不合理的活動」. The user's Day 92
+    save: before her 《隔壁》 (lin_hello taken away for the test) the evening's VIP draw never makes her; after it, she still comes over
+    now and then (her own story lives in those dinners); never as the stranger a 「VIP 預約」 reserved, never one of the 「饕客尖峰」
+    rush, never on her own last night; her story's own visits come whatever the draw; and the first VIP of an evening being her is
+    not announced as 「VIP 貴賓到了！消費高，要求也高。」."""
+    g = Game(b, port, target, seed=944, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day92_2105.json')
+    to_service(g)
+    g.ev(_HOOK)
+    out = json.loads(g.ev(r"""JSON.stringify((()=>{const sp=%s;const draw=(o,n)=>{let lin=0,all=0;for(let i=0;i<n;i++){(%s)();namedHist(LIN).seen=0;R.sched=R.sched.slice(0,R.si);const g=sp(Object.assign({t:R.t,type:'vip',size:1},o));if(g){all++;if(g.named===LIN)lin++}}return [lin,all]};
+      const F=story().facts;const hello=F.lin_hello;const res={};
+      delete F.lin_hello;res.before=draw({},90);F.lin_hello=hello;
+      res.after=draw({},90);res.res=draw({res:1},90);res.rush=draw({rush:1},90);
+      const L=linS();const last0=L.last;L.last=S.day;res.last=draw({},90);
+      {(%s)();namedHist(LIN).seen=0;const g=sp({t:R.t,type:'vip',size:1,name:LIN});res.storyLast=!!g&&g.named===LIN}
+      L.last=last0;
+      {(%s)();namedHist(LIN).seen=0;R.vipSaid=0;const t0=__toasts.length;sp({t:R.t,type:'vip',size:1,name:LIN});res.toastLin=__toasts.slice(t0).filter(t=>t.includes('VIP 貴賓到了')).length;
+       (%s)();const t1=__toasts.length;sp({t:R.t,type:'vip',size:1,name:'Mr. Hart'});res.toastHart=__toasts.slice(t1).filter(t=>t.includes('VIP 貴賓到了')).length}
+      return res})())""" % ((_SPAWN,) + (_CLEAR,) * 4)))
+    check(out['before'][0] == 0 and out['before'][1] >= 80, f'before 《隔壁》: never drawn: {out["before"]}')
+    check(out['after'][0] >= 10, f'after it: still comes over now and then: {out["after"]}')
+    check(out['res'][0] == 0 and out['rush'][0] == 0, f'never the reserved stranger nor one of the rush: res {out["res"]} rush {out["rush"]}')
+    check(out['last'][0] == 0, f'not on her own last night: {out["last"]}')
+    check(out['storyLast'], 'her story\'s own visits come whatever the draw')
+    check(out['toastLin'] == 0 and out['toastHart'] == 1, f'the VIP notice: not for her, as before for a stranger VIP: {out}')
+    check(not g.errors, f'page errors {g.errors[:2]}')
+    g.close()
+
+
+@test
+def a_passing_family_is_not_the_wangs(b, port, target):
+    """Decision 三 (the user, 2026-10-13): 「將普通客人池中的「王家三口」改成「一家三口」等不帶王姓的通用家庭稱呼」「真正的王先生、王太太及其故事
+    身分保持不變」「不修改客人 ID、用餐紀錄、故事解鎖或存檔」「確保玩家不會誤以為同一個王家同時出現在兩張桌子」. No ordinary family name
+    carries 王 (the pools and the fallback); an evening of the user's Day 92 save with sixty families and the regulars: no passer-by is
+    a 王, 王先生 and 王太太 come as themselves; a save that holds reviews by 「王家三口」 keeps them as written."""
+    g = Game(b, port, target, seed=945, manual=True, viewport={'width': 390, 'height': 844})
+    raw = load_save(g, 'player_day33.json')
+    kept = sum(1 for r in raw.get('reviews', []) if r.get('name') == '王家三口')
+    check(kept > 0, 'the case: the save holds reviews by 「王家三口」')
+    check(g.ev("S.reviews.filter(r=>r.name==='王家三口').length") == kept, 'the save keeps what it wrote')
+    g.close()
+    g = Game(b, port, target, seed=946, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day92_2105.json')
+    to_service(g)
+    out = json.loads(g.ev(r"""JSON.stringify((()=>{const sp=%s;const pools=Object.values(NAMES).flat().concat(Object.values(NAMES_MORE).flat()).concat(nmGen('family'),nmGen('couple'),nmGen('office'));
+      const fams=[];for(let i=0;i<60;i++){(%s)();const g=sp({t:R.t,type:'family',size:3});if(g)fams.push(g.name)}
+      const w=sp({t:R.t,type:'regular',reg:'wang',size:1}),ww=sp({t:R.t,type:'regular',reg:'wangwife',size:1});
+      return {wangPool:pools.filter(n=>/王/.test(n)),fams,wang:[w&&w.name,w&&w.reg,ww&&ww.name,ww&&ww.reg]}})())""" % (_SPAWN, _CLEAR)))
+    check(not out['wangPool'], f'no ordinary name carries 王: {out["wangPool"]}')
+    check(len(out['fams']) >= 50 and not [n for n in out['fams'] if '王' in n], f'sixty families, none a 王: {[n for n in out["fams"] if "王" in n]}')
+    check(out['wang'] == ['王先生', 'wang', '王太太', 'wangwife'], f'the regulars as themselves: {out["wang"]}')
+    g.close()
