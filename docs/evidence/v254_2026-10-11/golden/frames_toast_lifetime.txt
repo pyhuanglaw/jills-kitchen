@@ -1,0 +1,12 @@
+=== the notices over the sheets, their lifetime as before (only that taken out)
+PASS  golden_frames  (161.3s)
+=== re-recorded: this version
+PASS  golden_frames  (164.5s)
+=== re-recorded: the lifetime as before
+FAIL  golden_frames  (162.4s)
+      day1: first differing sample #3 (t=3.033): dom
+=== re-recorded: every dish's cost +$1
+FAIL  golden_frames  (161.7s)
+      service_20s: pixels differ in box (315, 19, 334, 31) (see tests/artifacts/)
+      service_panel: pixels differ in box (315, 19, 334, 31) (see tests/artifacts/)
+      pause: pixels differ in box (315, 19, 334, 31) (see tests/artifacts/)

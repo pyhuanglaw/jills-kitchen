@@ -1,0 +1,6 @@
+=== no_surnames
+FAIL  guests_one_evening_does_not_repeat_a_name  (6.8s)
+      the names run out: a grown-up borrows another grown-up's, then a surname (「鍾先生」), then 「另一位」 the name, 「另一位」 another; past all that the name drawn — no loop; a couple 「鍾先生和太太」, then 「另一對」; a student never an office worker's: {'a': 'Emma
+=== a_surname_someone_has
+FAIL  guests_one_evening_does_not_repeat_a_name  (6.6s)
+      the surnames: enough of them, and none is anyone's in the game (no 王 李 林 陳 周 杜 沈 許): ['王先生', '王小姐', '王先生和太太', '王家']

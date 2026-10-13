@@ -212,13 +212,18 @@ const NAMES={
    game uses for anyone else — and when even these are gone, 「另一位」 the name drawn (freshName). How many: a late
    evening of the user's Day 92 save played on (2026-10-11) had up to 20 couples and about 60 single grown-ups and
    students walk in, and up to 17 groups turned away at the door (they took a name too): the couples' first 13 ran
-   out (21 couples and the door's), so there are enough here for about twice that. */
+   out (21 couples and the door's), so there are enough here for about twice that. Past these, the way a restaurant
+   calls a guest it does not know: a surname — 「鍾先生」「彭小姐」, 「鍾先生和太太」, 「鍾家」 (nmGen) — from surnames no one in
+   the game has (not 王 李 林 陳 周 杜 沈 許: the Wangs, 老饕李先生, Madame Lin and 林予安, 陳伯伯, 周董, Monsieur 杜, 沈晴,
+   許葳). (2026-10-11: on the user's Day 92 save a late evening uses 60–80 names of grown-ups, counting the door.) */
+const NM_SURN='鍾彭游詹胡施余盧梁趙顏柯翁魏孫戴范方宋鄧傅侯曹薛丁卓阮馬溫唐藍蔣石古紀姚連馮歐程湯黃蔡楊鄭謝郭洪曾邱廖賴徐葉蘇莊呂江何蕭羅高潘簡朱'.split('');
+function nmGen(type){return type==='couple'?NM_SURN.map(x=>x+'先生和太太'):type==='family'?NM_SURN.map(x=>x+'家'):type==='student'?[]:NM_SURN.flatMap(x=>[x+'先生',x+'小姐'])}
 const NAMES_MORE={
- office:['許小姐','鄭先生','謝經理','郭小姐','洪先生','曾小姐','邱先生','廖小姐','賴先生','徐小姐','葉先生','蘇小姐','莊先生','呂小姐','江先生','何小姐','羅先生','Kevin','Vivian','Daniel','Joyce','Peter','Cindy','Tony','Wendy','方小姐','孫先生','馬經理','朱小姐','胡先生','簡小姐','汪先生','石小姐','Alice','Brian','Nancy','Mark','Linda','Jerry'],
+ office:['鍾小姐','鄭先生','謝經理','郭小姐','洪先生','曾小姐','邱先生','廖小姐','賴先生','徐小姐','葉先生','蘇小姐','莊先生','呂小姐','江先生','何小姐','羅先生','Kevin','Vivian','Daniel','Joyce','Peter','Cindy','Tony','Wendy','方小姐','孫先生','馬經理','朱小姐','胡先生','簡小姐','汪先生','石小姐','Alice','Brian','Nancy','Mark','Linda','Jerry'],
  student:['小柏','阿翔','小涵','阿誠','Sandy','小芸','阿豪','Joy','小真','阿樂','Kelly','小恩'],
  gourmet:['Olivia','Henry','Claire','Vincent','Jasmine','Albert','Irene','Louis'],
  couple:['阿翰與小慧','Max 與 Zoe','阿志與佩佩','Tom 與 Jenny','阿宏與小如','Chris 與 Nora','Eason 與 Kiki','阿文與小敏','阿祥與小琳','阿成與小蓉','阿峰與小婷','阿偉與小娟','阿政與小雅','阿龍與小青','阿嘉與小萱','Nick 與 Amber','Alan 與 Fiona','Eddie 與 Joanne','Frank 與 Tiffany','Gary 與 Stella','Ivan 與 Sharon','Owen 與 Lucy','Paul 與 Mandy','Steve 與 Carol'],
- family:['黃家','吳家四口','劉家','楊家三口','許媽媽一家','鄭家','謝家三口','郭家','蔡家','何家四口'],
+ family:['黃家','吳家四口','劉家','楊家三口','彭媽媽一家','鄭家','謝家三口','郭家','蔡家','何家四口'],
 };
 const REGS=[
  {id:'chen',n:'陳伯伯',day:2,type:'regular',size:1,fav:['friedrice','risotto'],looks:[{skin:'#EDC19C',hair:'#C9C3BA',hs:5,top:'#8A847C',pat:'knit',neck:'crew',outer:{k:'blazer',col:'#6B4E36'},brow:'thick',pants:'#5A5048'}],
@@ -1821,9 +1826,10 @@ function freshName(nm,type){const U=nmUsed();if(!U.includes(nm))return nm;
  const pre=type==='couple'?'另一對':type==='family'?'另一組':'另一位',sp=n=>pre+(/^[A-Za-z]/.test(n)?' ':'')+n;
  /* the kind's own names, its extra ones; one grown-up's name is as good as another's (the gourmet's own are two, the
     VIPs' all people's), so a grown-up then takes an office worker's or a gourmet's not used yet; then 「另一位」 the name
-    drawn, 「另一位」 another of the kind's; past all that the name drawn, as it was */
+    drawn, 「另一位」 another of the kind's; past all that the name drawn, as it was. v2.5.4: before 「另一位」 a surname
+    (nmGen: 130 for grown-ups, 65 couples, 65 families) */
  const chain=[own,NAMES_MORE[type]||[]];if(adult)chain.push(NAMES.office.concat(NAMES.gourmet).filter(n=>!NAMED[n]),NAMES_MORE.office.concat(NAMES_MORE.gourmet));
- chain.push([sp(nm)],own.map(sp));
+ chain.push(nmGen(type),[sp(nm)],own.map(sp));   /* then a surname, the way a restaurant calls someone it does not know */
  const h=hash('nm|'+S.day+'|'+R.gid);for(const L of chain){const f=L.filter(n=>!U.includes(n));if(f.length)return f[h%f.length]}return nm}
 function spawn(o){if(R.closed)return;if(o.pdWalk&&(!pdBuilt()||pdHeld()||pdOccupied()||(R.tables.find(t=>t.pdr)||{}).dirty))return;   /* v2.4 rc6: a party looks in only when the room is free */const reg=o.reg?REG_BY[o.reg]:null;const size=Math.min(o.size,maxSeats(R.tables));if(o.looks&&o.looks.length>size)o.looks=o.looks.slice(0,size);
  let nm0=o.name||(reg?reg.n:pick(NAMES[o.type]||NAMES.office));if(!o.reg&&NAMED[nm0]&&!o.kenHost&&!o.pianist&&(R.groups.some(q=>(q.named||q.name)===nm0&&!q.gone)||((story().named[nm0]||{}).seen===S.day&&!o.tries&&!o.tasting)||(!o.name&&R.sched.slice(R.si+1).some(q=>q.name===nm0)))){/* one person, one visit a day; a pool pick yields to the same person's planned evening */let alt=(NAMES[o.type]||NAMES.office).filter(n=>!NAMED[n]);if(!alt.length)alt=NAMES.gourmet.concat(NAMES.office).filter(n=>!NAMED[n]);/* every VIP name is a person: another VIP tonight is someone else */if(alt.length)nm0=R.groups.some(q=>(q.named||q.name)===nm0&&!q.gone)?pick(alt):alt[hash(nm0+'|'+S.day+'|'+R.gid)%alt.length]}/* (the visited-today case picks without touching the day's random stream) */if(!o.name&&!reg&&!NAMED[nm0])nm0=freshName(nm0,o.type);{const U=nmUsed();if(!U.includes(nm0))U.push(nm0)}/* v2.5.4: tonight's names */if(!o.reg&&NAMED[nm0])namedHist(nm0).seen=S.day;/* one person, one visit a day — counted when they walk in *//* v2.3: a named guest is one person — never two Kens in one evening */const g={id:R.gid++,type:o.type,size,reg:o.reg||null,regs:(o.regs||(o.reg?[o.reg]:[])).slice(0,size),forSig:!!o.forSig,ret:!!o.ret,looks:o.looks||(reg?reg.looks:(NAMED[nm0]?[Object.assign({},NAMED[nm0].looks)].concat(makeLooks(o.type,size,o.pdRes||o.pdWalk||o.pdStory?'pdr':o.lounge?'lounge':'main').slice(1)):makeLooks(o.type,size,o.pdRes||o.pdWalk||o.pdStory?'pdr':o.lounge?'lounge':'main'))),name:!o.reg&&NAMED[nm0]&&size>1?nm0+' 與朋友':nm0,named:!o.reg&&NAMED[nm0]?nm0:null,story:!!o.story,beat:!!o.beat,v24grp:o.v24grp||null,pdRes:o.pdRes||null,pdWalk:!!o.pdWalk,pdStory:o.pdStory||null,moment:o.moment||null,comp:o.comp||null,together:o.together||null,offduty:!!o.offduty,wantDish:o.wantDish||null,wantSide:!!o.wantSide,catfan:!!o.catfan,/* v2.3 */tasting:!!o.tasting,kenHost:!!o.kenHost,pianist:!!o.pianist,/* rc7 */
@@ -5631,7 +5637,7 @@ function trayFloat(s,txt,col){s.fx={txt,col,t:0}}
 function showCombo(){const el=$('#combo');el.hidden=false;el.innerHTML='COMBO<b>×'+(R.combo|0)+'</b>';el.classList.remove('bump');void el.offsetWidth;el.classList.add('bump')}
 function hideCombo(){$('#combo').hidden=true}
 function banner(title,subt,kind){const b=$('#banner');const d=document.createElement('div');d.className='bn '+(kind||'');d.innerHTML=`<b>${title}</b>${subt?`<span>${subt}</span>`:''}`;b.innerHTML='';b.appendChild(d);setTimeout(()=>{if(d.parentNode)d.remove()},kind==='perfect'?1050:1700)}
-function toast(html,kind,o){const box=$('#toasts');const lastT=box.lastElementChild;if(lastT&&lastT.innerHTML===html&&lastT.style.opacity!=='0')return;const d=document.createElement('div');d.className='toast '+(kind||'');d.innerHTML=html;if(o&&(o.g||o.who||o.tg)){d.classList.add('who');d.onclick=()=>{try{if(o.tg&&idFocusTable(o.tg))return;if(o.g)idFocusGroup(o.g,o.k||0);else idFocusWho(o.who)}catch(e){}}}   /* v2.4 rc6 (07:09): a line someone said finds them */box.appendChild(d);while(box.children.length>2)box.firstChild.remove();plinesLift();setTimeout(()=>{d.style.transition='opacity .4s';d.style.opacity='0';setTimeout(()=>{d.remove();plinesLift()},400)},kind==='q'?3600:2800)}
+function toast(html,kind,o){toastsHost();const box=$('#toasts');const lastT=box.lastElementChild;if(lastT&&lastT.innerHTML===html&&lastT.style.opacity!=='0')return;const d=document.createElement('div');d.className='toast '+(kind||'');d.innerHTML=html;if(o&&(o.g||o.who||o.tg)){d.classList.add('who');d.onclick=()=>{try{if(o.tg&&idFocusTable(o.tg))return;if(o.g)idFocusGroup(o.g,o.k||0);else idFocusWho(o.who)}catch(e){}}}   /* v2.4 rc6 (07:09): a line someone said finds them */box.appendChild(d);while(box.children.length>2)box.firstChild.remove();plinesLift();setTimeout(()=>{d.style.transition='opacity .4s';d.style.opacity='0';setTimeout(()=>{d.remove();plinesLift()},400)},box.classList.contains('over')?(kind==='warn'?6500:4200):kind==='q'?3600:2800)}   /* over a sheet the line is read, not glanced at: longer */
 function ach(id){if(S.achievements[id])return;S.achievements[id]=S.day;const a=ACH.find(x=>x.id===id);if(a){setTimeout(()=>banner(a.n,'成就解鎖'),600);sfx.buy()}}
 function coach(k){if(!R||R.coach<0)return;if(k===R.coach){showCoach(COACH[k]);R.coach++;if(R.coach>=COACH.length){R.coach=-1;setTimeout(hideCoach,4500)}}}
 /* rc8 (the player, 2026-10-03: 「這一段開店很久都不消失！」): a tip shows for 9 seconds of the service and goes; the next step still
@@ -12609,6 +12615,12 @@ function portraitLine(who,txt,o){o=o||{};const p=portraitOf(who,o.tone);if(!p)re
  box.appendChild(d);while(box.children.length>2)box.firstChild.remove();plinesLift();const T=setTimeout(()=>{d.classList.add('out');setTimeout(()=>d.remove(),260)},o.ms||4600);let done=false;const act=e=>{if(done)return;done=true;if(e&&e.preventDefault)e.preventDefault();clearTimeout(T);d.remove();try{if(o.tg&&R&&idFocusTable(o.tg))return;if(o.g&&R)idFocusGroup(o.g,o.k||0,{name:p.name});else if(!(who==='jill'&&o.with&&idFocusWithWho(o.with)))idFocusWho(who)}catch(e2){}};d.onpointerdown=act;d.onclick=act;   /* rc7.2 (the player, 22:07: 「有出現人頭的點下去不會看到他在哪一組」 — on the phone the tap went nowhere; on a computer it found them): the line answers the touch itself, not the click a phone may never send for it, and stays a little longer to be caught */   /* v2.4 rc6 (07:09): a tap on the line finds who said it; rc7 (15:37): a line said at a table finds the table, Jill's to someone finds them */
  return true}
 function hideScreen(){screenEl.hidden=true;screenEl.innerHTML='';sub=null}
+/* v2.5.4: the notices (toasts) live in the room's layer, under the sheets — the prep screen, the shop, the summary — so
+   every notice said while one was open was there and could not be seen: 「一鍵補到建議量」's line (the user, 2026-10-11:
+   「補貨完成時顯示簡短摘要」), 「只進了 N 份」, the shop's 「錢不夠」. While a sheet is open the same notices sit on top of it,
+   above its bottom button (no tap is taken: they never catch one); back in the room when it closes */
+function toastsHost(){const b=$('#toasts'),sc=$('#screen'),app=$('#app'),w=$('#sceneWrap');if(!b||!sc||!app||!w)return;if(!sc.hidden){if(b.parentNode!==app){app.appendChild(b);b.classList.add('over')}}else if(b.parentNode!==w){w.insertBefore(b,$('#storyNote'));b.classList.remove('over')}}
+try{new MutationObserver(toastsHost).observe($('#screen'),{attributes:true,attributeFilter:['hidden']})}catch(e){}
 function topIcons(){return`<button class="icon-btn" data-act="peek" aria-label="看店裡" style="font-weight:800;font-size:11px;width:auto;padding:0 9px">看店裡</button><button class="icon-btn" data-act="guide" aria-label="店主手冊" style="font-weight:800;font-size:15px">?</button><button class="icon-btn" data-act="book" aria-label="餐廳日誌">${SVG.book}</button><button class="icon-btn" data-act="settings" aria-label="設定">${SVG.gear}</button>`}
 
 function showTitle(){phase='title';mainScreen='title';R=null;IDLE=null;lifeReset();hud(true);renderTickets();const has=hasSave()&&(S.day>1||S.stats.days>0);

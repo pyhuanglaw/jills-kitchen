@@ -1044,6 +1044,19 @@ Release Gate 四-1／四-3：「不得出現無法透過合理操作、聘人或
       - `guests_one_evening_does_not_repeat_a_name`：使用者 Day 92 存檔整晚（75 組）沒有重複的一般客人名字；熟客、有名字的人、訂位和
         故事指定的名字不變；訂位的名字開店就算用掉；營業中存檔會存；名字用完時的備援；備援名字遊戲裡沒有別人用；桌子、點單對得上人。
     - 三個決策各自的故意做壞版本：決策一 10 個、決策二 10 個、決策三 7 個，全部失敗（`restock/`、`story_visit/`、`names/`）。
+    - **之後的修正（同一版，2026-10-11 重新開工後）**：
+      - 原始失敗案例重跑（使用者 Day 6 存檔、census 種子 1）找到：怡君那一幕要秀琴阿姨走過去，秀琴阿姨在洗碗、怡君先吃完走了，那一幕
+        延到隔天 → 那個人在座位上多坐一下等員工過來（最多 40 秒）。`story_a_beats_visitor_is_not_sent_away_by_the_ordinary_wait` 加了這段；
+        三個做壞版本都失敗（`story_visit/mutants_linger.txt`）。
+      - 模擬找到名字不夠：後期一晚的情侶、大人（連門口走掉的）用完名單 → 多加名字，再加「姓氏＋先生／小姐」「鍾先生和太太」「鍾家」。
+        `guests_one_evening_does_not_repeat_a_name` 的備援那段跟著改（多了姓氏那一層），並檢查姓氏不是遊戲裡有人的；兩個做壞版本都失敗
+        （`names/mutants_surnames.txt`）。
+      - 手機截圖找到：開店前、商店、結算面板開著時，小提示被面板蓋住。改成面板開著時提示在面板上面。
+        `stock_one_tap_restock_sends_back_the_dishes_off_the_menu_first` 加了「摘要看得到、不蓋住開始營業」的檢查；把修正拿掉的版本失敗
+        （`restock/mutant_toasts_under.txt`）。
+      - **金樣本**：`golden_scenario` 重錄一次（評論上的名字）；`golden_frames` 重錄兩次（名字；面板上的提示停久一點），每次都先證明只有那個
+        改動讓它變、重錄後拿掉那個改動或改成本都會失敗（`golden/`）。
+      - 模擬工具：門口那筆故事紀錄補上分類；觀察器不再假設每筆都有分類（第 61 天那局因此停過）。
 
 ## 使用者 iPhone 回報（2026-10-08 晚上到 10-09 凌晨）
 

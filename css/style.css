@@ -208,6 +208,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 #toasts{position:absolute;left:8px;right:8px;bottom:8px;z-index:4;display:flex;flex-direction:column;align-items:flex-start;gap:5px;pointer-events:none}
 .toast{max-width:100%;}
 #coach:not([hidden]) ~ #toasts{transform:translateY(-58px)}
+#toasts.over{z-index:23;bottom:84px!important;transform:none!important}   /* v2.5.4: over an open sheet (the prep screen, the shop, the summary), above its bottom button */
 .toast{padding:6px 11px;border-radius:10px;background:rgba(22,33,36,.88);border:1px solid rgba(230,194,122,.25);color:var(--cream);font-size:12.5px;font-weight:600;animation:tIn .25s ease}
 .toast.q{background:rgba(255,248,236,.95);color:var(--ink);border-color:transparent}
 .toast.q b{color:var(--tomato)}

@@ -1557,6 +1557,11 @@ def stock_one_tap_restock_sends_back_the_dishes_off_the_menu_first(b, port, targ
     check(not st['empty'] and all(n - have <= max(1, n * .1) for _, have, n in st['short']), f'with the room back, every dish of tonight is at its suggestion (the fridge full: a dish or two a portion short, two of tonight\'s leftovers being over theirs): {st}')
     t = json.loads(g.ev("JSON.stringify(__toasts)"))
     check(any('已退回 26 份下架菜品' in x and '並完成補貨' in x for x in t), f'one line says what went back and that the fridge is filled: {t}')
+    # v2.5.4: the line is seen — it used to be said under the prep screen's sheet, where no one could see it
+    seen = json.loads(g.ev("""JSON.stringify((()=>{const d=[...document.querySelectorAll('#toasts .toast')].pop();if(!d)return {none:1};const r=d.getBoundingClientRect();d.style.pointerEvents='auto';
+      const hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);d.style.pointerEvents='';const st=document.querySelector('#screen [data-act=start]').getBoundingClientRect();
+      return {txt:d.textContent,on:!!hit&&(hit===d||d.contains(hit)),inView:r.top>=0&&r.bottom<=innerHeight,overStart:!(r.bottom<=st.top||r.top>=st.bottom)}})())"""))
+    check(seen.get('on') and seen.get('inView') and not seen.get('overStart') and '已退回 26 份' in seen.get('txt', ''), f'the line is on top of the prep screen, in view, not over 「開始營業」: {seen}')
     check(not any('冰箱滿了' in x for x in t), f'no 「冰箱滿了」 on this press: {t}')
     g.click('[data-act=start]'); g.page.wait_for_timeout(150)
     warn = g.ev("(()=>{const e=document.querySelector('.inline-warn');return e?e.textContent:''})()")
@@ -1747,8 +1752,9 @@ def guests_one_evening_does_not_repeat_a_name(b, port, target):
     walked in or turned away at the door; the regulars, the named people and anyone booked or brought by a story keep
     theirs, and no one else takes them; each notice's name is one group's; tables and tickets point at the right groups.
     The names a booking gave are tonight's from the start. The evening's names are saved with it. When a kind's names run
-    out: a grown-up takes another grown-up's not used yet, then 「另一位 Eric」 (「另一對 …」 for a couple), and past that the
-    name drawn — no loop of draws. The extra names are nobody's in
+    out: a grown-up takes another grown-up's not used yet, then a surname the way a restaurant calls a guest
+    (「鍾先生」, 「鍾先生和太太」, 「鍾家」), then 「另一位 Eric」 (「另一對 …」 for a couple), and past that the name drawn — no
+    loop of draws. The extra names are nobody's in
     the game."""
     g = Game(b, port, target, seed=940, manual=True, viewport={'width': 390, 'height': 844})
     more = json.loads(g.ev("JSON.stringify(NAMES_MORE)"))
@@ -1787,15 +1793,21 @@ def guests_one_evening_does_not_repeat_a_name(b, port, target):
     door = [m.group(1) for x in t for m in [re.match(r'^(.+?) (?:等太久，離開了|生氣地離開了…|看到客滿，失望地走了…)$', x)] if m]
     check(all(names.count(n) + sum(1 for x in gs if x['name'] == n and (x['reg'] or x['named'] or x['oname'])) <= 1 for n in door if n in names), f'each name a notice says is one group\'s: {door}')
     # a kind's names all used: 「另一位」, then the name itself — no loop
-    fb = json.loads(g.ev("""JSON.stringify((()=>{const U=R.nmUsed,A=NAMES.office.concat(NAMES.gourmet,NAMES_MORE.office,NAMES_MORE.gourmet).filter(n=>!NAMED[n]);
+    fb = json.loads(g.ev("""JSON.stringify((()=>{const U=R.nmUsed,A=NAMES.office.concat(NAMES.gourmet,NAMES_MORE.office,NAMES_MORE.gourmet).filter(n=>!NAMED[n]),G=nmGen('office');
       R.nmUsed=NAMES.office.concat(NAMES_MORE.office);const a=freshName('Eric','office');
-      R.nmUsed=A.slice();const b=freshName('Eric','office');R.nmUsed.push(b);const c=freshName('Eric','office');
-      R.nmUsed=A.concat(NAMES.office.map(n=>'另一位'+(/^[A-Za-z]/.test(n)?' ':'')+n));const d=freshName('Eric','office');
-      R.nmUsed=NAMES.couple.concat(NAMES_MORE.couple);const e=freshName('Ryan 與 Ivy','couple');
+      R.nmUsed=A.slice();const b=freshName('Eric','office');
+      R.nmUsed=A.concat(G);const c=freshName('Eric','office');R.nmUsed.push(c);const c2=freshName('Eric','office');
+      R.nmUsed=A.concat(G,NAMES.office.map(n=>'另一位'+(/^[A-Za-z]/.test(n)?' ':'')+n));const d=freshName('Eric','office');
+      R.nmUsed=NAMES.couple.concat(NAMES_MORE.couple);const e=freshName('Ryan 與 Ivy','couple');R.nmUsed=R.nmUsed.concat(nmGen('couple'));const e2=freshName('Ryan 與 Ivy','couple');
       R.nmUsed=NAMES.student.concat(NAMES_MORE.student);const f=freshName('小安','student');
-      R.nmUsed=U;return {a,b,c,d,e,f}})())"""))
-    check(fb['a'] in more['gourmet'] + ['Chloe', 'Emma'] and fb['b'] == '另一位 Eric' and fb['c'].startswith('另一位') and fb['c'] != '另一位 Eric' and fb['d'] == 'Eric' and fb['e'] == '另一對 Ryan 與 Ivy' and fb['f'] == '另一位小安',
-          f'the names run out: a grown-up borrows another grown-up\'s, then 「另一位」 the name, 「另一位」 another; past all that the name drawn — no loop; a couple 「另一對」; a student never an office worker\'s: {fb}')
+      R.nmUsed=U;return {a,b,c,c2,d,e,e2,f,G,GC:nmGen('couple'),GF:nmGen('family')}})())"""))
+    check(fb['a'] in more['gourmet'] + ['Chloe', 'Emma'] and fb['b'] in fb['G'] and fb['c'] == '另一位 Eric' and fb['c2'].startswith('另一位') and fb['c2'] != '另一位 Eric' and fb['d'] == 'Eric'
+          and fb['e'] in fb['GC'] and fb['e2'] == '另一對 Ryan 與 Ivy' and fb['f'] == '另一位小安',
+          f'the names run out: a grown-up borrows another grown-up\'s, then a surname (「鍾先生」), then 「另一位」 the name, 「另一位」 another; past all that the name drawn — no loop; a couple 「鍾先生和太太」, then 「另一對」; a student never an office worker\'s: { {k: v for k, v in fb.items() if k not in ("G", "GC", "GF")} }')
+    gen = fb['G'] + fb['GC'] + fb['GF']
+    people = json.loads(g.ev("JSON.stringify([].concat(REGS.map(r=>r.n),Object.keys(NAMED),...Object.values(CREW_NAMES),(typeof LOUNGE_ROSTER!=='undefined'?LOUNGE_ROSTER.map(r=>r.name):[])))"))
+    bad = [n for n in gen if n in people or n[0] in '王李林陳周杜沈許']   # (a surname can make one of the pools' own plain names, 黃先生: it is a name like them, used once a night like them)
+    check(len(set(fb['G'])) >= 120 and len(set(fb['GC'])) >= 60 and not bad, f'the surnames: enough of them, and none is anyone\'s in the game (no 王 李 林 陳 周 杜 沈 許): {bad}')
     check(not g.errors, g.errors[:3]); g.close()
 
 
