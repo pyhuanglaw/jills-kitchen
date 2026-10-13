@@ -352,26 +352,25 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .menu-row .meta{font-size:11.5px;color:var(--ink2);font-variant-numeric:tabular-nums}
 .menu-row .ctl{grid-column:2/-1;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .menu-row.off{opacity:.55}
-.tog{width:46px;height:28px;border-radius:14px;border:0;background:#D9CDB8;position:relative;padding:0;grid-row:span 2}
+.tog{width:54px;height:36px;border-radius:18px;border:4px solid transparent;background:#D9CDB8;background-clip:padding-box;margin:-4px;position:relative;padding:0;grid-row:span 2}
 .tog::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}
-.tog.on{background:var(--sage)}
+.tog.on{background:var(--sage);background-clip:padding-box}
 .tog.on::after{transform:translateX(18px)}
 .step{display:inline-flex;align-items:center;border-radius:10px;background:var(--paper2);box-shadow:inset 0 0 0 1px var(--line);font-variant-numeric:tabular-nums}
-.step button{width:30px;height:30px;border:0;background:none;font-weight:800;font-size:16px;color:var(--ink)}
+.step button{width:42px;height:38px;margin:-4px -6px;border:0;background:none;font-weight:800;font-size:16px;color:var(--ink)}
 .step span{min-width:54px;text-align:center;font-weight:700;font-size:12.5px}
 .step label{font-size:10px;color:var(--ink3);padding-left:8px;font-weight:700}
 /* v2.2: the restock shortcuts beside the stepper */
 .step button:disabled{opacity:.3}
 /* 2026-10-13 (audit WS2-15, still so on the user's Day 92 save: 116 「−」「＋」 of 30×30 and 39 switches of 46×28 on the prep
-   screen, under a finger's 44): the place a finger can press reaches past the drawn button — half of the narrowest gap to the
-   next control (8 px between the price and the stock rows, 5 px between 「補到建議」 and 「補滿」), so no two places overlap.
-   Nothing drawn moves. */
-.step button,.stkq .mini{position:relative}
-.step button::before,.stkq .mini::before,.tog::before{content:"";position:absolute;inset:-4px -6px}
-.stkq .mini::before{inset:-4px -2px}
-.tog::before{inset:-4px -4px}
+   screen, under a finger's 44): the box a finger can press is bigger than what is drawn — half of the narrowest gap to the next
+   control (8 px between the price and the stock rows, 5 px between 「補到建議」 and 「補滿」), so no two overlap: 「−」「＋」 6 px
+   left and right and 4 px up and down (they draw no box of their own), the switches 4 px and 「補到建議」「補滿」 2 px sideways,
+   4 px up and down as a clear border outside their colour (background-clip). Negative margins give the room back, so nothing
+   drawn moves. (A first try reached out with a ::before; it read as cut text — content wider than its button — to the screen
+   checks, qa_the_screens_fit_375_390_430. The reach is now the button's own box.) */
 .stkq{display:inline-flex;gap:5px}
-.stkq .mini{height:28px;padding:0 9px;border:0;border-radius:9px;background:var(--paper2);box-shadow:inset 0 0 0 1px var(--line);font-weight:800;font-size:11.5px;color:var(--ink)}
+.stkq .mini{height:36px;padding:0 9px;border:solid transparent;border-width:4px 2px;border-radius:11px/13px;margin:-4px -2px;background:var(--paper2);background-clip:padding-box;box-shadow:inset 0 0 0 1px var(--line);font-weight:800;font-size:11.5px;color:var(--ink)}
 .stkq .mini:disabled{opacity:.35}
 .warnpill{font-size:10.5px;font-weight:800;color:#8A2A18;background:#F7DCD3;padding:2px 6px;border-radius:6px}
 .cap{display:flex;align-items:center;gap:10px;margin:8px 0 4px;font-size:12.5px;font-weight:600}
@@ -384,7 +383,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .sig small{color:var(--brass2);font-size:12px}
 /* the stock control on the dark signature card: dark well, cream figures, big enough to read on a phone */
 .sig .step{display:flex;width:max-content;background:rgba(0,0,0,.42);box-shadow:inset 0 0 0 1px rgba(230,194,122,.6)}   /* v2.4 rc5 (the player, 17:48): a line of its own in both cards — beside a short info line it used to jump up and down as the count changed width */
-.sig .step button{color:var(--cream);width:34px;height:34px;font-size:18px}
+.sig .step button{color:var(--cream);width:46px;height:42px;font-size:18px}
 .sig .step span{color:#fff;font-size:14px;font-weight:800;min-width:60px;text-shadow:0 1px 0 rgba(0,0,0,.4)}
 .footer{position:sticky;bottom:-20px;margin:16px -16px -20px;padding:12px 16px calc(16px + env(safe-area-inset-bottom,0px));background:linear-gradient(rgba(255,248,236,0),var(--paper) 30%)}
 .inline-warn{margin-bottom:8px;padding:9px 12px;border-radius:10px;background:#F7DCD3;color:#8A2A18;font-size:12.5px;font-weight:700}
