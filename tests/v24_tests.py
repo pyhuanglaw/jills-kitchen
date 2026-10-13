@@ -372,7 +372,7 @@ def v24_day52_save_plays_the_stories_in_order_over_forty_days(b, port, target):
     seed = "Math.random=(function(){let a=%s;return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}})()"
     # each morning's draw (planToday at nextDay: the day's weather, its event, its tasks) from a stream of its own, BASE + 500000 + d
     g.ev("window.__wxSeed=null;const __pt0=planToday;planToday=function(){if(window.__wxSeed!=null)" + seed % 'window.__wxSeed' + ";return __pt0.apply(this,arguments)}")
-    BASE = 7600
+    BASE = 7000
     # v2.4 rc7: the seed base was 7000. One seed is one trajectory, and any change in how many random numbers a day draws
     # moves it: since 8e8d407 (Ken: a named guest's party is never a passer-by's) the walk-ins draw less, and on 7000 the
     # wall began on Day 67, a day past the window. Seven seeds on both builds (docs/evidence/v24_rc7/sims/day52_seeds.txt):
@@ -437,6 +437,16 @@ def v24_day52_save_plays_the_stories_in_order_over_forty_days(b, port, target):
     # and 81.4 guests, 40.7 and 40.2 lost, $61,929 and $62,137). Not slower by the same rule, which takes the smallest base
     # that meets every target on both: 7600 (both: 53, 61, 63, 80). What the test checks is unchanged; on 7600 the move two
     # days later, the mediation six days later and the floor opening on the wall each fail it (after_iphone/mutants.txt).
+    # 2026-10-13 (v2.5.5's full regression on 86820a6): on 7600 怡君 got her key on Day 63 (meet 53, 《三個選項》 58, the move 61,
+    # the key 63, the wall 65, settled 82) — kept as found, docs/evidence/qa5_2026-10-13/day52/. Bisected: 24c04ec (a table that
+    # gave up at its seat writes no door line in its review: a smaller pool of lines, a different number of random draws from
+    # the first such table on Day 53) is the one that moves it; the two CSS changes leave every day the same. Fourteen bases
+    # (7000-8300, each morning's weather on its own stream, the same weather on every day of every base) on v2.5.4 (f8d9b87) and
+    # the candidate: the key on Day 61.57 and 61.57, the wall begins 64.57 and 64.43, settles 81.71 and 80.79; every target on 7
+    # and 9 of 14; the same evenings (81.9 and 81.6 guests, 39.9 and 40.0 lost, $61,867 and $61,786). Not slower by the rule
+    # written before any of it ran (day52/README.md, the 2026-10-10 rule word for word), which takes the smallest base that meets
+    # every target on both: 7000 (v2.5.4 61, 64, 81; the candidate 61, 63, 80). What the test checks is unchanged; on 7000 the
+    # move two days later, the mediation six days later and the floor opening on the wall each fail it (day52/mutants.txt).
     first = None; majors = {}
     for d in range(40):
         if g.ev("phase") == 'summary':
