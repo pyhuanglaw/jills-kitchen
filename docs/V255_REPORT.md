@@ -6,7 +6,10 @@ v2.5.4 發布後，照使用者 2026-10-11 第五點（`docs/v24/three_decisions
 **四層**（`docs/RELEASE_CHECKLIST.md` §3）：程式寫了／測試確認了／正常遊玩看得到／使用者在 iPhone 上確認了。這一版**使用者還沒有在
 iPhone 上看過**；截圖都是桌面 Chromium 開成 iPhone 尺寸，不是實機。
 
-（發布紀錄：發布後補）
+- Branch `main`，tag `v2.5.5` ＝ commit `401f7bc`（401f7bce48b684f594fbacb0e1bd5cc504f891c5；`feature/cooking-gameplay` 快轉合回 `main`，從 1fc0a5c，沒有強推）。
+  tag 只在本機；GitHub 上用 branch `archive/release-v2.5.5`（＝ 401f7bc）代替。合併前的 `main`（1fc0a5c）存在 `archive/main-before-v2.5.5-2026-10-13`。
+- 發布到正式網址：https://claude.ai/artifact/ThXBVmarX3k8SK47Hhh8qA ——**Version 16（version id `1791915824-da9e`）**；發布前讀到線上是
+  Version 15（`1791906199-248b`，v2.5.4）。2026-10-13。
 
 ## 1. 玩家會看到什麼
 
@@ -18,10 +21,17 @@ iPhone 上看過**；截圖都是桌面 Chromium 開成 iPhone 尺寸，不是�
 
 ## 2. 驗收
 
-（完整回歸、發布後檢查：發布後補）
-
+- **完整回歸：401f7bc 上 368/368**（三份同時跑；`docs/evidence/qa5_2026-10-13/regression/401f7bc_part*.txt`）。沒有刪測試、沒有跳過、沒有降低門檻。
+- **前一次（86820a6）366/368，兩個失敗都處理了**：
+  - `qa_the_screens_fit_375_390_430`：小按鈕第一版的做法（伸出按鈕外的透明層）被這個「字有沒有被切掉」的檢查當成被切掉的字。檢查是對的，
+    沒改；改了做法（按鈕自己的框變大、負邊距還回去）。新做法的測試又抓到一個真問題（「−」「＋」往內的範圍被數字蓋住），一起修好
+    （`docs/evidence/qa5_2026-10-13/tap_reach/README.md`）。
+  - `v24_day52_save_plays_the_stories_in_order_over_forty_days`：怡君晚一天拿到鑰匙。原始案例保留；二分是評論那個修正改了亂數的次數；照
+    2026-10-10 事先寫好、一字不改的規則比 14 個種子：候選版沒有比 v2.5.4 慢（鑰匙 61.57 對 61.57 天、牆開始 64.43 對 64.57、調解 80.79 對
+    81.71，每個目標都達到 9 對 7 個種子），所以照規則換到兩個版本都達標裡號碼最小的種子 7000；檢查和門檻沒改；三個故意做慢的版本在
+    7000 上都失敗（`docs/evidence/qa5_2026-10-13/day52/`）。
 - **新測試 3 個**：`qa_a_table_that_gave_up_does_not_review_the_door`、`qa_the_prep_screens_small_buttons_take_a_finger`、
-  `qa_the_staff_tables_show_what_each_one_does`。故意做壞的版本 5＋3＋3 個全部被抓到（`docs/evidence/qa5_2026-10-13/`）。員工表的測試第一版沒抓到
+  `qa_the_staff_tables_show_what_each_one_does`。故意做壞的版本 5＋5＋3 個全部被抓到（`docs/evidence/qa5_2026-10-13/`）。員工表的測試第一版沒抓到
   「表格排亂、整頁可以左右滑」的做壞版本，加了排版檢查以後抓到。
 - **手冊**：三件事手冊本來都沒寫；「開店前 › 備料」「員工」「一天怎麼玩」看過、沒有改字；稽核戳記 v2.5.5。
 - 繁體掃描：沒有新的簡體字；語法檢查 52 個（跟 v2.5.4 一樣）。
