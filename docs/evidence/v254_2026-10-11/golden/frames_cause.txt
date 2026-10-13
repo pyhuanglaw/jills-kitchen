@@ -1,0 +1,7 @@
+=== this version (all changes), against the golden recorded before v2.5.4
+FAIL  golden_frames  (146.6s)
+      day1: first differing sample #59 (t=59.1): scene, dom
+      day2: first differing sample #64 (t=64.033): dom
+      day2: end-of-day digest differs: reviewHash
+=== this version without decision 三's renaming (one line taken out)
+PASS  golden_frames  (146.9s)

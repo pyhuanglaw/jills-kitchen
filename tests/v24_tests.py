@@ -1662,7 +1662,8 @@ def story_a_beats_visitor_is_not_sent_away_by_the_ordinary_wait(b, port, target)
     familiar not; 怡君 for her beat outwaits her patience in the queue and at the table, without a word in her name; a
     full room at the door sends her back later past the old three tries, and at the end of the evening the door says
     nothing in her name; with nothing she wants left she is not sent away hungry, and the notice of the portion ordered in
-    for her says 「T? 的客人」, not her name, until the player has met her. The others, as before: an ordinary
+    for her says 「T? 的客人」, not her name, until the player has met her; with the crew member her beat needs on the way
+    over (busy at the sink), she stays at the table until they come (40 seconds at most) — an ordinary guest gets up. The others, as before: an ordinary
     guest and Sophie on an evening that is not a beat leave when their patience is gone (「等太久，離開了」), and a full
     door turns them away after three tries."""
     g = Game(b, port, target, seed=938, manual=True, viewport={'width': 390, 'height': 844})
@@ -1698,6 +1699,19 @@ def story_a_beats_visitor_is_not_sent_away_by_the_ordinary_wait(b, port, target)
     check(not any('怡君' in x and ('離開' in x or '走了' in x) for x in t), f'not a word of her leaving: {t}')
     check(any('的客人 要多等一下' in x for x in t) and not any('怡君' in x for x in t), f'the order in for her: the notice says the guest at her table, not her name before the player has met her: {t}')
     check(g.ev("(()=>{const F=story().facts;F.yj_meet={d:S.day};const n=shownName(__yj);delete F.yj_meet;return n})()") == '怡君', 'once 秀琴阿姨 has gone over to her, the notices use her name')
+    # a walk-over for the beat on the way (the user's Day 6 save, Day 8: 秀琴阿姨 at the sink when 怡君 was served at 21:37,
+    # free at 21:49 — the minute 怡君 got up; the beat waited a day): the one the story brought stays at the table until it
+    # comes, 40 seconds at most; anyone else gets up as before
+    g.ev("__tick(300)")   # the crew on the floor (their walkers start with the evening's first frames)
+    check(g.ev("S.crew.some(m=>crewSprite(m))"), 'the case: the crew are on the floor')
+    g.ev(f"window.__sw={sp}(Object.assign(regPlanVisit({{t:R.t,type:'regular',reg:'sophie',size:1}}),{{story:1,beat:1}}));window.__ow={sp}({{t:R.t,type:'office',size:1}})")
+    g.ev("""(()=>{const w=crewSprite(xqm())||S.crew.map(crewSprite).find(Boolean);window.__xw=w;for(const x of[__sw,__ow]){const t=R.tables.find(t=>!t.lounge&&!t.group&&t.seats>=x.size);t.dirty=false;seatGroup(x,t);x.state='eat';x.timer=0}
+      w.task={k:'wash',busy:0};w.next={k:'visit',t:R.tables[__sw.table],g:__sw,x:0,y:0,room:'main',dur:1.5,then:()=>{}};w.nextQ=[{k:'visit',t:R.tables[__ow.table],g:__ow,x:0,y:0,room:'main',dur:1.5,then:()=>{}}];
+      updGroup(__sw,.1);updGroup(__ow,.1)})()""")
+    check(g.ev("__sw.state") == 'eat' and g.ev("__ow.state") == 'check', f'with the walk-over on its way she stays at the table; an ordinary guest gets up: {g.ev("__sw.state")} / {g.ev("__ow.state")}')
+    g.ev("R.t+=41;updGroup(__sw,.1)")
+    check(g.ev("__sw.state") == 'check', 'not past 40 seconds')
+    g.ev("__xw.task=null;__xw.next=null;__xw.nextQ=null;for(const x of[__sw,__ow]){R.tables[x.table].group=null;x.table=null;x.gone=true}R.groups=R.groups.filter(x=>x!==__sw&&x!==__ow);R.t-=41")
     # the others, as before: an ordinary guest, Sophie on an evening that is not a beat
     g.ev(f"window.__og={sp}({{t:R.t,type:'office',size:1}});window.__so={sp}(Object.assign(regPlanVisit({{t:R.t,type:'regular',reg:'sophie',size:1}}),{{story:1}}))")
     check(g.ev("!!__og&&!!__so&&!__og.beat&&!__so.beat&&__so.reg==='sophie'"), 'the case: an ordinary guest and Sophie (her visit not a beat)')

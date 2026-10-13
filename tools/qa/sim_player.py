@@ -884,7 +884,7 @@ DAY_RECORD = r"""JSON.stringify((()=>{const L=S.lastSummary||{};const e=(window.
  return {day:S.day,money:S.money,level:S.level,rate:+rating().toFixed(2),rate1:+rating().toFixed(1),tables:tablesTotal(),crew:(S.crew||[]).length,roles,wagePools:pools,
   rentParts:L.rentParts||[],sum:{rev:L.rev,tips:L.tips,bonus:L.bonus,cost:L.cost,wages:L.wages,rent:L.rent,wine:L.wine,cfee:L.cfee,piano:L.piano,ken:L.ken,loan:L.loan,net:L.net,guests:L.guests,lost:L.lost,perfect:L.perfect,plated:L.plated,avg:L.avg,
    lg:L.lg?{tabs:L.lg.tabs,rev:L.lg.rev,tip:L.lg.tip}:null,lgSales:L.lgSales||null,dinWine:L.dinWine||null},econ:e,
-  beats:(story().trace||[]).filter(t=>t.d===S.day).map(t=>t.lane[0]+':'+t.k),
+  beats:(story().trace||[]).filter(t=>t.d===S.day).map(t=>String(t.lane||t.at||'-')[0]+':'+t.k),   /* 2026-10-11: not every entry has a lane (a dormant era's, the door's) */
   lounge:typeof loungeLv==='function'?loungeLv():0,proj:S.loungeProj?{state:S.loungeProj.state||null,open:S.loungeProj.open||null}:null,viewing:!!fact('lin_viewing'),
   linCard:(fact('lounge_project')&&!loungeLv())?{cost:LOUNGE_PROJ[0].cost}:null,up:!!(S.rooms&&S.rooms.up),wines:Object.keys(S.wineDev||{}).length,unlocked:(S.unlocked||[]).length,
   menu:menuList().map(d=>[d,priceOf(d)]),dy:S.dylan?{stage:S.dylan.stage,reveal:S.dylan.reveal||null}:null,firstFire:(S.achievements||{}).fire||null}})())"""   # (2026-10-10: the day of the first ON FIRE)

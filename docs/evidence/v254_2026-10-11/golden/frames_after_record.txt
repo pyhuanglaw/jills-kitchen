@@ -1,0 +1,21 @@
+=== this version, re-recorded golden_frames
+PASS  golden_frames  (149.7s)
+=== without decision 三's renaming
+FAIL  golden_frames  (152.6s)
+      day1: first differing sample #59 (t=59.1): scene, dom
+      day2: first differing sample #64 (t=64.033): dom
+      day2: end-of-day digest differs: reviewHash
+=== every dish's cost +$1
+FAIL  golden_frames  (149.9s)
+      service_20s: pixels differ in box (315, 19, 334, 31) (see tests/artifacts/)
+      service_panel: pixels differ in box (315, 19, 334, 31) (see tests/artifacts/)
+      pause: pixels differ in box (315, 19, 334, 31) (see tests/artifacts/)
+      evening: pixels differ in box (315, 19, 334, 31) (see tests/artifacts/)
+      summary: pixels differ in box (315, 19, 374, 459) (see tests/artifacts/)
+      shop: pixels differ in box (114, 19, 334, 447) (see tests/artifacts/)
+      book_cats: pixels differ in box (315, 19, 334, 31) (see tests/artifacts/)
+      book_mem: pixels differ in box (315, 19, 334, 31) (see tests/artifacts/)
+      day1: first differing sample #0 (t=0.033): dom
+      day1: end-of-day digest differs: money, summary
+      day2: first differing sample #0 (t=0.033): dom
+      day2: end-of-day digest differs: money, summary

@@ -1,0 +1,9 @@
+=== no_linger_for_the_walk_over
+FAIL  story_a_beats_visitor_is_not_sent_away_by_the_ordinary_wait  (1.6s)
+      with the walk-over on its way she stays at the table; an ordinary guest gets up: check / check
+=== linger_without_end
+FAIL  story_a_beats_visitor_is_not_sent_away_by_the_ordinary_wait  (1.8s)
+      not past 40 seconds
+=== everyone_lingers
+FAIL  story_a_beats_visitor_is_not_sent_away_by_the_ordinary_wait  (1.6s)
+      with the walk-over on its way she stays at the table; an ordinary guest gets up: eat / eat
