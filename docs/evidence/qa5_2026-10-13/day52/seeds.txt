@@ -1,0 +1,18 @@
+7000: main 61/64/65/69/81/84 ALL  |  new 61/63/64/68/80/83 ALL  |  same planned weather 40/40  | evenings main 80.2/39.0/4.0 new 81.3/38.9/3.6
+7100: main 61/63/64/66/79/82 ALL  |  new 61/63/64/66/78/81 ALL  |  same planned weather 40/40  | evenings main 82.1/41.5/4.2 new 82.0/42.0/3.8
+7200: main 61/63/66/68/81/84 ALL  |  new 61/63/64/66/80/83 ALL  |  same planned weather 40/40  | evenings main 83.0/38.7/3.9 new 83.8/39.8/3.2
+7300: main 61/63/65/68/80/83 ALL  |  new 61/63/65/68/80/83 ALL  |  same planned weather 40/40  | evenings main 82.2/40.4/3.8 new 82.3/40.5/3.5
+7400: main 61/65/66/68/80/83 ALL  |  new 61/65/66/68/80/83 ALL  |  same planned weather 40/40  | evenings main 80.4/41.4/4.3 new 80.8/40.9/4.5
+7500: main 63/67/68/71/84/87 miss move,wall62-66,settle  |  new 61/63/64/66/78/81 ALL  |  same planned weather 40/40  | evenings main 83.7/39.0/3.8 new 81.9/39.7/4.4
+7600: main 61/63/64/68/81/84 ALL  |  new 63/65/67/70/82/85 miss move  |  same planned weather 40/40  | evenings main 81.2/39.7/4.5 new 79.5/40.1/5.5
+7700: main 63/67/68/71/83/87 miss wall62-66,settle  |  new 63/67/68/71/83/87 miss wall62-66,settle  |  same planned weather 40/40  | evenings main 82.4/37.7/4.5 new 81.4/38.0/4.6
+7800: main 61/66/67/69/82/85 ALL  |  new 63/67/69/71/83/87 miss move,wall62-66,settle  |  same planned weather 40/40  | evenings main 82.2/39.3/3.6 new 81.0/39.9/4.4
+7900: main 61/64/65/69/84/88 miss settle  |  new 61/64/65/69/81/84 ALL  |  same planned weather 40/40  | evenings main 82.3/41.1/4.2 new 83.2/40.5/3.8
+8000: main 61/64/69/71/84/88 miss settle  |  new 61/65/66/69/83/89 miss settle  |  same planned weather 40/40  | evenings main 82.7/39.5/3.2 new 82.0/38.3/4.5
+8100: main 61/65/68/70/83/87 miss settle  |  new 61/64/65/68/80/83 ALL  |  same planned weather 40/40  | evenings main 81.2/41.7/4.9 new 81.8/42.2/4.4
+8200: main 63/65/66/68/80/83 miss move  |  new 61/64/65/68/80/83 ALL  |  same planned weather 40/40  | evenings main 82.1/39.9/4.0 new 80.7/40.1/4.6
+8300: main 63/65/66/70/82/85 miss move  |  new 63/66/67/71/83/88 miss settle  |  same planned weather 40/40  | evenings main 80.5/39.2/4.8 new 80.2/39.1/4.9
+(key/worry/photos/visit/settle/article)
+main (14): key 61.57, worry 64.57, settle 81.71, article 85.00 | photos-worry 1.64, visit-photos 2.79 | every target 7 of 14 | evenings 81.9 guests, 39.9 lost, 4.1 angry, $61,867
+new (14): key 61.57, worry 64.43, settle 80.79, article 84.29 | photos-worry 1.21, visit-photos 2.86 | every target 9 of 14 | evenings 81.6 guests, 40.0 lost, 4.3 angry, $61,786
+every target on both: [7000, 7100, 7200, 7300, 7400]
