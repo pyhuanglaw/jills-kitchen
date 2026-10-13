@@ -1,0 +1,29 @@
+The Day 52 test (seed base 7000, each morning's draw on its own stream) of the working tree at d101ffd, on the candidate's game
+(js/game.js of 86820a6/78e5149, the same file), on v2.5.4's (f8d9b87), and on three slowed versions of the candidate's game made by
+docs/evidence/cooking_2026-10-10/day52/mutants_make.py. Run by one.sh (JK_GAME_JS=<game> python3 tests/run_tests.py -k v24_day52_...), 2026-10-13 17:35-17:40 UTC.
+  yj_slow     — the move two days later: due('yj_move','yj_chose',2,'yj') -> 4
+  wall_slow   — the mediation six days later: due('wall_mediation','wall_prep',3,'wall') -> 9
+  up_on_wall  — the Second Floor opens on the wall, not on the Lounge
+
+== game_candidate
+PASS  v24_day52_save_plays_the_stories_in_order_over_forty_days  (173.2s)
+1 passed, 0 failed
+
+== game_v254_f8d9b87
+PASS  v24_day52_save_plays_the_stories_in_order_over_forty_days  (170.2s)
+1 passed, 0 failed
+
+== yj_slow
+FAIL  v24_day52_save_plays_the_stories_in_order_over_forty_days  (171.7s)
+      怡君 moved in within about ten days, by Day 62 (59–62) — a day later when a dated beat takes her first day (this seed: Dylan on Valentine's, Day 53): {'yj_meet': 53, 'yj_look': 54, 'yj_three': 56, 'yj_chose': 57, 'yj_move': 61, 'yj_key': 63, 'wall_worry': 65, 'wall_photos': 66, 'wall_visit': 69, 'wall_wang': 70, 'wall_setback': 72, 'wall_report': 75, 'wall_fee': 76, 'wall_prep': 78, 'wall_mediation': 81, 'wall_settle': 81, 'wall_article': 84}
+0 passed, 1 failed
+
+== wall_slow
+FAIL  v24_day52_save_plays_the_stories_in_order_over_forty_days  (173.9s)
+      settled within about two and a half weeks, by Day 82 (75–82): {'yj_meet': 53, 'yj_look': 54, 'yj_three': 56, 'yj_chose': 57, 'yj_move': 59, 'yj_key': 61, 'wall_worry': 63, 'wall_photos': 64, 'wall_visit': 68, 'wall_wang': 69, 'wall_setback': 71, 'wall_report': 74, 'wall_fee': 75, 'wall_prep': 77, 'wall_mediation': 86, 'wall_settle': 86, 'wall_article': 89}
+0 passed, 1 failed
+
+== up_on_wall
+FAIL  v24_day52_save_plays_the_stories_in_order_over_forty_days  (128.3s)
+      the wall settled, no Lounge in this save: the floor still waits for the Lounge
+0 passed, 1 failed
