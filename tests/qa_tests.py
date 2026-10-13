@@ -873,6 +873,38 @@ def qa_a_review_talks_about_the_food_not_the_glass(b, port, target):
 
 
 @test
+def qa_a_table_that_gave_up_does_not_review_the_door(b, port, target):
+    """2026-10-13 (point 五 of the user's 2026-10-11 instructions; the user's own saves): 90 one-star reviews read 「客滿，沒等到位子。」
+    from tables that had a seat and gave up at it (「生氣地離開了…」), some going on 「柔柔倒是來坐了一下。」; and a table that had
+    eaten and gave up waiting for the bill wrote 「餓著肚子離開了」. Through the game's own angryLeave: a seated table that gave up
+    never says it got no seat (nor the bench at the door); one that had eaten never says it left hungry; the door's own review
+    (a group that gave up in the queue) keeps its lines."""
+    p = Player(b, port, target, save=LATE)
+    try:
+        _to_service_from_late(p)
+        out = json.loads(p.ev("""JSON.stringify((()=>{const food=menuList().find(d=>DISH(d)&&DISH(d).cat==='main'&&d!=='signature');const seated=[],ate=[],door=[];
+          const one=(st,served)=>{for(const q of R.groups.slice())leaveGroup(q,'ok');for(const t of R.tables){t.dirty=false;t.group=null}
+            spawn({type:'couple',size:2});const g=R.groups[R.groups.length-1];g.name='T';g.cats=[];g.counted=false;
+            if(st==='queue'){g.state='queue';const n=R.st.reviews.length;angryLeave(g);return R.st.reviews.length>n?R.st.reviews[R.st.reviews.length-1]:null}
+            const t=freeTableFor(g);if(!t)return null;seatGroup(g,t);g.state=st;g.x=t.x;g.y=t.y;
+            if(served){g.ticket={id:R.tkid++,no:t.i+1,g,items:[{d:food,st:'served',q:'P'}],t0:R.t};R.tickets.push(g.ticket)}
+            const n=R.st.reviews.length;angryLeave(g);return R.st.reviews.length>n?R.st.reviews[R.st.reviews.length-1]:null};
+          for(let i=0;i<60;i++){const r=one('order',false);if(r)seated.push(r.txt)}
+          for(let i=0;i<60;i++){const r=one('check',true);if(r)ate.push(r.txt)}
+          for(let i=0;i<120;i++){const r=one('queue',false);if(r)door.push(r.txt)}
+          return {seated,ate,door}})())"""))
+        check(len(out['seated']) >= 50 and len(out['ate']) >= 50, f"too few reviews written: {len(out['seated'])} seated, {len(out['ate'])} ate")
+        bad = [t for t in out['seated'] + out['ate'] if '沒等到位子' in t or '長椅' in t]
+        check(not bad, f'a table that had a seat says it got none: {bad[:3]}')
+        hungry = [t for t in out['ate'] if '餓著肚子' in t or '沒吃到' in t]
+        check(not hungry, f'a table that had eaten says it left hungry: {hungry[:3]}')
+        check(any('餓著肚子' in t for t in out['seated']), f'a table that never ate lost its own line: {out["seated"][:4]}')
+        check(out['door'] and any('沒等到位子' in t or '腳痠' in t or '長椅' in t for t in out['door']), f'the door lost its own lines: {out["door"][:4]}')
+    finally:
+        p.close()
+
+
+@test
 def qa_a_new_game_gets_no_old_version_notes(b, port, target):
     """Known-open (WS1-06): on Day 3 a new game's prep screen shows the notes written for v2.0/v2.1 saves (「2.1：食物與
     日常。…」「2.0：店可以變大了。…」), which are not true for a new restaurant."""

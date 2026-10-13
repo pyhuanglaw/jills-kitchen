@@ -1928,7 +1928,7 @@ function leaveGroup(g,mood){if(R){R.leftAt=R.leftAt||{};for(const id of storyIds
  if(g.ticket){const tk=g.ticket;for(const s of R.slots)if(s.job&&s.job.tk===tk)s.job=null;wfDropTicket(tk);for(const it of tk.items)if(it.st==='pending')S.stock[it.d]=(S.stock[it.d]||0)+1;R.tickets=R.tickets.filter(x=>x!==tk);R.jill.hands=R.jill.hands.filter(c=>c.tk!==tk);R.tv++;g.ticket=null}}
 function angryLeave(g){if(g.state==='queue'||g.state==='arrive'){R.st.lost+=g.size;toast(`${shownName(g)} 等太久，離開了`);g.state='leave';sendOut(g);g.mood='sad';requeue();if(Math.random()<.35)addReview(g,2,pickT(['在門口的長椅上等到跟隔壁的陌生人變朋友。','等到腳痠，下次早點來。','客滿，沒等到位子。'].filter(x=>extOn('bench')||!x.includes('長椅'))),{wait:true,left:true});return}
  const t=R.tables[g.table];const served=g.ticket?g.ticket.items.some(i=>i.st==='served'):false;R.st.angry++;if(R.combo>=3)toast('COMBO 中斷');R.combo=0;R.streak=0;R.frun=0;sfx.angry();
- addFloat(t.x,t.y-50,'生氣離開','#E0654A',1,t.room);toast(`${shownName(g)} 生氣地離開了…`);if(!g.counted)addReview(g,1,null,{wait:true,left:true});/* v2.3: one review per visit */leaveGroup(g,'angry');if(served){t.dirty=true}}
+ addFloat(t.x,t.y-50,'生氣離開','#E0654A',1,t.room);toast(`${shownName(g)} 生氣地離開了…`);if(!g.counted)addReview(g,1,null,{wait:true,left:true,seated:true,ate:!!(g.ticket&&g.ticket.items.some(i=>i.st==='served'&&!isGlass(i.d)&&DISH(i.d)&&DISH(i.d).cat!=='drink'))});/* v2.3: one review per visit */leaveGroup(g,'angry');if(served){t.dirty=true}}
 /* ---- the day's talk: every line anyone says is kept, so a bubble missed during the rush can be read later ---- */
 let logNew=0;
 /* audit W3-13 (2026-10-06): outside a service the lines belong to a day too — after closing to that day's log (打烊後), and
@@ -2277,7 +2277,10 @@ function catReviewLine(g,stars){const evs=(g.cats||[]).slice();if(!evs.length)re
 function reviewText(g,stars,ctx){const c=ctx||{};const st=Math.max(1,Math.min(5,stars|0));const D=RV_DET;const dets=[];const add=(pool,w)=>{if(pool&&pool.length)dets.push({pool,w})};
  /* audit WS6-06／WS1-12 (2026-10-06): only the lines that are true of this guest — a dish named only when there was one; a cold
     plate is not 「火候剛剛好」「熱騰騰」「已經涼了」; the bench at the door only once it is there */
- const cold=!!c.dst&&!['stove','oven','pizza'].includes(c.dst);const ok=x=>(!!c.dn||!x.includes('{d}'))&&(!cold||!/火候|熱騰騰|涼了/.test(x))&&(extOn('bench')||!x.includes('長椅'));
+ const cold=!!c.dst&&!['stove','oven','pizza'].includes(c.dst);const ok=x=>(!!c.dn||!x.includes('{d}'))&&(!cold||!/火候|熱騰騰|涼了/.test(x))&&(extOn('bench')||!x.includes('長椅'))&&!(c.seated&&/沒等到位子|長椅/.test(x))&&!(c.ate&&/餓著肚子|沒吃到/.test(x));
+ /* 2026-10-13 (the user's saves: 90 one-star reviews 「客滿，沒等到位子。」, some with 「柔柔倒是來坐了一下。」): a table that gave up
+    had a seat (seated) — the door's lines are not theirs — and one that had eaten and gave up waiting for the bill (ate) did not
+    leave hungry. The door's own review (angryLeave, the queue) keeps its lines */
  const P=pool=>{const f=(pool||[]).filter(ok);return f.length?f:null};
  if(c.wine)add(D.wine[st],c.wineFan?4:2);if(c.lounge)add(D.lounge[st],c.wineFan?3:1.5);if(c.dessert)add(D.dessert[st],1.2);if(c.nocat)add(D.nocat[st],3);if(c.sideFan)add(D.side[st],3);/* v2.3 */if(c.wait)add(D.wait[st],st<=3?4:2);if(c.price)add(D.price[st],3);if(c.short)add(D.short[st],3);if(c.sig)add(D.sig[st],2);if(c.jill)add(D.jill[st],2);if(c.treat)add(D.treat[st],3);if(c.decor)add(D.decor[st],1);if(c.room==='front')add(D.terrace[st],1.5);if(c.room==='side')add(D.side[st],1.2);if(c.family)add(D.family[st],1.5);if(c.weather&&D.wx[c.weather]&&Math.random()<.4)add(wxLines(c.weather,st),1);
  const cat=c.cat?catReviewLine(g,st):null;reviewText.last={cat:null};const stale=pool=>pool.every(x=>saidRecently(x));

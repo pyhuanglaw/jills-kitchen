@@ -1,0 +1,15 @@
+== before
+FAIL  qa_a_table_that_gave_up_does_not_review_the_door  (2.8s)
+      a table that had a seat says it got none: ['客滿，沒等到位子。', '客滿，沒等到位子。', '客滿，沒等到位子。']
+== no_seated_ctx
+FAIL  qa_a_table_that_gave_up_does_not_review_the_door  (2.7s)
+      a table that had a seat says it got none: ['客滿，沒等到位子。', '客滿，沒等到位子。', '客滿，沒等到位子。']
+== no_ate_ctx
+FAIL  qa_a_table_that_gave_up_does_not_review_the_door  (2.8s)
+      a table that had eaten says it left hungry: ['餓著肚子離開了，Jill 下次見。', '餓著肚子離開了，Jill 下次見。', '餓著肚子離開了，Jill 下次見。']
+== no_seated_filter
+FAIL  qa_a_table_that_gave_up_does_not_review_the_door  (2.7s)
+      a table that had a seat says it got none: ['客滿，沒等到位子。', '客滿，沒等到位子。', '客滿，沒等到位子。']
+== no_ate_filter
+FAIL  qa_a_table_that_gave_up_does_not_review_the_door  (2.9s)
+      a table that had eaten says it left hungry: ['餓著肚子離開了，Jill 下次見。', '餓著肚子離開了，Jill 下次見。', '餓著肚子離開了，Jill 下次見。']
