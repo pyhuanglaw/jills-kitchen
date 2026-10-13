@@ -1,0 +1,9 @@
+== before (HEAD css)
+FAIL  qa_the_staff_tables_show_what_each_one_does  (1.4s)
+      375: duties cut short or not shown: [['上菜＋結帳', 0, 60], ['帶位＋點餐', 0, 60], ['上菜＋結帳＋收桌', 0, 96], ['全部都做・Lounge', 0, 104]]
+== numbers without their own line (nowrap, auto-placed): the table scrambles and runs off the screen (mutant m2_375.png)
+FAIL  qa_the_staff_tables_show_what_each_one_does  (1.3s)
+      375: a row is not name · level · duties, with its numbers under them: [['阿德師傅', 38, 278, 2055, 38, 2076], ['阿珠姐', 158, 38, 2095, 158, 2096], ['小林師傅', 278, 158, 2115, 278, 2116]]
+== numbers hidden
+FAIL  qa_the_staff_tables_show_what_each_one_does  (1.3s)
+      375: the numbers under a name are missing: {'n': 20, 'cut': [], 'stats': 0, 'off': [['阿德師傅', 38, 158, 2055, 0, 0], ['阿珠姐', 38, 158, 2075, 0, 0], ['小林師傅', 38, 158, 2095, 0, 0], ['老周師傅', 38, 158, 2115, 0, 0], ['Marco', 38, 158, 2135, 0, 0], ['Hugo', 38, 158, 2155, 0, 0], ['阿勇', 38, 158, 2175, 0, 0], ['阿拓', 38, 158, 2195, 0, 0], ['小茉', 38, 147, 3806, 0, 0], ['Kai', 38, 147, 3826, 0, 0], ['Nina', 38, 147, 3846, 0, 0], ['阿哲', 38, 147, 3866, 0, 0], ['安安', 38, 147, 3886, 0, 0], ['Momo', 38, 147, 3906, 0, 0], ['小威', 38, 147, 3926, 0, 0], ['Evan', 38, 139, 5380, 0, 0], ['沈晴', 38, 139, 5400, 0, 0], ['秀琴阿姨', 38, 158, 5859, 0, 0], ['小彤', 38, 158, 5879, 0, 0], ['許葳', 38, 158, 5899, 0, 0]], 'wide': 0, 'pageWide': False}

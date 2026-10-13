@@ -933,6 +933,33 @@ def qa_the_prep_screens_small_buttons_take_a_finger(b, port, target):
 
 
 @test
+def qa_the_staff_tables_show_what_each_one_does(b, port, target):
+    """Audit WS2-15 (「帶位＋點餐＋上菜＋結帳・Lounge」 cut short), worse on 2026-10-13: on the user's Day 92 save the shop's 員工
+    › 外場 table gave each waiter's duties 0 px at 375 and 3 px at 390 — a dot — because the numbers beside them (「一次端 4 盤、
+    一趟送 3 桌・反應 0.5 秒」) took the row. At 375, 390 and 430, by taps: every duty in every staff table is shown whole on its
+    name's line (name · level · duties), its numbers on the line under them, and no table runs off the screen."""
+    for W in (375, 390, 430):
+        p = Player(b, port, target, save=LATE, W=W)
+        try:
+            p.tap('#screen [data-act=open]'); p.settle()
+            check(p.state()['phase'] == 'shop', f'not in the shop: {p.state()}')
+            p.tap('#screen [data-act=tab][data-k=staff]'); p.settle()
+            out = json.loads(p.ev(r"""JSON.stringify((()=>{const ds=[...document.querySelectorAll('#screen .cg-cmp .cg-d')];const ss=[...document.querySelectorAll('#screen .cg-cmp .cg-s')];
+              const R=e=>e.getBoundingClientRect();const off=[];for(const row of document.querySelectorAll('#screen .cg-cmp .cg-row')){const [n,pp,d,st]=['.cg-n','.pips','.cg-d','.cg-s'].map(k=>row.querySelector(k));if(!n||!d||!st)continue;
+                const a=R(n),b=R(pp),c=R(d),e=R(st);if(Math.abs(a.top-c.top)>6||Math.abs(b.top+b.height/2-(c.top+c.height/2))>6||!(b.left>a.right-1&&c.left>b.right-1)||e.top<c.bottom-1||e.left<b.left-1)off.push([n.innerText,Math.round(a.left),Math.round(c.left),Math.round(c.top),Math.round(e.left),Math.round(e.top)])}
+              const wide=[...document.querySelectorAll('#screen .cg-cmp')].filter(t=>t.scrollWidth>t.clientWidth+1||R(t).right>innerWidth+1||R(t).left<-1).length;
+              return {n:ds.length,cut:ds.filter(e=>e.clientWidth<1||e.scrollWidth>e.clientWidth+1).map(e=>[e.innerText,e.clientWidth,e.scrollWidth]),
+                      stats:ss.filter(e=>e.clientWidth>40&&e.innerText.trim()).length,off,wide,pageWide:document.documentElement.scrollWidth>innerWidth+1}})())"""))
+            check(out['n'] >= 10, f'{W}: the staff tables are not there: {out}')
+            check(not out['cut'], f'{W}: duties cut short or not shown: {out["cut"][:4]}')
+            check(out['stats'] == out['n'], f'{W}: the numbers under a name are missing: {out}')
+            check(not out['off'], f'{W}: a row is not name · level · duties, with its numbers under them: {out["off"][:3]}')
+            check(not out['wide'] and not out['pageWide'], f'{W}: the staff table runs off the screen: {out["wide"]} tables, page wider: {out["pageWide"]}')
+        finally:
+            p.close()
+
+
+@test
 def qa_a_new_game_gets_no_old_version_notes(b, port, target):
     """Known-open (WS1-06): on Day 3 a new game's prep screen shows the notes written for v2.0/v2.1 saves (「2.1：食物與
     日常。…」「2.0：店可以變大了。…」), which are not true for a new restaurant."""
