@@ -1,10 +1,9 @@
 # Jill's Kitchen — 目前狀態（暫時的，會一直更新）
 
 這份只放「現在」的狀態：branch、版本、待辦、待確認。永久的設計規則在 `docs/PROJECT_MEMORY.md`，不要寫到這裡；這裡的內容過時了就
-直接改掉或刪掉。最後更新：2026-10-10 晚上，**v2.5.3 發布**（使用者睡前交代整夜自主工作，`docs/v24/overnight_autonomy_2026-10-10.txt`：
-模擬玩家抓到的 bug——「一鍵補到建議量」在冰箱放不下時，最後放上菜單的新菜一份都補不到——修好）。正式網址 **Version 14**，id `1791642868-d632`；
-遊戲內容＝ commit `0d41d8e`（tag `v2.5.3`，只在本機；GitHub 上是 branch `archive/release-v2.5.3`）；報告 `docs/V253_REPORT.md`；整夜的報告
-`docs/OVERNIGHT_REPORT_2026-10-10.md`（裡面有三件要使用者決定的事）。前一版 v2.5.2（第 8、9 位服務生小夏、阿衡）同一晚稍早發布。
+直接改掉或刪掉。最後更新：2026-10-13，**v2.5.4 已發布**（使用者 2026-10-11 的三項決策；正式網址 **Version 15**，id `1791906199-248b`；
+遊戲內容＝ commit `f8d9b87`，tag `v2.5.4` 只在本機，GitHub 上是 branch `archive/release-v2.5.4`；報告 `docs/V254_REPORT.md`）。之後照使用者交代的
+第五點自主排查（`docs/QA5_REPORT_2026-10-13.md`），修好三個 bug，**v2.5.5 正在 Release Gate**（下面「已完成、尚未發布」）。
 
 ## Repo 與 branch
 
@@ -134,7 +133,10 @@
 
 ### 已完成、尚未發布
 
-- （v2.5.4 發布以後，沒有已完成、尚未發布的遊戲改動。）
+- **v2.5.5（Release Gate 中，branch `feature/cooking-gameplay`）**：第五點排查修好的三個 bug——坐著生氣離開的客人評論不寫「客滿，沒等到位子。」
+  （24c04ec）、開店前的小按鈕按得到的範圍大一點（77f80d4）、商店 › 員工總表「負責什麼」那一欄被擠成 0 px（43703fe）；手冊戳記 v2.5.5（86820a6）。
+  完整回歸在 86820a6 上：`v24_day52_save_plays_the_stories_in_order_over_forty_days` 失敗（怡君第 63 天拿到鑰匙，晚一天），照
+  `docs/evidence/qa5_2026-10-13/day52/README.md` 事先寫好的規則比 14 個種子中。報告草稿 `docs/V255_REPORT.md`。
 
 - **料理流程 prototype**（branch `proto/cooking-flow`，`prototype/cooking/`）：獨立試玩頁，不是遊戲本體。使用者 2026-10-07：不合併、
   不發布、現在不要再做；之後重新開始時，以正式遊戲原本的廚房畫面為底，不重新設計美術。私人連結 https://claude.ai/artifact/EBzi6qETraguAApvettBFe 。
