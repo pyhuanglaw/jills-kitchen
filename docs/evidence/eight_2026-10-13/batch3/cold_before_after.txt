@@ -1,0 +1,44 @@
+== player_day92_2105 seed 300: 6 evenings, base = 400 (cold room cannot be bought), cold = 550 from the first morning
+ day |  cap  need sold unmet      net guests |  cap  need sold unmet      net guests
+  93 |  400   452    3     4    63384    117 |  550     0    2     0    60429    122
+  94 |  400   479    4     5    62351    117 |  550     0    0     0    57965    123
+  95 |  400   448    1     0    69172    125 |  550     0    0     0    74131    129
+  96 |  400   460    1     4    66158    118 |  550     0    0     0    72039    130
+  97 |  400   469    2     3    64685    117 |  550     0    3     7    58134    121
+  98 |  400   447    3     1    75275    125 |  550     0    0     0    90861    126
+sum  | sold 14 unmet 17 net 401025 rev 623425 cost 120118 | sold 5 unmet 7 net 413559 rev 650250 cost 127502  -> net diff 12534 over 6 evenings (the work costs $60,000 once)
+money at the end: base 1452121 cold 1464655 (cold's run had the work for free: subtract 60,000) ; rating 4.8 / 4.8 ; errors 0/0
+
+== player_day92_2105 seed 301: 6 evenings, base = 400 (cold room cannot be bought), cold = 550 from the first morning
+ day |  cap  need sold unmet      net guests |  cap  need sold unmet      net guests
+  93 |  400   452    2     2    57594    127 |  550     0    2     2    51400    120
+  94 |  400   472    0     0    50197    100 |  550     0    1     1    77897    129
+  95 |  400   458    6     2    70310    114 |  550     0    0     0    62004    107
+  96 |  400   453    1     0    61526    104 |  550     0    2     4    75227    117
+  97 |  400   460    5    11    59820    124 |  550     0    0     0    75433    126
+  98 |  400   456    3     4    72804    109 |  550     0    4     3    90609    122
+sum  | sold 17 unmet 19 net 372251 rev 594525 cost 114817 | sold 9 unmet 10 net 432570 rev 650090 cost 130889  -> net diff 60319 over 6 evenings (the work costs $60,000 once)
+money at the end: base 1423347 cold 1483666 (cold's run had the work for free: subtract 60,000) ; rating 4.7 / 4.8 ; errors 0/0
+
+== player_day61_0933 seed 300: 6 evenings, base = 400 (cold room cannot be bought), cold = 550 from the first morning
+ day |  cap  need sold unmet      net guests |  cap  need sold unmet      net guests
+  62 |  400   418    0     0    32072    103 |  550     0    0     0    29726    103
+  63 |  400     0    0     0    66638    114 |  550     0    0     0    68634    114
+  64 |  400     0    1     1    73241    131 |  550     0    1     1    73633    131
+  65 |  400   423    3     0    60593    122 |  550     0    1     0    56961    122
+  66 |  400   420    2     0    61764    113 |  550     0    0     0    49523    102
+  67 |  400   406    2     4    63146    115 |  550     0    1     0    67876    121
+sum  | sold 8 unmet 5 net 357454 rev 521570 cost 116752 | sold 3 unmet 1 net 346353 rev 515110 cost 115017  -> net diff -11101 over 6 evenings (the work costs $60,000 once)
+money at the end: base 240528 cold 229427 (cold's run had the work for free: subtract 60,000) ; rating 4.7 / 4.5 ; errors 0/0
+
+== player_day89_2320 seed 300: 6 evenings, base = 400 (cold room cannot be bought), cold = 550 from the first morning
+ day |  cap  need sold unmet      net guests |  cap  need sold unmet      net guests
+  89 |  400   478    4    12   103478    143 |  550   478    4    12   103478    143
+  90 |  400   488    3     4    66970    126 |  550     0    0     0    51734    117
+  91 |  400   461    3     4    59149    102 |  550     0    2     1    59262    123
+  92 |  400   454    3     2    64682    108 |  550     0    1     0    83706    120
+  93 |  400   446    6     3    84546    127 |  550     0    1     0    74675    122
+  94 |  400   459    1     1    66852    127 |  550     0    2     1    63074    121
+sum  | sold 20 unmet 26 net 445677 rev 641540 cost 129960 | sold 10 unmet 14 net 435929 rev 634165 cost 134010  -> net diff -9748 over 6 evenings (the work costs $60,000 once)
+money at the end: base 1097749 cold 1088001 (cold's run had the work for free: subtract 60,000) ; rating 4.8 / 4.9 ; errors 0/0
+
