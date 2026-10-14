@@ -1,0 +1,23 @@
+== current
+PASS  qa_the_summary_says_when_the_fridge_was_short  (4.5s)
+== always_upgrade
+FAIL  qa_the_summary_says_when_the_fridge_was_short  (1.9s)
+      the largest fridge, a day that wants more: {'t': '預估需求 760 份｜冰箱容量 550 份\n部分料理可能提前售完，可升級冰箱增加容量', 'capd': 760, 'cap': 550}
+== never_upgrade
+FAIL  qa_the_summary_says_when_the_fridge_was_short  (2.1s)
+      the Day 92 fridge (400) can still grow; the prep card says: '預估需求 468 份｜冰箱容量 400 份\n部分料理可能提前售完，冰箱和冷藏庫都已經是最大'
+== summary_upgrade_always
+FAIL  qa_the_summary_says_when_the_fridge_was_short  (2.9s)
+      with nothing left to buy, the summary still says to upgrade: '冰箱不夠放：預估需求 468 份｜冰箱容量 400 份\n今晚 2 道菜賣完，賣完後還有人想點的估計 5 份（照售價約 $3,540）。升級冰箱可以多放。'
+== summary_upgrade_never
+FAIL  qa_the_summary_says_when_the_fridge_was_short  (3.2s)
+      the Day 92 fridge can still grow (冷藏室擴建), the summary does not say so: '冰箱不夠放：預估需求 468 份｜冰箱容量 400 份\n今晚 2 道菜賣完，賣完後還有人想點的估計 5 份（照售價約 $3,540）。'
+== summary_no_line
+FAIL  qa_the_summary_says_when_the_fridge_was_short  (2.9s)
+      the Day 92 night ran out with the fridge too small for the day, and the summary says nothing
+== summary_any_night
+FAIL  qa_the_summary_says_when_the_fridge_was_short  (4.4s)
+      the Day 33 fridge held the day (capped 0); the summary still blames it: '冰箱不夠放：預估需求 0 份｜冰箱容量 260 份\n開店時放了 236 份。今晚 2 道菜賣完，賣完後還有人想點的估計 5 份（照售價約 $2,780）。升級冰箱可以多放。'
+== cold_not_counted
+FAIL  qa_the_summary_says_when_the_fridge_was_short  (2.1s)
+      the Day 92 fridge (400) can still grow; the prep card says: '預估需求 468 份｜冰箱容量 400 份\n部分料理可能提前售完，冰箱和冷藏庫都已經是最大'

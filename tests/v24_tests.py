@@ -2,7 +2,7 @@
 day's story presence, the walk-over, the order of the eras and their dormancy, narrative-time pacing, the story
 illustrations, the name pools. Same harness and TESTS list as run_tests.py (imported at the end of that file), so
 `python3 tests/run_tests.py -k v24` runs these."""
-import json, os, sys, glob, re
+import json, os, sys, glob, re, math
 _rt = sys.modules['__main__'] if hasattr(sys.modules.get('__main__'), 'TESTS') else __import__('run_tests')
 test, check, Game, ROOT, start_day, install_bot, LAZY_ACTOR, play_day = (_rt.test, _rt.check, _rt.Game, _rt.ROOT, _rt.start_day, _rt.install_bot, _rt.LAZY_ACTOR, _rt.play_day)
 
@@ -5304,7 +5304,10 @@ def v24_rc77_kens_share_of_a_tasting_night(b, port, target):
     paid = json.loads(g.ev("JSON.stringify(__paid)"))
     check(s['kt'] and s['kt']['n'] == sum(p['n'] for p in paid) and s['kt']['n'] >= 10, f'the night\'s guests counted: {s["kt"]} / {len(paid)} tabs')
     check(abs(s['kt']['cost'] - round(sum(p['cost'] for p in paid))) <= 1, f'what they had cost: {s["kt"]["cost"]}')
-    check(s['ken'] == round(.3 * max(0, s['kt']['rev'] - s['kt']['cost'])) and s['ken'] > 0, f'30% of the night\'s profit: {s}')
+    # (2026-10-14, the v2.6 gate: the game rounds as JavaScript does, Math.round — half up; Python's round() takes a half to the even
+    # number, so a night whose 30% ends in exactly .5 (rev 16,640, cost 5,145: 3,448.5 → the game 3,449) failed here though the game
+    # was right. math.floor(x + .5) is Math.round's own definition. docs/evidence/v26_gate/ken_round/)
+    check(s['ken'] == math.floor(.3 * max(0, s['kt']['rev'] - s['kt']['cost']) + .5) and s['ken'] > 0, f'30% of the night\'s profit: {s}')
     txt = g.ev("$('#screen').innerText")
     check('品酒之夜分潤' in txt and 'Ken，品酒客利潤的三成' in txt, 'the ledger\'s line')
     notes = json.loads(g.ev("JSON.stringify([...document.querySelectorAll('#screen .daynotes div')].map(e=>e.innerText.replace(/\\s+/g,' ')))"))

@@ -1,0 +1,13 @@
+== current
+PASS  v24_rc77_kens_share_of_a_tasting_night  (14.5s)
+== cut_25
+FAIL  v24_rc77_kens_share_of_a_tasting_night  (7.6s)
+      30% of the night's profit: {'ken': 2874, 'kt': {'n': 23, 'rev': 16640, 'cost': 5145}, 'net': 43445, 'cut': True}
+== cut_floor
+FAIL  v24_rc77_kens_share_of_a_tasting_night  (7.6s)
+      30% of the night's profit: {'ken': 3448, 'kt': {'n': 23, 'rev': 16640, 'cost': 5145}, 'net': 42871, 'cut': True}
+== cut_of_revenue
+FAIL  v24_rc77_kens_share_of_a_tasting_night  (7.3s)
+      30% of the night's profit: {'ken': 4992, 'kt': {'n': 23, 'rev': 16640, 'cost': 5145}, 'net': 41327, 'cut': True}
+== v255
+PASS  v24_rc77_kens_share_of_a_tasting_night  (13.2s)

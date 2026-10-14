@@ -1,0 +1,2 @@
+FAIL  v24_rc77_kens_share_of_a_tasting_night  (8.2s)
+      30% of the night's profit: {'ken': 3449, 'kt': {'n': 23, 'rev': 16640, 'cost': 5145}, 'net': 42870, 'cut': True}

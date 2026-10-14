@@ -1100,6 +1100,11 @@ Release Gate 四-1／四-3：「不得出現無法透過合理操作、聘人或
       - `golden_frames`：只重錄 `tests/golden/screens/prep.png`（第 1 天開店前多了備料卡片）；兩天逐格的行為和其他 9 張畫面沒變；重錄後開店前和
         結算頁的改變都還抓得到（`batch2/golden/`）。
       - `v24_manual_tutorial_and_news_cover_the_new_content`：手冊稽核戳記 `— last: v2.6,`（八件事都查過，沒有改字；見 `GUIDE` 上的戳記）。
+    - **完整回歸（80ce485）抓到的兩個測試缺陷**（378／380；遊戲沒有錯，`docs/evidence/v26_gate/`）：
+      - `v24_rc77_kens_share_of_a_tasting_night`：期望值用 Python 的 `round()`（.5 取偶數），遊戲用 `Math.round`（.5 進位）；那晚三成剛好是
+        3,448.5。改成 `math.floor(x + .5)`（`Math.round` 的定義）；這個版本和 v2.5.5 通過，分 25%、無條件捨去、用營業額算的三個做壞版本失敗（`ken_round/`）。
+      - `qa_the_summary_says_when_the_fridge_was_short`：第二批寫的時候 400 是最大；第三批加了 550 以後，第 92 天其實還能升級。改成驗證兩種情況
+        （還能升級：卡片和結算都說；升到最大而且想要的更多：都不說），7 個做壞版本都失敗（`summary_fridge/`）。
 
 ## 使用者 iPhone 回報（2026-10-08 晚上到 10-09 凌晨）
 

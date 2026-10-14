@@ -1,0 +1,2 @@
+FAIL  qa_the_summary_says_when_the_fridge_was_short  (1.7s)
+      the Day 92 fridge is at its largest; the prep card says: '預估需求 468 份｜冰箱容量 400 份\n部分料理可能提前售完，可升級冰箱增加容量'

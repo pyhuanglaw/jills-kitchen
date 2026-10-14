@@ -1156,8 +1156,10 @@ def qa_the_summary_says_when_the_fridge_was_short(b, port, target):
     計算，不得寫死」. On the user's Day 92 save (the suggestion cut to the fridge: 468 wanted, 400 held), restocked and opened: two
     dishes run out with tables still asking for them (3 and 2) — the summary says, under 「今天賣了什麼」, the day's demand and the
     fridge, how many dishes ran out, the 5 portions and what they would have fetched at tonight's prices; on the Day 33 save (the
-    fridge held the day) the same night says nothing. 「可升級冰箱」 only while there is an upgrade left (the Day 92 fridge is at
-    its largest; with the fridge two levels down, the prep card says it can grow)."""
+    fridge held the day) the same night says nothing. 「可升級冰箱」 only while there is an upgrade left: the Day 92 save's 400 can
+    still grow — decision 七's 冷藏室擴建 (550) — so the card and the summary say so; with that built and a day that wants more than
+    550, the card says the fridge and the cold room are at their largest and does not send the player to buy anything.
+    (Written in batch two, when 400 was the largest; batch three's 550 changed the Day 92 answer, the 2026-10-14 gate caught it.)"""
     for save in (LATE, 'player_day33.json'):
         p = Player(b, port, target, save=save, W=390, checkpoint=False)
         try:
@@ -1165,12 +1167,14 @@ def qa_the_summary_says_when_the_fridge_was_short(b, port, target):
             capd = p.ev("S.today.sugCapped||0")
             if save == LATE:
                 txt = p.ev("(document.querySelector('#screen .rs-short')||{}).innerText||''")
-                check(capd and '冰箱和冷藏庫都已經是最大' in txt and '可升級' not in txt, f'the Day 92 fridge is at its largest; the prep card says: {txt!r}')
-                lv = p.ev("S.eq.fridge")
-                p.ev("S.eq.fridge=3;S.today.sugKey=null;showPrep()"); p.frames(3)
+                check(capd and '可升級冰箱增加容量' in txt and '都已經是最大' not in txt, f'the Day 92 fridge (400) can still grow; the prep card says: {txt!r}')
+                # built to the last step, and a day that wants more than it holds: nothing left to buy
+                hist = p.ev("JSON.stringify(S.salesHist||{})")
+                p.ev("S.rooms.coldroom=1;for(const d in (S.salesHist||{}))S.salesHist[d]*=3;S.today.sugKey=null;showPrep()"); p.frames(3)
                 txt2 = json.loads(p.ev("JSON.stringify({t:(document.querySelector('#screen .rs-short')||{}).innerText||'',capd:S.today.sugCapped,cap:fridgeCap()})"))
-                check(f'預估需求 {txt2["capd"]} 份｜冰箱容量 {txt2["cap"]} 份' in txt2['t'] and '可升級冰箱增加容量' in txt2['t'], f'a smaller fridge: {txt2}')
-                p.ev(f"S.eq.fridge={lv};S.today.sugKey=null;showPrep()"); p.frames(3)
+                check(txt2['cap'] == 550 and txt2['capd'] > 550 and f'預估需求 {txt2["capd"]} 份｜冰箱容量 550 份' in txt2['t'] and '冰箱和冷藏庫都已經是最大' in txt2['t'] and '可升級' not in txt2['t'],
+                      f'the largest fridge, a day that wants more: {txt2}')
+                p.ev(f"delete S.rooms.coldroom;S.salesHist={hist};S.today.sugKey=null;showPrep()"); p.frames(3)
             p.restock(); p.start_day()
             r = json.loads(p.ev(r"""JSON.stringify((()=>{const ms=menuList().filter(d=>DISH(d)&&!DISH(d).bar&&DISH(d).cat!=='drink');const a=ms[0],b=ms[1];S.stock[a]=0;S.stock[b]=0;R.st.dish[a]=(R.st.dish[a]||0)+4;R.st.unmet={[a]:3,[b]:2};
               const st=R.st;for(const g of R.groups)g.gone=true;R.groups.length=0;R.closed=true;R.ended=true;endDay();while(typeof DLG!=='undefined'&&DLG)dlgNext();if(phase!=='summary')showSummary();
@@ -1181,7 +1185,9 @@ def qa_the_summary_says_when_the_fridge_was_short(b, port, target):
                 check(r['txt'], 'the Day 92 night ran out with the fridge too small for the day, and the summary says nothing')
                 for part in (f'預估需求 {capd} 份｜冰箱容量 {r["cap"]} 份', f'今晚 {r["out"]} 道菜賣完', '估計 5 份', r['rev']):
                     check(part in r['txt'], f'the summary\'s fridge line misses 「{part}」: {r["txt"]!r}')
-                check('升級冰箱' not in r['txt'], f'the fridge is at its largest, the summary still says to upgrade: {r["txt"]!r}')
+                check('升級冰箱可以多放' in r['txt'], f'the Day 92 fridge can still grow (冷藏室擴建), the summary does not say so: {r["txt"]!r}')
+                t2 = p.ev("(()=>{S.rooms.coldroom=1;showSummary();const e=document.querySelector('#screen .sum-fridge');const t=e?e.innerText:null;delete S.rooms.coldroom;return t})()")
+                check(t2 and '升級冰箱' not in t2, f'with nothing left to buy, the summary still says to upgrade: {t2!r}')
                 check(r['under'] and r['px'] >= 13, f'the line is not right under 「今天賣了什麼」 in readable type: {r}')
             else:
                 check(not capd and r['txt'] is None, f'the Day 33 fridge held the day (capped {capd}); the summary still blames it: {r["txt"]!r}')
