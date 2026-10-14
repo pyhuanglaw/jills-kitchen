@@ -1079,6 +1079,27 @@ Release Gate 四-1／四-3：「不得出現無法透過合理操作、聘人或
       64.43／64.57、調解 80.79／81.71，達標 9／7），換到兩個版本都達標裡號碼最小的 7000；檢查和門檻沒改；三個故意做慢的版本在 7000 上都
       失敗（`day52/`）。
     - `v24_manual_tutorial_and_news_cover_the_new_content`：手冊稽核戳記 `— last: v2.5.5,`（三件事手冊都沒寫，沒有改字）。
+47. **2026-10-13／14（v2.6，使用者的八項決策 `docs/v24/eight_decisions_2026-10-13.txt`；1c2db6e、96e116e、14f5ba5）**：證據
+    `docs/evidence/eight_2026-10-13/batch1/`、`batch2/`、`batch3/`。沒有刪測試、沒有跳過、沒有降低門檻；換種子：沒有。
+    - **新增**（每一個都有做壞的版本證明抓得到：第一批 18、第二批 17＋2、第三批 17）：
+      - 第一批：`dylan_takes_what_is_left_and_never_storms_off`、`important_people_complain_in_their_own_words`、
+        `madame_lin_comes_as_herself_not_as_a_drawn_stranger`、`a_passing_family_is_not_the_wangs`。
+      - 第二批：`qa_restock_sits_under_todays_weather`（第 92／33／6 天存檔、390×844 和 375×667：一打開不用捲就看得到、按下去的結果等於
+        `returnOffMenu`＋`restockPlan`）、`qa_the_prep_screens_44_reach_by_real_taps`（觸控點擊每個控制項範圍的外緣；每道菜的列高跟 1c2db6e
+        一樣）、`qa_the_staff_x_takes_a_finger`、`qa_the_summary_says_when_the_fridge_was_short`。
+      - 第三批：`kitchen_two_has_a_third_board_at_the_pass`、`without_kitchen_two_the_cold_counter_keeps_two`（含使用者第 89 天的舊格式營業中途
+        存檔怎麼對應到新廚房）、`the_cold_room_is_the_last_cold_step`、`the_forecast_counts_the_evening_that_comes`。
+    - **改過的**：
+      - `qa_the_prep_screens_small_buttons_take_a_finger`：門檻從 42×38／54×36／高 36 提高到 44 高（決策八）；取樣方式不變。
+      - `stock_suggestion_follows_each_dish_and_counts_the_demand_it_missed`：原本檢查開店前畫面有「冰箱裝不下」四個字；決策五把那句換成使用者
+        指定的「預估需求 N 份｜冰箱容量 M 份」，改成檢查這句和當天的數字（比原本嚴格）。
+      - `qa_restock_says_why_it_cannot`：原本——冰箱被「補滿」一道菜塞滿後按一鍵補貨，要嘛每道都補到、要嘛畫面說了為什麼。不再成立的是「按」：
+        卡片和按鈕現在先算好按下去會買多少（`restockPreview`），什麼都買不到時按鈕是灰的、寫「（冰箱已滿）」。改成——按鈕灰的時候要寫出原因
+        （按鈕「冰箱已滿」、卡片「冰箱滿了」）；按得下去時照原本的檢查。兩個做壞的版本（灰了不說原因、按得下去但買不到也不說）都失敗，
+        1c2db6e 和現在都通過（`batch2/mutants.txt`）。
+      - `golden_frames`：只重錄 `tests/golden/screens/prep.png`（第 1 天開店前多了備料卡片）；兩天逐格的行為和其他 9 張畫面沒變；重錄後開店前和
+        結算頁的改變都還抓得到（`batch2/golden/`）。
+      - `v24_manual_tutorial_and_news_cover_the_new_content`：手冊稽核戳記 `— last: v2.6,`（八件事都查過，沒有改字；見 `GUIDE` 上的戳記）。
 
 ## 使用者 iPhone 回報（2026-10-08 晚上到 10-09 凌晨）
 
