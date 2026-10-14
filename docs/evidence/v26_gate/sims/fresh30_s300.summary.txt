@@ -1,0 +1,18 @@
+days 1 -> 30 | page errors 0
+money 2496 -> 25924 | level 1 -> 2 | rating 3 -> 3.9
+net/evening min/avg/max 496 4134 9344 | guests avg 21.3 | lost avg 9.9
+story firsts: {'yj_meet': 8, 'yj_key': 16, 'yj_move': 14, 'lin_hello': 1, 'lin_seen': 19, 'ken_wine_q': 14, 'lounge_idea': 14}
+presence flags 41
+    {'d': 1, 'c': '17:00', 'w': 'Madame Lin', 't': '終於開了。', 'bad': 'guest-not-here', 'dlg': True, 'kind': 'g'}
+    {'d': 1, 'c': '17:00', 'w': 'Madame Lin', 't': '恭喜。', 'bad': 'guest-not-here', 'dlg': True, 'kind': 'g'}
+    {'d': 1, 'c': '17:00', 'w': 'Madame Lin', 't': '開店哪有空手來的。', 'bad': 'guest-not-here', 'dlg': True, 'kind': 'g'}
+    {'d': 1, 'c': '17:00', 'w': 'Madame Lin', 't': '隔壁更不能空手。', 'bad': 'guest-not-here', 'dlg': True, 'kind': 'g'}
+    {'d': 14, 'c': '20:20', 'w': '品酒師 Ken', 't': '那是隔壁。', 'bad': 'guest-not-here', 'dlg': True, 'kind': 'g'}
+    {'d': 16, 'c': '17:00', 'w': '怡君', 't': '給妳。', 'bad': 'guest-not-here', 'dlg': True, 'kind': 'g'}
+    {'d': 16, 'c': '17:00', 'w': '怡君', 't': '下次來不用在樓下等。', 'bad': 'guest-not-here', 'dlg': True, 'kind': 'g'}
+    {'d': 16, 'c': '17:00', 'w': '怡君', 't': '那就偶爾用。', 'bad': 'guest-not-here', 'dlg': True, 'kind': 'g'}
+    {'d': 17, 'c': '19:20', 'w': '衛生檢查員', 't': '衛生局，例行檢查。', 'bad': 'guest-not-here', 'dlg': False, 'kind': 'g'}
+    {'d': 19, 'c': '18:13', 'w': '品酒師 Ken', 't': '妳要賣？', 'bad': 'guest-not-here', 'dlg': True, 'kind': 'g'}
+    {'d': 19, 'c': '18:13', 'w': '品酒師 Ken', 't': '……只配菜？', 'bad': 'guest-not-here', 'dlg': True, 'kind': 'g'}
+    {'d': 23, 'c': '20:20', 'w': '衛生檢查員', 't': '衛生局，例行檢查。', 'bad': 'guest-not-here', 'dlg': False, 'kind': 'g'}
+王家三口 0 | 一家三口 0 | Dylan 想點的都賣完 0 | Dylan 先走了(substitute none) 0

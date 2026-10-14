@@ -1,0 +1,18 @@
+days 62 -> 75 | page errors 0
+money 163696 -> 314830 | level 5 -> 5 | rating 4.2 -> 4.8
+net/evening min/avg/max 32072 59508 73241 | guests avg 117.6 | lost avg 20.1
+story firsts: {'yj_key': 63, 'lin_seen': 62, 'up_full': 70}
+presence flags 21
+    {'d': 62, 'c': '21:09', 'w': '陳伯伯', 't': 'Jill，謝謝。', 'bad': 'guest-not-here', 'dlg': False, 'kind': 'g'}
+    {'d': 63, 'c': '17:00', 'w': '怡君', 't': '給妳。', 'bad': 'guest-not-here', 'dlg': True, 'kind': 'g'}
+    {'d': 63, 'c': '17:00', 'w': '怡君', 't': '下次來不用在樓下等。', 'bad': 'guest-not-here', 'dlg': True, 'kind': 'g'}
+    {'d': 63, 'c': '17:00', 'w': '怡君', 't': '那就偶爾用。', 'bad': 'guest-not-here', 'dlg': True, 'kind': 'g'}
+    {'d': 65, 'c': '18:46', 'w': 'Sophie', 't': '嗯。', 'bad': 'guest-not-here', 'dlg': False, 'kind': 'g'}
+    {'d': 66, 'c': '18:04', 'w': '衛生檢查員', 't': '衛生局，例行檢查。', 'bad': 'guest-not-here', 'dlg': False, 'kind': 'g'}
+    {'d': 70, 'c': '17:00', 'w': '怡君', 't': '就是這面。每次下雨都這樣。', 'bad': 'guest-not-here', 'dlg': True, 'kind': 'g'}
+    {'d': 70, 'c': '17:00', 'w': 'Mia', 't': '這一塊的漆，跟旁邊不是同一次刷的。', 'bad': 'guest-not-here', 'dlg': True, 'kind': 'g'}
+    {'d': 70, 'c': '17:00', 'w': 'Sophie', 't': '看屋的時候呢？', 'bad': 'guest-not-here', 'dlg': True, 'kind': 'g'}
+    {'d': 70, 'c': '17:00', 'w': '怡君', 't': '很新。我還以為他們有用心整理。', 'bad': 'guest-not-here', 'dlg': True, 'kind': 'g'}
+    {'d': 70, 'c': '17:00', 'w': 'Sophie', 't': '現況說明書怎麼寫？', 'bad': 'guest-not-here', 'dlg': True, 'kind': 'g'}
+    {'d': 70, 'c': '17:00', 'w': '怡君', 't': '「無滲漏水」。', 'bad': 'guest-not-here', 'dlg': True, 'kind': 'g'}
+王家三口 0 | 一家三口 11 | Dylan 想點的都賣完 0 | Dylan 先走了(substitute none) 0

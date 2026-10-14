@@ -1,0 +1,15 @@
+days 93 -> 102 | page errors 0
+money 1242530 -> 1597012 | level 5 -> 5 | rating 4.7 -> 4.8
+net/evening min/avg/max 60346 69592 80923 | guests avg 122.8 | lost avg 22.9
+story firsts: {'lin_seen': 93}
+presence flags 9
+    {'d': 94, 'c': '19:22', 'w': '衛生檢查員', 't': '衛生局，例行檢查。', 'bad': 'guest-not-here', 'dlg': False, 'kind': 'g'}
+    {'d': 95, 'c': '22:05', 'w': '林予安', 't': '一杯。', 'bad': 'guest-not-here', 'dlg': True, 'kind': 'g'}
+    {'d': 95, 'c': '22:05', 'w': '林予安', 't': '你們下班都會留下來？', 'bad': 'guest-not-here', 'dlg': True, 'kind': 'g'}
+    {'d': 97, 'c': '17:00', 'w': '品酒師 Ken', 't': '第一批。', 'bad': 'guest-not-here', 'dlg': True, 'kind': 'g'}
+    {'d': 97, 'c': '17:00', 'w': '品酒師 Ken', 't': '酒單上。', 'bad': 'guest-not-here', 'dlg': True, 'kind': 'g'}
+    {'d': 98, 'c': '18:14', 'w': '衛生檢查員', 't': '衛生局，例行檢查。', 'bad': 'guest-not-here', 'dlg': False, 'kind': 'g'}
+    {'d': 100, 'c': '18:19', 'w': '衛生檢查員', 't': '衛生局，例行檢查。', 'bad': 'guest-not-here', 'dlg': False, 'kind': 'g'}
+    {'d': 101, 'c': '22:22', 'w': 'Dylan', 't': '嗯？', 'bad': 'guest-not-here', 'dlg': True, 'kind': 'd'}
+    {'d': 101, 'c': '22:25', 'w': 'Dylan', 't': '……妳以前第一天賺多少？', 'bad': 'guest-not-here', 'dlg': True, 'kind': 'd'}
+王家三口 0 | 一家三口 11 | Dylan 想點的都賣完 0 | Dylan 先走了(substitute none) 0
