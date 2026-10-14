@@ -1,0 +1,15 @@
+== player_day92_2105_s300_base.json
+  Day 93: old display 102  new display 117  came 134 (served 117, left the queue 17)  k after 1.141
+  Day 94: old display 102  new display 134  came 149 (served 117, left the queue 32)  k after 1.192
+  Day 95: old display 102  new display 140  came 143 (served 125, left the queue 18)  k after 1.202
+  Day 96: old display 102  new display 141  came 148 (served 118, left the queue 30)  k after 1.225
+  Day 97: old display 102  new display 155  came 149 (served 117, left the queue 32)  k after 1.205
+  Day 98: old display 102  new display 141  came 152 (served 125, left the queue 27)  k after 1.241
+== player_day92_2105_s301_base.json
+  Day 93: old display 102  new display 117  came 148 (served 127, left the queue 21)  k after 1.261
+  Day 94: old display 102  new display 148  came 137 (served 100, left the queue 37)  k after 1.223
+  Day 95: old display 102  new display 149  came 133 (served 114, left the queue 19)  k after 1.17
+  Day 96: old display 102  new display 137  came 131 (served 104, left the queue 27)  k after 1.148
+  Day 97: old display 102  new display 135  came 137 (served 124, left the queue 13)  k after 1.156
+  Day 98: old display 102  new display 139  came 152 (served 109, left the queue 43)  k after 1.199
+mean |error|: old 28.3%  new 8.0%  (12 evenings)

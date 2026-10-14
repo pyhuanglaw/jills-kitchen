@@ -10,5 +10,6 @@
      在這張截圖的範圍外。這正是決策四要的改變。
 2. **重錄**：`python3 tests/run_tests.py -k golden_frames --record`。`git status` 只有 `tests/golden/screens/prep.png` 改變；
    `tests/golden/frames.json` 和其他 9 張圖逐位元組沒變。
-3. **重錄後的證明**（`proof.txt`）：同一個 build 跑 `golden_frames` 通過；把補貨卡片裡那行字往下挪 1 px 的版本、把結算頁帳目往下挪 1 px 的版本
-   （`../mutants_make.py` 的 `golden_card_1px`、`golden_summary_1px`）都失敗——它還看得到開店前畫面和其他畫面的改變。
+3. **重錄後的證明**（`proof.txt`）：同一個 build 跑 `golden_frames` 通過；把補貨卡片裡那行字往下挪 1 px 的版本（`golden_card_1px`）失敗——
+   它看得到開店前畫面的改變。另一個要證明「其他畫面也還看得到」的版本，第一次做壞的方式不對（`.ledger{margin-top:1px}` 被上面的邊距吃掉，
+   畫面根本沒變，所以通過）；改成把結算頁的數字字距加寬一點（`golden_summary_spacing`）後失敗：`summary: pixels differ`。兩次結果都留在 `proof.txt`。

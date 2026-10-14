@@ -353,7 +353,11 @@ const PROJECTS=[
    achievement 'The Whole Block' names its five projects. need = the project it builds on. */
 const KITCHEN_WORKS=[
  {k:'walkin',n:'走入式冷藏庫',cost:80000,lv:5,need:'cooler',ic:'walkin',room:'kitchen',d:'把冷藏庫打掉，換成人走得進去的冷藏室：食材容量再 +140 份（冰箱 LV5 時共 400 份）。生意最好的晚上，菜單上的菜也撐得到打烊。',done:'不鏽鋼的大門裝好了。門一拉開，一陣白霧。',jill:'這下放得下了。',unlock:['食材容量 +140 份'],react:()=>{const m=(S.crew||[]).find(q=>q.role==='chef');return m?`${m.name}：「熱的時候可以進去站一下嗎？」`:'包包在冷藏室門口坐了很久。'}},
- {k:'kitchen2',n:'廚房二期',cost:150000,lv:5,need:'kext',needEq:'bar',ic:'kitchen2',room:'kitchen',d:'咖啡機旁邊再裝一台雙沖煮頭：咖啡吧多 2 個杯位（最多同時 4 杯），點飲料的人多的晚上不用一杯等一杯。爐台收窄一點讓出位置。飲料出得快了，外場要有人端：服務生可以再多聘 2 位。',done:'第二台咖啡機開機了，兩台一起冒蒸氣。',jill:'兩台一起，比較像樣。',unlock:['咖啡吧杯位 +2','服務生 +2'],react:()=>{const m=(S.crew||[]).find(q=>q.role==='chef'&&q.duty==='bar')||(S.crew||[]).find(q=>q.role==='chef');return m?`${m.name}：「兩台，我一個人顧得來。」`:'蒸氣的聲音變成兩倍。'}},
+ /* 2026-10-13 (the user's decision 七, docs/v24/eight_decisions_2026-10-13.txt: 「新增後期冷藏庫升級：400 → 550 份」「使用既有店舖工程或
+    冷藏設備升級系統」「升級費用定為 $60,000」「保留原有容量升級階段，這是最高階的額外擴充」「UI 應明確標示增加的容量與費用」「不增加日常手動補貨
+    步驟」「舊存檔保留原本已購買的所有升級，不自動扣錢」): the last step of the cold storage, after the walk-in — the same one-tap restock fills it */
+ {k:'coldroom',n:'冷藏室擴建',cost:60000,lv:5,need:'walkin',ic:'coldroom',room:'kitchen',d:'把走入式冷藏庫往後面的儲藏間再打通一段，加一排層架和第二台壓縮機：食材容量再 +150 份（冰箱 LV5 時從 400 份變 550 份）。冷藏的最後一階；補貨照樣一鍵補到建議量。',done:'冷藏室多了一段層架，第二台壓縮機開始嗡嗡響。',jill:'這下真的放得下了。',unlock:['食材容量 +150 份（400 → 550）'],react:()=>{const m=(S.crew||[]).find(q=>q.role==='chef');return m?`${m.name}：「層架可以放到天花板了。」`:'包包在新層架底下找到一個最涼的角落。'}},
+ {k:'kitchen2',n:'廚房二期',cost:150000,lv:5,need:'kext',needEq:'bar',ic:'kitchen2',room:'kitchen',d:'咖啡機旁邊再裝一台雙沖煮頭：咖啡吧多 2 個杯位（最多同時 4 杯），點飲料的人多的晚上不用一杯等一杯。爐台收窄一點讓出位置。飲料出得快了，外場要有人端：服務生可以再多聘 2 位。出菜口右端改成木頭備料檯，多一塊砧板（第三塊，冷盤的菜可以三道一起做）。',done:'第二台咖啡機開機了，兩台一起冒蒸氣。',jill:'兩台一起，比較像樣。',unlock:['咖啡吧杯位 +2','服務生 +2','砧板 +1（出菜口旁）'],react:()=>{const m=(S.crew||[]).find(q=>q.role==='chef'&&q.duty==='bar')||(S.crew||[]).find(q=>q.role==='chef');return m?`${m.name}：「兩台，我一個人顧得來。」`:'蒸氣的聲音變成兩倍。'}},
  {k:'pizzaoven',n:'披薩烤爐',cost:120000,lv:4,needLounge:1,ic:'pizzaoven',room:'kitchen',d:'在廚房後牆、排煙罩旁邊砌一座磚造的披薩烤爐，底下是石板：可以在「菜單研發」研發酒吧披薩，給 Lounge 的客人。廚師可以再多聘 1 位；廚房裡有空的廚師都會烤，沒有廚師的晚上 Jill 自己烤。要先有 Lounge。',done:'烤爐點起來了。第一個晚上，整間廚房都是烤餅皮的味道。',jill:'……先烤一個我們自己吃。',unlock:['菜單研發：酒吧披薩','廚師 +1'],react:()=>{const m=(S.crew||[]).find(q=>q.role==='chef'&&q.name==='阿拓')||(S.crew||[]).find(q=>q.role==='chef');return m?`${m.name}：「我來顧。」`:'包包在烤爐前面坐了很久——那裡很暖。'}},   /* rc7.5 (23:08) */
 ];
 const EXTERIOR=[
@@ -529,7 +533,7 @@ const EQUIP=[
  {k:'pan',n:'平底鍋',cost:[0,600,1600,4000,9000],d:lv=>`煎類料理速度 +${(lv-1)*8}%`},   /* v2.5: the new kitchen has no Perfect window and nothing burns, so only the speed is left to say */
  {k:'oven',n:'烤箱',cost:[1200,1500,3500,8000,16000],d:lv=>lv?`${lv>=3?'雙門烤箱，2':'1'} 個烤位・速度 ×${SPD[lv-1].toFixed(2)}`:'爐台旁裝一台烤箱，解鎖烤類料理：松露薯條、烤雞、鮭魚…'},
  {k:'bar',n:'咖啡機',cost:[0,700,2000,5000,11000],d:lv=>lv?`${lv>=3?'雙沖煮頭，同時 2':'同時 1'} 杯${projOn('kitchen2')?`＋第二台，共 ${barCups(lv)} 杯`:''}・速度 ×${SPD[lv-1].toFixed(2)}`:'工作台尾端裝一台咖啡機，解鎖飲料。'},
- {k:'fridge',n:'冰箱',cost:[0,800,2200,5000,12000],d:lv=>`食材容量 ${FRIDGE[lv-1]+coldExtra()} 份・冷盤台 ${lv>=3?2:1} 塊砧板・冷藏速度 ×${SPD[lv-1].toFixed(2)}`},
+ {k:'fridge',n:'冰箱',cost:[0,800,2200,5000,12000],d:lv=>`食材容量 ${FRIDGE[lv-1]+coldExtra()} 份・冷盤台 ${lv>=3?2:1} 塊砧板${prepExtOn()?'＋出菜口旁 1 塊':''}・冷藏速度 ×${SPD[lv-1].toFixed(2)}`},
 ];
 const SPD=[1,1.12,1.25,1.4,1.55];
 const FRIDGE=[40,60,90,130,180];
@@ -750,9 +754,9 @@ const LV=()=>LEVELS[S.level-1];
 const tableCap=()=>LV().tables;
 const menuCap=()=>LV().menu+2*opsLv('board')+(projOn('side')?2:0);
 const menuCount=()=>S.menu.filter(d=>S.unlocked.includes(d)&&!(DISHES[d]&&DISHES[d].bar)).length;   /* v2.3: Bar Food takes no menu slot */
-const coldExtra=()=>(projOn('cooler')?80:0)+(projOn('walkin')?140:0);   /* the cold room, then the walk-in */
+const coldExtra=()=>(projOn('cooler')?80:0)+(projOn('walkin')?140:0)+(projOn('coldroom')?150:0);   /* the cold room, then the walk-in, then (2026-10-13, decision 七) the walk-in run through into the store room behind it */
 const fridgeCap=()=>FRIDGE[S.eq.fridge-1]+coldExtra();
-const COLD_PROJ=['cooler','walkin'];   /* the cold-room projects that add to the fridge, in order */
+const COLD_PROJ=['cooler','walkin','coldroom'];   /* the cold-room projects that add to the fridge, in order */
 const fridgeCanGrow=()=>S.eq.fridge<FRIDGE.length||COLD_PROJ.some(k=>!projOn(k));   /* 2026-10-13 decision 五: 「可升級冰箱增加容量」 only while there is an upgrade left to buy */
 const barCups=lv=>lv?(lv>=3?2:1)+(projOn('kitchen2')?2:0):0;   /* kitchen II: a second coffee machine */
 function ambience(){let a=0;for(const d of DECOR)a+=(S.decor[d.k]||0)*d.amb;if(projOn('glass'))a+=2;if(projOn('ceiling'))a+=3;if(projOn('catwalk'))a+=3;if(projOn('chandelier'))a+=3;if(projOn('painting'))a+=2;if(seasonOn())a+=1;if(opsLv('ac')>=2)a+=1;if(opsLv('ac')>=3)a+=2;return a+(S.level-1)}
@@ -841,7 +845,19 @@ function buildTables(){const out=[];const nM=Math.min(S.tables,MAIN_MAX);const o
  return out}
 /* the kitchen's places, kind by kind in this order (bar: how many cups the coffee bar holds — a checkpoint from an older
    kitchen is laid out with its own count, slotMapOf) */
-function slotPlan(bar){return[['stove',stoveSlots(S.eq.stove)],['oven',S.eq.oven?(S.eq.oven>=3?2:1):0],['bar',bar],['prep',S.eq.prep?(S.eq.fridge>=3?2:1):0],['pizza',projOn('pizzaoven')?1:0]]}   /* rc7.5: the pizza oven */
+/* 2026-10-13 (the user's decision 六, docs/v24/eight_decisions_2026-10-13.txt: 「廚房二期解鎖第三塊砧板，設於出菜口旁合理的延伸備料檯面」
+   「不能直接在原本只能放兩塊砧板的狹窄冷盤台重疊畫第三塊」「第三塊必須有自己的實際位置、工作狀態、料理動畫和人物站位」「不得阻擋中央走道、
+   出菜口、餐盤或人員移動」「不得使出菜口有效容量下降」「已完成廚房二期的舊存檔自動取得新工作位置」「不需要重蓋工程，也不得重複收費」):
+   with kitchen II the pass's right-hand end is a butcher-block prep counter with a board of its own — the last prep place
+   (prepLine()+1). Its cook stands behind it in the aisle, as the one plating at the pass does; the right half's plates sit
+   side by side from the opening (wfRowX), as many as before, under the same lamps; the pass's box, its opening, the dish cart's
+   drop on the left and the door to Jill's room on the right are where they were. The cold counter keeps its two boards. */
+const PREPX_W=24;   /* the extension's width on the pass's right end */
+function prepLine(){return S.eq.prep?(S.eq.fridge>=3?2:1):0}
+function prepExtOn(){return projOn('kitchen2')&&S.eq.prep>0}
+function prepExtX(){return passEnds().x1-13}
+function isPrepExt(s){return !!s&&s.type==='prep'&&prepExtOn()&&s.no===prepLine()+1}
+function slotPlan(bar,noExt){return[['stove',stoveSlots(S.eq.stove)],['oven',S.eq.oven?(S.eq.oven>=3?2:1):0],['bar',bar],['prep',prepLine()+(!noExt&&prepExtOn()?1:0)],['pizza',projOn('pizzaoven')?1:0]]}   /* rc7.5: the pizza oven */
 function buildSlots(){const a=[];for(const[t,n]of slotPlan(barCups(S.eq.bar)))for(let i=0;i<n;i++)a.push({type:t,no:i+1,job:null,fx:null,flash:0});return a}
 function seatPos(t){if(t.pdr)return pdSeats();return t.seats===4?[{dx:-14,dy:-15,side:0},{dx:14,dy:-15,side:0},{dx:-36,dy:2,side:-1},{dx:36,dy:2,side:1}]:[{dx:-28,dy:0,side:-1},{dx:28,dy:0,side:1}]}   /* v2.2.1 F: the two-top grew a little (rx 22→25) so it holds its own beside the booths; its chairs step out with it */
 
@@ -1561,6 +1577,9 @@ function iconURL(kind,lv){const k='i'+kind+(lv||0);if(ICACHE.has(k))return ICACH
  case 'walkin':{let g=c.createLinearGradient(-30,0,30,0);g.addColorStop(0,'#AEB4B8');g.addColorStop(.5,'#D6DADD');g.addColorStop(1,'#A2A8AC');c.fillStyle=g;rr(c,-30,-38,60,72,4);c.fill();c.fillStyle='#E6E9EB';rr(c,-24,-30,48,62,3);c.fill();c.strokeStyle='#8E979B';c.lineWidth=1.4;rr(c,-24,-30,48,62,3);c.stroke();
   c.fillStyle='#7C858A';circ(c,-4,-14,10);c.fillStyle='#3A5868';circ(c,-4,-14,8);c.fillStyle='rgba(235,246,252,.8)';for(let a=0;a<8;a++){const t=a/8*6.283;circ(c,-4+Math.cos(t)*6.6,-14+Math.sin(t)*6.6,1.3)}
   c.fillStyle='#3E86C8';rr(c,10,-26,11,7,1.5);c.fill();c.fillStyle='#5E676C';rr(c,13,-6,4.5,22,2);c.fill();c.fillStyle='#7C858A';rr(c,-27,-22,4,9,1);c.fill();rr(c,-27,14,4,9,1);c.fill();c.fillStyle='rgba(236,246,252,.6)';for(let i=0;i<3;i++)el(c,-14+i*12,36,7,2.4);break}
+ case 'coldroom':{steel(-34,-36,68,72,4);c.fillStyle='#E6E9EB';rr(c,-30,-29,28,62,3);c.fill();c.strokeStyle='#8E979B';c.lineWidth=1.2;rr(c,-30,-29,28,62,3);c.stroke();c.fillStyle='#7C858A';circ(c,-16,-13,7.5);c.fillStyle='#3A5868';circ(c,-16,-13,5.8);c.fillStyle='#5E676C';rr(c,-8,-2,3.6,16,1.6);c.fill();
+  c.fillStyle='#2A2F33';rr(c,2,-29,29,62,2);c.fill();const box=['#E7A03C','#7DB65A','#E05A44','#F2D16B','#8FB7D8','#C9935A'];for(let r=0;r<3;r++){c.fillStyle='#9AA3A8';c.fillRect(3,-12+r*18,27,2);for(let k=0;k<3;k++){c.fillStyle=box[(r*3+k)%6];rr(c,5+k*8.5,-21+r*18,7,9,1);c.fill()}}
+  c.fillStyle='#3E86C8';rr(c,-22,-34,13,6,1.5);c.fill();c.fillStyle='rgba(236,246,252,.7)';for(let i=0;i<4;i++)el(c,-24+i*16,37,6,2.2);break}
  case 'kitchen2':{for(const ox of[-18,13]){let g=c.createLinearGradient(ox-14,0,ox+14,0);g.addColorStop(0,'#9E7026');g.addColorStop(.5,'#EFCB80');g.addColorStop(1,'#95691F');c.fillStyle=g;rr(c,ox-14,-22,28,30,4);c.fill();c.fillStyle='#2A2A2A';rr(c,ox-12,8,24,5,1.5);c.fill();c.fillStyle='#555';c.fillRect(ox-8,13,3.6,6);c.fillRect(ox+4.4,13,3.6,6);c.fillStyle='#3A3F42';rr(c,ox-13,20,26,5,1.5);c.fill();c.fillStyle='#8FD3F4';circ(c,ox-7,-15,2);circ(c,ox+7,-15,2);
    for(let k=0;k<3;k++){c.fillStyle='#F7F4EE';rr(c,ox-10+k*7,-30,5.6,7,1.4);c.fill()}}c.fillStyle='#fff';rr(c,-24,24,9,7,2);c.fill();rr(c,7,24,9,7,2);c.fill();break}
  case 'pass':c.fillStyle='#2A2A2A';c.fillRect(-36,-30,72,3);for(const x of[-22,0,22]){c.fillRect(x-.8,-27,1.6,8);c.fillStyle='#B8536A';c.beginPath();c.moveTo(x-9,-8);c.lineTo(x+9,-8);c.lineTo(x+5,-19);c.lineTo(x-5,-19);c.closePath();c.fill();c.fillStyle='#FFE6A8';el(c,x,-7.5,6,1.6);c.fillStyle='#2A2A2A'}let pg=c.createLinearGradient(0,0,0,26);pg.addColorStop(0,'#D3D7D9');pg.addColorStop(1,'#AEB5B8');c.fillStyle=pg;rr(c,-40,8,80,18,4);c.fill();c.fillStyle='#F4F1EA';for(const x of[-22,0,22])el(c,x,8,9,4);break;
@@ -1691,7 +1710,18 @@ function expected(weather,event){const D=S.day;const NT=tablesTotal();let g=(3+N
  const people=Math.round(g*1.45);const items=Math.round(people*(D<=1?1:D<=3?1.4:1.7));return{groups:g,people,items}}
 function planToday(){if(S.today&&S.today.day===S.day)return;const F=feat();let weather='sun',event='none';
  if(F.events){const prev=S.wxPrev||'sun';const ww={sun:4,cloud:3,rain:2,storm:.9,hot:1.5,cool:1.6};if(prev==='rain'||prev==='storm'){ww.rain*=1.8;ww.storm*=1.5}if(prev==='hot')ww.hot*=1.8;weather=wpick(Object.keys(ww),k=>ww[k]);S.wxPrev=weather;const evs=Object.keys(EVENTS).filter(k=>!EVENTS[k].need||EVENTS[k].need());const cel=(S.stats.days+1)%10===0&&S.stats.days>0;event=cel?'celebrate':Math.random()<.38?'none':pick(evs.filter(k=>k!=='none'&&k!=='celebrate'&&(k!=='vip'||S.day>=5)))||'none'}
- const ex=expected(weather,event);S.today={day:S.day,weather,event,groups:ex.groups,people:ex.people,items:ex.items,tasks:[],reco:null};S.today.tasks=genTasks(ex);S.todayCost=S.todayCost||0}
+ const ex=expected(weather,event);S.today={day:S.day,weather,event,groups:ex.groups,people:ex.people,items:ex.items,tasks:[],reco:null};S.today.tasks=genTasks(ex);S.todayCost=S.todayCost||0;
+ {const base=ex.groups*meanGroupSize();S.today.flowBase=Math.round(base*10)/10;S.today.flow=Math.max(1,Math.round(base*(S.flowK||1)))}}
+/* 2026-10-13 (the user's decision 七: 「檢查原本預估客數固定約 102 位的封頂邏輯，改用合理的實際客流預估，不要讓後期固定顯示過低數字」).
+   The cap in expected() stays: it is how many parties the evening is planned with (buildSchedule), a grown restaurant's
+   tables turning three or four times — taking it away would bring more people, not a truer number. What was low is the
+   number shown: those parties × 1.45, when a party is about 1.6 people (the guests' own mix, meanGroupSize), and without
+   everyone who comes besides them — the regulars, the bookings, the critic, Ken, the Lounge's own guests, the stories.
+   So the prep screen shows the parties × their real size × what the last evenings brought on top (S.flowK: the people who
+   came — served and gone from the queue — over that estimate, kept as a running blend, set at each evening's end). The
+   tasks keep their own number (ex.people), as before. */
+function meanGroupSize(){const w=guestWeights();const sz={couple:2,vip:1.45,student:1.675,office:1.3,family:3};let a=0,b=0;for(const k in w){if(!(w[k]>0))continue;a+=w[k]*(sz[k]||1.4);b+=w[k]}return b?a/b:1.45}
+function flowLearn(st){const T=S.today;if(!T||!T.flowBase||T.day!==S.day)return;const came=(st.guests||0)+(st.lost||0);if(came<=0)return;const r=clamp(came/T.flowBase,.6,2.4);S.flowK=S.flowK?Math.round((S.flowK*.6+r*.4)*1000)/1000:Math.round(r*1000)/1000}
 function genTasks(ex){const D=S.day;const rw=60+D*25;const avgP=menuList().reduce((a,d)=>a+priceOf(d),0)/Math.max(1,menuList().length);
  const all=[{k:'guests',n:Math.max(3,Math.round(ex.people*.75)),t:n=>`服務 ${n} 位客人`},{k:'perfect',n:Math.max(1,Math.round(ex.items*(D<=2?.25:.3))),t:n=>`Perfect × ${n}`},{k:'revenue',n:Math.max(200,Math.round(ex.items*avgP*.65/50)*50),t:n=>`營業額 ${fmt(n)}`}];
  if(D>=3){all.push({k:'combo',n:Math.min(12,3+Math.floor(D/3)),t:n=>`達成 COMBO ×${n}`});all.push({k:'noangry',n:1,t:()=>'沒有客人生氣離開'})}
@@ -5663,6 +5693,7 @@ function endDay(){if(!R)return;try{upNightEnd()}catch(e){console.warn('[up]',e)}
  if(st.guests>=10)ach('rush');if(plated>=8&&st.q.B===0&&st.q.O===0&&st.angry===0)ach('perfectnight');if(rating()>=4.75&&S.reviews.length>=20)ach('chef');
  const r0=(S.rhist&&S.rhist.length)?S.rhist[S.rhist.length-1].r:3;const story=ratingStory(st,plated);S.rhist=S.rhist||[];S.rhist.push({d:D,r:Math.round(rating()*100)/100,n:st.reviews.length,rs:st.reviews.length?Math.round(st.reviews.reduce((a,r)=>a+r.s,0)/st.reviews.length*10)/10:null,why:story.slice(0,2).map(x=>x.t)});if(S.rhist.length>60)S.rhist.shift();
  const recs=updRecords(st,plated,D);achDay(st,plated);
+ try{flowLearn(st)}catch(e){console.warn('[flow]',e)}   /* decision 七: what tonight brought, for tomorrow's forecast */
  S.lastSummary={day:D,rev:st.rev,cost:S.todayCost,wages,cfee,rent,wine,piano,ken,kt:st.kt?{n:st.kt.n,rev:st.kt.rev,cost:Math.round(st.kt.cost)}:null,rentParts:rentParts(),loan:lent-repaid,tips:st.tips,bonus,insp:st.insp||0,net:st.rev+st.tips+bonus+(st.insp||0)-S.todayCost-wages-cfee-rent-wine-piano-ken,guests:st.guests,lost:st.lost,walkins:st.walkins||0,families:st.families||0,angry:st.angry,perfect:st.perfect,plated,avg:Math.round(avg),top,stars:dayStars,reviews:st.reviews.slice(-3),tasks,maxCombo:R.maxCombo,reco:recoDish(),recoN:recoDish()?(st.dish[recoDish()]||0):0,photos:albumList().filter(p=>p.day===D).length,r0,r1:Math.round(rating()*100)/100,story,recs,weather:R.weather,event:R.event,treats:st.treats||0,sets:st.sets||0,camp:st.camp&&st.camp.via?Object.assign({},st.camp):null,vip:st.vipN?{n:st.vipN,off:st.vipOff||0}:null,lg:loungeLv()?{tabs:st.lgTabs||0,rev:st.lgRev||0,off:st.lgOff||0,tip:st.lgTip||0,wait:st.lgWait||0,after:st.lgAfter||0,direct:st.lgDirect||0,sport:st.sport||0,cn:st.cn?{n:st.cn.n,rev:st.cn.rev}:null,open:loungeOpenTonight()}:null,pd:pdBuilt()?{n:st.pdN||0,res:st.pdRes||0,top:st.pdTop||0}:null,crew:(S.crew||[]).map(m=>({name:m.name,role:m.role,lv:m.lv,wage:crewWage(m),n:(st.crew||{})[m.id]||{},away:(crewAwayOf(m)||{}).k||null})),short:Object.values(st.short||{}).reduce((a,b)=>a+b,0),
   fr:fridgeShortSum(st),
   lgSales:loungeLv()?Object.keys(st.lgSold||{}).map(d=>({d,n:st.lgSold[d].n,rev:st.lgSold[d].rev,wine:String(d).startsWith('w_')})).filter(x=>x.n>0).sort((a,b)=>(b.wine-a.wine)||(b.n-a.n)):null,   /* v2.4 rc7 (14:51): what the Lounge's tabs paid for — its total is the Lounge's takings above */
@@ -6192,13 +6223,14 @@ function slotHome(s){const i=s.no-1;switch(s.type){
  case'oven':return{x:KX.oven.x+22,y:170,sc:.36,cx:KX.oven.x+22,place:'oven'};
  case'pizza':{const P=pizzaOvenRect();return{x:KX.oven.x+26,y:186,sc:.3,cx:P.mx+8,place:'pizza'}}   /* rc7.5: dressed on the counter below the oven, baked in its mouth */
  case'bar':{if(projOn('kitchen2')){const m=i>>1,cx=KX.bar.x+13+m*24;return{x:cx+(i%2?5:-5),y:192,sc:.28,cx,place:'bar'}}return{x:KX.bar.x+(i?25:9),y:192,sc:.32,cx:KX.bar.x+17,place:'bar'}}   /* kitchen II: two machines, two cups each */
- default:{const x=KX.prep.x+(i?KX.prep.w-19:19);return{x,y:172,sc:.36,cx:x,place:'prep'}}}}
+ default:{if(isPrepExt(s)){const x=prepExtX();return{x,y:KY.passTop+17,sc:.28,cx:x,cy:KY.passFeet,place:'prep',ext:1}}   /* (the board drawn a little smaller: it sits on the 24 px counter) */   /* decision 六: the board at the pass's end, its cook in the aisle behind it */
+  const x=KX.prep.x+(i?KX.prep.w-19:19);return{x,y:172,sc:.36,cx:x,place:'prep'}}}}
 /* where the current step of a job happens: the board for knife work, the sink to drain, the oven while it bakes,
    the pass once an oven dish is out (and for the plating of every chef's dish) */
 function stepSpot(s){const j=s.job;const h=slotHome(s);const out=Object.assign({cy:KY.feet},h);if(!j)return out;
  if(j.plating){const x=j.plating.x||WF_PASS_X[0];return Object.assign(out,{place:'pass',cx:x,cy:KY.passFeet,x,y:KY.passTop+22,sc:.5})}
  const k=j.step;if(!k)return out;const v=k.verb||k.txt||'';
- if(k.t==='work'&&k.board){const x=s.type==='prep'?h.x:KX.prep.x+35;return Object.assign(out,{place:'prep',x,y:172,cx:x,sc:.4,board:true})}
+ if(k.t==='work'&&k.board){const x=s.type==='prep'?h.x:KX.prep.x+35;return Object.assign(out,{place:'prep',x,y:h.ext?h.y:172,cx:x,sc:h.ext?.28:.4,board:true})}
  if(k.t==='add'&&/瀝乾/.test(v)){const x=KX.sink.x+13;return Object.assign(out,{place:'sink',x,y:158,cx:x,sc:.5})}
  if(k.v==='plate')return Object.assign(out,{place:'pass',cx:WF_PASS_X[0],cy:KY.passFeet,x:WF_PASS_X[0],y:KY.passTop+22,sc:.5});
  if(s.type==='pizza'){const steps=recipeOf(j.d);const zi=steps.findIndex(q=>q.t==='zone');const P=pizzaOvenRect();
@@ -6323,7 +6355,7 @@ function wfRack(){return{x:KX.sink.x+12,y:KY.top+KY.h+KY.face+4}}
 /* the plates waiting on the pass for the floor, in a row under the lamps; each keeps the spot it was set down on until
    it is taken (it.pi), so nothing slides along the pass by itself */
 function wfRowN(){return projOn('pass')?11:9}
-function wfRowX(i){const E=passEnds(),n=wfRowN(),nl=Math.ceil(n/2),p=projOn('pass')?18:18.5;if(i<nl)return E.x0+17+i*p;const nr=n-nl,span=(E.x1-17)-(PASS_GAP.x1+17);return PASS_GAP.x1+17+(span-(nr-1)*p)/2+(i-nl)*p}
+function wfRowX(i){const E=passEnds(),n=wfRowN(),nl=Math.ceil(n/2),p=projOn('pass')?18:18.5;if(i<nl)return E.x0+17+i*p;const nr=n-nl,span=(E.x1-(prepExtOn()?PREPX_W+10:17))-(PASS_GAP.x1+17);return PASS_GAP.x1+17+Math.max(0,(span-(nr-1)*p)/2)+(i-nl)*p}   /* decision 六: with the pass-end board the right half's plates keep their spacing, from the opening */
 /* v2.5 Workflow B (the user: 「Pass 正式變成 Finished Food Buffer… 要有真正容量」 and 「先依現在實際 Pass visual 與現有 upgrade
    決定」): the pass holds what its row holds — 9 plates, 11 with the bigger pass. Counted: the plates on it, the plates on
    their way to it, and the platings (and glasses) already under way, each needing its spots. Full, the next plating waits —
@@ -6386,7 +6418,7 @@ function wfUnhand(n){if(n.who==='jill'){const J=wfJ();J.wq=J.wq.filter(x=>x!==n.
    front burners, the board, the coffee machine's cups, a tray out of the oven — whose door is on the counter's front — the
    pizza ledge) is reached from in front of the counter, standing beside it (side: which side of it, -1 left / 1 right;
    0 = from behind, as before — the back burners) */
-function wfReach(n){const t=n.slot.type;const sp=t==='oven'||t==='pizza'?wfOutSpot(n):wfFoodSpot(n,n.slot);if(sp.y<165){const h=wfSpot(n.slot);return{x:h.cx,y:h.cy,side:0}}   /* (a baked dish: where it is put down to be plated; the oven's door is on the counter's front) */
+function wfReach(n){const t=n.slot.type;const sp=t==='oven'||t==='pizza'?wfOutSpot(n):wfFoodSpot(n,n.slot);if(sp.y<165||isPrepExt(n.slot)){   /* (decision 六: the pass-end board, from the aisle behind it) */const h=wfSpot(n.slot);return{x:h.cx,y:h.cy,side:0}}   /* (a baked dish: where it is put down to be plated; the oven's door is on the counter's front) */
  const side=t==='bar'||t==='prep'?-1:t==='oven'||t==='pizza'?1:(sp.x<KX.range.x+KX.range.w/2?-1:1);   /* the board: from its left, so the burners beside it stay in view */
  return{x:sp.x+side*44,y:KY.top+KY.h+KY.face+4,side}}
 /* where the one doing the step has to stand */
@@ -6526,7 +6558,7 @@ function wfRJ(n){const L=wfLook(n.d);if(!n.rj)n.rj={d:n.d,seed:n.seed,adds:[],mi
 /* baked food stays in the oven until someone takes it out (the user, 2026-10-08: 「烤雞仍在 oven tray / oven output position」):
    while it bakes, once it is done, while plates are fetched for it, and until the hands that plate it pull it out */
 function wfInOven(n){return n.st==='cook'||n.st==='ready'||n.st==='dish'||n.st==='tofood'||(n.st==='work'&&n.f==='plate'&&wfHands(n)<.18)}
-function wfFoodSpot(n,s){const h=slotHome(s);if(s.type==='prep')return{x:h.x,y:172,sc:wfHasBoard(n.d)?.4:.36};
+function wfFoodSpot(n,s){const h=slotHome(s);if(s.type==='prep')return{x:h.x,y:h.ext?h.y:172,sc:h.ext?(wfHasBoard(n.d)?.28:.26):wfHasBoard(n.d)?.4:.36};
  if(s.type==='oven'){if(wfInOven(n))return{x:KX.oven.x+(s.no>1?34:12),y:KY.top+KY.h+10,sc:.17,inOven:true};return{x:KX.oven.x+22,y:170,sc:.36}}
  if(s.type==='pizza'){const P=pizzaOvenRect();if(wfInOven(n))return{x:P.mx,y:P.my-3,sc:.2,inOven:true};return{x:KX.oven.x+26,y:186,sc:.3}}
  return{x:h.x,y:h.y,sc:h.sc}}
@@ -7018,6 +7050,7 @@ function wfOutSpot(n){const t=n.slot&&n.slot.type;if(t==='pizza')return{x:KX.ove
 /* where plate k of a piece of work sits while it is plated: on the counter beside the food, to the side with room */
 function wfPlateAt(n,sp,k){const t=n.slot?n.slot.type:'stove';
  if(n.slot&&t!=='pass'&&!sp.inOven){const r=wfReach(n);if(r.side){const y=KY.top+KY.h-6;return k===0?{x:sp.x+r.side*23,y,sc:.33}:{x:sp.x-r.side*(30+(k-1)*9),y:y+(k-1)*1.4,sc:.33}}}   /* plated from in front of the counter (wfReach): the first plate under her hand, between her and the food; the others on the counter's edge on its far side */
+ if(isPrepExt(n.slot))return{x:sp.x-2-k*10,y:KY.passTop+31+k*.8,sc:.33};   /* decision 六: on the pass-end counter's front half, under the cook's hands */
  let side;if(t==='oven'||t==='pizza')side=-1;else if(t==='prep')side=sp.x<KX.prep.x+35?-1:1;else if(t==='bar')side=-1;else side=sp.x<KX.range.x+KX.range.w/2?-1:1;
  const base=t==='stove'?33:t==='prep'?25:30;return{x:sp.x+side*(base+k*9),y:sp.y+(t==='stove'?5:3)+k*1.4,sc:.33}}
 /* plates being filled beside the food, the old way of looking for a dish without its own beats: the food goes from its
@@ -8312,7 +8345,7 @@ function wfDrawGhost(c,n,s,now){const f=WF_TYPE_F[s.type];if(!f)return;const ch=
 function wfSlotCenter(s){if(s.type==='pass'){const sp=wfSpot(s);return{x:sp.x,y:KY.passTop+14,rx:20,ry:10}}
  if(s.type==='oven'){const dx=KX.oven.x+2+(s.no-1)*22;return{x:dx+10,y:KY.top+KY.h+9,rx:13,ry:10}}
  if(s.type==='pizza'){const P=pizzaOvenRect();return{x:P.mx,y:P.my-6,rx:22,ry:11}}
- const h=slotHome(s);if(s.type==='prep')return{x:h.x,y:172,rx:21,ry:9};if(s.type==='bar')return{x:h.cx,y:172,rx:15,ry:16};return{x:h.x,y:h.y,rx:28*h.sc/.62,ry:13*h.sc/.62}}
+ const h=slotHome(s);if(s.type==='prep')return h.ext?{x:h.x,y:h.y,rx:13,ry:10}:{x:h.x,y:172,rx:21,ry:9};if(s.type==='bar')return{x:h.cx,y:172,rx:15,ry:16};return{x:h.x,y:h.y,rx:28*h.sc/.62,ry:13*h.sc/.62}}
 /* where the selected work is now (its food, or the rail when it has not started) */
 function wfAt(n){const s=n.slot;if(s){if(s.type==='pass'){const sp=wfSpot(s);return{x:sp.x,y:KY.passTop+10}}const sp=wfFoodSpot(n,s);return{x:sp.x,y:sp.y-6}}
  const it=n.its[0];const tk=it&&it.tk;const open=R.tickets.filter(t=>t.items.some(i=>i.st==='pending'||i.st==='cooking'));const k=Math.max(0,open.indexOf(tk));return{x:passTicketX(Math.min(k,8))+8,y:KY.passTop-10}}
@@ -8381,7 +8414,7 @@ function wfJillLoad(){if(!R||!R.wf)return 0;let w=0;for(const n of R.wf)if(wfOpe
    were kept is laid out as the kitchen was then (the coffee bar's old count: 1, 2 with the double group head, 2 more with
    kitchen II). -1: a place that is not there any more (null: the checkpoint cannot be read this way) */
 function slotMapOf(slots,snap){const n=snap.slotsN;if(n==null)return null;let kinds=snap.slotsK;
- if(!kinds){if(slots.length===n)return slots.map((_,i)=>i);kinds=[];for(const[t,k]of slotPlan(S.eq.bar?(S.eq.bar>=3?2:1)+(projOn('kitchen2')?2:0):0))for(let i=0;i<k;i++)kinds.push(t)}
+ if(!kinds){if(slots.length===n)return slots.map((_,i)=>i);kinds=[];for(const[t,k]of slotPlan(S.eq.bar?(S.eq.bar>=3?2:1)+(projOn('kitchen2')?2:0):0,true))for(let i=0;i<k;i++)kinds.push(t)}
  if(kinds.length!==n)return null;const seen={};return kinds.map(t=>{const no=seen[t]=(seen[t]||0)+1;return slots.findIndex(s0=>s0.type===t&&s0.no===no)})}
 /* a checkpoint's work back (restoreService). A dish of the new kitchen still on an old-style station job — a checkpoint saved
    before this version — goes back to the start and is made again; work that does not resolve does too (never lost, never
@@ -8481,7 +8514,7 @@ function drawLine(c,now,V){const E=S.eq;const x0=KX.sink.x-4,x1=KX.bar.x+KX.bar.
    /* cups warming on top of both machines */for(const mx of[x+1,x+26])for(let k=0;k<3;k++){const cx0=mx+4.5+k*6.6;c.fillStyle='#F7F4EE';rr(c,cx0-2.4,y+3.6,4.8,5.6,1.2);c.fill();c.fillStyle='rgba(0,0,0,.12)';c.fillRect(cx0-2.4,y+8,4.8,1.2)}}else if(E.bar)drawEspresso(c,x+1,y+10,32,E.bar>=3?44:40,now);else{c.fillStyle='rgba(0,0,0,.12)';el(c,x+12,y+46,10,3);c.fillStyle='#B8536A';rr(c,x+4,y+30,16,16,4);c.fill();c.fillStyle='#8A3A4A';c.fillRect(x+4,y+30,16,2.5);c.strokeStyle='#B8536A';c.lineWidth=2;c.beginPath();c.arc(x+22,y+37,4,-1.3,1.3);c.stroke();c.fillStyle='#2A2A2A';c.fillRect(x+10,y+27,4,3);for(const [mx,col] of[[x+27,'#5E8FA8'],[x+30,'#E6C27A']]){c.fillStyle=col;rr(c,mx,y+38,6,8,1.5);c.fill()}}}
  /* what is cooking: every job's vessel where its step happens (a pan left on the fire stays there, empty) */
  const vs=[];for(const s0 of V.slots){if(!s0.job||s0.job.plating)continue;const sp=stepSpot(s0);if(sp.place==='pass')continue;vs.push({s:s0,sp});if(s0.type==='stove'&&sp.place!=='range'){const hm=slotHome(s0);vs.push({s:s0,sp:hm,empty:true})}}
- for(const w of wfLineItems(V))vs.push(w);vs.sort((a,b)=>a.sp.y-b.sp.y);for(const v of vs){if(v.wf){wfDrawFood(c,v,now);continue}if(v.left){/* a pan plated out of, left where it was */c.save();c.translate(v.sp.x,v.sp.y);c.scale(v.sp.sc,v.sp.sc);drawVesselBack(c,v.left.v);drawVesselFront(c,v.left.v);c.restore();continue}if(v.empty){c.save();c.translate(v.sp.x,v.sp.y);c.scale(v.sp.sc,v.sp.sc);drawVesselBack(c,stepVessel(v.s.job));drawVesselFront(c,stepVessel(v.s.job));c.restore();continue}
+ for(const w of wfLineItems(V))if(!isPrepExt(w.s))vs.push(w);   /* (the pass-end board's work is drawn with the pass, on its own counter) */vs.sort((a,b)=>a.sp.y-b.sp.y);for(const v of vs){if(v.wf){wfDrawFood(c,v,now);continue}if(v.left){/* a pan plated out of, left where it was */c.save();c.translate(v.sp.x,v.sp.y);c.scale(v.sp.sc,v.sp.sc);drawVesselBack(c,v.left.v);drawVesselFront(c,v.left.v);c.restore();continue}if(v.empty){c.save();c.translate(v.sp.x,v.sp.y);c.scale(v.sp.sc,v.sp.sc);drawVesselBack(c,stepVessel(v.s.job));drawVesselFront(c,stepVessel(v.s.job));c.restore();continue}
   if(v.sp.inOven){c.save();c.translate(v.sp.x,v.sp.y);c.scale(v.sp.sc,v.sp.sc);c.globalAlpha=.9;drawVesselBack(c,DISH(v.s.job.d).v);drawContents(c,v.s.job,DISH(v.s.job.d).v,now);c.restore();continue}
   drawStageFood(c,v.s,v.s.job,v.sp.x,v.sp.y,v.sp.sc,now);
   const k=v.s.job.step;if(k&&k.t==='wait'&&/冷藏/.test(k.verb||'')){c.fillStyle='#F4F9FC';circ(c,v.sp.x+14,v.sp.y-18,6);c.fillStyle='#5E8FA8';c.font=`800 7px ${FONT}`;c.textAlign='center';c.textBaseline='middle';c.fillText('❄',v.sp.x+14,v.sp.y-17.6);c.textBaseline='alphabetic'}
@@ -8515,7 +8548,16 @@ function drawPass(c,now,V){const T=TH();const y=KY.passTop,h=KY.passH,f=KY.passF
  for(const [a,b] of H){c.fillStyle='rgba(0,0,0,.18)';rr(c,a+2,y+5,b-a,h+f+6,4);c.fill()}
  for(const [a,b] of H){let g=c.createLinearGradient(0,y,0,y+h);g.addColorStop(0,'#D3D7D9');g.addColorStop(1,'#AEB5B8');c.fillStyle=g;rr(c,a,y,b-a,h,4);c.fill();c.fillStyle='rgba(255,255,255,.5)';rr(c,a+2,y+1.5,b-a-4,2.5,1.2);c.fill();
   let fg=c.createLinearGradient(0,y+h,0,y+h+f);fg.addColorStop(0,T.c0);fg.addColorStop(1,T.c1);c.fillStyle=fg;rr(c,a,y+h-2,b-a,f+2,2);c.fill();c.fillStyle='rgba(0,0,0,.2)';c.fillRect(a,y+h+f-2,b-a,3)}
- /* the rail with the open tickets, along each counter's back edge */c.fillStyle='#3A3A3A';for(const [a,b] of H)c.fillRect(a+6,y-2,b-a-12,2);if(V.tickets){const open=V.tickets.filter(tk=>tk.items.some(it=>it.st==='pending'||it.st==='cooking'));
+ /* decision 六 (2026-10-13): kitchen II's prep counter at the pass's right end — a butcher-block top on the same counter, a seam
+    where the steel ends, a board and a knife of its own (the work on it is drawn on the board by the kitchen's own renderer) */
+ const XB=prepExtOn()?passEnds().x1-PREPX_W:null;
+ if(XB!=null){const x1=passEnds().x1;let g=c.createLinearGradient(0,y,0,y+h);g.addColorStop(0,'#D9B07A');g.addColorStop(1,'#B98A55');c.fillStyle=g;rr(c,XB,y,x1-XB,h,4);c.fill();
+  c.fillStyle='rgba(120,78,38,.35)';for(let k=1;k<4;k++)c.fillRect(XB+1,y+k*h/4,x1-XB-2,.6);c.fillStyle='rgba(255,255,255,.35)';rr(c,XB+2,y+1.5,x1-XB-4,2.2,1);c.fill();
+  c.fillStyle='rgba(60,40,20,.45)';c.fillRect(XB-.6,y+1,1.2,h-2);
+  const bx=prepExtX(),by=KY.passTop+17;c.fillStyle='rgba(0,0,0,.14)';el(c,bx+1,by+8,10,2.5);c.fillStyle='#C8965E';rr(c,bx-10,by-6,20,12,2.5);c.fill();c.fillStyle='#9A6534';c.fillRect(bx-10,by+4.5,20,1.5);
+  c.fillStyle='#8E979B';c.fillRect(bx-9,by+9,10,1.6);c.fillStyle='#2A2A2A';c.fillRect(bx+1,by+8.8,5,2);
+  for(const w of wfLineItems(V))if(isPrepExt(w.s)&&w.wf)wfDrawFood(c,w,now)}
+ /* the rail with the open tickets, along each counter's back edge */c.fillStyle='#3A3A3A';for(const [a,b] of H)c.fillRect(a+6,y-2,(XB!=null&&b>XB?XB-4:b)-a-12,2);if(V.tickets){const open=V.tickets.filter(tk=>tk.items.some(it=>it.st==='pending'||it.st==='cooking'));
   open.slice(0,9).forEach((tk,i)=>{const x=passTicketX(i),ty=y-16;c.fillStyle='rgba(0,0,0,.15)';c.fillRect(x+1,ty+1,16,15);c.fillStyle='#FFFDF5';c.fillRect(x,ty,16,15);c.fillStyle='#8A9498';c.fillRect(x+6,ty-2,4,3);c.fillStyle='#2E2019';c.font=`800 6px ${FONT}`;c.textAlign='center';c.textBaseline='middle';c.fillText('T'+tk.no,x+8,ty+5);tk.items.slice(0,4).forEach((it,k)=>{c.fillStyle=it.st==='cooking'||it.st==='plate'?'#E6B04A':it.st==='pending'?'#E0543A':it.st==='later'||it.st==='pour'||it.st==='round'?'#B8B2A6':'#8FB07A';circ(c,x+3+k*3.4,ty+11.5,1.3)})});c.textBaseline='alphabetic'}
  /* 2.1: a step that happens on the pass itself — the sauce over the sliced duck, the baked dish out of the oven */for(const s0 of V.slots){const j=s0.job;if(!j||j.plating)continue;const sp=stepSpot(s0);if(sp.place!=='pass')continue;drawStageFood(c,s0,j,sp.x,y+16,.5,now)}
  /* plates being finished at the pass */for(const s0 of V.slots){const j=s0.job;if(!j||!j.plating)continue;const px=j.plating.x||WF_PASS_X[0],py=y+14;const u=clamp(j.plating.t/j.plating.dur,0,1);const sz=24+u*10;c.globalAlpha=.55+u*.45;c.drawImage(dishCanvas(j.d,'G',64,S.decor.ware>0,j.it.want),px-sz/2,py-sz/2,sz,sz);c.globalAlpha=1;
@@ -8544,7 +8586,9 @@ function drawWalkin(c,now,k){const {x,y,w,h}=k;c.fillStyle='rgba(0,0,0,.18)';rr(
  /* frost in the top corners of the frame */c.fillStyle='rgba(240,248,252,.85)';for(const [fx,fy] of[[x+3,y+12],[x+w-3,y+12]]){circ(c,fx,fy,2.2);circ(c,fx+(fx<x+w/2?2.5:-2.5),fy+1.5,1.4)}
  /* the mat */c.fillStyle='#2E2A28';rr(c,x+4,y+h-1,w-8,6,2);c.fill();c.fillStyle='rgba(255,255,255,.07)';for(let mx=x+7;mx<x+w-6;mx+=4)c.fillRect(mx,y+h,1.2,4);
  /* a breath of cold under the door: every few seconds, or right after the fridge was opened */const cyc=(now%7)/7,recent=(now-FRIDGE_T)<2.4;if(cyc<.22||recent){const ph=recent?(now-FRIDGE_T)/2.4:cyc/.22;c.fillStyle=`rgba(236,246,252,${.5*(1-ph)})`;for(let i=0;i<4;i++)el(c,dx+6+i*(dw-12)/3+ph*6,dy+dh-1-ph*6,6+ph*6,2.2+ph*1.5)}
- c.fillStyle='rgba(42,47,51,.85)';c.font=`800 6.5px ${FONT}`;c.textAlign='center';c.fillText('走入式冷藏庫',x+w/2,y+h+13)}
+ /* decision 七: the cold room run through behind it — a second compressor on its roof, its fan turning, and the name */if(projOn('coldroom')){const cy=y-10;c.fillStyle='rgba(0,0,0,.16)';rr(c,x+5,cy+2,w-8,10,2);c.fill();let cg=c.createLinearGradient(0,cy,0,cy+9);cg.addColorStop(0,'#C9CED1');cg.addColorStop(1,'#8E979B');c.fillStyle=cg;rr(c,x+4,cy,w-8,9,2);c.fill();
+  c.strokeStyle='rgba(60,66,70,.55)';c.lineWidth=.5;for(let gx=x+8;gx<x+w-20;gx+=2.6){c.beginPath();c.moveTo(gx,cy+2);c.lineTo(gx,cy+7);c.stroke()}const fx=x+w-12,fy=cy+4.5;c.fillStyle='#4A5054';circ(c,fx,fy,3.6);c.strokeStyle='#C9CED1';c.lineWidth=.8;for(let q=0;q<3;q++){const t=now*9+q*2.094;c.beginPath();c.moveTo(fx,fy);c.lineTo(fx+Math.cos(t)*3,fy+Math.sin(t)*3);c.stroke()}}
+ c.fillStyle='rgba(42,47,51,.85)';c.font=`800 6.5px ${FONT}`;c.textAlign='center';c.fillText(projOn('coldroom')?'冷藏室（擴建）':'走入式冷藏庫',x+w/2,y+h+13)}
 function drawCooler(c,now,k){const {x,y,w,h}=k;c.fillStyle='rgba(0,0,0,.16)';rr(c,x+2,y+3,w,h,3);c.fill();c.fillStyle='#C9CDD0';rr(c,x,y,w,h,3);c.fill();c.fillStyle='#E4E6E7';rr(c,x+3,y+3,w-6,h-6,2);c.fill();c.fillStyle='#8FA0A8';rr(c,x+w-12,y+h/2-8,6,16,2);c.fill();c.fillStyle='rgba(140,200,230,.35)';rr(c,x+6,y+8,w-20,10,2);c.fill();c.fillStyle='#2A2F33';c.font=`800 6.5px ${FONT}`;c.textAlign='center';c.fillText('冷藏庫',x+w/2,y+h+9)}
 function drawHandKnife(c,x,y,f,now){const a=Math.sin(now*9);c.save();c.translate(x+f*4,y-26+a*1.6);c.rotate(f*(-.55+a*.3));c.fillStyle='#D9D9DD';rr(c,-1.1,-8,2.4,9.5,1);c.fill();c.strokeStyle='rgba(60,34,22,.4)';c.lineWidth=.5;c.stroke();c.fillStyle='#4A3226';rr(c,-1.4,1.4,3,4.4,1.2);c.fill();c.restore()}
 function drawHandSpoon(c,x,y,f,now){const a=now*6;c.save();c.translate(x+f*4+Math.cos(a)*2,y-27+Math.sin(a)*1.2);c.rotate(f*-.5);c.fillStyle='#6B4428';rr(c,-.9,-9,1.8,10,.9);c.fill();c.fillStyle='#8A6A42';el(c,0,1.5,2.4,1.6);c.restore()}
@@ -12691,6 +12735,8 @@ let menuSwap=null;   /* v2.2.1 #5: the weather dish waiting for a slot while the
 function menuSwapHTML(){if(!menuSwap||!S.today)return'';const inn=menuSwap;const exp=expectDemand(S.today.groups,60);const cur=S.menu.filter(x=>S.unlocked.includes(x)).map(d=>({d,e:Math.round(exp[d]||0),st:S.stock[d]||0})).sort((a,b)=>a.e-b.e);
  return`<div class="mswap"><div class="ms-h">菜單已滿，要換掉哪一道？<span class="muted">換成 <b>${dishName(inn)}</b></span><button class="btn sm" data-act="menuSwapNo">取消</button></div><div class="ms-list">${cur.map(x=>`<button class="ms-row" data-act="menuSwapDo" data-d="${x.d}"><img alt="" src="${dishURL(x.d,'P')}"><span class="nm">${dishName(x.d)}</span><small>預估 ${x.e} 份${x.st?`・冰箱 ${x.st}`:''}</small><b>換掉</b></button>`).join('')}</div><p class="small muted" style="margin:6px 0 0">依今天的預估銷量排序，最不會被點的在最前面。換掉的菜庫存留著，明天可以再放回來。</p></div>`}
 /* rc7.4: a Lounge already built when the new bites came has them on its list from the next morning, said once */
+/* decision 六: a restaurant that finished kitchen II before the pass-end board came has it from the next morning — said once, nothing paid */
+function prepExtMig(){if(!prepExtOn()||S.prepExtNews)return;S.prepExtNews=1;S.news=S.news||[];S.news.push('<b>出菜口右端多了一塊砧板：</b>廚房二期的木頭備料檯，冷盤的菜可以三道一起做。不用另外施工、不用付錢。')}
 function barMenuMig(){if(!loungeLv())return;const add=barDishes().filter(d=>!S.unlocked.includes(d)&&!DISHES[d].rd);if(!add.length)return;for(const d of add)unlockDish(d);S.news=S.news||[];S.news.push(`<b>Lounge 的小點多了：</b>${add.map(dishName).join('、')}。一樣是餐廳的廚師在廚房做，Lounge 的外場送過去；不佔菜單名額，冰箱記得補。`)}
 /* 2026-10-13 (the user's decisions 四 and 五, docs/v24/eight_decisions_2026-10-13.txt: 「在開店前畫面上方、今日天氣資訊下方，放置明顯的「一鍵補到
    建議量」主要操作按鈕」「玩家進入開店前畫面，不必向下捲動就應能找到」「顯示目前冰箱使用量、容量，以及簡短的補貨預估」「不能另外建立一套補貨
@@ -12712,7 +12758,7 @@ function prepRestockHTML(){const F=feat();if(!F.stock)return`<p class="muted" st
   <p class="rs-est">${pv.n>0?`照今晚的建議量還要補 ${pv.n} 份，約 ${fmt(pv.cost)}。`:pv.short>0?'冰箱滿了，放不下更多。':'今晚的菜都補到建議量了。'}${pv.offN?`按下去會先退掉不在菜單上的 ${pv.offN} 份。`:''}</p>
   ${capd?`<div class="rs-short"><b>預估需求 ${capd} 份｜冰箱容量 ${cap} 份</b><span>部分料理可能提前售完，${fridgeCanGrow()?'可升級冰箱增加容量':'冰箱和冷藏庫都已經是最大'}</span></div>`:''}
   <button class="btn primary rs-btn" data-act="restock" ${pv.n>0||pv.offN?'':'disabled'}>一鍵補到建議量 ${pv.n>0?fmt(pv.cost):pv.short>0?'（冰箱已滿）':'（已足夠）'}</button>${discN?`<button class="btn sm" data-act="${discardArmed?'discardAll':'discardAsk'}" style="width:100%;margin-top:6px">${discardArmed?`確定退掉這 ${discN} 份？（再按一次）`:`退掉不在菜單上的庫存（${discN} 份）`}</button>`:''}</div>`}
-function showPrep(){try{barMenuMig()}catch(e){console.warn('[bar]',e)}try{firstPhotoMig()}catch(e){console.warn('[first photo]',e)}phase='prep';mainScreen='prep';R=null;room='main';try{storyPhotoFlush();staffMealStory();upStaffMeal();/* v2.4 P2 */setTimeout(()=>{try{if(UPV==='reveal')return;storyProgressCheck()}catch(e){}},900)}catch(e){console.warn('[story]',e)}/* v2.3 */if(upRevealDue())setTimeout(()=>{try{upRevealStart()}catch(e){console.warn('[uprv]',e)}},450);else if(S.loungeProj&&S.loungeProj.state==='built'&&S.loungeProj.open===S.day&&!S.loungeProj.rv)setTimeout(()=>{try{loungeOpenReveal()}catch(e){console.warn('[lounge rv]',e)}},450);/* v2.4 rc6 (05:23): a room finished overnight is shown first */lifeReset();IDLE=makeIdle();layoutAll();hud(true);renderTickets();planToday();try{pdStoryDay();pdDay()}catch(e){console.warn('[pd]',e)}/* v2.4 rc6 */const T=S.today,F=feat();const W=WEATHER[T.weather],E=EVENTS[T.event];
+function showPrep(){try{barMenuMig()}catch(e){console.warn('[bar]',e)}try{prepExtMig()}catch(e){console.warn('[prepx]',e)}try{firstPhotoMig()}catch(e){console.warn('[first photo]',e)}phase='prep';mainScreen='prep';R=null;room='main';try{storyPhotoFlush();staffMealStory();upStaffMeal();/* v2.4 P2 */setTimeout(()=>{try{if(UPV==='reveal')return;storyProgressCheck()}catch(e){}},900)}catch(e){console.warn('[story]',e)}/* v2.3 */if(upRevealDue())setTimeout(()=>{try{upRevealStart()}catch(e){console.warn('[uprv]',e)}},450);else if(S.loungeProj&&S.loungeProj.state==='built'&&S.loungeProj.open===S.day&&!S.loungeProj.rv)setTimeout(()=>{try{loungeOpenReveal()}catch(e){console.warn('[lounge rv]',e)}},450);/* v2.4 rc6 (05:23): a room finished overnight is shown first */lifeReset();IDLE=makeIdle();layoutAll();hud(true);renderTickets();planToday();try{pdStoryDay();pdDay()}catch(e){console.warn('[pd]',e)}/* v2.4 rc6 */const T=S.today,F=feat();const W=WEATHER[T.weather],E=EVENTS[T.event];
  const unlocked=[...S.unlocked];const sug=suggestStock();
  const menuN=menuCount();
  const rows=unlocked.map(d=>{const D=DISH(d);const on=S.menu.includes(d);const m=S.price[d]||1;const st=S.stock[d]||0;const lv=mLv(d);
@@ -12723,7 +12769,7 @@ function showPrep(){try{barMenuMig()}catch(e){console.warn('[bar]',e)}try{firstP
   ${on&&(F.prices||F.stock)?`<div class="ctl">${F.prices?`<span class="step"><label>售價</label><button data-act="price" data-d="${d}" data-v="-1" aria-label="降價">−</button><span>${fmt(priceOf(d))}${m!==1?` <small>${m>1?'+':''}${Math.round((m-1)*100)}%</small>`:''}</span><button data-act="price" data-d="${d}" data-v="1" aria-label="漲價">＋</button></span>`:''}${F.stock?(()=>{const sg=sug[d]||0;const q1=stockQuote(d,1);return`<span class="step stk"><label>庫存</label><button data-act="stock" data-d="${d}" data-v="-1" aria-label="退一份" ${st>0?'':'disabled'}>−</button><span>${st} 份</span><button data-act="stock" data-d="${d}" data-v="1" aria-label="進一份" ${q1.n>0?'':'disabled'}>＋</button></span><span class="stkq"><button class="mini" data-act="stockTo" data-d="${d}" data-k="sug" ${st<sg&&q1.n>0?'':'disabled'}>補到建議 ${sg}</button><button class="mini" data-act="stockTo" data-d="${d}" data-k="max" ${q1.n>0?'':'disabled'}>補滿</button></span>`})():''}${F.prices?priceFeelHTML(d):''}${F.stock&&st===0&&!jillStocks()?'<span class="warnpill">沒有備料</span>':''}</div>`:''}</div>`}).join('');
  const sig=S.signature?`<div class="sig"><img alt="" src="${dishURL('signature','P')}"><div><div class="st">★ CHEF JILL'S SIGNATURE ★</div><b>${S.signature.name}</b><small>${fmt(priceOf('signature'))} · 庫存 ${S.stock.signature||0} 份 · 永遠在菜單最上方</small>${F.stock?`<div style="margin-top:6px" class="step"><button data-act="stock" data-d="signature" data-v="-2" style="color:var(--cream)">−</button><span style="color:var(--cream)">${S.stock.signature||0} 份</span><button data-act="stock" data-d="signature" data-v="2" style="color:var(--cream)">＋</button></div>`:''}</div></div>${S.sigDessert?`<div class="sig sigd"><img alt="" src="${dishURL('sigdessert','P')}"><div><div class="st">★ JILL'S SIGNATURE DESSERT ★</div><b>${S.sigDessert.name}</b><small>${fmt(priceOf('sigdessert'))} · 庫存 ${S.stock.sigdessert||0} 份 · 排在招牌菜下面</small>${F.stock?`<div style="margin-top:6px" class="step"><button data-act="stock" data-d="sigdessert" data-v="-2" style="color:var(--cream)">−</button><span style="color:var(--cream)">${S.stock.sigdessert||0} 份</span><button data-act="stock" data-d="sigdessert" data-v="2" style="color:var(--cream)">＋</button></div>`:''}</div></div>`:''}`:'';
  show(`<div class="sheet tall"><div class="sh-top"><div class="ttl"><div class="eyebrow">DAY ${S.day} · 開店前</div><h2>${LV().n}</h2></div>${topIcons()}</div>
-  <div class="card today"><div class="wx">${SVG[W.ic||T.weather]||SVG.sun}</div><div><b>${W.n} · 預計約 ${T.people} 位客人</b><p>${W.d}${S.buzz>1?' 店裡最近很紅，人潮會多一些。':''}${(()=>{const c=campaign();if(!c)return'';const C=CAMPS.find(x=>x.k===c.k);return`<br>📱 ${C.n}${c.dish?`（${dishName(c.dish)}）`:''}進行中，到 DAY ${c.until}${c.dish?'——那道菜備多一點。':'。'}`})()}${(()=>{const w=(S.crew||[]).filter(m=>m.role==='waiter').length;const NT=tablesTotal();return NT>w*6+8?`<br><b style="color:#B8432C">⚠ ${NT} 張桌、${w} 位服務生：桌數比服務生顧得來的多，客人會等太久。</b>`:''})()}</p>${(()=>{const h=wxHints();return h.length?`<p class="hint">今天可能要多準備：<b>${h.map(dishName).join('、')}</b></p>`:''})()}${(()=>{const off=wxOffMenu();if(!off.length)return'';const full=menuCount()>=menuCap();return`<p class="hint">今天的天氣也適合，但不在今天的菜單上：</p><div class="wxadd">${off.map(d=>`<button class="mini ${menuSwap===d?'on':''}" data-act="menuAdd" data-d="${d}">＋ ${dishName(d)}</button>`).join('')}</div>${full&&!menuSwap?`<p class="small muted">菜單已滿（${menuCap()} 道）——點一道，選要換掉哪一道。</p>`:''}${menuSwapHTML()}`})()}</div></div>
+  <div class="card today"><div class="wx">${SVG[W.ic||T.weather]||SVG.sun}</div><div><b>${W.n} · 預計約 ${T.flow||T.people} 位客人</b><p>${W.d}${S.buzz>1?' 店裡最近很紅，人潮會多一些。':''}${(()=>{const c=campaign();if(!c)return'';const C=CAMPS.find(x=>x.k===c.k);return`<br>📱 ${C.n}${c.dish?`（${dishName(c.dish)}）`:''}進行中，到 DAY ${c.until}${c.dish?'——那道菜備多一點。':'。'}`})()}${(()=>{const w=(S.crew||[]).filter(m=>m.role==='waiter').length;const NT=tablesTotal();return NT>w*6+8?`<br><b style="color:#B8432C">⚠ ${NT} 張桌、${w} 位服務生：桌數比服務生顧得來的多，客人會等太久。</b>`:''})()}</p>${(()=>{const h=wxHints();return h.length?`<p class="hint">今天可能要多準備：<b>${h.map(dishName).join('、')}</b></p>`:''})()}${(()=>{const off=wxOffMenu();if(!off.length)return'';const full=menuCount()>=menuCap();return`<p class="hint">今天的天氣也適合，但不在今天的菜單上：</p><div class="wxadd">${off.map(d=>`<button class="mini ${menuSwap===d?'on':''}" data-act="menuAdd" data-d="${d}">＋ ${dishName(d)}</button>`).join('')}</div>${full&&!menuSwap?`<p class="small muted">菜單已滿（${menuCap()} 道）——點一道，選要換掉哪一道。</p>`:''}${menuSwapHTML()}`})()}</div></div>
   ${prepRestockHTML()}
   ${(()=>{if(shopDay()<3)return'';const G=goalLadder();const g=G.find(x=>x.left>0)||G[0];if(!g)return'';const avg=S.lastSummary?Math.max(1,S.lastSummary.net):0;const days=g.left>0&&avg?Math.ceil(g.left/avg):0;return`<div class="goalline"><span>存錢目標</span><b>${g.n}</b><small>${g.left>0?`還差 ${fmt(g.left)}${days&&days<=30?` · 約 ${days} 天`:''}`:'今晚就買得起'}</small></div>`})()}
   ${shopDay()>=6?(()=>{const t=socialTopic();const c=campaign();const n=socialCands().length;return`<button class="goalline linkline" data-act="bookSocial"><span>社群與宣傳</span><b>${c?`${CAMPS.find(x=>x.k===c.k).n}進行中`:t?`大家在談：${t.k==='food'&&t.dish?dishName(t.dish):TOPICS[t.k].n}`:'最近大家在說什麼'}</b><small>${n?`今天可以發 ${n} 則 ›`:'›'}</small></button>`})():''}
@@ -13089,7 +13135,7 @@ function doAct0(a,d,k,b){
  case'buySideBooth':{const b=S.sideBooths|0;const c=SIDE_BOOTH_COST[b];if(!projOn('side')||c==null||(S.sideTables||0)<(b+2)*3||S.money<c)break;S.money-=c;S.sideBooths=b+1;save();IDLE=null;bg=null;for(const kk in BGC)delete BGC[kk];
   projectReveal({k:'sidebooth',n:'側廳卡座：'+SIDE_ROWS[b],done:SIDE_BOOTH_DONE[b],jill:b?'早該這樣。':'三個人來，也有地方坐了。',unlock:[b?'側廳九張桌都是四人卡座':'側廳中間那排：三張四人卡座'],room:'side'});break}
  case'buyFrontTable':{const n=S.frontTables||0;const c=FRONT_TABLE_COST[n];if(projOn('terrace')&&c!=null&&S.money>=c){S.money-=c;S.frontTables=n+1;sfx.buy();toast('陽傘下多了一張桌子');save();IDLE=null;keepScroll(showShop);shopAfterBuy()}break}
- case'buyProject':{const P=ALL_PROJECTS().find(x=>x.k===k);if(!P||projOn(P.k)||S.money<P.cost||S.level<P.lv||!projNeedOk(P))break;S.money-=P.cost;S.rooms[P.k]=1;S.newRooms[P.k]=S.day;S.reveal={k:P.k,day:S.day};if(P.k==='side')S.sideTables=Math.max(S.sideTables||0,2);if(P.k==='terrace')S.frontTables=Math.max(S.frontTables||0,1);ach('project');if(PROJECTS.every(x=>projOn(x.k)))ach('allprojects');save();IDLE=null;bg=null;for(const kk in BGC)delete BGC[kk];projectReveal(P);break}
+ case'buyProject':{const P=ALL_PROJECTS().find(x=>x.k===k);if(!P||projOn(P.k)||S.money<P.cost||S.level<P.lv||!projNeedOk(P))break;S.money-=P.cost;S.rooms[P.k]=1;S.newRooms[P.k]=S.day;if(P.k==='kitchen2')S.prepExtNews=1;   /* (its card says the board comes with it) */S.reveal={k:P.k,day:S.day};if(P.k==='side')S.sideTables=Math.max(S.sideTables||0,2);if(P.k==='terrace')S.frontTables=Math.max(S.frontTables||0,1);ach('project');if(PROJECTS.every(x=>projOn(x.k)))ach('allprojects');save();IDLE=null;bg=null;for(const kk in BGC)delete BGC[kk];projectReveal(P);break}
  case'buyExt':{const E=EXTERIOR.find(x=>x.k===k);if(!E||extOn(E.k)||S.money<E.cost||S.level<E.lv)break;S.money-=E.cost;S.ext[E.k]=1;sfx.buy();toast(`${E.n}：裝好了，到「店門口」看看`);if(EXTERIOR.every(x=>extOn(x.k)))ach('storefront');save();for(const kk in BGC)delete BGC[kk];keepScroll(showShop);shopAfterBuy();break}
  case'extStyle':{const E=EXTERIOR.find(x=>x.k===k);if(!E||!E.styles||!extOn(E.k))break;S.ext[E.k]=(S.ext[E.k]%E.styles.length)+1;sfx.tap();save();for(const kk in BGC)delete BGC[kk];keepScroll(showShop);break}
  case'buyGear':{const G=CATGEAR.find(x=>x.k===k);if(!G||G.story||gearOn(G.k)||S.money<G.cost||(G.need&&!projOn(G.need))||S.level<(G.lv||1))break;S.money-=G.cost;S.gear[G.k]=S.day;sfx.buy();toast(`${G.n}：擺好了。看牠們什麼時候發現。`);if(CATGEAR.filter(x=>!x.story).every(x=>gearOn(x.k)))ach('catgear');save();IDLE=null;bg=null;for(const kk in BGC)delete BGC[kk];keepScroll(showShop);shopAfterBuy();break}

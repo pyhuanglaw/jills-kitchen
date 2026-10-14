@@ -1,0 +1,18 @@
+PASS  h_i_k_t_shop_rooms_decoration_pass_and_dreams  (10.0s)
+PASS  workstation_assignment_is_explicit_with_capacities_and_swaps  (5.1s)
+PASS  kitchen_works_walk_in_and_a_second_coffee_machine  (10.6s)
+PASS  window_line_cats_stay_inside_and_in_sight  (16.6s)
+PASS  v24_restaurant_and_lounge_staff_are_two_pools_that_never_share_places  (4.5s)
+PASS  v24_rc75_the_pizza_oven_one_more_cook_and_the_bar_pizza  (37.2s)
+PASS  v24_rc8_the_restaurants_three_lists_and_the_lounges_one  (68.4s)
+PASS  qa_the_players_checkpoints_resume  (160.3s)
+PASS  qa_a_checkpoint_survives_a_new_table_count  (2.7s)
+PASS  cooking_the_bar_holds_one_cup_two_with_the_double_group_head_four_with_kitchen_ii  (10.6s)
+PASS  cooking_a_drink_batch_from_an_older_checkpoint_becomes_its_cups  (9.8s)
+PASS  cooking_plating_happens_where_the_food_is  (24.7s)
+PASS  cooking_the_bar_kitchens_burner_has_a_place_of_its_own  (7.7s)
+PASS  cooking_the_pass_opens_in_the_middle_and_keeps_its_row  (2.4s)
+PASS  cooking_people_walk_round_the_counters  (12.7s)
+PASS  workflow_the_pass_is_a_buffer_and_a_full_pass_is_a_quiet_wait  (5.0s)
+
+16 passed, 0 failed

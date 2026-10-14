@@ -1,0 +1,14 @@
+golden_frames after the re-record (tests/golden/screens/prep.png only), run against copies of the batch-two game.js (96e116e):
+
+== current
+PASS  golden_frames  (140.1s)
+== golden_card_1px
+FAIL  golden_frames  (159.2s)
+      prep: pixels differ in box (16, 338, 374, 732) (see tests/artifacts/)
+== golden_summary_1px
+PASS  golden_frames  (165.2s)
+
+golden_summary_1px PASSED: the mutant was wrong, not the test — '.ledger{margin-top:1px}' collapses into the margin above it, nothing on the screen moves.
+Rebuilt as golden_summary_spacing ('.ledger span{letter-spacing:.3px}', the summary's figures a little wider):
+FAIL  golden_frames  (156.8s)
+      summary: pixels differ in box (26, 211, 374, 461) (see tests/artifacts/)

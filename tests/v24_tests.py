@@ -6371,3 +6371,169 @@ def a_passing_family_is_not_the_wangs(b, port, target):
     check(len(out['fams']) >= 50 and not [n for n in out['fams'] if '王' in n], f'sixty families, none a 王: {[n for n in out["fams"] if "王" in n]}')
     check(out['wang'] == ['王先生', 'wang', '王太太', 'wangwife'], f'the regulars as themselves: {out["wang"]}')
     g.close()
+
+
+# ---------------------------------------------------------------- the user's decisions 六 and 七 (2026-10-13), batch three
+_PLAY = r"""((sec)=>{let t=0;while(t<sec*30&&phase==='service'){if(typeof DLG!=='undefined'&&DLG){dlgNext();continue}__act();__tick(1000/30);t++;if(t%30===0&&window.__samp3)__samp3()}return t})"""
+
+
+@test
+def kitchen_two_has_a_third_board_at_the_pass(b, port, target):
+    """Decision 六 (docs/v24/eight_decisions_2026-10-13.txt): 「廚房二期解鎖第三塊砧板，設於出菜口旁合理的延伸備料檯面」「第三塊必須有自己的
+    實際位置、工作狀態、料理動畫和人物站位」「不得阻擋中央走道、出菜口、餐盤或人員移動」「不得使出菜口有效容量下降」「必須在員工實際操作時看得出
+    三個獨立備料位置」「已完成廚房二期的舊存檔自動取得新工作位置」「不需要重蓋工程，也不得重複收費」. The user's Day 92 save (kitchen II
+    built before this version), opened: nothing is charged, the morning says once that the board is there. In the kitchen: three
+    prep places, two on the cold counter where they were and one on the pass's right end — on the counter, its cook's place in the
+    aisle behind it, clear of every obstacle; the pass keeps its 11 plate spots 18 apart (none on the board's counter), its three
+    plating places, its opening, the cart's drop and the door to Jill's room where they were. An evening with the staff working:
+    the pass-end board is used, by a cook standing at it, and at some moment three dishes are on three boards with three cooks at
+    three different places."""
+    g = Game(b, port, target, seed=963, manual=True, viewport={'width': 390, 'height': 844})
+    raw = load_save(g, 'player_day92_2105.json')
+    check(g.ev("projOn('kitchen2')"), 'the case: the Day 92 save has kitchen II')
+    if g.ev("phase") == 'shop':
+        g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(200)
+    check(g.ev("S.money") == raw['money'], f'opening the save charged something: {raw["money"]} → {g.ev("S.money")}')
+    news = g.ev("(document.querySelector('#screen .news')||{}).innerText||''")
+    check('出菜口右端多了一塊砧板' in news and '不用付錢' in news, f'the morning does not say the board is there: {news[:200]!r}')
+    g.ev("showPrep()"); g.page.wait_for_timeout(60)
+    check(g.ev("(document.querySelector('#screen .news')||{}).innerText||''").count('出菜口右端多了一塊砧板') == 1, 'the news is said more than once')
+    to_service(g)
+    geo = json.loads(g.ev(r"""JSON.stringify((()=>{const P=R.slots.filter(s=>s.type==='prep');const x=P.find(isPrepExt);const h=slotHome(x);const E=passEnds();
+      const inObs=(px,py)=>kitchenObs().some(o=>px>=o.bx0&&px<=o.bx1&&py>=o.by0&&py<=o.by1);const row=Array.from({length:wfRowN()},(_,i)=>wfRowX(i));
+      return {n:P.length,ext:P.filter(isPrepExt).length,h,line:P.filter(s=>!isPrepExt(s)).map(s=>{const q=slotHome(s);return [q.x,q.y]}),prep:KX.prep,E,rowN:wfRowN(),cap:passCap(),row,x0:E.x1-PREPX_W,
+        top:KY.passTop,ph:KY.passH,feet:KY.passFeet,standIn:inObs(h.cx,h.cy),dropIn:inObs(ddDrop().x,ddDrop().y),doorIn:inObs(homeKDoor().x,homeKDoor().y),gap:[PASS_GAP.x0,PASS_GAP.x1],drop:ddDrop(),door:homeKDoor()}})())"""))
+    check(geo['n'] == 3 and geo['ext'] == 1, f'kitchen II should have three prep places, one at the pass: {geo["n"]}, {geo["ext"]}')
+    check(geo['x0'] <= geo['h']['x'] <= geo['E']['x1'] and geo['top'] <= geo['h']['y'] <= geo['top'] + geo['ph'] and geo['h']['cy'] == geo['feet'],
+          f'the third board is not on the pass-end counter with its cook behind it: {geo["h"]}, counter {geo["x0"]}..{geo["E"]["x1"]}')
+    check(all(geo['prep']['x'] <= x <= geo['prep']['x'] + geo['prep']['w'] and y == 172 for x, y in geo['line']), f'the cold counter\'s boards moved: {geo["line"]}')
+    check(geo['rowN'] == 11 and geo['cap'] == 3, f'the pass lost room: {geo["rowN"]} plate spots, {geo["cap"]} plating places (11, 3 before)')
+    halves = [[x for x in geo['row'] if x < geo['gap'][0]], [x for x in geo['row'] if x > geo['gap'][1]]]
+    check(all(b2 - a >= 17.9 for h in halves for a, b2 in zip(h, h[1:])) and max(geo['row']) + 9 <= geo['x0'],
+          f'the plates are closer together or on the board\'s counter: {[round(x) for x in geo["row"]]}, the counter from {geo["x0"]}')
+    check(not geo['standIn'] and not geo['dropIn'] and not geo['doorIn'] and geo['gap'] == [188, 212],
+          f'something stands in the way: cook {geo["standIn"]}, cart drop {geo["dropIn"]}, Jill\'s door {geo["doorIn"]}, opening {geo["gap"]}')
+    g.ev(r"""window.__s3={max:0,ext:0,extAt:0,trio:null};window.__samp3=function(){const P=R.slots.filter(s=>s.type==='prep');const on=[];
+      for(const s of P){const n=s.wf;if(!n||n.slot!==s||n.st!=='work'||n.f!=='prep'||!n.who)continue;const a=R.ck&&R.ck[n.who];const sp=wfSpot(s);
+        const at=a&&!a.moving&&Math.hypot(a.x-sp.cx,a.y-sp.cy)<6;if(isPrepExt(s)){__s3.ext++;if(at)__s3.extAt++}if(at)on.push({no:s.no,who:n.who,x:Math.round(a.x),y:Math.round(a.y)})}
+      if(on.length>__s3.max){__s3.max=on.length;if(on.length>=3)__s3.trio=on}}""")
+    g.ev(_PLAY + "(260)")
+    s3 = json.loads(g.ev("JSON.stringify(__s3)"))
+    check(s3['ext'] >= 10 and s3['extAt'] >= 5, f'the pass-end board was hardly used, or not by someone standing at it: {s3}')
+    trio = s3['trio']
+    check(trio and len({t['no'] for t in trio}) == 3 and len({t['who'] for t in trio}) == 3 and
+          min(abs(a['x'] - c['x']) + abs(a['y'] - c['y']) for i, a in enumerate(trio) for c in trio[i + 1:]) >= 12,
+          f'never three dishes on three boards with three cooks at three places: {s3}')
+    check(not g.errors, f'page errors: {g.errors[:3]}')
+    g.close()
+
+
+@test
+def without_kitchen_two_the_cold_counter_keeps_two(b, port, target):
+    """Decision 六: the third board is kitchen II's — the user's Day 61 save (the walk-in, no kitchen II) has the cold counter's two
+    and nothing on the pass's end (no place, no counter drawn, the right half's plates where they were); built, the next service has
+    three. An old checkpoint laid out before the kinds were kept (the Day 89 save: 16 places, kitchen II) is read as the kitchen was
+    then, the new board free — see qa_the_players_checkpoints_resume for the evening coming back."""
+    g = Game(b, port, target, seed=964, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day61_0933.json')
+    check(not g.ev("projOn('kitchen2')"), 'the case: the Day 61 save has no kitchen II')
+    to_service(g)
+    a = json.loads(g.ev("JSON.stringify({n:R.slots.filter(s=>s.type==='prep').length,ext:R.slots.some(isPrepExt),row:Array.from({length:wfRowN()},(_,i)=>Math.round(wfRowX(i)*10)/10)})"))
+    check(a['n'] == 2 and not a['ext'], f'without kitchen II: {a}')
+    want = [round(x * 10) / 10 for x in g.ev("(()=>{const E=passEnds(),n=wfRowN(),nl=Math.ceil(n/2),p=projOn('pass')?18:18.5;return Array.from({length:n},(_,i)=>{if(i<nl)return E.x0+17+i*p;const nr=n-nl,span=(E.x1-17)-(PASS_GAP.x1+17);return PASS_GAP.x1+17+(span-(nr-1)*p)/2+(i-nl)*p})})()")]
+    check(a['row'] == want, f'the plates moved without kitchen II: {a["row"]} (as before: {want})')
+    g.ev("S.rooms.kitchen2=1;R.slots=buildSlots()")
+    check(g.ev("R.slots.filter(s=>s.type==='prep').length") == 3 and g.ev("R.slots.some(isPrepExt)"), 'with kitchen II built, three')
+    check(not g.errors, f'page errors: {g.errors[:3]}')
+    g.close()
+    # the user's Day 89 checkpoint (kitchen II, 16 places, no kinds kept — saved before 2026-10-09): onto today's 17 as it was
+    g = Game(b, port, target, seed=964, manual=True, viewport={'width': 390, 'height': 844})
+    raw = load_save(g, 'player_day89_0448.json')
+    snap = raw['checkpoint']['snap']
+    m = json.loads(g.ev(r"""JSON.stringify((snap=>{const slots=buildSlots();const map=slotMapOf(slots,snap);return {now:slots.length,n:snap.slotsN,map,ext:slots.findIndex(isPrepExt),kinds:map&&map.map(i=>i<0?null:slots[i].type+slots[i].no)}})(%s))""" % json.dumps({'slotsN': snap.get('slotsN')})))
+    check(m['n'] == 16 and m['now'] == 17 and m['map'] and len(m['map']) == 16 and m['ext'] not in m['map'] and -1 not in m['map'],
+          f'the Day 89 checkpoint is not laid onto today\'s kitchen as it was: {m}')
+    check(not g.errors, f'page errors: {g.errors[:3]}')
+    g.close()
+
+
+@test
+def the_cold_room_is_the_last_cold_step(b, port, target):
+    """Decision 七: 「新增後期冷藏庫升級：400 → 550 份」「使用既有店舖工程或冷藏設備升級系統」「升級費用定為 $60,000」「保留原有容量升級階段，
+    這是最高階的額外擴充」「UI 應明確標示增加的容量與費用」「不增加日常手動補貨步驟」「舊存檔保留原本已購買的所有升級，不自動扣錢」. The user's
+    Day 92 save (fridge LV5, the cold room, the walk-in: 400): opened, nothing charged, every work it had still built, the fridge
+    400; 廚房設備 › 後場工程 shows 冷藏室擴建 with $60,000, 「+150 份」 and 550; a tap builds it for exactly $60,000; the next morning the
+    fridge holds 550, the day's shortfall line counts with 550, one tap of 一鍵補到建議量 fills it, and 「可升級」 is no longer said
+    (nothing is left to buy). Without the walk-in it cannot be bought (the Day 33 save)."""
+    from player import Player
+    p = Player(b, port, target, save='player_day92_2105.json', W=390, checkpoint=False)
+    try:
+        raw = json.load(open(os.path.join(ROOT, 'tests', 'saves', 'player_day92_2105.json'), encoding='utf-8'))
+        raw = raw.get('save', raw)
+        p.tap('#screen [data-act=open]'); p.settle()
+        check(p.state()['phase'] == 'shop', f'not in the shop: {p.state()}')
+        st = json.loads(p.ev("JSON.stringify({money:S.money,cap:fridgeCap(),rooms:Object.keys(S.rooms).filter(k=>S.rooms[k]).sort(),cold:projOn('coldroom'),grow:fridgeCanGrow()})"))
+        check(st['money'] == raw['money'] and st['cap'] == 400 and not st['cold'] and st['grow'], f'opening the save: {st} (money in the file {raw["money"]})')
+        check(st['rooms'] == sorted(k for k, v in (raw.get('rooms') or {}).items() if v), f'the works built are not all kept: {st["rooms"]}')
+        p.tap('#screen [data-act=tab][data-k=kitchen]'); p.settle()
+        card = p.ev("(()=>{const b=document.querySelector('#screen [data-act=buyProject][data-k=coldroom]');const it=b&&b.closest('.item');return it?it.innerText:null})()")
+        check(card and '冷藏室擴建' in card and '$60,000' in card and '+150 份' in card and '550 份' in card, f'the card does not say what it adds and costs: {card!r}')
+        m0 = p.ev("S.money")
+        p.tap('#screen [data-act=buyProject][data-k=coldroom]'); p.adv(2.0); p.settle()
+        check(p.ev("projOn('coldroom')") and m0 - p.ev("S.money") == 60000, f'the cold room was not built for $60,000: {m0} → {p.ev("S.money")}')
+        rv = p.ev("(document.querySelector('#reveal')||{}).innerText||''")
+        check('冷藏室擴建' in rv and '+150 份' in rv, f'the completion card does not say what it adds: {rv!r}')
+        p.tap('#reveal [data-act=revealClose]'); p.settle()
+        check(p.ev("fridgeCap()") == 550 and not p.ev("fridgeCanGrow()"), f'the fridge holds {p.ev("fridgeCap()")} (550)')
+        p.tap('#screen [data-act=nextDay]'); p.settle()
+        out = json.loads(p.ev("JSON.stringify({capd:S.today.sugCapped||0,tot:stockTotal(),short:(document.querySelector('#screen .rs-short')||{}).innerText||'',fr:(document.querySelector('#screen .rs-h')||{}).innerText||''})"))
+        check('/550 份' in out['fr'], f'the restock card does not count with 550: {out}')
+        check(not out['capd'] or ('冰箱容量 550 份' in out['short'] and '可升級' not in out['short']), f'the shortfall line: {out}')
+        spent = p.restock()
+        after = json.loads(p.ev("JSON.stringify({tot:stockTotal(),cap:fridgeCap(),dis:document.querySelector('#screen [data-act=restock]').disabled})"))
+        check(spent > 0 and after['dis'] and (after['tot'] >= 545 or not out['capd']), f'one tap did not fill the bigger fridge: spent {spent}, {after}')
+        check(not p.errors, f'page errors: {p.errors[:3]}')
+    finally:
+        p.close()
+    q = Player(b, port, target, save='player_day33.json', W=390, checkpoint=False)
+    try:
+        q.ev("S.level=5;shopTab='kitchen';showShop()"); q.frames(4)
+        ok = q.ev("(()=>{const P=ALL_PROJECTS().find(x=>x.k==='coldroom');return projNeedOk(P)})()")
+        check(ok is False and not q.ev("!!document.querySelector('#screen [data-act=buyProject][data-k=coldroom]')"), 'the cold room can be bought without the walk-in')
+    finally:
+        q.close()
+
+
+@test
+def the_forecast_counts_the_evening_that_comes(b, port, target):
+    """Decision 七: 「檢查原本預估客數固定約 102 位的封頂邏輯，改用合理的實際客流預估，不要讓後期固定顯示過低數字」. The cap stays where it was
+    (it plans the evening's parties; the arrivals do not change); the number shown is those parties at their real size and what the last
+    evenings brought on top. On the user's Day 92 save: 「預計約 N 位客人」 is the parties × meanGroupSize() × S.flowK, above the old
+    ~102; the task 「服務 N 位客人」 keeps its number (75% of the old estimate); an evening played teaches S.flowK what came (served and
+    gone from the queue), and the next morning's number is that evening's arrivals within a fifth."""
+    g = Game(b, port, target, seed=965, manual=True, viewport={'width': 390, 'height': 844})
+    load_save(g, 'player_day92_2105.json')
+    if g.ev("phase") == 'shop':
+        g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(200)
+    a = json.loads(g.ev(r"""JSON.stringify((()=>{const T=S.today;const txt=(document.querySelector('#screen .card.today b')||{}).innerText||'';const task=(T.tasks.find(t=>t.k==='guests')||{}).n;
+      const NT=tablesTotal();return {groups:T.groups,people:T.people,flow:T.flow,base:T.flowBase,mean:meanGroupSize(),k:S.flowK||null,txt,task,old:Math.round(T.groups*1.45),NT,capG:Math.round(NT*dayDur(S.day)/75)}})())"""))
+    check(a['NT'] >= 8 and a['groups'] <= a['capG'], f'the evening\'s parties are no longer capped (the arrivals would change): {a}')
+    check(a['txt'].endswith(f'預計約 {a["flow"]} 位客人'), f'the card does not show the forecast: {a}')
+    check(a['flow'] == round(a['groups'] * a['mean'] * (a['k'] or 1)) and a['flow'] > a['old'], f'the forecast: {a}')
+    check(a['task'] is None or a['task'] == max(3, int(a['people'] * .75 + .5)), f'the guests task changed its number: {a}')   # (Math.round)
+    to_service(g)
+    g.ev(_PLAY + "(400)")
+    for _ in range(40):
+        if g.ev("phase") == 'summary':
+            break
+        g.ev(_PLAY + "(30)")
+    check(g.ev("phase") == 'summary', f'the evening did not end: {g.ev("phase")}')
+    came = g.ev("S.lastSummary.guests+S.lastSummary.lost")
+    k = g.ev("S.flowK")
+    check(k and 1.0 <= k <= 2.4, f'S.flowK was not learned from the evening: {k}')
+    g.click('#screen [data-act=toShop]') if g.page.query_selector('#screen [data-act=toShop]') else None
+    g.ev("if(phase!=='shop')showShop()"); g.click('#screen [data-act=nextDay]'); g.page.wait_for_timeout(200)
+    f2 = g.ev("S.today.flow")
+    check(abs(f2 - came) <= came * .2, f'the next morning says {f2} people; the evening before brought {came} (k {k})')
+    check(not g.errors, f'page errors: {g.errors[:3]}')
+    g.close()
